@@ -347,6 +347,9 @@ PUBLIC VARREF sorter(VARREF iostring, SV sepchar DEFAULT__FM) {return iostring.s
 ND PUBLIC var reverse(CVR instring, SV sepchar DEFAULT__FM) {return instring.reverse(sepchar);}
 PUBLIC VARREF reverser(VARREF iostring, SV sepchar DEFAULT__FM) {return iostring.reverser(sepchar);}
 
+ND PUBLIC var shuffle(CVR instring, SV sepchar DEFAULT__FM) {return instring.shuffle(sepchar);}
+PUBLIC VARREF shuffler(VARREF iostring, SV sepchar DEFAULT__FM) {return iostring.shuffler(sepchar);}
+
 ND PUBLIC var parser(CVR instring, char sepchar DEFAULT_CSPACE) {return instring.parse(sepchar);}
 PUBLIC VARREF parser(VARREF iostring, char sepchar DEFAULT_CSPACE) {return iostring.parser(sepchar);}
 

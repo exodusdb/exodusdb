@@ -167,12 +167,17 @@ friend class var;
 	ND dim reverse() const& {return dim(*this).reverser();}
 	ND dim& reverse() && {return this->reverser();}
 
+	ND dim shuffle() const& {return dim(*this).shuffler();}
+	ND dim& shuffle() && {return this->shuffler();}
+
 	///////////
 	// MUTATORS
 	///////////
 
 	dim& sorter(bool reverse = false);
 	dim& reverser();
+	dim& shuffler();
+
 	dim& splitter(CVR str1, SV sepchar = _FM);
 	dim& eraser(std::vector<var>::iterator iter1, std::vector<var>::iterator iter2) {data_.erase(iter1, iter2); return *this;}
 

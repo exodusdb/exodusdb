@@ -21,6 +21,8 @@ THE SOFTWARE.
 */
 
 #include <algorithm>
+#include <random>
+#include <memory>
 
 #include <exodus/varimpl.h>
 #include <exodus/dim.h>
@@ -31,6 +33,9 @@ THE SOFTWARE.
 // index is zero
 
 namespace exodus {
+
+	using RNG_typ = std::mt19937;
+	extern thread_local std::unique_ptr<RNG_typ> thread_RNG;
 
 	// Not currently used because we only provide begin/end iterator for dim
 	// and these cannot change the number of vector elements, only reorder them
@@ -426,6 +431,19 @@ dim& dim::reverser() {
 	return *this;
 }
 
+dim& dim::shuffler() {
+
+	// We must use dim's custom begin to skip element zero
+	//std::random_device rd;
+	//std::mt19937 g(rd());
+	// Create a base generator per thread on the heap. Will be destroyed on thread termination.
+	if (not thread_RNG.get())
+		var(0).initrnd();
+	std::shuffle(this->begin(), this->end(), *thread_RNG);
+
+	return *this;
+}
+
 bool dim::read(CVR filevar, CVR key) {
 
 	THISIS("bool dim::read(CVR filevar, CVR key)")
@@ -552,7 +570,7 @@ VARREF var::reverser(SV sepchar) {
 	return *this;
 }
 
-//reverseing var - using temporary dim
+//reversing var - using temporary dim
 var var::reverse(SV sepchar) const& {
 
 	THISIS("var var::reverse(SV sepchar = FM)")
@@ -646,6 +664,23 @@ var var::reverse(SV sepchar) const& {
 
 	return nrvo;
 
+}
+
+///////////////
+// var shuffler
+///////////////
+
+// no speed or memory advantage since not shuffling in place
+// but provided for syntactical convenience avoiding need to assign output of shuffle()
+VARREF var::shuffler(SV sepchar) {
+	(*this) = this->split(sepchar).shuffler().join(sepchar);
+	return *this;
+}
+
+// no speed or memory advantage since not shuffling in place
+// but provided for syntactical convenience avoiding need to assign output of shuffle()
+var var::shuffle(SV sepchar) const& {
+	return this->split(sepchar).shuffler().join(sepchar);
 }
 
 }  // namespace exodus

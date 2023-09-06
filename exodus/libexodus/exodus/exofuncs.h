@@ -394,6 +394,9 @@ VARREF sorter(VARREF iostring, SV sepchar DEFAULT__FM);
 ND var reverse(CVR instring, SV sepchar DEFAULT__FM);
 VARREF reverser(VARREF iostring, SV sepchar DEFAULT__FM);
 
+ND var shuffle(CVR instring, SV sepchar DEFAULT__FM);
+VARREF shuffler(VARREF iostring, SV sepchar DEFAULT__FM);
+
 ND var parser(CVR instring, char sepchar DEFAULT_CSPACE);
 VARREF parser(VARREF iostring, char sepchar DEFAULT_CSPACE);
 
