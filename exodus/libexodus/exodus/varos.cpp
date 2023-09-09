@@ -46,34 +46,55 @@ THE SOFTWARE.
 #include <exodus/varimpl.h>
 #include <exodus/varoshandle.h>
 
-std::once_flag locale_once_flag;
-
-void locale_once_func() {
-	// so wcscoll() sorts a<B etc instead of character number wise where B<a
-	// wcscoll currently only used on non-pc/non-mac ... see var::localeAwareCompare
-	// so has no effect on those platform for < <= etc
-	// only en_US.utf-8 seems to be widely available on all platforms
-	//.utf8 causes a utf-8 to wchar conversion when converting string to wstring by iterators
-	//.begin() .end() and we want to be able to control conversion more accurately than an
-	// automatic conversion en_US is missing from Ubuntu. en_IN is available on Ubuntu and
-	// Centos but not MacOSX if (!setlocale (LC_COLLATE, "en_US.utf8"))
-	// en_US.utf8 
-	//std::cout << std::cout.getloc().name() << std::endl;
-	if (!setlocale(LC_ALL, "en_US.utf8")) {
-		if (!setlocale(LC_ALL, "C.UTF-8"))
-			std::cout << "Cannot setlocale LC_COLLATE to en_US.utf8" << std::endl;
-	}
-	//std::cout << std::cout.getloc().name() << std::endl;
-}
-
-class LocaleOnce {
-   public:
-	LocaleOnce() { std::call_once(locale_once_flag, locale_once_func); }
-};
-
-static LocaleOnce locale_once_static;
-
 namespace exodus {
+
+// setgloballocale object constructs to standard on program startup
+// for correct collation
+class SetGlobalLocale {
+   public:
+	SetGlobalLocale() {
+
+//		// function to dump i/o stream locales for debugging
+//		auto dump = [](std::string is_was) {
+//			std::clog << "glob locale " << is_was << " " << std::locale("").name().c_str() << '\n';
+//			std::clog << "cout locale " << is_was << " " << std::cout.getloc().name() << '\n';
+//			std::clog << "cin  locale " << is_was << " " << std::cin.getloc().name() << '\n';
+//			std::clog << "cerr locale " << is_was << " " << std::cerr.getloc().name() << '\n';
+//		};
+
+		// Dump io stream locales before standardisation
+		//dump("was");
+		/*
+			glob locale was C.UTF-8
+			cout locale was C
+			cin  locale was C
+			cerr locale was C
+		*/
+
+		// Set the global default locale
+		if (!setlocale(LC_ALL, "en_US.utf8")) {
+			if (!setlocale(LC_ALL, "C.UTF-8"))
+				std::clog << "Cannot setlocale LC_COLLATE to en_US.utf8 or C.UTF-8" << std::endl;
+		}
+
+		// Imbue io streams with exodus standard locale
+		std::cout.imbue(std::locale(""));
+		std::cin.imbue(std::locale(""));
+		std::clog.imbue(std::locale(""));
+		std::cerr.imbue(std::locale(""));
+
+		// Dump io stream locales after standardisation
+		//dump("is");
+		/*
+			glob locale is C.UTF-8
+			cout locale is C.UTF-8
+			cin  locale is C.UTF-8
+			cerr locale is C.UTF-8
+		*/
+
+	}
+
+} setgloballocale;
 
 // this object caches fstream * pointers, to avoid multiple reopening files
 // extern VarOSHandlesCache mv_handles_cache;

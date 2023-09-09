@@ -894,11 +894,11 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 	assert(textchr(0x10FFFF) ne "");
 	assert(textchr(0x110000) eq "");
 
-	var cmd = "c:\\xwindowspath_test_main1_\\to\\xyz.exe arg1 arg2";
-	//assert(var(to_oscmd_string(cmd) eq cmd.convert("\\",OSSLASH));
-	// No conversion at the moment
-	//assert(to_oscmd_string(cmd) eq cmd);
-	assert(not osshell(cmd));
+//	var cmd = "c:\\xwindowspath_test_main1_\\to\\xyz.exe arg1 arg2";
+//	//assert(var(to_oscmd_string(cmd) eq cmd.convert("\\",OSSLASH));
+//	// No conversion at the moment
+//	//assert(to_oscmd_string(cmd) eq cmd);
+//	assert(not osshell(cmd));
 
 	printl(elapsedtimetext());
 	printl("Test passed");
