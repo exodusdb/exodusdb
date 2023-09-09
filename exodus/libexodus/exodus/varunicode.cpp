@@ -48,8 +48,8 @@ bool var::setxlocale() const {
 	// TODO do this in thread creation
 	// TODO destroy threalocale in thread destruction *OTHERWISE MEMORY LEAK
 	// to avoid checking on every setxlocale
-	if (uselocale(nullptr) == uselocale(LC_GLOBAL_LOCALE))
-		uselocale(duplocale(uselocale(LC_GLOBAL_LOCALE)));
+//	if (uselocale(nullptr) == uselocale(LC_GLOBAL_LOCALE))
+//		uselocale(duplocale(uselocale(LC_GLOBAL_LOCALE)));
 
 	return setlocale(LC_ALL, (*this).toString().c_str()) != nullptr;
 	// return setlocale(LC_CTYPE,(*this).toString().c_str())!=nullptr;

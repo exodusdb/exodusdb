@@ -56,6 +56,7 @@ class SetGlobalLocale {
 
 //		// function to dump i/o stream locales for debugging
 //		auto dump = [](std::string is_was) {
+//			std::clog << "thrd locale " << is_was << " " << uselocale((locale_t) 0) << '\n';
 //			std::clog << "glob locale " << is_was << " " << std::locale("").name().c_str() << '\n';
 //			std::clog << "cout locale " << is_was << " " << std::cout.getloc().name() << '\n';
 //			std::clog << "cin  locale " << is_was << " " << std::cin.getloc().name() << '\n';
@@ -77,6 +78,9 @@ class SetGlobalLocale {
 				std::clog << "Cannot setlocale LC_COLLATE to en_US.utf8 or C.UTF-8" << std::endl;
 		}
 
+		// The calling thread's current locale is set to the global locale determined by setlocale(3).
+		//uselocale(LC_GLOBAL_LOCALE);
+
 		// Imbue io streams with exodus standard locale
 		std::cout.imbue(std::locale(""));
 		std::cin.imbue(std::locale(""));
@@ -84,7 +88,7 @@ class SetGlobalLocale {
 		std::cerr.imbue(std::locale(""));
 
 		// Dump io stream locales after standardisation
-		//dump("is");
+		//dump("is ");
 		/*
 			glob locale is C.UTF-8
 			cout locale is C.UTF-8
