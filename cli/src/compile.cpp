@@ -278,6 +278,13 @@ function main() {
 			//This enables some extra warning flags that are not enabled by -Wall.
 			basicoptions ^= " -Wextra";
 
+			// Make all warnings the same as errors
+			// Omitting this to avoid blocking application programmers over technical matters
+			//basicoptions ^= " -Werror";
+
+			// Warnings for dangerous implicit conversions e.g. int -> char
+			basicoptions ^= " -Wconversion";
+
 			// Allow "Elvis operator" ?:
 			//warning: ISO C++ does not allow ?: with omitted middle operand [-Wpedantic]
 			//basicoptions ^= " -Wpedantic";
