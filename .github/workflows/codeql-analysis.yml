@@ -12,8 +12,8 @@
 name: "CodeQL"
 
 on:
-  #push:
-  #  branches: [ master ]
+  push:
+    branches: [ master ]
   #pull_request:
   #  # The branches below must be a subset of the branches above
   #  branches: [ master ]
@@ -39,11 +39,11 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL
-      uses: github/codeql-action/init@v1
+      uses: github/codeql-action/init@v2
       with:
         languages: ${{ matrix.language }}
         # If you wish to specify custom queries, you can do so here or in a config file.
@@ -67,11 +67,12 @@ jobs:
     #   make bootstrap
     #   make release
 
-    - run: |
-       sudo apt update
-       sudo apt install -yq postgresql-server-dev-all libboost-dev libboost-system-dev libboost-regex-dev libboost-thread-dev libboost-locale-dev libboost-chrono-dev libboost-date-time-dev libboost-atomic-dev
-       cmake .
-       make
+    #- run: |
+    #   sudo apt-get update
+    #   #sudo apt-get install -yq postgresql-server-dev-1* libboost-dev libboost-system-dev libboost-regex-dev libboost-thread-dev libboost-locale-dev libboost-chrono-dev libboost-date-time-dev libboost-atomic-dev
+    #   sudo apt-get install -yq postgresql-server-dev-1* libboost-regex-dev libboost-locale-dev
+    #   cmake .
+    #   make
 
     - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v1
+      uses: github/codeql-action/analyze@v2
