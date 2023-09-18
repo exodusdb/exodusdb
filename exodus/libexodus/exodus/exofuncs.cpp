@@ -82,10 +82,10 @@ PUBLIC void osclose(CVR osfilevar) {osfilevar.osclose();}
 ND PUBLIC bool osbread(VARREF data, CVR osfilevar, VARREF offset, const int length) {return data.osbread(osfilevar, offset, length);}
 ND PUBLIC bool osbwrite(CVR data, CVR osfilevar, VARREF offset) {return data.osbwrite(osfilevar, offset);}
 // Versions where offset is const offset e.g. numeric ints
-#ifdef VAR_OSBREADWRITE_CONST_OFFSET
-ND PUBLIC bool osbread(VARREF data, CVR osfilevar, CVR offset, const int length) {return data.osbread(osfilevar, const_cast<VARREF>(offset), length);}
-ND PUBLIC bool osbwrite(CVR data, CVR osfilevar, CVR offset) {return data.osbwrite(osfilevar, const_cast<VARREF>(offset));}
-#endif
+//#ifdef VAR_OSBREADWRITE_CONST_OFFSET
+//ND PUBLIC bool osbread(VARREF data, CVR osfilevar, CVR offset, const int length) {return data.osbread(osfilevar, const_cast<VARREF>(offset), length);}
+//ND PUBLIC bool osbwrite(CVR data, CVR osfilevar, CVR offset) {return data.osbwrite(osfilevar, const_cast<VARREF>(offset));}
+//#endif
 
 // Read/Write whole osfile
 ND PUBLIC bool oswrite(CVR data, CVR osfilepath, const char* codepage DEFAULT_EMPTY) {return data.oswrite(osfilepath, codepage);}

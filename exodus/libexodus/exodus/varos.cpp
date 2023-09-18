@@ -648,16 +648,16 @@ bool var::oswrite(CVR osfilename, const char* codepage) const {
 	return !failed;
 }
 
-#ifdef VAR_OSBREADWRITE_CONST_OFFSET
+//#ifdef VAR_OSBREADWRITE_CONST_OFFSET
 // a version that accepts a const offset ie ignores return value
 //bool var::osbwrite(CVR osfilevar, CVR offset, const bool adjust) const
 // offset -1 appends by starting writing one byte after the current end of the file
 // offset -2 updates the last byte of the file.
 // etc.
-bool var::osbwrite(CVR osfilevar, CVR offset) const {
-	return this->osbwrite(osfilevar, const_cast<VARREF>(offset));
-}
-#endif
+//bool var::osbwrite(CVR osfilevar, CVR offset) const {
+//	return this->osbwrite(osfilevar, const_cast<VARREF>(offset));
+//}
+//#endif
 
 //NOTE: unlike osread/oswrite which rely on iconv codepages to do any conversion
 //osbread and osbwrite rely on the locale being passed in on the osopen stage
