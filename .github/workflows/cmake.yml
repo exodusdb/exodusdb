@@ -16,8 +16,8 @@ jobs:
           #  PG_VER: 10
           #- UBUNTU_VER: 20.04
           #  PG_VER: 11
-#          - UBUNTU_VER: 20.04
-#            PG_VER: 12
+          - UBUNTU_VER: 20.04
+            PG_VER: 12
           #- UBUNTU_VER: 20.04
           #  PG_VER: 13
           #- UBUNTU_VER: 20.04
@@ -45,12 +45,11 @@ jobs:
     if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
     steps:
     - uses: actions/checkout@v3
+      with:
+        submodules: recursive
 
     - name: Install all
       run: |
         pwd # /home/runner/work/exodusdb/exodusdb
-        ls
-        # actions/checkout@v3 doesnt do git --recursive, so the pgexodus submodule download must be triggered here
-        git submodule init
-        git submodule update
+        ls -l
         sudo ./install_all.sh ubuntu-${{ matrix.UBUNTU_VER }} ${{ matrix.PG_VER }}

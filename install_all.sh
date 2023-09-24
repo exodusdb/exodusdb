@@ -88,6 +88,15 @@ set -euxo pipefail
 #	cd $EXODUS/build
 #	CTEST_OUTPUT_ON_FAILURE=1 CTEST_PARALLEL_LEVEL=`nproc` ctest
 :
+: ----------------------------------------
+: Check that postgresql is running locally
+: ----------------------------------------
+	psql --version || true
+	systemctl start postgresql || true
+	systemctl status postgresql || true
+	pgrep postgres -a || true
+	ls /var/run/postgresql || true
+:
 : -------------------------------
 : Configure postgresql for exodus
 : -------------------------------
@@ -98,14 +107,6 @@ set -euxo pipefail
 	# Optional. Remove warning by enable others/postgres to cd into build dir
 	# 'could not change directory to "/root": Permission denied'
 	chmod o+x $HOME
-
-	# Is postgres running?
-	systemctl status postgresql || true
-	systemctl start postgresql || true
-	systemctl status postgresql || true
-	psql --version || true
-	pgrep postgres -a || true
-	ls /var/run/postgresql || true
 
 	# Install into template1
 	sudo -u postgres psql < $EXODUS/install_template1.sql
