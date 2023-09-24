@@ -20,4 +20,8 @@ jobs:
     - name: Install all
       shell: bash
       working-directory: ${{github.workspace}}
-      run: sudo ./install_all.sh 22.04 14
+      run: |
+        pwd
+        ls
+        cat install_all.sh
+        sudo ./install_all.sh 22.04 14
