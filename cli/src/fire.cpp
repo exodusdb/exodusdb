@@ -32,8 +32,12 @@ function main() {
 
 	for (in osfilename : COMMAND) {
 
-		if (not RECORD.osread(osfilename))
-			abort(lasterror());
+		// Get text or skip
+		if (not RECORD.osread(osfilename)) {
+			//logputl(lasterror());
+			continue;
+		}
+
 		let origrec = RECORD;
 
 		//RECORD.regex_replacer(R"___(\tcall fsmsg\(\);\n\t+stop\(\);)___", R"___(\tabort\(lasterror\);)___", "s");
