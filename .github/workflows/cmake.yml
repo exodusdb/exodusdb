@@ -17,6 +17,7 @@ jobs:
     if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
     steps:
     - uses: actions/checkout@v3
+
     - name: Install all
       shell: bash
       working-directory: ${{github.workspace}}
@@ -24,4 +25,4 @@ jobs:
         pwd
         ls
         cat install_all.sh
-        sudo ./install_all.sh 22.04 14
+        #sudo ./install_all.sh 22.04 14
