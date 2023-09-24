@@ -1,9 +1,9 @@
 #!/bin/bash
 set -euxo pipefail
 :
-: -----------------------------
-: Builds exodus and installs it
-: -----------------------------
+: ------------------------------
+: Build, install and test exodus
+: ------------------------------
 :
 :	Ubuntu	Postgres
 :	23.04	15 OK
@@ -33,7 +33,20 @@ set -euxo pipefail
 : ------------------
 :
 	if ! test -f upgraded.txt; then
-		apt update && DEBIAN_FRONTEND=noninteractive apt -y upgrade
+		apt update
+		#skip upgrade since github workflow images contain a lot of unwanted packages
+		#apt -y upgrade
+		#The following packages will be upgraded:
+		#  aspnetcore-runtime-6.0 aspnetcore-runtime-7.0 aspnetcore-targeting-pack-6.0
+		#  aspnetcore-targeting-pack-7.0 bind9-dnsutils bind9-host bind9-libs dnsutils
+		#  dotnet-apphost-pack-6.0 dotnet-apphost-pack-7.0 dotnet-hostfxr-6.0
+		#  dotnet-runtime-6.0 dotnet-runtime-7.0 dotnet-targeting-pack-6.0
+		#  dotnet-targeting-pack-7.0 firefox lib32gcc-s1 lib32stdc++6 libatomic1
+		#  libcc1-0 libcups2 libgcc-s1 libgomp1 libitm1 liblsan0 libobjc4 libquadmath0
+		#  libstdc++6 libubsan1 linux-azure linux-cloud-tools-azure
+		#  linux-cloud-tools-common linux-headers-azure linux-image-azure
+		#  linux-libc-dev linux-tools-azure linux-tools-common
+		#  netstandard-targeting-pack-2.1 podman powershell ubuntu-advantage-tools
 	fi
 :
 : -----------------------------
@@ -84,7 +97,12 @@ set -euxo pipefail
 
 	# Optional. Remove warning by enable others/postgres to cd into build dir
 	# 'could not change directory to "/root": Permission denied'
-	#chmod o+x \$HOME
+	chmod o+x $HOME
+
+	# Is postgres running?
+	psql --version || true
+	pgrep postgres -a || true
+	ls /var/run/postgresql || true
 
 	# Install into template1
 	sudo -u postgres psql < $EXODUS/install_template1.sql

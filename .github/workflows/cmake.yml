@@ -8,21 +8,49 @@ env:
 
 jobs:
   build:
-    # The CMake configure and build commands are platform agnostic and should work equally
-    # well on Windows or Mac.  You can convert this to a matrix build if you need
-    # cross-platform coverage.
-    # See: https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
-    #runs-on: ubuntu-20.04
-    runs-on: ubuntu-22.04
+
+    strategy:
+      matrix:
+        include:
+          #- UBUNTU_VER: 20.04
+          #  PG_VER: 10
+          #- UBUNTU_VER: 20.04
+          #  PG_VER: 11
+#          - UBUNTU_VER: 20.04
+#            PG_VER: 12
+          #- UBUNTU_VER: 20.04
+          #  PG_VER: 13
+          #- UBUNTU_VER: 20.04
+          #  PG_VER: 14
+          #- UBUNTU_VER: 20.04
+          #  PG_VER: 15
+          ##- UBUNTU_VER: 20.04
+          ##  PG_VER: 16
+          #- UBUNTU_VER: 22.04
+          #  PG_VER: 10
+          #- UBUNTU_VER: 22.04
+          #  PG_VER: 11
+          #- UBUNTU_VER: 22.04
+          #  PG_VER: 12
+          #- UBUNTU_VER: 22.04
+          #  PG_VER: 13
+          - UBUNTU_VER: 22.04
+            PG_VER: 14
+          #- UBUNTU_VER: 22.04
+          #  PG_VER: 15
+          #- UBUNTU_VER: 22.04
+          #  PG_VER: 16
+
+    runs-on: ubuntu-${{ matrix.UBUNTU_VER }}
     if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
     steps:
     - uses: actions/checkout@v3
 
     - name: Install all
       run: |
-        pwd
+        pwd # /home/runner/work/exodusdb/exodusdb
         ls
         # actions/checkout@v3 doesnt do git --recursive, so the pgexodus submodule download must be triggered here
         git submodule init
         git submodule update
-        sudo ./install_all.sh 22.04 14
+        sudo ./install_all.sh ubuntu-${{ matrix.UBUNTU_VER }} ${{ matrix.PG_VER }}
