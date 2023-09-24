@@ -16,10 +16,13 @@ jobs:
     runs-on: ubuntu-22.04
     if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v3
 
     - name: Install all
       run: |
         pwd
         ls
+        # actions/checkout@v3 doesnt do git --recursive, so the pgexodus submodule download must be triggered here
+        git submodule init
+        git submodule update
         sudo ./install_all.sh 22.04 14
