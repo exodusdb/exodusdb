@@ -2,7 +2,7 @@
 # Config
 # ######
 #
-	cmake_minimum_required(VERSION 3.1)
+	cmake_minimum_required(VERSION 3.10)
 	project(exodus_test)
 
 	#https://cmake.org/cmake/help/book/mastering-cmake/chapter/Testing%20With%20CMake%20and%20CTest.html

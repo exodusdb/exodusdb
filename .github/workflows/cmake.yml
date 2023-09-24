@@ -34,8 +34,8 @@ jobs:
           #  PG_VER: 12
           #- UBUNTU_VER: 22.04
           #  PG_VER: 13
-          - UBUNTU_VER: 22.04
-            PG_VER: 14
+#          - UBUNTU_VER: 22.04
+#            PG_VER: 14
           #- UBUNTU_VER: 22.04
           #  PG_VER: 15
           #- UBUNTU_VER: 22.04
@@ -52,4 +52,5 @@ jobs:
       run: |
         pwd # /home/runner/work/exodusdb/exodusdb
         ls -l
+        sudo apt purge -y postgresql* # remove unwanted versions of postgresql (14?)
         sudo ./install_all.sh ubuntu-${{ matrix.UBUNTU_VER }} ${{ matrix.PG_VER }}
