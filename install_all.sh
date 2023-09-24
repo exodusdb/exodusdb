@@ -100,6 +100,9 @@ set -euxo pipefail
 	chmod o+x $HOME
 
 	# Is postgres running?
+	systemctl status postgresql || true
+	systemctl start postgresql || true
+	systemctl status postgresql || true
 	psql --version || true
 	pgrep postgres -a || true
 	ls /var/run/postgresql || true

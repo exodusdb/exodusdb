@@ -1,14 +1,17 @@
+#use make VERBOSE=1 to debug make
 #
 # CONFIG
 # ######
 #
-	cmake_minimum_required(VERSION 3.1)
+	cmake_minimum_required(VERSION 3.10)
 	project(exodus)
 
+#
+# CTest
+# #####
+#
 	include(CTest)
 	enable_testing()
-
-	#use make VERBOSE=1 to debug make
 
 #
 # CPack
@@ -164,11 +167,9 @@
 	#add_compile_options(-pg)
 
 #
-# Subdirs
-# #######
+# Subdirs/submodules
+# ##################
 #
-	message("CMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}")
-
 	add_subdirectory(exodus/libexodus/exodus)
 	#add_subdirectory(exodus/libpgexodus/src)
 	add_subdirectory(exodus/pgexodus)
@@ -191,3 +192,4 @@
 # Exit
 # ####
 #
+	message("CMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}")
