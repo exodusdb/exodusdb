@@ -18,5 +18,8 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Check packages
-      run: sudo apt search postgresql-server-dev
+    - name: Install all
+      run: |
+        pwd
+        ls
+        sudo ./install_all.sh 22.04 14
