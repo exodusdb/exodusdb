@@ -20,7 +20,7 @@ programinit()
 	assert(var().sqlexec(sql, ANS));
 	if (ANS) {
 		TRACE(ANS.convert(RM, _EOL).convert(FM, "\t"))
-		abort("There should be no 'idle in transaction'");
+		abort("Checking there are no hung transactions from cancelled test runs. There should be no 'idle in transaction'");
 	}
 
 	// Comment this out if you want to see anything in the database after an assert failure
@@ -339,6 +339,8 @@ dict(AGE_IN_YEARS) {
 	var clients_filename = "xo_clients";
 	if (myclients.open(clients_filename)) {
 
+		generate_xo_clients_dict_data(clients_filename);
+
 		printl();
 		printl("The following section requires data created by testsort.cpp");
 
@@ -610,6 +612,131 @@ dict(AGE_IN_YEARS) {
 	printl("Test passed");
 
 	return 0;
+}
+
+subroutine generate_xo_clients_dict_data(in filename) {
+
+	let dictfilename = "dict." ^ filename;
+
+	// Leave the test data files around for playing with after the program finishes
+	//let cleanup = false;
+
+	// Always delete and start from scratch (ignore fact that files will not exist the first time)
+	//if (cleanup) {
+	//deletefile(filename);
+	if (var().open(filename) and not deletefile(filename)) {
+		abort(lasterror());
+	}
+	//deletefile(dictfilename);
+	if (var().open(dictfilename) and not deletefile(dictfilename)) {
+		abort(lasterror());
+	}
+
+	printl("\nOpen or create test file ", filename);
+
+	var file;
+	if (not open(filename, file)) {
+		//createfile(filename);
+		if (not createfile(filename))
+			abort(lasterror());
+		if (not open(filename, file))
+			abort("Cannot create/open " ^ filename);
+	}
+
+	printl("\nOpen or create the test files dictionary ", dictfilename);
+
+	var dictfile;
+	if (not open(dictfilename, dictfile)) {
+		//createfile(dictfilename);
+		if (not createfile(dictfilename)) {
+			abort(lasterror());
+		}
+		if (not open(dictfilename, dictfile))
+			abort("Cannot create/open dictionary " ^ dictfilename);
+	}
+
+	printl("\nPrepare some dictionary records");
+
+
+	let dictrecs =
+		"CODE         |F|0|Code         ||||          ||L|8"  _FM
+		"NAME         |F|1|Name         ||||          ||T|15" _FM
+		"TYPE         |F|2|Type         ||||          ||L|5"  _FM
+		"DATE_CREATED |F|3|Date Created ||||D4        ||L|12" _FM
+		"TIME_CREATED |F|4|Time Created ||||MTH       ||L|12" _FM
+		"BALANCE      |F|5|Balance      ||||MD20P     ||R|10" _FM
+//		"TIMESTAMP    |F|6|Timestamp    ||||[DATETIME]||L|12"	_FM
+		"TIMESTAMP    |F|6|Timestamp    ||||          ||R|12" _FM
+		"NAME_AND_TYPE|S| |Name and Type||||          ||L|20" _FM
+		"NAME_AND_CODE|S| |Name and Code||||          ||L|20" _FM
+		"@CRT         |G| |CODE NAME TYPE NAME_AND_TYPE BALANCE DATE_CREATED TIME_CREATED TIMESTAMP"
+	;
+
+	printl("\nWrite the dictionary records to the dictionary");
+
+	// Using modern c++ range based for loop
+	for (var dictrec : dictrecs) {
+
+		let key = trim(field(dictrec, "|", 1));
+		var rec = field(dictrec, "|", 2, 999999);
+
+		printl(key, " : ", rec);
+
+		rec.trimmer();
+		rec.replacer(" |", "|");
+
+		rec.converter("|", FM);
+
+		write(rec, dictfile, key);
+
+		// Check we can read the record back
+		var rec2;
+		if (read(rec2, dictfile, key)) {
+			if (rec2 != rec)
+				printl("record differs?!");
+		} else
+			printl("Cant read ", key, " back");
+	}
+
+	var temprec;
+	if (not read(temprec, dictfile, "BALANCE"))
+		printl("Cant read 'balance' record from dictionary");
+
+	printl("\nNB 'name_and_type' dictionary item S type calls dict_xo_clients.cpp library function!");
+
+	printl("\nClear the client file");
+	//clearfile(filename);
+	if (var().open(filename) and not clearfile(filename)) {
+		abort(lasterror());
+	}
+
+	printl("\nPrepare some data records in a readable format");
+
+	var recs = "";
+	recs ^= FM ^ "SB001|Client AAA |A |15070|76539|1000.00|15070.76539";
+	recs ^= FM ^ "JB002|Client BBB |B |15000|50539|200.00 |15000.50539";
+	recs ^= FM ^ "JB001|Client CCC |B |15010|60539|2000.00|15010.60539";
+	recs ^= FM ^ "SB1  |Client SB1 |1 |     |     |       |           ";
+	recs ^= FM ^ "JB2  |Client JB2 |2 |14000|10539|0      |14000.10539";
+	recs ^= FM ^ "JB10 |Client JB10|10|14010|10539|2000.00|14010.10539";
+	paster(recs, 1, 1, "");
+
+	printl("\nWrite the data records to the data file");
+
+	//let maxrec = 100;
+
+	for (var rec : recs) {
+		let key = field(rec, "|", 1);
+		rec = field(rec, "|", 2, 9999);
+		printl(key, ": ", rec);
+		while (index(rec, " |"))
+			replacer(rec, " |", "|");
+		// OO syntax seems more readable here, so use it.
+		//write(trimlast(convert(rec, "|", FM)), file, trim(key));
+		rec.convert("|", FM).trimlast().write(file, key.trim());
+	}
+
+	return;
 }
 
 programexit()

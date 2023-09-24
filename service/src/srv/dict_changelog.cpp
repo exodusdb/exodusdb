@@ -9,7 +9,7 @@ function main() {
 	return ANS;
 }
 /*pgsql
-	ans := exodus_extract_text(DATA, 2, 0, 0);
+	ans := exodus.extract_text(DATA, 2, 0, 0);
 	ans := replace(ans, VM, ', ');
 	ans := replace(ans, SM, ', ');
 */

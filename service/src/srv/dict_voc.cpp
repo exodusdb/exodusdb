@@ -379,7 +379,7 @@ BEGIN
 	brandcode := key;
 	brand := xlate BRANDS brandcode ''
 	ans := split_part(brand,FM,2);
-	brandcode2 := exodus_extract_text(brand,8,1,1);
+	brandcode2 := exodus.extract_text(brand,8,1,1);
 	if brandcode2 != '' and brandcode2 != brandcode then
 		brandname2 := xlate BRANDS brandcode2 2
 		ans := brandname2 || ' ' || ans;

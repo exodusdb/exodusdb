@@ -121,8 +121,8 @@ void DBConnector::del_dbconn(const int index) {
 	if (iter != dbconns_.end()) {
 		//	PGconn* p /*std::pair<int, void*> p*/ = ;
 
-		if (iter->second.dbcache_.size())
-			var(iter->second.dbcache_.size()).errputl("del_dbconn: dbcache size was ");
+//		if (iter->second.dbcache_.size())
+//			var(iter->second.dbcache_.size()).logputl("del_dbconn: dbcache size was ");
 
 		del_(reinterpret_cast<PGconn*>(iter /*dbconns_.find(index)*/->second.pgconn_));
 		//delete /*dbconns_.find(index)*/ iter->second.locks__;
@@ -140,7 +140,7 @@ void DBConnector::del_dbconns(const int from_index) {
 			//TRACE(ix->first)
 
 			if (ix->second.dbcache_.size())
-				var(ix->second.dbcache_.size()).errputl("del_dbconns: []dbcache size was ");
+				var(ix->second.dbcache_.size()).logputl("del_dbconns: []dbcache size was ");
 
 			del_(reinterpret_cast<PGconn*>(ix->second.pgconn_));
 			//delete ix->second.locks__;

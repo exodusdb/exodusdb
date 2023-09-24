@@ -182,7 +182,7 @@ set -euxo pipefail
 : Finished install_all in $(($SECONDS/60)) minutes and $(($SECONDS%60)) seconds.
 : ==============================================================
 :
-:	Apache should now be listening on ipno $IPNO port 443
+:	Apache is now listening on https://$IPNO
 :
 :	cd ~/exodus/service
 :	systemctl stop exo_live@exodus

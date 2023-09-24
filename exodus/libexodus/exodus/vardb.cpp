@@ -262,8 +262,8 @@ static void PGconn_DELETER(PGconn* pgconn) {
 // on samples in src/tutorial/funcs_new.c)
 
 // SQL EXAMPLES
-// create or replace view testview as select exodus_extract_text(data,1,0,0) as field1 from test;
-// create index testfield1 on test (exodus_extract_text(data,1,0,0));
+// create or replace view testview as select exodus.extract_text(data,1,0,0) as field1 from test;
+// create index testfield1 on test (exodus.extract_text(data,1,0,0));
 // select * from testview where field1  > 'aaaaaaaaa';
 // analyse;
 // explain select * from testview where field1  > 'aaaaaaaaa';
@@ -2529,7 +2529,7 @@ inline var get_fileexpression(CVR mainfilename, CVR filename, CVR keyordata) {
 
 	// use COALESCE function in case this is a joined but missing record (and therefore null)
 	// in MYSQL this is the ISNULL expression?
-	// xlatekeyexpression="exodus_extract_text(coalesce(" ^ filename ^ ".data,''::text), " ^
+	// xlatekeyexpression="exodus.extract_text(coalesce(" ^ filename ^ ".data,''::text), " ^
 	// xlatefromfieldname.cut(8); if (filename==mainfilename) return expression; return
 	// "coalesce(" ^ expression ^", ''::text)";
 }
@@ -2581,9 +2581,9 @@ var get_dictexpression(CVR cursor, CVR mainfilename, CVR filename, CVR dictfilen
 	}
 
 	// given a file and dictionary id
-	// returns a postgres sql expression like (exodus_extract_text(filename.data,99,0,0))
-	// using one of the exodus backend functions installed in postgres like exodus_extract_text,
-	// exodus_extract_date etc.
+	// returns a postgres sql expression like (exodus.extract_text(filename.data,99,0,0))
+	// using one of the exodus backend functions installed in postgres like exodus.extract_text,
+	// exodus.extract_date etc.
 	var dictrec;
 	if (!dictrec.read(actualdictfile, fieldname)) {
 		// try lowercase
@@ -2658,10 +2658,10 @@ var get_dictexpression(CVR cursor, CVR mainfilename, CVR filename, CVR dictfilen
 		if (!fieldno) {
 
 			if (forsort && !isdate && !istime)
-				// sqlexpression="exodus_extract_sort(" ^
+				// sqlexpression="exodus.extract_sort(" ^
 				// get_fileexpression(mainfilename, filename,"key") ^ ")";
 				sqlexpression =
-					"exodus_extract_sort(" ^ mainfilename ^ ".key,0,0,0)";
+					"exodus.extract_sort(" ^ mainfilename ^ ".key,0,0,0)";
 			else
 				// sqlexpression="convert_from(" ^ get_fileexpression(mainfilename,
 				// filename, "key") ^ ", 'UTF8')";
@@ -2682,10 +2682,10 @@ var get_dictexpression(CVR cursor, CVR mainfilename, CVR filename, CVR dictfilen
 					//"date('1967-12-31') + " ^ sqlexpression ^ "::integer";
 					// cannot seem to use + on dates in indexes
 					//therefore
-					"exodus_extract_date(" ^ sqlexpression ^ ",0,0,0)";
+					"exodus.extract_date(" ^ sqlexpression ^ ",0,0,0)";
 			else if (istime)
 				sqlexpression =
-					"exodus_extract_time(" ^ sqlexpression ^ ",0,0,0)";
+					"exodus.extract_time(" ^ sqlexpression ^ ",0,0,0)";
 
 			if (DBTRACE) {
 				TRACE(fieldno)
@@ -2700,26 +2700,26 @@ var get_dictexpression(CVR cursor, CVR mainfilename, CVR filename, CVR dictfilen
 			get_fileexpression(mainfilename, filename, "data") ^ "," ^ fieldno ^ ", 0, 0)";
 
 		if (conversion.starts("[DATETIME"))
-			sqlexpression = "exodus_extract_datetime(" ^ extractargs;
+			sqlexpression = "exodus.extract_datetime(" ^ extractargs;
 
 		else if (isdate)
-			sqlexpression = "exodus_extract_date(" ^ extractargs;
+			sqlexpression = "exodus.extract_date(" ^ extractargs;
 
 		else if (istime)
-			sqlexpression = "exodus_extract_time(" ^ extractargs;
+			sqlexpression = "exodus.extract_time(" ^ extractargs;
 
 		// for now (until we have a extract_number/integer/float) that doesnt fail on
 		// non-numeric like cast "as integer" and "as float" does note that we could use
-		// exodus_extract_sort for EVERYTHING inc dates/time/numbers etc. but its large size
+		// exodus.extract_sort for EVERYTHING inc dates/time/numbers etc. but its large size
 		// is perhaps a disadvantage
 		else if (forsort)
-			sqlexpression = "exodus_extract_sort(" ^ extractargs;
+			sqlexpression = "exodus.extract_sort(" ^ extractargs;
 
 		else if (isnumeric)
-			sqlexpression = "exodus_extract_number(" ^ extractargs;
+			sqlexpression = "exodus.extract_number(" ^ extractargs;
 
 		else
-			sqlexpression = "exodus_extract_text(" ^ extractargs;
+			sqlexpression = "exodus.extract_text(" ^ extractargs;
 
 	} // of dict type F
 
@@ -2897,7 +2897,7 @@ TRACE: "QQQ"="QQQ"
 			// VARREF todictexpression=sqlexpression;
 			if (xlatetargetfieldname.isnum()) {
 				sqlexpression =
-					"exodus_extract_text(" ^
+					"exodus.extract_text(" ^
 					get_fileexpression(mainfilename, xlatetargetfilename,
 							"data") ^
 					", " ^ xlatetargetfieldname ^ ", 0, 0)";
@@ -2928,7 +2928,7 @@ TRACE: "QQQ"="QQQ"
 			var xlatekeyexpression = "";
 			//xlatefromfieldname.logputl("xlatefromfieldname=");
 			if (xlatefromfieldname.trim().lcase().starts("@record<")) {
-				xlatekeyexpression = "exodus_extract_text(";
+				xlatekeyexpression = "exodus.extract_text(";
 				xlatekeyexpression ^= filename ^ ".data";
 				xlatekeyexpression ^= ", " ^ xlatefromfieldname.cut(8);
 				xlatekeyexpression.popper();
@@ -3081,10 +3081,11 @@ exodus_call:
 		//ismv = true;
 
 		// var from="string_to_array(" ^ sqlexpression ^ ",'" ^ VM ^ "'";
+		// exodus_extract_date_array, exodus_extract_time_array
 		if (sqlexpression.starts("exodus_extract_date(") || sqlexpression.starts("exodus_extract_time("))
 			sqlexpression.paster(20, "_array");
 		else {
-			sqlexpression.regex_replacer("exodus_extract_sort\\(", "exodus_extract_text\\(");
+			sqlexpression.regex_replacer("exodus.extract_sort\\(", "exodus.extract_text\\(");
 			sqlexpression = "string_to_array(" ^ sqlexpression ^ ", chr(29),'')";
 
 			// Note 3rd argument '' means convert empty multivalues to nullptr in the array
@@ -3295,11 +3296,11 @@ var getword(VARREF remainingwords, VARREF ucword) {
 //}
 
 void to_extract_text(VARREF dictexpression) {
-				dictexpression.regex_replacer("^exodus_extract_number\\(", "exodus_extract_text\\(");
-				dictexpression.regex_replacer("^exodus_extract_sort\\(", "exodus_extract_text\\(");
-				dictexpression.regex_replacer("^exodus_extract_date\\(", "exodus_extract_text\\(");
-				dictexpression.regex_replacer("^exodus_extract_time\\(", "exodus_extract_text\\(");
-				dictexpression.regex_replacer("^exodus_extract_datetime\\(", "exodus_extract_text\\(");
+				dictexpression.regex_replacer("^exodus.extract_number\\(", "exodus.extract_text\\(");
+				dictexpression.regex_replacer("^exodus.extract_sort\\(", "exodus.extract_text\\(");
+				dictexpression.regex_replacer("^exodus.extract_date\\(", "exodus.extract_text\\(");
+				dictexpression.regex_replacer("^exodus.extract_time\\(", "exodus.extract_text\\(");
+				dictexpression.regex_replacer("^exodus.extract_datetime\\(", "exodus.extract_text\\(");
 }
 
 bool var::select(CVR sortselectclause) {
@@ -3531,9 +3532,9 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 				continue;
 			}
 
-			//use postgres collation instead of exodus_extract_sort
-			if (dictexpression.contains("exodus_extract_sort")) {
-				dictexpression.replacer("exodus_extract_sort", "exodus_extract_text");
+			//use postgres collation instead of exodus.extract_sort
+			if (dictexpression.contains("exodus.extract_sort")) {
+				dictexpression.replacer("exodus.extract_sort", "exodus.extract_text");
 				dictexpression ^= " COLLATE exodus_natural";
 			}
 
@@ -3607,7 +3608,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 			var dictexpression =
 				get_dictexpression(*this, actualfilename, actualfilename, dictfilename,
 							dictfile, word1, joins, unnests, selects, ismv, isdatetime, forsort);
-			//var usingnaturalorder = dictexpression.contains("exodus_extract_sort") or dictexpression.contains("exodus_natural");
+			//var usingnaturalorder = dictexpression.contains("exodus.extract_sort") or dictexpression.contains("exodus_natural");
 			var dictid = word1;
 
 			//var dictexpression_isarray=dictexpression.contains("string_to_array(");
@@ -3998,12 +3999,12 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 
 				var origdictexpression = dictexpression;
 				//remove conversion to date/number etc
-				//i.e for non-symbolic dicts i.e exodus_extract_date() and not dict_clients_stopped2()
+				//i.e for non-symbolic dicts i.e exodus.extract_date() and not dict_clients_stopped2()
 				to_extract_text(dictexpression);
 				var replacedbyextracttext = dictexpression != origdictexpression;
 
 				//remove conversion to array
-				//eg string_to_array(exodus_extract_text(JOBS.data,6, 0, 0), chr(29),'')
+				//eg string_to_array(exodus.extract_text(JOBS.data,6, 0, 0), chr(29),'')
 				if (dictexpression.starts("string_to_array(")) {
 					dictexpression.cutter(16);
 					dictexpression.cutter(-13);
@@ -4023,7 +4024,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 				//doesnt work on multivalued fields - results in:
 				//exodus_tobool(SELECT_CURSOR_STAGE2_19397_37442_012029.TOT_SUPPINV_AMOUNT_BASE_calc, chr(29),)
 				//TODO work out better way of determining DATE/TIME that must be tested versus null
-				//if (isdatetime || dictexpression.contains("FULLY_") || (!dictexpression.contains("exodus_extract") && dictexpression.contains("_DATE")))
+				//if (isdatetime || dictexpression.contains("FULLY_") || (!dictexpression.contains("exodus.extract") && dictexpression.contains("_DATE")))
 				//if (isdatetime)
 				if (isdatetime and not replacedbyextracttext)
 					dictexpression ^= " is not null";
@@ -4089,12 +4090,12 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 					+RECORDS+ | +RECORDS+
 					*/
 
-					dictexpression.regex_replacer("^exodus_extract_number\\(", "exodus_extract_text\\(");
+					dictexpression.regex_replacer("^exodus.extract_number\\(", "exodus.extract_text\\(");
 					if (not subvalue.starts("'"))
 						subvalue.squoter();
 
 					// .. with somefield starting 'abc'
-					// -> WHERE ( exodus_extract_text(somefile.data,999, 0, 0) COLLATE "C" BETWEEN 'abc' AND 'abcZZZZZZ' )
+					// -> WHERE ( exodus.extract_text(somefile.data,999, 0, 0) COLLATE "C" BETWEEN 'abc' AND 'abcZZZZZZ' )
 					expression ^= dictexpression ^ " COLLATE \"C\"";
 					expression ^= " BETWEEN " ^ subvalue ^ " AND " ^ subvalue.paste(-1, 0, "ZZZZZZ") ^ FM;
 				}
@@ -4511,7 +4512,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 		sql ^= " \nLIMIT\n " ^ maxnrecs;
 
 	// Final catch of obsolete function that was replaced by COLLATE keyword
-	sql.regex_replacer("exodus_extract_sort\\(", "exodus_extract_text\\(");
+	sql.regex_replacer("exodus.extract_sort\\(", "exodus.extract_text\\(");
 
 	//sql.logputl("sql=");
 
@@ -5324,7 +5325,7 @@ bool var::createindex(CVR fieldname0, CVR dictfile) const {
 		actualdictfile = "dict." ^ filename;
 
 	// example sql
-	// create index ads__brand_code on ads (exodus_extract_text(data,3,0,0));
+	// create index ads__brand_code on ads (exodus.extract_text(data,3,0,0));
 
 	// throws if cannot find dict file or record
 	var joins = "";   // throw away - cant index on joined fields at the moment

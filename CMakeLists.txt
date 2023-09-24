@@ -170,7 +170,8 @@
 	message("CMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}")
 
 	add_subdirectory(exodus/libexodus/exodus)
-	add_subdirectory(exodus/libpgexodus/src)
+	#add_subdirectory(exodus/libpgexodus/src)
+	add_subdirectory(exodus/pgexodus)
 	add_subdirectory(cli/src)
 	add_subdirectory(test/src)
 

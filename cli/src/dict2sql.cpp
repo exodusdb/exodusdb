@@ -33,10 +33,10 @@
 /*
 	time and compare the following. they are are same when using the pgexodus extension written in c
 
-	assert(var().sqlexec("select key from ads order by exodus_extract_text(data,1,0,0)"));
+	assert(var().sqlexec("select key from ads order by exodus.extract_text(data,1,0,0)"));
 	assert(var().sqlexec("select key from ads order by split_part(data, E'\x1E', 1)"));
 
-	but the pgsql implementation of exodus_extract_text (contained in this program) is significantly slower.
+	but the pgsql implementation of exodus.extract_text (contained in this program) is significantly slower.
 
 */
 
@@ -88,8 +88,8 @@ function main() {
 	// List of functions
 	// Schema | Name | Result data type | Argument data types | Type
 	// -------+---------------------------+--------------------+---------------------+--------
-	// public | exodus_count | integer | text, text | normal
-	// public | exodus_trim | text | data text
+	// exodus | exodus.count | integer | text, text | normal
+	// exodus | exodus_trim | text | data text
 	// ...
 
 	//establish the default connection BEFORE opening a connection to dict database
@@ -152,7 +152,7 @@ COST 10;
 )V0G0N";
 
 	// Drop obsolete functions - ignore errors
-	//var().sqlexec("DROP FUNCTION IF EXISTS exodus_extract_text2(text, int4, int4, int4);");
+	//var().sqlexec("DROP FUNCTION IF EXISTS exodus.extract_text2(text, int4, int4, int4);");
 
 	// Install general exodus requirements
 	if (install_exodus_extensions) {
@@ -197,40 +197,40 @@ COST 10;
 
 		let sqltemplate = sqltemplate_strict.replace(" STRICT", "");
 
-		create_function("exodus_extract_text(data text, fn int4, vn int4, sn int4)", "text", "", sqltemplate);
-		create_function("exodus_extract_number(data text, fn int4, vn int4, sn int4)", "float8", "", sqltemplate);
-		create_function("exodus_count(data text, countchar text)", "integer", "", sqltemplate);
+		create_function("exodus.extract_text(data text, fn int4, vn int4, sn int4)", "text", "", sqltemplate);
+		create_function("exodus.extract_number(data text, fn int4, vn int4, sn int4)", "float8", "", sqltemplate);
+		create_function("exodus.count(data text, countchar text)", "integer", "", sqltemplate);
 
-		//create_function("exodus_extract_sort(data text, fn int4, vn int4, sn int4)", "text", "", sqltemplate);
-		create_function("exodus_extract_date(data text, fn int4, vn int4, sn int4)", "date", "", sqltemplate_strict);
-		create_function("exodus_extract_time(data text, fn int4, vn int4, sn int4)", "interval", "", sqltemplate_strict);
-		create_function("exodus_extract_datetime(data text, fn int4, vn int4, sn int4)", "timestamp", "", sqltemplate_strict);
+		//create_function("exodus.extract_sort(data text, fn int4, vn int4, sn int4)", "text", "", sqltemplate);
+		create_function("exodus.extract_date(data text, fn int4, vn int4, sn int4)", "date", "", sqltemplate_strict);
+		create_function("exodus.extract_time(data text, fn int4, vn int4, sn int4)", "interval", "", sqltemplate_strict);
+		create_function("exodus.extract_datetime(data text, fn int4, vn int4, sn int4)", "timestamp", "", sqltemplate_strict);
 
 	} else if (install_exodus_extensions == "pgsql") {
 
-		//rawsqlexec("DROP FUNCTION IF EXISTS exodus_extract_sort(text, int4, int4, int4);");
+		//rawsqlexec("DROP FUNCTION IF EXISTS exodus.extract_sort(text, int4, int4, int4);");
 
-		//exodus_extract_text<fn,vn,sn> returns an sql text type
-		create_function("exodus_extract_text(data text, fn int, vn int, sn int)", "text", exodus_extract_text_sql, sqltemplate);
+		//exodus.extract_text<fn,vn,sn> returns an sql text type
+		create_function("exodus.extract_text(data text, fn int, vn int, sn int)", "text", exodus_extract_text_sql, sqltemplate);
 
 		//NOT implemented in pgsql. ::select uses COLLATE instead
-		//exodus_extract_sortt<fn,vn,sn> returns an sql text type
-		//create_function("exodus_extract_sort(data text, fn int, vn int, sn int)", "text", exodus_extract_text_sql, sqltemplate);
+		//exodus.extract_sortt<fn,vn,sn> returns an sql text type
+		//create_function("exodus.extract_sort(data text, fn int, vn int, sn int)", "text", exodus_extract_text_sql, sqltemplate);
 
-		//exodus_extract_date<fn,vn,sn> returns an sql data type
-		create_function("exodus_extract_date(data text, fn int4, vn int4, sn int4)", "date", exodus_extract_date_sql, sqltemplate);
+		//exodus.extract_date<fn,vn,sn> returns an sql data type
+		create_function("exodus.extract_date(data text, fn int4, vn int4, sn int4)", "date", exodus_extract_date_sql, sqltemplate);
 
-		//exodus_extract_time<fn,vn,sn> returns an sql time type
-		create_function("exodus_extract_time(data text, fn int4, vn int4, sn int4)", "time", exodus_extract_time_sql, sqltemplate);
+		//exodus.extract_time<fn,vn,sn> returns an sql time type
+		create_function("exodus.extract_time(data text, fn int4, vn int4, sn int4)", "time", exodus_extract_time_sql, sqltemplate);
 
-		//exodus_extract_date<fn,vn,sn> returns an sql data type
-		create_function("exodus_extract_datetime(data text, fn int4, vn int4, sn int4)", "timestamp", exodus_extract_datetime_sql, sqltemplate);
+		//exodus.extract_date<fn,vn,sn> returns an sql data type
+		create_function("exodus.extract_datetime(data text, fn int4, vn int4, sn int4)", "timestamp", exodus_extract_datetime_sql, sqltemplate);
 
-		//exodus_extract_number<fn,vn,sn> returns an sql float8 type
-		create_function("exodus_extract_number(data text, fn int4, vn int4, sn int4)", "float8", exodus_extract_number_sql, sqltemplate);
+		//exodus.extract_number<fn,vn,sn> returns an sql float8 type
+		create_function("exodus.extract_number(data text, fn int4, vn int4, sn int4)", "float8", exodus_extract_number_sql, sqltemplate);
 
-		//exodus_count(str,ch) returns an int
-		create_function("exodus_count(data text, countchar text)", "integer", exodus_count_sql, sqltemplate);
+		//exodus.count(str,ch) returns an int
+		create_function("exodus.count(data text, countchar text)", "integer", exodus_count_sql, sqltemplate);
 	}
 
 	// Various exodus pgsql utility functions
@@ -693,7 +693,7 @@ $RETVAR := array_to_string
 			// $2 is pgsql variable containing the data record
 			// 'XYZ' literals in single quotes
 			// e.g. split_part($1,'*',2) to use part of the key ($1)
-			// e.g. exodus_extract_text($2,3,2,1) to use part of the data record ($2)
+			// e.g. exodus.extract_text($2,3,2,1) to use part of the data record ($2)
 			// e.g. jobinvno||'**'||companycode using concatentated pgsql variables
 			// e.g. split_part(split_part(split_part($2,FM,2),VM,1),SM,2) another way to use
 			var source_key_expr = line.field(" ", 5);
@@ -734,12 +734,12 @@ $RETVAR := array_to_string
 
 				// 3,2 <field,value,subvalue>
 				else if (source_key_expr.match("^\\d+,\\d+$")) {
-					source_key_expr = "exodus_extract_text($2," ^ source_key_expr ^ ",0)";
+					source_key_expr = "exodus.extract_text($2," ^ source_key_expr ^ ",0)";
 				}
 
 				// 3,2,1 <field,value,subvalue>
 				else if (source_key_expr.match("^\\d+,\\d+,\\d+$")) {
-					source_key_expr = "exodus_extract_text($2," ^ source_key_expr ^ ")";
+					source_key_expr = "exodus.extract_text($2," ^ source_key_expr ^ ")";
 				}
 
 				// Target field expression
@@ -759,12 +759,12 @@ $RETVAR := array_to_string
 
 				// 3,2 <field,value,subvalue>
 				else if (target_expr.match("^\\d+,\\d+$")) {
-					target_expr = "exodus_extract_text(" ^ target_filename ^ ".data," ^ target_expr ^ ",0)";
+					target_expr = "exodus.extract_text(" ^ target_filename ^ ".data," ^ target_expr ^ ",0)";
 				}
 
 				// 3,2,1 <field,value,subvalue>
 				else if (target_expr.match("^\\d+,\\d+,\\d+$")) {
-					target_expr = "exodus_extract_text(" ^ target_filename ^ ".data," ^ target_expr ^ ")";
+					target_expr = "exodus.extract_text(" ^ target_filename ^ ".data," ^ target_expr ^ ")";
 
 				// target field is a dictionary name
 				// If it is an S type dictionary field with a pgsql function
@@ -1075,7 +1075,7 @@ BEGIN
    -- convert to decimal format
    -- remove all , '.' besides last
    numx=translate(numx, ',' , '.');
-   nn=exodus_count(numx,'.');
+   nn=exodus.count(numx,'.');
    for ii in 1..nn-1 loop
     tt=strpos(numx,'.');
     if tt<>0 then
@@ -1142,7 +1142,7 @@ BEGIN
   return 0;
  end if;
 
- nfields := exodus_count(searchstr,sepchar)+1;
+ nfields := exodus.count(searchstr,sepchar)+1;
  searchstrarray := string_to_array(searchstr,sepchar);
 
  for fieldn in 1..nfields loop
@@ -1242,7 +1242,7 @@ BEGIN
   dates := split_part(data, E'\x1E', fn);
  end if;
 
- ndates := exodus_count(dates,VM)+(dates!='')::int;
+ ndates := exodus.count(dates,VM)+(dates!='')::int;
  for daten in 1..ndates loop
   date := split_part(dates,VM,daten);
   if date = '' then
@@ -1271,7 +1271,7 @@ BEGIN
   times := split_part(data, E'\x1E', fn);
  end if;
 
- ntimes := exodus_count(times,VM)+(times!='')::int;
+ ntimes := exodus.count(times,VM)+(times!='')::int;
  for timen in 1..ntimes loop
   timex := split_part(times,VM,timen);
   if timex = '' then
@@ -1303,7 +1303,7 @@ EXCEPTION WHEN others THEN
 END;
 )V0G0N";
 
-//exodus_extract_text -> text
+//exodus.extract_text -> text
 
 var exodus_extract_text_sql = R"V0G0N(
  if fn < 1 then
@@ -1321,7 +1321,7 @@ var exodus_extract_text_sql = R"V0G0N(
   return split_part(split_part(split_part(data, E'\x1E', fn), E'\x1D', vn), E'\x1C', sn);
 )V0G0N";
 
-//exodus_extract_date -> date SIMILAR CODE in extract_number, extract_date and extract_time
+//exodus.extract_date -> date SIMILAR CODE in extract_number, extract_date and extract_time
 
 var exodus_extract_date_sql = R"V0G0N(
 DECLARE
@@ -1351,7 +1351,7 @@ BEGIN
 END;
 )V0G0N";
 
-//exodus_extract_time -> interval SIMILAR CODE in extract_number, extract_date and extract_time
+//exodus.extract_time -> interval SIMILAR CODE in extract_number, extract_date and extract_time
 
 var exodus_extract_time_sql = R"V0G0N(
 DECLARE
@@ -1381,7 +1381,7 @@ BEGIN
 END;
 )V0G0N";
 
-//exodus_extract_datetime -> timestamp SIMILAR CODE in extract_number, extract_date and extract_time
+//exodus.extract_datetime -> timestamp SIMILAR CODE in extract_number, extract_date and extract_time
 
 var exodus_extract_datetime_sql = R"V0G0N(
 DECLARE
@@ -1409,7 +1409,7 @@ BEGIN
 END;
 )V0G0N";
 
-//exodus_extract_number -> number SIMILAR CODE in extract_number, extract_date and extract_time
+//exodus.extract_number -> number SIMILAR CODE in extract_number, extract_date and extract_time
 
 var exodus_extract_number_sql = R"V0G0N(
 DECLARE
@@ -1439,7 +1439,7 @@ BEGIN
 END;
 )V0G0N";
 
-//exodus_count
+//exodus.count
 
 var exodus_count_sql = R"V0G0N(
 BEGIN

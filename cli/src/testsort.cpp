@@ -11,8 +11,8 @@ function main() {
 
 	// No real need for this especially because a) it does a default connection and b) we are not creating a connection for following db operations
 	// it is here just to remind that we can connect to specific servers and dataabases if desired
-	//if (not connect())
-	//	abort("Cannot connect to database. Please check configuration or run configexodus.");
+	if (not connect())
+		abort("Cannot connect to database. Please check configuration or run configexodus.");
 
 	//begintrans();
 //	if (not begintrans())

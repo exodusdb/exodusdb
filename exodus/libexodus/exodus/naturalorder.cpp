@@ -7,8 +7,8 @@
 
 namespace exodus {
 
-// select exodus_extract_text(data,1,0,0), exodus_extract_sort(data,1,0,0)
-// from test_alphanum order by exodus_extract_sort(data,1,0,0)
+// select exodus.extract_text(data,1,0,0), exodus.extract_sort(data,1,0,0)
+// from test_alphanum order by exodus.extract_sort(data,1,0,0)
 
 /* lexicographical sorting of numbers
 
