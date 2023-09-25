@@ -68,6 +68,7 @@ jobs:
         : sudo apt purge -y postgresql* # remove unwanted versions of postgresql (14?)
         :
         #sudo ./install.sh ${{ matrix.PG_VER }}
+        env
 
     - name: Prepare - Update repos
       run: sudo ./install.sh "${{ matrix.PG_VER }}" P

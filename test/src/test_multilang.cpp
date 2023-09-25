@@ -197,9 +197,9 @@ programinit()
 
 	// Skip due to taking long time to generate locales
 	TRACE(osgetenv("GITHUB_WORKSPACE"))
-	if (not osgetenv("GITHUB_WORKSPACE"))
-		assert(false);
-	if (0)
+//	if (not osgetenv("GITHUB_WORKSPACE"))
+//		assert(false);
+	if (1)
 	{
 		assert(var(123456.789).numberinwords("en_AU").outputl() eq "one hundred twenty-three thousand four hundred fifty-six point seven eight nine");
 
