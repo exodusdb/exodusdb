@@ -49,18 +49,39 @@ jobs:
         # with pgexodus
         submodules: recursive
 
-    - name: Install all
+    - name: Inspect image
       run: |
         pwd # /home/runner/work/exodusdb/exodusdb
         ls -l
         :
         : Installed postgresql
+        :
         apt list --installed postgresql*
         :
         : Available postgresql
+        :
         apt list postgresql*
         :
         : Remove all postgresql
-        sudo apt purge -y postgresql* # remove unwanted versions of postgresql (14?)
+        :
+        : sudo apt purge -y postgresql* # remove unwanted versions of postgresql (14?)
         :
         sudo ./install.sh ${{ matrix.PG_VER }}
+
+    - name: Prepare - Update repos
+      run: sudo ./install.sh ${{ matrix.PG_VER }} P
+
+    - name: Dependencies for build
+      run: sudo ./install.sh ${{ matrix.PG_VER }} X
+
+    - name: Build
+      run: sudo ./install.sh ${{ matrix.PG_VER }} P
+
+    - name: Dependencies for install
+      run: sudo ./install.sh ${{ matrix.PG_VER }} Y
+
+    - name: Install
+      run: sudo ./install.sh ${{ matrix.PG_VER }} I
+
+    - name: Test
+      run: sudo ./install.sh ${{ matrix.PG_VER }} T
