@@ -51,6 +51,7 @@ jobs:
 
     - name: Inspect image
       run: |
+        set -ex
         pwd # /home/runner/work/exodusdb/exodusdb
         ls -l
         :
@@ -69,19 +70,19 @@ jobs:
         #sudo ./install.sh ${{ matrix.PG_VER }}
 
     - name: Prepare - Update repos
-      run: sudo ./install.sh ${{ matrix.PG_VER }} P
+      run: sudo ./install.sh "${{ matrix.PG_VER }}" P
 
     - name: Dependencies for build
-      run: sudo ./install.sh ${{ matrix.PG_VER }} X
+      run: sudo ./install.sh "${{ matrix.PG_VER }}" X
 
     - name: Build
-      run: sudo ./install.sh ${{ matrix.PG_VER }} P
+      run: sudo ./install.sh "${{ matrix.PG_VER }}" P
 
     - name: Dependencies for install
-      run: sudo ./install.sh ${{ matrix.PG_VER }} Y
+      run: sudo ./install.sh "${{ matrix.PG_VER }}" Y
 
     - name: Install
-      run: sudo ./install.sh ${{ matrix.PG_VER }} I
+      run: sudo ./install.sh "${{ matrix.PG_VER }}" I
 
     - name: Test
-      run: sudo ./install.sh ${{ matrix.PG_VER }} T
+      run: sudo ./install.sh "${{ matrix.PG_VER }}" T
