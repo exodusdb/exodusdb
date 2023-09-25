@@ -16,8 +16,8 @@ jobs:
           #  PG_VER: 10
           #- UBUNTU_VER: 20.04
           #  PG_VER: 11
-          - UBUNTU_VER: 20.04
-            PG_VER: 12
+#          - UBUNTU_VER: 20.04
+#            PG_VER: 12
           #- UBUNTU_VER: 20.04
           #  PG_VER: 13
           #- UBUNTU_VER: 20.04
@@ -34,8 +34,8 @@ jobs:
           #  PG_VER: 12
           #- UBUNTU_VER: 22.04
           #  PG_VER: 13
-#          - UBUNTU_VER: 22.04
-#            PG_VER: 14
+          - UBUNTU_VER: 22.04
+            PG_VER: 14
           #- UBUNTU_VER: 22.04
           #  PG_VER: 15
           #- UBUNTU_VER: 22.04
@@ -46,11 +46,21 @@ jobs:
     steps:
     - uses: actions/checkout@v3
       with:
+        # with pgexodus
         submodules: recursive
 
     - name: Install all
       run: |
         pwd # /home/runner/work/exodusdb/exodusdb
         ls -l
+        :
+        : Installed postgresql
+        apt search --installed postgresql*
+        :
+        : Available postgresql
+        apt list postgresql*
+        :
+        : Remove all postgresql
         sudo apt purge -y postgresql* # remove unwanted versions of postgresql (14?)
-        sudo ./install_all.sh ubuntu-${{ matrix.UBUNTU_VER }} ${{ matrix.PG_VER }}
+        :
+        sudo ./install.sh ${{ matrix.PG_VER }}
