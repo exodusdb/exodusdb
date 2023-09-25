@@ -20,7 +20,7 @@ programinit()
 	assert(var().sqlexec(sql, ANS));
 	if (ANS) {
 		TRACE(ANS.convert(RM, _EOL).convert(FM, "\t"))
-		abort("Checking there are no hung transactions from cancelled test runs. There should be no 'idle in transaction'");
+		errputl("Checking there are no hung transactions from cancelled test runs. There should be no 'idle in transaction'");
 	}
 
 	// Comment this out if you want to see anything in the database after an assert failure

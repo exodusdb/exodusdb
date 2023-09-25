@@ -195,6 +195,9 @@ programinit()
 	assert(osbwrite(L"XYZ", OUTPUT_file, position));
 	assert(position eq 13);
 
+	// Skip due to taking long time to generate locales
+	TRACE(osgetenv("GITHUB_WORKSPACE"))
+	if (not osgetenv("GITHUB_WORKSPACE"))
 	{
 		assert(var(123456.789).numberinwords("en_AU").outputl() eq "one hundred twenty-three thousand four hundred fifty-six point seven eight nine");
 
