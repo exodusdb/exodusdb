@@ -76,7 +76,7 @@ jobs:
       run: sudo ./install.sh "${{ matrix.PG_VER }}" X
 
     - name: Build
-      run: sudo ./install.sh "${{ matrix.PG_VER }}" P
+      run: sudo ./install.sh "${{ matrix.PG_VER }}" B
 
     - name: Dependencies for install
       run: sudo ./install.sh "${{ matrix.PG_VER }}" Y
