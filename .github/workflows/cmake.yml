@@ -55,7 +55,7 @@ jobs:
         ls -l
         :
         : Installed postgresql
-        apt search --installed postgresql*
+        apt list --installed postgresql*
         :
         : Available postgresql
         apt list postgresql*
