@@ -148,7 +148,7 @@ function build_all {
 : ----------------------------------------
 :
 	cmake -S $EXODUS_DIR -B $EXODUS_DIR/build
-	cmake --build $EXODUS_DIR/build -j`nproc`
+	cmake --build $EXODUS_DIR/build -j$((`nproc`+1))
 }
 
 function prepare_for_install {
@@ -184,7 +184,7 @@ function install_all {
 #: -------------------------------
 #:
 #	cd $EXODUS_DIR/build
-#	CTEST_OUTPUT_ON_FAILURE=1 CTEST_PARALLEL_LEVEL=`nproc` ctest
+#	CTEST_OUTPUT_ON_FAILURE=1 CTEST_PARALLEL_LEVEL=$((`nproc`+1)) ctest
 :
 : ----------------------------------------
 : Check that postgresql is running locally
@@ -230,7 +230,7 @@ function test_all {
 	systemctl start postgresql
 
 	#testsort
-	cd $EXODUS_DIR/build && CTEST_OUTPUT_ON_FAILURE=1 CTEST_PARALLEL_LEVEL=`nproc` ctest
+	cd $EXODUS_DIR/build && CTEST_OUTPUT_ON_FAILURE=1 CTEST_PARALLEL_LEVEL=$((`nproc`+1)) ctest
 :
 	testsort
 }
