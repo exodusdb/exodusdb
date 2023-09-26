@@ -12,7 +12,7 @@ function main() {
 	//function main() {
 	//    ANS = RECORD.f(3) ^ "*" ^ RECORD.f(12);
 	//    /*pgsql;
-	//    ans:=exodus_extract_text(data,3,0,0) || '*' || exodus_extract_text(data,12,0,0);
+	//    ans:=exodus.extract_text(data,3,0,0) || '*' || exodus.extract_text(data,12,0,0);
 	//    */
 	//    return ANS;
 	//}
