@@ -58,7 +58,7 @@ jobs:
 
     # https://docs.github.com/en/actions/learn-github-actions/expressions
     #runs-on: ubuntu-${{ matrix.UBUNTU_VER }}
-    runs-on: ubuntu-${{ matrix.UBUNTU_VER != '' && matrix.UBUNTU_VER || 'latest' }}
+    runs-on: ubuntu-${{ matrix.UBUNTU_VER && matrix.UBUNTU_VER || 'latest' }}
     if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
     steps:
     - uses: actions/checkout@v3
