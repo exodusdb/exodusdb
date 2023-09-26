@@ -84,8 +84,6 @@ function get_dependencies_for_build {
 : GET DEPENDENCIES FOR BUILD
 : --------------------------
 :
-	env
-:
 : Postgresql package
 : ------------------
 :

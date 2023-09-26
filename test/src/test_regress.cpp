@@ -17,8 +17,9 @@ function main() {
 
 	//var manual = filenames;
 
+	// If env variables are missing, are you running under sudo
 	var exodusdir = osgetenv("GITHUB_WORKSPACE");
-TRACE(exodusdir)
+
 // Parallel testing negates the need for this
 //	//Skip if fast testing required
 //	if (not COMMAND(2) and osgetenv("EXO_FAST_TEST")) {
@@ -37,27 +38,19 @@ TRACE(exodusdir)
 		}
 		exodusdir = osgetenv("HOME") ^ OSSLASH ^ "exodus";
 	}
-TRACE(exodusdir)
+
 	var testdatadir = exodusdir ^ OSSLASH ^ "/test/data";
+
+	// If cant find test data then look for it in parent directory
 	if (not osdir(testdatadir))
 		testdatadir = "../data";
-TRACE(testdatadir)
+
 	if (not filenames or filenames eq "ALL") {
 		filenames = oslistf(testdatadir ^ OSSLASH ^ "*.TXT");
 		if (not filenames)
 			printl("Cannot find any files " ^ testdatadir);
 	}
-TRACE(filenames)
-TRACE(oscwd())
-assert(false);
-/*
-	TRACE: exodusdir=""
-	TRACE: exodusdir="/root/exodus"
-	TRACE: testdatadir="/root/exodus//test/data"
-	Cannot find any files /root/exodus//test/data
-	TRACE: filenames=""
-	TRACE: oscwd()="/home/runner/work/exodusdb/exodusdb/test/src"
-*/
+
 	//test each file
 	for (var filename : filenames) {
 
