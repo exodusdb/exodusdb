@@ -87,17 +87,14 @@ jobs:
         #sudo ./install.sh ${{ matrix.PG_VER }}
         env
 
-    - name: Prepare - Update repos
-      run: sudo ./install.sh "${{ matrix.PG_VER }}" P
-
-    - name: Dependencies for build
-      run: sudo ./install.sh "${{ matrix.PG_VER }}" X
+    - name: Get dependencies for build
+      run: sudo ./install.sh "${{ matrix.PG_VER }}" b
 
     - name: Build
       run: sudo ./install.sh "${{ matrix.PG_VER }}" B
 
-    - name: Dependencies for install
-      run: sudo ./install.sh "${{ matrix.PG_VER }}" Y
+    - name: Get dependencies for install
+      run: sudo ./install.sh "${{ matrix.PG_VER }}" i
 
     - name: Install
       run: sudo ./install.sh "${{ matrix.PG_VER }}" I
