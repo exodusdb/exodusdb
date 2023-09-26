@@ -241,47 +241,47 @@ COST 10;
 
 		//exodus_trim (leading, trailing and excess inner spaces)
 		let trimsql = R"(return regexp_replace(regexp_replace(data, '^\s+|\s+$', '', 'g'),'\s{2,}',' ','g');)";
-		create_function("exodus_trim(data text)", "text", trimsql, sqltemplate);
+		create_function("exodus.trim(data text)", "text", trimsql, sqltemplate);
 
 		//exodus_field_replace (a field)
-		create_function("exodus_field_replace(data text, sep text, fieldno int, replacement text)", "text", field_replace_sql, sqltemplate);
+		create_function("exodus.field_replace(data text, sep text, fieldno int, replacement text)", "text", field_replace_sql, sqltemplate);
 
 		//exodus_field_remove (a field)
-		create_function("exodus_field_remove(data text, sep text, fieldno int)", "text", field_remove_sql, sqltemplate);
+		create_function("exodus.field_remove(data text, sep text, fieldno int)", "text", field_remove_sql, sqltemplate);
 
 		//exodus_split 123.45USD -> 123.45
-		create_function("exodus_split(data text)", "text", split_sql, sqltemplate);
+		create_function("exodus.split(data text)", "text", split_sql, sqltemplate);
 
 		//exodus_unique (fields)
 		//https://github.com/JDBurnZ/postgresql-anyarray/blob/master/stable/anyarray_uniq.sql
-		create_function("exodus_unique(mvstring text, sepchar text)", "text", unique_sql, sqltemplate);
+		create_function("exodus.unique(mvstring text, sepchar text)", "text", unique_sql, sqltemplate);
 
 		//exodus_locate -> int
-		create_function("exodus_locate(substr text, searchstr text, sepchar text default VM)", "int", locate_sql, sqltemplate);
+		create_function("exodus.locate(substr text, searchstr text, sepchar text default VM)", "int", locate_sql, sqltemplate);
 
 		//exodus_isnum -> bool
-		create_function("exodus_isnum(instring text)", "bool", isnum_sql, sqltemplate);
+		create_function("exodus.isnum(instring text)", "bool", isnum_sql, sqltemplate);
 
-		//exodus_tobool(text) -> bool
-		create_function("exodus_tobool(instring text)", "bool", text_tobool_sql, sqltemplate);
+		//exodus.tobool(text) -> bool
+		create_function("exodus.tobool(instring text)", "bool", text_tobool_sql, sqltemplate);
 
-		//exodus_tobool(numeric) -> bool
-		create_function("exodus_tobool(innum numeric)", "bool", numeric_tobool_sql, sqltemplate);
+		//exodus.tobool(numeric) -> bool
+		create_function("exodus.tobool(innum numeric)", "bool", numeric_tobool_sql, sqltemplate);
 
 		//exodus_date -> int (today's date as a number according to pickos)
-		create_function("exodus_date()", "int", exodus_todays_date_sql, sqltemplate);
+		create_function("exodus.date()", "int", exodus_todays_date_sql, sqltemplate);
 
 		//exodus_extract_date_array -> date[]
-		create_function("exodus_extract_date_array(data text, fn int, vn int, sn int)", "date[]", exodus_extract_date_array_sql, sqltemplate);
+		create_function("exodus.extract_date_array(data text, fn int, vn int, sn int)", "date[]", exodus_extract_date_array_sql, sqltemplate);
 
 		//return time as interval which can handle times like 25:00
 		//exodus_extract_time_array -> time[]
-		//create_function("exodus_extract_time_array(data text, fn int, vn int, sn int)", "time[]", exodus_extract_time_array_sql, sqltemplate);
+		//create_function("exodus.extract_time_array(data text, fn int, vn int, sn int)", "time[]", exodus_extract_time_array_sql, sqltemplate);
 		//exodus_extract_time_array -> time[]
-		create_function("exodus_extract_time_array(data text, fn int, vn int, sn int)", "interval[]", exodus_extract_time_array_sql, sqltemplate);
+		create_function("exodus.extract_time_array(data text, fn int, vn int, sn int)", "interval[]", exodus_extract_time_array_sql, sqltemplate);
 
 		//exodus_addcent4 -> text
-		create_function("exodus_addcent4(data text)", "text", exodus_addcent4_sql, sqltemplate);
+		create_function("exodus.addcent4(data text)", "text", exodus_addcent4_sql, sqltemplate);
 	}
 
 	//create global view of all dicts in "dict.all"
@@ -482,7 +482,7 @@ subroutine onefileonedict(in dictfile, in dictfilename, in reqdictid) {
 	if (reqdictid)
 		makelist("", reqdictid);
 	else
-		select(dictfilename);
+		select(dictfilename ^ " by ID");
 
 	var dictid;
 	while (readnext(dictid)) {
@@ -503,6 +503,13 @@ subroutine onedictid(in dictfile, in dictfilename, io dictid, in reqdictid) {
 	}
 	var sourcecode = dictrec.f(8);
 	let ismv = dictrec.f(4)[1] == "M";
+
+	// Keep in sync (currently divergent)
+	// 1. vardb.cpp "bool isnumeric"
+	// 2. dict2sql.cpp "var dict_returns"
+	// vardb.cpp treats all R justified as numeric but dict2sql currently doesnt
+	// so "R" isnt sufficient to allow comparison of pgsql dicts with numeric values in select with clauses
+	// list dict.all with JUST '"R"' and with FORMULA containing "'[pgsql]'" by id
 
 	//dict returns text, date, integer or float
 	var dict_returns = "text";
@@ -1211,7 +1218,7 @@ EXCEPTION WHEN others THEN
 END;
 )V0G0N";
 
-//exodus_tobool(numeric) -> bool
+//exodus.tobool(numeric) -> bool
 
 var numeric_tobool_sql = R"V0G0N(
 BEGIN

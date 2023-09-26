@@ -3082,7 +3082,7 @@ exodus_call:
 
 		// var from="string_to_array(" ^ sqlexpression ^ ",'" ^ VM ^ "'";
 		// exodus_extract_date_array, exodus_extract_time_array
-		if (sqlexpression.starts("exodus_extract_date(") || sqlexpression.starts("exodus_extract_time("))
+		if (sqlexpression.starts("exodus.extract_date(") || sqlexpression.starts("exodus.extract_time("))
 			sqlexpression.paster(20, "_array");
 		else {
 			sqlexpression.regex_replacer("exodus.extract_sort\\(", "exodus.extract_text\\(");
@@ -3915,7 +3915,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 
 				//remove multivalue handling - duplicate code elsewhere
 				if (dictexpression.contains("to_tsvector(")) {
-					//dont create exodus_tobool(to_tsvector(...
+					//dont create exodus.tobool(to_tsvector(...
 					dictexpression.replacer("to_tsvector('simple',","");
 					dictexpression.popper();
 					dictexpression_isvector = false;
@@ -4012,7 +4012,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 
 				//remove multivalue handling - duplicate code elsewhere
 				if (dictexpression.contains("to_tsvector(")) {
-					//dont create exodus_tobool(to_tsvector(...
+					//dont create exodus.tobool(to_tsvector(...
 					dictexpression.replacer("to_tsvector('simple',","");
 					dictexpression.popper();
 					//TRACE(dictexpression)
@@ -4022,14 +4022,14 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 				//currently tobool requires only text input
 				//TODO some way to detect DATE SYMBOLIC FIELDS and not hack special dict words!
 				//doesnt work on multivalued fields - results in:
-				//exodus_tobool(SELECT_CURSOR_STAGE2_19397_37442_012029.TOT_SUPPINV_AMOUNT_BASE_calc, chr(29),)
+				//exodus.tobool(SELECT_CURSOR_STAGE2_19397_37442_012029.TOT_SUPPINV_AMOUNT_BASE_calc, chr(29),)
 				//TODO work out better way of determining DATE/TIME that must be tested versus null
 				//if (isdatetime || dictexpression.contains("FULLY_") || (!dictexpression.contains("exodus.extract") && dictexpression.contains("_DATE")))
 				//if (isdatetime)
 				if (isdatetime and not replacedbyextracttext)
 					dictexpression ^= " is not null";
 				else
-					dictexpression = "exodus_tobool(" ^ dictexpression ^ ")";
+					dictexpression = "exodus.tobool(" ^ dictexpression ^ ")";
 			}
 
 			// missing op means =
