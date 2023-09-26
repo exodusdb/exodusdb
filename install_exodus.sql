@@ -37,3 +37,7 @@
 			EXCEPTION WHEN duplicate_database THEN RAISE NOTICE '%, skipping', SQLERRM USING ERRCODE = SQLSTATE;
 		END
 	$$;
+
+\connect exodus
+
+	CREATE EXTENSION IF NOT EXISTS pgexodus;
