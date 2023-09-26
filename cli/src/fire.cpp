@@ -3,6 +3,9 @@ programinit()
 
 function main() {
 
+//	TRACE(COMMAND)
+//	TRACE(OPTIONS)
+//	TRACE(SENTENCE)
 	COMMAND.remover(1);
 
 	let find = COMMAND.f(1);
@@ -34,7 +37,7 @@ function main() {
 
 		// Get text or skip
 		if (not RECORD.osread(osfilename)) {
-			//logputl(lasterror());
+//			abort(lasterror());
 			continue;
 		}
 
@@ -62,8 +65,13 @@ function main() {
 				// Diff
 				let tmpfilename = ostempdirpath() ^ osfilename.convert(OSSLASH, "_");
 				oswrite(RECORD on tmpfilename) or abort(lasterror());
-				if (not osshell("diff " ^ osfilename ^ " " ^ tmpfilename ^ " --color=always")) {
-					lasterror().outputl();
+				// diff returns an error if there are differences
+				//if (not osshell("diff " ^ osfilename ^ " " ^ tmpfilename ^ " --color=always")) {
+				var cmd = "diff " ^ osfilename ^ " " ^ tmpfilename;
+				if (TERMINAL)
+					cmd ^= " --color=always";
+				if (not osshell(cmd)) {
+					//lasterror().outputl();
 				};
 				osremove(tmpfilename) or abort(lasterror());
 			}
