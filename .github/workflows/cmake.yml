@@ -100,6 +100,4 @@ jobs:
       run: sudo ./install.sh "${{ matrix.PG_VER }}" I
 
     - name: Test
-      run: |
-        env
-        sudo ./install.sh "${{ matrix.PG_VER }}" T
+      run: sudo ./install.sh "${{ matrix.PG_VER }}" T
