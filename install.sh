@@ -46,7 +46,7 @@ set -euxo pipefail
 : ----------
 :
 	if ! ls /var/cache/apt/*.bin &>/dev/null; then
-		apt update
+		sudo apt update
 	fi
 :
 : ------------------------
@@ -84,10 +84,12 @@ function get_dependencies_for_build {
 : GET DEPENDENCIES FOR BUILD
 : --------------------------
 :
+	env
+:
 : Postgresql package
 : ------------------
 :
-	apt install -y postgresql-common
+	sudo apt install -y postgresql-common
 :
 : pgexodus submodule
 : ------------------
@@ -100,7 +102,7 @@ function get_dependencies_for_build {
 : Get the full postgres debian repos IF we require a specific version
 : -------------------------------------------------------------------
 	if [[ -n $PG_VER ]]; then
-		yes | /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh || true
+		yes | sudo /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh || true
 	fi
 :
 : List installed postgresql
@@ -114,13 +116,13 @@ function get_dependencies_for_build {
 : exodus and pgexodus
 : -------------------
 :
-	apt install -y cmake
+	sudo apt install -y cmake
 :
 : exodus
 : ------
 :
-	apt install -y g++ libpq-dev libboost-regex-dev libboost-locale-dev
-	#apt install -y g++ libboost-date-time-dev libboost-system-dev libboost-thread-dev
+	sudo apt install -y g++ libpq-dev libboost-regex-dev libboost-locale-dev
+	#sudo apt install -y g++ libboost-date-time-dev libboost-system-dev libboost-thread-dev
 :
 	pg_conftool show all || true
 :
@@ -129,9 +131,8 @@ function get_dependencies_for_build {
 : pgexodus
 : --------
 :
-	apt install -y postgresql-server-dev-$SERVER_PG_VER
-	apt install -y postgresql-common
-:
+	sudo apt install -y postgresql-server-dev-$SERVER_PG_VER
+	sudo apt install -y postgresql-common
 :
 	pg_config
 :
@@ -164,7 +165,7 @@ function get_dependencies_for_install {
 : pgexodus
 : --------
 :
-	apt install -y postgresql$PG_VER_SUFFIX #for pgexodus install
+	sudo apt install -y postgresql$PG_VER_SUFFIX #for pgexodus install
 }
 
 function install_all {
@@ -172,7 +173,7 @@ function install_all {
 : INSTALL
 : -------
 :
-	cmake --install $EXODUS_DIR/build
+	sudo cmake --install $EXODUS_DIR/build
 :
 #:
 #: -------------------------------
@@ -187,9 +188,9 @@ function install_all {
 : ----------------------------------------
 	psql --version || true
 	#pg_ctl start || true
-	systemctl start postgresql || true # no systemctl on docker
-	systemctl status postgresql || true
-	pgrep postgres -a || true
+	sudo systemctl start postgresql || true # no systemctl on docker
+	sudo systemctl status postgresql || true
+	sudo pgrep postgres -a || true
 	ls /var/run/postgresql || true
 :
 : -------------------------------
@@ -201,9 +202,9 @@ function install_all {
 
 	# Optional. Remove warning by enable others/postgres to cd into build dir
 	# 'could not change directory to "/root": Permission denied'
-	chmod o+x $HOME
+	sudo chmod o+x $HOME
 
-	apt install -y sudo # for docker
+	sudo apt install -y sudo # for docker
 
 	# Install into template1
 	sudo -u postgres psql < $EXODUS_DIR/install_template1.sql
@@ -223,7 +224,7 @@ function test_all {
 : TEST
 : ----
 :
-	systemctl start postgresql
+	sudo systemctl start postgresql
 
 	#testsort
 	cd $EXODUS_DIR/build && CTEST_OUTPUT_ON_FAILURE=1 CTEST_PARALLEL_LEVEL=$((`nproc`+1)) ctest
