@@ -39,6 +39,8 @@ TRACE(exodusdir)
 	}
 TRACE(exodusdir)
 	var testdatadir = exodusdir ^ OSSLASH ^ "/test/data";
+	if (not osdir(testdatadir))
+		testdatadir = "../data";
 TRACE(testdatadir)
 	if (not filenames or filenames eq "ALL") {
 		filenames = oslistf(testdatadir ^ OSSLASH ^ "*.TXT");
@@ -47,7 +49,15 @@ TRACE(testdatadir)
 	}
 TRACE(filenames)
 TRACE(oscwd())
-assert(false);
+//assert(false);
+/*
+	TRACE: exodusdir=""
+	TRACE: exodusdir="/root/exodus"
+	TRACE: testdatadir="/root/exodus//test/data"
+	Cannot find any files /root/exodus//test/data
+	TRACE: filenames=""
+	TRACE: oscwd()="/home/runner/work/exodusdb/exodusdb/test/src"
+*/
 	//test each file
 	for (var filename : filenames) {
 
