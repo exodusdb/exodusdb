@@ -211,10 +211,10 @@ programinit()
 	}
 	logputl("----------");
 
-	// Skip due to taking long time to generate locales
-	var ghws = osgetenv("GITHUB_WORKSPACE");
-	TRACE(ghws)
-	if (not ghws)
+//	// Skip due to taking long time to generate locales
+//	var ghws = osgetenv("GITHUB_WORKSPACE");
+//	TRACE(ghws)
+//	if (not ghws)
 	{
 		printl();
 		printl("===============");
