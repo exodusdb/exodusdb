@@ -190,7 +190,7 @@ function install_all {
 : Check that postgresql is running locally
 : ----------------------------------------
 	psql --version || true
-	pg_ctl start || true
+	#pg_ctl start || true
 	systemctl start postgresql || true # no systemctl on docker
 	systemctl status postgresql || true
 	pgrep postgres -a || true

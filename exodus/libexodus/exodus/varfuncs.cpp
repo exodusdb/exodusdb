@@ -2206,46 +2206,63 @@ var var::numberinwords(CVR langname_or_locale_id) {
 	else
 		langcode = langname_or_locale_id;
 
+	var locale_id = langcode;
+	if (not locale_id.ends(".utf8"))
+		locale_id ^= ".utf8";
+
+	// skip locale-gen since
+	// 1. It is not necessary since boost::locale:generator seems to manage creation of all languages
+	// 2. It is slow and doesnt take effect until a new process is started
+
 	// Verify locale_id exists and create it
 	//var locale_id = langcode ^ ".UTF-8";
-	var locale_id = langcode ^ ".utf8";
-	var ok;
-	try {
-		std::locale mylocale(locale_id.toString());
-		ok = true;
-	} catch (std::runtime_error& re) {
-		ok = false;
-	}
-
-	// otherwise try to generate it and try again
-	// otherwise use default probably english
-	if (not ok) {
-		var("locale_id " ^ locale_id.quote() ^ " does not exist. Trying to generate it.").errputl();
-		var cmd = "locale-gen " ^ locale_id;
-		cmd.errputl();
-		if (not cmd.osshell())
-			this->lasterror().logputl();
-		try {
-			// Try again after attempted generation of locale
-			std::locale mylocale(locale_id.toString());
-		} catch (std::runtime_error& re) {
-			// Fall back to default locale
-			std::locale mylocale("");
-		}
-	}
+//	var ok;
+//	try {
+//		std::locale mylocale(locale_id.toString());
+//		ok = true;
+//	} catch (std::runtime_error& re) {
+//		ok = false;
+//		//var(re.what()).errputl();
+//	}
+//
+//	// otherwise try to generate it and try again
+//	// otherwise use default probably english
+//	if (not ok) {
+//		var("number_in_words:get_locale: locale_id " ^ locale_id.quote() ^ " does not exist. Trying to generate it.").errputl();
+//		var cmd = "locale-gen " ^ locale_id;
+//		cmd.errputl();
+//		if (not cmd.osshell())
+//			this->lasterror().logputl();
+//		try {
+//			// Try again after attempted generation of locale
+//			std::locale mylocale(locale_id.toString());
+//		} catch (std::runtime_error& re) {
+//			// Fall back to default locale
+//			//std::locale mylocale("");
+//			throw VarError("number_in_words:get_locale: " ^ var(re.what()) ^ ". get_locale cannot create locale for " ^ locale_id);
+//		}
+//	}
 
 	// Create the right language locale
 	//TRACE(locale_id);
 	boost::locale::generator locale_generator1;
-	std::locale locale1=locale_generator1(locale_id.toString());
+	var result;
+	try {
+		//TRACE(locale_id)
+		std::locale boost_generated_locale1=locale_generator1(locale_id.toString());
+		// create a locale imbued stringstream
+		std::ostringstream ss;
+		ss.imbue(boost_generated_locale1);
 
-	// create a locale imbued stringstream
-	std::ostringstream ss;
-	ss.imbue(locale1);
+	    ss << boost::locale::as::spellout << this->toDouble();
 
-    ss << boost::locale::as::spellout << this->toDouble();
+		result = ss.str();
+	}
+	catch (...) {
+			throw VarError("number_in_words: boost_locale_generator failed for " ^ locale_id);
+	}
 
-	return ss.str();
+	return result;
 
 }
 

@@ -196,6 +196,7 @@ programinit()
 	assert(osbwrite(L"XYZ", OUTPUT_file, position));
 	assert(position eq 13);
 
+	logputl("----------");
 	{
 		assert(var(123456.789).numberinwords("").outputl()        eq "one hundred twenty-three thousand four hundred fifty-six point seven eight nine");
 		assert(var(123456.789).numberinwords("english").outputl() eq "one hundred twenty-three thousand four hundred fifty-six point seven eight nine");
@@ -205,13 +206,18 @@ programinit()
 		assert(var(10000000000000).numberinwords("english").outputl() eq "ten trillion");
 		assert(var(1.2345678901).numberinwords("").outputl()        eq "one point two three four five six seven eight nine zero one");
 		assert(var(1.2345678901).numberinwords("english").outputl() eq "one point two three four five six seven eight nine zero one");
+
+		assert(var(123456.789).numberinwords("BADLOCALE").outputl()        eq "one hundred twenty-three thousand four hundred fifty-six point seven eight nine");
 	}
+	logputl("----------");
 
 	// Skip due to taking long time to generate locales
 	var ghws = osgetenv("GITHUB_WORKSPACE");
 	TRACE(ghws)
-	if (ghws)
+	if (not ghws)
 	{
+		printl();
+		printl("===============");
 		assert(var(123456.789).numberinwords("en_AU").outputl() eq "one hundred twenty-three thousand four hundred fifty-six point seven eight nine");
 
 		assert(var(123456.789).numberinwords("greek").outputl()   eq "εκατόν είκοσι τρεις χίλιάδες τετρακόσια πενήντα έξι κόμμα επτά οκτώ εννέα");
@@ -220,21 +226,267 @@ programinit()
 		assert(var(123456.789).numberinwords("french").outputl()  eq "cent vingt-trois mille quatre cent cinquante-six virgule sept huit neuf");
 		assert(var(123456.789).numberinwords("spanish").outputl() eq "ciento veintitrés mil cuatrocientos cincuenta y seis punto siete ocho nueve");
 
+		printl();
+		printl("===============");
+
 		assert(var(-123456.789).numberinwords("greek").outputl()   eq "μείον εκατόν είκοσι τρεις χίλιάδες τετρακόσια πενήντα έξι κόμμα επτά οκτώ εννέα");
 		assert(var(-123456.789).numberinwords("arabic").outputl()  eq "ناقص مائة و ثلاثة و عشرون ألف و أربعة مائة و ستة و خمسون فاصل سبعة ثمانية تسعة"
 			or var(-123456.789).numberinwords("arabic").outputl()  eq "ناقص مائة وثلاثة وعشرون ألف وأربعة مائة وستة وخمسون فاصل سبعة ثمانية تسعة");
 		assert(var(-123456.789).numberinwords("french").outputl()  eq "moins cent vingt-trois mille quatre cent cinquante-six virgule sept huit neuf");
 		assert(var(-123456.789).numberinwords("spanish").outputl() eq "menos ciento veintitrés mil cuatrocientos cincuenta y seis punto siete ocho nueve");
 
+		printl();
+		printl("===============");
+
 		assert(var(10000000000000).numberinwords("greek").outputl()   eq "δέκα τρισεκατομμύρια");
 		assert(var(10000000000000).numberinwords("arabic").outputl()  eq "عشرة ترليون");
 		assert(var(10000000000000).numberinwords("french").outputl()  eq "dix billions");
 		assert(var(10000000000000).numberinwords("spanish").outputl() eq "diez billones");
 
+		printl();
+		printl("===============");
+
 		assert(var(1.2345678901).numberinwords("greek").outputl()   eq "ένα κόμμα δύο τρία τέσσερα πέντε έξι επτά οκτώ εννέα μηδέν ένα");
 		assert(var(1.2345678901).numberinwords("arabic").outputl()  eq "واحد فاصل إثنان ثلاثة أربعة خمسة ستة سبعة ثمانية تسعة صفر واحد");
 		assert(var(1.2345678901).numberinwords("french").outputl()  eq "un virgule deux trois quatre cinq six sept huit neuf zéro un");
 		assert(var(1.2345678901).numberinwords("spanish").outputl() eq "uno punto dos tres cuatro cinco seis siete ocho nueve cero uno");
+	}
+
+var locales =R"V0G0N(
+af-ZA
+am-ET
+ar-AE
+ar-BH
+ar-DZ
+ar-EG
+ar-IQ
+ar-JO
+ar-KW
+ar-LB
+ar-LY
+ar-MA
+arn-CL
+ar-OM
+ar-QA
+ar-SA
+ar-SD
+ar-SY
+ar-TN
+ar-YE
+as-IN
+az-az
+az-Cyrl-AZ
+az-Latn-AZ
+ba-RU
+be-BY
+bg-BG
+bn-BD
+bn-IN
+bo-CN
+br-FR
+bs-Cyrl-BA
+bs-Latn-BA
+ca-ES
+co-FR
+cs-CZ
+cy-GB
+da-DK
+de-AT
+de-CH
+de-DE
+de-LI
+de-LU
+dsb-DE
+dv-MV
+el-CY
+el-GR
+en-029
+en-AU
+en-BZ
+en-CA
+en-cb
+en-GB
+en-IE
+en-IN
+en-JM
+en-MT
+en-MY
+en-NZ
+en-PH
+en-SG
+en-TT
+en-US
+en-ZA
+en-ZW
+es-AR
+es-BO
+es-CL
+es-CO
+es-CR
+es-DO
+es-EC
+es-ES
+es-GT
+es-HN
+es-MX
+es-NI
+es-PA
+es-PE
+es-PR
+es-PY
+es-SV
+es-US
+es-UY
+es-VE
+et-EE
+eu-ES
+fa-IR
+fi-FI
+fil-PH
+fo-FO
+fr-BE
+fr-CA
+fr-CH
+fr-FR
+fr-LU
+fr-MC
+fy-NL
+ga-IE
+gd-GB
+gd-ie
+gl-ES
+gsw-FR
+gu-IN
+ha-Latn-NG
+he-IL
+hi-IN
+hr-BA
+hr-HR
+hsb-DE
+hu-HU
+hy-AM
+id-ID
+ig-NG
+ii-CN
+in-ID
+is-IS
+it-CH
+it-IT
+iu-Cans-CA
+iu-Latn-CA
+iw-IL
+ja-JP
+ka-GE
+kk-KZ
+kl-GL
+km-KH
+kn-IN
+kok-IN
+ko-KR
+ky-KG
+lb-LU
+lo-LA
+lt-LT
+lv-LV
+mi-NZ
+mk-MK
+ml-IN
+mn-MN
+mn-Mong-CN
+moh-CA
+mr-IN
+ms-BN
+ms-MY
+mt-MT
+nb-NO
+ne-NP
+nl-BE
+nl-NL
+nn-NO
+no-no
+nso-ZA
+oc-FR
+or-IN
+pa-IN
+pl-PL
+prs-AF
+ps-AF
+pt-BR
+pt-PT
+qut-GT
+quz-BO
+quz-EC
+quz-PE
+rm-CH
+ro-mo
+ro-RO
+ru-mo
+ru-RU
+rw-RW
+sah-RU
+sa-IN
+se-FI
+se-NO
+se-SE
+si-LK
+sk-SK
+sl-SI
+sma-NO
+sma-SE
+smj-NO
+smj-SE
+smn-FI
+sms-FI
+sq-AL
+sr-BA
+sr-CS
+sr-Cyrl-BA
+sr-Cyrl-CS
+sr-Cyrl-ME
+sr-Cyrl-RS
+sr-Latn-BA
+sr-Latn-CS
+sr-Latn-ME
+sr-Latn-RS
+sr-ME
+sr-RS
+sr-sp
+sv-FI
+sv-SE
+sw-KE
+syr-SY
+ta-IN
+te-IN
+tg-Cyrl-TJ
+th-TH
+tk-TM
+tlh-QS
+tn-ZA
+tr-TR
+tt-RU
+tzm-Latn-DZ
+ug-CN
+uk-UA
+ur-PK
+uz-Cyrl-UZ
+uz-Latn-UZ
+uz-uz
+vi-VN
+wo-SN
+xh-ZA
+yo-NG
+zh-CN
+zh-HK
+zh-MO
+zh-SG
+zh-TW
+zu-ZA
+)V0G0N";
+	//var locales = osshellread("locale -a").convert("\n", FM);
+	locales.converter("\n", FM);
+	TRACE(locales)
+	for (var locale : locales) {
+		printl(locale ^ " 123456.78: " ^var(123456.78).numberinwords(locale));
 	}
 
 	{
