@@ -84,8 +84,18 @@ function get_dependencies_for_build {
 : GET DEPENDENCIES FOR BUILD
 : --------------------------
 :
+: Postgresql package
+: ------------------
+:
 	apt install -y postgresql-common
-
+:
+: pgexodus submodule
+: ------------------
+:
+	if ! test -f ls exodus/pgexodus/CMakeLists.txt; then
+		git submodule init
+		git submodule update
+	fi
 :
 : Get the full postgres debian repos IF we require a specific version
 : -------------------------------------------------------------------
