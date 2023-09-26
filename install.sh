@@ -31,7 +31,7 @@ set -euxo pipefail
 : T = Test
 :
 	PG_VER=${1:-}
-	STAGES=${2:-bBiIt}
+	STAGES=${2:-bBiIT}
 :
 : ------
 : CONFIG
@@ -229,7 +229,7 @@ function test_all {
 #	./install_all.sh'
 :
 : ----
-: main
+: MAIN
 : ----
 :
 	[[ $STAGES =~ b ]] && get_dependencies_for_build
