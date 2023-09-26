@@ -46,6 +46,7 @@ TRACE(testdatadir)
 			printl("Cannot find any files " ^ testdatadir);
 	}
 TRACE(filenames)
+TRACE(oscwd())
 assert(false);
 	//test each file
 	for (var filename : filenames) {
