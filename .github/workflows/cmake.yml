@@ -12,12 +12,20 @@ jobs:
     strategy:
       matrix:
         include:
+          #
+          # Default Postgres versions
+          #- UBUNTU_VER: 20.04
+          #  PG_VER:
+          #- UBUNTU_VER: 22.04
+          #  PG_VER:
+          #
+          # Specific Postgres versions
           #- UBUNTU_VER: 20.04
           #  PG_VER: 10
           #- UBUNTU_VER: 20.04
           #  PG_VER: 11
-#          - UBUNTU_VER: 20.04
-#            PG_VER: 12
+          #- UBUNTU_VER: 20.04
+          #  PG_VER: 12
           #- UBUNTU_VER: 20.04
           #  PG_VER: 13
           #- UBUNTU_VER: 20.04
@@ -34,12 +42,12 @@ jobs:
           #  PG_VER: 12
           #- UBUNTU_VER: 22.04
           #  PG_VER: 13
-          - UBUNTU_VER: 22.04
-            PG_VER: 
+          #- UBUNTU_VER: 22.04
+          #  PG_VER: 14
           #- UBUNTU_VER: 22.04
           #  PG_VER: 15
-          #- UBUNTU_VER: 22.04
-          #  PG_VER: 16
+          - UBUNTU_VER: 22.04
+            PG_VER: 16
 
     runs-on: ubuntu-${{ matrix.UBUNTU_VER }}
     if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
@@ -61,7 +69,7 @@ jobs:
         :
         : Available postgresql
         :
-        apt list postgresql*
+        apt list postgresql-*
         :
         : Remove all postgresql
         :
@@ -86,4 +94,6 @@ jobs:
       run: sudo ./install.sh "${{ matrix.PG_VER }}" I
 
     - name: Test
-      run: sudo ./install.sh "${{ matrix.PG_VER }}" T
+      run: |
+        env
+        sudo ./install.sh "${{ matrix.PG_VER }}" T
