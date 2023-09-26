@@ -18,7 +18,7 @@ function main() {
 	//var manual = filenames;
 
 	var exodusdir = osgetenv("GITHUB_WORKSPACE");
-
+TRACE(exodusdir)
 // Parallel testing negates the need for this
 //	//Skip if fast testing required
 //	if (not COMMAND(2) and osgetenv("EXO_FAST_TEST")) {
@@ -37,15 +37,16 @@ function main() {
 		}
 		exodusdir = osgetenv("HOME") ^ OSSLASH ^ "exodus";
 	}
-
+TRACE(exodusdir)
 	var testdatadir = exodusdir ^ OSSLASH ^ "/test/data";
-
+TRACE(testdatadir)
 	if (not filenames or filenames eq "ALL") {
 		filenames = oslistf(testdatadir ^ OSSLASH ^ "*.TXT");
 		if (not filenames)
 			printl("Cannot find any files " ^ testdatadir);
 	}
-
+TRACE(filenames)
+assert(false);
 	//test each file
 	for (var filename : filenames) {
 
