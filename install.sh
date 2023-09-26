@@ -12,36 +12,48 @@ set -euxo pipefail
 :	20.04	12 OK
 :	18.04	10 KO Exodus requires c++20 so will not build on 18.04
 :
-: -------
-: Syntax:
-: -------
+: ------
+: Syntax
+: ------
 :
 : $0 ' [<PG_VER>] [<STAGES>]'
 :
 : PG_VER e.g. 14 The default depends on apt and the Ubuntu version
 :
-: STAGE is letters. Default is "'PXBYIT'"
+: STAGES is one or more letters. Default is "'bBiIT'"
 :
-: P = Prepare
-: X = Dependencies for Build
+: b = Get dependencies for build
 : B = Build
-: Y = Dependencies for Install
+:
+: i = Get dependencies for install
 : I = Install
+:
 : T = Test
 :
 	PG_VER=${1:-}
-	STAGES=${2:-PXBYIT}
+	STAGES=${2:-bBiIt}
 :
 : ------
-: Config
+: CONFIG
 : ------
 :
 	export DEBIAN_FRONTEND=noninteractive
 	#EXODUS_DIR=${GITHUB_WORKSPACE:-~/exodus}
 	EXODUS_DIR=$(pwd)
 :
-: Need to know suffix -14 or blank
-: Need to know version number for postgresql-server-dev-NN
+: ----------
+: Update apt
+: ----------
+:
+	if ! ls /var/cache/apt/*.bin &>/dev/null; then
+		apt update
+	fi
+:
+: ------------------------
+: Work out postgres suffix
+: ------------------------
+:
+: Need to know version number for postgresql-server-dev-NN e.g. -14
 :
 	if [[ -n $PG_VER ]]; then
 		PG_VER_SUFFIX=-$PG_VER
@@ -66,32 +78,11 @@ set -euxo pipefail
 		fi
 	fi
 :
-: ------------------
-: Prepare the system
-: ------------------
-function prepare_all {
 
-	#if ! test -f upgraded.txt; then
-		apt update
-		#skip upgrade since github workflow images contain a lot of unwanted packages
-		#apt -y upgrade
-		#The following packages will be upgraded:
-		#  aspnetcore-runtime-6.0 aspnetcore-runtime-7.0 aspnetcore-targeting-pack-6.0
-		#  aspnetcore-targeting-pack-7.0 bind9-dnsutils bind9-host bind9-libs dnsutils
-		#  dotnet-apphost-pack-6.0 dotnet-apphost-pack-7.0 dotnet-hostfxr-6.0
-		#  dotnet-runtime-6.0 dotnet-runtime-7.0 dotnet-targeting-pack-6.0
-		#  dotnet-targeting-pack-7.0 firefox lib32gcc-s1 lib32stdc++6 libatomic1
-		#  libcc1-0 libcups2 libgcc-s1 libgomp1 libitm1 liblsan0 libobjc4 libquadmath0
-		#  libstdc++6 libubsan1 linux-azure linux-cloud-tools-azure
-		#  linux-cloud-tools-common linux-headers-azure linux-image-azure
-		#  linux-libc-dev linux-tools-azure linux-tools-common
-		#  netstandard-targeting-pack-2.1 podman powershell ubuntu-advantage-tools
-	#fi
-}
-
-function prepare_for_build {
-:
-: ------------------------------------
+function get_dependencies_for_build {
+: --------------------------
+: GET DEPENDENCIES FOR BUILD
+: --------------------------
 :
 	apt install -y postgresql-common
 
@@ -109,10 +100,6 @@ function prepare_for_build {
 : List available postgresql
 :
 	apt list postgresql*
-:
-: ----------------------
-: DEPENDENCIES FOR BUILD
-: ----------------------
 :
 : exodus and pgexodus
 : -------------------
@@ -142,19 +129,22 @@ function prepare_for_build {
 }
 
 function build_all {
+: -----
+: BUILD
+: -----
 :
-: ----------------------------------------
-: BUILD libexodus, pgexodus, cli and tests
-: ----------------------------------------
+: 1. libexodus
+: 2. exodus cli
+: 3. pgexodus extension
 :
 	cmake -S $EXODUS_DIR -B $EXODUS_DIR/build
 	cmake --build $EXODUS_DIR/build -j$((`nproc`+1))
 }
 
-function prepare_for_install {
-: ------------------------
-: DEPENDENCIES FOR INSTALL
-: ------------------------
+function get_dependencies_for_install {
+: ----------------------------
+: GET DEPENDENCIES FOR INSTALL
+: ----------------------------
 :
 : exodus
 : ------
@@ -168,13 +158,9 @@ function prepare_for_install {
 }
 
 function install_all {
-: ---------------------------
-: INSTALL EXODUS AND PGEXODUS
-: ---------------------------
-:
-: 1. libexodus
-: 2. exodus cli
-: 3. pgexodus extension
+: -------
+: INSTALL
+: -------
 :
 	cmake --install $EXODUS_DIR/build
 :
@@ -223,9 +209,9 @@ function install_all {
 }
 
 function test_all {
-: -------------------------
-: Test exodus all functions
-: -------------------------
+: ----
+: TEST
+: ----
 :
 	systemctl start postgresql
 
@@ -246,12 +232,10 @@ function test_all {
 : main
 : ----
 :
-	[[ $STAGES =~ P ]] && prepare_all
-
-	[[ $STAGES =~ X ]] && prepare_for_build
+	[[ $STAGES =~ b ]] && get_dependencies_for_build
 	[[ $STAGES =~ B ]] && build_all
 
-	[[ $STAGES =~ Y ]] && prepare_for_install
+	[[ $STAGES =~ i ]] && get_dependencies_for_install
 	[[ $STAGES =~ I ]] && install_all
 
 	[[ $STAGES =~ T ]] && test_all

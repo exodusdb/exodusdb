@@ -10,13 +10,14 @@ set -euxo pipefail
 :
 : PG_VER e.g. 14 The default depends on apt an d Ubuntu version.
 :
-: STAGE is letters. Default is "'PXBYIT'"
+: STAGE is letters. Default is "'bBiIT'"
 :
-: P = Prepare
-: X = Dependencies for Build
+: b = Dependencies for Build
 : B = Build
-: Y = Dependencies for Install
+:
+: i = Dependencies for Install
 : I = Install
+:
 : T = Test
 :
 : Config
@@ -26,15 +27,15 @@ set -euxo pipefail
 	#export NEEDRESTART_MODE=a
 	UBUNTU_VER=${1:?UBUNTU_VER is required. e.g. 22.04}
 	PG_VER=${2:-}
-	STAGES=${3:-PXBYIT}
+	STAGES=${3:-bBiIT}
 
 	if [[ ! $PG_VER =~ ^[0-9]*$ ]]; then
 		echo Postgres version is only digits or blank. Check syntax above.
 		exit 1
 	fi
 
-	if [[ ! $STAGES =~ ^[PXBYIT]*$ ]]; then
-		echo STAGES has only letters PXBYIT. Check syntax above.
+	if [[ ! $STAGES =~ ^[bBiIT]*$ ]]; then
+		echo STAGES has only letters bBiIT. Check syntax above.
 		exit 1
 	fi
 
@@ -65,7 +66,7 @@ function stage {
 :
 : Run the stage script
 :
-	STAGE_LETTERS=PXBYIT
+	STAGE_LETTERS=bBiIT
 	STAGE_LETTER=${STAGE_LETTERS:$((STAGE-1)):1}
 	lxc exec $NEW_C -- bash -c "ls && cd exodus && ./install.sh ${PG_VER:-''} $STAGE_LETTER" || exit 1
 }
@@ -74,12 +75,11 @@ function stage {
 : Main
 : ----
 :
-	[[ $STAGES =~ P ]] && stage 1 || true # Prepare
-	[[ $STAGES =~ X ]] && stage 2 || true # Dependencies for build
-	[[ $STAGES =~ B ]] && stage 3 || true # Build
-	[[ $STAGES =~ Y ]] && stage 4 || true # Dependencies for install
-	[[ $STAGES =~ I ]] && stage 5 || true # Install
-	[[ $STAGES =~ T ]] && stage 6 || true # Test
+	[[ $STAGES =~ b ]] && stage 1 || true # Dependencies for build
+	[[ $STAGES =~ B ]] && stage 2 || true # Build
+	[[ $STAGES =~ i ]] && stage 3 || true # Dependencies for install
+	[[ $STAGES =~ I ]] && stage 4 || true # Install
+	[[ $STAGES =~ T ]] && stage 5 || true # Test
 :
 : ------------------------------------------------------------
 : Finished $0 $* in $((SECONDS/60)) mins and $((SECONDS%60)) secs
