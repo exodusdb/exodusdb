@@ -49,7 +49,7 @@ TRACE(testdatadir)
 	}
 TRACE(filenames)
 TRACE(oscwd())
-//assert(false);
+assert(false);
 /*
 	TRACE: exodusdir=""
 	TRACE: exodusdir="/root/exodus"

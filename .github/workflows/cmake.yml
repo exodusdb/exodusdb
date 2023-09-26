@@ -88,16 +88,16 @@ jobs:
         env
 
     - name: Get dependencies for build
-      run: sudo ./install.sh "${{ matrix.PG_VER }}" b
+      run: env ./install.sh "${{ matrix.PG_VER }}" b
 
     - name: Build
-      run: sudo ./install.sh "${{ matrix.PG_VER }}" B
+      run: ./install.sh "${{ matrix.PG_VER }}" B
 
     - name: Get dependencies for install
-      run: sudo ./install.sh "${{ matrix.PG_VER }}" i
+      run: ./install.sh "${{ matrix.PG_VER }}" i
 
     - name: Install
-      run: sudo ./install.sh "${{ matrix.PG_VER }}" I
+      run: ./install.sh "${{ matrix.PG_VER }}" I
 
     - name: Test
-      run: sudo ./install.sh "${{ matrix.PG_VER }}" T
+      run: ./install.sh "${{ matrix.PG_VER }}" T
