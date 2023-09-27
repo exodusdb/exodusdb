@@ -49,12 +49,15 @@ set -euxo pipefail
 : Config
 : ------
 :
-	TARGET_UID=1000
-	TARGET_GID=1000
-	TARGET_HOME=/home/ubuntu
-#	TARGET_UID=0
-#	TARGET_GID=0
-#	TARGET_HOME=/root
+#	# Install into user 'ubuntu'
+#	TARGET_UID=1000
+#	TARGET_GID=1000
+#	TARGET_HOME=/home/ubuntu
+
+	# Install into root
+	TARGET_UID=0
+	TARGET_GID=0
+	TARGET_HOME=/root
 
 #	IMAGE=u2204-preinstalled
 #	lxc launch ubuntu:22.04 u2204-preinstalled
