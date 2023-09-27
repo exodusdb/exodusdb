@@ -92,7 +92,7 @@ function get_dependencies_for_build {
 : pgexodus submodule
 : ------------------
 :
-	if ! test -f ls exodus/pgexodus/CMakeLists.txt; then
+	if ! test -f exodus/pgexodus/CMakeLists.txt; then
 		git submodule init
 		git submodule update
 	fi
@@ -121,8 +121,6 @@ function get_dependencies_for_build {
 :
 	sudo apt install -y g++ libpq-dev libboost-regex-dev libboost-locale-dev
 	#sudo apt install -y g++ libboost-date-time-dev libboost-system-dev libboost-thread-dev
-:
-	pg_conftool show all || true
 :
 	ls -l /usr/lib/postgresql || true
 :
