@@ -118,7 +118,7 @@
 	endforeach()
 
 	# test_regress must be built with optimisation otherwise it runs very slowly
-	target_compile_options(test_regress PUBLIC "-O2")
+	target_compile_options(test_Regress PUBLIC "-O2")
 
 #
 # Exit
