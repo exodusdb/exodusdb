@@ -13,7 +13,7 @@ jobs:
       matrix:
         include:
           #
-          # Latest Ubuntu with default Postgres version
+          # Latest Ubuntu with default Postgres version #
           #
           #- UBUNTU_VER: latest
           #  PG_VER:
