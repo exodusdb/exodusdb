@@ -20,8 +20,8 @@ jobs:
           #
           # Default Postgres versions
           #
-          - UBUNTU_VER: 20.04
-            PG_VER:
+          #- UBUNTU_VER: 20.04
+          #  PG_VER:
           #- UBUNTU_VER: 22.04
           #  PG_VER:
           #
@@ -39,8 +39,8 @@ jobs:
           #  PG_VER: 14
           #- UBUNTU_VER: 20.04
           #  PG_VER: 15
-          ##- UBUNTU_VER: 20.04
-          ##  PG_VER: 16
+          #- UBUNTU_VER: 20.04
+          #  PG_VER: 16
           #- UBUNTU_VER: 22.04
           #  PG_VER: 10
           #- UBUNTU_VER: 22.04
@@ -49,12 +49,12 @@ jobs:
           #  PG_VER: 12
           #- UBUNTU_VER: 22.04
           #  PG_VER: 13
-          #- UBUNTU_VER: 22.04
-          #  PG_VER: 14
+          - UBUNTU_VER: 22.04
+            PG_VER: 14
           #- UBUNTU_VER: 22.04
           #  PG_VER: 15
-          - UBUNTU_VER: 22.04
-            PG_VER: 16
+          #- UBUNTU_VER: 22.04
+          #  PG_VER: 16
 
     # https://docs.github.com/en/actions/learn-github-actions/expressions
     #runs-on: ubuntu-${{ matrix.UBUNTU_VER }}
