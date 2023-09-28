@@ -24,8 +24,8 @@ THE SOFTWARE.
 
 // clang-format off
 
-#define EXODUS_RELEASE "22.09"
-#define EXODUS_PATCH "22.09.0"
+#define EXODUS_RELEASE "23.09"
+#define EXODUS_PATCH "23.09.0"
 
 #include <iostream>
 #include <string>

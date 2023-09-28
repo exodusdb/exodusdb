@@ -41,6 +41,7 @@ jobs:
           #  PG_VER: 15
           #- UBUNTU_VER: 20.04
           #  PG_VER: 16
+          #
           #- UBUNTU_VER: 22.04
           #  PG_VER: 10
           #- UBUNTU_VER: 22.04
@@ -84,7 +85,7 @@ jobs:
         :
         : sudo apt purge -y postgresql* # remove unwanted versions of postgresql (14?)
         :
-        #sudo ./install.sh ${{ matrix.PG_VER }}
+        : sudo ./install.sh ${{ matrix.PG_VER }}
         env
 
     - name: Get dependencies for build
