@@ -9,9 +9,9 @@ env:
 jobs:
   build:
 
-#    strategy:
-#      matrix:
-#        include:
+    strategy:
+      matrix:
+        include:
           #
           # Latest Ubuntu with default Postgres version
           #
@@ -20,8 +20,8 @@ jobs:
           #
           # Default Postgres versions
           #
-          #- UBUNTU_VER: 20.04
-          #  PG_VER:
+          - UBUNTU_VER: 20.04
+            PG_VER:
           #- UBUNTU_VER: 22.04
           #  PG_VER:
           #
@@ -53,8 +53,8 @@ jobs:
           #  PG_VER: 14
           #- UBUNTU_VER: 22.04
           #  PG_VER: 15
-          ##- UBUNTU_VER: 22.04
-          ##  PG_VER: 16
+          - UBUNTU_VER: 22.04
+            PG_VER: 16
 
     # https://docs.github.com/en/actions/learn-github-actions/expressions
     #runs-on: ubuntu-${{ matrix.UBUNTU_VER }}
@@ -78,7 +78,7 @@ jobs:
         :
         : Available postgresql
         :
-        apt list postgresql-*
+        : apt list postgresql-*
         :
         : Remove all postgresql
         :
