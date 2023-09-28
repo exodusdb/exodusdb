@@ -9,8 +9,9 @@
 # INIT
 # ####
 #
-	message("")
-	message("--LIBEXODUS CMAKE INIT --")
+	message("---------------------")
+	message("-- CMAKE LIBEXODUS --")
+	message("---------------------")
 
 	#Use CMakeList.txt options in parent directory
 	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-undef")
@@ -207,4 +208,4 @@
 # EXIT
 # ####
 #
-	message("--LIBEXODUS CMAKE EXIT --")
+#	message("--LIBEXODUS CMAKE EXIT --")

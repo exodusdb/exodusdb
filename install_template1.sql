@@ -12,7 +12,7 @@
 
 -- database template1 - requires superuser
 
-	\connect template1;
+--	\connect template1;
 
 -- extension 'pgexodus' - requires superuser
 

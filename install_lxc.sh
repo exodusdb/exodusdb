@@ -115,7 +115,7 @@ function stage {
 	lxc file push ~/exodus ${NEW_C}${TARGET_HOME} --recursive --create-dirs --quiet || exit 1
 :
 	#Avoid git error: "fatal: detected dubious ownership in repository at '.../exodus''
-	lxc exec $NEW_C -- bash -c "chown $TARGET_UID:$TARGET_GID ${TARGET_HOME}/exodus" || exit 1
+	lxc exec $NEW_C -- bash -c "chown -R $TARGET_UID:$TARGET_GID ${TARGET_HOME}/exodus" || exit 1
 :
 : Run the stage install script
 : ----------------------------

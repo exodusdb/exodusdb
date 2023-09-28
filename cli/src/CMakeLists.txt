@@ -9,8 +9,9 @@
 # INIT
 # ####
 #
-	message("")
-	message("--EXODUS CLI CMAKE INIT --")
+	message("----------------------")
+	message("-- CMAKE EXODUS CLI --")
+	message("----------------------")
 
 #use CMakeList.txt options in parent directory
 
@@ -245,4 +246,4 @@
 # Exit
 # ####
 #
-	message("--EXODUS CLI CMAKE EXIT --")
+#	message("--EXODUS CLI CMAKE EXIT --")

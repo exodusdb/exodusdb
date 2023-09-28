@@ -1,4 +1,7 @@
 #use make VERBOSE=1 to debug make
+	message("------------------")
+	message("-- CMAKE EXODUS --")
+	message("------------------")
 #
 # CONFIG
 # ######
@@ -66,10 +69,10 @@
 	#
 	#//Flags used by the CXX compiler during RELWITHDEBINFO builds.
 	#CMAKE_CXX_FLAGS_RELWITHDEBINFO:STRING=-O2 -g -DNDEBUG
-	message("CMAKE_CXX_FLAGS is ${CMAKE_CXX_FLAGS}")
-	message("CMAKE_CXX_FLAGS_DEBUG is ${CMAKE_CXX_FLAGS_DEBUG}")
-	message("CMAKE_CXX_FLAGS_RELEASE is ${CMAKE_CXX_FLAGS_RELEASE}")
-	message("CMAKE_CXX_FLAGS_MINSIZEREL is ${CMAKE_CXX_FLAGS_MINSIZEREL}")
+	message("CMAKE_CXX_FLAGS is                ${CMAKE_CXX_FLAGS}")
+	message("CMAKE_CXX_FLAGS_DEBUG is          ${CMAKE_CXX_FLAGS_DEBUG}")
+	message("CMAKE_CXX_FLAGS_RELEASE is        ${CMAKE_CXX_FLAGS_RELEASE}")
+	message("CMAKE_CXX_FLAGS_MINSIZEREL is     ${CMAKE_CXX_FLAGS_MINSIZEREL}")
 	message("CMAKE_CXX_FLAGS_RELWITHDEBINFO is ${CMAKE_CXX_FLAGS_RELWITHDEBINFO}")
 
 	#add_compile_options(-O3)   # 5% faster than -O2
@@ -167,16 +170,6 @@
 	#add_compile_options(-pg)
 
 #
-# Subdirs/submodules
-# ##################
-#
-	add_subdirectory(exodus/libexodus/exodus)
-	#add_subdirectory(exodus/libpgexodus/src)
-	add_subdirectory(exodus/pgexodus)
-	add_subdirectory(cli/src)
-	add_subdirectory(test/src)
-
-#
 # Uninstall
 # #########
 #
@@ -192,4 +185,14 @@
 # Exit
 # ####
 #
-	message("CMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}")
+
+#
+# Subdirs/submodules
+# ##################
+#
+	add_subdirectory(exodus/libexodus/exodus)
+	#add_subdirectory(exodus/libpgexodus/src)
+	add_subdirectory(exodus/pgexodus)
+	add_subdirectory(cli/src)
+	add_subdirectory(test/src)
+

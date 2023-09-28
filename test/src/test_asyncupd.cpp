@@ -19,7 +19,7 @@ programinit()
 function main() {
 
 	//Pass if no default database connection
-	if (not connect()) {
+	if (not connect() and osgetenv("EXO_NODATA")) {
 	//if (true or not connect()) {
 		////
 		printl("Test passed. Not really. No default db connection to perform test_asyncupd");

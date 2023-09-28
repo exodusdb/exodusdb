@@ -27,7 +27,7 @@ programinit()
 	function main() {
 
 	//Pass if no default database connection
-	if (not connect()) {
+	if (not connect() and osgetenv("EXO_NODATA")) {
 		printl("Test passed. Not really. No default db connection to perform db testing.");
 		return 0;
 	}

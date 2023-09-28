@@ -53,33 +53,79 @@ set -euxo pipefail
 : Work out postgres suffix
 : ------------------------
 :
+: If PG_VER not specified, use the latest version
+: of postgres installed as per pg_config
+:
+	PGBINROOT="/usr/lib/postgresql"
+	if [[ -z $PG_VER ]]; then
+		#redhat# PGBINROOT="/usr/pgsql-"
+		PG_VER=`ls -v $PGBINROOT* 2>/dev/null|tail -n1 || true`
+	fi
+:
 : Need to know version number for postgresql-server-dev-NN e.g. -14
 :
 	if [[ -n $PG_VER ]]; then
 		PG_VER_SUFFIX=-$PG_VER
 		SERVER_PG_VER=$PG_VER
+		export PGPATH=/usr/lib/postgresql/$PG_VER
 	else
 		PG_VER_SUFFIX=
+	fi
 :
 : 1. From latest version of installed postgresql
 :    Same method as used by pg_config
 :
-		SERVER_PG_VER=$(ls -v /usr/lib/postgresql/|head -1||true)
+#	SERVER_PG_VER=$(ls -v /usr/lib/postgresql/|tail -n 1||true)
+#	PG_VER=`ls -v $PGBINROOT* 2>/dev/null|tail -n1 || true`
+	SERVER_PG_VER=$PG_VER
 :
 : 2. From latest version available in apt
 :
-		if [[ -z $SERVER_PG_VER ]]; then
-			SERVER_PG_VER=$(apt list postgresql-server-* 2> /dev/null|grep -o -P 'dev-[0-9]{2}\b'|sort|head -n1|cut -d- -f2||true)
-		fi
+	if [[ -z $SERVER_PG_VER ]]; then
+		SERVER_PG_VER=$(apt list postgresql-server-* 2> /dev/null|grep -o -P 'dev-[0-9]{2}\b'|sort|tail -n1|cut -d- -f2||true)
+	fi
 
-		if [[ -z $SERVER_PG_VER ]]; then
-			echo "Cannot work out postgres server version"
-			exit 1
-		fi
+	if [[ -z $SERVER_PG_VER ]]; then
+		echo "Cannot work out postgres server version"
+		exit 1
+	fi
+:
+: ------------------------------
+: Discover postsgresql db socket
+: ------------------------------
+:
+: Version to port can be found in /etc/postgresql/NN/main/postgresql.conf
+:
+: Required in case multiple postgres versions are running
+: and psql default connects to the wrong one.
+:
+: Info
+: ----
+:
+	grep '^\s*port\s*=\s*\([0-9]\)*' /etc/postgresql/*/main/postgresql.conf || true
+:
+	pgrep postgres -a|grep postgresql || true
+:
+	ls -l /usr/lib/postgresql/ || true
+:
+	ls -l /run/postgresql/ || true
+:
+: Ports
+: -----
+:
+	if [[ -n $PG_VER ]]; then
+		PG_PORT=`grep '^\s*port\s*=\s*\([0-9]\)*' /etc/postgresql/$PG_VER/main/postgresql.conf|grep [0-9]* -o || true`
+		PSQL_PORT_OPT=-p$PG_PORT
+: For exodus programs like dict2sql and testsort
+		export EXO_PORT=$PG_PORT
+	else
+		PG_PORT=
+		PSQL_PORT_OPT=
 	fi
 :
 
 function get_dependencies_for_build {
+:
 : --------------------------
 : GET DEPENDENCIES FOR BUILD
 : --------------------------
@@ -144,6 +190,7 @@ function build_all {
 : 2. exodus cli
 : 3. pgexodus extension
 :
+	echo PGPATH=${PGPATH:-}
 	cmake -S $EXODUS_DIR -B $EXODUS_DIR/build
 	cmake --build $EXODUS_DIR/build -j$((`nproc`+1))
 }
@@ -178,41 +225,98 @@ function install_all {
 #:
 #	cd $EXODUS_DIR/build
 #	CTEST_OUTPUT_ON_FAILURE=1 CTEST_PARALLEL_LEVEL=$((`nproc`+1)) ctest
-:
+
 : ----------------------------------------
 : Check that postgresql is running locally
 : ----------------------------------------
-	psql --version || true
+	psql $PSQL_PORT_OPT --version || true
 	#pg_ctl start || true
 	sudo systemctl start postgresql || true # no systemctl on docker
 	sudo systemctl status postgresql || true
 	sudo pgrep postgres -a || true
 	ls /var/run/postgresql || true
 :
+: Optional grant others cd into HOME.
+: -----------------------------------
+:
+: Removes warning by enable others/postgres to cd into build dir
+: 'could not change directory to "/root": Permission denied'
+:
+	sudo chmod o+x $HOME
+:
+: Install sudo for docker?
+: ------------------------
+:
+	sudo apt install -y sudo # for docker
+:
 : -------------------------------
 : Configure postgresql for exodus
 : -------------------------------
-
+:
 	# Waiting for postgresql to start?
 	#(while ! nc -z -v -w1 localhost 5432 2>/dev/null; do echo "Waiting for port 5432 to open..."; sleep 2; done)
-
-	# Optional. Remove warning by enable others/postgres to cd into build dir
-	# 'could not change directory to "/root": Permission denied'
-	sudo chmod o+x $HOME
-
-	sudo apt install -y sudo # for docker
-
-	# Install into template1
-	sudo -u postgres psql < $EXODUS_DIR/install_template1.sql
-
-	# Create
-	# 1. exodus user login/password
-	# 2. exodus database
-	sudo -u postgres psql < $EXODUS_DIR/install_exodus.sql
-
-	# Lots of pgsql utility functions
-	# Necessary to test many exodus pgsql function e.g. exodus_date()
+:
+: Install into template1
+: ----------------------
+:
+: --  extension 'pgexodus'
+: --  collation 'exodus_natural'
+: --  extension 'unaccent' and function 'immutable_unaccent'
+: --  schema 'dict'
+: --  table 'lists'
+: --  table 'dict.voc'
+:
+	sudo -u postgres psql $PSQL_PORT_OPT template1 < $EXODUS_DIR/install_template1.sql
+:
+: Grant exodus login, createrole and createdatabase but not superuser
+: -------------------------------------------------------------------
+:
+	sudo -u postgres psql $PSQL_PORT_OPT <<-V0G0N
+		--
+		-- user 'exodus'
+		--
+	    -- The role was created without login permission when creating the extension
+	    -- since its objects are assigned to exodus.
+	    --
+	    -- Allow login with password and creation of users and databases
+	    -- but not superuser
+		--
+	    ALTER ROLE exodus
+	        LOGIN
+	        PASSWORD 'somesillysecret'
+	        CREATEDB
+	        CREATEROLE
+	    ;
+V0G0N
+:
+: Create exodus user login and database
+: -------------------------------------
+:
+: 1. exodus user login/password
+: 2. exodus database
+:
+	#sudo -u postgres psql $PSQL_PORT_OPT < $EXODUS_DIR/install_exodus.sql
+	if ! sudo -u postgres psql $PSQL_PORT_OPT exodus -c 'select version();'; then
+		sudo -u postgres psql $PSQL_PORT_OPT -c 'CREATE DATABASE exodus OWNER exodus;'
+	fi
+:
+: Install into into exodus as well.
+: --------------------------------
+:
+: Only required if exodus db already existed and was
+: therefore not created from template1 in above step.
+:
+	sudo -u postgres psql $PSQL_PORT_OPT exodus < $EXODUS_DIR/install_template1.sql
+:
+: Lots of pgsql utility functions
+: -------------------------------
+:
+: Necessary to test many exodus pgsql function e.g. exodus_date
+:
+: TODO make sure it connects to the right postgresql service/port
+:
 	dict2sql
+:
 }
 
 function test_all {
@@ -220,10 +324,17 @@ function test_all {
 : TEST
 : ----
 :
+: SERVER_PG_VER ${SERVER_PG_VER} EXO_PORT=$EXO_PORT
+:
 	sudo systemctl start postgresql
-
-	#testsort
+:
+: Many tests
+: ----------
+:
 	cd $EXODUS_DIR/build && CTEST_OUTPUT_ON_FAILURE=1 CTEST_PARALLEL_LEVEL=$((`nproc`+1)) ctest
+:
+: Demo program
+: ------------
 :
 	testsort
 }
@@ -247,6 +358,6 @@ function test_all {
 
 	[[ $STAGES =~ T ]] && test_all
 :
-: -------------------------------------------------------------
+: ----------------------------------------------------------------
 : Finished $0 $* in $((SECONDS/60)) mins and $((SECONDS%60)) secs.
-: -------------------------------------------------------------
+: ----------------------------------------------------------------

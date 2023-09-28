@@ -11,8 +11,9 @@
 # Init
 # ####
 #
-	message("")
-	message("--EXODUS TEST CMAKE INIT --")
+	message("-----------------------")
+	message("-- CMAKE EXODUS TEST --")
+	message("-----------------------")
 
 #
 # Ignore nodiscard warnings
@@ -124,4 +125,4 @@
 # Exit
 # ####
 #
-	message("--EXODUS TEST CMAKE EXIT --")
+#	message("--EXODUS TEST CMAKE EXIT --")
