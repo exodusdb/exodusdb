@@ -3,202 +3,10 @@
 #include <boost/range/irange.hpp>
 #include <cassert>
 
+void extract(char * instring, int inlength, int fieldno, int valueno, int subvalueno, int* outstart, int* outlength);
+void extract2(char * instring, int inlength, int fieldno, int valueno, int subvalueno, int* outstart, int* outlength);
+
 #include <exodus/program.h>
-
-#include <stdio.h>
-#include <string.h>
-
-/* not using invalid UTF8 characters any more
-#define FM_ '\xFE'
-#define VM_ '\xFD'
-#define SM_ '\xFC'
-*/
-
-#define FM_ '\x1E'
-#define VM_ '\x1D'
-#define SM_ '\x1C'
-
-/*
-TODO algorithm could be improved for value and subvalue extraction
-by not searching for the end of the field before starting to look for the multivalue
-and for  extracting subvalues, and not searching for the end of the multivalue
-before starting to look for the subvalue.
-*/
-void extract(char * instring, int inlength, int fieldno, int valueno, int subvalueno, int* outstart, int* outlength)
-{
-        int start_pos;
-        int fieldn2;
-        int field_end_pos;
-        int valuen2;
-        int value_end_pos;
-        int subvaluen2;
-        int subvalue_end_pos;
-
-        /*assert(assigned());*/
-
-        /*
-        any negatives at all returns "" but since this is unexpected
-        do it inline instead of special case to avoid wasting time
-        if (fieldno<0||valueno<0||subvalueno<0) return;
-        */
-
-        /*FIND FIELD*/
-
-        /*default to returning nothing*/
-        *outstart=0;
-        *outlength=0;
-
-        /*zero means all, negative return ""*/
-        if (fieldno<=0)
-        {
-                if (fieldno<0) return;
-                if (valueno||subvalueno) fieldno=1; else
-                {
-                        *outlength=inlength;
-                        return;
-                }
-        }
-
-        /*find the starting position of the field or return ""*/
-        start_pos=0;
-        fieldn2=1;
-
-        //ALN:NOTE - bad algorithm - assumes that string is valid UTF
-        //and FM_UTF8_1 or VM_UTF8_1 SM_UTF8_1 can not be last char in the string
-
-        while (fieldn2<fieldno)
-        {
-                for (;
-                                start_pos<inlength &&
-                                instring[start_pos] != FM_;
-                                //(instring[start_pos] != FM_UTF8_1 ||
-                                //instring[start_pos+1] != FM_UTF8_2) ;
-                        start_pos++)
-                {};
-                /*past of of string?*/
-                if (start_pos>=inlength)
-                        return;
-//              start_pos += 2;
-                start_pos++;
-                fieldn2++;
-        }
-
-        /*find the end of the field (or one after the end of the string)*/
-        for (field_end_pos=start_pos;
-                        field_end_pos<inlength &&
-                        instring[field_end_pos] != FM_;
-                        //(instring[field_end_pos]!=FM_UTF8_1 ||
-                        //instring[field_end_pos+1] != FM_UTF8_2);
-                field_end_pos++)
-        {};
-
-        /*FIND VALUE*/
-
-        /*zero means all, negative return ""*/
-        if (valueno<=0)
-        {
-                if (valueno<0)
-                        return;
-                if (subvalueno)
-                        valueno=1;
-                else
-                {
-                        *outstart=start_pos;
-                        *outlength=field_end_pos-start_pos;
-                        return;
-                }
-        }
-
-        /*
-        find the starting position of the value or return ""
-        using start_pos and end_pos of
-        */
-        valuen2=1;
-        while (valuen2<valueno)
-        {
-                for (/*start_pos=start_pos*/;
-                                start_pos<inlength &&
-                                instring[start_pos] != VM_;
-                                //(instring[start_pos]!=VM_UTF8_1 ||
-                                //instring[start_pos+1]!=VM_UTF8_2);
-                        start_pos++)
-                {};
-                /*past end of string?*/
-                if (start_pos>=inlength)
-                        return;
-//              start_pos += 2;
-                start_pos ++;
-                /*past end of field?*/
-                if (start_pos>field_end_pos)
-                        return;
-                valuen2++;
-        }
-
-        /*find the end of the value (or string)*/
-        for (value_end_pos=start_pos;
-                        value_end_pos<field_end_pos &&
-                        instring[value_end_pos] != VM_;
-                        //(instring[value_end_pos]!=VM_UTF8_1 ||
-                        //instring[value_end_pos+1]!=VM_UTF8_2);
-                value_end_pos++)
-        {}
-
-
-        /*FIND SUBVALUE*/
-
-        /*zero means all, negative means ""*/
-        if (subvalueno<=0)
-        {
-                if (subvalueno<0)
-                        return;
-                *outstart=start_pos;
-                *outlength=value_end_pos-start_pos;
-        }
-
-        /*
-        find the starting position of the subvalue or return ""
-        using start_pos and end_pos of
-        */
-        subvaluen2=1;
-        while (subvaluen2<subvalueno)
-        {
-                for (/*start_pos=start_pos*/;
-                                start_pos<field_end_pos &&
-                                instring[start_pos] != SM_;
-                                //(instring[start_pos]!=SM_UTF8_1 ||
-                                //instring[start_pos+1]!=SM_UTF8_2);
-                        start_pos++)
-                {};
-                /*past end of string?*/
-                if (start_pos>=inlength)
-                        return;
-                //start_pos += 2;
-                start_pos++;
-                /*past end of value?*/
-                if (start_pos>value_end_pos)
-                        return;
-                subvaluen2++;
-        }
-
-        /*find the end of the subvalue (or string)*/
-        for (subvalue_end_pos=start_pos;
-                        subvalue_end_pos<value_end_pos &&
-                        instring[subvalue_end_pos] != SM_;
-                        //(instring[subvalue_end_pos]!=SM_UTF8_1 ||
-                        //instring[subvalue_end_pos+1]!=SM_UTF8_2);
-                subvalue_end_pos++)
-        {};
-        if (subvalue_end_pos>=value_end_pos)
-        {
-                *outstart=start_pos;
-                *outlength=value_end_pos-start_pos;
-                return;
-        }
-        *outstart=start_pos;
-        *outlength=subvalue_end_pos-start_pos;
-        return;
-
-}
 
 programinit()
 
@@ -209,6 +17,42 @@ programinit()
 		printl();
 		printl("Test passed - skipped because MAKELEVEL is set");
 		return 0;
+	}
+
+	// test extract function
+	if (false) {
+		var data;
+		assert(osread(data from "/root/exodus/test/data/DYNARRAY.TXT"));
+		data.converter("\n", _FM);
+		//    EXTRACT abababab    -1  -1  -1
+		var linen = 0;
+		for (var line : data) {
+			if (not line)
+				continue;
+			line.converter("\xFF\xFE\xFD\xFC\xFB\xFA", _RM _FM _VM _SM _TM _ST);
+			dim line2    = line.split("\t");
+			if (line2(2) == "EXTRACT") {
+
+				//var result = line2(3).f(line2(4), line2(5), line2(6));
+				std::string arg1 = line2(3).toString();
+				int outstart;
+				int outlength;
+				//extract(arg1.data(), int(arg1.size()), int(line2(4)), int(line2(5)), int(line2(6)), &outstart, &outlength);
+				extract2(arg1.data(), int(arg1.size()), int(line2(4)), int(line2(5)), int(line2(6)), &outstart, &outlength);
+				var result = arg1.substr(outstart, outlength);
+
+				linen++;
+
+				if (line2(1) != result) {
+					TRACE(line)
+					printl(linen, "Expected:", quote(line2(1)), "Actual:", result.quote());
+					debug();
+					extract(arg1.data(), int(arg1.size()), int(line2(4)), int(line2(5)), int(line2(6)), &outstart, &outlength);
+				}
+				assert(line2(1) == result);
+			}
+		}
+		TRACE(linen)
 	}
 
 	printl();
@@ -229,10 +73,18 @@ programinit()
 		int len = int(s1.size());
 		int outstart = 0;
 		int outlen = 0;
+		var result;
 		for (int ii = 0; ii lt nn; ii++) {
 			the_truth_hurts = var().assigned();
-			//void extract(char * instring, int inlength, int fieldno, int valueno, int subvalueno, int* outstart, int* outlength)
-			extract(start, len, 10, 10, 10, &outstart, &outlen);
+
+			//void extract(char * instring, int inlength, int fieldno, int valueno, int subvalueno, int* outstart, int* outlength);
+
+			// old version using indexes 132ns (45ns -O1)
+			//extract(start, len, 10, 10, 10, &outstart, &outlen);
+
+			// new version using ptrs 120ns (40ns -O1)
+			extract2(start, len, 10, 10, 10, &outstart, &outlen);
+			//result = v1.f(10,10,10);
 		}
 		printl(std::string(start+outstart, outlen));
 		setup_time = ostime() - started;
@@ -528,6 +380,379 @@ programinit()
 	printl("Test passed");
 
 	return 0;
+}
+
+
+#include <stdio.h>
+#include <string.h>
+
+/*
+TODO algorithm could be improved for value and subvalue extraction
+by not searching for the end of the field before starting to look for the multivalue
+and for extracting subvalues, and not searching for the end of the multivalue
+before starting to look for the subvalue.
+*/
+void extract2(char * instring, int inlength, int fieldno, int valueno, int subvalueno, int* outstart, int* outlength)
+{
+	char* cptr;
+	char* instr_end_pos;
+
+	int fieldn2;
+	char* field_end_pos;
+
+	int valuen2;
+	char* value_end_pos;
+
+	int subvaluen2;
+	char* subvalue_end_pos;
+
+	/*assert(assigned());*/
+
+	/*
+	any negatives at all returns "" but since this is unexpected
+	do it inline instead of special case to avoid wasting time
+	if (fieldno<0||valueno<0||subvalueno<0) return;
+	*/
+
+	/*FIND FIELD*/
+
+	/*default to returning nothing*/
+	*outstart = 0;
+	*outlength = 0;
+
+	/*zero means all, negative return ""*/
+	if (fieldno <= 0)
+	{
+		if (fieldno < 0)
+
+			// Negative field number always returns empty string
+			return;
+
+		if (valueno || subvalueno) {
+
+			// Field 0 with any value number or subvaluen
+			fieldno = 1;
+
+		} else {
+
+			// field 0, value 0, subvalue 0 returns the whole original string
+			*outlength = inlength;
+			return;
+		}
+	}
+
+	// Start at the first character of the string
+	cptr = instring;
+
+	/* End before the character after the string*/
+	instr_end_pos = instring + inlength;
+
+	/* FIELD */
+
+	/* Find the start position or return empty string*/
+	fieldn2 = fieldno - 1;
+	while (fieldn2)
+	{
+
+		/* Find the next FM_*/
+		for (;;) {
+			/* Past end of string? - return empty string */
+			if (cptr >= instr_end_pos)
+				return;
+			if (*cptr == FM_)
+				break;
+			cptr++;
+		}
+
+		// Skip over the FM_ character
+		cptr++;
+
+		// Count down to the desired field number
+		fieldn2--;
+	}
+
+	/* Find the end of the current field */
+	field_end_pos = cptr;
+	while (field_end_pos < instr_end_pos && *field_end_pos != FM_) {
+		field_end_pos++;
+	}
+
+	/*FIND VALUE*/
+
+	/*zero means all, negative return ""*/
+	if (valueno <= 0)
+	{
+		if (valueno < 0)
+			return;
+		if (subvalueno)
+			valueno = 1;
+		else
+		{
+			*outstart = int(cptr - instring);
+			*outlength = int(field_end_pos - cptr);
+			return;
+		}
+	}
+
+	/*
+	find the starting position of the value or return ""
+	using cptr and end_pos of
+	*/
+	valuen2 = valueno - 1;
+	while (valuen2)
+	{
+
+		/* Find the next VM_*/
+		while (cptr < field_end_pos && *cptr != VM_) {
+			cptr++;
+		}
+
+		/* Past end of field? return empty string */
+		if (cptr >= field_end_pos)
+			return;
+
+		/* Skip over VM_ */
+		cptr ++;
+
+		/* Count down to the desired value */
+		valuen2--;
+	}
+
+	/*find the end of the current value */
+	value_end_pos = cptr;
+	while (value_end_pos < field_end_pos && *value_end_pos != VM_) {
+		value_end_pos++;
+	}
+
+	/*FIND SUBVALUE*/
+
+	/*zero means all, negative means ""*/
+	if (subvalueno <= 0) {
+		if (subvalueno < 0)
+			return;
+		*outstart = int(cptr - instring);
+		*outlength = int(value_end_pos - cptr);
+	}
+
+	/*
+	find the starting position of the subvalue or return ""
+	using cptr and end_pos of
+	*/
+	subvaluen2 = subvalueno - 1;
+	while (subvaluen2) {
+
+		/* Find the next SM_*/
+		while (cptr < value_end_pos && *cptr != SM_) {
+			cptr++;
+		}
+
+		/* Past end of value? return empty string */
+		if (cptr >= value_end_pos)
+			return;
+
+		/* Skip over the SM_ */
+		cptr++;
+
+		/* Count down to the desired subvalue */
+		subvaluen2--;
+	}
+
+	/*find the end of the current subvalue*/
+	subvalue_end_pos = cptr;
+	while (subvalue_end_pos < value_end_pos && *subvalue_end_pos != SM_) {
+		subvalue_end_pos++;
+	}
+
+	/* Return the start and length of the current subvalue */
+	*outstart = int(cptr - instring);
+	*outlength = int(subvalue_end_pos - cptr);
+
+	return;
+}
+
+#include <stdio.h>
+#include <string.h>
+
+/*
+TODO algorithm could be improved for value and subvalue extraction
+by not searching for the end of the field before starting to look for the multivalue
+and for  extracting subvalues, and not searching for the end of the multivalue
+before starting to look for the subvalue.
+*/
+void extract(char * instring, int inlength, int fieldno, int valueno, int subvalueno, int* outstart, int* outlength)
+{
+	int start_pos;
+	int fieldn2;
+	int field_end_pos;
+	int valuen2;
+	int value_end_pos;
+	int subvaluen2;
+	int subvalue_end_pos;
+
+	/*assert(assigned());*/
+
+	/*
+	any negatives at all returns "" but since this is unexpected
+	do it inline instead of special case to avoid wasting time
+	if (fieldno<0||valueno<0||subvalueno<0) return;
+	*/
+
+	/*FIND FIELD*/
+
+	/*default to returning nothing*/
+	*outstart=0;
+	*outlength=0;
+
+	/*zero means all, negative return ""*/
+	if (fieldno<=0)
+	{
+		if (fieldno<0) return;
+		if (valueno||subvalueno) fieldno=1; else
+		{
+			*outlength=inlength;
+			return;
+		}
+	}
+
+	/*find the starting position of the field or return ""*/
+	start_pos=0;
+	fieldn2=1;
+
+	//ALN:NOTE - bad algorithm - assumes that string is valid UTF
+	//and FM_UTF8_1 or VM_UTF8_1 SM_UTF8_1 can not be last char in the string
+
+	while (fieldn2<fieldno)
+	{
+		for (;
+				start_pos<inlength &&
+				instring[start_pos] != FM_;
+				//(instring[start_pos] != FM_UTF8_1 ||
+				//instring[start_pos+1] != FM_UTF8_2) ;
+			start_pos++)
+		{};
+		/*past of of string?*/
+		if (start_pos>=inlength)
+			return;
+//		start_pos += 2;
+		start_pos++;
+		fieldn2++;
+	}
+
+	/*find the end of the field (or one after the end of the string)*/
+	for (field_end_pos=start_pos;
+			field_end_pos<inlength &&
+			instring[field_end_pos] != FM_;
+			//(instring[field_end_pos]!=FM_UTF8_1 ||
+			//instring[field_end_pos+1] != FM_UTF8_2);
+		field_end_pos++)
+	{};
+
+	/*FIND VALUE*/
+
+	/*zero means all, negative return ""*/
+	if (valueno<=0)
+	{
+		if (valueno<0)
+			return;
+		if (subvalueno)
+			valueno=1;
+		else
+		{
+			*outstart=start_pos;
+			*outlength=field_end_pos-start_pos;
+			return;
+		}
+	}
+
+	/*
+	find the starting position of the value or return ""
+	using start_pos and end_pos of
+	*/
+	valuen2=1;
+	while (valuen2<valueno)
+	{
+		for (/*start_pos=start_pos*/;
+				start_pos<inlength &&
+				instring[start_pos] != VM_;
+				//(instring[start_pos]!=VM_UTF8_1 ||
+				//instring[start_pos+1]!=VM_UTF8_2);
+			start_pos++)
+		{};
+		/*past end of string?*/
+		if (start_pos>=inlength)
+			return;
+//		start_pos += 2;
+		start_pos ++;
+		/*past end of field?*/
+		if (start_pos>field_end_pos)
+			return;
+		valuen2++;
+	}
+
+	/*find the end of the value (or string)*/
+	for (value_end_pos=start_pos;
+			value_end_pos<field_end_pos &&
+			instring[value_end_pos] != VM_;
+			//(instring[value_end_pos]!=VM_UTF8_1 ||
+			//instring[value_end_pos+1]!=VM_UTF8_2);
+		value_end_pos++)
+	{}
+
+
+	/*FIND SUBVALUE*/
+
+	/*zero means all, negative means ""*/
+	if (subvalueno<=0)
+	{
+		if (subvalueno<0)
+			return;
+		*outstart=start_pos;
+		*outlength=value_end_pos-start_pos;
+	}
+
+	/*
+	find the starting position of the subvalue or return ""
+	using start_pos and end_pos of
+	*/
+	subvaluen2=1;
+	while (subvaluen2<subvalueno)
+	{
+		for (/*start_pos=start_pos*/;
+				start_pos<field_end_pos &&
+				instring[start_pos] != SM_;
+				//(instring[start_pos]!=SM_UTF8_1 ||
+				//instring[start_pos+1]!=SM_UTF8_2);
+			start_pos++)
+		{};
+		/*past end of string?*/
+		if (start_pos>=inlength)
+			return;
+		//start_pos += 2;
+		start_pos++;
+		/*past end of value?*/
+		if (start_pos>value_end_pos)
+			return;
+		subvaluen2++;
+	}
+
+	/*find the end of the subvalue (or string)*/
+	for (subvalue_end_pos=start_pos;
+			subvalue_end_pos<value_end_pos &&
+			instring[subvalue_end_pos] != SM_;
+			//(instring[subvalue_end_pos]!=SM_UTF8_1 ||
+			//instring[subvalue_end_pos+1]!=SM_UTF8_2);
+		subvalue_end_pos++)
+	{};
+	if (subvalue_end_pos>=value_end_pos)
+	{
+		*outstart=start_pos;
+		*outlength=value_end_pos-start_pos;
+		return;
+	}
+	*outstart=start_pos;
+	*outlength=subvalue_end_pos-start_pos;
+	return;
+
 }
 
 programexit()
