@@ -27,6 +27,8 @@ THE SOFTWARE.
 
 #include <exodus/varimpl.h>
 
+void extract(char * instring, int inlength, int fieldno, int valueno, int subvalueno, int* outstart, int* outlength);
+
 namespace exodus {
 
 // includes dim::split
@@ -834,6 +836,12 @@ var var::f(const int argfieldn, const int argvaluen/*=0*/, const int argsubvalue
 		"const")
 	assertString(function_sig);
 
+#if 1
+	int outstart;
+	int outlength;
+	::extract(var_str.data(), int(var_str.size()), argfieldn, argvaluen, argsubvaluen, &outstart, &outlength);
+	return var(var_str.data() + outstart, outlength);
+#else
 	// any negatives at all returns ""
 	// done inline since unusual
 	// if (fieldno<0||valueno<0||subvalueno<0) return ""
@@ -937,6 +945,8 @@ var var::f(const int argfieldn, const int argvaluen/*=0*/, const int argsubvalue
 		return var_str.substr(start_pos, value_end_pos - start_pos);
 
 	return var_str.substr(start_pos, subvalue_end_pos - start_pos);
+#endif
+
 }
 
 //////////////////////////////

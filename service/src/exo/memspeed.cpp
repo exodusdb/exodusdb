@@ -56,7 +56,7 @@ function main() {
 	msg(-1) = "More is faster.";
 	msg(-1) = "Typical speed for an entry level server in 2007 was 1";
 
-	call mssg(msg.oconv("L#60"));
+	call mssg(msg);
 
 	// call restorescreenss1, ss2);
 	stop();

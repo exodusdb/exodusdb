@@ -107,8 +107,8 @@ void DBConnector::cleardbcache(const int connid) {
 //	for (const auto& iter : *dbcache)
 //		var(iter.first % 1'000'000'000).errputl("Clearing cache of ");
 
-	if (dbcache->size())
-		var(dbcache->size()).errputl("cleardbcache: dbcache.size was ");
+	//if (dbcache->size())
+	//	var(dbcache->size()).errputl("cleardbcache: dbcache.size was ");
 
 	dbcache->clear();
 	return;
@@ -159,14 +159,14 @@ DBConnector::~DBConnector() {
 	// std::lock_guard lock(dbconns_mutex);
 	//TimeAcc t(110);
 
-	if (dbconns_.size())
-		var(dbconns_.size()).errputl("~DBConnector: dbconns_.size was ");
+	//if (dbconns_.size())
+	//	var(dbconns_.size()).errputl("~DBConnector: dbconns_.size was ");
 
 	auto ix = dbconns_.begin();
 	for (;ix != dbconns_.end(); ix++) {
 
-		if (ix->second.dbcache_.size())
-			var(ix->second.dbcache_.size()).errputl("~DBConnector: []dbcache_.size was ");
+		//if (ix->second.dbcache_.size())
+		//	var(ix->second.dbcache_.size()).errputl("~DBConnector: []dbcache_.size was ");
 
 		del_(reinterpret_cast<PGconn*>(ix->second.pgconn_));
 		//delete ix->second.locks__;

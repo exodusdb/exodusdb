@@ -244,11 +244,6 @@ function install_all {
 :
 	sudo chmod o+x $HOME
 :
-: Install sudo for docker?
-: ------------------------
-:
-	sudo apt install -y sudo # for docker
-:
 : -------------------------------
 : Configure postgresql for exodus
 : -------------------------------
@@ -300,13 +295,19 @@ V0G0N
 		sudo -u postgres psql $PSQL_PORT_OPT -c 'CREATE DATABASE exodus OWNER exodus;'
 	fi
 :
-: Install into into exodus as well.
-: --------------------------------
+: Install into into exodus database as well.
+: ------------------------------------------
 :
 : Only required if exodus db already existed and was
 : therefore not created from template1 in above step.
 :
 	sudo -u postgres psql $PSQL_PORT_OPT exodus < $EXODUS_DIR/install_template1.sql
+:
+: Configure exodus for postgres
+: -----------------------------
+:
+	mkdir -p ~/.config/exodus
+	echo "host=127.0.0.1 port=${EXO_PORT:-5432} dbname=exodus user=exodus password=somesillysecret" > ~/.config/exodus/exodus.cfg
 :
 : Lots of pgsql utility functions
 : -------------------------------
@@ -337,6 +338,8 @@ function test_all {
 : ------------
 :
 	testsort
+:
+: 'Recommended: "export HOME=$HOME:~/bin >> .bashrc"'
 }
 #:
 #: -------------------
