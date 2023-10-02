@@ -319,7 +319,10 @@ function main() {
 			if (OSSLASH == "/") {
 				compilecmd ^= " 2>&1";
 				compilecmd ^= " | tee " ^ compileoutputfilename.quote();
-				compilecmd ^= " | pager --chop-long-lines --quit-if-one-screen";
+				// --RAW-CONTROL-CHARS allows colors from compiler to be shown properly in compiler output
+				// --chop-long-lines prevents long lines wrapping and forces scrolling right to see them
+				// --quit-if-one-screen passes control immedately back to user shell if all compiler output fits on one page
+				compilecmd ^= " | pager --RAW-CONTROL-CHARS --chop-long-lines --quit-if-one-screen";
 
 			}
 			else
