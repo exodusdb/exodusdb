@@ -20,7 +20,9 @@ programinit()
 	let verbose = contains(OPTIONS, "V");
 	let silent = count(OPTIONS, "S");
 	let debugging = not contains(OPTIONS, "R");  //no symbols for backtrace
-	let optimise = count(OPTIONS, "O") - count(OPTIONS, "o");
+	// Default optimisation level from Oct 2023 is 1. Can be reduced to 0 by option o.
+	// Also compile will recognise "export CXX_OPTIONS--O0" in shell
+	let optimise = 1 + count(OPTIONS, "O") - count(OPTIONS, "o");
 	let generateheadersonly = contains(OPTIONS, "h");
 	let force = contains(OPTIONS, "F");
 	let color_option = contains(OPTIONS, "C");
