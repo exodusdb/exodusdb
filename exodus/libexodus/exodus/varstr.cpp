@@ -27,7 +27,9 @@ THE SOFTWARE.
 
 #include <exodus/varimpl.h>
 
-void extract(char * instring, int inlength, int fieldno, int valueno, int subvalueno, int* outstart, int* outlength);
+void extract_v2(char * instring, int inlength, int fieldno, int valueno, int subvalueno, int* outstart, int* outlength);
+void extract_v3(char * instring, int inlength, int fieldno, int valueno, int subvalueno, int* outstart, int* outlength);
+void extract_v4(char * instring, int inlength, int fieldno, int valueno, int subvalueno, int* outstart, int* outlength);
 
 namespace exodus {
 
@@ -836,11 +838,17 @@ var var::f(const int argfieldn, const int argvaluen/*=0*/, const int argsubvalue
 		"const")
 	assertString(function_sig);
 
-#if 1
+#if 0
+	// Trying "improved" versions of extraction on random smallish records with few fields/values/subvalues
+	// Very strange because the original version redundantly searches for the end of the field before looking for values etc.
+	// -original- min:  7ns avg: 14ns - the original is the winner ... strange (additional function call?)
+	// extract_v2 min: 11ns avg: 26ns
+	// extract_v3 min: 11ns avg: 20ns
+	// extract_v4 min: 11ns avg: 19ns
 	int outstart;
 	int outlength;
-	::extract(var_str.data(), int(var_str.size()), argfieldn, argvaluen, argsubvaluen, &outstart, &outlength);
-	return var(var_str.data() + outstart, outlength);
+	extract_v4(var_str.data(), int(var_str.size()), argfieldn, argvaluen, argsubvaluen, &outstart, &outlength);
+	return var_str.substr(outstart, outlength);
 #else
 	// any negatives at all returns ""
 	// done inline since unusual

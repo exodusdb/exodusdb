@@ -108,7 +108,9 @@
 		naturalorder.cpp gettimeofday.cpp
 		varoshandle.cpp vardbconn.cpp
 		variter.cpp
-		extract2.cpp # Duplicated in pgexodus as extract.c
+		extract_v2.cpp # Duplicated in pgexodus as extract.c
+		extract_v3.cpp # Failed attempt at optimisation
+		extract_v4.cpp # Failed attempt at optimisation
 		# Little ones last for quick parallel finishing
 		term_getkey.cpp term_haskey.cpp term_echo.cpp term_cursor.cpp
 	)

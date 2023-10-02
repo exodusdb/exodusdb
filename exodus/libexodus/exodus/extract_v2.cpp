@@ -16,8 +16,7 @@ before starting to look for the subvalue.
 
 /* See also extract.c which uses indexes instead of pointer/iterators */
 /* This version extract2.c is slightly faster 120/40ns per op compared to 130/45 ns/op for extract.c */
-void extract(char * instring, int inlength, int fieldno, int valueno, int subvalueno, int* outstart, int* outlength)
-{
+void extract_v2(char * instring, int inlength, int fieldno, int valueno, int subvalueno, int* outstart, int* outlength) noexcept {
 	char* cptr;
 	char* instr_end_pos;
 
