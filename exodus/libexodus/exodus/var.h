@@ -27,6 +27,7 @@ THE SOFTWARE.
 #define EXODUS_RELEASE "23.09"
 #define EXODUS_PATCH "23.09.0"
 
+#include <cstdint> // for uint64_t
 #include <iostream>
 #include <string>
 #include <string_view>
