@@ -5,12 +5,14 @@ set -euxo pipefail
 : Build, install and test exodus
 : ------------------------------
 :
-:	Ubuntu	Postgres
+:	Ubuntu       Postgres  g++
 :
-:	23.04	15 OK
-:	22.04	14 OK - current LTS
-:	20.04	12 OK
-:	18.04	10 KO Exodus requires c++20 so will not build on 18.04
+:	23.10        15.4 OK   13.2
+:	23.04        15.4 OK   12.3
+:	22.04.3 LTS  14.9 OK   11.4
+:	20.04LTS     12   OK
+:
+:	18.04LTS     10   KO Exodus requires c++20 so will not build on 18.04
 :
 : ------
 : Syntax

@@ -23,6 +23,9 @@ programinit()
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wpessimizing-move"
+// GCC warning started in g++13
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpessimizing-move"
 	// Test move constructor
 	{
 		//warning: moving a temporary object prevents copy elision [-Wpessimizing-move]
@@ -36,6 +39,7 @@ programinit()
 		x = std::move(var("xyz"));
 		assert(x eq "xyz");
 	}
+#pragma GCC diagnostic pop
 #pragma clang diagnostic pop
 
 	//++
