@@ -18,7 +18,7 @@ friend class var;
 
  private:
 
-	mutable unsigned int nrows_, ncols_;
+	mutable /*unsigned*/ int nrows_, ncols_;
 	std::vector<var> data_;
 	bool initialised_ = false;
 
@@ -100,9 +100,9 @@ friend class var;
 
 	// Constructor with number of rows and optional number of columns
 	/////////////////////////////////////////////////////////////////
-	dim(const unsigned int nrows, const unsigned int ncols = 1);
+	dim(const /*unsigned*/ int nrows, const /*unsigned*/ int ncols = 1);
 
-	bool redim(const unsigned int nrows, const unsigned int ncols = 1);
+	bool redim(const /*unsigned*/ int nrows, const /*unsigned*/ int ncols = 1);
 
     // Constructor from initializer_list for (int, double, cstr etc.)
 	/////////////////////////////////////////////////////////////////
@@ -114,8 +114,8 @@ friend class var;
 
 		//TRACE(var("dim constructor from initializer_list ") ^ int(list.size()));
 		// list rows, ncols = 1
-		// warning: conversion from ‘std::initializer_list<int>::size_type’ {aka ‘long unsigned int’} to ‘unsigned int’ may change value [-Wconversion]
-		redim(static_cast<unsigned int>(list.size()), 1);
+		// warning: conversion from ‘std::initializer_list<int>::size_type’ {aka ‘long /*unsigned*/ int’} to ‘/*unsigned*/ int’ may change value [-Wconversion]
+		redim(static_cast</*unsigned*/ int>(list.size()), 1);
 
 		// Allow arbitrary copying of element zero without throwing variable not assigned
 		//data_[0].var_typ = VARTYP_STR;
@@ -149,10 +149,10 @@ friend class var;
 	// returns a reference to one var of the array
 	// and so allows lhs assignment like d1(1,2) = "x";
 	// or if on the rhs then use as a normal expression
-	ND VARREF operator()(unsigned int rowno, unsigned int colno = 1);
+	ND VARREF operator()(/*unsigned*/ int rowno, /*unsigned*/ int colno = 1);
 
 	//following const version is called if we do () on a dim which was defined as const xx
-	ND CVR operator()(unsigned int rowno, unsigned int colno = 1) const;
+	ND CVR operator()(/*unsigned*/ int rowno, /*unsigned*/ int colno = 1) const;
 
 	ND var rows() const;
 	ND var cols() const;

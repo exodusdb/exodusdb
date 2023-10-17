@@ -46,7 +46,7 @@ namespace exodus {
 	// cols_ 3, data_ 1 (including element 0), rows = 1 - 1 -> 0, 0 / 3 -> 0 complete rows
 	// cols_ 3, data_ 4 (including element 0), rows = 3 - 1 -> 2, 2 / 3 -> 0 complete rows plus 2 extra elements
 	//#define EXO_DIM_RECALC_NROWS(DIM)\//
-	//	auto data_size = static_cast<unsigned int>((DIM).data_.size());\//
+	//	auto data_size = static_cast</*unsigned*/ int>((DIM).data_.size());\//
 	//	(DIM).nrows_ = data_size ? (--data_size / (DIM).ncols_) : 0;
 #define EXO_DIM_RECALC_NROWS(DIM)
 
@@ -77,8 +77,8 @@ void dim::operator=(const dim& sourcedim) &{
 	//size_t ncells = nrows_ * ncols_ + 1;
 	size_t ncells = data_.size();
 
-	//for (unsigned int celln = 0; celln < ncells; ++celln)
-	for (unsigned int celln = 1; celln < ncells; ++celln)
+	//for (/*unsigned*/ int celln = 0; celln < ncells; ++celln)
+	for (size_t celln = 1; celln < ncells; ++celln)
 		data_[celln] = sourcedim.data_[celln].clone();
 		//data_[celln] = sourcedim.data_[celln];
 	return;
@@ -104,14 +104,14 @@ void dim::operator=(dim&& sourcedim) & {
 }
 
 // constructor - rows only
-//dim::dim(const unsigned int rows)
+//dim::dim(const /*unsigned*/ int rows)
 //	: dim(rows, 1) {}
 
 /////////////////////////////////////////////
 // CONSTRUCTOR GIVEN NROWS AND OPTIONAL NCOLS
 /////////////////////////////////////////////
 
-dim::dim(const unsigned int rows, const unsigned int cols)
+dim::dim(const /*unsigned*/ int rows, const /*unsigned*/ int cols)
 	: nrows_(rows), ncols_(cols), initialised_(true)
 // data_ <--initialized below (after the 'if/throw' statement)
 {
@@ -153,7 +153,7 @@ var dim::cols() const {
 	return ncols_;
 }
 
-bool dim::redim(unsigned int rows, unsigned int cols) {
+bool dim::redim(/*unsigned*/ int rows, /*unsigned*/ int cols) {
 
 	// Allow redim(0, 0) to clear all date
 //	if (rows == 0 || cols == 0)
@@ -191,7 +191,7 @@ bool dim::redim(unsigned int rows, unsigned int cols) {
 
 // the same () function is called regardless of being on LHS or RHS
 // second version is IDENTICAL except for lack of const (used only on "const dim")
-VARREF dim::operator()(unsigned int rowno, unsigned int colno) {
+VARREF dim::operator()(/*unsigned*/ int rowno, /*unsigned*/ int colno) {
 
 	EXO_DIM_RECALC_NROWS(*this)
 
@@ -207,7 +207,7 @@ VARREF dim::operator()(unsigned int rowno, unsigned int colno) {
 	return data_[ncols_ * (rowno - 1) + colno];
 }
 
-CVR dim::operator()(unsigned int rowno, unsigned int colno) const {
+CVR dim::operator()(/*unsigned*/ int rowno, /*unsigned*/ int colno) const {
 
 	EXO_DIM_RECALC_NROWS(*this)
 
@@ -236,7 +236,7 @@ dim& dim::init(CVR sourcevar) {
 	auto data_size = data_.size();
 
 	// init starts from element[0]
-	for (unsigned int elementn = 0; elementn < data_size; elementn++)
+	for (size_t elementn = 0; elementn < data_size; elementn++)
 	//for (size_t elementn = 1; elementn < data_size; elementn++)
 		data_[elementn] = sourcevar;
 
@@ -340,7 +340,7 @@ dim& dim::splitter(CVR str1, SV sepchar) {
 	// Perhaps if sepchar is ""
 
 	THISIS("var dim::split(CVR str1, SV sepchar = FM)")
-	ISSTRING(str1);
+	ISSTRING(str1)
 
 	EXO_DIM_RECALC_NROWS(*this)
 
@@ -362,7 +362,8 @@ dim& dim::splitter(CVR str1, SV sepchar) {
 	std::string::size_type start_pos = 0;
 	std::string::size_type next_pos = 0;
 	size_t sepsize = sepchar.size();
-	size_t fieldno;
+	//size_t fieldno;
+	int fieldno;
 	for (fieldno = 1; fieldno <= this->nrows_; fieldno++) {
 
 		// find the next sepchar delimiter
