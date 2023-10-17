@@ -32,37 +32,39 @@ int DBConnector::add_dbconn(PGconn* conn_to_cache, const std::string conninfo) {
 
 PGconn* DBConnector::get_pgconn(const int index) const {
 	//TimeAcc t(100);
-	//std::lock_guard lock(dbconns_mutex); 
+	//std::lock_guard lock(dbconns_mutex);
 
 	//for (auto pair : dbconns) {
 	//	std::clog << pair.first << ". " << (pair.second.pgconn_) <<std::endl;
 	//}
 
 	//std::lock_guard lock(dbconns_mutex);
-	const auto iter = dbconns_.find(index);
-	return reinterpret_cast<PGconn*>(iter == dbconns_.end() ? 0 : iter->second.pgconn_);
+	auto iter = dbconns_.find(index);
+	//return (PGconn*)(iter == dbconns_.end() ? nullptr : iter->second.pgconn_);
+	//return reinterpret_cast<PGconn*>(iter == dbconns_.end() ? nullptr : iter->second.pgconn_);
+	return static_cast<PGconn*>(iter == dbconns_.end() ? nullptr : iter->second.pgconn_);
 }
 
 DBConn* DBConnector::get_dbconn(const int index) const {
 	//TimeAcc t(103);
 	//std::lock_guard lock(dbconns_mutex);
-	const auto iter = dbconns_.find(index);
-	return (DBConn*)(iter == dbconns_.end() ? 0 : &iter->second);
-	//return reinterpret_cast<DBConn*>(iter == dbconns_.end() ? 0 : &iter->second);
+	auto iter = dbconns_.find(index);
+	return static_cast<DBConn*>(iter == dbconns_.end() ? nullptr : &iter->second);
+	//return reinterpret_cast<DBConn*>(iter == dbconns_.end() ? nullptr : &iter->second);
 }
 
 //ConnectionLocks* DBConnector::get_lock_table(int index) const {
 //	//std::lock_guard lock(dbconns_mutex);
 //	const auto iter = dbconns_.find(index);
-//	return (ConnectionLocks*)(iter == dbconns_.end() ? 0 : iter->second.locks__);
+//	return (ConnectionLocks*)(iter == dbconns_.end() ? nullptr : iter->second.locks__);
 //}
 
-DBCache* DBConnector::get_dbcache(const int index) const {
+DBCache* DBConnector::get_dbcache(const int index) const{
 	//TimeAcc t(104);
 	//std::lock_guard lock(dbconns_mutex);
-	const auto iter = dbconns_.find(index);
-	return (DBCache*)(iter == dbconns_.end() ? 0 : &iter->second.dbcache_);
-	//return reinterpret_cast<DBCache*>(iter == dbconns_.end() ? 0 : &iter->second.dbcache_);
+	auto iter = dbconns_.find(index);
+	return static_cast<DBCache*>(iter == dbconns_.end() ? nullptr : &iter->second.dbcache_);
+	//return reinterpret_cast<DBCache*>(iter == dbconns_.end() ? nullptr : &iter->second.dbcache_);
 }
 
 // pass filename and key by value relying on short string optimisation for performance

@@ -185,7 +185,7 @@ syntax_flags_typ get_regex_syntax_flags(SV options) {
 	return regex_syntax_flags;
 }
 
-thread_local std::map<std::string, REGEX> thread_regexes;
+static thread_local std::map<std::string, REGEX> thread_regexes;
 
 // Caches regex giving very approx 10x speed up
 REGEX& getregex(SV matchstr, SV options) {
@@ -217,7 +217,8 @@ REGEX& getregex(SV matchstr, SV options) {
 	}
 
 	// Cannot get here
-	throw VarError("getreg");
+	//std::unreachable();
+	//throw VarError("getreg");
 }
 
 // should be in mvfuncs.cpp - here really because boost regex is included here for file matching
@@ -373,7 +374,8 @@ VARREF var::replacer(SV what, SV with) {
 		start_pos += with.size();
 	}
 
-	return *this;
+	//std::unreachable();
+	//return *this;
 }
 
 // Regex based string replacement

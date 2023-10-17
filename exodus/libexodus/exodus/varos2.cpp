@@ -156,7 +156,7 @@ void var::initrnd() const {
 	thread_RNG = std::make_unique<RNG_typ>(seed);
 }
 
-thread_local std::string thread_environ;
+static thread_local std::string thread_environ;
 
 bool var::osgetenv(const char* envcode) {
 

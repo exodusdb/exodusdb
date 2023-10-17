@@ -906,7 +906,7 @@ function loop_exit() {
 
 		// call log2('LISTEN: Backup time for ':datasetcode,logtime)
 
-		// delay closedown randomly to avoid conflict with identically configured processes
+		// delay 0 to 10 seconds closedown randomly to avoid conflict with identically configured processes
 		call ossleep(1000 * var(10).rnd());
 
 		dow = date().oconv("DW");
@@ -1037,7 +1037,8 @@ function got_link() {
 openlink1:
 		if (not linkfile1.osopen(linkfilename1)) {
 			// remove from future candidate files?
-			call ossleep(1000 * 1 / 10.0);
+			// delay 100ms = 1/10th of second
+			call ossleep(100);
 			if (tracing) {
 				printl("CANNOT OPEN RW ", linkfilename1.quote());
 			}
@@ -1057,7 +1058,8 @@ openlink1:
 		// if cannot read it then try again
 		if (request_ == "" and time() == timex) {
 			var().osflush();
-			call ossleep(1000 * 1 / 10.0);
+			// delay 100ms = 1/10th of second
+			call ossleep(100);
 			linkfile1.osclose();
 			// 			if (not linkfile1.osopen(linkfilename1)) {
 			// 				{}
@@ -1097,7 +1099,8 @@ deleterequest:
 			abort(lasterror());
 		if (linkfilename1.osfile()) {
 			var().osflush();
-			call ossleep(1000 * 1 / 10.0);
+			// delay 100ms = 1/10th of second
+			call ossleep(100);
 			ntries += 1;
 			// if tracing then print 'COULD NOT DELETE ':linkfile1
 			if (ntries < 100) {

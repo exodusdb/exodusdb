@@ -110,7 +110,7 @@ function main() {
 			if (count eq 2)
 				v1 = "cc";	//will have no effect on d1
 		}
-		TRACE(d1.join());
+		TRACE(d1.join())
 
 		assert(d1.join().outputl() eq "aa" _FM "bb");	//default separator is FM
 		assert(d1.join("").outputl() eq
@@ -167,7 +167,7 @@ function main() {
 			if (count eq 2)
 				v1 = "cc";	//will update d1
 		}
-		TRACE(d1.join());
+		TRACE(d1.join())
 		assert(d1.join() eq "aa" _FM "cc");	 //d1 updated
 	}
 
@@ -175,8 +175,8 @@ function main() {
 
 		// Construct from list
 		dim d1 = {1, 2, 3};
-		TRACE(d1.join());
-		TRACE(d1.join().outputl());
+		TRACE(d1.join())
+		TRACE(d1.join().outputl())
 		assert(d1.join() eq "1^2^3"_var);
 
 		// Copy construction (from lvalue)
@@ -203,7 +203,7 @@ function main() {
 	var a10;
 	//check global split returns number of elements and an array out
 	a9 = split("xx" ^ FM ^ "bb");
-	TRACE(a9.rows());
+	TRACE(a9.rows())
 	assert(a9.rows() eq 2);
 	//check join returns correct string
 	assert(join(a9) eq("xx" ^ FM ^ "bb"));
@@ -307,7 +307,7 @@ function main() {
 		// remove_if
 		d1 = "10^2^1^20"_var.split();
 		std::remove_if(d1.begin(), d1.end(), [](var x){return x eq "2";});
-		TRACE(d1.join("^"));
+		TRACE(d1.join("^"))
 		assert(d1.join() eq "10^1^20^"_var);
 
 		// remove_if
@@ -485,24 +485,24 @@ function main() {
 
 		printl("Test writing a dim array to a text file");
 		d1(3) = "bb";
-		TRACE(d1.join());
+		TRACE(d1.join())
 
 		txt = "a\nb\nbb\nc\n";
 		d1 = split(txt);
-		TRACE(txt);
-		TRACE(txt.oconv("HEX"));
-		TRACE(txt.replace("\n","|"));
-		TRACE(txt.replace("\n","|"));
+		TRACE(txt)
+		TRACE(txt.oconv("HEX"))
+		TRACE(txt.replace("\n","|"))
+		TRACE(txt.replace("\n","|"))
 
-		TRACE(d1.rows());
+		TRACE(d1.rows())
 		assert(d1.oswrite(osfilename));
 		assert(osfile(osfilename).f(1) eq 9);
 		printl();
 		assert(d1.osread(osfilename));
-		TRACE(d1.join("\n").replace("\n","|"));
-		TRACE(d1.rows());
-		TRACE(txt);
-		TRACE(txt.replace("\n","|"));
+		TRACE(d1.join("\n").replace("\n","|"))
+		TRACE(d1.rows())
+		TRACE(txt)
+		TRACE(txt.replace("\n","|"))
 		//assert((d1.join("\n") ^ "\n") eq txt);
 		assert(d1.join("\n") eq txt);
 
@@ -520,7 +520,7 @@ function main() {
 		printl("read wintext1 into dim array");
 		dim d2;
 		assert(d2.osread(temposfilename));
-		TRACE(d2.join());
+		TRACE(d2.join())
 
 		printl("verify dimmary array element (5) is eee");
 		assert(d2(5) eq "eee");
@@ -685,7 +685,7 @@ function main() {
 		dim d1;
 		var rec = "aa^bb^cc"_var;
 		d1.splitter(rec);
-		TRACE(d1.join());
+		TRACE(d1.join())
 		assert(d1.join() eq rec);
 
 		// Check split into existing array is padded with ""

@@ -111,8 +111,8 @@ void extract_v2(char * instring, int inlength, int fieldno, int valueno, int sub
 			valueno = 1;
 		else
 		{
-			*outstart = (int)(cptr - instring);
-			*outlength = (int)(field_end_pos - cptr);
+			*outstart = static_cast<int>(cptr - instring);
+			*outlength = static_cast<int>(field_end_pos - cptr);
 			return;
 		}
 	}
@@ -153,8 +153,8 @@ void extract_v2(char * instring, int inlength, int fieldno, int valueno, int sub
 	if (subvalueno <= 0) {
 		if (subvalueno < 0)
 			return;
-		*outstart = (int)(cptr - instring);
-		*outlength = (int)(value_end_pos - cptr);
+		*outstart = static_cast<int>(cptr - instring);
+		*outlength = static_cast<int>(value_end_pos - cptr);
 	}
 
 	/*
@@ -187,8 +187,8 @@ void extract_v2(char * instring, int inlength, int fieldno, int valueno, int sub
 	}
 
 	/* Return the start and length of the current subvalue */
-	*outstart = (int)(cptr - instring);
-	*outlength = (int)(subvalue_end_pos - cptr);
+	*outstart = static_cast<int>(cptr - instring);
+	*outlength = static_cast<int>(subvalue_end_pos - cptr);
 
 	return;
 }

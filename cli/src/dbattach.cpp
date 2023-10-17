@@ -176,12 +176,12 @@ function main() {
 				//if (not conn1.sqlexec("DROP TABLE IF EXISTS " ^ filenames.replace(","," ")))
 				//      abort(conn1.lasterror());
 				if (not conn1.deletefile(filename))
-					{};//logputl(conn1.lasterror());
+					{}//logputl(conn1.lasterror());
 			}
 
 			//logputl("Remove any existing connected foreign table " ^ filename);
 			if (conn1.open(filename) and not conn1.sqlexec("DROP FOREIGN TABLE IF EXISTS " ^ filename))
-				{};//abort(conn1.lasterror());
+				{}//abort(conn1.lasterror());
 		}
 		//logputl("Connect to the foreign table " ^ filename);
 		let sql = "IMPORT FOREIGN SCHEMA public LIMIT TO (" ^ filename ^ ") FROM SERVER " ^ dbname2 ^ " INTO public";

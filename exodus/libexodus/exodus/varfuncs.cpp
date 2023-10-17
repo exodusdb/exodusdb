@@ -65,7 +65,13 @@ Binary    Hex          Comments
 //https://github.com/fastfloat/fast_float
 #if __has_include(<fast_float/fast_float.h>)
 #define HAS_FASTFLOAT
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
+#pragma clang diagnostic ignored "-Wold-style-cast"
+#pragma clang diagnostic ignored "-Wextra-semi-stmt"
+#pragma clang diagnostic ignored "-Wreserved-identifier"
 #include <fast_float/fast_float.h>
+#pragma clang diagnostic pop
 #define STD_OR_FASTFLOAT fast_float
 
 #elif __GNUC__ >= 11
@@ -97,7 +103,7 @@ Binary    Hex          Comments
 #define DEFAULT_SPACE
 
 // std::ios::sync_with_stdio(false);
-bool desynced_with_stdio = false;
+static bool desynced_with_stdio = false;
 
 // TODO check that all string increase operations dont crash the system
 
@@ -110,7 +116,11 @@ namespace exodus {
 
 
 // exodus uses one locale per thread
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wexit-time-destructors"
+#pragma clang diagnostic ignored "-Wglobal-constructors"
 inline thread_local std::locale thread_boost_locale1;
+#pragma clang diagnostic pop
 
 inline void init_boost_locale1() {
 	if (thread_boost_locale1.name() != "*") {
@@ -667,7 +677,6 @@ VARREF var::inverter() {
 	// 256 byte page
 	for (auto& c : u32_str1)
 		c ^= char32_t(255);
-	;
 
 	// convert back to utf8
 	//this->from_u32string(u32_str1);
@@ -1795,7 +1804,7 @@ CVR var::put(std::ostream& ostream1) const {
 	// verify conversion to UTF8
 	// std::string tempstr=(*this).toString();
 
-	ostream1.write(var_str.data(), (std::streamsize)var_str.size());
+	ostream1.write(var_str.data(), static_cast<std::streamsize>(var_str.size()));
 	return *this;
 }
 
@@ -2093,7 +2102,8 @@ var var::indexn(SV substr, const int occurrenceno) const {
 	}
 
 	// should never get here
-	return 0;
+	//std::unreachable();
+	//return 0;
 }
 
 // fieldno can be "" to return the whole record (0 returns the key)

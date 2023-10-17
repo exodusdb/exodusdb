@@ -587,8 +587,8 @@ function getcss(io css, in version = "") {
 	//but work around is TABLE {FONT-SIZE:100%} in css
 
 	//prevents IE later versions from working in standards mode
-	//<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7" />
-	//<meta http-equiv="x-ua-compatible" content="IE=6" />
+	// <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7" />
+	// <meta http-equiv="x-ua-compatible" content="IE=6" />
 
 	let charset = SYSTEM.f(127);
 	if (charset) {

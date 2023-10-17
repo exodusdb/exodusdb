@@ -60,7 +60,7 @@ programinit()
 	assert(not read(RECORD, dosfile, "t_xyz.txt"));
 
 	var trec;
-	if (not deletefile(filename)) {};
+	if (not deletefile(filename)) {}
 	assert(createfile(filename));
 
 	printl("Test rename, and rename back");
@@ -180,7 +180,7 @@ programinit()
 		printl("Create a temp file");
 		var tempfilename = "xo_test_db_deleterecord_temp";
 		var tempfile	 = tempfilename;
-		if (not deletefile(tempfile)) {};
+		if (not deletefile(tempfile)) {}
 		assert(createfile(tempfile));
 		assert(not read(RECORD from tempfile, "%RECORDS%"));
 		for (int i = 1; i le 10; ++i)
@@ -357,7 +357,7 @@ programinit()
 		//	createfile/deletefile
 		assert(connect());	// global connection
 		var file = "NANOTABLE_temp";
-		if (not deletefile(file)) {};
+		if (not deletefile(file)) {}
 		assert(createfile(file));
 
 		//check 1 can be locked and not relocked
@@ -399,7 +399,7 @@ programinit()
 		assert(connect());	// global connection
 		assert(begintrans());
 		var file = "NANOTABLE";
-		if (not deletefile(file)) {};
+		if (not deletefile(file)) {}
 		assert(createfile(file));
 
 		//check 1 can be locked and CAN BE relocked since in a transaction

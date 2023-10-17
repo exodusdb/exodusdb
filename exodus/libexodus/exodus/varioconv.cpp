@@ -26,6 +26,7 @@ THE SOFTWARE.
 #include <string>
 #include <sstream>
 #include <bitset>
+//#include <utility> //std::unreachable()
 
 #include <exodus/varimpl.h>
 
@@ -39,28 +40,24 @@ static constexpr int LASTDELIMITERCHARNOPLUS1 = FM_ + 2;
 
 static constexpr int HEX_PER_CHAR = sizeof(char) * 2;
 
-//var var::iconv(CVR convstr) const {
+//var var::iconv(CVR convcstr) const {
 //
-//	THISIS("var var::iconv(CVR convstr) const")
-//	ISSTRING(convstr)
+//	THISIS("var var::iconv(CVR convcstr) const")
+//	ISSTRING(convcstr)
 //
-//	return iconv(convstr.var_str.c_str());
+//	return iconv(convcstr.var_str.c_str());
 //}
 
 /**
-converts from external format to internal depending on conversion
+	Converts from external format to internal depending on conversion
 
+	@param convcstr A string containing a conversion instruction
 
-@param convstr
-A string containing a conversion instruction
-
-@return
-The result in internal format
-
+	@return The result in internal format
 */
-var var::iconv(const char* convstr) const {
+var var::iconv(const char* convcstr) const {
 
-	THISIS("var var::iconv(const char* convstr) const")
+	THISIS("var var::iconv(const char* convcstr) const")
 	assertString(function_sig);
 
 	// empty string in, empty string out
@@ -74,7 +71,7 @@ var var::iconv(const char* convstr) const {
 	var terminator;
 	var outx = "";
 
-	const char* conversionchar = convstr;
+	const char* conversionchar = convcstr;
 
 	// check first character
 	switch (*conversionchar) {
@@ -90,7 +87,7 @@ var var::iconv(const char* convstr) const {
 
 				if (part.var_typ & VARTYP_STR && part.var_str.empty()) {
 				} else
-					outx ^= part.iconv_D(convstr);
+					outx ^= part.iconv_D(convcstr);
 
 				if (!terminator)
 					break;
@@ -98,8 +95,8 @@ var var::iconv(const char* convstr) const {
 			} while (true);
 
 			return outx;
+			//std::unreachable();
 			break;
-
 		// "MD", "MC", "MT", "MX"
 		case 'M':
 
@@ -117,7 +114,7 @@ var var::iconv(const char* convstr) const {
 				if (part.var_typ & VARTYP_STR && part.var_str.empty()) {
 				}
 
-				// do convstr on a number
+				// do convcstr on a number
 				else {
 
 					// check second character
@@ -130,12 +127,13 @@ var var::iconv(const char* convstr) const {
 							throw VarError(
 								"iconv MD and MC are not implemented yet");
 							//							output
-							//^= part.iconv_MD(convstr);
+							//^= part.iconv_MD(convcstr);
+							//std::unreachable();
 							break;
 
 						// "MT"
 						case 'T':
-							// outx ^= part.iconv_MT(convstr);
+							// outx ^= part.iconv_MT(convcstr);
 							outx ^= part.iconv_MT();
 							break;
 
@@ -151,6 +149,7 @@ var var::iconv(const char* convstr) const {
 							// ss << std::hex << std::uppercase << part.round().toInt();
 							// outx ^= ss.str();
 							// break;
+							//std::unreachable();
 
 						// "MB" binary to decimal
 						case 'B':
@@ -173,7 +172,7 @@ var var::iconv(const char* convstr) const {
 
 								outx ^= opart;
 							}
-							catch (std::invalid_argument& e) {
+							catch ([[maybe_unused]] std::invalid_argument& e) {
 								// If anything but 0 and 1 in string
 							}
 
@@ -187,6 +186,7 @@ var var::iconv(const char* convstr) const {
 			}
 
 			return outx;
+			//std::unreachable();
 			break;
 
 		// iconv L#, R#, T#, C# do nothing. TX converts text to record format
@@ -203,7 +203,8 @@ var var::iconv(const char* convstr) const {
 			[[fallthrough]];
 		case 'C':
 			// return "";
-			return convstr;
+			return convcstr;
+			//std::unreachable();
 			break;
 
 		// HEX
@@ -224,15 +225,19 @@ var var::iconv(const char* convstr) const {
 				switch (*conversionchar) {
 					case '\0':
 						return iconv_HEX(HEX_PER_CHAR);
+						//std::unreachable();
 						break;
 					case '2':
 						return iconv_HEX(2);
+						//std::unreachable();
 						break;
 					case '4':
 						return iconv_HEX(4);
+						//std::unreachable();
 						break;
 					case '8':
 						return iconv_HEX(8);
+						//std::unreachable();
 						break;
 				}
 
@@ -246,20 +251,21 @@ var var::iconv(const char* convstr) const {
 		// access to mv environment required to call external subroutines
 		case '[':
 
-			throw VarError("Custom conversions like (" ^ var(convstr) ^
+			throw VarError("Custom conversions like (" ^ var(convcstr) ^
 						  ") must be called like a function iconv(input,conversion) not "
 						  "like a method, input.iconv(conversion)");
 			break;
 
-		// empty convstr string - no conversion
+		// empty convcstr string - no conversion
 		case '\0':
 			return (*this);
 	}
 
 	// TODO implement
-	throw VarNotImplemented("iconv '" ^ var(convstr) ^ "' not implemented yet ");
+	throw VarNotImplemented("iconv '" ^ var(convcstr) ^ "' not implemented yet ");
 
-	return *this;
+	//std::unreachable();
+	//return *this;
 }
 
 var var::oconv_T(CVR format) const {
@@ -483,8 +489,8 @@ var var::oconv_MD(const char* conversion) const {
 			case 'X':
 				//do no conversion
 				return *this;
+				//std::unreachable();
 				break;
-
 			default:
 				if (prefixchar == '\0') {
 					//MD140P conversion ie 0 for prefix, is invalid conversion
@@ -710,7 +716,6 @@ var var::oconv_LRC(CVR format) const {
 		// BREAK;
 		if (!terminator)
 			break;
-		;
 
 		outx ^= var().chr(LASTDELIMITERCHARNOPLUS1 - terminator.toInt());
 	}  // loop;
@@ -964,8 +969,9 @@ var var::oconv(const char* conversion) const {
 	// TODO implement
 	throw VarNotImplemented("oconv '" ^ var(conversion).first(16) ^ "' not implemented yet ");
 
+	//std::unreachable();
 	// unknown conversions are simply ignored in pickos
-	return *this;
+	//return *this;
 }
 
 var var::oconv_TX(const int raw) const {

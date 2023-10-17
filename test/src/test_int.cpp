@@ -14,16 +14,16 @@ programinit()
 		TRACE(65536L * 65536L * 65536L)
 
 		try {
-			TRACE(0xffffffffffffffff);	// minus 1
+			TRACE(0xffffffffffffffff)	// minus 1
 			assert(false);
 		} catch (VarNumOverflow e) {
 			printl(e.description);
 		}
 
-		TRACE(0x7fffffffffffffff);	// max int64
+		TRACE(0x7fffffffffffffff)	// max int64
 
 		try {
-			TRACE(0x8000000000000000);	// min int64
+			TRACE(0x8000000000000000)	// min int64
 			assert(false);
 		} catch (VarNumOverflow e) {
 			printl(e.description);
@@ -32,7 +32,7 @@ programinit()
 		try {
 			var i64 = 0xefffffffffffffff;
 			i64.dump().outputl();
-			TRACE(i64);
+			TRACE(i64)
 			assert(false);
 		} catch (VarNumOverflow e) {
 			printl(e.description);
@@ -117,7 +117,7 @@ programinit()
 		assert(x.toInt64()    eq 21'112'000'001);
 		assert(x.toString() eq "21112000001");
 		x.dump().outputl();
-		TRACE(x.toInt());
+		TRACE(x.toInt())
 
 		printl();
 		var y = 21112000001;
@@ -130,13 +130,13 @@ programinit()
 		assert(y.toInt64()    eq 21'112'000'001);
 		assert(y.toString() eq "21112000001");
 		y.dump().outputl();
-		TRACE(y);
+		TRACE(y)
 
 		printl();
 		var z = 2;
 		TRACE(z)
 		z = z.pwr(4);
-		TRACE(z);
+		TRACE(z)
 		z.dump().outputl();
 
 		printl();
@@ -149,8 +149,8 @@ programinit()
 		//throws
 		//maxint++;
 
-		TRACE(maxint + 1);
-		TRACE(maxint * 2);
+		TRACE(maxint + 1)
+		TRACE(maxint * 2)
 
 		//should throw
 		maxint *= 2;

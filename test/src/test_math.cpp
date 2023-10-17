@@ -419,7 +419,7 @@ subroutine test2(in as, in bs) {
 		assert(exodus::sqrt(100.0)                eq 10);
 
 		var dividend = 100;
-		TRACE(mod(dividend, 30));
+		TRACE(mod(dividend, 30))
 
 		assert(mod(-4, 3) eq 2);
 		assert(mod(-3, 3) eq 0);
@@ -485,8 +485,8 @@ subroutine test2(in as, in bs) {
 		assert(mod(-1.0, -3.0) eq -1);
 		assert(mod(-0.0, -3.0) eq 0);
 		assert(mod(0.0, -3.0)  eq 0);
-		TRACE(mod(1.0, -3.0));
-		TRACE(fmod(1.0, -3.0));
+		TRACE(mod(1.0, -3.0))
+		TRACE(fmod(1.0, -3.0))
 		TRACE(1 % -3)
 		TRACE(-1 % 3)
 		assert(mod(1.0, -3.0)  eq -2);
@@ -495,13 +495,13 @@ subroutine test2(in as, in bs) {
 		assert(mod(4.0, -3.0)  eq -2);
 
 		//check floating point modulo
-		TRACE(mod(2.3, var(1.499)).round(3));
+		TRACE(mod(2.3, var(1.499)).round(3))
 		assert(mod(2.3, var(1.499)).round(3)   eq 0.801);
-		TRACE(mod(-2.3, var(-1.499)).round(3));
+		TRACE(mod(-2.3, var(-1.499)).round(3))
 		assert(mod(-2.3, var(-1.499)).round(3) eq - 0.801);
-		TRACE(mod(-2.3, var(1.499)).round(3));
+		TRACE(mod(-2.3, var(1.499)).round(3))
 		assert(mod(-2.3, var(1.499)).round(3)  eq 0.698);
-		TRACE(mod(2.3, var(-1.499)).round(3));
+		TRACE(mod(2.3, var(-1.499)).round(3))
 		assert(mod(2.3, var(-1.499)).round(3)  eq - 0.698);
 	}
 

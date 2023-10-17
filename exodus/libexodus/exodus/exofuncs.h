@@ -32,6 +32,10 @@ namespace exodus {
 
 	// clang-format off
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wexit-time-destructors"
+#pragma clang diagnostic ignored "-Wglobal-constructors"
+
 #if defined _MSC_VER || defined __CYGWIN__ || defined __MINGW32__
 
 	const var              EOL      = "\r\n";
@@ -62,6 +66,8 @@ namespace exodus {
 #	define                _PLATFORM   "x86"
 #endif
 
+#pragma clang diagnostic pop
+
 // clang-format on
 
 inline std::mutex global_mutex_threadstream;
@@ -83,14 +89,14 @@ inline std::mutex global_mutex_threadstream;
 #define DEFAULT_M1 = -1
 #define DEFAULT_FALSE = false
 
-int exodus_main(int exodus__argc, const char* exodus__argv[], ExoEnv& mv, int threadno);
+int exodus_main(int exodus_argc, const char* exodus_argv[], ExoEnv& mv, int threadno);
 
 ND var  osgetenv(CVR envcode DEFAULT_EMPTY);
 ND bool osgetenv(CVR code, VARREF value);
    void ossetenv(CVR code, CVR value);
 
-ND var ostempdirpath();
-ND var ostempfilename();
+ND var ostempdirpath(void);
+ND var ostempfilename(void);
 
 ND bool assigned(CVR var1);
 ND bool unassigned(CVR var1);
@@ -100,12 +106,12 @@ ND bool unassigned(CVR var1);
 
 // OS
 
-ND var date();
-ND var time();
-ND var ostime();
-ND var timestamp();
+ND var date(void);
+ND var time(void);
+ND var ostime(void);
+ND var timestamp(void);
 ND var timestamp(CVR date, CVR time);
-//ND var timedate();
+//ND var timedate(void);
 
    void ossleep(const int milliseconds);
 ND var  oswait(const int milliseconds, SV dirpath);
@@ -147,12 +153,12 @@ ND var  osdir(CVR dirpath);
 ND bool osmkdir(CVR dirpath);
 ND bool osrmdir(CVR dirpath, const bool evenifnotempty DEFAULT_FALSE);
 
-ND var  oscwd();
+ND var  oscwd(void);
 ND var  oscwd(CVR dirpath);
 
-   void osflush();
-ND var  ospid();
-ND var  ostid();
+   void osflush(void);
+ND var  ospid(void);
+ND var  ostid(void);
 
 ND bool osshell(CVR command);
 ND bool osshellwrite(CVR writestr, CVR command);
@@ -162,10 +168,10 @@ ND var  osshellread(CVR command);
 //var execute(CVR command);
 
 //void debug(CVR DEFAULT_EMPTY);
-ND var backtrace();
+ND var backtrace(void);
 
    bool setxlocale(const char* locale);
-ND var  getxlocale();
+ND var  getxlocale(void);
 
 // MATH
 
@@ -182,10 +188,10 @@ ND var mod(CVR dividend, CVR divisor);
 ND var mod(CVR dividend, const double divisor);
 ND var mod(CVR dividend, const int divisor);
 
-// integer() represents pick int() because int() is reserved word in c/c++
-// Note that integer like pick int() is the same as floor()
-// whereas the usual c/c++ int() simply take the next integer nearest 0 (ie cuts of any fractional
-// decimal places) to get the usual c/c++ effect use toInt() (although toInt() returns an int
+// integer(void) represents pick int(void) because int(void) is reserved word in c/c++
+// Note that integer like pick int(void) is the same as floor(void)
+// whereas the usual c/c++ int(void) simply take the next integer nearest 0 (ie cuts of any fractional
+// decimal places) to get the usual c/c++ effect use toInt(void) (although toInt(void) returns an int
 // instead of a var like normal exodus functions)
 ND var integer(CVR num1);
 ND var floor(CVR num1);
@@ -196,22 +202,22 @@ ND var rnd(const int number);
 
 // INPUT
 
-ND var getprompt();
+ND var getprompt(void);
    void setprompt(CVR prompt);
 
-var input();
+var input(void);
 
 var input(CVR prompt);
 
 var inputn(const int nchars);
 
-ND bool isterminal();
+ND bool isterminal(void);
 ND bool hasinput(const int millisecs DEFAULT_0);
-ND bool eof();
+ND bool eof(void);
    bool echo(const int on_off);
 
-   void breakon();
-   void breakoff();
+   void breakon(void);
+   void breakoff(void);
 
 // SIMPLE STRINGS
 
@@ -403,11 +409,11 @@ VARREF parser(VARREF iostring, char sepchar DEFAULT_CSPACE);
 // DATABASE
 
 ND bool connect(CVR connectioninfo DEFAULT_EMPTY);
-   void disconnect();
-   void disconnectall();
+   void disconnect(void);
+   void disconnectall(void);
 
 ND bool dbcreate(CVR dbname);
-ND var  dblist();
+ND var  dblist(void);
 ND bool dbcopy(CVR from_dbname, CVR to_dbname);
 ND bool dbdelete(CVR dbname);
 
@@ -415,7 +421,7 @@ ND bool createfile(CVR dbfilename);
 ND bool deletefile(CVR dbfilename_or_var);
 ND bool clearfile(CVR dbfilename_or_var);
 ND bool renamefile(CVR old_dbfilename, CVR new_dbfilename);
-ND var  listfiles();
+ND var  listfiles(void);
 
 ND var  reccount(CVR dbfilename_or_var);
 
@@ -423,15 +429,15 @@ ND bool createindex(CVR dbfilename_or_var, CVR fieldname DEFAULT_EMPTY, CVR dict
 ND bool deleteindex(CVR dbfilename_or_var, CVR fieldname DEFAULT_EMPTY);
 ND var  listindex(CVR dbfilename DEFAULT_EMPTY, CVR fieldname DEFAULT_EMPTY);
 
-ND bool begintrans();
-ND bool statustrans();
-ND bool rollbacktrans();
-ND bool committrans();
-   void cleardbcache();
+ND bool begintrans(void);
+ND bool statustrans(void);
+ND bool rollbacktrans(void);
+ND bool committrans(void);
+   void cleardbcache(void);
 
 ND bool lock(CVR dbfilevar, CVR key);
    void unlock(CVR dbfilevar, CVR key);
-   void unlockall();
+   void unlockall(void);
 
 ND bool open(CVR dbfilename, VARREF dbfilevar);
 ND bool open(CVR dbfilename);
@@ -452,7 +458,7 @@ ND bool dimwrite(const dim& dimrecord, CVR dbfilevar, CVR key);
 
 // moved to exoprog so they have access to default cursor in mv.CURSOR
 // bool select(CVR sortselectclause DEFAULT_EMPTY);
-// void clearselect();
+// void clearselect(void);
 // bool readnext(VARREF key);
 // bool readnext(VARREF key, VARREF valueno);
 // bool readnext(VARREF record, VARREF key, VARREF value);
@@ -461,14 +467,14 @@ ND bool dimwrite(const dim& dimrecord, CVR dbfilevar, CVR key);
 ND var xlate(CVR dbfilename, CVR key, CVR fieldno, const char* mode);
 ND var xlate(CVR dbfilename, CVR key, CVR fieldno, CVR mode);
 
-ND var lasterror();
+ND var lasterror(void);
    var loglasterror(CVR source DEFAULT_SPACE);
 
 ////////////////////////////////////////////
 //output(args), outputl(args), outputt(args)
 ////////////////////////////////////////////
 
-// BINARY TRANSPARENT version of print()
+// BINARY TRANSPARENT version of print(void)
 // No automatic separator
 // Outputs to stdout/cout
 // Multi-argument
@@ -620,29 +626,29 @@ void logput(const Printable&... values) {
 }
 
 /////////////////////////////////
-// printl(), errputl(), logputl()
+// printl(void), errputl(void), logputl(void)
 /////////////////////////////////
 
 // Always outputs just \n
 // Flushes output
 
-// printl() to cout
+// printl(void) to cout
 
-void printl() {
+inline void printl(void) {
 	LOCKIOSTREAM_SLOW
 	std::cout << std::endl;
 }
 
-// errputl() to cerr
+// errputl(void) to cerr
 
-void errputl() {
+inline void errputl(void) {
 	LOCKIOSTREAM_SLOW
 	std::cerr << std::endl;
 }
 
-// logputl() to clog
+// logputl(void) to clog
 
-void logputl() {
+inline void logputl(void) {
 	LOCKIOSTREAM_FAST
 	std::clog << std::endl;
 }
@@ -665,7 +671,7 @@ void printt(const Printable&... values) {
 }
 
 ///////////
-// printt()
+// printt(void)
 ///////////
 
 // Zero arguments
@@ -673,10 +679,10 @@ void printt(const Printable&... values) {
 // Just appends a sep (tab)
 // Does *not* flush output
 
-// printt() to cout
+// printt(void) to cout
 
 template <auto sep = '\t'>
-void printt() {
+void printt(void) {
 	LOCKIOSTREAM_SLOW
 	std::cout << sep;
 }

@@ -79,7 +79,7 @@ extern PUBLIC std::vector<ExoEnv*> global_environments;
 class NamedCommon {
  public:
 	// Virtual because derived class's members should be destructed
-	virtual ~NamedCommon(){};
+	virtual ~NamedCommon(){}
 };
 
 class PUBLIC ExoEnv final {
@@ -190,7 +190,7 @@ class PUBLIC ExoEnv final {
 	int COL2 = 0;
 
 	// define a type of object that holds many NamedCommons
-	NamedCommon* namedcommon[99] = {0};
+	NamedCommon* namedcommon[99] = {nullptr};
 
 	// A cache of handles to dynamically loaded shared libraries
 	std::map<std::string, void*> dlopen_cache;

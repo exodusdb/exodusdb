@@ -46,8 +46,8 @@ function main() {
 	testfilename = "xo_test_select";
 	dictfilename = "dict." ^ testfilename;
 
-	if (not deletefile(testfilename)) {};
-	if (not deletefile(dictfilename)) {};
+	if (not deletefile(testfilename)) {}
+	if (not deletefile(dictfilename)) {}
 
 	assert(createfile(testfilename));
 	assert(createfile(dictfilename));

@@ -171,7 +171,7 @@ programinit()
 		var x = "xyz"_var.locateby("XX", "xyz", MV);
 		assert(false);
 	} catch (VarError e) {
-	};
+	}
 
 	assert(var("f100" _FM "f210" _VM "" _VM "f230").locateby("AL", "", vn, 2));
 	assert(vn eq 2);
@@ -447,7 +447,7 @@ programinit()
 
 	//?
 	assert(!revints.locateby("DL", 21, locii));
-	TRACE(locii);
+	TRACE(locii)
 	assert(locii eq 2);
 
 	assert(!ascints.locateby("AR", 321, locii));

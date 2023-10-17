@@ -72,7 +72,7 @@ function main() {
 					cmd ^= " --color=always";
 				if (not osshell(cmd)) {
 					//lasterror().outputl();
-				};
+				}
 				osremove(tmpfilename) or abort(lasterror());
 			}
 		}

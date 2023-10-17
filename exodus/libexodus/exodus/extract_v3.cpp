@@ -111,6 +111,6 @@ void extract_v3(char * instring, int inlength, int fn, int vn, int sn, int* outs
 		// control characters from 0 to below SM_
 		++cptr;
 	}
-	*outstart = (int)(start - instring);
-	*outlength = (int)(cptr - start);
+	*outstart = static_cast<int>(start - instring);
+	*outlength = static_cast<int>(cptr - start);
 }

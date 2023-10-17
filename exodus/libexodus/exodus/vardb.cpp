@@ -188,7 +188,10 @@ Within transactions, lock requests for locks that have already been obtained alw
 //
 //  grep -P '\bPQ[\w]+' *.cpp --color=always|grep -vP 'errorMessage|resultStatus|ntuples|getisnull|cmdTuples|PQexec|getvalue|getlength|nfields|PQfname|resultError'
 //
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wreserved-identifier"
 #include <libpq-fe.h>  //in postgres/include
+#pragma GCC diagnostic pop
 
 //#include <arpa/inet.h>//for ntohl()
 
@@ -270,17 +273,17 @@ static void PGconn_DELETER(PGconn* pgconn) {
 // explain analyse select * from testview where field1  > 'aaaaaaaaa';e
 
 // THREAD_LOCAL data - shared by all dynamically loaded shared libraries
-thread_local int thread_default_data_dbconn_no = 0;
-thread_local int thread_default_dict_dbconn_no = 0;
+static thread_local int thread_default_data_dbconn_no = 0;
+static thread_local int thread_default_dict_dbconn_no = 0;
 //thread_local var thread_connparams = "";
-thread_local var thread_lasterror = "";
-thread_local DBConnector thread_dbconnector(PGconn_DELETER);
-thread_local std::map<std::string, std::string> thread_file_handles;
+static thread_local var thread_lasterror = "";
+static thread_local DBConnector thread_dbconnector(PGconn_DELETER);
+static thread_local std::map<std::string, std::string> thread_file_handles;
 
 //very few entries so map will be much faster than unordered_map
 //thread_local std::unordered_map<std::string, DBresult> thread_dbresults;
 class DBresult;
-thread_local std::map<std::string, DBresult> thread_dbresults;
+static thread_local std::map<std::string, DBresult> thread_dbresults;
 
 //std::string getpgresultcell(PGresult* pgresult, int rown, int coln) {
 //	return std::string(PQgetvalue(pgresult, rown, coln), PQgetlength(pgresult, rown, coln));
@@ -341,9 +344,11 @@ inline uint64_t mvdbpostgres_hash_stdstr(std::string str1) {
 	//	((uint64_t*)out)[1] = h2;
 
 	// xor bottom 64 bits with top 64 bits in attempt not to completely throw away the top half commpletely.
-	((uint64_t*)u128)[0] ^= ((uint64_t*)u128)[1];
+	//((uint64_t*)u128)[0] ^= ((uint64_t*)u128)[1];
+	static_cast<uint64_t*>(u128)[0] ^= static_cast<uint64_t*>(u128)[1];
 	// Return only 64 bits of u128;
-	return ((uint64_t*)u128)[0];
+	//return ((uint64_t*)u128)[0];
+	return static_cast<uint64_t*>(u128)[0];
 
 #elif defined(USE_MURMURHASH2)
 	return MurmurHash64(str1.data(), static_cast<int>(str1.size()), 0);
@@ -393,7 +398,8 @@ class DBresult {
 
 	// Allow construction from a PGresult*
 	//DBresult(PGresult* pgresult)
-	explicit DBresult(PGresult* pgresult)
+	//explicit DBresult(PGresult* pgresult)
+	DBresult(PGresult* pgresult)
 	:
 	pgresult_(pgresult) {
 
@@ -470,7 +476,7 @@ class DBresult {
 	}
 };
 
-int get_dbconn_no(CVR dbhandle) {
+static int get_dbconn_no(CVR dbhandle) {
 
 	if (!dbhandle.assigned()) {
 		// var("get_dbconn_no() returning 0 - unassigned").logputl();
@@ -495,7 +501,7 @@ int get_dbconn_no_or_default(CVR dbhandle) {
 
 	// otherwise get the default connection
 	if (DBTRACE_CONN >= 3 and dbhandle.assigned())
-		TRACE(dbhandle);
+		TRACE(dbhandle)
 
 	//dbhandle MUST always arrive in lower case to detect if "dict."
 	bool isdict = dbhandle.unassigned() ? false : dbhandle.starts("dict.");
@@ -508,10 +514,10 @@ int get_dbconn_no_or_default(CVR dbhandle) {
 		dbconn_no = thread_default_data_dbconn_no;
 
 	if (DBTRACE_CONN >= 3 ) {
-		TRACE(thread_default_data_dbconn_no);
-		TRACE(thread_default_dict_dbconn_no);
-		if (dbhandle.assigned()) TRACE(dbhandle);
-		TRACE(dbconn_no);
+		TRACE(thread_default_data_dbconn_no)
+		TRACE(thread_default_dict_dbconn_no)
+		if (dbhandle.assigned()) TRACE(dbhandle)
+		TRACE(dbconn_no)
 	}
 
 	// otherwise try the default connection
@@ -532,14 +538,14 @@ int get_dbconn_no_or_default(CVR dbhandle) {
 		}
 
 		if (DBTRACE_CONN >= 3)
-			TRACE(defaultdb);
+			TRACE(defaultdb)
 
 		//try to connect
 		if (defaultdb.connect()) {
 			dbconn_no = get_dbconn_no(defaultdb);
 
 			if (DBTRACE_CONN >= 3 )
-				TRACE("defaultdb connected");
+				TRACE("defaultdb connected")
 
 		//if cannot connect then for dictionaries look on default connection
 		} else if (isdict) {
@@ -555,12 +561,12 @@ int get_dbconn_no_or_default(CVR dbhandle) {
 			dbconn_no = thread_default_data_dbconn_no;
 
 			if (DBTRACE_CONN >= 3)
-				TRACE(thread_default_data_dbconn_no);
+				TRACE(thread_default_data_dbconn_no)
 
 		}
 
 		if (DBTRACE_CONN >= 3)
-			TRACE(dbconn_no);
+			TRACE(dbconn_no)
 
 		//save default dict/data connections
 		if (isdict) {
@@ -647,7 +653,7 @@ var var::setlasterror(CVR msg) const {
 	thread_lasterror = msg;
 
 	if (DBTRACE)
-		TRACE(thread_lasterror);
+		TRACE(thread_lasterror)
 
 	return lasterror();
 }
@@ -816,7 +822,7 @@ bool var::connect(CVR conninfo) {
 	ISSTRING(conninfo)
 
 	if (DBTRACE or DBTRACE_CONN) {
-		TRACE(__PRETTY_FUNCTION__);
+		TRACE(__PRETTY_FUNCTION__)
 		TRACE(conninfo)
 	}
 	var fullconninfo = conninfo.trimboth();
@@ -1498,12 +1504,13 @@ bool var::read(CVR filehandle, CVR key) {
 	var sql = "SELECT data FROM " ^ get_normal_filename(filehandle) ^ " WHERE key = $1";
 
 	DEBUG_LOG_SQL1
-	auto dbresult = (DBresult) PQexecParams(pgconn,
+	//DBresult dbresult = PQexecParams(pgconn,
+	DBresult dbresult = PQexecParams(pgconn,
 											// TODO: parameterise filename
 											sql.var_str.c_str(), 1, /* one param */
 											nullptr,					/* let the backend deduce param type */
 											paramValues, paramLengths,
-											0,	// text arguments
+											nullptr,	// text arguments
 											0);	// text results
 
 	// Handle serious errors
@@ -1515,7 +1522,7 @@ bool var::read(CVR filehandle, CVR key) {
 			errmsg ^= " File doesnt exist";
 		else
 			errmsg ^= var(PQerrorMessage(pgconn)) ^ " SQLERROR:" ^ sqlstate;
-		;
+
 		this->setlasterror(errmsg);
 		// // this->loglasterror();
 		throw VarDBException(errmsg);
@@ -1638,7 +1645,7 @@ var var::lock(CVR key) const {
 		((this->assigned() ? *this : "") ^ " | " ^ var(sql).replace("$1)", /*var(hash64) ^*/ ") file:" ^ *this ^ " key:" ^ key)).logputl("SQLL ");
 
 	// Call postgres
-	auto dbresult = (DBresult) PQexecParams(pgconn,
+	DBresult dbresult = PQexecParams(pgconn,
 											// TODO: parameterise filename
 											sql, 1,                                      /* one param */
 											nullptr,                                     /* let the backend deduce param type */
@@ -1713,7 +1720,7 @@ bool var::unlock(CVR key) const {
 		((this->assigned() ? *this : "") ^ " | " ^ var(sql).replace("$1)", /*var(hash64) ^*/ ") file:" ^ *this ^ " key:" ^ key)).logputl("SQLL ");
 
 	// Call postgres
-	auto dbresult = (DBresult) PQexecParams(pgconn,
+	DBresult dbresult = PQexecParams(pgconn,
 											// TODO: parameterise filename
 											sql, 1,										/* one param */
 											nullptr,									/* let the backend deduce param type */
@@ -1805,7 +1812,7 @@ bool var::sqlexec(CVR sqlcmd, VARREF response) const {
 	// NB PQexec cannot be told to return binary results
 	// but it can execute multiple commands
 	// whereas PQexecParams is the opposite
-	auto dbresult = (DBresult) PQexec(pgconn, sqlcmd.var_str.c_str());
+	DBresult dbresult = PQexec(pgconn, sqlcmd.var_str.c_str());
 
 	if (PQresultStatus(dbresult) != PGRES_COMMAND_OK &&
 		PQresultStatus(dbresult) != PGRES_TUPLES_OK) {
@@ -1928,13 +1935,13 @@ bool var::write(CVR filehandle, CVR key) const {
 	int paramLengths[] = {static_cast<int>(key2.size()), static_cast<int>(data2.size())};
 
 	DEBUG_LOG_SQL1
-	auto dbresult = (DBresult) PQexecParams(pgconn,
+	DBresult dbresult = PQexecParams(pgconn,
 											// TODO: parameterise filename
 											sql.var_str.c_str(),
 											2,       // two params (key and data)
 											nullptr, // let the backend deduce param type
 											paramValues, paramLengths,
-											0,       // text arguments
+											nullptr,       // text arguments
 											0);      // text results
 
 	// Handle serious errors
@@ -1993,13 +2000,13 @@ bool var::updaterecord(CVR filehandle, CVR key) const {
 	}
 
 	DEBUG_LOG_SQL1
-	auto dbresult = (DBresult) PQexecParams(pgconn,
+	DBresult dbresult = PQexecParams(pgconn,
 											// TODO: parameterise filename
 											sql.var_str.c_str(),
 											2,        // two params (key and data)
 											nullptr,  // let the backend deduce param type
 											paramValues, paramLengths,
-											0,        // text arguments
+											nullptr,        // text arguments
 											0);       // text results
 
 	// Handle serious errors
@@ -2060,13 +2067,13 @@ bool var::insertrecord(CVR filehandle, CVR key) const {
 	}
 
 	DEBUG_LOG_SQL1
-	auto dbresult = (DBresult) PQexecParams(pgconn,
+	DBresult dbresult = PQexecParams(pgconn,
 											// TODO: parameterise filename
 											sql.var_str.c_str(),
 											2,       // two params (key and data)
 											nullptr, // let the backend deduce param type
 											paramValues, paramLengths,
-											0,       // text arguments
+											nullptr,       // text arguments
 											0);      // text results
 
 	// Handle serious errors or ordinary duplicate key failure (which will mess us transactionsa)
@@ -2136,10 +2143,10 @@ bool var::deleterecord(CVR key) const {
 	}
 
 	DEBUG_LOG_SQL1
-	auto dbresult = (DBresult) PQexecParams(pgconn, sql.var_str.c_str(), 1, /* two param */
+	DBresult dbresult = PQexecParams(pgconn, sql.var_str.c_str(), 1, /* two param */
 											nullptr,							/* let the backend deduce param type */
 											paramValues, paramLengths,
-											0,  // text arguments
+											nullptr,  // text arguments
 											0); // text results
 
 	// Handle serious errors
@@ -2512,11 +2519,7 @@ inline void tosqlstring(VARREF string1) {
 	}
 }
 
-inline var get_fileexpression(CVR mainfilename, CVR filename, CVR keyordata) {
-
-	// evade warning: unused parameter mainfilename
-	if (false && mainfilename) {
-	}
+inline var get_fileexpression([[maybe_unused]] CVR mainfilename, CVR filename, CVR keyordata) {
 
 	// if (filename == mainfilename)
 	//	return keyordata;
@@ -3252,8 +3255,8 @@ var getword(VARREF remainingwords, VARREF ucword) {
 
 	ucword = word1.ucase();
 	if (DBTRACE) {
-		TRACE(word1);
-		TRACE(remainingwords);
+		TRACE(word1)
+		TRACE(remainingwords)
 	}
 	return word1;
 }
@@ -3347,7 +3350,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 	}
 
 	if (DBTRACE)
-		TRACE(sortselectclause);
+		TRACE(sortselectclause)
 
 	var actualfilename = get_normal_filename(*this);
 	// actualfilename.logputl("actualfilename=");
@@ -3469,7 +3472,8 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 					keycodes ^= FM;
 				keycodes ^= word1;
 			}
-			if (DBTRACE_SELECT) TRACE(keycodes);
+			if (DBTRACE_SELECT)
+				TRACE(keycodes)
 			continue;
 		}
 
@@ -3480,7 +3484,8 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 				var errmsg = "select() dict_" ^ dictfilename ^ " file cannot be opened";
 				throw VarDBException(errmsg);
 			}
-			if (DBTRACE_SELECT) TRACE(dictfilename);
+			if (DBTRACE_SELECT)
+				TRACE(dictfilename)
 			continue;
 		}
 
@@ -3491,7 +3496,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 			var distinctexpression = get_dictexpression(*this, actualfilename, actualfilename, dictfilename, dictfile, distinctfieldname, joins, unnests, selects, ismv, isdatetime, false);
 			var naturalsort_distinctexpression = get_dictexpression(*this, actualfilename, actualfilename, dictfilename, dictfile, distinctfieldname, joins, unnests, selects, ismv, isdatetime, true);
 
-			if (true) {
+			if ((true)) {
 				// this produces the right values but in random order
 				// it use any index on the distinct field so it works on large
 				// indexed files select distinct is really only useful on INDEXED
@@ -3505,7 +3510,8 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 								distinctexpression;
 				orderclause ^= ", " ^ naturalsort_distinctexpression;
 			}
-			if (DBTRACE_SELECT) TRACE(orderclause);
+			if (DBTRACE_SELECT)
+				TRACE(orderclause)
 			continue;
 		}
 
@@ -3543,7 +3549,8 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 			if (ucword == "BY-DSND")
 				orderclause ^= " DESC";
 
-			if (DBTRACE_SELECT) TRACE(orderclause);
+			if (DBTRACE_SELECT)
+				TRACE(orderclause)
 			continue;
 		}
 
@@ -3555,7 +3562,8 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 			if (ucword == "OR") {
 				orwith = true;
 			}
-			if (DBTRACE_SELECT) TRACE(whereclause)
+			if (DBTRACE_SELECT)
+				TRACE(whereclause)
 			continue;
 		}
 
@@ -3565,7 +3573,8 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 			if (whereclause[-1] == ")" and ucword == "(")
 				whereclause ^= "\nor";
 			whereclause ^= "\n " ^ ucword;
-			if (DBTRACE_SELECT) TRACE(whereclause);
+			if (DBTRACE_SELECT)
+				TRACE(whereclause)
 			continue;
 		}
 
@@ -3981,7 +3990,8 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 				calc_fields(3, calc_fieldn) = value.unquote().replace("'" _FM "'", FM).convert(FM, SM);
 
 				//place holder to be removed before issuing actual sql command
-	            if (DBTRACE_SELECT) TRACE(whereclause);
+	            if (DBTRACE_SELECT)
+					TRACE(whereclause)
 				whereclause ^= " true";
 
 				continue;
@@ -4321,13 +4331,15 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 			// Filter Stage 10 - COMBINE INTO WHERE CLAUSE
 			//////////////////////////////////////////////
 
-			if (DBTRACE_SELECT) TRACE(whereclause);
+			if (DBTRACE_SELECT)
+				TRACE(whereclause)
 			// Default to OR between with clauses
 			if (whereclause) {
 				var lastpart = whereclause.field2(" ", -1);
 				if (not var("OR AND (").locateusing(" ", lastpart))
 					whereclause ^= " or ";
-				if (DBTRACE_SELECT) TRACE(whereclause);
+				if (DBTRACE_SELECT)
+					TRACE(whereclause)
 			}
 
 			//negate
@@ -4339,7 +4351,8 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 			else
 				whereclause ^= " " ^ dictexpression ^ " " ^ op ^ " " ^ value;
 
-			if (DBTRACE_SELECT) TRACE(whereclause);
+			if (DBTRACE_SELECT)
+				TRACE(whereclause)
 
 		}  //with/without
 
@@ -4444,8 +4457,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 		}
 
 		if (this->f(3)) {
-			var errmsg = "selectx: Error. this->f(3) must be empty";
-			throw VarDBException(errmsg);
+			throw VarDBException("selectx: Error. this->f(3) must be empty");
 		}
 		//must be empty!
 
@@ -4523,21 +4535,21 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 	// first close any existing cursor with the same name, otherwise cannot create  new cursor
     // Avoid generating sql errors since they abort transactions
 	if (this->cursorexists()) {
-		var sql = "";
-		sql ^= "CLOSE cursor1_";
+		var sql2 = "";
+		sql2 ^= "CLOSE cursor1_";
 
 		if (this->assigned()) {
 			var cursorcode = this->f(1).convert(".", "_");
-			sql ^= cursorcode;
+			sql2 ^= cursorcode;
 			var cursorid = this->f(2) ^ "_" ^ cursorcode;
 			thread_dbresults.erase(cursorid);
 		}
 
 		var errmsg;
-		if (!this->sqlexec(sql, errmsg)) {
+		if (!this->sqlexec(sql2, errmsg)) {
 
 			if (errmsg)
-				errmsg.errputl("::selectx on handle(" ^ *this ^ ") " ^ sql ^ "\n");
+				errmsg.errputl("::selectx on handle(" ^ *this ^ ") " ^ sql2 ^ "\n");
 			// return false;
 		}
 	}
@@ -4555,7 +4567,8 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 
 		// if (autotrans)
 		//	rollbacktrans();
-		return false;
+		//std::unreachable();
+		//return false;
 	}
 
 	//sort/select on calculated items may be done in exoprog::calculate
@@ -5701,7 +5714,7 @@ static bool get_dbresult(CVR sql, DBresult& dbresult, PGconn* pgconn) {
 	dbresult = PQexecParams(pgconn, sql.toString().c_str(), 0, /* zero params */
 							nullptr,								/* let the backend deduce param type */
 							paramValues, paramLengths,
-							0,  // text arguments
+							nullptr,  // text arguments
 							0);	// text results
 
 	// Handle serious error. Why not throw?
@@ -5727,6 +5740,15 @@ static bool get_dbresult(CVR sql, DBresult& dbresult, PGconn* pgconn) {
 
 			return true;
 
+		case PGRES_EMPTY_QUERY:
+		case PGRES_COPY_OUT:
+		case PGRES_COPY_IN:
+		case PGRES_BAD_RESPONSE:
+		case PGRES_FATAL_ERROR:
+		case PGRES_COPY_BOTH:
+		case PGRES_SINGLE_TUPLE:
+		case PGRES_PIPELINE_SYNC:
+		case PGRES_PIPELINE_ABORTED:
 		default:
 
 			var("ERROR: mvdbpostgres pqexec " ^ var(sql)).errputl();
@@ -5739,7 +5761,8 @@ static bool get_dbresult(CVR sql, DBresult& dbresult, PGconn* pgconn) {
 	}
 
 	// should never get here
-	return false;
+	//std::unreachable
+	//return false;
 
 }
 

@@ -49,27 +49,27 @@ namespace exodus {
 // which is effectively about makeing objects behave like ordinary variable syntactically
 // implementing smartpointers
 
-void var::throwUndefined(CVR message) const {
+[[noreturn]] void var::throwUndefined(CVR message) const {
 	throw VarUndefined(message);
 }
 
-void var::throwUnassigned(CVR message) const {
+[[noreturn]] void var::throwUnassigned(CVR message) const {
 	throw VarUnassigned(message);
 }
 
-void var::throwNonNumeric(CVR message) const {
+[[noreturn]] void var::throwNonNumeric(CVR message) const {
 	throw VarNonNumeric(message);
 }
 
-void var::throwNonPositive(CVR message) const {
+[[noreturn]] void var::throwNonPositive(CVR message) const {
 	throw VarNonPositive(message);
 }
 
-void var::throwNumOverflow(CVR message) const {
+[[noreturn]] void var::throwNumOverflow(CVR message) const {
 	throw VarNumOverflow(message);
 }
 
-void var::throwNumUnderflow(CVR message) const {
+[[noreturn]] void var::throwNumUnderflow(CVR message) const {
 	throw VarNumUnderflow(message);
 }
 

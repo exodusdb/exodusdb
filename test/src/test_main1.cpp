@@ -295,7 +295,7 @@ programinit()
 	var offsetx = 0;
 	var testfilex;
 	assert(osopen(testfilename, testfilex));
-	TRACE(testfilex);
+	TRACE(testfilex)
 	assert(testfilex);
 	var testdata;
 	//assert(testdata.osbread(testfilex,offsetx=0,1) eq GreekSmallGamma);
@@ -339,8 +339,8 @@ programinit()
 	assert(offsetx                eq 2);
 
 	//check reading 1 byte results in nothing (and result is false)
-	TRACE(testfilex);
-	TRACE(offsetx);
+	TRACE(testfilex)
+	TRACE(offsetx)
 	offsetx = 0;
 	assert(not testdata.osbread(testfilex, offsetx, 1));
 	assert(testdata.len()         eq 0);
@@ -348,8 +348,8 @@ programinit()
 	assert(offsetx                eq 0);
 
 	//check reading 0 byte results in nothing (but result is true)
-	TRACE(testfilex);
-	TRACE(offsetx);
+	TRACE(testfilex)
+	TRACE(offsetx)
 	offsetx = 0;
 	assert(testdata.osbread(testfilex, offsetx, 0));
 	assert(testdata.len()         eq 0);
@@ -664,7 +664,7 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 	//test windows codepages
 	if (OSSLASH_IS_BACKSLASH) {
 		//show where we are working
-		TRACE(oscwd());
+		TRACE(oscwd())
 		var greektestfilename = "t_greeksas.txt";
 		//check CANNOT write greek unicode characters using French codepage
 		assert(not Greek_sas.oswrite(greektestfilename, "French"));	 //CANNOT write

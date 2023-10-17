@@ -36,13 +36,13 @@ class VARTYP {
 
 	// constructor from unsigned int
 	VARTYP(const unsigned int rhs)
-		: flags_(rhs){};
+		: flags_(rhs){}
 
 	// assign from unsigned int
 	VARTYP& operator=(const unsigned int rhs) {
 		flags_ = rhs;
 		return *this;
-	};
+	}
 
 	// bitwise mutators: xor, or, and
 	VARTYP& operator^=(const unsigned int rhs) {flags_ ^= rhs; return *this; }
@@ -50,10 +50,10 @@ class VARTYP {
 	VARTYP& operator&=(const unsigned int rhs) {flags_ &= rhs; return *this; }
 
 	// logical comparison with int and self
-	ND bool operator==(const unsigned int rhs) const { return flags_ == rhs; };
-	ND bool operator!=(const unsigned int rhs) const { return flags_ != rhs; };
-	ND bool operator==(const VARTYP rhs) const { return flags_ == rhs.flags_; };
-	ND bool operator!=(const VARTYP rhs) const { return flags_ != rhs.flags_; };
+	ND bool operator==(const unsigned int rhs) const { return flags_ == rhs; }
+	ND bool operator!=(const unsigned int rhs) const { return flags_ != rhs; }
+	ND bool operator==(const VARTYP rhs) const { return flags_ == rhs.flags_; }
+	ND bool operator!=(const VARTYP rhs) const { return flags_ != rhs.flags_; }
 
 	// bitwise accessors
 	VARTYP operator&(const unsigned int rhs) const { return flags_ & rhs; }

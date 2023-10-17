@@ -45,9 +45,9 @@ class PROGRAMCLASSNAME##ExodusProgram : public ExodusProgramBase {
  public:                                                                                                        \
     PROGRAMCLASSNAME##ExodusProgram(ExoEnv& mv) : ExodusProgramBase(mv) {}                                      \
 };                                                                                                              \
-int PROGRAMCLASSNAME##main2(int exodus__argc, const char* exodus__argv[], int threadno) {                       \
+static int PROGRAMCLASSNAME##main2(int exodus_argc, const char* exodus_argv[], int threadno) {                         \
 		ExoEnv mv;                                                                                              \
-		exodus_main(exodus__argc, exodus__argv, mv, threadno);                                                  \
+		exodus_main(exodus_argc, exodus_argv, mv, threadno);                                                    \
 		int result = 0;                                                                                         \
 		PROGRAMCLASSNAME##ExodusProgram exodusprogram1(mv);                                                     \
 		if (osgetenv("EXO_DEBUG")) {                                                                            \
@@ -97,7 +97,7 @@ int PROGRAMCLASSNAME##main2(int exodus__argc, const char* exodus__argv[], int th
 		return result;                                                                                          \
 	}                                                                                                           \
 	                                                                                                            \
-	int PROGRAMCLASSNAME##main(int exodus__argc, const char* exodus__argv[]) {                                  \
-		return PROGRAMCLASSNAME##main2(exodus__argc, exodus__argv, 0);                                          \
+	int PROGRAMCLASSNAME##main(int exodus_argc, const char* exodus_argv[]) {                                    \
+		return PROGRAMCLASSNAME##main2(exodus_argc, exodus_argv, 0);                                            \
 	}
 #endif // EXODUS_LIBEXODUS_EXODUS_PROGRAM_H_

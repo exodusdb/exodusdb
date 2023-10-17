@@ -105,7 +105,8 @@
 		varwait.cpp varunicode.cpp varposix.cpp exocallable.cpp
 		#murmurhash2_64.cpp
 		murmurhash3.cpp
-		naturalorder.cpp gettimeofday.cpp
+		#naturalorder.cpp
+		gettimeofday.cpp
 		varoshandle.cpp vardbconn.cpp
 		variter.cpp
 		extract_v2.cpp # Duplicated in pgexodus as extract.c

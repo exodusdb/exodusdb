@@ -498,7 +498,7 @@ inline bool locatex(const std::string& var_str, const std::string& target, const
 		if (valueno || subvalueno)
 			fieldno = 1;
 		else {
-			return locateat(var_str, target, (size_t)0, var_str.size(), ordermode,
+			return locateat(var_str, target, std::size_t(0), var_str.size(), ordermode,
 							usingchar, setting);
 		}
 	}

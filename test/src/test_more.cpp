@@ -231,10 +231,10 @@ programinit()
 		assert((var(char('A')) ^ "x").errputl() eq "Ax");
 
 		// signed char -> int
-		assert((var((signed char)('A')) ^ "x").errputl() eq "65x");	 //numeric character -> int
+		assert((var(static_cast<signed char>('A')) ^ "x").errputl() eq "65x");	 //numeric character -> int
 
 		// unsigned char -> int
-		assert((var((unsigned char)('A')) ^ "x").errputl() eq "65x");  //numeric character -> int
+		assert((var(static_cast<unsigned char>('A')) ^ "x").errputl() eq "65x");  //numeric character -> int
 
 		// std string suffix -> str
 		assert((var("AB"s) ^ "x").errputl() eq "ABx");
@@ -265,20 +265,20 @@ programinit()
 		assert((var(short(65)) ^ "x").errputl() eq "65x");
 
 		// unsigned short -> int
-		assert((var((unsigned short)(65)) ^ "x").errputl() eq "65x");
+		assert((var(static_cast<unsigned short>(65)) ^ "x").errputl() eq "65x");
 		assert((var(65) ^ "x").errputl()                   eq "65x");
 
 		// unsigned int -> int
 		assert((var(int(65)) ^ "x").errputl()            eq "65x");
-		assert((var((unsigned int)(65)) ^ "x").errputl() eq "65x");
+		assert((var(static_cast<unsigned int>(65)) ^ "x").errputl() eq "65x");
 
 		// unsigned long -> int
 		assert((var(65L) ^ "x").errputl()                  eq "65x");
-		assert((var((unsigned long)(65L)) ^ "x").errputl() eq "65x");
+		assert((var(static_cast<unsigned long>(65L)) ^ "x").errputl() eq "65x");
 
 		// unsigned long long -> int
 		assert((var(65LL) ^ "x").errputl()                      eq "65x");
-		assert((var((unsigned long long)(65L)) ^ "x").errputl() eq "65x");
+		assert((var(static_cast<unsigned long long>(65L)) ^ "x").errputl() eq "65x");
 
 		// float -> dbl
 		assert((var(123.456f).round(3) ^ "x").errputl() eq "123.456x");
@@ -299,7 +299,7 @@ programinit()
 		assert(func_s(var(s))      eq s);
 
 		const char* c = "abc";
-		assert(*(const char*)(var(c)) eq *c);
+		assert(*static_cast<const char*>(var(c)) eq *c);
 		assert(*func_c(var(c))        eq *c);
 
 		int i = 42;

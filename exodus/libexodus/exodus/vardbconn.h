@@ -31,7 +31,10 @@
 //					stored/deleted within connection record
 
 //for postgresql's PGconn connection handle type
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wreserved-identifier"
 #include <libpq-fe.h>
+#pragma GCC diagnostic push
 
 #include <string>
 
@@ -66,7 +69,7 @@ class DBConn	 // used as 'second' in pair, stored in connection map
 	// ctors
 
 	DBConn()
-		: pgconn_(0) {}
+		: pgconn_(nullptr) {}
 
 	DBConn(PGconn* pgconn, std::string conninfo)
 		: pgconn_(pgconn), conninfo_(conninfo) {
@@ -111,7 +114,7 @@ class DBConnector final {
 	int dbconn_no_;
 
 	// container
-	DBConns dbconns_;
+	mutable DBConns dbconns_;
 
    public:
 
@@ -141,8 +144,8 @@ class DBConnector final {
 	int max_dbconn_no();
 	PGconn* get_pgconn(const int dbconn_no) const;
 	DBConn* get_dbconn(const int dbconn_no) const;
-
 	DBCache* get_dbcache(const int dbconn_no) const;
+
 	bool getrecord(const int dbconn_no, const uint64_t hash64, std::string& record) const;
 	void putrecord(const int dbconn_no, const uint64_t hash64, const std::string& record);
 	bool delrecord(const int dbconn_no, const uint64_t hash64);

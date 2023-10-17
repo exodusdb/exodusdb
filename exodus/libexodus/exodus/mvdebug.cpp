@@ -43,7 +43,7 @@ THE SOFTWARE.
 
 namespace exodus {
 
-void addbacktraceline(CVR frameno, CVR sourcefilename, CVR lineno, VARREF returnlines) {
+static void addbacktraceline(CVR frameno, CVR sourcefilename, CVR lineno, VARREF returnlines) {
 
 	//#ifdef TRACING
 	//	sourcefilename.errputl("SOURCEFILENAME=");
@@ -242,13 +242,13 @@ var mv_backtrace(void* stack_addresses[BACKTRACE_MAXADDRESSES], size_t stack_siz
 
 //service managers like systemd will send a polite SIGTERM signal
 //and wait for say 90 seconds before sending a kill signal
-void SIGTERM_handler(int) {
+static void SIGTERM_handler(int) {
 	fprintf(stderr, "=== SIGTERM received ===\n");
 	TERMINATE_req = true;
 }
 
 //restart
-void SIGHUP_handler(int) {
+static void SIGHUP_handler(int) {
 	fprintf(stderr, "=== SIGHUP received ===\n");
 	RELOAD_req = true;
 }
@@ -263,7 +263,7 @@ PUBLIC void breakon();
 
 //signals are received by one thread at random
 //void SIGINT_handler(int sig) {
-void SIGINT_handler(int sig [[maybe_unused]]) {
+static void SIGINT_handler(int sig [[maybe_unused]]) {
 
 	// Ignore more of this signal - restore on exit
 	breakoff();

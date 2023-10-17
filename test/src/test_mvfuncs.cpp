@@ -44,12 +44,12 @@ programinit()
 	var w = "0123456789#";	//western
 	var a = "٠١٢٣٤٥٦٧٨٩#";	//arabic
 
-	TRACE(w);
-	TRACE(a);
-	TRACE(w.oconv("HEX"));
-	TRACE(textconvert("0123456789#", w, a).oconv("HEX"));
-	TRACE(a.oconv("HEX"));
-	TRACE(textconvert("0123456789#", w, a));
+	TRACE(w)
+	TRACE(a)
+	TRACE(w.oconv("HEX"))
+	TRACE(textconvert("0123456789#", w, a).oconv("HEX"))
+	TRACE(a.oconv("HEX"))
+	TRACE(textconvert("0123456789#", w, a))
 
 	assert(convert("0123456789#", w, a) ne a);	//bytewise conversion of utf8 must not work
 
@@ -68,21 +68,21 @@ programinit()
 
 	//toInt and oconv "MX"
 
-	TRACE(oconv(-3.5, "MX"));
-	TRACE(oconv(-3, "MX"));
-	TRACE(oconv(-2.5, "MX"));
-	TRACE(oconv(-2, "MX"));
-	TRACE(oconv(-1.5, "MX"));
-	TRACE(oconv(-1, "MX"));
-	TRACE(oconv(-.5, "MX"));
-	TRACE(oconv(0, "MX"));
-	TRACE(oconv(.5, "MX"));
-	TRACE(oconv(1, "MX"));
-	TRACE(oconv(1.5, "MX"));
-	TRACE(oconv(2, "MX"));
-	TRACE(oconv(2.5, "MX"));
-	TRACE(oconv(3, "MX"));
-	TRACE(oconv(3.5, "MX"));
+	TRACE(oconv(-3.5, "MX"))
+	TRACE(oconv(-3, "MX"))
+	TRACE(oconv(-2.5, "MX"))
+	TRACE(oconv(-2, "MX"))
+	TRACE(oconv(-1.5, "MX"))
+	TRACE(oconv(-1, "MX"))
+	TRACE(oconv(-.5, "MX"))
+	TRACE(oconv(0, "MX"))
+	TRACE(oconv(.5, "MX"))
+	TRACE(oconv(1, "MX"))
+	TRACE(oconv(1.5, "MX"))
+	TRACE(oconv(2, "MX"))
+	TRACE(oconv(2.5, "MX"))
+	TRACE(oconv(3, "MX"))
+	TRACE(oconv(3.5, "MX"))
 
 	//MX OCONV converts to integer and represents as HEX
 	//1. exodus rounds to nearest integer (tie away from zero)

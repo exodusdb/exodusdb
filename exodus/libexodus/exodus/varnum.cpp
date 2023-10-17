@@ -69,7 +69,13 @@ THE SOFTWARE.
 //https://github.com/fastfloat/fast_float
 #if __has_include(<fast_float/fast_float.h>)
 #define HAS_FASTFLOAT
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
+#pragma clang diagnostic ignored "-Wextra-semi-stmt"
+#pragma clang diagnostic ignored "-Wold-style-cast"
+#pragma clang diagnostic ignored "-Wreserved-identifier"
 #include <fast_float/fast_float.h>
+#pragma clang diagnostic pop
 #define STD_OR_FASTFLOAT fast_float
 
 #elif __GNUC__ >= 11

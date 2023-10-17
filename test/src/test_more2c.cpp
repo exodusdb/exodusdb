@@ -264,19 +264,19 @@ programinit()
 		var rec = "^aa^^cc^"_var;
 		auto i = begin(rec);
 
-		TRACE(*i);//
+		TRACE(*i)//
 		assert(*i eq "");
 		++i;
-		TRACE(*i);//aa
+		TRACE(*i)//aa
 		assert(*i eq "aa");
 		++i;
-		TRACE(*i);//
+		TRACE(*i)//
 		assert(*i eq "");
 		++i;
-		TRACE(*i);//cc
+		TRACE(*i)//cc
 		assert(*i eq "cc");
 		++i;
-		TRACE(*i);//
+		TRACE(*i)//
 		assert(*i eq "");
 		//++i; //throws
 		//TRACE(*i);//
@@ -284,16 +284,16 @@ programinit()
 		//DECREMENTING ITER
 
 		--i;
-		TRACE(*i);//cc
+		TRACE(*i)//cc
 		assert(*i eq "cc");
 		--i;
-		TRACE(*i);//
+		TRACE(*i)//
 		assert(*i eq "");
 		--i;
-		TRACE(*i);//aa
+		TRACE(*i)//aa
 		assert(*i eq "aa");
 		--i;
-		TRACE(*i);//
+		TRACE(*i)//
 		assert(*i eq "");
 		//--i; //throws
 		//TRACE(*i);//

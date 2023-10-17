@@ -25,7 +25,10 @@ THE SOFTWARE.
 
 #include <cstring>
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
 #include <exodus/gregorian.h>
+#pragma clang diagnostic pop
 
 #if defined _MSC_VER || defined __CYGWIN__ || defined __MINGW32__
 //   #include <time.h>
@@ -43,8 +46,8 @@ THE SOFTWARE.
 
 #define PICK_UNIX_DAY_OFFSET -732
 
-const char* shortmths = "JAN\0FEB\0MAR\0APR\0MAY\0JUN\0JUL\0AUG\0SEP\0OCT\0NOV\0DEC\0";
-const char* longmths =
+static const char* shortmths = "JAN\0FEB\0MAR\0APR\0MAY\0JUN\0JUL\0AUG\0SEP\0OCT\0NOV\0DEC\0";
+static const char* longmths =
 	"\0JANUARY\0  "
 	"\0FEBRUARY\0 "
 	"\0MARCH\0    "
@@ -58,7 +61,7 @@ const char* longmths =
 	"\0NOVEMBER\0 "
 	"\0DECEMBER\0 ";
 
-const char* longdayofweeks =
+static const char* longdayofweeks =
 	"MONDAY\0   "
 	"TUESDAY\0  "
 	"WEDNESDAY\0"
@@ -633,6 +636,7 @@ after_analyse_conversion:
 		if (negative)
 			timesecs = -timesecs;
 	} else {
+		negative = false;
 		timesecs = timesecs % 86400;
 		if (timesecs < 0)
 			timesecs += 86400;

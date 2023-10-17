@@ -23,7 +23,7 @@ var operator() ()
 
  // The first call will link to the shared lib and create/cache an object from it.
  // passing current standard variables in mv
- if (this->pmemberfunc_==NULL)
+ if (this->pmemberfunc_ == nullptr)
   this->init();
 
  // Define a function type (pExodusProgramBaseMemberFunction)

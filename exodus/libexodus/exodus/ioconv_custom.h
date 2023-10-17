@@ -12,7 +12,7 @@ public:
 // 1. The name of the shared library to open,
 // 2. The name of the function within the shared library that will create an exodus program object,
 // 3. The current program's mv environment to share with it.
-Callable_ioconv_custom(ExoEnv& mv) : Callable(mv) {}
+Callable_ioconv_custom(ExoEnv& mvx) : Callable(mvx) {}
 
 // Allow assignment of library name to override the default constructed
 using Callable::operator=;
@@ -23,7 +23,7 @@ var operator() (in type, in input, in mode, out output)
 
  // The first call will link to the shared lib and create/cache an object from it.
  // passing current standard variables in mv
- if (this->pmemberfunc_==NULL)
+ if (this->pmemberfunc_==nullptr)
   this->attach("ioconv_custom");
 
  // Define a function type (pExodusProgramBaseMemberFunction)
