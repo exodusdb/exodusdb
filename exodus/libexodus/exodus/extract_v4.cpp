@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+//#include <utility> // for std::unreachable();
 
 #ifndef FM
 #define FM_ '\x1E'
@@ -115,10 +116,12 @@ void extract_v4(char * instring, int inlength, int fn, int vn, int sn, int* outs
 
 		switch (*cptr) {
 			case FM_:
-					return;
+				return;
+				//std::unreachable();
 				break;
 			case VM_:
-					return;
+				return;
+				//std::unreachable();
 				break;
 			case SM_:
 				if (--sn0 < 0)
@@ -174,7 +177,7 @@ void extract_v4(char * instring, int inlength, int fn, int vn, int sn, int* outs
 		// control characters from 0 to below SM_
 		++cptr;
 	}
-	*outstart = (int)(start - instring);
-	*outlength = (int)(cptr - start);
+	*outstart = static_cast<int>(start - instring);
+	*outlength = static_cast<int>(cptr - start);
 	//return std::string(start, cptr);
 }

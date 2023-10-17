@@ -9,6 +9,8 @@
 
 //similar code in haskey.cpp and mvwait.cpp
 
+#pragma GCC diagnostic ignored "-Wunsafe-buffer-usage"
+
 namespace exodus {
 
 /* Read all available inotify events from the file descriptor 'fd'.
@@ -27,7 +29,8 @@ var handle_events(int inotify_fd, int* wd, const int argc, const char* argv[]) {
 
 	char buf[4096]
 		__attribute__((aligned(__alignof__(struct inotify_event))));
-	const struct inotify_event* event;
+	//const struct inotify_event* event;
+	const inotify_event* event;
 	int i;
 	ssize_t len;
 	char* ptr;
@@ -55,11 +58,14 @@ var handle_events(int inotify_fd, int* wd, const int argc, const char* argv[]) {
 		//printf("Loop over all events in the buffer\n");
 		for (ptr = buf; ptr < buf + len;
 
-			 ptr += sizeof(struct inotify_event) + event->len) {
+			 //ptr += sizeof(struct inotify_event) + event->len) {
+			 ptr += sizeof(inotify_event) + event->len) {
 
 			eventn++;
 
-			event = (const struct inotify_event*)ptr;
+			//event = (const struct inotify_event*)ptr;
+			//event = reinterpret_cast<struct inotify_event*>(ptr);
+			event = reinterpret_cast<inotify_event*>(ptr);
 
 			//printf("Print event type\n");
 			if (event->mask & IN_OPEN)

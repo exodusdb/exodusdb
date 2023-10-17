@@ -46,6 +46,9 @@ THE SOFTWARE.
 // may not be using any other includes
 // to avoid pollution, simply directly include the above headers as desired instead.
 //
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wheader-hygiene"
 using namespace exodus;
+#pragma clang diagnostic pop
 
 #endif	// EXODUS_LIBEXODUS_EXODUS_EXODUS_H_

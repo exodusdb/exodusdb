@@ -77,7 +77,8 @@ extern "C" PUBLIC void exodusprogrambasecreatedelete_##PROGRAMCLASSNAME(        
 			_Pragma("GCC diagnostic push")                                                     \
             _Pragma("GCC diagnostic ignored \"-Wcast-function-type\"")                         \
 				pmemberfunction =                                                              \
-					(pExodusProgramBaseMemberFunction)&PROGRAMCLASSNAME##ExodusProgram::main;  \
+					/*(pExodusProgramBaseMemberFunction)&PROGRAMCLASSNAME##ExodusProgram::main;*/  \
+					reinterpret_cast<pExodusProgramBaseMemberFunction>(&PROGRAMCLASSNAME##ExodusProgram::main);  \
 			_Pragma("GCC diagnostic pop")                                                      \
 		}                                                                                      \
 		return;                                                                                \

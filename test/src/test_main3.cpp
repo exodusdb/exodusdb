@@ -132,7 +132,7 @@ programinit()
 			var x = rnd(0);
 			assert(false);
 		} catch (VarDivideByZero e) {
-		};
+		}
 	}
 
 	{
@@ -330,11 +330,11 @@ programinit()
 			TRACE(TIMESTAMP)
 			TRACE(timestamp())
 			var onesec = 1.0/86'400;
-			TRACE(onesec);
-			TRACE(elapsedtimetext());
+			TRACE(onesec)
+			TRACE(elapsedtimetext())
 			assert(elapsedtimetext());
-			TRACE(elapsedtimetext(1));
-			TRACE(elapsedtimetext(1));
+			TRACE(elapsedtimetext(1))
+			TRACE(elapsedtimetext(1))
 			assert(elapsedtimetext(7.0).logputl() eq "1 week");//??
 			assert(elapsedtimetext(3.5).logputl() eq "3 days, 12 hours");//??
 			assert(elapsedtimetext(1.0).logputl() eq "1 day");//??
@@ -406,21 +406,21 @@ programinit()
 	{
 
 		printl("sizeof");
-		printl("int:	  ", (int)sizeof(int));
-		printl("long:	 ", (int)sizeof(long));
-		printl("long int: ", (int)sizeof(long int));
-		printl("long long:", (int)sizeof(long long));
-		printl("float:	", (int)sizeof(float));
-		printl("double:   ", (int)sizeof(double));
+		printl("int:	  ", sizeof(int));
+		printl("long:	 ", sizeof(long));
+		printl("long int: ", sizeof(long int));
+		printl("long long:", sizeof(long long));
+		printl("float:	", sizeof(float));
+		printl("double:   ", sizeof(double));
 		printl();
-		printl("string:   ", (int)sizeof(std::string));
-		printl("long long:", (int)sizeof(long long));
-		printl("double:   ", (int)sizeof(double));
-		printl("uint:	 ", (int)sizeof(uint));
-		printl("uint:	 ", (int)sizeof(uint), " padding1");
-		printl("long long:", (int)sizeof(long long), " padding2");
+		printl("string:   ", sizeof(std::string));
+		printl("long long:", sizeof(long long));
+		printl("double:   ", sizeof(double));
+		printl("uint:	 ", sizeof(uint));
+		printl("uint:	 ", sizeof(uint), " padding1");
+		printl("long long:", sizeof(long long), " padding2");
 		printl("		   ==");
-		printl("var:	  ", (int)sizeof(var));
+		printl("var:	  ", sizeof(var));
 
 		auto size	  = sizeof(std::string);
 		auto capacity = std::string().capacity();

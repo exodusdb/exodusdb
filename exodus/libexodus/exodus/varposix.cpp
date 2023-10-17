@@ -21,7 +21,7 @@ ND PUBLIC var getexecpath() {
 		path = fs::read_symlink(p).string();
 	} catch (...) {
 		path = "";
-	};
+	}
 	return path;
 }
 

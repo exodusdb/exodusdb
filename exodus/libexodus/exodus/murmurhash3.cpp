@@ -8,6 +8,9 @@
 // non-native version will be less than optimal.
 
 #pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
+#pragma GCC diagnostic ignored "-Wold-style-cast"
+#pragma GCC diagnostic ignored "-Wextra-semi-stmt"
+#pragma GCC diagnostic ignored "-Wcast-align"
 #include "murmurhash3.h"
 
 //-----------------------------------------------------------------------------

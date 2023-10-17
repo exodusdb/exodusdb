@@ -5,11 +5,11 @@
 #include <boost/asio/post.hpp>
 // Create a threadpool of suitable size to handle
 // ncpus/threads obtained from std::thread::hardware_concurrency()
-boost::asio::thread_pool threadpool1(std::thread::hardware_concurrency());
+static boost::asio::thread_pool threadpool1(std::thread::hardware_concurrency());
 
 // Use an atomic to allow threads to increment global failure count
 #include <atomic>
-std::atomic<int> atomic_ncompilation_failures;
+static std::atomic<int> atomic_ncompilation_failures;
 
 #include <exodus/program.h>
 programinit()
@@ -1142,7 +1142,7 @@ function main() {
 							_EOL
 							_EOL " /" "/ The first call will link to the shared lib and create/cache an object from it."
 							_EOL " /" "/ passing current standard variables in mv"
-							_EOL " if (this->pmemberfunc_==NULL)"
+							_EOL " if (this->pmemberfunc_== nullptr)"
 //							_EOL "  this->init();"
 							_EOL "  this->attach(\"funcx\");"
 							_EOL
@@ -1180,16 +1180,16 @@ function main() {
 						replacer(inclusion, "callorreturn", callorreturn);
 						replacer(inclusion, "{additional_funcs}", add_funcs);
 
-						if (true or text.contains("-Wcast-function-type")) {
-							replacer(inclusion, "{before_call}",
-									"#pragma GCC diagnostic push"
-									_EOL " #pragma GCC diagnostic ignored \"-Wcast-function-type\"");
-							replacer(inclusion, "{after_call}",
-									"#pragma GCC diagnostic pop");
-						} else {
-							replacer(inclusion, _EOL " {before_call}", "");
-							replacer(inclusion, _EOL " {after_call}", "");
-						}
+						//if (true or text.contains("-Wcast-function-type")) {
+						replacer(inclusion, "{before_call}",
+								"#pragma GCC diagnostic push"
+								_EOL " #pragma GCC diagnostic ignored \"-Wcast-function-type\"");
+						replacer(inclusion, "{after_call}",
+								"#pragma GCC diagnostic pop");
+//						} else {
+//							replacer(inclusion, _EOL " {before_call}", "");
+//							replacer(inclusion, _EOL " {after_call}", "");
+//						}
 						let usepredefinedcallable = nargs <= exodus_callable_maxnargs;
 						if (useclassmemberfunctions) {
 							if (funcname eq "main") {
@@ -1772,15 +1772,15 @@ function set_environment() {
 				field(line, "=", 1), field(line, "=", 2, 999999));
 		}
 	}
-	if (not osremove(tempfilenamebase ^ ".cmd")) {};
-	if (not osremove(tempfilenamebase ^ ".$$$")) {};
+	if (not osremove(tempfilenamebase ^ ".cmd")) {}
+	if (not osremove(tempfilenamebase ^ ".$$$")) {}
 	if (verbose) {
 		var errtemp;
 		if (osread(errtemp, tempfilenamebase ^ ".$2")) {
 			//printl(errtemp);
 		}
 	}
-	if (not osremove(tempfilenamebase ^ ".$2")) {};
+	if (not osremove(tempfilenamebase ^ ".$2")) {}
 
 	return true;
 }

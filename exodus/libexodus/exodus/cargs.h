@@ -40,7 +40,8 @@ class Cargs {
 
 	//return argv_ as char*[]
 	const char** argv() {
-		return (const char**)argv_.data();
+		//return (const char**)argv_.data();
+		return const_cast<const char**>(argv_.data());
 	}
 };
 

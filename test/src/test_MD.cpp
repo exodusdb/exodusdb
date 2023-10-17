@@ -85,7 +85,7 @@ programinit()
 
 		TRACE(_VM "0" _VM _VM)
 		TRACE("MD20PZ")
-		TRACE(oconv(_VM "0" _VM _VM, "MD20PZ"));
+		TRACE(oconv(_VM "0" _VM _VM, "MD20PZ"))
 		assert(oconv(_VM "0" _VM _VM, "MD20PZ") eq _VM _VM _VM);
 
 		assert(oconv(1234.567, "MC20PZ") eq "1234,57");

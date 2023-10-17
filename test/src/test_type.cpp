@@ -49,7 +49,7 @@ function main() {
 		try {
 			//x = 18446744073709551614ULL;
 			var x = 18446744073709551614ULL;
-			TRACE(x);
+			TRACE(x)
 			assert(x eq -2);
 			//		assert(x eq 18446744073709551614ULL)
 		} catch (VarNumOverflow e) {
@@ -205,7 +205,7 @@ function main() {
 			// doesnt compile because var doesnt have an IMPLICIT conversion to non-const char*
 			//std::cout << (char*) xyz;
 
-			std::cout << (const char*)xyz;
+			std::cout << static_cast<const char*>(xyz);
 		}
 		//assert(std::string(static_cast<char*>(x)) eq "-2.89");
 	}

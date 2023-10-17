@@ -33,18 +33,18 @@ programinit()
     var sorted1 = sort(un_sorted1, sep);
     var gccsorted1 = "10a^2^10^2a^aa^bb";
     var clgsorted1 = "2^10^10a^2a^aa^bb";
-    TRACE(sorted1);
-    TRACE(gccsorted1);
-    TRACE(clgsorted1);
+    TRACE(sorted1)
+    TRACE(gccsorted1)
+    TRACE(clgsorted1)
     assert(sorted1 eq gccsorted1 or sorted1 eq clgsorted1);
 
     var un_sorted2 = "bb^10^aa^2^a10^a2";
     var sorted2 = sort(un_sorted2, sep);
     var gccsorted2 = "10a^2^10^2a^aa^bb";
     var clgsorted2 = "2^10^a10^a2^aa^bb";
-    TRACE(sorted2);
-    TRACE(gccsorted2);
-    TRACE(clgsorted2);
+    TRACE(sorted2)
+    TRACE(gccsorted2)
+    TRACE(clgsorted2)
     assert(sorted2 eq gccsorted2 or sorted2 eq clgsorted2);
 
 	//sort via dim

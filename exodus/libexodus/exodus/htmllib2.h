@@ -23,7 +23,7 @@ var operator() (in mode, io dataio, in params0 = "", in params20 = "", in glang 
 
  // The first call will link to the shared lib and create/cache an object from it.
  // passing current standard variables in mv
- if (this->pmemberfunc_==NULL)
+ if (this->pmemberfunc_ == nullptr)
   this->attach("htmllib2");
 
  // Define a function type (pExodusProgramBaseMemberFunction)

@@ -106,25 +106,25 @@ namespace exodus {
 Callable::Callable()
 	// TODO optimise by only initialise one and detect usage on that only
 	: mv_(nullptr), libname_(""), funcname_(""), plib_(nullptr), pfunc_(nullptr), plibobject_(nullptr), pmemberfunc_(nullptr) {
-	plibobject_ = 0;
+	plibobject_ = nullptr;
 }
 
 // Constructor to provide everything immediately
 Callable::Callable(const std::string_view libname, const std::string_view funcname, ExoEnv& mv)
 	: mv_(&mv), libname_(libname), funcname_(funcname), plib_(nullptr), pfunc_(nullptr), plibobject_(nullptr), pmemberfunc_(nullptr) {
-	plibobject_ = 0;
+	plibobject_ = nullptr;
 }
 
 // Constructor to provide library name and function immediately
 Callable::Callable(const std::string_view libname, const std::string_view funcname)
 	: mv_(nullptr), libname_(libname), funcname_(funcname), plib_(nullptr), pfunc_(nullptr), plibobject_(nullptr), pmemberfunc_(nullptr) {
-	plibobject_ = 0;
+	plibobject_ = nullptr;
 }
 
 // Constructor to provide environment immediately. probably followed by .init(libname,funcname)
 Callable::Callable(ExoEnv& mv)
 	: mv_(&mv), libname_(""), funcname_(""), plib_(nullptr), pfunc_(nullptr), plibobject_(nullptr), pmemberfunc_(nullptr) {
-	plibobject_ = 0;
+	plibobject_ = nullptr;
 }
 
 // Destructor
@@ -346,7 +346,8 @@ bool Callable::checkload(const std::string newlibname, const std::string newfunc
 			std::cout << "exocallable:checkload: ko:" << newlibname << std::endl;
 		}
 		throw VarError("Unable to load " ^ var(libfilepath_));
-		return false;
+		//std::unreachable();
+		//return false;
 	}
 
 	// find the function or fail
@@ -358,7 +359,8 @@ bool Callable::checkload(const std::string newlibname, const std::string newfunc
 		}
 		throw VarError("Unable to find function " ^ var(newfuncname) ^ " in " ^
 					  var(libfilepath_));
-		return false;
+		//std::unreachable();
+		//return false;
 	}
 
 	if (TRACING >= 4) {
@@ -431,7 +433,7 @@ bool Callable::openlib(const std::string newlibname) {
 	// This may waste some processing if relocations are performed for functions that are never
 	// referenced. This behavior may be useful for applications that need to know as soon as an
 	// object is loaded that all symbols referenced during execution are available.
-	plib_ = (void*)dlopen(libfilepath_.c_str(), RTLD_NOW);
+	plib_ = static_cast<void*>(dlopen(libfilepath_.c_str(), RTLD_NOW));
 
 	// Try without path in case the library is system installed e.g. in /usr/local/lib
 	std::size_t fnpos0;
@@ -445,7 +447,7 @@ bool Callable::openlib(const std::string newlibname) {
 			purelibfilename = libfilepath_.substr(fnpos0 + 1);
 
 			//TRACE(purelibraryfilename)
-			plib_ = (void*)dlopen(purelibfilename.c_str(), RTLD_NOW);
+			plib_ = static_cast<void*>(dlopen(purelibfilename.c_str(), RTLD_NOW));
 
 //			// Try on the same path as the executable
 //			if (plib_ == nullptr) {
@@ -470,7 +472,8 @@ bool Callable::openlib(const std::string newlibname) {
 		} else {
 			throw VarError(libfilepath ^ " does not exist or cannot be found, or " ^ purelibfilename ^ " cannot be linked/wrong version?");
 		}
-		return false;
+		//std::unreachable();
+		//return false;
 	}
 
 	// Cache the dlopen result
@@ -509,7 +512,7 @@ bool Callable::openfunc(const std::string newfuncname) {
 	// This is the only call to dlsym
 	/////////////////////////////////
 	pfunc_ = reinterpret_cast<ExodusProgramBaseCreateDeleteFunction>(
-		dlsym((library_t)plib_, newfuncname.c_str())
+		dlsym(static_cast<library_t>(plib_), newfuncname.c_str())
 	);
 
 	// Log any error message
@@ -568,7 +571,8 @@ var Callable::callsmf() {
 	}
 
 	return CALLMEMBERFUNCTION(*(plibobject_),
-							  ((pExodusProgramBaseMemberFunction)(pmemberfunc_)))();
+							  //((pExodusProgramBaseMemberFunction)(pmemberfunc_)))();
+							  ( static_cast<pExodusProgramBaseMemberFunction>(pmemberfunc_) ))();
 }
 
 // Does not actually close any library but does delete the libprogram object

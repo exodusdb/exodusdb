@@ -1350,7 +1350,7 @@ x1exit:
 		htmlcode ^= ";page-break-after:avoid";
 		htmlcode ^= "\">";
 		htmlcode ^= _FM "<colgroup>" ^ coltags ^ "</colgroup>";
-		//<thead> may be hardcoded elsewhere for page heading
+		// <thead> may be hardcoded elsewhere for page heading
 		//!!!if you change it here, search and change it there too
 		htmlcode ^= _FM "<thead style=\"cursor:pointer\" onclick=\"sorttable(event)\">";
 		posttheadmark = "<postthead/>";

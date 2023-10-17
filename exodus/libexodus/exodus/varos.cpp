@@ -50,7 +50,7 @@ namespace exodus {
 
 // setgloballocale object constructs to standard on program startup
 // for correct collation
-class SetGlobalLocale {
+static class SetGlobalLocale {
    public:
 	SetGlobalLocale() {
 
@@ -137,7 +137,7 @@ std::locale get_locale(const char* locale_name)	// throw (VarError)
 				return mylocale;
 			}
 		} catch (std::runtime_error& re) {
-			throw VarError("get_locale cannot create locale for " ^ var(locale_name));
+			throw VarError("get_locale cannot create locale for " ^ var(locale_name).quote() ^ re.what());
 		}
 	}
 }
@@ -371,11 +371,11 @@ bool var::osopen(CVR osfilename, const char* locale) const {
 	if (THIS_IS_OSFILE())
 		osclose();
 
-	return this->osopenx(osfilename, locale) != 0;
+	return this->osopenx(osfilename, locale) != nullptr;
 }
 
 static void del_fstream(void* handle) {
-	delete (std::fstream*)handle;
+	delete static_cast<std::fstream*>(handle);
 }
 
 std::fstream* var::osopenx(CVR osfilename, const char* locale) const {
@@ -383,11 +383,11 @@ std::fstream* var::osopenx(CVR osfilename, const char* locale) const {
 	// Try to get the cached file handle. the usual case is that you osopen a file before doing
 	// osbwrite/osbread Using fstream instead of ofstream so that we can mix reads and writes on
 	// the same filehandle
-	std::fstream* pmyfile = 0;
+	std::fstream* pmyfile = nullptr;
 	if (THIS_IS_OSFILE()) {
 		pmyfile =
 			static_cast<std::fstream*>(mv_handles_cache.get_handle(static_cast<int>(var_int), var_str));
-		if (pmyfile == 0)  // nonvalid handle
+		if (pmyfile == nullptr)  // nonvalid handle
 		{
 			var_int = 0;
 			//			var_typ ^= VARTYP_OSFILE;	// clear bit
@@ -396,7 +396,7 @@ std::fstream* var::osopenx(CVR osfilename, const char* locale) const {
 	}
 
 	// If not already cached
-	if (pmyfile == 0) {
+	if (pmyfile == nullptr) {
 
 		// The file has NOT already been opened so open it now with the current default locale
 		// and add it to the cache. but normally the filehandle will have been previously opened
@@ -427,7 +427,7 @@ std::fstream* var::osopenx(CVR osfilename, const char* locale) const {
 			if (!(*pmyfile)) {
 				this->setlasterror(osfilename.quote() ^ " cannot be opened.");
 				delete pmyfile;
-				return 0;
+				return nullptr;
 			}
 		}
 
@@ -520,7 +520,7 @@ bool var::osread(const char* osfilename, const char* codepage) {
 	//	#pragma warning( disable: 4244 )
 	// warning C4244: '=' : conversion from 'std::streamoff' to 'unsigned int', possible loss of
 	// data
-	bytesize = (unsigned int)myfile.tellg();
+	bytesize = static_cast<unsigned int>(myfile.tellg());
 
 	// if empty file then done ok
 	if (bytesize == 0) {
@@ -540,7 +540,7 @@ bool var::osread(const char* osfilename, const char* codepage) {
 	} catch (std::bad_alloc& ex) {
 		myfile.close();
 		throw VarOutOfMemory("Could not obtain " ^ var(bytesize * sizeof(char)) ^
-							" bytes of memory to read " ^ var(osfilename));
+							" bytes of memory to read " ^ var(osfilename) ^ " - " ^ ex.what());
 	}
 
 	// read the file into the reserved memory block
@@ -548,14 +548,14 @@ bool var::osread(const char* osfilename, const char* codepage) {
 	// myfile.read (memblock.get(), (unsigned int) bytesize);
 	//myfile.read(&var_str[0], (unsigned int)bytesize);
 	//c++17 provides non-const access to data() :)
-	myfile.read(var_str.data(), (unsigned int)bytesize);
+	myfile.read(var_str.data(), static_cast<unsigned int>(bytesize));
 
 	bool failed = myfile.fail();
 
 	// in case we didnt read the whole file for some reason, remove garbage in the end of the
 	// string #pragma warning( disable: 4244 ) warning C4244: '=' : conversion from
 	// 'std::streamoff' to 'unsigned int', possible loss of data
-	bytesize = (unsigned int)myfile.gcount();
+	bytesize = static_cast<unsigned int>(myfile.gcount());
 	var_str.resize(bytesize);
 	myfile.close();
 
@@ -675,7 +675,7 @@ bool var::osbwrite(CVR osfilevar, VARREF offset) const {
 
 	// get the buffered file handle/open on the fly
 	std::fstream* pmyfile = osfilevar.osopenx(osfilevar, "");
-	if (pmyfile == 0) {
+	if (pmyfile == nullptr) {
 		//throw VarError(this->setlasterror(osfilevar.quote() ^ " osbwrite open failed"));
 		this->setlasterror("osbwrite failed. " ^ this->lasterror());
 		return false;
@@ -788,7 +788,7 @@ bool var::osbread(CVR osfilevar, VARREF offset, const int bytesize) {
 
 	// get the buffered file handle/open on the fly
 	std::fstream* pmyfile = osfilevar.osopenx(osfilevar, "");
-	if (pmyfile == 0) {
+	if (pmyfile == nullptr) {
 		this->setlasterror("osbread failed. " ^ this->lasterror());
 		return false;
 	}
@@ -819,7 +819,7 @@ bool var::osbread(CVR osfilevar, VARREF offset, const int bytesize) {
 	// get a memory block to read into
 	std::unique_ptr<char[]> memblock(new char[bytesize]);
 	//std::unique_ptr memblock(new char[bytesize]);
-	if (memblock == 0) {
+	if (memblock == nullptr) {
 		throw VarOutOfMemory("osbread could not obtain " ^ var(bytesize * sizeof(char)) ^
 							" bytes of memory to read " ^ osfilevar);
 	}
@@ -843,7 +843,7 @@ bool var::osbread(CVR osfilevar, VARREF offset, const int bytesize) {
 	// characters. int readsize = pmyfile->gcount(); #pragma warning( disable: 4244 )
 	// warning C4244: '=' : conversion from 'std::streamoff' to 'unsigned int', possible loss of
 	// data
-	var_str.assign(memblock.get(), (unsigned int)pmyfile->gcount());
+	var_str.assign(memblock.get(), static_cast<unsigned int>(pmyfile->gcount()));
 
 	// trim off any excess utf8 bytes if utf8
 	//	var(pmyfile->getloc().name()).outputl(L"loc name=");;
@@ -1295,12 +1295,7 @@ var var::oslist(SV globpattern0, const int mode) const {
 				if (getfiles)
 					filelist ^= dir_itr->path().filename().string() ^ FM;
 			}
-		} catch (const std::exception& ex) {
-			// evade warning: unused variable
-			if (false)
-				if (ex.what()) {
-				}
-
+		} catch ([[maybe_unused]] const std::exception& ex) {
 			//++err_count;
 			// std::cout << dir_itr->path().leaf() << " " << ex.what() << std::endl;
 		}

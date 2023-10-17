@@ -20,7 +20,7 @@ programinit()
 	}
 
 	// test extract function
-	if (false) {
+	if ((false)) {
 		var data;
 		assert(osread(data from "/root/exodus/test/data/DYNARRAY.TXT"));
 		data.converter("\n", _FM);
@@ -187,7 +187,7 @@ programinit()
 						nn = 1'000'000;
 						for (var v2 = 0; v2 le nn; v2++) {
 							i1 = v2;
-						};
+						}
 
 						break;
 					case 1:
@@ -195,7 +195,7 @@ programinit()
 							printl("Exp: 15     ns - new var method - for (var:range)");
 						for (const var v2 : range(0 to nn)) {
 							i1 = v2;
-						};
+						}
 
 						break;
 					case 2:
@@ -203,7 +203,7 @@ programinit()
 							printl("Exp: 0.840 ns - old int method - for (int;;)");
 						for (int i2 = 0; i2 le nn; i2++) {
 							i1 = i2;
-						};
+						}
 
 						break;
 					case 3:
@@ -211,7 +211,7 @@ programinit()
 							printl("Exp: 0.840 ns - new int method - for (int:range)");
 						for (int i2 : range(0 to nn)) {
 							i1 = i2;
-						};
+						}
 
 						break;
 					case 4:
@@ -219,7 +219,7 @@ programinit()
 							printl("Exp: 0.840 ns - new int method using boost - for (int:range)");
 						for (int i2 : boost::irange(0, nn)) {
 							i1 = i2;
-						};
+						}
 
 						break;
 //					case 21:
@@ -236,7 +236,7 @@ programinit()
 						for (int i2 = 0; i2 le nn; i2++) {
 							var x;
 							b1 = x.assigned();
-						};
+						}
 
 						break;
 					case 6:
@@ -245,7 +245,7 @@ programinit()
 						for (int i2 = 0; i2 le nn; i2++) {
 							var i = 123456;
 							b1	  = i.assigned();
-						};
+						}
 
 						break;
 					case 7:
@@ -254,7 +254,7 @@ programinit()
 						for (int i2 = 0; i2 le nn; i2++) {
 							var b = true;
 							b1	  = b.assigned();
-						};
+						}
 
 						break;
 					case 8:
@@ -263,7 +263,7 @@ programinit()
 						for (int i2 = 0; i2 le nn; i2++) {
 							var d = 123.456;
 							b1	  = d.assigned();
-						};
+						}
 
 						break;
 					case 9:
@@ -272,7 +272,7 @@ programinit()
 						for (int i2 = 0; i2 le nn; i2++) {
 							var s = "1";
 							b1	  = s.assigned();
-						};
+						}
 
 						break;
 					case 10:
@@ -281,7 +281,7 @@ programinit()
 						for (int i2 = 0; i2 le nn; i2++) {
 							var s = '1';
 							b1	  = s.assigned();
-						};
+						}
 
 						break;
 					case 11:
@@ -290,7 +290,7 @@ programinit()
 						for (int i2 = 0; i2 le nn; i2++) {
 							var s = ss1;
 							b1	  = s.assigned();
-						};
+						}
 
 						break;
 					case 12:
@@ -298,7 +298,7 @@ programinit()
 							printl("Exp: 4.5   ns - pure test");
 						for (int i2 = 0; i2 le nn; i2++) {
 							b1 = v1.assigned();
-						};
+						}
 
 						break;
 					case 13:
@@ -306,7 +306,7 @@ programinit()
 							printl("Exp: 0.9   ns - assign from int");
 						for (int i2 = 0; i2 le nn; i2++) {
 							v1 = 123456;
-						};
+						}
 
 						break;
 					case 14:
@@ -314,7 +314,7 @@ programinit()
 							printl("Exp: 0.9   ns - assign from bool");
 						for (int i2 = 0; i2 le nn; i2++) {
 							v1 = true;
-						};
+						}
 
 						break;
 					case 15:
@@ -322,7 +322,7 @@ programinit()
 							printl("Exp: 1.3   ns - assign from double");
 						for (int i2 = 0; i2 le nn; i2++) {
 							v1 = 123.456;
-						};
+						}
 
 						break;
 					case 16:
@@ -330,7 +330,7 @@ programinit()
 							printl("Exp: 13    ns - assign from cstr");
 						for (int i2 = 0; i2 le nn; i2++) {
 							v1 = "1";
-						};
+						}
 
 						break;
 					case 17:
@@ -338,7 +338,7 @@ programinit()
 							printl("Exp: 11    ns - assign from char");
 						for (int i2 = 0; i2 le nn; i2++) {
 							v1 = '1';
-						};
+						}
 
 						break;
 					case 18:
@@ -346,7 +346,7 @@ programinit()
 							printl("Exp: 11    ns - assign from std::string");
 						for (int i2 = 0; i2 le nn; i2++) {
 							v1 = ss1;
-						};
+						}
 
 						break;
 					case 19:
@@ -354,7 +354,7 @@ programinit()
 							printl("Exp: 22    ns - var + int + test");
 						for (int i2 = 0; i2 le nn; i2++) {
 							b1 = (v1 + i2).assigned();
-						};
+						}
 
 						break;
 					case 20:
@@ -362,7 +362,7 @@ programinit()
 							printl("Exp: 22    ns - var + 0.1 + test");
 						for (int i2 = 0; i2 le nn; i2++) {
 							b1 = (v1 + 0.1).assigned();
-						};
+						}
 						break;
 				}
 				var ended = ostime();
@@ -629,7 +629,7 @@ void extract(char * instring, int inlength, int fieldno, int valueno, int subval
 				//(instring[start_pos] != FM_UTF8_1 ||
 				//instring[start_pos+1] != FM_UTF8_2) ;
 			start_pos++)
-		{};
+		{}
 		/*past of of string?*/
 		if (start_pos>=inlength)
 			return;
@@ -645,7 +645,7 @@ void extract(char * instring, int inlength, int fieldno, int valueno, int subval
 			//(instring[field_end_pos]!=FM_UTF8_1 ||
 			//instring[field_end_pos+1] != FM_UTF8_2);
 		field_end_pos++)
-	{};
+	{}
 
 	/*FIND VALUE*/
 
@@ -677,7 +677,7 @@ void extract(char * instring, int inlength, int fieldno, int valueno, int subval
 				//(instring[start_pos]!=VM_UTF8_1 ||
 				//instring[start_pos+1]!=VM_UTF8_2);
 			start_pos++)
-		{};
+		{}
 		/*past end of string?*/
 		if (start_pos>=inlength)
 			return;
@@ -723,7 +723,7 @@ void extract(char * instring, int inlength, int fieldno, int valueno, int subval
 				//(instring[start_pos]!=SM_UTF8_1 ||
 				//instring[start_pos+1]!=SM_UTF8_2);
 			start_pos++)
-		{};
+		{}
 		/*past end of string?*/
 		if (start_pos>=inlength)
 			return;
@@ -742,7 +742,7 @@ void extract(char * instring, int inlength, int fieldno, int valueno, int subval
 			//(instring[subvalue_end_pos]!=SM_UTF8_1 ||
 			//instring[subvalue_end_pos+1]!=SM_UTF8_2);
 		subvalue_end_pos++)
-	{};
+	{}
 	if (subvalue_end_pos>=value_end_pos)
 	{
 		*outstart=start_pos;

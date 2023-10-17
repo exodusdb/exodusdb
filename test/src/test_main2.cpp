@@ -65,14 +65,14 @@ programinit()
 			var count = 0;
 			var str   = "";
 			for (const var ii : reverse_range(1, 10)) {
-				TRACE(ii);
+				TRACE(ii)
 				tot += ii;
 				count++;
-				str ^= ii ^ " ";;
+				str ^= ii ^ " ";
 			}
 			assert(tot   eq 55);
 			assert(count eq 10);
-			TRACE(str);
+			TRACE(str)
 			assert(str == "10 9 8 7 6 5 4 3 2 1 ");
 		}
 
@@ -82,15 +82,15 @@ programinit()
 			var count = 0;
 			var str   = "";
 			for (const var ii : reverse_range(-3, 3)) {
-				TRACE(ii);
+				TRACE(ii)
 				tot += ii;
 				count++;
-				str ^= ii ^ " ";;
+				str ^= ii ^ " ";
 			}
-			TRACE(tot);
+			TRACE(tot)
 			assert(tot   eq 0);
 			assert(count eq 7);
-			TRACE(str);
+			TRACE(str)
 			assert(str == "3 2 1 0 -1 -2 -3 ");
 		}
 
@@ -100,15 +100,15 @@ programinit()
 			var count = 0;
 			var str   = "";
 			for (const var ii : reverse_range(-3, 0)) {
-				TRACE(ii);
+				TRACE(ii)
 				tot += ii;
 				count++;
-				str ^= ii ^ " ";;
+				str ^= ii ^ " ";
 			}
-			TRACE(tot);
+			TRACE(tot)
 			assert(tot   eq -6);
 			assert(count eq 4);
-			TRACE(str);
+			TRACE(str)
 			assert(str == "0 -1 -2 -3 ");
 		}
 
@@ -118,15 +118,15 @@ programinit()
 			var count = 0;
 			var str   = "";
 			for (const var ii : reverse_range(-3, -6)) {
-				TRACE(ii);
+				TRACE(ii)
 				tot += ii;
 				count++;
-				str ^= ii ^ " ";;
+				str ^= ii ^ " ";
 			}
-			TRACE(tot);
+			TRACE(tot)
 			assert(tot   eq 0);
 			assert(count eq 0);
-			TRACE(str);
+			TRACE(str)
 			assert(str == "");
 		}
 

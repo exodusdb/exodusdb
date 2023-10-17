@@ -122,7 +122,7 @@ function main() {
 #ifndef USE_TO_CHARS_G
 		assert((var("999999999999999.9") + 0).outputl().toString()  eq "999999999999999.9");
 		printl(var(9999999999999999.9).toDouble());
-		TRACE(var("9999999999999999.9") + 0);
+		TRACE(var("9999999999999999.9") + 0)
 		//assert((var("9999999999999999.9")   + 0).outputl().toString() eq "1.0e+16");
 		assert((var("9999999999999999.9") + 0).outputl().toString() eq "1e+16");
 #endif

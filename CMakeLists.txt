@@ -133,6 +133,30 @@
 		## CLANG
 		# Suppress GNU warning about elvis operator ?:
 		# warning: use of GNU ?: conditional expression extension, omitting middle operand [-Wgnu-conditional-omitted-operand]
+		add_compile_options (
+								-Weverything
+								-Wno-c++98-compat
+								-Wno-c++98-compat-pedantic
+								-Wno-reserved-macro-identifier
+								-Wno-disabled-macro-expansion
+								-Wno-date-time
+								-Wno-ctad-maybe-unsupported
+								-Wno-padded
+								-Wno-unreachable-code-break
+								-Wno-weak-vtables
+								-Wno-double-promotion
+								-Wno-shadow
+								-Wno-exit-time-destructors
+								-Wno-global-constructors
+								-Wno-missing-prototypes
+								-Wno-unsafe-buffer-usage
+								-Wno-shadow-field
+								-Wno-float-equal
+								-Wno-cast-align
+								-Wno-unused-macros
+								-Wno-missing-variable-declarations
+								-Wno-covered-switch-default
+							)
 		add_compile_options(-pedantic)
 		add_compile_options(-Wno-gnu-conditional-omitted-operand)
 

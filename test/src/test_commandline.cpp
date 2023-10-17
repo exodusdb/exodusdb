@@ -24,7 +24,7 @@ function main() {
 	var execdir = EXECPATH.field(OSSLASH, 1, fcount(EXECPATH, OSSLASH) - 1);
 //	execdir = "";
 	execdir = "./";
-	TRACE(execdir ^ "testcommandline");
+	TRACE(execdir ^ "testcommandline")
 
 	if (not osfile(execdir ^ "testcommandline"))
 		abort("Test passed because testcommandline cannot be found");

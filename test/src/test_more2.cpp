@@ -356,7 +356,7 @@ programinit()
 		//assert(x.oconv("HEX") eq "3838003939");
 		//assert(x eq "88\099");
 		assert(x.len()        eq 2);
-		TRACE(x.oconv("HEX"));
+		TRACE(x.oconv("HEX"))
 		assert(x.oconv("HEX") eq "3838");
 		assert(x              eq "88");
 	}
@@ -366,7 +366,7 @@ programinit()
 		//assert(x.oconv("HEX") eq "3838003939");
 		//assert(x eq "88\099");
 		assert(x.len()        eq 2);
-		TRACE(x.oconv("HEX"));
+		TRACE(x.oconv("HEX"))
 		assert(x.oconv("HEX") eq "3838");
 		assert(x              eq "88");
 	}
@@ -376,7 +376,7 @@ programinit()
 		//assert(x.oconv("HEX") eq "3838003939");
 		//assert(x eq "88\099");
 		assert(x.len()        eq 2);
-		TRACE(x.oconv("HEX"));
+		TRACE(x.oconv("HEX"))
 		assert(x.oconv("HEX") eq "3838");
 		assert(x              eq "88");
 	}
@@ -386,7 +386,7 @@ programinit()
 	{
 		var x = '\0';
 		assert(x.len()        eq 1);
-		TRACE(x.oconv("HEX"));
+		TRACE(x.oconv("HEX"))
 		assert(x.oconv("HEX") eq "00");
 		assert(x              eq '\0');
 		assert(x ne "\0");	//cannot include char 0 in cstr
@@ -394,7 +394,7 @@ programinit()
 	{
 		var x('\0');
 		assert(x.len()        eq 1);
-		TRACE(x.oconv("HEX"));
+		TRACE(x.oconv("HEX"))
 		assert(x.oconv("HEX") eq "00");
 		assert(x              eq '\0');
 		assert(x ne "\0");	//cannot include char 0 in cstr
@@ -402,7 +402,7 @@ programinit()
 	{
 		var x{'\0'};
 		assert(x.len()        eq 1);
-		TRACE(x.oconv("HEX"));
+		TRACE(x.oconv("HEX"))
 		assert(x.oconv("HEX") eq "00");
 		assert(x              eq '\0');
 		assert(x ne "\0");	//cannot include char 0 in cstr
@@ -591,7 +591,7 @@ programinit()
 		assert(oconv('\xff', "HEX") eq "FF");
 	}
 
-	//<
+	// <
 	{
 		assert(var(1) lt var(2));
 		assert(var(1.1) lt var(2.1));

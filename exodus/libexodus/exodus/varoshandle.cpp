@@ -15,7 +15,8 @@ std::mutex mvhandles_mutex;
 namespace exodus {
 
 VarOSHandleEntry::VarOSHandleEntry()
-	: deleter((DELETER_AND_DESTROYER)0), handle(0) {}
+	//: deleter((DELETER_AND_DESTROYER)0), handle(0) {}
+	: deleter(static_cast<DELETER_AND_DESTROYER>(nullptr)), handle(nullptr) {}
 
 VarOSHandlesCache::VarOSHandlesCache()
 	: conntbl(HANDLES_CACHE_SIZE) {}
@@ -53,7 +54,7 @@ void VarOSHandlesCache::del_handle(int index) {
 		conntbl[index].deleter(conntbl[index].handle);
 		//conntbl[index].handle;
 	}
-	conntbl[index].deleter = 0;	 //	nullptr
+	conntbl[index].deleter = nullptr;
 }
 
 VarOSHandlesCache::~VarOSHandlesCache() {
@@ -66,7 +67,7 @@ VarOSHandlesCache::~VarOSHandlesCache() {
 		if (conntbl[ix].deleter != nullptr) {
 			// do not call 'del_handle(ix)' here because of deadlock
 			conntbl[ix].deleter(conntbl[ix].handle);
-			conntbl[ix].deleter = 0;  //	nullptr
+			conntbl[ix].deleter = nullptr;
 		}
 }
 

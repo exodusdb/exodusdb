@@ -37,7 +37,7 @@ function main() {
 
 	// This no longer works as is.
 	// It is unclear how to change the DEFAULT database for dicts
-	if (false) {
+	if ((false)) {
 
 		printl("\n   --- test with EXO_DICT ---\n");
 

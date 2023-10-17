@@ -242,7 +242,7 @@ programinit()
 		assert(  v1   ne true);
 		assert(!(v1   eq false));
 		assert(  v1   ne true);
-		;  //v1.toBool()
+		//v1.toBool()
 		assert("2.0" ne v2);
 		assert('2' ne v2);
 		assert(2 ne v2);
@@ -251,7 +251,6 @@ programinit()
 		assert(  true ne v2);
 		assert(!(false eq v2));
 		assert(  false ne v2);
-		;
 
 		// lt lt
 		assert((v1 lt v2));
@@ -345,10 +344,11 @@ programinit()
 		assert((true * v2)  eq 3);
 
 		// / divide
-		TRACE((v1 / v2));
+		TRACE((v1 / v2))
 		assert((v1 / v2) eq 0.6666);  //both are right because exodus compares floating point numbers only within 0.0001
 		assert((v1 / v2)    eq 0.6667);
-		TRACE((v1 / "3.0"));
+		TRACE((v1 / "3.0"))
+
 		assert((v1 / "3.0") eq 0.6667);
 		assert((v1 / '3')   eq 0.6667);
 		assert((v1 / 3)     eq 0.6667);

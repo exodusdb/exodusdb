@@ -48,7 +48,7 @@ THE SOFTWARE.
 
 namespace exodus {
 
-ND PUBLIC var osgetenv(CVR envcode DEFAULT_EMPTY) {var envvalue = ""; if (not envvalue.osgetenv(envcode)) {}; return envvalue;}
+ND PUBLIC var osgetenv(CVR envcode DEFAULT_EMPTY) {var envvalue = ""; if (not envvalue.osgetenv(envcode)) {} return envvalue;}
 ND PUBLIC bool osgetenv(CVR code, VARREF value) {return value.osgetenv(code);}
 PUBLIC void ossetenv(CVR code, CVR value) {return value.ossetenv(code);}
 
@@ -121,7 +121,7 @@ ND PUBLIC var ostid() {return var().ostid();}
 ND PUBLIC bool osshell(CVR command) {return command.osshell();}
 ND PUBLIC bool osshellwrite(CVR writestr, CVR command) {return writestr.osshellwrite(command);}
 ND PUBLIC bool osshellread(VARREF readstr, CVR command) {return readstr.osshellread(command);}
-ND PUBLIC var osshellread(CVR command) {var result = ""; if (not result.osshellread(command)) {}; return result;}
+ND PUBLIC var osshellread(CVR command) {var result = ""; if (not result.osshellread(command)) {} return result;}
 
 ND PUBLIC var backtrace();
 
@@ -382,7 +382,7 @@ ND PUBLIC bool rollbacktrans() {return var().rollbacktrans();}
 ND PUBLIC bool committrans() {return var().committrans();}
 PUBLIC void cleardbcache() {var().cleardbcache();}
 
-ND PUBLIC bool lock(CVR dbfilevar, CVR key) {return (bool)dbfilevar.lock(key);}
+ND PUBLIC bool lock(CVR dbfilevar, CVR key) {return static_cast<bool>(dbfilevar.lock(key));}
 PUBLIC void unlock(CVR dbfilevar, CVR key) {dbfilevar.unlock(key);}
 PUBLIC void unlockall() {var().unlockall();}
 
@@ -472,7 +472,7 @@ ND PUBLIC bool deleteindex(CVR dbfilename_or_var, CVR fieldname) {
 }
 
 PUBLIC
-int exodus_main(int exodus__argc, const char* exodus__argv[], ExoEnv& mv, int threadno) {
+int exodus_main(int exodus_argc, const char* exodus_argv[], ExoEnv& mv, int threadno) {
 
 	// signal/interrupt handlers
 	// install_signals();
@@ -491,8 +491,8 @@ int exodus_main(int exodus__argc, const char* exodus__argv[], ExoEnv& mv, int th
 
 	// No longer done here; to allow EXECPATH to be const
 	//if (not mv.EXECPATH) {
-	//	if (exodus__argc)
-	//		mv.EXECPATH = var(exodus__argv[0]);
+	//	if (exodus_argc)
+	//		mv.EXECPATH = var(exodus_argv[0]);
 	//	if (not mv.EXECPATH.contains(OSSLASH))
 	//		mv.EXECPATH.prefixer(oscwd() ^ OSSLASH);
 	//}
@@ -505,8 +505,8 @@ int exodus_main(int exodus__argc, const char* exodus__argv[], ExoEnv& mv, int th
 	// unless escaped needs to go after various exodus definitions how the MSVCRT tokenizes
 	// arguments http://msdn.microsoft.com/en-us/library/a1y7w461.aspx
 	// http://stackoverflow.com/questions/4094699/how-does-the-windows-command-interpreter-cmd-exe-parse-scripts
-	for (int ii = 0; ii < exodus__argc; ++ii) {
-		var word = var(exodus__argv[ii]);
+	for (int ii = 0; ii < exodus_argc; ++ii) {
+		var word = var(exodus_argv[ii]);
 		if (ii == 0) {
 			word = word.field2(OSSLASH, -1);
 			// remove trailing ".exe"
@@ -544,7 +544,7 @@ int exodus_main(int exodus__argc, const char* exodus__argv[], ExoEnv& mv, int th
 	// DBTRACE=osgetenv("EXO_DBTRACE",temp)?1:-1;
 
 	// would have to passed in as a function pointer
-	// main2(exodus__argc, exodus__argv);
+	// main2(exodus_argc, exodus_argv);
 
 	//atexit(exodus_atexit);
 

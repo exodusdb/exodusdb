@@ -942,7 +942,7 @@ notallowed:
 			// call note(task:' ko')
 			// RETURN 0
 			goto notallowed;
-	};	// lockn;
+	}	// lockn;
 
 	// ok:
 	// CALL STATUP(2,3,TASK)
@@ -1018,7 +1018,7 @@ var ExodusProgramBase::capitalise(CVR str0, CVR mode0, CVR wordseps0) const {
 				}
 			}
 
-		};	// ii;
+		}	// ii;
 
 		string2.replacer("\'S ", "\'s ");
 		if (string2.ends("\'S"))
@@ -1050,7 +1050,6 @@ var ExodusProgramBase::capitalise(CVR str0, CVR mode0, CVR wordseps0) const {
 			// BREAK;
 			if (!(tt != ""))
 				break;
-			;
 			if (tt == quoted) {
 				quoted = "";
 			} else {
@@ -1070,7 +1069,7 @@ var ExodusProgramBase::capitalise(CVR str0, CVR mode0, CVR wordseps0) const {
 					}
 				}
 			}
-		};	// ii;
+		}	// ii;
 
 		if (mode0.contains("TRIM")) {
 			string2.converter(" " _FM, _FM " ");
@@ -1574,7 +1573,8 @@ baddict:
 
 	throw VarError("ExodusProgramBase::calculate(" ^ dictid ^ ") " ^ DICT ^ " Invalid dictionary type " ^
 				  dicttype.quote());
-	return "";
+	//std::unreachable();
+	//return "";
 }
 
 //// debug
@@ -1596,16 +1596,12 @@ baddict:
 //}
 
 // sysvar
-var ExodusProgramBase::sysvar(CVR errmsg, CVR var2, CVR var3, CVR var4) {
+var ExodusProgramBase::sysvar(CVR /*errmsg*/, CVR /*var2*/, CVR /*var3*/, CVR /*var4*/) {
 
 	std::cout << "sysvar() do nothing:";
 	//	var reply;
 	//	cin>>reply;
 	return "";
-
-	// evade warning: unused parameter
-	if (errmsg || var2 || var3 || var4) {
-	}
 }
 
 // setprivilege
@@ -1697,12 +1693,8 @@ inp:
 }
 
 // savescreen
-void ExodusProgramBase::savescreen(VARREF origscrn, VARREF origattr) const {
+void ExodusProgramBase::savescreen(VARREF /*origscrn*/, VARREF /*origattr*/) const {
 	std::cout << "ExodusProgramBase::savescreen not implemented" << std::endl;
-
-	// evade warning: unused parameter
-	if (origscrn || origattr) {
-	}
 }
 
 // keypressed
@@ -1730,23 +1722,15 @@ bool ExodusProgramBase::esctoexit() const {
 }
 
 // otherusers
-var ExodusProgramBase::otherusers(CVR param) {
+var ExodusProgramBase::otherusers(CVR /*param*/) {
 	std::cout << "ExodusProgramBase::otherusers not implemented yet";
 	return var("");
-
-	// evade warning: unused parameter
-	if (param) {
-	}
 }
 
 // otherdatasetusers
-var ExodusProgramBase::otherdatasetusers(CVR param) {
+var ExodusProgramBase::otherdatasetusers(CVR /*param*/) {
 	std::cout << "ExodusProgramBase::otherdatausers not implemented yet";
 	return var("");
-
-	// evade warning: unused parameter
-	if (param) {
-	}
 }
 
 // lockrecord 3
@@ -1756,7 +1740,7 @@ bool ExodusProgramBase::lockrecord(CVR filename, VARREF file, CVR keyx) const {
 }
 
 // lockrecord 6
-bool ExodusProgramBase::lockrecord(CVR filename, VARREF file, CVR keyx, CVR recordx, const int waitsecs0, const bool allowduplicate) const {
+bool ExodusProgramBase::lockrecord(CVR filename, VARREF file, CVR keyx, CVR /*recordx*/, const int waitsecs0, const bool allowduplicate) const {
 
 	// linemark
 	// common /shadow.mfs/
@@ -1839,10 +1823,8 @@ lock:
 		return false;
 	}
 
-	// evade warning: unused parameter
-	(false || filename || recordx);
-
-	return true;
+	//std::unreachable()
+	//return true;
 }
 
 // unlockrecord 0 = unlock all
@@ -1852,7 +1834,7 @@ bool ExodusProgramBase::unlockrecord() const {
 }
 
 // unlockrecord
-bool ExodusProgramBase::unlockrecord(CVR filename, VARREF file0, CVR key) const {
+bool ExodusProgramBase::unlockrecord(CVR /*filename*/, VARREF file0, CVR key) const {
 	var file;
 	if (file0.unassigned())
 		file = "";
@@ -1872,11 +1854,6 @@ bool ExodusProgramBase::unlockrecord(CVR filename, VARREF file0, CVR key) const 
 	// remove actual lock
 	file.unlock(key);
 
-	return 1;
-
-	// evade warning: unused parameter
-	if (filename) {
-	}
 	return 1;
 }
 
@@ -1898,7 +1875,7 @@ var ExodusProgramBase::encrypt2(CVR encrypt0) const {
 		// BREAK;
 		if (!(encrypt != ""))
 			break;
-		;
+
 		encryptkey = (encryptkey % 390001) * (var(encrypt[1])).seq() + 1;
 		encrypt.cutter(1);
 	}  // loop;
@@ -1910,7 +1887,7 @@ var ExodusProgramBase::encrypt2(CVR encrypt0) const {
 		// BREAK;
 		if (!encryptkey)
 			break;
-		;
+
 	}  // loop;
 
 	return encrypt;
@@ -1940,11 +1917,7 @@ var ExodusProgramBase::xmlquote(CVR string0) const {
 }
 
 // loginnet
-bool ExodusProgramBase::loginnet(CVR dataset, CVR username, VARREF cookie, VARREF msg) {
-
-	// evade warning: unused parameter
-	if (false && dataset) {
-	}
+bool ExodusProgramBase::loginnet(CVR /*dataset*/, CVR username, VARREF cookie, VARREF msg) {
 
 	var menuid;
 	var usern;
@@ -2022,7 +1995,7 @@ bool ExodusProgramBase::loginnet(CVR dataset, CVR username, VARREF cookie, VARRE
 	 compcode = temp.f(ii);
 	 //until validcode('company',compcode)
 	 //BREAK;
-	 if (validcode2(compcode, "", "")) break;;
+	 if (validcode2(compcode, "", "")) break;
 	 };//ii;
 	 }else{
 	 compcode = temp.f(1);
@@ -2165,8 +2138,8 @@ var ExodusProgramBase::getuserdept(CVR usercode) {
 		// BREAK;
 		if (SECURITY.f(1, usernx) == "---")
 			break;
-		;
-	};	// usern;
+
+	}	// usern;
 
 	// get the department code
 	ANS = SECURITY.f(1, usernx - 1);
@@ -2299,7 +2272,7 @@ var ExodusProgramBase::iconv(CVR input, CVR conversion) {
 		} else {
 
 			//determine the function name
-			var functionname = subconversion.cut(1).field(",", 1).field("]", 1).lcase();;
+			var functionname = subconversion.cut(1).field(",", 1).field("]", 1).lcase();
 
 			// extract any params
 			var mode = subconversion.field(",", 2, 9999).field("]", 1);
@@ -2874,9 +2847,9 @@ void ExodusProgramBase::sortarray(VARREF array, CVR fns, CVR orderby0) {
 			fn = fns.f(1, fnn);
 			var othervalue = array.f(fn, vn);
 			newarray.inserter(fn, newvn, othervalue);
-		};	//fnn;
+		}	//fnn;
 
-	};	//vn;
+	}	//vn;
 
 	array.r(sortfn, sorted);
 
@@ -2915,9 +2888,9 @@ var ExodusProgramBase::invertarray(CVR input, CVR force0 /*=0*/) {
 				if (cell.len() or force) {
 					outx.r(vn, fn, cell);
 				}
-			};	//vn;
+			}	//vn;
 		}
-	};	//fn;
+	}	//fn;
 
 	return outx;
 }
