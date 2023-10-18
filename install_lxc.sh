@@ -8,13 +8,11 @@ set -euxo pipefail
 : Syntax
 : ------
 :
-:	$0 " <SOURCE> <NEW_CONTAINER_NAME> [<PG_VER>] [<STAGES>]"
+:	$0 " <SOURCE> <NEW_CONTAINER_NAME> [<STAGES>] [gcc|clang] [<PG_VER>]"
 :
 :	SOURCE e.g. an lxc image like ubuntu, ubuntu:22.04 etc. or an existing lxc container code
 :
 :	NEW_CONTAINER_NAME e.g. u2204 for lxc
-:
-:	PG_VER e.g. 14 or blank for the the default which depends on the Ubuntu version and apt.
 :
 :	STAGES is letters. Default is "'bBiIT'"
 :
@@ -26,23 +24,34 @@ set -euxo pipefail
 :
 :		T = Test
 :
-: Options
-: -------
+:	PG_VER e.g. 14 or blank for the the default which depends on the Ubuntu version and apt.
+:
+: Parse command line
+: ------------------
 :
 	#export DEBIAN_FRONTEND=noninteractive
 	#export NEEDRESTART_MODE=a
 	SOURCE=${1:?SOURCE is required. e.g. ubuntu, ubuntu:22.04 etc. or container code}
 	NEW_CONTAINER_NAME=${2:?NEW_CONTAINER_NAME is required. e.g. u2204 for lxc}
-	PG_VER=${3:-}
-	STAGES=${4:-bBiIT}
-
-	if [[ ! $PG_VER =~ ^[0-9]*$ ]]; then
-		echo Postgres version is only digits or blank. Check syntax above.
-		exit 1
-	fi
-
+	STAGES=${3:-bBiIT}
+	COMPILER=${4:-gcc}
+	PG_VER=${5:-}
+:
+: Validate
+: --------
+:
 	if [[ ! $STAGES =~ ^[bBiIT]*$ ]]; then
 		echo STAGES has only letters bBiIT. Check syntax above.
+		exit 1
+	fi
+:
+	if [[ ! $COMPILER =~ gcc|clang ]]; then
+		echo COMPILER must be gcc or clang
+		exit 1
+	fi
+:
+	if [[ ! $PG_VER =~ ^[0-9]*$ ]]; then
+		echo Postgres version is only digits or blank. Check syntax above.
 		exit 1
 	fi
 :
@@ -87,9 +96,11 @@ function stage {
 : Create/Overwrite container
 : --------------------------
 :
-	lxc rm $NEW_C --force || true
+	if lxc info $NEW_C &> /dev/null; then
+		lxc rm $NEW_C --force || true
+	fi
 	if [[ $STAGE == 1 ]]; then
-		if lxc info $SOURCE > /dev/null; then
+		if lxc info $SOURCE &> /dev/null; then
 			# copy container using a snapshot
 			lxc snapshot $SOURCE install_lxc_sh --reuse || exit 1
 			lxc copy $SOURCE/install_lxc_sh $NEW_C || exit 1
@@ -123,7 +134,7 @@ function stage {
 	STAGE_LETTERS=bBiIT
 	STAGE_LETTER=${STAGE_LETTERS:$((STAGE-1)):1}
 
-	lxc exec $NEW_C  --user $TARGET_UID --group $TARGET_GID -- bash -c "cd $TARGET_HOME/exodus && HOME=${TARGET_HOME} ./install.sh ${PG_VER:-''} $STAGE_LETTER" || exit 1
+	lxc exec $NEW_C  --user $TARGET_UID --group $TARGET_GID -- bash -c "cd $TARGET_HOME/exodus && HOME=${TARGET_HOME} ./install.sh \"$STAGE_LETTER\" \"$COMPILER\" ${PG_VER:-''}" || exit 1
 }
 :
 : ====

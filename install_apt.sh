@@ -24,7 +24,10 @@ set -euxo pipefail
 :
 : Tested on:
 :
-: "Ubuntu 23.04 - lunar"
+: See install.sh for latest:
+:
+: "Ubuntu 23.10       - mantic"
+: "Ubuntu 23.04       - lunar"
 : "Ubuntu 22.04.3 LTS - jammy"
 : "Ubuntu 20.04.3 LTS - bionic"
 :
@@ -36,10 +39,12 @@ set -euxo pipefail
 : "Debian GNU/Linux 6.0 \n \l"
 : "Linux debian32 2.6.32-5-686" #1 SMP Wed May 18 07:08:50 UTC 2011 i686 GNU/Linux
 :
-: Config
-: ------
+: Parse command line
+: ------------------
 :
-	EXODUS_DIR=${1:-${EXODUS_DIR:-~/exodus}}
+	EXODUS_DIR=${1:-~/exodus}
+	EXODUS_BRANCH_OR_TAG=${2:-master}
+	COMPILER=${3:-gcc}
 :
 : Update apt and install git
 : --------------------------
@@ -47,15 +52,15 @@ set -euxo pipefail
 	sudo apt-get update
 	sudo DEBIAN_FRONTEND=noninteractive apt-get -y install git
 :
-: Git clone exodus or refresh if already present
-: ----------------------------------------------
+: Git clone exodus or refresh if already present?
+: -----------------------------------------------
 :
 	if [ ! -d $EXODUS_DIR ]; then
-		git clone https://github.com/exodusdb/exodusdb $EXODUS_DIR
+		git clone --branch $EXODUS_BRANCH_OR_TAG https://github.com/exodusdb/exodusdb $EXODUS_DIR
 	else
 		cd $EXODUS_DIR
 		#git stash
-		git pull || true
+#		git pull || true
 		#git stash pop
 	fi
 :
@@ -63,7 +68,8 @@ set -euxo pipefail
 : -----------
 :
 	cd $EXODUS_DIR
-	./install.sh $*
+	./install.sh '' $COMPILER
 :
 : Finished $0 $* in $((SECONDS/60)) mins and $((SECONDS%60)) secs.
 : ----------------------------------------------------------------
+:

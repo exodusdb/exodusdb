@@ -18,9 +18,7 @@ set -euxo pipefail
 : Syntax
 : ------
 :
-: $0 ' [<PG_VER>] [<STAGES>]'
-:
-: PG_VER e.g. 14 The default depends on apt and the Ubuntu version
+: $0 ' [<STAGES>] [gcc|clang] [<PG_VER>]'
 :
 : STAGES is one or more letters. Default is "'bBiIT'"
 :
@@ -32,8 +30,14 @@ set -euxo pipefail
 :
 : T = Test
 :
-	PG_VER=${1:-}
-	STAGES=${2:-bBiIT}
+: PG_VER e.g. 14 or default depends on apt and the Ubuntu version
+:
+: Parse command line
+: ------------------
+:
+	STAGES=${1:-bBiIT}
+	COMPILER=${2:-gcc}
+	PG_VER=${3:-}
 :
 : ------
 : CONFIG
@@ -167,7 +171,15 @@ function get_dependencies_for_build {
 : exodus
 : ------
 :
-	sudo apt install -y g++ libpq-dev libboost-regex-dev libboost-locale-dev
+	if [[ $COMPILER == gcc ]]; then
+		sudo apt install -y g++
+	else
+		sudo apt install -y clang
+		update-alternatives --set c++ /usr/bin/clang++
+		update-alternatives --set cc /usr/bin/clang
+	fi
+:
+	sudo apt install -y libpq-dev libboost-regex-dev libboost-locale-dev
 	#sudo apt install -y g++ libboost-date-time-dev libboost-system-dev libboost-thread-dev
 :
 	ls -l /usr/lib/postgresql || true
@@ -227,7 +239,16 @@ function install_all {
 #:
 #	cd $EXODUS_DIR/build
 #	CTEST_OUTPUT_ON_FAILURE=1 CTEST_PARALLEL_LEVEL=$((`nproc`+1)) ctest
-
+:
+: Add \~/bin to all users PATH
+: ----------------------------
+:
+: Enable exodus programs created with edic/compile
+: to be run from command line without full path to \~/bin
+: Requires re-login after installation.
+:
+	echo 'export PATH="${PATH}:~/bin"' | sudo dd of=/etc/profile.d/exodus.sh status=none
+:
 : ----------------------------------------
 : Check that postgresql is running locally
 : ----------------------------------------
@@ -341,7 +362,10 @@ function test_all {
 :
 	testsort
 :
-: 'Recommended: "export HOME=$HOME:~/bin >> .bashrc"'
+: 'Recommended: "export PATH=${PATH}:~/bin"'
+: 'or logout/login to get new path from /etc/profile.d/exodus.sh'
+: 'which will enable running exodus programs created by edic/compile'
+: 'from the command line without prefixing ~/bin/'
 }
 #:
 #: -------------------
