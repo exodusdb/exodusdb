@@ -175,8 +175,8 @@ function get_dependencies_for_build {
 		sudo apt install -y g++
 	else
 		sudo apt install -y clang
-		update-alternatives --set c++ /usr/bin/clang++
-		update-alternatives --set cc /usr/bin/clang
+		sudo update-alternatives --set c++ /usr/bin/clang++
+		sudo update-alternatives --set cc /usr/bin/clang
 	fi
 :
 	sudo apt install -y libpq-dev libboost-regex-dev libboost-locale-dev
