@@ -17,45 +17,62 @@ jobs:
           #
           #- UBUNTU_VER: latest
           #  PG_VER:
+          #  COMPILER:
           #
           # Default Postgres versions
           #
           #- UBUNTU_VER: 20.04
           #  PG_VER:
+          #  COMPILER:
           #- UBUNTU_VER: 22.04
           #  PG_VER:
+          #  COMPILER:
           #
           # Specific Postgres versions
           #
           #- UBUNTU_VER: 20.04
           #  PG_VER: 10
+          #  COMPILER:
           #- UBUNTU_VER: 20.04
           #  PG_VER: 11
+          #  COMPILER:
           #- UBUNTU_VER: 20.04
           #  PG_VER: 12
+          #  COMPILER:
           #- UBUNTU_VER: 20.04
           #  PG_VER: 13
+          #  COMPILER:
           #- UBUNTU_VER: 20.04
           #  PG_VER: 14
+          #  COMPILER:
           #- UBUNTU_VER: 20.04
           #  PG_VER: 15
+          #  COMPILER:
           #- UBUNTU_VER: 20.04
           #  PG_VER: 16
+          #  COMPILER:
           #
           #- UBUNTU_VER: 22.04
           #  PG_VER: 10
+          #  COMPILER:
           #- UBUNTU_VER: 22.04
           #  PG_VER: 11
+          #  COMPILER:
           #- UBUNTU_VER: 22.04
           #  PG_VER: 12
+          #  COMPILER:
           #- UBUNTU_VER: 22.04
           #  PG_VER: 13
+          #  COMPILER:
           - UBUNTU_VER: 22.04
-            PG_VER: 14
+            PG_VER:
+            COMPILER: clang
           #- UBUNTU_VER: 22.04
           #  PG_VER: 15
+          #  COMPILER:
           #- UBUNTU_VER: 22.04
           #  PG_VER: 16
+          #  COMPILER:
 
     # https://docs.github.com/en/actions/learn-github-actions/expressions
     #runs-on: ubuntu-${{ matrix.UBUNTU_VER }}
@@ -90,16 +107,16 @@ jobs:
         env
 
     - name: Get dependencies for build
-      run: env ./install.sh "${{ matrix.PG_VER }}" b
+      run: env ./install.sh b "${{ matrix.COMPILER }}" "${{ matrix.PG_VER }}"
 
     - name: Build
-      run: ./install.sh "${{ matrix.PG_VER }}" B
+      run: ./install.sh B "${{ matrix.COMPILER }}" "${{ matrix.PG_VER }}"
 
     - name: Get dependencies for install
-      run: ./install.sh "${{ matrix.PG_VER }}" i
+      run: ./install.sh i "${{ matrix.COMPILER }}" "${{ matrix.PG_VER }}"
 
     - name: Install
-      run: ./install.sh "${{ matrix.PG_VER }}" I
+      run: ./install.sh I "${{ matrix.COMPILER }}" "${{ matrix.PG_VER }}"
 
     - name: Test
-      run: ./install.sh "${{ matrix.PG_VER }}" T
+      run: ./install.sh T "${{ matrix.COMPILER }}" "${{ matrix.PG_VER }}"
