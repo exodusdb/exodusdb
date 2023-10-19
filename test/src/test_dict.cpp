@@ -11,24 +11,28 @@ var xo_dict_conn;
 
 function main() {
 
-	printl("\n   --- clear any existing EXO_DATA/DICT env ---\n");
-	ossetenv("EXO_DATA", "");
-	ossetenv("EXO_DICT", "");
+    printl("\n   --- clear any existing EXO_DATA/DICT env ---\n");
+    ossetenv("EXO_DATA", "");
+    ossetenv("EXO_DICT", "");
 
-	printl("\n   --- default connection first thing before anything else to ensure clean ---\n");
-	printl("\n   --- quit (pass test) if no default database connection ---\n");
+	// Quit if no default database connection
 	if (not default_conn.connect()) {
-		printl("\n   --- No default db connection to perform db testing.\n");
-		printl("Test passed. Not really. No default db connection.");
+		//Pass if allowed
+		if (osgetenv("EXO_NODATA")) {
+			print("Test passed. Not really. ");
+		}
+		printl("No default db connection to perform db testing.");
 		return 0;
 	}
-	TRACE(default_conn)
 
-	//Skip if fast testing required
-	if (osgetenv("EXO_FAST_TEST")) {
-		printl("Test passed. Not really. EXO_FAST_TEST - skipping");
-		return 0;
-	}
+//	printl("\n   --- default connection first thing before anything else to ensure clean ---\n");
+//	printl("\n   --- quit (pass test) if no default database connection ---\n");
+//	if (not default_conn.connect()) {
+//		printl("\n   --- No default db connection to perform db testing.\n");
+//		printl("Test passed. Not really. No default db connection.");
+//		return 0;
+//	}
+//	TRACE(default_conn)
 
 	gosub cleanup();
 

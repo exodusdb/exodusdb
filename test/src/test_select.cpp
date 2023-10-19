@@ -11,9 +11,13 @@ var testfile;
 
 function main() {
 
-	//Pass if no default database connection
-	if (not connect() and osgetenv("EXO_NODATA")) {
-		printl("No default db connection to perform db testing. Test passed");
+	// Quit if no default database connection
+	if (not connect()) {
+		//Pass if allowed
+		if (osgetenv("EXO_NODATA")) {
+			print("Test passed. Not really. ");
+		}
+		printl("No default db connection to perform db testing.");
 		return 0;
 	}
 
