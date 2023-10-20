@@ -156,7 +156,7 @@ programinit()
 		assert((v1 / '2')   eq 1);
 		assert((v1 / 2)     eq 1);
 		assert((v1 / 2.0)   eq 1);
-		assert((v1 / true)  eq 2);
+		//assert((v1 / true)  eq 2); //should not compile since / false is divide by zero
 		assert(("2.0" / v2) eq 1);
 		assert(('2' / v2)   eq 1);
 		assert((2 / v2)     eq 1);
@@ -353,7 +353,7 @@ programinit()
 		assert((v1 / '3')   eq 0.6667);
 		assert((v1 / 3)     eq 0.6667);
 		assert((v1 / 3.0)   eq 0.6667);
-		assert((v1 / true)  eq 2);
+		//assert((v1 / true)  eq 2); //should not compile since / false is divide by zero
 		assert(("2.0" / v2) eq 0.6667);
 		assert(('2' / v2)   eq 0.6667);
 		assert((2 / v2)     eq 0.6667);
