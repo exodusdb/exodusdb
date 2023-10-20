@@ -22,20 +22,18 @@ THE SOFTWARE.
 
 #include <iostream>
 #include <string>
-//#include <utility> // for std::move
 
-//#include <cassert>
 #include <limits>
-//#include <sstream>
-//#include <vector>
 
-//#define EXO_VAR_CPP	// indicates globals are to be defined (omit extern keyword)
 #include <var.h>
 #include <varerr.h>
-//#include <exodus/varimpl.h>
-//#include <exodus/exoimpl.h>
 
 namespace exodus {
+
+inline bool almost_equal(double lhs_dbl, double rhs_dbl) {
+	//crude pickos method
+	return (std::abs(lhs_dbl - rhs_dbl) < SMALLEST_NUMBER);
+}
 
 /* more accurate way of comparing two decimals using EPSILON and ulp
    not using it simply to make better emulation of pickos at least initially
@@ -76,33 +74,31 @@ inline bool almost_equal(double x, double y, int ulp)
 }
 */
 
-inline bool almost_equal(double x, double y) {
-	//crude pickos method
-	return (std::abs(x - y) < SMALLEST_NUMBER);
-}
-
 PUBLIC bool bool_lt_bool(const bool lhs, const bool rhs) {
 
-	//return true if lhs is "less true" than rhs
+	// AXIOMS
+	// false == false
+	// true  == true
+	// false <  TRUE
 
-	//true  < true  -> false
-	//true  < false -> false
-	//false < true  -> TRUE
-	//false < false -> false
-	//
-	//     rhs: true    false
-	// lhs:     ----    -----
-	// true     false   false
-	// false    TRUE    false
+	// LEMMAS
+	// true  < true  -> false
+	// false < false -> false
+	// true  < false -> false
 
-	//std::clog << lhs << " " << rhs << " " << (rhs && !lhs) << std::endl;
-	return rhs && !lhs;
+	// TRUTH TABLE
+	//       rhs: true    false
+	// lhs:       ----    -----
+	// true       false   false
+	// false      TRUE    false
+
+	return !lhs && rhs;
 
 }
 
-// almost identical code in var_eq and var_lt except where noted
+// almost identical code in var_eq_var and var_lt_var except where noted
 // NOTE doubles compare only to 0.0001 accuracy)
-PUBLIC bool var_eq(CVR lhs, CVR rhs) {
+PUBLIC bool var_eq_var(CVR lhs, CVR rhs) {
 
 	lhs.assertDefined(__PRETTY_FUNCTION__);
 	rhs.assertDefined(__PRETTY_FUNCTION__);
@@ -115,15 +111,15 @@ PUBLIC bool var_eq(CVR lhs, CVR rhs) {
 			// we have two strings
 			// if they are both the same (including both empty) then eq is true
 			if (lhs.var_str == rhs.var_str)
-				// different from var_lt
+				// different from var_lt_var
 				return true;
 			// otherwise if either is empty then return eq false
 			//(since empty string is ONLY eq to another empty string)
 			if (lhs.var_str.empty())
-				// different from var_lt
+				// different from var_lt_var
 				return false;
 			if (rhs.var_str.empty())
-				// SAME as var_lt
+				// SAME as var_lt_var
 				return false;
 			// otherwise go on to test numerically then literally
 		} else {
@@ -134,7 +130,7 @@ PUBLIC bool var_eq(CVR lhs, CVR rhs) {
 					// throw VarUnassigned("eq(rhs)");
 					rhs.assertAssigned(__PRETTY_FUNCTION__);
 				}
-				// different from var_lt
+				// different from var_lt_var
 				return false;
 			}
 		}
@@ -146,7 +142,7 @@ PUBLIC bool var_eq(CVR lhs, CVR rhs) {
 				// throw VarUnassigned("eq(lhs)");
 				lhs.assertAssigned(__PRETTY_FUNCTION__);
 			}
-			// SAME as var_lt
+			// SAME as var_lt_var
 			return false;
 		}
 	}
@@ -162,7 +158,7 @@ PUBLIC bool var_eq(CVR lhs, CVR rhs) {
 			//DOUBLE v DOUBLE
 			//if (rhs.var_typ & VARTYP_INT)
 			if (rhs.var_typ & VARTYP_DBL) {
-				// different from var_lt
+				// different from var_lt_var
 
 				//return (lhs.var_intd == rhs.var_intd);
 
@@ -173,7 +169,7 @@ PUBLIC bool var_eq(CVR lhs, CVR rhs) {
 
 			//DOUBLE V INT
 			else {
-				// different from var_lt (uses absolute)
+				// different from var_lt_var (uses absolute)
 				// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
 
 				//return (lhs.var_int == rhs.var_dbl);
@@ -181,12 +177,13 @@ PUBLIC bool var_eq(CVR lhs, CVR rhs) {
 				// warning: conversion from ‘exodus::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
 				return almost_equal(lhs.var_dbl, static_cast<double>(rhs.var_int));
 			}
+			// std::unreachable();
 		}
 
 		//INT v DOUBLE
 		//if (rhs.var_typ & VARTYP_INTd)
 		if (rhs.var_typ & VARTYP_DBL) {
-			// different from var_lt (uses absolute)
+			// different from var_lt_var (uses absolute)
 			// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
 
 			//return (lhs.var_dbl == rhs.var_int);
@@ -199,7 +196,7 @@ PUBLIC bool var_eq(CVR lhs, CVR rhs) {
 
 		//INT v INT
 		else {
-			// different from var_lt (uses absolute)
+			// different from var_lt_var (uses absolute)
 
 			// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
 			//return (lhs.var_dbl == rhs.var_dbl);
@@ -207,6 +204,7 @@ PUBLIC bool var_eq(CVR lhs, CVR rhs) {
 
 			return (lhs.var_int == rhs.var_int);
 		}
+		// std::unreachable();
 	}
 
 	// 3. BOTH NON-NUMERIC STRINGS
@@ -214,14 +212,14 @@ PUBLIC bool var_eq(CVR lhs, CVR rhs) {
 		lhs.createString();
 	if (!(rhs.var_typ & VARTYP_STR))
 		rhs.createString();
-	// different from var_lt
+	// different from var_lt_var
 	//return lhs.localeAwareCompare(lhs.var_str, rhs.var_str) == 0;
 	return lhs.var_str == rhs.var_str;
 }
 
-// almost identical between var_eq and var_lt except where noted
+// almost identical between var_eq_var and var_lt_var except where noted
 // NOTE doubles compare only to 0.0001 accuracy)
-PUBLIC bool var_lt(CVR lhs, CVR rhs) {
+PUBLIC bool var_lt_var(CVR lhs, CVR rhs) {
 
 	lhs.assertDefined(__PRETTY_FUNCTION__);
 	rhs.assertDefined(__PRETTY_FUNCTION__);
@@ -234,15 +232,15 @@ PUBLIC bool var_lt(CVR lhs, CVR rhs) {
 			// we have two strings
 			// if they are both the same (including both empty) then eq is true
 			if (lhs.var_str == rhs.var_str)
-				// different from var_eq
+				// different from var_eq_var
 				return false;
 			// otherwise if either is empty then return eq false
 			//(since empty string is ONLY eq to another empty string)
 			if (lhs.var_str.empty())
-				// different from var_eq
+				// different from var_eq_var
 				return true;
 			if (rhs.var_str.empty())
-				// SAME as var_eq
+				// SAME as var_eq_var
 				return false;
 			// otherwise go on to test numerically then literally
 		} else {
@@ -253,7 +251,7 @@ PUBLIC bool var_lt(CVR lhs, CVR rhs) {
 					// throw VarUnassigned("eq(rhs)");
 					rhs.assertAssigned(__PRETTY_FUNCTION__);
 				}
-				// different from var_eq
+				// different from var_eq_var
 				return true;
 			}
 		}
@@ -265,7 +263,7 @@ PUBLIC bool var_lt(CVR lhs, CVR rhs) {
 				// throw VarUnassigned("eq(lhs)");
 				lhs.assertAssigned(__PRETTY_FUNCTION__);
 			}
-			// SAME as var_eq
+			// SAME as var_eq_var
 			return false;
 		}
 	}
@@ -274,25 +272,27 @@ PUBLIC bool var_lt(CVR lhs, CVR rhs) {
 	if (lhs.isnum() && rhs.isnum()) {
 		if (lhs.var_typ & VARTYP_INT) {
 			if (rhs.var_typ & VARTYP_INT)
-				// different from var_eq
+				// different from var_eq_var
 				return (lhs.var_int < rhs.var_int);
 			else
-				// different from var_eq
+				// different from var_eq_var
 				// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
 				//return (static_cast<double>(lhs.var_int) < rhs.var_dbl);
 				return (rhs.var_dbl - static_cast<double>(lhs.var_int)) >= SMALLEST_NUMBER;
 			//return ((rhs.var_dbl - static_cast<double>(lhs.var_int) >= SMALLEST_NUMBER);
+			// std::unreachable();
 		}
 		if (rhs.var_typ & VARTYP_INT)
-			// different from var_eq
+			// different from var_eq_var
 			// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
 			//return (lhs.var_dbl < static_cast<double>(rhs.var_int));
 			return (static_cast<double>(rhs.var_int) - lhs.var_dbl) >= SMALLEST_NUMBER;
 		else
-			// different from var_eq
+			// different from var_eq_var
 			// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
 			//return (lhs.var_dbl < rhs.var_dbl);
 			return (rhs.var_dbl - lhs.var_dbl) >= SMALLEST_NUMBER;
+		// std::unreachable();
 	}
 
 	// 3. either or both non-numerical strings
@@ -300,14 +300,14 @@ PUBLIC bool var_lt(CVR lhs, CVR rhs) {
 		lhs.createString();
 	if (!(rhs.var_typ & VARTYP_STR))
 		rhs.createString();
-	// different from var_eq
+	// different from var_eq_var
 	// return lhs.var_str<rhs.var_str;
 	return lhs.localeAwareCompare(lhs.var_str, rhs.var_str) < 0;
 }
 
-// similar to var_eq and var_lt - this is the var<int version for speed
+// similar to var_eq_var and var_lt_var - this is the var<int version for speed
 // NOTE doubles compare only to 0.0001 accuracy)
-PUBLIC bool var_lt_int(CVR lhs, const int int2) {
+PUBLIC bool var_lt_int(CVR lhs, const int rhs_int) {
 
 	lhs.assertDefined(__PRETTY_FUNCTION__);
 
@@ -318,27 +318,26 @@ PUBLIC bool var_lt_int(CVR lhs, const int int2) {
 	// LHS numerical?
 	do {
 
-		//compare int is already available
-		if (lhs.var_typ & VARTYP_INT)
-			return (lhs.var_int < int2);
-
-		//otherwise compare dbl
+		// Compare dbl by preference because int might be a conversion with loss of precision
 		if (lhs.var_typ & VARTYP_DBL)
 			// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
-			return (static_cast<double>(int2) - lhs.var_dbl) >= SMALLEST_NUMBER;
+			return (static_cast<double>(rhs_int) - lhs.var_dbl) >= SMALLEST_NUMBER;
+
+		//compare int if available
+		if (lhs.var_typ & VARTYP_INT)
+			return (lhs.var_int < rhs_int);
 
 		// Try to convert to number and try again
 		// Will check unassigned
-
 	} while (lhs.isnum());
 
 	// Non-numerical lhs
-	return lhs.var_str < std::to_string(int2);
+	return lhs.var_str < std::to_string(rhs_int);
 
 }
 
 // NOTE doubles compare only to 0.0001 accuracy)
-PUBLIC bool int_lt_var(const int int1, CVR rhs) {
+PUBLIC bool int_lt_var(const int lhs_int, CVR rhs) {
 
 	rhs.assertDefined(__PRETTY_FUNCTION__);
 
@@ -349,27 +348,27 @@ PUBLIC bool int_lt_var(const int int1, CVR rhs) {
 	// RHS numerical?
 	do {
 
-		//compare int if already available
-		if (rhs.var_typ & VARTYP_INT)
-			return (int1 < rhs.var_int);
-
-		//otherwise compare dbl
+		// Compare dbl by preference because int might be a conversion with loss of precision
 		if (rhs.var_typ & VARTYP_DBL) {
 			// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
-			return (rhs.var_dbl - static_cast<double>(int1)) >= SMALLEST_NUMBER;
+			return (rhs.var_dbl - static_cast<double>(lhs_int)) >= SMALLEST_NUMBER;
 		}
+
+		//compare int if available
+		if (rhs.var_typ & VARTYP_INT)
+			return (lhs_int < rhs.var_int);
 
 		// Try to convert to number and try again
 		// Will check unassigned
-
 	} while (rhs.isnum());
 
-	// Non-numerical rhs
-	return std::to_string(int1) < rhs.var_str;
+	// Non-numerical rhs so compare as strings
+	return std::to_string(lhs_int) < rhs.var_str;
+
 }
 
 // NOTE doubles compare only to 0.0001 accuracy)
-PUBLIC bool var_lt_dbl(CVR lhs, const double dbl2) {
+PUBLIC bool var_lt_dbl(CVR lhs, const double rhs_dbl) {
 
 	lhs.assertDefined(__PRETTY_FUNCTION__);
 
@@ -383,12 +382,12 @@ PUBLIC bool var_lt_dbl(CVR lhs, const double dbl2) {
 		// LHS DBL
 		if (lhs.var_typ & VARTYP_DBL)
 			// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
-			return (dbl2 - lhs.var_dbl) >= SMALLEST_NUMBER;
+			return (rhs_dbl - lhs.var_dbl) >= SMALLEST_NUMBER;
 
 		// LHS INT
 		if (lhs.var_typ & VARTYP_INT)
 			// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
-			return (dbl2 - static_cast<double>(lhs.var_int)) >= SMALLEST_NUMBER;
+			return (rhs_dbl - static_cast<double>(lhs.var_int)) >= SMALLEST_NUMBER;
 
 		// Try to convert to number and try again
 		// Will check unassigned
@@ -396,12 +395,12 @@ PUBLIC bool var_lt_dbl(CVR lhs, const double dbl2) {
 	} while (lhs.isnum());
 
 	// Non-numerical lhs
-	return lhs.var_str < std::to_string(dbl2);
+	return lhs.var_str < std::to_string(rhs_dbl);
 
 }
 
 // NOTE doubles compare only to 0.0001 accuracy)
-PUBLIC bool dbl_lt_var(const double dbl1, CVR rhs) {
+PUBLIC bool dbl_lt_var(const double lhs_dbl, CVR rhs) {
 
 	rhs.assertDefined(__PRETTY_FUNCTION__);
 
@@ -415,12 +414,12 @@ PUBLIC bool dbl_lt_var(const double dbl1, CVR rhs) {
 		// RHS double
 		if (rhs.var_typ & VARTYP_DBL)
 			// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
-			return (rhs.var_dbl - dbl1) >= SMALLEST_NUMBER;
+			return (rhs.var_dbl - lhs_dbl) >= SMALLEST_NUMBER;
 
 		// RHS int
 		if (rhs.var_typ & VARTYP_INT)
 			// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
-			return (static_cast<double>(rhs.var_int) - dbl1) >= SMALLEST_NUMBER;
+			return (static_cast<double>(rhs.var_int) - lhs_dbl) >= SMALLEST_NUMBER;
 
 		// Try to convert to number and try again
 		// Will check unassigned
@@ -428,11 +427,12 @@ PUBLIC bool dbl_lt_var(const double dbl1, CVR rhs) {
 	} while (rhs.isnum());
 
 	// Non-numerical rhs
-	return std::to_string(dbl1) < rhs.var_str;
+	return std::to_string(lhs_dbl) < rhs.var_str;
+
 }
 
 // NOTE doubles compare only to 0.0001 accuracy)
-PUBLIC bool var_eq_dbl(CVR lhs, const double dbl1) {
+PUBLIC bool var_eq_dbl(CVR lhs, const double rhs_dbl) {
 
 	lhs.assertDefined(__PRETTY_FUNCTION__);
 
@@ -451,8 +451,8 @@ PUBLIC bool var_eq_dbl(CVR lhs, const double dbl1) {
 
 			// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
 			//return (std::abs(lhs.var_dbl - rhs.var_dbl) < SMALLEST_NUMBER);
-			//std::clog << "var_eq_dbl 2. lhs double " << lhs.var_dbl << " compare to double " << dbl1 << std::endl;
-			return almost_equal(lhs.var_dbl, dbl1);
+			//std::clog << "var_eq_dbl 2. lhs double " << lhs.var_dbl << " compare to double " << rhs_dbl << std::endl;
+			return almost_equal(lhs.var_dbl, rhs_dbl);
 
 		}
 
@@ -460,16 +460,16 @@ PUBLIC bool var_eq_dbl(CVR lhs, const double dbl1) {
 		else if (lhs.var_typ & VARTYP_INT) {
 
 			// LHS INT
-			// different from var_lt (uses absolute)
+			// different from var_lt_var (uses absolute)
 			// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
 
 			//return (lhs.var_dbl == rhs.var_int);
 			//return (std::abs(static_cast<double>(lhs.var_int) - rhs.var_dbl) < SMALLEST_NUMBER);
 			//return almost_equal(lhs.var_int, rhs.var_dbl, 2);
 			//put lhs int 2nd argument to invoke the fastest implmentation
-			//std::clog << "var_eq_dbl 3. lhs int " << lhs.var_int << " compare to double " << dbl1 << std::endl;
+			//std::clog << "var_eq_dbl 3. lhs int " << lhs.var_int << " compare to double " << rhs_dbl << std::endl;
 			// warning: conversion from ‘exodus::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
-			return almost_equal(dbl1, static_cast<double>(lhs.var_int));
+			return almost_equal(static_cast<double>(lhs.var_int), rhs_dbl);
 
 		}
 
@@ -485,16 +485,13 @@ PUBLIC bool var_eq_dbl(CVR lhs, const double dbl1) {
 }
 
 // NOTE doubles compare only to 0.0001 accuracy)
-PUBLIC bool var_eq_bool(CVR lhs, const bool bool1) {
+PUBLIC bool var_eq_bool(CVR lhs, const bool rhs_bool) {
 
 	lhs.assertDefined(__PRETTY_FUNCTION__);
 
-	bool result;
-
 	// 1. EMPTY STRING equates to false
 	if (lhs.var_typ & VARTYP_STR && lhs.var_str.empty()) {
-		result = bool1 == false;
-		return result;
+		return rhs_bool == false;
 	}
 
 	do {
@@ -510,9 +507,7 @@ PUBLIC bool var_eq_bool(CVR lhs, const bool bool1) {
 			// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
 			//return (std::abs(lhs.var_dbl - rhs.var_dbl) < SMALLEST_NUMBER);
 			//std::clog << "var_eq_int 2. lhs double " << lhs.var_dbl << " compare to int " << int1 << std::endl;
-			result = almost_equal(lhs.var_dbl, (bool1 ? 1 : 0));
-
-			return result;
+			return almost_equal(lhs.var_dbl, (rhs_bool ? 1 : 0));
 
 		}
 
@@ -523,8 +518,7 @@ PUBLIC bool var_eq_bool(CVR lhs, const bool bool1) {
 		//
 		else if (lhs.var_typ & VARTYP_INT) {
 			//std::clog << "var_eq_int 3. lhs int " << lhs.var_int << " compare to int " << int1 << std::endl;
-			result = lhs.var_int == (bool1 ? 1 : 0);
-			return result;
+			return lhs.var_int == (rhs_bool ? 1 : 0);
 
 		}
 
@@ -533,15 +527,14 @@ PUBLIC bool var_eq_bool(CVR lhs, const bool bool1) {
 
 	} while (lhs.isnum());
 
-	// 4. NON-NUMERIC STRING dont equate to false or true
+	// 4. NON-NUMERIC STRING doesnt equate to false or true
 	//
-	result = false;
 
-	return result;
+	return false;
 
 }
 // NOTE doubles compare only to 0.0001 accuracy)
-PUBLIC bool var_eq_int(CVR lhs, const int int1) {
+PUBLIC bool var_eq_int(CVR lhs, const int rhs_int) {
 
 	lhs.assertDefined(__PRETTY_FUNCTION__);
 
@@ -558,15 +551,15 @@ PUBLIC bool var_eq_int(CVR lhs, const int int1) {
 
 			// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
 			//return (std::abs(lhs.var_dbl - rhs.var_dbl) < SMALLEST_NUMBER);
-			//std::clog << "var_eq_int 2. lhs double " << lhs.var_dbl << " compare to int " << int1 << std::endl;
-			return almost_equal(lhs.var_dbl, int1);
+			//std::clog << "var_eq_int 2. lhs double " << lhs.var_dbl << " compare to int " << rhs_int << std::endl;
+			return almost_equal(lhs.var_dbl, rhs_int);
 
 		}
 
 		// 3. LHS INT
 		else if (lhs.var_typ & VARTYP_INT) {
-			//std::clog << "var_eq_int 3. lhs int " << lhs.var_int << " compare to int " << int1 << std::endl;
-			return lhs.var_int == int1;
+			//std::clog << "var_eq_int 3. lhs int " << lhs.var_int << " compare to int " << rhs_int << std::endl;
+			return lhs.var_int == rhs_int;
 
 		}
 
