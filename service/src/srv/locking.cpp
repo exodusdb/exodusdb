@@ -104,7 +104,7 @@ tryagain:
 				if (tryn == 1) {
 					printl(msg, " trying for ", ntries, " secs");
 				} else if (ntries < 1000) {
-					print("*");
+					printx("*");
 				}
 				msg = "";
 				call ossleep(1000 * 1);

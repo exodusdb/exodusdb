@@ -188,10 +188,10 @@ Within transactions, lock requests for locks that have already been obtained alw
 //
 //  grep -P '\bPQ[\w]+' *.cpp --color=always|grep -vP 'errorMessage|resultStatus|ntuples|getisnull|cmdTuples|PQexec|getvalue|getlength|nfields|PQfname|resultError'
 //
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wreserved-identifier"
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wreserved-identifier"
 #include <libpq-fe.h>  //in postgres/include
-#pragma GCC diagnostic pop
+#pragma clang diagnostic pop
 
 //#include <arpa/inet.h>//for ntohl()
 

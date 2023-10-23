@@ -146,7 +146,7 @@ nextrec2:
 	reqdate = ID.field("*", 2);
 
 	if (reqdate >= datekept) {
-		print(" kept");
+		printx(" kept");
 		goto nextrec2;
 	}
 

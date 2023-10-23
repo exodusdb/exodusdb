@@ -21,7 +21,7 @@ function main(in cmd, in filename, in dictfile, out hits) {
 
 	// defeat compiler warning of unused
 	if (false)
-		print(dictfile);
+		printx(dictfile);
 
 	// XREF should be able to do it all in one go
 	let fieldname = cmd.f(1, 1);

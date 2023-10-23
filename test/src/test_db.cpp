@@ -30,7 +30,7 @@ programinit()
 	if (not connect()) {
 		//Pass if allowed
 		if (osgetenv("EXO_NODATA")) {
-			print("Test passed. Not really. ");
+			printx("Test passed. Not really. ");
 		}
 		printl("No default db connection to perform db testing.");
 		return 0;
@@ -188,7 +188,8 @@ programinit()
 		assert(createfile(tempfile));
 		assert(not read(RECORD from tempfile, "%RECORDS%"));
 		for (int i = 1; i le 10; ++i)
-			assert(write(i on tempfile, i));
+			//assert(write(i on tempfile, i));
+			assert(write(var(i) on tempfile, var(i)));
 
 		// Check reading magic key %RECORDS% returns all keys in natural order
 		assert(read(RECORD from tempfile, "%RECORDS%"));

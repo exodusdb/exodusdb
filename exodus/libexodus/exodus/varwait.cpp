@@ -9,7 +9,7 @@
 
 //similar code in haskey.cpp and mvwait.cpp
 
-#pragma GCC diagnostic ignored "-Wunsafe-buffer-usage"
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
 
 namespace exodus {
 

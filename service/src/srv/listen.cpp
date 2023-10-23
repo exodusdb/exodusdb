@@ -761,7 +761,7 @@ function loop_exit() {
 		call mssg("", "DB", buffer, "");
 		if (reply == INTCONST.f(1)) {
 			// space to defeat ANSI control chars after pressing Esc
-			print(" ");
+			printx(" ");
 			// gosub main_exit();
 			return false;
 		}
@@ -808,13 +808,13 @@ function loop_exit() {
 
 				if (statustrans()) {
 					if (decide("Commit any database updates ?", "Commit" _VM "Rollback") == "Commit") {
-						print("Committing transaction ... ");
+						printx("Committing transaction ... ");
 						//committrans();
 						if (not committrans())
 							loglasterror();
 						printl("done.");
 					} else {
-						print("*ROLLING BACK* transaction ... ");
+						printx("*ROLLING BACK* transaction ... ");
 						//rollbacktrans();
 						if (not rollbacktrans())
 							loglasterror();
@@ -1131,7 +1131,7 @@ function request_init() {
 	nrequests += 1;
 
 	// similar in listen and log2
-	print(THREADNO ^ ": ");
+	printx(THREADNO ^ ": ");
 
 	// clear out buffers just to be sure
 	data_ = "";
@@ -1273,7 +1273,7 @@ function request_init() {
 			t2 ^= " " ^ connection.f(1, 3);
 		}
 
-		print(t2.oconv("L#15"), tt, ":");
+		printx(t2.oconv("L#15"), tt, ":");
 	}
 
 	linkfilename2 = replyfilename;

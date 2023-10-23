@@ -526,7 +526,7 @@ subroutine test2(in as, in bs) {
 		assert(integer(var(2.9))  eq 2);
 		assert(integer(var(-2.9)) eq -2);
 
-		//		// BUT exodus and pickos int()
+		//		// BUT pickos int()
 		//		// is the floor function which is *not* symmetrical
 		//		// float -> nearest integer towards negative infinity
 		//		// 1.999 -> 1 and -1.001 -> -2
@@ -546,6 +546,45 @@ subroutine test2(in as, in bs) {
 		// round function is symmetrical
 		assert(var(1.5).round()  eq 2);
 		assert(var(-1.5).round() eq -2);
+
+		printl("More tests that var double to int is same as standard c++ static_cast i.e. truncate towards zero");
+
+		printl("c++ static_cast double to int is truncate towards zero");
+		assert(static_cast<int>(2.0) == 2);
+		assert(static_cast<int>(-2.0) == -2);
+		assert(static_cast<int>(2.1) == 2);
+		assert(static_cast<int>(2.0) == 2);
+		assert(static_cast<int>(2.1) == 2);
+		assert(static_cast<int>(-2.1) == -2);
+		assert(static_cast<int>(2.5) == 2);
+		assert(static_cast<int>(-2.5) == -2);
+		assert(static_cast<int>(2.9) == 2);
+		assert(static_cast<int>(-2.9) == -2);
+		assert(static_cast<int>(3.0) == 3);
+		assert(static_cast<int>(-3.0) == -3);
+
+		printl("var double to int is c++ truncate towards zero");
+		assert(var(2.0).toInt() == 2);
+		assert(var(-2.0).toInt() == -2);
+		assert(var(2.1).toInt() == 2);
+		assert(var(-2.1).toInt() == -2);
+		assert(var(2.5).toInt() == 2);
+		assert(var(-2.5).toInt() == -2);
+		assert(var(2.9).toInt() == 2);
+		assert(var(-2.9).toInt() == -2);
+		assert(var(3.0).toInt() == 3);
+		assert(var(-3.0).toInt() == -3);
+
+		printl("implicit conversion to int(var double) is c++ truncate towards zero");
+		assert(int(var(2.0)) == 2);
+		assert(int(var(2.1)) == 2);
+		assert(int(var(-2.1)) == -2);
+		assert(int(var(2.5)) == 2);
+		assert(int(var(-2.5)) == -2);
+		assert(int(var(2.9)) == 2);
+		assert(int(var(-2.9)) == -2);
+		assert(int(var(3.0)) == 3);
+		assert(int(var(-3.0)) == -3);
 	}
 
 	{
@@ -584,6 +623,45 @@ subroutine test2(in as, in bs) {
 		assert((var(3)).toInt()    eq 3);
 		assert((var(3.5)).toInt()  eq 3);
 	}
+	{
+		// Check that double is used in preference to int for lt/gt
+		var v1 = 1.9;
+		v1.toInt();
+		printl(v1);
+		printl(v1.dump());
+		assert(v1 < 2);
+		assert(v1 > 1);
+		assert(2 > v1);
+		assert(1 < v1);
+	}
+	{
+		// Check that double is used in preference to int for lt/gt
+		var v1 = -1.9;
+		v1.toInt();
+		printl(v1);
+		printl(v1.dump());
+		assert(v1 <  1);
+		assert(v1 > -2);
+		assert(1 > v1);
+		assert(-2 < v1);
+	}
+
+	// Check that test for equality uses double by preference if available
+	{
+		var v1=1.8;
+		printl(int(v1));
+		TRACE(v1.dump())
+		assert(v1 ne 1);
+		assert(1 ne v1);
+	}
+	{
+		var v1=-1.8;
+		printl(int(v1));
+		TRACE(v1.dump())
+		assert(v1 ne 1);
+		assert(1 ne v1);
+	}
+
 	return;
 }
 

@@ -34,6 +34,7 @@
 	set(CMAKE_CXX_STANDARD_REQUIRED ON)
 	set(CMAKE_CXX_EXTENSIONS OFF)
 
+	message("CMAKE_CXX_COMPILER_VERSION ${CMAKE_CXX_COMPILER_VERSION}")
 #
 # Build type
 # ##########
@@ -111,6 +112,13 @@
 		#./b2 toolset=clang cxxflags="-stdlib=libc++" linkflags="-stdlib=libc++"
 		#add_compile_options(-stdlib=libc++) #24 bytes strings. apt install libc++-dev libc++abi-dev
 	endif()
+
+##
+## FMT
+## ###
+##
+## This is probably not needed here and only required by cli compile.cpp
+#	find_package(fmt)
 
 #
 # Warnings
@@ -214,6 +222,16 @@
 # Subdirs/submodules
 # ##################
 #
+#	if (${CMAKE_CXX_COMPILER_VERSION} STRLESS "13")
+		message("----------------")
+		message("-- FMT EXODUS --")
+		message("----------------")
+		add_subdirectory(fmt)
+		set(FMT_LIBRARIES fmt)
+#	else()
+#		message("Omitting subdir fmt")
+#	endif()
+
 	add_subdirectory(exodus/libexodus/exodus)
 	#add_subdirectory(exodus/libpgexodus/src)
 	add_subdirectory(exodus/pgexodus)

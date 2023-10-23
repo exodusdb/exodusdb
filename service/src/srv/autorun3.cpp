@@ -174,7 +174,7 @@ readdoc:
 	}
 
 	if (logging) {
-		print(docid, " ");
+		printx(docid, " ");
 	}
 
 	// determine current datetime
@@ -667,9 +667,9 @@ nextsign:
 		if (forceemail)
 			SYSTEM(117) = forceemail;
 
-		print(" Emailing ", toaddress, ":");
+		printx(" Emailing ", toaddress, ":");
 		call sendmail(toaddress, ccaddress, subject, body, attachfilename, "", errormsg);
-		print("done");
+		printx("done");
 
 		// Restore original forced email or lack thereof
 		SYSTEM(117) = system117;
@@ -729,7 +729,7 @@ subroutine exec2() {
 	// print @(0):@(-4):localtime 'MTS':' AUTORUN ':docid:
 	// similar in LISTEN and AUTORUN
 	printl();
-	print(time().oconv("MTS"), " AUTORUN ", docid, " ", USERNAME, " ", request_.convert(_FM, " "), " ", srv.document.f(2), ":");
+	printx(time().oconv("MTS"), " AUTORUN ", docid, " ", USERNAME, " ", request_.convert(_FM, " "), " ", srv.document.f(2), ":");
 
 	// print 'link',linkfilename2
 	// print 'request',request
@@ -847,7 +847,7 @@ sysmsgit:
 	requeststoptime = ostime();
 	if (tracing) {
 		// print @(0):@(-4):'Responded in ':(requeststoptime-requeststarttime) 'MD20P':' SECS ':rawresponse
-		print(" ", ((requeststoptime - requeststarttime).mod(86400)).oconv("MD20P"), "secs ", rawresponse);
+		printx(" ", ((requeststoptime - requeststarttime).mod(86400)).oconv("MD20P"), "secs ", rawresponse);
 		// do after "emailing" message
 		// print str('-',79)
 		// print linkfilename1

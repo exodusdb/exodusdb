@@ -210,7 +210,10 @@ function main() {
 		//else
 		//linkoptions = " -lexodus -lstdc++fs -lpthread";
 		linkoptions = " -lexodus -lstdc++fs -lstdc++";
-
+//#if __has_include(<fmt/core.h>)
+#if EXO_FORMAT == 2
+		linkoptions ^= " -lfmt";
+#endif
 		//always look in header install path eg ~/inc
 		basicoptions ^= " -I" ^ incdir;
 
@@ -634,12 +637,12 @@ function main() {
 					errputl(" Error: Could not copy '" ^ srcfilename ^ "' to '" ^ targetfilename ^ "'");
 				} else if (not silent) {
 					printl(srcfilename);
-					//print(srcfilename ^ _EOL);
+					//printx(srcfilename ^ _EOL);
 				}
 			} else {
 				if (not silent)
 					printl(srcfilename);
-					//print(srcfilename ^ _EOL);
+					//printx(srcfilename ^ _EOL);
 			}
 			//osflush();
 			continue;
@@ -810,10 +813,10 @@ function main() {
 				printl("thread: sourcefilename=", srcfilename);
 			else if (not silent)
 				printl(srcfilename);
-				//print(srcfilename ^ _EOL);
+				//printx(srcfilename ^ _EOL);
 			else if (silent eq 1) {
 				nasterisks++;
-				print("*");
+				printx("*");
 				osflush();
 			}
 
@@ -1286,7 +1289,7 @@ function main() {
 				call make_include_dir(incdir);
 
 				if (verbose)
-					print("header file " ^ headerfilename ^ " ");
+					printx("header file " ^ headerfilename ^ " ");
 
 				//check if changed
 				//var headertext2 = osread(headertext2, headerfilename, locale);

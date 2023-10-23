@@ -29,14 +29,14 @@ function main() {
 		gosub getspeed(retval);
 		ntries += 1;
 		// if ntries>2 and secs then
-		// 		print(ntries, AT(-40));
+		// 		printx(ntries, AT(-40));
 		// Use retval to defeat optimiser
 		if (secs and retval) {
 
 			// Adjust time to account for change from var to int in loop
 			secs *= 6;
 
-			print(ntries, " ");
+			printx(ntries, " ");
 			tot += nn / secs;
 			ntots += 1;
 

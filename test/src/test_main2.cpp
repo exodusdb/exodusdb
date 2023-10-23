@@ -189,7 +189,7 @@ programinit()
 		var xx = xx.operator++();  //sadly c++ compiler allows this
 								   //var xx=xx++;			//doesnt compile
 	} catch (VarError error) {
-		print(error.description);
+		printx(error.description);
 	}
 
 #ifdef VAR_SAFE_DESTRUCTOR
@@ -553,11 +553,11 @@ programinit()
 			char   chars[8];
 		};
 		for (d1 = -5; d1 le 5; ++d1) {
-			print("Decimal ", d1, "= ");
+			printx("Decimal ", d1, "= ");
 			for (unsigned int partn = 0; partn lt sizeof(chars); ++partn) {
 				//var(chars[partn]).oconv("HEX").output();
 				//std::cout << std::hex << static_cast<unsigned int>(chars[partn]) << " " ;
-				print(oconv(chars[partn], "HEX"), "");
+				printx(oconv(chars[partn], "HEX"), "");
 			}
 			printl();
 		}
@@ -827,7 +827,7 @@ programinit()
 	printl("\nPrint out 1st 256 unicode characters and their hashes");
 	for (const var ii : range(0, 255)) {
 		var xx = chr(ii);
-		print(ii ^ ":" ^ xx ^ " " ^ xx.hash() ^ " ");
+		printx(ii ^ ":" ^ xx ^ " " ^ xx.hash() ^ " ");
 	}
 	printl();
 

@@ -176,7 +176,7 @@ subroutine writedict() {
 			if (doall) {
 				ans = "Y";
 			} else {
-				// 			print("press any key:");
+				// 			printx("press any key:");
 				// 			osflush();
 				// 			xx.inputn(1);
 				// 			if (var("Qq").contains(xx)) {
@@ -184,7 +184,7 @@ subroutine writedict() {
 				// 			}
 				printl("---------- NEW ", dictid, " ----------");
 				printl(dictrec.f(8).replace(VM, "\n"));
-				print("Update (y=yes, q=quit, a=all, n=no)");
+				printx("Update (y=yes, q=quit, a=all, n=no)");
 				osflush();
 				ans.inputn(1);
 				if (var("Qq").contains(ans)) {

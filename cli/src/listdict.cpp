@@ -48,7 +48,7 @@ function main() {
 				dictfilenames ^= filename ^ FM;
 		}
 		dictfilenames.replacer(FM, "\n");
-		print(dictfilenames);
+		printx(dictfilenames);
 
 		return 0;
 

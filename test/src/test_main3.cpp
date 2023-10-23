@@ -61,7 +61,7 @@ programinit()
 
 		for (auto i [[maybe_unused]] : range(1, ntests)) {
 			var r1 = rnd(n);
-			//print(r1,"");
+			//printx(r1,"");
 			d1(r1) += 1;
 		}
 		printl();
@@ -86,7 +86,7 @@ programinit()
 		for (auto i [[maybe_unused]] : range(1, ntests)) {
 			//var r1 = rnd(n);
 			var r1 = -rnd(-n);
-			//print(r1,"");
+			//printx(r1,"");
 			d1(r1) += 1;
 		}
 		printl();
@@ -605,41 +605,41 @@ programinit()
 		printl("l");
 		printl("l");
 
-		print("p");
-		print("pl");
+		printx("p");
+		printx("pl");
 		printl();
 		printl("l");
 		printt("t");
 		printl("l");
 
-		print("0", "p");
-		print("0", "pl");
+		printx("0", "p");
+		printx("0", "pl");
 		printl();
 		printl("0", "l");
 		printt("0", "t");
 		printl("0", "l");
 
-		print("0", "1", "2", "p");
-		print("0", "1", "2", "pl");
+		printx("0", "1", "2", "p");
+		printx("0", "1", "2", "pl");
 		printl();
 		printl("0", "1", "2", "l");
 		printt("0", "1", "2", "t");
 		printl("0", "1", "2", "l");
 
-		print<'-'>("0", "1", "2", "p");
-		print<'-'>("0", "1", "2", "pl");
+		printx<'-'>("0", "1", "2", "p");
+		printx<'-'>("0", "1", "2", "pl");
 		printl();
 		printl<'-'>("0", "1", "2", "l");
 		printt<'-'>("0", "1", "2", "t");
 		printl<'-'>("0", "1", "2", "l");
 
-		print(RM, FM, VM, SM, TM, ST);
+		printx(RM, FM, VM, SM, TM, ST);
 		printl(RM, FM, VM, SM, TM, ST);
 
 		{
 			static char const sep[] = ", ";
-			print<sep>("0", "1", "2", "p");
-			print<sep>("0", "1", "2", "pl");
+			printx<sep>("0", "1", "2", "p");
+			printx<sep>("0", "1", "2", "pl");
 			printl();
 			printl<sep>("0", "1", "2", "l");
 			printt<sep>("0", "1", "2", "t");

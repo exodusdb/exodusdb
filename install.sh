@@ -141,10 +141,10 @@ function get_dependencies_for_build {
 :
 	sudo apt install -y postgresql-common
 :
-: pgexodus submodule
-: ------------------
+: pgexodus and fmt submodules
+: ---------------------------
 :
-	if ! test -f exodus/pgexodus/CMakeLists.txt; then
+	if ! test -f exodus/pgexodus/CMakeLists.txt || ! test -f fmt/CMakeLists.txt; then
 		git submodule init
 		git submodule update
 	fi

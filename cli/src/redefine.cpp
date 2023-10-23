@@ -35,7 +35,7 @@ function main() {
 			abort(lasterror());
 
 		if (TERMINAL) {
-			print(AT(-40), ++osfilen ^ "/" ^ nosfiles ^ ".", osfilename);
+			printx(AT(-40), ++osfilen ^ "/" ^ nosfiles ^ ".", osfilename);
 			osflush();
 		}
 		newcpp = oldcpp;

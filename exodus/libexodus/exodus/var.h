@@ -100,7 +100,7 @@ inline const char BS_ = '\\';
 inline const char DQ_ = '\"';
 inline const char SQ_ = '\'';
 
-// print() converts FM etc to these characters. user literal conversion _var also has them but hard coded in fmiconverter()
+// printx() converts FM etc to these characters. user literal conversion _var also has them but hard coded in fmiconverter()
 //#define _VISIBLE_FMS "_^]\[Z"  //PickOS standard. Backslash not good since it is often used for escaping chars. Z is normal letter.
 //#define _VISIBLE_FMS "<[{}]>" //logical but hard to read direction of brackets quickly
 //#define _VISIBLE_FMS "_^]}`~" //all uncommon in natural language. first 3 _^] are identical to pickos

@@ -29,7 +29,7 @@ function main() {
 
 		// print
 		printl();
-		print("x","y");
+		printx("x","y");
 		printl("z");
 		printl("x yz");
 

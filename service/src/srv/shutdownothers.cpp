@@ -25,7 +25,7 @@ function main(in /*mode*/, in datasetcode, out result) {
 		// /BREAK;
 		if (not otherusers(datasetcode))
 			break;
-		print(".");
+		printx(".");
 		call ossleep(1000 * 1);
 		if (esctoexit()) {
 			// ii = 99999;

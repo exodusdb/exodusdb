@@ -11,7 +11,7 @@ programinit()
 	if (not connect()) {
 		//Pass if allowed
 		if (osgetenv("EXO_NODATA")) {
-			print("Test passed. Not really. ");
+			printx("Test passed. Not really. ");
 		}
 		printl("No default db connection to perform db testing.");
 		return 0;
@@ -173,7 +173,7 @@ dict(AGE_IN_YEARS) {
 	ANS=calculate("AGE_IN_DAYS")/365.25;
 }
 */
-		//		print(" AGE_IN_DAYS=",calculate("AGE_IN_DAYS"));
+		//		printx(" AGE_IN_DAYS=",calculate("AGE_IN_DAYS"));
 		//		printl(" AGE_IN_YEARS=",calculate("AGE_IN_YEARS"));
 	}
 
@@ -309,7 +309,7 @@ dict(AGE_IN_YEARS) {
 			if (!(ii % 10000))
 				printl(" " ^ key);
 			if (record.lcase().contains("QWEQWE"))
-				print("?");
+				printx("?");
 		}
 	}
 	clearselect();
@@ -437,23 +437,28 @@ dict(AGE_IN_YEARS) {
 
 		printl("Check open/read/write");
 		assert(open(filename to file));
-		assert(write(1 on file, 1));
-		assert(read(RECORD from file, 1));
+		//assert(write(1 on file, 1));
+		assert(write(1 on file, "1"));
+		//assert(read(RECORD from file, 1));
+		assert(read(RECORD from file, "1"));
 		assert(RECORD eq 1);
 
 		printl("Start transaction");
 		assert(begintrans());
 
 		printl("Check write within transaction can be seen within transaction");
-		assert(write(11 on file, 1));
-		assert(read(RECORD from file, 1));
+		//assert(write(11 on file, 1));
+		assert(write(11 on file, "1"));
+		//assert(read(RECORD from file, 1));
+		assert(read(RECORD from file, "1"));
 		assert(RECORD eq 11);
 
 		printl("test Rollback");
 		assert(rollbacktrans());
 
 		printl("Check rollback reverts write");
-		assert(read(RECORD from file, 1));
+		//assert(read(RECORD from file, 1));
+		assert(read(RECORD from file, "1"));
 		assert(RECORD eq 1);
 
 		printl("Check temporary files are deleted after closing connection");

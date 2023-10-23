@@ -423,9 +423,9 @@ nextprocess:
 					printl();
 					first = 0;
 				}
-				print(cmd, " ...");
+				printx(cmd, " ...");
 				// pcperform cmd
-				print("monitor2 calling shell2 ", cmd, " ...");
+				printx("monitor2 calling shell2 ", cmd, " ...");
 				call shell2(cmd);
 				call ossleep(1000 * 5);
 				printl("done.");

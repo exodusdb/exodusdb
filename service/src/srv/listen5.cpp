@@ -147,7 +147,7 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 							let cmd = "systemctl start " ^ app_code ^ "_" ^ mode ^ "@" ^ database;
 							// printl(AT(-40), time().oconv("MTS"), " ", tt);
 							if (TERMINAL)
-								print(AT(-40));
+								printx(AT(-40));
 							printl(time().oconv("MTS"), " ", cmd);
 
 							//cmd.osshell();
@@ -699,7 +699,7 @@ nextlock:
 		if (tracing) {
 			printl();
 		} else {
-			print(AT(0, 1));
+			printx(AT(0, 1));
 		}
 		var nn		 = select2data.count(FM);
 		let maxlines = 20;
@@ -719,13 +719,13 @@ nextlock:
 				break;
 			let row = select2data.f(ii);
 			if (not tracing) {
-				print("|");
+				printx("|");
 			}
 			tt = row.f(1, 1).trim();
 			if (not tracing) {
 				tt ^= " " ^ row.f(1, 3);
 			}
-			print(tt.oconv("L#19"));
+			printx(tt.oconv("L#19"));
 			if (not tracing) {
 				printl("|");
 			}

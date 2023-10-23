@@ -224,7 +224,7 @@ function main(in mode0, in subject0, in body0, in groupids0, in /*jobids0*/, in 
 
 	// userinit:
 	// ///////
-		print(usercode, " ");
+		printx(usercode, " ");
 
 		if (currdept and userx.f(5) != currdept) {
 			gosub sendemails(emaillog);

@@ -96,7 +96,7 @@ function main(io osfilename, in printopts0, out errors) {
 
 	pdfcmd ^= " -q " ^ osfilename ^ " " ^ pdffilename;
 
-	print("convhtml2pdf :");
+	printx("convhtml2pdf :");
 	call shell2(pdfcmd, errors);
 
 	if (errors) {

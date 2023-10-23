@@ -23,6 +23,18 @@ THE SOFTWARE.
 #ifndef EXODUSFUNCS_H
 #define EXODUSFUNCS_H 1
 
+//#include <version>
+//#ifdef __cpp_lib_format
+#if __has_include(<format>)
+//#	warning has <format>
+#	define EXO_FORMAT 1
+#	include <format>
+	namespace fmt = std;
+#elif __has_include(<fmt/core.h>)
+#	define EXO_FORMAT 2
+#	include <fmt/core.h>
+#endif
+
 #include <exodus/var.h>
 #include <mutex>
 
@@ -73,7 +85,7 @@ namespace exodus {
 inline std::mutex global_mutex_threadstream;
 //
 // SLOW = threadsafe. With locking.  Output all arguments together.
-//      = print/printl/printt, errput/errputl
+//      = printx/printl/printt, errput/errputl
 #define LOCKIOSTREAM_SLOW std::lock_guard guard(global_mutex_threadstream);
 //
 // FAST = not threadsafe. No locking. As fast as possible. Intermingled output.
@@ -474,7 +486,7 @@ ND var lasterror(void);
 //output(args), outputl(args), outputt(args)
 ////////////////////////////////////////////
 
-// BINARY TRANSPARENT version of print(void)
+// BINARY TRANSPARENT version of printx(void)
 // No automatic separator
 // Outputs to stdout/cout
 // Multi-argument
@@ -518,12 +530,12 @@ void outputt(const Printable&... value) {
 
 //Use like this:
 //
-// 1. print("hi","ho");                 // "hi ho"
+// 1. printx("hi","ho");                 // "hi ho"
 //
-// 2. print<','>("hi","ho");            // "hi,ho"
+// 2. printx<','>("hi","ho");            // "hi,ho"
 //
 // 3. static char const sep[] = ", ";
-//    print<sep>("hi","ho");            // "hi, ho"
+//    printx<sep>("hi","ho");            // "hi, ho"
 
 // printl(args) to cout
 
@@ -574,18 +586,18 @@ void logputl(const Printable&... values) {
 }
 
 //////////////////////////////////////////
-// print(args), errput(args), logput(args)
+// printx(args), errput(args), logput(args)
 //////////////////////////////////////////
 
 // Does *not* append \n
 // Multi-argument
-// Default sep is ' ' for print
+// Default sep is ' ' for printx
 // Does *not* flush output
 
-// print(args) to cout
+// printx(args) to cout
 
 template <auto sep DEFAULT_CSPACE, typename Printable, typename... Additional>
-void print(const Printable& value, const Additional&... values) {
+void printx(const Printable& value, const Additional&... values) {
 	LOCKIOSTREAM_SLOW
 	std::cout << value;
 	((std::cout << sep << values), ...);
@@ -687,6 +699,129 @@ void printt(void) {
 	std::cout << sep;
 }
 
+/////////////////////////
+// format, print, println
+/////////////////////////
+
+//#ifdef __cpp_lib_format
+#ifdef EXO_FORMAT
+
+template <typename... Args>
+var format(std::string_view sv1, Args&&... args) {
+	return fmt::vformat(sv1, fmt::make_format_args(args...));
+}
+
+template <typename... Args>
+void print(std::string_view sv1, Args&&... args) {
+	std::cout << fmt::vformat(sv1, fmt::make_format_args(args...));
+}
+
+template <typename... Args>
+void println(std::string_view sv1, Args&&... args) {
+	std::cout << fmt::vformat(sv1, fmt::make_format_args(args...)) << std::endl;
+}
+
+void println() {
+	std::cout << std::endl;
+}
+
+#endif
+
 }  // namespace exodus
+
+#ifdef EXO_FORMAT
+
+template <>
+struct fmt::formatter<exodus::var> {
+
+	//std::string_view fmt_str; // formatting information
+	std::string fmt_str;
+	char formatcode = ' ';
+	//char c1 = '~';
+	//char c2 = '~';
+	//char c3 = '~';
+	//char c4 = '~';
+	template<typename ParseContext>
+	constexpr auto parse(ParseContext& ctx) {
+		// begin() always starts at the first character after the opening { and optional "99:" positional argument
+		// if "{}" points at "}"
+		// if "{2} points at "}"
+		// if "{2:10.2f}" points at "1"
+		// end() always points to the final end of the whole format string, not after the closing "}" character.
+		//c1 = *(ctx.begin() - 1);
+		//c2 = *ctx.begin();
+		//c3 = *(ctx.end() - 1);
+		//c4 = *ctx.end();
+		auto it = ctx.begin();
+//		if (*it == '}') {
+//			fmt_str = "{0:s}";
+//			formatcode = ' ';
+//			return it;
+//		}
+		while (it != ctx.end()) {
+			//c2 = *it;
+			if (*it == '}') {
+				//fmt_str = {ctx.begin(), it + 1};
+				fmt_str = "{:";
+				fmt_str.append(ctx.begin(), it + 1);
+				//fmt_str[0] = '{';
+				//ctx.advance_to(it + 1);
+				return it;
+			}
+			formatcode = *it;
+			it++;
+		}
+		// If we dont find a closing "}" char
+
+#if EXO_FORMAT == 1
+		throw std::format_error("formatter_parse: format missing trailing '}'");
+#else
+		//throw_format_error("formatter_parse: format missing trailing }");
+		fmt_str = "{}";
+		return it;
+#endif
+		//std::unreachable();
+	}
+
+	// Good format code description although not from "fmt", not official c++
+	// https://fmt.dev/latest/syntax.html#formatspec
+
+	template <typename FormatContext>
+	auto format(const exodus::var& v1, FormatContext& ctx) const {
+		//std::cout << "c1:'" << c1 << " c2:'" << c2 << "' c3:'" << c3 << "' c4:'" << c4 << "' \n";
+		std::cout << "fmtstr:'" << fmt_str << "' fmtcode:'" << formatcode << "' \n";
+		switch (formatcode) {
+
+			// Floating point
+			case 'f':
+			case 'a':
+			case 'e':
+			case 'F':
+			case 'g':
+			case 'G': {
+				//return vformat_to(ctx.out(), fmt_str, make_format_args(v1.toDouble()));
+				auto d1 = v1.toDouble();
+				return vformat_to(ctx.out(), fmt_str, make_format_args(d1));
+			}
+			// Integer
+			case 'd':
+			case 'b':
+			case 'B':
+			case 'c':
+			case 'o':
+			case 'X':
+			case 'x': {
+				//return vformat_to(ctx.out(), fmt_str, make_format_args(v1.toInt()));
+				auto i1 = v1.toInt();
+				return vformat_to(ctx.out(), fmt_str, make_format_args(i1));
+			}
+			// String
+			default:
+				return vformat_to(ctx.out(), fmt_str, make_format_args(v1.toString()));
+		}
+	}
+};
+
+#endif	// EXO_FORMAT
 
 #endif	// EXODUSFUNCS_H

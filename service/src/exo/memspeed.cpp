@@ -30,10 +30,10 @@ function main() {
 		gosub getspeed(retval);
 		ntries += 1;
 		// if ntries>2 and secs then
-		// 		print(ntries, AT(-40));
+		// 		printx(ntries, AT(-40));
 		if (secs and retval) {
 
-			print(ntries, " ");
+			printx(ntries, " ");
 			tot += nn / secs;
 			ntots += 1;
 

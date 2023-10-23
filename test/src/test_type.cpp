@@ -291,7 +291,7 @@ function main() {
 		}
 	}
 	{
-		print("\n===INT UNDERFLOW===");
+		printx("\n===INT UNDERFLOW===");
 
 		printl("unsigned ints can never underflow on conversion to vars");
 
@@ -324,7 +324,7 @@ function main() {
 	}
 	{
 
-		print("\n===FLOATS===");
+		printx("\n===FLOATS===");
 
 		test_min_max<float>("float");
 		test_min_max<double>("double");

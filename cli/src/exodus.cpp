@@ -63,7 +63,7 @@ function main() {
 		//	printl("Could not set PATH="^newpath);
 		setenv ^= "PATH=" ^ newpath;
 
-		//print("LD_LIBRARY_PATH","~/lib:"^osgetenv("LD_LIBRARY_PATH"));
+		//printx("LD_LIBRARY_PATH","~/lib:"^osgetenv("LD_LIBRARY_PATH"));
 		let newlibpath = home ^ "/lib:" ^ libp;
 		//if (!ossetenv("LD_LIBRARY_PATH",newlibpath))
 		//	printl("Could not set LD_LIBRARY_PATH="^newlibpath);

@@ -346,7 +346,7 @@ function main() {
 					abort(lasterror());
 				}
 				if (OSSLASH != "/")
-					print(errors);
+					printx(errors);
 
 				startatlineno = "";
 				// gnu style error lines
@@ -383,7 +383,7 @@ function main() {
 			} // handle compile errors
 
 			// If no errors, break out of edit/compile loop and go to the next file
-			//print(compileoutputfilename);
+			//printx(compileoutputfilename);
 			break;
 
 		} // next edit/compile
