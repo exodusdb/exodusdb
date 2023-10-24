@@ -143,6 +143,7 @@
 		# warning: use of GNU ?: conditional expression extension, omitting middle operand [-Wgnu-conditional-omitted-operand]
 		add_compile_options (
 								-Weverything
+
 								-Wno-c++98-compat
 								-Wno-c++98-compat-pedantic
 								-Wno-reserved-macro-identifier
@@ -163,7 +164,15 @@
 								-Wno-cast-align
 								-Wno-unused-macros
 								-Wno-missing-variable-declarations
-								-Wno-covered-switch-default
+								-Wno-return-std-move-in-c++11
+
+								# building fmt
+								-Wno-documentation-unknown-command
+								-Wno-switch-enum
+								-Wno-undefined-func-template
+								#-Wno-reserved-id-macro
+								-Wno-c++20-compat
+
 							)
 		add_compile_options(-pedantic)
 		add_compile_options(-Wno-gnu-conditional-omitted-operand)

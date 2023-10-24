@@ -52,7 +52,7 @@ set -euxo pipefail
 : ----------
 :
 	if ! ls /var/cache/apt/*.bin &>/dev/null; then
-		sudo apt update
+		sudo DEBIAN_FRONTEND=noninteractive apt -y update
 	fi
 :
 : ------------------------
@@ -139,7 +139,7 @@ function get_dependencies_for_build {
 : Postgresql package
 : ------------------
 :
-	sudo apt install -y postgresql-common
+	sudo DEBIAN_FRONTEND=noninteractive apt install -y postgresql-common
 :
 : pgexodus and fmt submodules
 : ---------------------------
@@ -166,29 +166,29 @@ function get_dependencies_for_build {
 : exodus and pgexodus
 : -------------------
 :
-	sudo apt install -y cmake
+	sudo DEBIAN_FRONTEND=noninteractive apt install -y cmake
 :
 : exodus
 : ------
 :
 	if [[ $COMPILER == gcc ]]; then
-		sudo apt install -y g++
+		sudo DEBIAN_FRONTEND=noninteractive apt install -y g++
 	else
-		sudo apt install -y clang
+		sudo DEBIAN_FRONTEND=noninteractive apt install -y clang
 		sudo update-alternatives --set c++ /usr/bin/clang++
 		sudo update-alternatives --set cc /usr/bin/clang
 	fi
 :
-	sudo apt install -y libpq-dev libboost-regex-dev libboost-locale-dev
-	#sudo apt install -y g++ libboost-date-time-dev libboost-system-dev libboost-thread-dev
+	sudo DEBIAN_FRONTEND=noninteractive apt install -y libpq-dev libboost-regex-dev libboost-locale-dev
+	#sudo DEBIAN_FRONTEND=noninteractive apt install -y g++ libboost-date-time-dev libboost-system-dev libboost-thread-dev
 :
 	ls -l /usr/lib/postgresql || true
 :
 : pgexodus
 : --------
 :
-	sudo apt install -y postgresql-server-dev-$SERVER_PG_VER
-	sudo apt install -y postgresql-common
+	sudo DEBIAN_FRONTEND=noninteractive apt install -y postgresql-server-dev-$SERVER_PG_VER
+	sudo DEBIAN_FRONTEND=noninteractive apt install -y postgresql-common
 :
 	pg_config
 :
@@ -204,6 +204,9 @@ function build_all {
 : 2. exodus cli
 : 3. pgexodus extension
 :
+	cd $EXODUS_DIR
+	git submodule init
+	git submodule update
 	echo PGPATH=${PGPATH:-}
 	cmake -S $EXODUS_DIR -B $EXODUS_DIR/build
 	cmake --build $EXODUS_DIR/build -j$((`nproc`+1))
@@ -222,7 +225,7 @@ function get_dependencies_for_install {
 : pgexodus
 : --------
 :
-	sudo apt install -y postgresql$PG_VER_SUFFIX #for pgexodus install
+	sudo DEBIAN_FRONTEND=noninteractive apt install -y postgresql$PG_VER_SUFFIX #for pgexodus install
 }
 
 function install_all {

@@ -67,6 +67,9 @@ THE SOFTWARE.
 
 #include <exodus/vartyp.h>
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wreserved-id-macro"
+
 // Use ASCII 0x1A-0x1F for PickOS separator chars instead
 // of PickOS 0xFA-0xFF which are illegal utf-8 bytes
 
@@ -135,6 +138,8 @@ inline const char VISIBLE_ST_ = '~';
 #define ISNUMERIC(VARNAME) VARNAME.assertNumeric(function_sig, #VARNAME);
 
 #define BACKTRACE_MAXADDRESSES 100
+
+#pragma clang diagnostic push
 
 namespace exodus {
 
@@ -1227,7 +1232,9 @@ class PUBLIC var final {
 	// Logical friends for var and var
 
 	PUBLIC friend bool operator==(CVR lhs, CVR rhs) {return  var_eq_var(lhs, rhs );}
-	//PUBLIC friend bool operator!=(CVR lhs, CVR rhs) {return !var_eq_var(lhs, rhs );}
+#if !(__GNUG__ >= 11 || __clang_major__ >= 14)
+	PUBLIC friend bool operator!=(CVR lhs, CVR rhs) {return !var_eq_var(lhs, rhs );}
+#endif
 	PUBLIC friend bool operator< (CVR lhs, CVR rhs) {return  var_lt_var(lhs, rhs );}
 	PUBLIC friend bool operator>=(CVR lhs, CVR rhs) {return !var_lt_var(lhs, rhs );}
 	PUBLIC friend bool operator> (CVR lhs, CVR rhs) {return  var_lt_var(rhs, lhs );}
@@ -1272,19 +1279,19 @@ class PUBLIC var final {
 	PUBLIC friend bool operator==(const bool   bool1, CVR          rhs   ) {return  var_eq_bool( rhs, bool1  ); }
 
 	// != NE friends v. main types
+#if !(__GNUG__ >= 11 || __clang_major__ >= 14)
+	PUBLIC friend bool operator!=(CVR          lhs,   const char*  cstr2 ) {return !var_eq_var(      lhs, cstr2  ); }
+	PUBLIC friend bool operator!=(CVR          lhs,   const char   char2 ) {return !var_eq_var(      lhs, char2  ); }
+	PUBLIC friend bool operator!=(CVR          lhs,   const int    int2  ) {return !var_eq_int(  lhs, int2   ); }
+	PUBLIC friend bool operator!=(CVR          lhs,   const double dbl2  ) {return !var_eq_dbl(  lhs, dbl2   ); }
+	PUBLIC friend bool operator!=(CVR          lhs,   const bool   bool2 ) {return !var_eq_bool( lhs, bool2  ); }
 
-//	PUBLIC friend bool operator!=(CVR          lhs,   const char*  cstr2 ) {return !var_eq_var(      lhs, cstr2  ); }
-//	PUBLIC friend bool operator!=(CVR          lhs,   const char   char2 ) {return !var_eq_var(      lhs, char2  ); }
-//	PUBLIC friend bool operator!=(CVR          lhs,   const int    int2  ) {return !var_eq_int(  lhs, int2   ); }
-//	PUBLIC friend bool operator!=(CVR          lhs,   const double dbl2  ) {return !var_eq_dbl(  lhs, dbl2   ); }
-//	PUBLIC friend bool operator!=(CVR          lhs,   const bool   bool2 ) {return !var_eq_bool( lhs, bool2  ); }
-//
-//	PUBLIC friend bool operator!=(const char*  cstr1, CVR          rhs   ) {return !var_eq_var(      rhs, cstr1  ); }
-//	PUBLIC friend bool operator!=(const char   char1, CVR          rhs   ) {return !var_eq_var(      rhs, char1  ); }
-//	PUBLIC friend bool operator!=(const int    int1,  CVR          rhs   ) {return !var_eq_int(  rhs, int1   ); }
-//	PUBLIC friend bool operator!=(const double dbl1,  CVR          rhs   ) {return !var_eq_dbl(  rhs, dbl1   ); }
-//	PUBLIC friend bool operator!=(const bool   bool1, CVR          rhs   ) {return !var_eq_bool( rhs, bool1  ); }
-
+	PUBLIC friend bool operator!=(const char*  cstr1, CVR          rhs   ) {return !var_eq_var(      rhs, cstr1  ); }
+	PUBLIC friend bool operator!=(const char   char1, CVR          rhs   ) {return !var_eq_var(      rhs, char1  ); }
+	PUBLIC friend bool operator!=(const int    int1,  CVR          rhs   ) {return !var_eq_int(  rhs, int1   ); }
+	PUBLIC friend bool operator!=(const double dbl1,  CVR          rhs   ) {return !var_eq_dbl(  rhs, dbl1   ); }
+	PUBLIC friend bool operator!=(const bool   bool1, CVR          rhs   ) {return !var_eq_bool( rhs, bool1  ); }
+#endif
 	// < LT friends v. main types
 
 	PUBLIC friend bool operator<(CVR           lhs,   const char*  cstr2 ) {return  var_lt_var(lhs,   cstr2 ); }

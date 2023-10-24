@@ -5747,8 +5747,14 @@ static bool get_dbresult(CVR sql, DBresult& dbresult, PGconn* pgconn) {
 		case PGRES_FATAL_ERROR:
 		case PGRES_COPY_BOTH:
 		case PGRES_SINGLE_TUPLE:
+#ifdef PGRES_PIPELINE_SYNC
 		case PGRES_PIPELINE_SYNC:
+#endif
+#ifdef PGRES_PIPELINE_ABORTED
 		case PGRES_PIPELINE_ABORTED:
+#endif
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wcovered-switch-default"
 		default:
 
 			var("ERROR: mvdbpostgres pqexec " ^ var(sql)).errputl();
@@ -5758,6 +5764,7 @@ static bool get_dbresult(CVR sql, DBresult& dbresult, PGconn* pgconn) {
 				.errputl();
 
 			return false;
+#pragma clang diagnostic push
 	}
 
 	// should never get here

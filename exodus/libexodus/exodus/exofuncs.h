@@ -32,7 +32,10 @@ THE SOFTWARE.
 	namespace fmt = std;
 #elif __has_include(<fmt/core.h>)
 #	define EXO_FORMAT 2
+#	pragma clang diagnostic push
+#	pragma clang diagnostic ignored "-Wdocumentation-unknown-command"
 #	include <fmt/core.h>
+#	pragma clang diagnostic pop
 #endif
 
 #include <exodus/var.h>
