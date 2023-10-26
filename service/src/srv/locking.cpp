@@ -114,11 +114,11 @@ tryagain:
 		}
 
 		//std::unreachable();
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunreachable-code-return"
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunreachable-code-return"
 		// Here for safety in case the above code is broken by maintenance programming
 		return 0;
-#pragma GCC diagnostic pop
+#pragma clang diagnostic pop
 	}
 
 	locklist(-1) = lockitem;

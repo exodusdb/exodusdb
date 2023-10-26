@@ -193,6 +193,9 @@ function main() {
 		}
 		//basic compiler options
 
+		let clang = osshellread(compiler ^ " --version").contains("clang");
+		let gcc = osshellread(compiler ^ " --version").contains("g++");
+
 		//c++11/17
 		//basicoptions^=" -std=gnu++0x";//pre gcc 4.7 enables gnu extentions.
 		//basicoptions^=" -std=gnu++11";//gcc 4.7 and later  enables gnu extensions.
@@ -306,18 +309,25 @@ function main() {
 //			basicoptions ^= " -Wno-extra-semi-stmt";
 //			basicoptions ^= " -Wno-newline-eof";
 //		}
-
 		if (warnings > 0) {
-			basicoptions ^= " -Weverything";
+			if (clang)
+				basicoptions ^= " -Weverything ";
+			else {
+				//basicoptions ^= " -Weffc++ ";
+				basicoptions ^= " -Wwrite-strings ";
+				basicoptions ^= " -Wno-unknown-pragmas ";
+			}
 
 			// The following warnings will only appear at level 2 or greater
 			if (warnings < 2) {
 				basicoptions ^= " -Wno-shadow";
 				basicoptions ^= " -Wno-unreachable-code";
-				basicoptions ^= " -Wno-unreachable-code-return";
 				basicoptions ^= " -Wno-unused-macros";
-				// use of GNU ?: conditional expression extension, omitting middle operand
-				basicoptions ^= " -Wno-gnu-conditional-omitted-operand";
+				if (clang) {
+					basicoptions ^= " -Wno-unreachable-code-return";
+					// use of GNU ?: conditional expression extension, omitting middle operand
+					basicoptions ^= " -Wno-gnu-conditional-omitted-operand";
+				}
 				basicoptions ^= " -Wno-padded";
 			}
 
@@ -334,20 +344,20 @@ function main() {
 			//basicoptions ^= " -Wno-cast-function-type";
 		}
 
-		// Never warn about c++98 compatibility
-		basicoptions ^= " -Wno-c++98-compat";
-		basicoptions ^= " -Wno-c++98-compat-pedantic";
+		if (clang) {
+			// Never warn about c++98 compatibility
+			basicoptions ^= " -Wno-c++98-compat";
+			basicoptions ^= " -Wno-c++98-compat-pedantic";
 
-		// Never warn about macro expansion since it is essential for mv.RECORD etc.
-		basicoptions ^= " -Wno-disabled-macro-expansion";
+			// Never warn about macro expansion since it is essential for mv.RECORD etc.
+			basicoptions ^= " -Wno-disabled-macro-expansion";
+		}
 
 		if (warnings_are_errors) {
 			// Omitting this by default to avoid blocking application programmers
 			// over technical matters that may arise in new versions of compilers
 			basicoptions ^= " -Werror";
 		}
-
-		let gcc = osshellread(compiler ^ " --version").contains("Free Software Foundation");
 
 		// Suppress GCC and clang's warnings about each others warning flags
 		if (warnings lt 2) {
@@ -1176,11 +1186,11 @@ function main() {
 							_EOL
 							_EOL "/" "/ A 'callable' class and object that allows function call syntax to actually open shared libraries/create Exodus Program objects on the fly."
 							_EOL
-							_EOL "#pragma GCC diagnostic push"
-							_EOL "#pragma GCC diagnostic ignored \"-Wweak-vtables\""
+							_EOL "#pragma clang diagnostic push"
+							_EOL "#pragma clang diagnostic ignored \"-Wweak-vtables\""
 							_EOL "class Callable_funcx : public Callable"
-							_EOL "#pragma GCC diagnostic pop"
 							_EOL "{"
+							_EOL "#pragma clang diagnostic pop"
 							_EOL "public:"
 							_EOL
 							_EOL "/" "/ A constructor providing:"

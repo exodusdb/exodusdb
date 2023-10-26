@@ -36,27 +36,34 @@
 
 // A program is just a class with an following
 // int main() function that creates and calls it
-#define programinit(PROGRAMCLASSNAME)                                \
-_Pragma("GCC diagnostic push")                                       \
-_Pragma("GCC diagnostic ignored \"-Wweak-vtables\"")                 \
-class PROGRAMCLASSNAME##ExodusProgram : public ExodusProgramBase {   \
-_Pragma("GCC diagnostic pop")
+#define programinit(PROGRAMCLASSNAME)                               \
+_Pragma("clang diagnostic push")                                    \
+_Pragma("clang diagnostic ignored \"-Wweak-vtables\"")              \
+class PROGRAMCLASSNAME##ExodusProgram : public ExodusProgramBase {  \
+_Pragma("clang diagnostic pop")
 
 //OPTION I=Ignore. Causes error exit to be suppressed
 //OPTION D=Debug. Suppress try/catch exception handling so debuggers can catch errors
 #define programexit(PROGRAMCLASSNAME)                                                                           \
  public:                                                                                                        \
-_Pragma("GCC diagnostic push")                                                                                  \
-_Pragma("GCC diagnostic ignored \"-Wshadow-field\"")                                                            \
+_Pragma("clang diagnostic push")                                                                                \
+_Pragma("clang diagnostic ignored \"-Wshadow-field\"")                                                          \
+                                                                                                                \
     PROGRAMCLASSNAME##ExodusProgram(ExoEnv& mv) : ExodusProgramBase(mv) {}                                      \
-_Pragma("GCC diagnostic pop")                                                                                   \
+                                                                                                                \
+_Pragma("clang diagnostic pop")                                                                                 \
 };                                                                                                              \
+                                                                                                                \
+_Pragma("clang diagnostic push")                                                                                \
+_Pragma("clang diagnostic ignored \"-Wshadow-field\"")                                                          \
+                                                                                                                \
 static int PROGRAMCLASSNAME##main2(int exodus_argc, const char* exodus_argv[], int threadno) {                  \
-_Pragma("GCC diagnostic push")                                                                                  \
-_Pragma("GCC diagnostic ignored \"-Wshadow-field\"")                                                            \
+                                                                                                                \
 		ExoEnv mv;                                                                                              \
-_Pragma("GCC diagnostic pop")                                                                                   \
 		exodus_main(exodus_argc, exodus_argv, mv, threadno);                                                    \
+                                                                                                                \
+_Pragma("clang diagnostic pop")                                                                                 \
+                                                                                                                \
 		int result = 0;                                                                                         \
 		PROGRAMCLASSNAME##ExodusProgram exodusprogram1(mv);                                                     \
 		if (osgetenv("EXO_DEBUG")) {                                                                            \
