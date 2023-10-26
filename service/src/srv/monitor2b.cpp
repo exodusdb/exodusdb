@@ -12,9 +12,9 @@ var wgetrc;
 var authurl;
 var params;
 var text;
-var hashcode;  // num
+//var hashcode;  // num
 var errors;
-var log;
+//var log;
 
 function main(in mode, in request, in tempfilename, out datax, out msg) {
 
@@ -145,6 +145,7 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 			params ^= "&data=" ^ datax;
 
 			text = params;
+			var hashcode;
 			gosub hash(salt, max, hashcode);
 			params.prefixer("hashcode=" ^ hashcode ^ "&");
 		}
@@ -356,6 +357,7 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 
 	} else if (mode == "READ") {
 
+		var log;
 		let tt = tempfilename2.osfile().f(1);
 		// if tt > 32000 then
 		if (tt > maxstrsize_ / 2) {
@@ -385,6 +387,8 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 			msg = "No response" ^ log;
 			return 0;
 		}
+
+		var hashcode;
 
 		// verify echo
 		let expect = SYSTEM.f(45) ^ "," ^ SYSTEM.f(17) ^ "," ^ cidx ^ "," ^ sessionid;

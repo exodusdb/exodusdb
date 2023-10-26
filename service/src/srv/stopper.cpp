@@ -1,7 +1,7 @@
 #include <exodus/library.h>
 libraryinit()
 
-#include <videorw.h>
+//#include <videorw.h>
 
 #include <service_common.h>
 
@@ -9,7 +9,7 @@ libraryinit()
 
 var mode;
 
-function main(in mode0, in time, in date, io buffer, out msg) {
+function main(in mode0, in time, in date, io /*buffer*/, out msg) {
 
 	if (msg.unassigned()) {
 		msg = "";
@@ -44,9 +44,9 @@ function main(in mode0, in time, in date, io buffer, out msg) {
 		}
 	}
 
-	if (not buffer.unassigned()) {
-		call videorw(0, 0, CRTWIDE - 1, CRTHIGH - 1, "W", buffer);
-	}
+	//if (not buffer.unassigned()) {
+	//	call videorw(0, 0, CRTWIDE - 1, CRTHIGH - 1, "W", buffer);
+	//}
 
 	return result;
 }

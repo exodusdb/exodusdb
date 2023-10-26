@@ -41,7 +41,7 @@ libraryinit()
 #define minpasswordchars_ 4
 #define emailnewusers_ RECORD.f(26)
 
-#define tstore_             req.registerx(3)
+//#define tstore_             req.registerx(3) not used this program
 #define updatelowergroups_  req.registerx(4)
 #define updatehighergroups_ req.registerx(5)
 #define curruser_           req.registerx(6)
@@ -226,7 +226,7 @@ function main(in mode) {
 			if (not usercodes.f(1).locate(USERNAME, usern)) {
 				msg = USERNAME ^ " user not in in authorisation file";
 				return invalid(msg);
-				stop();
+				//stop();
 			}
 
 			// hide higher users
@@ -259,7 +259,7 @@ function main(in mode) {
 			// also in prewrite
 
 			if (startn_ != 1 or endn_ != nusers) {
-				let nn = endn_ - startn_ + 1;
+				let nallowed = endn_ - startn_ + 1;
 
 				if (not interactive) {
 
@@ -271,7 +271,7 @@ function main(in mode) {
 
 					// save hidden keys for remote client in field 23
 
-					var visiblekeys = RECORD.f(2).field(VM, startn_, nn);
+					var visiblekeys = RECORD.f(2).field(VM, startn_, nallowed);
 					visiblekeys.converter(",", VM);
 					visiblekeys = trim(visiblekeys, VM);
 
@@ -299,7 +299,7 @@ function main(in mode) {
 
 				// delete higher and lower users if not allowed
 				for (const var fn : range(1, 8)) {
-					RECORD(fn) = RECORD.f(fn).field(VM, startn_, nn);
+					RECORD(fn) = RECORD.f(fn).field(VM, startn_, nallowed);
 				}  // fn;
 
 			} else {
@@ -311,9 +311,9 @@ function main(in mode) {
 		// get the local passwords from the system file for users that exist there
 		// also get any user generated passwords
 		let usercodes = RECORD.f(1);
-		let nusers	  = usercodes.fcount(VM);
-		// for (usern = 1; usern <= nusers; ++usern) {
-		for (const var usern : range(1, nusers)) {
+		//let nnr	  = usercodes.fcount(VM);
+		// for (usern = 1; usern <= nnr; ++usern) {
+		for (const var usern : range(1, usercodes.fcount(VM))) {
 			let userx	 = usercodes.f(1, usern);
 			var sysrec	 = RECORD.f(4, usern, 2);
 			let pass	 = userx.xlate("USERS", 4, "X");
@@ -488,12 +488,12 @@ function main(in mode) {
 
 			// put back any hidden users
 			if (startn_) {
-				let nn	 = endn_ - startn_ + 1;
+				let nhidden	 = endn_ - startn_ + 1;
 				let nvms = RECORD.f(1).count(VM);
 				for (const var fn : range(1, 8)) {
 					var temp = RECORD.f(fn);
 					temp ^= VM.str(nvms - temp.count(VM));
-					RECORD(fn) = origfullrec_.f(fn).fieldstore(VM, startn_, -nn, temp);
+					RECORD(fn) = origfullrec_.f(fn).fieldstore(VM, startn_, -nhidden, temp);
 				}  // fn;
 			}
 
@@ -564,119 +564,123 @@ function main(in mode) {
 		if (not users.open("USERS", "")) {
 			users = "";
 		}
-		// update users in the central system file if they exist there (direct login)
-		let usercodes	  = RECORD.f(1);
-		let useremails	  = RECORD.f(7);
-		let usernames	  = RECORD.f(8);
-		let userpasswords = RECORD.f(4);
-		let nusers		  = usercodes.fcount(VM);
-		// for (usern = 1; usern <= nusers; ++usern) {
-		for (const var usern : range(1, nusers)) {
-			let userx = usercodes.f(1, usern);
 
-			if (not userx.contains("---")) {
+		// 1. subsection to update
+		{
+			// update users in the central system file if they exist there (direct login)
+			let usercodes	  = RECORD.f(1);
+			let useremails	  = RECORD.f(7);
+			let usernames	  = RECORD.f(8);
+			let userpasswords = RECORD.f(4);
+			let nusers		  = usercodes.fcount(VM);
+			// for (usern = 1; usern <= nusers; ++usern) {
+			for (const var usern : range(1, nusers)) {
+				let userx = usercodes.f(1, usern);
 
-				// get the original and current system records
-				var sysrec = RECORD.f(4, usern, 2);
-				// locate user in orec<1> setting ousern then
-				var menuid = "";
-				var ousern;
-				if (origfullrec_.f(1).locate(userx, ousern)) {
-					// oSYSREC=orec<4,ousern,2>
-					let osysrec = origfullrec_.f(4, ousern, 2);
-				} else {
-					let osysrec = "";
+				if (not userx.contains("---")) {
 
-					// new users look for legacy menu in following (lower rank) users
-					for (const var usern2 : range(usern + 1, nusers)) {
-						let usercode2 = usercodes.f(1, usern2);
-						if (usercode2) {
-							if (not menuid.readf(users, usercode2, 34)) {
-								menuid = "";
+					// get the original and current system records
+					var sysrec = RECORD.f(4, usern, 2);
+					// locate user in orec<1> setting ousern then
+					var menuid = "";
+					var ousern;
+					if (origfullrec_.f(1).locate(userx, ousern)) {
+						// oSYSREC=orec<4,ousern,2>
+						let osysrec = origfullrec_.f(4, ousern, 2);
+					} else {
+						let osysrec = "";
+
+						// new users look for legacy menu in following (lower rank) users
+						for (const var usern2 : range(usern + 1, nusers)) {
+							let usercode2 = usercodes.f(1, usern2);
+							if (usercode2) {
+								if (not menuid.readf(users, usercode2, 34)) {
+									menuid = "";
+								}
 							}
+							// /BREAK;
+							if (not not(menuid))
+								break;
+						}  // usern2;
+					}
+
+					// update the users file
+					if (users) {
+
+						// get the current user record
+						var userrec;
+						if (not userrec.read(users, userx)) {
+							userrec		= "";
+							userrec(34) = menuid;
 						}
-						// /BREAK;
-						if (not not(menuid))
-							break;
-					}  // usern2;
-				}
+						let origuserrec = userrec;
 
-				// update the users file
-				if (users) {
+						// determine the user department
+						call usersubs("GETUSERDEPT," ^ userx);
+						var	 departmentcode	 = ANS.trim();
+						var	 departmentcode2 = departmentcode;
+						departmentcode.converter("0123456789", "");
 
-					// get the current user record
-					var userrec;
-					if (not userrec.read(users, userx)) {
-						userrec		= "";
-						userrec(34) = menuid;
-					}
-					let origuserrec = userrec;
+						var username = usernames.f(1, usern);
+						if (not username) {
+							username = userx;
+						}
 
-					// determine the user department
-					call usersubs("GETUSERDEPT," ^ userx);
-					var	 departmentcode	 = ANS.trim();
-					var	 departmentcode2 = departmentcode;
-					departmentcode.converter("0123456789", "");
+						// update the user record
+						userrec(1) = username;
+						userrec(5) = departmentcode;
+						userrec(7) = useremails.f(1, usern);
+						// userrec<8>=username
+						userrec(11) = usern;
+						userrec(21) = departmentcode2;
+						// expirydate
+						userrec(35) = RECORD.f(3, usern);
+						userrec(40) = RECORD.f(6, usern);
+						userrec(41) = RECORD.f(2, usern);
 
-					var username = usernames.f(1, usern);
-					if (not username) {
-						username = userx;
-					}
+						// new password cause entry in users log to renable login if blocked
+						// save historical logins/password resets in listen2 and security.subs
+						// similar in security.subs and user.subs
+						let userpass  = userpasswords.f(1, usern);
+						let ouserpass = origfullrec_.f(4, ousern);
+						if (userpass != ouserpass) {
+							// datetime=(date():'.':time() 'R(0)#5')+0
+							let datetime = date() ^ "." ^ time().oconv("R(0)#5");
+							userrec.inserter(15, 1, datetime);
+							userrec.inserter(16, 1, SYSTEM.f(40, 2));
 
-					// update the user record
-					userrec(1) = username;
-					userrec(5) = departmentcode;
-					userrec(7) = useremails.f(1, usern);
-					// userrec<8>=username
-					userrec(11) = usern;
-					userrec(21) = departmentcode2;
-					// expirydate
-					userrec(35) = RECORD.f(3, usern);
-					userrec(40) = RECORD.f(6, usern);
-					userrec(41) = RECORD.f(2, usern);
+							let text = "OK New password by " ^ USERNAME ^ ".";
+							userrec.inserter(18, 1, text);
 
-					// new password cause entry in users log to renable login if blocked
-					// save historical logins/password resets in listen2 and security.subs
-					// similar in security.subs and user.subs
-					let userpass  = userpasswords.f(1, usern);
-					let ouserpass = origfullrec_.f(4, ousern);
-					if (userpass != ouserpass) {
-						// datetime=(date():'.':time() 'R(0)#5')+0
-						let datetime = date() ^ "." ^ time().oconv("R(0)#5");
-						userrec.inserter(15, 1, datetime);
-						userrec.inserter(16, 1, SYSTEM.f(40, 2));
+							userrec(36) = datetime;
+						}
 
-						let text = "OK New password by " ^ USERNAME ^ ".";
-						userrec.inserter(18, 1, text);
+						if (userrec != origuserrec) {
+							userrec.write(users, userx);
 
-						userrec(36) = datetime;
-					}
+							// similar code in user.subs and security.subs
+							// ///////////
+							// updatemirror:
+							// ///////////
+							// save the user keyed as username too
+							// because we save the user name and executive code in many places
+							// and we still need to get the executive email if they are a user
+							var mirror	  = userrec.fieldstore(FM, 13, 5, "");
+							mirror		  = userrec.fieldstore(FM, 31, 3, "");
+							let mirrorkey = "%" ^ userrec.f(1).ucase() ^ "%";
+							mirror(1)	  = userx;
+							mirror.write(users, mirrorkey);
 
-					if (userrec != origuserrec) {
-						userrec.write(users, userx);
-
-						// similar code in user.subs and security.subs
-						// ///////////
-						// updatemirror:
-						// ///////////
-						// save the user keyed as username too
-						// because we save the user name and executive code in many places
-						// and we still need to get the executive email if they are a user
-						var mirror	  = userrec.fieldstore(FM, 13, 5, "");
-						mirror		  = userrec.fieldstore(FM, 31, 3, "");
-						let mirrorkey = "%" ^ userrec.f(1).ucase() ^ "%";
-						mirror(1)	  = userx;
-						mirror.write(users, mirrorkey);
-
-						let isnew = origuserrec.f(1) == "";
-						// only warn about new users with emails (ignore creation of groups/testusers)
-						gosub getemailtx(emailtx, newusers, isnew, userx, userrec, origuserrec, userfields, nuserfields);
+							let isnew = origuserrec.f(1) == "";
+							// only warn about new users with emails (ignore creation of groups/testusers)
+							gosub getemailtx(emailtx, newusers, isnew, userx, userrec, origuserrec, userfields, nuserfields);
+						}
 					}
 				}
-			}
-		}  // usern;
+			}  // usern;
+		}
 
-		// subsection for deletion of old
+		// 2. subsection for deletion of old
 		{
 			// delete any deleted users from the system file for direct login
 			let usercodes = req.orec.f(1);
@@ -726,8 +730,8 @@ function main(in mode) {
 
 			// email new users if requested to do so
 			if (newusers and emailnewusers_) {
-				let nn = newusers.fcount(FM);
-				for (const var ii : range(1, nn)) {
+				//let nnewusers = newusers.fcount(FM);
+				for (const var ii : range(1, newusers.fcount(FM))) {
 
 					let replyto = (USERNAME == "EXODUS") ? "support@neosys.com" : USERNAME.xlate("USERS", 7, "X");
 					let toaddress = newusers.f(ii, 3);
@@ -826,9 +830,9 @@ function main(in mode) {
 
 		// remove expired users
 		let expirydates = temprec.f(3);
-		let nn			= expirydates.fcount(VM);
-		//for (var ii = nn; ii >= 1; --ii) {
-		for (let ii : reverse_range(1, nn)) {
+		//let nexpired			= expirydates.fcount(VM);
+		//for (var ii = nexpired; ii >= 1; --ii) {
+		for (let ii : reverse_range(1, expirydates.fcount(VM))) {
 			let expirydate = expirydates.f(1, ii);
 			if (expirydate) {
 				if (expirydate <= date()) {
@@ -845,9 +849,9 @@ function main(in mode) {
 		// remove empty groups
 		{
 			let usercodes = temprec.f(1);
-			let nn		  = usercodes.fcount(VM);
-			//for (var ii = nn; ii >= 2; --ii) {
-			for (let ii : reverse_range(2, nn)) {
+			let nusers		  = usercodes.fcount(VM);
+			//for (var ii = nusers; ii >= 2; --ii) {
+			for (let ii : reverse_range(2, nusers)) {
 				let usercode = usercodes.f(1, ii);
 				if (usercode) {
 					if (temprec.f(8, ii) == "" or temprec.f(7, ii) == "") {

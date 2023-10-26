@@ -20,7 +20,7 @@ dim rowfieldismv;
 //int rowfn;	// num
 var rowfield;
 var totcol;
-var coln;  // num
+//var colnx;  // num
 var colorder;
 var coldict;
 var datadict;
@@ -39,14 +39,14 @@ var colvals;
 var ncolvals;
 //var rowvaln;  // num
 var rowval;
-var rown;  // num
+//var rown;  // num
 var msg;
 //var colvaln;  // num
 var colval;
 //var rownx;	 // num
 var oldval;	 // num
-var colconv;
-var rowconv;
+//var colconv;
+//var rowconv;
 
 var printptr;	// num
 var topmargin;	// num
@@ -157,7 +157,7 @@ function main(in filename, in rowfields0, in colfield, in datafield, io output, 
 	}  // rowfn;
 
 	totcol = colfield == "TOTAL";
-	coln   = 1;
+	var colnx   = 1;
 	if (totcol) {
 		colorder = "AR";
 	} else {
@@ -307,6 +307,7 @@ nextmv:
 		}
 
 		// determine which row to add into
+		var rown;
 		if (not allrowvals.f(1).locateby("AL", rowval, rown)) {
 			if (allrowvals.len() + rowval.len() > 65000) {
 				gosub abort_toobig(filename);
@@ -320,20 +321,20 @@ nextmv:
 
 			// determine which column to add into
 			colval = colvals.f(1, colvaln);
-			if (not allcolvals.f(1).locateby(colorder, colval, coln)) {
+			if (not allcolvals.f(1).locateby(colorder, colval, colnx)) {
 				ncols += 1;
 				if (allcolvals.len() + colval.len() > 65000) {
 					gosub abort_toobig(filename);
 				}
-				allcolvals.inserter(1, coln, colval);
+				allcolvals.inserter(1, colnx, colval);
 
 				if (output.len() + nrows * 2 > 65000) {
 					gosub abort_toobig(filename);
 				}
 
-				output.inserter(1, 1 + coln, colval);
+				output.inserter(1, 1 + colnx, colval);
 				for (const int rownx : range(2, nrows + 1)) {
-					output.inserter(rownx, 1 + coln, "");
+					output.inserter(rownx, 1 + colnx, "");
 				}  // rownx;
 			}
 
@@ -341,10 +342,10 @@ nextmv:
 				gosub abort_toobig(filename);
 			}
 
-			oldval = output.f(rown + 1, coln + 1);
-			// output(rown + 1, coln + 1) = oldval + datavals;
+			oldval = output.f(rown + 1, colnx + 1);
+			// output(rown + 1, colnx + 1) = oldval + datavals;
 			// output(1, 1) = output.f(1, 1) + 1;
-			pickreplacer(output, rown + 1, coln + 1, oldval + datavals);
+			pickreplacer(output, rown + 1, colnx + 1, oldval + datavals);
 			pickreplacer(output, 1, 1, output.f(1, 1) + 1);
 
 			// total column at the end
@@ -370,7 +371,7 @@ exit:
 	// ///
 	// format the column title values
 	if (not totcol) {
-		colconv = coldict.f(7);
+		let colconv = coldict.f(7);
 		if (colconv) {
 			for (const int coln : range(1, ncols)) {
 				output(1, 1 + coln) = oconv(output.f(1, 1 + coln), colconv);
@@ -379,7 +380,7 @@ exit:
 	}
 
 	if (totcol) {
-		output(1, 1 + coln) = datadict.f(3);
+		output(1, 1 + colnx) = datadict.f(3);
 	} else {
 		for (const int coln : range(1, ncols)) {
 			output(1, 1 + coln) = coldict.f(3) ^ " " ^ output.f(1, 1 + coln);
@@ -400,7 +401,7 @@ exit:
 		// output<1,1,rowfn>=rowfields<1,rowfn>
 		output(1, 1, rowfn) = rowdict(rowfn).f(3);
 
-		rowconv = rowdict(rowfn).f(7);
+		let rowconv = rowdict(rowfn).f(7);
 		if (rowconv) {
 			for (const int rown : range(1, nrows)) {
 				output(rown + 1, 1, rowfn) = oconv(output.f(rown + 1, 1, rowfn), rowconv);

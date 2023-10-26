@@ -6,19 +6,20 @@ libraryinit()
 #include <srv_common.h>
 
 // clang-format off
-#define lastbakattemptdate_ bakpars.f(1)
-#define minbaktime_         bakpars.f(3)
-#define maxbaktime_         bakpars.f(4)
-#define bakdows_            bakpars.f(5)
-#define bakemails_          bakpars.f(6)
+// Note: Defines are commented simply to avoid compiler warnings
+//#define lastbakattemptdate_ bakpars.f(1)
+//#define minbaktime_         bakpars.f(3)
+//#define maxbaktime_         bakpars.f(4)
+//#define bakdows_            bakpars.f(5)
+//#define bakemails_          bakpars.f(6)
 #define bakdisk_            bakpars.f(7)
 #define bakexcludedatasets_ bakpars.f(8)
-#define bakdisable_         bakpars.f(9)
-#define bakdataemails_      bakpars.f(10)
+//#define bakdisable_         bakpars.f(9)
+//#define bakdataemails_      bakpars.f(10)
 #define baktestdata_        bakpars.f(11)
 #define bakdisk2_           bakpars.f(12)
-#define bakmediarotation_   bakpars.f(13)
-#define logemail_           bakpars.f(14)
+//#define bakmediarotation_   bakpars.f(13)
+//#define logemail_           bakpars.f(14)
 
 //backup params
 //

@@ -18,7 +18,9 @@ libraryinit()
 	// we wish to interactive with alternative database backends or have multiple file handlers called per file i/o
 
 function main(in code, in fs, io handle, in keyorfilename, in fmc, io record, io status) {
-	true || code || fs || handle || keyorfilename || fmc || record || status;
+
+	//evade compiler warnings about not used
+	(true) || code || fs || handle || keyorfilename || fmc || record || status;
 
 	// clang-format off
 
@@ -145,9 +147,11 @@ INSTALL      | 22 | Passed         | Unused         | Unused         | Unused   
 
 	default:
 		throw VarError(code ^ " invalid code in rtp57");
-		break;
+		//std::unreachable();
+		//break;
 
 	}
+
 	return 0;
 }
 

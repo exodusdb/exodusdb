@@ -72,7 +72,8 @@ returnzero:
 		return 0;
 	}
 
-	if (true) {
+	if ((true)) {
+		// Provide a link to ip info instead of actually doing any investigation
 		text =
 			"http:/"
 			"/geoiplookup.net/ip/" ^

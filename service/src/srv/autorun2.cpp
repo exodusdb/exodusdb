@@ -12,7 +12,7 @@ var datax;
 var runasusercode;
 var targetusercodes;
 var title;
-var usern;	// num
+//var usern;	// num
 
 function main(in mode0, in title0, in module, in request, in data0, in runasusercode0, in targetusercodes0, io document0, io docid, out msg) {
 
@@ -116,6 +116,7 @@ function main(in mode0, in title0, in module, in request, in data0, in runasuser
 	let initialtargetusercodes = targetusercodes;
 	if (targetusercodes == "{GROUP}") {
 		var tt = runasusercode;
+		var usern;
 		if (SECURITY.f(1).locate(tt, usern)) {
 			while (true) {
 				var userx;

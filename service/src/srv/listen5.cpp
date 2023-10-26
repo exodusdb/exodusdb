@@ -11,7 +11,7 @@ libraryinit()
 #include <openfile.h>
 #include <otherusers.h>
 #include <rtp57.h>
-#include <scrnio.h>
+//#include <scrnio.h>
 #include <select2.h>
 #include <singular.h>
 #include <sysmsg.h>

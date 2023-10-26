@@ -3,7 +3,7 @@ libraryinit()
 
 #include <service_common.h>
 
-function main(in cmd, in filename, in dictfile, out hits) {
+function main(in cmd, in filename, in /*dictfile*/, out hits) {
 
 	// replacement for simple btree.extract functions using SELECT command
 	// which is slower but perhaps more portable and works without btree indexes
@@ -20,8 +20,8 @@ function main(in cmd, in filename, in dictfile, out hits) {
 	hits = "";
 
 	// defeat compiler warning of unused
-	if (false)
-		printx(dictfile);
+//	if (false)
+//		printx(dictfile);
 
 	// XREF should be able to do it all in one go
 	let fieldname = cmd.f(1, 1);

@@ -134,7 +134,7 @@ var linkfilename3;
 var linkfile2size;
 var linkfile2;
 var inptr;	  // num
-var blockn;	  // num
+//var blockn;	  // num
 var lendata;  // num
 var savelogptr;
 var invaliduser;
@@ -154,7 +154,7 @@ var triggers;
 var postread;
 var filetitle2;
 var secmode;
-var ok;	 // num
+//var ok;	 // num
 var file;
 var keyx0;
 var preread;
@@ -791,7 +791,10 @@ function loop_exit() {
 			try {
 
 				// Execute the command as user EXODUS
-				let username = USERNAME;
+				// TODO how to ensure that this gets restored below?
+				// Probably not important since the command line
+				// implies debugging by devops staff
+				let saveusername = USERNAME;
 				USERNAME	 = "EXODUS";
 
 				if (not cmd.starts("list")) {
@@ -822,7 +825,7 @@ function loop_exit() {
 					}
 				}
 
-				USERNAME = username;
+				USERNAME = saveusername;
 
 			} catch (VarError& e) {
 				errputl(e.description);
@@ -1656,8 +1659,7 @@ subroutine process2() {
 		filetitle2.converter(".", " ");
 		// if postread else
 		secmode = "ACCESS";
-		gosub filesecurity();
-		if (not ok) {
+		if (not filesecurity()) {
 			return;
 		}
 		// end
@@ -2007,8 +2009,7 @@ noupdate:
 		// double check allowed access to file
 		// if prewrite else
 		secmode = "ACCESS";
-		gosub filesecurity();
-		if (not ok) {
+		if (not filesecurity()) {
 			return;
 		}
 		// end
@@ -2254,8 +2255,7 @@ badwrite:
 			// end
 			// if predelete else
 			secmode = "DELETE";
-			gosub filesecurity();
-			if (not ok) {
+			if (not filesecurity()) {
 				return;
 			}
 			// end
@@ -2961,11 +2961,11 @@ subroutine badfile() {
 	return;
 }
 
-function openleaselocks(in file) {
+function openleaselocks(in datafile) {
 
 	// Open the leaselocks on the same connection as the data file
-	if (not leaselocks.open("LOCKS", file)) {
-		response_ = "Error: LOCKS for " ^ file ^ " cannot be opened.";
+	if (not leaselocks.open("LOCKS", datafile)) {
+		response_ = "Error: LOCKS for " ^ datafile ^ " cannot be opened.";
 		// call listen4(9, response_, req.datafile);
 		return false;
 	}
@@ -3091,11 +3091,11 @@ subroutine writelogx2() {
 	return;
 }
 
-subroutine filesecurity() {
+function filesecurity() {
 
-	ok = 1;
+	//ok = 1;
 	if (keyx.contains("*")) {
-		return;
+		return 1;
 	}
 	let positive = authorised(filetitle2 ^ " " ^ secmode, msg0, "") ? "" : "#";
 	if (not authorised(positive ^ filetitle2 ^ " " ^ secmode ^ " " ^ (keyx.quote()), posmsg)) {
@@ -3106,10 +3106,11 @@ subroutine filesecurity() {
 		} else {
 			posmsg.move(response_);
 		}
-		ok = 0;
+		//ok = 0;
 		gosub fmtresp();
+		return 0;
 	}
-	return;
+	return 1;
 }
 
 subroutine addlockholder() {

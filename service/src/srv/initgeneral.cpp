@@ -26,7 +26,7 @@ libraryinit()
 
 var lastlog;
 var logtime;
-var msg;
+//var msg;
 var pidfilename;
 var pidrec;
 var dbdate;
@@ -34,7 +34,7 @@ var dbtime;
 var dbdatetimerequired;
 var reply;
 var reply2;
-var tt;	 // num
+//var tt;	 // num
 var colors;
 var reportkey;
 //var tt2;  // num
@@ -259,7 +259,7 @@ function main() {
 			// np if own lock
 			if (FILEERROR != "414") {
 				if (not lockrecord("VOC", voc, "INIT.GENERAL.LOGIN", "", initwaitsecs)) {
-					msg = "INIT.GENERAL couldnt get exclusive lock. Quitting.";
+					let msg = "INIT.GENERAL couldnt get exclusive lock. Quitting.";
 					// maybe a long upgrade process is running
 					call note(msg);
 					if (SYSTEM.f(33)) {
@@ -315,7 +315,7 @@ function main() {
 			if (oldmethod and dbversion.f(1) == "14334.5") {
 			}
 			if (dbversion.f(1) > dbdatetimerequired) {
-				msg = "Software version " ^ dbversion.f(1).oconv("D") ^ " " ^ dbversion.f(1).field(".", 2).oconv("MTS") ^ " is incompatible with" ^ FM ^ "Database version " ^ dbdate ^ " " ^ dbtime;
+				var msg = "Software version " ^ dbversion.f(1).oconv("D") ^ " " ^ dbversion.f(1).field(".", 2).oconv("MTS") ^ " is incompatible with" ^ FM ^ "Database version " ^ dbdate ^ " " ^ dbtime;
 				msg = msg.oconv("L#60");
 				// abort since db is advanced
 				if (not interactive) {
@@ -438,7 +438,7 @@ updateversion:
 	call log2("*detach merges", logtime);
 	// locate 'MERGES' in @files using fm setting xx then perform 'DETACH MERGES (S)'
 	// open 'MERGES' to xx then perform 'DETACH MERGES (S)'
-	if (tt.open("MERGES", "")) {
+	if (var().open("MERGES", "")) {
 		perform("DELETEFILE MERGES (S)");
 	}
 
@@ -508,7 +508,7 @@ nextreport:
 	}
 
 	if (not DEFINITIONS.open("DEFINITIONS", "")) {
-		msg		= "The DEFINITIONS file is missing";
+		var msg	= "The DEFINITIONS file is missing";
 		msg(-1) = "Did you startup using the right command file/datasettype?";
 		call note(msg);
 	}
@@ -527,7 +527,7 @@ nextreport:
 			}
 
 			call log2("*inform user and close", logtime);
-			msg = var("594F552043414E4E4F5420555345204E454F53595320534F465457415245204F4E205448495320434F4D50555445527C554E54494C20594F5520484156452054484520415554484F5249534154494F4E204E554D4245522E").iconv("HEX2");
+			var msg = var("594F552043414E4E4F5420555345204E454F53595320534F465457415245204F4E205448495320434F4D50555445527C554E54494C20594F5520484156452054484520415554484F5249534154494F4E204E554D4245522E").iconv("HEX2");
 
 			// chr(7).output().str(3);
 			call note(msg);
@@ -538,7 +538,7 @@ nextreport:
 		call log2("*check users", logtime);
 		// if nusers < otherusers('')+1 then
 		if (nusers < notherusers + 1) {
-			msg = var("4D4158494D554D20415554484F5249534544204E554D424552204F46205553455253204558434545444544").iconv("HEX2");
+			var msg = var("4D4158494D554D20415554484F5249534544204E554D424552204F46205553455253204558434545444544").iconv("HEX2");
 			call note(msg);
 			if (SYSTEM.f(33)) {
 				gosub failsys();
@@ -550,7 +550,7 @@ nextreport:
 
 	call log2("*prevent use of this program via F10", logtime);
 	if (((initmode != "LOGIN" and LEVEL != 1) and interactive) and not(resetting)) {
-		msg		= "You cannot quit from within another program via F10.";
+		var msg	= "You cannot quit from within another program via F10.";
 		msg(-1) = "Please quit all programs first and then try again.";
 		call note(msg);
 		stop();
@@ -579,7 +579,7 @@ nextreport:
 
 	call log2("*check for invalid characters in workstation name", logtime);
 	if (STATION.contains("'") or STATION.contains(DQ)) {
-		msg = "WARNING: EXODUS WILL NOT WORK PROPERLY BECAUSE";
+		var msg = "WARNING: EXODUS WILL NOT WORK PROPERLY BECAUSE";
 		msg ^= FM ^ "YOUR WORKSTATION NAME (" ^ STATION.trim() ^ ")";
 		msg ^= FM ^ "CONTAINS QUOTATION MARKS. PLEASE ASK YOUR ";
 		msg ^= FM ^ "TECHNICIAN TO CHANGE THE WORKSTATION NAME.";
@@ -589,10 +589,11 @@ nextreport:
 	call log2("*convert SYSTEM to SYSTEM.CFG", logtime);
 	// leave old SYSTEM around in case old version of software reinstalled
 	// can be deleted manually
-	if (tt.osread("system")) {
+	var systemrec;
+	if (systemrec.osread("system")) {
 		if (not var("system.cfg").osfile()) {
 			//var(tt).oswrite("system.cfg");
-			if (not var(tt).oswrite("system.cfg"))
+			if (not var(systemrec).oswrite("system.cfg"))
 				loglasterror();
 		}
 	}
@@ -613,9 +614,9 @@ nextreport:
 
 	var	  tpath = "../../";
 	tpath.converter("/", OSSLASH);
-	tt	= tpath ^ "system.cfg";
+	//tt	= tpath ^ "system.cfg";
 //	tt2 = 1;
-	gosub getsystem(tt, 1);
+	gosub getsystem(tpath ^ "system.cfg", 1);
 
 	// //c++ only
 	// SYSTEM(58) = oslistd("../data/").convert(FM,VM);
@@ -643,9 +644,9 @@ nextreport:
 	s33 = SYSTEM.f(33);
 	// currdatasetname
 	SYSTEM(23) = oldsystem.f(23);
-	var tt	   = osread("../data/" ^ oldsystem.f(17) ^ "/name");
-	if (tt) {
-		SYSTEM(23) = tt;
+	var dbname = osread("../data/" ^ oldsystem.f(17) ^ "/name");
+	if (dbname) {
+		SYSTEM(23) = dbname;
 	}
 	// process/connection number
 	SYSTEM(24) = oldsystem.f(24);
@@ -704,13 +705,14 @@ nextreport:
 			sysname.converter("!\"#$%^&*()_+-=[]{};:@,./<>?", "");
 			SYSTEM(57) = sysname;
 			// call osread(tt,'system.cfg')
-			if (not tt.osread("system.cfg")) {
-				tt = "";
+			var systemcfg;
+			if (not systemcfg.osread("system.cfg")) {
+				systemcfg = "";
 			}
-			tt(57) = sysname;
+			systemcfg(57) = sysname;
 			// call oswrite(tt,'system.cfg')
 			//var(tt).oswrite("system.cfg");
-			if (not var(tt).oswrite("system.cfg"))
+			if (not systemcfg.oswrite("system.cfg"))
 				loglasterror();
 		}
 	}
@@ -782,15 +784,15 @@ nextreport:
 	}
 
 	call log2("*determine upload path", logtime);
-	tt = SYSTEM.f(49);
-	if (tt == "") {
+	let uploadpath = SYSTEM.f(49);
+	if (uploadpath == "") {
 		// system<49>='..\images\'
 		var imagesdir = "../images/";
 		imagesdir.converter("/", OSSLASH);
 		SYSTEM(49) = imagesdir;
-	} else if (not tt.ends(OSSLASH)) {
-		// system<49>=tt:'\'
-		SYSTEM(49) = tt ^ OSSLASH;
+	} else if (not uploadpath.ends(OSSLASH)) {
+		// system<49>=uploadpath:'\'
+		SYSTEM(49) = uploadpath ^ OSSLASH;
 	}
 
 	if (not SYSTEM.f(46, 1)) {
@@ -829,12 +831,14 @@ nextreport:
 			if (codepage.contains("UTF-8")) {
 				codepage = "UTF-8";
 			}
-			if (var("UTF-8,720,737").locateusing(",", codepage, tt)) {
-				tt = var("UTF-8,windows-1256,windows-1253").field(",", tt);
+			var pos;
+			var codepage2;
+			if (var("UTF-8,720,737").locateusing(",", codepage, pos)) {
+				codepage2 = var("UTF-8,windows-1256,windows-1253").field(",", pos);
 			} else {
-				tt = "windows-1252";
+				codepage2 = "windows-1252";
 			}
-			SYSTEM(127) = tt;
+			SYSTEM(127) = codepage2;
 		}
 	}
 
@@ -897,9 +901,9 @@ nextreport:
 		let nsockets = cpu.fcount(FM);
 		let nlogical = SYSTEM.f(9);
 		cpu			 = cpu.f(1).trim() ^ " ";
-		tt			 = nlogical / nsockets;
-		if (tt > 1) {
-			cpu ^= nsockets ^ "x" ^ tt;
+		let nlogical_per_socket = nlogical / nsockets;
+		if (nlogical_per_socket > 1) {
+			cpu ^= nsockets ^ "x" ^ nlogical_per_socket;
 		} else {
 			cpu ^= "x" ^ nsockets;
 		}
@@ -918,7 +922,7 @@ nextreport:
 	// notherusers=otherusers('')+1
 	if (freemb < reqfreemb * notherusers) {
 		// if 1 then
-		msg = "THERE IS NOT ENOUGH FREE DISK SPACE AVAILABLE";
+		var msg = "THERE IS NOT ENOUGH FREE DISK SPACE AVAILABLE";
 		msg ^= "||EXODUS needs at least " ^ reqfreemb ^ "Mb PER USER|of free space on disk " ^ oscwd().first(2) ^ " but";
 		msg ^= "|there is only " ^ freemb ^ "Mb available.";
 		if (notherusers) {
@@ -963,71 +967,75 @@ nextreport:
 	// write invert(userprivs) on definitions,'SECURITY'
 	// end
 
-	// setup a few tasks in advance since failure to find task in client
-	// doesnt cause automatic addition into auth file since only disallowed
-	// tasks are sent to client for speed
-	// Failure to show all possible tasks would mean difficulty to know
-	// what tasks are available to be locked
-	// in init.xxx files per module
-	// if @account='ACCOUNTS' then
-	tt = "GS";
-	// end else
-	// tt='EXODUS'
-	// end
-	if (not authorised("DATABASE STOP", msg, tt)) {
-		// Task added
-	}
-	if (not authorised("DATABASE RESTART", msg, tt)) {
-		// Task added
-	}
-	if (not authorised("DATASET COPY", msg, tt)) {
-		// Task added
-	}
-	// if security('%RENAME%':'AUTHORISATION UPDATE KEYS',msg,'AUTHORISATION UPDATE GROUPS') else null
-	if (not authorised("AUTHORISATION UPDATE", msg, tt)) {
-		// Task added
-	}
-	if (not authorised("AUTHORISATION UPDATE LOCKS", msg, tt)) {
-		// Task added
-	}
-	if (not authorised("AUTHORISATION UPDATE LOWER GROUPS", msg, tt)) {
-		// Task added
-	}
-	if (not authorised("AUTHORISATION UPDATE HIGHER GROUPS", msg, tt)) {
-		// Task added
-	}
+	// Section to add any tasks missing from SECURITY
+	{
+		var msg;
+		// setup a few tasks in advance since failure to find task in client
+		// doesnt cause automatic addition into auth file since only disallowed
+		// tasks are sent to client for speed
+		// Failure to show all possible tasks would mean difficulty to know
+		// what tasks are available to be locked
+		// in init.xxx files per module
+		// if @account='ACCOUNTS' then
+		var tt = "GS";
+		// end else
+		// tt='EXODUS'
+		// end
+		if (not authorised("DATABASE STOP", msg, tt)) {
+			// Task added
+		}
+		if (not authorised("DATABASE RESTART", msg, tt)) {
+			// Task added
+		}
+		if (not authorised("DATASET COPY", msg, tt)) {
+			// Task added
+		}
+		// if security('%RENAME%':'AUTHORISATION UPDATE KEYS',msg,'AUTHORISATION UPDATE GROUPS') else null
+		if (not authorised("AUTHORISATION UPDATE", msg, tt)) {
+			// Task added
+		}
+		if (not authorised("AUTHORISATION UPDATE LOCKS", msg, tt)) {
+			// Task added
+		}
+		if (not authorised("AUTHORISATION UPDATE LOWER GROUPS", msg, tt)) {
+			// Task added
+		}
+		if (not authorised("AUTHORISATION UPDATE HIGHER GROUPS", msg, tt)) {
+			// Task added
+		}
 
-	if (tt == "GS") {
-		tt = "LS";
-	}
-	if (not authorised("SYSTEM CONFIGURATION CREATE", msg, tt)) {
-		// Task added
-	}
-	if (not authorised("SYSTEM CONFIGURATION UPDATE", msg, tt)) {
-		// Task added
-	}
-	if (not authorised("SYSTEM CONFIGURATION DELETE", msg, tt)) {
-		// Task added
-	}
+		if (tt == "GS") {
+			tt = "LS";
+		}
+		if (not authorised("SYSTEM CONFIGURATION CREATE", msg, tt)) {
+			// Task added
+		}
+		if (not authorised("SYSTEM CONFIGURATION UPDATE", msg, tt)) {
+			// Task added
+		}
+		if (not authorised("SYSTEM CONFIGURATION DELETE", msg, tt)) {
+			// Task added
+		}
 
-	if (not authorised("CURRENCY UPDATE DECIMALS", msg, "EXODUS")) {
-		// Task added
-	}
-	if (not authorised("MENU SUPPORT", msg, "LS")) {
-		// Task added
-	}
-	// if security('%DELETE%':'SUPPORT MENU ACCESS',xx) else null
-	// if security('%DELETE%':'USE TCL COMMAND KEY F5',xx) else null
-	if (not authorised("UPLOAD CREATE")) {
-		// Task added
-	}
-	if (not authorised("REQUESTLOG ACCESS", msg, "LS")) {
-		// Task added
-	}
+		if (not authorised("CURRENCY UPDATE DECIMALS", msg, "EXODUS")) {
+			// Task added
+		}
+		if (not authorised("MENU SUPPORT", msg, "LS")) {
+			// Task added
+		}
+		// if security('%DELETE%':'SUPPORT MENU ACCESS',xx) else null
+		// if security('%DELETE%':'USE TCL COMMAND KEY F5',xx) else null
+		if (not authorised("UPLOAD CREATE")) {
+			// Task added
+		}
+		if (not authorised("REQUESTLOG ACCESS", msg, "LS")) {
+			// Task added
+		}
 
-	var dummy;
-	if (not authorised("USER UPDATE", dummy, "AUTHORISATION UPDATE")) {
-		// Task added
+		if (not authorised("USER UPDATE", msg, "AUTHORISATION UPDATE")) {
+			// Task added
+		}
+
 	}
 
 	call log2("*create user file", logtime);
@@ -1128,6 +1136,7 @@ nextreport:
 
 	call log2("*open general files", logtime);
 	var	 valid = 1;
+	var dummy;
 	// DEFINITIONS='' why was this commented out?
 	if (not openfile("ALANGUAGE", srv.alanguage, "DEFINITIONS")) {
 		valid = 0;
@@ -1364,9 +1373,8 @@ fixnextcompany:
 		// 		}
 
 		// initialise with a recent company
-		tt = srv.company.f(2).field("/", 2);
-		if (tt > maxyear) {
-			maxyear			  = tt;
+		if (var company_maxyear = srv.company.f(2).field("/", 2); company_maxyear > maxyear) {
+			maxyear			  = company_maxyear;
 			srv.gcurrcompcode = companycode;
 		}
 
@@ -1375,8 +1383,8 @@ fixnextcompany:
 			if (srv.markets.open("MARKETS", "")) {
 				var market;
 				if (not market.read(srv.markets, marketcode)) {
-					market = "";
-					msg	   = marketcode.quote() ^ " is missing from company " ^ companycode;
+					market  = "";
+					let msg = marketcode.quote() ^ " is missing from company " ^ companycode;
 					call note(msg);
 					goto fixcompany;
 				}
@@ -1385,9 +1393,10 @@ fixnextcompany:
 
 		call log2("*remove obsolete period 13 from deloitte data", logtime);
 		if (srv.company.contains("13X4WEEK,1/7,5")) {
-			tt = srv.company.f(16);
-			tt.replacer("13/", "12/");
-			srv.company(16) = tt;
+//			tt = srv.company.f(16);
+//			tt.replacer("13/", "12/");
+//			srv.company(16) = tt;
+			srv.company(16) = srv.company.f(16).replace("13/", "12/");
 fixcompany:
 			srv.company.write(srv.companies, companycode);
 			goto fixnextcompany;
@@ -1632,10 +1641,11 @@ adddatasetcodename:
 
 		// update software version in database
 		let lastupdate_key = "VERSION*LASTEMAILED";
-		if (not tt.read(DEFINITIONS, lastupdate_key)) {
-			tt = "";
+		var lastupdate_rec;
+		if (not lastupdate_rec.read(DEFINITIONS, lastupdate_key)) {
+			lastupdate_rec = "";
 		}
-		if (tt != versioninstalled) {
+		if (lastupdate_rec != versioninstalled) {
 			versioninstalled.write(DEFINITIONS, lastupdate_key);
 
 			// email users on live systems LISTED IN SYSTEM CONFIGURATION only
@@ -1644,13 +1654,13 @@ adddatasetcodename:
 					let idate = version.field(" ", 2, 4).iconv("D");
 					let itime = version.field(" ", 1).iconv("MT");
 					// tt=idate 'D/J':' ':itime 'MT'
-					tt = idate.oconv("D/E");
-					tt = idate.last(4) ^ "/" ^ tt.first(5) ^ " " ^ itime.oconv("MT");
-					call decide("Email users about upgrade?|(or later on do F5 EMAILUSERS UPGRADE " ^ tt ^ ")", "", reply);
+					var version_date = idate.oconv("D/E");
+					version_date = idate.last(4) ^ "/" ^ version_date.first(5) ^ " " ^ itime.oconv("MT");
+					call decide("Email users about upgrade?|(or later on do F5 EMAILUSERS UPGRADE " ^ version_date ^ ")", "", reply);
 					if (reply == 1) {
-						perform("EMAILUSERS UPGRADE " ^ tt);
+						perform("EMAILUSERS UPGRADE " ^ version_date);
 					}
-					call sysmsg("EXODUS Software Upgrade " ^ tt);
+					call sysmsg("EXODUS Software Upgrade " ^ version_date);
 				}
 			}
 		}
@@ -1697,8 +1707,6 @@ adddatasetcodename:
 
 	stop();
 	return 0;
-
-	return "";
 }
 
 subroutine getsystem(in config_osfilename, in confign) {
@@ -1732,24 +1740,24 @@ subroutine getsystem(in config_osfilename, in confign) {
 }
 
 subroutine failsys() {
-	msg = msg_;
+	var msgx = msg_;
 
-	tt = "*Authorisation Failure. " ^ msg;
-	tt.converter(FM, "|");
-	call log2(tt, logtime);
+	var msg2 = "*Authorisation Failure. " ^ msgx;
+	msg2.converter(FM, "|");
+	call log2(msg2, logtime);
 
 	// onscreen message
 	s33		   = SYSTEM.f(33);
 	SYSTEM(33) = "";
-	call mssg(msg ^ "", "T3", yy, "");
+	call mssg(msgx ^ "", "T3", yy, "");
 	SYSTEM(33) = s33;
 
 	// respond to user
-	msg.replacer(FM ^ FM, FM);
-	msg.converter(FM, "|");
+	msgx.replacer(FM ^ FM, FM);
+	msgx.converter(FM, "|");
 	// call oswrite(msg,system<33,10>:'.$2')
 	//var(msg).oswrite(SYSTEM.f(33, 10) ^ ".$2");
-	if (not var(msg).oswrite(SYSTEM.f(33, 10) ^ ".$2"))
+	if (not msgx.oswrite(SYSTEM.f(33, 10) ^ ".$2"))
 		loglasterror();
 
 	// and quit

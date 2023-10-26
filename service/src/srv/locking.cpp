@@ -113,7 +113,12 @@ tryagain:
 			}
 		}
 
+		//std::unreachable();
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunreachable-code-return"
+		// Here for safety in case the above code is broken by maintenance programming
 		return 0;
+#pragma GCC diagnostic pop
 	}
 
 	locklist(-1) = lockitem;
@@ -121,11 +126,11 @@ tryagain:
 	return 1;
 }
 
-subroutine getlockdesc(io lockdesc, in lockfilename, in lockkey) {
+subroutine getlockdesc(io lockdescx, in lockfilename, in lockkey) {
 
-	if (not lockdesc) {
-		lockdesc = lockfilename ^ " " ^ lockkey;
-		lockdesc.converter(".", " ");
+	if (not lockdescx) {
+		lockdescx = lockfilename ^ " " ^ lockkey;
+		lockdescx.converter(".", " ");
 	}
 
 	return;

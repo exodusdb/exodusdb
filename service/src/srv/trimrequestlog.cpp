@@ -166,7 +166,7 @@ nextrec2:
 	goto nextrec2;
 
 	// for c++
-	return 0;
+	//return 0;
 }
 
 libraryexit()

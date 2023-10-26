@@ -1,7 +1,7 @@
 #include <exodus/library.h>
 libraryinit()
 
-#include <videorw.h>
+//#include <videorw.h>
 
 #include <service_common.h>
 
@@ -11,7 +11,7 @@ var startmode;
 var temp;
 var reply;	// num
 
-function main(in startmode0, out starttime, out startdate, out startbuffer) {
+function main(in startmode0, out starttime, out startdate, out /*startbuffer*/) {
 
 	if (startmode0.unassigned()) {
 		startmode = "";
@@ -30,7 +30,7 @@ function main(in startmode0, out starttime, out startdate, out startbuffer) {
 	// autostart in system mode
 	// if @volumes else return 1
 
-	call videorw(0, 0, CRTWIDE - 1, CRTHIGH - 1, "R", startbuffer);
+	//call videorw(0, 0, CRTWIDE - 1, CRTHIGH - 1, "R", startbuffer);
 
 	if (not interactive_) {
 		return 1;

@@ -76,8 +76,6 @@ function main() {
 	stop();
 
 	return 0;
-
-	return "";
 }
 
 subroutine getver() {

@@ -13,7 +13,7 @@ libraryinit()
 var sentencex;
 var selectx;
 var nfilters0;
-var nfilters;  // num
+//var nfilters;  // num
 var filterfields;
 var filtervalues;
 dim filters;
@@ -190,7 +190,6 @@ function main(in sentence0, in select0 = "", in filters0 = "") {
 				exportable = exportable.f(3);
 				exportable.converter(VM ^ " ", FM ^ FM);
 			}
-			;
 			// Find first blank field
 			if (var pos = exportable.index(FM ^ FM);pos) {
 				keyx  = exportable.first(pos - 1);
@@ -278,7 +277,7 @@ function main(in sentence0, in select0 = "", in filters0 = "") {
 	dictids		 = "";	// dim
 	colgroups	 = "";	// dim
 	var headingx = "";
-	var coln	 = 0;
+	var colnx	 = 0;
 
 nextdict:
 	if (readnext(dictid, MV)) {
@@ -292,26 +291,26 @@ nextdict:
 		}
 
 		if (dictid == "LINE_NO") {
-			coln += 1;
-			dictids(coln)  = dictid;
-			headingx(coln) = "Line No.";
-			fmtxs(coln)	   = "R";
-			dictrecs(coln) = "";
+			colnx += 1;
+			dictids(colnx)  = dictid;
+			headingx(colnx) = "Line No.";
+			fmtxs(colnx)	   = "R";
+			dictrecs(colnx) = "";
 		} else {
 			if (dict.read(DICT, dictid)) {
 				// TODO implement JBASE/PICK dict types I/A/D
 				// call dicti2a(dict)
-				coln += 1;
+				colnx += 1;
 				// if dict<2> matches '0N' then
 				let fn = dict.f(2);
 				if (fn > nfields) {
 					nfields = fn;
 				}
 
-				fmtxs(coln) = dict.f(9)[1];
+				fmtxs(colnx) = dict.f(9)[1];
 
 				if (raw) {
-					headingx(coln) = dictid;
+					headingx(colnx) = dictid;
 				} else {
 
 					// extract title
@@ -331,22 +330,22 @@ nextdict:
 
 					// swap ' code' with '' in title
 
-					headingx(coln) = title.trim();
+					headingx(colnx) = title.trim();
 				}
 
 				// extract file
 				if (dict.f(11).starts("<")) {
 					temp			 = dict.f(11).cut(1).field(">", 1);
-					xfilenames(coln) = temp;
-					if (not xfiles(coln).open(temp, "")) {
+					xfilenames(colnx) = temp;
+					if (not xfiles(colnx).open(temp, "")) {
 						call  mssg(temp.quote() ^ " file cannot be found in dict " ^ (dictid.quote()));
 						gosub exit2();
 						return 0;
 					}
-					var title = headingx.f(coln);
+					var title = headingx.f(colnx);
 					if (title.ucase().ends(" CODE")) {
 						title.cutter(-5);
-						headingx(coln) = title;
+						headingx(colnx) = title;
 					}
 				}
 
@@ -372,18 +371,18 @@ nextdict:
 						oconvx = "";
 					}
 
-					oconvxs(coln) = oconvx;
+					oconvxs(colnx) = oconvx;
 				}
 
-				colgroups(coln) = dict.f(4).starts("M");
-				dictids(coln)	= dictid;
-				dictrecs(coln)	= dict;
+				colgroups(colnx) = dict.f(4).starts("M");
+				dictids(colnx)	= dictid;
+				dictrecs(colnx)	= dict;
 			}
 			// end
 		}
 		goto nextdict;
 	}
-	let ncols = coln;
+	let ncols = colnx;
 
 	// if @username='EXODUS' then oswrite matunparse(dictids) on 'csv'
 

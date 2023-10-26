@@ -32,24 +32,25 @@ function main(in mode) {
 		let newlocks = RECORD.f(11);
 		let oldtasks = origfullrec_.f(10);
 		let oldlocks = origfullrec_.f(11);
-		let ntasks	 = newtasks.fcount(VM);
-		for (let taskn : range(1, ntasks)) {
-			let task = newtasks.f(1, taskn);
-			if (task) {
-				let newlock = newlocks.f(1, taskn);
-				var oldtaskn;
-				if (oldtasks.locate(task, oldtaskn)) {
-					let oldlock = oldlocks.f(1, oldtaskn);
-					if (newlock != oldlock) {
-						// changed
-						emailtx2(-1) = FM ^ "Task : " ^ task ^ " *CHANGED*" ^ FM ^ "Lock : " ^ newlock ^ FM ^ " was : " ^ oldlock;
+		{
+			let ntasks	 = newtasks.fcount(VM);
+			for (let taskn : range(1, ntasks)) {
+				let task = newtasks.f(1, taskn);
+				if (task) {
+					let newlock = newlocks.f(1, taskn);
+					var oldtaskn;
+					if (oldtasks.locate(task, oldtaskn)) {
+						let oldlock = oldlocks.f(1, oldtaskn);
+						if (newlock != oldlock) {
+							// changed
+							emailtx2(-1) = FM ^ "Task : " ^ task ^ " *CHANGED*" ^ FM ^ "Lock : " ^ newlock ^ FM ^ " was : " ^ oldlock;
+						}
+					} else {
+						emailtx2(-1) = FM ^ "Task : " ^ task ^ " *CREATED*" ^ FM ^ "Lock : " ^ newlock;
 					}
-				} else {
-					emailtx2(-1) = FM ^ "Task : " ^ task ^ " *CREATED*" ^ FM ^ "Lock : " ^ newlock;
 				}
-			}
-		}  // taskn;
-
+			}  // taskn;
+		}
 		{
 			let ntasks = oldtasks.fcount(VM);
 			for (let taskn : range(1, ntasks)) {
@@ -215,27 +216,32 @@ function main(in mode) {
 		call log2("*delete some obsolete tasks", logtime);
 		var	 obsoletetasks = "COMPANY ACCESS PARTIAL";
 		obsoletetasks(-1)  = "MARKET ACCESS PARTIAL";
-		var taskn;
-		for (const var ii : range(1, 9999)) {
-			let tt = obsoletetasks.f(ii);
-			// /BREAK;
-			if (not tt)
-				break;
-			if (newuserprivs.f(10).locate(tt, taskn)) {
-				newuserprivs.remover(10, taskn);
-				newuserprivs.remover(11, taskn);
-			}
-		}  // ii;
+		{
+			var taskn;
+			for (const var ii : range(1, 9999)) {
+				let tt = obsoletetasks.f(ii);
+				// /BREAK;
+				if (not tt)
+					break;
+				if (newuserprivs.f(10).locate(tt, taskn)) {
+					newuserprivs.remover(10, taskn);
+					newuserprivs.remover(11, taskn);
+				}
+			}  // ii;
+		}
 
 		// ensure certain documents cannot be deleted
-		if (newuserprivs.f(10).locate("JOB ORDER DELETE", taskn)) {
-			newuserprivs(11, taskn) = "EXODUS";
-		}
-		if (newuserprivs.f(10).locate("JOB ESTIMATE DELETE", taskn)) {
-			newuserprivs(11, taskn) = "EXODUS";
-		}
-		if (newuserprivs.f(10).locate("JOB DELETE", taskn)) {
-			newuserprivs(11, taskn) = "EXODUS";
+		{
+			var taskn;
+			if (newuserprivs.f(10).locate("JOB ORDER DELETE", taskn)) {
+				newuserprivs(11, taskn) = "EXODUS";
+			}
+			if (newuserprivs.f(10).locate("JOB ESTIMATE DELETE", taskn)) {
+				newuserprivs(11, taskn) = "EXODUS";
+			}
+			if (newuserprivs.f(10).locate("JOB DELETE", taskn)) {
+				newuserprivs(11, taskn) = "EXODUS";
+			}
 		}
 
 		call log2("*delete any superfluous tasks", logtime);
