@@ -33,8 +33,11 @@
 // a library section is just a class plus a global exported function that allows the class
 // to be instantiated and its main(...) called from another program via so/dll delay loading
 // AND share the mv environment variables of the calling program!
-#define libraryinit(PROGRAMCLASSNAME) \
-class PROGRAMCLASSNAME##ExodusProgram : public ExodusProgramBase {
+#define libraryinit(PROGRAMCLASSNAME)                              \
+_Pragma("GCC diagnostic push")                                     \
+_Pragma("GCC diagnostic ignored \"-Wweak-vtables\"")               \
+class PROGRAMCLASSNAME##ExodusProgram : public ExodusProgramBase { \
+_Pragma("GCC diagnostic pop")
 
 // to undo an ms optimisation that prevents casting between member function pointers
 // http://social.msdn.microsoft.com/Forums/en/vclanguage/thread/a9cfa5c4-d90b-4c33-89b1-9366e5fbae74
@@ -63,9 +66,15 @@ Pointers to members have different representations; cannot cast between them
 
 #define libraryexit(PROGRAMCLASSNAME)                                                          \
  public:                                                                                       \
+	_Pragma("GCC diagnostic push")                                                             \
+	_Pragma("GCC diagnostic ignored \"-Wshadow-field\"")                                       \
 	PROGRAMCLASSNAME##ExodusProgram(ExoEnv& mv) : ExodusProgramBase(mv) {}                     \
+	_Pragma("GCC diagnostic pop")                                                              \
 };                                                                                             \
+_Pragma("GCC diagnostic push")                                                                 \
+_Pragma("GCC diagnostic ignored \"-Wmissing-prototypes\"")                                     \
 extern "C" PUBLIC void exodusprogrambasecreatedelete_##PROGRAMCLASSNAME(                       \
+_Pragma("GCC diagnostic pop")                                                                  \
 		pExodusProgramBase& pexodusprogrambase, ExoEnv& mv,                                    \
 		pExodusProgramBaseMemberFunction& pmemberfunction) {                                   \
 		if (pexodusprogrambase) {                                                              \

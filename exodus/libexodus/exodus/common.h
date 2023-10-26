@@ -16,25 +16,43 @@
 #define subroutine \
  public:           \
 	void
-#define function \
- public:         \
+#define function   \
+ public:           \
 	var
 
 ////////////////////////////////////////
 // Open a class derived from NamedCommon
 ////////////////////////////////////////
-#define commoninit(COMMON_CODE, COMMON_NO)        \
-class COMMON_CODE##_common : public NamedCommon { \
+#define commoninit(COMMON_CODE, COMMON_NO)           \
+                                                     \
+_Pragma("GCC diagnostic push")                       \
+_Pragma("GCC diagnostic ignored \"-Wweak-vtables\"") \
+                                                     \
+class COMMON_CODE##_common : public NamedCommon {    \
+                                                     \
+_Pragma("GCC diagnostic push")                       \
+                                                     \
  public:
 
 //////////////////////////////////////////////////////////////////////
 // Close the class and define a variable to access it and its members.
 //////////////////////////////////////////////////////////////////////
-#define commonexit(COMMON_CODE, COMMON_NO)                                             \
-~COMMON_CODE##_common() = default;/*{std::cout << __PRETTY_FUNCTION__ << std::endl;}*/ \
-};                                                                                     \
-[[maybe_unused]]                                                                       \
-	COMMON_CODE##_common& COMMON_CODE = static_cast<COMMON_CODE##_common&>(*mv.namedcommon[COMMON_NO]);
+#define commonexit(COMMON_CODE, COMMON_NO)                                                              \
+                                                                                                        \
+~COMMON_CODE##_common() = default;/*{std::cout << __PRETTY_FUNCTION__ << std::endl;}*/                  \
+                                                                                                        \
+};                                                                                                      \
+                                                                                                        \
+_Pragma("GCC diagnostic push")                                                                          \
+_Pragma("GCC diagnostic ignored \"-Wpadded\"")                                                          \
+                                                                                                        \
+[[maybe_unused]]                                                                                        \
+	COMMON_CODE##_common& COMMON_CODE = static_cast<COMMON_CODE##_common&>(*mv.namedcommon[COMMON_NO]); \
+                                                                                                        \
+_Pragma("GCC diagnostic pop")
+
+//e.g.
+//	agy_common& agy = static_cast<agy_common&>(*mv.namedcommon[3]);
 
 ///////////
 // Comments

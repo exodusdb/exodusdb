@@ -36,17 +36,26 @@
 
 // A program is just a class with an following
 // int main() function that creates and calls it
-#define programinit(PROGRAMCLASSNAME) \
-class PROGRAMCLASSNAME##ExodusProgram : public ExodusProgramBase {
+#define programinit(PROGRAMCLASSNAME)                                \
+_Pragma("GCC diagnostic push")                                       \
+_Pragma("GCC diagnostic ignored \"-Wweak-vtables\"")                 \
+class PROGRAMCLASSNAME##ExodusProgram : public ExodusProgramBase {   \
+_Pragma("GCC diagnostic pop")
 
 //OPTION I=Ignore. Causes error exit to be suppressed
 //OPTION D=Debug. Suppress try/catch exception handling so debuggers can catch errors
 #define programexit(PROGRAMCLASSNAME)                                                                           \
  public:                                                                                                        \
+_Pragma("GCC diagnostic push")                                                                                  \
+_Pragma("GCC diagnostic ignored \"-Wshadow-field\"")                                                            \
     PROGRAMCLASSNAME##ExodusProgram(ExoEnv& mv) : ExodusProgramBase(mv) {}                                      \
+_Pragma("GCC diagnostic pop")                                                                                   \
 };                                                                                                              \
-static int PROGRAMCLASSNAME##main2(int exodus_argc, const char* exodus_argv[], int threadno) {                         \
+static int PROGRAMCLASSNAME##main2(int exodus_argc, const char* exodus_argv[], int threadno) {                  \
+_Pragma("GCC diagnostic push")                                                                                  \
+_Pragma("GCC diagnostic ignored \"-Wshadow-field\"")                                                            \
 		ExoEnv mv;                                                                                              \
+_Pragma("GCC diagnostic pop")                                                                                   \
 		exodus_main(exodus_argc, exodus_argv, mv, threadno);                                                    \
 		int result = 0;                                                                                         \
 		PROGRAMCLASSNAME##ExodusProgram exodusprogram1(mv);                                                     \
@@ -97,7 +106,9 @@ static int PROGRAMCLASSNAME##main2(int exodus_argc, const char* exodus_argv[], i
 		return result;                                                                                          \
 	}                                                                                                           \
 	                                                                                                            \
+	int PROGRAMCLASSNAME##main(int exodus_argc, const char* exodus_argv[]);                                     \
 	int PROGRAMCLASSNAME##main(int exodus_argc, const char* exodus_argv[]) {                                    \
 		return PROGRAMCLASSNAME##main2(exodus_argc, exodus_argv, 0);                                            \
 	}
+
 #endif // EXODUS_LIBEXODUS_EXODUS_PROGRAM_H_
