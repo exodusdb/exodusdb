@@ -13,17 +13,17 @@ jobs:
       matrix:
         include:
           # Specific one
-#          - UBUNTU_VER: "22.04"
-#            PG_VER:
-#            COMPILER:
+          - UBUNTU_VER: "22.04"
+            PG_VER:
+            COMPILER:
 #          # Specific one
 #          - UBUNTU_VER: "20.04"
 #            PG_VER:
 #            COMPILER:
-          # Specific one
-          - UBUNTU_VER: "22.04"
-            PG_VER:
-            COMPILER: clang
+#          # Specific one
+#          - UBUNTU_VER: "22.04"
+#            PG_VER:
+#            COMPILER: clang
 #          # Specific one
 #          - UBUNTU_VER: "20.04"
 #            PG_VER:
