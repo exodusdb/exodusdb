@@ -803,7 +803,8 @@ struct fmt::formatter<exodus::var> {
 		if (fmt_str[2] == ':') {
 			//ctx.out() << v1.oconv(fmt_str.data());
 			auto conversion = std::string(fmt_str.begin() + 3, fmt_str.end() - 1);
-			return vformat_to(ctx.out(), "{:}", make_format_args(v1.oconv(conversion.data()).toString()));
+			auto s1 = v1.oconv(conversion.data()).toString();
+			return vformat_to(ctx.out(), "{:}", make_format_args(s1));
 		}
 
 		else
