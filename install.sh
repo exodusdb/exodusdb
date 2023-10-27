@@ -193,11 +193,13 @@ function get_dependencies_for_build {
 :
 		if [[ `lsb_release -rs` == 22.04 ]]; then
 :
-: Simply make a fake version 99 that clang++ will use. See info in Build stage
+: Simply make a fake gcc tool chain version 99 that clang++ will use. See info in Build stage
 :
 			GCC_VERSION=11
 			GCC_FAKE_VERSION=99
 			sudo ln -snf /usr/lib/gcc/x86_64-linux-gnu/$GCC_VERSION /usr/lib/gcc/x86_64-linux-gnu/$GCC_FAKE_VERSION
+			sudo ln -snf /usr/include/x86_64-linux-gnu/c++/$GCC_VERSION /usr/include/x86_64-linux-gnu/c++/$GCC_FAKE_VERSION
+			sudo ln -snf /usr/include/c++/$GCC_VERSION /usr/include/c++/$GCC_FAKE_VERSION
 
 #			for VERSION in 12 13; do
 #				REMOVABLE=`dpkg -S /usr/lib/gcc/x86_64-linux-gnu/$VERSION/ | sed 's/,//g' | sed "s#: /usr/lib/gcc/x86_64-linux-gnu/$VERSION##g"`
