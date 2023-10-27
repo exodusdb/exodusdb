@@ -793,6 +793,21 @@ struct fmt::formatter<exodus::var> {
 	auto format(const exodus::var& v1, FormatContext& ctx) const {
 		//std::cout << "c1:'" << c1 << " c2:'" << c2 << "' c3:'" << c3 << "' c4:'" << c4 << "' \n";
 		//std::cout << "fmtstr:'" << fmt_str << "' fmtcode:'" << formatcode << "' \n";
+
+		// 1. EXODUS conversions
+		// Unfortunately without time zone or number format currently.
+		// TODO allow thread_local global timezone, number format?
+		// {::MD20PZ}
+		// {::D2/E} etc.
+		// {::MTHS} etc.
+		if (fmt_str[2] == ':') {
+			//ctx.out() << v1.oconv(fmt_str.data());
+			auto conversion = std::string(fmt_str.begin() + 3, fmt_str.end() - 1);
+			return vformat_to(ctx.out(), "{:}", make_format_args(v1.oconv(conversion.data()).toString()));
+		}
+
+		else
+		// 2. C++ style format codes
 		switch (formatcode) {
 
 			// Floating point

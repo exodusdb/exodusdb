@@ -56,9 +56,10 @@ set -euxo pipefail
 : Update apt
 : ----------
 :
-	if ! ls /var/cache/apt/*.bin &>/dev/null; then
-		sudo apt -y update
-	fi
+	ls -l /var/cache/apt/ || true
+	while ! ls /var/cache/apt/*.bin && ! sudo apt -y update; do
+		sleep 1
+	done
 :
 : ------------------------
 : Work out postgres suffix
