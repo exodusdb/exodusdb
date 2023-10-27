@@ -9,6 +9,32 @@ function main() {
 
 #ifdef EXO_FORMAT
 
+	{
+		// Various exodus conversions using the {::XXXXXX} pattern
+
+		assert(format("{::MD20}", var(123.456)).outputl() == "123.46");
+		assert(format("{::MD20}", var(123456)).outputl() == "123456.00");
+		// P has no effect if both number of decimals (2) and number to move (0) are specified
+		assert(format("{::MD20P}", var(123.456)).outputl() == "123.46");
+		assert(format("{::MD20P}", var(123456)).outputl() == "123456.00");
+
+		// P = Preserve decimal point position
+
+		// A single 2 means MOVE the decimal place left by two AND show 2 decimal places
+		assert(format("{::MD2}", var(123.456)).outputl() == "1.23");
+		assert(format("{::MD2}", var(123456)).outputl() == "1234.56");
+
+		// P means "if a decimal point is found then do not move the decimal point"
+		// otherwise a single 2 means MOVE the decimal point left by 2 AND use use two decimal places
+		assert(format("{::MD2P}", var(123.456)).outputl() == "123.46");
+		assert(format("{::MD2P}", var(123456)).outputl() == "123456.00");
+
+
+		assert(format("{::MTS}", var(60*60*12 + 1)) == "12:00:01");
+
+		assert(format("{::D4/E}", var(20000)) == "03/10/2022");
+	}
+
 	assert(format("{:9.1f}", 123.456) == "    123.5");
 	assert(format("{:9.1f}", -123.456) == "   -123.5");
 //	assert(std::format("{:9.1f}", var(123.456)) == "    123.5");
