@@ -197,6 +197,12 @@ function get_dependencies_for_build {
 			sudo apt autoremove -y || true
 :
 			apt list libstdc++*dev --installed || true
+:
+			dpkg -S /usr/include/c++/12 || true
+			dpkg -S /usr/include/c++/13 || true
+			dpkg -S /usr/lib/gcc/x86_64-linux-gnu/12/ || true
+			dpkg -S /usr/lib/gcc/x86_64-linux-gnu/13/ || true
+			exit 1
 		fi
 	fi
 :
