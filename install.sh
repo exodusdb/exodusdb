@@ -197,7 +197,7 @@ function get_dependencies_for_build {
 :
 			GCC_VERSION=11
 			GCC_FAKE_VERSION=99
-			ln -snf /usr/lib/gcc/x86_64-linux-gnu/$GCC_VERSION /usr/lib/gcc/x86_64-linux-gnu/$GCC_FAKE_VERSION
+			sudo ln -snf /usr/lib/gcc/x86_64-linux-gnu/$GCC_VERSION /usr/lib/gcc/x86_64-linux-gnu/$GCC_FAKE_VERSION
 
 #			for VERSION in 12 13; do
 #				REMOVABLE=`dpkg -S /usr/lib/gcc/x86_64-linux-gnu/$VERSION/ | sed 's/,//g' | sed "s#: /usr/lib/gcc/x86_64-linux-gnu/$VERSION##g"`
