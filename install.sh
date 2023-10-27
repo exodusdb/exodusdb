@@ -189,20 +189,21 @@ function get_dependencies_for_build {
 :
 		apt list libstdc++*dev || true
 :
-: Remove troublesome latest versions of libstdc++ which are troublesome to clang 14 on Ubuntu 22.04
+: Remove troublesome latest versions 12 and 13 of gcc tool chains which are troublesome to clang 14 on Ubuntu 22.04
 :
 		if [[ `lsb_release -rs` == 22.04 ]]; then
-			sudo apt remove -y libstdc++-12-dev || true
-			sudo apt remove -y libstdc++-13-dev || true
+			sudo apt remove -y libstdc++-12-dev libgcc-12-dev:amd64, gcc-12: /usr/lib/gcc/x86_64-linux-gnu/12|| true
+			sudo apt remove -y libstdc++-13-dev libgcc-13-dev:amd64, gcc-13: /usr/lib/gcc/x86_64-linux-gnu/13 || true
 			sudo apt autoremove -y || true
+:
+: What is installed after the removal?
 :
 			apt list libstdc++*dev --installed || true
 :
-			dpkg -S /usr/include/c++/12 || true
-			dpkg -S /usr/include/c++/13 || true
-			dpkg -S /usr/lib/gcc/x86_64-linux-gnu/12/ || true
-			dpkg -S /usr/lib/gcc/x86_64-linux-gnu/13/ || true
-			exit 1
+: Nothing should provide gcc tool chains 12 and 13 now
+:
+			dpkg -S /usr/lib/gcc/x86_64-linux-gnu/12/ && false
+			dpkg -S /usr/lib/gcc/x86_64-linux-gnu/13/ && false
 		fi
 	fi
 :
