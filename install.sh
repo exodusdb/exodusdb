@@ -182,15 +182,30 @@ function get_dependencies_for_build {
 		sudo DEBIAN_FRONTEND=noninteractive apt install -y clang
 		sudo update-alternatives --set c++ /usr/bin/clang++
 		sudo update-alternatives --set cc /usr/bin/clang
+:
+		dpkg -S /usr/include/c++ || true
+:
+		apt list libstdc++*|grep -P "libstdc\+\+-[0-9]+-dev-amd64" || true
+:
+		apt list libstdc++* --installed || true
+:
+: Remove troublesome latest versions of libstdc++ which are troublesome to clang 14 on Ubuntu 22.04
+:
+		if [[ `lsb_release -rs` == 22.04 ]]; then
+			sudo DEBIAN_FRONTEND=noninteractive apt remove -y libstdc++-12-dev:amd64 || true
+			sudo DEBIAN_FRONTEND=noninteractive apt remove -y libstdc++-13-dev:amd64 || true
+:
+			apt list libstdc++* --installed || true
+		fi
 	fi
 :
 	sudo DEBIAN_FRONTEND=noninteractive apt install -y libpq-dev libboost-regex-dev libboost-locale-dev
 	#sudo DEBIAN_FRONTEND=noninteractive apt install -y g++ libboost-date-time-dev libboost-system-dev libboost-thread-dev
 :
-	ls -l /usr/lib/postgresql || true
-:
 : pgexodus
 : --------
+:
+	ls -l /usr/lib/postgresql || true
 :
 	sudo DEBIAN_FRONTEND=noninteractive apt install -y postgresql-server-dev-$SERVER_PG_VER
 	sudo DEBIAN_FRONTEND=noninteractive apt install -y postgresql-common
@@ -212,6 +227,12 @@ function build_all {
 : Info
 :
 	ls -l /usr/lib/gcc/x86_64-linux-gnu/ || true
+:
+	dpkg -S /usr/lib/gcc/x86_64-linux-gnu || true
+:
+	dpkg -S /usr/include/c++ || true
+:
+	c++ -v -print-search-dirs || true
 :
 : Build
 :
