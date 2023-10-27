@@ -15,7 +15,7 @@ function main() {
 	if (not connect()) {
 		//Pass if allowed
 		if (osgetenv("EXO_NODATA")) {
-			print("Test passed. Not really. ");
+			printx("Test passed. Not really. ");
 		}
 		printl("No default db connection to perform db testing.");
 		return 0;

@@ -24,7 +24,7 @@ var ok;	 // num
 //var nn;
 var errormsg;
 
-function main(in mode0, in subject0, in body0, in groupids0, in /*jobids0*/, in userids0, in options, io emaillog) {
+function main(in /*mode0*/, in subject0, in body0, in groupids0, in /*jobids0*/, in userids0, in options, io emaillog) {
 
 	let interactive = false;  //not(SYSTEM.f(33));
 
@@ -32,16 +32,16 @@ function main(in mode0, in subject0, in body0, in groupids0, in /*jobids0*/, in 
 	// R = REPLYTO=@username email address if exists
 	// W = Groups by Word eg user with dept MEDIA BUYING matches group MEDIA
 
-	let mode = mode0.assigned() ? mode0 : "";
+	//let modeq = mode0.assigned() ? mode0 : "";
 
 	if (SENTENCE.field(" ", 1) == "EMAILUSERS") {
 
-		let mode	= SENTENCE.field(" ", 2);
+		let modex	= SENTENCE.field(" ", 2);
 		let version = SENTENCE.field(" ", 3, 9999);
 		SENTENCE	= "";
 
-		if (mode != "UPGRADE") {
-			let msg = mode.quote() ^ " is invalid in EMAILUSERS";
+		if (modex != "UPGRADE") {
+			let msg = modex.quote() ^ " is invalid in EMAILUSERS";
 			if (interactive) {
 				call mssg(msg);
 			} else {
@@ -73,7 +73,7 @@ function main(in mode0, in subject0, in body0, in groupids0, in /*jobids0*/, in 
 		// and replyto option suppresses the email header
 		// urn:schemas:mailheader:X-Auto-Response-Suppress = RN, NRN, OOF
 		// thereby allowing Out of Office replies which we do not want
-		call emailusers(mode, subject, body, "", "", "", "", emaillog);
+		call emailusers(modex, subject, body, "", "", "", "", emaillog);
 
 		if (not emaillog) {
 			emaillog = "(nobody)";
@@ -224,7 +224,7 @@ function main(in mode0, in subject0, in body0, in groupids0, in /*jobids0*/, in 
 
 	// userinit:
 	// ///////
-		print(usercode, " ");
+		printx(usercode, " ");
 
 		if (currdept and userx.f(5) != currdept) {
 			gosub sendemails(emaillog);

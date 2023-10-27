@@ -207,6 +207,85 @@ function main() {
 libraryexit(dt)
 
 
+libraryinit(executive_email)
+//--------------------------
+	// @ans=xlate('USERS',{EXECUTIVE_CODE},7,'C')
+function main() {
+	var executivecode = calculate("EXECUTIVE_CODE");
+	executivecode.ucaser();
+
+	// @ in executive name assume is an email email
+	if (executivecode.contains("@")) {
+		ANS = executivecode;
+		ANS.converter(" ,", ";;");
+	} else {
+
+	// 1) look for user code directly
+		var userx = xlate("USERS", executivecode, "", "X");
+
+	// 2) look for user name
+		if (not userx) {
+			userx = xlate("USERS", "%" ^ executivecode ^ "%", "", "X");
+		}
+
+	// 3) try to use the first word of the executive code as the username
+	// first name only
+		if (not userx) {
+			userx = xlate("USERS", executivecode.field(" ", 1), "", "X");
+		}
+
+		if (userx.f(35) and date() >= userx.f(35)) {
+		// expired
+			ANS = "";
+		} else {
+		// not expired
+			ANS = userx.f(7);
+		}
+
+	// runtime users email
+		if (not ANS) {
+			ANS = USERNAME.xlate("USERS", 7, "X");
+		}
+
+	}
+	return ANS;
+}
+libraryexit(executive_email)
+
+
+libraryinit(executive_name)
+//-------------------------
+	// @ans=xlate('USERS',{EXECUTIVE_CODE},1,'C')
+function main() {
+	// ans={EXECUTIVE_CODE}
+	// ans2=ans
+	// convert @lower.case to @upper.case in ans2
+	// @ans=xlate('USERS',ans2,1,'X')
+	// if @ans else @ans=ans
+	var ans = calculate("EXECUTIVE_CODE");
+	var ans2 = ans;
+	ans2.ucaser();
+	if (ans2 != ans) {
+		ans.move(ANS);
+	} else {
+	// @ans=xlate('USERS','%':ans2:'%',1,'X')
+		ANS = ans2.xlate("USERS", 1, "X");
+		if (ANS) {
+			ans2 = ANS;
+			ans2.ucaser();
+			if (ans2 == ANS) {
+				ANS = capitalise(ANS);
+				}
+			} else {
+			ans.move(ANS);
+			ANS = capitalise(ANS);
+		}
+	}
+	return ANS;
+}
+libraryexit(executive_name)
+
+
 libraryinit(field)
 //----------------
 function main() {
@@ -274,6 +353,40 @@ function main() {
 	return ANS;
 }
 libraryexit(findall)
+
+
+libraryinit(full_brand_name)
+//--------------------------
+function main() {
+	var brandcode = calculate("BRAND_CODE");
+	var brand = brandcode.xlate("BRANDS", "", "X");
+	var ans = brand.f(2);
+	var brandcode1 = brand.f(8);
+	brandcode1.converter(SM, VM);
+	brandcode1 = brandcode1.f(1, 1);
+	if (brandcode1 and brandcode1 != brandcode) {
+		ans.prefixer(brandcode1.xlate("BRANDS", 2, "X") ^ " ");
+	}
+	return ans;
+}
+/*pgsql BRAND_CODE
+DECLARE
+	brandcode text;
+	brand text;
+	brandcode2 text;
+	brandname2 text;
+BEGIN
+	brandcode := key;
+	brand := xlate BRANDS brandcode ''
+	ans := split_part(brand,FM,2);
+	brandcode2 := exodus_extract_text(brand,8,1,1);
+	if brandcode2 != '' and brandcode2 != brandcode then
+		brandname2 := xlate BRANDS brandcode2 2
+		ans := brandname2 || ' ' || ans;
+	end if;
+END;
+*/
+libraryexit(full_brand_name)
 
 
 libraryinit(iscpp)

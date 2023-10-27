@@ -103,7 +103,7 @@ function main() {
 		printl("Cannot update ", configfilename, " Maybe you dont have sufficient rights");
 	}
 
-	print("Press Enter ... ");
+	printx("Press Enter ... ");
 	input();
 	return 0;
 }
@@ -121,7 +121,7 @@ subroutine getinput(in prompt, io data) {
 	var text = prompt ^ " (" ^ data ^ ")";
 	if (len(text) < 30)
 		text = oconv(text, "L#30");
-	print(text, " ? ");
+	printx(text, " ? ");
 	let result = input();
 	if (result != "")
 		data = result;
@@ -156,7 +156,7 @@ function input_adminconfig(in origconfig, out serverconfig) {
 		printl("\n", adminconfig, "\n");
 		adminconfig ^= " password=" ^ pass;
 
-		print(oconv("Attempting to connect ... ", "L#40"));
+		printx(oconv("Attempting to connect ... ", "L#40"));
 		if (connect(adminconfig)) {
 			printl("done!");
 			break;
@@ -233,21 +233,21 @@ function create_db(in dbname, in dbusername) {
 }
 
 function configure_via_connection(in adminconfig, in dbname, in dbusername, in dbuserpass) {
-	print(oconv("Creating new user " ^ dbusername ^ " ... ", "L#40"));
+	printx(oconv("Creating new user " ^ dbusername ^ " ... ", "L#40"));
 	if (not create_dbuser(dbusername, dbuserpass))
 		//stop();
 		printl("Error: Could not create user ", dbusername);
 
-	print(oconv("Creating new database " ^ dbname ^ " ... ", "L#40"));
+	printx(oconv("Creating new database " ^ dbname ^ " ... ", "L#40"));
 	if (not create_db(dbname, dbusername))
 		//stop();
 		printl("Error: Could not create database ", dbname);
 
-	print(oconv("Detaching from postgres database ... ", "L#40"));
+	printx(oconv("Detaching from postgres database ... ", "L#40"));
 	disconnect();
 	printl("done!");
 
-	print(oconv("Connecting to new database ... ", "L#40"));
+	printx(oconv("Connecting to new database ... ", "L#40"));
 	let connstr2 = adminconfig ^ " dbname=" ^ dbname;
 
 	//^" user="^dbusername^" password="^dbuserpass;
@@ -333,25 +333,25 @@ function configure_via_connection(in adminconfig, in dbname, in dbusername, in d
 		}
 	}
 
-	print(oconv("Configuring pgexodus postgres plugin ... ", "L#40"));
+	printx(oconv("Configuring pgexodus postgres plugin ... ", "L#40"));
 	if (not add_pgexodus_postgres_plugin())
 		printl("Not enough privileges?");
 
-	print(oconv("Detaching from new database ... ", "L#40"));
+	printx(oconv("Detaching from new database ... ", "L#40"));
 	disconnect();
 	printl("done!");
 
-	print(oconv("Connecting to template1 database ... ", "L#40"));
+	printx(oconv("Connecting to template1 database ... ", "L#40"));
 	let connstr3 = adminconfig ^ " dbname=template1";
 	if (not connect(connstr3))
 		abort("Stopping. Cannot connect to template1 database");
 	printl("done!");
 
-	print(oconv("Add pgexodus postgres plugin ... ", "L#40"));
+	printx(oconv("Add pgexodus postgres plugin ... ", "L#40"));
 	if (not add_pgexodus_postgres_plugin())
 		printl(" Not enough privileges");
 
-	print(oconv("Detaching from template1 database ... ", "L#40"));
+	printx(oconv("Detaching from template1 database ... ", "L#40"));
 	disconnect();
 	printl("done!");
 

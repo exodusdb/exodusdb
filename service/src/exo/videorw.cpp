@@ -1,7 +1,7 @@
 #include <exodus/library.h>
 libraryinit()
 
-function main(in x, in y, in x2, in y2, in readwrite, io buffer) {
+function main(in /*x*/, in /*y*/, in /*x2*/, in /*y2*/, in /*readwrite*/, io /*buffer*/) {
 
 	// TODO implement if screen handling required
 
@@ -10,12 +10,12 @@ function main(in x, in y, in x2, in y2, in readwrite, io buffer) {
 	// R=Read, W=Write
 
 	// evade warning "usused"
-	false and x and y and x2 and y2 and readwrite;
+	//false and x and y and x2 and y2 and readwrite;
 
-	if (readwrite == "R") {
-		buffer = "";
-	} else if (readwrite == "W") {
-	}
+//	if (readwrite == "R") {
+//		buffer = "";
+//	} else if (readwrite == "W") {
+//	}
 
 	return 0;
 }

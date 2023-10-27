@@ -78,7 +78,7 @@ programinit()
 	if (TERMINAL) {
 
 		// getcursor may return "\x1b[0;0H" if not enabled
-		print(AT(-1));
+		printx(AT(-1));
 		var cursor = getcursor();
 		TRACE(cursor)
 		//no cursor if no terminal
@@ -86,11 +86,11 @@ programinit()
 
 		//should show 1;1 in top left
 		for (const var ii : range(0, 12)) {
-			print(AT(ii, ii));
-			print(getcursor().b(2));
+			printx(AT(ii, ii));
+			printx(getcursor().b(2));
 		}
 
-		print(AT(7, 24));
+		printx(AT(7, 24));
 		cursor = getcursor();
 		TRACE(cursor)
 		assert(cursor eq "\x1b[24;7H" or cursor eq "" or cursor eq "\x1b[0;0H");

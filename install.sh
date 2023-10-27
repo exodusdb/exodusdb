@@ -5,14 +5,17 @@ set -euxo pipefail
 : Build, install and test exodus
 : ------------------------------
 :
-:	Ubuntu       Postgres  g++
-:
-:	23.10        15.4 OK   13.2
-:	23.04        15.4 OK   12.3
-:	22.04.3 LTS  14.9 OK   11.4
-:	20.04LTS     12   OK
-:
-:	18.04LTS     10   KO Exodus requires c++20 so will not build on 18.04
+: '====== ===========   ========  ====  ====='
+: 'Status Ubuntu        Postgres  g++   clang'
+: '====== ===========   ========  ====  ====='
+: 'OK     23.10            15.4   13.2     16'
+: 'OK     23.04            15.4   12.3       '
+: 'OK     22.04.3 LTS      14.9   11.4     14'
+: 'OK     20.04.6 LTS      12.16   9.4     10'
+: '====== ===========   ========  ====  ====='
+: 'KO     18.04   LTS      10                '
+: '====== ===========   ========  ====  ====='
+: 'Exodus now requires c++20 so will no longer build on 18.04'
 :
 : ------
 : Syntax
@@ -29,6 +32,8 @@ set -euxo pipefail
 : I = Install
 :
 : T = Test
+:
+: W = Install web service
 :
 : PG_VER e.g. 14 or default depends on apt and the Ubuntu version
 :
@@ -52,7 +57,7 @@ set -euxo pipefail
 : ----------
 :
 	if ! ls /var/cache/apt/*.bin &>/dev/null; then
-		sudo apt update
+		sudo apt -y update
 	fi
 :
 : ------------------------
@@ -141,10 +146,10 @@ function get_dependencies_for_build {
 :
 	sudo apt install -y postgresql-common
 :
-: pgexodus submodule
-: ------------------
+: pgexodus and fmt submodules
+: ---------------------------
 :
-	if ! test -f exodus/pgexodus/CMakeLists.txt; then
+	if ! test -f exodus/pgexodus/CMakeLists.txt || ! test -f fmt/CMakeLists.txt; then
 		git submodule init
 		git submodule update
 	fi
@@ -161,7 +166,7 @@ function get_dependencies_for_build {
 :
 : List available postgresql
 :
-	apt list postgresql*
+	apt list postgresql*dev*
 :
 : exodus and pgexodus
 : -------------------
@@ -177,22 +182,58 @@ function get_dependencies_for_build {
 		sudo apt install -y clang
 		sudo update-alternatives --set c++ /usr/bin/clang++
 		sudo update-alternatives --set cc /usr/bin/clang
+:
+		apt list libstdc++*dev --installed || true
+:
+		dpkg -S /usr/include/c++ || true
+:
+		apt list libstdc++*dev || true
+:
+: Work around troublesome latest versions 12 and 13 of gcc tool chains which are troublesome to clang 14 on Ubuntu 22.04
+:
+		if [[ `lsb_release -rs` == 22.04 ]]; then
+:
+: Simply make a fake gcc tool chain version 99 that clang++ will use. See info in Build stage
+:
+			GCC_VERSION=11
+			GCC_FAKE_VERSION=99
+			sudo ln -snf /usr/lib/gcc/x86_64-linux-gnu/$GCC_VERSION /usr/lib/gcc/x86_64-linux-gnu/$GCC_FAKE_VERSION
+			sudo ln -snf /usr/include/x86_64-linux-gnu/c++/$GCC_VERSION /usr/include/x86_64-linux-gnu/c++/$GCC_FAKE_VERSION
+			sudo ln -snf /usr/include/c++/$GCC_VERSION /usr/include/c++/$GCC_FAKE_VERSION
+
+#			for VERSION in 12 13; do
+#				REMOVABLE=`dpkg -S /usr/lib/gcc/x86_64-linux-gnu/$VERSION/ | sed 's/,//g' | sed "s#: /usr/lib/gcc/x86_64-linux-gnu/$VERSION##g"`
+#				sudo apt remove -y $REMOVABLE|| true
+#				# Fail if anything remains
+#				dpkg -S /usr/lib/gcc/x86_64-linux-gnu/$VERSION/ && false
+#			done
+#			#sudo apt autoremove -y || true
+#:
+#: What is installed after the removal?
+#:
+#			apt list libstdc++*dev --installed || true
+##:
+##: Nothing should provide gcc tool chains 12 and 13 now
+##:
+##			dpkg -S /usr/lib/gcc/x86_64-linux-gnu/12/ && false
+##			dpkg -S /usr/lib/gcc/x86_64-linux-gnu/13/ && false
+		fi
 	fi
 :
 	sudo apt install -y libpq-dev libboost-regex-dev libboost-locale-dev
 	#sudo apt install -y g++ libboost-date-time-dev libboost-system-dev libboost-thread-dev
 :
-	ls -l /usr/lib/postgresql || true
-:
 : pgexodus
 : --------
+:
+	ls -l /usr/lib/postgresql || true
 :
 	sudo apt install -y postgresql-server-dev-$SERVER_PG_VER
 	sudo apt install -y postgresql-common
 :
 	pg_config
 :
-	ls -l /usr/lib/postgresql || true
+	ls -l /usr/lib/postgresql/ || true
 }
 
 function build_all {
@@ -204,6 +245,21 @@ function build_all {
 : 2. exodus cli
 : 3. pgexodus extension
 :
+: Info
+:
+	ls -l /usr/lib/gcc/x86_64-linux-gnu/ || true
+:
+	dpkg -S /usr/lib/gcc/x86_64-linux-gnu || true
+:
+	dpkg -S /usr/include/c++ || true
+:
+	c++ -v -print-search-dirs || true
+:
+: Build
+:
+	cd $EXODUS_DIR
+	git submodule init
+	git submodule update
 	echo PGPATH=${PGPATH:-}
 	cmake -S $EXODUS_DIR -B $EXODUS_DIR/build
 	cmake --build $EXODUS_DIR/build -j$((`nproc`+1))
@@ -367,13 +423,23 @@ function test_all {
 : 'which will enable running exodus programs created by edic/compile'
 : 'from the command line without prefixing ~/bin/'
 }
+function install_www_service {
+: -------------------
+: Install www service
+: -------------------
+:
+	cd $EXODUS_DIR/service
+	./install_all.sh
+}
+:
+#function build_service {
+#: -------------
+#: BUILD SERVICE
+#: -------------
 #:
-#: -------------------
-#: Install www service
-#: -------------------
-#
-#	cd $EXODUS_DIR/service
-#	./install_all.sh'
+#	cd $EXODUS_DIR/service/src
+#	./compall
+#}
 :
 : ----
 : MAIN
@@ -386,6 +452,8 @@ function test_all {
 	[[ $STAGES =~ I ]] && install_all
 
 	[[ $STAGES =~ T ]] && test_all
+
+	[[ $STAGES =~ W ]] && install_www_service
 :
 : ----------------------------------------------------------------
 : Finished $0 $* in $((SECONDS/60)) mins and $((SECONDS%60)) secs.

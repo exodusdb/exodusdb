@@ -38,7 +38,7 @@ var haspostread;
 var realfilename;
 var triggers;
 var postreadmode;
-var ndictids;
+//var ndictids;
 //var xx;
 var row;
 

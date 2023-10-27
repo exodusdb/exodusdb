@@ -167,7 +167,7 @@ function main() {
 
 			if (text2 != text) {
 
-				//print("Ok to update? ");
+				//printx("Ok to update? ");
 				//var reply=inputl();
 				let reply = "Y";
 

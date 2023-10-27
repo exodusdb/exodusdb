@@ -112,60 +112,55 @@ stage2:
 	recn		 = 0;
 	var ndeleted = 0;
 
-nextrec2:
-	// ///////
-	if (esctoexit()) {
-		stop();
-	}
+//nextrec2:
+// ///////
+	while (not esctoexit() and readnext(ID)) {
 
-	if (not readnext(ID)) {
+		recn += 1;
+		if (TERMINAL)
+			output(AT(-40), recn, ". ", ID);
 
-		// email results of deletions
+		reqdate = ID.field("*", 2);
+
+		if (reqdate >= datekept) {
+			printx(" kept");
+			//goto nextrec2;
+			continue;
+		}
+
 		if (update) {
-			tt = "Deleted";
+			if (not RECORD.read(requestlog, ID)) {
+				//goto nextrec2;
+				continue;
+			}
+			requestlog.deleterecord(ID);
+
+			printl(" deleted");
+			ndeleted += 1;
+			sizedeleted += ID.len() + RECORD.len();
 		} else {
-			tt = "Deletable";
+			printl(" deletable");
 		}
-		tx(-1) = "";
-		tx(-1) = tt.oconv("L#22") ^ ndeleted ^ " records - " ^ oconv(sizedeleted, "[XBYTES]");
 
-		// call sysmsg(tx)
-		call log("TRIMREQUESTLOG", tx);
-
-		tx.replacer(_FM, _EOL);
-		printl();
-		printl(tx);
-
-		stop();
+		//goto nextrec2;
 	}
 
-	recn += 1;
-	if (TERMINAL)
-		output(AT(-40), recn, ". ", ID);
-
-	reqdate = ID.field("*", 2);
-
-	if (reqdate >= datekept) {
-		print(" kept");
-		goto nextrec2;
-	}
-
+	// email results of deletions
 	if (update) {
-		if (not RECORD.read(requestlog, ID)) {
-			goto nextrec2;
-		}
-		requestlog.deleterecord(ID);
-
-		printl(" deleted");
-		ndeleted += 1;
-		sizedeleted += ID.len() + RECORD.len();
+		tt = "Deleted";
 	} else {
-		printl(" deletable");
+		tt = "Deletable";
 	}
+	tx(-1) = "";
+	tx(-1) = tt.oconv("L#22") ^ ndeleted ^ " records - " ^ oconv(sizedeleted, "[XBYTES]");
 
-	goto nextrec2;
+	// call sysmsg(tx)
+	call log("TRIMREQUESTLOG", tx);
 
-	// for c++
+	tx.replacer(_FM, _EOL);
+	printl();
+	printl(tx);
+
 	return 0;
 }
 

@@ -104,7 +104,7 @@ tryagain:
 				if (tryn == 1) {
 					printl(msg, " trying for ", ntries, " secs");
 				} else if (ntries < 1000) {
-					print("*");
+					printx("*");
 				}
 				msg = "";
 				call ossleep(1000 * 1);
@@ -113,7 +113,12 @@ tryagain:
 			}
 		}
 
+		//std::unreachable();
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunreachable-code-return"
+		// Here for safety in case the above code is broken by maintenance programming
 		return 0;
+#pragma clang diagnostic pop
 	}
 
 	locklist(-1) = lockitem;
@@ -121,11 +126,11 @@ tryagain:
 	return 1;
 }
 
-subroutine getlockdesc(io lockdesc, in lockfilename, in lockkey) {
+subroutine getlockdesc(io lockdescx, in lockfilename, in lockkey) {
 
-	if (not lockdesc) {
-		lockdesc = lockfilename ^ " " ^ lockkey;
-		lockdesc.converter(".", " ");
+	if (not lockdescx) {
+		lockdescx = lockfilename ^ " " ^ lockkey;
+		lockdescx.converter(".", " ");
 	}
 
 	return;

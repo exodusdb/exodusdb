@@ -56,7 +56,7 @@ set -euxo pipefail
 : -----------------------------------------------
 :
 	if [ ! -d $EXODUS_DIR ]; then
-		git clone --branch $EXODUS_BRANCH_OR_TAG https://github.com/exodusdb/exodusdb $EXODUS_DIR
+		git clone --recursive --branch $EXODUS_BRANCH_OR_TAG https://github.com/exodusdb/exodusdb $EXODUS_DIR
 	else
 		cd $EXODUS_DIR
 		#git stash

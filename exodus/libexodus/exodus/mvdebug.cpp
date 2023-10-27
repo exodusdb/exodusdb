@@ -21,14 +21,14 @@ THE SOFTWARE.
 */
 
 #ifndef _MSC_VER
-#	define _POSIX_SOURCE
-#	define _POSIX_OSSLASH "/"
+#	define EXODUS_POSIX_SOURCE
+#	define EXODUS_POSIX_OSSLASH "/"
 #endif
 
 // for debugging
 //#define TRACING
 
-#ifdef _POSIX_SOURCE
+#ifdef EXODUS_POSIX_SOURCE
 #	include <stdio.h>
 #	include <cstdlib>
 #	include <iostream>
@@ -53,7 +53,7 @@ static void addbacktraceline(CVR frameno, CVR sourcefilename, CVR lineno, VARREF
 	if (not lineno || not lineno.isnum())
 		return;
 
-	var linetext = (frameno + 1) ^ ": " ^ sourcefilename.field2(_POSIX_OSSLASH, -1) ^ ":" ^ lineno;
+	var linetext = (frameno + 1) ^ ": " ^ sourcefilename.field2(EXODUS_POSIX_OSSLASH, -1) ^ ":" ^ lineno;
 
 	// get the source file text
 	var filetext;
@@ -175,7 +175,7 @@ var mv_backtrace(void* stack_addresses[BACKTRACE_MAXADDRESSES], size_t stack_siz
 		if (not objfilename.osfile()) {
 			// loadable program
 			var temp;
-			if (not temp.osshellread("which " ^ objfilename.field2(_POSIX_OSSLASH, -1))) {
+			if (not temp.osshellread("which " ^ objfilename.field2(EXODUS_POSIX_OSSLASH, -1))) {
 				//null
 			}
 			temp = temp.field("\n", 1).field("\r", 1);

@@ -3,13 +3,13 @@
 
 #include <singular.h>
 
-function security(in mode)
+function security(in modex)
 {
 	var op = singular(req.datafile);
-	return security2(mode,op);
+	return security2(modex,op);
 }
 
-function security2(in mode, in op0)
+function security2(in modex, in op0)
 {
 	var op=op0.convert("_.", "  ");
 	var op2 = "";
@@ -18,12 +18,12 @@ function security2(in mode, in op0)
 		op.cutter(-op2.len());
 		op2.prefixer(" ");
 	}
-	if (mode.contains("INIT")) {
-		var msg;
-		if (!(authorised(op ^ " ACCESS" ^ op2, msg, "")))
-			return invalid(msg);
+	if (modex.contains("INIT")) {
+		var msgx;
+		if (!(authorised(op ^ " ACCESS" ^ op2, msgx, "")))
+			return invalid(msgx);
 
-	}else if (mode.contains("READ") || mode.contains("WRITE")) {
+	}else if (modex.contains("READ") || modex.contains("WRITE")) {
 		if (!req.wlocked) {
 			op ^= " ACCESS";
 		} else {
@@ -33,8 +33,8 @@ function security2(in mode, in op0)
 				op ^= " CREATE";
 			}
 		}
-		var msg;
-		if (!(authorised(op ^ op2, msg, ""))) {
+		var msgx;
+		if (!(authorised(op ^ op2, msgx, ""))) {
 			if (req.orec == "" || !req.wlocked) {
 				invalid();
 				req.reset = 5;
@@ -45,10 +45,10 @@ function security2(in mode, in op0)
 			}
 		}
 
-	}else if (mode.contains("DELETE")) {
-		var msg;
-		if (!(authorised(op ^ " DELETE" ^ op2, msg, "")))
-			return invalid(msg);
+	}else if (modex.contains("DELETE")) {
+		var msgx;
+		if (!(authorised(op ^ " DELETE" ^ op2, msgx, "")))
+			return invalid(msgx);
 
 	}else if (1) {
 		return security3(op,op2);
@@ -59,16 +59,16 @@ function security2(in mode, in op0)
 function security3(in op, in op2)
 {
 	var op2b=op2.assigned()?op2:"";
-	var msg;
-	if (!(authorised(op ^ op2b, msg, "")))
-		return invalid(msg);
+	var msgx;
+	if (!(authorised(op ^ op2b, msgx, "")))
+		return invalid(msgx);
 
 	return true;
 }
 
-function invalidq(in msg)
+function invalidq(in msgx)
 {
-	return invalid(req.is.f(1, 1, 1).quote() ^ " " ^ msg);
+	return invalid(req.is.f(1, 1, 1).quote() ^ " " ^ msgx);
 }
 
 function invalid()
@@ -76,7 +76,7 @@ function invalid()
 	return invalid("");
 }
 
-function invalid(in msg)
+function invalid(in msgx)
 {
 	req.valid = 0;
 	if (!req.isorig.unassigned()) {
@@ -84,14 +84,14 @@ function invalid(in msg)
 		if (!req.reset)
 			req.reset = 1;
 	}
-	if (!msg) return true;
-	note(msg);
+	if (!msgx) return true;
+	note(msgx);
 	return 0;
 }
 
-function invalid2(in msg) {
+function invalid2(in msgx) {
 	if (not req.registerx(3)) {
-		invalid(msg);
+		invalid(msgx);
 	}
 	if (req.isorig) {
 		req.is = req.isorig;
@@ -101,20 +101,20 @@ function invalid2(in msg) {
 	return 0;
 }
 
-function note3(in msg) {
-	if (not msg) {
+function note3(in msgx) {
+	if (not msgx) {
 		return 0;
 	}
 	if (req.registerx(3)) {
 		return 0;
  	}
-	note(msg);
+	note(msgx);
 	return 0;
 }
 
-function badchars(io msg) {
+function badchars(io msgx) {
 
-	msg = "";
+	msgx = "";
 	if (not req.is) {
 		return 0;
 	}
@@ -124,8 +124,8 @@ function badchars(io msg) {
 	if (tt ne req.is) {
 		var t2 = req.is;
 		t2.converter(tt, "");
-		msg = "SORRY, YOU CANNOT USE|" ^ t2 ^ " CHARACTERS IN KEY FIELDS";
-		gosub invalid(msg);
+		msgx = "SORRY, YOU CANNOT USE|" ^ t2 ^ " CHARACTERS IN KEY FIELDS";
+		gosub invalid(msgx);
 	}
 	return 0;
 }

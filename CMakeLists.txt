@@ -34,6 +34,7 @@
 	set(CMAKE_CXX_STANDARD_REQUIRED ON)
 	set(CMAKE_CXX_EXTENSIONS OFF)
 
+	message("CMAKE_CXX_COMPILER_VERSION ${CMAKE_CXX_COMPILER_VERSION}")
 #
 # Build type
 # ##########
@@ -112,6 +113,13 @@
 		#add_compile_options(-stdlib=libc++) #24 bytes strings. apt install libc++-dev libc++abi-dev
 	endif()
 
+##
+## FMT
+## ###
+##
+## This is probably not needed here and only required by cli compile.cpp
+#	find_package(fmt)
+
 #
 # Warnings
 # ########
@@ -135,6 +143,7 @@
 		# warning: use of GNU ?: conditional expression extension, omitting middle operand [-Wgnu-conditional-omitted-operand]
 		add_compile_options (
 								-Weverything
+
 								-Wno-c++98-compat
 								-Wno-c++98-compat-pedantic
 								-Wno-reserved-macro-identifier
@@ -155,7 +164,15 @@
 								-Wno-cast-align
 								-Wno-unused-macros
 								-Wno-missing-variable-declarations
-								-Wno-covered-switch-default
+								-Wno-return-std-move-in-c++11
+
+								# building fmt
+								-Wno-documentation-unknown-command
+								-Wno-switch-enum
+								-Wno-undefined-func-template
+								#-Wno-reserved-id-macro
+								-Wno-c++20-compat
+
 							)
 		add_compile_options(-pedantic)
 		add_compile_options(-Wno-gnu-conditional-omitted-operand)
@@ -214,6 +231,19 @@
 # Subdirs/submodules
 # ##################
 #
+#	if (${CMAKE_CXX_COMPILER_VERSION} STRLESS "13")
+		message("----------------")
+		message("-- FMT EXODUS --")
+		message("----------------")
+# See https://fmt.dev/latest/usage.html
+# How to build
+		set(BUILD_SHARED_LIBS true)
+		add_subdirectory(fmt)
+		set(FMT_LIBRARIES fmt)
+#	else()
+#		message("Omitting subdir fmt")
+#	endif()
+
 	add_subdirectory(exodus/libexodus/exodus)
 	#add_subdirectory(exodus/libpgexodus/src)
 	add_subdirectory(exodus/pgexodus)

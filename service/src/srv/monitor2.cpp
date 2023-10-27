@@ -43,7 +43,7 @@ var backupdrives;
 var dbasesystems;
 var dbasecodes;
 var dbasecode;
-var dbasen;	 // num
+//var dbasen;	 // num
 var status;
 var statusn;
 var bakpars;
@@ -69,7 +69,7 @@ var home;
 var lastbackupsize;		 // num
 var lastbackupdatetime;	 // num
 var currentdatetime;	 // num
-var backupdriven;		 // num
+//var backupdriven;		 // num
 var freespace;			 // num
 var testdata;
 var testfile;
@@ -85,7 +85,7 @@ var toaddresses;
 var remindern;
 var subject;
 var body;
-var nbackupdrives;
+//var nbackupdrives;
 var present;
 var deletingsize;  // num
 //var hostdescriptions;
@@ -98,7 +98,7 @@ var errors;
 //var upgradex;
 //var upgradefiledatetime;
 var wgetoutput;
-var jj;	 // num
+//var jj;	 // num
 var osver;
 var cpudesc;
 var nprocs;
@@ -270,6 +270,7 @@ nextprocess:
 		if (not dbasecode) {
 			goto nextprocess;
 		}
+		var dbasen;
 		if (not dbasecodes.f(1).locate(dbasecode, dbasen)) {
 			dbasecodes(1, dbasen) = dbasecode;
 		}
@@ -423,9 +424,9 @@ nextprocess:
 					printl();
 					first = 0;
 				}
-				print(cmd, " ...");
+				printx(cmd, " ...");
 				// pcperform cmd
-				print("monitor2 calling shell2 ", cmd, " ...");
+				printx("monitor2 calling shell2 ", cmd, " ...");
 				call shell2(cmd);
 				call ossleep(1000 * 5);
 				printl("done.");
@@ -504,6 +505,7 @@ nextprocess:
 				}
 			}
 
+			var backupdriven;
 			if (not backupdrives.f(1).locate(backupdrive, backupdriven)) {
 				backupdrives(1, backupdriven) = backupdrive;
 

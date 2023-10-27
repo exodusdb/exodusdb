@@ -88,7 +88,7 @@
 		add_executable(${file_without_ext} ${file})
 
 		#target_link_libraries(${file_without_ext} ${PROJECT_LIBS} exodus)
-		target_link_libraries(${file_without_ext} exodus)
+		target_link_libraries(${file_without_ext} ${FMT_LIBRARIES} exodus)
 
 		#setup a classic test i.e. requiring output of "Test passed"
 		add_test(NAME ${file_without_ext} COMMAND ${file_without_ext} WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})

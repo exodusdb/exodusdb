@@ -31,10 +31,10 @@
 //					stored/deleted within connection record
 
 //for postgresql's PGconn connection handle type
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wreserved-identifier"
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wreserved-identifier"
 #include <libpq-fe.h>
-#pragma GCC diagnostic push
+#pragma clang diagnostic push
 
 #include <string>
 

@@ -126,7 +126,8 @@ function main(in msgno, io msg, in params0 = "") {
 			// keyword to force adecom to insert a c++ }  to close the switch statement
 	}
 
-	return 0;
+	//std::unreachable();
+	//return 0;
 }
 
 libraryexit()

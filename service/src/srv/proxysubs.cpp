@@ -8,7 +8,7 @@ libraryinit()
 
 #include <srv_common.h>
 
-var outfile;
+//var outfile;
 var errors;
 
 function main(in module, in mode, in stationery) {
@@ -35,7 +35,7 @@ function main(in module, in mode, in stationery) {
 	let nfiles = outfiles.fcount(VM);
 	for (const var filen : range(1, nfiles)) {
 
-		outfile = outfiles.f(1, filen);
+		var outfile = outfiles.f(1, filen);
 
 		gosub check_exists_and_maybe_convert(module, mode, stationery, outfile);
 

@@ -11,7 +11,6 @@ var mode;
 function main(in mode0) {
 
 	/*
-		-Wcast-function-type - magic word - do not remove or split from previous line
 
 		THE HEADER .H FILE OF THS SUBROUTINE IS USED AS A DUMMY
 		FOR CALLING FUNCTIONS BY VARIABLE FUNCTON NAME
@@ -35,7 +34,6 @@ function main(in mode0) {
 
 	// this is a template used for calling all filexxxsubs() routines
 	// they must have ONE in arg
-	return 0;
 
 	mode = mode0;
 
@@ -54,6 +52,7 @@ function main(in mode0) {
 		call mssg(DQ ^ (mode ^ DQ) ^ " - invalid mode ignored");
 		// valid=0
 	}
+
 	return 0;
 }
 

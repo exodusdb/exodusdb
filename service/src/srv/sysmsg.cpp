@@ -58,10 +58,10 @@ function main(in msg0, in subject0 = "", in username0 = "") {
 	if (not interactive) {
 		// print msg:', ':subjectin:', ':username
 		//printl("sysmsg: ", subjectin, ", ", username, ", ", msg.f(1, 1).field("|", 1).f(1, 1));
-		print("sysmsg:");
+		printx("sysmsg:");
 		if (not msg.contains(subjectin))
-			print(" ", subjectin);
-		print(" ", username);
+			printx(" ", subjectin);
+		printx(" ", username);
 		printl(msg);
 	}
 

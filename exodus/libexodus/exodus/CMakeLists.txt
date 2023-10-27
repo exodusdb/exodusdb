@@ -130,6 +130,10 @@
 		target_link_libraries(exodus ${Boost_LIBRARIES} ${PostgreSQL_LIBRARIES} dl ${RYU_LIBRARIES})
 	endif()
 
+# This is probably not needed here and only required by cli compile.cpp linkoptions?
+#
+	target_link_libraries(exodus ${FMT_LIBRARIES})
+
 #
 # State that the output libexodus should be installed in the default system library
 # #################################################################################

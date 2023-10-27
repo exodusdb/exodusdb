@@ -79,12 +79,12 @@ function main(in mode, in params, io result, io msg) {
 		}
 
 		// get the round robin data
-		var roundrobin;
-		if (not roundrobin.read(roundrobinfile, roundrobinkey_)) {
-			roundrobin = "";
+		var roundrobinrec;
+		if (not roundrobinrec.read(roundrobinfile, roundrobinkey_)) {
+			roundrobinrec = "";
 		}
-		if (roundrobin.contains(chr(0))) {
-			roundrobin.converter(chr(0), "");
+		if (roundrobinrec.contains(chr(0))) {
+			roundrobinrec.converter(chr(0), "");
 			//var(date() ^ FM ^ time()).oswrite("rrobin");
 			if (not var(date() ^ FM ^ time()).oswrite("rrobin")) {
 				loglasterror();
@@ -94,7 +94,7 @@ function main(in mode, in params, io result, io msg) {
 		// determine current and last timeperiod
 		// currentperiodn=date()*24*secsperperiod+mod(time(),secsperperiod)
 		let currentperiodn = ((date() * 24 * 60 * 60 + time()) / secsperperiod_).floor();
-		var lastperiodn	   = roundrobin.f(1);
+		var lastperiodn	   = roundrobinrec.f(1);
 
 		// prevent catch up longer than periodsperwindow (add 2 for safety)
 		if (currentperiodn - lastperiodn > periodsperwindow_ + 2) {
@@ -105,33 +105,33 @@ function main(in mode, in params, io result, io msg) {
 		// nb start from lastperiodn+1 to avoid clearing current period multiple times
 		// ie clear only on the first time that we arrive in it
 		for (const var periodn : range(lastperiodn + 1, currentperiodn)) {
-			roundrobin(2, periodn.mod(periodsperwindow_) + 1) = "";
+			roundrobinrec(2, periodn.mod(periodsperwindow_) + 1) = "";
 		}  // periodn;
 
 		// record the current period as the last period so that in the next call
 		// we can clear skipped periods (but not the current period again)
-		roundrobin(1)	  = currentperiodn;
+		roundrobinrec(1)	  = currentperiodn;
 		let currentbreakn = currentperiodn.mod(periodsperwindow_) + 1;
 
-		if (roundrobin.f(2).sum() < maxeventsperwindow_) {
+		if (roundrobinrec.f(2).sum() < maxeventsperwindow_) {
 
 			result = 1;
 
 			// increment the current number of events in the current period
-			roundrobin(2, currentbreakn) = roundrobin.f(2, currentbreakn) + 1;
+			roundrobinrec(2, currentbreakn) = roundrobinrec.f(2, currentbreakn) + 1;
 
 		} else {
 			result = 0;
 		}
 
-		if (roundrobin.contains(chr(0))) {
-			roundrobin.converter(chr(0), "");
+		if (roundrobinrec.contains(chr(0))) {
+			roundrobinrec.converter(chr(0), "");
 			//var(date() ^ FM ^ time()).oswrite("RRW");
 			if (not var(date() ^ FM ^ time()).oswrite("RRW")) {
 				loglasterror();
 			}
 		}
-		roundrobin.write(roundrobinfile, roundrobinkey_);
+		roundrobinrec.write(roundrobinfile, roundrobinkey_);
 
 		// for testing
 		// print lastperiodn,currentperiodn,currentbreakn,result,roundrobin<2>

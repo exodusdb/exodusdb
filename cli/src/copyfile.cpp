@@ -235,7 +235,7 @@ function main() {
 
 			//user interrupt
 			if (not mod(recn, 1000)) {
-				//print(AT(-40), sourcefilename, recn ^ ".", ID);
+				//printx(AT(-40), sourcefilename, recn ^ ".", ID);
 				if (esctoexit())
 					abort("");
 			}
@@ -255,12 +255,12 @@ function main() {
 				//skip update if no change
 				if (RECORD == oldrec) {
 					nsame++;
-					print("\tNot changed");
+					printx("\tNot changed");
 					continue;
 				}
 
 				nchanged++;
-				print("\tChanged");
+				printx("\tChanged");
 				if (not allow_overwrite) {
 					printl("\t - skipped");
 					continue;
@@ -270,7 +270,7 @@ function main() {
 			} else {
 
 				nnew++;
-				print("\tNew");
+				printx("\tNew");
 				if (not allow_new) {
 					printl("\t - skipped");
 					continue;
@@ -290,7 +290,7 @@ function main() {
 			}
 		}
 
-		print(AT(-40));
+		printx(AT(-40));
 		//if (nsame or nchanged or nnew) {
 		if (nchanged or nnew) {
 			printl("Same:", nsame, "Changed:", nchanged, "New:", nnew);
@@ -324,7 +324,7 @@ function getrec() {
 
 		if (result) {
 			recn++;
-			print(AT(-40) ^ recn ^ ".", ID);
+			printx(AT(-40) ^ recn ^ ".", ID);
 		}
 
 		return result;
@@ -412,7 +412,7 @@ function getrec() {
 	gosub unescape_sql(RECORD);
 	//TRACE(ID)
 
-	print(AT(-40) ^ recn ^ ".", ID);
+	printx(AT(-40) ^ recn ^ ".", ID);
 
 	return true;
 }

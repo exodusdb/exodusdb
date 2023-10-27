@@ -21,7 +21,7 @@ programinit()
 
 	function test(in str, in str2o = "") {
 
-	print(str, "==", str.quote());
+	printx(str, "==", str.quote());
 	printl((str eq str) ? " is true" : " is false", "and ");
 
 	//test self equality via string
@@ -59,7 +59,7 @@ programinit()
 	assert(str         eq double(str));
 
 	var str2 = (len(str2o) gt 0) ? str2o : str;
-	print("\t\t\t\t", quote(str), " -> ", quote(str2));
+	printx("\t\t\t\t", quote(str), " -> ", quote(str2));
 	printl((quote(str + 0) eq quote(str2)) ? " is true" : " is false");
 	//var x=str+0;
 	//var y=quote(str+0);

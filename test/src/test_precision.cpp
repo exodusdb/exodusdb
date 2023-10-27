@@ -769,9 +769,9 @@ function test2(const std::string str1, const std::string str2 = std::string()) {
 	dv2		= str1;
 	sv1		= dv1 ^ "x";
 	var pad = (dd1 ge 0) ? " " : "";
-	print(pad, str1, "->", pad, sv1, "target:", pad, str2);
+	printx(pad, str1, "->", pad, sv1, "target:", pad, str2);
 	//printf(" printf:  %.17g\n", dd1);
-	//print(std::format("{:10g}", dd1);
+	//printx(std::format("{:10g}", dd1);
 	osflush();
 	//gosub out();
 

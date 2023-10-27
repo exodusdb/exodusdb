@@ -25,7 +25,7 @@ var fileptr;	// num
 var buff;
 var linenox;  // num
 var eof;	  // num
-var line;
+var linex;
 //var csv;
 //var ptr;  // num
 //var ncols;
@@ -67,7 +67,7 @@ function main(in mode) {
 			return invalid(msg);
 		}
 
-		var file;
+		//var file;
 		var rec;
 		if (not rec.read(file, key)) {
 			msg = "upload.subs cannot read " ^ filename ^ " " ^ key;
@@ -287,10 +287,10 @@ postuploadfail:
 		// Option to DELETE all the files found
 		///////////////////////////////////////
 		if (request_.f(3) == "NEW") {
-			for (let file : uploadfilenames) {
+			for (let filename : uploadfilenames) {
 				// if (not osremove(uploadroot ^ relative_path ^ file)) {
-				if (osfile(uploadroot ^ relative_path ^ file)) {
-					if (not osremove(uploadroot ^ relative_path ^ file)) {
+				if (osfile(uploadroot ^ relative_path ^ filename)) {
+					if (not osremove(uploadroot ^ relative_path ^ filename)) {
 						abort(lasterror());
 					}
 				}
@@ -463,21 +463,21 @@ nextline:
 			if (eof)
 				break;
 
-			if (not(line and linenox >= startatrown)) {
+			if (not(linex and linenox >= startatrown)) {
 				goto nextline;
 			}
 
 			// Determine cols and if is csv from first line col headings
 			if (not cols) {
 
-				//csv = line.index("\",\"");
-				csv = line.index(R"___(",")___");
-				//csv = line.index(_DQ "," _DQ);
+				//csv = linex.index("\",\"");
+				csv = linex.index(R"___(",")___");
+				//csv = linex.index(_DQ "," _DQ);
 				if (csv) {
 
-					gosub parseline(line);
-					line.converter(_VM, _FM);
-					cols = line;
+					gosub parseline(linex);
+					linex.converter(_VM, _FM);
+					cols = linex;
 
 				} else {
 					var colstart = 1;
@@ -487,17 +487,17 @@ nextline:
 						// allowing column titles to have single spaces within the title
 
 						// Find the first space after the column title otherwise we are done
-						var ptr = line.index("  ");
+						var ptr = linex.index("  ");
 						if (not ptr)
 							break;
 
 						// Each column becomes a field in cols
 						// value 1 = column title
 						// value 2 = column start ptr
-						cols(-1) = line.first(ptr - 1) ^ VM ^ colstart;
+						cols(-1) = linex.first(ptr - 1) ^ VM ^ colstart;
 
 						// Find the end of the column title by skipping over spaces
-						while (line[ptr + 1] == " ")
+						while (linex[ptr + 1] == " ")
 								++ptr;
 
 						// Save the length of the column
@@ -509,7 +509,7 @@ nextline:
 
 						// Cut off the processed column title and spaces
 						// leaving the remaining column titles to be processed
-						line.cutter(ptr);
+						linex.cutter(ptr);
 
 					}  // loop;
 				}
@@ -593,16 +593,16 @@ nextline:
 			}
 
 			if (csv) {
-				gosub parseline(line);
+				gosub parseline(linex);
 			}
 
 			var rec = "";
 			for (const var coln : range(1, ncols)) {
 				let col = cols.f(coln);
 				if (csv) {
-					cell = line.f(1, coln);
+					cell = linex.f(1, coln);
 				} else {
-					cell = line.b(col.f(1, 2), col.f(1, 3)).trimlast();
+					cell = linex.b(col.f(1, 2), col.f(1, 3)).trimlast();
 				}
 				if (cell.len()) {
 					if (col.f(1, 4)) {
@@ -692,7 +692,7 @@ addbuff:
 
 		if (not buff.len()) {
 			eof	 = 1;
-			line = "";
+			linex = "";
 			return;
 		}
 	}
@@ -708,10 +708,10 @@ addbuff:
 		goto addbuff;
 	}
 
-	line = buff.field("\r", 1);
-	buff.cutter(line.len() + 1);
+	linex = buff.field("\r", 1);
+	buff.cutter(linex.len() + 1);
 
-	nquotes = line.count(DQ);
+	nquotes = linex.count(DQ);
 	while (true) {
 		// /BREAK;
 		if (not(((nquotes / 2).floor() * 2 != nquotes) and buff.len()))
@@ -719,8 +719,8 @@ addbuff:
 		let line2 = buff.field("\r", 1);
 		nquotes += line2.count(DQ);
 		buff.cutter(line2.len() + 1);
-		line ^= "\n";
-		line ^= line2;
+		linex ^= "\n";
+		linex ^= line2;
 	}  // loop;
 
 	linenox += 1;

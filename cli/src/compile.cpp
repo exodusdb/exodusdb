@@ -16,18 +16,6 @@ programinit()
 
 	// CONSTANTS
 
-	// Options
-	let verbose = contains(OPTIONS, "V");
-	let silent = count(OPTIONS, "S");
-	let debugging = not contains(OPTIONS, "R");  //no symbols for backtrace
-	// Default optimisation level from Oct 2023 is 1. Can be reduced to 0 by option o.
-	// Also compile will recognise "export CXX_OPTIONS--O0" in shell
-	let optimise = 1 + count(OPTIONS, "O") - count(OPTIONS, "o");
-	let generateheadersonly = contains(OPTIONS, "h");
-	let force = contains(OPTIONS, "F");
-	let color_option = contains(OPTIONS, "C");
-	let warnings = count(OPTIONS, "W") - count(OPTIONS, "w");
-
 	// Source extensions
 	let src_extensions = "cpp cxx cc";
 	let inc_extensions = "h hpp hxx";
@@ -58,10 +46,33 @@ programinit()
 	//more complicated so for now use extern "C" and not .def files
 	//#define EXODUS_EXPORT_USING_DEF
 
+	var verbose;
+
 function main() {
 
+	// Get more options from environment and possibly the second word of the command
+	var options = OPTIONS ^ osgetenv("EXO_COMPILE_OPTIONS");
+	let secondword = COMMAND.f(2);
+	if (var("{(").contains(secondword[1]) && var("})").contains(secondword[-1])) {
+		COMMAND.remover(2);
+		options ^= secondword;
+	}
+
+	// Options
+	verbose = contains(options, "V");
+	let silent = count(options, "S");
+	let debugging = not contains(options, "R");  //no symbols for backtrace
+	// Default optimisation level from Oct 2023 is 1. Can be reduced to 0 by option o.
+	// Also compile will recognise "export CXX_options--O0" in shell
+	let optimise = 1 + count(options, "O") - count(options, "o");
+	let generateheadersonly = contains(options, "h");
+	let force = contains(options, "F");
+	let color_option = contains(options, "C");
+	let warnings = count(options, "W") - count(options, "w");
+	let warnings_are_errors = count(options, "E") - count(options, "e");
+
 	// Skip compile for option X - allows disabling compilations unless generating headers
-	if (OPTIONS.contains("X") and not OPTIONS.contains("h"))
+	if (options.contains("X") and not options.contains("h"))
 		return 0;
 
 	// If no file/dirnames then default to previous edic
@@ -76,7 +87,7 @@ function main() {
 	// Extract file/dirnames
 	var filenames = field(COMMAND, FM, 2, 999999999);
 	var nfiles = fcount(filenames, FM);
-	if (not filenames or OPTIONS.contains("H"))
+	if (not filenames or options.contains("H"))
 		abort(
 			"SYNTAX\n"
 			"	compile FILENAME|DIRNAME ... [{OPTION...}]\n"
@@ -84,14 +95,17 @@ function main() {
 			"	R = Release (No symbols)\n"
 			"	O/OO/OOO = Optimisation levels (Poorer debugging/backtrace)\n"
 			"	o/oo/ooo = Unoptimise (cancels 'O's)\n"
-			"	W = Increase warnings\n"
-			"	w = Reduce warnings\n"
+			"	W/WW/WWW = Increase warnings\n"
+			"	w/ww/www = Reduce warnings\n"
+			"	E = Warnings are errors\n"
+			"	e = Warnings are not errors (default)/cancel E\n"
 			"	V = Verbose\n"
 			"	S = Silent (stars only)\n"
 			"	h = Generate headers only\n"
 			"	X = Skip compilation\n"
 			"ENVIRONMENT\n"
-			"	CXX_OPTIONS"
+			"	EXO_COMPILE_OPTIONS as above"
+			"	CXX_OPTIONS depends on c++ compiler used"
 			"	CXX e.g. g++, clang, c++ with or without full path"
 		);
 
@@ -179,6 +193,9 @@ function main() {
 		}
 		//basic compiler options
 
+		let clang = osshellread(compiler ^ " --version").contains("clang");
+		let gcc = not(clang) and osshellread(compiler ^ " --version").contains("g++");
+
 		//c++11/17
 		//basicoptions^=" -std=gnu++0x";//pre gcc 4.7 enables gnu extentions.
 		//basicoptions^=" -std=gnu++11";//gcc 4.7 and later  enables gnu extensions.
@@ -210,7 +227,10 @@ function main() {
 		//else
 		//linkoptions = " -lexodus -lstdc++fs -lpthread";
 		linkoptions = " -lexodus -lstdc++fs -lstdc++";
-
+//#if __has_include(<fmt/core.h>)
+#if EXO_FORMAT == 2
+		linkoptions ^= " -lfmt";
+#endif
 		//always look in header install path eg ~/inc
 		basicoptions ^= " -I" ^ incdir;
 
@@ -280,22 +300,64 @@ function main() {
 			//This enables some extra warning flags that are not enabled by -Wall.
 			basicoptions ^= " -Wextra";
 
-			// Make all warnings the same as errors
-			// Omitting this to avoid blocking application programmers over technical matters
-			//basicoptions ^= " -Werror";
-
 			// Warnings for dangerous implicit conversions e.g. int -> char
 			basicoptions ^= " -Wconversion";
 
-			// Allow "Elvis operator" ?:
-			//warning: ISO C++ does not allow ?: with omitted middle operand [-Wpedantic]
-			//basicoptions ^= " -Wpedantic";
+		}
 
-			// no-xxxxxxxx means switch off warning xxxxxxxx
+//		if (not warnings) {
+//			basicoptions ^= " -Wno-extra-semi-stmt";
+//			basicoptions ^= " -Wno-newline-eof";
+//		}
+		if (warnings > 0) {
+			if (clang)
+				basicoptions ^= " -Weverything ";
+			else {
+				//basicoptions ^= " -Weffc++ ";
+				basicoptions ^= " -Wwrite-strings ";
+				basicoptions ^= " -Wno-unknown-pragmas ";
+			}
+
+			// The following warnings will only appear at level 2 or greater
+			if (warnings < 2) {
+				basicoptions ^= " -Wno-shadow";
+				basicoptions ^= " -Wno-unreachable-code";
+				basicoptions ^= " -Wno-unused-macros";
+				if (clang) {
+					basicoptions ^= " -Wno-unreachable-code-return";
+					// use of GNU ?: conditional expression extension, omitting middle operand
+					basicoptions ^= " -Wno-gnu-conditional-omitted-operand";
+				}
+				basicoptions ^= " -Wno-padded";
+			}
+
+			if (warnings < 3) {
+				basicoptions ^= " -Wno-padded";
+			}
+
+			// The following warnings will only appear at level 3 or greater
+			if (warnings > 3) {
+				//basicoptions ^= " -Wno-missing-prototypes";
+				//basicoptions ^= " -Wno-weak-vtables";
+				basicoptions ^= " -Wpedantic";// Disallows "Elvis operator" ?:
+			}
 			//basicoptions ^= " -Wno-cast-function-type";
 		}
 
-		let gcc = osshellread(compiler ^ " --version").contains("Free Software Foundation");
+		if (clang) {
+			// Never warn about c++98 compatibility
+			basicoptions ^= " -Wno-c++98-compat";
+			basicoptions ^= " -Wno-c++98-compat-pedantic";
+
+			// Never warn about macro expansion since it is essential for mv.RECORD etc.
+			basicoptions ^= " -Wno-disabled-macro-expansion";
+		}
+
+		if (warnings_are_errors) {
+			// Omitting this by default to avoid blocking application programmers
+			// over technical matters that may arise in new versions of compilers
+			basicoptions ^= " -Werror";
+		}
 
 		// Suppress GCC and clang's warnings about each others warning flags
 		if (warnings lt 2) {
@@ -634,12 +696,12 @@ function main() {
 					errputl(" Error: Could not copy '" ^ srcfilename ^ "' to '" ^ targetfilename ^ "'");
 				} else if (not silent) {
 					printl(srcfilename);
-					//print(srcfilename ^ _EOL);
+					//printx(srcfilename ^ _EOL);
 				}
 			} else {
 				if (not silent)
 					printl(srcfilename);
-					//print(srcfilename ^ _EOL);
+					//printx(srcfilename ^ _EOL);
 			}
 			//osflush();
 			continue;
@@ -810,10 +872,10 @@ function main() {
 				printl("thread: sourcefilename=", srcfilename);
 			else if (not silent)
 				printl(srcfilename);
-				//print(srcfilename ^ _EOL);
+				//printx(srcfilename ^ _EOL);
 			else if (silent eq 1) {
 				nasterisks++;
-				print("*");
+				printx("*");
 				osflush();
 			}
 
@@ -968,7 +1030,8 @@ function main() {
 								let ch = funcargsdecl[charn];
 								if (ch eq ")") {
 									if (level eq 0) {
-										funcargsdecl.firster(charn - 1);
+										//funcargsdecl.firster(charn - 1);
+										funcargsdecl.firster(static_cast<size_t>(charn - 1));
 										break;
 									}
 									--level;
@@ -1123,8 +1186,11 @@ function main() {
 							_EOL
 							_EOL "/" "/ A 'callable' class and object that allows function call syntax to actually open shared libraries/create Exodus Program objects on the fly."
 							_EOL
+							_EOL "#pragma clang diagnostic push"
+							_EOL "#pragma clang diagnostic ignored \"-Wweak-vtables\""
 							_EOL "class Callable_funcx : public Callable"
 							_EOL "{"
+							_EOL "#pragma clang diagnostic pop"
 							_EOL "public:"
 							_EOL
 							_EOL "/" "/ A constructor providing:"
@@ -1137,6 +1203,8 @@ function main() {
 							_EOL "using Callable::operator=;"
 							_EOL
 							_EOL "/" "/ A callable member function with the right arguments, returning a var or void"
+							_EOL "#pragma GCC diagnostic push"
+							_EOL "#pragma GCC diagnostic ignored \"-Wshadow\""
 							_EOL "RETURNTYPE operator() (in arg1=var(), out arg2=var(), out arg3=var())"
 							_EOL "{"
 							_EOL
@@ -1146,11 +1214,11 @@ function main() {
 //							_EOL "  this->init();"
 							_EOL "  this->attach(\"funcx\");"
 							_EOL
-							_EOL " /" "/ Define a function type (pExodusProgramBaseMemberFunction)"
+							_EOL " /" "/ Define a function type (funcx_pExodusProgramBaseMemberFunction)"
 							_EOL " /" "/ that can call the shared library object member function"
 							_EOL " /" "/ with the right arguments and returning a var or void"
-							//_EOL " typedef RETURNTYPE (ExodusProgramBase::*pExodusProgramBaseMemberFunction)(IN,OUT,OUT);"
-							_EOL " using pExodusProgramBaseMemberFunction = auto (ExodusProgramBase::*)(IN,OUT,OUT) -> RETURNTYPE;"
+							//_EOL " typedef RETURNTYPE (ExodusProgramBase::*funcx_pExodusProgramBaseMemberFunction)(IN,OUT,OUT);"
+							_EOL " using funcx_pExodusProgramBaseMemberFunction = auto (ExodusProgramBase::*)(IN,OUT,OUT) -> RETURNTYPE;"
 							_EOL
 							_EOL " /" "/ Call the shared library object main function with the right args,"
 							_EOL " /" "/  returning a var or void"
@@ -1158,14 +1226,15 @@ function main() {
 							_EOL " return CALLMEMBERFUNCTION(*(this->plibobject_),"
 							// 2022-10-23
 							// Use reinterpret_cast instead of c-style cast for clarity in code review and assuming equivalence
-							//_EOL " ((pExodusProgramBaseMemberFunction) (this->pmemberfunc_)))"
-							_EOL " (reinterpret_cast<pExodusProgramBaseMemberFunction>(this->pmemberfunc_)))"
+							//_EOL " ((funcx_pExodusProgramBaseMemberFunction) (this->pmemberfunc_)))"
+							_EOL " (reinterpret_cast<funcx_pExodusProgramBaseMemberFunction>(this->pmemberfunc_)))"
 							_EOL "  (ARG1,ARG2,ARG3);"
 							_EOL " {after_call}"
 							_EOL
 							_EOL "}"
 							"{additional_funcs}"
 							_EOL "};"
+							_EOL "#pragma GCC diagnostic pop"
 							_EOL
 							_EOL "/" "/ A callable object of the above type that allows function call syntax to access"
 							_EOL "/" "/ an Exodus program/function initialized with the current mv environment."
@@ -1286,7 +1355,7 @@ function main() {
 				call make_include_dir(incdir);
 
 				if (verbose)
-					print("header file " ^ headerfilename ^ " ");
+					printx("header file " ^ headerfilename ^ " ");
 
 				//check if changed
 				//var headertext2 = osread(headertext2, headerfilename, locale);

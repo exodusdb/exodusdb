@@ -188,10 +188,10 @@ Within transactions, lock requests for locks that have already been obtained alw
 //
 //  grep -P '\bPQ[\w]+' *.cpp --color=always|grep -vP 'errorMessage|resultStatus|ntuples|getisnull|cmdTuples|PQexec|getvalue|getlength|nfields|PQfname|resultError'
 //
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wreserved-identifier"
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wreserved-identifier"
 #include <libpq-fe.h>  //in postgres/include
-#pragma GCC diagnostic pop
+#pragma clang diagnostic pop
 
 //#include <arpa/inet.h>//for ntohl()
 
@@ -5747,8 +5747,14 @@ static bool get_dbresult(CVR sql, DBresult& dbresult, PGconn* pgconn) {
 		case PGRES_FATAL_ERROR:
 		case PGRES_COPY_BOTH:
 		case PGRES_SINGLE_TUPLE:
+#ifdef PGRES_PIPELINE_SYNC
 		case PGRES_PIPELINE_SYNC:
+#endif
+#ifdef PGRES_PIPELINE_ABORTED
 		case PGRES_PIPELINE_ABORTED:
+#endif
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wcovered-switch-default"
 		default:
 
 			var("ERROR: mvdbpostgres pqexec " ^ var(sql)).errputl();
@@ -5758,6 +5764,7 @@ static bool get_dbresult(CVR sql, DBresult& dbresult, PGconn* pgconn) {
 				.errputl();
 
 			return false;
+#pragma clang diagnostic push
 	}
 
 	// should never get here

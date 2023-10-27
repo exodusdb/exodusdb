@@ -587,7 +587,7 @@ programexit()
 	//	var stroustrup = "Stroustrup B. - The C++ programming language (3rd edition) (1997).pdf";
 	//	var CppCounter = 0;
 	//	var begin, end;
-	//	print( L"Start of osbread() benchmark: ");
+	//	printx( L"Start of osbread() benchmark: ");
 	//	begin = begin.timedate();
 	//	printl( begin.oconv( L"MTS"));
 	//
@@ -597,10 +597,10 @@ programexit()
 	//		buf.osbread( stroustrup, i, 5);
 	////		if( buf eq L"C")
 	////			CppCounter ++;
-	////		print( var(i)^L" "^CppCounter^L"\r");
+	////		printx( var(i)^L" "^CppCounter^L"\r");
 	//	}
 	//	end = end.timedate();
-	//	print( L"End of  osbread()  benchmark: ");
+	//	printx( L"End of  osbread()  benchmark: ");
 	//	printl( end.oconv( L"MTS"));
 	//
 	////	var duration = end - begin;
@@ -609,11 +609,11 @@ programexit()
 	//	stroustrup.osclose();
 	//
 	//	printl( L"");
-	//	print( L"Print any key to execute other types of tests ...");
+	//	printx( L"Print any key to execute other types of tests ...");
 	//	int c = getchar();
 	//
 	//	var counting = "counting.txt";
-	//	print( L"Start of osbwrite() benchmark: ");
+	//	printx( L"Start of osbwrite() benchmark: ");
 	//	begin = begin.timedate();
 	//	printl( begin.oconv( L"MTS"));
 	//	for( int i = 0; i lt 3459406 / 5; i += 5)
@@ -623,7 +623,7 @@ programexit()
 	//		buf.osbwrite( counting, i);
 	//	}
 	//	end = end.timedate();
-	//	print( L"End of  osbwrite()  benchmark: ");
+	//	printx( L"End of  osbwrite()  benchmark: ");
 	//	printl( end.oconv( L"MTS"));
 	//
 	////	var duration = end - begin;
@@ -631,5 +631,5 @@ programexit()
 	//
 	//	counting.osclose();
 	//
-	//	print( L"Print any key to execute other types of tests ...");
+	//	printx( L"Print any key to execute other types of tests ...");
 	//
