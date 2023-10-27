@@ -208,7 +208,7 @@ function get_dependencies_for_build {
 #:
 #			dpkg -S /usr/lib/gcc/x86_64-linux-gnu/12/ && false
 #			dpkg -S /usr/lib/gcc/x86_64-linux-gnu/13/ && false
-#		fi
+		fi
 	fi
 :
 	sudo apt install -y libpq-dev libboost-regex-dev libboost-locale-dev
