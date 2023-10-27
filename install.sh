@@ -192,19 +192,23 @@ function get_dependencies_for_build {
 : Remove troublesome latest versions 12 and 13 of gcc tool chains which are troublesome to clang 14 on Ubuntu 22.04
 :
 		if [[ `lsb_release -rs` == 22.04 ]]; then
-			sudo apt remove -y libstdc++-12-dev libgcc-12-dev:amd64, gcc-12: /usr/lib/gcc/x86_64-linux-gnu/12|| true
-			sudo apt remove -y libstdc++-13-dev libgcc-13-dev:amd64, gcc-13: /usr/lib/gcc/x86_64-linux-gnu/13 || true
-			sudo apt autoremove -y || true
+			for VERSION in 12 13; do
+				REMOVABLE=`dpkg -S /usr/lib/gcc/x86_64-linux-gnu/$VERSION/ | sed 's/,//g'`
+				sudo apt remove -y $REMOVABLE|| true
+				# Fail if anything remains
+				dpkg -S /usr/lib/gcc/x86_64-linux-gnu/$VERSION/ && false
+			done
+			#sudo apt autoremove -y || true
 :
 : What is installed after the removal?
 :
 			apt list libstdc++*dev --installed || true
-:
-: Nothing should provide gcc tool chains 12 and 13 now
-:
-			dpkg -S /usr/lib/gcc/x86_64-linux-gnu/12/ && false
-			dpkg -S /usr/lib/gcc/x86_64-linux-gnu/13/ && false
-		fi
+#:
+#: Nothing should provide gcc tool chains 12 and 13 now
+#:
+#			dpkg -S /usr/lib/gcc/x86_64-linux-gnu/12/ && false
+#			dpkg -S /usr/lib/gcc/x86_64-linux-gnu/13/ && false
+#		fi
 	fi
 :
 	sudo apt install -y libpq-dev libboost-regex-dev libboost-locale-dev
