@@ -5,14 +5,17 @@ set -euxo pipefail
 : Build, install and test exodus
 : ------------------------------
 :
-:	Ubuntu       Postgres  g++
-:
-:	23.10        15.4 OK   13.2
-:	23.04        15.4 OK   12.3
-:	22.04.3 LTS  14.9 OK   11.4
-:	20.04LTS     12   OK
-:
-:	18.04LTS     10   KO Exodus requires c++20 so will not build on 18.04
+: '====== ===========   ========  ====  ====='
+: 'Status Ubuntu        Postgres  g++   clang'
+: '====== ===========   ========  ====  ====='
+: 'OK     23.10            15.4   13.2     16'
+: 'OK     23.04            15.4   12.3       '
+: 'OK     22.04.3 LTS      14.9   11.4     14'
+: 'OK     20.04.6 LTS      12.16   9.4     10'
+: '====== ===========   ========  ====  ====='
+: 'KO     18.04   LTS      10                '
+: '====== ===========   ========  ====  ====='
+: 'Exodus now requires c++20 so will no longer build on 18.04'
 :
 : ------
 : Syntax
@@ -29,6 +32,8 @@ set -euxo pipefail
 : I = Install
 :
 : T = Test
+:
+: W = Install web service
 :
 : PG_VER e.g. 14 or default depends on apt and the Ubuntu version
 :
@@ -161,7 +166,7 @@ function get_dependencies_for_build {
 :
 : List available postgresql
 :
-	apt list postgresql*
+	apt list postgresql*dev*
 :
 : exodus and pgexodus
 : -------------------
@@ -192,7 +197,7 @@ function get_dependencies_for_build {
 :
 	pg_config
 :
-	ls -l /usr/lib/postgresql || true
+	ls -l /usr/lib/postgresql/ || true
 }
 
 function build_all {
@@ -203,6 +208,12 @@ function build_all {
 : 1. libexodus
 : 2. exodus cli
 : 3. pgexodus extension
+:
+: Info
+:
+	ls -l /usr/lib/gcc/x86_64-linux-gnu/ || true
+:
+: Build
 :
 	cd $EXODUS_DIR
 	git submodule init
@@ -370,13 +381,23 @@ function test_all {
 : 'which will enable running exodus programs created by edic/compile'
 : 'from the command line without prefixing ~/bin/'
 }
+function install_www_service {
+: -------------------
+: Install www service
+: -------------------
+:
+	cd $EXODUS_DIR/service
+	./install_all.sh
+}
+:
+#function build_service {
+#: -------------
+#: BUILD SERVICE
+#: -------------
 #:
-#: -------------------
-#: Install www service
-#: -------------------
-#
-#	cd $EXODUS_DIR/service
-#	./install_all.sh'
+#	cd $EXODUS_DIR/service/src
+#	./compall
+#}
 :
 : ----
 : MAIN
@@ -389,6 +410,8 @@ function test_all {
 	[[ $STAGES =~ I ]] && install_all
 
 	[[ $STAGES =~ T ]] && test_all
+
+	[[ $STAGES =~ W ]] && install_www_service
 :
 : ----------------------------------------------------------------
 : Finished $0 $* in $((SECONDS/60)) mins and $((SECONDS%60)) secs.

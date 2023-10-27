@@ -194,7 +194,7 @@ function main() {
 		//basic compiler options
 
 		let clang = osshellread(compiler ^ " --version").contains("clang");
-		let gcc = osshellread(compiler ^ " --version").contains("g++");
+		let gcc = not(clang) and osshellread(compiler ^ " --version").contains("g++");
 
 		//c++11/17
 		//basicoptions^=" -std=gnu++0x";//pre gcc 4.7 enables gnu extentions.

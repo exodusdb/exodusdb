@@ -235,6 +235,9 @@
 		message("----------------")
 		message("-- FMT EXODUS --")
 		message("----------------")
+# See https://fmt.dev/latest/usage.html
+# How to build
+		set(BUILD_SHARED_LIBS true)
 		add_subdirectory(fmt)
 		set(FMT_LIBRARIES fmt)
 #	else()

@@ -24,6 +24,8 @@ set -euxo pipefail
 :
 :		T = Test
 :
+:		W = Install www service
+:
 :	PG_VER e.g. 14 or blank for the the default which depends on the Ubuntu version and apt.
 :
 : Parse command line
@@ -40,8 +42,8 @@ set -euxo pipefail
 : Validate
 : --------
 :
-	if [[ ! $STAGES =~ ^[bBiIT]*$ ]]; then
-		echo STAGES has only letters bBiIT. Check syntax above.
+	if [[ ! $STAGES =~ ^[bBiITW]*$ ]]; then
+		echo STAGES has only letters bBiITW. Check syntax above.
 		exit 1
 	fi
 :
@@ -131,7 +133,7 @@ function stage {
 : Run the stage install script
 : ----------------------------
 :
-	STAGE_LETTERS=bBiIT
+	STAGE_LETTERS=bBiITW
 	STAGE_LETTER=${STAGE_LETTERS:$((STAGE-1)):1}
 
 	lxc exec $NEW_C  --user $TARGET_UID --group $TARGET_GID -- bash -c "cd $TARGET_HOME/exodus && HOME=${TARGET_HOME} ./install.sh \"$STAGE_LETTER\" \"$COMPILER\" ${PG_VER:-''}" || exit 1
@@ -146,6 +148,7 @@ function stage {
 	[[ $STAGES =~ i ]] && stage 3 || true # 'Get dependencies for install'
 	[[ $STAGES =~ I ]] && stage 4 || true # 'Install'
 	[[ $STAGES =~ T ]] && stage 5 || true # 'Test'
+	[[ $STAGES =~ W ]] && stage 6 || true # 'Install www service'
 :
 : ===============================================================
 : Finished $0 $* in $((SECONDS/60)) mins and $((SECONDS%60)) secs

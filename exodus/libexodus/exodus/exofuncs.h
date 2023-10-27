@@ -792,7 +792,7 @@ struct fmt::formatter<exodus::var> {
 	template <typename FormatContext>
 	auto format(const exodus::var& v1, FormatContext& ctx) const {
 		//std::cout << "c1:'" << c1 << " c2:'" << c2 << "' c3:'" << c3 << "' c4:'" << c4 << "' \n";
-		std::cout << "fmtstr:'" << fmt_str << "' fmtcode:'" << formatcode << "' \n";
+		//std::cout << "fmtstr:'" << fmt_str << "' fmtcode:'" << formatcode << "' \n";
 		switch (formatcode) {
 
 			// Floating point
