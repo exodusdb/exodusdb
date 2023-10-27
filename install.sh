@@ -193,7 +193,7 @@ function get_dependencies_for_build {
 :
 		if [[ `lsb_release -rs` == 22.04 ]]; then
 			for VERSION in 12 13; do
-				REMOVABLE=`dpkg -S /usr/lib/gcc/x86_64-linux-gnu/$VERSION/ | sed 's/,//g'`
+				REMOVABLE=`dpkg -S /usr/lib/gcc/x86_64-linux-gnu/$VERSION/ | sed 's/,//g' | sed 's#: /usr/lib/gcc/x86_64-linux-gnu/$VERSION##g'`
 				sudo apt remove -y $REMOVABLE|| true
 				# Fail if anything remains
 				dpkg -S /usr/lib/gcc/x86_64-linux-gnu/$VERSION/ && false
