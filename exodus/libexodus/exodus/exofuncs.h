@@ -711,6 +711,7 @@ void printt(void) {
 
 template <typename... Args>
 var format(std::string_view sv1, Args&&... args) {
+TRACE(sv1)
 	return fmt::vformat(sv1, fmt::make_format_args(args...));
 }
 
@@ -738,6 +739,7 @@ template <>
 struct fmt::formatter<exodus::var> {
 
 	//std::string_view fmt_str; // formatting information
+	//std::string fmt_str = exodus::var("").errputl("hello");
 	std::string fmt_str;
 	char formatcode = ' ';
 	//char c1 = '~';
