@@ -167,6 +167,7 @@ programinit()
 	assert(oconv(15036, "D2/E") eq "01/03/09");
 
 	// Quarter of year
+	TRACE(oconv(15036, "DQ"))
 	assert(oconv(15036, "DQ")  eq "1");
 	assert(oconv(iconv("1/1/2000","DE"),"DQ") eq 1);
 	assert(oconv(iconv("1/4/2000","DE"),"DQ") eq 2);

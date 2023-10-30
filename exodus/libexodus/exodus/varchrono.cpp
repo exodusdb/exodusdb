@@ -376,7 +376,7 @@ var var::iconv_D(const char* conversion) const {
 
 }
 
-var var::oconv_D(const char* conversion) const {
+std::string var::oconv_D(const char* conversion) const {
 
 	// by this time *this is known to be numeric and not an empty string
 
@@ -431,7 +431,7 @@ var var::oconv_D(const char* conversion) const {
 				++conversionchar;
 				if (*conversionchar == 'A')
 					return &longmths[civil_month * 11 - 10];
-				return var(static_cast<int>(civil_month));
+				return std::to_string(static_cast<int>(civil_month));
 
 			// Not AREV
 			// DW returns day of week number number 1-7 Mon-Sun
@@ -442,7 +442,7 @@ var var::oconv_D(const char* conversion) const {
 				++conversionchar;
 				if (*conversionchar == 'A')
 					return &longdayofweeks[dow * 10 - 10];
-				return dow;
+				return std::to_string(dow);
 
 			// Not AREV
 			// DY year (four digits or D2Y works too)
@@ -460,18 +460,18 @@ var var::oconv_D(const char* conversion) const {
 			// Not AREV
 			// DD day of month
 			case 'D':
-				return var(static_cast<int>(civil_day));
+				return std::to_string(static_cast<int>(civil_day));
 
 			// Not AREV
 			// DQ returns quarter number
 			case 'Q':
-				return var(static_cast<int>((civil_month - 1) / 3) + 1);
+				return std::to_string(static_cast<int>((civil_month - 1) / 3) + 1);
 
 			// Not AREV
 			// DyJ returns day of year
 			case 'J':
 				//return static_cast<int>(desired_date.day_of_year());
-				return unixdayno - hinnant::gregorian::days_from_civil(civil_year, 1, 1) + 1;
+				return std::to_string(unixdayno - hinnant::gregorian::days_from_civil(civil_year, 1, 1) + 1);
 
 			// iso year format - at the beginning
 			case 'S':
@@ -482,7 +482,7 @@ var var::oconv_D(const char* conversion) const {
 			// DL LAST day of month
 			case 'L':
 				//return var(static_cast<int>(desired_date.end_of_month().day()));
-				return var(static_cast<int>(hinnant::gregorian::last_day_of_month(civil_year, civil_month)));
+				return std::to_string(static_cast<int>(hinnant::gregorian::last_day_of_month(civil_year, civil_month)));
 
 			default:
 				sepchar = *conversionchar;
@@ -555,8 +555,7 @@ var var::oconv_D(const char* conversion) const {
 	return ss.str();
 }
 
-var var::oconv_MT(const char* conversion) const {
-	// conversion points to the character AFTER MT - which may be \0
+std::string var::oconv_MT(const char* conversion) const {
 	// MT, MTH, MTS, MTx, MTHx, MTSx MTHS MTHSx where x is a sep char
 
 	// MT2... also a 2 digit may be inserted in all cases just after MT
@@ -572,7 +571,7 @@ var var::oconv_MT(const char* conversion) const {
 	bool showsecs = false;
 	bool input_is_hours = false;
 	char sepchar = ':';
-	const char* conversionchar = conversion;
+	const char* conversionchar = conversion + 2;
 	int timesecs;
 
 	// Analyse conversion characters
@@ -658,57 +657,58 @@ after_analyse_conversion:
 		}
 	}
 
-	var newmv;
-	newmv.var_typ = VARTYP_STR;
+//	var newmv;
+//	newmv.var_typ = VARTYP_STR;
+	std::string result;
 
 	//hours first
 	if (unlimited) {
 		//unlimited hours
 		if (negative)
-			newmv.var_str = "-";
+			result = "-";
 		//else
 		//	newmv = "";
 		if (hours < 10)
-			newmv.var_str.push_back('0');
-		newmv ^= hours;
+			result.push_back('0');
+		result.append(std::to_string(hours));
 	} else {
 		// two digit hours
 		//newmv = ("00" ^ var(hours)).last(2);
-		newmv.var_str.push_back(static_cast<char>('0' + hours / 10));
-		newmv.var_str.push_back(static_cast<char>('0' + hours % 10));
+		result.push_back(static_cast<char>('0' + hours / 10));
+		result.push_back(static_cast<char>('0' + hours % 10));
 	}
 
 	// separator
-	newmv.var_str.push_back(sepchar);
+	result.push_back(sepchar);
 
 	// two digit minutes
 	//newmv ^= ("00" ^ var(mins)).last(2);
-	newmv.var_str.push_back(static_cast<char>('0' + mins / 10));
-	newmv.var_str.push_back(static_cast<char>('0' + mins % 10));
+	result.push_back(static_cast<char>('0' + mins / 10));
+	result.push_back(static_cast<char>('0' + mins % 10));
 
 	if (showsecs) {
 
 		// separator
-		newmv.var_str.push_back(sepchar);
+		result.push_back(sepchar);
 
 		// two digit seconds
 		//newmv ^= ("00" ^ var(secs)).last(2);
-		newmv.var_str.push_back(static_cast<char>('0' + secs / 10));
-		newmv.var_str.push_back(static_cast<char>('0' + secs % 10));
+		result.push_back(static_cast<char>('0' + secs / 10));
+		result.push_back(static_cast<char>('0' + secs % 10));
 	}
 
 	// optional AM/PM suffix
 	if (twelvehour) {
 		if (am) {
-			newmv.var_str.push_back('A');
-			newmv.var_str.push_back('M');
+			result.push_back('A');
+			result.push_back('M');
 		} else {
-			newmv.var_str.push_back('P');
-			newmv.var_str.push_back('M');
+			result.push_back('P');
+			result.push_back('M');
 		}
 	}
 
-	return newmv;
+	return result;
 }
 
 }  // namespace exodus

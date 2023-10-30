@@ -496,6 +496,9 @@ VARREF var::oconv_MR(const char* conversionchar) {
 	//assertString(function_sig);
 	// conversionchar arrives pointing to 3rd character (eg A in MCA)
 
+	// Skip over the MR bit
+	conversionchar += 2;
+
 	// abort if no 3rd char
 	if (*conversionchar == '\0')
 		return (*this);

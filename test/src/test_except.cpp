@@ -426,7 +426,7 @@ programinit()
 
 		try {
 			var v	 = var("x").oconv("QQQ");
-			uncaught = "VarNotImplemented";
+			uncaught = "VarOconvNotImplemented";
 		} catch (VarNotImplemented e) {
 			printl(e.description);
 		}
@@ -532,7 +532,7 @@ programinit()
 		}
 
 		if (uncaught) {
-			printl(uncaught);
+			TRACE(uncaught)
 			assert(uncaught eq "");
 		}
 		//	try {throw Var("test");} catch (Var e){};

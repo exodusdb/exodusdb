@@ -2168,13 +2168,14 @@ var ExodusProgramBase::oconv(CVR input0, CVR conversion) {
 		// var subconversion=conversion.remove(ptr,delimiter);
 		var subconversion = conversion.substr2(ptr, delimiter);
 
-		// EITHER call standard conversion methods
-		if (subconversion[1] != "[") {
+		// EITHER 1. Call standard conversion methods
+		//if (subconversion[1] != "[") {
+		if (!subconversion.starts("[")) {
 			result = result.oconv(subconversion);
 		}
 
 		else
-		// OR call custom conversion routines
+		// OR 2. Call custom conversion routines
 		// unlike pickos, custom routines are reponsible
 		// for processing and returning multiple values
 		{
