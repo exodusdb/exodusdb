@@ -2214,35 +2214,35 @@ class PUBLIC var final {
 
 	// TODO check if can speed up by returning reference to converted self like MC
 
-	// Text -> left/right/center padded and truncated
-	ND var oconv_LRC(CVR format) const;
-	// Text -> justified and folded
-	ND var oconv_T(CVR format) const;
-	// Int -> Date
-	ND var oconv_D(const char* conversion) const;
-	// Int -> Time
-	ND var oconv_MT(const char* conversion) const;
-	// Decimal -> Decimal
-	ND var oconv_MD(const char* conversion) const;
-	// Character replacement
+	// Faster primitive oconv
+	// L/R/C: Text -> left/right/center padded and truncated
+	ND std::string oconv_LRC(CVR format) const;
+	// T: Text -> justified and folded
+	ND std::string oconv_T(CVR format) const;
+	// D: Int -> Date
+	ND std::string oconv_D(const char* conversion) const;
+	// MT: Int -> Time
+	ND std::string oconv_MT(const char* conversion) const;
+	// MD: Decimal -> Decimal
+	ND std::string oconv_MD(const char* conversion) const;
+	// MR: Character replacement
 	ND VARREF oconv_MR(const char* conversion);
-	// Hex output
-	// Chars -> Hex
-	ND var oconv_HEX(const int ioratio) const;
-	// Record (FM) -> text (\n) and \ line endings
-	ND var oconv_TX(const int raw = 0) const;
+	// HEX: Chars -> Hex
+	ND std::string oconv_HEX(const int ioratio) const;
+	// TX: Record (FM) -> text (\n) and \ line endings
+	ND std::string oconv_TX(const char* conversion) const;
 
 	// Faster primitive iconv
-	// Int <- Date
+	// D: Int <- Date
 	ND var iconv_D(const char* conversion) const;
-	// Int <- Time
+	// MT: Int <- Time
 	ND var iconv_MT() const;
-	// Decimal <- Decimal
+	// MD_ Decimal <- Decimal
 	ND var iconv_MD(const char* conversion) const;
 	// Chars <- Hex
 	ND var iconv_HEX(const int ioratio) const;
-	// Record (FM) <- text (\n) and \ line endings
-	ND var iconv_TX(const int raw = 0) const;
+	// TX: Record (FM) <- text (\n) and \ line endings
+	ND var iconv_TX(const char* conversion) const;
 
 	ND std::fstream* osopenx(CVR osfilename, const char* locale) const;
 

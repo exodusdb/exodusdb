@@ -319,7 +319,8 @@ programinit()
 	}
 
 	{
-		printl("Check BYes,No");
+		printl("Check conversion 'BYes,No'");
+		TRACE(oconv(var(true), "BYes,No"))
 		assert(oconv(var(true), "BYes,No").outputl()  eq "Yes");
 		assert(oconv(var(false), "BYes,No").outputl() eq "No");
 	}

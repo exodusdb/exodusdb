@@ -549,6 +549,7 @@ programinit()
 		assert(oconv('\x17', "HEX") eq "17");
 		assert(oconv('\x18', "HEX") eq "18");
 		assert(oconv('\x19', "HEX") eq "19");
+		//TRACE( oconv('\x1a', "HEX")        );
 		assert(oconv('\x1a', "HEX") eq "1A");
 		assert(oconv('\x1b', "HEX") eq "1B");
 		assert(oconv('\x1c', "HEX") eq "1C");

@@ -35,29 +35,21 @@ namespace exodus {
 // Would be 256 if RM was character number 255.
 // Last delimiter character is 0x1F (RM)
 // Used in var::remove()
-// #define LASTDELIMITERCHARNOPLUS1 0x20
-static constexpr int LASTDELIMITERCHARNOPLUS1 = FM_ + 2;
+// #define LAST_DELIMITER_CHARNO_PLUS1 0x20
+static constexpr int LAST_DELIMITER_CHARNO_PLUS1 = RM_ + 1;
 
 static constexpr int HEX_PER_CHAR = sizeof(char) * 2;
-
-//var var::iconv(CVR convcstr) const {
-//
-//	THISIS("var var::iconv(CVR convcstr) const")
-//	ISSTRING(convcstr)
-//
-//	return iconv(convcstr.var_str.c_str());
-//}
 
 /**
 	Converts from external format to internal depending on conversion
 
-	@param convcstr A string containing a conversion instruction
+	@param conversion A string containing a conversion instruction
 
 	@return The result in internal format
 */
-var var::iconv(const char* convcstr) const {
+var var::iconv(const char* conversion) const {
 
-	THISIS("var var::iconv(const char* convcstr) const")
+	THISIS("var var::iconv(const char* conversion) const")
 	assertString(function_sig);
 
 	// empty string in, empty string out
@@ -69,12 +61,12 @@ var var::iconv(const char* convcstr) const {
 	var part;
 	var charn = 1;
 	var terminator;
-	var outx = "";
+	var result = "";
 
-	const char* conversionchar = convcstr;
+	const char* pconversion = conversion;
 
 	// check first character
-	switch (*conversionchar) {
+	switch (*pconversion) {
 		// D
 		case 'D':
 
@@ -87,21 +79,22 @@ var var::iconv(const char* convcstr) const {
 
 				if (part.var_typ & VARTYP_STR && part.var_str.empty()) {
 				} else
-					outx ^= part.iconv_D(convcstr);
+					result ^= part.iconv_D(conversion);
 
 				if (!terminator)
 					break;
-				outx ^= var().chr(LASTDELIMITERCHARNOPLUS1 - terminator.toInt());
+				result ^= var().chr(LAST_DELIMITER_CHARNO_PLUS1 - terminator.toInt());
 			} while (true);
 
-			return outx;
+			return result;
 			//std::unreachable();
 			break;
+
 		// "MD", "MC", "MT", "MX"
 		case 'M':
 
 			// point to 2nd character
-			++conversionchar;
+			++pconversion;
 
 			while (true) {
 
@@ -114,11 +107,11 @@ var var::iconv(const char* convcstr) const {
 				if (part.var_typ & VARTYP_STR && part.var_str.empty()) {
 				}
 
-				// do convcstr on a number
+				// do conversion on a number
 				else {
 
 					// check second character
-					switch (*conversionchar) {
+					switch (*pconversion) {
 
 						// "MD" "MC" - Decimal places
 						case 'D':
@@ -127,19 +120,20 @@ var var::iconv(const char* convcstr) const {
 							throw VarError(
 								"iconv MD and MC are not implemented yet");
 							//							output
-							//^= part.iconv_MD(convcstr);
+							//^= part.iconv_MD(conversion);
 							//std::unreachable();
 							break;
 
 						// "MT"
 						case 'T':
-							// outx ^= part.iconv_MT(convcstr);
-							outx ^= part.iconv_MT();
+							// result ^= part.iconv_MT(conversion);
+							result ^= part.iconv_MT();
 							break;
 
 						// "MR" - replace iconv is same as oconv!
 						case 'R':
-							outx ^= part.oconv_MR(conversionchar);
+							//result ^= part.oconv_MR(pconversion);
+							result ^= part.oconv_MR(conversion);
 							break;
 
 						// "MX" number to hex (not string to hex)
@@ -147,7 +141,7 @@ var var::iconv(const char* convcstr) const {
 							throw VarNotImplemented("iconv('MX')");
 							// std::ostringstream ss;
 							// ss << std::hex << std::uppercase << part.round().toInt();
-							// outx ^= ss.str();
+							// result ^= ss.str();
 							// break;
 							//std::unreachable();
 
@@ -170,7 +164,7 @@ var var::iconv(const char* convcstr) const {
 								opart.var_typ = VARTYP_INT;
 								opart.var_int = int1;
 
-								outx ^= opart;
+								result ^= opart;
 							}
 							catch ([[maybe_unused]] std::invalid_argument& e) {
 								// If anything but 0 and 1 in string
@@ -182,10 +176,10 @@ var var::iconv(const char* convcstr) const {
 
 				if (!terminator)
 					break;
-				outx ^= var().chr(LASTDELIMITERCHARNOPLUS1 - terminator.toInt());
+				result ^= var().chr(LAST_DELIMITER_CHARNO_PLUS1 - terminator.toInt());
 			}
 
-			return outx;
+			return result;
 			//std::unreachable();
 			break;
 
@@ -195,15 +189,15 @@ var var::iconv(const char* convcstr) const {
 		case 'T':
 			// TX
 			// TX1 TX2 TX3 TX4 TX5 for progressive conversion starting with FM
-			++conversionchar;
-			if (*conversionchar == 'X') {
-				++conversionchar;
-				return iconv_TX(*conversionchar);
+			++pconversion;
+			if (*pconversion == 'X') {
+				++pconversion;
+				return iconv_TX(conversion);
 			}
 			[[fallthrough]];
 		case 'C':
 			// return "";
-			return convcstr;
+			return conversion;
 			//std::unreachable();
 			break;
 
@@ -218,11 +212,11 @@ var var::iconv(const char* convcstr) const {
 
 			// check 2nd character is E, 3rd character is X and next character is null, or a
 			// digit
-			if ((*(++conversionchar) == 'E') && (*(++conversionchar) == 'X')) {
+			if ((*(++pconversion) == 'E') && (*(++pconversion) == 'X')) {
 				// point to one character after HEX
-				++conversionchar;
+				++pconversion;
 
-				switch (*conversionchar) {
+				switch (*pconversion) {
 					case '\0':
 						return iconv_HEX(HEX_PER_CHAR);
 						//std::unreachable();
@@ -251,28 +245,30 @@ var var::iconv(const char* convcstr) const {
 		// access to mv environment required to call external subroutines
 		case '[':
 
-			throw VarError("Custom conversions like (" ^ var(convcstr) ^
+			throw VarError("Custom conversions like (" ^ var(conversion) ^
 						  ") must be called like a function iconv(input,conversion) not "
 						  "like a method, input.iconv(conversion)");
 			break;
 
-		// empty convcstr string - no conversion
+		// empty conversion string - no conversion
 		case '\0':
 			return (*this);
 	}
 
 	// TODO implement
-	throw VarNotImplemented("iconv '" ^ var(convcstr) ^ "' not implemented yet ");
+	throw VarNotImplemented("iconv '" ^ var(conversion) ^ "' not implemented yet ");
 
 	//std::unreachable();
 	//return *this;
 }
 
-var var::oconv_T(CVR format) const {
+std::string var::oconv_T(CVR format) const {
 
 	// expecting only "T#99" with no mask at the moment
 
-	var just = (format.field("#", 1, 1))[1];
+	// TODO to pure c++ for speed
+
+	//var just = (format.field("#", 1, 1))[1];
 
 	var width2 = format.field("#", 2, 1);
 
@@ -290,7 +286,7 @@ var var::oconv_T(CVR format) const {
 	else
 		fillchar = ' ';
 
-	var outx = "";
+	std::string result = "";
 
 	var terminator;
 	std::size_t nwords;
@@ -314,15 +310,15 @@ var var::oconv_T(CVR format) const {
 			auto partlen = part.var_str.size();
 			if (partlen <= width) {
 
-				// outx ^= part;
-				// outx ^= var(width-partlen).space();
+				// result ^= part;
+				// result ^= var(width-partlen).space();
 				part.var_str.resize(width, fillchar);
-				outx ^= part.var_str;
+				result += part.var_str;
 
 				if (!terminator)
 					break;
 
-				outx ^= var().chr(LASTDELIMITERCHARNOPLUS1 - terminator.toInt());
+				result.push_back(char(LAST_DELIMITER_CHARNO_PLUS1 - terminator.toInt()));
 
 				continue;
 			}
@@ -338,15 +334,15 @@ var var::oconv_T(CVR format) const {
 				if (wordn > 1) {
 					if (!wordlen)
 						continue;
-					outx ^= TM;
+					result.push_back(TM_);
 				}
 
 				// long words get tm inserted every width characters
 				for (std::size_t ii = 1; ii <= wordlen; ii += width) {
 					if (ii > 1)
-						outx.var_str.push_back(TM_);
-					//outx ^= word.b(ii, width);
-					outx.var_str.append(word.var_str, ii - 1, width);
+						result.push_back(TM_);
+					//result ^= word.b(ii, width);
+					result.append(word.var_str, ii - 1, width);
 				}	// ii;
 
 				auto remaining = width - (wordlen % width);
@@ -355,7 +351,7 @@ var var::oconv_T(CVR format) const {
 
 					if (remaining <= 1) {
 						if (remaining)
-							outx ^= fillchar;
+							result.push_back(fillchar);
 					} else {
 
 						// try to squeeze in following words into the
@@ -369,14 +365,14 @@ var var::oconv_T(CVR format) const {
 								break;
 
 							wordn += 1;
-							outx ^= fillchar;
-							outx ^= nextword;
+							result.push_back(fillchar);
+							result += nextword.var_str;
 							remaining -= nextwordlen + 1;
 						}  // loop;
 
-						// outx ^= var(remaining).space();
+						// result ^= var(remaining).space();
 						spacing.resize(remaining, fillchar);
-						outx ^= spacing;
+						result += spacing;
 					}
 				}
 
@@ -386,14 +382,14 @@ var var::oconv_T(CVR format) const {
 		if (!terminator)
 			break;
 
-		outx ^= var().chr(LASTDELIMITERCHARNOPLUS1 - terminator.toInt());
+		result.push_back(char(LAST_DELIMITER_CHARNO_PLUS1 - terminator.toInt()));
 
 	}  // loop parts
 
-	return outx;
+	return result;
 }
 
-var var::oconv_MD(const char* conversion) const {
+std::string var::oconv_MD(const char* conversion) const {
 
 	// http://www.d3ref.com/index.php?token=basic.masking.function
 
@@ -534,34 +530,34 @@ convert:
 
 	//var part1 = newmv.field(".", 1);
 	//var part2 = newmv.field(".", 2);
-	std::string part1;
-	std::string part2;
+	std::string strpart1;
+	std::string strpart2;
 	std::string::size_type decpos = newmv.var_str.find('.');
 	if (decpos == std::string::npos) {
-		part1 = newmv.var_str;
-		part2 = "";
+		strpart1 = newmv.var_str;
+		strpart2 = "";
 	} else {
-		part1 = newmv.var_str.substr(0, decpos);
-		part2 = newmv.var_str.substr(decpos + 1);
+		strpart1 = newmv.var_str.substr(0, decpos);
+		strpart2 = newmv.var_str.substr(decpos + 1);
 	}
 
-	auto part2len = part2.size();
+	auto strpart2len = strpart2.size();
 
 	// thousand separators
 	if (septhousands) {
-		auto part1len = part1.size();
-		if (part1len > 3) {
+		auto strpart1len = strpart1.size();
+		if (strpart1len > 3) {
 			char thousandsep = (conversion[1] == 'C') ? '.' : ',';
-//			std::size_t minii = part1.front() == '-' ? 2 : 1;
-			std::size_t minpos = part1.front() == '-' ? 2 : 1;
-//			for (std::size_t ii = part1len - 2; ii > minii; ii -= 3) {
-//				//part1.paster(ii, 0, thousandsep);
-//				part1.insert(ii - 1, 1, thousandsep);
+//			std::size_t minii = strpart1.front() == '-' ? 2 : 1;
+			std::size_t minpos = strpart1.front() == '-' ? 2 : 1;
+//			for (std::size_t ii = strpart1len - 2; ii > minii; ii -= 3) {
+//				//strpart1.paster(ii, 0, thousandsep);
+//				strpart1.insert(ii - 1, 1, thousandsep);
 //			}
 			{
-				auto pos = part1.size() - 2;
+				auto pos = strpart1.size() - 2;
 				while (pos > minpos) {
-					part1.insert(pos - 1, 1, thousandsep);
+					strpart1.insert(pos - 1, 1, thousandsep);
 					// Be careful not to allow pos < 0 since it is unsigned
 					if (pos < 4)
 						break;
@@ -575,19 +571,19 @@ convert:
 	//if (ndecimals > 0) {
 	if (ndecimals != 0) {
 		// append decimal point
-		//part1 ^= (conversion[1] == 'C') ? ',' : '.';
-		part1.push_back((conversion[1] == 'C') ? ',' : '.');
+		//strpart1 ^= (conversion[1] == 'C') ? ',' : '.';
+		strpart1.push_back((conversion[1] == 'C') ? ',' : '.');
 
-		if (ndecimals == part2len)
-			//part1 ^= part2;
-			part1.append(part2);
+		if (ndecimals == strpart2len)
+			//strpart1 ^= strpart2;
+			strpart1.append(strpart2);
 
-		else if (ndecimals > part2len)
-			//part1 ^= part2 ^ std::string(ndecimals - part2len, '0');
-			part1.append(part2).append(std::string(ndecimals - part2len, '0'));
+		else if (ndecimals > strpart2len)
+			//strpart1 ^= strpart2 ^ std::string(ndecimals - strpart2len, '0');
+			strpart1.append(strpart2).append(std::string(ndecimals - strpart2len, '0'));
 
-		else /*if (ndecimals < part2len)*/
-			part1.append(part2.substr(0, ndecimals));
+		else /*if (ndecimals < strpart2len)*/
+			strpart1.append(strpart2.substr(0, ndecimals));
 
 	}
 
@@ -597,55 +593,55 @@ convert:
 			break;
 
 		case '<':
-			if (part1.front() == '-') {
-				part1.front() = '<';
-				part1.push_back('>');
+			if (strpart1.front() == '-') {
+				strpart1.front() = '<';
+				strpart1.push_back('>');
 			}
 			break;
 
 		case '-':
-			if (part1.front() == '-') {
-				part1.erase(0, 1);
-				part1.push_back('-');
+			if (strpart1.front() == '-') {
+				strpart1.erase(0, 1);
+				strpart1.push_back('-');
 			} else
-				part1.push_back(' ');
+				strpart1.push_back(' ');
 			break;
 
 		case 'C':
-			if (part1.front() == '-') {
-				part1.erase(0,1);
+			if (strpart1.front() == '-') {
+				strpart1.erase(0,1);
 				//CR
-				part1.push_back('C');
-				part1.push_back('R');
+				strpart1.push_back('C');
+				strpart1.push_back('R');
 			} else {
 				//DR
-				part1.push_back(' ');
-				part1.push_back(' ');
+				strpart1.push_back(' ');
+				strpart1.push_back(' ');
 			}
 			break;
 
 		case 'D':
-			if (part1.front() == '-') {
-				part1.erase(0,1);
+			if (strpart1.front() == '-') {
+				strpart1.erase(0,1);
 				//DR
-				part1.push_back('D');
-				part1.push_back('B');
+				strpart1.push_back('D');
+				strpart1.push_back('B');
 			} else {
 				//CR
-				part1.push_back(' ');
-				part1.push_back(' ');
+				strpart1.push_back(' ');
+				strpart1.push_back(' ');
 			}
 			break;
 
 	}
 
 	if (prefixchar != '\0')
-		part1.insert(0, 1, prefixchar);
+		strpart1.insert(0, 1, prefixchar);
 
-	return part1;
+	return strpart1;
 }
 
-var var::oconv_LRC(CVR format) const {
+std::string var::oconv_LRC(CVR format) const {
 
 	// TODO convert to C instead of var for speed
 	// and implement full mask options eg L#2-#3-#4 etc
@@ -664,7 +660,7 @@ var var::oconv_LRC(CVR format) const {
 	else
 		fillchar = ' ';
 
-	var outx = "";
+	std::string result = "";
 	var terminator;
 
 	var part;
@@ -685,30 +681,29 @@ var var::oconv_LRC(CVR format) const {
 			if (width > part.var_str.size()) {
 				remaining = width - part.var_str.size();
 				if (just == "L") {
-					// outx ^= part;
-					// outx ^= remaining.space();
+					// result ^= part;
+					// result ^= remaining.space();
 					part.var_str.resize(width, fillchar);
-					outx ^= part;
+					result += part.var_str;
 				} else if (just == "R") {
-					// outx ^= remaining.space();
-					// outx ^= part;
+					// result ^= remaining.space();
+					// result ^= part;
 					part.var_str.insert(0, remaining, fillchar);
-					outx ^= part;
+					result += part.var_str;
 				} else	//"C"
 				{
 					part.var_str.insert(0, remaining / 2, fillchar);
-					outx ^= part;
-					outx.var_str.resize(width, fillchar);
+					result += part.var_str;
+					result.resize(width, fillchar);
 				}
 			} else {
 				if (just == "R") {
 					// take the last n characters
-					outx ^= part.var_str.substr(part.var_str.size() - width,
-												  width);
+					result += part.var_str.substr(part.var_str.size() - width, width);
 				} else	// L or C
 				{
 					// take the first n characters
-					outx ^= part.var_str.substr(0, width);
+					result += part.var_str.substr(0, width);
 				}
 			}
 		}
@@ -717,303 +712,318 @@ var var::oconv_LRC(CVR format) const {
 		if (!terminator)
 			break;
 
-		outx ^= var().chr(LASTDELIMITERCHARNOPLUS1 - terminator.toInt());
+		result.push_back(char(LAST_DELIMITER_CHARNO_PLUS1 - terminator.toInt()));
 	}  // loop;
 
-	return outx;
+	return result;
 }
 
-//var var::oconv(CVR conversion) const {
-//
-//	THISIS("var var::oconv(CVR conversion) const")
-//	assertDefined(function_sig);
-//	ISSTRING(conversion)
-//
-//	return oconv(conversion.var_str.c_str());
-//}
-
-// fast version for common programming example where conversion is provided as a hard coded string
-// but application programs source code is usually going to usually be "D2" and not "D2" so provide
-// a narrow char* version? possibly most oconvs will come from variables (eg read from dicts) so
-// will be string format
 var var::oconv(const char* conversion) const {
 
 	THISIS("var var::oconv(const char* conversion) const")
-	// TODO this should be THISISASSIGNED since no point converting numbers to strings for many
-	// oconvs
-	assertString(function_sig);
+	assertAssigned(function_sig);
 
-	// REMOVE the remove logic out of the L# R# and T# here
+	// TODO provide a version that converts numeric vars directly to dates and times
+	// without going via string
 
-	var part;
+	//var part;
 	var charn = 1;
 	var terminator;
-	var outx = "";
+	std::string outstr = "";
 
-	const char* conversionchar = conversion;
+	// Will oconv each subfield of the input separately
+	while (true) {
 
-	// check first character
-	switch (*conversionchar) {
-		// D
-		case 'D':
+		// very similar subfield remove code for most conversions except TLR which
+		// always format "" and [] part=remove(charn, terminator);
 
-			while (true) {
+		// Extract a field up to a field mark "terminator" where FM = 5 VM = 4 etc. or 0 if none
+		// TODO optimise in case not a string and the conversion doesnt need a string
+		// NB HEX and T/TX conversions use the WHOLE var_str not just PART
+		var part = this->substr2(charn, terminator);
+//		var part = (this->var_typ & VARTYP_INTDBL) ?
+//			terminator = 0, this->clone()
+//		:
+//			this->substr2(charn, terminator)
+//		;
+		// if len(part) or terminator then
 
-				// very similar subfield remove code for most conversions except TLR which
-				// always format "" and [] part=remove(charn, terminator);
-				part = this->substr2(charn, terminator);
-				// if len(part) or terminator then
+		const char* pconversion = conversion;
 
-				if (part.var_typ & VARTYP_STR && part.var_str.empty()) {
-				} else if (!part.isnum())
-					outx ^= part;
-				else
-					outx ^= part.oconv_D(conversion);
+		// check first character of conversion code
+		switch (*pconversion) {
 
-				if (!terminator)
-					break;
-				outx ^= var().chr(LASTDELIMITERCHARNOPLUS1 - terminator.toInt());
-			}
+			// D conversions
 
-			return outx;
-			break;
+			case 'D':
 
-		// "MD", "MC", "MT", "MX", "ML", "MR"
-		case 'M':
+				if (part.var_str.empty()) {
 
-			// point to 2nd character
-			++conversionchar;
+				} else if (!part.isnum()) {
+					// Non-numeric dates are simple left untouched
+					outstr += part.var_str;
 
-			while (true) {
-
-				// very similar subfield remove code for most conversions except TLR which
-				// always format "" and [] part=remove(charn, terminator);
-				part = this->substr2(charn, terminator);
-				// if len(part) or terminator then
-
-				// null string
-				// if (part.var_typ&VARTYP_STR && part.var_str.empty())
-				//	{}
-				bool notemptystring =
-					!(part.var_typ & VARTYP_STR && part.var_str.empty());
-
-				// MR ... character replacement
-				if (*conversionchar == 'R') {
-					if (notemptystring)
-						outx ^= part.oconv_MR(++conversionchar);
+				} else {
+					// TODO return a std::string for speed?
+					// Note that D doesnt always return a date. e.g. "DQ" returns 1-4 for quarter
+					//outstr += part.oconv_D(conversion).toString();
+					outstr += part.oconv_D(conversion);
 				}
-
-				// non-numeric are left unconverted for "MD", "MT", "MX"
-				else if (!part.isnum())
-					outx ^= part;
-
-				// do conversion on a number
-				else {
-
-					// check second character
-					switch (*conversionchar) {
-						// MD and MC - decimal places
-						case 'D':
-						case 'C':
-							// may treat empty string as zero
-							outx ^= part.oconv_MD(conversion);
-							break;
-
-						// "MT" - time
-						case 'T':
-							// point to the remainder of the conversion after the "MT"
-							if (notemptystring) {
-								outx ^= part.oconv_MT(conversionchar + 1);
-							}
-
-							break;
-
-						// MX - number to hex (not string to hex)
-						case 'X':
-							if (notemptystring) {
-
-								//convert decimal to long
-								if (!(part.var_typ & VARTYP_INT)) {
-									part = part.round();  //actually to var_int i.e. int64_t
-									//part.toLong();
-									part.toInt();
-								}
-
-								//convert to hex
-								std::ostringstream ss;
-								ss << std::hex << std::uppercase
-								   //   << part.round().toInt();
-								   << part.var_int;
-
-								outx ^= ss.str();
-							}
-
-							break;
-
-						// MB - number to binary
-						case 'B':
-							if (notemptystring) {
-
-								//convert decimal to long
-								if (!(part.var_typ & VARTYP_INT)) {
-									part = part.round();  //actually to var_int i.e. int64_t
-									//part.toLong();
-									part.toInt();
-								}
-
-//								//convert to binary string
-//								std::ostringstream ss;
-//								ss << std::bitset<64>(part.var_int);
-//
-//								outx ^= ss.str();
-								outx ^= std::bitset<64>(part.var_int).to_string();
-							}
-
-							break;
-					}
-				}
-
-				if (!terminator)
-					break;
-				outx ^= var().chr(LASTDELIMITERCHARNOPLUS1 - terminator.toInt());
-			}
-
-			return outx;
-			break;
-
-		//TODO implement masking eg.
-		// oconv("1234567890","L(###)###-####") -> "(123)456-7890"
-
-		// L#, R#, C#
-		// format even empty strings
-		case 'L':
-		case 'R':
-		case 'C':
-			return oconv_LRC(conversion);
-			break;
-
-		// T#
-		// format even empty strings
-		case 'T':
-			++conversionchar;
-			// TX
-			// TX1 TX2 TX3 TX4 TX5 for progressive conversion starting with FM
-			if (*conversionchar == 'X') {
-				++conversionchar;
-				return oconv_TX(*conversionchar);
-			}
-			else
-				return oconv_T(conversion);
-			break;
-
-		// HEX (unlike pickos, it converts high separator characters)
-		case 'H':
-
-			// empty string in, empty string out
-			if (var_typ & VARTYP_STR && var_str.empty())
-				return "";
-
-			// check 2nd character is E, 3rd character is X and next character is null, or a
-			// digit
-			if ((*(++conversionchar) == 'E') && (*(++conversionchar) == 'X')) {
-				// point to one character after HEX
-				++conversionchar;
-
-				switch (*conversionchar) {
-					case '\0':
-						return oconv_HEX(HEX_PER_CHAR);
-						break;
-					case '2':
-						return oconv_HEX(2);
-						break;
-					case '4':
-						return oconv_HEX(4);
-						break;
-					case '8':
-						return oconv_HEX(8);
-						break;
-				}
-
-				// return oconv_HEX(HEX_IO_RATIO);
 				break;
-			}
 
+			// "MD", "MC", "MT", "MX", "MB", "MR"
+
+			case 'M':
+
+					pconversion++;
+
+					// MR ... character replacement
+					if (*pconversion == 'R') {
+						if (!part.var_str.empty())
+							outstr += part.oconv_MR(conversion).var_str;
+					}
+
+					// non-numeric are left unconverted for "MD", "MT", "MX"
+					else if (!part.isnum()) {
+						outstr += part.var_str;
+					}
+
+					// do conversion on a number
+					else {
+
+						// check second character
+						switch (*pconversion) {
+
+							// MD and MC - decimal places
+							case 'D':
+							case 'C':
+								// may treat empty string as zero
+								outstr += part.oconv_MD(conversion);
+								break;
+
+							// "MT" - time
+							case 'T':
+								// point to the remainder of the conversion after the "MT"
+								if (!part.var_str.empty()) {
+									outstr += part.oconv_MT(conversion);
+								}
+								break;
+
+							// MX - number to hex (not string to hex)
+							case 'X':
+								if (!part.var_str.empty()) {
+
+									//convert decimal to long
+									if (!(part.var_typ & VARTYP_INT)) {
+										part = part.round();  //actually to var_int i.e. int64_t
+										//part.toLong();
+										part.toInt();
+									}
+
+									//convert to hex
+									std::ostringstream ss;
+									ss << std::hex << std::uppercase
+									   //   << part.round().toInt();
+									   << part.var_int;
+
+									outstr += ss.str();
+								}
+								break;
+
+							// MB - number to binary
+							case 'B':
+								if (!part.var_str.empty()) {
+
+									//convert decimal to long
+									if (!(part.var_typ & VARTYP_INT)) {
+										part = part.round();  //actually to var_int i.e. int64_t
+										//part.toLong();
+										part.toInt();
+									}
+
+	//								//convert to binary string
+	//								std::ostringstream ss;
+	//								ss << std::bitset<64>(part.var_int);
+	//
+	//								outstr ^= ss.str();
+									outstr += std::bitset<64>(part.var_int).to_string();
+								}
+
+								break;
+						}
+					}
+//
+//					if (!terminator)
+//						break;
+//					outstr ^= var().chr(LAST_DELIMITER_CHARNO_PLUS1 - terminator.toInt());
+//				}
+//
+//				return outstr;
+				break;
+
+			//TODO implement masking eg.
+			// oconv("1234567890","L(###)###-####") -> "(123)456-7890"
+
+			// L#, R#, C#
+
+			case 'L':
+			case 'R':
+			case 'C':
+				// format even empty strings
+				outstr += part.oconv_LRC(conversion);
+				break;
+
+			// T#... TX TXR
+
+			case 'T':
+
+				// format even empty strings
+
+				// NOTE: Using WHOLE input, not just PART
+				terminator = 0;
+
+				++pconversion;
+				if (*pconversion == 'X') {
+					//return this->oconv_TX(conversion);
+					outstr += this->oconv_TX(conversion);
+				}
+				// T
+				else {
+					//return this->oconv_T(conversion);
+					outstr += this->oconv_T(conversion);
+				}
+				break;
+
+			// HEX, HEX2, HEX4, HEX8
+			case 'H':
+
+				// check 2nd character is E, 3rd character is X and next character is null, or a
+				// digit
+				if ((*(++pconversion)) == 'E' && (*(++pconversion) == 'X')) {
+
+					// NOTE: Using WHOLE input, not just PART
+					// HEX will use the whole input regardless of FM characters
+					terminator = 0;
+
+					// Empty string in, empty string out
+					if (this->var_str.empty()) {
+						//return "";
+						break;
+					}
+
+					// The first char after "HEX" determines the width of hex codes
+					++pconversion;
+					switch (*pconversion) {
+						case '\0':
+							outstr += this->oconv_HEX(HEX_PER_CHAR);
+							break;
+						case '2':
+							outstr += this->oconv_HEX(2);
+							break;
+						case '4':
+							outstr += this->oconv_HEX(4);
+							break;
+						case '8':
+							outstr += this->oconv_HEX(8);
+							break;
+						default:
+							throw VarNotImplemented("oconv " ^ var(conversion).first(64).quote() ^ " not implemented yet ");
+					}
+
+				} else {
+					throw VarNotImplemented("oconv " ^ var(conversion).first(64).quote() ^ " not implemented yet ");
+				}
+
+				break;
+
+			// B:
+
+			case 'B':
+
+				// Empty string in, empty string out
+				if (part.var_str.empty()) {
+					//outstr += "";
+				}
+				else {
+					// Extract field 1 (bool=1) or 2 (bool=0) from "BYes,No" after skipping the B
+					outstr += var(conversion + 1).field(",", 2 - part.toBool()).var_str;
+				}
+				break;
+
+			// custom conversion should not be called via ::oconv
+			case '[':
+
+				throw VarError("Custom conversions like (" ^ var(pconversion - 1) ^
+							  ") must be called like a function oconv(input,conversion) not "
+							  "like a method, input.oconv(conversion)");
+				break;
+
+			// empty conversion string - no conversion
+			case '\0':
+				part.assertString(__PRETTY_FUNCTION__);
+				outstr += part.var_str;
+				break;
+
+			default:
+				throw VarNotImplemented("oconv " ^ var(conversion).first(64).quote() ^ " not implemented yet ");
+
+		} // switch (*pconversion)
+
+		// We are done if no terminator char was discovered in the current loop iteration
+		if (!terminator)
 			break;
 
-		case 'B':
-			// empty string in, empty string out
-			if (var_typ & VARTYP_STR && var_str.empty())
-				return "";
-			if (this->toBool())
-				return var(conversion).cut(1).field(",", 1);
-			else
-				return var(conversion).cut(1).field(",", 2);
-			break;
+		// Append a delimiter char and go back around to convert the next part
+		outstr += char(LAST_DELIMITER_CHARNO_PLUS1 - terminator);
 
-		// custom conversion should not be called via ::oconv
-		case '[':
+	} // while (true)
 
-			throw VarError("Custom conversions like (" ^ var(conversion) ^
-						  ") must be called like a function oconv(input,conversion) not "
-						  "like a method, input.oconv(conversion)");
-			break;
+	return outstr;
 
-		// empty conversion string - no conversion
-		case '\0':
-			return (*this);
-
-			//default:
-			//	throw MVNotImplmented("oconv " ^ var(*conversionchar).oconv("HEX").first(6) ^ " not implemented yet ");
-	}
-
-	// TODO implement
-	throw VarNotImplemented("oconv '" ^ var(conversion).first(16) ^ "' not implemented yet ");
-
-	//std::unreachable();
-	// unknown conversions are simply ignored in pickos
-	//return *this;
 }
 
-var var::oconv_TX(const int raw) const {
+std::string var::oconv_TX(const char* conversion) const {
 
-	var txt = this->var_str;
+	var result = this->var_str;
 
 	// Backslashes before NL are going to be used to indicate VM, SM etc
 	// so we have to escape them somehow first
 	// for usual case skip if no backslashes are present
-	if (txt.var_str.find('\\') != std::string::npos)
-		txt.regex_replacer("\\\\([" _FM _VM _SM _TM _ST "])", "{Back_Slash}\\1");
+	if (result.var_str.find('\\') != std::string::npos)
+		result.regex_replacer("\\\\([" _FM _VM _SM _TM _ST "])", "{Back_Slash}\\1");
 
 	// "\n" -> "\\n"
-	txt.replacer("\\n", "\\\\n");
+	result.replacer("\\n", "\\\\n");
 
 	// LF -> literal "\n"
-	txt.replacer("\n", "\\n");
+	result.replacer("\n", "\\n");
 
 	// FM -> LF
-	txt.converter(_FM, "\n");
+	result.converter(_FM, "\n");
 
 	// VM -> \ + LF
 	// SM -> \\ + LF
 	// TM -> \\\ + LF
 	// ST -> \\\\ + LF
+	const char raw = conversion[2];
 	if (not raw) {
-		txt.replacer(_VM, "\\\n");
-		txt.replacer(_SM, "\\\\\n");
-		txt.replacer(_TM, "\\\\\\\n");
-		txt.replacer(_ST, "\\\\\\\\\n");
+		result.replacer(_VM, "\\\n");
+		result.replacer(_SM, "\\\\\n");
+		result.replacer(_TM, "\\\\\\\n");
+		result.replacer(_ST, "\\\\\\\\\n");
 	}
 
-	return txt;
+	return result.var_str;
 }
 
-var var::iconv_TX(const int raw) const {
+var var::iconv_TX(const char* conversion) const {
 
 	var record = this->var_str;
 	// \ + LF -> VM
 	// \\ + LF -> SM
 	// \\ + LF -> TM
 	// \\\ + LF -> ST
+	const char raw = conversion[2];
 	if (not raw) {
 		record.replacer("\\\\\\\\\n", _ST);
 		record.replacer("\\\\\\\n", _TM);
@@ -1040,43 +1050,15 @@ var var::iconv_TX(const int raw) const {
 }
 
 
-var var::oconv_HEX([[maybe_unused]] const int ioratio) const {
-
-	// this needs rewritting because we have changed from wstring to string for internal coding
-	// decided to output 8 fixed hex digits per character to represent the full range of unicode
-	// characters regardless of platform
-	// 1. output 8 fixed hex digits per character to represent
-	// logic is that this would be consistent and easy to postprocess programmatically and
-	// visually and that the inefficiencies are not important since hex isnt a storage format
-	// HEX8 and HEX16 codes could be implemented to cater for the alternatives below.
-	// Rejected alternatives:
-	// 2. convert to utf8 and represent each byte as two hex digits.
-	// 3. convert to utf16 and represent each byte pair as four hex digits
-	// 4. convert as 1. or 3 depending on platform (word length 4 or 2 chars)
-
-	/*	std::ostringstream ss;
-		int nchars=size();
-		ss.flags (std::ios::right | std::ios::hex | std::ios::uppercase);
-		//ss.setbase(16) useful to set numerically instead of ios::hex
-		ss.fill('0');
-		//perhaps convert to use iterators especially to allow for variable width characters
-	   under utf16. for (int charn=0;charn<nchars;++charn)
-		{
-			ss.width(ioratio);//must be called every time
-			ss << int((*this).var_str[charn]);
-		}
-		return ss.str();
-	*/
+std::string var::oconv_HEX([[maybe_unused]] const int ioratio) const {
 
 	char const hex_chars[16] = {'0', '1', '2', '3', '4', '5', '6', '7',
 								'8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
 
 	std::string result;
-	auto nchars = var_str.size();
-	for (std::size_t charn = 0; charn < nchars; ++charn) {
-		char const byte = var_str[charn];
-		result += hex_chars[(byte & 0xF0) >> 4];
-		result += hex_chars[(byte & 0x0F) >> 0];
+	for (auto byte : var_str) {
+		result.push_back(hex_chars[(byte & 0xF0) >> 4]);
+		result.push_back(hex_chars[(byte & 0x0F) >> 0]);
 	}
 
 	return result;
