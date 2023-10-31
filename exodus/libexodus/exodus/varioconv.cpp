@@ -728,43 +728,48 @@ var var::oconv(const char* conversion_in) const {
 
 	//var part;
 	var charn = 1;
-	var terminator;
+	var terminator = 0;
 	std::string outstr = "";
+
+	// Convert any embedded VMs or '|' chars to \0 so that multiple conversions all look like cstr
+	std::string all_conversions = conversion_in;
+	std::replace(all_conversions.begin(), all_conversions.end(), VM_, '\0');
+	std::replace(all_conversions.begin(), all_conversions.end(), '|', '\0');
+
+	// Get the end of all conversions
+	auto all_conversions_end = all_conversions.data() + all_conversions.size();
 
 	// Multiple fields/values of input data
 	// ------------------------------------
 	while (true) {
 
-		// very similar subfield remove code for most conversions except TLR which
-		// always format "" and [] part=remove(charn, terminator);
+		// NB HEX and T/TX conversions use the WHOLE input not just PART
 
-		// Extract a field up to a field mark "terminator" where FM = 5 VM = 4 etc. or 0 if none
-		// TODO optimise in case not a string and the conversion doesnt need a string
-		// NB HEX and T/TX conversions use the WHOLE var_str not just PART
-		var part = this->substr2(charn, terminator);
-//		var part = (this->var_typ & VARTYP_INTDBL) ?
-//			terminator = 0, this->clone()
-//		:
-//			this->substr2(charn, terminator)
-//		;
-		// if len(part) or terminator then
+		// If no number available then extract a field up to a field mark "terminator"
+		// where FM = 5 VM = 4 etc. or 0 if none
+		//
+		// In case the input is numeric then avoid converting to a string
+		// only to have to convert it back again for some conversions
+		// e.g. oconv D converts numeric dates directly to text dates
+		//
+		//var part = this->substr2(charn, terminator);
+		var part = (this->var_typ & VARTYP_INTDBL) ?
+			this->clone()
+		:
+			this->substr2(charn, terminator)
+		;
 
-		// Any embedded VMs become \0
-		std::string all_conversions = conversion_in;
-		std::replace(all_conversions.begin(), all_conversions.end(), VM_, '\0');
-		std::replace(all_conversions.begin(), all_conversions.end(), '|', '\0');
-
+		// Start a the beginning
 		const char* pconversion = all_conversions.data();
-
-		auto all_conversions_end = pconversion + all_conversions.size();
 
 		// Multiple conversions
 		// --------------------
 		while (true) {
 
+			// Save a pointer to the beginning of the conversion code
 			const char* conversion = pconversion;
 
-			// Find end of conversion (char \0)
+			// Find the end of conversion code (char \0)
 			const char* conversion_end = conversion;
 			while (*conversion_end != '\0') {
 				 conversion_end++;
@@ -777,13 +782,13 @@ var var::oconv(const char* conversion_in) const {
 
 				case 'D':
 
-					if (part.var_str.empty()) {
+					if (part.var_typ & VARTYP_STR && part.var_str.empty()) {
+						// Empty string returns empty string date
 
 					} else if (!part.isnum()) {
 						// Non-numeric dates are simply left untouched
 
 					} else {
-						// TODO return a std::string for speed?
 						// Note that D doesnt always return a date.
 						// e.g. "DQ" returns 1-4 for quarter
 						part = part.oconv_D(conversion);
@@ -796,18 +801,23 @@ var var::oconv(const char* conversion_in) const {
 
 						pconversion++;
 
-						// MR: Various character replacements
+						// MR:
 
 						if (*pconversion == 'R') {
-							if (!part.var_str.empty())
+							if (part.var_typ & VARTYP_STR && part.var_str.empty()) {
+								// Empty string returns empty string
+
+							} else {
+								// Various character replacements
 								part = part.oconv_MR(conversion).var_str;
+							}
 						}
 
 						// Non-numeric are left unconverted for "MD", "MT", "MX"
 						else if (!part.isnum()) {
 						}
 
-						// Do conversion on a number
+						// Various conversions on numbers
 						else {
 
 							// Check character after initial M
@@ -824,7 +834,9 @@ var var::oconv(const char* conversion_in) const {
 								// "MT" - time e.g. 1 -> 1/1/1967
 
 								case 'T':
-									if (!part.var_str.empty()) {
+									if (part.var_typ & VARTYP_STR && part.var_str.empty()) {
+										// Empty string returns empty string
+									} else {
 										part = part.oconv_MT(conversion);
 									}
 									break;
@@ -832,8 +844,10 @@ var var::oconv(const char* conversion_in) const {
 								// MX - number to hexadecimal (not string to hex) e.g. 15 -> 0F
 
 								case 'X':
-									if (!part.var_str.empty()) {
+									if (part.var_typ & VARTYP_STR && part.var_str.empty()) {
+										// Empty string returns empty string
 
+									} else {
 										// Convert decimal to long integer
 										if (!(part.var_typ & VARTYP_INT)) {
 											part = part.round();  //actually to var_int i.e. int64_t
@@ -853,8 +867,10 @@ var var::oconv(const char* conversion_in) const {
 								// MB - number to ASCII binary eg 15 -> 1111
 
 								case 'B':
-									if (!part.var_str.empty()) {
+									if (part.var_typ & VARTYP_STR && part.var_str.empty()) {
+										// Empty string returns empty string
 
+									} else {
 										// Convert decimal to long
 										if (!(part.var_typ & VARTYP_INT)) {
 											part = part.round();  //actually to var_int i.e. int64_t
@@ -888,9 +904,10 @@ var var::oconv(const char* conversion_in) const {
 
 				case 'T':
 
-					// Format even empty strings
 					// NOTE: Using WHOLE input, not just PART
 					terminator = 0;
+
+					// Format even empty strings
 
 					++pconversion;
 					if (*pconversion == 'X') {
@@ -912,12 +929,18 @@ var var::oconv(const char* conversion_in) const {
 
 						// NOTE: Using WHOLE input, not just PART
 						// HEX will use the whole input regardless of FM characters
+
 						terminator = 0;
 
-						// Empty string in, empty string out
-						if (this->var_str.empty()) {
-							part = "";
-							break;
+						if (this->var_typ & VARTYP_STR) {
+							if (this->var_str.empty()) {
+								// Empty string in, empty string out
+								part = "";
+								break;
+							}
+						} else {
+							// HEX represents strings so create var_str from int or double
+							ISSTRING(*this)
 						}
 
 						// The first char after "HEX" determines the width of hex codes
@@ -949,11 +972,14 @@ var var::oconv(const char* conversion_in) const {
 
 				case 'B':
 
-					// Empty string in, empty string out
-					if (!part.var_str.empty()) {
-						// Extract field 1 (bool=1) or 2 (bool=0) from "BYes,No" after skipping the B
+					if (part.var_typ & VARTYP_STR && part.var_str.empty()) {
+						// Empty string in, empty string out
+
+					} else {
+						// From something like "BYes,No", extract field 1 (bool=1) or 2 (bool=0) after skipping the B
 						part = var(conversion + 1).field(",", 2 - part.toBool()).var_str;
 					}
+
 					break;
 
 				// Custom conversion should not be called via ::oconv ATM
@@ -974,17 +1000,19 @@ var var::oconv(const char* conversion_in) const {
 
 			} // switch depending on first char of conversion
 
+			// Quit conversion loop if there any no more conversions
 			pconversion = conversion_end;
 			if (pconversion == all_conversions_end)
 				break;
 
+			// Point to the start of the next conversion
 			pconversion++;
 
 		} // while (true) next conversion
 
 		outstr += part.var_str;
 
-		// No more data fields to convert?
+		// Quit loop if no more input data parts
 		if (!terminator)
 			break;
 

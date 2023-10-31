@@ -119,6 +119,8 @@ programinit()
 
 	{
 		assert(var(' ').oconv("HEX").outputl()      eq "20");
+		TRACE("---");
+		TRACE(var(uint(48)).oconv("HEX"))
 		assert(var(uint(48)).oconv("HEX").outputl() eq "3438");
 		assert(oconv(uint(48), "HEX").outputl()     eq "3438");
 		assert(oconv(uint(128), "HEX").outputl()    eq "313238");

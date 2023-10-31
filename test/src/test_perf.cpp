@@ -159,7 +159,7 @@ programinit()
 		if (not firstcasen)
 			firstcasen = 0;
 
-		int ncases = 20;
+		int ncases = 21;
 
 		for (int casen = firstcasen; casen le ncases; casen++) {
 
@@ -174,6 +174,7 @@ programinit()
 				//			char* cp1 = nullptr;
 				bool		b1	= true;
 				var			v1	= 1;
+				var			v2	= 1;
 				std::string ss1 = "x";
 
 				var started = ostime();
@@ -362,6 +363,13 @@ programinit()
 							printl("Exp: 22    ns - var + 0.1 + test");
 						for (int i2 = 0; i2 le nn; i2++) {
 							b1 = (v1 + 0.1).assigned();
+						}
+						break;
+					case 21:
+						if (repeatn eq 0)
+							printl("Exp: 150   ns - var.oconv(\"MD20\")");
+						for (int i2 = 0; i2 le nn; i2++) {
+							v2 = v1.oconv("MD20P");
 						}
 						break;
 				}
