@@ -21,7 +21,7 @@ THE SOFTWARE.
 */
 
 #include <math.h> //for pow
-
+#include <algorithm> //for std::replace
 #include <cstring>//for strlen
 #include <string>
 #include <sstream>
@@ -718,7 +718,7 @@ std::string var::oconv_LRC(CVR format) const {
 	return result;
 }
 
-var var::oconv(const char* conversion) const {
+var var::oconv(const char* conversion_in) const {
 
 	THISIS("var var::oconv(const char* conversion) const")
 	assertAssigned(function_sig);
@@ -728,255 +728,298 @@ var var::oconv(const char* conversion) const {
 
 	//var part;
 	var charn = 1;
-	var terminator;
+	var terminator = 0;
 	std::string outstr = "";
 
-	// Will oconv each subfield of the input separately
+	// Convert any embedded VMs or '|' chars to \0 so that multiple conversions all look like cstr
+	std::string all_conversions = conversion_in;
+	std::replace(all_conversions.begin(), all_conversions.end(), VM_, '\0');
+	std::replace(all_conversions.begin(), all_conversions.end(), '|', '\0');
+
+	// Get the end of all conversions
+	auto all_conversions_end = all_conversions.data() + all_conversions.size();
+
+	// Multiple fields/values of input data
+	// ------------------------------------
 	while (true) {
 
-		// very similar subfield remove code for most conversions except TLR which
-		// always format "" and [] part=remove(charn, terminator);
+		// NB HEX and T/TX conversions use the WHOLE input not just PART
 
-		// Extract a field up to a field mark "terminator" where FM = 5 VM = 4 etc. or 0 if none
-		// TODO optimise in case not a string and the conversion doesnt need a string
-		// NB HEX and T/TX conversions use the WHOLE var_str not just PART
-		var part = this->substr2(charn, terminator);
-//		var part = (this->var_typ & VARTYP_INTDBL) ?
-//			terminator = 0, this->clone()
-//		:
-//			this->substr2(charn, terminator)
-//		;
-		// if len(part) or terminator then
+		// If no number available then extract a field up to a field mark "terminator"
+		// where FM = 5 VM = 4 etc. or 0 if none
+		//
+		// In case the input is numeric then avoid converting to a string
+		// only to have to convert it back again for some conversions
+		// e.g. oconv D converts numeric dates directly to text dates
+		//
+		//var part = this->substr2(charn, terminator);
+		var part = (this->var_typ & VARTYP_INTDBL) ?
+			this->clone()
+		:
+			this->substr2(charn, terminator)
+		;
 
-		const char* pconversion = conversion;
+		// Start a the beginning
+		const char* pconversion = all_conversions.data();
 
-		// check first character of conversion code
-		switch (*pconversion) {
+		// Multiple conversions
+		// --------------------
+		while (true) {
 
-			// D conversions
+			// Save a pointer to the beginning of the conversion code
+			const char* conversion = pconversion;
 
-			case 'D':
+			// Find the end of conversion code (char \0)
+			const char* conversion_end = conversion;
+			while (*conversion_end != '\0') {
+				 conversion_end++;
+			}
 
-				if (part.var_str.empty()) {
+			// Check 1st character of conversion code
+			switch (*pconversion) {
 
-				} else if (!part.isnum()) {
-					// Non-numeric dates are simple left untouched
-					outstr += part.var_str;
+				// D: Dates
 
-				} else {
-					// TODO return a std::string for speed?
-					// Note that D doesnt always return a date. e.g. "DQ" returns 1-4 for quarter
-					//outstr += part.oconv_D(conversion).toString();
-					outstr += part.oconv_D(conversion);
-				}
-				break;
+				case 'D':
 
-			// "MD", "MC", "MT", "MX", "MB", "MR"
+					if (part.var_typ & VARTYP_STR && part.var_str.empty()) {
+						// Empty string returns empty string date
 
-			case 'M':
+					} else if (!part.isnum()) {
+						// Non-numeric dates are simply left untouched
 
-					pconversion++;
-
-					// MR ... character replacement
-					if (*pconversion == 'R') {
-						if (!part.var_str.empty())
-							outstr += part.oconv_MR(conversion).var_str;
+					} else {
+						// Note that D doesnt always return a date.
+						// e.g. "DQ" returns 1-4 for quarter
+						part = part.oconv_D(conversion);
 					}
+					break;
 
-					// non-numeric are left unconverted for "MD", "MT", "MX"
-					else if (!part.isnum()) {
-						outstr += part.var_str;
-					}
+				// "MD", "MC", "MT", "MX", "MB", "MR"
 
-					// do conversion on a number
-					else {
+				case 'M':
 
-						// check second character
-						switch (*pconversion) {
+						pconversion++;
 
-							// MD and MC - decimal places
-							case 'D':
-							case 'C':
-								// may treat empty string as zero
-								outstr += part.oconv_MD(conversion);
-								break;
+						// MR:
 
-							// "MT" - time
-							case 'T':
-								// point to the remainder of the conversion after the "MT"
-								if (!part.var_str.empty()) {
-									outstr += part.oconv_MT(conversion);
-								}
-								break;
+						if (*pconversion == 'R') {
+							if (part.var_typ & VARTYP_STR && part.var_str.empty()) {
+								// Empty string returns empty string
 
-							// MX - number to hex (not string to hex)
-							case 'X':
-								if (!part.var_str.empty()) {
-
-									//convert decimal to long
-									if (!(part.var_typ & VARTYP_INT)) {
-										part = part.round();  //actually to var_int i.e. int64_t
-										//part.toLong();
-										part.toInt();
-									}
-
-									//convert to hex
-									std::ostringstream ss;
-									ss << std::hex << std::uppercase
-									   //   << part.round().toInt();
-									   << part.var_int;
-
-									outstr += ss.str();
-								}
-								break;
-
-							// MB - number to binary
-							case 'B':
-								if (!part.var_str.empty()) {
-
-									//convert decimal to long
-									if (!(part.var_typ & VARTYP_INT)) {
-										part = part.round();  //actually to var_int i.e. int64_t
-										//part.toLong();
-										part.toInt();
-									}
-
-	//								//convert to binary string
-	//								std::ostringstream ss;
-	//								ss << std::bitset<64>(part.var_int);
-	//
-	//								outstr ^= ss.str();
-									outstr += std::bitset<64>(part.var_int).to_string();
-								}
-
-								break;
+							} else {
+								// Various character replacements
+								part = part.oconv_MR(conversion).var_str;
+							}
 						}
-					}
-//
-//					if (!terminator)
-//						break;
-//					outstr ^= var().chr(LAST_DELIMITER_CHARNO_PLUS1 - terminator.toInt());
-//				}
-//
-//				return outstr;
-				break;
 
-			//TODO implement masking eg.
-			// oconv("1234567890","L(###)###-####") -> "(123)456-7890"
+						// Non-numeric are left unconverted for "MD", "MT", "MX"
+						else if (!part.isnum()) {
+						}
 
-			// L#, R#, C#
+						// Various conversions on numbers
+						else {
 
-			case 'L':
-			case 'R':
-			case 'C':
-				// format even empty strings
-				outstr += part.oconv_LRC(conversion);
-				break;
+							// Check character after initial M
+							switch (*pconversion) {
 
-			// T#... TX TXR
+								// MD and MC - decimal places
 
-			case 'T':
+								case 'D':
+								case 'C':
+									// Might treat empty string as zero (with Z option in conversion)
+									part = part.oconv_MD(conversion);
+									break;
 
-				// format even empty strings
+								// "MT" - time e.g. 1 -> 1/1/1967
 
-				// NOTE: Using WHOLE input, not just PART
-				terminator = 0;
+								case 'T':
+									if (part.var_typ & VARTYP_STR && part.var_str.empty()) {
+										// Empty string returns empty string
+									} else {
+										part = part.oconv_MT(conversion);
+									}
+									break;
 
-				++pconversion;
-				if (*pconversion == 'X') {
-					//return this->oconv_TX(conversion);
-					outstr += this->oconv_TX(conversion);
-				}
-				// T
-				else {
-					//return this->oconv_T(conversion);
-					outstr += this->oconv_T(conversion);
-				}
-				break;
+								// MX - number to hexadecimal (not string to hex) e.g. 15 -> 0F
 
-			// HEX, HEX2, HEX4, HEX8
-			case 'H':
+								case 'X':
+									if (part.var_typ & VARTYP_STR && part.var_str.empty()) {
+										// Empty string returns empty string
 
-				// check 2nd character is E, 3rd character is X and next character is null, or a
-				// digit
-				if ((*(++pconversion)) == 'E' && (*(++pconversion) == 'X')) {
+									} else {
+										// Convert decimal to long integer
+										if (!(part.var_typ & VARTYP_INT)) {
+											part = part.round();  //actually to var_int i.e. int64_t
+											part.toInt();
+										}
+
+										// Convert integer to hexadecimal
+										std::ostringstream ss;
+										ss << std::hex << std::uppercase
+										   //   << part.round().toInt();
+										   << part.var_int;
+
+										part = ss.str();
+									}
+									break;
+
+								// MB - number to ASCII binary eg 15 -> 1111
+
+								case 'B':
+									if (part.var_typ & VARTYP_STR && part.var_str.empty()) {
+										// Empty string returns empty string
+
+									} else {
+										// Convert decimal to long
+										if (!(part.var_typ & VARTYP_INT)) {
+											part = part.round();  //actually to var_int i.e. int64_t
+											//part.toLong();
+											part.toInt();
+										}
+
+										// Convert 64 bits to string of up to 64 chars '1' or '0'
+										part = std::bitset<64>(part.var_int).to_string();
+									}
+
+									break;
+							}
+						}
+
+					break;
+
+				//TODO implement masking eg.
+				// oconv("1234567890","L(###)###-####") -> "(123)456-7890"
+
+				// L#, R#, C#
+
+				case 'L':
+				case 'R':
+				case 'C':
+					// Format even empty strings
+					part = part.oconv_LRC(conversion);
+					break;
+
+				// T#... TX TXR
+
+				case 'T':
 
 					// NOTE: Using WHOLE input, not just PART
-					// HEX will use the whole input regardless of FM characters
 					terminator = 0;
 
-					// Empty string in, empty string out
-					if (this->var_str.empty()) {
-						//return "";
-						break;
-					}
+					// Format even empty strings
 
-					// The first char after "HEX" determines the width of hex codes
 					++pconversion;
-					switch (*pconversion) {
-						case '\0':
-							outstr += this->oconv_HEX(HEX_PER_CHAR);
-							break;
-						case '2':
-							outstr += this->oconv_HEX(2);
-							break;
-						case '4':
-							outstr += this->oconv_HEX(4);
-							break;
-						case '8':
-							outstr += this->oconv_HEX(8);
-							break;
-						default:
-							throw VarNotImplemented("oconv " ^ var(conversion).first(64).quote() ^ " not implemented yet ");
+					if (*pconversion == 'X') {
+						part = this->oconv_TX(conversion);
+					}
+					// T
+					else {
+						part = this->oconv_T(conversion);
+					}
+					break;
+
+				// HEX, HEX2, HEX4, HEX8
+
+				case 'H':
+
+					// check 2nd character is E, 3rd character is X and next character is null
+					// or a digit
+					if ((*(++pconversion)) == 'E' && (*(++pconversion) == 'X')) {
+
+						// NOTE: Using WHOLE input, not just PART
+						// HEX will use the whole input regardless of FM characters
+
+						terminator = 0;
+
+						if (this->var_typ & VARTYP_STR) {
+							if (this->var_str.empty()) {
+								// Empty string in, empty string out
+								part = "";
+								break;
+							}
+						} else {
+							// HEX represents strings so create var_str from int or double
+							ISSTRING(*this)
+						}
+
+						// The first char after "HEX" determines the width of hex codes
+						++pconversion;
+						switch (*pconversion) {
+							case '\0':
+								part = this->oconv_HEX(HEX_PER_CHAR);
+								break;
+							case '2':
+								part = this->oconv_HEX(2);
+								break;
+							case '4':
+								part = this->oconv_HEX(4);
+								break;
+							case '8':
+								part = this->oconv_HEX(8);
+								break;
+							default:
+								throw VarNotImplemented("oconv " ^ var(conversion).first(64).quote() ^ " not implemented yet ");
+						}
+
+					} else {
+						throw VarNotImplemented("oconv " ^ var(conversion).first(64).quote() ^ " not implemented yet ");
 					}
 
-				} else {
+					break;
+
+				// B:
+
+				case 'B':
+
+					if (part.var_typ & VARTYP_STR && part.var_str.empty()) {
+						// Empty string in, empty string out
+
+					} else {
+						// From something like "BYes,No", extract field 1 (bool=1) or 2 (bool=0) after skipping the B
+						part = var(conversion + 1).field(",", 2 - part.toBool()).var_str;
+					}
+
+					break;
+
+				// Custom conversion should not be called via ::oconv ATM
+				// TODO implement via thread_local array of registered exoprog functions
+				case '[':
+
+					throw VarError("Custom conversions like (" ^ var(pconversion - 1) ^
+								  ") must be called like a function oconv(input,conversion) not "
+								  "like a method, input.oconv(conversion)");
+					break;
+
+				// Empty conversion string - no conversion
+				case '\0':
+					break;
+
+				default:
 					throw VarNotImplemented("oconv " ^ var(conversion).first(64).quote() ^ " not implemented yet ");
-				}
 
+			} // switch depending on first char of conversion
+
+			// Quit conversion loop if there any no more conversions
+			pconversion = conversion_end;
+			if (pconversion == all_conversions_end)
 				break;
 
-			// B:
+			// Point to the start of the next conversion
+			pconversion++;
 
-			case 'B':
+		} // while (true) next conversion
 
-				// Empty string in, empty string out
-				if (part.var_str.empty()) {
-					//outstr += "";
-				}
-				else {
-					// Extract field 1 (bool=1) or 2 (bool=0) from "BYes,No" after skipping the B
-					outstr += var(conversion + 1).field(",", 2 - part.toBool()).var_str;
-				}
-				break;
+		outstr += part.var_str;
 
-			// custom conversion should not be called via ::oconv
-			case '[':
-
-				throw VarError("Custom conversions like (" ^ var(pconversion - 1) ^
-							  ") must be called like a function oconv(input,conversion) not "
-							  "like a method, input.oconv(conversion)");
-				break;
-
-			// empty conversion string - no conversion
-			case '\0':
-				part.assertString(__PRETTY_FUNCTION__);
-				outstr += part.var_str;
-				break;
-
-			default:
-				throw VarNotImplemented("oconv " ^ var(conversion).first(64).quote() ^ " not implemented yet ");
-
-		} // switch (*pconversion)
-
-		// We are done if no terminator char was discovered in the current loop iteration
+		// Quit loop if no more input data parts
 		if (!terminator)
 			break;
 
 		// Append a delimiter char and go back around to convert the next part
 		outstr += char(LAST_DELIMITER_CHARNO_PLUS1 - terminator);
 
-	} // while (true)
+	} // while (true) next part
 
 	return outstr;
 

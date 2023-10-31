@@ -12,6 +12,16 @@ function main() {
 	{
 		// Various exodus conversions using the {::XXXXXX} pattern
 
+		// Multivalued formats allow padding
+		//std::string s1 = "{::MD2PR#12}"_var;
+		//assert(format(s1, var(123.456)).outputl() == "      123.46");
+		var v1 = "{::MD2P|R#12}";
+		//var v1 = "{::MD2P]R#12}"_var;
+		//TRACE(format(v1, var(123.456)));
+		assert(format(v1, var(123.456)).outputl() == "      123.46");
+		assert(format("{::MD2P|R#12}", var(123.456)).outputl() == "      123.46");
+		//assert(format("{::MD2P]R#12}"_var, var(123456)).outputl() == "   123456.00");
+
 		assert(format("{::MD20}", var(123.456)).outputl() == "123.46");
 		assert(format("{::MD20}", var(123456)).outputl() == "123456.00");
 		// P has no effect if both number of decimals (2) and number to move (0) are specified
@@ -28,7 +38,6 @@ function main() {
 		// otherwise a single 2 means MOVE the decimal point left by 2 AND use use two decimal places
 		assert(format("{::MD2P}", var(123.456)).outputl() == "123.46");
 		assert(format("{::MD2P}", var(123456)).outputl() == "123456.00");
-
 
 		assert(format("{::MTS}", var(60*60*12 + 1)) == "12:00:01");
 
@@ -119,6 +128,39 @@ function main() {
 	TRACE(format("{}", var("abcdefg")))
 
 #endif
+
+	{
+		// Not format but multivalued oconv is useful in format
+
+		assert("20000]]21000"_var.oconv("DY-4]R#12"_var) == "  2022-10-03]            ]  2025-06-29"_var);
+		assert("20000]]21000"_var.oconv("DY-4]L#12"_var) == "2022-10-03  ]            ]2025-06-29  "_var);
+		assert("20000]]21000"_var.oconv("DY-4]C#12"_var) == " 2022-10-03 ]            ] 2025-06-29 "_var);
+
+		//TRACE("jsdgh cjhgs djhg sdjcg jsdhg cjsgdcjgsdjcgh jhg sjd ghc sdkjch kshj kj hskdjh cskjd hckjhkj kshdckhj ksdh "_var.oconv("T#12"))
+
+		assert("jsdgh cjhgs djhg sdjcg jsdhg cjsgdcjgsdjcgh jhg sjd ghc sdkjch kshj kj hskdjh cskjd hckjhkj kshdckhj ksdh "_var.oconv("T#12") == "jsdgh cjhgs |djhg sdjcg  |jsdhg       |cjsgdcjgsdjc|gh jhg sjd  |ghc sdkjch  |kshj kj     |hskdjh cskjd|hckjhkj     |kshdckhj    |ksdh        "_var);
+
+		assert("1234.56789"_var.oconv("MD20]R#10"_var) == "   1234.57");
+
+		// subvalues
+		assert("1234.56789}2345.6789"_var.oconv("MD20]R#10"_var) == "   1234.57}   2345.68"_var);
+		//multivalues
+		assert("1234.56789]2345.6789"_var.oconv("MD20]R#10"_var) == "   1234.57]   2345.68"_var);
+		//fields
+		assert("1234.56789^2345.6789"_var.oconv("MD20]R#10"_var) == "   1234.57^   2345.68"_var);
+
+		//empty fields: sole, inner, leading and trailing
+		assert(""_var.oconv("MD20]R#10"_var) == "          "_var);
+		assert("1234.56789^^2345.6789"_var.oconv("MD20]R#10"_var) == "   1234.57^          ^   2345.68"_var);
+		assert("^1234.56789^2345.6789"_var.oconv("MD20]R#10"_var) == "          ^   1234.57^   2345.68"_var);
+		assert("1234.56789^2345.6789^"_var.oconv("MD20]R#10"_var) == "   1234.57^   2345.68^          "_var);
+
+		assert("1234.56789"_var.oconv("MD20"_var) == "1234.57");
+		assert("1234.56789"_var.oconv("MD20]MD10"_var) == "1234.6");
+		assert("1234.56789]2345.6789"_var.oconv("MD20"_var) == "1234.57]2345.68"_var);
+		assert("1234.56789]2345.6789"_var.oconv("MD20]MD10"_var) == "1234.6]2345.7"_var);
+
+	}
 
 	printl(elapsedtimetext());
 	printl("Test passed");
