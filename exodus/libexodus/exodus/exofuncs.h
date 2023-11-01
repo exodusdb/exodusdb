@@ -711,7 +711,7 @@ void printt(void) {
 
 template <typename... Args>
 var format(std::string_view sv1, Args&&... args) {
-TRACE(sv1)
+	//TRACE(sv1)
 	return fmt::vformat(sv1, fmt::make_format_args(args...));
 }
 

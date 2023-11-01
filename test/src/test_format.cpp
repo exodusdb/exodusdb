@@ -10,6 +10,40 @@ function main() {
 #ifdef EXO_FORMAT
 
 	{
+//		C++ format code "f" rounding has a DIFFERENT rounding rule compared to exodus format code "MD"
+//
+//		"f" fmt code rounds 0.5 towards zero on even numbers like 0.5 2.5 4.5 e.g. 0.5 -> 0
+//		and away from zero on 1.5 3.5 5.5 etc. e.g. 1.5 -> 2
+
+//		WRONG
+		assert(format("{:.0f}x", 3.5) == "4x");
+		assert(format("{:.0f}x", 2.5) == "2x");   // WRONG
+		assert(format("{:.0f}x", 1.5) == "2x");
+		assert(format("{:.0f}x", 0.5) == "0x");   // WRONG
+		assert(format("{:.0f}x", 0.0) == "0x");
+		assert(format("{:.0f}x", -0.0) == "-0x"); // WRONG
+		assert(format("{:.0f}x", -0.5) == "-0x"); // WRONG
+		assert(format("{:.0f}x", -1.5) == "-2x");
+		assert(format("{:.0f}x", -2.5) == "-2x"); // WRONG
+		assert(format("{:.0f}x", -3.5) == "-4x");
+	}
+	{
+		// *** Note *** EXODUS format codes can ONLY be used on parameters that are exodus var type
+
+		// CORRECT
+		assert(format("{::MD00}x", var(3.5)) == "4x");
+		assert(format("{::MD00}x", var(2.5)) == "3x");
+		assert(format("{::MD00}x", var(1.5)) == "2x");
+		assert(format("{::MD00}x", var(0.5)) == "1x");
+		assert(format("{::MD00}x", var(0.0)) == "0x");
+		assert(format("{::MD00}x", var(-0.0)) == "0x");
+		assert(format("{::MD00}x", var(-0.5)) == "-1x");
+		assert(format("{::MD00}x", var(-1.5)) == "-2x");
+		assert(format("{::MD00}x", var(-2.5)) == "-3x");
+		assert(format("{::MD00}x", var(-3.5)) == "-4x");
+	}
+
+	{
 		// Various exodus conversions using the {::XXXXXX} pattern
 
 		// Multivalued formats allow padding
