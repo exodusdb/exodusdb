@@ -852,6 +852,7 @@ class PUBLIC var final {
 	ND var_proxy1 operator()(int fieldno);
 	ND var_proxy2 operator()(int fieldno, int valueno);
 	ND var_proxy3 operator()(int fieldno, int valueno, int subvalueno);
+
 	// non-const xxxx(fn,vn,sn) returns a proxy that can be aasigned to or implicitly converted to a var
 	//
 
@@ -1016,7 +1017,7 @@ class PUBLIC var final {
 
 	// Extract a character from a constant var
 	// first=1 last=-1 etc.
-	ND var operator[](const int pos1) const;
+	ND var operator[](int pos1) const {return this->at(pos1);}
 
 	// Named member function identical to operator[]
 	ND var at(const int pos1) const;
@@ -1714,10 +1715,15 @@ class PUBLIC var final {
 	//ND var append(SV appendstr) const&;
 	ND var pop() const&;                      // byte removed
 
-	ND var fieldstore(SV sepchar, const int fieldno, const int nfields, CVR replacement) const&;
-	ND var substr(const int pos1, const int length) const&; // byte pos1, length
+	// var.fieldstore(separator,fieldno,nfields,replacement)
+	ND var fieldstore(SV separator, const int fieldno, const int nfields, CVR replacement) const& {return var(*this).fieldstorer(separator, fieldno, nfields, replacement);}
+
+	//ND var substr(const int pos1, const int length) const&; // byte pos1, length
+	ND var substr(const int startindex1, const int length) const& {return var(*this).substrer(startindex1, length);}
+	//ND var substr(const int pos1) const&;                   // byte pos1
+	ND var substr(const int startindex1) const& {return var(*this).substrer(startindex1);}
+
 	ND var b(const int pos1, const int length) const& {return substr(pos1, length);} // byte pos1, length
-	ND var substr(const int pos1) const&;                   // byte pos1
 	ND var b(const int pos1) const& {return substr(pos1);}  // byte pos1
 
 	ND var convert(SV fromchars, SV tochars) const&;        // byte fromchars, tochars
@@ -1817,7 +1823,11 @@ class PUBLIC var final {
 
 	VARREF fieldstorer(SV sepchar, const int fieldno, const int nfields, CVR replacement);
 	VARREF substrer(const int pos1, const int length);
-	VARREF substrer(const int pos1);
+	//VARREF substrer(const int pos1);
+	// TODO look at using erase to speed up
+	//VARREF substrer(const int startindex1) {this->toString();return this->substrer(startindex1, static_cast<int>(var_str.size()));}
+	//VARREF substrer(const int startindex1) {return this->substrer(startindex1, static_cast<int>(var_str.size()));}
+	VARREF substrer(const int startindex1) {this->assertString(__PRETTY_FUNCTION__);return this->substrer(startindex1, static_cast<int>(var_str.size()));}
 
 	VARREF converter(SV fromchars, SV tochars);
 	VARREF textconverter(SV fromchars, SV tochars);
@@ -1860,7 +1870,8 @@ class PUBLIC var final {
 	ND var field(SV strx, const int fieldnx = 1, const int nfieldsx = 1) const;
 	// version that treats fieldn -1 as the last field, -2 the penultimate field etc. - TODO
 	// should probably make field() do this
-	ND var field2(SV strx, const int fieldnx, const int nfieldsx = 1) const;
+	//ND var field2(SV strx, const int fieldnx, const int nfieldsx = 1) const;
+	ND var field2(SV separator, const int fieldno, const int nfields = 1) const {if (fieldno >= 0) return field(separator, fieldno, nfields); else return field(separator, count(separator) + 1 + fieldno + 1, nfields);}
 
 	// I/O CONVERSION
 	/////////////////
@@ -1878,18 +1889,22 @@ class PUBLIC var final {
 	// something better it was called replace() in pickos but we are now using "replace()" to
 	// change substrings using regex (similar to the old pickos replace function) its mutator function
 	// is .r()
-	ND var pickreplace(const int fieldno, const int valueno, const int subvalueno, CVR replacement) const;
-	ND var pickreplace(const int fieldno, const int valueno, CVR replacement) const;
-	ND var pickreplace(const int fieldno, CVR replacement) const;
+//	ND var pickreplace(const int fieldno, const int valueno, const int subvalueno, CVR replacement) const;
+//	ND var pickreplace(const int fieldno, const int valueno, CVR replacement) const;
+//	ND var pickreplace(const int fieldno, CVR replacement) const;
+	ND var pickreplace(const int fieldno, const int valueno, const int subvalueno, CVR replacement) const {return var(*this).r(fieldno, valueno, subvalueno, replacement);}
+	ND var pickreplace(const int fieldno, const int valueno, CVR replacement) const {return var(*this).r(fieldno, valueno, 0, replacement);}
+	ND var pickreplace(const int fieldno, CVR replacement) const {return var(*this).r(fieldno, 0, 0, replacement);}
 
 	// cf mutator inserter()
-	ND var insert(const int fieldno, const int valueno, const int subvalueno, CVR insertion) const&;
-	ND var insert(const int fieldno, const int valueno, CVR insertion) const&;
-	ND var insert(const int fieldno, CVR insertion) const&;
+	ND var insert(const int fieldno, const int valueno, const int subvalueno, CVR insertion) const& {return var(*this).inserter(fieldno, valueno, subvalueno, insertion);}
+	ND var insert(const int fieldno, const int valueno, CVR insertion) const& {return this->insert(fieldno, valueno, 0, insertion);}
+	ND var insert(const int fieldno, CVR insertion) const& {return this->insert(fieldno, 0, 0, insertion);}
 
 	/// remove() was delete() in pickos
 	// var erase(const int fieldno, const int valueno=0, const int subvalueno=0) const;
-	ND var remove(const int fieldno, const int valueno = 0, const int subvalueno = 0) const;
+	//ND var remove(const int fieldno, const int valueno = 0, const int subvalueno = 0) const;
+	ND var remove(const int fieldno, const int valueno = 0, const int subvalueno = 0) const {return var(*this).remover(fieldno, valueno, subvalueno);}
 
 	//.f(...) stands for .attribute(...) or extract(...)
 	// pickos
@@ -1897,14 +1912,14 @@ class PUBLIC var final {
 	// becomes c++
 	// xxx=yyy.f(10);
 	ND var f(const int fieldno, const int valueno = 0, const int subvalueno = 0) const;
-	ND var extract(const int fieldno, const int valueno = 0, const int subvalueno = 0) const;
+	ND var extract(const int fieldno, const int valueno = 0, const int subvalueno = 0) const {return this->f(fieldno, valueno, subvalueno);}
 
 	// SAME AS ABOVE ON TEMPORARIES
 	///////////////////////////////
 
-	ND VARREF insert(const int fieldno, const int valueno, const int subvalueno, CVR insertion) &&;
-	ND VARREF insert(const int fieldno, const int valueno, CVR insertion) &&;
-	ND VARREF insert(const int fieldno, CVR insertion) &&;
+	ND VARREF insert(const int fieldno, const int valueno, const int subvalueno, CVR insertion) && {return this->inserter(fieldno, valueno, subvalueno, insertion);}
+	ND VARREF insert(const int fieldno, const int valueno, CVR insertion) && {return this->inserter(fieldno, valueno, 0, insertion);}
+	ND VARREF insert(const int fieldno, CVR insertion) && {return this->inserter(fieldno, 0, 0, insertion);}
 
 	// MV STRING FILTERS
 	////////////////////
@@ -1930,12 +1945,14 @@ class PUBLIC var final {
 
 	// r() is short for replacer() since it is probably the most common var function after a()
 	VARREF r(const int fieldno, const int valueno, const int subvalueno, CVR replacement);
-	VARREF r(const int fieldno, const int valueno, CVR replacement);
-	VARREF r(const int fieldno, CVR replacement);
+	//VARREF r(const int fieldno, const int valueno, CVR replacement);
+	//VARREF r(const int fieldno, CVR replacement);
+	VARREF r(const int fieldno, const int valueno, CVR replacement) {return r(fieldno, valueno, 0, replacement);}
+	VARREF r(const int fieldno, CVR replacement) {	return r(fieldno, 0, 0, replacement);}
 
 	VARREF inserter(const int fieldno, const int valueno, const int subvalueno, CVR insertion);
-	VARREF inserter(const int fieldno, const int valueno, CVR insertion);
-	VARREF inserter(const int fieldno, CVR insertion);
+	VARREF inserter(const int fieldno, const int valueno, CVR insertion) {return this->inserter(fieldno, valueno, 0, insertion);}
+	VARREF inserter(const int fieldno, CVR insertion) {return this->inserter(fieldno, 0, 0, insertion);}
 
 	// VARREF eraser(const int fieldno, const int valueno=0, const int subvalueno=0);
 	VARREF remover(const int fieldno, const int valueno = 0, const int subvalueno = 0);
@@ -2446,6 +2463,10 @@ class PUBLIC var_proxy3 {
 	}
 
 };
+
+ND inline var_proxy1 var::operator()(int fieldno) {return var_proxy1(*this, fieldno);}
+ND inline var_proxy2 var::operator()(int fieldno, int valueno) {return var_proxy2(*this, fieldno, valueno);}
+ND inline var_proxy3 var::operator()(int fieldno, int valueno, int subvalueno) {return var_proxy3(*this, fieldno, valueno, subvalueno);}
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wexit-time-destructors"

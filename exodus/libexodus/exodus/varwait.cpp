@@ -20,7 +20,7 @@ namespace exodus {
   Entry 0 of wd and argv is unused. */
 
 //return true if any relevent events
-var handle_events(int inotify_fd, int* wd, const int argc, const char* argv[]) {
+static inline var handle_events(int inotify_fd, int* wd, const int argc, const char* argv[]) {
 	/* Some systems cannot read integer variables if they are not
       properly aligned. On other systems, incorrect alignment may
       decrease performance. Hence, the buffer used for reading from
@@ -131,7 +131,7 @@ var handle_events(int inotify_fd, int* wd, const int argc, const char* argv[]) {
 //
 //returns a list of events in those directories
 //or "1" if a key was pressed
-var wait_main(const int argc, const char* argv[], const int wait_time_ms) {
+static inline var wait_main(const int argc, const char* argv[], const int wait_time_ms) {
 
 	//c style declaration at top
 	//char buf;

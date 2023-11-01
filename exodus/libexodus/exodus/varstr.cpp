@@ -25,6 +25,12 @@ THE SOFTWARE.
 #include <algorithm>  //for dim::sort
 #include <cstring>	  //for strlen strstr
 
+#ifdef __has_include
+#	if __has_include(<version>)
+#		include <version>
+#	endif
+#endif
+
 #include <exodus/varimpl.h>
 
 void extract_v2(char * instring, int inlength, int fieldno, int valueno, int subvalueno, int* outstart, int* outlength);
@@ -37,19 +43,10 @@ namespace exodus {
 
 // and var::field,field2,locate,extract,remove,pickreplace,insert,substr,paste,remove
 
-///////////////
-// FIELD/FIELD2
-///////////////
+////////
+// FIELD
+////////
 
-// FIELD2()
-var var::field2(SV separator, const int fieldno, const int nfields) const {
-	if (fieldno >= 0)
-		return field(separator, fieldno, nfields);
-
-	return field(separator, count(separator) + 1 + fieldno + 1, nfields);
-}
-
-// FIELD()
 // var.field(separator,fieldno,nfields)
 var var::field(SV separatorx, const int fieldnx, const int nfieldsx) const {
 
@@ -106,10 +103,10 @@ var var::field(SV separatorx, const int fieldnx, const int nfieldsx) const {
 // FIELDSTORE
 /////////////
 
-// var.fieldstore(separator,fieldno,nfields,replacement)
-var var::fieldstore(SV separator, const int fieldnx, const int nfieldsx, CVR replacementx) const& {
-	return var(*this).fieldstorer(separator, fieldnx, nfieldsx, replacementx);
-}
+//// var.fieldstore(separator,fieldno,nfields,replacement)
+//var var::fieldstore(SV separator, const int fieldnx, const int nfieldsx, CVR replacementx) const& {
+//	return var(*this).fieldstorer(separator, fieldnx, nfieldsx, replacementx);
+//}
 
 // in-place
 VARREF var::fieldstorer(SV separator, const int fieldnx, const int nfieldsx, CVR replacementx) {
@@ -214,7 +211,7 @@ VARREF var::fieldstorer(SV separator, const int fieldnx, const int nfieldsx, CVR
 /////////
 
 // hardcore string locate function given a section of a string and all parameters
-inline bool locateat(const std::string& var_str, const std::string& target, size_t start_pos, size_t end_pos, const int order, SV usingchar, VARREF setting) {
+static bool locateat(const std::string& var_str, const std::string& target, size_t start_pos, size_t end_pos, const int order, SV usingchar, VARREF setting) {
 	// private - assume everything is defined/assigned correctly
 
 	//
@@ -462,7 +459,7 @@ inline bool locateat(const std::string& var_str, const std::string& target, size
 }
 
 // locate within extraction
-inline bool locatex(const std::string& var_str, const std::string& target, const char* ordercode, SV usingchar, VARREF setting, int fieldno, int valueno, const int subvalueno) {
+static bool locatex(const std::string& var_str, const std::string& target, const char* ordercode, SV usingchar, VARREF setting, int fieldno, int valueno, const int subvalueno) {
 	// private - assume everything is defined/assigned correctly
 
 	// any negatives at all returns ""
@@ -802,31 +799,13 @@ bool var::locateusing(const char* usingchar, CVR target, VARREF setting, const i
 // EXTRACT
 //////////
 
-// const var(fn,vn,sn) extract var
-//
-//var var::operator()(int fieldno, int valueno/*=0*/, int subvalueno/*=0*/) const {
-//	return f(fieldno, valueno, subvalueno);
-//}
-
-// non-const xxxx(fn,vn,sn) returns a proxy that can be aasigned to or implicitly converted to a var
-//
-var_proxy1 var::operator()(int fieldno) {
-	return var_proxy1(*this, fieldno);
-}
-var_proxy2 var::operator()(int fieldno, int valueno) {
-	return var_proxy2(*this, fieldno, valueno);
-}
-var_proxy3 var::operator()(int fieldno, int valueno, int subvalueno) {
-	return var_proxy3(*this, fieldno, valueno, subvalueno);
-}
-
 // Old "extract()" function in either procedural or OO style.
 //     xxx = extract(yyy, 1, 2, 3)
 //  or xxx = yyy.extract(1, 2, 3)
 //
-var var::extract(const int argfieldn, const int argvaluen/*=0*/, const int argsubvaluen/*=0*/) const {
-	return this->f(argfieldn, argvaluen, argsubvaluen);
-}
+//var var::extract(const int argfieldn, const int argvaluen/*=0*/, const int argsubvaluen/*=0*/) const {
+//	return this->f(argfieldn, argvaluen, argsubvaluen);
+//}
 
 // Abbreviated xxxx.f(1,2,3) syntax. PickOS angle bracket syntax (xxx<1,2,3>) not possible in C++
 //     xxx = yyy.f(1,2,3)
@@ -961,12 +940,7 @@ var var::f(const int argfieldn, const int argvaluen/*=0*/, const int argsubvalue
 // REMOVE was PickOS "DELETE()"
 //////////////////////////////
 
-// 1. return a temporary
-var var::remove(const int fieldno, const int valueno, const int subvalueno) const {
-	return var(*this).remover(fieldno, valueno, subvalueno);
-}
-
-// 2. remove in place
+// Remove in place
 VARREF var::remover(int fieldno, int valueno, int subvalueno) {
 
 	THISIS("VARREF var::remover(int fieldno,int valueno,int subvalueno)")
@@ -1091,26 +1065,6 @@ VARREF var::remover(int fieldno, int valueno, int subvalueno) {
 ///////////////////////////////////////////
 // PICKREPLACE int int int var
 ///////////////////////////////////////////
-
-var var::pickreplace(const int fieldno, const int valueno, const int subvalueno, CVR replacement) const {
-	return var(*this).r(fieldno, valueno, subvalueno, replacement);
-}
-
-var var::pickreplace(const int fieldno, const int valueno, CVR replacement) const {
-	return var(*this).r(fieldno, valueno, 0, replacement);
-}
-
-var var::pickreplace(const int fieldno, CVR replacement) const {
-	return var(*this).r(fieldno, 0, 0, replacement);
-}
-
-VARREF var::r(const int fieldno, const int valueno, CVR replacement) {
-	return r(fieldno, valueno, 0, replacement);
-}
-
-VARREF var::r(const int fieldno, CVR replacement) {
-	return r(fieldno, 0, 0, replacement);
-}
 
 VARREF var::r(int fieldno, int valueno, int subvalueno, CVR replacement) {
 
@@ -1252,45 +1206,6 @@ VARREF var::r(int fieldno, int valueno, int subvalueno, CVR replacement) {
 ///////////////////////////////////////////
 // INSERT int int int var
 ///////////////////////////////////////////
-
-var var::insert(const int fieldno, const int valueno, const int subvalueno, CVR insertion) const& {
-	return var(*this).inserter(fieldno, valueno, subvalueno, insertion);
-}
-
-// given only field and value numbers
-var var::insert(const int fieldno, const int valueno, CVR insertion) const& {
-	return this->insert(fieldno, valueno, 0, insertion);
-}
-
-// given only field number
-var var::insert(const int fieldno, CVR insertion) const& {
-	return this->insert(fieldno, 0, 0, insertion);
-}
-
-// on temporary
-VARREF var::insert(const int fieldno, const int valueno, const int subvalueno, CVR insertion) && {
-	return this->inserter(fieldno, valueno, subvalueno, insertion);
-}
-
-// on temporary - given only field and value number
-VARREF var::insert(const int fieldno, const int valueno, CVR insertion) && {
-	return this->inserter(fieldno, valueno, 0, insertion);
-}
-
-// on temporary - given only field number
-VARREF var::insert(const int fieldno, CVR insertion) && {
-	return this->inserter(fieldno, 0, 0, insertion);
-}
-
-// in-place - given field and value no
-VARREF var::inserter(const int fieldno, const int valueno, CVR insertion) {
-	return this->inserter(fieldno, valueno, 0, insertion);
-}
-
-// in-place given only field no
-VARREF var::inserter(const int fieldno, CVR insertion) {
-	return this->inserter(fieldno, 0, 0, insertion);
-}
 
 //in-place - given everything
 VARREF var::inserter(const int fieldno, const int valueno, const int subvalueno, CVR insertion) {
@@ -1505,21 +1420,15 @@ bool var::contains(SV str) const {
 	// Programmer logic: Compare as many characters as are in the search string for presence in the list of characters and return success if there are no failures.
 	//
 	if (str.empty()) {
-
-//		var(function_sig).errputl();
-//		if (not var().osgetenv("EXO_DEBUG")) {
-//			// The following triggers a break when EXO_DEBUG is set
-//			VarError e("Searching for '' in "_var ^ __PRETTY_FUNCTION__);
-//			e.description.errput();
-//			//e.stack().f(1).errputl(", ");
-//			//e.stack(1).errputl(", ");
-//		}
-
 		return false;
 	}
 
+#ifdef __cpp_lib_string_contains
+	//C++23
+	return var_str.contains(str);
+#else
 	return var_str.find(str) != std::string::npos;
-	//C++23 return var_str.contains(vstr.var_str);
+#endif
 }
 
 ////////
@@ -1698,23 +1607,6 @@ VARREF var::cutter(const int length) {
 // SUBSTR
 /////////
 
-var var::substr(const int startindex1) const& {
-	return var(*this).substrer(startindex1);
-}
-
-//[x,y]
-// var.s(start,length) substring
-var var::substr(const int startindex1, const int length) const& {
-	return var(*this).substrer(startindex1, length);
-}
-
-// in-place
-VARREF var::substrer(const int startindex1) {
-	// TODO look at using erase to speed up
-	this->toString();
-	return this->substrer(startindex1, static_cast<int>(var_str.size()));
-}
-
 //[x,y]
 // var.s(start,length) substring
 VARREF var::substrer(const int startindex1, const int length) {
@@ -1787,15 +1679,12 @@ VARREF var::substrer(const int startindex1, const int length) {
 	return *this;
 }
 
-var var::operator[](int charno) const {
-	//errputl(__PRETTY_FUNCTION__);
-	return this->at(charno);
-}
+//////
+/// AT
+//////
 
-// var.c(charno) character
 //var var::operator[](const int charno) const {
 var var::at(const int charno) const {
-	//std::cout << "rvalue" <<std::endl;
 
 	THISIS("var var::at(const int charno) const")
 	assertString(function_sig);
@@ -2164,7 +2053,7 @@ void var_brackets_proxy::operator=(char char1) {
 
 //////
 // SUM
-/////
+//////
 var var::sumall() const {
 
 	THISIS("var var::sumall()")

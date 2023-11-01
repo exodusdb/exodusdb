@@ -110,7 +110,7 @@ static class SetGlobalLocale {
 //	- if user forgets to call osclose(), the stream remains opened (alive) until
 //		~VarOSHandlesCache for h_cache closes/deletes all registered objects.
 
-std::locale get_locale(const char* locale_name)	// throw (VarError)
+static std::locale get_locale(const char* locale_name)	// throw (VarError)
 {
 	// assume is checked prior to calling since this is an internal exodus function
 	// THISIS("std::locale get_locale(const char* locale_name)")
@@ -142,7 +142,7 @@ std::locale get_locale(const char* locale_name)	// throw (VarError)
 	}
 }
 
-bool checknotabsoluterootfolder(std::string dirpath) {
+static bool checknotabsoluterootfolder(std::string dirpath) {
 	// safety - will not rename/remove top level folders
 	// cwd to top level and delete relative
 	// top level folder has only one slash either at the beginning or, on windows, like x:\ .
@@ -164,11 +164,11 @@ bool checknotabsoluterootfolder(std::string dirpath) {
 	return true;
 }
 
-const std::string to_path_string(CVR str1) {
+static const std::string to_path_string(CVR str1) {
 	return str1.toString();
 }
 
-const std::string to_oscmd_string(CVR cmd) {
+static const std::string to_oscmd_string(CVR cmd) {
 
 	// while converting from DOS convert all backslashes in first word to forward slashes on
 	// linux or leave as if exodus on windows
@@ -715,7 +715,7 @@ bool var::osbwrite(CVR osfilevar, VARREF offset) const {
 	return true;
 }
 
-unsigned count_excess_UTF8_bytes(const std::string& str) {
+static unsigned count_excess_UTF8_bytes(const std::string& str) {
 
 	// Scans backward from the end of string.
 	const char* cptr = &str.back();
