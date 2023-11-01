@@ -74,7 +74,7 @@ Binary    Hex          Comments
 #pragma clang diagnostic pop
 #define STD_OR_FASTFLOAT fast_float
 
-#elif __GNUC__ >= 11
+#elif __GNUC__ >= 11 || __clang_major__ >= 14
 #define USE_CHARCONV
 #define STD_OR_FASTFLOAT std
 

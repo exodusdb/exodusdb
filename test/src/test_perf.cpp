@@ -39,7 +39,7 @@ programinit()
 				int outlength;
 				//extract(arg1.data(), int(arg1.size()), int(line2(4)), int(line2(5)), int(line2(6)), &outstart, &outlength);
 				extract2(arg1.data(), int(arg1.size()), int(line2(4)), int(line2(5)), int(line2(6)), &outstart, &outlength);
-				var result = arg1.substr(outstart, outlength);
+				var result = arg1.substr(static_cast<size_t>(outstart), static_cast<size_t>(outlength));
 
 				linen++;
 
@@ -86,7 +86,7 @@ programinit()
 			extract2(start, len, 10, 10, 10, &outstart, &outlen);
 			//result = v1.f(10,10,10);
 		}
-		printl(std::string(start+outstart, outlen));
+		printl(std::string(start+outstart, static_cast<size_t>(outlen)));
 		setup_time = ostime() - started;
 		printl("Act:", round((setup_time) / nn * 1E9), "ns");
 	}
