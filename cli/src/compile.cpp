@@ -36,6 +36,7 @@ programinit()
 	// Do NOT update in multithreaded compile function
 
 	var exodus_include_dir_info = "";
+	var exodus_libfile_info = "";
 	var nasterisks = 0;
 
 	//.def file is one way on msvc to force library function names to be "undecorated"
@@ -427,7 +428,7 @@ function main() {
 		liboptions ^= " -fvisibility=hidden -fvisibility-inlines-hidden";
 #endif
 
-		//libexodusinfo = osfile("/usr/local/lib/libexodus.so");
+		exodus_libfile_info = osfile("/usr/local/lib/libexodus.so");
 		exodus_include_dir_info = osdir("/usr/local/include/exodus");
 
 	} else {
@@ -1400,11 +1401,11 @@ function main() {
 			//////////////////////////////////////////////////////////////////////////////////////
 
 			let outfileinfo = osfile(outputdir ^ field2(binfilename, OSSLASH, -1));
-			if (outfileinfo and not(force) and not(generateheadersonly) && is_newer(outfileinfo, srcfileinfo) && is_newer(outfileinfo, exodus_include_dir_info)) {
+			if (outfileinfo and not(force) and not(generateheadersonly) && is_newer(outfileinfo, srcfileinfo) && is_newer(outfileinfo, exodus_include_dir_info) and is_newer(outfileinfo, exodus_libfile_info)) {
 
 				// Recompile is required if any include file is younger than the current output binary
 				bool recompile_required = false;
-				// TODO recode to find #index directly instead of by line since includes are generally only in the first part of a program
+				// TODO recode to find #include directly instead of by line since includes are generally only in the first part of a program
 				for (var line : text) {
 
 					// Skip lines unlike "#include <printplans7.h>"
