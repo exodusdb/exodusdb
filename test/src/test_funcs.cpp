@@ -64,7 +64,7 @@ programinit()
 		try {
 			abort("asd");
 			assert(false);
-		} catch (MVAbort v) {
+		} catch (MVAbort& e) {
 			printl("Caught MVAbort");
 		}
 	}

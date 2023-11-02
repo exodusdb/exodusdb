@@ -50,7 +50,7 @@ namespace exodus {
 // unlike c++ which is acts more like a divisor/remainder function
 // Note that PICKOS definition is symmetrical about 0 the limit of 0
 //i.e. mod(x,y) == -(mod(-x,-y))
-inline double exodusmodulo_dbl(const double dividend, const double limit) {
+static double exodusmodulo_dbl(const double dividend, const double limit) {
 
 	if (!limit)
 		throw VarDivideByZero("mod('" ^ var(dividend) ^ "', '" ^ var(limit) ^ ")");
@@ -70,7 +70,7 @@ inline double exodusmodulo_dbl(const double dividend, const double limit) {
 	return result;
 }
 
-inline varint_t exodusmodulo_int(const varint_t dividend, const varint_t limit) {
+static varint_t exodusmodulo_int(const varint_t dividend, const varint_t limit) {
 
 	if (!limit)
 		throw VarDivideByZero("mod('" ^ var(dividend) ^ "', '" ^ var(limit) ^ ")");

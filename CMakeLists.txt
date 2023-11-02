@@ -125,6 +125,7 @@
 # ########
 #
 	add_compile_options(-Wall -Wextra -Wconversion)
+	add_compile_options(-Winline)
 	#add_compile_options(-Wno-unused-result) #switch off nodiscard warnings
 
 	if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
@@ -238,6 +239,7 @@
 # See https://fmt.dev/latest/usage.html
 # How to build
 		set(BUILD_SHARED_LIBS true)
+		set(FMT_PEDANTIC true)
 		add_subdirectory(fmt)
 		set(FMT_LIBRARIES fmt)
 #	else()

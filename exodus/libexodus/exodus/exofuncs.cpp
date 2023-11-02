@@ -24,6 +24,8 @@ THE SOFTWARE.
 
 #include <exodus/var.h>
 #include <exodus/exoenv.h>
+
+#define EXO_FUNCS_CPP
 #include <exodus/exofuncs.h>
 
 #undef DEFAULT_EMPTY
@@ -471,8 +473,7 @@ ND PUBLIC bool deleteindex(CVR dbfilename_or_var, CVR fieldname) {
 	return dbfilename_or_var.deleteindex(fieldname);
 }
 
-PUBLIC
-int exodus_main(int exodus_argc, const char* exodus_argv[], ExoEnv& mv, int threadno) {
+PUBLIC int exodus_main(int exodus_argc, const char* exodus_argv[], ExoEnv& mv, int threadno) {
 
 	// signal/interrupt handlers
 	// install_signals();

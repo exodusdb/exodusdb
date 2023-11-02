@@ -844,6 +844,8 @@ function main() {
 		// "this" means capture member variables by reference?
 		// "=" means capture local variables by value. MAKE SURE ALL ARE ASSIGNED!
 		//
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Winline"
 		boost::asio::post(
 			threadpool1,
 			[
@@ -1492,6 +1494,7 @@ function main() {
 		} // end of big lambda
 
 		); // end of boost::asio::post function
+#pragma GCC diagnostic pop
 
 	}  //goto nextfile
 

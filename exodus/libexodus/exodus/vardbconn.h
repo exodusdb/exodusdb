@@ -68,12 +68,13 @@ class DBConn	 // used as 'second' in pair, stored in connection map
 
 	// ctors
 
-	DBConn()
-		: pgconn_(nullptr) {}
+//	DBConn() : pgconn_(nullptr) {}
+	explicit DBConn() = default;
 
-	DBConn(PGconn* pgconn, std::string conninfo)
-		: pgconn_(pgconn), conninfo_(conninfo) {
-	}
+	//DBConn(PGconn* pgconn, std::string conninfo)
+	//	: pgconn_(pgconn), conninfo_(conninfo) {
+	//}
+	DBConn(PGconn* pgconn, std::string conninfo);
 
 	// members
 	//////////
@@ -83,7 +84,7 @@ class DBConn	 // used as 'second' in pair, stored in connection map
 	int flag = 0;
 
 	// postgres connection handle
-	PGconn* pgconn_;
+	PGconn* pgconn_ = nullptr;
 
 	// postgres locks per dbconn
 	// used to fail lock (per mv standard_ instead of stack locks (per postgres standard)
@@ -100,6 +101,10 @@ class DBConn	 // used as 'second' in pair, stored in connection map
 	bool in_transaction_ = false;
 
 };
+
+//PUBLIC DBConn::DBConn(PGconn* pgconn, std::string conninfo)
+//		: pgconn_(pgconn), conninfo_(conninfo) {
+//	}
 
 // "final" to avoid declaring the destructor as virtual as a precaution
 class DBConnector final {

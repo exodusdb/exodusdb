@@ -987,6 +987,25 @@ std::istream& operator>>(std::istream& istream1, VARREF into_str1) {
 	return istream1;
 }
 
+////////////////////
+// _var user literal
+////////////////////
+
+// "abc^def"_var
+ND var operator""_var(const char* cstr, std::size_t size) {
+    return var(cstr, size).fmiconverter();
+}
+
+// 123456_var
+ND var operator""_var(unsigned long long int i) {
+    return var(i);
+}
+
+// 123.456_var
+ND var operator""_var(long double d) {
+    return var(d);
+}
+
 //#endif
 
 } // namespace exodus

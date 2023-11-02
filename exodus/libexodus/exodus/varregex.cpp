@@ -74,13 +74,13 @@ allowing it to interface correctly with UTF-8, UTF-16, and UTF-32 data:
 
 #define USE_BOOST
 #ifdef USE_BOOST
-#define std_boost boost
-#include <boost/regex/icu.hpp>
-#include <boost/regex.hpp>
+#	define std_boost boost
+#	include <boost/regex/icu.hpp>
+#	include <boost/regex.hpp>
 
 #else // USE_BOOST not defined
-#include <regex>
-#define std_boost std
+#	include <regex>
+#	define std_boost std
 #endif
 
 #include <exodus/varimpl.h>
@@ -92,8 +92,8 @@ namespace exodus {
 // in order to correctly process no-ASCII/multibyte characters
 
 #ifdef USE_BOOST
-#define REGEX boost::u32regex
-#define REGEX_REPLACE boost::u32regex_replace
+#	define REGEX boost::u32regex
+#	define REGEX_REPLACE boost::u32regex_replace
 
 	using syntax_flags_typ = int;
 
@@ -115,8 +115,8 @@ namespace exodus {
         boost::make_u32regex("\\W+");  // \W non-alphanumeric
 
 #else // USE_BOOST not defined
-#define REGEX std::regex
-#define REGEX_REPLACE std::regex_replace
+#	define REGEX std::regex
+#	define REGEX_REPLACE std::regex_replace
 	using syntax_flags_typ = std::regex::flag_type;
 
 	static const std::regex digits_regex("\\d+");  //\d numeric
@@ -188,7 +188,7 @@ syntax_flags_typ get_regex_syntax_flags(SV options) {
 static thread_local std::map<std::string, REGEX> thread_regexes;
 
 // Caches regex giving very approx 10x speed up
-REGEX& getregex(SV matchstr, SV options) {
+static REGEX& getregex(SV matchstr, SV options) {
 
 	auto cache_key = std::string(matchstr);
 	cache_key.push_back(FM_);
@@ -461,10 +461,10 @@ var var::iconv_MT() const {
 
 	// var time=(*this).replace("^\\D+|\\D+$", "", "r").replace("\\D+", " ", "r");
 
-	static std_boost::regex surrounding_nondigits_regex("^\\D+|\\D+$",
+	static const std_boost::regex surrounding_nondigits_regex("^\\D+|\\D+$",
 														std_boost::regex_constants::icase);
 
-	static std_boost::regex inner_nondigits_regex("\\D+", std_boost::regex_constants::icase);
+	static const std_boost::regex inner_nondigits_regex("\\D+", std_boost::regex_constants::icase);
 
 	var time = var(std_boost::regex_replace(var_str, surrounding_nondigits_regex, ""));
 	time = var(std_boost::regex_replace(time.var_str, inner_nondigits_regex, " "));

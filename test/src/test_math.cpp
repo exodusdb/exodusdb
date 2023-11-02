@@ -262,7 +262,7 @@ subroutine test2(in as, in bs) {
 			var x	 = 100.0;
 			x /= zero;
 			assert(false);
-		} catch (VarDivideByZero) {
+		} catch (VarDivideByZero& e) {
 		}
 	}
 	{
@@ -272,7 +272,7 @@ subroutine test2(in as, in bs) {
 			var x	 = 100.0;
 			x /= zero;
 			assert(false);
-		} catch (VarDivideByZero) {
+		} catch (VarDivideByZero& e) {
 		}
 	}
 
@@ -283,7 +283,7 @@ subroutine test2(in as, in bs) {
 			var x	 = 100;
 			x /= zero;
 			assert(false);
-		} catch (VarDivideByZero) {
+		} catch (VarDivideByZero& e) {
 		}
 	}
 	{
@@ -293,7 +293,7 @@ subroutine test2(in as, in bs) {
 			var x	 = 100;
 			x /= zero;
 			assert(false);
-		} catch (VarDivideByZero) {
+		} catch (VarDivideByZero& e) {
 		}
 	}
 	{

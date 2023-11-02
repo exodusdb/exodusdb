@@ -34,10 +34,11 @@
 // to be instantiated and its main(...) called from another program via so/dll delay loading
 // AND share the mv environment variables of the calling program!
 #define libraryinit(PROGRAMCLASSNAME)                              \
-_Pragma("clang diagnostic push")                                     \
-_Pragma("clang diagnostic ignored \"-Wweak-vtables\"")               \
+_Pragma("GCC diagnostic push")                                     \
+_Pragma("clang diagnostic ignored \"-Wweak-vtables\"")             \
+_Pragma("GCC diagnostic ignored \"-Winline\"")                     \
 class PROGRAMCLASSNAME##ExodusProgram : public ExodusProgramBase { \
-_Pragma("clang diagnostic pop")
+_Pragma("GCC diagnostic pop")
 
 // to undo an ms optimisation that prevents casting between member function pointers
 // http://social.msdn.microsoft.com/Forums/en/vclanguage/thread/a9cfa5c4-d90b-4c33-89b1-9366e5fbae74
@@ -66,17 +67,17 @@ Pointers to members have different representations; cannot cast between them
 
 #define libraryexit(PROGRAMCLASSNAME)                                                          \
  public:                                                                                       \
-	_Pragma("clang diagnostic push")                                                             \
-	_Pragma("clang diagnostic ignored \"-Wshadow-field\"")                                       \
+	_Pragma("clang diagnostic push")                                                           \
+	_Pragma("clang diagnostic ignored \"-Wshadow-field\"")                                     \
 	PROGRAMCLASSNAME##ExodusProgram(ExoEnv& mv) : ExodusProgramBase(mv) {}                     \
-	_Pragma("clang diagnostic pop")                                                              \
+	_Pragma("clang diagnostic pop")                                                            \
 };                                                                                             \
-_Pragma("clang diagnostic push")                                                                 \
-_Pragma("clang diagnostic ignored \"-Wmissing-prototypes\"")                                     \
+_Pragma("clang diagnostic push")                                                               \
+_Pragma("clang diagnostic ignored \"-Wmissing-prototypes\"")                                   \
 extern "C" PUBLIC void exodusprogrambasecreatedelete_##PROGRAMCLASSNAME(                       \
 		pExodusProgramBase& pexodusprogrambase, ExoEnv& mv,                                    \
 		pExodusProgramBaseMemberFunction& pmemberfunction) {                                   \
-_Pragma("clang diagnostic pop")                                                                  \
+_Pragma("clang diagnostic pop")                                                                \
 		if (pexodusprogrambase) {                                                              \
 			delete pexodusprogrambase;                                                         \
 			pexodusprogrambase = nullptr;                                                      \

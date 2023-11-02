@@ -52,7 +52,7 @@ function main() {
 			TRACE(x)
 			assert(x eq -2);
 			//		assert(x eq 18446744073709551614ULL)
-		} catch (VarNumOverflow e) {
+		} catch (VarNumOverflow& e) {
 			errputl(" thrown ", e.description);
 		}
 	}
@@ -109,8 +109,8 @@ function main() {
 		try {
 			unsigned int ui = x;
 			assert(false && ui);
-		} catch (VarNonPositive e) {
-			//} catch(VarNumUnderflow e) {
+		} catch (VarNonPositive& e) {
+			//} catch(VarNumUnderflow& e) {
 			errputl(" thrown ", e.description);
 		}
 		//		std::cout << ui << std::endl;
@@ -121,8 +121,8 @@ function main() {
 		try {
 			uint64_t ull = x;
 			assert(false && ull);
-		} catch (VarNonPositive e) {
-			//} catch(VarNumUnderflow e) {
+		} catch (VarNonPositive& e) {
+			//} catch(VarNumUnderflow& e) {
 			errputl(" thrown ", e.description);
 		}
 		//		std::cout << ull << std::endl;
@@ -185,7 +185,7 @@ function main() {
 			assert(false);
 			std::cout << int(c2) << std::endl;
 			//assert(c2 ==?);
-		} catch (VarNonNumeric e) {
+		} catch (VarNonNumeric& e) {
 			errputl(" thrown ", e.description);
 		}
 
@@ -268,7 +268,7 @@ function main() {
 			test_min_max<unsigned long>("unsigned long", 1);
 			assert(false);
 		}
-		catch (VarNumOverflow e) {
+		catch (VarNumOverflow& e) {
 			errputl(" thrown ", e.description);
 		}
 
@@ -277,7 +277,7 @@ function main() {
 			test_min_max<unsigned long long>("unsigned long long", 1);
 			assert(false);
 		}
-		catch (VarNumOverflow e) {
+		catch (VarNumOverflow& e) {
 			errputl(" thrown ", e.description);
 		}
 
@@ -286,7 +286,7 @@ function main() {
 			test_min_max<uint64_t>("uint64_t", 1);
 			assert(false);
 		}
-		catch (VarNumOverflow e) {
+		catch (VarNumOverflow& e) {
 			errputl(" thrown ", e.description);
 		}
 	}
@@ -300,7 +300,7 @@ function main() {
 //			test_min_max<unsigned long>("unsigned long", 2);
 //			assert(false);
 //		}
-//		catch (VarNumUnderflow e) {
+//		catch (VarNumUnderflow& e) {
 //			errputl(" thrown ", e.description);
 //		}
 //
@@ -309,7 +309,7 @@ function main() {
 //			test_min_max<unsigned long long>("unsigned long long", 2);
 //			assert(false);
 //		}
-//		catch (VarNumUnderflow e) {
+//		catch (VarNumUnderflow& e) {
 //			errputl(" thrown ", e.description);
 //		}
 //
@@ -318,7 +318,7 @@ function main() {
 //			test_min_max<uint64_t>("uint64_t", 2);
 //			assert(false);
 //		}
-//		catch (VarNumUnderflow e) {
+//		catch (VarNumUnderflow& e) {
 //			errputl(" thrown ", e.description);
 //		}
 	}
@@ -338,7 +338,7 @@ function main() {
 			test_min_max<long double>("long double", 1 /*max*/);
 			assert(false);
 		}
-		catch (VarNumOverflow e) {
+		catch (VarNumOverflow& e) {
 			errputl(" thrown ", e.description);
 		}
 
@@ -349,7 +349,7 @@ function main() {
 			test_min_max<long double>("long double", 2 /*low*/);
 			assert(false);
 		}
-		catch (VarNumUnderflow e) {
+		catch (VarNumUnderflow& e) {
 			errputl(" thrown ", e.description);
 		}
 

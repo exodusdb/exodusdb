@@ -17,7 +17,7 @@ programinit()
 			assert(f.first(-1).outputl() eq "");
 			assert(false);
 		}
-		catch (VarNonPositive e) {e.description.errputl();}
+		catch (VarNonPositive& e) {e.description.errputl();}
 
 		assert(f.first(0) eq "");
 		assert(f.first(1) eq "a");
@@ -33,7 +33,7 @@ programinit()
 			assert(l.last(-1) eq "");
 			assert(false);
 		}
-		catch (VarNonPositive e) {e.description.errputl();}
+		catch (VarNonPositive& e) {e.description.errputl();}
 
 		assert(l.last(0) eq "");
 		assert(l.last(1) eq "c");
@@ -51,7 +51,7 @@ programinit()
 			assert(var("abc").first(-1) eq "");
 			assert(false);
 		}
-		catch (VarNonPositive e) {e.description.errputl();}
+		catch (VarNonPositive& e) {e.description.errputl();}
 
 		assert(var("abc").first(0) eq "");
 		assert(var("abc").first(1) eq "a");
@@ -65,7 +65,7 @@ programinit()
 			assert(var("abc").last(-1) eq "");
 			assert(false);
 		}
-		catch (VarNonPositive e) {e.description.errputl();}
+		catch (VarNonPositive& e) {e.description.errputl();}
 
 		assert(var("abc").last(0) eq "");
 		assert(var("abc").last(1) eq "c");
@@ -83,7 +83,7 @@ programinit()
 			{var f = "abc";f.firster(-1);assert(f eq "");}
 			assert(false);
 		}
-		catch (VarNonPositive e) {e.description.errputl();}
+		catch (VarNonPositive& e) {e.description.errputl();}
 
 		{var f = "abc";f.firster(0);assert(f eq "");}
 		{var f = "abc";f.firster(1);assert(f eq "a");}
@@ -97,7 +97,7 @@ programinit()
 			{var l = "abc";l.laster(-1);assert(l eq "");}
 			assert(false);
 		}
-		catch (VarNonPositive e) {e.description.errputl();}
+		catch (VarNonPositive& e) {e.description.errputl();}
 
 		{var l = "abc";l.laster(0);assert(l eq "");}
 		{var l = "abc";l.laster(1);assert(l eq "c");}

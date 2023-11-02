@@ -3,9 +3,12 @@
 
 namespace exodus {
 
-// clang-format off
+//#pragma GCC diagnostic push
+//#pragma GCC diagnostic ignored "-Winline"
 
-//individual exceptions are made public so exodus programmers can catch specific errors or even stop/abort/debug if they want
+// Individual exceptions type are made public so that EXODUS programmers can
+// catch specific types of errors and/or stop, abort, or debug as they choose
+// clang-format off
 class PUBLIC VarDivideByZero    : public VarError {public: explicit VarDivideByZero(    CVR var1);};
 class PUBLIC VarNonNumeric      : public VarError {public: explicit VarNonNumeric(      CVR var1);};
 class PUBLIC VarNonPositive     : public VarError {public: explicit VarNonPositive(     CVR var1);};
@@ -24,6 +27,8 @@ class PUBLIC DimIndexOutOfBounds: public VarError {public: explicit DimIndexOutO
 class PUBLIC DimNotDimensioned  : public VarError {public: explicit DimNotDimensioned(  CVR var1);};
 
 // clang-format on
+
+//#pragma GCC diagnostic pop
 
 } //namespace exodus
 

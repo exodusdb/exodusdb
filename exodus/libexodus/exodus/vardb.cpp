@@ -232,7 +232,7 @@ Within transactions, lock requests for locks that have already been obtained alw
 namespace exodus {
 
 // the idea is for exodus to have access to one standard database without secret password
-static var defaultconninfo =
+static const var defaultconninfo =
 	"host=127.0.0.1 port=5432 dbname=exodus user=exodus "
 	"password=somesillysecret connect_timeout=10";
 
@@ -289,7 +289,7 @@ static thread_local std::map<std::string, DBresult> thread_dbresults;
 //	return std::string(PQgetvalue(pgresult, rown, coln), PQgetlength(pgresult, rown, coln));
 //}
 
-var getpgresultcell(PGresult* pgresult, int rown, int coln) {
+static var getpgresultcell(PGresult* pgresult, int rown, int coln) {
 	return var(PQgetvalue(pgresult, rown, coln), PQgetlength(pgresult, rown, coln));
 }
 
@@ -318,7 +318,7 @@ var getpgresultcell(PGresult* pgresult, int rown, int coln) {
 
 // Given a file name or handle, extract filename, standardize utf8, lowercase and change . to _
 // Normalise all alternative utf8 encodings of the same unicode points so they are identical
-var get_normal_filename(CVR filename_or_handle) {
+static var get_normal_filename(CVR filename_or_handle) {
 	//return filename_or_handle.f(1).normalize().lcase().convert(".", "_").replace("dict_","dict.");
 	// No longer convert . in filenames to _
 	return filename_or_handle.f(1).normalize().lcase();
@@ -330,7 +330,7 @@ static const var valuechars("\"'.0123456789-+");
 
 // hash64 a std::string
 ///////////////////////
-inline uint64_t mvdbpostgres_hash_stdstr(std::string str1) {
+static uint64_t mvdbpostgres_hash_stdstr(std::string str1) {
 
 #if defined(USE_WYHASH)
 	return wyhash(str1.data(), str1.size(), 0, _wyp);
@@ -362,7 +362,7 @@ inline uint64_t mvdbpostgres_hash_stdstr(std::string str1) {
 /////////////////////////////
 // Create a cross platform stable unique lock number per filename & key to manipulate advisory locks on a postgres connection
 // TODO Provide an endian identical version. required if and when exodus processes connect to postgres from different endian hosts
-inline uint64_t mvdbpostgres_hash_file_and_key(CVR filehandle, CVR key) {
+static uint64_t mvdbpostgres_hash_file_and_key(CVR filehandle, CVR key) {
 
 	// Use the pure filename and disregard any connection number
 	std::string fileandkey = get_normal_filename(filehandle);
@@ -493,7 +493,7 @@ static int get_dbconn_no(CVR dbhandle) {
 	return 0;
 }
 
-int get_dbconn_no_or_default(CVR dbhandle) {
+static int get_dbconn_no_or_default(CVR dbhandle) {
 
 	int dbconn_no = get_dbconn_no(dbhandle);
 	if (dbconn_no)
@@ -592,7 +592,6 @@ int get_dbconn_no_or_default(CVR dbhandle) {
 	return dbconn_no;
 }
 
-// var::get_pgconn()
 // 1. return the associated db connection
 // this could be a previously opened filevar, a previous connected connectionvar
 // or any variable previously used for a default connection
@@ -604,7 +603,7 @@ int get_dbconn_no_or_default(CVR dbhandle) {
 // NB in case 2 and 3 the connection id is recorded in the var
 // use void pointer to avoid need for including postgres headers in mv.h or any fancy class
 // hierarchy (assumes accurate programming by system programmers in exodus mvdb routines)
-PGconn* get_pgconn(CVR dbhandle) {
+static PGconn* get_pgconn(CVR dbhandle) {
 
 	// var("--- connection ---").logputl();
 	// get the connection associated with *this
@@ -630,7 +629,7 @@ PGconn* get_pgconn(CVR dbhandle) {
 }
 
 // gets lock_table, associated with connection, associated with this object
-DBConn* get_dbconn(CVR dbhandle) {
+static DBConn* get_dbconn(CVR dbhandle) {
 	int dbconn_no = get_dbconn_no_or_default(dbhandle);
 	if (!dbconn_no) {
 		var errmsg = "get_dbconn() attempted when not connected";
@@ -639,35 +638,87 @@ DBConn* get_dbconn(CVR dbhandle) {
 	return thread_dbconnector.get_dbconn(dbconn_no);
 }
 
-var var::setlasterror(CVR msg) const {
-	// no checking for speed
-	// THISIS("void var::lasterror(CVR msg")
-	// ISSTRING(msg)
+//static bool get_dbresult(CVR sql, DBresult& dbresult, PGconn* pgconn);
+// used for sql commands that require no parameters
+// returns 1 for success
+// returns 0 for failure
+// dbresult is returned to caller to extract any data and call PQclear(dbresult) in destructor of DBresult
+static bool get_dbresult(CVR sql, DBresult& dbresult, PGconn* pgconn) {
+	DEBUG_LOG_SQL
 
-	// tcache_get (tc_idx=12) at malloc.c:2943
-	// 2943    malloc.c: No such file or directory.
-	// You have heap corruption somewhere -- someone is running off the end of an array or
-	// dereferencing an invalid pointer or using some object after it has been freed. EVADE
-	// error for now by commenting next line
+	/* dont use PQexec because is cannot be told to return binary results
+	and use PQexecParams with zero parameters instead
+	//execute the command
+	dbresult = get_dbresult(pgconn, sql.var_str.c_str());
+	dbresult = dbresult;
+	*/
 
-	thread_lasterror = msg;
+	// Parameter array with no parameters
+	const char* paramValues[1];
+	int paramLengths[1];
 
-	if (DBTRACE)
-		TRACE(thread_lasterror)
+	// will contain any dbresult IF successful
+	dbresult = PQexecParams(pgconn, sql.toString().c_str(), 0, /* zero params */
+							nullptr,								/* let the backend deduce param type */
+							paramValues, paramLengths,
+							nullptr,  // text arguments
+							0);	// text results
 
-	return lasterror();
+	// Handle serious error. Why not throw?
+	if (!dbresult) {
+		var("ERROR: mvdbpostgres PQexec command failed, no error code: ").errputl();
+		return false;
+	}
+
+	switch (PQresultStatus(dbresult)) {
+
+		case PGRES_COMMAND_OK:
+			return true;
+
+		case PGRES_TUPLES_OK:
+			return PQntuples(dbresult) > 0;
+
+		case PGRES_NONFATAL_ERROR:
+
+			var("ERROR: mvdbpostgres SQL non-fatal error code " ^
+				var(PQresStatus(PQresultStatus(dbresult))) ^ ", " ^
+				var(PQresultErrorMessage(dbresult)))
+				.errputl();
+
+			return true;
+
+		case PGRES_EMPTY_QUERY:
+		case PGRES_COPY_OUT:
+		case PGRES_COPY_IN:
+		case PGRES_BAD_RESPONSE:
+		case PGRES_FATAL_ERROR:
+		case PGRES_COPY_BOTH:
+		case PGRES_SINGLE_TUPLE:
+#ifdef PGRES_PIPELINE_SYNC
+		case PGRES_PIPELINE_SYNC:
+#endif
+#ifdef PGRES_PIPELINE_ABORTED
+		case PGRES_PIPELINE_ABORTED:
+#endif
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wcovered-switch-default"
+		default:
+
+			var("ERROR: mvdbpostgres pqexec " ^ var(sql)).errputl();
+			var("ERROR: mvdbpostgres pqexec " ^
+				var(PQresStatus(PQresultStatus(dbresult))) ^ ": " ^
+				var(PQresultErrorMessage(dbresult)))
+				.errputl();
+
+			return false;
+#pragma clang diagnostic push
+	}
+
+	// should never get here
+	//std::unreachable
+	//return false;
+
 }
-
-var var::lasterror() const {
-	//TRACE(thread_file_handles.size());
-	return thread_lasterror;
-}
-
-var var::loglasterror(CVR source) const {
-	return thread_lasterror.logputl(source ^ " ");
-}
-
-static bool get_dbresult(CVR sql, DBresult& dbresult, PGconn* pgconn);
 
 #if defined _MSC_VER  //|| defined __CYGWIN__ || defined __MINGW32__
 LONG WINAPI DelayLoadDllExceptionFilter(PEXCEPTION_POINTERS pExcPointers) {
@@ -706,7 +757,7 @@ LONG WINAPI DelayLoadDllExceptionFilter(PEXCEPTION_POINTERS pExcPointers) {
 // require standard c++ try/catch stack unwinding?) maybe it would be easier to manually load it
 // using dlopen/dlsym implemented in var as var::load and var::call
 // http://msdn.microsoft.com/en-us/library/5skw957f(vs.80).aspx
-bool msvc_PQconnectdb(PGconn** pgconn, const std::string& conninfo) {
+static bool msvc_PQconnectdb(PGconn** pgconn, const std::string& conninfo) {
 	// connect or fail
 	__try {
 		*pgconn = PQconnectdb(conninfo.c_str());
@@ -718,8 +769,7 @@ bool msvc_PQconnectdb(PGconn** pgconn, const std::string& conninfo) {
 
 #endif
 
-//var var::build_conn_info(CVR conninfo) const {
-var build_conn_info(CVR conninfo) {
+static var build_conn_info(CVR conninfo) {
 	// priority is
 	// 1) given parameters //or last connection parameters
 	// 2) individual environment parameters
@@ -809,8 +859,56 @@ var build_conn_info(CVR conninfo) {
 	return result;
 }
 
-// var connection;
-// connection.connect2("dbname=exodusbase");
+static inline void unquoter_inline(VARREF iovar) {
+	// remove "", '' and {}
+	static var quotecharacters("\"'{");
+	if (quotecharacters.contains(iovar[1]))
+		//string = string.b(2, string.len() - 2);
+		//iovar = iovar.cut(1).popper();
+		iovar.cutter(1).popper();
+}
+
+static void tosqlstring(VARREF string1) {
+
+	// if double quoted then convert to sql style single quoted strings
+	// double up any internal single quotes
+	if (string1.starts("\"")) {
+	//if (string1.var_str.front() == '"') {
+		string1.replacer("'", "''");
+		string1.paster(1, 1, "'");
+		string1.paster(-1, 1, "'");
+		//string1.var_str.front() = "'";
+		//string1.var_str.back() = "'";
+	}
+}
+
+static var get_fileexpression([[maybe_unused]] CVR mainfilename, CVR filename, CVR keyordata) {
+
+	// if (filename == mainfilename)
+	//	return keyordata;
+	// else
+	//return filename.convert(".", "_") ^ "." ^ keyordata;
+	return get_normal_filename(filename) ^ "." ^ keyordata;
+
+	// if you dont use STRICT in the postgres function declaration/definitions then nullptr
+	// parameters do not abort functions
+
+	// use COALESCE function in case this is a joined but missing record (and therefore null)
+	// in MYSQL this is the ISNULL expression?
+	// xlatekeyexpression="exodus.extract_text(coalesce(" ^ filename ^ ".data,''::text), " ^
+	// xlatefromfieldname.cut(8); if (filename==mainfilename) return expression; return
+	// "coalesce(" ^ expression ^", ''::text)";
+}
+
+// Used in var::selectx
+static void to_extract_text(VARREF dictexpression) {
+				dictexpression.regex_replacer("^exodus.extract_number\\(", "exodus.extract_text\\(");
+				dictexpression.regex_replacer("^exodus.extract_sort\\(", "exodus.extract_text\\(");
+				dictexpression.regex_replacer("^exodus.extract_date\\(", "exodus.extract_text\\(");
+				dictexpression.regex_replacer("^exodus.extract_time\\(", "exodus.extract_text\\(");
+				dictexpression.regex_replacer("^exodus.extract_datetime\\(", "exodus.extract_text\\(");
+}
+
 bool var::connect(CVR conninfo) {
 
 	Timer t(242);//connect
@@ -2496,48 +2594,7 @@ bool var::clearfile(CVR filename) const {
 	return true;
 }
 
-inline void unquoter_inline(VARREF iovar) {
-	// remove "", '' and {}
-	static var quotecharacters("\"'{");
-	if (quotecharacters.contains(iovar[1]))
-		//string = string.b(2, string.len() - 2);
-		//iovar = iovar.cut(1).popper();
-		iovar.cutter(1).popper();
-}
-
-inline void tosqlstring(VARREF string1) {
-
-	// if double quoted then convert to sql style single quoted strings
-	// double up any internal single quotes
-	if (string1.starts("\"")) {
-	//if (string1.var_str.front() == '"') {
-		string1.replacer("'", "''");
-		string1.paster(1, 1, "'");
-		string1.paster(-1, 1, "'");
-		//string1.var_str.front() = "'";
-		//string1.var_str.back() = "'";
-	}
-}
-
-inline var get_fileexpression([[maybe_unused]] CVR mainfilename, CVR filename, CVR keyordata) {
-
-	// if (filename == mainfilename)
-	//	return keyordata;
-	// else
-	//return filename.convert(".", "_") ^ "." ^ keyordata;
-	return get_normal_filename(filename) ^ "." ^ keyordata;
-
-	// if you dont use STRICT in the postgres function declaration/definitions then nullptr
-	// parameters do not abort functions
-
-	// use COALESCE function in case this is a joined but missing record (and therefore null)
-	// in MYSQL this is the ISNULL expression?
-	// xlatekeyexpression="exodus.extract_text(coalesce(" ^ filename ^ ".data,''::text), " ^
-	// xlatefromfieldname.cut(8); if (filename==mainfilename) return expression; return
-	// "coalesce(" ^ expression ^", ''::text)";
-}
-
-var get_dictexpression(CVR cursor, CVR mainfilename, CVR filename, CVR dictfilename, CVR dictfile, CVR fieldname0, VARREF joins, VARREF unnests, VARREF selects, bool& ismv, bool& isdatetime, bool forsort) {
+static var get_dictexpression(CVR cursor, CVR mainfilename, CVR filename, CVR dictfilename, CVR dictfile, CVR fieldname0, VARREF joins, VARREF unnests, VARREF selects, bool& ismv, bool& isdatetime, bool forsort) {
 
 	Timer t(262);//get_dictexpression
 
@@ -3154,7 +3211,7 @@ exodus_call:
 }
 
 // var getword(VARREF remainingwords, CVR joinvalues=false)
-var getword(VARREF remainingwords, VARREF ucword) {
+static var getword(VARREF remainingwords, VARREF ucword) {
 
 	// gets the next word
 	// or a series of words separated by FM while they are numbers or quoted strings)
@@ -3298,14 +3355,6 @@ var getword(VARREF remainingwords, VARREF ucword) {
 //	return recn > 0;
 //}
 
-void to_extract_text(VARREF dictexpression) {
-				dictexpression.regex_replacer("^exodus.extract_number\\(", "exodus.extract_text\\(");
-				dictexpression.regex_replacer("^exodus.extract_sort\\(", "exodus.extract_text\\(");
-				dictexpression.regex_replacer("^exodus.extract_date\\(", "exodus.extract_text\\(");
-				dictexpression.regex_replacer("^exodus.extract_time\\(", "exodus.extract_text\\(");
-				dictexpression.regex_replacer("^exodus.extract_datetime\\(", "exodus.extract_text\\(");
-}
-
 bool var::select(CVR sortselectclause) {
 
 	Timer t(264);//select
@@ -3327,7 +3376,7 @@ bool var::select(CVR sortselectclause) {
 }
 
 // currently only called from select, selectrecord and getlist
-// TODO merge into plain select()
+// TODO merge into plain select()?
 bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 	// private - and arguments are left unchecked for speed
 	//?allow undefined usage like var xyz=xyz.select();
@@ -4665,7 +4714,7 @@ void var::clearselect() {
 // bool readnextx(const std::string& cursor, PGresultptr& dbresult)
 // called by readnext (and perhaps hasnext/select to implement LISTACTIVE)
 //bool readnextx(CVR cursor, PGresult* pgresult, PGconn* pgconn, int  nrows, int* rown) {
-bool readnextx(CVR cursor, PGconn* pgconn, int  direction, PGresult*& pgresult, int* rown) {
+static bool readnextx(CVR cursor, PGconn* pgconn, int  direction, PGresult*& pgresult, int* rown) {
 
 	var cursorcode = cursor.f(1).convert(".", "_");
 	var cursorid = cursor.f(2) ^ "_" ^ cursorcode;
@@ -4867,7 +4916,8 @@ bool var::savelist(CVR listname) {
 	var listno = 1;
 	var listkey = listname;
 	var list = "";
-	static int maxlistsize = 1024 * 1024;
+	// Limit maximum number of keys in one block to 1Mb
+	constexpr int maxlistsize = 1024 * 1024;
 
 	// Function to write list of keys.
 	// Called in readnext loop if list gets too large
@@ -5692,85 +5742,32 @@ var var::flushindex(CVR filename) const {
 	return flushresult;
 }
 
-// used for sql commands that require no parameters
-// returns 1 for success
-// returns 0 for failure
-// dbresult is returned to caller to extract any data and call PQclear(dbresult) in destructor of DBresult
-static bool get_dbresult(CVR sql, DBresult& dbresult, PGconn* pgconn) {
-	DEBUG_LOG_SQL
+var var::setlasterror(CVR msg) const {
+	// no checking for speed
+	// THISIS("void var::lasterror(CVR msg")
+	// ISSTRING(msg)
 
-	/* dont use PQexec because is cannot be told to return binary results
-	and use PQexecParams with zero parameters instead
-	//execute the command
-	dbresult = get_dbresult(pgconn, sql.var_str.c_str());
-	dbresult = dbresult;
-	*/
+	// tcache_get (tc_idx=12) at malloc.c:2943
+	// 2943    malloc.c: No such file or directory.
+	// You have heap corruption somewhere -- someone is running off the end of an array or
+	// dereferencing an invalid pointer or using some object after it has been freed. EVADE
+	// error for now by commenting next line
 
-	// Parameter array with no parameters
-	const char* paramValues[1];
-	int paramLengths[1];
+	thread_lasterror = msg;
 
-	// will contain any dbresult IF successful
-	dbresult = PQexecParams(pgconn, sql.toString().c_str(), 0, /* zero params */
-							nullptr,								/* let the backend deduce param type */
-							paramValues, paramLengths,
-							nullptr,  // text arguments
-							0);	// text results
+	if (DBTRACE)
+		TRACE(thread_lasterror)
 
-	// Handle serious error. Why not throw?
-	if (!dbresult) {
-		var("ERROR: mvdbpostgres PQexec command failed, no error code: ").errputl();
-		return false;
-	}
+	return lasterror();
+}
 
-	switch (PQresultStatus(dbresult)) {
+var var::lasterror() const {
+	//TRACE(thread_file_handles.size());
+	return thread_lasterror;
+}
 
-		case PGRES_COMMAND_OK:
-			return true;
-
-		case PGRES_TUPLES_OK:
-			return PQntuples(dbresult) > 0;
-
-		case PGRES_NONFATAL_ERROR:
-
-			var("ERROR: mvdbpostgres SQL non-fatal error code " ^
-				var(PQresStatus(PQresultStatus(dbresult))) ^ ", " ^
-				var(PQresultErrorMessage(dbresult)))
-				.errputl();
-
-			return true;
-
-		case PGRES_EMPTY_QUERY:
-		case PGRES_COPY_OUT:
-		case PGRES_COPY_IN:
-		case PGRES_BAD_RESPONSE:
-		case PGRES_FATAL_ERROR:
-		case PGRES_COPY_BOTH:
-		case PGRES_SINGLE_TUPLE:
-#ifdef PGRES_PIPELINE_SYNC
-		case PGRES_PIPELINE_SYNC:
-#endif
-#ifdef PGRES_PIPELINE_ABORTED
-		case PGRES_PIPELINE_ABORTED:
-#endif
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wcovered-switch-default"
-		default:
-
-			var("ERROR: mvdbpostgres pqexec " ^ var(sql)).errputl();
-			var("ERROR: mvdbpostgres pqexec " ^
-				var(PQresStatus(PQresultStatus(dbresult))) ^ ": " ^
-				var(PQresultErrorMessage(dbresult)))
-				.errputl();
-
-			return false;
-#pragma clang diagnostic push
-	}
-
-	// should never get here
-	//std::unreachable
-	//return false;
-
+var var::loglasterror(CVR source) const {
+	return thread_lasterror.logputl(source ^ " ");
 }
 
 }  // namespace exodus

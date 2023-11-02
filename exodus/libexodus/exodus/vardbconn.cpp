@@ -11,6 +11,10 @@ constexpr int TRACING = 0;
 
 namespace exodus {
 
+DBConn::DBConn(PGconn* pgconn, std::string conninfo)
+	: pgconn_(pgconn), conninfo_(conninfo) {
+}
+
 DBConnector::DBConnector(PGCONN_DELETER del)
 	// see important NOTE_OSX in header
 	: del_(del), dbconn_no_(0), dbconns_() {
@@ -20,8 +24,11 @@ int DBConnector::add_dbconn(PGconn* conn_to_cache, const std::string conninfo) {
 	// no longer need locking since dbconns_ is thread_local
 	//std::lock_guard lock(dbconns_mutex);
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Winline"
 	++dbconn_no_;
 	dbconns_[dbconn_no_] = DBConn(conn_to_cache, conninfo);
+#pragma GCC diagnostic pop
 
 	if (TRACING >= 3) {
 		var(conninfo).regex_replacer(R"(password\s*=\s*\w*)", "").errputl("DBConnector::add_dbconn: " ^ var(dbconn_no_) ^ " conninfo: ");

@@ -131,7 +131,7 @@ programinit()
 		try {
 			var x = rnd(0);
 			assert(false);
-		} catch (VarDivideByZero e) {
+		} catch (VarDivideByZero& e) {
 		}
 	}
 
@@ -282,7 +282,7 @@ programinit()
 				var x3 = x1;  //unassigned var
 				//assert(false && "var x3 = x1 should throw unassigned error)");
 				assert(false);
-			} catch (VarUnassigned e) {
+			} catch (VarUnassigned& e) {
 				//assert(true || "var v3 = v1) does give unassigned error)");
 			}
 		}
@@ -294,7 +294,7 @@ programinit()
 				var x2(x1);	 //unassigned dim element
 				//assert(false && "var x2(x1) should throw unassigned error)");
 				assert(false);
-			} catch (VarUnassigned e) {
+			} catch (VarUnassigned& e) {
 				//assert(true || "x2(x1) does give unassigned error)");
 			}
 		}

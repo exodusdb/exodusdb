@@ -190,13 +190,13 @@ programinit()
 		try {
 			notutf8.match("X").errputl();
 			assert(false);
-		} catch (VarError e) {errputl(e.description);}
+		} catch (VarError& e) {errputl(e.description);}
 
 		// bad target
 		try {
 			utf8.match(notutf8).errputl();
 			assert(false);
-		} catch (VarError e) {errputl(e.description);}
+		} catch (VarError& e) {errputl(e.description);}
 
 		// REPLACING
 
@@ -204,19 +204,19 @@ programinit()
 		try {
 			notutf8.regex_replace("X", "Y").errputl();
 			assert(false);
-		} catch (VarError e) {errputl(e.description);}
+		} catch (VarError& e) {errputl(e.description);}
 
 		// bad target
 		try {
 			utf8.regex_replace(notutf8, "Y").errputl();
 			assert(false);
-		} catch (VarError e) {errputl(e.description);}
+		} catch (VarError& e) {errputl(e.description);}
 
 		// bad replacement
 		try {
 			utf8.regex_replace("X", notutf8).errputl();
 			assert(false);
-		} catch (VarError e) {errputl(e.description);}
+		} catch (VarError& e) {errputl(e.description);}
 	}
 
 	printl(elapsedtimetext());

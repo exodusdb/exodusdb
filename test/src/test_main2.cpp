@@ -188,7 +188,7 @@ programinit()
 		//var x++;				//doesnt compile
 		var xx = xx.operator++();  //sadly c++ compiler allows this
 								   //var xx=xx++;			//doesnt compile
-	} catch (VarError error) {
+	} catch (VarError& error) {
 		printx(error.description);
 	}
 
@@ -198,15 +198,15 @@ programinit()
 		var abc = abc + 1;
 		printl("should never get here because above should cause a runtime undefined error");
 		assert(false);
-	} catch (VarUndefined mve) {
+	} catch (VarUndefined& e) {
 		//g++ sees the above as undefined
-		mve.description.outputl();
-	} catch (VarUnassigned mve) {
+		e.description.outputl();
+	} catch (VarUnassigned& e) {
 		//clang sees the above as unassigned
-		mve.description.outputl();
+		e.description.outputl();
 	}
-	//catch(VarNonNumeric mve) {
-	//	mve.description.outputl();
+	//catch(VarNonNumeric& e) {
+	//	e.description.outputl();
 	//}
 	catch (...) {
 		//should never get here because above should cause a runtime error
@@ -708,7 +708,7 @@ programinit()
 	try {
 		printl(filehandle);
 	}
-	catch (VarError error) {
+	catch (VarError& error) {
 		error.description.outputl();
 	}
 */

@@ -32,10 +32,11 @@ THE SOFTWARE.
 	namespace fmt = std;
 #elif __has_include(<fmt/core.h>)
 #	define EXO_FORMAT 2
-#	pragma clang diagnostic push
+#	pragma GCC diagnostic push
 #	pragma clang diagnostic ignored "-Wdocumentation-unknown-command"
+#	pragma GCC diagnostic ignored "-Winline"
 #	include <fmt/core.h>
-#	pragma clang diagnostic pop
+#	pragma GCC diagnostic pop
 #endif
 
 #include <exodus/var.h>
@@ -85,7 +86,11 @@ namespace exodus {
 
 // clang-format on
 
-inline std::mutex global_mutex_threadstream;
+#ifndef EXO_FUNCS_CPP
+extern
+#endif
+PUBLIC std::mutex global_mutex_threadstream;
+
 //
 // SLOW = threadsafe. With locking.  Output all arguments together.
 //      = printx/printl/printt, errput/errputl
@@ -649,21 +654,21 @@ void logput(const Printable&... values) {
 
 // printl(void) to cout
 
-inline void printl(void) {
+void printl(void) {
 	LOCKIOSTREAM_SLOW
 	std::cout << std::endl;
 }
 
 // errputl(void) to cerr
 
-inline void errputl(void) {
+void errputl(void) {
 	LOCKIOSTREAM_SLOW
 	std::cerr << std::endl;
 }
 
 // logputl(void) to clog
 
-inline void logputl(void) {
+void logputl(void) {
 	LOCKIOSTREAM_FAST
 	std::clog << std::endl;
 }
@@ -717,15 +722,18 @@ var format(std::string_view sv1, Args&&... args) {
 
 template <typename... Args>
 void print(std::string_view sv1, Args&&... args) {
+	LOCKIOSTREAM_SLOW
 	std::cout << fmt::vformat(sv1, fmt::make_format_args(args...));
 }
 
 template <typename... Args>
 void println(std::string_view sv1, Args&&... args) {
+	LOCKIOSTREAM_SLOW
 	std::cout << fmt::vformat(sv1, fmt::make_format_args(args...)) << std::endl;
 }
 
 void println() {
+	LOCKIOSTREAM_SLOW
 	std::cout << std::endl;
 }
 

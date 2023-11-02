@@ -16,7 +16,7 @@ programinit()
 		try {
 			TRACE(0xffffffffffffffff)	// minus 1
 			assert(false);
-		} catch (VarNumOverflow e) {
+		} catch (VarNumOverflow& e) {
 			printl(e.description);
 		}
 
@@ -25,7 +25,7 @@ programinit()
 		try {
 			TRACE(0x8000000000000000)	// min int64
 			assert(false);
-		} catch (VarNumOverflow e) {
+		} catch (VarNumOverflow& e) {
 			printl(e.description);
 		}
 
@@ -34,7 +34,7 @@ programinit()
 			i64.dump().outputl();
 			TRACE(i64)
 			assert(false);
-		} catch (VarNumOverflow e) {
+		} catch (VarNumOverflow& e) {
 			printl(e.description);
 		}
 
@@ -55,7 +55,7 @@ programinit()
 				i64_min--;
 				assert(false and var("i64_min--"));
 				i64_min.dump().outputl();
-			} catch (VarNumUnderflow e) {
+			} catch (VarNumUnderflow& e) {
 				printl("Successfully caught deliberate error", e.description);
 			}
 		}
@@ -104,7 +104,7 @@ programinit()
 				i64_max++;
 				assert(false and var("i64_max++"));
 				i64_max.dump().outputl();
-			} catch (VarNumOverflow e) {
+			} catch (VarNumOverflow& e) {
 				printl("Successfully caught deliberate error", e.description);
 			}
 		}
@@ -183,7 +183,7 @@ programinit()
 		try {
 			assert(x.toInt64());
 			assert(false);	//should not get here
-		} catch (VarNonNumeric e) {
+		} catch (VarNonNumeric& e) {
 			printl("OK", e.description);
 		}
 		x.dump().outputl();
@@ -197,7 +197,7 @@ programinit()
 		try {
 			assert(x.toInt64());
 			assert(false);	//should not get here
-		} catch (VarNonNumeric e) {
+		} catch (VarNonNumeric& e) {
 			printl("OK", e.description);
 		}
 		x.dump().outputl();

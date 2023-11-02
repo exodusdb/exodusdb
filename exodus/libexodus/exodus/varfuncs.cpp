@@ -111,18 +111,17 @@ namespace exodus {
 
 // output/errput/logput not threadsafe but probably not a problem
 //inline std::mutex global_mutex_threadstream;
-//#define LOCKIOSTREAM std::lock_guard guard(global_mutex_threadstream);
-#define LOCKIOSTREAM
-
+//#define LOCKIOSTREAM_OR_NOT std::lock_guard guard(global_mutex_threadstream);
+#define LOCKIOSTREAM_OR_NOT
 
 // exodus uses one locale per thread
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wexit-time-destructors"
 #pragma clang diagnostic ignored "-Wglobal-constructors"
-inline thread_local std::locale thread_boost_locale1;
+static thread_local std::locale thread_boost_locale1;
 #pragma clang diagnostic pop
 
-inline void init_boost_locale1() {
+static void init_boost_locale1() {
 	if (thread_boost_locale1.name() != "*") {
 		boost::locale::generator generator1;
 		thread_boost_locale1 = generator1("");
@@ -176,7 +175,7 @@ bool var::hasinput(int milliseconds) const {
 	//declare in haskey.cpp
 	bool haskey(int milliseconds);
 
-	//LOCKIOSTREAM
+	//LOCKIOSTREAM_OR_NOT
 
 	return haskey(milliseconds);
 }
@@ -194,7 +193,7 @@ VARREF var::input() {
 	var_str.clear();
 	var_typ = VARTYP_STR;
 
-	//LOCKIOSTREAM
+	//LOCKIOSTREAM_OR_NOT
 
 	if (!std::cin.eof())
 		std::getline(std::cin, var_str);
@@ -209,7 +208,7 @@ VARREF var::input(CVR prompt) {
 	assertDefined(function_sig);
 	ISSTRING(prompt)
 
-	//LOCKIOSTREAM
+	//LOCKIOSTREAM_OR_NOT
 
 	var default_input = this->assigned() ? (*this) : "";
 
@@ -247,7 +246,7 @@ VARREF var::inputn(const int nchars) {
 	THISIS("bool var::inputn(const int nchars")
 	assertDefined(function_sig);
 
-	//LOCKIOSTREAM
+	//LOCKIOSTREAM_OR_NOT
 
 	var_str.clear();
 	var_typ = VARTYP_STR;
@@ -262,7 +261,7 @@ VARREF var::inputn(const int nchars) {
 		for (;;) {
 			char char1;
 			{
-				//LOCKIOSTREAM
+				//LOCKIOSTREAM_OR_NOT
 				char1 = getkey();
 			}
 
@@ -284,7 +283,7 @@ VARREF var::inputn(const int nchars) {
 
 			char char1;
 			{
-				//LOCKIOSTREAM
+				//LOCKIOSTREAM_OR_NOT
 				char1 = getkey();
 			}
 
@@ -465,7 +464,7 @@ var::var(const std::wstring& wstr1) {
 
 
 // trim leading trimchars from a given string
-inline void trimmerfirst_helper(std::string& instr, SV trimchars) {
+static void trimmerfirst_helper(std::string& instr, SV trimchars) {
 
 	auto start_pos = instr.find_first_not_of(trimchars);
 
@@ -482,7 +481,7 @@ inline void trimmerfirst_helper(std::string& instr, SV trimchars) {
 }
 
 // trim trailing trimchars from a given string
-inline void trimmerlast_helper(std::string& iostr, SV trimchars) {
+static void trimmerlast_helper(std::string& iostr, SV trimchars) {
 
 	std::size_t end_pos = iostr.find_last_not_of(trimchars);
 
@@ -499,7 +498,7 @@ inline void trimmerlast_helper(std::string& iostr, SV trimchars) {
 
 // trim inner excess trimchars from a given string
 // ONLY works after trimming leading (F)ront and trailing (B)ack spaces
-inline void trimmerinner_helper(std::string& instr, SV trimchars) {
+static void trimmerinner_helper(std::string& instr, SV trimchars) {
 
 	// find the starting position of any embedded trimchars
 	// working backwards
@@ -837,7 +836,7 @@ VARREF var::fcaser() {
 	return *this;
 }
 
-inline bool is_ascii(std::string_view str1) {
+static inline bool is_ascii(std::string_view str1) {
 	// optimise for ASCII
 	// try ASCII uppercase to start with for speed
 	// this may not be correct for all locales. eg Turkish I i İ ı mixing Latin and Turkish
@@ -1560,7 +1559,7 @@ VARREF var::raiser() {
 
 //generic helper to handle char and u32_char wise conversion (mapping)
 template <class T1, class T2, class T3>
-void string_converter(T1& var_str, const T2 fromchars, const T3 tochars) {
+static void string_converter(T1& var_str, const T2 fromchars, const T3 tochars) {
 	typename T1::size_type pos = T1::npos;
 
 	// Optimise for single character replacement
@@ -1813,14 +1812,14 @@ CVR var::put(std::ostream& ostream1) const {
 
 // output() buffered threadsafe output to standard output
 CVR var::output() const {
-	LOCKIOSTREAM
+	LOCKIOSTREAM_OR_NOT
 	return this->put(std::cout);
 }
 
 // outputl() flushed threadsafe output to standard output
 // adds \n and flushes so is slower than output("\n")
 CVR var::outputl() const {
-	LOCKIOSTREAM
+	LOCKIOSTREAM_OR_NOT
 	this->put(std::cout);
 	std::cout << std::endl;
 	return *this;
@@ -1829,7 +1828,7 @@ CVR var::outputl() const {
 // outputt() buffered threadsafe output to standard output
 // adds \t
 CVR var::outputt() const {
-	LOCKIOSTREAM
+	LOCKIOSTREAM_OR_NOT
 	this->put(std::cout);
 	std::cout << '\t';
 	return *this;
@@ -1837,14 +1836,14 @@ CVR var::outputt() const {
 
 // overloaded output() outputs a prefix str
 CVR var::output(CVR str) const {
-	LOCKIOSTREAM
+	LOCKIOSTREAM_OR_NOT
 	str.put(std::cout);
 	return this->put(std::cout);
 }
 
 // oveloaded outputl() outputs a prefix str
 CVR var::outputl(CVR str) const {
-	LOCKIOSTREAM
+	LOCKIOSTREAM_OR_NOT
 	str.put(std::cout);
 	this->put(std::cout);
 	std::cout << std::endl;
@@ -1853,7 +1852,7 @@ CVR var::outputl(CVR str) const {
 
 // overloaded outputt() outputs a prefix str
 CVR var::outputt(CVR str) const {
-	LOCKIOSTREAM
+	LOCKIOSTREAM_OR_NOT
 	std::cout << "\t";
 	str.put(std::cout);
 	std::cout << "\t";
@@ -1866,7 +1865,7 @@ CVR var::outputt(CVR str) const {
 
 // errput() unbuffered threadsafe output to standard error
 CVR var::errput() const {
-	LOCKIOSTREAM
+	LOCKIOSTREAM_OR_NOT
 	//return put(std::cerr);
 	std::cerr << *this;
 	return *this;
@@ -1875,7 +1874,7 @@ CVR var::errput() const {
 // errputl() unbuffered threadsafe output to standard error
 // adds "\n"
 CVR var::errputl() const {
-	LOCKIOSTREAM
+	LOCKIOSTREAM_OR_NOT
 	//this->put(std::cerr);
 	std::cerr << *this;
 	std::cerr << std::endl;
@@ -1884,7 +1883,7 @@ CVR var::errputl() const {
 
 // overloaded errput outputs a prefix str
 CVR var::errput(CVR str) const {
-	LOCKIOSTREAM
+	LOCKIOSTREAM_OR_NOT
 	//str.put(std::cerr);
 	//return this->put(std::cerr);
 	std::cerr << str;
@@ -1894,7 +1893,7 @@ CVR var::errput(CVR str) const {
 
 // overloaded errputl outputs a prefix str
 CVR var::errputl(CVR str) const {
-	LOCKIOSTREAM
+	LOCKIOSTREAM_OR_NOT
 	//str.put(std::cerr);
 	//this->put(std::cerr);
 	std::cerr << str;
@@ -1908,7 +1907,7 @@ CVR var::errputl(CVR str) const {
 
 // logput() buffered threadsafe output to standard log
 CVR var::logput() const {
-	LOCKIOSTREAM
+	LOCKIOSTREAM_OR_NOT
 	//this->put(std::clog);
 	std::clog << *this;
 	//std::clog.flush();
@@ -1917,7 +1916,7 @@ CVR var::logput() const {
 
 // logputl() flushed threadsafe output to standard log
 CVR var::logputl() const {
-	LOCKIOSTREAM
+	LOCKIOSTREAM_OR_NOT
 	//this->put(std::clog);
 	std::clog << *this;
 	std::clog << std::endl;
@@ -1926,7 +1925,7 @@ CVR var::logputl() const {
 
 // overloaded logput with a prefix str
 CVR var::logput(CVR str) const {
-	LOCKIOSTREAM
+	LOCKIOSTREAM_OR_NOT
 	//str.put(std::clog);
 	std::clog << str;
 	std::clog << *this;
@@ -1935,7 +1934,7 @@ CVR var::logput(CVR str) const {
 
 // overloaded logputl with a prefix str
 CVR var::logputl(CVR str) const {
-	LOCKIOSTREAM
+	LOCKIOSTREAM_OR_NOT
 	//str.put(std::clog);
 	//this->put(std::clog);
 	std::clog << str;

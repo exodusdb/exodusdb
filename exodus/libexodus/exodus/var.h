@@ -2505,12 +2505,16 @@ ND inline var_proxy3 var::operator()(int fieldno, int valueno, int subvalueno) {
 
 #pragma clang diagnostic pop
 
+//#pragma GCC diagnostic push
+//#pragma GCC diagnostic ignored "-Winline"
+
 /////////////////////////
 // A base exception class - Provide stack tracing
 /////////////////////////
 class PUBLIC VarError {
  public:
 
+	//VarError(CVR description) = delete;
 	explicit VarError(CVR description);
 
 	var description;
@@ -2524,27 +2528,20 @@ class PUBLIC VarError {
 	mutable size_t stack_size_ = 0;
 
 };
+//#pragma GCC diagnostic pop
 
 ////////////////////
 // _var user literal
 ////////////////////
 
-//inline to evade ODR rule
-
 // "abc^def"_var
-ND inline var operator""_var(const char* cstr, std::size_t size) {
-	return var(cstr, size).fmiconverter();
-}
+PUBLIC ND var operator""_var(const char* cstr, std::size_t size);
 
 // 123456_var
-ND inline var operator""_var(unsigned long long int i) {
-	return var(i);
-}
+PUBLIC ND var operator""_var(unsigned long long int i);
 
 // 123.456_var
-ND inline var operator""_var(long double d) {
-	return var(d);
-}
+PUBLIC ND var operator""_var(long double d);
 
 }  // namespace exodus
 
