@@ -31,6 +31,8 @@ function main() {
 		// *** Note *** EXODUS format codes can ONLY be used on parameters that are exodus var type
 
 		// CORRECT
+		//0.5 -0.5 round to 1 and -1 respectively
+		//1.5 -1.5 round to 2 and -2 respectively
 		assert(format("{::MD00}x", var(3.5)) == "4x");
 		assert(format("{::MD00}x", var(2.5)) == "3x");
 		assert(format("{::MD00}x", var(1.5)) == "2x");
