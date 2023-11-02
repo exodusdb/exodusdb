@@ -248,6 +248,7 @@ var var::ostempfilename() const {
 	// Linux only function to create a temporary file
 	int fd_or_error;
 	if ((fd_or_error = mkstemp(&buffer[0])) == -1)
+		[[unlikely]]
 		throw VarError(var(__PRETTY_FUNCTION__) ^ " - Cannot create tempfilename " ^ rvo_tempfilename.quote());
 
 	// Must close or we will leak file handles because this badly designed function returns a name not a handle
@@ -675,7 +676,7 @@ bool var::osbwrite(CVR osfilevar, VARREF offset) const {
 
 	// get the buffered file handle/open on the fly
 	std::fstream* pmyfile = osfilevar.osopenx(osfilevar, "");
-	if (pmyfile == nullptr) {
+	if (pmyfile == nullptr) [[unlikely]] {
 		//throw VarError(this->setlasterror(osfilevar.quote() ^ " osbwrite open failed"));
 		this->setlasterror("osbwrite failed. " ^ this->lasterror());
 		return false;
@@ -697,7 +698,7 @@ bool var::osbwrite(CVR osfilevar, VARREF offset) const {
 	// if you are trying to write an exodus string containing a GREEK CAPITAL GAMMA
 	// unicode \x0393 and current codepage is *NOT* CP1253 (Greek)
 	// then c++ wiofstream cannot convert \x0393 to a single byte (in CP1253)
-	if (pmyfile->fail()) {
+	if (pmyfile->fail()) [[unlikely]] {
 		// saved in cache, DO NOT CLOSE!
 		// myfile.close();
 		throw VarError(this->setlasterror(osfilevar.quote() ^ " osbwrite write failed"));
@@ -819,7 +820,7 @@ bool var::osbread(CVR osfilevar, VARREF offset, const int bytesize) {
 	// get a memory block to read into
 	std::unique_ptr<char[]> memblock(new char[bytesize]);
 	//std::unique_ptr memblock(new char[bytesize]);
-	if (memblock == nullptr) {
+	if (memblock == nullptr) [[unlikely]] {
 		throw VarOutOfMemory("osbread could not obtain " ^ var(bytesize * sizeof(char)) ^
 							" bytes of memory to read " ^ osfilevar);
 	}

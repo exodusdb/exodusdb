@@ -95,6 +95,7 @@ var var::rnd() const {
 
 	// rnd(-1 ... 1) will always return 0 which is not random
 	if (std::abs(top) <= 1)
+		[[unlikely]]
 		throw VarDivideByZero("rnd(" ^ *this ^ ") will always return 0 which is not random");
 
 	// Define a integer range (0 to n-1) or (n+1 to 0)
@@ -145,7 +146,7 @@ void var::initrnd() const {
 			seed *= var_str[ii];
 		// seed=MurmurHash64((char*)var_str.data(),int(var_str.size()*sizeof(char)),0);
 
-	} else {
+	} else [[unlikely]] {
 		// Cant get here because already checked but need to evade a warning
 		// warning: ‘seed’ may be used uninitialized in this function [-Wmaybe-uninitialized]
 		seed = 0;

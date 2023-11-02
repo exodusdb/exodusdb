@@ -787,6 +787,7 @@ struct fmt::formatter<exodus::var> {
 		// If we dont find a closing "}" char
 
 #if EXO_FORMAT == 1
+		[[unlikely]]
 		throw std::format_error("formatter_parse: format missing trailing '}'");
 #else
 		//throw_format_error("formatter_parse: format missing trailing }");

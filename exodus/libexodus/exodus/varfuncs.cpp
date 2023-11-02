@@ -355,7 +355,7 @@ void var::default_to(CVR defaultvalue) {
 	//?allow undefined usage like var xyz=xyz.readnext();
 	// if (var_typ & VARTYP_MASK)
 
-	if (this->unassigned()) {
+	if (this->unassigned()) [[unlikely]]{
 		// throw VarUndefined("unassigned( ^ defaultvalue ^")");
 		// var_str="";
 		// var_typ=VARTYP_STR;

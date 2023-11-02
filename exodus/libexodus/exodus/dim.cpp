@@ -60,6 +60,7 @@ void dim::operator=(const dim& sourcedim) &{
 	//TRACE("CP ASS")
 	// cannot copy an undimensioned array
 	if (!sourcedim.initialised_)
+		[[unlikely]]
 		throw DimNotDimensioned("");
 
 	//this->redim(sourcedim.nrows_, sourcedim.ncols_);
@@ -92,6 +93,7 @@ void dim::operator=(dim&& sourcedim) & {
 	//TRACE("MV ASS")
 	// cannot copy an undimensioned array
 	if (!sourcedim.initialised_)
+		[[unlikely]]
 		throw DimNotDimensioned("");
 
 	EXO_DIM_RECALC_NROWS(sourcedim)
@@ -142,6 +144,7 @@ void dim::operator=(const double sourcedbl) {
 
 var dim::rows() const {
 	if (!this->initialised_)
+		[[unlikely]]
 		throw DimNotDimensioned("");
 	EXO_DIM_RECALC_NROWS(*this)
 	return nrows_;
@@ -149,6 +152,7 @@ var dim::rows() const {
 
 var dim::cols() const {
 	if (!this->initialised_)
+		[[unlikely]]
 		throw DimNotDimensioned("");
 	return ncols_;
 }
@@ -157,7 +161,7 @@ bool dim::redim(/*unsigned*/ int rows, /*unsigned*/ int cols) {
 
 	// Allow redim(0, 0) to clear all date
 //	if (rows == 0 || cols == 0)
-//		throw DimDimensionedZero();
+//		[[unlikely]] throw DimDimensionedZero();
 
 //	// do nothing if no change
 //	if (this->initialised_ && rows == nrows_ && cols == ncols_)
@@ -179,6 +183,7 @@ bool dim::redim(/*unsigned*/ int rows, /*unsigned*/ int cols) {
 		//std::cout<< "created[] " << newdata << std::endl;
 	}
 	catch (const std::bad_alloc& e) {
+		[[unlikely]]
 		throw VarOutOfMemory("redim("_var ^ var(rows) ^ ", " ^ var(cols) ^ ") " ^ e.what());
 	}
 
@@ -197,8 +202,10 @@ VARREF dim::operator()(/*unsigned*/ int rowno, /*unsigned*/ int colno) {
 
 	// check bounds
 	if (rowno > nrows_)
+		[[unlikely]]
 		throw DimIndexOutOfBounds("row:" ^ var(rowno) ^ " > " ^ var(nrows_));
 	if (colno > ncols_)
+		[[unlikely]]
 		throw DimIndexOutOfBounds("col:" ^ var(colno) ^ " > " ^ var(ncols_));
 
 	if (rowno == 0 || colno == 0)
@@ -214,10 +221,12 @@ CVR dim::operator()(/*unsigned*/ int rowno, /*unsigned*/ int colno) const {
 	// check bounds
 	//if (rowno > nrows_ || rowno < 0)
 	if (rowno > nrows_)
+		[[unlikely]]
 		throw DimIndexOutOfBounds("row:" ^ var(rowno) ^ " > " ^ var(nrows_));
 
 	//if (colno > ncols_ || colno < 0)
 	if (colno > ncols_)
+		[[unlikely]]
 		throw DimIndexOutOfBounds("col:" ^ var(colno) ^ " > " ^ var(ncols_));
 
 	if (rowno == 0 || colno == 0) {
@@ -229,6 +238,7 @@ CVR dim::operator()(/*unsigned*/ int rowno, /*unsigned*/ int colno) const {
 
 dim& dim::init(CVR sourcevar) {
 	if (!initialised_)
+		[[unlikely]]
 		throw DimNotDimensioned("");
 
 	// Use vector size in case some algorithm has adjusted it
@@ -246,6 +256,7 @@ dim& dim::init(CVR sourcevar) {
 var dim::join(SV sepchar) const {
 
 	if (!initialised_)
+		[[unlikely]]
 		throw DimNotDimensioned("");
 
 	// Use vector size in case some algorithm has adjusted it

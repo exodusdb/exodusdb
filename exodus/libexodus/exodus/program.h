@@ -39,7 +39,7 @@
 #define programinit(PROGRAMCLASSNAME)                               \
 _Pragma("GCC diagnostic push")                                      \
 _Pragma("clang diagnostic ignored \"-Wweak-vtables\"")              \
-/*_Pragma("GCC diagnostic ignored \"-Winline\"")*/                  \
+_Pragma("GCC diagnostic ignored \"-Winline\"")                      \
 class PROGRAMCLASSNAME##ExodusProgram : public ExodusProgramBase {  \
 _Pragma("GCC diagnostic pop")
 

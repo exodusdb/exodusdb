@@ -53,10 +53,9 @@ var var::field(SV separatorx, const int fieldnx, const int nfieldsx) const {
 	THISIS("var var::field(SV separatorx,const int fieldnx,const int nfieldsx) const")
 	assertString(function_sig);
 
-	if (separatorx.empty()) {
-		//return "";
+	if (separatorx.empty())
+		[[unlikely]]
 		throw VarError("separator cannot be blank in field()");
-	}
 
 	int fieldno = fieldnx > 0 ? fieldnx : 1;
 	int nfields = nfieldsx > 0 ? nfieldsx : 1;
@@ -116,13 +115,9 @@ VARREF var::fieldstorer(SV separator, const int fieldnx, const int nfieldsx, CVR
 		"CVR replacementx)")
 	assertStringMutator(function_sig);
 
-	if (separator.empty()) {
-		//// *this = "";
-		//var_str.clear();
-		//var_typ = VARTYP_STR;
-		//return *this;
+	if (separator.empty())
+		[[unlikely]]
 		throw VarError("separator cannot be blank in fieldstorer()");
-	}
 
 	// handle multibyte/non-ASCII separators
 	std::string::size_type separator_len = separator.size();
@@ -345,6 +340,7 @@ static bool locateat(const std::string& var_str, const std::string& target, size
 					//break;
 
 				default:
+					[[unlikely]]
 					throw VarError("locateat() invalid mode " ^ var(order));
 			}
 		}
@@ -450,6 +446,7 @@ static bool locateat(const std::string& var_str, const std::string& target, size
 				break;
 
 			default:
+				[[unlikely]]
 				throw VarError("locateat() invalid order" ^ var(order));
 		}
 		// skip over any sep character
@@ -475,6 +472,7 @@ static bool locatex(const std::string& var_str, const std::string& target, const
 		const char* ordercodes = "ALARDLDR";
 		const char* orderindex = strstr(ordercodes, ordercode);
 		if (orderindex == nullptr)
+			[[unlikely]]
 			throw VarError("locateby('" ^ var(ordercode) ^ "') is invalid");
 
 		// convert the memory address to the char position within the codes
@@ -1443,6 +1441,7 @@ var var::first(const size_t  length) const& {
 	// Assume high half of size_t is c++ unblockable conversion
 	// of negative ints to size_t. Runtime error
 	if (length > std::string::npos >> 1)
+		[[unlikely]]
 		throwNonPositive(__PRETTY_FUNCTION__);
 
 	// Construct a new var with the required number of chars from this or all
@@ -1463,6 +1462,7 @@ VARREF var::firster(const size_t length) {
 	// Assume high half of size_t is c++ unblockable conversion
 	// of negative ints to size_t. Runtime error
 	if (length > std::string::npos >> 1)
+		[[unlikely]]
 		throwNonPositive(__PRETTY_FUNCTION__);
 
 	// Reduce the size of this string if necessary
@@ -1485,6 +1485,7 @@ var var::last(const size_t  length) const& {
 	// Assume high half of size_t is c++ unblockable conversion
 	// of negative ints to size_t. Runtime error
 	if (length > std::string::npos >> 1)
+		[[unlikely]]
 		throwNonPositive(__PRETTY_FUNCTION__);
 
 	// Example "abc".last(2)
@@ -1510,6 +1511,7 @@ VARREF var::laster(const size_t length) {
 	// Assume high half of size_t is c++ unblockable conversion
 	// of negative ints to size_t. Runtime error
 	if (length > std::string::npos >> 1)
+		[[unlikely]]
 		throwNonPositive(__PRETTY_FUNCTION__);
 
 	// Example "abc".last(2)
@@ -2076,6 +2078,7 @@ var var::sumall() const {
 			//for clarity of error message,
 			//throw any error here instead of leaving it up to the +=
 			if (!subfield.isnum())
+				[[unlikely]]
 				throw VarNonNumeric("sumall() " ^ subfield.first(128).quote());
 
 			result += subfield;
@@ -2117,6 +2120,7 @@ var var::sum() const {
 		//for clarity of error message,
 		//throw any error here instead of leaving it up to the +=
 		if (!this->isnum())
+			[[unlikely]]
 			throw VarNonNumeric("sum() " ^ this->first(128).quote());
 
 		return (*this) + 0;
@@ -2137,6 +2141,7 @@ var var::sum() const {
 		//for clarity of error message,
 		//throw any error here instead of leaving it up to the +=
 		if (!part.isnum())
+			[[unlikely]]
 			throw VarNonNumeric("sum() " ^ part.first(128).quote());
 
 		if (flag) {

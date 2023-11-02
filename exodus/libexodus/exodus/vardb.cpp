@@ -611,7 +611,7 @@ static PGconn* get_pgconn(CVR dbhandle) {
 	// var(dbconn_no).logputl("dbconn_no1=");
 
 	// otherwise fail
-	if (!dbconn_no)
+	if (!dbconn_no) [[unlikely]] 
 //		throw VarDBException("pgconnection() requested when not connected.");
 		return nullptr;
 
@@ -631,7 +631,7 @@ static PGconn* get_pgconn(CVR dbhandle) {
 // gets lock_table, associated with connection, associated with this object
 static DBConn* get_dbconn(CVR dbhandle) {
 	int dbconn_no = get_dbconn_no_or_default(dbhandle);
-	if (!dbconn_no) {
+	if (!dbconn_no) [[unlikely]] {
 		var errmsg = "get_dbconn() attempted when not connected";
 		throw VarDBException(errmsg);
 	}
@@ -996,7 +996,7 @@ bool var::connect(CVR conninfo) {
 
 // abort if multithreading and it is not supported
 #ifdef PQisthreadsafe
-	if (!PQisthreadsafe()) {
+	if (!PQisthreadsafe()) [[unlikely]] {
 		// TODO only abort if environmentn>0
 		var errmsg = "connect(): Postgres PQ library is not threadsafe";
 		throw VarDBException(errmsg);
@@ -1316,6 +1316,7 @@ bool var::open(CVR filename, CVR connection /*DEFAULTNULL*/) {
 				)";
 	var result;
 	if (not connection2.sqlexec(sql, result))
+		[[unlikely]]
 		throw VarDBException(this->lasterror());
 	//result.convert(RM,"|").logputl("result=");
 
@@ -1338,6 +1339,7 @@ bool var::open(CVR filename, CVR connection /*DEFAULTNULL*/) {
 					)\
 		";
 		if (not connection2.sqlexec(sql, result))
+			[[unlikely]]
 			throw VarDBException(lasterror());
 	}
 
@@ -1410,6 +1412,7 @@ bool var::readc(CVR filehandle, CVR key) {
 	// check cache first, and return any cached record
 	int dbconn_no = get_dbconn_no_or_default(filehandle);
 	if (!dbconn_no)
+		[[unlikely]]
 		throw VarDBException("get_dbconn_no() failed");
 
 	// Initialise the record var to unassigned
@@ -1472,6 +1475,7 @@ bool var::writec(CVR filehandle, CVR key) const {
 	// virtually identical code in read and write/update/insert/delete
 	int dbconn_no = get_dbconn_no_or_default(filehandle);
 	if (!dbconn_no)
+		[[unlikely]]
 		throw VarDBException("get_dbconn_no() failed");
 
 	auto hash64 = mvdbpostgres_hash_file_and_key(filehandle, key);
@@ -1491,6 +1495,7 @@ bool var::deletec(CVR key) const {
 	// virtually identical code in read and write/update/insert/delete
 	int dbconn_no = get_dbconn_no_or_default(*this);
 	if (!dbconn_no)
+		[[unlikely]]
 		throw VarDBException("get_dbconn_no() failed");
 
 	auto hash64 = mvdbpostgres_hash_file_and_key(*this, key);
@@ -1538,7 +1543,7 @@ bool var::read(CVR filehandle, CVR key) {
 	}
 
 	// asking to read DOS file! do osread using key as osfilename!
-	if (filehandle == "") {
+	if (filehandle == "") [[unlikely]] {
 		var errmsg = "read(...) filename not specified, probably not opened.";
 		this->setlasterror(errmsg);
 		throw VarDBException(errmsg);
@@ -1589,7 +1594,7 @@ bool var::read(CVR filehandle, CVR key) {
 
 	// get filehandle specific connection or fail
 	auto pgconn = get_pgconn(filehandle);
-	if (!pgconn) {
+	if (!pgconn) [[unlikely]] {
 		var errmsg = "var::read() get_pgconn() failed for " ^ filehandle;
 		this->setlasterror(errmsg);
 		// // this->loglasterror(errmsg);
@@ -1612,7 +1617,7 @@ bool var::read(CVR filehandle, CVR key) {
 											0);	// text results
 
 	// Handle serious errors
-	if (PQresultStatus(dbresult) != PGRES_TUPLES_OK) {
+	if (PQresultStatus(dbresult) != PGRES_TUPLES_OK) [[unlikely]] {
 		var sqlstate = var(PQresultErrorField(dbresult, PG_DIAG_SQLSTATE));
 		var errmsg =
 			"read(" ^ filehandle.convert("." _FM, "_^").replace("dict_","dict.").quote() ^ ", " ^ key.quote() ^ ")";
@@ -1638,7 +1643,7 @@ bool var::read(CVR filehandle, CVR key) {
 	}
 
 	// A serious error
-	if (PQntuples(dbresult) > 1) {
+	if (PQntuples(dbresult) > 1) [[unlikely]] {
 		var errmsg = "ERROR: mvdbpostgres read() SELECT returned more than one record";
 		this->setlasterror(errmsg);
 		// this->loglasterror();
@@ -1700,7 +1705,7 @@ var var::lock(CVR key) const {
 	ISSTRING(key)
 
 	PGconn* pgconn = get_pgconn(*this);
-	if (!pgconn) {
+	if (!pgconn) [[unlikely]] {
 		var errmsg = "var::lock() get_pgconn() failed. ";
 		if (this->assigned())
 			errmsg ^= *this ^ ", ";
@@ -1750,7 +1755,7 @@ var var::lock(CVR key) const {
 											paramValues, paramLengths, paramFormats, 1); /* ask for binary dbresults */
 
 	// Handle serious errors
-	if (PQresultStatus(dbresult) != PGRES_TUPLES_OK || PQntuples(dbresult) != 1) {
+	if (PQresultStatus(dbresult) != PGRES_TUPLES_OK || PQntuples(dbresult) != 1) [[unlikely]] {
 		var sqlstate = var(PQresultErrorField(dbresult, PG_DIAG_SQLSTATE));
 		var errmsg = "lock(" ^ *this ^ ", " ^ key ^ ")\n" ^
 			var(PQerrorMessage(pgconn)) ^ "\nSQLERROR:" ^ sqlstate ^ " PQresultStatus=" ^
@@ -1783,7 +1788,7 @@ bool var::unlock(CVR key) const {
 	auto hash64 = mvdbpostgres_hash_file_and_key(*this, key);
 
 	auto pgconn = get_pgconn(*this);
-	if (!pgconn) {
+	if (!pgconn) [[unlikely]] {
 		var errmsg = "var::unlock() get_pgconn() failed. ";
 		if (this->assigned())
 			errmsg ^= *this ^ ", ";
@@ -1825,7 +1830,7 @@ bool var::unlock(CVR key) const {
 											paramValues, paramLengths, paramFormats, 1); /* ask for binary results */
 
 	// Handle serious errors
-	if (PQresultStatus(dbresult) != PGRES_TUPLES_OK) {
+	if (PQresultStatus(dbresult) != PGRES_TUPLES_OK) [[unlikely]] {
 		var sqlstate = var(PQresultErrorField(dbresult, PG_DIAG_SQLSTATE));
 		var errmsg = "unlock(" ^ this->convert(_FM, "^") ^ ", " ^ key ^ ")\n" ^
 				var(PQerrorMessage(pgconn)) ^ "\nSQLERROR:" ^ sqlstate ^ " PQresultStatus=" ^
@@ -1846,7 +1851,7 @@ bool var::unlockall() const {
 	assertDefined(function_sig);
 
 	auto pgconn = get_pgconn(*this);
-	if (!pgconn) {
+	if (!pgconn) [[unlikely]] {
 		var errmsg = "var::unlockall() get_pgconn() failed. ";
 		if (this->assigned())
 			errmsg ^= *this;
@@ -1892,7 +1897,7 @@ bool var::sqlexec(CVR sqlcmd, VARREF response) const {
 	ISSTRING(sqlcmd)
 
 	auto pgconn = get_pgconn(*this);
-	if (!pgconn) {
+	if (!pgconn) [[unlikely]] {
 		var errmsg = "var::sqlexec() get_pgconn() failed. ";
 		if (this->assigned())
 			errmsg ^= *this;
@@ -2020,7 +2025,7 @@ bool var::write(CVR filehandle, CVR key) const {
 	sql ^= " DO UPDATE SET data = $2";
 
 	auto pgconn = get_pgconn(filehandle);
-	if (!pgconn) {
+	if (!pgconn) [[unlikely]] {
 		var errmsg = "var::write() get_pgconn() failed. ";
 		errmsg ^= filehandle ^ ", " ^ key;
 		this->setlasterror(errmsg);
@@ -2043,7 +2048,7 @@ bool var::write(CVR filehandle, CVR key) const {
 											0);      // text results
 
 	// Handle serious errors
-	if (PQresultStatus(dbresult) != PGRES_COMMAND_OK) {
+	if (PQresultStatus(dbresult) != PGRES_COMMAND_OK) [[unlikely]] {
 		var sqlstate = var(PQresultErrorField(dbresult, PG_DIAG_SQLSTATE));
 		var errmsg = "ERROR: mvdbpostgres write(" ^ filehandle.convert(_FM, "^") ^
 					", " ^ key ^ ") failed: SQLERROR:" ^ sqlstate ^ " PQresultStatus=" ^
@@ -2089,7 +2094,7 @@ bool var::updaterecord(CVR filehandle, CVR key) const {
 	var sql = "UPDATE "  ^ get_normal_filename(filehandle) ^ " SET data = $2 WHERE key = $1";
 
 	auto pgconn = get_pgconn(filehandle);
-	if (!pgconn) {
+	if (!pgconn) [[unlikely]] {
 		var errmsg = "var::updaterecord() get_pgconn() failed. ";
 		errmsg ^= filehandle ^ ", " ^ key;
 		this->setlasterror(errmsg);
@@ -2108,7 +2113,7 @@ bool var::updaterecord(CVR filehandle, CVR key) const {
 											0);       // text results
 
 	// Handle serious errors
-	if (PQresultStatus(dbresult) != PGRES_COMMAND_OK) {
+	if (PQresultStatus(dbresult) != PGRES_COMMAND_OK) [[unlikely]] {
 		var sqlstate = var(PQresultErrorField(dbresult, PG_DIAG_SQLSTATE));
 		var errmsg = "ERROR: mvdbpostgres update(" ^ filehandle.convert(_FM, "^") ^
 				", " ^ key ^ ") SQLERROR: " ^ sqlstate ^ " Failed: " ^ var(PQntuples(dbresult)) ^ " " ^
@@ -2156,7 +2161,7 @@ bool var::insertrecord(CVR filehandle, CVR key) const {
 		"INSERT INTO " ^ get_normal_filename(filehandle) ^ " (key,data) values( $1 , $2)";
 
 	auto pgconn = get_pgconn(filehandle);
-	if (!pgconn) {
+	if (!pgconn) [[unlikely]] {
 		var errmsg = "var::insertrecord() get_pgconn() failed. ";
 		errmsg ^= filehandle ^ ", " ^ key;
 		this->setlasterror(errmsg);
@@ -2175,7 +2180,7 @@ bool var::insertrecord(CVR filehandle, CVR key) const {
 											0);      // text results
 
 	// Handle serious errors or ordinary duplicate key failure (which will mess us transactionsa)
-	if (PQresultStatus(dbresult) != PGRES_COMMAND_OK) {
+	if (PQresultStatus(dbresult) != PGRES_COMMAND_OK) [[unlikely]] {
 
 		// "duplicate key value violates unique constraint"
 		var sqlstate = var(PQresultErrorField(dbresult, PG_DIAG_SQLSTATE));
@@ -2230,7 +2235,7 @@ bool var::deleterecord(CVR key) const {
 	var sql = "DELETE FROM " ^ get_normal_filename(*this) ^ " WHERE KEY = $1";
 
 	auto pgconn = get_pgconn(*this);
-	if (!pgconn) {
+	if (!pgconn) [[unlikely]] {
 		var errmsg = "var::deleterecord() get_pgconn() failed. ";
 		if (this->assigned())
 			errmsg ^= *this ^ ", ";
@@ -2248,7 +2253,7 @@ bool var::deleterecord(CVR key) const {
 											0); // text results
 
 	// Handle serious errors
-	if (PQresultStatus(dbresult) != PGRES_COMMAND_OK) {
+	if (PQresultStatus(dbresult) != PGRES_COMMAND_OK) [[unlikely]] {
 		var sqlstate = var(PQresultErrorField(dbresult, PG_DIAG_SQLSTATE));
 		var errmsg = "ERROR: mvdbpostgres deleterecord(" ^ this->convert(_FM, "^") ^
 				", " ^ key ^ ") SQLERROR: " ^ sqlstate ^ " Failed: " ^ var(PQntuples(dbresult)) ^ " " ^
@@ -2527,6 +2532,7 @@ bool var::renamefile(CVR filename, CVR newfilename) const {
 //	else
 //		return filename.sqlexec(sql);
 	if (!filehandle.sqlexec(sql))
+		[[unlikely]]
 		throw VarDBException(this->lasterror());
 
 	return true;
@@ -2564,6 +2570,7 @@ bool var::deletefile(CVR filename) const {
 //	else
 //		return filename.sqlexec(sql);
 	if (!filehandle.sqlexec(sql))
+		[[unlikely]]
 		throw VarDBException(this->lasterror());
 
 	return true;
@@ -2589,6 +2596,7 @@ bool var::clearfile(CVR filename) const {
 //	else
 //		return filename.sqlexec(sql);
 	if (!filehandle.sqlexec(sql))
+		[[unlikely]]
 		throw VarDBException(this->lasterror());
 
 	return true;
@@ -2618,7 +2626,7 @@ static var get_dictexpression(CVR cursor, CVR mainfilename, CVR filename, CVR di
 		// If dict .mainfile is not available, use dict.voc
 		if (!actualdictfile.open(dictfilename)) {
 			dictfilename = "dict.voc";
-			if (!actualdictfile.open(dictfilename)) {
+			if (!actualdictfile.open(dictfilename)) [[unlikely]] {
 				var errmsg = "get_dictexpression() cannot open " ^ dictfilename.quote();
 				//this->setlasterror(errmsg);
 				//this->loglasterror();
@@ -2666,7 +2674,7 @@ static var get_dictexpression(CVR cursor, CVR mainfilename, CVR filename, CVR di
 							dictrec = "F" ^ FM ^ "0" ^ FM ^ "Ref" ^ FM ^
 								FM ^ FM ^ FM ^ FM ^ FM ^ "" ^ FM ^
 								15;
-						else {
+						else [[unlikely]] {
 							var errmsg = "get_dictexpression() cannot read " ^
 								fieldname.quote() ^ " from " ^
 								actualdictfile.convert(FM, "^")
@@ -2973,7 +2981,7 @@ TRACE: "QQQ"="QQQ"
 				// ismv;
 				var xlatetargetdictfilename = "dict." ^ xlatetargetfilename;
 				var xlatetargetdictfile;
-				if (!xlatetargetdictfile.open(xlatetargetdictfilename)) {
+				if (!xlatetargetdictfile.open(xlatetargetdictfilename)) [[unlikely]] {
 					var errmsg = xlatetargetdictfilename ^ " cannot be opened for " ^ function_src;
 					throw VarDBException(errmsg);
 				}
@@ -3012,7 +3020,7 @@ TRACE: "QQQ"="QQQ"
 			} else if (xlatefromfieldname.lcase() == "@id") {
 				xlatekeyexpression = filename ^ ".key";
 
-			} else {
+			} else [[unlikely]] {
 				// throw  VarDBException("get_dictexpression() " ^
 				// filename.quote() ^ " " ^ fieldname.quote() ^ " - INVALID
 				// DICTIONARY EXPRESSION - " ^ dictrec.f(8).quote());
@@ -3095,7 +3103,7 @@ exodus_call:
 		}
 	} // of dict type S
 
-	else {
+	else [[unlikely]] {
 		// throw  filename ^ " " ^ fieldname ^ " - INVALID DICTIONARY ITEM";
 		// throw  VarDBException("get_dictexpression(" ^ filename.quote() ^ ", " ^
 		// fieldname.quote() ^ ") invalid dictionary type " ^ dicttype.quote());
@@ -3429,7 +3437,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 	this->r(10, "");
 
 	//catch bad FM character
-	if (sortselectclause.var_str.find(FM_) != std::string::npos) {
+	if (sortselectclause.var_str.find(FM_) != std::string::npos) [[unlikely]] {
 		var errmsg = "Illegal FM character in " ^ sortselectclause;
 		throw VarDBException(errmsg);
 	}
@@ -3486,7 +3494,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 	}
 
 	// actualfilename.logputl("actualfilename=");
-	if (!actualfilename) {
+	if (!actualfilename) [[unlikely]] {
 		// this->outputl("this=");
 		var errmsg = "filename missing from select statement:" ^ sortselectclause;
 		throw VarDBException(errmsg);
@@ -3529,7 +3537,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 		// using filename
 		else if (ucword == "USING" && remaining) {
 			dictfilename = getword(remaining, xx);
-			if (!dictfile.open("dict." ^ dictfilename)) {
+			if (!dictfile.open("dict." ^ dictfilename)) [[unlikely]] {
 				var errmsg = "select() dict_" ^ dictfilename ^ " file cannot be opened";
 				throw VarDBException(errmsg);
 			}
@@ -3708,7 +3716,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 			if (ucword == "BETWEEN" || ucword == "FROM") {
 
 				//prevent BETWEEN being used on fields
-				if (dictexpression_isvector) {
+				if (dictexpression_isvector) [[unlikely]] {
 					var errmsg = sortselectclause ^ " 'BETWEEN x AND y' and 'FROM x TO y' ... are not currently supported for mv or xref columns";
 					throw VarDBException(errmsg);
 				}
@@ -3725,7 +3733,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 				}
 
 				// check we have two values (in word1 and word2)
-				if (!valuechars.contains(word1[1]) || !valuechars.contains(word2[1])) {
+				if (!valuechars.contains(word1[1]) || !valuechars.contains(word2[1])) [[unlikely]] {
 					var errmsg = sortselectclause ^ "BETWEEN x AND y/FROM x TO y must be followed by two values (x AND/TO y)";
 					throw VarDBException(errmsg);
 				}
@@ -3751,7 +3759,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 
 					//prevent WITH XXX appearing twice in the same sort/select clause
 					//unless and until implemented
-					if (calc_fields.f(2, calc_fieldn)) {
+					if (calc_fields.f(2, calc_fieldn)) [[unlikely]] {
 						var errmsg = "WITH " ^ dictid ^ " must not appear twice in " ^ sortselectclause.quote();
 						throw VarDBException(errmsg);
 					}
@@ -3943,7 +3951,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 				//only ops <> and != are supported when using the regular expression operator (starting/ending/containing)
 				if (op == "<>")
 					negative = !negative;
-				else if (op != "=" and op != "") {
+				else if (op != "=" and op != "") [[unlikely]] {
 					var errmsg = "SELECT ... WITH " ^ op ^ " " ^ word1 ^ " is not supported. " ^ prefix.quote() ^ " " ^ postfix.quote();
 					throw VarDBException(errmsg);
 				}
@@ -4025,7 +4033,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 					//calc_fields.r(1, calc_fieldn, dictid);
 					calc_fields(1, calc_fieldn) = dictid;
 				}
-				if (calc_fields.f(2, calc_fieldn)) {
+				if (calc_fields.f(2, calc_fieldn)) [[unlikely]] {
 					var errmsg = "WITH " ^ dictid ^ " must not appear twice in " ^ sortselectclause.quote();
 					throw VarDBException(errmsg);
 				}
@@ -4493,7 +4501,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 		createtablesql ^= " (KEY TEXT)\n";
 		createtablesql ^= ";DELETE FROM " ^ temptablename ^ "\n";
 		var errmsg;
-		if (!this->sqlexec(createtablesql, errmsg)) {
+		if (!this->sqlexec(createtablesql, errmsg)) [[unlikely]] {
 			throw VarDBException(errmsg);
 		}
 
@@ -4502,10 +4510,11 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 		while (this->readnext(key)) {
 			//std::cout<<key<<std::endl;
 			if (not this->sqlexec("INSERT INTO " ^ temptablename ^ "(KEY) VALUES('" ^ key.replace("'", "''") ^ "')"))
+				[[unlikely]]
 				throw VarDBException(lasterror());
 		}
 
-		if (this->f(3)) {
+		if (this->f(3)) [[unlikely]] {
 			throw VarDBException("selectx: Error. this->f(3) must be empty");
 		}
 		//must be empty!
@@ -4604,7 +4613,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 	}
 
 	var errmsg;
-	if (!this->sqlexec(sql, errmsg)) {
+	if (!this->sqlexec(sql, errmsg)) [[unlikely]] {
 
 		if (listname)
 			this->deletelist(listname);
@@ -4815,7 +4824,7 @@ static bool readnextx(CVR cursor, PGconn* pgconn, int  direction, PGresult*& pgr
 		}
 
 		// any other error
-		if (errmsg) {
+		if (errmsg) [[unlikely]] {
 			errmsg ^= " sqlstate= " ^ sqlstate.quote() ^ " in SQL " ^ sql;
 			throw VarDBException(errmsg);
 		}
@@ -4873,7 +4882,7 @@ bool var::deletelist(CVR listname) const {
 
 	// open the lists file on the same connection
 	var lists = *this;
-	if (!lists.open("LISTS"))
+	if (!lists.open("LISTS")) [[unlikely]] 
 		//skip this error for now because maybe no LISTS on some databases
 		return false;
 		//throw VarDBException("deletelist() LISTS file cannot be opened");
@@ -4906,7 +4915,7 @@ bool var::savelist(CVR listname) {
 
 	// open the lists file on the same connection
 	var lists = *this;
-	if (!lists.open("LISTS")) {
+	if (!lists.open("LISTS")) [[unlikely]] {
 		var errmsg = "savelist() LISTS file cannot be opened";
 		this->setlasterror(errmsg);
 		// this->loglasterror();
@@ -4999,7 +5008,7 @@ bool var::getlist(CVR listname) {
 
 	// open the lists file on the same connection
 	var lists = *this;
-	if (!lists.open("LISTS")) {
+	if (!lists.open("LISTS")) [[unlikely]] {
 		var errmsg = "getlist() LISTS file cannot be opened";
 		this->setlasterror(errmsg);
 		// this->loglasterror();
@@ -5054,6 +5063,7 @@ bool var::formlist(CVR keys, CVR fieldno) {
 		record = record.f(fieldno).converter(VM, FM);
 
 	if (not this->makelist("", record))
+		[[unlikely]]
 		throw VarDBException(this->lasterror());
 
 	return true;
@@ -5082,7 +5092,7 @@ bool var::makelist(CVR listname, CVR keys) {
 
 		// open the lists file on the same connection
 		var lists = *this;
-		if (!lists.open("LISTS")) {
+		if (!lists.open("LISTS")) [[unlikely]] {
 			var errmsg = "makelist() LISTS file cannot be opened";
 			this->setlasterror(errmsg);
 			// this->loglasterror();
@@ -5146,7 +5156,7 @@ bool var::hasnext() {
 
 		// otherwise try and get another block
 		var lists = *this;
-		if (!lists.open("LISTS")) {
+		if (!lists.open("LISTS")) [[unlikely]] {
 			var errmsg = "var::hasnext(): LISTS file cannot be opened";
 			this->setlasterror(errmsg);
 			// this->loglasterror();
@@ -5181,7 +5191,7 @@ bool var::hasnext() {
 		return false;
 
 	auto pgconn = get_pgconn(*this);
-	if (!pgconn) {
+	if (!pgconn) [[unlikely]] {
 		var errmsg = "var::hasnext() get_pgconn() failed for " ^ this->quote();
 		this->setlasterror(errmsg);
 		// this->loglasterror();
@@ -5276,7 +5286,7 @@ bool var::readnext(VARREF record, VARREF key, VARREF valueno) {
 				}
 
 				var lists = *this;
-				if (!lists.open("LISTS")) {
+				if (!lists.open("LISTS")) [[unlikely]] {
 					var errmsg = "readnext() LISTS file cannot be opened";
 			        this->setlasterror(errmsg);
        				// this->loglasterror();

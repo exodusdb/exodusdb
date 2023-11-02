@@ -114,8 +114,8 @@ var var::iconv(const char* conversion) const {
 					switch (*pconversion) {
 
 						// "MD" "MC" - Decimal places
-						case 'D':
-						case 'C':
+						case 'D': [[unlikely]]
+						case 'C': [[unlikely]]
 
 							throw VarError(
 								"iconv MD and MC are not implemented yet");
@@ -137,7 +137,7 @@ var var::iconv(const char* conversion) const {
 							break;
 
 						// "MX" number to hex (not string to hex)
-						case 'X':
+						case 'X': [[unlikely]]
 							throw VarNotImplemented("iconv('MX')");
 							// std::ostringstream ss;
 							// ss << std::hex << std::uppercase << part.round().toInt();
@@ -243,7 +243,7 @@ var var::iconv(const char* conversion) const {
 
 		// custom io conversions should not be called via ::iconv or ::oconv since they have no
 		// access to mv environment required to call external subroutines
-		case '[':
+		case '[': [[unlikely]]
 
 			throw VarError("Custom conversions like (" ^ var(conversion) ^
 						  ") must be called like a function iconv(input,conversion) not "

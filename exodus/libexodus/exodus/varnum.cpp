@@ -128,6 +128,7 @@ std::string mvd2s(double double1) {
 
 	// Throw if non-numeric
 	if (ec != std::errc())
+		[[unlikely]]
 		throw VarNonNumeric("mvd2s: Cannot convert double to 24 characters");
 
 	// Convert to a string. Hopefully using small string optimisation (SSO)
@@ -424,7 +425,7 @@ void var::createString() const {
 		return;
 	}
 	// already a string (unlikely since only called when not a string)
-	if (var_typ & VARTYP_STR) {
+	if (var_typ & VARTYP_STR) [[likely]] {
 		return;
 	}
 

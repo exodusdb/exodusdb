@@ -422,6 +422,7 @@ class PUBLIC var final {
 		// Prevent overlarge unsigned ints resulting in negative ints
 		if (std::is_unsigned<Integer>::value) {
 			if (this->var_int < 0)
+				[[unlikely]]
 				throwNumOverflow(var(__PRETTY_FUNCTION__).field(";", 1));
 		}
 	}
@@ -448,9 +449,11 @@ class PUBLIC var final {
 		// Prevent overlarge or overnegative long doubles entering var's double
 		if (std::is_same<FloatingPoint, long double>::value) {
 			if (rhs > VAR_MAX_DOUBLE)
-			    throwNumOverflow(var(__PRETTY_FUNCTION__).field(";", 1));
+				[[unlikely]]
+				throwNumOverflow(var(__PRETTY_FUNCTION__).field(";", 1));
 			if (rhs < VAR_LOW_DOUBLE)
-			    throwNumUnderflow(var(__PRETTY_FUNCTION__).field(";", 1));
+				[[unlikely]]
+				throwNumUnderflow(var(__PRETTY_FUNCTION__).field(";", 1));
 		}
 	}
 
@@ -669,6 +672,7 @@ class PUBLIC var final {
 		// Prevent conversion of negative numbers to unsigned integers
 		if (std::is_unsigned<Integer>::value) {
 			if (this->var_int < 0)
+				[[unlikely]]
 				throwNonPositive(__PRETTY_FUNCTION__);
 		}
 		// Similar code in constructor(int) operator=(int) and int()
@@ -898,6 +902,7 @@ class PUBLIC var final {
 		// Prevent overlarge unsigned ints resulting in negative ints
 		if (std::is_unsigned<Integer>::value) {
 			if (this->var_int < 0)
+				[[unlikely]]
 				throwNumOverflow(var(__PRETTY_FUNCTION__).field(";", 1));
 		}
 
@@ -2153,17 +2158,20 @@ class PUBLIC var final {
 	// OTHERWISE *WILL* get recursion/segfault
 	void assertDefined(const char* message, const char* varname = "") const {
 		if (var_typ & VARTYP_MASK)
+			[[unlikely]]
 			throwUndefined(var(varname) ^ " in " ^ message);
 	}
 
 	void assertAssigned(const char* message, const char* varname = "") const {
 		assertDefined(message, varname);
 		if (!var_typ)
+			[[unlikely]]
 			throwUnassigned(var(varname) ^ " in " ^ message);
 	}
 
 	void assertNumeric(const char* message, const char* varname = "") const {
 		if (!this->isnum())
+			[[unlikely]]
 			throwNonNumeric(var(varname) ^ " in " ^ var(message) ^ " data: " ^ this->first(128).quote());
 	}
 
@@ -2205,6 +2213,7 @@ class PUBLIC var final {
 		assertDefined(message, varname);
 		if (!(var_typ & VARTYP_STR)) {
 			if (!var_typ)
+				[[unlikely]]
 				throwUnassigned(var(varname) ^ " in " ^ message);
 			this->createString();
 		}
