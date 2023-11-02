@@ -20,13 +20,13 @@ programinit()
 		try {
 			var v = unass;
 			assert(false && "copy constructor from unassigned lvalue");
-		} catch (VarUnassigned& e) {
+		} catch (VarUnassigned&) {
 		}
 		try {
 			var v;
 			v = unass;
 			assert(false && "copy assign from unassigned lvalue");
-		} catch (VarUnassigned& e) {
+		} catch (VarUnassigned&) {
 		}
 
 		//move ALLOWS use of unassigned without throwing for performance since temporaries are unlikeley to be unassigned
@@ -34,13 +34,13 @@ programinit()
 		//		try {var v;v = var()      ;assert(false && "move assign from unassigned rvalue");}    catch (VarUnassigned& e){};
 		try {
 			var v = var();
-		} catch (VarUnassigned& e) {
+		} catch (VarUnassigned&) {
 			assert(false && "move constructor from unassigned rvalue");
 		}
 		try {
 			var v;
 			v = var();
-		} catch (VarUnassigned& e) {
+		} catch (VarUnassigned&) {
 			assert(false && "move assign from unassigned rvalue");
 		}
 
@@ -49,7 +49,7 @@ programinit()
 		try {
 			var v	 = var("x") + 1;
 			uncaught = "VarNonNumeric";
-		} catch (VarNonNumeric& e) {
+		} catch (VarNonNumeric&) {
 		}
 
 		// Divide by zero
@@ -58,44 +58,44 @@ programinit()
 			var v	 = 1;
 			v		 = v / var(0);
 			uncaught = "VarDivideByZero";
-		} catch (VarDivideByZero& e) {
+		} catch (VarDivideByZero&) {
 		}
 		try {
 			var v	 = 1;
 			v		 = v / 0;
 			uncaught = "VarDivideByZero";
-		} catch (VarDivideByZero& e) {
+		} catch (VarDivideByZero&) {
 		}
 		try {
 			var v	 = 1;
 			v		 = v / "0";
 			uncaught = "VarDivideByZero";
-		} catch (VarDivideByZero& e) {
+		} catch (VarDivideByZero&) {
 		}
 		try {
 			var v	 = 1;
 			v		 = v / 0.0;
 			uncaught = "VarDivideByZero";
-		} catch (VarDivideByZero& e) {
+		} catch (VarDivideByZero&) {
 		}
 		try {
 			var v	 = 1;
 			v		 = v / "0.0";
 			uncaught = "VarDivideByZero";
-		} catch (VarDivideByZero& e) {
+		} catch (VarDivideByZero&) {
 		}
 
 		try {
 			var v = 1;
 			v %= var(0.0);
 			uncaught = "VarDivideByZero";
-		} catch (VarDivideByZero& e) {
+		} catch (VarDivideByZero&) {
 		}
 		try {
 			var v = 1;
 			v %= var(0);
 			uncaught = "VarDivideByZero";
-		} catch (VarDivideByZero& e) {
+		} catch (VarDivideByZero&) {
 		}
 
 		// Unitary minus
@@ -104,13 +104,13 @@ programinit()
 			var v;
 			v		 = -v;
 			uncaught = "VarUnassigned";
-		} catch (VarUnassigned& e) {
+		} catch (VarUnassigned&) {
 		}
 		try {
 			var v	 = "x";
 			v		 = -v;
 			uncaught = "VarNonNumeric";
-		} catch (VarNonNumeric& e) {
+		} catch (VarNonNumeric&) {
 		}
 
 		// Increment/Decrement
@@ -119,50 +119,50 @@ programinit()
 			var v;
 			v++;
 			uncaught = "VarUnassigned";
-		} catch (VarUnassigned& e) {
+		} catch (VarUnassigned&) {
 		}
 		try {
 			var v;
 			v--;
 			uncaught = "VarUnassigned";
-		} catch (VarUnassigned& e) {
+		} catch (VarUnassigned&) {
 		}
 		try {
 			var v;
 			++v;
 			uncaught = "VarUnassigned";
-		} catch (VarUnassigned& e) {
+		} catch (VarUnassigned&) {
 		}
 		try {
 			var v;
 			--v;
 			uncaught = "VarUnassigned";
-		} catch (VarUnassigned& e) {
+		} catch (VarUnassigned&) {
 		}
 
 		try {
 			var v = "x";
 			v++;
 			uncaught = "VarNonNumeric";
-		} catch (VarNonNumeric& e) {
+		} catch (VarNonNumeric&) {
 		}
 		try {
 			var v = "x";
 			v--;
 			uncaught = "VarNonNumeric";
-		} catch (VarNonNumeric& e) {
+		} catch (VarNonNumeric&) {
 		}
 		try {
 			var v = "x";
 			++v;
 			uncaught = "VarNonNumeric";
-		} catch (VarNonNumeric& e) {
+		} catch (VarNonNumeric&) {
 		}
 		try {
 			var v = "x";
 			--v;
 			uncaught = "VarNonNumeric";
-		} catch (VarNonNumeric& e) {
+		} catch (VarNonNumeric&) {
 		}
 
 		// Self assign
@@ -171,186 +171,186 @@ programinit()
 			var v;
 			v += 1.1;
 			uncaught = "VarUnassigned";
-		} catch (VarUnassigned& e) {
+		} catch (VarUnassigned&) {
 		}
 		try {
 			var v;
 			v -= 1.1;
 			uncaught = "VarUnassigned";
-		} catch (VarUnassigned& e) {
+		} catch (VarUnassigned&) {
 		}
 		try {
 			var v;
 			v *= 1.1;
 			uncaught = "VarUnassigned";
-		} catch (VarUnassigned& e) {
+		} catch (VarUnassigned&) {
 		}
 		try {
 			var v;
 			v /= 1.1;
 			uncaught = "VarUnassigned";
-		} catch (VarUnassigned& e) {
+		} catch (VarUnassigned&) {
 		}
 		try {
 			var v;
 			v %= 1.1;
 			uncaught = "VarUnassigned";
-		} catch (VarUnassigned& e) {
+		} catch (VarUnassigned&) {
 		}
 
 		try {
 			var v = "x";
 			v += 1.1;
 			uncaught = "VarNonNumeric";
-		} catch (VarNonNumeric& e) {
+		} catch (VarNonNumeric&) {
 		}
 		try {
 			var v = "x";
 			v -= 1.1;
 			uncaught = "VarNonNumeric";
-		} catch (VarNonNumeric& e) {
+		} catch (VarNonNumeric&) {
 		}
 		try {
 			var v = "x";
 			v *= 1.1;
 			uncaught = "VarNonNumeric";
-		} catch (VarNonNumeric& e) {
+		} catch (VarNonNumeric&) {
 		}
 		try {
 			var v = "x";
 			v /= 1.1;
 			uncaught = "VarNonNumeric";
-		} catch (VarNonNumeric& e) {
+		} catch (VarNonNumeric&) {
 		}
 		try {
 			var v = "x";
 			v %= 1.1;
 			uncaught = "VarNonNumeric";
-		} catch (VarNonNumeric& e) {
+		} catch (VarNonNumeric&) {
 		}
 
 		try {
 			var v;
 			v += 1;
 			uncaught = "VarUnassigned";
-		} catch (VarUnassigned& e) {
+		} catch (VarUnassigned&) {
 		}
 		try {
 			var v;
 			v -= 1;
 			uncaught = "VarUnassigned";
-		} catch (VarUnassigned& e) {
+		} catch (VarUnassigned&) {
 		}
 		try {
 			var v;
 			v *= 1;
 			uncaught = "VarUnassigned";
-		} catch (VarUnassigned& e) {
+		} catch (VarUnassigned&) {
 		}
 		try {
 			var v;
 			v /= 1;
 			uncaught = "VarUnassigned";
-		} catch (VarUnassigned& e) {
+		} catch (VarUnassigned&) {
 		}
 		try {
 			var v;
 			v %= 1;
 			uncaught = "VarUnassigned";
-		} catch (VarUnassigned& e) {
+		} catch (VarUnassigned&) {
 		}
 
 		try {
 			var v = "x";
 			v += 1;
 			uncaught = "VarNonNumeric";
-		} catch (VarNonNumeric& e) {
+		} catch (VarNonNumeric&) {
 		}
 		try {
 			var v = "x";
 			v -= 1;
 			uncaught = "VarNonNumeric";
-		} catch (VarNonNumeric& e) {
+		} catch (VarNonNumeric&) {
 		}
 		try {
 			var v = "x";
 			v *= 1;
 			uncaught = "VarNonNumeric";
-		} catch (VarNonNumeric& e) {
+		} catch (VarNonNumeric&) {
 		}
 		try {
 			var v = "x";
 			v /= 1;
 			uncaught = "VarNonNumeric";
-		} catch (VarNonNumeric& e) {
+		} catch (VarNonNumeric&) {
 		}
 		try {
 			var v = "x";
 			v %= 1;
 			uncaught = "VarNonNumeric";
-		} catch (VarNonNumeric& e) {
+		} catch (VarNonNumeric&) {
 		}
 
 		try {
 			var v;
 			v += "1";
 			uncaught = "VarUnassigned";
-		} catch (VarUnassigned& e) {
+		} catch (VarUnassigned&) {
 		}
 		try {
 			var v;
 			v -= "1";
 			uncaught = "VarUnassigned";
-		} catch (VarUnassigned& e) {
+		} catch (VarUnassigned&) {
 		}
 		try {
 			var v;
 			v *= "1";
 			uncaught = "VarUnassigned";
-		} catch (VarUnassigned& e) {
+		} catch (VarUnassigned&) {
 		}
 		try {
 			var v;
 			v /= "1";
 			uncaught = "VarUnassigned";
-		} catch (VarUnassigned& e) {
+		} catch (VarUnassigned&) {
 		}
 		try {
 			var v;
 			v %= "1";
 			uncaught = "VarUnassigned";
-		} catch (VarUnassigned& e) {
+		} catch (VarUnassigned&) {
 		}
 
 		try {
 			var v = "x";
 			v += "1";
 			uncaught = "VarNonNumeric";
-		} catch (VarNonNumeric& e) {
+		} catch (VarNonNumeric&) {
 		}
 		try {
 			var v = "x";
 			v -= "1";
 			uncaught = "VarNonNumeric";
-		} catch (VarNonNumeric& e) {
+		} catch (VarNonNumeric&) {
 		}
 		try {
 			var v = "x";
 			v *= "1";
 			uncaught = "VarNonNumeric";
-		} catch (VarNonNumeric& e) {
+		} catch (VarNonNumeric&) {
 		}
 		try {
 			var v = "x";
 			v /= "1";
 			uncaught = "VarNonNumeric";
-		} catch (VarNonNumeric& e) {
+		} catch (VarNonNumeric&) {
 		}
 		try {
 			var v = "x";
 			v %= "1";
 			uncaught = "VarNonNumeric";
-		} catch (VarNonNumeric& e) {
+		} catch (VarNonNumeric&) {
 		}
 
 		// Overflow on inc/dec

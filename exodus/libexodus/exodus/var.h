@@ -2535,13 +2535,13 @@ class PUBLIC VarError {
 ////////////////////
 
 // "abc^def"_var
-PUBLIC ND var operator""_var(const char* cstr, std::size_t size);
+PUBLIC var operator""_var(const char* cstr, std::size_t size);
 
 // 123456_var
-PUBLIC ND var operator""_var(unsigned long long int i);
+PUBLIC var operator""_var(unsigned long long int i);
 
 // 123.456_var
-PUBLIC ND var operator""_var(long double d);
+PUBLIC var operator""_var(long double d);
 
 }  // namespace exodus
 
