@@ -1371,6 +1371,10 @@ function main() {
 				}
 				if (headertext2 ne headertext) {
 
+//					TRACE(headerfilename)
+//					TRACE(headertext)
+//					TRACE(headertext2)
+
 					//over/write if changed
 					if (not oswrite(headertext, headerfilename, locale))
 						loglasterror();
@@ -1380,14 +1384,19 @@ function main() {
 					var headertext3;
 					if (not osread(headertext3, headerfilename, locale))
 						loglasterror();
+
+//					TRACE(headertext3)
+//					oswrite(headertext, "1");
+//					oswrite(headertext2, "2");
+//					oswrite(headertext3, "3");
+
 					if (headertext3 ne headertext) {
 						atomic_ncompilation_failures++;
-
 						errputl("Error: compile could not accurately update " ^ headerfilename ^ " locale: " ^ locale
 							^ ". Perhaps multiple files with the same name.\n"
-							^ " 1: " ^ headertext.f(1) ^ "\n"
-							^ " 2: " ^ headertext2.f(2) ^ "\n"
-							^ " 3: " ^ headertext3.f(3));
+							^ " 1: " ^ headertext.f(1).quote() ^ "\n"
+							^ " 2: " ^ headertext2.f(1).quote() ^ "\n"
+							^ " 3: " ^ headertext3.f(1).quote());
 					}
 					else if (verbose)
 						printl("generated or updated.");

@@ -49,7 +49,7 @@ set -euxo pipefail
 : S - Silent
 : V - Verbose
 :
-	compile alt exo srv {S${COMPILER_OPTIONS}}
+	compile alt exo srv dic {S${COMPILER_OPTIONS}}
 
 :
 : Flag syncdat to review all and syncdat to exodus
