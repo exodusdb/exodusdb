@@ -40,9 +40,6 @@ function main() {
 
 	call autorun3(docids, options);
 
-	stop();
-
-	// only for c++
 	return 0;
 }
 

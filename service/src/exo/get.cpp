@@ -112,8 +112,6 @@ nooutput:
 	// dfs=dfs2
 	// end
 
-	stop();
-	// for c++
 	return 0;
 }
 

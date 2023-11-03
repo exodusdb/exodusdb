@@ -311,6 +311,7 @@ nextmv:
 		if (not allrowvals.f(1).locateby("AL", rowval, rown)) {
 			if (allrowvals.len() + rowval.len() > 65000) {
 				gosub abort_toobig(filename);
+				//std::unreachable()
 			}
 			nrows += 1;
 			allrowvals.inserter(1, rown, rowval);
@@ -325,11 +326,13 @@ nextmv:
 				ncols += 1;
 				if (allcolvals.len() + colval.len() > 65000) {
 					gosub abort_toobig(filename);
+					//std::unreachable()
 				}
 				allcolvals.inserter(1, colnx, colval);
 
 				if (output.len() + nrows * 2 > 65000) {
 					gosub abort_toobig(filename);
+					//std::unreachable()
 				}
 
 				output.inserter(1, 1 + colnx, colval);
@@ -340,6 +343,7 @@ nextmv:
 
 			if (output.len() + datavals.len() > 6500) {
 				gosub abort_toobig(filename);
+				//std::unreachable()
 			}
 
 			oldval = output.f(rown + 1, colnx + 1);
@@ -391,6 +395,7 @@ exit:
 	for (const int rown : range(1, nrows)) {
 		if (output.len() + allrowvals.len() > 65000) {
 			gosub abort_toobig(filename);
+			//std::unreachable()
 		}
 		output(rown + 1, 1) = allrowvals.f(1, rown);
 	}  // rown;
@@ -416,7 +421,7 @@ exit:
 	return 0;
 }
 
-subroutine abort_toobig(in filename) {
+subroutine_noreturn abort_toobig(in filename) {
 
 	clearselect();
 	msg = "Crosstab too complex. Please simplify your request.";

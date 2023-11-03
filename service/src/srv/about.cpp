@@ -73,8 +73,6 @@ function main() {
 
 	call note(text);
 
-	stop();
-
 	return 0;
 }
 

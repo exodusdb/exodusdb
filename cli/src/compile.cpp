@@ -306,11 +306,8 @@ function main() {
 
 		}
 
-//		if (not warnings) {
-//			basicoptions ^= " -Wno-extra-semi-stmt";
-//			basicoptions ^= " -Wno-newline-eof";
-//		}
 		if (warnings > 0) {
+
 			if (clang)
 				basicoptions ^= " -Weverything ";
 			else {
@@ -319,17 +316,24 @@ function main() {
 				basicoptions ^= " -Wno-unknown-pragmas ";
 			}
 
+			// Show these warnings at any level > 0
+			//if (warnings < 0) {
+			//	basicoptions ^= " -Wno-extra-semi-stmt";
+			//	basicoptions ^= " -Wno-newline-eof";
+			//}
+
 			// The following warnings will only appear at level 2 or greater
 			if (warnings < 2) {
 				basicoptions ^= " -Wno-shadow";
 				basicoptions ^= " -Wno-unreachable-code";
+				basicoptions ^= " -Wno-unreachable-code-return";
 				basicoptions ^= " -Wno-unused-macros";
-				if (clang) {
+				basicoptions ^= " -Wno-missing-noreturn";
+				//if (clang) {
 					basicoptions ^= " -Wno-unreachable-code-return";
 					// use of GNU ?: conditional expression extension, omitting middle operand
 					basicoptions ^= " -Wno-gnu-conditional-omitted-operand";
-				}
-				basicoptions ^= " -Wno-padded";
+				//}
 			}
 
 			if (warnings < 3) {
@@ -337,7 +341,7 @@ function main() {
 			}
 
 			// The following warnings will only appear at level 3 or greater
-			if (warnings > 3) {
+			if (warnings >= 3) {
 				//basicoptions ^= " -Wno-missing-prototypes";
 				//basicoptions ^= " -Wno-weak-vtables";
 				basicoptions ^= " -Wpedantic";// Disallows "Elvis operator" ?:

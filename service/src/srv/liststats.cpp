@@ -261,8 +261,6 @@ function main() {
 	}
 
 	stop();
-
-	return 0;
 }
 
 libraryexit()

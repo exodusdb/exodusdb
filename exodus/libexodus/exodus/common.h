@@ -10,16 +10,6 @@
 // An xxx_common.h file may have multiple commoninit/exit sections.
 //
 
-// Why is this needed here? It is needed in program.h library.h.
-#undef subroutine
-#undef function
-#define subroutine \
- public:           \
-	void
-#define function   \
- public:           \
-	var
-
 ////////////////////////////////////////
 // Open a class derived from NamedCommon
 ////////////////////////////////////////

@@ -164,9 +164,8 @@ next:
 exit:
 	// ///
 	gosub flush(filename);
-	stop();
 
-	return "";
+	return 0;
 }
 
 subroutine flush(in filename) {

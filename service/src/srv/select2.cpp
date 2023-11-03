@@ -431,7 +431,6 @@ nextrec:
 			// abort
 			gosub exit();
 			stop();
-			return 0;
 		}
 	}  // limitfieldn;
 

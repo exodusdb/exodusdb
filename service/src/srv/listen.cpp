@@ -239,8 +239,6 @@ function main() {
 
 	stop();
 
-	// never gets here
-	return 0;
 }
 
 function main_init() {

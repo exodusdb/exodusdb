@@ -20,16 +20,12 @@
 // argument. Additional matching pairs of statements can delineate additional subprograms as long
 // as each pair has a unique argument since their argument names are used as part of the class name.
 
-#undef subroutine
-#undef function
-
-#define subroutine \
-   public:         \
-	void
-
-#define function \
-   public:       \
-	var
+//#undef function
+//#undef subroutine
+//#undef subroutine_noreturn
+//#define function public: var
+//#define subroutine public: void
+//#define subroutine_noreturn public: [[noreturn]] void
 
 // SIMILAR CODE IN
 // program.h library.h

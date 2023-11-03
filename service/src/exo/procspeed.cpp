@@ -61,10 +61,8 @@ function main() {
 
 	call mssg(msg);
 
-	// call restorescreenss1, ss2);
-	stop();
+	return 0;
 
-	return "";
 }
 
 subroutine getspeed(io retval) {

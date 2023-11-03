@@ -177,7 +177,7 @@ function main() {
 
 		}
 
-		var newcpptext = "#include <exodus/library.h>\n";
+		var newcpptext = "#include <exodus/library.h>\n\n";
 		var dict2sql_ids = "";
 
 		// Process each dat file/record in the subdir

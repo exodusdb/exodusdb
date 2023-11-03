@@ -322,8 +322,8 @@ function main() {
 badversion:
 					msg_ = msg;
 					gosub failsys();
-					stop();
-
+					//stop();
+					//std::unreachable()
 				} else {
 decideversion:
 					var options = "Quit (RECOMMENDED)";
@@ -523,7 +523,8 @@ nextreport:
 			call log2("*if sysmode then respond to response file and close", logtime);
 			if (SYSTEM.f(33)) {
 				gosub failsys();
-				stop();
+				//stop();
+				//std::unreachable();
 			}
 
 			call log2("*inform user and close", logtime);
@@ -542,9 +543,12 @@ nextreport:
 			call note(msg);
 			if (SYSTEM.f(33)) {
 				gosub failsys();
+				//stop();
+				//std::unreachable();
 			}
 			perform("OFF");
 			logoff();
+			//std::unreachable();
 		}
 	}
 
@@ -1501,7 +1505,8 @@ adddatasetcodename:
 		if (not datasetid.f(4).locate(cid())) {
 			msg_ = var("CANNOT USE THIS DATABASE ON THIS COMPUTER").quote();
 			gosub failsys();
-			stop();
+			//stop();
+			//std::unreachable();
 		}
 	}
 
@@ -1706,7 +1711,6 @@ adddatasetcodename:
 	}
 
 	stop();
-	return 0;
 }
 
 subroutine getsystem(in config_osfilename, in confign) {
@@ -1739,7 +1743,7 @@ subroutine getsystem(in config_osfilename, in confign) {
 	return;
 }
 
-subroutine failsys() {
+subroutine_noreturn failsys() {
 	var msgx = msg_;
 
 	var msg2 = "*Authorisation Failure. " ^ msgx;
@@ -1764,7 +1768,8 @@ subroutine failsys() {
 	perform("OFF");
 	logoff();
 
-	return;
+	//return;
+	//std::unreachable();
 }
 
 libraryexit()

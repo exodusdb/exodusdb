@@ -83,7 +83,6 @@ function main() {
 
 	stop();
 
-	return "";
 }
 
 subroutine definemacro() {

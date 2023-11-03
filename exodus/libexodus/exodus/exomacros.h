@@ -63,9 +63,12 @@ THE SOFTWARE.
 // ===========================
 // Allow simplified syntax eg "function xyz(in arg1, out arg2) { ..."
 //
+#undef function
+#undef subroutine
+#undef subroutine_noreturn
+#define function public: var
 #define subroutine public: void
-#define function   public: var
-
+#define subroutine_noreturn public: [[noreturn]] void
 
 // "Call" and "Gosub"
 // ==================
