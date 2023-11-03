@@ -370,7 +370,7 @@ function onefile(in filename, in maxndifferences) {
 				ndifferences += 1;
 				printl(line, "Unknown function");
 				stop();
-				continue;
+				//std::unreachable();
 		}
 
 		if (result ne TARGET) {

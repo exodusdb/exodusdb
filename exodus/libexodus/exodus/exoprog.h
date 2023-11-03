@@ -154,7 +154,7 @@ class PUBLIC ExodusProgramBase {
 
 	var libinfo(CVR command);
 	var perform(CVR sentence);
-	void chain(CVR libraryname);
+	[[noreturn]] void chain(CVR libraryname);
 	var execute(CVR sentence);
 
 	// given dictid reads dictrec from DICT file and extracts from RECORD/ID or calls library

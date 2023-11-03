@@ -506,30 +506,37 @@ programinit()
 			printl(e.description);
 		}
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunreachable-code"
 		try {
 			stop();
 			uncaught = "MVStop";
+			//std::unreachable();
 		} catch (MVStop& e) {
 			printl("Caught MVStop", e.description);
 		}
 		try {
 			abort(99);
 			uncaught = "MVAbort";
+			//std::unreachable();
 		} catch (MVAbort& e) {
 			printl("Caught MVAbort", e.description);
 		}
 		try {
 			abortall();
 			uncaught = "MVAbortAll";
+			//std::unreachable();
 		} catch (MVAbortAll& e) {
 			printl("Caught MVAbortAll", e.description);
 		}
 		try {
 			logoff();
 			uncaught = "MVLogoff";
+			//std::unreachable();
 		} catch (MVLogoff& e) {
 			printl("Caught MVlogoff", e.description);
 		}
+#pragma GCC diagnostic pop
 
 		if (uncaught) {
 			TRACE(uncaught)

@@ -6,7 +6,9 @@ programinit()
 
 	function main() {
 
-	stop("Test passed");
+	if (not TERMINAL) {
+		stop("Test passed - Not really. It is impossible to test without TERMINAL");
+	}
 
 	{
 		echo(false);

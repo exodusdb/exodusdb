@@ -113,17 +113,6 @@ var var::iconv(const char* conversion) const {
 					// check second character
 					switch (*pconversion) {
 
-						// "MD" "MC" - Decimal places
-						case 'D': [[unlikely]]
-						case 'C': [[unlikely]]
-
-							throw VarError(
-								"iconv MD and MC are not implemented yet");
-							//							output
-							//^= part.iconv_MD(conversion);
-							//std::unreachable();
-							break;
-
 						// "MT"
 						case 'T':
 							// result ^= part.iconv_MT(conversion);
@@ -144,6 +133,18 @@ var var::iconv(const char* conversion) const {
 							// result ^= ss.str();
 							// break;
 							//std::unreachable();
+							break;
+
+						// "MD" "MC" - Decimal places
+						case 'D':
+						case 'C': [[unlikely]]
+
+							throw VarError(
+								"iconv MD and MC are not implemented yet");
+							//							output
+							//^= part.iconv_MD(conversion);
+							//std::unreachable();
+							break;
 
 						// "MB" binary to decimal
 						case 'B':

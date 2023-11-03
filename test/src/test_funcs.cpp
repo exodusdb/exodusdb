@@ -65,7 +65,7 @@ programinit()
 			abort("asd");
 			assert(false);
 		} catch (MVAbort& e) {
-			printl("Caught MVAbort");
+			printl(e.description);
 		}
 	}
 	{

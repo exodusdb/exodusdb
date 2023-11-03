@@ -262,7 +262,8 @@ subroutine test2(in as, in bs) {
 			var x	 = 100.0;
 			x /= zero;
 			assert(false);
-		} catch (VarDivideByZero& e) {
+			//std::unreachable();
+		} catch (VarDivideByZero&) {
 		}
 	}
 	{
@@ -272,7 +273,8 @@ subroutine test2(in as, in bs) {
 			var x	 = 100.0;
 			x /= zero;
 			assert(false);
-		} catch (VarDivideByZero& e) {
+			//std::unreachable();
+		} catch (VarDivideByZero&) {
 		}
 	}
 
@@ -283,7 +285,8 @@ subroutine test2(in as, in bs) {
 			var x	 = 100;
 			x /= zero;
 			assert(false);
-		} catch (VarDivideByZero& e) {
+			//std::unreachable();
+		} catch (VarDivideByZero&) {
 		}
 	}
 	{
@@ -293,7 +296,8 @@ subroutine test2(in as, in bs) {
 			var x	 = 100;
 			x /= zero;
 			assert(false);
-		} catch (VarDivideByZero& e) {
+			//std::unreachable();
+		} catch (VarDivideByZero&) {
 		}
 	}
 	{

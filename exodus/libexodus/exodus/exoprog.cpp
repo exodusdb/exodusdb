@@ -1102,6 +1102,7 @@ var ExodusProgramBase::execute(CVR sentence) {
 }
 
 // chain
+[[noreturn]]
 void ExodusProgramBase::chain(CVR libraryname) {
 	CHAIN = libraryname;
 	this->stop();

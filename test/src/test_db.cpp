@@ -303,7 +303,7 @@ programinit()
 	try {
 		printl(rec.quote());
 		assert(false);
-	} catch (VarError& e) {
+	} catch (VarError&) {
 		printl("OK failure to read a record makes the record variable unassigned. For programming safety");
 	}
 

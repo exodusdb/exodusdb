@@ -42,12 +42,12 @@ programinit()
 	try {
 		printl(fieldstore(greekstr2, "", 2, 1, "xxx"));
 		assert(false && "empty separator character in fieldstore() should generate an error");
-	} catch (VarError& e) {
+	} catch (VarError&) {
 	}
 	try {
 		printl(field(greekstr2, "", 1));
 		assert(false && "empty separator character in field() should generate an error");
-	} catch (VarError& e) {
+	} catch (VarError&) {
 	}
 	//fieldstore after end of string
 	greekstr2 = greek5x2;
@@ -170,7 +170,8 @@ programinit()
 	try {
 		var x = "xyz"_var.locateby("XX", "xyz", MV);
 		assert(false);
-	} catch (VarError& e) {
+		//std::unreachable()
+	} catch (VarError&) {
 	}
 
 	assert(var("f100" _FM "f210" _VM "" _VM "f230").locateby("AL", "", vn, 2));
