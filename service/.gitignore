@@ -12,3 +12,4 @@ www/exodus/images/theme2/neosyss.png
 systemctl.daemon-reload.required
 wkhtmltox_*.deb
 google.pdf
+src/dic
