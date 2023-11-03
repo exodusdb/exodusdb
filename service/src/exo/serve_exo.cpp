@@ -15,7 +15,7 @@ function main() {
 
 	// NB numbers and names MUST match those in the matching common .h files
 #pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunsafe-buffer-usage"
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
 	mv.namedcommon[req_common_no] = new req_common;
 	mv.namedcommon[srv_common_no] = new srv_common;
 	// mv.namedcommon[agy_common_no]=new agy_common;
