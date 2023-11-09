@@ -24,11 +24,12 @@ THE SOFTWARE.
 */
 
 #include <cstring>
+#include <array>
 
-#pragma clang diagnostic push
+#pragma GCC diagnostic push
 #pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
 #include <exodus/gregorian.h>
-#pragma clang diagnostic pop
+#pragma GCC diagnostic pop
 
 #if defined _MSC_VER || defined __CYGWIN__ || defined __MINGW32__
 //   #include <time.h>
@@ -44,10 +45,14 @@ THE SOFTWARE.
 
 // ostime, osdate, osfile, osdir should return dates and times in UTC
 
-#define PICK_UNIX_DAY_OFFSET -732
+#define PICK_UNIX_DATE_OFFSET -732
 
-static const char* shortmths = "JAN\0FEB\0MAR\0APR\0MAY\0JUN\0JUL\0AUG\0SEP\0OCT\0NOV\0DEC\0";
-static const char* longmths =
+//static const char* shortmths = "JAN\0FEB\0MAR\0APR\0MAY\0JUN\0JUL\0AUG\0SEP\0OCT\0NOV\0DEC\0";
+//static const std::string shortmths {"JAN,FEB,MAR,APR,MAY,JUN,JUL,AUG,SEP,OCT,NOV,DEC"};
+//static constexpr std::array shortmths {"JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"};
+static constexpr std::string_view shortmths {"JAN FEB MAR APR MAY JUN JUL AUG SEP OCT NOV DEC"};
+//static const char* longmths =
+static constexpr std::string_view longmths =
 	"\0JANUARY\0  "
 	"\0FEBRUARY\0 "
 	"\0MARCH\0    "
@@ -61,7 +66,8 @@ static const char* longmths =
 	"\0NOVEMBER\0 "
 	"\0DECEMBER\0 ";
 
-static const char* longdayofweeks =
+//static const char* longdayofweeks =
+static constexpr std::string_view longdayofweeks =
 	"MONDAY\0   "
 	"TUESDAY\0  "
 	"WEDNESDAY\0"
@@ -72,6 +78,35 @@ static const char* longdayofweeks =
 
 #include <exodus/var.h>
 
+//// Iterating over char*
+//// https://www.foonathan.net/2020/03/iterator-sentinel/
+//
+//// Empty type.
+//struct zstring_sentinel {};
+//
+//// Are we done?
+//static bool operator==(const char* str, zstring_sentinel)
+//{
+//	return *str == '\0';
+//}
+//
+//struct zstring_range
+//{
+//	const char* str;
+//
+//	auto begin() const
+//	{
+//		// The begin is just the pointer to our string.
+//		return str;
+//	}
+//	auto end() const
+//	{
+//		// The end is a different type, the sentinel.
+//		return zstring_sentinel{};
+//	}
+//};
+//
+
 namespace exodus {
 
 // time_t -> pick integer date, time
@@ -81,20 +116,20 @@ void time_t_to_pick_date_time(const time_t time, int* pick_date, int* pick_time)
 
 	// https://howardhinnant.github.io/date_algorithms.html#What%20can%20I%20do%20with%20that%20%3Ccode%3Echrono%3C/code%3E%20compatibility?
 
-    const auto duration_since_epoch = std::chrono::system_clock::from_time_t(time).time_since_epoch();
+	const auto duration_since_epoch = std::chrono::system_clock::from_time_t(time).time_since_epoch();
 
-//    const auto duration_in_days = std::chrono::duration_cast<std::chrono::days>(duration_since_epoch);
-//    idate = duration_in_days.count();
+//	const auto duration_in_days = std::chrono::duration_cast<std::chrono::days>(duration_since_epoch);
+//	idate = duration_in_days.count();
 
-    const auto duration_in_secs = std::chrono::duration_cast<std::chrono::seconds>(duration_since_epoch);
+	const auto duration_in_secs = std::chrono::duration_cast<std::chrono::seconds>(duration_since_epoch);
 
 	//Modulo 86'400 to seconds within day
 	// warning: conversion from ‘std::chrono::duration<long int>::rep’ {aka ‘long int’} to ‘int’ may change value [-Wconversion]
-    *pick_time = static_cast<int>(duration_in_secs.count()) % 86'400;
+	*pick_time = static_cast<int>(duration_in_secs.count()) % 86'400;
 
 	// Integer division by 86'400 to get whole days
 	//warning: conversion from ‘std::chrono::duration<long int>::rep’ {aka ‘long int’} to ‘int’ may change value [-Wconversion]
-	*pick_date = static_cast<int>(duration_in_secs.count()) / 86'400 - PICK_UNIX_DAY_OFFSET;
+	*pick_date = static_cast<int>(duration_in_secs.count()) / 86'400 - PICK_UNIX_DATE_OFFSET;
 
 }
 
@@ -105,7 +140,7 @@ var var::date() const {
 
 	// https://howardhinnant.github.io/date_algorithms.html#What%20can%20I%20do%20with%20that%20%3Ccode%3Echrono%3C/code%3E%20compatibility?
 
-    const auto duration_since_epoch = std::chrono::system_clock().now().time_since_epoch();
+	const auto duration_since_epoch = std::chrono::system_clock().now().time_since_epoch();
 
 	using days = std::chrono::duration<int, std::ratio_multiply<std::chrono::hours::period, std::ratio<24>>>;
 	const auto duration_in_days = std::chrono::duration_cast<days>(duration_since_epoch).count();
@@ -113,7 +148,7 @@ var var::date() const {
 	//const auto duration_in_days = std::chrono::duration_cast<std::chrono::days>(duration_since_epoch).count();
 
 	// timestamp() assumes that the var returned is an int
-	return duration_in_days - PICK_UNIX_DAY_OFFSET;
+	return duration_in_days - PICK_UNIX_DATE_OFFSET;
 
 }
 
@@ -124,12 +159,12 @@ var var::time() const {
 
 	// https://howardhinnant.github.io/date_algorithms.html#What%20can%20I%20do%20with%20that%20%3Ccode%3Echrono%3C/code%3E%20compatibility?
 
-    const auto duration_since_epoch = std::chrono::system_clock().now().time_since_epoch();
+	const auto duration_since_epoch = std::chrono::system_clock().now().time_since_epoch();
 
-    const auto secs_since_epoch = std::chrono::duration_cast<std::chrono::seconds>(duration_since_epoch).count();
+	const auto secs_since_epoch = std::chrono::duration_cast<std::chrono::seconds>(duration_since_epoch).count();
 
 	// Modulo 86'400 to get seconds since midnight
-    return secs_since_epoch % 86'400;
+	return secs_since_epoch % 86'400;
 
 }
 
@@ -138,7 +173,7 @@ var var::ostime() const {
 
 	// ASSUMPTION: td::chrono::system_clock() epoch is midnight
 
-    const auto duration_since_epoch = std::chrono::system_clock().now().time_since_epoch();
+	const auto duration_since_epoch = std::chrono::system_clock().now().time_since_epoch();
 
 	// ms accuracy
 	//uint64_t now = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
@@ -173,9 +208,9 @@ var var::timestamp() const {
 // -> decimal fractional days since pick epoch 1967-12-31 00:00:00 (up to micro or nano second accuracy)
 var var::timestamp(CVR ostime) const {
 
-    THISIS("var var::timestamp(CVR ostime) const")
-    assertNumeric(function_sig);
-    assertNumeric(function_sig, ostime);
+	THISIS("var var::timestamp(CVR ostime) const")
+	assertNumeric(function_sig);
+	assertNumeric(function_sig, ostime);
 
 	return this->floor() + ostime / 86'400;
 
@@ -218,14 +253,26 @@ var var::iconv_D(const char* conversion) const {
 	bool yearfirst = false;
 	bool dayfirst = false;
 
-	const char* conversionchar = conversion;
-//	if (*conversionchar != 'D')
-//		return *this;
-	++conversionchar;
+//	const char* conversionchar = conversion;
+////	if (*conversionchar != 'D')
+////		return *this;
+//	++conversionchar;
+//
+//	while (*conversionchar) {
+//		switch (*conversionchar) {
+//			case 'E':
+//				dayfirst = true;
+//				break;
+//			case 'S':
+//				yearfirst = true;
+//				break;
+//		}
+//		++conversionchar;
+//	}
 
-	while (*conversionchar) {
-
-		switch (*conversionchar) {
+	std::string_view sv = conversion;
+	for (const char charx : sv) {
+		switch (charx) {
 			case 'E':
 				dayfirst = true;
 				break;
@@ -233,19 +280,21 @@ var var::iconv_D(const char* conversion) const {
 				yearfirst = true;
 				break;
 		}
-		++conversionchar;
 	}
 
 	const int maxnparts = 3;
-	int parts[maxnparts];
+	//int parts[maxnparts];
+	std::array<int, maxnparts> parts;
 	parts[0] = 0;
 	int partn = -1;
 
 	int month = 0;
 
-	const char* iter = var_str.c_str();
-	while (*iter != '\0') {
-
+	//const char* iter = var_str.c_str();
+	//while (*iter != '\0') {
+	auto iter = var_str.begin();
+	const auto end = var_str.end();
+	while (iter != end) {
 		if (isdigit(*iter)) {
 
 			partn++;
@@ -263,10 +312,11 @@ var var::iconv_D(const char* conversion) const {
 
 		else if (::isalpha(*iter)) {
 
-			// Month letters can only appear once
+			// Alphabetic months must only appear once
 			if (month != 0)
 				return "";
 
+			// Build alphabetic month after uppercasing
 			std::string word;
 			do {
 				// toupper returns an int despite being given a char
@@ -274,15 +324,27 @@ var var::iconv_D(const char* conversion) const {
 				word.push_back(static_cast<char>(toupper(*iter++)));
 			} while (::isalpha(*iter));
 
-			// determine the month or return "" to indicate failure
-			for (int ii = 0; ii < 12 * 4; ii += 4) {
-				if (strcmp(static_cast<const char*>(shortmths + ii), word.c_str()) == 0) {
-					month = ii / 4 + 1;
-					break;
-				}
-			}
-			if (month == 0)
+//			// determine the month number 1 - 12
+//			for (int ii = 0; ii < 12 * 4; ii += 4) {
+//				if (strcmp(static_cast<const char*>(shortmths + ii), word.c_str()) == 0) {
+//					month = ii / 4 + 1;
+//					break;
+//				}
+//			}
+//			if (month == 0)
+//				return "";
+
+			// Alphabetic month must be exactly 3 letters
+			if (word.size() != 3)
 				return "";
+
+			// Find in the list of all three letter months
+			auto pos = shortmths.find(word);
+			if (pos == std::string::npos)
+				return "";
+
+			// Determine month number 1 - 12
+			month = int(pos) / 4 + 1;
 
 			continue;
 		}
@@ -357,7 +419,7 @@ var var::iconv_D(const char* conversion) const {
 		return "";
 
 	// Table of max gregorian day per month
-    constexpr const int maxdays_by_month[] = {
+	constexpr const std::array maxdays_by_month = {
 							31,28,31,//Jan, Feb, Mar
 							30,31,30,//Apr, May, Jun
 							31,31,30,//Jul, Aug, Sep
@@ -372,7 +434,7 @@ var var::iconv_D(const char* conversion) const {
 	}
 
 	// Convert to pick integer date which is the number of days since 1967-12-31
-	return hinnant::gregorian::days_from_civil(year, month, day) - PICK_UNIX_DAY_OFFSET;
+	return hinnant::gregorian::days_from_civil(year, month, day) - PICK_UNIX_DATE_OFFSET;
 
 }
 
@@ -381,10 +443,10 @@ std::string var::oconv_D(const char* conversion) const {
 	// by this time *this is known to be numeric and not an empty string
 
 	// pick date uses floor() i.e. day 0.9 = day 0 and day -0.9 -> -1
-	int pickdayno = this->floor();
+	int pickdateno = this->floor();
 
 	// convert to day, month and year
-	int unixdayno = pickdayno + PICK_UNIX_DAY_OFFSET;
+	int unixdayno = pickdateno + PICK_UNIX_DATE_OFFSET;
 	int civil_year;
 	unsigned civil_month;
 	unsigned civil_day;
@@ -398,10 +460,16 @@ std::string var::oconv_D(const char* conversion) const {
 	// bool leadingzeros=true;
 	char sepchar = ' ';
 
-	// this function is only called when the 1st character is "D"
+#pragma GCC diagnostic push
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
 	const char* conversionchar = conversion;
+#pragma GCC diagnostic pop
 
-    // bump to the next char
+//	const zstring_range conversion2{conversion};
+//	auto conversionchar = conversion2.begin();
+
+	// This function is only called when the 1st character is "D"
+	// Bump to the next char
 	++conversionchar;
 
 	// DY means year only unless followed by a separator character
@@ -452,7 +520,8 @@ std::string var::oconv_D(const char* conversion) const {
 				// yearonly=true;
 				// allow trailing digit as well to control ndigits
 				++conversionchar;
-				if ((*conversionchar) <= '9' && (*conversionchar) >= '0')
+				//if ((*conversionchar) <= '9' && (*conversionchar) >= '0')
+				if ((*conversionchar) >= '0' && (*conversionchar) <= '9')
 					yeardigits = (*conversionchar) - '0';
 				--conversionchar;
 				break;
@@ -530,7 +599,7 @@ std::string var::oconv_D(const char* conversion) const {
 	// month
 	if (alphamonth) {
 		// ss.width(3);
-		ss << &shortmths[civil_month * 4 - 4];
+		ss << shortmths.substr(civil_month * 4 - 4, 3);
 	} else {
 		ss.width(2);
 		ss << static_cast<int>(civil_month);
@@ -571,7 +640,15 @@ std::string var::oconv_MT(const char* conversion) const {
 	bool showsecs = false;
 	bool input_is_hours = false;
 	char sepchar = ':';
-	const char* conversionchar = conversion + 2;
+
+#pragma GCC diagnostic push
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
+	const char* conversionchar = conversion;
+#pragma GCC diagnostic pop
+
+	// Skip over leading "MT"
+	conversionchar += 2;
+
 	int timesecs;
 
 	// Analyse conversion characters

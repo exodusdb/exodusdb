@@ -85,6 +85,7 @@
 	add_library(nlist SHARED nlist.cpp)
 	add_library(dict_xo_clients SHARED dict_xo_clients.cpp)
 
+	# SPECIAL for nlist
 	target_compile_options(nlist PUBLIC "-O2")
 
 #

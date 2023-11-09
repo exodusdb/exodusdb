@@ -11,6 +11,7 @@
 #pragma GCC diagnostic ignored "-Wold-style-cast"
 #pragma GCC diagnostic ignored "-Wextra-semi"
 //#pragma clang diagnostic ignored "-Wextra-semi-stmt"
+#pragma GCC diagnostic ignored "-Wunsafe-buffer-usage"
 #pragma GCC diagnostic ignored "-Wcast-align"
 #include "murmurhash3.h"
 

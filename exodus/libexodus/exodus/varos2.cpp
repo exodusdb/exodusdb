@@ -31,7 +31,10 @@ THE SOFTWARE.
 
 
 // to get whole environment
+#pragma GCC diagnostic push
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
 extern char** environ;
+#pragma GCC diagnostic pop
 
 namespace exodus {
 

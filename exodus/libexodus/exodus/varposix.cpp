@@ -1,3 +1,4 @@
+#include <limits.h>
 #include <unistd.h>
 #include <filesystem>
 namespace fs = std::filesystem;
@@ -26,9 +27,18 @@ ND PUBLIC var getexecpath() {
 }
 
 ND PUBLIC std::string gethostname() {
-    char hostname[1024];
-    hostname[1023] = '\0';
-    ::gethostname(hostname, 1023);
+//    char hostname[1024];
+//    hostname[1023] = '\0';
+//    ::gethostname(hostname, 1023);
+	std::string hostname(' ', HOST_NAME_MAX);
+	if (::gethostname(hostname.data(), HOST_NAME_MAX))
+		hostname = "";
+	else {
+		size_t pos = hostname.find('\0');
+		if (pos != std::string::npos)
+			hostname.erase(pos);
+	}
+
     return hostname;
 }
 

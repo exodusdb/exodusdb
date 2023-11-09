@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2009 steve.bush@neosys.com   
+Copyright (c) 2009 steve.bush@neosys.com
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -101,7 +101,40 @@ THE SOFTWARE.
 
 namespace exodus {
 
-std::string mvd2s(double double1) {
+/////////////////////////////////////
+// Wrapper function for std::to_chars
+/////////////////////////////////////
+
+static std::string double_to_chars_to_string(
+		double double1,
+		std::chars_format format = std::chars_format::general,
+		int decimals = std::numeric_limits<double>::digits10 + 1
+	) {
+
+	// Local stack working space for to_chars
+	constexpr auto MAX_CHARS = 24;
+	std::array<char, MAX_CHARS> chars;
+
+	// to_chars
+#pragma GCC diagnostic push
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
+	auto [ptr, ec] = std::to_chars(chars.data(), chars.data() + chars.size(), double1, format, decimals);
+#pragma GCC diagnostic pop
+
+	// Throw NON-NUMERIC if cannot convert
+	if (ec != std::errc())
+		throw VarNonNumeric("var::round: Cannot round " ^ var(double1) ^ " ndecimals: " ^ decimals ^ " to " ^ MAX_CHARS ^ " characters");
+
+	// Convert to a string.
+	// Hopefully using small string optimisation (SSO)
+	return std::string(chars.data(), ptr - chars.data());
+}
+
+//////////////////////////////////////////
+// Utility to convert double to std string
+//////////////////////////////////////////
+
+static std::string double_to_string(double double1) {
 
 	// prevent "-0"
 	if (!double1)
@@ -122,33 +155,46 @@ std::string mvd2s(double double1) {
 	// Use the new low level high performance double to chars converter
 	// https://en.cppreference.com/w/cpp/utility/to_chars
 
-	std::array<char, 24> chars;
-	//auto [ptr, ec] = std::to_chars(chars.data(), chars.data() + chars.size(), double1, std::chars_format::scientific);
-	auto [ptr, ec] = std::to_chars(chars.data(), chars.data() + chars.size(), double1, std::chars_format::general, std::numeric_limits<double>::digits10 + 1);
+//	// Use local data to avoid using heap
+//	// The result chars are very likely to fit in std::string SSO without using the heap
+//	// (15 bytes in gcc and 23 in clang)
+//	constexpr auto MAX_CHARS = 24;
+//	std::array<char, MAX_CHARS> chars;
+//
+//	//auto [ptr, ec] = std::to_chars(chars.data(), chars.data() + chars.size(), double1, std::chars_format::scientific);
+//#pragma GCC diagnostic push
+//#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
+//	auto [ptr, ec] = std::to_chars(chars.data(), chars.data() + chars.size(), double1, std::chars_format::general, std::numeric_limits<double>::digits10 + 1);
+//	//auto [ptr, ec] = std::to_chars(chars.data(), chars.data() + chars.size(), double1, std::chars_format::general, precision);
+//#pragma GCC diagnostic pop
+//
+//	// Throw if non-numeric
+//	if (ec != std::errc())
+//		[[unlikely]]
+//		throw VarNonNumeric("double_to_string: Cannot convert double to " ^ var(MAX_CHARS) ^ " characters");
+//
+//	// Create a std string from the fixed array of char
+//	// Probably it will use small string optimisation (SSO)
+//	// - gcc 15 chars
+//	// - clang 23 chars
+//	std::string resultstr = std::string(chars.data(), ptr - chars.data());
 
-	// Throw if non-numeric
-	if (ec != std::errc())
-		[[unlikely]]
-		throw VarNonNumeric("mvd2s: Cannot convert double to 24 characters");
-
-	// Convert to a string. Hopefully using small string optimisation (SSO)
-	std::string s = std::string(chars.data(), ptr - chars.data());
-
-//	return s;
+	std::string resultstr = double_to_chars_to_string(double1);
 
 	// Find the exponent if any
-	const std::size_t epos = s.find('e');
+	const std::size_t epos = resultstr.find('e');
 
 	// We are done if there is no exponent
 	if (epos == std::string::npos)
-		return s;
+		return resultstr;
 
 #elif defined(USE_RYU)
 
 	//std::cout << "ryu_printf decimal oconv" << std::endl;
 
-	std::string s;
-	s.resize(24);
+	// TODO use std::array to avoid std::string going to the heap?
+	std::string resultstr;
+	resultstr.resize(24);
 
 //#define USE_RYU_D2S
 //#ifdef USE_RYU_D2S
@@ -165,30 +211,30 @@ std::string mvd2s(double double1) {
 	//i.e. calculated doubles are sometimes wrong
 	//e.g. 10.0/3.0 -> 3.3333333333333335 whereas "3.3333333333333333" -> double -> "3.3333333333333333"
 	//e.g. 1234567890.00005678 -> "1234567890.0000567"
-	const int n = d2s_buffered_n(double1, s.data());
-	s.resize(n);
-	//s is now something like "1.2345678E3" or "0E0" always in E format.
-	//std::cout << s << std::endl;
-	//return s;//435ns here. 500ns after conversion to fixed decimal place below (65ns)
-	std::size_t epos = s.find('E');
+	const int n = d2s_buffered_n(double1, resultstr.data());
+	resultstr.resize(n);
+	//resultstr is now something like "1.2345678E3" or "0E0" always in E format.
+	//std::cout << resultstr << std::endl;
+	//return resultstr;//435ns here. 500ns after conversion to fixed decimal place below (65ns)
+	std::size_t epos = resultstr.find('E');
 
 	// Convert ryu exponents 'E' to 'e'
-	s.replace(epos, 1, "e");
+	resultstr.replace(epos, 1, "e");
 
-	// Add ryu exponent's missing '+'
-	if (s[epos + 1] != '-')
-		s.insert(epos + 1, 1, '+');
+	// Add ryu exponent'resultstr missing '+'
+	if (resultstr[epos + 1] != '-')
+		resultstr.insert(epos + 1, 1, '+');
 
 	// Add ryu exponents leading '0'
-	if (epos == s.size() - 3)
-		s.insert(epos + 2, 1, '0');
+	if (epos == resultstr.size() - 3)
+		resultstr.insert(epos + 2, 1, '0');
 
 	// Add ryu missing ".0" if like "1e+07"
 	if (epos == 1) {
-		s.insert(1, ".0");
+		resultstr.insert(1, ".0");
 		epos += 2;
-	} else if (s[0] == '-' && epos == 2) {
-		s.insert(2, ".0");
+	} else if (resultstr[0] == '-' && epos == 2) {
+		resultstr.insert(2, ".0");
 		epos += 2;
 	}
 //#elif 0
@@ -200,12 +246,12 @@ std::string mvd2s(double double1) {
 //	//ryu_printf %e equivalent (always scientific format to properly control precision)
 //	//followed by conversion to fixed format below
 //	//using precision 15 (which means 16 digits in scientific format)
-//	const int n = d2exp_buffered_n(double1, 15, s.data());
-//	s.resize(n);
-//	//s is now something like "1.234567800000000e+03"
-//	//std::cout << s << std::endl;
-//	//return s;//650ns here. 743ns after changing to fixed point below (93ns)
-//	const std::size_t epos = s.find('e');
+//	const int n = d2exp_buffered_n(double1, 15, resultstr.data());
+//	resultstr.resize(n);
+//	//resultstr is now something like "1.234567800000000e+03"
+//	//std::cout << resultstr << std::endl;
+//	//return resultstr;//650ns here. 743ns after changing to fixed point below (93ns)
+//	const std::size_t epos = resultstr.find('e');
 //
 //#else
 //
@@ -218,21 +264,21 @@ std::string mvd2s(double double1) {
 //	//printl( var("999999999999999.9")    + 0);
 //	//             999999999999999.875
 //	//Could truncate after 15 digits but this would not be rounded properly
-//	const int n = d2fixed_buffered_n(double1, 16, s.data());
-//	s.resize(n);
+//	const int n = d2fixed_buffered_n(double1, 16, resultstr.data());
+//	resultstr.resize(n);
 //	//remove trailing zeros
-//	//while (s.back() == '0')
-//	//	s.pop_back();
-//	std::size_t lastdigit = s.find_last_not_of('0');
+//	//while (resultstr.back() == '0')
+//	//	resultstr.pop_back();
+//	std::size_t lastdigit = resultstr.find_last_not_of('0');
 //	if (lastdigit != std::string::npos)
-//		s.resize(lastdigit);
+//		resultstr.resize(lastdigit);
 //	//remove trailing decimal point
-//	if (s.back() == '.')
-//		s.pop_back();
-//	return s;
+//	if (resultstr.back() == '.')
+//		resultstr.pop_back();
+//	return resultstr;
 //	const std::size_t epos = std::string::npos;
 //#endif
-//	//std::cout << s << std::endl;
+//	//std::cout << resultstr << std::endl;
 
 #else //USE_SSTREAM
 
@@ -275,56 +321,54 @@ std::string mvd2s(double double1) {
 #endif
 
 	ss << double1;
-	std::string s = ss.str();
+	std::string resultstr = ss.str();
 
-	std::size_t epos = s.find('e');
+	std::size_t epos = resultstr.find('e');
 
 	////////////////////////////////////////////
 	//if not scientific format then return as is
 	////////////////////////////////////////////
 #ifndef ALWAYS_VIA_SCIENTIFIC
 	if (epos == std::string::npos)
-		return s;
+		return resultstr;
 #endif
 		//std::cout << "xxxxxxxxxxxxxxxxxxxxxxxxxxxx" << std::endl;
 
 #endif	//USE_RYU / do not use RYU
 
-/////////////////////////////////////////////////
 // PROCESS THE OUTPUT OF THE ABOVE 3 ALTERNATIVES
 /////////////////////////////////////////////////
 
 	// Get exponent as a signed int from -308 to 308
-	auto exponent = stoi(s.substr(epos + 1));
+	auto exponent = stoi(resultstr.substr(epos + 1));
 
 	// Get the exponent as text with its leading + or - char
-	auto exponent_text = s.substr(epos);
+	auto exponent_text = resultstr.substr(epos);
 
 	//Remove the exponent (everything starting at the E/e)
 	if (epos != std::string::npos)
-		s.erase(epos);
+		resultstr.erase(epos);
 
 	// Exponent 0 special treatment and exit
 	if (!exponent) {
 
 //#ifndef USE_RYU_D2S
 		//remove trailing zeros and decimal point
-		while (s.back() == '0')
-			s.pop_back();
-		if (s.back() == '.')
-			s.pop_back();
-			//s.push_back('0');
+		while (resultstr.back() == '0')
+			resultstr.pop_back();
+		if (resultstr.back() == '.')
+			resultstr.pop_back();
+			//resultstr.push_back('0');
 //#ifdef USE_RYU
 		//single zero if none
-		//if (s.size() == std::size_t(minus))
-		if (s.empty() || s == "-")
-			s.push_back('0');
+		//if (resultstr.size() == std::size_t(minus))
+		if (resultstr.empty() || resultstr == "-")
+			resultstr.push_back('0');
 //#endif
 //#endif
-		return s;
+		return resultstr;
 	}
 
-	////////////////////////////////////////////
 	//leave exponent in if abs(exponent) is > 15
 	////////////////////////////////////////////
 	//if (exponent < -6 or exponent > 12) {
@@ -332,19 +376,18 @@ std::string mvd2s(double double1) {
 	if (std::abs(exponent) > std::numeric_limits<double>::digits10) {
 
 		//remove trailing zeros
-		while (s.back() == '0')
-			s.pop_back();
-		if (s.back() == '.')
-			//s.push_back('0');
-			s.pop_back();
+		while (resultstr.back() == '0')
+			resultstr.pop_back();
+		if (resultstr.back() == '.')
+			//resultstr.push_back('0');
+			resultstr.pop_back();
 
 		//append the exponent text
-		s.append(exponent_text);
+		resultstr.append(exponent_text);
 
-		return s;
+		return resultstr;
 	}
 
-	//////////////////////////////////////////////////////////////////////////
 	// "Small" exponents just move the decimal point and show without exponent
 	//////////////////////////////////////////////////////////////////////////
 
@@ -352,17 +395,17 @@ std::string mvd2s(double double1) {
 	if (exponent > 0) {
 
 		//remove decimal point
-		s.erase(1 + minus, 1);
+		resultstr.erase(1 + minus, 1);
 
 		//determine how many zeros need appending if any
-		int addzeros = exponent - static_cast<int>(s.size()) + 1 + minus;
+		int addzeros = exponent - static_cast<int>(resultstr.size()) + 1 + minus;
 
 		//debugging
-		//std::cout << ss.str() << " " << s << " " << exponent << " " << s.size() << " " << addzeros << std::endl;
+		//std::cout << ss.str() << " " << resultstr << " " << exponent << " " << resultstr.size() << " " << addzeros << std::endl;
 
 		//either append sufficient zeros
 		if (addzeros > 0) {
-			s.append(addzeros, '0');
+			resultstr.append(addzeros, '0');
 
 		}
 
@@ -370,7 +413,7 @@ std::string mvd2s(double double1) {
 		else if (addzeros < 0) {
 
 			//insert decimal point
-			s.insert(exponent + minus + 1, 1, '.');
+			resultstr.insert(exponent + minus + 1, 1, '.');
 
 			goto removetrailing;
 		}
@@ -379,30 +422,33 @@ std::string mvd2s(double double1) {
 	} else {
 
 		//remove decimal point
-		s.erase(1 + minus, 1);
+		resultstr.erase(1 + minus, 1);
 
 		//prefix sufficient zeros
-		s.insert(0 + minus, -exponent, '0');
+		resultstr.insert(0 + minus, -exponent, '0');
 
 		//insert decimal point
-		s.insert(1 + minus, 1, '.');
+		resultstr.insert(1 + minus, 1, '.');
 
 removetrailing:
 		//remove trailing zeros
-		while (s.back() == '0')
-			s.pop_back();
-		//std::size_t lastdigit = s.find_last_not_of('0');
+		while (resultstr.back() == '0')
+			resultstr.pop_back();
+		//std::size_t lastdigit = resultstr.find_last_not_of('0');
 		//if (lastdigit != std::string::npos)
-		//	s.resize(lastdigit+1);
+		//	resultstr.resize(lastdigit+1);
 
 		//remove trailing decimal point
-		if (s.back() == '.')
-			s.pop_back();
+		if (resultstr.back() == '.')
+			resultstr.pop_back();
 	}
 
-	return s;
+	return resultstr;
 }
 
+////////////////////
+// var::createstring
+////////////////////
 
 // mainly called in ISSTRING when not already a string
 void var::createString() const {
@@ -413,7 +459,7 @@ void var::createString() const {
 	// dbl - create string from dbl
 	// prefer double
 	if (var_typ & VARTYP_DBL) {
-		var_str = mvd2s(var_dbl);
+		var_str = double_to_string(var_dbl);
 		var_typ |= VARTYP_STR;
 		return;
 	}
@@ -433,6 +479,10 @@ void var::createString() const {
 	//(usually var_typ & VARTYP_UNA)
 	throw VarUnassigned("createString()");
 }
+
+/////////////
+// var::round
+/////////////
 
 var var::round(const int ndecimals) const {
 
@@ -468,7 +518,9 @@ var var::round(const int ndecimals) const {
 */
 
 /*
-	pickos round rounds positive .5 up to 1 and negative .5 down to -1 etc
+	pickos round rounds all positive .5/1.5/2.5 up to 1/2/3 and negative .5/1.5/2.5 down to -1/-2/-3 etc
+	(not bankers rounding which is evens 0.5/2.5 etc. rounds towards zero (0/2) and odds 1.5/3.5 roundsaway from zero 2/4)
+	-1.5=-2
 	-1.0=-1
 	-0.9=-1
 	-0.5=-1
@@ -478,6 +530,8 @@ var var::round(const int ndecimals) const {
 	 0.5= 1.0
 	 0.9= 1.0
 	 1.0= 1.0
+	 1.5= 2.0
+
 */
 
 	//var_str is always set on return
@@ -567,18 +621,24 @@ var var::round(const int ndecimals) const {
 	// Use the new low level high performance double to chars converter
 	// https://en.cppreference.com/w/cpp/utility/to_chars
 
-	constexpr int maxchars {48};
+//	constexpr int maxchars {48};
+//
+//	// Local 
+//	std::array<char, maxchars> chars;
+//
+//	// Fixed decimal places
+//	// Specific number of decimal places
+//	auto [ptr, ec] = std::to_chars(chars.data(), chars.data() + chars.size(), rounded_double, std::chars_format::fixed, ndecimals >= 0 ? ndecimals : 0);
+//
+//	// Throw if non-numeric
+//	if (ec != std::errc())
+//		//throw VarNonNumeric("var::round: Cannot convert to 24 characters");
+//		throw VarNonNumeric("var::round: Cannot round " ^ var(fromdouble) ^ " ndecs: " ^ ndecimals ^ " to " ^ maxchars ^ " characters");
+//
+//	// Convert to a string. Hopefully using small string optimisation (SSO)
+//	result.var_str = std::string(chars.data(), ptr - chars.data());
 
-	std::array<char, maxchars> chars;
-	auto [ptr, ec] = std::to_chars(chars.data(), chars.data() + chars.size(), rounded_double, std::chars_format::fixed, ndecimals >= 0 ? ndecimals : 0);
-
-	// Throw if non-numeric
-	if (ec != std::errc())
-		//throw VarNonNumeric("var::round: Cannot convert to 24 characters");
-		throw VarNonNumeric("var::round: Cannot round " ^ var(fromdouble) ^ " ndecs: " ^ ndecimals ^ " to " ^ maxchars ^ " characters");
-
-	// Convert to a string. Hopefully using small string optimisation (SSO)
-	result.var_str = std::string(chars.data(), ptr - chars.data());
+	result.var_str = double_to_chars_to_string(rounded_double, std::chars_format::fixed, ndecimals >= 0 ? ndecimals : 0);
 
 #else
 	// We might use ryu here if installed but will not bother as to_chars(double) is built-in to g++v11 in Ubuntu 22.04
@@ -589,40 +649,63 @@ var var::round(const int ndecimals) const {
 
 #endif
 
-	result.var_typ = VARTYP_STR;
+	result.var_dbl = rounded_double;
+	result.var_typ = VARTYP_DBLSTR;
 
 	return result;
 }
+
+///////////////
+// var::integer
+///////////////
 
 // function name is "integer" instead of "int" because int is a reserved word in c/c++ for int datatype
 // using the system int() function on a var e.g. int(varx) returns an int whereas this function returns a var
 var var::integer() const {
 
-    //-1.0=-1
-    //-0.9=0
-    //-0.5=0
-    //-0.1=0
-    // 0  =0
-    // 0.1=0
-    // 0.5=0
-    // 0.9=0
-    // 1.0=1
+    //-1.0 = -1
+
+    //-0.9 = 0
+    //-0.5 = 0
+    //-0.1 = 0
+
+    // 0   = 0
+
+    // 0.1 = 0
+    // 0.5 = 0
+    // 0.9 = 0
+
+    // 1.0 = 1
 
 	this->assertInteger(__PRETTY_FUNCTION__);
 	return var_int;
 }
 
+/////////////
+// var::floor
+/////////////
+
 var var::floor() const {
 
-    //-1.0=-1
-    //-0.9=-1
-    //-0.5=-1
-    //-0.1=-1
-    // 0  =0
-    // 0.1=0
-    // 0.5=0
-    // 0.9=0
-    // 1.0=1
+	// Goes to the closest integer towards negative infinity
+
+	//-1.9 - -2
+	//-1.5 = -2
+    //-1.0 = -1
+
+    //-0.9 = -1
+    //-0.5 = -1
+    //-0.1 = -1
+
+    // 0   = 0
+
+    // 0.1 = 0
+    // 0.5 = 0
+    // 0.9 = 0
+
+    // 1.0 = 1
+	// 1.5 = 1
+	// 1.9 = 1
 
 	this->assertNumeric(__PRETTY_FUNCTION__);
 
@@ -638,6 +721,10 @@ var var::floor() const {
 
 	return var_int;
 }
+
+//////////////
+// var::toBool
+//////////////
 
 bool var::toBool() const {
 
@@ -686,6 +773,10 @@ bool var::toBool() const {
 //	return var_int;
 //}
 
+/////////////
+// var::toInt
+/////////////
+
 int var::toInt() const {
 
 	this->assertInteger(__PRETTY_FUNCTION__);
@@ -694,6 +785,10 @@ int var::toInt() const {
 	//return var_int;
 	return static_cast<int>(*this);
 }
+
+///////////////
+// var::toInt64
+///////////////
 
 int64_t var::toInt64() const {
 
@@ -711,12 +806,20 @@ int64_t var::toInt64() const {
 //	return static_cast<long long int>(var_int);
 //}
 
+////////////////
+// var::toDouble
+////////////////
+
 double var::toDouble() const {
 
 	this->assertDecimal(__PRETTY_FUNCTION__);
 
 	return var_dbl;
 }
+
+/////////////
+// var::isnum
+/////////////
 
 // RULES need updating since we are now allowing E/e scientific notation
 //
@@ -739,7 +842,6 @@ double var::toDouble() const {
 // 4. all characters mean non-numeric
 
 bool var::isnum(void) const {
-
 
 	// TODO make isnum private and ensure ISDEFINED is checked before all calls to isnum
 	// to save the probably double check here
@@ -819,18 +921,21 @@ bool var::isnum(void) const {
 		}
 	}
 
-	char* first = var_str.data();
-	char* last = first + strlen;
+#pragma GCC diagnostic push
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
+	char* firstchar = var_str.data();
+	char* lastchar = firstchar + strlen;
+#pragma GCC diagnostic pop
 
 	// Skip leading + to be compatible with javascript
 	// from_chars does not allow it.
-	first += *first == '+';
+	firstchar += *firstchar == '+';
 
 	if (floating) {
 
 		// to double
-		auto [p, ec] = STD_OR_FASTFLOAT::from_chars(first, last, var_dbl);
-		if (ec != std::errc() || p != last) {
+		auto [p, ec] = STD_OR_FASTFLOAT::from_chars(firstchar, lastchar, var_dbl);
+		if (ec != std::errc() || p != lastchar) {
 			var_typ = VARTYP_NANSTR;
 			return false;
 		}
@@ -841,8 +946,8 @@ bool var::isnum(void) const {
 	} else {
 
 		// to long int
-		auto [p, ec] = std::from_chars(first, last, var_int);
-		if (ec != std::errc() || p != last) {
+		auto [p, ec] = std::from_chars(firstchar, lastchar, var_int);
+		if (ec != std::errc() || p != lastchar) {
 			var_typ = VARTYP_NANSTR;
 			return false;
 		}

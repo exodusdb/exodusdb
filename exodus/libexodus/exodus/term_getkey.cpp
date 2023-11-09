@@ -34,8 +34,11 @@ char getkey(void) {
 	newAttr.c_iflag = 0;		/* input mode */
 	newAttr.c_oflag = 0;		/* output mode */
 	newAttr.c_lflag &= ~ICANON; /* line settings */
+#pragma GCC diagnostic push
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
 	newAttr.c_cc[VMIN] = 1;		/* minimum chars to wait for */
 	newAttr.c_cc[VTIME] = 1;	/* minimum wait time */
+#pragma GCC diagnostic pop
 
 	// Set stdin to nonblocking, noncanonical input
 	fcntl(fd, F_SETFL, O_NONBLOCK);

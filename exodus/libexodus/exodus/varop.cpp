@@ -23,6 +23,7 @@ THE SOFTWARE.
 #include <iostream>
 #include <string>
 #include <utility> // for std::move
+#include <array>
 
 //#include <cassert>
 #include <limits>
@@ -51,7 +52,7 @@ namespace exodus {
 //^= is not templated since slightly slower to go through the creation of an var()
 
 //^=var
-// The assignment operator should always return a reference to *this.
+// The assignment operator must always return a reference to *this.
 VARREF var::operator^=(CVR rhs) & {
 
 	assertString(__PRETTY_FUNCTION__);
@@ -65,7 +66,7 @@ VARREF var::operator^=(CVR rhs) & {
 }
 
 //^=int
-// The assignment operator should always return a reference to *this.
+// The assignment operator must always return a reference to *this.
 VARREF var::operator^=(const int int1) & {
 
 	assertString(__PRETTY_FUNCTION__);
@@ -78,7 +79,7 @@ VARREF var::operator^=(const int int1) & {
 }
 
 //^=double
-// The assignment operator should always return a reference to *this.
+// The assignment operator must always return a reference to *this.
 VARREF var::operator^=(const double double1) & {
 
 	assertString(__PRETTY_FUNCTION__);
@@ -88,13 +89,13 @@ VARREF var::operator^=(const double double1) & {
 	//var_typ = VARTYP_STR;  // reset to one unique type
 	var temp(double1);
 	temp.createString();
-	var_str += std::move(temp.var_str);
+	var_str += temp.var_str;
 
 	return *this;
 }
 
 //^=char
-// The assignment operator should always return a reference to *this.
+// The assignment operator must always return a reference to *this.
 VARREF var::operator^=(const char char1) & {
 
 	assertString(__PRETTY_FUNCTION__);
@@ -106,37 +107,52 @@ VARREF var::operator^=(const char char1) & {
 	return *this;
 }
 
-//^=char*
-// The assignment operator should always return a reference to *this.
-VARREF var::operator^=(const char* cstr) & {
-
-	assertString(__PRETTY_FUNCTION__);
-
-	// var_str+=var(int1).var_str;
-	// var_str+=std::string(char1);
-	var_str += cstr;
-	var_typ = VARTYP_STR;  // reset to one unique type
-
-	return *this;
-}
-
-//^=std::string
-// The assignment operator should always return a reference to *this.
-VARREF var::operator^=(const std::string& string1) & {
-
-	assertString(__PRETTY_FUNCTION__);
-
-	// var_str+=var(int1).var_str;
-	var_str += string1;
-	var_typ = VARTYP_STR;  // reset to one unique type
-
-	return *this;
-}
+//#ifdef NOT_TEMPLATED_APPEND
+//
+////^=char*
+//// The assignment operator must always return a reference to *this.
+//VARREF var::operator^=(const char* cstr) & {
+//
+//	assertString(__PRETTY_FUNCTION__);
+//
+//	// var_str+=var(int1).var_str;
+//	// var_str+=std::string(char1);
+//	var_str += cstr;
+//	var_typ = VARTYP_STR;  // reset to one unique type
+//
+//	return *this;
+//}
+//
+////^=std::string
+//// The assignment operator must always return a reference to *this.
+//VARREF var::operator^=(const std::string& string1) & {
+//
+//	assertString(__PRETTY_FUNCTION__);
+//
+//	// var_str+=var(int1).var_str;
+//	var_str += string1;
+//	var_typ = VARTYP_STR;  // reset to one unique type
+//
+//	return *this;
+//}
+//
+////^=std::string_view
+//// The assignment operator must always return a reference to *this.
+//VARREF var::operator^=(SV sv1) & {
+//
+//	assertString(__PRETTY_FUNCTION__);
+//
+//	// var_str+=var(int1).var_str;
+//	var_str += sv1;
+//	var_typ = VARTYP_STR;  // reset to one unique type
+//
+//	return *this;
+//}
+//#endif // NOT_TEMPLATED_APPEND
 
 // You must *not* make the postfix version return the 'this' object by reference
 //
 // *** YOU HAVE BEEN WARNED ***
-
 // not returning void so is usable in expressions
 // int argument indicates that this is POSTFIX override v++
 var var::operator++(int) & {
@@ -971,14 +987,18 @@ std::ostream& operator<<(std::ostream& ostream1, var var1) {
 
 	var1.assertString(__PRETTY_FUNCTION__);
 
+	constexpr std::array VISIBLE_FMS_EXCEPT_ESC {VISIBLE_ST_, TM_, VISIBLE_SM_, VISIBLE_VM_, VISIBLE_FM_, VISIBLE_RM_};
+
 	//replace various unprintable field marks with unusual ASCII characters
 	//leave ESC as \x1B because it is used to control ANSI terminal control sequences
 	//std::string str = "\x1A\x1B\x1C\x1D\x1E\x1F";
 	// |\x1B}]^~  or in high to low ~^]}\x1B|     or in TRACE() ... ~^]}_|
-	std::string str = "\x1E\x1D\x1C\x1B\x1A\x1F";  //order by frequency of occurrence
-	for (auto& c : var1.var_str) {
-		if (c >= 0x1A && c <= 0x1F)
-			c = "|\x1B}]^~"[c - 0x1A];
+	for (auto& charx : var1.var_str) {
+		if (charx <= 0x1F && charx >= 0x1A) {
+			[[unlikely]]
+			//charx = "|\x1B}]^~"[charx - 0x1A];
+			charx = VISIBLE_FMS_EXCEPT_ESC[charx - 0x1A];
+		}
 	}
 
 	// use toString() to avoid creating a constructor which logs here recursively

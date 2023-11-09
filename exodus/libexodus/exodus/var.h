@@ -196,7 +196,22 @@ using varint_t = int64_t;
 inline const long double VAR_MAX_DOUBLE = static_cast<long double>(1.797693134862315708145274237317043567981e+30);
 inline const long double VAR_LOW_DOUBLE = static_cast<long double>(-1.797693134862315708145274237317043567981e+30);
 
-// class var final
+//template<class T, class... P0toN>
+//struct is_one_of;
+//
+//template<class T>
+//struct is_one_of<T> : std::false_type {static const bool value{false};};
+//
+//template<class T, class... P1toN>
+//struct is_one_of<T, T, P1toN...> : std::true_type {static const bool value{true};};
+//
+//template<class T, class P0, class... P1toN>
+//struct is_one_of<T, P0, P1toN...> : is_one_of<T, P1toN...> {};
+
+	////////////
+	// class var
+	////////////
+
 //"final" to prevent inheritance because var has a destructor which is non-virtual to save space and time
 class PUBLIC var final {
 
@@ -229,7 +244,7 @@ class PUBLIC var final {
 	//
 	// allow syntax "var v;" to create an "unassigned" var (var_typ is 0)
 	//
-	var() = default;
+	var() noexcept = default;
 
 //	var()
 //		: var_typ(VARTYP_UNA) {
@@ -359,7 +374,7 @@ class PUBLIC var final {
 	// b) It doesnt check if rhs is assigned although this is
 	//    is less important for temporaries which are rarely unassigned.
 	//var& operator=(TVR rhs) & noexcept = default;
-	void operator=(TVR rhs) & {
+	void operator=(TVR rhs) & noexcept {
 
 		// Skipped for speed
 		//assertDefined(__PRETTY_FUNCTION__);
@@ -1085,9 +1100,34 @@ class PUBLIC var final {
 	VARREF operator^=(const int) &;
 	VARREF operator^=(const double) &;
 	VARREF operator^=(const char) &;
-	VARREF operator^=(const char*) &;
-	VARREF operator^=(const std::string&) &;
-
+////#define NOT_TEMPLATED_APPEND
+//#ifdef NOT_TEMPLATED_APPEND
+//	VARREF operator^=(const char*) &;
+//	VARREF operator^=(const std::string&) &;
+//	VARREF operator^=(SV) &;
+//#else
+	// var = string-like
+	template <typename Appendable, std::enable_if_t<
+		std::is_same<Appendable, const char*>::value
+		||
+		std::is_same<Appendable, const std::string>::value
+		||
+		std::is_same<Appendable, const std::string&>::value
+		||
+		std::is_same<Appendable, const std::string_view>::value
+	>>
+	/*
+		char*,
+		std::string,
+		std::string_view,
+	*/
+	VARREF operator^=(Appendable str2) & {
+		assertString(__PRETTY_FUNCTION__);
+		var_str += str2;
+		var_typ = VARTYP_STR;  // must reset to one unique type
+		return *this;
+	}
+//#endif
 
 	///////////////////////////////////////
 	// SELF ASSIGN OPERATORS ON TEMPORARIES - all deprecated or deleted to prevent unusual and unnecessary coding
@@ -1145,6 +1185,7 @@ class PUBLIC var final {
 	DEPRECATE VARREF operator^=(const char         rhs) && {(*this) ^= rhs; return *this;}// = delete;
 	DEPRECATE VARREF operator^=(const char*        rhs) && {(*this) ^= rhs; return *this;}// = delete;
 	DEPRECATE VARREF operator^=(const std::string& rhs) && {(*this) ^= rhs; return *this;}// = delete;
+	DEPRECATE VARREF operator^=(const std::string_view rhs) && {(*this) ^= rhs; return *this;}// = delete;
 
 	#undef DEPRECATE
 
@@ -1684,7 +1725,7 @@ class PUBLIC var final {
 	ND var indexn(SV str, const int occurrence) const;      // byte returned
 	ND var indexr(SV str, const int startchar1 = -1) const; // byte returned
 
-	//static member for speed on std strings
+	//static member for speed on std strings because of underlying boost implementation
 	static int localeAwareCompare(const std::string& str1, const std::string& str2);
 	//int localeAwareCompare(const std::string& str2) const;
 
@@ -1741,7 +1782,7 @@ class PUBLIC var final {
 	ND var sort(SV sepchar = _FM) const&;
 	ND var reverse(SV sepchar = _FM) const&;
 	ND var shuffle(SV sepchar = _FM) const&;
-    ND var parse(char sepchar = ' ') const&;
+	ND var parse(char sepchar = ' ') const&;
 
 	// SAME ON TEMPORARIES - MUTATE FOR SPEED
 	/////////////////////////////////////////
