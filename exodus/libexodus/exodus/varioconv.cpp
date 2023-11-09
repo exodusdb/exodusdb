@@ -26,6 +26,7 @@ THE SOFTWARE.
 #include <string>
 #include <sstream>
 #include <bitset>
+#include <array>
 //#include <utility> //std::unreachable()
 
 #include <exodus/varimpl.h>
@@ -63,7 +64,10 @@ var var::iconv(const char* conversion) const {
 	var terminator;
 	var result = "";
 
+#pragma GCC diagnostic push
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
 	const char* pconversion = conversion;
+#pragma GCC diagnostic pop
 
 	// check first character
 	switch (*pconversion) {
@@ -94,7 +98,7 @@ var var::iconv(const char* conversion) const {
 		case 'M':
 
 			// point to 2nd character
-			++pconversion;
+			pconversion++;
 
 			while (true) {
 
@@ -190,9 +194,9 @@ var var::iconv(const char* conversion) const {
 		case 'T':
 			// TX
 			// TX1 TX2 TX3 TX4 TX5 for progressive conversion starting with FM
-			++pconversion;
+			pconversion++;
 			if (*pconversion == 'X') {
-				++pconversion;
+				pconversion++;
 				return iconv_TX(conversion);
 			}
 			[[fallthrough]];
@@ -215,7 +219,7 @@ var var::iconv(const char* conversion) const {
 			// digit
 			if ((*(++pconversion) == 'E') && (*(++pconversion) == 'X')) {
 				// point to one character after HEX
-				++pconversion;
+				pconversion++;
 
 				switch (*pconversion) {
 					case '\0':
@@ -394,14 +398,36 @@ std::string var::oconv_MD(const char* conversion) const {
 
 	// http://www.d3ref.com/index.php?token=basic.masking.function
 
-	// TODO consider implementing nextchar as a pointer to eliminate charn and convlen
+	// 1. Analyse conversion
+
+	// get pointer to the third character (after the MD/MC bit)
+#pragma GCC diagnostic push
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
+	const char* pconversion = conversion;
+#pragma GCC diagnostic pop
+
+	// Second letter must be D or C
+	pconversion++;
+	char thousandsep;
+	char decimalsep;
+	if (*pconversion == 'D') [[likely]] {
+		thousandsep = ',';
+		decimalsep = '.';
+	} else {
+		thousandsep = '.';
+		decimalsep = ',';
+	}
+
+	// get the third character
+	pconversion++;
+	char nextchar = *pconversion;
 
 	// no conversion in the following cases
 	// 1. zero length string
 	// 2. non-numeric string
 	// 3. plain "MD" conversion without any trailing digits
-	size_t convlen = strlen(conversion);
-	if (((var_typ & VARTYP_STR) && !var_str.size()) || !(this->isnum()) || convlen <= 2)
+	//size_t convlen = strlen(conversion);
+	if (((var_typ & VARTYP_STR) && !var_str.size()) || !(this->isnum()) || !nextchar)
 		return *this;
 
 	// default conversion options
@@ -413,12 +439,6 @@ std::string var::oconv_MD(const char* conversion) const {
 	char trailer = '\0';
 	char prefixchar = '\0';
 
-	// get pointer to the third character (after the MD/MC bit)
-	size_t pos = 2;
-
-	// get the first (next) character
-	char nextchar = conversion[pos];
-
 	// following up to two digits are ndecimals, or ndecimals and movedecimals
 	// look for a digit
 	//TODO allow A-I to act like 10 to 19 digits
@@ -428,28 +448,29 @@ std::string var::oconv_MD(const char* conversion) const {
 		ndecimals = nextchar - '0';
 		movedecs = ndecimals;
 
-		// are we done
-		if (pos >= convlen)
-			goto convert;
+//		// are we done
+//		if (pos >= convlen)
+//			goto convert;
 
 		// look for a second digit
-		pos++;
-		nextchar = conversion[pos];
+		pconversion++;
+		nextchar = *pconversion;
 		if (isdigit(nextchar)) {
 			// get movedecimals
 			movedecs = nextchar - '0';
 
-			// are we done
-			if (pos >= convlen)
-				goto convert;
+//			// are we done
+//			if (pos >= convlen)
+//				goto convert;
 
 			// move to the next character
-			pos++;
-			nextchar = conversion[pos];
+			pconversion++;
+			nextchar = *pconversion;
 		}
 	}
 
-	while (true) {
+	while (nextchar) {
+
 		switch (nextchar) {
 			case 'P':
 				dontmovepoint = true;
@@ -497,14 +518,11 @@ std::string var::oconv_MD(const char* conversion) const {
 				}
 				break;
 		}
-		// move to next character if any otherwise break
-		if (pos >= convlen)
-			break;
-		pos++;
-		nextchar = conversion[pos];
+		pconversion++;
+		nextchar = *pconversion;
 	}
 
-convert:
+	// 2. Create output
 
 	// ndecimals is required for any conversion
 	if (ndecimals == std::string::npos)
@@ -548,7 +566,6 @@ convert:
 	if (septhousands) {
 		auto strpart1len = strpart1.size();
 		if (strpart1len > 3) {
-			char thousandsep = (conversion[1] == 'C') ? '.' : ',';
 //			std::size_t minii = strpart1.front() == '-' ? 2 : 1;
 			std::size_t minpos = strpart1.front() == '-' ? 2 : 1;
 //			for (std::size_t ii = strpart1len - 2; ii > minii; ii -= 3) {
@@ -573,7 +590,7 @@ convert:
 	if (ndecimals != 0) {
 		// append decimal point
 		//strpart1 ^= (conversion[1] == 'C') ? ',' : '.';
-		strpart1.push_back((conversion[1] == 'C') ? ',' : '.');
+		strpart1.push_back(decimalsep);
 
 		if (ndecimals == strpart2len)
 			//strpart1 ^= strpart2;
@@ -738,7 +755,10 @@ var var::oconv(const char* conversion_in) const {
 	std::replace(all_conversions.begin(), all_conversions.end(), '|', '\0');
 
 	// Get the end of all conversions
+#pragma GCC diagnostic push
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
 	auto all_conversions_end = all_conversions.data() + all_conversions.size();
+#pragma GCC diagnostic pop
 
 	// Multiple fields/values of input data
 	// ------------------------------------
@@ -761,13 +781,18 @@ var var::oconv(const char* conversion_in) const {
 		;
 
 		// Start a the beginning
+#pragma GCC diagnostic push
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
 		const char* pconversion = all_conversions.data();
+#pragma GCC diagnostic pop
 
 		// Multiple conversions
 		// --------------------
 		while (true) {
 
 			// Save a pointer to the beginning of the conversion code
+#pragma GCC diagnostic push
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
 			const char* conversion = pconversion;
 
 			// Find the end of conversion code (char \0)
@@ -775,6 +800,7 @@ var var::oconv(const char* conversion_in) const {
 			while (*conversion_end != '\0') {
 				 conversion_end++;
 			}
+#pragma GCC diagnostic pop
 
 			// Check 1st character of conversion code
 			switch (*pconversion) {
@@ -910,7 +936,7 @@ var var::oconv(const char* conversion_in) const {
 
 					// Format even empty strings
 
-					++pconversion;
+					pconversion++;
 					if (*pconversion == 'X') {
 						part = this->oconv_TX(conversion);
 					}
@@ -945,7 +971,7 @@ var var::oconv(const char* conversion_in) const {
 						}
 
 						// The first char after "HEX" determines the width of hex codes
-						++pconversion;
+						pconversion++;
 						switch (*pconversion) {
 							case '\0':
 								part = this->oconv_HEX(HEX_PER_CHAR);
@@ -1027,7 +1053,10 @@ var var::oconv(const char* conversion_in) const {
 
 }
 
+#pragma GCC diagnostic push
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
 std::string var::oconv_TX(const char* conversion) const {
+#pragma GCC diagnostic pop
 
 	var result = this->var_str;
 
@@ -1061,7 +1090,10 @@ std::string var::oconv_TX(const char* conversion) const {
 	return result.var_str;
 }
 
+#pragma GCC diagnostic push
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
 var var::iconv_TX(const char* conversion) const {
+#pragma GCC diagnostic pop
 
 	var record = this->var_str;
 	// \ + LF -> VM
@@ -1094,16 +1126,14 @@ var var::iconv_TX(const char* conversion) const {
 	return record;
 }
 
+constinit std::array hex_digits {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
 
 std::string var::oconv_HEX([[maybe_unused]] const int ioratio) const {
 
-	char const hex_chars[16] = {'0', '1', '2', '3', '4', '5', '6', '7',
-								'8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
-
 	std::string result;
 	for (auto byte : var_str) {
-		result.push_back(hex_chars[(byte & 0xF0) >> 4]);
-		result.push_back(hex_chars[(byte & 0x0F) >> 0]);
+		result.push_back(hex_digits[(byte & 0xF0) >> 4]);
+		result.push_back(hex_digits[(byte & 0x0F) >> 0]);
 	}
 
 	return result;

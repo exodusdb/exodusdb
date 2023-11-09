@@ -114,11 +114,22 @@
 	endif()
 
 ##
-## FMT
+## FMT - before setting complex compiler warnings for exodus subdirs/modules
 ## ###
 ##
-## This is probably not needed here and only required by cli compile.cpp
-#	find_package(fmt)
+#	if (${CMAKE_CXX_COMPILER_VERSION} STRLESS "13")
+		message("----------------")
+		message("-- FMT EXODUS --")
+		message("----------------")
+# See https://fmt.dev/latest/usage.html
+# How to build
+		set(BUILD_SHARED_LIBS true)
+		set(FMT_PEDANTIC true)
+		add_subdirectory(fmt)
+		set(FMT_LIBRARIES fmt)
+#	else()
+#		message("Omitting subdir fmt")
+#	endif()
 
 #
 # Warnings
@@ -126,7 +137,8 @@
 #
 	add_compile_options(-Wall -Wextra -Wconversion)
 	add_compile_options(-Winline)
-	#add_compile_options(-Wno-unused-result) #switch off nodiscard warnings
+	#switch off nodiscard warnings
+	#add_compile_options(-Wno-unused-result)
 
 	if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
 
@@ -159,7 +171,7 @@
 								-Wno-exit-time-destructors
 								-Wno-global-constructors
 								-Wno-missing-prototypes
-								-Wno-unsafe-buffer-usage
+								#-Wno-unsafe-buffer-usage
 								-Wno-shadow-field
 								-Wno-float-equal
 								-Wno-cast-align
@@ -231,24 +243,16 @@
 #
 # Subdirs/submodules
 # ##################
-#
-#	if (${CMAKE_CXX_COMPILER_VERSION} STRLESS "13")
-		message("----------------")
-		message("-- FMT EXODUS --")
-		message("----------------")
-# See https://fmt.dev/latest/usage.html
-# How to build
-		set(BUILD_SHARED_LIBS true)
-		set(FMT_PEDANTIC true)
-		add_subdirectory(fmt)
-		set(FMT_LIBRARIES fmt)
-#	else()
-#		message("Omitting subdir fmt")
-#	endif()
 
 	add_subdirectory(exodus/libexodus/exodus)
+	#target_compile_options(exodus PUBLIC -Wall)
+
 	#add_subdirectory(exodus/libpgexodus/src)
 	add_subdirectory(exodus/pgexodus)
-	add_subdirectory(cli/src)
-	add_subdirectory(test/src)
+	#target_compile_options(pgexodus PUBLIC -Wall)
 
+	add_subdirectory(cli/src)
+	#target_compile_options(nlist PUBLIC "-O2")
+
+	add_subdirectory(test/src)
+	#target_compile_options(test_Regress PUBLIC "-O2")

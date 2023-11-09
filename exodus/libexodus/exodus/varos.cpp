@@ -719,7 +719,10 @@ bool var::osbwrite(CVR osfilevar, VARREF offset) const {
 static unsigned count_excess_UTF8_bytes(const std::string& str) {
 
 	// Scans backward from the end of string.
+#pragma GCC diagnostic push
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
 	const char* cptr = &str.back();
+#pragma GCC diagnostic pop
 	int num = 1;
 	int numBytesToTruncate = 0;
 

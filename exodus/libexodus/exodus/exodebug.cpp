@@ -22,10 +22,10 @@ THE SOFTWARE.
 
 #ifndef _MSC_VER
 #	define EXODUS_POSIX_SOURCE
-#	define EXODUS_POSIX_OSSLASH "/"
+#	define _OSSLASH "/"
 #endif
 
-// for debugging
+// For debugging
 //#define TRACING
 
 #ifdef EXODUS_POSIX_SOURCE
@@ -36,55 +36,57 @@ THE SOFTWARE.
 #	include <execinfo.h> // for backtrace
 #	include <unistd.h> // for getpid
 #	include <signal.h>
+#	include <memory> // for make_unique
 #endif
 
 #include <exodus/var.h>
 #include <exodus/exoimpl.h>
+#include <exodus/range.h>
 
 namespace exodus {
 
-static void addbacktraceline(CVR frameno, CVR sourcefilename, CVR lineno, VARREF returnlines) {
-
-	//#ifdef TRACING
-	//	sourcefilename.errputl("SOURCEFILENAME=");
-	//	lineno.errputl("LINENO=");
-	//#endif
-
-	if (not lineno || not lineno.isnum())
-		return;
-
-	var linetext = (frameno + 1) ^ ": " ^ sourcefilename.field2(EXODUS_POSIX_OSSLASH, -1) ^ ":" ^ lineno;
-
-	// get the source file text
-	var filetext;
-	if (filetext.osread(sourcefilename)) {
-	}
-
-	// change DOS/WIN and MAC line ends to lf only
-	filetext.replacer("\x0D\x0A", "\x0A").converter("\x0D", "\x0A");
-
-	// extract the source line
-	var line = filetext.field("\x0A", lineno).trimfirst(" \t");
-
-	// suppress confusing and unhelpful exodus macros
-	//if ((line.first(12) == "programexit(" || line.first(12) == "libraryexit(" || line.first(10) == "classexit(") or
-	//if (line.match("^(program|library|class)(init|exit)\\(") or
-	//	(line == "}" && sourcefilename.ends(".h")) or (line == ""))
-	//	return;
-	if (line.match("^(program|library|class)(init|exit)\\("))
-		return;
-
-#ifdef TRACING
-	line.errputl();
-#endif
-
-	// errputl(linetext);
-	linetext ^= ": " ^ line;
-
-	returnlines ^= FM ^ linetext;
-
-	return;
-}
+//static void addbacktraceline(CVR frameno, CVR sourcefilename, CVR lineno, VARREF returnlines) {
+//
+//	//#ifdef TRACING
+//	//	sourcefilename.errputl("SOURCEFILENAME=");
+//	//	lineno.errputl("LINENO=");
+//	//#endif
+//
+//	if (not lineno || not lineno.isnum())
+//		return;
+//
+//	var linetext = (frameno + 1) ^ ": " ^ sourcefilename.field2(_OSSLASH, -1) ^ ":" ^ lineno;
+//
+//	// get the source file text
+//	var filetext;
+//	if (filetext.osread(sourcefilename)) {
+//	}
+//
+//	// change DOS/WIN and MAC line ends to lf only
+//	filetext.replacer("\x0D\x0A", "\x0A").converter("\x0D", "\x0A");
+//
+//	// extract the source line
+//	var line = filetext.field("\x0A", lineno).trimfirst(" \t");
+//
+//	// suppress confusing and unhelpful exodus macros
+//	//if ((line.first(12) == "programexit(" || line.first(12) == "libraryexit(" || line.first(10) == "classexit(") or
+//	//if (line.match("^(program|library|class)(init|exit)\\(") or
+//	//	(line == "}" && sourcefilename.ends(".h")) or (line == ""))
+//	//	return;
+//	if (line.match("^(program|library|class)(init|exit)\\("))
+//		return;
+//
+//#ifdef TRACING
+//	line.errputl();
+//#endif
+//
+//	// errputl(linetext);
+//	linetext ^= ": " ^ line;
+//
+//	returnlines ^= linetext ^ FM;
+//
+//	return;
+//}
 
 ////////////////////////////////////////////////////////////////////
 //// Reserve space for snapshot of stack taken on every mv exception
@@ -97,7 +99,7 @@ static void addbacktraceline(CVR frameno, CVR sourcefilename, CVR lineno, VARREF
 //}
 
 // Capture the current stack addresses for later decoding
-void mv_savestack(void* stack_addresses[BACKTRACE_MAXADDRESSES], size_t* stack_size) {
+void exo_savestack(void* stack_addresses[BACKTRACE_MAXADDRESSES], size_t* stack_size) {
 	*stack_size = ::backtrace(stack_addresses, BACKTRACE_MAXADDRESSES);
 }
 
@@ -105,7 +107,7 @@ void mv_savestack(void* stack_addresses[BACKTRACE_MAXADDRESSES], size_t* stack_s
 // Convert the stack addresses to source file, line no and line text
 ////////////////////////////////////////////////////////////////////
 // http://www.delorie.com/gnu/docs/glibc/libc_665.html
-var mv_backtrace(void* stack_addresses[BACKTRACE_MAXADDRESSES], size_t stack_size, size_t limit) {
+var exo_backtrace(void* stack_addresses[BACKTRACE_MAXADDRESSES], size_t stack_size, size_t limit) {
 
 	var returnlines = "";
 	size_t nlines = 0;
@@ -114,8 +116,8 @@ var mv_backtrace(void* stack_addresses[BACKTRACE_MAXADDRESSES], size_t stack_siz
 
 	var internaladdresses = "";
 
-//    var exo_debug;
-//    exo_debug.osgetenv("EXO_DEBUG");
+//	var exo_debug;
+//	exo_debug.osgetenv("EXO_DEBUG");
 
 	/* example of TRACE from osx 64
 	Stack frames: 8
@@ -139,12 +141,13 @@ var mv_backtrace(void* stack_addresses[BACKTRACE_MAXADDRESSES], size_t stack_siz
 	// TODO autodetect if addr2line or dwalfdump/dSYM is available
 
 	//warning: conversion from ‘size_t’ {aka ‘long unsigned int’} to ‘int’ may change value [-Wconversion]
-	char** strings = backtrace_symbols(stack_addresses, static_cast<int>(stack_size));
+	//char** strings = backtrace_symbols(stack_addresses, static_cast<int>(stack_size));
+	auto strings = std::unique_ptr<char*[], void(*)(void*)>{backtrace_symbols(stack_addresses, static_cast<int>(stack_size)), ::free};
 
 	for (size_t ii = 0; ii < stack_size; ii++) {
 
 #ifdef TRACING
-		fprintf(stderr, "Backtrace %d: %p \"%s\"\n", ii, stack_addresses[ii], strings[ii]);
+		fprintf(stderr, "Backtrace %d: %p \"%s\"\n", int(ii) + 1, stack_addresses[ii], strings[ii]);
 		// Backtrace 0: 0x7f9d247cf9fd
 		// "/usr/local/lib/libexodus.so.19.01(_ZN6exodus9backtraceEv+0x62) [0x7f9d247cf9fd]"
 		// Backtrace 5: 0x7f638280e3f6 "/root/lib/libl1.so(+0xa3f6) [0x7f638280e3f6]"
@@ -158,29 +161,31 @@ var mv_backtrace(void* stack_addresses[BACKTRACE_MAXADDRESSES], size_t stack_siz
 			objaddress = var(strings[ii]).field("(", 2).field(")", 1).field("+", 2);
 
 		// Skip libc
-		if (objfilename.contains("libc.so"))
+		if (objfilename.contains("libc.so")) {
 			continue;
+		}
 
 		// Skip libexodus source code
 		//if (not exo_debug and objfilename.contains("libexodus.so"))
 		//if (objfilename.contains("libexodus.so"))
 		//	continue;
 
-#ifdef TRACING
-		objfilename.errput("objfilename=");
-		objaddress.errputl(" objaddress=");
-#endif
+//#ifdef TRACING
+//		fprintf(stderr, " %s addr:%s\n", objfilename.c_str(), objaddress.c_str());
+////		objfilename.errput("objfilename=");
+////		objaddress.errputl(" objaddress=");
+//#endif
 
 		// if (objfilename == objfilename.convert("/\\:",""))
 		if (not objfilename.osfile()) {
 			// loadable program
-			var temp;
-			if (not temp.osshellread("which " ^ objfilename.field2(EXODUS_POSIX_OSSLASH, -1))) {
+			var which_out;
+			if (not which_out.osshellread("which " ^ objfilename.field2(_OSSLASH, -1))) {
 				//null
 			}
-			temp = temp.field("\n", 1).field("\r", 1);
-			if (temp)
-				objfilename = temp;
+			which_out = which_out.field("\n", 1).field("\r", 1);
+			if (which_out)
+				objfilename = which_out;
 			else
 				// things like what?
 				continue;
@@ -192,51 +197,73 @@ var mv_backtrace(void* stack_addresses[BACKTRACE_MAXADDRESSES], size_t stack_siz
 		var startaddress = objaddress.paste(-3, 3, "000");
 
 		////////////////////////
-		//temp = temp.osshellread();
-		var temp;
+		//objdump_out = objdump_out.osshellread();
+		var objdump_out;
 		var cmd = "objdump --start-address=" ^ startaddress ^ " --stop-address=" ^
-						 objaddress ^ " --disassemble -l " ^ objfilename;
-		//cmd.errputl();
-		if (not temp.osshellread(cmd))
+//						 objaddress ^ " --disassemble -l " ^ objfilename;
+						 objaddress ^ " --source --line-numbers " ^ objfilename;
+#ifdef TRACING
+		cmd.errputl();
+#endif
+		if (not objdump_out.osshellread(cmd))
 			continue;
 		////////////////////////
 
-		temp.converter("\r\n", _FM _FM);
+		objdump_out.converter("\r\n", _FM _FM);
 
 		// find the last line containing .cpp
 		/// root/exodus/exodus/libexodus/exodus/l1.cpp:7 (discriminator 3)
-		var nn2 = temp.fcount(FM);
+		const var nn2 = objdump_out.fcount(FM);
 		var line = "";
 		var linesource = "";
-		for (var ii2 = 1; ii2 < nn2; ++ii2) {
-			if (temp.f(ii2).contains(".cpp")) {
-				line = temp.f(ii2);
-				linesource = temp.f(ii2 + 1);
+		//for (var ii2 = 1; ii2 < nn2; ++ii2) {
+		for (var ii2 : reverse_range(1, nn2)) {
+			if (objdump_out.f(ii2).contains(".cpp:")) {
+				var nextline = objdump_out.f(ii2 + 1);
+				// Skip disassembly lines
+				if (not nextline.match("    [0-9a-f]: ")) {
+					// Skip lines like "return 1;" since they seem to be spurious
+					if (nextline.match("^\\s*return\\s*\\d+;"))
+						break;
+					line = objdump_out.f(ii2);
+					linesource = nextline;
+#ifdef TRACING
+					TRACE(line)
+					TRACE(linesource)
+#endif
+					break;
+				}
 			}
 		}
 
-#ifdef TRACING
-		if (line)
-			line.errputl("line=");
-#endif
+//#ifdef TRACING
+//		if (line)
+//			line.errputl("line=");
+//#endif
 
 		// append the source line text and number to the output
 		if (line) {
 			var sourcefilename = line.field(":", 1);
 			var lineno = line.field(":", 2).field(" ", 1);
-			addbacktraceline(ii, sourcefilename, lineno, returnlines);
-			// returnlines^=FM^sourcefilename.field2(OSSLASH,-1) ^ ":" ^ lineno ^ " " ^
-			// linesource;
+			//addbacktraceline(ii, sourcefilename, lineno, returnlines);
+			//7: p1.cpp:13: return 1;
+			//returnlines ^= var(ii + 1) ^ ": " ^ sourcefilename ^ ":" ^ lineno ^ ": " ^ linesource ^ FM;
+			returnlines ^= var(ii + 1) ^ ": " ^ line.field2(_OSSLASH, -1) ^ " " ^ linesource ^ FM;
 		}
 
+#ifdef TRACING
+		var("").errputl();
+#endif
 		// Quit if reached limit of desired backtrace
 		if (limit && nlines++ >= limit)
 			break;
 
 	}
 
-	free(strings);
-	return returnlines.cut(1);
+	// Handled automatically by unique_ptr
+	//::free(strings);
+
+	return returnlines.popper();
 
 }
 

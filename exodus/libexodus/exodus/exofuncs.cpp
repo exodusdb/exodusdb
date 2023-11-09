@@ -473,7 +473,10 @@ ND PUBLIC bool deleteindex(CVR dbfilename_or_var, CVR fieldname) {
 	return dbfilename_or_var.deleteindex(fieldname);
 }
 
+#pragma GCC diagnostic push
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
 PUBLIC int exodus_main(int exodus_argc, const char* exodus_argv[], ExoEnv& mv, int threadno) {
+#pragma GCC diagnostic pop
 
 	// signal/interrupt handlers
 	// install_signals();

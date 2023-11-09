@@ -7,6 +7,8 @@
 #define SM_ '\x1C'
 #endif
 
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
+
 void extract_v3(char * instring, int inlength, int fn, int vn, int sn, int* outstart, int* outlength) noexcept {
 
 //	printl("---");

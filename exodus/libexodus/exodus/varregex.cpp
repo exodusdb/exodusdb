@@ -491,13 +491,18 @@ var var::iconv_MT() const {
 ///////////
 
 // regular expressions for ICONV_MC
-VARREF var::oconv_MR(const char* conversionchar) {
+VARREF var::oconv_MR(const char* conversion) {
 	//THISIS("VARREF var::oconv_MR(const char* conversionchar)")
 	//assertString(function_sig);
 	// conversionchar arrives pointing to 3rd character (eg A in MCA)
 
-	// Skip over the MR bit
-	conversionchar += 2;
+#pragma GCC diagnostic push
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
+    const char* conversionchar = conversion;
+#pragma GCC diagnostic pop
+
+    // Skip over leading "MR"
+    conversionchar += 2;
 
 	// abort if no 3rd char
 	if (*conversionchar == '\0')

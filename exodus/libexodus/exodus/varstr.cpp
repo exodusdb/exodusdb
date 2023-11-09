@@ -1492,12 +1492,16 @@ var var::last(const size_t  length) const& {
 	// min of 2, 3 -> 2 for copylen
 	// copy start = data() +3 -2 = data+1, copylen 2
 
-	size_t copylen = std::min(length, this->var_str.size());
-
-	// Construct a new var with the required number of chars from this
-	var nrvo(this->var_str.data() + this->var_str.size() - copylen, copylen);
-
-	return nrvo;
+//	size_t copylen = std::min(length, this->var_str.size());
+//
+//	// Construct a new var with the required number of chars from this
+//	var nrvo(this->var_str.data() + this->var_str.size() - copylen, copylen);
+//
+//	return nrvo;
+	if (length >= var_str.size())
+		return var_str;
+	else
+		return var_str.substr(var_str.size() - length);
 }
 //__cpp_lib_string_contains
 
