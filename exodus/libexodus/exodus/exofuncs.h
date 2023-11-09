@@ -765,7 +765,11 @@ struct fmt::formatter<exodus::var> {
 		//c2 = *ctx.begin();
 		//c3 = *(ctx.end() - 1);
 		//c4 = *ctx.end();
+
+#pragma GCC diagnostic push
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
 		auto it = ctx.begin();
+#pragma GCC diagnostic pop
 //		if (*it == '}') {
 //			fmt_str = "{0:s}";
 //			formatcode = ' ';

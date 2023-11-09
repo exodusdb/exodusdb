@@ -7,6 +7,8 @@
 #define SM_ '\x1C'
 #endif
 
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
+
 /*
 TODO algorithm could be improved for value and subvalue extraction
 by not searching for the end of the field before starting to look for the multivalue

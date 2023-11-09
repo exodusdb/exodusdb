@@ -535,7 +535,7 @@ programinit()
 	ossetenv("XYZ", "abc");
 	assert(osgetenv("XYZ") eq "abc");
 
-	assert(oconv(1234, "MD20P") eq "1234.00");
+	assert(oconv(1234, "MD20P").outputl() eq "1234.00");
 
 	assert(var("a") lt var("B"));
 
@@ -550,7 +550,8 @@ programinit()
 			d2 = d3;
 		union {
 			double d1;
-			char   chars[8];
+			// char   chars[sizeof d1];
+			std::array<char, sizeof d1> chars;
 		};
 		for (d1 = -5; d1 le 5; ++d1) {
 			printx("Decimal ", d1, "= ");
@@ -735,7 +736,7 @@ programinit()
 	{
 		// Test insertion of commas
 		assert(var(1000).oconv("MD20P,") eq "1,000.00");
-		assert(var(1000).oconv("MC20P,") eq "1.000,00");
+		assert(var(1000).oconv("MC20P,").outputl() eq "1.000,00");
 		assert(var(1).oconv("MD20P,") eq "1.00");
 		assert(var(12).oconv("MD20P,") eq "12.00");
 		assert(var(123).oconv("MD20P,") eq "123.00");

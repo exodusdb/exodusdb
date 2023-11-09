@@ -158,6 +158,7 @@ Within transactions, lock requests for locks that have already been obtained alw
 
 #include <string>
 #include <string_view>
+#include <array>
 
 // Using map for caches instead of unordered_map since it is faster
 // up to about 400 elements according to https://youtu.be/M2fKMP47slQ?t=258
@@ -334,21 +335,28 @@ static uint64_t mvdbpostgres_hash_stdstr(std::string str1) {
 
 #if defined(USE_WYHASH)
 	return wyhash(str1.data(), str1.size(), 0, _wyp);
+
 #elif defined(USE_MURMURHASH3)
 
-	uint64_t u128[2];
-	MurmurHash3_x64_128(str1.data(), static_cast<int>(str1.size()), murmurhash_seed, u128);
+//	uint64_t u128[2];
+//	MurmurHash3_x64_128(str1.data(), static_cast<int>(str1.size()), murmurhash_seed, u128);
+//
+//	static_cast<uint64_t*>(u128)[0] ^= static_cast<uint64_t*>(u128)[1];
+//	return static_cast<uint64_t*>(u128)[0];
 
-	// From above function's finalizer.
-	//	((uint64_t*)out)[0] = h1;
-	//	((uint64_t*)out)[1] = h2;
+	// Pass two uint64_t to MurmurHash3
+	std::array<uint64_t, 2> u128;
 
-	// xor bottom 64 bits with top 64 bits in attempt not to completely throw away the top half commpletely.
-	//((uint64_t*)u128)[0] ^= ((uint64_t*)u128)[1];
-	static_cast<uint64_t*>(u128)[0] ^= static_cast<uint64_t*>(u128)[1];
-	// Return only 64 bits of u128;
-	//return ((uint64_t*)u128)[0];
-	return static_cast<uint64_t*>(u128)[0];
+	// MurmurHash3
+	MurmurHash3_x64_128(str1.data(), static_cast<int>(str1.size()), murmurhash_seed, &u128[0]);
+
+	// From the MurmurHash3 function's finalizer.
+	//
+	//  ((uint64_t*)out)[0] = h1;
+	//  ((uint64_t*)out)[1] = h2;
+
+	// Return a mix of first 64 bits with last 64 bits using xor because we can only return 64 bits
+	return u128[0] ^ u128[1];
 
 #elif defined(USE_MURMURHASH2)
 	return MurmurHash64(str1.data(), static_cast<int>(str1.size()), 0);

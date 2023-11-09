@@ -3,8 +3,8 @@
 #include <boost/range/irange.hpp>
 #include <cassert>
 
-void extract(char * instring, int inlength, int fieldno, int valueno, int subvalueno, int* outstart, int* outlength);
-void extract2(char * instring, int inlength, int fieldno, int valueno, int subvalueno, int* outstart, int* outlength);
+//void extract(char * instring, int inlength, int fieldno, int valueno, int subvalueno, int* outstart, int* outlength);
+//void extract2(char * instring, int inlength, int fieldno, int valueno, int subvalueno, int* outstart, int* outlength);
 
 #include <exodus/program.h>
 
@@ -69,7 +69,8 @@ programinit()
 		var started = ostime();
 		var v1 = str("1" _FM, 9) ^ str("2" _VM, 9) ^ str("3" _SM, 9) ^ "Q";
 		auto s1 = v1.toString();
-		char* start = s1.data();
+		//char* start = s1.data();
+		auto start = s1.data();
 		int len = int(s1.size());
 		int outstart = 0;
 		int outlen = 0;
@@ -86,7 +87,8 @@ programinit()
 			extract2(start, len, 10, 10, 10, &outstart, &outlen);
 			//result = v1.f(10,10,10);
 		}
-		printl(std::string(start+outstart, static_cast<size_t>(outlen)));
+		//printl(std::string(start+outstart, static_cast<size_t>(outlen)));
+		printl(s1.substr(size_t(outstart), size_t(outlen)));
 		setup_time = ostime() - started;
 		printl("Act:", round((setup_time) / nn * 1E9), "ns");
 	}
@@ -181,7 +183,6 @@ programinit()
 
 				switch (casen) {
 
-					break;
 					case 0:
 						if (repeatn eq 0)
 							printl("Exp: 35     ns - old var method - for (var;;)");
@@ -394,6 +395,8 @@ programinit()
 #include <stdio.h>
 #include <string.h>
 
+#pragma GCC diagnostic push
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
 /*
 TODO algorithm could be improved for value and subvalue extraction
 by not searching for the end of the field before starting to look for the multivalue
@@ -762,5 +765,6 @@ void extract(char * instring, int inlength, int fieldno, int valueno, int subval
 	return;
 
 }
+#pragma GCC diagnostic pop
 
 programexit()
