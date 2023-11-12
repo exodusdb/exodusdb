@@ -5,7 +5,8 @@
 #include <boost/asio/post.hpp>
 // Create a threadpool of suitable size to handle
 // ncpus/threads obtained from std::thread::hardware_concurrency()
-static boost::asio::thread_pool threadpool1(std::thread::hardware_concurrency());
+static boost::asio::thread_pool threadpool1(std::thread::hardware_concurrency() + 1);
+//static boost::asio::thread_pool threadpool1(1);
 
 // Use an atomic to allow threads to increment global failure count
 #include <atomic>
@@ -94,8 +95,8 @@ function main() {
 			"	compile FILENAME|DIRNAME ... [{OPTION...}]\n"
 			"OPTIONS\n"
 			"	R = Release (No symbols)\n"
-			"	O/OO/OOO = Optimisation levels (Poorer debugging/backtrace)\n"
-			"	o/oo/ooo = Unoptimise (cancels 'O's)\n"
+			"	O/OO/OOO = Optimisation levels (Default 'O') (Poorer debugging/backtrace)\n"
+			"	o/oo/ooo = Deoptimise (cancels 'O's)\n"
 			"	W/WW/WWW = Increase warnings\n"
 			"	w/ww/www = Reduce warnings\n"
 			"	E = Warnings are errors\n"
@@ -901,9 +902,9 @@ function main() {
 				return;
 			}
 
-			// Try reading the source text is various locales
+			// Try reading the source text is various locales starting with "" no/default locale
 			var text;
-			let alllocales = "utf8" _FM "en_US.iso88591" _FM "en_GB.iso88591";
+			let alllocales = _FM "utf8" _FM "en_US.iso88591" _FM "en_GB.iso88591";
 			var locales = "";
 			//var nlocales = fcount(alllocales, " ");
 			var locale;
@@ -915,7 +916,7 @@ function main() {
 				//check all but utf8 and skip those not existing
 				//use dpkg-reconfigure locales to get more
 				//locale = alllocales.field(" ", localen);
-				if (locale2 ne "utf8") {
+				if (locale2 && locale2 ne "utf8") {
 					if (not setxlocale(locale2)) {
 						continue;
 					}
@@ -974,7 +975,7 @@ function main() {
 ///////////
 			//and, for subroutines and functions, create header file (even if compilation not successful)
 			let eol = EOL;
-			var headertext = "";
+			var newheadertext = "";
 			converter(text, "\r\n", _FM _FM);
 			dim text2 = split(text);
 			let nlines = text2.rows();
@@ -1017,7 +1018,7 @@ function main() {
 //					deftext ^= eol ^ " " ^ funcname ^ " @" ^ defordinal;
 //#endif
 					if (loadtimelinking) {
-						headertext ^= eol ^ funcdecl ^ ";";
+						newheadertext ^= eol ^ funcdecl ^ ";";
 					} else {
 						let libname = filepath_without_ext;
 						var returntype = word1 eq "subroutine" ? "void" : "var";
@@ -1270,7 +1271,7 @@ function main() {
 						if (useclassmemberfunctions) {
 							if (funcname eq "main") {
 								// Functions return var and subroutines return void
-								headertext ^= inclusion;
+								newheadertext ^= inclusion;
 							}
 						}
 
@@ -1288,28 +1289,28 @@ function main() {
 
 							//dont include more than once in the header file
 							//function might appear more than once if declared and defined separately
-							if (not headertext.contains(funcdecl)) {
-								headertext ^= eol;
-								headertext ^= eol;
+							if (not newheadertext.contains(funcdecl)) {
+								newheadertext ^= eol;
+								newheadertext ^= eol;
 								let includecallable = "#include <exodus/xcallable" ^ functype ^ nargs ^ ".h>" ^ eol;
-								if (not headertext.contains(includecallable))
-									headertext ^= includecallable;
-								headertext ^= funcdecl;
+								if (not newheadertext.contains(includecallable))
+									newheadertext ^= includecallable;
+								newheadertext ^= funcdecl;
 							}
 
 						} else {
-							headertext ^= eol;
-							headertext ^= "#define EXODUSLIBNAME " ^ libname.quote() ^ eol;
-							headertext ^= "#define EXODUSFUNCNAME " ^ funcname.quote() ^ eol;
-							headertext ^= "#define EXODUSFUNCNAME0 " ^ funcname ^ eol;
-							headertext ^= "#define EXODUSFUNCRETURN " ^ returntype ^ eol;
-							headertext ^= "#define EXODUSFUNCRETURNVOID " ^ funcreturnvoid ^ eol;
-							headertext ^= "#define EXODUSfuncargsdecl " ^ funcargsdecl ^ eol;
-							headertext ^= "#define EXODUSfuncargs " ^ funcargs ^ eol;
-							headertext ^= "#define EXODUSCALLABLECLASSNAME ExodusCallable_" ^ funcname ^ eol;
-							headertext ^= "#define EXODUSFUNCTYPE ExodusDynamic_" ^ funcname ^ eol;
-							//headertext^="#define EXODUSCLASSNAME Exodus_Callable_Class_"^funcname^eol;
-							headertext ^= "#include <exodus/mvlink.h>" ^ eol;
+							newheadertext ^= eol;
+							newheadertext ^= "#define EXODUSLIBNAME " ^ libname.quote() ^ eol;
+							newheadertext ^= "#define EXODUSFUNCNAME " ^ funcname.quote() ^ eol;
+							newheadertext ^= "#define EXODUSFUNCNAME0 " ^ funcname ^ eol;
+							newheadertext ^= "#define EXODUSFUNCRETURN " ^ returntype ^ eol;
+							newheadertext ^= "#define EXODUSFUNCRETURNVOID " ^ funcreturnvoid ^ eol;
+							newheadertext ^= "#define EXODUSfuncargsdecl " ^ funcargsdecl ^ eol;
+							newheadertext ^= "#define EXODUSfuncargs " ^ funcargs ^ eol;
+							newheadertext ^= "#define EXODUSCALLABLECLASSNAME ExodusCallable_" ^ funcname ^ eol;
+							newheadertext ^= "#define EXODUSFUNCTYPE ExodusDynamic_" ^ funcname ^ eol;
+							//newheadertext^="#define EXODUSCLASSNAME Exodus_Callable_Class_"^funcname^eol;
+							newheadertext ^= "#include <exodus/mvlink.h>" ^ eol;
 							//undefs are automatic at the end of mvlink.h to allow multiple inclusion
 						}
 					}
@@ -1345,16 +1346,16 @@ function main() {
 			// so that we can edic and compile by simple file name without paths
 			// Fake header files for executables end in .H instead of .h
 			// This allows libraries and programs to have the same base name
-			//if (headertext) {
+			//if (newheadertext) {
 			{
 				var abs_srcfilename = srcfilename;
 				if (abs_srcfilename[1] != OSSLASH)
 					abs_srcfilename.prefixer(oscwd() ^ OSSLASH);
 				let EXODUS_CALLABLE_XXXXX_H = "EXODUS_CALLABLE_" ^ ucase(filename_without_ext) ^ "_H";
-				headertext.prefixer("#define " ^ EXODUS_CALLABLE_XXXXX_H);
-				headertext.prefixer("/" "/#ifndef" ^ EXODUS_CALLABLE_XXXXX_H ^ eol);
-				headertext.prefixer("/" "/generated by exodus \"compile " ^ abs_srcfilename ^ DQ ^ eol);
-				headertext ^= eol ^ "/" "/#endif" ^ eol;
+				newheadertext.prefixer("#define " ^ EXODUS_CALLABLE_XXXXX_H);
+				newheadertext.prefixer("/" "/#ifndef " ^ EXODUS_CALLABLE_XXXXX_H ^ eol);
+				newheadertext.prefixer("/" "/Generated by exodus \"compile " ^ abs_srcfilename ^ DQ ^ eol);
+				newheadertext ^= eol ^ "/" "/#endif" ^ eol;
 				//var headerfilename=filepath_without_ext^".h";
 				let headerfilename = incdir ^ OSSLASH ^ filename_without_ext ^ (isprogram ? ".H" : ".h");
 
@@ -1365,38 +1366,41 @@ function main() {
 					printx("header file " ^ headerfilename ^ " ");
 
 				//check if changed
-				//var headertext2 = osread(headertext2, headerfilename, locale);
-				var headertext2;
-				if (not osread(headertext2, headerfilename, locale)) {
+				//var oldheadertext = osread(oldheadertext, headerfilename, locale);
+				var oldheadertext;
+				osflush();
+				if (not osread(oldheadertext, headerfilename, locale)) {
 				}
-				if (headertext2 ne headertext) {
+				if (oldheadertext ne newheadertext) {
 
 //					TRACE(headerfilename)
-//					TRACE(headertext)
-//					TRACE(headertext2)
+//					TRACE(newheadertext)
+//					TRACE(oldheadertext)
 
 					//over/write if changed
-					if (not oswrite(headertext, headerfilename, locale))
+					if (not oswrite(newheadertext, headerfilename, locale))
 						loglasterror();
 
 					//verify written ok
-					//var headertext3 = osread(headertext3, headerfilename, locale);
-					var headertext3;
-					if (not osread(headertext3, headerfilename, locale))
+					//var chkheadertext = osread(chkheadertext, headerfilename, locale);
+					var chkheadertext;
+					if (not osread(chkheadertext, headerfilename, locale))
 						loglasterror();
 
-//					TRACE(headertext3)
-//					oswrite(headertext, "1");
-//					oswrite(headertext2, "2");
-//					oswrite(headertext3, "3");
+//					TRACE(chkheadertext)
+//					oswrite(newheadertext, "1");
+//					oswrite(oldheadertext, "2");
+//					oswrite(chkheadertext, "3");
 
-					if (headertext3 ne headertext) {
+					if (chkheadertext ne newheadertext) {
 						atomic_ncompilation_failures++;
+
 						errputl("Error: compile could not accurately update " ^ headerfilename ^ " locale: " ^ locale
-							^ ". Perhaps multiple files with the same name.\n"
-							^ " 1: " ^ headertext.f(1).quote() ^ "\n"
-							^ " 2: " ^ headertext2.f(1).quote() ^ "\n"
-							^ " 3: " ^ headertext3.f(1).quote());
+							^ ". Perhaps multiple files in different dirs with the same name compiling at the same same.\n"
+							^ " 1: " ^ newheadertext.f(1).quote() ^ "\n"
+							^ " 2: " ^ oldheadertext.f(1).quote() ^ "\n"
+							^ " 3: " ^ chkheadertext.f(1).quote()
+						);
 					}
 					else if (verbose)
 						printl("generated or updated.");

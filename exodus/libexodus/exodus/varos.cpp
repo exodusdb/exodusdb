@@ -521,14 +521,16 @@ bool var::osread(const char* osfilename, const char* codepage) {
 	//	#pragma warning( disable: 4244 )
 	// warning C4244: '=' : conversion from 'std::streamoff' to 'unsigned int', possible loss of
 	// data
+	//myfile.seekg(0, std::ios::end);
 	bytesize = static_cast<unsigned int>(myfile.tellg());
 
 	// if empty file then done ok
 	if (bytesize == 0) {
+//TRACE(var(osfilename) ^ " bytesize:" ^ var(bytesize) ^ " dir:" ^ var(osfilename).osfile())
+//TRACE(var("ls -l " ^ var(osfilename)).osshell())
 		myfile.close();
 		return true;
 	}
-
 	// reserve memory - now reading directly into var_str
 	// get file size * wchar memory to load the file or fail
 	try {

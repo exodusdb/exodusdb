@@ -398,8 +398,10 @@ function main() {
 
 	} // next dat dir
 
+	// Compile, or just generate headers.
 	if (dict_cpp_filenames) {
-		let cmd = "compile " ^ dict_cpp_filenames ^ "{S}";
+		let options = "S" ^ generate ? "h" : "";
+		let cmd = "compile " ^ dict_cpp_filenames ^ "{" ^ options ^ "}";
 		printl(cmd);
 		if (not osshell(cmd))
 			abort("syncdat could not compile one or more dict_xxxx.cpp files");

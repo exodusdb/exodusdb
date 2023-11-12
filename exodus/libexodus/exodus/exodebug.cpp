@@ -45,48 +45,50 @@ THE SOFTWARE.
 
 namespace exodus {
 
-//static void addbacktraceline(CVR frameno, CVR sourcefilename, CVR lineno, VARREF returnlines) {
-//
-//	//#ifdef TRACING
-//	//	sourcefilename.errputl("SOURCEFILENAME=");
-//	//	lineno.errputl("LINENO=");
-//	//#endif
-//
-//	if (not lineno || not lineno.isnum())
-//		return;
-//
-//	var linetext = (frameno + 1) ^ ": " ^ sourcefilename.field2(_OSSLASH, -1) ^ ":" ^ lineno;
-//
-//	// get the source file text
-//	var filetext;
-//	if (filetext.osread(sourcefilename)) {
-//	}
-//
-//	// change DOS/WIN and MAC line ends to lf only
-//	filetext.replacer("\x0D\x0A", "\x0A").converter("\x0D", "\x0A");
-//
-//	// extract the source line
-//	var line = filetext.field("\x0A", lineno).trimfirst(" \t");
-//
-//	// suppress confusing and unhelpful exodus macros
-//	//if ((line.first(12) == "programexit(" || line.first(12) == "libraryexit(" || line.first(10) == "classexit(") or
-//	//if (line.match("^(program|library|class)(init|exit)\\(") or
-//	//	(line == "}" && sourcefilename.ends(".h")) or (line == ""))
-//	//	return;
-//	if (line.match("^(program|library|class)(init|exit)\\("))
-//		return;
-//
-//#ifdef TRACING
-//	line.errputl();
-//#endif
-//
-//	// errputl(linetext);
-//	linetext ^= ": " ^ line;
-//
-//	returnlines ^= linetext ^ FM;
-//
-//	return;
-//}
+static void addbacktraceline(CVR frameno, CVR sourcefilename, CVR lineno, VARREF returnlines) {
+
+	//#ifdef TRACING
+	//	sourcefilename.errputl("SOURCEFILENAME=");
+	//	lineno.errputl("LINENO=");
+	//#endif
+
+	if (not lineno || not lineno.isnum())
+		return;
+
+	// Get the source file text
+	var filetext;
+	if (not filetext.osread(sourcefilename))
+		return;
+
+	// Change DOS/WIN and MAC line ends to lf only
+	filetext.replacer("\x0D\x0A", "\x0A").converter("\x0D", "\x0A");
+
+	// Extract the source line
+	var line = filetext.field("\x0A", lineno).trimfirst(" \t");
+	if (not line or line.match("^\\s*}"))
+		return;
+
+	// Suppress confusing and unhelpful exodus macros like programinit/exit, libraryinit/exit, classinit/exit
+	if (line.match("^(program|library|class)(init|exit)\\("))
+		return;
+
+	// Skip "return nn"
+	if (line.match("^\\s*return\\s*\\d*"))
+		return;
+
+#ifdef TRACING
+	line.errputl();
+#endif
+
+	// Example output line:
+	// "8: p2.cpp:15: printl(v2);"
+	var linetext = (frameno + 1) ^ ": " ^ sourcefilename.field2(_OSSLASH, -1) ^ ":" ^ lineno ^ ": " ^ line;
+	//var linetext = std::format("{:0}: {:1}:{:2}: {:3}" , frameno + 1, sourcefilename.field2(_OSSLASH, -1), lineno, line);
+
+	returnlines ^= linetext ^ FM;
+
+	return;
+}
 
 ////////////////////////////////////////////////////////////////////
 //// Reserve space for snapshot of stack taken on every mv exception
@@ -219,20 +221,20 @@ var exo_backtrace(void* stack_addresses[BACKTRACE_MAXADDRESSES], size_t stack_si
 		//for (var ii2 = 1; ii2 < nn2; ++ii2) {
 		for (var ii2 : reverse_range(1, nn2)) {
 			if (objdump_out.f(ii2).contains(".cpp:")) {
-				var nextline = objdump_out.f(ii2 + 1);
-				// Skip disassembly lines
-				if (not nextline.match("    [0-9a-f]: ")) {
-					// Skip lines like "return 1;" since they seem to be spurious
-					if (nextline.match("^\\s*return\\s*\\d+;"))
-						break;
+//				var nextline = objdump_out.f(ii2 + 1);
+//				// Skip disassembly lines
+//				if (not nextline.match("    [0-9a-f]: ")) {
+//					// Skip lines like "return 1;" since they seem to be spurious
+//					if (nextline.match("^\\s*return\\s*\\d+;"))
+//						break;
 					line = objdump_out.f(ii2);
-					linesource = nextline;
-#ifdef TRACING
-					TRACE(line)
-					TRACE(linesource)
-#endif
+//					linesource = nextline;
+//#ifdef TRACING
+//					TRACE(line)
+//					TRACE(linesource)
+//#endif
 					break;
-				}
+//				}
 			}
 		}
 
@@ -245,10 +247,10 @@ var exo_backtrace(void* stack_addresses[BACKTRACE_MAXADDRESSES], size_t stack_si
 		if (line) {
 			var sourcefilename = line.field(":", 1);
 			var lineno = line.field(":", 2).field(" ", 1);
-			//addbacktraceline(ii, sourcefilename, lineno, returnlines);
+			addbacktraceline(ii, sourcefilename, lineno, returnlines);
 			//7: p1.cpp:13: return 1;
 			//returnlines ^= var(ii + 1) ^ ": " ^ sourcefilename ^ ":" ^ lineno ^ ": " ^ linesource ^ FM;
-			returnlines ^= var(ii + 1) ^ ": " ^ line.field2(_OSSLASH, -1) ^ " " ^ linesource ^ FM;
+			//returnlines ^= var(ii + 1) ^ ": " ^ line.field2(_OSSLASH, -1) ^ " " ^ linesource ^ FM;
 		}
 
 #ifdef TRACING
