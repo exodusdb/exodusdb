@@ -416,12 +416,23 @@ programinit()
 
 	{
 		var x = ".,1,.2.,";
+#define BOOST_TRIM
+#ifdef BOOST_TRIM
+		// take the first if multiple inner
+		assert(trim(x      , ".,").outputl() eq "1,2");
+
+		var x2 = ".,1,.2.,";trimmer(x2     , ".,").outputl(); assert(x2 eq "1,2");
+#else
+		// take the last if multiple inner
 		assert(trim(x      , ".,").outputl() eq "1.2");
+
+		var x2 = ".,1,.2.,";trimmer(x2     , ".,").outputl(); assert(x2 eq "1.2");
+
+#endif
 		assert(trimfirst(x , ".,").outputl() eq "1,.2.,");
 		assert(trimlast(x  , ".,").outputl() eq ".,1,.2");
 		assert(trimboth(x  , ".,").outputl() eq "1,.2");
 
-		x = ".,1,.2.,";trimmer(x     , ".,").outputl(); assert(x eq "1.2");
 		x = ".,1,.2.,";trimmerfirst(x, ".,").outputl(); assert(x eq "1,.2.,");
 		x = ".,1,.2.,";trimmerlast(x , ".,").outputl(); assert(x eq ".,1,.2");
 		x = ".,1,.2.,";trimmerboth(x , ".,").outputl(); assert(x eq "1,.2");

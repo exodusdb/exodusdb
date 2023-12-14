@@ -71,6 +71,7 @@ allowing it to interface correctly with UTF-8, UTF-16, and UTF-32 data:
 #include <iostream>
 #include <utility> //for replace
 #include <string>
+#include <boost/algorithm/string/replace.hpp>
 
 #define USE_BOOST
 #ifdef USE_BOOST
@@ -133,7 +134,7 @@ namespace exodus {
 
 #endif
 
-syntax_flags_typ get_regex_syntax_flags(SV options) {
+static syntax_flags_typ get_regex_syntax_flags(SV options) {
 	// determine options from string
 
 	// Default flavour is ECMAScript/Perl
@@ -340,10 +341,11 @@ var var::match(SV matchstr, SV options) const {
 // Simple non-regex case sensitive substr replacement
 /////////////////////////////////////////////////////
 
-// const
+// constant
 var var::replace(SV what, SV with) const& {
-	var nrvo = *this;
-	return nrvo.replacer(what, with);
+
+	//return this->clone().replacer(what, with);}
+	return boost::algorithm::replace_all_copy(var_str, what, with);
 }
 
 // mutator
@@ -356,26 +358,28 @@ VARREF var::replacer(SV what, SV with) {
 	if (what.empty())
 		return *this;
 
-	// Optimise for single character replacement
-	// No measurable speedup
-	//if (what.size() == 1 and with.size() == 1) {
-	//	std::replace(var_str.begin(), var_str.end(), what[0], with[0]);
-	//	return *this;
-	//}
+//	// Optimise for single character replacement
+//	// No measurable speedup
+//	//if (what.size() == 1 and with.size() == 1) {
+//	//	std::replace(var_str.begin(), var_str.end(), what[0], with[0]);
+//	//	return *this;
+//	//}
+//
+//	// find the starting position of the field or return
+//	std::string::size_type start_pos = 0;
+//	while (true) {
+//		start_pos = var_str.find(what, start_pos);
+//		// past of of string?
+//		if (start_pos == std::string::npos)
+//			return *this;
+//		var_str.replace(start_pos, what.size(), with);
+//		start_pos += with.size();
+//	}
 
-	// find the starting position of the field or return
-	std::string::size_type start_pos = 0;
-	while (true) {
-		start_pos = var_str.find(what, start_pos);
-		// past of of string?
-		if (start_pos == std::string::npos)
-			return *this;
-		var_str.replace(start_pos, what.size(), with);
-		start_pos += with.size();
-	}
+	boost::algorithm::replace_all(var_str, what, with);
 
-	//std::unreachable();
-	//return *this;
+	return *this;
+
 }
 
 // Regex based string replacement
@@ -385,17 +389,15 @@ VARREF var::replacer(SV what, SV with) {
 
 // option  f - first occurrence only
 
-// const
+// constant
 var var::regex_replace(SV regexstr, SV replacementstr, SV options) const& {
-	var nrvo = *this;
-	return nrvo.regex_replacer(regexstr, replacementstr, options);
+	return this->clone().regex_replacer(regexstr, replacementstr, options);
 }
 
 // mutator
 VARREF var::regex_replacer(SV regexstr, SV replacementstr, SV options) {
 
-	THISIS(
-		"VARREF var::regex_replacer(SV regexstr, SV replacementstr, SV options)")
+	THISIS("VARREF var::regex_replacer(SV regexstr, SV replacementstr, SV options)")
 	assertStringMutator(function_sig);
 	//ISSTRING(regexstr)
 	//ISSTRING(replacementstr)
@@ -429,6 +431,7 @@ VARREF var::regex_replacer(SV regexstr, SV replacementstr, SV options) {
 			var_str.begin(),
 			var_str.end(),
 			regex,
+			//replacementstr,
 			std::string(replacementstr),
 			//boost::match_default | boost::format_all
 			match_flags

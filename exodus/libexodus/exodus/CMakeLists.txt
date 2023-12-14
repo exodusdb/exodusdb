@@ -111,6 +111,8 @@
 		gettimeofday.cpp
 		varoshandle.cpp vardbconn.cpp
 		variter.cpp
+		varput.cpp
+		timebank.cpp
 		extract_v2.cpp # Duplicated in pgexodus as extract.c
 		extract_v3.cpp # Failed attempt at optimisation
 		extract_v4.cpp # Failed attempt at optimisation

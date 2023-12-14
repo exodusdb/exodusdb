@@ -39,6 +39,10 @@ THE SOFTWARE.
 #	include <memory> // for make_unique
 #endif
 
+#ifdef TRACING
+#	include <boost/stacktrace.hpp>
+#endif
+
 #include <exodus/var.h>
 #include <exodus/exoimpl.h>
 #include <exodus/range.h>
@@ -82,8 +86,8 @@ static void addbacktraceline(CVR frameno, CVR sourcefilename, CVR lineno, VARREF
 
 	// Example output line:
 	// "8: p2.cpp:15: printl(v2);"
-	var linetext = (frameno + 1) ^ ": " ^ sourcefilename.field2(_OSSLASH, -1) ^ ":" ^ lineno ^ ": " ^ line;
-	//var linetext = std::format("{:0}: {:1}:{:2}: {:3}" , frameno + 1, sourcefilename.field2(_OSSLASH, -1), lineno, line);
+	var linetext = (frameno) ^ ": " ^ sourcefilename.field2(_OSSLASH, -1) ^ ":" ^ lineno ^ ": " ^ line;
+	//var linetext = std::format("{:0}: {:1}:{:2}: {:3}" , frameno, sourcefilename.field2(_OSSLASH, -1), lineno, line);
 
 	returnlines ^= linetext ^ FM;
 
@@ -103,6 +107,9 @@ static void addbacktraceline(CVR frameno, CVR sourcefilename, CVR lineno, VARREF
 // Capture the current stack addresses for later decoding
 void exo_savestack(void* stack_addresses[BACKTRACE_MAXADDRESSES], size_t* stack_size) {
 	*stack_size = ::backtrace(stack_addresses, BACKTRACE_MAXADDRESSES);
+#ifdef TRACING
+	std::cout << boost::stacktrace::stacktrace();
+#endif
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -149,7 +156,7 @@ var exo_backtrace(void* stack_addresses[BACKTRACE_MAXADDRESSES], size_t stack_si
 	for (size_t ii = 0; ii < stack_size; ii++) {
 
 #ifdef TRACING
-		fprintf(stderr, "Backtrace %d: %p \"%s\"\n", int(ii) + 1, stack_addresses[ii], strings[ii]);
+		fprintf(stderr, "Backtrace %d: %p \"%s\"\n", int(ii), stack_addresses[ii], strings[ii]);
 		// Backtrace 0: 0x7f9d247cf9fd
 		// "/usr/local/lib/libexodus.so.19.01(_ZN6exodus9backtraceEv+0x62) [0x7f9d247cf9fd]"
 		// Backtrace 5: 0x7f638280e3f6 "/root/lib/libl1.so(+0xa3f6) [0x7f638280e3f6]"
@@ -221,7 +228,7 @@ var exo_backtrace(void* stack_addresses[BACKTRACE_MAXADDRESSES], size_t stack_si
 		//for (var ii2 = 1; ii2 < nn2; ++ii2) {
 		for (var ii2 : reverse_range(1, nn2)) {
 			if (objdump_out.f(ii2).contains(".cpp:")) {
-//				var nextline = objdump_out.f(ii2 + 1);
+//				var nextline = objdump_out.f(ii2);
 //				// Skip disassembly lines
 //				if (not nextline.match("    [0-9a-f]: ")) {
 //					// Skip lines like "return 1;" since they seem to be spurious

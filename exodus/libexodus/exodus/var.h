@@ -31,7 +31,9 @@ THE SOFTWARE.
 #include <iostream>
 #include <string>
 #include <string_view>
-//#include "timeaccount.h"
+#if EXODUS_TIMEBANK == 1
+#	include "timebank.h"
+#endif
 
 // http://stackoverflow.com/questions/538134/exporting-functions-from-a-dll-with-dllexport
 // Using dllimport and dllexport in C++ Classes
@@ -130,7 +132,11 @@ inline const char VISIBLE_ST_ = '~';
 #define DEFAULT_VM = VM_
 #define DEFAULT_NULL = nullptr
 
-#define THISIS(FUNC_DESC) [[maybe_unused]] static const char* function_sig = FUNC_DESC;
+#if EXODUS_TIMEBANK == 1
+#	define THISIS(FUNC_DESC) [[maybe_unused]] static const char* function_sig = FUNC_DESC;Timer thisistimer(get_timeacno(FUNC_DESC));
+#else
+#	define THISIS(FUNC_DESC) [[maybe_unused]] static const char* function_sig = FUNC_DESC;
+#endif
 
 #define ISDEFINED(VARNAME) (VARNAME).assertDefined(function_sig, #VARNAME);
 #define ISASSIGNED(VARNAME) (VARNAME).assertAssigned(function_sig, #VARNAME);
@@ -1620,9 +1626,9 @@ class PUBLIC var final {
 	CVR swap(CVR var2) const;//version that works on const vars
 	VARREF swap(VARREF var2);//version that works on non-const vars
 	var clone() const {
-		var clone;
-		clone.var_typ = var_typ;
-		clone.var_str = var_str;
+		var rvo;
+		rvo.var_typ = var_typ;
+		rvo.var_str = var_str;
 
 		// Avoid copying int and dbl in case cloning an unassigned var
 		// since default ctor var() = default and int/dbl are not initialised to zero.
@@ -1638,11 +1644,11 @@ class PUBLIC var final {
 		// Avoid triggering a compiler warning
 		// warning: ‘<anonymous>.exodus::var::var_dbl’ may be used uninitialized in this function [-Wmaybe-uninitialized]
 		if (var_typ) {
-			clone.var_int = var_int;
-			clone.var_dbl = var_dbl;
+			rvo.var_int = var_int;
+			rvo.var_dbl = var_dbl;
 		}
 
-		return clone;
+		return rvo;
 	}
 
 	ND var dump() const;
@@ -1747,10 +1753,10 @@ class PUBLIC var final {
 	ND var squote() const&;
 	ND var unquote() const&;
 
-	ND var trim(SV trimchars  DEFAULT_SPACE) const&; // byte trimchars
+	ND var trim(SV trimchars  DEFAULT_SPACE) const&;     // byte trimchars
 	ND var trimfirst(SV trimchars DEFAULT_SPACE) const&; // byte trimchars
-	ND var trimlast(SV trimchars DEFAULT_SPACE) const&; // byte trimchars
-	ND var trimboth(SV trimchars DEFAULT_SPACE) const&; // byte trimchars
+	ND var trimlast(SV trimchars DEFAULT_SPACE) const&;  // byte trimchars
+	ND var trimboth(SV trimchars DEFAULT_SPACE) const&;  // byte trimchars
 
 	ND var first(const size_t length) const&; // byte length
 	ND var last(const size_t length) const&;  // byte length
@@ -1762,15 +1768,15 @@ class PUBLIC var final {
 	ND var pop() const&;                      // byte removed
 
 	// var.fieldstore(separator,fieldno,nfields,replacement)
-	ND var fieldstore(SV separator, const int fieldno, const int nfields, CVR replacement) const& {return var(*this).fieldstorer(separator, fieldno, nfields, replacement);}
+	ND var fieldstore(SV separator, const int fieldno, const int nfields, CVR replacement) const&;
 
 	//ND var substr(const int pos1, const int length) const&; // byte pos1, length
-	ND var substr(const int startindex1, const int length) const& {return var(*this).substrer(startindex1, length);}
+	ND var substr(const int startindex1, const int length) const&;
 	//ND var substr(const int pos1) const&;                   // byte pos1
-	ND var substr(const int startindex1) const& {return var(*this).substrer(startindex1);}
+	ND var substr(const int startindex1) const&;
 
-	ND var b(const int pos1, const int length) const& {return substr(pos1, length);} // byte pos1, length
-	ND var b(const int pos1) const& {return substr(pos1);}  // byte pos1
+	ND var b(const int pos1, const int length) const&; // byte pos1, length
+	ND var b(const int pos1) const&; // byte pos1
 
 	ND var convert(SV fromchars, SV tochars) const&;        // byte fromchars, tochars
 	ND var textconvert(SV fromchars, SV tochars) const&;
@@ -1789,49 +1795,93 @@ class PUBLIC var final {
 
 	// utf8/byte as for accessors
 
-	ND VARREF ucase() && {return ucaser();}
-	ND VARREF lcase() && {return lcaser();}
-	ND VARREF tcase() && {return tcaser();}
-	ND VARREF fcase() && {return fcaser();}
-	ND VARREF normalize() && {return normalizer();}
-	ND VARREF invert() && {return inverter();}
+	ND VARREF ucase() &&;
+	ND VARREF lcase() &&;
+	ND VARREF tcase() &&;
+	ND VARREF fcase() &&;
+	ND VARREF normalize() &&;
+	ND VARREF invert() &&;
 
-	ND VARREF lower() && {return lowerer();}
-	ND VARREF raise() && {return raiser();}
-	ND VARREF crop() && {return cropper();}
+	ND VARREF lower() &&;
+	ND VARREF raise() &&;
+	ND VARREF crop() &&;
 
-	ND VARREF quote() && {return quoter();}
-	ND VARREF squote() && {return squoter();}
-	ND VARREF unquote() && {return unquoter();}
+	ND VARREF quote() &&;
+	ND VARREF squote() &&;
+	ND VARREF unquote() &&;
 
-	ND VARREF trim(SV trimchars DEFAULT_SPACE) && {return trimmer(trimchars);}
-	ND VARREF trimfirst(SV trimchars DEFAULT_SPACE) && {return trimmerfirst(trimchars);}
-	ND VARREF trimlast(SV trimchars DEFAULT_SPACE) && {return trimmerlast(trimchars);}
-	ND VARREF trimboth(SV trimchars DEFAULT_SPACE) && {return trimmerboth(trimchars);}
+	ND VARREF trim(SV trimchars DEFAULT_SPACE) &&;
+	ND VARREF trimfirst(SV trimchars DEFAULT_SPACE) &&;
+	ND VARREF trimlast(SV trimchars DEFAULT_SPACE) &&;
+	ND VARREF trimboth(SV trimchars DEFAULT_SPACE) &&;
 
-	ND VARREF first(const size_t length) && {return firster(length);}
-	ND VARREF last(const size_t length) && {return laster(length);}
-	ND VARREF cut(const int length) && {return cutter(length);}
-	ND VARREF paste(const int pos1, const int length, SV insertstr) && {return paster(pos1, length, insertstr);}
-	ND VARREF paste(const int pos1, SV insertstr) && {return paster(pos1, insertstr);}
-	ND VARREF prefix(SV insertstr) && {return prefixer(insertstr);}
-	//ND VARREF append(SV appendstr) && {return appender(appendstr);}
-	ND VARREF pop() && {return popper();}
+	ND VARREF first(const size_t length) &&;
+	ND VARREF last(const size_t length) &&;
+	ND VARREF cut(const int length) &&;
+	ND VARREF paste(const int pos1, const int length, SV insertstr) &&;
+	ND VARREF paste(const int pos1, SV insertstr) &&;
+	ND VARREF prefix(SV insertstr) &&;
+	//ND VARREF append(SV appendstr) &&;
+	ND VARREF pop() &&;
 
-	ND VARREF fieldstore(SV sepchar, const int fieldno, const int nfields, CVR replacement) && {return fieldstorer(sepchar, fieldno, nfields, replacement);}
-	ND VARREF substr(const int pos1, const int length) && {return substrer(pos1, length);}
-	ND VARREF substr(const int pos1) && {return substrer(pos1);}
+	ND VARREF fieldstore(SV sepchar, const int fieldno, const int nfields, CVR replacement) &&;
+	ND VARREF substr(const int pos1, const int length) &&;
+	ND VARREF substr(const int pos1) &&;
 
-	ND VARREF convert(SV fromchars, SV tochars) && {return converter(fromchars, tochars);}
-	ND VARREF textconvert(SV fromchars, SV tochars) && {return textconverter(fromchars, tochars);}
-	ND VARREF replace(SV fromstr, SV tostr) && {return replacer(fromstr, tostr);}
-	ND VARREF regex_replace(SV regex, SV replacement, SV options DEFAULT_EMPTY) && {return regex_replacer(regex, replacement, options);}
+	ND VARREF convert(SV fromchars, SV tochars) &&;
+	ND VARREF textconvert(SV fromchars, SV tochars) &&;
+	ND VARREF replace(SV fromstr, SV tostr) &&;
+	ND VARREF regex_replace(SV regex, SV replacement, SV options DEFAULT_EMPTY) &&;
 
-	ND VARREF unique() && {return uniquer();}
-	ND VARREF sort(SV sepchar = _FM) && {return sorter(sepchar);}
-	ND VARREF reverse(SV sepchar = _FM) && {return reverser(sepchar);}
-	ND VARREF shuffle(SV sepchar = _FM) && {return shuffler(sepchar);}
-    ND VARREF parse(char sepchar = ' ') && {return parser(sepchar);}
+	ND VARREF unique() &&;
+	ND VARREF sort(SV sepchar = _FM) &&;
+	ND VARREF reverse(SV sepchar = _FM) &&;
+	ND VARREF shuffle(SV sepchar = _FM) &&;
+    ND VARREF parse(char sepchar = ' ') &&;
+
+//	ND VARREF ucase() && {return ucaser();}
+//	ND VARREF lcase() && {return lcaser();}
+//	ND VARREF tcase() && {return tcaser();}
+//	ND VARREF fcase() && {return fcaser();}
+//	ND VARREF normalize() && {return normalizer();}
+//	ND VARREF invert() && {return inverter();}
+//
+//	ND VARREF lower() && {return lowerer();}
+//	ND VARREF raise() && {return raiser();}
+//	ND VARREF crop() && {return cropper();}
+//
+//	ND VARREF quote() && {return quoter();}
+//	ND VARREF squote() && {return squoter();}
+//	ND VARREF unquote() && {return unquoter();}
+//
+//	ND VARREF trim(SV trimchars DEFAULT_SPACE) && {return trimmer(trimchars);}
+//	ND VARREF trimfirst(SV trimchars DEFAULT_SPACE) && {return trimmerfirst(trimchars);}
+//	ND VARREF trimlast(SV trimchars DEFAULT_SPACE) && {return trimmerlast(trimchars);}
+//	ND VARREF trimboth(SV trimchars DEFAULT_SPACE) && {return trimmerboth(trimchars);}
+//
+//	ND VARREF first(const size_t length) && {return firster(length);}
+//	ND VARREF last(const size_t length) && {return laster(length);}
+//	ND VARREF cut(const int length) && {return cutter(length);}
+//	ND VARREF paste(const int pos1, const int length, SV insertstr) && {return paster(pos1, length, insertstr);}
+//	ND VARREF paste(const int pos1, SV insertstr) && {return paster(pos1, insertstr);}
+//	ND VARREF prefix(SV insertstr) && {return prefixer(insertstr);}
+//	//ND VARREF append(SV appendstr) && {return appender(appendstr);}
+//	ND VARREF pop() && {return popper();}
+//
+//	ND VARREF fieldstore(SV sepchar, const int fieldno, const int nfields, CVR replacement) && {return fieldstorer(sepchar, fieldno, nfields, replacement);}
+//	ND VARREF substr(const int pos1, const int length) && {return substrer(pos1, length);}
+//	ND VARREF substr(const int pos1) && {return substrer(pos1);}
+//
+//	ND VARREF convert(SV fromchars, SV tochars) && {return converter(fromchars, tochars);}
+//	ND VARREF textconvert(SV fromchars, SV tochars) && {return textconverter(fromchars, tochars);}
+//	ND VARREF replace(SV fromstr, SV tostr) && {return replacer(fromstr, tostr);}
+//	ND VARREF regex_replace(SV regex, SV replacement, SV options DEFAULT_EMPTY) && {return regex_replacer(regex, replacement, options);}
+//
+//	ND VARREF unique() && {return uniquer();}
+//	ND VARREF sort(SV sepchar = _FM) && {return sorter(sepchar);}
+//	ND VARREF reverse(SV sepchar = _FM) && {return reverser(sepchar);}
+//	ND VARREF shuffle(SV sepchar = _FM) && {return shuffler(sepchar);}
+//	ND VARREF parse(char sepchar = ' ') && {return parser(sepchar);}
 
 	// STRING MUTATORS
 	//////////////////

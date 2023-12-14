@@ -107,12 +107,15 @@ var var::field(SV separatorx, const int fieldnx, const int nfieldsx) const {
 //	return var(*this).fieldstorer(separator, fieldnx, nfieldsx, replacementx);
 //}
 
-// in-place
+// Constant
+ND var var::fieldstore(SV separator, const int fieldno, const int nfields, CVR replacement) const& {
+	return var(*this).fieldstorer(separator, fieldno, nfields, replacement);
+}
+
+// Mutator
 VARREF var::fieldstorer(SV separator, const int fieldnx, const int nfieldsx, CVR replacementx) {
 
-	THISIS(
-		"VARREF var::fieldstorer(SV separator0,const int fieldnx,const int nfieldsx, "
-		"CVR replacementx)")
+	THISIS("VARREF var::fieldstorer(SV separator0,const int fieldnx,const int nfieldsx, CVR replacementx)")
 	assertStringMutator(function_sig);
 
 	if (separator.empty())
@@ -224,9 +227,9 @@ static bool locateat(const std::string& var_str, const std::string& target, size
 	if (order) {
 		// THISIS(...)
 		// ISSTRING(usingchar)
-		//bool result = locateat(var_str, target, start_pos, end_pos, 0, usingchar, setting);
-		//if (result)
-		//	return result;
+		//bool nrvo = locateat(var_str, target, start_pos, end_pos, 0, usingchar, setting);
+		//if (nrvo)
+		//	return nrvo;
 		if (locateat(var_str, target, start_pos, end_pos, 0, usingchar, setting))
 			return true;
 	}
@@ -625,9 +628,7 @@ static bool locatex(const std::string& var_str, const std::string& target, const
 // default locate using VM
 bool var::locate(CVR target, VARREF setting) const {
 
-	THISIS(
-		"bool var::locate(CVR target, VARREF setting, const int fieldno/*=0*/,const "
-		"int valueno/*=0*/) const")
+	THISIS("bool var::locate(CVR target, VARREF setting, const int fieldno/*=0*/,const int valueno/*=0*/) const")
 	assertString(function_sig);
 	ISSTRING(target)
 	ISDEFINED(setting)
@@ -637,9 +638,7 @@ bool var::locate(CVR target, VARREF setting) const {
 
 bool var::locate(CVR target, VARREF setting, const int fieldno, const int valueno /*=0*/) const {
 
-	THISIS(
-		"bool var::locate(CVR target, VARREF setting, const int fieldno/*=0*/,const "
-		"int valueno/*=0*/) const")
+	THISIS("bool var::locate(CVR target, VARREF setting, const int fieldno/*=0*/,const int valueno/*=0*/) const")
 	assertString(function_sig);
 	ISSTRING(target)
 	ISDEFINED(setting)
@@ -710,9 +709,7 @@ bool var::locateby(const char* ordercode, CVR target, VARREF setting) const {
 // string it avoids the conversion from string to var and back again
 bool var::locateby(const char* ordercode, CVR target, VARREF setting, const int fieldno, const int valueno /*=0*/) const {
 
-	THISIS(
-		"bool var::locateby(const char* ordercode, CVR target, VARREF setting, const "
-		"int fieldno, const int valueno/*=0*/) const")
+	THISIS("bool var::locateby(const char* ordercode, CVR target, VARREF setting, const int fieldno, const int valueno/*=0*/) const")
 	assertString(function_sig);
 	ISSTRING(target)
 	ISDEFINED(setting)
@@ -745,9 +742,7 @@ bool var::locateby(const char* ordercode, CVR target, VARREF setting, const int 
 
 bool var::locatebyusing(const char* ordercode, const char* usingchar, CVR target, VARREF setting, const int fieldno /*=0*/, const int valueno /*=0*/, const int subvalueno /*=0*/) const {
 
-	THISIS(
-		"bool var::locatebyusing(const char* ordercode, const char* usingchar, CVR "
-		"target, VARREF setting, const int fieldno=0, const int valueno=0, const int valueno=0) const")
+	THISIS("bool var::locatebyusing(const char* ordercode, const char* usingchar, CVR target, VARREF setting, const int fieldno=0, const int valueno=0, const int valueno=0) const")
 	assertString(function_sig);
 	ISSTRING(target)
 	ISDEFINED(setting)
@@ -782,9 +777,7 @@ bool var::locateusing(const char* usingchar, CVR target) const {
 // 2. specify field/value/subvalue and return position
 bool var::locateusing(const char* usingchar, CVR target, VARREF setting, const int fieldno /*=0*/, const int valueno /*=0*/, const int subvalueno /*=0*/) const {
 
-	THISIS(
-		"bool var::locateusing(const char* usingchar, CVR target, VARREF setting, const "
-		"int fieldno/*=0*/, const int valueno/*=0*/, const int subvalueno/*=0*/) const")
+	THISIS("bool var::locateusing(const char* usingchar, CVR target, VARREF setting, const int fieldno/*=0*/, const int valueno/*=0*/, const int subvalueno/*=0*/) const")
 	assertString(function_sig);
 	ISSTRING(target)
 	ISDEFINED(setting)
@@ -810,9 +803,7 @@ bool var::locateusing(const char* usingchar, CVR target, VARREF setting, const i
 //
 var var::f(const int argfieldn, const int argvaluen/*=0*/, const int argsubvaluen/*=0*/) const {
 
-	THISIS(
-		"var var::f(const int argfieldn, const int argvaluen, const int argsubvaluen) "
-		"const")
+	THISIS("var var::f(const int argfieldn, const int argvaluen, const int argsubvaluen) const")
 	assertString(function_sig);
 
 #if 0
@@ -1208,9 +1199,7 @@ VARREF var::r(int fieldno, int valueno, int subvalueno, CVR replacement) {
 //in-place - given everything
 VARREF var::inserter(const int fieldno, const int valueno, const int subvalueno, CVR insertion) {
 
-	THISIS(
-		"VARREF var::inserter(const int fieldno,const int valueno,const int subvalueno,const "
-		"VARREF insertion)")
+	THISIS("VARREF var::inserter(const int fieldno,const int valueno,const int subvalueno,const VARREF insertion)")
 	assertStringMutator(function_sig);
 	ISSTRING(insertion)
 
@@ -1444,10 +1433,8 @@ var var::first(const size_t  length) const& {
 		[[unlikely]]
 		throwNonPositive(__PRETTY_FUNCTION__);
 
-	// Construct a new var with the required number of chars from this or all
-	var nrvo(this->var_str.data(), std::min(length, this->var_str.size()));
-
-	return nrvo;
+	// Return a new var with the required number of chars from this or all
+	return var(this->var_str.data(), std::min(length, this->var_str.size()));
 }
 //__cpp_lib_string_contains
 
@@ -1613,6 +1600,24 @@ VARREF var::cutter(const int length) {
 // SUBSTR
 /////////
 
+//ND var substr(const int pos1, const int length) const&; // byte pos1, length
+ND var var::substr(const int startindex1, const int length) const& {
+	return var(*this).substrer(startindex1, length);
+}
+//ND var substr(const int pos1) const&;                   // byte pos1
+ND var var::substr(const int startindex1) const& {
+	return var(*this).substrer(startindex1);
+}
+
+// byte pos1, length
+ND var var::b(const int pos1, const int length) const& {
+	return substr(pos1, length);
+}
+// byte pos1
+ND var var::b(const int pos1) const& {
+	return substr(pos1);
+}
+
 //[x,y]
 // var.s(start,length) substring
 VARREF var::substrer(const int startindex1, const int length) {
@@ -1747,7 +1752,7 @@ var var::mv(const char* opcode, CVR var2) const {
 	assertString(function_sig);
 	ISSTRING(var2)
 
-	var outstr = "";
+	var nrvo = "";
 	var mv1;
 	var mv2;
 	char separator1 = VM_;
@@ -1797,15 +1802,15 @@ getnextp2:
 		switch (opcode[0]) {
 
 			case '+':
-				outstr ^= mv1 + mv2;
+				nrvo ^= mv1 + mv2;
 				break;
 
 			case '-':
-				outstr ^= mv1 - mv2;
+				nrvo ^= mv1 - mv2;
 				break;
 
 			case '*':
-				outstr ^= mv1 * mv2;
+				nrvo ^= mv1 * mv2;
 				break;
 
 			case '/':
@@ -1818,11 +1823,11 @@ getnextp2:
 					mv1 = mv1 / mv2;
 				else
 					mv1 = 0;
-				outstr ^= mv1;
+				nrvo ^= mv1;
 				break;
 
 			case ':':
-				outstr ^= mv1 ^ mv2;
+				nrvo ^= mv1 ^ mv2;
 				break;
 		}
 
@@ -1832,27 +1837,27 @@ getnextp2:
 			if (separator1 > RM_)
 				break;
 
-			outstr ^= separator1;
-			// outstr.convert(_VM _FM, "]^").outputl("= outstr=");
+			nrvo ^= separator1;
+			// nrvo.convert(_VM _FM, "]^").outputl("= nrvo=");
 			p1a++;
 			p2a++;
 		} else if (separator1 < separator2) {
-			outstr ^= separator1;
-			// outstr.convert(_VM _FM, "]^").outputl("< outstr=");
+			nrvo ^= separator1;
+			// nrvo.convert(_VM _FM, "]^").outputl("< nrvo=");
 			mv2 = "";
 			p1a++;
 			separator1_prior = separator1;
 			goto getnextp1;
 		} else {
-			outstr ^= separator2;
-			// outstr.convert(_VM _FM, "]^").outputl("> outstr=");
+			nrvo ^= separator2;
+			// nrvo.convert(_VM _FM, "]^").outputl("> nrvo=");
 			mv1 = "";
 			p2a++;
 			goto getnextp2;
 		}
 	}
 
-	return outstr;
+	return nrvo;
 }
 
 ////////
@@ -2069,7 +2074,7 @@ var var::sumall() const {
 	// Limit the number of decimal places in returned value to the max found in the input
 	// assert(sum("2245000900.76" _FM "102768099.9" _VM "-2347769000.66") == 0);
 
-	var result = 0;
+	var nrvo = 0;
 	var start = 0;
 	var subfield, term;
 	size_t maxdecimals = 0;
@@ -2085,7 +2090,7 @@ var var::sumall() const {
 				[[unlikely]]
 				throw VarNonNumeric("sumall() " ^ subfield.first(128).quote());
 
-			result += subfield;
+			nrvo += subfield;
 			size_t n = subfield.var_str.find('.');
 			if (n) {
 				n = subfieldsize - n;
@@ -2096,7 +2101,7 @@ var var::sumall() const {
 		if (not term)
 			break;
 	}
-	return result.round(static_cast<int>(maxdecimals));
+	return nrvo.round(static_cast<int>(maxdecimals));
 }
 
 var var::sum() const {
@@ -2132,7 +2137,7 @@ var var::sum() const {
 	min_sep_present = 1 + max_sep - min_sep_present;
 	var inpos = 1;
 	var flag = 0;
-	var outstr = "";  //NRVO hopefully
+	var nrvo = "";
 
 	//std::clog << (*this) << std::endl;
 
@@ -2199,12 +2204,12 @@ var var::sum() const {
                         accum.var_str.pop_back();
                 }
 
-				outstr.var_str.append(accum.var_str);
+				nrvo.var_str.append(accum.var_str);
 
 			}
 
 			if (nextsep) {
-				outstr ^= this->chr(1 + max_sep - nextsep);
+				nrvo ^= this->chr(1 + max_sep - nextsep);
 			}
 
 			flag = 0;
@@ -2212,7 +2217,7 @@ var var::sum() const {
 
 	} while (nextsep);
 
-	return outstr;	//NRVO hopefully since single named return
+	return nrvo;
 }
 
 var var::sum(SV separator) const {
@@ -2220,7 +2225,7 @@ var var::sum(SV separator) const {
 	THISIS("var var::sum(SV separator) const")
 	assertString(function_sig);
 
-	var result = 0;
+	var nrvo = 0;
 	int nn = this->fcount(separator);
 
 	// static var allseparators=_ST _TM _SM _VM _FM _RM;
@@ -2232,12 +2237,12 @@ var var::sum(SV separator) const {
 	for (int ii = 1; ii <= nn; ++ii) {
 		temp = (*this).field(separator, ii);
 		if (temp.isnum())
-			result += temp;
+			nrvo += temp;
 		else
-			//result += (*this).sum(temp);
-			result += temp.sum();
+			//nrvo += (*this).sum(temp);
+			nrvo += temp.sum();
 	}
-	return result;	//NRVO hopefully since single named return
+	return nrvo;	//NRVO hopefully since single named return
 }
 
 }  // namespace exodus

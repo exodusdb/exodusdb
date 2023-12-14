@@ -69,7 +69,7 @@ var var::dump() const {
 		nrvo ^= "int:" ^ var(var_int) ^ " ";
 	if (var_typ & VARTYP_DBL)
 		nrvo ^= "dbl:" ^ var(var_dbl) ^ " ";
-	nrvo ^= "typ:" ^ var(int(var_typ)).oconv("MB").trimfirst("0");
+	nrvo ^= "typ:" ^ (var(int(var_typ)).oconv("MB").trimfirst("0") + 0);
 	return nrvo;
 }
 
