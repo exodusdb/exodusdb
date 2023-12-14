@@ -44,6 +44,7 @@
 programinit()
 
 var verbose;
+var force;
 //var dictfilename;
 //var dictfile;
 var dictrec;
@@ -104,7 +105,9 @@ function main() {
 
 	var filenames = COMMAND.f(2).lcase();
 	let dictids = COMMAND.field(FM, 3, 999999);
-	verbose = index(OPTIONS, "V");
+	// VV shows function bodies as well
+	verbose = OPTIONS.count("V");
+	force = OPTIONS.contains("F");
 	var doall = true;
 
 	// Option to install standard exodus functions
@@ -319,7 +322,7 @@ COST 10;
 			//remove trailing "UNION" word
 			viewsql.cutter(-6);
 
-			if (verbose)
+			if (verbose > 1)
 				viewsql.output("SQL:");
 
 			var errmsg;
@@ -366,9 +369,11 @@ subroutine replace_FM_etc(io sql) {
 
 }
 
-subroutine create_function(in functionname_and_args, in return_sqltype, in sql, in sqltemplate) {
+subroutine create_function(in functionname_and_args, in return_sqltype, in sql, in sqltemplate0) {
 
-	printl(functionname_and_args, " -> ", return_sqltype);
+//	printl(functionname_and_args, " -> ", return_sqltype);
+
+	let sqltemplate = sqltemplate0.trimfirst("\n").trimlast("|n");
 
 	var functionsql = sqltemplate;
 
@@ -380,23 +385,92 @@ subroutine create_function(in functionname_and_args, in return_sqltype, in sql, 
 
 	replace_FM_etc(functionsql);
 
-	if (verbose)
+	if (verbose > 1)
 		functionsql.outputl();
 
 	//decide if reindex is required - only if function has changed
 	var reindex_if_indexed = false;
 	var oldfunction;
-	let functionname = field(functionname_and_args, "(", 1).lcase();
+	let functionname0 = field(functionname_and_args, "(", 1).lcase();
+	var schemaname = field(functionname0, ".", 1);
+	var functionname = field(functionname0, ".", 2);
+	if (not functionname)
+		schemaname.swap(functionname);
+
+	// Split out new argtypes and argnames
+	var argtypes = "";
+	var argnames = "";
+	{
+		var args = field(functionname_and_args,"(", 2).field(")", 1);
+		args.converter(",", _FM);
+		for (auto arg : args) {
+			arg.trimmer();
+			argtypes ^= field(arg," ",2) ^ ",";
+			argnames ^= field(arg," ",1) ^ ",";
+		}
+		argtypes.popper();
+		argnames.popper();
+	}
+
 	//var().sqlexec("select routine_definition from information_schema.routines where routine_name = '" ^ functionname ^ "'", oldfunction);
-	if (not var().sqlexec("select routine_definition from information_schema.routines where routine_name = '" ^ functionname ^ "'", oldfunction)) {
+	//let sql_get_existing_declaration = "select routine_definition from information_schema.routines where routine_name = '" ^ functionname ^ "'";
+	let sql_get_existing_declaration =
+			"SELECT prosrc"
+			" FROM   pg_catalog.pg_proc"
+			" WHERE  proname = "         ^ squote(functionname) ^
+			" AND  oid::regprocedure = " ^ squote("exodus." ^ functionname ^ "(" ^ argtypes ^ ")") ^ "::regprocedure"
+			//" AND    proargnames = "     ^ squote("{" ^ argnames ^ "}")
+	;
+	if (not var().sqlexec(sql_get_existing_declaration, oldfunction)) {
 		//null
 	}
 	oldfunction.substrer(oldfunction.index("\n") + 1);
+
+	// Skip if no change in name, arg types and body
+	if (not force && oldfunction && functionsql.contains(oldfunction) ) {
+		if (verbose)
+			printl(functionname_and_args, "No change. Skipped.");
+		return;
+	}
+
 	if (oldfunction and not functionsql.contains(oldfunction)) {
 		reindex_if_indexed = true;
-		//TRACE(functionsql)
-		//TRACE(oldfunction)
 	}
+//		TRACE(functionname_and_args)
+//		TRACE(sql_get_existing_declaration)
+//		TRACE(functionsql)
+//		TRACE(oldfunction)
+//		TRACE(oswrite(functionsql on "n"))
+//		TRACE(oswrite(oldfunction on "o"))
+
+	/* example oldfunction - contains just the body of pgsql
+		DECLARE
+		 ans text;
+		BEGIN
+		 ans:=upper(translate(substring(dict_vouchers_text(key,data),0,1000),E'\x1D\x1E .,-/()\+$%&*+={}[<>?;:|"''`~!#^_@\x1A\x1B\x1C\x1F',repeat(' ',78)));
+		  RETURN ans;
+		 END;
+	*/
+
+	/* Example of functionsql - contains wrapping SQL around the function body inside $$$
+		CREATE OR REPLACE FUNCTION dict_vouchers_TEXT_XREF(key text, data text)  RETURNS text
+		AS
+		$$
+		DECLARE
+		 ans text;
+		BEGIN
+		 ans:=upper(translate(substring(dict_vouchers_text(key,data),0,1000),E'\x1D\x1E .,-/()\+$%&*+={}[<>?;:|"''`~!#^_@\x1A\x1B\x1C\x1F',repeat(' ',78)));
+		  RETURN ans;
+		 END;
+		$$
+		LANGUAGE 'plpgsql'
+		IMMUTABLE
+		SECURITY
+		DEFINER
+		COST 10;
+	*/
+
+	printl(functionname_and_args, "->", return_sqltype);
 
 	//create the function
 	var errmsg;
@@ -414,7 +488,7 @@ subroutine create_function(in functionname_and_args, in return_sqltype, in sql, 
 		reindex_if_indexed = true;
 
 		rawsqlexec(dropsql, errmsg);
-		errmsg.outputl();
+		//errmsg.outputl();
 
 		rawsqlexec(functionsql, errmsg);
 	}
@@ -444,17 +518,19 @@ subroutine create_function(in functionname_and_args, in return_sqltype, in sql, 
 		//var fieldname = filename.convert(LOWERCASE, "").trim("_");
 		let fieldname = filename.convert("abcdefghijklmnopqrstuvwxyz", "").trim("_");
 		//filename = filename.convert(UPPERCASE, "").trim("_");
-		filename.converter("ABCDEFGHIJKLMNOPQRSTUVWXYZ", "").trimmer("_");
-		if (filename.listindex(filename, fieldname)) {
-			logputl("Deleting index " ^ filename ^ " " ^ fieldname);
-			//filename.deleteindex(fieldname);
-			if (not filename.deleteindex(fieldname)) {
-				abort(lasterror());
-			}
-			logputl("Creating index " ^ filename ^ " " ^ fieldname);
-			//filename.createindex(fieldname);
-			if (not filename.createindex(fieldname)) {
-				abort(lasterror());
+		if (filename and fieldname) {
+			filename.converter("ABCDEFGHIJKLMNOPQRSTUVWXYZ", "").trimmer("_");
+			if (filename.listindex(filename, fieldname)) {
+				logputl("Deleting index " ^ filename ^ " " ^ fieldname);
+				//filename.deleteindex(fieldname);
+				if (not filename.deleteindex(fieldname)) {
+					abort(lasterror());
+				}
+				logputl("Creating index " ^ filename ^ " " ^ fieldname);
+				//filename.createindex(fieldname);
+				if (not filename.createindex(fieldname)) {
+					abort(lasterror());
+				}
 			}
 		}
 	}
@@ -1457,7 +1533,8 @@ END;
 )V0G0N";
 
 subroutine rawsqlexec(in sql) {
-	printl(sql.field("RETURNS", 1));
+	if (verbose)
+		printl(sql.field("RETURNS", 1));
 	var errormsg;
 	if (not var().sqlexec(sql, errormsg)) {
 		errors ^= "\n" ^ errormsg;
@@ -1466,7 +1543,8 @@ subroutine rawsqlexec(in sql) {
 }
 
 subroutine rawsqlexec(in sql, out errormsg) {
-	printl(sql.field("RETURNS", 1));
+	if (verbose)
+		printl(sql.field("RETURNS", 1));
 	//var().sqlexec(sql, errormsg);
 	if (not var().sqlexec(sql, errormsg)) {
 		//null

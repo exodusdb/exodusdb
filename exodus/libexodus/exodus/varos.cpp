@@ -582,9 +582,7 @@ bool var::osread(const char* osfilename, const char* codepage) {
 
 var var::to_codepage(const char* codepage) const {
 
-	THISIS(
-		"bool var::to_codepage(const char* codepage"
-		") const")
+	THISIS("bool var::to_codepage(const char* codepage) const")
 	assertString(function_sig);
 
 	// NB to_codepage UTF32 adds a BOM at the front eg FFFE0000
@@ -602,9 +600,7 @@ var var::to_codepage(const char* codepage) const {
 
 var var::from_codepage(const char* codepage) const {
 
-	THISIS(
-		"bool var::from_codepage(const char* codepage"
-		") const")
+	THISIS("bool var::from_codepage(const char* codepage) const")
 	assertString(function_sig);
 
 	//to utf8 from codepage
@@ -619,9 +615,7 @@ var var::from_codepage(const char* codepage) const {
 // utf-8 and converts all output to the specified codepage
 bool var::oswrite(CVR osfilename, const char* codepage) const {
 
-	THISIS(
-		"bool var::oswrite(CVR osfilename, const char* codepage"
-		") const")
+	THISIS("bool var::oswrite(CVR osfilename, const char* codepage) const")
 	assertString(function_sig);
 	ISSTRING(osfilename)
 
@@ -670,9 +664,7 @@ bool var::osbwrite(CVR osfilevar, VARREF offset) const {
 	// osfilehandle is just the filename but buffers the "file number" in the mvint too
 
 
-	THISIS(
-		"bool var::osbwrite(CVR osfilevar, VARREF offset) "
-		"const")
+	THISIS("bool var::osbwrite(CVR osfilevar, VARREF offset) const")
 	assertString(function_sig);
 	ISNUMERIC(offset)
 

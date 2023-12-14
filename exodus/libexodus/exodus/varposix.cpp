@@ -1,3 +1,4 @@
+#include <cassert>
 #include <limits.h>
 #include <unistd.h>
 #include <filesystem>
@@ -26,12 +27,19 @@ ND PUBLIC var getexecpath() {
 	return path;
 }
 
+//consteval size_t host_name_max = HOST_NAME_MAX;
+// HOST_NAME_MAX is 64 on Linux
+constinit size_t host_name_max = 32;
+
 ND PUBLIC std::string gethostname() {
 //    char hostname[1024];
 //    hostname[1023] = '\0';
 //    ::gethostname(hostname, 1023);
-	std::string hostname(' ', HOST_NAME_MAX);
-	if (::gethostname(hostname.data(), HOST_NAME_MAX))
+//	std::string hostname(' ', HOST_NAME_MAX);
+//	if (::gethostname(hostname.data(), HOST_NAME_MAX))
+	std::string hostname(host_name_max, ' ');
+	assert(hostname.size() == host_name_max);
+	if (::gethostname(hostname.data(), host_name_max))
 		hostname = "";
 	else {
 		size_t pos = hostname.find('\0');

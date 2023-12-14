@@ -93,6 +93,7 @@ Binary    Hex          Comments
 //#include <memory>   //for unique_ptr
 
 #include <boost/locale.hpp>
+#include <boost/algorithm/string/trim_all.hpp>
 
 #include <exodus/varimpl.h>
 //#include <exodus/mvutf.h>
@@ -101,9 +102,13 @@ Binary    Hex          Comments
 // Keep doxygen happy
 #undef DEFAULT_SPACE
 #define DEFAULT_SPACE
+#undef DEFAULT_EMPTY
+#define DEFAULT_EMPTY
+#undef DEFAULT_FM
+#define DEFAULT_FM
 
 // std::ios::sync_with_stdio(false);
-static bool desynced_with_stdio = false;
+//static bool desynced_with_stdio = false;
 
 // TODO check that all string increase operations dont crash the system
 
@@ -168,7 +173,7 @@ bool var::eof() const {
 	// THISIS("bool var::eof() const")
 	// assertDefined(function_sig);
 
-	return (std::cin.eof());
+	return std::cin.eof();
 }
 
 bool var::hasinput(int milliseconds) const {
@@ -462,173 +467,19 @@ var::var(const std::wstring& wstr1) {
 	var_str = boost::locale::conv::utf_to_utf<char>(wstr1);
 }
 
+///////////////////////////////////////////////////////////////////////
+// trim - remove leading, trailing and excess internal spaces/character
+///////////////////////////////////////////////////////////////////////
 
-// trim leading trimchars from a given string
-static void trimmerfirst_helper(std::string& instr, SV trimchars) {
+// trim
 
-	auto start_pos = instr.find_first_not_of(trimchars);
-
-	// Early exit
-	if (start_pos == std::string::npos) {
-		instr.clear();
-		return;
-	}
-
-	// return var(var_str.substr(start_pos));
-	instr.erase(0, start_pos);
-
-	return;
-}
-
-// trim trailing trimchars from a given string
-static void trimmerlast_helper(std::string& iostr, SV trimchars) {
-
-	std::size_t end_pos = iostr.find_last_not_of(trimchars);
-
-	// Early exit
-	if (end_pos == std::string::npos) {
-		iostr.clear();
-		return;
-	}
-
-	iostr.erase(end_pos + 1);
-
-	return;
-}
-
-// trim inner excess trimchars from a given string
-// ONLY works after trimming leading (F)ront and trailing (B)ack spaces
-static void trimmerinner_helper(std::string& instr, SV trimchars) {
-
-	// find the starting position of any embedded trimchars
-	// working backwards
-	auto start_pos = std::string::npos;
-	while (true) {
-
-		// find a trimchars
-		start_pos = instr.find_last_of(trimchars, start_pos);
-
-		// Early exit
-		// if no (more) trimchars then return the string
-		if (start_pos == std::string::npos || start_pos <= 0)
-			return;
-
-		// find the first non-trimchar thereafter
-		auto end_pos = instr.find_last_not_of(trimchars, start_pos - 1);
-
-		// if first non trimchars character is not one before the trimchars
-		if (end_pos < start_pos - 1) {
-			instr.erase(end_pos + 1, start_pos - end_pos - 1);
-		}
-
-		if (end_pos <= 0)
-			break;
-
-		start_pos = end_pos - 1;
-	}
-
-	return;
-}
-
-//trimfirst() - trim leading spaces/character
-
-// constant
-var var::trimfirst(SV trimchars DEFAULT_SPACE) const& {
-
-	THISIS("var var::trimfirst(SV trimchars) const&")
-	assertStringMutator(function_sig);
-
-	var nrvo = *this;
-
-	trimmerfirst_helper(nrvo.var_str, trimchars);
-
-	return nrvo;
-}
-
-// mutate
-VARREF var::trimmerfirst(SV trimchars DEFAULT_SPACE) {
-
-	THISIS("VARREF var::trimmerfirst(SV trimchars)")
-	assertStringMutator(function_sig);
-
-	trimmerfirst_helper(var_str, trimchars);
-
-	return *this;
-}
-
-// trimlast() - trim backward (trailing) spaces/character
-
-// constant
-var var::trimlast(SV trimchars DEFAULT_SPACE) const& {
-
-	THISIS("var var::trimlast(SV trimchars) const&")
-	assertStringMutator(function_sig);
-
-	var nrvo = *this;
-
-	trimmerlast_helper(nrvo.var_str, trimchars);
-
-	return nrvo;
-}
-
-// mutate
-VARREF var::trimmerlast(SV trimchars DEFAULT_SPACE) {
-
-	THISIS("VARREF var::trimmerlast(SV trimchars)")
-	assertStringMutator(function_sig);
-
-	trimmerlast_helper(var_str, trimchars);
-
-	return *this;
-}
-
-//trimboth() - remove leading and trailing spaces/characters
-
-// constant
-var var::trimboth(SV trimchars DEFAULT_SPACE) const& {
-
-	THISIS("var var::trimboth(SV trimchars) const&")
-	assertStringMutator(function_sig);
-
-	var nrvo = *this;
-
-	trimmerlast_helper(nrvo.var_str, trimchars);
-	trimmerfirst_helper(nrvo.var_str, trimchars);
-
-	return nrvo;
-}
-
-// mutate
-VARREF var::trimmerboth(SV trimchars DEFAULT_SPACE) {
-
-	// TODO reimplement with boost string trim_if algorithm
-	// http://www.boost.org/doc/libs/1_39_0/doc/html/string_algo/reference.html
-
-	THISIS("VARREF var::trimmerboth(SV trimchars)")
-	assertStringMutator(function_sig);
-
-	trimmerlast_helper(var_str, trimchars);
-	trimmerfirst_helper(var_str, trimchars);
-
-	return *this;
-}
-
-//trim() - remove leading, trailing and excess internal spaces/character
-
-// constant
+// const
 var var::trim(SV trimchars DEFAULT_SPACE) const& {
 
-	THISIS("var var::trim(SV trimchars) const&")
-	assertStringMutator(function_sig);
+	THISIS("VARREF var::trim(SV trimchars)")
+	assertString(function_sig);
 
-	var nrvo = *this;
-
-	trimmerlast_helper(nrvo.var_str, trimchars);
-	trimmerfirst_helper(nrvo.var_str, trimchars);
-	//trimmerinner_helper only works after first and last trimchars are removed
-	trimmerinner_helper(nrvo.var_str, trimchars);
-
-	return nrvo;
+	return boost::algorithm::trim_all_copy_if(var_str, boost::algorithm::is_any_of(trimchars));
 }
 
 // mutate
@@ -640,23 +491,83 @@ VARREF var::trimmer(SV trimchars DEFAULT_SPACE) {
 	THISIS("VARREF var::trimmer(SV trimchars)")
 	assertStringMutator(function_sig);
 
-	trimmerlast_helper(var_str, trimchars);
-	trimmerfirst_helper(var_str, trimchars);
-	//trimmerinner_helper only works after first and last trimchars are removed
-	trimmerinner_helper(var_str, trimchars);
+//	trimmerlast_helper(var_str, trimchars);
+//	trimmerfirst_helper(var_str, trimchars);
+//	//trimmerinner_helper only works after first and last trimchars are removed
+//	trimmerinner_helper(var_str, trimchars);
+	boost::algorithm::trim_all_if(var_str, boost::algorithm::is_any_of(trimchars));
 
 	return *this;
 }
 
+// trimfirst - remove leading/left bytes
+
+// const
+var var::trimfirst(SV trimchars DEFAULT_SPACE) const& {
+
+	THISIS("VARREF var::trimfirst(SV trimchars) const&")
+	assertString(function_sig);
+
+	return boost::algorithm::trim_left_copy_if(var_str, boost::algorithm::is_any_of(trimchars));
+}
+
+// mutate
+VARREF var::trimmerfirst(SV trimchars DEFAULT_SPACE) {
+
+	THISIS("VARREF var::trimmerfirst(SV trimchars)")
+	assertStringMutator(function_sig);
+
+	boost::algorithm::trim_left_if(var_str, boost::algorithm::is_any_of(trimchars));
+
+	return *this;
+}
+
+// trimlast() - trim trailing/right bytes
+
+// const
+var var::trimlast(SV trimchars DEFAULT_SPACE) const& {
+
+	THISIS("VARREF var::trimlast(SV trimchars) const&")
+	assertString(function_sig);
+
+	return boost::algorithm::trim_right_copy_if(var_str, boost::algorithm::is_any_of(trimchars));
+}
+
+// mutate
+VARREF var::trimmerlast(SV trimchars DEFAULT_SPACE) {
+
+	THISIS("VARREF var::trimmerlast(SV trimchars)")
+	assertStringMutator(function_sig);
+
+	//trimmerlast_helper(var_str, trimchars);
+	boost::algorithm::trim_right_if(var_str, boost::algorithm::is_any_of(trimchars));
+
+	return *this;
+}
+
+//trimboth() - remove leading and trailing spaces/characters but not inner
+
+// const
+var var::trimboth(SV trimchars DEFAULT_SPACE) const& {
+
+	THISIS("VARREF var::trimboth(SV trimchars) const&")
+	assertString(function_sig);
+
+	return boost::algorithm::trim_copy_if(var_str, boost::algorithm::is_any_of(trimchars));
+}
+
+// mutate
+VARREF var::trimmerboth(SV trimchars DEFAULT_SPACE) {
+
+	THISIS("VARREF var::trimmerboth(SV trimchars)")
+	assertStringMutator(function_sig);
+
+	boost::algorithm::trim_if(var_str, boost::algorithm::is_any_of(trimchars));
+
+	return *this;
+}
 
 // invert() - inverts lower 8 bits of UTF8 codepoints (not bytes)
-
-// constant
-var var::invert() const& {
-	var tt = *this;
-	tt.inverter();
-	return tt;
-}
 
 // mutate
 VARREF var::inverter() {
@@ -686,11 +597,6 @@ VARREF var::inverter() {
 
 
 // ucase() - upper case
-
-// constant
-var var::ucase() const& {
-	return var(*this).ucaser();
-}
 
 // mutate
 VARREF var::ucaser() {
@@ -736,11 +642,6 @@ VARREF var::ucaser() {
 
 // lcase() - lower case
 
-// constant
-var var::lcase() const& {
-	return var(*this).lcaser();
-}
-
 // mutate
 VARREF var::lcaser() {
 
@@ -777,11 +678,6 @@ VARREF var::lcaser() {
 
 // tcase() - title case
 
-// constant
-var var::tcase() const& {
-	return var(*this).tcaser();
-}
-
 // mutate
 VARREF var::tcaser() {
 
@@ -816,11 +712,6 @@ VARREF var::tcaser() {
 // Case Folding - is a process of converting a text to case independent representation.
 // For example case folding for a word "Grüßen" is "grüssen"
 // where the letter "ß" is represented in case independent way as "ss".
-
-// constant
-var var::fcase() const& {
-	return var(*this).fcaser();
-}
 
 // mutate
 VARREF var::fcaser() {
@@ -862,11 +753,6 @@ static inline bool is_ascii(std::string_view str1) {
 // not
 // have any unassigned characters is normalized under one version of Unicode,
 // it must remain normalized under all future versions of Unicode."
-
-// constant
-var var::normalize() const& {
-	return var(*this).normalizer();
-}
 
 // mutate
 VARREF var::normalizer() {
@@ -999,23 +885,10 @@ var var::textchr(const int utf_codepoint) const {
 // QUOTE - wrap with double quotes
 ////////
 
-// constant
-var var::quote() const& {
-
-	THISIS(__PRETTY_FUNCTION__)
-	assertString(function_sig);
-
-	var nrvo = DQ_;
-	nrvo.var_str.append(this->var_str);
-	nrvo.var_str.push_back(DQ_);
-
-	return nrvo;
-}
-
 // mutate
 VARREF var::quoter() {
 
-	THISIS(__PRETTY_FUNCTION__)
+	THISIS("VARREF var::quoter()")
 	assertStringMutator(function_sig);
 
 	// NB this is std::string "replace" not var field replace
@@ -1029,23 +902,10 @@ VARREF var::quoter() {
 // SQUOTE - wrap with single quotes
 /////////
 
-// constant
-var var::squote() const& {
-
-	THISIS(__PRETTY_FUNCTION__)
-	assertString(function_sig);
-
-	var nrvo = SQ_;
-	nrvo.var_str.append(this->var_str);
-	nrvo.var_str.push_back(SQ_);
-
-	return nrvo;
-}
-
 // mutate
 VARREF var::squoter() {
 
-	THISIS(__PRETTY_FUNCTION__)
+	THISIS("VARREF var::squoter()")
 	assertStringMutator(function_sig);
 
 	// NB this is std::string "replace" not var field replace
@@ -1060,36 +920,10 @@ VARREF var::squoter() {
 // UNQUOTE - remove outer double or single quotes
 //////////
 
-// constant
-var var::unquote() const& {
-
-	THISIS(__PRETTY_FUNCTION__)
-	assertString(function_sig);
-
-	var nrvo;
-	nrvo.var_typ = VARTYP_STR;
-
-	if (
-		this->var_str.size() > 1 and (
-			(this->var_str.starts_with(DQ_) and this->var_str.ends_with(DQ_))
-			or
-			(this->var_str.starts_with(SQ_) and this->var_str.ends_with(SQ_))
-		)
-	) {
-		// Skip first and last char
-		nrvo.var_str.append(++this->var_str.begin(), this->var_str.end());
-		nrvo.var_str.pop_back();
-	} else {
-		nrvo.var_str = this->var_str;
-	}
-
-	return nrvo;
-}
-
 // mutate
 VARREF var::unquoter() {
 
-	THISIS(__PRETTY_FUNCTION__)
+	THISIS("VARREF var::unquoter()")
 	assertStringMutator(function_sig);
 
 	// removes MATCHING beginning and terminating " or ' characters
@@ -1125,12 +959,6 @@ VARREF var::unquoter() {
 ////////
 
 // 1. paste replace
-
-// constant
-var var::paste(const int pos1, const int length, SV insertstr) const& {
-	// TODO avoid copy
-	return var(*this).paster(pos1, length, insertstr);
-}
 
 // mutate
 VARREF var::paster(const int pos1, const int length, SV insertstr) {
@@ -1234,12 +1062,6 @@ VARREF var::paster(const int pos1, const int length, SV insertstr) {
 
 // 3. paste insert at
 
-// constant
-var var::paste(const int pos1, SV insertstr) const& {
-	// TODO avoid copy
-	return var(*this).paster(pos1, insertstr);
-}
-
 // mutate
 VARREF var::paster(const int pos1, SV insertstr) {
 
@@ -1286,7 +1108,8 @@ var var::prefix(SV insertstr) const& {
 	THISIS("var var::prefix(SV insertstr)")
 	assertString(function_sig);
 
-	var nrvo(insertstr);
+	var nrvo = insertstr;
+
 	nrvo.var_str.append(this->var_str);
 
 	return nrvo;
@@ -1307,11 +1130,6 @@ VARREF var::prefixer(SV insertstr) {
 //////
 // POP -remove last byte of string
 //////
-
-// constant
-var var::pop() const& {
-	return var(*this).popper();
-}
 
 // mutate
 VARREF var::popper() {
@@ -1366,7 +1184,7 @@ VARREF var::move(VARREF tovar) {
 // const version needed in calculatex
 CVR var::swap(CVR var2) const {
 
-	THISIS(__PRETTY_FUNCTION__)
+	THISIS("CVR var::swap(CVR var2) const")
 	// Works on unassigned vars
 	assertDefined(function_sig);
 	ISDEFINED(var2)
@@ -1395,7 +1213,7 @@ CVR var::swap(CVR var2) const {
 // non-const version
 VARREF var::swap(VARREF var2) {
 
-	THISIS(__PRETTY_FUNCTION__)
+	THISIS("VARREF var::swap(VARREF var2)")
 	// Works on unassigned vars
 	assertDefined(function_sig);
 	ISDEFINED(var2)
@@ -1458,9 +1276,6 @@ var var::space() const {
 
 
 //crop() - remove superfluous FM, VM etc.
-var var::crop() const& {
-	return var(*this).cropper();
-}
 
 // mutate
 VARREF var::cropper() {
@@ -1512,9 +1327,6 @@ VARREF var::cropper() {
 
 
 // lower() drops FM to VM, VM to SM etc.
-var var::lower() const& {
-	return var(*this).lowerer();
-}
 
 // mutate
 VARREF var::lowerer() {
@@ -1533,11 +1345,7 @@ VARREF var::lowerer() {
 	return *this;
 }
 
-
 // raise() lifts VM to FM, SM to VM etc.
-var var::raise() const& {
-	return var(*this).raiser();
-}
 
 // mutate
 VARREF var::raiser() {
@@ -1601,15 +1409,6 @@ static void string_converter(T1& var_str, const T2 fromchars, const T3 tochars) 
 // convert() - replaces one by one in string, a list of characters with another list of characters
 // if the target list is shorter than the source list of characters then characters are deleted
 //var var::convert(CVR fromchars, CVR tochars) const& {
-var var::convert(SV fromchars, SV tochars) const& {
-
-//	THISIS("var var::convert(SV fromchars,SV tochars) const")
-//	assertString(function_sig);
-
-	// return var(*this).converter(fromchars,tochars);
-	var temp = var(*this).converter(fromchars, tochars);
-	return temp;
-}
 
 // mutate
 //VARREF var::converter(CVR fromchars, CVR tochars) {
@@ -1635,12 +1434,6 @@ VARREF var::converter(SV fromchars, SV tochars) {
 //
 //	return *this;
 //}
-
-// textconvert() - replaces one by one in string, a list of characters with another list of characters
-// if the target list is shorter than the source list of characters then characters are deleted
-var var::textconvert(SV fromchars, SV tochars) const& {
-	return var(*this).textconverter(fromchars, tochars);
-}
 
 // mutate
 VARREF var::textconverter(SV fromchars, SV tochars) {
@@ -1677,11 +1470,6 @@ VARREF var::textconverter(SV fromchars, SV tochars) {
 
 // parse() - replaces seps with FMs except inside double and single quotes. Backslash escapes.
 
-// copy
-var var::parse(char sepchar) const& {
-	var temp = var(*this).parser(sepchar);
-	return temp;
-}
 
 // mutate
 VARREF var::parser(char sepchar) {
@@ -1782,167 +1570,6 @@ next_unquoted:
 	return *this;
 }
 
-/////////
-// output
-/////////
-
-//warning put() is not threadsafe whereas output(), errput() and logput() are threadsafe
-CVR var::put(std::ostream& ostream1) const {
-
-	THISIS("CVR var::put(std::ostream& ostream1) const")
-	assertString(function_sig);
-
-	// prevent output to cout suppressing output to cout (by non-exodus routines)
-	// http://gcc.gnu.org/ml/gcc-bugs/2006-05/msg01196.html
-	// TODO optimise by calling once instead of every call to output()
-	if (!desynced_with_stdio) {
-		std::ios::sync_with_stdio(false);
-		desynced_with_stdio = true;
-	}
-
-	// verify conversion to UTF8
-	// std::string tempstr=(*this).toString();
-
-	ostream1.write(var_str.data(), static_cast<std::streamsize>(var_str.size()));
-	return *this;
-}
-
-// output -> cout which is buffered standard output
-///////////////////////////////////////////////////
-
-// output() buffered threadsafe output to standard output
-CVR var::output() const {
-	LOCKIOSTREAM_OR_NOT
-	return this->put(std::cout);
-}
-
-// outputl() flushed threadsafe output to standard output
-// adds \n and flushes so is slower than output("\n")
-CVR var::outputl() const {
-	LOCKIOSTREAM_OR_NOT
-	this->put(std::cout);
-	std::cout << std::endl;
-	return *this;
-}
-
-// outputt() buffered threadsafe output to standard output
-// adds \t
-CVR var::outputt() const {
-	LOCKIOSTREAM_OR_NOT
-	this->put(std::cout);
-	std::cout << '\t';
-	return *this;
-}
-
-// overloaded output() outputs a prefix str
-CVR var::output(CVR str) const {
-	LOCKIOSTREAM_OR_NOT
-	str.put(std::cout);
-	return this->put(std::cout);
-}
-
-// oveloaded outputl() outputs a prefix str
-CVR var::outputl(CVR str) const {
-	LOCKIOSTREAM_OR_NOT
-	str.put(std::cout);
-	this->put(std::cout);
-	std::cout << std::endl;
-	return *this;
-}
-
-// overloaded outputt() outputs a prefix str
-CVR var::outputt(CVR str) const {
-	LOCKIOSTREAM_OR_NOT
-	std::cout << "\t";
-	str.put(std::cout);
-	std::cout << "\t";
-	this->put(std::cout);
-	return *this;
-}
-
-// errput -> cerr which is unbuffered standard error
-////////////////////////////////////////////////////
-
-// errput() unbuffered threadsafe output to standard error
-CVR var::errput() const {
-	LOCKIOSTREAM_OR_NOT
-	//return put(std::cerr);
-	std::cerr << *this;
-	return *this;
-}
-
-// errputl() unbuffered threadsafe output to standard error
-// adds "\n"
-CVR var::errputl() const {
-	LOCKIOSTREAM_OR_NOT
-	//this->put(std::cerr);
-	std::cerr << *this;
-	std::cerr << std::endl;
-	return *this;
-}
-
-// overloaded errput outputs a prefix str
-CVR var::errput(CVR str) const {
-	LOCKIOSTREAM_OR_NOT
-	//str.put(std::cerr);
-	//return this->put(std::cerr);
-	std::cerr << str;
-	std::cerr << *this;
-	return *this;
-}
-
-// overloaded errputl outputs a prefix str
-CVR var::errputl(CVR str) const {
-	LOCKIOSTREAM_OR_NOT
-	//str.put(std::cerr);
-	//this->put(std::cerr);
-	std::cerr << str;
-	std::cerr << *this;
-	std::cerr << std::endl;
-	return *this;
-}
-
-// logput -> clog which is a buffered version of cerr standard error output
-///////////////////////////////////////////////////////////////////////////
-
-// logput() buffered threadsafe output to standard log
-CVR var::logput() const {
-	LOCKIOSTREAM_OR_NOT
-	//this->put(std::clog);
-	std::clog << *this;
-	//std::clog.flush();
-	return *this;
-}
-
-// logputl() flushed threadsafe output to standard log
-CVR var::logputl() const {
-	LOCKIOSTREAM_OR_NOT
-	//this->put(std::clog);
-	std::clog << *this;
-	std::clog << std::endl;
-	return *this;
-}
-
-// overloaded logput with a prefix str
-CVR var::logput(CVR str) const {
-	LOCKIOSTREAM_OR_NOT
-	//str.put(std::clog);
-	std::clog << str;
-	std::clog << *this;
-	return *this;
-}
-
-// overloaded logputl with a prefix str
-CVR var::logputl(CVR str) const {
-	LOCKIOSTREAM_OR_NOT
-	//str.put(std::clog);
-	//this->put(std::clog);
-	std::clog << str;
-	std::clog << *this;
-	std::clog << std::endl;
-	return *this;
-}
-
 ////////
 // FCOUNT
 ////////
@@ -1961,7 +1588,6 @@ var var::fcount(SV sep) const {
 
 	return this->count(sep) + 1;
 }
-
 ////////
 // COUNT
 ////////
@@ -2274,5 +1900,78 @@ var var::numberinwords(CVR langname_or_locale_id) {
 	return result;
 
 }
+
+// clang-format off
+
+var var::ucase()     const& {return this->clone().ucaser();}
+var var::lcase()     const& {return this->clone().lcaser();}
+var var::tcase()     const& {return this->clone().tcaser();}
+var var::fcase()     const& {return this->clone().fcaser();}
+var var::normalize() const& {return this->clone().normalizer();}
+var var::invert()    const& {return this->clone().inverter();}
+
+var var::lower()     const& {return this->clone().lowerer();}
+var var::raise()     const& {return this->clone().raiser();}
+var var::crop()      const& {return this->clone().cropper();}
+
+var var::quote()     const& {return this->clone().quoter();}
+var var::squote()    const& {return this->clone().squoter();}
+var var::unquote()   const& {return this->clone().unquoter();}
+
+var var::convert(SV fromchars, SV tochars)                     const& {return this->clone().converter(fromchars,tochars);}
+var var::textconvert(SV fromchars, SV tochars)                 const& {return this->clone().textconverter(fromchars,tochars);}
+var var::parse(char sepchar)                                   const& {return this->clone().parser(sepchar);}
+
+var var::pop()                                                 const& {return this->clone().popper();}
+
+var var::paste(const int pos1, const int length, SV insertstr) const& {return this->clone().paster(pos1, length, insertstr);}
+var var::paste(const int pos1, SV insertstr)                   const& {return this->clone().paster(pos1, insertstr);}
+
+ND VARREF var::ucase()     && {return ucaser();}
+ND VARREF var::lcase()     && {return lcaser();}
+ND VARREF var::tcase()     && {return tcaser();}
+ND VARREF var::fcase()     && {return fcaser();}
+ND VARREF var::normalize() && {return normalizer();}
+ND VARREF var::invert()    && {return inverter();}
+
+ND VARREF var::lower()     && {return lowerer();}
+ND VARREF var::raise()     && {return raiser();}
+ND VARREF var::crop()      && {return cropper();}
+
+ND VARREF var::quote()     && {return quoter();}
+ND VARREF var::squote()    && {return squoter();}
+ND VARREF var::unquote()   && {return unquoter();}
+
+ND VARREF var::trim(SV trimchars DEFAULT_SPACE)                      && {return trimmer(trimchars);}
+ND VARREF var::trimfirst(SV trimchars DEFAULT_SPACE)                 && {return trimmerfirst(trimchars);}
+ND VARREF var::trimlast(SV trimchars DEFAULT_SPACE)                  && {return trimmerlast(trimchars);}
+ND VARREF var::trimboth(SV trimchars DEFAULT_SPACE)                  && {return trimmerboth(trimchars);}
+
+ND VARREF var::first(const size_t length)                            && {return firster(length);}
+ND VARREF var::last(const size_t length)                             && {return laster(length);}
+ND VARREF var::cut(const int length)                                 && {return cutter(length);}
+ND VARREF var::paste(const int pos1, const int length, SV insertstr) && {return paster(pos1, length, insertstr);}
+ND VARREF var::paste(const int pos1, SV insertstr)                   && {return paster(pos1, insertstr);}
+ND VARREF var::prefix(SV insertstr)                                  && {return prefixer(insertstr);}
+//ND VARREF append(SV appendstr) && {return appender(appendstr);}
+ND VARREF var::pop()                                                 && {return popper();}
+
+ND VARREF var::fieldstore(SV sepchar, const int fieldno, const int nfields, CVR replacement)
+                                                                     && {return fieldstorer(sepchar, fieldno, nfields, replacement);}
+ND VARREF var::substr(const int pos1, const int length)              && {return substrer(pos1, length);}
+ND VARREF var::substr(const int pos1)                                && {return substrer(pos1);}
+
+ND VARREF var::convert(SV fromchars, SV tochars)                     && {return converter(fromchars, tochars);}
+ND VARREF var::textconvert(SV fromchars, SV tochars)                 && {return textconverter(fromchars, tochars);}
+ND VARREF var::replace(SV fromstr, SV tostr)                         && {return replacer(fromstr, tostr);}
+ND VARREF var::regex_replace(SV regex, SV replacement, SV options DEFAULT_EMPTY)
+                                                                     && {return regex_replacer(regex, replacement, options);}
+ND VARREF var::unique()                       && {return uniquer();}
+ND VARREF var::sort(SV sepchar DEFAULT_FM)    && {return sorter(sepchar);}
+ND VARREF var::reverse(SV sepchar DEFAULT_FM) && {return reverser(sepchar);}
+ND VARREF var::shuffle(SV sepchar DEFAULT_FM) && {return shuffler(sepchar);}
+ND VARREF var::parse(char sepchar DEFAULT_FM) && {return parser(sepchar);}
+
+// clang-format on
 
 }  // namespace exodus
