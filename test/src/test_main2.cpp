@@ -483,6 +483,34 @@ programinit()
 	assert(str1.trimmerboth(" ") eq "xxx  xxx");
 	assert(str1 ne str0);
 
+#define BOOST_TRIM
+#ifdef BOOST_TRIM
+	// take the first if multiple inner
+	{
+		// on temporary
+		assert(trim("XYZabcXYZdefXYZ", "XYZ").outputl() eq "abcXdef");
+		// on reference
+		var x = "XYZabcXYZdefXYZ";
+		trimmer(x, "XYZ");
+		TRACE(x)
+		assert(x.outputl()                                        eq "abcXdef");
+	}
+
+	{
+		assert(trimfirst("XYZabcXYZdefXYZ", "XYZ").outputl() eq "abcXYZdefXYZ");
+		var x = "XYZabcXYZdefXYZ";
+		trimmerfirst(x, "XYZ");
+		assert(x.outputl()                                         eq "abcXYZdefXYZ");
+	}
+
+	{
+		assert(trimlast("XYZabcXYZdefXYZ", "XYZ").outputl() eq "XYZabcXYZdef");
+		var x = "XYZabcXYZdefXYZ";
+		trimmerlast(x, "XYZ");
+		assert(x.outputl()                                         eq "XYZabcXYZdef");
+	}
+#else
+	// take the last if multiple inner
 	{
 		assert(trim("XYZabcXYZdefXYZ", "XYZ").outputl() eq "abcZdef");
 		var x = "XYZabcXYZdefXYZ";
@@ -503,6 +531,8 @@ programinit()
 		trimmerlast(x, "XYZ");
 		assert(x                                         eq "XYZabcXYZdef");
 	}
+
+#endif
 
 	//test daisychaining assignments NOT ALLOWED - TO PREVENT = being used instead of eq by mistake in if() clauses
 	//var aa1,aa2,aa3,aa4;
@@ -677,7 +707,12 @@ programinit()
 	//anything invalid returns empty string
 	assert(var("XF").iconv("HEX").oconv("HEX")               eq "");
 
-	assert(var("abcabdef").trim("abef")                eq "cbd");
+#ifdef BOOST_TRIM
+	assert(var("abcabdef").trim("abef").outputl()                eq "cad");
+#else
+	assert(var("abcabdef").trim("abef").outputl()                eq "cbd");
+#endif
+
 	assert(var("abcabdef").trimfirst("abef").trimlast("abef") eq "cabd");
 
 	var temp3 = "c";

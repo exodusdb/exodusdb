@@ -919,8 +919,6 @@ static void to_extract_text(VARREF dictexpression) {
 
 bool var::connect(CVR conninfo) {
 
-	Timer t(242);//connect
-
 	THISIS("bool var::connect(CVR conninfo")
 	// nb dont log/trace or otherwise output the full connection info without HIDING the
 	// password
@@ -1243,8 +1241,6 @@ void var::disconnectall() {
 // connection is optional and default connection may be used instead
 bool var::open(CVR filename, CVR connection /*DEFAULTNULL*/) {
 
-	Timer t(244);//open
-
 	THISIS("bool var::open(CVR filename, CVR connection)")
 	assertDefined(function_sig);
 	ISSTRING(filename)
@@ -1294,7 +1290,8 @@ bool var::open(CVR filename, CVR connection /*DEFAULTNULL*/) {
 
 	}
 
-	Timer t2(245);//open cache_miss
+	//Timer t2(245);//open cache_miss
+	Timer timer1(get_timeacno("bool var::open cache_miss"));
 	//if (DBTRACE) {
 	//	connection2.logputl("DBTR var::open-1 ");
 	//}
@@ -1325,7 +1322,8 @@ bool var::open(CVR filename, CVR connection /*DEFAULTNULL*/) {
 	var result;
 	if (not connection2.sqlexec(sql, result))
 		[[unlikely]]
-		throw VarDBException(this->lasterror());
+		//throw VarDBException(this->lasterror());
+		throw VarDBException(result);
 	//result.convert(RM,"|").logputl("result=");
 
 	//if (DBTRACE) {
@@ -1408,8 +1406,6 @@ bool var::readf(CVR filehandle, CVR key, const int fieldno) {
 
 bool var::readc(CVR filehandle, CVR key) {
 
-	Timer t(246);//readc
-
 	THISIS("bool var::readc(CVR filehandle,CVR key)")
 	assertDefined(function_sig);
 	//ISSTRING(filehandle)
@@ -1451,7 +1447,8 @@ bool var::readc(CVR filehandle, CVR key) {
 	}
 	//TRACE("cache miss" ^ key);
 
-	Timer t2(247);//readc cache_miss
+	//Timer t2(247);//readc cache_miss
+	Timer timer1(get_timeacno("bool var::reado cache_miss"));
 
 	// Ordinary read from the database
 	bool result = this->read(filehandle, key);
@@ -1512,8 +1509,6 @@ bool var::deletec(CVR key) const {
 }
 
 bool var::read(CVR filehandle, CVR key) {
-
-	Timer t(248);//read
 
 	THISIS("bool var::read(CVR filehandle,CVR key)")
 	assertDefined(function_sig);
@@ -1898,8 +1893,6 @@ bool var::sqlexec(CVR sql) const {
 
 // returns success or failure, and response = data or errmsg (response can be preset to max number of tuples)
 bool var::sqlexec(CVR sqlcmd, VARREF response) const {
-
-	Timer t(250);//sqlexec
 
 	THISIS("bool var::sqlexec(CVR sqlcmd, VARREF response) const")
 	ISSTRING(sqlcmd)
@@ -2309,8 +2302,6 @@ void var::cleardbcache() const {
 
 bool var::begintrans() const {
 
-	Timer t(252);//begintrans
-
 	THISIS("bool var::begintrans() const")
 	assertDefined(function_sig);
 
@@ -2337,8 +2328,6 @@ bool var::begintrans() const {
 
 bool var::rollbacktrans() const {
 
-	Timer t(254);//rollbacktrans
-
 	THISIS("bool var::rollbacktrans() const")
 	assertDefined(function_sig);
 
@@ -2361,8 +2350,6 @@ bool var::rollbacktrans() const {
 }
 
 bool var::committrans() const {
-
-	Timer t(256);//committrane
 
 	THISIS("bool var::committrans() const")
 	assertDefined(function_sig);
@@ -2387,8 +2374,6 @@ bool var::committrans() const {
 }
 
 bool var::statustrans() const {
-
-	Timer t(258);//statustrans
 
 	THISIS("bool var::statustrans() const")
 	assertDefined(function_sig);
@@ -2475,8 +2460,6 @@ bool var::dbdelete(CVR dbname) const {
 }
 
 bool var::createfile(CVR filename) const {
-
-	Timer t(260);//createfile
 
 	THISIS("bool var::createfile(CVR filename)")
 	assertDefined(function_sig);
@@ -2611,8 +2594,6 @@ bool var::clearfile(CVR filename) const {
 }
 
 static var get_dictexpression(CVR cursor, CVR mainfilename, CVR filename, CVR dictfilename, CVR dictfile, CVR fieldname0, VARREF joins, VARREF unnests, VARREF selects, bool& ismv, bool& isdatetime, bool forsort) {
-
-	Timer t(262);//get_dictexpression
 
 	//cursor is required to join any calculated fields in any second pass
 
@@ -3372,8 +3353,6 @@ static var getword(VARREF remainingwords, VARREF ucword) {
 //}
 
 bool var::select(CVR sortselectclause) {
-
-	Timer t(264);//select
 
 	THISIS("bool var::select(CVR sortselectclause) const")
 	//?allow undefined usage like var xyz=xyz.select();
@@ -4878,8 +4857,6 @@ static bool readnextx(CVR cursor, PGconn* pgconn, int  direction, PGresult*& pgr
 
 bool var::deletelist(CVR listname) const {
 
-	Timer t(226);//deletelist
-
 	THISIS("bool var::deletelist(CVR listname) const")
 	//?allow undefined usage like var xyz=xyz.select();
 	assertDefined(function_sig);
@@ -4910,8 +4887,6 @@ bool var::deletelist(CVR listname) const {
 }
 
 bool var::savelist(CVR listname) {
-
-	Timer t(228);//savelist
 
 	THISIS("bool var::savelist(CVR listname)")
 	//?allow undefined usage like var xyz=xyz.select();
@@ -4997,8 +4972,6 @@ bool var::savelist(CVR listname) {
 
 bool var::getlist(CVR listname) {
 
-	Timer t(230);//getlist
-
 	THISIS("bool var::getlist(CVR listname) const")
 	//?allow undefined usage like var xyz=xyz.select();
 	assertDefined(function_sig);
@@ -5047,8 +5020,6 @@ bool var::getlist(CVR listname) {
 //TODO make it work for multiple keys or select list
 bool var::formlist(CVR keys, CVR fieldno) {
 
-	Timer t(232);//formlist
-
 	THISIS("bool var::formlist(CVR keys, CVR fieldno)")
 	//?allow undefined usage like var xyz=xyz.select();
 	assertString(function_sig);
@@ -5082,8 +5053,6 @@ bool var::formlist(CVR keys, CVR fieldno) {
 // SELECT statement Making a list can be done simply by writing the keys into the list file without
 // using this function
 bool var::makelist(CVR listname, CVR keys) {
-
-	Timer t(234);//makelist
 
 	THISIS("bool var::makelist(CVR listname)")
 	//?allow undefined usage like var xyz=xyz.select();
@@ -5135,12 +5104,10 @@ bool var::makelist(CVR listname, CVR keys) {
 //bool var::hasnext() const {
 bool var::hasnext() {
 
-	Timer t(236);//hasnext
-
 	// var xx;
 	// return this->readnext(xx);
 
-	// THISIS("bool var::hasnext() const")
+	THISIS("bool var::hasnext() const")
 	// assertString(function_sig);
 
 	// default cursor is ""
@@ -5248,8 +5215,6 @@ bool var::readnext(VARREF key, VARREF valueno) {
 }
 
 bool var::readnext(VARREF record, VARREF key, VARREF valueno) {
-
-	Timer t(238);//readnext
 
 	//?allow undefined usage like var xyz=xyz.readnext();
 	if (var_typ & VARTYP_MASK || !var_typ) {
@@ -5591,8 +5556,6 @@ var var::dblist() const {
 //TODO avoid round trip to server to check this somehow or avoid calling it all the time
 bool var::cursorexists() {
 
-	Timer t(240);//cursorexists
-
 	THISIS("bool var::cursorexists()")
 	// could allow undefined usage since *this isnt used?
 	assertDefined(function_sig);
@@ -5728,9 +5691,7 @@ var var::reccount(CVR filename0) const {
 
 var var::flushindex(CVR filename) const {
 
-	THISIS(
-		"var var::flushindex(CVR filename="
-		") const")
+	THISIS("var var::flushindex(CVR filename=) const")
 	// could allow undefined usage since *this isnt used?
 	assertDefined(function_sig);
 	ISSTRING(filename)
