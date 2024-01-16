@@ -88,7 +88,7 @@ set -euxo pipefail
 : Optionally compare the restored test database with the backed up live db
 : ========================================================================
 :
-	DBCOMP_FAILED=
+	DBCOMP_DIFF_FOUND=0
 	if [[  $OPTIONS =~ "V" ]]; then
 
 		if dbcomp $LIVE_EXO_DATA $TEST_EXO_DATA {S}; then
@@ -111,7 +111,7 @@ set -euxo pipefail
             : =================================
             :
 				# Dont exit 1 yet, in case dbdelete or service restart is required
-				DBCOMP_FAILED=1
+				DBCOMP_DIFF_FOUND=1
 		fi
 	fi
 
@@ -136,7 +136,7 @@ set -euxo pipefail
 : Check for dbcomp failure
 : ========================
 :
-	if [ "$DBCOMP_FAILED" ]; then
+	if [ $DBCOMP_DIFF_FOUND ]; then
 		:
 		: Finished backup_db $1 in $(($SECONDS / 60)) minutes and $(($SECONDS % 60)) seconds.
 		: ======================================================
