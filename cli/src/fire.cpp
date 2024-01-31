@@ -41,6 +41,14 @@ function main() {
 			continue;
 		}
 
+		// Ignore .swp files else ::regex_replace throws
+		// "Invalid data or replacement during regex replace of "aaa" with "bbb"."
+		// "Invalid UTF-8 sequence encountered while trying to encode UTF-32 character"
+		if (osfilename.ends(".swp")) {
+			logputl("Skipping " ^ osfilename);
+			continue;
+		}
+
 		let origrec = RECORD;
 
 		//RECORD.regex_replacer(R"___(\tcall fsmsg\(\);\n\t+stop\(\);)___", R"___(\tabort\(lasterror\);)___", "s");
