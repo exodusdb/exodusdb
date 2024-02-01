@@ -127,7 +127,11 @@ set -euxo pipefail
 :
 	if [[ -n $PG_VER ]]; then
 		PG_PORT=`grep '^\s*port\s*=\s*\([0-9]\)*' /etc/postgresql/$PG_VER/main/postgresql.conf|grep [0-9]* -o || true`
-		PSQL_PORT_OPT=-p$PG_PORT
+		#PSQL_PORT_OPT=-p$PG_PORT
+		PSQL_PORT_OPT=''
+		if [ "$PG_PORT" ]; then
+			PSQL_PORT_OPT="-p $PG_PORT"
+		fi
 : For exodus programs like dict2sql and testsort
 		export EXO_PORT=$PG_PORT
 	else
@@ -145,6 +149,13 @@ function get_dependencies_for_build {
 : Postgresql package
 : ------------------
 :
+	#Uninstall postgresql-server-dev-all for old existing installations
+	#otherwise all postgres versions are installed and pg_config outputs latest version
+	#details instead of the specified PG_VER failing pgexodus testing
+	#Specified PG_VER for postgresql-server-dev-NN installed later in this stage
+	# 1/49 Test  #1: pgexodus_test ....................***Failed    0.08 sec
+	#  grep: /etc/postgresql/16/main/postgresql.conf: No such file or directory
+	apt remove -y 'postgresql-server-dev-all' && apt -y autoremove || true
 	sudo apt install -y postgresql-common
 :
 : pgexodus and fmt submodules
