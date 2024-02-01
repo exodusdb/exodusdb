@@ -76,8 +76,8 @@ set -euxo pipefail
 : Create the target database as empty
 : ===================================
 :
-	#sudo -u postgres createdb --owner exodus --template template1 $TEST_EXO_DATA
-	sudo -u postgres createdb --owner exodus --template template0 $TEST_EXO_DATA
+	sudo -u postgres createdb --owner exodus --template template1 $TEST_EXO_DATA
+	#sudo -u postgres createdb --owner exodus --template template0 $TEST_EXO_DATA
 
 :
 : Restore into the target database
