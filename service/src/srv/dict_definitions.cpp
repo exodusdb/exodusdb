@@ -1,5 +1,27 @@
 #include <exodus/library.h>
 
+
+libraryinit(chequedesign_account_name)
+//------------------------------------
+function main() {
+	// @ans=xlate('ACCOUNTS',field(@id,'*',2),1,'X')
+	return ID.field("*", 2).xlate("ACCOUNTS", 1, "X");
+}
+libraryexit(chequedesign_account_name)
+
+
+libraryinit(chequedesign_is_default)
+//----------------------------------
+function main() {
+	ANS = RECORD.f(14);
+	if (ANS) {
+		ANS = "Default";
+	}
+	return ANS;
+}
+libraryexit(chequedesign_is_default)
+
+
 libraryinit(email_address)
 //------------------------
 function main() {
