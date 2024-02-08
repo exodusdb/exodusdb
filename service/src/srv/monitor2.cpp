@@ -604,7 +604,10 @@ nextprocess:
 													   "before 00:00 midnight tonight.";
 										}
 										printl(body);
-										body.replacer(FM, chr(13));
+										//body.replacer(FM, chr(13));
+										// chr(13) no longer compatible with Postfix 3.6.4-1ubuntu1.2
+										// sendmail.cpp converts FM to newline
+
 										call sendmail(toaddresses, "", subject, body, "", "");
 									}
 								}

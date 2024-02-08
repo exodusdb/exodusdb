@@ -660,7 +660,9 @@ nextsign:
 
 			subject.replacer("%RESULT%", "");
 		}
-		body.replacer(_FM, chr(13));
+		//body.replacer(_FM, chr(13));
+		// chr(13) no longer compatible with Postfix 3.6.4-1ubuntu1.2
+		// sendmail.cpp converts FM to newline
 
 		// Option to force the actual email recipient
 		let system117 = SYSTEM.f(117);

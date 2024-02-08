@@ -793,7 +793,11 @@ function main(in mode) {
 					body.replacer("%EMAIL%", toaddress);
 					body.replacer("%GROUP%", newusers.f(ii, 4));
 					body.replacer("%DATABASE%", SYSTEM.f(14, 1) ^ " (" ^ SYSTEM.f(17, 1) ^ ")");
-					body.replacer(VM, chr(13));
+
+					//body.replacer(VM, chr(13));
+					// chr(13) no longer compatible with Postfix 3.6.4-1ubuntu1.2
+					// sendmail.cpp converts FM to newline
+					body.replacer(VM, FM);
 
 					var dummy;
 					var dummy2;

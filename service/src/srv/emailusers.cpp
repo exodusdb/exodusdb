@@ -64,7 +64,11 @@ function main(in /*mode0*/, in subject0, in body0, in groupids0, in /*jobids0*/,
 		body ^= VM ^ "Please email SUPPORT@EXODUS.COM for any assistance.";
 		// body:=vm
 		// body:=vm:'This is an automated email. You cannot reply to it.'
-		body.converter(VM, chr(13));
+
+		//body.converter(VM, chr(13));
+		// chr(13) no longer compatible with Postfix 3.6.4-1ubuntu1.2
+		// sendmail.cpp converts FM to newline
+		body.converter(VM, FM);
 
 		// call emailusers(mode,subject,body,'','','','R',emaillog)
 		// no more replyto support@neosys.com because no longer needed
@@ -79,7 +83,12 @@ function main(in /*mode0*/, in subject0, in body0, in groupids0, in /*jobids0*/,
 			emaillog = "(nobody)";
 		}
 		emaillog = "Upgrade Notification emailed to:" ^ VM ^ emaillog;
-		emaillog.replacer(VM, chr(13));
+
+		//emaillog.replacer(VM, chr(13));
+		// chr(13) no longer compatible with Postfix 3.6.4-1ubuntu1.2
+		// sendmail.cpp converts FM to newline
+		emaillog.replacer(VM, FM);
+
 		call sysmsg(emaillog, "Upgrade to version " ^ version);
 
 		stop();
@@ -115,7 +124,11 @@ function main(in /*mode0*/, in subject0, in body0, in groupids0, in /*jobids0*/,
 	let nusers		   = usercodes.fcount(VM);
 	emaillog		   = "";
 	var alreadyemailed = "";
-	body.converter(FM ^ VM, chr(13) ^ chr(13));
+
+	//body.converter(FM ^ VM, chr(13) ^ chr(13));
+	// chr(13) no longer compatible with Postfix 3.6.4-1ubuntu1.2
+	// sendmail.cpp converts FM to newline
+	body.converter(VM, FM);
 
 	var groupids = groupids0;
 	groupids.converter(",", VM);
@@ -258,7 +271,12 @@ function main(in /*mode0*/, in subject0, in body0, in groupids0, in /*jobids0*/,
 	if (nsent and replyto) {
 		toemails = replyto;
 		body ^= VM ^ VM ^ "-- Sent to --" ^ emaillog;
-		body.replacer(VM, chr(13));
+
+		//body.replacer(VM, chr(13));
+		// chr(13) no longer compatible with Postfix 3.6.4-1ubuntu1.2
+		// sendmail.cpp converts FM to newline
+		body.replacer(VM, FM);
+
 		gosub sendemails(emaillog);
 	}
 
