@@ -151,6 +151,11 @@ function main(in mode0, out letterhead_out, in compcode0 = "", in qr_text0 = "")
 	// QR code (requires apt install qrencode)
 	if (letterhead.contains("%QR%")) {
 
+		// Check qrencoder installed
+		if (not osshell("which qrencode > /dev/null")) {
+			call mssg("qrencode not installed!");
+		}
+
 		var svg = "";
 		if (qr_text) {
 
@@ -285,7 +290,9 @@ subroutine getcompanyconfig(out letterhead, io mode) {
 
 	// start a one row 100% width table to aid formatting
 	if (usetable) {
-		tab(-1) = "<table width=100% cellspacing=0 cellpadding=0 borderpadding=0";
+		//tab(-1) = "<table width=100% cellspacing=0 cellpadding=0 borderpadding=0";
+		// id="letterhead" used in xmlinvs.cpp/submitxml()
+		tab(-1) = "<table id=\"letterhead\" width=100% cellspacing=0 cellpadding=0 borderpadding=0";
 		tab ^= " style=\"border-collapse:collapse\"";
 		tab ^= ">";
 		tab(-1) = " <tr>";
