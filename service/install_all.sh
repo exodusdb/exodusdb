@@ -44,7 +44,7 @@ set -euxo pipefail
 : Disable default web sites
 : =========================
 :
-	sudo a2dissite 000-default default-ssl.conf
+	sudo a2dissite 000-default default-ssl.conf || true
 
 :
 : Compile the service
