@@ -2,211 +2,225 @@
 <html lang="en">
 
 <head>
-    <title>EXODUS Login</title>
+	<title>EXODUS Login</title>
 
-    <script type="text/javascript">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        var EXODUSlocation = 'exodus/'
-        var glogin = true
-        var gshowmenu = false
-        var gswitchingbrowser = false
+	<style>
+		/*entire form including left form side and right image side*/
+		.loginform {
+		    display: flex;
+			flex-direction: row;
+			margin: auto;
+		    width: 100%;
+		    max-width: 800px;
+		    border-radius: 0.5rem;
+		    box-shadow: 0 0 30px rgba(0,0,0,0.1);
+		    overflow: hidden;
+		}
 
-        //1. following code will, in exodus/3, switch to exodus (exodus/2 in future) if the browser doesnt support yield - eg MSIE
-        //2. note that client.js in exodus2 will switch to exodus/3 if showmodaldialog is not supported (and yield is supported)
-        // yield //var guseyield=false //activated in exodus/2 - code doesnt use yield
-        /* yield */var guseyield = true  //activated in exodus/3 - code has yield
-        if (guseyield) {
+		/*usercode, password, database*/
+		.loginfield {
+		    width: 100%;
+		    padding: 10px;
+		    margin: auto;
+		    box-sizing: border-box;
+		    border: 1px solid #ccc;
+			border-radius: 0.5rem
+			/*text-transform: uppercase*/
+			/*should not transform database field*/
+		}
 
-            //determine if yield * supported by browser
-            var gcan_yield
-            try { eval('function * f(x){return yield * true;}'); gcan_yield = true } catch (e) { gcan_yield = false }
+		.loginbutton
+		{
+			/*applies only to login page*/
+			color: white;
+			background-color: #b28d4f;
+			padding: 0.5rem;
+			font-size: 12px;
+			width: 100%;
+			margin: auto;
+			border: none;
+			border-radius: 1.5rem;
+			box-sizing: border-box;
+		}
 
-            //cannot continue in non-yielding code if browser does not support showmodaldialog
-            //if (!window.showModalDialog && !guseyield) {
-            if (!gcan_yield) {
-                gswitchingbrowser = true
-                if (window.showModalDialog) {
-                    var oldurl = window.location.toString()
-                    window.location = oldurl.replace(/\/3\//, '/2/')
-                }
-            }
+	</style>
 
-        }
 
-        //dont include exodus/3 yielding code with function * or yield * until we know the browser can handler them
-        //because the browser will fail and anyway, we are switching to a different url that doesnt require yielding browser
-        if (!gswitchingbrowser) {
-            document.writeln('<scr' + 'ipt type="text/javascript" src="' + EXODUSlocation + 'scripts/client.js"></scr' + 'ipt>')
-            document.writeln('<scr' + 'ipt type="text/javascript" src="' + EXODUSlocation + 'scripts/login.js"></scr' + 'ipt>')
-        }
+	<script type="text/javascript">
 
-    </script>
+		var EXODUSlocation = 'exodus/'
+		var glogin = true
+		var gshowmenu = false
+		var gswitchingbrowser = false
+
+		//1. following code will, in exodus/3, switch to exodus (exodus/2 in future) if the browser doesnt support yield - eg MSIE
+		//2. note that client.js in exodus2 will switch to exodus/3 if showmodaldialog is not supported (and yield is supported)
+		// yield //var guseyield=false //activated in exodus/2 - code doesnt use yield
+		/* yield */var guseyield = true  //activated in exodus/3 - code has yield
+		if (guseyield) {
+
+			//determine if yield * supported by browser
+			var gcan_yield
+			try { eval('function * f(x){return yield * true;}'); gcan_yield = true } catch (e) { gcan_yield = false }
+
+			//cannot continue in non-yielding code if browser does not support showmodaldialog
+			//if (!window.showModalDialog && !guseyield) {
+			if (!gcan_yield) {
+				gswitchingbrowser = true
+				if (window.showModalDialog) {
+					var oldurl = window.location.toString()
+					window.location = oldurl.replace(/\/3\//, '/2/')
+				}
+			}
+
+		}
+
+		//dont include exodus/3 yielding code with function * or yield * until we know the browser can handler them
+		//because the browser will fail and anyway, we are switching to a different url that doesnt require yielding browser
+		if (!gswitchingbrowser) {
+			document.writeln('<scr' + 'ipt type="text/javascript" src="' + EXODUSlocation + 'scripts/client.js"></scr' + 'ipt>')
+			document.writeln('<scr' + 'ipt type="text/javascript" src="' + EXODUSlocation + 'scripts/login.js"></scr' + 'ipt>')
+		}
+
+<!--		To ensure the focus moves from Login button to Usercode field-->
+		window.addEventListener('DOMContentLoaded', (event) => {
+		    var loginButton = document.getElementById('loginbutton');
+		    var userCodeField = document.getElementById('usernameelement');
+
+		    loginButton.addEventListener('keydown', function(event) {
+		        if (event.key === 'Tab' && !event.shiftKey && !event.ctrlKey && !event.altKey && !event.metaKey) {
+		            event.preventDefault(); // Prevent default tabbing behavior
+		            userCodeField.focus(); // Focus the user code field
+		        }
+		    });
+		});
+
+	</script>
 
 </head>
 
-<body>
-    <div>
-        <div id="logindiv" style="display: none">
-            <table>
-                <tr>
-                    <td style="vertical-align: middle" rowspan="4">
-                        <span style="white-space: nowrap;margin-right:10px">
-                            <img alt="EXODUS" src="../exodus/images/theme2/exodusm.png" />
-                        </span>
-                    </td>
-                    <td>
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>
-                                        <b>User Code:</b>
-                                    </th>
-                                    <th>
-                                        <b>Password:</b>
-                                    </th>
-                                    <th>
-                                    </th>
-                                    <th style="padding-right:2rem">
-                                        <b>Autologin</b>
-                                    </th>
-                                    <th>
-                                        <b>Password</b>
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td style="padding-right:1rem">
-                                        <input tabindex="1" style="text-transform: uppercase;" id="usernameelement"
-                                            class="clsRequired" size="15" />
-                                    </td>
-                                    <td style="padding-right:1rem">
-                                        <input tabindex="1" type="password" id="passwordelement" class="clsRequired"
-                                            size="15" />
-                                    </td>
-                                    <td style="white-space: nowrap;padding-right:1rem">
-                                        <button tabindex="1" id="loginbutton" type="submit" class="exodusbutton" title="Press F9 or Ctrl+Enter">
-                                            Login</button>
-                                    </td>
-                                    <td style="padding-right:1rem;text-align: center;">
-                                        <input type="checkbox" tabindex="1" id="autologinelement" />
-                                    </td>
-                                    <td>
-                                        <button tabindex="1" id="passwordresetbutton" class="exodusbutton">
-                                            Reset</button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th>
-                                    </th>
-                                    <th>
-                                        <button tabindex="1" id="showpasswordelement" onclick="showpassword_sync()"
-                                            class="exodusbutton">
-                                            Show Password</button>
-                                    </th>
-                                    <th>
-                                    </th>
-                                    <th>
-                                    </th>
-                                    <th>
-                                    </th>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        &nbsp;
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="3" style="vertical-align: top">
-                        <b>Database:</b>
-                        <br />
-                        <select id="datasetelement" class="clsRequired">
-                        </select>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="6">
-                        <br />
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        &nbsp;
-                    </td>
-                    <td colspan="4">
-                        <span style="white-space: nowrap">Version 2022-06-15 Copyright NEOSYS All rights
-                            reserved.</span>
-                    </td>
-                </tr>
-            </table>
-        </div>
-        <!-- copy this to wrongbrowser.htm and top level redirecing default.htm as well -->
-        <div style="text-align: center" id="wrongconfiguration">
-            <div align="center">
-                <table cellpadding="5" cellspacing="0" style="background-color: #f5fffa">
-                    <tr style="vertical-align: top; background-color: #b0e0e6">
-                        <th>
-                            EXODUS requires
-                        </th>
-                        <th>
-                            You have
-                        </th>
-                    </tr>
-                    <tr style="vertical-align: top">
-                        <td>
-                            1. MS Edge<br />
-                            &nbsp;or Safari<br />
-                            &nbsp;or Firefox<br />
-                            &nbsp;or Chrome<br />
-                        </td>
-                        <td>
 
-                            <script
-                                type="text/javascript">                                document.writeln(navigator.appName)</script>
+<body style="background: #ecefee;">
 
-                            <br />
+	<!--div holds position of full login box-->
+	<div style="display: flex; justify-content: center; align-items: center; height: 100vh;">
+		<!--div holds properties/styles related to full login box-->
+	    <div id="logindiv" class="loginform" style="border-style: hidden; width: 80%; display: flex; border: 1px solid #ccc; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
 
-                            <script
-                                type="text/javascript">                                document.writeln(navigator.userAgent)</script>
+			<div style="background-color: #f1eee0; width: 30%; padding: 1.5rem; display: flex; flex-direction: column; justify-content: center; border-radius: 8px 0 0 8px">
+	            <div style="text-align: center; padding-top: 1rem; padding-bottom: 2rem; margin: auto;">
+					<img alt="EXODUS" src="../exodus/images/theme2/exoduslogo.png" style="height: 80px; width: 100px" />
+	            </div>
 
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            2. Scripting enabled
-                        </td>
-                        <td>
-                            <noscript>
-                                <span style="color: Red"><b>Scripting disabled</b></span></noscript>
+	            <div style="margin-bottom: 1rem;">
+					<input tabindex="1" id="usernameelement" class="loginfield" placeholder="USERCODE" style="text-transform: uppercase;" />
+	            </div>
 
-                            <script
-                                type="text/javascript">                                document.write('Scripting enabled')</script>
+				<!--button behavior set in login.js				-->
+	            <div style="margin-bottom: 1rem; position: relative; display: flex; align-items: center;">
+	                <input tabindex="2" type="password" id="passwordelement" class="loginfield" placeholder="PASSWORD" style="padding-right: 40px; text-transform: uppercase;">
+					<button id="togglePassword" class="toggle-password" onclick="showpassword_sync()" title="Hide/Show Password" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; padding: 0; outline: none;">
+					    <img src="../exodus/images/theme2/eye.png" style="height: 10px; width: 15px;">
+					</button>
+	            </div>
 
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            3. Cookies enabled
-                        </td>
-                        <td>
-                            <noscript>
-                                <span style="color: Red"><b>Unknown</b></span></noscript>
+	            <div style="margin-bottom: 1rem;">
+	                <select tabindex="3" id="datasetelement" class="loginfield">
+	                </select>
+	            </div>
 
-                            <script
-                                type="text/javascript">                                document.writeln((!window.dialogArguments && navigator.cookieEnabled) ? 'Cookies enabled' : '<font color="red"><B>Cookies disabled</B></font>')</script>
+	            <div style="margin-bottom: 1rem; text-align: right; padding-top: 1rem;">
+	                <button id="loginbutton" type="submit" class="loginbutton";">
+	                    <b>Login</b>
+	                </button>
+	            </div>
 
-                        </td>
-                    </tr>
-                </table>
-            </div>
-        </div>
-        <div style="display: none; text-align: center" id="waitdivelement" class="waiting">
-            Please wait ...</div>
-    </div>
+	            <div style="display: flex; justify-content: space-between; align-items: center;">
+	                <div>
+	                    <input type="checkbox" id="autologinelement" />
+	                    <label for="autologinelement">Remember me</label>
+	                </div>
+	                <a id="passwordresetlink" style="text-decoration: underline; color: black; cursor: pointer;">
+	                    Reset Password
+	                </a>
+	            </div>
+			</div>
+
+	        <!-- Right side with the image -->
+	        <div style="width: 70%; padding-right: 15px; padding-bottom: 15px; background-color: #f1eee0; display: flex; align-items: center; justify-content: center;">
+	            <div style="width: 100%; height: 100%; background-image: url('../exodus/images/theme2/login.jpg'); background-size: cover; background-position: center;"></div>
+	        </div>
+
+	    </div>
+	</div>
+
+	<!-- copy this to wrongbrowser.htm and top level redirecing default.htm as well -->
+	<div style="text-align: center" id="wrongconfiguration">
+		<div align="center">
+			<table cellpadding="5" cellspacing="0" style="background-color: #f5fffa">
+				<tr style="vertical-align: top; background-color: #b0e0e6">
+					<th>
+						EXODUS requires
+					</th>
+					<th>
+					You have
+					</th>
+				</tr>
+				<tr style="vertical-align: top">
+					<td>
+						1. MS Edge<br />
+						&nbsp;or Safari<br />
+						&nbsp;or Firefox<br />
+						&nbsp;or Chrome<br />
+					</td>
+					<td>
+						<script
+							type="text/javascript">                                document.writeln(navigator.appName)</script>
+						<br />
+
+						<script
+							type="text/javascript">                                document.writeln(navigator.userAgent)</script>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						2. Scripting enabled
+					</td>
+					<td>
+						<noscript>
+							<span style="color: Red"><b>Scripting disabled</b></span></noscript>
+
+					<script
+							type="text/javascript">                                document.write('Scripting enabled')</script>
+
+					</td>
+				</tr>
+				<tr>
+					<td>
+						3. Cookies enabled
+					</td>
+					<td>
+						<noscript>
+							<span style="color: Red"><b>Unknown</b></span></noscript>
+						<script
+							type="text/javascript">                                document.writeln((!window.dialogArguments && navigator.cookieEnabled) ? 'Cookies enabled' : '<font color="red"><B>Cookies disabled</B></font>')</script>
+
+					</td>
+				</tr>
+			</table>
+		</div>
+	</div>
+	<div style="display: none; text-align: center" id="waitdivelement" class="waiting">
+		Please wait ...</div>
+	</div>
 </body>
+
+<footer style="position: absolute; bottom: 0; right: 0; padding: 0.1rem; text-align: right; z-index: -1;">
+	<span>Version 2022-06-15 Copyright © NEOSYS All rights reserved.</span>
+</footer>
+
 
 </html>

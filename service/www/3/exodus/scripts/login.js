@@ -2,7 +2,8 @@ var gusername_element
 var gpassword_element
 var gdataset_element
 var gautologin_element
-var gpasswordreset_button
+//var gpasswordreset_button
+var gpasswordreset_link
 var glogin_button
 var gisdialog
 
@@ -39,7 +40,8 @@ function* formfunctions_onload() {
     gpassword_element = $$('passwordelement')
     gdataset_element = $$('datasetelement')
     gautologin_element = $$('autologinelement')
-    gpasswordreset_button = $$('passwordresetbutton')
+    //gpasswordreset_button = $$('passwordresetbutton')
+    gpasswordreset_link = $$('passwordresetlink')
     glogin_button = $$('loginbutton')
     gwaitdiv = $$('waitdivelement')
 
@@ -48,7 +50,8 @@ function* formfunctions_onload() {
 
     addeventlistener(glogin_button,'click','login_onclick')
     addeventlistener(gautologin_element,'click','autologin_onclick')
-    addeventlistener(gpasswordreset_button,'click','passwordreset_onclick')
+    //addeventlistener(gpasswordreset_button,'click','passwordreset_onclick')
+    addeventlistener(gpasswordreset_link,'click','passwordreset_onclick')
     var datasetx
 
     //fix a bug in mac ie5 where input fields are not selectable in modaldialogs
@@ -356,7 +359,8 @@ function* login_onclick() {
                 var choice=yield* exodusinvalid(db.response.split('|').join('\n'))
             }
             if (choice == 2) {
-                exodussettimeout('gpasswordreset_button.click()',100)
+                //exodussettimeout('gpasswordreset_button.click()',100)
+                exodussettimeout('gpasswordreset_link.click()',100)
             } else {
                 gpassword_element.focus()
                 gpassword_element.select()
@@ -381,31 +385,49 @@ function* hidepassword(chainexpression) {
 
 var gsavedpasswordelement
 function showpassword_sync() {
-    var currpasswordelement=$$('passwordelement')
-    var showpasswordelement=$$('showpasswordelement')
-    if (gsavedpasswordelement){
-        currpasswordelement.id='visiblepasswordelement'
-        gsavedpasswordelement.id='passwordelement'
-        gsavedpasswordelement.value=currpasswordelement.value
-        currpasswordelement.parentNode.insertBefore(gsavedpasswordelement,currpasswordelement)
-        currpasswordelement.parentNode.removeChild(currpasswordelement)
-        gsavedpasswordelement=null
-        showpasswordelement.innerText='Show Password'
-        return true
-    } else {
-        gsavedpasswordelement=currpasswordelement
-        //<input tabindex="1" type="password" id="passwordelement" size="15" />
-        var el=document.createElement('input')
-        el.classList=gsavedpasswordelement.classList
-        el.id='passwordelement'
-        el.size=gsavedpasswordelement.size
-        el.tabIndex=gsavedpasswordelement.tabIndex
-        el.value=gsavedpasswordelement.value
-        el.style.textTransform='uppercase'
-        currpasswordelement.parentNode.insertBefore(el,currpasswordelement)
-        gsavedpasswordelement.parentNode.removeChild(gsavedpasswordelement)
-        showpasswordelement.innerText='Hide Password'
-        return false
-    }
+	var currpasswordelement=$$('passwordelement')
+	var togglePasswordBtn=$$('togglePassword');
+	var showpasswordelement = togglePasswordBtn.getElementsByTagName('img')[0];
+	//var showpasswordelement=$$('showpasswordelement')
+	if (gsavedpasswordelement){
+		// hide password
+		currpasswordelement.id='visiblepasswordelement'
+		gsavedpasswordelement.id='passwordelement'
+		gsavedpasswordelement.value=currpasswordelement.value
+
+		currpasswordelement.parentNode.insertBefore(gsavedpasswordelement,currpasswordelement)
+		currpasswordelement.parentNode.removeChild(currpasswordelement)
+		gsavedpasswordelement=null
+		showpasswordelement.src = '../exodus/images/theme2/eye.png';
+		return true
+
+	} else {
+
+		// show password
+		gsavedpasswordelement=currpasswordelement
+		// get attributes from the parent
+		var parent = gsavedpasswordelement.parentNode;
+		var el=document.createElement('input')
+		el.classList=gsavedpasswordelement.classList
+		el.id='passwordelement'
+		//el.size=gsavedpasswordelement.size
+		//el.setAttribute('size', gsavedpasswordelement.getAttribute('size'));
+		el.tabIndex=gsavedpasswordelement.tabIndex
+		el.value=gsavedpasswordelement.value
+		el.style.textTransform='uppercase'
+		// apply parent's width and height to the new element, adjusted for any padding or borders
+		var computedStyle = window.getComputedStyle(parent);
+		el.style.width = computedStyle.width;
+		el.style.height = computedStyle.height;
+		el.style.boxSizing = 'border-box';
+		// padding so password does not overlap eye icon, similar padding for show password done in index.html
+		el.style.paddingRight = '25px';
+
+		//currpasswordelement.parentNode.insertBefore(el,currpasswordelement)
+		parent.insertBefore(el, gsavedpasswordelement);
+		//gsavedpasswordelement.parentNode.removeChild(gsavedpasswordelement)
+		parent.removeChild(gsavedpasswordelement);
+		showpasswordelement.src = '../exodus/images/theme2/eye-slash.png';
+		return false
+	}
 }
-                    
