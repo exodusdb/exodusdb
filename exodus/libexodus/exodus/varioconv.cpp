@@ -994,7 +994,8 @@ var var::oconv(const char* conversion_in) const {
 
 				// Empty conversion string - no conversion
 				case '\0':
-					break;
+					return (*this);
+					//break;
 
 				default:
 					throw VarNotImplemented("oconv " ^ var(conversion).first(64).quote() ^ " not implemented yet ");
