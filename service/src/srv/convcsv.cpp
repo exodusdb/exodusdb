@@ -14,8 +14,8 @@ var sentencex;
 var selectx;
 var nfilters0;
 //var nfilters;  // num
-var filterfields;
-var filtervalues;
+//var filterfields;
+//var filtervalues;
 dim filters;
 var temp;  // num
 var ptr;   // num
@@ -62,10 +62,11 @@ function main(in sentence0, in select0 = "", in filters0 = "") {
 		selectx = select0;
 	}
 
-	let nfilters = nfilters0.default_from("").fcount(FM);
+	//let nfilters = nfilters0.default_from("").fcount(FM);
+	let nfilters = nfilters0.f(1).fcount(FM);
 	if (nfilters) {
-		filterfields = filters0.f(1);
-		filtervalues = filters0.f(3);
+		let filterfields = filters0.f(1);
+		let filtervalues = filters0.f(3);
 		filters.redim(3, nfilters);
 		for (const var filtern : range(1, nfilters)) {
 			filters(1, filtern) = filterfields.f(1, filtern).convert(SM, VM);
