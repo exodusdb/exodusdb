@@ -63,7 +63,7 @@ function main(in sentence0, in select0 = "", in filters0 = "") {
 	}
 
 	//let nfilters = nfilters0.default_from("").fcount(FM);
-	let nfilters = nfilters0.f(1).fcount(FM);
+	let nfilters = filters0.f(1).fcount(FM);
 	if (nfilters) {
 		let filterfields = filters0.f(1);
 		let filtervalues = filters0.f(3);
