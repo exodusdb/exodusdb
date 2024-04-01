@@ -146,6 +146,55 @@ programinit()
 	    assert(oconv("5x00", "MD2") eq "5x00");
 	}
 
+	{
+		// Empty conversion string - no conversion
+
+		assert(var("").oconv("")                   eq var(""));
+
+		// INT +/-
+		assert(var(123).oconv("")                  eq var(123));
+		assert(var(1234567891234567).oconv("")     eq var(1234567891234567));
+		assert(var(-123).oconv("")                 eq var(-123));
+		assert(var(-1234567891234567).oconv("")    eq var(-1234567891234567));
+
+		// DBL +/-
+		assert(var(.456).oconv("")                 eq var(".456"));
+		assert(var(123.456).oconv("")              eq var("123.456"));
+		assert(var(123456789.123).oconv("")        eq var("123456789.123"));
+		assert(var(123456789.123456).oconv("")     eq var("123456789.123456"));
+		assert(var(1.23456789123456).oconv("")     eq var("1.23456789123456"));
+
+		assert(var(-.456).oconv("")                eq var(-.456));
+		assert(var(-123.456).oconv("")             eq var(-123.456));
+		assert(var(-123456789.123).oconv("")       eq var(-123456789.123));
+		assert(var(-123456789.123456).oconv("")    eq var(-123456789.123456));
+		assert(var(-1.23456789123456).oconv("")    eq var(-1.23456789123456));
+
+		// STR
+		assert(var("ABCDEF").oconv("")              eq var("ABCDEF"));
+		assert(var("  CD  ").oconv("")              eq var("  CD  "));
+		assert(var("      ").oconv("")              eq var("      "));
+
+		// STR INT +/-
+		assert(var("123").oconv("")                eq var("123"));
+		assert(var("1234567891234567").oconv("")   eq var("1234567891234567"));
+		assert(var("-123").oconv("")               eq var("-123"));
+		assert(var("-1234567891234567").oconv("")  eq var("-1234567891234567"));
+
+		// STR DBL +/-
+		assert(var(".456").oconv("")               eq var(".456"));
+		assert(var("123.456").oconv("")            eq var("123.456"));
+		assert(var("123456789.123").oconv("")      eq var("123456789.123"));
+		assert(var("123456789.123456").oconv("")   eq var("123456789.123456"));
+		assert(var("1.23456789123456").oconv("")   eq var("1.23456789123456"));
+
+		assert(var("-.456").oconv("")              eq var("-.456"));
+		assert(var("-123.456").oconv("")           eq var("-123.456"));
+		assert(var("-123456789.123").oconv("")     eq var("-123456789.123"));
+		assert(var("-123456789.123456").oconv("")  eq var("-123456789.123456"));
+		assert(var("-1.23456789123456").oconv("")  eq var("-1.23456789123456"));
+	}
+
 	printl(elapsedtimetext());
 	printl("Test passed");
 
