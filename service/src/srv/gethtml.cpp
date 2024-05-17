@@ -35,37 +35,54 @@ function main(in mode0, out letterhead_out, in compcode0 = "", in qr_text0 = "")
 	// or indirectly via included printtx.hpp
 	//
 
-	var mode;
-	if (mode0.assigned()) {
-		mode  = mode0;
-		modex = mode;
-	}
-
-	// returns source in MODE ie COMPANY or definitions file key
-
 	// TODO what about letterhead with vehicle logos?
 
 	// cant use global company info if not initialised in c++
 	hascompanies = SYSTEM.f(133);
 
-	compcode = "";
-	if (mode0.unassigned() or compcode0.unassigned()) {
-		if (hascompanies) {
-			compcode = srv.gcurrcompcode;
-		}
-	} else if (compcode0) {
-		compcode = compcode0;
-	} else {
-		if (hascompanies) {
-			compcode = srv.gcurrcompcode;
-		}
-	}
-
+	var mode;
 	var qr_text;
-	if (qr_text0.unassigned()) {
+	var performed = 0;
+
+	// detect if called via perform
+	// and avoid segfault on args without memory addr
+	if (SENTENCE.field(" ", 1).ucase() == "GETHTML") {
+
+		performed = 1;
+		mode = "";
+		compcode = "";
 		qr_text = "";
+
+		if (hascompanies) {
+			compcode = srv.gcurrcompcode;
+		}
+
 	} else {
-		qr_text = qr_text0;
+
+		if (mode0.assigned()) {
+			mode  = mode0;
+			modex = mode;
+		}
+		// returns source in MODE ie COMPANY or definitions file key
+
+		compcode = "";
+		if (mode0.unassigned() or compcode0.unassigned()) {
+			if (hascompanies) {
+				compcode = srv.gcurrcompcode;
+			}
+		} else if (compcode0) {
+			compcode = compcode0;
+		} else {
+			if (hascompanies) {
+				compcode = srv.gcurrcompcode;
+			}
+		}
+
+		if (qr_text0.unassigned()) {
+			qr_text = "";
+		} else {
+			qr_text = qr_text0;
+		}
 	}
 
 	letterheadcompany = "";
@@ -241,7 +258,8 @@ function main(in mode0, out letterhead_out, in compcode0 = "", in qr_text0 = "")
 	}
 
 	// Also return letterhead in ANS in case gethtml was performed, not called.
-	if (mode0.unassigned()) {
+	//if (mode0.unassigned()) {
+	if (performed) {
 		ANS = letterhead;
 		return ANS;
 	}
