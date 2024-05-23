@@ -76,7 +76,8 @@ returnzero:
 		// Provide a link to ip info instead of actually doing any investigation
 		text =
 			"http:/"
-			"/geoiplookup.net/ip/" ^
+//			"/geoiplookup.net/ip/" ^
+			"/geoiplookup.io/geo/" ^
 			ipno;
 	} else {
 		cmd = SYSTEM.f(50);
