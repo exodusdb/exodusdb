@@ -1943,14 +1943,14 @@ bool var::sqlexec(CVR sqlcmd, VARREF response) const {
 
 	response = "";
 
-	//first row is the column names
+	//first row is the column/field names
 	for (int coln = 0; coln < ncols; ++coln) {
 		response.var_str.append(PQfname(dbresult, coln));
 		response.var_str.push_back(FM_);
 	}
 	response.var_str.pop_back();
 
-	//output the rows
+	//output the rows/columns as records separated by RM and fields separated by FM
 	for (int rown = 0; rown < nrows; rown++) {
 		response.var_str.push_back(RM_);
 		for (int coln = 0; coln < ncols; ++coln) {

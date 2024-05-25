@@ -5,16 +5,17 @@ set -euxo pipefail
 : Build, install and test exodus
 : ------------------------------
 :
-: '====== ===========   ========  ====  ====='
-: 'Status Ubuntu        Postgres  g++   clang'
-: '====== ===========   ========  ====  ====='
-: 'OK     23.10            15.4   13.2     16'
-: 'OK     23.04            15.4   12.3       '
-: 'OK     22.04.3 LTS      14.9   11.4     14'
-: 'OK     20.04.6 LTS      12.16   9.4     10'
-: '====== ===========   ========  ====  ====='
-: 'KO     18.04   LTS      10                '
-: '====== ===========   ========  ====  ====='
+: '====== ===========   ========  ====  =====  '
+: 'Status Ubuntu        Postgres  g++   clang  '
+: '====== ===========   ========  ====  =====  '
+: 'OK     24.04   LTS      16.2   13.2     18.1'
+: 'OK     23.10            15.4   13.2     16  '
+: 'OK     23.04            15.4   12.3         '
+: 'OK     22.04.3 LTS      14.9   11.4     14  '
+: 'OK     20.04.6 LTS      12.16   9.4     10  '
+: '====== ===========   ========  ====  =====  '
+: 'KO     18.04   LTS      10                  '
+: '====== ===========   ========  ====  =====  '
 : 'Exodus now requires c++20 so will no longer build on 18.04'
 :
 : ------
@@ -382,7 +383,7 @@ V0G0N
 : 2. exodus database
 :
 	#sudo -u postgres psql $PSQL_PORT_OPT < $EXODUS_DIR/install_exodus.sql
-	if ! sudo -u postgres psql $PSQL_PORT_OPT exodus -c 'select version();'; then
+	if ! sudo -u postgres psql $PSQL_PORT_OPT exodus -c 'select version();' 2>/dev/null; then
 		sudo -u postgres psql $PSQL_PORT_OPT -c 'CREATE DATABASE exodus OWNER exodus;'
 	fi
 :
