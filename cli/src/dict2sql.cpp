@@ -410,18 +410,30 @@ subroutine create_function(in functionname_and_args, in return_sqltype, in sql, 
 		}
 		argtypes.popper();
 		argnames.popper();
+		argtypes.replacer("int4", "integer");
 	}
 
 	//var().sqlexec("select routine_definition from information_schema.routines where routine_name = '" ^ functionname ^ "'", oldfunction);
 	//let sql_get_existing_declaration = "select routine_definition from information_schema.routines where routine_name = '" ^ functionname ^ "'";
+//	//Cannot use 'somefunc(args)'::regprocedure since it causes sql error and transaction failure if procedure does not exist
+//	let sql_get_existing_declaration =
+//			"SELECT prosrc"
+//			" FROM   pg_catalog.pg_proc"
+//			" WHERE  proname = "         ^ squote(functionname) ^
+//			" AND  oid::regprocedure = " ^ squote("exodus." ^ functionname ^ "(" ^ argtypes ^ ")") ^ "::regprocedure"
+//			//" AND    proargnames = "     ^ squote("{" ^ argnames ^ "}")
+//	;
+	// Get any existing routine source code
 	let sql_get_existing_declaration =
-			"SELECT prosrc"
-			" FROM   pg_catalog.pg_proc"
-			" WHERE  proname = "         ^ squote(functionname) ^
-			" AND  oid::regprocedure = " ^ squote("exodus." ^ functionname ^ "(" ^ argtypes ^ ")") ^ "::regprocedure"
-			//" AND    proargnames = "     ^ squote("{" ^ argnames ^ "}")
+		"SELECT     prosrc"
+		" FROM      pg_catalog.pg_proc"
+		" LEFT JOIN pg_catalog.pg_namespace n ON n.oid = pronamespace"
+		" WHERE     proname   = " ^ squote(functionname) ^
+		" AND       proargnames " ^ (argnames ? (" = '{" ^ argnames ^ "}'") : " is null") ^
+		" AND       n.nspname = 'exodus'"
 	;
 	if (not var().sqlexec(sql_get_existing_declaration, oldfunction)) {
+		var().lasterror().logput("DICT2SQL ERROR:" ^ oldfunction);
 		//null
 	}
 	oldfunction.substrer(oldfunction.index("\n") + 1);
