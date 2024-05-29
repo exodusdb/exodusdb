@@ -156,7 +156,11 @@ int var::localeAwareCompare(const std::string& str1, const std::string& str2) {
 //	boost::string_view str2b(str2.data(), str2.size());
 
 	int result = std::use_facet<boost::locale::collator<char>>(thread_boost_locale1)
-					 .compare(boost::locale::collator_base::COMP_LEVEL, str1, str2);
+#if BOOST_VERSION < 108300
+					.compare(boost::locale::collator_base::COMP_LEVEL, str1, str2);
+#else
+					.compare(boost::locale::collate_level::COMP_LEVEL, str1, str2);
+#endif
 
 	//var(str1).outputl("str1=");
 	//var(str2).outputl("str2=");

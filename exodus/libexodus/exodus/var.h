@@ -31,7 +31,7 @@ THE SOFTWARE.
 #include <iostream>
 #include <string>
 #include <string_view>
-#if EXODUS_TIMEBANK == 1
+#ifdef EXODUS_TIMEBANK
 #	include "timebank.h"
 #endif
 
@@ -132,7 +132,7 @@ inline const char VISIBLE_ST_ = '~';
 #define DEFAULT_VM = VM_
 #define DEFAULT_NULL = nullptr
 
-#if EXODUS_TIMEBANK == 1
+#ifdef EXODUS_TIMEBANK
 #	define THISIS(FUNC_DESC) [[maybe_unused]] static const char* function_sig = FUNC_DESC;Timer thisistimer(get_timeacno(FUNC_DESC));
 #else
 #	define THISIS(FUNC_DESC) [[maybe_unused]] static const char* function_sig = FUNC_DESC;

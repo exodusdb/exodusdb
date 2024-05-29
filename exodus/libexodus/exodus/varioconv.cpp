@@ -1126,7 +1126,13 @@ var var::iconv_TX(const char* conversion) const {
 	return record;
 }
 
-constinit std::array hex_digits {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+//	constinit std::array hex_digits {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+#if __cpp_constinit >= 201907
+	constinit
+#else
+	constexpr
+#endif
+	std::array hex_digits {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
 
 std::string var::oconv_HEX([[maybe_unused]] const int ioratio) const {
 

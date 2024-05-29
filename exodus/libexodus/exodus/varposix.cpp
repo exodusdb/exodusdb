@@ -29,7 +29,13 @@ ND PUBLIC var getexecpath() {
 
 //consteval size_t host_name_max = HOST_NAME_MAX;
 // HOST_NAME_MAX is 64 on Linux
-constinit size_t host_name_max = 32;
+//constinit size_t host_name_max = 32;
+#if __cpp_constinit >= 201907
+	constinit
+#else
+	constexpr
+#endif
+	size_t host_name_max = 32;
 
 ND PUBLIC std::string gethostname() {
 //    char hostname[1024];

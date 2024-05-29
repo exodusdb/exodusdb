@@ -4,7 +4,7 @@
 // EXODUS_TIMEBANK must be defined to create functional Timers
 // e.g. cmake . -DEXODUS_TIMEBANK=1
 
-#if EXODUS_TIMEBANK != 1
+#ifdef EXODUS_TIMEBANK
 
 struct Timer{
 	explicit Timer(int){

@@ -225,7 +225,9 @@ Within transactions, lock requests for locks that have already been obtained alw
 //#include <exodus/mvutf.h>
 #include <exodus/dim.h>
 
+#ifdef EXODUS_TIMEBANK
 #include "timebank.h"
+#endif
 
 #define DBTRACE_SELECT DBTRACE
 #define DBTRACE_CONN 0
@@ -1290,11 +1292,13 @@ bool var::open(CVR filename, CVR connection /*DEFAULTNULL*/) {
 
 	}
 
+#ifdef EXODUS_TIMEBANK
 	//Timer t2(245);//open cache_miss
 	Timer timer1(get_timeacno("bool var::open cache_miss"));
 	//if (DBTRACE) {
 	//	connection2.logputl("DBTR var::open-1 ");
 	//}
+#endif
 
 	var tablename;
 	var schema;
@@ -1447,9 +1451,10 @@ bool var::readc(CVR filehandle, CVR key) {
 	}
 	//TRACE("cache miss" ^ key);
 
+#ifdef EXODUS_TIMEBANK
 	//Timer t2(247);//readc cache_miss
 	Timer timer1(get_timeacno("bool var::reado cache_miss"));
-
+#endif
 	// Ordinary read from the database
 	bool result = this->read(filehandle, key);
 
