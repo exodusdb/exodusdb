@@ -1,8 +1,15 @@
 // NOTE The rhs comment in the following line is in a special format
 // REQUIRED instruction to compile and link with pthread library
 #include <thread>  //gcc_link_options -lpthread
+
+// Suppress warning
+// warning: inlining failed in call to ‘constexpr ExodusProgram::main()::<lambda()>::<lambda>(ExodusProgram::main()::<lambda()>&&)’: --param max-inline-insns-single limit reached [-Winline] 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Winline"
 #include <boost/asio/thread_pool.hpp>
 #include <boost/asio/post.hpp>
+#pragma GCC diagnostic pop
+
 // Create a threadpool of suitable size to handle
 // ncpus/threads obtained from std::thread::hardware_concurrency()
 static boost::asio::thread_pool threadpool1(std::thread::hardware_concurrency() + 1);

@@ -101,6 +101,7 @@ THE SOFTWARE.
 
 namespace exodus {
 
+#ifdef USE_TO_CHARS
 /////////////////////////////////////
 // Wrapper function for std::to_chars
 /////////////////////////////////////
@@ -129,6 +130,7 @@ static std::string double_to_chars_to_string(
 	// Hopefully using small string optimisation (SSO)
 	return std::string(chars.data(), ptr - chars.data());
 }
+#endif
 
 //////////////////////////////////////////
 // Utility to convert double to std string
