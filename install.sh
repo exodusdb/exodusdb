@@ -24,7 +24,7 @@ set -euxo pipefail
 :
 : $0 ' [<STAGES>] [gcc|clang] [<PG_VER>]'
 :
-: STAGES is one or more letters. Default is "'bBiIT'"
+: STAGES is one or more letters. Default is "'bBiIT'" all except W - Web service
 :
 : b = Get dependencies for build
 : B = Build
@@ -57,8 +57,8 @@ set -euxo pipefail
 : Update apt
 : ----------
 :
-	ls -l /var/cache/apt/ || true
-	while ! ls /var/cache/apt/*.bin && ! sudo apt -y update; do
+	ls -l /var/cache/apt/ 2> /dev/null || true
+	while ! ls /var/cache/apt/*.bin 2> /dev/null && ! sudo apt -y update; do
 		sleep 1
 	done
 :

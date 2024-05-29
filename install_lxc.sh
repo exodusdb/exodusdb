@@ -8,13 +8,15 @@ set -euxo pipefail
 : Syntax
 : ------
 :
-:	$0 " <SOURCE> <NEW_CONTAINER_NAME> [<STAGES>] [gcc|clang] [<PG_VER>]"
+:	$0 " <SOURCE> <NEW_CONTAINER_NAME> <STAGES> [gcc|clang] [<PG_VER>]"
 :
 :	SOURCE e.g. an lxc image like ubuntu, ubuntu:22.04 etc. or an existing lxc container code
 :
 :	NEW_CONTAINER_NAME e.g. u2204 for lxc
 :
-:	STAGES is letters. Default is "'bBiIT'"
+:	STAGES is letters.
+:
+:		A = All "'bBiIT'" except W
 :
 :		b = Get dependencies for build
 :		B = Build
@@ -35,13 +37,17 @@ set -euxo pipefail
 	#export NEEDRESTART_MODE=a
 	SOURCE=${1:?SOURCE is required. e.g. ubuntu, ubuntu:22.04 etc. or container code}
 	NEW_CONTAINER_NAME=${2:?NEW_CONTAINER_NAME is required. e.g. u2204 for lxc}
-	STAGES=${3:-bBiIT}
+#	STAGES=${3:-bBiIT}
+	STAGES=${3:?Stages is required. A for 'bBiIT' - all except Web service}
 	COMPILER=${4:-gcc}
 	PG_VER=${5:-}
 :
 : Validate
 : --------
 :
+	if [[ $STAGES = "A" ]]; then
+		STAGES=bBiIT
+	fi
 	if [[ ! $STAGES =~ ^[bBiITW]*$ ]]; then
 		echo STAGES has only letters bBiITW. Check syntax above.
 		exit 1
