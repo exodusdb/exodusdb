@@ -119,9 +119,9 @@ set -euxo pipefail
 :
 	pgrep postgres -a|grep postgresql || true
 :
-	ls -l /usr/lib/postgresql/ || true
+	ls -l /usr/lib/postgresql/ 2> /dev/null || true
 :
-	ls -l /run/postgresql/ || true
+	ls -l /run/postgresql/ 2> /dev/null || true
 :
 : Ports
 : -----
@@ -156,7 +156,7 @@ function get_dependencies_for_build {
 	#Specified PG_VER for postgresql-server-dev-NN installed later in this stage
 	# 1/49 Test  #1: pgexodus_test ....................***Failed    0.08 sec
 	#  grep: /etc/postgresql/16/main/postgresql.conf: No such file or directory
-	apt remove -y 'postgresql-server-dev-all' && apt -y autoremove || true
+	sudo apt remove -y 'postgresql-server-dev-all' && sudo apt -y autoremove || true
 	sudo apt install -y postgresql-common
 :
 : pgexodus and fmt submodules
@@ -190,8 +190,16 @@ function get_dependencies_for_build {
 : ------
 :
 	if [[ $COMPILER == gcc ]]; then
+:
+: gcc
+: ---
+:
 		sudo apt install -y g++
 	else
+:
+: clang
+: -----
+:
 		sudo apt install -y clang
 		sudo update-alternatives --set c++ /usr/bin/clang++
 		sudo update-alternatives --set cc /usr/bin/clang
@@ -269,13 +277,27 @@ function build_all {
 	c++ -v -print-search-dirs || true
 :
 : Build
+: -----
 :
 	cd $EXODUS_DIR
+:
+: Acquire any submodules e.g. pgexodus and fmt
+: ----------------------
+:
 	git submodule init
 	git submodule update
+:
+: Build
+: -----
+:
 	echo PGPATH=${PGPATH:-}
 	cmake -S $EXODUS_DIR -B $EXODUS_DIR/build
 	cmake --build $EXODUS_DIR/build -j$((`nproc`+1))
+:
+: Run tests that do not require database - since it is not installed yet
+: --------------------------------------
+:
+	cd $EXODUS_DIR/build/test/src && EXO_NODATA=1 CTEST_OUTPUT_ON_FAILURE=1 CTEST_PARALLEL_LEVEL=$((`nproc`+1)) ctest
 }
 
 function get_dependencies_for_install {
