@@ -10,7 +10,7 @@ programinit()
 	var tempfilename = tempdir ^ _OSSLASH "temp1";
 
 	{
-		printl("Waiting for 500ms for any event on the log dir");
+		printl("test_os waiting for 500ms for any event on the log dir - for quiet period to attempt to avoid interactions?");
 		var events = oswait(500, "/var/log");
 		TRACE(events)
 	}
@@ -19,12 +19,17 @@ programinit()
 		// check osshell failures
 
 		var badcmd = "test_bad_cmd_usdcmwelefhayasflkj";
+TRACE("aa")
 		assert(osshell("ls"));
+TRACE("bb")
 		assert(not osshell(badcmd));
+TRACE("cc")
 		assert(not osshellread(badcmd));
+TRACE("dd")
 		assert(not osshellread(RECORD from badcmd));
+TRACE("ee")
 		assert(not osshellwrite("abc" on badcmd));
-TRACE("1")
+TRACE("ee")
 	}
 
 	//test copying files forced overwrite)
