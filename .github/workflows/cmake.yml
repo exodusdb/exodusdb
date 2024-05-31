@@ -9,6 +9,7 @@ env:
 jobs:
   build:
 
+    # Comment out whole of strategy to get latest version automatically
     strategy:
       matrix:
         include:
@@ -16,18 +17,18 @@ jobs:
           - UBUNTU_VER: "24.04"
             PG_VER:
             COMPILER: gcc
-          # Specific one
-          - UBUNTU_VER: "24.04"
-            PG_VER:
-            COMPILER: clang
-          # Specific one
-          - UBUNTU_VER: "22.04"
-            PG_VER:
-            COMPILER: gcc
-          # Specific one
-          - UBUNTU_VER: "22.04"
-            PG_VER:
-            COMPILER: clang
+#          # Specific one
+#          - UBUNTU_VER: "24.04"
+#            PG_VER:
+#            COMPILER: clang
+#          # Specific one
+#          - UBUNTU_VER: "22.04"
+#            PG_VER:
+#            COMPILER: gcc
+#          # Specific one
+#          - UBUNTU_VER: "22.04"
+#            PG_VER:
+#            COMPILER: clang
 #          # Specific one
 #          - UBUNTU_VER: "20.04"
 #            PG_VER:
