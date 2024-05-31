@@ -107,8 +107,13 @@ extern "C"
 #include <stdio.h>
 #include <string.h>
 
+// /usr/include/postgresql/16/server/fmgr.h:434:25:
+// warning: identifier '_PG_init' is reserved because it starts with '_' followed by a capital letter [-Wreserved-identifier]
+#pragma GCC diagnostic push
+#pragma clang diagnostic ignored "-Wreserved-identifier"
 #include "postgres.h"
 #include "fmgr.h"
+#pragma GCC diagnostic pop
 
 /*#include "utils/geo_decls.h"*/
 #include <utils/timestamp.h> //for PG_RETURN_TIMESTAMP

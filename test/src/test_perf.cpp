@@ -373,6 +373,8 @@ programinit()
 							v2 = v1.oconv("MD20P");
 						}
 						break;
+					default:
+						throw VarError("test_perf Error: Invalid case " ^ var(casen));
 				}
 				var ended = ostime();
 				if (i1 or b1 or v1)

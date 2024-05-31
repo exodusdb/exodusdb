@@ -927,11 +927,11 @@ bool var::isnum(void) const {
 #pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
 	char* firstchar = var_str.data();
 	char* lastchar = firstchar + strlen;
-#pragma GCC diagnostic pop
 
 	// Skip leading + to be compatible with javascript
 	// from_chars does not allow it.
 	firstchar += *firstchar == '+';
+#pragma GCC diagnostic pop
 
 	if (floating) {
 

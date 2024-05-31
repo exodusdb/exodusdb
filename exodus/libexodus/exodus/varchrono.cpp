@@ -279,6 +279,8 @@ var var::iconv_D(const char* conversion) const {
 			case 'S':
 				yearfirst = true;
 				break;
+			default:;
+				//[[fallthough]];
 		}
 	}
 
@@ -438,6 +440,8 @@ var var::iconv_D(const char* conversion) const {
 
 }
 
+#pragma GCC diagnostic push
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
 std::string var::oconv_D(const char* conversion) const {
 
 	// by this time *this is known to be numeric and not an empty string
@@ -460,10 +464,7 @@ std::string var::oconv_D(const char* conversion) const {
 	// bool leadingzeros=true;
 	char sepchar = ' ';
 
-#pragma GCC diagnostic push
-#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
 	const char* conversionchar = conversion;
-#pragma GCC diagnostic pop
 
 //	const zstring_range conversion2{conversion};
 //	auto conversionchar = conversion2.begin();
@@ -623,7 +624,10 @@ std::string var::oconv_D(const char* conversion) const {
 	// outputl(var(ss.str()).quote());
 	return ss.str();
 }
+#pragma GCC diagnostic pop
 
+#pragma GCC diagnostic push
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
 std::string var::oconv_MT(const char* conversion) const {
 	// MT, MTH, MTS, MTx, MTHx, MTSx MTHS MTHSx where x is a sep char
 
@@ -641,10 +645,7 @@ std::string var::oconv_MT(const char* conversion) const {
 	bool input_is_hours = false;
 	char sepchar = ':';
 
-#pragma GCC diagnostic push
-#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
 	const char* conversionchar = conversion;
-#pragma GCC diagnostic pop
 
 	// Skip over leading "MT"
 	conversionchar += 2;
@@ -787,6 +788,7 @@ after_analyse_conversion:
 
 	return result;
 }
+#pragma GCC diagnostic pop
 
 }  // namespace exodus
 

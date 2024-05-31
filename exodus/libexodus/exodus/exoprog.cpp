@@ -397,6 +397,9 @@ bool ExodusProgramBase::select(CVR sortselectclause_or_filehandle) {
 						case 19:  //  CONTAINING []
 							ok = reqivalues(fieldn).contains(ivalue);
 							break;
+						default:
+						    // TODO should this be a special system error since it cannot be caused by application programmer?
+						    throw VarError("EXODUS: Error in " ^ var(__PRETTY_FUNCTION__) ^ " Invalid opmo " ^ opnos(fieldn));
 					}//switch
 
 					//quit searching data values if found or no more
@@ -1586,8 +1589,6 @@ baddict:
 	[[unlikely]]
 	throw VarError("ExodusProgramBase::calculate(" ^ dictid ^ ") " ^ DICT ^ " Invalid dictionary type " ^
 				  dicttype.quote());
-	//std::unreachable();
-	//return "";
 }
 
 //// debug
@@ -1837,8 +1838,9 @@ lock:
 		return false;
 	}
 
-	//std::unreachable()
-	//return true;
+	// TODO should this be a special system error since it cannot be caused by application programmer?
+	throw VarError("EXODUS: Error in " ^ var(__PRETTY_FUNCTION__) ^ " Executing unreachable code.");
+
 }
 
 // unlockrecord 0 = unlock all

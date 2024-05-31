@@ -2378,6 +2378,8 @@ class PUBLIC var final {
 				case VISIBLE_TM_: c = TM_; break;
 				case VISIBLE_ST_: c = ST_; break;
 				case VISIBLE_RM_: c = RM_; break;
+				// All other chars left unconverted
+				default:;
 			}
 		}
 		return *this;
@@ -2395,6 +2397,8 @@ class PUBLIC var final {
 					case SM_: c = VISIBLE_SM_; break;
 					case TM_: c = VISIBLE_TM_; break;
 					case ST_: c = VISIBLE_ST_; break;
+					// All other chars left unconverted;
+					default:;
 				}
 			}
 		}

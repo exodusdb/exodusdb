@@ -502,10 +502,10 @@ VARREF var::oconv_MR(const char* conversion) {
 #pragma GCC diagnostic push
 #pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
     const char* conversionchar = conversion;
-#pragma GCC diagnostic pop
 
     // Skip over leading "MR"
     conversionchar += 2;
+#pragma GCC diagnostic pop
 
 	// abort if no 3rd char
 	if (*conversionchar == '\0')
@@ -552,7 +552,12 @@ VARREF var::oconv_MR(const char* conversion) {
 
 	// negate if /
 	if (*conversionchar == '/') {
+
+#pragma GCC diagnostic push
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
 		++conversionchar;
+#pragma GCC diagnostic pop
+
 		switch (*conversionchar) {
 			// MC/N return everything except digits i.e. remove all digits 0123456789
 			case 'N': {
@@ -573,6 +578,8 @@ VARREF var::oconv_MR(const char* conversion) {
 				var_str = REGEX_REPLACE(var_str, alphanum_regex, "");
 				break;
 			}
+			// No conversion if not N, A or B
+			default:;
 		}
 		return *this;
 	}
@@ -609,6 +616,8 @@ VARREF var::oconv_MR(const char* conversion) {
 			ucaser();
 			break;
 		}
+		// No conversion if not N, A, B, L or U
+		default:;
 	}
 
 	return *this;

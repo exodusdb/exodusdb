@@ -171,7 +171,8 @@
 								-Wno-exit-time-destructors
 								-Wno-global-constructors
 								-Wno-missing-prototypes
-								#-Wno-unsafe-buffer-usage
+							#-Wno-unsafe-buffer-usage
+							# -fsafe-buffer-usage-suggestions # not available in clang 14 on Ubuntu 22.04
 								-Wno-shadow-field
 								-Wno-float-equal
 								-Wno-cast-align
