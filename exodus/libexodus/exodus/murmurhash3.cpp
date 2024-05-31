@@ -139,6 +139,7 @@ void MurmurHash3_x86_32 ( const void * key, int len,
   case 2: k1 ^= tail[1] << 8;
   case 1: k1 ^= tail[0];
           k1 *= c1; k1 = ROTL32(k1,15); k1 *= c2; h1 ^= k1;
+  default:;
   }
 
   //----------
@@ -232,6 +233,7 @@ void MurmurHash3_x86_128 ( const void * key, const int len,
   case  2: k1 ^= tail[ 1] << 8;
   case  1: k1 ^= tail[ 0] << 0;
            k1 *= c1; k1  = ROTL32(k1,15); k1 *= c2; h1 ^= k1;
+  default:;
   }
 
   //----------
@@ -317,6 +319,7 @@ void MurmurHash3_x64_128 ( const void * key, const int len,
   case  2: k1 ^= ((uint64_t)tail[ 1]) << 8;
   case  1: k1 ^= ((uint64_t)tail[ 0]) << 0;
            k1 *= c1; k1  = ROTL64(k1,31); k1 *= c2; h1 ^= k1;
+  default:;
   }
 
   //----------

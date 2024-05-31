@@ -769,7 +769,6 @@ struct fmt::formatter<exodus::var> {
 #pragma GCC diagnostic push
 #pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
 		auto it = ctx.begin();
-#pragma GCC diagnostic pop
 //		if (*it == '}') {
 //			fmt_str = "{0:s}";
 //			formatcode = ' ';
@@ -780,13 +779,19 @@ struct fmt::formatter<exodus::var> {
 			if (*it == '}') {
 				//fmt_str = {ctx.begin(), it + 1};
 				fmt_str = "{:";
+#pragma GCC diagnostic push
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
 				fmt_str.append(ctx.begin(), it + 1);
+#pragma GCC diagnostic pop
 				//fmt_str[0] = '{';
 				//ctx.advance_to(it + 1);
 				return it;
 			}
 			formatcode = *it;
+#pragma GCC diagnostic push
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
 			it++;
+#pragma GCC diagnostic pop
 		}
 		// If we dont find a closing "}" char
 

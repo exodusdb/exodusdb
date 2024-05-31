@@ -33,6 +33,10 @@ THE SOFTWARE.
 
 namespace exodus {
 
+#if defined(__clang__)
+#	pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
+#endif
+
 // Would be 256 if RM was character number 255.
 // Last delimiter character is 0x1F (RM)
 // Used in var::remove()
@@ -64,10 +68,7 @@ var var::iconv(const char* conversion) const {
 	var terminator;
 	var result = "";
 
-#pragma GCC diagnostic push
-#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
 	const char* pconversion = conversion;
-#pragma GCC diagnostic pop
 
 	// check first character
 	switch (*pconversion) {
@@ -176,6 +177,9 @@ var var::iconv(const char* conversion) const {
 							}
 
 							break;
+
+						// No conversion unless one of MT, MR, MX, MD, MC, MB"
+						default:;
 					}
 				}
 
@@ -238,6 +242,8 @@ var var::iconv(const char* conversion) const {
 						return iconv_HEX(8);
 						//std::unreachable();
 						break;
+					// No conversion if not one of HEX, HEX2, HEX4, HEX8
+					default:;
 				}
 
 				// return oconv_HEX(HEX_IO_RATIO);
@@ -258,6 +264,9 @@ var var::iconv(const char* conversion) const {
 		// empty conversion string - no conversion
 		case '\0':
 			return (*this);
+
+		// invalid conversion
+		default:;
 	}
 
 	// TODO implement
@@ -401,10 +410,7 @@ std::string var::oconv_MD(const char* conversion) const {
 	// 1. Analyse conversion
 
 	// get pointer to the third character (after the MD/MC bit)
-#pragma GCC diagnostic push
-#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
 	const char* pconversion = conversion;
-#pragma GCC diagnostic pop
 
 	// Second letter must be D or C
 	pconversion++;
@@ -651,6 +657,8 @@ std::string var::oconv_MD(const char* conversion) const {
 			}
 			break;
 
+		// No trailer if not one of <, -, C or D
+		default:;
 	}
 
 	if (prefixchar != '\0')
@@ -755,10 +763,7 @@ var var::oconv(const char* conversion_in) const {
 	std::replace(all_conversions.begin(), all_conversions.end(), '|', '\0');
 
 	// Get the end of all conversions
-#pragma GCC diagnostic push
-#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
 	auto all_conversions_end = all_conversions.data() + all_conversions.size();
-#pragma GCC diagnostic pop
 
 	// Multiple fields/values of input data
 	// ------------------------------------
@@ -781,18 +786,13 @@ var var::oconv(const char* conversion_in) const {
 		;
 
 		// Start a the beginning
-#pragma GCC diagnostic push
-#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
 		const char* pconversion = all_conversions.data();
-#pragma GCC diagnostic pop
 
 		// Multiple conversions
 		// --------------------
 		while (true) {
 
 			// Save a pointer to the beginning of the conversion code
-#pragma GCC diagnostic push
-#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
 			const char* conversion = pconversion;
 
 			// Find the end of conversion code (char \0)
@@ -800,7 +800,6 @@ var var::oconv(const char* conversion_in) const {
 			while (*conversion_end != '\0') {
 				 conversion_end++;
 			}
-#pragma GCC diagnostic pop
 
 			// Check 1st character of conversion code
 			switch (*pconversion) {
@@ -910,6 +909,9 @@ var var::oconv(const char* conversion_in) const {
 									}
 
 									break;
+
+								// No conversion if not not one of MD, MC, MT, MX or MB
+								default:;
 							}
 						}
 
@@ -1053,10 +1055,7 @@ var var::oconv(const char* conversion_in) const {
 
 }
 
-#pragma GCC diagnostic push
-#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
 std::string var::oconv_TX(const char* conversion) const {
-#pragma GCC diagnostic pop
 
 	var result = this->var_str;
 
@@ -1090,10 +1089,7 @@ std::string var::oconv_TX(const char* conversion) const {
 	return result.var_str;
 }
 
-#pragma GCC diagnostic push
-#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
 var var::iconv_TX(const char* conversion) const {
-#pragma GCC diagnostic pop
 
 	var record = this->var_str;
 	// \ + LF -> VM
@@ -1219,6 +1215,10 @@ var var::iconv_HEX(const int ioratio) const {
 				ADD_NYBBLE_OR_FAIL
 				// no shift on last nybble in since it is loaded into the right (right) four
 				// bits outchar<<=4;
+				[[fallthrough]];
+
+			// Evade compiler warning
+			default:;
 		}
 
 		textstr += static_cast<char>(outchar);

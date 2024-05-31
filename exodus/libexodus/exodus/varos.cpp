@@ -759,7 +759,10 @@ static unsigned count_excess_UTF8_bytes(const std::string& str) {
 			return 0;
 		}
 
+#pragma GCC diagnostic push
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
 		cptr -= 1;
+#pragma GCC diagnostic pop
 
 	}  // next char
 

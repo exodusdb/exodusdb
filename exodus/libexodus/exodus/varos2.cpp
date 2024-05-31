@@ -189,11 +189,14 @@ bool var::osgetenv(const char* envcode) {
 		// extern char **environ;
 		// environ is a pointer to an array of pointers to char* env pairs like xxx=yyy
 		// the last pointer in the array is nullptr
+#pragma GCC diagnostic push
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
 		for (auto envn = 0; environ[envn]; ++envn) {
 			//printf("%s\n", environ[i]);
 			thread_environ.append(environ[envn]);
 			thread_environ.push_back(FM_);
 		}
+#pragma GCC diagnostic pop
 
 		// Remove the last (or only) trailing FM_
 		thread_environ.pop_back();

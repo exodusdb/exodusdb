@@ -1829,6 +1829,9 @@ getnextp2:
 			case ':':
 				nrvo ^= mv1 ^ mv2;
 				break;
+			default:
+				// TODO should this be a different exception since it is not caused by application programmer?
+				throw VarError("EXODUS: Error in " ^ var(__PRETTY_FUNCTION__) ^ " opcode " ^ var(opcode[0]) ^ "is not valid. SHould be one of +, -, *, / or :");
 		}
 
 		if (separator1 == separator2) {
