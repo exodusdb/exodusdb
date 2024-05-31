@@ -33,20 +33,21 @@ TRACE("ee")
 	}
 
 	//test copying files forced overwrite)
+TRACE("10")
 	assert(osmkdir("d1/d1"));
-TRACE("1")
+TRACE("11")
 	assert(oswrite("f1", "d1/f1"));
-TRACE("1")
+TRACE("12")
 	assert(oswrite("f2", "d1/f2"));
-TRACE("1")
+TRACE("13")
 	assert(oscopy("d1/f1", "d1/f2"));
-TRACE("1")
+TRACE("14")
 	var data;
 	assert(osread(data, "d1/f2"));
-TRACE("1")
+TRACE("15")
 	printl(data eq "f1");
 
-TRACE("2")
+TRACE("16")
 	//test copying directories (recursive)
 	assert(oswrite("f1", "d1/d1/f1"));
 	assert(oscopy("d1", "d2"));
