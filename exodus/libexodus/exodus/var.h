@@ -2621,6 +2621,12 @@ class PUBLIC VarError {
 	//VarError(CVR description) = delete;
 	explicit VarError(CVR description);
 
+	// Note: "description" is not const so that an exception handler (catch block)
+	// can add any context (additional info only known in the handler)
+	// to the error description and rethrow the exception up to
+	// a higher exception handler.
+	// (using plain "throw;")
+	// Otherwise the only the stack track captured by the exception site will be available. 
 	var description;
 
 	// Convert stack addresses to source code if available
