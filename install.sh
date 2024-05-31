@@ -52,6 +52,8 @@ set -euxo pipefail
 	export DEBIAN_FRONTEND=noninteractive
 	#EXODUS_DIR=${GITHUB_WORKSPACE:-~/exodus}
 	EXODUS_DIR=$(pwd)
+	# Set by github action if chosen to rerun in debug mode?
+	#RUNNER_DEBUG=1
 :
 : ----------
 : Update apt

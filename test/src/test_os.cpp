@@ -19,36 +19,24 @@ programinit()
 		// check osshell failures
 
 		var badcmd = "test_bad_cmd_usdcmwelefhayasflkj";
-TRACE("aa")
 		assert(osshell("ls"));
-TRACE("bb")
 		assert(not osshell(badcmd));
-TRACE("cc")
 		assert(not osshellread(badcmd));
-TRACE("dd")
 		assert(not osshellread(RECORD from badcmd));
-TRACE("ee")
-// BUGGY UNRELIABLE?
+// BUGGY UNRELIABLE on gcc Ubuntu 24.04 at least
 //		assert(not osshellwrite("abc" on badcmd));
-TRACE("ff")
+//TRACE("osshellwrite with bad command passed")
 	}
 
 	//test copying files forced overwrite)
-TRACE("10")
 	assert(osmkdir("d1/d1"));
-TRACE("11")
 	assert(oswrite("f1", "d1/f1"));
-TRACE("12")
 	assert(oswrite("f2", "d1/f2"));
-TRACE("13")
 	assert(oscopy("d1/f1", "d1/f2"));
-TRACE("14")
 	var data;
 	assert(osread(data, "d1/f2"));
-TRACE("15")
 	printl(data eq "f1");
 
-TRACE("16")
 	//test copying directories (recursive)
 	assert(oswrite("f1", "d1/d1/f1"));
 	assert(oscopy("d1", "d2"));
