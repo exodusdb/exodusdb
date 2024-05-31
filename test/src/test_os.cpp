@@ -18,23 +18,30 @@ programinit()
 	{
 		// check osshell failures
 
-		var badcmd = "usdcmwelefhayasflkj";
+		var badcmd = "test_bad_cmd_usdcmwelefhayasflkj";
 		assert(osshell("ls"));
 		assert(not osshell(badcmd));
 		assert(not osshellread(badcmd));
 		assert(not osshellread(RECORD from badcmd));
 		assert(not osshellwrite("abc" on badcmd));
+TRACE("1")
 	}
 
 	//test copying files forced overwrite)
 	assert(osmkdir("d1/d1"));
+TRACE("1")
 	assert(oswrite("f1", "d1/f1"));
+TRACE("1")
 	assert(oswrite("f2", "d1/f2"));
+TRACE("1")
 	assert(oscopy("d1/f1", "d1/f2"));
+TRACE("1")
 	var data;
 	assert(osread(data, "d1/f2"));
+TRACE("1")
 	printl(data eq "f1");
 
+TRACE("2")
 	//test copying directories (recursive)
 	assert(oswrite("f1", "d1/d1/f1"));
 	assert(oscopy("d1", "d2"));
