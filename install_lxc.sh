@@ -105,7 +105,7 @@ function stage {
 : --------------------------
 :
 	if lxc info $NEW_C &> /dev/null; then
-		lxc rm $NEW_C --force || true
+		lxc rm $NEW_C --force |& grep -v "already stopped"|| true
 	fi
 	if [[ $STAGE == 1 ]]; then
 		if lxc info $SOURCE &> /dev/null; then
@@ -119,13 +119,13 @@ function stage {
 			lxc launch $SOURCE $NEW_C || exit 1
 		fi
 	else
-		lxc stop $OLD_C --force || true
+		lxc stop $OLD_C --force |& grep -v "already stopped"|| true
 		lxc cp $OLD_C $NEW_C || exit 1
 		lxc start $NEW_C || exit 1
 	fi
 :
-: Update container
-: ----------------
+: Update container with local exodus dir
+: --------------------------------------
 :
 	#lxc file push * $NEW_C/root/exodus --recursive --create-dirs --quiet
 	#lxc file push . $NEW_C/root --recursive --create-dirs --quiet
