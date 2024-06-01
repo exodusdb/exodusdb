@@ -37,6 +37,8 @@ THE SOFTWARE.
 #	pragma GCC diagnostic ignored "-Winline"
 #	include <fmt/core.h>
 #	pragma GCC diagnostic pop
+#else
+#	define EXO_FORMAT 0
 #endif
 
 #include <exodus/var.h>
@@ -712,7 +714,7 @@ void printt(void) {
 /////////////////////////
 
 //#ifdef __cpp_lib_format
-#ifdef EXO_FORMAT
+#if EXO_FORMAT
 
 template <typename... Args>
 var format(std::string_view sv1, Args&&... args) {
@@ -741,7 +743,7 @@ void println() {
 
 }  // namespace exodus
 
-#ifdef EXO_FORMAT
+#if EXO_FORMAT
 
 template <>
 struct fmt::formatter<exodus::var> {

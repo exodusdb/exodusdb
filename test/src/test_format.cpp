@@ -7,7 +7,7 @@ programinit()
 
 function main() {
 
-#ifdef EXO_FORMAT
+#if EXO_FORMAT
 
 	{
 //		C++ format code "f" rounding has a DIFFERENT rounding rule compared to exodus format code "MD"
@@ -133,13 +133,18 @@ function main() {
 	assert(var("🐱") == "\xF0\x9F\x90\xB1");
 	assert(var("🐱") == "\U0001F431");
 
-#if EXO_FORMAT == 1
+//g++ 11 in Ubuntu 22.04 has format but a bug in width of unicode characters
+//#if EXO_FORMAT == 1
+#if EXO_FORMAT == 1 and __GNUG__ == 13
+#warning EXO_FORMAT == 1 and _GNUG__ == 13 has error in formatting width of multibyte utf-8
 	// Incorrect in g++13.2
 	// Width is calculated as bytes not utf-8 character widths
 	// Cat = four bytes so takes up "4" positions in formatting
 	assert(format("{:.^5s}", var("🐱")) == "🐱.");
 
-#elif EXO_FORMAT == 2
+#elif EXO_FORMAT
+#warning Using fmt library instead of std::format
+	//__clang_major__ 18
 	// Correct in fmt library
 	assert(format("{:.^5s}", "🐱") == ".🐱..");
 	assert(format("{:.5s}", "🐱🐱🐱") == "🐱🐱🐱");

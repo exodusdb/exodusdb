@@ -321,7 +321,7 @@ function main() {
 
 		// unique?
 		d1 = "b^a^a^b^c"_var.split();
-		std::unique(d1.begin(), d1.end());
+		[[maybe_unused]] auto dummy3 = std::unique(d1.begin(), d1.end());
 		assert(d1.join().outputl() eq "b^a^b^c^"_var);
 
 		// std::find
