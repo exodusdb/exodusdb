@@ -142,7 +142,7 @@ function main() {
 	// Cat = four bytes so takes up "4" positions in formatting
 	assert(format("{:.^5s}", var("🐱")) == "🐱.");
 
-#elif EXO_FORMAT
+#else
 #warning Using fmt library instead of std::format
 	//__clang_major__ 18
 	// Correct in fmt library

@@ -206,17 +206,20 @@ function get_dependencies_for_build {
 		sudo update-alternatives --set c++ /usr/bin/clang++
 		sudo update-alternatives --set cc /usr/bin/clang
 :
+: libstdc++ and clang information
+: -------------------------------
+:
 		apt list libstdc++*dev --installed || true
 :
 		dpkg -S /usr/include/c++ || true
 :
 		apt list libstdc++*dev || true
 :
-: Work around troublesome latest versions 12 and 13 of gcc tool chains which are troublesome to clang 14 on Ubuntu 22.04
+: On Ubuntu 22.04, prevent clang from using later versions 12 and 13 of gcc tool chains which are troublesome to clang 14
+: Force clang to use version 11 of the gcc tool chain by creating gcc tool chain version 99 pointing to 11
+: See info on libstdc++ in install log - Build stage
 :
 		if [[ `lsb_release -rs` == 22.04 ]]; then
-:
-: Simply make a fake gcc tool chain version 99 that clang++ will use. See info in Build stage
 :
 			GCC_VERSION=11
 			GCC_FAKE_VERSION=99
@@ -224,22 +227,6 @@ function get_dependencies_for_build {
 			sudo ln -snf /usr/include/x86_64-linux-gnu/c++/$GCC_VERSION /usr/include/x86_64-linux-gnu/c++/$GCC_FAKE_VERSION
 			sudo ln -snf /usr/include/c++/$GCC_VERSION /usr/include/c++/$GCC_FAKE_VERSION
 
-#			for VERSION in 12 13; do
-#				REMOVABLE=`dpkg -S /usr/lib/gcc/x86_64-linux-gnu/$VERSION/ | sed 's/,//g' | sed "s#: /usr/lib/gcc/x86_64-linux-gnu/$VERSION##g"`
-#				sudo apt remove -y $REMOVABLE|| true
-#				# Fail if anything remains
-#				dpkg -S /usr/lib/gcc/x86_64-linux-gnu/$VERSION/ && false
-#			done
-#			#sudo apt autoremove -y || true
-#:
-#: What is installed after the removal?
-#:
-#			apt list libstdc++*dev --installed || true
-##:
-##: Nothing should provide gcc tool chains 12 and 13 now
-##:
-##			dpkg -S /usr/lib/gcc/x86_64-linux-gnu/12/ && false
-##			dpkg -S /usr/lib/gcc/x86_64-linux-gnu/13/ && false
 		fi
 	fi
 :

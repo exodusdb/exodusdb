@@ -23,18 +23,29 @@ THE SOFTWARE.
 #ifndef EXODUSFUNCS_H
 #define EXODUSFUNCS_H 1
 
+// Including the large fmt library header here so exodus::format can precompile strings using fmt::vformat
+//
+// Sadly that implies that it will be waste time in endless recompilations until it becomes
+// a c++ module.
+//
+// Always use fmt library for now because of various bugs in early
+// versions of stdlibc++ implementation of std::format
+//
 //#include <version>
 //#ifdef __cpp_lib_format
-#if __has_include(<format>)
+//#if __has_include(<formatx>)
 //#	warning has <format>
-#	define EXO_FORMAT 1
-#	include <format>
-	namespace fmt = std;
-#elif __has_include(<fmt/core.h>)
+//#	define EXO_FORMAT 1
+//#	include <format>
+//	namespace fmt = std;
+//#elif __has_include(<fmt/core.h>)
+#if __has_include(<fmt/core.h>)
+//#	warning Using fmt library instead std::format
 #	define EXO_FORMAT 2
 #	pragma GCC diagnostic push
 #	pragma clang diagnostic ignored "-Wdocumentation-unknown-command"
 #	pragma GCC diagnostic ignored "-Winline"
+#	pragma GCC diagnostic ignored "-Wswitch-default"
 #	include <fmt/core.h>
 #	pragma GCC diagnostic pop
 #else
