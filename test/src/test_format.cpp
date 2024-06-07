@@ -203,6 +203,201 @@ function main() {
 
 	}
 
+	{	// Dynamic width possible using vars only with standard c++ format specifiers at the moment
+		// must convert to string - see next block
+
+		// https://en.cppreference.com/w/cpp/utility/format/spec
+		assert(format("{:.^5s}",   "🐱").squote().outputl()     == "'.🐱..'");
+
+		assert(format("{:.^5s}",   var("🐱"), 5).squote().outputl()     == "'.🐱..'");
+
+		// fmtlib v10 fails following
+		//assert(format("{:.5s}",    "🐱🐱🐱").squote().outputl() == "'🐱🐱'");
+		//assert(format("{:.<5.5s}", "🐱🐱🐱").squote().outputl() == "'🐱🐱.'");
+
+		// Not using dynamic arguments
+		//assert(format(FMT_COMPILE("{:4}"), var(9)).squote().outputl() == "'9   '");
+		assert(format("{:4}", var(9), 7, 8, 9).squote().outputl() == "'9   '");
+		assert(format("{:}", var(9)).squote().outputl() == "'9'");
+		assert(format("{}", var(9), 7, 8, 9).squote().outputl() == "'9'");
+
+		// terminate called after throwing an instance of 'fmt::v10::format_error'
+		//  what():  missing '}' in format string
+
+		assert(format("{:{}}", var("x"), 7).squote().outputl() == "'x      '");
+
+		// argument not found
+		//assert(format("{:{}}", var(9), 4).squote().outputl() == "'9   '");
+		//assert(format("{:{}}", var(9), 4).squote().outputl() == "'9   '");
+		//assert(format("{:{}s}", var(9), 4).squote().outputl() == "'9   '");
+		//assert(format("{:0<.{}}", var(9), 4).squote().outputl() == "'9   '");
+		//assert(format("{:<{}}", var(9), 4).squote().outputl() == "'9   '");
+		//assert(format("{0:<{}}", var(9), 4).squote().outputl() == "'9   '");
+
+		// cannot switch from automatic to manual argument indexing
+		//assert(format("{:<{1}}", var(9), 4).squote().outputl() == "'9   '");
+		//assert(format("{0:<{1}}", var(9), 4).squote().outputl() == "'9   '");
+
+	}
+
+	{
+		// oconv(9, "L#4");
+		assert(format("{:{}s}", var(9).toString(), 4).squote().outputl() == "'9   '");
+		assert(format("{:{}}", var(9).toString(), 4).squote().outputl() == "'9   '");
+		assert(format("{:<{}}", var(9).toString(), 4).squote().outputl() == "'9   '");
+
+		// oconv(9, "R#4");
+		assert(format("{:>{}}", var(9).toString(), 4).squote().outputl() == "'   9'");
+
+		// oconv(9, "C#4");
+		assert(format("{:^{}}", var(9).toString(), 4).squote().outputl() == "' 9  '");
+
+	}
+
+	{
+		// oconv(9, "L(0)#4");
+		assert(format("{:0<{}}", var(9).toString(), 4).squote().outputl() == "'9000'");
+
+		// oconv(9, "R(0)#4");
+		assert(format("{:0>{}}", var(9).toString(), 4).squote().outputl() == "'0009'");
+
+		// oconv(9, "C(0)#4");
+		assert(format("{:0^{}}", var(9).toString(), 4).squote().outputl() == "'0900'");
+
+	}
+
+	{
+		// Using d for integer output
+		/////////////////////////////
+
+		// oconv(9, "R(0)#4");
+		assert(format("{:04d}", var(9)).squote().outputl() == "'0009'");
+		assert(format("{:0>4d}", var(9)).squote().outputl() == "'0009'");
+
+		// oconv(9, "L(0)4")
+		assert(format("{:0<4d}", var(9)).squote().outputl() == "'9000'");
+
+		// oconv(9, "C(0)4")
+		assert(format("{:0^4d}", var(9)).squote().outputl() == "'0900'");
+
+		// oconv(9, "R#4")
+		assert(format("{:>4d}", var(9)).squote().outputl() == "'   9'");
+		assert(format("{:>04d}", var(9)).squote().outputl() == "'   9'");// 0 in the wrong place so ignored
+
+		// oconv(9, "L#4")
+		assert(format("{:<4d}", var(9)).squote().outputl() == "'9   '");
+		assert(format("{:<04d}", var(9)).squote().outputl() == "'9   '"); // ditto
+
+		// oconv(9, "C#4")
+		assert(format("{:^4d}", var(9)).squote().outputl() == "' 9  '");
+		assert(format("{:^04d}", var(9)).squote().outputl() == "' 9  '"); // ditto
+	}
+
+	{
+		var pi = 3.1415;
+		assert(format("{:10f}", pi).squote().outputl() == "'  3.141500'");
+
+		format("{:03}",7).squote().outputl(":03 7 = ");//007
+		format("{:0{}}",7,4).squote().outputl(":0{} 7 = ");//0007
+
+		// f = floating point after rounding
+		assert(format("{:06f}",var(7.9)).squote().outputl() == "'7.900000'");
+		assert(format("{:07f}",var(7.9)).squote().outputl() == "'7.900000'");
+		assert(format("{:01f}",var(7.9)).squote().outputl() == "'7.900000'"); // why the same? leading zero does nothing?
+
+		assert(format("{:.1f}",var(7.55)).squote().outputl() == "'7.5'");   // wrong!
+		assert(format("{:.1f}",var(-7.55)).squote().outputl() == "'-7.5'"); // wrong!
+
+		assert(format("{:.1f}",var(6.55)).squote().outputl() == "'6.5'");   // wrong!
+		assert(format("{:.1f}",var(-6.55)).squote().outputl() == "'-6.5'"); // wrong!
+
+		assert(format("{:.1f}",var(6.59)).squote().outputl() == "'6.6'");   // OK
+		assert(format("{:.1f}",var(-6.59)).squote().outputl() == "'-6.6'"); // OK
+
+		assert(format("{:.1f}",var(6.55)).squote().outputl() == "'6.5'");   // wrong!
+		assert(format("{:.1f}",var(-6.55)).squote().outputl() == "'-6.5'"); // wrong!
+
+		assert(format("{:06d}",var(8.9)).squote().outputl() == "'000008'");
+		assert(format("{:010.6f}",var(7.9)).squote().outputl() == "'007.900000'");
+
+		// d = digits for integer AFTER truncating
+		assert(format("{:6d}",var(7.5)).squote().outputl() == "'     7'");
+		assert(format("{:6d}",var(7.9)).squote().outputl() == "'     7'");
+		assert(format("{:6d}",var(8.5)).squote().outputl() == "'     8'");
+		assert(format("{:6d}",var(-7.5)).squote().outputl() == "'    -7'");
+		assert(format("{:6d}",var(-8.5)).squote().outputl() == "'    -8'");
+		assert(format("{:6d}",var(-8.9)).squote().outputl() == "'    -8'");
+
+		//format("{::0{}}",var(7),4).squote().outputl(":0{} 7 = ");  //      7
+
+		std::cout << fmt::format("{:03}",7) << " :03 7 = " << std::endl;
+
+		// OK - Check double width emoji
+		assert("🐱"_var.oconv("L(.)#5").outputl() == "🐱...");
+		assert("🐱"_var.oconv("L(.)#1").outputl() == "\xf0"); // WRONG!
+
+		assert("🐱"_var.oconv("R(.)#5").outputl() == "...🐱");
+		assert("🐱"_var.oconv("R(.)#1").outputl() == "\xb1"); // WRONG!
+
+		assert("🐱"_var.oconv("C(.)#5").outputl() == ".🐱..");
+		assert("🐱"_var.oconv("C(.)#1").outputl() == "\xf0"); // WRONG!
+
+	}
+
+	{
+		// Check exodus::textwidth which uses OS wcswidth function except that control characters count as zero
+
+		// Implementation of os wcswidth for terminal output of wide characters
+		// https://mitchellh.com/writing/grapheme-clusters-in-terminals
+		// list of terminal program support. Need switch on/off for programming?
+
+		// GRAPHEME CLUSTER EXAMPLE
+		// 1. U+1F9D1 🧑(Adult face) (2 cells)
+		// 2. U+200D (ZWJ) Zero Width Joiner (Zero cells)
+		// 3. U+1F33E 🌾 (Ear of Rice) (2 cells)
+		//
+		// Should show as a farmer with 2 cells wide
+		// But on Linux Gnome Terminal. shows as 5 cells wide
+		//
+		//var farmer = "🧑‍🌾"; Not showing face on Ubuntu 20.04
+		var farmer = "\U0001F9D1\u0200\U0001F33E";
+		printl("Grapheme clustering not supported on Linux gnome terminal 20.04 22.04 24.04?");
+		var farmerwidth = farmer.output("Farmer Grapheme Cluster = ").textwidth().outputl(" textwidth = ");
+		// Ubuntu 20.04 = 5, Ubuntu 22.04 and 24.04 = 4
+		assert(farmerwidth == 4 or farmerwidth == 5);
+
+		// OK - Combining e and Grave Accent gives width 1
+		assert(textwidth("e\u0300"_var.outputl("✅︎ 1 = ")) == 1);
+
+		// KO - Check Combining waving han (width 2) AND light skin tone (width 2) should be combine into width 2 of the hand only
+		assert(textwidth("\U0001F44B\U0001F3FB"_var.outputl("❌ 4 should be 2 ")) == 4);
+		assert(textwidth("👋🏻"_var.outputl("❌ 4 should be 2 ")) == 4);
+
+		// OK - Any unprintable count as zero
+		var v1 = "abc" "\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f";
+		//v1.squote().outputl();
+		assert(textwidth(v1).outputl("✅ control chars 0 - 32 should be 0") == 3);
+	}
+
+	{
+		var v1 {"abc"};
+		var v2 = 12.345;
+		var v10 = 10;
+
+		assert(format("{:.>{}.{}f}", v2, 10, 5).squote().outputl() == "'..12.34500'");
+
+		assert(format("'{:13f}'", v2).outputl() == "'    12.345000'");
+
+		// dynamic pad width and precision on standard format specifiers like f (fixed decimals)
+		assert(format("'{:{}.{}f}'", v2, 12, 2).outputl() == "'       12.35'");
+		assert(format("{:.>{}.{}}", v1, 10, 5).outputl() == ".......abc");
+		assert(format("'{:{}b}'", v10, 12, 2).outputl() == "'        1010'");
+		assert(format("'{:0f}'", v2).outputl() == "'12.345000'");
+		assert(format("'{::HEX}'", v10).outputl() == "'3130'");
+		assert(format("a {} b {} c", 100, 200).outputl() == "a 100 b 200 c");
+
+	}
+
 	printl(elapsedtimetext());
 	printl("Test passed");
 

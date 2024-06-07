@@ -764,124 +764,436 @@ void println() {
 
 #if EXO_FORMAT
 
+// All c++ format specifiers formatting is locale-independent by default.
+// Use the 'L' format specifier to insert the appropriate number separator characters from the locale:
+// Locale only affects arithmetic and bool types
+// https://en.cppreference.com/w/cpp/utility/format/spec
+//
+// Exodus conversions likewise although note that some conversions by oconv member function of exoprog is dependent on exoenv globals
+
+/////////////////
+// fmt::formatter - for var.
+/////////////////
+
+// Needs to know how to delegate parse and format functions to standard string_view, double and int versions
+// therefore multiple inheritance
 template <>
-struct fmt::formatter<exodus::var> {
+struct fmt::formatter<exodus::var> : formatter<std::string_view>, formatter<double>, formatter<int> {
 
-	//std::string_view fmt_str; // formatting information
-	//std::string fmt_str = exodus::var("").errputl("hello");
-	std::string fmt_str;
-	char formatcode = ' ';
-	//char c1 = '~';
-	//char c2 = '~';
-	//char c3 = '~';
-	//char c4 = '~';
-	template<typename ParseContext>
-	constexpr auto parse(ParseContext& ctx) {
-		// begin() always starts at the first character after the opening { and optional "99:" positional argument
-		// if "{}" points at "}"
-		// if "{2} points at "}"
-		// if "{2:10.2f}" points at "1"
-		// end() always points to the final end of the whole format string, not after the closing "}" character.
-		//c1 = *(ctx.begin() - 1);
-		//c2 = *ctx.begin();
-		//c3 = *(ctx.end() - 1);
-		//c4 = *ctx.end();
+	// Detect leading ':' -> exodus conversions/format specifiers
+	// otherwise trailing characters -> standard fmt/std format specifiers
+	//
+	// parse determines which parse/format functions should be used
+	//
+	// ':' for exodus conversions which do not use standard parse/float functions
+	// 'F' standard floating point f,F,e,E,g,G,a,A
+	// 'I' standard intege b,B,d,o,x,X
+	// 'S' standard string for s,c or not specified
+	char fmt_code_ = ' ';
+
+	// Need to pass exodus format strings to formatter (starting :) e.g. as in "abc{::MD20}def"
+	// since all parsing is done at runtime for exodus conversions
+	std::string fmt_str_;
+
+	// TODO allow dynamic arguments for exodus conversions (MD R# etc.)
+	// Future use for dynamic arguments in exodus conversions ("format specifiers")
+	int dynargn1 = -1;
+	// Will require storage of the argument number(s) (either automatic or manual)
+	// and using those argument numbers to extract the right argument value in the format stage
+	// argument values are available in ctx.arg(n) in the format stage
+	// but as they are variants they require careful extraction using visit_format_arg(...) or basic_format_arg.visit(...)
+	//
+	// 1. For exodus conversions?
+	//
+	// MD{}{}P ?
+	//
+	// 2. standard c++ fmt/std::format specifiers already work
+	//  because we are calling the standard parse and format functions
+	//
+	// std::format dynamic arguments
+	// https://hackingcpp.com/cpp/libs/fmt.html
+	//
+	// strings        -> field-width and cut-width
+	// chars          -> pad-width
+	// integers       -> pad-width
+	// floating point -> pad-width
+
+//////////////////////////
+// fmt::formatter::parse() - maybe at compile time
+//////////////////////////
+//
+//	NOTE that providing a parse function means the context object passed into format
+//  is no longer capable of being forwarded to the standard format functions as in ...
+//
+//	Works but only supports string format specifier
+//
+//	template <>
+//	struct formatter<exodus::var> : formatter<std::string_view> {
+//		auto format(const exodus::var& var1, format_context& ctx) {
+//  	return formatter<std::string_view>::format(var1.toString(), ctx);
+//	};
+//
+//
+template<typename ParseContext>
+constexpr auto parse(ParseContext& ctx) {
+
+	//std::cerr << " \n>>> exofuncs.h parse  '" << std::string(ctx.begin(), ctx.end()) << "'" << std::endl;
 
 #pragma GCC diagnostic push
 #pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
-		auto it = ctx.begin();
-//		if (*it == '}') {
-//			fmt_str = "{0:s}";
-//			formatcode = ' ';
-//			return it;
-//		}
-		while (it != ctx.end()) {
-			//c2 = *it;
+	auto it = ctx.begin();
+
+	// We might have been given nothing if pattern was {}
+	if (it == ctx.end()) {
+		fmt_code_ = 'S';
+		return formatter<std::string_view>::parse(ctx);
+	}
+
+	// Pick/Exodus conversion codes if starts with :
+	const bool exodus_style_conversion = *it == ':';
+
+	while (it != ctx.end()) {
+
+		// Acquire (and skip over?) any dynamic argument
+		// TODO handle multiple dynamic arguments?
+		if (*it == '{') {
+			//fmt_str_.push_back('{');
+			std::string arg_str;
+			it++;
+
+			while (*it != '}' && it != ctx.end()) {
+			//	fmt_str_.push_back(*it);
+				arg_str.push_back(*it);
+				it++;
+			}
+
+			if (! arg_str.empty()) {
+				try {
+					dynargn1 = std::stoi(arg_str);
+				} catch (...) {
+					//throw std::format_error("exofuncs.h: formatter_parse: invalid dynamic arg '" + arg_str + "'");
+					//throw_format_error(std::string("exofuncs.h: formatter_parse: invalid dynamic arg ") + arg_str);
+					throw_format_error(std::string("exofuncs.h: formatter_parse: invalid dynamic arg '" + arg_str + "'").c_str());
+				}
+			}
+
 			if (*it == '}') {
-				//fmt_str = {ctx.begin(), it + 1};
-				fmt_str = "{:";
-#pragma GCC diagnostic push
-#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
-				fmt_str.append(ctx.begin(), it + 1);
-#pragma GCC diagnostic pop
-				//fmt_str[0] = '{';
-				//ctx.advance_to(it + 1);
+				it++;
+			}
+
+			continue;
+		}
+
+		// Terminate parse if we reach } char
+		if (*it == '}') {
+
+			// 1. exodus style conversions/format specifiers
+			// need the whole fmt string (e.g. "MD20P") in the format stage
+			// so save it in a member data of the this formatter object
+			if (exodus_style_conversion) {
+				fmt_code_ = ':';
+				fmt_str_ = std::string(ctx.begin() + 1, it);
 				return it;
 			}
-			formatcode = *it;
+
+			// 2. C++ style format codes need parsing
+			switch (fmt_code_) {
+
+				// Floating point
+				case 'a':
+				case 'A':
+				case 'e':
+				case 'E':
+				case 'f':
+				case 'F':
+				case 'g':
+				case 'G': {
+					fmt_code_ = 'F';
+					return formatter<double>::parse(ctx);
+				}
+				// Integer
+				case 'd':
+				case 'b':
+				case 'B':
+				case 'o':
+				case 'X':
+				case 'x': {
+					fmt_code_ = 'I';
+					return formatter<int>::parse(ctx);
+				}
+				// String
+				case 'c':
+				default:
+					fmt_code_ = 'S';
+					return formatter<std::string_view>::parse(ctx);
+			}
+		}
+
+		fmt_code_ = *it;
 #pragma GCC diagnostic push
 #pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
-			it++;
+		it++;
 #pragma GCC diagnostic pop
-		}
-		// If we dont find a closing "}" char
+	}
+	// If we dont find a closing "}" char
 
 #if EXO_FORMAT == 1
-		[[unlikely]]
-		throw std::format_error("formatter_parse: format missing trailing '}'");
+	[[unlikely]]
+	throw std::format_error("exofuncs.h: formatter_parse: format missing trailing }");
 #else
-		//throw_format_error("formatter_parse: format missing trailing }");
-		fmt_str = "{}";
-		return it;
+	throw_format_error("exofuncs.h: formatter_parse: format missing trailing }");
+//		fmt_str_ = "{}";
+//		return it;
 #endif
-		//std::unreachable();
-	}
+	//std::unreachable();
 
-	// Good format code description although not from "fmt", not official c++
-	// https://fmt.dev/latest/syntax.html#formatspec
+} // formatter::parse()
 
-	template <typename FormatContext>
-	auto format(const exodus::var& v1, FormatContext& ctx) const {
-		//std::cout << "c1:'" << c1 << " c2:'" << c2 << "' c3:'" << c3 << "' c4:'" << c4 << "' \n";
-		//std::cout << "fmtstr:'" << fmt_str << "' fmtcode:'" << formatcode << "' \n";
+//////////////////////
+// formatter::format() - run time
+//////////////////////
+
+// Good format code description although not from "fmt", not official c++
+// https://fmt.dev/latest/syntax.html#formatspec
+
+template <typename FormatContext>
+auto format(const exodus::var& var1, FormatContext& ctx) const {
+
+	//std::cerr << ">>> exofuncs.h format '" << fmt_str_ << "' '" << fmt_code_ << "' '" << var1 << "'\n";
+
+	switch (fmt_code_) {
 
 		// 1. EXODUS conversions
-		// Unfortunately without time zone or number format currently.
-		// TODO allow thread_local global timezone, number format?
-		// {::MD20PZ}
-		// {::D2/E} etc.
-		// {::MTHS} etc.
-		if (fmt_str[2] == ':') {
-			//ctx.out() << v1.oconv(fmt_str.data());
-			auto conversion = std::string(fmt_str.begin() + 3, fmt_str.end() - 1);
-			auto s1 = v1.oconv(conversion.data()).toString();
-			return vformat_to(ctx.out(), "{:}", make_format_args(s1));
+
+		case ':': {
+
+			// Unfortunately without time zone or number format currently.
+			// TODO allow thread_local global timezone, number format?
+			// {::MD20PZ}
+			// {::D2/E} etc.
+			// {::MTHS} etc.
+			//return formatter<std::string_view>::format(var1, ctx);
+			exodus::var converted_var1 = var1.oconv(fmt_str_.c_str());
+			auto sv1 = std::string_view(converted_var1);
+			return vformat_to(ctx.out(), "{:}", make_format_args(sv1));
+
 		}
 
-		else
 		// 2. C++ style format codes
-		switch (formatcode) {
 
-			// Floating point
-			case 'f':
-			case 'a':
-			case 'e':
-			case 'F':
-			case 'g':
-			case 'G': {
-				//return vformat_to(ctx.out(), fmt_str, make_format_args(v1.toDouble()));
-				auto d1 = v1.toDouble();
-				return vformat_to(ctx.out(), fmt_str, make_format_args(d1));
-			}
-			// Integer
-			case 'd':
-			case 'b':
-			case 'B':
-			case 'c':
-			case 'o':
-			case 'X':
-			case 'x': {
-				//return vformat_to(ctx.out(), fmt_str, make_format_args(v1.toInt()));
-				auto i1 = v1.toInt();
-				return vformat_to(ctx.out(), fmt_str, make_format_args(i1));
-			}
-			// String
-			default:
-				return vformat_to(ctx.out(), fmt_str, make_format_args(v1.toString()));
+		// Standard floating point on var::toDouble()
+		case 'F': {
+			return formatter<double>::format(var1.toDouble(), ctx);
 		}
+
+		// Standard integer on var::toInt()
+		case 'I': {
+			return formatter<int>::format(var1.toInt(), ctx);
+		}
+
+		// Standard string on var::toString()
+		case 'S':
+		default:
+			return formatter<std::string_view>::format(std::string_view(var1), ctx);
+
 	}
-};
+} // formatter::format
+}; //fmt::formatter
+
+// How to format user defined types.
+//
+// 1. https://en.cppreference.com/w/cpp/utility/format/formatter
+//
+// 2. https://fmt.dev/latest/api.html
+// Section: Formatting User-Defined Types
+//
+// *** NEEDS #include fmt/format.h not fmt/core.h
+//
+//template<class T>
+//struct formatter {
+//	constexpr auto parse(format_parse_context&);
+//
+//	typename format_context::iterator
+//	format(const T&, format_context&);
+//};
+//
+
+
+//namespace fmt {
+//
+//// Works fine but only supports string format specifiers
+//template <>
+//struct formatter<exodus::var> : formatter<std::string_view> {
+//
+//auto format(const exodus::var& var1, format_context& ctx) {
+//	// Sadly we dont have access to the formatstring that parse has access to
+//	//auto s = std::string(ctx.begin(), ctx.end());
+//	return formatter<std::string_view>::format(var1.toString(), ctx);
+//}
+//
+//}; // formatter
+//
+//} // namespace fmt
 
 #endif	// EXO_FORMAT
 
 #endif	// EXODUSFUNCS_H
+
+/*
+FOLLOWING IS A FAILED ATTEMPT TO USE VISITOR PATTERN
+TO PROVIDE DYNAMIC FORMAT ARGUMENTS FOR EXODUS FORMAT CONVERSIONS LIKE {:MD20P}
+
+//////////////////
+// Visitor pattern
+//////////////////   
+
+template<typename ... Ts>
+struct Overload : Ts ... {
+    using Ts::operator() ...;
+};
+template<class... Ts> Overload(Ts...) -> Overload<Ts...>;
+
+FOLLOWING SHOULD BE INSIDE class formatter<exodus::var>::format function
+
+// ctx.arg(n) appear to be format_arguments which is a variant like object
+// https://en.cppreference.com/w/cpp/utility/format/basic_format_context
+std::cerr << " has dynargn0 " << bool(ctx.arg(0)) << std::endl;
+std::cerr << " has dynargn1 " << bool(ctx.arg(1)) << std::endl;
+std::cerr << " has dynargn2 " << bool(ctx.arg(2)) << std::endl;
+std::cerr << " has dynargn3 " << bool(ctx.arg(3)) << std::endl;
+std::cerr << " has dynargn4 " << bool(ctx.arg(4)) << std::endl;
+////				auto dynarg1v = 13;
+////				return vformat_to(ctx.out(), fmt_str_, make_format_args(var1.toString(), dynarg1v));
+//
+//					auto format_args = make_format_args(var1.toString(), 1, 2, 3, 4);
+////				if (dynarg1) {
+////					format_args.push_back(dynarg1));
+////				}
+////				return vformat_to(ctx.out(), fmt_str_, format_args);
+////				return vformat_to(ctx.out(), fmt_str_, ctx.arg);
+////				return vformat_to(ctx.out(), fmt_str_, ctx.arg[dynargn1]);
+//
+// requires #include <fmt/args.h>
+
+		fmt::dynamic_format_arg_store<FormatContext> store;
+		store.push_back(var1.toString());
+
+//	https://en.cppreference.com/w/cpp/utility/format/basic_format_arg
+//	std::basic_format_arg
+//
+//	A basic_format_arg object behaves as if it stores a std::variant of the following types:
+//
+//	std::monostate (only if the object was default-constructed)
+//	bool
+//	Context::char_type
+//	int
+//	unsigned int
+//	long long int
+//	unsigned long long int
+//	float
+//	double
+//	long double
+//	const Context::char_type*
+//	std::basic_string_view<Context::char_type>
+//	const void*
+//	basic_format_arg::handle
+
+// https://en.cppreference.com/w/cpp/utility/format/visit_format_arg
+// std::visit(std::forward<Visitor>(vis), value)
+// visit_format_arg( Visitor&& vis, std::basic_format_arg<Context> arg );
+
+// Sadly int(vx) doesnt compile even when protected inside constexpr visitor lambda when type of vx is int!
+
+    auto visitor1 = Overload{
+        [](auto vx) -> int {
+				std::cout << "Visitor type    " << typeid(vx).name() << '\n';
+//				std::cout << "double        d " << typeid(double).name() << '\n';
+//				std::cout << "long double   e " << typeid(long double).name() << '\n';
+//				std::cout << "short int     s " << typeid(short int).name() << '\n';
+//				std::cout << "int           i " << typeid(int).name() << '\n';
+//				std::cout << "long int      l " << typeid(long int).name() << '\n';
+//				std::cout << "long long int x " << typeid(long long int).name() << '\n';
+//return int(-1);
+				if (std::is_same<decltype(vx), monostate>::value)
+					return int(0);// missing argument
+
+				if (std::is_same<decltype(vx), double>::value) {
+					std::cout << "double" << std::endl;
+					//return int(vx);
+					return int(sizeof vx);
+				}
+				if (std::is_integral<decltype(vx)>::value)
+					return int(11);
+				if (std::is_floating_point<decltype(vx)>::value)
+//					return static_cast<const int>(vx);
+					return int(vx); // WHY DOES THIS NOT COMPILE??
+					return int(sizeof vx);//8
+
+//				if (std::is_same<decltype(vx), const char*>::value)
+//					return int(2);
+				if (std::is_same<decltype(vx), const fmt::v10::monostate>::value)
+					return int(5);
+				if (std::is_same<decltype(vx), std::monostate>::value)
+					return int(5);
+				if (std::is_same<decltype(vx), bool>::value)
+					return int(5);
+//				if (std::is_same<decltype(vx), FormatContext::char_type>::value)
+//					return int(5);
+//				if (std::is_same<decltype(vx), FormatContext::char_type*>::value)
+//					return int(5);
+				if (std::is_same<decltype(vx), short int>::value)
+					return int(5);
+				if (std::is_same<decltype(vx), int>::value)
+					return int(5);
+				if (std::is_same<decltype(vx), unsigned int>::value)
+					return int(5);
+				if (std::is_same<decltype(vx), long long int>::value)
+					return int(5);
+				if (std::is_same<decltype(vx), unsigned long long int>::value)
+					return int(5);
+				if (std::is_same<decltype(vx), float>::value)
+					return int(5);
+				if (std::is_same<decltype(vx), double>::value)
+					return int(5);
+				if (std::is_same<decltype(vx), long double>::value)
+					return int(5);
+				if (std::is_same<decltype(vx), std::basic_string_view<typename FormatContext::char_type>>::value)
+					return int(5);
+				if (std::is_same<decltype(vx), const void*>::value)
+					return int(5);
+
+				if (std::is_same<decltype(vx), const char*>::value)
+					return int(5);
+				if (std::is_same<decltype(vx), basic_string_view<char>>::value)
+					return int(5);
+//				if (std::is_same<decltype(vx), basic_format_arg<FormatContext>::handle>::value)
+//					return int(5);
+
+//				if (std::is_floating_point<decltype(vx)>::value)
+//					return static_cast<int>(vx);
+//				if (std::is_arithmetic_v<decltype(vx)>)
+//					return static_cast<int>(vx);
+				//return uint(sizeof vx);
+//				fmt::println("missing {}", typeid(vx));
+				return int(6);
+		},
+	};
+//	[](std::monostate)           {return int(-1);},
+//	[](bool v)                   {return int(v);},
+//	[](FormatContext::char_type) {return int(-1);},
+//	[](int v)                    {return int(v);},
+//	[](unsigned int v)           {return int(v);},
+//	[](long long int v)          {return int(v);},
+//	[](unsigned long long int v) {return int(v);},
+//	[](float v)                  {return int(v);},
+//	[](double v)                 {return int(v);},
+//	[](long double v)            {return int(v);},
+//	[](const FormatContext::char_type*) {return int(-1);},
+//	[](std::basic_string_view<typename FormatContext::char_type>) {return int(-1);},
+//	[](const void*)              {return int(-1);},
+//	[](basic_format_arg<FormatContext>::handle) {return int(-1);},
+		auto result = visit_format_arg(visitor1, ctx.arg(1));
+		//auto result2 = visit_format_arg(visitor1, ctx.arg(2));
+		store.push_back(result);
+//std::string result = vformat_to(ctx.out(), fmt_str_, store);
+*/
