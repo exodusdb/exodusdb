@@ -22,7 +22,10 @@ THE SOFTWARE.
 
 #ifndef _MSC_VER
 #	define EXODUS_POSIX_SOURCE
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wreserved-id-macro"
 #	define _OSSLASH "/"
+#pragma clang diagnostic pop
 #endif
 
 // For debugging

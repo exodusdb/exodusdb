@@ -143,7 +143,7 @@ function main() {
 	assert(format("{:.^5s}", var("🐱")) == "🐱.");
 
 #else
-#warning Using fmt library instead of std::format
+#warning Using fmtlib library instead of std::format
 	//__clang_major__ 18
 	// Correct in fmt library
 	assert(format("{:.^5s}", "🐱") == ".🐱..");
