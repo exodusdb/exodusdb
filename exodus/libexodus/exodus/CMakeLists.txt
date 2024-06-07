@@ -16,6 +16,10 @@
 	#Use CMakeList.txt options in parent directory
 	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-undef")
 
+	# only for g++ 9.4.0 etc. on Ubuntu 20.04
+	if (CMAKE_CXX_COMPILER_VERSION MATCHES "^9.")
+		SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-inline -Wno-attributes")
+	endif()
 #
 # Add TIMEBANK option
 # ###################
