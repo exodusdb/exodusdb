@@ -1313,6 +1313,7 @@ x1exit:
 				}
 
 			} else {
+				// L# R# C# T#
 				for (int ii = 1; ii <= 9; ++ii) {
 					colhdg(ii) = colhdg.f(ii) ^ oconv(coldict2(coln, 3).f(1, ii), coldict2(coln, 11)) ^ " ";
 				}
@@ -1643,6 +1644,7 @@ nextrec:
 
 		if (coldict2(coln, 9) == "T" and not(html)) {
 
+			// T#
 			mcol(coln) = oconv(calculate(colname(coln)), coldict2(coln, 11));
 
 		} else {
@@ -1770,6 +1772,7 @@ recexit:
 			}
 			if (coldict2(coln, 10)) {
 				if (not html) {
+					// L# R# C# T#
 					tt = oconv(tt, coldict2(coln, 11));
 				}
 				if (tt == "") {
@@ -2297,7 +2300,7 @@ subroutine printbreaks() {
 					}
 					tx ^= ">";
 				}
-				// e.g. L#20 R#20 T#20 etc
+				// L# R# C# T#
 				if (not html) {
 					cell = oconv(cell, coldict2(coln, 11));
 				}
