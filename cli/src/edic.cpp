@@ -352,7 +352,7 @@ function main() {
 				// gnu style error lines
 				// There's a de facto standard format for compiler or linter error messages,
 				// which is the same format as grep -n: FILE_NAME:LINE_NUMBER:MESSAGE
-				let matches = errors.match("\\w" ^ filename ^ ":(\\d+):(\\d+):");
+				let matches = errors.match("\\w" ^ filename ^ ":(\\d+):(\\d+):[^\n]*error");
 				if (matches) {
 
 					startatlineno = matches.f(1, 2);
