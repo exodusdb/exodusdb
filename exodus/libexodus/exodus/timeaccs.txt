@@ -67,7 +67,7 @@
 566 std::string var::toString() && 
 567 std::string var::toString() const& 
 568 var var::len() const 
-569 var var::textsize() 
+569 var var::textlen() 
 570 std::u32string var::to_u32string() const 
 571 VARREF var::trim(SV trimchars) 
 572 VARREF var::trimmer(SV trimchars) 
@@ -185,3 +185,4 @@
 684 VARREF var::unquoter() 
 685 CVR var::swap(CVR var2) const 
 686 VARREF var::swap(VARREF var2) 
+687 var var::textwidth() 

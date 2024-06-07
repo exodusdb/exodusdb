@@ -256,6 +256,7 @@ ND bool eof(void);
 
 ND var len(CVR var1);
 ND var textlen(CVR var1);
+ND var textwidth(CVR var1);
 
 ND var convert(CVR instring, SV fromchars, SV tochars);
 VARREF converter(VARREF iostring, SV fromchars, SV tochars);

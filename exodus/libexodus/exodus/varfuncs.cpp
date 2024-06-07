@@ -133,6 +133,19 @@ static void init_boost_locale1() {
 	}
 }
 
+static inline bool is_ascii(std::string_view str1) {
+	// optimise for ASCII
+	// try ASCII uppercase to start with for speed
+	// this may not be correct for all locales. eg Turkish I i İ ı mixing Latin and Turkish
+	// letters.
+	//for (const char& c : str1) {
+	for (const char c : str1) {
+		if ((c & ~0x7f) != 0)
+			return false;
+	}
+	return true;
+}
+
 int var::localeAwareCompare(const std::string& str1, const std::string& str2) {
 	// https://www.boost.org/doc/libs/1_70_0/libs/locale/doc/html/collation.html
 	// eg ensure lower case sorts before uppercase (despite "A" \x41 is less than "a" \x61)
@@ -413,13 +426,68 @@ const std::string& var::toString() const& {
 	return var_str;
 }
 
-// synonym for length for compatibility with pick's len()
+// synonym for length for compatibility with pick's len() which is bytes
 var var::len() const {
 
 	THISIS("var var::len() const")
 	assertString(function_sig);
 
 	return var_str.size();
+}
+
+// Implementation of os wcswidth for terminal output of wide characters
+// https://mitchellh.com/writing/grapheme-clusters-in-terminals
+// list of terminal program support. Need switch on/off for programming?
+// https://www.man7.org/linux/man-pages/man3/wcswidth.3.html
+// The behavior of wcswidth() depends on the LC_CTYPE category of
+// the current locale.
+var var::textwidth() const {
+
+	THISIS("var var::textwidth() const")
+	assertString(function_sig);
+
+	// If all ASCII then return count of non-control chars
+	auto size = var_str.size();
+	for (const unsigned char c : var_str) {
+		if (c > '\x7f') [[unlikely]]
+			goto unicode;
+		if (c < '\x20') [[unlikely]]
+			size--;
+	}
+	return size;
+
+    //int wcswidth(const wchar_t *s, size_t n);
+unicode:
+	auto wstr1 = this->to_wstring();
+	auto width = wcswidth(wstr1.data(),std::string::npos);
+
+	// If any control chars present then replace them with spaces and try again
+	if (width < 0) {
+		int ncontrolchars = 0;
+		std::replace_if(
+			wstr1.begin(),
+			wstr1.end(),
+			// lambda function to replace and count control chars (0x00 to 0x1f)
+			[&ncontrolchars](const char ch) {
+				if (ch >= 32) [[likely]]
+					return false;
+				ncontrolchars++;
+				return true;
+			},
+			' '
+		);
+		width = wcswidth(wstr1.data(),std::string::npos) - ncontrolchars;
+
+		// If still cannot get length then report an error and terminate
+		if (width < 0) {
+			if (not this->oswrite("error_textwidth.txt")) {
+				this->lasterror().errputl();
+			}
+			throw VarError("EXODUS: Error in " ^ var(__PRETTY_FUNCTION__) ^ " wcswidth failed - see error_textwidth.txt");
+		}
+	}
+
+	return width;
 }
 
 //const char* var::data() const {
@@ -432,11 +500,11 @@ var var::len() const {
 
 var var::textlen() const {
 
-	THISIS("var var::textsize()")
+	THISIS("var var::textlen()")
 	assertString(function_sig);
 
 	var result = 0;
-	for (char& c : var_str) {
+	for (const char c : var_str) {
 		result.var_int += (c & 0b1100'0000) != 0b1000'0000;
 		//std::cout << c << " " << std::bitset<8>(c) << " " << result.var_int << std::endl;
 	}
@@ -730,20 +798,6 @@ VARREF var::fcaser() {
 
 	return *this;
 }
-
-static inline bool is_ascii(std::string_view str1) {
-	// optimise for ASCII
-	// try ASCII uppercase to start with for speed
-	// this may not be correct for all locales. eg Turkish I i İ ı mixing Latin and Turkish
-	// letters.
-	//for (const char& c : str1) {
-	for (const char c : str1) {
-		if ((c & ~0x7f) != 0)
-			return false;
-	}
-	return true;
-}
-
 
 // *** USED TO NORMALISE ALL KEYS BEFORE READING OR WRITING ***
 // *** otherwise can have two record with similar keys á and á

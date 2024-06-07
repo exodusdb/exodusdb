@@ -150,8 +150,8 @@ consteval auto get_timeacno(const char* arg1) -> int {
 	else if ( ! std::strcmp(arg1, "std::string var::toString() &&")) acno = 67;
 	else if ( ! std::strcmp(arg1, "std::string var::toString() const&")) acno = 68;
 	else if ( ! std::strcmp(arg1, "var var::len() const")) acno = 69;
-	else if ( ! std::strcmp(arg1, "var var::textsize()")) acno = 70;
-	else if ( ! std::strcmp(arg1, "std::u32string var::to_u32string() const")) acno = 71;
+	else if ( ! std::strcmp(arg1, "var var::textlen()")) acno = 70;
+--	else if ( ! std::strcmp(arg1, "std::u32string var::to_u32string() const")) acno = 71;
 	else if ( ! std::strcmp(arg1, "VARREF var::trim(SV trimchars)")) acno = 72;
 	else if ( ! std::strcmp(arg1, "VARREF var::trimmer(SV trimchars)")) acno = 73;
 	else if ( ! std::strcmp(arg1, "VARREF var::trimfirst(SV trimchars) const&")) acno = 74;
@@ -268,6 +268,7 @@ consteval auto get_timeacno(const char* arg1) -> int {
 	else if ( ! std::strcmp(arg1, "VARREF var::unquoter()")) acno = 185;
 	else if ( ! std::strcmp(arg1, "CVR var::swap(CVR var2) const")) acno = 186;
 	else if ( ! std::strcmp(arg1, "VARREF var::swap(VARREF var2)")) acno = 187;
+	else if ( ! std::strcmp(arg1, "var var::textwidth()")) acno = 188;
 	else {
 		//throw std::runtime_error("");
 		//throw 500;
