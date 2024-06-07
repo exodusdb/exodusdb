@@ -524,6 +524,19 @@ std::u32string var::to_u32string() const {
 	return boost::locale::conv::utf_to_utf<char32_t>(var_str);
 }
 
+std::wstring var::to_wstring() const {
+
+	 THISIS("std::wstring var::to_wstring() const")
+	 assertString(function_sig);
+
+	// 1.4 secs per 10,000,000 var=var copies of 3 byte ASCII strings
+	// simple var=var copy of the following data
+
+	// 14.9 secs round trips u8->w->u8 per 10,000,000 on vm7
+	// SKIPS/TRIMS OUT any bad utf8
+	return boost::locale::conv::utf_to_utf<wchar_t>(var_str);
+}
+
 void var::from_u32string(std::u32string u32str) const {
 	// for speed, dont validate
 	// THISIS("void var::from_u32tring() const")
