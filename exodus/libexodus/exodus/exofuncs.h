@@ -797,6 +797,7 @@ struct fmt::formatter<exodus::var> : formatter<std::string_view>, formatter<doub
 
 	// TODO allow dynamic arguments for exodus conversions (MD R# etc.)
 	// Future use for dynamic arguments in exodus conversions ("format specifiers")
+	std::string arg_str; // only here because clang on Ubuntu 22.04 cannot declare str string in constexpr functions
 	int dynargn1 = -1;
 	// Will require storage of the argument number(s) (either automatic or manual)
 	// and using those argument numbers to extract the right argument value in the format stage
@@ -858,7 +859,8 @@ constexpr auto parse(ParseContext& ctx) {
 		// TODO handle multiple dynamic arguments?
 		if (*it == '{') {
 			//fmt_str_.push_back('{');
-			std::string arg_str;
+			//std::string arg_str;
+			arg_str.clear();
 			it++;
 
 			while (*it != '}' && it != ctx.end()) {
