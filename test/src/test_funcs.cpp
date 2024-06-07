@@ -72,12 +72,35 @@ programinit()
 		var x = "asd";
 		assert(len(x)     eq 3);
 		assert(textlen(x) eq 3);
+		assert(textwidth(x) eq 3);
 
 		x = "Γιάννης";
 		assert(len(x)     eq 14);
 		assert(textlen(x) eq 7);
+		assert(textwidth(x) eq 7);
 	}
 
+	{
+		// OK - Check double width emoji with "cat face"
+		assert(len("\U0001f431"_var.outputl("✅︎ 2 = ")) == 4);
+		assert(len("🐱"_var.outputl("✅︎ 2 = ")) == 4);
+		assert(textlen("🐱"_var.outputl("✅︎ 2 = ")) == 1);
+		assert(textwidth("🐱"_var.outputl("✅︎ 2 = ")) == 2);
+
+		// OK - Any unprintable ASCII control chars count as zero
+		assert(textwidth("\u0001"_var.outputl("✅ control chars 0 - 32 should be 0 ")) == 0);
+
+		// OK - Combining e and Grave Accent gives width 1
+		assert(textwidth("e\u0300"_var.outputl("✅︎ 1 = ")).outputl() == 1);
+
+		// KO - Check Combining waving han (width 2) AND light skin tone (width 2) should be combine into width 2 of the hand only
+		assert(textwidth("\U0001F44B\U0001F3FB"_var.outputl("❌ 4 should be 2 ")) == 4);
+		assert(textwidth("👋🏻"_var.outputl("❌ 4 should be 2 ")) == 4);
+
+		// KO - Unicode unprintable ZERO WIDTH SPACE
+		assert(textwidth("\u0200"_var.outputl("❌ 1 should 0 ZERO_WIDTH SPACE ")).outputl() == 1);
+
+	}
 	{
 		//convert complex utf8 characters to utf8 characters
 		var yiannis = "Γιάννης";
