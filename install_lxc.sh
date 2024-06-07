@@ -76,6 +76,8 @@ set -euxo pipefail
 	TARGET_GID=0
 	TARGET_HOME=/root
 
+	SSH_OPT="-o BatchMode=yes -o StrictHostKeyChecking=no"
+
 #	IMAGE=u2204-preinstalled
 #	lxc launch ubuntu:22.04 u2204-preinstalled
 #	lxc start u2204-preinstalled
@@ -124,15 +126,59 @@ function stage {
 		lxc start $NEW_C || exit 1
 	fi
 :
+: Wait for ip no
+: --------------
+:
+	for i in {1..100}; do
+		IPNO=`lxc list $NEW_C --format csv --columns 4 | grep -P -o "\d+\.\d+\.\d+\.\d+" || true`
+		if [[ "$IPNO" != "" ]]; then
+			set -x
+			break
+		fi
+		sleep 1
+		set +x
+		echo Waiting for ip no to appear in lxc
+	done
+	echo $IPNO
+
+:
+: Enable ssh login
+: ----------------
+:
+	lxc exec $NEW_C -- bash -c "ssh-keygen -t rsa -N '' -f ~/.ssh/id_rsa <<< y" || exit 1
+
+	lxc exec $NEW_C -- bash -c "echo '`cat ~/.ssh/*.pub`' >> /root/.ssh/authorized_keys" || exit 1
+:
+: Check we can now ssh into the container
+:
+	sleep 1
+	if ! ssh $SSH_OPT root@$IPNO pwd ; then
+		sleep 1
+	fi
+	ssh $SSH_OPT root@$IPNO pwd || exit 1
+
+:
 : Update container with local exodus dir
 : --------------------------------------
 :
-	#lxc file push * $NEW_C/root/exodus --recursive --create-dirs --quiet
-	#lxc file push . $NEW_C/root --recursive --create-dirs --quiet
-	#lxc file push ~/exodus $NEW_C/root --recursive --create-dirs --quiet --gid 0 --uid 0
-	#lxc file push ~/exodus $NEW_C/root --recursive --create-dirs --quiet || exit 1
-	lxc file push ~/exodus ${NEW_C}${TARGET_HOME} --recursive --create-dirs --quiet || exit 1
-:
+	CONNECTION=22
+	SSH_USER=root
+	SOURCE=
+	FILEORFOLDER=exodus
+	TARGET=root@$IPNO
+	PARENTPATH=/root/
+	rsync -avz --links -e "ssh -p ${CONNECTION} $SSH_OPT" `pwd` ${TARGET}:/root
+
+#:
+#: Update container with local exodus dir
+#: --------------------------------------
+#:
+#	#lxc file push * $NEW_C/root/exodus --recursive --create-dirs --quiet
+#	#lxc file push . $NEW_C/root --recursive --create-dirs --quiet
+#	#lxc file push ~/exodus $NEW_C/root --recursive --create-dirs --quiet --gid 0 --uid 0
+#	#lxc file push ~/exodus $NEW_C/root --recursive --create-dirs --quiet || exit 1
+#	lxc file push ~/exodus ${NEW_C}${TARGET_HOME} --recursive --create-dirs --quiet || exit 1
+#:
 	#Avoid git error: "fatal: detected dubious ownership in repository at '.../exodus''
 	lxc exec $NEW_C -- bash -c "chown -R $TARGET_UID:$TARGET_GID ${TARGET_HOME}/exodus" || exit 1
 :
