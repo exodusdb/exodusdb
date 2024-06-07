@@ -1197,3 +1197,4 @@ std::cerr << " has dynargn4 " << bool(ctx.arg(4)) << std::endl;
 		store.push_back(result);
 //std::string result = vformat_to(ctx.out(), fmt_str_, store);
 */
+
