@@ -633,6 +633,7 @@ class PUBLIC var final {
 		return var_str.c_str();
 	}
 
+	std::wstring to_wstring() const;
 	std::u32string to_u32string() const;
 
 	//void from_u32string(std::u32string) const;
