@@ -145,7 +145,12 @@
 		# GCC
 		add_compile_options(-Wno-cast-function-type)
 		add_compile_options(-Wno-maybe-uninitialized)
-		add_compile_options(-Wno-unknown-pragmas) #switched off to avoid various warnings
+
+		# only for g++ 9.4.0 etc. on Ubuntu 20.04
+		if (CMAKE_CXX_COMPILER_VERSION MATCHES "^9.")
+			add_compile_options(-Wno-inline)
+			add_compile_options(-Wno-unknown-pragmas)
+		endif()
 
 	else()
 
