@@ -149,6 +149,11 @@ function get_dependencies_for_build {
 : GET DEPENDENCIES FOR BUILD
 : --------------------------
 :
+:
+: Update apt
+:
+	sudo apt -y update
+
 : Postgresql package
 : ------------------
 :
