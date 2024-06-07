@@ -744,6 +744,92 @@ std::string var::oconv_LRC(CVR format) const {
 	return result;
 }
 
+/* partial conversion to multibyte/grapheme formatting
+   but only padding, not truncating
+std::string var::oconv_LRC(CVR format) const {
+
+	// TODO convert to C instead of var for speed
+	// and implement full mask options eg L#2-#3-#4 etc
+
+	var varwidth = format.field("#", 2, 1);
+	var just = (format.field("#", 1, 1))[1];
+
+	if (!varwidth.isnum() or varwidth < 0)
+		return *this;
+	std::size_t width = varwidth.toInt();
+
+	// get padding character from "L(?)" or space
+	char fillchar;
+	if (format.var_str.size() >= 4 && format.var_str[1] == '(' && format.var_str[3] == ')')
+		fillchar = format.var_str[2];
+	else
+		fillchar = ' ';
+
+	std::string result = "";
+	var terminator;
+
+	var part;
+	std::size_t remaining;
+	var charn = 1;
+	while (true) {
+
+		// part=remove(charn, terminator);
+		part = this->substr2(charn, terminator);
+		// if len(part) or terminator then
+
+		// TODO optimise with pos1() and pos2()
+		// or substr "upto" next character (space here)
+
+		if (width) {
+
+			//if (remaining > 0) {
+			//if (width > part.var_str.size()) {
+			//	remaining = width - part.var_str.size();
+			auto part_textwidth = part.textwidth();
+			if (width > part_textwidth) {
+
+				// Padding
+
+				remaining = width - part_textwidth.toInt();
+				if (just == "L") {
+					result += part.var_str;
+					result.append(remaining, fillchar);
+				} else if (just == "R") {
+					part.var_str.insert(0, remaining, fillchar);
+					result += part.var_str;
+				} else	//"C"
+				{
+					std::size_t nprefix = remaining / 2;
+					part.var_str.insert(0, nprefix, fillchar);
+					result += part.var_str;
+					result.append(remaining - nprefix, fillchar);
+				}
+			} else {
+
+				// Truncating
+
+				if (just == "R") {
+					// take the last n characters
+					result += part.var_str.substr(part.var_str.size() - width, width);
+				} else	// L or C
+				{
+					// take the first n characters
+					result += part.var_str.substr(0, width);
+				}
+			}
+		}
+
+		// BREAK;
+		if (!terminator)
+			break;
+
+		result.push_back(char(LAST_DELIMITER_CHARNO_PLUS1 - terminator.toInt()));
+	}  // loop;
+
+	return result;
+}
+*/
+
 var var::oconv(const char* conversion_in) const {
 
 	THISIS("var var::oconv(const char* conversion) const")
