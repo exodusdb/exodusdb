@@ -28,8 +28,11 @@ THE SOFTWARE.
 // Sadly that implies that it will be waste time in endless recompilations until it becomes
 // a c++ module.
 //
-// Always use fmt library for now because of various bugs in early
-// versions of stdlibc++ implementation of std::format
+// Always use fmt library for now because of various bugs causing inconsistency
+// in early versions of stdlibc++ implementation of std::format
+// As of 2024
+// 1. Width calculation doesn’t use grapheme clusterization. The latter has been implemented in a separate branch but hasn’t been integrated yet.
+// 2. Most C++20 chrono types are not supported yet.
 //
 //#include <version>
 //#ifdef __cpp_lib_format
@@ -38,6 +41,7 @@ THE SOFTWARE.
 //#	define EXO_FORMAT 1
 //#	include <format>
 //	namespace fmt = std;
+
 //#elif __has_include(<fmt/core.h>)
 #if __has_include(<fmt/core.h>)
 //#	warning Using fmt library instead std::format
@@ -46,7 +50,10 @@ THE SOFTWARE.
 #	pragma clang diagnostic ignored "-Wdocumentation-unknown-command"
 #	pragma GCC diagnostic ignored "-Winline"
 #	pragma GCC diagnostic ignored "-Wswitch-default"
-#	include <fmt/core.h>
+//#	include <fmt/core.h>
+#	include <fmt/format.h> // for fmt::formatter<std::string_view> etc.
+#	include <fmt/args.h> // for fmt::dynamic_format_arg_store
+#	include <variant>
 #	pragma GCC diagnostic pop
 #else
 #	define EXO_FORMAT 0
