@@ -111,6 +111,7 @@ function main() {
 			"	V = Verbose\n"
 			"	S = Silent (stars only)\n"
 			"	h = Generate headers only\n"
+			"	F = Force compilation even if output file is newer than all input files\n"
 			"	X = Skip compilation\n"
 			"ENVIRONMENT\n"
 			"	EXO_COMPILE_OPTIONS as above"
@@ -441,6 +442,7 @@ function main() {
 		liboptions ^= " -fvisibility=hidden -fvisibility-inlines-hidden";
 #endif
 
+		// TODO Dont hard code for typical Ubuntu
 		exodus_libfile_info = osfile("/usr/local/lib/libexodus.so");
 		exodus_include_dir_info = osdir("/usr/local/include/exodus");
 
@@ -1428,7 +1430,15 @@ function main() {
 			//////////////////////////////////////////////////////////////////////////////////////
 
 			let outfileinfo = osfile(outputdir ^ field2(binfilename, OSSLASH, -1));
-			if (outfileinfo and not(force) and not(generateheadersonly) && is_newer(outfileinfo, srcfileinfo) && is_newer(outfileinfo, exodus_include_dir_info) and is_newer(outfileinfo, exodus_libfile_info)) {
+//TRACE(is_newer(outfileinfo, exodus_include_dir_info))
+//TRACE(is_newer(outfileinfo, exodus_libfile_info))
+			if (outfileinfo
+				and not(force)
+				and not(generateheadersonly)
+				and is_newer(outfileinfo, srcfileinfo)
+				and is_newer(outfileinfo, exodus_include_dir_info)
+				and is_newer(outfileinfo, exodus_libfile_info)
+				) {
 
 				// Recompile is required if any include file is younger than the current output binary
 				bool recompile_required = false;
