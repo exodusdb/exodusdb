@@ -1710,6 +1710,7 @@ class PUBLIC var final {
 	ND var seq() const;     // byte
 	ND var textseq() const;
 	ND var len() const;     // bytes
+	ND var textwidth() const;     // number of output columns. Allows multi column unicode and reduces combining characters etc.
 	bool isnum() const;     // integer or floating point. optional prefix -, + disallowed, solitary . and - not allowed. Empty string is numeric 0
 
 	// STRING SCANNING

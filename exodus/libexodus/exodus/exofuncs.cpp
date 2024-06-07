@@ -180,6 +180,7 @@ PUBLIC void breakoff();
 
 ND PUBLIC var len(CVR var1) {return var1.len();}
 ND PUBLIC var textlen(CVR var1) {return var1.textlen();}
+ND PUBLIC var textwidth(CVR var1) {return var1.textwidth();}
 
 ND PUBLIC var convert(CVR instring, SV fromchars, SV tochars) {return instring.convert(fromchars, tochars);}
 PUBLIC VARREF converter(VARREF iostring, SV fromchars, SV tochars) {return iostring.converter(fromchars, tochars);}

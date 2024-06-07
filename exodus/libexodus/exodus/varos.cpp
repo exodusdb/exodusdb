@@ -730,7 +730,7 @@ static unsigned count_excess_UTF8_bytes(const std::string& str) {
 			// if ((*cptr & 0xFC) == 0xFC) { if (num == 6) { return 0; } break; }
 			// if ((*cptr & 0xF8) == 0xF8) { if (num == 5) { return 0; } break; }
 
-			// If char binary is 11110000, it means it's a 4 bytes long unicode.
+			// If char binary is 1111xxxx, it means it's a 4 bytes long unicode.
 			if ((*cptr & 0xF0) == 0xF0) {
 				if (num == 4) {
 					return 0;
@@ -738,7 +738,7 @@ static unsigned count_excess_UTF8_bytes(const std::string& str) {
 				break;
 			}
 
-			// If char binary is 11100000, it means it's a 3 bytes long unicode.
+			// If char binary is 1110xxxx, it means it's a 3 bytes long unicode.
 			if ((*cptr & 0xE0) == 0xE0) {
 				if (num == 3) {
 					return 0;
@@ -746,6 +746,7 @@ static unsigned count_excess_UTF8_bytes(const std::string& str) {
 				break;
 			}
 
+			// If char binary is 110xxxxx, it means it's a 2 bytes long unicode.
 			if ((*cptr & 0xC0) == 0xC0) {
 				if (num == 2) {
 					return 0;
