@@ -2855,9 +2855,18 @@ void ExodusProgramBase::sortarray(VARREF array, CVR fns, CVR orderby0) {
 	var unsorted = array.f(sortfn);
 	var sorted = "";
 
+	//count values in sorted and parallel fields
+	var nv = unsorted.fcount(VM);
+	for (var fnn = 2; fnn <= nfns; ++fnn) {
+		fn = fns.f(1, fnn);
+		var othervalues = array.f(fn);
+		var nv2 = array.f(fn).fcount(VM);
+		if (nv2 > nv)
+			nv = nv2;
+	} //fnn;
+
 	//insert into a new array without other fields for speed
 	var newarray = "";
-	var nv = unsorted.fcount(VM);
 	for (var vn = 1; vn <= nv; ++vn) {
 		var value = unsorted.f(1, vn);
 		if (not(sorted.locateby(orderby, value, newvn))) {
