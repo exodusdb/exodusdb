@@ -64,9 +64,9 @@ set -euxo pipefail
 		sleep 1
 	done
 :
-: ------------------------
-: Work out postgres suffix
-: ------------------------
+: -----------------------------------------
+: Work out postgres version suffix e.g. -14
+: -----------------------------------------
 :
 : If PG_VER not specified, use the latest version
 : of postgres installed as per pg_config
@@ -114,8 +114,8 @@ set -euxo pipefail
 : Required in case multiple postgres versions are running
 : and psql default connects to the wrong one.
 :
-: Info
-: ----
+: Info about postgres
+: -------------------
 :
 	grep '^\s*port\s*=\s*\([0-9]\)*' /etc/postgresql/*/main/postgresql.conf || true
 :
@@ -125,8 +125,8 @@ set -euxo pipefail
 :
 	ls -l /run/postgresql/ 2> /dev/null || true
 :
-: Ports
-: -----
+: Postgres ports
+: --------------
 :
 	if [[ -n $PG_VER ]]; then
 		PG_PORT=`grep '^\s*port\s*=\s*\([0-9]\)*' /etc/postgresql/$PG_VER/main/postgresql.conf|grep [0-9]* -o || true`
@@ -146,16 +146,17 @@ set -euxo pipefail
 function get_dependencies_for_build {
 :
 : --------------------------
-: GET DEPENDENCIES FOR BUILD
+: GET DEPENDENCIES FOR BUILD $*
 : --------------------------
 :
 :
 : Update apt
+: ----------
 :
 	sudo apt -y update
-
-: Postgresql package
-: ------------------
+:
+: Install Postgresql package
+: --------------------------
 :
 	#Uninstall postgresql-server-dev-all for old existing installations
 	#otherwise all postgres versions are installed and pg_config outputs latest version
@@ -166,8 +167,8 @@ function get_dependencies_for_build {
 	sudo apt remove -y 'postgresql-server-dev-all' && sudo apt -y autoremove || true
 	sudo apt install -y postgresql-common
 :
-: pgexodus and fmt submodules
-: ---------------------------
+: Install pgexodus and fmt submodules source
+: ------------------------------------------
 :
 	if ! test -f exodus/pgexodus/CMakeLists.txt || ! test -f fmt/CMakeLists.txt; then
 		git submodule init
@@ -181,38 +182,40 @@ function get_dependencies_for_build {
 	fi
 :
 : List installed postgresql
+: -------------------------
 :
 	apt list postgresql* --installed
 :
 : List available postgresql
+: -------------------------
 :
 	apt list postgresql*dev*
 :
-: exodus and pgexodus
-: -------------------
+: Installing exodus and pgexodus dependencies
+: -------------------------------------------
 :
 	sudo apt install -y cmake
 :
-: exodus
-: ------
+: Install exodus dependencies
+: ---------------------------
 :
 	if [[ $COMPILER == gcc ]]; then
 :
-: gcc
-: ---
+: Install gcc
+: -----------
 :
 		sudo apt install -y g++
 	else
 :
-: clang
-: -----
+: Install clang
+: -------------
 :
 		sudo apt install -y clang
 		sudo update-alternatives --set c++ /usr/bin/clang++
 		sudo update-alternatives --set cc /usr/bin/clang
 :
-: libstdc++ and clang information
-: -------------------------------
+: Show libstdc++ and clang information
+: ------------------------------------
 :
 		apt list libstdc++*dev --installed || true
 :
@@ -235,11 +238,14 @@ function get_dependencies_for_build {
 		fi
 	fi
 :
+: Install dev packages for postgresql client lib and boost
+: --------------------------------------------------------
+:
 	sudo apt install -y libpq-dev libboost-regex-dev libboost-locale-dev
 	#sudo apt install -y g++ libboost-date-time-dev libboost-system-dev libboost-thread-dev
 :
-: pgexodus
-: --------
+: Install pgexodus postgres dependencies
+: --------------------------------------
 :
 	ls -l /usr/lib/postgresql || true
 :
@@ -253,7 +259,7 @@ function get_dependencies_for_build {
 
 function build_all {
 : -----
-: BUILD
+: BUILD $*
 : -----
 :
 : 1. libexodus
@@ -281,8 +287,8 @@ function build_all {
 	git submodule init
 	git submodule update
 :
-: Build
-: -----
+: Build exodus
+: ------------
 :
 	echo PGPATH=${PGPATH:-}
 	cmake -S $EXODUS_DIR -B $EXODUS_DIR/build
@@ -296,7 +302,7 @@ function build_all {
 
 function get_dependencies_for_install {
 : ----------------------------
-: GET DEPENDENCIES FOR INSTALL
+: GET DEPENDENCIES FOR INSTALL $*
 : ----------------------------
 :
 : exodus
@@ -312,7 +318,7 @@ function get_dependencies_for_install {
 
 function install_all {
 : -------
-: INSTALL
+: INSTALL $*
 : -------
 :
 	sudo cmake --install $EXODUS_DIR/build
@@ -430,7 +436,7 @@ V0G0N
 
 function test_all {
 : ----
-: TEST
+: TEST $*
 : ----
 :
 : SERVER_PG_VER ${SERVER_PG_VER} EXO_PORT=$EXO_PORT
@@ -471,7 +477,7 @@ function install_www_service {
 #}
 :
 : ----
-: MAIN
+: MAIN $*
 : ----
 :
 	[[ $STAGES =~ b ]] && get_dependencies_for_build

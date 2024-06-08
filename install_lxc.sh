@@ -1,6 +1,7 @@
 #!/bin/bash
 set -euxo pipefail
 :
+: $0 $*
 : ===========================================================
 : Install current dir of exodus in an LXC container in stages
 : ===========================================================
@@ -30,6 +31,12 @@ set -euxo pipefail
 :
 :	PG_VER e.g. 14 or blank for the the default which depends on the Ubuntu version and apt.
 :
+:	Each stage of build, install and test will create
+:	a new container with name ending "-1", "-2" etc.
+:
+:	Each compiler will be setup in a new container
+:	with name ending g or c for gcc and clang.
+
 : Parse command line
 : ------------------
 :
@@ -103,7 +110,7 @@ function stage {
 	OLD_C=${NEW_CONTAINER_NAME}-$(($1 - 1))
 	NEW_C=${NEW_CONTAINER_NAME}-$1
 :
-: Create/Overwrite container
+: Create/Overwrite container $NEW_C
 : --------------------------
 :
 	if lxc info $NEW_C &> /dev/null; then
