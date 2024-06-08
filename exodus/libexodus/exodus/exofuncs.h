@@ -55,6 +55,17 @@ THE SOFTWARE.
 #	include <fmt/args.h> // for fmt::dynamic_format_arg_store
 #	include <variant>
 #	pragma GCC diagnostic pop
+#	if __GNUC__ >= 11
+///root/exodus/fmt/include/fmt/core.h: In member function ‘constexpr auto fmt::v10::formatter<exodus::var>::parse(ParseContext&) [with ParseContext =
+// fmt::v10::basic_format_parse_context<char>]’:
+///root/exodus/fmt/include/fmt/core.h:2712:22: warning: inlining failed in call to ‘constexpr const Char* fmt::v10::formatter<T, Char, typename std::enable_if<(fmt::v10::detail::type_constant<T, Char>::value != fmt::v10::detail::type::custom_type), void>::type>::parse(ParseContext&) [with ParseContext = fmt::v10::basic_format_parse_context<char>; T = fmt::v10::basic_string_view<char>; Char = char]’: --param max-inline-insns-single limit reached [-Winline]
+// 2712 |   FMT_CONSTEXPR auto parse(ParseContext& ctx) -> const Char* {
+//      |                      ^~~~~
+///root/exodus/test/src/../../exodus/libexodus/exodus/exofuncs.h:850:58: note: called from here
+//  850 |                 return formatter<std::string_view>::parse(ctx);
+//      |                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~
+#		pragma GCC diagnostic ignored "-Winline"
+#	endif
 #else
 #	define EXO_FORMAT 0
 #endif
