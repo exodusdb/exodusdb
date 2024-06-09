@@ -36,16 +36,26 @@ set -euxo pipefail
 : ---------------------------
 :
 		lxc info $OS >/dev/null
+
+:
+: Upgrade base container if building from scratch
+: -----------------------------------------------
+:
+		if [[ "bA" =~ ${STAGES} ]]; then
+
 :
 : Start base container $OS
 : --------------------
 :
-		lxc start $OS || true
+			lxc start $OS || true
 :
 : Upgrade all in base container $OS
 : -----------------------------
 :
-		lxc exec $OS -- bash -c "apt-get update && apt -y dist-upgrade || true"
+			lxc exec $OS -- bash -c "apt-get update && apt -y dist-upgrade || true"
+:
+		fi # upgrading base container
+
 :
 : For each requested compiler $COMPILERS
 : ---------------------------
