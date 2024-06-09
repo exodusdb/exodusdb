@@ -28,6 +28,9 @@ THE SOFTWARE.
 #define EXODUS_PATCH "23.09.0"
 
 #include <cstdint> // for uint64_t
+#if __has_include(<concepts>)
+#	include <concepts>
+#endif
 #include <iostream>
 #include <string>
 #include <string_view>
@@ -411,7 +414,11 @@ class PUBLIC var final {
 
 	// var(integer)
 
+#if __cpp_lib_concepts >= 202002L
+	template <std::integral Integer>
+#else
 	template <typename Integer, std::enable_if_t<std::is_integral<Integer>::value, bool> = true>
+#endif
 	//enable_if can be replaced by a concept when available in g++ compiler (gcc v11?)
 	/*
 		bool
@@ -455,7 +462,11 @@ class PUBLIC var final {
 
 	// var = floating point
 
+#if __cpp_lib_concepts >= 202002L
+	template <std::floating_point FloatingPoint>
+#else
 	template <typename FloatingPoint, std::enable_if_t<std::is_floating_point<FloatingPoint>::value, bool> = true>
+#endif
 	//enable_if can be replaced by a concept when available in g++ compiler (gcc v11?)
 	/*
 		float,
@@ -463,6 +474,7 @@ class PUBLIC var final {
 		long double
 	*/
 	var(FloatingPoint rhs)
+	//var(std::floating_point FloatingPoint rhs)
 		:
 		var_dbl(static_cast<double>(rhs)),
 		var_typ(VARTYP_DBL) {
@@ -485,7 +497,11 @@ class PUBLIC var final {
 
 	// var = string-like
 
+//#if __cpp_lib_concepts >= 202002L
+//	template <std::string_view StringView>
+//#else
 	template <typename StringView, std::enable_if_t<std::is_convertible<StringView, std::string_view>::value, bool> = true>
+//#endif
 	//enable_if can be replaced by a concept when available in g++ compiler (gcc v11?)
 	/*
 		// Accepts l and r values efficiently hopefully
@@ -496,6 +512,15 @@ class PUBLIC var final {
 	var(StringView&& fromstr)
 		:
 		var_str(std::forward<StringView>(fromstr)),
+		var_typ(VARTYP_STR) {
+
+		//std::cerr << "var(str)" << std::endl;
+	}
+
+	// ordinary function to ensure move used on temporary std::string
+	var(std::string&& fromstr)
+		:
+		var_str(std::forward<std::string>(fromstr)),
 		var_typ(VARTYP_STR) {
 
 		//std::cerr << "var(str)" << std::endl;
