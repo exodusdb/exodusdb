@@ -137,11 +137,14 @@ jobs:
     - name: Build
       run: ./install.sh B "${{ matrix.COMPILER }}" "${{ matrix.PG_VER }}"
 
-#    - name: Get dependencies for install
-#      run: ./install.sh i "${{ matrix.COMPILER }}" "${{ matrix.PG_VER }}"
-#
-#    - name: Install
-#      run: ./install.sh I "${{ matrix.COMPILER }}" "${{ matrix.PG_VER }}"
-#
-#    - name: Test
-#      run: ./install.sh T "${{ matrix.COMPILER }}" "${{ matrix.PG_VER }}"
+    - name: Get dependencies for install
+      run: ./install.sh i "${{ matrix.COMPILER }}" "${{ matrix.PG_VER }}"
+
+    - name: Install
+      run: ./install.sh I "${{ matrix.COMPILER }}" "${{ matrix.PG_VER }}"
+
+    - name: Test
+      run: ./install.sh T "${{ matrix.COMPILER }}" "${{ matrix.PG_VER }}"
+
+    - name: Build and install web service
+      run: ./install.sh W "${{ matrix.COMPILER }}" "${{ matrix.PG_VER }}"
