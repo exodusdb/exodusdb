@@ -132,11 +132,18 @@ set -euxo pipefail
 :
 : 20.04/bionic and 18.04/focal are available
 :
-: #22.04/jammy not available as at 2022/01/14
 : 22.04/jammy available as at 2022/06/29
 :
+: 24.04/noble is not available as at 2024/06/09 - but 22.04 version compiles and seems to work
+:
 	RELEASE=`lsb_release -cs`
-	VERSION=0.12.6.1-2
+
+#	if [[ $RELEASE == focal ]]; then
+	if [[ `lsb_release -rs` < "22.04" ]]; then
+		VERSION=0.12.6-1
+	else
+		VERSION=0.12.6.1-2
+	fi
 	#if curl --fail -LO https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6-1/wkhtmltox_0.12.6-1.${RELEASE}_amd64.deb; then
 	if ! curl --fail -LO https://github.com/wkhtmltopdf/packaging/releases/download/$VERSION/wkhtmltox_$VERSION.${RELEASE}_amd64.deb; then
 :
