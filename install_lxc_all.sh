@@ -31,18 +31,20 @@ set -euxo pipefail
 :
 #	for OS in u2404 u2204 u2004; do
 	for OS in ${BASE_CONTAINERS//,/ }; do
+
+: Check if starting from stage 1
+: ------------------------------
+:
+		if [[ "bA" =~ ${STAGES} ]]; then
+
+:
+: Upgrade base container
+: ----------------------
 :
 : Check base container exists $OS
 : ---------------------------
 :
 		lxc info $OS >/dev/null
-
-:
-: Upgrade base container if building from scratch
-: -----------------------------------------------
-:
-		if [[ "bA" =~ ${STAGES} ]]; then
-
 :
 : Start base container $OS
 : --------------------
@@ -65,8 +67,10 @@ set -euxo pipefail
 : Install using specific compiler $COMPILER
 : -------------------------------
 :
-			./install_lxc.sh $OS ${OS}${COMPILER:0:1} $STAGES $COMPILER || ERRORS=1
+			./install_lxc.sh $OS ${OS}${COMPILER:0:1} $STAGES $COMPILER
+
 		done
+
 	done
 : ====================================================================
 : Finished $0 $* in $((SECONDS / 60)) mins and $((SECONDS % 60)) secs.
