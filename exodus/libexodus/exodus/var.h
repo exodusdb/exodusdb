@@ -152,6 +152,14 @@ inline const char VISIBLE_ST_ = '~';
 
 namespace exodus {
 
+#if __cpp_lib_concepts >= 201907L
+	template <typename T>
+	concept std_string_or_convertible = std::is_convertible_v<T, std::string_view>;
+
+	template <typename T>
+	concept std_u32string_or_convertible = std::is_convertible_v<T, std::u32string_view>;
+#endif
+
 //#define SMALLEST_NUMBER 1e-13
 //sum(1287.89,-1226.54,-61.35,1226.54,-1226.54) -> 0.000'000'000'000'23
 //#define SMALLEST_NUMBER 1e-10
@@ -414,12 +422,11 @@ class PUBLIC var final {
 
 	// var(integer)
 
-#if __cpp_lib_concepts >= 202002L
+#if __cpp_lib_concepts >= 201907L
 	template <std::integral Integer>
 #else
 	template <typename Integer, std::enable_if_t<std::is_integral<Integer>::value, bool> = true>
 #endif
-	//enable_if can be replaced by a concept when available in g++ compiler (gcc v11?)
 	/*
 		bool
 
@@ -462,19 +469,17 @@ class PUBLIC var final {
 
 	// var = floating point
 
-#if __cpp_lib_concepts >= 202002L
+#if __cpp_lib_concepts >= 201907L
 	template <std::floating_point FloatingPoint>
 #else
 	template <typename FloatingPoint, std::enable_if_t<std::is_floating_point<FloatingPoint>::value, bool> = true>
 #endif
-	//enable_if can be replaced by a concept when available in g++ compiler (gcc v11?)
 	/*
 		float,
 		double,
 		long double
 	*/
 	var(FloatingPoint rhs)
-	//var(std::floating_point FloatingPoint rhs)
 		:
 		var_dbl(static_cast<double>(rhs)),
 		var_typ(VARTYP_DBL) {
@@ -497,30 +502,20 @@ class PUBLIC var final {
 
 	// var = string-like
 
-//#if __cpp_lib_concepts >= 202002L
-//	template <std::string_view StringView>
-//#else
-	template <typename StringView, std::enable_if_t<std::is_convertible<StringView, std::string_view>::value, bool> = true>
-//#endif
-	//enable_if can be replaced by a concept when available in g++ compiler (gcc v11?)
+#if __cpp_lib_concepts >= 201907L
+	template <std_string_or_convertible StringLike>
+#else
+	template <typename StringLike, std::enable_if_t<std::is_convertible<StringLike, std::string_view>::value, bool> = true>
+#endif
 	/*
 		// Accepts l and r values efficiently hopefully
 		std::string,
 		std::string_view,
 		char*,
 	*/
-	var(StringView&& fromstr)
+	var(StringLike&& fromstr)
 		:
-		var_str(std::forward<StringView>(fromstr)),
-		var_typ(VARTYP_STR) {
-
-		//std::cerr << "var(str)" << std::endl;
-	}
-
-	// ordinary function to ensure move used on temporary std::string
-	var(std::string&& fromstr)
-		:
-		var_str(std::forward<std::string>(fromstr)),
+		var_str(std::forward<StringLike>(fromstr)),
 		var_typ(VARTYP_STR) {
 
 		//std::cerr << "var(str)" << std::endl;
@@ -554,8 +549,11 @@ class PUBLIC var final {
 
 	// var(wide-string-like)
 
+#if __cpp_lib_concepts >= 201907L
+	template <std_u32string_or_convertible W>
+#else
 	template <typename W, std::enable_if_t<std::is_convertible<W, std::u32string_view>::value, bool> = true>
-	//enable_if can be replaced by a concept when available in g++ compiler (gcc v11?)
+#endif
 	/*
 		std::u32string,
 		std::u32string_view,
@@ -688,8 +686,11 @@ class PUBLIC var final {
 
 	// necessary to allow conversion to int in many functions like extract(x,y,z)
 
+#if __cpp_lib_concepts >= 201907L
+	template <std::integral Integer>
+#else
 	template <typename Integer, std::enable_if_t<std::is_integral<Integer>::value, bool> = false>
-	//enable_if can be replaced by a concept when available in g++ compiler (gcc v11?)
+#endif
 	/*
 		bool
 
@@ -730,8 +731,11 @@ class PUBLIC var final {
 	// floating point <- var
 	////////////////////////
 
+#if __cpp_lib_concepts >= 201907L
+	template <std::floating_point FloatingPoint>
+#else
 	template <typename FloatingPoint, std::enable_if_t<std::is_floating_point<FloatingPoint>::value, bool> = true>
-	//enable_if can be replaced by a concept when available in g++ compiler (gcc v11?)
+#endif
 	/*
 		float,
 		double,
@@ -797,7 +801,7 @@ class PUBLIC var final {
 	// string-like <- var
 	/////////////////////
 
-//	template <typename StringView, std::enable_if_t<std::is_convertible<StringView, std::string_view>::value, bool> = true>
+//	template <typename StringLike, std::enable_if_t<std::is_convertible<StringLike, std::string_view>::value, bool> = true>
 //	//enable_if can be replaced by a concept when available in g++ compiler (gcc v11?)
 //	/*
 //	// Accepts l and r values efficiently hopefully
@@ -805,7 +809,7 @@ class PUBLIC var final {
 //	std::string_view,
 //	char*,
 //	*/
-//	operator StringView() {
+//	operator StringLike() {
 //		assertString(__PRETTY_FUNCTION__);
 //		return std::string_view(var_str);
 //		//std::cerr << "var(str)" << std::endl;
@@ -916,7 +920,11 @@ class PUBLIC var final {
 	// var = Integral
 	/////////////////
 
+#if __cpp_lib_concepts >= 201907L
+	template <std::integral Integer>
+#else
 	template <typename Integer, std::enable_if_t<std::is_integral<Integer>::value, bool> = true>
+#endif
 	/*
 		bool
 
@@ -938,7 +946,6 @@ class PUBLIC var final {
 		unsigned long long (C++11)
 		etc.
 	*/
-	//enable_if can be replaced by a concept when available in g++ compiler (gcc v11?)
 	void operator=(Integer rhs) & {
 
 		// Similar code in constructor(int) operator=(int) and int()
@@ -966,13 +973,16 @@ class PUBLIC var final {
 	// var = Floating Point
 	///////////////////////
 
+#if __cpp_lib_concepts >= 201907L
+	template <std::floating_point FloatingPoint>
+#else
 	template <typename FloatingPoint, std::enable_if_t<std::is_floating_point<FloatingPoint>::value, bool> = true>
+#endif
 	/*
 		float,
 		double,
 		long double
 	*/
-	//enable_if can be replaced by a concept when available in g++ compiler (gcc v11?)
 	void operator=(FloatingPoint rhs) & {
 		var_dbl = rhs;
 		var_typ = VARTYP_DBL;
