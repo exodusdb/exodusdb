@@ -170,9 +170,9 @@
 	else()
 
 		# only for older clang 10.* etc. on Ubuntu 20.04
-		if (CMAKE_CXX_COMPILER_VERSION MATCHES "^10.")
+#		if (CMAKE_CXX_COMPILER_VERSION MATCHES "^10.")
 			add_compile_options(-Wno-undef)
-		endif()
+#		endif()
 
 		add_compile_options(-Wno-unknown-warning-option)
 
