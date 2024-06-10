@@ -1839,15 +1839,15 @@ lock:
 		return false;
 	}
 
-#if __cpp_lib_unreachable >= 202202L 
-	std::unreachable();
-#else
+//#if __cpp_lib_unreachable >= 202202L 
+//	std::unreachable();
+//#else
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wunreachable-code"
 	// TODO should this be a special system error since it cannot be caused by application programmer?
 	throw VarError("EXODUS: Error in " ^ var(__PRETTY_FUNCTION__) ^ " Executing unreachable code.");
 #pragma clang diagnostic push
-#endif
+//#endif
 }
 
 // unlockrecord 0 = unlock all
