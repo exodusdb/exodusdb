@@ -145,14 +145,38 @@ friend class var;
 
 	ND var join(SV sepchar = _FM) const;
 
+	// brackets operators often come in pairs
+	// returns a reference to one var of the array
+	// and so allows lhs assignment like d1(1,2) = "x";
+	// or if on the rhs then use as a normal expression
+	ND VARREF operator[](/*unsigned*/ int rowno) {return getelementref(rowno, 1);}
+
+	//following const version is called if we do () on a dim which was defined as const xx
+	ND CVR operator[](/*unsigned*/ int rowno) const {return getelementref(rowno, 1);}
+
+	// Provide 2d version of bracket operator if c++23+
+	// and deprecate the parenthesis operator
+#	define DEPRECATED_PARENS
+#if __cpp_multidimensional_subscript >= 202110L
+//#	define DEPRECATED_PARENS [[deprecated("Replace single dimensioned array accessors like () with [] e.g. dimarray(n) -> dimarray[n]")]]
+	ND VARREF operator[](/*unsigned*/ int rowno, /*unsigned*/ int colno) {return getelementref(rowno, colno);}
+	ND CVR operator[](/*unsigned*/ int rowno, /*unsigned*/ int colno) const {return getelementref(rowno, colno);}
+#endif
+
+	DEPRECATED_PARENS
+	ND VARREF operator()(/*unsigned*/ int rowno) {return getelementref(rowno, 1);}
+	DEPRECATED_PARENS
+	ND CVR operator()(/*unsigned*/ int rowno) const {return getelementref(rowno, 1);}
+
 	// parenthesis operators often come in pairs
 	// returns a reference to one var of the array
 	// and so allows lhs assignment like d1(1,2) = "x";
 	// or if on the rhs then use as a normal expression
-	ND VARREF operator()(/*unsigned*/ int rowno, /*unsigned*/ int colno = 1);
-
 	//following const version is called if we do () on a dim which was defined as const xx
-	ND CVR operator()(/*unsigned*/ int rowno, /*unsigned*/ int colno = 1) const;
+	//DEPRECATED_PARENS
+	ND VARREF operator()(/*unsigned*/ int rowno, /*unsigned*/ int colno) {return getelementref(rowno, colno);}
+	//DEPRECATED_PARENS
+	ND CVR operator()(/*unsigned*/ int rowno, /*unsigned*/ int colno) const {return getelementref(rowno, colno);}
 
 	ND var rows() const;
 	ND var cols() const;
@@ -213,6 +237,9 @@ friend class var;
  private:
 
 	dim& init(CVR var1);
+
+	ND CVR getelementref(int row, int colno) const;
+	ND VARREF getelementref(int row, int colno);
 
 }; // class dim
 
