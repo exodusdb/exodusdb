@@ -988,7 +988,7 @@ auto format(const exodus::var& var1, FormatContext& ctx) const {
 			//return formatter<std::string_view>::format(var1, ctx);
 			exodus::var converted_var1 = var1.oconv(fmt_str_.c_str());
 			auto sv1 = std::string_view(converted_var1);
-			return vformat_to(ctx.out(), "{:}", make_format_args(sv1));
+			return vformat_to(ctx.out(), "{:}", fmt::make_format_args(sv1));
 
 		}
 

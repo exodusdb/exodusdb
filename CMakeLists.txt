@@ -282,3 +282,7 @@
 
 	add_subdirectory(test/src)
 	#target_compile_options(test_Regress PUBLIC "-O2")
+
+	message("---------------------------")
+	message("-- CMAKE EXODUS FINISHED --")
+	message("---------------------------")
