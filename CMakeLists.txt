@@ -9,6 +9,20 @@
 	cmake_minimum_required(VERSION 3.10)
 	project(exodus)
 
+#	cmake versions available 2024-06-10
+#
+#	Ubuntu       24.04   22.04   20.04
+#
+#	snap cmake  3.29.5  3.29.5  3.29.5
+#	max c++         26      26     26
+#
+#	apt  cmake  3.28.3  3.22.1  3.16.3
+#   max c++         26      23      20
+#
+#   g++             13      11       9
+#   max c++         26      23      20
+#
+#   g++max          14      12      10
 #
 # CTest
 # #####
@@ -30,8 +44,9 @@
 # ############
 #
 	#CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++2a"
-	set(CMAKE_CXX_STANDARD 20)
-	set(CMAKE_CXX_STANDARD_REQUIRED ON)
+	set(CMAKE_CXX_STANDARD 23)
+	# TODO check minimum c++20
+#	set(CMAKE_CXX_STANDARD_REQUIRED ON)
 	set(CMAKE_CXX_EXTENSIONS OFF)
 
 	message("CMAKE_CXX_COMPILER_VERSION ${CMAKE_CXX_COMPILER_VERSION}")
