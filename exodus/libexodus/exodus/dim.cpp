@@ -194,10 +194,14 @@ bool dim::redim(/*unsigned*/ int rows, /*unsigned*/ int cols) {
 	return true;
 }
 
-// the same () function is called regardless of being on LHS or RHS
-// second version is IDENTICAL except for lack of const (used only on "const dim")
-VARREF dim::operator()(/*unsigned*/ int rowno, /*unsigned*/ int colno) {
+// the same function is called regardless of being on LHS or RHS
+// Keep IDENTICAL body with the function below
+VARREF dim::getelementref(/*unsigned*/ int rowno, /*unsigned*/ int colno) {
 
+	// TODO deduplicate code by calling the const function a la Scott Myers Effective C++
+	//return const_cast<int&>(const_cast<const Foo*>(this)->get());
+	return const_cast<var&>(const_cast<const dim*>(this)->getelementref(rowno, colno));
+/*
 	EXO_DIM_RECALC_NROWS(*this)
 
 	// check bounds
@@ -212,9 +216,11 @@ VARREF dim::operator()(/*unsigned*/ int rowno, /*unsigned*/ int colno) {
 		return data_[0];
 
 	return data_[ncols_ * (rowno - 1) + colno];
+*/
 }
 
-CVR dim::operator()(/*unsigned*/ int rowno, /*unsigned*/ int colno) const {
+// Keep IDENTICAL body with the function above
+CVR dim::getelementref(/*unsigned*/ int rowno, /*unsigned*/ int colno) const {
 
 	EXO_DIM_RECALC_NROWS(*this)
 
