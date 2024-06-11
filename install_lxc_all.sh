@@ -67,7 +67,9 @@ set -euxo pipefail
 : Install using specific compiler $COMPILER
 : -------------------------------
 :
-			./install_lxc.sh $OS ${OS}${COMPILER:0:1} $STAGES $COMPILER
+			export CXX_OPTIONS=-fdiagnostics-color=always
+			LOGFILE=${OS}${COMPILER:0:1}-$STAGES.log
+			./install_lxc.sh $OS ${OS}${COMPILER:0:1} $STAGES $COMPILER |& tee $LOGFILE
 
 		done
 
