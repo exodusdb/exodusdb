@@ -205,6 +205,8 @@ function get_dependencies_for_build {
 : -----------
 :
 		sudo apt install -y g++
+		readlink `which c++` -e
+
 	else
 :
 : Install clang
@@ -213,6 +215,7 @@ function get_dependencies_for_build {
 		sudo apt install -y clang
 		sudo update-alternatives --set c++ /usr/bin/clang++
 		sudo update-alternatives --set cc /usr/bin/clang
+		readlink `which c++` -e
 :
 : Show libstdc++ and clang information
 : ------------------------------------
@@ -223,19 +226,16 @@ function get_dependencies_for_build {
 :
 		apt list libstdc++*dev || true
 :
-: On Ubuntu 22.04, prevent clang from using later versions 12 and 13 of gcc tool chains which are troublesome to clang 14
-: Force clang to use version 11 of the gcc tool chain by creating gcc tool chain version 99 pointing to 11
-: See info on libstdc++ in install log - Build stage
+: Prevent clang from using later versions of gcc tool chains which are troublesome
+: Force clang to use same version of the gcc tool chain as gcc
+: See initial info on libstdc++ in install log - Build stage, above and below.
 :
-		if [[ `lsb_release -rs` == 22.04 ]]; then
-:
-			GCC_VERSION=11
-			GCC_FAKE_VERSION=99
-			sudo ln -snf /usr/lib/gcc/x86_64-linux-gnu/$GCC_VERSION /usr/lib/gcc/x86_64-linux-gnu/$GCC_FAKE_VERSION
-			sudo ln -snf /usr/include/x86_64-linux-gnu/c++/$GCC_VERSION /usr/include/x86_64-linux-gnu/c++/$GCC_FAKE_VERSION
-			sudo ln -snf /usr/include/c++/$GCC_VERSION /usr/include/c++/$GCC_FAKE_VERSION
+		GCC_VERSION=$(gcc -v|&grep gcc\ version|cut -d' ' -f3|cut -d'.' -f1)
+		GCC_FAKE_VERSION=99
+		sudo ln -snf /usr/lib/gcc/x86_64-linux-gnu/$GCC_VERSION /usr/lib/gcc/x86_64-linux-gnu/$GCC_FAKE_VERSION
+		sudo ln -snf /usr/include/x86_64-linux-gnu/c++/$GCC_VERSION /usr/include/x86_64-linux-gnu/c++/$GCC_FAKE_VERSION
+		sudo ln -snf /usr/include/c++/$GCC_VERSION /usr/include/c++/$GCC_FAKE_VERSION
 
-		fi
 	fi
 :
 : Install dev packages for postgresql client lib and boost
@@ -255,6 +255,13 @@ function get_dependencies_for_build {
 	pg_config
 :
 	ls -l /usr/lib/postgresql/ || true
+
+:
+: Show installed compilers and standard library versions
+: ------------------------------------------------------
+:
+	readlink `which c++` -e
+	dpkg -l | egrep "gcc|clang|libstd|libc\+\+" | awk '{print $2}'
 }
 
 function build_all {
