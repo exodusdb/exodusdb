@@ -21,22 +21,25 @@ set -euxo pipefail
 : Config
 : ======
 :
-	EXODUS=~/exodus
+:	EXODUS_DIR provided caller or default to the parent dir of the current working dir
+:
+#	EXODUS_DIR=~/exodus
+	EXODUS_DIR=${EXODUS_DIR:-$(realpath `pwd`/..)}
 
 :
-: Allow cd into /root - but no read access of course
-: ==================================================
+: Allow cd into subdirs of /root - but no read access of course
+: =============================================================
 :
 : 	Only if installing into /root/
 :
-	[ ${EXODUS:0:6} = /root/ ] && chmod o+x /root
+	[ ${EXODUS_DIR:0:6} = /root/ ] && chmod o+x /root
 
 :
 : Install apache with php and configure a site
 : ============================================
 :
 	if [ $SITE_NAME != none ]; then
-		cd $EXODUS/service
+		cd $EXODUS_DIR/service
 		./create_site $SITE_NAME '' '' $DOMAIN_PREFIX
 	fi
 
@@ -50,14 +53,14 @@ set -euxo pipefail
 : Compile the service
 : ===================
 :
-	cd $EXODUS/service/src
+	cd $EXODUS_DIR/service/src
 	./compall
 
 :
-: Copy all $EXODUS/bin,lib,dat to ~/live
+: Copy all $EXODUS_DIR/bin,lib,dat to ~/live
 : ======================================
 :
-	cd $EXODUS/service
+	cd $EXODUS_DIR/service
 	./copyall CONFIRM
 
 :
@@ -71,16 +74,16 @@ set -euxo pipefail
 : ===========================================
 :
 	cd /tmp
-	#sudo -u postgres psql exodus < $EXODUS/service/src/sql/dict_voc.sql
-	#sudo -u postgres psql exodus < $EXODUS/service/src/sql/dict_users.sql
-	#sudo -u postgres psql exodus < $EXODUS/service/src/sql/dict_processes.sql
-	#sudo -u postgres psql exodus < $EXODUS/service/src/sql/dict_locks.sql
-	#sudo -u postgres psql exodus < $EXODUS/service/src/sql/dict_requestlog.sql
-	#sudo -u postgres psql exodus < $EXODUS/service/src/sql/dict_statistics.sql
-	#sudo -u postgres psql exodus < $EXODUS/service/src/sql/dict_changelog.sql
-	#sudo -u postgres psql exodus < $EXODUS/service/src/sql/dict_definitions.sql
-	#cat $EXODUS/service/src/sql/*.sql | sudo -u postgres psql exodus
-	#cat $EXODUS/service/src/sql/*.sql | sudo -u postgres psql exodus_live
+	#sudo -u postgres psql exodus < $EXODUS_DIR/service/src/sql/dict_voc.sql
+	#sudo -u postgres psql exodus < $EXODUS_DIR/service/src/sql/dict_users.sql
+	#sudo -u postgres psql exodus < $EXODUS_DIR/service/src/sql/dict_processes.sql
+	#sudo -u postgres psql exodus < $EXODUS_DIR/service/src/sql/dict_locks.sql
+	#sudo -u postgres psql exodus < $EXODUS_DIR/service/src/sql/dict_requestlog.sql
+	#sudo -u postgres psql exodus < $EXODUS_DIR/service/src/sql/dict_statistics.sql
+	#sudo -u postgres psql exodus < $EXODUS_DIR/service/src/sql/dict_changelog.sql
+	#sudo -u postgres psql exodus < $EXODUS_DIR/service/src/sql/dict_definitions.sql
+	#cat $EXODUS_DIR/service/src/sql/*.sql | sudo -u postgres psql exodus
+	#cat $EXODUS_DIR/service/src/sql/*.sql | sudo -u postgres psql exodus_live
 	#EXO_DATA=exodus EXO_DICT=exodus sync_dat
 	EXO_DATA=exodus EXO_DICT=exodus syncdat
 	#EXO_DATA=exodus EXO_DICT=exodus_live sync_dat
@@ -91,7 +94,7 @@ set -euxo pipefail
 : ============================
 :
 	if [ $SITE_NAME != none ]; then
-		cd $EXODUS/service
+		cd $EXODUS_DIR/service
 		./create_service exo $SITE_NAME '' live
 	fi
 
@@ -100,7 +103,7 @@ set -euxo pipefail
 : =================
 :
 	if [ $SITE_NAME != none ]; then
-		cd $EXODUS/service
+		cd $EXODUS_DIR/service
 		./service $SITE_NAME start live
 	fi
 
@@ -181,7 +184,7 @@ set -euxo pipefail
 : Copy logo and ico into images and web root
 : ==========================================
 
-	cd $EXODUS/service
+	cd $EXODUS_DIR/service
 	cp favicon.ico www
 	cp exodusm.png www/exodus/images/theme2
 
