@@ -69,7 +69,7 @@ set -euxo pipefail
 :
 			export CXX_OPTIONS=-fdiagnostics-color=always
 			LOGFILE=${OS}${COMPILER:0:1}-$STAGES.log
-			./install_lxc.sh $OS ${OS}${COMPILER:0:1} $STAGES $COMPILER |& tee $LOGFILE
+			./install_lxc.sh $OS ${OS} $STAGES $COMPILER |& tee $LOGFILE
 
 		done
 
