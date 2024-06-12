@@ -194,14 +194,14 @@ using SV = std::string_view;
 // IT SHOULD BE ABLE TO DERIVE FROM IT AND DO DELETE()
 // http://www.parashift.com/c++-faq-lite/virtual-functions.html#faq-20.7
 
-// on gcc, size of var is 48 bytes
+// on gcc and clang, size of var is as follows:
 //
-// string:    32
-// int:        8
-// double:     8
-// type:       4
-//           ---
-// var:       52
+// var_str std::string: 32
+// var_int int64_t:      8
+// var_dbl double:       8
+// var_typ uint:         4 (Only 5 bits are used. Presence of any other bits indicates use of an improperly contructed var)
+//                     ---
+// var:                 52
 
 using varint_t = int64_t;
 
@@ -210,8 +210,8 @@ using varint_t = int64_t;
 // #define VAR_LOW_DOUBLE std::numeric_limits<varint_t>::lowest()
 //#define VAR_MAX_DOUBLE 1.797693134862315708145274237317043567981e+308
 //#define VAR_LOW_DOUBLE -1.797693134862315708145274237317043567981e+308
-inline const long double VAR_MAX_DOUBLE = static_cast<long double>(1.797693134862315708145274237317043567981e+30);
-inline const long double VAR_LOW_DOUBLE = static_cast<long double>(-1.797693134862315708145274237317043567981e+30);
+inline const long double VAR_MAX_DOUBLE = static_cast<long double>(1.797693134862315708145274237317043567981e+308);
+inline const long double VAR_LOW_DOUBLE = static_cast<long double>(-1.797693134862315708145274237317043567981e+308);
 
 //template<class T, class... P0toN>
 //struct is_one_of;
