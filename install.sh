@@ -191,26 +191,24 @@ function get_dependencies_for_build {
 :
 	apt list postgresql*dev*
 :
-: Installing exodus and pgexodus dependencies
-: -------------------------------------------
+: Installing build dependencies for exodus and pgexodus
+: -----------------------------------------------------
 :
 	sudo apt install -y cmake
 :
-: Install exodus dependencies
-: ---------------------------
-:
 	if [[ $COMPILER == gcc ]]; then
+
 :
-: Install gcc
-: -----------
+: Install gcc compiler
+: --------------------
 :
 		sudo apt install -y g++
 		readlink `which c++` -e
 
 	else
 :
-: Install clang
-: -------------
+: Install clang compiler
+: ----------------------
 :
 		sudo apt install -y clang
 		sudo update-alternatives --set c++ /usr/bin/clang++
@@ -244,8 +242,8 @@ function get_dependencies_for_build {
 	sudo apt install -y libpq-dev libboost-regex-dev libboost-locale-dev
 	#sudo apt install -y g++ libboost-date-time-dev libboost-system-dev libboost-thread-dev
 :
-: Install pgexodus postgres dependencies
-: --------------------------------------
+: Install pgexodus postgres build dependencies
+: --------------------------------------------
 :
 	ls -l /usr/lib/postgresql || true
 :

@@ -9,13 +9,13 @@ set -euxo pipefail
 : Syntax
 : ------
 :
-:	$0 " <SOURCE> <NEW_CONTAINER_NAME> <STAGES> [gcc|clang] [<PG_VER>]"
+:	$0 " <SOURCE> <NEW_CONTAINER_NAME> <REQ_STAGE_LETTERS> [gcc|clang] [<PG_VER>]"
 :
 :	SOURCE e.g. an lxc image like ubuntu, ubuntu:22.04 etc. or an existing lxc container code
 :
 :	NEW_CONTAINER_NAME e.g. u2204 for lxc
 :
-:	STAGES is letters.
+:	REQ_STAGE_LETTERS is letters.
 :
 :		A = All "'bBiIT'" except W
 :
@@ -31,32 +31,42 @@ set -euxo pipefail
 :
 :	PG_VER e.g. 14 or blank for the the default which depends on the Ubuntu version and apt.
 :
+:	Container names may be prefixed by lxc host. Recommended both the same to avoid copying across network.
+:
+:	e.g. ./install_lxc.sh nl22:u2204 nl22:u2204 A gcc
+:	e.g. ./install_lxc.sh nl22:ubuntu:22.04 nl22:u2204 A
+:
 :	Each stage of build, install and test will create
-:	a new container with name ending "-1", "-2" etc.
+:	a new container with name ending "x-1", "x-2" etc. where x is g for gcc or c for clang
 :
 :	Each compiler will be setup in a new container
 :	with name ending g or c for gcc and clang.
+:
+:	Note: /etc/cloud/cloud.cfg will be run on first boot of a new container to configure it.
+:	e.g. Overwriting /etc/apt/sources.list. See that file for more info how to prevent that.
 
-: Parse command line
+#: Parse command line
 : ------------------
 :
 	#export DEBIAN_FRONTEND=noninteractive
 	#export NEEDRESTART_MODE=a
 	SOURCE=${1:?SOURCE is required. e.g. ubuntu, ubuntu:22.04 etc. or container code}
 	NEW_CONTAINER_NAME=${2:?NEW_CONTAINER_NAME is required. e.g. u2204 for lxc}
-#	STAGES=${3:-bBiIT}
-	STAGES=${3:?Stages is required. A for 'bBiIT' - all except Web service}
+#	REQ_STAGE_LETTERS=${3:-bBiIT}
+	REQ_STAGE_LETTERS=${3:?Stages is required. A for 'bBiIT' - all except Web service}
 	COMPILER=${4:-gcc}
 	PG_VER=${5:-}
 :
 : Validate
 : --------
 :
-	if [[ $STAGES = "A" ]]; then
-		STAGES=bBiIT
+	ALL_STAGE_LETTERS=bBiITW
+
+	if [[ $REQ_STAGE_LETTERS = "A" ]]; then
+		REQ_STAGE_LETTERS=bBiIT
 	fi
-	if [[ ! $STAGES =~ ^[bBiITW]*$ ]]; then
-		echo STAGES has only letters bBiITW. Check syntax above.
+	if [[ ! $REQ_STAGE_LETTERS =~ ^[$ALL_STAGE_LETTERS]*$ ]]; then
+		echo REQ_STAGE_LETTERS has only letters $ALL_STAGE_LETTERS. Check syntax above.
 		exit 1
 	fi
 :
@@ -99,27 +109,31 @@ set -euxo pipefail
 #		sudo apt install -y postgresql-{14,16} #for pgexodus install
 #	V0G0N
 
-: =========================
-: Function to do each stage
-: =========================
+function do_one_stage {
 :
-function stage {
+: ============
+: Do one stage - $1
+: ============
 :
-	STAGE=$1
+	STAGE_NO=$1
+	STAGE_LETTER=${ALL_STAGE_LETTERS:$((STAGE_NO-1)):1}
 
-	OLD_C=${NEW_CONTAINER_NAME}-$(($1 - 1))
-	NEW_C=${NEW_CONTAINER_NAME}-$1
+	OLD_C=${NEW_CONTAINER_NAME}${COMPILER:0:1}-$(($1 - 1))
+	NEW_C=${NEW_CONTAINER_NAME}${COMPILER:0:1}-$1
 :
-: Create/Overwrite container $NEW_C
+: Create/Overwrite container - $NEW_C
 : --------------------------
 :
 	if lxc info $NEW_C &> /dev/null; then
 		lxc rm $NEW_C --force |& grep -v "already stopped"|| true
 	fi
-	if [[ $STAGE == 1 ]]; then
+	if [[ $STAGE_NO == 1 ]]; then
 		if lxc info $SOURCE &> /dev/null; then
-			# copy container using a snapshot
 			lxc snapshot $SOURCE install_lxc_sh --reuse || exit 1
+:
+: Copy container using a snapshot
+: Note. See note in heading about cloud.cfg which runs on first boot of new container
+:
 			lxc copy $SOURCE/install_lxc_sh $NEW_C || exit 1
 			lxc rm $SOURCE/install_lxc_sh || exit 1
 			lxc start $NEW_C || exit 1
@@ -133,68 +147,131 @@ function stage {
 		lxc start $NEW_C || exit 1
 	fi
 :
-: Wait for ip no
-: --------------
+: On the first stage copy local exodus to the target container - $NEW_C
+: ------------------------------------------------------------
 :
-	for i in {1..100}; do
-		IPNO=`lxc list $NEW_C --format csv --columns 4 | grep -P -o "\d+\.\d+\.\d+\.\d+" || true`
-		if [[ "$IPNO" != "" ]]; then
-			set -x
-			break
-		fi
-		sleep 1
-		set +x
-		echo Waiting for ip no to appear in lxc
-	done
-	echo $IPNO
+: TODO update the source container instead
+:
+	if [[ $FIRST_STAGE_UPDATE_EXODUS == YES ]]; then
 
-:
-: Enable ssh login
-: ----------------
-:
-	lxc exec $NEW_C -- bash -c "ssh-keygen -t rsa -N '' -f ~/.ssh/id_rsa <<< y" || exit 1
+		FIRST_STAGE_UPDATE_EXODUS=NO
 
-	lxc exec $NEW_C -- bash -c "echo '`cat ~/.ssh/*.pub`' >> /root/.ssh/authorized_keys" || exit 1
-:
-: Check we can now ssh into the container
-:
-	sleep 1
-	if ! ssh $SSH_OPT root@$IPNO pwd ; then
-		sleep 1
-	fi
-	ssh $SSH_OPT root@$IPNO pwd || exit 1
-
-:
-: Update container with local exodus dir
-: --------------------------------------
-:
-	CONNECTION=22
-	SSH_USER=root
-	SOURCE=
-	FILEORFOLDER=exodus
-	TARGET=root@$IPNO
-	PARENTPATH=/root/
-	rsync -avz --links -e "ssh -p ${CONNECTION} $SSH_OPT" `pwd` ${TARGET}:/root
-
+# No need to use ssh and rsync because pushing a tar file retains the file and dir timestamps
+# Retain code in case we need it in future
+#
+#:
+#: Check if remote lxc host
+#: ------------------------
+#	:
+#		if [[ $NEW_C =~ : ]]; then
+#			USE_SSH=NO
+#		else
+#			USE_SSH=YES
+#		fi
+#
+#		if [[ $USE_SSH == YES ]]; then
+#:
+#: Wait for ip no
+#: --------------
+#:
+#			for i in {1..100}; do
+#				IPNO=`lxc list $NEW_C --format csv --columns 4 | grep -P -o "\d+\.\d+\.\d+\.\d+" || true`
+#				if [[ "$IPNO" != "" ]]; then
+#					set -x
+#					break
+#				fi
+#				sleep 1
+#				set +x
+#				echo Waiting for ip no to appear in lxc
+#			done
+#			echo $IPNO
+#
+#:
+#: Enable ssh login
+#: ----------------
+#:
+#			lxc exec $NEW_C -- bash -c "ssh-keygen -t rsa -N '' -f ~/.ssh/id_rsa <<< y" || exit 1
+#
+#			lxc exec $NEW_C -- bash -c "echo '`cat ~/.ssh/*.pub`' >> /root/.ssh/authorized_keys" || exit 1
+#:
+#: Check we can now ssh into the container
+#:
+#			sleep 1
+#			if ! ssh $SSH_OPT root@$IPNO pwd ; then
+#				sleep 1
+#			fi
+#
+#: Check again
+#: -----------
+#:
+#			if ! ssh $SSH_OPT root@$IPNO pwd; then
+#				USE_SSH=NO
+#			fi
+#		fi
+#
 #:
 #: Update container with local exodus dir
 #: --------------------------------------
 #:
-#	#lxc file push * $NEW_C/root/exodus --recursive --create-dirs --quiet
-#	#lxc file push . $NEW_C/root --recursive --create-dirs --quiet
-#	#lxc file push ~/exodus $NEW_C/root --recursive --create-dirs --quiet --gid 0 --uid 0
-#	#lxc file push ~/exodus $NEW_C/root --recursive --create-dirs --quiet || exit 1
-#	lxc file push ~/exodus ${NEW_C}${TARGET_HOME} --recursive --create-dirs --quiet || exit 1
-#:
-	#Avoid git error: "fatal: detected dubious ownership in repository at '.../exodus''
-	lxc exec $NEW_C -- bash -c "chown -R $TARGET_UID:$TARGET_GID ${TARGET_HOME}/exodus" || exit 1
-:
-: Run the stage install script
-: ----------------------------
-:
-	STAGE_LETTERS=bBiITW
-	STAGE_LETTER=${STAGE_LETTERS:$((STAGE-1)):1}
+#		if [[ $USE_SSH == YES ]]; then
+#
+#			CONNECTION=22
+#			SSH_USER=root
+#			SOURCE=
+#			FILEORFOLDER=exodus
+#			TARGET=root@$IPNO
+#			PARENTPATH=/root/
+#			rsync -avz --links -e "ssh -p ${CONNECTION} $SSH_OPT" `pwd` ${TARGET}:/root
+#
+#		else
 
+:
+: Update container with local exodus dir
+: --------------------------------------
+			#lxc file push * $NEW_C/root/exodus --recursive --create-dirs --quiet
+			#lxc file push . $NEW_C/root --recursive --create-dirs --quiet
+			#lxc file push ~/exodus $NEW_C/root --recursive --create-dirs --quiet --gid 0 --uid 0
+			#lxc file push ~/exodus $NEW_C/root --recursive --create-dirs --quiet || exit 1
+	#		lxc file push ~/exodus ${NEW_C}${TARGET_HOME} --recursive --create-dirs --quiet || exit 1
+
+	#		Avoid push unless it is a local container since pushing thousands of files isnt efficient
+	#		lxc file push ~/exodus ${NEW_C}${TARGET_HOME} --recursive --create-dirs || exit 1
+:
+:	tar local exodus dir
+:
+			TAR_FILENAME=lxc_exodus.tar.z
+			rm ../$TAR_FILENAME -rf
+			tar cfz ../$TAR_FILENAME ../exodus
+			TAR_SIZE=$(ls -lh ../$TAR_FILENAME|cut -d' ' -f5)
+:
+:	Push the tar file $TAR_SIZE to $NEW_C
+:
+			lxc file push ../$TAR_FILENAME ${NEW_C}${TARGET_HOME}/$TAR_FILENAME || exit 1
+			rm ../$TAR_FILENAME
+:
+:	Untar exodus on the target - $NEW_C
+:
+			lxc exec $NEW_C -- bash -c "tar xfz $TAR_FILENAME" || exit 1
+:
+
+#		fi #not USE_SSH
+
+:
+: Avoid git error: "fatal: detected dubious ownership in repository at '.../exodus'"
+: ----------------------------------------------------------------------------------
+:
+		lxc exec $NEW_C -- bash -c "chown -R $TARGET_UID:$TARGET_GID ${TARGET_HOME}/exodus" || exit 1
+
+:
+: End of updating exodus on first stage - $STAGE_NO $STAGE_LETTER
+: -------------------------------------
+:
+	fi
+
+:
+: Run the exodus/install.sh script on the target - $NEW_C
+: ----------------------------------------------
+:
 	lxc exec $NEW_C  --user $TARGET_UID --group $TARGET_GID -- bash -c "cd $TARGET_HOME/exodus && HOME=${TARGET_HOME} ./install.sh \"$STAGE_LETTER\" \"$COMPILER\" ${PG_VER:-''}" || exit 1
 }
 :
@@ -202,12 +279,13 @@ function stage {
 : MAIN
 : ====
 :
-	[[ $STAGES =~ b ]] && stage 1 || true # 'Get dependencies for build'
-	[[ $STAGES =~ B ]] && stage 2 || true # 'Build'
-	[[ $STAGES =~ i ]] && stage 3 || true # 'Get dependencies for install'
-	[[ $STAGES =~ I ]] && stage 4 || true # 'Install'
-	[[ $STAGES =~ T ]] && stage 5 || true # 'Test'
-	[[ $STAGES =~ W ]] && stage 6 || true # 'Install www service'
+	FIRST_STAGE_UPDATE_EXODUS=YES
+	[[ $REQ_STAGE_LETTERS =~ b ]] && do_one_stage 1 || true # 'Get dependencies for build'
+	[[ $REQ_STAGE_LETTERS =~ B ]] && do_one_stage 2 || true # 'Build'
+	[[ $REQ_STAGE_LETTERS =~ i ]] && do_one_stage 3 || true # 'Get dependencies for install'
+	[[ $REQ_STAGE_LETTERS =~ I ]] && do_one_stage 4 || true # 'Install'
+	[[ $REQ_STAGE_LETTERS =~ T ]] && do_one_stage 5 || true # 'Test'
+	[[ $REQ_STAGE_LETTERS =~ W ]] && do_one_stage 6 || true # 'Install www service'
 :
 : ===============================================================
 : Finished $0 $* in $((SECONDS/60)) mins and $((SECONDS%60)) secs
