@@ -349,13 +349,20 @@ function build_all {
 	echo PGPATH=${PGPATH:-}
 	cmake -S $EXODUS_DIR -B $EXODUS_DIR/build
 	cmake --build $EXODUS_DIR/build -j$((`nproc`+1))
+
 :
 : Run tests that do not require database - since it is not installed yet
 : --------------------------------------
 :
 	cd $EXODUS_DIR/build/test/src && EXO_NODATA=1 CTEST_OUTPUT_ON_FAILURE=1 CTEST_PARALLEL_LEVEL=$((`nproc`+1)) ctest
 
-} # end of i Install dependencies stage
+:
+: Install exodus without database
+: -------------------------------
+:
+	cmake --install $EXODUS_DIR/build
+
+} # end of B Build stage
 
 function get_dependencies_for_install {
 :
