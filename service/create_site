@@ -60,9 +60,11 @@ set -euxo pipefail
 	PHP_CONF_DIR=`php --ini|grep '/etc/php/[0-9.]*' -o | head -n1`
 	PHP_EXODUS_INI=${PHP_CONF_DIR}/apache2/conf.d/00-exodus.ini
 :
-#	sudo ls -l $PHP_CONF_DIR -r
-#	sudo php --ini
+	sudo ls -l $PHP_CONF_DIR -r
+	sudo php --ini
 #	sudo find /etc/ -name php.ini | grep 'apache2' || true
+	sudo find /etc/ -name php.ini || true
+	sudo find /etc/ -name xml.ini || true
 :
 	if [ ! -e $PHP_EXODUS_INI ]; then
 		(
@@ -77,7 +79,7 @@ set -euxo pipefail
 				upload_max_filesize = 10M
 				post_max_size = 10M
 			V0G0N
-		) || true # ignore failure TODO fix
+		) || true # ignore failure. TODO fix
 	fi
 
 :
