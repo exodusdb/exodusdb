@@ -45,12 +45,15 @@ set -euxo pipefail
 : Install apache and php if not already installed
 : ===============================================
 :
-	if ! which apachectl || ! which php; then
-		sudo apt install -y apache2 php php-xml
-		sudo a2enmod rewrite ssl
-		sudo /etc/init.d/apache2 restart
-	fi
+#	if ! which apachectl || ! which php; then
+#		sudo apt install -y apache2 php php-xml
+#		sudo apt install -y apache2 php php-xml
+#	fi
 
+	sudo apt install -y apache2 php php-xml
+	sudo a2enmod rewrite ssl
+	#sudo /etc/init.d/apache2 restart
+	apachectl restart
 :
 : Configure php.ini - increase limits
 : ===================================
