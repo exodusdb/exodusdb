@@ -50,7 +50,8 @@ set -euxo pipefail
 #	fi
 	sudo apt install -y apache2 php php-xml
 	sudo a2enmod rewrite ssl
-	sudo apachectl restart
+#	sudo apachectl restart
+	sudo systemctl restart apache2
 
 :
 : Configure php.ini - increase limits
