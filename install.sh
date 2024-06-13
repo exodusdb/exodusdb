@@ -1,21 +1,22 @@
 #!/bin/bash
 set -euxo pipefail
 :
-: ------------------------------
+: $0 $*
+: ==============================
 : Build, install and test exodus
-: ------------------------------
+: ==============================
 :
-: '====== ============ ===== ========  ====  =====   ====='
+: '------ ------------ ----- --------  ----  -----   -----'
 : 'Status Ubuntu  LTS  Name  Postgres  g++   clang   boost'
-: '====== ============ ===== ========  ====  =====   ====='
+: '------ ------------ ----- --------  ----  -----   -----'
 : 'OK     24.04   Yes  noble 16.3      13.2  18.1    83   '
 : 'OK     23.10              15.4      13.2  16           '
 : 'OK     23.04              15.4      12.3               '
 : 'OK     22.04.3 Yes  jammy 14.9      11.4  14.0    74   '
 : 'OK     20.04.6 Yes  focal 12.16      9.4  10      71   '
-: '====== ===========  ===== ========  ====  =====   ====='
+: '------ -----------  ----- --------  ----  -----   -----'
 : 'KO     18.04   Yes        10                           '
-: '====== ===========  ===== ========  ====  =====   ====='
+: '------ -----------  ----- --------  ----  -----   -----'
 : 'Exodus now requires c++20 so will no longer build on 18.04'
 :
 : ------
@@ -24,7 +25,11 @@ set -euxo pipefail
 :
 : $0 ' [<STAGES>] [gcc|clang] [<PG_VER>]'
 :
-: STAGES is one or more letters. Default is "'bBiIT'" all except W - Web service
+	ALL_STAGES=bBiITW
+	DEFAULT_STAGES=bBiIT
+:
+: STAGES is one or more consecutive letters from $ALL_STAGES.
+: Default is "'$DEFAULT_STAGES'" all except W - Web service
 :
 : b = Get dependencies for build
 : B = Build
@@ -41,9 +46,23 @@ set -euxo pipefail
 : Parse command line
 : ------------------
 :
-	STAGES=${1:-bBiIT}
+	REQ_STAGES=${1:-$DEFAULT_STAGES}
 	COMPILER=${2:-gcc}
 	PG_VER=${3:-}
+
+:
+: Validate
+: --------
+:
+	if [[ ! $ALL_STAGES =~ $REQ_STAGES ]]; then
+		echo STAGES "'$REQ_STAGES'" must be one or more consecutive letters from $ALL_STAGES
+		exit 1
+	fi
+
+	if [[ ! $COMPILER =~ gcc|clang ]]; then
+		echo COMPILER must be gcc or clang
+		exit 1
+	fi
 :
 : ------
 : CONFIG
@@ -54,13 +73,26 @@ set -euxo pipefail
 	export EXODUS_DIR=$(pwd)
 	# Set by github action if chosen to rerun in debug mode?
 	#RUNNER_DEBUG=1
+
+:
+: Wait for systemctl to get its brain in gear and be ready to serve hostname to sudo
+: ----------------------------------------------------------------------------------
+:
+: Loop until success or timeout
+:
+	while ! hostnamectl status > /dev/null && [[ $SECONDS -lt 60 ]]; do sleep 1; done
+:
+: Generate error if timeout reached. Otherwise display various host info.
+:
+	hostnamectl status
+
 :
 : ----------
 : Update apt
 : ----------
 :
 	ls -l /var/cache/apt/ 2> /dev/null || true
-	while ! ls /var/cache/apt/*.bin 2> /dev/null && ! sudo apt -y update; do
+	while ! ls /var/cache/apt/*.bin 2> /dev/null && ! sudo apt-get -y update; do
 		sleep 1
 	done
 :
@@ -97,7 +129,7 @@ set -euxo pipefail
 : 2. From latest version available in apt
 :
 	if [[ -z $SERVER_PG_VER ]]; then
-		SERVER_PG_VER=$(apt list postgresql-server-* 2> /dev/null|grep -o -P 'dev-[0-9]{2}\b'|sort|tail -n1|cut -d- -f2||true)
+		SERVER_PG_VER=$(apt-cache search postgresql-server-* 2> /dev/null|grep -o -P 'dev-[0-9]{2}\b'|sort|tail -n1|cut -d- -f2||true)
 	fi
 
 	if [[ -z $SERVER_PG_VER ]]; then
@@ -153,7 +185,7 @@ function get_dependencies_for_build {
 : Update apt
 : ----------
 :
-	sudo apt -y update
+	sudo apt-get -y update
 :
 : Install Postgresql package
 : --------------------------
@@ -164,8 +196,8 @@ function get_dependencies_for_build {
 	#Specified PG_VER for postgresql-server-dev-NN installed later in this stage
 	# 1/49 Test  #1: pgexodus_test ....................***Failed    0.08 sec
 	#  grep: /etc/postgresql/16/main/postgresql.conf: No such file or directory
-	sudo apt remove -y 'postgresql-server-dev-all' && sudo apt -y autoremove || true
-	sudo apt install -y postgresql-common
+	sudo apt-get remove -y 'postgresql-server-dev-all' && sudo apt-get -y autoremove || true
+	sudo apt-get install -y postgresql-common
 :
 : Install pgexodus and fmt submodules source
 : ------------------------------------------
@@ -184,17 +216,19 @@ function get_dependencies_for_build {
 : List installed postgresql
 : -------------------------
 :
-	apt list postgresql* --installed
+	apt list postgresql* --installed |& grep postgresql
+
 :
 : List available postgresql
 : -------------------------
 :
-	apt list postgresql*dev*
+	apt list postgresql*dev* |& grep postgresql
+
 :
 : Installing build dependencies for exodus and pgexodus
 : -----------------------------------------------------
 :
-	sudo apt install -y cmake
+	sudo apt-get install -y cmake
 :
 	if [[ $COMPILER == gcc ]]; then
 
@@ -202,7 +236,7 @@ function get_dependencies_for_build {
 : Install gcc compiler
 : --------------------
 :
-		sudo apt install -y g++
+		sudo apt-get install -y g++
 		readlink `which c++` -e
 
 	else
@@ -210,7 +244,7 @@ function get_dependencies_for_build {
 : Install clang compiler
 : ----------------------
 :
-		sudo apt install -y clang
+		sudo apt-get install -y clang
 		sudo update-alternatives --set c++ /usr/bin/clang++
 		sudo update-alternatives --set cc /usr/bin/clang
 		readlink `which c++` -e
@@ -239,16 +273,16 @@ function get_dependencies_for_build {
 : Install dev packages for postgresql client lib and boost
 : --------------------------------------------------------
 :
-	sudo apt install -y libpq-dev libboost-regex-dev libboost-locale-dev
-	#sudo apt install -y g++ libboost-date-time-dev libboost-system-dev libboost-thread-dev
+	sudo apt-get install -y libpq-dev libboost-regex-dev libboost-locale-dev
+	#sudo apt-get install -y g++ libboost-date-time-dev libboost-system-dev libboost-thread-dev
 :
 : Install pgexodus postgres build dependencies
 : --------------------------------------------
 :
 	ls -l /usr/lib/postgresql || true
 :
-	sudo apt install -y postgresql-server-dev-$SERVER_PG_VER
-	sudo apt install -y postgresql-common
+	sudo apt-get install -y postgresql-server-dev-$SERVER_PG_VER
+	sudo apt-get install -y postgresql-common
 :
 	pg_config
 :
@@ -260,9 +294,11 @@ function get_dependencies_for_build {
 :
 	readlink `which c++` -e
 	dpkg -l | egrep "gcc|clang|libstd|libc\+\+" | awk '{print $2}'
-}
+
+} # end of b install build dependencies
 
 function build_all {
+:
 : -----
 : BUILD $*
 : -----
@@ -303,9 +339,11 @@ function build_all {
 : --------------------------------------
 :
 	cd $EXODUS_DIR/build/test/src && EXO_NODATA=1 CTEST_OUTPUT_ON_FAILURE=1 CTEST_PARALLEL_LEVEL=$((`nproc`+1)) ctest
-}
+
+} # end of i Install dependencies stage
 
 function get_dependencies_for_install {
+:
 : ----------------------------
 : GET DEPENDENCIES FOR INSTALL $*
 : ----------------------------
@@ -318,10 +356,11 @@ function get_dependencies_for_install {
 : pgexodus
 : --------
 :
-	sudo apt install -y postgresql$PG_VER_SUFFIX #for pgexodus install
+	sudo apt-get install -y postgresql$PG_VER_SUFFIX #for pgexodus install
 }
 
 function install_all {
+:
 : -------
 : INSTALL $*
 : -------
@@ -437,24 +476,32 @@ V0G0N
 :
 	dict2sql
 :
-}
+} # end of I install stage
 
 function test_all {
+:
 : ----
 : TEST $*
 : ----
 :
-: SERVER_PG_VER ${SERVER_PG_VER} EXO_PORT=$EXO_PORT
+: Postgres version and port - SERVER_PG_VER ${SERVER_PG_VER} and EXO_PORT=$EXO_PORT
+: -------------------------
+:
+: Start postgresql although it should be running
 :
 	sudo systemctl start postgresql
+
 :
-: Many tests
-: ----------
+: Many tests using ctest - In parallel. Output only on error
+: ----------------------
+:
+: Note that all the tests that do not require database were already run in the build stage using EXO_NODATA=1 envvar
 :
 	cd $EXODUS_DIR/build && CTEST_OUTPUT_ON_FAILURE=1 CTEST_PARALLEL_LEVEL=$((`nproc`+1)) ctest
+
 :
-: Demo program
-: ------------
+: Run the demo program - testsort
+: --------------------
 :
 	testsort
 :
@@ -462,10 +509,13 @@ function test_all {
 : 'or logout/login to get new path from /etc/profile.d/exodus.sh'
 : 'which will enable running exodus programs created by edic/compile'
 : 'from the command line without prefixing ~/bin/'
-}
+
+} # end of T test stage
+
 function install_www_service {
+:
 : -------------------
-: Install www service
+: INSTALL WWW SERVICE
 : -------------------
 :
 	cd $EXODUS_DIR/service
@@ -480,20 +530,21 @@ function install_www_service {
 #	cd $EXODUS_DIR/service/src
 #	./compall
 #}
+
 :
 : ----
 : MAIN $*
 : ----
 :
-	[[ $STAGES =~ b ]] && get_dependencies_for_build
-	[[ $STAGES =~ B ]] && build_all
+	[[ $REQ_STAGES =~ b ]] && get_dependencies_for_build
+	[[ $REQ_STAGES =~ B ]] && build_all
 
-	[[ $STAGES =~ i ]] && get_dependencies_for_install
-	[[ $STAGES =~ I ]] && install_all
+	[[ $REQ_STAGES =~ i ]] && get_dependencies_for_install
+	[[ $REQ_STAGES =~ I ]] && install_all
 
-	[[ $STAGES =~ T ]] && test_all
+	[[ $REQ_STAGES =~ T ]] && test_all
 
-	[[ $STAGES =~ W ]] && install_www_service
+	[[ $REQ_STAGES =~ W ]] && install_www_service
 :
 : ----------------------------------------------------------------
 : Finished $0 $* in $((SECONDS/60)) mins and $((SECONDS%60)) secs.

@@ -9,15 +9,18 @@ set -euxo pipefail
 : Syntax
 : ------
 :
-:	$0 " <SOURCE> <NEW_CONTAINER_NAME> <REQ_STAGE_LETTERS> [gcc|clang] [<PG_VER>]"
+:	$0 " <SOURCE> <NEW_CONTAINER_NAME> <REQ_STAGES> [gcc|clang] [<PG_VER>]"
 :
 :	SOURCE e.g. an lxc image like ubuntu, ubuntu:22.04 etc. or an existing lxc container code
 :
 :	NEW_CONTAINER_NAME e.g. u2204 for lxc
 :
-:	REQ_STAGE_LETTERS is letters.
+	ALL_STAGES=bBiITW
+	DEFAULT_STAGES=bBiIT
 :
-:		A = All "'bBiIT'" except W
+:	REQ_STAGES must be one or more letters as follows -
+:
+:		A = All "'$DEFAULT_STAGES'" except W
 :
 :		b = Get dependencies for build
 :		B = Build
@@ -52,21 +55,18 @@ set -euxo pipefail
 	#export NEEDRESTART_MODE=a
 	SOURCE=${1:?SOURCE is required. e.g. ubuntu, ubuntu:22.04 etc. or container code}
 	NEW_CONTAINER_NAME=${2:?NEW_CONTAINER_NAME is required. e.g. u2204 for lxc}
-#	REQ_STAGE_LETTERS=${3:-bBiIT}
-	REQ_STAGE_LETTERS=${3:?Stages is required. A for 'bBiIT' - all except Web service}
+	REQ_STAGES=${3:?Stages is required. A for '$DEFAULT_STAGES' - all except Web service}
 	COMPILER=${4:-gcc}
 	PG_VER=${5:-}
 :
 : Validate
 : --------
 :
-	ALL_STAGE_LETTERS=bBiITW
-
-	if [[ $REQ_STAGE_LETTERS = "A" ]]; then
-		REQ_STAGE_LETTERS=bBiIT
+	if [[ $REQ_STAGES = "A" ]]; then
+		REQ_STAGES=$DEFAULT_STAGES
 	fi
-	if [[ ! $REQ_STAGE_LETTERS =~ ^[$ALL_STAGE_LETTERS]*$ ]]; then
-		echo REQ_STAGE_LETTERS has only letters $ALL_STAGE_LETTERS. Check syntax above.
+	if [[ ! $ALL_STAGES =~ $REQ_STAGES ]]; then
+		echo STAGES "'$REQ_STAGES'" must be one or more consecutive letters from $ALL_STAGES
 		exit 1
 	fi
 :
@@ -111,15 +111,15 @@ set -euxo pipefail
 
 function do_one_stage {
 :
+	STAGE_NO=$1
+	STAGE_LETTER=${ALL_STAGES:$((STAGE_NO-1)):1}
+	NEW_C=${NEW_CONTAINER_NAME}${COMPILER:0:1}-$STAGE_NO
+:
 : ============
-: Do one stage - $1
+: Do one stage - $STAGE_LETTER in ${NEW_C}
 : ============
 :
-	STAGE_NO=$1
-	STAGE_LETTER=${ALL_STAGE_LETTERS:$((STAGE_NO-1)):1}
-
 	OLD_C=${NEW_CONTAINER_NAME}${COMPILER:0:1}-$(($1 - 1))
-	NEW_C=${NEW_CONTAINER_NAME}${COMPILER:0:1}-$1
 :
 : Create/Overwrite container - $NEW_C
 : --------------------------
@@ -280,12 +280,12 @@ function do_one_stage {
 : ====
 :
 	FIRST_STAGE_UPDATE_EXODUS=YES
-	[[ $REQ_STAGE_LETTERS =~ b ]] && do_one_stage 1 || true # 'Get dependencies for build'
-	[[ $REQ_STAGE_LETTERS =~ B ]] && do_one_stage 2 || true # 'Build'
-	[[ $REQ_STAGE_LETTERS =~ i ]] && do_one_stage 3 || true # 'Get dependencies for install'
-	[[ $REQ_STAGE_LETTERS =~ I ]] && do_one_stage 4 || true # 'Install'
-	[[ $REQ_STAGE_LETTERS =~ T ]] && do_one_stage 5 || true # 'Test'
-	[[ $REQ_STAGE_LETTERS =~ W ]] && do_one_stage 6 || true # 'Install www service'
+	[[ $REQ_STAGES =~ b ]] && do_one_stage 1 || true # 'Get dependencies for build'
+	[[ $REQ_STAGES =~ B ]] && do_one_stage 2 || true # 'Build'
+	[[ $REQ_STAGES =~ i ]] && do_one_stage 3 || true # 'Get dependencies for install'
+	[[ $REQ_STAGES =~ I ]] && do_one_stage 4 || true # 'Install'
+	[[ $REQ_STAGES =~ T ]] && do_one_stage 5 || true # 'Test'
+	[[ $REQ_STAGES =~ W ]] && do_one_stage 6 || true # 'Install www service'
 :
 : ===============================================================
 : Finished $0 $* in $((SECONDS/60)) mins and $((SECONDS%60)) secs
