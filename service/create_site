@@ -60,7 +60,7 @@ set -euxo pipefail
 :
 	sudo ls -l $PHP_CONF_DIR -r
 	sudo php --ini
-	sudo find /etc/ -name php.ini | grep 'apache2'
+	sudo find /etc/ -name php.ini | grep 'apache2' || true
 :
 	if [ ! -e $PHP_EXODUS_INI ]; then
 		sudo cat > ${PHP_EXODUS_INI} <<-V0G0N
@@ -73,7 +73,7 @@ set -euxo pipefail
 			max_execution_time = 606
 			upload_max_filesize = 10M
 			post_max_size = 10M
-		V0G0N
+		V0G0N || true
 	fi
 
 :
