@@ -116,7 +116,7 @@ set -euxo pipefail
 :	postfix     email handler
 :	mailutils	NOT installed. like bsd-mailx but doesnt have identical options
 :
-	DEBIAN_FRONTEND=noninteractive apt-get -y install whois postfix bsd-mailx
+	DEBIAN_FRONTEND=noninteractive sudo apt-get -y install whois postfix bsd-mailx
 
 :
 : Configure postfix
@@ -161,11 +161,11 @@ set -euxo pipefail
 :
 : Install the deb package
 :
-	dpkg -i wkhtmltox_$VERSION.${RELEASE}_amd64.deb || true
+	sudo dpkg -i wkhtmltox_$VERSION.${RELEASE}_amd64.deb || true
 :
 : The package is missing dependencies but those will and must be fixed as follows:
 :
-	apt -y --fix-broken install
+	sudo apt -y --fix-broken install
 :
 : Verify html2pdf works
 :
@@ -195,5 +195,5 @@ set -euxo pipefail
 :	Apache is now listening on https://$IPNO
 :
 :	cd ~/exodus/service
-:	systemctl stop exo_live@exodus
+:	sudo systemctl stop exo_live@exodus
 :	./run exodus
