@@ -65,17 +65,19 @@ set -euxo pipefail
 #	sudo find /etc/ -name php.ini | grep 'apache2' || true
 :
 	if [ ! -e $PHP_EXODUS_INI ]; then
-		sudo cat > ${PHP_EXODUS_INI} <<-V0G0N
-			[exodus]
-			; defaults
-			; max_execution_time = 30
-			; upload_max_filesize = 2M
-			; post_max_size = 8M
+		(
+			sudo cat > ${PHP_EXODUS_INI} <<-V0G0N
+				[exodus]
+				; defaults
+				; max_execution_time = 30
+				; upload_max_filesize = 2M
+				; post_max_size = 8M
 
-			max_execution_time = 606
-			upload_max_filesize = 10M
-			post_max_size = 10M
-		V0G0N
+				max_execution_time = 606
+				upload_max_filesize = 10M
+				post_max_size = 10M
+			V0G0N
+		) || true # ignore failure TODO fix
 	fi
 
 :
