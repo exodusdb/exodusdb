@@ -2612,6 +2612,7 @@ ND inline var_proxy3 var::operator()(int fieldno, int valueno, int subvalueno) {
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wexit-time-destructors"
 #pragma clang diagnostic ignored "-Wglobal-constructors"
+#pragma clang diagnostic ignored "-Wreserved-identifier"
 
 ////////////////////////////////////////////////
 // var versions of various field mark characters
@@ -2626,6 +2627,10 @@ ND inline var_proxy3 var::operator()(int fieldno, int valueno, int subvalueno) {
 	PUBLIC extern const var BS;
 	PUBLIC extern const var DQ;
 	PUBLIC extern const var SQ;
+
+	PUBLIC extern const char* const _OS_NAME;
+	PUBLIC extern const char* const _OS_VERSION;
+
 #ifdef EXO_VAR_CPP
 	const var RM = RM_;
 	const var FM = FM_;
@@ -2637,6 +2642,14 @@ ND inline var_proxy3 var::operator()(int fieldno, int valueno, int subvalueno) {
 	const var BS = BS_;
 	const var DQ = DQ_;
 	const var SQ = SQ_;
+
+#ifdef EXO_OS_NAME
+	const char* const _OS_NAME = EXO_OS_NAME;
+#endif
+#ifdef EXO_OS_VERSION
+	const char* const _OS_VERSION = EXO_OS_VERSION;
+#endif
+
 #endif
 
 /////////////////////////////////////

@@ -106,24 +106,6 @@ namespace exodus {
 
 #endif
 
-#ifdef __clang__
-	//__clang_major__
-	//__clang_minor__
-	//__clang_patchlevel__
-	//__clang_version__
-	const constexpr auto _COMPILER =  "clang";
-	const constexpr auto _COMPILER_VERSION =  __clang_major__;
-#elif defined(__GNUC__)
-	//__GNUC__
-	//__GNUC_MINOR__
-	//__GNUC_PATCHLEVEL__
-	const constexpr auto _COMPILER =  "gcc";
-	const constexpr auto _COMPILER_VERSION =  __GNUC__;
-#else
-	const constexpr auto _COMPILER =  "unknown";
-	const constexpr auto _COMPILER_VERSION = 0;
-#endif
-
 	// _cplusplus is in format YYYYMM e.g. 202002, 202102, 202302 etc.
 	// We will extract the two digit year only - using integer division and integer remainder ops.
 	// Years e.g. 21 which are in between the actual standards like c++20, c++23, c++26 etc.
@@ -136,6 +118,24 @@ namespace exodus {
 #else
 #	define                _PLATFORM   "x86"
 	const var              PLATFORM = _PLATFORM;
+#endif
+
+#ifdef __clang__
+	//__clang_major__
+	//__clang_minor__
+	//__clang_patchlevel__
+	//__clang_version__
+	inline const constexpr auto _COMPILER =  "clang";
+	inline const constexpr auto _COMPILER_VERSION =  __clang_major__;
+#elif defined(__GNUC__)
+	//__GNUC__
+	//__GNUC_MINOR__
+	//__GNUC_PATCHLEVEL__
+	inline const constexpr auto _COMPILER =  "gcc";
+	inline const constexpr auto _COMPILER_VERSION =  __GNUC__;
+#else
+	inline const constexpr auto _COMPILER =  "unknown";
+	inline const constexpr auto _COMPILER_VERSION = 0;
 #endif
 
 #pragma clang diagnostic pop
