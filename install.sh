@@ -542,6 +542,7 @@ function install_www_service {
 : INSTALL WWW SERVICE
 : -------------------
 :
+	export EXODUS_DIR
 	cd $EXODUS_DIR/service
 	./install_all.sh
 }
