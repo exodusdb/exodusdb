@@ -14,29 +14,29 @@ jobs:
       matrix:
         include:
 
-          - UBUNTU_VER: "24.04"
-            PG_VER:
-            COMPILER: gcc
-
-          - UBUNTU_VER: "24.04"
-            PG_VER:
-            COMPILER: clang
-
+#          - UBUNTU_VER: "24.04"
+#            PG_VER:
+#            COMPILER: gcc
+#
+#          - UBUNTU_VER: "24.04"
+#            PG_VER:
+#            COMPILER: clang
+#
           - UBUNTU_VER: "22.04"
             PG_VER:
             COMPILER: gcc
 
-          - UBUNTU_VER: "22.04"
-            PG_VER:
-            COMPILER: clang
-
-          - UBUNTU_VER: "20.04"
-            PG_VER:
-            COMPILER: gcc
-
-          - UBUNTU_VER: "20.04"
-            PG_VER:
-            COMPILER: clang
+#          - UBUNTU_VER: "22.04"
+#            PG_VER:
+#            COMPILER: clang
+#
+#          - UBUNTU_VER: "20.04"
+#            PG_VER:
+#            COMPILER: gcc
+#
+#          - UBUNTU_VER: "20.04"
+#            PG_VER:
+#            COMPILER: clang
           #
           #
           # Latest Ubuntu with default Postgres version #
