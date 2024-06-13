@@ -60,6 +60,7 @@ set -euxo pipefail
 :
 	sudo ls -l $PHP_CONF_DIR -r
 	sudo php --ini
+	sudo find /etc/ -name php.ini | grep 'apache2'
 :
 	if [ ! -e $PHP_EXODUS_INI ]; then
 		sudo cat > ${PHP_EXODUS_INI} <<-V0G0N
