@@ -360,8 +360,19 @@ function build_all {
 : Install exodus without database
 : -------------------------------
 :
-	cmake --install $EXODUS_DIR/build
+	#duplicated in Build and Install stages
+	sudo cmake --install $EXODUS_DIR/build
 
+:
+: Add \~/bin to all users PATH
+: ----------------------------
+:
+: Enable exodus programs created with edic/compile
+: to be run from command line without full path to \~/bin
+: Requires re-login after installation.
+:
+	echo 'export PATH="${PATH}:~/bin"' | sudo dd of=/etc/profile.d/exodus.sh status=none
+:
 } # end of B Build stage
 
 function get_dependencies_for_install {
@@ -387,6 +398,7 @@ function install_all {
 : INSTALL $*
 : -------
 :
+	#duplicated in Build and Install stages
 	sudo cmake --install $EXODUS_DIR/build
 :
 #:
@@ -396,16 +408,6 @@ function install_all {
 #:
 #	cd $EXODUS_DIR/build
 #	CTEST_OUTPUT_ON_FAILURE=1 CTEST_PARALLEL_LEVEL=$((`nproc`+1)) ctest
-:
-: Add \~/bin to all users PATH
-: ----------------------------
-:
-: Enable exodus programs created with edic/compile
-: to be run from command line without full path to \~/bin
-: Requires re-login after installation.
-:
-	echo 'export PATH="${PATH}:~/bin"' | sudo dd of=/etc/profile.d/exodus.sh status=none
-:
 : ----------------------------------------
 : Check that postgresql is running locally
 : ----------------------------------------
