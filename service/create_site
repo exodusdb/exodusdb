@@ -48,7 +48,7 @@ set -euxo pipefail
 #	if ! which apachectl || ! which php; then
 #		sudo apt install -y apache2 php php-xml
 #	fi
-	sudo apt install -y apache2 php php-xml
+	sudo apt install -y apache2 php php-xml libapache2-mod-php
 	sudo a2enmod rewrite ssl
 #	sudo apachectl restart
 	sudo systemctl restart apache2
