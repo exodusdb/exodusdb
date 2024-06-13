@@ -6,6 +6,18 @@ set -euxo pipefail
 : Build, install and test exodus
 : ==============================
 :
+: 'Output from cli exodus.cpp for 3 OS x 2 compilers'
+: '"c++ 21" indicates c++20 plus informal support for c++23'
+: '"c++ 24" indicates c++23 plus informal support for c++26'
+:
+: 'Build: Ubuntu 24.04 x64 gcc   13 c++ 21'
+: 'Build: Ubuntu 22.04 x64 gcc   11 c++ 21'
+: 'Build: Ubuntu 20.04 x64 gcc    9 c++ 17'
+:
+: 'Build: Ubuntu 24.04 x64 clang 18 c++ 24'
+: 'Build: Ubuntu 22.04 x64 clang 14 c++ 21'
+: 'Build: Ubuntu 20.04 x64 clang 10 c++ 20'
+:
 : '------ ------------ ----- --------  ----  -----   -----'
 : 'Status Ubuntu  LTS  Name  Postgres  g++   clang   boost'
 : '------ ------------ ----- --------  ----  -----   -----'
@@ -316,17 +328,20 @@ function build_all {
 	dpkg -S /usr/include/c++ || true
 :
 	c++ -v -print-search-dirs || true
+
 :
 : Build
 : -----
 :
 	cd $EXODUS_DIR
+
 :
 : Acquire any submodules e.g. pgexodus and fmt
 : ----------------------
 :
 	git submodule init
 	git submodule update
+
 :
 : Build exodus
 : ------------

@@ -147,6 +147,23 @@
 		#add_compile_options(-stdlib=libc++) #24 bytes strings. apt install libc++-dev libc++abi-dev
 	endif()
 
+#
+# Acquire and pass definitions for OS_NAME and OS_VERSION e.g. Ubuntu, 24.04
+
+	execute_process(
+		COMMAND lsb_release -rs
+		OUTPUT_VARIABLE OS_VERSION
+		OUTPUT_STRIP_TRAILING_WHITESPACE)
+	MESSAGE(STATUS "OS_VERSION = ${OS_VERSION}")
+	ADD_DEFINITIONS( -DEXO_OS_VERSION=\"${OS_VERSION}\" )
+
+	execute_process(
+		COMMAND lsb_release -is
+		OUTPUT_VARIABLE OS_NAME
+		OUTPUT_STRIP_TRAILING_WHITESPACE)
+	MESSAGE(STATUS "OS_NAME = ${OS_NAME}")
+	ADD_DEFINITIONS( -DEXO_OS_NAME=\"${OS_NAME}\" )
+
 ##
 ## FMT - before setting complex compiler warnings for exodus subdirs/modules
 ## ###
