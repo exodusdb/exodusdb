@@ -21,7 +21,7 @@ set -euxo pipefail
 : Config
 : ======
 :
-:	EXODUS_DIR provided caller or default to the parent dir of the current working dir
+:	EXODUS_DIR provided by caller or default to the parent dir of the current working dir
 :
 #	EXODUS_DIR=~/exodus
 	EXODUS_DIR=${EXODUS_DIR:-$(realpath `pwd`/..)}
