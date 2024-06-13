@@ -57,9 +57,10 @@ set -euxo pipefail
 :
 	PHP_CONF_DIR=`php --ini|grep '/etc/php/[0-9.]*' -o | head -n1`
 	PHP_EXODUS_INI=${PHP_CONF_DIR}/apache2/conf.d/00-exodus.ini
+	sudo ls -l PHP_CONF_DIR -r
 :
 	if [ ! -e $PHP_EXODUS_INI ]; then
-		cat > ${PHP_EXODUS_INI} <<-V0G0N
+		sudo cat > ${PHP_EXODUS_INI} <<-V0G0N
 			[exodus]
 			; defaults
 			; max_execution_time = 30
