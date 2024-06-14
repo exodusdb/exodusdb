@@ -264,11 +264,11 @@ function get_dependencies_for_build_and_install {
 : Show libstdc++ and clang information
 : ------------------------------------
 :
-		apt list libstdc++*dev --installed || true
+		apt list libstdc++*dev --installed | grep libstdc || true
 :
 		dpkg -S /usr/include/c++ || true
 :
-		apt list libstdc++*dev || true
+		apt list libstdc++*dev | grep libstdc || true
 :
 : Prevent clang from using later versions of gcc tool chains which are troublesome
 : Force clang to use same version of the gcc tool chain as gcc

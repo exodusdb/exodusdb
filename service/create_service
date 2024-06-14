@@ -152,7 +152,7 @@ V0G0N
 : Ensure setfacl is installed
 : ===========================
 :
-    which setfacl || apt install -y acl
+    which setfacl || apt-get install -y acl
 
 :
 : Ensure directory permissions on data/$FULL_DB_CODE

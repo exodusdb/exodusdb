@@ -125,7 +125,7 @@ set -euxo pipefail
 : Install gdb if necessary
 : ========================
 :
-    which gdb || apt install -y gdb
+    which gdb || apt-get install -y gdb
 
 :
 : Start the server process under gdb

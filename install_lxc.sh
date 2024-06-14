@@ -99,14 +99,14 @@ set -euxo pipefail
 #	lxc launch ubuntu:22.04 u2204-preinstalled
 #	lxc start u2204-preinstalled
 #	lxc shell u2204-preinstalled <<-V0G0N
-#		sudo apt update
-#		sudo apt install -y postgresql-common
+#		sudo apt-get update
+#		sudo apt-get install -y postgresql-common
 #		sudo /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh || true
-#		sudo apt install -y cmake
-#		sudo apt install -y g++ libpq-dev libboost-regex-dev libboost-locale-dev
-#		sudo apt install -y postgresql-server-dev-{14,16}
-#		sudo apt install -y postgresql-common
-#		sudo apt install -y postgresql-{14,16} #for pgexodus install
+#		sudo apt-get install -y cmake
+#		sudo apt-get install -y g++ libpq-dev libboost-regex-dev libboost-locale-dev
+#		sudo apt-get install -y postgresql-server-dev-{14,16}
+#		sudo apt-get install -y postgresql-common
+#		sudo apt-get install -y postgresql-{14,16} #for pgexodus install
 #	V0G0N
 
 function do_one_stage {

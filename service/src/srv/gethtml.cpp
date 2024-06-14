@@ -165,7 +165,7 @@ function main(in mode0, out letterhead_out, in compcode0 = "", in qr_text0 = "")
 	letterhead.replacer("%URL%", SYSTEM.f(114, 1));
 	letterhead.replacer("%DATABASE%", SYSTEM.f(17, 1));
 
-	// QR code (requires apt install qrencode)
+	// QR code (requires apt-get install qrencode)
 	if (letterhead.contains("%QR%")) {
 
 		// Check qrencoder installed
