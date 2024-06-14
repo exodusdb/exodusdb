@@ -37,17 +37,17 @@ set -euxo pipefail
 :
 : $0 ' [<STAGES>] [gcc|clang] [<PG_VER>]'
 :
-	ALL_STAGES=bBiITW
-	DEFAULT_STAGES=bBiIT
+	ALL_STAGES=bBdDTW
+	DEFAULT_STAGES=bBdDT
 :
 : STAGES is one or more consecutive letters from $ALL_STAGES.
 : Default is "'$DEFAULT_STAGES'" all except W - Web service
 :
-: b = Get dependencies for build
-: B = Build
+: b = Get dependencies for build and install
+: B = Build and install
 :
-: i = Get dependencies for install
-: I = Install
+: d = Get dependencies for database
+: D = Install database
 :
 : T = Test
 :
@@ -187,11 +187,11 @@ set -euxo pipefail
 	fi
 :
 
-function get_dependencies_for_build {
+function get_dependencies_for_build_and_install {
 :
-: --------------------------
-: GET DEPENDENCIES FOR BUILD $*
-: --------------------------
+: --------------------------------------
+: GET DEPENDENCIES FOR BUILD AND INSTALL $*
+: --------------------------------------
 :
 :
 : Update apt
@@ -199,8 +199,8 @@ function get_dependencies_for_build {
 :
 	sudo apt-get -y update
 :
-: Install Postgresql package
-: --------------------------
+: Install Postgresql dev and client package
+: -----------------------------------------
 :
 	#Uninstall postgresql-server-dev-all for old existing installations
 	#otherwise all postgres versions are installed and pg_config outputs latest version
@@ -307,9 +307,9 @@ function get_dependencies_for_build {
 	readlink `which c++` -e
 	dpkg -l | egrep "gcc|clang|libstd|libc\+\+" | awk '{print $2}'
 
-} # end of b install build dependencies
+} # end of stage b - Install dependencies
 
-function build_all {
+function build_and_install {
 :
 : -----
 : BUILD $*
@@ -351,16 +351,20 @@ function build_all {
 	cmake --build $EXODUS_DIR/build -j$((`nproc`+1))
 
 :
-: Run tests that do not require database - since it is not installed yet
+: Run tests that do not require database
 : --------------------------------------
+:
+: 1. Test in build/test/src to avoid testing pgexodus lib since postgres is not installed yet
+: 2. EXO_NODATA=1 causes tests related to database to pass automatically
 :
 	cd $EXODUS_DIR/build/test/src && EXO_NODATA=1 CTEST_OUTPUT_ON_FAILURE=1 CTEST_PARALLEL_LEVEL=$((`nproc`+1)) ctest
 
 :
-: Install exodus without database
-: -------------------------------
+: Install exodus
+: --------------
 :
-	#duplicated in Build and Install stages
+: Also installs pgexodus.so to /usr/lib/postgresql but not actually required.
+:
 	sudo cmake --install $EXODUS_DIR/build
 
 :
@@ -375,13 +379,13 @@ function build_all {
 :
 	echo 'export PATH="${PATH}:~/bin"' | sudo dd of=/etc/profile.d/exodus.sh status=none
 :
-} # end of B Build stage
+} # end of stage B - Build and install
 
-function get_dependencies_for_install {
+function get_dependencies_for_database {
 :
-: ----------------------------
-: GET DEPENDENCIES FOR INSTALL $*
-: ----------------------------
+: -----------------------------
+: GET DEPENDENCIES FOR DATABASE $*
+: -----------------------------
 :
 : exodus
 : ------
@@ -394,14 +398,21 @@ function get_dependencies_for_install {
 	sudo apt-get install -y postgresql$PG_VER_SUFFIX #for pgexodus install
 }
 
-function install_all {
+function install_database {
 :
-: -------
-: INSTALL $*
-: -------
+: ----------------
+: INSTALL DATABASE $*
+: ----------------
 :
-	#duplicated in Build and Install stages
-	sudo cmake --install $EXODUS_DIR/build
+	# Already installed in b stage along main exodus
+	# but here only the postgresl extension is installed
+	#sudo cmake --install $EXODUS_DIR/build
+	sudo cmake --install $EXODUS_DIR/build/exodus/pgexodus/
+#
+#-- Install configuration: "RELEASE"
+#-- Up-to-date: /usr/lib/postgresql/16/lib/pgexodus.so
+#-- Up-to-date: /usr/share/postgresql/16/extension/pgexodus.control
+#-- Up-to-date: /usr/share/postgresql/16/extension/pgexodus--1.0.sql
 :
 #:
 #: -------------------------------
@@ -419,6 +430,7 @@ function install_all {
 	sudo systemctl status postgresql || true
 	sudo pgrep postgres -a || true
 	ls /var/run/postgresql || true
+
 :
 : Optional grant others cd into HOME.
 : -----------------------------------
@@ -426,7 +438,16 @@ function install_all {
 : Removes warning by enable others/postgres to cd into build dir
 : 'could not change directory to "/root": Permission denied'
 :
+: Required for the following stage.
+:
 	sudo chmod o+x $HOME
+
+:
+: Test the pgexodus postgresql extension
+: --------------------------------------
+:
+	cd $EXODUS_DIR/build/exodus/pgexodus && CTEST_OUTPUT_ON_FAILURE=1 ctest
+
 :
 : -------------------------------
 : Configure postgresql for exodus
@@ -467,6 +488,7 @@ function install_all {
 	        CREATEROLE
 	    ;
 V0G0N
+
 :
 : Create exodus user login and database
 : -------------------------------------
@@ -478,6 +500,7 @@ V0G0N
 	if ! sudo -u postgres psql $PSQL_PORT_OPT exodus -c 'select version();' 2>/dev/null; then
 		sudo -u postgres psql $PSQL_PORT_OPT -c 'CREATE DATABASE exodus OWNER exodus;'
 	fi
+
 :
 : Install into into exodus database as well.
 : ------------------------------------------
@@ -486,29 +509,39 @@ V0G0N
 : therefore not created from template1 in above step.
 :
 	sudo -u postgres psql $PSQL_PORT_OPT exodus < $EXODUS_DIR/install_template1.sql
+
 :
 : Configure exodus for postgres
 : -----------------------------
 :
 	mkdir -p ~/.config/exodus
 	echo "host=127.0.0.1 port=${EXO_PORT:-5432} dbname=exodus user=exodus password=somesillysecret" > ~/.config/exodus/exodus.cfg
+#
+#:
+#: Test the pgexodus postgresql extension
+#: --------------------------------------
+#:
+#	cd $EXODUS_DIR/build/exodus/pgexodus && CTEST_OUTPUT_ON_FAILURE=1 ctest
+#
+
 :
-: Lots of pgsql utility functions
-: -------------------------------
+: Install lots of pgsql utility functions
+: ---------------------------------------
 :
-: Necessary to test many exodus pgsql function e.g. exodus_date
+: Necessary to test many exodus pgsql function e.g. exodus_date - not exodus::extract_date
 :
 : TODO make sure it connects to the right postgresql service/port
 :
 	dict2sql
 :
-} # end of I install stage
 
-function test_all {
+} # end of stage D - Install database
+
+function test_exodus_and_database {
 :
-: ----
-: TEST $*
-: ----
+: ------------------------
+: TEST EXODUS AND DATABASE $*
+: ------------------------
 :
 : Postgres version and port - SERVER_PG_VER ${SERVER_PG_VER} and EXO_PORT=$EXO_PORT
 : -------------------------
@@ -521,7 +554,9 @@ function test_all {
 : Many tests using ctest - In parallel. Output only on error
 : ----------------------
 :
-: Note that all the tests that do not require database were already run in the build stage using EXO_NODATA=1 envvar
+: Note that all the exodus/build/test/src test to that do not require database were already run
+: in the build stage using EXO_NODATA=1 and pgexodus test is omitted
+: This test is run in the exodus/build
 :
 	cd $EXODUS_DIR/build && CTEST_OUTPUT_ON_FAILURE=1 CTEST_PARALLEL_LEVEL=$((`nproc`+1)) ctest
 
@@ -536,7 +571,7 @@ function test_all {
 : 'which will enable running exodus programs created by edic/compile'
 : 'from the command line without prefixing ~/bin/'
 
-} # end of T test stage
+} # end of stage T - Test exodus and database
 
 function install_www_service {
 :
@@ -563,13 +598,13 @@ function install_www_service {
 : MAIN $*
 : ----
 :
-	[[ $REQ_STAGES =~ b ]] && get_dependencies_for_build
-	[[ $REQ_STAGES =~ B ]] && build_all
+	[[ $REQ_STAGES =~ b ]] && get_dependencies_for_build_and_install
+	[[ $REQ_STAGES =~ B ]] && build_and_install
 
-	[[ $REQ_STAGES =~ i ]] && get_dependencies_for_install
-	[[ $REQ_STAGES =~ I ]] && install_all
+	[[ $REQ_STAGES =~ d ]] && get_dependencies_for_database
+	[[ $REQ_STAGES =~ D ]] && install_database
 
-	[[ $REQ_STAGES =~ T ]] && test_all
+	[[ $REQ_STAGES =~ T ]] && test_exodus_and_database
 
 	[[ $REQ_STAGES =~ W ]] && install_www_service
 :
