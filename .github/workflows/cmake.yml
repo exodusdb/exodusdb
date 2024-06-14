@@ -131,17 +131,17 @@ jobs:
         : sudo ./install.sh ${{ matrix.PG_VER }}
         env
 
-    - name: Get dependencies for build
+    - name: Get dependencies for build and install
       run: env ./install.sh b "${{ matrix.COMPILER }}" "${{ matrix.PG_VER }}"
 
-    - name: Build
+    - name: Build and install
       run: ./install.sh B "${{ matrix.COMPILER }}" "${{ matrix.PG_VER }}"
 
-    - name: Get dependencies for install
-      run: ./install.sh i "${{ matrix.COMPILER }}" "${{ matrix.PG_VER }}"
+    - name: Get dependencies for database
+      run: ./install.sh d "${{ matrix.COMPILER }}" "${{ matrix.PG_VER }}"
 
-    - name: Install
-      run: ./install.sh I "${{ matrix.COMPILER }}" "${{ matrix.PG_VER }}"
+    - name: Install database
+      run: ./install.sh D "${{ matrix.COMPILER }}" "${{ matrix.PG_VER }}"
 
     - name: Test
       run: ./install.sh T "${{ matrix.COMPILER }}" "${{ matrix.PG_VER }}"
