@@ -45,11 +45,13 @@ set -euxo pipefail
 : Install apache and php if not already installed
 : ===============================================
 :
+#	Be careful that apache may already be installed without all the necessary mods
 #	if ! which apachectl || ! which php; then
 #		sudo apt install -y apache2 php php-xml
 #	fi
 	sudo apt install -y apache2 php php-xml libapache2-mod-php
-	sudo a2enmod rewrite ssl
+	sudo a2enmod rewrite ssl php*
+	echo | sudo a2dismod
 #	sudo apachectl restart
 	sudo systemctl restart apache2
 
@@ -65,10 +67,14 @@ set -euxo pipefail
 #	sudo find /etc/ -name php.ini | grep 'apache2' || true
 	sudo find /etc/ -name php.ini || true
 	sudo find /etc/ -name xml.ini || true
+
 :
 	if [ ! -e $PHP_EXODUS_INI ]; then
 		(
-			sudo cat > ${PHP_EXODUS_INI} <<-V0G0N
+			#sudo cat > ${PHP_EXODUS_INI} <<-V0G0N
+			#Use sudo dd because sudo doesnt work with redirection
+			#It acts after the redirection is established
+			sudo dd of=${PHP_EXODUS_INI} status=none <<-V0G0N
 				[exodus]
 				; defaults
 				; max_execution_time = 30
@@ -79,7 +85,21 @@ set -euxo pipefail
 				upload_max_filesize = 10M
 				post_max_size = 10M
 			V0G0N
-		) || true # ignore failure. TODO fix
+		) || (
+: =====================================================
+: Error: Could not configure $PHP_EXODUS_INI. See above
+: =====================================================
+			if [[ -n ${GITHUB_WORKSPACE:-} ]]; then
+:
+: Skipping to allow building on github
+: which seems to be missing /etc/php/N.N/apache2/conf.d
+: TODO resolve missing apache/php packages?
+:
+				true
+			else
+				false
+			fi
+		)
 	fi
 
 :

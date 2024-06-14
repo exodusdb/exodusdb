@@ -371,6 +371,8 @@ function build_all {
 : to be run from command line without full path to \~/bin
 : Requires re-login after installation.
 :
+: Note: Using "'echo sudo'" dd trick because "'sudo echo xxx > yyy'" doesnt sudo the "> yyy" bit.
+:
 	echo 'export PATH="${PATH}:~/bin"' | sudo dd of=/etc/profile.d/exodus.sh status=none
 :
 } # end of B Build stage
@@ -544,7 +546,7 @@ function install_www_service {
 :
 	export EXODUS_DIR
 	cd $EXODUS_DIR/service
-	./install_all.sh
+	sudo ./install_all.sh
 }
 :
 #function build_service {
