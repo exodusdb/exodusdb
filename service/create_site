@@ -47,16 +47,16 @@ set -euxo pipefail
 :
 : Note that apache/mods may be already installed but not enabled
 :
-	sudo apt-get install -y apache2 php php-xml
+	sudo apt-get install -y apache2 libapache2-mod-php php php-xml
 :
 : Dump mods available and enabled
 :
-	sudo ls -l /etc/apache2/mods-available/
+#	sudo ls -l /etc/apache2/mods-available/
 	sudo ls -l /etc/apache2/mods-enabled/
 :
 : Ensure that  required mods are actually enabled
 :
-	sudo a2enmod rewrite ssl php* || true
+	sudo a2enmod rewrite ssl php*
 :
 : Restart apache
 :
