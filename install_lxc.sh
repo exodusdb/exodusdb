@@ -15,8 +15,8 @@ set -euxo pipefail
 :
 :	NEW_CONTAINER_NAME e.g. u2204 for lxc
 :
-	ALL_STAGES=bBiITW
-	DEFAULT_STAGES=bBiIT
+	ALL_STAGES=bBdDTW
+	DEFAULT_STAGES=bBdDT
 :
 :	REQ_STAGES must be one or more letters as follows -
 :
@@ -282,8 +282,8 @@ function do_one_stage {
 	FIRST_STAGE_UPDATE_EXODUS=YES
 	[[ $REQ_STAGES =~ b ]] && do_one_stage 1 || true # 'Get dependencies for build'
 	[[ $REQ_STAGES =~ B ]] && do_one_stage 2 || true # 'Build'
-	[[ $REQ_STAGES =~ i ]] && do_one_stage 3 || true # 'Get dependencies for install'
-	[[ $REQ_STAGES =~ I ]] && do_one_stage 4 || true # 'Install'
+	[[ $REQ_STAGES =~ d ]] && do_one_stage 3 || true # 'Get dependencies for install'
+	[[ $REQ_STAGES =~ D ]] && do_one_stage 4 || true # 'Install'
 	[[ $REQ_STAGES =~ T ]] && do_one_stage 5 || true # 'Test'
 	[[ $REQ_STAGES =~ W ]] && do_one_stage 6 || true # 'Install www service'
 :
