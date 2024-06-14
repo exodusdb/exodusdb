@@ -24,17 +24,17 @@ function main(io osfilename, in printopts0, out errors) {
 		# 18.04 bionic
 		wget https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6-1/wkhtmltox_0.12.6-1.bionic_amd64.deb;
 		dpkg -i wkhtmltox_0.12.6-1.bionic_amd64.deb;
-		apt --fix-broken install;
+		apt-get --fix-broken install;
 
 		# 20.04 focal
 		wget https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6-1/wkhtmltox_0.12.6-1.focal_amd64.deb;
 		dpkg -i wkhtmltox_0.12.6-1.focal_amd64.deb;
-		apt --fix-broken install;
+		apt-get --fix-broken install;
 
 		https://wkhtmltopdf.org/;
 		wget https://downloads.wkhtmltopdf.org/0.12/0.12.5/wkhtmltox_0.12.5-1.bionic_amd64.deb;
 		dpkg -i wkhtmltox_0.12.5-1.bionic_amd64.deb;
-		apt --fix-broken install;
+		apt-get --fix-broken install;
 
 		// test
 		/usr/local/bin/wkhtmltopdf http://google.com google.pdf;

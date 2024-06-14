@@ -47,15 +47,16 @@ set -euxo pipefail
 :
 : Note that apache/mods may be already installed but not enabled
 :
-	sudo apt install -y apache2 php php-xml
+	sudo apt-get install -y apache2 php php-xml
+:
+: Dump mods available and enabled
+:
+	sudo ls -l /etc/apache2/mods-available/
+	sudo ls -l /etc/apache2/mods-enabled/
 :
 : Ensure that  required mods are actually enabled
 :
-	sudo a2enmod rewrite ssl php*
-:
-: Display enabled mods
-:
-	echo | sudo a2dismod
+	sudo a2enmod rewrite ssl php* || true
 :
 : Restart apache
 :
@@ -124,7 +125,7 @@ set -euxo pipefail
 : Ensure setfacl is installed
 : ===========================
 :
-	which setfacl || sudo apt install -y acl
+	which setfacl || sudo apt-get install -y acl
 
 :
 : Create link from hostname dir to host dir if different

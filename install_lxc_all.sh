@@ -54,7 +54,7 @@ set -euxo pipefail
 : Upgrade all in base container $OS
 : -----------------------------
 :
-			lxc exec $OS -- bash -c "apt-get update && apt -y dist-upgrade || true"
+			lxc exec $OS -- bash -c "apt-get update && apt-get -y dist-upgrade || true"
 :
 		fi # upgrading base container
 

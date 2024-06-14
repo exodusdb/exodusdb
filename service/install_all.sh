@@ -165,7 +165,7 @@ set -euxo pipefail
 :
 : The package is missing dependencies but those will and must be fixed as follows:
 :
-	sudo apt -y --fix-broken install
+	sudo apt-get -y --fix-broken install
 :
 : Verify html2pdf works
 :
