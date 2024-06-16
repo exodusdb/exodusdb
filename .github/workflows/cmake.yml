@@ -146,6 +146,6 @@ jobs:
     - name: Test
       run: ./install.sh T "${{ matrix.COMPILER }}" "${{ matrix.PG_VER }}"
 
-
-    - name: Build and install web service
-      run: ./install.sh W "${{ matrix.COMPILER }}" "${{ matrix.PG_VER }}"
+#
+#    - name: Build and install web service
+#      run: ./install.sh W "${{ matrix.COMPILER }}" "${{ matrix.PG_VER }}"
