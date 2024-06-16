@@ -214,10 +214,89 @@ function main() {
 		//if( __cplusplus >= 201103L )
 		//basicoptions^=" -std=c++11";//gcc 4.7 and later DISABLES gnu extensions
 		//if  (__cplusplus >= 202003L)
-		if (__cplusplus >= 201709)
-			basicoptions ^= " -std=c++2a";  //gcc 4.7 and later DISABLES gnu extensions
-		else
-			basicoptions ^= " -std=c++17";  //gcc 4.7 and later DISABLES gnu extensions
+
+		// c++ standard feature support by g++ version
+		// https://gcc.gnu.org/projects/cxx-status.html
+
+		// Hard code best c++ standard version
+		// Discovered from man pages
+		// man g++-13|\grep c++2[0-9a-z] -o|sort|uniq
+		int compiler_version_no = compiler_version.match("\\d+\\.\\d+\\.\\d+").f(1).field(".", 1);
+		var std = "";
+		if (gcc) {
+			switch (compiler_version_no) {
+				case 9:  // Ubuntu 20.04 g++ default
+					std = "c++2a";
+					break;
+				case 10: // Ubuntu 20.04 g++ max
+					std = "c++20"; // c++2a
+					break;
+				case 11: // Ubuntu 22.04 g++ default
+				case 12: // Ubuntu 22.04 g++ max
+				case 13: // Ubuntu 24.04 g++ default
+					//std = "c++20"; // c++2a
+					std = "c++23"; // c++2b
+					break;
+				case 14: // Ubuntu 24.04 g++ max
+					//std = "c++20"; // c++2a
+					//std = "c++23"; // c++2b
+					std = "c++26"; // c++2c
+					break;
+				default:
+					// Max supported will be discovered from man pages below
+					{}
+			}
+		} else if (clang) {
+			switch (compiler_version_no) {
+				case 10:
+				case 11:
+				case 12:
+				case 13:
+				case 14:
+					std = "c++2a";
+					break;
+				case 15:
+				case 16:
+					//std = "c++20";
+					std = "c++2b"; // some c++23
+					break;
+				case 17:
+				case 18:
+					//std = "c++20";
+					//std = "c++23";
+					std = "c++2c"; // some c++26
+					break;
+				default:
+					// Max supported will be discovered from man pages below
+					{}
+			}
+		}
+
+		// If unknown compiler name or version, try to find latest supported version in man pages
+		if (not std) {
+
+			// Determine the actual compiler being used
+			let manpage_compiler = osshellread("readlink -f `which " ^ compiler ^ "`").trim("\n").field2(_OSSLASH, -1);
+			// /x86_64-linux-gnu-g++-13
+			// /usr/lib/llvm-18/bin/clang
+
+			// Find all man page occurrences of c++2X and c++3X where X is a digit or letter
+			let manpage_versions = osshellread("man " ^ manpage_compiler ^ "|grep c++[23][0-9a-z] -o|sort -r|uniq").trim("\n");
+
+			// Choose the greatest c++ standard available from the compiler according to its man page
+			std = manpage_versions.field("\n", 1);
+			if (verbose)
+				printl("man pages for", compiler, manpage_compiler, "-> latest -std=" ^ std);
+		}
+
+		// Append c++ standard option
+		if (std) {
+			basicoptions ^= " -std=" ^ std;
+		}
+//		if (__cplusplus >= 201709)
+//			basicoptions ^= " -std=c++2a";  //gcc 4.7 and later DISABLES gnu extensions
+//		else
+//			basicoptions ^= " -std=c++17";  //gcc 4.7 and later DISABLES gnu extensions
 
 		// Minor space savings
 		basicoptions ^= " -fvisibility=hidden -ffunction-sections -fdata-sections";
