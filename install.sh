@@ -118,6 +118,21 @@ set -euxo pipefail
 		sleep 1
 	done
 :
+: Determine actual compiler version if min/max requested
+: ------------------------------------------------------
+:
+	COMPILER_VERSION=`echo $COMPILER | cut -d'-' -f2`
+	if [[ $COMPILER_VERSION =~ ^(min|max)$ ]]; then
+		COMPILER_NAME=`echo $COMPILER|cut -d'-' -f1`
+		if [[ $COMPILER_VERSION = max ]]; then
+			HEAD_OR_TAIL=tail
+		else
+			HEAD_OR_TAIL=head
+		fi
+		COMPILER_VERSION=`apt search $COMPILER_NAME |& \grep $COMPILER_NAME-[0-9][0-9.]* -o | \grep [0-9]* -o|sort -n|uniq|$HEAD_OR_TAIL -n1`
+		COMPILER=$COMPILER_NAME-$COMPILER_VERSION
+	fi
+:
 : -----------------------------------------
 : Work out postgres version suffix e.g. -14
 : -----------------------------------------
@@ -252,45 +267,57 @@ function get_dependencies_for_build_and_install {
 :
 	sudo apt-get install -y cmake
 :
-	if [[ $COMPILER == gcc ]]; then
+:
+: Install compiler $COMPILER
+: ----------------
+:
+: e.g. g++, g++-12, clang, clang-12 etc.
+:
+
+	sudo apt-get install -y $COMPILER
+:
+: Set as the default c++ compiler
+:
+	sudo update-alternatives --install /usr/bin/c++ c++ /usr/bin/$COMPILER 0
+	sudo update-alternatives --set c++ /usr/bin/$COMPILER
+	readlink `which c++` -e
 
 :
-: Install gcc compiler
-: --------------------
+: Set as the default c compiler. Why is this necessary?
 :
-		sudo apt-get install -y g++
-		readlink `which c++` -e
+	C_COMPILER=${COMPILER//+/c} #g++XXXXX becomes gccXXXXX
+	sudo update-alternatives --install /usr/bin/cc cc /usr/bin/$C_COMPILER 0
+	sudo update-alternatives --set cc /usr/bin/$C_COMPILER
+	readlink `which cc` -e
 
-	else
-:
-: Install clang compiler
-: ----------------------
-:
-		sudo apt-get install -y clang
-		sudo update-alternatives --set c++ /usr/bin/clang++
-		sudo update-alternatives --set cc /usr/bin/clang
-		readlink `which c++` -e
 :
 : Show libstdc++ and clang information
 : ------------------------------------
 :
-		apt list libstdc++*dev --installed | grep libstdc || true
+	apt list libstdc++*dev --installed |& grep libstdc || true
 :
-		dpkg -S /usr/include/c++ || true
+	dpkg -S /usr/include/c++ || true
 :
-		apt list libstdc++*dev | grep libstdc || true
-:
-: Prevent clang from using later versions of gcc tool chains which are troublesome
-: Force clang to use same version of the gcc tool chain as gcc
-: See initial info on libstdc++ in install log - Build stage, above and below.
-:
+	apt list libstdc++*dev |& grep libstdc || true
+
+#:
+#: Check if clang compiler
+#: -----------------------
+#:
+#	if [[ $COMPILER =~ ^clang ]]; then
+#
+#:
+#: Prevent clang from using later versions of gcc tool chains which are troublesome
+#: Force clang to use same version of the gcc tool chain as gcc
+#: See initial info on libstdc++ in install log - Build stage, above and below.
+#:
 		GCC_VERSION=$(gcc -v|&grep gcc\ version|cut -d' ' -f3|cut -d'.' -f1)
 		GCC_FAKE_VERSION=99
 		sudo ln -snf /usr/lib/gcc/x86_64-linux-gnu/$GCC_VERSION /usr/lib/gcc/x86_64-linux-gnu/$GCC_FAKE_VERSION
 		sudo ln -snf /usr/include/x86_64-linux-gnu/c++/$GCC_VERSION /usr/include/x86_64-linux-gnu/c++/$GCC_FAKE_VERSION
 		sudo ln -snf /usr/include/c++/$GCC_VERSION /usr/include/c++/$GCC_FAKE_VERSION
 
-	fi
+#	fi
 :
 : Install dev packages for postgresql client lib and boost
 : --------------------------------------------------------
