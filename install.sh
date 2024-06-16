@@ -31,14 +31,14 @@ set -euxo pipefail
 : '------ -----------  ----- --------  ----  -----   -----'
 : 'Exodus now requires c++20 so will no longer build on 18.04'
 :
-: Min/Default/Max compiler version
+: min/default/latest compiler version
 : --------------------------------
 :
-: OS      g++           clang
-:         min def max   min def max
-: 24.04     9  13  14    14  18  18
-: 22.04     9  11  12    11  14  15
-: 20.04     7  9   10     7  10  12
+: OS      g++             clang
+:         min def latest  min def latest
+: 24.04     9  13  14      14  18  18
+: 22.04     9  11  12      11  14  15
+: 20.04     7  9   10       7  10  12
 
 : ------
 : Syntax
@@ -93,8 +93,8 @@ set -euxo pipefail
 	fi
 
 	# duplicate code in install.sh and install_lxc.sh
-	if [[ ! $COMPILER =~ ^((g\+\+)|(clang))(-(([0-9]+)|min|max))?$ ]]; then
-		echo COMPILER must be g++ or clang. Optionally followed by a version e.g. g++-12, clang-12, g++-max, clang-max, g++-min, clang-min
+	if [[ ! $COMPILER =~ ^((g\+\+)|(clang))(-(([0-9]+)|min|latest))?$ ]]; then
+		echo COMPILER must be g++ or clang. Optionally followed by a version e.g. g++-12, clang-12, g++-latest, clang-latest, g++-min, clang-min
 		exit 1
 	fi
 
@@ -130,21 +130,23 @@ set -euxo pipefail
 	while ! ls /var/cache/apt/*.bin 2> /dev/null && ! sudo apt-get -y update; do
 		sleep 1
 	done
-:
-: Determine actual compiler version if min/max requested
-: ------------------------------------------------------
-:
-	COMPILER_VERSION=`echo $COMPILER | cut -d'-' -f2`
-	if [[ $COMPILER_VERSION =~ ^(min|max)$ ]]; then
-		COMPILER_NAME=`echo $COMPILER|cut -d'-' -f1`
-		if [[ $COMPILER_VERSION = max ]]; then
-			HEAD_OR_TAIL=tail
-		else
-			HEAD_OR_TAIL=head
-		fi
-		COMPILER_VERSION=`apt search $COMPILER_NAME |& \grep $COMPILER_NAME-[0-9][0-9.]* -o | \grep [0-9]* -o|sort -n|uniq|$HEAD_OR_TAIL -n1`
-		COMPILER=$COMPILER_NAME-$COMPILER_VERSION
-	fi
+
+#:
+#: Determine actual compiler version if min/latest requested
+#: ------------------------------------------------------
+#:
+#	COMPILER_VERSION=`echo $COMPILER | cut -d'-' -f2`
+#	if [[ $COMPILER_VERSION =~ ^(min|latest)$ ]]; then
+#		COMPILER_NAME=`echo $COMPILER|cut -d'-' -f1`
+#		if [[ $COMPILER_VERSION = latest ]]; then
+#			HEAD_OR_TAIL=tail
+#		else
+#			HEAD_OR_TAIL=head
+#		fi
+#		COMPILER_VERSION=`apt search $COMPILER_NAME |& grep "$COMPILER_NAME-[0-9][0-9.]*" -o | grep '[0-9]*' -o|sort -n|uniq|$HEAD_OR_TAIL -n1`
+#		COMPILER=$COMPILER_NAME-$COMPILER_VERSION
+#	fi
+
 :
 : -----------------------------------------
 : Work out postgres version suffix e.g. -14
@@ -231,11 +233,11 @@ function get_dependencies_for_build_and_install {
 : GET DEPENDENCIES FOR BUILD AND INSTALL $*
 : --------------------------------------
 :
-:
 : Update apt
 : ----------
 :
 	sudo apt-get -y update
+
 :
 : Install Postgresql dev and client package
 : -----------------------------------------
@@ -248,6 +250,7 @@ function get_dependencies_for_build_and_install {
 	#  grep: /etc/postgresql/16/main/postgresql.conf: No such file or directory
 	sudo apt-get remove -y 'postgresql-server-dev-all' && sudo apt-get -y autoremove || true
 	sudo apt-get install -y postgresql-common
+
 :
 : Install pgexodus and fmt submodules source
 : ------------------------------------------
@@ -256,12 +259,14 @@ function get_dependencies_for_build_and_install {
 		git submodule init
 		git submodule update
 	fi
+
 :
 : Get the full postgres debian repos IF we require a specific version
 : -------------------------------------------------------------------
 	if [[ -n $PG_VER ]]; then
 		yes | sudo /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh || true
 	fi
+
 :
 : List installed postgresql
 : -------------------------
@@ -279,7 +284,23 @@ function get_dependencies_for_build_and_install {
 : -----------------------------------------------------
 :
 	sudo apt-get install -y cmake
+
 :
+: Determine actual compiler version if min/latest requested
+: ------------------------------------------------------
+:
+	COMPILER_VERSION=`echo $COMPILER | cut -d'-' -f2`
+	if [[ $COMPILER_VERSION =~ ^(min|latest)$ ]]; then
+		COMPILER_NAME=`echo $COMPILER|cut -d'-' -f1`
+		if [[ $COMPILER_VERSION = latest ]]; then
+			HEAD_OR_TAIL=tail
+		else
+			HEAD_OR_TAIL=head
+		fi
+		COMPILER_VERSION=`apt search $COMPILER_NAME |& grep "$COMPILER_NAME-[0-9][0-9.]*" -o | grep '[0-9]*' -o|sort -n|uniq|$HEAD_OR_TAIL -n1`
+		COMPILER=$COMPILER_NAME-$COMPILER_VERSION
+	fi
+
 :
 : Install compiler $COMPILER
 : ----------------
@@ -288,6 +309,7 @@ function get_dependencies_for_build_and_install {
 :
 
 	sudo apt-get install -y $COMPILER
+
 :
 : Set as the default c++ compiler
 :
@@ -297,6 +319,7 @@ function get_dependencies_for_build_and_install {
 
 :
 : Set as the default c compiler. Why is this necessary?
+: 24.04 clang postgres c build fails with an invalid compiler flag -Weverything
 :
 	C_COMPILER=${COMPILER//+/c} #g++XXXXX becomes gccXXXXX
 	sudo update-alternatives --install /usr/bin/cc cc /usr/bin/$C_COMPILER 0
@@ -329,14 +352,15 @@ function get_dependencies_for_build_and_install {
 		sudo ln -snf /usr/lib/gcc/x86_64-linux-gnu/$GCC_VERSION /usr/lib/gcc/x86_64-linux-gnu/$GCC_FAKE_VERSION
 		sudo ln -snf /usr/include/x86_64-linux-gnu/c++/$GCC_VERSION /usr/include/x86_64-linux-gnu/c++/$GCC_FAKE_VERSION
 		sudo ln -snf /usr/include/c++/$GCC_VERSION /usr/include/c++/$GCC_FAKE_VERSION
-
 #	fi
+
 :
 : Install dev packages for postgresql client lib and boost
 : --------------------------------------------------------
 :
 	sudo apt-get install -y libpq-dev libboost-regex-dev libboost-locale-dev
 	#sudo apt-get install -y g++ libboost-date-time-dev libboost-system-dev libboost-thread-dev
+
 :
 : Install pgexodus postgres build dependencies
 : --------------------------------------------
@@ -367,7 +391,8 @@ function build_and_install {
 :
 : 1. libexodus
 : 2. exodus cli
-: 3. pgexodus extension
+: 3. test
+: 4. pgexodus extension
 :
 : Info
 :
@@ -396,8 +421,14 @@ function build_and_install {
 : Build exodus
 : ------------
 :
+:
+: Prep
+:
 	echo PGPATH=${PGPATH:-}
 	cmake -S $EXODUS_DIR -B $EXODUS_DIR/build
+:
+: Make
+:
 	cmake --build $EXODUS_DIR/build -j$((`nproc`+1))
 
 :
@@ -648,15 +679,16 @@ function install_www_service {
 : MAIN $*
 : ----
 :
-	[[ $REQ_STAGES =~ b ]] && get_dependencies_for_build_and_install
-	[[ $REQ_STAGES =~ B ]] && build_and_install
 
-	[[ $REQ_STAGES =~ d ]] && get_dependencies_for_database
-	[[ $REQ_STAGES =~ D ]] && install_database
+	if [[ $REQ_STAGES =~ b ]]; then get_dependencies_for_build_and_install; fi
+	if [[ $REQ_STAGES =~ B ]]; then build_and_install; fi
 
-	[[ $REQ_STAGES =~ T ]] && test_exodus_and_database
+	if [[ $REQ_STAGES =~ d ]]; then get_dependencies_for_database; fi
+	if [[ $REQ_STAGES =~ D ]]; then install_database; fi
 
-	[[ $REQ_STAGES =~ W ]] && install_www_service
+	if [[ $REQ_STAGES =~ T ]]; then test_exodus_and_database; fi
+
+	if [[ $REQ_STAGES =~ W ]]; then install_www_service; fi
 :
 : ================================================================
 : Finished $0 $* in $((SECONDS/60)) mins and $((SECONDS%60)) secs.

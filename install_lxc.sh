@@ -9,30 +9,36 @@ set -euxo pipefail
 : Syntax
 : ------
 :
-:	$0 " <SOURCE> <NEW_CONTAINER_NAME> <REQ_STAGES> [g++|clang] [<PG_VER>]"
+:	$0 " <SOURCE> <NEW_CONTAINER_NAME> <REQ_STAGES> [<COMPILER>] [<PG_VER>]"
 :
-:	SOURCE e.g. an lxc image like ubuntu, ubuntu:22.04 etc. or an existing lxc container code
+: SOURCE e.g. an lxc image like ubuntu, ubuntu:22.04 etc. or an existing lxc container code
 :
-:	NEW_CONTAINER_NAME e.g. u2204 for lxc
+: NEW_CONTAINER_NAME e.g. u2204 for lxc
 :
 	ALL_STAGES=bBdDTW
 	DEFAULT_STAGES=bBdDT
 :
-:	REQ_STAGES must be one or more letters as follows -
+: REQ_STAGES must be one or more letters as follows -
 :
-:		A = All "'$DEFAULT_STAGES'" except W
+:	A = All "'$DEFAULT_STAGES'" except W
 :
-:		b = Get dependencies for build
-:		B = Build
+:	b = Get dependencies for build
+:	B = Build
 :
-:		i = Get dependencies for install
-:		I = Install
+:	i = Get dependencies for install
+:	I = Install
 :
-:		T = Test
+:	T = Test
 :
-:		W = Install www service
+:	W = Install www service
 :
-:	PG_VER e.g. 14 or blank for the the default which depends on the Ubuntu version and apt.
+: COMPILER
+:
+:	e.g. g++, g++-14, g++-latest, clang, clang-18, clang latest etc.
+:
+:	More info in install.sh
+:
+: PG_VER e.g. 14 or blank for the the default which depends on the Ubuntu version and apt.
 :
 :	Container names may be prefixed by lxc host. Recommended both the same to avoid copying across network.
 :
@@ -71,8 +77,8 @@ set -euxo pipefail
 	fi
 :
 	# duplicate code in install.sh and install_lxc.sh
-	if [[ ! $COMPILER =~ ^((g\+\+)|(clang))(-(([0-9]+)|min|max))?$ ]]; then
-		echo COMPILER must be g++ or clang. Optionally followed by a version e.g. g++-12, clang-12, g++-max, clang-max, g++-min, clang-min
+	if [[ ! $COMPILER =~ ^((g\+\+)|(clang))(-(([0-9]+)|min|latest))?$ ]]; then
+		echo COMPILER must be g++ or clang. Optionally followed by a version e.g. g++-12, clang-12, g++-latest, clang-latest, g++-min, clang-min
 		exit 1
 	fi
 :
@@ -281,12 +287,12 @@ function do_one_stage {
 : ====
 :
 	FIRST_STAGE_UPDATE_EXODUS=YES
-	[[ $REQ_STAGES =~ b ]] && do_one_stage 1 || true # 'Get dependencies for build'
-	[[ $REQ_STAGES =~ B ]] && do_one_stage 2 || true # 'Build'
-	[[ $REQ_STAGES =~ d ]] && do_one_stage 3 || true # 'Get dependencies for install'
-	[[ $REQ_STAGES =~ D ]] && do_one_stage 4 || true # 'Install'
-	[[ $REQ_STAGES =~ T ]] && do_one_stage 5 || true # 'Test'
-	[[ $REQ_STAGES =~ W ]] && do_one_stage 6 || true # 'Install www service'
+	if [[ $REQ_STAGES =~ b ]]; then do_one_stage 1; fi # 'Get dependencies for build'
+	if [[ $REQ_STAGES =~ B ]]; then do_one_stage 2; fi # 'Build'
+	if [[ $REQ_STAGES =~ d ]]; then do_one_stage 3; fi # 'Get dependencies for install'
+	if [[ $REQ_STAGES =~ D ]]; then do_one_stage 4; fi # 'Install'
+	if [[ $REQ_STAGES =~ T ]]; then do_one_stage 5; fi # 'Test'
+	if [[ $REQ_STAGES =~ W ]]; then do_one_stage 6; fi # 'Install www service'
 :
 : ===============================================================
 : Finished $0 $* in $((SECONDS/60)) mins and $((SECONDS%60)) secs
