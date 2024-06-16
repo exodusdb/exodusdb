@@ -9,7 +9,7 @@ set -euxo pipefail
 : Syntax
 : ------
 :
-:	$0 " <SOURCE> <NEW_CONTAINER_NAME> <REQ_STAGES> [gcc|clang] [<PG_VER>]"
+:	$0 " <SOURCE> <NEW_CONTAINER_NAME> <REQ_STAGES> [g++|clang] [<PG_VER>]"
 :
 :	SOURCE e.g. an lxc image like ubuntu, ubuntu:22.04 etc. or an existing lxc container code
 :
@@ -36,14 +36,14 @@ set -euxo pipefail
 :
 :	Container names may be prefixed by lxc host. Recommended both the same to avoid copying across network.
 :
-:	e.g. ./install_lxc.sh nl22:u2204 nl22:u2204 A gcc
+:	e.g. ./install_lxc.sh nl22:u2204 nl22:u2204 A g++
 :	e.g. ./install_lxc.sh nl22:ubuntu:22.04 nl22:u2204 A
 :
 :	Each stage of build, install and test will create
-:	a new container with name ending "x-1", "x-2" etc. where x is g for gcc or c for clang
+:	a new container with name ending "x-1", "x-2" etc. where x is g for g++ or c for clang
 :
 :	Each compiler will be setup in a new container
-:	with name ending g or c for gcc and clang.
+:	with name ending g or c for g++ and clang.
 :
 :	Note: /etc/cloud/cloud.cfg will be run on first boot of a new container to configure it.
 :	e.g. Overwriting /etc/apt/sources.list. See that file for more info how to prevent that.
@@ -56,7 +56,7 @@ set -euxo pipefail
 	SOURCE=${1:?SOURCE is required. e.g. ubuntu, ubuntu:22.04 etc. or container code}
 	NEW_CONTAINER_NAME=${2:?NEW_CONTAINER_NAME is required. e.g. u2204 for lxc}
 	REQ_STAGES=${3:?Stages is required. A for '$DEFAULT_STAGES' - all except Web service}
-	COMPILER=${4:-gcc}
+	COMPILER=${4:-g++}
 	PG_VER=${5:-}
 :
 : Validate
