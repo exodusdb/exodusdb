@@ -44,25 +44,38 @@ set -euxo pipefail
 : Syntax
 : ------
 :
-: $0 ' [<STAGES>] [g++|clang] [<PG_VER>]'
+: $0 ' [<STAGES>] [<COMPILER>] [<PG_VER>]'
+:
+: STAGES
 :
 	ALL_STAGES=bBdDTW
 	DEFAULT_STAGES=bBdDT
 :
-: STAGES is one or more consecutive letters from $ALL_STAGES.
-: Default is "'$DEFAULT_STAGES'" all except W - Web service
+:	Must be one or more *consecutive* letters from $ALL_STAGES.
 :
-: b = Get dependencies for build and install
-: B = Build and install
+:	Default is "'$DEFAULT_STAGES'" i.e. all except W - Web service
 :
-: d = Get dependencies for database
-: D = Install database
+:	b = Get dependencies for build and install
+:	B = Build and install
 :
-: T = Test
+:	d = Get dependencies for database
+:	D = Install database
 :
-: W = Install web service
+:	T = Test
 :
-: PG_VER e.g. 14 or default depends on apt and the Ubuntu version
+:	W = Install web service
+:
+: COMPILER
+:
+:	e.g. g++, clang, g++-14, clang-18, g++-latest, clang-latest
+:
+:	If version no is omitted, the default for the OS will be used.
+:
+:	Choosing compiler/version only has effect on the initial b stage when installing build dependencies.
+:
+: PG_VER
+:
+:	e.g. 14 or default depends on apt and the Ubuntu version
 :
 : Parse command line
 : ------------------
