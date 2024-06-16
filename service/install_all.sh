@@ -190,7 +190,8 @@ set -euxo pipefail
 	cp exodusm.png www/exodus/images/theme2
 
 :
-: Finished install_all in $(($SECONDS/60)) minutes and $(($SECONDS%60)) seconds.
+: ==============================================================
+: Finished $0 $* in $(($SECONDS/60)) minutes and $(($SECONDS%60)) seconds.
 : ==============================================================
 :
 :	Apache is now listening on https://$IPNO

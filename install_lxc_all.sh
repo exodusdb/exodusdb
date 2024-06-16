@@ -7,13 +7,13 @@ set -euxo pipefail
 :
 : Syntax:
 :
-: "$0 <BASE_CONTAINERS,> <STAGES> [gcc|clang]"
+: "$0 <BASE_CONTAINERS,> <STAGES> [g++|clang,]"
 :
-: Just the build stage with gcc for two OSes
+: Just the build stage with g++ for two OSes
 :
-: $0 u2404,u2204 B gcc
+: $0 u2404,u2204 B g++
 :
-: All stages for both gcc and clang
+: All stages for both g++ and clang
 :
 : $0 u2404 A
 :
@@ -24,7 +24,7 @@ set -euxo pipefail
 :
 	BASE_CONTAINERS=${1:?BASE_CONTAINERS is required. e.g u2404 or using commas: u2404,u2202. Must exist and will be copied.}
 	STAGES=${2:?Stages is required e.g. A for all or any consecutive chars of 'bBiITW'}
-	COMPILERS=${3:-gcc clang}
+	COMPILERS=${3:-g++ clang}
 :
 : MAIN
 : ----

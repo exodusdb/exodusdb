@@ -10,9 +10,9 @@ set -euxo pipefail
 : '"c++ 21" indicates c++20 plus informal support for c++23'
 : '"c++ 24" indicates c++23 plus informal support for c++26'
 :
-: 'Build: Ubuntu 24.04 x64 gcc   13 c++ 21'
-: 'Build: Ubuntu 22.04 x64 gcc   11 c++ 21'
-: 'Build: Ubuntu 20.04 x64 gcc    9 c++ 17'
+: 'Build: Ubuntu 24.04 x64 g++   13 c++ 21'
+: 'Build: Ubuntu 22.04 x64 g++   11 c++ 21'
+: 'Build: Ubuntu 20.04 x64 g++    9 c++ 17'
 :
 : 'Build: Ubuntu 24.04 x64 clang 18 c++ 24'
 : 'Build: Ubuntu 22.04 x64 clang 14 c++ 21'
@@ -31,11 +31,20 @@ set -euxo pipefail
 : '------ -----------  ----- --------  ----  -----   -----'
 : 'Exodus now requires c++20 so will no longer build on 18.04'
 :
+: Min/Default/Max compiler version
+: --------------------------------
+:
+: OS      g++           clang
+:         min def max   min def max
+: 24.04     9  13  14    14  18  18
+: 22.04     9  11  12    11  14  15
+: 20.04     7  9   10     7  10  12
+
 : ------
 : Syntax
 : ------
 :
-: $0 ' [<STAGES>] [gcc|clang] [<PG_VER>]'
+: $0 ' [<STAGES>] [g++|clang] [<PG_VER>]'
 :
 	ALL_STAGES=bBdDTW
 	DEFAULT_STAGES=bBdDT
@@ -59,9 +68,8 @@ set -euxo pipefail
 : ------------------
 :
 	REQ_STAGES=${1:-$DEFAULT_STAGES}
-	COMPILER=${2:-gcc}
+	COMPILER=${2:-g++}
 	PG_VER=${3:-}
-
 :
 : Validate
 : --------
@@ -71,10 +79,12 @@ set -euxo pipefail
 		exit 1
 	fi
 
-	if [[ ! $COMPILER =~ gcc|clang ]]; then
-		echo COMPILER must be gcc or clang
+	# duplicate code in install.sh and install_lxc.sh
+	if [[ ! $COMPILER =~ ^((g\+\+)|(clang))(-(([0-9]+)|min|max))?$ ]]; then
+		echo COMPILER must be g++ or clang. Optionally followed by a version e.g. g++-12, clang-12, g++-max, clang-max, g++-min, clang-min
 		exit 1
 	fi
+
 :
 : ------
 : CONFIG
@@ -305,7 +315,7 @@ function get_dependencies_for_build_and_install {
 : ------------------------------------------------------
 :
 	readlink `which c++` -e
-	dpkg -l | egrep "gcc|clang|libstd|libc\+\+" | awk '{print $2}'
+	dpkg -l | egrep "g++|clang|libstd|libc\+\+" | awk '{print $2}'
 
 } # end of stage b - Install dependencies
 
@@ -608,6 +618,6 @@ function install_www_service {
 
 	[[ $REQ_STAGES =~ W ]] && install_www_service
 :
-: ----------------------------------------------------------------
+: ================================================================
 : Finished $0 $* in $((SECONDS/60)) mins and $((SECONDS%60)) secs.
-: ----------------------------------------------------------------
+: ================================================================
