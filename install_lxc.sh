@@ -66,12 +66,13 @@ set -euxo pipefail
 		REQ_STAGES=$DEFAULT_STAGES
 	fi
 	if [[ ! $ALL_STAGES =~ $REQ_STAGES ]]; then
-		echo STAGES "'$REQ_STAGES'" must be one or more consecutive letters from $ALL_STAGES
+		echo INVALID STAGES "'$REQ_STAGES'" must be one or more consecutive letters from $ALL_STAGES
 		exit 1
 	fi
 :
-	if [[ ! $COMPILER =~ gcc|clang ]]; then
-		echo COMPILER must be gcc or clang
+	# duplicate code in install.sh and install_lxc.sh
+	if [[ ! $COMPILER =~ ^((g\+\+)|(clang))(-(([0-9]+)|min|max))?$ ]]; then
+		echo COMPILER must be g++ or clang. Optionally followed by a version e.g. g++-12, clang-12, g++-max, clang-max, g++-min, clang-min
 		exit 1
 	fi
 :
