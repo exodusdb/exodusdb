@@ -129,22 +129,22 @@ function do_one_stage {
 	fi
 	if [[ $STAGE_NO == 1 ]]; then
 		if lxc info $SOURCE &> /dev/null; then
-			lxc snapshot $SOURCE install_lxc_sh --reuse || exit 1
+			lxc snapshot $SOURCE install_lxc_sh --reuse
 :
 : Copy container using a snapshot
 : Note. See note in heading about cloud.cfg which runs on first boot of new container
 :
-			lxc copy $SOURCE/install_lxc_sh $NEW_C || exit 1
-			lxc rm $SOURCE/install_lxc_sh || exit 1
-			lxc start $NEW_C || exit 1
+			lxc copy $SOURCE/install_lxc_sh $NEW_C
+			lxc rm $SOURCE/install_lxc_sh
+			lxc start $NEW_C
 		else
 			# Assume $SOURCE is an image
-			lxc launch $SOURCE $NEW_C || exit 1
+			lxc launch $SOURCE $NEW_C
 		fi
 	else
 		lxc stop $OLD_C --force |& grep -v "already stopped"|| true
-		lxc cp $OLD_C $NEW_C || exit 1
-		lxc start $NEW_C || exit 1
+		lxc cp $OLD_C $NEW_C
+		lxc start $NEW_C
 	fi
 :
 : On the first stage copy local exodus to the target container - $NEW_C
@@ -190,9 +190,9 @@ function do_one_stage {
 #: Enable ssh login
 #: ----------------
 #:
-#			lxc exec $NEW_C -- bash -c "ssh-keygen -t rsa -N '' -f ~/.ssh/id_rsa <<< y" || exit 1
+#			lxc exec $NEW_C -- bash -c "ssh-keygen -t rsa -N '' -f ~/.ssh/id_rsa <<< y"
 #
-#			lxc exec $NEW_C -- bash -c "echo '`cat ~/.ssh/*.pub`' >> /root/.ssh/authorized_keys" || exit 1
+#			lxc exec $NEW_C -- bash -c "echo '`cat ~/.ssh/*.pub`' >> /root/.ssh/authorized_keys"
 #:
 #: Check we can now ssh into the container
 #:
@@ -231,11 +231,11 @@ function do_one_stage {
 			#lxc file push * $NEW_C/root/exodus --recursive --create-dirs --quiet
 			#lxc file push . $NEW_C/root --recursive --create-dirs --quiet
 			#lxc file push ~/exodus $NEW_C/root --recursive --create-dirs --quiet --gid 0 --uid 0
-			#lxc file push ~/exodus $NEW_C/root --recursive --create-dirs --quiet || exit 1
-	#		lxc file push ~/exodus ${NEW_C}${TARGET_HOME} --recursive --create-dirs --quiet || exit 1
+			#lxc file push ~/exodus $NEW_C/root --recursive --create-dirs --quiet
+	#		lxc file push ~/exodus ${NEW_C}${TARGET_HOME} --recursive --create-dirs --quiet
 
 	#		Avoid push unless it is a local container since pushing thousands of files isnt efficient
-	#		lxc file push ~/exodus ${NEW_C}${TARGET_HOME} --recursive --create-dirs || exit 1
+	#		lxc file push ~/exodus ${NEW_C}${TARGET_HOME} --recursive --create-dirs
 :
 :	tar local exodus dir
 :
@@ -246,12 +246,12 @@ function do_one_stage {
 :
 :	Push the tar file $TAR_SIZE to $NEW_C
 :
-			lxc file push ../$TAR_FILENAME ${NEW_C}${TARGET_HOME}/$TAR_FILENAME || exit 1
+			lxc file push ../$TAR_FILENAME ${NEW_C}${TARGET_HOME}/$TAR_FILENAME
 			rm ../$TAR_FILENAME
 :
 :	Untar exodus on the target - $NEW_C
 :
-			lxc exec $NEW_C -- bash -c "tar xfz $TAR_FILENAME" || exit 1
+			lxc exec $NEW_C -- bash -c "tar xfz $TAR_FILENAME"
 :
 
 #		fi #not USE_SSH
@@ -260,7 +260,7 @@ function do_one_stage {
 : Avoid git error: "fatal: detected dubious ownership in repository at '.../exodus'"
 : ----------------------------------------------------------------------------------
 :
-		lxc exec $NEW_C -- bash -c "chown -R $TARGET_UID:$TARGET_GID ${TARGET_HOME}/exodus" || exit 1
+		lxc exec $NEW_C -- bash -c "chown -R $TARGET_UID:$TARGET_GID ${TARGET_HOME}/exodus"
 
 :
 : End of updating exodus on first stage - $STAGE_NO $STAGE_LETTER
@@ -272,7 +272,7 @@ function do_one_stage {
 : Run the exodus/install.sh script on the target - $NEW_C
 : ----------------------------------------------
 :
-	lxc exec $NEW_C  --user $TARGET_UID --group $TARGET_GID -- bash -c "cd $TARGET_HOME/exodus && HOME=${TARGET_HOME} ./install.sh \"$STAGE_LETTER\" \"$COMPILER\" ${PG_VER:-''}" || exit 1
+	lxc exec $NEW_C  --user $TARGET_UID --group $TARGET_GID -- bash -c "cd $TARGET_HOME/exodus && HOME=${TARGET_HOME} ./install.sh \"$STAGE_LETTER\" \"$COMPILER\" ${PG_VER:-''}"
 }
 :
 : ====
