@@ -42,12 +42,12 @@ libraryinit()
 #define emailnewusers_ RECORD.f(26)
 
 //#define tstore_             req.registerx(3) not used this program
-#define updatelowergroups_  req.registerx(4)
-#define updatehighergroups_ req.registerx(5)
-#define curruser_           req.registerx(6)
-#define origfullrec_        req.registerx(7)
-#define startn_             req.registerx(8)
-#define endn_               req.registerx(9)
+#define updatelowergroups_  req.registerx[4]
+#define updatehighergroups_ req.registerx[5]
+#define curruser_           req.registerx[6]
+#define origfullrec_        req.registerx[7]
+#define startn_             req.registerx[8]
+#define endn_               req.registerx[9]
 
 // clang-format on
 
@@ -389,7 +389,7 @@ function main(in mode) {
 		gosub cleartemp();
 
 		// if locked then skip out
-		if (interactive and req.ww(2).f(18).count("P")) {
+		if (interactive and req.ww[2].f(18).count("P")) {
 			return 0;
 		}
 

@@ -338,7 +338,7 @@ function getrec() {
 		if (ln > nlines)
 			return false;
 
-		RECORD = sql_text_in(ln);
+		RECORD = sql_text_in[ln];
 
 		// If we dont have a filename then find a line starting COPY and extract filename from it
 		if (not targetfilename) {

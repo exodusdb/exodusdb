@@ -436,7 +436,7 @@ programinit()
 		//try {dim x(0)             ;uncaught="DimDimensionedZero";} catch (DimDimensionedZero& e){};
 		try {
 			dim x(10);
-			printl(x(11));
+			printl(x[11]);
 			uncaught = "DimIndexOutofBounds";
 		} catch (DimIndexOutOfBounds& e) {
 			printl(e.description);
@@ -450,7 +450,7 @@ programinit()
 		}
 		try {
 			const dim x(10);
-			printl(x(11));
+			printl(x[11]);
 			uncaught = "DimIndexOutofBounds";
 		} catch (DimIndexOutOfBounds& e) {
 			printl(e.description);

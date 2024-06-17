@@ -14,8 +14,8 @@ function main(in multipliers, in multiplicand, in sep) {
 	for (int ii = 1; ii <= nn; ++ii) {
 		// return null if null
 		// return zero if multiplicand is zero
-		if (output(ii)) {
-			output(ii) = output(ii) * multiplicand;
+		if (output[ii]) {
+			output[ii] = output[ii] * multiplicand;
 		}
 	}
 	return output.join(sep);
