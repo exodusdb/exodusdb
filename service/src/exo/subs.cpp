@@ -26,23 +26,23 @@ function main(in args1, in args2, in sep) {
 	// deal with the common elements first for speed
 	for (int ii = 1; ii <= min_nn; ++ii) {
 		// subtract arg2, if not null, from arg1
-		if (array2(ii).len())
-			output(ii) = array1(ii) - array2(ii);
+		if (array2[ii].len())
+			output[ii] = array1[ii] - array2[ii];
 		else
-			output(ii) = array1(ii);
+			output[ii] = array1[ii];
 	}
 
 	// deal with the remaining elements which must all be null or zero
 	for (int ii = min_nn + 1; ii <= max_nn; ++ii) {
 		if (ii > nn1) {
 			// array2 is longer than array1
-			if (array2(ii).len())
-				output(ii) = -array2(ii);
+			if (array2[ii].len())
+				output[ii] = -array2[ii];
 			else
-				output(ii) = "";
+				output[ii] = "";
 		} else {
 			// array1 is longer than array2
-			output(ii) = array1(ii);
+			output[ii] = array1[ii];
 		}
 	}
 	return output.join(sep);

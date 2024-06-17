@@ -231,14 +231,14 @@ nextstatistic:
 
 			// count the "user"
 			netid.redim(3);
-			netid(1) = ID.field("*", 2);
-			netid(2) = ID.field("*", 3);
-			netid(3) = ID.field("*", 4);
+			netid[1] = ID.field("*", 2);
+			netid[2] = ID.field("*", 3);
+			netid[3] = ID.field("*", 4);
 			hourn	 = ((currenttime - RECORD.f(1)) * 24).floor() + 1;
 			hourn	 = (hourn - 1).mod(24) + 1;
 			for (const int ii : range(1, 3)) {
-				if (not usertab(hourn, ii).locate(netid(ii))) {
-					usertab(hourn, ii)(1, -1) = netid(ii);
+				if (not usertab(hourn, ii).locate(netid[ii])) {
+					usertab(hourn, ii)(1, -1) = netid[ii];
 				}
 			}  // ii;
 

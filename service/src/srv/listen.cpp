@@ -1296,21 +1296,21 @@ function request_init() {
 			inptr = 0;
 			for (let blockn : range(1, nblocks)) {
 
-				// osbread datx(blockn) from linkfilename2 at ((blockn-1)*inblocksize) length inblocksize
+				// osbread datx[blockn] from linkfilename2 at ((blockn-1)*inblocksize) length inblocksize
 				// tt=(blockn-1)*inblocksize
-				//call osbread(datx(blockn), linkfile2, inptr, inblocksize);
-				if (not osbread(datx(blockn), linkfile2, inptr, inblocksize))
+				//call osbread(datx[blockn], linkfile2, inptr, inblocksize);
+				if (not osbread(datx[blockn], linkfile2, inptr, inblocksize))
 					abort(lasterror());
 
-				if (not datx(blockn).len())
+				if (not datx[blockn].len())
 					break;
 
 				// avoid hexcode spanning block end by moving one or two bytes backwards
 				if (blockn > 1) {
-					tt = ((datx(blockn - 1)).last(2)).index("%");
+					tt = ((datx[blockn - 1]).last(2)).index("%");
 					if (tt) {
-						datx(blockn - 1) ^= datx(blockn).first(tt);
-						datx(blockn).cutter(tt);
+						datx[blockn - 1] ^= datx[blockn].first(tt);
+						datx[blockn].cutter(tt);
 					}
 				}
 
@@ -1320,7 +1320,7 @@ function request_init() {
 			lendata = 0;
 			for (let blockn : range(1, nblocks)) {
 
-				if (datx(blockn).len()) {
+				if (datx[blockn].len()) {
 
 					// output to log before unescaping since log is xml
 					if (logfilename) {
@@ -1333,11 +1333,11 @@ function request_init() {
 							logx ^= _EOL "<DataIn>";
 						}
 
-						logx ^= datx(blockn);
+						logx ^= datx[blockn];
 						gosub writelogx();
 					}
 
-					lendata += datx(blockn).len();
+					lendata += datx[blockn].len();
 				}
 
 			}  // blockn;
@@ -1353,8 +1353,8 @@ function request_init() {
 			} else {
 				data_ = "";
 				for (let blockn : range(1, nblocks)) {
-					data_ ^= datx(blockn);
-					datx(blockn) = "";
+					data_ ^= datx[blockn];
+					datx[blockn] = "";
 				}  // blockn;
 			}
 

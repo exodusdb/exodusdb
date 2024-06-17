@@ -171,7 +171,7 @@ bool ExodusProgramBase::select(CVR sortselectclause_or_filehandle) {
 		var dictrec;
 		if (not dictrec.readc(DICT,dictid))
 			dictrec="";
-		ioconvs(fieldn) = dictrec.f(7);
+		ioconvs[fieldn] = dictrec.f(7);
 
 		//add colons to the end of every calculated field in the sselect clause
 		//so that 2nd stage select knows that these fields are available in the
@@ -179,7 +179,7 @@ bool ExodusProgramBase::select(CVR sortselectclause_or_filehandle) {
 		sortselectclause.regex_replacer("\\b" ^ dictid ^ "\\b", dictid ^ ":");
 
 		dictid.converter(".", "_");
-		dictids(fieldn) = dictid;
+		dictids[fieldn] = dictid;
 		var sqlcolid = dictid ^ "_calc";
 
 		//ops
@@ -203,7 +203,7 @@ bool ExodusProgramBase::select(CVR sortselectclause_or_filehandle) {
 		else if (not var("= <> > < >= <= ~ ~* !~ !~* >< >!< in not_in !! ! ] [ []").locateusing(" ", op.convert(" ", "_"), opno))
 			[[unlikely]]
 			throw VarError(op.quote() ^ " unknown op in sql select");
-		opnos(fieldn) = opno;
+		opnos[fieldn] = opno;
 
 		//reqivalues
 		if (op == "in" and ovalue.starts("(") and ovalue.ends(")")) {
@@ -218,7 +218,7 @@ bool ExodusProgramBase::select(CVR sortselectclause_or_filehandle) {
 		//iconv
 		var ivalue;
 		var ivalue2;
-		var ioconv = ioconvs(fieldn);
+		var ioconv = ioconvs[fieldn];
 		if (ioconv) {
 			ivalue = iconv(ovalue, ioconv);
 			ivalue2 = iconv(ovalue2, ioconv);
@@ -229,8 +229,8 @@ bool ExodusProgramBase::select(CVR sortselectclause_or_filehandle) {
 		}
 
 		//save reqivalues
-		reqivalues(fieldn) = ivalue;
-		reqivalues2(fieldn) = ivalue2;
+		reqivalues[fieldn] = ivalue;
+		reqivalues2[fieldn] = ivalue2;
 
 		//sqltype
 		var sqltype;
@@ -239,7 +239,7 @@ bool ExodusProgramBase::select(CVR sortselectclause_or_filehandle) {
 		//}
 		if (ioconv.starts("[DATE")) {
 			sqltype = "DATE";
-            ioconvs(fieldn) = "D";
+            ioconvs[fieldn] = "D";
 		}
 		else if (ioconv.starts("[TIME")) {
 			sqltype = "TIME";//TODO check if works
@@ -251,7 +251,7 @@ bool ExodusProgramBase::select(CVR sortselectclause_or_filehandle) {
 		else {
 			sqltype = "TEXT";
 		}
-		sqltypes(fieldn) = sqltype;
+		sqltypes[fieldn] = sqltype;
 		//TRACE(dictid^" "^ioconv^" "^sqltype)
 
 		//sql temp table column
@@ -309,14 +309,14 @@ bool ExodusProgramBase::select(CVR sortselectclause_or_filehandle) {
 		//some or all fields may not have filters, if 'order by' calculated fields
 		for (int fieldn = 1; fieldn <= nfields; ++fieldn) {
 
-			var ivalues = calculate(dictids(fieldn));
+			var ivalues = calculate(dictids[fieldn]);
 //			TRACE(ivalues)
 //			TRACE(opnos.join())
 //			TRACE(fieldn)
-//			TRACE(opnos(fieldn))
-			if (opnos(fieldn)) {
+//			TRACE(opnos[fieldn])
+			if (opnos[fieldn]) {
 				//debug
-				//ivalues.logputl(dictids(fieldn) ^ " ivalues=");
+				//ivalues.logputl(dictids[fieldn] ^ " ivalues=");
 
 				var nextsep;
 				var pos = 1;
@@ -327,58 +327,58 @@ bool ExodusProgramBase::select(CVR sortselectclause_or_filehandle) {
 					var ivalue = ivalues.substr2(pos,nextsep);
 //					TRACE(ivalue)
 
-					switch (int(opnos(fieldn))) {
+					switch (int(opnos[fieldn])) {
 						case 0://cannot occur - due to if statement above
 							break;
 						case 1:	 // =
-							ok = ivalue == reqivalues(fieldn);
-							//ok = ivalue.locate(reqivalues(fieldn));
+							ok = ivalue == reqivalues[fieldn];
+							//ok = ivalue.locate(reqivalues[fieldn]);
 							//if (ok) {
 							//	TRACE(ivalue)
-							//	TRACE(reqivalues(fieldn))
+							//	TRACE(reqivalues[fieldn])
 							//	TRACE(calculate("COMPANY_CODE"))
 							//}
 							break;
 						case 2:	 // <>
-							ok = ivalue != reqivalues(fieldn);
-							//ok = !ivalue.locate(reqivalues(fieldn));
+							ok = ivalue != reqivalues[fieldn];
+							//ok = !ivalue.locate(reqivalues[fieldn]);
 							break;
 						case 3:	 // >
-							ok = ivalue > reqivalues(fieldn);
+							ok = ivalue > reqivalues[fieldn];
 							break;
 						case 4:	 // <
-							ok = ivalue < reqivalues(fieldn);
+							ok = ivalue < reqivalues[fieldn];
 							break;
 						case 5:	 // >=
-							ok = ivalue >= reqivalues(fieldn);
-							//TRACE(ivalue ^ " " ^ reqivalues(fieldn) ^ " " ^ ok)
+							ok = ivalue >= reqivalues[fieldn];
+							//TRACE(ivalue ^ " " ^ reqivalues[fieldn] ^ " " ^ ok)
 							break;
 						case 6:	 // <=
-							ok = ivalue <= reqivalues(fieldn);
+							ok = ivalue <= reqivalues[fieldn];
 							break;
 						case 7:	 // ~ regex
-							ok = ivalue.match(reqivalues(fieldn));
+							ok = ivalue.match(reqivalues[fieldn]);
 							break;
 						case 8:	 // ~* regex case insensitive
-							ok = ivalue.match(reqivalues(fieldn), "i");
+							ok = ivalue.match(reqivalues[fieldn], "i");
 							break;
 						case 9:	 // !~ not regex
-							ok = !(ivalue.match(reqivalues(fieldn)));
+							ok = !(ivalue.match(reqivalues[fieldn]));
 							break;
 						case 10:  // !~* not regex case insensitive
-							ok = !(ivalue.match(reqivalues(fieldn), "i"));
+							ok = !(ivalue.match(reqivalues[fieldn], "i"));
 							break;
 						case 11:  // between x and y, from x to
-							ok = (ivalue >= reqivalues(fieldn) && ivalue <= reqivalues2(fieldn));
+							ok = (ivalue >= reqivalues[fieldn] && ivalue <= reqivalues2[fieldn]);
 							break;
 						case 12:  // not between x and y, not from x to y
-							ok = (ivalue < reqivalues(fieldn) || ivalue > reqivalues2(fieldn));
+							ok = (ivalue < reqivalues[fieldn] || ivalue > reqivalues2[fieldn]);
 							break;
 						case 13:  // in list
-							ok = reqivalues(fieldn).locate(ivalue);
+							ok = reqivalues[fieldn].locate(ivalue);
 							break;
 						case 14:  // not in list
-							ok = !reqivalues(fieldn).locate(ivalue);
+							ok = !reqivalues[fieldn].locate(ivalue);
 							break;
 						case 15:  // is true (not "" 0 "0" "00" "0.0" etc).
 							ok = ivalue;
@@ -389,18 +389,18 @@ bool ExodusProgramBase::select(CVR sortselectclause_or_filehandle) {
 							ok = !ivalue;
 							break;
 						case 17:  // STARTING ]
-							ok = reqivalues(fieldn).starts(ivalue);
+							ok = reqivalues[fieldn].starts(ivalue);
 							break;
 						case 18:  // ENDING [
-							ok = reqivalues(fieldn).ends(ivalue);
+							ok = reqivalues[fieldn].ends(ivalue);
 							ok = !ivalue;
 							break;
 						case 19:  //  CONTAINING []
-							ok = reqivalues(fieldn).contains(ivalue);
+							ok = reqivalues[fieldn].contains(ivalue);
 							break;
 						default:
 						    // TODO should this be a special system error since it cannot be caused by application programmer?
-						    throw VarError("EXODUS: Error in " ^ var(__PRETTY_FUNCTION__) ^ " Invalid opmo " ^ opnos(fieldn));
+						    throw VarError("EXODUS: Error in " ^ var(__PRETTY_FUNCTION__) ^ " Invalid opmo " ^ opnos[fieldn]);
 					}//switch
 
 					//quit searching data values if found or no more
@@ -420,11 +420,11 @@ bool ExodusProgramBase::select(CVR sortselectclause_or_filehandle) {
 
 			}//if opno
 
-			var sqltype = sqltypes(fieldn);
+			var sqltype = sqltypes[fieldn];
 			var ovalues;
 			if (sqltype == "DATE" || sqltype == "TIME" || sqltype == "TIMESTAMP") {
 				if (ivalues) {
-					ovalues = oconv(ivalues,ioconvs(fieldn)).squoter();
+					ovalues = oconv(ivalues,ioconvs[fieldn]).squoter();
 				}
 				else
 					//ovalues = "nullptr";

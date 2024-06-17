@@ -921,11 +921,11 @@ phraseinit:
 			abort();
 		}
 		// Skip if detsupp2 and column is being skipped
-		if (not(coldict(coln).unassigned())) {
+		if (not(coldict[coln].unassigned())) {
 			gosub getquotedword();
-			coldict(coln)(9) = word[1];
-			coldict(coln)(10) = word.cut(2);
-			coldict(coln)(11) = word;
+			coldict[coln](9) = word[1];
+			coldict[coln](10) = word.cut(2);
+			coldict[coln](11) = word;
 		}
 
 	//colhead
@@ -936,9 +936,9 @@ phraseinit:
 		}
 		gosub getquotedword();
 		// Skip if detsupp2 and column is being skipped
-		if (not(coldict(coln).unassigned())) {
+		if (not(coldict[coln].unassigned())) {
 			word.converter("|", _VM);
-			coldict(coln)(3) = word;
+			coldict[coln](3) = word;
 		}
 
 	} else if (word == "OC" or word == "OCONV") {
@@ -948,11 +948,11 @@ phraseinit:
 		}
 		gosub getquotedword();
 		// Skip if detsupp2 and column is being skipped
-		if (not(coldict(coln).unassigned())) {
+		if (not(coldict[coln].unassigned())) {
 			if (html) {
 				word.replacer("[DATE]", "[DATE,*]");
 			}
-			coldict(coln)(7) = word;
+			coldict[coln](7) = word;
 		}
 
 	} else if (word == "ID-SUPP" or word == "IS") {
@@ -1003,7 +1003,7 @@ phraseinit:
 			}
 
 			coln += 1;
-			colname(coln) = word;
+			colname[coln] = word;
 
 			// Increase column width if column title needs it
 			{
@@ -1051,18 +1051,18 @@ phraseinit:
 					dictrec(9) = "R";
 				}
 			}
-			coldict(coln) = dictrec;
+			coldict[coln] = dictrec;
 
 			// Store the format in a convenient place
 			tt = "";
 			if (not html) {
-				tt = coldict(coln).f(9) ^ "#" ^ coldict(coln).f(10);
+				tt = coldict[coln].f(9) ^ "#" ^ coldict[coln].f(10);
 			}
-			coldict(coln)(11) = tt;
+			coldict[coln](11) = tt;
 
 			// This could be a break-on column and have break-on options
 			if (breakonflag) {
-				coldict(coln)(13) = 1;
+				coldict[coln](13) = 1;
 				breakonflag = 0;
 
 				if (nextword.starts(DQ)) {
@@ -1073,7 +1073,7 @@ phraseinit:
 					if (tt) {
 
 						// Suppress columns that appear in the heading
-						coldict(coln)(10) = 0;
+						coldict[coln](10) = 0;
 
 						// Determine B99.99 format for row and col
 						tt2 = "";
@@ -1101,7 +1101,7 @@ phraseinit:
 								hcoln = 1;
 							}
 							tcoln = (hcoln - 1) * 2 + 1;
-							headtab(hrown, tcoln) = coldict(coln).f(3).convert(_VM, " ") ^ nbsp ^ ":";
+							headtab(hrown, tcoln) = coldict[coln].f(3).convert(_VM, " ") ^ nbsp ^ ":";
 							headtab(hrown, tcoln + 1) = "'B" ^ tt2 ^ "'";
 							hrown += 1;
 						}
@@ -1172,23 +1172,23 @@ x1exit:
 
 		// Move the columns up by one to make space for a new column 1
 		for (coln = ncols; coln >= 2; --coln) {
-			coldict(coln) = coldict(coln - 1);
-			colname(coln) = colname(coln - 1);
+			coldict[coln] = coldict[coln - 1];
+			colname[coln] = colname[coln - 1];
 		}
 
 		// Set column 1
-		colname(1) = "@ID";
-		if (not(coldict(1).readc(DICT, "@ID"))) {
-			if (not(coldict(1).readc(dictvoc, "@ID"))) {
-				coldict(1) = "F^^Ref^^^^^^L^15"_var;
+		colname[1] = "@ID";
+		if (not(coldict[1].readc(DICT, "@ID"))) {
+			if (not(coldict[1].readc(dictvoc, "@ID"))) {
+				coldict[1] = "F^^Ref^^^^^^L^15"_var;
 			}
 		}
 		if (html) {
 			tt = "";
 		} else {
-			tt = coldict(1).f(9) ^ "#" ^ coldict(1).f(10);
+			tt = coldict[1].f(9) ^ "#" ^ coldict[1].f(10);
 		}
-		coldict(1)(11) = tt;
+		coldict[1](11) = tt;
 
 		// Increment the list of breaking columns by one as well
 		for (int breakn : range(1, nbreaks)) {
@@ -1209,7 +1209,7 @@ x1exit:
 	const int maxdictfn = 20;
 	coldict2.redim(ncols, maxdictfn);
 	for (auto coln : range(1, ncols)) {
-		var& dictrec = coldict(coln);
+		var& dictrec = coldict[coln];
 		for (auto fn : range(1, maxdictfn)) {
 			coldict2(coln, fn) = dictrec.f(fn);
 		}
@@ -1645,20 +1645,20 @@ nextrec:
 		if (coldict2(coln, 9) == "T" and not(html)) {
 
 			// T#
-			mcol(coln) = oconv(calculate(colname(coln)), coldict2(coln, 11));
+			mcol[coln] = oconv(calculate(colname[coln]), coldict2(coln, 11));
 
 		} else {
 
-			mcol(coln) = calculate(colname(coln));
+			mcol[coln] = calculate(colname[coln]);
 
 			if (html) {
-				mcol(coln).replacer(TM, "<br />");
+				mcol[coln].replacer(TM, "<br />");
 			}
 		}
 
-		pcol(coln) = 1;
-		ccol(coln) = 7;
-		scol(coln) = mcol(coln);
+		pcol[coln] = 1;
+		ccol[coln] = 7;
+		scol[coln] = mcol[coln];
 	} //coln;
 
 	// Break subtotals
@@ -1671,7 +1671,7 @@ nextrec:
 		for (leveln = nbreaks; leveln >= 1; --leveln) {
 			coln = breakcolns.f(leveln);
 
-			if (scol(coln) != breakvalue(coln))
+			if (scol[coln] != breakvalue[coln])
 				break;
 
 		} //leveln;
@@ -1691,12 +1691,12 @@ recexit:
 	// Remove appropriate value from multi-valued column(s)
 	newmarklevel = 0;
 	for (int coln : range(1, ncols)) {
-		if (ccol(coln) >= previousmarklevel) {
-			icol(coln) = mcol(coln).substr2(pcol(coln), ccol(coln));
-			scol(coln) = icol(coln);
+		if (ccol[coln] >= previousmarklevel) {
+			icol[coln] = mcol[coln].substr2(pcol[coln], ccol[coln]);
+			scol[coln] = icol[coln];
 		}
-		if (ccol(coln) > newmarklevel) {
-			newmarklevel = ccol(coln);
+		if (ccol[coln] > newmarklevel) {
+			newmarklevel = ccol[coln];
 		}
 	} //coln;
 
@@ -1704,18 +1704,18 @@ recexit:
 	for (int coln : range(1, ncols)) {
 		// Only totalled columns
 		if (coldict2(coln, 12)) {
-			if (icol(coln)) {
+			if (icol[coln]) {
 				if (html) {
 					//breaktotal(coln,1)+=i.col(coln)
-					//call addunits(icol(coln), breaktotal(coln, 1), VM);
+					//call addunits(icol[coln], breaktotal(coln, 1), VM);
 					// breaktotal <- icol
-					call htmllib2("ADDUNITS", breaktotal(coln, 1), icol(coln), _VM);
+					call htmllib2("ADDUNITS", breaktotal(coln, 1), icol[coln], _VM);
 				} else {
-					if (breaktotal(coln, 1).isnum() and icol(coln).isnum()) {
-						breaktotal(coln, 1) += icol(coln);
+					if (breaktotal(coln, 1).isnum() and icol[coln].isnum()) {
+						breaktotal(coln, 1) += icol[coln];
 					} else {
-						if (colname(coln) == "DATEGRID") {
-							str1 = icol(coln);
+						if (colname[coln] == "DATEGRID") {
+							str1 = icol[coln];
 							str2 = breaktotal(coln, 1);
 							gosub addstr();
 							breaktotal(coln, 1) = str3;
@@ -1723,8 +1723,8 @@ recexit:
 					}
 				}
 			}
-			breakcount(1) += 1;
-			icol(coln) = "";
+			breakcount[1] += 1;
+			icol[coln] = "";
 		}
 	} //coln;
 
@@ -1758,7 +1758,7 @@ recexit:
 			tx1 ^= ">";
 		}
 		for (int coln : range(1, ncols)) {
-			tt = scol(coln);
+			tt = scol[coln];
 			oconvx = coldict2(coln, 7);
 			if (oconvx) {
 				tt = oconv(tt, oconvx);
@@ -1823,7 +1823,7 @@ recexit:
 		// Folding text or multivalued lines
 		if (newmarklevel) {
 			for (int coln : range(1, ncols)) {
-				scol(coln) = "";
+				scol[coln] = "";
 			}
 			previousmarklevel = newmarklevel;
 			goto recexit;
@@ -2216,7 +2216,7 @@ subroutine printbreaks() {
 						}
 					}
 
-					breakcount(leveln + 1) += breakcount(leveln);
+					breakcount[leveln + 1] += breakcount[leveln];
 				}
 
 				// Format it
@@ -2236,14 +2236,14 @@ subroutine printbreaks() {
 			} else if (coln == breakcoln) {
 
 				// Print the old break value
-				cell = breakvalue(coln);
+				cell = breakvalue[coln];
 				oconvx = coldict2(coln, 7);
 				if (oconvx) {
 					cell = oconv(cell, oconvx);
 				}
 
 				// Store the new break value
-				breakvalue(coln) = scol(coln);
+				breakvalue[coln] = scol[coln];
 
 				if (pagebreaks.f(coln)) {
 
@@ -2254,7 +2254,7 @@ subroutine printbreaks() {
 					}
 
 					// Get the page break data
-					tt = scol(coln);
+					tt = scol[coln];
 
 					if (oconvx) {
 						tt = oconv(tt, oconvx);
@@ -2277,7 +2277,7 @@ subroutine printbreaks() {
 			} else {
 				cell = "";
 
-				cell = oconv(oldbreakvalue(coln), coldict2(coln, 7));
+				cell = oconv(oldbreakvalue[coln], coldict2(coln, 7));
 				if (var colbreakn; breakcolns.locateusing(_FM, coln, colbreakn)) {
 					if (colbreakn < leveln) {
 						cell = "Total";

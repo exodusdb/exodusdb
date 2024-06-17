@@ -31,25 +31,25 @@ programinit()
 				continue;
 			line.converter("\xFF\xFE\xFD\xFC\xFB\xFA", _RM _FM _VM _SM _TM _ST);
 			dim line2    = line.split("\t");
-			if (line2(2) == "EXTRACT") {
+			if (line2[2] == "EXTRACT") {
 
 				//var result = line2(3).f(line2(4), line2(5), line2(6));
-				std::string arg1 = line2(3).toString();
+				std::string arg1 = line2[3].toString();
 				int outstart;
 				int outlength;
 				//extract(arg1.data(), int(arg1.size()), int(line2(4)), int(line2(5)), int(line2(6)), &outstart, &outlength);
-				extract2(arg1.data(), int(arg1.size()), int(line2(4)), int(line2(5)), int(line2(6)), &outstart, &outlength);
+				extract2(arg1.data(), int(arg1.size()), int(line2[4]), int(line2[5]), int(line2[6]), &outstart, &outlength);
 				var result = arg1.substr(static_cast<size_t>(outstart), static_cast<size_t>(outlength));
 
 				linen++;
 
-				if (line2(1) != result) {
+				if (line2[1] != result) {
 					TRACE(line)
-					printl(linen, "Expected:", quote(line2(1)), "Actual:", result.quote());
+					printl(linen, "Expected:", quote(line2[1]), "Actual:", result.quote());
 					debug();
-					extract(arg1.data(), int(arg1.size()), int(line2(4)), int(line2(5)), int(line2(6)), &outstart, &outlength);
+					extract(arg1.data(), int(arg1.size()), int(line2[4]), int(line2[5]), int(line2[6]), &outstart, &outlength);
 				}
-				assert(line2(1) == result);
+				assert(line2[1] == result);
 			}
 		}
 		TRACE(linen)

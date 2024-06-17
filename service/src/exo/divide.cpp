@@ -13,8 +13,8 @@ function main(in numerators, in denominator, in sep) {
 	int nn	   = output.rows();
 	for (int ii = 1; ii <= nn; ++ii) {
 		// null or zero elements remain null or zero
-		if (output(ii)) {
-			output(ii) = output(ii) / denominator;
+		if (output[ii]) {
+			output[ii] = output[ii] / denominator;
 		}
 	}
 	return output.join(sep);

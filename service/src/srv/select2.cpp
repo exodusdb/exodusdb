@@ -89,7 +89,7 @@ function main(in filenamex, in linkfilename2, in sortselect0, in dictids0, in op
 		hexx.redim(8);
 		// changed to allow language characters to pass through x80-xF9
 		for (const var ii : range(249, 255)) {
-			hexx(ii - 249) = "%" ^ ii.oconv("MX").oconv("R(0)#2");
+			hexx[ii - 249] = "%" ^ ii.oconv("MX").oconv("R(0)#2");
 		}  // ii;
 	}
 
@@ -543,7 +543,7 @@ nextrec:
 			rowpart.replacer("%", "%25");
 			// changed to allow language characters to pass through x80-xF9
 			for (const var ii : range(249, 255)) {
-				rowpart.replacer(chr(ii), hexx(ii - 249));
+				rowpart.replacer(chr(ii), hexx[ii - 249]);
 			}  // ii;
 
 			// output converted row part

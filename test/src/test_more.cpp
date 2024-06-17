@@ -201,18 +201,18 @@ programinit()
 
 		//create fixed dim array using list of int
 		dim d = {1, 20, 30};
-		assert(d(1) eq 1);
-		assert(d(3) eq 30);
+		assert(d[1] eq 1);
+		assert(d[3] eq 30);
 
 		//create fixed dim array using list of double
 		dim d2 = {1.0, 20.0, 30.0};
-		assert(d2(1) eq 1.0);
-		assert(d2(3) eq 30.0);
+		assert(d2[1] eq 1.0);
+		assert(d2[3] eq 30.0);
 
 		//create fixed dim array using list of const char*
 		dim d3 = {"1x", "20x", "30x"};
-		assert(d3(1) eq "1x");
-		assert(d3(3) eq "30x");
+		assert(d3[1] eq "1x");
+		assert(d3[3] eq "30x");
 
 		//oswrite dim to file
 		var tfilename = "t_dimoswrite.txt";

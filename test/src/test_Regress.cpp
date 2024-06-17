@@ -101,16 +101,16 @@ Lines: 190125 differences: 2 Max differences: 2
 	return totndifferences;
 }
 
-#define TARGET line2(1)
-#define FUNC   line2(2)
-#define ARG0   line2(3)
-#define ARG1   line2(4)
-#define ARG2   line2(5)
-#define ARG3   line2(6)
-#define ARG4   line2(7)
-#define ARG5   line2(8)
-#define ARG6   line2(9)
-#define ARG7   line2(10)
+#define TARGET line2[1]
+#define FUNC   line2[2]
+#define ARG0   line2[3]
+#define ARG1   line2[4]
+#define ARG2   line2[5]
+#define ARG3   line2[6]
+#define ARG4   line2[7]
+#define ARG5   line2[8]
+#define ARG6   line2[9]
+#define ARG7   line2[10]
 
 #define LOCATE_WHAT	 ARG1  //col4
 #define LOCATE_BY	 ARG2  //col5
@@ -153,7 +153,7 @@ function onefile(in filename, in maxndifferences) {
 		converter(line, "\xFF\xFE\xFD\xFC\xFB\xFA", _RM _FM _VM _SM _TM _ST);
 
 		dim line2	 = line.split("\t");
-		var funcname = line2(2);
+		var funcname = line2[2];
 		if (not funcnames.locateusing(",", funcname, funcno)) {
 			ndifferences += 1;
 			printl(line, "Unknown function");

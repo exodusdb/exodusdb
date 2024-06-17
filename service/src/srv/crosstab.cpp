@@ -144,15 +144,15 @@ function main(in filename, in rowfields0, in colfield, in datafield, io output, 
 	rowfieldismv.redim(20);
 	for (const int rowfn : range(1, nrowfields)) {
 		rowfield = rowfields.f(1, rowfn);
-		if (not rowdict(rowfn).read(DICT, rowfield)) {
-			if (not rowdict(rowfn).read(dictvoc, rowfield)) {
+		if (not rowdict[rowfn].read(DICT, rowfield)) {
+			if (not rowdict[rowfn].read(dictvoc, rowfield)) {
 				call mssg(rowfield.quote() ^ " row field doesnt exist in " ^ filename);
 				stop();
 			}
 		}
-		rowfieldismv(rowfn) = rowdict(rowfn).f(4) != "S";
-		if ((rowfieldismv(rowfn) and not(prefixmvfn)) and rowdict(rowfn).f(1) == "F") {
-			prefixmvfn = rowdict(rowfn).f(2);
+		rowfieldismv[rowfn] = rowdict[rowfn].f(4) != "S";
+		if ((rowfieldismv[rowfn] and not(prefixmvfn)) and rowdict[rowfn].f(1) == "F") {
+			prefixmvfn = rowdict[rowfn].f(2);
 		}
 	}  // rowfn;
 
@@ -295,7 +295,7 @@ nextmv:
 		if (nrowfields) {
 			rowval = "";
 			for (const int rowfn : range(1, nrowfields)) {
-				if (rowfieldismv(rowfn)) {
+				if (rowfieldismv[rowfn]) {
 					tt = rowvals.f(rowfn, rowvaln);
 				} else {
 					tt = rowvals.f(rowfn, 1);
@@ -404,9 +404,9 @@ exit:
 	output(1, 1, 1) = "";
 	for (const int rowfn : range(1, nrowfields)) {
 		// output<1,1,rowfn>=rowfields<1,rowfn>
-		output(1, 1, rowfn) = rowdict(rowfn).f(3);
+		output(1, 1, rowfn) = rowdict[rowfn].f(3);
 
-		let rowconv = rowdict(rowfn).f(7);
+		let rowconv = rowdict[rowfn].f(7);
 		if (rowconv) {
 			for (const int rown : range(1, nrows)) {
 				output(rown + 1, 1, rowfn) = oconv(output.f(rown + 1, 1, rowfn), rowconv);

@@ -23,18 +23,18 @@ function main() {
 
 		auto indenter = [&]() {
 			for (var ln : range(block_startln, ln)) {
-				var coln = text(ln).index(token);
+				var coln = text[ln].index(token);
 
 				// Dont update // comment lines
 				// Dont update lines not ending in ;
 				// Dont update lines if the token is in double quotes
 				// (there are an odd number of double quotes before the token
-				if (not text(ln).match(comment_regex) and text(ln)[-1] eq ";" and text(ln).first(coln).count(DQ).mod(2) eq 0) {
-					var printcoln = textlen(text(ln).first(coln - 1)) + 1;
+				if (not text[ln].match(comment_regex) and text[ln][-1] eq ";" and text[ln].first(coln).count(DQ).mod(2) eq 0) {
+					var printcoln = textlen(text[ln].first(coln - 1)) + 1;
 					if (coln and printcoln lt maxprintcoln) {
-						text(ln).paster(coln, space(maxprintcoln-printcoln));
+						text[ln].paster(coln, space(maxprintcoln-printcoln));
 						updated = true;
-						//printl(text(ln));
+						//printl(text[ln]);
 					}
 				}
 			}

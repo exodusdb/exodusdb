@@ -293,10 +293,10 @@ nextdict:
 
 		if (dictid == "LINE_NO") {
 			colnx += 1;
-			dictids(colnx)  = dictid;
+			dictids[colnx]  = dictid;
 			headingx(colnx) = "Line No.";
-			fmtxs(colnx)	   = "R";
-			dictrecs(colnx) = "";
+			fmtxs[colnx]	   = "R";
+			dictrecs[colnx] = "";
 		} else {
 			if (dict.read(DICT, dictid)) {
 				// TODO implement JBASE/PICK dict types I/A/D
@@ -308,7 +308,7 @@ nextdict:
 					nfields = fn;
 				}
 
-				fmtxs(colnx) = dict.f(9)[1];
+				fmtxs[colnx] = dict.f(9)[1];
 
 				if (raw) {
 					headingx(colnx) = dictid;
@@ -337,8 +337,8 @@ nextdict:
 				// extract file
 				if (dict.f(11).starts("<")) {
 					temp			 = dict.f(11).cut(1).field(">", 1);
-					xfilenames(colnx) = temp;
-					if (not xfiles(colnx).open(temp, "")) {
+					xfilenames[colnx] = temp;
+					if (not xfiles[colnx].open(temp, "")) {
 						call  mssg(temp.quote() ^ " file cannot be found in dict " ^ (dictid.quote()));
 						gosub exit2();
 						return 0;
@@ -372,12 +372,12 @@ nextdict:
 						oconvx = "";
 					}
 
-					oconvxs(colnx) = oconvx;
+					oconvxs[colnx] = oconvx;
 				}
 
-				colgroups(colnx) = dict.f(4).starts("M");
-				dictids(colnx)	= dictid;
-				dictrecs(colnx)	= dict;
+				colgroups[colnx] = dict.f(4).starts("M");
+				dictids[colnx]	= dictid;
+				dictrecs[colnx]	= dict;
 			}
 			// end
 		}
@@ -494,9 +494,9 @@ nextrec:
 
 	for (const var coln : range(1, ncols)) {
 		MV	   = mvx;
-		dictid = dictids(coln);
+		dictid = dictids[coln];
 		temp   = "";
-		if (dictid != "LINE_NO" and dictrecs(coln).f(4) != "S") {
+		if (dictid != "LINE_NO" and dictrecs[coln].f(4) != "S") {
 			temp = calculate(dictid).fcount(VM);
 			if (temp > maxvn) {
 				maxvn = temp;
@@ -509,12 +509,12 @@ nextrec:
 	var anydata = 0;
 	for (const var coln : range(1, ncols)) {
 		MV	   = mvx;
-		dictid = dictids(coln);
+		dictid = dictids[coln];
 		if (dictid == "LINE_NO") {
 		} else {
 			let cell = calculate(dictid);
 			if (cell != "") {
-				rec(coln) = cell;
+				rec[coln] = cell;
 				anydata	  = 1;
 			}
 		}
@@ -541,26 +541,26 @@ nextvn:
 		for (const var coln : range(1, ncols)) {
 
 			// choose the right mv
-			if (dictids(coln) == "LINE_NO") {
-				rec(coln) = vn;
+			if (dictids[coln] == "LINE_NO") {
+				rec[coln] = vn;
 			} else {
-				mvx = colgroups(coln);
+				mvx = colgroups[coln];
 				if (mvx) {
-					rec(coln) = mvrec(coln).f(1, vn);
+					rec[coln] = mvrec[coln].f(1, vn);
 				}
 			}
 
-			var cell = rec(coln);
+			var cell = rec[coln];
 
 			if (cell != "") {
 
 				if (mvx or vn == 1) {
 
 					// convert codes to names
-					if (xfilenames(coln) and not(raw)) {
+					if (xfilenames[coln] and not(raw)) {
 						var rec2;
-						if (rec2.read(xfiles(coln), cell)) {
-							if (xfilenames(coln) == "BRANDS") {
+						if (rec2.read(xfiles[coln], cell)) {
+							if (xfilenames[coln] == "BRANDS") {
 								cell = rec2.f(2, 1);
 							} else {
 								cell = rec2.f(1);
@@ -569,8 +569,8 @@ nextvn:
 					}
 
 					// other conversions
-					if (oconvxs(coln)) {
-						cell = oconv(cell, oconvxs(coln));
+					if (oconvxs[coln]) {
+						cell = oconv(cell, oconvxs[coln]);
 					}
 				}
 
@@ -589,7 +589,7 @@ nextvn:
 					cell.firster(200);
 					cell ^= " ...";
 				}
-				if (fmtxs(coln) != "R" or not(cell.isnum())) {
+				if (fmtxs[coln] != "R" or not(cell.isnum())) {
 
 					// make sure "1-12" is not interpreted as a formula
 					if (var(1) or excel) {
@@ -601,7 +601,7 @@ nextvn:
 					}
 
 					if (cell.contains(DQ)) {
-						if (fmtxs(coln) == "T") {
+						if (fmtxs[coln] == "T") {
 							if (not cell.starts(DQ) or not cell.ends(DQ)) {
 								cell.replacer(DQ, "''");
 								cell.quoter();
@@ -612,7 +612,7 @@ nextvn:
 					}
 				}
 				// gotcell:
-				rec(coln) = cell;
+				rec[coln] = cell;
 			}
 
 		}  // coln;

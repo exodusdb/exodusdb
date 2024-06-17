@@ -216,7 +216,7 @@ function main() {
 
 	//test dim=var.split()
 	dim a = var("abc" _FM "def").split();
-	assert(a(2) eq "def");
+	assert(a[2] eq "def");
 
 //	{// No way to limit number of fields at the moment
 //		//dim.split(stringvar)
@@ -248,8 +248,8 @@ function main() {
 
 	dim a11(10);
 	a11 = "1";	//fill all with 1
-	assert(a11(1)  eq 1);
-	assert(a11(10) eq 1);
+	assert(a11[1]  eq 1);
+	assert(a11[10] eq 1);
 	a11 = split("");	//fill all with "" TODO should this not just make an array of 1 element?
 	assert(a11.rows() eq 1);
 //	assert(a11(1)  eq "");
@@ -388,8 +388,8 @@ function main() {
 	printl();
 
 	a7 = split("xx" ^ FM ^ "bb");
-	assert(a7(1)                      eq "xx");
-	assert(a7(2)                      eq "bb");
+	assert(a7[1]                      eq "xx");
+	assert(a7[2]                      eq "bb");
 	assert(a7.join() eq("xx" ^ FM ^ "bb"));
 
 	dim arrx(2, 2), arry;
@@ -405,18 +405,18 @@ function main() {
 	//mv dimensioned arrays have a zero element that is
 	//used in case either or both of the indexes are zero
 	dim arr1(3), arr2(3, 3);
-	arr1(0)	   = 0;
+	arr1[0]	   = 0;
 	arr1(0, 0) = 0;
 	for (int ii = 1; ii le 3; ++ii) {
-		arr1(ii) = ii;
+		arr1[ii] = ii;
 		for (int jj = 1; jj le 3; ++jj) {
 			arr2(ii, jj) = ii * 3 + jj;
 		}
 	}
-	assert(arr1(0)        eq "0");
+	assert(arr1[0]        eq "0");
 	assert(arr1(0, 0)     eq "0");
 	for (int ii = 1; ii le 3; ++ii) {
-		assert(arr1(ii)      eq ii);
+		assert(arr1[ii]      eq ii);
 		for (int jj = 1; jj le 3; ++jj) {
 			assert(arr2(ii, jj) eq ii * 3 + jj);
 		}
@@ -488,7 +488,7 @@ function main() {
 		assert(d1.join("\n") eq txt);
 
 		printl("Test writing a dim array to a text file");
-		d1(3) = "bb";
+		d1[3] = "bb";
 		TRACE(d1.join())
 
 		txt = "a\nb\nbb\nc\n";
@@ -527,11 +527,11 @@ function main() {
 		TRACE(d2.join())
 
 		printl("verify dimmary array element (5) is eee");
-		assert(d2(5) eq "eee");
+		assert(d2[5] eq "eee");
 
 		printl("Verify line ending \r\n has been remembered in array element 0");
-		TRACE(d2(0).oconv("HEX"))
-		assert(d2(0) eq "\r\n");
+		TRACE(d2[0].oconv("HEX"))
+		assert(d2[0] eq "\r\n");
 
 		printl("Check round trip");
 		assert(d2.join("\r\n") eq wintext1);
@@ -701,11 +701,11 @@ function main() {
 		// Check split into existing array overflows into final element
 		dim d3(2);
 		d3.splitter(rec);
-		TRACE(d3(1))
-		TRACE(d3(2))
+		TRACE(d3[1])
+		TRACE(d3[2])
 		TRACE(d3.join())
 		assert(d3.join() eq rec);
-		assert(d3(2) eq "bb^cc"_var);
+		assert(d3[2] eq "bb^cc"_var);
 	}
 
 	{
