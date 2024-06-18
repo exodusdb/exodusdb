@@ -38,6 +38,9 @@ THE SOFTWARE.
 #	include "timebank.h"
 #endif
 
+#pragma GCC diagnostic ignored "-Winline"
+#include <fmt/format.h>
+
 // http://stackoverflow.com/questions/538134/exporting-functions-from-a-dll-with-dllexport
 // Using dllimport and dllexport in C++ Classes
 // http://msdn.microsoft.com/en-us/library/81h27t8c(VS.80).aspx
@@ -2011,6 +2014,23 @@ class PUBLIC var final {
 
 	ND var oconv(const char* convstr) const;
 	ND var iconv(const char* convstr) const;
+
+	template<class... Args>
+	ND var format(fmt::format_string<var, Args...> fmt_str, Args&&... args) {
+#if __cpp_if_consteval >= 202106L
+		if consteval {
+			return fmt::format(fmt_str, *this, args... );
+		} else
+#endif
+		{
+			return fmt::vformat(fmt_str, fmt::make_format_args(*this, args...) );
+		}
+	}
+
+	template<class... Args>
+	ND var vformat(SV fmt_str, Args&&... args) {
+		return fmt::vformat(fmt_str, fmt::make_format_args(*this, args...) );
+	}
 
 	ND var from_codepage(const char* codepage) const;
 	ND var to_codepage(const char* codepage) const;
