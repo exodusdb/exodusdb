@@ -50,6 +50,10 @@ THE SOFTWARE.
 
 namespace exodus {
 
+//ND PUBLIC var var::format(SV format_str) const {
+//	return vformat(format_str,*this);
+//}
+
 ND PUBLIC var osgetenv(CVR envcode DEFAULT_EMPTY) {var envvalue = ""; if (not envvalue.osgetenv(envcode)) {} return envvalue;}
 ND PUBLIC bool osgetenv(CVR code, VARREF value) {return value.osgetenv(code);}
 PUBLIC void ossetenv(CVR code, CVR value) {return value.ossetenv(code);}

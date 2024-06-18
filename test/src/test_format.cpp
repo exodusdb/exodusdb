@@ -7,7 +7,52 @@ programinit()
 
 function main() {
 
-#if EXO_FORMAT
+	var x = 12.3456;
+	assert(x.format("{:.2f}").outputl() == "12.35");
+	{
+		var fmt = "{:.2f}";
+		assert(vformat(fmt, x).outputl() == "12.35");
+		assert(vformat(fmt, 12.3456).outputl() == "12.35");
+		assert(x.vformat(fmt).outputl() == "12.35");
+	}
+	{
+		var fmt = "{:.2f} and {:.3}";
+		assert(vformat(fmt, 12.3456, 1.23456).outputl() == "12.35 and 1.23");
+		assert(x.vformat(fmt, 1.23456).outputl() == "12.35 and 1.23");
+	}
+
+	// format will work on consteval format strings
+	printl(format("abc {} ghi", "def"));
+	printl(format("abc {} ghi", "def"));
+
+	// need vformat if fmt is not consteval
+	var v1 = "iii {} kkk";
+	std::string s1 = "xxx {} zzz";
+	auto c1 = "xxx {} zzz";
+
+	// Will not compile. need vformat.
+//	assert(format(v1, "jjj") == "iii jjj kkk");
+//	assert(format(s1, "yyy") == "xxx yyy zzz");
+//	assert(format(c1, "yyy") == "xxx yyy zzz");
+	assert(vformat(v1, "jjj") == "iii jjj kkk");
+	assert(vformat(s1, "yyy") == "xxx yyy zzz");
+	assert(vformat(c1, "yyy") == "xxx yyy zzz");
+	assert(var("jjj").vformat(v1) == "iii jjj kkk");
+	assert(var("yyy").vformat(s1) == "xxx yyy zzz");
+	assert(var("yyy").vformat(c1) == "xxx yyy zzz");
+
+	// vprint is required for variable format strings
+	// Whill not compile. vprint/vprintln is required
+//	print(v1, "yyy");
+//	print(s1, "yyy");
+//	println(v1, "yyy");
+//	println(s1, "yyy");
+	vprint(v1, "yyy");
+	vprint(s1, "yyy");
+	vprintln(v1, "yyy");
+	vprintln(s1, "yyy");
+
+	printl(fmt::format("abc {} ghi", "def"));
 
 	{
 //		C++ format code "f" rounding has a DIFFERENT rounding rule compared to exodus format code "MD"
@@ -52,9 +97,18 @@ function main() {
 		//std::string s1 = "{::MD2PR#12}"_var;
 		//assert(format(s1, var(123.456)).outputl() == "      123.46");
 		var v1 = "{::MD2P|R#12}";
+		var s1 = "{::MD2P|R#12}";
 		//var v1 = "{::MD2P]R#12}"_var;
 		//TRACE(format(v1, var(123.456)));
-		assert(format(v1, var(123.456)).outputl() == "      123.46");
+
+		// format ... v1/s1 etc. DOES NOT COMPILE
+		//assert(format(v1, var(123.456)).outputl() == "      123.46");
+		//assert(format(s1, var(123.456)).outputl() == "      123.46");
+
+		// vformat ... v1/s1 DOES COMPILE
+		assert(vformat(v1, var(123.456)).outputl() == "      123.46");
+		assert(vformat(s1, var(123.456)).outputl() == "      123.46");
+
 		assert(format("{::MD2P|R#12}", var(123.456)).outputl() == "      123.46");
 		//assert(format("{::MD2P]R#12}"_var, var(123456)).outputl() == "   123456.00");
 
@@ -168,7 +222,7 @@ function main() {
 	TRACE(format("{}", var(12345)))
 	TRACE(format("{}", var("abcdefg")))
 
-#endif
+//#endif
 
 	{
 		// Not format but multivalued oconv is useful in format
