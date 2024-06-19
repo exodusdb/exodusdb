@@ -20,7 +20,7 @@
 # ###############################
 #
 	cmake_policy(SET CMP0015 NEW)
-	include_directories(../../exodus/libexodus)
+	include_directories(../../exodus/libexodus ${FMT_INCLUDE} ../../fmt/include)
 	link_directories(${CMAKE_CURRENT_SOURCE_DIR}../../exodus/libexodus/exodus)
 
 #

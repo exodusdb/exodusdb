@@ -23,6 +23,7 @@ THE SOFTWARE.
 #ifndef EXODUSFUNCS_H
 #define EXODUSFUNCS_H 1
 
+#ifdef EXO_FORMAT
 // Including the large fmt library header here so exodus::format can precompile strings using fmt::vformat
 //
 // Sadly that implies that it will be waste time in endless recompilations until it becomes
@@ -41,6 +42,8 @@ THE SOFTWARE.
 //#	define EXO_FORMAT 1
 //#	include <format>
 //	namespace fmt = std;
+
+#undef EXO_FORMAT // only to avoid warning about redefinition below
 
 //#elif __has_include(<fmt/core.h>)
 #if __has_include(<fmt/core.h>)
@@ -66,9 +69,8 @@ THE SOFTWARE.
 //      |                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~
 #		pragma GCC diagnostic ignored "-Winline"
 #	endif
-#else
-#	define EXO_FORMAT 0
 #endif
+#endif // EXO_FORMAT
 
 #include <exodus/var.h>
 #include <mutex>
@@ -764,12 +766,13 @@ void printt(void) {
 	std::cout << sep;
 }
 
+#ifdef EXO_FORMAT
+
 /////////////////
 // print, println - requires compile time format string
 /////////////////
 
 //#ifdef __cpp_lib_format
-#if EXO_FORMAT
 
 using fmt::print;
 using fmt::println;
@@ -824,11 +827,13 @@ ND var vformat(std::string_view fmt_sv, Args&&... args) {
 	return fmt::vformat(fmt_sv, fmt::make_format_args(args...));
 }
 
-#endif
+#endif //EXO_FORMAT
 
 }  // namespace exodus
 
-#if EXO_FORMAT
+#ifdef EXO_FORMAT
+
+// formatter for var must be defined in global namespace
 
 // All c++ format specifiers formatting is locale-independent by default.
 // Use the 'L' format specifier to insert the appropriate number separator characters from the locale:
@@ -880,10 +885,12 @@ struct fmt::formatter<exodus::var> : formatter<std::string_view>, formatter<doub
 	// std::format dynamic arguments
 	// https://hackingcpp.com/cpp/libs/fmt.html
 	//
-	// strings        -> field-width and cut-width
+	// strings        -> field-width, cut-width
 	// chars          -> pad-width
 	// integers       -> pad-width
-	// floating point -> pad-width
+	// floating point -> pad-width, precision
+	//
+	// Note: int/float are not cut down in size if they exceed the pad-width
 
 //////////////////////////
 // fmt::formatter::parse() - maybe at compile time
