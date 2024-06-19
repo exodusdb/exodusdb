@@ -10,23 +10,17 @@ function main() {
 #ifdef EXO_FORMAT
 
 	var x = 12.3456;
-#ifdef EXO_FORMAT_MF
 	assert(x.format("{:.2f}").outputl() == "12.35");
-#endif
 	{
 		var fmt = "{:.2f}";
 		assert(xvformat(fmt, x).outputl() == "12.35");
 		assert(xvformat(fmt, 12.3456).outputl() == "12.35");
-#ifdef EXO_FORMAT_MF
 		assert(x.vformat(fmt).outputl() == "12.35");
-#endif
 	}
 	{
 		var fmt = "{:.2f} and {:.3}";
 		assert(xvformat(fmt, 12.3456, 1.23456).outputl() == "12.35 and 1.23");
-#ifdef EXO_FORMAT_MF
 		assert(x.vformat(fmt, 1.23456).outputl() == "12.35 and 1.23");
-#endif
 	}
 
 	// format will work on consteval format strings
@@ -45,11 +39,9 @@ function main() {
 	assert(xvformat(v1, "jjj") == "iii jjj kkk");
 	assert(xvformat(s1, "yyy") == "xxx yyy zzz");
 	assert(xvformat(c1, "yyy") == "xxx yyy zzz");
-#ifdef EXO_FORMAT_MF
 	assert(var("jjj").vformat(v1) == "iii jjj kkk");
 	assert(var("yyy").vformat(s1) == "xxx yyy zzz");
 	assert(var("yyy").vformat(c1) == "xxx yyy zzz");
-#endif
 	// vprint is required for variable format strings
 	// Whill not compile. vprint/vprintln is required
 //	print(v1, "yyy");
