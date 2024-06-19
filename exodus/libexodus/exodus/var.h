@@ -2028,11 +2028,17 @@ class PUBLIC var final {
 	template<class... Args>
 	ND var format(const fmt::format_string<const var&, Args...> fmt_str, Args&&... args) {
 
-#if __cpp_if_consteval >= 202106L // OK in 2404g
-		if consteval {
-			return fmt::format(fmt_str, *this, args... );
-		} else
-#endif
+//// OK in 2404 g++ but not OK in 2404 clang
+//#if __cpp_if_consteval >= 202106L
+////error: call to consteval function 'fmt::basic_format_string<char, exodus::var &>
+////::basic_format_string<fmt::basic_format_string<char, const exodus::var &>, 0>' is not a constant expression
+//// 2033 |                         return fmt::format(fmt_str, *this, args... );
+////      |                                            ^
+//
+//		if consteval {
+//			return fmt::format(fmt_str, *this, args... );
+//		} else
+//#endif
 		{
 			return fmt::vformat(fmt_str, fmt::make_format_args(*this, args...) );
 		}
