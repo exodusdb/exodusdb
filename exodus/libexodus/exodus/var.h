@@ -41,6 +41,8 @@ THE SOFTWARE.
 #define EXO_FORMAT
 #ifdef EXO_FORMAT
 #   pragma GCC diagnostic ignored "-Winline"
+#   pragma clang diagnostic ignored "-Wswitch-default" //18 24.04
+#   pragma clang diagnostic ignored "-Wunsafe-buffer-usage" //18 24.04
 #   include <fmt/format.h>
 #endif
 
@@ -2020,9 +2022,13 @@ class PUBLIC var final {
 
 #ifdef EXO_FORMAT
 
+#define EXO_FORMAT_MF // OK in 2404g
+
+#ifdef EXO_FORMAT_MF
 	template<class... Args>
-	ND var format(fmt::format_string<var, Args...> fmt_str, Args&&... args) {
-#if __cpp_if_consteval >= 202106L
+	ND var format(const fmt::format_string<const var&, Args...> fmt_str, Args&&... args) {
+
+#if __cpp_if_consteval >= 202106L // OK in 2404g
 		if consteval {
 			return fmt::format(fmt_str, *this, args... );
 		} else
@@ -2031,12 +2037,19 @@ class PUBLIC var final {
 			return fmt::vformat(fmt_str, fmt::make_format_args(*this, args...) );
 		}
 	}
+#else
+	template<class... Args>
+	ND var format(SV fmt_str, Args&&... args) {
+		return fmt::vformat(fmt_str, fmt::make_format_args(*this, args...) );
+//		return this->vformat(fmt_str, args...);
+	}
+#endif //EXO_FORMAT_MF
 
 	template<class... Args>
 	ND var vformat(SV fmt_str, Args&&... args) {
 		return fmt::vformat(fmt_str, fmt::make_format_args(*this, args...) );
 	}
-#endif
+#endif //EXO_FORMAT
 
 	ND var from_codepage(const char* codepage) const;
 	ND var to_codepage(const char* codepage) const;

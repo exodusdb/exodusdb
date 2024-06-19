@@ -10,22 +10,28 @@ function main() {
 #ifdef EXO_FORMAT
 
 	var x = 12.3456;
+#ifdef EXO_FORMAT_MF
 	assert(x.format("{:.2f}").outputl() == "12.35");
+#endif
 	{
 		var fmt = "{:.2f}";
-		assert(vformat(fmt, x).outputl() == "12.35");
-		assert(vformat(fmt, 12.3456).outputl() == "12.35");
+		assert(xvformat(fmt, x).outputl() == "12.35");
+		assert(xvformat(fmt, 12.3456).outputl() == "12.35");
+#ifdef EXO_FORMAT_MF
 		assert(x.vformat(fmt).outputl() == "12.35");
+#endif
 	}
 	{
 		var fmt = "{:.2f} and {:.3}";
-		assert(vformat(fmt, 12.3456, 1.23456).outputl() == "12.35 and 1.23");
+		assert(xvformat(fmt, 12.3456, 1.23456).outputl() == "12.35 and 1.23");
+#ifdef EXO_FORMAT_MF
 		assert(x.vformat(fmt, 1.23456).outputl() == "12.35 and 1.23");
+#endif
 	}
 
 	// format will work on consteval format strings
-	printl(format("abc {} ghi", "def"));
-	printl(format("abc {} ghi", "def"));
+	printl(xformat("abc {} ghi", "def"));
+	printl(xformat("abc {} ghi", "def"));
 
 	// need vformat if fmt is not consteval
 	var v1 = "iii {} kkk";
@@ -33,16 +39,17 @@ function main() {
 	auto c1 = "xxx {} zzz";
 
 	// Will not compile. need vformat.
-//	assert(format(v1, "jjj") == "iii jjj kkk");
-//	assert(format(s1, "yyy") == "xxx yyy zzz");
-//	assert(format(c1, "yyy") == "xxx yyy zzz");
-	assert(vformat(v1, "jjj") == "iii jjj kkk");
-	assert(vformat(s1, "yyy") == "xxx yyy zzz");
-	assert(vformat(c1, "yyy") == "xxx yyy zzz");
+//	assert(xformat(v1, "jjj") == "iii jjj kkk");
+//	assert(xformat(s1, "yyy") == "xxx yyy zzz");
+//	assert(xformat(c1, "yyy") == "xxx yyy zzz");
+	assert(xvformat(v1, "jjj") == "iii jjj kkk");
+	assert(xvformat(s1, "yyy") == "xxx yyy zzz");
+	assert(xvformat(c1, "yyy") == "xxx yyy zzz");
+#ifdef EXO_FORMAT_MF
 	assert(var("jjj").vformat(v1) == "iii jjj kkk");
 	assert(var("yyy").vformat(s1) == "xxx yyy zzz");
 	assert(var("yyy").vformat(c1) == "xxx yyy zzz");
-
+#endif
 	// vprint is required for variable format strings
 	// Whill not compile. vprint/vprintln is required
 //	print(v1, "yyy");
@@ -63,16 +70,16 @@ function main() {
 //		and away from zero on 1.5 3.5 5.5 etc. e.g. 1.5 -> 2
 
 //		WRONG
-		assert(format("{:.0f}x", 3.5) == "4x");
-		assert(format("{:.0f}x", 2.5) == "2x");   // WRONG
-		assert(format("{:.0f}x", 1.5) == "2x");
-		assert(format("{:.0f}x", 0.5) == "0x");   // WRONG
-		assert(format("{:.0f}x", 0.0) == "0x");
-		assert(format("{:.0f}x", -0.0) == "-0x"); // WRONG
-		assert(format("{:.0f}x", -0.5) == "-0x"); // WRONG
-		assert(format("{:.0f}x", -1.5) == "-2x");
-		assert(format("{:.0f}x", -2.5) == "-2x"); // WRONG
-		assert(format("{:.0f}x", -3.5) == "-4x");
+		assert(xformat("{:.0f}x", 3.5) == "4x");
+		assert(xformat("{:.0f}x", 2.5) == "2x");   // WRONG
+		assert(xformat("{:.0f}x", 1.5) == "2x");
+		assert(xformat("{:.0f}x", 0.5) == "0x");   // WRONG
+		assert(xformat("{:.0f}x", 0.0) == "0x");
+		assert(xformat("{:.0f}x", -0.0) == "-0x"); // WRONG
+		assert(xformat("{:.0f}x", -0.5) == "-0x"); // WRONG
+		assert(xformat("{:.0f}x", -1.5) == "-2x");
+		assert(xformat("{:.0f}x", -2.5) == "-2x"); // WRONG
+		assert(xformat("{:.0f}x", -3.5) == "-4x");
 	}
 	{
 		// *** Note *** EXODUS format codes can ONLY be used on parameters that are exodus var type
@@ -80,16 +87,16 @@ function main() {
 		// CORRECT
 		//0.5 -0.5 round to 1 and -1 respectively
 		//1.5 -1.5 round to 2 and -2 respectively
-		assert(format("{::MD00}x", var(3.5)) == "4x");
-		assert(format("{::MD00}x", var(2.5)) == "3x");
-		assert(format("{::MD00}x", var(1.5)) == "2x");
-		assert(format("{::MD00}x", var(0.5)) == "1x");
-		assert(format("{::MD00}x", var(0.0)) == "0x");
-		assert(format("{::MD00}x", var(-0.0)) == "0x");
-		assert(format("{::MD00}x", var(-0.5)) == "-1x");
-		assert(format("{::MD00}x", var(-1.5)) == "-2x");
-		assert(format("{::MD00}x", var(-2.5)) == "-3x");
-		assert(format("{::MD00}x", var(-3.5)) == "-4x");
+		assert(xformat("{::MD00}x", var(3.5)) == "4x");
+		assert(xformat("{::MD00}x", var(2.5)) == "3x");
+		assert(xformat("{::MD00}x", var(1.5)) == "2x");
+		assert(xformat("{::MD00}x", var(0.5)) == "1x");
+		assert(xformat("{::MD00}x", var(0.0)) == "0x");
+		assert(xformat("{::MD00}x", var(-0.0)) == "0x");
+		assert(xformat("{::MD00}x", var(-0.5)) == "-1x");
+		assert(xformat("{::MD00}x", var(-1.5)) == "-2x");
+		assert(xformat("{::MD00}x", var(-2.5)) == "-3x");
+		assert(xformat("{::MD00}x", var(-3.5)) == "-4x");
 	}
 
 	{
@@ -97,89 +104,89 @@ function main() {
 
 		// Multivalued formats allow padding
 		//std::string s1 = "{::MD2PR#12}"_var;
-		//assert(format(s1, var(123.456)).outputl() == "      123.46");
+		//assert(xformat(s1, var(123.456)).outputl() == "      123.46");
 		var v1 = "{::MD2P|R#12}";
 		var s1 = "{::MD2P|R#12}";
 		//var v1 = "{::MD2P]R#12}"_var;
-		//TRACE(format(v1, var(123.456)));
+		//TRACE(xformat(v1, var(123.456)));
 
 		// format ... v1/s1 etc. DOES NOT COMPILE
-		//assert(format(v1, var(123.456)).outputl() == "      123.46");
-		//assert(format(s1, var(123.456)).outputl() == "      123.46");
+		//assert(xformat(v1, var(123.456)).outputl() == "      123.46");
+		//assert(xformat(s1, var(123.456)).outputl() == "      123.46");
 
 		// vformat ... v1/s1 DOES COMPILE
-		assert(vformat(v1, var(123.456)).outputl() == "      123.46");
-		assert(vformat(s1, var(123.456)).outputl() == "      123.46");
+		assert(xvformat(v1, var(123.456)).outputl() == "      123.46");
+		assert(xvformat(s1, var(123.456)).outputl() == "      123.46");
 
-		assert(format("{::MD2P|R#12}", var(123.456)).outputl() == "      123.46");
-		//assert(format("{::MD2P]R#12}"_var, var(123456)).outputl() == "   123456.00");
+		assert(xformat("{::MD2P|R#12}", var(123.456)).outputl() == "      123.46");
+		//assert(xformat("{::MD2P]R#12}"_var, var(123456)).outputl() == "   123456.00");
 
-		assert(format("{::MD20}", var(123.456)).outputl() == "123.46");
-		assert(format("{::MD20}", var(123456)).outputl() == "123456.00");
+		assert(xformat("{::MD20}", var(123.456)).outputl() == "123.46");
+		assert(xformat("{::MD20}", var(123456)).outputl() == "123456.00");
 		// P has no effect if both number of decimals (2) and number to move (0) are specified
-		assert(format("{::MD20P}", var(123.456)).outputl() == "123.46");
-		assert(format("{::MD20P}", var(123456)).outputl() == "123456.00");
+		assert(xformat("{::MD20P}", var(123.456)).outputl() == "123.46");
+		assert(xformat("{::MD20P}", var(123456)).outputl() == "123456.00");
 
 		// P = Preserve decimal point position
 
 		// A single 2 means MOVE the decimal place left by two AND show 2 decimal places
-		assert(format("{::MD2}", var(123.456)).outputl() == "1.23");
-		assert(format("{::MD2}", var(123456)).outputl() == "1234.56");
+		assert(xformat("{::MD2}", var(123.456)).outputl() == "1.23");
+		assert(xformat("{::MD2}", var(123456)).outputl() == "1234.56");
 
 		// P means "if a decimal point is found then do not move the decimal point"
 		// otherwise a single 2 means MOVE the decimal point left by 2 AND use use two decimal places
-		assert(format("{::MD2P}", var(123.456)).outputl() == "123.46");
-		assert(format("{::MD2P}", var(123456)).outputl() == "123456.00");
+		assert(xformat("{::MD2P}", var(123.456)).outputl() == "123.46");
+		assert(xformat("{::MD2P}", var(123456)).outputl() == "123456.00");
 
-		assert(format("{::MTS}", var(60*60*12 + 1)) == "12:00:01");
+		assert(xformat("{::MTS}", var(60*60*12 + 1)) == "12:00:01");
 
-		assert(format("{::D4/E}", var(20000)) == "03/10/2022");
+		assert(xformat("{::D4/E}", var(20000)) == "03/10/2022");
 	}
 
-	assert(format("{:9.1f}", 123.456) == "    123.5");
-	assert(format("{:9.1f}", -123.456) == "   -123.5");
+	assert(xformat("{:9.1f}", 123.456) == "    123.5");
+	assert(xformat("{:9.1f}", -123.456) == "   -123.5");
 //	assert(std::format("{:9.1f}", var(123.456)) == "    123.5");
-	assert(format("{:9.1f}", var(123.456)) == "    123.5");
-	assert(format("{:9.1f}", var(-123.456)) == "   -123.5");
-	assert(format("{:9d}", var(1234.56)) == "     1234");
-	assert(format("{:9d}", var(-1234.56)) == "    -1234");
-	//assert(format("{0}", var("\u03a3")) == "Σ");
-	//assert(format("{0}", var("Σ")) == "Σ");
+	assert(xformat("{:9.1f}", var(123.456)) == "    123.5");
+	assert(xformat("{:9.1f}", var(-123.456)) == "   -123.5");
+	assert(xformat("{:9d}", var(1234.56)) == "     1234");
+	assert(xformat("{:9d}", var(-1234.56)) == "    -1234");
+	//assert(xformat("{0}", var("\u03a3")) == "Σ");
+	//assert(xformat("{0}", var("Σ")) == "Σ");
 //stop();
 
-	assert(format("{}",1000.0001) == "1000.0001");
-	assert(format("{}",1000.00001) == "1000.00001");
-	assert(format("{}",1000.000001) == "1000.000001");
-	assert(format("{}",1000.0000001) == "1000.0000001");
-	assert(format("{}",1000.00000001) == "1000.00000001");
-	assert(format("{}",1000.000000001) == "1000.000000001");
-	assert(format("{}",1000.0000000001) == "1000.0000000001");
-	assert(format("{}",1000.00000000001) == "1000.00000000001");
-	assert(format("{}",1000.000000000001) == "1000.000000000001");
-	assert(format("{}",1000.0000000000001) == "1000.0000000000001");
-	assert(format("{}",1000.00000000000001) == "1000");
-	assert(format("{}",1000.000000000000001) == "1000");
-	assert(format("{}",1000.0000000000000001) == "1000");
+	assert(xformat("{}",1000.0001) == "1000.0001");
+	assert(xformat("{}",1000.00001) == "1000.00001");
+	assert(xformat("{}",1000.000001) == "1000.000001");
+	assert(xformat("{}",1000.0000001) == "1000.0000001");
+	assert(xformat("{}",1000.00000001) == "1000.00000001");
+	assert(xformat("{}",1000.000000001) == "1000.000000001");
+	assert(xformat("{}",1000.0000000001) == "1000.0000000001");
+	assert(xformat("{}",1000.00000000001) == "1000.00000000001");
+	assert(xformat("{}",1000.000000000001) == "1000.000000000001");
+	assert(xformat("{}",1000.0000000000001) == "1000.0000000000001");
+	assert(xformat("{}",1000.00000000000001) == "1000");
+	assert(xformat("{}",1000.000000000000001) == "1000");
+	assert(xformat("{}",1000.0000000000000001) == "1000");
 
-	assert(format("{}",var(1000.0001)) == "1000.0001");
-	assert(format("{}",var(1000.00001)) == "1000.00001");
-	assert(format("{}",var(1000.000001)) == "1000.000001");
-	assert(format("{}",var(1000.0000001)) == "1000.0000001");
-	assert(format("{}",var(1000.00000001)) == "1000.00000001");
-	assert(format("{}",var(1000.000000001)) == "1000.000000001");
-	assert(format("{}",var(1000.0000000001)) == "1000.0000000001");
-	assert(format("{}",var(1000.00000000001)) == "1000.00000000001");
-	assert(format("{}",var(1000.000000000001)) == "1000.000000000001");
-	assert(format("{}",var(1000.0000000000001)) == "1000");
-	assert(format("{}",var(1000.00000000000001)) == "1000");
-	assert(format("{}",var(1000.000000000000001)) == "1000");
-	assert(format("{}",var(1000.0000000000000001)) == "1000");
+	assert(xformat("{}",var(1000.0001)) == "1000.0001");
+	assert(xformat("{}",var(1000.00001)) == "1000.00001");
+	assert(xformat("{}",var(1000.000001)) == "1000.000001");
+	assert(xformat("{}",var(1000.0000001)) == "1000.0000001");
+	assert(xformat("{}",var(1000.00000001)) == "1000.00000001");
+	assert(xformat("{}",var(1000.000000001)) == "1000.000000001");
+	assert(xformat("{}",var(1000.0000000001)) == "1000.0000000001");
+	assert(xformat("{}",var(1000.00000000001)) == "1000.00000000001");
+	assert(xformat("{}",var(1000.000000000001)) == "1000.000000000001");
+	assert(xformat("{}",var(1000.0000000000001)) == "1000");
+	assert(xformat("{}",var(1000.00000000000001)) == "1000");
+	assert(xformat("{}",var(1000.000000000000001)) == "1000");
+	assert(xformat("{}",var(1000.0000000000000001)) == "1000");
 
-	assert(format("{:b}", var(256)) == "100000000");
-	assert(format("{:B}", var(256)) == "100000000");
-	assert(format("{:o}", var(256)) == "400");
-	assert(format("{:x}", var(256)) == "100");
-	assert(format("{:X}", var(256)) == "100");
+	assert(xformat("{:b}", var(256)) == "100000000");
+	assert(xformat("{:B}", var(256)) == "100000000");
+	assert(xformat("{:o}", var(256)) == "400");
+	assert(xformat("{:x}", var(256)) == "100");
+	assert(xformat("{:X}", var(256)) == "100");
 
 	// CAT FACE
 	// Unicode character 0x1F431
@@ -196,33 +203,33 @@ function main() {
 	// Incorrect in g++13.2
 	// Width is calculated as bytes not utf-8 character widths
 	// Cat = four bytes so takes up "4" positions in formatting
-	assert(format("{:.^5s}", var("🐱")) == "🐱.");
+	assert(xformat("{:.^5s}", var("🐱")) == "🐱.");
 
 #else
 #warning Using fmtlib library instead of std::format
 	//__clang_major__ 18
 	// Correct in fmt library
-	assert(format("{:.^5s}", "🐱") == ".🐱..");
-	assert(format("{:.5s}", "🐱🐱🐱") == "🐱🐱🐱");
-	assert(format("{:.<5.5s}", "🐱🐱🐱") == "🐱🐱🐱");
+	assert(xformat("{:.^5s}", "🐱") == ".🐱..");
+	assert(xformat("{:.5s}", "🐱🐱🐱") == "🐱🐱🐱");
+	assert(xformat("{:.<5.5s}", "🐱🐱🐱") == "🐱🐱🐱");
 
-	assert(format("{:^5s}", "🐱") == " 🐱  ");
-	assert(format("{:.5s}", "🐱🐱🐱") == "🐱🐱🐱");
-	assert(format("{:<5.5s}", "🐱🐱🐱") == "🐱🐱🐱");
+	assert(xformat("{:^5s}", "🐱") == " 🐱  ");
+	assert(xformat("{:.5s}", "🐱🐱🐱") == "🐱🐱🐱");
+	assert(xformat("{:<5.5s}", "🐱🐱🐱") == "🐱🐱🐱");
 #endif
 
 	var pi = 3.14f;
-	assert(format("{:10f}", pi) == "  3.140000");
-	assert(format("{:.5f}", pi) == "3.14000");
-	assert(format("{:10.5f}", pi) == "   3.14000");
+	assert(xformat("{:10f}", pi) == "  3.140000");
+	assert(xformat("{:.5f}", pi) == "3.14000");
+	assert(xformat("{:10.5f}", pi) == "   3.14000");
 
-	assert(format("a {} b {} c", 100, 200) == "a 100 b 200 c");
-	assert(format("a {0} b {1} c", var("x"), var("y")) == "a x b y c");
-	TRACE(format("{:9.1f}", 123.456))
-	TRACE(format("{:9.1f}", var(123.456)))
-	TRACE(format("{}", var(123.456)))
-	TRACE(format("{}", var(12345)))
-	TRACE(format("{}", var("abcdefg")))
+	assert(xformat("a {} b {} c", 100, 200) == "a 100 b 200 c");
+	assert(xformat("a {0} b {1} c", var("x"), var("y")) == "a x b y c");
+	TRACE(xformat("{:9.1f}", 123.456))
+	TRACE(xformat("{:9.1f}", var(123.456)))
+	TRACE(xformat("{}", var(123.456)))
+	TRACE(xformat("{}", var(12345)))
+	TRACE(xformat("{}", var("abcdefg")))
 
 //#endif
 
@@ -263,62 +270,62 @@ function main() {
 		// must convert to string - see next block
 
 		// https://en.cppreference.com/w/cpp/utility/format/spec
-		assert(format("{:.^5s}",   "🐱").squote().outputl()     == "'.🐱..'");
+		assert(xformat("{:.^5s}",   "🐱").squote().outputl()     == "'.🐱..'");
 
-		assert(format("{:.^5s}",   var("🐱"), 5).squote().outputl()     == "'.🐱..'");
+		assert(xformat("{:.^5s}",   var("🐱"), 5).squote().outputl()     == "'.🐱..'");
 
 		// fmtlib v10 fails following
-		//assert(format("{:.5s}",    "🐱🐱🐱").squote().outputl() == "'🐱🐱'");
-		//assert(format("{:.<5.5s}", "🐱🐱🐱").squote().outputl() == "'🐱🐱.'");
+		//assert(xformat("{:.5s}",    "🐱🐱🐱").squote().outputl() == "'🐱🐱'");
+		//assert(xformat("{:.<5.5s}", "🐱🐱🐱").squote().outputl() == "'🐱🐱.'");
 
 		// Not using dynamic arguments
-		//assert(format(FMT_COMPILE("{:4}"), var(9)).squote().outputl() == "'9   '");
-		assert(format("{:4}", var(9), 7, 8, 9).squote().outputl() == "'9   '");
-		assert(format("{:}", var(9)).squote().outputl() == "'9'");
-		assert(format("{}", var(9), 7, 8, 9).squote().outputl() == "'9'");
+		//assert(xformat(FMT_COMPILE("{:4}"), var(9)).squote().outputl() == "'9   '");
+		assert(xformat("{:4}", var(9), 7, 8, 9).squote().outputl() == "'9   '");
+		assert(xformat("{:}", var(9)).squote().outputl() == "'9'");
+		assert(xformat("{}", var(9), 7, 8, 9).squote().outputl() == "'9'");
 
 		// terminate called after throwing an instance of 'fmt::v10::format_error'
 		//  what():  missing '}' in format string
 
-		assert(format("{:{}}", var("x"), 7).squote().outputl() == "'x      '");
+		assert(xformat("{:{}}", var("x"), 7).squote().outputl() == "'x      '");
 
 		// argument not found
-		//assert(format("{:{}}", var(9), 4).squote().outputl() == "'9   '");
-		//assert(format("{:{}}", var(9), 4).squote().outputl() == "'9   '");
-		//assert(format("{:{}s}", var(9), 4).squote().outputl() == "'9   '");
-		//assert(format("{:0<.{}}", var(9), 4).squote().outputl() == "'9   '");
-		//assert(format("{:<{}}", var(9), 4).squote().outputl() == "'9   '");
-		//assert(format("{0:<{}}", var(9), 4).squote().outputl() == "'9   '");
+		//assert(xformat("{:{}}", var(9), 4).squote().outputl() == "'9   '");
+		//assert(xformat("{:{}}", var(9), 4).squote().outputl() == "'9   '");
+		//assert(xformat("{:{}s}", var(9), 4).squote().outputl() == "'9   '");
+		//assert(xformat("{:0<.{}}", var(9), 4).squote().outputl() == "'9   '");
+		//assert(xformat("{:<{}}", var(9), 4).squote().outputl() == "'9   '");
+		//assert(xformat("{0:<{}}", var(9), 4).squote().outputl() == "'9   '");
 
 		// cannot switch from automatic to manual argument indexing
-		//assert(format("{:<{1}}", var(9), 4).squote().outputl() == "'9   '");
-		//assert(format("{0:<{1}}", var(9), 4).squote().outputl() == "'9   '");
+		//assert(xformat("{:<{1}}", var(9), 4).squote().outputl() == "'9   '");
+		//assert(xformat("{0:<{1}}", var(9), 4).squote().outputl() == "'9   '");
 
 	}
 
 	{
 		// oconv(9, "L#4");
-		assert(format("{:{}s}", var(9).toString(), 4).squote().outputl() == "'9   '");
-		assert(format("{:{}}", var(9).toString(), 4).squote().outputl() == "'9   '");
-		assert(format("{:<{}}", var(9).toString(), 4).squote().outputl() == "'9   '");
+		assert(xformat("{:{}s}", var(9).toString(), 4).squote().outputl() == "'9   '");
+		assert(xformat("{:{}}", var(9).toString(), 4).squote().outputl() == "'9   '");
+		assert(xformat("{:<{}}", var(9).toString(), 4).squote().outputl() == "'9   '");
 
 		// oconv(9, "R#4");
-		assert(format("{:>{}}", var(9).toString(), 4).squote().outputl() == "'   9'");
+		assert(xformat("{:>{}}", var(9).toString(), 4).squote().outputl() == "'   9'");
 
 		// oconv(9, "C#4");
-		assert(format("{:^{}}", var(9).toString(), 4).squote().outputl() == "' 9  '");
+		assert(xformat("{:^{}}", var(9).toString(), 4).squote().outputl() == "' 9  '");
 
 	}
 
 	{
 		// oconv(9, "L(0)#4");
-		assert(format("{:0<{}}", var(9).toString(), 4).squote().outputl() == "'9000'");
+		assert(xformat("{:0<{}}", var(9).toString(), 4).squote().outputl() == "'9000'");
 
 		// oconv(9, "R(0)#4");
-		assert(format("{:0>{}}", var(9).toString(), 4).squote().outputl() == "'0009'");
+		assert(xformat("{:0>{}}", var(9).toString(), 4).squote().outputl() == "'0009'");
 
 		// oconv(9, "C(0)#4");
-		assert(format("{:0^{}}", var(9).toString(), 4).squote().outputl() == "'0900'");
+		assert(xformat("{:0^{}}", var(9).toString(), 4).squote().outputl() == "'0900'");
 
 	}
 
@@ -327,62 +334,62 @@ function main() {
 		/////////////////////////////
 
 		// oconv(9, "R(0)#4");
-		assert(format("{:04d}", var(9)).squote().outputl() == "'0009'");
-		assert(format("{:0>4d}", var(9)).squote().outputl() == "'0009'");
+		assert(xformat("{:04d}", var(9)).squote().outputl() == "'0009'");
+		assert(xformat("{:0>4d}", var(9)).squote().outputl() == "'0009'");
 
 		// oconv(9, "L(0)4")
-		assert(format("{:0<4d}", var(9)).squote().outputl() == "'9000'");
+		assert(xformat("{:0<4d}", var(9)).squote().outputl() == "'9000'");
 
 		// oconv(9, "C(0)4")
-		assert(format("{:0^4d}", var(9)).squote().outputl() == "'0900'");
+		assert(xformat("{:0^4d}", var(9)).squote().outputl() == "'0900'");
 
 		// oconv(9, "R#4")
-		assert(format("{:>4d}", var(9)).squote().outputl() == "'   9'");
-		assert(format("{:>04d}", var(9)).squote().outputl() == "'   9'");// 0 in the wrong place so ignored
+		assert(xformat("{:>4d}", var(9)).squote().outputl() == "'   9'");
+		assert(xformat("{:>04d}", var(9)).squote().outputl() == "'   9'");// 0 in the wrong place so ignored
 
 		// oconv(9, "L#4")
-		assert(format("{:<4d}", var(9)).squote().outputl() == "'9   '");
-		assert(format("{:<04d}", var(9)).squote().outputl() == "'9   '"); // ditto
+		assert(xformat("{:<4d}", var(9)).squote().outputl() == "'9   '");
+		assert(xformat("{:<04d}", var(9)).squote().outputl() == "'9   '"); // ditto
 
 		// oconv(9, "C#4")
-		assert(format("{:^4d}", var(9)).squote().outputl() == "' 9  '");
-		assert(format("{:^04d}", var(9)).squote().outputl() == "' 9  '"); // ditto
+		assert(xformat("{:^4d}", var(9)).squote().outputl() == "' 9  '");
+		assert(xformat("{:^04d}", var(9)).squote().outputl() == "' 9  '"); // ditto
 	}
 
 	{
 		var pi = 3.1415;
-		assert(format("{:10f}", pi).squote().outputl() == "'  3.141500'");
+		assert(xformat("{:10f}", pi).squote().outputl() == "'  3.141500'");
 
-		format("{:03}",7).squote().outputl(":03 7 = ");//007
-		format("{:0{}}",7,4).squote().outputl(":0{} 7 = ");//0007
+		xformat("{:03}",7).squote().outputl(":03 7 = ");//007
+		xformat("{:0{}}",7,4).squote().outputl(":0{} 7 = ");//0007
 
 		// f = floating point after rounding
-		assert(format("{:06f}",var(7.9)).squote().outputl() == "'7.900000'");
-		assert(format("{:07f}",var(7.9)).squote().outputl() == "'7.900000'");
-		assert(format("{:01f}",var(7.9)).squote().outputl() == "'7.900000'"); // why the same? leading zero does nothing?
+		assert(xformat("{:06f}",var(7.9)).squote().outputl() == "'7.900000'");
+		assert(xformat("{:07f}",var(7.9)).squote().outputl() == "'7.900000'");
+		assert(xformat("{:01f}",var(7.9)).squote().outputl() == "'7.900000'"); // why the same? leading zero does nothing?
 
-		assert(format("{:.1f}",var(7.55)).squote().outputl() == "'7.5'");   // wrong!
-		assert(format("{:.1f}",var(-7.55)).squote().outputl() == "'-7.5'"); // wrong!
+		assert(xformat("{:.1f}",var(7.55)).squote().outputl() == "'7.5'");   // wrong!
+		assert(xformat("{:.1f}",var(-7.55)).squote().outputl() == "'-7.5'"); // wrong!
 
-		assert(format("{:.1f}",var(6.55)).squote().outputl() == "'6.5'");   // wrong!
-		assert(format("{:.1f}",var(-6.55)).squote().outputl() == "'-6.5'"); // wrong!
+		assert(xformat("{:.1f}",var(6.55)).squote().outputl() == "'6.5'");   // wrong!
+		assert(xformat("{:.1f}",var(-6.55)).squote().outputl() == "'-6.5'"); // wrong!
 
-		assert(format("{:.1f}",var(6.59)).squote().outputl() == "'6.6'");   // OK
-		assert(format("{:.1f}",var(-6.59)).squote().outputl() == "'-6.6'"); // OK
+		assert(xformat("{:.1f}",var(6.59)).squote().outputl() == "'6.6'");   // OK
+		assert(xformat("{:.1f}",var(-6.59)).squote().outputl() == "'-6.6'"); // OK
 
-		assert(format("{:.1f}",var(6.55)).squote().outputl() == "'6.5'");   // wrong!
-		assert(format("{:.1f}",var(-6.55)).squote().outputl() == "'-6.5'"); // wrong!
+		assert(xformat("{:.1f}",var(6.55)).squote().outputl() == "'6.5'");   // wrong!
+		assert(xformat("{:.1f}",var(-6.55)).squote().outputl() == "'-6.5'"); // wrong!
 
-		assert(format("{:06d}",var(8.9)).squote().outputl() == "'000008'");
-		assert(format("{:010.6f}",var(7.9)).squote().outputl() == "'007.900000'");
+		assert(xformat("{:06d}",var(8.9)).squote().outputl() == "'000008'");
+		assert(xformat("{:010.6f}",var(7.9)).squote().outputl() == "'007.900000'");
 
 		// d = digits for integer AFTER truncating
-		assert(format("{:6d}",var(7.5)).squote().outputl() == "'     7'");
-		assert(format("{:6d}",var(7.9)).squote().outputl() == "'     7'");
-		assert(format("{:6d}",var(8.5)).squote().outputl() == "'     8'");
-		assert(format("{:6d}",var(-7.5)).squote().outputl() == "'    -7'");
-		assert(format("{:6d}",var(-8.5)).squote().outputl() == "'    -8'");
-		assert(format("{:6d}",var(-8.9)).squote().outputl() == "'    -8'");
+		assert(xformat("{:6d}",var(7.5)).squote().outputl() == "'     7'");
+		assert(xformat("{:6d}",var(7.9)).squote().outputl() == "'     7'");
+		assert(xformat("{:6d}",var(8.5)).squote().outputl() == "'     8'");
+		assert(xformat("{:6d}",var(-7.5)).squote().outputl() == "'    -7'");
+		assert(xformat("{:6d}",var(-8.5)).squote().outputl() == "'    -8'");
+		assert(xformat("{:6d}",var(-8.9)).squote().outputl() == "'    -8'");
 
 		//format("{::0{}}",var(7),4).squote().outputl(":0{} 7 = ");  //      7
 
@@ -450,17 +457,17 @@ function main() {
 		var v2 = 12.345;
 		var v10 = 10;
 
-		assert(format("{:.>{}.{}f}", v2, 10, 5).squote().outputl() == "'..12.34500'");
+		assert(xformat("{:.>{}.{}f}", v2, 10, 5).squote().outputl() == "'..12.34500'");
 
-		assert(format("'{:13f}'", v2).outputl() == "'    12.345000'");
+		assert(xformat("'{:13f}'", v2).outputl() == "'    12.345000'");
 
 		// dynamic pad width and precision on standard format specifiers like f (fixed decimals)
-		assert(format("'{:{}.{}f}'", v2, 12, 2).outputl() == "'       12.35'");
-		assert(format("{:.>{}.{}}", v1, 10, 5).outputl() == ".......abc");
-		assert(format("'{:{}b}'", v10, 12, 2).outputl() == "'        1010'");
-		assert(format("'{:0f}'", v2).outputl() == "'12.345000'");
-		assert(format("'{::HEX}'", v10).outputl() == "'3130'");
-		assert(format("a {} b {} c", 100, 200).outputl() == "a 100 b 200 c");
+		assert(xformat("'{:{}.{}f}'", v2, 12, 2).outputl() == "'       12.35'");
+		assert(xformat("{:.>{}.{}}", v1, 10, 5).outputl() == ".......abc");
+		assert(xformat("'{:{}b}'", v10, 12, 2).outputl() == "'        1010'");
+		assert(xformat("'{:0f}'", v2).outputl() == "'12.345000'");
+		assert(xformat("'{::HEX}'", v10).outputl() == "'3130'");
+		assert(xformat("a {} b {} c", 100, 200).outputl() == "a 100 b 200 c");
 
 	}
 #endif // EXO_FORMAT

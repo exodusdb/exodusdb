@@ -777,10 +777,10 @@ void printt(void) {
 using fmt::print;
 using fmt::println;
 
-void println() {
-	LOCKIOSTREAM_SLOW
-	std::cout << std::endl;
-}
+//void println() {
+//	LOCKIOSTREAM_SLOW
+//	std::cout << std::endl;
+//}
 
 ///////////////////
 // vprint, vprintln - can use a variable run time format string
@@ -798,34 +798,47 @@ void vprintln(std::string_view fmt_sv, Args&&... args) {
 	std::cout << fmt::vformat(fmt_sv, fmt::make_format_args(args...)) << std::endl;
 }
 
-/////////
-// format - requires a compile time format string
-/////////
-
-// not using fmt/std::format because we want to return a var
-// TODO does this prevent "using std;" when using #include <format> (standard)
-// by introducting an overload of std::format that only differs in return type?
-template<class... Args>
-ND var format(fmt::format_string<Args...> fmt_str, Args&&... args) {
-#if __cpp_if_consteval >= 202106L
-	if consteval {
-		return fmt::format(fmt_str, args... );
-	} else
-#endif
-	{
-		return fmt::vformat(fmt_str, fmt::make_format_args(args...) );
-	}
-}
-
 //////////
 // vformat - can use a variable run time format string
 //////////
 
 // not using fmt/std::vformat because we want to return a var
 template <typename... Args>
-ND var vformat(std::string_view fmt_sv, Args&&... args) {
+ND var xvformat(std::string_view fmt_sv, Args&&... args) {
 	return fmt::vformat(fmt_sv, fmt::make_format_args(args...));
 }
+
+// not using fmt/std::vformat because we want to return a var
+template <typename... Args>
+ND var xformat(std::string_view fmt_sv, Args&&... args) {
+	return fmt::vformat(fmt_sv, fmt::make_format_args(args...));
+}
+
+///////////
+//// format - requires a compile time format string
+///////////
+//
+//// not using fmt/std::format because we want to return a var
+//// TODO does this prevent "using std;" when using #include <format> (standard)
+//// by introducting an overload of std::format that only differs in return type?
+//#ifdef EXO_FORMAT_MF
+//template<class... Args>
+//ND var xformat(fmt::format_string<Args...> fmt_str, Args&&... args) {
+////#if __cpp_if_consteval >= 202106L
+////	if consteval {
+////		return fmt::format(fmt_str, args... );
+////	} else
+////#endif
+//	{
+//		return fmt::vformat(fmt_str, fmt::make_format_args(args...) );
+//	}
+//}
+////#else
+////template<class... Args>
+////ND var xformat(std::string_view fmt_sv, Args&&... args) {
+////	return xvformat(fmt_sv, args...);
+////}
+//#endif
 
 #endif //EXO_FORMAT
 
