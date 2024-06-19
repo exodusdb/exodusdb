@@ -2024,7 +2024,7 @@ class PUBLIC var final {
 
 #if __GNUC__ >= 7 || __clang_major__ > 15
 	// Compile time or rumtime?
-#	define EXO_FORMAT_STRING_TYPE fmt::format_string<var, Args...> fmt_str
+#	define EXO_FORMAT_STRING_TYPE fmt::format_string<var, Args...>
 #else
 	// Always run time?
 #	define EXO_FORMAT_STRING_TYPE SV
