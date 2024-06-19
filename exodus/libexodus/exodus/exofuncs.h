@@ -787,15 +787,15 @@ using fmt::println;
 ///////////////////
 
 template <typename... Args>
-void vprint(std::string_view fmt_sv, Args&&... args) {
+void vprint(std::string_view fmt_str, Args&&... args) {
 	LOCKIOSTREAM_SLOW
-	std::cout << fmt::vformat(fmt_sv, fmt::make_format_args(args...));
+	std::cout << fmt::vformat(fmt_str, fmt::make_format_args(args...));
 }
 
 template <typename... Args>
-void vprintln(std::string_view fmt_sv, Args&&... args) {
+void vprintln(std::string_view fmt_str, Args&&... args) {
 	LOCKIOSTREAM_SLOW
-	std::cout << fmt::vformat(fmt_sv, fmt::make_format_args(args...)) << std::endl;
+	std::cout << fmt::vformat(fmt_str, fmt::make_format_args(args...)) << std::endl;
 }
 
 //////////
@@ -804,15 +804,33 @@ void vprintln(std::string_view fmt_sv, Args&&... args) {
 
 // not using fmt/std::vformat because we want to return a var
 template <typename... Args>
-ND var xvformat(std::string_view fmt_sv, Args&&... args) {
-	return fmt::vformat(fmt_sv, fmt::make_format_args(args...));
+ND var xvformat(std::string_view fmt_str, Args&&... args) {
+//	return fmt::vformat(fmt_str, fmt::make_format_args(std::forward<Args>(args)...));
+//error: cannot bind non-const lvalue reference of type ‘exodus::var&’ to an rvalue of type ‘exodus::var’
+	return fmt::vformat(fmt_str, fmt::make_format_args(args...));
 }
+
+// TODO dduplicate from var.h
+#if __GNUC__ >= 7 || __clang_major__ > 15
+    // Compile time or rumtime?
+#   define EXO_FORMAT_STRING_TYPE2 fmt::format_string<Args...>
+#else
+    // Always run time?
+#   define EXO_FORMAT_STRING_TYPE2 SV
+#endif
 
 // not using fmt/std::vformat because we want to return a var
 template <typename... Args>
-ND var xformat(std::string_view fmt_sv, Args&&... args) {
-	return fmt::vformat(fmt_sv, fmt::make_format_args(args...));
+ND var xformat(EXO_FORMAT_STRING_TYPE2 fmt_str, Args&&... args) {
+//	return fmt::vformat(fmt_str, fmt::make_format_args(std::forward<Args>(args)...));
+// error: cannot bind non-const lvalue reference of type ‘exodus::var&’ to an rvalue of type ‘exodus::var’
+	return fmt::vformat(fmt_str, fmt::make_format_args(args...));
 }
+
+//template<class... Args>
+//ND var vformat(SV fmt_str, Args&&... args) {
+//	return fmt::vformat(fmt_str, fmt::make_format_args(*this, args...) );
+//}
 
 ///////////
 //// format - requires a compile time format string
@@ -835,8 +853,8 @@ ND var xformat(std::string_view fmt_sv, Args&&... args) {
 //}
 ////#else
 ////template<class... Args>
-////ND var xformat(std::string_view fmt_sv, Args&&... args) {
-////	return xvformat(fmt_sv, args...);
+////ND var xformat(std::string_view fmt_str, Args&&... args) {
+////	return xvformat(fmt_str, args...);
 ////}
 //#endif
 
