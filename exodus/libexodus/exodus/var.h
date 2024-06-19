@@ -38,8 +38,11 @@ THE SOFTWARE.
 #	include "timebank.h"
 #endif
 
-#pragma GCC diagnostic ignored "-Winline"
-#include <fmt/format.h>
+#define EXO_FORMAT
+#ifdef EXO_FORMAT
+#   pragma GCC diagnostic ignored "-Winline"
+#   include <fmt/format.h>
+#endif
 
 // http://stackoverflow.com/questions/538134/exporting-functions-from-a-dll-with-dllexport
 // Using dllimport and dllexport in C++ Classes
@@ -2015,6 +2018,8 @@ class PUBLIC var final {
 	ND var oconv(const char* convstr) const;
 	ND var iconv(const char* convstr) const;
 
+#ifdef EXO_FORMAT
+
 	template<class... Args>
 	ND var format(fmt::format_string<var, Args...> fmt_str, Args&&... args) {
 #if __cpp_if_consteval >= 202106L
@@ -2031,6 +2036,7 @@ class PUBLIC var final {
 	ND var vformat(SV fmt_str, Args&&... args) {
 		return fmt::vformat(fmt_str, fmt::make_format_args(*this, args...) );
 	}
+#endif
 
 	ND var from_codepage(const char* codepage) const;
 	ND var to_codepage(const char* codepage) const;

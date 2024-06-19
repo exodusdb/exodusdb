@@ -7,6 +7,8 @@ programinit()
 
 function main() {
 
+#ifdef EXO_FORMAT
+
 	var x = 12.3456;
 	assert(x.format("{:.2f}").outputl() == "12.35");
 	{
@@ -461,6 +463,7 @@ function main() {
 		assert(format("a {} b {} c", 100, 200).outputl() == "a 100 b 200 c");
 
 	}
+#endif // EXO_FORMAT
 
 	printl(elapsedtimetext());
 	printl("Test passed");
