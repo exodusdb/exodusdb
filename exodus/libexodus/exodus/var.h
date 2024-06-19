@@ -2022,11 +2022,20 @@ class PUBLIC var final {
 
 #ifdef EXO_FORMAT
 
-#define EXO_FORMAT_MF // OK in 2404g
+#if __GNUC__ >= 7 || __clang_major__ > 15
+	// Compile time or rumtime?
+#	define EXO_FORMAT_STRING_TYPE fmt::format_string<var, Args...> fmt_str
+#else
+	// Always run time?
+#	define EXO_FORMAT_STRING_TYPE SV
+#endif
 
-#ifdef EXO_FORMAT_MF
-	template<class... Args>
-	ND var format(const fmt::format_string<const var&, Args...> fmt_str, Args&&... args) {
+template<class... Args>
+	ND var format(EXO_FORMAT_STRING_TYPE fmt_str, Args&&... args) {
+// clang on 22.04 cannot accept compile time format string even if a cstr
+///root/exodus/test/src/test_format.cpp:14:18: error: call to consteval function 'fmt::basic_format_string<char, exodus::var>::basic_format_string<ch
+//ar[7], 0>' is not a constant expression
+//        assert(x.format("{:.2f}").outputl() == "12.35");
 
 //// OK in 2404 g++ but not OK in 2404 clang
 //#if __cpp_if_consteval >= 202106L
@@ -2034,27 +2043,20 @@ class PUBLIC var final {
 ////::basic_format_string<fmt::basic_format_string<char, const exodus::var &>, 0>' is not a constant expression
 //// 2033 |                         return fmt::format(fmt_str, *this, args... );
 ////      |                                            ^
-//
+
 //		if consteval {
-//			return fmt::format(fmt_str, *this, args... );
-//		} else
+//			return fmt::format(fmt_str, *this, std::forward<Args>(args)... );
+//          return fmt::format(fmt_str, *this, std::forward<Args>(args)... );
+//		} else {
 //#endif
-		{
-			return fmt::vformat(fmt_str, fmt::make_format_args(*this, args...) );
-		}
+		return fmt::vformat(fmt_str, fmt::make_format_args(*this, std::forward<Args>(args)...) );
 	}
-#else
-	template<class... Args>
-	ND var format(SV fmt_str, Args&&... args) {
-		return fmt::vformat(fmt_str, fmt::make_format_args(*this, args...) );
-//		return this->vformat(fmt_str, args...);
-	}
-#endif //EXO_FORMAT_MF
 
 	template<class... Args>
 	ND var vformat(SV fmt_str, Args&&... args) {
 		return fmt::vformat(fmt_str, fmt::make_format_args(*this, args...) );
 	}
+
 #endif //EXO_FORMAT
 
 	ND var from_codepage(const char* codepage) const;
