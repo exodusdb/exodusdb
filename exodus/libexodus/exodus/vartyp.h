@@ -17,7 +17,7 @@ class VARTYP {
  public:
 
 	// default constructor
-	VARTYP() = default;
+	constexpr VARTYP() = default;
 	//VARTYP() : flags(0) {
 	//    std::cout<<"def ctor2"
 	//    << std::endl;
@@ -35,11 +35,11 @@ class VARTYP {
 	VARTYP& operator=(const VARTYP& rhs) = default;
 
 	// constructor from unsigned int
-	VARTYP(const unsigned int rhs)
+	constexpr VARTYP(const unsigned int rhs)
 		: flags_(rhs){}
 
 	// assign from unsigned int
-	VARTYP& operator=(const unsigned int rhs) {
+	constexpr VARTYP& operator=(const unsigned int rhs) {
 		flags_ = rhs;
 		return *this;
 	}

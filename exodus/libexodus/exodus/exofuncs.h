@@ -88,23 +88,23 @@ namespace exodus {
 
 #if defined _MSC_VER || defined __CYGWIN__ || defined __MINGW32__
 
-	const var              EOL      = "\r\n";
-#	define                _EOL        "\r\n"
+	constinit const var              EOL      = "\r\n";
+#	define                          _EOL        "\r\n"
 
-	const var              OSSLASH  = "\\";
-#	define                _OSSLASH    "\\"
-	constexpr char         OSSLASH_ = '\\';
-	constexpr bool         OSSLASH_IS_BACKSLASH = true;
+	constinit const var              OSSLASH  = "\\";
+#	define                          _OSSLASH    "\\"
+	constinit /*constexpr*/ char     OSSLASH_ = '\\';
+	constinit /*constexpr*/ bool     OSSLASH_IS_BACKSLASH = true;
 
 #else
 
-	const var              EOL      = "\n";
-#	define                _EOL        "\n"
+	constinit const var              EOL      = "\n";
+#	define                          _EOL        "\n"
 
-	const var              OSSLASH  = "/";
-#	define                _OSSLASH    "/"
-	constexpr char         OSSLASH_ = '/';
-	constexpr bool         OSSLASH_IS_BACKSLASH = false;
+	constinit const var              OSSLASH  = "/";
+#	define                          _OSSLASH    "/"
+	constinit /*constexpr*/ char     OSSLASH_ = '/';
+	constinit /*constexpr*/ bool     OSSLASH_IS_BACKSLASH = false;
 
 #endif
 
@@ -112,32 +112,31 @@ namespace exodus {
 	// We will extract the two digit year only - using integer division and integer remainder ops.
 	// Years e.g. 21 which are in between the actual standards like c++20, c++23, c++26 etc.
 	// indicate partial informal support for some features of the next standard
-	const constexpr auto _CPP_STANDARD=__cplusplus / 100 % 1000;
+	const constinit /*constexpr*/ auto _CPP_STANDARD=__cplusplus / 100 % 1000;
 
 #if defined(_WIN64) or defined(_LP64)
 #	define                _PLATFORM   "x64"
-	const var              PLATFORM = _PLATFORM;
 #else
 #	define                _PLATFORM   "x86"
-	const var              PLATFORM = _PLATFORM;
 #endif
+	constinit const var    PLATFORM = _PLATFORM;
 
 #ifdef __clang__
 	//__clang_major__
 	//__clang_minor__
 	//__clang_patchlevel__
 	//__clang_version__
-	inline const constexpr auto _COMPILER =  "clang";
-	inline const constexpr auto _COMPILER_VERSION =  __clang_major__;
+	inline const constinit /*constexpr*/ auto _COMPILER =  "clang";
+	inline const constinit /*constexpr*/ auto _COMPILER_VERSION =  __clang_major__;
 #elif defined(__GNUC__)
 	//__GNUC__
 	//__GNUC_MINOR__
 	//__GNUC_PATCHLEVEL__
-	inline const constexpr auto _COMPILER =  "gcc";
-	inline const constexpr auto _COMPILER_VERSION =  __GNUC__;
+	inline const constinit /*constexpr*/ auto _COMPILER =  "gcc";
+	inline const constinit /*constexpr*/ auto _COMPILER_VERSION =  __GNUC__;
 #else
-	inline const constexpr auto _COMPILER =  "unknown";
-	inline const constexpr auto _COMPILER_VERSION = 0;
+	inline const constinit /*constexpr*/ auto _COMPILER =  "unknown";
+	inline const constinit /*constexpr*/ auto _COMPILER_VERSION = 0;
 #endif
 
 #pragma clang diagnostic pop
@@ -776,6 +775,8 @@ void printt(void) {
 
 using fmt::print;
 using fmt::println;
+using fmt::vprint;
+//using fmt::vprintln;
 
 //void println() {
 //	LOCKIOSTREAM_SLOW
@@ -790,12 +791,15 @@ template <typename... Args>
 void vprint(std::string_view fmt_str, Args&&... args) {
 	LOCKIOSTREAM_SLOW
 	std::cout << fmt::vformat(fmt_str, fmt::make_format_args(args...));
+//	fmt::vformat_to(std::cout, fmt_str, fmt::make_format_args(args...));
 }
 
 template <typename... Args>
 void vprintln(std::string_view fmt_str, Args&&... args) {
 	LOCKIOSTREAM_SLOW
 	std::cout << fmt::vformat(fmt_str, fmt::make_format_args(args...)) << std::endl;
+//	fmt::vformat_to(std::cout, fmt_str, fmt::make_format_args(args...));
+//	std::cout << std::endl;
 }
 
 //////////
@@ -804,20 +808,11 @@ void vprintln(std::string_view fmt_str, Args&&... args) {
 
 // not using fmt/std::vformat because we want to return a var
 template <typename... Args>
-ND var xvformat(std::string_view fmt_str, Args&&... args) {
+ND var xvformat(SV fmt_str, Args&&... args) {
 //	return fmt::vformat(fmt_str, fmt::make_format_args(std::forward<Args>(args)...));
 //error: cannot bind non-const lvalue reference of type ‘exodus::var&’ to an rvalue of type ‘exodus::var’
 	return fmt::vformat(fmt_str, fmt::make_format_args(args...));
 }
-
-// TODO dduplicate from var.h
-#if __GNUC__ >= 7 || __clang_major__ > 15
-    // Compile time or rumtime?
-#   define EXO_FORMAT_STRING_TYPE2 fmt::format_string<Args...>
-#else
-    // Always run time?
-#   define EXO_FORMAT_STRING_TYPE2 SV
-#endif
 
 // not using fmt/std::vformat because we want to return a var
 template <typename... Args>

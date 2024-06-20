@@ -238,6 +238,8 @@ inline const long double VAR_LOW_DOUBLE = static_cast<long double>(-1.7976931348
 	////////////
 
 //"final" to prevent inheritance because var has a destructor which is non-virtual to save space and time
+// However, since the destructor is trivial and non-essential perhaps lack of virtual is OK as long as
+// derived classes do not require special polymorphic destruction.
 class PUBLIC var final {
 
 	///////////////////////
@@ -251,8 +253,8 @@ class PUBLIC var final {
 
 	// All mutable because asking for a string can create it from an integer and vice versa
 	mutable std::string var_str; // 32 bytes on g++. is default constructed to empty string
-	mutable varint_t    var_int; // 8 bytes/64 bits - currently defined as a long long
-	mutable double      var_dbl; // 8 bytes/64 buts - double
+	mutable varint_t    var_int = 0;// 8 bytes/64 bits - currently defined as a long long
+	mutable double      var_dbl = 0; // 8 bytes/64 buts - double
 	mutable VARTYP      var_typ; // Default initialised to VARTYP_UNA
 	                             // Actually a unsigned int which will be 4 bytes
 
@@ -298,7 +300,7 @@ class PUBLIC var final {
 	// Inline for speed but slows compilation unless optimising switched off
 #define VAR_SAFE_DESTRUCTOR
 #ifdef VAR_SAFE_DESTRUCTOR
-	~var() {
+	constexpr ~var() {
 		//std::cout << "dtor:" << var_str << std::endl;
 
 		// try to ensure any memory is not later recognises as initialised memory
@@ -313,14 +315,14 @@ class PUBLIC var final {
 #endif
 	}
 #else
-	~var() = default;
+	constexpr ~var() = default;
 #endif
 
 	//////////////////////
 	// 3. Copy constructor - Cant use default because we need to throw if rhs is unassigned
 	//////////////////////
 	//
-	var(CVR rhs)
+	constexpr var(CVR rhs)
 		:
 		var_str(rhs.var_str),
 		var_int(rhs.var_int),
@@ -341,7 +343,7 @@ class PUBLIC var final {
 	//
 	// If noexcept then STL containers will use move during various operations otherwise they will use copy
 	// We will use default since temporaries are unlikely to be undefined or unassigned and we will skip the usual checks
-	var(TVR fromvar) noexcept = default;
+	constexpr var(TVR fromvar) noexcept = default;
 
 	/////////////////////
 	// 5. copy assignment - from lvalue
@@ -362,7 +364,7 @@ class PUBLIC var final {
 	// Cannot use default copy assignment because
 	// a) it returns a value allowing accidental use of "=" instead of == in if statements
 	// b) doesnt check if rhs is assigned
-	void operator=(CVR rhs) & {
+	constexpr void operator=(CVR rhs) & {
 
 		//assertDefined(__PRETTY_FUNCTION__);  //could be skipped for speed?
 		rhs.assertAssigned(__PRETTY_FUNCTION__);
@@ -392,14 +394,14 @@ class PUBLIC var final {
 
 	// Prevent assigning to temporaries
 	// xyz.f(2) = "abc"; // Must not compile
-	void operator=(TVR rhs) && noexcept = delete;
+	constexpr void operator=(TVR rhs) && noexcept = delete;
 
 	// Cannot use the default move assignment because
 	// a) It returns a value allowing accidental use of "=" in if statements instead of ==
 	// b) It doesnt check if rhs is assigned although this is
 	//    is less important for temporaries which are rarely unassigned.
 	//var& operator=(TVR rhs) & noexcept = default;
-	void operator=(TVR rhs) & noexcept {
+	constexpr void operator=(TVR rhs) & noexcept {
 
 		// Skipped for speed
 		//assertDefined(__PRETTY_FUNCTION__);
@@ -457,7 +459,7 @@ class PUBLIC var final {
 		unsigned long
 		unsigned long long (C++11)
 	*/
-	var(Integer rhs)
+	constexpr var(Integer rhs)
 		:
 		var_int(rhs),
 		var_typ(VARTYP_INT) {
@@ -487,7 +489,7 @@ class PUBLIC var final {
 		double,
 		long double
 	*/
-	var(FloatingPoint rhs)
+	constexpr var(FloatingPoint rhs)
 		:
 		var_dbl(static_cast<double>(rhs)),
 		var_typ(VARTYP_DBL) {
@@ -521,7 +523,7 @@ class PUBLIC var final {
 		std::string_view,
 		char*,
 	*/
-	var(StringLike&& fromstr)
+	constexpr var(StringLike&& fromstr)
 		:
 		var_str(std::forward<StringLike>(fromstr)),
 		var_typ(VARTYP_STR) {
@@ -531,7 +533,7 @@ class PUBLIC var final {
 
 	// memory block
 	///////////////
-	var(const char* charstart, const size_t nchars)
+	constexpr var(const char* charstart, const size_t nchars)
 		:
 		var_typ(VARTYP_STR) {
 
@@ -629,6 +631,7 @@ class PUBLIC var final {
 	// int, double, cstr etc.
 	/////////////////////////
 	var(std::initializer_list<T> list)
+	//constexpr var(std::initializer_list<T> list)
 		:
 		var_typ(VARTYP_STR) {
 
@@ -2023,37 +2026,46 @@ class PUBLIC var final {
 #ifdef EXO_FORMAT
 
 #if __GNUC__ >= 7 || __clang_major__ > 15
-	// Compile time or rumtime?
-#	define EXO_FORMAT_STRING_TYPE fmt::format_string<var, Args...>
+	// Works at compile time (only? or if possible)
+#	define EXO_FORMAT_STRING_TYPE1 fmt::format_string<var, Args...>
+#	define EXO_FORMAT_STRING_TYPE2 fmt::format_string<Args...>
 #else
-	// Always run time?
-#	define EXO_FORMAT_STRING_TYPE SV
+	// Always run time
+#	define EXO_FORMAT_STRING_TYPE1 SV
+#	define EXO_FORMAT_STRING_TYPE2 SV
 #endif
 
 template<class... Args>
-	ND var format(EXO_FORMAT_STRING_TYPE fmt_str, Args&&... args) {
+	ND constexpr var format(EXO_FORMAT_STRING_TYPE1&& fmt_str, Args&&... args) const {
+
+//error: call to consteval function 'fmt::basic_format_string<char, exodus::var &>
+//::basic_format_string<fmt::basic_format_string<char, const exodus::var &>, 0>' is not a constant expression
+// 2033 |                         return fmt::format(fmt_str, *this, args... );
+//      |                                            ^
+
+#if __clang_major__ == 0
+#if __cpp_if_consteval >= 202106L
+		if consteval {
+#else
+		if (std::is_constant_evaluated()) {
+#endif
+// OK in 2404 g++ but not OK in 2404 clang
 // clang on 22.04 cannot accept compile time format string even if a cstr
 ///root/exodus/test/src/test_format.cpp:14:18: error: call to consteval function 'fmt::basic_format_string<char, exodus::var>::basic_format_string<ch
 //ar[7], 0>' is not a constant expression
 //        assert(x.format("{:.2f}").outputl() == "12.35");
 
-//// OK in 2404 g++ but not OK in 2404 clang
-//#if __cpp_if_consteval >= 202106L
-////error: call to consteval function 'fmt::basic_format_string<char, exodus::var &>
-////::basic_format_string<fmt::basic_format_string<char, const exodus::var &>, 0>' is not a constant expression
-//// 2033 |                         return fmt::format(fmt_str, *this, args... );
-////      |                                            ^
+			return fmt::format(std::forward<EXO_FORMAT_STRING_TYPE1>(fmt_str), *this, std::forward<Args>(args)... );
+		} else
+#endif
 
-//		if consteval {
-//			return fmt::format(fmt_str, *this, std::forward<Args>(args)... );
-//          return fmt::format(fmt_str, *this, std::forward<Args>(args)... );
-//		} else {
-//#endif
-		return fmt::vformat(fmt_str, fmt::make_format_args(*this, std::forward<Args>(args)...) );
+		{
+			return fmt::vformat(fmt_str, fmt::make_format_args(*this, std::forward<Args>(args)...) );
+		}
 	}
 
 	template<class... Args>
-	ND var vformat(SV fmt_str, Args&&... args) {
+	ND var vformat(SV fmt_str, Args&&... args) const {
 		return fmt::vformat(fmt_str, fmt::make_format_args(*this, args...) );
 	}
 
