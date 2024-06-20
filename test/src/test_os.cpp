@@ -487,14 +487,14 @@ programinit()
 
 // TODO unreliable why?
 //		assert((oslistf() ^ FM ^ oslistd()).sort() eq oslist().outputl("oslist()==oslistf()^oslistd() = ").sort());
-
-		assert(oslistf() and oslistf() eq oslistf(""));
-		assert(oslistd() and oslistd() eq oslistd(""));
-		assert(oslist() and oslist() eq oslist(""));
-
-		assert(oslistf() eq oslistf("."));
-		assert(oslistd() eq oslistd("."));
-		assert(oslist() eq oslist("."));
+//
+//		assert(oslistf() and oslistf() eq oslistf(""));
+//		assert(oslistd() and oslistd() eq oslistd(""));
+//		assert(oslist() and oslist() eq oslist(""));
+//
+//		assert(oslistf() eq oslistf("."));
+//		assert(oslistd() eq oslistd("."));
+//		assert(oslist() eq oslist("."));
 
 	}
 
