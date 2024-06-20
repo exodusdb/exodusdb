@@ -17,7 +17,8 @@ class VARTYP {
  public:
 
 	// default constructor
-	constexpr VARTYP() = default;
+	constexpr
+	VARTYP() = default;
 	//VARTYP() : flags(0) {
 	//    std::cout<<"def ctor2"
 	//    << std::endl;
@@ -25,6 +26,7 @@ class VARTYP {
 
 	// copy constructor
 	// warning: definition of implicit copy assignment operator for 'VARTYP' is deprecated because it has a user-declared copy constructor [-Wdeprecated-copy]
+	constexpr
 	VARTYP(const VARTYP& rhs) = default;
 	//VARTYP(const VARTYP& rhs) : flags_(rhs.flags_) {
 	//    std::cout<<"copy ctor "<< rhs.flags
@@ -32,36 +34,42 @@ class VARTYP {
 	//};
 
 	// copy assignment
+	constexpr
 	VARTYP& operator=(const VARTYP& rhs) = default;
 
 	// constructor from unsigned int
-	constexpr VARTYP(const unsigned int rhs)
+	constexpr
+	VARTYP(const unsigned int rhs)
 		: flags_(rhs){}
 
 	// assign from unsigned int
-	constexpr VARTYP& operator=(const unsigned int rhs) {
+	constexpr
+	VARTYP& operator=(const unsigned int rhs) {
 		flags_ = rhs;
 		return *this;
 	}
 
 	// bitwise mutators: xor, or, and
+	constexpr
 	VARTYP& operator^=(const unsigned int rhs) {flags_ ^= rhs; return *this; }
+	constexpr
 	VARTYP& operator|=(const unsigned int rhs) {flags_ |= rhs; return *this; }
+	constexpr
 	VARTYP& operator&=(const unsigned int rhs) {flags_ &= rhs; return *this; }
 
 	// logical comparison with int and self
-	ND bool operator==(const unsigned int rhs) const { return flags_ == rhs; }
-	ND bool operator!=(const unsigned int rhs) const { return flags_ != rhs; }
-	ND bool operator==(const VARTYP rhs) const { return flags_ == rhs.flags_; }
-	ND bool operator!=(const VARTYP rhs) const { return flags_ != rhs.flags_; }
+	ND constexpr bool operator==(const unsigned int rhs) const { return flags_ == rhs; }
+	ND constexpr bool operator!=(const unsigned int rhs) const { return flags_ != rhs; }
+	ND constexpr bool operator==(const VARTYP rhs) const { return flags_ == rhs.flags_; }
+	ND constexpr bool operator!=(const VARTYP rhs) const { return flags_ != rhs.flags_; }
 
 	// bitwise accessors
-	VARTYP operator&(const unsigned int rhs) const { return flags_ & rhs; }
-	VARTYP operator|(const unsigned int rhs) const { return flags_ | rhs; }
-	VARTYP operator~() const { return VARTYP(~flags_); }
+	constexpr VARTYP operator&(const unsigned int rhs) const { return flags_ & rhs; }
+	constexpr VARTYP operator|(const unsigned int rhs) const { return flags_ | rhs; }
+	constexpr VARTYP operator~() const { return VARTYP(~flags_); }
 
 	// int - not explicit so we can do "if (var_typ)"
-	operator int() const { return flags_; }
+	constexpr operator int() const { return flags_; }
 
 }; // class VARTYP
 

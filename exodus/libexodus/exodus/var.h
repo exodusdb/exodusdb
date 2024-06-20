@@ -34,10 +34,14 @@ THE SOFTWARE.
 #include <iostream>
 #include <string>
 #include <string_view>
+
+// Capture function execution times and dump on program exit
+// Use cmake -DEXODUS_TIMEBANK
 #ifdef EXODUS_TIMEBANK
 #	include "timebank.h"
 #endif
 
+// Support var::format functions
 #define EXO_FORMAT
 #ifdef EXO_FORMAT
 #   pragma GCC diagnostic ignored "-Winline"
@@ -77,6 +81,26 @@ THE SOFTWARE.
 //#endif
 
 #define ND [[nodiscard]]
+
+// Make var constexpr/constinit
+#if __cpp_lib_constexpr_string >= 201907L
+// Ubuntu 22.04 g++12
+#	define CONSTEXPR constexpr
+#	define CONSTINIT constinit
+#	define CONSTINIT_OR_EXPR constinit
+
+#if ( __GNUC__  >= 13 ) || ( __clang_major__ > 1)
+#		define CONSTINIT_VAR constinit
+#	else
+#		define CONSTINIT_VAR
+#	endif
+
+#else
+#	define CONSTEXPR
+#	define CONSTINIT
+#	define CONSTINIT_OR_EXPR constexpr
+#	define CONSTINIT_VAR
+#endif
 
 #include <exodus/vartyp.h>
 
@@ -300,7 +324,8 @@ class PUBLIC var final {
 	// Inline for speed but slows compilation unless optimising switched off
 #define VAR_SAFE_DESTRUCTOR
 #ifdef VAR_SAFE_DESTRUCTOR
-	constexpr ~var() {
+	CONSTEXPR
+	~var() {
 		//std::cout << "dtor:" << var_str << std::endl;
 
 		// try to ensure any memory is not later recognises as initialised memory
@@ -315,14 +340,16 @@ class PUBLIC var final {
 #endif
 	}
 #else
-	constexpr ~var() = default;
+	CONSTEXPR
+	~var() = default;
 #endif
 
 	//////////////////////
 	// 3. Copy constructor - Cant use default because we need to throw if rhs is unassigned
 	//////////////////////
 	//
-	constexpr var(CVR rhs)
+	CONSTEXPR
+	var(CVR rhs)
 		:
 		var_str(rhs.var_str),
 		var_int(rhs.var_int),
@@ -343,7 +370,8 @@ class PUBLIC var final {
 	//
 	// If noexcept then STL containers will use move during various operations otherwise they will use copy
 	// We will use default since temporaries are unlikely to be undefined or unassigned and we will skip the usual checks
-	constexpr var(TVR fromvar) noexcept = default;
+	CONSTEXPR
+	var(TVR fromvar) noexcept = default;
 
 	/////////////////////
 	// 5. copy assignment - from lvalue
@@ -364,7 +392,8 @@ class PUBLIC var final {
 	// Cannot use default copy assignment because
 	// a) it returns a value allowing accidental use of "=" instead of == in if statements
 	// b) doesnt check if rhs is assigned
-	constexpr void operator=(CVR rhs) & {
+	CONSTEXPR
+	void operator=(CVR rhs) & {
 
 		//assertDefined(__PRETTY_FUNCTION__);  //could be skipped for speed?
 		rhs.assertAssigned(__PRETTY_FUNCTION__);
@@ -394,14 +423,16 @@ class PUBLIC var final {
 
 	// Prevent assigning to temporaries
 	// xyz.f(2) = "abc"; // Must not compile
-	constexpr void operator=(TVR rhs) && noexcept = delete;
+	CONSTEXPR
+	void operator=(TVR rhs) && noexcept = delete;
 
 	// Cannot use the default move assignment because
 	// a) It returns a value allowing accidental use of "=" in if statements instead of ==
 	// b) It doesnt check if rhs is assigned although this is
 	//    is less important for temporaries which are rarely unassigned.
 	//var& operator=(TVR rhs) & noexcept = default;
-	constexpr void operator=(TVR rhs) & noexcept {
+	CONSTEXPR
+	void operator=(TVR rhs) & noexcept {
 
 		// Skipped for speed
 		//assertDefined(__PRETTY_FUNCTION__);
@@ -459,7 +490,8 @@ class PUBLIC var final {
 		unsigned long
 		unsigned long long (C++11)
 	*/
-	constexpr var(Integer rhs)
+	CONSTEXPR
+	var(Integer rhs)
 		:
 		var_int(rhs),
 		var_typ(VARTYP_INT) {
@@ -489,7 +521,8 @@ class PUBLIC var final {
 		double,
 		long double
 	*/
-	constexpr var(FloatingPoint rhs)
+	CONSTEXPR
+	var(FloatingPoint rhs)
 		:
 		var_dbl(static_cast<double>(rhs)),
 		var_typ(VARTYP_DBL) {
@@ -523,7 +556,8 @@ class PUBLIC var final {
 		std::string_view,
 		char*,
 	*/
-	constexpr var(StringLike&& fromstr)
+	CONSTEXPR
+	var(StringLike&& fromstr)
 		:
 		var_str(std::forward<StringLike>(fromstr)),
 		var_typ(VARTYP_STR) {
@@ -531,9 +565,20 @@ class PUBLIC var final {
 		//std::cerr << "var(str)" << std::endl;
 	}
 
+//	// only for g++12 which cant constexpr from cstr
+//	// char*
+//	/////////
+//	CONSTEXPR
+//	var(const char* cstr1)
+//		:
+//		var_str(cstr1),
+//		var_typ(VARTYP_STR){
+//	}
+
 	// memory block
 	///////////////
-	constexpr var(const char* charstart, const size_t nchars)
+	CONSTEXPR
+	var(const char* charstart, const size_t nchars)
 		:
 		var_typ(VARTYP_STR) {
 
@@ -544,12 +589,13 @@ class PUBLIC var final {
 	// char
 	///////
 	//must be separate from unsigned int contructor to get a string/char not an int/ character number
+	CONSTEXPR
 	var(const char char1) noexcept
 		:
-		var_str(1, char1),
+		//var_str(1, char1), // not liked by what?
 		var_typ(VARTYP_STR) {
-
-			//std::cerr << "var(char)" << std::endl;
+		var_str = char1;
+		//std::cerr << "var(char)" << std::endl;
 	}
 
 
@@ -570,6 +616,7 @@ class PUBLIC var final {
 		u32char*,
 		u32char
 	*/
+	//CONSTEXPR
 	var(W& from_wstr)
 		:
 		var_typ(VARTYP_STR)	{
@@ -583,6 +630,7 @@ class PUBLIC var final {
 
 	// wchar*
 	/////////
+	//CONSTEXPR
 	var(const wchar_t* wcstr1)
 		:
 		var_str(var(std::wstring(wcstr1)).var_str),
@@ -630,13 +678,14 @@ class PUBLIC var final {
 	template <class T>
 	// int, double, cstr etc.
 	/////////////////////////
+	CONSTEXPR
 	var(std::initializer_list<T> list)
-	//constexpr var(std::initializer_list<T> list)
 		:
 		var_typ(VARTYP_STR) {
 
 		for (auto item : list) {
-			(*this) ^= item;
+			//(*this) ^= item;
+			var_str += std::string_view(var(item));
 			var_str.push_back(FM_);
 		}
 		if (!var_str.empty())
@@ -831,6 +880,7 @@ class PUBLIC var final {
 		return var_str;
 	}
 
+	CONSTEXPR
 	operator std::string_view() const {
 		assertString(__PRETTY_FUNCTION__);
 		return std::string_view(var_str);
@@ -1755,11 +1805,162 @@ class PUBLIC var final {
 	//////////////
 
 	ND var seq() const;     // byte
-	ND var textseq() const;
-	ND var len() const;     // bytes
-	ND var textwidth() const;     // number of output columns. Allows multi column unicode and reduces combining characters etc.
-	bool isnum() const;     // integer or floating point. optional prefix -, + disallowed, solitary . and - not allowed. Empty string is numeric 0
 
+	ND var textseq() const;
+
+	ND var len() const;     // bytes
+
+	// number of output columns. Allows multi column unicode and reduces combining characters etc. like e followed by grave accent
+	// Possibly does not properly calculate combining sequences of graphemes e.g. face followed by colour
+	ND var textwidth() const;
+
+	// integer or floating point. optional prefix -, + disallowed, solitary . and - not allowed. Empty string is numeric 0
+	CONSTEXPR
+	bool isnum() const;
+
+///////////////
+//// var::isnum
+///////////////
+//
+//// RULES need updating since we are now allowing E/e scientific notation
+////
+//// numeric is one of four regular expressions or zero length string
+////^$			zero length string
+////[+-]?9+		eg 999
+////[+-]?9+.		eg 999.
+////[+-]?.9+		eg .999
+////[+-]?9+.9+	eg 999.999
+//// where the last four examples may also have a + or - character prefix
+//
+//// be careful that the following are NOT numeric. regexp [+-]?[.]?
+//// + - . +. -.
+//
+//// rules
+//// 0. zero length string is numeric integer 0
+//// 1. any + or - must be the first character
+//// 2. point may occur 0 or 1 times
+//// 3. digits (0-9) must occur 1 or more times (but see rule 0.)
+//// 4. all characters mean non-numeric
+//
+////CONSTEXPR bool var::isnum(void) const {
+//CONSTEXPR bool isnum(void) const {
+//
+//	// TODO make isnum private and ensure ISDEFINED is checked before all calls to isnum
+//	// to save the probably double check here
+//	this->assertDefined(__PRETTY_FUNCTION__);
+//
+//	// Known to be numeric already
+//	if (var_typ & VARTYP_INTDBL)
+//		return true;
+//
+//	// Known to be not numeric already
+//	// maybe put this first if comparison operations on strings are more frequent than numeric
+//	// operations on numbers
+//	if (var_typ & VARTYP_NAN)
+//		return false;
+//
+//	// Not assigned error
+//	if (!var_typ)
+//		throw VarUnassigned("isnum()");
+//
+//	// Empty string is zero. Leave the string as "".
+//	auto strlen = var_str.size();
+//	if (strlen == 0) {
+//		var_int = 0;
+//		var_typ = VARTYP_INTSTR;
+//		return true;
+//	}
+//
+//	// Preparse the string to detect if integer or decimal or many types of non-numeric
+//	// We need to detect NAN ASAP because string comparison always attempts to compare numerically.
+//	// The parsing does not need to be perfect since we will rely
+//	// on from_chars for the final parsing
+//	bool floating = false;
+//	bool has_sign = false;
+//	for (std::size_t ii = 0; ii < strlen; ii++) {
+//		char cc = var_str[ii];
+//
+//		// +   2B
+//		// -   2D
+//		// .   2E
+//		// 0-9 30-39
+//		// E   45
+//		// e   65
+//
+//		// Ideally we put the most divisive test first
+//		// but, assuming that non-numeric strings are tested more frequently
+//		// then following is perhaps not the best choice.
+//		if (cc >= '0' and cc <= '9')
+//			continue;
+//
+//		switch (cc) {
+//
+//		case '.':
+//			floating = true;
+//			break;
+//
+//		case '-':
+//		case '+':
+//			// Disallow more than one sign eg "+-999"
+//			// Disallow a single + since it will be trimmed off below
+//			if (has_sign or strlen == 0) {
+//				var_typ = VARTYP_NANSTR;
+//				return false;
+//			}
+//			has_sign = true;
+//			break;
+//
+//		case 'e':
+//		case 'E':
+//			floating = true;
+//			// Allow a sign again after any e/E
+//			has_sign = false;
+//			break;
+//
+//		default:
+//			var_typ = VARTYP_NANSTR;
+//			return false;
+//		}
+//	}
+//
+//#pragma GCC diagnostic push
+//#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
+//	char* firstchar = var_str.data();
+//	char* lastchar = firstchar + strlen;
+//
+//	// Skip leading + to be compatible with javascript
+//	// from_chars does not allow it.
+//	firstchar += *firstchar == '+';
+//#pragma GCC diagnostic pop
+//
+//	if (floating) {
+//
+//		// to double
+//		auto [p, ec] = STD_OR_FASTFLOAT::from_chars(firstchar, lastchar, var_dbl);
+//		if (ec != std::errc() || p != lastchar) {
+//			var_typ = VARTYP_NANSTR;
+//			return false;
+//		}
+//
+//		// indicate that the var is a string and a double
+//		var_typ = VARTYP_DBLSTR;
+//
+//	} else {
+//
+//		// to long int
+//		auto [p, ec] = std::from_chars(firstchar, lastchar, var_int);
+//		if (ec != std::errc() || p != lastchar) {
+//			var_typ = VARTYP_NANSTR;
+//			return false;
+//		}
+//
+//		// indicate that the var is a string and a long int
+//		var_typ = VARTYP_INTSTR;
+//	}
+//
+//	return true;
+//}
+//
 	// STRING SCANNING
 	//////////////////
 
@@ -2036,7 +2237,8 @@ class PUBLIC var final {
 #endif
 
 template<class... Args>
-	ND constexpr var format(EXO_FORMAT_STRING_TYPE1&& fmt_str, Args&&... args) const {
+	ND CONSTEXPR
+	var format(EXO_FORMAT_STRING_TYPE1&& fmt_str, Args&&... args) const {
 
 //error: call to consteval function 'fmt::basic_format_string<char, exodus::var &>
 //::basic_format_string<fmt::basic_format_string<char, const exodus::var &>, 0>' is not a constant expression
@@ -2343,12 +2545,14 @@ template<class... Args>
 
 	// WARNING: MUST NOT use any var when checking Undefined
 	// OTHERWISE *WILL* get recursion/segfault
+	CONSTEXPR
 	void assertDefined(const char* message, const char* varname = "") const {
 		if (var_typ & VARTYP_MASK)
 			[[unlikely]]
 			throwUndefined(var(varname) ^ " in " ^ message);
 	}
 
+	CONSTEXPR
 	void assertAssigned(const char* message, const char* varname = "") const {
 		assertDefined(message, varname);
 		if (!var_typ)
@@ -2356,12 +2560,14 @@ template<class... Args>
 			throwUnassigned(var(varname) ^ " in " ^ message);
 	}
 
+	CONSTEXPR
 	void assertNumeric(const char* message, const char* varname = "") const {
 		if (!this->isnum())
 			[[unlikely]]
 			throwNonNumeric(var(varname) ^ " in " ^ var(message) ^ " data: " ^ this->first(128).quote());
 	}
 
+	CONSTEXPR
 	void assertDecimal(const char* message, const char* varname = "") const {
 		assertNumeric(message, varname);
 		if (!(var_typ & VARTYP_DBL)) {
@@ -2371,6 +2577,7 @@ template<class... Args>
 		}
 	}
 
+	CONSTEXPR
 	void assertInteger(const char* message, const char* varname = "") const {
 		assertNumeric(message, varname);
 		if (!(var_typ & VARTYP_INT)) {
@@ -2396,6 +2603,7 @@ template<class... Args>
 		}
 	}
 
+	CONSTEXPR
 	void assertString(const char* message, const char* varname = "") const {
 		assertDefined(message, varname);
 		if (!(var_typ & VARTYP_STR)) {
@@ -2406,6 +2614,7 @@ template<class... Args>
 		}
 	}
 
+	CONSTEXPR
 	void assertStringMutator(const char* message, const char* varname = "") const {
 		assertString(message, varname);
 		// VERY IMPORTANT:
@@ -2691,16 +2900,16 @@ ND inline var_proxy3 var::operator()(int fieldno, int valueno, int subvalueno) {
 	PUBLIC extern const char* const _OS_VERSION;
 
 #ifdef EXO_VAR_CPP
-	const var RM = RM_;
-	const var FM = FM_;
-	const var VM = VM_;
-	const var SM = SM_;
-	const var TM = TM_;
-	const var ST = ST_;
+	CONSTINIT_VAR const var RM = RM_;
+	CONSTINIT_VAR const var FM = FM_;
+	CONSTINIT_VAR const var VM = VM_;
+	CONSTINIT_VAR const var SM = SM_;
+	CONSTINIT_VAR const var TM = TM_;
+	CONSTINIT_VAR const var ST = ST_;
 
-	const var BS = BS_;
-	const var DQ = DQ_;
-	const var SQ = SQ_;
+	CONSTINIT_VAR const var BS = BS_;
+	CONSTINIT_VAR const var DQ = DQ_;
+	CONSTINIT_VAR const var SQ = SQ_;
 
 #ifdef EXO_OS_NAME
 	const char* const _OS_NAME = EXO_OS_NAME;
