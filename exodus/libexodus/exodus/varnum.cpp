@@ -843,7 +843,7 @@ double var::toDouble() const {
 // 3. digits (0-9) must occur 1 or more times (but see rule 0.)
 // 4. all characters mean non-numeric
 
-CONSTEXPR
+//CONSTEXPR
 bool var::isnum(void) const {
 
 	// TODO make isnum private and ensure ISDEFINED is checked before all calls to isnum

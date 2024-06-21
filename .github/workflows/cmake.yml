@@ -16,8 +16,7 @@ jobs:
 
           - UBUNTU_VER: "24.04"
             PG_VER:
-#            COMPILER: g++-latest
-            COMPILER: g++
+            COMPILER: g++-latest
 
           - UBUNTU_VER: "24.04"
             PG_VER:

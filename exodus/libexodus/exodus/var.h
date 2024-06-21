@@ -82,23 +82,42 @@ THE SOFTWARE.
 
 #define ND [[nodiscard]]
 
-// Make var constexpr/constinit
+// constinit https://en.cppreference.com/w/cpp/language/constinit
+//
+// constinit - asserts that a variable has static initialization,
+// i.e. zero initialization and constant initialization, otherwise the program is ill-formed.
+//
+// The constinit specifier declares a variable with static or thread storage duration.
+// If a variable is declared with constinit, its initializing declaration must be applied with constinit.
+// If a variable declared with constinit has dynamic initialization
+// (even if it is performed as static initialization), the program is ill-formed.
+// If no constinit declaration is reachable at the point of the initializing declaration,
+// the program is ill-formed, no diagnostic required.
+//
+// constinit cannot be used together with constexpr.
+// When the declared variable is a reference, constinit is equivalent to constexpr.
+// When the declared variable is an object, constexpr mandates that the object must
+// have static initialization and constant destruction and makes the object const-qualified,
+// however, constinit does not mandate constant destruction and const-qualification.
+// As a result, an object of a type which has constexpr constructors and no constexpr destructor
+// (e.g. std::shared_ptr<T>) might be declared with constinit but not constexpr.
+
+// Make var constinit/constexpr if std::string is constexpr (c++20 but g++-12 has some limitation)
+//
 #if __cpp_lib_constexpr_string >= 201907L
-// Ubuntu 22.04 g++12
 #	define CONSTEXPR constexpr
-#	define CONSTINIT constinit
-#	define CONSTINIT_OR_EXPR constinit
+#	define CONSTINIT_OR_CONSTEXPR constinit const // const because constexpr implies const
 
 #if ( __GNUC__  >= 13 ) || ( __clang_major__ > 1)
 #		define CONSTINIT_VAR constinit
 #	else
+		// Ubuntu 22.04 g++12 doesnt support constinit var
 #		define CONSTINIT_VAR
 #	endif
 
 #else
 #	define CONSTEXPR
-#	define CONSTINIT
-#	define CONSTINIT_OR_EXPR constexpr
+#	define CONSTINIT_OR_CONSTEXPR constexpr
 #	define CONSTINIT_VAR
 #endif
 
@@ -1815,152 +1834,9 @@ class PUBLIC var final {
 	ND var textwidth() const;
 
 	// integer or floating point. optional prefix -, + disallowed, solitary . and - not allowed. Empty string is numeric 0
-	CONSTEXPR
+	//CONSTEXPR
 	bool isnum() const;
 
-///////////////
-//// var::isnum
-///////////////
-//
-//// RULES need updating since we are now allowing E/e scientific notation
-////
-//// numeric is one of four regular expressions or zero length string
-////^$			zero length string
-////[+-]?9+		eg 999
-////[+-]?9+.		eg 999.
-////[+-]?.9+		eg .999
-////[+-]?9+.9+	eg 999.999
-//// where the last four examples may also have a + or - character prefix
-//
-//// be careful that the following are NOT numeric. regexp [+-]?[.]?
-//// + - . +. -.
-//
-//// rules
-//// 0. zero length string is numeric integer 0
-//// 1. any + or - must be the first character
-//// 2. point may occur 0 or 1 times
-//// 3. digits (0-9) must occur 1 or more times (but see rule 0.)
-//// 4. all characters mean non-numeric
-//
-////CONSTEXPR bool var::isnum(void) const {
-//CONSTEXPR bool isnum(void) const {
-//
-//	// TODO make isnum private and ensure ISDEFINED is checked before all calls to isnum
-//	// to save the probably double check here
-//	this->assertDefined(__PRETTY_FUNCTION__);
-//
-//	// Known to be numeric already
-//	if (var_typ & VARTYP_INTDBL)
-//		return true;
-//
-//	// Known to be not numeric already
-//	// maybe put this first if comparison operations on strings are more frequent than numeric
-//	// operations on numbers
-//	if (var_typ & VARTYP_NAN)
-//		return false;
-//
-//	// Not assigned error
-//	if (!var_typ)
-//		throw VarUnassigned("isnum()");
-//
-//	// Empty string is zero. Leave the string as "".
-//	auto strlen = var_str.size();
-//	if (strlen == 0) {
-//		var_int = 0;
-//		var_typ = VARTYP_INTSTR;
-//		return true;
-//	}
-//
-//	// Preparse the string to detect if integer or decimal or many types of non-numeric
-//	// We need to detect NAN ASAP because string comparison always attempts to compare numerically.
-//	// The parsing does not need to be perfect since we will rely
-//	// on from_chars for the final parsing
-//	bool floating = false;
-//	bool has_sign = false;
-//	for (std::size_t ii = 0; ii < strlen; ii++) {
-//		char cc = var_str[ii];
-//
-//		// +   2B
-//		// -   2D
-//		// .   2E
-//		// 0-9 30-39
-//		// E   45
-//		// e   65
-//
-//		// Ideally we put the most divisive test first
-//		// but, assuming that non-numeric strings are tested more frequently
-//		// then following is perhaps not the best choice.
-//		if (cc >= '0' and cc <= '9')
-//			continue;
-//
-//		switch (cc) {
-//
-//		case '.':
-//			floating = true;
-//			break;
-//
-//		case '-':
-//		case '+':
-//			// Disallow more than one sign eg "+-999"
-//			// Disallow a single + since it will be trimmed off below
-//			if (has_sign or strlen == 0) {
-//				var_typ = VARTYP_NANSTR;
-//				return false;
-//			}
-//			has_sign = true;
-//			break;
-//
-//		case 'e':
-//		case 'E':
-//			floating = true;
-//			// Allow a sign again after any e/E
-//			has_sign = false;
-//			break;
-//
-//		default:
-//			var_typ = VARTYP_NANSTR;
-//			return false;
-//		}
-//	}
-//
-//#pragma GCC diagnostic push
-//#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
-//	char* firstchar = var_str.data();
-//	char* lastchar = firstchar + strlen;
-//
-//	// Skip leading + to be compatible with javascript
-//	// from_chars does not allow it.
-//	firstchar += *firstchar == '+';
-//#pragma GCC diagnostic pop
-//
-//	if (floating) {
-//
-//		// to double
-//		auto [p, ec] = STD_OR_FASTFLOAT::from_chars(firstchar, lastchar, var_dbl);
-//		if (ec != std::errc() || p != lastchar) {
-//			var_typ = VARTYP_NANSTR;
-//			return false;
-//		}
-//
-//		// indicate that the var is a string and a double
-//		var_typ = VARTYP_DBLSTR;
-//
-//	} else {
-//
-//		// to long int
-//		auto [p, ec] = std::from_chars(firstchar, lastchar, var_int);
-//		if (ec != std::errc() || p != lastchar) {
-//			var_typ = VARTYP_NANSTR;
-//			return false;
-//		}
-//
-//		// indicate that the var is a string and a long int
-//		var_typ = VARTYP_INTSTR;
-//	}
-//
-//	return true;
-//}
-//
 	// STRING SCANNING
 	//////////////////
 
@@ -2560,14 +2436,14 @@ template<class... Args>
 			throwUnassigned(var(varname) ^ " in " ^ message);
 	}
 
-	CONSTEXPR
+	//CONSTEXPR
 	void assertNumeric(const char* message, const char* varname = "") const {
 		if (!this->isnum())
 			[[unlikely]]
 			throwNonNumeric(var(varname) ^ " in " ^ var(message) ^ " data: " ^ this->first(128).quote());
 	}
 
-	CONSTEXPR
+	//CONSTEXPR
 	void assertDecimal(const char* message, const char* varname = "") const {
 		assertNumeric(message, varname);
 		if (!(var_typ & VARTYP_DBL)) {
@@ -2577,7 +2453,7 @@ template<class... Args>
 		}
 	}
 
-	CONSTEXPR
+	//CONSTEXPR
 	void assertInteger(const char* message, const char* varname = "") const {
 		assertNumeric(message, varname);
 		if (!(var_typ & VARTYP_INT)) {

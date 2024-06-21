@@ -27,31 +27,25 @@ ND PUBLIC var getexecpath() {
 	return path;
 }
 
-//consteval size_t host_name_max = HOST_NAME_MAX;
-// HOST_NAME_MAX is 64 on Linux
-//constinit size_t host_name_max = 32;
-#if __cpp_constinit >= 201907
-	constinit
-#else
-	constexpr
-#endif
-	size_t host_name_max = 32;
-
 ND PUBLIC std::string gethostname() {
-//    char hostname[1024];
-//    hostname[1023] = '\0';
-//    ::gethostname(hostname, 1023);
-//	std::string hostname(' ', HOST_NAME_MAX);
-//	if (::gethostname(hostname.data(), HOST_NAME_MAX))
-	std::string hostname(host_name_max, ' ');
-	assert(hostname.size() == host_name_max);
-	if (::gethostname(hostname.data(), host_name_max))
+
+	// Acquire std::string space buffer for c function
+	// HOST_NAME_MAX is 64 on Ubuntu 24.04
+	// On Linux, HOST_NAME_MAX is defined with the value 64
+	std::string hostname(HOST_NAME_MAX, ' ');
+	assert(hostname.size() == HOST_NAME_MAX);
+
+	// man gethostname
+	if (::gethostname(hostname.data(), HOST_NAME_MAX)) {
+		// No hostname if any error
 		hostname = "";
-	else {
-		size_t pos = hostname.find('\0');
-		if (pos != std::string::npos)
-			hostname.erase(pos);
+		return hostname;
 	}
+
+	// Trim std string from trailing \0 return by c function
+	size_t pos = hostname.find('\0');
+	if (pos != std::string::npos)
+		hostname.erase(pos);
 
     return hostname;
 }

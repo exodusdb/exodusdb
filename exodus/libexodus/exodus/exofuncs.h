@@ -88,23 +88,26 @@ namespace exodus {
 
 #if defined _MSC_VER || defined __CYGWIN__ || defined __MINGW32__
 
-	CONSTINIT_VAR const var              EOL      = "\r\n";
-#	define                          _EOL        "\r\n"
+#	define                         _EOL        "\r\n"
+	CONSTINIT_VAR const var         EOL      = _EOL;
 
-	CONSTINIT_VAR const var              OSSLASH  = "\\";
-#	define                          _OSSLASH    "\\"
-	CONSTINIT_OR_EXPR char     OSSLASH_ = '\\';
-	CONSTINIT_OR_EXPR bool     OSSLASH_IS_BACKSLASH = true;
+#	define                         _OSSLASH    "\\"
+	CONSTINIT_VAR const var         OSSLASH  = _OSSLASH;
+
+	CONSTINIT_OR_CONSTEXPR auto     OSSLASH_ = '\\';
+
+	CONSTINIT_OR_CONSTEXPR auto     OSSLASH_IS_BACKSLASH = true;
 
 #else
 
-	CONSTINIT_VAR const var              EOL      {"\n"};
-#	define                          _EOL        "\n"
+#	define                          _EOL       "\n"
+	CONSTINIT_VAR const var          EOL     = _EOL;
 
-	CONSTINIT_VAR const var              OSSLASH  = "/";
-#	define                          _OSSLASH    "/"
-	CONSTINIT_OR_EXPR char     OSSLASH_ = '/';
-	CONSTINIT_OR_EXPR bool     OSSLASH_IS_BACKSLASH = false;
+#	define                         _OSSLASH    "/"
+	CONSTINIT_VAR const var         OSSLASH  = _OSSLASH;
+
+	CONSTINIT_OR_CONSTEXPR auto     OSSLASH_ = '/';
+	CONSTINIT_OR_CONSTEXPR auto     OSSLASH_IS_BACKSLASH = false;
 
 #endif
 
@@ -112,12 +115,16 @@ namespace exodus {
 	// We will extract the two digit year only - using integer division and integer remainder ops.
 	// Years e.g. 21 which are in between the actual standards like c++20, c++23, c++26 etc.
 	// indicate partial informal support for some features of the next standard
-	const CONSTINIT_OR_EXPR auto _CPP_STANDARD=__cplusplus / 100 % 1000;
+	// 20 c++20
+	// 21 some c++23
+	// 23 c++23
+	// 24 some c++26
+	CONSTINIT_OR_CONSTEXPR auto _CPP_STANDARD=__cplusplus / 100 % 1000;
 
 #if defined(_WIN64) or defined(_LP64)
-#	define                _PLATFORM   "x64"
+#	define                    _PLATFORM   "x64"
 #else
-#	define                _PLATFORM   "x86"
+#	define                    _PLATFORM   "x86"
 #endif
 	CONSTINIT_VAR const var    PLATFORM = _PLATFORM;
 
@@ -126,17 +133,17 @@ namespace exodus {
 	//__clang_minor__
 	//__clang_patchlevel__
 	//__clang_version__
-	inline const CONSTINIT_OR_EXPR auto _COMPILER =  "clang";
-	inline const CONSTINIT_OR_EXPR auto _COMPILER_VERSION =  __clang_major__;
+	inline CONSTINIT_OR_CONSTEXPR auto _COMPILER =  "clang";
+	inline CONSTINIT_OR_CONSTEXPR auto _COMPILER_VERSION =  __clang_major__;
 #elif defined(__GNUC__)
 	//__GNUC__
 	//__GNUC_MINOR__
 	//__GNUC_PATCHLEVEL__
-	inline const CONSTINIT_OR_EXPR auto _COMPILER =  "gcc";
-	inline const CONSTINIT_OR_EXPR auto _COMPILER_VERSION =  __GNUC__;
+	inline CONSTINIT_OR_CONSTEXPR auto _COMPILER =  "gcc";
+	inline CONSTINIT_OR_CONSTEXPR auto _COMPILER_VERSION =  __GNUC__;
 #else
-	inline const CONSTINIT_OR_EXPR auto _COMPILER =  "unknown";
-	inline const CONSTINIT_OR_EXPR auto _COMPILER_VERSION = 0;
+	inline CONSTINIT_OR_CONSTEXPR auto _COMPILER =  "unknown";
+	inline CONSTINIT_OR_CONSTEXPR auto _COMPILER_VERSION = 0;
 #endif
 
 #pragma clang diagnostic pop
