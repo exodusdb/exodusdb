@@ -205,6 +205,11 @@
 
 	else()
 
+#	add_compile_options(-Wno-undefined-inline)
+#	#/root/exodus/test/src/../../exodus/libexodus/exodus/var.h:1819:7: warning: inline function 'exodus::var::isnum' is not defined [-Wundefined-inline]
+#	# 1819 |         bool isnum() const;
+#	#      |              ^
+
 		# only for older clang 10.* etc. on Ubuntu 20.04
 #		if (CMAKE_CXX_COMPILER_VERSION MATCHES "^10.")
 			add_compile_options(-Wno-undef)
