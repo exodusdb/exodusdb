@@ -272,6 +272,10 @@ PUBLIC VARREF trimmerfirst(VARREF iostring, SV trimchars DEFAULT_SPACE) {return 
 PUBLIC VARREF trimmerlast(VARREF iostring, SV trimchars DEFAULT_SPACE) {return iostring.trimmerlast(trimchars);}
 PUBLIC VARREF trimmerboth(VARREF iostring, SV trimchars DEFAULT_SPACE) {return iostring.trimmerboth(trimchars);}
 
+ND PUBLIC var first(CVR instring) {return instring.first();}
+ND PUBLIC var last(CVR instring) {return instring.last();}
+ND PUBLIC var first(CVR instring, const int nbytes) {return instring.first(nbytes);}
+ND PUBLIC var last(CVR instring, const int nbytes) {return instring.last(nbytes);}
 
 ND PUBLIC var chr(const int integer) {return var().chr(integer);}
 ND PUBLIC var textchr(const int integer) {return var().textchr(integer);}

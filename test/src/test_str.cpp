@@ -19,11 +19,15 @@ programinit()
 		}
 		catch (VarNonPositive& e) {e.description.errputl();}
 
+		assert(f.first() eq "a");
 		assert(f.first(0) eq "");
 		assert(f.first(1) eq "a");
 		assert(f.first(2) eq "ab");
 		assert(f.first(3) eq "abc");
 		assert(f.first(4) eq "abc");
+
+		assert(first(f) eq "a");
+		assert(first(f, 2) eq "ab");
 
 		// var::last(n)
 
@@ -35,11 +39,15 @@ programinit()
 		}
 		catch (VarNonPositive& e) {e.description.errputl();}
 
+		assert(l.last() eq "c");
 		assert(l.last(0) eq "");
 		assert(l.last(1) eq "c");
 		assert(l.last(2) eq "bc");
 		assert(l.last(3) eq "abc");
 		assert(l.last(4) eq "abc");
+
+		assert(last(l) eq "c");
+		assert(last(l, 2) eq "bc");
 	}
 
 	{

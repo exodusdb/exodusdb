@@ -1422,6 +1422,20 @@ bool var::contains(SV str) const {
 // FIRST
 ////////
 
+var var::first() const& {
+
+	THISIS("var var::first()")
+	assertString(function_sig);
+
+	if (var_str.empty()) {
+		[[unlikely]]
+		return "";
+	}
+
+	return var_str.front();
+
+}
+
 var var::first(const size_t  length) const& {
 
 	THISIS("var var::first(const size_t length)")
@@ -1463,6 +1477,20 @@ VARREF var::firster(const size_t length) {
 ///////
 // LAST
 ///////
+
+var var::last() const& {
+
+	THISIS("var var::back()")
+	assertString(function_sig);
+
+	if (var_str.empty()) {
+		[[unlikely]]
+		return "";
+	}
+
+	return var_str.back();
+
+}
 
 var var::last(const size_t  length) const& {
 
