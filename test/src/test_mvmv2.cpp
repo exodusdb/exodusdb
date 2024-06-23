@@ -552,22 +552,22 @@ programinit()
 
 	//accessing individual characters by index 1=first -1=last etc.
 	var a = "abc";
-	assert(a[1] eq "a");   //a = first character
-	assert(a[2] eq "b");   //b = second character
-	assert(a[4] eq "");	   //"" = if access after last character
-	assert(a[-1] eq "c");  //c = last character
-	assert(a[-2] eq "b");  //b = last but one character
-	assert(a[-9] eq "a");  //a = first character if too negative
-	assert(a[0] eq "a");   //a = zero is the same as too negative
+	assert(a.at(1) eq "a");   //a = first character
+	assert(a.at(2) eq "b");   //b = second character
+	assert(a.at(4) eq "");	   //"" = if access after last character
+	assert(a.at(-1) eq "c");  //c = last character
+	assert(a.at(-2) eq "b");  //b = last but one character
+	assert(a.at(-9) eq "a");  //a = first character if too negative
+	assert(a.at(0) eq "a");   //a = zero is the same as too negative
 
 	a = "";
-	assert(a[1]  eq "");
-	assert(a[2]  eq "");
-	assert(a[4]  eq "");
-	assert(a[-1] eq "");
-	assert(a[-2] eq "");
-	assert(a[-9] eq "");
-	assert(a[0]  eq "");
+	assert(a.at(1)  eq "");
+	assert(a.at(2)  eq "");
+	assert(a.at(4)  eq "");
+	assert(a.at(-1) eq "");
+	assert(a.at(-2) eq "");
+	assert(a.at(-9) eq "");
+	assert(a.at(0)  eq "");
 
 	{
 		var left = "left";

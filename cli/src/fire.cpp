@@ -14,7 +14,7 @@ function main() {
 	let repl = COMMAND.f(1);
 	COMMAND.remover(1);
 
-	if (not find) {
+	if (not find or OPTIONS.convert("rsiU", "")) {
 		let syntax = "\n"
 			"SYNOPSIS\n"
 			"	fire FIND REPL filepath ... {OPTIONS}\n"

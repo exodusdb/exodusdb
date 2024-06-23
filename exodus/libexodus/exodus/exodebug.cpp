@@ -203,7 +203,7 @@ var exo_backtrace(void* stack_addresses[BACKTRACE_MAXADDRESSES], size_t stack_si
 				continue;
 		}
 
-		if (objaddress[1] != "0" || objaddress[2] != "x")
+		if (objaddress.first() != "0" || objaddress.at(2) != "x")
 			continue;
 
 		var startaddress = objaddress.paste(-3, 3, "000");
@@ -336,7 +336,7 @@ static void SIGINT_handler(int sig [[maybe_unused]]) {
 		}
 
 		// only look at first character in uppercase
-		var cmd1 = var(cmd[1]).ucase();
+		var cmd1 = var(cmd.first()).ucase();
 
 		if (cmd1 == "C") {
 

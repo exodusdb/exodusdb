@@ -187,7 +187,7 @@
 
 	install (
 		FILES
-			timeaccs.txt
+			timebank.txt
 		DESTINATION share/exodus
 	)
 

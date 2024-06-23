@@ -1422,18 +1422,37 @@ bool var::contains(SV str) const {
 // FIRST
 ////////
 
+//[1,1]
+// .substr(1,1)
 var var::first() const& {
 
 	THISIS("var var::first()")
 	assertString(function_sig);
 
+	// Return "" if empty
 	if (var_str.empty()) {
 		[[unlikely]]
 		return "";
 	}
 
+	// Return the first char only
 	return var_str.front();
 
+}
+
+//[1,1]
+// .substr(1,1)
+VARREF var::firster() {
+
+	THISIS("VARREF var::firster()")
+	assertStringMutator(function_sig);
+
+	// Reduce the size of this string to max 1
+	if (var_str.size() > 1) {
+		var_str.resize(1);
+	}
+
+	return *this;
 }
 
 var var::first(const size_t  length) const& {
@@ -1450,11 +1469,10 @@ var var::first(const size_t  length) const& {
 	// Return a new var with the required number of chars from this or all
 	return var(this->var_str.data(), std::min(length, this->var_str.size()));
 }
-//__cpp_lib_string_contains
 
 
 //[1,y]
-// var.s(1,length) substring
+// var.substr(1,length)
 VARREF var::firster(const size_t length) {
 
 	THISIS("VARREF var::firster(const size_t length)")
@@ -1478,9 +1496,11 @@ VARREF var::firster(const size_t length) {
 // LAST
 ///////
 
+// [-1]
+// .substr(1, 1)
 var var::last() const& {
 
-	THISIS("var var::back()")
+	THISIS("var var::last()")
 	assertString(function_sig);
 
 	if (var_str.empty()) {
@@ -1491,6 +1511,21 @@ var var::last() const& {
 	return var_str.back();
 
 }
+
+//[-1]
+// .substr(-1,1)
+VARREF var::laster() {
+
+	THISIS("VARREF var::laster()")
+	assertStringMutator(function_sig);
+
+	// Leave only the last char
+	if (var_str.size() > 1)
+		var_str = var_str.back();
+
+	return *this;
+}
+
 
 var var::last(const size_t  length) const& {
 
@@ -1638,6 +1673,7 @@ ND var var::substr(const int startindex1) const& {
 }
 
 // byte pos1, length
+[[deprecated("EXODUS: Replace all xxx.b(start, len) with xxx.subst(start, len)")]]
 ND var var::b(const int pos1, const int length) const& {
 	return substr(pos1, length);
 }

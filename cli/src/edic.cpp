@@ -219,7 +219,7 @@ function main() {
 			}
 
 			//ensure ends in eol
-			if (blankfile.at(1) != "\n")
+			if (blankfile.first() != "\n")
 				blankfile ^= "\n";
 
 			//convert to DOS format on Windows
@@ -459,7 +459,7 @@ subroutine geteditor(out editor, out linenopattern) {
 		if (not osdir(cygwinpath))
 			cygwinpath = "";
 
-		if (cygwinpath and cygwinpath[-1] != OSSLASH)
+		if (cygwinpath and cygwinpath.last() != OSSLASH)
 			cygwinpath ^= OSSLASH;
 		//editor=cygwinpath^"bash --login -i -c \"/bin/";
 		editor = cygwinpath;
@@ -491,7 +491,7 @@ subroutine geteditor(out editor, out linenopattern) {
 			nanorcfilename = osgetenv("HOME");
 			if (not nanorcfilename)
 				nanorcfilename = osgetenv("HOMEDRIVE") ^ osgetenv("HOMEPATH");
-			if (nanorcfilename[-1] != OSSLASH)
+			if (nanorcfilename.last() != OSSLASH)
 				nanorcfilename ^= OSSLASH;
 			nanorcfilename ^= ".nanorc";
 		}

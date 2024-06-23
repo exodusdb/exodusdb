@@ -62,7 +62,7 @@ function main() {
 	// Get more options from environment and possibly the second word of the command
 	var options = OPTIONS ^ osgetenv("EXO_COMPILE_OPTIONS");
 	let secondword = COMMAND.f(2);
-	if (var("{(").contains(secondword[1]) && var("})").contains(secondword[-1])) {
+	if (var("{(").contains(secondword.first()) && var("})").contains(secondword.last())) {
 		COMMAND.remover(2);
 		options ^= secondword;
 	}
@@ -732,9 +732,9 @@ function main() {
 
 	} // of not posix
 
-	if (bindir[-1] ne OSSLASH)
+	if (bindir.last() ne OSSLASH)
 		bindir ^= OSSLASH;
-	if (libdir[-1] != OSSLASH)
+	if (libdir.last() != OSSLASH)
 		libdir ^= OSSLASH;
 
 	var srcfilenames = "";
@@ -1124,7 +1124,7 @@ function main() {
 						{
 							int level = 0;
 							for (int charn : range(1, len(funcargsdecl))) {
-								let ch = funcargsdecl[charn];
+								let ch = funcargsdecl.at(charn);
 								if (ch eq ")") {
 									if (level eq 0) {
 										//funcargsdecl.firster(charn - 1);
@@ -1409,7 +1409,7 @@ function main() {
 				//build up list of loadtime libraries required by linker
 				if (loadtimelinking and word1 eq "#include") {
 					var word2 = line.field(" ", 2);
-					if (word2[1] == DQ) {
+					if (word2.first() == DQ) {
 						word2 = word2.cut(1).pop();
 						if (word2.ends(".h"))
 							word2.cutter(-2);
@@ -1438,7 +1438,7 @@ function main() {
 			//if (newheadertext) {
 			{
 				var abs_srcfilename = srcfilename;
-				if (abs_srcfilename[1] != OSSLASH)
+				if (abs_srcfilename.first() != OSSLASH)
 					abs_srcfilename.prefixer(oscwd() ^ OSSLASH);
 				let EXODUS_CALLABLE_XXXXX_H = "EXODUS_CALLABLE_" ^ ucase(filename_without_ext) ^ "_H";
 				newheadertext.prefixer("#define " ^ EXODUS_CALLABLE_XXXXX_H);
@@ -1878,7 +1878,7 @@ function set_environment() {
 		if (not msvs)
 			break;
 
-		if (msvs[-1] ne OSSLASH)
+		if (msvs.last() ne OSSLASH)
 			msvs ^= OSSLASH;
 		searched ^= "\n" ^ msvs;
 

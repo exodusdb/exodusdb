@@ -590,7 +590,7 @@ subroutine onedictid(in dictfile, in dictfilename, io dictid, in reqdictid) {
 			abort(quote(dictid) ^ " cannot be read in " ^ quote(dictfilename));
 	}
 	var sourcecode = dictrec.f(8);
-	let ismv = dictrec.f(4)[1] == "M";
+	let ismv = dictrec.f(4).first() == "M";
 
 	// Keep in sync (currently divergent)
 	// 1. vardb.cpp "bool isnumeric"
@@ -610,7 +610,7 @@ subroutine onedictid(in dictfile, in dictfilename, io dictid, in reqdictid) {
 		//dict_returns = "time";
 		dict_returns = "interval";
 	else if (conversion.starts("[NUMBER")) {
-		if (conversion[9] == "0")
+		if (conversion.at(9) == "0")
 			//[NUMBER,0]
 			dict_returns = "integer";
 		else

@@ -250,7 +250,7 @@ function main() {
 
 				// Close function main if not already done
 				if (addfunctionmain) {
-					if (new_cpp_text[-1] != "\n")
+					if (new_cpp_text.last() != "\n")
 						new_cpp_text ^= '\n';
 					new_cpp_text ^= "}\n";
 				}

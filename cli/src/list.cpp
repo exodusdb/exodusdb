@@ -34,10 +34,10 @@ function main() {
 	// then escape any single quotes and wrap in single quotes
 	for (var word : COMMAND) {
 
-		if (word[1] == DQ and word[-1] == DQ) {
+		if (word.first() == DQ and word.last() == DQ) {
 			word.squoter();
 		}
-		else if (word[1] == SQ and word[-1] == SQ) {
+		else if (word.first() == SQ and word.last() == SQ) {
 			word.quoter();
 		}
 		else {

@@ -752,7 +752,7 @@ phraseinit:
 				sortselect ^= " " ^ word;
 				if (limitx) {
 					if (word.starts(DQ) or word.starts(SQ)) {
-						if (word.starts(word[-1])) {
+						if (word.starts(word.last())) {
 							word.cutter(1).popper();
 						}
 					}
@@ -851,7 +851,7 @@ phraseinit:
 
 		gosub getquotedword2();
 
-		if ((DQ ^ "'").contains(nextword[1])) {
+		if ((DQ ^ "'").contains(nextword.first())) {
 			title = word;
 			gosub getquotedword2();
 			value = word;
@@ -923,7 +923,7 @@ phraseinit:
 		// Skip if detsupp2 and column is being skipped
 		if (not(coldict[coln].unassigned())) {
 			gosub getquotedword();
-			coldict[coln](9) = word[1];
+			coldict[coln](9) = word.first();
 			coldict[coln](10) = word.cut(2);
 			coldict[coln](11) = word;
 		}
@@ -967,7 +967,7 @@ phraseinit:
 
 	} else if (word == "EMAIL_CC") {
 		gosub getword();
-		if ((DQ ^ "'").contains(word[1])) {
+		if ((DQ ^ "'").contains(word.first())) {
 			emailcc = word.cut(1).pop();
 			nextemailcc = emailcc;
 		} else {
@@ -976,7 +976,7 @@ phraseinit:
 
 	} else if (word == "EMAIL_SUBJECT") {
 		gosub getword();
-		if ((DQ ^ "'").contains(word[1])) {
+		if ((DQ ^ "'").contains(word.first())) {
 			emailsubject = word.cut(1).pop();
 			nextemailsubject = emailsubject;
 		} else {
@@ -1079,7 +1079,7 @@ phraseinit:
 						tt2 = "";
 						int wordlen = word.len();
 						for (tt += 1; tt <= wordlen; ++tt) {
-							charx = word[tt];
+							charx = word.at(tt);
 
 							if (not var("0123456789,").contains(charx))
 								break;
@@ -1783,7 +1783,7 @@ recexit:
 
 				// Colored cells starting with colorprefix
 				if (tt.starts(colorprefix)) {
-					if (tt[2] == colorprefix) {
+					if (tt.at(2) == colorprefix) {
 						tt = tt.field(" ", 2, 999999);
 						if (tt.len()) {
 							tx1 ^= td ^ "<nobr>" ^ tt ^ "</nobr>" ^ tdx;
@@ -1935,7 +1935,7 @@ subroutine getquotedword() {
 
 subroutine getquotedword2() {
 	gosub getword();
-	if (((DQ ^ "'").contains(word[1])) and (word.starts(word[-1]))) {
+	if (((DQ ^ "'").contains(word.first())) and (word.starts(word.last()))) {
 		word.cutter(1);
 		word.popper();
 	} else {
@@ -1992,7 +1992,7 @@ getword2b:
 	charn += 1;
 
 	// Skip spaces
-	while (sentencex[charn] == " ") {
+	while (sentencex.at(charn) == " ") {
 		charn += 1;
 		if (charn > sentencex.len()) {
 			return;
@@ -2002,7 +2002,7 @@ getword2b:
 	// If next word starts with " or ' then scan for the same closing
 	// otherwise scan up to the next space char
 	startcharn = charn;
-	charx = sentencex[charn];
+	charx = sentencex.at(charn);
 	if (charx == _DQ or charx == _SQ) {
 		searchchar = charx;
 	} else {
@@ -2014,7 +2014,7 @@ getword2b:
 	// closing character (" ' or space)
 	while (charn < sentencex.len()) {
 		charn += 1;
-		charx = sentencex[charn];
+		charx = sentencex.at(charn);
 
 		if (charx == searchchar)
 			break;
@@ -2399,9 +2399,9 @@ subroutine addstr() {
 		str3 ^= (str1.len() - str2.len()).space();
 	}
 	for (int ii = 1; ii <= str1.len(); ++ii) {
-		char1 = (str1[ii]).trim();
+		char1 = (str1.at(ii)).trim();
 		if (char1 != "") {
-			char2 = str3[ii];
+			char2 = str3.at(ii);
 			if (char2 == " ") {
 				str3.paster(ii, 1, char1);
 			} else {
@@ -2437,7 +2437,7 @@ subroutine emailing() {
 		return;
 	}
 
-	if ((DQ ^ "'").contains(emailtoid[1])) {
+	if ((DQ ^ "'").contains(emailtoid.first())) {
 		nextemailto = emailtoid.cut(1).pop();
 	} else {
 		nextemailto = calculate(emailtoid);

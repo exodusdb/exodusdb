@@ -68,15 +68,15 @@ struct Timer {
 consteval auto get_timeacno(const char* arg1) -> int {
 	int acno = 0;
 
-	// To renumber timeaccs.txt sequentially e.g. after inserting new elements
+	// To renumber timebank.txt sequentially e.g. after inserting new elements
 	/*
-		cut -d' ' -f2-999 timeaccs.txt > x
-		awk '{print NR+499 " " $0}' x > timeaccs.txt
+		cut -d' ' -f2-999 timebank.txt > x
+		awk '{print NR+499 " " $0}' x > timebank.txt
 	*/
 
 	// Create this code block using
 	/*
-		cut -d' ' -f2-999 timeaccs.txt > p
+		cut -d' ' -f2-999 timebank.txt > p
 		sed 's#\s*$##g' p > q
 		awk '{print "else if ( ! std::strcmp(arg1, \"" $0 "\")) acno = " ++i ";"}' q > r
 	*/
@@ -269,6 +269,11 @@ consteval auto get_timeacno(const char* arg1) -> int {
 	else if ( ! std::strcmp(arg1, "CVR var::swap(CVR var2) const")) acno = 186;
 	else if ( ! std::strcmp(arg1, "VARREF var::swap(VARREF var2)")) acno = 187;
 	else if ( ! std::strcmp(arg1, "var var::textwidth()")) acno = 188;
+	else if ( ! std::strcmp(arg1, "var var::first()")) acno = 189;
+	else if ( ! std::strcmp(arg1, "var var::last()")) acno = 190;
+	else if ( ! std::strcmp(arg1, "VARREF var::firster()")) acno = 191;
+	else if ( ! std::strcmp(arg1, "VARREF var::laster()")) acno = 192;
+
 	else {
 		//throw std::runtime_error("");
 		//throw 500;
