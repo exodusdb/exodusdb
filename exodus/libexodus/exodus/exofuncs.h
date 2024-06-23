@@ -399,6 +399,10 @@ VARREF trimmerfirst(VARREF iostring, SV trimchars DEFAULT_SPACE);
 VARREF trimmerlast(VARREF iostring, SV trimchars DEFAULT_SPACE);
 VARREF trimmerboth(VARREF iostring, SV trimchars DEFAULT_SPACE);
 
+ND var first(CVR instring);
+ND var last(CVR instring);
+ND var first(CVR instring, const int nbytes);
+ND var last(CVR instring, const int nbytes);
 
 ND var chr(const int integer);
 ND var textchr(const int integer);

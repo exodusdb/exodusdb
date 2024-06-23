@@ -1883,6 +1883,8 @@ class PUBLIC var final {
 	ND var trimlast(SV trimchars DEFAULT_SPACE) const&;  // byte trimchars
 	ND var trimboth(SV trimchars DEFAULT_SPACE) const&;  // byte trimchars
 
+	ND var first() const&; // max 1 byte
+	ND var last() const&;  // max 1 byte
 	ND var first(const size_t length) const&; // byte length
 	ND var last(const size_t length) const&;  // byte length
 	ND var cut(const int length) const&;      // byte length
@@ -1940,6 +1942,8 @@ class PUBLIC var final {
 	ND VARREF trimlast(SV trimchars DEFAULT_SPACE) &&;
 	ND VARREF trimboth(SV trimchars DEFAULT_SPACE) &&;
 
+	ND VARREF first() &&;
+	ND VARREF last() &&;
 	ND VARREF first(const size_t length) &&;
 	ND VARREF last(const size_t length) &&;
 	ND VARREF cut(const int length) &&;
