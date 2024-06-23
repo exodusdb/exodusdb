@@ -157,11 +157,13 @@ friend class var;
 	// Provide 2d version of bracket operator if c++23+
 	// and deprecate the parenthesis operator
 #if __cpp_multidimensional_subscript >= 202110L
-#	define DEPRECATED_PARENS [[deprecated("Replace single dimensioned array accessors like () with [] e.g. dimarray(n) -> dimarray[n]")]]
+    // Don't change woring without also changing it in cli/convdeprecated
+#	define DEPRECATED_PARENS [[deprecated("EXODUS: Replace single dimensioned array accessors like () with [] e.g. dimarray(n) -> dimarray[n]")]]
 	ND VARREF operator[](/*unsigned*/ int rowno, /*unsigned*/ int colno) {return getelementref(rowno, colno);}
 	ND CVR operator[](/*unsigned*/ int rowno, /*unsigned*/ int colno) const {return getelementref(rowno, colno);}
 #else
-#	define DEPRECATED_PARENS
+//#	define DEPRECATED_PARENS
+#	define DEPRECATED_PARENS [[deprecated("EXODUS: Replace single dimensioned array accessors like () with [] e.g. dimarray(n) -> dimarray[n]")]]
 #endif
 
 	DEPRECATED_PARENS ND VARREF operator()(/*unsigned*/ int rowno) {return getelementref(rowno, 1);}
