@@ -872,7 +872,7 @@ static var build_conn_info(CVR conninfo) {
 static inline void unquoter_inline(VARREF iovar) {
 	// remove "", '' and {}
 	static var quotecharacters("\"'{");
-	if (quotecharacters.contains(iovar[1]))
+	if (quotecharacters.contains(iovar.first()))
 		//string = string.b(2, string.len() - 2);
 		//iovar = iovar.cut(1).popper();
 		iovar.cutter(1).popper();
@@ -1336,7 +1336,7 @@ bool var::open(CVR filename, CVR connection /*DEFAULTNULL*/) {
 
 	// 2. look in materialised views
 	// select matviewname from pg_matviews where matviewname = '...';
-	if (result[-1] != "t") {
+	if (result.last() != "t") {
 		sql =
 			"\
 			SELECT\
@@ -1354,7 +1354,7 @@ bool var::open(CVR filename, CVR connection /*DEFAULTNULL*/) {
 	}
 
 	//failure if not found
-	if (result[-1] != "t") {
+	if (result.last() != "t") {
 		var errmsg = "ERROR: mvdbpostgres 2 open(" ^ filename.quote() ^
 					") file does not exist.";
 		this->setlasterror(errmsg);
@@ -1579,7 +1579,7 @@ bool var::read(CVR filehandle, CVR key) {
 			if (!PQgetisnull(dbresult, tuplen, 0)) {
 				var key = getpgresultcell(dbresult, tuplen, 0);
 				//skip metadata keys starting and ending in % eg "%RECORDS%"
-				if (key[1] != "%" && key[-1] != "%") {
+				if (key.first() != "%" && key.last() != "%") {
 					if (this->len() <= 65535) {
 						if (!this->locatebyusing("AR", _FM, key, keyn))
 							this->inserter(keyn, key);
@@ -3227,7 +3227,7 @@ static var getword(VARREF remainingwords, VARREF ucword) {
 
 	//separate out leading or trailing parens () but not both
 	if (word1.len() > 1) {
-		if (word1.starts("(") && word1[-1] != ")") {
+		if (word1.starts("(") && word1.last() != ")") {
 			//put remaining word back on the pending words
 			remainingwords.prefixer(word1.cut(1) ^ " ");
 			//return single leading paren (
@@ -3241,7 +3241,7 @@ static var getword(VARREF remainingwords, VARREF ucword) {
 	}
 
 	// join words within quote marks into one quoted phrase
-	var char1 = word1[1];
+	var char1 = word1.first();
 	if ((char1 == DQ || char1 == SQ)) {
 		while (not word1.ends(char1) || word1.len() <= 1) {
 			if (remainingwords.len()) {
@@ -3258,7 +3258,7 @@ static var getword(VARREF remainingwords, VARREF ucword) {
 
 	// grab multiple values (numbers or quoted words) into one list, separated by FM
 	//value chars are " ' 0-9 . + -
-	if (remainingwords && joinvalues && valuechars.contains(word1[1])) {
+	if (remainingwords && joinvalues && valuechars.contains(word1.first())) {
 		word1 = SQ ^ word1.unquote().replace("'", "''") ^ SQ;
 
 		var nextword = remainingwords.field(" ", 1);
@@ -3268,7 +3268,7 @@ static var getword(VARREF remainingwords, VARREF ucword) {
 		// duplicated above/below
 		if (nextword == "and") {
 			var nextword2 = remainingwords;
-			if (valuechars.contains(nextword2[1])) {
+			if (valuechars.contains(nextword2.first())) {
 				nextword = nextword2;
 				remainingwords = remainingwords.field(" ", 2, 99999);
 			}
@@ -3297,7 +3297,7 @@ static var getword(VARREF remainingwords, VARREF ucword) {
 		}
 		*/
 		nextword = getword(remainingwords, ucword);
-		if (nextword && valuechars.contains(nextword[1])) {
+		if (nextword && valuechars.contains(nextword.first())) {
 			tosqlstring(nextword);
 			if (word1 != "")
 				word1 ^= FM_;
@@ -3515,7 +3515,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 		// 2. value chars are " ' 0-9 . + -
 		// 3. values are ignored after any with/by statements to skip the following
 		//    e.g. JUSTLEN "T#20" or HEADING "..."
-		else if (valuechars.contains(word1[1])) {
+		else if (valuechars.contains(word1.first())) {
 			if (!whereclause && !orderclause) {
 				if (keycodes)
 					keycodes ^= FM;
@@ -3619,7 +3619,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 		// subexpression grouping
 		else if (ucword == "(" || ucword == ")") {
 			//default to or between WITH clauses
-			if (whereclause[-1] == ")" and ucword == "(")
+			if (whereclause.last() == ")" and ucword == "(")
 				whereclause ^= "\nor";
 			whereclause ^= "\n " ^ ucword;
 			if (DBTRACE_SELECT)
@@ -3725,7 +3725,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 				}
 
 				// check we have two values (in word1 and word2)
-				if (!valuechars.contains(word1[1]) || !valuechars.contains(word2[1])) [[unlikely]] {
+				if (!valuechars.contains(word1.first()) || !valuechars.contains(word2.first())) [[unlikely]] {
 					var errmsg = sortselectclause ^ "BETWEEN x AND y/FROM x TO y must be followed by two values (x AND/TO y)";
 					throw VarDBException(errmsg);
 				}
@@ -3865,12 +3865,12 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 			// TODO
 			if (word1.starts("'")) {
 
-				if (word1[2] == "[") {
+				if (word1.at(2) == "[") {
 					word1.paster(2, 1, "");
 					prefix = ".*";
 
 					//CONTAINING
-					if (word1[-2] == "]") {
+					if (word1.at(-2) == "]") {
 						word1.paster(-2, 1, "");
 						postfix = ".*";
 					}
@@ -3880,7 +3880,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 					}
 
 					//STARTING
-				} else if (word1[-2] == "]") {
+				} else if (word1.at(-2) == "]") {
 					word1.paster(-2, 1, "");
 
 					//identical code above/below
@@ -3933,7 +3933,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 				word1.replacer("\\", "\\\\");
 				var special = "[^$.|?*+()";
 				for (int ii = special.len(); ii > 0; --ii) {
-					if (special.contains(word1[ii]))
+					if (special.contains(word1.at(ii)))
 						word1.paster(ii, "\\");
 				}
 				word1.replacer("'" _FM "'", postfix ^ "'" _FM "'" ^ prefix);
@@ -3955,7 +3955,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 
 			// word1 at this point may be empty, contain a value or be the first word of an unrelated clause
 			// if non-value word1 unrelated to current phrase
-			if (ucword.len() && !valuechars.contains(ucword[1])) {
+			if (ucword.len() && !valuechars.contains(ucword.first())) {
 
 				// push back and treat as missing value
 				// remaining[1,0]=ucword:' '

@@ -385,13 +385,13 @@ programinit()
 	var expected = "a" _FM "a" _FM "b" _FM "a" _FM "a" _FM "b" _FM "";
 	var tempstr2 = "ab";
 	for (const var ii : range(-3, 3)) {
-		assert(tempstr2[ii] eq expected.f(ii + 4));
+		assert(tempstr2.at(ii) eq expected.f(ii + 4));
 	}
 
 	//test single character extraction on ""
 	tempstr2 = "";
 	for (const var ii : range(-3, 3)) {
-		assert(tempstr2[ii] eq "");
+		assert(tempstr2.at(ii) eq "");
 	}
 
 	var str0 = "  xxx  xxx  ";
@@ -646,7 +646,7 @@ programinit()
 
 	var subs = "xyz";
 	assert(subs.b(-1) eq "z");
-	assert(subs[-1]        eq "z");
+	assert(subs.at(-1)        eq "z");
 
 	printl(oconv("a", "L#3").quote());
 	assert(oconv("a", "L#3")    eq "a  ");

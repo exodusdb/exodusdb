@@ -673,7 +673,7 @@ std::string var::oconv_LRC(CVR format) const {
 	// and implement full mask options eg L#2-#3-#4 etc
 
 	var varwidth = format.field("#", 2, 1);
-	var just = (format.field("#", 1, 1))[1];
+	var just = (format.field("#", 1, 1)).first();
 
 	if (!varwidth.isnum() or varwidth < 0)
 		return *this;

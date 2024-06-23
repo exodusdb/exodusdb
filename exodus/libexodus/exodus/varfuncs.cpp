@@ -2018,6 +2018,8 @@ ND VARREF var::trimfirst(SV trimchars DEFAULT_SPACE)                 && {return 
 ND VARREF var::trimlast(SV trimchars DEFAULT_SPACE)                  && {return trimmerlast(trimchars);}
 ND VARREF var::trimboth(SV trimchars DEFAULT_SPACE)                  && {return trimmerboth(trimchars);}
 
+ND VARREF var::first()                                               && {return firster();}
+ND VARREF var::last()                                                && {return laster();}
 ND VARREF var::first(const size_t length)                            && {return firster(length);}
 ND VARREF var::last(const size_t length)                             && {return laster(length);}
 ND VARREF var::cut(const int length)                                 && {return cutter(length);}

@@ -778,7 +778,7 @@ var ExodusProgramBase::authorised(CVR task0, VARREF msg, CVR defaultlock, CVR us
 		var lenuserprivs = SECURITY.len();
 		noadd = task.ends(DQ) or lenuserprivs > 48000;
 	}
-	var positive = task[1];
+	var positive = task.first();
 	if (positive == "#")
 		task.cutter(1);
 	else
@@ -989,7 +989,7 @@ var ExodusProgramBase::capitalise(CVR str0, CVR mode0, CVR wordseps0) const {
 		string2 = str0;
 		// convert @upper.case to @lower.case in string2
 		int nn = string2.len();
-		var numx = var("1234567890").contains(string2[1]);
+		var numx = var("1234567890").contains(string2.first());
 		var cap = 1;
 		var wordseps;
 		var inquotes = 0;
@@ -1013,7 +1013,7 @@ var ExodusProgramBase::capitalise(CVR str0, CVR mode0, CVR wordseps0) const {
 						cap = 1;
 						if (tt == " ")
 							//numx = var("1234567890").contains(string2.b(ii + 1, 1), 1);
-							numx = var("1234567890").contains(string2[ii + 1]);
+							numx = var("1234567890").contains(string2.at(ii + 1));
 					} else {
 						if (cap || numx) {
 							tt.ucaser();
@@ -1055,7 +1055,7 @@ var ExodusProgramBase::capitalise(CVR str0, CVR mode0, CVR wordseps0) const {
 		var quoted = "";
 		for (int ii = 1; ii <= 99999; ii++) {
 			//var tt = string2.b(ii, 1);
-			var tt = string2[ii];
+			var tt = string2.at(ii);
 			// BREAK;
 			if (!(tt != ""))
 				break;
@@ -1734,7 +1734,7 @@ bool ExodusProgramBase::esctoexit() const {
 	//key.logputl("key=");
 	//key.oconv("HEX").logputl("key=");
 
-	return key.at(-1).ucase() == "N";
+	return key.last().ucase() == "N";
 }
 
 // otherusers
@@ -1899,7 +1899,7 @@ var ExodusProgramBase::encrypt2(CVR encrypt0) const {
 		if (!(encrypt != ""))
 			break;
 
-		encryptkey = (encryptkey % 390001) * (var(encrypt[1])).seq() + 1;
+		encryptkey = (encryptkey % 390001) * (var(encrypt.first())).seq() + 1;
 		encrypt.cutter(1);
 	}  // loop;
 
@@ -2288,7 +2288,7 @@ var ExodusProgramBase::iconv(CVR input, CVR conversion) {
 		var subconversion = conversion.substr2(ptr, delimiter);
 
 		// or call standard conversion methods
-		if (subconversion[1] != "[") {
+		if (subconversion.first() != "[") {
 
 			result = result.iconv(subconversion);
 
@@ -2631,7 +2631,7 @@ ok:
 					outx.paster(1, 1, " ");
 				}
 
-				if (outx[4] eq "0") {
+				if (outx.at(4) eq "0") {
 					outx.paster(4, 1, " ");
 				}
 
@@ -2710,7 +2710,7 @@ var ExodusProgramBase::exoprog_number(CVR type, CVR input0, CVR ndecs0, VARREF o
 			if (DICT) {
 				ndecs = calculate("NDECS");
 			} else {
-				ndecs = BASEFMT[3];
+				ndecs = BASEFMT.at(3);
 			}
 			if (ndecs == "") {
 				ndecs = 2;
@@ -2754,13 +2754,13 @@ var ExodusProgramBase::exoprog_number(CVR type, CVR input0, CVR ndecs0, VARREF o
 	while (true) {
 		input1 = input.substr2(posn, delim);
 
-		var perc = input1[-1];
+		var perc = input1.last();
 		if (perc == "%") {
 			input1.popper();
 		} else {
 			perc = "";
 		}
-		var plus = input1[1];
+		var plus = input1.first();
 		if (plus == "+") {
 			input1.cutter(1);
 		} else {
@@ -2804,7 +2804,7 @@ var ExodusProgramBase::exoprog_number(CVR type, CVR input0, CVR ndecs0, VARREF o
 			}
 
 			if (output1.len()) {
-				if (var(".,").count(output1[1])) {
+				if (var(".,").count(output1.first())) {
 					output1.prefixer("0");
 				}
 			}

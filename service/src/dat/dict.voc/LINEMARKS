@@ -5,7 +5,7 @@ S
 
 
 
-	if (var("$*").contains(ID[1])) {\
+	if (var("$*").contains(ID.first())) {\
 		return "";\
 	} else if (RECORD.contains("linemark")) {\
 		var tt = RECORD;\

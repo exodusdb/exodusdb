@@ -91,7 +91,7 @@ function main() {
 	while (true) {
 
 		getinput("Save user configuration in .exodus", saveconfig);
-		if (not var(saveconfig[1]).ucase().contains("Y"))
+		if (not var(saveconfig.first()).ucase().contains("Y"))
 			break;
 
 		oconv("Saving user configuration in .exodus", "L#40").output();
@@ -163,7 +163,7 @@ function input_adminconfig(in origconfig, out serverconfig) {
 		}
 
 		getinput("\nCannot connect. Try Again? ", yesno);
-		if (yesno.ucase()[1] != "Y")
+		if (yesno.ucase().first() != "Y")
 			return false;  //stop("Cancelled.");
 
 	} while (true);

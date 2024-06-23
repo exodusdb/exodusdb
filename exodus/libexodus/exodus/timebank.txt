@@ -186,3 +186,7 @@
 685 CVR var::swap(CVR var2) const 
 686 VARREF var::swap(VARREF var2) 
 687 var var::textwidth() 
+688 var var::first()
+689 var var::last()
+690 VARREF var::firster()
+691 VARREF var::laster()

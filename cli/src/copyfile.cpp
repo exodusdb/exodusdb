@@ -114,7 +114,7 @@ function main() {
 		targetdb = "";
 
 		//target name will be a dir path
-		if (targetname[-1] != "/")
+		if (targetname.last() != "/")
 			targetname ^= "/";
 	} else {
 		//connect to target db

@@ -79,7 +79,7 @@ programinit()
 	{
 		// Check brackets work on var_proxy i.e. x(2)[n] instead of x.f(2)[n]
 		var x = "abc^xyz"_var;
-		assert(x(2)[-2] eq "y");
+		assert(x(2).at(-2) eq "y");
 	}
 
 	/* UBUNTU locale-gen
@@ -143,7 +143,7 @@ programinit()
 	assert(len(compact_a) eq 2);
 
 	TRACE(decomp_a)
-	TRACE(decomp_a[1])	//ASCII A
+	TRACE(decomp_a.at(1))	//ASCII A
 	//TRACE(decomp_a[2])
 	//TRACE(decomp_a[3])
 	TRACE(decomp_a.b(2, 2))  //ACCENT_ON_PRIOR
@@ -541,16 +541,16 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 		//assert(data.osbread(tempfile,offset2=3,1) eq greek2[4]);
 		offset2 = 0;
 		assert(data.osbread(tempfile, offset2, 1));
-		assert(data eq greek2[1]);
+		assert(data eq greek2.at(1));
 		offset2 = 1;
 		assert(data.osbread(tempfile, offset2, 1));
-		assert(data eq greek2[2]);
+		assert(data eq greek2.at(2));
 		offset2 = 2;
 		assert(data.osbread(tempfile, offset2, 1));
-		assert(data eq greek2[3]);
+		assert(data eq greek2.at(3));
 		offset2 = 3;
 		assert(data.osbread(tempfile, offset2, 1));
-		assert(data eq greek2[4]);
+		assert(data eq greek2.at(4));
 
 		//verify utf-8 bytes
 		if (nbinarychars eq 256) {

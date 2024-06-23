@@ -297,7 +297,7 @@ subroutine convoptions(io ptx_temp) {
 		while (true) {
 
 			optioncharn += 1;
-			var optionchar = ptx_temp[optioncharn];
+			var optionchar = ptx_temp.at(optioncharn);
 
 			//if (not(optionchar ne "" and optionchar ne "\'"))
 			if (optionchar eq _SQ or optionchar eq "")
@@ -307,7 +307,7 @@ subroutine convoptions(io ptx_temp) {
 		}
 		var newoptions = "";
 		for (var i_ = 1; i_ <= optionchars.len(); ++i_) {
-			var optionchar = optionchars[i_];
+			var optionchar = optionchars.at(i_);
 			if (optionchar == "T") {
 #ifdef EXO_NOHTML
 				newoptions ^= oconv(time(), "MTS") ^ " " ^ oconv(date(), "D");
@@ -328,10 +328,10 @@ subroutine convoptions(io ptx_temp) {
 				var spaceoptionsize = "";
 				while (true) {
 
-					if (not optionchars[i_ + 1].match("^\\d$"))
+					if (not optionchars.at(i_ + 1).match("^\\d$"))
 						break;
 
-					spaceoptionsize ^= optionchars[i_ + 1];
+					spaceoptionsize ^= optionchars.at(i_ + 1);
 					i_ += 1;
 				}
 				newoptions ^= spaceoptionsize.space();

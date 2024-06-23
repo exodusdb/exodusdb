@@ -1159,6 +1159,8 @@ class PUBLIC var final {
 
 	// Extract a character from a constant var
 	// first=1 last=-1 etc.
+	// Don't change wordng without also changing it in cli/convdeprecated
+	[[deprecated ("EXODUS: Replace single character accessors like xxx[n] with xxx.at(n)")]]
 	ND var operator[](int pos1) const {return this->at(pos1);}
 
 	// Named member function identical to operator[]
@@ -1968,50 +1970,6 @@ class PUBLIC var final {
 	ND VARREF shuffle(SV sepchar = _FM) &&;
     ND VARREF parse(char sepchar = ' ') &&;
 
-//	ND VARREF ucase() && {return ucaser();}
-//	ND VARREF lcase() && {return lcaser();}
-//	ND VARREF tcase() && {return tcaser();}
-//	ND VARREF fcase() && {return fcaser();}
-//	ND VARREF normalize() && {return normalizer();}
-//	ND VARREF invert() && {return inverter();}
-//
-//	ND VARREF lower() && {return lowerer();}
-//	ND VARREF raise() && {return raiser();}
-//	ND VARREF crop() && {return cropper();}
-//
-//	ND VARREF quote() && {return quoter();}
-//	ND VARREF squote() && {return squoter();}
-//	ND VARREF unquote() && {return unquoter();}
-//
-//	ND VARREF trim(SV trimchars DEFAULT_SPACE) && {return trimmer(trimchars);}
-//	ND VARREF trimfirst(SV trimchars DEFAULT_SPACE) && {return trimmerfirst(trimchars);}
-//	ND VARREF trimlast(SV trimchars DEFAULT_SPACE) && {return trimmerlast(trimchars);}
-//	ND VARREF trimboth(SV trimchars DEFAULT_SPACE) && {return trimmerboth(trimchars);}
-//
-//	ND VARREF first(const size_t length) && {return firster(length);}
-//	ND VARREF last(const size_t length) && {return laster(length);}
-//	ND VARREF cut(const int length) && {return cutter(length);}
-//	ND VARREF paste(const int pos1, const int length, SV insertstr) && {return paster(pos1, length, insertstr);}
-//	ND VARREF paste(const int pos1, SV insertstr) && {return paster(pos1, insertstr);}
-//	ND VARREF prefix(SV insertstr) && {return prefixer(insertstr);}
-//	//ND VARREF append(SV appendstr) && {return appender(appendstr);}
-//	ND VARREF pop() && {return popper();}
-//
-//	ND VARREF fieldstore(SV sepchar, const int fieldno, const int nfields, CVR replacement) && {return fieldstorer(sepchar, fieldno, nfields, replacement);}
-//	ND VARREF substr(const int pos1, const int length) && {return substrer(pos1, length);}
-//	ND VARREF substr(const int pos1) && {return substrer(pos1);}
-//
-//	ND VARREF convert(SV fromchars, SV tochars) && {return converter(fromchars, tochars);}
-//	ND VARREF textconvert(SV fromchars, SV tochars) && {return textconverter(fromchars, tochars);}
-//	ND VARREF replace(SV fromstr, SV tostr) && {return replacer(fromstr, tostr);}
-//	ND VARREF regex_replace(SV regex, SV replacement, SV options DEFAULT_EMPTY) && {return regex_replacer(regex, replacement, options);}
-//
-//	ND VARREF unique() && {return uniquer();}
-//	ND VARREF sort(SV sepchar = _FM) && {return sorter(sepchar);}
-//	ND VARREF reverse(SV sepchar = _FM) && {return reverser(sepchar);}
-//	ND VARREF shuffle(SV sepchar = _FM) && {return shuffler(sepchar);}
-//	ND VARREF parse(char sepchar = ' ') && {return parser(sepchar);}
-
 	// STRING MUTATORS
 	//////////////////
 
@@ -2037,6 +1995,8 @@ class PUBLIC var final {
 	VARREF trimmerlast(SV trimchars DEFAULT_SPACE);
 	VARREF trimmerboth(SV trimchars DEFAULT_SPACE);
 
+	VARREF firster();
+	VARREF laster();
 	VARREF firster(const size_t length);
 	VARREF laster(const size_t length);
 	VARREF cutter(const int length);
@@ -2680,9 +2640,14 @@ class PUBLIC var_proxy1 {
 
 	// Operator []. Allow character extraction.
 	// xxx(fn)[cn]
+	[[deprecated ("EXODUS: Replace single character accessors like xxx[n] with xxx.at(n)")]]
 	ND var operator[](const int pos1) const {
-		return var_.f(fn_)[pos1];
+		return var_.f(fn_).at(pos1);
 	}
+
+    ND var at(const int pos1) const {
+        return var_.f(fn_).at(pos1);
+    }
 
 };
 
@@ -2713,9 +2678,14 @@ class PUBLIC var_proxy2 {
 		return var_.f(fn_, vn_);
 	}
 
+	[[deprecated ("EXODUS: Replace single character accessors like xxx[n] with xxx.at(n)")]]
 	ND var operator[](const int pos1) const {
-		return var_.f(fn_, vn_)[pos1];
+		return var_.f(fn_, vn_).at(pos1);
 	}
+
+    ND var at(const int pos1) const {
+        return var_.f(fn_, vn_).at(pos1);
+    }
 
 };
 
@@ -2746,10 +2716,14 @@ class PUBLIC var_proxy3 {
 	explicit operator bool() const {
 		return var_.f(fn_, vn_, sn_);
 	}
-
+	[[deprecated ("EXODUS: Replace single character accessors like xxx[n] with xxx.at(n)")]]
 	ND var operator[](const int pos1) const {
-		return var_.f(fn_, vn_, sn_)[pos1];
+		return var_.f(fn_, vn_, sn_).at(pos1);
 	}
+
+    ND var at(const int pos1) const {
+        return var_.f(fn_, vn_, sn_).at(pos1);
+    }
 
 };
 
