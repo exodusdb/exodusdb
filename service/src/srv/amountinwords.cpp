@@ -115,9 +115,9 @@ function main(in amountfmlanguage, in currcode0) {
 			// IF UNITSx LE 20 THEN
 			// WORDS:=TEXT<1,UNITSx+1>
 			// end else
-			words ^= text.f(1, 19 + unitsx[-2]);
+			words ^= text.f(1, 19 + unitsx.at(-2));
 			if (not unitsx.ends("0")) {
-				words ^= "-" ^ text.f(1, unitsx[-1] + 1);
+				words ^= "-" ^ text.f(1, unitsx.last() + 1);
 			}
 		}
 	}
@@ -271,8 +271,8 @@ arabic:
 
 		} else {
 			// Build the translation for numbers above 20
-			tens     = unitsx[-2];
-			ones     = unitsx[-1];
+			tens     = unitsx.at(-2);
+			ones     = unitsx.last();
 
 			// ones is done first before tens because in arabic 35 is pronounced as "five and thirty"
 			// ones
@@ -315,18 +315,18 @@ arabic:
 				// two digit sub-units eg: 45
 				hundreds = "";
 				// tenth place, 4
-				tens     = subunitsx[+1];
+				tens     = subunitsx.at(+1);
 				// hundredth place, 5
-				ones     = subunitsx[+2];
+				ones     = subunitsx.at(+2);
 
 				// three digit sub-units eg: 456
 				if (nsubunits == 3) {
 					// tenth place, 4
-					hundreds = subunitsx[+1];
+					hundreds = subunitsx.at(+1);
 					// hundredth place, 5
-					tens     = subunitsx[+2];
+					tens     = subunitsx.at(+2);
 					// thousandth place, 6
-					ones     = subunitsx[+3];
+					ones     = subunitsx.at(+3);
 				}
 
 				// hundreds
@@ -408,8 +408,8 @@ french:
 			words ^= text.f(1, unitsx + 1);
 		} else {
 
-			tens = unitsx[-2];
-			ones = unitsx[-1];
+			tens = unitsx.at(-2);
+			ones = unitsx.last();
 
 			// 70's and 90's
 			if (tens == 9 or tens == 7) {

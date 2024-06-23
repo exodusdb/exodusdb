@@ -438,7 +438,7 @@ nextprocess:
 		// show maintenance
 		nmaint = processcount.f(3, dbasen);
 		if (nmaint) {
-			if ((description[-1]).isnum()) {
+			if ((description.last()).isnum()) {
 				description ^= "+";
 			} else if (not description.ends(" ")) {
 				description ^= " ";

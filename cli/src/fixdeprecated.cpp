@@ -112,6 +112,8 @@ function main() {
 		if (not compline.contains("deprecated"))
 			continue;
 
+		compline.trimmerfirst("*");
+
 		// Example compile warning
 		//fin/ledger4.cpp:170:27: warning: ‘exodus::var& exodus::dim::operator()(int)’ is deprecated: EXODUS: Replace single dimensioned array accessors like () with [] e.g. dimarray(n) -> dimarray[n] [-Wdeprecated-declarations]
 		//  170 |   let taxcodes = lg.vch(24);

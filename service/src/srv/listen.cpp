@@ -2769,7 +2769,7 @@ subroutine leaselock() {
 	} else {
 		newsessionid = "";
 		for (let ii : range(1, 8)) {
-			newsessionid ^= var("01234567890ABDCEF")[var(16).rnd() + 1];
+			newsessionid ^= var("01234567890ABDCEF").at(var(16).rnd() + 1);
 		}  // ii;
 	}
 

@@ -79,7 +79,7 @@ function main(io ranges0, in basekey0 = "", in listid0 = "") {
 		var startx = "";
 		var prefix = rangex.field("-", 1);
 		while (true) {
-			let lastchar = prefix[-1];
+			let lastchar = prefix.last();
 			// /BREAK;
 			if (not var("0123456789").contains(lastchar))
 				break;
@@ -98,7 +98,7 @@ function main(io ranges0, in basekey0 = "", in listid0 = "") {
 			var finish = "";
 			var tt	   = ranges.f(ii).field("-", 2);
 			while (true) {
-				let lastchar = tt[-1];
+				let lastchar = tt.last();
 				// /BREAK;
 				if (not var("0123456789").contains(lastchar))
 					break;
