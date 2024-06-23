@@ -33,8 +33,8 @@ function main(in /*mode*/, io list1, io list2, in seps) {
 		}
 	}  // list1n;
 
-	list1.converter(FM, seps[1]);
-	list2.converter(FM, seps[1]);
+	list1.converter(FM, seps.first());
+	list2.converter(FM, seps.first());
 
 	return 0;
 }

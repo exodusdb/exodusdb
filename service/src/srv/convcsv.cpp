@@ -308,7 +308,7 @@ nextdict:
 					nfields = fn;
 				}
 
-				fmtxs[colnx] = dict.f(9)[1];
+				fmtxs[colnx] = dict.f(9).first();
 
 				if (raw) {
 					headingx(colnx) = dictid;
@@ -593,7 +593,7 @@ nextvn:
 
 					// make sure "1-12" is not interpreted as a formula
 					if (var(1) or excel) {
-						if (var(".-+0123456789").contains(cell[1])) {
+						if (var(".-+0123456789").contains(cell.first())) {
 							if (not cell.isnum()) {
 								cell.prefixer(" ");
 							}

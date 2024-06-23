@@ -1013,8 +1013,8 @@ function generatepassword() {
 	consonants.converter(vowels ^ "QX", "");
 	var newpassword = "";
 	for (const var ii : range(1, minpasswordchars_ / 2)) {
-		newpassword ^= consonants[consonants.len().rnd() + 1];
-		newpassword ^= vowels[vowels.len().rnd() + 1];
+		newpassword ^= consonants.at(consonants.len().rnd() + 1);
+		newpassword ^= vowels.at(vowels.len().rnd() + 1);
 	}  // ii;
 	return newpassword;
 }

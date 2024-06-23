@@ -67,7 +67,7 @@ ok:
 					output.paster(1, 1, " ");
 				}
 
-				if (output[4] == "0") {
+				if (output.at(4) == "0") {
 					output.paster(4, 1, " ");
 				}
 

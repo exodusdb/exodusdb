@@ -69,7 +69,7 @@ nousername0:
 		task.cutter(1);
 	}
 
-	var positive = task[1];
+	var positive = task.first();
 	if (positive == "#") {
 		task.cutter(1);
 	} else {

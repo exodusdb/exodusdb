@@ -300,7 +300,7 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 				loglasterror();
 			}
 
-			if (wgetrcfilename[2] == ":") {
+			if (wgetrcfilename.at(2) == ":") {
 				wgetrcfilename.paster(2, 1, "");
 				wgetrcfilename.prefixer("/cygdrive/");
 			}
@@ -471,7 +471,7 @@ subroutine hash(in salt, in max, out hashcode) {
 
 	hashcode = salt;
 	for (const int ii : range(1, text.len())) {
-		hashcode = (hashcode * (text[ii]).seq()).mod(max);
+		hashcode = (hashcode * (text.at(ii)).seq()).mod(max);
 	}  // ii;
 	return;
 }

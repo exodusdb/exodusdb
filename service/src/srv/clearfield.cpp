@@ -139,7 +139,7 @@ next:
 		if (cleared) {
 			while (true) {
 				// /BREAK;
-				if (not(RECORD and ((FM ^ VM ^ SM).contains(RECORD[-1]))))
+				if (not(RECORD and ((FM ^ VM ^ SM).contains(RECORD.last()))))
 					break;
 				RECORD.popper();
 			}  // loop;

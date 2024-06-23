@@ -17,7 +17,7 @@ function main(in /*type*/, in in0, in mode, out output) {
 
 	if (output.starts("-")) {
 		if (mode == "TD") {
-			if (var("1234567890").contains(output[2])) {
+			if (var("1234567890").contains(output.at(2))) {
 				output = "<NOBR>" ^ output ^ "</NOBR>";
 			}
 		}

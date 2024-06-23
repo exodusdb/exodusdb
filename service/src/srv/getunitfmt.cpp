@@ -29,7 +29,7 @@ function main(in code, out fmtx) {
 
 	// Default to base currency ndecs or 2
 	if (not ndecs.len()) {
-		ndecs = BASEFMT[3];
+		ndecs = BASEFMT.at(3);
 		if (not ndecs.match("^\\d$")) {
 			ndecs = 2;
 		}

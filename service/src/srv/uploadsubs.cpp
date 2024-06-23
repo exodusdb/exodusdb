@@ -499,7 +499,7 @@ nextline:
 						cols(-1) = linex.first(ptr - 1) ^ VM ^ colstart;
 
 						// Find the end of the column title by skipping over spaces
-						while (linex[ptr + 1] == " ")
+						while (linex.at(ptr + 1) == " ")
 								++ptr;
 
 						// Save the length of the column
