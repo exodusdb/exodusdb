@@ -74,6 +74,7 @@
 	add_executable(cpp2dat cpp2dat.cpp)
 	add_executable(convsyntax convsyntax.cpp)
 	add_executable(fixdeprecated fixdeprecated.cpp)
+	add_executable(var2let var2let.cpp)
 	add_executable(redefine redefine.cpp)
 	add_executable(fire fire.cpp)
 
@@ -130,6 +131,7 @@
 	target_link_libraries(cpp2dat exodus stdc++fs ${LIBS})
 	target_link_libraries(convsyntax exodus stdc++fs ${LIBS})
 	target_link_libraries(fixdeprecated exodus stdc++fs ${LIBS})
+	target_link_libraries(var2let exodus stdc++fs ${LIBS})
 	target_link_libraries(redefine exodus stdc++fs ${LIBS})
 	target_link_libraries(fire exodus stdc++fs ${LIBS})
 
@@ -171,6 +173,7 @@
 			cpp2dat
 			convsyntax
 			fixdeprecated
+			var2let
 			redefine
 			fire
 

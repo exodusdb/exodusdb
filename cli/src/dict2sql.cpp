@@ -392,8 +392,8 @@ subroutine create_function(in functionname_and_args, in return_sqltype, in sql, 
 	var reindex_if_indexed = false;
 	var oldfunction;
 	let functionname0 = field(functionname_and_args, "(", 1).lcase();
-	var schemaname = field(functionname0, ".", 1);
-	var functionname = field(functionname0, ".", 2);
+	let schemaname = field(functionname0, ".", 1);
+	let functionname = field(functionname0, ".", 2);
 	if (not functionname)
 		schemaname.swap(functionname);
 

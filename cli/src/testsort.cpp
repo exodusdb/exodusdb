@@ -193,8 +193,8 @@ subroutine sortselect(in file, in sortselectclause) {
 
 	printl("Read the data");
 
-	var record;
-	var key;
+	let record;
+	let key;
 
 	// Could also use the readnextrecord() function here
 	// if we had used the new selectrecord() function above
