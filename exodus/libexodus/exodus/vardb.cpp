@@ -1336,7 +1336,7 @@ bool var::open(CVR filename, CVR connection /*DEFAULTNULL*/) {
 
 	// 2. look in materialised views
 	// select matviewname from pg_matviews where matviewname = '...';
-	if (result.last() != "t") {
+	if (not result.ends("t")) {
 		sql =
 			"\
 			SELECT\
@@ -1354,7 +1354,7 @@ bool var::open(CVR filename, CVR connection /*DEFAULTNULL*/) {
 	}
 
 	//failure if not found
-	if (result.last() != "t") {
+	if (not result.ends("t")) {
 		var errmsg = "ERROR: mvdbpostgres 2 open(" ^ filename.quote() ^
 					") file does not exist.";
 		this->setlasterror(errmsg);
@@ -1579,7 +1579,7 @@ bool var::read(CVR filehandle, CVR key) {
 			if (!PQgetisnull(dbresult, tuplen, 0)) {
 				var key = getpgresultcell(dbresult, tuplen, 0);
 				//skip metadata keys starting and ending in % eg "%RECORDS%"
-				if (key.first() != "%" && key.last() != "%") {
+				if (not key.starts("%") && not key.ends("%")) {
 					if (this->len() <= 65535) {
 						if (!this->locatebyusing("AR", _FM, key, keyn))
 							this->inserter(keyn, key);
@@ -3227,7 +3227,7 @@ static var getword(VARREF remainingwords, VARREF ucword) {
 
 	//separate out leading or trailing parens () but not both
 	if (word1.len() > 1) {
-		if (word1.starts("(") && word1.last() != ")") {
+		if (word1.starts("(") && not word1.ends(")")) {
 			//put remaining word back on the pending words
 			remainingwords.prefixer(word1.cut(1) ^ " ");
 			//return single leading paren (
@@ -3619,7 +3619,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 		// subexpression grouping
 		else if (ucword == "(" || ucword == ")") {
 			//default to or between WITH clauses
-			if (whereclause.last() == ")" and ucword == "(")
+			if (whereclause.ends(")") and ucword == "(")
 				whereclause ^= "\nor";
 			whereclause ^= "\n " ^ ucword;
 			if (DBTRACE_SELECT)

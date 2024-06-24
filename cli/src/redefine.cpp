@@ -61,7 +61,7 @@ function main() {
 //
 //			newcpp.regex_replacer(oldcode, newcode);
 
-			if (name.last() == "+")
+			if (name.ends("+"))
 				name.popper() ^= value;
 
 			value.replacer("(", "\\(");

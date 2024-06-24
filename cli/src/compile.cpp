@@ -732,9 +732,9 @@ function main() {
 
 	} // of not posix
 
-	if (bindir.last() ne OSSLASH)
+	if (not bindir.ends(OSSLASH))
 		bindir ^= OSSLASH;
-	if (libdir.last() != OSSLASH)
+	if (not libdir.ends(OSSLASH))
 		libdir ^= OSSLASH;
 
 	var srcfilenames = "";
@@ -1409,7 +1409,7 @@ function main() {
 				//build up list of loadtime libraries required by linker
 				if (loadtimelinking and word1 eq "#include") {
 					var word2 = line.field(" ", 2);
-					if (word2.first() == DQ) {
+					if (word2.starts(DQ)) {
 						word2 = word2.cut(1).pop();
 						if (word2.ends(".h"))
 							word2.cutter(-2);
@@ -1438,7 +1438,7 @@ function main() {
 			//if (newheadertext) {
 			{
 				var abs_srcfilename = srcfilename;
-				if (abs_srcfilename.first() != OSSLASH)
+				if (not abs_srcfilename.starts(OSSLASH))
 					abs_srcfilename.prefixer(oscwd() ^ OSSLASH);
 				let EXODUS_CALLABLE_XXXXX_H = "EXODUS_CALLABLE_" ^ ucase(filename_without_ext) ^ "_H";
 				newheadertext.prefixer("#define " ^ EXODUS_CALLABLE_XXXXX_H);
@@ -1878,7 +1878,7 @@ function set_environment() {
 		if (not msvs)
 			break;
 
-		if (msvs.last() ne OSSLASH)
+		if (not msvs.ends(OSSLASH))
 			msvs ^= OSSLASH;
 		searched ^= "\n" ^ msvs;
 

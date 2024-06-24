@@ -590,7 +590,7 @@ subroutine onedictid(in dictfile, in dictfilename, io dictid, in reqdictid) {
 			abort(quote(dictid) ^ " cannot be read in " ^ quote(dictfilename));
 	}
 	var sourcecode = dictrec.f(8);
-	let ismv = dictrec.f(4).first() == "M";
+	let ismv = dictrec.f(4).starts("M");
 
 	// Keep in sync (currently divergent)
 	// 1. vardb.cpp "bool isnumeric"

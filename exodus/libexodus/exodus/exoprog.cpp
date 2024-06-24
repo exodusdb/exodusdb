@@ -2288,7 +2288,7 @@ var ExodusProgramBase::iconv(CVR input, CVR conversion) {
 		var subconversion = conversion.substr2(ptr, delimiter);
 
 		// or call standard conversion methods
-		if (subconversion.first() != "[") {
+		if (not subconversion.starts("[")) {
 
 			result = result.iconv(subconversion);
 
