@@ -151,7 +151,7 @@ function main() {
 						oldpgsql.replacer(" " _VM, _VM);
 
 					// Add one indent if none present
-					if (oldpgsql.f(1, 2) != "DECLARE" and oldpgsql.f(1,2).first() != "\t") {
+					if (oldpgsql.f(1, 2) != "DECLARE" and not oldpgsql.f(1,2).starts("\t")) {
 						oldpgsql.replacer(_VM, _VM "\t");
 						//unindent the closing comment
 						oldpgsql.replacer(_VM "\t" "*" "/", _VM "*" "/");

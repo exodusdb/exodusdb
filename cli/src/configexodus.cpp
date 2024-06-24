@@ -163,7 +163,7 @@ function input_adminconfig(in origconfig, out serverconfig) {
 		}
 
 		getinput("\nCannot connect. Try Again? ", yesno);
-		if (yesno.ucase().first() != "Y")
+		if (not yesno.ucase().starts("Y"))
 			return false;  //stop("Cancelled.");
 
 	} while (true);
