@@ -19,7 +19,7 @@ function main() {
     let filename = COMMAND.f(2);
 	var key = COMMAND.f(3);
 	var filterfieldnos = COMMAND.f(4);
-	var dosfilename = COMMAND.f(5);
+	let dosfilename = COMMAND.f(5);
 
 	var syntaxmsg = "Syntax: EXO_DATA=<DBCODE> ddview <FILENAME> <KEY> [FIELDNO or DOS] [DOSFILENAME] {OPTIONS}";
 		syntaxmsg ^= "\n                   e.g ddview schedules J1061 ";
@@ -37,9 +37,9 @@ function main() {
 	// Expand filtered field range
 	if (filterfieldnos.contains("-")) {
 
-		var min = filterfieldnos.field("-", 1);
-		var max = filterfieldnos.field("-", 2);
-		var diff = max - min;
+		let min = filterfieldnos.field("-", 1);
+		let max = filterfieldnos.field("-", 2);
+		let diff = max - min;
 
 		filterfieldnos = "";
 		for (var ii : range(min, max)) {
@@ -96,8 +96,8 @@ function main() {
 	// Print lines
 	while (readnext(RECORD, ID, MV)) {
 
-		var dictfieldno = RECORD.f(2);
-		var dictfieldname = RECORD.f(3);
+		let dictfieldno = RECORD.f(2);
+		let dictfieldname = RECORD.f(3);
 		var dictvaluetype = RECORD.f(4);
 
 		// simplify multi-value detail like 1.3 to just "M"

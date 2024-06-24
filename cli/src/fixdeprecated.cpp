@@ -89,7 +89,7 @@ function main() {
 			// //copied by exodus "compile /root/neosys/src/agy/ab_common.h"
 			// TODO think about possible race condition with piped parallel compiler input to this program
 			if (srcfile.ends(".h")) {
-				var origfile = src.field(EOL, 1).field("\"", 2).field(" ", 2);
+				let origfile = src.field(EOL, 1).field("\"", 2).field(" ", 2);
 				if (not oswrite(src on origfile))
 					abort(lasterror());
 				if (verbose)
