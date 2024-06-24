@@ -446,7 +446,7 @@ PUBLIC void debug(CVR var1) {
 
 #elif defined(_MSC_VER)
 	// this will terminate the program rather than invoke the debugger but is catchable
-	//[[unlikely]] throw VarDebug(var1);
+	//UNLIKELY throw VarDebug(var1);
 
 // another way to break into the debugger by causing a seg fault
 #elif 0

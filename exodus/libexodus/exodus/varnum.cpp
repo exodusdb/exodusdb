@@ -172,7 +172,7 @@ static std::string double_to_string(double double1) {
 //
 //	// Throw if non-numeric
 //	if (ec != std::errc())
-//		[[unlikely]]
+//		UNLIKELY
 //		throw VarNonNumeric("double_to_string: Cannot convert double to " ^ var(MAX_CHARS) ^ " characters");
 //
 //	// Create a std string from the fixed array of char
@@ -473,7 +473,7 @@ void var::createString() const {
 		return;
 	}
 	// already a string (unlikely since only called when not a string)
-	if (var_typ & VARTYP_STR) [[likely]] {
+	if (var_typ & VARTYP_STR) LIKELY {
 		return;
 	}
 

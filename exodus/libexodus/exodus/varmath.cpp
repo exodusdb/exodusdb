@@ -53,15 +53,15 @@ namespace exodus {
 static double exodusmodulo_dbl(const double dividend, const double limit) {
 
 	if (!limit)
-		[[unlikely]]
+		UNLIKELY
 		throw VarDivideByZero("mod('" ^ var(dividend) ^ "', '" ^ var(limit) ^ ")");
 
 	double result;
 	if (limit > 0) {
-		[[likely]]
+		LIKELY
 		result = fmod(dividend, limit);
 		if (result < 0)
-			[[unlikely]]
+			UNLIKELY
 			result += limit;
 	} else {
 		result = -fmod(-dividend, -limit);
@@ -74,15 +74,15 @@ static double exodusmodulo_dbl(const double dividend, const double limit) {
 static varint_t exodusmodulo_int(const varint_t dividend, const varint_t limit) {
 
 	if (!limit)
-		[[unlikely]]
+		UNLIKELY
 		throw VarDivideByZero("mod('" ^ var(dividend) ^ "', '" ^ var(limit) ^ ")");
 
 	varint_t result;
 	if (limit > 0) {
-		[[likely]]
+		LIKELY
 		result = dividend % limit;
 		if (result < 0)
-			[[unlikely]]
+			UNLIKELY
 			result += limit;
 	} else {
 		result = -(-dividend % -limit);

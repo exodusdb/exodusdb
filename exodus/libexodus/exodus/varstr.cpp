@@ -54,7 +54,7 @@ var var::field(SV separatorx, const int fieldnx, const int nfieldsx) const {
 	assertString(function_sig);
 
 	if (separatorx.empty())
-		[[unlikely]]
+		UNLIKELY
 		throw VarError("separator cannot be blank in field()");
 
 	int fieldno = fieldnx > 0 ? fieldnx : 1;
@@ -119,7 +119,7 @@ VARREF var::fieldstorer(SV separator, const int fieldnx, const int nfieldsx, CVR
 	assertStringMutator(function_sig);
 
 	if (separator.empty())
-		[[unlikely]]
+		UNLIKELY
 		throw VarError("separator cannot be blank in fieldstorer()");
 
 	// handle multibyte/non-ASCII separators
@@ -343,7 +343,7 @@ static bool locateat(const std::string& var_str, const std::string& target, size
 					//break;
 
 				default:
-					[[unlikely]]
+					UNLIKELY
 					throw VarError("locateat() invalid mode " ^ var(order));
 			}
 		}
@@ -449,7 +449,7 @@ static bool locateat(const std::string& var_str, const std::string& target, size
 				break;
 
 			default:
-				[[unlikely]]
+				UNLIKELY
 				throw VarError("locateat() invalid order" ^ var(order));
 		}
 		// skip over any sep character
@@ -475,7 +475,7 @@ static bool locatex(const std::string& var_str, const std::string& target, const
 		const char* ordercodes = "ALARDLDR";
 		const char* orderindex = strstr(ordercodes, ordercode);
 		if (orderindex == nullptr)
-			[[unlikely]]
+			UNLIKELY
 			throw VarError("locateby('" ^ var(ordercode) ^ "') is invalid");
 
 		// convert the memory address to the char position within the codes
@@ -1431,7 +1431,7 @@ var var::first() const& {
 
 	// Return "" if empty
 	if (var_str.empty()) {
-		[[unlikely]]
+		UNLIKELY
 		return "";
 	}
 
@@ -1463,7 +1463,7 @@ var var::first(const size_t  length) const& {
 	// Assume high half of size_t is c++ unblockable conversion
 	// of negative ints to size_t. Runtime error
 	if (length > std::string::npos >> 1)
-		[[unlikely]]
+		UNLIKELY
 		throwNonPositive(__PRETTY_FUNCTION__);
 
 	// Return a new var with the required number of chars from this or all
@@ -1481,7 +1481,7 @@ VARREF var::firster(const size_t length) {
 	// Assume high half of size_t is c++ unblockable conversion
 	// of negative ints to size_t. Runtime error
 	if (length > std::string::npos >> 1)
-		[[unlikely]]
+		UNLIKELY
 		throwNonPositive(__PRETTY_FUNCTION__);
 
 	// Reduce the size of this string if necessary
@@ -1504,7 +1504,7 @@ var var::last() const& {
 	assertString(function_sig);
 
 	if (var_str.empty()) {
-		[[unlikely]]
+		UNLIKELY
 		return "";
 	}
 
@@ -1535,7 +1535,7 @@ var var::last(const size_t  length) const& {
 	// Assume high half of size_t is c++ unblockable conversion
 	// of negative ints to size_t. Runtime error
 	if (length > std::string::npos >> 1)
-		[[unlikely]]
+		UNLIKELY
 		throwNonPositive(__PRETTY_FUNCTION__);
 
 	// Example "abc".last(2)
@@ -1565,7 +1565,7 @@ VARREF var::laster(const size_t length) {
 	// Assume high half of size_t is c++ unblockable conversion
 	// of negative ints to size_t. Runtime error
 	if (length > std::string::npos >> 1)
-		[[unlikely]]
+		UNLIKELY
 		throwNonPositive(__PRETTY_FUNCTION__);
 
 	// Example "abc".last(2)
@@ -2154,7 +2154,7 @@ var var::sumall() const {
 			//for clarity of error message,
 			//throw any error here instead of leaving it up to the +=
 			if (!subfield.isnum())
-				[[unlikely]]
+				UNLIKELY
 				throw VarNonNumeric("sumall() " ^ subfield.first(128).quote());
 
 			nrvo += subfield;
@@ -2196,7 +2196,7 @@ var var::sum() const {
 		//for clarity of error message,
 		//throw any error here instead of leaving it up to the +=
 		if (!this->isnum())
-			[[unlikely]]
+			UNLIKELY
 			throw VarNonNumeric("sum() " ^ this->first(128).quote());
 
 		return (*this) + 0;
@@ -2217,7 +2217,7 @@ var var::sum() const {
 		//for clarity of error message,
 		//throw any error here instead of leaving it up to the +=
 		if (!part.isnum())
-			[[unlikely]]
+			UNLIKELY
 			throw VarNonNumeric("sum() " ^ part.first(128).quote());
 
 		if (flag) {

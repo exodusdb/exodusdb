@@ -91,7 +91,7 @@ var_iter var_iter::operator--() {
 
 	// Decrement below zero is not allowed and throws if attempted
 	if (startpos_ < 1)
-		[[unlikely]]
+		UNLIKELY
 		throw VarError(__PRETTY_FUNCTION__);
 
 	// Point to the separator before the current field
