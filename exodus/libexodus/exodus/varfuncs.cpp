@@ -377,7 +377,7 @@ void var::default_to(CVR defaultvalue) {
 	//?allow undefined usage like var xyz=xyz.readnext();
 	// if (var_typ & VARTYP_MASK)
 
-	if (this->unassigned()) [[unlikely]]{
+	if (this->unassigned()) UNLIKELY{
 		// throw VarUndefined("unassigned( ^ defaultvalue ^")");
 		// var_str="";
 		// var_typ=VARTYP_STR;
@@ -449,9 +449,9 @@ var var::textwidth() const {
 	// If all ASCII then return count of non-control chars
 	auto size = var_str.size();
 	for (const unsigned char c : var_str) {
-		if (c > '\x7f') [[unlikely]]
+		if (c > '\x7f') UNLIKELY
 			goto unicode;
-		if (c < '\x20') [[unlikely]]
+		if (c < '\x20') UNLIKELY
 			size--;
 	}
 	return size;
@@ -469,7 +469,7 @@ unicode:
 			wstr1.end(),
 			// lambda function to replace and count control chars (0x00 to 0x1f)
 			[&ncontrolchars](const char ch) {
-				if (ch >= 32) [[likely]]
+				if (ch >= 32) LIKELY
 					return false;
 				ncontrolchars++;
 				return true;

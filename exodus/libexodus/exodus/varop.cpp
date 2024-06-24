@@ -166,7 +166,7 @@ tryagain:
 	// prefer int since ++ nearly always on integers
 	if (var_typ & VARTYP_INT) {
 		if (var_int == std::numeric_limits<decltype(var_int)>::max())
-			[[unlikely]]
+			UNLIKELY
 			throw VarNumOverflow("operator++");
 		priorvalue = var(var_int);
 		var_int++;
@@ -207,7 +207,7 @@ tryagain:
 	// prefer int since -- nearly always on integers
 	if (var_typ & VARTYP_INT) {
 		if (var_int == std::numeric_limits<decltype(var_int)>::min())
-			[[unlikely]]
+			UNLIKELY
 			throw VarNumUnderflow("operator--");
 		priorvalue = var(var_int);
 		var_int--;
@@ -245,7 +245,7 @@ tryagain:
 	// prefer int since -- nearly always on integers
 	if (var_typ & VARTYP_INT) {
 		if (var_int == std::numeric_limits<decltype(var_int)>::max())
-			[[unlikely]]
+			UNLIKELY
 			throw VarNumOverflow("operator++");
 		var_int++;
 		var_typ = VARTYP_INT;  // reset to one unique type
@@ -280,7 +280,7 @@ tryagain:
 	// prefer int since -- nearly always on integers
 	if (var_typ & VARTYP_INT) {
 		if (var_int == std::numeric_limits<decltype(var_int)>::min())
-			[[unlikely]]
+			UNLIKELY
 			throw VarNumUnderflow("operator--");
 		var_int--;
 		var_typ = VARTYP_INT;  // reset to one unique type
@@ -353,7 +353,7 @@ tryagain:
 
 	// try to convert to numeric
 	if (isnum())
-		[[likely]]
+		LIKELY
 		goto tryagain;
 
 	assertNumeric(__PRETTY_FUNCTION__);
@@ -401,7 +401,7 @@ tryagain:
 
 	// try to convert to numeric
 	if (isnum())
-		[[likely]]
+		LIKELY
 		goto tryagain;
 
 	assertNumeric(__PRETTY_FUNCTION__);
@@ -449,7 +449,7 @@ tryagain:
 
 	// try to convert to numeric
 	if (isnum())
-		[[likely]]
+		LIKELY
 		goto tryagain;
 
 	assertNumeric(__PRETTY_FUNCTION__);
@@ -476,7 +476,7 @@ tryagain:
 		// rhs double
 		if (rhs.var_typ & VARTYP_DBL) {
 			if (!rhs.var_dbl)
-				[[unlikely]]
+				UNLIKELY
 				throw VarDivideByZero("div('" ^ this->first(128) ^ "', '" ^ rhs.first(128) ^
 									 "')");
 			var_dbl /= rhs.var_dbl;
@@ -485,7 +485,7 @@ tryagain:
 		// rhs double
 		else {
 			if (!rhs.var_int)
-				[[unlikely]]
+				UNLIKELY
 				throw VarDivideByZero("div('" ^ this->first(128) ^ "', '" ^ rhs.first(128) ^
 									 "')");
 			// warning: conversion from ‘exodus::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
@@ -500,7 +500,7 @@ tryagain:
 		// rhs double
 		if (rhs.var_typ & VARTYP_DBL) {
 			if (!rhs.var_dbl)
-				[[unlikely]]
+				UNLIKELY
 				throw VarDivideByZero("div('" ^ this->first(128) ^ "', '" ^ rhs.first(128) ^
 								 "')");
 			// warning: conversion from ‘exodus::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
@@ -510,7 +510,7 @@ tryagain:
 		// both are ints - must return a double
 		else {
 			if (!rhs.var_int)
-				[[unlikely]]
+				UNLIKELY
 				throw VarDivideByZero("div('" ^ this->first(128) ^ "', '" ^ rhs.first(128) ^
 				"')");
 			// warning: conversion from ‘exodus::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
@@ -563,7 +563,7 @@ tryagain:
 	else if (isnum())
 		goto tryagain;
 
-	else [[unlikely]] {
+	else UNLIKELY {
 		assertNumeric(__PRETTY_FUNCTION__);
 		// Cant get here
 		throw VarNonNumeric(this->first(128) ^ "+= ");
@@ -637,7 +637,7 @@ tryagain:
 VARREF var::operator/=(const double dbl1) &{
 
 	if (!dbl1)
-		[[unlikely]]
+		UNLIKELY
 		throw VarDivideByZero("div('" ^ this->first(128) ^ "', '" ^ dbl1 ^
 		"')");
 
@@ -702,7 +702,7 @@ tryagain:
 
 	// try to convert to numeric
 	if (isnum())
-		[[likely]]
+		LIKELY
 		goto tryagain;
 
 	assertNumeric(__PRETTY_FUNCTION__);
@@ -736,7 +736,7 @@ tryagain:
 
 	// try to convert to numeric
 	if (isnum())
-		[[likely]]
+		LIKELY
 		goto tryagain;
 
 	assertNumeric(__PRETTY_FUNCTION__);
@@ -770,7 +770,7 @@ tryagain:
 
 	// try to convert to numeric
 	if (isnum())
-		[[likely]]
+		LIKELY
 		goto tryagain;
 
 	assertNumeric(__PRETTY_FUNCTION__);
@@ -787,7 +787,7 @@ VARREF var::operator/=(const int int1) &{
 	// Always return double
 
 	if (!int1)
-		[[unlikely]]
+		UNLIKELY
 		throw VarDivideByZero("div('" ^ this->first(128) ^ "', '" ^ int1 ^
 		"')");
 
@@ -872,7 +872,7 @@ var var::operator-() const{
 
 	assertDefined(__PRETTY_FUNCTION__);
 
-	do [[likely]] {
+	do LIKELY {
 		// dbl
 		if (var_typ & VARTYP_DBL)
 			return -var_dbl;
@@ -995,7 +995,7 @@ std::ostream& operator<<(std::ostream& ostream1, var var1) {
 	// |\x1B}]^~  or in high to low ~^]}\x1B|     or in TRACE() ... ~^]}_|
 	for (auto& charx : var1.var_str) {
 		if (charx <= 0x1F && charx >= 0x1A) {
-			[[unlikely]]
+			UNLIKELY
 			//charx = "|\x1B}]^~"[charx - 0x1A];
 			charx = VISIBLE_FMS_EXCEPT_ESC[charx - 0x1A];
 		}

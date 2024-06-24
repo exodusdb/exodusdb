@@ -127,7 +127,7 @@ bool ExodusProgramBase::select(CVR sortselectclause_or_filehandle) {
 		dictfilename = "dict.voc";
 		if (!DICT.open(dictfilename)) {
 			//throw VarDBException(dictfilename.quote() ^ " cannot be opened");
-			[[unlikely]]
+			UNLIKELY
 			throw VarError(dictfilename.quote() ^ " cannot be opened");
 		}
 	}
@@ -201,7 +201,7 @@ bool ExodusProgramBase::select(CVR sortselectclause_or_filehandle) {
 		if (!op)
 			opno = 0;
 		else if (not var("= <> > < >= <= ~ ~* !~ !~* >< >!< in not_in !! ! ] [ []").locateusing(" ", op.convert(" ", "_"), opno))
-			[[unlikely]]
+			UNLIKELY
 			throw VarError(op.quote() ^ " unknown op in sql select");
 		opnos[fieldn] = opno;
 
@@ -288,7 +288,7 @@ bool ExodusProgramBase::select(CVR sortselectclause_or_filehandle) {
 
 		//create the temporary table
 		if (!CURSOR.sqlexec(createtablesql))
-			[[unlikely]]
+			UNLIKELY
 			throw VarError("ExodusProgramBase::select " ^ var().lasterror());
 
 	} else
@@ -505,7 +505,7 @@ bool ExodusProgramBase::formlist(CVR filename_or_command, CVR keys /*=""*/, cons
 	//open the file
 	clearselect();
 	if (not CURSOR.open(filename2))
-		[[unlikely]]
+		UNLIKELY
 		throw VarError(filename2.quote() ^ " file cannot be opened in formlist(" ^ keys ^ ")");
 
 	return CURSOR.formlist(keys2, fieldno);
@@ -551,7 +551,7 @@ bool ExodusProgramBase::deleterecord(CVR filename_or_handle_or_command, CVR key)
 
 	if (not filename_or_handle_or_command.assigned() || not key.assigned())
 		//throw VarUnassigned("bool ExodusProgramBase::deleterecord(CVR filename_or_handle_or_command, CVR key)");
-		[[unlikely]]
+		UNLIKELY
 		throw VarError("bool ExodusProgramBase::deleterecord(CVR filename_or_handle_or_command, CVR key)");
 
 	// Simple deleterecord
@@ -1218,7 +1218,7 @@ var ExodusProgramBase::perform(CVR sentence) {
 											)) {
 			USER4 ^= "perform() Cannot find shared library \"" + libname +
 					 "\", or \"libraryexit()\" is not present in it.";
-			// [[unlikely]] throw VarError(USER4);
+			// UNLIKELY throw VarError(USER4);
 			// return "";
 			break;
 		}
@@ -1240,7 +1240,7 @@ var ExodusProgramBase::perform(CVR sentence) {
 			if (retval->unassigned()) {
 				retval->dump().errputl();
 				restore_environment();
-				[[unlikely]]
+				UNLIKELY
 				throw VarError("exoprog::perform corrupt result. perform only functions, not subroutines.");
 			}
 
@@ -1294,7 +1294,7 @@ var ExodusProgramBase::perform(CVR sentence) {
 			restore_environment();
 
 			// Use gdb command "catch throw" to break at error line to get back traces there
-			[[unlikely]]
+			UNLIKELY
 			throw;
 		}
 
@@ -1350,7 +1350,7 @@ var ExodusProgramBase::xlate(CVR filename, CVR key, CVR fieldno_or_name, const c
 	var dictfile;
 	if (not is_fieldno) {
 		if (not dictfile.open("dict." ^ filename.f(1))) {
-			[[unlikely]]
+			UNLIKELY
 			throw VarError("ExodusProgramBase::xlate(filename:" ^ filename ^ ", key:" ^ key ^ ",field:" ^ fieldno_or_name ^ ") - dict." ^ filename ^ " does not exist.");
 		}
 	}
@@ -1453,7 +1453,7 @@ var ExodusProgramBase::calculate(CVR dictid) {
 		newlibfunc = true;
 
 		if (not DICT)
-			[[unlikely]]
+			UNLIKELY
 			throw VarError("ExodusProgramBase::calculate(" ^ dictid ^
 						  ") DICT file variable has not been set");
 
@@ -1466,7 +1466,7 @@ var ExodusProgramBase::calculate(CVR dictid) {
 				var dictvoc;  // TODO implement mv.DICTVOC to avoid opening
 				if (not dictvoc.open("dict.voc")) {
 baddict:
-					[[unlikely]]
+					UNLIKELY
 					throw VarError("ExodusProgramBase::calculate(" ^ dictid ^
 								  ") dictionary record not in DICT " ^
 								  DICT.f(1).quote() ^ " nor in dict.voc");
@@ -1553,7 +1553,7 @@ baddict:
 														libname.c_str(),
 														str_funcname.c_str())
 													)
-					[[unlikely]]
+					UNLIKELY
 					throw VarError("ExodusProgramBase::calculate() Cannot find Library " +
 								  libname + ", or function " +
 								  dictid.lcase() + " is not present");
@@ -1587,7 +1587,7 @@ baddict:
 		return ANS;
 	}
 
-	[[unlikely]]
+	UNLIKELY
 	throw VarError("ExodusProgramBase::calculate(" ^ dictid ^ ") " ^ DICT ^ " Invalid dictionary type " ^
 				  dicttype.quote());
 }
@@ -1701,7 +1701,7 @@ inp:
 	if (reply < 0 || reply > noptions) {
 		if (interactive)
 			goto inp;
-		[[unlikely]]
+		UNLIKELY
 		throw VarError(questionx ^ " Default reply must be 0-" ^ noptions);
 	}
 

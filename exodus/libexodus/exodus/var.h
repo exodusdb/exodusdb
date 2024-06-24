@@ -80,6 +80,14 @@ THE SOFTWARE.
 //#	define EXTERN
 //#endif
 
+#if __has_cpp_attribute(likely)
+#	define LIKELY [[likely]]
+#	define UNLIKELY [[unlikely]]
+#else
+#	define LIKELY
+#	define UNLIKELY
+#endif
+
 #define ND [[nodiscard]]
 
 // constinit https://en.cppreference.com/w/cpp/language/constinit

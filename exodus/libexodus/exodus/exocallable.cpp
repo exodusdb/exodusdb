@@ -345,7 +345,7 @@ bool Callable::checkload(const std::string newlibname, const std::string newfunc
 		if (TRACING >= 1) {
 			std::cout << "exocallable:checkload: ko:" << newlibname << std::endl;
 		}
-		[[unlikely]]
+		UNLIKELY
 		throw VarError("Unable to load " ^ var(libfilepath_));
 		//std::unreachable();
 		//return false;
@@ -358,7 +358,7 @@ bool Callable::checkload(const std::string newlibname, const std::string newfunc
 			std::cout << "exocallable:checkload: ko:" << libname_ << " " << newfuncname
 					  << std::endl;
 		}
-		[[unlikely]]
+		UNLIKELY
 		throw VarError("Unable to find function " ^ var(newfuncname) ^ " in " ^
 					  var(libfilepath_));
 		//std::unreachable();
@@ -468,12 +468,12 @@ bool Callable::openlib(const std::string newlibname) {
 	if (plib_ == nullptr) {
 		var libfilepath = libfilepath_;
 		if (libfilepath.osfile()) {
-			[[unlikely]]
+			UNLIKELY
 			throw VarError(libfilepath ^ " Cannot be linked/wrong version. Run with LD_DEBUG=libs for more info. Look for 'fatal'. Also run 'ldd "
 			^ libfilepath ^ "' to check its sublibs are available. Also run 'nm -C " ^ libfilepath ^ "' to check its content.)"
 			^ " To unmangle undefined symbols run 'c++filt _ZN6exodus3varC1Ev' for example to to see  exodus::var::var()");
 		} else {
-			[[unlikely]]
+			UNLIKELY
 			throw VarError(libfilepath ^ " does not exist or cannot be found, or " ^ purelibfilename ^ " cannot be linked/wrong version?");
 		}
 		//std::unreachable();
@@ -528,7 +528,7 @@ bool Callable::openfunc(const std::string newfuncname) {
 
 	// Throw if symbol does not exist
 	if (pfunc_ == nullptr) {
-		[[unlikely]]
+		UNLIKELY
 		throw VarError(var(newfuncname).replace("exodusprogrambasecreatedelete_", "").quote() ^ " function cannot be found in lib " ^
 					  var(libfilepath_).quote());
 	}
