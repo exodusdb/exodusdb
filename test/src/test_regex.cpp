@@ -38,7 +38,8 @@ programinit()
 	//groups
 	var csvline1 = "abcdef abcdef";
 	var csvre1	 = "(bc).(ef)";
-	assert(match(csvline1, csvre1).convert(_FM _VM, "^]") eq "bcdef]bc]ef^bcdef]bc]ef");
+	// bcdef]bc]ef^bcdef]bc]ef
+	assert(match(csvline1, csvre1).convert(_FM _VM, "^]").outputl() eq "bcdef]bc]ef^bcdef]bc]ef");
 
 	//no groups
 	var csvline2 = "abcdef abcdef";
@@ -100,7 +101,8 @@ programinit()
 	}
 
 	if (BOOST_REGEX) {
-		assert(match(csvline, csvre).convert(_FM _VM, "^]") eq R"raw(123]]123^,2.99]]2.99^,AMO024]]AMO024^,Title]]Title^,"Description, more info"]"]Description, more info^,^,123987564]]123987564)raw");
+		//123]]123^,2.99]]2.99^,AMO024]]AMO024^,Title]]Title^,"Description, more info"]"]Description, more info^,]]^,123987564]]123987564
+		assert(match(csvline, csvre).convert(_FM _VM, "^]").outputl() eq R"raw(123]]123^,2.99]]2.99^,AMO024]]AMO024^,Title]]Title^,"Description, more info"]"]Description, more info^,]]^,123987564]]123987564)raw");
 
 		//unicode case insensitive finding
 		assert(match("αβγδεΑΒΓΔΕ", "(Α).(γδ)", "i").convert(_FM _VM, "^]") eq "αβγδ]α]γδ^ΑΒΓΔ]Α]ΓΔ");

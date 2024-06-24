@@ -296,7 +296,6 @@ var var::match(SV matchstr, SV options) const {
 			++iter;
 		}
 	*/
-	std::string found;
 
 	// https://stackoverflow.com/questions/26320987/what-is-the-difference-between-regex-token-iterator-and-regex-iterator
 	// boost::u32regex_token_iterator<std::string::const_iterator>
@@ -316,25 +315,42 @@ var var::match(SV matchstr, SV options) const {
 	std::regex_iterator<std::string::const_iterator> iter(var_str.begin(), var_str.end(), regex);
 #endif
 
+	var result;
+	result.var_typ = VARTYP_STR;
+
 	// Using declarative functional style "for_each with lambda" instead of "while (iter!=end)" loop
 	decltype(iter) end{};
 	std::for_each(iter, end,
-		[&found](auto what) {
-		  for (int groupn = 0; uint(groupn) <= what.size(); ++groupn) {
-			  // std::cout<< what[0] << std::endl;
-			  found.append(what[groupn]);
-			  found.push_back(VM_);
-		  }
-		  if (!found.empty())
-			  while (found.back() == VM_)
-				  found.pop_back();
-		  found.push_back(FM_);
-		});
+		[&result](auto match_results) {
 
-	if (!found.empty())
-		found.pop_back();
+			// group 0 is complete match
+			// any subgroups are groupn 1+
+//			for (int groupn = 0; uint(groupn) <= match_results.size(); ++groupn) {
+			for (int groupn = 0; uint(groupn) < match_results.size(); ++groupn) {
+				// std::cout<< match_results[0] << std::endl;
+				result.var_str.append(match_results[groupn]);
+				//result.var_str.append(var(groupn).toString());
 
-	return found;
+				// any submatch groups are separated by VM
+				result.var_str.push_back(VM_);
+			}
+
+			// Remove trailing VM
+			if (!result.var_str.empty()) {
+//				while (result.var_str.back() == VM_)
+				result.var_str.pop_back();
+			}
+
+			// muliple matches are separated by FM
+			result.var_str.push_back(FM_);
+		}
+	);
+
+	// Remove trailing FM
+	if (!result.var_str.empty())
+		result.var_str.pop_back();
+
+	return result;
 
 }
 
