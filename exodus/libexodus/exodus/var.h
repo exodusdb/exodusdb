@@ -35,12 +35,6 @@ THE SOFTWARE.
 #include <string>
 #include <string_view>
 
-// Capture function execution times and dump on program exit
-// Use cmake -DEXODUS_TIMEBANK
-#ifdef EXODUS_TIMEBANK
-#	include "timebank.h"
-#endif
-
 // Support var::format functions
 #define EXO_FORMAT
 #ifdef EXO_FORMAT
@@ -127,6 +121,18 @@ THE SOFTWARE.
 #	define CONSTEXPR
 #	define CONSTINIT_OR_CONSTEXPR constexpr
 #	define CONSTINIT_VAR
+#endif
+
+#if __cpp_consteval >= 201811L
+#	define CONSTEVAL_OR_CONSTEXPR consteval
+#else
+#	define CONSTEVAL_OR_CONSTEXPR constexpr
+#endif
+
+// Capture function execution times and dump on program exit
+// Use cmake -DEXODUS_TIMEBANK=1
+#ifdef EXODUS_TIMEBANK
+#	include "timebank.h"
 #endif
 
 #include <exodus/vartyp.h>
@@ -1853,7 +1859,7 @@ class PUBLIC var final {
 	ND var textlen() const;
 	ND var fcount(SV str) const;
 	ND var count(SV str) const;
-	ND var match(SV str, SV options DEFAULT_EMPTY) const;
+	ND var match(SV regex, SV regex_options DEFAULT_EMPTY) const;
 
 	//                                  Javascript   PHP             Python       Go          Rust          C++
 	ND bool starts(SV str) const;    // startsWith() str_starts_with startswith() HasPrefix() starts_with() starts_with
@@ -1862,9 +1868,11 @@ class PUBLIC var final {
 
 	//https://en.wikipedia.org/wiki/Comparison_of_programming_languages_(string_functions)#Find
 	//ND var index(SV str) const;
-	ND var index(SV str, const int startchar1 = 1) const;   // byte returned and startchar1
-	ND var indexn(SV str, const int occurrence) const;      // byte returned
-	ND var indexr(SV str, const int startchar1 = -1) const; // byte returned
+	ND var index(SV str, const int startchar1 = 1) const;   // return byte no if found or 0 if not. startchar1 is byte no to start at.
+	ND var indexn(SV str, const int occurrence) const;      // ditto. occurrence 1 = find first occurrence
+	ND var indexr(SV str, const int startchar1 = -1) const; // ditto. reverse search. startchar1 -1 starts from the last byte
+
+	ND var search(SV regex, VARREF startchar1, SV regex_options DEFAULT_EMPTY) const; // returns match with groups and startchar1 one after matched
 
 	//static member for speed on std strings because of underlying boost implementation
 	static int localeAwareCompare(const std::string& str1, const std::string& str2);
@@ -1919,7 +1927,7 @@ class PUBLIC var final {
 	ND var textconvert(SV fromchars, SV tochars) const&;
 
 	ND var replace(SV fromstr, SV tostr) const&;
-	ND var regex_replace(SV regex, SV replacement, SV options DEFAULT_EMPTY) const&;
+	ND var regex_replace(SV regex, SV replacement, SV regex_options DEFAULT_EMPTY) const&;
 
 	ND var unique() const&;
 	ND var sort(SV sepchar = _FM) const&;
@@ -1970,7 +1978,7 @@ class PUBLIC var final {
 	ND VARREF convert(SV fromchars, SV tochars) &&;
 	ND VARREF textconvert(SV fromchars, SV tochars) &&;
 	ND VARREF replace(SV fromstr, SV tostr) &&;
-	ND VARREF regex_replace(SV regex, SV replacement, SV options DEFAULT_EMPTY) &&;
+	ND VARREF regex_replace(SV regex, SV replacement, SV regex_options DEFAULT_EMPTY) &&;
 
 	ND VARREF unique() &&;
 	ND VARREF sort(SV sepchar = _FM) &&;
@@ -2025,7 +2033,7 @@ class PUBLIC var final {
 	VARREF converter(SV fromchars, SV tochars);
 	VARREF textconverter(SV fromchars, SV tochars);
 	VARREF replacer(SV fromstr, SV tostr);
-	VARREF regex_replacer(SV regex, SV replacement, SV options DEFAULT_EMPTY);
+	VARREF regex_replacer(SV regex, SV replacement, SV regex_options DEFAULT_EMPTY);
 
 	VARREF uniquer();
 	VARREF sorter(SV sepchar = _FM);

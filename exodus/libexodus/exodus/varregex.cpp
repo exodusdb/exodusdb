@@ -134,66 +134,102 @@ namespace exodus {
 
 #endif
 
-static syntax_flags_typ get_regex_syntax_flags(SV options) {
-	// determine options from string
+constexpr static syntax_flags_typ get_syntax_flags(SV regex_options) {
+
+	// Note that match_flags e.g. (f for first only) are only used in regex_replace
+
+	// determine regex_options from string
+
+	// char ranges like a-z will be locale sensitive if ECMAScript
+
+	// w - glob not regex (for match)
+
+	// l - literal
+
+	// i - case insensitive
+
+	// p - ECMAScript/Perl default
+	// b - basic posix
+	// e - extended posix
+
+	// m - multiline. default in boost
+	// s - single line. default in std::regex
 
 	// Default flavour is ECMAScript/Perl
 	// https://www.boost.org/doc/libs/1_80_0/libs/regex/doc/html/boost_regex/ref/syntax_option_type/syntax_option_type_perl.html
 	// https://en.cppreference.com/w/cpp/regex/syntax_option_type
 
-	// default
-	// collate	Character ranges of the form "[a-b]" will be locale sensitive.
-	// if the normal/ECMAScript/perl engine is selected.
+	// default - collate - Character ranges of the form "[a-b]" will be locale sensitive.
+	// IF? the normal/ECMAScript/perl engine is selected.
 	syntax_flags_typ regex_syntax_flags = std_boost::regex_constants::collate;
 
-	// i = icase
-	//if (options.contains("i"))
-	if (options.find('i') != std::string::npos)
+	// i = icase - Character matching should be performed without regard to case.
+	if (regex_options.find('i') != std::string::npos)
 		regex_syntax_flags |= std_boost::regex_constants::icase;
 
 	// m = multiline (The default in boost but not std::regex
 	// Specifies that ^ shall match the beginning of a line and $ shall match the end of a line,
 	// if the normal/perl/ECMAScript engine is selected.
-	//if (options.find('m') != std::string::npos)
-	//	regex_syntax_flags|=std_boost::regex_constants::multiline;
+#ifndef USE_BOOST
+	if (regex_options.find('m') != std::string::npos)
+		regex_syntax_flags|=std_boost::regex_constants::multiline;
+#endif
 
 	// s = single/no multiline (The default in std::regex but not boost
 	// Specifies that ^ shall match the beginning of a line and $ shall match the end of a line,
 	// if the normal/perl/ECMAScript engine is selected.
-	if (options.find('s') != std::string::npos)
+	if (regex_options.find('s') != std::string::npos)
 		regex_syntax_flags|=std_boost::regex_constants::no_mod_m;
 
-	// b = basic (withdrawn after c++17?)
-	// Use the basic POSIX regular expression grammar
-	// if (options.contains("b"))
-	//	regex_syntax_flags|=std_boost::regex_constants::basic;
+	// b = basic - Use the basic POSIX regular expression grammar
+	if (regex_options.find('b') != std::string::npos)
+		regex_syntax_flags|=std_boost::regex_constants::basic;
 
-	// e = extended
-	// Use the extended POSIX regular expression grammar
-	//if (options.contains("e"))
-	if (options.find('e') != std::string::npos)
+	// e = extended - Use the extended POSIX regular expression grammar
+	if (regex_options.find('e') != std::string::npos)
 		regex_syntax_flags |= std_boost::regex_constants::extended;
+
+	// a = awk - Use the regular expression grammar used by the awk utility in POSIX
+	// Use the extended POSIX regular expression grammar
+	if (regex_options.find('a') != std::string::npos)
+		regex_syntax_flags |= std_boost::regex_constants::awk;
+
+	// n = nosubs - When performing matches, all marked sub-expressions (expr) are treated
+	// as non-marking sub-expressions (?:expr).
+	// No matches are stored in the supplied std::regex_match structure and mark_count() is zero.
+	if (regex_options.find('n') != std::string::npos)
+		regex_syntax_flags |= std_boost::regex_constants::nosubs;
+
+	// g = grep - Use the regular expression grammar used by the grep utility in POSIX.
+	// This is effectively the same as the basic option with the addition of newline '\n' as an alternation separator.
+	if (regex_options.find('g') != std::string::npos)
+		regex_syntax_flags |= std_boost::regex_constants::grep;
 
 	// l - literal TODO manually implement
 	// ignore all usual regex special characters
 	// BOOST only option
 #ifdef USE_BOOST
-	//if (options.contains("l"))
-	if (options.find('l') != std::string::npos)
+	//if (regex_options.contains("l"))
+	if (regex_options.find('l') != std::string::npos)
 		regex_syntax_flags |= std_boost::regex_constants::literal;
 #endif
 
 	return regex_syntax_flags;
 }
 
+///////////
+// getregex helper/cache
+///////////
+
 static thread_local std::map<std::string, REGEX> thread_regexes;
 
 // Caches regex giving very approx 10x speed up
-static REGEX& getregex(SV matchstr, SV options) {
+static REGEX& getregex(SV regex, SV regex_options) {
 
-	auto cache_key = std::string(matchstr);
+	// cache with regex and regex_options since regex_options change the effect
+	auto cache_key = std::string(regex);
 	cache_key.push_back(FM_);
-	cache_key += options;
+	cache_key += regex_options;
 
 	auto mapiter = thread_regexes.find(cache_key);
 	if (mapiter != thread_regexes.end())
@@ -203,18 +239,18 @@ static REGEX& getregex(SV matchstr, SV options) {
 		[[maybe_unused]] auto [mapiter, success] = thread_regexes.emplace(
 			cache_key,
 			boost::make_u32regex(
-				std::string(matchstr),
-				// Analyse the options requested
-				get_regex_syntax_flags(options)
+				std::string(regex),
+				// Analyse the regex_options requested
+				get_syntax_flags(regex_options)
 			)
 		);
 		return mapiter->second;
 	}
 	catch (boost::wrapexcept<std::out_of_range>& e) {
-		throw VarError("Error: (1) Invalid data during match of " ^ var(matchstr).quote() ^ ". " ^ var(e.what()));
+		throw VarError("Error: (1) Invalid data during match of " ^ var(regex).quote() ^ ". " ^ var(e.what()));
 	}
 	catch (std_boost::regex_error& e) {
-		throw VarError("Error: Invalid regex string " ^ var(matchstr).quote() ^ ". " ^ var(e.what()).quote());
+		throw VarError("Error: Invalid regex string " ^ var(regex).quote() ^ ". " ^ var(e.what()).quote());
 	}
 
 	// Cannot get here
@@ -222,22 +258,26 @@ static REGEX& getregex(SV matchstr, SV options) {
 	//throw VarError("getreg");
 }
 
-// should be in mvfuncs.cpp - here really because boost regex is included here for file matching
-var var::match(SV matchstr, SV options) const {
+////////
+// match
+////////
 
-	// VISUALISE REGULAR EXPRESSIONS GRAPHICALLY!
+// should be in mvfuncs.cpp - here really because boost regex is included here for file matching
+var var::match(SV regex, SV regex_options) const {
+
+	// VISUALISE REGULAR EXPRESSIONS GRAPHICALLY
 	// https:www.debuggex.com
 
-	THISIS("bool var::match(SV matchstr, SV options) const")
+	THISIS("var var::match(SV regex, SV regex_options) const")
 	assertString(function_sig);
-	//ISSTRING(matchstr)
+	//ISSTRING(regex)
 
 	// wild cards like
 	// *.* or *.???
 	// *abcde
 	// abcde*
-	//if (options.contains("w")) { //c++20
-	if (options.find("w") != std::string::npos) {
+	//if (regex_options.contains("w")) { //c++20
+	if (regex_options.find('w') != std::string::npos) {
 
 		// rules of glob - converting glob to regex
 
@@ -255,96 +295,78 @@ var var::match(SV matchstr, SV options) const {
 		const std::string replacement_for_regex_special = R"raw(\$&)raw";
 #endif
 
-		//std::string matchstr2 = std_boost::regex_replace(matchstr.var_str, regex_special_chars,
-		std::string matchstr2 = std_boost::regex_replace(std::string(matchstr), regex_special_chars,
+		//std::string regex2 = std_boost::regex_replace(regex.var_str, regex_special_chars,
+		std::string regex2 = std_boost::regex_replace(std::string(regex), regex_special_chars,
 											  replacement_for_regex_special);
 
 		// 1. force to match whole string
-		var matchstr3 = "^" + matchstr2 + "$";
+		var regex3 = "^" + regex2 + "$";
 
 		// 2. * matches zero or more characters like .* in regex
-		matchstr3.replacer("*", ".*");
+		regex3.replacer("*", ".*");
 
 		// 3. ? matches any one character
-		matchstr3.replacer("?", ".");
-		//TRACE(matchstr3)
+		regex3.replacer("?", ".");
+		//TRACE(regex3)
 
 		// having created a suitable regex str, recursively call match with it
-		return this->match(matchstr3);
+		return this->match(regex3);
 	}
 
-	REGEX& regex = getregex(matchstr, options);
-
-	/*
-		//create iterators to matches
-		//https://www.boost.org/doc/libs/1_70_0/libs/regex/doc/html/boost_regex/ref/non_std_strings/icu/unicode_iter.html
-		//auto iter {std_boost::make_u32regex_token_iterator(var_str,regex)};
-		const int subs[] = {1, 2, 3, 0};
-		boost::u32regex_token_iterator<std::string::const_iterator> iter
-	   {std_boost::make_u32regex_token_iterator(var_str,regex,subs)}; decltype(iter) end {};
-
-		//cycle through matches, appending whatever is found to the output
-		std::string found="";
-		int ii {0};
-		while (iter != end)
-		{
-			std::cout<< ++ii << " " <<*iter<<std::endl;
-			//std::cout<<(*iter).first<<std::endl;
-			//std::cout << iter->size() << std::endl;
-			found.append(*iter);
-			found.push_back(FM_);
-			++iter;
-		}
-	*/
-
-	// https://stackoverflow.com/questions/26320987/what-is-the-difference-between-regex-token-iterator-and-regex-iterator
-	// boost::u32regex_token_iterator<std::string::const_iterator>
-	//	iter {std_boost::make_u32regex_token_iterator(var_str,regex,{0,1,2,3,4,etc or -1})};
-	// token_iterator allow you to access none-matching parts of the string for parsing stuff
-	// but doesnt return an iterator with an array of groups
+	REGEX& regex_obj = getregex(regex, regex_options);
 
 	// construct our iterators:
 #ifdef USE_BOOST
 	boost::u32regex_iterator<std::string::const_iterator> iter;
 	try {
-		iter = boost::make_u32regex_iterator(var_str, regex);
+		iter = boost::make_u32regex_iterator(var_str, regex_obj);
 	} catch (boost::wrapexcept<std::out_of_range>& e) {
-		throw VarError("Error: (2) Invalid match string " ^ var(matchstr).quote() ^ ". " ^ var(e.what()));
+		throw VarError("Error: (2) Invalid match string " ^ var(regex).quote() ^ ". " ^ var(e.what()));
 	}
 #else
-	std::regex_iterator<std::string::const_iterator> iter(var_str.begin(), var_str.end(), regex);
+	std::regex_iterator<std::string::const_iterator> iter(var_str.begin(), var_str.end(), regex_obj);
 #endif
+	decltype(iter) end{};
 
+	// Prepare to return empty string
 	var result;
 	result.var_typ = VARTYP_STR;
 
-	// Using declarative functional style "for_each with lambda" instead of "while (iter!=end)" loop
-	decltype(iter) end{};
-	std::for_each(iter, end,
-		[&result](auto match_results) {
+	// NOT using declarative functional style "for_each with lambda" instead of "while (iter!=end)" loop
+	// Because we need to optionally break out after first match
+//	std::for_each(iter, end,
+//		[&result](auto match_results) {
 
-			// group 0 is complete match
-			// any subgroups are groupn 1+
+	bool firstonly = regex_options.find('f') != std::string::npos;
+	while (iter != end) {
+
+		auto match_results = *iter;
+
+		// group 0 is complete match
+		// any subgroups are groupn 1+
 //			for (int groupn = 0; uint(groupn) <= match_results.size(); ++groupn) {
-			for (int groupn = 0; uint(groupn) < match_results.size(); ++groupn) {
-				// std::cout<< match_results[0] << std::endl;
-				result.var_str.append(match_results[groupn]);
-				//result.var_str.append(var(groupn).toString());
+		for (int groupn = 0; uint(groupn) < match_results.size(); ++groupn) {
+			// std::cout<< match_results[0] << std::endl;
+			result.var_str.append(match_results[groupn]);
+			//result.var_str.append(var(groupn).toString());
 
-				// any submatch groups are separated by VM
-				result.var_str.push_back(VM_);
-			}
-
-			// Remove trailing VM
-			if (!result.var_str.empty()) {
-//				while (result.var_str.back() == VM_)
-				result.var_str.pop_back();
-			}
-
-			// muliple matches are separated by FM
-			result.var_str.push_back(FM_);
+			// Groups are separated by VM
+			result.var_str.push_back(VM_);
 		}
-	);
+
+		// Remove trailing VM
+		if (!result.var_str.empty()) {
+			result.var_str.pop_back();
+		}
+
+		// Multiple matches are separated by FM
+		result.var_str.push_back(FM_);
+
+		if (firstonly)
+			break;
+
+		iter++;
+	}
 
 	// Remove trailing FM
 	if (!result.var_str.empty())
@@ -354,8 +376,151 @@ var var::match(SV matchstr, SV options) const {
 
 }
 
+/////////
+// search
+/////////
+
+// should be in mvfuncs.cpp - here really because boost regex is included here for file matching
+var var::search(SV regex, VARREF startchar1, SV regex_options) const {
+
+	THISIS("var var::search(SV regex, int startchar1, SV regex_options) const")
+	assertString(function_sig);
+
+	// Note that option f - first only is deliberately not implemented in search
+
+	// startchar1 can unassigned or numeric
+	if (startchar1.unassigned())
+		startchar1 = 1;
+	else
+		startchar1.assertInteger(__PRETTY_FUNCTION__, "startchar1");
+
+	// TODO deduplicate in ::match and ::search
+
+	// wild cards like
+	// *.* or *.???
+	// *abcde
+	// abcde*
+	//if (regex_options.contains("w")) { //c++20
+	if (regex_options.find('w') != std::string::npos) {
+
+		// rules of glob - converting glob to regex
+
+		// 0. the following regexe special characters are not special so, if present in
+		// match expression, they must be escaped
+		// https://stackoverflow.com/questions/1252992/how-to-escape-a-string-for-use-in-boost-regex
+		// const std_boost::regex esc("[.^$|()\\[\\]{}*+?\\\\]");
+		// allow * and ? in glob expressions
+		// Special chars ". ^ $ | ( ) [ ] { } + \"
+		const std_boost::regex regex_special_chars{R"raw([.^$|()\[\]{}+\\])raw"};
+
+#ifdef USE_BOOST
+		const std::string replacement_for_regex_special = R"raw(\\$&)raw";
+#else
+		const std::string replacement_for_regex_special = R"raw(\$&)raw";
+#endif
+
+		//std::string regex2 = std_boost::regex_replace(regex.var_str, regex_special_chars,
+		std::string regex2 = std_boost::regex_replace(std::string(regex), regex_special_chars,
+											  replacement_for_regex_special);
+
+		// 1. force to match whole string
+		var regex3 = "^" + regex2 + "$";
+
+		// 2. * matches zero or more characters like .* in regex
+		regex3.replacer("*", ".*");
+
+		// 3. ? matches any one character
+		regex3.replacer("?", ".");
+		//TRACE(regex3)
+
+		// having created a suitable regex str, recursively call match with it
+		return this->search(regex3, startchar1);
+	}
+
+	REGEX& regex_obj = getregex(regex, regex_options);
+
+	// https://stackoverflow.com/questions/26320987/what-is-the-difference-between-regex-token-iterator-and-regex-iterator
+	// boost::u32regex_token_iterator<std::string::const_iterator>
+	//	iter {std_boost::make_u32regex_token_iterator(var_str,regex,{0,1,2,3,4,etc or -1})};
+	// token_iterator allow you to access none-matching parts of the string for parsing stuff
+	// but doesnt return an iterator with an array of groups
+
+	// Default return empty string
+	var result = "";
+	result.var_typ = VARTYP_STR;
+
+	// Negative start treated same as zero
+	if (startchar1 < 1) UNLIKELY
+		startchar1 = 1;
+
+	// Excessive start returns no match and pointing to end of string i.e. null byte
+	if (startchar1 > var_str.size()) UNLIKELY {
+		// Return empty string
+		//startchar1 = var_str.length() + 1;
+		startchar1 = 0;
+		return result;
+	}
+
+	// Construct our iterators:
+
+#ifdef USE_BOOST
+	boost::u32regex_iterator<const char*> iter;
+	try {
+//		iter = boost::make_u32regex_iterator(std::advance(var_str.begin(), startchar1), regex);
+		// Unfortunately boost::make_u32regex_iterator only supports std::string and const char*
+		// and we need start in the middle of std::string so we must use const char*
+		// so any \0 byte in var_str will terminate the match.
+		// TODO how to create an iterator over std::string but starting in the middle.
+		iter = boost::make_u32regex_iterator(var_str.data() + startchar1.var_int - 1, regex_obj);
+	} catch (boost::wrapexcept<std::out_of_range>& e) {
+		throw VarError("Error: (2) Invalid match string " ^ var(regex).quote() ^ ". " ^ var(e.what()));
+	}
+#else
+	std::regex_iterator<std::string::const_iterator> iter(std::advance(var_str.begin(), startchar1 - 1), var_str.end(), regex_obj);
+#endif
+
+	// Quit if no match
+	decltype(iter) end{};
+	if (iter ==  end) {
+		// Return empty string
+		//startchar1 = var_str.length() + 1;
+		startchar1 = 0;
+		return result;
+	}
+
+	// Get access to various match data
+	// https://en.cppreference.com/w/cpp/regex/regex_search
+	auto& match_results = *iter;
+
+	// Calculate the new startchar1 to be returned as an io_arg.
+	// The end of the matching sequence (one after last char of match)
+	startchar1.var_int = match_results[0].second - var_str.data() + 1;
+	startchar1.var_typ = VARTYP_INT;
+
+	// Group 0 is complete match of all groups
+	// Group 1+ are any subgroups
+	for (uint groupn = 0; groupn < match_results.size(); ++groupn) {
+
+		// Return the matching string
+		result.var_str.append(match_results[groupn]);
+
+		// Groups are separated by VM
+		result.var_str.push_back(VM_);
+	}
+
+	// Remove trailing VM after all groups
+	if (!result.var_str.empty())
+		result.var_str.pop_back();
+
+	return result;
+
+}
+
+//////////
+// replace
+//////////
+
 // Simple non-regex case sensitive substr replacement
-/////////////////////////////////////////////////////
 
 // constant
 var var::replace(SV what, SV with) const& {
@@ -374,24 +539,6 @@ VARREF var::replacer(SV what, SV with) {
 	if (what.empty())
 		return *this;
 
-//	// Optimise for single character replacement
-//	// No measurable speedup
-//	//if (what.size() == 1 and with.size() == 1) {
-//	//	std::replace(var_str.begin(), var_str.end(), what[0], with[0]);
-//	//	return *this;
-//	//}
-//
-//	// find the starting position of the field or return
-//	std::string::size_type start_pos = 0;
-//	while (true) {
-//		start_pos = var_str.find(what, start_pos);
-//		// past of of string?
-//		if (start_pos == std::string::npos)
-//			return *this;
-//		var_str.replace(start_pos, what.size(), with);
-//		start_pos += with.size();
-//	}
-
 	boost::algorithm::replace_all(var_str, what, with);
 
 	return *this;
@@ -406,41 +553,49 @@ VARREF var::replacer(SV what, SV with) {
 // option  f - first occurrence only
 
 // constant
-var var::regex_replace(SV regexstr, SV replacementstr, SV options) const& {
-	return this->clone().regex_replacer(regexstr, replacementstr, options);
+var var::regex_replace(SV regexstr, SV replacementstr, SV regex_options) const& {
+	return this->clone().regex_replacer(regexstr, replacementstr, regex_options);
 }
 
 // mutator
-VARREF var::regex_replacer(SV regexstr, SV replacementstr, SV options) {
+VARREF var::regex_replacer(SV regexstr, SV replacementstr, SV regex_options) {
 
-	THISIS("VARREF var::regex_replacer(SV regexstr, SV replacementstr, SV options)")
+	THISIS("VARREF var::regex_replacer(SV regex, SV replacement, SV regex_options)")
 	assertStringMutator(function_sig);
-	//ISSTRING(regexstr)
-	//ISSTRING(replacementstr)
 
 	// http://www.boost.org/doc/libs/1_38_0/libs/regex/doc/html/boost_regex/syntax/basic_syntax.html
 
-	// Build the regex object with the given options
-	REGEX& regex = getregex(regexstr, options);
+	// Build the regex object with the given regex_options
+	REGEX& regex = getregex(regexstr, regex_options);
 
-	// return regex_match(var_str, expression);
-
-	// One liner to replace the first occurrence only
+	// One liner to replace the first occurrence only?
 	//var_str = REGEX_REPLACE(var_str, regex1, std::string(replacementstr));
 
 	// Get an ostringstream object and an iterator on it
 	std::ostringstream oss1(std::ios::out | std::ios::binary);
 	std::ostream_iterator<char, char> oiter(oss1);
 
+	// match_flags
+	//////////////
+
+	// https://en.cppreference.com/w/cpp/regex/match_flag_type
+
+	// match_flags are only used in replacements
 	auto match_flags = std_boost::match_flag_type(boost::match_default);
 	// Option f = first only, otherwise all
-	//c++23 if (options.contains("f"))
-	if (options.find("f") != std::string::npos)
+	//c++23 if (regex_options.contains("f"))
+
+	// TODO check syntax letters do not overlap between syntax_flags and match_flags
+
+	// f - first only
+	if (regex_options.find('f') != std::string::npos)
 		match_flags |= boost::format_first_only;
 	else
 		match_flags |= boost::format_all;
 
 	// Generate output
+	//////////////////
+
 	try {
 		std_boost::u32regex_replace(
 			oiter,
@@ -449,7 +604,6 @@ VARREF var::regex_replacer(SV regexstr, SV replacementstr, SV options) {
 			regex,
 			//replacementstr,
 			std::string(replacementstr),
-			//boost::match_default | boost::format_all
 			match_flags
 		);
 	} catch (boost::wrapexcept<std::out_of_range>& e) {
