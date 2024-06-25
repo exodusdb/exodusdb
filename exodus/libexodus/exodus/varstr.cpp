@@ -660,7 +660,7 @@ bool var::locate(CVR target, VARREF setting, const int fieldno, const int valuen
 // without setting
 bool var::locate(CVR target) const {
 
-	THISIS("bool var::locate(CVR target")
+	THISIS("bool var::locate(CVR target) const")
 	assertString(function_sig);
 	ISSTRING(target)
 
@@ -1426,7 +1426,7 @@ bool var::contains(SV str) const {
 // .substr(1,1)
 var var::first() const& {
 
-	THISIS("var var::first()")
+	THISIS("var var::first() const")
 	assertString(function_sig);
 
 	// Return "" if empty
@@ -1457,7 +1457,7 @@ VARREF var::firster() {
 
 var var::first(const size_t  length) const& {
 
-	THISIS("var var::first(const size_t length)")
+	THISIS("var var::first(const size_t length) const")
 	assertString(function_sig);
 
 	// Assume high half of size_t is c++ unblockable conversion
@@ -1500,7 +1500,7 @@ VARREF var::firster(const size_t length) {
 // .substr(1, 1)
 var var::last() const& {
 
-	THISIS("var var::last()")
+	THISIS("var var::last() const")
 	assertString(function_sig);
 
 	if (var_str.empty()) {
@@ -1529,7 +1529,7 @@ VARREF var::laster() {
 
 var var::last(const size_t  length) const& {
 
-	THISIS("var var::last(const size_t length)")
+	THISIS("var var::last(const size_t length) const")
 	assertString(function_sig);
 
 	// Assume high half of size_t is c++ unblockable conversion
@@ -1589,7 +1589,7 @@ VARREF var::laster(const size_t length) {
 // var[-length, length] = ""  cut last n bytes
 var var::cut(const int length) const& {
 
-	THISIS("var var::cut(const int length)")
+	THISIS("var var::cut(const int length) const")
 	assertString(function_sig);
 
 	var nrvo;
@@ -2134,7 +2134,7 @@ void var_brackets_proxy::operator=(char char1) {
 //////
 var var::sumall() const {
 
-	THISIS("var var::sumall()")
+	THISIS("var var::sumall() const")
 	assertString(function_sig);
 
 	// Add up all numbers regardless of separators or levels (multilevel)
@@ -2173,7 +2173,7 @@ var var::sumall() const {
 
 var var::sum() const {
 
-	THISIS("var var::sum()")
+	THISIS("var var::sum() const")
 	assertString(function_sig);
 
 	// Limit the number of decimal places in returned value to the max found in the input
