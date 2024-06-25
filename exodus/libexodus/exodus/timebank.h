@@ -4,16 +4,23 @@
 // EXODUS_TIMEBANK must be defined to create functional Timers
 // e.g. cmake . -DEXODUS_TIMEBANK=1
 
-#ifdef EXODUS_TIMEBANK
+#ifndef EXODUS_TIMEBANK
+////////////////////////
+// DUMMY TIMEBANK HEADER
+////////////////////////
 
 struct Timer{
 	explicit Timer(int){
 	}
 };
 
-consteval auto get_timeacno(const char* /*arg1*/) -> int {return 0;}
+CONSTEVAL_OR_CONSTEXPR
+auto get_timeacno(const char* /*arg1*/) -> int {return 0;}
 
 #else
+/////////////////////////
+// ACTUAL TIMEBANK HEADER
+/////////////////////////
 
 #include <chrono>
 #include <array>
@@ -24,8 +31,8 @@ namespace exodus {
 void get_timeacc0();
 
 //consteval auto get_timeacno(const char* arg1) -> int;
-
-inline struct TimeBank {
+inline
+struct TimeBank {
 
 	struct Acc {
 		uint64_t count = 0;
@@ -65,7 +72,8 @@ struct Timer {
 
 };
 
-consteval auto get_timeacno(const char* arg1) -> int {
+CONSTEVAL_OR_CONSTEXPR
+auto get_timeacno(const char* arg1) -> int {
 	int acno = 0;
 
 	// To renumber timebank.txt sequentially e.g. after inserting new elements
@@ -151,7 +159,7 @@ consteval auto get_timeacno(const char* arg1) -> int {
 	else if ( ! std::strcmp(arg1, "std::string var::toString() const&")) acno = 68;
 	else if ( ! std::strcmp(arg1, "var var::len() const")) acno = 69;
 	else if ( ! std::strcmp(arg1, "var var::textlen()")) acno = 70;
---	else if ( ! std::strcmp(arg1, "std::u32string var::to_u32string() const")) acno = 71;
+	else if ( ! std::strcmp(arg1, "std::u32string var::to_u32string() const")) acno = 71;
 	else if ( ! std::strcmp(arg1, "VARREF var::trim(SV trimchars)")) acno = 72;
 	else if ( ! std::strcmp(arg1, "VARREF var::trimmer(SV trimchars)")) acno = 73;
 	else if ( ! std::strcmp(arg1, "VARREF var::trimfirst(SV trimchars) const&")) acno = 74;
@@ -228,14 +236,14 @@ consteval auto get_timeacno(const char* arg1) -> int {
 	else if ( ! std::strcmp(arg1, "bool var::osgetenv(const char* envcode)")) acno = 145;
 	else if ( ! std::strcmp(arg1, "bool var::ossetenv(const char* envcode) const")) acno = 146;
 	else if ( ! std::strcmp(arg1, "CVR var::put(std::ostream& ostream1) const")) acno = 147;
-	else if ( ! std::strcmp(arg1, "bool var::match(SV matchstr, SV options) const")) acno = 148;
+	else if ( ! std::strcmp(arg1, "var var::match(SV regex, SV regex_options) const")) acno = 148;
 	else if ( ! std::strcmp(arg1, "VARREF var::replacer(SV what, SV with)")) acno = 149;
-	else if ( ! std::strcmp(arg1, "VARREF var::regex_replacer(SV regexstr, SV replacementstr, SV options)")) acno = 150;
+	else if ( ! std::strcmp(arg1, "VARREF var::regex_replacer(SV regex, SV replacement, SV regex_options)")) acno = 150;
 	else if ( ! std::strcmp(arg1, "var var::field(SV separatorx,const int fieldnx,const int nfieldsx) const")) acno = 151;
 	else if ( ! std::strcmp(arg1, "VARREF var::fieldstorer(SV separator0,const int fieldnx,const int nfieldsx, CVR replacementx)")) acno = 152;
 	else if ( ! std::strcmp(arg1, "bool var::locate(CVR target, VARREF setting, const int fieldno/*=0*/,const int valueno/*=0*/) const")) acno = 153;
 	else if ( ! std::strcmp(arg1, "bool var::locate(CVR target, VARREF setting, const int fieldno/*=0*/,const int valueno/*=0*/) const")) acno = 154;
-	else if ( ! std::strcmp(arg1, "bool var::locate(CVR target")) acno = 155;
+	else if ( ! std::strcmp(arg1, "bool var::locate(CVR target) const")) acno = 155;
 	else if ( ! std::strcmp(arg1, "bool var::locateby(const char* ordercode, CVR target, VARREF setting) const")) acno = 156;
 	else if ( ! std::strcmp(arg1, "bool var::locateby(const char* ordercode, CVR target, VARREF setting, const int fieldno, const int valueno/*=0*/) const")) acno = 157;
 	else if ( ! std::strcmp(arg1, "bool var::locatebyusing(const char* ordercode, const char* usingchar, CVR target, VARREF setting, const int fieldno=0, const int valueno=0, const int valueno=0) const")) acno = 158;
@@ -248,19 +256,19 @@ consteval auto get_timeacno(const char* arg1) -> int {
 	else if ( ! std::strcmp(arg1, "bool var::starts(SV str) const")) acno = 165;
 	else if ( ! std::strcmp(arg1, "bool var::ends(SV str) const")) acno = 166;
 	else if ( ! std::strcmp(arg1, "bool var::contains(SV str) const")) acno = 167;
-	else if ( ! std::strcmp(arg1, "var var::first(const size_t length)")) acno = 168;
+	else if ( ! std::strcmp(arg1, "var var::first(const size_t length) const")) acno = 168;
 	else if ( ! std::strcmp(arg1, "VARREF var::firster(const size_t length)")) acno = 169;
-	else if ( ! std::strcmp(arg1, "var var::last(const size_t length)")) acno = 170;
+	else if ( ! std::strcmp(arg1, "var var::last(const size_t length) const")) acno = 170;
 	else if ( ! std::strcmp(arg1, "VARREF var::laster(const size_t length)")) acno = 171;
-	else if ( ! std::strcmp(arg1, "var var::cut(const int length)")) acno = 172;
+	else if ( ! std::strcmp(arg1, "var var::cut(const int length) const")) acno = 172;
 	else if ( ! std::strcmp(arg1, "VARREF var::cutter(const int length)")) acno = 173;
 	else if ( ! std::strcmp(arg1, "VARREF var::substrer(const int startindex1,const int length)")) acno = 174;
 	else if ( ! std::strcmp(arg1, "var var::at(const int charno) const")) acno = 175;
 	else if ( ! std::strcmp(arg1, "var var::multivalued(const char* opcode, CVR var2) const")) acno = 176;
 	else if ( ! std::strcmp(arg1, "var var::substr(const int startindex1, VARREF delimiterchars, int& endindex) const")) acno = 177;
 	else if ( ! std::strcmp(arg1, "var var::substr2(VARREF startindex1, VARREF delimiterno) const")) acno = 178;
-	else if ( ! std::strcmp(arg1, "var var::sumall()")) acno = 179;
-	else if ( ! std::strcmp(arg1, "var var::sum()")) acno = 180;
+	else if ( ! std::strcmp(arg1, "var var::sumall() const")) acno = 179;
+	else if ( ! std::strcmp(arg1, "var var::sum() const")) acno = 180;
 	else if ( ! std::strcmp(arg1, "var var::sum(SV separator) const")) acno = 181;
 	else if ( ! std::strcmp(arg1, "bool var::setxlocale() const")) acno = 182;
 	else if ( ! std::strcmp(arg1, "VARREF var::quoter()")) acno = 183;
@@ -268,15 +276,18 @@ consteval auto get_timeacno(const char* arg1) -> int {
 	else if ( ! std::strcmp(arg1, "VARREF var::unquoter()")) acno = 185;
 	else if ( ! std::strcmp(arg1, "CVR var::swap(CVR var2) const")) acno = 186;
 	else if ( ! std::strcmp(arg1, "VARREF var::swap(VARREF var2)")) acno = 187;
-	else if ( ! std::strcmp(arg1, "var var::textwidth()")) acno = 188;
-	else if ( ! std::strcmp(arg1, "var var::first()")) acno = 189;
-	else if ( ! std::strcmp(arg1, "var var::last()")) acno = 190;
+	else if ( ! std::strcmp(arg1, "var var::textwidth() const")) acno = 188;
+	else if ( ! std::strcmp(arg1, "var var::first() const")) acno = 189;
+	else if ( ! std::strcmp(arg1, "var var::last() const")) acno = 190;
 	else if ( ! std::strcmp(arg1, "VARREF var::firster()")) acno = 191;
 	else if ( ! std::strcmp(arg1, "VARREF var::laster()")) acno = 192;
+	else if ( ! std::strcmp(arg1, "var var::search(SV regex, int startchar1, SV regex_options) const")) acno = 193;
+	else if ( ! std::strcmp(arg1, "std::wstring var::to_wstring() const")) acno = 194;
 
 	else {
 		//throw std::runtime_error("");
 		//throw 500;
+		std::cerr << "Error: " << __PRETTY_FUNCTION__ << ": Unrecognised time account title: '" << arg1 << "'. Must be added to timebank.h and timebank.txt" << std::endl;
 		throw arg1;
 		//static_assert(false);
 		//static_assert(arg1);
@@ -286,5 +297,5 @@ consteval auto get_timeacno(const char* arg1) -> int {
 }
 
 } // namespace exodus
-#endif // EXO_TIMEBANK
+#endif // EXODUS_TIMEBANK
 #endif // EXODUS_LIBEXODUS_EXODUS_TIMEBANK_H_
