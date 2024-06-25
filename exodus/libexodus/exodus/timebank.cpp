@@ -16,7 +16,7 @@ namespace exodus {
 
 void get_timeacc0();
 
-exodus::TimeBank::~TimeBank() {
+TimeBank::~TimeBank() {
 
 		// Note that you cannot use global variables like FM
 		// which may already have destructed. Use _FM constants.
@@ -211,4 +211,4 @@ void get_timeacc0() {
 }
 
 } // namespace exodus
-#endif // EXO_TIMEBANK
+#endif // EXODUS_TIMEBANK
