@@ -147,7 +147,7 @@
 646 CVR var::put(std::ostream& ostream1) const 
 647 var var::match(SV regex, SV regex_options) const 
 648 VARREF var::replacer(SV what, SV with) 
-649 VARREF var::regex_replacer(SV regex, SV replacement, SV regex_options) 
+649 var var::replace(const rex& regex, SV replacement) const 
 650 var var::field(SV separatorx,const int fieldnx,const int nfieldsx) const 
 651 VARREF var::fieldstorer(SV separator0,const int fieldnx,const int nfieldsx, CVR replacementx) 
 652 bool var::locate(CVR target, VARREF setting, const int fieldno/*=0*/,const int valueno/*=0*/) const 

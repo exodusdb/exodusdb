@@ -238,7 +238,7 @@ auto get_timeacno(const char* arg1) -> int {
 	else if ( ! std::strcmp(arg1, "CVR var::put(std::ostream& ostream1) const")) acno = 147;
 	else if ( ! std::strcmp(arg1, "var var::match(SV regex, SV regex_options) const")) acno = 148;
 	else if ( ! std::strcmp(arg1, "VARREF var::replacer(SV what, SV with)")) acno = 149;
-	else if ( ! std::strcmp(arg1, "VARREF var::regex_replacer(SV regex, SV replacement, SV regex_options)")) acno = 150;
+	else if ( ! std::strcmp(arg1, "var var::replace(const rex& regex, SV replacement) const")) acno = 150;
 	else if ( ! std::strcmp(arg1, "var var::field(SV separatorx,const int fieldnx,const int nfieldsx) const")) acno = 151;
 	else if ( ! std::strcmp(arg1, "VARREF var::fieldstorer(SV separator0,const int fieldnx,const int nfieldsx, CVR replacementx)")) acno = 152;
 	else if ( ! std::strcmp(arg1, "bool var::locate(CVR target, VARREF setting, const int fieldno/*=0*/,const int valueno/*=0*/) const")) acno = 153;

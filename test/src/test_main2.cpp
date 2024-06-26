@@ -691,7 +691,7 @@ programinit()
 	//assert(oconv("1234567890","L(###)###-####") eq "(123)456-7890");
 
 	//http://www.regular-expressions.info/examples.html
-	assert(regex_replace("Steve Bush Bash bish", "B.", "Ru", "ri") eq "Steve Rush Rush Rush");
+	assert(replace("Steve Bush Bash bish", rex("B.", "ri"), "Ru") eq "Steve Rush Rush Rush");
 
 	assert(oconv("Aa019KK", "HEX")             eq "41613031394B4B");
 	assert(oconv("Aa019KK", "HEX2")            eq "41613031394B4B");

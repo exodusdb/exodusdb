@@ -781,7 +781,7 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 	//replace(unicode,"\\p{L}","?","ri").oconv("HEX4").outputl();
 	//p(L} is regular expression for Unicode Letter
 	if (OSSLASH_IS_BACKSLASH)
-		assert(regex_replace(unicode, "\\pL", "?", "ri") eq expect);
+		assert(replace(unicode, rex(R"(\pL)", "ri"), "?") eq expect);
 	//but what is its inverse?
 	//assert(replace(unicode,"\\PL","?","ri") eq expect);
 

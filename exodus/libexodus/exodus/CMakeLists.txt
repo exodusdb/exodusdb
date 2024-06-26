@@ -165,6 +165,7 @@
 			vartyp.h
 			varerr.h
 			dim.h
+			rex.h
 			exodus.h
 			range.h
 			exoimpl.h

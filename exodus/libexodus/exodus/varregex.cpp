@@ -87,7 +87,19 @@ allowing it to interface correctly with UTF-8, UTF-16, and UTF-32 data:
 #include <exodus/varimpl.h>
 #include <exodus/varoshandle.h>
 
+#include <exodus/rex.h>
+
 namespace exodus {
+
+///////////////////
+// rex constructors
+///////////////////
+
+rex::rex(SV expression) :expression_(expression) {
+}
+
+rex::rex(SV expression, SV options) :expression_(expression), options_(options) {
+}
 
 // From here on we need to use Boost's u32_regex, u32_match, u32_replace
 // in order to correctly process no-ASCII/multibyte characters
@@ -217,14 +229,16 @@ constexpr static syntax_flags_typ get_syntax_flags(SV regex_options) {
 	return regex_syntax_flags;
 }
 
-///////////
-// getregex helper/cache
-///////////
+//////////////////
+// getregex_engine helper/cache
+//////////////////
 
 static thread_local std::map<std::string, REGEX> thread_regexes;
 
 // Caches regex giving very approx 10x speed up
-static REGEX& getregex(SV regex, SV regex_options) {
+// TODO merge with get_syntax_flags?
+// TODO arg should be just a rex?
+static REGEX& get_regex_engine(SV regex, SV regex_options) {
 
 	// cache with regex and regex_options since regex_options change the effect
 	auto cache_key = std::string(regex);
@@ -313,18 +327,18 @@ var var::match(SV regex, SV regex_options) const {
 		return this->match(regex3);
 	}
 
-	REGEX& regex_obj = getregex(regex, regex_options);
+	REGEX& regex_engine = get_regex_engine(regex, regex_options);
 
 	// construct our iterators:
 #ifdef USE_BOOST
 	boost::u32regex_iterator<std::string::const_iterator> iter;
 	try {
-		iter = boost::make_u32regex_iterator(var_str, regex_obj);
+		iter = boost::make_u32regex_iterator(var_str, regex_engine);
 	} catch (boost::wrapexcept<std::out_of_range>& e) {
 		throw VarError("Error: (2) Invalid match string " ^ var(regex).quote() ^ ". " ^ var(e.what()));
 	}
 #else
-	std::regex_iterator<std::string::const_iterator> iter(var_str.begin(), var_str.end(), regex_obj);
+	std::regex_iterator<std::string::const_iterator> iter(var_str.begin(), var_str.end(), regex_engine);
 #endif
 	decltype(iter) end{};
 
@@ -437,7 +451,7 @@ var var::search(SV regex, VARREF startchar1, SV regex_options) const {
 		return this->search(regex3, startchar1);
 	}
 
-	REGEX& regex_obj = getregex(regex, regex_options);
+	REGEX& regex_engine = get_regex_engine(regex, regex_options);
 
 	// https://stackoverflow.com/questions/26320987/what-is-the-difference-between-regex-token-iterator-and-regex-iterator
 	// boost::u32regex_token_iterator<std::string::const_iterator>
@@ -471,12 +485,12 @@ var var::search(SV regex, VARREF startchar1, SV regex_options) const {
 		// and we need start in the middle of std::string so we must use const char*
 		// so any \0 byte in var_str will terminate the match.
 		// TODO how to create an iterator over std::string but starting in the middle.
-		iter = boost::make_u32regex_iterator(var_str.data() + startchar1.var_int - 1, regex_obj);
+		iter = boost::make_u32regex_iterator(var_str.data() + startchar1.var_int - 1, regex_engine);
 	} catch (boost::wrapexcept<std::out_of_range>& e) {
 		throw VarError("Error: (2) Invalid match string " ^ var(regex).quote() ^ ". " ^ var(e.what()));
 	}
 #else
-	std::regex_iterator<std::string::const_iterator> iter(std::advance(var_str.begin(), startchar1 - 1), var_str.end(), regex_obj);
+	std::regex_iterator<std::string::const_iterator> iter(std::advance(var_str.begin(), startchar1 - 1), var_str.end(), regex_engine);
 #endif
 
 	// Quit if no match
@@ -550,26 +564,22 @@ VARREF var::replacer(SV what, SV with) {
 
 // only here really because boost regex is included here for file matching
 
-// option  f - first occurrence only
-
-// constant
-var var::regex_replace(SV regexstr, SV replacementstr, SV regex_options) const& {
-	return this->clone().regex_replacer(regexstr, replacementstr, regex_options);
+// mutator
+VARREF var::replacer(const rex& regex, SV replacement) {
+	*this = this->replace(regex, replacement);
+	return *this;
 }
 
-// mutator
-VARREF var::regex_replacer(SV regexstr, SV replacementstr, SV regex_options) {
+// const
+var var::replace(const rex& regex, SV replacement) const& {
 
-	THISIS("VARREF var::regex_replacer(SV regex, SV replacement, SV regex_options)")
-	assertStringMutator(function_sig);
+	THISIS("var var::replace(const rex& regex, SV replacement) const")
+	assertString(function_sig);
 
 	// http://www.boost.org/doc/libs/1_38_0/libs/regex/doc/html/boost_regex/syntax/basic_syntax.html
 
 	// Build the regex object with the given regex_options
-	REGEX& regex = getregex(regexstr, regex_options);
-
-	// One liner to replace the first occurrence only?
-	//var_str = REGEX_REPLACE(var_str, regex1, std::string(replacementstr));
+	REGEX& regex_engine = get_regex_engine(regex.expression_, regex.options_);
 
 	// Get an ostringstream object and an iterator on it
 	std::ostringstream oss1(std::ios::out | std::ios::binary);
@@ -588,7 +598,7 @@ VARREF var::regex_replacer(SV regexstr, SV replacementstr, SV regex_options) {
 	// TODO check syntax letters do not overlap between syntax_flags and match_flags
 
 	// f - first only
-	if (regex_options.find('f') != std::string::npos)
+	if (regex.options_.var_str.find('f') != std::string::npos)
 		match_flags |= boost::format_first_only;
 	else
 		match_flags |= boost::format_all;
@@ -601,23 +611,31 @@ VARREF var::regex_replacer(SV regexstr, SV replacementstr, SV regex_options) {
 			oiter,
 			var_str.begin(),
 			var_str.end(),
-			regex,
-			//replacementstr,
-			std::string(replacementstr),
+			regex_engine,
+			// Sadly boost regex cannot handle string_view
+			//replacement,
+			std::string(replacement),
 			match_flags
 		);
 	} catch (boost::wrapexcept<std::out_of_range>& e) {
-		var errmsg = "Error: (3) Invalid data or replacement during regex replace of " ^ var(regexstr).quote() ^ " with " ^ var(replacementstr).quote() ^ ". " ^ var(e.what());
+		var errmsg =
+			"Error: (3) Invalid data or replacement during regex replace of "
+			^ var(regex.expression_).quote()
+			^ " with "
+			^ var(replacement).quote()
+			^ ". "
+			^ var(e.what())
+		;
 		//TODO Show some of the invalid UTF8 bytes maybe.
 		//Cannot show actual data because it could be a security breach.
 		//errmsg ^= ". Data[1,128] = " ^ this->first(128).quote();
 		throw VarError(errmsg);
 	}
 
-	// Acquire the output
-	var_str = std::move(oss1).str();
+	// Acquire and return the output
+	var result = std::move(oss1).str();
+	return result;
 
-	return *this;
 }
 
 // ICONV_MT can be moved back to mvioconv.cpp if it stops using regular expressions
@@ -791,6 +809,15 @@ VARREF var::oconv_MR(const char* conversion) {
 	}
 
 	return *this;
+}
+
+//////////////////////////////
+// User defined literal "_rex"
+//////////////////////////////
+
+// "[a-z]"_rex
+ND rex operator""_rex(const char* cstr, std::size_t size) {
+	return rex(std::string_view(cstr, size));
 }
 
 } // namespace exodus

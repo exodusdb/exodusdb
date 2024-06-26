@@ -234,6 +234,7 @@ constexpr double SMALLEST_NUMBER = 0.0001;// for pickos compatibility
 
 class var;
 class dim;
+class rex;
 class var_iter;
 class var_extractreplace;
 
@@ -1373,6 +1374,7 @@ class PUBLIC var final {
 	PUBLIC friend var_iter end(CVR v);
 
 	friend class dim;
+	friend class rex;
 	//friend class var_brackets_proxy;
 
 	///////////////
@@ -1927,7 +1929,8 @@ class PUBLIC var final {
 	ND var textconvert(SV fromchars, SV tochars) const&;
 
 	ND var replace(SV fromstr, SV tostr) const&;
-	ND var regex_replace(SV regex, SV replacement, SV regex_options DEFAULT_EMPTY) const&;
+	ND var replace(const rex& regex, SV tostr) const&;
+	//ND var regex_replace(SV regex, SV replacement, SV regex_options DEFAULT_EMPTY) const&;
 
 	ND var unique() const&;
 	ND var sort(SV sepchar = _FM) const&;
@@ -1977,8 +1980,9 @@ class PUBLIC var final {
 
 	ND VARREF convert(SV fromchars, SV tochars) &&;
 	ND VARREF textconvert(SV fromchars, SV tochars) &&;
+	ND VARREF replace(const rex& regex, SV tostr) &&;
 	ND VARREF replace(SV fromstr, SV tostr) &&;
-	ND VARREF regex_replace(SV regex, SV replacement, SV regex_options DEFAULT_EMPTY) &&;
+	//ND VARREF regex_replace(SV regex, SV replacement, SV regex_options DEFAULT_EMPTY) &&;
 
 	ND VARREF unique() &&;
 	ND VARREF sort(SV sepchar = _FM) &&;
@@ -2032,8 +2036,9 @@ class PUBLIC var final {
 
 	VARREF converter(SV fromchars, SV tochars);
 	VARREF textconverter(SV fromchars, SV tochars);
+	VARREF replacer(const rex& regex, SV tostr);
 	VARREF replacer(SV fromstr, SV tostr);
-	VARREF regex_replacer(SV regex, SV replacement, SV regex_options DEFAULT_EMPTY);
+	//VARREF regex_replacer(SV regex, SV replacement, SV regex_options DEFAULT_EMPTY);
 
 	VARREF uniquer();
 	VARREF sorter(SV sepchar = _FM);

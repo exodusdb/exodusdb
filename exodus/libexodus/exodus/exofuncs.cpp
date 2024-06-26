@@ -24,6 +24,7 @@ THE SOFTWARE.
 
 #include <exodus/var.h>
 #include <exodus/exoenv.h>
+#include <exodus/rex.h>
 
 #define EXO_FUNCS_CPP
 #include <exodus/exofuncs.h>
@@ -192,11 +193,11 @@ PUBLIC VARREF converter(VARREF iostring, SV fromchars, SV tochars) {return iostr
 ND PUBLIC var textconvert(CVR instring, SV fromchars, SV tochars) {return instring.textconvert(fromchars, tochars);}
 PUBLIC VARREF textconverter(VARREF iostring, SV fromchars, SV tochars) {return iostring.textconverter(fromchars, tochars);}
 
-ND PUBLIC var replace(CVR instring, SV fromstr, SV tostr) {var newstring = instring; return newstring.replace(fromstr, tostr);}
+ND PUBLIC var replace(CVR instring, SV fromstr, SV tostr) {return instring.replace(fromstr, tostr);}
 PUBLIC VARREF replacer(VARREF iostring, SV fromstr, SV tostr) {return iostring.replacer(fromstr, tostr);}
 
-ND PUBLIC var regex_replace(CVR instring, SV regex, SV replacement, SV options DEFAULT_EMPTY) {var newstring = instring; return newstring.regex_replacer(regex, replacement, options);}
-PUBLIC VARREF regex_replacer(VARREF iostring, SV regex, SV replacement, SV options DEFAULT_EMPTY) {return iostring.regex_replacer(regex, replacement, options);}
+ND PUBLIC var replace(CVR instring, const rex& regex, SV replacement) {return instring.replace(regex, replacement);}
+PUBLIC VARREF replacer(VARREF iostring, const rex& regex, SV replacement) {return iostring.replacer(regex, replacement);}
 
 ND PUBLIC var ucase(CVR instring) {return instring.ucase();}
 PUBLIC VARREF ucaser(VARREF iostring) {return iostring.ucaser();}

@@ -1139,14 +1139,10 @@ function main() {
 //						funcargsdecl.firster(charn - 1);
 
 						// Replace comment outs like /*arg1*/ with arg1
-						funcargsdecl.regex_replacer(
-										"/"
-										"\\*",
-										"")
-							.regex_replacer(
-								"\\*"
-								"/",
-								"");
+						funcargsdecl
+							.replacer(rex("/" "\\*"), "")
+							.replacer(rex("\\*" "/"), "")
+						;
 
 						//work out the function arguments without declaratives
 						//to be inserted in the calling brackets.

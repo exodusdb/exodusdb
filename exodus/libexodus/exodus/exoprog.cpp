@@ -176,7 +176,7 @@ bool ExodusProgramBase::select(CVR sortselectclause_or_filehandle) {
 		//add colons to the end of every calculated field in the sselect clause
 		//so that 2nd stage select knows that these fields are available in the
 		//temporary parallel file
-		sortselectclause.regex_replacer("\\b" ^ dictid ^ "\\b", dictid ^ ":");
+		sortselectclause.replacer(rex("\\b" ^ dictid ^ "\\b"), dictid ^ ":");
 
 		dictid.converter(".", "_");
 		dictids[fieldn] = dictid;
