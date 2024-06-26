@@ -19,130 +19,75 @@
     <script type="text/javascript" src="../exodus/scripts/colors.js"></script>
 
     <script type="text/javascript" src="../exodus/scripts/users.js"></script>
-
+    <style>
+        #DEPARTMENT {
+            background-color: inherit;
+        }
+    </style>
     <title>User Details</title>
 </head>
 <body>
     <div align="center">
-        <h1>
-            User Details</h1>
-        <table class="exodusform" bordercolor="#d0d0d0" bordercolor="#d0d0d0">
-            <thead>
-            </thead>
+        <h1> User Details </h1>
+
+        <table class="exodusform">
             <tbody>
                 <tr>
-                    <td>
-                        User Code
+                    <td rowspan="5" style= "font-size:11px; text-align: center; padding: 20px;">
+                        <img src="../../exodus/images/theme2/profile.png" style="height:70px; width:70px" />
+                        <br><b>Profile</b>
                     </td>
-                    <td colspan="2">
+                    <td style="padding:5px;">
+                        User Code 
+                    </td>
+                    <td colspan="1" style="padding:5px">
                         <input id="USER_ID" />
                     </td>
-                    <td style="text-align: right" id="expiryelement">
-                    </td>
-                    <td colspan="2">
+                    <td colspan="2" style=" padding:5px;" >
                         <input exodusgroup="0" id="button_password" title="Change the password" class="exodusbutton"
-                            disabled="disabled" type="button" exodustype="B" tabindex="999" value="Change password"
+                            disabled="disabled" type="button" exodustype="B" tabindex="999" value="Reset password"
                             exodusonclick="yield* user_setpassword(true)" />
-                    </td>
-                    <td>
-                        <a id="gettingstarted" target="_blank" rel="noreferrer" href="https://userwiki.neosys.com/index.php/gettingstarted">
-                            Browser configuration/reset</a><br />
-                        <a target="_blank" rel="noreferrer" href="https://userwiki.neosys.com">EXODUS Wikipedia</a>
                     </td>
                 </tr>
                 <tr>
-                    <td>
+                    <td style="padding:5px;">
                         User Name
                     </td>
-                    <td colspan="6">
+                    <td colspan="4" style="padding:5px">
                         <input id="USER_NAME" />
                     </td>
                 </tr>
                 <tr>
-                    <td>
+                    <td style="padding:5px;">
+                        Email Address
+                    </td>
+                    <td colspan="4" style="padding:5px">
+                        <input id="EMAIL_ADDRESS" />
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding:5px;">
+						Status
+					</td>
+                    <td colspan="1" id="expiryelement" style="padding: 5px"></td>
+                    <td style="padding:5px;">
                         Department
                     </td>
-                    <td colspan="6">
+                    <td colspan="1" style="padding:5px;">
                         <input id="DEPARTMENT" />
                     </td>
                 </tr>
                 <tr>
-                    <td>
-                        Email Address(es)
+                    <td style="padding:5px">
+                        Signature
                     </td>
-                    <td colspan="6">
-                        <input id="EMAIL_ADDRESS" />
-                    </td>
-                </tr>
-                <!-- Copied in users.htm, systemconfiguration.htm and companies.htm -->
-                <tr>
-                    <td>
-                        Style
-                    </td>
-                    <th>
-                        Font name
-                    </th>
-                    <th>
-                        Font size %
-                    </th>
-                    <th>
-                    </th>
-                    <th>
-                        Body color
-                    </th>
-                    <th colspan="2">
-                        Heading color
-                    </th>
-                </tr>
-                <tr>
-                    <td style="text-align: right">
-                        Screens:
-                    </td>
-                    <td>
-                        <input id="SCREEN_FONT" />
-                    </td>
-                    <td style="text-align: right">
-                        <input id="SCREEN_FONT_SIZE" />
-                    </td>
-                    <td>
-                    </td>
-                    <td>
-                        <input id="SCREEN_BODY_COLOR" />
-                    </td>
-                    <td colspan="2">
-                        &nbsp;
-                    </td>
-                </tr>
-                <tr>
-                    <td style="text-align: right">
-                        Reports:
-                    </td>
-                    <td>
-                        <input id="REPORT_FONT_NAME" />
-                    </td>
-                    <td style="text-align: right">
-                        <input id="REPORT_FONT_SIZE" />
-                    </td>
-                    <td>
-                    </td>
-                    <td>
-                        <input id="REPORT_BODY_COLOR" />
-                    </td>
-                    <td colspan="2">
-                        <input id="REPORT_HEAD_COLOR" />
-                    </td>
-                </tr>
-                <tr style="vertical-align: top">
-                    <td>
-                        Signature <span style="font-size: 76%">(75dpi)</span>
-                    </td>
-                    <td colspan="6">
+                    <td colspan="4">
                         <table>
                             <tr>
                                 <td>
                                     <img src="" alt="" id="signature_image" onload="user_signature_onload_sync()" />
                                 </td>
-                                <td style="vertical-align: top">
+                                <td style="vertical-align: middle; padding:5px;">
                                     <input exodustype="B" value="Upload" exodusonclick="yield* users_upload_signature()"
                                         class="exodusbutton" type="button" title="upload user signature for various documents footings (where configured)"
                                         id="button_upload_signature" name="button_upload_signature" />
@@ -150,59 +95,135 @@
                             </tr>
                         </table>
                     </td>
-                </tr>
+				</tr>
+
+
                 <tr>
-                    <td colspan="7" style="padding: 0px">
+                    <td rowspan="6" style="font-size:11px; text-align: center; padding:20px;">
+                        <img src="../../exodus/images/theme2/paint.png" style="height: 70px; width: 70px" />
+                        <br><b>Styles</b>
+                    </td>
+					<td colspan="4" style="padding:5px;"> 
+                        <b>Screens</b>
+					</td>
+				</tr>
+				<tr>
+					<td style="padding:5px;"> 
+                        Font Name
+					</td>
+					<td style="padding:5px;"> 
+						<input id="SCREEN_FONT" />
+                    </td>
+                    <td style="padding:5px;">
+						Font Size %
+					</td>
+                    <td style="padding:5px;">
+						<input id="SCREEN_FONT_SIZE" />
+                    </td>
+				</tr>
+				<tr>
+                    <td style="padding:5px;">
+                        Body Color
+					</td>
+                    <td colspan="3" style="padding:5px;">
+						<input id="SCREEN_BODY_COLOR" style="width: 100%; box-sizing: border-box;" />
+                    </td>
+				</tr>
+				<tr>
+					<td colspan="4" style="padding:5px;"> 
+                        <b>Documents & Reports</b>
+					</td>
+				</tr>
+				<tr>
+                    <td style="padding:5px;">
+						Font Name
+					</td>
+                    <td style="padding:5px;">
+						<input id="REPORT_FONT_NAME" />
+					</td>
+                    <td style="padding:5px;">
+						Font Size %
+					</td>
+                    <td style="padding:5px;">
+						<input id="REPORT_FONT_SIZE" />
+					</td>
+				</tr>
+				<tr>
+                    <td style="padding:5px">
+                        Body Color
+					</td>
+                    <td style="padding:5px">
+						<input id="REPORT_BODY_COLOR" />
+					</td>
+                    <td style="padding:5px;">
+						Heading Color
+					</td>
+                    <td style="padding:5px">
+						<input id="REPORT_HEAD_COLOR" />
+                    </td>
+				</tr>
+
+                <tr>
+                    <td colspan="7" style="padding: 5px;">
                         <table class="exodustable2" width="100%">
                             <tr style="vertical-align: top">
-                                <td>
+
+                                <td style="padding:10px; border-right: 1px solid lightgrey;">
                                     <table width="100%">
                                         <thead>
                                             <tr>
-                                                <th colspan="3">
-                                                    Last login attempts:
+                                                <th colspan="3" style="font-size:11px;">
+                                                    <b>Last login attempts:</b>
                                                 </th>
                                             </tr>
                                             <tr>
-                                                <th id="LOGIN_DATETIME_title">
-                                                    Date/Time
-                                                </th>
-                                                <th id="LOGIN_LOCATION_title">
-                                                    Location
-                                                </th>
-                                                <th id="LOGIN_RESULT_title">
-                                                    Result
-                                                </th>
+                                                <th id="LOGIN_DATETIME_title"> Date/Time </th>
+                                                <th id="LOGIN_LOCATION_title"> Location  </th>
+                                                <th id="LOGIN_RESULT_title">   Result    </th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr>
-                                                <td>
-                                                    <input id="LOGIN_DATETIME" />
-                                                </td>
-                                                <td>
-                                                    <input id="LOGIN_LOCATION" />
-                                                </td>
-                                                <td>
-                                                    <input id="LOGIN_RESULT" />
-                                                </td>
+                                            <tr> 
+                                                 <td> <input id="LOGIN_DATETIME" /> </td> 
+                                                 <td> <input id="LOGIN_LOCATION" /> </td>
+                                                 <td> <input id="LOGIN_RESULT" />   </td>
                                             </tr>
                                         </tbody>
                                     </table>
                                 </td>
-                                <td>
-                                    <br />
-                                    Market Code
-                                    <input id="MARKET_CODE" />
-                                    <br />
-                                    <br />
+
+                                <td style="padding:10px">
+									<table>
+                                        <tr>
+                                            <th style="font-size:11px;">
+						                        <b>Timesheets:</b>
+						                    </th>
+                                        </tr>
+                                        <tr>
+                                            <th>
+						                        Market Code:
+						                    </th>
+						                    <th>
+						                        <input id="MARKET_CODE" />
+						                    </th>
+                                        </tr>
+						                <tr>
+						                    <th>
+						                        Weekdays off:
+						                    </th>
+						                    <th>
+						                        <input id="WEEKDAYS_OFF" />
+						                    </th>
+						                </tr>
+                                        <tr>
+                                            <td>
+                                                Away/Holiday Dates:
+                                            </td>
+                                        </tr>
+									</table>
+
                                     <table width="1%">
                                         <thead>
-                                            <tr>
-                                                <td>
-                                                    Away/Holiday Dates
-                                                </td>
-                                            </tr>
                                             <tr>
                                                 <th>
                                                     From
@@ -229,11 +250,6 @@
                                             </tr>
                                         </tbody>
                                     </table>
-                                </td>
-                                <td>
-                                    Weekdays<br />
-                                    Off<br />
-                                    <input id="WEEKDAYS_OFF" />
                                 </td>
                             </tr>
                         </table>

@@ -35,8 +35,8 @@ function* form_postdisplay() {
     $expiryelement = $$('expiryelement')
     $expiryelement.innerHTML = ''
 
-    var gettingstarted=$$('gettingstarted')
-    gettingstarted.innerHTML='Browser Configuration/Reset'
+    //var gettingstarted=$$('gettingstarted')
+    //gettingstarted.innerHTML='Browser Configuration/Reset'
 
     var firstlogin=false
     if (gkey==gusername) {
@@ -45,11 +45,11 @@ function* form_postdisplay() {
         //if (true||!loginstatus.exoduslocate('OK'))
         //    gettingstarted.innerHTML='<font color=red><strong>Click HERE for browser configuration *REQUIRED*</strong></font>'
     }
-        
+
     return true
 }
-    
-//just to avoid confirmation			
+
+//just to avoid confirmation
 function* form_prewrite() {
     return true
 }
@@ -87,7 +87,7 @@ function* users_postdisplay() {
     var signatureimageelement = document.getElementById('signature_image')
     if (signatureimageelement) {
         signatureimageelement.src = ''
-        
+
         //older msie browsers IE6-8? show a red cross/missing file icon for users with no uploaded signature file
         //instead of the alt ("") which more recent browsers do
         //removed in image onload event - see user_signature_onload_sync
@@ -95,7 +95,6 @@ function* users_postdisplay() {
             signatureimageelement.height = 0
             signatureimageelement.width = 0
         }
-                
         signatureimageelement.src = '../../images/'+gdataset+'/upload/users/' + gkey.exodusconvert(' ', '').toLowerCase() + '_signature.jpg'
     }
 
@@ -109,10 +108,12 @@ function* users_postdisplay() {
     if (userexpirydate && userexpirydate <= exodusdate()) {
         $expiryelement.innerHTML = '<font color=red><strong>EXPIRED ' + userexpirydate.exodusoconv('[DATE]') + '</strong></font>'
     } else {
-    
         var reminderdays = 6
         var passwordexpires = yield* gds.getx('PASSWORD_EXPIRY_DATE')
-        if (passwordexpires) {
+        //if (passwordexpires) {
+        if (!passwordexpires) {
+            $expiryelement.innerHTML = '<font color=green><strong>ACTIVE</strong></font>'
+        } else {
             var text=''
             var expirydays = (exodusint(passwordexpires) - exodusdate())
             if (expirydays < 0)
@@ -125,7 +126,6 @@ function* users_postdisplay() {
                 $expiryelement.innerHTML = '<font color=red>&nbsp;&nbsp;&nbsp;'+text+'</font>'
         }
     }
-    
     return true
 }
 
@@ -140,7 +140,7 @@ function* users_upload_signature() {
     var username=gkey
     if (!username)
         username=gusername
-        
+
     //images are not stored per dataset at the moment so that they can be
     //nor are they stored per file or per key so that they can be easily saved into a shared folder instead of going by web upload
     params = {}

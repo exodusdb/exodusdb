@@ -97,6 +97,7 @@ function* dict_USERS() {
 
  di = dict[++din] = dictrec('WEEKDAYS_OFF', 'F', 24)
  di.checkbox='1;Mon:2;Tue:3;Wed:4;Thu:5;Fri:6;Sat:7;Sun'
+ di.horizontal = true
 
  di=dict[++din]=dictrec('MARKET_CODE', 'F',25)
  if (typeof general_dict_marketcode !== 'undefined')
