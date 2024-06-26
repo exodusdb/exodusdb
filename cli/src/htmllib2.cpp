@@ -620,10 +620,12 @@ function getcss(io css, in version = "") {
 		fontsize ^= "%";
 	}
 	if (thcolor) {
-		css.replacer("#ffff80", "%thcol%");
+		//css.replacer("#ffff80", "%thcol%");
+		css.replacer("#fff099", "%thcol%");
 	}
 	if (tdcolor) {
-		css.replacer("#ffffc0", "%tdcol%");
+		//css.replacer("#ffffc0", "%tdcol%");
+		css.replacer("#fdf5e6", "%tdcol%");
 	}
 	if (thcolor) {
 		css.replacer("%thcol%", thcolor);
@@ -651,7 +653,7 @@ function getvogonpoetry_css(in version) {
 		return
 R"V0G0N(
 <style type="text/css">
-/*ver2*/
+/*ver2 for reports e.g list of invoices*/
 .BHEAD {display:none}
 .BHEAD2 {}
 body {background-color:#ffffff; font-family:exodusfont,verdana,sans-serif,arial,helvetica; font-size: exodussize}
@@ -660,7 +662,8 @@ a {color:blue;}
 a:visited {color:purple;}
 a:hover {color:red;}
 tt {font-family:courier new,courier;font-size:80%}
-xth {background-color:#ffff80;}
+//xth {background-color:#ffff80;}
+xth {background-color:#fff099;}
 thead {display:table-header-group}
 tfoot {page-break-inside:avoid}
 td.nb {border-bottom:none}
@@ -682,12 +685,14 @@ table.exodustable {
  border-spacing:0px;}
 
 table.exodustable th {
- background-color:#ffff80;
+ //background-color:#ffff80;
+ background-color:#fff099;
  padding:2px;
  border:1px solid #808080;}
 
 table.exodustable > tbody > tr > td {
- background-color:#ffffc0;
+ //background-color:#ffffc0;
+ background-color:#fdf5e6;
  padding:2px;
  border:1px solid #d3d3d3;}
 
@@ -791,7 +796,7 @@ window.onload=function (){
 		return
 R"V0G0N(
 <style type="text/css">
-/*ver1*/
+/*ver1 for documents like invoices*/
 .BHEAD {display:none}
 .BHEAD2 {}
 body {background-color:#ffffff; font-family:exodusfont,verdana,sans-serif,arial,helvetica; font-size: exodussize}
@@ -800,7 +805,8 @@ a {color:blue;}
 a:visited {color:purple;}
 a:hover {color:red;}
 tt {font-family:courier new,courier;font-size:80%}
-th {background-color:#ffff80;}
+//th {background-color:#ffff80;}
+th {background-color:#fff099;}
 thead {display:table-header-group}
 td.nb {border-bottom:none}
 td.nt {border-top:none}
@@ -810,7 +816,8 @@ td.nx {border-top:none;border-bottom:none}
 .acenter {text-align:center}
 .nobr {white-space:nowrap;}
 .num {text-align:right;mso-number-format:General}
-.exodustable {background-color:#ffffc0; border-width:2px; border-collapse:collapse; padding:1px}
+//.exodustable {background-color:#ffffc0; border-width:2px; border-collapse:collapse; padding:1px}
+.exodustable {background-color:#fdf5e6; border-width:2px; border-collapse:collapse; padding:1px}
 .hashtable td {padding:0px; margin:0px; vertical-align:top; border-collapse:collapse; border:0px solid lightgrey;}
 .pagedivider {border-top:1px dashed #808080; border-bottom:0px;}
 </style>

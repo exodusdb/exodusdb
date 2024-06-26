@@ -800,10 +800,12 @@ nextreport:
 	}
 
 	if (not SYSTEM.f(46, 1)) {
-		SYSTEM(46, 1) = "#FFFF80";
+		//SYSTEM(46, 1) = "#FFFF80";
+		SYSTEM(46, 1) = "#FFF099";
 	}
 	if (not SYSTEM.f(46, 2)) {
-		SYSTEM(46, 2) = "#FFFFC0";
+		//SYSTEM(46, 2) = "#FFFFC0";
+		SYSTEM(46, 2) = "#FDF5E6";
 	}
 	// if system<46,3> else system<46,3>=''
 

@@ -4,7 +4,8 @@ TABLE.exodusform
     /*display: none; this used to be cleared by something on successful loading */
     margin: 1px; /*inconsistent color setting bug in ie7xp if you dont set it to something and display is initially inline*/
     border-collapse: collapse;
-    background-color: #ffffc0; /*cellpadding: 1;*/
+    /*background-color: #ffffc0; /*cellpadding: 1;*/*/
+    background-color: #fdf5e6;
     border-color: #d0d0d0;
     border-width: 1px 1px 1px 1px;
     border-style:  solid; /* works in ie     border-right: thin;     border-left: thin;     border-bottom: thin;     border-top: thin;     */
@@ -50,7 +51,8 @@ BUTTON:focus, SELECT:focus, TEXTAREA:focus, INPUT:focus, SPAN:focus
 
 BODY
 {
-    background: #ffffff;
+    /*background: #ffffff;*/
+    background: #f9f9f9;
     color: #000000;
 }
 

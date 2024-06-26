@@ -1327,9 +1327,12 @@ function exodus_set_style(mode, value, value2) {
         //style.display = 'inline-block'
         style.display = ''
 
-        //initial color is buff yellow
-        if (!value)
-            value = '#ffffc0'
+        if (!value) {
+            //initial color is buff yellow
+            //value = '#ffffc0'
+            //initial color is oldlace
+            value = '#fdf5e6'
+		}
 
         oldvalue = style.backgroundColor
         try {
