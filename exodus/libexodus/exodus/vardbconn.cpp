@@ -5,6 +5,7 @@
 //variable (that is linked to SQL TABLE name - in field 2 of file handle)
 //
 //#define INSIDE_MVDBCONNS_CPP
+#include <exodus/rex.h>
 #include <exodus/vardbconn.h>
 
 constexpr int TRACING = 0;
@@ -31,7 +32,7 @@ int DBConnector::add_dbconn(PGconn* conn_to_cache, const std::string conninfo) {
 #pragma GCC diagnostic pop
 
 	if (TRACING >= 3) {
-		var(conninfo).regex_replacer(R"(password\s*=\s*\w*)", "").errputl("DBConnector::add_dbconn: " ^ var(dbconn_no_) ^ " conninfo: ");
+		var(conninfo).replacer(R"(password\s*=\s*\w*)"_rex, "").errputl("DBConnector::add_dbconn: " ^ var(dbconn_no_) ^ " conninfo: ");
 	}
 
 	return dbconn_no_;

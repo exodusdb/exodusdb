@@ -41,7 +41,7 @@ function main() {
 			continue;
 		}
 
-		// Ignore .swp files else ::regex_replace throws
+		// Ignore .swp files else ::replace throws
 		// "Invalid data or replacement during regex replace of "aaa" with "bbb"."
 		// "Invalid UTF-8 sequence encountered while trying to encode UTF-32 character"
 		if (osfilename.ends(".swp")) {
@@ -51,12 +51,13 @@ function main() {
 
 		let origrec = RECORD;
 
-		//RECORD.regex_replacer(R"___(\tcall fsmsg\(\);\n\t+stop\(\);)___", R"___(\tabort\(lasterror\);)___", "s");
-		//RECORD.regex_replacer(R"___(\breado\b)___", R"___(readc)___", "s");
+		//RECORD.replacer(R"___(\tcall fsmsg\(\);\n\t+stop\(\);)___"_rex, R"___(\tabort\(lasterror\);)___", "s");
+		//RECORD.replacer(R"___(\breado\b)___"_rex, R"___(readc)___", "s");
 		if (raw)
 			RECORD.replacer(find, repl);
 		else
-			RECORD.regex_replacer(find, repl, rxopts);
+			//RECORD.replacer(find, repl, rxopts);
+			RECORD.replacer(rex(find,rxopts), repl);
 
 		if (RECORD != origrec) {
 

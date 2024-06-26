@@ -30,6 +30,7 @@ THE SOFTWARE.
 //#include <utility> //std::unreachable()
 
 #include <exodus/varimpl.h>
+#include <exodus/rex.h>
 
 namespace exodus {
 
@@ -1149,7 +1150,8 @@ std::string var::oconv_TX(const char* conversion) const {
 	// so we have to escape them somehow first
 	// for usual case skip if no backslashes are present
 	if (result.var_str.find('\\') != std::string::npos)
-		result.regex_replacer("\\\\([" _FM _VM _SM _TM _ST "])", "{Back_Slash}\\1");
+		//result.regex_replacer("\\\\([" _FM _VM _SM _TM _ST "])", "{Back_Slash}\\1");
+		result.replacer("\\\\([" _FM _VM _SM _TM _ST "])"_rex, "{Back_Slash}\\1");
 
 	// "\n" -> "\\n"
 	result.replacer("\\n", "\\\\n");
@@ -1203,7 +1205,8 @@ var var::iconv_TX(const char* conversion) const {
 	// so we have to escape them somehow first
 	// for usual case skip if no { is present
 	if (record.var_str.find('{') != std::string::npos)
-		record.regex_replacer("{Back_Slash}([" _FM _VM _SM _TM _ST "])", "\\\\" "\\1");
+		//record.regex_replacer("{Back_Slash}([" _FM _VM _SM _TM _ST "])", "\\\\" "\\1");
+		record.replacer("{Back_Slash}([" _FM _VM _SM _TM _ST "])"_rex, "\\\\" "\\1");
 
 	return record;
 }

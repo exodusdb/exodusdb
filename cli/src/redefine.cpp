@@ -54,12 +54,12 @@ function main() {
 //			let oldcode = "(orec|RECORD)\\(" ^ value ^ "\\b";
 //			let newcode = "\\1\\(" ^ name ^ "";
 //
-//			newcpp.regex_replacer(oldcode, newcode);
+//			newcpp.replacer(rex(oldcode), newcode);
 //
 //			oldcode = "(orec|RECORD)\\.f\\(" ^ value ^ "\\b";
 //			newcode = "\\1.f\\(" ^ name ^ "";
 //
-//			newcpp.regex_replacer(oldcode, newcode);
+//			newcpp.replacer(rex(oldcode), newcode);
 
 			if (name.ends("+"))
 				name.popper() ^= value;
@@ -80,7 +80,7 @@ function main() {
 			if (found)
 				printl("", found, "->", newcode);
 
-			newcpp.regex_replacer(regex, newcode);
+			newcpp.replacer(rex(regex), newcode);
 
 		}
 

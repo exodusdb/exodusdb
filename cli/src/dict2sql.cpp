@@ -346,12 +346,12 @@ COST 10;
 }
 
 subroutine replace_FM_etc(io sql) {
-	sql.regex_replacer(R"(\bRM\b)", R"(E'\\x1F')");
-	sql.regex_replacer(R"(\bFM\b)", R"(E'\\x1E')");
-	sql.regex_replacer(R"(\bVM\b)", R"(E'\\x1D')");
-	sql.regex_replacer(R"(\bSM\b)", R"(E'\\x1C')");
-	sql.regex_replacer(R"(\bTM\b)", R"(E'\\x1B')");
-	sql.regex_replacer(R"(\bST\b)", R"(E'\\x1A')");
+	sql.replacer(R"(\bRM\b)"_rex, R"(E'\\x1F')");
+	sql.replacer(R"(\bFM\b)"_rex, R"(E'\\x1E')");
+	sql.replacer(R"(\bVM\b)"_rex, R"(E'\\x1D')");
+	sql.replacer(R"(\bSM\b)"_rex, R"(E'\\x1C')");
+	sql.replacer(R"(\bTM\b)"_rex, R"(E'\\x1B')");
+	sql.replacer(R"(\bST\b)"_rex, R"(E'\\x1A')");
 
 	// In case refactoring c++ code mangles pgsql code
 	//

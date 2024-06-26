@@ -23,6 +23,8 @@ THE SOFTWARE.
 #ifndef EXODUSFUNCS_H
 #define EXODUSFUNCS_H 1
 
+#include <mutex>
+
 #ifdef EXO_FORMAT
 // Including the large fmt library header here so exodus::format can precompile strings using fmt::vformat
 //
@@ -73,7 +75,8 @@ THE SOFTWARE.
 #endif // EXO_FORMAT
 
 #include <exodus/var.h>
-#include <mutex>
+#include <exodus/rex.h>
+//#include <mutex>
 
 // add global function type syntax to the exodus users
 // SIMILAR code in exofuncs.h and varimpl.h
@@ -318,8 +321,8 @@ VARREF textconverter(VARREF iostring, SV fromchars, SV tochars);
 ND var replace(CVR instring, SV fromstr, SV tostr);
 VARREF replacer(VARREF iostring, SV fromstr, SV tostr);
 
-ND var regex_replace(CVR instring, SV regex, SV replacement, SV options DEFAULT_EMPTY);
-VARREF regex_replacer(VARREF iostring, SV regex, SV replacement, SV options DEFAULT_EMPTY);
+ND var replace(CVR instring, const rex& regex, SV replacement);
+VARREF replacer(VARREF iostring, const rex& regex, SV replacement);
 
 ND var ucase(CVR instring);
 VARREF ucaser(VARREF iostring);

@@ -120,18 +120,18 @@ programinit()
 	{
 		// \d \D and [:number:]
 		var x = "a1b23c99";
-		regex_replacer(x, "\\d", "N");
+		replacer(x, R"(\d)"_rex, "N");
 		assert(x                               eq "aNbNNcNN");
 
 		x = "a1b23c99";
-		regex_replacer(x, "\\D", "N");
+		replacer(x, R"(\D)"_rex, "N");
 		assert(x        eq "N1N23N99");
 		//if (BOOST_REGEX) {
 		x = "a1b23c99";
-		regex_replacer(x, "[[:number:]]", "N");
+		replacer(x, "[[:number:]]"_rex, "N");
 		assert(x        eq "aNbNNcNN");
 		x = "a1b23c99";
-		regex_replacer(x, "[^[:number:]]", "N");
+		replacer(x, "[^[:number:]]"_rex, "N");
 		assert(x        eq "N1N23N99");
 		//}
 	}

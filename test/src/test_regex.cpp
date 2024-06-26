@@ -40,31 +40,30 @@ programinit()
 		//printl("Words longer than", n, "characters:\n" ^ v1.match("\\w{7,}").convert(FM, "\n"));
 
 		// Replace large words
-		printl(v1.regex_replace("(\\w{7,})", "[$&]"));
+		printl(v1.replace("(\\w{7,})"_rex, "[$&]"));
 
 	}
 	{
 		// first
-		assert(regex_replace("aaa bbb ccc", "b", "Q", "f") eq "aaa Qbb ccc");
+		assert(replace("aaa bbb ccc", rex("b", "f"), "Q") eq "aaa Qbb ccc");
 
 		// all
-		assert(regex_replace("aaa bbb ccc", "b", "Q") eq "aaa QQQ ccc");
+		assert(replace("aaa bbb ccc", "b"_rex, "Q") eq "aaa QQQ ccc");
 
 		// case insensitive
-		assert(regex_replace("aAa bbb ccc", "a", "Q", "i") eq "QQQ bbb ccc");
+		assert(replace("aAa bbb ccc", rex("a", "i"), "Q") eq "QQQ bbb ccc");
 
 		// single-line. ^ only matches beginning of string and not any embedded \n chars
-		assert(regex_replace("aaa\nbbb\nccc\n", "^b.*?$", "QQQ", "s").outputl() eq "aaa\nbbb\nccc\n");
+		assert(replace("aaa\nbbb\nccc\n", rex("^b.*?$", "s"), "QQQ").outputl() eq "aaa\nbbb\nccc\n");
 
 		// multi-line ^ matches beginning of string AND any embedded \n chars
-		assert(regex_replace("aaa\nbbb\nccc\n", "^b.*?$", "QQQ").outputl() eq "aaa\nQQQ\nccc\n");
-		assert(regex_replace("aaa\nbbb\nccc\n", "^b.*?$", "QQQ").outputl() eq "aaa\nQQQ\nccc\n");
+		assert(replace("aaa\nbbb\nccc\n", rex("^b.*?$", "m"), "QQQ").outputl() eq "aaa\nQQQ\nccc\n");
 
 		// l - literal - no special regex characters ... but better to use var::replace() for this
-		assert(regex_replace("aaa\n***\nccc\n", "*", "Q", "l").outputl() eq "aaa\nQQQ\nccc\n");
+		assert(replace("aaa\n***\nccc\n", rex("*", "l"), "Q").outputl() eq "aaa\nQQQ\nccc\n");
 
 		// lif - literal, case insensitive and first only
-		assert(regex_replace("aaa\nb*b*b\nccc\n", "B*", "Q", "fil").outputl() eq "aaa\nQb*b\nccc\n");
+		assert(replace("aaa\nb*b*b\nccc\n", rex("B*", "fil"), "Q").outputl() eq "aaa\nQb*b\nccc\n");
 
 	}
 
@@ -100,38 +99,38 @@ programinit()
 	{
 
 		// \d \D and [:number:]
-		assert(var("a1b23c99").regex_replace("\\d", "N")            eq "aNbNNcNN");
-		assert(var("a1b23c99").regex_replace("\\D", "N")            eq "N1N23N99");
+		assert(var("a1b23c99").replace("\\d"_rex, "N")            eq "aNbNNcNN");
+		assert(var("a1b23c99").replace("\\D"_rex, "N")            eq "N1N23N99");
 		if (BOOST_REGEX) {
-			assert(var("a1b23c99").regex_replace("[[:number:]]", "N")  eq "aNbNNcNN");
-			assert(var("a1b23c99").regex_replace("[^[:number:]]", "N") eq "N1N23N99");
+			assert(var("a1b23c99").replace("[[:number:]]"_rex, "N")  eq "aNbNNcNN");
+			assert(var("a1b23c99").replace("[^[:number:]]"_rex, "N") eq "N1N23N99");
 		}
 
 		// [:alnum:] = letters and numbers. No _
 		if (BOOST_REGEX) {
-			assert(var("a1b2_ \n3c99").regex_replace("[[:alnum:]]", "N").outputl()  eq "NNNN_ \nNNNN");
-			assert(var("a1b2_ \n3c99").regex_replace("[^[:alnum:]]", "N").outputl() eq "a1b2NNN3c99");
+			assert(var("a1b2_ \n3c99").replace("[[:alnum:]]"_rex, "N").outputl()  eq "NNNN_ \nNNNN");
+			assert(var("a1b2_ \n3c99").replace("[^[:alnum:]]"_rex, "N").outputl() eq "a1b2NNN3c99");
 		}
 
 		// \w and \W in alnum + _
-		assert(var("a1b2_ \n3c99").regex_replace("\\w", "N").outputl()            eq "NNNNN \nNNNN");
-		assert(var("a1b2_ \n3c99").regex_replace("\\W", "N").outputl()            eq "a1b2_NN3c99");
+		assert(var("a1b2_ \n3c99").replace("\\w"_rex, "N").outputl()            eq "NNNNN \nNNNN");
+		assert(var("a1b2_ \n3c99").replace("\\W"_rex, "N").outputl()            eq "a1b2_NN3c99");
 		if (BOOST_REGEX) {
-			assert(var("a1b2_ \n3c99").regex_replace("[_[:alnum:]]", "N").outputl()  eq "NNNNN \nNNNN");
-			assert(var("a1b2_ \n3c99").regex_replace("[^_[:alnum:]]", "N").outputl() eq "a1b2_NN3c99");
+			assert(var("a1b2_ \n3c99").replace("[_[:alnum:]]"_rex, "N").outputl()  eq "NNNNN \nNNNN");
+			assert(var("a1b2_ \n3c99").replace("[^_[:alnum:]]"_rex, "N").outputl() eq "a1b2_NN3c99");
 		}
 
 		// \s \S and [[:space:]]  means whitespace
-		assert(var("a1b2_ \n3c99").regex_replace("\\s", "N").outputl()           eq "a1b2_NN3c99");
-		assert(var("a1b2_ \n3c99").regex_replace("\\S", "N").outputl()           eq "NNNNN \nNNNN");
+		assert(var("a1b2_ \n3c99").replace("\\s"_rex, "N").outputl()           eq "a1b2_NN3c99");
+		assert(var("a1b2_ \n3c99").replace("\\S"_rex, "N").outputl()           eq "NNNNN \nNNNN");
 		if (BOOST_REGEX) {
-			assert(var("a1b2_ \n3c99").regex_replace("[[:space:]]", "N").outputl()  eq "a1b2_NN3c99");
-			assert(var("a1b2_ \n3c99").regex_replace("[^[:space:]]", "N").outputl() eq "NNNNN \nNNNN");
+			assert(var("a1b2_ \n3c99").replace("[[:space:]]"_rex, "N").outputl()  eq "a1b2_NN3c99");
+			assert(var("a1b2_ \n3c99").replace("[^[:space:]]"_rex, "N").outputl() eq "NNNNN \nNNNN");
 		}
 
 		if (BOOST_REGEX) {
 			// \{Number}
-			assert(var("a1b2_ \n3c99").regex_replace("\\p{Number}", "N").outputl() eq "aNbN_ \nNcNN");
+			assert(var("a1b2_ \n3c99").replace("\\p{Number}"_rex, "N").outputl() eq "aNbN_ \nNcNN");
 		}
 	}
 
@@ -147,22 +146,22 @@ programinit()
 	}
 
 	var r1 = _FM "0.123";
-	assert(r1.regex_replace("([\x1A-\x1F]-?)0.", "$1.") eq _FM ".123");
+	assert(r1.replace("([\x1A-\x1F]-?)0."_rex, "$1.") eq _FM ".123");
 	var r2 = _ST "-0.123";
-	assert(r2.regex_replace("([\x1A-\x1F]-?)0.", "$1.") eq _ST "-.123");
+	assert(r2.replace("([\x1A-\x1F]-?)0."_rex, "$1.") eq _ST "-.123");
 
 	//replacing unicode style numbers characters using javascript style regex
-	//assert(var("Ⅻ").regex_replace(R"(\p{Number})","yes")=="yes");
-	//assert(var("⅝").regex_replace(R"(\p{Number})","yes")=="yes");
-	assert(var("1").regex_replace(R"([[:digit:]])", "yes") eq "yes");
+	//assert(var("Ⅻ").replace(R"(\p{Number})"_rex,"yes")=="yes");
+	//assert(var("⅝").replace(R"(\p{Number})"_rex,"yes")=="yes");
+	assert(var("1").replace(R"([[:digit:]])"_rex, "yes") eq "yes");
 	if (BOOST_REGEX) {
-		assert(var("Ⅻ").regex_replace(R"(\p{Number})", "yes") eq "yes");
-		assert(var("⅝").regex_replace(R"(\p{Number})", "yes") eq "yes");
+		assert(var("Ⅻ").replace(R"(\p{Number})"_rex, "yes") eq "yes");
+		assert(var("⅝").replace(R"(\p{Number})"_rex, "yes") eq "yes");
 
-		//assert(var("Ⅻ").regex_replace(R"(\p{Number})","yes").outputl()!="yes");
-		//assert(var("⅝").regex_replace(R"(\p{Number})","yes").outputl()!="yes");
-		assert(var("Ⅻ").regex_replace(R"([[:digit:]])", "yes").outputl() ne "yes");
-		assert(var("⅝").regex_replace(R"([[:digit:]])", "yes").outputl() ne "yes");
+		//assert(var("Ⅻ").replace(R"(\p{Number})"_rex,"yes").outputl()!="yes");
+		//assert(var("⅝").replace(R"(\p{Number})"_rex,"yes").outputl()!="yes");
+		assert(var("Ⅻ").replace(R"([[:digit:]])"_rex, "yes").outputl() ne "yes");
+		assert(var("⅝").replace(R"([[:digit:]])"_rex, "yes").outputl() ne "yes");
 	}
 
 	//test glob matching using * ? eg *.* and *.??? etc
@@ -195,25 +194,25 @@ programinit()
 		//replace char+space with x+char+dash
 		//TODO add g option
 		var text = "what a lot of money";
-		assert(text.regex_replace("(.) ", "x$1-") eq "whaxt-xa-loxt-oxf-money");
+		assert(text.replace("(.) "_rex, "x$1-") eq "whaxt-xa-loxt-oxf-money");
 
 		//simple test of regex and case insensitive regex swap (commonly known as replace)
-		assert(regex_replace("abcd", "b.", "xyz").outputl() eq "axyzd");	   //right case to convert
-		assert(regex_replace("abc", "B.", "xyz").outputl() eq "abc");		   //wrong case to convert
-		assert(regex_replace("abcd", "B.", "xyz", "i").outputl() eq "axyzd");  //case insensitive converts
+		assert(replace("abcd", "b."_rex, "xyz").outputl() eq "axyzd");	   //right case to convert
+		assert(replace("abc", "B."_rex, "xyz").outputl() eq "abc");		   //wrong case to convert
+		assert(replace("abcd", rex("B.", "i"), "xyz").outputl() eq "axyzd");  //case insensitive converts
 		if (BOOST_REGEX)
-			assert(regex_replace("abc", "b.", "xyz", "l").outputl() eq "abc");	//literal wont convert
+			assert(replace("abc", rex("b.", "l"), "xyz").outputl() eq "abc");	//literal wont convert
 
 		//simple test of case sensitive/insensitive swap
 		assert(replace("abc", "b", "xyz").outputl() eq "axyzc");				 //will convert right case
 		assert(replace("abc", "B", "xyz").outputl() eq "abc");					 //wont convert wrong case
-		assert(regex_replace("abc", "B", "xyz", "i").outputl() eq "axyzc");	 //will convert case insensitive
+		assert(replace("abc", rex("B", "i"), "xyz").outputl() eq "axyzc");	 //will convert case insensitive
 		if (BOOST_REGEX)
-			assert(regex_replace("ab*c", "B*", "xyz", "il").outputl() eq "axyzc");	//will convert case insensitive but not regex
+			assert(replace("ab*c", rex("B*", "il"), "xyz").outputl() eq "axyzc");	//will convert case insensitive but not regex
 
 		assert(replace("abababab", "ab", "x").outputl()           eq "xxxx");
-		assert(regex_replace("abababab", "ab", "x").outputl() eq "xxxx");		//regex
-		assert(regex_replace("abababab", "a.", "xy").outputl() eq "xyxyxyxy");	//regex
+		assert(replace("abababab", "ab"_rex, "x").outputl() eq "xxxx");		//regex
+		assert(replace("abababab", "a."_rex, "xy").outputl() eq "xyxyxyxy");	//regex
 	}
 
 	{
@@ -239,19 +238,19 @@ programinit()
 
 		// bad data
 		try {
-			notutf8.regex_replace("X", "Y").errputl();
+			notutf8.replace("X"_rex, "Y").errputl();
 			assert(false);
 		} catch (VarError& e) {errputl(e.description);}
 
 		// bad target
 		try {
-			utf8.regex_replace(notutf8, "Y").errputl();
+			utf8.replace(rex(notutf8), "Y").errputl();
 			assert(false);
 		} catch (VarError& e) {errputl(e.description);}
 
 		// bad replacement
 		try {
-			utf8.regex_replace("X", notutf8).errputl();
+			utf8.replace("X"_rex, notutf8).errputl();
 			assert(false);
 		} catch (VarError& e) {errputl(e.description);}
 	}

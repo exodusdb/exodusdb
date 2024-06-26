@@ -224,6 +224,7 @@ Within transactions, lock requests for locks that have already been obtained alw
 //#include <exodus/exoenv.h>
 //#include <exodus/mvutf.h>
 #include <exodus/dim.h>
+#include <exodus/rex.h>
 
 #ifdef EXODUS_TIMEBANK
 #include "timebank.h"
@@ -795,7 +796,8 @@ static var build_conn_info(CVR conninfo) {
 	//	result = thread_connparams;
 
 	// Remove spaces around = to enable parsing using space
-	result.regex_replacer("\\s+=\\s+", "=");
+	//result.regex_replacer("\\s+=\\s+", "=");
+	result.replacer(R"(\s+=\s+)"_rex, "=");
 
 	// otherwise search for details from exodus config file
 	// if incomplete connection parameters provided
@@ -833,7 +835,8 @@ static var build_conn_info(CVR conninfo) {
 			envconn ^= " user=" ^ temp;
 
 		if (temp.osgetenv("EXO_DATA") && temp) {
-			envconn.regex_replacer(R"(dbname\s*=\s*\w*)", "");
+			//envconn.regex_replacer(R"(dbname\s*=\s*\w*)", "");
+			envconn.replacer(R"(dbname\s*=\s*\w*)"_rex, "");
 			envconn ^= " dbname=" ^ temp;
 		}
 
@@ -847,7 +850,8 @@ static var build_conn_info(CVR conninfo) {
 	}
 
 	// Remove excess spaces. Especially around = to enable parsing using space
-	result.regex_replacer("\\s+=\\s+", "=");
+	//result.regex_replacer("\\s+=\\s+", "=");
+	result.replacer(R"(\s+=\s+)"_rex, "=");
 	result.trimmer();
 
 	// Work backwards through parts
@@ -912,11 +916,16 @@ static var get_fileexpression([[maybe_unused]] CVR mainfilename, CVR filename, C
 
 // Used in var::selectx
 static void to_extract_text(VARREF dictexpression) {
-				dictexpression.regex_replacer("^exodus.extract_number\\(", "exodus.extract_text\\(");
-				dictexpression.regex_replacer("^exodus.extract_sort\\(", "exodus.extract_text\\(");
-				dictexpression.regex_replacer("^exodus.extract_date\\(", "exodus.extract_text\\(");
-				dictexpression.regex_replacer("^exodus.extract_time\\(", "exodus.extract_text\\(");
-				dictexpression.regex_replacer("^exodus.extract_datetime\\(", "exodus.extract_text\\(");
+//				dictexpression.regex_replacer("^exodus.extract_number\\(", "exodus.extract_text\\(");
+//				dictexpression.regex_replacer("^exodus.extract_sort\\(", "exodus.extract_text\\(");
+//				dictexpression.regex_replacer("^exodus.extract_date\\(", "exodus.extract_text\\(");
+//				dictexpression.regex_replacer("^exodus.extract_time\\(", "exodus.extract_text\\(");
+//				dictexpression.regex_replacer("^exodus.extract_datetime\\(", "exodus.extract_text\\(");
+				dictexpression.replacer("^exodus.extract_number\\("_rex, "exodus.extract_text\\(");
+				dictexpression.replacer("^exodus.extract_sort\\("_rex, "exodus.extract_text\\(");
+				dictexpression.replacer("^exodus.extract_date\\("_rex, "exodus.extract_text\\(");
+				dictexpression.replacer("^exodus.extract_time\\("_rex, "exodus.extract_text\\(");
+				dictexpression.replacer("^exodus.extract_datetime\\("_rex, "exodus.extract_text\\(");
 }
 
 bool var::connect(CVR conninfo) {
@@ -957,7 +966,8 @@ bool var::connect(CVR conninfo) {
 
 	if (DBTRACE_CONN) {
 		//fullconninfo.replace(R"(password\s*=\s*\w*)", "password=**********").logputl("var::connect( ) ");
-		fullconninfo.regex_replace(R"(password\s*=\s*\w*)", "password=**********").logputl("\nvar::connect( ) ");
+		//fullconninfo.regex_replace(R"(password\s*=\s*\w*)", "password=**********").logputl("\nvar::connect( ) ");
+		fullconninfo.replace(R"(password\s*=\s*\w*)"_rex, "password=**********").logputl("\nvar::connect( ) ");
 	}
 
 	PGconn* pgconn;
@@ -1030,7 +1040,8 @@ bool var::connect(CVR conninfo) {
 	(*this)(3) = dbconn_no;
 
 	if (DBTRACE_CONN) {
-		fullconninfo.regex_replace(R"(password\s*=\s*\w*)", "password=**********").logputl("var::connect() OK ");
+		//fullconninfo.regex_replace(R"(password\s*=\s*\w*)", "password=**********").logputl("var::connect() OK ");
+		fullconninfo.replace(R"(password\s*=\s*\w*)"_rex, "password=**********").logputl("var::connect() OK ");
 		this->logput("var::connect() OK ");
 		std::clog << " " << pgconn << std::endl;
 	}
@@ -3147,7 +3158,8 @@ exodus_call:
 		if (sqlexpression.starts("exodus.extract_date(") || sqlexpression.starts("exodus.extract_time("))
 			sqlexpression.paster(20, "_array");
 		else {
-			sqlexpression.regex_replacer("exodus.extract_sort\\(", "exodus.extract_text\\(");
+			//sqlexpression.regex_replacer("exodus.extract_sort\\(", "exodus.extract_text\\(");
+			sqlexpression.replacer("exodus.extract_sort\\("_rex, "exodus.extract_text\\(");
 			sqlexpression = "string_to_array(" ^ sqlexpression ^ ", chr(29),'')";
 
 			// Note 3rd argument '' means convert empty multivalues to nullptr in the array
@@ -4149,7 +4161,8 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 					+RECORDS+ | +RECORDS+
 					*/
 
-					dictexpression.regex_replacer("^exodus.extract_number\\(", "exodus.extract_text\\(");
+					//dictexpression.regex_replacer("^exodus.extract_number\\(", "exodus.extract_text\\(");
+					dictexpression.replacer("^exodus.extract_number\\("_rex, "exodus.extract_text\\(");
 					if (not subvalue.starts("'"))
 						subvalue.squoter();
 
@@ -4459,8 +4472,9 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 	//actualfieldnames.logputl("actualfieldnames=");
 	//actualfieldnames.replacer("key", actualfilename ^ ".key");
 	//actualfieldnames.replacer("data", actualfilename ^ ".data");
-	actualfieldnames.regex_replacer("\\bkey\\b", actualfilename ^ ".key");
-	actualfieldnames.regex_replacer("\\bdata\\b", actualfilename ^ ".data");
+	//actualfieldnames.regex_replacer("\\bkey\\b", actualfilename ^ ".key");
+	//actualfieldnames.regex_replacer("\\bdata\\b", actualfilename ^ ".data");
+	actualfieldnames.replacer(R"(\b(key|data)\b)"_rex, actualfilename ^ ".$&");
 
 	// DISTINCT has special fieldnames
 	if (distinctfieldnames)
@@ -4574,7 +4588,8 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 		sql ^= " \nLIMIT\n " ^ maxnrecs;
 
 	// Final catch of obsolete function that was replaced by COLLATE keyword
-	sql.regex_replacer("exodus.extract_sort\\(", "exodus.extract_text\\(");
+	//sql.regex_replacer("exodus.extract_sort\\(", "exodus.extract_text\\(");
+	sql.replacer("exodus.extract_sort\\("_rex, "exodus.extract_text\\(");
 
 	//sql.logputl("sql=");
 

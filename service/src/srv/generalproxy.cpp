@@ -277,7 +277,7 @@ function main() {
 		if (not sourcedbcode.ends("_test")) {
 			liveortest = "live";
 		}
-		let srcservicecode = "agy_" ^ liveortest ^ "@" ^ sourcedbcode.regex_replace("_test", "");
+		let srcservicecode = "agy_" ^ liveortest ^ "@" ^ sourcedbcode.replace("_test", "");
 
 		// stop source db live/test service
 		//if (not osshell("systemctl stop agy_live@" ^ sourcedbcode)) {

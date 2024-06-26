@@ -2037,8 +2037,8 @@ ND VARREF var::substr(const int pos1)                                && {return 
 ND VARREF var::convert(SV fromchars, SV tochars)                     && {return converter(fromchars, tochars);}
 ND VARREF var::textconvert(SV fromchars, SV tochars)                 && {return textconverter(fromchars, tochars);}
 ND VARREF var::replace(SV fromstr, SV tostr)                         && {return replacer(fromstr, tostr);}
-ND VARREF var::regex_replace(SV regex, SV replacement, SV options DEFAULT_EMPTY)
-                                                                     && {return regex_replacer(regex, replacement, options);}
+ND VARREF var::replace(const rex& regex, SV replacement)
+                                                                     && {return replacer(regex, replacement);}
 ND VARREF var::unique()                       && {return uniquer();}
 ND VARREF var::sort(SV sepchar DEFAULT_FM)    && {return sorter(sepchar);}
 ND VARREF var::reverse(SV sepchar DEFAULT_FM) && {return reverser(sepchar);}

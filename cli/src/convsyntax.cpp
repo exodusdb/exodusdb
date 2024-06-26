@@ -122,17 +122,17 @@ function main() {
 				var line2 = hide_subsyntax(line, pos, ',');
 
 				//x(fn) = y;
-				line2.regex_replacer(
+				line2.replacer(
 					"([\\w()]+)"	// (1) A variable or variable with brackets containing a variable
 					"\\.r\\("		// The .r( syntax
 					"([^,]+)"		// (2) Everything up to the only comma is the FN
 					", ?"			// ,
 					"([^,]+)"		// (3) Everything else if no comma is the replacement
-					"\\);"			// The trailing );
+					"\\);"_rex		// The trailing );
 				, R"(\1(\2) = \3;)");
 
 				//x(fn, vn) = y;
-				line2.regex_replacer(
+				line2.replacer(
 					"([\\w()]+)"	// (1) A variable or variable with brackets containing a variable
 					"\\.r\\("		// The .r( syntax
 					"([^,]+)"		// (2) Everything up to the first comma is the FN
@@ -140,11 +140,11 @@ function main() {
 					"([^,]+)"		// (3) Everything up to the second comma is the VN
 					", ?"			// ,
 					"([^,]+)"		// (4) Everything else if no comma is the replacement
-					"\\);"			// The trailing );
+					"\\);"_rex		// The trailing );
 				, R"(\1(\2, \3) = \4;)");
 
 				//x(fn, vm , sn) = y;
-				line2.regex_replacer(
+				line2.replacer(
 					"([\\w()]+)"	// (1) A variable or variable with brackets containing a variable
 					"\\.r\\("		// The .r( syntax
 					"([^,]+)"		// (2) Everything up to the first comma is the FN
@@ -154,7 +154,7 @@ function main() {
 					"([^,]+)"		// (4) Everything up to the third comma is the SN
 					", ?"			// ,
 					"([^,]+)"		// (5) Everything else if no comma is the replacement
-					"\\);"			// The trailing );
+					"\\);"_rex		// The trailing );
 				, R"(\1(\2, \3, \4) = \5;)");
 
 
@@ -226,8 +226,8 @@ function main() {
 						}
 					}
 				} else if (forrange == 2) {
-					line2.regex_replacer(
-						R"___(\tfor \(([a-z0-9_]+?) = (.+?); \1 (<=|le) (.+?); (\+\+\1|\1\+\+)\))___",
+					line2.replacer(
+						R"___(\tfor \(([a-z0-9_]+?) = (.+?); \1 (<=|le) (.+?); (\+\+\1|\1\+\+)\))___"_rex,
 						R"___(\tfor \(let \1 : range\(\2, \4\)\))___");
 						//R"___(\tfor \(([a-zA-Z_.0-9]+) =)___",
 						//R"___(QQQ : range\()___");
@@ -267,21 +267,21 @@ function main() {
 
 			// B - substr() to b()
 			if (substr2b) {
-				line2.regex_replacer(R"__(\.substr\()__", R"__(.b\()__");
+				line2.replacer(R"__(\.substr\()__"_rex, R"__(.b\()__");
 			}
 
 			// S - .b(1, ..) == -> .starts(..
-			//var newrec = RECORD.regex_replace(R"(\.b\(1, \d+\) == (".*"))", R"(.starts(\1)");
+			//var newrec = RECORD.replace(R"(\.b\(1, \d+\) == (".*"))"_rex, R"(.starts(\1)");
 			if (b1eq2starts) {
-				line2.regex_replacer(
-					R"__(\.b\(1, ?\d+\) ?(eq|==) ?(".*?"))__",
-					R"__(.starts\(\2\))__", "g"
+				line2.replacer(
+					rex(R"__(\.b\(1, ?\d+\) ?(eq|==) ?(".*?"))__", "g"),
+					R"__(.starts\(\2\))__"
 				);
 
 				// first
-				line.regex_replacer(
-					R"__(\.b\(1, ?(\d+)\))__",
-					R"__(.first\(\1\))__", "g"
+				line.replacer(
+					rex(R"__(\.b\(1, ?(\d+)\))__", "g"),
+					R"__(.first\(\1\))__"
 				);
 			}
 
@@ -289,54 +289,54 @@ function main() {
 			if (b2last) {
 
 				// ends
-				line2.regex_replacer(
-					R"__(\.b\(-(\d+), ?\1\) ?(eq|==) ?(".*?"))__",
-					R"__(.ends\(\3\))__", "g"
+				line2.replacer(
+					rex(R"__(\.b\(-(\d+), ?\1\) ?(eq|==) ?(".*?"))__", "g"),
+					R"__(.ends\(\3\))__"
 				);
 
 				// last
-				line2.regex_replacer(
-					R"__(\.b\(-(\d+), ?\1\))__",
-					R"__(.last\(\1\))__", "g"
+				line2.replacer(
+					rex(R"__(\.b\(-(\d+), ?\1\))__", "g"),
+					R"__(.last\(\1\))__"
 				);
 			}
 
 			// C - Cut
 			if (cutting) {
-				line2.regex_replacer(
-					R"__(\.b\(2\))__",
+				line2.replacer(
+					R"__(\.b\(2\))__"_rex,
 					R"__(\.cut\(1\))__"
 				);
-				line2.regex_replacer(
-					R"__(\.b\(3\))__",
+				line2.replacer(
+					R"__(\.b\(3\))__"_rex,
 					R"__(\.cut\(2\))__"
 				);
-				line2.regex_replacer(
-					R"__(\.b\(4\))__",
+				line2.replacer(
+					R"__(\.b\(4\))__"_rex,
 					R"__(\.cut\(3\))__"
 				);
-				line2.regex_replacer(
-					R"__(\.b\(5\))__",
+				line2.replacer(
+					R"__(\.b\(5\))__"_rex,
 					R"__(\.cut\(4\))__"
 				);
-				line2.regex_replacer(
-					R"__(\.b\(6\))__",
+				line2.replacer(
+					R"__(\.b\(6\))__"_rex,
 					R"__(\.cut\(5\))__"
 				);
-				line2.regex_replacer(
-					R"__(\.b\(7\))__",
+				line2.replacer(
+					R"__(\.b\(7\))__"_rex,
 					R"__(\.cut\(6\))__"
 				);
-				line2.regex_replacer(
-					R"__(\.b\(8\))__",
+				line2.replacer(
+					R"__(\.b\(8\))__"_rex,
 					R"__(\.cut\(7\))__"
 				);
-				line2.regex_replacer(
-					R"__(\.b\(9\))__",
+				line2.replacer(
+					R"__(\.b\(9\))__"_rex,
 					R"__(\.cut\(8\))__"
 				);
-				line2.regex_replacer(
-					R"__(\.b\(10\))__",
+				line2.replacer(
+					R"__(\.b\(10\))__"_rex,
 					R"__(\.cut\(9\))__"
 				);
 			}
@@ -344,9 +344,9 @@ function main() {
 			// paster "" -> cutter
 			if (splicing) {
 
-				line2.regex_replacer(
-					//R"__(.paster\(1,\s*([A-Z0-9a-z_. + -]+),\s*""\))__",
-					R"__(.paster\(1,\s*([^,]+),\s*""\))__",
+				line2.replacer(
+					//R"__(.paster\(1,\s*([A-Z0-9a-z_. + -]+),\s*""\))__"_rex,
+					R"__(.paster\(1,\s*([^,]+),\s*""\))__"_rex,
 					R"__(.cutter\(\1\))__"
 				);
 
@@ -355,21 +355,21 @@ function main() {
 			// G - General
 			if (general) {
 
-				line2.regex_replacer(
-					R"__(\.oconv\("D2/E"\)\.first\(2\))__",
+				line2.replacer(
+					R"__(\.oconv\("D2/E"\)\.first\(2\))__"_rex,
 					R"__(\.oconv\("DD"\))__"
 				);
 
 				// .b(9, 99) -> .b(9)
-				line2.regex_replacer(
-					R"__(\.b\(([a-zA-Z_0-9"]+), 99+\))__",
+				line2.replacer(
+					R"__(\.b\(([a-zA-Z_0-9"]+), 99+\))__"_rex,
 					//R"__(\.b\((\d), 99+\))__",
 					R"__(.b\(\1\))__"
 				);
 
 				// .b(1, -> .starts(
-				line2.regex_replacer(
-					R"__(\.b\(1,\s*)__",
+				line2.replacer(
+					R"__(\.b\(1,\s*)__"_rex,
 					R"__(.first\()__"
 				);
 
@@ -378,8 +378,8 @@ function main() {
 			if (emptyvar) {
 
 				// var().date/time/chr( -> date/time/chr(
-				line2.regex_replacer(
-					R"__(var\(\)\.(chr|date|time)\()__",
+				line2.replacer(
+					R"__(var\(\)\.(chr|date|time)\()__"_rex,
 					R"__(\1\()__"
 				);
 
@@ -388,13 +388,13 @@ function main() {
 			// [1/-1] eq/ne "x"/XX -> .starts/ends(xx) []
 			if (onechar) {
 
-				line2.regex_replacer(
-					R"__(\[1\]\s(eq|==)\s(".{1,2}"|[A-Z0-9a-z_.]+\b))__",
+				line2.replacer(
+					R"__(\[1\]\s(eq|==)\s(".{1,2}"|[A-Z0-9a-z_.]+\b))__"_rex,
 					R"__(.starts\(\2\))__"
 				);
 
-				line2.regex_replacer(
-					R"__(\[-1\]\s(eq|==)\s(".{1,2}"|[A-Z0-9a-z_.]+\b))__",
+				line2.replacer(
+					R"__(\[-1\]\s(eq|==)\s(".{1,2}"|[A-Z0-9a-z_.]+\b))__"_rex,
 					R"__(.ends\(\2\))__"
 				);
 
