@@ -25,7 +25,43 @@ programinit()
 			printl("Text contains the phrase 'regular expressions");
 
 		// Count occurrences
-		println("Found {} words", v1.match("\\w+").fcount(FM));
+		//println("Found {} words", v1.match("\\w+").fcount(FM));
+		//println("Found {:} words", v1.match("\\w+").fcount(FM));
+		//let nwords = v1.match("\\w+").fcount(FM);
+		int nwords = v1.match("\\w+").fcount(FM);
+		println("Found {} words", nwords);
+
+// clang 15 on u22.04 has a problem with the above var in println
+
+///root/exodus/test/src/test_regex.cpp:28:11: error: call to consteval function 'fmt::basic_format_string<char, exodus::var>::basic_format_string<cha
+//r[15], 0>' is not a constant expression                                                                                                            
+//                println("Found {} words", v1.match("\\w+").fcount(FM));                                                                            
+//                        ^                                                                                                                          
+///root/exodus/test/src/../../fmt/include/fmt/core.h:2561:12: note: non-literal type 'formatter<mapped_type, char_type>' (aka 'formatter<exodus::var,
+// char>') cannot be used in a constant expression                                                                                                   
+//    return formatter<mapped_type, char_type>().parse(ctx);               
+//           ^                                                             
+///root/exodus/test/src/../../fmt/include/fmt/core.h:2654:39: note: in call to 'parse_format_specs(checker(s).context_)'                             
+//    return id >= 0 && id < num_args ? parse_funcs_[id](context_) : begin;                                                                          
+//                                      ^
+///root/exodus/test/src/../../fmt/include/fmt/core.h:2647:5: note: in call to '&checker(s)->on_format_specs(0, &"Found {} words"[7], &"Found {} words
+//"[7])'
+//    on_format_specs(id, begin, begin);  // Call parse() on empty specs.
+//    ^
+///root/exodus/test/src/../../fmt/include/fmt/core.h:2472:13: note: in call to '&checker(s)->on_replacement_field(0, &"Found {} words"[7])'
+//    handler.on_replacement_field(handler.on_arg_id(), begin);
+//            ^
+///root/exodus/test/src/../../fmt/include/fmt/core.h:2504:21: note: in call to 'parse_replacement_field(&"Found {} words"[7], &"Found {} words"[14], 
+//checker(s))'
+//        begin = p = parse_replacement_field(p - 1, end, handler);
+//                    ^
+///root/exodus/test/src/../../fmt/include/fmt/core.h:2757:7: note: in call to 'parse_format_string({&"Found {} words"[0], 14}, checker(s))'
+//      detail::parse_format_string<true>(str_, checker(s));
+//      ^
+///root/exodus/test/src/test_regex.cpp:28:11: note: in call to 'basic_format_string("Found {} words")'
+//                println("Found {} words", v1.match("\\w+").fcount(FM));
+//                        ^
+//
 
 		// Use search loop to process occurrences. Could allow complex amendments.
 		var n = 6;

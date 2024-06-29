@@ -33,7 +33,7 @@ function main() {
 		// Force recompilation to generate all warning messages
 		let pipedcmd = compilecmd ^ " {F} |& convsyntax3 {X" ^ OPTIONS ^ "}";
 		if (verbose)
-			TRACE(pipedcmd);
+			TRACE(pipedcmd)
 		if (not osshell("bash -c " ^ pipedcmd.squote()))
 			abort(lasterror());
 
@@ -41,7 +41,7 @@ function main() {
 		if (recompile) {
 			let recompilecmd = compilecmd ^ " {S}";
 			if (verbose)
-				TRACE(recompilecmd);
+				TRACE(recompilecmd)
 			if (not osshell(recompilecmd))
 				abort(lasterror());
 		}
@@ -221,7 +221,7 @@ function main() {
 			srcline.paster(charno2, 1, new_open);
 
 			if (verbose)
-				TRACE(compline);
+				TRACE(compline)
 			printl(srcloc, srcline.trimfirst("\t "));
 
 			// Flag update required
