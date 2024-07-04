@@ -112,8 +112,9 @@ set -euxo pipefail
 :	bsd-mailx	provides "mail" which is required to send email?
 :	postfix     email handler
 :	mailutils	NOT installed. like bsd-mailx but doesnt have identical options
+:	qrencode	used in htmllib2 for KSA invoices
 :
-	DEBIAN_FRONTEND=noninteractive apt-get -y install whois postfix bsd-mailx
+	DEBIAN_FRONTEND=noninteractive apt-get -y install whois postfix bsd-mailx qrencode
 
 :
 : Configure postfix
