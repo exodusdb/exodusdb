@@ -29,7 +29,7 @@ programinit()
 	}
 
 	//test copying files forced overwrite)
-	osrmdir("d1", true) || true;
+	if (not osrmdir("d1", true)) {};
 	assert(osmkdir("d1/d1"));
 	assert(oswrite("f1", "d1/f1"));
 	assert(oswrite("f2", "d1/f2"));
@@ -302,7 +302,7 @@ programinit()
 
 		var env;
 		assert(env.osgetenv(""));
-		TRACE(env);
+		TRACE(env)
 		printl();
 		TRACE(env.len())
 
@@ -313,7 +313,7 @@ programinit()
 			env2 ^= FM_;
 		}
 		env2.popper();
-		TRACE(env2);
+		TRACE(env2)
 		TRACE(env2.len())
 
 		assert(env2 eq env);
