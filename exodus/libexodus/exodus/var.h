@@ -34,6 +34,7 @@ THE SOFTWARE.
 #include <iostream>
 #include <string>
 #include <string_view>
+#include <array> // used in operator<<
 
 // Support var::format functions
 #define EXO_FORMAT
