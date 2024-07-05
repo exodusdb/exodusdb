@@ -3543,8 +3543,8 @@ function* editreleaserecord_onclick() {
     if (!(yield* saveandorcleardoc('RELEASE')))
         return false
 
-    //editreleaserecord.value='Edit'
-    setgraphicbutton(editreleaserecord, '<u>E</u>dit', geditimage)
+    //editreleaserecord.value=' Edit'
+    setgraphicbutton(editreleaserecord, ' <u>E</u>dit', geditimage)
     setdisabledandhidden(editreleaserecord, false)
 
     return true
