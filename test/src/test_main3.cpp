@@ -32,25 +32,6 @@ programinit()
 	function main() {
 
 	{
-		// Check conversion of visible to internal field marks in user literals
-		assert("`^]}|~"_var eq _RM _FM _VM _SM _TM _ST);
-	}
-
-	{
-		outputt("xxx", "yyy");
-		outputl();
-		outputl("===\t===");
-
-		errput("aaa", "bbb");
-		errputl();
-		errputl("---", "---");
-
-		logput("111", "222");
-		logputl();
-		logputl("...", "...");
-	}
-
-	{
 		printl("Check randomness of rnd(10)");
 
 		var ntests = 1'000'000;
@@ -803,11 +784,18 @@ programinit()
 		{
 			// member functions
 
+			var xx = '\x1E';
+			assert(xx.oconv("HEX").outputl() == "1E");
+
+			assert(FM.oconv("HEX").outputl() == "1E");
+
 			var rem = "abc" ^ FM ^ "xyz";
 			var ptr = 2;
 			var sep;
-
+			TRACE(rem.oconv("HEX"))
+			assert(rem == "\x61\x62\x63\x1e\x78\x79\x7a");
 			var result = rem.substr2(ptr, sep);
+			assert(result.outputl() == "bc");
 			assert(var(result ^ "|" ^ ptr ^ "|" ^ sep).outputl() eq "bc|5|2");
 
 			result = rem.substr2(ptr, sep);
@@ -862,6 +850,78 @@ programinit()
 
 		//test unquote
 		assert(unquote("\"This is quoted?\"") eq "This is quoted?");
+	}
+
+	{
+		assert(RM.oconv("HEX").outputl() == "1F");
+		assert(FM.oconv("HEX").outputl() == "1E");
+		assert(VM.oconv("HEX").outputl() == "1D");
+		assert(SM.oconv("HEX").outputl() == "1C");
+		assert(TM.oconv("HEX").outputl() == "1B");
+		assert(ST.oconv("HEX").outputl() == "1A");
+
+		assert(var(_RM).oconv("HEX").outputl() == "1F");
+		assert(var(_FM).oconv("HEX").outputl() == "1E");
+		assert(var(_VM).oconv("HEX").outputl() == "1D");
+		assert(var(_SM).oconv("HEX").outputl() == "1C");
+		assert(var(_TM).oconv("HEX").outputl() == "1B");
+		assert(var(_ST).oconv("HEX").outputl() == "1A");
+
+		assert(var(RM_).oconv("HEX").outputl() == "1F");
+		assert(var(FM_).oconv("HEX").outputl() == "1E");
+		assert(var(VM_).oconv("HEX").outputl() == "1D");
+		assert(var(SM_).oconv("HEX").outputl() == "1C");
+		assert(var(TM_).oconv("HEX").outputl() == "1B");
+		assert(var(ST_).oconv("HEX").outputl() == "1A");
+
+	}
+	{
+		assert(RM == RM_);
+		assert(FM == FM_);
+		assert(VM == VM_);
+		assert(SM == SM_);
+		assert(TM == TM_);
+		assert(ST == ST_);
+
+		assert(RM == _RM);
+		assert(FM == _FM);
+		assert(VM == _VM);
+		assert(SM == _SM);
+		assert(TM == _TM);
+		assert(ST == _ST);
+
+		assert(RM_ == RM);
+		assert(FM_ == FM);
+		assert(VM_ == VM);
+		assert(SM_ == SM);
+		assert(TM_ == TM);
+		assert(ST_ == ST);
+
+		assert(_RM == RM);
+		assert(_FM == FM);
+		assert(_VM == VM);
+		assert(_SM == SM);
+		assert(_TM == TM);
+		assert(_ST == ST);
+	}
+
+	{
+		// Check conversion of visible to internal field marks in user literals
+		assert("`^]}|~"_var eq _RM _FM _VM _SM _TM _ST);
+	}
+
+	{
+		outputt("xxx", "yyy");
+		outputl();
+		outputl("===\t===");
+
+		errput("aaa", "bbb");
+		errputl();
+		errputl("---", "---");
+
+		logput("111", "222");
+		logputl();
+		logputl("...", "...");
 	}
 
 	printl(elapsedtimetext());

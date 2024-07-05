@@ -203,7 +203,7 @@ var exo_backtrace(void* stack_addresses[BACKTRACE_MAXADDRESSES], size_t stack_si
 				continue;
 		}
 
-		if (not objaddress.starts("0") || objaddress.at(2) != "x")
+		if ((not objaddress.starts("0")) || objaddress.at(2) != "x")
 			continue;
 
 		var startaddress = objaddress.paste(-3, 3, "000");

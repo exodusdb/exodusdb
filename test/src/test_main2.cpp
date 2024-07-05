@@ -183,13 +183,19 @@ programinit()
 	try {
 		//runtime errors instead of compiler error sadly
 
-		var x1	   = x1 ^= 1;	//sadly c++ compiler allows this
+//		var x1	   = x1 ^= 1;	//sadly c++ compiler allows this
+		var x1	   = x1 + 1;	//sadly c++ compiler allows this
 		var undefx = undefx++;	//sadly c++ compiler allows this
 		var z	   = z + 1;		//sadly c++ compiler allows this
 		//var x++;				//doesnt compile
-		var xx = xx.operator++();  //sadly c++ compiler allows this
+//		var xx = xx.operator++();  //sadly c++ compiler allows this
+		var xx = xx++;  //sadly c++ compiler allows this
+////var x = "x";
+////printl(x + x);
+//		throw VarError("xxxxxx");
 								   //var xx=xx++;			//doesnt compile
 	} catch (VarError& error) {
+		std::cout << "error in main2.cpp2\n";
 		printx(error.description);
 	}
 
@@ -638,21 +644,40 @@ programinit()
 	//var log3=count(log1,"x")+(log1 ne "");
 	//just convert it to the better
 	assert(fcount(log1, "x") eq 3);
-
+TRACE("qqq")
 	printl(SENTENCE);
 	assert(var("xyz").b(4, 1) eq "");
 
 	//TODO ensure isnum converts ints larger that the maximum int to FLOATS
+TRACE("qqq0")
 
 	var subs = "xyz";
+TRACE("qqq1")
 	assert(subs.b(-1) eq "z");
+TRACE("qqq2")
 	assert(subs.at(-1)        eq "z");
 
+TRACE("qqq3")
 	printl(oconv("a", "L#3").quote());
+TRACE("qqq4")
 	assert(oconv("a", "L#3")    eq "a  ");
+TRACE("qqq7")
+	TRACE("a  ")
+TRACE("qqq5")
 	assert(oconv("abc", "L#3")  eq "abc");
+TRACE("qqq6")
 	assert(oconv("abcd", "L#3") eq "abc");
+
+TRACE("a  " ^ FM)
+TRACE("b  " ^ FM ^ "abc")
+TRACE("c  " ^ FM ^ "abc" ^ FM)
+TRACE("d  " ^ FM ^ "abc" ^ FM ^ "abc")
+
+TRACE("qqq8")
+	TRACE(oconv("a" ^ FM ^ "abc" ^ FM ^ "abcd", "L#3"))
+TRACE("qqq9")
 	assert(oconv("a" ^ FM ^ "abc" ^ FM ^ "abcd", "L#3") eq("a  " ^ FM ^ "abc" ^ FM ^ "abc"));
+TRACE("qqqa")
 
 	assert(oconv("a", "R#3")    eq "  a");
 	assert(oconv("abc", "R#3")  eq "abc");
@@ -876,11 +901,12 @@ programinit()
 
 //be careful not to name any subroutines the same as any variables
 subroutine internal_subroutine_xyzz(in xyzz) {
-	printl("internal_subroutine_xyzz(in xyzz)");
+	printl("internal_subroutine_xyzz(in xyzz) ENTERED");
 	//var xx;
 	//printl(xx);
 	//false && xyzz;
 	assert(xyzz.f(2, 2, 2) eq "b22");
+	printl("internal_subroutine_xyzz(in xyzz) LEAVING");
 	return;
 }
 

@@ -207,16 +207,24 @@ function main() {
 	assert(a9.rows() eq 2);
 	//check join returns correct string
 	assert(join(a9) eq("xx" ^ FM ^ "bb"));
-
+TRACE("x")
 	dim dx(3);
+TRACE("y")
 	//assign all elements to one value
 	dx = 1;
+TRACE("z")
 	//check join
+	dx.join().outputl();
+TRACE("q")
+	(1 ^ FM ^ 1 ^ FM ^ 1);
+TRACE("r")
 	assert(dx.join().outputl() eq (1 ^ FM ^ 1 ^ FM ^ 1));
+TRACE("x")
 
 	//test dim=var.split()
 	dim a = var("abc" _FM "def").split();
 	assert(a[2] eq "def");
+TRACE("x")
 
 //	{// No way to limit number of fields at the moment
 //		//dim.split(stringvar)
@@ -237,6 +245,7 @@ function main() {
 	dim a13 = var("10" _FM "2" _FM "1" _FM "20" _FM "-2").split();
 	printl(a13.join());
 	assert(a13.join("^") eq "10^2^1^20^-2");
+TRACE("x")
 
 	a13.sorter();
 	printl(a13.join());

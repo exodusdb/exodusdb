@@ -164,6 +164,7 @@
 			var.h
 			vartyp.h
 			varerr.h
+			varfriends.h
 			dim.h
 			rex.h
 			exodus.h

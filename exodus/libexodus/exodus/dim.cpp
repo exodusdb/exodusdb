@@ -499,7 +499,7 @@ bool dim::write(CVR filevar, CVR key) const {
 
 }
 
-bool dim::osread(CVR osfilename, const char* codepage) {\
+bool dim::osread(CVR osfilename, const char* codepage) {
 
 	THISIS("bool dim::osread(CVR osfilename, const char* codepage DEFAULT_EMPTY)")
 	ISSTRING(osfilename)

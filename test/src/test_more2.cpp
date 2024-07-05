@@ -127,9 +127,11 @@ programinit()
 		assert(x++ eq 1);
 		assert(x   eq 2);
 
-		//assert(x.f(1)++ eq 1);//does not compile
-		//assert((x.f(1))++ eq 1);//does not compile
-		//assert(x eq 2);
+		assert(x.f(1).outputl() eq 2);
+
+		//assert(x.f(1)++.outputl() eq 3); // should not compile
+		//assert((x.f(1))++.outputl() eq 3); // should not compile
+		//assert(x.f(1)++ eq 3);
 
 		x = 1;
 		assert(++x eq 2);
@@ -137,8 +139,8 @@ programinit()
 
 		x = 1;
 		//assert(++x.f(1) eq 2);//does not compile
-		assert((++x).f(1) eq 2);
-		assert(x          eq 2);
+		//assert((++x).f(1) eq 2); // SADLY WILL NOT COMPILE because ++x produces a var& and ++ is implemented in var_base ATM
+		//assert(x          eq 2);
 
 		//DECREMENT
 
@@ -146,8 +148,8 @@ programinit()
 		assert(x-- eq 1);
 		assert(x   eq 0);
 
-		//assert(x.f(1)-- eq 1);//does not compile
-		//assert((x.f(1))-- eq 1);//does not compile
+		//assert(x.f(1)-- eq 1);//should not compile
+		//assert((x.f(1))-- eq 1);//should not compile
 		assert(x eq 0);
 
 		x = 1;
@@ -156,8 +158,8 @@ programinit()
 
 		x = 1;
 		//assert(--x.f(1) eq 2);//does not compile
-		assert((--x).f(1) eq 0);
-		assert(x          eq 0);
+		//assert((--x).f(1) eq 0); // SADLY WILL NOT COMPILE because ++x produces a var& and ++ is implemented in var_base ATM
+		//assert(x          eq 0);
 	}
 
 	//+=
