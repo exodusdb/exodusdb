@@ -793,24 +793,16 @@ class PUBLIC var_base {
 	// any changes to the base object.
 
 	// Implicitly convert var_base to var
-//	operator const var() {
-//		// TODO This is UB if var not laid out like var_base (doesnt first inherit from var_base)
-//		// Implement in var as an implicit conversion to var_base?
-//		return *static_cast<const var*>(this);
-//	}
+	operator var() &{
+		// Clone, like most var_base functions returns a var since var's are var_base's but not vice versa
+		return this->clone();
+	}
 
-////	// Implicitly convert var_base& to var&
-//	operator const var&() {
-//		// This is UB if var not laid out like var_base (doesnt first inherit from var_base)
-//
-//		// error: invalid initialization of non-const reference of type ‘exodus::var&’ from an rvalue of type ‘exodus::var*’
-//
-//		//return static_cast<const var*>(this);
-//
-//		// error: error: invalid ‘static_cast’ from type ‘exodus::var_base<exodus::var>*’ to type ‘const exodus::var&’
-//		//return static_cast<const var&>(this);
-//	}
-//
+	operator var() && {
+		// Clone, like most var_base functions returns a var since var's are var_base's but not vice versa
+		return this->clone(); // TODO move/steal
+	}
+
 	// integer <- var
 	/////////////////
 
@@ -1645,8 +1637,6 @@ public:
 	// Inherit all constructors from var_base
 	using var_base::var_base;
 
-	//using var_base::clone;
-
 	////////////////////////////////////////////
 	// GENERAL CONSTRUCTOR FROM INITIALIZER LIST
 	////////////////////////////////////////////
@@ -1674,14 +1664,23 @@ public:
 			var_str.pop_back();
 	}
 
-//	// ? Implicit conversion to var_base<var>
-//	operator var_base<var>&() {
-//		return this;
+	// ? Implicit conversion to var_base<var>
+	// Replicated more reliably in var_base using .clone()
+	// TODO is this UB if var is not exactly a var_base?
+//	operator var_base<var>() const {
+//		// Compiles with a warning:
+//		// warning: converting ‘exodus::var’ to a base class ‘exodus::var_base<exodus::var>’
+//		// will never use a type conversion operator [-Wclass-conversion]
+//		// BUT causes compile errors in cpp files where "++x" is used as an argument.
+//		// error: invalid initialization of reference of type ‘exodus::CVR’ {aka ‘const exodus::var&’}
+//		// from expression of type ‘exodus::var_base<exodus::var>’
+//		return *static_cast<const var_base<var>*>(this);
 //	}
 //	operator const var_base<var>&() const {
-//		return this;
+//		// warning: converting ‘exodus::var’ to a reference to a base class ‘exodus::var_base<exodus::var>’
+//		// will never use a type conversion operator [-Wclass-conversion]
+//		return *static_cast<const var_base<var>*>(this);
 //	}
-
 
 	/////////////////
 	// PARENTHESIS ()
