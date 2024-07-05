@@ -24,8 +24,8 @@ THE SOFTWARE.
 
 // clang-format off
 
-#define EXODUS_RELEASE "23.09"
-#define EXODUS_PATCH "23.09.0"
+#define EXODUS_RELEASE "24.07"
+#define EXODUS_PATCH "24.07.0"
 
 #include <cstdint> // for uint64_t
 #if __has_include(<concepts>)

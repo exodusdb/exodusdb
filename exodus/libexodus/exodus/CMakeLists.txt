@@ -153,7 +153,7 @@
 	)
 
 	#set_target_properties(exodus PROPERTIES SOVERSION "${MAJOR_VERSION}.${MINOR_VERSION}.${BUILD_VERSION}")
-	set_target_properties(exodus PROPERTIES SOVERSION "23.09")
+	set_target_properties(exodus PROPERTIES SOVERSION "24.07")
 
 #
 # Install some of exodus' include files so programs can be written in exodus c++
