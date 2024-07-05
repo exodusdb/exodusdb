@@ -114,6 +114,11 @@ Binary    Hex          Comments
 
 namespace exodus {
 
+//NOTE: INSTANTIATIONS at end of file
+//template<typename var_base> bool var_base::unassigned() const {
+//template<typename var_base> void var_base::default_to(const var_base& defaultvalue) {
+//template<typename var_base> var_base::var_base(const std::wstring& wstr1) {
+
 // output/errput/logput not threadsafe but probably not a problem
 //inline std::mutex global_mutex_threadstream;
 //#define LOCKIOSTREAM_OR_NOT std::lock_guard guard(global_mutex_threadstream);
@@ -146,7 +151,8 @@ static inline bool is_ascii(std::string_view str1) {
 	return true;
 }
 
-int var::localeAwareCompare(const std::string& str1, const std::string& str2) {
+//int var::localeAwareCompare(const std::string& str1, const std::string& str2) {
+template<typename var> int var_base<var>::localeAwareCompare(const std::string& str1, const std::string& str2) {
 	// https://www.boost.org/doc/libs/1_70_0/libs/locale/doc/html/collation.html
 	// eg ensure lower case sorts before uppercase (despite "A" \x41 is less than "a" \x61)
 	init_boost_locale1();
@@ -339,7 +345,7 @@ VARREF var::inputn(const int nchars) {
 	return *this;
 }
 
-bool var::assigned() const {
+template<typename T> bool var_base<T>::assigned() const {
 	// THISIS("bool var::assigned() const")
 
 	// treat undefined as unassigned
@@ -353,7 +359,7 @@ bool var::assigned() const {
 	return var_typ != VARTYP_UNA;
 }
 
-bool var::unassigned() const {
+template<typename var> bool var_base<var>::unassigned() const {
 	// see explanation above in assigned
 	// THISIS("bool var::unassigned() const")
 	// assertDefined(function_sig);
@@ -364,8 +370,7 @@ bool var::unassigned() const {
 	return !var_typ;
 }
 
-//VARREF var::default_to(CVR defaultvalue) {
-void var::default_to(CVR defaultvalue) {
+template<typename var> void var_base<var>::default_to(const var_base<var>& defaultvalue) {
 
 	// see explanation above in assigned
 	// assertDefined(function_sig);
@@ -386,18 +391,28 @@ void var::default_to(CVR defaultvalue) {
 	return;// *this;
 }
 
-var var::default_from(CVR defaultvalue) const {
+template<> RETVAR var_base<var>::default_from(const var_base<var>& defaultvalue) const {
 
 	THISIS("VARREF var::default_from(CVR defaultvalue)")
 	ISASSIGNED(defaultvalue)
 
-	if (this->unassigned())
-		return defaultvalue;
-	else
-		return *this;
+
+//	const RETVAR* presult;
+	if (this->unassigned()) {
+		// Compiles but doesnt work
+//		return static_cast<var>(defaultvalue);
+//		return static_cast<const var>(defaultvalue);
+		return *static_cast<const var*>(&defaultvalue);
+	} else {
+		// Compiles but doesnt work
+//		return static_cast<const var>(*this);
+//		return static_cast<var>(*this);
+		return *static_cast<const var*>(this);
+	}
+//	return *presult;
 }
 
-char var::toChar() const {
+template<typename var> char var_base<var>::toChar() const {
 
 	THISIS("char var::toChar() const")
 	assertString(function_sig);
@@ -409,7 +424,7 @@ char var::toChar() const {
 }
 
 // temporary var can return move its string into the output
-std::string var::toString() && {
+template<typename var> std::string var_base<var>::toString() && {
 
 	THISIS("std::string var::toString() &&")
 	assertString(function_sig);
@@ -418,7 +433,7 @@ std::string var::toString() && {
 }
 
 // non-temporary var can return a const ref to its string
-const std::string& var::toString() const& {
+template<typename var> const std::string& var_base<var>::toString() const& {
 
 	THISIS("std::string var::toString() const&")
 	assertString(function_sig);
@@ -511,7 +526,7 @@ var var::textlen() const {
 	return result;
 }
 
-std::u32string var::to_u32string() const {
+template<typename var> std::u32string var_base<var>::to_u32string() const {
 
 	 THISIS("std::u32string var::to_u32string() const")
 	 assertString(function_sig);
@@ -524,7 +539,7 @@ std::u32string var::to_u32string() const {
 	return boost::locale::conv::utf_to_utf<char32_t>(var_str);
 }
 
-std::wstring var::to_wstring() const {
+template<typename var> std::wstring var_base<var>::to_wstring() const {
 
 	 THISIS("std::wstring var::to_wstring() const")
 	 assertString(function_sig);
@@ -537,7 +552,7 @@ std::wstring var::to_wstring() const {
 	return boost::locale::conv::utf_to_utf<wchar_t>(var_str);
 }
 
-void var::from_u32string(std::u32string u32str) const {
+template<typename var> void var_base<var>::from_u32string(std::u32string u32str) const {
 	// for speed, dont validate
 	// THISIS("void var::from_u32tring() const")
 	// assertDefined(function_sig);
@@ -546,8 +561,8 @@ void var::from_u32string(std::u32string u32str) const {
 	var_str = boost::locale::conv::utf_to_utf<char>(u32str);
 }
 
-// CONSTRUCTOR from const std::u32string
-var::var(const std::wstring& wstr1) {
+// CONSTRUCTOR from const std::u32string converts to utf-8
+template<typename var> var_base<var>::var_base(const std::wstring& wstr1) {
 	var_typ = VARTYP_STR;
 	var_str = boost::locale::conv::utf_to_utf<char>(wstr1);
 }
@@ -1231,7 +1246,7 @@ VARREF pasterx(const int start1, const int length, const char* c) {
 };
 */
 
-VARREF var::move(VARREF tovar) {
+template<typename var> var_base<var>& var_base<var>::move(var_base<var>& tovar) {
 
 	THISIS("VARREF var::move(VARREF tovar)")
 	assertAssigned(function_sig);
@@ -1253,7 +1268,7 @@ VARREF var::move(VARREF tovar) {
 }
 
 // const version needed in calculatex
-CVR var::swap(CVR var2) const {
+template<typename var> const var_base<var>& var_base<var>::swap(const var_base<var>& var2) const {
 
 	THISIS("CVR var::swap(CVR var2) const")
 	// Works on unassigned vars
@@ -1282,7 +1297,7 @@ CVR var::swap(CVR var2) const {
 }
 
 // non-const version
-VARREF var::swap(VARREF var2) {
+template<typename var> var_base<var>& var_base<var>::swap(var_base<var>& var2) {
 
 	THISIS("VARREF var::swap(VARREF var2)")
 	// Works on unassigned vars
@@ -2044,6 +2059,27 @@ ND VARREF var::sort(SV sepchar DEFAULT_FM)    && {return sorter(sepchar);}
 ND VARREF var::reverse(SV sepchar DEFAULT_FM) && {return reverser(sepchar);}
 ND VARREF var::shuffle(SV sepchar DEFAULT_FM) && {return shuffler(sepchar);}
 ND VARREF var::parse(char sepchar DEFAULT_FM) && {return parser(sepchar);}
+
+// INSTANTIATIONS of var_base templated functions
+
+template       int            var_base<var>::localeAwareCompare(const std::string& str1, const std::string& str2);
+template       bool           var_base<var>::assigned() const;
+template       bool           var_base<var>::unassigned() const;
+template       void           var_base<var>::default_to(const var_base<var>& defaultvalue);
+template       RETVAR         var_base<var>::default_from(const var_base<var>& defaultvalue) const;
+template       char           var_base<var>::toChar() const;
+template       std::string    var_base<var>::toString() &&;
+template const std::string&   var_base<var>::toString() const&;
+template       std::u32string var_base<var>::to_u32string() const;
+template       std::wstring   var_base<var>::to_wstring() const;
+template       void           var_base<var>::from_u32string(std::u32string u32str) const;
+
+template       var_base<var>& var_base<var>::move(var_base<var>& tovar);
+template const var_base<var>& var_base<var>::swap(const var_base<var>& var2) const;
+template       var_base<var>& var_base<var>::swap(var_base<var>& var2);
+
+// constructor
+template                      var_base<var>::var_base<var>(const std::wstring& wstr1);
 
 // clang-format on
 

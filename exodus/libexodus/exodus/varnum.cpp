@@ -31,6 +31,8 @@ THE SOFTWARE.
     //v.isnum();         //+???ns (???ns using <charconv> from_chars)
 */
 
+// Note: VAR_TEMPLATE both defines and instantiates an instance of the member function for var_base<var>::xxxxxxxxxxx
+
 // Use ryu if GNUC < 11 and ryu include available
 //ryu            1234.5678 -> "1234.5678" 500ns
 //ryu_printf     1234.5678 -> "1234.5678" 800ns
@@ -453,7 +455,8 @@ removetrailing:
 ////////////////////
 
 // mainly called in ISSTRING when not already a string
-void var::createString() const {
+VAR_TEMPLATE(void var_base<var>::createString() const) {
+
 	// TODO ensure ISDEFINED is called everywhere in advance
 	// to avoid wasting time doing multiple calls to ISDEFINED
 	// this->assertDefined(__PRETTY_FUNCTION__);
@@ -728,7 +731,11 @@ var var::floor() const {
 // var::toBool
 //////////////
 
-bool var::toBool() const {
+//template
+//PUBLIC bool var_base<var>::toBool() const;
+//template<typename var>
+//PUBLIC bool var_base<var>::toBool() const {
+VAR_TEMPLATE(PUBLIC bool var_base<var>::toBool() const) {
 
 	// could be skipped for speed assuming that people will not write unusual "var x=f(x)" type
 	// syntax as follows: var xx=xx?11:22;
@@ -767,11 +774,8 @@ bool var::toBool() const {
 	}
 }
 
-//int64_t var::toInt64() const {
-//
+//VAR_TEMPLATE(int64_t var_base<var>::toInt64() const) {
 //	this->assertInteger(__PRETTY_FUNCTION__);
-//
-//	//return static_cast<int>(var_int);
 //	return var_int;
 //}
 
@@ -779,12 +783,8 @@ bool var::toBool() const {
 // var::toInt
 /////////////
 
-int var::toInt() const {
-
+VAR_TEMPLATE(int var_base<var>::toInt() const) {
 	this->assertInteger(__PRETTY_FUNCTION__);
-
-	//return static_cast<int>(var_int);
-	//return var_int;
 	return static_cast<int>(*this);
 }
 
@@ -792,19 +792,13 @@ int var::toInt() const {
 // var::toInt64
 ///////////////
 
-int64_t var::toInt64() const {
-
+VAR_TEMPLATE(int64_t var_base<var>::toInt64() const) {
 	this->assertInteger(__PRETTY_FUNCTION__);
-
-	//return static_cast<int>(var_int);
-	//return var_int;
 	return static_cast<int64_t>(*this);
 }
 
-//long long int var::toLong() const {
-//
+//VAR_TEMPLATE(long long int var_base<var>::toLong() const) {
 //	this->assertInteger(__PRETTY_FUNCTION__);
-//
 //	return static_cast<long long int>(var_int);
 //}
 
@@ -812,10 +806,8 @@ int64_t var::toInt64() const {
 // var::toDouble
 ////////////////
 
-double var::toDouble() const {
-
+VAR_TEMPLATE(double var_base<var>::toDouble() const) {
 	this->assertDecimal(__PRETTY_FUNCTION__);
-
 	return var_dbl;
 }
 
@@ -844,7 +836,7 @@ double var::toDouble() const {
 // 4. all characters mean non-numeric
 
 //CONSTEXPR
-bool var::isnum(void) const {
+VAR_TEMPLATE(bool var_base<var>::isnum(void) const) {
 
 	// TODO make isnum private and ensure ISDEFINED is checked before all calls to isnum
 	// to save the probably double check here

@@ -34,6 +34,8 @@ THE SOFTWARE.
 
 namespace exodus {
 
+// Some template instatiations are at the end of this file
+
 //C/C++                Int  Float	Definition
 //
 //%, div               Yes  No   Truncated[c]
@@ -92,7 +94,7 @@ static varint_t exodusmodulo_int(const varint_t dividend, const varint_t limit) 
 	return result;
 }
 
-var var::mod(CVR limit) const {
+VAR_TEMPLATE(RETVAR VARBASE::mod(CBR limit) const) {
 
 	THISIS("var var::mod(CVR limit) const")
 	assertNumeric(function_sig);
@@ -124,7 +126,8 @@ mod_doubles:
 	return exodusmodulo_int(this->var_int, limit.var_int);
 }
 
-var var::mod(double limit) const {
+
+VAR_TEMPLATE(RETVAR VARBASE::mod(double limit) const) {
 
 	THISIS("var var::mod(double limit) const")
 	assertNumeric(function_sig);
@@ -139,7 +142,8 @@ var var::mod(double limit) const {
 	return exodusmodulo_dbl(this->var_dbl, limit);
 }
 
-var var::mod(const int limit) const {
+
+VAR_TEMPLATE(RETVAR VARBASE::mod(const int limit) const) {
 
 	THISIS("var var::mod(const int limit) const")
 	assertNumeric(function_sig);
@@ -274,4 +278,3 @@ var var::exp() const {
 }
 
 } // namespace exodus
-

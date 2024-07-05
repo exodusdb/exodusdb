@@ -468,7 +468,7 @@ var var::search(SV regex, VARREF startchar1, SV regex_options) const {
 		startchar1 = 1;
 
 	// Excessive start returns no match and pointing to end of string i.e. null byte
-	if (startchar1 > var_str.size()) UNLIKELY {
+	if (startchar1 > static_cast<int>(var_str.size())) UNLIKELY {
 		// Return empty string
 		//startchar1 = var_str.length() + 1;
 		startchar1 = 0;

@@ -112,14 +112,15 @@ subroutine test_mod() {
 		if (not line)
 			continue;
 
-		printl("mod", line);
+		TRACE(line)
+		line.outputl("line=");
 
 		var a	   = line.f(1, 1);
 		var b	   = line.f(1, 2);
 		var target = line.f(1, TARGET_COLN);
 
 		// var % var
-		assert((a % b)   eq target);
+		assert((a.outputl("a=") % b.outputl("b="))   eq target);
 		assert(mod(a, b) eq target);
 
 		// test symmetry around zero of limit

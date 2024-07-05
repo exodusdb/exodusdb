@@ -28,41 +28,35 @@ THE SOFTWARE.
 
 namespace exodus {
 
-[[noreturn]] void var::throwUndefined(CVR message) const {
+// Note: VAR_TEMPLATE both defines and instantiates an instance of the member function for var_base<var>::xxxxxxxxxxx
+
+VAR_TEMPLATE([[noreturn]] void VARBASE::throwUndefined(CBR message) const) {
 	throw VarUndefined(message);
 }
 
-[[noreturn]] void var::throwUnassigned(CVR message) const {
+VAR_TEMPLATE([[noreturn]] void VARBASE::throwUnassigned(CBR message) const) {
 	throw VarUnassigned(message);
 }
 
-[[noreturn]] void var::throwNonNumeric(CVR message) const {
+VAR_TEMPLATE([[noreturn]] void VARBASE::throwNonNumeric(CBR message) const) {
 	throw VarNonNumeric(message);
 }
 
-[[noreturn]] void var::throwNonPositive(CVR message) const {
+VAR_TEMPLATE([[noreturn]] void VARBASE::throwNonPositive(CBR message) const) {
 	throw VarNonPositive(message);
 }
 
-[[noreturn]] void var::throwNumOverflow(CVR message) const {
+VAR_TEMPLATE([[noreturn]] void VARBASE::throwNumOverflow(CBR message) const) {
 	throw VarNumOverflow(message);
 }
 
-[[noreturn]] void var::throwNumUnderflow(CVR message) const {
+VAR_TEMPLATE([[noreturn]] void VARBASE::throwNumUnderflow(CBR message) const) {
 	throw VarNumUnderflow(message);
 }
 
-var var::dump() const {
-//	std::clog << "DUMP: " << text << " ";
-//	if (var_typ & VARTYP_STR)
-//		std::clog << "str: " _DQ << var(var_str).first(1024).convert(_ALL_FMS, _VISIBLE_FMS) << _DQ " ";
-//	if (var_typ & VARTYP_INT)
-//		std::clog << "int:" << var(var_int) << " ";
-//	if (var_typ & VARTYP_DBL)
-//		std::clog << "dbl:" << var(var_dbl) << " ";
-//	std::clog << "typ:" << var_typ << std::endl;
-//	return *this;
+VAR_TEMPLATE(RETVAR VARBASE::dump() const) {
 	var nrvo = "var: ";
+
 	if (var_typ & VARTYP_STR)
 		nrvo ^= "str: " _DQ ^ var(var_str).first(1024).convert(_ALL_FMS, _VISIBLE_FMS) ^ _DQ " ";
 	if (var_typ & VARTYP_INT)
@@ -75,35 +69,33 @@ var var::dump() const {
 
 // Forward declaration of free functions defined in mvdebug.cpp
 void save_stack_addresses();
-//var backtrace();
 
 // Exception constructors
 /////////////////////////
 
 // clang-format off
 
-VarUnassigned     ::VarUnassigned    (CVR errmsg) : VarError("VarUnassigned:"     ^ errmsg) {}
-VarDivideByZero   ::VarDivideByZero  (CVR errmsg) : VarError("VarDivideByZero:"   ^ errmsg) {}
-VarNonNumeric     ::VarNonNumeric    (CVR errmsg) : VarError("VarNonNumeric:"     ^ errmsg) {}
-VarNonPositive    ::VarNonPositive   (CVR errmsg) : VarError("VarNonPositive:"    ^ errmsg) {}
-VarNumOverflow    ::VarNumOverflow   (CVR errmsg) : VarError("VarNumOverflow:"    ^ errmsg) {}
-VarNumUnderflow   ::VarNumUnderflow  (CVR errmsg) : VarError("VarNumUnderflow:"   ^ errmsg) {}
-VarUndefined      ::VarUndefined     (CVR errmsg) : VarError("VarUndefined:"      ^ errmsg) {}
-VarOutOfMemory    ::VarOutOfMemory   (CVR errmsg) : VarError("VarOutOfMemory:"    ^ errmsg) {}
-VarInvalidPointer ::VarInvalidPointer(CVR errmsg) : VarError("VarInvalidPointer:" ^ errmsg) {}
-VarDBException    ::VarDBException   (CVR errmsg) : VarError("VarDBException:"    ^ errmsg) {}
-VarNotImplemented ::VarNotImplemented(CVR errmsg) : VarError("VarNotImplemented:" ^ errmsg) {}
-VarDebug          ::VarDebug         (CVR errmsg) : VarError("VarDebug"           ^ errmsg) {}
+VarUnassigned      ::VarUnassigned      (CBR errmsg) : VarError("VarUnassigned:"       ^ errmsg) {}
+VarDivideByZero    ::VarDivideByZero    (CBR errmsg) : VarError("VarDivideByZero:"     ^ errmsg) {}
+VarNonNumeric      ::VarNonNumeric      (CBR errmsg) : VarError("VarNonNumeric:"       ^ errmsg) {}
+VarNonPositive     ::VarNonPositive     (CBR errmsg) : VarError("VarNonPositive:"      ^ errmsg) {}
+VarNumOverflow     ::VarNumOverflow     (CBR errmsg) : VarError("VarNumOverflow:"      ^ errmsg) {}
+VarNumUnderflow    ::VarNumUnderflow    (CBR errmsg) : VarError("VarNumUnderflow:"     ^ errmsg) {}
+VarUndefined       ::VarUndefined       (CBR errmsg) : VarError("VarUndefined:"        ^ errmsg) {}
+VarOutOfMemory     ::VarOutOfMemory     (CBR errmsg) : VarError("VarOutOfMemory:"      ^ errmsg) {}
+VarInvalidPointer  ::VarInvalidPointer  (CBR errmsg) : VarError("VarInvalidPointer:"   ^ errmsg) {}
+VarDBException     ::VarDBException     (CBR errmsg) : VarError("VarDBException:"      ^ errmsg) {}
+VarNotImplemented  ::VarNotImplemented  (CBR errmsg) : VarError("VarNotImplemented:"   ^ errmsg) {}
+VarDebug           ::VarDebug           (CBR errmsg) : VarError("VarDebug"             ^ errmsg) {}
 
-DimNotDimensioned   ::DimNotDimensioned  (CVR errmsg) : VarError("DimNotDimensioned"    ^ errmsg) {}
-DimDimensionedZero  ::DimDimensionedZero (CVR errmsg) : VarError("DimDimensionedZero:"  ^ errmsg) {}
-DimIndexOutOfBounds ::DimIndexOutOfBounds(CVR errmsg) : VarError("DimIndexOutOfBounds:" ^ errmsg) {}
+DimNotDimensioned  ::DimNotDimensioned  (CBR errmsg) : VarError("DimNotDimensioned"    ^ errmsg) {}
+DimDimensionedZero ::DimDimensionedZero (CBR errmsg) : VarError("DimDimensionedZero:"  ^ errmsg) {}
+DimIndexOutOfBounds::DimIndexOutOfBounds(CBR errmsg) : VarError("DimIndexOutOfBounds:" ^ errmsg) {}
 
 // clang-format on
 
 VarError::VarError(CVR description_)
 	: description(description_) {
-
 	// *** WARNING ***
 	// any errors in this constructor
 	// will cause recursion and hang/segfault
@@ -112,7 +104,8 @@ VarError::VarError(CVR description_)
 //		description.put(std::cerr);
 //	var("\n").put(std::cerr);
 
-	// capture the stack at point of creation i.e. when thrown
+	// Capture the stack at point of creation i.e. when thrown
+	// TODO capture in caller using default argument to VarError?
 	exo_savestack(stack_addresses_, &stack_size_);
 
 //	this->stack = exo_backtrace();
@@ -138,5 +131,11 @@ var VarError::stack(const size_t limit) const {
 	return exo_backtrace(stack_addresses_, stack_size_, limit);
 
 }
+
+// DEFINE implementation of all friends previously friended in var.h
+////////////////////////////////////////////////////////////////////
+#undef VAR_FRIEND
+#define VAR_FRIEND
+#include "varfriends_impl.h"
 
 }  // namespace exodus

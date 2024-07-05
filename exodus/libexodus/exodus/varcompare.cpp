@@ -30,6 +30,21 @@ THE SOFTWARE.
 
 namespace exodus {
 
+// NOTE: INSTANTIATIONS ARE AT THE END OF THIS FILE
+//bool var_eq_var (const var_base<var>& lhs, const var_base<var>& rhs );
+//bool var_eq_dbl (const var_base<var>& lhs, const double         rhs );
+//bool var_eq_bool(const var_base<var>& lhs, const bool           rhs );
+//bool var_eq_int (const var_base<var>& lhs, const int            rhs );
+//
+//bool var_lt_var (const var_base<var>& lhs, const var_base<var>& rhs );
+//bool int_lt_var (const int            lhs, const var_base<var>& rhs );
+//bool var_lt_int (const var_base<var>& lhs, const int            rhs );
+//bool var_lt_dbl (const var_base<var>& lhs, const double         rhs );
+//bool dbl_lt_var (const double         lhs, const var_base<var>& rhs );
+
+// NOTE: Using "var_base" instead of "T" for clarity in template parameters.
+// Potentially confusing but has identical meaning.
+
 inline bool almost_equal(double lhs_dbl, double rhs_dbl) {
 	//crude pickos method
 	return (std::abs(lhs_dbl - rhs_dbl) < SMALLEST_NUMBER);
@@ -74,7 +89,7 @@ inline bool almost_equal(double x, double y, int ulp)
 }
 */
 
-PUBLIC bool bool_lt_bool(const bool lhs, const bool rhs) {
+bool bool_lt_bool(const bool lhs, const bool rhs) {
 
 	// AXIOMS
 	// false == false
@@ -98,7 +113,7 @@ PUBLIC bool bool_lt_bool(const bool lhs, const bool rhs) {
 
 // almost identical code in var_eq_var and var_lt_var except where noted
 // NOTE doubles compare only to 0.0001 accuracy)
-PUBLIC bool var_eq_var(CVR lhs, CVR rhs) {
+bool var_eq_var(const var_base<var>& lhs, const var_base<var>& rhs) {
 
 	lhs.assertDefined(__PRETTY_FUNCTION__);
 	rhs.assertDefined(__PRETTY_FUNCTION__);
@@ -219,7 +234,7 @@ PUBLIC bool var_eq_var(CVR lhs, CVR rhs) {
 
 // almost identical between var_eq_var and var_lt_var except where noted
 // NOTE doubles compare only to 0.0001 accuracy)
-PUBLIC bool var_lt_var(CVR lhs, CVR rhs) {
+bool var_lt_var(const var_base<var>& lhs, const var_base<var>& rhs) {
 
 	lhs.assertDefined(__PRETTY_FUNCTION__);
 	rhs.assertDefined(__PRETTY_FUNCTION__);
@@ -307,7 +322,7 @@ PUBLIC bool var_lt_var(CVR lhs, CVR rhs) {
 
 // similar to var_eq_var and var_lt_var - this is the var<int version for speed
 // NOTE doubles compare only to 0.0001 accuracy)
-PUBLIC bool var_lt_int(CVR lhs, const int rhs_int) {
+bool var_lt_int(const var_base<var>& lhs, const int rhs_int) {
 
 	lhs.assertDefined(__PRETTY_FUNCTION__);
 
@@ -337,7 +352,7 @@ PUBLIC bool var_lt_int(CVR lhs, const int rhs_int) {
 }
 
 // NOTE doubles compare only to 0.0001 accuracy)
-PUBLIC bool int_lt_var(const int lhs_int, CVR rhs) {
+bool int_lt_var(const int lhs_int, const var_base<var>& rhs) {
 
 	rhs.assertDefined(__PRETTY_FUNCTION__);
 
@@ -368,7 +383,7 @@ PUBLIC bool int_lt_var(const int lhs_int, CVR rhs) {
 }
 
 // NOTE doubles compare only to 0.0001 accuracy)
-PUBLIC bool var_lt_dbl(CVR lhs, const double rhs_dbl) {
+bool var_lt_dbl(const var_base<var>& lhs, const double rhs_dbl) {
 
 	lhs.assertDefined(__PRETTY_FUNCTION__);
 
@@ -400,7 +415,7 @@ PUBLIC bool var_lt_dbl(CVR lhs, const double rhs_dbl) {
 }
 
 // NOTE doubles compare only to 0.0001 accuracy)
-PUBLIC bool dbl_lt_var(const double lhs_dbl, CVR rhs) {
+bool dbl_lt_var(const double lhs_dbl, const var_base<var>& rhs) {
 
 	rhs.assertDefined(__PRETTY_FUNCTION__);
 
@@ -432,7 +447,7 @@ PUBLIC bool dbl_lt_var(const double lhs_dbl, CVR rhs) {
 }
 
 // NOTE doubles compare only to 0.0001 accuracy)
-PUBLIC bool var_eq_dbl(CVR lhs, const double rhs_dbl) {
+bool var_eq_dbl(const var_base<var>& lhs, const double rhs_dbl) {
 
 	lhs.assertDefined(__PRETTY_FUNCTION__);
 
@@ -485,7 +500,7 @@ PUBLIC bool var_eq_dbl(CVR lhs, const double rhs_dbl) {
 }
 
 // NOTE doubles compare only to 0.0001 accuracy)
-PUBLIC bool var_eq_bool(CVR lhs, const bool rhs_bool) {
+bool var_eq_bool(const var_base<var>& lhs, const bool rhs_bool) {
 
 	lhs.assertDefined(__PRETTY_FUNCTION__);
 
@@ -534,7 +549,7 @@ PUBLIC bool var_eq_bool(CVR lhs, const bool rhs_bool) {
 
 }
 // NOTE doubles compare only to 0.0001 accuracy)
-PUBLIC bool var_eq_int(CVR lhs, const int rhs_int) {
+bool var_eq_int(const var_base<var>& lhs, const int rhs_int) {
 
 	lhs.assertDefined(__PRETTY_FUNCTION__);
 
@@ -573,5 +588,22 @@ PUBLIC bool var_eq_int(CVR lhs, const int rhs_int) {
 	return false;
 
 }
+
+/////////////////
+// INSTANTIATIONS
+/////////////////
+
+// clang-format off
+bool var_eq_var (const var_base<var>& lhs, const var_base<var>& rhs );
+bool var_eq_dbl (const var_base<var>& lhs, const double         rhs );
+bool var_eq_bool(const var_base<var>& lhs, const bool           rhs );
+bool var_eq_int (const var_base<var>& lhs, const int            rhs );
+
+bool var_lt_var (const var_base<var>& lhs, const var_base<var>& rhs );
+bool int_lt_var (const int            lhs, const var_base<var>& rhs );
+bool var_lt_int (const var_base<var>& lhs, const int            rhs );
+bool var_lt_dbl (const var_base<var>& lhs, const double         rhs );
+bool dbl_lt_var (const double         lhs, const var_base<var>& rhs );
+//clang-format on
 
 } // namespace exodus

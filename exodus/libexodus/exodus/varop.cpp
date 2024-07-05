@@ -53,7 +53,8 @@ namespace exodus {
 
 //^=var
 // The assignment operator must always return a reference to *this.
-VARREF var::operator^=(CVR rhs) & {
+//template<typename var> VARBASEREF VARBASE::operator^=(CVR rhs) & {
+VAR_TEMPLATE(VARBASEREF VARBASE::operator^=(CBR rhs) &) {
 
 	assertString(__PRETTY_FUNCTION__);
 	rhs.assertString(__PRETTY_FUNCTION__);
@@ -67,7 +68,7 @@ VARREF var::operator^=(CVR rhs) & {
 
 //^=int
 // The assignment operator must always return a reference to *this.
-VARREF var::operator^=(const int int1) & {
+VAR_TEMPLATE(VARBASEREF VARBASE::operator^=(const int int1) &) {
 
 	assertString(__PRETTY_FUNCTION__);
 
@@ -80,7 +81,7 @@ VARREF var::operator^=(const int int1) & {
 
 //^=double
 // The assignment operator must always return a reference to *this.
-VARREF var::operator^=(const double double1) & {
+ VAR_TEMPLATE(VARBASEREF VARBASE::operator^=(const double double1) &) {
 
 	assertString(__PRETTY_FUNCTION__);
 
@@ -96,7 +97,7 @@ VARREF var::operator^=(const double double1) & {
 
 //^=char
 // The assignment operator must always return a reference to *this.
-VARREF var::operator^=(const char char1) & {
+VAR_TEMPLATE(VARBASEREF VARBASE::operator^=(const char char1) &) {
 
 	assertString(__PRETTY_FUNCTION__);
 
@@ -107,55 +108,56 @@ VARREF var::operator^=(const char char1) & {
 	return *this;
 }
 
-//#ifdef NOT_TEMPLATED_APPEND
-//
-////^=char*
-//// The assignment operator must always return a reference to *this.
-//VARREF var::operator^=(const char* cstr) & {
-//
-//	assertString(__PRETTY_FUNCTION__);
-//
-//	// var_str+=var(int1).var_str;
-//	// var_str+=std::string(char1);
-//	var_str += cstr;
-//	var_typ = VARTYP_STR;  // reset to one unique type
-//
-//	return *this;
-//}
-//
-////^=std::string
-//// The assignment operator must always return a reference to *this.
-//VARREF var::operator^=(const std::string& string1) & {
-//
-//	assertString(__PRETTY_FUNCTION__);
-//
-//	// var_str+=var(int1).var_str;
-//	var_str += string1;
-//	var_typ = VARTYP_STR;  // reset to one unique type
-//
-//	return *this;
-//}
-//
-////^=std::string_view
-//// The assignment operator must always return a reference to *this.
-//VARREF var::operator^=(SV sv1) & {
-//
-//	assertString(__PRETTY_FUNCTION__);
-//
-//	// var_str+=var(int1).var_str;
-//	var_str += sv1;
-//	var_typ = VARTYP_STR;  // reset to one unique type
-//
-//	return *this;
-//}
-//#endif // NOT_TEMPLATED_APPEND
+#ifdef NOT_TEMPLATED_APPEND
+
+//^=char*
+// The assignment operator must always return a reference to *this.
+VAR_TEMPLATE(VARBASEREF VARBASE::operator^=(const char* cstr) &) {
+
+	assertString(__PRETTY_FUNCTION__);
+
+	// var_str+=var(int1).var_str;
+	// var_str+=std::string(char1);
+	var_str += cstr;
+	var_typ = VARTYP_STR;  // reset to one unique type
+
+	return *this;
+}
+
+//^=std::string
+// The assignment operator must always return a reference to *this.
+VAR_TEMPLATE(VARBASEREF VARBASE::operator^=(const std::string& string1) &) {
+
+	assertString(__PRETTY_FUNCTION__);
+
+	// var_str+=var(int1).var_str;
+	var_str += string1;
+	var_typ = VARTYP_STR;  // reset to one unique type
+
+	return *this;
+}
+
+//^=std::string_view
+// The assignment operator must always return a reference to *this.
+VAR_TEMPLATE(VARBASEREF VARBASE::operator^=(SV sv1) &) {
+
+	assertString(__PRETTY_FUNCTION__);
+
+	// var_str+=var(int1).var_str;
+	var_str += sv1;
+	var_typ = VARTYP_STR;  // reset to one unique type
+
+	return *this;
+}
+#endif // NOT_TEMPLATED_APPEND
 
 // You must *not* make the postfix version return the 'this' object by reference
 //
 // *** YOU HAVE BEEN WARNED ***
 // not returning void so is usable in expressions
 // int argument indicates that this is POSTFIX override v++
-var var::operator++(int) & {
+//template<typename var> RETVAR VARBASE::operator++(int) {
+VAR_TEMPLATE(RETVAR VARBASE::operator++(int) &) {
 
 	// full check done below to avoid double checking number type
 	assertDefined(__PRETTY_FUNCTION__);
@@ -196,7 +198,7 @@ tryagain:
 
 // not returning void so is usable in expressions
 // int argument indicates that this is POSTFIX override v--
-var var::operator--(int) & {
+VAR_TEMPLATE(RETVAR VARBASE::operator--(int) &) {
 
 	// full check done below to avoid double checking number type
 	assertDefined(__PRETTY_FUNCTION__);
@@ -236,7 +238,8 @@ tryagain:
 
 // not returning void so is usable in expressions
 // no argument indicates that this is prefix override ++var
-VARREF var::operator++() & {
+//template<typename var> RETVAR& VARBASE::operator++() & {
+VAR_TEMPLATE(VARBASE& VARBASE::operator++() &) {
 
 	// full check done below to avoid double checking number type
 	assertDefined(__PRETTY_FUNCTION__);
@@ -271,7 +274,8 @@ tryagain:
 
 // not returning void so is usable in expressions
 // no argument indicates that this is prefix override --var
-VARREF var::operator--() & {
+//template<typename var> RETVAR& VARBASE::operator--() & {
+VAR_TEMPLATE(VARBASE& VARBASE::operator--() &) {
 
 	// full check done below to avoid double checking number type
 	assertDefined(__PRETTY_FUNCTION__);
@@ -316,7 +320,7 @@ tryagain:
 
 // ADD VAR
 
-VARREF var::operator+=(CVR rhs) &{
+VAR_TEMPLATE(VARBASEREF VARBASE::operator+=(CBR rhs) &) {
 
 	rhs.assertNumeric(__PRETTY_FUNCTION__);
 
@@ -359,12 +363,12 @@ tryagain:
 	assertNumeric(__PRETTY_FUNCTION__);
 
 	// Cant get here
-	throw VarNonNumeric(this->first(128) ^ "+= ");
+	throw VarNonNumeric(this->first_(128) ^ "+= ");
 }
 
 // MULTIPLY VAR
 
-VARREF var::operator*=(CVR rhs) &{
+VAR_TEMPLATE(VARBASEREF VARBASE::operator*=(CBR rhs) &) {
 
 	rhs.assertNumeric(__PRETTY_FUNCTION__);
 
@@ -407,12 +411,12 @@ tryagain:
 	assertNumeric(__PRETTY_FUNCTION__);
 
 	// Cant get here
-	throw VarNonNumeric(this->first(128) ^ "+= ");
+	throw VarNonNumeric(this->first_(128) ^ "+= ");
 }
 
 // SUBTRACT VAR
 
-VARREF var::operator-=(CVR rhs) &{
+VAR_TEMPLATE(VARBASEREF VARBASE::operator-=(CBR rhs) &) {
 
 	rhs.assertNumeric(__PRETTY_FUNCTION__);
 
@@ -455,13 +459,13 @@ tryagain:
 	assertNumeric(__PRETTY_FUNCTION__);
 
 	// Cant get here
-	throw VarNonNumeric(this->first(128) ^ "+= ");
+	throw VarNonNumeric(this->first_(128) ^ "+= ");
 }
 
 
 // DIVIDE VAR
 
-VARREF var::operator/=(CVR rhs) &{
+VAR_TEMPLATE(VARBASEREF VARBASE::operator/=(CBR rhs) &) {
 
 	// Always returns a double because
 	// 10/3 must be 3.3333333
@@ -477,7 +481,7 @@ tryagain:
 		if (rhs.var_typ & VARTYP_DBL) {
 			if (!rhs.var_dbl)
 				UNLIKELY
-				throw VarDivideByZero("div('" ^ this->first(128) ^ "', '" ^ rhs.first(128) ^
+				throw VarDivideByZero("div('" ^ this->first_(128) ^ "', '" ^ rhs.first_(128) ^
 									 "')");
 			var_dbl /= rhs.var_dbl;
 		}
@@ -486,7 +490,7 @@ tryagain:
 		else {
 			if (!rhs.var_int)
 				UNLIKELY
-				throw VarDivideByZero("div('" ^ this->first(128) ^ "', '" ^ rhs.first(128) ^
+				throw VarDivideByZero("div('" ^ this->first_(128) ^ "', '" ^ rhs.first_(128) ^
 									 "')");
 			// warning: conversion from ‘exodus::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
 			var_dbl /= static_cast<double>(rhs.var_int);
@@ -501,7 +505,7 @@ tryagain:
 		if (rhs.var_typ & VARTYP_DBL) {
 			if (!rhs.var_dbl)
 				UNLIKELY
-				throw VarDivideByZero("div('" ^ this->first(128) ^ "', '" ^ rhs.first(128) ^
+				throw VarDivideByZero("div('" ^ this->first_(128) ^ "', '" ^ rhs.first_(128) ^
 								 "')");
 			// warning: conversion from ‘exodus::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
 			var_dbl = static_cast<double>(this->var_int) / rhs.var_dbl;
@@ -511,7 +515,7 @@ tryagain:
 		else {
 			if (!rhs.var_int)
 				UNLIKELY
-				throw VarDivideByZero("div('" ^ this->first(128) ^ "', '" ^ rhs.first(128) ^
+				throw VarDivideByZero("div('" ^ this->first_(128) ^ "', '" ^ rhs.first_(128) ^
 				"')");
 			// warning: conversion from ‘exodus::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
 			var_dbl = static_cast<double>(this->var_int) / static_cast<double>(rhs.var_int);
@@ -535,7 +539,7 @@ tryagain:
 
 // MODULO VAR
 
-VARREF var::operator%=(CVR rhs) &{
+VAR_TEMPLATE(VARBASEREF VARBASE::operator%=(CBR rhs) &) {
 	*this = this->mod(rhs);
 	return *this;
 }
@@ -546,7 +550,7 @@ VARREF var::operator%=(CVR rhs) &{
 
 // ADD DOUBLE
 
-VARREF var::operator+=(const double dbl1) &{
+VAR_TEMPLATE(VARBASEREF VARBASE::operator+=(const double dbl1) &) {
 
 tryagain:
 
@@ -566,7 +570,7 @@ tryagain:
 	else UNLIKELY {
 		assertNumeric(__PRETTY_FUNCTION__);
 		// Cant get here
-		throw VarNonNumeric(this->first(128) ^ "+= ");
+		throw VarNonNumeric(this->first_(128) ^ "+= ");
 	}
 
 	// reset to one unique type
@@ -577,7 +581,7 @@ tryagain:
 
 // MULTIPLY DOUBLE
 
-VARREF var::operator*=(const double dbl1) &{
+VAR_TEMPLATE(VARBASEREF VARBASE::operator*=(const double dbl1) &) {
 
 tryagain:
 
@@ -605,7 +609,7 @@ tryagain:
 
 // SUBTRACT DOUBLE
 
-VARREF var::operator-=(const double dbl1) &{
+VAR_TEMPLATE(VARBASEREF VARBASE::operator-=(const double dbl1) &) {
 
 tryagain:
 
@@ -634,11 +638,11 @@ tryagain:
 
 // DIVIDE DOUBLE
 
-VARREF var::operator/=(const double dbl1) &{
+VAR_TEMPLATE(VARBASEREF VARBASE::operator/=(const double dbl1) &) {
 
 	if (!dbl1)
 		UNLIKELY
-		throw VarDivideByZero("div('" ^ this->first(128) ^ "', '" ^ dbl1 ^
+		throw VarDivideByZero("div('" ^ this->first_(128) ^ "', '" ^ dbl1 ^
 		"')");
 
 tryagain:
@@ -668,7 +672,7 @@ tryagain:
 
 // MODULO DOUBLE
 
-VARREF var::operator%=(const double rhs) &{
+VAR_TEMPLATE(VARBASEREF VARBASE::operator%=(const double rhs) &) {
 	*this = this->mod(rhs);
 	return *this;
 }
@@ -679,7 +683,7 @@ VARREF var::operator%=(const double rhs) &{
 
 // ADD INT
 
-VARREF var::operator+=(const int int1) &{
+VAR_TEMPLATE(VARBASEREF VARBASE::operator+=(const int int1) &) {
 
 tryagain:
 
@@ -708,12 +712,12 @@ tryagain:
 	assertNumeric(__PRETTY_FUNCTION__);
 
 	// Cant get here
-	throw VarNonNumeric(this->first(128) ^ "+= ");
+	throw VarNonNumeric(this->first_(128) ^ "+= ");
 }
 
 // MULTIPLY INT
 
-VARREF var::operator*=(const int int1) &{
+VAR_TEMPLATE(VARBASEREF VARBASE::operator*=(const int int1) &) {
 
 tryagain:
 
@@ -742,12 +746,12 @@ tryagain:
 	assertNumeric(__PRETTY_FUNCTION__);
 
 	// Cant get here
-	throw VarNonNumeric(this->first(128) ^ "+= ");
+	throw VarNonNumeric(this->first_(128) ^ "+= ");
 }
 
 //SUBTRACT INT
 
-VARREF var::operator-=(const int int1) &{
+VAR_TEMPLATE(VARBASEREF VARBASE::operator-=(const int int1) &) {
 
 tryagain:
 
@@ -776,19 +780,19 @@ tryagain:
 	assertNumeric(__PRETTY_FUNCTION__);
 
 	// Cant get here
-	throw VarNonNumeric(this->first(128) ^ "+= ");
+	throw VarNonNumeric(this->first_(128) ^ "+= ");
 }
 
 
 //DIVIDE INT
 
-VARREF var::operator/=(const int int1) &{
+VAR_TEMPLATE(VARBASEREF VARBASE::operator/=(const int int1) &) {
 
 	// Always return double
 
 	if (!int1)
 		UNLIKELY
-		throw VarDivideByZero("div('" ^ this->first(128) ^ "', '" ^ int1 ^
+		throw VarDivideByZero("div('" ^ this->first_(128) ^ "', '" ^ int1 ^
 		"')");
 
 tryagain:
@@ -818,7 +822,7 @@ tryagain:
 
 //MODULO INT
 
-VARREF var::operator%=(const int rhs) &{
+VAR_TEMPLATE(VARBASEREF VARBASE::operator%=(const int rhs) &) {
 	*this = this->mod(rhs);
 	return *this;
 }
@@ -829,7 +833,7 @@ VARREF var::operator%=(const int rhs) &{
 
 // ADD BOOL
 
-VARREF var::operator+=(const bool bool1) &{
+VAR_TEMPLATE(VARBASEREF VARBASE::operator+=(const bool bool1) &) {
 	if (bool1)
 		(*this)++;
 	else
@@ -839,7 +843,7 @@ VARREF var::operator+=(const bool bool1) &{
 
 // MULTIPLY BOOL
 
-VARREF var::operator*=(const bool bool1) &{
+VAR_TEMPLATE(VARBASEREF VARBASE::operator*=(const bool bool1) &) {
 	assertNumeric(__PRETTY_FUNCTION__);
 	if (!bool1) {
 		var_int = 0;
@@ -850,7 +854,7 @@ VARREF var::operator*=(const bool bool1) &{
 
 // SUBTRACT BOOL
 
-VARREF var::operator-=(const bool bool1) &{
+VAR_TEMPLATE(VARBASEREF VARBASE::operator-=(const bool bool1) &) {
 	if (bool1)
 		(*this)--;
 	else
@@ -859,16 +863,17 @@ VARREF var::operator-=(const bool bool1) &{
 }
 
 // +var
-var var::operator+() const{
+VAR_TEMPLATE(RETVAR VARBASE::operator+() const) {
 
 	assertDefined(__PRETTY_FUNCTION__);
 	assertNumeric(__PRETTY_FUNCTION__);
 
-	return *this;
+	//return static_cast<RETVAR>(*this);
+	return *static_cast<const RETVAR*>(this);
 }
 
 // -var
-var var::operator-() const{
+VAR_TEMPLATE(RETVAR VARBASE::operator-() const) {
 
 	assertDefined(__PRETTY_FUNCTION__);
 
@@ -890,17 +895,22 @@ var var::operator-() const{
 	this->assertNumeric(__PRETTY_FUNCTION__);
 
 	// will never get here
-	throw VarNonNumeric("+(" ^ this->first(128) ^ ")");
+	throw VarNonNumeric("+(" ^ this->first_(128) ^ ")");
 }
 
 // var^var we reassign the logical xor operator ^ to be string concatenate!!!
 // slightly wrong precedence but at least we have a reliable concat operator to replace the + which
 // is now reserved for forced ADDITION both according to fundamental PickOS principle
-var var_cat_var(CVR lhs, CVR rhs) {
+//template RETVAR var_cat_var(CBR lhs, CBR rhs);
+//template<typename T> RETVAR var_cat_var(const T& lhs, const T& rhs) {
+RETVAR var_cat_var(CBR lhs, CBR rhs) {
+// Doesnt work because we need to template the whole of var_base<var> ... not just the var bit
+//template<typename var> var var_cat_var(const var_base<var>& lhs, const var_base<var>& rhs) {
 
 	lhs.assertString(__PRETTY_FUNCTION__);
 	rhs.assertString(__PRETTY_FUNCTION__);
-
+TRACE(lhs)
+TRACE(rhs)
 	// return lhs.var_str + rhs.var_str;
 
 	var result(lhs.var_str);
@@ -909,7 +919,10 @@ var var_cat_var(CVR lhs, CVR rhs) {
 	return result;
 }
 
-var var_cat_cstr(CVR lhs, const char* rhs) {
+//var var_cat_cstr(CVR lhs, const char* rhs) {
+//template RETVAR var_cat_cstr(CBR lhs, const char* rhs);
+//template<typename T> RETVAR var_cat_cstr(const T& lhs, const char* rhs) {
+RETVAR var_cat_cstr(CBR lhs, const char* rhs) {
 
 	lhs.assertString(__PRETTY_FUNCTION__);
 
@@ -921,7 +934,10 @@ var var_cat_cstr(CVR lhs, const char* rhs) {
 	return result;
 }
 
-var var_cat_char(CVR lhs, const char rhs) {
+//var var_cat_char(CVR lhs, const char rhs) {
+//template RETVAR var_cat_char(CBR lhs, const char rhs);
+//template<typename T> RETVAR var_cat_char(const T& lhs, const char rhs) {
+RETVAR var_cat_char(CBR lhs, const char rhs) {
 
 	lhs.assertString(__PRETTY_FUNCTION__);
 
@@ -933,7 +949,10 @@ var var_cat_char(CVR lhs, const char rhs) {
 	return result;
 }
 
-var cstr_cat_var(const char* lhs, CVR rhs) {
+//var cstr_cat_var(const char* lhs, CVR rhs) {
+//template RETVAR cstr_cat_var(const char* lhs, CBR rhs);
+//template<typename T> RETVAR cstr_cat_var(const char* lhs, const T& rhs) {
+RETVAR cstr_cat_var(const char* lhs, CBR rhs) {
 
 	rhs.assertString(__PRETTY_FUNCTION__);
 
@@ -945,83 +964,80 @@ var cstr_cat_var(const char* lhs, CVR rhs) {
 	return result;
 }
 
-/*
-
-VARREF var::operator^(CVR vstr) {
-
-	assertString(__PRETTY_FUNCTION__);
-	vstr.assertString(__PRETTY_FUNCTION__);
-
-	var_str += vstr.var_str;
-
-	return *this;
-}
-
-VARREF var::operator^(const char* cstr) {
-	std::clog <<("var operator^(const char& cstr)") << std::endl;
-
-	assertString(__PRETTY_FUNCTION__);
-
-	var_str += cstr;
-
-	return *this;
-}
-
-VARREF var::operator^(const std::string& stdstr) {
-
-	assertString(__PRETTY_FUNCTION__);
-	stdstr.assertString(__PRETTY_FUNCTION__);
-
-	var_str += stdstr.var_str;
-
-	return *this;
-}
-*/
+//VAR_TEMPLATE(RETVARREF VARBASE::operator^(CVR vstr)) {
+//
+//	assertString(__PRETTY_FUNCTION__);
+//	vstr.assertString(__PRETTY_FUNCTION__);
+//
+//	var_str += vstr.var_str;
+//
+//	return *this;
+//}
+//
+//VAR_TEMPLATE(RETVARREF VARBASE::operator^(const char* cstr))  {
+//	std::clog <<("var operator^(const char& cstr)") << std::endl;
+//
+//	assertString(__PRETTY_FUNCTION__);
+//
+//	var_str += cstr;
+//
+//	return *this;
+//}
+//
+//VAR_TEMPLATE(RETVARREF VARBASE::operator^(const std::string& stdstr)) {
+//
+//	assertString(__PRETTY_FUNCTION__);
+//	stdstr.assertString(__PRETTY_FUNCTION__);
+//
+//	var_str += stdstr.var_str;
+//
+//	return *this;
+//}
 
 //#if defined __MINGW32__
 // allow use of cout<<var
 //pass by value (make a copy) because we are going to convert FM to ^ etc
 //TODO provide a version that works on temporaries?
 //PUBLIC
-std::ostream& operator<<(std::ostream& ostream1, var var1) {
+//std::ostream& operator<<(std::ostream& ostream1, var var1) {
+//
+//	var1.assertString(__PRETTY_FUNCTION__);
+//
+//	constexpr std::array VISIBLE_FMS_EXCEPT_ESC {VISIBLE_ST_, TM_, VISIBLE_SM_, VISIBLE_VM_, VISIBLE_FM_, VISIBLE_RM_};
+//
+//	//replace various unprintable field marks with unusual ASCII characters
+//	//leave ESC as \x1B because it is used to control ANSI terminal control sequences
+//	//std::string str = "\x1A\x1B\x1C\x1D\x1E\x1F";
+//	// |\x1B}]^~  or in high to low ~^]}\x1B|     or in TRACE() ... ~^]}_|
+//	for (auto& charx : var1.var_str) {
+//		if (charx <= 0x1F && charx >= 0x1A) {
+//			UNLIKELY
+//			//charx = "|\x1B}]^~"[charx - 0x1A];
+//			charx = VISIBLE_FMS_EXCEPT_ESC[charx - 0x1A];
+//		}
+//	}
+//
+//	// use toString() to avoid creating a constructor which logs here recursively
+//	// should this use a ut16/32 -> UTF8 code facet? or convert to UTF8 and output to ostream?
+//	ostream1 << var1.var_str;
+//	return ostream1;
+//}
 
-	var1.assertString(__PRETTY_FUNCTION__);
-
-	constexpr std::array VISIBLE_FMS_EXCEPT_ESC {VISIBLE_ST_, TM_, VISIBLE_SM_, VISIBLE_VM_, VISIBLE_FM_, VISIBLE_RM_};
-
-	//replace various unprintable field marks with unusual ASCII characters
-	//leave ESC as \x1B because it is used to control ANSI terminal control sequences
-	//std::string str = "\x1A\x1B\x1C\x1D\x1E\x1F";
-	// |\x1B}]^~  or in high to low ~^]}\x1B|     or in TRACE() ... ~^]}_|
-	for (auto& charx : var1.var_str) {
-		if (charx <= 0x1F && charx >= 0x1A) {
-			UNLIKELY
-			//charx = "|\x1B}]^~"[charx - 0x1A];
-			charx = VISIBLE_FMS_EXCEPT_ESC[charx - 0x1A];
-		}
-	}
-
-	// use toString() to avoid creating a constructor which logs here recursively
-	// should this use a ut16/32 -> UTF8 code facet? or convert to UTF8 and output to ostream?
-	ostream1 << var1.var_str;
-	return ostream1;
-}
-
-std::istream& operator>>(std::istream& istream1, VARREF into_str1) {
-
-	into_str1.assertDefined(__PRETTY_FUNCTION__);
-
-	into_str1.var_str.clear();
-	into_str1.var_typ = VARTYP_STR;
-
-	//std::string tempstr;
-	istream1 >> std::noskipws >> into_str1.var_str;
-
-	// this would verify all input is valid utf8
-	// into_str1.var_str=boost::locale::conv::utf_to_utf<char>(into_str1)
-
-	return istream1;
-}
+//std::istream& operator>>(std::istream& istream1, VARREF into_str1) {
+//
+//	into_str1.assertDefined(__PRETTY_FUNCTION__);
+//
+//	into_str1.var_str.clear();
+//	into_str1.var_typ = VARTYP_STR;
+//
+//	//std::string tempstr;
+//	istream1 >> std::noskipws >> into_str1.var_str;
+//
+//	// this would verify all input is valid utf8
+//	// into_str1.var_str=boost::locale::conv::utf_to_utf<char>(into_str1)
+//
+//	return istream1;
+//}
 
 ////////////////////
 // _var user literal
