@@ -30,27 +30,32 @@ namespace exodus {
 
 // Note: VAR_TEMPLATE both defines and instantiates an instance of the member function for var_base<var>::xxxxxxxxxxx
 
-VAR_TEMPLATE([[noreturn]] void VARBASE::throwUndefined(CBR message) const) {
+#if __clang_major__
+#	define NORETURN
+#else
+#	define NORETURN NORETURN
+#endif
+VAR_TEMPLATE(NORETURN void VARBASE::throwUndefined(CBR message) const) {
 	throw VarUndefined(message);
 }
 
-VAR_TEMPLATE([[noreturn]] void VARBASE::throwUnassigned(CBR message) const) {
+VAR_TEMPLATE(NORETURN void VARBASE::throwUnassigned(CBR message) const) {
 	throw VarUnassigned(message);
 }
 
-VAR_TEMPLATE([[noreturn]] void VARBASE::throwNonNumeric(CBR message) const) {
+VAR_TEMPLATE(NORETURN void VARBASE::throwNonNumeric(CBR message) const) {
 	throw VarNonNumeric(message);
 }
 
-VAR_TEMPLATE([[noreturn]] void VARBASE::throwNonPositive(CBR message) const) {
+VAR_TEMPLATE(NORETURN void VARBASE::throwNonPositive(CBR message) const) {
 	throw VarNonPositive(message);
 }
 
-VAR_TEMPLATE([[noreturn]] void VARBASE::throwNumOverflow(CBR message) const) {
+VAR_TEMPLATE(NORETURN void VARBASE::throwNumOverflow(CBR message) const) {
 	throw VarNumOverflow(message);
 }
 
-VAR_TEMPLATE([[noreturn]] void VARBASE::throwNumUnderflow(CBR message) const) {
+VAR_TEMPLATE(NORETURN void VARBASE::throwNumUnderflow(CBR message) const) {
 	throw VarNumUnderflow(message);
 }
 
