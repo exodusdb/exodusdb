@@ -160,7 +160,7 @@
 
 //	PUBLIC VAR_FRIEND RETVAR operator^(CBR lhs, CBR rhs) /*IMPL*/ {return var_cat_var(lhs, rhs ); }
 	//PUBLIC VAR_FRIEND RETVAR operator^(TBR lhs, CBR rhs) /*IMPL*/ {return lhs ^= rhs ; }
-//	PUBLIC VAR_FRIEND RETVAR operator^(var_base<var>&& lhs, CBR rhs) /*IMPL*/ {return static_cast<RETVAR>(lhs ^= rhs) ; } //var_base -> var
+//	PUBLIC VAR_FRIEND RETVAR operator^(TBR lhs, CBR rhs) /*IMPL*/ {return static_cast<RETVAR>(lhs ^= rhs) ; } //var_base -> var
 //	template<typename T> PUBLIC VAR_FRIEND RETVAR operator^(const T&  lhs, const T& rhs) /*IMPL*/ {return var_cat_var(lhs, rhs ); }
 //	template<typename T> PUBLIC VAR_FRIEND RETVAR operator^(      T&& lhs, const T& rhs) /*IMPL*/ {return static_cast<RETVAR>(lhs ^= rhs) ; } //var_base -> va
 
@@ -168,8 +168,8 @@
 
 //	PUBLIC VAR_FRIEND RETVAR operator^(CBR lhs,CBR rhs) /*IMPL*/ {return var_cat_var(VARBASE(lhs), rhs ); }
 	PUBLIC VAR_FRIEND RETVAR operator^(CBR lhs,CBR rhs) /*IMPL*/ {var lhs2 = lhs.toString(); lhs2 ^= rhs; return lhs2; }
-	PUBLIC VAR_FRIEND RETVAR operator^(var_base<var>&& lhs,CBR rhs) /*IMPL*/ {lhs ^= rhs; return *static_cast<var*>(&lhs); }
-//	PUBLIC VAR_FRIEND RETVAR operator^(var_base<var>&& lhs,CBR rhs) /*IMPL*/ {return var_cat_var(lhs, rhs); }
+	PUBLIC VAR_FRIEND RETVAR operator^(TBR lhs,CBR rhs) /*IMPL*/ {lhs ^= rhs; return *static_cast<var*>(&lhs); }
+//	PUBLIC VAR_FRIEND RETVAR operator^(TBR lhs,CBR rhs) /*IMPL*/ {return var_cat_var(lhs, rhs); }
 
 //	//template<typename T> PUBLIC VAR_FRIEND RETVAR operator^(const T&   lhs,       CBR rhs) /*IMPL*/ {var_base<var> nrvo = lhs; return var_cat_var(nrvo, rhs ); }
 //	template<typename T> PUBLIC VAR_FRIEND RETVAR operator^(const T&   lhs,       CBR rhs) /*IMPL*/ {return var_cat_var(VARBASE(lhs), rhs ); }
@@ -311,7 +311,7 @@
 	PUBLIC VAR_FRIEND RETVAR operator^(const double  lhs,       CBR     rhs) /*IMPL*/ {rhs.assertString(__PRETTY_FUNCTION__); return RETVAR(lhs).toString() += rhs.var_str;}
 
 	//temporaries (rvalues) - mutate the temporary string to save a copy
-	PUBLIC VAR_FRIEND RETVAR operator^(var_base<var>&&    lhs, const char*  rhs) /*IMPL*/ {lhs ^= rhs; return std::move(lhs.var_str);}
-	PUBLIC VAR_FRIEND RETVAR operator^(var_base<var>&&    lhs, const char   rhs) /*IMPL*/ {lhs ^= rhs; return std::move(lhs.var_str);}
-	PUBLIC VAR_FRIEND RETVAR operator^(var_base<var>&&    lhs, const int    rhs) /*IMPL*/ {lhs ^= rhs; return std::move(lhs.var_str);}
-	PUBLIC VAR_FRIEND RETVAR operator^(var_base<var>&&    lhs, const double rhs) /*IMPL*/ {lhs ^= rhs; return std::move(lhs.var_str);}
+	PUBLIC VAR_FRIEND RETVAR operator^(TBR    lhs, const char*  rhs) /*IMPL*/ {lhs ^= rhs; return std::move(lhs.var_str);}
+	PUBLIC VAR_FRIEND RETVAR operator^(TBR    lhs, const char   rhs) /*IMPL*/ {lhs ^= rhs; return std::move(lhs.var_str);}
+	PUBLIC VAR_FRIEND RETVAR operator^(TBR    lhs, const int    rhs) /*IMPL*/ {lhs ^= rhs; return std::move(lhs.var_str);}
+	PUBLIC VAR_FRIEND RETVAR operator^(TBR    lhs, const double rhs) /*IMPL*/ {lhs ^= rhs; return std::move(lhs.var_str);}
