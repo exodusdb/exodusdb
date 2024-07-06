@@ -53,6 +53,8 @@ THE SOFTWARE.
 #	define EXO_FORMAT 2
 #	pragma GCC diagnostic push
 #	pragma clang diagnostic ignored "-Wdocumentation-unknown-command"
+#   pragma clang diagnostic ignored "-Wreserved-id-macro" //18 20.04
+#   pragma clang diagnostic ignored "-Wduplicate-enum" //18 20.04
 #	pragma GCC diagnostic ignored "-Winline"
 #	pragma GCC diagnostic ignored "-Wswitch-default"
 //#	include <fmt/core.h>
@@ -988,7 +990,8 @@ constexpr auto parse(ParseContext& ctx) {
 				} catch (...) {
 					//throw std::format_error("exofuncs.h: formatter_parse: invalid dynamic arg '" + arg_str + "'");
 					//throw_format_error(std::string("exofuncs.h: formatter_parse: invalid dynamic arg ") + arg_str);
-					throw_format_error(std::string("exofuncs.h: formatter_parse: invalid dynamic arg '" + arg_str + "'").c_str());
+					//throw_format_error(std::string("exofuncs.h: formatter_parse: invalid dynamic arg '" + arg_str + "'").c_str());
+					throw  fmt::format_error(std::string("exofuncs.h: formatter_parse: invalid dynamic arg '" + arg_str + "'").c_str());
 				}
 			}
 
@@ -1052,14 +1055,14 @@ constexpr auto parse(ParseContext& ctx) {
 	}
 	// If we dont find a closing "}" char
 
-#if EXO_FORMAT == 1
+//#if EXO_FORMAT == 1
 	[[unlikely]]
-	throw std::format_error("exofuncs.h: formatter_parse: format missing trailing }");
-#else
-	throw_format_error("exofuncs.h: formatter_parse: format missing trailing }");
+	throw fmt::format_error("exofuncs.h: formatter_parse: format missing trailing }");
+//#else
+//	throw_format_error("exofuncs.h: formatter_parse: format missing trailing }");
 //		fmt_str_ = "{}";
 //		return it;
-#endif
+//#endif
 	//std::unreachable();
 
 } // formatter::parse()
