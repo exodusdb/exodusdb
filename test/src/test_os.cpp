@@ -29,7 +29,7 @@ programinit()
 	}
 
 	//test copying files forced overwrite)
-	if (not osrmdir("d1", true)) {};
+	if (not osrmdir("d1", true)) {}
 	assert(osmkdir("d1/d1"));
 	assert(oswrite("f1", "d1/f1"));
 	assert(oswrite("f2", "d1/f2"));

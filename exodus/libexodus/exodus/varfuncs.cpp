@@ -2057,7 +2057,7 @@ ND VARREF var::shuffle(SV sepchar DEFAULT_FM) && {return shuffler(sepchar);}
 ND VARREF var::parse(char sepchar DEFAULT_FM) && {return parser(sepchar);}
 
 // constructor
-template       var_base<var>::var_base(const std::wstring& wstr1);
+//template       var_base<var>::var_base(const std::wstring& wstr1);
 
 // clang-format on
 

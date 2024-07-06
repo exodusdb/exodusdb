@@ -33,7 +33,7 @@ namespace exodus {
 #if __clang_major__
 #	define NORETURN
 #else
-#	define NORETURN NORETURN
+#	define NORETURN [[noreturn]]
 #endif
 VAR_TEMPLATE(NORETURN void VARBASE::throwUndefined(CBR message) const) {
 	throw VarUndefined(message);
