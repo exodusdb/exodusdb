@@ -260,7 +260,7 @@ function get_dependencies_for_build_and_install {
 #   if ! test -f exodus/pgexodus/CMakeLists.txt || ! test -f fmt/CMakeLists.txt; then
 		git submodule init
 		git submodule update --remote   # assuming "branch = master" in .gitmodules file for each module
-		git submodule foreach git checkout master
+#		git submodule foreach git checkout master
 		git submodule foreach git pull origin master
 #   fi
 
@@ -422,9 +422,10 @@ function build_and_install {
 :
 #   if ! test -f exodus/pgexodus/CMakeLists.txt || ! test -f fmt/CMakeLists.txt; then
 		git submodule init
-		git submodule update --remote   # assuming "branch = master" in .gitmodules file for each module
-		git submodule foreach git checkout master
-		git submodule foreach git pull origin master
+#		git submodule update --remote   # assuming "branch = master" in .gitmodules file for each module
+##		git submodule foreach git checkout master
+#		git submodule foreach git pull origin master
+		git submodule update --remote --merge
 #   fi
 
 :
