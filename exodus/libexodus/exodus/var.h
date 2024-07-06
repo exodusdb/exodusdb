@@ -42,6 +42,8 @@ THE SOFTWARE.
 #   pragma GCC diagnostic ignored "-Winline"
 #   pragma clang diagnostic ignored "-Wswitch-default" //18 24.04
 #   pragma clang diagnostic ignored "-Wunsafe-buffer-usage" //18 24.04
+#   pragma clang diagnostic ignored "-Wreserved-id-macro" //18 20.04
+#   pragma clang diagnostic ignored "-Wduplicate-enum" //18 20.04
 #   include <fmt/format.h>
 #endif
 

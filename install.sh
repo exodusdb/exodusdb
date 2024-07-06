@@ -252,15 +252,17 @@ function get_dependencies_for_build_and_install {
 	sudo apt-get install -y postgresql-common
 
 :
-: Install pgexodus and fmt submodules source
+: Install pgexodus and fmt submodules source - duplicated in b and B stages - keep in sync
 : ------------------------------------------
 :
-	if ! test -f exodus/pgexodus/CMakeLists.txt || ! test -f fmt/CMakeLists.txt; then
+: Note that main git repo contains just a hash/pointer to the commit to be checked out, not a tag to master
+:
+#   if ! test -f exodus/pgexodus/CMakeLists.txt || ! test -f fmt/CMakeLists.txt; then
 		git submodule init
-		git submodule update
+		git submodule update --remote   # assuming "branch = master" in .gitmodules file for each module
 		git submodule foreach git checkout master
 		git submodule foreach git pull origin master
-	fi
+#   fi
 
 :
 : Get the full postgres debian repos IF we require a specific version
@@ -413,11 +415,24 @@ function build_and_install {
 	cd $EXODUS_DIR
 
 :
-: Acquire any submodules e.g. pgexodus and fmt
-: ----------------------
+: Install pgexodus and fmt submodules source - duplicated in b and B stages - keep in sync
+: ------------------------------------------
 :
-	git submodule init
-	git submodule update
+: Note that main git repo contains just a hash/pointer to the commit to be checked out, not a tag to master
+:
+#   if ! test -f exodus/pgexodus/CMakeLists.txt || ! test -f fmt/CMakeLists.txt; then
+		git submodule init
+		git submodule update --remote   # assuming "branch = master" in .gitmodules file for each module
+		git submodule foreach git checkout master
+		git submodule foreach git pull origin master
+#   fi
+
+:
+: Verify submodules exist
+: -----------------------
+:
+	test -f $EXODUS_DIR/fmt/CMakeLists.txt
+	test -f $EXODUS_DIR/exodus/pgexodus/CMakeLists.txt
 
 :
 : Build exodus
@@ -427,6 +442,7 @@ function build_and_install {
 : Prep
 :
 	echo PGPATH=${PGPATH:-}
+	rm $EXODUS_DIR/build -rf
 	cmake -S $EXODUS_DIR -B $EXODUS_DIR/build
 :
 : Make
