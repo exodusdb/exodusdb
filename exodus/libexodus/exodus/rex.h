@@ -5,7 +5,7 @@
 
 //warning: inlining failed in call to ‘exodus::rex::~rex() noexcept’: call is unlikely and code size would grow [-Winline]
 #pragma GCC diagnostic push
-#if __GNUC__ && __GNUC__ <= 10
+#if __GNUC__ <= 10
 #	pragma GCC diagnostic ignored "-Winline"
 #endif
 

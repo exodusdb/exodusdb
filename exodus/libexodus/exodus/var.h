@@ -28,18 +28,24 @@ THE SOFTWARE.
 #define EXODUS_PATCH "24.07.0"
 
 #include <cstdint> // for uint64_t
-#if __has_include(<concepts>)
-#	include <concepts>
-#endif
+
 #include <iostream>
 #include <string>
 #include <string_view>
 #include <array> // used in operator<<
 
+#if __has_include(<concepts>)
+#	include <concepts>
+#endif
+
+#if __cpp_lib_concepts >= 201907L && ( __GNUC__ > 10 || __clang_major__ > 1 )
+#	define EXO_CONCEPTS
+#endif
+
 #pragma GCC diagnostic ignored "-Winline"
 
 // Support var::format functions
-#if ! __GNUC__ || __GNUC__ > 10
+#if __GNUC__  >= 10 || __clang_major__ > 1
 #	define EXO_FORMAT
 #	ifdef EXO_FORMAT
 #		pragma GCC diagnostic ignored "-Winline"
@@ -224,7 +230,7 @@ inline const char VISIBLE_ST_ = '~';
 
 namespace exodus {
 
-#if __cpp_lib_concepts >= 201907L && ( ! __GNUC__ || __GNUC__ > 10)
+#ifdef EXO_CONCEPTS
 	template <typename T>
 	concept std_string_or_convertible = std::is_convertible_v<T, std::string_view>;
 
@@ -547,7 +553,7 @@ class PUBLIC var_base {
 
 	// var_base(integer)
 
-#if __cpp_lib_concepts >= 201907L && ( ! __GNUC__ || __GNUC__ > 10)
+#ifdef EXO_CONCEPTS
 	template <std::integral Integer>
 #else
 	template <typename Integer, std::enable_if_t<std::is_integral<Integer>::value, bool> = true>
@@ -595,7 +601,7 @@ class PUBLIC var_base {
 
 	// var_base = floating point
 
-#if __cpp_lib_concepts >= 201907L && ( ! __GNUC__ || __GNUC__ > 10)
+#ifdef EXO_CONCEPTS
 	template <std::floating_point FloatingPoint>
 #else
 	template <typename FloatingPoint, std::enable_if_t<std::is_floating_point<FloatingPoint>::value, bool> = true>
@@ -628,7 +634,7 @@ class PUBLIC var_base {
 
 	// var_base = string-like
 
-#if __cpp_lib_concepts >= 201907L && ( ! __GNUC__ || __GNUC__ > 10)
+#ifdef EXO_CONCEPTS
 	template <std_string_or_convertible StringLike>
 #else
 	template <typename StringLike, std::enable_if_t<std::is_convertible<StringLike, std::string_view>::value, bool> = true>
@@ -688,7 +694,7 @@ class PUBLIC var_base {
 
 	// var_base(wide-string-like)
 
-#if __cpp_lib_concepts >= 201907L && ( ! __GNUC__ || __GNUC__ > 10)
+#ifdef EXO_CONCEPTS
 	template <std_u32string_or_convertible W>
 #else
 	template <typename W, std::enable_if_t<std::is_convertible<W, std::u32string_view>::value, bool> = true>
@@ -815,7 +821,7 @@ class PUBLIC var_base {
 
 	// necessary to allow conversion to int in many functions like extract(x,y,z)
 
-#if __cpp_lib_concepts >= 201907L && ( ! __GNUC__ || __GNUC__ > 10)
+#ifdef EXO_CONCEPTS
 	template <std::integral Integer>
 #else
 	template <typename Integer, std::enable_if_t<std::is_integral<Integer>::value, bool> = false>
@@ -860,7 +866,7 @@ class PUBLIC var_base {
 	// floating point <- var
 	////////////////////////
 
-#if __cpp_lib_concepts >= 201907L && ( ! __GNUC__ || __GNUC__ > 10)
+#ifdef EXO_CONCEPTS
 	template <std::floating_point FloatingPoint>
 #else
 	template <typename FloatingPoint, std::enable_if_t<std::is_floating_point<FloatingPoint>::value, bool> = true>
@@ -1009,7 +1015,7 @@ class PUBLIC var_base {
 	// var = Integral
 	/////////////////
 
-#if __cpp_lib_concepts >= 201907L && ( ! __GNUC__ || __GNUC__ > 10)
+#ifdef EXO_CONCEPTS
 	template <std::integral Integer>
 #else
 	template <typename Integer, std::enable_if_t<std::is_integral<Integer>::value, bool> = true>
@@ -1062,7 +1068,7 @@ class PUBLIC var_base {
 	// var = Floating Point
 	///////////////////////
 
-#if __cpp_lib_concepts >= 201907L && ( ! __GNUC__ || __GNUC__ > 10)
+#ifdef EXO_CONCEPTS
 	template <std::floating_point FloatingPoint>
 #else
 	template <typename FloatingPoint, std::enable_if_t<std::is_floating_point<FloatingPoint>::value, bool> = true>

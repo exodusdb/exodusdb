@@ -485,7 +485,12 @@ var var::search(SV regex, VARREF startchar1, SV regex_options) const {
 		// and we need start in the middle of std::string so we must use const char*
 		// so any \0 byte in var_str will terminate the match.
 		// TODO how to create an iterator over std::string but starting in the middle.
+		///root/exodus/exodus/libexodus/exodus/varregex.cpp:488:55: warning: unsafe pointer arithmetic [-Wunsafe-buffer-usage]
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
+		// Sadly u32regex will not take a std::string_view so we point into the middle of a std::string (unsafe)
 		iter = boost::make_u32regex_iterator(var_str.data() + startchar1.var_int - 1, regex_engine);
+#pragma clang diagnostic pop
 	} catch (boost::wrapexcept<std::out_of_range>& e) {
 		throw VarError("Error: (2) Invalid match string " ^ var(regex).quote() ^ ". " ^ var(e.what()));
 	}
