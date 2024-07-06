@@ -3,6 +3,12 @@
 
 #include <exodus/var.h>
 
+//warning: inlining failed in call to ‘exodus::rex::~rex() noexcept’: call is unlikely and code size would grow [-Winline]
+#pragma GCC diagnostic push
+#if __GNUC__ && __GNUC__ <= 10
+#	pragma GCC diagnostic ignored "-Winline"
+#endif
+
 namespace exodus {
 
 // Note that "for (var& var1: dim1)" with & allows direct access and update into the elements of the array dim1 via varx
@@ -127,7 +133,10 @@ rex(SV expression, SV options);
 // "[a-z]"_rex
 PUBLIC rex operator""_rex(const char* cstr, std::size_t size);
 
+
 } // namespace exodus
+
+#pragma GCC diagnostic pop
 
 #endif //VARREX_H
 
