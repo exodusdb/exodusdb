@@ -54,7 +54,7 @@ function main() {
 // Init
 ///////
 
-	println("Reading from stdin");
+	printl("Reading from stdin");
 
 	var src;
 	var srcfile = "";

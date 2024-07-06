@@ -29,7 +29,8 @@ programinit()
 		//println("Found {:} words", v1.match("\\w+").fcount(FM));
 		//let nwords = v1.match("\\w+").fcount(FM);
 		int nwords = v1.match("\\w+").fcount(FM);
-		println("Found {} words", nwords);
+		//println("Found {} words", nwords);
+		printl("Found", nwords, "words");
 
 // clang 15 on u22.04 has a problem with the above var in println
 

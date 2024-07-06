@@ -36,15 +36,19 @@ THE SOFTWARE.
 #include <string_view>
 #include <array> // used in operator<<
 
+#pragma GCC diagnostic ignored "-Winline"
+
 // Support var::format functions
-#define EXO_FORMAT
-#ifdef EXO_FORMAT
-#   pragma GCC diagnostic ignored "-Winline"
-#   pragma clang diagnostic ignored "-Wswitch-default" //18 24.04
-#   pragma clang diagnostic ignored "-Wunsafe-buffer-usage" //18 24.04
-#   pragma clang diagnostic ignored "-Wreserved-id-macro" //18 20.04
-#   pragma clang diagnostic ignored "-Wduplicate-enum" //18 20.04
-#   include <fmt/format.h>
+#if ! __GNUC__ || __GNUC__ > 10
+#	define EXO_FORMAT
+#	ifdef EXO_FORMAT
+#		pragma GCC diagnostic ignored "-Winline"
+#		pragma clang diagnostic ignored "-Wswitch-default" //18 24.04
+#		pragma clang diagnostic ignored "-Wunsafe-buffer-usage" //18 24.04
+#		pragma clang diagnostic ignored "-Wreserved-id-macro" //18 20.04
+#		pragma clang diagnostic ignored "-Wduplicate-enum" //18 20.04
+#		include <fmt/format.h>
+#	endif
 #endif
 
 // http://stackoverflow.com/questions/538134/exporting-functions-from-a-dll-with-dllexport
@@ -220,7 +224,7 @@ inline const char VISIBLE_ST_ = '~';
 
 namespace exodus {
 
-#if __cpp_lib_concepts >= 201907L
+#if __cpp_lib_concepts >= 201907L && ( ! __GNUC__ || __GNUC__ > 10)
 	template <typename T>
 	concept std_string_or_convertible = std::is_convertible_v<T, std::string_view>;
 
@@ -543,7 +547,7 @@ class PUBLIC var_base {
 
 	// var_base(integer)
 
-#if __cpp_lib_concepts >= 201907L
+#if __cpp_lib_concepts >= 201907L && ( ! __GNUC__ || __GNUC__ > 10)
 	template <std::integral Integer>
 #else
 	template <typename Integer, std::enable_if_t<std::is_integral<Integer>::value, bool> = true>
@@ -591,7 +595,7 @@ class PUBLIC var_base {
 
 	// var_base = floating point
 
-#if __cpp_lib_concepts >= 201907L
+#if __cpp_lib_concepts >= 201907L && ( ! __GNUC__ || __GNUC__ > 10)
 	template <std::floating_point FloatingPoint>
 #else
 	template <typename FloatingPoint, std::enable_if_t<std::is_floating_point<FloatingPoint>::value, bool> = true>
@@ -624,7 +628,7 @@ class PUBLIC var_base {
 
 	// var_base = string-like
 
-#if __cpp_lib_concepts >= 201907L
+#if __cpp_lib_concepts >= 201907L && ( ! __GNUC__ || __GNUC__ > 10)
 	template <std_string_or_convertible StringLike>
 #else
 	template <typename StringLike, std::enable_if_t<std::is_convertible<StringLike, std::string_view>::value, bool> = true>
@@ -684,7 +688,7 @@ class PUBLIC var_base {
 
 	// var_base(wide-string-like)
 
-#if __cpp_lib_concepts >= 201907L
+#if __cpp_lib_concepts >= 201907L && ( ! __GNUC__ || __GNUC__ > 10)
 	template <std_u32string_or_convertible W>
 #else
 	template <typename W, std::enable_if_t<std::is_convertible<W, std::u32string_view>::value, bool> = true>
@@ -811,7 +815,7 @@ class PUBLIC var_base {
 
 	// necessary to allow conversion to int in many functions like extract(x,y,z)
 
-#if __cpp_lib_concepts >= 201907L
+#if __cpp_lib_concepts >= 201907L && ( ! __GNUC__ || __GNUC__ > 10)
 	template <std::integral Integer>
 #else
 	template <typename Integer, std::enable_if_t<std::is_integral<Integer>::value, bool> = false>
@@ -856,7 +860,7 @@ class PUBLIC var_base {
 	// floating point <- var
 	////////////////////////
 
-#if __cpp_lib_concepts >= 201907L
+#if __cpp_lib_concepts >= 201907L && ( ! __GNUC__ || __GNUC__ > 10)
 	template <std::floating_point FloatingPoint>
 #else
 	template <typename FloatingPoint, std::enable_if_t<std::is_floating_point<FloatingPoint>::value, bool> = true>
@@ -1005,7 +1009,7 @@ class PUBLIC var_base {
 	// var = Integral
 	/////////////////
 
-#if __cpp_lib_concepts >= 201907L
+#if __cpp_lib_concepts >= 201907L && ( ! __GNUC__ || __GNUC__ > 10)
 	template <std::integral Integer>
 #else
 	template <typename Integer, std::enable_if_t<std::is_integral<Integer>::value, bool> = true>
@@ -1058,7 +1062,7 @@ class PUBLIC var_base {
 	// var = Floating Point
 	///////////////////////
 
-#if __cpp_lib_concepts >= 201907L
+#if __cpp_lib_concepts >= 201907L && ( ! __GNUC__ || __GNUC__ > 10)
 	template <std::floating_point FloatingPoint>
 #else
 	template <typename FloatingPoint, std::enable_if_t<std::is_floating_point<FloatingPoint>::value, bool> = true>
