@@ -258,6 +258,8 @@ function get_dependencies_for_build_and_install {
 	if ! test -f exodus/pgexodus/CMakeLists.txt || ! test -f fmt/CMakeLists.txt; then
 		git submodule init
 		git submodule update
+		git submodule foreach git checkout master
+		git submodule foreach git pull origin master
 	fi
 
 :

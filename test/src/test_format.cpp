@@ -198,7 +198,7 @@ function main() {
 	assert(xformat("{:.^5s}", var("🐱")) == "🐱.");
 
 #else
-#warning Using fmtlib library instead of std::format
+#warning Note: We are using fmtlib library instead of std::format for now since it appears more consistent with double width unicode chars
 	//__clang_major__ 18
 	// Correct in fmt library
 	assert(xformat("{:.^5s}", "🐱") == ".🐱..");
