@@ -45,7 +45,7 @@ THE SOFTWARE.
 #pragma GCC diagnostic ignored "-Winline"
 
 // Support var::format functions
-#if __GNUC__  >= 10 || __clang_major__ > 1
+#if __GNUC__  > 10 || __clang_major__ > 1
 #	define EXO_FORMAT
 #	ifdef EXO_FORMAT
 #		pragma GCC diagnostic ignored "-Winline"
