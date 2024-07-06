@@ -31,18 +31,8 @@ THE SOFTWARE.
 namespace exodus {
 
 // NOTE: INSTANTIATIONS ARE AT THE END OF THIS FILE
-//bool var_eq_var (const var_base<var>& lhs, const var_base<var>& rhs );
-//bool var_eq_dbl (const var_base<var>& lhs, const double         rhs );
-//bool var_eq_bool(const var_base<var>& lhs, const bool           rhs );
-//bool var_eq_int (const var_base<var>& lhs, const int            rhs );
-//
-//bool var_lt_var (const var_base<var>& lhs, const var_base<var>& rhs );
-//bool int_lt_var (const int            lhs, const var_base<var>& rhs );
-//bool var_lt_int (const var_base<var>& lhs, const int            rhs );
-//bool var_lt_dbl (const var_base<var>& lhs, const double         rhs );
-//bool dbl_lt_var (const double         lhs, const var_base<var>& rhs );
 
-// NOTE: Using "var_base" instead of "T" for clarity in template parameters.
+// NOTE: Using "var_base" (VARBASE/CBR) instead of "T" for clarity in template parameters.
 // Potentially confusing but has identical meaning.
 
 inline bool almost_equal(double lhs_dbl, double rhs_dbl) {
@@ -113,7 +103,7 @@ bool bool_lt_bool(const bool lhs, const bool rhs) {
 
 // almost identical code in var_eq_var and var_lt_var except where noted
 // NOTE doubles compare only to 0.0001 accuracy)
-bool var_eq_var(const var_base<var>& lhs, const var_base<var>& rhs) {
+bool var_eq_var(CBR lhs, CBR rhs) {
 
 	lhs.assertDefined(__PRETTY_FUNCTION__);
 	rhs.assertDefined(__PRETTY_FUNCTION__);
@@ -234,7 +224,7 @@ bool var_eq_var(const var_base<var>& lhs, const var_base<var>& rhs) {
 
 // almost identical between var_eq_var and var_lt_var except where noted
 // NOTE doubles compare only to 0.0001 accuracy)
-bool var_lt_var(const var_base<var>& lhs, const var_base<var>& rhs) {
+bool var_lt_var(CBR lhs, CBR rhs) {
 
 	lhs.assertDefined(__PRETTY_FUNCTION__);
 	rhs.assertDefined(__PRETTY_FUNCTION__);
@@ -322,7 +312,7 @@ bool var_lt_var(const var_base<var>& lhs, const var_base<var>& rhs) {
 
 // similar to var_eq_var and var_lt_var - this is the var<int version for speed
 // NOTE doubles compare only to 0.0001 accuracy)
-bool var_lt_int(const var_base<var>& lhs, const int rhs_int) {
+bool var_lt_int(CBR lhs, const int rhs_int) {
 
 	lhs.assertDefined(__PRETTY_FUNCTION__);
 
@@ -352,7 +342,7 @@ bool var_lt_int(const var_base<var>& lhs, const int rhs_int) {
 }
 
 // NOTE doubles compare only to 0.0001 accuracy)
-bool int_lt_var(const int lhs_int, const var_base<var>& rhs) {
+bool int_lt_var(const int lhs_int, CBR rhs) {
 
 	rhs.assertDefined(__PRETTY_FUNCTION__);
 
@@ -383,7 +373,7 @@ bool int_lt_var(const int lhs_int, const var_base<var>& rhs) {
 }
 
 // NOTE doubles compare only to 0.0001 accuracy)
-bool var_lt_dbl(const var_base<var>& lhs, const double rhs_dbl) {
+bool var_lt_dbl(CBR lhs, const double rhs_dbl) {
 
 	lhs.assertDefined(__PRETTY_FUNCTION__);
 
@@ -415,7 +405,7 @@ bool var_lt_dbl(const var_base<var>& lhs, const double rhs_dbl) {
 }
 
 // NOTE doubles compare only to 0.0001 accuracy)
-bool dbl_lt_var(const double lhs_dbl, const var_base<var>& rhs) {
+bool dbl_lt_var(const double lhs_dbl, CBR rhs) {
 
 	rhs.assertDefined(__PRETTY_FUNCTION__);
 
@@ -447,7 +437,7 @@ bool dbl_lt_var(const double lhs_dbl, const var_base<var>& rhs) {
 }
 
 // NOTE doubles compare only to 0.0001 accuracy)
-bool var_eq_dbl(const var_base<var>& lhs, const double rhs_dbl) {
+bool var_eq_dbl(CBR lhs, const double rhs_dbl) {
 
 	lhs.assertDefined(__PRETTY_FUNCTION__);
 
@@ -500,7 +490,7 @@ bool var_eq_dbl(const var_base<var>& lhs, const double rhs_dbl) {
 }
 
 // NOTE doubles compare only to 0.0001 accuracy)
-bool var_eq_bool(const var_base<var>& lhs, const bool rhs_bool) {
+bool var_eq_bool(CBR lhs, const bool rhs_bool) {
 
 	lhs.assertDefined(__PRETTY_FUNCTION__);
 
@@ -549,7 +539,7 @@ bool var_eq_bool(const var_base<var>& lhs, const bool rhs_bool) {
 
 }
 // NOTE doubles compare only to 0.0001 accuracy)
-bool var_eq_int(const var_base<var>& lhs, const int rhs_int) {
+bool var_eq_int(CBR lhs, const int rhs_int) {
 
 	lhs.assertDefined(__PRETTY_FUNCTION__);
 
@@ -594,16 +584,16 @@ bool var_eq_int(const var_base<var>& lhs, const int rhs_int) {
 /////////////////
 
 // clang-format off
-bool var_eq_var (const var_base<var>& lhs, const var_base<var>& rhs );
-bool var_eq_dbl (const var_base<var>& lhs, const double         rhs );
-bool var_eq_bool(const var_base<var>& lhs, const bool           rhs );
-bool var_eq_int (const var_base<var>& lhs, const int            rhs );
+bool var_eq_var (CBR          lhs, CBR          rhs );
+bool var_eq_int (CBR          lhs, const int    rhs );
+bool var_eq_dbl (CBR          lhs, const double rhs );
+bool var_eq_bool(CBR          lhs, const bool   rhs );
 
-bool var_lt_var (const var_base<var>& lhs, const var_base<var>& rhs );
-bool int_lt_var (const int            lhs, const var_base<var>& rhs );
-bool var_lt_int (const var_base<var>& lhs, const int            rhs );
-bool var_lt_dbl (const var_base<var>& lhs, const double         rhs );
-bool dbl_lt_var (const double         lhs, const var_base<var>& rhs );
+bool var_lt_var (CBR          lhs, CBR          rhs );
+bool var_lt_int (CBR          lhs, const int    rhs );
+bool var_lt_dbl (CBR          lhs, const double rhs );
+bool int_lt_var (const int    lhs, CBR          rhs );
+bool dbl_lt_var (const double lhs, CBR          rhs );
 //clang-format on
 
 } // namespace exodus

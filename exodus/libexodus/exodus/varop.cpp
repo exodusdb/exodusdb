@@ -53,8 +53,7 @@ namespace exodus {
 
 //^=var
 // The assignment operator must always return a reference to *this.
-//template<typename var> VARBASEREF VARBASE::operator^=(CVR rhs) & {
-VAR_TEMPLATE(VARBASEREF VARBASE::operator^=(CBR rhs) &) {
+VAR_TEMPLATE(VBR VARBASE::operator^=(CBR rhs) &) {
 
 	assertString(__PRETTY_FUNCTION__);
 	rhs.assertString(__PRETTY_FUNCTION__);
@@ -68,7 +67,7 @@ VAR_TEMPLATE(VARBASEREF VARBASE::operator^=(CBR rhs) &) {
 
 //^=int
 // The assignment operator must always return a reference to *this.
-VAR_TEMPLATE(VARBASEREF VARBASE::operator^=(const int int1) &) {
+VAR_TEMPLATE(VBR VARBASE::operator^=(const int int1) &) {
 
 	assertString(__PRETTY_FUNCTION__);
 
@@ -81,7 +80,7 @@ VAR_TEMPLATE(VARBASEREF VARBASE::operator^=(const int int1) &) {
 
 //^=double
 // The assignment operator must always return a reference to *this.
- VAR_TEMPLATE(VARBASEREF VARBASE::operator^=(const double double1) &) {
+ VAR_TEMPLATE(VBR VARBASE::operator^=(const double double1) &) {
 
 	assertString(__PRETTY_FUNCTION__);
 
@@ -97,7 +96,7 @@ VAR_TEMPLATE(VARBASEREF VARBASE::operator^=(const int int1) &) {
 
 //^=char
 // The assignment operator must always return a reference to *this.
-VAR_TEMPLATE(VARBASEREF VARBASE::operator^=(const char char1) &) {
+VAR_TEMPLATE(VBR VARBASE::operator^=(const char char1) &) {
 
 	assertString(__PRETTY_FUNCTION__);
 
@@ -112,7 +111,7 @@ VAR_TEMPLATE(VARBASEREF VARBASE::operator^=(const char char1) &) {
 
 //^=char*
 // The assignment operator must always return a reference to *this.
-VAR_TEMPLATE(VARBASEREF VARBASE::operator^=(const char* cstr) &) {
+VAR_TEMPLATE(VBR VARBASE::operator^=(const char* cstr) &) {
 
 	assertString(__PRETTY_FUNCTION__);
 
@@ -126,7 +125,7 @@ VAR_TEMPLATE(VARBASEREF VARBASE::operator^=(const char* cstr) &) {
 
 //^=std::string
 // The assignment operator must always return a reference to *this.
-VAR_TEMPLATE(VARBASEREF VARBASE::operator^=(const std::string& string1) &) {
+VAR_TEMPLATE(VBR VARBASE::operator^=(const std::string& string1) &) {
 
 	assertString(__PRETTY_FUNCTION__);
 
@@ -139,7 +138,7 @@ VAR_TEMPLATE(VARBASEREF VARBASE::operator^=(const std::string& string1) &) {
 
 //^=std::string_view
 // The assignment operator must always return a reference to *this.
-VAR_TEMPLATE(VARBASEREF VARBASE::operator^=(SV sv1) &) {
+VAR_TEMPLATE(VBR VARBASE::operator^=(SV sv1) &) {
 
 	assertString(__PRETTY_FUNCTION__);
 
@@ -156,7 +155,6 @@ VAR_TEMPLATE(VARBASEREF VARBASE::operator^=(SV sv1) &) {
 // *** YOU HAVE BEEN WARNED ***
 // not returning void so is usable in expressions
 // int argument indicates that this is POSTFIX override v++
-//template<typename var> RETVAR VARBASE::operator++(int) {
 VAR_TEMPLATE(RETVAR VARBASE::operator++(int) &) {
 
 	// full check done below to avoid double checking number type
@@ -238,8 +236,7 @@ tryagain:
 
 // not returning void so is usable in expressions
 // no argument indicates that this is prefix override ++var
-//template<typename var> RETVAR& VARBASE::operator++() & {
-VAR_TEMPLATE(VARBASE& VARBASE::operator++() &) {
+VAR_TEMPLATE(VBR VARBASE::operator++() &) {
 
 	// full check done below to avoid double checking number type
 	assertDefined(__PRETTY_FUNCTION__);
@@ -274,8 +271,7 @@ tryagain:
 
 // not returning void so is usable in expressions
 // no argument indicates that this is prefix override --var
-//template<typename var> RETVAR& VARBASE::operator--() & {
-VAR_TEMPLATE(VARBASE& VARBASE::operator--() &) {
+VAR_TEMPLATE(VBR VARBASE::operator--() &) {
 
 	// full check done below to avoid double checking number type
 	assertDefined(__PRETTY_FUNCTION__);
@@ -320,7 +316,7 @@ tryagain:
 
 // ADD VAR
 
-VAR_TEMPLATE(VARBASEREF VARBASE::operator+=(CBR rhs) &) {
+VAR_TEMPLATE(VBR VARBASE::operator+=(CBR rhs) &) {
 
 	rhs.assertNumeric(__PRETTY_FUNCTION__);
 
@@ -368,7 +364,7 @@ tryagain:
 
 // MULTIPLY VAR
 
-VAR_TEMPLATE(VARBASEREF VARBASE::operator*=(CBR rhs) &) {
+VAR_TEMPLATE(VBR VARBASE::operator*=(CBR rhs) &) {
 
 	rhs.assertNumeric(__PRETTY_FUNCTION__);
 
@@ -416,7 +412,7 @@ tryagain:
 
 // SUBTRACT VAR
 
-VAR_TEMPLATE(VARBASEREF VARBASE::operator-=(CBR rhs) &) {
+VAR_TEMPLATE(VBR VARBASE::operator-=(CBR rhs) &) {
 
 	rhs.assertNumeric(__PRETTY_FUNCTION__);
 
@@ -465,7 +461,7 @@ tryagain:
 
 // DIVIDE VAR
 
-VAR_TEMPLATE(VARBASEREF VARBASE::operator/=(CBR rhs) &) {
+VAR_TEMPLATE(VBR VARBASE::operator/=(CBR rhs) &) {
 
 	// Always returns a double because
 	// 10/3 must be 3.3333333
@@ -539,7 +535,7 @@ tryagain:
 
 // MODULO VAR
 
-VAR_TEMPLATE(VARBASEREF VARBASE::operator%=(CBR rhs) &) {
+VAR_TEMPLATE(VBR VARBASE::operator%=(CBR rhs) &) {
 	*this = this->mod(rhs);
 	return *this;
 }
@@ -550,7 +546,7 @@ VAR_TEMPLATE(VARBASEREF VARBASE::operator%=(CBR rhs) &) {
 
 // ADD DOUBLE
 
-VAR_TEMPLATE(VARBASEREF VARBASE::operator+=(const double dbl1) &) {
+VAR_TEMPLATE(VBR VARBASE::operator+=(const double dbl1) &) {
 
 tryagain:
 
@@ -581,7 +577,7 @@ tryagain:
 
 // MULTIPLY DOUBLE
 
-VAR_TEMPLATE(VARBASEREF VARBASE::operator*=(const double dbl1) &) {
+VAR_TEMPLATE(VBR VARBASE::operator*=(const double dbl1) &) {
 
 tryagain:
 
@@ -609,7 +605,7 @@ tryagain:
 
 // SUBTRACT DOUBLE
 
-VAR_TEMPLATE(VARBASEREF VARBASE::operator-=(const double dbl1) &) {
+VAR_TEMPLATE(VBR VARBASE::operator-=(const double dbl1) &) {
 
 tryagain:
 
@@ -638,7 +634,7 @@ tryagain:
 
 // DIVIDE DOUBLE
 
-VAR_TEMPLATE(VARBASEREF VARBASE::operator/=(const double dbl1) &) {
+VAR_TEMPLATE(VBR VARBASE::operator/=(const double dbl1) &) {
 
 	if (!dbl1)
 		UNLIKELY
@@ -672,7 +668,7 @@ tryagain:
 
 // MODULO DOUBLE
 
-VAR_TEMPLATE(VARBASEREF VARBASE::operator%=(const double rhs) &) {
+VAR_TEMPLATE(VBR VARBASE::operator%=(const double rhs) &) {
 	*this = this->mod(rhs);
 	return *this;
 }
@@ -683,7 +679,7 @@ VAR_TEMPLATE(VARBASEREF VARBASE::operator%=(const double rhs) &) {
 
 // ADD INT
 
-VAR_TEMPLATE(VARBASEREF VARBASE::operator+=(const int int1) &) {
+VAR_TEMPLATE(VBR VARBASE::operator+=(const int int1) &) {
 
 tryagain:
 
@@ -717,7 +713,7 @@ tryagain:
 
 // MULTIPLY INT
 
-VAR_TEMPLATE(VARBASEREF VARBASE::operator*=(const int int1) &) {
+VAR_TEMPLATE(VBR VARBASE::operator*=(const int int1) &) {
 
 tryagain:
 
@@ -751,7 +747,7 @@ tryagain:
 
 //SUBTRACT INT
 
-VAR_TEMPLATE(VARBASEREF VARBASE::operator-=(const int int1) &) {
+VAR_TEMPLATE(VBR VARBASE::operator-=(const int int1) &) {
 
 tryagain:
 
@@ -786,7 +782,7 @@ tryagain:
 
 //DIVIDE INT
 
-VAR_TEMPLATE(VARBASEREF VARBASE::operator/=(const int int1) &) {
+VAR_TEMPLATE(VBR VARBASE::operator/=(const int int1) &) {
 
 	// Always return double
 
@@ -822,7 +818,7 @@ tryagain:
 
 //MODULO INT
 
-VAR_TEMPLATE(VARBASEREF VARBASE::operator%=(const int rhs) &) {
+VAR_TEMPLATE(VBR VARBASE::operator%=(const int rhs) &) {
 	*this = this->mod(rhs);
 	return *this;
 }
@@ -833,7 +829,7 @@ VAR_TEMPLATE(VARBASEREF VARBASE::operator%=(const int rhs) &) {
 
 // ADD BOOL
 
-VAR_TEMPLATE(VARBASEREF VARBASE::operator+=(const bool bool1) &) {
+VAR_TEMPLATE(VBR VARBASE::operator+=(const bool bool1) &) {
 	if (bool1)
 		(*this)++;
 	else
@@ -843,7 +839,7 @@ VAR_TEMPLATE(VARBASEREF VARBASE::operator+=(const bool bool1) &) {
 
 // MULTIPLY BOOL
 
-VAR_TEMPLATE(VARBASEREF VARBASE::operator*=(const bool bool1) &) {
+VAR_TEMPLATE(VBR VARBASE::operator*=(const bool bool1) &) {
 	assertNumeric(__PRETTY_FUNCTION__);
 	if (!bool1) {
 		var_int = 0;
@@ -854,7 +850,7 @@ VAR_TEMPLATE(VARBASEREF VARBASE::operator*=(const bool bool1) &) {
 
 // SUBTRACT BOOL
 
-VAR_TEMPLATE(VARBASEREF VARBASE::operator-=(const bool bool1) &) {
+VAR_TEMPLATE(VBR VARBASE::operator-=(const bool bool1) &) {
 	if (bool1)
 		(*this)--;
 	else
@@ -901,16 +897,10 @@ VAR_TEMPLATE(RETVAR VARBASE::operator-() const) {
 // var^var we reassign the logical xor operator ^ to be string concatenate!!!
 // slightly wrong precedence but at least we have a reliable concat operator to replace the + which
 // is now reserved for forced ADDITION both according to fundamental PickOS principle
-//template RETVAR var_cat_var(CBR lhs, CBR rhs);
-//template<typename T> RETVAR var_cat_var(const T& lhs, const T& rhs) {
 RETVAR var_cat_var(CBR lhs, CBR rhs) {
-// Doesnt work because we need to template the whole of var_base<var> ... not just the var bit
-//template<typename var> var var_cat_var(const var_base<var>& lhs, const var_base<var>& rhs) {
 
 	lhs.assertString(__PRETTY_FUNCTION__);
 	rhs.assertString(__PRETTY_FUNCTION__);
-TRACE(lhs)
-TRACE(rhs)
 	// return lhs.var_str + rhs.var_str;
 
 	var result(lhs.var_str);
@@ -919,9 +909,6 @@ TRACE(rhs)
 	return result;
 }
 
-//var var_cat_cstr(CVR lhs, const char* rhs) {
-//template RETVAR var_cat_cstr(CBR lhs, const char* rhs);
-//template<typename T> RETVAR var_cat_cstr(const T& lhs, const char* rhs) {
 RETVAR var_cat_cstr(CBR lhs, const char* rhs) {
 
 	lhs.assertString(__PRETTY_FUNCTION__);
@@ -934,9 +921,6 @@ RETVAR var_cat_cstr(CBR lhs, const char* rhs) {
 	return result;
 }
 
-//var var_cat_char(CVR lhs, const char rhs) {
-//template RETVAR var_cat_char(CBR lhs, const char rhs);
-//template<typename T> RETVAR var_cat_char(const T& lhs, const char rhs) {
 RETVAR var_cat_char(CBR lhs, const char rhs) {
 
 	lhs.assertString(__PRETTY_FUNCTION__);
@@ -949,9 +933,6 @@ RETVAR var_cat_char(CBR lhs, const char rhs) {
 	return result;
 }
 
-//var cstr_cat_var(const char* lhs, CVR rhs) {
-//template RETVAR cstr_cat_var(const char* lhs, CBR rhs);
-//template<typename T> RETVAR cstr_cat_var(const char* lhs, const T& rhs) {
 RETVAR cstr_cat_var(const char* lhs, CBR rhs) {
 
 	rhs.assertString(__PRETTY_FUNCTION__);

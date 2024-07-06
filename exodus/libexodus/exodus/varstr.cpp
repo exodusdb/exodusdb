@@ -243,8 +243,8 @@ static bool locateat(const std::string& var_str, const std::string& target, size
 	size_t usingchar_len = usingchar.size();
 
 	// for use in AR/DR;
-	var_base<var> value;
-	var_base<var> target2;
+	var value;
+	var target2;
 	target2 = target;
 
 	// find the starting position of the value or return ""
@@ -1759,15 +1759,11 @@ VARREF var::substrer(const int startindex1, const int length) {
 //////
 //    ND var at(const int pos1) const;
 
-template var var_base<var>::operator[](const int pos1) const;
-template<typename var> var var_base<var>::operator[](const int pos1) const {
+VAR_TEMPLATE(RETVAR VARBASE::operator[](const int pos1) const) {
 	return this->at(pos1);
 }
 
-template var var_base<var>::at(const int charno) const;
-//template<typename T> T var_base<T>::at(const int charno) const {
-template<typename RETVAR> RETVAR VARBASE::at(const int charno) const {
-//template<typename var> var var_base<var>::at(const int charno) const {
+VAR_TEMPLATE(RETVAR VARBASE::at(const int charno) const) {
 
 	THISIS("var var::at(const int charno) const")
 	assertString(function_sig);
@@ -1825,8 +1821,8 @@ var var::mv(const char* opcode, CVR var2) const {
 	ISSTRING(var2)
 
 	var nrvo = "";
-	var_base<var> mv1;
-	var_base<var> mv2;
+	var mv1;
+	var mv2;
 	char separator1 = VM_;
 	char separator2 = VM_;
 
@@ -2319,8 +2315,5 @@ var var::sum(SV separator) const {
 	}
 	return nrvo;	//NRVO hopefully since single named return
 }
-
-//template var var_base<var>::at(const int) const;
-//var exodus::var_base<var>::at(int) const
 
 }  // namespace exodus

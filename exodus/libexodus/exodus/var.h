@@ -254,19 +254,18 @@ class var_proxy1;
 class var_proxy2;
 class var_proxy3;
 
-using VAR    = var;
-using VARREF = var&;
+using VAR    =       var;
+using VARREF =       var&;
 using CVR    = const var&;
-using TVR    = var&&;
-using SV     = std::string_view;
+using TVR    =       var&&;
+using SV     =       std::string_view;
 
-#define VARBASE var_base<var>
-#define VARBASEREF VARBASE&
-#define CBR const VARBASEREF
-#define TBR const VARBASEREF&
-//using RETVAR = var;
-//using RETVARREF = var&;
-#define RETVAR var
+// grep -P "VBR|CBR|TBR|RETVAR|VARBASE" -rl
+#define VARBASE   var_base<var>
+#define VBR       var_base<var>&
+#define CBR const var_base<var>&
+#define TBR       var_base<var>&&
+#define RETVAR    var
 #define RETVARREF var&
 
 // Define and instantiate a <var> template

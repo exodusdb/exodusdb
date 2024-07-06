@@ -147,7 +147,7 @@ static inline bool is_ascii(std::string_view str1) {
 }
 
 //int var::localeAwareCompare(const std::string& str1, const std::string& str2) {
-VAR_TEMPLATE(int var_base<var>::localeAwareCompare(const std::string& str1, const std::string& str2)) {
+VAR_TEMPLATE(int VARBASE::localeAwareCompare(const std::string& str1, const std::string& str2)) {
 	// https://www.boost.org/doc/libs/1_70_0/libs/locale/doc/html/collation.html
 	// eg ensure lower case sorts before uppercase (despite "A" \x41 is less than "a" \x61)
 	init_boost_locale1();
@@ -340,7 +340,7 @@ VARREF var::inputn(const int nchars) {
 	return *this;
 }
 
-VAR_TEMPLATE(bool var_base<var>::assigned() const) {
+VAR_TEMPLATE(bool VARBASE::assigned() const) {
 	// THISIS("bool var::assigned() const")
 
 	// treat undefined as unassigned
@@ -354,7 +354,7 @@ VAR_TEMPLATE(bool var_base<var>::assigned() const) {
 	return var_typ != VARTYP_UNA;
 }
 
-VAR_TEMPLATE(bool var_base<var>::unassigned() const) {
+VAR_TEMPLATE(bool VARBASE::unassigned() const) {
 	// see explanation above in assigned
 	// THISIS("bool var::unassigned() const")
 	// assertDefined(function_sig);
@@ -365,7 +365,7 @@ VAR_TEMPLATE(bool var_base<var>::unassigned() const) {
 	return !var_typ;
 }
 
-VAR_TEMPLATE(void var_base<var>::default_to(const var_base<var>& defaultvalue)) {
+VAR_TEMPLATE(void VARBASE::default_to(CBR defaultvalue)) {
 
 	// see explanation above in assigned
 	// assertDefined(function_sig);
@@ -386,8 +386,8 @@ VAR_TEMPLATE(void var_base<var>::default_to(const var_base<var>& defaultvalue)) 
 	return;// *this;
 }
 
-VAR_TEMPLATE(RETVAR var_base<var>::default_from(const var_base<var>& defaultvalue) const) {
-//template<> RETVAR var_base<var>::default_from(const var_base<var>& defaultvalue) const {
+VAR_TEMPLATE(RETVAR VARBASE::default_from(CBR defaultvalue) const) {
+//template<> RETVAR VARBASE::default_from(CBR defaultvalue) const {
 
 	THISIS("VARREF var::default_from(CVR defaultvalue)")
 	ISASSIGNED(defaultvalue)
@@ -408,7 +408,7 @@ VAR_TEMPLATE(RETVAR var_base<var>::default_from(const var_base<var>& defaultvalu
 //	return *presult;
 }
 
-VAR_TEMPLATE(char var_base<var>::toChar() const) {
+VAR_TEMPLATE(char VARBASE::toChar() const) {
 
 	THISIS("char var::toChar() const")
 	assertString(function_sig);
@@ -420,7 +420,7 @@ VAR_TEMPLATE(char var_base<var>::toChar() const) {
 }
 
 // temporary var can return move its string into the output
-VAR_TEMPLATE(std::string var_base<var>::toString() &&) {
+VAR_TEMPLATE(std::string VARBASE::toString() &&) {
 
 	THISIS("std::string var::toString() &&")
 	assertString(function_sig);
@@ -429,7 +429,7 @@ VAR_TEMPLATE(std::string var_base<var>::toString() &&) {
 }
 
 // non-temporary var can return a const ref to its string
-VAR_TEMPLATE(const std::string& var_base<var>::toString() const&) {
+VAR_TEMPLATE(const std::string& VARBASE::toString() const&) {
 
 	THISIS("std::string var::toString() const&")
 	assertString(function_sig);
@@ -516,13 +516,14 @@ var var::textlen() const {
 
 	var result = 0;
 	for (const char c : var_str) {
+		// Count bytes that dont start with 10 in the high end two bits, since these are utf-8 continuation bytes
 		result.var_int += (c & 0b1100'0000) != 0b1000'0000;
 		//std::cout << c << " " << std::bitset<8>(c) << " " << result.var_int << std::endl;
 	}
 	return result;
 }
 
-VAR_TEMPLATE(std::u32string var_base<var>::to_u32string() const) {
+VAR_TEMPLATE(std::u32string VARBASE::to_u32string() const) {
 
 	 THISIS("std::u32string var::to_u32string() const")
 	 assertString(function_sig);
@@ -535,7 +536,7 @@ VAR_TEMPLATE(std::u32string var_base<var>::to_u32string() const) {
 	return boost::locale::conv::utf_to_utf<char32_t>(var_str);
 }
 
-VAR_TEMPLATE(std::wstring var_base<var>::to_wstring() const) {
+VAR_TEMPLATE(std::wstring VARBASE::to_wstring() const) {
 
 	 THISIS("std::wstring var::to_wstring() const")
 	 assertString(function_sig);
@@ -548,7 +549,7 @@ VAR_TEMPLATE(std::wstring var_base<var>::to_wstring() const) {
 	return boost::locale::conv::utf_to_utf<wchar_t>(var_str);
 }
 
-VAR_TEMPLATE(void var_base<var>::from_u32string(std::u32string u32str) const) {
+VAR_TEMPLATE(void VARBASE::from_u32string(std::u32string u32str) const) {
 	// for speed, dont validate
 	// THISIS("void var::from_u32tring() const")
 	// assertDefined(function_sig);
@@ -558,7 +559,7 @@ VAR_TEMPLATE(void var_base<var>::from_u32string(std::u32string u32str) const) {
 }
 
 // CONSTRUCTOR from const std::u32string converts to utf-8
-VAR_TEMPLATE(var_base<var>::var_base(const std::wstring& wstr1)) {
+VAR_TEMPLATE(VARBASE::var_base(const std::wstring& wstr1)) {
 	var_typ = VARTYP_STR;
 	var_str = boost::locale::conv::utf_to_utf<char>(wstr1);
 }
@@ -1242,7 +1243,7 @@ VARREF pasterx(const int start1, const int length, const char* c) {
 };
 */
 
-VAR_TEMPLATE(var_base<var>& var_base<var>::move(var_base<var>& tovar)) {
+VAR_TEMPLATE(VBR VARBASE::move(VBR tovar)) {
 
 	THISIS("VARREF var::move(VARREF tovar)")
 	assertAssigned(function_sig);
@@ -1264,7 +1265,7 @@ VAR_TEMPLATE(var_base<var>& var_base<var>::move(var_base<var>& tovar)) {
 }
 
 // const version needed in calculatex
-VAR_TEMPLATE(const var_base<var>& var_base<var>::swap(const var_base<var>& var2) const) {
+VAR_TEMPLATE(CBR VARBASE::swap(CBR var2) const) {
 
 	THISIS("CVR var::swap(CVR var2) const")
 	// Works on unassigned vars
@@ -1293,7 +1294,7 @@ VAR_TEMPLATE(const var_base<var>& var_base<var>::swap(const var_base<var>& var2)
 }
 
 // non-const version
-VAR_TEMPLATE(var_base<var>& var_base<var>::swap(var_base<var>& var2)) {
+VAR_TEMPLATE(VBR VARBASE::swap(VBR var2)) {
 
 	THISIS("VARREF var::swap(VARREF var2)")
 	// Works on unassigned vars
@@ -1985,79 +1986,83 @@ var var::numberinwords(CVR langname_or_locale_id) {
 
 // clang-format off
 
-var var::ucase()     const& {return this->clone().ucaser();}
-var var::lcase()     const& {return this->clone().lcaser();}
-var var::tcase()     const& {return this->clone().tcaser();}
-var var::fcase()     const& {return this->clone().fcaser();}
-var var::normalize() const& {return this->clone().normalizer();}
-var var::invert()    const& {return this->clone().inverter();}
+// Many of the non-mutating functions are forwarded with a clone to the mutating function
 
-var var::lower()     const& {return this->clone().lowerer();}
-var var::raise()     const& {return this->clone().raiser();}
-var var::crop()      const& {return this->clone().cropper();}
+var var::ucase()                               const& {return this->clone().ucaser();}
+var var::lcase()                               const& {return this->clone().lcaser();}
+var var::tcase()                               const& {return this->clone().tcaser();}
+var var::fcase()                               const& {return this->clone().fcaser();}
+var var::normalize()                           const& {return this->clone().normalizer();}
+var var::invert()                              const& {return this->clone().inverter();}
 
-var var::quote()     const& {return this->clone().quoter();}
-var var::squote()    const& {return this->clone().squoter();}
-var var::unquote()   const& {return this->clone().unquoter();}
+var var::lower()                               const& {return this->clone().lowerer();}
+var var::raise()                               const& {return this->clone().raiser();}
+var var::crop()                                const& {return this->clone().cropper();}
 
-var var::convert(SV fromchars, SV tochars)                     const& {return this->clone().converter(fromchars,tochars);}
-var var::textconvert(SV fromchars, SV tochars)                 const& {return this->clone().textconverter(fromchars,tochars);}
-var var::parse(char sepchar)                                   const& {return this->clone().parser(sepchar);}
+var var::quote()                               const& {return this->clone().quoter();}
+var var::squote()                              const& {return this->clone().squoter();}
+var var::unquote()                             const& {return this->clone().unquoter();}
 
-var var::pop()                                                 const& {return this->clone().popper();}
+var var::convert(SV fromchars, SV tochars)     const& {return this->clone().converter(fromchars,tochars);}
+var var::textconvert(SV fromchars, SV tochars) const& {return this->clone().textconverter(fromchars,tochars);}
+var var::parse(char sepchar)                   const& {return this->clone().parser(sepchar);}
 
-var var::paste(const int pos1, const int length, SV insertstr) const& {return this->clone().paster(pos1, length, insertstr);}
-var var::paste(const int pos1, SV insertstr)                   const& {return this->clone().paster(pos1, insertstr);}
+var var::pop()                                 const& {return this->clone().popper();}
 
-ND VARREF var::ucase()     && {return ucaser();}
-ND VARREF var::lcase()     && {return lcaser();}
-ND VARREF var::tcase()     && {return tcaser();}
-ND VARREF var::fcase()     && {return fcaser();}
-ND VARREF var::normalize() && {return normalizer();}
-ND VARREF var::invert()    && {return inverter();}
+var var::paste(const int pos1, const int length, SV insertstr)
+                                               const& {return this->clone().paster(pos1, length, insertstr);}
+var var::paste(const int pos1, SV insertstr)   const& {return this->clone().paster(pos1, insertstr);}
 
-ND VARREF var::lower()     && {return lowerer();}
-ND VARREF var::raise()     && {return raiser();}
-ND VARREF var::crop()      && {return cropper();}
+// on temporaries the mutator function is called to avoid creating a temporary in many cases
 
-ND VARREF var::quote()     && {return quoter();}
-ND VARREF var::squote()    && {return squoter();}
-ND VARREF var::unquote()   && {return unquoter();}
+ND VARREF var::ucase()                                   && {return ucaser();}
+ND VARREF var::lcase()                                   && {return lcaser();}
+ND VARREF var::tcase()                                   && {return tcaser();}
+ND VARREF var::fcase()                                   && {return fcaser();}
+ND VARREF var::normalize()                               && {return normalizer();}
+ND VARREF var::invert()                                  && {return inverter();}
 
-ND VARREF var::trim(SV trimchars DEFAULT_SPACE)                      && {return trimmer(trimchars);}
-ND VARREF var::trimfirst(SV trimchars DEFAULT_SPACE)                 && {return trimmerfirst(trimchars);}
-ND VARREF var::trimlast(SV trimchars DEFAULT_SPACE)                  && {return trimmerlast(trimchars);}
-ND VARREF var::trimboth(SV trimchars DEFAULT_SPACE)                  && {return trimmerboth(trimchars);}
+ND VARREF var::lower()                                   && {return lowerer();}
+ND VARREF var::raise()                                   && {return raiser();}
+ND VARREF var::crop()                                    && {return cropper();}
 
-ND VARREF var::first()                                               && {return firster();}
-ND VARREF var::last()                                                && {return laster();}
-ND VARREF var::first(const size_t length)                            && {return firster(length);}
-ND VARREF var::last(const size_t length)                             && {return laster(length);}
-ND VARREF var::cut(const int length)                                 && {return cutter(length);}
-ND VARREF var::paste(const int pos1, const int length, SV insertstr) && {return paster(pos1, length, insertstr);}
-ND VARREF var::paste(const int pos1, SV insertstr)                   && {return paster(pos1, insertstr);}
-ND VARREF var::prefix(SV insertstr)                                  && {return prefixer(insertstr);}
-//ND VARREF append(SV appendstr) && {return appender(appendstr);}
-ND VARREF var::pop()                                                 && {return popper();}
+ND VARREF var::quote()                                   && {return quoter();}
+ND VARREF var::squote()                                  && {return squoter();}
+ND VARREF var::unquote()                                 && {return unquoter();}
+
+ND VARREF var::trim(     SV trimchars DEFAULT_SPACE)     && {return trimmer(trimchars);}
+ND VARREF var::trimfirst(SV trimchars DEFAULT_SPACE)     && {return trimmerfirst(trimchars);}
+ND VARREF var::trimlast( SV trimchars DEFAULT_SPACE)     && {return trimmerlast(trimchars);}
+ND VARREF var::trimboth( SV trimchars DEFAULT_SPACE)     && {return trimmerboth(trimchars);}
+
+ND VARREF var::first()                                   && {return firster();}
+ND VARREF var::last()                                    && {return laster();}
+ND VARREF var::first(const size_t length)                && {return firster(length);}
+ND VARREF var::last( const size_t length)                && {return laster(length);}
+ND VARREF var::cut(  const int    length)                && {return cutter(length);}
+ND VARREF var::paste(const int    pos1, const int length,
+                                        SV insertstr)    && {return paster(pos1, length, insertstr);}
+ND VARREF var::paste(const int    pos1, SV insertstr)    && {return paster(pos1, insertstr);}
+ND VARREF var::prefix(                  SV insertstr)    && {return prefixer(insertstr);}
+//ND VARREF append(SV appendstr)                         && {return appender(appendstr);}
+ND VARREF var::pop()                                     && {return popper();}
 
 ND VARREF var::fieldstore(SV sepchar, const int fieldno, const int nfields, CVR replacement)
-                                                                     && {return fieldstorer(sepchar, fieldno, nfields, replacement);}
-ND VARREF var::substr(const int pos1, const int length)              && {return substrer(pos1, length);}
-ND VARREF var::substr(const int pos1)                                && {return substrer(pos1);}
+                                                         && {return fieldstorer(sepchar, fieldno, nfields, replacement);}
 
-ND VARREF var::convert(SV fromchars, SV tochars)                     && {return converter(fromchars, tochars);}
-ND VARREF var::textconvert(SV fromchars, SV tochars)                 && {return textconverter(fromchars, tochars);}
-ND VARREF var::replace(SV fromstr, SV tostr)                         && {return replacer(fromstr, tostr);}
-ND VARREF var::replace(const rex& regex, SV replacement)
-                                                                     && {return replacer(regex, replacement);}
-ND VARREF var::unique()                       && {return uniquer();}
-ND VARREF var::sort(SV sepchar DEFAULT_FM)    && {return sorter(sepchar);}
-ND VARREF var::reverse(SV sepchar DEFAULT_FM) && {return reverser(sepchar);}
-ND VARREF var::shuffle(SV sepchar DEFAULT_FM) && {return shuffler(sepchar);}
-ND VARREF var::parse(char sepchar DEFAULT_FM) && {return parser(sepchar);}
+ND VARREF var::substr(const int pos1, const int length)  && {return substrer(pos1, length);}
+ND VARREF var::substr(const int pos1)                    && {return substrer(pos1);}
 
-// constructor
-//template       var_base<var>::var_base(const std::wstring& wstr1);
+ND VARREF var::convert(    SV fromchars, SV tochars)     && {return converter(fromchars, tochars);}
+ND VARREF var::textconvert(SV fromchars, SV tochars)     && {return textconverter(fromchars, tochars);}
+ND VARREF var::replace(    SV fromstr,   SV tostr)       && {return replacer(fromstr, tostr);}
+ND VARREF var::replace(const rex& regex, SV replacement) && {return replacer(regex, replacement);}
+
+ND VARREF var::unique()                                  && {return uniquer();}
+ND VARREF var::sort(   SV sepchar DEFAULT_FM)            && {return sorter(sepchar);}
+ND VARREF var::reverse(SV sepchar DEFAULT_FM)            && {return reverser(sepchar);}
+ND VARREF var::shuffle(SV sepchar DEFAULT_FM)            && {return shuffler(sepchar);}
+ND VARREF var::parse(char sepchar DEFAULT_FM)            && {return parser(sepchar);}
 
 // clang-format on
 
