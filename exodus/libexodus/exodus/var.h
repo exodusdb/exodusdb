@@ -45,7 +45,7 @@ THE SOFTWARE.
 #pragma GCC diagnostic ignored "-Winline"
 
 // Support var::format functions
-#if __GNUC__  > 10 || __clang_major__ > 1
+#if __GNUC__  > 11 || __clang_major__ > 1
 #	define EXO_FORMAT
 #	ifdef EXO_FORMAT
 #		pragma GCC diagnostic ignored "-Winline"
@@ -268,12 +268,21 @@ using SV     =       std::string_view;
 #define RETVAR    var
 #define RETVARREF var&
 
-// Define and instantiate a <var> template
+// Define a template member function and instantiate it.
+// Used for the many "var_base<var>::xxxxx()" template member functions.
+// Saves writing the function declaration again to instantiate it.
+// var_base<var> functions are instantiated for the library to avoid client code bloat.
+//
+// 1st line will instantiate the function.
+// 2nd line will declare the template member function.
+// The definition (body) of the template member function should follow, embraced in {}.
+//
+// Note that "var" in the 2nd line is acting as a template parameter
+// (not a concrete type) for the body of the template member function
+//
 #define VAR_TEMPLATE(...) \
-template PUBLIC \
-__VA_ARGS__;\
-template<typename var> PUBLIC \
-__VA_ARGS__
+template PUBLIC __VA_ARGS__;\
+template<typename var> PUBLIC __VA_ARGS__
 
 // original help from Thinking in C++ Volume 1 Chapter 12
 // http://www.camtp.uni-mb.si/books/Thinking-in-C++/TIC2Vone-distribution/html/Chapter12.html
