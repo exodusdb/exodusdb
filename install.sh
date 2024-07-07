@@ -67,7 +67,7 @@ set -euxo pipefail
 :
 : COMPILER
 :
-:	e.g. g++, clang, g++-14, clang-18, g++-latest, clang-latest
+:	e.g. g++, clang, g++-14, clang-18, g++-default, clang-default
 :
 :	If version no is omitted, the default for the OS will be used.
 :
@@ -93,8 +93,8 @@ set -euxo pipefail
 	fi
 
 	# duplicate code in install.sh and install_lxc.sh
-	if [[ ! $COMPILER =~ ^((g\+\+)|(clang))(-(([0-9]+)|min|latest))?$ ]]; then
-		echo COMPILER must be g++ or clang. Optionally followed by a version e.g. g++-12, clang-12, g++-latest, clang-latest, g++-min, clang-min
+	if [[ ! $COMPILER =~ ^((g\+\+)|(clang))(-(([0-9]+)|min|default))?$ ]]; then
+		echo COMPILER must be g++ or clang. Optionally followed by a version e.g. g++-12, clang-12, g++-default, clang-default, g++-min, clang-min
 		exit 1
 	fi
 
@@ -130,22 +130,6 @@ set -euxo pipefail
 	while ! ls /var/cache/apt/*.bin 2> /dev/null && ! sudo apt-get -y update; do
 		sleep 1
 	done
-
-#:
-#: Determine actual compiler version if min/latest requested
-#: ------------------------------------------------------
-#:
-#	COMPILER_VERSION=`echo $COMPILER | cut -d'-' -f2`
-#	if [[ $COMPILER_VERSION =~ ^(min|latest)$ ]]; then
-#		COMPILER_NAME=`echo $COMPILER|cut -d'-' -f1`
-#		if [[ $COMPILER_VERSION = latest ]]; then
-#			HEAD_OR_TAIL=tail
-#		else
-#			HEAD_OR_TAIL=head
-#		fi
-#		COMPILER_VERSION=`apt search $COMPILER_NAME |& grep "$COMPILER_NAME-[0-9][0-9.]*" -o | grep '[0-9]*' -o|sort -n|uniq|$HEAD_OR_TAIL -n1`
-#		COMPILER=$COMPILER_NAME-$COMPILER_VERSION
-#	fi
 
 :
 : -----------------------------------------
@@ -290,16 +274,16 @@ function get_dependencies_for_build_and_install {
 	sudo apt-get install -y cmake
 
 :
-: Determine actual compiler version if min/latest requested
+: Determine actual compiler version if min/default requested
 : ------------------------------------------------------
 :
 	COMPILER_VERSION=`echo $COMPILER | cut -d'-' -f2`
-	if [[ $COMPILER_VERSION =~ ^(min|latest)$ ]]; then
+	if [[ $COMPILER_VERSION != default ]]; then
 		COMPILER_NAME=`echo $COMPILER|cut -d'-' -f1`
-		if [[ $COMPILER_VERSION = latest ]]; then
-			HEAD_OR_TAIL=tail
-		else
+		if [[ $COMPILER_VERSION = min ]]; then
 			HEAD_OR_TAIL=head
+		else
+			HEAD_OR_TAIL=tail
 		fi
 		COMPILER_VERSION=`apt search $COMPILER_NAME |& grep "$COMPILER_NAME-[0-9][0-9.]*" -o | grep '[0-9]*' -o|sort -n|uniq|$HEAD_OR_TAIL -n1`
 		COMPILER=$COMPILER_NAME-$COMPILER_VERSION
@@ -426,6 +410,7 @@ function build_and_install {
 ##		git submodule foreach git checkout master
 #		git submodule foreach git pull origin master
 		git submodule update --remote --merge
+		git submodule status
 #   fi
 
 :

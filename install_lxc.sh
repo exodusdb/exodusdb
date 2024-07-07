@@ -34,7 +34,7 @@ set -euxo pipefail
 :
 : COMPILER
 :
-:	e.g. g++, g++-14, g++-latest, clang, clang-18, clang latest etc.
+:	e.g. g++, g++-14, g++-default, clang, clang-18, clang default etc.
 :
 :	More info in install.sh
 :
@@ -77,8 +77,8 @@ set -euxo pipefail
 	fi
 :
 	# duplicate code in install.sh and install_lxc.sh
-	if [[ ! $COMPILER =~ ^((g\+\+)|(clang))(-(([0-9]+)|min|latest))?$ ]]; then
-		echo COMPILER must be g++ or clang. Optionally followed by a version e.g. g++-12, clang-12, g++-latest, clang-latest, g++-min, clang-min
+	if [[ ! $COMPILER =~ ^((g\+\+)|(clang))(-(([0-9]+)|min|default))?$ ]]; then
+		echo COMPILER must be g++ or clang. Optionally followed by a version e.g. g++-12, clang-12, g++-default, clang-default, g++-min, clang-min
 		exit 1
 	fi
 :
