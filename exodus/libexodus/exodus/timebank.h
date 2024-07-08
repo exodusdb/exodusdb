@@ -26,7 +26,7 @@ auto get_timeacno(const char* /*arg1*/) -> int {return 0;}
 #include <array>
 #include <cstring> // for strcmp
 
-namespace exodus {
+namespace exo {
 
 void get_timeacc0();
 
@@ -296,6 +296,6 @@ auto get_timeacno(const char* arg1) -> int {
 	return acno + 499;
 }
 
-} // namespace exodus
+} // namespace exo
 #endif // EXODUS_TIMEBANK
 #endif // EXODUS_LIBEXODUS_EXODUS_TIMEBANK_H_

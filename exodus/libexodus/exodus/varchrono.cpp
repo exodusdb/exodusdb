@@ -107,7 +107,7 @@ static constexpr std::string_view longdayofweeks =
 //};
 //
 
-namespace exodus {
+namespace exo {
 
 // time_t -> pick integer date, time
 void time_t_to_pick_date_time(const time_t time, int* pick_date, int* pick_time) noexcept {
@@ -790,6 +790,6 @@ after_analyse_conversion:
 }
 #pragma GCC diagnostic pop
 
-}  // namespace exodus
+}  // namespace exo
 
 #endif

@@ -60,8 +60,8 @@ without the above pragma, in msvc 2005+ you get an error when compiling librarie
 (exodus external subroutines) in the libraryexit() line containing "&ExodusProgram::main;" as
 follows:
 
-f1.cpp(12) : error C2440: 'type cast' : cannot convert from 'exodus::var (__this
-call ExodusProgram::* )(exodus::in)' to 'exodus::pExodusProgramBaseMemberFunction';
+f1.cpp(12) : error C2440: 'type cast' : cannot convert from 'exo::var (__this
+call ExodusProgram::* )(exo::in)' to 'exo::pExodusProgramBaseMemberFunction';
 Pointers to members have different representations; cannot cast between them
 */
 

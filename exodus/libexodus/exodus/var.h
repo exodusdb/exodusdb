@@ -228,7 +228,7 @@ inline const char VISIBLE_ST_ = '~';
 
 #pragma clang diagnostic push
 
-namespace exodus {
+namespace exo {
 
 #ifdef EXO_CONCEPTS
 	template <typename T>
@@ -245,7 +245,9 @@ namespace exodus {
 //#define SMALLEST_NUMBER 1e-4d//0.0001 for pickos compatibility
 constexpr double SMALLEST_NUMBER = 0.0001;// for pickos compatibility
 
+//class var_base;
 class var;
+template<typename var> class var_mid; // forward declaration of a class template
 class dim;
 class rex;
 class var_iter;
@@ -260,13 +262,38 @@ using CVR    = const var&;
 using TVR    =       var&&;
 using SV     =       std::string_view;
 
+// Inside class var_base
+//using VAR    =       var_base;
+//using VARREF =       var_base&;
+//using CVR    = const var_base&;
+//using TVR    =       var_base&&;
+
 // grep -P "VBR|CBR|TBR|RETVAR|VARBASE" -rl
-#define VARBASE   var_base<var>
-#define VBR       var_base<var>&
-#define CBR const var_base<var>&
-#define TBR       var_base<var>&&
-#define RETVAR    var
-#define RETVARREF var&
+#define VARBASEX   var_base<var>
+#define VARBASE    var_base<var_mid<exo::var>>
+#define VARBASE1   var_base<var_mid<exo::var>>
+#define VARBASE2   var_base<var>
+//#define VARBASE   var_base<var>
+
+#define VBR1      var_base<var_mid<var>>&
+#define VBR2      var_base<var>& // var=T
+#define CBR const var_base<var_mid<exo::var>>&
+#define TBR       var_base<var_mid<exo::var>>&&
+#define CBQ	CBR
+
+#define VBX       var_base&
+#define CBX const var_base&
+#define TBX const var_base&&
+
+#define RETVAR    exo::var
+#define RETVARREF exo::var&
+
+//// Define and instantiate a <var> template
+//#define VAR_TEMPLATE(...) \
+//template PUBLIC \
+//__VA_ARGS__;\
+//template<typename var> PUBLIC \
+//__VA_ARGS__
 
 // Define a template member function and instantiate it.
 // Used for the many "var_base<var>::xxxxx()" template member functions.
@@ -283,6 +310,7 @@ using SV     =       std::string_view;
 #define VAR_TEMPLATE(...) \
 template PUBLIC __VA_ARGS__;\
 template<typename var> PUBLIC __VA_ARGS__
+//template<> PUBLIC __VA_ARGS__
 
 // original help from Thinking in C++ Volume 1 Chapter 12
 // http://www.camtp.uni-mb.si/books/Thinking-in-C++/TIC2Vone-distribution/html/Chapter12.html
@@ -376,7 +404,8 @@ class PUBLIC var_base {
 
  public:
 
-	friend var; // Does this actually do anything useful? var already inherits access to all var_base protected members
+	//friend class var; // Does this actually do anything useful? var already inherits access to all var_base protected members
+	friend class var_mid<var>; // Does this actually do anything useful? var already inherits access to all var_base protected members
 
 	/////////////////////////
 	// 1. Default constructor
@@ -1192,7 +1221,7 @@ class PUBLIC var_base {
 
 	// Named member function identical to operator[]
 	//ND RETVAR at(const int pos1) const;
-	ND var at(const int pos1) const;
+	ND RETVAR at(const int pos1) const;
 
 	// as of now, sadly the following all works EXCEPT that var[99].anymethod() doesnt work
 	// so would have to implement all var methods and free functions on the proxy object
@@ -1404,28 +1433,28 @@ class PUBLIC var_base {
 
 	// Specialisations for speed
 
-	friend bool var_eq_dbl (      CBR     lhs,   const double dbl1 );
-	friend bool var_eq_int (      CBR     lhs,   const int    int1 );
-	friend bool var_eq_bool(      CBR     lhs,   const bool   bool1);
+	friend bool var_eq_dbl (      CBQ     lhs,   const double dbl1 );
+	friend bool var_eq_int (      CBQ     lhs,   const int    int1 );
+	friend bool var_eq_bool(      CBQ     lhs,   const bool   bool1);
 
-	friend bool var_lt_int (      CBR     lhs,   const int    int1 );
-	friend bool int_lt_var (const int    int1,        CBR     rhs  );
+	friend bool var_lt_int (      CBQ     lhs,   const int    int1 );
+	friend bool int_lt_var (const int    int1,        CBQ     rhs  );
 
-	friend bool var_lt_dbl (      CBR     lhs,   const double dbl1 );
-	friend bool dbl_lt_var (const double dbl1,        CBR     rhs  );
+	friend bool var_lt_dbl (      CBQ     lhs,   const double dbl1 );
+	friend bool dbl_lt_var (const double dbl1,        CBQ     rhs  );
 
-	friend bool var_lt_bool (      CBR    lhs,   const bool   bool1) = delete;
-	friend bool bool_lt_var (const bool  bool1,       CBR     rhs  ) = delete;
+	friend bool var_lt_bool (      CBQ    lhs,   const bool   bool1) = delete;
+	friend bool bool_lt_var (const bool  bool1,       CBQ     rhs  ) = delete;
 
 	// Concatenation
 
-	friend RETVAR var_cat_var(       CBR   lhs,       CBR    rhs);
+	friend RETVAR var_cat_var(       CBQ   lhs,       CBQ    rhs);
 
 	// Specialisations for speed
 
-	friend RETVAR var_cat_cstr(      CBR   lhs, const char* rhs);
-	friend RETVAR var_cat_char(      CBR   lhs, const char  rhs);
-	friend RETVAR cstr_cat_var(const char* lhs,       CBR   rhs);
+	friend RETVAR var_cat_cstr(      CBQ   lhs, const char* rhs);
+	friend RETVAR var_cat_char(      CBQ   lhs, const char  rhs);
+	friend RETVAR cstr_cat_var(const char* lhs,       CBQ   rhs);
 
 	//friend var operator""_var(const char* cstr, std::size_t size);
 
@@ -1438,7 +1467,11 @@ class PUBLIC var_base {
 	// Implementations are in varfriends_impl.h included in var.cpp
 
 #define VAR_FRIEND friend
+#undef TBR
+#define TBR var_base&&
 #include "varfriends.h"
+#undef TBR
+#define TBR var_base<var_mid<var>>&&
 //#include "varfriends_impl.h"
 
 #pragma GCC diagnostic pop
@@ -1516,7 +1549,7 @@ class PUBLIC var_base {
 	// Currently this is required in rare cases where functions like exoprog::calculate
 	// temporarily require member variables to be something else but switch back before exiting
 	// if such function throws then it would leave the member variables in a changed state.
-	CBR swap(CBR var2) const;//version that works on const vars
+	CBQ swap(CVR var2) const;//version that works on const vars
 	VARREF swap(VARREF var2);//version that works on non-const vars
 
 	// Converts to var
@@ -1529,7 +1562,7 @@ class PUBLIC var_base {
 	ND RETVAR first_(int nchars) const;
 
 	// Needed in operator%
-	ND RETVAR mod(CBR divisor) const;
+	ND RETVAR mod(CVR divisor) const;
 	ND RETVAR mod(double divisor) const;
 	ND RETVAR mod(const int divisor) const;
 
@@ -1641,9 +1674,35 @@ protected:
 
 };
 
+template <typename var>
+class var_mid : public var_base<var_mid<var>> {
+
+public:
+
+	//friend class var;// Does this achieve anything?
+
+	// Inherit constructors
+	using var_base<var_mid<var>>::var_base;
+
+    // Implicitly convert var_base to var
+    operator var() &{
+        // Clone, like most var_base functions returns a var since var's are var_base's but not vice versa
+        return this->clone();
+    }
+
+    operator var() && {
+        // Clone, like most var_base functions returns a var since var's are var_base's but not vice versa
+        return this->clone(); // TODO move/steal
+    }
+};
+
 // class var
 // using CRTP to capture a customised base class that knows what a var is
-class PUBLIC var : public var_base<var> {
+class PUBLIC var : public var_mid<var> {
+
+//// class var
+//// using CRTP to capture a customised base class that knows what a var is
+//class PUBLIC var : public var_base<var> {
 
 	using VARREF = var&;
 	using CVR    = const var&;
@@ -1656,7 +1715,8 @@ class PUBLIC var : public var_base<var> {
 public:
 
 	// Inherit all constructors from var_base
-	using var_base::var_base;
+//	using var_base::var_base;
+	using var_mid<var>::var_mid;
 
 	////////////////////////////////////////////
 	// GENERAL CONSTRUCTOR FROM INITIALIZER LIST
@@ -1690,15 +1750,15 @@ public:
 	// TODO is this UB if var is not exactly a var_base?
 //	operator var_base<var>() const {
 //		// Compiles with a warning:
-//		// warning: converting ‘exodus::var’ to a base class ‘exodus::var_base<exodus::var>’
+//		// warning: converting ‘exo::var’ to a base class ‘exo::var_base<exo::var>’
 //		// will never use a type conversion operator [-Wclass-conversion]
 //		// BUT causes compile errors in cpp files where "++x" is used as an argument.
-//		// error: invalid initialization of reference of type ‘exodus::CVR’ {aka ‘const exodus::var&’}
-//		// from expression of type ‘exodus::var_base<exodus::var>’
+//		// error: invalid initialization of reference of type ‘exo::CVR’ {aka ‘const exo::var&’}
+//		// from expression of type ‘exo::var_base<exo::var>’
 //		return *static_cast<const var_base<var>*>(this);
 //	}
 //	operator const var_base<var>&() const {
-//		// warning: converting ‘exodus::var’ to a reference to a base class ‘exodus::var_base<exodus::var>’
+//		// warning: converting ‘exo::var’ to a reference to a base class ‘exo::var_base<exo::var>’
 //		// will never use a type conversion operator [-Wclass-conversion]
 //		return *static_cast<const var_base<var>*>(this);
 //	}
@@ -2109,8 +2169,8 @@ template<class... Args>
 	ND CONSTEXPR
 	var format(EXO_FORMAT_STRING_TYPE1&& fmt_str, Args&&... args) const {
 
-//error: call to consteval function 'fmt::basic_format_string<char, exodus::var &>
-//::basic_format_string<fmt::basic_format_string<char, const exodus::var &>, 0>' is not a constant expression
+//error: call to consteval function 'fmt::basic_format_string<char, exo::var &>
+//::basic_format_string<fmt::basic_format_string<char, const exo::var &>, 0>' is not a constant expression
 // 2033 |                         return fmt::format(fmt_str, *this, args... );
 //      |                                            ^
 
@@ -2122,7 +2182,7 @@ template<class... Args>
 #endif
 // OK in 2404 g++ but not OK in 2404 clang
 // clang on 22.04 cannot accept compile time format string even if a cstr
-///root/exodus/test/src/test_format.cpp:14:18: error: call to consteval function 'fmt::basic_format_string<char, exodus::var>::basic_format_string<ch
+///root/exodus/test/src/test_format.cpp:14:18: error: call to consteval function 'fmt::basic_format_string<char, exo::var>::basic_format_string<ch
 //ar[7], 0>' is not a constant expression
 //        assert(x.format("{:.2f}").outputl() == "12.35");
 
@@ -2551,7 +2611,7 @@ class PUBLIC var_proxy1 {
 
  private:
 
-	exodus::var& var_;
+	exo::var& var_;
 	mutable int fn_;
 
 	var_proxy1() = delete;
@@ -2622,16 +2682,16 @@ class PUBLIC var_proxy1 {
 	// xxx(fn)[cn]
 	// DONT change deprecation wordng without also changing it in cli/fixdeprecated
 	[[deprecated ("EXODUS: Replace single character accessors like xxx[n] with xxx.at(n)")]]
-	ND exodus::var operator[](const int pos1) const {
+	ND RETVAR operator[](const int pos1) const {
 		return this->at(pos1);
 	}
 
 	// TODO replace .f with a version of .f that returns a string_view
 	// instead of wasting time constructing a temporary var only to extract a single char from it
-	ND var at(const int pos1) const {
+	ND RETVAR at(const int pos1) const {
 		//return var_.f(fn_).at(pos1);
 		// TODO work out why this workaround is required
-		exodus::var v1 = var_.f(fn_);
+		RETVAR v1 = var_.f(fn_);
 		return v1.at(pos1);
 	}
 
@@ -2643,7 +2703,7 @@ class PUBLIC var_proxy2 {
  
  private:
 
-	exodus::var& var_;
+	exo::var& var_;
 	mutable int fn_;
 	mutable int vn_;
 
@@ -2673,7 +2733,7 @@ class PUBLIC var_proxy2 {
 
 	ND var at(const int pos1) const {
 		//return var_.f(fn_, vn_).at(pos1);
-		exodus::var v1 = var_.f(fn_, vn_);
+		RETVAR v1 = var_.f(fn_, vn_);
 		return v1.at(pos1);
 	}
 
@@ -2685,7 +2745,7 @@ class PUBLIC var_proxy3 {
 
  private:
 
-	exodus::var& var_;
+	exo::var& var_;
 	mutable int fn_;
 	mutable int vn_;
 	mutable int sn_;
@@ -2715,7 +2775,7 @@ class PUBLIC var_proxy3 {
 
     ND var at(const int pos1) const {
 		//return var_.f(fn_, vn_, sn_).at(pos1);
-		exodus::var v1 = var_.f(fn_, vn_, sn_);
+		RETVAR v1 = var_.f(fn_, vn_, sn_);
 		return v1.at(pos1);
     }
 
@@ -2819,7 +2879,7 @@ PUBLIC var operator""_var(unsigned long long int i);
 // 123.456_var
 PUBLIC var operator""_var(long double d);
 
-template<typename var> RETVAR VARBASE::clone() const {
+template<typename var> RETVAR VARBASEX::clone() const {
 
 	RETVAR rvo;
 	rvo.var_typ = var_typ;
@@ -2837,7 +2897,7 @@ template<typename var> RETVAR VARBASE::clone() const {
 	// to something, probably zero.
 	//
 	// Avoid triggering a compiler warning
-	// warning: ‘<anonymous>.exodus::var::var_dbl’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+	// warning: ‘<anonymous>.exo::var::var_dbl’ may be used uninitialized in this function [-Wmaybe-uninitialized]
 	if (var_typ) {
 		rvo.var_int = var_int;
 		rvo.var_dbl = var_dbl;
@@ -2847,7 +2907,7 @@ template<typename var> RETVAR VARBASE::clone() const {
 }
 
 // basic string function on var_base for throwing errors
-template<typename var> RETVAR VARBASE::first_(int nchars) const {
+template<typename var> RETVAR VARBASEX::first_(int nchars) const {
 	assertString(__PRETTY_FUNCTION__);
 	if (nchars < static_cast<int>(var_str.size()))
 		return var_str.substr(0, nchars);
@@ -2860,7 +2920,7 @@ template<typename var> RETVAR VARBASE::first_(int nchars) const {
 //#define VAR_FRIEND
 //#include "varfriends.h"
 
-}  // namespace exodus
+}  // namespace exo
 
 
 #endif //EXODUS_LIBEXODUS_EXODUS_VAR_H_

@@ -28,7 +28,7 @@ THE SOFTWARE.
 // one based two dimensional array but (0,0) is a separate element set or got if either or both
 // index is zero
 
-namespace exodus {
+namespace exo {
 
 // User defined literal "_rex"
 
@@ -48,4 +48,4 @@ ND rex operator""_rex(const char* cstr, std::size_t size) {
 }
 
 
-}  // namespace exodus
+}  // namespace exo

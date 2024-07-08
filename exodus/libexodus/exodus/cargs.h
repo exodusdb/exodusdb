@@ -7,7 +7,7 @@
 
 #include <exodus/var.h>
 
-namespace exodus {
+namespace exo {
 
 //Cargs is a class to create temporary argv (char*[]) from a var string
 //that will autodestruct when out of scope and not leak memory
@@ -45,6 +45,6 @@ class Cargs {
 	}
 };
 
-}  // namespace exodus
+}  // namespace exo
 
 #endif

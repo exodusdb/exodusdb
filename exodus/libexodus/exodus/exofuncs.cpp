@@ -49,7 +49,7 @@ THE SOFTWARE.
 #define DEFAULT_M1
 #define DEFAULT_FALSE
 
-namespace exodus {
+namespace exo {
 
 //ND PUBLIC var var::format(SV format_str) const {
 //	return vformat(format_str,*this);
@@ -594,4 +594,4 @@ if(bytes >= 0)
 return bytes;
 */
 
-}  // namespace exodus
+}  // namespace exo

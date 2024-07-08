@@ -28,7 +28,7 @@
 // avoid this unless absolutely necessary then possible to move this file out of exodus var library
 //(stick to throwing VarError with a suitable error message)
 
-namespace exodus {
+namespace exo {
 
 //int getprocessno(const char* filename, int* fd);
 //bool processno_islocked2(int processno, int* fd);
@@ -86,4 +86,4 @@ bool ExoEnv::init(const int threadno) {
 //	return processno_islocked2(processno, &processnolockfd);
 //}
 
-}  // namespace exodus
+}  // namespace exo

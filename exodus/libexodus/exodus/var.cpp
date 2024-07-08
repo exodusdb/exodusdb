@@ -26,7 +26,7 @@ THE SOFTWARE.
 //#include <exodus/varimpl.h>
 #include <exodus/exoimpl.h>
 
-namespace exodus {
+namespace exo {
 
 // Note: VAR_TEMPLATE both defines and instantiates an instance of the member function for var_base<var>::xxxxxxxxxxx
 
@@ -35,40 +35,48 @@ namespace exodus {
 #else
 #	define NORETURN [[noreturn]]
 #endif
-VAR_TEMPLATE(NORETURN void VARBASE::throwUndefined(CBR message) const) {
+template NORETURN void VARBASE1::throwUndefined(const VARBASE1& message) const;
+template<typename var> NORETURN void VARBASE2::throwUndefined(const VARBASE2& message) const {
 	throw VarUndefined(message);
 }
 
-VAR_TEMPLATE(NORETURN void VARBASE::throwUnassigned(CBR message) const) {
+template NORETURN void VARBASE1::throwUnassigned(const VARBASE1& message) const;
+template<typename var> NORETURN void VARBASE2::throwUnassigned(const VARBASE2& message) const {
 	throw VarUnassigned(message);
 }
 
-VAR_TEMPLATE(NORETURN void VARBASE::throwNonNumeric(CBR message) const) {
+template NORETURN void VARBASE1::throwNonNumeric(const VARBASE1& message) const;
+template<typename var> NORETURN void VARBASE2::throwNonNumeric(const VARBASE2& message) const {
 	throw VarNonNumeric(message);
 }
 
-VAR_TEMPLATE(NORETURN void VARBASE::throwNonPositive(CBR message) const) {
+template NORETURN void VARBASE1::throwNonPositive(const VARBASE1& message) const;
+template<typename var> NORETURN void VARBASE2::throwNonPositive(const VARBASE2& message) const {
 	throw VarNonPositive(message);
 }
 
-VAR_TEMPLATE(NORETURN void VARBASE::throwNumOverflow(CBR message) const) {
+template NORETURN void VARBASE1::throwNumOverflow(const VARBASE1& message) const;
+template<typename var> NORETURN void VARBASE2::throwNumOverflow(const VARBASE2& message) const {
 	throw VarNumOverflow(message);
 }
 
-VAR_TEMPLATE(NORETURN void VARBASE::throwNumUnderflow(CBR message) const) {
+template NORETURN void VARBASE1::throwNumUnderflow(const VARBASE1& message) const;
+template<typename var> NORETURN void VARBASE2::throwNumUnderflow(const VARBASE2& message) const {
 	throw VarNumUnderflow(message);
 }
 
-VAR_TEMPLATE(RETVAR VARBASE::dump() const) {
+template RETVAR VARBASE1::dump() const;
+template<typename var> RETVAR VARBASE2::dump() const {
 	var nrvo = "var: ";
 
 	if (var_typ & VARTYP_STR)
-		nrvo ^= "str: " _DQ ^ var(var_str).first(1024).convert(_ALL_FMS, _VISIBLE_FMS) ^ _DQ " ";
+		nrvo ^= "str: " _DQ ^ var_base(var_str).first_(1024).convert(_ALL_FMS, _VISIBLE_FMS) ^ _DQ " ";
 	if (var_typ & VARTYP_INT)
-		nrvo ^= "int:" ^ var(var_int) ^ " ";
+		nrvo ^= "int:" ^ var_base(var_int) ^ " ";
 	if (var_typ & VARTYP_DBL)
-		nrvo ^= "dbl:" ^ var(var_dbl) ^ " ";
-	nrvo ^= "typ:" ^ (var(int(var_typ)).oconv("MB").trimfirst("0") + 0);
+		nrvo ^= "dbl:" ^ var_base(var_dbl) ^ " ";
+//	nrvo ^= "typ:" ^ (var_base(int(var_typ)).oconv("MB").trimfirst("0") + 0);
+	nrvo ^= "typ:" ^ (var_base(int(var_typ))/*.oconv("MB").trimfirst("0") + 0*/);
 	return nrvo;
 }
 
@@ -143,4 +151,4 @@ var VarError::stack(const size_t limit) const {
 #define VAR_FRIEND
 #include "varfriends_impl.h"
 
-}  // namespace exodus
+}  // namespace exo

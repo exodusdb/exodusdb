@@ -4,7 +4,7 @@
 #include <exodus/var.h>
 #include <exodus/varerr.h>
 
-namespace exodus {
+namespace exo {
 
 	// clang-format off
 
@@ -24,6 +24,6 @@ namespace exodus {
 
 	// clang-format on
 
-} // namespace exodus
+} // namespace exo
 
 #endif // EXODUS_LIBEXODUS_EXODUS_VARIMPL_H_

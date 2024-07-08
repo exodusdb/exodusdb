@@ -410,7 +410,7 @@ function main() {
 	}
 
 	{
-		// Check exodus::textwidth which uses OS wcswidth function except that control characters count as zero
+		// Check exo::textwidth which uses OS wcswidth function except that control characters count as zero
 
 		// Implementation of os wcswidth for terminal output of wide characters
 		// https://mitchellh.com/writing/grapheme-clusters-in-terminals

@@ -368,60 +368,60 @@ subroutine test2(in as, in bs) {
 		//we resolved the issue here by being specific about the namespace
 
 		//trig on integers
-		TRACE(exodus::sin(30))
-		TRACE(exodus::cos(30))
-		TRACE(exodus::tan(30))
-		TRACE(exodus::atan(1))
-		assert(exodus::sin(30).round(8)   eq 0.5);
-		assert(exodus::cos(60).round(8)   eq 0.5);
-		assert(exodus::tan(45).round(8)   eq 1);
-		assert(exodus::atan(1).round(6)   eq 45);
+		TRACE(exo::sin(30))
+		TRACE(exo::cos(30))
+		TRACE(exo::tan(30))
+		TRACE(exo::atan(1))
+		assert(exo::sin(30).round(8)   eq 0.5);
+		assert(exo::cos(60).round(8)   eq 0.5);
+		assert(exo::tan(45).round(8)   eq 1);
+		assert(exo::atan(1).round(6)   eq 45);
 		//trig on doubles
-		assert(exodus::sin(30.0).round(8) eq 0.5);
-		assert(exodus::cos(60.0).round(8) eq 0.5);
-		assert(exodus::tan(45.0).round(8) eq 1);
-		assert(exodus::atan(1.0).round(6) eq 45);
+		assert(exo::sin(30.0).round(8) eq 0.5);
+		assert(exo::cos(60.0).round(8) eq 0.5);
+		assert(exo::tan(45.0).round(8) eq 1);
+		assert(exo::atan(1.0).round(6) eq 45);
 
 		// abs positives
-		assert(exodus::abs(0)      eq 0);
-		assert(exodus::abs(30)     eq 30);
-		assert(exodus::abs(30.00)  eq 30);
-		assert(exodus::abs(30.10)  eq 30.1);
-		assert(exodus::abs(30.90)  eq 30.9);
+		assert(exo::abs(0)      eq 0);
+		assert(exo::abs(30)     eq 30);
+		assert(exo::abs(30.00)  eq 30);
+		assert(exo::abs(30.10)  eq 30.1);
+		assert(exo::abs(30.90)  eq 30.9);
 
-		assert(exodus::abs(0.01) eq 0.01);
-		assert(exodus::abs(0.001) eq 0.001);
-		assert(exodus::abs(0.0001) eq 0.0001);
-		assert(exodus::abs(0.00001) eq 0.00001);
-		assert(exodus::abs(0.000001) eq 0.000001);
-		assert(exodus::abs(0.0000001) eq 0.0000001);
-		assert(exodus::abs(0.00000001) eq 0.00000001);
-		assert(exodus::abs(0.000000001) eq 0.000000001);
+		assert(exo::abs(0.01) eq 0.01);
+		assert(exo::abs(0.001) eq 0.001);
+		assert(exo::abs(0.0001) eq 0.0001);
+		assert(exo::abs(0.00001) eq 0.00001);
+		assert(exo::abs(0.000001) eq 0.000001);
+		assert(exo::abs(0.0000001) eq 0.0000001);
+		assert(exo::abs(0.00000001) eq 0.00000001);
+		assert(exo::abs(0.000000001) eq 0.000000001);
 
 		//abs negatives
-		assert(exodus::abs(-0)     eq 0);
-		assert(exodus::abs(-30)    eq 30);
-		assert(exodus::abs(-30.00) eq 30);
-		assert(exodus::abs(-30.10) eq 30.1);
-		assert(exodus::abs(-30.90) eq 30.9);
+		assert(exo::abs(-0)     eq 0);
+		assert(exo::abs(-30)    eq 30);
+		assert(exo::abs(-30.00) eq 30);
+		assert(exo::abs(-30.10) eq 30.1);
+		assert(exo::abs(-30.90) eq 30.9);
 
-		assert(exodus::abs(-0.01) eq 0.01);
-		assert(exodus::abs(-0.001) eq 0.001);
-		assert(exodus::abs(-0.0001) eq 0.0001);
-		assert(exodus::abs(-0.00001) eq 0.00001);
-		assert(exodus::abs(-0.000001) eq 0.000001);
-		assert(exodus::abs(-0.0000001) eq 0.0000001);
-		assert(exodus::abs(-0.00000001) eq 0.00000001);
-		assert(exodus::abs(-0.000000001) eq 0.000000001);
+		assert(exo::abs(-0.01) eq 0.01);
+		assert(exo::abs(-0.001) eq 0.001);
+		assert(exo::abs(-0.0001) eq 0.0001);
+		assert(exo::abs(-0.00001) eq 0.00001);
+		assert(exo::abs(-0.000001) eq 0.000001);
+		assert(exo::abs(-0.0000001) eq 0.0000001);
+		assert(exo::abs(-0.00000001) eq 0.00000001);
+		assert(exo::abs(-0.000000001) eq 0.000000001);
 
 		// exponents and roots on integers and doubls
-		assert(exodus::exp(1).round(9)            eq 2.718281828);
-		assert(exodus::exp(1.0).round(9)          eq 2.718281828);
-		assert(exodus::loge(1)                    eq 0);
-		assert(exodus::loge(2.718281828).round(9) eq 1);
-		assert(exodus::loge(10).round(9)          eq 2.302585093);
-		assert(exodus::sqrt(100)                  eq 10);
-		assert(exodus::sqrt(100.0)                eq 10);
+		assert(exo::exp(1).round(9)            eq 2.718281828);
+		assert(exo::exp(1.0).round(9)          eq 2.718281828);
+		assert(exo::loge(1)                    eq 0);
+		assert(exo::loge(2.718281828).round(9) eq 1);
+		assert(exo::loge(10).round(9)          eq 2.302585093);
+		assert(exo::sqrt(100)                  eq 10);
+		assert(exo::sqrt(100.0)                eq 10);
 
 		var dividend = 100;
 		TRACE(mod(dividend, 30))

@@ -32,7 +32,7 @@ THE SOFTWARE.
 // 2643383279502884197169399375105820974944592307816406286208998f;
 #endif
 
-namespace exodus {
+namespace exo {
 
 // Some template instatiations are at the end of this file
 
@@ -94,7 +94,8 @@ static varint_t exodusmodulo_int(const varint_t dividend, const varint_t limit) 
 	return result;
 }
 
-VAR_TEMPLATE(RETVAR VARBASE::mod(CBR limit) const) {
+template RETVAR VARBASE1::mod(CBX limit) const;
+template<typename var> RETVAR VARBASE2::mod(CBX limit) const {
 
 	THISIS("var var::mod(CVR limit) const")
 	assertNumeric(function_sig);
@@ -127,7 +128,8 @@ mod_doubles:
 }
 
 
-VAR_TEMPLATE(RETVAR VARBASE::mod(double limit) const) {
+template RETVAR VARBASE1::mod(double limit) const;
+template<typename var> RETVAR VARBASE2::mod(double limit) const {
 
 	THISIS("var var::mod(double limit) const")
 	assertNumeric(function_sig);
@@ -143,7 +145,8 @@ VAR_TEMPLATE(RETVAR VARBASE::mod(double limit) const) {
 }
 
 
-VAR_TEMPLATE(RETVAR VARBASE::mod(const int limit) const) {
+template RETVAR VARBASE1::mod(const int limit) const;
+template<typename var> RETVAR VARBASE2::mod(const int limit) const {
 
 	THISIS("var var::mod(const int limit) const")
 	assertNumeric(function_sig);
@@ -277,4 +280,4 @@ var var::exp() const {
 		return std::exp(static_cast<double>(var_int));
 }
 
-} // namespace exodus
+} // namespace exo

@@ -79,8 +79,8 @@ dictexit(bbb)
 // http://www.parashift.com/c++-faq-lite/pointers-to-members.html#faq-33.6
 #define CALLMEMBERFUNCTION(object, ptrToMember) ((object).*(ptrToMember))
 
-namespace exodus {
-// using namespace exodus;
+namespace exo {
+// using namespace exo;
 
 class ExodusProgramBase;
 class ExoEnv;
@@ -143,8 +143,8 @@ class PUBLIC Callable {
 		So we will be getting the following warning which will have to ignored.
 
 		warning: cast between incompatible pointer to member types from
-		‘exodus::pExodusProgramBaseMemberFunction’ {aka ‘exodus::var (exodus::ExodusProgramBase::*)()’} to
-		        ‘pExodusProgramBaseMemberFunction’ {aka ‘exodus::var (exodus::ExodusProgramBase::*)(const exodus::var&)’}
+		‘exo::pExodusProgramBaseMemberFunction’ {aka ‘exo::var (exo::ExodusProgramBase::*)()’} to
+		        ‘pExodusProgramBaseMemberFunction’ {aka ‘exo::var (exo::ExodusProgramBase::*)(const exo::var&)’}
 
 		We can ignore such warnings using something like [-Wcast-function-type] in gcc and clang.
 
@@ -241,6 +241,6 @@ private:
 
 };
 
-}  // namespace exodus
+}  // namespace exo
 
 #endif // EXODUS_LIBEXODUS_EXODUS_EXOCALLABLE_H_

@@ -89,7 +89,7 @@ allowing it to interface correctly with UTF-8, UTF-16, and UTF-32 data:
 
 #include <exodus/rex.h>
 
-namespace exodus {
+namespace exo {
 
 ///////////////////
 // rex constructors
@@ -825,4 +825,4 @@ ND rex operator""_rex(const char* cstr, std::size_t size) {
 	return rex(std::string_view(cstr, size));
 }
 
-} // namespace exodus
+} // namespace exo

@@ -6,7 +6,7 @@
 #include <exodus/var.h>
 #include <exoprog.h>
 
-namespace exodus {
+namespace exo {
 
 
 bool var::isterminal() const {
@@ -115,4 +115,4 @@ void ExodusProgramBase::setprompt(CVR /*prompt*/) const {
 	return;
 }
 
-}  // namespace exodus
+}  // namespace exo

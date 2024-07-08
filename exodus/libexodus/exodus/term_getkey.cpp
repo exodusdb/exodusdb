@@ -16,7 +16,7 @@
 // it turns ECHO off and turns ECHO ON afterwards
 //
 
-namespace exodus {
+namespace exo {
 
 char getkey(void) {
 	char ch = 0;
@@ -76,4 +76,4 @@ int main()
 }
 */
 
-}  // namespace exodus
+}  // namespace exo

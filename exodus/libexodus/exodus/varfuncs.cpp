@@ -112,7 +112,7 @@ Binary    Hex          Comments
 
 // TODO check that all string increase operations dont crash the system
 
-namespace exodus {
+namespace exo {
 
 // output/errput/logput not threadsafe but probably not a problem
 //inline std::mutex global_mutex_threadstream;
@@ -147,7 +147,8 @@ static inline bool is_ascii(std::string_view str1) {
 }
 
 //int var::localeAwareCompare(const std::string& str1, const std::string& str2) {
-VAR_TEMPLATE(int VARBASE::localeAwareCompare(const std::string& str1, const std::string& str2)) {
+template int VARBASE1::localeAwareCompare(const std::string& str1, const std::string& str2);
+template<typename var> int VARBASE2::localeAwareCompare(const std::string& str1, const std::string& str2) {
 	// https://www.boost.org/doc/libs/1_70_0/libs/locale/doc/html/collation.html
 	// eg ensure lower case sorts before uppercase (despite "A" \x41 is less than "a" \x61)
 	init_boost_locale1();
@@ -340,7 +341,8 @@ VARREF var::inputn(const int nchars) {
 	return *this;
 }
 
-VAR_TEMPLATE(bool VARBASE::assigned() const) {
+template bool VARBASE1::assigned() const;
+template<typename var> bool VARBASE2::assigned() const {
 	// THISIS("bool var::assigned() const")
 
 	// treat undefined as unassigned
@@ -354,7 +356,8 @@ VAR_TEMPLATE(bool VARBASE::assigned() const) {
 	return var_typ != VARTYP_UNA;
 }
 
-VAR_TEMPLATE(bool VARBASE::unassigned() const) {
+template bool VARBASE1::unassigned() const;
+template<typename var> bool VARBASE2::unassigned() const {
 	// see explanation above in assigned
 	// THISIS("bool var::unassigned() const")
 	// assertDefined(function_sig);
@@ -365,7 +368,8 @@ VAR_TEMPLATE(bool VARBASE::unassigned() const) {
 	return !var_typ;
 }
 
-VAR_TEMPLATE(void VARBASE::default_to(CBR defaultvalue)) {
+template void VARBASE1::default_to(CBX defaultvalue);
+template<typename var> void VARBASE2::default_to(CBX defaultvalue) {
 
 	// see explanation above in assigned
 	// assertDefined(function_sig);
@@ -386,7 +390,8 @@ VAR_TEMPLATE(void VARBASE::default_to(CBR defaultvalue)) {
 	return;// *this;
 }
 
-VAR_TEMPLATE(RETVAR VARBASE::default_from(CBR defaultvalue) const) {
+template RETVAR VARBASE1::default_from(CBX defaultvalue) const;
+template<typename var> RETVAR VARBASE2::default_from(CBX defaultvalue) const {
 //template<> RETVAR VARBASE::default_from(CBR defaultvalue) const {
 
 	THISIS("VARREF var::default_from(CVR defaultvalue)")
@@ -398,17 +403,18 @@ VAR_TEMPLATE(RETVAR VARBASE::default_from(CBR defaultvalue) const) {
 		// Compiles but doesnt work
 //		return static_cast<var>(defaultvalue);
 //		return static_cast<const var>(defaultvalue);
-		return *static_cast<const var*>(&defaultvalue);
+		return *static_cast<const exo::var*>(&defaultvalue);
 	} else {
 		// Compiles but doesnt work
 //		return static_cast<const var>(*this);
 //		return static_cast<var>(*this);
-		return *static_cast<const var*>(this);
+		return *static_cast<const exo::var*>(this);
 	}
 //	return *presult;
 }
 
-VAR_TEMPLATE(char VARBASE::toChar() const) {
+template char VARBASE1::toChar() const;
+template<typename var> char VARBASE2::toChar() const {
 
 	THISIS("char var::toChar() const")
 	assertString(function_sig);
@@ -420,7 +426,8 @@ VAR_TEMPLATE(char VARBASE::toChar() const) {
 }
 
 // temporary var can return move its string into the output
-VAR_TEMPLATE(std::string VARBASE::toString() &&) {
+template std::string VARBASE1::toString() &&;
+template<typename var> std::string VARBASE2::toString() && {
 
 	THISIS("std::string var::toString() &&")
 	assertString(function_sig);
@@ -429,7 +436,8 @@ VAR_TEMPLATE(std::string VARBASE::toString() &&) {
 }
 
 // non-temporary var can return a const ref to its string
-VAR_TEMPLATE(const std::string& VARBASE::toString() const&) {
+template const std::string& VARBASE1::toString() const&;
+template<typename var> const std::string& VARBASE2::toString() const& {
 
 	THISIS("std::string var::toString() const&")
 	assertString(function_sig);
@@ -523,7 +531,8 @@ var var::textlen() const {
 	return result;
 }
 
-VAR_TEMPLATE(std::u32string VARBASE::to_u32string() const) {
+template std::u32string VARBASE1::to_u32string() const;
+template<typename var> std::u32string VARBASE2::to_u32string() const {
 
 	 THISIS("std::u32string var::to_u32string() const")
 	 assertString(function_sig);
@@ -536,7 +545,8 @@ VAR_TEMPLATE(std::u32string VARBASE::to_u32string() const) {
 	return boost::locale::conv::utf_to_utf<char32_t>(var_str);
 }
 
-VAR_TEMPLATE(std::wstring VARBASE::to_wstring() const) {
+template std::wstring VARBASE1::to_wstring() const;
+template<typename var> std::wstring VARBASE2::to_wstring() const {
 
 	 THISIS("std::wstring var::to_wstring() const")
 	 assertString(function_sig);
@@ -549,7 +559,8 @@ VAR_TEMPLATE(std::wstring VARBASE::to_wstring() const) {
 	return boost::locale::conv::utf_to_utf<wchar_t>(var_str);
 }
 
-VAR_TEMPLATE(void VARBASE::from_u32string(std::u32string u32str) const) {
+template void VARBASE1::from_u32string(std::u32string u32str) const;
+template<typename var> void VARBASE2::from_u32string(std::u32string u32str) const {
 	// for speed, dont validate
 	// THISIS("void var::from_u32tring() const")
 	// assertDefined(function_sig);
@@ -559,7 +570,8 @@ VAR_TEMPLATE(void VARBASE::from_u32string(std::u32string u32str) const) {
 }
 
 // CONSTRUCTOR from const std::u32string converts to utf-8
-VAR_TEMPLATE(VARBASE::var_base(const std::wstring& wstr1)) {
+template VARBASE1::var_base(const std::wstring& wstr1);
+template<typename var> VARBASE2::var_base(const std::wstring& wstr1) {
 	var_typ = VARTYP_STR;
 	var_str = boost::locale::conv::utf_to_utf<char>(wstr1);
 }
@@ -1243,7 +1255,8 @@ VARREF pasterx(const int start1, const int length, const char* c) {
 };
 */
 
-VAR_TEMPLATE(VBR VARBASE::move(VBR tovar)) {
+template VBR1 VARBASE1::move(VBX tovar);
+template<typename var> VBR2 VARBASE2::move(VBX tovar) {
 
 	THISIS("VARREF var::move(VARREF tovar)")
 	assertAssigned(function_sig);
@@ -1265,7 +1278,8 @@ VAR_TEMPLATE(VBR VARBASE::move(VBR tovar)) {
 }
 
 // const version needed in calculatex
-VAR_TEMPLATE(CBR VARBASE::swap(CBR var2) const) {
+template CBR VARBASE1::swap(CBX var2) const;
+template<typename var> CBR VARBASE2::swap(CBX var2) const {
 
 	THISIS("CVR var::swap(CVR var2) const")
 	// Works on unassigned vars
@@ -1294,7 +1308,8 @@ VAR_TEMPLATE(CBR VARBASE::swap(CBR var2) const) {
 }
 
 // non-const version
-VAR_TEMPLATE(VBR VARBASE::swap(VBR var2)) {
+template VBR1 VARBASE1::swap(VBX var2);
+template<typename var> VBR2 VARBASE2::swap(VBX var2) {
 
 	THISIS("VARREF var::swap(VARREF var2)")
 	// Works on unassigned vars
@@ -2066,4 +2081,4 @@ ND VARREF var::parse(char sepchar DEFAULT_FM)            && {return parser(sepch
 
 // clang-format on
 
-}  // namespace exodus
+}  // namespace exo

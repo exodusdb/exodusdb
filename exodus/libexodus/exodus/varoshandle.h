@@ -15,7 +15,7 @@
 #include <string>
 #include <vector>
 
-namespace exodus {
+namespace exo {
 
 using CACHED_HANDLE = void*;
 using DELETER_AND_DESTROYER = void (*)(CACHED_HANDLE);
@@ -49,6 +49,6 @@ extern
 #endif								  // INSIDE_VAR_OSHANDLE_CPP
 	thread_local VarOSHandlesCache mv_handles_cache;  // global table (intended usage: mvos.cpp and mvdbpostgres.cpp)
 
-}  // namespace exodus
+}  // namespace exo
 
 #endif  // EXODUS_LIBEXODUS_EXODUS_VAROSHANDLE_H_

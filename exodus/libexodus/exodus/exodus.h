@@ -48,7 +48,7 @@ THE SOFTWARE.
 //
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wheader-hygiene"
-using namespace exodus;
+using namespace exo;
 #pragma clang diagnostic pop
 
 #endif	// EXODUS_LIBEXODUS_EXODUS_EXODUS_H_

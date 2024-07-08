@@ -10,7 +10,7 @@
 #include <exodus/var.h>
 #include <exodus/timebank.h>
 
-namespace exodus {
+namespace exo {
 
 void get_timeacc0();
 
@@ -208,5 +208,5 @@ void get_timeacc0() {
 	{Timer {0};}
 }
 
-} // namespace exodus
+} // namespace exo
 #endif // EXODUS_TIMEBANK

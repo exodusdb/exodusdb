@@ -28,7 +28,7 @@ THE SOFTWARE.
 #include <var.h>
 #include <varerr.h>
 
-namespace exodus {
+namespace exo {
 
 // NOTE: INSTANTIATIONS ARE AT THE END OF THIS FILE
 
@@ -179,7 +179,7 @@ bool var_eq_var(CBR lhs, CBR rhs) {
 
 				//return (lhs.var_int == rhs.var_dbl);
 				//return (std::abs(lhs.var_dbl - static_cast<double>(rhs.var_int)) < SMALLEST_NUMBER);
-				// warning: conversion from ‘exodus::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
+				// warning: conversion from ‘exo::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
 				return almost_equal(lhs.var_dbl, static_cast<double>(rhs.var_int));
 			}
 			// std::unreachable();
@@ -195,7 +195,7 @@ bool var_eq_var(CBR lhs, CBR rhs) {
 			//return (std::abs(static_cast<double>(lhs.var_int) - rhs.var_dbl) < SMALLEST_NUMBER);
 			//return almost_equal(lhs.var_int, rhs.var_dbl, 2);
 			//put lhs int 2nd argument to invoke the fastest implmentation
-			// warning: conversion from ‘exodus::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
+			// warning: conversion from ‘exo::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
 			return almost_equal(rhs.var_dbl, static_cast<double>(lhs.var_int));
 		}
 
@@ -473,7 +473,7 @@ bool var_eq_dbl(CBR lhs, const double rhs_dbl) {
 			//return almost_equal(lhs.var_int, rhs.var_dbl, 2);
 			//put lhs int 2nd argument to invoke the fastest implmentation
 			//std::clog << "var_eq_dbl 3. lhs int " << lhs.var_int << " compare to double " << rhs_dbl << std::endl;
-			// warning: conversion from ‘exodus::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
+			// warning: conversion from ‘exo::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
 			return almost_equal(static_cast<double>(lhs.var_int), rhs_dbl);
 
 		}
@@ -596,4 +596,4 @@ bool int_lt_var (const int    lhs, CBR          rhs );
 bool dbl_lt_var (const double lhs, CBR          rhs );
 //clang-format on
 
-} // namespace exodus
+} // namespace exo

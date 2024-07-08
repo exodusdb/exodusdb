@@ -5,7 +5,7 @@
 
 #include <exodus/var.h>
 
-namespace exodus {
+namespace exo {
 
 // Note that "for (var& var1: dim1)" with & allows direct access and update into the elements of the array dim1 via varx
 // whereas "for (var var1 : dim1)" gives a copy of each element which is slower allows updating var1 without updating dim1
@@ -244,7 +244,7 @@ friend class var;
 
 }; // class dim
 
-} // namespace exodus
+} // namespace exo
 
 #endif //VARDIM_H
 
