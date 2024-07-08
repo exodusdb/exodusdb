@@ -1464,7 +1464,7 @@ var var::first(const size_t  length) const& {
 	// of negative ints to size_t. Runtime error
 	if (length > std::string::npos >> 1)
 		UNLIKELY
-		throwNonPositive(__PRETTY_FUNCTION__);
+		throw VarNonPositive(__PRETTY_FUNCTION__);
 
 	// Return a new var with the required number of chars from this or all
 	return var(this->var_str.data(), std::min(length, this->var_str.size()));
@@ -1482,7 +1482,7 @@ VARREF var::firster(const size_t length) {
 	// of negative ints to size_t. Runtime error
 	if (length > std::string::npos >> 1)
 		UNLIKELY
-		throwNonPositive(__PRETTY_FUNCTION__);
+		throw VarNonPositive(__PRETTY_FUNCTION__);
 
 	// Reduce the size of this string if necessary
 	if (length < this->var_str.size()) {
@@ -1536,7 +1536,7 @@ var var::last(const size_t  length) const& {
 	// of negative ints to size_t. Runtime error
 	if (length > std::string::npos >> 1)
 		UNLIKELY
-		throwNonPositive(__PRETTY_FUNCTION__);
+		throw VarNonPositive(__PRETTY_FUNCTION__);
 
 	// Example "abc".last(2)
 	// min of 2, 3 -> 2 for copylen
@@ -1566,7 +1566,7 @@ VARREF var::laster(const size_t length) {
 	// of negative ints to size_t. Runtime error
 	if (length > std::string::npos >> 1)
 		UNLIKELY
-		throwNonPositive(__PRETTY_FUNCTION__);
+		throw VarNonPositive(__PRETTY_FUNCTION__);
 
 	// Example "abc".last(2)
 	// 2 < 3
