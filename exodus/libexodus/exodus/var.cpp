@@ -30,41 +30,6 @@ namespace exo {
 
 // Note: VAR_TEMPLATE both defines and instantiates an instance of the member function for var_base<var>::xxxxxxxxxxx
 
-#if __clang_major__
-#	define NORETURN
-#else
-#	define NORETURN [[noreturn]]
-#endif
-template NORETURN void VARBASE1::throwUndefined(const VARBASE1& message) const;
-template<typename var> NORETURN void VARBASE2::throwUndefined(const VARBASE2& message) const {
-	throw VarUndefined(message);
-}
-
-template NORETURN void VARBASE1::throwUnassigned(const VARBASE1& message) const;
-template<typename var> NORETURN void VARBASE2::throwUnassigned(const VARBASE2& message) const {
-	throw VarUnassigned(message);
-}
-
-template NORETURN void VARBASE1::throwNonNumeric(const VARBASE1& message) const;
-template<typename var> NORETURN void VARBASE2::throwNonNumeric(const VARBASE2& message) const {
-	throw VarNonNumeric(message);
-}
-
-template NORETURN void VARBASE1::throwNonPositive(const VARBASE1& message) const;
-template<typename var> NORETURN void VARBASE2::throwNonPositive(const VARBASE2& message) const {
-	throw VarNonPositive(message);
-}
-
-template NORETURN void VARBASE1::throwNumOverflow(const VARBASE1& message) const;
-template<typename var> NORETURN void VARBASE2::throwNumOverflow(const VARBASE2& message) const {
-	throw VarNumOverflow(message);
-}
-
-template NORETURN void VARBASE1::throwNumUnderflow(const VARBASE1& message) const;
-template<typename var> NORETURN void VARBASE2::throwNumUnderflow(const VARBASE2& message) const {
-	throw VarNumUnderflow(message);
-}
-
 template RETVAR VARBASE1::dump() const;
 template<typename var> RETVAR VARBASE2::dump() const {
 	var nrvo = "var: ";

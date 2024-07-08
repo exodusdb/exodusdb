@@ -628,7 +628,7 @@ class PUBLIC var_base {
 		if (std::is_unsigned<Integer>::value) {
 			if (this->var_int < 0)
 				[[unlikely]]
-				throwNumOverflow(var_base(__PRETTY_FUNCTION__)/*.field(";", 1)*/);
+				throw VarNumOverflow(var_base(__PRETTY_FUNCTION__)/*.field(";", 1)*/);
 		}
 	}
 
@@ -659,10 +659,10 @@ class PUBLIC var_base {
 		if (std::is_same<FloatingPoint, long double>::value) {
 			if (rhs > VAR_MAX_DOUBLE)
 				[[unlikely]]
-				throwNumOverflow(var_base(__PRETTY_FUNCTION__)/*.field(";", 1)*/);
+				throw VarNumOverflow(var_base(__PRETTY_FUNCTION__)/*.field(";", 1)*/);
 			if (rhs < VAR_LOW_DOUBLE)
 				[[unlikely]]
-				throwNumUnderflow(var_base(__PRETTY_FUNCTION__)/*.field(";", 1)*/);
+				throw VarNumUnderflow(var_base(__PRETTY_FUNCTION__)/*.field(";", 1)*/);
 		}
 	}
 
@@ -894,7 +894,7 @@ class PUBLIC var_base {
 		if (std::is_unsigned<Integer>::value) {
 			if (this->var_int < 0)
 				[[unlikely]]
-				throwNonPositive(__PRETTY_FUNCTION__);
+				throw VarNonPositive(__PRETTY_FUNCTION__);
 		}
 		// Similar code in constructor(int) operator=(int) and int()
 
@@ -1090,7 +1090,7 @@ class PUBLIC var_base {
 		if (std::is_unsigned<Integer>::value) {
 			if (this->var_int < 0)
 				[[unlikely]]
-				throwNumOverflow(var_base(__PRETTY_FUNCTION__)/*.field(";", 1)*/);
+				throw VarNumOverflow(var_base(__PRETTY_FUNCTION__)/*.field(";", 1)*/);
 		}
 
 	}
@@ -1579,20 +1579,13 @@ class PUBLIC var_base {
 
 protected:
 
-	[[noreturn]] void throwUndefined(CVR message) const;
-	[[noreturn]] void throwUnassigned(CVR message) const;
-	[[noreturn]] void throwNonNumeric(CVR message) const;
-	[[noreturn]] void throwNonPositive(CVR message) const;
-	[[noreturn]] void throwNumOverflow(CVR message) const;
-	[[noreturn]] void throwNumUnderflow(CVR message) const;
-
 	// WARNING: MUST NOT use any var when checking Undefined
 	// OTHERWISE *WILL* get recursion/segfault
 	CONSTEXPR
 	void assertDefined(const char* message, const char* varname = "") const {
 		if (var_typ & VARTYP_MASK)
 			[[unlikely]]
-			throwUndefined(var_base(varname) ^ " in " ^ message);
+			throw VarUndefined(std::string(varname) + " in " + message);
 	}
 
 	CONSTEXPR
@@ -1653,7 +1646,7 @@ protected:
 		if (!(var_typ & VARTYP_STR)) {
 			if (!var_typ)
 				[[unlikely]]
-				throwUnassigned(var_base(varname) ^ " in " ^ message);
+				throw VarUnassigned(var_base(varname) ^ " in " ^ message);
 			this->createString();
 		}
 	}
