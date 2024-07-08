@@ -363,7 +363,7 @@ static void SIGINT_handler(int sig [[maybe_unused]]) {
 			fflush(stderr);			// duplicated in init and B
 
 			// Backtrace
-			err.stack().convert(FM, "\n").errputl();
+			var(err.stack()).convert(FM, "\n").errputl();
 
 		} else if (cmd1 == "D") {
 

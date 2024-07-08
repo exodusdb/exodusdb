@@ -88,26 +88,26 @@ void save_stack_addresses();
 
 // clang-format off
 
-VarUnassigned      ::VarUnassigned      (CBR errmsg) : VarError("VarUnassigned:"       ^ errmsg) {}
-VarDivideByZero    ::VarDivideByZero    (CBR errmsg) : VarError("VarDivideByZero:"     ^ errmsg) {}
-VarNonNumeric      ::VarNonNumeric      (CBR errmsg) : VarError("VarNonNumeric:"       ^ errmsg) {}
-VarNonPositive     ::VarNonPositive     (CBR errmsg) : VarError("VarNonPositive:"      ^ errmsg) {}
-VarNumOverflow     ::VarNumOverflow     (CBR errmsg) : VarError("VarNumOverflow:"      ^ errmsg) {}
-VarNumUnderflow    ::VarNumUnderflow    (CBR errmsg) : VarError("VarNumUnderflow:"     ^ errmsg) {}
-VarUndefined       ::VarUndefined       (CBR errmsg) : VarError("VarUndefined:"        ^ errmsg) {}
-VarOutOfMemory     ::VarOutOfMemory     (CBR errmsg) : VarError("VarOutOfMemory:"      ^ errmsg) {}
-VarInvalidPointer  ::VarInvalidPointer  (CBR errmsg) : VarError("VarInvalidPointer:"   ^ errmsg) {}
-VarDBException     ::VarDBException     (CBR errmsg) : VarError("VarDBException:"      ^ errmsg) {}
-VarNotImplemented  ::VarNotImplemented  (CBR errmsg) : VarError("VarNotImplemented:"   ^ errmsg) {}
-VarDebug           ::VarDebug           (CBR errmsg) : VarError("VarDebug"             ^ errmsg) {}
+VarUnassigned      ::VarUnassigned      (std::string errmsg) : VarError("VarUnassigned:"       + errmsg) {}
+VarDivideByZero    ::VarDivideByZero    (std::string errmsg) : VarError("VarDivideByZero:"     + errmsg) {}
+VarNonNumeric      ::VarNonNumeric      (std::string errmsg) : VarError("VarNonNumeric:"       + errmsg) {}
+VarNonPositive     ::VarNonPositive     (std::string errmsg) : VarError("VarNonPositive:"      + errmsg) {}
+VarNumOverflow     ::VarNumOverflow     (std::string errmsg) : VarError("VarNumOverflow:"      + errmsg) {}
+VarNumUnderflow    ::VarNumUnderflow    (std::string errmsg) : VarError("VarNumUnderflow:"     + errmsg) {}
+VarUndefined       ::VarUndefined       (std::string errmsg) : VarError("VarUndefined:"        + errmsg) {}
+VarOutOfMemory     ::VarOutOfMemory     (std::string errmsg) : VarError("VarOutOfMemory:"      + errmsg) {}
+VarInvalidPointer  ::VarInvalidPointer  (std::string errmsg) : VarError("VarInvalidPointer:"   + errmsg) {}
+VarDBException     ::VarDBException     (std::string errmsg) : VarError("VarDBException:"      + errmsg) {}
+VarNotImplemented  ::VarNotImplemented  (std::string errmsg) : VarError("VarNotImplemented:"   + errmsg) {}
+VarDebug           ::VarDebug           (std::string errmsg) : VarError("VarDebug"             + errmsg) {}
 
-DimNotDimensioned  ::DimNotDimensioned  (CBR errmsg) : VarError("DimNotDimensioned"    ^ errmsg) {}
-DimDimensionedZero ::DimDimensionedZero (CBR errmsg) : VarError("DimDimensionedZero:"  ^ errmsg) {}
-DimIndexOutOfBounds::DimIndexOutOfBounds(CBR errmsg) : VarError("DimIndexOutOfBounds:" ^ errmsg) {}
+DimNotDimensioned  ::DimNotDimensioned  (std::string errmsg) : VarError("DimNotDimensioned"    + errmsg) {}
+DimDimensionedZero ::DimDimensionedZero (std::string errmsg) : VarError("DimDimensionedZero:"  + errmsg) {}
+DimIndexOutOfBounds::DimIndexOutOfBounds(std::string errmsg) : VarError("DimIndexOutOfBounds:" + errmsg) {}
 
 // clang-format on
 
-VarError::VarError(CVR description_)
+VarError::VarError(std::string description_)
 	: description(description_) {
 	// *** WARNING ***
 	// any errors in this constructor
@@ -132,13 +132,13 @@ VarError::VarError(CVR description_)
 	// otherwise allow catch at a higher level or terminate
 	var exo_debug;
 	if (exo_debug.osgetenv("EXO_DEBUG") and exo_debug) {
-		description.errputl("\n");
-		stack().convert(FM, "\n").errputl();
+		var(description).errputl("\n");
+		var(stack()).convert(FM, "\n").errputl();
 		debug();
 	}
 }
 
-var VarError::stack(const size_t limit) const {
+std::string VarError::stack(const size_t limit) const {
 
 	// Convert the stack addresses into source code lines
 	return exo_backtrace(stack_addresses_, stack_size_, limit);

@@ -207,10 +207,10 @@ programinit()
 		assert(false);
 	} catch (VarUndefined& e) {
 		//g++ sees the above as undefined
-		e.description.outputl();
+		var(e.description).outputl();
 	} catch (VarUnassigned& e) {
 		//clang sees the above as unassigned
-		e.description.outputl();
+		var(e.description).outputl();
 	}
 	//catch(VarNonNumeric& e) {
 	//	e.description.outputl();
