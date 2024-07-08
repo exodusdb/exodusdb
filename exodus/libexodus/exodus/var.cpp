@@ -30,8 +30,42 @@ namespace exo {
 
 // Note: VAR_TEMPLATE both defines and instantiates an instance of the member function for var_base<var>::xxxxxxxxxxx
 
-template RETVAR VARBASE1::dump() const;
-template<typename var> RETVAR VARBASE2::dump() const {
+template<> PUBLIC RETVAR VARBASE1::clone() const {
+
+	RETVAR rvo;
+	rvo.var_typ = var_typ;
+	rvo.var_str = var_str;
+
+	// Avoid copying int and dbl in case cloning an unassigned var
+	// since default ctor var() = default and int/dbl are not initialised to zero.
+	//
+	// Strategy is as follows:
+	//
+	// Cloning uninitialised data should leave the target uninitialised as well
+	//
+	// If var implementation ever changes so that int/dbl must be cloned
+	// even if vartype is unassigned then int/dbl will have to be default initialised
+	// to something, probably zero.
+	//
+	// Avoid triggering a compiler warning
+	// warning: ‘<anonymous>.exo::var::var_dbl’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+	if (var_typ) {
+		rvo.var_int = var_int;
+		rvo.var_dbl = var_dbl;
+	}
+
+	return rvo;
+}
+
+// basic string function on var_base for throwing errors
+template<> PUBLIC RETVAR VARBASE1::first_(int nchars) const {
+	assertString(__PRETTY_FUNCTION__);
+	if (nchars < static_cast<int>(var_str.size()))
+		return var_str.substr(0, nchars);
+	return var_str;
+}
+
+template<> PUBLIC RETVAR VARBASE1::dump() const {
 	var nrvo = "var: ";
 
 	if (var_typ & VARTYP_STR)
@@ -108,6 +142,24 @@ std::string VarError::stack(const size_t limit) const {
 	// Convert the stack addresses into source code lines
 	return exo_backtrace(stack_addresses_, stack_size_, limit);
 
+}
+
+// TODO replace .f with a version of .f that returns a string_view
+// instead of wasting time constructing a temporary var only to extract a single char from it
+ND RETVAR var_proxy1::at(const int pos1) const {
+	//TODO! allow at() to work directly on var_str without extracting the required field first
+	var v1 = var_.f(fn_);
+	return v1.at(pos1);
+}
+
+ND var var_proxy2::at(const int pos1) const {
+	var v1 = var_.f(fn_, vn_);
+	return v1.at(pos1);
+}
+
+ND var var_proxy3::at(const int pos1) const {
+	var v1 = var_.f(fn_, vn_, sn_);
+	return v1.at(pos1);
 }
 
 // DEFINE implementation of all friends previously friended in var.h

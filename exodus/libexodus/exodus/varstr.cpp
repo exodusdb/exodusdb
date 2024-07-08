@@ -1759,16 +1759,7 @@ VARREF var::substrer(const int startindex1, const int length) {
 //////
 //    ND var at(const int pos1) const;
 
-template RETVAR VARBASE1::operator[](const int pos1) const;
-template<typename var> RETVAR VARBASE2::operator[](const int pos1) const {
-//exo::var var_base<var_mid<var>>::operator[](const int pos1) const {
-//template<> exo::var var_base<var_mid<var>>::operator[](const int pos1) const {
-	return this->at(pos1);
-}
-
-template exo::var var_base<var_mid<var>>::at(const int charno) const;
-template<typename var> exo::var var_base<var>::at(const int charno) const {
-//VAR_TEMPLATE(RETVAR VARBASE::at(const int charno) const) {
+template<> PUBLIC RETVAR VARBASE1::at(const int charno) const {
 
 	THISIS("var var::at(const int charno) const")
 	assertString(function_sig);
@@ -1811,6 +1802,10 @@ template<typename var> exo::var var_base<var>::at(const int charno) const {
 	// otherwise so negative as to point before beginning of string
 	// and rule is to return the first character in that case
 	return var_str[0];
+}
+
+template<> PUBLIC RETVAR VARBASE1::operator[](const int pos1) const {
+	return this->at(pos1);
 }
 
 /////////////////////////////////////

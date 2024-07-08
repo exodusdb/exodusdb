@@ -168,7 +168,6 @@
 
 #undef TBX
 #define TBX var_base<var_mid<exo::var>>&&
-//	PUBLIC VAR_FRIEND RETVAR operator^(CBX lhs,CBX rhs);//IMPL {return var_cat_var(VARBASE(lhs), rhs ); }
 	PUBLIC VAR_FRIEND RETVAR operator^(CBX lhs,CBX rhs);//IMPL {var lhs2 = lhs.toString(); lhs2 ^= rhs; return lhs2; }
 	PUBLIC VAR_FRIEND RETVAR operator^(TBX lhs,CBX rhs);//IMPL {lhs ^= rhs; return *static_cast<var*>(&lhs); }
 //	PUBLIC VAR_FRIEND RETVAR operator^(TBX lhs,CBX rhs);//IMPL {return var_cat_var(lhs, rhs); }

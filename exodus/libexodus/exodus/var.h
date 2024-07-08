@@ -75,7 +75,10 @@ THE SOFTWARE.
 #else
 
 	// use g++ -fvisibility=hidden to make all hidden except those marked PUBLIC ie "default"
-	// see nm -D libexodus.so --demangle |grep T -w
+	// "Weak" templated functions seem to get excluded if visiblity is hidden, despite being marked as PUBLIC
+	//
+	// nm -C *so |&grep -F "exo::var_base<exo::var_mid<exo::var> >::"
+	// nm -D libexodus.so --demangle |grep T -w
 
 #	define PUBLIC __attribute__((visibility("default")))
 
@@ -269,18 +272,12 @@ using SV     =       std::string_view;
 //using CVR    = const var_base&;
 //using TVR    =       var_base&&;
 
-// grep -P "VBR|CBR|TBR|RETVAR|VARBASE" -rl
-#define VARBASEX   var_base<var>
-#define VARBASE    var_base<var_mid<exo::var>>
+// grep -P "VBR|CBR|TBR|RETVAR" -rl
 #define VARBASE1   var_base<var_mid<exo::var>>
-#define VARBASE2   var_base<var>
-//#define VARBASE   var_base<var>
 
 #define VBR1      var_base<var_mid<var>>&
-#define VBR2      var_base<var>& // var=T
 #define CBR const var_base<var_mid<exo::var>>&
 #define TBR       var_base<var_mid<exo::var>>&&
-#define CBQ	CBR
 
 #define VBX       var_base&
 #define CBX const var_base&
@@ -289,29 +286,29 @@ using SV     =       std::string_view;
 #define RETVAR    exo::var
 #define RETVARREF exo::var&
 
-//// Define and instantiate a <var> template
+// Not used
+////// Define and instantiate a <var> template
+////#define VAR_TEMPLATE(...) \
+////template PUBLIC \
+////__VA_ARGS__;\
+////template<typename var> PUBLIC \
+////__VA_ARGS__
+//
+//// Define a template member function and instantiate it.
+//// Used for the many "var_base<var>::xxxxx()" template member functions.
+//// Saves writing the function declaration again to instantiate it.
+//// var_base<var> functions are instantiated for the library to avoid client code bloat.
+////
+//// 1st line will instantiate the function.
+//// 2nd line will declare the template member function.
+//// The definition (body) of the template member function should follow, embraced in {}.
+////
+//// Note that "var" in the 2nd line is acting as a template parameter
+//// (not a concrete type) for the body of the template member function
+////
 //#define VAR_TEMPLATE(...) \
-//template PUBLIC \
-//__VA_ARGS__;\
-//template<typename var> PUBLIC \
-//__VA_ARGS__
-
-// Define a template member function and instantiate it.
-// Used for the many "var_base<var>::xxxxx()" template member functions.
-// Saves writing the function declaration again to instantiate it.
-// var_base<var> functions are instantiated for the library to avoid client code bloat.
-//
-// 1st line will instantiate the function.
-// 2nd line will declare the template member function.
-// The definition (body) of the template member function should follow, embraced in {}.
-//
-// Note that "var" in the 2nd line is acting as a template parameter
-// (not a concrete type) for the body of the template member function
-//
-#define VAR_TEMPLATE(...) \
-template PUBLIC __VA_ARGS__;\
-template<typename var> PUBLIC __VA_ARGS__
-//template<> PUBLIC __VA_ARGS__
+//template PUBLIC __VA_ARGS__;\
+//template<typename var> PUBLIC __VA_ARGS__
 
 // original help from Thinking in C++ Volume 1 Chapter 12
 // http://www.camtp.uni-mb.si/books/Thinking-in-C++/TIC2Vone-distribution/html/Chapter12.html
@@ -851,7 +848,7 @@ class PUBLIC var_base {
 
 	operator var() && {
 		// Clone, like most var_base functions returns a var since var's are var_base's but not vice versa
-		return this->clone(); // TODO move/steal
+		return this->clone(); // TODO! move/steal
 	}
 
 	// integer <- var
@@ -1434,28 +1431,28 @@ class PUBLIC var_base {
 
 	// Specialisations for speed
 
-	friend bool var_eq_dbl (      CBQ     lhs,   const double dbl1 );
-	friend bool var_eq_int (      CBQ     lhs,   const int    int1 );
-	friend bool var_eq_bool(      CBQ     lhs,   const bool   bool1);
+	friend bool var_eq_dbl (      CBR     lhs,   const double dbl1 );
+	friend bool var_eq_int (      CBR     lhs,   const int    int1 );
+	friend bool var_eq_bool(      CBR     lhs,   const bool   bool1);
 
-	friend bool var_lt_int (      CBQ     lhs,   const int    int1 );
-	friend bool int_lt_var (const int    int1,        CBQ     rhs  );
+	friend bool var_lt_int (      CBR     lhs,   const int    int1 );
+	friend bool int_lt_var (const int    int1,        CBR     rhs  );
 
-	friend bool var_lt_dbl (      CBQ     lhs,   const double dbl1 );
-	friend bool dbl_lt_var (const double dbl1,        CBQ     rhs  );
+	friend bool var_lt_dbl (      CBR     lhs,   const double dbl1 );
+	friend bool dbl_lt_var (const double dbl1,        CBR     rhs  );
 
-	friend bool var_lt_bool (      CBQ    lhs,   const bool   bool1) = delete;
-	friend bool bool_lt_var (const bool  bool1,       CBQ     rhs  ) = delete;
+//	friend bool var_lt_bool (      CBR    lhs,   const bool   bool1) = delete;
+//	friend bool bool_lt_var (const bool  bool1,       CBR     rhs  ) = delete;
 
 	// Concatenation
 
-	friend RETVAR var_cat_var(       CBQ   lhs,       CBQ    rhs);
+	friend RETVAR var_cat_var(       CBR   lhs,       CBR    rhs);
 
 	// Specialisations for speed
 
-	friend RETVAR var_cat_cstr(      CBQ   lhs, const char* rhs);
-	friend RETVAR var_cat_char(      CBQ   lhs, const char  rhs);
-	friend RETVAR cstr_cat_var(const char* lhs,       CBQ   rhs);
+	friend RETVAR var_cat_cstr(      CBR   lhs, const char* rhs);
+	friend RETVAR var_cat_char(      CBR   lhs, const char  rhs);
+	friend RETVAR cstr_cat_var(const char* lhs,       CBR   rhs);
 
 	//friend var operator""_var(const char* cstr, std::size_t size);
 
@@ -1550,7 +1547,7 @@ class PUBLIC var_base {
 	// Currently this is required in rare cases where functions like exoprog::calculate
 	// temporarily require member variables to be something else but switch back before exiting
 	// if such function throws then it would leave the member variables in a changed state.
-	CBQ swap(CVR var2) const;//version that works on const vars
+	CBR swap(CVR var2) const;//version that works on const vars
 	VARREF swap(VARREF var2);//version that works on non-const vars
 
 	// Converts to var
@@ -1593,16 +1590,11 @@ protected:
 		assertDefined(message, varname);
 		if (!var_typ)
 			[[unlikely]]
-			throwUnassigned(var_base(varname) ^ " in " ^ message);
+			throw VarUnassigned(var_base(varname) ^ " in " ^ message);
 	}
 
 	//CONSTEXPR
-	void assertNumeric(const char* message, const char* varname = "") const {
-		if (!this->isnum())
-			[[unlikely]]
-			//throwNonNumeric(var_base(varname) ^ " in " ^ var_base(message) ^ " data: " ^ var_str.substr(0,127));
-			throwNonNumeric(std::string(varname) + " in " + std::string(message) + " is '" + var_str.substr(0, 32) + "'");
-	}
+	void assertNumeric(const char* message, const char* varname = "") const;
 
 	//CONSTEXPR
 	void assertDecimal(const char* message, const char* varname = "") const {
@@ -2608,6 +2600,7 @@ class PUBLIC var_proxy1 {
 	exo::var& var_;
 	mutable int fn_;
 
+	// No default contructor
 	var_proxy1() = delete;
 
  public:
@@ -2682,12 +2675,15 @@ class PUBLIC var_proxy1 {
 
 	// TODO replace .f with a version of .f that returns a string_view
 	// instead of wasting time constructing a temporary var only to extract a single char from it
-	ND RETVAR at(const int pos1) const {
-		//return var_.f(fn_).at(pos1);
-		// TODO work out why this workaround is required
-		RETVAR v1 = var_.f(fn_);
-		return v1.at(pos1);
-	}
+	ND RETVAR at(const int pos1) const;
+//		//return var_.f(fn_).at(pos1);
+//		// TODO work out why this workaround is required
+////		RETVAR v1 = var_.f(fn_);
+////		return v1.at(pos1);
+//
+//		//TODO! allow at() to work directly on var_str without extracting the required field first
+//		return var_.f(fn_).at(pos1);
+//	}
 
 };
 
@@ -2701,6 +2697,7 @@ class PUBLIC var_proxy2 {
 	mutable int fn_;
 	mutable int vn_;
 
+	// No default contructor
 	var_proxy2() = delete;
 
  public:
@@ -2725,11 +2722,11 @@ class PUBLIC var_proxy2 {
 		return this->at(pos1);
 	}
 
-	ND var at(const int pos1) const {
-		//return var_.f(fn_, vn_).at(pos1);
-		RETVAR v1 = var_.f(fn_, vn_);
-		return v1.at(pos1);
-	}
+	ND var at(const int pos1) const;
+//		//return var_.f(fn_, vn_).at(pos1);
+//		RETVAR v1 = var_.f(fn_, vn_);
+//		return v1.at(pos1);
+//	}
 
 };
 
@@ -2744,6 +2741,7 @@ class PUBLIC var_proxy3 {
 	mutable int vn_;
 	mutable int sn_;
 
+	// No default contructor
 	var_proxy3() = delete;
 
  public:
@@ -2767,11 +2765,11 @@ class PUBLIC var_proxy3 {
 		return this->at(pos1);
 	}
 
-    ND var at(const int pos1) const {
-		//return var_.f(fn_, vn_, sn_).at(pos1);
-		RETVAR v1 = var_.f(fn_, vn_, sn_);
-		return v1.at(pos1);
-    }
+    ND var at(const int pos1) const;
+//		//return var_.f(fn_, vn_, sn_).at(pos1);
+//		RETVAR v1 = var_.f(fn_, vn_, sn_);
+//		return v1.at(pos1);
+//    }
 
 };
 
@@ -2816,6 +2814,7 @@ ND inline var_proxy3 var::operator()(int fieldno, int valueno, int subvalueno) {
 #ifdef EXO_OS_NAME
 	const char* const _OS_NAME = EXO_OS_NAME;
 #endif
+
 #ifdef EXO_OS_VERSION
 	const char* const _OS_VERSION = EXO_OS_VERSION;
 #endif
@@ -2840,47 +2839,6 @@ PUBLIC var operator""_var(unsigned long long int i);
 
 // 123.456_var
 PUBLIC var operator""_var(long double d);
-
-template<typename var> RETVAR VARBASEX::clone() const {
-
-	RETVAR rvo;
-	rvo.var_typ = var_typ;
-	rvo.var_str = var_str;
-
-	// Avoid copying int and dbl in case cloning an unassigned var
-	// since default ctor var() = default and int/dbl are not initialised to zero.
-	//
-	// Strategy is as follows:
-	//
-	// Cloning uninitialised data should leave the target uninitialised as well
-	//
-	// If var implementation ever changes so that int/dbl must be cloned
-	// even if vartype is unassigned then int/dbl will have to be default initialised
-	// to something, probably zero.
-	//
-	// Avoid triggering a compiler warning
-	// warning: ‘<anonymous>.exo::var::var_dbl’ may be used uninitialized in this function [-Wmaybe-uninitialized]
-	if (var_typ) {
-		rvo.var_int = var_int;
-		rvo.var_dbl = var_dbl;
-	}
-
-	return rvo;
-}
-
-// basic string function on var_base for throwing errors
-template<typename var> RETVAR VARBASEX::first_(int nchars) const {
-	assertString(__PRETTY_FUNCTION__);
-	if (nchars < static_cast<int>(var_str.size()))
-		return var_str.substr(0, nchars);
-	return var_str;
-}
-
-//// Declare all friends previously friended and declared above
-///////////////////////////////////////////////////////////////
-//#undef VAR_FRIEND
-//#define VAR_FRIEND
-//#include "varfriends.h"
 
 }  // namespace exo
 

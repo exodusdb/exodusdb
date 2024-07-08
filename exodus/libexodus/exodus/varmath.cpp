@@ -94,8 +94,7 @@ static varint_t exodusmodulo_int(const varint_t dividend, const varint_t limit) 
 	return result;
 }
 
-template RETVAR VARBASE1::mod(CBX limit) const;
-template<typename var> RETVAR VARBASE2::mod(CBX limit) const {
+template<> PUBLIC RETVAR VARBASE1::mod(CBX limit) const {
 
 	THISIS("var var::mod(CVR limit) const")
 	assertNumeric(function_sig);
@@ -128,8 +127,7 @@ mod_doubles:
 }
 
 
-template RETVAR VARBASE1::mod(double limit) const;
-template<typename var> RETVAR VARBASE2::mod(double limit) const {
+template<> PUBLIC RETVAR VARBASE1::mod(double limit) const {
 
 	THISIS("var var::mod(double limit) const")
 	assertNumeric(function_sig);
@@ -145,8 +143,7 @@ template<typename var> RETVAR VARBASE2::mod(double limit) const {
 }
 
 
-template RETVAR VARBASE1::mod(const int limit) const;
-template<typename var> RETVAR VARBASE2::mod(const int limit) const {
+template<> PUBLIC RETVAR VARBASE1::mod(const int limit) const {
 
 	THISIS("var var::mod(const int limit) const")
 	assertNumeric(function_sig);

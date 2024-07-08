@@ -31,8 +31,6 @@ THE SOFTWARE.
     //v.isnum();         //+???ns (???ns using <charconv> from_chars)
 */
 
-// Note: VAR_TEMPLATE both defines and instantiates an instance of the member function for VARBASE::xxxxxxxxxxx
-
 // Use ryu if GNUC < 11 and ryu include available
 //ryu            1234.5678 -> "1234.5678" 500ns
 //ryu_printf     1234.5678 -> "1234.5678" 800ns
@@ -455,8 +453,7 @@ removetrailing:
 ////////////////////
 
 // mainly called in ISSTRING when not already a string
-template void VARBASE1::createString() const;
-template<typename var> PUBLIC void VARBASE2::createString() const {
+template<> PUBLIC void VARBASE1::createString() const {
 
 	// TODO ensure ISDEFINED is called everywhere in advance
 	// to avoid wasting time doing multiple calls to ISDEFINED
@@ -484,6 +481,231 @@ template<typename var> PUBLIC void VARBASE2::createString() const {
 	// treat any other case as unassigned
 	//(usually var_typ & VARTYP_UNA)
 	throw VarUnassigned("createString()");
+}
+
+/////////////
+// var::isnum
+/////////////
+
+// RULES need updating since we are now allowing E/e scientific notation
+//
+// numeric is one of four regular expressions or zero length string
+//^$			zero length string
+//[+-]?9+		eg 999
+//[+-]?9+.		eg 999.
+//[+-]?.9+		eg .999
+//[+-]?9+.9+	eg 999.999
+// where the last four examples may also have a + or - character prefix
+
+// be careful that the following are NOT numeric. regexp [+-]?[.]?
+// + - . +. -.
+
+// rules
+// 0. zero length string is numeric integer 0
+// 1. any + or - must be the first character
+// 2. point may occur 0 or 1 times
+// 3. digits (0-9) must occur 1 or more times (but see rule 0.)
+// 4. all characters mean non-numeric
+
+// Explicit specialisation
+//template<>           PUBLIC bool var_base<var_mid<var>>::isnum(void) const;
+
+// Explicit instantiation
+//template             PUBLIC bool var_base<var_mid<var>>::isnum(void) const;
+
+template<> PUBLIC bool VARBASE1::isnum(void) const {
+
+	// TODO make isnum private and ensure ISDEFINED is checked before all calls to isnum
+	// to save the probably double check here
+	this->assertDefined(__PRETTY_FUNCTION__);
+
+	// Known to be numeric already
+	if (var_typ & VARTYP_INTDBL)
+		return true;
+
+	// Known to be not numeric already
+	// maybe put this first if comparison operations on strings are more frequent than numeric
+	// operations on numbers
+	if (var_typ & VARTYP_NAN)
+		return false;
+
+	// Not assigned error
+	if (!var_typ)
+		throw VarUnassigned("isnum()");
+
+	// Empty string is zero. Leave the string as "".
+	auto strlen = var_str.size();
+	if (strlen == 0) {
+		var_int = 0;
+		var_typ = VARTYP_INTSTR;
+		return true;
+	}
+
+	// Preparse the string to detect if integer or decimal or many types of non-numeric
+	// We need to detect NAN ASAP because string comparison always attempts to compare numerically.
+	// The parsing does not need to be perfect since we will rely
+	// on from_chars for the final parsing
+	bool floating = false;
+	bool has_sign = false;
+	for (std::size_t ii = 0; ii < strlen; ii++) {
+		char cc = var_str[ii];
+
+		// +   2B
+		// -   2D
+		// .   2E
+		// 0-9 30-39
+		// E   45
+		// e   65
+
+		// Ideally we put the most divisive test first
+		// but, assuming that non-numeric strings are tested more frequently
+		// then following is perhaps not the best choice.
+		if (cc >= '0' and cc <= '9')
+			continue;
+
+		switch (cc) {
+
+		case '.':
+			floating = true;
+			break;
+
+		case '-':
+		case '+':
+			// Disallow more than one sign eg "+-999"
+			// Disallow a single + since it will be trimmed off below
+			if (has_sign or strlen == 0) {
+				var_typ = VARTYP_NANSTR;
+				return false;
+			}
+			has_sign = true;
+			break;
+
+		case 'e':
+		case 'E':
+			floating = true;
+			// Allow a sign again after any e/E
+			has_sign = false;
+			break;
+
+		default:
+			var_typ = VARTYP_NANSTR;
+			return false;
+		}
+	}
+
+#pragma GCC diagnostic push
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
+	char* firstchar = var_str.data();
+	char* lastchar = firstchar + strlen;
+
+	// Skip leading + to be compatible with javascript
+	// from_chars does not allow it.
+	firstchar += *firstchar == '+';
+#pragma GCC diagnostic pop
+
+	if (floating) {
+
+		// to double
+		auto [p, ec] = STD_OR_FASTFLOAT::from_chars(firstchar, lastchar, var_dbl);
+		if (ec != std::errc() || p != lastchar) {
+			var_typ = VARTYP_NANSTR;
+			return false;
+		}
+
+		// indicate that the var is a string and a double
+		var_typ = VARTYP_DBLSTR;
+
+	} else {
+
+		// to long int
+		auto [p, ec] = std::from_chars(firstchar, lastchar, var_int);
+		if (ec != std::errc() || p != lastchar) {
+			var_typ = VARTYP_NANSTR;
+			return false;
+		}
+
+		// indicate that the var is a string and a long int
+		var_typ = VARTYP_INTSTR;
+	}
+
+	return true;
+}
+
+template<> PUBLIC void VARBASE1::assertNumeric(const char* message, const char* varname/* = ""*/) const {
+	if (!this->isnum())
+		[[unlikely]]
+		//throw VarNonNumeric(var_base(varname) ^ " in " ^ var_base(message) ^ " data: " ^ var_str.substr(0,127));
+		throw VarNonNumeric(std::string(varname) + " in '" + message + "' is '" + var_str.substr(0, 32) + "'");
+}
+
+//////////////
+// var::toBool
+//////////////
+
+template<> PUBLIC bool VARBASE1::toBool() const {
+
+	// could be skipped for speed assuming that people will not write unusual "var x=f(x)" type
+	// syntax as follows: var xx=xx?11:22;
+	this->assertDefined(__PRETTY_FUNCTION__);
+
+	// identical code in void* and bool except returns void* and bool respectively
+	while (true) {
+		// ints are true except for zero
+		if (var_typ & VARTYP_INT)
+			//return static_cast<bool>(var_int != 0);
+			return var_int != 0;
+
+		// non-numeric strings are true unless zero length
+		if (var_typ & VARTYP_NAN)
+			return !var_str.empty();
+
+		// doubles are true unless zero
+		// check double first dbl on guess that tests will be most often on financial
+		// numbers
+		// TODO should we consider very small numbers to be the same as zero?
+		if (var_typ & VARTYP_DBL)
+			//return (bool)(var_dbl != 0);
+			//return std::abs(var_dbl)>=0.00000000001;
+			//pickos print (0.00001 or 0)    ... prints 0 (bool)
+			//pickos print (0.00005=0.00006) ... prints 0 (==)
+			//pickos print (0.00005<0.00006) ... prints 1 (<)
+			return std::abs(var_dbl) >= SMALLEST_NUMBER;
+
+		if (!(var_typ)) {
+			this->assertAssigned(__PRETTY_FUNCTION__);
+			throw VarUnassigned("toBool()");
+		}
+
+		// must be string - try to convert to numeric and do all tests again
+		this->isnum();
+	}
+}
+
+/////////////
+// var::toInt
+/////////////
+
+template<> PUBLIC int VARBASE1::toInt() const {
+	this->assertInteger(__PRETTY_FUNCTION__);
+	return static_cast<int>(*this);
+}
+
+///////////////
+// var::toInt64
+///////////////
+
+template<> PUBLIC int64_t VARBASE1::toInt64() const {
+	this->assertInteger(__PRETTY_FUNCTION__);
+	return static_cast<int64_t>(*this);
+}
+
+////////////////
+// var::toDouble
+////////////////
+
+template<> PUBLIC double VARBASE1::toDouble() const {
+	this->assertDecimal(__PRETTY_FUNCTION__);
+	return var_dbl;
 }
 
 /////////////
@@ -726,242 +948,6 @@ var var::floor() const {
 	}
 
 	return var_int;
-}
-
-//////////////
-// var::toBool
-//////////////
-
-template PUBLIC bool VARBASE1::toBool() const;
-template<typename var> PUBLIC PUBLIC bool VARBASE2::toBool() const {
-
-	// could be skipped for speed assuming that people will not write unusual "var x=f(x)" type
-	// syntax as follows: var xx=xx?11:22;
-	this->assertDefined(__PRETTY_FUNCTION__);
-
-	// identical code in void* and bool except returns void* and bool respectively
-	while (true) {
-		// ints are true except for zero
-		if (var_typ & VARTYP_INT)
-			//return static_cast<bool>(var_int != 0);
-			return var_int != 0;
-
-		// non-numeric strings are true unless zero length
-		if (var_typ & VARTYP_NAN)
-			return !var_str.empty();
-
-		// doubles are true unless zero
-		// check double first dbl on guess that tests will be most often on financial
-		// numbers
-		// TODO should we consider very small numbers to be the same as zero?
-		if (var_typ & VARTYP_DBL)
-			//return (bool)(var_dbl != 0);
-			//return std::abs(var_dbl)>=0.00000000001;
-			//pickos print (0.00001 or 0)    ... prints 0 (bool)
-			//pickos print (0.00005=0.00006) ... prints 0 (==)
-			//pickos print (0.00005<0.00006) ... prints 1 (<)
-			return std::abs(var_dbl) >= SMALLEST_NUMBER;
-
-		if (!(var_typ)) {
-			this->assertAssigned(__PRETTY_FUNCTION__);
-			throw VarUnassigned("toBool()");
-		}
-
-		// must be string - try to convert to numeric and do all tests again
-		this->isnum();
-	}
-}
-
-//VAR_TEMPLATE(int64_t VARBASE::toInt64() const) {
-//	this->assertInteger(__PRETTY_FUNCTION__);
-//	return var_int;
-//}
-
-/////////////
-// var::toInt
-/////////////
-
-template int VARBASE1::toInt() const;
-template<typename var> PUBLIC int VARBASE2::toInt() const {
-	this->assertInteger(__PRETTY_FUNCTION__);
-	return static_cast<int>(*this);
-}
-
-///////////////
-// var::toInt64
-///////////////
-
-template int64_t VARBASE1::toInt64() const;
-template<typename var> PUBLIC int64_t VARBASE2::toInt64() const {
-	this->assertInteger(__PRETTY_FUNCTION__);
-	return static_cast<int64_t>(*this);
-}
-
-//VAR_TEMPLATE(long long int VARBASE::toLong() const) {
-//	this->assertInteger(__PRETTY_FUNCTION__);
-//	return static_cast<long long int>(var_int);
-//}
-
-////////////////
-// var::toDouble
-////////////////
-
-template double VARBASE1::toDouble() const;
-template<typename var> PUBLIC double VARBASE2::toDouble() const {
-	this->assertDecimal(__PRETTY_FUNCTION__);
-	return var_dbl;
-}
-
-/////////////
-// var::isnum
-/////////////
-
-// RULES need updating since we are now allowing E/e scientific notation
-//
-// numeric is one of four regular expressions or zero length string
-//^$			zero length string
-//[+-]?9+		eg 999
-//[+-]?9+.		eg 999.
-//[+-]?.9+		eg .999
-//[+-]?9+.9+	eg 999.999
-// where the last four examples may also have a + or - character prefix
-
-// be careful that the following are NOT numeric. regexp [+-]?[.]?
-// + - . +. -.
-
-// rules
-// 0. zero length string is numeric integer 0
-// 1. any + or - must be the first character
-// 2. point may occur 0 or 1 times
-// 3. digits (0-9) must occur 1 or more times (but see rule 0.)
-// 4. all characters mean non-numeric
-
-//CONSTEXPR
-//template PUBLIC bool VARBASE1::isnum(void) const;
-//template<typename var> PUBLIC bool VARBASE2::isnum(void) const {
-
-// Explicit specialisation
-//template<>           PUBLIC bool var_base<var_mid<var>>::isnum(void) const;
-
-// Explicit instantiation
-template             PUBLIC bool var_base<var_mid<var>>::isnum(void) const;
-template<typename T> PUBLIC bool var_base<T>::isnum(void) const {
-//template<> PUBLICX bool var_base<var_mid<exo::var>>::isnum(void) const {
-
-	// TODO make isnum private and ensure ISDEFINED is checked before all calls to isnum
-	// to save the probably double check here
-	this->assertDefined(__PRETTY_FUNCTION__);
-
-	// Known to be numeric already
-	if (var_typ & VARTYP_INTDBL)
-		return true;
-
-	// Known to be not numeric already
-	// maybe put this first if comparison operations on strings are more frequent than numeric
-	// operations on numbers
-	if (var_typ & VARTYP_NAN)
-		return false;
-
-	// Not assigned error
-	if (!var_typ)
-		throw VarUnassigned("isnum()");
-
-	// Empty string is zero. Leave the string as "".
-	auto strlen = var_str.size();
-	if (strlen == 0) {
-		var_int = 0;
-		var_typ = VARTYP_INTSTR;
-		return true;
-	}
-
-	// Preparse the string to detect if integer or decimal or many types of non-numeric
-	// We need to detect NAN ASAP because string comparison always attempts to compare numerically.
-	// The parsing does not need to be perfect since we will rely
-	// on from_chars for the final parsing
-	bool floating = false;
-	bool has_sign = false;
-	for (std::size_t ii = 0; ii < strlen; ii++) {
-		char cc = var_str[ii];
-
-		// +   2B
-		// -   2D
-		// .   2E
-		// 0-9 30-39
-		// E   45
-		// e   65
-
-		// Ideally we put the most divisive test first
-		// but, assuming that non-numeric strings are tested more frequently
-		// then following is perhaps not the best choice.
-		if (cc >= '0' and cc <= '9')
-			continue;
-
-		switch (cc) {
-
-		case '.':
-			floating = true;
-			break;
-
-		case '-':
-		case '+':
-			// Disallow more than one sign eg "+-999"
-			// Disallow a single + since it will be trimmed off below
-			if (has_sign or strlen == 0) {
-				var_typ = VARTYP_NANSTR;
-				return false;
-			}
-			has_sign = true;
-			break;
-
-		case 'e':
-		case 'E':
-			floating = true;
-			// Allow a sign again after any e/E
-			has_sign = false;
-			break;
-
-		default:
-			var_typ = VARTYP_NANSTR;
-			return false;
-		}
-	}
-
-#pragma GCC diagnostic push
-#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
-	char* firstchar = var_str.data();
-	char* lastchar = firstchar + strlen;
-
-	// Skip leading + to be compatible with javascript
-	// from_chars does not allow it.
-	firstchar += *firstchar == '+';
-#pragma GCC diagnostic pop
-
-	if (floating) {
-
-		// to double
-		auto [p, ec] = STD_OR_FASTFLOAT::from_chars(firstchar, lastchar, var_dbl);
-		if (ec != std::errc() || p != lastchar) {
-			var_typ = VARTYP_NANSTR;
-			return false;
-		}
-
-		// indicate that the var is a string and a double
-		var_typ = VARTYP_DBLSTR;
-
-	} else {
-
-		// to long int
-		auto [p, ec] = std::from_chars(firstchar, lastchar, var_int);
-		if (ec != std::errc() || p != lastchar) {
-			var_typ = VARTYP_NANSTR;
-			return false;
-		}
-
-		// indicate that the var is a string and a long int
-		var_typ = VARTYP_INTSTR;
-	}
-
-	return true;
 }
 
 } // namespace exo

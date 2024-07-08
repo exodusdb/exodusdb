@@ -166,7 +166,6 @@
 
 	// TODO review all operators are doing minimal copying/constructing
 
-//	PUBLIC VAR_FRIEND RETVAR operator^(CBR lhs,CBR rhs) /*IMPL*/ {return var_cat_var(VARBASE(lhs), rhs ); }
 	PUBLIC VAR_FRIEND RETVAR operator^(CBR lhs,CBR rhs) /*IMPL*/ {var lhs2 = lhs.toString(); lhs2 ^= rhs; return lhs2; }
 	PUBLIC VAR_FRIEND RETVAR operator^(TBR lhs,CBR rhs) /*IMPL*/ {lhs ^= rhs; return *static_cast<var*>(&lhs); }
 //	PUBLIC VAR_FRIEND RETVAR operator^(TBR lhs,CBR rhs) /*IMPL*/ {return var_cat_var(lhs, rhs); }
