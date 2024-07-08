@@ -146,9 +146,74 @@ static inline bool is_ascii(std::string_view str1) {
 	return true;
 }
 
+template<> PUBLIC bool VARBASE1::assigned() const {
+	// THISIS("bool var::assigned() const")
+
+	// treat undefined as unassigned
+	// undefined is a state where we are USING the variable before its contructor has been
+	// called! which is possible (in syntax like var xx.osread()?) and also when passing default
+	// variables to functions in the callables on ISDEFINED(gcc)
+
+	if (var_typ & VARTYP_MASK)
+		return false;
+
+	return var_typ != VARTYP_UNA;
+}
+
+template<> PUBLIC bool VARBASE1::unassigned() const {
+	// see explanation above in assigned
+	// THISIS("bool var::unassigned() const")
+	// assertDefined(function_sig);
+
+	if (var_typ & VARTYP_MASK)
+		return true;
+
+	return !var_typ;
+}
+
+template<> PUBLIC std::u32string VARBASE1::to_u32string() const {
+
+	 THISIS("std::u32string var::to_u32string() const")
+	 assertString(function_sig);
+
+	// 1.4 secs per 10,000,000 var=var copies of 3 byte ASCII strings
+	// simple var=var copy of the following data
+
+	// 14.9 secs round trips u8->u32->u8 per 10,000,000 on vm7
+	// SKIPS/TRIMS OUT any bad utf8
+	return boost::locale::conv::utf_to_utf<char32_t>(var_str);
+}
+
+template<> PUBLIC std::wstring VARBASE1::to_wstring() const {
+
+	 THISIS("std::wstring var::to_wstring() const")
+	 assertString(function_sig);
+
+	// 1.4 secs per 10,000,000 var=var copies of 3 byte ASCII strings
+	// simple var=var copy of the following data
+
+	// 14.9 secs round trips u8->w->u8 per 10,000,000 on vm7
+	// SKIPS/TRIMS OUT any bad utf8
+	return boost::locale::conv::utf_to_utf<wchar_t>(var_str);
+}
+
+template<> PUBLIC void VARBASE1::from_u32string(std::u32string u32str) const {
+	// for speed, dont validate
+	// THISIS("void var::from_u32tring() const")
+	// assertDefined(function_sig);
+	var_typ = VARTYP_STR;
+
+	var_str = boost::locale::conv::utf_to_utf<char>(u32str);
+}
+
+// CONSTRUCTOR from const std::u32string converts to utf-8
+template<> PUBLIC VARBASE1::var_base(const std::wstring& wstr1) {
+	var_typ = VARTYP_STR;
+	var_str = boost::locale::conv::utf_to_utf<char>(wstr1);
+}
+
 //int var::localeAwareCompare(const std::string& str1, const std::string& str2) {
-template int VARBASE1::localeAwareCompare(const std::string& str1, const std::string& str2);
-template<typename var> int VARBASE2::localeAwareCompare(const std::string& str1, const std::string& str2) {
+template<> PUBLIC int VARBASE1::localeAwareCompare(const std::string& str1, const std::string& str2) {
 	// https://www.boost.org/doc/libs/1_70_0/libs/locale/doc/html/collation.html
 	// eg ensure lower case sorts before uppercase (despite "A" \x41 is less than "a" \x61)
 	init_boost_locale1();
@@ -341,35 +406,7 @@ VARREF var::inputn(const int nchars) {
 	return *this;
 }
 
-template bool VARBASE1::assigned() const;
-template<typename var> bool VARBASE2::assigned() const {
-	// THISIS("bool var::assigned() const")
-
-	// treat undefined as unassigned
-	// undefined is a state where we are USING the variable before its contructor has been
-	// called! which is possible (in syntax like var xx.osread()?) and also when passing default
-	// variables to functions in the callables on ISDEFINED(gcc)
-
-	if (var_typ & VARTYP_MASK)
-		return false;
-
-	return var_typ != VARTYP_UNA;
-}
-
-template bool VARBASE1::unassigned() const;
-template<typename var> bool VARBASE2::unassigned() const {
-	// see explanation above in assigned
-	// THISIS("bool var::unassigned() const")
-	// assertDefined(function_sig);
-
-	if (var_typ & VARTYP_MASK)
-		return true;
-
-	return !var_typ;
-}
-
-template void VARBASE1::default_to(CBX defaultvalue);
-template<typename var> void VARBASE2::default_to(CBX defaultvalue) {
+template<> PUBLIC void VARBASE1::default_to(CBX defaultvalue) {
 
 	// see explanation above in assigned
 	// assertDefined(function_sig);
@@ -390,9 +427,7 @@ template<typename var> void VARBASE2::default_to(CBX defaultvalue) {
 	return;// *this;
 }
 
-template RETVAR VARBASE1::default_from(CBX defaultvalue) const;
-template<typename var> RETVAR VARBASE2::default_from(CBX defaultvalue) const {
-//template<> RETVAR VARBASE::default_from(CBR defaultvalue) const {
+template<> PUBLIC RETVAR VARBASE1::default_from(CBX defaultvalue) const {
 
 	THISIS("VARREF var::default_from(CVR defaultvalue)")
 	ISASSIGNED(defaultvalue)
@@ -413,8 +448,7 @@ template<typename var> RETVAR VARBASE2::default_from(CBX defaultvalue) const {
 //	return *presult;
 }
 
-template char VARBASE1::toChar() const;
-template<typename var> char VARBASE2::toChar() const {
+template<> PUBLIC char VARBASE1::toChar() const {
 
 	THISIS("char var::toChar() const")
 	assertString(function_sig);
@@ -426,8 +460,7 @@ template<typename var> char VARBASE2::toChar() const {
 }
 
 // temporary var can return move its string into the output
-template std::string VARBASE1::toString() &&;
-template<typename var> std::string VARBASE2::toString() && {
+template<> PUBLIC std::string VARBASE1::toString() && {
 
 	THISIS("std::string var::toString() &&")
 	assertString(function_sig);
@@ -436,8 +469,7 @@ template<typename var> std::string VARBASE2::toString() && {
 }
 
 // non-temporary var can return a const ref to its string
-template const std::string& VARBASE1::toString() const&;
-template<typename var> const std::string& VARBASE2::toString() const& {
+template<> PUBLIC const std::string& VARBASE1::toString() const& {
 
 	THISIS("std::string var::toString() const&")
 	assertString(function_sig);
@@ -529,51 +561,6 @@ var var::textlen() const {
 		//std::cout << c << " " << std::bitset<8>(c) << " " << result.var_int << std::endl;
 	}
 	return result;
-}
-
-template std::u32string VARBASE1::to_u32string() const;
-template<typename var> std::u32string VARBASE2::to_u32string() const {
-
-	 THISIS("std::u32string var::to_u32string() const")
-	 assertString(function_sig);
-
-	// 1.4 secs per 10,000,000 var=var copies of 3 byte ASCII strings
-	// simple var=var copy of the following data
-
-	// 14.9 secs round trips u8->u32->u8 per 10,000,000 on vm7
-	// SKIPS/TRIMS OUT any bad utf8
-	return boost::locale::conv::utf_to_utf<char32_t>(var_str);
-}
-
-template std::wstring VARBASE1::to_wstring() const;
-template<typename var> std::wstring VARBASE2::to_wstring() const {
-
-	 THISIS("std::wstring var::to_wstring() const")
-	 assertString(function_sig);
-
-	// 1.4 secs per 10,000,000 var=var copies of 3 byte ASCII strings
-	// simple var=var copy of the following data
-
-	// 14.9 secs round trips u8->w->u8 per 10,000,000 on vm7
-	// SKIPS/TRIMS OUT any bad utf8
-	return boost::locale::conv::utf_to_utf<wchar_t>(var_str);
-}
-
-template void VARBASE1::from_u32string(std::u32string u32str) const;
-template<typename var> void VARBASE2::from_u32string(std::u32string u32str) const {
-	// for speed, dont validate
-	// THISIS("void var::from_u32tring() const")
-	// assertDefined(function_sig);
-	var_typ = VARTYP_STR;
-
-	var_str = boost::locale::conv::utf_to_utf<char>(u32str);
-}
-
-// CONSTRUCTOR from const std::u32string converts to utf-8
-template VARBASE1::var_base(const std::wstring& wstr1);
-template<typename var> VARBASE2::var_base(const std::wstring& wstr1) {
-	var_typ = VARTYP_STR;
-	var_str = boost::locale::conv::utf_to_utf<char>(wstr1);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -1255,8 +1242,7 @@ VARREF pasterx(const int start1, const int length, const char* c) {
 };
 */
 
-template VBR1 VARBASE1::move(VBX tovar);
-template<typename var> VBR2 VARBASE2::move(VBX tovar) {
+template<> PUBLIC VBR1 VARBASE1::move(VBX tovar) {
 
 	THISIS("VARREF var::move(VARREF tovar)")
 	assertAssigned(function_sig);
@@ -1278,8 +1264,7 @@ template<typename var> VBR2 VARBASE2::move(VBX tovar) {
 }
 
 // const version needed in calculatex
-template CBR VARBASE1::swap(CBX var2) const;
-template<typename var> CBR VARBASE2::swap(CBX var2) const {
+template<> PUBLIC CBR VARBASE1::swap(CBX var2) const {
 
 	THISIS("CVR var::swap(CVR var2) const")
 	// Works on unassigned vars
@@ -1308,8 +1293,7 @@ template<typename var> CBR VARBASE2::swap(CBX var2) const {
 }
 
 // non-const version
-template VBR1 VARBASE1::swap(VBX var2);
-template<typename var> VBR2 VARBASE2::swap(VBX var2) {
+template<> PUBLIC VBR1 VARBASE1::swap(VBX var2) {
 
 	THISIS("VARREF var::swap(VARREF var2)")
 	// Works on unassigned vars
@@ -1464,7 +1448,7 @@ VARREF var::raiser() {
 }
 
 //generic helper to handle char and u32_char wise conversion (mapping)
-template <class T1, class T2, class T3>
+template<typename T1, typename T2, typename T3>
 static void string_converter(T1& var_str, const T2 fromchars, const T3 tochars) {
 	typename T1::size_type pos = T1::npos;
 

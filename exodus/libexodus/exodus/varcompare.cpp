@@ -32,9 +32,6 @@ namespace exo {
 
 // NOTE: INSTANTIATIONS ARE AT THE END OF THIS FILE
 
-// NOTE: Using "var_base" (VARBASE/CBR) instead of "T" for clarity in template parameters.
-// Potentially confusing but has identical meaning.
-
 inline bool almost_equal(double lhs_dbl, double rhs_dbl) {
 	//crude pickos method
 	return (std::abs(lhs_dbl - rhs_dbl) < SMALLEST_NUMBER);

@@ -53,8 +53,7 @@ namespace exo {
 
 //^=var
 // The assignment operator must always return a reference to *this.
-template VBR1 VARBASE1::operator^=(CBX rhs) &;
-template<typename var> var_base<var>& VARBASE2::operator^=(CBX rhs) & {
+template<> PUBLIC VBR1 VARBASE1::operator^=(CBX rhs) & {
 
 	assertString(__PRETTY_FUNCTION__);
 	rhs.assertString(__PRETTY_FUNCTION__);
@@ -68,8 +67,7 @@ template<typename var> var_base<var>& VARBASE2::operator^=(CBX rhs) & {
 
 //^=int
 // The assignment operator must always return a reference to *this.
-template VBR1 VARBASE1::operator^=(const int int1) &;
-template<typename var> VBR2 VARBASE2::operator^=(const int int1) & {
+template<> PUBLIC VBR1 VARBASE1::operator^=(const int int1) & {
 
 	assertString(__PRETTY_FUNCTION__);
 
@@ -82,9 +80,7 @@ template<typename var> VBR2 VARBASE2::operator^=(const int int1) & {
 
 //^=double
 // The assignment operator must always return a reference to *this.
-//VAR_TEMPLATE(VBR VARBASE::operator^=(const double double1) &) {
-template VBR1 VARBASE1::operator^=(const double double1) &;
-template<typename var> VBR2 VARBASE2::operator^=(const double double1) & {
+template<> PUBLIC VBR1 VARBASE1::operator^=(const double double1) & {
 
 	assertString(__PRETTY_FUNCTION__);
 
@@ -100,8 +96,7 @@ template<typename var> VBR2 VARBASE2::operator^=(const double double1) & {
 
 //^=char
 // The assignment operator must always return a reference to *this.
-template VBR1 VARBASE1::operator^=(const char char1) &;
-template<typename var> VBR2 VARBASE2::operator^=(const char char1) & {
+template<> PUBLIC VBR1 VARBASE1::operator^=(const char char1) & {
 
 	assertString(__PRETTY_FUNCTION__);
 
@@ -116,8 +111,7 @@ template<typename var> VBR2 VARBASE2::operator^=(const char char1) & {
 
 //^=char*
 // The assignment operator must always return a reference to *this.
-template VBR1 VARBASE1::operator^=(const char* cstr) &;
-template<typename var> VBR2 VARBASE2::operator^=(const char* cstr) & {
+template<> PUBLIC VBR1 VARBASE1::operator^=(const char* cstr) & {
 
 	assertString(__PRETTY_FUNCTION__);
 
@@ -131,8 +125,7 @@ template<typename var> VBR2 VARBASE2::operator^=(const char* cstr) & {
 
 //^=std::string
 // The assignment operator must always return a reference to *this.
-template VBR1 VARBASE1::operator^=(const std::string& string1) &;
-template<typename var> VBR2 VARBASE2::operator^=(const std::string& string1) & {
+template<> PUBLIC VBR1 VARBASE1::operator^=(const std::string& string1) & {
 
 	assertString(__PRETTY_FUNCTION__);
 
@@ -145,8 +138,7 @@ template<typename var> VBR2 VARBASE2::operator^=(const std::string& string1) & {
 
 //^=std::string_view
 // The assignment operator must always return a reference to *this.
-template VBR1 VARBASE1::operator^=(SV sv1) &;
-template<typename var> VBR2 VARBASE2::operator^=(SV sv1) & {
+template<> PUBLIC VBR1 VARBASE1::operator^=(SV sv1) & {
 
 	assertString(__PRETTY_FUNCTION__);
 
@@ -163,8 +155,7 @@ template<typename var> VBR2 VARBASE2::operator^=(SV sv1) & {
 // *** YOU HAVE BEEN WARNED ***
 // not returning void so is usable in expressions
 // int argument indicates that this is POSTFIX override v++
-template RETVAR VARBASE1::operator++(int) &;
-template<typename var> RETVAR VARBASE2::operator++(int) & {
+template<> PUBLIC RETVAR VARBASE1::operator++(int) & {
 
 	// full check done below to avoid double checking number type
 	assertDefined(__PRETTY_FUNCTION__);
@@ -205,8 +196,7 @@ tryagain:
 
 // not returning void so is usable in expressions
 // int argument indicates that this is POSTFIX override v--
-template RETVAR VARBASE1::operator--(int) &;
-template<typename var> RETVAR VARBASE2::operator--(int) & {
+template<> PUBLIC RETVAR VARBASE1::operator--(int) & {
 
 	// full check done below to avoid double checking number type
 	assertDefined(__PRETTY_FUNCTION__);
@@ -246,8 +236,7 @@ tryagain:
 
 // not returning void so is usable in expressions
 // no argument indicates that this is prefix override ++var
-template VBR1 VARBASE1::operator++() &;
-template<typename var> VBR2 VARBASE2::operator++() & {
+template<> PUBLIC VBR1 VARBASE1::operator++() & {
 
 	// full check done below to avoid double checking number type
 	assertDefined(__PRETTY_FUNCTION__);
@@ -282,8 +271,7 @@ tryagain:
 
 // not returning void so is usable in expressions
 // no argument indicates that this is prefix override --var
-template VBR1 VARBASE1::operator--() &;
-template<typename var> VBR2 VARBASE2::operator--() & {
+template<> PUBLIC VBR1 VARBASE1::operator--() & {
 
 	// full check done below to avoid double checking number type
 	assertDefined(__PRETTY_FUNCTION__);
@@ -328,8 +316,7 @@ tryagain:
 
 // ADD VAR
 
-template VBR1 VARBASE1::operator+=(CBX rhs) &;
-template<typename var> VBR2 VARBASE2::operator+=(CBX rhs) & {
+template<> PUBLIC VBR1 VARBASE1::operator+=(CBX rhs) & {
 
 	rhs.assertNumeric(__PRETTY_FUNCTION__);
 
@@ -377,8 +364,7 @@ tryagain:
 
 // MULTIPLY VAR
 
-template VBR1 VARBASE1::operator*=(CBX rhs) &;
-template<typename var> VBR2 VARBASE2::operator*=(CBX rhs) & {
+template<> PUBLIC VBR1 VARBASE1::operator*=(CBX rhs) & {
 
 	rhs.assertNumeric(__PRETTY_FUNCTION__);
 
@@ -426,8 +412,7 @@ tryagain:
 
 // SUBTRACT VAR
 
-template VBR1 VARBASE1::operator-=(CBX rhs) &;
-template<typename var> VBR2 VARBASE2::operator-=(CBX rhs) & {
+template<> PUBLIC VBR1 VARBASE1::operator-=(CBX rhs) & {
 
 	rhs.assertNumeric(__PRETTY_FUNCTION__);
 
@@ -476,8 +461,7 @@ tryagain:
 
 // DIVIDE VAR
 
-template VBR1 VARBASE1::operator/=(CBX rhs) &;
-template<typename var> VBR2 VARBASE2::operator/=(CBX rhs) & {
+template<> PUBLIC VBR1 VARBASE1::operator/=(CBX rhs) & {
 
 	// Always returns a double because
 	// 10/3 must be 3.3333333
@@ -551,8 +535,7 @@ tryagain:
 
 // MODULO VAR
 
-template VBR1 VARBASE1::operator%=(CBX rhs) &;
-template<typename var> VBR2 VARBASE2::operator%=(CBX rhs) & {
+template<> PUBLIC VBR1 VARBASE1::operator%=(CBX rhs) & {
 	*this = this->mod(rhs);
 	return *this;
 }
@@ -563,8 +546,7 @@ template<typename var> VBR2 VARBASE2::operator%=(CBX rhs) & {
 
 // ADD DOUBLE
 
-template VBR1 VARBASE1::operator+=(const double dbl1) &;
-template<typename var> VBR2 VARBASE2::operator+=(const double dbl1) & {
+template<> PUBLIC VBR1 VARBASE1::operator+=(const double dbl1) & {
 
 tryagain:
 
@@ -595,8 +577,7 @@ tryagain:
 
 // MULTIPLY DOUBLE
 
-template VBR1 VARBASE1::operator*=(const double dbl1) &;
-template<typename var> VBR2 VARBASE2::operator*=(const double dbl1) & {
+template<> PUBLIC VBR1 VARBASE1::operator*=(const double dbl1) & {
 
 tryagain:
 
@@ -624,8 +605,7 @@ tryagain:
 
 // SUBTRACT DOUBLE
 
-template VBR1 VARBASE1::operator-=(const double dbl1) &;
-template<typename var> VBR2 VARBASE2::operator-=(const double dbl1) & {
+template<> PUBLIC VBR1 VARBASE1::operator-=(const double dbl1) & {
 
 tryagain:
 
@@ -654,8 +634,7 @@ tryagain:
 
 // DIVIDE DOUBLE
 
-template VBR1 VARBASE1::operator/=(const double dbl1) &;
-template<typename var> VBR2 VARBASE2::operator/=(const double dbl1) & {
+template<> PUBLIC VBR1 VARBASE1::operator/=(const double dbl1) & {
 
 	if (!dbl1)
 		UNLIKELY
@@ -689,8 +668,7 @@ tryagain:
 
 // MODULO DOUBLE
 
-template VBR1 VARBASE1::operator%=(const double rhs) &;
-template<typename var> VBR2 VARBASE2::operator%=(const double rhs) & {
+template<> PUBLIC VBR1 VARBASE1::operator%=(const double rhs) & {
 	*this = this->mod(rhs);
 	return *this;
 }
@@ -701,8 +679,7 @@ template<typename var> VBR2 VARBASE2::operator%=(const double rhs) & {
 
 // ADD INT
 
-template VBR1 VARBASE1::operator+=(const int int1) &;
-template<typename var> VBR2 VARBASE2::operator+=(const int int1) & {
+template<> PUBLIC VBR1 VARBASE1::operator+=(const int int1) & {
 
 tryagain:
 
@@ -736,8 +713,7 @@ tryagain:
 
 // MULTIPLY INT
 
-template VBR1 VARBASE1::operator*=(const int int1) &;
-template<typename var> VBR2 VARBASE2::operator*=(const int int1) & {
+template<> PUBLIC VBR1 VARBASE1::operator*=(const int int1) & {
 
 tryagain:
 
@@ -771,8 +747,7 @@ tryagain:
 
 //SUBTRACT INT
 
-template VBR1 VARBASE1::operator-=(const int int1) &;
-template<typename var> VBR2 VARBASE2::operator-=(const int int1) & {
+template<> PUBLIC VBR1 VARBASE1::operator-=(const int int1) & {
 
 tryagain:
 
@@ -807,8 +782,7 @@ tryagain:
 
 //DIVIDE INT
 
-template VBR1 VARBASE1::operator/=(const int int1) &;
-template<typename var> VBR2 VARBASE2::operator/=(const int int1) & {
+template<> PUBLIC VBR1 VARBASE1::operator/=(const int int1) & {
 
 	// Always return double
 
@@ -844,8 +818,7 @@ tryagain:
 
 //MODULO INT
 
-template VBR1 VARBASE1::operator%=(const int rhs) &;
-template<typename var> VBR2 VARBASE2::operator%=(const int rhs) & {
+template<> PUBLIC VBR1 VARBASE1::operator%=(const int rhs) & {
 	*this = this->mod(rhs);
 	return *this;
 }
@@ -856,8 +829,7 @@ template<typename var> VBR2 VARBASE2::operator%=(const int rhs) & {
 
 // ADD BOOL
 
-template VBR1 VARBASE1::operator+=(const bool bool1) &;
-template<typename var> VBR2 VARBASE2::operator+=(const bool bool1) & {
+template<> PUBLIC VBR1 VARBASE1::operator+=(const bool bool1) & {
 	if (bool1)
 		(*this)++;
 	else
@@ -867,8 +839,7 @@ template<typename var> VBR2 VARBASE2::operator+=(const bool bool1) & {
 
 // MULTIPLY BOOL
 
-template VBR1 VARBASE1::operator*=(const bool bool1) &;
-template<typename var> VBR2 VARBASE2::operator*=(const bool bool1) & {
+template<> PUBLIC VBR1 VARBASE1::operator*=(const bool bool1) & {
 	assertNumeric(__PRETTY_FUNCTION__);
 	if (!bool1) {
 		var_int = 0;
@@ -879,8 +850,7 @@ template<typename var> VBR2 VARBASE2::operator*=(const bool bool1) & {
 
 // SUBTRACT BOOL
 
-template VBR1 VARBASE1::operator-=(const bool bool1) &;
-template<typename var> VBR2 VARBASE2::operator-=(const bool bool1) & {
+template<> PUBLIC VBR1 VARBASE1::operator-=(const bool bool1) & {
 	if (bool1)
 		(*this)--;
 	else
@@ -889,8 +859,7 @@ template<typename var> VBR2 VARBASE2::operator-=(const bool bool1) & {
 }
 
 // +var
-template RETVAR VARBASE1::operator+() const;
-template<typename var> RETVAR VARBASE2::operator+() const {
+template<> PUBLIC RETVAR VARBASE1::operator+() const {
 
 	assertDefined(__PRETTY_FUNCTION__);
 	assertNumeric(__PRETTY_FUNCTION__);
@@ -900,8 +869,7 @@ template<typename var> RETVAR VARBASE2::operator+() const {
 }
 
 // -var
-template RETVAR VARBASE1::operator-() const;
-template<typename var> RETVAR VARBASE2::operator-() const {
+template<> PUBLIC RETVAR VARBASE1::operator-() const {
 
 	assertDefined(__PRETTY_FUNCTION__);
 
@@ -977,81 +945,6 @@ RETVAR cstr_cat_var(const char* lhs, CBR rhs) {
 	return result;
 }
 
-//VAR_TEMPLATE(RETVARREF VARBASE::operator^(CVR vstr)) {
-//
-//	assertString(__PRETTY_FUNCTION__);
-//	vstr.assertString(__PRETTY_FUNCTION__);
-//
-//	var_str += vstr.var_str;
-//
-//	return *this;
-//}
-//
-//VAR_TEMPLATE(RETVARREF VARBASE::operator^(const char* cstr))  {
-//	std::clog <<("var operator^(const char& cstr)") << std::endl;
-//
-//	assertString(__PRETTY_FUNCTION__);
-//
-//	var_str += cstr;
-//
-//	return *this;
-//}
-//
-//VAR_TEMPLATE(RETVARREF VARBASE::operator^(const std::string& stdstr)) {
-//
-//	assertString(__PRETTY_FUNCTION__);
-//	stdstr.assertString(__PRETTY_FUNCTION__);
-//
-//	var_str += stdstr.var_str;
-//
-//	return *this;
-//}
-
-//#if defined __MINGW32__
-// allow use of cout<<var
-//pass by value (make a copy) because we are going to convert FM to ^ etc
-//TODO provide a version that works on temporaries?
-//PUBLIC
-//std::ostream& operator<<(std::ostream& ostream1, var var1) {
-//
-//	var1.assertString(__PRETTY_FUNCTION__);
-//
-//	constexpr std::array VISIBLE_FMS_EXCEPT_ESC {VISIBLE_ST_, TM_, VISIBLE_SM_, VISIBLE_VM_, VISIBLE_FM_, VISIBLE_RM_};
-//
-//	//replace various unprintable field marks with unusual ASCII characters
-//	//leave ESC as \x1B because it is used to control ANSI terminal control sequences
-//	//std::string str = "\x1A\x1B\x1C\x1D\x1E\x1F";
-//	// |\x1B}]^~  or in high to low ~^]}\x1B|     or in TRACE() ... ~^]}_|
-//	for (auto& charx : var1.var_str) {
-//		if (charx <= 0x1F && charx >= 0x1A) {
-//			UNLIKELY
-//			//charx = "|\x1B}]^~"[charx - 0x1A];
-//			charx = VISIBLE_FMS_EXCEPT_ESC[charx - 0x1A];
-//		}
-//	}
-//
-//	// use toString() to avoid creating a constructor which logs here recursively
-//	// should this use a ut16/32 -> UTF8 code facet? or convert to UTF8 and output to ostream?
-//	ostream1 << var1.var_str;
-//	return ostream1;
-//}
-
-//std::istream& operator>>(std::istream& istream1, VARREF into_str1) {
-//
-//	into_str1.assertDefined(__PRETTY_FUNCTION__);
-//
-//	into_str1.var_str.clear();
-//	into_str1.var_typ = VARTYP_STR;
-//
-//	//std::string tempstr;
-//	istream1 >> std::noskipws >> into_str1.var_str;
-//
-//	// this would verify all input is valid utf8
-//	// into_str1.var_str=boost::locale::conv::utf_to_utf<char>(into_str1)
-//
-//	return istream1;
-//}
-
 ////////////////////
 // _var user literal
 ////////////////////
@@ -1070,7 +963,5 @@ ND var operator""_var(unsigned long long int i) {
 ND var operator""_var(long double d) {
     return var(d);
 }
-
-//#endif
 
 } // namespace exo
