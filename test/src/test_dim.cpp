@@ -289,14 +289,14 @@ TRACE("x")
 		try {
 			assert(d3.reverse().join(",") eq "");
 			assert(false);
-		} catch (DimNotDimensioned& e) { e.description.errputl();}
+		} catch (DimNotDimensioned& e) { var(e.description).errputl();}
 
 		// Reverse - unassigned should be error
 		dim d4;
 		try {
 			assert(d4.reverse().join(",") eq "");
 			assert(false);
-		} catch (DimNotDimensioned& e) { e.description.errputl();}
+		} catch (DimNotDimensioned& e) { var(e.description).errputl();}
 
 	}
 	{
@@ -744,7 +744,7 @@ TRACE("x")
 		try {
 			var x = d1.join(",");
 			assert(false);
-		} catch (DimNotDimensioned& e) { e.description.errputl();}
+		} catch (DimNotDimensioned& e) { var(e.description).errputl();}
 	}
 
 	printl(elapsedtimetext());

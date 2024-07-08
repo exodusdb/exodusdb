@@ -148,6 +148,9 @@ THE SOFTWARE.
 #	include "timebank.h"
 #endif
 
+#define BACKTRACE_MAXADDRESSES 100
+#include <exodus/varerr.h>
+
 #include <exodus/vartyp.h>
 
 #pragma clang diagnostic push
@@ -223,8 +226,6 @@ inline const char VISIBLE_ST_ = '~';
 #define ISASSIGNED(VARNAME) (VARNAME).assertAssigned(function_sig, #VARNAME);
 #define ISSTRING(VARNAME) (VARNAME).assertString(function_sig, #VARNAME);
 #define ISNUMERIC(VARNAME) (VARNAME).assertNumeric(function_sig, #VARNAME);
-
-#define BACKTRACE_MAXADDRESSES 100
 
 #pragma clang diagnostic push
 
@@ -2833,39 +2834,7 @@ ND inline var_proxy3 var::operator()(int fieldno, int valueno, int subvalueno) {
 /////////////////////////////////////
 [[maybe_unused]] static inline int DBTRACE = var().osgetenv("EXO_DBTRACE");
 
-#pragma clang diagnostic pop
-
-//#pragma GCC diagnostic push
-//#pragma GCC diagnostic ignored "-Winline"
-
-/////////////////////////
-// A base exception class - Provide stack tracing
-/////////////////////////
-class PUBLIC VarError {
- public:
-
-	//VarError(CBR description) = delete;
-	explicit VarError(CVR description);
-
-	// Note: "description" is not const so that an exception handler (catch block)
-	// can add any context (additional info only known in the handler)
-	// to the error description and rethrow the exception up to
-	// a higher exception handler.
-	// (using plain "throw;")
-	// Otherwise the only the stack track captured by the exception site will be available. 
-	var description;
-
-	// Convert stack addresses to source code if available
-	var stack(const size_t limit = 0) const;
-
- private:
-
-	mutable void* stack_addresses_[BACKTRACE_MAXADDRESSES];
-	mutable size_t stack_size_ = 0;
-
-};
-//#pragma GCC diagnostic pop
-
+//
 ////////////////////
 // _var user literal
 ////////////////////
