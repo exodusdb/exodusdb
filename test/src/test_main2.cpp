@@ -629,15 +629,15 @@ programinit()
 	//following will not compile now that all exodus logical operators return bool instead of var
 	//if (log1 eq log2^log1) {}
 	/*
-	in.cpp(181) : error C2666: 'exodus::operator ^' : 7 overloads have similar conversions
-	could be 'exodus::var exodus::operator +(const int,const exodus::var &)' [found using argument-dependent lookup]
-	or 'exodus::var exodus::operator +(const exodus::var &,const double)' [found using argument-dependent lookup]
-	or 'exodus::var exodus::operator +(const exodus::var &,const int)' [found using argument-dependent lookup]
-	or 'exodus::var exodus::operator +(const exodus::var &,const exodus::var &)' [found using argument-dependent lookup]
+	in.cpp(181) : error C2666: 'exo::operator ^' : 7 overloads have similar conversions
+	could be 'exo::var exo::operator +(const int,const exo::var &)' [found using argument-dependent lookup]
+	or 'exo::var exo::operator +(const exo::var &,const double)' [found using argument-dependent lookup]
+	or 'exo::var exo::operator +(const exo::var &,const int)' [found using argument-dependent lookup]
+	or 'exo::var exo::operator +(const exo::var &,const exo::var &)' [found using argument-dependent lookup]
 	or 'built-in C++ operator+(int, bool)'
 	or 'built-in C++ operator+(unsigned int, bool)'
 	or 'built-in C++ operator+(bool, bool)'
-	while trying to match the argument list '(exodus::var, bool)'
+	while trying to match the argument list '(exo::var, bool)'
 	*/
 
 	//neither will the following

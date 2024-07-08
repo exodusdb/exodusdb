@@ -114,7 +114,7 @@ BOOL APIENTRY DllMain(HANDLE hModule, DWORD dwReason, LPVOID lpReserved) {
 extern "C" {
 
 #define function(funcname) \
-	exodus::var __declspec(dllexport) funcname(exodus::ExoEnv& env) {
+	exo::var __declspec(dllexport) funcname(exo::ExoEnv& env) {
 
 #define functionexit }
 

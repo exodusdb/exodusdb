@@ -316,7 +316,7 @@ TRACE("x")
 		// remove_if
 		d1 = "10^2^1^20"_var.split();
 		[[maybe_unused]] auto dummy1 = std::remove_if(d1.begin(), d1.end(), [](var x){return x eq "2";});
-		// TODO add erase to exodus::dim?
+		// TODO add erase to exo::dim?
 //		d1.erase(std::remove_if(d1.begin(), d1.end(), [](var x){return x eq "2";}), d1.end());
 		TRACE(d1.join("^"))
 		assert(d1.join() eq "10^1^20^"_var);
@@ -324,7 +324,7 @@ TRACE("x")
 		// remove_if
 		d1 = v1.split();
 		[[maybe_unused]] auto dummy2 = std::remove_if(d1.begin(), d1.end(), [](var x){return x eq "2";});
-		// TODO add erase to exodus::dim?
+		// TODO add erase to exo::dim?
 //		d1.erase(std::remove_if(d1.begin(), d1.end(), [](var x){return x eq "2";}), d1.end());
 		assert(d1.join() eq "10^1^20^"_var);
 

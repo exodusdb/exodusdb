@@ -34,11 +34,11 @@ programinit()
 
 // clang 15 on u22.04 has a problem with the above var in println
 
-///root/exodus/test/src/test_regex.cpp:28:11: error: call to consteval function 'fmt::basic_format_string<char, exodus::var>::basic_format_string<cha
+///root/exodus/test/src/test_regex.cpp:28:11: error: call to consteval function 'fmt::basic_format_string<char, exo::var>::basic_format_string<cha
 //r[15], 0>' is not a constant expression                                                                                                            
 //                println("Found {} words", v1.match("\\w+").fcount(FM));                                                                            
 //                        ^                                                                                                                          
-///root/exodus/test/src/../../fmt/include/fmt/core.h:2561:12: note: non-literal type 'formatter<mapped_type, char_type>' (aka 'formatter<exodus::var,
+///root/exodus/test/src/../../fmt/include/fmt/core.h:2561:12: note: non-literal type 'formatter<mapped_type, char_type>' (aka 'formatter<exo::var,
 // char>') cannot be used in a constant expression                                                                                                   
 //    return formatter<mapped_type, char_type>().parse(ctx);               
 //           ^                                                             

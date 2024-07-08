@@ -98,9 +98,9 @@ static std::mutex global_mutex_lockdlcache;
 #include <exodus/varimpl.h>
 #include <exodus/exoenv.h>
 #include <exodus/exocallable.h>
-namespace exodus {
+namespace exo {
 
-// using namespace exodus;
+// using namespace exo;
 
 // Default constructor.  probably followed by .init(libname,funcname,mv)
 Callable::Callable()
@@ -471,7 +471,7 @@ bool Callable::openlib(const std::string newlibname) {
 			UNLIKELY
 			throw VarError(libfilepath ^ " Cannot be linked/wrong version. Run with LD_DEBUG=libs for more info. Look for 'fatal'. Also run 'ldd "
 			^ libfilepath ^ "' to check its sublibs are available. Also run 'nm -C " ^ libfilepath ^ "' to check its content.)"
-			^ " To unmangle undefined symbols run 'c++filt _ZN6exodus3varC1Ev' for example to to see  exodus::var::var()");
+			^ " To unmangle undefined symbols run 'c++filt _ZN6exodus3varC1Ev' for example to to see  exo::var::var()");
 		} else {
 			UNLIKELY
 			throw VarError(libfilepath ^ " does not exist or cannot be found, or " ^ purelibfilename ^ " cannot be linked/wrong version?");
@@ -640,4 +640,4 @@ void Callable::delete_shared_object() {
 	// funcname_="";
 }
 
-}  // namespace exodus
+}  // namespace exo

@@ -12,7 +12,7 @@
 //#include <unordered_map>
 #include <utility> // for std::unreachable
 
-namespace exodus {
+namespace exo {
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuninitialized"
@@ -3013,4 +3013,4 @@ MVLogoff   ::MVLogoff(CVR errmsg)   : description(errmsg) {}
 
 // clang-format on
 
-}  // namespace exodus
+}  // namespace exo

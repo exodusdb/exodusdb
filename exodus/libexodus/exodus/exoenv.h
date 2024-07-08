@@ -41,7 +41,7 @@ THE SOFTWARE.
 #include <exodus/rex.h>
 #include <exodus/exocallable.h>
 
-namespace exodus {
+namespace exo {
 
 using let = const var;
 
@@ -207,6 +207,6 @@ var osgetenv(const char* envcode) {
 
 };
 
-}  // namespace exodus
+}  // namespace exo
 
 #endif //EXOENV_H

@@ -2,7 +2,7 @@
 #include <exodus/var.h>
 
 //using namespace exodus;
-using exodus::var;
+using exo::var;
 
 int main() {
 

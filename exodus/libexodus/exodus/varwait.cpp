@@ -11,7 +11,7 @@
 
 #pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
 
-namespace exodus {
+namespace exo {
 
 /* Read all available inotify events from the file descriptor 'fd'.
   wd is the table of watch descriptors for the directories in argv.
@@ -319,4 +319,4 @@ var var::oswait(const int milliseconds, SV directory) const {
 	return wait_main(cargs.argc(), cargs.argv(), milliseconds);
 }
 
-}  // namespace exodus
+}  // namespace exo

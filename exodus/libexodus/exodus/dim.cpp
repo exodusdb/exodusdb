@@ -32,7 +32,7 @@ THE SOFTWARE.
 // one based two dimensional array but (0,0) is a separate element set or got if either or both
 // index is zero
 
-namespace exodus {
+namespace exo {
 
 	using RNG_typ = std::mt19937;
 	extern thread_local std::unique_ptr<RNG_typ> thread_RNG;
@@ -701,4 +701,4 @@ var var::shuffle(SV sepchar) const& {
 	return this->split(sepchar).shuffler().join(sepchar);
 }
 
-}  // namespace exodus
+}  // namespace exo

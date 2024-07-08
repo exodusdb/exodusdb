@@ -233,7 +233,7 @@ Within transactions, lock requests for locks that have already been obtained alw
 #define DBTRACE_SELECT DBTRACE
 #define DBTRACE_CONN 0
 
-namespace exodus {
+namespace exo {
 
 // the idea is for exodus to have access to one standard database without secret password
 static const var defaultconninfo =
@@ -2686,7 +2686,7 @@ static var get_dictexpression(CVR cursor, CVR mainfilename, CVR filename, CVR di
 									.quote() ^
 								" or \"dict.voc\"";
 							throw VarDBException(errmsg);
-							//					exodus::errputl("ERROR:
+							//					exo::errputl("ERROR:
 							// mvdbpostgres get_dictexpression() cannot
 							// read " ^ fieldname.quote() ^ " from " ^
 							// actualdictfile.quote());
@@ -4595,7 +4595,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 
 	// DEBUG_LOG_SQL
 	// if (DBTRACE)
-	//	exodus::logputl(sql);
+	//	exo::logputl(sql);
 
 	// first close any existing cursor with the same name, otherwise cannot create  new cursor
     // Avoid generating sql errors since they abort transactions
@@ -4675,7 +4675,7 @@ void var::clearselect() {
 	var listname = (*this) ^ "_" ^ ospid() ^ "_tempx";
 
 	// if (DBTRACE)
-	//	exodus::logputl("DBTRACE: ::clearselect() for " ^ listname);
+	//	exo::logputl("DBTRACE: ::clearselect() for " ^ listname);
 
 	// Dont close cursor unless it exists otherwise sql error aborts any transaction
     // Avoid generating sql errors since they abort transactions
@@ -4823,7 +4823,7 @@ static bool readnextx(CVR cursor, PGconn* pgconn, int  direction, PGresult*& pgr
 			if (not cursor.select("select " ^ listfilename))
 				return false;
 			if (DBTRACE)
-				exodus::logputl("DBTRACE: readnextx(...) found standard selectfile "
+				exo::logputl("DBTRACE: readnextx(...) found standard selectfile "
 			^ listfilename);
 
 			return readnextx(cursor, dbresult, pgconn, clearselect_onfail, forwards);
@@ -5769,4 +5769,4 @@ var var::loglasterror(CVR source) const {
 	return thread_lasterror.logputl(source ^ " ");
 }
 
-}  // namespace exodus
+}  // namespace exo

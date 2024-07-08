@@ -3,7 +3,7 @@
 
 #include <exodus/var.h>
 
-namespace exodus {
+namespace exo {
 
 //echo on=1 off=0
 bool var::echo(const int on_off) const {
@@ -32,4 +32,4 @@ bool var::echo(const int on_off) const {
 	return true;
 }
 
-}  // namespace exodus
+}  // namespace exo

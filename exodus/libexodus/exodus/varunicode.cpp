@@ -17,7 +17,7 @@
 
 #include <exodus/var.h>
 
-namespace exodus {
+namespace exo {
 
 bool var::setxlocale() const {
 
@@ -68,4 +68,4 @@ VARREF var::getxlocale() {
 #endif
 }
 
-}  // namespace exodus
+}  // namespace exo

@@ -49,7 +49,7 @@
 
 #include <exodus/var.h>
 
-namespace exodus {
+namespace exo {
 
 using ConnectionLocks = std::map<uint64_t, int>;
 //using DBCache = std::unordered_map<uint64_t, std::string>;
@@ -160,5 +160,5 @@ class DBConnector final {
 
 };
 
-}  // namespace exodus
+}  // namespace exo
 #endif	//EXODUS_LIBEXODUS_EXODUS_VARDBCONN_H_

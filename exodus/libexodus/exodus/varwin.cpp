@@ -7,7 +7,7 @@
 
 #include <exodus/var.h>
 
-namespace exodus {
+namespace exo {
 
 var getprocessn() {
 	// DWORD WINAPI
@@ -42,6 +42,6 @@ var getexecpath() {
 	}
 }
 
-}  // namespace exodus
+}  // namespace exo
 
 #endif

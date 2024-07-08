@@ -46,7 +46,7 @@ THE SOFTWARE.
 #include <exodus/varimpl.h>
 #include <exodus/varoshandle.h>
 
-namespace exodus {
+namespace exo {
 
 // setgloballocale object constructs to standard on program startup
 // for correct collation
@@ -1344,4 +1344,4 @@ var var::oscwd() const {
 	return var(currentpath).convert("/", _OSSLASH);
 }
 
-}  // namespace exodus
+}  // namespace exo

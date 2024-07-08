@@ -1,7 +1,7 @@
 #ifndef EXODUS_LIBEXODUS_EXODUS_RANGE_H_
 #define EXODUS_LIBEXODUS_EXODUS_RANGE_H_
 
-namespace exodus {
+namespace exo {
 
 // class range
 // provides "for (const var i : range(1,10))"
@@ -129,6 +129,6 @@ class PUBLIC reverse_range {
 
 };
 
-} // namespace exodus
+} // namespace exo
 
 #endif // EXODUS_LIBEXODUS_EXODUS_RANGE_H_

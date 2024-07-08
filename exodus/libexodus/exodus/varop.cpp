@@ -35,7 +35,7 @@ THE SOFTWARE.
 //#include <exodus/varimpl.h>
 //#include <exodus/exoimpl.h>
 
-namespace exodus {
+namespace exo {
 
 // Originally most help from Thinking in C++ Volume 1 Chapter 12
 // http://www.camtp.uni-mb.si/books/Thinking-in-C++/TIC2Vone-distribution/html/Chapter12.html
@@ -53,7 +53,8 @@ namespace exodus {
 
 //^=var
 // The assignment operator must always return a reference to *this.
-VAR_TEMPLATE(VBR VARBASE::operator^=(CBR rhs) &) {
+template VBR1 VARBASE1::operator^=(CBX rhs) &;
+template<typename var> var_base<var>& VARBASE2::operator^=(CBX rhs) & {
 
 	assertString(__PRETTY_FUNCTION__);
 	rhs.assertString(__PRETTY_FUNCTION__);
@@ -67,7 +68,8 @@ VAR_TEMPLATE(VBR VARBASE::operator^=(CBR rhs) &) {
 
 //^=int
 // The assignment operator must always return a reference to *this.
-VAR_TEMPLATE(VBR VARBASE::operator^=(const int int1) &) {
+template VBR1 VARBASE1::operator^=(const int int1) &;
+template<typename var> VBR2 VARBASE2::operator^=(const int int1) & {
 
 	assertString(__PRETTY_FUNCTION__);
 
@@ -80,7 +82,9 @@ VAR_TEMPLATE(VBR VARBASE::operator^=(const int int1) &) {
 
 //^=double
 // The assignment operator must always return a reference to *this.
- VAR_TEMPLATE(VBR VARBASE::operator^=(const double double1) &) {
+//VAR_TEMPLATE(VBR VARBASE::operator^=(const double double1) &) {
+template VBR1 VARBASE1::operator^=(const double double1) &;
+template<typename var> VBR2 VARBASE2::operator^=(const double double1) & {
 
 	assertString(__PRETTY_FUNCTION__);
 
@@ -96,7 +100,8 @@ VAR_TEMPLATE(VBR VARBASE::operator^=(const int int1) &) {
 
 //^=char
 // The assignment operator must always return a reference to *this.
-VAR_TEMPLATE(VBR VARBASE::operator^=(const char char1) &) {
+template VBR1 VARBASE1::operator^=(const char char1) &;
+template<typename var> VBR2 VARBASE2::operator^=(const char char1) & {
 
 	assertString(__PRETTY_FUNCTION__);
 
@@ -111,7 +116,8 @@ VAR_TEMPLATE(VBR VARBASE::operator^=(const char char1) &) {
 
 //^=char*
 // The assignment operator must always return a reference to *this.
-VAR_TEMPLATE(VBR VARBASE::operator^=(const char* cstr) &) {
+template VBR1 VARBASE1::operator^=(const char* cstr) &;
+template<typename var> VBR2 VARBASE2::operator^=(const char* cstr) & {
 
 	assertString(__PRETTY_FUNCTION__);
 
@@ -125,7 +131,8 @@ VAR_TEMPLATE(VBR VARBASE::operator^=(const char* cstr) &) {
 
 //^=std::string
 // The assignment operator must always return a reference to *this.
-VAR_TEMPLATE(VBR VARBASE::operator^=(const std::string& string1) &) {
+template VBR1 VARBASE1::operator^=(const std::string& string1) &;
+template<typename var> VBR2 VARBASE2::operator^=(const std::string& string1) & {
 
 	assertString(__PRETTY_FUNCTION__);
 
@@ -138,7 +145,8 @@ VAR_TEMPLATE(VBR VARBASE::operator^=(const std::string& string1) &) {
 
 //^=std::string_view
 // The assignment operator must always return a reference to *this.
-VAR_TEMPLATE(VBR VARBASE::operator^=(SV sv1) &) {
+template VBR1 VARBASE1::operator^=(SV sv1) &;
+template<typename var> VBR2 VARBASE2::operator^=(SV sv1) & {
 
 	assertString(__PRETTY_FUNCTION__);
 
@@ -155,7 +163,8 @@ VAR_TEMPLATE(VBR VARBASE::operator^=(SV sv1) &) {
 // *** YOU HAVE BEEN WARNED ***
 // not returning void so is usable in expressions
 // int argument indicates that this is POSTFIX override v++
-VAR_TEMPLATE(RETVAR VARBASE::operator++(int) &) {
+template RETVAR VARBASE1::operator++(int) &;
+template<typename var> RETVAR VARBASE2::operator++(int) & {
 
 	// full check done below to avoid double checking number type
 	assertDefined(__PRETTY_FUNCTION__);
@@ -196,7 +205,8 @@ tryagain:
 
 // not returning void so is usable in expressions
 // int argument indicates that this is POSTFIX override v--
-VAR_TEMPLATE(RETVAR VARBASE::operator--(int) &) {
+template RETVAR VARBASE1::operator--(int) &;
+template<typename var> RETVAR VARBASE2::operator--(int) & {
 
 	// full check done below to avoid double checking number type
 	assertDefined(__PRETTY_FUNCTION__);
@@ -236,7 +246,8 @@ tryagain:
 
 // not returning void so is usable in expressions
 // no argument indicates that this is prefix override ++var
-VAR_TEMPLATE(VBR VARBASE::operator++() &) {
+template VBR1 VARBASE1::operator++() &;
+template<typename var> VBR2 VARBASE2::operator++() & {
 
 	// full check done below to avoid double checking number type
 	assertDefined(__PRETTY_FUNCTION__);
@@ -271,7 +282,8 @@ tryagain:
 
 // not returning void so is usable in expressions
 // no argument indicates that this is prefix override --var
-VAR_TEMPLATE(VBR VARBASE::operator--() &) {
+template VBR1 VARBASE1::operator--() &;
+template<typename var> VBR2 VARBASE2::operator--() & {
 
 	// full check done below to avoid double checking number type
 	assertDefined(__PRETTY_FUNCTION__);
@@ -316,7 +328,8 @@ tryagain:
 
 // ADD VAR
 
-VAR_TEMPLATE(VBR VARBASE::operator+=(CBR rhs) &) {
+template VBR1 VARBASE1::operator+=(CBX rhs) &;
+template<typename var> VBR2 VARBASE2::operator+=(CBX rhs) & {
 
 	rhs.assertNumeric(__PRETTY_FUNCTION__);
 
@@ -325,7 +338,7 @@ tryagain:
 	// lhs double
 	if (var_typ & VARTYP_DBL) {
 		// use rhs double if available otherwise use its int
-		// warning: conversion from ‘exodus::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
+		// warning: conversion from ‘exo::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
 		var_dbl += (rhs.var_typ & VARTYP_DBL) ? rhs.var_dbl : static_cast<double>(rhs.var_int);
 		// reset lhs to one unique type
 		var_typ = VARTYP_DBL;
@@ -337,7 +350,7 @@ tryagain:
 
 		// rhs double
 		if (rhs.var_typ & VARTYP_DBL) {
-			// warning: conversion from ‘exodus::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
+			// warning: conversion from ‘exo::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
 			var_dbl = static_cast<double>(var_int) + rhs.var_dbl;
 			// reset lhs to one unique type
 			var_typ = VARTYP_DBL;
@@ -364,7 +377,8 @@ tryagain:
 
 // MULTIPLY VAR
 
-VAR_TEMPLATE(VBR VARBASE::operator*=(CBR rhs) &) {
+template VBR1 VARBASE1::operator*=(CBX rhs) &;
+template<typename var> VBR2 VARBASE2::operator*=(CBX rhs) & {
 
 	rhs.assertNumeric(__PRETTY_FUNCTION__);
 
@@ -373,7 +387,7 @@ tryagain:
 	// lhs double
 	if (var_typ & VARTYP_DBL) {
 		// use rhs double if available otherwise use its int
-		// warning: conversion from ‘exodus::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
+		// warning: conversion from ‘exo::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
 		var_dbl *= (rhs.var_typ & VARTYP_DBL) ? rhs.var_dbl : static_cast<double>(rhs.var_int);
 		// reset lhs to one unique type
 		var_typ = VARTYP_DBL;
@@ -385,7 +399,7 @@ tryagain:
 
 		// rhs double
 		if (rhs.var_typ & VARTYP_DBL) {
-			//warning: conversion from ‘exodus::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
+			//warning: conversion from ‘exo::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
 			var_dbl = static_cast<double>(var_int) * rhs.var_dbl;
 			// reset lhs to one unique type
 			var_typ = VARTYP_DBL;
@@ -412,7 +426,8 @@ tryagain:
 
 // SUBTRACT VAR
 
-VAR_TEMPLATE(VBR VARBASE::operator-=(CBR rhs) &) {
+template VBR1 VARBASE1::operator-=(CBX rhs) &;
+template<typename var> VBR2 VARBASE2::operator-=(CBX rhs) & {
 
 	rhs.assertNumeric(__PRETTY_FUNCTION__);
 
@@ -421,7 +436,7 @@ tryagain:
 	// lhs double
 	if (var_typ & VARTYP_DBL) {
 		// use rhs double if available otherwise use its int
-		// warning: conversion from ‘exodus::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
+		// warning: conversion from ‘exo::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
 		var_dbl -= (rhs.var_typ & VARTYP_DBL) ? rhs.var_dbl : static_cast<double>(rhs.var_int);
 		// reset lhs to one unique type
 		var_typ = VARTYP_DBL;
@@ -433,7 +448,7 @@ tryagain:
 
 		// use rhs double if available
 		if (rhs.var_typ & VARTYP_DBL) {
-			// warning: conversion from ‘exodus::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
+			// warning: conversion from ‘exo::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
 			var_dbl = static_cast<double>(var_int) - rhs.var_dbl;
 			// reset lhs to one unique type
 			var_typ = VARTYP_DBL;
@@ -461,7 +476,8 @@ tryagain:
 
 // DIVIDE VAR
 
-VAR_TEMPLATE(VBR VARBASE::operator/=(CBR rhs) &) {
+template VBR1 VARBASE1::operator/=(CBX rhs) &;
+template<typename var> VBR2 VARBASE2::operator/=(CBX rhs) & {
 
 	// Always returns a double because
 	// 10/3 must be 3.3333333
@@ -488,7 +504,7 @@ tryagain:
 				UNLIKELY
 				throw VarDivideByZero("div('" ^ this->first_(128) ^ "', '" ^ rhs.first_(128) ^
 									 "')");
-			// warning: conversion from ‘exodus::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
+			// warning: conversion from ‘exo::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
 			var_dbl /= static_cast<double>(rhs.var_int);
 		}
 
@@ -503,7 +519,7 @@ tryagain:
 				UNLIKELY
 				throw VarDivideByZero("div('" ^ this->first_(128) ^ "', '" ^ rhs.first_(128) ^
 								 "')");
-			// warning: conversion from ‘exodus::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
+			// warning: conversion from ‘exo::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
 			var_dbl = static_cast<double>(this->var_int) / rhs.var_dbl;
 		}
 
@@ -513,7 +529,7 @@ tryagain:
 				UNLIKELY
 				throw VarDivideByZero("div('" ^ this->first_(128) ^ "', '" ^ rhs.first_(128) ^
 				"')");
-			// warning: conversion from ‘exodus::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
+			// warning: conversion from ‘exo::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
 			var_dbl = static_cast<double>(this->var_int) / static_cast<double>(rhs.var_int);
 		}
 
@@ -535,7 +551,8 @@ tryagain:
 
 // MODULO VAR
 
-VAR_TEMPLATE(VBR VARBASE::operator%=(CBR rhs) &) {
+template VBR1 VARBASE1::operator%=(CBX rhs) &;
+template<typename var> VBR2 VARBASE2::operator%=(CBX rhs) & {
 	*this = this->mod(rhs);
 	return *this;
 }
@@ -546,7 +563,8 @@ VAR_TEMPLATE(VBR VARBASE::operator%=(CBR rhs) &) {
 
 // ADD DOUBLE
 
-VAR_TEMPLATE(VBR VARBASE::operator+=(const double dbl1) &) {
+template VBR1 VARBASE1::operator+=(const double dbl1) &;
+template<typename var> VBR2 VARBASE2::operator+=(const double dbl1) & {
 
 tryagain:
 
@@ -556,7 +574,7 @@ tryagain:
 
 	// lhs int
 	else if (var_typ & VARTYP_INT)
-		// warning: conversion from ‘exodus::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
+		// warning: conversion from ‘exo::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
 		var_dbl = static_cast<double>(var_int) + dbl1;
 
 	// try to convert to numeric
@@ -577,7 +595,8 @@ tryagain:
 
 // MULTIPLY DOUBLE
 
-VAR_TEMPLATE(VBR VARBASE::operator*=(const double dbl1) &) {
+template VBR1 VARBASE1::operator*=(const double dbl1) &;
+template<typename var> VBR2 VARBASE2::operator*=(const double dbl1) & {
 
 tryagain:
 
@@ -587,7 +606,7 @@ tryagain:
 
 	// lhs int
 	else if (var_typ & VARTYP_INT)
-		// warning: conversion from ‘exodus::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
+		// warning: conversion from ‘exo::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
 		var_dbl = static_cast<double>(var_int) * dbl1;
 
 	// try to convert to numeric
@@ -605,7 +624,8 @@ tryagain:
 
 // SUBTRACT DOUBLE
 
-VAR_TEMPLATE(VBR VARBASE::operator-=(const double dbl1) &) {
+template VBR1 VARBASE1::operator-=(const double dbl1) &;
+template<typename var> VBR2 VARBASE2::operator-=(const double dbl1) & {
 
 tryagain:
 
@@ -615,7 +635,7 @@ tryagain:
 
 	// lhs int
 	else if (var_typ & VARTYP_INT)
-		// warning: conversion from ‘exodus::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
+		// warning: conversion from ‘exo::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
 		var_dbl = static_cast<double>(var_int) - dbl1;
 
 	// try to convert to numeric
@@ -634,7 +654,8 @@ tryagain:
 
 // DIVIDE DOUBLE
 
-VAR_TEMPLATE(VBR VARBASE::operator/=(const double dbl1) &) {
+template VBR1 VARBASE1::operator/=(const double dbl1) &;
+template<typename var> VBR2 VARBASE2::operator/=(const double dbl1) & {
 
 	if (!dbl1)
 		UNLIKELY
@@ -649,7 +670,7 @@ tryagain:
 
 	// lhs int
 	else if (var_typ & VARTYP_INT)
-		// warning: conversion from ‘exodus::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
+		// warning: conversion from ‘exo::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
 		var_dbl = static_cast<double>(var_int) / dbl1;
 
 	// try to convert to numeric
@@ -668,7 +689,8 @@ tryagain:
 
 // MODULO DOUBLE
 
-VAR_TEMPLATE(VBR VARBASE::operator%=(const double rhs) &) {
+template VBR1 VARBASE1::operator%=(const double rhs) &;
+template<typename var> VBR2 VARBASE2::operator%=(const double rhs) & {
 	*this = this->mod(rhs);
 	return *this;
 }
@@ -679,13 +701,14 @@ VAR_TEMPLATE(VBR VARBASE::operator%=(const double rhs) &) {
 
 // ADD INT
 
-VAR_TEMPLATE(VBR VARBASE::operator+=(const int int1) &) {
+template VBR1 VARBASE1::operator+=(const int int1) &;
+template<typename var> VBR2 VARBASE2::operator+=(const int int1) & {
 
 tryagain:
 
 	// lhs double
 	if (var_typ & VARTYP_DBL) {
-		// warning: conversion from ‘exodus::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
+		// warning: conversion from ‘exo::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
 		var_dbl += static_cast<double>(int1);
 		// reset to one unique type
 		var_typ = VARTYP_DBL;
@@ -713,13 +736,14 @@ tryagain:
 
 // MULTIPLY INT
 
-VAR_TEMPLATE(VBR VARBASE::operator*=(const int int1) &) {
+template VBR1 VARBASE1::operator*=(const int int1) &;
+template<typename var> VBR2 VARBASE2::operator*=(const int int1) & {
 
 tryagain:
 
 	// lhs double
 	if (var_typ & VARTYP_DBL) {
-		// warning: conversion from ‘exodus::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
+		// warning: conversion from ‘exo::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
 		var_dbl *= static_cast<double>(int1);
 		// reset to one unique type
 		var_typ = VARTYP_DBL;
@@ -747,13 +771,14 @@ tryagain:
 
 //SUBTRACT INT
 
-VAR_TEMPLATE(VBR VARBASE::operator-=(const int int1) &) {
+template VBR1 VARBASE1::operator-=(const int int1) &;
+template<typename var> VBR2 VARBASE2::operator-=(const int int1) & {
 
 tryagain:
 
 	// lhs double
 	if (var_typ & VARTYP_DBL) {
-		// warning: conversion from ‘exodus::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
+		// warning: conversion from ‘exo::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
 		var_dbl -= static_cast<double>(int1);
 		// reset to one unique type
 		var_typ = VARTYP_DBL;
@@ -782,7 +807,8 @@ tryagain:
 
 //DIVIDE INT
 
-VAR_TEMPLATE(VBR VARBASE::operator/=(const int int1) &) {
+template VBR1 VARBASE1::operator/=(const int int1) &;
+template<typename var> VBR2 VARBASE2::operator/=(const int int1) & {
 
 	// Always return double
 
@@ -795,12 +821,12 @@ tryagain:
 
 	// lhs double
 	if (var_typ & VARTYP_DBL)
-		// warning: conversion from ‘exodus::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
+		// warning: conversion from ‘exo::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
 		var_dbl /= static_cast<double>(int1);
 
 	// both int
 	else if (var_typ & VARTYP_INT)
-		// warning: conversion from ‘exodus::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
+		// warning: conversion from ‘exo::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
 		var_dbl = static_cast<double>(var_int) / static_cast<double>(int1);
 
 	// try to convert to numeric
@@ -818,7 +844,8 @@ tryagain:
 
 //MODULO INT
 
-VAR_TEMPLATE(VBR VARBASE::operator%=(const int rhs) &) {
+template VBR1 VARBASE1::operator%=(const int rhs) &;
+template<typename var> VBR2 VARBASE2::operator%=(const int rhs) & {
 	*this = this->mod(rhs);
 	return *this;
 }
@@ -829,7 +856,8 @@ VAR_TEMPLATE(VBR VARBASE::operator%=(const int rhs) &) {
 
 // ADD BOOL
 
-VAR_TEMPLATE(VBR VARBASE::operator+=(const bool bool1) &) {
+template VBR1 VARBASE1::operator+=(const bool bool1) &;
+template<typename var> VBR2 VARBASE2::operator+=(const bool bool1) & {
 	if (bool1)
 		(*this)++;
 	else
@@ -839,7 +867,8 @@ VAR_TEMPLATE(VBR VARBASE::operator+=(const bool bool1) &) {
 
 // MULTIPLY BOOL
 
-VAR_TEMPLATE(VBR VARBASE::operator*=(const bool bool1) &) {
+template VBR1 VARBASE1::operator*=(const bool bool1) &;
+template<typename var> VBR2 VARBASE2::operator*=(const bool bool1) & {
 	assertNumeric(__PRETTY_FUNCTION__);
 	if (!bool1) {
 		var_int = 0;
@@ -850,7 +879,8 @@ VAR_TEMPLATE(VBR VARBASE::operator*=(const bool bool1) &) {
 
 // SUBTRACT BOOL
 
-VAR_TEMPLATE(VBR VARBASE::operator-=(const bool bool1) &) {
+template VBR1 VARBASE1::operator-=(const bool bool1) &;
+template<typename var> VBR2 VARBASE2::operator-=(const bool bool1) & {
 	if (bool1)
 		(*this)--;
 	else
@@ -859,7 +889,8 @@ VAR_TEMPLATE(VBR VARBASE::operator-=(const bool bool1) &) {
 }
 
 // +var
-VAR_TEMPLATE(RETVAR VARBASE::operator+() const) {
+template RETVAR VARBASE1::operator+() const;
+template<typename var> RETVAR VARBASE2::operator+() const {
 
 	assertDefined(__PRETTY_FUNCTION__);
 	assertNumeric(__PRETTY_FUNCTION__);
@@ -869,7 +900,8 @@ VAR_TEMPLATE(RETVAR VARBASE::operator+() const) {
 }
 
 // -var
-VAR_TEMPLATE(RETVAR VARBASE::operator-() const) {
+template RETVAR VARBASE1::operator-() const;
+template<typename var> RETVAR VARBASE2::operator-() const {
 
 	assertDefined(__PRETTY_FUNCTION__);
 
@@ -1041,4 +1073,4 @@ ND var operator""_var(long double d) {
 
 //#endif
 
-} // namespace exodus
+} // namespace exo

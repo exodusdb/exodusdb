@@ -3,13 +3,13 @@
 
 #include <exodus/var.h>
 
-//warning: inlining failed in call to ‘exodus::rex::~rex() noexcept’: call is unlikely and code size would grow [-Winline]
+//warning: inlining failed in call to ‘exo::rex::~rex() noexcept’: call is unlikely and code size would grow [-Winline]
 #pragma GCC diagnostic push
 #if __GNUC__ <= 10
 #	pragma GCC diagnostic ignored "-Winline"
 #endif
 
-namespace exodus {
+namespace exo {
 
 // Note that "for (var& var1: dim1)" with & allows direct access and update into the elements of the array dim1 via varx
 // whereas "for (var var1 : dim1)" gives a copy of each element which is slower allows updating var1 without updating dim1
@@ -134,7 +134,7 @@ rex(SV expression, SV options);
 PUBLIC rex operator""_rex(const char* cstr, std::size_t size);
 
 
-} // namespace exodus
+} // namespace exo
 
 #pragma GCC diagnostic pop
 

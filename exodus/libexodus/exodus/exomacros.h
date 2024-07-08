@@ -112,7 +112,7 @@ THE SOFTWARE.
 // Declared in exodus namespace which is useful since "in" and "out" could easily
 // occur in other libraries.
 //
-namespace exodus {
+namespace exo {
 	using in = const var&;  // CVR;
 	using io = var&;        // VARREF;
 	using out = var&;       // VARREF;

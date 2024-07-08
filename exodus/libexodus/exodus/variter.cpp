@@ -20,7 +20,7 @@
 //    NewValues<Pos> = Value
 //Next Value
 
-namespace exodus {
+namespace exo {
 
 ///////////
 // var_iter
@@ -142,6 +142,6 @@ PUBLIC var_iter end([[maybe_unused]] CVR var1) {
 	return var_iter();
 }
 
-}  //namespace exodus
+}  //namespace exo
 
 

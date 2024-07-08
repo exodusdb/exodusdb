@@ -5,7 +5,7 @@
 
 #include <exodus/var.h>
 
-namespace exodus {
+namespace exo {
 
 // select exodus.extract_text(data,1,0,0), exodus.extract_sort(data,1,0,0)
 // from test_alphanum order by exodus.extract_sort(data,1,0,0)
@@ -300,4 +300,4 @@ naturalorderexit:
 	return ostringstream1.str();
 }
 
-}  // namespace exodus
+}  // namespace exo

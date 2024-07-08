@@ -101,7 +101,7 @@ THE SOFTWARE.
 
 #include <exodus/varimpl.h>
 
-namespace exodus {
+namespace exo {
 
 #ifdef USE_TO_CHARS
 /////////////////////////////////////
@@ -455,7 +455,8 @@ removetrailing:
 ////////////////////
 
 // mainly called in ISSTRING when not already a string
-VAR_TEMPLATE(void VARBASE::createString() const) {
+template void VARBASE1::createString() const;
+template<typename var> PUBLIC void VARBASE2::createString() const {
 
 	// TODO ensure ISDEFINED is called everywhere in advance
 	// to avoid wasting time doing multiple calls to ISDEFINED
@@ -731,7 +732,8 @@ var var::floor() const {
 // var::toBool
 //////////////
 
-VAR_TEMPLATE(PUBLIC bool VARBASE::toBool() const) {
+template PUBLIC bool VARBASE1::toBool() const;
+template<typename var> PUBLIC PUBLIC bool VARBASE2::toBool() const {
 
 	// could be skipped for speed assuming that people will not write unusual "var x=f(x)" type
 	// syntax as follows: var xx=xx?11:22;
@@ -779,7 +781,8 @@ VAR_TEMPLATE(PUBLIC bool VARBASE::toBool() const) {
 // var::toInt
 /////////////
 
-VAR_TEMPLATE(int VARBASE::toInt() const) {
+template int VARBASE1::toInt() const;
+template<typename var> PUBLIC int VARBASE2::toInt() const {
 	this->assertInteger(__PRETTY_FUNCTION__);
 	return static_cast<int>(*this);
 }
@@ -788,7 +791,8 @@ VAR_TEMPLATE(int VARBASE::toInt() const) {
 // var::toInt64
 ///////////////
 
-VAR_TEMPLATE(int64_t VARBASE::toInt64() const) {
+template int64_t VARBASE1::toInt64() const;
+template<typename var> PUBLIC int64_t VARBASE2::toInt64() const {
 	this->assertInteger(__PRETTY_FUNCTION__);
 	return static_cast<int64_t>(*this);
 }
@@ -802,7 +806,8 @@ VAR_TEMPLATE(int64_t VARBASE::toInt64() const) {
 // var::toDouble
 ////////////////
 
-VAR_TEMPLATE(double VARBASE::toDouble() const) {
+template double VARBASE1::toDouble() const;
+template<typename var> PUBLIC double VARBASE2::toDouble() const {
 	this->assertDecimal(__PRETTY_FUNCTION__);
 	return var_dbl;
 }
@@ -832,7 +837,16 @@ VAR_TEMPLATE(double VARBASE::toDouble() const) {
 // 4. all characters mean non-numeric
 
 //CONSTEXPR
-VAR_TEMPLATE(bool VARBASE::isnum(void) const) {
+//template PUBLIC bool VARBASE1::isnum(void) const;
+//template<typename var> PUBLIC bool VARBASE2::isnum(void) const {
+
+// Explicit specialisation
+//template<>           PUBLIC bool var_base<var_mid<var>>::isnum(void) const;
+
+// Explicit instantiation
+template             PUBLIC bool var_base<var_mid<var>>::isnum(void) const;
+template<typename T> PUBLIC bool var_base<T>::isnum(void) const {
+//template<> PUBLICX bool var_base<var_mid<exo::var>>::isnum(void) const {
 
 	// TODO make isnum private and ensure ISDEFINED is checked before all calls to isnum
 	// to save the probably double check here
@@ -950,4 +964,4 @@ VAR_TEMPLATE(bool VARBASE::isnum(void) const) {
 	return true;
 }
 
-} // namespace exodus
+} // namespace exo

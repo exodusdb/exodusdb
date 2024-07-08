@@ -1,7 +1,7 @@
 #ifndef EXODUS_LIBEXODUS_EXODUS_VARERR_H_
 #define EXODUS_LIBEXODUS_EXODUS_VARERR_H_
 
-namespace exodus {
+namespace exo {
 
 //#pragma GCC diagnostic push
 //#pragma GCC diagnostic ignored "-Winline"
@@ -30,7 +30,7 @@ class PUBLIC DimNotDimensioned  : public VarError {public: explicit DimNotDimens
 
 //#pragma GCC diagnostic pop
 
-} //namespace exodus
+} //namespace exo
 
 #endif //EXODUS_LIBEXODUS_EXODUS_VARERR_H_
 

@@ -1,6 +1,6 @@
 #include <boost/locale.hpp>
 
-namespace exodus {
+namespace exo {
 
 //// exodus uses one locale per thread instead of global
 //inline thread_local std::locale thread_boost_locale1;
@@ -12,4 +12,4 @@ namespace exodus {
 //	}
 //}
 
-}  // namespace exodus
+}  // namespace exo

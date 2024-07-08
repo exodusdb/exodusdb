@@ -26,7 +26,7 @@ THE SOFTWARE.
 #include <mutex>
 
 #ifdef EXO_FORMAT
-// Including the large fmt library header here so exodus::format can precompile strings using fmt::vformat
+// Including the large fmt library header here so exo::format can precompile strings using fmt::vformat
 //
 // Sadly that implies that it will be waste time in endless recompilations until it becomes
 // a c++ module.
@@ -63,7 +63,7 @@ THE SOFTWARE.
 #	include <variant>
 #	pragma GCC diagnostic pop
 #	if __GNUC__ >= 11 || __clang_major__ > 1
-///root/exodus/fmt/include/fmt/core.h: In member function ‘constexpr auto fmt::v10::formatter<exodus::var>::parse(ParseContext&) [with ParseContext =
+///root/exodus/fmt/include/fmt/core.h: In member function ‘constexpr auto fmt::v10::formatter<exo::var>::parse(ParseContext&) [with ParseContext =
 // fmt::v10::basic_format_parse_context<char>]’:
 ///root/exodus/fmt/include/fmt/core.h:2712:22: warning: inlining failed in call to ‘constexpr const Char* fmt::v10::formatter<T, Char, typename std::enable_if<(fmt::v10::detail::type_constant<T, Char>::value != fmt::v10::detail::type::custom_type), void>::type>::parse(ParseContext&) [with ParseContext = fmt::v10::basic_format_parse_context<char>; T = fmt::v10::basic_string_view<char>; Char = char]’: --param max-inline-insns-single limit reached [-Winline]
 // 2712 |   FMT_CONSTEXPR auto parse(ParseContext& ctx) -> const Char* {
@@ -82,7 +82,7 @@ THE SOFTWARE.
 
 // add global function type syntax to the exodus users
 // SIMILAR code in exofuncs.h and varimpl.h
-namespace exodus {
+namespace exo {
 
 	// clang-format off
 
@@ -826,7 +826,7 @@ void vprintln(std::string_view fmt_str, Args&&... args) {
 template <typename... Args>
 ND var xvformat(SV fmt_str, Args&&... args) {
 //	return fmt::vformat(fmt_str, fmt::make_format_args(std::forward<Args>(args)...));
-//error: cannot bind non-const lvalue reference of type ‘exodus::var&’ to an rvalue of type ‘exodus::var’
+//error: cannot bind non-const lvalue reference of type ‘exo::var&’ to an rvalue of type ‘exo::var’
 	return fmt::vformat(fmt_str, fmt::make_format_args(args...));
 }
 
@@ -834,7 +834,7 @@ ND var xvformat(SV fmt_str, Args&&... args) {
 template <typename... Args>
 ND var xformat(EXO_FORMAT_STRING_TYPE2 fmt_str, Args&&... args) {
 //	return fmt::vformat(fmt_str, fmt::make_format_args(std::forward<Args>(args)...));
-// error: cannot bind non-const lvalue reference of type ‘exodus::var&’ to an rvalue of type ‘exodus::var’
+// error: cannot bind non-const lvalue reference of type ‘exo::var&’ to an rvalue of type ‘exo::var’
 	return fmt::vformat(fmt_str, fmt::make_format_args(args...));
 }
 
@@ -871,7 +871,7 @@ ND var xformat(EXO_FORMAT_STRING_TYPE2 fmt_str, Args&&... args) {
 
 #endif //EXO_FORMAT
 
-}  // namespace exodus
+}  // namespace exo
 
 #ifdef EXO_FORMAT
 
@@ -891,7 +891,7 @@ ND var xformat(EXO_FORMAT_STRING_TYPE2 fmt_str, Args&&... args) {
 // Needs to know how to delegate parse and format functions to standard string_view, double and int versions
 // therefore multiple inheritance
 template <>
-struct fmt::formatter<exodus::var> : formatter<std::string_view>, formatter<double>, formatter<int> {
+struct fmt::formatter<exo::var> : formatter<std::string_view>, formatter<double>, formatter<int> {
 
 	// Detect leading ':' -> exodus conversions/format specifiers
 	// otherwise trailing characters -> standard fmt/std format specifiers
@@ -944,8 +944,8 @@ struct fmt::formatter<exodus::var> : formatter<std::string_view>, formatter<doub
 //	Works but only supports string format specifier
 //
 //	template <>
-//	struct formatter<exodus::var> : formatter<std::string_view> {
-//		auto format(const exodus::var& var1, format_context& ctx) {
+//	struct formatter<exo::var> : formatter<std::string_view> {
+//		auto format(const exo::var& var1, format_context& ctx) {
 //  	return formatter<std::string_view>::format(var1.toString(), ctx);
 //	};
 //
@@ -1075,7 +1075,7 @@ constexpr auto parse(ParseContext& ctx) {
 // https://fmt.dev/latest/syntax.html#formatspec
 
 template <typename FormatContext>
-auto format(const exodus::var& var1, FormatContext& ctx) const {
+auto format(const exo::var& var1, FormatContext& ctx) const {
 
 	//std::cerr << ">>> exofuncs.h format '" << fmt_str_ << "' '" << fmt_code_ << "' '" << var1 << "'\n";
 
@@ -1091,7 +1091,7 @@ auto format(const exodus::var& var1, FormatContext& ctx) const {
 			// {::D2/E} etc.
 			// {::MTHS} etc.
 			//return formatter<std::string_view>::format(var1, ctx);
-			exodus::var converted_var1 = var1.oconv(fmt_str_.c_str());
+			exo::var converted_var1 = var1.oconv(fmt_str_.c_str());
 			auto sv1 = std::string_view(converted_var1);
 			return vformat_to(ctx.out(), "{:}", fmt::make_format_args(sv1));
 
@@ -1141,9 +1141,9 @@ auto format(const exodus::var& var1, FormatContext& ctx) const {
 //
 //// Works fine but only supports string format specifiers
 //template <>
-//struct formatter<exodus::var> : formatter<std::string_view> {
+//struct formatter<exo::var> : formatter<std::string_view> {
 //
-//auto format(const exodus::var& var1, format_context& ctx) {
+//auto format(const exo::var& var1, format_context& ctx) {
 //	// Sadly we dont have access to the formatstring that parse has access to
 //	//auto s = std::string(ctx.begin(), ctx.end());
 //	return formatter<std::string_view>::format(var1.toString(), ctx);
@@ -1171,7 +1171,7 @@ struct Overload : Ts ... {
 };
 template<class... Ts> Overload(Ts...) -> Overload<Ts...>;
 
-FOLLOWING SHOULD BE INSIDE class formatter<exodus::var>::format function
+FOLLOWING SHOULD BE INSIDE class formatter<exo::var>::format function
 
 // ctx.arg(n) appear to be format_arguments which is a variant like object
 // https://en.cppreference.com/w/cpp/utility/format/basic_format_context

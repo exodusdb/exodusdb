@@ -26,7 +26,7 @@ THE SOFTWARE.
 
 static bool desynced_with_stdio = false;
 
-namespace exodus {
+namespace exo {
 
 // output/errput/logput not threadsafe but probably not a problem
 //inline std::mutex global_mutex_threadstream;
@@ -195,4 +195,4 @@ CVR var::logputl(CVR str) const {
 	return *this;
 }
 
-} // namespace exodus
+} // namespace exo

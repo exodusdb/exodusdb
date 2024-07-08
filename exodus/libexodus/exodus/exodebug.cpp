@@ -50,7 +50,7 @@ THE SOFTWARE.
 #include <exodus/exoimpl.h>
 #include <exodus/range.h>
 
-namespace exodus {
+namespace exo {
 
 static void addbacktraceline(CVR frameno, CVR sourcefilename, CVR lineno, VARREF returnlines) {
 
@@ -456,4 +456,4 @@ PUBLIC void debug(CVR var1) {
 	return;
 }
 
-}  // namespace exodus
+}  // namespace exo

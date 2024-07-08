@@ -12,7 +12,7 @@ std::mutex mvhandles_mutex;
 
 #define HANDLES_CACHE_SIZE 3
 
-namespace exodus {
+namespace exo {
 
 VarOSHandleEntry::VarOSHandleEntry()
 	//: deleter((DELETER_AND_DESTROYER)0), handle(0) {}
@@ -71,4 +71,4 @@ VarOSHandlesCache::~VarOSHandlesCache() {
 		}
 }
 
-}  // namespace exodus
+}  // namespace exo

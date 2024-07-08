@@ -14,7 +14,7 @@
 //#include <exodus/exocallable.h>
 //#include "timeaccount.h"
 
-namespace exodus {
+namespace exo {
 
 // mv.xyz is going to be used a lot by exodus programmers for exodus "global variables"
 // eg mv.RECORD mv.DICT
@@ -260,5 +260,5 @@ class PUBLIC MVLogoff   {public:explicit MVLogoff  (CVR var1 DEFAULT_EMPTY); var
 
 // clang-format on
 
-}  // namespace exodus
+}  // namespace exo
 #endif	// EXODUS_LIBEXODUS_EXODUS_EXOPROG_H_

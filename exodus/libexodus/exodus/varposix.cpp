@@ -6,7 +6,7 @@ namespace fs = std::filesystem;
 
 #include <exodus/var.h>
 
-namespace exodus {
+namespace exo {
 
 ND PUBLIC var getprocessn() {
 	return var(getpid());
@@ -50,4 +50,4 @@ ND PUBLIC std::string gethostname() {
     return hostname;
 }
 
-}  // namespace exodus
+}  // namespace exo

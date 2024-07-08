@@ -36,7 +36,7 @@ THE SOFTWARE.
 extern char** environ;
 #pragma GCC diagnostic pop
 
-namespace exodus {
+namespace exo {
 
 void var::ossleep(const int milliseconds) const {
 
@@ -316,5 +316,5 @@ var var::ostid() const {
 	return gettid();
 }
 
-}  // namespace exodus
+}  // namespace exo
 

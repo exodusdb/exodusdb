@@ -37,7 +37,7 @@ void extract_v2(char * instring, int inlength, int fieldno, int valueno, int sub
 void extract_v3(char * instring, int inlength, int fieldno, int valueno, int subvalueno, int* outstart, int* outlength);
 void extract_v4(char * instring, int inlength, int fieldno, int valueno, int subvalueno, int* outstart, int* outlength);
 
-namespace exodus {
+namespace exo {
 
 // includes dim::split
 
@@ -1361,7 +1361,7 @@ bool var::starts(SV str) const {
 
 	THISIS("bool var::starts(SV str) const")
 	//THISIS(__PRETTY_FUNCTION__)
-	//      bool exodus::var::starts(const exodus::VARREF) const
+	//      bool exo::var::starts(const exo::VARREF) const
 	assertString(function_sig);
 
 	// Differ from c++, javascript, python3 - see comment on var::contains
@@ -1759,11 +1759,16 @@ VARREF var::substrer(const int startindex1, const int length) {
 //////
 //    ND var at(const int pos1) const;
 
-VAR_TEMPLATE(RETVAR VARBASE::operator[](const int pos1) const) {
+template RETVAR VARBASE1::operator[](const int pos1) const;
+template<typename var> RETVAR VARBASE2::operator[](const int pos1) const {
+//exo::var var_base<var_mid<var>>::operator[](const int pos1) const {
+//template<> exo::var var_base<var_mid<var>>::operator[](const int pos1) const {
 	return this->at(pos1);
 }
 
-VAR_TEMPLATE(RETVAR VARBASE::at(const int charno) const) {
+template exo::var var_base<var_mid<var>>::at(const int charno) const;
+template<typename var> exo::var var_base<var>::at(const int charno) const {
+//VAR_TEMPLATE(RETVAR VARBASE::at(const int charno) const) {
 
 	THISIS("var var::at(const int charno) const")
 	assertString(function_sig);
@@ -2316,4 +2321,4 @@ var var::sum(SV separator) const {
 	return nrvo;	//NRVO hopefully since single named return
 }
 
-}  // namespace exodus
+}  // namespace exo

@@ -310,7 +310,9 @@
 	PUBLIC VAR_FRIEND RETVAR operator^(const int     lhs,       CBR     rhs) /*IMPL*/ {rhs.assertString(__PRETTY_FUNCTION__); return RETVAR(lhs).toString() += rhs.var_str;}
 	PUBLIC VAR_FRIEND RETVAR operator^(const double  lhs,       CBR     rhs) /*IMPL*/ {rhs.assertString(__PRETTY_FUNCTION__); return RETVAR(lhs).toString() += rhs.var_str;}
 
-	//temporaries (rvalues) - mutate the temporary string to save a copy
+	//temporaries (rvalues) - mutate the temporary var to save a copy
+#undef TBR
+#define TBR var_base<var_mid<exo::var>>&&
 	PUBLIC VAR_FRIEND RETVAR operator^(TBR    lhs, const char*  rhs) /*IMPL*/ {lhs ^= rhs; return std::move(lhs.var_str);}
 	PUBLIC VAR_FRIEND RETVAR operator^(TBR    lhs, const char   rhs) /*IMPL*/ {lhs ^= rhs; return std::move(lhs.var_str);}
 	PUBLIC VAR_FRIEND RETVAR operator^(TBR    lhs, const int    rhs) /*IMPL*/ {lhs ^= rhs; return std::move(lhs.var_str);}

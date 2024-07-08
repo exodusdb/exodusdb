@@ -6,7 +6,7 @@
 
 //similar code in haskey.cpp and mvwait.cpp
 
-namespace exodus {
+namespace exo {
 
 bool haskey(int milliseconds = 0) {
 	struct termios oldtio, curtio;
@@ -60,4 +60,4 @@ bool haskey(int milliseconds = 0) {
 	return hasdata;
 }
 
-}  // namespace exodus
+}  // namespace exo

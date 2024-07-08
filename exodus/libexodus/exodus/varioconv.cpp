@@ -32,7 +32,7 @@ THE SOFTWARE.
 #include <exodus/varimpl.h>
 #include <exodus/rex.h>
 
-namespace exodus {
+namespace exo {
 
 #if defined(__clang__)
 #	pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
@@ -1317,4 +1317,4 @@ var var::iconv_HEX(const int ioratio) const {
 
 #undef ADD_NYBBLE_OR_FAIL
 
-}  // namespace exodus
+}  // namespace exo

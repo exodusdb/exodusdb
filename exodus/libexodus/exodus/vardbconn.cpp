@@ -10,7 +10,7 @@
 
 constexpr int TRACING = 0;
 
-namespace exodus {
+namespace exo {
 
 DBConn::DBConn(PGconn* pgconn, std::string conninfo)
 	: pgconn_(pgconn), conninfo_(conninfo) {
@@ -192,4 +192,4 @@ int DBConnector::max_dbconn_no() {
 	return dbconn_no_;
 }
 
-}  // namespace exodus
+}  // namespace exo
