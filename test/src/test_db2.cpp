@@ -483,8 +483,15 @@ dict(AGE_IN_YEARS) {
 		var alphanum2 = "Flat 2b";
 		//Flat 2b is before Flat 10a
 		//assert(naturalorder(alphanum1.toString()) gt naturalorder(alphanum2.toString()));
-		assert(write(++key on naturals, alphanum1));
+
+		// NOTE if any argument is not proper var them might call global stdio write function and give NONNUMERIC ERROR
+		//assert(write(++key on naturals, alphanum1));
+		exo::write(++key on naturals, alphanum1);
 		assert(write(++key on naturals, alphanum2));
+		assert(key == 2);
+		var rec;
+		assert(read(rec from naturals, alphanum2));
+		assert(rec == 2);
 
 		alphanum1 = "Part A-10";
 		alphanum2 = "Part A-2";

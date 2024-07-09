@@ -306,6 +306,34 @@ tryagain:
 	return *this;
 }
 
+/////////////////////////////////////////
+// VAR Prefix/Postfix increment/decrement
+/////////////////////////////////////////
+
+//Forward to var_base
+
+var var::operator++(int) & {
+	var orig = this->clone();
+	var_base::operator++();
+	return orig;
+}
+
+var var::operator--(int) & {
+	var orig = this->clone();
+	var_base::operator--(0);
+	return orig;
+}
+
+var& var::operator++() & {
+	var_base::operator++(0);
+	return *this;
+}
+
+var& var::operator--() & {
+	var_base::operator--();
+	return *this;
+}
+
 //////////////
 // SELF ASSIGN
 //////////////

@@ -286,6 +286,7 @@ using SV     =       std::string_view;
 #define RETVAR    exo::var
 #define RETVARREF exo::var&
 
+/*
 // Not used
 ////// Define and instantiate a <var> template
 ////#define VAR_TEMPLATE(...) \
@@ -309,6 +310,7 @@ using SV     =       std::string_view;
 //#define VAR_TEMPLATE(...) \
 //template PUBLIC __VA_ARGS__;\
 //template<typename var> PUBLIC __VA_ARGS__
+*/
 
 // original help from Thinking in C++ Volume 1 Chapter 12
 // http://www.camtp.uni-mb.si/books/Thinking-in-C++/TIC2Vone-distribution/html/Chapter12.html
@@ -850,6 +852,12 @@ class PUBLIC var_base {
 		// Clone, like most var_base functions returns a var since var's are var_base's but not vice versa
 		return this->clone(); // TODO! move/steal
 	}
+
+//	// TODO Is this functionality used for anything?
+//	// TODO Ensure that this is safe in case var acquires a different data layout from var_base
+//	operator var&() & {
+//		return static_cast<exo::var*>(this);
+//	}
 
 	// integer <- var
 	/////////////////
@@ -1793,6 +1801,23 @@ public:
 	ND var_proxy2 operator()(int fieldno, int valueno);
 	ND var_proxy3 operator()(int fieldno, int valueno, int subvalueno);
 
+	// Prefix operators must be replicated in var
+	// //////////////////////////////////////////
+	//
+	// Cannot use the var_base version because it returns a var_base which
+	// cannot be used in place of a var and would stop the use of ++xxx and --xxx
+	// in places where a var is required. e.g. some function arguments.
+	//
+	// Will be forwarded to var_base behind the scenes
+	//
+	// Must have postfix operators if prefix operators are defined
+
+	var operator++(int) &;
+	var operator--(int) &;
+
+	VARREF operator++() &;
+	VARREF operator--() &;
+
 	// OUTPUT
 	/////////
 
@@ -2500,7 +2525,7 @@ template<class... Args>
 	// Convert _VISIBLE_FMS to _ALL_FMS
 	// In header to perhaps aid runtime string literal conversion for operator""_var
 	// since currently it cannot be constexpr due to var containing a std::string
-	var& fmiconverter() {
+	VARREF fmiconverter() {
 		for (char& c : this->var_str) {
 			switch (c) {
 				// Most common first to perhaps aid optimisation
@@ -2518,7 +2543,7 @@ template<class... Args>
 	}
 
 	// Convert _ALL_FMS to _VISIBLE_FMS
-	var& fmoconverter() {
+	VARREF fmoconverter() {
 		for (char& c : this->var_str) {
 			if (c > RM_ || c > RM_) {
 				switch (c) {
