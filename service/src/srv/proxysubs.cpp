@@ -106,7 +106,8 @@ fileok:
 		}
 
 		// force error
-		if (response_.first(6) != "Error:") {
+//		if (response_.first(6) != "Error:") {
+		if (not response_.starts("Error:")) {
 			response_.prefixer("Error:");
 		}
 	}

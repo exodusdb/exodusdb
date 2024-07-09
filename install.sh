@@ -131,7 +131,7 @@ function APT_GET {
 :
 : Loop until success or timeout
 :
-	while ! hostnamectl status > /dev/null && [[ $SECONDS -lt 60 ]]; do sleep 1; done
+	while ! hostnamectl status > /dev/null && [[ $SECONDS -lt 60 ]]; do sleep 2; done
 :
 : Generate error if timeout reached. Otherwise display various host info.
 :

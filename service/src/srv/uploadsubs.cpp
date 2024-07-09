@@ -392,7 +392,8 @@ postuploadfail:
 		if (not dictfilename) {
 			dictfilename = filename;
 		}
-		if (dictfilename.first(4) != "DICT") {
+//		if (dictfilename.first(4) != "DICT") {
+		if (not dictfilename.starts("DICT")) {
 			dictfilename.prefixer("DICT.");
 		}
 		// if keydictid else keydictid='@ID'

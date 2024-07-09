@@ -54,7 +54,8 @@ function main(io osfilename, in printopts0, out errors) {
 	}
 
 	// only convert .htm files
-	if (osfilename.lcase().last(4) != ".htm") {
+//	if (osfilename.lcase().last(4) != ".htm") {
+	if (not osfilename.lcase().ends(".htm")) {
 		return 0;
 	}
 

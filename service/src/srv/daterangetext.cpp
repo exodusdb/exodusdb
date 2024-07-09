@@ -63,7 +63,8 @@ function main(in d1, in d2, out result, io lang) {
 	}
 
 	// add hyphen if still a range
-	if (not(tt.first(3) eq(FM ^ FM ^ FM))) {
+//	if (not(tt.first(3) eq(FM ^ FM ^ FM))) {
+	if (not tt.starts(_FM _FM _FM)) {
 		if (tt.f(2) == "" and tt.f(3) == "") {
 			tt(3) = tt.f(3) ^ " ^ ";
 		} else {

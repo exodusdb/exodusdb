@@ -74,7 +74,8 @@ function main(in msg0, in subject0 = "", in username0 = "") {
 	}
 
 	// remove html tags from message and decode things like &nbsp;
-	if (msg.first(2) != "@@") {
+//	if (msg.first(2) != "@@") {
+	if (not msg.starts("@@")) {
 		call htmllib2("STRIPTAGS", msg);
 		call htmllib2("DECODEHTML", msg);
 	}

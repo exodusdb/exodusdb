@@ -844,17 +844,20 @@ class PUBLIC var_base {
 
 	// Implicitly convert var_base to var
 	operator var() &{
+		// TODO should be implemented as a var constructor?
 		// Clone, like most var_base functions returns a var since var's are var_base's but not vice versa
 		return this->clone();
 	}
 
 	operator var() && {
-		// Clone, like most var_base functions returns a var since var's are var_base's but not vice versa
-		return this->clone(); // TODO! move/steal
+		// TODO should be implemented as a var constructor?
+		exo::var nrvo;
+		this->move(nrvo);
+		return nrvo;
 	}
 
-//	// TODO Is this functionality used for anything?
-//	// TODO Ensure that this is safe in case var acquires a different data layout from var_base
+//	// TODO Check if this provides any useful functionality
+//	// but ensure that it is safe in case var acquires a different data layout from var_base
 //	operator var&() & {
 //		return static_cast<exo::var*>(this);
 //	}
