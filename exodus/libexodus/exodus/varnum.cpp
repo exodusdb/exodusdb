@@ -632,10 +632,11 @@ template<> PUBLIC bool VARBASE1::isnum(void) const {
 }
 
 template<> PUBLIC void VARBASE1::assertNumeric(const char* message, const char* varname/* = ""*/) const {
-	if (!this->isnum())
-		[[unlikely]]
+	if (!this->isnum()) {
+		UNLIKELY
 		//throw VarNonNumeric(var_base(varname) ^ " in " ^ var_base(message) ^ " data: " ^ var_str.substr(0,127));
 		throw VarNonNumeric(std::string(varname) + " in '" + message + "' is '" + var_str.substr(0, 32) + "'");
+	}
 }
 
 //////////////

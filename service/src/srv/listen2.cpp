@@ -188,7 +188,7 @@ function main(in request1, in request2, in request3, in request4, io request5, i
 					let tt = userx.f(18, failn);
 					// /BREAK;
 //					if (not(tt != "" and tt.first(2) != "OK"))
-					if (not(tt != "" and not tt.starts("OK"))
+					if (not(tt != "" and not tt.starts("OK")))
 						break;
 				}  // failn;
 				   //do normal authorisation to show type of failure - but fail even if ok
