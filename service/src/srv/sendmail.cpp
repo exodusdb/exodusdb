@@ -338,7 +338,8 @@ forcedemail:
 	// if delete then params:=' /d ':delete
 
 	// condition subject start standard with 'EXODUS: '
-	if (subject.first(8) != "EXODUS: ") {
+//	if (subject.first(8) != "EXODUS: ") {
+	if (not subject.starts("EXODUS: ")) {
 		if (subject.starts("EXODUS")) {
 			subject.cutter(6).trimmerfirst();
 		}

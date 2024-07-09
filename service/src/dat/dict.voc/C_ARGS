@@ -6,7 +6,7 @@ S
 
 
 	ANS = RECORD.f(2);\
-	if (ANS.first(3) != "*c ") {\
+	if (not ANS.starts("*c ")) {\
 		ANS = "";\
 	}\
 	return ANS;

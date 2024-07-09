@@ -603,7 +603,8 @@ nextsign:
 		subject ^= ": %RESULT%" ^ srv.document.f(2);
 
 		// email it
-		if (response_.first(2) != "OK" or printfilename.osfile().f(1) < 10) {
+//		if (response_.first(2) != "OK" or printfilename.osfile().f(1) < 10) {
+		if (not response_.starts("OK") or printfilename.osfile().f(1) < 10) {
 
 			// plain "OK" with no file means nothing to email
 			if (response_ == "OK") {
@@ -809,7 +810,8 @@ subroutine exec2() {
 	}
 
 	// send errors to exodus
-	if (response_ == "" or response_.first(2) != "OK") {
+//	if (response_ == "" or response_.first(2) != "OK") {
+	if (response_ == "" or not response_.starts("OK")) {
 		if (not response_) {
 			response_ = "No response from " ^ voccmd;
 		}
