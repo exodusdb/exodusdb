@@ -29,7 +29,7 @@ function main(in pluralnoun) {
 		if (temp2.ends("S")) {
 			// ANALYSIS, DOS
 //			if ((temp2.last(2) != "IS") and (temp2.last(2) != "OS")) {
-			if (not temp2.ends("IS") and not temp2.ends("OS") {
+			if (not temp2.ends("IS") and not temp2.ends("OS")) {
 				temp.popper();
 			}
 		}

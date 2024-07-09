@@ -311,7 +311,7 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 				abort(lasterror());
 			patchid = firstblock.f(2).cut(5);
 //			if (firstblock.f(1) != "00000DEFINITIONS" or patchid.first(8) != "INSTALL*") {
-			if (firstblock.f(1) != "00000DEFINITIONS" or not(patchid.starts("INSTALL*")) {
+			if (firstblock.f(1) != "00000DEFINITIONS" or not patchid.starts("INSTALL*")) {
 				goto nextpatch;
 			}
 
