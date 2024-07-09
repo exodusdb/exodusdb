@@ -57,6 +57,42 @@ template<> PUBLIC RETVAR VARBASE1::clone() const {
 	return rvo;
 }
 
+template<> PUBLIC RETVAR VARBASE1::move() {
+
+	// Like clone but moves the std::string and sets the old var to UNA empty string.
+
+	RETVAR rvo;
+	rvo.var_typ = var_typ;
+	rvo.var_str = std::move(var_str);
+
+	// Avoid copying int and dbl in case cloning an unassigned var
+	// since default ctor var() = default and int/dbl are not initialised to zero.
+	//
+	// Strategy is as follows:
+	//
+	// Cloning uninitialised data should leave the target uninitialised as well
+	//
+	// If var implementation ever changes so that int/dbl must be cloned
+	// even if vartype is unassigned then int/dbl will have to be default initialised
+	// to something, probably zero.
+	//
+	// Avoid triggering a compiler warning
+	// warning: ‘<anonymous>.exo::var::var_dbl’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+	if (var_typ) {
+		rvo.var_int = var_int;
+		rvo.var_dbl = var_dbl;
+	}
+
+	// Clean up this source
+	var_str.clear();
+	var_typ = VARTYP_UNA;
+
+	// TODO
+	// Clear int and dbl?
+
+	return rvo;
+}
+
 // basic string function on var_base for throwing errors
 template<> PUBLIC RETVAR VARBASE1::first_(int nchars) const {
 	assertString(__PRETTY_FUNCTION__);
