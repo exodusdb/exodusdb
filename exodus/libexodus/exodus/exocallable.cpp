@@ -468,12 +468,10 @@ bool Callable::openlib(const std::string newlibname) {
 	if (plib_ == nullptr) {
 		var libfilepath = libfilepath_;
 		if (libfilepath.osfile()) {
-			UNLIKELY
 			throw VarError(libfilepath ^ " Cannot be linked/wrong version. Run with LD_DEBUG=libs for more info. Look for 'fatal'. Also run 'ldd "
 			^ libfilepath ^ "' to check its sublibs are available. Also run 'nm -C " ^ libfilepath ^ "' to check its content.)"
 			^ " To unmangle undefined symbols run 'c++filt _ZN6exodus3varC1Ev' for example to to see  exo::var::var()");
 		} else {
-			UNLIKELY
 			throw VarError(libfilepath ^ " does not exist or cannot be found, or " ^ purelibfilename ^ " cannot be linked/wrong version?");
 		}
 		//std::unreachable();
