@@ -844,16 +844,13 @@ class PUBLIC var_base {
 
 	// Implicitly convert var_base to var
 	operator var() &{
-		// TODO should be implemented as a var constructor?
-		// Clone, like most var_base functions returns a var since var's are var_base's but not vice versa
+		// clone, like most var_base functions returns a var since var's are var_base's but not vice versa
 		return this->clone();
 	}
 
 	operator var() && {
-		// TODO should be implemented as a var constructor?
-		exo::var nrvo;
-		this->move(nrvo);
-		return nrvo;
+		// move, like most var_base functions returns a var since var's are var_base's but not vice versa
+		return this->move();
 	}
 
 //	// TODO Check if this provides any useful functionality
@@ -1561,8 +1558,9 @@ class PUBLIC var_base {
 	CBR swap(CVR var2) const;//version that works on const vars
 	VARREF swap(VARREF var2);//version that works on non-const vars
 
-	// Converts to var
+	// Create a var
 	RETVAR clone() const;
+	RETVAR move();
 
 	// Text representation of var_base internals
 	ND RETVAR dump() const;

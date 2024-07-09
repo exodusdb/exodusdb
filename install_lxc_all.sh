@@ -23,7 +23,7 @@ set -euxo pipefail
 : ------
 :
 	BASE_CONTAINERS=${1:?BASE_CONTAINERS is required. e.g u2404 or using commas: u2404,u2202. Must exist and will be copied.}
-	STAGES=${2:?Stages is required e.g. A for all or any consecutive chars of 'bBiITW'}
+	STAGES=${2:?Stages is required e.g. A for all or any consecutive chars of 'bBdDTW'}
 	COMPILERS=${3:-g++ clang}
 :
 : MAIN
