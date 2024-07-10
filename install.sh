@@ -126,6 +126,33 @@ function APT_GET {
 }
 
 :
+: Function to download submodules
+: -------------------------------
+:
+function download_submodules {
+:
+: Note that main git repo contains just a hash/pointer to the commit to be checked out,
+: not a tag to master, and the initial state will be "HEAD detached".
+:
+	# Does having branch = master in .submodules have any effect?
+	git submodule init
+#	git submodule update --remote
+	git submodule update
+:
+: Reconnect submodule to HEAD in case development/push desired
+:
+#	git submodule foreach git pull origin master
+	git submodule foreach git checkout master
+#	git submodule foreach git reset --hard
+:
+: Verify submodules exist
+: -----------------------
+:
+	test -f $EXODUS_DIR/fmt/CMakeLists.txt
+	test -f $EXODUS_DIR/exodus/pgexodus/CMakeLists.txt
+}
+
+:
 : Wait for systemctl to get its brain in gear and be ready to serve hostname to sudo
 : ----------------------------------------------------------------------------------
 :
@@ -239,8 +266,8 @@ function get_dependencies_for_build_and_install {
 	APT_GET sudo apt-get -y update
 
 :
-: Install Postgresql dev and client package
-: -----------------------------------------
+: Download Postgresql dev and client package
+: ------------------------------------------
 :
 	#Uninstall postgresql-server-dev-all for old existing installations
 	#otherwise all postgres versions are installed and pg_config outputs latest version
@@ -252,17 +279,10 @@ function get_dependencies_for_build_and_install {
 	APT_GET sudo apt-get install -y postgresql-common
 
 :
-: Install pgexodus and fmt submodules source - duplicated in b and B stages - keep in sync
-: ------------------------------------------
+: Download pgexodus and fmt submodules source in b and B stages
+: -------------------------------------------
 :
-: Note that main git repo contains just a hash/pointer to the commit to be checked out, not a tag to master
-:
-#   if ! test -f exodus/pgexodus/CMakeLists.txt || ! test -f fmt/CMakeLists.txt; then
-		git submodule init
-		git submodule update --remote   # assuming "branch = master" in .gitmodules file for each module
-#		git submodule foreach git checkout master
-		git submodule foreach git pull origin master
-#   fi
+	download_submodules
 
 :
 : Get the full postgres debian repos IF we require a specific version
@@ -284,8 +304,8 @@ function get_dependencies_for_build_and_install {
 	apt list postgresql*dev* |& grep postgresql
 
 :
-: Installing build dependencies for exodus and pgexodus
-: -----------------------------------------------------
+: Download and install build dependencies for exodus and pgexodus
+: ---------------------------------------------------------------
 :
 	APT_GET sudo apt-get install -y cmake
 
@@ -306,8 +326,8 @@ function get_dependencies_for_build_and_install {
 	fi
 
 :
-: Install compiler $COMPILER
-: ----------------
+: Download and install compiler $COMPILER
+: ---------------------------------------
 :
 : e.g. g++, g++-12, clang, clang-12 etc.
 :
@@ -359,15 +379,15 @@ function get_dependencies_for_build_and_install {
 #	fi
 
 :
-: Install dev packages for postgresql client lib and boost
-: --------------------------------------------------------
+: Download and install dev packages for postgresql client lib and boost
+: ---------------------------------------------------------------------
 :
 	APT_GET sudo apt-get install -y libpq-dev libboost-regex-dev libboost-locale-dev
 	#APT_GET sudo apt-get install -y g++ libboost-date-time-dev libboost-system-dev libboost-thread-dev
 
 :
-: Install pgexodus postgres build dependencies
-: --------------------------------------------
+: Download and install pgexodus postgres build dependencies
+: ---------------------------------------------------------
 :
 	ls -l /usr/lib/postgresql || true
 :
@@ -415,26 +435,10 @@ function build_and_install {
 	cd $EXODUS_DIR
 
 :
-: Install pgexodus and fmt submodules source - duplicated in b and B stages - keep in sync
-: ------------------------------------------
+: Download pgexodus and fmt submodules source in b and B stages
+: -------------------------------------------------------------
 :
-: Note that main git repo contains just a hash/pointer to the commit to be checked out, not a tag to master
-:
-#   if ! test -f exodus/pgexodus/CMakeLists.txt || ! test -f fmt/CMakeLists.txt; then
-		git submodule init
-#		git submodule update --remote   # assuming "branch = master" in .gitmodules file for each module
-##		git submodule foreach git checkout master
-#		git submodule foreach git pull origin master
-		git submodule update --remote --merge
-		git submodule status
-#   fi
-
-:
-: Verify submodules exist
-: -----------------------
-:
-	test -f $EXODUS_DIR/fmt/CMakeLists.txt
-	test -f $EXODUS_DIR/exodus/pgexodus/CMakeLists.txt
+	download_submodules
 
 :
 : Build exodus
@@ -484,9 +488,9 @@ function build_and_install {
 
 function get_dependencies_for_database {
 :
-: -----------------------------
-: GET DEPENDENCIES FOR DATABASE $*
-: -----------------------------
+: ----------------------------------------------
+: DOWNLOAD AND INSTALL DEPENDENCIES FOR DATABASE $*
+: ----------------------------------------------
 :
 : exodus
 : ------
