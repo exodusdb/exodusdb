@@ -1,28 +1,38 @@
 #include <exodus/program.h>
 programinit()
 
+let syntax = R"(
+SYNTAX
+	fixdeprecated file|dir ... {OPTIONS}
+OPTIONS
+	U - Actually update
+	V - Verbose
+	H - Help
+)";
+
 function main() {
 
-	let option_d = OPTIONS.count("d");
-	let option_s = OPTIONS.count("s");
-	let recompile = OPTIONS.contains("C");
-	let update = OPTIONS.contains("U") or recompile;
+	let option_d = 2;//OPTIONS.count("d");
+	let option_s = 1;//OPTIONS.count("s");
+	let update = OPTIONS.contains("U");
+	let recompile = update;
 	let verbose = OPTIONS.contains("V");
 
-	if (not OPTIONS or OPTIONS.convert("dsUCXV", "")) {
-		abort("Invalid options");
+	if (OPTIONS.convert("UV", "")) {
+		abort(syntax);
 	}
 
 	// If any files provided on command line
-	// then setup a pipe from the compiler to another copy of this program in another process
-	/////////////////////////////////////////////////////////////////////////////////////////
+	// then recompile them to get any deprecation messages and pipe
+	// them into a another copy of this program in another process
+	///////////////////////////////////////////////////////////////
 	if (COMMAND.count(FM))  {
 
 		// Compile all requested files to generate deprecation warnings
 		// Parallel compilation will speed matters up.
 		let compilecmd = COMMAND.pickreplace(1, "compile").convert(FM, " ");
 
-		// Generate all headers and install in ~/inc first
+		// h = Generate all headers and install in ~/inc first
 		let headercmd = compilecmd ^ " {hS}";
 		if (verbose)
 			TRACE(headercmd)
@@ -30,8 +40,8 @@ function main() {
 			abort(lasterror());
 
 		// Pipe the compiler output into another process of this command
-		// Force recompilation to generate all warning messages
-		let pipedcmd = compilecmd ^ " {F} |& convsyntax3 {X" ^ OPTIONS ^ "}";
+		// F = Force recompilation to generate any deprecation warning messages
+		let pipedcmd = compilecmd ^ " {F} |& " ^ COMMAND.f(1);
 		if (verbose)
 			TRACE(pipedcmd)
 		if (not osshell("bash -c " ^ pipedcmd.squote()))
