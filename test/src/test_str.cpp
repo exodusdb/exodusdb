@@ -7,6 +7,37 @@ programinit()
 	function main() {
 
 	{
+        // using using SNITCH in var.h
+		// Test temp var ^ temp var uses nrvo and std::move to save copying temporary strings
+		var x = "============================================";
+		var y = var("aaaa+bbbb+cccc+dddd+eeee+ffff+gggg+") ^ var("1111+2222+3333+4444+5555+6666+7777+");
+/*
+0x7ffdd50bbcf8 var_base Str  1          0          0 '============================================'
+0x7ffdd50bbcc0 var_base Str  1          0          0 'aaaa+bbbb+cccc+dddd+eeee+ffff+gggg+'
+0x7ffdd50bbd30 var_base Str  1          0          0 '1111+2222+3333+4444+5555+6666+7777+'
+0x7ffdd50bbd68 var_base Str  1          0          0 'aaaa+bbbb+cccc+dddd+eeee+ffff+gggg+1111+2222+3333+4444+5555+6666+7777+'
+0x7ffdd50bbd30 var_base -    1          0          0 '1111+2222+3333+4444+5555+6666+7777+'
+0x7ffdd50bbcc0 var_base -    1          0          0 ''
+0x7ffdd50bbd68 var_base -    1          0          0 'aaaa+bbbb+cccc+dddd+eeee+ffff+gggg+1111+2222+3333+4444+5555+6666+7777+'
+0x7ffdd50bbcf8 var_base -    1          0          0 '============================================'
+*/
+	}
+	{
+        // using using SNITCH in var.h
+		// Test temp var ^ temp var uses nrvo and std::move to save copying temporary strings
+		var x = "--------------------------------------------";
+		var y = var("aaaa+bbbb+cccc+dddd+eeee+ffff+gggg+") ^ "1111+2222+3333+4444+5555+6666+7777+";
+/*
+0x7ffdd50bbcf8 var_base Str  1          0          0 '--------------------------------------------'
+0x7ffdd50bbcc0 var_base Str  1          0          0 'aaaa+bbbb+cccc+dddd+eeee+ffff+gggg+'
+0x7ffdd50bbd68 var_base Str  1          0          0 'aaaa+bbbb+cccc+dddd+eeee+ffff+gggg+1111+2222+3333+4444+5555+6666+7777+'
+0x7ffdd50bbcc0 var_base -    1          0          0 ''
+0x7ffdd50bbd68 var_base -    1          0          0 'aaaa+bbbb+cccc+dddd+eeee+ffff+gggg+1111+2222+3333+4444+5555+6666+7777+'
+0x7ffdd50bbcf8 var_base -    1          0          0 '--------------------------------------------'
+*/
+	}
+
+	{
 		// on lvalue
 
 		// var::first(n)

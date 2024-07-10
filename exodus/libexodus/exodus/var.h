@@ -57,39 +57,27 @@ THE SOFTWARE.
 #	endif
 #endif
 
-// http://stackoverflow.com/questions/538134/exporting-functions-from-a-dll-with-dllexport
-// Using dllimport and dllexport in C++ Classes
-// http://msdn.microsoft.com/en-us/library/81h27t8c(VS.80).aspx
-
-//https://quuxplusone.github.io/blog/2021/11/09/pass-string-view-by-value/
-
-#if defined _MSC_VER || defined __CYGWIN__ || defined __MINGW32__
-
-	// BUILDING_LIBRARY is defined set in exodus/library.h and exodus/common.h
-#	ifdef BUILDING_LIBRARY
-#		define PUBLIC __declspec(dllexport)
-#	else
-#		define PUBLIC __declspec(dllimport)
-#	endif
-
+//#define EXO_SNITCH
+#ifdef EXO_SNITCH
+#	undef EXO_SNITCH
+#include <iomanip>
+#	define EXO_SNITCH(FUNC) std::clog << this << " " << FUNC << " " << var_typ << " " << std::setw(10) << var_int << " " << std::setw(10) << var_dbl << " '" << var_str << "' " << std::endl;
+#	define EXO_SNITCHING
 #else
+#	define EXO_SNITCH(FUNC)
+#endif
 
-	// use g++ -fvisibility=hidden to make all hidden except those marked PUBLIC ie "default"
-	// "Weak" templated functions seem to get excluded if visiblity is hidden, despite being marked as PUBLIC
-	//
-	// nm -C *so |&grep -F "exo::var_base<exo::var_mid<exo::var> >::"
-	// nm -D libexodus.so --demangle |grep T -w
+// Visibility
+//
+// If using g++ -fvisibility=hidden to make all hidden except those marked PUBLIC ie "default"
+// "Weak" template functions seem to get excluded if visiblity is hidden, despite being marked as PUBLIC
+// so we explictly instantiate them as non-template functions with "template<> ..." syntax.
+// nm -C *so |&grep -F "exo::var_base<exo::var_mid<exo::var> >::"
+// nm -D libexodus.so --demangle |grep T -w
+#define PUBLIC __attribute__((visibility("default")))
 
-#	define PUBLIC __attribute__((visibility("default")))
-
-#endif // not windows
-
-//#ifndef EXO_VAR_CPP
-#	define EXTERN extern
-//#else
-//#	define EXTERN
-//#endif
-
+// [[likely]] [[unlikely]]
+//
 #if __has_cpp_attribute(likely)
 #	define LIKELY [[likely]]
 #	define UNLIKELY [[unlikely]]
@@ -98,8 +86,12 @@ THE SOFTWARE.
 #	define UNLIKELY
 #endif
 
+// [[nodiscard]]
+//
 #define ND [[nodiscard]]
 
+// constinit/consteval where possible otherwise constexpt
+//
 // constinit https://en.cppreference.com/w/cpp/language/constinit
 //
 // constinit - asserts that a variable has static initialization,
@@ -145,15 +137,21 @@ THE SOFTWARE.
 #	define CONSTEVAL_OR_CONSTEXPR constexpr
 #endif
 
+// timebank profiling
+//
 // Capture function execution times and dump on program exit
 // Use cmake -DEXODUS_TIMEBANK=1
 #ifdef EXODUS_TIMEBANK
 #	include "timebank.h"
 #endif
 
+// varerror
+//
 #define BACKTRACE_MAXADDRESSES 100
 #include <exodus/varerr.h>
 
+// vartype
+//
 #include <exodus/vartyp.h>
 
 #pragma clang diagnostic push
@@ -281,7 +279,8 @@ using SV     =       std::string_view;
 
 #define VBX       var_base&
 #define CBX const var_base&
-#define TBX const var_base&&
+//#define TBX const var_base&&
+#define TBX       var_base&&
 
 #define RETVAR    exo::var
 #define RETVARREF exo::var&
@@ -415,25 +414,30 @@ class PUBLIC var_base {
 	// 2. Constructors with a constexpr specifier make their type a LiteralType.
 	// 3. Using default since members std::string and var_typ have constructors
 
-	//CONSTEXPR
+#ifndef EXO_SNITCHING
+	CONSTEXPR
 	var_base() noexcept = default;
 
-//	var_base()
-//		: var_typ(VARTYP_UNA) {
-//		//std::cout << "ctor()" << std::endl;
-//
-//		// int xyz=3;
-//		// WARNING neither initialisers nor constructors are called in the following case !!!
-//		// var xxx=xxx.somefunction()
-//		// known as "undefined usage of uninitialised variable";
-//		// and not even a compiler warning in msvc8 or g++4.1.2
-//
-//		// so the following test is put everywhere to protect against this type of accidental
-//		// programming if (var_typ&VARTYP_MASK) throw VarUndefined("funcname()"); should really
-//		// ensure a magic number and not just HOPE for some binary digits above bottom four 0-15
-//		// decimal 1111binary this could be removed in production code perhaps
-//
-//	}
+#else
+	CONSTEXPR
+	var_base()
+		: var_typ(VARTYP_UNA) {
+		//std::cout << "ctor()" << std::endl;
+
+		// int xyz=3;
+		// WARNING neither initialisers nor constructors are called in the following case !!!
+		// var xxx=xxx.somefunction()
+		// known as "undefined usage of uninitialised variable";
+		// and not even a compiler warning in msvc8 or g++4.1.2
+
+		// so the following test is put everywhere to protect against this type of accidental
+		// programming if (var_typ&VARTYP_MASK) throw VarUndefined("funcname()"); should really
+		// ensure a magic number and not just HOPE for some binary digits above bottom four 0-15
+		// decimal 1111binary this could be removed in production code perhaps
+
+		EXO_SNITCH("var_base +   ")
+	}
+#endif
 
 	////////////////
 	// 2. Destructor - We need to set var_typ to undefined for safety.
@@ -449,6 +453,8 @@ class PUBLIC var_base {
 	~var_base() {
 		//std::cout << "dtor:" << var_str << std::endl;
 
+		EXO_SNITCH("var_base -   ")
+
 		// Try to ensure any memory is not later recognises as initialised memory
 		//(exodus tries to detect undefined use of uninitialised objects at runtime - that dumb
 		// compilers allow without warning) this could be removed in production code perhaps set all
@@ -458,13 +464,10 @@ class PUBLIC var_base {
 		var_typ = VARTYP_MASK;
 
 	}
+
 #else
 	CONSTEXPR
 	~var_base() = default;
-#endif
-
-#ifdef EXO_SNITCH
-		std::clog << this << " var_base dtor" <<std::endl;
 #endif
 
 	//////////////////////
@@ -482,9 +485,7 @@ class PUBLIC var_base {
 		// use initializers for speed? and only check afterwards if rhs was assigned
 		rhs.assertAssigned(__PRETTY_FUNCTION__);
 
-#ifdef EXO_SNITCH
-		std::clog << this << " var_base copy ctor" <<std::endl;
-#endif
+		EXO_SNITCH("var_base COPY")
 	}
 
 	//////////////////////
@@ -494,8 +495,25 @@ class PUBLIC var_base {
 	// If noexcept then STL containers will use move during various operations otherwise they will use copy
 	// We will use default since temporaries are unlikely to be undefined or unassigned and we will skip the usual checks
 
+#ifndef SNITCHING
 	CONSTEXPR
 	var_base(TVR fromvar) noexcept = default;
+
+#else
+	CONSTEXPR
+	var_base(TVR rhs)
+		:
+		var_str(std::move(rhs.var_str)),
+		var_int(rhs.var_int),
+		var_dbl(rhs.var_dbl),
+		var_typ(rhs.var_typ) {
+
+		// use initializers for speed? and only check afterwards if rhs was assigned
+		//rhs.assertAssigned(__PRETTY_FUNCTION__);
+
+		EXO_SNITCH("var_base MOVE")
+	}
+#endif
 
 	/////////////////////
 	// 5. copy assignment - from lvalue
@@ -523,9 +541,6 @@ class PUBLIC var_base {
 		//assertDefined(__PRETTY_FUNCTION__);  //could be skipped for speed?
 		rhs.assertAssigned(__PRETTY_FUNCTION__);
 
-#ifdef EXO_SNITCH
-		std::clog << this << " var_base copy assign" <<std::endl;
-#endif
 		// Prevent self assign
 		// Removed for speed since we assume std::string handles it ok
 		//if (this == &rhs)
@@ -537,7 +552,7 @@ class PUBLIC var_base {
 		var_int = rhs.var_int;
 		var_typ = rhs.var_typ;
 
-		return;
+		EXO_SNITCH("var_base =cop")
 	}
 
 	/////////////////////
@@ -580,9 +595,8 @@ class PUBLIC var_base {
 		var_int = rhs.var_int;
 		var_typ = rhs.var_typ;
 
-		return;
+		EXO_SNITCH("var_base =mov")
 	}
-
 
 	///////////////////
 	// INT CONSTRUCTORS
@@ -629,6 +643,7 @@ class PUBLIC var_base {
 				[[unlikely]]
 				throw VarNumOverflow(var_base(__PRETTY_FUNCTION__)/*.field(";", 1)*/);
 		}
+		EXO_SNITCH("var_base Int ")
 	}
 
 
@@ -663,6 +678,7 @@ class PUBLIC var_base {
 				[[unlikely]]
 				throw VarNumUnderflow(var_base(__PRETTY_FUNCTION__)/*.field(";", 1)*/);
 		}
+		EXO_SNITCH("var_base Fp  ")
 	}
 
 	//////////////////////
@@ -689,6 +705,7 @@ class PUBLIC var_base {
 		var_typ(VARTYP_STR) {
 
 		//std::cerr << "var_base(str)" << std::endl;
+		EXO_SNITCH("var_base Str ")
 	}
 
 //	// only for g++12 which cant constexpr from cstr
@@ -710,6 +727,7 @@ class PUBLIC var_base {
 
 		if (charstart)
 			var_str = std::string_view(charstart, nchars);
+		EXO_SNITCH("var_base c*+n")
 	}
 
 	// char
@@ -722,6 +740,7 @@ class PUBLIC var_base {
 		var_typ(VARTYP_STR) {
 		var_str = char1;
 		//std::cerr << "var_base(char)" << std::endl;
+		EXO_SNITCH("var_base char")
 	}
 
 
@@ -732,9 +751,9 @@ class PUBLIC var_base {
 	// var_base(wide-string-like)
 
 #ifdef EXO_CONCEPTS
-	template <std_u32string_or_convertible W>
+	template <std_u32string_or_convertible U32S>
 #else
-	template <typename W, std::enable_if_t<std::is_convertible<W, std::u32string_view>::value, bool> = true>
+	template <typename U32S, std::enable_if_t<std::is_convertible<U32S, std::u32string_view>::value, bool> = true>
 #endif
 	/*
 		std::u32string,
@@ -743,16 +762,18 @@ class PUBLIC var_base {
 		u32char
 	*/
 	//CONSTEXPR
-	var_base(W& from_wstr)
+	var_base(U32S& from_wstr)
 		:
 		var_typ(VARTYP_STR)	{
 
 		this->from_u32string(from_wstr);
+		EXO_SNITCH("var_base U32S")
 	}
 
 	// const std::wstring&
 	//////////////////////
 	var_base(const std::wstring& wstr1);
+//		EXO_SNITCH("var_base = mv")
 
 	// wchar*
 	/////////
@@ -761,6 +782,7 @@ class PUBLIC var_base {
 		:
 		var_str(var_base(std::wstring(wcstr1)).var_str),
 		var_typ(VARTYP_STR){
+		EXO_SNITCH("var_base wch*")
 	}
 
 // Cant provide these and support L'x' since it they are ambiguous with char when creating var_base from ints
@@ -771,6 +793,7 @@ class PUBLIC var_base {
 //		: var_typ(VARTYP_STR) {
 //
 //		(*this) = var_base(std::wstring(1, wchar1));
+//		EXO_SNITCH("var_base wcha")
 //	}
 //
 //	// char32_t char
@@ -779,6 +802,7 @@ class PUBLIC var_base {
 //		: var_typ(VARTYP_STR) {
 //
 //		this->from_u32string(std::u32string(1, u32char));
+//		EXO_SNITCH("var_base u32c")
 //	}
 //
 //	// char8_t char
@@ -787,12 +811,15 @@ class PUBLIC var_base {
 //		: var_typ(VARTYP_STR) {
 //
 //		this->var_str = std::string(1, u8char);
+//		EXO_SNITCH("var_base u8ch")
 //	}
 
 //	// const std::u32string&
 //  ////////////////////////
 //	var_base(const std::u32string&& u32str1);
 //	//	this->from_u32string(str1);
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
 
 	///////////////////////
 	// NAMED CONVERSIONS TO
@@ -845,11 +872,13 @@ class PUBLIC var_base {
 	// Implicitly convert var_base to var
 	operator var() &{
 		// clone, like most var_base functions returns a var since var's are var_base's but not vice versa
+		EXO_SNITCH("var_base cp>v")
 		return this->clone();
 	}
 
 	operator var() && {
 		// move, like most var_base functions returns a var since var's are var_base's but not vice versa
+		EXO_SNITCH("var_base mv>v")
 		return this->move();
 	}
 
@@ -903,6 +932,7 @@ class PUBLIC var_base {
 		}
 		// Similar code in constructor(int) operator=(int) and int()
 
+		EXO_SNITCH("var_base >Int")
 		return static_cast<Integer>(var_int);
 	}
 
@@ -921,6 +951,7 @@ class PUBLIC var_base {
 	*/
 	operator FloatingPoint() const {
 		assertDecimal(__PRETTY_FUNCTION__);
+		EXO_SNITCH("var_base >Fp ")
 		return static_cast<FloatingPoint>(var_dbl);
 	}
 
@@ -948,6 +979,7 @@ class PUBLIC var_base {
 	//////////////
 
 	operator bool() const {
+		EXO_SNITCH("var_base >boo")
 		return this->toBool();
 	}
 
@@ -995,21 +1027,25 @@ class PUBLIC var_base {
 
 	operator std::string() const {
 		assertString(__PRETTY_FUNCTION__);
+		EXO_SNITCH("var_base >Str")
 		return var_str;
 	}
 
 	CONSTEXPR
 	operator std::string_view() const {
 		assertString(__PRETTY_FUNCTION__);
+		EXO_SNITCH("var_base >SV ")
 		return std::string_view(var_str);
 	}
 
 	operator const char*() const {
 		assertString(__PRETTY_FUNCTION__);
+		EXO_SNITCH("var_base >ch*")
 		return var_str.c_str();
 	}
 
 	operator std::u32string() const {
+		EXO_SNITCH("var_base >u32")
 		return this->to_u32string();
 	}
 
@@ -1022,7 +1058,7 @@ class PUBLIC var_base {
 	//
 	// Prevent compilation of expressions containing
 	//
-    //  *outvar[4]
+	//  *outvar[4]
 	//  *outvar.b(99)
 	//
 	// but allow
@@ -1098,6 +1134,7 @@ class PUBLIC var_base {
 				throw VarNumOverflow(var_base(__PRETTY_FUNCTION__)/*.field(";", 1)*/);
 		}
 
+		EXO_SNITCH("var_base =Int")
 	}
 
 //	// Specialisation for bool to avoid a compiler warning
@@ -1124,6 +1161,7 @@ class PUBLIC var_base {
 	void operator=(FloatingPoint rhs) & {
 		var_dbl = rhs;
 		var_typ = VARTYP_DBL;
+		EXO_SNITCH("var_base =Fp ")
 	}
 
 	// var = char
@@ -1145,6 +1183,7 @@ class PUBLIC var_base {
 		// reset to one unique type
 		var_typ = VARTYP_STR;
 
+		EXO_SNITCH("var_base =chr")
 		return;
 	}
 
@@ -1165,6 +1204,7 @@ class PUBLIC var_base {
 		// reset to one unique type
 		var_typ = VARTYP_STR;
 
+		EXO_SNITCH("var_base =ch*")
 		return;
 	}
 
@@ -1204,6 +1244,7 @@ class PUBLIC var_base {
 		// reset to one unique type
 		var_typ = VARTYP_STR;
 
+		EXO_SNITCH("var_base =str")
 		return;
 	}
 
@@ -1286,6 +1327,7 @@ class PUBLIC var_base {
 	VARREF operator^=(const int) &;
 	VARREF operator^=(const double) &;
 	VARREF operator^=(const char) &;
+
 #define NOT_TEMPLATED_APPEND
 #ifdef NOT_TEMPLATED_APPEND
 	VARREF operator^=(const char*) &;
@@ -1679,16 +1721,16 @@ public:
 	// Inherit constructors
 	using var_base<var_mid<var>>::var_base;
 
-    // Implicitly convert var_base to var
-    operator var() &{
-        // Clone, like most var_base functions returns a var since var's are var_base's but not vice versa
-        return this->clone();
-    }
+	// Implicitly convert var_base to var
+	operator var() &{
+		// Clone, like most var_base functions returns a var since var's are var_base's but not vice versa
+		return this->clone();
+	}
 
-    operator var() && {
-        // Clone, like most var_base functions returns a var since var's are var_base's but not vice versa
-        return this->clone(); // TODO move/steal
-    }
+	operator var() && {
+		// Clone, like most var_base functions returns a var since var's are var_base's but not vice versa
+		return this->clone(); // TODO move/steal
+	}
 };
 
 // class var
@@ -2064,7 +2106,7 @@ public:
 	ND VARREF sort(SV sepchar = _FM) &&;
 	ND VARREF reverse(SV sepchar = _FM) &&;
 	ND VARREF shuffle(SV sepchar = _FM) &&;
-    ND VARREF parse(char sepchar = ' ') &&;
+	ND VARREF parse(char sepchar = ' ') &&;
 
 	// STRING MUTATORS
 	//////////////////
@@ -2791,7 +2833,7 @@ class PUBLIC var_proxy3 {
 		return this->at(pos1);
 	}
 
-    ND var at(const int pos1) const;
+	ND var at(const int pos1) const;
 //		//return var_.f(fn_, vn_, sn_).at(pos1);
 //		RETVAR v1 = var_.f(fn_, vn_, sn_);
 //		return v1.at(pos1);
