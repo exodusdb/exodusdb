@@ -6,6 +6,7 @@ SYNTAX
 	fixdeprecated file|dir ... {OPTIONS}
 OPTIONS
 	U - Actually update
+	C - Recompile if updated
 	V - Verbose
 	H - Help
 	X - Read compiler output from standard input (file|dir ignored)
@@ -16,11 +17,11 @@ function main() {
 	let option_d = 2;//OPTIONS.count("d");
 	let option_s = 1;//OPTIONS.count("s");
 	let update = OPTIONS.contains("U");
-	let recompile = update;
+	let recompile = OPTIONS.contains("C");
 	let verbose = OPTIONS.contains("V");
 	let stdinput = OPTIONS.contains("X");
 
-	if (OPTIONS.convert("UVX", "")) {
+	if (OPTIONS.convert("UCVX", "")) {
 		abort(syntax);
 	}
 
@@ -48,7 +49,7 @@ function main() {
 
 		// Pipe the compiler output into another process of this command
 		// F = Force recompilation to generate any deprecation warning messages
-		let pipedcmd = compilecmd ^ " {F} |& " ^ COMMAND.f(1) ^ " {X}";
+		let pipedcmd = compilecmd ^ " {F} |& " ^ COMMAND.f(1) ^ " {X" ^ OPTIONS ^ "}";
 		if (verbose)
 			TRACE(pipedcmd)
 		if (not osshell("bash -c " ^ pipedcmd.squote()))
@@ -56,6 +57,7 @@ function main() {
 
 		// Optionally recompile all requested files after updating in order to gain parallelism
 		if (recompile) {
+			printl("Recompiling");
 			let recompilecmd = compilecmd ^ " {S}";
 			if (verbose)
 				TRACE(recompilecmd)
