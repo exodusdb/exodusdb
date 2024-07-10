@@ -8,6 +8,7 @@ OPTIONS
 	U - Actually update
 	V - Verbose
 	H - Help
+	X - Read compiler output from standard input (file|dir ignored)
 )";
 
 function main() {
@@ -17,8 +18,9 @@ function main() {
 	let update = OPTIONS.contains("U");
 	let recompile = update;
 	let verbose = OPTIONS.contains("V");
+	let stdinput = OPTIONS.contains("X");
 
-	if (OPTIONS.convert("UV", "")) {
+	if (OPTIONS.convert("UVX", "")) {
 		abort(syntax);
 	}
 
@@ -26,7 +28,12 @@ function main() {
 	// then recompile them to get any deprecation messages and pipe
 	// them into a another copy of this program in another process
 	///////////////////////////////////////////////////////////////
-	if (COMMAND.count(FM))  {
+	if (not stdinput) {
+
+		// Must specify some files/dirs
+		if (not COMMAND.count(FM)) {
+			abort(syntax);
+		}
 
 		// Compile all requested files to generate deprecation warnings
 		// Parallel compilation will speed matters up.
@@ -41,7 +48,7 @@ function main() {
 
 		// Pipe the compiler output into another process of this command
 		// F = Force recompilation to generate any deprecation warning messages
-		let pipedcmd = compilecmd ^ " {F} |& " ^ COMMAND.f(1);
+		let pipedcmd = compilecmd ^ " {F} |& " ^ COMMAND.f(1) ^ " {X}";
 		if (verbose)
 			TRACE(pipedcmd)
 		if (not osshell("bash -c " ^ pipedcmd.squote()))
