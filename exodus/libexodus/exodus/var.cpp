@@ -22,13 +22,12 @@ THE SOFTWARE.
 
 #define EXO_VAR_CPP	// indicates globals are to be defined (omit extern keyword)
 #include <var.h>
-#include <varerr.h>
+//#include <varb.h>
+//#include <varerr.h>
 //#include <exodus/varimpl.h>
 #include <exodus/exoimpl.h>
 
 namespace exo {
-
-// Note: VAR_TEMPLATE both defines and instantiates an instance of the member function for var_base<var>::xxxxxxxxxxx
 
 template<> PUBLIC RETVAR VARBASE1::clone() const {
 

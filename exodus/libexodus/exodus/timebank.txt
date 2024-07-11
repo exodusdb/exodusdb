@@ -192,3 +192,4 @@
 691 VARREF var::laster() const 
 692 var var::search(SV regex, int startchar1, SV regex_options) const 
 693 std::wstring var::to_wstring() const 
+694 const char* var::c_str() const 

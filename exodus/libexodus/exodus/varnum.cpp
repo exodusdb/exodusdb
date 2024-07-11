@@ -685,12 +685,6 @@ template<> PUBLIC bool VARBASE1::toBool() const {
 	}
 }
 
-////CONSTEXPR // causes varnum.cpp:646:34: error: explicit specialization of 'toBool' after instantiation
-//template<> PUBLIC VARBASE1::operator bool() const {
-//	EXO_SNITCH("var_base >boo")
-//	return this->toBool();
-//}
-
 /////////////
 // var::toInt
 /////////////
