@@ -651,14 +651,17 @@ template<> PUBLIC bool VARBASE1::toBool() const {
 
 	// identical code in void* and bool except returns void* and bool respectively
 	while (true) {
+
 		// ints are true except for zero
 		if (var_typ & VARTYP_INT)
 			//return static_cast<bool>(var_int != 0);
 			return var_int != 0;
 
-		// non-numeric strings are true unless zero length
+		// non-numeric strings are true unless empty
+		// but empty string is numeric int 0
+		// so NAN -> true
 		if (var_typ & VARTYP_NAN)
-			return !var_str.empty();
+			return true;
 
 		// doubles are true unless zero
 		// check double first dbl on guess that tests will be most often on financial
@@ -681,6 +684,12 @@ template<> PUBLIC bool VARBASE1::toBool() const {
 		this->isnum();
 	}
 }
+
+////CONSTEXPR // causes varnum.cpp:646:34: error: explicit specialization of 'toBool' after instantiation
+//template<> PUBLIC VARBASE1::operator bool() const {
+//	EXO_SNITCH("var_base >boo")
+//	return this->toBool();
+//}
 
 /////////////
 // var::toInt

@@ -474,7 +474,7 @@ class PUBLIC var_base {
 	// 3. Copy constructor - Cant use default because we need to throw if rhs is unassigned
 	//////////////////////
 	//
-	CONSTEXPR
+	CONSTEXPR // but new std::string?
 	var_base(CVR rhs)
 		:
 		var_str(rhs.var_str),
@@ -501,7 +501,7 @@ class PUBLIC var_base {
 
 #else
 	CONSTEXPR
-	var_base(TVR rhs)
+	var_base(TVR rhs) noexcept
 		:
 		var_str(std::move(rhs.var_str)),
 		var_int(rhs.var_int),
@@ -528,6 +528,7 @@ class PUBLIC var_base {
 	// Prevent assigning to temporaries with a clearer error message
 	// e.g. printl(date() = 12345);
 	//[[deprecated("Deprecated is a great way to highlight all uses of something which can otherwise be hard or slow to find!")]
+	CONSTEXPR
 	void operator=(CVR rhs) && = delete;
 
 	// var_base& operator=(CVR rhs) & = default;
@@ -535,7 +536,7 @@ class PUBLIC var_base {
 	// a) it returns a value allowing accidental use of "=" instead of == in if statements
 	// b) doesnt check if rhs is assigned
 
-	CONSTEXPR
+	CONSTEXPR // but new std::string?
 	void operator=(CVR rhs) & {
 
 		//assertDefined(__PRETTY_FUNCTION__);  //could be skipped for speed?
@@ -698,7 +699,7 @@ class PUBLIC var_base {
 		std::string_view,
 		char*,
 	*/
-	CONSTEXPR
+	CONSTEXPR // but new std::string?
 	var_base(StringLike&& fromstr)
 		:
 		var_str(std::forward<StringLike>(fromstr)),
@@ -720,7 +721,7 @@ class PUBLIC var_base {
 
 	// memory block
 	///////////////
-	CONSTEXPR
+	CONSTEXPR // but new std::string?
 	var_base(const char* charstart, const size_t nchars)
 		:
 		var_typ(VARTYP_STR) {
@@ -820,10 +821,8 @@ class PUBLIC var_base {
 //	//	this->from_u32string(str1);
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
-
-	///////////////////////
-	// NAMED CONVERSIONS TO
-	///////////////////////
+//                                  NAMED CONVERSION FUNCTIONS (CONVERT TO)
+/////////////////////////////////////////////////////////////////////////////////////////////////
 
 	bool toBool() const;
 
@@ -855,9 +854,9 @@ class PUBLIC var_base {
 	const std::string& toString() const&;  //for non-temporaries.
 
 
-	//////////////////////////
-	// IMPLICIT CONVERSIONS TO
-	//////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////
+//                               IMPLICIT CONVERSION OPERATORS (CONVERT TO)
+/////////////////////////////////////////////////////////////////////////////////////////////////
 
 	// someone recommends not to create more than one automatic converter
 	// to avoid the compiler error "ambiguous conversion"
@@ -870,12 +869,14 @@ class PUBLIC var_base {
 	// any changes to the base object.
 
 	// Implicitly convert var_base to var
+	CONSTEXPR
 	operator var() &{
 		// clone, like most var_base functions returns a var since var's are var_base's but not vice versa
 		EXO_SNITCH("var_base cp>v")
 		return this->clone();
 	}
 
+	CONSTEXPR
 	operator var() && {
 		// move, like most var_base functions returns a var since var's are var_base's but not vice versa
 		EXO_SNITCH("var_base mv>v")
@@ -921,6 +922,7 @@ class PUBLIC var_base {
 		unsigned long long (C++11)
 
 	*/
+	CONSTEXPR
 	operator Integer() const {
 		assertInteger(__PRETTY_FUNCTION__);
 
@@ -949,6 +951,7 @@ class PUBLIC var_base {
 		double,
 		long double
 	*/
+	CONSTEXPR
 	operator FloatingPoint() const {
 		assertDecimal(__PRETTY_FUNCTION__);
 		EXO_SNITCH("var_base >Fp ")
@@ -967,21 +970,27 @@ class PUBLIC var_base {
 	// http://www.informit.com/guides/content.aspx?g=cplusplus&seqNum=297
 	// necessary to allow var to be used standalone in "if (xxx)" but see mv.h for discussion of
 	// using void* instead of bool
+	CONSTEXPR
 	operator void*() const {
 		// result in an attempt to convert an uninitialised object to void* since there is a bool
 		// conversion when does c++ use automatic conversion to void* note that exodus operator !
 		// uses (void*) trial elimination of operator void* seems to cause no problems but without
 		// full regression testing
+		EXO_SNITCH("var_base >vd*")
 		return reinterpret_cast<void*>(this->toBool());
 	}
 
 	// bool <- var
 	//////////////
 
+	CONSTEXPR
 	operator bool() const {
 		EXO_SNITCH("var_base >boo")
 		return this->toBool();
 	}
+
+	// Implemented in varnum after ::toBool to avoid
+	// varnum.cpp:646:34: error: explicit specialization of 'toBool' after instantiation
 
 	// NB && and || operators are NOT overloaded because var is set to convert to boolean
 	// automatically this is fortunate because "shortcircuiting" of && and || doesnt happen when
@@ -1025,6 +1034,7 @@ class PUBLIC var_base {
 //		//std::cerr << "var(str)" << std::endl;
 //	}
 
+	CONSTEXPR
 	operator std::string() const {
 		assertString(__PRETTY_FUNCTION__);
 		EXO_SNITCH("var_base >Str")
@@ -1038,12 +1048,14 @@ class PUBLIC var_base {
 		return std::string_view(var_str);
 	}
 
+	CONSTEXPR
 	operator const char*() const {
 		assertString(__PRETTY_FUNCTION__);
 		EXO_SNITCH("var_base >ch*")
 		return var_str.c_str();
 	}
 
+	CONSTEXPR
 	operator std::u32string() const {
 		EXO_SNITCH("var_base >u32")
 		return this->to_u32string();
@@ -1085,9 +1097,9 @@ class PUBLIC var_base {
 	// non-const xxxx(fn,vn,sn) returns a proxy that can be aasigned to or implicitly converted to a var
 	//
 
-	/////////////
-	// ASSIGNMENT
-	/////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////
+//                                        ASSIGNMENT OPERATOR
+/////////////////////////////////////////////////////////////////////////////////////////////////
 
 	// The assignment operators return void to prevent accidental misuse where == was intended.
 
@@ -1120,6 +1132,7 @@ class PUBLIC var_base {
 		unsigned long long (C++11)
 		etc.
 	*/
+	CONSTEXPR
 	void operator=(Integer rhs) & {
 
 		// Similar code in constructor(int) operator=(int) and int()
@@ -1158,6 +1171,7 @@ class PUBLIC var_base {
 		double,
 		long double
 	*/
+	CONSTEXPR
 	void operator=(FloatingPoint rhs) & {
 		var_dbl = rhs;
 		var_typ = VARTYP_DBL;
@@ -1166,7 +1180,7 @@ class PUBLIC var_base {
 
 	// var = char
 	/////////////
-
+	CONSTEXPR
 	void operator=(const char char2) & {
 
 		//THISIS("RETVARREF operator= (const char char2) &")
@@ -1191,6 +1205,7 @@ class PUBLIC var_base {
 	//////////////
 
 	// The assignment operator should always return a reference to *this.
+	CONSTEXPR
 	void operator=(const char* cstr) & {
 		//THISIS("RETVARREF operator= (const char* cstr2) &")
 		// protect against unlikely syntax as follows:
@@ -1230,6 +1245,7 @@ class PUBLIC var_base {
 
 	// The assignment operator should always return a reference to *this.
 	// but we do not in order to prevent misuse when == intended
+	CONSTEXPR
 	void operator=(std::string&& string2) & {
 
 		//THISIS("RETVARREF operator= (const std::string&& string2) &")
@@ -1248,36 +1264,9 @@ class PUBLIC var_base {
 		return;
 	}
 
-
-	//////////////
-	// BRACKETS []
-	//////////////
-
-	// Coming in C++23 (already in gcc trunk) - multi-dimensional arrays with more than one index eg [x,y], [x,y,z] etc.
-	// and left/right distinction for assign/extract? SADLY NO
-	//
-	// 2024 decided to deprecate usage of pickos-like brackets [] for text extraction and
-	// not limit [] to accessing array like objects
-	// e.g. dim which can be used on either side of the = (lvalue and rvalue)
-
-	// Extract a character from a constant var
-	// first=1 last=-1 etc.
-	// DONT change deprecation wordng without also changing it in cli/fixdeprecated
-	[[deprecated ("EXODUS: Replace single character accessors like xxx[n] with xxx.at(n)")]]
-	ND RETVAR operator[](int pos1) const; //{return this->at(pos1);}
-
-	// Named member function identical to operator[]
-	//ND RETVAR at(const int pos1) const;
-	ND RETVAR at(const int pos1) const;
-
-	// as of now, sadly the following all works EXCEPT that var[99].anymethod() doesnt work
-	// so would have to implement all var methods and free functions on the proxy object
-	//ND var_brackets_proxy operator[](int pos1);
-	//ND var operator[](int pos1) &&;
-
-	////////////////////////
-	// SELF ASSIGN OPERATORS - MEMBER FUNCTIONS
-	////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////
+//                                   SELF ASSIGN OPERATOR ON LVALUES
+/////////////////////////////////////////////////////////////////////////////////////////////////
 
 	VARREF operator+=(CVR) &;
 	VARREF operator*=(CVR) &;
@@ -1357,9 +1346,11 @@ class PUBLIC var_base {
 	}
 #endif
 
-	///////////////////////////////////////
-	// SELF ASSIGN OPERATORS ON TEMPORARIES - DEPRECATED or DELETED to prevent unusual and unnecessary coding
-	///////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////
+//                          SELF ASSIGN OPERATOR ON TEMPORARIES - DEPRECATED
+/////////////////////////////////////////////////////////////////////////////////////////////////
+
+	// Prevent accidental, unusual and unnecessary coding
 
 	#define DEPRECATE [[deprecated("Using self assign operators on temporaries is pointless. Use the operator by itself, without the = sign, to achieve the same.")]]
 
@@ -1417,9 +1408,9 @@ class PUBLIC var_base {
 
 	#undef DEPRECATE
 
-	//////////////////////////////////////////
-	// UNARY AND INCREMENT/DECREMENT OPERATORS - MEMBER FUNCTIONS
-	//////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////
+//                                      UNARY OPERATORS
+/////////////////////////////////////////////////////////////////////////////////////////////////
 
 	// Unary
 	RETVAR operator+() const;
@@ -1437,9 +1428,9 @@ class PUBLIC var_base {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wnon-template-friend"
 
-	/////////////
-	// BINARY OPS - NON-MEMBER FUNCTIONS
-	/////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////
+//                                      BINARY OP FRIENDS
+/////////////////////////////////////////////////////////////////////////////////////////////////
 
 	// For detailed info on making templated value types operators work with free and templated function:
 	// See CppCon 2018: Dan Saks “Making New Friends”
@@ -1531,8 +1522,39 @@ class PUBLIC var_base {
 	//CONSTEXPR
 	bool isnum() const;
 
-	// OSTREAM FRIEND
-	/////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////
+//                                   [] or at
+/////////////////////////////////////////////////////////////////////////////////////////////////
+
+	// Coming in C++23 (already in gcc trunk) - multi-dimensional arrays with more than one index eg [x,y], [x,y,z] etc.
+	// and left/right distinction for assign/extract? SADLY NO
+	//
+	// 2024 decided to deprecate usage of pickos-like brackets [] for text extraction and
+	// not limit [] to accessing array like objects
+	// e.g. dim which can be used on either side of the = (lvalue and rvalue)
+
+	// Extract a character from a constant var
+	// first=1 last=-1 etc.
+	// DONT change deprecation wordng without also changing it in cli/fixdeprecated
+	[[deprecated ("EXODUS: Replace single character accessors like xxx[n] with xxx.at(n)")]]
+	ND RETVAR operator[](int pos1) const; //{return this->at(pos1);}
+
+	// Named member function identical to operator[]
+	//ND RETVAR at(const int pos1) const;
+	ND RETVAR at(const int pos1) const;
+
+	// as of now, sadly the following all works EXCEPT that var[99].anymethod() doesnt work
+	// so would have to implement all var methods and free functions on the proxy object
+	//ND var_brackets_proxy operator[](int pos1);
+	//ND var operator[](int pos1) &&;
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
+//                                         IOSTREAM FRIENDS
+/////////////////////////////////////////////////////////////////////////////////////////////////
+
+	// OSTREAM
+	//////////
 
 	// WARNING: MUST pass a COPY of var_base in since it will may be modified before being output
 	// TODO Take a reference and make an internal copy if any FM need to be converted
@@ -1562,8 +1584,8 @@ class PUBLIC var_base {
 		return ostream1;
 	}
 
-	// ISTREAM FRIEND
-	/////////////////
+	// ISTREAM
+	//////////
 
 	PUBLIC friend std::istream& operator>>(std::istream& istream1, VARREF invar) {
 
@@ -1581,10 +1603,12 @@ class PUBLIC var_base {
 		return istream1;
 	}
 
-	// friend bool operator<<(CVR);
+/////////////////////////////////////////////////////////////////////////////////////////////////
+//                                         PUBLIC MEMBER FUNCTIONS
+/////////////////////////////////////////////////////////////////////////////////////////////////
 
-	// VAR_BASE MANAGEMENT
-	//////////////////////
+	// Housekeeping functions
+	/////////////////////////
 
 	ND bool assigned() const;
 	ND bool unassigned() const;
@@ -1621,11 +1645,22 @@ class PUBLIC var_base {
 	static int localeAwareCompare(const std::string& str1, const std::string& str2);
 	//int localeAwareCompare(const std::string& str2) const;
 
-	/////////////////////////////
-	// PROTECTED MEMBER FUNCTIONS
-	/////////////////////////////
 
+/////////////////////////////////////////////////////////////////////////////////////////////////
+//                                       PROTECTED MEMBER FUNCTIONS
+/////////////////////////////////////////////////////////////////////////////////////////////////
 protected:
+
+	// u32string utility
+
+	void from_u32string(std::u32string u32str) const;
+
+	// force var_str available or VNA
+
+	//CONSTEXPR
+	void createString() const;
+
+	// assertDefined
 
 	// WARNING: MUST NOT use any var when checking Undefined
 	// OTHERWISE *WILL* get recursion/segfault
@@ -1636,6 +1671,8 @@ protected:
 			throw VarUndefined(std::string(varname) + " in " + message);
 	}
 
+	// assertAssigned
+
 	CONSTEXPR
 	void assertAssigned(const char* message, const char* varname = "") const {
 		assertDefined(message, varname);
@@ -1644,10 +1681,14 @@ protected:
 			throw VarUnassigned(var_base(varname) ^ " in " ^ message);
 	}
 
+	// assertNumeric
+
 	//CONSTEXPR
 	void assertNumeric(const char* message, const char* varname = "") const;
 
-	//CONSTEXPR
+	// assertDecimal
+
+	CONSTEXPR
 	void assertDecimal(const char* message, const char* varname = "") const {
 		assertNumeric(message, varname);
 		if (!(var_typ & VARTYP_DBL)) {
@@ -1657,7 +1698,9 @@ protected:
 		}
 	}
 
-	//CONSTEXPR
+	// assertInteger
+
+	CONSTEXPR
 	void assertInteger(const char* message, const char* varname = "") const {
 		assertNumeric(message, varname);
 		if (!(var_typ & VARTYP_INT)) {
@@ -1683,7 +1726,9 @@ protected:
 		}
 	}
 
-	//CONSTEXPR
+	// assertString
+
+	CONSTEXPR
 	void assertString(const char* message, const char* varname = "") const {
 		assertDefined(message, varname);
 		if (!(var_typ & VARTYP_STR)) {
@@ -1694,9 +1739,12 @@ protected:
 		}
 	}
 
-	//CONSTEXPR
+	// assertStringMutator
+
+	CONSTEXPR
 	void assertStringMutator(const char* message, const char* varname = "") const {
 		assertString(message, varname);
+
 		// VERY IMPORTANT:
 		// If var_str is mutated then we MUST
 		// reset all flags to ensure that the int/dbl, if needed,
@@ -1704,12 +1752,22 @@ protected:
 		var_typ = VARTYP_STR;
 	}
 
-	// Constructor
-	void from_u32string(std::u32string u32str) const;
-
-	void createString() const;
-
 };
+
+////////////////////////////////
+// var_base forward declarations
+////////////////////////////////
+
+// Forward declaration of some member functions to avoid errors like
+// error: explicit specialization of 'toBool' after instantiation
+template<> PUBLIC bool VARBASE1::toBool() const;
+template<> PUBLIC void VARBASE1::createString() const;
+template<> PUBLIC void VARBASE1::assertNumeric(const char* message, const char* varname/* = ""*/) const;
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//                                               VAR_MID
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
 template <typename var>
 class var_mid : public var_base<var_mid<var>> {
@@ -1732,6 +1790,10 @@ public:
 		return this->clone(); // TODO move/steal
 	}
 };
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//                                               VAR
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
 // class var
 // using CRTP to capture a customised base class that knows what a var is
@@ -2827,6 +2889,7 @@ class PUBLIC var_proxy3 {
 	explicit operator bool() const {
 		return var_.f(fn_, vn_, sn_);
 	}
+
 	// DONT change deprecation wordng without also changing it in cli/fixdeprecated
 	[[deprecated ("EXODUS: Replace single character accessors like xxx[n] with xxx.at(n)")]]
 	ND var operator[](const int pos1) const {
