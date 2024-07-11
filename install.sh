@@ -335,7 +335,9 @@ function get_dependencies_for_build_and_install {
 	APT_GET sudo apt-get install -y $COMPILER
 
 :
-: Set as the default c++ compiler
+: Set as the default ++ compiler
+:
+: NB SETTING c++ not g++ or clang
 :
 	sudo update-alternatives --install /usr/bin/c++ c++ /usr/bin/$COMPILER 0
 	sudo update-alternatives --set c++ /usr/bin/$COMPILER

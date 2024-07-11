@@ -9,7 +9,8 @@ set -euxo pipefail
 :
 : "$0 <BASE_CONTAINERS,> <STAGES> [g++,clang,g++-default,clang-default,]"
 :
-: Just the build stage with g++ for two OSes using latest version of g++ available
+: Just the build stage with g++ for two OSes
+: using whatever version of g++ was installed in stage b
 :
 : $0 u2404,u2204 B g++
 :
