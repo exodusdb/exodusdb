@@ -161,6 +161,7 @@
 #
 	install(
 		FILES
+			varb.h
 			var.h
 			vartyp.h
 			varerr.h

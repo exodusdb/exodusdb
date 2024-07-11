@@ -411,7 +411,6 @@ template<> PUBLIC void VARBASE1::default_to(CBX defaultvalue) {
 	// see explanation above in assigned
 	// assertDefined(function_sig);
 
-
 	THISIS("VARREF var::default_to(CVR defaultvalue) const")
 	ISASSIGNED(defaultvalue)
 
@@ -419,9 +418,6 @@ template<> PUBLIC void VARBASE1::default_to(CBX defaultvalue) {
 	// if (var_typ & VARTYP_MASK)
 
 	if (this->unassigned()) UNLIKELY{
-		// throw VarUndefined("unassigned( ^ defaultvalue ^")");
-		// var_str="";
-		// var_typ=VARTYP_STR;
 		*this = defaultvalue;
 	}
 	return;// *this;
@@ -432,20 +428,19 @@ template<> PUBLIC RETVAR VARBASE1::default_from(CBX defaultvalue) const {
 	THISIS("VARREF var::default_from(CVR defaultvalue)")
 	ISASSIGNED(defaultvalue)
 
-
-//	const RETVAR* presult;
 	if (this->unassigned()) {
-		// Compiles but doesnt work
-//		return static_cast<var>(defaultvalue);
-//		return static_cast<const var>(defaultvalue);
 		return *static_cast<const exo::var*>(&defaultvalue);
 	} else {
-		// Compiles but doesnt work
-//		return static_cast<const var>(*this);
-//		return static_cast<var>(*this);
 		return *static_cast<const exo::var*>(this);
 	}
-//	return *presult;
+}
+
+template<> PUBLIC const char* VARBASE1::c_str() const& {
+
+	THISIS("const char* var::c_str() const")
+	assertString(function_sig);
+
+	return var_str.c_str();
 }
 
 template<> PUBLIC char VARBASE1::toChar() const {

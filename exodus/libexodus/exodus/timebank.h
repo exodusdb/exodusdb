@@ -283,6 +283,7 @@ auto get_timeacno(const char* arg1) -> int {
 	else if ( ! std::strcmp(arg1, "VARREF var::laster()")) acno = 192;
 	else if ( ! std::strcmp(arg1, "var var::search(SV regex, int startchar1, SV regex_options) const")) acno = 193;
 	else if ( ! std::strcmp(arg1, "std::wstring var::to_wstring() const")) acno = 194;
+	else if ( ! std::strcmp(arg1, "const char* var::c_str() const")) acno = 195;
 
 	else {
 		//throw std::runtime_error("");
