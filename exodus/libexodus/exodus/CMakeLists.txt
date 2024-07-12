@@ -102,6 +102,7 @@
 		# Big ones first for efficient parallel compilation
 		exoprog.cpp
 		vardb.cpp varregex.cpp varos.cpp varos2.cpp varstr.cpp
+		varb.cpp
 		var.cpp dim.cpp varnum.cpp varmath.cpp exodebug.cpp
 		varcompare.cpp
 		varop.cpp

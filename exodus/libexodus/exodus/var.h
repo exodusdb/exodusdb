@@ -1333,7 +1333,7 @@ ND inline var_proxy3 var::operator()(int fieldno, int valueno, int subvalueno) {
 	const char* const _OS_VERSION = EXO_OS_VERSION;
 #endif
 
-#endif
+#endif // EXO_VAR_CPP
 
 /////////////////////////////////////
 // A global flag used in mvdbpostgres
