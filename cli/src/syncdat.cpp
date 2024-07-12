@@ -3,6 +3,7 @@ programinit()
 
 	let force = index(OPTIONS, "F");
 	let generate = index(OPTIONS, "G");
+	let ignore_nodb = index(OPTIONS, "I");
 	let verbose = index(OPTIONS, "V");
 
 	var last_sync_date;
@@ -36,6 +37,8 @@ function main() {
 			"\n"
 			"    G = Generate and compile dict_*.cpp\n"
 			"\n"
+			"    I = Ignore if no DB\n"
+			"\n"
 			"    V = Verbose\n"
 			"\n"
 			"EXAMPLES\n"
@@ -55,6 +58,12 @@ function main() {
 			"causes deletion of the database FILE\n"
 		);
 		return 0;
+	}
+
+	// Quit if no default database connection
+	if (not connect()) {
+		errputl("No default db connection to perform syncdat and no option I - 'Ignore no db' provided.");
+		return ! ignore_nodb;
 	}
 
 	// "Elvis" operator and temporaries dont mix.

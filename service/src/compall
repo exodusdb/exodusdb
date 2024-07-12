@@ -35,7 +35,7 @@ set -euxo pipefail
 : ===============================================================
 :
 	touch dat
-	syncdat dat {G$COMPILER_OPTIONS}
+	syncdat dat {IG$COMPILER_OPTIONS}
 
 :
 : Compile EXODUS service
