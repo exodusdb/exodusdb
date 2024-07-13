@@ -63,9 +63,12 @@
 # #######################################
 #
 	add_executable(testcommandline testcommandline.cpp)
-	target_link_libraries(testcommandline ${PROJECT_LIBS} exodus)
+	target_link_libraries(testcommandline exodus ${PROJECT_LIBS})
+
     # lib #
     add_library(testcommandlib SHARED testcommandlib.cpp)
+	# REQUIRED only for c++ module discovery
+	target_link_libraries(testcommandlib exodus ${PROJECT_LIBS})
 
 #
 # Trigger cmake update if any new test_*.cpp files appear

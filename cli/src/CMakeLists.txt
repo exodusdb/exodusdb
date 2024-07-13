@@ -84,8 +84,11 @@
 
 	# lib #
 	add_library(htmllib2 SHARED htmllib2.cpp)
+#	add_library(htmllib2 SHARED)
+#	target_sources(htmllib2 PUBLIC FILE_SET cxx_modules TYPE CXX_MODULES FILES htmllib2.cpp)
 	add_library(nlist SHARED nlist.cpp)
 	add_library(dict_xo_clients SHARED dict_xo_clients.cpp)
+
 
 	# SPECIAL for nlist
 	target_compile_options(nlist PUBLIC "-O2")
@@ -134,6 +137,11 @@
 	target_link_libraries(var2let exodus stdc++fs ${LIBS})
 	target_link_libraries(redefine exodus stdc++fs ${LIBS})
 	target_link_libraries(fire exodus stdc++fs ${LIBS})
+
+	# REQUIRED only for c++ module discovery
+	target_link_libraries(htmllib2 exodus ${LIBS})
+	target_link_libraries(nlist exodus ${LIBS})
+	target_link_libraries(dict_xo_clients exodus ${LIBS})
 
 #
 # 3. INSTALL BINs

@@ -20,12 +20,39 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
+// vartype
+//
+#define EXO_IMPORT import
+#ifdef EXO_IMPORT
+//	EXO_IMPORT vartyp;
+	import vartyp;
+#else
+	#include <exodus/vartyp.cpp>
+#endif
+#include <exodus/varb.h>
+
 #include <var.h>
 #include <exodus/exoimpl.h>
 
 namespace exo {
 
-// ::clone
+//// clone to var
+////
+//CONSTEXPR
+//operator VARBASE1::var() &{
+//	EXO_SNITCH("var_base cp>v")
+//	return this->clone();
+//}
+//
+//// move to var
+////
+//CONSTEXPR
+//operator VARBASE1::var() && {
+//	EXO_SNITCH("var_base mv>v")
+//	return this->move();
+//}
+
+// ::clone to var
 //
 template<> PUBLIC RETVAR VARBASE1::clone() const {
 
@@ -54,7 +81,7 @@ template<> PUBLIC RETVAR VARBASE1::clone() const {
 	return rvo;
 }
 
-// ::move
+// ::move to var
 //
 template<> PUBLIC RETVAR VARBASE1::move() {
 

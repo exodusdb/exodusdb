@@ -291,15 +291,12 @@ function main() {
 
 		// Append c++ standard option
 		if (std) {
-			basicoptions ^= " -std=" ^ std;
+			basicoptions ^= " -std=" ^ std ^ " ";
 		}
 //		if (__cplusplus >= 201709)
 //			basicoptions ^= " -std=c++2a";  //gcc 4.7 and later DISABLES gnu extensions
 //		else
 //			basicoptions ^= " -std=c++17";  //gcc 4.7 and later DISABLES gnu extensions
-
-		// Minor space savings
-		basicoptions ^= " -fvisibility=hidden -ffunction-sections -fdata-sections";
 
 		//not available on gcc 4.1.2 TODO work out gcc version
 		//basicoptions^=" -Wno-unused-parameters"; //dont want if functions dont use their parameters
@@ -316,13 +313,13 @@ function main() {
 		//	linkoptions=" -lexodus-gd";
 		//else
 		//linkoptions = " -lexodus -lstdc++fs -lpthread";
-		linkoptions = " -lexodus -lstdc++fs -lstdc++";
+		linkoptions = "  -lexodus -lstdc++fs -lstdc++";
 //#if __has_include(<fmt/core.h>)
 #if EXO_FORMAT == 2
-		linkoptions ^= " -lfmt";
+		linkoptions ^= " -lfmt ";
 #endif
 		//always look in header install path eg ~/inc
-		basicoptions ^= " -I" ^ incdir;
+		basicoptions ^= " -I" ^ incdir ^ " ";
 
 		if (debugging) {
 
@@ -346,7 +343,7 @@ function main() {
 			// https://stackoverflow.com/questions/10475040/gcc-g-vs-g3-gdb-flag-what-is-the-difference
 			//basicoptions ^= " -ggdb";
 			//basicoptions ^= " -g";
-			basicoptions ^= " -g3";
+			basicoptions ^= " -g3 ";
 
 		} // debugging
 
@@ -359,9 +356,20 @@ function main() {
 //			if (optimise eq 1)
 //				basicoptions ^= " -Og";
 //			else
-				basicoptions ^= " -O" ^ optimise;
+				basicoptions ^= " -O" ^ optimise ^ " ";
 		}
 		//}
+
+		// Minor space savings
+		basicoptions ^= " -ffunction-sections -fdata-sections ";
+
+		// Use c++ (g++/clang) -fvisibility=hidden to make all hidden except those marked DLL_PUBLIC ie "default"
+#if __GNUC__ >= 4
+		liboptions ^= " -fvisibility=hidden -fvisibility-inlines-hidden ";
+#endif
+
+		// Precompiled modules
+		basicoptions ^= " -fmodule-file=vartyp=/usr/local/lib/vartyp.pcm ";
 
 		if (color_option)
 			basicoptions ^= " -fdiagnostics-color=always";
@@ -440,7 +448,7 @@ function main() {
 
 		if (clang) {
 			// Never warn about c++98 compatibility
-			basicoptions ^= " -Wno-c++98-compat";
+			basicoptions ^= "  -Wno-c++98-compat";
 			basicoptions ^= " -Wno-c++98-compat-pedantic";
 
 			// Never warn about macro expansion since it is essential for mv.RECORD etc.
@@ -506,7 +514,7 @@ function main() {
 		}
 
 		//how to output to a named file
-		outputoption = " -o ";
+		outputoption = " -o";
 
 		//general options
 		binoptions = "";
@@ -514,12 +522,8 @@ function main() {
 		//binoptions=" -fPIC";
 
 		//how to make a shared library
-		liboptions = " -fPIC -shared";
+		liboptions ^= " -fPIC -shared";
 		//soname?
-#if __GNUC__ >= 4
-		//use c++ (g++/clang) -fvisibility=hidden to make all hidden except those marked DLL_PUBLIC ie "default"
-		liboptions ^= " -fvisibility=hidden -fvisibility-inlines-hidden";
-#endif
 
 		// TODO Dont hard code for typical Ubuntu
 		exodus_libfile_info = osfile("/usr/local/lib/libexodus.so");
@@ -739,8 +743,8 @@ function main() {
 
 	var srcfilenames = "";
 
-	basicoptions ^= " " ^ addoptions;
-	linkoptions ^= " " ^ addlinkoptions;
+	basicoptions ^= "  " ^ addoptions;
+	linkoptions ^= "  " ^ addlinkoptions;
 
 ///////////
 //initfile:

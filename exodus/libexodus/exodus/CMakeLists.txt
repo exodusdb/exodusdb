@@ -94,6 +94,103 @@
 	find_library(RYU_LIBRARIES NAMES ryu)
 	message(" RYU_LIBRARIES=${RYU_LIBRARIES}")
 
+# strings `which cmake`|grep CXX_MODULE
+#
+#CXX_MODULES
+#INTERFACE_CXX_MODULE_SETS
+#CXX_MODULE_DIRS
+#CXX_MODULE_SET
+#CXX_MODULE_DIRS_
+#CXX_MODULE_SET_
+#IMPORTED_CXX_MODULES_
+#CXX_MODULES_DIRECTORY
+#CXX_MODULES_BMI
+#CXX_MODULE_HEADERS
+#CXX_MODULE
+#IMPORTED_CXX_MODULES_INCLUDE_DIRECTORIES
+#IMPORTED_CXX_MODULES_COMPILE_DEFINITIONS
+#IMPORTED_CXX_MODULES_COMPILE_FEATURES
+#IMPORTED_CXX_MODULES_COMPILE_OPTIONS
+#IMPORTED_CXX_MODULES_LINK_LIBRARIES
+#CMAKE_CXX_MODULE_BMI_ONLY_FLAG
+
+# strings `which cmake`|grep _MODULE
+#
+#CMAKE_MODULE_LINKER_FLAGS
+#CMAKE_MODULE_PATH
+#CXX_MODULES
+#INTERFACE_CXX_MODULE_SETS
+#CXX_MODULE_DIRS
+#CXX_MODULE_SET
+#CXX_MODULE_DIRS_
+#CXX_MODULE_SET_
+#IMPORTED_CXX_MODULES_
+#CMAKE_SHARED_MODULE_SUFFIX
+#CMAKE_SHARED_MODULE_PREFIX
+#Fortran_MODULE_DIRECTORY
+#Swift_MODULE_DIRECTORY
+#CXX_MODULES_DIRECTORY
+#_FIND_MODULE
+#NO_MODULE
+#CXX_MODULES_BMI
+#_MODULE_MAP_FORMAT
+#_MODULE_MAP_FLAG
+#$DYNDEP_MODULE_MAP_FILE
+#$SWIFT_MODULE
+#$SWIFT_MODULE_NAME
+#CMAKE_SHARED_MODULE_LOADER_
+#CXX_MODULE_HEADERS
+#LOCAL_MODULE := 
+#_CREATE_SHARED_MODULE
+#CXX_MODULE
+#set(CMAKE_MODULE_PATH "%s")
+#CMAKE_CXX_SCAN_FOR_MODULES
+#CMAKE_SHARED_MODULE_CREATE_${LANG}_FLAGS
+#CMAKE_SHARED_MODULE_${LANG}_FLAGS
+# (found via CMAKE_MODULE_PATH) which shadows 
+#UseSWIG honors SWIG_MODULE_NAME via -module flag.
+#IMPORTED_CXX_MODULES_INCLUDE_DIRECTORIES
+#IMPORTED_CXX_MODULES_COMPILE_DEFINITIONS
+#IMPORTED_CXX_MODULES_COMPILE_FEATURES
+#IMPORTED_CXX_MODULES_COMPILE_OPTIONS
+#IMPORTED_CXX_MODULES_LINK_LIBRARIES
+#.cmake" in CMAKE_MODULE_PATH this project has asked CMake to find a package configuration file provided by "
+#.cmake" found in CMAKE_MODULE_PATH.
+#.cmake must either be part of this project itself, in this case adjust CMAKE_MODULE_PATH so that it points to the correct location inside its source tree.
+#Or it must be installed by a package which has already been found via find_package().  In this case make sure that package has indeed been found and adjust CMAKE_MODULE_PATH to contain the location where that package has installed Find
+#CMAKE_FIND_PACKAGE_WARN_NO_MODULE
+#.cmake module is in CMAKE_MODULE_PATH.  Add MODULE to exclusively request Module mode and fail if Find
+#find_package called without NO_MODULE option and no Find
+#.cmake module is in CMAKE_MODULE_PATH.  Add NO_MODULE to exclusively request Config mode and search for a package configuration file provided by 
+#.cmake available in CMAKE_MODULE_PATH.
+#(Variable CMAKE_FIND_PACKAGE_WARN_NO_MODULE enabled this warning.)
+#CMAKE_CXX_MODULE_BMI_ONLY_FLAG
+#in a "FILE_SET TYPE CXX_MODULES" but it is not scheduled for compilation.
+#  PROPERTY IMPORTED_CXX_MODULES_
+#` module but it is not found in a `FILE_SET` of type `CXX_MODULES`
+# is of type `CXX_MODULES` but does not provide a module interface unit or partition
+#` module but must be of type `CXX_MODULES`
+#Modules are supported only by Ninja, Ninja Multi-Config, and Visual Studio generators for VS 17.4 and newer.  See the cmake-cxxmodules(7) manual for details.  Use the CMAKE_CXX_SCAN_FOR_MODULES variable to enable or disable scanning.
+#" has C++ sources that may use modules, but the compiler does not provide a way to discover the import graph dependencies.  See the cmake-cxxmodules(7) manual for details.  Use the CMAKE_CXX_SCAN_FOR_MODULES variable to enable or disable scanning.
+#set(CMAKE_Fortran_TARGET_MODULE_DIR "
+#set(CMAKE_Fortran_TARGET_BUILDING_INSTRINSIC_MODULES ON) 
+#'; must be one of 'SOURCE' or 'CXX_MODULE'
+#  PRIVATE FILE_SET %s TYPE CXX_MODULES BASE_DIRS "%s" FILES
+
+#add_library(Constants)
+#target_sources(Constants
+#  PUBLIC
+#    FILE_SET cxx_modules TYPE CXX_MODULES FILES
+#    Constants.ixx
+#)
+
+#add_library(vartyp)
+#target_sources(vartyp
+#  PUBLIC
+#    FILE_SET cxx_modules TYPE CXX_MODULES FILES
+#	vartyp.cpp
+#)
+
 #
 # A shared library output called exodus - list all its source files
 # #################################################################
@@ -125,6 +222,23 @@
 		term_getkey.cpp term_haskey.cpp term_echo.cpp term_cursor.cpp
 	)
 
+target_sources(exodus
+  PUBLIC
+#MUST include ONLY IF using c++ modules
+    FILE_SET cxx_modules TYPE CXX_MODULES FILES
+	# exports vartyp
+	vartyp.cpp
+)
+
+#target_sources(exodus
+#  PUBLIC
+#    FILE_SET
+#      CXX_MODULES
+#      FILES
+#        ${CMAKE_CURRENT_SOURCE_DIR}/vartyp.ixx
+##        ${CMAKE_CURRENT_SOURCE_DIR}/Constants.ixx
+#)
+
 #
 # Specify what libraries are to be linked in when building libexodus
 # ##################################################################
@@ -142,6 +256,11 @@
 	target_link_libraries(exodus ${FMT_LIBRARIES})
 	include_directories(exodus ${FMT_INCLUDE})
 
+set_target_properties(exodus
+  PROPERTIES
+    CXX_SCAN_FOR_MODULES ON
+)
+
 #
 # State that the output libexodus should be installed in the default system library
 # #################################################################################
@@ -150,6 +269,19 @@
 	# CMAKE_INSTALL_PREFIX defaults to /usr/local/
 	install(
 		TARGETS exodus
+		DESTINATION lib
+	)
+
+	# CMAKE_INSTALL_PREFIX defaults to /usr/local/
+	install(
+		TARGETS exodus
+		DESTINATION lib
+	)
+
+	# CMAKE_INSTALL_PREFIX defaults to /usr/local/
+	install(
+		FILES
+		/root/exodus/ninja/exodus/libexodus/exodus/CMakeFiles/exodus.dir/vartyp.pcm
 		DESTINATION lib
 	)
 

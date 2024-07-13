@@ -1,5 +1,6 @@
 #ifndef EXODUS_LIBEXODUS_EXODUS_VARB_H_
 #define EXODUS_LIBEXODUS_EXODUS_VARB_H_
+
 /*
 Copyright (c) 2009 steve.bush@neosys.com
 
@@ -130,7 +131,13 @@ using SV = std::string_view;
 
 // vartype
 //
-#include <exodus/vartyp.h>
+#define EXO_IMPORT import
+#ifdef EXO_IMPORT
+//	EXO_IMPORT vartyp;
+	import vartyp;
+#else
+	#include <exodus/vartyp.cpp>
+#endif
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wreserved-id-macro"
@@ -743,19 +750,14 @@ class PUBLIC var_base {
 	// any changes to the base object.
 
 	// Implicitly convert var_base to var
-	CONSTEXPR
-	operator var() &{
-		// clone, like most var_base functions returns a var since var's are var_base's but not vice versa
-		EXO_SNITCH("var_base cp>v")
-		return this->clone();
-	}
 
-	CONSTEXPR
-	operator var() && {
-		// move, like most var_base functions returns a var since var's are var_base's but not vice versa
-		EXO_SNITCH("var_base mv>v")
-		return this->move();
-	}
+//	// clone, like most var_base functions returns a var since var's are var_base's but not vice versa
+//	CONSTEXPR
+//	operator var() &;
+//
+//	CONSTEXPR
+//	// move, like most var_base functions returns a var since var's are var_base's but not vice versa
+//	operator var() &&;
 
 //	// TODO Check if this provides any useful functionality
 //	// but ensure that it is safe in case var acquires a different data layout from var_base
