@@ -86,6 +86,7 @@ set -euxo pipefail
 
 	USE_MODULES=1
 	CMAKE_BUILD_OPTIONS=-GNinja
+	BUILD_DEPS="ninja-build ${COMPILER/clang/clang-tools}"
 
 :
 : Validate
@@ -311,7 +312,7 @@ function get_dependencies_for_build_and_install {
 : Download and install build dependencies for exodus and pgexodus
 : ---------------------------------------------------------------
 :
-	APT_GET sudo apt-get install -y cmake
+	APT_GET sudo apt-get install -y cmake $BUILD_DEPS
 
 :
 : Determine actual compiler version if min/default requested
@@ -382,9 +383,6 @@ function get_dependencies_for_build_and_install {
 		sudo ln -snf /usr/lib/gcc/x86_64-linux-gnu/$GCC_VERSION /usr/lib/gcc/x86_64-linux-gnu/$GCC_FAKE_VERSION
 		sudo ln -snf /usr/include/x86_64-linux-gnu/c++/$GCC_VERSION /usr/include/x86_64-linux-gnu/c++/$GCC_FAKE_VERSION
 		sudo ln -snf /usr/include/c++/$GCC_VERSION /usr/include/c++/$GCC_FAKE_VERSION
-
-
-	APT_GET sudo apt-get ${COMPILER/clang/clang-tools}
 
 	fi
 
