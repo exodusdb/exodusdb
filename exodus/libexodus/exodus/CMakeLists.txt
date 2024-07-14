@@ -1,28 +1,29 @@
 #
-# CONFIG
+# Config
 # ######
 #
 	cmake_minimum_required(VERSION 3.16)
 	project(libexodus)
 
-#
-# INIT
-# ####
-#
 	message("---------------------")
 	message("-- CMAKE LIBEXODUS --")
 	message("---------------------")
 
-	#Use CMakeList.txt options in parent directory
+#
+# Compiler flags
+# ##############
+#
+	# Use CMakeList.txt options in parent directory
 	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-undef")
 
 	# only for g++ 9.4.0 etc. on Ubuntu 20.04
 	if (CMAKE_CXX_COMPILER_VERSION MATCHES "^9.")
 		SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-inline -Wno-attributes")
 	endif()
+
 #
-# Add TIMEBANK option
-# ###################
+# Timebank option -DEXODUS_TIMEBANK=ON
+# ###############
 #
 	OPTION(EXODUS_TIMEBANK "Option Debug timers" OFF) # Enabled by default
 	IF(EXODUS_TIMEBANK)
@@ -46,8 +47,8 @@
 	#SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address")
 
 #
-# POSTGRES
-# ########
+# Postgresql
+# ##########
 #
 	# See /usr/share/cmake-3.16/Modules/FindPostgreSQL.cmake for documentation
 
@@ -59,7 +60,7 @@
 	include_directories(${PostgreSQL_INCLUDE_DIRS})
 
 #
-# BOOST
+# Boost
 # #####
 #
 	# See /usr/share/cmake-3.16/Modules/FindBoost.cmake for documentation
@@ -79,21 +80,30 @@
 	include_directories(${BOOST_INCLUDE_DIR})
 
 #
-# ICU
-# ###
+# fast_float
+############
 #
-	message("OTHER")
-	set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}")
-	#note that displayed path confusingly shows no space or ; between multiple paths if multiple are specified either by space or ;
-	message(" CMAKE_MODULE_PATH=${CMAKE_MODULE_PATH}")
+	include_directories(. .. ../../../fast_float/include)
 
 #
-# RYU
+# Ryu
 # ###
 #
 	find_library(RYU_LIBRARIES NAMES ryu)
 	message(" RYU_LIBRARIES=${RYU_LIBRARIES}")
 
+#
+# ICU
+# ###
+#
+#	message("OTHER")
+#	set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}")
+#	#note that displayed path confusingly shows no space or ; between multiple paths if multiple are specified either by space or ;
+#	message(" CMAKE_MODULE_PATH=${CMAKE_MODULE_PATH}")
+
+# cmake MODULE options?
+# #####################
+#
 # strings `which cmake`|grep CXX_MODULE
 #
 #CXX_MODULES
@@ -192,8 +202,8 @@
 #)
 
 #
-# A shared library output called exodus - list all its source files
-# #################################################################
+# libexodus source
+##################
 #
 	add_library(exodus SHARED
 		# Big ones first for efficient parallel compilation
@@ -222,13 +232,17 @@
 		term_getkey.cpp term_haskey.cpp term_echo.cpp term_cursor.cpp
 	)
 
-target_sources(exodus
-  PUBLIC
-#MUST include ONLY IF using c++ modules
-    FILE_SET cxx_modules TYPE CXX_MODULES FILES
-	# exports vartyp
-	vartyp.cpp
-)
+#
+# libexodus modules
+# #################
+#
+	target_sources(exodus
+		PUBLIC
+		#MUST include ONLY IF using c++ modules
+		FILE_SET cxx_modules TYPE CXX_MODULES FILES
+		# exports vartyp
+		vartyp.cpp
+	)
 
 #target_sources(exodus
 #  PUBLIC
@@ -240,10 +254,9 @@ target_sources(exodus
 #)
 
 #
-# Specify what libraries are to be linked in when building libexodus
-# ##################################################################
+# link libs
+# #########
 #
-	include_directories(. .. ../../../fast_float/include)
 	#dl is needed for dynamic link library code
 	if (RYU_LIBRARIES STREQUAL "RYU_LIBRARIES-NOTFOUND")
 		target_link_libraries(exodus ${Boost_LIBRARIES} ${PostgreSQL_LIBRARIES} dl)
@@ -251,8 +264,7 @@ target_sources(exodus
 		target_link_libraries(exodus ${Boost_LIBRARIES} ${PostgreSQL_LIBRARIES} dl ${RYU_LIBRARIES})
 	endif()
 
-# This is probably not needed here and only required by cli compile.cpp linkoptions?
-#
+	# This is probably not needed here and only required by cli compile.cpp linkoptions?
 	target_link_libraries(exodus ${FMT_LIBRARIES})
 	include_directories(exodus ${FMT_INCLUDE})
 
@@ -262,37 +274,34 @@ set_target_properties(exodus
 )
 
 #
-# State that the output libexodus should be installed in the default system library
-# #################################################################################
+# Request .so versioning e.g. /usr/local/lib/libexodus.so -> libexodus.so.24.07
+# ######################
 #
-
-	# CMAKE_INSTALL_PREFIX defaults to /usr/local/
-	install(
-		TARGETS exodus
-		DESTINATION lib
-	)
-
-	# CMAKE_INSTALL_PREFIX defaults to /usr/local/
-	install(
-		TARGETS exodus
-		DESTINATION lib
-	)
-
-	# CMAKE_INSTALL_PREFIX defaults to /usr/local/
-	install(
-		FILES
-#		/root/exodus/ninja/exodus/libexodus/exodus/CMakeFiles/exodus.dir/vartyp.pcm
-		# Assuming we are in the build dir
-		${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/exodus.dir/vartyp.pcm
-		DESTINATION lib
-	)
-
 	#set_target_properties(exodus PROPERTIES SOVERSION "${MAJOR_VERSION}.${MINOR_VERSION}.${BUILD_VERSION}")
 	set_target_properties(exodus PROPERTIES SOVERSION "24.07")
 
 #
-# Install some of exodus' include files so programs can be written in exodus c++
-# ##############################################################################
+# Install libexodus.so
+# ####################
+#
+	# CMAKE_INSTALL_PREFIX defaults to /usr/local/
+	install(
+		TARGETS exodus
+		DESTINATION lib
+	)
+#
+# Install modules
+# ###############
+#
+	install(
+		FILES
+		${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/exodus.dir/vartyp.pcm
+		DESTINATION lib
+	)
+
+#
+# Install headers
+# ###############
 #
 	install(
 		FILES
@@ -323,13 +332,21 @@ set_target_properties(exodus
 		DESTINATION include/exodus
 	)
 
+#
+# Install timebank info
+# #####################
+#
 	install (
-		FILES
-			timebank.txt
+		FILES timebank.txt
 		DESTINATION share/exodus
 	)
 
+#
+# Trigger ldconfig
+# ################
+#
 	# In libexodus and cli now that both install into lib
+	# Is this really necessary or should cmake be doing it anyway?
 	install(
 		CODE "
 	        execute_process(
@@ -344,23 +361,19 @@ set_target_properties(exodus
 	            <\${ERRVAR}>\n
 	            <\${RESVAR}>\n
 	        )
-	    "
+		"
 	)
 
-# 6. CLEAN OUT ANY HOME DIR FILES THAT MAY SHADOW THE REAL FILE IN /usr/local/...
-#################################################################################
+# Cleanup
+# #######
 #
-    install(
-        CODE "
-            execute_process(
-	            COMMAND
-    	            rm -f $ENV{HOME}/inc/printtx.hpp
-            )
-        "
-    )
+	# Remove any old files that might shadow the files we installed in /usr/
+	install(
+		CODE "execute_process(COMMAND rm -f $ENV{HOME}/inc/printtx.hpp)"
+	)
 
 #
-# EXIT
+# Exit
 # ####
 #
 #	message("--LIBEXODUS CMAKE EXIT --")
