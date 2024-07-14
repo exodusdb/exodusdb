@@ -12,12 +12,13 @@ programinit()
 
 	function main() {
 
-	// Quit if running under make since there are no tests
-	if (osgetenv("MAKELEVEL")) {
-		printl();
-		printl("Test passed - skipped because MAKELEVEL is set");
-		return 0;
-	}
+	// Leave it in as a measure of total perf (around 1sec)
+//	// Quit if running under make since there are no tests
+//	if (osgetenv("MAKELEVEL")) {
+//		printl();
+//		printl("Test passed - skipped because MAKELEVEL is set");
+//		return 0;
+//	}
 
 	// test extract function
 	if ((false)) {

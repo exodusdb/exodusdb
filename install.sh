@@ -67,11 +67,11 @@ set -euxo pipefail
 :
 : COMPILER
 :
-:	e.g. g++, clang, g++-14, clang-18, g++-default, clang-default
-:
-:	If version no is omitted, the default for the OS will be used.
-:
 :	Choosing compiler/version only has effect on the initial b stage when installing build dependencies.
+:
+:	g++ is the default, otherwise can be one of clang, g++-14, clang-18, g++-default, clang-default
+:
+:	If version no is omitted, the latest available for the OS will be used.
 :
 : PG_VER
 :
@@ -110,15 +110,15 @@ set -euxo pipefail
 	#RUNNER_DEBUG=1
 
 :
-: Function to call apt-get three times in case of timeout
-: -------------------------------------------------------
+: Function to retry three times in case of timeout
+: -----------------------------------------------------
 :
-function APT_GET {
+function RETRY {
 :
 	for N in 1 2 3; do
 :
-: Retry apt-get three times if it times out. $N/3
-: ----------------------------------------------
+: Retry three times on timeout. $N/3
+: ---------------------------------
 		if timeout 120s $*; then
 			break
 		fi
@@ -263,7 +263,7 @@ function get_dependencies_for_build_and_install {
 : Update apt
 : ----------
 :
-	APT_GET sudo apt-get -y update
+	RETRY sudo apt-get -y update
 
 :
 : Download Postgresql dev and client package
@@ -275,8 +275,8 @@ function get_dependencies_for_build_and_install {
 	#Specified PG_VER for postgresql-server-dev-NN installed later in this stage
 	# 1/49 Test  #1: pgexodus_test ....................***Failed    0.08 sec
 	#  grep: /etc/postgresql/16/main/postgresql.conf: No such file or directory
-	APT_GET sudo apt-get remove -y 'postgresql-server-dev-all' && APT_GET sudo apt-get -y autoremove || true
-	APT_GET sudo apt-get install -y postgresql-common
+	RETRY sudo apt-get remove -y 'postgresql-server-dev-all' && RETRY sudo apt-get -y autoremove || true
+	RETRY sudo apt-get install -y postgresql-common
 
 :
 : Download pgexodus and fmt submodules source in b and B stages
@@ -307,7 +307,7 @@ function get_dependencies_for_build_and_install {
 : Download and install build dependencies for exodus and pgexodus
 : ---------------------------------------------------------------
 :
-	APT_GET sudo apt-get install -y cmake
+	RETRY sudo apt-get install -y cmake
 
 :
 : Determine actual compiler version if min/default requested
@@ -332,7 +332,7 @@ function get_dependencies_for_build_and_install {
 : e.g. g++, g++-12, clang, clang-12 etc.
 :
 
-	APT_GET sudo apt-get install -y $COMPILER
+	RETRY sudo apt-get install -y $COMPILER
 
 :
 : Set as the default ++ compiler
@@ -384,8 +384,8 @@ function get_dependencies_for_build_and_install {
 : Download and install dev packages for postgresql client lib and boost
 : ---------------------------------------------------------------------
 :
-	APT_GET sudo apt-get install -y libpq-dev libboost-regex-dev libboost-locale-dev
-	#APT_GET sudo apt-get install -y g++ libboost-date-time-dev libboost-system-dev libboost-thread-dev
+	RETRY sudo apt-get install -y libpq-dev libboost-regex-dev libboost-locale-dev
+	#RETRY sudo apt-get install -y g++ libboost-date-time-dev libboost-system-dev libboost-thread-dev
 
 :
 : Download and install pgexodus postgres build dependencies
@@ -393,8 +393,8 @@ function get_dependencies_for_build_and_install {
 :
 	ls -l /usr/lib/postgresql || true
 :
-	APT_GET sudo apt-get install -y postgresql-server-dev-$SERVER_PG_VER
-	APT_GET sudo apt-get install -y postgresql-common
+	RETRY sudo apt-get install -y postgresql-server-dev-$SERVER_PG_VER
+	RETRY sudo apt-get install -y postgresql-common
 :
 	pg_config
 :
@@ -502,7 +502,7 @@ function get_dependencies_for_database {
 : pgexodus
 : --------
 :
-	APT_GET sudo apt-get install -y postgresql$PG_VER_SUFFIX #for pgexodus install
+	RETRY sudo apt-get install -y postgresql$PG_VER_SUFFIX #for pgexodus install
 }
 
 function install_database {
