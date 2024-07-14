@@ -11,6 +11,7 @@
 
 //EXO_EXPORT
 export namespace exo {
+//namespace exo {
 
 #define ND [[nodiscard]]
 

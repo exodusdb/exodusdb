@@ -22,14 +22,14 @@ THE SOFTWARE.
 
 // vartype
 //
-#define EXO_IMPORT import
-#ifdef EXO_IMPORT
-//	EXO_IMPORT vartyp;
-	import vartyp;
-#else
-	#include <exodus/vartyp.cpp>
-#endif
-#include <exodus/varb.h>
+//#define xEXO_IMPORT import
+//#ifdef EXO_IMPORT
+////	EXO_IMPORT vartyp;
+//	import vartyp;
+//#else
+//	#include <exodus/vartyp.h>
+//#endif
+//#include <exodus/varb.h>
 
 #include <var.h>
 #include <exodus/exoimpl.h>

@@ -1,6 +1,6 @@
 #ifndef VARTYP_H
 #define VARTYP_H
-
+#define ND [[nodiscard]]
 namespace exo {
 
 class VARTYP {

@@ -281,7 +281,9 @@ set_target_properties(exodus
 	# CMAKE_INSTALL_PREFIX defaults to /usr/local/
 	install(
 		FILES
-		/root/exodus/ninja/exodus/libexodus/exodus/CMakeFiles/exodus.dir/vartyp.pcm
+#		/root/exodus/ninja/exodus/libexodus/exodus/CMakeFiles/exodus.dir/vartyp.pcm
+		# Assuming we are in the build dir
+		${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/exodus.dir/vartyp.pcm
 		DESTINATION lib
 	)
 

@@ -36,6 +36,7 @@ THE SOFTWARE.
 
 // var_base provides the basic var-like functionality for var
 //
+#include <exodus/vartyp.h>
 #include <exodus/varb.h>
 
 // Use ASCII 0x1A-0x1F for PickOS separator chars instead

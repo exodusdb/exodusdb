@@ -83,6 +83,10 @@ set -euxo pipefail
 	REQ_STAGES=${1:-$DEFAULT_STAGES}
 	COMPILER=${2:-g++}
 	PG_VER=${3:-}
+
+	USE_MODULES=1
+	CMAKE_BUILD_OPTIONS=-GNinja
+
 :
 : Validate
 : --------
@@ -362,23 +366,27 @@ function get_dependencies_for_build_and_install {
 :
 	apt list libstdc++*dev |& grep libstdc || true
 
-#:
-#: Check if clang compiler
-#: -----------------------
-#:
-#	if [[ $COMPILER =~ ^clang ]]; then
-#
-#:
-#: Prevent clang from using later versions of gcc tool chains which are troublesome
-#: Force clang to use same version of the gcc tool chain as gcc
-#: See initial info on libstdc++ in install log - Build stage, above and below.
-#:
+:
+: Check if clang compiler
+: -----------------------
+:
+	if [[ $COMPILER =~ ^clang ]]; then
+
+:
+: Prevent clang from using later versions of gcc tool chains which are troublesome
+: Force clang to use same version of the gcc tool chain as gcc
+: See initial info on libstdc++ in install log - Build stage, above and below.
+:
 		GCC_VERSION=$(gcc -v|&grep gcc\ version|cut -d' ' -f3|cut -d'.' -f1)
 		GCC_FAKE_VERSION=99
 		sudo ln -snf /usr/lib/gcc/x86_64-linux-gnu/$GCC_VERSION /usr/lib/gcc/x86_64-linux-gnu/$GCC_FAKE_VERSION
 		sudo ln -snf /usr/include/x86_64-linux-gnu/c++/$GCC_VERSION /usr/include/x86_64-linux-gnu/c++/$GCC_FAKE_VERSION
 		sudo ln -snf /usr/include/c++/$GCC_VERSION /usr/include/c++/$GCC_FAKE_VERSION
-#	fi
+
+
+	APT_GET sudo apt-get ${COMPILER/clang/clang-tools}
+
+	fi
 
 :
 : Download and install dev packages for postgresql client lib and boost
@@ -451,7 +459,7 @@ function build_and_install {
 :
 	echo PGPATH=${PGPATH:-}
 	rm $EXODUS_DIR/build -rf
-	cmake -S $EXODUS_DIR -B $EXODUS_DIR/build
+	cmake -S $EXODUS_DIR -B $EXODUS_DIR/build $CMAKE_BUILD_OPTIONS
 :
 : Make
 :

@@ -131,12 +131,12 @@ using SV = std::string_view;
 
 // vartype
 //
-#define EXO_IMPORT import
+#define xEXO_IMPORT import
 #ifdef EXO_IMPORT
 //	EXO_IMPORT vartyp;
 	import vartyp;
 #else
-	#include <exodus/vartyp.cpp>
+	#include <exodus/vartyp.h>
 #endif
 
 #pragma clang diagnostic push
