@@ -44,7 +44,8 @@ programinit()
 	// Do NOT update in multithreaded compile function
 
 	var exodus_include_dir_info = "";
-	var exodus_libfile_info = "";
+	var exodus_libfile1_info = "";
+	var exodus_libfile2_info = "";
 	var nasterisks = 0;
 
 	//.def file is one way on msvc to force library function names to be "undecorated"
@@ -313,11 +314,15 @@ function main() {
 		//	linkoptions=" -lexodus-gd";
 		//else
 		//linkoptions = " -lexodus -lstdc++fs -lpthread";
-		linkoptions = "  -lexodus -lstdc++fs -lstdc++";
+
+		// Precompiled modules need -f ... var.pcm and -l ... libexovar.so
+		linkoptions = "  -lexodus -lexovar -lstdc++fs -lstdc++";
+
 //#if __has_include(<fmt/core.h>)
 #if EXO_FORMAT == 2
 		linkoptions ^= " -lfmt ";
 #endif
+
 		//always look in header install path eg ~/inc
 		basicoptions ^= " -I" ^ incdir ^ " ";
 
@@ -368,8 +373,8 @@ function main() {
 		liboptions ^= " -fvisibility=hidden -fvisibility-inlines-hidden ";
 #endif
 
-		// Precompiled modules
-		basicoptions ^= " -fmodule-file=vartyp=/usr/local/lib/vartyp.pcm ";
+		// Precompiled modules need -f ... var.pcm and -l ... libexovar.so
+		basicoptions ^= " -fmodule-file=var=/usr/local/lib/var.pcm";
 
 		if (color_option)
 			basicoptions ^= " -fdiagnostics-color=always";
@@ -526,7 +531,8 @@ function main() {
 		//soname?
 
 		// TODO Dont hard code for typical Ubuntu
-		exodus_libfile_info = osfile("/usr/local/lib/libexodus.so");
+		exodus_libfile1_info = osfile("/usr/local/lib/libexodus.so");
+		exodus_libfile2_info = osfile("/usr/local/lib/libexovar.so");
 		exodus_include_dir_info = osdir("/usr/local/include/exodus");
 
 	} else {
@@ -1516,7 +1522,8 @@ function main() {
 				and not(generateheadersonly)
 				and is_newer(outfileinfo, srcfileinfo)
 				and is_newer(outfileinfo, exodus_include_dir_info)
-				and is_newer(outfileinfo, exodus_libfile_info)
+				and is_newer(outfileinfo, exodus_libfile1_info)
+				and is_newer(outfileinfo, exodus_libfile2_info)
 				) {
 
 				// Recompile is required if any include file is younger than the current output binary

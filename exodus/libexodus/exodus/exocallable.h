@@ -73,7 +73,7 @@ dictexit(bbb)
 #ifndef EXODUS_LIBEXODUS_EXODUS_EXOCALLABLE_H_
 #define EXODUS_LIBEXODUS_EXODUS_EXOCALLABLE_H_
 
-#include <exodus/var.h>
+import var;//#include <exodus/var.h>
 
 // good programming practice to prevent many white hairs
 // http://www.parashift.com/c++-faq-lite/pointers-to-members.html#faq-33.6

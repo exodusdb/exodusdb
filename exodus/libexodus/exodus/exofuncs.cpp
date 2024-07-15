@@ -22,7 +22,7 @@ THE SOFTWARE.
 
 //#include <cstdlib> //for atexit()
 
-#include <exodus/var.h>
+import var;//#include <exodus/var.h>
 #include <exodus/exoenv.h>
 #include <exodus/rex.h>
 

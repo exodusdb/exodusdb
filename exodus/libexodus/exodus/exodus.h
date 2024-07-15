@@ -38,7 +38,8 @@ THE SOFTWARE.
 #include <exodus/exofuncs.h>
 #include <exodus/exomacros.h>
 #include <exodus/exoimpl.h>
-#include <exodus/varerr.h>
+import var;//#include <exodus/varerr.h>
+exo::var dummy;
 #include <exodus/range.h>
 
 // It usually poor practice to "pollute" the global space of the header user

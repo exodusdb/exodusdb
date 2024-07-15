@@ -30,7 +30,7 @@ THE SOFTWARE.
 // header file.
 // You can program without exodus macros by including var.h directly
 
-#include <exodus/var.h>
+import var;//#include <exodus/var.h>
 #include <exodus/exocallable.h>
 
 

@@ -76,7 +76,7 @@ THE SOFTWARE.
 #endif
 #endif // EXO_FORMAT
 
-#include <exodus/var.h>
+import var;//#include <exodus/var.h>
 #include <exodus/rex.h>
 //#include <mutex>
 

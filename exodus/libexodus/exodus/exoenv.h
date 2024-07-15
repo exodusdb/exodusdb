@@ -36,7 +36,7 @@ THE SOFTWARE.
 #include <vector>
 //#define eq ==
 
-#include <exodus/var.h>
+import var;//#include <exodus/var.h>
 #include <exodus/dim.h>
 #include <exodus/rex.h>
 #include <exodus/exocallable.h>

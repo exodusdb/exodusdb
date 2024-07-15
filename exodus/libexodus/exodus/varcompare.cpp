@@ -25,8 +25,9 @@ THE SOFTWARE.
 
 #include <limits>
 
-#include <var.h>
-#include <varerr.h>
+#include "var.h"
+//import exovar;
+#include "varerr.h"
 
 namespace exo {
 

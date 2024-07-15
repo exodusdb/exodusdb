@@ -191,7 +191,8 @@ Within transactions, lock requests for locks that have already been obtained alw
 //
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wreserved-identifier"
-#include <libpq-fe.h>  //in postgres/include
+// Probably in /usr/include/postgresql/libpq-fe.h
+#include <libpq-fe.h>
 #pragma clang diagnostic pop
 
 //#include <arpa/inet.h>//for ntohl()

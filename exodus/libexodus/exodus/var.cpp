@@ -23,7 +23,9 @@ THE SOFTWARE.
 // indicates that global const var FM etc. to be defined (omit extern keyword)
 #define EXO_VAR_CPP
 
-#include <var.h>
+#include "var.h"
+
+#include "varimpl.h"
 
 namespace exo {
 

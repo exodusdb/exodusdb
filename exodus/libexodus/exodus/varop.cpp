@@ -30,8 +30,8 @@ THE SOFTWARE.
 //#include <sstream>
 //#include <vector>
 
-#include <var.h>
-#include <varerr.h>
+#include "var.h"
+#include "varerr.h"
 //#include <exodus/varimpl.h>
 //#include <exodus/exoimpl.h>
 
