@@ -37,7 +37,7 @@ THE SOFTWARE.
 //#define eq ==
 
 import var;//#include <exodus/var.h>
-#include <exodus/dim.h>
+//import exo:dim;//#include <exodus/dim.h>
 #include <exodus/rex.h>
 #include <exodus/exocallable.h>
 

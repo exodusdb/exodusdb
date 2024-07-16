@@ -169,7 +169,9 @@
 		FILE_SET modules_public
 		TYPE CXX_MODULES
 		FILES
+#			exo.cppm
 			var.cppm
+#			dim.cppm
 	)
 	target_link_libraries(exovar ${FMT_LIBRARIES})
 
