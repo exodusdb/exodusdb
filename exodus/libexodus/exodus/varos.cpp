@@ -41,6 +41,9 @@ THE SOFTWARE.
 //used to convert to and from utf8 in osread and oswrite
 #include <boost/locale.hpp>
 
+// Doesnt work
+//#include <boost/program_options/detail/utf8_codecvt_facet.hpp>
+
 //#include <boost/date_time/posix_time/posix_time.hpp>
 
 #include <exodus/varimpl.h>
@@ -110,20 +113,40 @@ static class SetGlobalLocale {
 //	- if user forgets to call osclose(), the stream remains opened (alive) until
 //		~VarOSHandlesCache for h_cache closes/deletes all registered objects.
 
-static std::locale get_locale(const char* locale_name)	// throw (VarError)
+static std::locale varos_get_locale(const char* locale_name)	// throw (VarError)
 {
 	// assume is checked prior to calling since this is an internal exodus function
-	// THISIS("std::locale get_locale(const char* locale_name)")
+	// THISIS("std::locale varos_get_locale(const char* locale_name)")
 	// ISSTRING(locale_name)
 
 	if (not *locale_name || strcmp(locale_name, "utf8") == 0) {
 		std::locale old_locale;
 
+		// Force any locale based multibyte (i.e. utf8) x wide character (wchar_t) conversions
+		// to use a utf-8 x wchar_t converter.
+
+		// TODO not tested. Unused? Used for cin/cout/cerr/clog?
+
 		//https://exceptionshub.com/read-unicode-utf-8-file-into-wstring.html
 		//wif.imbue(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t>));
 
-		std::locale utf8_locale(old_locale,
-								new std::codecvt_utf8<wchar_t>);
+		// OLD C++ Standard - std::code_cvt_utf8
+		// https://en.cppreference.com/w/cpp/locale/codecvt_utf8
+		// Introduced in c++11, deprecated in c++17, REMOVED in c++23
+		std::locale utf8_locale(old_locale, new std::codecvt_utf8<wchar_t>);
+
+		// NEW C++ Standard - std::codecvt (BUT NOT GUARANTED TO BE UTF8!)
+		// https://en.cppreference.com/w/cpp/locale/codecvt
+		// "Conversion between the system's native wide and the single-byte narrow character sets"
+		// Untested. utf8 on linux presumably but on other platforms esp. Windows?
+		//std::locale utf8_locale(old_locale, new std::codecvt<wchar_t, char, std::mbstate_t>);
+
+		// NEW Boost - utf8:codecvt_facet
+		// https://www.boost.org/doc/libs/1_85_0/libs/serialization/doc/codecvt.html
+		// Guaranteed behaviour on all platforms
+		// Doesnt link
+		// undefined reference to `boost::program_options::detail::utf8_codecvt_facet::utf8_codecvt_facet(unsigned long)'
+		//std::locale utf8_locale(old_locale, new boost::program_options::detail::utf8_codecvt_facet);
 
 		return utf8_locale;
 	} else {
@@ -137,7 +160,7 @@ static std::locale get_locale(const char* locale_name)	// throw (VarError)
 				return mylocale;
 			}
 		} catch (std::runtime_error& re) {
-			throw VarError("get_locale cannot create locale for " ^ var(locale_name).quote() ^ re.what());
+			throw VarError("varos_get_locale cannot create locale for " ^ var(locale_name).quote() ^ re.what());
 		}
 	}
 }
@@ -412,7 +435,7 @@ std::fstream* var::osopenx(CVR osfilename, const char* locale) const {
 
 		// Apply the locale
 		if (locale)
-			pmyfile->imbue(get_locale(locale));
+			pmyfile->imbue(varos_get_locale(locale));
 
 		// Open the file for i/o (fail if the file doesnt exist and do NOT delete any
 		// existing file) binary and in/out to allow reading and writing from same file
