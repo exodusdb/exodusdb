@@ -20,7 +20,7 @@
  THE SOFTWARE.
  */
 
-#include <string>
+//module #include <string>
 #include <thread>
 #define EXOENV_CPP
 #include <exodus/exoenv.h>

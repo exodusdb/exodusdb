@@ -1,19 +1,20 @@
-//#include <wctype.h>
-
-#if defined(_MSC_VER)
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-#else
-#include <string.h>
-#endif
-
-#include <locale.h>
-#ifdef __APPLE__
-#include <xlocale.h>
-//#include <CoreFoundation/CFBase.h>
-#include <CoreFoundation/CFString.h>
-//#include <CoreFoundation/CFStringEncodingExt.h>
-#endif
+import std;
+////#include <wctype.h>
+//
+//#if defined(_MSC_VER)
+//#define WIN32_LEAN_AND_MEAN
+//#include <windows.h>
+//#else
+//#include <string.h>
+//#endif
+//
+//#include <locale.h>
+//#ifdef __APPLE__
+//#include <xlocale.h>
+////#include <CoreFoundation/CFBase.h>
+//#include <CoreFoundation/CFString.h>
+////#include <CoreFoundation/CFStringEncodingExt.h>
+//#endif
 
 #include <exodus/var.h>
 

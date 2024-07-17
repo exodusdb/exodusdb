@@ -23,7 +23,8 @@ THE SOFTWARE.
 #ifndef EXODUSFUNCS_H
 #define EXODUSFUNCS_H 1
 
-#include <mutex>
+import std;
+//module #include <mutex>
 
 #ifdef EXO_FORMAT
 // Including the large fmt library header here so exo::format can precompile strings using fmt::vformat
@@ -60,7 +61,7 @@ THE SOFTWARE.
 //#	include <fmt/core.h>
 #	include <fmt/format.h> // for fmt::formatter<std::string_view> etc.
 #	include <fmt/args.h> // for fmt::dynamic_format_arg_store
-#	include <variant>
+//module #	include <variant>
 #	pragma GCC diagnostic pop
 #	if __GNUC__ >= 11 || __clang_major__ > 1
 ///root/exodus/fmt/include/fmt/core.h: In member function ‘constexpr auto fmt::v10::formatter<exo::var>::parse(ParseContext&) [with ParseContext =
@@ -78,7 +79,6 @@ THE SOFTWARE.
 
 import var;//#include <exodus/var.h>
 #include <exodus/rex.h>
-//#include <mutex>
 
 // add global function type syntax to the exodus users
 // SIMILAR code in exofuncs.h and varimpl.h

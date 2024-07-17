@@ -20,9 +20,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#include <algorithm>
-#include <random>
-#include <memory>
+#include <cstdlib>
+import std;
+
+//#include <bits/stl_algo.h>
+//module #include <algorithm>
+//module #include <random>
+//module #include <memory>
 
 #include <exodus/varimpl.h>
 #include <exodus/dim.h>

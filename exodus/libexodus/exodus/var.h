@@ -30,7 +30,7 @@ THE SOFTWARE.
 #define EXODUS_PATCH "24.07.0"
 
 #include <iostream>
-#include <string>
+//module #include <string>
 #include <string_view>
 #include <array> // used in operator<<
 

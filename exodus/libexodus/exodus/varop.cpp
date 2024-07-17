@@ -20,20 +20,21 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#include <iostream>
-#include <string>
-#include <utility> // for std::move
-#include <array>
+import std;
+//#include <iostream>
+////module #include <string>
+//#include <utility> // for std::move
+//#include <array>
+//
+////#include <cassert>
+//#include <limits>
+////#include <sstream>
+////#include <vector>
 
-//#include <cassert>
-#include <limits>
-//#include <sstream>
-//#include <vector>
-
-#include "var.h"
-#include "varerr.h"
-//#include <exodus/varimpl.h>
-//#include <exodus/exoimpl.h>
+#include <exodus/var.h>
+#include <exodus/varerr.h>
+#include <exodus/varimpl.h>
+#include <exodus/exoimpl.h>
 
 namespace exo {
 

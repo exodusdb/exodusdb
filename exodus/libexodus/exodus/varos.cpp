@@ -20,25 +20,27 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#include <sys/types.h>
+import std;
+//module #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h> //for close()
 #include <fnmatch.h> //for fnmatch() globbing
 
-//#include <algorithm>  //for count in osrename
-#include <fstream>
-#include <iostream>
-#include <locale>
-#include <mutex>
-#include <filesystem>
-#include <chrono>
-#include <memory>
-#include <string>
-#include <algorithm>
-#include <vector>
-#include <codecvt>
+//module #include <algorithm>  //for count in osrename
+//module #include <fstream>
+//module #include <iostream>
+//module #include <locale>
+//module #include <mutex>
+//module #include <filesystem>
+//module #include <chrono>
+//module #include <memory>
+//module #include <string>
+//module #include <algorithm>
+//#include <vector>
+//#module #include <codecvt>
 
 //used to convert to and from utf8 in osread and oswrite
+//#include <boost/detail/utf8_codecvt_facet.hpp>
 #include <boost/locale.hpp>
 
 //#include <boost/date_time/posix_time/posix_time.hpp>
@@ -122,8 +124,9 @@ static std::locale get_locale(const char* locale_name)	// throw (VarError)
 		//https://exceptionshub.com/read-unicode-utf-8-file-into-wstring.html
 		//wif.imbue(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t>));
 
-		std::locale utf8_locale(old_locale,
-								new std::codecvt_utf8<wchar_t>);
+//		std::locale utf8_locale(old_locale,
+//								new std::codecvt_utf8<wchar_t>);
+		std::locale utf8_locale(old_locale, new std::codecvt<wchar_t, char, std::mbstate_t>);
 
 		return utf8_locale;
 	} else {
@@ -917,9 +920,20 @@ bool var::oscopy(CVR new_dirpath_or_filepath) const {
 	std::filesystem::path topathx(path2.c_str());
 	//https://en.cppreference.com/w/cpp/filesystem/copy
 	std::error_code error_code;
-	copy(frompathx, topathx,
-		 std::filesystem::copy_options::overwrite_existing | std::filesystem::copy_options::recursive | std::filesystem::copy_options::copy_symlinks,
-		 error_code);
+	std::filesystem::copy(
+		frompathx,
+		topathx,
+//		std::filesystem::copy_options::overwrite_existing
+//		| std::filesystem::copy_options::recursive
+//		| std::filesystem::copy_options::copy_symlinks,
+		// Cludge to avoid compile error about missing binary operator when working under home brew module std
+		std::filesystem::copy_options(
+			  int(std::filesystem::copy_options::overwrite_existing)
+			| int(std::filesystem::copy_options::recursive)
+			| int(std::filesystem::copy_options::copy_symlinks)
+		),
+		error_code
+	);
 
     // Handle error
     if (error_code) {

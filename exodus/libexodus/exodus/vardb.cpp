@@ -154,19 +154,21 @@ Within transactions, lock requests for locks that have already been obtained alw
 
 */
 
-#include <cstring>	//for strcmp strlen
+import std;
 
-#include <string>
-#include <string_view>
-#include <array>
+//module #include <cstring>	//for strcmp strlen
+
+//module //module #include <string>
+//module #include <string_view>
+//module #include <array>
 
 // Using map for caches instead of unordered_map since it is faster
 // up to about 400 elements according to https://youtu.be/M2fKMP47slQ?t=258
 // and perhaps even more since it doesnt require hashing time.
 // Perhaps switch to this https://youtu.be/M2fKMP47slQ?t=476
 //#include <unordered_map>
-#include <map>
-#include <utility> //for pair
+//module #include <map>
+//module #include <utility> //for pair
 
 #if defined _MSC_VER  // || defined __CYGWIN__ || defined __MINGW32__
 #define WIN32_LEAN_AND_MEAN
@@ -175,8 +177,7 @@ Within transactions, lock requests for locks that have already been obtained alw
 #else
 #endif
 
-#include <iostream>
-
+//module #include <iostream>
 
 // To see Postgres PQlib calls
 //////////////////////////////

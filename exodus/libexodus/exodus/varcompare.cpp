@@ -20,14 +20,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#include <iostream>
-#include <string>
+import std;
+//#include <iostream>
+////module #include <string>
+//
+//#include <limits>
 
-#include <limits>
-
-#include "var.h"
+#include <exodus/var.h>
 //import exovar;
-#include "varerr.h"
+#include <exodus/varerr.h>
 
 namespace exo {
 

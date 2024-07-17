@@ -30,15 +30,16 @@ THE SOFTWARE.
 
 // clang-format off
 
-#include <iostream>
-#include <string>
-#include <string_view>
+import std;
+//module #include <iostream>
+//module #include <string>
+//module #include <string_view>
 
 using SV = std::string_view;
 
-#if __has_include(<concepts>)
-#	include <concepts>
-#endif
+//#if __has_include(<concepts>)
+//#	include <concepts>
+//#endif
 
 #if __cpp_lib_concepts >= 201907L && ( __GNUC__ > 10 || __clang_major__ > 1 )
 #	define EXO_CONCEPTS

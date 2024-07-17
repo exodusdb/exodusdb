@@ -20,15 +20,17 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#include <math.h> //for pow
-#include <algorithm> //for std::replace
-#include <cstring>//for strlen
-#include <string>
-#include <sstream>
-#include <bitset>
-#include <array>
+import std;
+//module #include <math.h> //for pow
+//module #include <algorithm> //for std::replace
+//module #include <cstring>//for strlen
+//module #include <string>
+//module #include <sstream>
+//module #include <bitset>
+//module #include <array>
 //#include <utility> //std::unreachable()
 
+#include <exodus/var.h>
 #include <exodus/varimpl.h>
 #include <exodus/rex.h>
 

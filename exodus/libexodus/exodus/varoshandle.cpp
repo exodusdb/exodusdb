@@ -1,13 +1,14 @@
 //
 // Copyright (c) 2010 steve.bush@neosys.com
 //
-#include <algorithm>
-#include <cassert>
+//module #include <algorithm>
+//module #include <cassert>
 
 #define INSIDE_VAR_OSHANDLE_CPP  // global obj in "varoshandle.h"
-#include <exodus/varoshandle.h>
+#include "varoshandle.h"
 
-#include <mutex>
+//module #include <mutex>
+// TODO double check that this does need to be thread_local
 std::mutex mvhandles_mutex;
 
 #define HANDLES_CACHE_SIZE 3
@@ -22,7 +23,11 @@ VarOSHandlesCache::VarOSHandlesCache()
 	: conntbl(HANDLES_CACHE_SIZE) {}
 
 int VarOSHandlesCache::add_handle(CACHED_HANDLE handle_to_cache, DELETER_AND_DESTROYER del, std::string name) {
-	assert(del);
+
+	//assert(del);
+	if (!del)
+		throw VarDBException(std::string(__PRETTY_FUNCTION__).append(" del is missing."));
+
 	// No longer need locking since mv_handlescache is thread_local
 	//std::lock_guard lock(mvhandles_mutex);
 
@@ -49,7 +54,9 @@ CACHED_HANDLE VarOSHandlesCache::get_handle(int index, std::string name) {
 
 void VarOSHandlesCache::del_handle(int index) {
 	//std::lock_guard lock(mvhandles_mutex);
-	assert(conntbl[index].deleter);
+	//assert(conntbl[index].deleter);
+	if (!conntbl[index].deleter)
+		throw VarDBException(std::string(__PRETTY_FUNCTION__).append(" deleter is missing."));
 	if (conntbl[index].deleter) {
 		conntbl[index].deleter(conntbl[index].handle);
 		//conntbl[index].handle;

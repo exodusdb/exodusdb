@@ -1,5 +1,6 @@
-#include <string>
+//module #include <string>
 
+import std;
 #include <exodus/var.h>
 #include <exodus/dim.h>
 

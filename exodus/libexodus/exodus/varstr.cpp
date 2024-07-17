@@ -20,9 +20,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#include <string>
+//module #include <string>
 
-#include <algorithm>  //for dim::sort
+//module #include <algorithm>  //for dim::sort
 #include <cstring>	  //for strlen strstr
 
 #ifdef __has_include

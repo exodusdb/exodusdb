@@ -1,7 +1,8 @@
 #ifndef VARDIM_H
 #define VARDIM_H
 
-#include <vector>
+import std;//#include <vector>
+//module #include <initializer_list>;
 
 #include <exodus/var.h>
 

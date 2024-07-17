@@ -23,8 +23,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#include <cstring>
-#include <array>
+import std;
+//#include <cstring>
+//#include <array>
+////module #include <string>
+//#include <iostream> //for cerr
+//#include <chrono>
+//#include <sstream>
 
 #pragma GCC diagnostic push
 #pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
@@ -35,13 +40,8 @@ THE SOFTWARE.
 //   #include <time.h>
 #include <exodus/gettimeofday.h>
 #else
-#include <sys/time.h>
+//#include <sys/time.h>
 #endif
-
-#include <string>
-#include <iostream> //for cerr
-#include <chrono>
-#include <sstream>
 
 // ostime, osdate, osfile, osdir should return dates and times in UTC
 

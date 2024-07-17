@@ -52,7 +52,7 @@ THE SOFTWARE.
 
 #include <limits> //for std::numeric_limits<double>::digits10
 
-#include <string>
+//module #include <string>
 #include <sstream>
 
 //fastfloat  "1234.5678" -> 1234.5678  56ns (but does it round trip?)

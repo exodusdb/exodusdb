@@ -41,8 +41,9 @@ THE SOFTWARE.
 
 constexpr int TRACING = 0;
 
-#include <iostream>
-#include <string>
+import std;
+//module #include <iostream>
+//module #include <string>
 
 //////////
 // WINDOWS
@@ -90,14 +91,15 @@ constexpr int TRACING = 0;
 //#include <stdlib.h>
 
 // Probably no need for LOCKDLCACHE since we have a separate cache per exoenv
-#include <mutex>
+//module #include <mutex>
 static std::mutex global_mutex_lockdlcache;
 //#define LOCKDLCACHE std::lock_guard<std::mutex> guard(global_mutex_lockdlcache);
 #define LOCKDLCACHE std::lock_guard guard(global_mutex_lockdlcache);
 
-import var;//#include <exodus/varimpl.h>
+#include <exodus/varimpl.h>
 #include <exodus/exoenv.h>
 #include <exodus/exocallable.h>
+
 namespace exo {
 
 // using namespace exo;

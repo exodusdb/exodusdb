@@ -156,6 +156,35 @@
 #	vartyp.cpp
 #)
 
+##
+## module allstd
+## #############
+##
+#	add_library(allstd)
+#	target_sources(allstd
+#		PUBLIC
+#		FILE_SET modules_public
+#		TYPE CXX_MODULES
+#		FILES
+#			allstd.cppm
+#	)
+#	target_compile_options(allstd PRIVATE -Wno-include-angled-in-module-purview -Wno-reserved-module-identifier)
+
+#
+# module std
+# ##########
+#
+	add_library(std)
+	target_sources(std
+		PUBLIC
+		FILE_SET modules_public
+		TYPE CXX_MODULES
+		FILES
+			std.cppm
+	)
+	target_compile_options(std PRIVATE -Wno-include-angled-in-module-purview -Wno-reserved-module-identifier)
+#	target_link_libraries(std allstd)
+
 #
 # module?
 # #######
@@ -173,7 +202,7 @@
 			var.cppm
 #			dim.cppm
 	)
-	target_link_libraries(exovar ${FMT_LIBRARIES})
+	target_link_libraries(exovar std ${FMT_LIBRARIES})
 
 #
 # libexodus source
@@ -278,7 +307,7 @@
 #
 	# CMAKE_INSTALL_PREFIX defaults to /usr/local/
 	install(
-		TARGETS exodus exovar
+		TARGETS exodus exovar std
 		DESTINATION lib
 	)
 ##

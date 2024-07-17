@@ -31,7 +31,7 @@ THE SOFTWARE.
 //#endif
 //#include <exodus/varb.h>
 
-#include <var.h>
+#include <exodus/var.h>
 #include <exodus/exoimpl.h>
 
 namespace exo {

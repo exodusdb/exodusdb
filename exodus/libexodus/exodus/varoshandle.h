@@ -12,8 +12,13 @@
 #ifndef EXODUS_LIBEXODUS_EXODUS_VAROSHANDLE_H_
 #define EXODUS_LIBEXODUS_EXODUS_VAROSHANDLE_H_
 
-#include <string>
-#include <vector>
+//#include <cstdlib>
+//#include <cassert>
+import std;
+//module #include <string>
+//#include <vector>
+
+#include <exodus/var.h>
 
 namespace exo {
 

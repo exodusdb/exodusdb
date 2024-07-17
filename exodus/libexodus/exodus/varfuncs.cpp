@@ -34,7 +34,7 @@ Binary    Hex          Comments
 
 #include <utility> //for move
 //#include <mutex> //for lock_guard
-#include <string>
+//module #include <string>
 
 #if __has_include(<signal.h>)
 #include <signal.h>	 //for raise(SIGTRAP)
