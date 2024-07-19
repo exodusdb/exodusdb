@@ -101,7 +101,7 @@ function main() {
 		std::cout << ll << std::endl;
 		assert(ll eq - 2);
 
-		int64_t i64 = x;
+		std::int64_t i64 = x;
 		std::cout << i64 << std::endl;
 		assert(i64 eq - 2);
 
@@ -119,7 +119,7 @@ function main() {
 
 		printl("Verify cannot convert negative vars to unsigned uint types");
 		try {
-			uint64_t ull = x;
+			std::uint64_t ull = x;
 			assert(false && ull);
 		} catch (VarNonPositive& e) {
 			//} catch(VarNumUnderflow& e) {
@@ -228,7 +228,7 @@ function main() {
 		// g++ doesnt always warn
 		//assert(ui eq -2);
 
-		uint64_t ull = x;
+		std::uint64_t ull = x;
 		std::cout << ull << std::endl;
 		assert(ull eq 4294967294ULL);
 		//assert(ull eq -2);// using an small negative, signed int, to set an unsigned int results in a very large number (2's complement)
@@ -242,19 +242,19 @@ function main() {
 		test_min_max<int>("int");
 		test_min_max<long>("long");
 		test_min_max<long long>("long long");
-		test_min_max<int8_t>("int8_t");
-		test_min_max<int16_t>("int16_6");
-		test_min_max<int32_t>("int32_t");
-		test_min_max<int64_t>("int64_t");
+		test_min_max<std::int8_t>("int8_t");
+		test_min_max<std::int16_t>("int16_6");
+		test_min_max<std::int32_t>("int32_t");
+		test_min_max<std::int64_t>("int64_t");
 
 		test_min_max<unsigned short>("unsigned short");
 		test_min_max<unsigned int>("unsigned int");
 		//test_min_max<unsigned long>("unsigned long"); //too large for var's SIGNED int64_t
 		//test_min_max<unsigned long long>("unsigned long long") // too large for var's SIGNED int64_t
-		test_min_max<uint8_t>("uint8_t");
-		test_min_max<uint16_t>("uint16_t");
-		test_min_max<uint32_t>("uint32_t");
-		//test_min_max<uint64_t>("unit64_t"); //too large var's SIGNED int64_t
+		test_min_max<std::uint8_t>("uint8_t");
+		test_min_max<std::uint16_t>("uint16_t");
+		test_min_max<std::uint32_t>("uint32_t");
+		//test_min_max<std::uint64_t>("unit64_t"); //too large var's SIGNED int64_t
 
 //		test_min_max<int128_t>();
 //		test_min_max<__int128>();
@@ -283,7 +283,7 @@ function main() {
 
 		// uint64_t - Check too large var's SIGNED int64_t
 		try {
-			test_min_max<uint64_t>("uint64_t", 1);
+			test_min_max<std::uint64_t>("uint64_t", 1);
 			assert(false);
 		}
 		catch (VarNumOverflow& e) {
@@ -315,7 +315,7 @@ function main() {
 //
 //		// uint64_t - Check too low negative var's SIGNED int64_t
 //		try {
-//			test_min_max<uint64_t>("uint64_t", 2);
+//			test_min_max<std::uint64_t>("uint64_t", 2);
 //			assert(false);
 //		}
 //		catch (VarNumUnderflow& e) {

@@ -1,9 +1,13 @@
 #include <termios.h>
-#include <unistd.h>
+#include <unistd.h> // isatty
 
 #include <exodus/var.h>
 
 namespace exo {
+
+bool var::isterminal() const {
+	return isatty(fileno(stdin));
+}
 
 //echo on=1 off=0
 bool var::echo(const int on_off) const {

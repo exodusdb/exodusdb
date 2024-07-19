@@ -17,6 +17,7 @@ import std;
 //#endif
 
 #include <exodus/var.h>
+#include <clocale> // for LC_ALL
 
 namespace exo {
 

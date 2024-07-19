@@ -35,8 +35,8 @@ inline
 struct TimeBank {
 
 	struct Acc {
-		uint64_t count = 0;
-		uint64_t ns = 0;
+		std::uint64_t count = 0;
+		std::uint64_t ns = 0;
 	};
 
 	std::array<Acc, 1000> timeaccs_;
@@ -256,10 +256,10 @@ auto get_timeacno(const char* arg1) -> int {
 	else if ( ! std::strcmp(arg1, "bool var::starts(SV str) const")) acno = 165;
 	else if ( ! std::strcmp(arg1, "bool var::ends(SV str) const")) acno = 166;
 	else if ( ! std::strcmp(arg1, "bool var::contains(SV str) const")) acno = 167;
-	else if ( ! std::strcmp(arg1, "var var::first(const size_t length) const")) acno = 168;
-	else if ( ! std::strcmp(arg1, "VARREF var::firster(const size_t length)")) acno = 169;
-	else if ( ! std::strcmp(arg1, "var var::last(const size_t length) const")) acno = 170;
-	else if ( ! std::strcmp(arg1, "VARREF var::laster(const size_t length)")) acno = 171;
+	else if ( ! std::strcmp(arg1, "var var::first(const std::size_t length) const")) acno = 168;
+	else if ( ! std::strcmp(arg1, "VARREF var::firster(const std::size_t length)")) acno = 169;
+	else if ( ! std::strcmp(arg1, "var var::last(const std::size_t length) const")) acno = 170;
+	else if ( ! std::strcmp(arg1, "VARREF var::laster(const std::size_t length)")) acno = 171;
 	else if ( ! std::strcmp(arg1, "var var::cut(const int length) const")) acno = 172;
 	else if ( ! std::strcmp(arg1, "VARREF var::cutter(const int length)")) acno = 173;
 	else if ( ! std::strcmp(arg1, "VARREF var::substrer(const int startindex1,const int length)")) acno = 174;

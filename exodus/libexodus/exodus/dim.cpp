@@ -20,8 +20,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#include <cstdlib>
 import std;
+
+//#include <cstdlib>
+#include <new> // for std::bad_alloc
 
 //#include <bits/stl_algo.h>
 //module #include <algorithm>
@@ -79,11 +81,11 @@ void dim::operator=(const dim& sourcedim) &{
 		data_[0] = sourcedim.data_[0].clone();
 
 	// Use vector size in case some algorithm has adjusted it
-	//size_t ncells = nrows_ * ncols_ + 1;
-	size_t ncells = data_.size();
+	//std::size_t ncells = nrows_ * ncols_ + 1;
+	std::size_t ncells = data_.size();
 
 	//for (/*unsigned*/ int celln = 0; celln < ncells; ++celln)
-	for (size_t celln = 1; celln < ncells; ++celln)
+	for (std::size_t celln = 1; celln < ncells; ++celln)
 		data_[celln] = sourcedim.data_[celln].clone();
 		//data_[celln] = sourcedim.data_[celln];
 	return;
@@ -252,12 +254,12 @@ dim& dim::init(CVR sourcevar) {
 		throw DimNotDimensioned("");
 
 	// Use vector size in case some algorithm has adjusted it
-	//size_t data_size = nrows_ * ncols_ + 1;
+	//std::size_t data_size = nrows_ * ncols_ + 1;
 	auto data_size = data_.size();
 
 	// init starts from element[0]
-	for (size_t elementn = 0; elementn < data_size; elementn++)
-	//for (size_t elementn = 1; elementn < data_size; elementn++)
+	for (std::size_t elementn = 0; elementn < data_size; elementn++)
+	//for (std::size_t elementn = 1; elementn < data_size; elementn++)
 		data_[elementn] = sourcevar;
 
 	return *this;
@@ -270,7 +272,7 @@ var dim::join(SV sepchar) const {
 		throw DimNotDimensioned("");
 
 	// Use vector size in case some algorithm has adjusted it
-	//size_t data_size = nrows_ * ncols_;
+	//std::size_t data_size = nrows_ * ncols_;
 	auto data_size = data_.size();
 	auto sepchar_size = sepchar.size();
 
@@ -325,7 +327,7 @@ var dim::join(SV sepchar) const {
 		char sepbyte = sepchar[0];
 
 		// Append any additional elements. Single byte sepchar
-		for (size_t elementn = 2; elementn <= nelements; ++elementn) {
+		for (std::size_t elementn = 2; elementn <= nelements; ++elementn) {
 			output.var_str.push_back(sepbyte);
 			output ^= data_[elementn];
 		}
@@ -333,7 +335,7 @@ var dim::join(SV sepchar) const {
 	} else {
 
 		// Append any additional elements. Multibyte sepchar
-		for (size_t elementn = 2; elementn <= nelements; ++elementn) {
+		for (std::size_t elementn = 2; elementn <= nelements; ++elementn) {
 			output.var_str += sepchar;
 			output ^= data_[elementn];
 		}
@@ -380,10 +382,10 @@ dim& dim::splitter(CVR str1, SV sepchar) {
 	// split always fills starting from element[1] and ignores element[0]
 
 	// start at the beginning and look for sepchar delimiters
-	std::string::size_type start_pos = 0;
-	std::string::size_type next_pos = 0;
-	size_t sepsize = sepchar.size();
-	//size_t fieldno;
+	std::size_t start_pos = 0;
+	std::size_t next_pos = 0;
+	std::size_t sepsize = sepchar.size();
+	//std::size_t fieldno;
 	int fieldno;
 	for (fieldno = 1; fieldno <= this->nrows_; fieldno++) {
 
@@ -404,7 +406,7 @@ dim& dim::splitter(CVR str1, SV sepchar) {
 
 	}
 
-	//size_t nfields = fieldno;
+	//std::size_t nfields = fieldno;
 
 	if (next_pos != std::string::npos) {
 

@@ -68,6 +68,8 @@ takes one template parameter (the iterator type). It also calls u32regex_search 
 allowing it to interface correctly with UTF-8, UTF-16, and UTF-32 data:
 */
 
+import std;
+
 //module #include <iostream>
 //module #include <utility> //for replace
 //module #include <string>

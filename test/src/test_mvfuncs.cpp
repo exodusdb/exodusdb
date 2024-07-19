@@ -119,14 +119,14 @@ programinit()
 
 	{
 		assert(var(' ').oconv("HEX").outputl()      eq "20");
-		assert(var(uint(48)).oconv("HEX").outputl() eq "3438");
-		assert(oconv(uint(48), "HEX").outputl()     eq "3438");
-		assert(oconv(uint(128), "HEX").outputl()    eq "313238");
+		assert(var(static_cast<unsigned int>(48)).oconv("HEX").outputl() eq "3438");
+		assert(oconv(static_cast<unsigned int>(48), "HEX").outputl()     eq "3438");
+		assert(oconv(static_cast<unsigned int>(128), "HEX").outputl()    eq "313238");
 
-		assert(var(uint(128)).oconv("MX").outputl()         eq "80");
-		assert(var(uint(48)).oconv("MX").outputl()          eq "30");
-		assert(("x" ^ var(uint(256)).oconv("MX")).outputl() eq "x100");
-		assert(("x" ^ var(uint(255)).oconv("MX")).outputl() eq "xFF");
+		assert(var(static_cast<unsigned int>(128)).oconv("MX").outputl()         eq "80");
+		assert(var(static_cast<unsigned int>(48)).oconv("MX").outputl()          eq "30");
+		assert(("x" ^ var(static_cast<unsigned int>(256)).oconv("MX")).outputl() eq "x100");
+		assert(("x" ^ var(static_cast<unsigned int>(255)).oconv("MX")).outputl() eq "xFF");
 	}
 
 	printl(elapsedtimetext());

@@ -3,6 +3,8 @@
 #include <sstream>
 #include <cassert>
 
+//#include <cctype> // for std::isdigit
+
 #include <exodus/var.h>
 
 namespace exo {
@@ -19,7 +21,7 @@ behaviour and not be forced into alphabetic sorting of numbers eg 10,2.
 If possible we also wish mixed alphanumerics to be sorted reasonably eg A2,A10 (ie not A10,A2).
 
 NB the following is based on 32 bit ints and floats but the same techniques can be applied to 64 bit
-doubles, mapping them to some 64-bit ints like uint64_t.
+doubles, mapping them to some 64-bit ints like std::uint64_t.
 
 long int http://en.wikipedia.org/wiki/Long_integer
 long long int is from C99 and is required to be at least 64 bits
@@ -228,7 +230,7 @@ naturalorderbegin:
 	for (;;) {
 		if (iter == iterend)
 			goto naturalorderexit;
-		if (!isdigit(*iter))
+		if (!std::isdigit(*iter))
 			break;
 		hasdigit = true;
 		val = 10.0 * val + (*iter - '0');
@@ -244,7 +246,7 @@ naturalorderbegin:
 	for (;;) {
 		if (iter == iterend)
 			goto naturalorderexit;
-		if (!isdigit(*iter))
+		if (!std::isdigit(*iter))
 			break;
 		hasdigit = true;
 		val = 10.0 * val + (*iter - '0');

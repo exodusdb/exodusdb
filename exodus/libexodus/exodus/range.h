@@ -1,6 +1,8 @@
 #ifndef EXODUS_LIBEXODUS_EXODUS_RANGE_H_
 #define EXODUS_LIBEXODUS_EXODUS_RANGE_H_
 
+#include <exodus/exoimpl.h>
+
 namespace exo {
 
 // class range

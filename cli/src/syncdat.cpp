@@ -62,8 +62,11 @@ function main() {
 
 	// Quit if no default database connection
 	if (not connect()) {
-		errputl("No default db connection to perform syncdat and no option I - 'Ignore no db' provided.");
-		return ! ignore_nodb;
+		let msg = "No default db connection to perform syncdat, ";
+		if (ignore_nodb)
+			stop(msg ^ "and option I - Ignore if no db. Continuing.");
+		else
+			abort(msg ^ "and no option I to ignore. Aborting.");
 	}
 
 	// "Elvis" operator and temporaries dont mix.

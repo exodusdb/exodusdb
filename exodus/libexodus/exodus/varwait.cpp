@@ -5,6 +5,9 @@ import std;
 #include <unistd.h>
 #include <errno.h>
 
+#include <stdlib.h> // for EXIT_FAILURE
+#include <cstdio> // for stderr
+
 #include <exodus/cargs.h>
 #include <exodus/var.h>
 
@@ -46,8 +49,8 @@ static var handle_events(int inotify_fd, int* wd, const int argc, const char* ar
 		// Read some events
 		len = read(inotify_fd, buf, sizeof buf);
 		if (len == -1 && errno != EAGAIN) {
-			perror("mvwait: read");
-			exit(EXIT_FAILURE);
+			std::perror("mvwait: read");
+			std::exit(EXIT_FAILURE);
 		}
 
 		// If the nonblocking read() found no events to read, then
@@ -154,16 +157,16 @@ static var wait_main(const int argc, const char* argv[], const int wait_time_ms)
 	// or crash
 	inotify_fd = inotify_init1(IN_NONBLOCK);
 	if (inotify_fd == -1) {
-		perror("mvwait: inotify_init1");
-		exit(EXIT_FAILURE);
+		std::perror("mvwait: inotify_init1");
+		std::exit(EXIT_FAILURE);
 	}
 
 	//Allocate memory for watch descriptors
 	// or crash
 	wd = reinterpret_cast<int*>(calloc(argc, sizeof(int)));
 	if (wd == nullptr) {
-		perror("mvwait: calloc");
-		exit(EXIT_FAILURE);
+		std::perror("mvwait: calloc");
+		std::exit(EXIT_FAILURE);
 	}
 
 	for (i = 1; i < argc; i++) {
@@ -178,8 +181,8 @@ static var wait_main(const int argc, const char* argv[], const int wait_time_ms)
 		// or crash
 		if (wd[i] == -1) {
 			fprintf(stderr, "Cannot watch '%s'\n", argv[i]);
-			perror("mvwait: inotify_add_watch");
-			exit(EXIT_FAILURE);
+			std::perror("mvwait: inotify_add_watch");
+			std::exit(EXIT_FAILURE);
 		}
 	}
 
@@ -246,8 +249,8 @@ static var wait_main(const int argc, const char* argv[], const int wait_time_ms)
 		if (poll_num == -1) {
 			if (errno == EINTR)
 				continue;
-			perror("mvwait: poll");
-			exit(EXIT_FAILURE);
+			std::perror("mvwait: poll");
+			std::exit(EXIT_FAILURE);
 		}
 
 		if (poll_num > 0) {
@@ -285,8 +288,8 @@ static var wait_main(const int argc, const char* argv[], const int wait_time_ms)
 	//remove watches or crash (is this necessary since we close the fd next)
 	for (i = 1; i < argc; i++) {
 		if (inotify_rm_watch(inotify_fd, wd[i]) < 0) {
-			perror("mvwait: inotify_rm_watch");
-			exit(EXIT_FAILURE);
+			std::perror("mvwait: inotify_rm_watch");
+			std::exit(EXIT_FAILURE);
 		}
 	}
 

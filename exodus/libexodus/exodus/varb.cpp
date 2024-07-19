@@ -208,7 +208,7 @@ VarError::VarError(std::string description_)
 
 // stack - source line acquisition
 //
-std::string VarError::stack(const size_t limit) const {
+std::string VarError::stack(const std::size_t limit) const {
 
 	// Convert the stack addresses into source code lines
 	return exo_backtrace(stack_addresses_, stack_size_, limit);

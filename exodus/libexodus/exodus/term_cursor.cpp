@@ -1,17 +1,21 @@
-#include <iostream>
-#include <stdio.h>
-#include <termios.h>
-#include <unistd.h>
+//import std;
+//#include <iomanip>
+//#include <iostream>
+//#include <stdio.h>
+//#include <termios.h>
+//#include <unistd.h> // for isatty
 
-#include <exodus/var.h>
-#include <exoprog.h>
+//import var;
+//#include <exodus/var.h>
+
+#include <exodus/exoprog.h>
 
 namespace exo {
 
-
-bool var::isterminal() const {
-	return isatty(fileno(stdin));
-}
+// Moved to term_echo.cpp
+//bool var::isterminal() const {
+//	return isatty(fileno(stdin));
+//}
 
 var ExodusProgramBase::getcursor() const {
 
@@ -101,17 +105,21 @@ var ExodusProgramBase::getcursor() const {
 }
 
 void ExodusProgramBase::setcursor(CVR cursor) const {
-	std::cout << cursor << std::flush;
+	//std::cout << cursor << std::flush;
+	cursor.output();
+	cursor.osflush();
 	return;
 }
 
 var ExodusProgramBase::getprompt() const {
-	std::cout << "ExodusProgramBase::getprompt() not implemented yet " << std::endl;
+	//std::cout << "ExodusProgramBase::getprompt() not implemented yet " << std::endl;
+	var("ExodusProgramBase::getprompt() not implemented yet ").outputl();
 	return "";
 }
 
 void ExodusProgramBase::setprompt(CVR /*prompt*/) const {
-	std::cout << "ExodusProgramBase::setprompt() not implemented yet " << std::endl;
+	//std::cout << "ExodusProgramBase::setprompt() not implemented yet " << std::endl;
+	var("ExodusProgramBase::setprompt() not implemented yet ").outputl();
 	return;
 }
 

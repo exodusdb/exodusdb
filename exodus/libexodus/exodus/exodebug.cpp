@@ -104,11 +104,11 @@ static void addbacktraceline(CVR frameno, CVR sourcefilename, CVR lineno, VARREF
 //namespace {
 //	#define BACKTRACE_MAXADDRESSES 100
 //	thread_local void* thread_stack_addresses[BACKTRACE_MAXADDRESSES];
-//	thread_local size_t thread_stack_size = 0;
+//	thread_local std::size_t thread_stack_size = 0;
 //}
 
 // Capture the current stack addresses for later decoding
-void exo_savestack(void* stack_addresses[BACKTRACE_MAXADDRESSES], size_t* stack_size) {
+void exo_savestack(void* stack_addresses[BACKTRACE_MAXADDRESSES], std::size_t* stack_size) {
 	*stack_size = ::backtrace(stack_addresses, BACKTRACE_MAXADDRESSES);
 #ifdef TRACING
 	std::cout << boost::stacktrace::stacktrace();
@@ -119,10 +119,10 @@ void exo_savestack(void* stack_addresses[BACKTRACE_MAXADDRESSES], size_t* stack_
 // Convert the stack addresses to source file, line no and line text
 ////////////////////////////////////////////////////////////////////
 // http://www.delorie.com/gnu/docs/glibc/libc_665.html
-var exo_backtrace(void* stack_addresses[BACKTRACE_MAXADDRESSES], size_t stack_size, size_t limit) {
+var exo_backtrace(void* stack_addresses[BACKTRACE_MAXADDRESSES], std::size_t stack_size, std::size_t limit) {
 
 	var returnlines = "";
-	size_t nlines = 0;
+	std::size_t nlines = 0;
 
 	//var("backtrace()").errputl();
 
@@ -152,11 +152,11 @@ var exo_backtrace(void* stack_addresses[BACKTRACE_MAXADDRESSES], size_t stack_si
 
 	// TODO autodetect if addr2line or dwalfdump/dSYM is available
 
-	//warning: conversion from ‘size_t’ {aka ‘long unsigned int’} to ‘int’ may change value [-Wconversion]
+	//warning: conversion from ‘std::size_t’ {aka ‘long unsigned int’} to ‘int’ may change value [-Wconversion]
 	//char** strings = backtrace_symbols(stack_addresses, static_cast<int>(stack_size));
 	auto strings = std::unique_ptr<char*[], void(*)(void*)>{backtrace_symbols(stack_addresses, static_cast<int>(stack_size)), ::free};
 
-	for (size_t ii = 0; ii < stack_size; ii++) {
+	for (std::size_t ii = 0; ii < stack_size; ii++) {
 
 #ifdef TRACING
 		fprintf(stderr, "Backtrace %d: %p \"%s\"\n", int(ii), stack_addresses[ii], strings[ii]);

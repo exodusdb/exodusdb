@@ -23,7 +23,7 @@ THE SOFTWARE.
 //module #include <string>
 
 //module #include <algorithm>  //for dim::sort
-#include <cstring>	  //for strlen strstr
+//#include <cstring>	  //for strlen strstr
 
 #ifdef __has_include
 #	if __has_include(<version>)
@@ -61,12 +61,12 @@ var var::field(SV separatorx, const int fieldnx, const int nfieldsx) const {
 	int nfields = nfieldsx > 0 ? nfieldsx : 1;
 
 	// separator might be multi-byte ... esp. for non-ASCII
-	std::string::size_type len_separator = separatorx.size();
+	std::size_t len_separator = separatorx.size();
 
 	// FIND FIELD
 
 	// find the starting position of the field or return ""
-	std::string::size_type start_pos = 0;
+	std::size_t start_pos = 0;
 	int fieldn2 = 1;
 	while (fieldn2 < fieldno) {
 		start_pos = var_str.find(separatorx, start_pos);
@@ -79,7 +79,7 @@ var var::field(SV separatorx, const int fieldnx, const int nfieldsx) const {
 	}
 
 	// find the end of the field (or string)
-	std::string::size_type end_pos = start_pos;
+	std::size_t end_pos = start_pos;
 	int pastfieldn = fieldno + nfields;
 	while (fieldn2 < pastfieldn) {
 		end_pos = var_str.find(separatorx, end_pos);
@@ -123,7 +123,7 @@ VARREF var::fieldstorer(SV separator, const int fieldnx, const int nfieldsx, CVR
 		throw VarError("separator cannot be blank in fieldstorer()");
 
 	// handle multibyte/non-ASCII separators
-	std::string::size_type separator_len = separator.size();
+	std::size_t separator_len = separator.size();
 
 	int fieldno;
 	if (fieldnx > 0)
@@ -155,7 +155,7 @@ VARREF var::fieldstorer(SV separator, const int fieldnx, const int nfieldsx, CVR
 	// FIND FIELD
 
 	// find the starting position of the field or return ""
-	std::string::size_type start_pos = 0;
+	std::size_t start_pos = 0;
 	int fieldn2 = 1;
 	while (fieldn2 < fieldno) {
 		start_pos = var_str.find(separator, start_pos);
@@ -174,7 +174,7 @@ VARREF var::fieldstorer(SV separator, const int fieldnx, const int nfieldsx, CVR
 	}
 
 	// find the end of the field (or string)
-	std::string::size_type end_pos = start_pos;
+	std::size_t end_pos = start_pos;
 	int pastfieldn = fieldno + nfields;
 	while (fieldn2 < pastfieldn) {
 		end_pos = var_str.find(separator, end_pos);
@@ -209,7 +209,7 @@ VARREF var::fieldstorer(SV separator, const int fieldnx, const int nfieldsx, CVR
 /////////
 
 // hardcore string locate function given a section of a string and all parameters
-static bool locateat(const std::string& var_str, const std::string& target, size_t start_pos, size_t end_pos, const int order, SV usingchar, VARREF setting) {
+static bool locateat(const std::string& var_str, const std::string& target, std::size_t start_pos, std::size_t end_pos, const int order, SV usingchar, VARREF setting) {
 	// private - assume everything is defined/assigned correctly
 
 	//
@@ -240,7 +240,7 @@ static bool locateat(const std::string& var_str, const std::string& target, size
 		return !target.size();
 	}
 
-	size_t usingchar_len = usingchar.size();
+	std::size_t usingchar_len = usingchar.size();
 
 	// for use in AR/DR;
 	var value;
@@ -253,7 +253,7 @@ static bool locateat(const std::string& var_str, const std::string& target, size
 	int valuen2 = 1;
 	do {
 
-		size_t nextstart_pos = var_str.find(usingchar, start_pos);
+		std::size_t nextstart_pos = var_str.find(usingchar, start_pos);
 		// past end of string?
 		// if (nextstart_pos==string::npos)
 		//{
@@ -467,13 +467,13 @@ static bool locatex(const std::string& var_str, const std::string& target, const
 	// if (fieldno<0||valueno<0||subvalueno<0) return ""
 
 	int ordermode;
-	if (strlen(ordercode) == 0)
+	if (std::strlen(ordercode) == 0)
 		ordermode = 0;
 	else {
 		// locate the order code in a list of the four possible order codes
 		// and throw if not found
 		const char* ordercodes = "ALARDLDR";
-		const char* orderindex = strstr(ordercodes, ordercode);
+		const char* orderindex = std::strstr(ordercodes, ordercode);
 		if (orderindex == nullptr)
 			UNLIKELY
 			throw VarError("locateby('" ^ var(ordercode) ^ "') is invalid");
@@ -502,7 +502,7 @@ static bool locatex(const std::string& var_str, const std::string& target, const
 	}
 
 	// find the starting position of the field or return ""
-	std::string::size_type start_pos = 0;
+	std::size_t start_pos = 0;
 	int fieldn2 = 1;
 	while (fieldn2 < fieldno) {
 		start_pos = var_str.find(FM_, start_pos);
@@ -518,7 +518,7 @@ static bool locatex(const std::string& var_str, const std::string& target, const
 	}
 
 	// find the end of the field (or string)
-	std::string::size_type field_end_pos;
+	std::size_t field_end_pos;
 	field_end_pos = var_str.find(FM_, start_pos);
 	if (field_end_pos == std::string::npos)
 		field_end_pos = var_str.size();
@@ -566,7 +566,7 @@ static bool locatex(const std::string& var_str, const std::string& target, const
 	}
 
 	// find the end of the value (or string)
-	std::string::size_type value_end_pos;
+	std::size_t value_end_pos;
 	value_end_pos = var_str.find(VM_, start_pos);
 	if (value_end_pos == std::string::npos || value_end_pos > field_end_pos)
 		value_end_pos = field_end_pos;
@@ -614,7 +614,7 @@ static bool locatex(const std::string& var_str, const std::string& target, const
 	}
 
 	// find the end of the subvalue (or string)
-	std::string::size_type subvalue_end_pos;
+	std::size_t subvalue_end_pos;
 	subvalue_end_pos = var_str.find(SM_, start_pos);
 	if (subvalue_end_pos == std::string::npos || subvalue_end_pos > value_end_pos) {
 		return locateat(var_str, target, start_pos, value_end_pos, ordermode, usingchar,
@@ -839,7 +839,7 @@ var var::f(const int argfieldn, const int argvaluen/*=0*/, const int argsubvalue
 
 	// unless extracting field 1,
 	// find the starting position of the field or return ""
-	std::string::size_type start_pos = 0;
+	std::size_t start_pos = 0;
 	int fieldn2 = 1;
 	while (fieldn2 < fieldno) {
 		start_pos = var_str.find(FM_, start_pos);
@@ -851,7 +851,7 @@ var var::f(const int argfieldn, const int argvaluen/*=0*/, const int argsubvalue
 	}
 
 	// find the end of the field (or string)
-	std::string::size_type field_end_pos;
+	std::size_t field_end_pos;
 	field_end_pos = var_str.find(FM_, start_pos);
 	if (field_end_pos == std::string::npos)
 		field_end_pos = var_str.size();
@@ -885,7 +885,7 @@ var var::f(const int argfieldn, const int argvaluen/*=0*/, const int argsubvalue
 	}
 
 	// find the end of the value (or string)
-	std::string::size_type value_end_pos;
+	std::size_t value_end_pos;
 	value_end_pos = var_str.find(VM_, start_pos);
 	if (value_end_pos == std::string::npos || value_end_pos > field_end_pos)
 		value_end_pos = field_end_pos;
@@ -915,7 +915,7 @@ var var::f(const int argfieldn, const int argvaluen/*=0*/, const int argsubvalue
 	}
 
 	// find the end of the subvalue (or string)
-	std::string::size_type subvalue_end_pos;
+	std::size_t subvalue_end_pos;
 	subvalue_end_pos = var_str.find(SM_, start_pos);
 	if (subvalue_end_pos == std::string::npos || subvalue_end_pos > value_end_pos)
 		return var_str.substr(start_pos, value_end_pos - start_pos);
@@ -945,8 +945,8 @@ VARREF var::remover(int fieldno, int valueno, int subvalueno) {
 	}
 
 	/////////////   FIND FIELD  /////////////////
-	std::string::size_type start_pos = 0;
-	std::string::size_type field_end_pos;
+	std::size_t start_pos = 0;
+	std::size_t field_end_pos;
 
 	// negative means remove nothing
 	if (fieldno < 0) {
@@ -973,7 +973,7 @@ VARREF var::remover(int fieldno, int valueno, int subvalueno) {
 	}
 
 	////////////// FIND VALUE ///////////////////
-	std::string::size_type value_end_pos;
+	std::size_t value_end_pos;
 
 	// zero means remove all values, negative means remove nothing
 	if (valueno < 0) {
@@ -1008,7 +1008,7 @@ VARREF var::remover(int fieldno, int valueno, int subvalueno) {
 	}
 
 	////////// FIND SUBVALUE  //////////////////////
-	std::string::size_type subvalue_end_pos;
+	std::size_t subvalue_end_pos;
 
 	// zero means remove all subvalues, negative means remove nothing
 	if (subvalueno < 0) {
@@ -1070,8 +1070,8 @@ VARREF var::r(int fieldno, int valueno, int subvalueno, CVR replacement) {
 	}
 
 	/////////////   FIND FIELD  /////////////////
-	std::string::size_type start_pos = 0;
-	std::string::size_type field_end_pos;
+	std::size_t start_pos = 0;
+	std::size_t field_end_pos;
 
 	// negative means append
 	if (fieldno < 0) {
@@ -1110,7 +1110,7 @@ VARREF var::r(int fieldno, int valueno, int subvalueno, CVR replacement) {
 	}
 
 	////////////// FIND VALUE ///////////////////
-	std::string::size_type value_end_pos;
+	std::size_t value_end_pos;
 
 	// zero means all, negative means append one mv ... regardless of subvalueno
 	if (valueno < 0) {
@@ -1149,7 +1149,7 @@ VARREF var::r(int fieldno, int valueno, int subvalueno, CVR replacement) {
 	}
 
 	////////// FIND SUBVALUE  //////////////////////
-	std::string::size_type subvalue_end_pos;
+	std::size_t subvalue_end_pos;
 
 	// zero means all, negative means append one sv ... regardless of subvalueno
 	if (subvalueno < 0) {
@@ -1214,8 +1214,8 @@ VARREF var::inserter(const int fieldno, const int valueno, const int subvalueno,
 	}
 
 	/////////////   FIND FIELD  /////////////////
-	std::string::size_type start_pos = 0;
-	std::string::size_type field_end_pos;
+	std::size_t start_pos = 0;
+	std::size_t field_end_pos;
 
 	int pad = false;
 
@@ -1257,7 +1257,7 @@ VARREF var::inserter(const int fieldno, const int valueno, const int subvalueno,
 	}
 
 	////////////// FIND VALUE ///////////////////
-	std::string::size_type value_end_pos;
+	std::size_t value_end_pos;
 
 	// zero means all, negative means append one mv ... regardless of subvalueno
 	if (valueno < 0) {
@@ -1300,7 +1300,7 @@ VARREF var::inserter(const int fieldno, const int valueno, const int subvalueno,
 	}
 
 	////////// FIND SUBVALUE  //////////////////////
-	//std::string::size_type subvalue_end_pos;
+	//std::size_t subvalue_end_pos;
 
 	// zero means all, negative means append one sv ... regardless of subvalueno
 	if (subvalueno < 0) {
@@ -1455,13 +1455,13 @@ VARREF var::firster() {
 	return *this;
 }
 
-var var::first(const size_t  length) const& {
+var var::first(const std::size_t  length) const& {
 
-	THISIS("var var::first(const size_t length) const")
+	THISIS("var var::first(const std::size_t length) const")
 	assertString(function_sig);
 
-	// Assume high half of size_t is c++ unblockable conversion
-	// of negative ints to size_t. Runtime error
+	// Assume high half of std::size_t is c++ unblockable conversion
+	// of negative ints to std::size_t. Runtime error
 	if (length > std::string::npos >> 1)
 		UNLIKELY
 		throw VarNonPositive(__PRETTY_FUNCTION__);
@@ -1473,13 +1473,13 @@ var var::first(const size_t  length) const& {
 
 //[1,y]
 // var.substr(1,length)
-VARREF var::firster(const size_t length) {
+VARREF var::firster(const std::size_t length) {
 
-	THISIS("VARREF var::firster(const size_t length)")
+	THISIS("VARREF var::firster(const std::size_t length)")
 	assertStringMutator(function_sig);
 
-	// Assume high half of size_t is c++ unblockable conversion
-	// of negative ints to size_t. Runtime error
+	// Assume high half of std::size_t is c++ unblockable conversion
+	// of negative ints to std::size_t. Runtime error
 	if (length > std::string::npos >> 1)
 		UNLIKELY
 		throw VarNonPositive(__PRETTY_FUNCTION__);
@@ -1527,13 +1527,13 @@ VARREF var::laster() {
 }
 
 
-var var::last(const size_t  length) const& {
+var var::last(const std::size_t  length) const& {
 
-	THISIS("var var::last(const size_t length) const")
+	THISIS("var var::last(const std::size_t length) const")
 	assertString(function_sig);
 
-	// Assume high half of size_t is c++ unblockable conversion
-	// of negative ints to size_t. Runtime error
+	// Assume high half of std::size_t is c++ unblockable conversion
+	// of negative ints to std::size_t. Runtime error
 	if (length > std::string::npos >> 1)
 		UNLIKELY
 		throw VarNonPositive(__PRETTY_FUNCTION__);
@@ -1542,7 +1542,7 @@ var var::last(const size_t  length) const& {
 	// min of 2, 3 -> 2 for copylen
 	// copy start = data() +3 -2 = data+1, copylen 2
 
-//	size_t copylen = std::min(length, this->var_str.size());
+//	std::size_t copylen = std::min(length, this->var_str.size());
 //
 //	// Construct a new var with the required number of chars from this
 //	var nrvo(this->var_str.data() + this->var_str.size() - copylen, copylen);
@@ -1557,13 +1557,13 @@ var var::last(const size_t  length) const& {
 
 //[-y]
 // var.s(-length) substring
-VARREF var::laster(const size_t length) {
+VARREF var::laster(const std::size_t length) {
 
-	THISIS("VARREF var::laster(const size_t length)")
+	THISIS("VARREF var::laster(const std::size_t length)")
 	assertStringMutator(function_sig);
 
-	// Assume high half of size_t is c++ unblockable conversion
-	// of negative ints to size_t. Runtime error
+	// Assume high half of std::size_t is c++ unblockable conversion
+	// of negative ints to std::size_t. Runtime error
 	if (length > std::string::npos >> 1)
 		UNLIKELY
 		throw VarNonPositive(__PRETTY_FUNCTION__);
@@ -1639,7 +1639,7 @@ VARREF var::cutter(const int length) {
 		var_str.erase(0, length);
 
 	}
-	// warning: comparison of integer expressions of different signedness: ‘int’ and ‘std::__cxx11::basic_string<char>::size_type’ {aka ‘long unsigned int’} [-Wsign-compare]
+	// warning: comparison of integer expressions of different signedness: ‘int’ and ‘std::__cxx11::basic_string<char>::size_t’ {aka ‘long unsigned int’} [-Wsign-compare]
 	else if (-length >= static_cast<int>(var_str.size())) {
 
 		// Negative = cut last n chars. Erase from middle to end.
@@ -1829,13 +1829,13 @@ var var::mv(const char* opcode, CVR var2) const {
 	// pointers into var_str
 	// p1a and p1b are zero based indexes of first and last+1 characters of a value in var1
 	// (this)
-	std::string::size_type p1a = 0;
-	std::string::size_type p1b;
+	std::size_t p1a = 0;
+	std::size_t p1b;
 
 	// pointers into var2.var_str
 	// p2a and p2b are zero based indexes of first and last+1 characters of a value in var2
-	std::string::size_type p2a = 0;
-	std::string::size_type p2b;
+	std::size_t p2a = 0;
+	std::size_t p2b;
 
 	while (true) {
 
@@ -1944,7 +1944,7 @@ var var::substr(const int startindex1, CVR delimiterchars, int& endindex) const 
 	assertString(function_sig);
 	ISSTRING(delimiterchars)
 
-	std::string::size_type start_pos;
+	std::size_t start_pos;
 
 	// domain check min startindex1
 	// handle before start of string
@@ -1964,7 +1964,7 @@ var var::substr(const int startindex1, CVR delimiterchars, int& endindex) const 
 	}
 
 	// find the end of the field (or string)
-	std::string::size_type end_pos;
+	std::size_t end_pos;
 	end_pos = var_str.find_first_of(delimiterchars.var_str, start_pos);
 
 	// past of of string?
@@ -1997,7 +1997,7 @@ var var::substr2(VARREF startindex1, VARREF delimiterno) const {
 	ISDEFINED(delimiterno)
 
 	int startindex0 = startindex1.toInt() - 1;
-	std::string::size_type start_pos = (startindex0 >= 0) ? startindex0 : 0;
+	std::size_t start_pos = (startindex0 >= 0) ? startindex0 : 0;
 
 	//var returnable = "";
 
@@ -2019,7 +2019,7 @@ var var::substr2(VARREF startindex1, VARREF delimiterno) const {
 	}
 
 	// find the end of the field (or string)
-	std::string::size_type end_pos;
+	std::size_t end_pos;
 	end_pos = var_str.find_first_of(_RM _FM _VM _SM _TM _ST, start_pos);
 
 	// past of of string?
@@ -2148,12 +2148,12 @@ var var::sumall() const {
 	var nrvo = 0;
 	var start = 0;
 	var subfield, term;
-	size_t maxdecimals = 0;
+	std::size_t maxdecimals = 0;
 	while (true) {
 		//this extracts a substring up to any separator charactor ST-RM
 		subfield = (*this).substr2(start, term);
 
-		size_t subfieldsize = subfield.var_str.size();
+		std::size_t subfieldsize = subfield.var_str.size();
 		if (subfieldsize) {
 			//for clarity of error message,
 			//throw any error here instead of leaving it up to the +=
@@ -2162,7 +2162,7 @@ var var::sumall() const {
 				throw VarNonNumeric("sumall() " ^ subfield.first(128).quote());
 
 			nrvo += subfield;
-			size_t n = subfield.var_str.find('.');
+			std::size_t n = subfield.var_str.find('.');
 			if (n) {
 				n = subfieldsize - n;
 				if (n > maxdecimals)
@@ -2212,7 +2212,7 @@ var var::sum() const {
 
 	//std::clog << (*this) << std::endl;
 
-	size_t maxndecimals = 0;  //initialise only to avoid warning
+	std::size_t maxndecimals = 0;  //initialise only to avoid warning
 	do {
 
 		//extract the next field and get the nextsep field number 1-6 or 0 if none
@@ -2230,7 +2230,7 @@ var var::sum() const {
 			accum += part;
 
 			//record maximum decimal places on input
-			size_t pos = part.var_str.find('.');
+			std::size_t pos = part.var_str.find('.');
 			if (pos != std::string::npos) {
 				pos = part.var_str.size() - pos - 1;
 				if (pos > maxndecimals)
@@ -2242,7 +2242,7 @@ var var::sum() const {
 			accum = part;
 
 			//record maximum decimal places on input
-			size_t pos = part.var_str.find('.');
+			std::size_t pos = part.var_str.find('.');
 			if (pos != std::string::npos) {
 				maxndecimals = part.var_str.size() - pos - 1;
 			} else

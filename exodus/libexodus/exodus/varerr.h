@@ -1,6 +1,8 @@
 #ifndef EXODUS_LIBEXODUS_EXODUS_VARERR_H_
 #define EXODUS_LIBEXODUS_EXODUS_VARERR_H_
 
+//#include <stddef> // std::size_t
+
 namespace exo {
 
 //#pragma GCC diagnostic push
@@ -25,12 +27,12 @@ class PUBLIC VarError {
 	std::string description;
 
 	// function to convert stack addresses to source code if available
-	std::string stack(const size_t limit = 0) const;
+	std::string stack(const std::size_t limit = 0) const;
 
  private:
 
 	mutable void* stack_addresses_[BACKTRACE_MAXADDRESSES];
-	mutable size_t stack_size_ = 0;
+	mutable std::size_t stack_size_ = 0;
 
 };
 

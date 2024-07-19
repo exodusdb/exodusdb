@@ -32,12 +32,12 @@ Binary    Hex          Comments
 //#include <math.h>    //for abs(double) and stod
 //#include <cstdlib>  //for exit
 
-#include <utility> //for move
+//#include <utility> //for move
 //#include <mutex> //for lock_guard
 //module #include <string>
 
 #if __has_include(<signal.h>)
-#include <signal.h>	 //for raise(SIGTRAP)
+//#include <signal.h>	 //for raise(SIGTRAP)
 #endif
 
 /* using fastfloat instead of ryu because it is > 3 time faster
@@ -84,7 +84,7 @@ Binary    Hex          Comments
 #endif
 
 //gcc 10 doesnt include conv from and to floating point
-#include <charconv>	 // for from_chars and to_chars
+//#include <charconv>	 // for from_chars and to_chars
 
 //#include <sstream>
 //#include <iomanip>    //for setprecision
@@ -502,7 +502,7 @@ var var::textwidth() const {
 	}
 	return size;
 
-    //int wcswidth(const wchar_t *s, size_t n);
+    //int wcswidth(const wchar_t *s, std::size_t n);
 unicode:
 	auto wstr1 = this->to_wstring();
 	auto width = wcswidth(wstr1.data(),std::string::npos);
@@ -1008,7 +1008,7 @@ VARREF var::unquoter() {
 	// characters
 
 	// no change if no length
-	size_t len = var_str.size();
+	std::size_t len = var_str.size();
 	if (len < 2)
 		return *this;
 
@@ -1559,7 +1559,7 @@ VARREF var::parser(char sepchar) {
 //	//std::string s1 = R"___(a 'b c' d")___";
 //	std::string s2 = s1;
 
-	size_t len = var_str.size();
+	std::size_t len = var_str.size();
 	if (!len)
 		return *this;
 
@@ -1677,10 +1677,10 @@ var var::count(SV str) const {
 	if (str.empty())
 		return "";
 
-	std::string::size_type substr_len = str.size();
+	std::size_t substr_len = str.size();
 
 	// find the starting position of the field or return ""
-	std::string::size_type start_pos = 0;
+	std::size_t start_pos = 0;
 	int fieldno = 0;
 	while (true) {
 		start_pos = var_str.find(str, start_pos);
@@ -1712,7 +1712,7 @@ var var::index(SV substr, const int startindex) const {
 		return "";
 
 	// find the starting position of the field or return ""
-	std::string::size_type start_pos = startindex - 1;
+	std::size_t start_pos = startindex - 1;
 	start_pos = var_str.find(substr, start_pos);
 
 	// not found, return 0
@@ -1732,7 +1732,7 @@ var var::indexr(SV substr, const int startindex) const {
 	if (substr.empty())
 		return "";
 
-	std::string::size_type start_pos;
+	std::size_t start_pos;
 
 	if (startindex == 0) {
 		start_pos = std::string::npos;
@@ -1777,8 +1777,8 @@ var var::indexn(SV substr, const int occurrenceno) const {
 	if (substr.empty())
 		return "";
 
-	std::string::size_type start_pos = 0;
-	std::string::size_type substr_len = substr.size();
+	std::size_t start_pos = 0;
+	std::size_t substr_len = substr.size();
 
 	// negative and 0th occurrence mean the first
 	int countdown = occurrenceno >= 1 ? occurrenceno : 1;
@@ -2031,8 +2031,8 @@ ND VARREF var::trimboth( SV trimchars DEFAULT_SPACE)     && {return trimmerboth(
 
 ND VARREF var::first()                                   && {return firster();}
 ND VARREF var::last()                                    && {return laster();}
-ND VARREF var::first(const size_t length)                && {return firster(length);}
-ND VARREF var::last( const size_t length)                && {return laster(length);}
+ND VARREF var::first(const std::size_t length)           && {return firster(length);}
+ND VARREF var::last( const std::size_t length)           && {return laster(length);}
 ND VARREF var::cut(  const int    length)                && {return cutter(length);}
 ND VARREF var::paste(const int    pos1, const int length,
                                         SV insertstr)    && {return paster(pos1, length, insertstr);}

@@ -1,3 +1,5 @@
+#include <string>
+
 #include <exodus/exoprog.h>
 
 #include <exodus/exoimpl.h>
@@ -10,7 +12,7 @@
 // variable which is also available in all exodus programs.
 
 //#include <unordered_map>
-#include <utility> // for std::unreachable
+//#include <utility> // for std::unreachable
 
 namespace exo {
 

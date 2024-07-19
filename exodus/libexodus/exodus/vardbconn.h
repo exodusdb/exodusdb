@@ -46,22 +46,16 @@ import std;
 // Perhaps switch to this https://youtu.be/M2fKMP47slQ?t=476
 //module #include <map>
 
-//currently only for dbcache
-#include <unordered_map>
-
 #include <exodus/var.h>
 
 namespace exo {
 
-using ConnectionLocks = std::map<uint64_t, int>;
-//using DBCache = std::unordered_map<uint64_t, std::string>;
-using DBCache = std::map<uint64_t, std::string>;
-//using DBCache = std::map<uint64_t, std::string>;
+using ConnectionLocks = std::map<std::uint64_t, int>;
+using DBCache = std::map<std::uint64_t, std::string>;
 using PGCONN_DELETER = void (*)(PGconn*);
 
 class DBConn;
 using DBConns = std::map<int, DBConn>;
-//using DBConnector = std::unordered_map<int, DBConn>;
 
 // Holds a pointer to a PGconn, caches for records, and a lock table
 class DBConn	 // used as 'second' in pair, stored in connection map
@@ -153,9 +147,9 @@ class DBConnector final {
 	DBConn* get_dbconn(const int dbconn_no) const;
 	DBCache* get_dbcache(const int dbconn_no) const;
 
-	bool getrecord(const int dbconn_no, const uint64_t hash64, std::string& record) const;
-	void putrecord(const int dbconn_no, const uint64_t hash64, const std::string& record);
-	bool delrecord(const int dbconn_no, const uint64_t hash64);
+	bool getrecord(const int dbconn_no, const std::uint64_t hash64, std::string& record) const;
+	void putrecord(const int dbconn_no, const std::uint64_t hash64, const std::string& record);
+	bool delrecord(const int dbconn_no, const std::uint64_t hash64);
 	void cleardbcache(const int dbconn_no);
 
    private:

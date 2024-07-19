@@ -1,7 +1,7 @@
 #ifndef EXODUS_LIBEXODUS_EXODUS_EXOPROG_H_
 #define EXODUS_LIBEXODUS_EXODUS_EXOPROG_H_
 
-import std;
+//import std;
 
 //module #include <string>
 
@@ -12,7 +12,10 @@ import std;
 //#include <unordered_map>
 //module #include <map>
 
+#include <exodus/exoimpl.h>
 #include <exodus/exoenv.h>
+#include <exodus/vardefs.h>
+
 //#include <exodus/exocallable.h>
 //#include "timeaccount.h"
 

@@ -1,8 +1,10 @@
 import std;
 #include <cassert> // for assert
-//#include <limits.h>
+#include <limits.h> // for HOST_NAME_MAX
 #include <unistd.h> // for getpid
 //#include <filesystem>
+
+// Abbreviated namespace
 namespace fs = std::filesystem;
 
 #include <exodus/var.h>
@@ -44,7 +46,7 @@ ND PUBLIC std::string gethostname() {
 	}
 
 	// Trim std string from trailing \0 return by c function
-	size_t pos = hostname.find('\0');
+	std::size_t pos = hostname.find('\0');
 	if (pos != std::string::npos)
 		hostname.erase(pos);
 

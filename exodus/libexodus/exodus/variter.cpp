@@ -144,5 +144,3 @@ PUBLIC var_iter end([[maybe_unused]] CVR var1) {
 }
 
 }  //namespace exo
-
-

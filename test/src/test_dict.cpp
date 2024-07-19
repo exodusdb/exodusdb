@@ -50,7 +50,10 @@ function main() {
 
 		printl("\n   --- say that dicts are on the specific database " ^ xo_dict ^ " ---\n");
 		ossetenv("EXO_DICT",xo_dict);
-		assert(var(getenv("EXO_DICT")) eq xo_dict);
+//		assert(var(getenv("EXO_DICT")) eq xo_dict);
+//		assert(var(std::getenv("EXO_DICT")) eq xo_dict);
+//		assert(var(exo::getenv("EXO_DICT")) eq xo_dict);
+		assert(var(osgetenv("EXO_DICT")) eq xo_dict);
 
 		printl("\n   --- create a dict on the specific database implicitly ---\n");
 		assert(createfile(dict_xo_test));

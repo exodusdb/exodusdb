@@ -126,7 +126,7 @@ void var::initrnd() const {
 	assertAssigned(__PRETTY_FUNCTION__);
 
 	// Get a seed for the RNG
-	uint64_t seed;
+	std::uint64_t seed;
 	if (this->isnum()) {
 
 		// Seed from number

@@ -21,7 +21,7 @@ THE SOFTWARE.
 */
 
 #include <boost/regex.hpp>
-#include <exodus/rex.h>
+#include "rex.h"
 
 // based on http://geneura.ugr.es/~jmerelo/c++-faq/operator-overloading.html#faq-13.8
 

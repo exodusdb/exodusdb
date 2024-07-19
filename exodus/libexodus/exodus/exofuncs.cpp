@@ -24,7 +24,7 @@ THE SOFTWARE.
 
 import var;//#include <exodus/var.h>
 #include <exodus/exoenv.h>
-#include <exodus/rex.h>
+//#include <exodus/rex.h>
 
 #define EXO_FUNCS_CPP
 #include <exodus/exofuncs.h>

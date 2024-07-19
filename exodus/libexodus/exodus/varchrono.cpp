@@ -30,6 +30,10 @@ import std;
 //#include <iostream> //for cerr
 //#include <chrono>
 //#include <sstream>
+//#include <cctype> // for std::isdigit
+
+//#include <ctime> // for std::time_t
+//#include <cctype> // for std::isalpha std::toupper
 
 #pragma GCC diagnostic push
 #pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
@@ -109,8 +113,8 @@ static constexpr std::string_view longdayofweeks =
 
 namespace exo {
 
-// time_t -> pick integer date, time
-void time_t_to_pick_date_time(const time_t time, int* pick_date, int* pick_time) noexcept {
+// std::time_t -> pick integer date, time
+void time_t_to_pick_date_time(const std::time_t time, int* pick_date, int* pick_time) noexcept {
 
 	// ASSUMPTION: td::chrono::system_clock() epoch is 1970/01/01 00:00:00
 
@@ -176,7 +180,7 @@ var var::ostime() const {
 	const auto duration_since_epoch = std::chrono::system_clock().now().time_since_epoch();
 
 	// ms accuracy
-	//uint64_t now = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+	//std::uint64_t now = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 	//return now % 86400000000 / 1000000.0;
 
 	// ns accuracy
@@ -297,7 +301,7 @@ var var::iconv_D(const char* conversion) const {
 	auto iter = var_str.begin();
 	const auto end = var_str.end();
 	while (iter != end) {
-		if (isdigit(*iter)) {
+		if (std::isdigit(*iter)) {
 
 			partn++;
 
@@ -306,13 +310,13 @@ var var::iconv_D(const char* conversion) const {
 
 			// Accumulate any additional digits as ints
 			// after multipying prior accumulation by 10
-			while (isdigit(*iter))
+			while (std::isdigit(*iter))
 				parts[partn] = (parts[partn] * 10) + ((*iter++) - '0');
 
 			continue;
 		}
 
-		else if (::isalpha(*iter)) {
+		else if (std::isalpha(*iter)) {
 
 			// Alphabetic months must only appear once
 			if (month != 0)
@@ -323,8 +327,8 @@ var var::iconv_D(const char* conversion) const {
 			do {
 				// toupper returns an int despite being given a char
 				// Presumably safe to cast back to char
-				word.push_back(static_cast<char>(toupper(*iter++)));
-			} while (::isalpha(*iter));
+				word.push_back(static_cast<char>(std::toupper(*iter++)));
+			} while (std::isalpha(*iter));
 
 //			// determine the month number 1 - 12
 //			for (int ii = 0; ii < 12 * 4; ii += 4) {

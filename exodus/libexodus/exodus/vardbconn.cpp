@@ -76,7 +76,7 @@ DBCache* DBConnector::get_dbcache(const int index) const{
 }
 
 // pass filename and key by value relying on short string optimisation for performance
-bool DBConnector::getrecord(const int connid, const uint64_t hash64, std::string& record) const {
+bool DBConnector::getrecord(const int connid, const std::uint64_t hash64, std::string& record) const {
 	//TimeAcc t(105);
 	auto dbcache = get_dbcache(connid);
 	auto cacheentry = dbcache->find(hash64);
@@ -91,7 +91,7 @@ bool DBConnector::getrecord(const int connid, const uint64_t hash64, std::string
 }
 
 // pass filename and key by value relying on short string optimisation for performance
-void DBConnector::putrecord(const int connid, const uint64_t hash64, const std::string& record) {
+void DBConnector::putrecord(const int connid, const std::uint64_t hash64, const std::string& record) {
 	//TimeAcc t(106);
 	auto dbcache = get_dbcache(connid);
 	dbcache->insert_or_assign(hash64, record);
@@ -101,7 +101,7 @@ void DBConnector::putrecord(const int connid, const uint64_t hash64, const std::
 
 // delrecord is currently setting record to "" to counter c++ unordered map reputed performance issues
 // pass filename and key by value relying on short string optimisation for performance
-bool DBConnector::delrecord(const int connid, const uint64_t hash64) {
+bool DBConnector::delrecord(const int connid, const std::uint64_t hash64) {
 	//TimeAcc t(106);
 	auto dbcache = get_dbcache(connid);
 	//Must remove since empty entries indicate no present and could be writing a record

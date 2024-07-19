@@ -21,7 +21,7 @@ THE SOFTWARE.
 */
 
 //#include <math.h>
-#include <cmath>
+//#include <cmath>
 #include <errno.h>
 
 #include "varimpl.h"
@@ -61,12 +61,12 @@ static double exodusmodulo_dbl(const double dividend, const double limit) {
 	double result;
 	if (limit > 0) {
 		LIKELY
-		result = fmod(dividend, limit);
+		result = std::fmod(dividend, limit);
 		if (result < 0)
 			UNLIKELY
 			result += limit;
 	} else {
-		result = -fmod(-dividend, -limit);
+		result = -std::fmod(-dividend, -limit);
 		if (result > 0)
 			result += limit;
 	}

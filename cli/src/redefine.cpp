@@ -4,6 +4,8 @@
 //#include <filesystem>
 //namespace fs = std::filesystem;
 
+#include <vector>
+
 #include <exodus/program.h>
 programinit()
 

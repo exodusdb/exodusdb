@@ -29,6 +29,7 @@ import std;
 //module #include <bitset>
 //module #include <array>
 //#include <utility> //std::unreachable()
+//#include <stdexcept> // for std::invalid_argument
 
 #include <exodus/var.h>
 #include <exodus/varimpl.h>
@@ -167,7 +168,7 @@ var var::iconv(const char* conversion) const {
 
 								auto int1 = static_cast<varint_t>(std::bitset<64>(part.var_str).to_ullong());
 
-								// Cannot create using ordinary var construction from uint64_t
+								// Cannot create using ordinary var construction from std::uint64_t
 								// because they throw VarIntOverflow if bit 64 is set.
 								var opart;
 								opart.var_typ = VARTYP_INT;
@@ -435,7 +436,7 @@ std::string var::oconv_MD(const char* conversion) const {
 	// 1. zero length string
 	// 2. non-numeric string
 	// 3. plain "MD" conversion without any trailing digits
-	//size_t convlen = strlen(conversion);
+	//std::size_t convlen = strlen(conversion);
 	if (((var_typ & VARTYP_STR) && !var_str.size()) || !(this->isnum()) || !nextchar)
 		return *this;
 
@@ -451,7 +452,7 @@ std::string var::oconv_MD(const char* conversion) const {
 	// following up to two digits are ndecimals, or ndecimals and movedecimals
 	// look for a digit
 	//TODO allow A-I to act like 10 to 19 digits
-	if (isdigit(nextchar)) {
+	if (std::isdigit(nextchar)) {
 
 		// first digit is either ndecimals or ndecimals and movedecimals
 		ndecimals = nextchar - '0';
@@ -464,7 +465,7 @@ std::string var::oconv_MD(const char* conversion) const {
 		// look for a second digit
 		pconversion++;
 		nextchar = *pconversion;
-		if (isdigit(nextchar)) {
+		if (std::isdigit(nextchar)) {
 			// get movedecimals
 			movedecs = nextchar - '0';
 
@@ -541,7 +542,7 @@ std::string var::oconv_MD(const char* conversion) const {
 
 	// move decimals
 	if (!dontmovepoint && movedecs != std::string::npos)
-		newmv = newmv / pow(10.0, movedecs);
+		newmv = newmv / std::pow(10.0, movedecs);
 
 	// rounding
 	//if (ndecimals != std::string::npos) {
@@ -560,7 +561,7 @@ std::string var::oconv_MD(const char* conversion) const {
 	//var part2 = newmv.field(".", 2);
 	std::string strpart1;
 	std::string strpart2;
-	std::string::size_type decpos = newmv.var_str.find('.');
+	std::size_t decpos = newmv.var_str.find('.');
 	if (decpos == std::string::npos) {
 		strpart1 = newmv.var_str;
 		strpart2 = "";
@@ -1249,17 +1250,17 @@ var var::iconv_HEX(const int ioratio) const {
 	// 8 hex digits to one wchar of size 4
 
 	// empty string in, empty string out
-	size_t endposn = var_str.size();
+	std::size_t endposn = var_str.size();
 	if (!endposn)
 		return "";
 
 	std::string textstr;
 
-	size_t posn = 0;
+	std::size_t posn = 0;
 
 	// work out how many hex digits in first character to cater for shortfall
 	// eg 7 hex digits 1234567 with ioratio of 4 would be consumed as 0123 4567
-	size_t ratio = endposn % ioratio;
+	std::size_t ratio = endposn % ioratio;
 	if (!ratio)
 		ratio = ioratio;
 

@@ -165,10 +165,10 @@
 664 bool var::starts(SV str) const 
 665 bool var::ends(SV str) const 
 666 bool var::contains(SV str) const 
-667 var var::first(const size_t length) const 
-668 VARREF var::firster(const size_t length) 
-669 var var::last(const size_t length) const 
-670 VARREF var::laster(const size_t length) 
+667 var var::first(const std::size_t length) const 
+668 VARREF var::firster(const std::size_t length) 
+669 var var::last(const std::size_t length) const 
+670 VARREF var::laster(const std::size_t length) 
 671 var var::cut(const int length) const 
 672 VARREF var::cutter(const int length) 
 673 VARREF var::substrer(const int startindex1,const int length) 

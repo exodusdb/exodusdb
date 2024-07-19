@@ -24,103 +24,17 @@ THE SOFTWARE.
 
 // clang-format off
 
-// Info used in cli/compile
-//
-#define EXODUS_RELEASE "24.07"
-#define EXODUS_PATCH "24.07.0"
-
-#include <iostream>
-//module #include <string>
-#include <string_view>
-#include <array> // used in operator<<
+import std;
+//#include <iostream>
+////module #include <string>
+//#include <string_view>
+//#include <array> // used in operator<<
 
 // var_base provides the basic var-like functionality for var
 //
 #include <exodus/vartyp.h>
 #include <exodus/varb.h>
-
-// Use ASCII 0x1A-0x1F for PickOS separator chars instead
-// of PickOS 0xFA-0xFF which are illegal utf-8 bytes
-
-// Also defined in pgexodus in extract.c etc.
-
-// The var versions of the following (without leading or trailing _)
-// are defined AFTER the class declaration of "var"
-
-// Leading _ char* versions of classic pick delimiters
-// Using macros to allow use of space as compile time concatenation operator
-// e.g. _FM _VM will compile directly to "\x1F\x1E"
-
-#define _RM "\x1F"  // Record Mark
-#define _FM "\x1E"  // Field Mark
-#define _VM "\x1D"  // Value Mark
-#define _SM "\x1C"  // Subvalue Mark
-#define _TM "\x1B"  // Text Mark
-#define _ST "\x1A"  // Subtext Mark
-
-#define _BS "\\"
-#define _DQ "\""
-#define _SQ "\'"
-
-// trailing _ char versions of classic pick delimiters
-//
-
-CONSTINIT_OR_CONSTEXPR auto RM_ = '\x1F';     // Record Mark
-CONSTINIT_OR_CONSTEXPR auto FM_ = '\x1E';     // Field Mark
-CONSTINIT_OR_CONSTEXPR auto VM_ = '\x1D';     // Value Mark
-CONSTINIT_OR_CONSTEXPR auto SM_ = '\x1C';     // Subvalue Mark
-CONSTINIT_OR_CONSTEXPR auto TM_ = '\x1B';     // Text Mark
-CONSTINIT_OR_CONSTEXPR auto ST_ = '\x1A';     // Subtext Mark
-
-CONSTINIT_OR_CONSTEXPR auto BS_ = '\\';
-CONSTINIT_OR_CONSTEXPR auto DQ_ = '\"';
-CONSTINIT_OR_CONSTEXPR auto SQ_ = '\'';
-
-// Visible versions of FM, VM etc.
-//
-// printx() converts FM etc to these characters. user literal conversion _var also has them but hard coded in fmiconverter()
-//#define _VISIBLE_FMS "_^]\[Z"  //PickOS standard. Backslash not good since it is often used for escaping chars. Z is normal letter.
-//#define _VISIBLE_FMS "<[{}]>" //logical but hard to read direction of brackets quickly
-//#define _VISIBLE_FMS "_^]}`~" //all uncommon in natural language. first 3 _^] are identical to pickos
-//#define _VISIBLE_FMS "_^]}|~"   //all uncommon in natural language. first 3 _^] are identical to pickos
-#define _VISIBLE_FMS "`^]}|~"   //all uncommon in natural language. ^] are identical to pickos. Using ` for RM since _ common in IT
-CONSTINIT_OR_CONSTEXPR auto VISIBLE_RM_ = '`';
-CONSTINIT_OR_CONSTEXPR auto VISIBLE_FM_ = '^';
-CONSTINIT_OR_CONSTEXPR auto VISIBLE_VM_ = ']';
-CONSTINIT_OR_CONSTEXPR auto VISIBLE_SM_ = '}';
-CONSTINIT_OR_CONSTEXPR auto VISIBLE_TM_ = '|';
-CONSTINIT_OR_CONSTEXPR auto VISIBLE_ST_ = '~';
-#define _ALL_FMS _RM _FM _VM _SM _TM _ST
-
-// Useful TRACE() function for debugging
-//
-#define TRACE(EXPRESSION) \
-	var(EXPRESSION).convert(_ALL_FMS, _VISIBLE_FMS).quote().logputl("TRACE: " #EXPRESSION "=");
-#define TRACE2(EXPRESSION) \
-	std::cerr << (EXPRESSION) << std::endl;
-
-// Readability for defaults
-//
-#define DEFAULT_UNASSIGNED = var()
-#define DEFAULT_EMPTY = ""
-#define DEFAULT_DOT = "."
-#define DEFAULT_SPACE = " "
-#define DEFAULT_VM = VM_
-#define DEFAULT_NULL = nullptr
-
-// Support var::format and var::println
-//
-#if __GNUC__  > 11 || __clang_major__ > 1
-#	define EXO_FORMAT
-#	ifdef EXO_FORMAT
-#		pragma GCC diagnostic ignored "-Winline"
-#		pragma clang diagnostic ignored "-Wswitch-default" //18 24.04
-#		pragma clang diagnostic ignored "-Wunsafe-buffer-usage" //18 24.04
-#		pragma clang diagnostic ignored "-Wreserved-id-macro" //18 20.04
-#		pragma clang diagnostic ignored "-Wduplicate-enum" //18 20.04
-#		include <fmt/format.h>
-#	endif
-#endif
+#include <exodus/vardefs.h>
 
 namespace exo {
 
@@ -484,8 +398,8 @@ public:
 
 	ND var first() const&; // max 1 byte
 	ND var last() const&;  // max 1 byte
-	ND var first(const size_t length) const&; // byte length
-	ND var last(const size_t length) const&;  // byte length
+	ND var first(const std::size_t length) const&; // byte length
+	ND var last(const std::size_t length) const&;  // byte length
 	ND var cut(const int length) const&;      // byte length
 	ND var paste(const int pos1, const int length, SV insertstr) const&; // byte pos1, length
 	ND var paste(const int pos1, SV insertstr) const&; // byte pos1
@@ -544,8 +458,8 @@ public:
 
 	ND VARREF first() &&;
 	ND VARREF last() &&;
-	ND VARREF first(const size_t length) &&;
-	ND VARREF last(const size_t length) &&;
+	ND VARREF first(const std::size_t length) &&;
+	ND VARREF last(const std::size_t length) &&;
 	ND VARREF cut(const int length) &&;
 	ND VARREF paste(const int pos1, const int length, SV insertstr) &&;
 	ND VARREF paste(const int pos1, SV insertstr) &&;
@@ -596,8 +510,8 @@ public:
 
 	VARREF firster();
 	VARREF laster();
-	VARREF firster(const size_t length);
-	VARREF laster(const size_t length);
+	VARREF firster(const std::size_t length);
+	VARREF laster(const std::size_t length);
 	VARREF cutter(const int length);
 	VARREF paster(const int pos1, const int length, SV insertstr);
 	VARREF paster(const int pos1, SV insertstr);
@@ -628,7 +542,7 @@ public:
 	// OTHER STRING ACCESS
 	//////////////////////
 
-	ND var hash(const uint64_t modulus = 0) const;
+	ND var hash(const std::uint64_t modulus = 0) const;
 
 	ND dim split(SV sepchar = _FM) const;
 
@@ -670,6 +584,7 @@ public:
 
 #ifdef EXO_FORMAT
 
+// Replicated in var.h and exofuncs.h - KEEP IN SYNC
 #if __GNUC__ >= 7 || __clang_major__ > 15
 	// Works at compile time (only? or if possible)
 #	define EXO_FORMAT_STRING_TYPE1 fmt::format_string<var, Args...>
@@ -973,7 +888,8 @@ template<class... Args>
 	ND bool osgetenv(const char* code);
 	   void ossetenv(const char* code) const;
 
-	friend class var_iter;
+	// friend class to iterate over the fields of a var
+	friend PUBLIC class var_iter;
 
 	//BEGIN/END - free functions to create iterators over a var
 	PUBLIC friend var_iter begin(CVR v);
@@ -1092,8 +1008,8 @@ template<class... Args>
 class PUBLIC var_iter {
 
 	const var* pvar_;
-	mutable std::string::size_type startpos_ = 0;
-	mutable std::string::size_type endpos_ = std::string::npos;
+	mutable std::size_t startpos_ = 0;
+	mutable std::size_t endpos_ = std::string::npos;
 
  public:
 	// Default constructor

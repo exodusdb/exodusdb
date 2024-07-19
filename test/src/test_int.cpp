@@ -40,15 +40,15 @@ programinit()
 
 		{  //min int64
 
-			TRACE(std::numeric_limits<int64_t>::min())
+			TRACE(std::numeric_limits<std::int64_t>::min())
 			//var i64 = -9223372036854775808L;
-			var i64_min = std::numeric_limits<int64_t>::min();
+			var i64_min = std::numeric_limits<std::int64_t>::min();
 			TRACE(i64_min)
 			i64_min.dump().outputl();
 			//assert(i64_min.toInt() eq -9223372036854775808);
 			printl("i64_min.toInt() =", i64_min.toInt());
-			//assert(i64_min.toInt()    eq std::numeric_limits<int64_t>::min());
-			assert(i64_min.toInt64()    eq std::numeric_limits<int64_t>::min());
+			//assert(i64_min.toInt()    eq std::numeric_limits<std::int64_t>::min());
+			assert(i64_min.toInt64()    eq std::numeric_limits<std::int64_t>::min());
 			assert(i64_min.toString() eq "-9223372036854775808");
 
 			try {
@@ -62,42 +62,42 @@ programinit()
 
 		{  //max int(32)
 
-			TRACE(std::numeric_limits<int32_t>::max())
+			TRACE(std::numeric_limits<std::int32_t>::max())
 			//var i32 = -9223372036854775808L;
-			var i32_max = std::numeric_limits<int32_t>::max();
+			var i32_max = std::numeric_limits<std::int32_t>::max();
 			TRACE(i32_max)
 			i32_max.dump().outputl();
 			assert(i32_max.toInt() eq 2147483647);
-			assert(i32_max.toInt()    eq std::numeric_limits<int32_t>::max());
+			assert(i32_max.toInt()    eq std::numeric_limits<std::int32_t>::max());
 			assert(i32_max.toString() eq "2147483647");
 
-			assert(static_cast<varint_t>(++i32_max) eq 2147483648);
+			assert(static_cast<exo::varint_t>(++i32_max) eq 2147483648);
 		}
 		{  //min int(32)
 
-			TRACE(std::numeric_limits<int32_t>::min())
+			TRACE(std::numeric_limits<std::int32_t>::min())
 			//var i32 = -9223372036854775808L;
-			var i32_min = std::numeric_limits<int32_t>::min();
+			var i32_min = std::numeric_limits<std::int32_t>::min();
 			TRACE(i32_min)
 			i32_min.dump().outputl();
 			assert(i32_min.toInt() eq -2147483648);
 			printl("i32_min.toInt() =", i32_min.toInt());
-			assert(i32_min.toInt()    eq std::numeric_limits<int32_t>::min());
+			assert(i32_min.toInt()    eq std::numeric_limits<std::int32_t>::min());
 			assert(i32_min.toString() eq "-2147483648");
 
-			assert(static_cast<varint_t>(--i32_min) eq -2147483649);
+			assert(static_cast<exo::varint_t>(--i32_min) eq -2147483649);
 		}
 
 		{  //max int64
 
-			TRACE(std::numeric_limits<int64_t>::max())
+			TRACE(std::numeric_limits<std::int64_t>::max())
 			//var i64 = -9223372036854775808L;
-			var i64_max = std::numeric_limits<int64_t>::max();
+			var i64_max = std::numeric_limits<std::int64_t>::max();
 			TRACE(i64_max)
 			i64_max.dump().outputl();
 			//assert(i64_max.toInt() eq -9223372036854775808);
-			//assert(i64_max.toInt()    eq std::numeric_limits<int64_t>::max());
-			assert(i64_max.toInt64()    eq std::numeric_limits<int64_t>::max());
+			//assert(i64_max.toInt()    eq std::numeric_limits<std::int64_t>::max());
+			assert(i64_max.toInt64()    eq std::numeric_limits<std::int64_t>::max());
 			assert(i64_max.toString() eq "9223372036854775807");
 
 			try {

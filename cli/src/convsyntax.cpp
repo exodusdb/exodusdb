@@ -1,3 +1,5 @@
+#include <vector>
+
 #include <exodus/program.h>
 programinit()
 

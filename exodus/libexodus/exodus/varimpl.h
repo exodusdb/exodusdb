@@ -11,12 +11,12 @@ namespace exo {
 // SIMILAR code in exofuncs.h and varimpl.h
 // all defined to allow compile time concatenation
 #if defined _MSC_VER || defined __CYGWIN__ || defined __MINGW32__
-#	define _EOL      "\r\n"
+//#	define _EOL      "\r\n"
 #	define _OSSLASH  "\\"
 #	define  OSSLASH_ '\\'
 #	define  SLASH_IS_BACKSLASH true
 #else
-#	define _EOL      "\n"
+//#	define _EOL      "\n"
 #	define _OSSLASH  "/"
 #	define  OSSLASH_ '/'
 #	define  SLASH_IS_BACKSLASH false

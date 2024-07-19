@@ -500,8 +500,8 @@ function main_init() {
 	stack = "";
 	// call programstackstack);
 
-	//nextconnection.connect(getenv("EXO_DATA"));
-	if (not nextconnection.connect(getenv("EXO_DATA")))
+	//nextconnection.connect(osgetenv("EXO_DATA"));
+	if (not nextconnection.connect(osgetenv("EXO_DATA")))
 		loglasterror();
 
 	return true;

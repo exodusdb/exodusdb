@@ -45,6 +45,9 @@ import std;
 //module #include <iostream>
 //module #include <string>
 
+#include <exodus/exocallable.h>
+#include <exodus/exoenv.h>
+
 //////////
 // WINDOWS
 //////////
@@ -95,10 +98,6 @@ import std;
 static std::mutex global_mutex_lockdlcache;
 //#define LOCKDLCACHE std::lock_guard<std::mutex> guard(global_mutex_lockdlcache);
 #define LOCKDLCACHE std::lock_guard guard(global_mutex_lockdlcache);
-
-#include <exodus/varimpl.h>
-#include <exodus/exoenv.h>
-#include <exodus/exocallable.h>
 
 namespace exo {
 
@@ -444,7 +443,7 @@ bool Callable::openlib(const std::string newlibname) {
 	std::string purelibfilename;
 	if (plib_ == nullptr) {
 
-		fnpos0 = libfilepath_.rfind('/'/*OSSLASH_*/);
+		fnpos0 = libfilepath_.rfind(OSSLASH_);
 		if (fnpos0 != std::string::npos && fnpos0 != libfilepath_.size() - 1) {
 
 			// In two places

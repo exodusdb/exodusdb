@@ -31,11 +31,15 @@ THE SOFTWARE.
 // clang-format off
 
 import std;
-//module #include <iostream>
-//module #include <string>
-//module #include <string_view>
+//#include <iostream>
+//#include <fstream>
+#include <iomanip>
+//#include <string>
+//#include <string_view>
 
-using SV = std::string_view;
+namespace exo {
+	using SV = std::string_view;
+}
 
 //#if __has_include(<concepts>)
 //#	include <concepts>
@@ -161,7 +165,7 @@ using SV = std::string_view;
 //
 #ifdef EXO_SNITCH
 #	undef EXO_SNITCH
-#include <iomanip>
+//#include <iomanip>
 #	define EXO_SNITCH(FUNC) std::clog << this << " " << FUNC << " " << var_typ << " " << std::setw(10) << var_int << " " << std::setw(10) << var_dbl << " '" << var_str << "' " << std::endl;
 #	define EXO_SNITCHING
 #else
@@ -185,7 +189,8 @@ namespace exo {
 //#define SMALLEST_NUMBER 1e-10
 //#define SMALLEST_NUMBER 2.91E-11 (2^-35) or 0.000'000'000'029'1
 //#define SMALLEST_NUMBER 1e-4d//0.0001 for pickos compatibility
-constexpr double SMALLEST_NUMBER = 0.0001;// for pickos compatibility
+//PUBLIC CONSTINIT_OR_CONSTEXPR double SMALLEST_NUMBER = 0.0001;// for pickos compatibility
+inline const double SMALLEST_NUMBER = 0.0001;// for pickos compatibility
 
 // Forward declarations
 
@@ -227,7 +232,7 @@ template<typename var> class var_mid; // forward declaration of a class template
 //                     ---
 // var_base:            52
 
-using varint_t = int64_t;
+using varint_t = std::int64_t;
 
 // Hard coding to avoid including <limits>
 // #define VAR_MAX_DOUBLE std::numeric_limits<varint_t>::max()
@@ -596,20 +601,20 @@ class PUBLIC var_base {
 		EXO_SNITCH("var_base Str ")
 	}
 
-//	// only for g++12 which cant constexpr from cstr
-//	// char*
-//	/////////
-//	CONSTEXPR
-//	var_base(const char* cstr1)
-//		:
-//		var_str(cstr1),
-//		var_typ(VARTYP_STR){
-//	}
+	// only for g++12 which cant constexpr from cstr
+	// char*
+	/////////
+	CONSTEXPR
+	var_base(const char* cstr1)
+		:
+		var_str(cstr1),
+		var_typ(VARTYP_STR){
+	}
 
 	// memory block
 	///////////////
 	CONSTEXPR // but new std::string?
-	var_base(const char* charstart, const size_t nchars)
+	var_base(const char* charstart, const std::size_t nchars)
 		:
 		var_typ(VARTYP_STR) {
 
@@ -720,7 +725,7 @@ class PUBLIC var_base {
 	//int64_t toInt() const;
 	int toInt() const;
 
-	int64_t toInt64() const;
+	std::int64_t toInt64() const;
 
 	double toDouble() const;
 

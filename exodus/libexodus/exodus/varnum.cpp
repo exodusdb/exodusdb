@@ -39,7 +39,7 @@ THE SOFTWARE.
 // 1. TO_CHARS from Ubuntu 22.04
 #if __GNUC__ >= 11 || __clang_major__ >=  14
 #define USE_TO_CHARS
-#include <array>
+//#include <array>
 
 // 2. RYU
 #elif __has_include(<ryu/ryu.h>)
@@ -50,10 +50,10 @@ THE SOFTWARE.
 #else
 #endif
 
-#include <limits> //for std::numeric_limits<double>::digits10
+//#include <limits> //for std::numeric_limits<double>::digits10
 
 //module #include <string>
-#include <sstream>
+//#include <sstream>
 
 //fastfloat  "1234.5678" -> 1234.5678  56ns (but does it round trip?)
 //ryu        "1234.5678" -> 1234.5678 184ns
@@ -89,7 +89,7 @@ THE SOFTWARE.
 #endif
 
 //gcc 10 doesnt include conv from and to floating point
-#include <charconv>	 // for from_chars and to_chars
+//#include <charconv>	 // for from_chars and to_chars
 
 #ifndef M_PI
 //#define M_PI 3.14159265358979323846f
@@ -800,7 +800,7 @@ var var::round(const int ndecimals) const {
 			return result;
 		}
 
-		// loss of precision if var_int is uint64_t
+		// loss of precision if var_int is std::uint64_t
 		fromdouble = static_cast<double>(var_int);
 	}
 

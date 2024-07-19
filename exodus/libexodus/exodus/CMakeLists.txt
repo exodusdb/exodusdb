@@ -325,13 +325,14 @@
 #
 	install(
 		FILES
-			varb.h
-			var.h
-			vartyp.h
-			varerr.h
-			varfriends.h
-			dim.h
-			rex.h
+#			varb.h
+#			var.h
+#			vartyp.h
+#			varerr.h
+#			varfriends.h
+#			dim.h
+#			rex.h
+			vardefs.h
 			exodus.h
 			range.h
 			exoimpl.h

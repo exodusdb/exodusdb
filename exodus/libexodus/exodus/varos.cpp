@@ -817,7 +817,7 @@ bool var::osbread(CVR osfilevar, VARREF offset, const int bytesize) {
 		// pmyfile->seekg (static_cast<long> (offset.var_int), std::ios::beg);	//
 		// 'std::streampos' usually 'long' seekg always seems to result in tellg being -1 in
 		// linux (Ubunut 10.04 64bit)
-		pmyfile->rdbuf()->pubseekpos(static_cast<uint64_t>(offset.var_int));
+		pmyfile->rdbuf()->pubseekpos(static_cast<std::uint64_t>(offset.var_int));
 	}
 	// var((int) pmyfile->tellg()).outputl("2 tellg=");
 

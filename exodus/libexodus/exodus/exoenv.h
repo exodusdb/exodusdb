@@ -24,24 +24,12 @@ THE SOFTWARE.
 #define EXOENV_H 1
 
 import std;
+//#include <string>
+//#include <map>
 
-//#undef eq
-//module #include <iostream>
-
-// Using map for dllib cache instead of unordered_map since it is faster
-// up to about 400 elements according to https://youtu.be/M2fKMP47slQ?t=258
-// and perhaps even more since it doesnt require hashing time.
-// Perhaps switch to this https://youtu.be/M2fKMP47slQ?t=476
-//#include <unordered_map>
-//module #include <map>
-
-//#include <vector>
-//#define eq ==
-
-import var;//#include <exodus/var.h>
-//import exo:dim;//#include <exodus/dim.h>
-#include <exodus/rex.h>
+#include <exodus/exoimpl.h>
 #include <exodus/exocallable.h>
+#include <exodus/vardefs.h>
 
 namespace exo {
 

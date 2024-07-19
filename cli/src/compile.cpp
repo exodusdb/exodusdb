@@ -319,7 +319,8 @@ function main() {
 		linkoptions = "  -lexodus -lexovar -lstd -lstdc++fs -lstdc++";
 
 //#if __has_include(<fmt/core.h>)
-#if EXO_FORMAT == 2
+//#if EXO_FORMAT == 2
+#if defined(EXO_FORMAT) && EXO_FORMAT == 2
 		linkoptions ^= " -lfmt ";
 #endif
 

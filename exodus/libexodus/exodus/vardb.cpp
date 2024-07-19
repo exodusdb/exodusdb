@@ -156,7 +156,7 @@ Within transactions, lock requests for locks that have already been obtained alw
 
 import std;
 
-//module #include <cstring>	//for strcmp strlen
+//module #include <cstring>	//for std::strcmp strlen
 
 //module //module #include <string>
 //module #include <string_view>
@@ -212,7 +212,7 @@ import std;
 	static const uint32_t murmurhash_seed = 0xf00dba11;
 
 #elif defined(USE_MURMURHASH2)
-#	include "murmurhash2_64.h" // it has included in vardbconn.h (uint64_t defined)
+#	include "murmurhash2_64.h" // it has included in vardbconn.h (std::uint64_t defined)
 
 #else
 	// c++ std Hash functions are only required to produce the same result for the same input within a single execution of a program;
@@ -336,29 +336,29 @@ static const var valuechars("\"'.0123456789-+");
 
 // hash64 a std::string
 ///////////////////////
-static uint64_t mvdbpostgres_hash_stdstr(std::string str1) {
+static std::uint64_t mvdbpostgres_hash_stdstr(std::string str1) {
 
 #if defined(USE_WYHASH)
 	return wyhash(str1.data(), str1.size(), 0, _wyp);
 
 #elif defined(USE_MURMURHASH3)
 
-//	uint64_t u128[2];
+//	std::uint64_t u128[2];
 //	MurmurHash3_x64_128(str1.data(), static_cast<int>(str1.size()), murmurhash_seed, u128);
 //
-//	static_cast<uint64_t*>(u128)[0] ^= static_cast<uint64_t*>(u128)[1];
-//	return static_cast<uint64_t*>(u128)[0];
+//	static_cast<std::uint64_t*>(u128)[0] ^= static_cast<std::uint64_t*>(u128)[1];
+//	return static_cast<std::uint64_t*>(u128)[0];
 
-	// Pass two uint64_t to MurmurHash3
-	std::array<uint64_t, 2> u128;
+	// Pass two std::uint64_t to MurmurHash3
+	std::array<std::uint64_t, 2> u128;
 
 	// MurmurHash3
 	MurmurHash3_x64_128(str1.data(), static_cast<int>(str1.size()), murmurhash_seed, &u128[0]);
 
 	// From the MurmurHash3 function's finalizer.
 	//
-	//  ((uint64_t*)out)[0] = h1;
-	//  ((uint64_t*)out)[1] = h2;
+	//  ((std::uint64_t*)out)[0] = h1;
+	//  ((std::uint64_t*)out)[1] = h2;
 
 	// Return a mix of first 64 bits with last 64 bits using xor because we can only return 64 bits
 	return u128[0] ^ u128[1];
@@ -375,7 +375,7 @@ static uint64_t mvdbpostgres_hash_stdstr(std::string str1) {
 /////////////////////////////
 // Create a cross platform stable unique lock number per filename & key to manipulate advisory locks on a postgres connection
 // TODO Provide an endian identical version. required if and when exodus processes connect to postgres from different endian hosts
-static uint64_t mvdbpostgres_hash_file_and_key(CVR filehandle, CVR key) {
+static std::uint64_t mvdbpostgres_hash_file_and_key(CVR filehandle, CVR key) {
 
 	// Use the pure filename and disregard any connection number
 	std::string fileandkey = get_normal_filename(filehandle);
@@ -1676,7 +1676,7 @@ bool var::read(CVR filehandle, CVR key) {
 	return true;
 }
 
-var var::hash(const uint64_t modulus) const {
+var var::hash(const std::uint64_t modulus) const {
 
 	THISIS("var var::hash() const")
 	assertDefined(function_sig);
@@ -1687,18 +1687,18 @@ var var::hash(const uint64_t modulus) const {
 	// std::string tempstr=this->normalize();
 
 //
-//	// uint64_t
+//	// std::uint64_t
 //	// hash64=MurmurHash64((wchar_t*)fileandkey.data(),static_cast<int>(fileandkey.size()*sizeof(wchar_t)),0);
 //
 //#if defined(USE_WYHASH)
-//	uint64_t hash64 = wyhash(var_str.data(), var_str.size(), 0, _wyp);
+//	std::uint64_t hash64 = wyhash(var_str.data(), var_str.size(), 0, _wyp);
 //#elif defined(USE_MURMURHASH)
-//	uint64_t hash64 = MurmurHash64(var_str.data(), static_cast<int>(var_str.size()), 0);
+//	std::uint64_t hash64 = MurmurHash64(var_str.data(), static_cast<int>(var_str.size()), 0);
 //#else
-//	uint64_t hash64 = std::hash<std::string>{}(var_str);
+//	std::uint64_t hash64 = std::hash<std::string>{}(var_str);
 //#endif
 //
-	uint64_t hash64 = mvdbpostgres_hash_stdstr(this->var_str);
+	std::uint64_t hash64 = mvdbpostgres_hash_stdstr(this->var_str);
 
 	if (modulus)
 		return var_int = hash64 % modulus;
@@ -1757,7 +1757,7 @@ var var::lock(CVR key) const {
 
 	// Parameter array
 	const char* paramValues[] = {reinterpret_cast<char*>(&hash64)};
-	int paramLengths[] = {sizeof(uint64_t)};
+	int paramLengths[] = {sizeof(std::uint64_t)};
 	int paramFormats[] = {1};  // binary
 
 	// Locks outside transactions remain for the duration of the connection and can be unlocked/relocked or unlockall'd
@@ -1789,7 +1789,7 @@ var var::lock(CVR key) const {
 
 	// Add to lock cache if successful
 	if (*PQgetvalue(dbresult, 0, 0) != 0) {
-		std::pair<const uint64_t, int> lock(hash64, 0);
+		std::pair<const std::uint64_t, int> lock(hash64, 0);
 		dbconn->locks_.insert(lock);
 		return 1;
 	}
@@ -1834,7 +1834,7 @@ bool var::unlock(CVR key) const {
 
 	// Parameter array
 	const char* paramValues[] = {reinterpret_cast<char*>(&hash64)};
-	int paramLengths[] = {sizeof(uint64_t)};
+	int paramLengths[] = {sizeof(std::uint64_t)};
 	int paramFormats[] = {1};//binary
 
 	// $1=hashed filename and key
@@ -2084,7 +2084,7 @@ bool var::write(CVR filehandle, CVR key) const {
 	}
 
 	// success if inserted or updated 1 record
-	//return strcmp(PQcmdTuples(dbresult), "1") != 0;
+	//return std::strcmp(PQcmdTuples(dbresult), "1") != 0;
 
 	return true;
 }
@@ -2143,7 +2143,7 @@ bool var::updaterecord(CVR filehandle, CVR key) const {
 	}
 
 	// if not updated 1 then fail
-	if (strcmp(PQcmdTuples(dbresult), "1") != 0) {
+	if (std::strcmp(PQcmdTuples(dbresult), "1") != 0) {
 		var("ERROR: mvdbpostgres update(" ^ filehandle.convert(_FM, "^") ^
 			", " ^ key ^ ") Failed: " ^ var(PQntuples(dbresult)) ^ " " ^
 			var(PQerrorMessage(pgconn)))
@@ -2216,7 +2216,7 @@ bool var::insertrecord(CVR filehandle, CVR key) const {
 	}
 
 	// if not updated 1 then fail
-	if (strcmp(PQcmdTuples(dbresult), "1") != 0) {
+	if (std::strcmp(PQcmdTuples(dbresult), "1") != 0) {
 		var("ERROR: mvdbpostgres insertrecord(" ^ filehandle.convert(_FM, "^") ^
 			", " ^ key ^ ") Failed: " ^ var(PQntuples(dbresult)) ^ " " ^
 			var(PQerrorMessage(pgconn)))
@@ -2284,7 +2284,7 @@ bool var::deleterecord(CVR key) const {
 
 	// if not updated 1 then fail
 	bool result;
-	if (strcmp(PQcmdTuples(dbresult), "1") != 0) {
+	if (std::strcmp(PQcmdTuples(dbresult), "1") != 0) {
 		if (DBTRACE)
 			var("var::deleterecord(" ^ this->convert(_FM, "^") ^ ", " ^ key ^
 				") failed. Record does not exist")

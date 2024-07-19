@@ -27,18 +27,15 @@ THE SOFTWARE.
 // NOTE exodus.h MUST be included LAST to avoid its macros causing problems in standard libraries
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
-// Must be before exodus macros and functions otherwise lots of errors
-// from standard libararies which are included here
-//
-import var;//#include <exodus/varerr.h>
-#include <exodus/exoenv.h>
+import var;
+#include <exodus/vardefs.h>
+
+#include <exodus/exoimpl.h>
 #include <exodus/exocallable.h>
 #include <exodus/exoprog.h>
 
-// Always last to avoid conflicting definitions
 #include <exodus/exofuncs.h>
 #include <exodus/exomacros.h>
-#include <exodus/exoimpl.h>
 #include <exodus/range.h>
 
 // It usually poor practice to "pollute" the global space of the header user
