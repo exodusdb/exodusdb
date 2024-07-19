@@ -1,10 +1,13 @@
 #ifndef CARGS_H
 #define CARGS_H 1
 
-import std;
-//module #include <list>
-//module #include <string>
-//#include <vector>
+#ifdef EXO_MODULE
+	import std;
+#else
+#	include <list>
+#	include <string>
+#	include <vector>
+#endif
 
 #include <exodus/var.h>
 

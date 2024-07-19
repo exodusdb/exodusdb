@@ -30,21 +30,25 @@
 //Requirement 11. ConnectionLockss (which accompany DB table locks), are added to connection table and
 //					stored/deleted within connection record
 
-import std;
+#ifdef EXO_MODULE
+	import std;
+#else
+#	include <string>
+
+	// Using map generally instead of unordered_map since it is faster
+	// up to about 400 elements according to https://youtu.be/M2fKMP47slQ?t=258
+	// and perhaps even more since it doesnt require hashing time.
+	// Perhaps switch to this https://youtu.be/M2fKMP47slQ?t=476
+#	include <map>
+
+#endif
+
 
 //for postgresql's PGconn connection handle type
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wreserved-identifier"
 #include <libpq-fe.h>
 #pragma clang diagnostic push
-
-//module #include <string>
-
-// Using map generally instead of unordered_map since it is faster
-// up to about 400 elements according to https://youtu.be/M2fKMP47slQ?t=258
-// and perhaps even more since it doesnt require hashing time.
-// Perhaps switch to this https://youtu.be/M2fKMP47slQ?t=476
-//module #include <map>
 
 #include <exodus/var.h>
 

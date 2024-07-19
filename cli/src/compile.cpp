@@ -315,8 +315,13 @@ function main() {
 		//else
 		//linkoptions = " -lexodus -lstdc++fs -lpthread";
 
+		linkoptions = "  -lexodus";
+
 		// Precompiled modules need -f ... var.pcm and -l ... libexovar.so
-		linkoptions = "  -lexodus -lexovar -lstd -lstdc++fs -lstdc++";
+#ifdef EXO_MODULE
+		linkoptions ^= " -lexovar -lstd";
+#endif
+		linkoptions ^= " -lstdc++fs -lstdc++";
 
 //#if __has_include(<fmt/core.h>)
 //#if EXO_FORMAT == 2
@@ -375,9 +380,12 @@ function main() {
 #endif
 
 		// Precompiled modules need -f ... var.pcm and -l ... libexovar.so
+#ifdef EXO_MODULE
+		// Perpetuate EXO_MODULE as at original build time of compile
+		basicoptions ^= " -DEXO_MODULE";
 		basicoptions ^= " -fmodule-file=var=/usr/local/lib/var.pcm";
 		basicoptions ^= " -fmodule-file=std=/usr/local/lib/std.pcm";
-
+#endif
 		if (color_option)
 			basicoptions ^= " -fdiagnostics-color=always";
 

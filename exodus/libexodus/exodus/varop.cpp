@@ -20,16 +20,19 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-import std;
-//#include <iostream>
-////module #include <string>
-//#include <utility> // for std::move
-//#include <array>
+#ifdef EXO_MODULE
+	import std;
+#else
+#	include <iostream>
+#	include <string>
+//#	include <utility> // for std::move
+//#	include <array>
 //
-////#include <cassert>
-//#include <limits>
+//#include <cassert>
+#	include <limits>
 ////#include <sstream>
 ////#include <vector>
+#endif
 
 #include <exodus/var.h>
 #include <exodus/varerr.h>

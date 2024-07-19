@@ -30,20 +30,27 @@ THE SOFTWARE.
 
 // clang-format off
 
-import std;
-//#include <iostream>
-//#include <fstream>
-#include <iomanip>
-//#include <string>
-//#include <string_view>
+#ifdef EXO_MODULE
+	import std;
+#	include <iomanip> // Here only to solve some inability to manually create a std module
+#else
+#	include <cstdint> // for std::int64_t etc.
+//#	include <cmath>   // for std::fmod etc.
+//#	include <cstring> // for std::strstr etc.
+
+#	include <iostream>
+#	include <fstream>
+#	include <string>
+#	include <string_view>
+#	include <iomanip>
+#	if __has_include(<concepts>)
+#		include <concepts>
+#	endif
+#endif
 
 namespace exo {
 	using SV = std::string_view;
 }
-
-//#if __has_include(<concepts>)
-//#	include <concepts>
-//#endif
 
 #if __cpp_lib_concepts >= 201907L && ( __GNUC__ > 10 || __clang_major__ > 1 )
 #	define EXO_CONCEPTS
@@ -136,13 +143,7 @@ namespace exo {
 
 // vartype
 //
-#define xEXO_IMPORT import
-#ifdef EXO_IMPORT
-//	EXO_IMPORT vartyp;
-	import vartyp;
-#else
-	#include <exodus/vartyp.h>
-#endif
+#include <exodus/vartyp.h>
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wreserved-id-macro"

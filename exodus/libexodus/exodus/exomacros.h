@@ -30,9 +30,13 @@ THE SOFTWARE.
 // header file.
 // You can program without exodus macros by including var.h directly
 
-import var;//#include <exodus/var.h>
-#include <exodus/exocallable.h>
+#ifdef EXO_MODULE
+	import var;
+#else
+#	include <exodus/var.h>
+#endif
 
+#include <exodus/exocallable.h>
 
 // Order of C++ standard includes
 // ==============================
@@ -148,7 +152,6 @@ namespace exo {
 #define from ,
 #define with ,
 #define to ,
-
 
 // Environment variables
 // =====================

@@ -20,10 +20,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-//module #include <string>
-
-//module #include <algorithm>  //for dim::sort
-//#include <cstring>	  //for strlen strstr
+#ifdef EXO_MODULE
+#else
+//#	include <string>
+#	include <algorithm>  //for dim::sort
+#	include <cstring>	  //for strlen strstr
+#endif
 
 #ifdef __has_include
 #	if __has_include(<version>)

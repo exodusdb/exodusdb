@@ -38,14 +38,17 @@ THE SOFTWARE.
 //#include <vector>
 //#define eq ==
 
-import std;
+#ifdef EXO_MODULE
+	import std;
 
-import var;
-#include <exodus/vardefs.h>
-//#include <exodus/var.h>
-//import exo:dim;//#include <exodus/dim.h>
-
+	import var;
+#else
+#	include <exodus/var.h>
+//#include <exodus/dim.h>
 //#include <exodus/rex.h>
+#endif
+
+#include <exodus/vardefs.h>
 
 // Visibility
 //

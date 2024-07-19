@@ -31,6 +31,11 @@ THE SOFTWARE.
     //v.isnum();         //+???ns (???ns using <charconv> from_chars)
 */
 
+#ifdef EXO_MODULE
+#else
+#	include <charconv>
+#endif
+
 // Use ryu if GNUC < 11 and ryu include available
 //ryu            1234.5678 -> "1234.5678" 500ns
 //ryu_printf     1234.5678 -> "1234.5678" 800ns
@@ -698,9 +703,9 @@ template<> PUBLIC int VARBASE1::toInt() const {
 // var::toInt64
 ///////////////
 
-template<> PUBLIC int64_t VARBASE1::toInt64() const {
+template<> PUBLIC std::int64_t VARBASE1::toInt64() const {
 	this->assertInteger(__PRETTY_FUNCTION__);
-	return static_cast<int64_t>(*this);
+	return static_cast<std::int64_t>(*this);
 }
 
 ////////////////

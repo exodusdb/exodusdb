@@ -20,24 +20,27 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-import std;
-//module #include <sys/types.h>
+#ifdef EXO_MODULE
+	import std;
+#else
+#	include <sys/types.h>
+#	include <algorithm>  //for count in osrename
+#	include <fstream>
+#	include <iostream>
+#	include <locale>
+#	include <mutex>
+#	include <filesystem>
+#	include <chrono>
+#	include <memory>
+#	include <string>
+#	include <algorithm>
+#	include <vector>
+#	include <codecvt>
+#endif
+
 #include <sys/stat.h>
 #include <unistd.h> //for close()
 #include <fnmatch.h> //for fnmatch() globbing
-
-//module #include <algorithm>  //for count in osrename
-//module #include <fstream>
-//module #include <iostream>
-//module #include <locale>
-//module #include <mutex>
-//module #include <filesystem>
-//module #include <chrono>
-//module #include <memory>
-//module #include <string>
-//module #include <algorithm>
-//#include <vector>
-//#module #include <codecvt>
 
 //used to convert to and from utf8 in osread and oswrite
 //#include <boost/detail/utf8_codecvt_facet.hpp>

@@ -1,8 +1,12 @@
 #ifndef VARDIM_H
 #define VARDIM_H
 
-import std;//#include <vector>
-//module #include <initializer_list>;
+#ifdef EXO_MODULE
+	import std;
+#else
+#	include <vector>
+#	include <initializer_list>
+#endif
 
 #include <exodus/var.h>
 

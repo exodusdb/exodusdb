@@ -20,15 +20,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-import std;
-
-//#include <cstdlib>
-#include <new> // for std::bad_alloc
-
-//#include <bits/stl_algo.h>
-//module #include <algorithm>
-//module #include <random>
-//module #include <memory>
+#ifdef EXO_MODULE
+	import std;
+#	include <new> // for std::bad_alloc
+#else
+#	include <cstdlib>
+#	include <algorithm>
+#	include <random>
+#	include <memory>
+#endif
 
 #include <exodus/varimpl.h>
 #include <exodus/dim.h>

@@ -20,13 +20,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-import std;
 #include <unistd.h> //for getpid
-
-//module #include <thread> //for sleep
-//module #include <chrono>
-//module #include <random>
-//module #include <memory> //for make_unique
+#ifdef EXO_MODULE
+	import std;
+#else
+#	include <thread> //for sleep
+#	include <chrono>
+#	include <random>
+#	include <memory> //for make_unique
+#endif
 
 #include <exodus/var.h>
 #include <exodus/varimpl.h>

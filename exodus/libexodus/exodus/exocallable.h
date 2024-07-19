@@ -73,8 +73,13 @@ dictexit(bbb)
 #ifndef EXODUS_LIBEXODUS_EXODUS_EXOCALLABLE_H_
 #define EXODUS_LIBEXODUS_EXODUS_EXOCALLABLE_H_
 
-import var;
-//#include <exodus/var.h>
+#ifdef EXO_MODULE
+	import var;
+#else
+#	include <mutex>
+#	include <exodus/var.h>
+#endif
+
 #include <exodus/exoimpl.h>
 
 // good programming practice to prevent many white hairs

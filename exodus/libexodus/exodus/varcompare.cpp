@@ -20,11 +20,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-import std;
-//#include <iostream>
-////module #include <string>
-//
-//#include <limits>
+#ifdef EXO_MODULE
+	import std;
+#else
+#	include <iostream>
+#	include <string>
+#	include <limits>
+#endif
 
 #include <exodus/var.h>
 //import exovar;

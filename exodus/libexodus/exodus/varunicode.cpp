@@ -1,4 +1,6 @@
-import std;
+#ifdef EXO_MODULE
+	import std;
+#endif
 ////#include <wctype.h>
 //
 //#if defined(_MSC_VER)

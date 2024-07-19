@@ -1,4 +1,7 @@
-import std;
+#ifdef EXO_MODULE
+	import std;
+#endif
+
 #include <poll.h>
 #include <sys/inotify.h>
 #include <termios.h>

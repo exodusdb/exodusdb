@@ -154,21 +154,22 @@ Within transactions, lock requests for locks that have already been obtained alw
 
 */
 
-import std;
+#ifdef EXO_MODULE
+	import std;
+#else
+#	include <cstring>	//for std::strcmp strlen
 
-//module #include <cstring>	//for std::strcmp strlen
-
-//module //module #include <string>
-//module #include <string_view>
-//module #include <array>
+#	include <string>
+#	include <string_view>
+#	include <array>
+#	include <iostream>
 
 // Using map for caches instead of unordered_map since it is faster
 // up to about 400 elements according to https://youtu.be/M2fKMP47slQ?t=258
 // and perhaps even more since it doesnt require hashing time.
-// Perhaps switch to this https://youtu.be/M2fKMP47slQ?t=476
-//#include <unordered_map>
-//module #include <map>
-//module #include <utility> //for pair
+#	include <map>
+#	include <utility> //for pair
+#endif
 
 #if defined _MSC_VER  // || defined __CYGWIN__ || defined __MINGW32__
 #define WIN32_LEAN_AND_MEAN
@@ -176,8 +177,6 @@ import std;
 #include <windows.h>
 #else
 #endif
-
-//module #include <iostream>
 
 // To see Postgres PQlib calls
 //////////////////////////////

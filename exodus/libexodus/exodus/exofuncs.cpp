@@ -20,11 +20,16 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-//#include <cstdlib> //for atexit()
+#ifdef EXO_MODULE
+	import var;
+#else
+#	include <cstdlib> //for atexit()
+#	include <exodus/var.h>
+#	include <exodus/dim.h>
+#	include <exodus/rex.h>
+#endif
 
-import var;//#include <exodus/var.h>
 #include <exodus/exoenv.h>
-//#include <exodus/rex.h>
 
 #define EXO_FUNCS_CPP
 #include <exodus/exofuncs.h>

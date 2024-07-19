@@ -24,11 +24,14 @@ THE SOFTWARE.
 
 // clang-format off
 
-import std;
-//#include <iostream>
-////module #include <string>
-//#include <string_view>
-//#include <array> // used in operator<<
+#ifdef EXO_MODULE
+	import std;
+#else
+#	include <iostream>
+#	include <string>
+#	include <string_view>
+#	include <array> // used in operator<<
+#endif
 
 // var_base provides the basic var-like functionality for var
 //

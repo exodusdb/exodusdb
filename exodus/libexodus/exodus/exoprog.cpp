@@ -1,4 +1,8 @@
-#include <string>
+#ifdef EXO_MODULE
+#else
+#	include <exodus/dim.h>
+#	include <exodus/rex.h>
+#endif
 
 #include <exodus/exoprog.h>
 
@@ -10,9 +14,6 @@
 
 // Putting various member functions into all exodus programs allows access to the mv environment
 // variable which is also available in all exodus programs.
-
-//#include <unordered_map>
-//#include <utility> // for std::unreachable
 
 namespace exo {
 

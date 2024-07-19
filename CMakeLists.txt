@@ -68,8 +68,8 @@
 	# man cmake-cxxmodules
 	# See CMP0155 scanning defaults to yes for c++20 files from cmake 3.28 onwards
 	# Why is this required then?
-#	set(CMAKE_CXX_SCAN_FOR_MODULES OFF)
-	set(CMAKE_CXX_SCAN_FOR_MODULES ON)
+	set(CMAKE_CXX_SCAN_FOR_MODULES OFF)
+#	set(CMAKE_CXX_SCAN_FOR_MODULES ON)
 	message("CMAKE_CXX_SCAN_FOR_MODULES is ${CMAKE_CXX_SCAN_FOR_MODULES}")
 
 	# Allow lower C++ versions

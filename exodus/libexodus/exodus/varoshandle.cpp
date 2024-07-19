@@ -1,14 +1,17 @@
 //
 // Copyright (c) 2010 steve.bush@neosys.com
 //
-//module #include <algorithm>
-//module #include <cassert>
+#ifdef EXO_MODULE
+#else
+#	include <cstring>
+//#	include <algorithm>
+#	include <mutex>
+#endif
 
 #define INSIDE_VAR_OSHANDLE_CPP  // global obj in "varoshandle.h"
 #include "varoshandle.h"
 
-//module #include <mutex>
-// TODO double check that this does need to be thread_local
+// TODO double check if this should be thread_local
 std::mutex mvhandles_mutex;
 
 #define HANDLES_CACHE_SIZE 3
@@ -24,7 +27,6 @@ VarOSHandlesCache::VarOSHandlesCache()
 
 int VarOSHandlesCache::add_handle(CACHED_HANDLE handle_to_cache, DELETER_AND_DESTROYER del, std::string name) {
 
-	//assert(del);
 	if (!del)
 		throw VarDBException(std::string(__PRETTY_FUNCTION__).append(" del is missing."));
 
@@ -54,7 +56,6 @@ CACHED_HANDLE VarOSHandlesCache::get_handle(int index, std::string name) {
 
 void VarOSHandlesCache::del_handle(int index) {
 	//std::lock_guard lock(mvhandles_mutex);
-	//assert(conntbl[index].deleter);
 	if (!conntbl[index].deleter)
 		throw VarDBException(std::string(__PRETTY_FUNCTION__).append(" deleter is missing."));
 	if (conntbl[index].deleter) {

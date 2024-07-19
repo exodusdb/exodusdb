@@ -1,23 +1,25 @@
 #ifndef EXODUS_LIBEXODUS_EXODUS_EXOPROG_H_
 #define EXODUS_LIBEXODUS_EXODUS_EXOPROG_H_
 
-//import std;
-
-//module #include <string>
+#ifdef EXO_MODULE
+	import std;
+#else
+#	include <string>
 
 // Using map for dict function cache instead of unordered_map since it is faster
 // up to about 400 elements according to https://youtu.be/M2fKMP47slQ?t=258
 // and perhaps even more since it doesnt require hashing time.
-// Perhaps switch to this https://youtu.be/M2fKMP47slQ?t=476
-//#include <unordered_map>
-//module #include <map>
+// https://youtu.be/M2fKMP47slQ?t=476
+#	include <map>
+//#include <exodus/exocallable.h>
+//#include "timeaccount.h"
+
+#	include <exodus/var.h>
+#endif
 
 #include <exodus/exoimpl.h>
 #include <exodus/exoenv.h>
 #include <exodus/vardefs.h>
-
-//#include <exodus/exocallable.h>
-//#include "timeaccount.h"
 
 namespace exo {
 

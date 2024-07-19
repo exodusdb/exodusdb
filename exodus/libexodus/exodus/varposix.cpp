@@ -1,8 +1,12 @@
-import std;
+#ifdef EXO_MODULE
+	import std;
+#else
+#	include <filesystem>
+#endif
+
 #include <cassert> // for assert
 #include <limits.h> // for HOST_NAME_MAX
 #include <unistd.h> // for getpid
-//#include <filesystem>
 
 // Abbreviated namespace
 namespace fs = std::filesystem;

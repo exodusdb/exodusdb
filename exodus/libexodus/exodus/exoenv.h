@@ -23,9 +23,12 @@ THE SOFTWARE.
 #ifndef EXOENV_H
 #define EXOENV_H 1
 
-import std;
-//#include <string>
-//#include <map>
+#ifdef EXO_MODULE
+	import std;
+#else
+#	include <string>
+#	include <map>
+#endif
 
 #include <exodus/exoimpl.h>
 #include <exodus/exocallable.h>

@@ -41,9 +41,12 @@ THE SOFTWARE.
 
 constexpr int TRACING = 0;
 
-import std;
-//module #include <iostream>
-//module #include <string>
+#ifdef EXO_MODULE
+	import std;
+#else
+#	include <iostream>
+#	include <string>
+#endif
 
 #include <exodus/exocallable.h>
 #include <exodus/exoenv.h>

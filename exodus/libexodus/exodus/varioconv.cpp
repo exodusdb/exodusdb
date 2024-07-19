@@ -20,16 +20,19 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-import std;
-//module #include <math.h> //for pow
-//module #include <algorithm> //for std::replace
-//module #include <cstring>//for strlen
-//module #include <string>
-//module #include <sstream>
-//module #include <bitset>
-//module #include <array>
-//#include <utility> //std::unreachable()
+#ifdef EXO_MODULE
+	import std;
+#else
+#	include <cmath>    //for pow
+#	include <algorithm> //for std::replace
+#	include <cstring>   //for strlen
+#	include <string>
+#	include <sstream>
+#	include <bitset>
+#	include <array>
+//#include <utility>   //std::unreachable()
 //#include <stdexcept> // for std::invalid_argument
+#endif
 
 #include <exodus/var.h>
 #include <exodus/varimpl.h>

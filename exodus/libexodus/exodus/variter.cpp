@@ -1,8 +1,13 @@
-//module #include <string>
 
-import std;
+#ifdef EXO_MODULE
+	import std;
+#else
+#	include <string>
+#endif
+
 #include <exodus/var.h>
 #include <exodus/dim.h>
+#include <exodus/rex.h>
 
 //mv_iter class enables c++ range based programming over a dynamic array
 //

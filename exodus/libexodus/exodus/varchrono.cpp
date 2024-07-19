@@ -23,28 +23,33 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-import std;
-//#include <cstring>
-//#include <array>
-////module #include <string>
-//#include <iostream> //for cerr
-//#include <chrono>
-//#include <sstream>
-//#include <cctype> // for std::isdigit
+#ifdef EXO_MODULE
+	import std;
+#else
+#	include <cstring>
+#	include <array>
+#	include <string>
+#	include <iostream> //for cerr
+#	include <chrono>
+#	include <sstream>
+#	include <cctype> // for std::isdigit
 
-//#include <ctime> // for std::time_t
-//#include <cctype> // for std::isalpha std::toupper
+#	include <ctime> // for std::time_t
+#	include <cctype> // for std::isalpha std::toupper
+#endif
 
 #pragma GCC diagnostic push
 #pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
 #include <exodus/gregorian.h>
 #pragma GCC diagnostic pop
 
-#if defined _MSC_VER || defined __CYGWIN__ || defined __MINGW32__
-//   #include <time.h>
-#include <exodus/gettimeofday.h>
-#else
-//#include <sys/time.h>
+#ifndef EXO_MODULE
+#	if defined _MSC_VER || defined __CYGWIN__ || defined __MINGW32__
+#		include <time.h>
+#		include <exodus/gettimeofday.h>
+#	else
+#		include <sys/time.h>
+#	endif
 #endif
 
 // ostime, osdate, osfile, osdir should return dates and times in UTC

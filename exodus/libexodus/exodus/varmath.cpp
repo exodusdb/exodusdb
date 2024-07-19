@@ -20,8 +20,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-//#include <math.h>
-//#include <cmath>
+#ifdef EXO_MODULE
+#else
+#	include <math.h>
+#	include <cmath>
+#   include <cstdint> // for std::int64_t etc.
+#   include <cmath>   // for std::fmod etc.
+#   include <cstring> // for std::strstr etc.
+#endif
+
 #include <errno.h>
 
 #include "varimpl.h"

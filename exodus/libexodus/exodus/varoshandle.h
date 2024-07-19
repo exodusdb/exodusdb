@@ -12,11 +12,14 @@
 #ifndef EXODUS_LIBEXODUS_EXODUS_VAROSHANDLE_H_
 #define EXODUS_LIBEXODUS_EXODUS_VAROSHANDLE_H_
 
-//#include <cstdlib>
-//#include <cassert>
-import std;
-//module #include <string>
-//#include <vector>
+#ifdef EXO_MODULE
+	import std;
+#else
+//#	include <cstdlib>
+//#	include <cassert>
+#	include <string>
+#	include <vector>
+#endif
 
 #include <exodus/var.h>
 

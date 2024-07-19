@@ -68,11 +68,15 @@ takes one template parameter (the iterator type). It also calls u32regex_search 
 allowing it to interface correctly with UTF-8, UTF-16, and UTF-32 data:
 */
 
-import std;
+#ifdef EXO_MODULE
+	import std;
+#else
+#	include <cstring>	// for str::strlen etc.
+#	include <iostream>
+#	include <utility> //for replace
+#	include <string>
+#endif
 
-//module #include <iostream>
-//module #include <utility> //for replace
-//module #include <string>
 #include <boost/algorithm/string/replace.hpp>
 
 #define USE_BOOST
@@ -82,7 +86,9 @@ import std;
 #	include <boost/regex.hpp>
 
 #else // USE_BOOST not defined
-//module #	include <regex>
+#	ifndef EXO_MODULE
+#		include <regex>
+#	endif
 #	define std_boost std
 #endif
 
