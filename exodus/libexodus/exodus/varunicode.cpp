@@ -1,4 +1,4 @@
-#ifdef EXO_MODULE
+#if EXO_MODULE
 	import std;
 #endif
 ////#include <wctype.h>

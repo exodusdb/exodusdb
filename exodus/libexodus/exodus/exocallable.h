@@ -73,7 +73,7 @@ dictexit(bbb)
 #ifndef EXODUS_LIBEXODUS_EXODUS_EXOCALLABLE_H_
 #define EXODUS_LIBEXODUS_EXODUS_EXOCALLABLE_H_
 
-#ifdef EXO_MODULE
+#if EXO_MODULE
 	import var;
 #else
 #	include <mutex>

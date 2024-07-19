@@ -41,7 +41,7 @@ THE SOFTWARE.
 
 constexpr int TRACING = 0;
 
-#ifdef EXO_MODULE
+#if EXO_MODULE
 	import std;
 #else
 #	include <iostream>

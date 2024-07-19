@@ -21,7 +21,7 @@ THE SOFTWARE.
 */
 
 #include <unistd.h> //for getpid
-#ifdef EXO_MODULE
+#if EXO_MODULE
 	import std;
 #else
 #	include <thread> //for sleep

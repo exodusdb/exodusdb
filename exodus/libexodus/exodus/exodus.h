@@ -27,7 +27,7 @@ THE SOFTWARE.
 // NOTE exodus.h MUST be included LAST to avoid its macros causing problems in standard libraries
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
-#ifdef EXO_MODULE
+#if EXO_MODULE
 	import var;
 #else
 #	include <exodus/var.h>

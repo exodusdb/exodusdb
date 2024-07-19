@@ -23,7 +23,7 @@ THE SOFTWARE.
 #ifndef EXODUSFUNCS_H
 #define EXODUSFUNCS_H 1
 
-#ifdef EXO_MODULE
+#if EXO_MODULE
 	import std;
 	import var;
 #else

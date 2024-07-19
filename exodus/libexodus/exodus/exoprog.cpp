@@ -1,4 +1,4 @@
-#ifdef EXO_MODULE
+#if EXO_MODULE
 #else
 #	include <exodus/dim.h>
 #	include <exodus/rex.h>

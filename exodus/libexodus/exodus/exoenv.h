@@ -23,7 +23,7 @@ THE SOFTWARE.
 #ifndef EXOENV_H
 #define EXOENV_H 1
 
-#ifdef EXO_MODULE
+#if EXO_MODULE
 	import std;
 #else
 #	include <string>

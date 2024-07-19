@@ -31,7 +31,7 @@ THE SOFTWARE.
     //v.isnum();         //+???ns (???ns using <charconv> from_chars)
 */
 
-#ifdef EXO_MODULE
+#if EXO_MODULE
 #else
 #	include <charconv>
 #endif

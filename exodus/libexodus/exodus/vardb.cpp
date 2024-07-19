@@ -154,7 +154,7 @@ Within transactions, lock requests for locks that have already been obtained alw
 
 */
 
-#ifdef EXO_MODULE
+#if EXO_MODULE
 	import std;
 #else
 #	include <cstring>	//for std::strcmp strlen

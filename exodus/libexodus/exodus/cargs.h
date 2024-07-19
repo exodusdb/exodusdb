@@ -1,7 +1,7 @@
 #ifndef CARGS_H
 #define CARGS_H 1
 
-#ifdef EXO_MODULE
+#if EXO_MODULE
 	import std;
 #else
 #	include <list>

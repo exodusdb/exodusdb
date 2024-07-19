@@ -30,7 +30,7 @@
 //Requirement 11. ConnectionLockss (which accompany DB table locks), are added to connection table and
 //					stored/deleted within connection record
 
-#ifdef EXO_MODULE
+#if EXO_MODULE
 	import std;
 #else
 #	include <string>

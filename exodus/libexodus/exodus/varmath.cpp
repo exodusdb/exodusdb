@@ -20,7 +20,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#ifdef EXO_MODULE
+#if EXO_MODULE
 #else
 #	include <math.h>
 #	include <cmath>

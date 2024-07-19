@@ -68,7 +68,7 @@ takes one template parameter (the iterator type). It also calls u32regex_search 
 allowing it to interface correctly with UTF-8, UTF-16, and UTF-32 data:
 */
 
-#ifdef EXO_MODULE
+#if EXO_MODULE
 	import std;
 #else
 #	include <cstring>	// for str::strlen etc.
@@ -86,7 +86,8 @@ allowing it to interface correctly with UTF-8, UTF-16, and UTF-32 data:
 #	include <boost/regex.hpp>
 
 #else // USE_BOOST not defined
-#	ifndef EXO_MODULE
+#	if EXO_MODULE
+#	else
 #		include <regex>
 #	endif
 #	define std_boost std

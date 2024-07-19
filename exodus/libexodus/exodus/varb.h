@@ -30,7 +30,7 @@ THE SOFTWARE.
 
 // clang-format off
 
-#ifdef EXO_MODULE
+#if EXO_MODULE
 	import std;
 #	include <iomanip> // Here only to solve some inability to manually create a std module
 #else

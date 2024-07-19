@@ -1,7 +1,7 @@
 //
 // Copyright (c) 2010 steve.bush@neosys.com
 //
-#ifdef EXO_MODULE
+#if EXO_MODULE
 #else
 #	include <cstring>
 //#	include <algorithm>

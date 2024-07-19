@@ -23,7 +23,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#ifdef EXO_MODULE
+#if EXO_MODULE
 	import std;
 #else
 #	include <cstring>
@@ -43,7 +43,8 @@ THE SOFTWARE.
 #include <exodus/gregorian.h>
 #pragma GCC diagnostic pop
 
-#ifndef EXO_MODULE
+#if EXO_MODULE
+#else
 #	if defined _MSC_VER || defined __CYGWIN__ || defined __MINGW32__
 #		include <time.h>
 #		include <exodus/gettimeofday.h>

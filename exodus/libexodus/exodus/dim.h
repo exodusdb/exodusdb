@@ -1,7 +1,7 @@
 #ifndef VARDIM_H
 #define VARDIM_H
 
-#ifdef EXO_MODULE
+#if EXO_MODULE
 	import std;
 #else
 #	include <vector>

@@ -30,7 +30,7 @@ THE SOFTWARE.
 // header file.
 // You can program without exodus macros by including var.h directly
 
-#ifdef EXO_MODULE
+#if EXO_MODULE
 	import var;
 #else
 #	include <exodus/var.h>

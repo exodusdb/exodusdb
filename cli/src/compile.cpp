@@ -318,7 +318,7 @@ function main() {
 		linkoptions = "  -lexodus";
 
 		// Precompiled modules need -f ... var.pcm and -l ... libexovar.so
-#ifdef EXO_MODULE
+#if EXO_MODULE
 		linkoptions ^= " -lexovar -lstd";
 #endif
 		linkoptions ^= " -lstdc++fs -lstdc++";
@@ -380,7 +380,7 @@ function main() {
 #endif
 
 		// Precompiled modules need -f ... var.pcm and -l ... libexovar.so
-#ifdef EXO_MODULE
+#if EXO_MODULE
 		// Perpetuate EXO_MODULE as at original build time of compile
 		basicoptions ^= " -DEXO_MODULE";
 		basicoptions ^= " -fmodule-file=var=/usr/local/lib/var.pcm";
