@@ -24,10 +24,10 @@
 # Add TIMEBANK option
 # ###################
 #
-	OPTION(EXODUS_TIMEBANK "Option Debug timers" OFF) # Enabled by default
-	IF(EXODUS_TIMEBANK)
-		ADD_DEFINITIONS(-DEXODUS_TIMEBANK=${EXODUS_TIMEBANK})
-	ENDIF(EXODUS_TIMEBANK)
+	OPTION(EXO_TIMEBANK "Option Debug timers" OFF) # Enabled by default
+	IF(EXO_TIMEBANK)
+		ADD_DEFINITIONS(-DEXO_TIMEBANK=${EXO_TIMEBANK})
+	ENDIF(EXO_TIMEBANK)
 
 #
 # Coverage testing

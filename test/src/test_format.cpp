@@ -8,7 +8,7 @@ programinit()
 function main() {
 
 #ifdef EXO_FORMAT
-
+//#if 1
 	var x = 12.3456;
 	assert(x.format("{:.2f}").outputl() == "12.35");
 	{

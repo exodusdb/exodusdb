@@ -63,26 +63,27 @@
 
 	endif()
 
-	message("-------------------------------------------------")
+	message("")
 
 #
-# Modules option -DEX_MODULE=ON
+# Modules option -DEXO_MODULE=ON/OFF
 # ##############
 #
 	option(EXO_MODULE "Build as c++ modules" OFF) # Disabled by default
-	add_definitions(-DEXO_MODULE=${EXO_MODULE})
-	message("EXO_MODULE is ${EXO_MODULE}")
+	message("-- EXO_MODULE is ${EXO_MODULE}")
 
 	# man cmake-cxxmodules
 	# See CMP0155 scanning defaults to yes for c++20 files from cmake 3.28 onwards
 	# Why is this required then?
-#	set(CMAKE_CXX_SCAN_FOR_MODULES OFF)
 	if (EXO_MODULE)
+		add_compile_definitions(-DEXO_MODULE=1)
 		set(CMAKE_CXX_SCAN_FOR_MODULES ON)
 	else()
+		add_compile_definitions(-DEXO_MODULE=0)
 		set(CMAKE_CXX_SCAN_FOR_MODULES OFF)
 	endif()
-	message("CMAKE_CXX_SCAN_FOR_MODULES is ${CMAKE_CXX_SCAN_FOR_MODULES}")
+	message(STATUS "CMAKE_CXX_SCAN_FOR_MODULES is ${CMAKE_CXX_SCAN_FOR_MODULES}")
+	message("")
 
 	# Allow lower C++ versions
 	# TODO check minimum c++20
@@ -90,13 +91,13 @@
 
 	set(CMAKE_CXX_EXTENSIONS OFF)
 
-	message("CMAKE_CXX_COMPILER_VERSION REQUESTED is ${CMAKE_CXX_COMPILER_VERSION}")
+	message(STATUS "CMAKE_CXX_COMPILER_VERSION REQUESTED is ${CMAKE_CXX_COMPILER_VERSION}")
+	message(STATUS "CMAKE_CXX_FLAGS is                ${CMAKE_CXX_FLAGS}")
 
 	#set(CMAKE_CXX_MODULE_EXTENSIONS ".cpp")
 #	set(CMAKE_CXX_MODULE_EXTENSIONS ".cpp" ".h")
 #	set(CMAKE_CXX_MODULE_EXTENSIONS ".ixx" ".h")
 
-	message("-------------------------------------------------")
 #
 # Build type
 # ##########
@@ -111,7 +112,7 @@
 			"Default build type: RelWithDebInfo" FORCE)
 	endif()
 
-	message("CMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}")
+	message(STATUS "CMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}")
 	#-DCMAKE_BUILD_TYPE=DEBUG
 	#-DCMAKE_BUILD_TYPE=MINSIZEREL
 	#-DCMAKE_BUILD_TYPE=RELEASE
@@ -132,13 +133,12 @@
 	#
 	#//Flags used by the CXX compiler during RELWITHDEBINFO builds.
 	#CMAKE_CXX_FLAGS_RELWITHDEBINFO:STRING=-O2 -g -DNDEBUG
-	message("CMAKE_CXX_FLAGS is                ${CMAKE_CXX_FLAGS}")
-	message("CMAKE_CXX_FLAGS_DEBUG is          ${CMAKE_CXX_FLAGS_DEBUG}")
-	message("CMAKE_CXX_FLAGS_RELEASE is        ${CMAKE_CXX_FLAGS_RELEASE}")
-	message("CMAKE_CXX_FLAGS_MINSIZEREL is     ${CMAKE_CXX_FLAGS_MINSIZEREL}")
-	message("CMAKE_CXX_FLAGS_RELWITHDEBINFO is ${CMAKE_CXX_FLAGS_RELWITHDEBINFO}")
-
-	message("-------------------------------------------------")
+	message("")
+	message("   CMAKE_CXX_FLAGS_DEBUG is          ${CMAKE_CXX_FLAGS_DEBUG}")
+	message("   CMAKE_CXX_FLAGS_RELEASE is        ${CMAKE_CXX_FLAGS_RELEASE}")
+	message("   CMAKE_CXX_FLAGS_MINSIZEREL is     ${CMAKE_CXX_FLAGS_MINSIZEREL}")
+	message("   CMAKE_CXX_FLAGS_RELWITHDEBINFO is ${CMAKE_CXX_FLAGS_RELWITHDEBINFO}")
+	message("")
 
 	add_compile_options(-Wno-unknown-warning-option)
 	#add_compile_options(-O3)   # 5% faster than -O2
@@ -200,6 +200,7 @@
 ## ###
 ##
 #	if (${CMAKE_CXX_COMPILER_VERSION} STRLESS "13")
+		message("")
 		message("----------------")
 		message("-- FMT EXODUS --")
 		message("----------------")
@@ -344,13 +345,15 @@
 # Subdirs/submodules
 # ##################
 
+	message("")
 	add_subdirectory(exodus/libexodus/exodus)
 	#target_compile_options(exodus PUBLIC -Wall)
 
-	#add_subdirectory(exodus/libpgexodus/src)
+	message("")
 	add_subdirectory(exodus/pgexodus)
 	#target_compile_options(pgexodus PUBLIC -Wall)
 
+	message("")
 	add_subdirectory(cli/src)
 	#target_compile_options(nlist PUBLIC "-O2")
 

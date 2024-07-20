@@ -1,7 +1,7 @@
-// EXODUS_TIMEBANK must be defined to create functional Timers
-// e.g. cmake . -DEXODUS_TIMEBANK=1
+// EXO_TIMEBANK must be defined to create functional Timers
+// e.g. cmake . -DEXO_TIMEBANK=1
 
-#ifdef EXODUS_TIMEBANK
+#ifdef EXO_TIMEBANK
 
 #include <iostream>
 #include <iomanip>
@@ -209,4 +209,4 @@ void get_timeacc0() {
 }
 
 } // namespace exo
-#endif // EXODUS_TIMEBANK
+#endif // EXO_TIMEBANK

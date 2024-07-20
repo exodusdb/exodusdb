@@ -22,20 +22,13 @@
 	endif()
 
 #
-# Timebank option -DEXODUS_TIMEBANK=ON
+# Timebank option -DEXO_TIMEBANK=ON
 # ###############
 #
-	option(EXODUS_TIMEBANK "Option Debug timers" OFF) # Disabled by default
-	if(EXODUS_TIMEBANK)
-		add_definitions(-DEXODUS_TIMEBANK=${EXODUS_TIMEBANK})
-	endif(EXODUS_TIMEBANK)
-
-#
-# Modules option -DEX_MODULE=ON
-# ##############
-#
-	option(EXO_MODULE "Build as c++ modules" OFF) # Disabled by default
-	add_definitions(-DEXO_MODULE=${EXO_MODULE})
+	option(EXO_TIMEBANK "Option Debug timers" OFF) # Disabled by default
+	if(EXO_TIMEBANK)
+		add_definitions(-DEXO_TIMEBANK=${EXO_TIMEBANK})
+	endif(EXO_TIMEBANK)
 
 #
 # Coverage testing

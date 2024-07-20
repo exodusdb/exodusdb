@@ -321,15 +321,18 @@ function main() {
 #if EXO_MODULE
 		linkoptions ^= " -lexovar -lstd";
 #endif
+
+		// Mandatory c++ library and file system library
 		linkoptions ^= " -lstdc++fs -lstdc++";
 
+		// link to fmt library (only if using it instead of std::format)
 //#if __has_include(<fmt/core.h>)
 //#if EXO_FORMAT == 2
 #if defined(EXO_FORMAT) && EXO_FORMAT == 2
 		linkoptions ^= " -lfmt ";
 #endif
 
-		//always look in header install path eg ~/inc
+		// Append ~/inc directory
 		basicoptions ^= " -I" ^ incdir ^ " ";
 
 		if (debugging) {
@@ -379,10 +382,12 @@ function main() {
 		liboptions ^= " -fvisibility=hidden -fvisibility-inlines-hidden ";
 #endif
 
-		// Precompiled modules need -f ... var.pcm and -l ... libexovar.so
 #if EXO_MODULE
-		// Perpetuate EXO_MODULE as at original build time of compile
+
+		// Memorise/bequeath/perpetuate the state of EXO_MODULE as at original build time of compile.cpp
 		basicoptions ^= " -DEXO_MODULE";
+
+		// Add path to var and std modules
 		basicoptions ^= " -fmodule-file=var=/usr/local/lib/var.pcm";
 		basicoptions ^= " -fmodule-file=std=/usr/local/lib/std.pcm";
 #endif

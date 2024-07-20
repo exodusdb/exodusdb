@@ -227,7 +227,7 @@ Within transactions, lock requests for locks that have already been obtained alw
 #include <exodus/dim.h>
 #include <exodus/rex.h>
 
-#ifdef EXODUS_TIMEBANK
+#ifdef EXO_TIMEBANK
 #include "timebank.h"
 #endif
 
@@ -1304,7 +1304,7 @@ bool var::open(CVR filename, CVR connection /*DEFAULTNULL*/) {
 
 	}
 
-#ifdef EXODUS_TIMEBANK
+#ifdef EXO_TIMEBANK
 	//Timer t2(245);//open cache_miss
 	Timer timer1(get_timeacno("bool var::open cache_miss"));
 	//if (DBTRACE) {
@@ -1463,7 +1463,7 @@ bool var::readc(CVR filehandle, CVR key) {
 	}
 	//TRACE("cache miss" ^ key);
 
-#ifdef EXODUS_TIMEBANK
+#ifdef EXO_TIMEBANK
 	//Timer t2(247);//readc cache_miss
 	Timer timer1(get_timeacno("bool var::reado cache_miss"));
 #endif

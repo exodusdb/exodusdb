@@ -131,8 +131,8 @@ namespace exo {
 // timebank profiling
 //
 // Capture function execution times and dump on program exit
-// Use cmake -DEXODUS_TIMEBANK=1 to enable
-#ifdef EXODUS_TIMEBANK
+// Use cmake -DEXO_TIMEBANK=1 to enable
+#ifdef EXO_TIMEBANK
 #	include "timebank.h"
 #endif
 
@@ -148,7 +148,7 @@ namespace exo {
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wreserved-id-macro"
 
-#ifdef EXODUS_TIMEBANK
+#ifdef EXO_TIMEBANK
 #	define THISIS(FUNC_DESC) [[maybe_unused]] static const char* function_sig = FUNC_DESC;Timer thisistimer(get_timeacno(FUNC_DESC));
 #else
 #	define THISIS(FUNC_DESC) [[maybe_unused]] static const char* function_sig = FUNC_DESC;

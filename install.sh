@@ -459,6 +459,10 @@ function build_and_install {
 	rm $EXODUS_DIR/build -rf
 	cmake -S $EXODUS_DIR -B $EXODUS_DIR/build $CMAKE_BUILD_OPTIONS
 :
+: Dump cmake configuration
+:
+	cmake -L -B $EXODUS_DIR/build
+:
 : Make
 :
 	cmake --build $EXODUS_DIR/build -j$((`nproc`+1))

@@ -1,10 +1,10 @@
-#ifndef EXODUS_LIBEXODUS_EXODUS_TIMEBANK_H_
-#define EXODUS_LIBEXODUS_EXODUS_TIMEBANK_H_
+#ifndef EXODUS_LIBEXODUS_EXO_TIMEBANK_H_
+#define EXODUS_LIBEXODUS_EXO_TIMEBANK_H_
 
-// EXODUS_TIMEBANK must be defined to create functional Timers
-// e.g. cmake . -DEXODUS_TIMEBANK=1
+// EXO_TIMEBANK must be defined to create functional Timers
+// e.g. cmake . -DEXO_TIMEBANK=1
 
-#ifndef EXODUS_TIMEBANK
+#ifndef EXO_TIMEBANK
 ////////////////////////
 // DUMMY TIMEBANK HEADER
 ////////////////////////
@@ -298,5 +298,5 @@ auto get_timeacno(const char* arg1) -> int {
 }
 
 } // namespace exo
-#endif // EXODUS_TIMEBANK
-#endif // EXODUS_LIBEXODUS_EXODUS_TIMEBANK_H_
+#endif // EXO_TIMEBANK
+#endif // EXODUS_LIBEXODUS_EXO_TIMEBANK_H_
