@@ -44,16 +44,16 @@ set -euxo pipefail
 : Syntax
 : ------
 :
-: $0 ' [<STAGES>] [<COMPILER>] [<PG_VER>]'
+: $0 ' <STAGES> [<COMPILER>] [<PG_VER>]'
 :
 : STAGES
 :
 	ALL_STAGES=bBdDTW
 	DEFAULT_STAGES=bBdDT
 :
-:	Must be one or more *consecutive* letters from $ALL_STAGES.
+:	STAGES must be one or more _consecutive_ letters from $ALL_STAGES, or A for all stages except W.
 :
-:	Default is "'$DEFAULT_STAGES'" i.e. all except W - Web service
+:	A = All stages $DEFAULT_STAGES except W - Web service
 :
 :	b = Get dependencies for build and install
 :	B = Build and install
@@ -80,7 +80,7 @@ set -euxo pipefail
 : Parse command line
 : ------------------
 :
-	REQ_STAGES=${1:-$DEFAULT_STAGES}
+	REQ_STAGES=${1:?STAGES is required and must be one or more *consecutive* letters from $ALL_STAGES, or A for all stages except W.}
 	COMPILER=${2:-g++}
 	PG_VER=${3:-}
 
@@ -92,11 +92,14 @@ set -euxo pipefail
 : Validate
 : --------
 :
+	if [[ $REQ_STAGES = A ]]; then
+		REQ_STAGES=$DEFAULT_STAGES
+	fi
 	if [[ ! $ALL_STAGES =~ $REQ_STAGES ]]; then
 		echo STAGES "'$REQ_STAGES'" must be one or more consecutive letters from $ALL_STAGES
 		exit 1
 	fi
-
+exit
 	# duplicate code in install.sh and install_lxc.sh
 	if [[ ! $COMPILER =~ ^((g\+\+)|(clang))(-(([0-9]+)|min|default))?$ ]]; then
 		echo COMPILER must be g++ or clang. Optionally followed by a version e.g. g++-12, clang-12, g++-default, clang-default, g++-min, clang-min

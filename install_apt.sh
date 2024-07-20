@@ -68,7 +68,7 @@ set -euxo pipefail
 : -----------
 :
 	cd $EXODUS_DIR
-	./install.sh '' $COMPILER
+	./install.sh A $COMPILER
 :
 : Finished $0 $* in $((SECONDS/60)) mins and $((SECONDS%60)) secs.
 : ----------------------------------------------------------------
