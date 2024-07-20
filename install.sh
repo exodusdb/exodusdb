@@ -39,6 +39,11 @@ set -euxo pipefail
 : 24.04    09  13  14      14  18  18
 : 22.04    09  11  12      11  14  15
 : 20.04    07  09  10      07  10  12
+:
+: OS          Cmake
+: Noble 24.04 3.28.3
+: jammy 22.04 3.22.1
+: focal 20.04 3.16.3
 
 : ------
 : Syntax
@@ -495,7 +500,7 @@ function build_and_install {
 : to be run from command line without full path to \~/bin
 : Requires re-login after installation.
 :
-: Note: Using "'echo sudo'" dd trick because "'sudo echo xxx > yyy'" doesnt sudo the "> yyy" bit.
+: Note: Using 'echo sudo dd' trick because 'sudo echo xxx > yyy' doesnt sudo the '> yyy' bit.
 :
 	echo 'export PATH="${PATH}:~/bin"' | sudo dd of=/etc/profile.d/exodus.sh status=none
 :

@@ -385,7 +385,7 @@ function main() {
 #if EXO_MODULE
 
 		// Memorise/bequeath/perpetuate the state of EXO_MODULE as at original build time of compile.cpp
-		basicoptions ^= " -DEXO_MODULE";
+		basicoptions ^= " -DEXO_MODULE=1";
 
 		// Add path to var and std modules
 		basicoptions ^= " -fmodule-file=var=/usr/local/lib/var.pcm";

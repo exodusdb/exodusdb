@@ -6,8 +6,8 @@
 # CONFIG
 # ######
 #
-#	cmake_minimum_required(VERSION 3.10)
-	cmake_minimum_required(VERSION 3.28)
+	cmake_minimum_required(VERSION 3.10)
+#	cmake_minimum_required(VERSION 3.28)
 	project(exodus)
 
 #	cmake versions available 2024-06-10
@@ -76,10 +76,10 @@
 	# See CMP0155 scanning defaults to yes for c++20 files from cmake 3.28 onwards
 	# Why is this required then?
 	if (EXO_MODULE)
-		add_compile_definitions(-DEXO_MODULE=1)
+		add_compile_definitions(EXO_MODULE=1)
 		set(CMAKE_CXX_SCAN_FOR_MODULES ON)
 	else()
-		add_compile_definitions(-DEXO_MODULE=0)
+		add_compile_definitions(EXO_MODULE=0)
 		set(CMAKE_CXX_SCAN_FOR_MODULES OFF)
 	endif()
 	message(STATUS "CMAKE_CXX_SCAN_FOR_MODULES is ${CMAKE_CXX_SCAN_FOR_MODULES}")
