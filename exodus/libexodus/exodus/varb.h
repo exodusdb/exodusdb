@@ -1443,7 +1443,7 @@ class PUBLIC var_base {
 	// friend std::ostream& operator<<(std::ostream& ostream1, TVR var1);
 
 	// Note replicated for var but that one converts FM, VM etc. to visible chars before output
-	PUBLIC friend std::ostream& operator<<(std::ostream& ostream1, CBR outvar) {
+	friend std::ostream& operator<<(std::ostream& ostream1, CBR outvar) {
 		outvar.assertString(__PRETTY_FUNCTION__);
 		ostream1 << outvar.var_str;
 		return ostream1;
@@ -1452,7 +1452,7 @@ class PUBLIC var_base {
 	// ISTREAM
 	//////////
 
-	PUBLIC friend std::istream& operator>>(std::istream& istream1, VARREF invar) {
+	friend std::istream& operator>>(std::istream& istream1, VARREF invar) {
 
 		invar.assertDefined(__PRETTY_FUNCTION__);
 

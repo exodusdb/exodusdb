@@ -154,7 +154,7 @@ public:
 	// TODO Take a reference and make an internal copy if any FM need to be converted
 	// Causes ambiguous overload for some unknown reason despite being a hidden friend
 	// friend std::ostream& operator<<(std::ostream& ostream1, TVR var1);
-	PUBLIC friend std::ostream& operator<<(std::ostream& ostream1, var outvar) {
+	friend std::ostream& operator<<(std::ostream& ostream1, var outvar) {
 
 		outvar.assertString(__PRETTY_FUNCTION__);
 
@@ -892,11 +892,10 @@ template<class... Args>
 	   void ossetenv(const char* code) const;
 
 	// friend class to iterate over the fields of a var
-	friend PUBLIC class var_iter;
-
 	//BEGIN/END - free functions to create iterators over a var
-	PUBLIC friend var_iter begin(CVR v);
-	PUBLIC friend var_iter end(CVR v);
+	friend class var_iter;
+	friend var_iter begin(CVR v);
+	friend var_iter end(CVR v);
 
 	///////////////////////////
 	// PRIVATE MEMBER FUNCTIONS
