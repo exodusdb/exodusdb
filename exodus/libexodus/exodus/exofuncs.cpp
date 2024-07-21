@@ -29,6 +29,8 @@ THE SOFTWARE.
 #	include <exodus/rex.h>
 #endif
 
+#include <exodus/format.h>
+
 #include <exodus/exoenv.h>
 
 #define EXO_FUNCS_CPP

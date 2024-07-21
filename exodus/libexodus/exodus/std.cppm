@@ -87,6 +87,9 @@ export namespace std {
 	using std::from_chars;
 	using std::chars_format;
 
+	// really? since we are providing fmt::format
+	using std::format;
+
 	using std::pair;
 	using std::initializer_list;
 

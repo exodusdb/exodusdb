@@ -367,6 +367,7 @@
 			exomacros.h
 			exoenv.h
 			exofuncs.h
+			format.h
 			#mvimpl.h mvipc.h mvconfig.h mvlink.h
 			exocallable.h
 			program.h

@@ -1,5 +1,11 @@
+//import std;
 #undef NDEBUG  //because we are using assert to check actual operations that cannot be skipped in release mode testing
 #include <cassert>
+
+// exodus format/println functions
+// Require this additional header BEFORE any other exodus_header.
+// Slows down compilation a bit so not included in standard exodus headers
+#include <exodus/format.h>
 
 #include <exodus/program.h>
 
@@ -7,8 +13,12 @@ programinit()
 
 function main() {
 
-#ifdef EXO_FORMAT
-//#if 1
+#ifndef EXO_FORMAT
+	printl("EXO_FORMAT is not available so std::format a var is not possible.");
+#else
+
+	printl(std::format("EXO_FORMAT is defined so formatting a var is possible. e.g. {}", "'hello'"));
+
 	var x = 12.3456;
 	assert(x.format("{:.2f}").outputl() == "12.35");
 	{

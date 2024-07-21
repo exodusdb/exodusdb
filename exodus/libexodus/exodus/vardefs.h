@@ -85,18 +85,4 @@ namespace exo {
 #define DEFAULT_VM = VM_
 #define DEFAULT_NULL = nullptr
 
-// Support var::format and var::println
-//
-#if __GNUC__  > 11 || __clang_major__ > 1
-#	define EXO_FORMAT
-#	ifdef EXO_FORMAT
-#		pragma GCC diagnostic ignored "-Winline"
-#		pragma clang diagnostic ignored "-Wswitch-default" //18 24.04
-#		pragma clang diagnostic ignored "-Wunsafe-buffer-usage" //18 24.04
-#		pragma clang diagnostic ignored "-Wreserved-id-macro" //18 20.04
-#		pragma clang diagnostic ignored "-Wduplicate-enum" //18 20.04
-#		include <fmt/format.h>
-#	endif
-#endif
-
 #endif //EXO_VARDEFS_H

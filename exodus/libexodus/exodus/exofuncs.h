@@ -35,56 +35,7 @@ THE SOFTWARE.
 
 #include <exodus/exoimpl.h>
 
-#ifdef EXO_FORMAT
-// Including the large fmt library header here so exo::format can precompile strings using fmt::vformat
-//
-// Sadly that implies that it will be waste time in endless recompilations until it becomes
-// a c++ module.
-//
-// Always use fmt library for now because of various bugs causing inconsistency
-// in early versions of stdlibc++ implementation of std::format
-// As of 2024
-// 1. Width calculation doesn’t use grapheme clusterization. The latter has been implemented in a separate branch but hasn’t been integrated yet.
-// 2. Most C++20 chrono types are not supported yet.
-//
-//#include <version>
-//#ifdef __cpp_lib_format
-//#if __has_include(<formatx>)
-//#	warning has <format>
-//#	define EXO_FORMAT 1
-//#	include <format>
-//	namespace fmt = std;
-
-#undef EXO_FORMAT // only to avoid warning about redefinition below
-
-//#elif __has_include(<fmt/core.h>)
-#if __has_include(<fmt/core.h>)
-//#	warning Using fmt library instead std::format
-#	define EXO_FORMAT 2
-#	pragma GCC diagnostic push
-#	pragma clang diagnostic ignored "-Wdocumentation-unknown-command"
-#   pragma clang diagnostic ignored "-Wreserved-id-macro" //18 20.04
-#   pragma clang diagnostic ignored "-Wduplicate-enum" //18 20.04
-#	pragma GCC diagnostic ignored "-Winline"
-#	pragma GCC diagnostic ignored "-Wswitch-default"
-//#	include <fmt/core.h>
-#	include <fmt/format.h> // for fmt::formatter<std::string_view> etc.
-#	include <fmt/args.h> // for fmt::dynamic_format_arg_store
-//module #	include <variant>
-#	pragma GCC diagnostic pop
-#	if __GNUC__ >= 11 || __clang_major__ > 1
-///root/exodus/fmt/include/fmt/core.h: In member function ‘constexpr auto fmt::v10::formatter<exo::var>::parse(ParseContext&) [with ParseContext =
-// fmt::v10::basic_format_parse_context<char>]’:
-///root/exodus/fmt/include/fmt/core.h:2712:22: warning: inlining failed in call to ‘constexpr const Char* fmt::v10::formatter<T, Char, typename std::enable_if<(fmt::v10::detail::type_constant<T, Char>::value != fmt::v10::detail::type::custom_type), void>::type>::parse(ParseContext&) [with ParseContext = fmt::v10::basic_format_parse_context<char>; T = fmt::v10::basic_string_view<char>; Char = char]’: --param max-inline-insns-single limit reached [-Winline]
-// 2712 |   FMT_CONSTEXPR auto parse(ParseContext& ctx) -> const Char* {
-//      |                      ^~~~~
-///root/exodus/test/src/../../exodus/libexodus/exodus/exofuncs.h:850:58: note: called from here
-//  850 |                 return formatter<std::string_view>::parse(ctx);
-//      |                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~
-#		pragma GCC diagnostic ignored "-Winline"
-#	endif
-#endif
-#endif // EXO_FORMAT
+//#include <exodus/format.h>
 
 // add global function type syntax to the exodus users
 // SIMILAR code in exofuncs.h and varimpl.h

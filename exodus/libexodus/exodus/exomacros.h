@@ -38,6 +38,9 @@ THE SOFTWARE.
 
 #include <exodus/exocallable.h>
 
+// Flag to force exodus/format.h to be included BEFORE other exodus headers and their intrusive macros (e.g. mv)
+#define EXODUS_MACROS
+
 // Order of C++ standard includes
 // ==============================
 //

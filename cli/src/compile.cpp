@@ -19,6 +19,9 @@ static boost::asio::thread_pool threadpool1(std::thread::hardware_concurrency() 
 #include <atomic>
 static std::atomic<int> atomic_ncompilation_failures;
 
+// EXO_FORMAT required to append -lfmt to compile and link command
+#include <exodus/format.h>
+
 #include <exodus/program.h>
 programinit()
 
