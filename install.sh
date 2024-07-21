@@ -471,7 +471,7 @@ function build_and_install {
 :
 	cmake -L -B $EXODUS_DIR/build
 :
-: Make
+: Build
 :
 	cmake --build $EXODUS_DIR/build -j$((`nproc`+1))
 

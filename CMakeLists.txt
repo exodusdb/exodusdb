@@ -72,6 +72,8 @@
 	option(EXO_MODULE "Build as c++ modules" OFF) # Disabled by default
 	message("-- EXO_MODULE is ${EXO_MODULE}")
 
+	add_compile_definitions(EXO_MODULE_INITIAL_BUILD=1)
+
 	# man cmake-cxxmodules
 	# See CMP0155 scanning defaults to yes for c++20 files from cmake 3.28 onwards
 	# Why is this required then?
