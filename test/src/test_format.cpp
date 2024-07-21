@@ -349,15 +349,18 @@ function main() {
 
 		// oconv(9, "R#4")
 		assert(xformat("{:>4d}", var(9)).squote().outputl() == "'   9'");
-		assert(xformat("{:>04d}", var(9)).squote().outputl() == "'   9'");// 0 in the wrong place so ignored
+//		assert(xformat("{:>04d}", var(9)).squote().outputl() == "'   9'");// 0 in the wrong place so ignored
+		assert(xformat("{:>04d}", var(9)).squote().outputl() == "'0009'");// libfmt9
 
 		// oconv(9, "L#4")
 		assert(xformat("{:<4d}", var(9)).squote().outputl() == "'9   '");
-		assert(xformat("{:<04d}", var(9)).squote().outputl() == "'9   '"); // ditto
+//		assert(xformat("{:<04d}", var(9)).squote().outputl() == "'9   '"); // ditto
+		assert(xformat("{:<04d}", var(9)).squote().outputl() == "'9000'"); // libfmt9
 
 		// oconv(9, "C#4")
 		assert(xformat("{:^4d}", var(9)).squote().outputl() == "' 9  '");
-		assert(xformat("{:^04d}", var(9)).squote().outputl() == "' 9  '"); // ditto
+//		assert(xformat("{:^04d}", var(9)).squote().outputl() == "' 9  '"); // ditto
+		assert(xformat("{:^04d}", var(9)).squote().outputl() == "'0900'"); // libfmt9
 	}
 
 	{

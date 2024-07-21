@@ -89,9 +89,8 @@ set -euxo pipefail
 	COMPILER=${2:-g++}
 	PG_VER=${3:-}
 
-	USE_MODULES=1
 	CMAKE_BUILD_OPTIONS=-GNinja
-	BUILD_DEPS="ninja-build ${COMPILER/clang/clang-tools}"
+	BUILD_DEPS="ninja-build ${COMPILER/clang/clang-tools} libfmt-dev"
 
 :
 : Validate
@@ -320,6 +319,8 @@ function get_dependencies_for_build_and_install {
 : Download and install build dependencies for exodus and pgexodus
 : ---------------------------------------------------------------
 :
+: Repeated in Build stage
+:
 	APT_GET sudo apt-get install -y cmake $BUILD_DEPS
 
 :
@@ -455,6 +456,11 @@ function build_and_install {
 : -------------------------------------------------------------
 :
 	download_submodules
+
+:
+: Repeated from Build stage
+:
+	APT_GET sudo apt-get install -y cmake $BUILD_DEPS
 
 :
 : Build exodus

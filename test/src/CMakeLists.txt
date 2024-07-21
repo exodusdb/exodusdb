@@ -47,7 +47,8 @@
 # ###############################
 #
 	cmake_policy(SET CMP0015 NEW)
-	include_directories(../../exodus/libexodus ../../fast_float/include ../../fmt/include)
+#	include_directories(../../exodus/libexodus ../../fast_float/include ../../fmt/include)
+	include_directories(../../exodus/libexodus ../../fast_float/include)
 	#link_directories(${CMAKE_CURRENT_SOURCE_DIR}../../exodus/libexodus/exodus)
 	link_directories(../../exodus/libexodus/exodus)
 
@@ -91,7 +92,8 @@
 		add_executable(${file_without_ext} ${file})
 
 		#target_link_libraries(${file_without_ext} ${PROJECT_LIBS} exodus)
-		target_link_libraries(${file_without_ext} ${FMT_LIBRARIES} exodus)
+#		target_link_libraries(${file_without_ext} ${FMT_LIBRARIES} exodus)
+		target_link_libraries(${file_without_ext} exodus)
 		target_link_libraries(${file_without_ext} ${PROJECT_LIBS})
 		if (EXO_MODULE)
 			target_link_libraries(${file_without_ext}

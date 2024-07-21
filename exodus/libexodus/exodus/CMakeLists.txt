@@ -91,10 +91,10 @@
 #
 	include_directories(. .. ../../../fast_float/include)
 
-#
-# fmt
-# ###
-#
+##
+## fmt
+## ###
+##
 	include_directories(${FMT_INCLUDE})
 
 #
@@ -193,7 +193,8 @@
 #
 	if (EXO_MODULE)
 		add_library(exovar)
-		target_include_directories(exovar PRIVATE ${PostgreSQL_INCLUDE_DIRS} ${BOOST_INCLUDE_DIR} ${FMT_INCLUDE})
+		target_include_directories(exovar PRIVATE ${PostgreSQL_INCLUDE_DIRS} ${BOOST_INCLUDE_DIR})
+		target_include_directories(exovar PRIVATE ${FMT_INCLUDE})
 		#target_include_directories(exovar PRIVATE exodus/include)
 		#target_compile_features(${NAME} PUBLIC cxx_std_23)
 		target_sources(exovar
@@ -205,7 +206,9 @@
 				var.cppm
 	#			dim.cppm
 		)
-		target_link_libraries(exovar std ${FMT_LIBRARIES})
+		target_link_libraries(exovar std)
+#		target_link_libraries(exovar ${FMT_LIBRARIES})
+		target_link_libraries(exovar fmt::fmt)
 	endif()
 #
 # libexodus source
@@ -287,11 +290,12 @@
 		)
 	endif()
 
-	# fmt
-	# ###
-	#
-	# This is probably not needed here. Maybe required by cli compile.cpp linkoptions?
-	target_link_libraries(exodus ${FMT_LIBRARIES})
+#	# fmt
+#	# ###
+#	#
+#	# This is probably not needed here. Maybe required by cli compile.cpp linkoptions?
+#	target_link_libraries(exodus ${FMT_LIBRARIES})
+	target_link_libraries(exodus fmt::fmt)
 
 #
 # Request .so versioning e.g. /usr/local/lib/libexodus.so -> libexodus.so.24.07

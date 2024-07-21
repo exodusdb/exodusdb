@@ -197,24 +197,30 @@
 	MESSAGE(STATUS "OS_NAME = ${OS_NAME}")
 	ADD_DEFINITIONS( -DEXO_OS_NAME=\"${OS_NAME}\" )
 
-##
-## FMT - before setting complex compiler warnings for exodus subdirs/modules
-## ###
-##
-#	if (${CMAKE_CXX_COMPILER_VERSION} STRLESS "13")
-		message("")
-		message("----------------")
-		message("-- FMT EXODUS --")
-		message("----------------")
-		# See https://fmt.dev/latest/usage.html
-		# How to build
-		set(BUILD_SHARED_LIBS true)
-		set(FMT_PEDANTIC true)
-		add_subdirectory(fmt)
-		set(FMT_LIBRARIES fmt)
-#	else()
-#		message("Omitting subdir fmt")
-#	endif()
+#		message("----------------")
+#		message("-- FMT EXODUS --")
+#		message("----------------")
+	find_package(fmt)
+	#target_link_libraries(<your-target> fmt::fmt)
+
+###
+### FMT - before setting complex compiler warnings for exodus subdirs/modules
+### ###
+###
+##	if (${CMAKE_CXX_COMPILER_VERSION} STRLESS "13")
+#		message("")
+#		message("----------------")
+#		message("-- FMT EXODUS --")
+#		message("----------------")
+#		# See https://fmt.dev/latest/usage.html
+#		# How to build
+#		set(BUILD_SHARED_LIBS true)
+#		set(FMT_PEDANTIC true)
+#		add_subdirectory(fmt)
+#		set(FMT_LIBRARIES fmt)
+##	else()
+##		message("Omitting subdir fmt")
+##	endif()
 
 #
 # Warnings
