@@ -46,10 +46,11 @@ THE SOFTWARE.
 //#	include <format>
 //	namespace fmt = std;
 
-#undef EXO_FORMAT // only to avoid warning about redefinition below
+//#undef EXO_FORMAT // only to avoid warning about redefinition below
 
 //#elif __has_include(<fmt/core.h>)
-#if __has_include(<fmt/core.h>)
+// Not available in libfmt6 which doesnt compile with exodus
+#if __has_include(<fmt/args.h>)
 //#	warning Using fmt library instead std::format
 #	define EXO_FORMAT 2
 #	pragma GCC diagnostic push
@@ -60,7 +61,7 @@ THE SOFTWARE.
 #	pragma GCC diagnostic ignored "-Wswitch-default"
 //#	include <fmt/core.h>
 #	include <fmt/format.h> // for fmt::formatter<std::string_view> etc.
-#	include <fmt/args.h> // for fmt::dynamic_format_arg_store
+#	include <fmt/args.h> // only for fmt::dynamic_format_arg_store which we are not using ATM
 //module #	include <variant>
 #	pragma GCC diagnostic pop
 #	if __GNUC__ >= 11 || __clang_major__ > 1

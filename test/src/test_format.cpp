@@ -214,12 +214,17 @@ function main() {
 	//__clang_major__ 18
 	// Correct in fmt library
 	assert(xformat("{:.^5s}", "🐱") == ".🐱..");
-//	assert(xformat("{:.5s}", "🐱🐱🐱") == "🐱🐱🐱"); //libfmt8 fails here TODO DONT SKIP IF NOT libfmt8
-//	assert(xformat("{:.<5.5s}", "🐱🐱🐱") == "🐱🐱🐱"); //and here
 
 	assert(xformat("{:^5s}", "🐱") == " 🐱  ");
-//	assert(xformat("{:.5s}", "🐱🐱🐱") == "🐱🐱🐱"); //libfmt8 fails
-//	assert(xformat("{:<5.5s}", "🐱🐱🐱") == "🐱🐱🐱"); //and here
+
+#if FMT_VERSION == 0 || FMT_VERSION >= 90000
+	assert(xformat("{:.5s}", "🐱🐱🐱") == "🐱🐱🐱"); //libfmt8 fails here TODO DONT SKIP IF NOT libfmt8
+	assert(xformat("{:.<5.5s}", "🐱🐱🐱") == "🐱🐱🐱"); //and here
+
+	assert(xformat("{:.5s}", "🐱🐱🐱") == "🐱🐱🐱"); //libfmt8 fails
+	assert(xformat("{:<5.5s}", "🐱🐱🐱") == "🐱🐱🐱"); //and here
+#endif
+
 #endif
 
 	var pi = 3.14f;

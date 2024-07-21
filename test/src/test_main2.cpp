@@ -183,13 +183,13 @@ programinit()
 	try {
 		//runtime errors instead of compiler error sadly
 
-//		var x1	   = x1 ^= 1;	//sadly c++ compiler allows this
-		var x1	   = x1 + 1;	//sadly c++ compiler allows this
-		var undefx = undefx++;	//sadly c++ compiler allows this
-		var z	   = z + 1;		//sadly c++ compiler allows this
+//		var x1	   = x1 ^= 1;	//sadly c++ compiler allows this (some warn). Exodus catches it at runtime with VarUndefined
+		var x1	   = x1 + 1;	//sadly c++ compiler allows this (some warn). Exodus catches it at runtime with VarUndefined
+		var undefx = undefx++;	//sadly c++ compiler allows this (some warn). Exodus catches it at runtime with VarUndefined
+		var z	   = z + 1;		//sadly c++ compiler allows this (some warn). Exodus catches it at runtime with VarUndefined
 		//var x++;				//doesnt compile
-//		var xx = xx.operator++();  //sadly c++ compiler allows this
-		var xx = xx++;  //sadly c++ compiler allows this
+//		var xx = xx.operator++();  //sadly c++ compiler allows this (some warn). Exodus catches it at runtime with VarUndefined
+		var xx = xx++;  //sadly c++ compiler allows this (some warn). Exodus catches it at runtime with VarUndefined
 ////var x = "x";
 ////printl(x + x);
 //		throw VarError("xxxxxx");
@@ -202,7 +202,7 @@ programinit()
 #ifdef VAR_SAFE_DESTRUCTOR
 	printl("\nVerify that exodus catches c++ defect at runtime");
 	try {
-		var abc = abc + 1;
+		var abc = abc + 1; //sadly c++ compiler allows this (some warn). Exodus catches it at runtime with VarUndefined
 		printl("should never get here because above should cause a runtime undefined error");
 		assert(false);
 	} catch (VarUndefined& e) {
