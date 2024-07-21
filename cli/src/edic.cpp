@@ -322,7 +322,9 @@ function main() {
 				// --RAW-CONTROL-CHARS allows colors from compiler to be shown properly in compiler output
 				// --chop-long-lines prevents long lines wrapping and forces scrolling right to see them
 				// --quit-if-one-screen passes control immedately back to user shell if all compiler output fits on one page
-				compilecmd ^= " | pager --RAW-CONTROL-CHARS --chop-long-lines --quit-if-one-screen";
+//				compilecmd ^= " | pager --RAW-CONTROL-CHARS --chop-long-lines --quit-if-one-screen";
+				// Remove long line scroll right because it prevents cut and pasting long lines
+				compilecmd ^= " | pager --RAW-CONTROL-CHARS --quit-if-one-screen";
 
 			}
 			else

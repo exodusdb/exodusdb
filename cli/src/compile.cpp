@@ -387,7 +387,8 @@ function main() {
 
 #if EXO_MODULE
 
-		// Memorise/bequeath/perpetuate the state of EXO_MODULE as at original build time of compile.cpp
+		// Bequeath/perpetuate the state of EXO_MODULE to compiled programs
+		// as at original build time of the current compiler object
 		basicoptions ^= " -DEXO_MODULE=1";
 
 		// Add path to var and std modules
@@ -1755,21 +1756,23 @@ function static compile2(
 	////////////////////
 	if (verbose)
 		printl(compilecmd);
-	var compileroutput;
-	let compileok = osshellread(compileroutput, compilecmd);
+	var compileoutput;
+	let compileok = osshellread(compileoutput, compilecmd);
 	if (not compileok) {
 		atomic_ncompilation_failures++;
 	}
 
-	// Handle compiler output
-	compileroutput.trimmerlast("\n\t\r ");
+	// Handle compile output
+	compileoutput.trimmerlast("\n\t\r ");
 	var startatlineno;
 	{
-		if (compileroutput)
-			compileroutput.outputl();
-		let charn = index(compileroutput, ": error:");
+		if (compileoutput)
+			compileoutput.outputl();
+
+		// Locate the first syntax error if any
+		let charn = index(compileoutput, ": error:");
 		if (charn) {
-			startatlineno = compileroutput.b(charn - 9, 9);
+			startatlineno = compileoutput.b(charn - 9, 9);
 			startatlineno = startatlineno.field2(":", -1);
 			return "";	//continue;
 		}
@@ -1778,10 +1781,16 @@ function static compile2(
 	// Get new objfile info or continue
 	let newobjfileinfo = osfile(objfilename);
 	if (not newobjfileinfo) {
+
+		// linker errors might not give a compile error so bump count in that case
 		if (compileok)
 			atomic_ncompilation_failures++;
-		errputl(oscwd());
+
+		// Allow user to see compile command in case of lack of desired output
+		errputl(compilecmd);
+
 		objfilename.errputl("Error: Cannot output file ");
+
 		return "";	//continue;
 	}
 
