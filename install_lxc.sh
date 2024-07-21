@@ -246,15 +246,21 @@ function do_one_stage {
 :
 :	tar local exodus dir
 :
-			TAR_FILENAME=lxc_exodus.tar.z
-			rm ../$TAR_FILENAME -rf
-			tar cfz ../$TAR_FILENAME ../exodus
-			TAR_SIZE=$(ls -lh ../$TAR_FILENAME|cut -d' ' -f5)
+			TAR_FILENAME=${ALL_TAR_FILENAME:-lxc_$$_exodus.tar.z}
+			if [[ ! -f $TAR_FILENAME ]]; then
+				tar cfz $TAR_FILENAME ../exodus
+			fi
+			TAR_SIZE=$(ls -lh $TAR_FILENAME|cut -d' ' -f5)
 :
 :	Push the tar file $TAR_SIZE to $NEW_C
 :
-			lxc file push ../$TAR_FILENAME ${NEW_C}${TARGET_HOME}/$TAR_FILENAME
-			rm ../$TAR_FILENAME
+			lxc file push $TAR_FILENAME ${NEW_C}${TARGET_HOME}/$TAR_FILENAME
+:
+:	Remove the tar file if not running under install_lxc_all.sh
+:
+			if [[ ! -n ${ALL_TAR_FILENAME:-} ]]; then
+				rm $TAR_FILENAME -f
+			fi
 :
 :	Untar exodus on the target - $NEW_C
 :
