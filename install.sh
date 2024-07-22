@@ -316,6 +316,17 @@ function get_dependencies_for_build_and_install {
 	apt list postgresql*dev* |& grep postgresql
 
 :
+: Remove local libfmt if installed
+: --------------------------------
+:
+#	if [[ -d /usr/local/include/fmt ]]; then
+		sudo rm /usr/local/include/fmt -rf
+		sudo rm /usr/local/lib/libfmt* -f
+		sudo rm /usr/local/lib/cmake/fmt/ -rf
+		sudo ldconfig
+#	fi
+
+:
 : Download and install build dependencies for exodus and pgexodus
 : ---------------------------------------------------------------
 :
