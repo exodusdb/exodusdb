@@ -5,8 +5,6 @@
 
 #include <exodus/program.h>
 
-#define BOOST_REGEX 1
-
 // TESTING
 // =======
 //
@@ -801,14 +799,12 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 
 	assert(oconv(digits, "MRA")     eq "");
 	assert(oconv(digits, "MR/A")    eq digits);
-	//#ifndef __APPLE__
-	if (BOOST_REGEX) {
+#ifdef EXO_REGEX_BOOST
 		assert(oconv(digits, "MRN")    eq digits);
 		assert(oconv(digits, "MRB")    eq digits);
 		assert(oconv(digits, "MR/N")   eq "");
 		assert(oconv(digits, "MR/B")   eq "");
-	}
-	//#endif
+#endif
 	assert(oconv("abc .DEF", "MRU") eq "ABC .DEF");
 	assert(oconv("abc .DEF", "MRL") eq "abc .def");
 
@@ -831,7 +827,7 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 	assert(oconv(lowercase, "MRL") eq lowercase);
 
 	TRACE(letters)
-	if (BOOST_REGEX) {
+#ifdef EXO_REGEX_BOOST
 		oconv(letters, "MRA").outputl("Expected:" ^ letters ^ " Actual:");
 		oconv(letters, "MRN").outputl("Expected:\"\" Actual:");
 		oconv(letters, "MRB").outputl("Expected:" ^ letters ^ " Actual:");
@@ -841,7 +837,7 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 		assert(oconv(letters, "MR/A") eq "");
 		assert(oconv(letters, "MR/N") eq letters);
 		assert(oconv(letters, "MR/B") eq "");
-	}
+#endif
 
 	//lambda function
 	auto testinvert = [](var cc) {

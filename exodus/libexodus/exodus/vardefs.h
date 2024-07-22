@@ -85,4 +85,6 @@ namespace exo {
 #define DEFAULT_VM = VM_
 #define DEFAULT_NULL = nullptr
 
+#define EXO_REGEX_BOOST
+
 #endif //EXO_VARDEFS_H

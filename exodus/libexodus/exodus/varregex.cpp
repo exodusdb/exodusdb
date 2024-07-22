@@ -79,13 +79,13 @@ allowing it to interface correctly with UTF-8, UTF-16, and UTF-32 data:
 
 #include <boost/algorithm/string/replace.hpp>
 
-#define USE_BOOST
-#ifdef USE_BOOST
+#define EXO_BOOST_REGEX
+#ifdef EXO_BOOST_REGEX
 #	define std_boost boost
 #	include <boost/regex/icu.hpp>
 #	include <boost/regex.hpp>
 
-#else // USE_BOOST not defined
+#else // EXO_BOOST_REGEX not defined
 #	if EXO_MODULE
 #	else
 #		include <regex>
@@ -113,7 +113,7 @@ rex::rex(SV expression, SV options) :expression_(expression), options_(options) 
 // From here on we need to use Boost's u32_regex, u32_match, u32_replace
 // in order to correctly process no-ASCII/multibyte characters
 
-#ifdef USE_BOOST
+#ifdef EXO_BOOST_REGEX
 #	define REGEX boost::u32regex
 #	define REGEX_REPLACE boost::u32regex_replace
 
@@ -136,7 +136,7 @@ rex::rex(SV expression, SV options) :expression_(expression), options_(options) 
     static const boost::u32regex non_alphanum_regex =
         boost::make_u32regex("\\W+");  // \W non-alphanumeric
 
-#else // USE_BOOST not defined
+#else // EXO_BOOST_REGEX not defined
 #	define REGEX std::regex
 #	define REGEX_REPLACE std::regex_replace
 	using syntax_flags_typ = std::regex::flag_type;
@@ -157,83 +157,102 @@ rex::rex(SV expression, SV options) :expression_(expression), options_(options) 
 
 constexpr static syntax_flags_typ get_syntax_flags(SV regex_options) {
 
+	// Default flavour is ECMAScript/Perl
+	// https://www.boost.org/doc/libs/1_80_0/libs/regex/doc/html/boost_regex/ref/syntax_option_type/syntax_option_type_perl.html
+	// https://en.cppreference.com/w/cpp/regex/syntax_option_type
+
+	// Using only c++11 std::regex standardized syntax options
+	// Except for w - wild cards/globs and l - literal
+
 	// Note that match_flags e.g. (f for first only) are only used in regex_replace
 
 	// determine regex_options from string
 
 	// char ranges like a-z will be locale sensitive if ECMAScript
 
-	// w - glob not regex (for match)
+	// w - glob not regex (for match and search only ATM)
 
 	// l - literal
 
 	// i - case insensitive
 
 	// p - ECMAScript/Perl default
-	// b - basic posix
-	// e - extended posix
+	// b - basic POSIX (same as sed)
+	// e - extended POSIX
+	// a - awk
+	// g - grep
+	// eg - egrep or grep -E
 
-	// m - multiline. default in boost
-	// s - single line. default in std::regex
-
-	// Default flavour is ECMAScript/Perl
-	// https://www.boost.org/doc/libs/1_80_0/libs/regex/doc/html/boost_regex/ref/syntax_option_type/syntax_option_type_perl.html
-	// https://en.cppreference.com/w/cpp/regex/syntax_option_type
+	// m - multiline. Default in boost (and therefore exodus)
+	// s - single line. Default in std::regex
 
 	// default - collate - Character ranges of the form "[a-b]" will be locale sensitive.
 	// IF? the normal/ECMAScript/perl engine is selected.
 	syntax_flags_typ regex_syntax_flags = std_boost::regex_constants::collate;
 
 	// i = icase - Character matching should be performed without regard to case.
-	if (regex_options.find('i') != std::string::npos)
+	if (regex_options.find('i') != std::string::npos) {
 		regex_syntax_flags |= std_boost::regex_constants::icase;
+	}
 
 	// m = multiline (The default in boost but not std::regex
 	// Specifies that ^ shall match the beginning of a line and $ shall match the end of a line,
 	// if the normal/perl/ECMAScript engine is selected.
-#ifndef USE_BOOST
-	if (regex_options.find('m') != std::string::npos)
+#ifndef EXO_BOOST_REGEX
+	if (regex_options.find('m') != std::string::npos) {
 		regex_syntax_flags|=std_boost::regex_constants::multiline;
+	}
 #endif
 
-	// s = single/no multiline (The default in std::regex but not boost
+	// s = single/no multiline (The default in std::regex but not boost)
 	// Specifies that ^ shall match the beginning of a line and $ shall match the end of a line,
 	// if the normal/perl/ECMAScript engine is selected.
-	if (regex_options.find('s') != std::string::npos)
+	if (regex_options.find('s') != std::string::npos) {
 		regex_syntax_flags|=std_boost::regex_constants::no_mod_m;
-
-	// b = basic - Use the basic POSIX regular expression grammar
-	if (regex_options.find('b') != std::string::npos)
-		regex_syntax_flags|=std_boost::regex_constants::basic;
-
-	// e = extended - Use the extended POSIX regular expression grammar
-	if (regex_options.find('e') != std::string::npos)
-		regex_syntax_flags |= std_boost::regex_constants::extended;
-
-	// a = awk - Use the regular expression grammar used by the awk utility in POSIX
-	// Use the extended POSIX regular expression grammar
-	if (regex_options.find('a') != std::string::npos)
-		regex_syntax_flags |= std_boost::regex_constants::awk;
-
-	// n = nosubs - When performing matches, all marked sub-expressions (expr) are treated
-	// as non-marking sub-expressions (?:expr).
-	// No matches are stored in the supplied std::regex_match structure and mark_count() is zero.
-	if (regex_options.find('n') != std::string::npos)
-		regex_syntax_flags |= std_boost::regex_constants::nosubs;
-
-	// g = grep - Use the regular expression grammar used by the grep utility in POSIX.
-	// This is effectively the same as the basic option with the addition of newline '\n' as an alternation separator.
-	if (regex_options.find('g') != std::string::npos)
-		regex_syntax_flags |= std_boost::regex_constants::grep;
+	}
 
 	// l - literal TODO manually implement
 	// ignore all usual regex special characters
 	// BOOST only option
-#ifdef USE_BOOST
+#ifdef EXO_BOOST_REGEX
 	//if (regex_options.contains("l"))
-	if (regex_options.find('l') != std::string::npos)
+	if (regex_options.find('l') != std::string::npos) {
 		regex_syntax_flags |= std_boost::regex_constants::literal;
+	}
+	else
 #endif
+
+	// g = grep - Use the regular expression grammar used by the grep utility in POSIX.
+	// eg = egrep (like grep -E) This is effectively the same as the basic option with the addition of newline '\n' as an alternation separator.
+	if (regex_options.find('g') != std::string::npos) {
+		if (regex_options.find('e') != std::string::npos)
+			regex_syntax_flags |= std_boost::regex_constants::egrep;
+		else
+			regex_syntax_flags |= std_boost::regex_constants::grep;
+	}
+
+	// e = extended - Use the extended POSIX regular expression grammar
+	else if (regex_options.find('e') != std::string::npos) {
+			regex_syntax_flags |= std_boost::regex_constants::extended;
+	}
+
+	// b = basic - Use the basic POSIX regular expression grammar
+	else if (regex_options.find('b') != std::string::npos) {
+		regex_syntax_flags|=std_boost::regex_constants::basic;
+	}
+
+	// a = awk - Use the regular expression grammar used by the awk utility in POSIX
+	// Use the extended POSIX regular expression grammar
+	else if (regex_options.find('a') != std::string::npos) {
+		regex_syntax_flags |= std_boost::regex_constants::awk;
+	}
+
+	// n = nosubs - When performing matches, all marked sub-expressions (expr) are treated
+	// as non-marking sub-expressions (?:expr).
+	// No matches are stored in the supplied std::regex_match structure and mark_count() is zero.
+	if (regex_options.find('n') != std::string::npos) {
+		regex_syntax_flags |= std_boost::regex_constants::nosubs;
+	}
 
 	return regex_syntax_flags;
 }
@@ -312,7 +331,7 @@ var var::match(SV regex, SV regex_options) const {
 		// Special chars ". ^ $ | ( ) [ ] { } + \"
 		const std_boost::regex regex_special_chars{R"raw([.^$|()\[\]{}+\\])raw"};
 
-#ifdef USE_BOOST
+#ifdef EXO_BOOST_REGEX
 		const std::string replacement_for_regex_special = R"raw(\\$&)raw";
 #else
 		const std::string replacement_for_regex_special = R"raw(\$&)raw";
@@ -339,7 +358,7 @@ var var::match(SV regex, SV regex_options) const {
 	REGEX& regex_engine = get_regex_engine(regex, regex_options);
 
 	// construct our iterators:
-#ifdef USE_BOOST
+#ifdef EXO_BOOST_REGEX
 	boost::u32regex_iterator<std::string::const_iterator> iter;
 	try {
 		iter = boost::make_u32regex_iterator(var_str, regex_engine);
@@ -436,7 +455,7 @@ var var::search(SV regex, VARREF startchar1, SV regex_options) const {
 		// Special chars ". ^ $ | ( ) [ ] { } + \"
 		const std_boost::regex regex_special_chars{R"raw([.^$|()\[\]{}+\\])raw"};
 
-#ifdef USE_BOOST
+#ifdef EXO_BOOST_REGEX
 		const std::string replacement_for_regex_special = R"raw(\\$&)raw";
 #else
 		const std::string replacement_for_regex_special = R"raw(\$&)raw";
@@ -486,7 +505,7 @@ var var::search(SV regex, VARREF startchar1, SV regex_options) const {
 
 	// Construct our iterators:
 
-#ifdef USE_BOOST
+#ifdef EXO_BOOST_REGEX
 	boost::u32regex_iterator<const char*> iter;
 	try {
 //		iter = boost::make_u32regex_iterator(std::advance(var_str.begin(), startchar1), regex);

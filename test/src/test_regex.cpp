@@ -1,8 +1,6 @@
 #undef NDEBUG  //because we are using assert to check actual operations that cannot be skipped in release mode testing
 #include <cassert>
 
-#define BOOST_REGEX 1
-
 #include <exodus/program.h>
 programinit()
 
@@ -90,10 +88,13 @@ programinit()
 		// case insensitive
 		assert(replace("aAa bbb ccc", rex("a", "i"), "Q") eq "QQQ bbb ccc");
 
-		// single-line. ^ only matches beginning of string and not any embedded \n chars
+		// single-line. ^ only matches beginning of string and NOT any embedded \n chars
 		assert(replace("aaa\nbbb\nccc\n", rex("^b.*?$", "s"), "QQQ").outputl() eq "aaa\nbbb\nccc\n");
 
 		// multi-line ^ matches beginning of string AND any embedded \n chars
+		assert(replace("aaa\nbbb\nccc\n", rex("^b.*?$", "m"), "QQQ").outputl() eq "aaa\nQQQ\nccc\n");
+
+		// DEFAULT is multiline ^ matches beginning of string AND any embedded \n chars
 		assert(replace("aaa\nbbb\nccc\n", rex("^b.*?$", "m"), "QQQ").outputl() eq "aaa\nQQQ\nccc\n");
 
 		// l - literal - no special regex characters ... but better to use var::replace() for this
@@ -132,46 +133,45 @@ programinit()
 
 	// no need to backslash many letters
 
-#define BOOST_REGEX 1
 	{
 
 		// \d \D and [:number:]
 		assert(var("a1b23c99").replace("\\d"_rex, "N")            eq "aNbNNcNN");
 		assert(var("a1b23c99").replace("\\D"_rex, "N")            eq "N1N23N99");
-		if (BOOST_REGEX) {
+#ifdef EXO_REGEX_BOOST
 			assert(var("a1b23c99").replace("[[:number:]]"_rex, "N")  eq "aNbNNcNN");
 			assert(var("a1b23c99").replace("[^[:number:]]"_rex, "N") eq "N1N23N99");
-		}
+#endif
 
 		// [:alnum:] = letters and numbers. No _
-		if (BOOST_REGEX) {
+#ifdef EXO_REGEX_BOOST
 			assert(var("a1b2_ \n3c99").replace("[[:alnum:]]"_rex, "N").outputl()  eq "NNNN_ \nNNNN");
 			assert(var("a1b2_ \n3c99").replace("[^[:alnum:]]"_rex, "N").outputl() eq "a1b2NNN3c99");
-		}
+#endif
 
 		// \w and \W in alnum + _
 		assert(var("a1b2_ \n3c99").replace("\\w"_rex, "N").outputl()            eq "NNNNN \nNNNN");
 		assert(var("a1b2_ \n3c99").replace("\\W"_rex, "N").outputl()            eq "a1b2_NN3c99");
-		if (BOOST_REGEX) {
+#ifdef EXO_REGEX_BOOST
 			assert(var("a1b2_ \n3c99").replace("[_[:alnum:]]"_rex, "N").outputl()  eq "NNNNN \nNNNN");
 			assert(var("a1b2_ \n3c99").replace("[^_[:alnum:]]"_rex, "N").outputl() eq "a1b2_NN3c99");
-		}
+#endif
 
 		// \s \S and [[:space:]]  means whitespace
 		assert(var("a1b2_ \n3c99").replace("\\s"_rex, "N").outputl()           eq "a1b2_NN3c99");
 		assert(var("a1b2_ \n3c99").replace("\\S"_rex, "N").outputl()           eq "NNNNN \nNNNN");
-		if (BOOST_REGEX) {
+#ifdef EXO_REGEX_BOOST
 			assert(var("a1b2_ \n3c99").replace("[[:space:]]"_rex, "N").outputl()  eq "a1b2_NN3c99");
 			assert(var("a1b2_ \n3c99").replace("[^[:space:]]"_rex, "N").outputl() eq "NNNNN \nNNNN");
-		}
+#endif
 
-		if (BOOST_REGEX) {
+#ifdef EXO_REGEX_BOOST
 			// \{Number}
 			assert(var("a1b2_ \n3c99").replace("\\p{Number}"_rex, "N").outputl() eq "aNbN_ \nNcNN");
-		}
+#endif
 	}
 
-	if (BOOST_REGEX) {
+#ifdef EXO_REGEX_BOOST
 		//123]]123^,2.99]]2.99^,AMO024]]AMO024^,Title]]Title^,"Description, more info"]"]Description, more info^,]]^,123987564]]123987564
 		assert(match(csvline, csvre).convert(_FM _VM, "^]").outputl() eq R"raw(123]]123^,2.99]]2.99^,AMO024]]AMO024^,Title]]Title^,"Description, more info"]"]Description, more info^,]]^,123987564]]123987564)raw");
 
@@ -180,7 +180,7 @@ programinit()
 
 		//unicode case sensitive NOT finding
 		assert(match("αβγδεΑΒΓΔΕ", "(Α).(γδ)", "").convert(_FM _VM, "^]") eq "");
-	}
+#endif
 
 	var r1 = _FM "0.123";
 	assert(r1.replace("([\x1A-\x1F]-?)0."_rex, "$1.") eq _FM ".123");
@@ -191,7 +191,7 @@ programinit()
 	//assert(var("Ⅻ").replace(R"(\p{Number})"_rex,"yes")=="yes");
 	//assert(var("⅝").replace(R"(\p{Number})"_rex,"yes")=="yes");
 	assert(var("1").replace(R"([[:digit:]])"_rex, "yes") eq "yes");
-	if (BOOST_REGEX) {
+#ifdef EXO_REGEX_BOOST
 		assert(var("Ⅻ").replace(R"(\p{Number})"_rex, "yes") eq "yes");
 		assert(var("⅝").replace(R"(\p{Number})"_rex, "yes") eq "yes");
 
@@ -199,7 +199,7 @@ programinit()
 		//assert(var("⅝").replace(R"(\p{Number})"_rex,"yes").outputl()!="yes");
 		assert(var("Ⅻ").replace(R"([[:digit:]])"_rex, "yes").outputl() ne "yes");
 		assert(var("⅝").replace(R"([[:digit:]])"_rex, "yes").outputl() ne "yes");
-	}
+#endif
 
 	//test glob matching using * ? eg *.* and *.??? etc
 	assert(var("test.htm").match("*.*", "w").outputl() eq "test.htm");
@@ -237,16 +237,16 @@ programinit()
 		assert(replace("abcd", "b."_rex, "xyz").outputl() eq "axyzd");	   //right case to convert
 		assert(replace("abc", "B."_rex, "xyz").outputl() eq "abc");		   //wrong case to convert
 		assert(replace("abcd", rex("B.", "i"), "xyz").outputl() eq "axyzd");  //case insensitive converts
-		if (BOOST_REGEX)
+#ifdef EXO_REGEX_BOOST
 			assert(replace("abc", rex("b.", "l"), "xyz").outputl() eq "abc");	//literal wont convert
-
+#endif
 		//simple test of case sensitive/insensitive swap
 		assert(replace("abc", "b", "xyz").outputl() eq "axyzc");				 //will convert right case
 		assert(replace("abc", "B", "xyz").outputl() eq "abc");					 //wont convert wrong case
 		assert(replace("abc", rex("B", "i"), "xyz").outputl() eq "axyzc");	 //will convert case insensitive
-		if (BOOST_REGEX)
+#ifdef EXO_REGEX_BOOST
 			assert(replace("ab*c", rex("B*", "il"), "xyz").outputl() eq "axyzc");	//will convert case insensitive but not regex
-
+#endif
 		assert(replace("abababab", "ab", "x").outputl()           eq "xxxx");
 		assert(replace("abababab", "ab"_rex, "x").outputl() eq "xxxx");		//regex
 		assert(replace("abababab", "a."_rex, "xy").outputl() eq "xyxyxyxy");	//regex

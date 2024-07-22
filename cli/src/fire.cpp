@@ -29,8 +29,10 @@ function main() {
 	}
 
 	let update = OPTIONS.contains("U");
-//	const bool raw = rxopts.contains("r");
+
 	const bool raw = OPTIONS.contains("r");
+
+	// Remove all non-regex options
 	let rxopts = OPTIONS.convert("rU", "");
 
 	for (in osfilename : COMMAND) {
