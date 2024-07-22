@@ -2,6 +2,16 @@
 #undef NDEBUG  //because we are using assert to check actual operations that cannot be skipped in release mode testing
 #include <cassert>
 
+// Ignore a warning from gcc. TODO proper solution?
+#if __GNUC__ == 14
+///usr/include/c++/14/bits/stl_algobase.h:452:30: warning:
+// ‘void* __builtin_memmove(void*, const void*, long unsigned int)’ writing between 5 and 922
+//3372036854775807 bytes into a region of size 4 overflows the destination [-Wstringop-overflow=]
+//  452 |             __builtin_memmove(__result, __first, sizeof(_Tp) * _Num);
+//      |             ~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#	pragma GCC diagnostic ignored "-Wstringop-overflow="
+#endif
+
 // exodus format/println functions
 // Require this additional header BEFORE any other exodus_header.
 // Slows down compilation a bit so not included in standard exodus headers
