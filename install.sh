@@ -131,7 +131,10 @@ function APT_GET {
 :
 : Retry apt-get three times if it times out. $N/3
 : ----------------------------------------------
-		if timeout 120s $*; then
+:
+		# /dev/null to stop timeout causing random hang until timeout
+		# with apt process stuck on tcsetattr call. see gdb -p 9999
+		if timeout 120s $* < /dev/null; then
 			break
 		fi
 	done
