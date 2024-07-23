@@ -485,15 +485,15 @@ function build_and_install {
 :
 	echo PGPATH=${PGPATH:-}
 	rm $EXODUS_DIR/build -rf
-	cmake -S $EXODUS_DIR -B $EXODUS_DIR/build $CMAKE_BUILD_OPTIONS
-:
-: Dump cmake configuration
-:
-	cmake -L -B $EXODUS_DIR/build
+	cmake -L -S $EXODUS_DIR -B $EXODUS_DIR/build $CMAKE_BUILD_OPTIONS #--warn-uninitialized --trace-expanded
 :
 : Build
 :
-	cmake --build $EXODUS_DIR/build -j$((`nproc`+1))
+	#cd $EXODUS_DIR/build
+	#make -j$((`nproc`+1))
+	#ninja
+	#cmake --build $EXODUS_DIR/build -j$((`nproc`+1))
+	cmake --build $EXODUS_DIR/build
 
 :
 : Run tests that do not require database
