@@ -2,12 +2,15 @@
 #include <cassert>
 
 // 1. TO_CHARS from Ubuntu 22.04
-#if __GNUC__ >=11
-#define USE_TO_CHARS_G
+// Duplicated in varnum.cpp, testnum.cpp and test_precision.cpp. Keep in sync.
+#if __GNUC__ >= 11 || __clang_major__ >=  14
+#define USE_TO_CHARS
+//#include <array>
 
 // 2. RYU
 #elif __has_include(<ryu/ryu.h>)
 #define USE_RYU
+#include <ryu/ryu.h>
 
 // 3. STRINGSTREAM
 #else

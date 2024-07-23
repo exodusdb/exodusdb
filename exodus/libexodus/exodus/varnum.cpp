@@ -42,6 +42,7 @@ THE SOFTWARE.
 //sstream/printf 1234.5678 -> "1234.5678" 1800ns
 
 // 1. TO_CHARS from Ubuntu 22.04
+// Duplicated in varnum.cpp, testnum.cpp and test_precision.cpp. Keep in sync.
 #if __GNUC__ >= 11 || __clang_major__ >=  14
 #define USE_TO_CHARS
 //#include <array>

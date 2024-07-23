@@ -6,12 +6,15 @@
 #include <sstream>
 
 // 1. TO_CHARS from Ubuntu 22.04
-#if __GNUC__ >=11
-#define USE_TO_CHARS_G
+// Duplicated in varnum.cpp, testnum.cpp and test_precision.cpp. Keep in sync.
+#if __GNUC__ >= 11 || __clang_major__ >=  14
+#define USE_TO_CHARS
+//#include <array>
 
 // 2. RYU
 #elif __has_include(<ryu/ryu.h>)
 #define USE_RYU
+#include <ryu/ryu.h>
 
 // 3. STRINGSTREAM
 #else
@@ -89,7 +92,7 @@ function main() {
 		assert((var(9.36749) ^ "x").outputl()         eq "9.36749x");
 		assert(((var("9.36749") + 0) ^ "x").outputl() eq "9.36749x");
 
-#ifdef USE_TO_CHARS_G
+#ifdef USE_TO_CHARS
 		//assert((var(1234567890123456789.)  ^ "x").outputl() eq "1234567890123456768x");
 		//assert((var(12345678901234567890.) ^ "x").outputl() eq "12345678901234567168x");
 		assert((var(1234567890123456789.) ^ "x").outputl()  eq "1.234567890123457e+18x");
@@ -119,7 +122,7 @@ function main() {
 		assert((var(12345678901234567890.) ^ "x").outputl() eq "1.234567890123457e+19x");
 #endif
 
-#ifndef USE_TO_CHARS_G
+#ifndef USE_TO_CHARS
 		assert((var("999999999999999.9") + 0).outputl().toString()  eq "999999999999999.9");
 		printl(var(9999999999999999.9).toDouble());
 		TRACE(var("9999999999999999.9") + 0)
@@ -148,7 +151,7 @@ function main() {
 		dv2 = "0.00005678901234567890d";
 		sv1 = dv1 ^ "x";
 		//var sv2 = "0.00005678901235x";
-#ifdef USE_TO_CHARS_G
+#ifdef USE_TO_CHARS
 		//sv2 = "5.67890123456789e-05x";
 		sv2 = "0.0000567890123456789x";
 #else
@@ -166,7 +169,7 @@ function main() {
 		TRACE(var(dv1))
 		TRACE(var(dv2))
 
-//#if defined(USE_TO_CHARS_G)
+//#if defined(USE_TO_CHARS)
 //		sv2 = "1234567890.0000567x";
 #if defined(USE_RYU)
 		sv2 = "1234567890.0000567x";
@@ -185,7 +188,7 @@ function main() {
 		dv1 = dd1;
 		dv2 = "0.00005678d";
 		sv1 = dv1 ^ "x";
-		//#ifdef USE_TO_CHARS_G
+		//#ifdef USE_TO_CHARS
 		//		sv2 = "5.678e-05x";
 		//#else
 		sv2 = "0.00005678x";
@@ -198,7 +201,7 @@ function main() {
 		dv1 = dd1;
 		dv2 = "0.0000000000001d";
 		sv1 = dv1 ^ "x";
-		//#ifdef USE_TO_CHARS_G
+		//#ifdef USE_TO_CHARS
 		//		sv2="1e-13x";
 		sv2 = "0.0000000000001x";
 		//#else
@@ -425,7 +428,7 @@ programexit()
 		assert(test2(".000000000000000000000000000012345678901234567890123456789", "1.2345678901234567e-29x"));
 		assert(test2(".0000000000000000000000000000012345678901234567890123456789", "1.2345678901234568e-30x"));
 #else
-		//#if defined(USE_TO_CHARS_G)
+		//#if defined(USE_TO_CHARS)
 		assert(test2("123456789012345678901234567890000000000000000000000000000000.", "1.234567890123457e+59x"));
 		assert(test2("12345678901234567890123456789000000000000000000000000000000.", "1.234567890123457e+58x"));
 		assert(test2("1234567890123456789012345678900000000000000000000000000000.", "1.234567890123457e+57x"));
@@ -614,7 +617,7 @@ programexit()
 	assert(var(1e-11f).outputl().toString() eq "0.000000000009999999960041972");
 	printl(var(1e-11));
 
-	//#ifdef USE_TO_CHARS_G
+	//#ifdef USE_TO_CHARS
 	//	assert(var(1e-11).outputl().toString() eq "1e-11");
 	//#elif defined(USE_RYU)
 	//	assert(var(1e-11).outputl().toString() eq "1e-11");
@@ -636,7 +639,7 @@ programexit()
 	assert(var(1e-13f).outputl().toString() eq "0.000000000000099999998245167");
 	assert(var(1e-14f).outputl().toString() eq "0.0000000000000099999998245167");
 
-	//#ifdef USE_TO_CHARS_G
+	//#ifdef USE_TO_CHARS
 	//	assert(var(1e-12 ).outputl().toString() eq "1e-12");
 	//	assert(var(1e-13 ).outputl().toString() eq "1e-13");
 	//	assert(var(1e-14 ).outputl().toString() eq "1e-14");
@@ -678,7 +681,7 @@ programexit()
 
 	//assert((var(pwr(10,-26)) ^ "x").outputl() =="0.00000000000000000000000001x");//better calculation of 10^-26
 	//assert((var(1/pwr(10,26)) ^ "x").outputl() =="0.000000000000000000000000009999999999999999x");//poorer calculation of 1/10^26
-#ifdef USE_TO_CHARS_G
+#ifdef USE_TO_CHARS
 	assert((var(pwr(10, -26)) ^ "x").outputl() eq "1e-26x");  //better calculation of 10^-26
 #else
 	assert((var(pwr(10, -26)) ^ "x").outputl() eq "1e-26x");										   //better calculation of 10^-26
@@ -686,7 +689,7 @@ programexit()
 	assert((var(1 / pwr(10, 26)) ^ "x").outputl() eq "9.999999999999999e-27x");	 //poorer calculation of 1/10^26
 
 	printl(((var(pwr(10, -26)) - var(1 / pwr(10, 26))) ^ "x"));
-//#if defined(USE_RYU) or defined(USE_TO_CHARS_G)
+//#if defined(USE_RYU) or defined(USE_TO_CHARS)
 //	assert(((var(pwr(10,-26)) - var(1/pwr(10,26))) ^ "x").outputl() eq "1.4349296274686127e-42x");//ryu
 //#else
 #ifdef USE_RYU
@@ -701,7 +704,7 @@ programexit()
 	//assert((var(1/pwr(10,26)) ^ "x").outputl() eq "0.000000000000000000000000009999999999999999x");
 	//assert((var(pwr(10,-27)) ^ "x")  eq "0.000000000000000000000000001x");
 
-#ifdef USE_TO_CHARS_G
+#ifdef USE_TO_CHARS
 	assert((var(pwr(10, -26)) ^ "x").output()     eq "1e-26x");
 	assert((var(pwr(10, -27)) ^ "x").output()     eq "1e-27x");
 #else
@@ -715,7 +718,7 @@ programexit()
 		assert(var(1000).outputl().toString()       eq "1000");
 		assert(var(10'000'000).outputl().toString() eq "10000000");
 
-		//#ifdef USE_TO_CHARS_G
+		//#ifdef USE_TO_CHARS
 		//		assert(var(0.0001)       .outputl().toString() eq "1e-04");
 		//		assert(var(0.000'000'01) .outputl().toString() eq "1e-08");
 		//		assert(var(-0.000'000'01).outputl().toString() eq "-1e-08");
