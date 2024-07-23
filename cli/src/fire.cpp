@@ -79,8 +79,19 @@ function main() {
 				// diff returns an error if there are differences
 				//if (not osshell("diff " ^ osfilename ^ " " ^ tmpfilename ^ " --color=always")) {
 				var cmd = "diff " ^ osfilename ^ " " ^ tmpfilename;
-				if (TERMINAL)
-					cmd ^= " --color=always";
+				if (TERMINAL) {
+					var palette=osgetenv("DIFF_COLORS");
+//					if (not palette) {
+//						var palette=osgetenv("GREP_COLORS");
+//						// https://www.linux.org/docs/man1/grep.html
+//						GREP_COLORS=ms=1;31:mc=1;31:sl=:cx=:fn=1;35:ln=1;32:bn=1;32:se=1;36
+//					}
+					if (not palette)
+						// ad = additions
+						// de = deletions
+						palette = "ad=01;31;38;5;154:de=01;31;38;5;9";
+					cmd ^= " --color=always --palette=" ^ squote(palette);
+				}
 				if (not osshell(cmd)) {
 					//lasterror().outputl();
 				}
