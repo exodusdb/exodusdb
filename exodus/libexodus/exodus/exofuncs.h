@@ -221,6 +221,9 @@ ND var  getxlocale(void);
 
 // MATH
 
+ND bool isnum(CVR num1);
+ND var num(CVR num1);
+
 ND var abs(CVR num1);
 ND var pwr(CVR base, CVR exponent);
 ND var exp(CVR power);

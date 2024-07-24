@@ -144,6 +144,9 @@ ND PUBLIC var getxlocale() {return var().getxlocale();}
 
 // MATH
 
+ND PUBLIC bool isnum(CVR num1) {return num1.isnum();}
+ND PUBLIC var num(CVR num1) {return num1.num();}
+
 ND PUBLIC var abs(CVR num1) {return num1.abs();}
 ND PUBLIC var pwr(CVR base, CVR exponent) {return base.pwr(exponent);}
 ND PUBLIC var exp(CVR power) {return power.exp();}

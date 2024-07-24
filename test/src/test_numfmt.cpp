@@ -185,6 +185,52 @@ function main() {
 	test("999.", "999");
 	test("9999");
 
+// // isnum returns bool true or false
+//
+// // num   returns the original var IF isnum is true or 0 if the var is non-numeric
+//          in other words, it forces numeric and non-numeric becomes zero.
+//
+//	isnum is true for all numeric vars which includes all strings that can be converted to numbers (which includes "" which is 0)
+//
+//	num is the same as isnum but zero (and "") is FALSE for num and TRUE for isnum
+
+//	var        isnum   num   diff
+//	---        -----   ---   ----
+//	""         true    false *
+//	0 or "0"   true    false *
+//
+//  1 or "1"   true    true
+//  "x"        false   false
+
+//	"" isnum but not num
+//	"0" isnum but not num
+//	"1" isnum and num
+//	"x" not isnum and not num
+
+	{
+		var v1 = "";
+		assert(isnum(v1));
+		assert(not num(v1));
+	}
+
+	{
+		var v1 = "0";
+		assert(isnum(v1));
+		assert(not num(v1));
+	}
+
+	{
+		var v1 = "1.234";
+		assert(isnum(v1));
+		assert(num(v1));
+	}
+
+	{
+		var v1 = "abc";
+		assert(not isnum(v1));
+		assert(not num(v1));
+	}
+
 	printl(elapsedtimetext());
 	printl("Test passed");
 

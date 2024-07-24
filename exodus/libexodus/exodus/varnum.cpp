@@ -637,6 +637,15 @@ template<> PUBLIC bool VARBASE1::isnum(void) const {
 	return true;
 }
 
+template<> PUBLIC RETVAR VARBASE1::num(void) const {
+	RETVAR result;
+	if (this->isnum())
+		result = this->clone();
+	else
+		result = 0;
+	return result;
+}
+
 template<> PUBLIC void VARBASE1::assertNumeric(const char* message, const char* varname/* = ""*/) const {
 	if (!this->isnum()) {
 		UNLIKELY
