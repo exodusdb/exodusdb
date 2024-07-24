@@ -118,9 +118,10 @@ function main() {
 			"	F = Force compilation even if output file is newer than all input files\n"
 			"	X = Skip compilation\n"
 			"ENVIRONMENT\n"
-			"	EXO_COMPILE_OPTIONS as above"
-			"	CXX_OPTIONS depends on c++ compiler used"
-			"	CXX e.g. g++, clang, c++ with or without full path"
+			"	EXO_COMPILE_OPTIONS as above`"
+			"	CXX_OPTIONS depends on c++ compiler used`"
+			"	CXX e.g. g++, clang, c++ with or without full path`"
+			"	EXO_POST_COMPILE can be something like 'tac|fixdeprecated'"	
 		);
 
 
@@ -1751,8 +1752,14 @@ function static compile2(
 		compilecmd ^= " " ^ outputoption ^ " " ^ objfilename;
 	compilecmd ^= linkoptions;
 
+	// Capture warnings and errors for post compilation processing
+	let exo_post_compile = osgetenv("EXO_POST_COMPILE");
+	if (exo_post_compile) {
+		compilecmd ^= " 2>&1";
+	}
+
 	////////////////////
-	// Call the compiler
+	// Call the compiler - Dont forget that we are probably doing many in parallel threads
 	////////////////////
 	if (verbose)
 		printl(compilecmd);
@@ -1766,9 +1773,13 @@ function static compile2(
 	compileoutput.trimmerlast("\n\t\r ");
 	var startatlineno;
 	{
-		if (compileoutput)
+		if (compileoutput) {
 			compileoutput.outputl();
-
+			if (exo_post_compile) {
+				// e.g. tac|fixdeprecated
+				osshellwrite(compileoutput on exo_post_compile);
+			}
+		}
 		// Locate the first syntax error if any
 		let charn = index(compileoutput, ": error:");
 		if (charn) {
