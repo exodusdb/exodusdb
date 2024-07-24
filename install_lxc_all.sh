@@ -7,7 +7,16 @@ set -euxo pipefail
 :
 : Syntax:
 :
-: "$0 <BASE_CONTAINERS,> <STAGES> [clang,clang-default,clang-18,g++,g++-default,g++-14]"
+: "$0 <BASE_CONTAINERS,> <STAGES> [clang,clang-default,clang-18,clang-latest,g++,g++-default,g++-14,g++-latest, ]"
+:
+: 'BASE CONTAINERS - e.g. u2404,u2204,u2004'
+:
+: 'COMPILERS - default is both clang and g++'
+:
+: 'clang or g++ for latest version available. Optionally followed by a version e.g.'
+: 'clang-18, clang-min, clang-latest, clang-default, g++-14, g++-min, g++-latest, g++-default'
+:
+: Example:
 :
 : Just the build stage with g++ for two OSes
 : using whatever version of g++ was installed in stage b
@@ -25,7 +34,7 @@ set -euxo pipefail
 :
 	BASE_CONTAINERS=${1:?BASE_CONTAINERS is required. e.g u2404 or using commas: u2404,u2202. Must exist and will be copied.}
 	STAGES=${2:?Stages is required e.g. A for all or any consecutive chars of 'bBdDTW'}
-	COMPILERS=${3:-g++ clang}
+	COMPILERS=${3:-clang g++}
 
 :
 : Main

@@ -14,29 +14,29 @@ jobs:
       matrix:
         include:
 
-#          - UBUNTU_VER: "24.04"
-#            PG_VER:
-#            COMPILER: g++-latest
-#
-#          - UBUNTU_VER: "24.04"
-#            PG_VER:
-#            COMPILER: clang-latest
+          - UBUNTU_VER: "24.04"
+            PG_VER:
+            COMPILER: g++-latest
+
+          - UBUNTU_VER: "24.04"
+            PG_VER:
+            COMPILER: clang-latest
 
           - UBUNTU_VER: "22.04"
             PG_VER:
             COMPILER: g++-latest
 
-#          - UBUNTU_VER: "22.04"
-#            PG_VER:
-#            COMPILER: clang-latest
-#
-#          - UBUNTU_VER: "20.04"
-#            PG_VER:
-#            COMPILER: g++-latest
-#
-#          - UBUNTU_VER: "20.04"
-#            PG_VER:
-#            COMPILER: clang-latest
+          - UBUNTU_VER: "22.04"
+            PG_VER:
+            COMPILER: clang-latest
+
+          - UBUNTU_VER: "20.04"
+            PG_VER:
+            COMPILER: g++-latest
+
+          - UBUNTU_VER: "20.04"
+            PG_VER:
+            COMPILER: clang-latest
 
           #
           #
@@ -104,7 +104,7 @@ jobs:
     #runs-on: ubuntu-${{ matrix.UBUNTU_VER }}
     runs-on: ubuntu-${{ matrix.UBUNTU_VER && matrix.UBUNTU_VER || 'latest' }}
     #if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
-    if: ${{ github.event_name == 'pull_request' || github.ref == 'refs/heads/dev' }}
+    if: ${{ github.event_name == 'pull_request' || github.ref == 'refs/heads/modules' }}
     steps:
     - uses: actions/checkout@v4
       with:

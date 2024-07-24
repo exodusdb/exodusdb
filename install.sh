@@ -72,7 +72,9 @@ set -euxo pipefail
 :
 : COMPILER
 :
-:	"e.g. clang (the default), g++, g++-14, clang-18, clang-default, g++-default"
+:	"clang or g++ for latest version available. Optionally followed by -version."
+:	"clang-18, clang-min, clang-latest, clang-default"
+:	"g++-14, g++-min, g++-latest, g++-default"
 :
 :	If version no is omitted, the LATEST available for the OS will be used.
 :
@@ -89,6 +91,8 @@ set -euxo pipefail
 	COMPILER=${2:-clang}
 	PG_VER=${3:-}
 
+	# Remove the phrase -latest since we treat enpty as meaning -latest
+	COMPILER=${COMPILER/-latest/}
 	CMAKE_BUILD_OPTIONS=-GNinja
 	BUILD_DEPS="ninja-build ${COMPILER/clang/clang-tools} libfmt-dev"
 
@@ -105,8 +109,8 @@ set -euxo pipefail
 	fi
 
 	# duplicate code in install.sh and install_lxc.sh
-	if [[ ! $COMPILER =~ ^((g\+\+)|(clang))(-(([0-9]+)|min|default))?$ ]]; then
-		echo COMPILER must be g++ or clang. Optionally followed by a version e.g. g++-12, clang-12, g++-default, clang-default, g++-min, clang-min
+	if [[ ! $COMPILER =~ ^((g\+\+)|(clang))(-(([0-9]+)|latest|min|default))?$ ]]; then
+		echo COMPILER must be clang or g++ for latest version available. Optionally followed by a version e.g. clang-18, clang-min, clang-latest, clang-default, g++-14, g++-min, g++-latest, g++-default
 		exit 1
 	fi
 

@@ -76,7 +76,7 @@
 #
 	if (${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" AND ${CMAKE_CXX_COMPILER_VERSION} VERSION_GREATER_EQUAL 18.0)
 		option(EXO_MODULE "Build as c++ modules if clang >= 18" ON) # Enabled clang >= 18
-	else()
+#	else()
 		option(EXO_MODULE "Build as c++ modules if not clang >= 18" OFF) # Disabled by default
 	endif()
 	message("-- EXO_MODULE is ${EXO_MODULE}")
@@ -90,7 +90,7 @@
 		add_compile_definitions(EXO_MODULE=1)
 		set(CMAKE_CXX_SCAN_FOR_MODULES ON)
 	else()
-		add_compile_definitions(EXO_MODULE=0)
+#		add_compile_definitions(EXO_MODULE=0)
 		set(CMAKE_CXX_SCAN_FOR_MODULES OFF)
 	endif()
 	message(STATUS "CMAKE_CXX_SCAN_FOR_MODULES is ${CMAKE_CXX_SCAN_FOR_MODULES}")

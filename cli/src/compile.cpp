@@ -1777,7 +1777,8 @@ function static compile2(
 			compileoutput.outputl();
 			if (exo_post_compile) {
 				// e.g. tac|fixdeprecated
-				osshellwrite(compileoutput on exo_post_compile);
+				if (not osshellwrite(compileoutput on exo_post_compile))
+					loglasterror();
 			}
 		}
 		// Locate the first syntax error if any
