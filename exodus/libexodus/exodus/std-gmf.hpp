@@ -1,5 +1,6 @@
 // The subset of "C headers" [tab:c.headers] corresponding to
 // the "C++ headers for C library facilities" [tab:headers.cpp.c]
+//#include <cassert>
 #include <assert.h>
 #include <ctype.h>
 #include <errno.h>

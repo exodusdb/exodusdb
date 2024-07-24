@@ -35,10 +35,13 @@ export namespace std {
 
 //	using std::concepts;
 
-	using std::operator+;
-//	using std::operator-;
+//	using ::assert;
+
 	using std::operator<<;
 	using std::operator>>;
+
+	using std::operator+;
+//	using std::operator-;
 //	using std::operator>=;
 //	using std::operator<=;
 	using std::operator==;
@@ -211,6 +214,7 @@ export namespace std {
 	}
 
 	// from <cstdint>
+	using ::uint;
 	using std::size_t;
 	using std::int8_t;
 	using std::int16_t;
@@ -260,6 +264,10 @@ export namespace std {
 	using std::invalid_argument;
 
 	using std::getenv;
+
+	using std::regex;
+	using std::smatch;
+	using std::regex_search;
 
 //	using std::binary_function;
 //	using std::_Select1st;
