@@ -65,11 +65,20 @@
 
 	message("")
 
+	message(STATUS "CMAKE_CXX_COMPILER_ID      is ${CMAKE_CXX_COMPILER_ID}")
+	message(STATUS "CMAKE_CXX_COMPILER_VERSION is ${CMAKE_CXX_COMPILER_VERSION}")
+	message(STATUS "CMAKE_CXX_FLAGS            is ${CMAKE_CXX_FLAGS}")
+	message("")
+
 #
-# Modules option -DEXO_MODULE=ON/OFF
+# Modules option -DEXO_MODULE=ON/OFF or enabled by default for clang >= 18
 # ##############
 #
-	option(EXO_MODULE "Build as c++ modules" OFF) # Disabled by default
+	if (${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" AND ${CMAKE_CXX_COMPILER_VERSION} VERSION_GREATER_EQUAL 18.0)
+		option(EXO_MODULE "Build as c++ modules if clang >= 18" ON) # Enabled clang >= 18
+	else()
+		option(EXO_MODULE "Build as c++ modules if not clang >= 18" OFF) # Disabled by default
+	endif()
 	message("-- EXO_MODULE is ${EXO_MODULE}")
 
 	add_compile_definitions(EXO_MODULE_INITIAL_BUILD=1)
@@ -92,9 +101,6 @@
 	#set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 	set(CMAKE_CXX_EXTENSIONS OFF)
-
-	message(STATUS "CMAKE_CXX_COMPILER_VERSION REQUESTED is ${CMAKE_CXX_COMPILER_VERSION}")
-	message(STATUS "CMAKE_CXX_FLAGS is                ${CMAKE_CXX_FLAGS}")
 
 	#set(CMAKE_CXX_MODULE_EXTENSIONS ".cpp")
 #	set(CMAKE_CXX_MODULE_EXTENSIONS ".cpp" ".h")
