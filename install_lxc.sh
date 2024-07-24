@@ -34,7 +34,7 @@ set -euxo pipefail
 :
 : COMPILER
 :
-:	e.g. g++, g++-14, g++-default, clang, clang-18, clang default etc.
+:	e.g. clang, clang-18, clang-default, g++, g++-14, g++-default, etc.
 :
 :	More info in install.sh
 :
@@ -62,7 +62,7 @@ set -euxo pipefail
 	SOURCE=${1:?SOURCE is required. e.g. ubuntu, ubuntu:22.04 etc. or container code}
 	NEW_CONTAINER_NAME=${2:?NEW_CONTAINER_NAME is required. e.g. u2204 for lxc}
 	REQ_STAGES=${3:?Stages is required. A for '$DEFAULT_STAGES' - all except Web service}
-	COMPILER=${4:-g++}
+	COMPILER=${4:-clang}
 	PG_VER=${5:-}
 :
 : Validate

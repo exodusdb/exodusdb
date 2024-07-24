@@ -72,9 +72,9 @@ set -euxo pipefail
 :
 : COMPILER
 :
-:	e.g. g++, clang, g++-14, clang-18, g++-default, clang-default
+:	"e.g. clang (the default), g++, g++-14, clang-18, clang-default, g++-default"
 :
-:	If version no is omitted, the default for the OS will be used.
+:	If version no is omitted, the LATEST available for the OS will be used.
 :
 :	Choosing compiler/version only has effect on the initial b stage when installing build dependencies.
 :
@@ -86,7 +86,7 @@ set -euxo pipefail
 : ------------------
 :
 	REQ_STAGES=${1:?STAGES is required and must be one or more *consecutive* letters from $ALL_STAGES, or A for all stages except W.}
-	COMPILER=${2:-g++}
+	COMPILER=${2:-clang}
 	PG_VER=${3:-}
 
 	CMAKE_BUILD_OPTIONS=-GNinja
@@ -407,6 +407,9 @@ function get_dependencies_for_build_and_install {
 		sudo ln -snf /usr/lib/gcc/x86_64-linux-gnu/$GCC_VERSION /usr/lib/gcc/x86_64-linux-gnu/$GCC_FAKE_VERSION
 		sudo ln -snf /usr/include/x86_64-linux-gnu/c++/$GCC_VERSION /usr/include/x86_64-linux-gnu/c++/$GCC_FAKE_VERSION
 		sudo ln -snf /usr/include/c++/$GCC_VERSION /usr/include/c++/$GCC_FAKE_VERSION
+#		sudo rm /usr/lib/gcc/x86_64-linux-gnu/$GCC_FAKE_VERSION -f
+#		sudo rm /usr/include/x86_64-linux-gnu/c++/$GCC_FAKE_VERSION -f
+#		sudo rm /usr/include/c++/$GCC_FAKE_VERSION -f
 
 	fi
 
