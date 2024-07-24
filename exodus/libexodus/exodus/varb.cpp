@@ -173,6 +173,16 @@ DimIndexOutOfBounds::DimIndexOutOfBounds(std::string errmsg) : VarError("DimInde
 
 // clang-format on
 
+// std::string utility
+inline void varb_replace_string (std::string& subject, const std::string& search, const std::string& replace) {
+	std::size_t pos = 0;
+//	while
+	if ((pos = subject.find(search, pos)) != std::string::npos) {
+		subject.replace(pos, search.length(), replace);
+//		pos += replace.length();
+		}
+	}
+
 // VarError constructor
 //
 VarError::VarError(std::string description_)
@@ -195,6 +205,13 @@ VarError::VarError(std::string description_)
 
 //	stack.convert(FM, "\n").put(std::cerr);
 //	var("\n").put(std::cerr);
+
+	// Hide complexity
+//	if (description.contains("var_")) {
+	if (description.find("var_") != std::string::npos) {
+	    varb_replace_string(description, "exo::var_base<exo::var_mid<exo::var>>", "var");
+    	varb_replace_string(description, " [var = exo::var_mid<exo::var>]", "");
+	}
 
 	// Break into debugger if EXO_DEBUG is set to non-zero
 	// otherwise allow catch at a higher level or terminate
