@@ -275,83 +275,83 @@ ND var textlen(in var1);
 ND var textwidth(in var1);
 
 ND var convert(in instring, SV fromchars, SV tochars);
-VARREF converter(io iostring, SV fromchars, SV tochars);
+io converter(io iostring, SV fromchars, SV tochars);
 
 ND var textconvert(in instring, SV fromchars, SV tochars);
-VARREF textconverter(io iostring, SV fromchars, SV tochars);
+io textconverter(io iostring, SV fromchars, SV tochars);
 
 ND var replace(in instring, SV fromstr, SV tostr);
-VARREF replacer(io iostring, SV fromstr, SV tostr);
+io replacer(io iostring, SV fromstr, SV tostr);
 
 ND var replace(in instring, const rex& regex, SV replacement);
-VARREF replacer(io iostring, const rex& regex, SV replacement);
+io replacer(io iostring, const rex& regex, SV replacement);
 
 ND var ucase(in instring);
-VARREF ucaser(io iostring);
+io ucaser(io iostring);
 
 ND var lcase(in instring);
-VARREF lcaser(io iostring);
+io lcaser(io iostring);
 
 ND var tcase(in instring);
-VARREF tcaser(io iostring);
+io tcaser(io iostring);
 
 ND var fcase(in instring);
-VARREF fcaser(io iostring);
+io fcaser(io iostring);
 
 ND var normalize(in instring);
-VARREF normalizer(io iostring);
+io normalizer(io iostring);
 
-VARREF uniquer(io iostring);
+io uniquer(io iostring);
 ND var unique(in instring);
 
 ND var invert(in instring);
-VARREF inverter(io iostring);
+io inverter(io iostring);
 ND var invert(var&& instring);
-//VARREF inverter(io iostring);;
+//io inverter(io iostring);;
 //ND var invert(in instring);;
 //ND var invert(var&& instring);;
 //template<typename T> T invert(var && instring);
 
 ND var lower(in instring);
-VARREF lowerer(io iostring);
+io lowerer(io iostring);
 
 ND var raise(in instring);
-VARREF raiser(io iostring);
+io raiser(io iostring);
 
 // PASTER
 
 // 1. paste replace
 ND var paste(in instring, const int pos1, const int length, in str);
-VARREF paster(io iostring, const int pos1, const int length, in str);
+io paster(io iostring, const int pos1, const int length, in str);
 
 //// 2. paste over to end
-//VARREF pasterall(io iostring, const int pos1, in str);
+//io pasterall(io iostring, const int pos1, in str);
 //ND var pasteall(in instring, const int pos1, in str);
 
 // 3. paste insert at pos1
 ND var paste(in instring, const int pos1, in str);
-VARREF paster(io iostring, const int pos1, in str);
+io paster(io iostring, const int pos1, in str);
 
 // PREFIX
 ND var prefix(in instring, in str);
-VARREF prefixer(io iostring, in str);
+io prefixer(io iostring, in str);
 
 ND var pop(in instring);
-VARREF popper(io iostring);
+io popper(io iostring);
 
 
 ND var quote(in instring);
-VARREF quoter(io iostring);
+io quoter(io iostring);
 
 ND var squote(in instring);
-VARREF squoter(io iostring);
+io squoter(io iostring);
 
 ND var unquote(in instring);
-VARREF unquoter(io iostring);
+io unquoter(io iostring);
 
 
 ND var fieldstore(in instring, SV sepchar, const int fieldno, const int nfields, in replacement);
-VARREF fieldstorer(io iostring, SV sepchar, const int fieldno, const int nfields, in replacement);
+io fieldstorer(io iostring, SV sepchar, const int fieldno, const int nfields, in replacement);
 
 
 ND var trim(in instring, SV trimchars DEFAULT_SPACE);
@@ -359,10 +359,10 @@ ND var trimfirst(in instring, SV trimchars DEFAULT_SPACE);
 ND var trimlast(in instring, SV trimchars DEFAULT_SPACE);
 ND var trimboth(in instring, SV trimchars DEFAULT_SPACE);
 
-VARREF trimmer(io iostring, SV trimchars DEFAULT_SPACE);
-VARREF trimmerfirst(io iostring, SV trimchars DEFAULT_SPACE);
-VARREF trimmerlast(io iostring, SV trimchars DEFAULT_SPACE);
-VARREF trimmerboth(io iostring, SV trimchars DEFAULT_SPACE);
+io trimmer(io iostring, SV trimchars DEFAULT_SPACE);
+io trimmerfirst(io iostring, SV trimchars DEFAULT_SPACE);
+io trimmerlast(io iostring, SV trimchars DEFAULT_SPACE);
+io trimmerboth(io iostring, SV trimchars DEFAULT_SPACE);
 
 ND var first(in instring);
 ND var last(in instring);
@@ -381,8 +381,8 @@ ND var count(in instring, SV substr);
 
 ND var substr(in instring, const int startindex);
 ND var substr(in instring, const int startindex, const int length);
-VARREF substrer(io iostring, const int startindex);
-VARREF substrer(io iostring, const int startindex, const int length);
+io substrer(io iostring, const int startindex);
+io substrer(io iostring, const int startindex, const int length);
 
 ND bool starts(in instring, SV substr);
 ND bool end(in instring, SV substr);
@@ -416,17 +416,17 @@ ND var insert(in instring, const int fieldno, in insertion);
 // subvalueno=0);
 ND var remove(in instring, const int fieldno, const int valueno DEFAULT_0, const int subvalueno DEFAULT_0);
 
-VARREF pickreplacer(io iostring, const int fieldno, const int valueno, const int subvalueno, in replacement);
-VARREF pickreplacer(io iostring, const int fieldno, const int valueno, in replacement);
-VARREF pickreplacer(io iostring, const int fieldno, in replacement);
+io pickreplacer(io iostring, const int fieldno, const int valueno, const int subvalueno, in replacement);
+io pickreplacer(io iostring, const int fieldno, const int valueno, in replacement);
+io pickreplacer(io iostring, const int fieldno, in replacement);
 
-VARREF inserter(io iostring, const int fieldno, const int valueno, const int subvalueno, in insertion);
-VARREF inserter(io iostring, const int fieldno, const int valueno, in insertion);
-VARREF inserter(io iostring, const int fieldno, in insertion);
+io inserter(io iostring, const int fieldno, const int valueno, const int subvalueno, in insertion);
+io inserter(io iostring, const int fieldno, const int valueno, in insertion);
+io inserter(io iostring, const int fieldno, in insertion);
 
-// VARREF eraser(io iostring, const int fieldno, const int valueno=0, const int
+// io eraser(io iostring, const int fieldno, const int valueno=0, const int
 // subvalueno=0);
-VARREF remover(io iostring, const int fieldno, const int valueno DEFAULT_0, const int subvalueno DEFAULT_0);
+io remover(io iostring, const int fieldno, const int valueno DEFAULT_0, const int subvalueno DEFAULT_0);
 
 ND bool locate(in target, in instring);
 ND bool locate(in target, in instring, io setting);
@@ -446,19 +446,19 @@ ND var sum(in instring, SV sepchar);
 ND var sum(in instring);
 
 ND var crop(in instring);
-VARREF cropper(io iostring);
+io cropper(io iostring);
 
 ND var sort(in instring, SV sepchar DEFAULT__FM);
-VARREF sorter(io iostring, SV sepchar DEFAULT__FM);
+io sorter(io iostring, SV sepchar DEFAULT__FM);
 
 ND var reverse(in instring, SV sepchar DEFAULT__FM);
-VARREF reverser(io iostring, SV sepchar DEFAULT__FM);
+io reverser(io iostring, SV sepchar DEFAULT__FM);
 
 ND var shuffle(in instring, SV sepchar DEFAULT__FM);
-VARREF shuffler(io iostring, SV sepchar DEFAULT__FM);
+io shuffler(io iostring, SV sepchar DEFAULT__FM);
 
 ND var parser(in instring, char sepchar DEFAULT_CSPACE);
-VARREF parser(io iostring, char sepchar DEFAULT_CSPACE);
+io parser(io iostring, char sepchar DEFAULT_CSPACE);
 
 // DATABASE
 
