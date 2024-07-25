@@ -97,8 +97,8 @@ ND PUBLIC bool osbread(io data, in osfilevar, io offset, const int length) {retu
 ND PUBLIC bool osbwrite(in data, in osfilevar, io offset) {return data.osbwrite(osfilevar, offset);}
 // Versions where offset is const offset e.g. numeric ints
 //#ifdef VAR_OSBREADWRITE_CONST_OFFSET
-//ND PUBLIC bool osbread(io data, in osfilevar, in offset, const int length) {return data.osbread(osfilevar, const_cast<VARREF>(offset), length);}
-//ND PUBLIC bool osbwrite(in data, in osfilevar, in offset) {return data.osbwrite(osfilevar, const_cast<VARREF>(offset));}
+//ND PUBLIC bool osbread(io data, in osfilevar, in offset, const int length) {return data.osbread(osfilevar, const_cast<io>(offset), length);}
+//ND PUBLIC bool osbwrite(in data, in osfilevar, in offset) {return data.osbwrite(osfilevar, const_cast<io>(offset));}
 //#endif
 
 // Read/Write whole osfile

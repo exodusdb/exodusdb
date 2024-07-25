@@ -2964,7 +2964,7 @@ TRACE: "QQQ"="QQQ"
 //			TRACE("doing a join")
 			// Assume we have a good simple xlate function_src and can convert to a JOIN
 			// Determine the expression in the xlate target file
-			// VARREF todictexpression=sqlexpression;
+			// io todictexpression=sqlexpression;
 			if (xlatetargetfieldname.isnum()) {
 				sqlexpression =
 					"exodus.extract_text(" ^

@@ -658,7 +658,7 @@ bool var::oswrite(in osfilename, const char* codepage) const {
 // offset -2 updates the last byte of the file.
 // etc.
 //bool var::osbwrite(in osfilevar, in offset) const {
-//	return this->osbwrite(osfilevar, const_cast<VARREF>(offset));
+//	return this->osbwrite(osfilevar, const_cast<io>(offset));
 //}
 //#endif
 

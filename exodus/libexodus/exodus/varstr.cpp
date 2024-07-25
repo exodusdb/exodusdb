@@ -1362,8 +1362,6 @@ io var::inserter(const int fieldno, const int valueno, const int subvalueno, in 
 bool var::starts(SV str) const {
 
 	THISIS("bool var::starts(SV str) const")
-	//THISIS(__PRETTY_FUNCTION__)
-	//      bool exo::var::starts(const exo::VARREF) const
 	assertString(function_sig);
 
 	// Differ from c++, javascript, python3 - see comment on var::contains

@@ -1221,22 +1221,6 @@ io var::popper() {
 }
 
 
-/* Failed attempt to get compiler to call different functions depending on specific arguments
-
-template<class T1, class T2, class T3>
-VARREF pasterx(T1 start1, T2 length, const T3 str) {
-	return this->paste(start1, length, var(str));
-};
-
-// Specialise paster(-1, 1, "") to call popper()
-// Sadly compiler never chooses this one over the main template
-template<const int = -1, const int = 1, const char* = "">
-VARREF pasterx(const int start1, const int length, const char* c) {
-       this->outputl("testing");
-       return this->popper();
-};
-*/
-
 template<> PUBLIC VBR1 VARBASE1::move(VBX tovar) {
 
 	THISIS("io var::move(io tovar)")
@@ -2038,7 +2022,7 @@ ND io var::paste(const int    pos1, const int length,
                                         SV insertstr)    && {return paster(pos1, length, insertstr);}
 ND io var::paste(const int    pos1, SV insertstr)    && {return paster(pos1, insertstr);}
 ND io var::prefix(                  SV insertstr)    && {return prefixer(insertstr);}
-//ND VARREF append(SV appendstr)                         && {return appender(appendstr);}
+//ND io append(SV appendstr)                         && {return appender(appendstr);}
 ND io var::pop()                                     && {return popper();}
 
 ND io var::fieldstore(SV sepchar, const int fieldno, const int nfields, in replacement)
