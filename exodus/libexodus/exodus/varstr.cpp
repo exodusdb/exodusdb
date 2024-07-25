@@ -115,9 +115,9 @@ ND var var::fieldstore(SV separator, const int fieldno, const int nfields, in re
 }
 
 // Mutator
-VARREF var::fieldstorer(SV separator, const int fieldnx, const int nfieldsx, in replacementx) {
+io var::fieldstorer(SV separator, const int fieldnx, const int nfieldsx, in replacementx) {
 
-	THISIS("VARREF var::fieldstorer(SV separator0, const int fieldnx, const int nfieldsx, in replacementx)")
+	THISIS("io var::fieldstorer(SV separator0, const int fieldnx, const int nfieldsx, in replacementx)")
 	assertStringMutator(function_sig);
 
 	if (separator.empty())
@@ -932,9 +932,9 @@ var var::f(const int argfieldn, const int argvaluen/*=0*/, const int argsubvalue
 //////////////////////////////
 
 // Remove in place
-VARREF var::remover(int fieldno, int valueno, int subvalueno) {
+io var::remover(int fieldno, int valueno, int subvalueno) {
 
-	THISIS("VARREF var::remover(int fieldno, int valueno, int subvalueno)")
+	THISIS("io var::remover(int fieldno, int valueno, int subvalueno)")
 	assertStringMutator(function_sig);
 
 	// return "" if replacing 0,0,0
@@ -1057,9 +1057,9 @@ VARREF var::remover(int fieldno, int valueno, int subvalueno) {
 // PICKREPLACE int int int var
 ///////////////////////////////////////////
 
-VARREF var::r(int fieldno, int valueno, int subvalueno, in replacement) {
+io var::r(int fieldno, int valueno, int subvalueno, in replacement) {
 
-	THISIS("VARREF var::r(int fieldno, int valueno, int subvalueno, in replacement)")
+	THISIS("io var::r(int fieldno, int valueno, int subvalueno, in replacement)")
 	assertStringMutator(function_sig);
 	ISSTRING(replacement)
 
@@ -1199,9 +1199,9 @@ VARREF var::r(int fieldno, int valueno, int subvalueno, in replacement) {
 ///////////////////////////////////////////
 
 //in-place - given everything
-VARREF var::inserter(const int fieldno, const int valueno, const int subvalueno, in insertion) {
+io var::inserter(const int fieldno, const int valueno, const int subvalueno, in insertion) {
 
-	THISIS("VARREF var::inserter(const int fieldno, const int valueno, const int subvalueno, const VARREF insertion)")
+	THISIS("io var::inserter(const int fieldno, const int valueno, const int subvalueno, in insertion)")
 	assertStringMutator(function_sig);
 	ISSTRING(insertion)
 
@@ -1444,9 +1444,9 @@ var var::first() const& {
 
 //[1,1]
 // .substr(1,1)
-VARREF var::firster() {
+io var::firster() {
 
-	THISIS("VARREF var::firster()")
+	THISIS("io var::firster()")
 	assertStringMutator(function_sig);
 
 	// Reduce the size of this string to max 1
@@ -1475,9 +1475,9 @@ var var::first(const std::size_t  length) const& {
 
 //[1,y]
 // var.substr(1,length)
-VARREF var::firster(const std::size_t length) {
+io var::firster(const std::size_t length) {
 
-	THISIS("VARREF var::firster(const std::size_t length)")
+	THISIS("io var::firster(const std::size_t length)")
 	assertStringMutator(function_sig);
 
 	// Assume high half of std::size_t is c++ unblockable conversion
@@ -1516,9 +1516,9 @@ var var::last() const& {
 
 //[-1]
 // .substr(-1,1)
-VARREF var::laster() {
+io var::laster() {
 
-	THISIS("VARREF var::laster()")
+	THISIS("io var::laster()")
 	assertStringMutator(function_sig);
 
 	// Leave only the last char
@@ -1559,9 +1559,9 @@ var var::last(const std::size_t  length) const& {
 
 //[-y]
 // var.s(-length) substring
-VARREF var::laster(const std::size_t length) {
+io var::laster(const std::size_t length) {
 
-	THISIS("VARREF var::laster(const std::size_t length)")
+	THISIS("io var::laster(const std::size_t length)")
 	assertStringMutator(function_sig);
 
 	// Assume high half of std::size_t is c++ unblockable conversion
@@ -1626,9 +1626,9 @@ var var::cut(const int length) const& {
 
 // x[1, length] = ""
 // x[-length, length] = ""
-VARREF var::cutter(const int length) {
+io var::cutter(const int length) {
 
-	THISIS("VARREF var::cutter(const int length)")
+	THISIS("io var::cutter(const int length)")
 	assertStringMutator(function_sig);
 
 	if (length >= 0 ) {
@@ -1686,9 +1686,9 @@ ND var var::b(const int pos1) const& {
 
 //[x,y]
 // var.s(start,length) substring
-VARREF var::substrer(const int startindex1, const int length) {
+io var::substrer(const int startindex1, const int length) {
 
-	THISIS("VARREF var::substrer(const int startindex1, const int length)")
+	THISIS("io var::substrer(const int startindex1, const int length)")
 	assertStringMutator(function_sig);
 
 	// return "" for ""

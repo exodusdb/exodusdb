@@ -577,9 +577,9 @@ var var::replace(SV what, SV with) const& {
 }
 
 // mutator
-VARREF var::replacer(SV what, SV with) {
+io var::replacer(SV what, SV with) {
 
-	THISIS("VARREF var::replacer(SV what, SV with)")
+	THISIS("io var::replacer(SV what, SV with)")
 	assertStringMutator(function_sig);
 
 	// nothing to do if oldstr is ""
@@ -598,7 +598,7 @@ VARREF var::replacer(SV what, SV with) {
 // only here really because boost regex is included here for file matching
 
 // mutator
-VARREF var::replacer(const rex& regex, SV replacement) {
+io var::replacer(const rex& regex, SV replacement) {
 	*this = this->replace(regex, replacement);
 	return *this;
 }
@@ -715,8 +715,8 @@ var var::iconv_MT() const {
 ///////////
 
 // regular expressions for ICONV_MC
-VARREF var::oconv_MR(const char* conversion) {
-	//THISIS("VARREF var::oconv_MR(const char* conversionchar)")
+io var::oconv_MR(const char* conversion) {
+	//THISIS("io var::oconv_MR(const char* conversionchar)")
 	//assertString(function_sig);
 	// conversionchar arrives pointing to 3rd character (eg A in MCA)
 

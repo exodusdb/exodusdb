@@ -251,8 +251,8 @@ public:
 	var operator++(int) &;
 	var operator--(int) &;
 
-	VARREF operator++() &;
-	VARREF operator--() &;
+	io operator++() &;
+	io operator--() &;
 
 	// OUTPUT
 	/////////
@@ -289,9 +289,9 @@ public:
 	// STANDARD INPUT
 	/////////////////
 
-	VARREF input();
-	VARREF input(in prompt);
-	VARREF inputn(const int nchars);
+	io input();
+	io input(in prompt);
+	io inputn(const int nchars);
 
 	ND bool isterminal() const;
 	ND bool hasinput(int milliseconds = 0) const;
@@ -328,7 +328,7 @@ public:
 	/////////
 
 	bool setxlocale() const;
-	ND VARREF getxlocale();
+	ND io getxlocale();
 
 	// STRING CREATION
 	//////////////////
@@ -454,108 +454,108 @@ public:
 
 	// utf8/byte as for accessors
 
-	ND VARREF ucase() &&;
-	ND VARREF lcase() &&;
-	ND VARREF tcase() &&;
-	ND VARREF fcase() &&;
-	ND VARREF normalize() &&;
-	ND VARREF invert() &&;
+	ND io ucase() &&;
+	ND io lcase() &&;
+	ND io tcase() &&;
+	ND io fcase() &&;
+	ND io normalize() &&;
+	ND io invert() &&;
 
-	ND VARREF lower() &&;
-	ND VARREF raise() &&;
-	ND VARREF crop() &&;
+	ND io lower() &&;
+	ND io raise() &&;
+	ND io crop() &&;
 
-	ND VARREF quote() &&;
-	ND VARREF squote() &&;
-	ND VARREF unquote() &&;
+	ND io quote() &&;
+	ND io squote() &&;
+	ND io unquote() &&;
 
-	ND VARREF trim(SV trimchars DEFAULT_SPACE) &&;
-	ND VARREF trimfirst(SV trimchars DEFAULT_SPACE) &&;
-	ND VARREF trimlast(SV trimchars DEFAULT_SPACE) &&;
-	ND VARREF trimboth(SV trimchars DEFAULT_SPACE) &&;
+	ND io trim(SV trimchars DEFAULT_SPACE) &&;
+	ND io trimfirst(SV trimchars DEFAULT_SPACE) &&;
+	ND io trimlast(SV trimchars DEFAULT_SPACE) &&;
+	ND io trimboth(SV trimchars DEFAULT_SPACE) &&;
 
-	ND VARREF first() &&;
-	ND VARREF last() &&;
-	ND VARREF first(const std::size_t length) &&;
-	ND VARREF last(const std::size_t length) &&;
-	ND VARREF cut(const int length) &&;
-	ND VARREF paste(const int pos1, const int length, SV insertstr) &&;
-	ND VARREF paste(const int pos1, SV insertstr) &&;
-	ND VARREF prefix(SV insertstr) &&;
-	//ND VARREF append(SV appendstr) &&;
-	ND VARREF pop() &&;
+	ND io first() &&;
+	ND io last() &&;
+	ND io first(const std::size_t length) &&;
+	ND io last(const std::size_t length) &&;
+	ND io cut(const int length) &&;
+	ND io paste(const int pos1, const int length, SV insertstr) &&;
+	ND io paste(const int pos1, SV insertstr) &&;
+	ND io prefix(SV insertstr) &&;
+	//ND io append(SV appendstr) &&;
+	ND io pop() &&;
 
-	ND VARREF fieldstore(SV sepchar, const int fieldno, const int nfields, in replacement) &&;
-	ND VARREF substr(const int pos1, const int length) &&;
-	ND VARREF substr(const int pos1) &&;
+	ND io fieldstore(SV sepchar, const int fieldno, const int nfields, in replacement) &&;
+	ND io substr(const int pos1, const int length) &&;
+	ND io substr(const int pos1) &&;
 
-	ND VARREF convert(SV fromchars, SV tochars) &&;
-	ND VARREF textconvert(SV fromchars, SV tochars) &&;
-	ND VARREF replace(const rex& regex, SV tostr) &&;
-	ND VARREF replace(SV fromstr, SV tostr) &&;
-	//ND VARREF regex_replace(SV regex, SV replacement, SV regex_options DEFAULT_EMPTY) &&;
+	ND io convert(SV fromchars, SV tochars) &&;
+	ND io textconvert(SV fromchars, SV tochars) &&;
+	ND io replace(const rex& regex, SV tostr) &&;
+	ND io replace(SV fromstr, SV tostr) &&;
+	//ND io regex_replace(SV regex, SV replacement, SV regex_options DEFAULT_EMPTY) &&;
 
-	ND VARREF unique() &&;
-	ND VARREF sort(SV sepchar = _FM) &&;
-	ND VARREF reverse(SV sepchar = _FM) &&;
-	ND VARREF shuffle(SV sepchar = _FM) &&;
-	ND VARREF parse(char sepchar = ' ') &&;
+	ND io unique() &&;
+	ND io sort(SV sepchar = _FM) &&;
+	ND io reverse(SV sepchar = _FM) &&;
+	ND io shuffle(SV sepchar = _FM) &&;
+	ND io parse(char sepchar = ' ') &&;
 
 	// STRING MUTATORS
 	//////////////////
 
 	// utf8/byte as for accessors
 
-	VARREF ucaser();
-	VARREF lcaser();
-	VARREF tcaser();
-	VARREF fcaser();
-	VARREF normalizer();
-	VARREF inverter();
+	io ucaser();
+	io lcaser();
+	io tcaser();
+	io fcaser();
+	io normalizer();
+	io inverter();
 
-	VARREF quoter();
-	VARREF squoter();
-	VARREF unquoter();
+	io quoter();
+	io squoter();
+	io unquoter();
 
-	VARREF lowerer();
-	VARREF raiser();
-	VARREF cropper();
+	io lowerer();
+	io raiser();
+	io cropper();
 
-	VARREF trimmer(SV trimchars DEFAULT_SPACE);
-	VARREF trimmerfirst(SV trimchars DEFAULT_SPACE);
-	VARREF trimmerlast(SV trimchars DEFAULT_SPACE);
-	VARREF trimmerboth(SV trimchars DEFAULT_SPACE);
+	io trimmer(SV trimchars DEFAULT_SPACE);
+	io trimmerfirst(SV trimchars DEFAULT_SPACE);
+	io trimmerlast(SV trimchars DEFAULT_SPACE);
+	io trimmerboth(SV trimchars DEFAULT_SPACE);
 
-	VARREF firster();
-	VARREF laster();
-	VARREF firster(const std::size_t length);
-	VARREF laster(const std::size_t length);
-	VARREF cutter(const int length);
-	VARREF paster(const int pos1, const int length, SV insertstr);
-	VARREF paster(const int pos1, SV insertstr);
-	VARREF prefixer(SV insertstr);
-	//VARREF appender(SV appendstr);
-	VARREF popper();
+	io firster();
+	io laster();
+	io firster(const std::size_t length);
+	io laster(const std::size_t length);
+	io cutter(const int length);
+	io paster(const int pos1, const int length, SV insertstr);
+	io paster(const int pos1, SV insertstr);
+	io prefixer(SV insertstr);
+	//io appender(SV appendstr);
+	io popper();
 
-	VARREF fieldstorer(SV sepchar, const int fieldno, const int nfields, in replacement);
-	VARREF substrer(const int pos1, const int length);
-	//VARREF substrer(const int pos1);
+	io fieldstorer(SV sepchar, const int fieldno, const int nfields, in replacement);
+	io substrer(const int pos1, const int length);
+	//io substrer(const int pos1);
 	// TODO look at using erase to speed up
-	//VARREF substrer(const int startindex1) {this->toString();return this->substrer(startindex1, static_cast<int>(var_str.size()));}
-	//VARREF substrer(const int startindex1) {return this->substrer(startindex1, static_cast<int>(var_str.size()));}
-	VARREF substrer(const int startindex1) {this->assertString(__PRETTY_FUNCTION__);return this->substrer(startindex1, static_cast<int>(var_str.size()));}
+	//io substrer(const int startindex1) {this->toString();return this->substrer(startindex1, static_cast<int>(var_str.size()));}
+	//io substrer(const int startindex1) {return this->substrer(startindex1, static_cast<int>(var_str.size()));}
+	io substrer(const int startindex1) {this->assertString(__PRETTY_FUNCTION__);return this->substrer(startindex1, static_cast<int>(var_str.size()));}
 
-	VARREF converter(SV fromchars, SV tochars);
-	VARREF textconverter(SV fromchars, SV tochars);
-	VARREF replacer(const rex& regex, SV tostr);
-	VARREF replacer(SV fromstr, SV tostr);
-	//VARREF regex_replacer(SV regex, SV replacement, SV regex_options DEFAULT_EMPTY);
+	io converter(SV fromchars, SV tochars);
+	io textconverter(SV fromchars, SV tochars);
+	io replacer(const rex& regex, SV tostr);
+	io replacer(SV fromstr, SV tostr);
+	//io regex_replacer(SV regex, SV replacement, SV regex_options DEFAULT_EMPTY);
 
-	VARREF uniquer();
-	VARREF sorter(SV sepchar = _FM);
-	VARREF reverser(SV sepchar = _FM);
-	VARREF shuffler(SV sepchar = _FM);
-	VARREF parser(char sepchar = ' ');
+	io uniquer();
+	io sorter(SV sepchar = _FM);
+	io reverser(SV sepchar = _FM);
+	io shuffler(SV sepchar = _FM);
+	io parser(char sepchar = ' ');
 
 	// OTHER STRING ACCESS
 	//////////////////////
@@ -579,7 +579,7 @@ public:
 	// returns the delimiter no (1-6)
 	// if no delimiter byte is found then it returns bytes up to the end of the string, sets
 	// startstopindex to after tne end of the string and returns delimiter no 0 NOTE that it
-	// does NOT remove anything from the source string var remove(io pos1, VARREF
+	// does NOT remove anything from the source string var remove(io pos1, io
 	// delimiterno) const;
 	var substr2(io startstopindex, io delimiterno) const;
 	var b2(io startstopindex, io delimiterno) const {return substr2(startstopindex, delimiterno);}
@@ -688,9 +688,9 @@ template<class... Args>
 	// SAME AS ABOVE ON TEMPORARIES
 	///////////////////////////////
 
-	ND VARREF insert(const int fieldno, const int valueno, const int subvalueno, in insertion) && {return this->inserter(fieldno, valueno, subvalueno, insertion);}
-	ND VARREF insert(const int fieldno, const int valueno, in insertion) && {return this->inserter(fieldno, valueno, 0, insertion);}
-	ND VARREF insert(const int fieldno, in insertion) && {return this->inserter(fieldno, 0, 0, insertion);}
+	ND io insert(const int fieldno, const int valueno, const int subvalueno, in insertion) && {return this->inserter(fieldno, valueno, subvalueno, insertion);}
+	ND io insert(const int fieldno, const int valueno, in insertion) && {return this->inserter(fieldno, valueno, 0, insertion);}
+	ND io insert(const int fieldno, in insertion) && {return this->inserter(fieldno, 0, 0, insertion);}
 
 	// MV STRING FILTERS
 	////////////////////
@@ -715,20 +715,20 @@ template<class... Args>
 	//  xyz.r(10,"abc");
 
 	// r() is short for replacer() since it is probably the most common var function after a()
-	VARREF r(const int fieldno, const int valueno, const int subvalueno, in replacement);
-	//VARREF r(const int fieldno, const int valueno, in replacement);
-	//VARREF r(const int fieldno, in replacement);
-	VARREF r(const int fieldno, const int valueno, in replacement) {return r(fieldno, valueno, 0, replacement);}
-	VARREF r(const int fieldno, in replacement) {	return r(fieldno, 0, 0, replacement);}
+	io r(const int fieldno, const int valueno, const int subvalueno, in replacement);
+	//io r(const int fieldno, const int valueno, in replacement);
+	//io r(const int fieldno, in replacement);
+	io r(const int fieldno, const int valueno, in replacement) {return r(fieldno, valueno, 0, replacement);}
+	io r(const int fieldno, in replacement) {	return r(fieldno, 0, 0, replacement);}
 
-	VARREF inserter(const int fieldno, const int valueno, const int subvalueno, in insertion);
-	VARREF inserter(const int fieldno, const int valueno, in insertion) {return this->inserter(fieldno, valueno, 0, insertion);}
-	VARREF inserter(const int fieldno, in insertion) {return this->inserter(fieldno, 0, 0, insertion);}
+	io inserter(const int fieldno, const int valueno, const int subvalueno, in insertion);
+	io inserter(const int fieldno, const int valueno, in insertion) {return this->inserter(fieldno, valueno, 0, insertion);}
+	io inserter(const int fieldno, in insertion) {return this->inserter(fieldno, 0, 0, insertion);}
 
-	// VARREF eraser(const int fieldno, const int valueno=0, const int subvalueno=0);
-	VARREF remover(const int fieldno, const int valueno = 0, const int subvalueno = 0);
+	// io eraser(const int fieldno, const int valueno=0, const int subvalueno=0);
+	io remover(const int fieldno, const int valueno = 0, const int subvalueno = 0);
 	//-er version could be extract and erase in one go
-	// VARREF extracter(int fieldno, int valueno=0, int subvalueno=0) const;
+	// io extracter(int fieldno, int valueno=0, int subvalueno=0) const;
 
 	// MV STRING LOCATORS
 	/////////////////////
@@ -937,7 +937,7 @@ template<class... Args>
 	// MD: Decimal -> Decimal
 	ND std::string oconv_MD(const char* conversion) const;
 	// MR: Character replacement
-	ND VARREF oconv_MR(const char* conversion);
+	ND io oconv_MR(const char* conversion);
 	// HEX: Chars -> Hex
 	ND std::string oconv_HEX(const int ioratio) const;
 	// TX: Record (FM) -> text (\n) and \ line endings
@@ -962,7 +962,7 @@ template<class... Args>
 	// Convert _VISIBLE_FMS to _ALL_FMS
 	// In header to perhaps aid runtime string literal conversion for operator""_var
 	// since currently it cannot be constexpr due to var containing a std::string
-	VARREF fmiconverter() {
+	io fmiconverter() {
 		for (char& c : this->var_str) {
 			switch (c) {
 				// Most common first to perhaps aid optimisation
@@ -980,7 +980,7 @@ template<class... Args>
 	}
 
 	// Convert _ALL_FMS to _VISIBLE_FMS
-	VARREF fmoconverter() {
+	io fmoconverter() {
 		for (char& c : this->var_str) {
 			if (c > RM_ || c > RM_) {
 				switch (c) {

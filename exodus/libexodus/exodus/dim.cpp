@@ -562,7 +562,7 @@ bool dim::oswrite(in osfilename, const char* codepage) const {
 
 // no speed or memory advantage since not sorting in place
 // but provided for syntactical convenience avoiding need to assign output of sort()
-VARREF var::sorter(SV sepchar) {
+io var::sorter(SV sepchar) {
 	(*this) = this->split(sepchar).sort().join(sepchar);
 	return *this;
 }
@@ -589,7 +589,7 @@ var var::sort(SV sepchar) const& {
 
 // no speed or memory advantage since not sorting in place
 // but provided for syntactical convenience avoiding need to assign output of reverse()
-VARREF var::reverser(SV sepchar) {
+io var::reverser(SV sepchar) {
 	(*this) = this->split(sepchar).reverse().join(sepchar);
 	return *this;
 }
@@ -696,7 +696,7 @@ var var::reverse(SV sepchar) const& {
 
 // no speed or memory advantage since not shuffling in place
 // but provided for syntactical convenience avoiding need to assign output of shuffle()
-VARREF var::shuffler(SV sepchar) {
+io var::shuffler(SV sepchar) {
 	(*this) = this->split(sepchar).shuffler().join(sepchar);
 	return *this;
 }

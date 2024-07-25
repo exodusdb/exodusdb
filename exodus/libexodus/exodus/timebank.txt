@@ -61,45 +61,45 @@
 560 bool var::input() 
 561 bool var::input(in prompt 
 562 bool var::inputn(const int nchars 
-563 VARREF var::default_to(in defaultvalue) const 
-564 VARREF var::default_from(in defaultvalue) 
+563 io var::default_to(in defaultvalue) const 
+564 io var::default_from(in defaultvalue) 
 565 char var::toChar() const 
 566 std::string var::toString() && 
 567 std::string var::toString() const& 
 568 var var::len() const 
 569 var var::textlen() 
 570 std::u32string var::to_u32string() const 
-571 VARREF var::trim(SV trimchars) 
-572 VARREF var::trimmer(SV trimchars) 
-573 VARREF var::trimfirst(SV trimchars) const& 
-574 VARREF var::trimmerfirst(SV trimchars) 
-575 VARREF var::trimlast(SV trimchars) const& 
-576 VARREF var::trimmerlast(SV trimchars) 
-577 VARREF var::trimboth(SV trimchars) const& 
-578 VARREF var::trimmerboth(SV trimchars) 
-579 VARREF var::inverter() 
-580 VARREF var::ucaser() 
-581 VARREF var::lcaser() 
-582 VARREF var::tcaser() 
-583 VARREF var::fcaser() 
-584 VARREF var::normalizer() 
+571 io var::trim(SV trimchars) 
+572 io var::trimmer(SV trimchars) 
+573 io var::trimfirst(SV trimchars) const& 
+574 io var::trimmerfirst(SV trimchars) 
+575 io var::trimlast(SV trimchars) const& 
+576 io var::trimmerlast(SV trimchars) 
+577 io var::trimboth(SV trimchars) const& 
+578 io var::trimmerboth(SV trimchars) 
+579 io var::inverter() 
+580 io var::ucaser() 
+581 io var::lcaser() 
+582 io var::tcaser() 
+583 io var::fcaser() 
+584 io var::normalizer() 
 585 var var::unique() 
 586 var var::seq() const 
 587 var var::textseq() const 
-588 VARREF var::paster(const int pos1, const int length, SV insertstr) 
-589 VARREF var::paster(const int pos1, SV insertstr) 
+588 io var::paster(const int pos1, const int length, SV insertstr) 
+589 io var::paster(const int pos1, SV insertstr) 
 590 var var::prefix(SV insertstr) 
-591 VARREF var::prefixer(SV insertstr) 
-592 VARREF var::popper() 
-593 VARREF var::move(io tovar) 
+591 io var::prefixer(SV insertstr) 
+592 io var::popper() 
+593 io var::move(io tovar) 
 594 var var::str(const int num) const 
 595 var var::space() const 
-596 VARREF var::cropper() 
-597 VARREF var::lowerer() 
-598 VARREF var::raiser() 
-599 VARREF var::converter(SV fromchars, SV tochars) 
-600 VARREF var::converter(in fromchars, in tochars) 
-601 VARREF var::parser(char sepchar) 
+596 io var::cropper() 
+597 io var::lowerer() 
+598 io var::raiser() 
+599 io var::converter(SV fromchars, SV tochars) 
+600 io var::converter(in fromchars, in tochars) 
+601 io var::parser(char sepchar) 
 602 var var::fcount(SV sep) const 
 603 var var::count(SV str) const 
 604 var var::index(SV substr, const int startindex) const 
@@ -146,10 +146,10 @@
 645 bool var::ossetenv(const char* envcode) const 
 646 CVR var::put(std::ostream& ostream1) const 
 647 var var::match(SV regex, SV regex_options) const 
-648 VARREF var::replacer(SV what, SV with) 
+648 io var::replacer(SV what, SV with) 
 649 var var::replace(const rex& regex, SV replacement) const 
 650 var var::field(SV separatorx, const int fieldnx, const int nfieldsx) const 
-651 VARREF var::fieldstorer(SV separator0, const int fieldnx, const int nfieldsx, in replacementx) 
+651 io var::fieldstorer(SV separator0, const int fieldnx, const int nfieldsx, in replacementx) 
 652 bool var::locate(in target, io setting, const int fieldno/*=0*/, const int valueno/*=0*/) const 
 653 bool var::locate(in target, io setting, const int fieldno/*=0*/, const int valueno/*=0*/) const 
 654 bool var::locate(in target) const 
@@ -159,19 +159,19 @@
 658 bool var::locateusing(const char* usingchar, in target) const 
 659 bool var::locateusing(const char* usingchar, in target, io setting, const int fieldno/*=0*/, const int valueno/*=0*/, const int subvalueno/*=0*/) const 
 660 var var::f(const int argfieldn, const int argvaluen, const int argsubvaluen) const 
-661 VARREF var::remover(int fieldno, int valueno, int subvalueno) 
-662 VARREF var::r(int fieldno, int valueno, int subvalueno, in replacement) 
-663 VARREF var::inserter(const int fieldno, const int valueno, const int subvalueno, const VARREF insertion) 
+661 io var::remover(int fieldno, int valueno, int subvalueno) 
+662 io var::r(int fieldno, int valueno, int subvalueno, in replacement) 
+663 io var::inserter(const int fieldno, const int valueno, const int subvalueno, in insertion) 
 664 bool var::starts(SV str) const 
 665 bool var::ends(SV str) const 
 666 bool var::contains(SV str) const 
 667 var var::first(const std::size_t length) const 
-668 VARREF var::firster(const std::size_t length) 
+668 io var::firster(const std::size_t length) 
 669 var var::last(const std::size_t length) const 
-670 VARREF var::laster(const std::size_t length) 
+670 io var::laster(const std::size_t length) 
 671 var var::cut(const int length) const 
-672 VARREF var::cutter(const int length) 
-673 VARREF var::substrer(const int startindex1, const int length) 
+672 io var::cutter(const int length) 
+673 io var::substrer(const int startindex1, const int length) 
 674 var var::at(const int charno) const 
 675 var var::multivalued(const char* opcode, in var2) const 
 676 var var::substr(const int startindex1, io delimiterchars, int& endindex) const 
@@ -180,16 +180,16 @@
 679 var var::sum() const 
 680 var var::sum(SV separator) const 
 681 bool var::setxlocale() const 
-682 VARREF var::quoter() 
-683 VARREF var::squoter() 
-684 VARREF var::unquoter() 
+682 io var::quoter() 
+683 io var::squoter() 
+684 io var::unquoter() 
 685 CVR var::swap(in var2) const 
-686 VARREF var::swap(io var2) 
+686 io var::swap(io var2) 
 687 var var::textwidth() const 
 688 var var::first() const 
 689 var var::last() const 
-690 VARREF var::firster() const
-691 VARREF var::laster() const 
+690 io var::firster() const
+691 io var::laster() const 
 692 var var::search(SV regex, int startchar1, SV regex_options) const 
 693 std::wstring var::to_wstring() const 
 694 const char* var::c_str() const 
