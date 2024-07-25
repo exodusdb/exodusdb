@@ -108,7 +108,7 @@ THE SOFTWARE.
 //
 // Instead of:
 //
-//  function xyz(in arg1, VARREF arg2)"
+//  function xyz(in arg1, io arg2)"
 //
 // Note: io and out parameters must be variables not constants.
 //

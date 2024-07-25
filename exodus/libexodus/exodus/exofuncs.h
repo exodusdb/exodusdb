@@ -138,7 +138,7 @@ PUBLIC std::mutex global_mutex_threadstream;
 int exodus_main(int exodus_argc, const char* exodus_argv[], ExoEnv& mv, int threadno);
 
 ND var  osgetenv(in envcode DEFAULT_EMPTY);
-ND bool osgetenv(in code, VARREF value);
+ND bool osgetenv(in code, io value);
    void ossetenv(in code, in value);
 
 ND var ostempdirpath(void);
@@ -147,8 +147,8 @@ ND var ostempfilename(void);
 ND bool assigned(in var1);
 ND bool unassigned(in var1);
 
-   void move(VARREF fromvar, VARREF tovar);
-   void swap(VARREF var1, VARREF var2);
+   void move(io fromvar, io tovar);
+   void swap(io var1, io var2);
 
 // OS
 
@@ -165,20 +165,20 @@ ND var  oswait(const int milliseconds, SV dirpath);
 // 4 argument version for statement format
 // osbread(data from x at y length z)
 // Read/write osfile at specified offset. Must open/close.
-ND bool osopen(in osfilepath, VARREF osfilevar, const char* locale DEFAULT_EMPTY);
+ND bool osopen(in osfilepath, io osfilevar, const char* locale DEFAULT_EMPTY);
    void osclose(in osfilevar);
 // Versions where offset is input and output
-ND bool osbread(VARREF data, in osfilevar, VARREF offset, const int length);
-ND bool osbwrite(in data, in osfilevar, VARREF offset);
+ND bool osbread(io data, in osfilevar, io offset, const int length);
+ND bool osbwrite(in data, in osfilevar, io offset);
 // Versions where offset is const offset e.g. numeric ints
 #ifdef VAR_OSBREADWRITE_CONST_OFFSET
-ND bool osbread(VARREF data, in osfilevar, in offset, const int length);
+ND bool osbread(io data, in osfilevar, in offset, const int length);
 ND bool osbwrite(in data, in osfilevar, in offset);
 #endif
 
 // Read/Write whole osfile
 ND bool oswrite(in data, in osfilepath, const char* codepage DEFAULT_EMPTY);
-ND bool osread(VARREF data, in osfilepath, const char* codepage DEFAULT_EMPTY);
+ND bool osread(io data, in osfilepath, const char* codepage DEFAULT_EMPTY);
 // Simple version without codepage returns the contents or "" if file cannot be read
 // one argument returns the contents directly to be used in assignments
 ND var  osread(in osfilepath);
@@ -208,7 +208,7 @@ ND var  ostid(void);
 
 ND bool osshell(in command);
 ND bool osshellwrite(in writestr, in command);
-ND bool osshellread(VARREF readstr, in command);
+ND bool osshellread(io readstr, in command);
 ND var  osshellread(in command);
 
 //var execute(in command);
@@ -275,83 +275,83 @@ ND var textlen(in var1);
 ND var textwidth(in var1);
 
 ND var convert(in instring, SV fromchars, SV tochars);
-VARREF converter(VARREF iostring, SV fromchars, SV tochars);
+VARREF converter(io iostring, SV fromchars, SV tochars);
 
 ND var textconvert(in instring, SV fromchars, SV tochars);
-VARREF textconverter(VARREF iostring, SV fromchars, SV tochars);
+VARREF textconverter(io iostring, SV fromchars, SV tochars);
 
 ND var replace(in instring, SV fromstr, SV tostr);
-VARREF replacer(VARREF iostring, SV fromstr, SV tostr);
+VARREF replacer(io iostring, SV fromstr, SV tostr);
 
 ND var replace(in instring, const rex& regex, SV replacement);
-VARREF replacer(VARREF iostring, const rex& regex, SV replacement);
+VARREF replacer(io iostring, const rex& regex, SV replacement);
 
 ND var ucase(in instring);
-VARREF ucaser(VARREF iostring);
+VARREF ucaser(io iostring);
 
 ND var lcase(in instring);
-VARREF lcaser(VARREF iostring);
+VARREF lcaser(io iostring);
 
 ND var tcase(in instring);
-VARREF tcaser(VARREF iostring);
+VARREF tcaser(io iostring);
 
 ND var fcase(in instring);
-VARREF fcaser(VARREF iostring);
+VARREF fcaser(io iostring);
 
 ND var normalize(in instring);
-VARREF normalizer(VARREF iostring);
+VARREF normalizer(io iostring);
 
-VARREF uniquer(VARREF iostring);
+VARREF uniquer(io iostring);
 ND var unique(in instring);
 
 ND var invert(in instring);
-VARREF inverter(VARREF iostring);
+VARREF inverter(io iostring);
 ND var invert(var&& instring);
-//VARREF inverter(VARREF iostring);;
+//VARREF inverter(io iostring);;
 //ND var invert(in instring);;
 //ND var invert(var&& instring);;
 //template<typename T> T invert(var && instring);
 
 ND var lower(in instring);
-VARREF lowerer(VARREF iostring);
+VARREF lowerer(io iostring);
 
 ND var raise(in instring);
-VARREF raiser(VARREF iostring);
+VARREF raiser(io iostring);
 
 // PASTER
 
 // 1. paste replace
 ND var paste(in instring, const int pos1, const int length, in str);
-VARREF paster(VARREF iostring, const int pos1, const int length, in str);
+VARREF paster(io iostring, const int pos1, const int length, in str);
 
 //// 2. paste over to end
-//VARREF pasterall(VARREF iostring, const int pos1, in str);
+//VARREF pasterall(io iostring, const int pos1, in str);
 //ND var pasteall(in instring, const int pos1, in str);
 
 // 3. paste insert at pos1
 ND var paste(in instring, const int pos1, in str);
-VARREF paster(VARREF iostring, const int pos1, in str);
+VARREF paster(io iostring, const int pos1, in str);
 
 // PREFIX
 ND var prefix(in instring, in str);
-VARREF prefixer(VARREF iostring, in str);
+VARREF prefixer(io iostring, in str);
 
 ND var pop(in instring);
-VARREF popper(VARREF iostring);
+VARREF popper(io iostring);
 
 
 ND var quote(in instring);
-VARREF quoter(VARREF iostring);
+VARREF quoter(io iostring);
 
 ND var squote(in instring);
-VARREF squoter(VARREF iostring);
+VARREF squoter(io iostring);
 
 ND var unquote(in instring);
-VARREF unquoter(VARREF iostring);
+VARREF unquoter(io iostring);
 
 
 ND var fieldstore(in instring, SV sepchar, const int fieldno, const int nfields, in replacement);
-VARREF fieldstorer(VARREF iostring, SV sepchar, const int fieldno, const int nfields, in replacement);
+VARREF fieldstorer(io iostring, SV sepchar, const int fieldno, const int nfields, in replacement);
 
 
 ND var trim(in instring, SV trimchars DEFAULT_SPACE);
@@ -359,10 +359,10 @@ ND var trimfirst(in instring, SV trimchars DEFAULT_SPACE);
 ND var trimlast(in instring, SV trimchars DEFAULT_SPACE);
 ND var trimboth(in instring, SV trimchars DEFAULT_SPACE);
 
-VARREF trimmer(VARREF iostring, SV trimchars DEFAULT_SPACE);
-VARREF trimmerfirst(VARREF iostring, SV trimchars DEFAULT_SPACE);
-VARREF trimmerlast(VARREF iostring, SV trimchars DEFAULT_SPACE);
-VARREF trimmerboth(VARREF iostring, SV trimchars DEFAULT_SPACE);
+VARREF trimmer(io iostring, SV trimchars DEFAULT_SPACE);
+VARREF trimmerfirst(io iostring, SV trimchars DEFAULT_SPACE);
+VARREF trimmerlast(io iostring, SV trimchars DEFAULT_SPACE);
+VARREF trimmerboth(io iostring, SV trimchars DEFAULT_SPACE);
 
 ND var first(in instring);
 ND var last(in instring);
@@ -381,8 +381,8 @@ ND var count(in instring, SV substr);
 
 ND var substr(in instring, const int startindex);
 ND var substr(in instring, const int startindex, const int length);
-VARREF substrer(VARREF iostring, const int startindex);
-VARREF substrer(VARREF iostring, const int startindex, const int length);
+VARREF substrer(io iostring, const int startindex);
+VARREF substrer(io iostring, const int startindex, const int length);
 
 ND bool starts(in instring, SV substr);
 ND bool end(in instring, SV substr);
@@ -397,7 +397,7 @@ ND var field2(in instring, SV substr, const int fieldno, const int nfields DEFAU
 
 // STRINGS WITH FIELD MARKS
 
-ND var substr2(in fromstr, VARREF startindex, VARREF delimiterno);
+ND var substr2(in fromstr, io startindex, io delimiterno);
 
 ND dim split(in sourcevar, SV sepchar DEFAULT__FM);
 ND var join(const dim& sourcedim, SV sepchar DEFAULT__FM);
@@ -416,49 +416,49 @@ ND var insert(in instring, const int fieldno, in insertion);
 // subvalueno=0);
 ND var remove(in instring, const int fieldno, const int valueno DEFAULT_0, const int subvalueno DEFAULT_0);
 
-VARREF pickreplacer(VARREF iostring, const int fieldno, const int valueno, const int subvalueno, in replacement);
-VARREF pickreplacer(VARREF iostring, const int fieldno, const int valueno, in replacement);
-VARREF pickreplacer(VARREF iostring, const int fieldno, in replacement);
+VARREF pickreplacer(io iostring, const int fieldno, const int valueno, const int subvalueno, in replacement);
+VARREF pickreplacer(io iostring, const int fieldno, const int valueno, in replacement);
+VARREF pickreplacer(io iostring, const int fieldno, in replacement);
 
-VARREF inserter(VARREF iostring, const int fieldno, const int valueno, const int subvalueno, in insertion);
-VARREF inserter(VARREF iostring, const int fieldno, const int valueno, in insertion);
-VARREF inserter(VARREF iostring, const int fieldno, in insertion);
+VARREF inserter(io iostring, const int fieldno, const int valueno, const int subvalueno, in insertion);
+VARREF inserter(io iostring, const int fieldno, const int valueno, in insertion);
+VARREF inserter(io iostring, const int fieldno, in insertion);
 
-// VARREF eraser(VARREF iostring, const int fieldno, const int valueno=0, const int
+// VARREF eraser(io iostring, const int fieldno, const int valueno=0, const int
 // subvalueno=0);
-VARREF remover(VARREF iostring, const int fieldno, const int valueno DEFAULT_0, const int subvalueno DEFAULT_0);
+VARREF remover(io iostring, const int fieldno, const int valueno DEFAULT_0, const int subvalueno DEFAULT_0);
 
 ND bool locate(in target, in instring);
-ND bool locate(in target, in instring, VARREF setting);
-ND bool locate(in target, in instring, VARREF setting, const int fieldno, const int valueno DEFAULT_0);
+ND bool locate(in target, in instring, io setting);
+ND bool locate(in target, in instring, io setting, const int fieldno, const int valueno DEFAULT_0);
 
-ND bool locateby(const char* ordercode, in target, in instring, VARREF setting);
-ND bool locateby(const char* ordercode, in target, in instring, VARREF setting, const int fieldno, const int valueno DEFAULT_0);
+ND bool locateby(const char* ordercode, in target, in instring, io setting);
+ND bool locateby(const char* ordercode, in target, in instring, io setting, const int fieldno, const int valueno DEFAULT_0);
 
-ND bool locateby(in ordercode, in target, in instring, VARREF setting);
-ND bool locateby(in ordercode, in target, in instring, VARREF setting, const int fieldno, const int valueno DEFAULT_0);
+ND bool locateby(in ordercode, in target, in instring, io setting);
+ND bool locateby(in ordercode, in target, in instring, io setting, const int fieldno, const int valueno DEFAULT_0);
 
 ND bool locateusing(in usingchar, in target, in instring);
-ND bool locateusing(in usingchar, in target, in instring, VARREF setting);
-ND bool locateusing(in usingchar, in target, in instring, VARREF setting, const int fieldno, const int valueno DEFAULT_0, const int subvalueno DEFAULT_0);
+ND bool locateusing(in usingchar, in target, in instring, io setting);
+ND bool locateusing(in usingchar, in target, in instring, io setting, const int fieldno, const int valueno DEFAULT_0, const int subvalueno DEFAULT_0);
 
 ND var sum(in instring, SV sepchar);
 ND var sum(in instring);
 
 ND var crop(in instring);
-VARREF cropper(VARREF iostring);
+VARREF cropper(io iostring);
 
 ND var sort(in instring, SV sepchar DEFAULT__FM);
-VARREF sorter(VARREF iostring, SV sepchar DEFAULT__FM);
+VARREF sorter(io iostring, SV sepchar DEFAULT__FM);
 
 ND var reverse(in instring, SV sepchar DEFAULT__FM);
-VARREF reverser(VARREF iostring, SV sepchar DEFAULT__FM);
+VARREF reverser(io iostring, SV sepchar DEFAULT__FM);
 
 ND var shuffle(in instring, SV sepchar DEFAULT__FM);
-VARREF shuffler(VARREF iostring, SV sepchar DEFAULT__FM);
+VARREF shuffler(io iostring, SV sepchar DEFAULT__FM);
 
 ND var parser(in instring, char sepchar DEFAULT_CSPACE);
-VARREF parser(VARREF iostring, char sepchar DEFAULT_CSPACE);
+VARREF parser(io iostring, char sepchar DEFAULT_CSPACE);
 
 // DATABASE
 
@@ -493,13 +493,13 @@ ND bool lock(in dbfilevar, in key);
    void unlock(in dbfilevar, in key);
    void unlockall(void);
 
-ND bool open(in dbfilename, VARREF dbfilevar);
+ND bool open(in dbfilename, io dbfilevar);
 ND bool open(in dbfilename);
-// bool open(in dictdata, in dbfilename, VARREF dbfilevar);
+// bool open(in dictdata, in dbfilename, io dbfilevar);
 
-ND bool read(VARREF record, in dbfilevar, in key);
-ND bool readc(VARREF record, in dbfilevar, in key);
-ND bool readf(VARREF record, in dbfilevar, in key, in fieldnumber);
+ND bool read(io record, in dbfilevar, in key);
+ND bool readc(io record, in dbfilevar, in key);
+ND bool readf(io record, in dbfilevar, in key, in fieldnumber);
 
    bool write(in record, in dbfilevar, in key);
    bool writec(in record, in dbfilevar, in key);
@@ -513,9 +513,9 @@ ND bool dimwrite(const dim& dimrecord, in dbfilevar, in key);
 // moved to exoprog so they have access to default cursor in mv.CURSOR
 // bool select(in sortselectclause DEFAULT_EMPTY);
 // void clearselect(void);
-// bool readnext(VARREF key);
-// bool readnext(VARREF key, VARREF valueno);
-// bool readnext(VARREF record, VARREF key, VARREF value);
+// bool readnext(io key);
+// bool readnext(io key, io valueno);
+// bool readnext(io record, io key, io value);
 // bool deleterecord(in dbfilename_or_var_or_command, in key DEFAULT_EMPTY);
 
 ND var xlate(in dbfilename, in key, in fieldno, const char* mode);

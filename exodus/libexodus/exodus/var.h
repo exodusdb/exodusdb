@@ -385,7 +385,7 @@ public:
 	ND var indexn(SV str, const int occurrence) const;      // ditto. occurrence 1 = find first occurrence
 	ND var indexr(SV str, const int startchar1 = -1) const; // ditto. reverse search. startchar1 -1 starts from the last byte
 
-	ND var search(SV regex, VARREF startchar1, SV regex_options DEFAULT_EMPTY) const; // returns match with groups and startchar1 one after matched
+	ND var search(SV regex, io startchar1, SV regex_options DEFAULT_EMPTY) const; // returns match with groups and startchar1 one after matched
 
 //	//static member for speed on std strings because of underlying boost implementation
 //	static int localeAwareCompare(const std::string& str1, const std::string& str2);
@@ -579,10 +579,10 @@ public:
 	// returns the delimiter no (1-6)
 	// if no delimiter byte is found then it returns bytes up to the end of the string, sets
 	// startstopindex to after tne end of the string and returns delimiter no 0 NOTE that it
-	// does NOT remove anything from the source string var remove(VARREF pos1, VARREF
+	// does NOT remove anything from the source string var remove(io pos1, VARREF
 	// delimiterno) const;
-	var substr2(VARREF startstopindex, VARREF delimiterno) const;
-	var b2(VARREF startstopindex, VARREF delimiterno) const {return substr2(startstopindex, delimiterno);}
+	var substr2(io startstopindex, io delimiterno) const;
+	var b2(io startstopindex, io delimiterno) const {return substr2(startstopindex, delimiterno);}
 
 	ND var field(SV strx, const int fieldnx = 1, const int nfieldsx = 1) const;
 
@@ -736,20 +736,20 @@ template<class... Args>
 	// should these be like extract, replace, insert, delete
 	// locate(fieldno, valueno, subvalueno,target,setting,by DEFAULT_EMPTY)
 	ND bool locate(in target) const;
-	ND bool locate(in target, VARREF setting) const;
-	ND bool locate(in target, VARREF setting, const int fieldno, const int valueno = 0) const;
+	ND bool locate(in target, io setting) const;
+	ND bool locate(in target, io setting, const int fieldno, const int valueno = 0) const;
 
-	ND bool locateusing(const char* usingchar, in target, VARREF setting, const int fieldno = 0, const int valueno = 0, const int subvalueno = 0) const;
+	ND bool locateusing(const char* usingchar, in target, io setting, const int fieldno = 0, const int valueno = 0, const int subvalueno = 0) const;
 	ND bool locateusing(const char* usingchar, in target) const;
 
 	// locateby without fieldno or valueno arguments uses character VM
-	ND bool locateby(const char* ordercode, in target, VARREF setting) const;
+	ND bool locateby(const char* ordercode, in target, io setting) const;
 
 	// locateby with fieldno=0 uses character FM
-	ND bool locateby(const char* ordercode, in target, VARREF setting, const int fieldno, const int valueno = 0) const;
+	ND bool locateby(const char* ordercode, in target, io setting, const int fieldno, const int valueno = 0) const;
 
 	// locatebyusing
-	ND bool locatebyusing(const char* ordercode, const char* usingchar, in target, VARREF setting, const int fieldno = 0, const int valueno = 0, const int subvalueno = 0) const;
+	ND bool locatebyusing(const char* ordercode, const char* usingchar, in target, io setting, const int fieldno = 0, const int valueno = 0, const int subvalueno = 0) const;
 
 	// DATABASE ACCESS
 	//////////////////
@@ -769,7 +769,7 @@ template<class... Args>
 	   void cleardbcache() const;
 
 	ND bool sqlexec(in sqlcmd) const;
-	ND bool sqlexec(in sqlcmd, VARREF response) const;
+	ND bool sqlexec(in sqlcmd, io response) const;
 
 	ND var  lasterror() const;
 	   var  loglasterror(in source DEFAULT_EMPTY) const;
@@ -838,9 +838,9 @@ template<class... Args>
 
 	//ND bool hasnext() const;
 	ND bool hasnext();
-	ND bool readnext(VARREF key);
-	ND bool readnext(VARREF key, VARREF valueno);
-	ND bool readnext(VARREF record, VARREF key, VARREF valueno);
+	ND bool readnext(io key);
+	ND bool readnext(io key, io valueno);
+	ND bool readnext(io record, io key, io valueno);
 
 	   bool savelist(in listname);
 	ND bool getlist(in listname);
@@ -866,8 +866,8 @@ template<class... Args>
 	/////////////////
 
 	ND bool osopen(in filename, const char* locale DEFAULT_EMPTY) const;
-	ND bool osbread(in osfilevar, VARREF offset, const int length);
-	ND bool osbwrite(in osfilevar, VARREF offset) const;
+	ND bool osbread(in osfilevar, io offset, const int length);
+	ND bool osbwrite(in osfilevar, io offset) const;
 	   void osclose() const;
 
 	ND bool osread(const char* osfilename, const char* codepage DEFAULT_EMPTY);
@@ -1001,7 +1001,7 @@ template<class... Args>
 
 };  // class "var"
 
-// NB we should probably NEVER add operator^(VARREF var1, bool)
+// NB we should probably NEVER add operator^(io var1, bool)
 // this is a trick to avoid a problem that exodus concat operator
 // has the wrong precedence versus the logical operators
 // a ^ b > c //we should prevent this from compiling because

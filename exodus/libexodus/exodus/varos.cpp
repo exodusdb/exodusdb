@@ -665,12 +665,12 @@ bool var::oswrite(in osfilename, const char* codepage) const {
 //NOTE: unlike osread/oswrite which rely on iconv codepages to do any conversion
 //osbread and osbwrite rely on the locale being passed in on the osopen stage
 
-//bool var::osbwrite(in osfilevar, VARREF offset, const bool adjust) const
-bool var::osbwrite(in osfilevar, VARREF offset) const {
+//bool var::osbwrite(in osfilevar, io offset, const bool adjust) const
+bool var::osbwrite(in osfilevar, io offset) const {
 	// osfilehandle is just the filename but buffers the "file number" in the mvint too
 
 
-	THISIS("bool var::osbwrite(in osfilevar, VARREF offset) const")
+	THISIS("bool var::osbwrite(in osfilevar, io offset) const")
 	assertString(function_sig);
 	ISNUMERIC(offset)
 
@@ -780,9 +780,9 @@ static unsigned count_excess_UTF8_bytes(const std::string& str) {
 //not being an exact number of valid utf-8 code units) are trimmed off the return value
 //The new offset is changed to reflect the above and is simply increased by bytesize
 
-bool var::osbread(in osfilevar, VARREF offset, const int bytesize) {
+bool var::osbread(in osfilevar, io offset, const int bytesize) {
 
-	THISIS("bool var::osbread(in osfilevar, VARREF offset, const int bytesize")
+	THISIS("bool var::osbread(in osfilevar, io offset, const int bytesize")
 	assertDefined(function_sig);
 	ISNUMERIC(offset)
 

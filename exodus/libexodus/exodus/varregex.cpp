@@ -423,7 +423,7 @@ var var::match(SV regex, SV regex_options) const {
 /////////
 
 // should be in mvfuncs.cpp - here really because boost regex is included here for file matching
-var var::search(SV regex, VARREF startchar1, SV regex_options) const {
+var var::search(SV regex, io startchar1, SV regex_options) const {
 
 	THISIS("var var::search(SV regex, int startchar1, SV regex_options) const")
 	assertString(function_sig);

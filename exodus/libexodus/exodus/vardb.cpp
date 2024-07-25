@@ -875,7 +875,7 @@ static var build_conn_info(in conninfo) {
 	return result;
 }
 
-static inline void unquoter_inline(VARREF iovar) {
+static inline void unquoter_inline(io iovar) {
 	// remove "", '' and {}
 	static var quotecharacters("\"'{");
 	if (quotecharacters.contains(iovar.first()))
@@ -884,7 +884,7 @@ static inline void unquoter_inline(VARREF iovar) {
 		iovar.cutter(1).popper();
 }
 
-static void tosqlstring(VARREF string1) {
+static void tosqlstring(io string1) {
 
 	// if double quoted then convert to sql style single quoted strings
 	// double up any internal single quotes
@@ -917,7 +917,7 @@ static var get_fileexpression(in /*mainfilename*/, in filename, in keyordata) {
 }
 
 // Used in var::selectx
-static void to_extract_text(VARREF dictexpression) {
+static void to_extract_text(io dictexpression) {
 //				dictexpression.regex_replacer("^exodus.extract_number\\(", "exodus.extract_text\\(");
 //				dictexpression.regex_replacer("^exodus.extract_sort\\(", "exodus.extract_text\\(");
 //				dictexpression.regex_replacer("^exodus.extract_date\\(", "exodus.extract_text\\(");
@@ -1907,9 +1907,9 @@ bool var::sqlexec(in sql) const {
 }
 
 // returns success or failure, and response = data or errmsg (response can be preset to max number of tuples)
-bool var::sqlexec(in sqlcmd, VARREF response) const {
+bool var::sqlexec(in sqlcmd, io response) const {
 
-	THISIS("bool var::sqlexec(in sqlcmd, VARREF response) const")
+	THISIS("bool var::sqlexec(in sqlcmd, io response) const")
 	ISSTRING(sqlcmd)
 
 	auto pgconn = get_pgconn(*this);
@@ -2606,7 +2606,7 @@ bool var::clearfile(in filename) const {
 	return true;
 }
 
-static var get_dictexpression(in cursor, in mainfilename, in filename, in dictfilename, in dictfile, in fieldname0, VARREF joins, VARREF unnests, VARREF selects, bool& ismv, bool& isdatetime, bool forsort) {
+static var get_dictexpression(in cursor, in mainfilename, in filename, in dictfilename, in dictfile, in fieldname0, io joins, io unnests, io selects, bool& ismv, bool& isdatetime, bool forsort) {
 
 	//cursor is required to join any calculated fields in any second pass
 
@@ -3221,8 +3221,8 @@ exodus_call:
 	return sqlexpression;
 }
 
-// var getword(VARREF remainingwords, in joinvalues=false)
-static var getword(VARREF remainingwords, VARREF ucword) {
+// var getword(io remainingwords, in joinvalues=false)
+static var getword(io remainingwords, io ucword) {
 
 	// gets the next word
 	// or a series of words separated by FM while they are numbers or quoted strings)
@@ -5204,12 +5204,12 @@ bool var::hasnext() {
 	return true;
 }
 
-bool var::readnext(VARREF key) {
+bool var::readnext(io key) {
 	var valueno;
 	return this->readnext(key, valueno);
 }
 
-bool var::readnext(VARREF key, VARREF valueno) {
+bool var::readnext(io key, io valueno) {
 
 	//?allow undefined usage like var xyz=xyz.readnext();
 	if (var_typ & VARTYP_MASK) {
@@ -5222,14 +5222,14 @@ bool var::readnext(VARREF key, VARREF valueno) {
 	this->default_to("");
 
 
-	THISIS("bool var::readnext(VARREF key, VARREF valueno) const")
+	THISIS("bool var::readnext(io key, io valueno) const")
 	assertString(function_sig);
 
 	var record;
 	return this->readnext(record, key, valueno);
 }
 
-bool var::readnext(VARREF record, VARREF key, VARREF valueno) {
+bool var::readnext(io record, io key, io valueno) {
 
 	//?allow undefined usage like var xyz=xyz.readnext();
 	if (var_typ & VARTYP_MASK || !var_typ) {
@@ -5241,7 +5241,7 @@ bool var::readnext(VARREF record, VARREF key, VARREF valueno) {
 	// default cursor is ""
 	this->default_to("");
 
-	THISIS("bool var::readnext(VARREF record, VARREF key, VARREF valueno) const")
+	THISIS("bool var::readnext(io record, io key, io valueno) const")
 	assertString(function_sig);
 	ISDEFINED(key)
 	ISDEFINED(record)

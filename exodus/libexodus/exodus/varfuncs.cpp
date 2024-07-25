@@ -1239,7 +1239,7 @@ VARREF pasterx(const int start1, const int length, const char* c) {
 
 template<> PUBLIC VBR1 VARBASE1::move(VBX tovar) {
 
-	THISIS("VARREF var::move(VARREF tovar)")
+	THISIS("VARREF var::move(io tovar)")
 	assertAssigned(function_sig);
 	ISDEFINED(tovar)
 
@@ -1290,7 +1290,7 @@ template<> PUBLIC CBR VARBASE1::swap(CBX var2) const {
 // non-const version
 template<> PUBLIC VBR1 VARBASE1::swap(VBX var2) {
 
-	THISIS("VARREF var::swap(VARREF var2)")
+	THISIS("VARREF var::swap(io var2)")
 	// Works on unassigned vars
 	assertDefined(function_sig);
 	ISDEFINED(var2)

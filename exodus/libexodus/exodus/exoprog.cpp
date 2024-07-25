@@ -535,17 +535,17 @@ bool ExodusProgramBase::hasnext() {
 }
 
 // readnext 1
-bool ExodusProgramBase::readnext(VARREF key) {
+bool ExodusProgramBase::readnext(io key) {
 	return CURSOR.readnext(key);
 }
 
 // readnext 2
-bool ExodusProgramBase::readnext(VARREF key, VARREF valueno) {
+bool ExodusProgramBase::readnext(io key, io valueno) {
 	return CURSOR.readnext(key, valueno);
 }
 
 // readnext 3
-bool ExodusProgramBase::readnext(VARREF record, VARREF key, VARREF valueno) {
+bool ExodusProgramBase::readnext(io record, io key, io valueno) {
 	return CURSOR.readnext(record, key, valueno);
 }
 
@@ -604,7 +604,7 @@ bool ExodusProgramBase::deleterecord(in filename_or_handle_or_command, in key) {
 }
 
 // pushselect
-bool ExodusProgramBase::pushselect(in /*v1*/, VARREF v2, VARREF /*v3*/, VARREF /*v4*/) {
+bool ExodusProgramBase::pushselect(in /*v1*/, io v2, io /*v3*/, io /*v4*/) {
 
 	// CURSOR.quote().logputl("CURSOR=");
 	// CURSOR++;
@@ -616,7 +616,7 @@ bool ExodusProgramBase::pushselect(in /*v1*/, VARREF v2, VARREF /*v3*/, VARREF /
 }
 
 // popselect
-bool ExodusProgramBase::popselect(in v1, VARREF v2, VARREF /*v3*/, VARREF /*v4*/) {
+bool ExodusProgramBase::popselect(in v1, io v2, io /*v3*/, io /*v4*/) {
 	// CURSOR.quote().logputl("CURSOR=");
 	// CURSOR--;
 	v2.move(CURSOR);
@@ -630,7 +630,7 @@ void ExodusProgramBase::note(in msg, in options) const {
 }
 
 // note 4
-void ExodusProgramBase::note(in msg, in options, VARREF buffer, in params) const {
+void ExodusProgramBase::note(in msg, in options, io buffer, in params) const {
 	mssg(msg, options, buffer, params);
 }
 
@@ -641,7 +641,7 @@ void ExodusProgramBase::mssg(in msg, in options) const {
 }
 
 // mssg 4
-void ExodusProgramBase::mssg(in msg, in options, VARREF buffer, in params) const {
+void ExodusProgramBase::mssg(in msg, in options, io buffer, in params) const {
 
 	var interactive = !SYSTEM.f(33);
 	if (interactive)
@@ -724,7 +724,7 @@ var ExodusProgramBase::authorised(in task0) {
 }
 
 // authorised 4
-var ExodusProgramBase::authorised(in task0, VARREF msg, in defaultlock, in username0) {
+var ExodusProgramBase::authorised(in task0, io msg, in defaultlock, in username0) {
 
 	var username;
 	var msgusername;
@@ -1639,7 +1639,7 @@ var ExodusProgramBase::decide(in question, in options) const {
 }
 
 // decide 4
-var ExodusProgramBase::decide(in questionx, in optionsx, VARREF reply, const int defaultreply) const {
+var ExodusProgramBase::decide(in questionx, in optionsx, io reply, const int defaultreply) const {
 
 	// If default reply is 0 then there is no default
 	// and pressing Enter returns "" and reply is set to 0
@@ -1712,7 +1712,7 @@ inp:
 }
 
 // savescreen
-void ExodusProgramBase::savescreen(VARREF /*origscrn*/, VARREF /*origattr*/) const {
+void ExodusProgramBase::savescreen(io /*origscrn*/, io /*origattr*/) const {
 	std::cout << "ExodusProgramBase::savescreen not implemented" << std::endl;
 }
 
@@ -1753,13 +1753,13 @@ var ExodusProgramBase::otherdatasetusers(in /*param*/) {
 }
 
 // lockrecord 3
-bool ExodusProgramBase::lockrecord(in filename, VARREF file, in keyx) const {
+bool ExodusProgramBase::lockrecord(in filename, io file, in keyx) const {
 	var record;
 	return lockrecord(filename, file, keyx, record);
 }
 
 // lockrecord 6
-bool ExodusProgramBase::lockrecord(in filename, VARREF file, in keyx, in /*recordx*/, const int waitsecs0, const bool allowduplicate) const {
+bool ExodusProgramBase::lockrecord(in filename, io file, in keyx, in /*recordx*/, const int waitsecs0, const bool allowduplicate) const {
 
 	// linemark
 	// common /shadow.mfs/
@@ -1860,7 +1860,7 @@ bool ExodusProgramBase::unlockrecord() const {
 }
 
 // unlockrecord
-bool ExodusProgramBase::unlockrecord(in /*filename*/, VARREF file0, in key) const {
+bool ExodusProgramBase::unlockrecord(in /*filename*/, io file0, in key) const {
 	var file;
 	if (file0.unassigned())
 		file = "";
@@ -1943,7 +1943,7 @@ var ExodusProgramBase::xmlquote(in string0) const {
 }
 
 // loginnet
-bool ExodusProgramBase::loginnet(in /*dataset*/, in username, VARREF cookie, VARREF msg) {
+bool ExodusProgramBase::loginnet(in /*dataset*/, in username, io cookie, io msg) {
 
 	var menuid;
 	var usern;
@@ -2559,8 +2559,8 @@ zero:
 	//function main(in type, in input0, in ndecs0, out outx) {
 	//c xxx in,in,in,out
 
-var ExodusProgramBase::exoprog_date(in type, in in0, in mode0, VARREF outx) {
-//var ExodusProgramBase::number(in type, in input0, in ndecs0, VARREF outx) {
+var ExodusProgramBase::exoprog_date(in type, in in0, in mode0, io outx) {
+//var ExodusProgramBase::number(in type, in input0, in ndecs0, io outx) {
 	//c sys in,in,in,out,in
 
 	//should really be sensitive to timezone in @SW
@@ -2662,7 +2662,7 @@ ok:
 }
 
 // number
-var ExodusProgramBase::exoprog_number(in type, in input0, in ndecs0, VARREF outx) {
+var ExodusProgramBase::exoprog_number(in type, in input0, in ndecs0, io outx) {
 	//function main(in type, in input0, in ndecs0, out outx) {
 	//c xxx in,in,in,out
 
@@ -2821,7 +2821,7 @@ var ExodusProgramBase::exoprog_number(in type, in input0, in ndecs0, VARREF outx
 }
 
 // sortarray
-void ExodusProgramBase::sortarray(VARREF array, in fns, in orderby0) {
+void ExodusProgramBase::sortarray(io array, in fns, in orderby0) {
 	//function main(io array, in fns=0, in orderby0="") {
 	//c sys io,0,""
 

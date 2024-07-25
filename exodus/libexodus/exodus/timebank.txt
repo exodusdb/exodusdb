@@ -24,7 +24,7 @@
 523 var var::lock(in key) const 
 524 void var::unlock(in key) const 
 525 void var::unlockall() const 
-526 bool var::sqlexec(in sqlcmd, VARREF response) const 
+526 bool var::sqlexec(in sqlcmd, io response) const 
 527 bool var::writef(in filehandle, in key, const int fieldno) const 
 528 bool var::write(in filehandle, in key) const 
 529 bool var::updaterecord(in filehandle, in key) const 
@@ -48,8 +48,8 @@
 547 bool var::formlist(in keys, in fieldno) 
 548 bool var::makelist(in listname)
 549 bool var::hasnext() const
-550 bool var::readnext(VARREF key, VARREF valueno) const 
-551 bool var::readnext(VARREF record, VARREF key, VARREF valueno) const 
+550 bool var::readnext(io key, io valueno) const 
+551 bool var::readnext(io record, io key, io valueno) const 
 552 bool var::createindex(in fieldname, in dictfile) const 
 553 bool var::deleteindex(in fieldname) const 
 554 var var::listfiles() const 
@@ -91,7 +91,7 @@
 590 var var::prefix(SV insertstr) 
 591 VARREF var::prefixer(SV insertstr) 
 592 VARREF var::popper() 
-593 VARREF var::move(VARREF tovar) 
+593 VARREF var::move(io tovar) 
 594 var var::str(const int num) const 
 595 var var::space() const 
 596 VARREF var::cropper() 
@@ -130,8 +130,8 @@
 629 bool var::to_codepage(const char* codepage) const 
 630 bool var::from_codepage(const char* codepage) const 
 631 bool var::oswrite(in osfilename, const char* codepage) const 
-632 bool var::osbwrite(in osfilevar, VARREF offset) const 
-633 bool var::osbread(in osfilevar, VARREF offset, const int bytesize 
+632 bool var::osbwrite(in osfilevar, io offset) const 
+633 bool var::osbread(in osfilevar, io offset, const int bytesize 
 634 bool var::osrename(in new_dirpath_or_filepath) const 
 635 bool var::oscopy(in new_dirpath_or_filepath) const 
 636 bool var::osmove(in new_dirpath_or_filepath) const 
@@ -150,14 +150,14 @@
 649 var var::replace(const rex& regex, SV replacement) const 
 650 var var::field(SV separatorx, const int fieldnx, const int nfieldsx) const 
 651 VARREF var::fieldstorer(SV separator0, const int fieldnx, const int nfieldsx, in replacementx) 
-652 bool var::locate(in target, VARREF setting, const int fieldno/*=0*/, const int valueno/*=0*/) const 
-653 bool var::locate(in target, VARREF setting, const int fieldno/*=0*/, const int valueno/*=0*/) const 
+652 bool var::locate(in target, io setting, const int fieldno/*=0*/, const int valueno/*=0*/) const 
+653 bool var::locate(in target, io setting, const int fieldno/*=0*/, const int valueno/*=0*/) const 
 654 bool var::locate(in target) const 
-655 bool var::locateby(const char* ordercode, in target, VARREF setting) const 
-656 bool var::locateby(const char* ordercode, in target, VARREF setting, const int fieldno, const int valueno/*=0*/) const 
-657 bool var::locatebyusing(const char* ordercode, const char* usingchar, in target, VARREF setting, const int fieldno=0, const int valueno=0, const int valueno=0) const 
+655 bool var::locateby(const char* ordercode, in target, io setting) const 
+656 bool var::locateby(const char* ordercode, in target, io setting, const int fieldno, const int valueno/*=0*/) const 
+657 bool var::locatebyusing(const char* ordercode, const char* usingchar, in target, io setting, const int fieldno=0, const int valueno=0, const int valueno=0) const 
 658 bool var::locateusing(const char* usingchar, in target) const 
-659 bool var::locateusing(const char* usingchar, in target, VARREF setting, const int fieldno/*=0*/, const int valueno/*=0*/, const int subvalueno/*=0*/) const 
+659 bool var::locateusing(const char* usingchar, in target, io setting, const int fieldno/*=0*/, const int valueno/*=0*/, const int subvalueno/*=0*/) const 
 660 var var::f(const int argfieldn, const int argvaluen, const int argsubvaluen) const 
 661 VARREF var::remover(int fieldno, int valueno, int subvalueno) 
 662 VARREF var::r(int fieldno, int valueno, int subvalueno, in replacement) 
@@ -174,8 +174,8 @@
 673 VARREF var::substrer(const int startindex1, const int length) 
 674 var var::at(const int charno) const 
 675 var var::multivalued(const char* opcode, in var2) const 
-676 var var::substr(const int startindex1, VARREF delimiterchars, int& endindex) const 
-677 var var::substr2(VARREF startindex1, VARREF delimiterno) const 
+676 var var::substr(const int startindex1, io delimiterchars, int& endindex) const 
+677 var var::substr2(io startindex1, io delimiterno) const 
 678 var var::sumall() const 
 679 var var::sum() const 
 680 var var::sum(SV separator) const 
@@ -184,7 +184,7 @@
 683 VARREF var::squoter() 
 684 VARREF var::unquoter() 
 685 CVR var::swap(in var2) const 
-686 VARREF var::swap(VARREF var2) 
+686 VARREF var::swap(io var2) 
 687 var var::textwidth() const 
 688 var var::first() const 
 689 var var::last() const 

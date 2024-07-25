@@ -133,11 +133,11 @@ class PUBLIC ExodusProgramBase {
 	// work on CURSOR
 	bool select(in sortselectclause_or_filehandle DEFAULT_EMPTY);
 	ND bool hasnext();
-	bool readnext(VARREF key);
-	bool readnext(VARREF key, VARREF valueno);
-	bool readnext(VARREF record, VARREF key, VARREF valueno);
-	bool pushselect(in v1, VARREF v2, VARREF v3, VARREF v4);
-	bool popselect(in v1, VARREF v2, VARREF v3, VARREF v4);
+	bool readnext(io key);
+	bool readnext(io key, io valueno);
+	bool readnext(io record, io key, io valueno);
+	bool pushselect(in v1, io v2, io v3, io v4);
+	bool popselect(in v1, io v2, io v3, io v4);
 	void clearselect();
 	bool deleterecord(in filename_or_handle_or_command, in key DEFAULT_EMPTY);
 
@@ -148,11 +148,11 @@ class PUBLIC ExodusProgramBase {
 	bool deletelist(in listname);
 
 	void note(in msg, in options = "") const;
-	void note(in msg, in options, VARREF buffer, in params = "") const;
+	void note(in msg, in options, io buffer, in params = "") const;
 	void mssg(in msg, in options = "") const;
-	void mssg(in msg, in options, VARREF buffer, in params = "") const;
+	void mssg(in msg, in options, io buffer, in params = "") const;
 
-	var authorised(in task0, VARREF msg, in defaultlock = "", in username0 = "");
+	var authorised(in task0, io msg, in defaultlock = "", in username0 = "");
 	var authorised(in task0);
 	void readuserprivs() const;
 	void writeuserprivs() const;
@@ -178,22 +178,22 @@ class PUBLIC ExodusProgramBase {
 	void setprivilege(in var1);
 
 	// NB does not return record yet
-	ND bool lockrecord(in filename, VARREF file, in keyx, in recordx, const int waitsecs = 0, const bool allowduplicate = false) const;
-	ND bool lockrecord(in filename, VARREF file, in keyx) const;
-	bool unlockrecord(in filename, VARREF file, in key) const;
+	ND bool lockrecord(in filename, io file, in keyx, in recordx, const int waitsecs = 0, const bool allowduplicate = false) const;
+	ND bool lockrecord(in filename, io file, in keyx) const;
+	bool unlockrecord(in filename, io file, in key) const;
 	bool unlockrecord() const;
 
 	ND var decide(in question, in options = "") const;
-	var decide(in question, in options, VARREF reply, const int defaultreply = 1) const;
+	var decide(in question, in options, io reply, const int defaultreply = 1) const;
 
-	void savescreen(VARREF origscrn, VARREF origattr) const;
+	void savescreen(io origscrn, io origattr) const;
 	var keypressed(int milliseconds = 0) const;
 	ND bool esctoexit() const;
 
 	void flushindex(in filename);
 	ND var encrypt2(in encrypt0) const;
 	ND var xmlquote(in str) const;
-	ND bool loginnet(in dataset, in username, VARREF cookie, VARREF msg);
+	ND bool loginnet(in dataset, in username, io cookie, io msg);
 
 	// TERMINAL specific terminal cursor control
 	ND var AT(const int code) const;
@@ -215,7 +215,7 @@ class PUBLIC ExodusProgramBase {
 	ND var iconv(in input, in conversion);
 
 	ND var invertarray(in input, in force0 = (0));
-	void sortarray(VARREF array, in fns = 0, in orderby0 = "");
+	void sortarray(io array, in fns = 0, in orderby0 = "");
 
 	ND var timedate2() {return timedate2(var(), var());}
 	ND var timedate2(in localdate0, in localtime0, in glang = "");
@@ -253,8 +253,8 @@ class PUBLIC ExodusProgramBase {
  private:
 
 	// ioconv with a language specific month
-	var exoprog_date(in type, in input0, in ndecs0, VARREF output);
-	var exoprog_number(in type, in input0, in ndecs0, VARREF output);
+	var exoprog_date(in type, in input0, in ndecs0, io output);
+	var exoprog_number(in type, in input0, in ndecs0, io output);
 
 };
 

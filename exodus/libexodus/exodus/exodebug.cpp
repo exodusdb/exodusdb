@@ -52,7 +52,7 @@ THE SOFTWARE.
 
 namespace exo {
 
-static void addbacktraceline(in frameno, in sourcefilename, in lineno, VARREF returnlines) {
+static void addbacktraceline(in frameno, in sourcefilename, in lineno, io returnlines) {
 
 	//#ifdef TRACING
 	//	sourcefilename.errputl("SOURCEFILENAME=");
