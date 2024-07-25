@@ -186,8 +186,25 @@ class PUBLIC ExoEnv final {
 	// define a type of object that holds many NamedCommons
 	NamedCommon* namedcommon[99] = {nullptr};
 
+	// Evade a warning from clang 18 when building with modules
+	// about some unused "less" function in the std::map<std::string, void*> that we use
+	// root cause in std.cppm?
+//neo@hp7:~/exodus$ [255/450] Building CXX object exodus/libexodus/exodus/CMakeFiles/exodus.dir/exoenv.cpp.o
+//In module 'std' imported from /root/exodus/exodus/libexodus/exodus/../exodus/exoenv.h:27:
+///usr/bin/../lib/gcc/x86_64-linux-gnu/99/../../../../include/c++/99/bits/stl_function.h:403:26: warning: 'binary_function<std::__cxx11::basic_string<char>, std::__cxx11::basic_string<char>, bool>' is deprecated [-Wdeprecated-declarations]
+//  403 |     struct less : public binary_function<_Tp, _Tp, bool>
+//      |                          ^
+#pragma clang diagnostic push
+// Evade clang -Wdeprecated-declarations warning when using dlopen_cache
+// Some "using" statement must be missing from std.cppm
+#if defined(EXO_MODULE) && __clang_major__ >= 18
+#	pragma clang diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
 	// A cache of handles to dynamically loaded shared libraries
 	std::map<std::string, void*> dlopen_cache;
+
+#pragma clang diagnostic pop
 
  private:
 

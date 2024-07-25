@@ -41,6 +41,12 @@ THE SOFTWARE.
 
 constexpr int TRACING = 0;
 
+// Evade clang -Wdeprecated-declarations warning when using dlopen_cache
+// Some "using" statement must be missing from std.cppm
+#if defined(EXO_MODULE) && __clang_major__ >= 18
+#	include <iostream>
+#endif
+
 #if EXO_MODULE
 	import std;
 #else
@@ -415,8 +421,22 @@ bool Callable::openlib(const std::string newlibname) {
 		// No need for this if dlcache is per mv and is therefore effectively threadlocal?
 		LOCKDLCACHE
 
+	// Evade a warning from clang 18 when building with modules
+	// about some "pair" function in the std::map<std::string, void*> that we use
+	// root cause in std.cppm?
+//[163/366] Building CXX object exodus/libexodus/exodus/CMakeFiles/exodus.dir/exocallable.cpp.o
+//In module 'std' imported from /root/exodus/exodus/libexodus/exodus/exocallable.cpp:45:
+///usr/bin/../lib/gcc/x86_64-linux-gnu/99/../../../../include/c++/99/bits/stl_function.h:1175:14: warning: 'unary_function<std::pair<const std::__cxx11::basic_string<char>, void *>, const std::__cxx11::basic_string<char>>' is deprecated [-Wdeprecated-declarations]
+// 1175 |     : public unary_function<_Pair, typename _Pair::first_type>
+//#pragma clang diagnostic push
+//#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+
+
 		// Look for library in cache
 		auto cacheentry = mv_->dlopen_cache.find(newlibname);
+
+//#pragma clang diagnostic pop
+
 		if (cacheentry != mv_->dlopen_cache.end()) {
 			//std::cout << "using dlopen cache for " << newlibraryname << std::endl;
 			plib_ = mv_->dlopen_cache.at(newlibname);
