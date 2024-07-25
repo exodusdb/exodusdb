@@ -490,7 +490,7 @@ class DBresult {
 
 static int get_dbconn_no(CVR dbhandle) {
 
-	if (!dbhandle.assigned()) {
+	if (!dbhandle.assigned()) UNLIKELY {
 		// var("get_dbconn_no() returning 0 - unassigned").logputl();
 		return 0;
 	}
@@ -508,7 +508,7 @@ static int get_dbconn_no(CVR dbhandle) {
 static int get_dbconn_no_or_default(CVR dbhandle) {
 
 	int dbconn_no = get_dbconn_no(dbhandle);
-	if (dbconn_no)
+	if (dbconn_no) LIKELY
 		return dbconn_no;
 
 	// otherwise get the default connection
@@ -627,7 +627,7 @@ static PGconn* get_pgconn(CVR dbhandle) {
 //		throw VarDBException("pgconnection() requested when not connected.");
 		return nullptr;
 
-	if (DBTRACE) {
+	if (DBTRACE) UNLIKELY {
 		std::cout << std::endl;
 		PGconn* pgconn=thread_dbconnector.get_pgconn(dbconn_no);
 		std::clog << "CONN " << dbconn_no << " " << pgconn << std::endl;
@@ -677,7 +677,7 @@ static bool get_dbresult(CVR sql, DBresult& dbresult, PGconn* pgconn) {
 							0);	// text results
 
 	// Handle serious error. Why not throw?
-	if (!dbresult) {
+	if (!dbresult) UNLIKELY {
 		var("ERROR: mvdbpostgres PQexec command failed, no error code: ").errputl();
 		return false;
 	}
@@ -685,6 +685,7 @@ static bool get_dbresult(CVR sql, DBresult& dbresult, PGconn* pgconn) {
 	switch (PQresultStatus(dbresult)) {
 
 		case PGRES_COMMAND_OK:
+			LIKELY
 			return true;
 
 		case PGRES_TUPLES_OK:
@@ -715,7 +716,7 @@ static bool get_dbresult(CVR sql, DBresult& dbresult, PGconn* pgconn) {
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wcovered-switch-default"
 		default:
-
+			UNLIKELY
 			var("ERROR: mvdbpostgres pqexec " ^ var(sql)).errputl();
 			var("ERROR: mvdbpostgres pqexec " ^
 				var(PQresStatus(PQresultStatus(dbresult))) ^ ": " ^
@@ -975,7 +976,7 @@ bool var::connect(CVR conninfo) {
 	for (;;) {
 
 #if defined _MSC_VER  //|| defined __CYGWIN__ || defined __MINGW32__
-		if (not msvc_PQconnectdb(&pgconn, fullconninfo.var_str)) {
+		if (not msvc_PQconnectdb(&pgconn, fullconninfo.var_str)) UNLIKELY {
 			var libname = "libpq.dl";
 			// var libname="libpq.so";
 			var errmsg="ERROR: mvdbpostgres connect() Cannot load shared library " ^ libname ^
@@ -1001,7 +1002,7 @@ bool var::connect(CVR conninfo) {
 	}
 
 	// failed to connect so return false
-	if (PQstatus(pgconn) != CONNECTION_OK) {
+	if (PQstatus(pgconn) != CONNECTION_OK) UNLIKELY {
 
 		var errmsg = "ERROR: mvdbpostgres connect() Connection to database failed: " ^ var(PQerrorMessage(pgconn));
 
@@ -1068,7 +1069,7 @@ bool var::connect(CVR conninfo) {
 	// this turns off the notice when creating tables with a primary key
 	// DEBUG5, DEBUG4, DEBUG3, DEBUG2, DEBUG1, LOG, NOTICE, WARNING, ERROR, FATAL, and PANIC
 	//this->sqlexec(var("SET client_min_messages = ") ^ (DBTRACE ? "LOG" : "WARNING"));
-	if (not this->sqlexec(var("SET client_min_messages = ") ^ (DBTRACE ? "LOG" : "WARNING")))
+	if (not this->sqlexec(var("SET client_min_messages = ") ^ (DBTRACE ? "LOG" : "WARNING"))) UNLIKELY
 		this->loglasterror();
 
 	return true;
@@ -1114,7 +1115,7 @@ bool var::attach(CVR filenames) {
 	}
 
 	//fail if anything not attached
-	if (notattached_filenames) {
+	if (notattached_filenames) UNLIKELY {
 		var errmsg = "ERROR: mvdbpostgres/attach: " ^ notattached_filenames ^ "cannot be attached on connection " ^ this->f(1).quote();
 		this->setlasterror(errmsg);
 		return false;
@@ -1153,7 +1154,7 @@ void var::disconnect() {
 		dbconn_no = thread_default_data_dbconn_no;
 
 	// Quit if no connection
-	if (not dbconn_no)
+	if (not dbconn_no) UNLIKELY
 		return;
 
 	//disconnect
@@ -1187,7 +1188,7 @@ void var::disconnect() {
 		[dbconn_no](auto iter){
 			var filehandle = iter.second;
 			// Don't erase if not the desired dbconn_no
-			if (filehandle.f(2) != dbconn_no)
+			if (filehandle.f(2) != dbconn_no) UNLIKELY
 				return false;
 			if (DBTRACE_CONN >= 3) {
 				var(iter.second).logputl("var::disconnect() remove cached filehandle ");
@@ -1262,7 +1263,7 @@ bool var::open(CVR filename, CVR connection /*DEFAULTNULL*/) {
 	const var normal_filename = get_normal_filename(filename);
 
 	// filename dos or DOS  means osread/oswrite/osremove
-	if (normal_filename.var_str.size() == 3 && normal_filename.var_str == "dos") {
+	if (normal_filename.var_str.size() == 3 && normal_filename.var_str == "dos") UNLIKELY {
 		//(*this) = "dos";
 		var_str = "dos";
 		var_typ = VARTYP_NANSTR;
@@ -1292,7 +1293,7 @@ bool var::open(CVR filename, CVR connection /*DEFAULTNULL*/) {
 				//var(cached_file_handle).errputl("==== Connection cache VALID   = ");
 				var_str = cached_file_handle;
 				var_typ = VARTYP_NANSTR;
-				if (DBTRACE)
+				if (DBTRACE) UNLIKELY
 					this->logputl("DBTR open() cached or attached ");
 				return true;
 			}
@@ -1336,8 +1337,7 @@ bool var::open(CVR filename, CVR connection /*DEFAULTNULL*/) {
 				WHERE  table_name = " ^ tablename.squote() ^ and_schema_clause ^ "\
 				)";
 	var result;
-	if (not connection2.sqlexec(sql, result))
-		UNLIKELY
+	if (not connection2.sqlexec(sql, result)) UNLIKELY
 		//throw VarDBException(this->lasterror());
 		throw VarDBException(result);
 	//result.convert(RM,"|").logputl("result=");
@@ -1360,13 +1360,12 @@ bool var::open(CVR filename, CVR connection /*DEFAULTNULL*/) {
 						and matviewname = '" ^ tablename ^	"'\
 					)\
 		";
-		if (not connection2.sqlexec(sql, result))
-			UNLIKELY
+		if (not connection2.sqlexec(sql, result)) UNLIKELY
 			throw VarDBException(lasterror());
 	}
 
 	//failure if not found
-	if (not result.ends("t")) {
+	if (not result.ends("t")) UNLIKELY {
 		var errmsg = "ERROR: mvdbpostgres 2 open(" ^ filename.quote() ^
 					") file does not exist.";
 		this->setlasterror(errmsg);
@@ -1390,7 +1389,7 @@ bool var::open(CVR filename, CVR connection /*DEFAULTNULL*/) {
 	// Similar code in dbattach and open
 	thread_file_handles[normal_filename] = var_str;
 
-	if (DBTRACE)
+	if (DBTRACE) UNLIKELY
 		this->logputl("DBTR var::open-3 ");
 
 	return true;
@@ -1411,7 +1410,7 @@ bool var::readf(CVR filehandle, CVR key, const int fieldno) {
 	//ISSTRING(filehandle)
 	//ISSTRING(key)
 
-	if (!this->read(filehandle, key))
+	if (!this->read(filehandle, key)) UNLIKELY
 		return false;
 
 	var_str = this->f(fieldno).var_str;
@@ -1431,8 +1430,7 @@ bool var::readc(CVR filehandle, CVR key) {
 
 	// check cache first, and return any cached record
 	int dbconn_no = get_dbconn_no_or_default(filehandle);
-	if (!dbconn_no)
-		UNLIKELY
+	if (!dbconn_no) UNLIKELY
 		throw VarDBException("get_dbconn_no() failed");
 
 	// Initialise the record var to unassigned
@@ -1451,7 +1449,7 @@ bool var::readc(CVR filehandle, CVR key) {
 	//TRACE("readc " ^ filehandle ^ " " ^ key ^ " " ^ var(hash64 % 1'000'000'000)) //modulo to bring the uint64 into range that var can handle without throwing overflow
 	std::string cachedrecord;
 	if (thread_dbconnector.getrecord(dbconn_no, hash64, cachedrecord)) {
-		if (cachedrecord.empty()) {
+		if (cachedrecord.empty()) LIKELY {
 			//TRACE("cache hit-" ^ key);
 			return false;
 		} else {
@@ -1556,7 +1554,7 @@ bool var::read(CVR filehandle, CVR key) {
 	std::string key2 = key.normalize().var_str;
 
 	// dos or DOS filehandle means osread/oswrite/osremove
-	if (filehandle.var_str.size() == 3 && (filehandle.var_str == "dos" || filehandle.var_str == "DOS")) {
+	if (filehandle.var_str.size() == 3 && (filehandle.var_str == "dos" || filehandle.var_str == "DOS")) UNLIKELY {
 		//return this->osread(key2);  //.convert("\\",OSSLASH));
 		//use osfilenames unnormalised so we can read and write as is
 		return this->osread(key);  //.convert("\\",OSSLASH));
@@ -1570,11 +1568,11 @@ bool var::read(CVR filehandle, CVR key) {
 	}
 
 	// reading a magic special key returns all keys in the file in natural order
-	if (key == "%RECORDS%") {
+	if (key == "%RECORDS%") UNLIKELY {
 		var sql = "SELECT key from " ^ get_normal_filename(filehandle) ^ ";";
 
 		auto pgconn = get_pgconn(filehandle);
-		if (! pgconn)
+		if (! pgconn) UNLIKELY
 			return false;
 
 		DBresult dbresult;
@@ -1604,7 +1602,7 @@ bool var::read(CVR filehandle, CVR key) {
 		}
 
 		//remove any trailing FM
-		if (var_str.back() == FM_)
+		if (var_str.back() == FM_) LIKELY
 			var_str.pop_back();
 
 		//this->setlasterror();
@@ -1651,7 +1649,7 @@ bool var::read(CVR filehandle, CVR key) {
 		throw VarDBException(errmsg);
 	}
 
-	if (PQntuples(dbresult) < 1) {
+	if (PQntuples(dbresult) < 1) UNLIKELY {
 
 		// Leave unassigned if not read
 		//leave record (this) untouched if record cannot be read
@@ -1901,7 +1899,7 @@ bool var::unlockall() const {
 // returns only success or failure and any response is logged and saved for future lasterror() call
 bool var::sqlexec(CVR sql) const {
 	var response = -1;	//no response required
-	if (!this->sqlexec(sql, response)) {
+	if (!this->sqlexec(sql, response)) UNLIKELY {
 		this->setlasterror(response);
 		return false;
 	}
@@ -1936,7 +1934,7 @@ bool var::sqlexec(CVR sqlcmd, VARREF response) const {
 	DBresult dbresult = PQexec(pgconn, sqlcmd.var_str.c_str());
 
 	if (PQresultStatus(dbresult) != PGRES_COMMAND_OK &&
-		PQresultStatus(dbresult) != PGRES_TUPLES_OK) {
+		PQresultStatus(dbresult) != PGRES_TUPLES_OK) UNLIKELY {
 		//int xx = PQresultStatus(dbresult);
 		var sqlstate = var(PQresultErrorField(dbresult, PG_DIAG_SQLSTATE));
 		// sql state 42P03 = duplicate_cursor
@@ -1983,7 +1981,8 @@ bool var::sqlexec(CVR sqlcmd, VARREF response) const {
 // writef writes a specific field number in a record
 //(why it is "writef" instead of "writef" isnt known!
 bool var::writef(CVR filehandle, CVR key, const int fieldno) const {
-	if (fieldno <= 0)
+
+	if (fieldno <= 0) UNLIKELY
 		return write(filehandle, key);
 
 	THISIS("bool var::writef(CVR filehandle,CVR key,const int fieldno) const")
@@ -2026,7 +2025,7 @@ bool var::write(CVR filehandle, CVR key) const {
 	filehandle.deletec(key2);
 
 	// filehandle dos or DOS means osread/oswrite/osremove
-	if (filehandle.var_str.size() == 3 && (filehandle.var_str == "dos" || filehandle.var_str == "DOS")) {
+	if (filehandle.var_str.size() == 3 && (filehandle.var_str == "dos" || filehandle.var_str == "DOS")) UNLIKELY {
 		//this->oswrite(key2); //.convert("\\",OSSLASH));
 		//use osfilenames unnormalised so we can read and write as is
 		return this->oswrite(key);
@@ -2142,7 +2141,7 @@ bool var::updaterecord(CVR filehandle, CVR key) const {
 	}
 
 	// if not updated 1 then fail
-	if (std::strcmp(PQcmdTuples(dbresult), "1") != 0) {
+	if (std::strcmp(PQcmdTuples(dbresult), "1") != 0) UNLIKELY {
 		var("ERROR: mvdbpostgres update(" ^ filehandle.convert(_FM, "^") ^
 			", " ^ key ^ ") Failed: " ^ var(PQntuples(dbresult)) ^ " " ^
 			var(PQerrorMessage(pgconn)))
@@ -2202,7 +2201,7 @@ bool var::insertrecord(CVR filehandle, CVR key) const {
 
 		// "duplicate key value violates unique constraint"
 		var sqlstate = var(PQresultErrorField(dbresult, PG_DIAG_SQLSTATE));
-		if (sqlstate == 23505)
+		if (sqlstate == 23505) UNLIKELY
 			return false;
 
 		var errmsg = "ERROR: mvdbpostgres insertrecord(" ^
@@ -2215,7 +2214,7 @@ bool var::insertrecord(CVR filehandle, CVR key) const {
 	}
 
 	// if not updated 1 then fail
-	if (std::strcmp(PQcmdTuples(dbresult), "1") != 0) {
+	if (std::strcmp(PQcmdTuples(dbresult), "1") != 0) UNLIKELY {
 		var("ERROR: mvdbpostgres insertrecord(" ^ filehandle.convert(_FM, "^") ^
 			", " ^ key ^ ") Failed: " ^ var(PQntuples(dbresult)) ^ " " ^
 			var(PQerrorMessage(pgconn)))
@@ -2239,7 +2238,7 @@ bool var::deleterecord(CVR key) const {
 	std::string key2 = key.normalize().var_str;
 
 	// filehandle dos or DOS means osread/oswrite/osremove
-	if (var_str.size() == 3 && (var_str == "dos" || var_str == "DOS")) {
+	if (var_str.size() == 3 && (var_str == "dos" || var_str == "DOS")) UNLIKELY {
 		//return this->osremove(key2);
 		//use osfilenames unnormalised so we can read and write as is
 		//return key.osremove();
@@ -2301,7 +2300,7 @@ void var::cleardbcache() const {
 	assertDefined(function_sig);
 
 	int dbconn_no = get_dbconn_no_or_default(*this);
-	if (!dbconn_no)
+	if (!dbconn_no) UNLIKELY
 //		throw VarDBException("get_dbconn_no() failed in cleardbcache");
 		return;
 
@@ -2329,7 +2328,7 @@ bool var::begintrans() const {
 	//if (!this->sqlexec("BEGIN"))
 	// Read Committed is the default isolation level in PostgreSQL.
 	// https://www.postgresql.org/docs/current/transaction-iso.html#XACT-READ-COMMITTED
-	if (!this->sqlexec("BEGIN TRANSACTION ISOLATION LEVEL READ COMMITTED"))
+	if (!this->sqlexec("BEGIN TRANSACTION ISOLATION LEVEL READ COMMITTED")) UNLIKELY
 		return false;
 
 	auto dbconn = get_dbconn(*this);
@@ -2352,7 +2351,7 @@ bool var::rollbacktrans() const {
 	this->cleardbcache();
 
 	// Rollback a transaction
-	if (!this->sqlexec("ROLLBACK"))
+	if (!this->sqlexec("ROLLBACK")) UNLIKELY
 		return false;
 
 	auto dbconn = get_dbconn(*this);
@@ -2375,7 +2374,7 @@ bool var::committrans() const {
 	this->cleardbcache();
 
 	// end (commit) a transaction
-	if (!this->sqlexec("END"))
+	if (!this->sqlexec("END")) UNLIKELY
 		return false;
 
 	auto dbconn = get_dbconn(*this);
@@ -2432,14 +2431,14 @@ bool var::dbcopy(CVR from_dbname, CVR to_dbname) const {
 		sql ^= " TEMPLATE " ^ from_dbname;
 
 	// Create the database
-	if (!this->sqlexec(sql)) {
+	if (!this->sqlexec(sql)) UNLIKELY {
 		//newdb.lasterror().errputl();
 		return false;
 	}
 
 	// Connect to the new db
 	var newdb;
-	if (not newdb.connect(to_dbname)) {
+	if (not newdb.connect(to_dbname)) UNLIKELY {
 		//newdb.lasterror().errputl();
 		return false;
 	}
@@ -2448,7 +2447,7 @@ bool var::dbcopy(CVR from_dbname, CVR to_dbname) const {
 	sql = "CREATE SCHEMA IF NOT EXISTS dict";
 	//sql ^= "AUTHORIZATION exodus;"
 	var result = true;
-	if (!newdb.sqlexec(sql)) {
+	if (!newdb.sqlexec(sql)) UNLIKELY {
 		//newdb.lasterror().errputl();
 		result = false;
 	}
@@ -2468,7 +2467,7 @@ bool var::dbdelete(CVR dbname) const {
 
 	// Fail neatly if the database does not exist.
 	// SQL errors during a transaction cause the whole transaction to fail.
-	if (!this->clone().dblist().lower().locate(dbname)) {
+	if (!this->clone().dblist().lower().locate(dbname)) UNLIKELY {
 		setlasterror(dbname.quote() ^ " db does not exist.");
 		return false;
 	}
@@ -2490,7 +2489,7 @@ bool var::createfile(CVR filename) const {
 
 	// Fail neatly if the file already exists.
 	// SQL errors during a transaction cause the whole transaction to fail.
-	if (this->clone().open(filename)) {
+	if (this->clone().open(filename)) UNLIKELY {
 		setlasterror(filename.quote() ^ " already exists.");
 		return false;
 	}
@@ -2501,10 +2500,10 @@ bool var::createfile(CVR filename) const {
 	sql ^= " TABLE " ^ get_normal_filename(filename);
 	sql ^= " (key text primary key, data text)";
 
-	if (this->assigned())
+	if (this->assigned()) LIKELY
 		return this->sqlexec(sql);
-	else
-		return filename.sqlexec(sql);
+
+	return filename.sqlexec(sql);
 }
 
 bool var::renamefile(CVR filename, CVR newfilename) const {
@@ -2518,14 +2517,14 @@ bool var::renamefile(CVR filename, CVR newfilename) const {
 	// SQL errors during a transaction cause the whole transaction to fail.
 	// Make sure we use the right connection
 	var filehandle = this->clone();
-	if (!filehandle.open(filename)) {
+	if (!filehandle.open(filename)) UNLIKELY {
 		setlasterror(filename.quote() ^ " cannot be renamed because it does not exist.");
 		return false;
 	}
 
 	// Fail neatly if the new file exists
 	// SQL errors during a transaction cause the whole transaction to fail.
-	if (filehandle.open(newfilename)) {
+	if (filehandle.open(newfilename)) UNLIKELY {
 		setlasterror(filename.quote() ^ " cannot be renamed because " ^ newfilename.quote() ^ " already exists.");
 		return false;
 	}
@@ -2539,8 +2538,7 @@ bool var::renamefile(CVR filename, CVR newfilename) const {
 //		return this->sqlexec(sql);
 //	else
 //		return filename.sqlexec(sql);
-	if (!filehandle.sqlexec(sql))
-		UNLIKELY
+	if (!filehandle.sqlexec(sql)) UNLIKELY
 		throw VarDBException(this->lasterror());
 
 	return true;
@@ -2556,7 +2554,7 @@ bool var::deletefile(CVR filename) const {
 	// SQL errors during a transaction cause the whole transaction to fail.
 	// Delete the file on whatever connection it exists;
 	var filehandle = this->clone();
-	if (!filehandle.open(filename)) {
+	if (!filehandle.open(filename)) UNLIKELY {
 		setlasterror(filename.quote() ^ " cannot be deleted because it does not exist.");
 		return false;
 	}
@@ -2577,8 +2575,7 @@ bool var::deletefile(CVR filename) const {
 //		return this->sqlexec(sql);
 //	else
 //		return filename.sqlexec(sql);
-	if (!filehandle.sqlexec(sql))
-		UNLIKELY
+	if (!filehandle.sqlexec(sql)) UNLIKELY
 		throw VarDBException(this->lasterror());
 
 	return true;
@@ -2593,8 +2590,8 @@ bool var::clearfile(CVR filename) const {
 	// Fail neatly if the file does not exist
 	// SQL errors during a transaction cause the whole transaction to fail.
 	var filehandle = this->clone();
-	if (!filehandle.open(filename, *this)) {
-		setlasterror(filename.quote() ^ " cannot be deleted because it does not exist.");
+	if (!filehandle.open(filename, *this)) UNLIKELY {
+		setlasterror(filename.quote() ^ " cannot be cleared because it does not exist.");
 		return false;
 	}
 
@@ -2603,8 +2600,7 @@ bool var::clearfile(CVR filename) const {
 //		return this->sqlexec(sql);
 //	else
 //		return filename.sqlexec(sql);
-	if (!filehandle.sqlexec(sql))
-		UNLIKELY
+	if (!filehandle.sqlexec(sql)) UNLIKELY
 		throw VarDBException(this->lasterror());
 
 	return true;
@@ -2659,7 +2655,7 @@ static var get_dictexpression(CVR cursor, CVR mainfilename, CVR filename, CVR di
 	// using one of the exodus backend functions installed in postgres like exodus.extract_text,
 	// exodus.extract_date etc.
 	var dictrec;
-	if (!dictrec.read(actualdictfile, fieldname)) {
+	if (!dictrec.read(actualdictfile, fieldname)) UNLIKELY {
 		// try lowercase
 		fieldname.lcaser();
 		if (!dictrec.read(actualdictfile, fieldname)) {
@@ -3041,7 +3037,7 @@ TRACE: "QQQ"="QQQ"
 			//if the xlate key expression is stage2_calculated then
 			//indicate that the whole dictid expression is stage2_calculated
 			//and do not do any join
-			if (xlatekeyexpression.contains("exodus_call")) {
+			if (xlatekeyexpression.contains("exodus_call")) UNLIKELY {
 				sqlexpression = "exodus_call(";
 				if (DBTRACE)
 					TRACE(sqlexpression)
@@ -3074,7 +3070,7 @@ TRACE: "QQQ"="QQQ"
 				//joins.r(joinsectionn, -1, join_part1 ^ join_part2);
 				joins(joinsectionn, -1) = join_part1 ^ join_part2;
 
-			if (DBTRACE)
+			if (DBTRACE) UNLIKELY
 				TRACE(sqlexpression)
 
 			return sqlexpression;
@@ -3102,7 +3098,7 @@ exodus_call:
 			// TODO apply naturalorder conversion by passing forsort
 			// option to exodus_call
 
-			if (DBTRACE)
+			if (DBTRACE) UNLIKELY
 				TRACE(sqlexpression)
 
 			return sqlexpression;
@@ -3219,7 +3215,7 @@ exodus_call:
 		}
 	}
 
-	if (DBTRACE)
+	if (DBTRACE) UNLIKELY
 		TRACE(sqlexpression)
 
 	return sqlexpression;
@@ -3326,7 +3322,7 @@ static var getword(VARREF remainingwords, VARREF ucword) {
 	}
 
 	ucword = word1.ucase();
-	if (DBTRACE) {
+	if (DBTRACE) UNLIKELY {
 		TRACE(word1)
 		TRACE(remainingwords)
 	}
@@ -3552,7 +3548,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 		}
 
 		// distinct fieldname (returns a field instead of the key)
-		else if (ucword == "DISTINCT" && remaining) {
+		else if (ucword == "DISTINCT" && remaining) UNLIKELY {
 
 			var distinctfieldname = getword(remaining, xx);
 			var distinctexpression = get_dictexpression(*this, actualfilename, actualfilename, dictfilename, dictfile, distinctfieldname, joins, unnests, selects, ismv, isdatetime, false);
@@ -4341,7 +4337,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 
 			// testing for "" may become testing for null
 			// for date and time which are returned as null for empty string
-			else if (value == "''") {
+			else if (value == "''") UNLIKELY {
 				if (dictexpression.contains("extract_date") ||
 					dictexpression.contains("extract_datetime") ||
 					dictexpression.contains("extract_time")) {
@@ -4516,8 +4512,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 		var key;
 		while (this->readnext(key)) {
 			//std::cout<<key<<std::endl;
-			if (not this->sqlexec("INSERT INTO " ^ temptablename ^ "(KEY) VALUES('" ^ key.replace("'", "''") ^ "')"))
-				UNLIKELY
+			if (not this->sqlexec("INSERT INTO " ^ temptablename ^ "(KEY) VALUES('" ^ key.replace("'", "''") ^ "')")) UNLIKELY
 				throw VarDBException(lasterror());
 		}
 
@@ -4612,7 +4607,7 @@ bool var::selectx(CVR fieldnames, CVR sortselectclause) {
 		}
 
 		var errmsg;
-		if (!this->sqlexec(sql2, errmsg)) {
+		if (!this->sqlexec(sql2, errmsg)) UNLIKELY {
 
 			if (errmsg)
 				errmsg.errputl("::selectx on handle(" ^ *this ^ ") " ^ sql2 ^ "\n");
@@ -4681,7 +4676,7 @@ void var::clearselect() {
 	// Dont close cursor unless it exists otherwise sql error aborts any transaction
     // Avoid generating sql errors since they abort transactions
 	// if (not this->cursorexists())
-	if (not this->cursorexists())
+	if (not this->cursorexists()) UNLIKELY
 		return;
 
 	// clear any select list
@@ -4717,7 +4712,7 @@ void var::clearselect() {
 
 	//sql.output();
 
-	if (!this->sqlexec(sql, errors)) {
+	if (!this->sqlexec(sql, errors)) UNLIKELY {
 		if (errors)
 			errors.errputl("::clearselect on handle(" ^ *this ^ ") ");
 		return;
@@ -4746,7 +4741,7 @@ static bool readnextx(CVR cursor, PGconn* pgconn, int  direction, PGresult*& pgr
 
 		// If backwards
 		// (should only be done after going forwards)
-		if (direction < 0) {
+		if (direction < 0) UNLIKELY {
 
 			// rown is unlikely to be used after requesting backwards
 			(*rown)--;
@@ -4764,7 +4759,7 @@ static bool readnextx(CVR cursor, PGconn* pgconn, int  direction, PGresult*& pgr
 		// return success and the rown if within bounds
 //TRACE(*rown)
 //TRACE(PQntuples(*dbresult))
-		if (*rown < PQntuples(*dbresult)) {
+		if (*rown < PQntuples(*dbresult)) LIKELY {
 
 			// Save the rown for the next iteration
 			dbresult->rown_ = *rown;
@@ -4812,7 +4807,7 @@ static bool readnextx(CVR cursor, PGconn* pgconn, int  direction, PGresult*& pgr
 
 		// if cursor simply doesnt exist then see if a savelist one is available and enable
 		// it 34000 - "ERROR:  cursor "cursor1_" does not exist"
-		if (direction >= 0 && sqlstate == "34000") {
+		if (direction >= 0 && sqlstate == "34000") UNLIKELY {
 			return false;
 
 			/**
@@ -4888,7 +4883,7 @@ bool var::deletelist(CVR listname) const {
 
 	// open the lists file on the same connection
 	var lists = *this;
-	if (!lists.open("LISTS")) UNLIKELY 
+	if (!lists.open("LISTS")) UNLIKELY
 		//skip this error for now because maybe no LISTS on some databases
 		return false;
 		//throw VarDBException("deletelist() LISTS file cannot be opened");
@@ -4937,7 +4932,7 @@ bool var::savelist(CVR listname) {
 	// and after the loop to save any unsaved keys
 	auto write_list = [&] () {
 
-		if (!list.var_str.size())
+		if (!list.var_str.size()) UNLIKELY
 			return;
 
 		// Delete any prior list with the same name
@@ -5018,7 +5013,7 @@ bool var::getlist(CVR listname) {
 	}
 
 	var keys;
-	if (!keys.read(lists, listname))
+	if (!keys.read(lists, listname)) UNLIKELY
 		// throw VarDBException(listname.quote() ^ " list does not exist.");
 		return false;
 
@@ -5053,7 +5048,7 @@ bool var::formlist(CVR keys, CVR fieldno) {
 	this->clearselect();
 
 	var record;
-	if (not record.read(*this, keys)) {
+	if (not record.read(*this, keys)) UNLIKELY {
 		keys.errputl("formlist() cannot read on handle(" ^ *this ^ ") ");
 		return false;
 	}
@@ -5062,8 +5057,7 @@ bool var::formlist(CVR keys, CVR fieldno) {
 	if (fieldno)
 		record = record.f(fieldno).converter(VM, FM);
 
-	if (not this->makelist("", record))
-		UNLIKELY
+	if (not this->makelist("", record)) UNLIKELY
 		throw VarDBException(this->lasterror());
 
 	return true;
@@ -5144,10 +5138,10 @@ bool var::hasnext() {
 		var key_and_mv = this->f(6, keyno);
 
 		// true if we have another key
-		if (key_and_mv.len())
+		if (key_and_mv.len()) LIKELY
 			return true;
 
-		if (DBTRACE)
+		if (DBTRACE) UNLIKELY
 			this->logputl("DBTR var::hasnext(" ^ listid ^ ") ");
 
 		// otherwise try and get another block
@@ -5183,7 +5177,7 @@ bool var::hasnext() {
 
 	//TODO avoid this trip to the database somehow?
     // Avoid generating sql errors since they abort transactions
-	if (!this->cursorexists())
+	if (!this->cursorexists()) UNLIKELY
 		return false;
 
 	auto pgconn = get_pgconn(*this);
@@ -5198,7 +5192,7 @@ bool var::hasnext() {
 	// Try to move the cursor forward
 	PGresult* pgresult = nullptr;
 	int rown;
-	if (!readnextx(*this, pgconn, /*direction=*/1, pgresult, &rown))
+	if (!readnextx(*this, pgconn, /*direction=*/1, pgresult, &rown)) UNLIKELY
 		return false;
 
 	//////////////////////////////
@@ -5271,7 +5265,7 @@ bool var::readnext(VARREF record, VARREF key, VARREF valueno) {
 			if (key_and_mv.len() == 0) {
 
 				// makelist provides one block of keys and nothing in the lists file
-				if (listid == "%MAKELIST%") {
+				if (listid == "%MAKELIST%") UNLIKELY {
 					this->r(3, "");
 					this->r(4, "");
 					this->r(5, "");
@@ -5317,17 +5311,17 @@ bool var::readnext(VARREF record, VARREF key, VARREF valueno) {
 	}
 
 	auto pgconn = get_pgconn(*this);
-	if (! pgconn)
+	if (! pgconn) UNLIKELY
 		return false;
 
 	// Avoid generating sql errors since they abort transactions
-	if (!this->cursorexists())
+	if (!this->cursorexists()) UNLIKELY
 		return false;
 
 	//DBresult dbresult;
 	PGresult* pgresult = nullptr;
 	int rown;
-	if (!readnextx(*this, pgconn, /*direction=*/1, pgresult, &rown)) {
+	if (!readnextx(*this, pgconn, /*direction=*/1, pgresult, &rown)) UNLIKELY {
 		this->clearselect();
 		return false;
 	}
@@ -5344,7 +5338,7 @@ bool var::readnext(VARREF record, VARREF key, VARREF valueno) {
 	//recursive call to skip any meta data with keys starting and ending %
 	//eg keys like "%RECORDS%" (without the quotes)
 	//similar code in readnext()
-	if (key.starts("%") && key.ends("%")) {
+	if (key.starts("%") && key.ends("%")) UNLIKELY {
 		return readnext(record, key, valueno);
 	}
 
@@ -5415,7 +5409,7 @@ bool var::createindex(CVR fieldname0, CVR dictfile) const {
 	var sql;
 
 	// index on calculated columns causes an additional column to be created
-	if (dictexpression.contains("exodus_call")) {
+	if (dictexpression.contains("exodus_call")) UNLIKELY {
 		("ERROR: Cannot create index on " ^ filename ^ " for calculated field " ^ fieldname).errputl();
 		return false;
 
@@ -5445,7 +5439,7 @@ bool var::createindex(CVR fieldname0, CVR dictfile) const {
 
 	// Fail neatly if the index already exists
 	// SQL errors during a transaction cause the whole transaction to fail.
-	if (this->listindex(filename, fieldname)) {
+	if (this->listindex(filename, fieldname)) UNLIKELY {
 		setlasterror(filename.quote() ^ ", " ^ fieldname.quote() ^ " index already exists.");
 		return false;
 	}
@@ -5461,7 +5455,7 @@ bool var::createindex(CVR fieldname0, CVR dictfile) const {
 	sql ^= ")";
 
 	var response = "";
-	if (!this->sqlexec(sql, response)) {
+	if (!this->sqlexec(sql, response)) UNLIKELY {
 		//ERROR:  cannot create index on foreign table "clients"
 		//sqlstate:42809 CREATE INDEX index__suppliers__SEQUENCE_XREF ON suppliers USING GIN (to_tsvector('simple',dict_suppliers_SEQUENCE_XREF(suppliers.key, suppliers.data)))
 		if (!response.contains("sqlstate:42809"))
@@ -5489,7 +5483,7 @@ bool var::deleteindex(CVR fieldname0) const {
 
 	// Fail neatly if the index does not exist
 	// SQL errors during a transaction cause the whole transaction to fail.
-	if (not this->listindex(filename, fieldname)) {
+	if (not this->listindex(filename, fieldname)) UNLIKELY {
 		setlasterror(filename.quote() ^ ", " ^ fieldname.quote() ^ " index does not exist.");
 		return false;
 	}
@@ -5518,11 +5512,11 @@ var var::listfiles() const {
 	sql ^= " WHERE schemaname " ^ schemafilter;
 
 	auto pgconn = get_pgconn(*this);
-	if (! pgconn)
+	if (! pgconn) UNLIKELY
 		return "";
 
 	DBresult dbresult;
-	if (!get_dbresult(sql, dbresult, pgconn))
+	if (!get_dbresult(sql, dbresult, pgconn)) UNLIKELY
 		return "";
 
 	var filenames = "";
@@ -5551,11 +5545,11 @@ var var::dblist() const {
 	var sql = "SELECT datname FROM pg_database";
 
 	auto pgconn = get_pgconn(*this);
-	if (! pgconn)
+	if (! pgconn) UNLIKELY
 		return "";
 
 	DBresult dbresult;
-	if (!get_dbresult(sql, dbresult, pgconn))
+	if (!get_dbresult(sql, dbresult, pgconn)) UNLIKELY
 		return "";
 
 	var dbnames = "";
@@ -5590,18 +5584,18 @@ bool var::cursorexists() {
 	var cursorid = this->f(2) ^ "_" ^ cursorcode;
 
 	// true if exists in cursor cache
-	if (thread_dbresults.find(cursorid) != thread_dbresults.end())
+	if (thread_dbresults.find(cursorid) != thread_dbresults.end()) LIKELY
 		return true;
 
 	auto pgconn = get_pgconn(*this);
-	if (! pgconn)
+	if (! pgconn) UNLIKELY
 		return false;
 
 	// from http://www.alberton.info/postgresql_meta_info.html
 	var sql = "SELECT name from pg_cursors where name = 'cursor1_" ^ cursorcode ^ "'";
 
 	DBresult dbresult;
-	if (!get_dbresult(sql, dbresult, pgconn))
+	if (!get_dbresult(sql, dbresult, pgconn)) UNLIKELY
 		return false;
 
 	return PQntuples(dbresult) > 0;
@@ -5638,12 +5632,12 @@ var var::listindex(CVR filename0, CVR fieldname0) const {
 		");";
 
 	auto pgconn = get_pgconn(*this);
-	if (! pgconn)
+	if (! pgconn) UNLIKELY
 		return "";
 
 	// execute command or return empty string
 	DBresult dbresult;
-	if (!get_dbresult(sql, dbresult, pgconn))
+	if (!get_dbresult(sql, dbresult, pgconn)) UNLIKELY
 		return "";
 
 	std::string indexnames = "";
@@ -5692,12 +5686,12 @@ var var::reccount(CVR filename0) const {
 	sql ^= "';";
 
 	auto pgconn = get_pgconn(filename);
-	if (! pgconn)
+	if (! pgconn) UNLIKELY
 		return "";
 
 	// execute command or return empty string
 	DBresult dbresult;
-	if (!get_dbresult(sql, dbresult, pgconn))
+	if (!get_dbresult(sql, dbresult, pgconn)) UNLIKELY
 		return "";
 
 	var reccount = "";
@@ -5726,12 +5720,12 @@ var var::flushindex(CVR filename) const {
 
 	// TODO perhaps should get connection from filehandle if passed a filehandle
 	auto pgconn = get_pgconn(*this);
-	if (! pgconn)
+	if (! pgconn) UNLIKELY
 		return "";
 
 	// execute command or return empty string
 	DBresult dbresult;
-	if (!get_dbresult(sql, dbresult, pgconn))
+	if (!get_dbresult(sql, dbresult, pgconn)) UNLIKELY
 		return "";
 
 	var flushresult = "";
