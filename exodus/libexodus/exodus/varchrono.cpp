@@ -216,9 +216,9 @@ var var::timestamp() const {
 }
 
 // -> decimal fractional days since pick epoch 1967-12-31 00:00:00 (up to micro or nano second accuracy)
-var var::timestamp(CVR ostime) const {
+var var::timestamp(in ostime) const {
 
-	THISIS("var var::timestamp(CVR ostime) const")
+	THISIS("var var::timestamp(in ostime) const")
 	assertNumeric(function_sig);
 	assertNumeric(function_sig, ostime);
 

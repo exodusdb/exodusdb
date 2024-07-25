@@ -1,68 +1,68 @@
 500 dim var::split(SV sepchar = FM) 
-501 var dim::split(CVR str1, SV sepchar = FM) 
-502 bool dim::read(CVR filevar, CVR key) 
-503 bool dim::write(CVR filevar, CVR key) const 
-504 bool dim::osread(CVR osfilename, const char* codepage DEFAULT_EMPTY) 
-505 bool dim::oswrite(CVR osfilename, const char* codepage DEFAULT_EMPTY) 
+501 var dim::split(in str1, SV sepchar = FM) 
+502 bool dim::read(in filevar, in key) 
+503 bool dim::write(in filevar, in key) const 
+504 bool dim::osread(in osfilename, const char* codepage DEFAULT_EMPTY) 
+505 bool dim::oswrite(in osfilename, const char* codepage DEFAULT_EMPTY) 
 506 var var::sort(SV sepchar = FM) 
 507 var var::reverse(SV sepchar = FM) 
-508 var var::timestamp(CVR ostime) const 
-509 bool var::connect(CVR conninfo 
-510 bool var::attach(CVR filenames 
-511 bool var::detach(CVR filenames 
+508 var var::timestamp(in ostime) const 
+509 bool var::connect(in conninfo 
+510 bool var::attach(in filenames 
+511 bool var::detach(in filenames 
 512 bool var::disconnect() 
 513 bool var::disconnectall() 
-514 bool var::open(CVR filename, CVR connection) 
+514 bool var::open(in filename, in connection) 
 515 bool var::open cache_miss
 516 void var::close() 
-517 bool var::readc(CVR filehandle, CVR key) 
-518 void var::writec(CVR filehandle, CVR key) 
-519 bool var::deletec(CVR key) 
-520 bool var::read(CVR filehandle, CVR key) 
+517 bool var::readc(in filehandle, in key) 
+518 void var::writec(in filehandle, in key) 
+519 bool var::deletec(in key) 
+520 bool var::read(in filehandle, in key) 
 521 bool var::reado cache_miss
 522 var var::hash() const 
-523 var var::lock(CVR key) const 
-524 void var::unlock(CVR key) const 
+523 var var::lock(in key) const 
+524 void var::unlock(in key) const 
 525 void var::unlockall() const 
-526 bool var::sqlexec(CVR sqlcmd, VARREF response) const 
-527 bool var::writef(CVR filehandle, CVR key, const int fieldno) const 
-528 bool var::write(CVR filehandle, CVR key) const 
-529 bool var::updaterecord(CVR filehandle, CVR key) const 
-530 bool var::insertrecord(CVR filehandle, CVR key) const 
-531 bool var::deleterecord(CVR key) const 
+526 bool var::sqlexec(in sqlcmd, VARREF response) const 
+527 bool var::writef(in filehandle, in key, const int fieldno) const 
+528 bool var::write(in filehandle, in key) const 
+529 bool var::updaterecord(in filehandle, in key) const 
+530 bool var::insertrecord(in filehandle, in key) const 
+531 bool var::deleterecord(in key) const 
 532 bool var::cleardbcache() const 
 533 bool var::begintrans() const 
 534 bool var::rollbacktrans() const 
 535 bool var::committrans() const 
 536 bool var::statustrans() const 
-537 bool var::dbcreate(CVR from_dbname, CVR to_dbname) 
-538 bool var::dbdelete(CVR dbname) 
-539 bool var::createfile(CVR filename) 
-540 bool var::renamefile(CVR filename, CVR newfilename) 
-541 bool var::deletefile(CVR filename) 
-542 bool var::clearfile(CVR filename) 
-543 bool var::select(CVR sortselectclause) const 
-544 bool var::deletelist(CVR listname) const 
-545 bool var::savelist(CVR listname) 
-546 bool var::getlist(CVR listname) const 
-547 bool var::formlist(CVR keys, CVR fieldno) 
-548 bool var::makelist(CVR listname)
+537 bool var::dbcreate(in from_dbname, in to_dbname) 
+538 bool var::dbdelete(in dbname) 
+539 bool var::createfile(in filename) 
+540 bool var::renamefile(in filename, in newfilename) 
+541 bool var::deletefile(in filename) 
+542 bool var::clearfile(in filename) 
+543 bool var::select(in sortselectclause) const 
+544 bool var::deletelist(in listname) const 
+545 bool var::savelist(in listname) 
+546 bool var::getlist(in listname) const 
+547 bool var::formlist(in keys, in fieldno) 
+548 bool var::makelist(in listname)
 549 bool var::hasnext() const
 550 bool var::readnext(VARREF key, VARREF valueno) const 
 551 bool var::readnext(VARREF record, VARREF key, VARREF valueno) const 
-552 bool var::createindex(CVR fieldname, CVR dictfile) const 
-553 bool var::deleteindex(CVR fieldname) const 
+552 bool var::createindex(in fieldname, in dictfile) const 
+553 bool var::deleteindex(in fieldname) const 
 554 var var::listfiles() const 
 555 var var::dblist() const 
 556 bool var::cursorexists() 
-557 var var::listindex(CVR filename) const 
-558 var var::reccount(CVR filename_or_handle_or_null) const 
-559 var var::flushindex(CVR filename=) const 
+557 var var::listindex(in filename) const 
+558 var var::reccount(in filename_or_handle_or_null) const 
+559 var var::flushindex(in filename=) const 
 560 bool var::input() 
-561 bool var::input(CVR prompt 
+561 bool var::input(in prompt 
 562 bool var::inputn(const int nchars 
-563 VARREF var::default_to(CVR defaultvalue) const 
-564 VARREF var::default_from(CVR defaultvalue) 
+563 VARREF var::default_to(in defaultvalue) const 
+564 VARREF var::default_from(in defaultvalue) 
 565 char var::toChar() const 
 566 std::string var::toString() && 
 567 std::string var::toString() const& 
@@ -98,18 +98,18 @@
 597 VARREF var::lowerer() 
 598 VARREF var::raiser() 
 599 VARREF var::converter(SV fromchars, SV tochars) 
-600 VARREF var::converter(CVR fromchars, CVR tochars) 
+600 VARREF var::converter(in fromchars, in tochars) 
 601 VARREF var::parser(char sepchar) 
 602 var var::fcount(SV sep) const 
 603 var var::count(SV str) const 
 604 var var::index(SV substr, const int startindex) const 
 605 var var::indexr(SV substr, const int startindex) const 
 606 var var::index(SV substr) const 
-607 var var::xlate(CVR filename, CVR fieldno, const char* mode) const 
+607 var var::xlate(in filename, in fieldno, const char* mode) const 
 608 var var::numberinwords(in number, in langname_or_locale_id) 
 609 var var::iconv(const char* conversion) const 
 610 var var::oconv(const char* conversion) const 
-611 var var::mod(CVR limit) const 
+611 var var::mod(in limit) const 
 612 var var::mod(double limit) const 
 613 var var::mod(const int limit) const 
 614 var var::abs() const 
@@ -119,24 +119,24 @@
 618 var var::atan() const 
 619 var var::loge() const 
 620 var var::sqrt() const 
-621 var var::pwr(CVR exponent) const 
+621 var var::pwr(in exponent) const 
 622 var var::exp() const 
 623 var var::osshell() const 
 624 var var::osshellread() const 
-625 var var::osshellwrite(CVR oscmd) const 
-626 bool var::osopen(CVR osfilename, const char* locale) 
-627 bool var::osopenx(CVR osfilename, const char* locale) 
+625 var var::osshellwrite(in oscmd) const 
+626 bool var::osopen(in osfilename, const char* locale) 
+627 bool var::osopenx(in osfilename, const char* locale) 
 628 bool var::osread(const char* osfilename, const char* codepage 
 629 bool var::to_codepage(const char* codepage) const 
 630 bool var::from_codepage(const char* codepage) const 
-631 bool var::oswrite(CVR osfilename, const char* codepage) const 
-632 bool var::osbwrite(CVR osfilevar, VARREF offset) const 
-633 bool var::osbread(CVR osfilevar, VARREF offset, const int bytesize 
-634 bool var::osrename(CVR new_dirpath_or_filepath) const 
-635 bool var::oscopy(CVR new_dirpath_or_filepath) const 
-636 bool var::osmove(CVR new_dirpath_or_filepath) const 
+631 bool var::oswrite(in osfilename, const char* codepage) const 
+632 bool var::osbwrite(in osfilevar, VARREF offset) const 
+633 bool var::osbread(in osfilevar, VARREF offset, const int bytesize 
+634 bool var::osrename(in new_dirpath_or_filepath) const 
+635 bool var::oscopy(in new_dirpath_or_filepath) const 
+636 bool var::osmove(in new_dirpath_or_filepath) const 
 637 bool var::osrmdir(bool evenifnotempty) const 
-638 var var::oslist(CVR globpattern, const int mode) const 
+638 var var::oslist(in globpattern, const int mode) const 
 639 var var::oscwd(const char* newpath) const 
 640 var var::oscwd() const 
 641 void var::ossleep(const int milliseconds) const 
@@ -149,18 +149,18 @@
 648 VARREF var::replacer(SV what, SV with) 
 649 var var::replace(const rex& regex, SV replacement) const 
 650 var var::field(SV separatorx, const int fieldnx, const int nfieldsx) const 
-651 VARREF var::fieldstorer(SV separator0, const int fieldnx, const int nfieldsx, CVR replacementx) 
-652 bool var::locate(CVR target, VARREF setting, const int fieldno/*=0*/, const int valueno/*=0*/) const 
-653 bool var::locate(CVR target, VARREF setting, const int fieldno/*=0*/, const int valueno/*=0*/) const 
-654 bool var::locate(CVR target) const 
-655 bool var::locateby(const char* ordercode, CVR target, VARREF setting) const 
-656 bool var::locateby(const char* ordercode, CVR target, VARREF setting, const int fieldno, const int valueno/*=0*/) const 
-657 bool var::locatebyusing(const char* ordercode, const char* usingchar, CVR target, VARREF setting, const int fieldno=0, const int valueno=0, const int valueno=0) const 
-658 bool var::locateusing(const char* usingchar, CVR target) const 
-659 bool var::locateusing(const char* usingchar, CVR target, VARREF setting, const int fieldno/*=0*/, const int valueno/*=0*/, const int subvalueno/*=0*/) const 
+651 VARREF var::fieldstorer(SV separator0, const int fieldnx, const int nfieldsx, in replacementx) 
+652 bool var::locate(in target, VARREF setting, const int fieldno/*=0*/, const int valueno/*=0*/) const 
+653 bool var::locate(in target, VARREF setting, const int fieldno/*=0*/, const int valueno/*=0*/) const 
+654 bool var::locate(in target) const 
+655 bool var::locateby(const char* ordercode, in target, VARREF setting) const 
+656 bool var::locateby(const char* ordercode, in target, VARREF setting, const int fieldno, const int valueno/*=0*/) const 
+657 bool var::locatebyusing(const char* ordercode, const char* usingchar, in target, VARREF setting, const int fieldno=0, const int valueno=0, const int valueno=0) const 
+658 bool var::locateusing(const char* usingchar, in target) const 
+659 bool var::locateusing(const char* usingchar, in target, VARREF setting, const int fieldno/*=0*/, const int valueno/*=0*/, const int subvalueno/*=0*/) const 
 660 var var::f(const int argfieldn, const int argvaluen, const int argsubvaluen) const 
 661 VARREF var::remover(int fieldno, int valueno, int subvalueno) 
-662 VARREF var::r(int fieldno, int valueno, int subvalueno, CVR replacement) 
+662 VARREF var::r(int fieldno, int valueno, int subvalueno, in replacement) 
 663 VARREF var::inserter(const int fieldno, const int valueno, const int subvalueno, const VARREF insertion) 
 664 bool var::starts(SV str) const 
 665 bool var::ends(SV str) const 
@@ -173,7 +173,7 @@
 672 VARREF var::cutter(const int length) 
 673 VARREF var::substrer(const int startindex1, const int length) 
 674 var var::at(const int charno) const 
-675 var var::multivalued(const char* opcode, CVR var2) const 
+675 var var::multivalued(const char* opcode, in var2) const 
 676 var var::substr(const int startindex1, VARREF delimiterchars, int& endindex) const 
 677 var var::substr2(VARREF startindex1, VARREF delimiterno) const 
 678 var var::sumall() const 
@@ -183,7 +183,7 @@
 682 VARREF var::quoter() 
 683 VARREF var::squoter() 
 684 VARREF var::unquoter() 
-685 CVR var::swap(CVR var2) const 
+685 CVR var::swap(in var2) const 
 686 VARREF var::swap(VARREF var2) 
 687 var var::textwidth() const 
 688 var var::first() const 

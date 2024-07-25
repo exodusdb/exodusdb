@@ -80,7 +80,7 @@ friend class var;
 	// Prevent assigning to temporaries
 	void operator=(const dim& rhs) && = delete;
 
-	// var& operator=(CVR rhs) & = default;
+	// var& operator=(in rhs) & = default;
 	// Cannot use default copy assignment because
 	// a) it returns a value allowing accidental use of "=" instead of == in if statements
 	// b) doesnt check if rhs is assigned
@@ -137,10 +137,10 @@ friend class var;
 
 	//=var
 	// The assignment operator should always return a reference to *this.
-	// cant be (CVR var1) because seems to cause a problem with var1=var2 in function
+	// cant be (in var1) because seems to cause a problem with var1=var2 in function
 	// parameters unfortunately causes problem of passing var by value and thereby unnecessary
 	// contruction see also ^= etc
-	void operator=(CVR sourcevar);
+	void operator=(in sourcevar);
 	void operator=(const int sourceint);
 	void operator=(const double sourcedbl);
 
@@ -208,7 +208,7 @@ friend class var;
 	dim& reverser();
 	dim& shuffler();
 
-	dim& splitter(CVR str1, SV sepchar = _FM);
+	dim& splitter(in str1, SV sepchar = _FM);
 	dim& eraser(std::vector<var>::iterator iter1, std::vector<var>::iterator iter2) {data_.erase(iter1, iter2); return *this;}
 
 	/////////////
@@ -216,12 +216,12 @@ friend class var;
 	/////////////
 
 	// db
-	ND bool read(CVR filevar, CVR key);
-	bool write(CVR filevar, CVR key) const;
+	ND bool read(in filevar, in key);
+	bool write(in filevar, in key) const;
 
 	// os
-	ND bool osread(CVR osfilename, const char* codepage DEFAULT_EMPTY);
-	ND bool oswrite(CVR osfilename, const char* codepage DEFAULT_EMPTY) const;
+	ND bool osread(in osfilename, const char* codepage DEFAULT_EMPTY);
+	ND bool oswrite(in osfilename, const char* codepage DEFAULT_EMPTY) const;
 
 	////////////
 	// ITERATORS
@@ -242,7 +242,7 @@ friend class var;
 
  private:
 
-	dim& init(CVR var1);
+	dim& init(in var1);
 
 	ND CVR getelementref(int row, int colno) const;
 	ND VARREF getelementref(int row, int colno);

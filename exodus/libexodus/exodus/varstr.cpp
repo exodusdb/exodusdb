@@ -105,19 +105,19 @@ var var::field(SV separatorx, const int fieldnx, const int nfieldsx) const {
 /////////////
 
 //// var.fieldstore(separator,fieldno,nfields,replacement)
-//var var::fieldstore(SV separator, const int fieldnx, const int nfieldsx, CVR replacementx) const& {
+//var var::fieldstore(SV separator, const int fieldnx, const int nfieldsx, in replacementx) const& {
 //	return var(*this).fieldstorer(separator, fieldnx, nfieldsx, replacementx);
 //}
 
 // Constant
-ND var var::fieldstore(SV separator, const int fieldno, const int nfields, CVR replacement) const& {
+ND var var::fieldstore(SV separator, const int fieldno, const int nfields, in replacement) const& {
 	return var(*this).fieldstorer(separator, fieldno, nfields, replacement);
 }
 
 // Mutator
-VARREF var::fieldstorer(SV separator, const int fieldnx, const int nfieldsx, CVR replacementx) {
+VARREF var::fieldstorer(SV separator, const int fieldnx, const int nfieldsx, in replacementx) {
 
-	THISIS("VARREF var::fieldstorer(SV separator0, const int fieldnx, const int nfieldsx, CVR replacementx)")
+	THISIS("VARREF var::fieldstorer(SV separator0, const int fieldnx, const int nfieldsx, in replacementx)")
 	assertStringMutator(function_sig);
 
 	if (separator.empty())
@@ -628,9 +628,9 @@ static bool locatex(const std::string& var_str, const std::string& target, const
 }
 
 // default locate using VM
-bool var::locate(CVR target, VARREF setting) const {
+bool var::locate(in target, VARREF setting) const {
 
-	THISIS("bool var::locate(CVR target, VARREF setting, const int fieldno/*=0*/, const int valueno/*=0*/) const")
+	THISIS("bool var::locate(in target, VARREF setting, const int fieldno/*=0*/, const int valueno/*=0*/) const")
 	assertString(function_sig);
 	ISSTRING(target)
 	ISDEFINED(setting)
@@ -638,9 +638,9 @@ bool var::locate(CVR target, VARREF setting) const {
 	return locatex(var_str, target.var_str, "", _VM, setting, 0, 0, 0);
 }
 
-bool var::locate(CVR target, VARREF setting, const int fieldno, const int valueno /*=0*/) const {
+bool var::locate(in target, VARREF setting, const int fieldno, const int valueno /*=0*/) const {
 
-	THISIS("bool var::locate(CVR target, VARREF setting, const int fieldno/*=0*/, const int valueno/*=0*/) const")
+	THISIS("bool var::locate(in target, VARREF setting, const int fieldno/*=0*/, const int valueno/*=0*/) const")
 	assertString(function_sig);
 	ISSTRING(target)
 	ISDEFINED(setting)
@@ -660,9 +660,9 @@ bool var::locate(CVR target, VARREF setting, const int fieldno, const int valuen
 }
 
 // without setting
-bool var::locate(CVR target) const {
+bool var::locate(in target) const {
 
-	THISIS("bool var::locate(CVR target) const")
+	THISIS("bool var::locate(in target) const")
 	assertString(function_sig);
 	ISSTRING(target)
 
@@ -675,22 +675,22 @@ bool var::locate(CVR target) const {
 ////////////
 
 //// 1. rare syntax where the order is given as a variable
-//bool var::locateby(CVR ordercode, CVR target, VARREF setting, const int fieldno, const int valueno /*=0*/) const {
+//bool var::locateby(in ordercode, in target, VARREF setting, const int fieldno, const int valueno /*=0*/) const {
 //	return locateby(ordercode.toString().c_str(), target, setting, fieldno, valueno);
 //}
 
 //// 2. no fieldno or valueno means locate using character VM
 //// caters for the rare syntax where the order is given as a variable
-//bool var::locateby(CVR ordercode, CVR target, VARREF setting) const {
+//bool var::locateby(in ordercode, in target, VARREF setting) const {
 //	return locateby(ordercode.toString().c_str(), target, setting);
 //}
 
 // 3. no fieldno or valueno means locate using character VM
 // specialised const char version of ordercode for speed of usual syntax where ordermode is given as
 // string it avoids the conversion from string to var and back again
-bool var::locateby(const char* ordercode, CVR target, VARREF setting) const {
+bool var::locateby(const char* ordercode, in target, VARREF setting) const {
 
-	THISIS("bool var::locateby(const char* ordercode, CVR target, VARREF setting) const")
+	THISIS("bool var::locateby(const char* ordercode, in target, VARREF setting) const")
 	assertString(function_sig);
 	ISSTRING(target)
 	ISDEFINED(setting)
@@ -709,9 +709,9 @@ bool var::locateby(const char* ordercode, CVR target, VARREF setting) const {
 
 // 4. specialised const char version of ordercode for speed of usual syntax where ordermode is given as
 // string it avoids the conversion from string to var and back again
-bool var::locateby(const char* ordercode, CVR target, VARREF setting, const int fieldno, const int valueno /*=0*/) const {
+bool var::locateby(const char* ordercode, in target, VARREF setting, const int fieldno, const int valueno /*=0*/) const {
 
-	THISIS("bool var::locateby(const char* ordercode, CVR target, VARREF setting, const int fieldno, const int valueno/*=0*/) const")
+	THISIS("bool var::locateby(const char* ordercode, in target, VARREF setting, const int fieldno, const int valueno/*=0*/) const")
 	assertString(function_sig);
 	ISSTRING(target)
 	ISDEFINED(setting)
@@ -742,9 +742,9 @@ bool var::locateby(const char* ordercode, CVR target, VARREF setting, const int 
 // LOCATE BY, USING
 ///////////////////
 
-bool var::locatebyusing(const char* ordercode, const char* usingchar, CVR target, VARREF setting, const int fieldno /*=0*/, const int valueno /*=0*/, const int subvalueno /*=0*/) const {
+bool var::locatebyusing(const char* ordercode, const char* usingchar, in target, VARREF setting, const int fieldno /*=0*/, const int valueno /*=0*/, const int subvalueno /*=0*/) const {
 
-	THISIS("bool var::locatebyusing(const char* ordercode, const char* usingchar, CVR target, VARREF setting, const int fieldno=0, const int valueno=0, const int valueno=0) const")
+	THISIS("bool var::locatebyusing(const char* ordercode, const char* usingchar, in target, VARREF setting, const int fieldno=0, const int valueno=0, const int valueno=0) const")
 	assertString(function_sig);
 	ISSTRING(target)
 	ISDEFINED(setting)
@@ -766,9 +766,9 @@ bool var::locatebyusing(const char* ordercode, const char* usingchar, CVR target
 ///////////////
 
 // 1. simple version
-bool var::locateusing(const char* usingchar, CVR target) const {
+bool var::locateusing(const char* usingchar, in target) const {
 
-	THISIS("bool var::locateusing(const char* usingchar, CVR target) const")
+	THISIS("bool var::locateusing(const char* usingchar, in target) const")
 	assertString(function_sig);
 	ISSTRING(target)
 
@@ -777,9 +777,9 @@ bool var::locateusing(const char* usingchar, CVR target) const {
 }
 
 // 2. specify field/value/subvalue and return position
-bool var::locateusing(const char* usingchar, CVR target, VARREF setting, const int fieldno /*=0*/, const int valueno /*=0*/, const int subvalueno /*=0*/) const {
+bool var::locateusing(const char* usingchar, in target, VARREF setting, const int fieldno /*=0*/, const int valueno /*=0*/, const int subvalueno /*=0*/) const {
 
-	THISIS("bool var::locateusing(const char* usingchar, CVR target, VARREF setting, const int fieldno/*=0*/, const int valueno/*=0*/, const int subvalueno/*=0*/) const")
+	THISIS("bool var::locateusing(const char* usingchar, in target, VARREF setting, const int fieldno/*=0*/, const int valueno/*=0*/, const int subvalueno/*=0*/) const")
 	assertString(function_sig);
 	ISSTRING(target)
 	ISDEFINED(setting)
@@ -1057,9 +1057,9 @@ VARREF var::remover(int fieldno, int valueno, int subvalueno) {
 // PICKREPLACE int int int var
 ///////////////////////////////////////////
 
-VARREF var::r(int fieldno, int valueno, int subvalueno, CVR replacement) {
+VARREF var::r(int fieldno, int valueno, int subvalueno, in replacement) {
 
-	THISIS("VARREF var::r(int fieldno, int valueno, int subvalueno, CVR replacement)")
+	THISIS("VARREF var::r(int fieldno, int valueno, int subvalueno, in replacement)")
 	assertStringMutator(function_sig);
 	ISSTRING(replacement)
 
@@ -1199,7 +1199,7 @@ VARREF var::r(int fieldno, int valueno, int subvalueno, CVR replacement) {
 ///////////////////////////////////////////
 
 //in-place - given everything
-VARREF var::inserter(const int fieldno, const int valueno, const int subvalueno, CVR insertion) {
+VARREF var::inserter(const int fieldno, const int valueno, const int subvalueno, in insertion) {
 
 	THISIS("VARREF var::inserter(const int fieldno, const int valueno, const int subvalueno, const VARREF insertion)")
 	assertStringMutator(function_sig);
@@ -1816,9 +1816,9 @@ template<> PUBLIC RETVAR VARBASE1::operator[](const int pos1) const {
 
 // performs an operation + - * / : on two multivalued strings in parallel
 // returning a multivalued string of the results
-var var::mv(const char* opcode, CVR var2) const {
+var var::mv(const char* opcode, in var2) const {
 
-	THISIS("var var::multivalued(const char* opcode, CVR var2) const")
+	THISIS("var var::multivalued(const char* opcode, in var2) const")
 	assertString(function_sig);
 	ISSTRING(var2)
 
@@ -1940,7 +1940,7 @@ getnextp2:
 // returns the characters up to the next delimiter
 // also returns the index of the next delimiter discovered or 1 after the string if none (like
 // COL2() in pickos) NOTE startindex1 is 1 based not 0. anything less than 1 is treated as 1
-var var::substr(const int startindex1, CVR delimiterchars, int& endindex) const {
+var var::substr(const int startindex1, in delimiterchars, int& endindex) const {
 
 	THISIS("var var::substr(const int startindex1, VARREF delimiterchars, int& endindex) const")
 	assertString(function_sig);

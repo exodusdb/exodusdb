@@ -291,9 +291,9 @@ VARREF var::input() {
 }
 
 // input with prompt allows default value and editing if isterminal
-VARREF var::input(CVR prompt) {
+VARREF var::input(in prompt) {
 
-	THISIS("bool var::input(CVR prompt")
+	THISIS("bool var::input(in prompt")
 	assertDefined(function_sig);
 	ISSTRING(prompt)
 
@@ -411,7 +411,7 @@ template<> PUBLIC void VARBASE1::default_to(CBX defaultvalue) {
 	// see explanation above in assigned
 	// assertDefined(function_sig);
 
-	THISIS("VARREF var::default_to(CVR defaultvalue) const")
+	THISIS("VARREF var::default_to(in defaultvalue) const")
 	ISASSIGNED(defaultvalue)
 
 	//?allow undefined usage like var xyz=xyz.readnext();
@@ -425,7 +425,7 @@ template<> PUBLIC void VARBASE1::default_to(CBX defaultvalue) {
 
 template<> PUBLIC RETVAR VARBASE1::default_from(CBX defaultvalue) const {
 
-	THISIS("VARREF var::default_from(CVR defaultvalue)")
+	THISIS("VARREF var::default_from(in defaultvalue)")
 	ISASSIGNED(defaultvalue)
 
 	if (this->unassigned()) {
@@ -1261,7 +1261,7 @@ template<> PUBLIC VBR1 VARBASE1::move(VBX tovar) {
 // const version needed in calculatex
 template<> PUBLIC CBR VARBASE1::swap(CBX var2) const {
 
-	THISIS("CVR var::swap(CVR var2) const")
+	THISIS("CVR var::swap(in var2) const")
 	// Works on unassigned vars
 	assertDefined(function_sig);
 	ISDEFINED(var2)
@@ -1485,10 +1485,10 @@ static void string_converter(T1& var_str, const T2 fromchars, const T3 tochars) 
 
 // convert() - replaces one by one in string, a list of characters with another list of characters
 // if the target list is shorter than the source list of characters then characters are deleted
-//var var::convert(CVR fromchars, CVR tochars) const& {
+//var var::convert(in fromchars, in tochars) const& {
 
 // mutate
-//VARREF var::converter(CVR fromchars, CVR tochars) {
+//VARREF var::converter(in fromchars, in tochars) {
 VARREF var::converter(SV fromchars, SV tochars) {
 
 	THISIS("VARREF var::converter(SV fromchars, SV tochars)")
@@ -1515,7 +1515,7 @@ VARREF var::converter(SV fromchars, SV tochars) {
 // mutate
 VARREF var::textconverter(SV fromchars, SV tochars) {
 
-	THISIS("VARREF var::converter(CVR fromchars, CVR tochars)")
+	THISIS("VARREF var::converter(in fromchars, in tochars)")
 	assertStringMutator(function_sig);
 
 	// all ASCII -> bytewise conversion for speed
@@ -1812,9 +1812,9 @@ var var::indexn(SV substr, const int occurrenceno) const {
 // TODO provide a version with int fieldno to handle the most frequent case
 // although may also support dictid (of target file) instead of fieldno
 
-var var::xlate(CVR filename, CVR fieldno, const char* mode) const {
+var var::xlate(in filename, in fieldno, const char* mode) const {
 
-	THISIS("var var::xlate(CVR filename, CVR fieldno, const char* mode) const")
+	THISIS("var var::xlate(in filename, in fieldno, const char* mode) const")
 	assertString(function_sig);
 	ISSTRING(filename)
 	// fieldnames are supported as exoprog::xlate
@@ -1887,7 +1887,7 @@ var var::xlate(CVR filename, CVR fieldno, const char* mode) const {
 	return response;
 }
 
-var var::numberinwords(CVR langname_or_locale_id) {
+var var::numberinwords(in langname_or_locale_id) {
 
 	THISIS("var var::numberinwords(in number, in langname_or_locale_id)")
 	assertNumeric(function_sig);
@@ -2041,7 +2041,7 @@ ND VARREF var::prefix(                  SV insertstr)    && {return prefixer(ins
 //ND VARREF append(SV appendstr)                         && {return appender(appendstr);}
 ND VARREF var::pop()                                     && {return popper();}
 
-ND VARREF var::fieldstore(SV sepchar, const int fieldno, const int nfields, CVR replacement)
+ND VARREF var::fieldstore(SV sepchar, const int fieldno, const int nfields, in replacement)
                                                          && {return fieldstorer(sepchar, fieldno, nfields, replacement);}
 
 ND VARREF var::substr(const int pos1, const int length)  && {return substrer(pos1, length);}

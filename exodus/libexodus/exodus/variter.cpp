@@ -15,7 +15,7 @@
 //
 //Example:
 //
-// for (CVR v : dynstr) {...}
+// for (in v : dynstr) {...}
 //
 //Warning: updating the string probably invalidates the iterator! It is a byte pointer into the string.
 //
@@ -33,7 +33,7 @@ namespace exo {
 ///////////
 
 //CONSTRUCTOR from a var (ie begin())
-var_iter::var_iter(CVR var1)
+var_iter::var_iter(in var1)
 	: pvar_(&var1){
 	if (!var1.len())
 		startpos_ = std::string::npos;
@@ -135,13 +135,13 @@ var_iter var_iter::operator--(int) {
 }
 
 //BEGIN - free function to create an iterator -> begin
-PUBLIC var_iter begin(CVR var1) {
+PUBLIC var_iter begin(in var1) {
 	//std::cerr << __PRETTY_FUNCTION__ << std::endl;
 	return var_iter(var1);
 }
 
 //END - free function to create an interator -> end
-PUBLIC var_iter end([[maybe_unused]] CVR var1) {
+PUBLIC var_iter end(in /*var1*/) {
 	//std::cerr << __PRETTY_FUNCTION__ << std::endl;
 	// No need to use var1 since the end is always string::npos
 	// so var_iter!=var_iter is implemented in terms of startpos_ != string::npos;

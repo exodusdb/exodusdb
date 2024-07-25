@@ -133,7 +133,7 @@ dim::dim(const /*unsigned*/ int rows, const /*unsigned*/ int cols)
 	this->redim(rows, cols);
 }
 
-void dim::operator=(CVR sourcevar) {
+void dim::operator=(in sourcevar) {
 	this->init(sourcevar);
 	return;
 }
@@ -248,7 +248,7 @@ CVR dim::getelementref(/*unsigned*/ int rowno, /*unsigned*/ int colno) const {
 	return data_[ncols_ * (rowno - 1) + colno];
 }
 
-dim& dim::init(CVR sourcevar) {
+dim& dim::init(in sourcevar) {
 	if (!initialised_)
 		UNLIKELY
 		throw DimNotDimensioned("");
@@ -357,12 +357,12 @@ dim var::split(SV sepchar) const {
 }
 
 // d.splitter(v, sep)
-dim& dim::splitter(CVR str1, SV sepchar) {
+dim& dim::splitter(in str1, SV sepchar) {
 
 	//TODO provide a version that can split on any utf8 character
 	// Perhaps if sepchar is ""
 
-	THISIS("var dim::split(CVR str1, SV sepchar = FM)")
+	THISIS("var dim::split(in str1, SV sepchar = FM)")
 	ISSTRING(str1)
 
 	EXO_DIM_RECALC_NROWS(*this)
@@ -468,9 +468,9 @@ dim& dim::shuffler() {
 	return *this;
 }
 
-bool dim::read(CVR filevar, CVR key) {
+bool dim::read(in filevar, in key) {
 
-	THISIS("bool dim::read(CVR filevar, CVR key)")
+	THISIS("bool dim::read(in filevar, in key)")
 	ISSTRING(filevar)
 	ISSTRING(key)
 
@@ -493,9 +493,9 @@ bool dim::read(CVR filevar, CVR key) {
 	return true;
 }
 
-bool dim::write(CVR filevar, CVR key) const {
+bool dim::write(in filevar, in key) const {
 
-	THISIS("bool dim::write(CVR filevar, CVR key) const")
+	THISIS("bool dim::write(in filevar, in key) const")
 	ISSTRING(filevar)
 	ISSTRING(key)
 
@@ -505,9 +505,9 @@ bool dim::write(CVR filevar, CVR key) const {
 
 }
 
-bool dim::osread(CVR osfilename, const char* codepage) {
+bool dim::osread(in osfilename, const char* codepage) {
 
-	THISIS("bool dim::osread(CVR osfilename, const char* codepage DEFAULT_EMPTY)")
+	THISIS("bool dim::osread(in osfilename, const char* codepage DEFAULT_EMPTY)")
 	ISSTRING(osfilename)
 
 	var txt;
@@ -534,9 +534,9 @@ bool dim::osread(CVR osfilename, const char* codepage) {
 	return true;
 }
 
-bool dim::oswrite(CVR osfilename, const char* codepage) const {
+bool dim::oswrite(in osfilename, const char* codepage) const {
 
-	THISIS("bool dim::oswrite(CVR osfilename, const char* codepage DEFAULT_EMPTY)")
+	THISIS("bool dim::oswrite(in osfilename, const char* codepage DEFAULT_EMPTY)")
 	ISSTRING(osfilename)
 //	ISSTRING(codepage)
 

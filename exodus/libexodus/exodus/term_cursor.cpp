@@ -104,7 +104,7 @@ var ExodusProgramBase::getcursor() const {
 
 }
 
-void ExodusProgramBase::setcursor(CVR cursor) const {
+void ExodusProgramBase::setcursor(in cursor) const {
 	//std::cout << cursor << std::flush;
 	cursor.output();
 	cursor.osflush();
@@ -117,7 +117,7 @@ var ExodusProgramBase::getprompt() const {
 	return "";
 }
 
-void ExodusProgramBase::setprompt(CVR /*prompt*/) const {
+void ExodusProgramBase::setprompt(in /*prompt*/) const {
 	//std::cout << "ExodusProgramBase::setprompt() not implemented yet " << std::endl;
 	var("ExodusProgramBase::setprompt() not implemented yet ").outputl();
 	return;

@@ -170,11 +170,11 @@ static bool checknotabsoluterootfolder(std::string dirpath) {
 	return true;
 }
 
-static const std::string to_path_string(CVR str1) {
+static const std::string to_path_string(in str1) {
 	return str1.toString();
 }
 
-static const std::string to_oscmd_string(CVR cmd) {
+static const std::string to_oscmd_string(in cmd) {
 
 	// while converting from DOS convert all backslashes in first word to forward slashes on
 	// linux or leave as if exodus on windows
@@ -286,7 +286,7 @@ bool var::osshell() const {
 	return !shellresult;
 }
 
-bool var::osshellread(CVR oscmd) {
+bool var::osshellread(in oscmd) {
 
 	THISIS("var var::osshellread() const")
 	// will be checked again by toString()
@@ -331,9 +331,9 @@ bool var::osshellread(CVR oscmd) {
 
 }
 
-bool var::osshellwrite(CVR oscmd) const {
+bool var::osshellwrite(in oscmd) const {
 
-	THISIS("var var::osshellwrite(CVR oscmd) const")
+	THISIS("var var::osshellwrite(in oscmd) const")
 	// will be checked again by toString()
 	// but put it here so any unassigned error shows in osshell
 	assertString(function_sig);
@@ -368,9 +368,9 @@ void var::osflush() const {
 }
 
 // optional locale (not the same as codepage)
-bool var::osopen(CVR osfilename, const char* locale) const {
+bool var::osopen(in osfilename, const char* locale) const {
 
-	THISIS("bool var::osopen(CVR osfilename, const char* locale)")
+	THISIS("bool var::osopen(in osfilename, const char* locale)")
 	assertDefined(function_sig);
 	ISSTRING(osfilename)
 
@@ -385,7 +385,7 @@ static void del_fstream(void* handle) {
 	delete static_cast<std::fstream*>(handle);
 }
 
-std::fstream* var::osopenx(CVR osfilename, const char* locale) const {
+std::fstream* var::osopenx(in osfilename, const char* locale) const {
 
 	// Try to get the cached file handle. the usual case is that you osopen a file before doing
 	// osbwrite/osbread Using fstream instead of ofstream so that we can mix reads and writes on
@@ -410,7 +410,7 @@ std::fstream* var::osopenx(CVR osfilename, const char* locale) const {
 		// with osopen and perhaps a specific locale.
 
 		// Delay checking until necessary
-		THISIS("bool var::osopenx(CVR osfilename, const char* locale)")
+		THISIS("bool var::osopenx(in osfilename, const char* locale)")
 		ISSTRING(osfilename)
 
 		// TODO replace new/delete with some object
@@ -493,9 +493,9 @@ WINDOWS-1258
 //// no binary conversion is performed on input unless
 //// codepage is provided then exodus converts from the
 //// specified codepage (not locale) on input to utf-8 internally
-//bool var::osread(CVR osfilename, const char* codepage) {
+//bool var::osread(in osfilename, const char* codepage) {
 //
-//	THISIS("bool var::osread(CVR osfilename, const char* codepage")
+//	THISIS("bool var::osread(in osfilename, const char* codepage")
 //	ISSTRING(osfilename)
 //	return osread(to_path_string(osfilename).c_str(), codepage);
 //}
@@ -619,9 +619,9 @@ var var::from_codepage(const char* codepage) const {
 // no binary conversion is performed on output unless
 // codepage is provided (not locale) then exodus assumes internally
 // utf-8 and converts all output to the specified codepage
-bool var::oswrite(CVR osfilename, const char* codepage) const {
+bool var::oswrite(in osfilename, const char* codepage) const {
 
-	THISIS("bool var::oswrite(CVR osfilename, const char* codepage) const")
+	THISIS("bool var::oswrite(in osfilename, const char* codepage) const")
 	assertString(function_sig);
 	ISSTRING(osfilename)
 
@@ -653,11 +653,11 @@ bool var::oswrite(CVR osfilename, const char* codepage) const {
 
 //#ifdef VAR_OSBREADWRITE_CONST_OFFSET
 // a version that accepts a const offset ie ignores return value
-//bool var::osbwrite(CVR osfilevar, CVR offset, const bool adjust) const
+//bool var::osbwrite(in osfilevar, in offset, const bool adjust) const
 // offset -1 appends by starting writing one byte after the current end of the file
 // offset -2 updates the last byte of the file.
 // etc.
-//bool var::osbwrite(CVR osfilevar, CVR offset) const {
+//bool var::osbwrite(in osfilevar, in offset) const {
 //	return this->osbwrite(osfilevar, const_cast<VARREF>(offset));
 //}
 //#endif
@@ -665,12 +665,12 @@ bool var::oswrite(CVR osfilename, const char* codepage) const {
 //NOTE: unlike osread/oswrite which rely on iconv codepages to do any conversion
 //osbread and osbwrite rely on the locale being passed in on the osopen stage
 
-//bool var::osbwrite(CVR osfilevar, VARREF offset, const bool adjust) const
-bool var::osbwrite(CVR osfilevar, VARREF offset) const {
+//bool var::osbwrite(in osfilevar, VARREF offset, const bool adjust) const
+bool var::osbwrite(in osfilevar, VARREF offset) const {
 	// osfilehandle is just the filename but buffers the "file number" in the mvint too
 
 
-	THISIS("bool var::osbwrite(CVR osfilevar, VARREF offset) const")
+	THISIS("bool var::osbwrite(in osfilevar, VARREF offset) const")
 	assertString(function_sig);
 	ISNUMERIC(offset)
 
@@ -780,9 +780,9 @@ static unsigned count_excess_UTF8_bytes(const std::string& str) {
 //not being an exact number of valid utf-8 code units) are trimmed off the return value
 //The new offset is changed to reflect the above and is simply increased by bytesize
 
-bool var::osbread(CVR osfilevar, VARREF offset, const int bytesize) {
+bool var::osbread(in osfilevar, VARREF offset, const int bytesize) {
 
-	THISIS("bool var::osbread(CVR osfilevar, VARREF offset, const int bytesize")
+	THISIS("bool var::osbread(in osfilevar, VARREF offset, const int bytesize")
 	assertDefined(function_sig);
 	ISNUMERIC(offset)
 
@@ -875,9 +875,9 @@ void var::osclose() const {
 	// in all other cases, the files should be closed.
 }
 
-bool var::osrename(CVR new_dirpath_or_filepath) const {
+bool var::osrename(in new_dirpath_or_filepath) const {
 
-	THISIS("bool var::osrename(CVR new_dirpath_or_filepath) const")
+	THISIS("bool var::osrename(in new_dirpath_or_filepath) const")
 	assertString(function_sig);
 	ISSTRING(new_dirpath_or_filepath)
 
@@ -909,9 +909,9 @@ bool var::osrename(CVR new_dirpath_or_filepath) const {
 	return !std::rename(path1.c_str(), path2.c_str());
 }
 
-bool var::oscopy(CVR new_dirpath_or_filepath) const {
+bool var::oscopy(in new_dirpath_or_filepath) const {
 
-	THISIS("bool var::oscopy(CVR new_dirpath_or_filepath) const")
+	THISIS("bool var::oscopy(in new_dirpath_or_filepath) const")
 	assertString(function_sig);
 	ISSTRING(new_dirpath_or_filepath)
 
@@ -947,9 +947,9 @@ bool var::oscopy(CVR new_dirpath_or_filepath) const {
 	return true;
 }
 
-bool var::osmove(CVR new_dirpath_or_filepath) const {
+bool var::osmove(in new_dirpath_or_filepath) const {
 
-	THISIS("bool var::osmove(CVR new_dirpath_or_filepath) const")
+	THISIS("bool var::osmove(in new_dirpath_or_filepath) const")
 	assertString(function_sig);
 	ISSTRING(new_dirpath_or_filepath)
 
@@ -1237,7 +1237,7 @@ var var::oslistd(SV globpattern) const {
 */
 var var::oslist(SV globpattern0, const int mode) const {
 
-	THISIS("var var::oslist(CVR globpattern, const int mode) const")
+	THISIS("var var::oslist(in globpattern, const int mode) const")
 	assertDefined(function_sig);
 	//ISSTRING(path0)
 	//ISSTRING(globpattern0)
@@ -1326,7 +1326,7 @@ var var::oslist(SV globpattern0, const int mode) const {
 	return filelist;
 }
 
-bool var::oscwd(CVR newpath) const {
+bool var::oscwd(in newpath) const {
 
 	THISIS("var var::oscwd(const char* newpath) const")
 	// doesnt use *this - should syntax be changed to setcwd? and getcwd()?

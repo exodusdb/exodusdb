@@ -323,7 +323,7 @@ static var getpgresultcell(PGresult* pgresult, int rown, int coln) {
 
 // Given a file name or handle, extract filename, standardize utf8, lowercase and change . to _
 // Normalise all alternative utf8 encodings of the same unicode points so they are identical
-static var get_normal_filename(CVR filename_or_handle) {
+static var get_normal_filename(in filename_or_handle) {
 	//return filename_or_handle.f(1).normalize().lcase().convert(".", "_").replace("dict_","dict.");
 	// No longer convert . in filenames to _
 	return filename_or_handle.f(1).normalize().lcase();
@@ -374,7 +374,7 @@ static std::uint64_t mvdbpostgres_hash_stdstr(std::string str1) {
 /////////////////////////////
 // Create a cross platform stable unique lock number per filename & key to manipulate advisory locks on a postgres connection
 // TODO Provide an endian identical version. required if and when exodus processes connect to postgres from different endian hosts
-static std::uint64_t mvdbpostgres_hash_file_and_key(CVR filehandle, CVR key) {
+static std::uint64_t mvdbpostgres_hash_file_and_key(in filehandle, in key) {
 
 	// Use the pure filename and disregard any connection number
 	std::string fileandkey = get_normal_filename(filehandle);
@@ -488,7 +488,7 @@ class DBresult {
 	}
 };
 
-static int get_dbconn_no(CVR dbhandle) {
+static int get_dbconn_no(in dbhandle) {
 
 	if (!dbhandle.assigned()) UNLIKELY {
 		// var("get_dbconn_no() returning 0 - unassigned").logputl();
@@ -505,7 +505,7 @@ static int get_dbconn_no(CVR dbhandle) {
 	return 0;
 }
 
-static int get_dbconn_no_or_default(CVR dbhandle) {
+static int get_dbconn_no_or_default(in dbhandle) {
 
 	int dbconn_no = get_dbconn_no(dbhandle);
 	if (dbconn_no) LIKELY
@@ -615,7 +615,7 @@ static int get_dbconn_no_or_default(CVR dbhandle) {
 // NB in case 2 and 3 the connection id is recorded in the var
 // use void pointer to avoid need for including postgres headers in mv.h or any fancy class
 // hierarchy (assumes accurate programming by system programmers in exodus mvdb routines)
-static PGconn* get_pgconn(CVR dbhandle) {
+static PGconn* get_pgconn(in dbhandle) {
 
 	// var("--- connection ---").logputl();
 	// get the connection associated with *this
@@ -641,7 +641,7 @@ static PGconn* get_pgconn(CVR dbhandle) {
 }
 
 // gets lock_table, associated with connection, associated with this object
-static DBConn* get_dbconn(CVR dbhandle) {
+static DBConn* get_dbconn(in dbhandle) {
 	int dbconn_no = get_dbconn_no_or_default(dbhandle);
 	if (!dbconn_no) UNLIKELY {
 		var errmsg = "get_dbconn() attempted when not connected";
@@ -650,12 +650,12 @@ static DBConn* get_dbconn(CVR dbhandle) {
 	return thread_dbconnector.get_dbconn(dbconn_no);
 }
 
-//static bool get_dbresult(CVR sql, DBresult& dbresult, PGconn* pgconn);
+//static bool get_dbresult(in sql, DBresult& dbresult, PGconn* pgconn);
 // used for sql commands that require no parameters
 // returns 1 for success
 // returns 0 for failure
 // dbresult is returned to caller to extract any data and call PQclear(dbresult) in destructor of DBresult
-static bool get_dbresult(CVR sql, DBresult& dbresult, PGconn* pgconn) {
+static bool get_dbresult(in sql, DBresult& dbresult, PGconn* pgconn) {
 	DEBUG_LOG_SQL
 
 	/* dont use PQexec because is cannot be told to return binary results
@@ -782,7 +782,7 @@ static bool msvc_PQconnectdb(PGconn** pgconn, const std::string& conninfo) {
 
 #endif
 
-static var build_conn_info(CVR conninfo) {
+static var build_conn_info(in conninfo) {
 	// priority is
 	// 1) given parameters //or last connection parameters
 	// 2) individual environment parameters
@@ -898,7 +898,7 @@ static void tosqlstring(VARREF string1) {
 	}
 }
 
-static var get_fileexpression([[maybe_unused]] CVR mainfilename, CVR filename, CVR keyordata) {
+static var get_fileexpression(in /*mainfilename*/, in filename, in keyordata) {
 
 	// if (filename == mainfilename)
 	//	return keyordata;
@@ -930,9 +930,9 @@ static void to_extract_text(VARREF dictexpression) {
 				dictexpression.replacer("^exodus.extract_datetime\\("_rex, "exodus.extract_text\\(");
 }
 
-bool var::connect(CVR conninfo) {
+bool var::connect(in conninfo) {
 
-	THISIS("bool var::connect(CVR conninfo")
+	THISIS("bool var::connect(in conninfo")
 	// nb dont log/trace or otherwise output the full connection info without HIDING the
 	// password
 	assertDefined(function_sig);
@@ -1076,9 +1076,9 @@ bool var::connect(CVR conninfo) {
 }
 
 // conn1.attach("filename1^filename2...");
-bool var::attach(CVR filenames) {
+bool var::attach(in filenames) {
 
-	THISIS("bool var::attach(CVR filenames")
+	THISIS("bool var::attach(in filenames")
 	assertDefined(function_sig);
 	ISSTRING(filenames)
 
@@ -1125,9 +1125,9 @@ bool var::attach(CVR filenames) {
 }
 
 // conn1.detach("filename1^filename2...");
-void var::detach(CVR filenames) {
+void var::detach(in filenames) {
 
-	THISIS("bool var::detach(CVR filenames")
+	THISIS("bool var::detach(in filenames")
 	assertDefined(function_sig);
 	ISSTRING(filenames)
 
@@ -1254,9 +1254,9 @@ void var::disconnectall() {
 // if (not file.open(filename)) ...
 
 // connection is optional and default connection may be used instead
-bool var::open(CVR filename, CVR connection /*DEFAULTNULL*/) {
+bool var::open(in filename, in connection /*DEFAULTNULL*/) {
 
-	THISIS("bool var::open(CVR filename, CVR connection)")
+	THISIS("bool var::open(in filename, in connection)")
 	assertDefined(function_sig);
 	ISSTRING(filename)
 
@@ -1404,8 +1404,8 @@ void var::close() {
 	*/
 }
 
-bool var::readf(CVR filehandle, CVR key, const int fieldno) {
-	//THISIS("bool var::readf(CVR filehandle, CVR key, const int fieldno)")
+bool var::readf(in filehandle, in key, const int fieldno) {
+	//THISIS("bool var::readf(in filehandle, in key, const int fieldno)")
 	//assertDefined(function_sig);
 	//ISSTRING(filehandle)
 	//ISSTRING(key)
@@ -1419,9 +1419,9 @@ bool var::readf(CVR filehandle, CVR key, const int fieldno) {
 	return true;
 }
 
-bool var::readc(CVR filehandle, CVR key) {
+bool var::readc(in filehandle, in key) {
 
-	THISIS("bool var::readc(CVR filehandle, CVR key)")
+	THISIS("bool var::readc(in filehandle, in key)")
 	assertDefined(function_sig);
 	//ISSTRING(filehandle)
 	//ISSTRING(key)
@@ -1484,9 +1484,9 @@ bool var::readc(CVR filehandle, CVR key) {
 	return result;
 }
 
-bool var::writec(CVR filehandle, CVR key) const {
+bool var::writec(in filehandle, in key) const {
 
-	THISIS("void var::writec(CVR filehandle, CVR key)")
+	THISIS("void var::writec(in filehandle, in key)")
 	assertString(function_sig);
 	ISSTRING(filehandle)
 	ISSTRING(key)
@@ -1505,9 +1505,9 @@ bool var::writec(CVR filehandle, CVR key) const {
 	return true;
 }
 
-bool var::deletec(CVR key) const {
+bool var::deletec(in key) const {
 
-	THISIS("bool var::deletec(CVR key)")
+	THISIS("bool var::deletec(in key)")
 	assertString(function_sig);
 	ISSTRING(key)
 
@@ -1523,9 +1523,9 @@ bool var::deletec(CVR key) const {
 	return thread_dbconnector.delrecord(dbconn_no, hash64);
 }
 
-bool var::read(CVR filehandle, CVR key) {
+bool var::read(in filehandle, in key) {
 
-	THISIS("bool var::read(CVR filehandle, CVR key)")
+	THISIS("bool var::read(in filehandle, in key)")
 	assertDefined(function_sig);
 	ISSTRING(filehandle)
 	ISSTRING(key)
@@ -1710,7 +1710,7 @@ var var::hash(const std::uint64_t modulus) const {
 // 1  - Success
 // "" - Failure - already locked and not in a transaction
 // 2  - Success - already locked and in a transaction
-var var::lock(CVR key) const {
+var var::lock(in key) const {
 
 	// on postgres, repeated locks for the same thing (from the same connection) succeed and
 	// stack up they need the same number of unlocks (from the same connection) before other
@@ -1718,7 +1718,7 @@ var var::lock(CVR key) const {
 	// false if you dont have the lock NB return "" if ALREADY locked on this connection
 
 
-	THISIS("var var::lock(CVR key) const")
+	THISIS("var var::lock(in key) const")
 	assertDefined(function_sig);
 	ISSTRING(key)
 
@@ -1796,10 +1796,10 @@ var var::lock(CVR key) const {
 
 }
 
-bool var::unlock(CVR key) const {
+bool var::unlock(in key) const {
 
 
-	THISIS("void var::unlock(CVR key) const")
+	THISIS("void var::unlock(in key) const")
 	assertDefined(function_sig);
 	ISSTRING(key)
 
@@ -1897,7 +1897,7 @@ bool var::unlockall() const {
 }
 
 // returns only success or failure and any response is logged and saved for future lasterror() call
-bool var::sqlexec(CVR sql) const {
+bool var::sqlexec(in sql) const {
 	var response = -1;	//no response required
 	if (!this->sqlexec(sql, response)) UNLIKELY {
 		this->setlasterror(response);
@@ -1907,9 +1907,9 @@ bool var::sqlexec(CVR sql) const {
 }
 
 // returns success or failure, and response = data or errmsg (response can be preset to max number of tuples)
-bool var::sqlexec(CVR sqlcmd, VARREF response) const {
+bool var::sqlexec(in sqlcmd, VARREF response) const {
 
-	THISIS("bool var::sqlexec(CVR sqlcmd, VARREF response) const")
+	THISIS("bool var::sqlexec(in sqlcmd, VARREF response) const")
 	ISSTRING(sqlcmd)
 
 	auto pgconn = get_pgconn(*this);
@@ -1980,12 +1980,12 @@ bool var::sqlexec(CVR sqlcmd, VARREF response) const {
 
 // writef writes a specific field number in a record
 //(why it is "writef" instead of "writef" isnt known!
-bool var::writef(CVR filehandle, CVR key, const int fieldno) const {
+bool var::writef(in filehandle, in key, const int fieldno) const {
 
 	if (fieldno <= 0) UNLIKELY
 		return write(filehandle, key);
 
-	THISIS("bool var::writef(CVR filehandle, CVR key, const int fieldno) const")
+	THISIS("bool var::writef(in filehandle, in key, const int fieldno) const")
 	// will be duplicated in read and write but do here to present the correct function name on
 	// error
 	assertString(function_sig);
@@ -2005,13 +2005,13 @@ bool var::writef(CVR filehandle, CVR key, const int fieldno) const {
 }
 
 /* "prepared statement" version doesnt seem to make much difference approx -10% - possibly because
-two field file is so simple bool var::write(CVR filehandle, CVR key) const {}
+two field file is so simple bool var::write(in filehandle, in key) const {}
 */
 
 //"update if present or insert if not" is handled in postgres using ON CONFLICT clause
-bool var::write(CVR filehandle, CVR key) const {
+bool var::write(in filehandle, in key) const {
 
-	THISIS("bool var::write(CVR filehandle, CVR key) const")
+	THISIS("bool var::write(in filehandle, in key) const")
 	assertString(function_sig);
 	ISSTRING(filehandle)
 	ISSTRING(key)
@@ -2089,9 +2089,9 @@ bool var::write(CVR filehandle, CVR key) const {
 
 //"updaterecord" is non-standard for pick - but allows "write only if already exists" logic
 
-bool var::updaterecord(CVR filehandle, CVR key) const {
+bool var::updaterecord(in filehandle, in key) const {
 
-	THISIS("bool var::updaterecord(CVR filehandle, CVR key) const")
+	THISIS("bool var::updaterecord(in filehandle, in key) const")
 	assertString(function_sig);
 	ISSTRING(filehandle)
 	ISSTRING(key)
@@ -2155,9 +2155,9 @@ bool var::updaterecord(CVR filehandle, CVR key) const {
 //"insertrecord" is non-standard for pick - but allows faster writes under "write only if doesnt
 // already exist" logic
 
-bool var::insertrecord(CVR filehandle, CVR key) const {
+bool var::insertrecord(in filehandle, in key) const {
 
-	THISIS("bool var::insertrecord(CVR filehandle, CVR key) const")
+	THISIS("bool var::insertrecord(in filehandle, in key) const")
 	assertString(function_sig);
 	ISSTRING(filehandle)
 	ISSTRING(key)
@@ -2225,9 +2225,9 @@ bool var::insertrecord(CVR filehandle, CVR key) const {
 	return true;
 }
 
-bool var::deleterecord(CVR key) const {
+bool var::deleterecord(in key) const {
 
-	THISIS("bool var::deleterecord(CVR key) const")
+	THISIS("bool var::deleterecord(in key) const")
 	assertString(function_sig);
 	ISSTRING(key)
 
@@ -2409,13 +2409,13 @@ bool var::statustrans() const {
 // connectionhandle.connect("connection string pars");
 // connectionhandle.dbcreate("mynewdb");
 
-bool var::dbcreate(CVR dbname) const {
+bool var::dbcreate(in dbname) const {
 	return this->dbcopy(var(""), dbname);
 }
 
-bool var::dbcopy(CVR from_dbname, CVR to_dbname) const {
+bool var::dbcopy(in from_dbname, in to_dbname) const {
 
-	THISIS("bool var::dbcreate(CVR from_dbname, CVR to_dbname)")
+	THISIS("bool var::dbcreate(in from_dbname, in to_dbname)")
 	assertDefined(function_sig);
 	ISSTRING(from_dbname)
 	ISSTRING(to_dbname)
@@ -2459,9 +2459,9 @@ bool var::dbcopy(CVR from_dbname, CVR to_dbname) const {
 
 }
 
-bool var::dbdelete(CVR dbname) const {
+bool var::dbdelete(in dbname) const {
 
-	THISIS("bool var::dbdelete(CVR dbname)")
+	THISIS("bool var::dbdelete(in dbname)")
 	assertDefined(function_sig);
 	ISSTRING(dbname)
 
@@ -2475,9 +2475,9 @@ bool var::dbdelete(CVR dbname) const {
 	return this->sqlexec("DROP DATABASE " ^ dbname);
 }
 
-bool var::createfile(CVR filename) const {
+bool var::createfile(in filename) const {
 
-	THISIS("bool var::createfile(CVR filename)")
+	THISIS("bool var::createfile(in filename)")
 	assertDefined(function_sig);
 	ISSTRING(filename)
 
@@ -2506,9 +2506,9 @@ bool var::createfile(CVR filename) const {
 	return filename.sqlexec(sql);
 }
 
-bool var::renamefile(CVR filename, CVR newfilename) const {
+bool var::renamefile(in filename, in newfilename) const {
 
-	THISIS("bool var::renamefile(CVR filename, CVR newfilename)")
+	THISIS("bool var::renamefile(in filename, in newfilename)")
 	assertDefined(function_sig);
 	ISSTRING(filename)
 	ISSTRING(newfilename)
@@ -2544,9 +2544,9 @@ bool var::renamefile(CVR filename, CVR newfilename) const {
 	return true;
 }
 
-bool var::deletefile(CVR filename) const {
+bool var::deletefile(in filename) const {
 
-	THISIS("bool var::deletefile(CVR filename)")
+	THISIS("bool var::deletefile(in filename)")
 	assertDefined(function_sig);
 	ISSTRING(filename)
 
@@ -2581,9 +2581,9 @@ bool var::deletefile(CVR filename) const {
 	return true;
 }
 
-bool var::clearfile(CVR filename) const {
+bool var::clearfile(in filename) const {
 
-	THISIS("bool var::clearfile(CVR filename)")
+	THISIS("bool var::clearfile(in filename)")
 	assertDefined(function_sig);
 	ISSTRING(filename)
 
@@ -2606,7 +2606,7 @@ bool var::clearfile(CVR filename) const {
 	return true;
 }
 
-static var get_dictexpression(CVR cursor, CVR mainfilename, CVR filename, CVR dictfilename, CVR dictfile, CVR fieldname0, VARREF joins, VARREF unnests, VARREF selects, bool& ismv, bool& isdatetime, bool forsort) {
+static var get_dictexpression(in cursor, in mainfilename, in filename, in dictfilename, in dictfile, in fieldname0, VARREF joins, VARREF unnests, VARREF selects, bool& ismv, bool& isdatetime, bool forsort) {
 
 	//cursor is required to join any calculated fields in any second pass
 
@@ -3221,7 +3221,7 @@ exodus_call:
 	return sqlexpression;
 }
 
-// var getword(VARREF remainingwords, CVR joinvalues=false)
+// var getword(VARREF remainingwords, in joinvalues=false)
 static var getword(VARREF remainingwords, VARREF ucword) {
 
 	// gets the next word
@@ -3329,9 +3329,9 @@ static var getword(VARREF remainingwords, VARREF ucword) {
 	return word1;
 }
 
-//bool var::saveselect(CVR filename) {
+//bool var::saveselect(in filename) {
 //
-//	THISIS("bool var::saveselect(CVR filename) const")
+//	THISIS("bool var::saveselect(in filename) const")
 //	//?allow undefined usage like var xyz=xyz.select();
 //	assertDefined(function_sig);
 //	ISSTRING(filename)
@@ -3366,9 +3366,9 @@ static var getword(VARREF remainingwords, VARREF ucword) {
 //	return recn > 0;
 //}
 
-bool var::select(CVR sortselectclause) {
+bool var::select(in sortselectclause) {
 
-	THISIS("bool var::select(CVR sortselectclause) const")
+	THISIS("bool var::select(in sortselectclause) const")
 	//?allow undefined usage like var xyz=xyz.select();
 	assertDefined(function_sig);
 	ISSTRING(sortselectclause)
@@ -3386,7 +3386,7 @@ bool var::select(CVR sortselectclause) {
 
 // currently only called from select, selectrecord and getlist
 // TODO merge into plain select()?
-bool var::selectx(CVR fieldnames, CVR sortselectclause) {
+bool var::selectx(in fieldnames, in sortselectclause) {
 	// private - and arguments are left unchecked for speed
 	//?allow undefined usage like var xyz=xyz.select();
 	if (var_typ & VARTYP_MASK) {
@@ -4725,8 +4725,8 @@ void var::clearselect() {
 //	To make it var:: privat member -> pollute mv.h with PGresultptr :(
 // bool readnextx(const std::string& cursor, PGresultptr& dbresult)
 // called by readnext (and perhaps hasnext/select to implement LISTACTIVE)
-//bool readnextx(CVR cursor, PGresult* pgresult, PGconn* pgconn, int  nrows, int* rown) {
-static bool readnextx(CVR cursor, PGconn* pgconn, int  direction, PGresult*& pgresult, int* rown) {
+//bool readnextx(in cursor, PGresult* pgresult, PGconn* pgconn, int  nrows, int* rown) {
+static bool readnextx(in cursor, PGconn* pgconn, int  direction, PGresult*& pgresult, int* rown) {
 
 	var cursorcode = cursor.f(1).convert(".", "_");
 	var cursorid = cursor.f(2) ^ "_" ^ cursorcode;
@@ -4871,9 +4871,9 @@ static bool readnextx(CVR cursor, PGconn* pgconn, int  direction, PGresult*& pgr
 	return true;
 }
 
-bool var::deletelist(CVR listname) const {
+bool var::deletelist(in listname) const {
 
-	THISIS("bool var::deletelist(CVR listname) const")
+	THISIS("bool var::deletelist(in listname) const")
 	//?allow undefined usage like var xyz=xyz.select();
 	assertDefined(function_sig);
 	ISSTRING(listname)
@@ -4902,9 +4902,9 @@ bool var::deletelist(CVR listname) const {
 	return true;
 }
 
-bool var::savelist(CVR listname) {
+bool var::savelist(in listname) {
 
-	THISIS("bool var::savelist(CVR listname)")
+	THISIS("bool var::savelist(in listname)")
 	//?allow undefined usage like var xyz=xyz.select();
 	assertDefined(function_sig);
 	ISSTRING(listname)
@@ -4986,9 +4986,9 @@ bool var::savelist(CVR listname) {
 	return listno > 1;
 }
 
-bool var::getlist(CVR listname) {
+bool var::getlist(in listname) {
 
-	THISIS("bool var::getlist(CVR listname) const")
+	THISIS("bool var::getlist(in listname) const")
 	//?allow undefined usage like var xyz=xyz.select();
 	assertDefined(function_sig);
 	ISSTRING(listname)
@@ -5034,9 +5034,9 @@ bool var::getlist(CVR listname) {
 }
 
 //TODO make it work for multiple keys or select list
-bool var::formlist(CVR keys, CVR fieldno) {
+bool var::formlist(in keys, in fieldno) {
 
-	THISIS("bool var::formlist(CVR keys, CVR fieldno)")
+	THISIS("bool var::formlist(in keys, in fieldno)")
 	//?allow undefined usage like var xyz=xyz.select();
 	assertString(function_sig);
 	ISSTRING(keys)
@@ -5067,9 +5067,9 @@ bool var::formlist(CVR keys, CVR fieldno) {
 // since the most common usage is to omit listname in which case the keys will be used to simulate a
 // SELECT statement Making a list can be done simply by writing the keys into the list file without
 // using this function
-bool var::makelist(CVR listname, CVR keys) {
+bool var::makelist(in listname, in keys) {
 
-	THISIS("bool var::makelist(CVR listname)")
+	THISIS("bool var::makelist(in listname)")
 	//?allow undefined usage like var xyz=xyz.select();
 	assertDefined(function_sig);
 	ISSTRING(listname)
@@ -5368,9 +5368,9 @@ bool var::readnext(VARREF record, VARREF key, VARREF valueno) {
 	return true;
 }
 
-bool var::createindex(CVR fieldname0, CVR dictfile) const {
+bool var::createindex(in fieldname0, in dictfile) const {
 
-	THISIS("bool var::createindex(CVR fieldname, CVR dictfile) const")
+	THISIS("bool var::createindex(in fieldname, in dictfile) const")
 	assertString(function_sig);
 	ISSTRING(fieldname0)
 	ISSTRING(dictfile)
@@ -5466,9 +5466,9 @@ bool var::createindex(CVR fieldname0, CVR dictfile) const {
 	return true;
 }
 
-bool var::deleteindex(CVR fieldname0) const {
+bool var::deleteindex(in fieldname0) const {
 
-	THISIS("bool var::deleteindex(CVR fieldname) const")
+	THISIS("bool var::deleteindex(in fieldname) const")
 	assertString(function_sig);
 	ISSTRING(fieldname0)
 
@@ -5601,9 +5601,9 @@ bool var::cursorexists() {
 	return PQntuples(dbresult) > 0;
 }
 
-var var::listindex(CVR filename0, CVR fieldname0) const {
+var var::listindex(in filename0, in fieldname0) const {
 
-	THISIS("var var::listindex(CVR filename) const")
+	THISIS("var var::listindex(in filename) const")
 	// could allow undefined usage since *this isnt used?
 	assertDefined(function_sig);
 	ISSTRING(filename0)
@@ -5668,9 +5668,9 @@ var var::listindex(CVR filename0, CVR fieldname0) const {
 	return result;
 }
 
-var var::reccount(CVR filename0) const {
+var var::reccount(in filename0) const {
 
-	THISIS("var var::reccount(CVR filename_or_handle_or_null) const")
+	THISIS("var var::reccount(in filename_or_handle_or_null) const")
 	// could allow undefined usage since *this isnt used?
 	assertDefined(function_sig);
 	ISSTRING(filename0)
@@ -5704,9 +5704,9 @@ var var::reccount(CVR filename0) const {
 	return reccount;
 }
 
-var var::flushindex(CVR filename) const {
+var var::flushindex(in filename) const {
 
-	THISIS("var var::flushindex(CVR filename=) const")
+	THISIS("var var::flushindex(in filename=) const")
 	// could allow undefined usage since *this isnt used?
 	assertDefined(function_sig);
 	ISSTRING(filename)
@@ -5736,9 +5736,9 @@ var var::flushindex(CVR filename) const {
 	return flushresult;
 }
 
-var var::setlasterror(CVR msg) const {
+var var::setlasterror(in msg) const {
 	// no checking for speed
-	// THISIS("void var::lasterror(CVR msg")
+	// THISIS("void var::lasterror(in msg")
 	// ISSTRING(msg)
 
 	// tcache_get (tc_idx=12) at malloc.c:2943
@@ -5760,7 +5760,7 @@ var var::lasterror() const {
 	return thread_lasterror;
 }
 
-var var::loglasterror(CVR source) const {
+var var::loglasterror(in source) const {
 	return thread_lasterror.logputl(source ^ " ");
 }
 

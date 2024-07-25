@@ -82,7 +82,7 @@ rex(SV expression, SV options);
 //	// Prevent assigning to temporaries
 //	void operator=(const rex& rhs) && = delete;
 //
-//	// var& operator=(CVR rhs) & = default;
+//	// var& operator=(in rhs) & = default;
 //	// Cannot use default copy assignment because
 //	// a) it returns a value allowing accidental use of "=" instead of == in if statements
 //	// b) doesnt check if rhs is assigned
@@ -115,10 +115,10 @@ rex(SV expression, SV options);
 //
 //	//=var
 //	// The assignment operator should always return a reference to *this.
-//	// cant be (CVR var1) because seems to cause a problem with var1=var2 in function
+//	// cant be (in var1) because seems to cause a problem with var1=var2 in function
 //	// parameters unfortunately causes problem of passing var by value and thereby unnecessary
 //	// contruction see also ^= etc
-//	void operator=(CVR sourcevar);
+//	void operator=(in sourcevar);
 //
 //	////////////
 //	// ACCESSORS

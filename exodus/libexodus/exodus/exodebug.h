@@ -4,4 +4,4 @@
 	PUBLIC void breakon();
 	PUBLIC void breakoff();
 	ND PUBLIC var backtrace();
-	PUBLIC void debug(CVR var1);
+	PUBLIC void debug(in var1);

@@ -275,6 +275,10 @@ class PUBLIC var_base {
 	using CVR    = const var_base&;
 	using TVR    =       var_base&&;
 
+//	using in     = const var_base&;
+//	using out    =       var_base&;
+//	using io     =       var_base&;
+
 	// Understanding size of bytes, characters, integers and floating point
 	// See https://en.cppreference.com/w/cpp/language/types
 

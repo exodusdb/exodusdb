@@ -263,25 +263,25 @@ public:
 	CVR outputt() const;     // stdout adds a tab, buffered
 
 	// As above but with a prefix
-	CVR output(CVR var1) const;  // stdout with a prefix, no new line, buffered
-	CVR outputl(CVR var1) const; // stdout with a prefix, starts a new line, flushed
-	CVR outputt(CVR var1) const; // stdout with a prefix, adds a tab, buffered
+	CVR output(in var1) const;  // stdout with a prefix, no new line, buffered
+	CVR outputl(in var1) const; // stdout with a prefix, starts a new line, flushed
+	CVR outputt(in var1) const; // stdout with a prefix, adds a tab, buffered
 
 	// To stdlog/clog buffered
 	CVR logput() const;  // stdlog no new line, buffered
 	CVR logputl() const; // stdlog starts a new line, flushed
 
 	// As above but with a prefix
-	CVR logput(CVR var1) const;  // stdlog with a prefix, no new line, buffered
-	CVR logputl(CVR var1) const; // stdlog with a prefix, starts a new line, flushed
+	CVR logput(in var1) const;  // stdlog with a prefix, no new line, buffered
+	CVR logputl(in var1) const; // stdlog with a prefix, starts a new line, flushed
 
 	// To stderr/cerr usually unbuffered
 	CVR errput() const;  // stderr no new line, flushed
 	CVR errputl() const; // stderr starts a new line, flushed
 
 	// As above but with a prefix
-	CVR errput(CVR var1) const;  // stderr with a prefix, no new line, flushed
-	CVR errputl(CVR var1) const; // stderr with a prefix, starts a new line, flushed
+	CVR errput(in var1) const;  // stderr with a prefix, no new line, flushed
+	CVR errputl(in var1) const; // stderr with a prefix, starts a new line, flushed
 
 	// Output to a given stream
 	CVR put(std::ostream& ostream1) const;
@@ -290,7 +290,7 @@ public:
 	/////////////////
 
 	VARREF input();
-	VARREF input(CVR prompt);
+	VARREF input(in prompt);
 	VARREF inputn(const int nchars);
 
 	ND bool isterminal() const;
@@ -306,10 +306,10 @@ public:
 
 	ND var abs() const;
 // Moved to var_base
-//	ND var mod(CVR divisor) const;
+//	ND var mod(in divisor) const;
 //	ND var mod(double divisor) const;
 //	ND var mod(const int divisor) const;
-	ND var pwr(CVR exponent) const;
+	ND var pwr(in exponent) const;
 	ND var rnd() const;
 	void initrnd() const;
 	ND var exp() const;
@@ -347,7 +347,7 @@ public:
 	ND var str(const int num) const;
 	ND var space() const;
 
-	ND var numberinwords(CVR languagename_or_locale_id DEFAULT_EMPTY);
+	ND var numberinwords(in languagename_or_locale_id DEFAULT_EMPTY);
 
 	////////////
 	// STRING // All utf8 unless mentioned
@@ -426,7 +426,7 @@ public:
 	ND var pop() const&;                      // byte removed
 
 	// var.fieldstore(separator,fieldno,nfields,replacement)
-	ND var fieldstore(SV separator, const int fieldno, const int nfields, CVR replacement) const&;
+	ND var fieldstore(SV separator, const int fieldno, const int nfields, in replacement) const&;
 
 	//ND var substr(const int pos1, const int length) const&; // byte pos1, length
 	ND var substr(const int startindex1, const int length) const&;
@@ -485,7 +485,7 @@ public:
 	//ND VARREF append(SV appendstr) &&;
 	ND VARREF pop() &&;
 
-	ND VARREF fieldstore(SV sepchar, const int fieldno, const int nfields, CVR replacement) &&;
+	ND VARREF fieldstore(SV sepchar, const int fieldno, const int nfields, in replacement) &&;
 	ND VARREF substr(const int pos1, const int length) &&;
 	ND VARREF substr(const int pos1) &&;
 
@@ -537,7 +537,7 @@ public:
 	//VARREF appender(SV appendstr);
 	VARREF popper();
 
-	VARREF fieldstorer(SV sepchar, const int fieldno, const int nfields, CVR replacement);
+	VARREF fieldstorer(SV sepchar, const int fieldno, const int nfields, in replacement);
 	VARREF substrer(const int pos1, const int length);
 	//VARREF substrer(const int pos1);
 	// TODO look at using erase to speed up
@@ -566,8 +566,8 @@ public:
 
 	// v3 - returns bytes from some byte number upto the first of a given list of bytes
 	// this is something like std::string::find_first_of but doesnt return the delimiter found
-	var substr(const int pos1, CVR delimiterchars, int& endindex) const;
-	var b(const int pos1, CVR delimiterchars, int& endindex) const {return substr(pos1, delimiterchars, endindex);}
+	var substr(const int pos1, in delimiterchars, int& endindex) const;
+	var b(const int pos1, in delimiterchars, int& endindex) const {return substr(pos1, delimiterchars, endindex);}
 
 	// v4 - like v3. was named "remove" in pick. notably used in nlist to print parallel columns
 	// of mixed combinations of multivalues/subvalues and text marks
@@ -660,17 +660,17 @@ template<class... Args>
 	// something better it was called replace() in Pick Basic but we are now using "replace()" to
 	// change substrings using regex (similar to the old Pick Basic replace function) its mutator function
 	// is .r()
-//	ND var pickreplace(const int fieldno, const int valueno, const int subvalueno, CVR replacement) const;
-//	ND var pickreplace(const int fieldno, const int valueno, CVR replacement) const;
-//	ND var pickreplace(const int fieldno, CVR replacement) const;
-	ND var pickreplace(const int fieldno, const int valueno, const int subvalueno, CVR replacement) const {return var(*this).r(fieldno, valueno, subvalueno, replacement);}
-	ND var pickreplace(const int fieldno, const int valueno, CVR replacement) const {return var(*this).r(fieldno, valueno, 0, replacement);}
-	ND var pickreplace(const int fieldno, CVR replacement) const {return var(*this).r(fieldno, 0, 0, replacement);}
+//	ND var pickreplace(const int fieldno, const int valueno, const int subvalueno, in replacement) const;
+//	ND var pickreplace(const int fieldno, const int valueno, in replacement) const;
+//	ND var pickreplace(const int fieldno, in replacement) const;
+	ND var pickreplace(const int fieldno, const int valueno, const int subvalueno, in replacement) const {return var(*this).r(fieldno, valueno, subvalueno, replacement);}
+	ND var pickreplace(const int fieldno, const int valueno, in replacement) const {return var(*this).r(fieldno, valueno, 0, replacement);}
+	ND var pickreplace(const int fieldno, in replacement) const {return var(*this).r(fieldno, 0, 0, replacement);}
 
 	// cf mutator inserter()
-	ND var insert(const int fieldno, const int valueno, const int subvalueno, CVR insertion) const& {return var(*this).inserter(fieldno, valueno, subvalueno, insertion);}
-	ND var insert(const int fieldno, const int valueno, CVR insertion) const& {return this->insert(fieldno, valueno, 0, insertion);}
-	ND var insert(const int fieldno, CVR insertion) const& {return this->insert(fieldno, 0, 0, insertion);}
+	ND var insert(const int fieldno, const int valueno, const int subvalueno, in insertion) const& {return var(*this).inserter(fieldno, valueno, subvalueno, insertion);}
+	ND var insert(const int fieldno, const int valueno, in insertion) const& {return this->insert(fieldno, valueno, 0, insertion);}
+	ND var insert(const int fieldno, in insertion) const& {return this->insert(fieldno, 0, 0, insertion);}
 
 	/// remove() was delete() in Pick Basic
 	// var erase(const int fieldno, const int valueno=0, const int subvalueno=0) const;
@@ -688,9 +688,9 @@ template<class... Args>
 	// SAME AS ABOVE ON TEMPORARIES
 	///////////////////////////////
 
-	ND VARREF insert(const int fieldno, const int valueno, const int subvalueno, CVR insertion) && {return this->inserter(fieldno, valueno, subvalueno, insertion);}
-	ND VARREF insert(const int fieldno, const int valueno, CVR insertion) && {return this->inserter(fieldno, valueno, 0, insertion);}
-	ND VARREF insert(const int fieldno, CVR insertion) && {return this->inserter(fieldno, 0, 0, insertion);}
+	ND VARREF insert(const int fieldno, const int valueno, const int subvalueno, in insertion) && {return this->inserter(fieldno, valueno, subvalueno, insertion);}
+	ND VARREF insert(const int fieldno, const int valueno, in insertion) && {return this->inserter(fieldno, valueno, 0, insertion);}
+	ND VARREF insert(const int fieldno, in insertion) && {return this->inserter(fieldno, 0, 0, insertion);}
 
 	// MV STRING FILTERS
 	////////////////////
@@ -702,7 +702,7 @@ template<class... Args>
 	// binary ops + - * / : on mv strings 10]20]30
 	// e.g. var("10]20]30").mv("+","2]3]4")
 	// result is "12]23]34"
-	ND var mv(const char* opcode, CVR var2) const;
+	ND var mv(const char* opcode, in var2) const;
 
 	// MV STRING MUTATORS
 	/////////////////////
@@ -715,15 +715,15 @@ template<class... Args>
 	//  xyz.r(10,"abc");
 
 	// r() is short for replacer() since it is probably the most common var function after a()
-	VARREF r(const int fieldno, const int valueno, const int subvalueno, CVR replacement);
-	//VARREF r(const int fieldno, const int valueno, CVR replacement);
-	//VARREF r(const int fieldno, CVR replacement);
-	VARREF r(const int fieldno, const int valueno, CVR replacement) {return r(fieldno, valueno, 0, replacement);}
-	VARREF r(const int fieldno, CVR replacement) {	return r(fieldno, 0, 0, replacement);}
+	VARREF r(const int fieldno, const int valueno, const int subvalueno, in replacement);
+	//VARREF r(const int fieldno, const int valueno, in replacement);
+	//VARREF r(const int fieldno, in replacement);
+	VARREF r(const int fieldno, const int valueno, in replacement) {return r(fieldno, valueno, 0, replacement);}
+	VARREF r(const int fieldno, in replacement) {	return r(fieldno, 0, 0, replacement);}
 
-	VARREF inserter(const int fieldno, const int valueno, const int subvalueno, CVR insertion);
-	VARREF inserter(const int fieldno, const int valueno, CVR insertion) {return this->inserter(fieldno, valueno, 0, insertion);}
-	VARREF inserter(const int fieldno, CVR insertion) {return this->inserter(fieldno, 0, 0, insertion);}
+	VARREF inserter(const int fieldno, const int valueno, const int subvalueno, in insertion);
+	VARREF inserter(const int fieldno, const int valueno, in insertion) {return this->inserter(fieldno, valueno, 0, insertion);}
+	VARREF inserter(const int fieldno, in insertion) {return this->inserter(fieldno, 0, 0, insertion);}
 
 	// VARREF eraser(const int fieldno, const int valueno=0, const int subvalueno=0);
 	VARREF remover(const int fieldno, const int valueno = 0, const int subvalueno = 0);
@@ -735,31 +735,31 @@ template<class... Args>
 
 	// should these be like extract, replace, insert, delete
 	// locate(fieldno, valueno, subvalueno,target,setting,by DEFAULT_EMPTY)
-	ND bool locate(CVR target) const;
-	ND bool locate(CVR target, VARREF setting) const;
-	ND bool locate(CVR target, VARREF setting, const int fieldno, const int valueno = 0) const;
+	ND bool locate(in target) const;
+	ND bool locate(in target, VARREF setting) const;
+	ND bool locate(in target, VARREF setting, const int fieldno, const int valueno = 0) const;
 
-	ND bool locateusing(const char* usingchar, CVR target, VARREF setting, const int fieldno = 0, const int valueno = 0, const int subvalueno = 0) const;
-	ND bool locateusing(const char* usingchar, CVR target) const;
+	ND bool locateusing(const char* usingchar, in target, VARREF setting, const int fieldno = 0, const int valueno = 0, const int subvalueno = 0) const;
+	ND bool locateusing(const char* usingchar, in target) const;
 
 	// locateby without fieldno or valueno arguments uses character VM
-	ND bool locateby(const char* ordercode, CVR target, VARREF setting) const;
+	ND bool locateby(const char* ordercode, in target, VARREF setting) const;
 
 	// locateby with fieldno=0 uses character FM
-	ND bool locateby(const char* ordercode, CVR target, VARREF setting, const int fieldno, const int valueno = 0) const;
+	ND bool locateby(const char* ordercode, in target, VARREF setting, const int fieldno, const int valueno = 0) const;
 
 	// locatebyusing
-	ND bool locatebyusing(const char* ordercode, const char* usingchar, CVR target, VARREF setting, const int fieldno = 0, const int valueno = 0, const int subvalueno = 0) const;
+	ND bool locatebyusing(const char* ordercode, const char* usingchar, in target, VARREF setting, const int fieldno = 0, const int valueno = 0, const int subvalueno = 0) const;
 
 	// DATABASE ACCESS
 	//////////////////
 
-	ND bool connect(CVR conninfo DEFAULT_EMPTY);
+	ND bool connect(in conninfo DEFAULT_EMPTY);
 	void disconnect();
 	void disconnectall();
 
-	ND bool attach(CVR filenames);
-	void detach(CVR filenames);
+	ND bool attach(in filenames);
+	void detach(in filenames);
 
 	// var() is a db connection or default connection
 	ND bool begintrans() const;
@@ -768,72 +768,72 @@ template<class... Args>
 	ND bool statustrans() const;
 	   void cleardbcache() const;
 
-	ND bool sqlexec(CVR sqlcmd) const;
-	ND bool sqlexec(CVR sqlcmd, VARREF response) const;
+	ND bool sqlexec(in sqlcmd) const;
+	ND bool sqlexec(in sqlcmd, VARREF response) const;
 
 	ND var  lasterror() const;
-	   var  loglasterror(CVR source DEFAULT_EMPTY) const;
+	   var  loglasterror(in source DEFAULT_EMPTY) const;
 
 	// DATABASE MANAGEMENT
 	//////////////////////
 
-	ND bool dbcreate(CVR dbname) const;
+	ND bool dbcreate(in dbname) const;
 	ND var  dblist() const;
-	ND bool dbcopy(CVR from_dbname, CVR to_dbname) const;
-	ND bool dbdelete(CVR dbname) const;
+	ND bool dbcopy(in from_dbname, in to_dbname) const;
+	ND bool dbdelete(in dbname) const;
 
-	ND bool createfile(CVR filename) const;
-	ND bool renamefile(CVR filename, CVR newfilename) const;
-	ND bool deletefile(CVR filename) const;
-	ND bool clearfile(CVR filename) const;
+	ND bool createfile(in filename) const;
+	ND bool renamefile(in filename, in newfilename) const;
+	ND bool deletefile(in filename) const;
+	ND bool clearfile(in filename) const;
 	ND var  listfiles() const;
 
-	ND bool createindex(CVR fieldname, CVR dictfile DEFAULT_EMPTY) const;
-	ND bool deleteindex(CVR fieldname) const;
-	ND var  listindex(CVR filename DEFAULT_EMPTY, CVR fieldname DEFAULT_EMPTY) const;
+	ND bool createindex(in fieldname, in dictfile DEFAULT_EMPTY) const;
+	ND bool deleteindex(in fieldname) const;
+	ND var  listindex(in filename DEFAULT_EMPTY, in fieldname DEFAULT_EMPTY) const;
 
 	// bool selftest() const;
 	ND var  version() const;
 
-	ND var  reccount(CVR filename DEFAULT_EMPTY) const;
-	   var  flushindex(CVR filename DEFAULT_EMPTY) const;
+	ND var  reccount(in filename DEFAULT_EMPTY) const;
+	   var  flushindex(in filename DEFAULT_EMPTY) const;
 
-	ND bool open(CVR dbfilename, CVR connection DEFAULT_EMPTY);
+	ND bool open(in dbfilename, in connection DEFAULT_EMPTY);
 	   void close();
 
 	// 1=ok, 0=failed, ""=already locked
-	ND var  lock(CVR key) const;
-	// void unlock(CVR key) const;
+	ND var  lock(in key) const;
+	// void unlock(in key) const;
 	// void unlockall() const;
-	   bool unlock(CVR key) const;
+	   bool unlock(in key) const;
 	   bool unlockall() const;
 
 	// db file i/o
-	ND bool read(CVR filehandle, CVR key);
-	   bool write(CVR filehandle, CVR key) const;
-	   bool deleterecord(CVR key) const;
-	ND bool updaterecord(CVR filehandle, CVR key) const;
-	ND bool insertrecord(CVR filehandle, CVR key) const;
+	ND bool read(in filehandle, in key);
+	   bool write(in filehandle, in key) const;
+	   bool deleterecord(in key) const;
+	ND bool updaterecord(in filehandle, in key) const;
+	ND bool insertrecord(in filehandle, in key) const;
 
 	// specific db field i/o
-	ND bool readf(CVR filehandle, CVR key, const int fieldno);
-	   bool writef(CVR filehandle, CVR key, const int fieldno) const;
+	ND bool readf(in filehandle, in key, const int fieldno);
+	   bool writef(in filehandle, in key, const int fieldno) const;
 
 	// cached db file i/o
-	ND bool readc(CVR filehandle, CVR key);
-	   bool writec(CVR filehandle, CVR key) const;
-	   bool deletec(CVR key) const;
+	ND bool readc(in filehandle, in key);
+	   bool writec(in filehandle, in key) const;
+	   bool deletec(in key) const;
 
 	// ExoEnv function now to allow access to RECORD ID DICT etc. and call external
 	// functions
 	// var calculate() const;
 
-	ND var  xlate(CVR filename, CVR fieldno, const char* mode) const;
+	ND var  xlate(in filename, in fieldno, const char* mode) const;
 
 	// DATABASE SORT/SELECT
 	///////////////////////
 
-	ND bool select(CVR sortselectclause DEFAULT_EMPTY);
+	ND bool select(in sortselectclause DEFAULT_EMPTY);
 	   void clearselect();
 
 	//ND bool hasnext() const;
@@ -842,13 +842,13 @@ template<class... Args>
 	ND bool readnext(VARREF key, VARREF valueno);
 	ND bool readnext(VARREF record, VARREF key, VARREF valueno);
 
-	   bool savelist(CVR listname);
-	ND bool getlist(CVR listname);
-	ND bool makelist(CVR listname, CVR keys);
-	   bool deletelist(CVR listname) const;
-	ND bool formlist(CVR keys, CVR fieldno = 0);
+	   bool savelist(in listname);
+	ND bool getlist(in listname);
+	ND bool makelist(in listname, in keys);
+	   bool deletelist(in listname) const;
+	ND bool formlist(in keys, in fieldno = 0);
 
-	//bool saveselect(CVR filename);
+	//bool saveselect(in filename);
 
 	// OS TIME/DATE
 	///////////////
@@ -857,7 +857,7 @@ template<class... Args>
 	ND var  time() const;//int seconds since last midnight
 	ND var  ostime() const;
 	ND var  timestamp() const; // floating point fractional days since pick epoch 1967-12-31 00:00:00
-	ND var  timestamp(CVR ostime) const; // construct a timestamp from a date and time
+	ND var  timestamp(in ostime) const; // construct a timestamp from a date and time
 
 	   void ossleep(const int milliseconds) const;
 	   var  oswait(const int milliseconds, SV directory) const;
@@ -865,17 +865,17 @@ template<class... Args>
 	// OS FILE SYSTEM
 	/////////////////
 
-	ND bool osopen(CVR filename, const char* locale DEFAULT_EMPTY) const;
-	ND bool osbread(CVR osfilevar, VARREF offset, const int length);
-	ND bool osbwrite(CVR osfilevar, VARREF offset) const;
+	ND bool osopen(in filename, const char* locale DEFAULT_EMPTY) const;
+	ND bool osbread(in osfilevar, VARREF offset, const int length);
+	ND bool osbwrite(in osfilevar, VARREF offset) const;
 	   void osclose() const;
 
 	ND bool osread(const char* osfilename, const char* codepage DEFAULT_EMPTY);
-	ND bool oswrite(CVR osfilename, const char* codepage DEFAULT_EMPTY) const;
+	ND bool oswrite(in osfilename, const char* codepage DEFAULT_EMPTY) const;
 	ND bool osremove() const;
-	ND bool osrename(CVR new_dirpath_or_filepath) const;
-	ND bool oscopy(CVR to_osfilename) const;
-	ND bool osmove(CVR to_osfilename) const;
+	ND bool osrename(in new_dirpath_or_filepath) const;
+	ND bool oscopy(in to_osfilename) const;
+	ND bool osmove(in to_osfilename) const;
 
 	ND var  oslist(SV globpattern DEFAULT_EMPTY, const int mode = 0) const;
 	ND var  oslistf(SV globpattern DEFAULT_EMPTY) const;
@@ -891,15 +891,15 @@ template<class... Args>
 	ND var ospid() const;
 	ND var ostid() const;
 	ND var oscwd() const;
-	ND bool oscwd(CVR newpath) const;
+	ND bool oscwd(in newpath) const;
 	void osflush() const;
 
 	// OS SHELL/ENVIRONMENT
 	///////////////////////
 
 	ND bool osshell() const;
-	ND bool osshellread(CVR oscmd);
-	ND bool osshellwrite(CVR oscmd) const;
+	ND bool osshellread(in oscmd);
+	ND bool osshellwrite(in oscmd) const;
 	ND var  ostempdirpath() const;
 	ND var  ostempfilename() const;
 
@@ -909,8 +909,8 @@ template<class... Args>
 	// friend class to iterate over the fields of a var
 	//BEGIN/END - free functions to create iterators over a var
 	friend class var_iter;
-	friend var_iter begin(CVR v);
-	friend var_iter end(CVR v);
+	friend var_iter begin(in v);
+	friend var_iter end(in v);
 
 	///////////////////////////
 	// PRIVATE MEMBER FUNCTIONS
@@ -919,17 +919,17 @@ template<class... Args>
  private:
 
 	ND bool cursorexists(); //database, not terminal
-	ND bool selectx(CVR fieldnames, CVR sortselectclause);
+	ND bool selectx(in fieldnames, in sortselectclause);
 
-	   var  setlasterror(CVR msg) const;
+	   var  setlasterror(in msg) const;
 
 	// TODO check if can speed up by returning reference to converted self like MC
 
 	// Faster primitive oconv
 	// L/R/C: Text -> left/right/center padded and truncated
-	ND std::string oconv_LRC(CVR format) const;
+	ND std::string oconv_LRC(in format) const;
 	// T: Text -> justified and folded
-	ND std::string oconv_T(CVR format) const;
+	ND std::string oconv_T(in format) const;
 	// D: Int -> Date
 	ND std::string oconv_D(const char* conversion) const;
 	// MT: Int -> Time
@@ -955,7 +955,7 @@ template<class... Args>
 	// TX: Record (FM) <- text (\n) and \ line endings
 	ND var iconv_TX(const char* conversion) const;
 
-	ND std::fstream* osopenx(CVR osfilename, const char* locale) const;
+	ND std::fstream* osopenx(in osfilename, const char* locale) const;
 
 	bool THIS_IS_OSFILE() const { return ((var_typ & VARTYP_OSFILE) != VARTYP_UNA); }
 
@@ -1033,7 +1033,7 @@ class PUBLIC var_iter {
 	var_iter() = default;
 
 	// Construct from var
-	var_iter(CVR v);
+	var_iter(in v);
 
 	// Check iter != iter (i.e. iter != string::npos)
 	bool operator!=(const var_iter& vi);
@@ -1109,7 +1109,7 @@ class PUBLIC var_proxy1 {
 	//  x<1,2,3> = y // Replace field 1, value 2, subvalue 3 (var_proxy3)
 	//  x<-1>    = y // Append a field
 	//
-	void operator=(CVR replacement) {
+	void operator=(in replacement) {
 		var_.r(fn_, replacement);
 	}
 
@@ -1162,7 +1162,7 @@ class PUBLIC var_proxy2 {
 		return var_.f(fn_, vn_);
 	}
 
-	void operator=(CVR replacement) {
+	void operator=(in replacement) {
 		var_.r(fn_, vn_, replacement);
 	}
 
@@ -1202,7 +1202,7 @@ class PUBLIC var_proxy3 {
 		return var_.f(fn_, vn_, sn_);
 	}
 
-	void operator=(CVR replacement) {
+	void operator=(in replacement) {
 		var_.r(fn_, vn_, sn_, replacement);
 	}
 

@@ -138,7 +138,7 @@ namespace exo {
 	PUBLIC extern const char* const _OS_NAME;
 	PUBLIC extern const char* const _OS_VERSION;
 
-	PUBLIC void debug(CVR = "");
+	PUBLIC void debug(in = "");
 	PUBLIC void exo_savestack(void* stack_addresses[BACKTRACE_MAXADDRESSES], std::size_t* stack_size);
 	ND PUBLIC var exo_backtrace( void* stack_addresses[BACKTRACE_MAXADDRESSES], std::size_t stack_size, std::size_t limit = 0);
 

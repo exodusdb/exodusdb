@@ -52,7 +52,7 @@ THE SOFTWARE.
 
 namespace exo {
 
-static void addbacktraceline(CVR frameno, CVR sourcefilename, CVR lineno, VARREF returnlines) {
+static void addbacktraceline(in frameno, in sourcefilename, in lineno, VARREF returnlines) {
 
 	//#ifdef TRACING
 	//	sourcefilename.errputl("SOURCEFILENAME=");
@@ -426,8 +426,8 @@ ND PUBLIC var backtrace() {
 	return e.stack();
 }
 
-//void var::debug(CVR var1) const {
-PUBLIC void debug(CVR var1) {
+//void var::debug(in var1) const {
+PUBLIC void debug(in var1) {
 	// THISIS("var var::debug() const")
 
 	std::clog << "debug(" << var1 << ")" << std::endl;

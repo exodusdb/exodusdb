@@ -103,7 +103,7 @@ static varint_t exodusmodulo_int(const varint_t dividend, const varint_t limit) 
 
 template<> PUBLIC RETVAR VARBASE1::mod(CBX limit) const {
 
-	THISIS("var var::mod(CVR limit) const")
+	THISIS("var var::mod(in limit) const")
 	assertNumeric(function_sig);
 	ISNUMERIC(limit)
 
@@ -259,9 +259,9 @@ var var::sqrt() const {
 	return std::sqrt(static_cast<double>(var_int));
 }
 
-var var::pwr(CVR exponent) const {
+var var::pwr(in exponent) const {
 
-	THISIS("var var::pwr(CVR exponent) const")
+	THISIS("var var::pwr(in exponent) const")
 	assertNumeric(function_sig);
 	ISNUMERIC(exponent)
 

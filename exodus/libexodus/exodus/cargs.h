@@ -26,7 +26,7 @@ class Cargs {
 
    public:
 	//constructor from var
-	Cargs(CVR command) {
+	Cargs(in command) {
 		//printl(command);
 		for (var word : command) {
 			//printl(word);

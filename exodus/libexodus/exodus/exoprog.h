@@ -131,99 +131,99 @@ class PUBLIC ExodusProgramBase {
 	virtual ~ExodusProgramBase();
 
 	// work on CURSOR
-	bool select(CVR sortselectclause_or_filehandle DEFAULT_EMPTY);
+	bool select(in sortselectclause_or_filehandle DEFAULT_EMPTY);
 	ND bool hasnext();
 	bool readnext(VARREF key);
 	bool readnext(VARREF key, VARREF valueno);
 	bool readnext(VARREF record, VARREF key, VARREF valueno);
-	bool pushselect(CVR v1, VARREF v2, VARREF v3, VARREF v4);
-	bool popselect(CVR v1, VARREF v2, VARREF v3, VARREF v4);
+	bool pushselect(in v1, VARREF v2, VARREF v3, VARREF v4);
+	bool popselect(in v1, VARREF v2, VARREF v3, VARREF v4);
 	void clearselect();
-	bool deleterecord(CVR filename_or_handle_or_command, CVR key DEFAULT_EMPTY);
+	bool deleterecord(in filename_or_handle_or_command, in key DEFAULT_EMPTY);
 
-	bool savelist(CVR listname);
-	bool getlist(CVR listname);
-	bool formlist(CVR filename_or_command, CVR keys = "", const var fieldno = 0);
-	bool makelist(CVR listname, CVR keys);
-	bool deletelist(CVR listname);
+	bool savelist(in listname);
+	bool getlist(in listname);
+	bool formlist(in filename_or_command, in keys = "", const var fieldno = 0);
+	bool makelist(in listname, in keys);
+	bool deletelist(in listname);
 
-	void note(CVR msg, CVR options = "") const;
-	void note(CVR msg, CVR options, VARREF buffer, CVR params = "") const;
-	void mssg(CVR msg, CVR options = "") const;
-	void mssg(CVR msg, CVR options, VARREF buffer, CVR params = "") const;
+	void note(in msg, in options = "") const;
+	void note(in msg, in options, VARREF buffer, in params = "") const;
+	void mssg(in msg, in options = "") const;
+	void mssg(in msg, in options, VARREF buffer, in params = "") const;
 
-	var authorised(CVR task0, VARREF msg, CVR defaultlock = "", CVR username0 = "");
-	var authorised(CVR task0);
+	var authorised(in task0, VARREF msg, in defaultlock = "", in username0 = "");
+	var authorised(in task0);
 	void readuserprivs() const;
 	void writeuserprivs() const;
 
-	ND var capitalise(CVR str0, CVR mode = var(), CVR wordseps = var()) const;
+	ND var capitalise(in str0, in mode = var(), in wordseps = var()) const;
 
-	var libinfo(CVR command);
-	var perform(CVR sentence);
-	[[noreturn]] void chain(CVR libraryname);
-	var execute(CVR sentence);
+	var libinfo(in command);
+	var perform(in sentence);
+	[[noreturn]] void chain(in libraryname);
+	var execute(in sentence);
 
 	// given dictid reads dictrec from DICT file and extracts from RECORD/ID or calls library
 	// called dict+DICT function dictid not const so we can mess with the library?
-	ND var calculate(CVR dictid);
-	ND var calculate(CVR dictid, CVR dictfile, CVR id, CVR record, CVR mv = 0);
-	ND var xlate(CVR filename, CVR key, CVR fieldno_or_name, const char* mode);
+	ND var calculate(in dictid);
+	ND var calculate(in dictid, in dictfile, in id, in record, in mv = 0);
+	ND var xlate(in filename, in key, in fieldno_or_name, const char* mode);
 
-	ND var otherusers(CVR param);
-	ND var otherdatasetusers(CVR param);
+	ND var otherusers(in param);
+	ND var otherdatasetusers(in param);
 
-	//bool fsmsg(CVR msg = "") const;	 // always returns false so can be used like return fsmsg();
-	ND var sysvar(CVR var1, CVR var2, CVR mv3, CVR mv4);
-	void setprivilege(CVR var1);
+	//bool fsmsg(in msg = "") const;	 // always returns false so can be used like return fsmsg();
+	ND var sysvar(in var1, in var2, in mv3, in mv4);
+	void setprivilege(in var1);
 
 	// NB does not return record yet
-	ND bool lockrecord(CVR filename, VARREF file, CVR keyx, CVR recordx, const int waitsecs = 0, const bool allowduplicate = false) const;
-	ND bool lockrecord(CVR filename, VARREF file, CVR keyx) const;
-	bool unlockrecord(CVR filename, VARREF file, CVR key) const;
+	ND bool lockrecord(in filename, VARREF file, in keyx, in recordx, const int waitsecs = 0, const bool allowduplicate = false) const;
+	ND bool lockrecord(in filename, VARREF file, in keyx) const;
+	bool unlockrecord(in filename, VARREF file, in key) const;
 	bool unlockrecord() const;
 
-	ND var decide(CVR question, CVR options = "") const;
-	var decide(CVR question, CVR options, VARREF reply, const int defaultreply = 1) const;
+	ND var decide(in question, in options = "") const;
+	var decide(in question, in options, VARREF reply, const int defaultreply = 1) const;
 
 	void savescreen(VARREF origscrn, VARREF origattr) const;
 	var keypressed(int milliseconds = 0) const;
 	ND bool esctoexit() const;
 
-	void flushindex(CVR filename);
-	ND var encrypt2(CVR encrypt0) const;
-	ND var xmlquote(CVR str) const;
-	ND bool loginnet(CVR dataset, CVR username, VARREF cookie, VARREF msg);
+	void flushindex(in filename);
+	ND var encrypt2(in encrypt0) const;
+	ND var xmlquote(in str) const;
+	ND bool loginnet(in dataset, in username, VARREF cookie, VARREF msg);
 
 	// TERMINAL specific terminal cursor control
 	ND var AT(const int code) const;
 	ND var AT(const int x, const int y) const;
 
 	ND var getcursor() const;
-	void setcursor(CVR cursor) const;
+	void setcursor(in cursor) const;
 
 	ND var getprompt() const;
-	void setprompt(CVR prompt) const;
+	void setprompt(in prompt) const;
 
-	ND var handlefilename(CVR handle);
+	ND var handlefilename(in handle);
 
-	ND var getuserdept(CVR usercode);
+	ND var getuserdept(in usercode);
 
 	// ioconv with access to all exoprog functionality and base ioconv
 	// Particularly the ability to call custom ioconv funcs like "[xxxxxxxx]"
-	ND var oconv(CVR input, CVR conversion);
-	ND var iconv(CVR input, CVR conversion);
+	ND var oconv(in input, in conversion);
+	ND var iconv(in input, in conversion);
 
-	ND var invertarray(CVR input, CVR force0 = (0));
-	void sortarray(VARREF array, CVR fns = 0, CVR orderby0 = "");
+	ND var invertarray(in input, in force0 = (0));
+	void sortarray(VARREF array, in fns = 0, in orderby0 = "");
 
 	ND var timedate2() {return timedate2(var(), var());}
 	ND var timedate2(in localdate0, in localtime0, in glang = "");
 	void getdatetime(out localdate, out localtime, out sysdate, out systime, out utcdate, out utctime);
 
 	ND var elapsedtimetext() const; // Since TIMESTAMP
-	ND var elapsedtimetext(CVR timestamp_difference) const;
-	ND var elapsedtimetext(CVR timestamp1, CVR timestamp2) const;
+	ND var elapsedtimetext(in timestamp_difference) const;
+	ND var elapsedtimetext(in timestamp1, in timestamp2) const;
 
 	ND var amountunit(in input0);
 	var amountunit(in input0, out unitx);
@@ -234,36 +234,36 @@ class PUBLIC ExodusProgramBase {
 	// Return to parent exoprog
 	// or quit to OS WITHOUT an error
 	// bool to allow "or stop()"
-	[[noreturn]] bool stop(CVR description DEFAULT_EMPTY) const;
+	[[noreturn]] bool stop(in description DEFAULT_EMPTY) const;
 
 	// Return to parent exoprog
 	// or quit to OS WITH an error 1
 	// bool to allow "or abort()"
-	[[noreturn]] bool abort(CVR description DEFAULT_EMPTY) const;
+	[[noreturn]] bool abort(in description DEFAULT_EMPTY) const;
 
 	// Quit to OS WITH an error 2
 	// bool to allow "or abortall()"
-	[[noreturn]] bool abortall(CVR description DEFAULT_EMPTY) const;
+	[[noreturn]] bool abortall(in description DEFAULT_EMPTY) const;
 
 	// Quit to OS WITHOUT an error
 	// bool to allow "or logoff()"
 	//[[deprecated("Deprecated is a great way to highlight all uses of something!")]]
-	[[noreturn]] bool logoff(CVR description DEFAULT_EMPTY) const;
+	[[noreturn]] bool logoff(in description DEFAULT_EMPTY) const;
 
  private:
 
 	// ioconv with a language specific month
-	var exoprog_date(CVR type, CVR input0, CVR ndecs0, VARREF output);
-	var exoprog_number(CVR type, CVR input0, CVR ndecs0, VARREF output);
+	var exoprog_date(in type, in input0, in ndecs0, VARREF output);
+	var exoprog_number(in type, in input0, in ndecs0, VARREF output);
 
 };
 
 // clang-format off
 
-class PUBLIC MVStop     {public:explicit MVStop    (CVR var1 DEFAULT_EMPTY); var description;};
-class PUBLIC MVAbort    {public:explicit MVAbort   (CVR var1 DEFAULT_EMPTY); var description;};
-class PUBLIC MVAbortAll {public:explicit MVAbortAll(CVR var1 DEFAULT_EMPTY); var description;};
-class PUBLIC MVLogoff   {public:explicit MVLogoff  (CVR var1 DEFAULT_EMPTY); var description;};
+class PUBLIC MVStop     {public:explicit MVStop    (in var1 DEFAULT_EMPTY); var description;};
+class PUBLIC MVAbort    {public:explicit MVAbort   (in var1 DEFAULT_EMPTY); var description;};
+class PUBLIC MVAbortAll {public:explicit MVAbortAll(in var1 DEFAULT_EMPTY); var description;};
+class PUBLIC MVLogoff   {public:explicit MVLogoff  (in var1 DEFAULT_EMPTY); var description;};
 
 // clang-format on
 

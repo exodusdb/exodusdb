@@ -87,14 +87,14 @@ CVR var::outputt() const {
 }
 
 // overloaded output() outputs a prefix str
-CVR var::output(CVR str) const {
+CVR var::output(in str) const {
 	LOCKIOSTREAM_OR_NOT
 	str.put(std::cout);
 	return this->put(std::cout);
 }
 
 // oveloaded outputl() outputs a prefix str
-CVR var::outputl(CVR str) const {
+CVR var::outputl(in str) const {
 	LOCKIOSTREAM_OR_NOT
 	str.put(std::cout);
 	this->put(std::cout);
@@ -103,7 +103,7 @@ CVR var::outputl(CVR str) const {
 }
 
 // overloaded outputt() outputs a prefix str
-CVR var::outputt(CVR str) const {
+CVR var::outputt(in str) const {
 	LOCKIOSTREAM_OR_NOT
 	std::cout << "\t";
 	str.put(std::cout);
@@ -134,7 +134,7 @@ CVR var::errputl() const {
 }
 
 // overloaded errput outputs a prefix str
-CVR var::errput(CVR str) const {
+CVR var::errput(in str) const {
 	LOCKIOSTREAM_OR_NOT
 	//str.put(std::cerr);
 	//return this->put(std::cerr);
@@ -144,7 +144,7 @@ CVR var::errput(CVR str) const {
 }
 
 // overloaded errputl outputs a prefix str
-CVR var::errputl(CVR str) const {
+CVR var::errputl(in str) const {
 	LOCKIOSTREAM_OR_NOT
 	//str.put(std::cerr);
 	//this->put(std::cerr);
@@ -176,7 +176,7 @@ CVR var::logputl() const {
 }
 
 // overloaded logput with a prefix str
-CVR var::logput(CVR str) const {
+CVR var::logput(in str) const {
 	LOCKIOSTREAM_OR_NOT
 	//str.put(std::clog);
 	std::clog << str;
@@ -185,7 +185,7 @@ CVR var::logput(CVR str) const {
 }
 
 // overloaded logputl with a prefix str
-CVR var::logputl(CVR str) const {
+CVR var::logputl(in str) const {
 	LOCKIOSTREAM_OR_NOT
 	//str.put(std::clog);
 	//this->put(std::clog);

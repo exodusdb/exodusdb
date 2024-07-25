@@ -283,7 +283,7 @@ var var::iconv(const char* conversion) const {
 	//return *this;
 }
 
-std::string var::oconv_T(CVR format) const {
+std::string var::oconv_T(in format) const {
 
 	// expecting only "T#99" with no mask at the moment
 
@@ -674,7 +674,7 @@ std::string var::oconv_MD(const char* conversion) const {
 	return strpart1;
 }
 
-std::string var::oconv_LRC(CVR format) const {
+std::string var::oconv_LRC(in format) const {
 
 	// TODO convert to C instead of var for speed
 	// and implement full mask options eg L#2-#3-#4 etc
@@ -753,7 +753,7 @@ std::string var::oconv_LRC(CVR format) const {
 
 /* partial conversion to multibyte/grapheme formatting
    but only padding, not truncating
-std::string var::oconv_LRC(CVR format) const {
+std::string var::oconv_LRC(in format) const {
 
 	// TODO convert to C instead of var for speed
 	// and implement full mask options eg L#2-#3-#4 etc
