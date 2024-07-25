@@ -133,7 +133,6 @@ bool var_eq_var(CBR lhs, CBR rhs) {
 			//(after checking that rhs is actually assigned)
 			if (lhs.var_str.empty()) {
 				if (!rhs.var_typ) {
-					// throw VarUnassigned("eq(rhs)");
 					rhs.assertAssigned(__PRETTY_FUNCTION__);
 				}
 				// different from var_lt_var
@@ -145,7 +144,6 @@ bool var_eq_var(CBR lhs, CBR rhs) {
 		//(after checking that lhs is actually assigned)
 		if ((rhs.var_typ & VARTYP_STR) && (rhs.var_str.empty())) {
 			if (!lhs.var_typ) {
-				// throw VarUnassigned("eq(lhs)");
 				lhs.assertAssigned(__PRETTY_FUNCTION__);
 			}
 			// SAME as var_lt_var
@@ -254,7 +252,6 @@ bool var_lt_var(CBR lhs, CBR rhs) {
 			// after checking that rhs is actually assigned
 			if (lhs.var_str.empty()) {
 				if (!rhs.var_typ) {
-					// throw VarUnassigned("eq(rhs)");
 					rhs.assertAssigned(__PRETTY_FUNCTION__);
 				}
 				// different from var_eq_var
@@ -266,7 +263,6 @@ bool var_lt_var(CBR lhs, CBR rhs) {
 		// after checking that lhs is actually assigned
 		if ((rhs.var_typ & VARTYP_STR) && (rhs.var_str.empty())) {
 			if (!lhs.var_typ) {
-				// throw VarUnassigned("eq(lhs)");
 				lhs.assertAssigned(__PRETTY_FUNCTION__);
 			}
 			// SAME as var_eq_var
