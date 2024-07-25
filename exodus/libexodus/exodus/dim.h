@@ -221,7 +221,7 @@ friend class var;
 
 	// os
 	ND bool osread(CVR osfilename, const char* codepage DEFAULT_EMPTY);
-	ND bool oswrite(CVR osfilename,const char* codepage DEFAULT_EMPTY) const;
+	ND bool oswrite(CVR osfilename, const char* codepage DEFAULT_EMPTY) const;
 
 	////////////
 	// ITERATORS

@@ -1491,7 +1491,7 @@ static void string_converter(T1& var_str, const T2 fromchars, const T3 tochars) 
 //VARREF var::converter(CVR fromchars, CVR tochars) {
 VARREF var::converter(SV fromchars, SV tochars) {
 
-	THISIS("VARREF var::converter(SV fromchars,SV tochars)")
+	THISIS("VARREF var::converter(SV fromchars, SV tochars)")
 	assertStringMutator(function_sig);
 
 	//string_converter(var_str, fromchars.var_str, tochars.var_str);
@@ -1515,7 +1515,7 @@ VARREF var::converter(SV fromchars, SV tochars) {
 // mutate
 VARREF var::textconverter(SV fromchars, SV tochars) {
 
-	THISIS("VARREF var::converter(CVR fromchars,CVR tochars)")
+	THISIS("VARREF var::converter(CVR fromchars, CVR tochars)")
 	assertStringMutator(function_sig);
 
 	// all ASCII -> bytewise conversion for speed
@@ -1705,7 +1705,7 @@ var var::count(SV str) const {
 // 1 based starting byte no of first occurrence starting from byte no, or 0 if not present
 var var::index(SV substr, const int startindex) const {
 
-	THISIS("var var::index(SV substr,const int startindex) const")
+	THISIS("var var::index(SV substr, const int startindex) const")
 	assertString(function_sig);
 
 	if (substr.empty())
@@ -1726,7 +1726,7 @@ var var::index(SV substr, const int startindex) const {
 // 1 based starting byte no of first occurrence starting from byte no, or 0 if not present
 var var::indexr(SV substr, const int startindex) const {
 
-	THISIS("var var::indexr(SV substr,const int startindex) const")
+	THISIS("var var::indexr(SV substr, const int startindex) const")
 	assertString(function_sig);
 
 	if (substr.empty())
@@ -1767,7 +1767,7 @@ var var::indexr(SV substr, const int startindex) const {
 // 1 based starting byte no of an occurrence or 0 if not present
 var var::indexn(SV substr, const int occurrenceno) const {
 
-	//THISIS("var var::index(SV substr,const int occurrenceno) const")
+	//THISIS("var var::index(SV substr, const int occurrenceno) const")
 	THISIS("var var::index(SV substr) const")
 	assertString(function_sig);
 
@@ -1814,7 +1814,7 @@ var var::indexn(SV substr, const int occurrenceno) const {
 
 var var::xlate(CVR filename, CVR fieldno, const char* mode) const {
 
-	THISIS("var var::xlate(CVR filename,CVR fieldno, const char* mode) const")
+	THISIS("var var::xlate(CVR filename, CVR fieldno, const char* mode) const")
 	assertString(function_sig);
 	ISSTRING(filename)
 	// fieldnames are supported as exoprog::xlate

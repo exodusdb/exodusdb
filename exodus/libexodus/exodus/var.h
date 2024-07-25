@@ -728,7 +728,7 @@ template<class... Args>
 	// VARREF eraser(const int fieldno, const int valueno=0, const int subvalueno=0);
 	VARREF remover(const int fieldno, const int valueno = 0, const int subvalueno = 0);
 	//-er version could be extract and erase in one go
-	// VARREF extracter(int fieldno,int valueno=0,int subvalueno=0) const;
+	// VARREF extracter(int fieldno, int valueno=0, int subvalueno=0) const;
 
 	// MV STRING LOCATORS
 	/////////////////////

@@ -8,6 +8,10 @@ namespace exo {
 	using VARREF =       var&;
 	using CVR    = const var&;
 	using TVR    =       var&&;
+
+	using in     = const var&;
+	using out    =       var&;
+	using io     =       var&;
 }
 
 // Info used in cli/compile
@@ -88,3 +92,4 @@ namespace exo {
 #define EXO_REGEX_BOOST
 
 #endif //EXO_VARDEFS_H
+

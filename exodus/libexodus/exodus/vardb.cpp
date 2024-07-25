@@ -1405,7 +1405,7 @@ void var::close() {
 }
 
 bool var::readf(CVR filehandle, CVR key, const int fieldno) {
-	//THISIS("bool var::readf(CVR filehandle,CVR key,const int fieldno)")
+	//THISIS("bool var::readf(CVR filehandle, CVR key, const int fieldno)")
 	//assertDefined(function_sig);
 	//ISSTRING(filehandle)
 	//ISSTRING(key)
@@ -1421,7 +1421,7 @@ bool var::readf(CVR filehandle, CVR key, const int fieldno) {
 
 bool var::readc(CVR filehandle, CVR key) {
 
-	THISIS("bool var::readc(CVR filehandle,CVR key)")
+	THISIS("bool var::readc(CVR filehandle, CVR key)")
 	assertDefined(function_sig);
 	//ISSTRING(filehandle)
 	//ISSTRING(key)
@@ -1486,7 +1486,7 @@ bool var::readc(CVR filehandle, CVR key) {
 
 bool var::writec(CVR filehandle, CVR key) const {
 
-	THISIS("void var::writec(CVR filehandle,CVR key)")
+	THISIS("void var::writec(CVR filehandle, CVR key)")
 	assertString(function_sig);
 	ISSTRING(filehandle)
 	ISSTRING(key)
@@ -1525,7 +1525,7 @@ bool var::deletec(CVR key) const {
 
 bool var::read(CVR filehandle, CVR key) {
 
-	THISIS("bool var::read(CVR filehandle,CVR key)")
+	THISIS("bool var::read(CVR filehandle, CVR key)")
 	assertDefined(function_sig);
 	ISSTRING(filehandle)
 	ISSTRING(key)
@@ -1985,7 +1985,7 @@ bool var::writef(CVR filehandle, CVR key, const int fieldno) const {
 	if (fieldno <= 0) UNLIKELY
 		return write(filehandle, key);
 
-	THISIS("bool var::writef(CVR filehandle,CVR key,const int fieldno) const")
+	THISIS("bool var::writef(CVR filehandle, CVR key, const int fieldno) const")
 	// will be duplicated in read and write but do here to present the correct function name on
 	// error
 	assertString(function_sig);
@@ -2005,7 +2005,7 @@ bool var::writef(CVR filehandle, CVR key, const int fieldno) const {
 }
 
 /* "prepared statement" version doesnt seem to make much difference approx -10% - possibly because
-two field file is so simple bool var::write(CVR filehandle,CVR key) const {}
+two field file is so simple bool var::write(CVR filehandle, CVR key) const {}
 */
 
 //"update if present or insert if not" is handled in postgres using ON CONFLICT clause
@@ -2091,7 +2091,7 @@ bool var::write(CVR filehandle, CVR key) const {
 
 bool var::updaterecord(CVR filehandle, CVR key) const {
 
-	THISIS("bool var::updaterecord(CVR filehandle,CVR key) const")
+	THISIS("bool var::updaterecord(CVR filehandle, CVR key) const")
 	assertString(function_sig);
 	ISSTRING(filehandle)
 	ISSTRING(key)
@@ -2157,7 +2157,7 @@ bool var::updaterecord(CVR filehandle, CVR key) const {
 
 bool var::insertrecord(CVR filehandle, CVR key) const {
 
-	THISIS("bool var::insertrecord(CVR filehandle,CVR key) const")
+	THISIS("bool var::insertrecord(CVR filehandle, CVR key) const")
 	assertString(function_sig);
 	ISSTRING(filehandle)
 	ISSTRING(key)

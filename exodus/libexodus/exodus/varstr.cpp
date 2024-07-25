@@ -52,7 +52,7 @@ namespace exo {
 // var.field(separator,fieldno,nfields)
 var var::field(SV separatorx, const int fieldnx, const int nfieldsx) const {
 
-	THISIS("var var::field(SV separatorx,const int fieldnx,const int nfieldsx) const")
+	THISIS("var var::field(SV separatorx, const int fieldnx, const int nfieldsx) const")
 	assertString(function_sig);
 
 	if (separatorx.empty())
@@ -117,7 +117,7 @@ ND var var::fieldstore(SV separator, const int fieldno, const int nfields, CVR r
 // Mutator
 VARREF var::fieldstorer(SV separator, const int fieldnx, const int nfieldsx, CVR replacementx) {
 
-	THISIS("VARREF var::fieldstorer(SV separator0,const int fieldnx,const int nfieldsx, CVR replacementx)")
+	THISIS("VARREF var::fieldstorer(SV separator0, const int fieldnx, const int nfieldsx, CVR replacementx)")
 	assertStringMutator(function_sig);
 
 	if (separator.empty())
@@ -630,7 +630,7 @@ static bool locatex(const std::string& var_str, const std::string& target, const
 // default locate using VM
 bool var::locate(CVR target, VARREF setting) const {
 
-	THISIS("bool var::locate(CVR target, VARREF setting, const int fieldno/*=0*/,const int valueno/*=0*/) const")
+	THISIS("bool var::locate(CVR target, VARREF setting, const int fieldno/*=0*/, const int valueno/*=0*/) const")
 	assertString(function_sig);
 	ISSTRING(target)
 	ISDEFINED(setting)
@@ -640,7 +640,7 @@ bool var::locate(CVR target, VARREF setting) const {
 
 bool var::locate(CVR target, VARREF setting, const int fieldno, const int valueno /*=0*/) const {
 
-	THISIS("bool var::locate(CVR target, VARREF setting, const int fieldno/*=0*/,const int valueno/*=0*/) const")
+	THISIS("bool var::locate(CVR target, VARREF setting, const int fieldno/*=0*/, const int valueno/*=0*/) const")
 	assertString(function_sig);
 	ISSTRING(target)
 	ISDEFINED(setting)
@@ -934,7 +934,7 @@ var var::f(const int argfieldn, const int argvaluen/*=0*/, const int argsubvalue
 // Remove in place
 VARREF var::remover(int fieldno, int valueno, int subvalueno) {
 
-	THISIS("VARREF var::remover(int fieldno,int valueno,int subvalueno)")
+	THISIS("VARREF var::remover(int fieldno, int valueno, int subvalueno)")
 	assertStringMutator(function_sig);
 
 	// return "" if replacing 0,0,0
@@ -1059,7 +1059,7 @@ VARREF var::remover(int fieldno, int valueno, int subvalueno) {
 
 VARREF var::r(int fieldno, int valueno, int subvalueno, CVR replacement) {
 
-	THISIS("VARREF var::r(int fieldno,int valueno,int subvalueno,CVR replacement)")
+	THISIS("VARREF var::r(int fieldno, int valueno, int subvalueno, CVR replacement)")
 	assertStringMutator(function_sig);
 	ISSTRING(replacement)
 
@@ -1201,7 +1201,7 @@ VARREF var::r(int fieldno, int valueno, int subvalueno, CVR replacement) {
 //in-place - given everything
 VARREF var::inserter(const int fieldno, const int valueno, const int subvalueno, CVR insertion) {
 
-	THISIS("VARREF var::inserter(const int fieldno,const int valueno,const int subvalueno,const VARREF insertion)")
+	THISIS("VARREF var::inserter(const int fieldno, const int valueno, const int subvalueno, const VARREF insertion)")
 	assertStringMutator(function_sig);
 	ISSTRING(insertion)
 
@@ -1688,7 +1688,7 @@ ND var var::b(const int pos1) const& {
 // var.s(start,length) substring
 VARREF var::substrer(const int startindex1, const int length) {
 
-	THISIS("VARREF var::substrer(const int startindex1,const int length)")
+	THISIS("VARREF var::substrer(const int startindex1, const int length)")
 	assertStringMutator(function_sig);
 
 	// return "" for ""
