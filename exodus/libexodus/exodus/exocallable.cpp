@@ -44,7 +44,7 @@ constexpr int TRACING = 0;
 // Evade clang -Wdeprecated-declarations warning when using dlopen_cache
 // Some "using" statement must be missing from std.cppm
 #if defined(EXO_MODULE) && __clang_major__ >= 18
-#	include <iostream>
+#	include <ios>
 #endif
 
 #if EXO_MODULE

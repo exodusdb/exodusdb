@@ -41,13 +41,13 @@ export namespace std {
 	using std::operator>>;
 
 	using std::operator+;
-//	using std::operator-;
-//	using std::operator>=;
-//	using std::operator<=;
+	using std::operator-;
+	using std::operator>=;
+	using std::operator<=;
 	using std::operator==;
-//	using std::operator!=;
-//	using std::operator<;
-//	using std::operator>;
+	using std::operator!=;
+	using std::operator<;
+	using std::operator>;
 
 	using std::string;
 	using std::u32string;
@@ -56,12 +56,21 @@ export namespace std {
 	using std::u32string_view;
 
 	// <<functional>
-	using std::greater;
-	using std::greater_equal;
-	using std::less;
-	using std::less_equal;
-	using std::__equal_to;
-	using std::__not_equal_to;
+//	using std::greater;
+//	using std::greater_equal;
+//	using std::less;
+//	using std::less_equal;
+//	using std::__equal_to;
+//	using std::__not_equal_to;
+//	using std::equal_to;
+//	using std::not_equal_to;
+
+	using std::plus;
+	using std::minus;
+	using std::multiplies;
+	using std::divides;
+	using std::modulus;
+	using std::negate;
 
 	using std::bad_alloc;
 
@@ -69,7 +78,6 @@ export namespace std {
 	using std::normal_distribution;
 	using std::allocator;
 	using std::iterator;
-	using std::__cxx11::basic_string;
 	using std::basic_string;
 	using std::char_traits;
 	using std::system_error;
@@ -84,6 +92,10 @@ export namespace std {
 	using std::get_time;
 	using std::put_time;
 	using std::quoted;
+
+	using std::ios;
+	using std::ios_base;
+	using std::basic_ios;
 
 	using std::to_string;
 	using std::to_chars;
@@ -177,6 +189,7 @@ export namespace std {
 	using std::flush;
 
 //	using std::filesystem;
+// Lots more - see https://en.cppreference.com/w/cpp/filesystem
 	namespace filesystem {
 		using std::filesystem::temp_directory_path;
 		using std::filesystem::is_directory;

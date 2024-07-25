@@ -203,6 +203,8 @@ class PUBLIC ExoEnv final {
 
 	// A cache of handles to dynamically loaded shared libraries
 	std::map<std::string, void*> dlopen_cache;
+//	std::map<std::string, void*, std::less<std::string<char>>> dlopen_cache;
+//	std::map<std::string, void*, std::less<char>> dlopen_cache;
 
 #pragma clang diagnostic pop
 

@@ -2,6 +2,12 @@
 
 #include <cassert>
 
+// Evade clang 18 warning about for std::regex -Wdeprecated-declarations
+// Probably need some additional "using" clause in std.cppm or #include <iostream> above to get some missing definitions
+#if defined(EXO_MODULE) and __clang_major__ >= 18
+#	include <ios>
+#endif
+
 #ifdef EXO_MODULE
 	import std;
 #else
@@ -17,9 +23,7 @@ function main() {
 
 	printl("z says 'Hello World!'");
 
-// Evade clang 18 warning about for std::regex -Wdeprecated-declarations
-// Probably need some additional "using" clause in std.cppm or #include <iostream> above to get some missing definitions
-#ifndef EXO_MODULE
+//#ifndef EXO_MODULE
 	{
 		// Example of std::regex from cppref
 		// https://en.cppreference.com/w/cpp/regex/syntax_option_type
@@ -48,7 +52,7 @@ function main() {
 		//   POSIX (leftmost longest)  match: zzxa
 
 	}
-#endif
+//#endif
 	// EXODUS regex options
 
 	// w - glob not regex (for match)
