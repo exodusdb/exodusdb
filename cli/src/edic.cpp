@@ -29,6 +29,8 @@ function main() {
 			abort(lasterror());
 		}
 	}
+	if (not COMMAND.f(2).starts(OSSLASH))
+		COMMAND(2) = oscwd() ^ OSSLASH ^ COMMAND.f(2);
 	if (not oswrite(lower(COMMAND) ^ FM ^ OPTIONS on edic_hist))
 		printl("Cannot write to ", edic_hist);
 
