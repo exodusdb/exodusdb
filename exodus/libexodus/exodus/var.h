@@ -108,7 +108,9 @@ class var_proxy3;
 // using CRTP to capture a customised base class that knows what a var is
 class PUBLIC var : public var_mid<var> {
 
-//	using VARREF = var&;
+	// Apparently the "using CVR - const var&;" declared in exo namespace scope
+	// isnt isnt exactly the same inside the actual var class definition
+	// for some reason. So we will simply redeclare it.
 	using CVR    = const var&;
 
 	friend class dim;
@@ -163,7 +165,7 @@ public:
 
 		outvar.assertString(__PRETTY_FUNCTION__);
 
-		constexpr std::array VISIBLE_FMS_EXCEPT_ESC {VISIBLE_ST_, TM_, VISIBLE_SM_, VISIBLE_VM_, VISIBLE_FM_, VISIBLE_RM_};
+		CONSTEXPR std::array VISIBLE_FMS_EXCEPT_ESC {VISIBLE_ST_, TM_, VISIBLE_SM_, VISIBLE_VM_, VISIBLE_FM_, VISIBLE_RM_};
 
 		// Replace various unprintable field marks with unusual ASCII characters
 		// Leave ESC as \x1B because it is used to control ANSI terminal control sequences
@@ -248,33 +250,33 @@ public:
 	/////////
 
 	// To stdout/cout buffered
-	CVR output() const;      // stdout no new line, buffered
-	CVR outputl() const;     // stdout starts a new line, flushed
-	CVR outputt() const;     // stdout adds a tab, buffered
+	   CVR output() const;      // stdout no new line, buffered
+	   CVR outputl() const;     // stdout starts a new line, flushed
+	   CVR outputt() const;     // stdout adds a tab, buffered
 
 	// As above but with a prefix
-	CVR output(in var1) const;  // stdout with a prefix, no new line, buffered
-	CVR outputl(in var1) const; // stdout with a prefix, starts a new line, flushed
-	CVR outputt(in var1) const; // stdout with a prefix, adds a tab, buffered
+	   CVR output(in var1) const;  // stdout with a prefix, no new line, buffered
+	   CVR outputl(in var1) const; // stdout with a prefix, starts a new line, flushed
+	   CVR outputt(in var1) const; // stdout with a prefix, adds a tab, buffered
 
 	// To stdlog/clog buffered
-	CVR logput() const;  // stdlog no new line, buffered
-	CVR logputl() const; // stdlog starts a new line, flushed
+	   CVR logput() const;  // stdlog no new line, buffered
+	   CVR logputl() const; // stdlog starts a new line, flushed
 
 	// As above but with a prefix
-	CVR logput(in var1) const;  // stdlog with a prefix, no new line, buffered
-	CVR logputl(in var1) const; // stdlog with a prefix, starts a new line, flushed
+	   CVR logput(in var1) const;  // stdlog with a prefix, no new line, buffered
+	   CVR logputl(in var1) const; // stdlog with a prefix, starts a new line, flushed
 
 	// To stderr/cerr usually unbuffered
-	CVR errput() const;  // stderr no new line, flushed
-	CVR errputl() const; // stderr starts a new line, flushed
+	   CVR errput() const;  // stderr no new line, flushed
+	   CVR errputl() const; // stderr starts a new line, flushed
 
 	// As above but with a prefix
-	CVR errput(in var1) const;  // stderr with a prefix, no new line, flushed
-	CVR errputl(in var1) const; // stderr with a prefix, starts a new line, flushed
+	   CVR errput(in var1) const;  // stderr with a prefix, no new line, flushed
+	   CVR errputl(in var1) const; // stderr with a prefix, starts a new line, flushed
 
 	// Output to a given stream
-	CVR put(std::ostream& ostream1) const;
+	   CVR put(std::ostream& ostream1) const;
 
 	// STANDARD INPUT
 	/////////////////
@@ -295,7 +297,7 @@ public:
 	///////////////
 
 	ND var  abs() const;
-// Moved to var_base
+//	Moved to var_base
 //	ND var  mod(in divisor) const;
 //	ND var  mod(double divisor) const;
 //	ND var  mod(const int divisor) const;
@@ -552,7 +554,7 @@ public:
 
 	ND var  hash(const std::uint64_t modulus = 0) const;
 
-	ND dim split(SV sepchar = _FM) const;
+	ND dim  split(SV sepchar = _FM) const;
 
 	// v3 - returns bytes from some byte number upto the first of a given list of bytes
 	// this is something like std::string::find_first_of but doesnt return the delimiter found
@@ -951,7 +953,8 @@ template<class... Args>
 
 	// Convert _VISIBLE_FMS to _ALL_FMS
 	// In header to perhaps aid runtime string literal conversion for operator""_var
-	// since currently it cannot be constexpr due to var containing a std::string
+	// since currently it cannot be CONSTEXPR due to var containing a std::string
+	ND CONSTEXPR
 	   io   fmiconverter() {
 		for (char& c : this->var_str) {
 			switch (c) {
@@ -970,6 +973,7 @@ template<class... Args>
 	}
 
 	// Convert _ALL_FMS to _VISIBLE_FMS
+	ND CONSTEXPR
 	   io   fmoconverter() {
 		for (char& c : this->var_str) {
 			if (c > RM_ || c > RM_) {
