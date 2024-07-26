@@ -4,15 +4,23 @@
 #define BACKTRACE_MAXADDRESSES 100
 
 namespace exo {
-	using VAR    =       var;
-	using VARREF =       var&;
-	using CVR    = const var&;
-	using TVR    =       var&&;
+	using VAR    =       exo::var;
+	using VARREF =       exo::var&;
+	using CVR    = const exo::var&;
+	using TVR    =       exo::var&&;
 
-	using in     = const var&;
-	using out    =       var&;
-	using io     =       var&;
+	using in     = const exo::var&;
+	using out    =       exo::var&;
+	using io     =       exo::var&;
+
+//	Note:
+//	Inside class var_base
+//	using VAR    =       var_base;
+//	using VARREF =       var_base&;
+//	using CVR    = const var_base&;
+//	using TVR    =       var_base&&;
 }
+
 
 // Info used in cli/compile
 //

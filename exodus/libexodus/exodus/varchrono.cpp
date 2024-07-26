@@ -144,7 +144,7 @@ void time_t_to_pick_date_time(const std::time_t time, int* pick_date, int* pick_
 }
 
 // -> number of days since the pick date epoch 31/12/1967
-var var::date() const {
+var  var::date() const {
 
 	// ASSUMPTION: td::chrono::system_clock() epoch is 1970/01/01 00:00:00
 
@@ -163,7 +163,7 @@ var var::date() const {
 }
 
 // -> number of whole seconds since midnight
-var var::time() const {
+var  var::time() const {
 
 	// ASSUMPTION: td::chrono::system_clock() epoch is midnight
 
@@ -179,7 +179,7 @@ var var::time() const {
 }
 
 // -> decimal fractional seconds since midnight (up to micro or nano second accuracy)
-var var::ostime() const {
+var  var::ostime() const {
 
 	// ASSUMPTION: td::chrono::system_clock() epoch is midnight
 
@@ -199,7 +199,7 @@ var var::ostime() const {
 }
 
 // -> decimal fractional days since pick epoch 1967-12-31 00:00:00 (up to micro or nano second accuracy)
-var var::timestamp() const {
+var  var::timestamp() const {
 
 	var datenow = this->date();
 	var timenow = this->ostime();
@@ -216,9 +216,9 @@ var var::timestamp() const {
 }
 
 // -> decimal fractional days since pick epoch 1967-12-31 00:00:00 (up to micro or nano second accuracy)
-var var::timestamp(in ostime) const {
+var  var::timestamp(in ostime) const {
 
-	THISIS("var var::timestamp(in ostime) const")
+	THISIS("var  var::timestamp(in ostime) const")
 	assertNumeric(function_sig);
 	assertNumeric(function_sig, ostime);
 
@@ -226,7 +226,7 @@ var var::timestamp(in ostime) const {
 
 }
 
-//var var::timedate() const {
+//var  var::timedate() const {
 //	// output the current "HH:MM:SS  DD MMM YYYY" without quotes but note the double space
 //
 //	// TODO make this rely on a single timestamp instead of time and date
@@ -234,7 +234,7 @@ var var::timestamp(in ostime) const {
 //	return time().oconv_MT("S") ^ " " ^ date().oconv_D("D");
 //}
 
-var var::iconv_D(const char* conversion) const {
+var  var::iconv_D(const char* conversion) const {
 
 	// should perhaps ONLY implement only ISO8601 which is in xml
 	// yyyy-mm-ddTHH:MM:SS.SSS

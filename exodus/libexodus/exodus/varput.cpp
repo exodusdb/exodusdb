@@ -23,6 +23,7 @@ THE SOFTWARE.
 ////module #include <string>
 
 #include <exodus/varimpl.h>
+#include <exodus/vardefs.h>
 
 static bool desynced_with_stdio = false;
 

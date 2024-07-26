@@ -88,9 +88,9 @@ thread_local std::unique_ptr<RNG_typ> thread_RNG;
 
 // PickOS returns pseudo random integers in the range of 0-4 for rnd(5)
 // Exodus is symmetrical for negative numbers
-var var::rnd() const {
+var  var::rnd() const {
 
-	THISIS("var var::rnd() const")
+	THISIS("var  var::rnd() const")
 	assertNumeric(function_sig);
 
 	// Create a base generator per thread on the heap. Will be destroyed on thread termination.
@@ -309,13 +309,13 @@ void var::ossetenv(const char* envcode) const {
 	return;
 }
 
-var var::ospid() const {
-	//THISIS("var var::ospid() const")
+var  var::ospid() const {
+	//THISIS("var  var::ospid() const")
 	return getpid();
 }
 
-var var::ostid() const {
-	//THISIS("var var::ospid() const")
+var  var::ostid() const {
+	//THISIS("var  var::ospid() const")
 	return gettid();
 }
 

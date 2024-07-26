@@ -50,9 +50,9 @@ namespace exo {
 ////////
 
 // var.field(separator,fieldno,nfields)
-var var::field(SV separatorx, const int fieldnx, const int nfieldsx) const {
+var  var::field(SV separatorx, const int fieldnx, const int nfieldsx) const {
 
-	THISIS("var var::field(SV separatorx, const int fieldnx, const int nfieldsx) const")
+	THISIS("var  var::field(SV separatorx, const int fieldnx, const int nfieldsx) const")
 	assertString(function_sig);
 
 	if (separatorx.empty())
@@ -105,19 +105,19 @@ var var::field(SV separatorx, const int fieldnx, const int nfieldsx) const {
 /////////////
 
 //// var.fieldstore(separator,fieldno,nfields,replacement)
-//var var::fieldstore(SV separator, const int fieldnx, const int nfieldsx, in replacementx) const& {
+//var  var::fieldstore(SV separator, const int fieldnx, const int nfieldsx, in replacementx) const& {
 //	return var(*this).fieldstorer(separator, fieldnx, nfieldsx, replacementx);
 //}
 
 // Constant
-ND var var::fieldstore(SV separator, const int fieldno, const int nfields, in replacement) const& {
+ND var  var::fieldstore(SV separator, const int fieldno, const int nfields, in replacement) const& {
 	return var(*this).fieldstorer(separator, fieldno, nfields, replacement);
 }
 
 // Mutator
-io var::fieldstorer(SV separator, const int fieldnx, const int nfieldsx, in replacementx) {
+io   var::fieldstorer(SV separator, const int fieldnx, const int nfieldsx, in replacementx) {
 
-	THISIS("io var::fieldstorer(SV separator0, const int fieldnx, const int nfieldsx, in replacementx)")
+	THISIS("io   var::fieldstorer(SV separator0, const int fieldnx, const int nfieldsx, in replacementx)")
 	assertStringMutator(function_sig);
 
 	if (separator.empty())
@@ -796,16 +796,16 @@ bool var::locateusing(const char* usingchar, in target, io setting, const int fi
 //     xxx = extract(yyy, 1, 2, 3)
 //  or xxx = yyy.extract(1, 2, 3)
 //
-//var var::extract(const int argfieldn, const int argvaluen/*=0*/, const int argsubvaluen/*=0*/) const {
+//var  var::extract(const int argfieldn, const int argvaluen/*=0*/, const int argsubvaluen/*=0*/) const {
 //	return this->f(argfieldn, argvaluen, argsubvaluen);
 //}
 
 // Abbreviated xxxx.f(1,2,3) syntax. PickOS angle bracket syntax (xxx<1,2,3>) not possible in C++
 //     xxx = yyy.f(1,2,3)
 //
-var var::f(const int argfieldn, const int argvaluen/*=0*/, const int argsubvaluen/*=0*/) const {
+var  var::f(const int argfieldn, const int argvaluen/*=0*/, const int argsubvaluen/*=0*/) const {
 
-	THISIS("var var::f(const int argfieldn, const int argvaluen, const int argsubvaluen) const")
+	THISIS("var  var::f(const int argfieldn, const int argvaluen, const int argsubvaluen) const")
 	assertString(function_sig);
 
 #if 0
@@ -932,9 +932,9 @@ var var::f(const int argfieldn, const int argvaluen/*=0*/, const int argsubvalue
 //////////////////////////////
 
 // Remove in place
-io var::remover(int fieldno, int valueno, int subvalueno) {
+io   var::remover(int fieldno, int valueno, int subvalueno) {
 
-	THISIS("io var::remover(int fieldno, int valueno, int subvalueno)")
+	THISIS("io   var::remover(int fieldno, int valueno, int subvalueno)")
 	assertStringMutator(function_sig);
 
 	// return "" if replacing 0,0,0
@@ -1057,9 +1057,9 @@ io var::remover(int fieldno, int valueno, int subvalueno) {
 // PICKREPLACE int int int var
 ///////////////////////////////////////////
 
-io var::r(int fieldno, int valueno, int subvalueno, in replacement) {
+io   var::r(int fieldno, int valueno, int subvalueno, in replacement) {
 
-	THISIS("io var::r(int fieldno, int valueno, int subvalueno, in replacement)")
+	THISIS("io   var::r(int fieldno, int valueno, int subvalueno, in replacement)")
 	assertStringMutator(function_sig);
 	ISSTRING(replacement)
 
@@ -1199,9 +1199,9 @@ io var::r(int fieldno, int valueno, int subvalueno, in replacement) {
 ///////////////////////////////////////////
 
 //in-place - given everything
-io var::inserter(const int fieldno, const int valueno, const int subvalueno, in insertion) {
+io   var::inserter(const int fieldno, const int valueno, const int subvalueno, in insertion) {
 
-	THISIS("io var::inserter(const int fieldno, const int valueno, const int subvalueno, in insertion)")
+	THISIS("io   var::inserter(const int fieldno, const int valueno, const int subvalueno, in insertion)")
 	assertStringMutator(function_sig);
 	ISSTRING(insertion)
 
@@ -1424,9 +1424,9 @@ bool var::contains(SV str) const {
 
 //[1,1]
 // .substr(1,1)
-var var::first() const& {
+var  var::first() const& {
 
-	THISIS("var var::first() const")
+	THISIS("var  var::first() const")
 	assertString(function_sig);
 
 	// Return "" if empty
@@ -1442,9 +1442,9 @@ var var::first() const& {
 
 //[1,1]
 // .substr(1,1)
-io var::firster() {
+io   var::firster() {
 
-	THISIS("io var::firster()")
+	THISIS("io   var::firster()")
 	assertStringMutator(function_sig);
 
 	// Reduce the size of this string to max 1
@@ -1455,9 +1455,9 @@ io var::firster() {
 	return *this;
 }
 
-var var::first(const std::size_t  length) const& {
+var  var::first(const std::size_t  length) const& {
 
-	THISIS("var var::first(const std::size_t length) const")
+	THISIS("var  var::first(const std::size_t length) const")
 	assertString(function_sig);
 
 	// Assume high half of std::size_t is c++ unblockable conversion
@@ -1473,9 +1473,9 @@ var var::first(const std::size_t  length) const& {
 
 //[1,y]
 // var.substr(1,length)
-io var::firster(const std::size_t length) {
+io   var::firster(const std::size_t length) {
 
-	THISIS("io var::firster(const std::size_t length)")
+	THISIS("io   var::firster(const std::size_t length)")
 	assertStringMutator(function_sig);
 
 	// Assume high half of std::size_t is c++ unblockable conversion
@@ -1498,9 +1498,9 @@ io var::firster(const std::size_t length) {
 
 // [-1]
 // .substr(1, 1)
-var var::last() const& {
+var  var::last() const& {
 
-	THISIS("var var::last() const")
+	THISIS("var  var::last() const")
 	assertString(function_sig);
 
 	if (var_str.empty()) {
@@ -1514,9 +1514,9 @@ var var::last() const& {
 
 //[-1]
 // .substr(-1,1)
-io var::laster() {
+io   var::laster() {
 
-	THISIS("io var::laster()")
+	THISIS("io   var::laster()")
 	assertStringMutator(function_sig);
 
 	// Leave only the last char
@@ -1527,9 +1527,9 @@ io var::laster() {
 }
 
 
-var var::last(const std::size_t  length) const& {
+var  var::last(const std::size_t  length) const& {
 
-	THISIS("var var::last(const std::size_t length) const")
+	THISIS("var  var::last(const std::size_t length) const")
 	assertString(function_sig);
 
 	// Assume high half of std::size_t is c++ unblockable conversion
@@ -1557,9 +1557,9 @@ var var::last(const std::size_t  length) const& {
 
 //[-y]
 // var.s(-length) substring
-io var::laster(const std::size_t length) {
+io   var::laster(const std::size_t length) {
 
-	THISIS("io var::laster(const std::size_t length)")
+	THISIS("io   var::laster(const std::size_t length)")
 	assertStringMutator(function_sig);
 
 	// Assume high half of std::size_t is c++ unblockable conversion
@@ -1587,9 +1587,9 @@ io var::laster(const std::size_t length) {
 
 // var[1,length] = ""         cut first n bytes
 // var[-length, length] = ""  cut last n bytes
-var var::cut(const int length) const& {
+var  var::cut(const int length) const& {
 
-	THISIS("var var::cut(const int length) const")
+	THISIS("var  var::cut(const int length) const")
 	assertString(function_sig);
 
 	var nrvo;
@@ -1624,9 +1624,9 @@ var var::cut(const int length) const& {
 
 // x[1, length] = ""
 // x[-length, length] = ""
-io var::cutter(const int length) {
+io   var::cutter(const int length) {
 
-	THISIS("io var::cutter(const int length)")
+	THISIS("io   var::cutter(const int length)")
 	assertStringMutator(function_sig);
 
 	if (length >= 0 ) {
@@ -1664,29 +1664,29 @@ io var::cutter(const int length) {
 /////////
 
 //ND var substr(const int pos1, const int length) const&; // byte pos1, length
-ND var var::substr(const int startindex1, const int length) const& {
+ND var  var::substr(const int startindex1, const int length) const& {
 	return var(*this).substrer(startindex1, length);
 }
 //ND var substr(const int pos1) const&;                   // byte pos1
-ND var var::substr(const int startindex1) const& {
+ND var  var::substr(const int startindex1) const& {
 	return var(*this).substrer(startindex1);
 }
 
 // byte pos1, length
 [[deprecated("EXODUS: Replace all xxx.b(start, len) with xxx.subst(start, len)")]]
-ND var var::b(const int pos1, const int length) const& {
+ND var  var::b(const int pos1, const int length) const& {
 	return substr(pos1, length);
 }
 // byte pos1
-ND var var::b(const int pos1) const& {
+ND var  var::b(const int pos1) const& {
 	return substr(pos1);
 }
 
 //[x,y]
 // var.s(start,length) substring
-io var::substrer(const int startindex1, const int length) {
+io   var::substrer(const int startindex1, const int length) {
 
-	THISIS("io var::substrer(const int startindex1, const int length)")
+	THISIS("io   var::substrer(const int startindex1, const int length)")
 	assertStringMutator(function_sig);
 
 	// return "" for ""
@@ -1761,7 +1761,7 @@ io var::substrer(const int startindex1, const int length) {
 
 template<> PUBLIC RETVAR VARBASE1::at(const int charno) const {
 
-	THISIS("var var::at(const int charno) const")
+	THISIS("var  var::at(const int charno) const")
 	assertString(function_sig);
 
 	int nchars = static_cast<int>(var_str.size());
@@ -1814,9 +1814,9 @@ template<> PUBLIC RETVAR VARBASE1::operator[](const int pos1) const {
 
 // performs an operation + - * / : on two multivalued strings in parallel
 // returning a multivalued string of the results
-var var::mv(const char* opcode, in var2) const {
+var  var::mv(const char* opcode, in var2) const {
 
-	THISIS("var var::multivalued(const char* opcode, in var2) const")
+	THISIS("var  var::multivalued(const char* opcode, in var2) const")
 	assertString(function_sig);
 	ISSTRING(var2)
 
@@ -1938,9 +1938,9 @@ getnextp2:
 // returns the characters up to the next delimiter
 // also returns the index of the next delimiter discovered or 1 after the string if none (like
 // COL2() in pickos) NOTE startindex1 is 1 based not 0. anything less than 1 is treated as 1
-var var::substr(const int startindex1, in delimiterchars, int& endindex) const {
+var  var::substr(const int startindex1, in delimiterchars, int& endindex) const {
 
-	THISIS("var var::substr(const int startindex1, io delimiterchars, int& endindex) const")
+	THISIS("var  var::substr(const int startindex1, io delimiterchars, int& endindex) const")
 	assertString(function_sig);
 	ISSTRING(delimiterchars)
 
@@ -1989,9 +1989,9 @@ var var::substr(const int startindex1, in delimiterchars, int& endindex) const {
 // returns the characters up to the next delimiter
 // delimiter returned as numbers RM=1F=1 FM=1E=2, VM=1D=3 SM=1C=4 TM=1B=5 to ST=1A=6 or 0 if not found
 // NOTE startindex1 is 1 based not 0. anything less than 1 is treated as 1
-var var::substr2(io startindex1, io delimiterno) const {
+var  var::substr2(io startindex1, io delimiterno) const {
 
-	THISIS("var var::substr2(io startindex1, io delimiterno) const")
+	THISIS("var  var::substr2(io startindex1, io delimiterno) const")
 	assertString(function_sig);
 	ISNUMERIC(startindex1)
 	ISDEFINED(delimiterno)
@@ -2136,9 +2136,9 @@ void var_brackets_proxy::operator=(char char1) {
 //////
 // SUM
 //////
-var var::sumall() const {
+var  var::sumall() const {
 
-	THISIS("var var::sumall() const")
+	THISIS("var  var::sumall() const")
 	assertString(function_sig);
 
 	// Add up all numbers regardless of separators or levels (multilevel)
@@ -2175,9 +2175,9 @@ var var::sumall() const {
 	return nrvo.round(static_cast<int>(maxdecimals));
 }
 
-var var::sum() const {
+var  var::sum() const {
 
-	THISIS("var var::sum() const")
+	THISIS("var  var::sum() const")
 	assertString(function_sig);
 
 	// Limit the number of decimal places in returned value to the max found in the input
@@ -2291,9 +2291,9 @@ var var::sum() const {
 	return nrvo;
 }
 
-var var::sum(SV separator) const {
+var  var::sum(SV separator) const {
 
-	THISIS("var var::sum(SV separator) const")
+	THISIS("var  var::sum(SV separator) const")
 	assertString(function_sig);
 
 	var nrvo = 0;

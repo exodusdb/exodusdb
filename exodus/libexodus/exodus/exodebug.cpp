@@ -428,7 +428,7 @@ ND PUBLIC var backtrace() {
 
 //void var::debug(in var1) const {
 PUBLIC void debug(in var1) {
-	// THISIS("var var::debug() const")
+	// THISIS("var  var::debug() const")
 
 	std::clog << "debug(" << var1 << ")" << std::endl;
 	std::cout << std::flush;

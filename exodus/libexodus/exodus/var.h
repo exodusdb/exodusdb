@@ -93,11 +93,6 @@ class var_proxy1;
 class var_proxy2;
 class var_proxy3;
 
-using VAR    =       var;
-using VARREF =       var&;
-using CVR    = const var&;
-using TVR    =       var&&;
-
 // Note:
 // Inside class var_base
 // using VAR    =       var_base;
@@ -113,17 +108,13 @@ using TVR    =       var&&;
 // using CRTP to capture a customised base class that knows what a var is
 class PUBLIC var : public var_mid<var> {
 
-//// class var
-//// using CRTP to capture a customised base class that knows what a var is
-//class PUBLIC var : public var_base<var> {
-
-	using VARREF = var&;
+//	using VARREF = var&;
 	using CVR    = const var&;
 
 	friend class dim;
 	friend class rex;
 
-	friend var operator""_var(const char* cstr, std::size_t size);
+	friend var  operator""_var(const char* cstr, std::size_t size);
 
 public:
 
@@ -139,8 +130,7 @@ public:
 
 	// initializer lists can only be of one type int, double, cstr, char etc.
 	template <class T>
-	CONSTEXPR
-	var(std::initializer_list<T> list)
+	CONSTEXPR var(std::initializer_list<T> list)
 	// This constructor assumes FM delimiter so keep it out of var_base.
 	//Therefore it cannot use var_base initializers
 	//:
@@ -213,8 +203,8 @@ public:
 	// 1. () on const vars will extract the desired field/value/subvalue as a proper var
 	// Note that all  function "in" arguments are const vars
 	// so will work perfectly with () extraction
-	ND var operator()(int fieldno, int valueno = 0, int subvalueno = 0) const {return this->f(fieldno, valueno, subvalueno);}
-	//ND var operator()(int fieldno, int valueno = 0, int subvalueno = 0) &&      {return a(fieldno, valueno, subvalueno);}
+	ND var  operator()(int fieldno, int valueno = 0, int subvalueno = 0) const {return this->f(fieldno, valueno, subvalueno);}
+//	ND var  operator()(int fieldno, int valueno = 0, int subvalueno = 0) &&      {return a(fieldno, valueno, subvalueno);}
 
 	// DONT declare this so we force use of the above const version that produces a temporary
 	//RETVARREF operator()(int fieldno, int valueno = 0, int subvalueno = 0);
@@ -248,11 +238,11 @@ public:
 	//
 	// Must have postfix operators if prefix operators are defined
 
-	var operator++(int) &;
-	var operator--(int) &;
+	   var  operator++(int) &;
+	   var  operator--(int) &;
 
-	io operator++() &;
-	io operator--() &;
+	   io   operator++() &;
+	   io   operator--() &;
 
 	// OUTPUT
 	/////////
@@ -289,65 +279,65 @@ public:
 	// STANDARD INPUT
 	/////////////////
 
-	io input();
-	io input(in prompt);
-	io inputn(const int nchars);
+	   io   input();
+	   io   input(in prompt);
+	   io   inputn(const int nchars);
 
 	ND bool isterminal() const;
 	ND bool hasinput(int milliseconds = 0) const;
 	ND bool eof() const;
-	bool echo(const int on_off) const;
+	   bool echo(const int on_off) const;
 
-	void breakon() const;
-	void breakoff() const;
+	   void breakon() const;
+	   void breakoff() const;
 
 	// MATH/BOOLEAN
 	///////////////
 
-	ND var abs() const;
+	ND var  abs() const;
 // Moved to var_base
-//	ND var mod(in divisor) const;
-//	ND var mod(double divisor) const;
-//	ND var mod(const int divisor) const;
-	ND var pwr(in exponent) const;
-	ND var rnd() const;
-	void initrnd() const;
-	ND var exp() const;
-	ND var sqrt() const;
-	ND var sin() const;
-	ND var cos() const;
-	ND var tan() const;
-	ND var atan() const;
-	ND var loge() const;
-	//ND var int() const;//reserved word
-	ND var integer() const;//returns a var in case you need a var and not an int  which the c++ built-in int(varx) produces
-	ND var floor() const;
-	ND var round(const int ndecimals = 0) const;
+//	ND var  mod(in divisor) const;
+//	ND var  mod(double divisor) const;
+//	ND var  mod(const int divisor) const;
+	ND var  pwr(in exponent) const;
+	ND var  rnd() const;
+	   void initrnd() const;
+	ND var  exp() const;
+	ND var  sqrt() const;
+	ND var  sin() const;
+	ND var  cos() const;
+	ND var  tan() const;
+	ND var  atan() const;
+	ND var  loge() const;
+//	ND var  int() const;//reserved word
+	ND var  integer() const;//returns a var in case you need a var and not an int  which the c++ built-in int(varx) produces
+	ND var  floor() const;
+	ND var  round(const int ndecimals = 0) const;
 
 	// LOCALE
 	/////////
 
-	bool setxlocale() const;
-	ND io getxlocale();
+	   bool setxlocale() const;
+	ND io   getxlocale();
 
 	// STRING CREATION
 	//////////////////
 
-	// var chr() const;
+	// var  chr() const;
 	// version 1 chr - only char 0 - 255 returned in a single byte
 	// bytes 128-255 are not valid utf-8 so cannot be written to database/postgres
-	ND var chr(const int num) const;  // ASCII
+	ND var  chr(const int num) const;  // ASCII
 
 	// version 2 textchr - returns utf8 byte sequences for all unicode code points
 	// not unsigned int so to get utf codepoints > 2^63 must provide negative ints
 	// not providing implicit constructor from var to unsigned int due to getting ambigious conversions
 	// since int and unsigned int are parallel priority in c++ implicit conversions
-	ND var textchr(const int num) const;  // UTF8
+	ND var  textchr(const int num) const;  // UTF8
 
-	ND var str(const int num) const;
-	ND var space() const;
+	ND var  str(const int num) const;
+	ND var  space() const;
 
-	ND var numberinwords(in languagename_or_locale_id DEFAULT_EMPTY);
+	ND var  numberinwords(in languagename_or_locale_id DEFAULT_EMPTY);
 
 	////////////
 	// STRING // All utf8 unless mentioned
@@ -356,23 +346,23 @@ public:
 	// STRING INFO
 	//////////////
 
-	ND var seq() const;     // byte
+	ND var  seq() const;     // byte
 
-	ND var textseq() const;
+	ND var  textseq() const;
 
-	ND var len() const;     // bytes
+	ND var  len() const;     // bytes
 
 	// number of output columns. Allows multi column unicode and reduces combining characters etc. like e followed by grave accent
 	// Possibly does not properly calculate combining sequences of graphemes e.g. face followed by colour
-	ND var textwidth() const;
+	ND var  textwidth() const;
 
 	// STRING SCANNING
 	//////////////////
 
-	ND var textlen() const;
-	ND var fcount(SV str) const;
-	ND var count(SV str) const;
-	ND var match(SV regex, SV regex_options DEFAULT_EMPTY) const;
+	ND var  textlen() const;
+	ND var  fcount(SV str) const;
+	ND var  count(SV str) const;
+	ND var  match(SV regex, SV regex_options DEFAULT_EMPTY) const;
 
 	//                                  Javascript   PHP             Python       Go          Rust          C++
 	ND bool starts(SV str) const;    // startsWith() str_starts_with startswith() HasPrefix() starts_with() starts_with
@@ -380,12 +370,12 @@ public:
 	ND bool contains(SV str) const;  // includes()   str_contains    contains()   Contains()  contains()    contains
 
 	//https://en.wikipedia.org/wiki/Comparison_of_programming_languages_(string_functions)#Find
-	//ND var index(SV str) const;
-	ND var index(SV str, const int startchar1 = 1) const;   // return byte no if found or 0 if not. startchar1 is byte no to start at.
-	ND var indexn(SV str, const int occurrence) const;      // ditto. occurrence 1 = find first occurrence
-	ND var indexr(SV str, const int startchar1 = -1) const; // ditto. reverse search. startchar1 -1 starts from the last byte
+//	ND var  index(SV str) const;
+	ND var  index(SV str, const int startchar1 = 1) const;   // return byte no if found or 0 if not. startchar1 is byte no to start at.
+	ND var  indexn(SV str, const int occurrence) const;      // ditto. occurrence 1 = find first occurrence
+	ND var  indexr(SV str, const int startchar1 = -1) const; // ditto. reverse search. startchar1 -1 starts from the last byte
 
-	ND var search(SV regex, io startchar1, SV regex_options DEFAULT_EMPTY) const; // returns match with groups and startchar1 one after matched
+	ND var  search(SV regex, io startchar1, SV regex_options DEFAULT_EMPTY) const; // returns match with groups and startchar1 one after matched
 
 //	//static member for speed on std strings because of underlying boost implementation
 //	static int localeAwareCompare(const std::string& str1, const std::string& str2);
@@ -394,180 +384,180 @@ public:
 	// STRING CONVERSION - Non-mutating
 	////////////////////
 
-	ND var ucase() const&;
-	ND var lcase() const&;
-	ND var tcase() const&;
-	ND var fcase() const&;
-	ND var normalize() const&;
-	ND var invert() const&;
+	ND var  ucase() const&;
+	ND var  lcase() const&;
+	ND var  tcase() const&;
+	ND var  fcase() const&;
+	ND var  normalize() const&;
+	ND var  invert() const&;
 
-	ND var lower() const&;
-	ND var raise() const&;
-	ND var crop() const&;
+	ND var  lower() const&;
+	ND var  raise() const&;
+	ND var  crop() const&;
 
-	ND var quote() const&;
-	ND var squote() const&;
-	ND var unquote() const&;
+	ND var  quote() const&;
+	ND var  squote() const&;
+	ND var  unquote() const&;
 
-	ND var trim(SV trimchars  DEFAULT_SPACE) const&;     // byte trimchars
-	ND var trimfirst(SV trimchars DEFAULT_SPACE) const&; // byte trimchars
-	ND var trimlast(SV trimchars DEFAULT_SPACE) const&;  // byte trimchars
-	ND var trimboth(SV trimchars DEFAULT_SPACE) const&;  // byte trimchars
+	ND var  trim(SV trimchars  DEFAULT_SPACE) const&;     // byte trimchars
+	ND var  trimfirst(SV trimchars DEFAULT_SPACE) const&; // byte trimchars
+	ND var  trimlast(SV trimchars DEFAULT_SPACE) const&;  // byte trimchars
+	ND var  trimboth(SV trimchars DEFAULT_SPACE) const&;  // byte trimchars
 
-	ND var first() const&; // max 1 byte
-	ND var last() const&;  // max 1 byte
-	ND var first(const std::size_t length) const&; // byte length
-	ND var last(const std::size_t length) const&;  // byte length
-	ND var cut(const int length) const&;      // byte length
-	ND var paste(const int pos1, const int length, SV insertstr) const&; // byte pos1, length
-	ND var paste(const int pos1, SV insertstr) const&; // byte pos1
-	ND var prefix(SV insertstr) const&;
-	//ND var append(SV appendstr) const&;
-	ND var pop() const&;                      // byte removed
+	ND var  first() const&; // max 1 byte
+	ND var  last() const&;  // max 1 byte
+	ND var  first(const std::size_t length) const&; // byte length
+	ND var  last(const std::size_t length) const&;  // byte length
+	ND var  cut(const int length) const&;      // byte length
+	ND var  paste(const int pos1, const int length, SV insertstr) const&; // byte pos1, length
+	ND var  paste(const int pos1, SV insertstr) const&; // byte pos1
+	ND var  prefix(SV insertstr) const&;
+//	ND var  append(SV appendstr) const&;
+	ND var  pop() const&;                      // byte removed
 
 	// var.fieldstore(separator,fieldno,nfields,replacement)
-	ND var fieldstore(SV separator, const int fieldno, const int nfields, in replacement) const&;
+	ND var  fieldstore(SV separator, const int fieldno, const int nfields, in replacement) const&;
 
-	//ND var substr(const int pos1, const int length) const&; // byte pos1, length
-	ND var substr(const int startindex1, const int length) const&;
-	//ND var substr(const int pos1) const&;                   // byte pos1
-	ND var substr(const int startindex1) const&;
+//	ND var  substr(const int pos1, const int length) const&; // byte pos1, length
+	ND var  substr(const int startindex1, const int length) const&;
+//	ND var  substr(const int pos1) const&;                   // byte pos1
+	ND var  substr(const int startindex1) const&;
 
-	ND var b(const int pos1, const int length) const&; // byte pos1, length
-	ND var b(const int pos1) const&; // byte pos1
+	ND var  b(const int pos1, const int length) const&; // byte pos1, length
+	ND var  b(const int pos1) const&; // byte pos1
 
-	ND var convert(SV fromchars, SV tochars) const&;        // byte fromchars, tochars
-	ND var textconvert(SV fromchars, SV tochars) const&;
+	ND var  convert(SV fromchars, SV tochars) const&;        // byte fromchars, tochars
+	ND var  textconvert(SV fromchars, SV tochars) const&;
 
-	ND var replace(SV fromstr, SV tostr) const&;
-	ND var replace(const rex& regex, SV tostr) const&;
-	//ND var regex_replace(SV regex, SV replacement, SV regex_options DEFAULT_EMPTY) const&;
+	ND var  replace(SV fromstr, SV tostr) const&;
+	ND var  replace(const rex& regex, SV tostr) const&;
+//	ND var  regex_replace(SV regex, SV replacement, SV regex_options DEFAULT_EMPTY) const&;
 
-	ND var unique() const&;
-	ND var sort(SV sepchar = _FM) const&;
-	ND var reverse(SV sepchar = _FM) const&;
-	ND var shuffle(SV sepchar = _FM) const&;
-	ND var parse(char sepchar = ' ') const&;
+	ND var  unique() const&;
+	ND var  sort(SV sepchar = _FM) const&;
+	ND var  reverse(SV sepchar = _FM) const&;
+	ND var  shuffle(SV sepchar = _FM) const&;
+	ND var  parse(char sepchar = ' ') const&;
 
 	// SAME ON TEMPORARIES - MUTATE FOR SPEED
 	/////////////////////////////////////////
 
 	// utf8/byte as for accessors
 
-	ND io ucase() &&;
-	ND io lcase() &&;
-	ND io tcase() &&;
-	ND io fcase() &&;
-	ND io normalize() &&;
-	ND io invert() &&;
+	ND io   ucase() &&;
+	ND io   lcase() &&;
+	ND io   tcase() &&;
+	ND io   fcase() &&;
+	ND io   normalize() &&;
+	ND io   invert() &&;
 
-	ND io lower() &&;
-	ND io raise() &&;
-	ND io crop() &&;
+	ND io   lower() &&;
+	ND io   raise() &&;
+	ND io   crop() &&;
 
-	ND io quote() &&;
-	ND io squote() &&;
-	ND io unquote() &&;
+	ND io   quote() &&;
+	ND io   squote() &&;
+	ND io   unquote() &&;
 
-	ND io trim(SV trimchars DEFAULT_SPACE) &&;
-	ND io trimfirst(SV trimchars DEFAULT_SPACE) &&;
-	ND io trimlast(SV trimchars DEFAULT_SPACE) &&;
-	ND io trimboth(SV trimchars DEFAULT_SPACE) &&;
+	ND io   trim(SV trimchars DEFAULT_SPACE) &&;
+	ND io   trimfirst(SV trimchars DEFAULT_SPACE) &&;
+	ND io   trimlast(SV trimchars DEFAULT_SPACE) &&;
+	ND io   trimboth(SV trimchars DEFAULT_SPACE) &&;
 
-	ND io first() &&;
-	ND io last() &&;
-	ND io first(const std::size_t length) &&;
-	ND io last(const std::size_t length) &&;
-	ND io cut(const int length) &&;
-	ND io paste(const int pos1, const int length, SV insertstr) &&;
-	ND io paste(const int pos1, SV insertstr) &&;
-	ND io prefix(SV insertstr) &&;
-	//ND io append(SV appendstr) &&;
-	ND io pop() &&;
+	ND io   first() &&;
+	ND io   last() &&;
+	ND io   first(const std::size_t length) &&;
+	ND io   last(const std::size_t length) &&;
+	ND io   cut(const int length) &&;
+	ND io   paste(const int pos1, const int length, SV insertstr) &&;
+	ND io   paste(const int pos1, SV insertstr) &&;
+	ND io   prefix(SV insertstr) &&;
+//	ND io   append(SV appendstr) &&;
+	ND io   pop() &&;
 
-	ND io fieldstore(SV sepchar, const int fieldno, const int nfields, in replacement) &&;
-	ND io substr(const int pos1, const int length) &&;
-	ND io substr(const int pos1) &&;
+	ND io   fieldstore(SV sepchar, const int fieldno, const int nfields, in replacement) &&;
+	ND io   substr(const int pos1, const int length) &&;
+	ND io   substr(const int pos1) &&;
 
-	ND io convert(SV fromchars, SV tochars) &&;
-	ND io textconvert(SV fromchars, SV tochars) &&;
-	ND io replace(const rex& regex, SV tostr) &&;
-	ND io replace(SV fromstr, SV tostr) &&;
-	//ND io regex_replace(SV regex, SV replacement, SV regex_options DEFAULT_EMPTY) &&;
+	ND io   convert(SV fromchars, SV tochars) &&;
+	ND io   textconvert(SV fromchars, SV tochars) &&;
+	ND io   replace(const rex& regex, SV tostr) &&;
+	ND io   replace(SV fromstr, SV tostr) &&;
+//	ND io   regex_replace(SV regex, SV replacement, SV regex_options DEFAULT_EMPTY) &&;
 
-	ND io unique() &&;
-	ND io sort(SV sepchar = _FM) &&;
-	ND io reverse(SV sepchar = _FM) &&;
-	ND io shuffle(SV sepchar = _FM) &&;
-	ND io parse(char sepchar = ' ') &&;
+	ND io   unique() &&;
+	ND io   sort(SV sepchar = _FM) &&;
+	ND io   reverse(SV sepchar = _FM) &&;
+	ND io   shuffle(SV sepchar = _FM) &&;
+	ND io   parse(char sepchar = ' ') &&;
 
 	// STRING MUTATORS
 	//////////////////
 
 	// utf8/byte as for accessors
 
-	io ucaser();
-	io lcaser();
-	io tcaser();
-	io fcaser();
-	io normalizer();
-	io inverter();
+	   io   ucaser();
+	   io   lcaser();
+	   io   tcaser();
+	   io   fcaser();
+	   io   normalizer();
+	   io   inverter();
 
-	io quoter();
-	io squoter();
-	io unquoter();
+	   io   quoter();
+	   io   squoter();
+	   io   unquoter();
 
-	io lowerer();
-	io raiser();
-	io cropper();
+	   io   lowerer();
+	   io   raiser();
+	   io   cropper();
 
-	io trimmer(SV trimchars DEFAULT_SPACE);
-	io trimmerfirst(SV trimchars DEFAULT_SPACE);
-	io trimmerlast(SV trimchars DEFAULT_SPACE);
-	io trimmerboth(SV trimchars DEFAULT_SPACE);
+	   io   trimmer(SV trimchars DEFAULT_SPACE);
+	   io   trimmerfirst(SV trimchars DEFAULT_SPACE);
+	   io   trimmerlast(SV trimchars DEFAULT_SPACE);
+	   io   trimmerboth(SV trimchars DEFAULT_SPACE);
 
-	io firster();
-	io laster();
-	io firster(const std::size_t length);
-	io laster(const std::size_t length);
-	io cutter(const int length);
-	io paster(const int pos1, const int length, SV insertstr);
-	io paster(const int pos1, SV insertstr);
-	io prefixer(SV insertstr);
-	//io appender(SV appendstr);
-	io popper();
+	   io   firster();
+	   io   laster();
+	   io   firster(const std::size_t length);
+	   io   laster(const std::size_t length);
+	   io   cutter(const int length);
+	   io   paster(const int pos1, const int length, SV insertstr);
+	   io   paster(const int pos1, SV insertstr);
+	   io   prefixer(SV insertstr);
+//	   io   appender(SV appendstr);
+	   io   popper();
 
-	io fieldstorer(SV sepchar, const int fieldno, const int nfields, in replacement);
-	io substrer(const int pos1, const int length);
-	//io substrer(const int pos1);
+	   io   fieldstorer(SV sepchar, const int fieldno, const int nfields, in replacement);
+	   io   substrer(const int pos1, const int length);
+//	   io   substrer(const int pos1);
 	// TODO look at using erase to speed up
-	//io substrer(const int startindex1) {this->toString();return this->substrer(startindex1, static_cast<int>(var_str.size()));}
-	//io substrer(const int startindex1) {return this->substrer(startindex1, static_cast<int>(var_str.size()));}
-	io substrer(const int startindex1) {this->assertString(__PRETTY_FUNCTION__);return this->substrer(startindex1, static_cast<int>(var_str.size()));}
+//	   io   substrer(const int startindex1) {this->toString();return this->substrer(startindex1, static_cast<int>(var_str.size()));}
+//	   io   substrer(const int startindex1) {return this->substrer(startindex1, static_cast<int>(var_str.size()));}
+	   io   substrer(const int startindex1) {this->assertString(__PRETTY_FUNCTION__);return this->substrer(startindex1, static_cast<int>(var_str.size()));}
 
-	io converter(SV fromchars, SV tochars);
-	io textconverter(SV fromchars, SV tochars);
-	io replacer(const rex& regex, SV tostr);
-	io replacer(SV fromstr, SV tostr);
-	//io regex_replacer(SV regex, SV replacement, SV regex_options DEFAULT_EMPTY);
+	   io   converter(SV fromchars, SV tochars);
+	   io   textconverter(SV fromchars, SV tochars);
+	   io   replacer(const rex& regex, SV tostr);
+	   io   replacer(SV fromstr, SV tostr);
+//	   io   regex_replacer(SV regex, SV replacement, SV regex_options DEFAULT_EMPTY);
 
-	io uniquer();
-	io sorter(SV sepchar = _FM);
-	io reverser(SV sepchar = _FM);
-	io shuffler(SV sepchar = _FM);
-	io parser(char sepchar = ' ');
+	   io   uniquer();
+	   io   sorter(SV sepchar = _FM);
+	   io   reverser(SV sepchar = _FM);
+	   io   shuffler(SV sepchar = _FM);
+	   io   parser(char sepchar = ' ');
 
 	// OTHER STRING ACCESS
 	//////////////////////
 
-	ND var hash(const std::uint64_t modulus = 0) const;
+	ND var  hash(const std::uint64_t modulus = 0) const;
 
 	ND dim split(SV sepchar = _FM) const;
 
 	// v3 - returns bytes from some byte number upto the first of a given list of bytes
 	// this is something like std::string::find_first_of but doesnt return the delimiter found
-	var substr(const int pos1, in delimiterchars, int& endindex) const;
-	var b(const int pos1, in delimiterchars, int& endindex) const {return substr(pos1, delimiterchars, endindex);}
+	   var  substr(const int pos1, in delimiterchars, int& endindex) const;
+	   var  b(const int pos1, in delimiterchars, int& endindex) const {return substr(pos1, delimiterchars, endindex);}
 
 	// v4 - like v3. was named "remove" in pick. notably used in nlist to print parallel columns
 	// of mixed combinations of multivalues/subvalues and text marks
@@ -581,14 +571,14 @@ public:
 	// startstopindex to after tne end of the string and returns delimiter no 0 NOTE that it
 	// does NOT remove anything from the source string var remove(io pos1, io
 	// delimiterno) const;
-	var substr2(io startstopindex, io delimiterno) const;
-	var b2(io startstopindex, io delimiterno) const {return substr2(startstopindex, delimiterno);}
+	   var  substr2(io startstopindex, io delimiterno) const;
+	   var  b2(io startstopindex, io delimiterno) const {return substr2(startstopindex, delimiterno);}
 
-	ND var field(SV strx, const int fieldnx = 1, const int nfieldsx = 1) const;
+	ND var  field(SV strx, const int fieldnx = 1, const int nfieldsx = 1) const;
 
 	// field2 is a version that treats fieldn -1 as the last field, -2 the penultimate field etc. -
 	// TODO Should probably make field() do this (since -1 is basically an erroneous call) and remove field2
-	ND var field2(SV separator, const int fieldno, const int nfields = 1) const {
+	ND var  field2(SV separator, const int fieldno, const int nfields = 1) const {
 		if (fieldno >= 0) LIKELY
 			return field(separator, fieldno, nfields);
 		return field(separator, this->count(separator) + 1 + fieldno + 1, nfields);
@@ -597,8 +587,8 @@ public:
 	// I/O CONVERSION
 	/////////////////
 
-	ND var oconv(const char* convstr) const;
-	ND var iconv(const char* convstr) const;
+	ND var  oconv(const char* convstr) const;
+	ND var  iconv(const char* convstr) const;
 
 #ifdef EXO_FORMAT
 
@@ -615,7 +605,7 @@ public:
 
 template<class... Args>
 	ND CONSTEXPR
-	var format(EXO_FORMAT_STRING_TYPE1&& fmt_str, Args&&... args) const {
+	   var  format(EXO_FORMAT_STRING_TYPE1&& fmt_str, Args&&... args) const {
 
 //error: call to consteval function 'fmt::basic_format_string<char, exo::var &>
 //::basic_format_string<fmt::basic_format_string<char, const exo::var &>, 0>' is not a constant expression
@@ -644,14 +634,14 @@ template<class... Args>
 	}
 
 	template<class... Args>
-	ND var vformat(SV fmt_str, Args&&... args) const {
+	ND var  vformat(SV fmt_str, Args&&... args) const {
 		return fmt::vformat(fmt_str, fmt::make_format_args(*this, args...) );
 	}
 
 #endif //EXO_FORMAT
 
-	ND var from_codepage(const char* codepage) const;
-	ND var to_codepage(const char* codepage) const;
+	ND var  from_codepage(const char* codepage) const;
+	ND var  to_codepage(const char* codepage) const;
 
 	// CLASSIC MV STRING FUNCTIONS
 	//////////////////////////////
@@ -660,49 +650,49 @@ template<class... Args>
 	// something better it was called replace() in Pick Basic but we are now using "replace()" to
 	// change substrings using regex (similar to the old Pick Basic replace function) its mutator function
 	// is .r()
-//	ND var pickreplace(const int fieldno, const int valueno, const int subvalueno, in replacement) const;
-//	ND var pickreplace(const int fieldno, const int valueno, in replacement) const;
-//	ND var pickreplace(const int fieldno, in replacement) const;
-	ND var pickreplace(const int fieldno, const int valueno, const int subvalueno, in replacement) const {return var(*this).r(fieldno, valueno, subvalueno, replacement);}
-	ND var pickreplace(const int fieldno, const int valueno, in replacement) const {return var(*this).r(fieldno, valueno, 0, replacement);}
-	ND var pickreplace(const int fieldno, in replacement) const {return var(*this).r(fieldno, 0, 0, replacement);}
+//	ND var  pickreplace(const int fieldno, const int valueno, const int subvalueno, in replacement) const;
+//	ND var  pickreplace(const int fieldno, const int valueno, in replacement) const;
+//	ND var  pickreplace(const int fieldno, in replacement) const;
+	ND var  pickreplace(const int fieldno, const int valueno, const int subvalueno, in replacement) const {return var(*this).r(fieldno, valueno, subvalueno, replacement);}
+	ND var  pickreplace(const int fieldno, const int valueno, in replacement) const {return var(*this).r(fieldno, valueno, 0, replacement);}
+	ND var  pickreplace(const int fieldno, in replacement) const {return var(*this).r(fieldno, 0, 0, replacement);}
 
 	// cf mutator inserter()
-	ND var insert(const int fieldno, const int valueno, const int subvalueno, in insertion) const& {return var(*this).inserter(fieldno, valueno, subvalueno, insertion);}
-	ND var insert(const int fieldno, const int valueno, in insertion) const& {return this->insert(fieldno, valueno, 0, insertion);}
-	ND var insert(const int fieldno, in insertion) const& {return this->insert(fieldno, 0, 0, insertion);}
+	ND var  insert(const int fieldno, const int valueno, const int subvalueno, in insertion) const& {return var(*this).inserter(fieldno, valueno, subvalueno, insertion);}
+	ND var  insert(const int fieldno, const int valueno, in insertion) const& {return this->insert(fieldno, valueno, 0, insertion);}
+	ND var  insert(const int fieldno, in insertion) const& {return this->insert(fieldno, 0, 0, insertion);}
 
 	/// remove() was delete() in Pick Basic
-	// var erase(const int fieldno, const int valueno=0, const int subvalueno=0) const;
-	//ND var remove(const int fieldno, const int valueno = 0, const int subvalueno = 0) const;
-	ND var remove(const int fieldno, const int valueno = 0, const int subvalueno = 0) const {return var(*this).remover(fieldno, valueno, subvalueno);}
+	// var  erase(const int fieldno, const int valueno=0, const int subvalueno=0) const;
+//	ND var  remove(const int fieldno, const int valueno = 0, const int subvalueno = 0) const;
+	ND var  remove(const int fieldno, const int valueno = 0, const int subvalueno = 0) const {return var(*this).remover(fieldno, valueno, subvalueno);}
 
 	//.f(...) stands for .attribute(...) or extract(...)
 	// Pick Basic
 	// xxx=yyy<10>";
 	// becomes c++
 	// xxx=yyy.f(10);
-	ND var f(const int fieldno, const int valueno = 0, const int subvalueno = 0) const;
-	ND var extract(const int fieldno, const int valueno = 0, const int subvalueno = 0) const {return this->f(fieldno, valueno, subvalueno);}
+	ND var  f(const int fieldno, const int valueno = 0, const int subvalueno = 0) const;
+	ND var  extract(const int fieldno, const int valueno = 0, const int subvalueno = 0) const {return this->f(fieldno, valueno, subvalueno);}
 
 	// SAME AS ABOVE ON TEMPORARIES
 	///////////////////////////////
 
-	ND io insert(const int fieldno, const int valueno, const int subvalueno, in insertion) && {return this->inserter(fieldno, valueno, subvalueno, insertion);}
-	ND io insert(const int fieldno, const int valueno, in insertion) && {return this->inserter(fieldno, valueno, 0, insertion);}
-	ND io insert(const int fieldno, in insertion) && {return this->inserter(fieldno, 0, 0, insertion);}
+	ND io   insert(const int fieldno, const int valueno, const int subvalueno, in insertion) && {return this->inserter(fieldno, valueno, subvalueno, insertion);}
+	ND io   insert(const int fieldno, const int valueno, in insertion) && {return this->inserter(fieldno, valueno, 0, insertion);}
+	ND io   insert(const int fieldno, in insertion) && {return this->inserter(fieldno, 0, 0, insertion);}
 
 	// MV STRING FILTERS
 	////////////////////
 
-	ND var sum() const;
-	ND var sumall() const;
-	ND var sum(SV sepchar) const;
+	ND var  sum() const;
+	ND var  sumall() const;
+	ND var  sum(SV sepchar) const;
 
 	// binary ops + - * / : on mv strings 10]20]30
 	// e.g. var("10]20]30").mv("+","2]3]4")
 	// result is "12]23]34"
-	ND var mv(const char* opcode, in var2) const;
+	ND var  mv(const char* opcode, in var2) const;
 
 	// MV STRING MUTATORS
 	/////////////////////
@@ -715,20 +705,20 @@ template<class... Args>
 	//  xyz.r(10,"abc");
 
 	// r() is short for replacer() since it is probably the most common var function after a()
-	io r(const int fieldno, const int valueno, const int subvalueno, in replacement);
-	//io r(const int fieldno, const int valueno, in replacement);
-	//io r(const int fieldno, in replacement);
-	io r(const int fieldno, const int valueno, in replacement) {return r(fieldno, valueno, 0, replacement);}
-	io r(const int fieldno, in replacement) {	return r(fieldno, 0, 0, replacement);}
+	   io   r(const int fieldno, const int valueno, const int subvalueno, in replacement);
+//	   io   r(const int fieldno, const int valueno, in replacement);
+//	   io   r(const int fieldno, in replacement);
+	   io   r(const int fieldno, const int valueno, in replacement) {return r(fieldno, valueno, 0, replacement);}
+	   io   r(const int fieldno, in replacement) {	return r(fieldno, 0, 0, replacement);}
 
-	io inserter(const int fieldno, const int valueno, const int subvalueno, in insertion);
-	io inserter(const int fieldno, const int valueno, in insertion) {return this->inserter(fieldno, valueno, 0, insertion);}
-	io inserter(const int fieldno, in insertion) {return this->inserter(fieldno, 0, 0, insertion);}
+	   io   inserter(const int fieldno, const int valueno, const int subvalueno, in insertion);
+	   io   inserter(const int fieldno, const int valueno, in insertion) {return this->inserter(fieldno, valueno, 0, insertion);}
+	   io   inserter(const int fieldno, in insertion) {return this->inserter(fieldno, 0, 0, insertion);}
 
-	// io eraser(const int fieldno, const int valueno=0, const int subvalueno=0);
-	io remover(const int fieldno, const int valueno = 0, const int subvalueno = 0);
+	// io   eraser(const int fieldno, const int valueno=0, const int subvalueno=0);
+	   io   remover(const int fieldno, const int valueno = 0, const int subvalueno = 0);
 	//-er version could be extract and erase in one go
-	// io extracter(int fieldno, int valueno=0, int subvalueno=0) const;
+	// io   extracter(int fieldno, int valueno=0, int subvalueno=0) const;
 
 	// MV STRING LOCATORS
 	/////////////////////
@@ -755,11 +745,11 @@ template<class... Args>
 	//////////////////
 
 	ND bool connect(in conninfo DEFAULT_EMPTY);
-	void disconnect();
-	void disconnectall();
+	   void disconnect();
+	   void disconnectall();
 
 	ND bool attach(in filenames);
-	void detach(in filenames);
+	   void detach(in filenames);
 
 	// var() is a db connection or default connection
 	ND bool begintrans() const;
@@ -826,7 +816,7 @@ template<class... Args>
 
 	// ExoEnv function now to allow access to RECORD ID DICT etc. and call external
 	// functions
-	// var calculate() const;
+	// var  calculate() const;
 
 	ND var  xlate(in filename, in fieldno, const char* mode) const;
 
@@ -836,7 +826,7 @@ template<class... Args>
 	ND bool select(in sortselectclause DEFAULT_EMPTY);
 	   void clearselect();
 
-	//ND bool hasnext() const;
+//	ND bool hasnext() const;
 	ND bool hasnext();
 	ND bool readnext(io key);
 	ND bool readnext(io key, io valueno);
@@ -888,11 +878,11 @@ template<class... Args>
 	ND bool osrmdir(bool evenifnotempty = false) const;
 
 	// TODO check for threadsafe
-	ND var ospid() const;
-	ND var ostid() const;
-	ND var oscwd() const;
+	ND var  ospid() const;
+	ND var  ostid() const;
+	ND var  oscwd() const;
 	ND bool oscwd(in newpath) const;
-	void osflush() const;
+	   void osflush() const;
 
 	// OS SHELL/ENVIRONMENT
 	///////////////////////
@@ -937,7 +927,7 @@ template<class... Args>
 	// MD: Decimal -> Decimal
 	ND std::string oconv_MD(const char* conversion) const;
 	// MR: Character replacement
-	ND io oconv_MR(const char* conversion);
+	ND io   oconv_MR(const char* conversion);
 	// HEX: Chars -> Hex
 	ND std::string oconv_HEX(const int ioratio) const;
 	// TX: Record (FM) -> text (\n) and \ line endings
@@ -945,24 +935,24 @@ template<class... Args>
 
 	// Faster primitive iconv
 	// D: Int <- Date
-	ND var iconv_D(const char* conversion) const;
+	ND var  iconv_D(const char* conversion) const;
 	// MT: Int <- Time
-	ND var iconv_MT() const;
+	ND var  iconv_MT() const;
 	// MD_ Decimal <- Decimal
-	ND var iconv_MD(const char* conversion) const;
+	ND var  iconv_MD(const char* conversion) const;
 	// Chars <- Hex
-	ND var iconv_HEX(const int ioratio) const;
+	ND var  iconv_HEX(const int ioratio) const;
 	// TX: Record (FM) <- text (\n) and \ line endings
-	ND var iconv_TX(const char* conversion) const;
+	ND var  iconv_TX(const char* conversion) const;
 
 	ND std::fstream* osopenx(in osfilename, const char* locale) const;
 
-	bool THIS_IS_OSFILE() const { return ((var_typ & VARTYP_OSFILE) != VARTYP_UNA); }
+	   bool THIS_IS_OSFILE() const { return ((var_typ & VARTYP_OSFILE) != VARTYP_UNA); }
 
 	// Convert _VISIBLE_FMS to _ALL_FMS
 	// In header to perhaps aid runtime string literal conversion for operator""_var
 	// since currently it cannot be constexpr due to var containing a std::string
-	io fmiconverter() {
+	   io   fmiconverter() {
 		for (char& c : this->var_str) {
 			switch (c) {
 				// Most common first to perhaps aid optimisation
@@ -980,7 +970,7 @@ template<class... Args>
 	}
 
 	// Convert _ALL_FMS to _VISIBLE_FMS
-	io fmoconverter() {
+	   io   fmoconverter() {
 		for (char& c : this->var_str) {
 			if (c > RM_ || c > RM_) {
 				switch (c) {
@@ -1036,10 +1026,10 @@ class PUBLIC var_iter {
 	var_iter(in v);
 
 	// Check iter != iter (i.e. iter != string::npos)
-	bool operator!=(const var_iter& vi);
+	   bool operator!=(const var_iter& vi);
 
 	// Convert to var
-	var operator*() const;
+	var  operator*() const;
 
 	// Iter++
 	var_iter operator++();
@@ -1109,7 +1099,7 @@ class PUBLIC var_proxy1 {
 	//  x<1,2,3> = y // Replace field 1, value 2, subvalue 3 (var_proxy3)
 	//  x<-1>    = y // Append a field
 	//
-	void operator=(in replacement) {
+	   void operator=(in replacement) {
 		var_.r(fn_, replacement);
 	}
 
@@ -1162,7 +1152,7 @@ class PUBLIC var_proxy2 {
 		return var_.f(fn_, vn_);
 	}
 
-	void operator=(in replacement) {
+	   void operator=(in replacement) {
 		var_.r(fn_, vn_, replacement);
 	}
 
@@ -1172,11 +1162,11 @@ class PUBLIC var_proxy2 {
 
 	// DONT change deprecation wordng without also changing it in cli/fixdeprecated
 	[[deprecated ("EXODUS: Replace single character accessors like xxx[n] with xxx.at(n)")]]
-	ND var operator[](const int pos1) const {
+	ND var  operator[](const int pos1) const {
 		return this->at(pos1);
 	}
 
-	ND var at(const int pos1) const;
+	ND var  at(const int pos1) const;
 
 }; // class var
 
@@ -1202,7 +1192,7 @@ class PUBLIC var_proxy3 {
 		return var_.f(fn_, vn_, sn_);
 	}
 
-	void operator=(in replacement) {
+	   void operator=(in replacement) {
 		var_.r(fn_, vn_, sn_, replacement);
 	}
 
@@ -1212,11 +1202,11 @@ class PUBLIC var_proxy3 {
 
 	// DONT change deprecation wordng without also changing it in cli/fixdeprecated
 	[[deprecated ("EXODUS: Replace single character accessors like xxx[n] with xxx.at(n)")]]
-	ND var operator[](const int pos1) const {
+	ND var  operator[](const int pos1) const {
 		return this->at(pos1);
 	}
 
-	ND var at(const int pos1) const;
+	ND var  at(const int pos1) const;
 
 };
 
@@ -1280,14 +1270,16 @@ ND inline var_proxy3 var::operator()(int fieldno, int valueno, int subvalueno) {
 /////////////////////
 
 // "abc^def"_var
-PUBLIC var operator""_var(const char* cstr, std::size_t size);
+PUBLIC var  operator""_var(const char* cstr, std::size_t size);
 
 // 123456_var
-PUBLIC var operator""_var(unsigned long long int i);
+PUBLIC var  operator""_var(unsigned long long int i);
 
 // 123.456_var
-PUBLIC var operator""_var(long double d);
+PUBLIC var  operator""_var(long double d);
 
 }  // namespace exo
+
+// clang-format off
 
 #endif //EXODUS_LIBEXODUS_EXODUS_VAR_H_

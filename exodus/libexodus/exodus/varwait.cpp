@@ -312,7 +312,7 @@ static var wait_main(const int argc, const char* argv[], const int wait_time_ms)
 	return events;
 }
 
-var var::oswait(const int milliseconds, SV directory) const {
+var  var::oswait(const int milliseconds, SV directory) const {
 
 //	THISIS("void var::oswait(const int milliseconds, const var directory) const")
 //	// doesnt use *this - should syntax be changed to setcwd? and getcwd()?

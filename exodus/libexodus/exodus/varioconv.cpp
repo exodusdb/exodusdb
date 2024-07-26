@@ -59,9 +59,9 @@ static constexpr int HEX_PER_CHAR = sizeof(char) * 2;
 
 	@return The result in internal format
 */
-var var::iconv(const char* conversion) const {
+var  var::iconv(const char* conversion) const {
 
-	THISIS("var var::iconv(const char* conversion) const")
+	THISIS("var  var::iconv(const char* conversion) const")
 	assertString(function_sig);
 
 	// empty string in, empty string out
@@ -837,9 +837,9 @@ std::string var::oconv_LRC(in format) const {
 }
 */
 
-var var::oconv(const char* conversion_in) const {
+var  var::oconv(const char* conversion_in) const {
 
-	THISIS("var var::oconv(const char* conversion) const")
+	THISIS("var  var::oconv(const char* conversion) const")
 	assertAssigned(function_sig);
 
 	// TODO provide a version that converts numeric vars directly to dates and times
@@ -1183,7 +1183,7 @@ std::string var::oconv_TX(const char* conversion) const {
 	return result.var_str;
 }
 
-var var::iconv_TX(const char* conversion) const {
+var  var::iconv_TX(const char* conversion) const {
 
 	var record = this->var_str;
 	// \ + LF -> VM
@@ -1246,7 +1246,7 @@ std::string var::oconv_HEX([[maybe_unused]] const int ioratio) const {
 		return "";                               \
 	outchar += nybble;
 
-var var::iconv_HEX(const int ioratio) const {
+var  var::iconv_HEX(const int ioratio) const {
 	// ioratio
 	// 2 hex digits to one char
 	// 4 hex digits to one wchar of size 2

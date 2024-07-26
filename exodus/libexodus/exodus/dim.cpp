@@ -562,15 +562,15 @@ bool dim::oswrite(in osfilename, const char* codepage) const {
 
 // no speed or memory advantage since not sorting in place
 // but provided for syntactical convenience avoiding need to assign output of sort()
-io var::sorter(SV sepchar) {
+io   var::sorter(SV sepchar) {
 	(*this) = this->split(sepchar).sort().join(sepchar);
 	return *this;
 }
 
 //sorting var - using temporary dim
-var var::sort(SV sepchar) const& {
+var  var::sort(SV sepchar) const& {
 
-	THISIS("var var::sort(SV sepchar = FM)")
+	THISIS("var  var::sort(SV sepchar = FM)")
 	assertString(function_sig);
 
 	//perhaps is slower but sorts testing var < var linguistically but not natural numbers like 10a 2b
@@ -589,15 +589,15 @@ var var::sort(SV sepchar) const& {
 
 // no speed or memory advantage since not sorting in place
 // but provided for syntactical convenience avoiding need to assign output of reverse()
-io var::reverser(SV sepchar) {
+io   var::reverser(SV sepchar) {
 	(*this) = this->split(sepchar).reverse().join(sepchar);
 	return *this;
 }
 
 //reversing var - using temporary dim
-var var::reverse(SV sepchar) const& {
+var  var::reverse(SV sepchar) const& {
 
-	THISIS("var var::reverse(SV sepchar = FM)")
+	THISIS("var  var::reverse(SV sepchar = FM)")
 	assertString(function_sig);
 
 	//split into a temporary dim array for reversing
@@ -696,14 +696,14 @@ var var::reverse(SV sepchar) const& {
 
 // no speed or memory advantage since not shuffling in place
 // but provided for syntactical convenience avoiding need to assign output of shuffle()
-io var::shuffler(SV sepchar) {
+io   var::shuffler(SV sepchar) {
 	(*this) = this->split(sepchar).shuffler().join(sepchar);
 	return *this;
 }
 
 // no speed or memory advantage since not shuffling in place
 // but provided for syntactical convenience avoiding need to assign output of shuffle()
-var var::shuffle(SV sepchar) const& {
+var  var::shuffle(SV sepchar) const& {
 	return this->split(sepchar).shuffler().join(sepchar);
 }
 

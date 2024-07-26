@@ -188,7 +188,7 @@ static const std::string to_oscmd_string(in cmd) {
 }
 
 // Returns with trailing OSSLASH
-var var::ostempdirpath() const {
+var  var::ostempdirpath() const {
 	std::error_code error_code;
 	//TODO handle error code specifically
 	std::string dirpath = std::string(std::filesystem::temp_directory_path(error_code));
@@ -214,7 +214,7 @@ var var::ostempdirpath() const {
 // and will automatically be fully deleted when the file handle is closed/process terminates.
 //
 
-//var var::ostempfilename() const {
+//var  var::ostempfilename() const {
 //
 //	// Linux immediately unlinks the temporary file so it exists without a name.
 //	// the actual file is automatically deleted from the file system when the file handle is closed/process is closed.
@@ -240,7 +240,7 @@ var var::ostempdirpath() const {
 // This function actually creates a file which must be cleaned up by the caller
 // The filenames are random names
 // TODO is this threadsafe?
-var var::ostempfilename() const {
+var  var::ostempfilename() const {
 
 	//https://cpp.hotexamples.com/examples/-/-/mkstemp/cpp-mkstemp-function-examples.html
 
@@ -268,7 +268,7 @@ var var::ostempfilename() const {
 
 bool var::osshell() const {
 
-	THISIS("var var::osshell() const")
+	THISIS("var  var::osshell() const")
 	// will be checked again by toString()
 	// but put it here so any unassigned error shows in osshell
 	assertString(function_sig);
@@ -288,7 +288,7 @@ bool var::osshell() const {
 
 bool var::osshellread(in oscmd) {
 
-	THISIS("var var::osshellread() const")
+	THISIS("var  var::osshellread() const")
 	// will be checked again by toString()
 	// but put it here so any unassigned error shows in osshell
 	ISSTRING(oscmd)
@@ -333,7 +333,7 @@ bool var::osshellread(in oscmd) {
 
 bool var::osshellwrite(in oscmd) const {
 
-	THISIS("var var::osshellwrite(in oscmd) const")
+	THISIS("var  var::osshellwrite(in oscmd) const")
 	// will be checked again by toString()
 	// but put it here so any unassigned error shows in osshell
 	assertString(function_sig);
@@ -586,7 +586,7 @@ bool var::osread(const char* osfilename, const char* codepage) {
 	return true;
 }
 
-var var::to_codepage(const char* codepage) const {
+var  var::to_codepage(const char* codepage) const {
 
 	THISIS("bool var::to_codepage(const char* codepage) const")
 	assertString(function_sig);
@@ -604,7 +604,7 @@ var var::to_codepage(const char* codepage) const {
 	//	return var_str;
 }
 
-var var::from_codepage(const char* codepage) const {
+var  var::from_codepage(const char* codepage) const {
 
 	THISIS("bool var::from_codepage(const char* codepage) const")
 	assertString(function_sig);
@@ -1105,7 +1105,7 @@ void time_t_to_pick_date_time(time_t time, int* pick_date, int* pick_time);
 //	return system_clock::to_time_t(sctp);
 //}
 
-var var::osinfo(const int mode) const {
+var  var::osinfo(const int mode) const {
 
 	assertString(__PRETTY_FUNCTION__);
 
@@ -1169,18 +1169,18 @@ var var::osinfo(const int mode) const {
 	}
 }
 
-var var::osfile() const {
+var  var::osfile() const {
 	return this->osinfo(1);
 }
 
-var var::osdir() const {
+var  var::osdir() const {
 	return this->osinfo(2);
 }
 
 // old slower implementation using std::filesystem
-//var var::osdir() const {
+//var  var::osdir() const {
 //
-//	THISIS("var var::osdir() const")
+//	THISIS("var  var::osdir() const")
 //	assertString(function_sig);
 //
 //	// get a handle and return "" if doesnt exist or is NOT a directory
@@ -1221,11 +1221,11 @@ var var::osdir() const {
 //	}
 //}
 
-var var::oslistf(SV globpattern) const {
+var  var::oslistf(SV globpattern) const {
 	return this->oslist(globpattern, 1);
 }
 
-var var::oslistd(SV globpattern) const {
+var  var::oslistd(SV globpattern) const {
 	return this->oslist(globpattern, 2);
 }
 
@@ -1235,9 +1235,9 @@ var var::oslistd(SV globpattern) const {
 *@param	mode	1=files only, 2=directories only, otherwise both.
 *@returns		List of directory and/or filenames depending on mode. fm separator
 */
-var var::oslist(SV globpattern0, const int mode) const {
+var  var::oslist(SV globpattern0, const int mode) const {
 
-	THISIS("var var::oslist(in globpattern, const int mode) const")
+	THISIS("var  var::oslist(in globpattern, const int mode) const")
 	assertDefined(function_sig);
 	//ISSTRING(path0)
 	//ISSTRING(globpattern0)
@@ -1328,7 +1328,7 @@ var var::oslist(SV globpattern0, const int mode) const {
 
 bool var::oscwd(in newpath) const {
 
-	THISIS("var var::oscwd(const char* newpath) const")
+	THISIS("var  var::oscwd(const char* newpath) const")
 	// doesnt use *this - should syntax be changed to setcwd? and getcwd()?
 	assertDefined(function_sig);	 // not needed if *this not used
 	ISSTRING(newpath)
@@ -1346,9 +1346,9 @@ bool var::oscwd(in newpath) const {
 	return true;
 }
 
-var var::oscwd() const {
+var  var::oscwd() const {
 
-	THISIS("var var::oscwd() const")
+	THISIS("var  var::oscwd() const")
 	// doesnt use *this - should syntax be changed to ossetcwd? and osgetcwd()?
 	assertDefined(function_sig);	 // not needed if *this not used
 

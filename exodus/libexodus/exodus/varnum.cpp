@@ -731,7 +731,7 @@ template<> PUBLIC double VARBASE1::toDouble() const {
 // var::round
 /////////////
 
-var var::round(const int ndecimals) const {
+var  var::round(const int ndecimals) const {
 
 /*
 	"Round half away from zero" or "Commercial rounding"
@@ -908,7 +908,7 @@ var var::round(const int ndecimals) const {
 
 // function name is "integer" instead of "int" because int is a reserved word in c/c++ for int datatype
 // using the system int() function on a var e.g. int(varx) returns an int whereas this function returns a var
-var var::integer() const {
+var  var::integer() const {
 
     //-1.0 = -1
 
@@ -932,7 +932,7 @@ var var::integer() const {
 // var::floor
 /////////////
 
-var var::floor() const {
+var  var::floor() const {
 
 	// Goes to the closest integer towards negative infinity
 

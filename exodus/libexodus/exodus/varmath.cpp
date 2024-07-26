@@ -103,7 +103,7 @@ static varint_t exodusmodulo_int(const varint_t dividend, const varint_t limit) 
 
 template<> PUBLIC RETVAR VARBASE1::mod(CBX limit) const {
 
-	THISIS("var var::mod(in limit) const")
+	THISIS("var  var::mod(in limit) const")
 	assertNumeric(function_sig);
 	ISNUMERIC(limit)
 
@@ -136,7 +136,7 @@ mod_doubles:
 
 template<> PUBLIC RETVAR VARBASE1::mod(double limit) const {
 
-	THISIS("var var::mod(double limit) const")
+	THISIS("var  var::mod(double limit) const")
 	assertNumeric(function_sig);
 
 	// ensure double dividend
@@ -152,7 +152,7 @@ template<> PUBLIC RETVAR VARBASE1::mod(double limit) const {
 
 template<> PUBLIC RETVAR VARBASE1::mod(const int limit) const {
 
-	THISIS("var var::mod(const int limit) const")
+	THISIS("var  var::mod(const int limit) const")
 	assertNumeric(function_sig);
 
 	// prefer double dividend
@@ -169,9 +169,9 @@ template<> PUBLIC RETVAR VARBASE1::mod(const int limit) const {
 	var loge() const;
 */
 
-var var::abs() const {
+var  var::abs() const {
 
-	THISIS("var var::abs() const")
+	THISIS("var  var::abs() const")
 	assertNumeric(function_sig);
 
 	// prefer double
@@ -186,9 +186,9 @@ var var::abs() const {
 	}
 }
 
-var var::sin() const {
+var  var::sin() const {
 
-	THISIS("var var::sin() const")
+	THISIS("var  var::sin() const")
 	assertNumeric(function_sig);
 
 	// prefer double
@@ -198,9 +198,9 @@ var var::sin() const {
 		return std::sin(static_cast<double>(var_int) * M_PI / 180);
 }
 
-var var::cos() const {
+var  var::cos() const {
 
-	THISIS("var var::cos() const")
+	THISIS("var  var::cos() const")
 	assertNumeric(function_sig);
 
 	// prefer double
@@ -210,9 +210,9 @@ var var::cos() const {
 		return std::cos(static_cast<double>(var_int) * M_PI / 180);
 }
 
-var var::tan() const {
+var  var::tan() const {
 
-	THISIS("var var::tan() const")
+	THISIS("var  var::tan() const")
 	assertNumeric(function_sig);
 
 	// prefer double
@@ -222,9 +222,9 @@ var var::tan() const {
 		return std::tan(static_cast<double>(var_int) * M_PI / 180);
 }
 
-var var::atan() const {
+var  var::atan() const {
 
-	THISIS("var var::atan() const")
+	THISIS("var  var::atan() const")
 	assertNumeric(function_sig);
 
 	// prefer double
@@ -234,9 +234,9 @@ var var::atan() const {
 		return std::atan(static_cast<double>(var_int)) / M_PI * 180;
 }
 
-var var::loge() const {
+var  var::loge() const {
 
-	THISIS("var var::loge() const")
+	THISIS("var  var::loge() const")
 	assertNumeric(function_sig);
 
 	// prefer double
@@ -246,9 +246,9 @@ var var::loge() const {
 		return std::log(static_cast<double>(var_int));
 }
 
-var var::sqrt() const {
+var  var::sqrt() const {
 
-	THISIS("var var::sqrt() const")
+	THISIS("var  var::sqrt() const")
 	assertNumeric(function_sig);
 
 	// prefer double
@@ -259,9 +259,9 @@ var var::sqrt() const {
 	return std::sqrt(static_cast<double>(var_int));
 }
 
-var var::pwr(in exponent) const {
+var  var::pwr(in exponent) const {
 
-	THISIS("var var::pwr(in exponent) const")
+	THISIS("var  var::pwr(in exponent) const")
 	assertNumeric(function_sig);
 	ISNUMERIC(exponent)
 
@@ -272,9 +272,9 @@ var var::pwr(in exponent) const {
 		return std::pow(static_cast<double>(var_int), exponent.toDouble());
 }
 
-var var::exp() const {
+var  var::exp() const {
 
-	THISIS("var var::exp() const")
+	THISIS("var  var::exp() const")
 	assertNumeric(function_sig);
 
 	// prefer double

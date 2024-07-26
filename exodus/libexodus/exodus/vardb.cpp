@@ -1673,9 +1673,9 @@ bool var::read(in filehandle, in key) {
 	return true;
 }
 
-var var::hash(const std::uint64_t modulus) const {
+var  var::hash(const std::uint64_t modulus) const {
 
-	THISIS("var var::hash() const")
+	THISIS("var  var::hash() const")
 	assertDefined(function_sig);
 	assertString(function_sig);
 	// ISNUMERIC(modulus)
@@ -1710,7 +1710,7 @@ var var::hash(const std::uint64_t modulus) const {
 // 1  - Success
 // "" - Failure - already locked and not in a transaction
 // 2  - Success - already locked and in a transaction
-var var::lock(in key) const {
+var  var::lock(in key) const {
 
 	// on postgres, repeated locks for the same thing (from the same connection) succeed and
 	// stack up they need the same number of unlocks (from the same connection) before other
@@ -1718,7 +1718,7 @@ var var::lock(in key) const {
 	// false if you dont have the lock NB return "" if ALREADY locked on this connection
 
 
-	THISIS("var var::lock(in key) const")
+	THISIS("var  var::lock(in key) const")
 	assertDefined(function_sig);
 	ISSTRING(key)
 
@@ -5493,9 +5493,9 @@ bool var::deleteindex(in fieldname0) const {
 	return this->sqlexec(sql);
 }
 
-var var::listfiles() const {
+var  var::listfiles() const {
 
-	THISIS("var var::listfiles() const")
+	THISIS("var  var::listfiles() const")
 	assertDefined(function_sig);
 
 	// from http://www.alberton.info/postgresql_meta_info.html
@@ -5537,9 +5537,9 @@ var var::listfiles() const {
 	return filenames;
 }
 
-var var::dblist() const {
+var  var::dblist() const {
 
-	THISIS("var var::dblist() const")
+	THISIS("var  var::dblist() const")
 	assertDefined(function_sig);
 
 	var sql = "SELECT datname FROM pg_database";
@@ -5601,9 +5601,9 @@ bool var::cursorexists() {
 	return PQntuples(dbresult) > 0;
 }
 
-var var::listindex(in filename0, in fieldname0) const {
+var  var::listindex(in filename0, in fieldname0) const {
 
-	THISIS("var var::listindex(in filename) const")
+	THISIS("var  var::listindex(in filename) const")
 	// could allow undefined usage since *this isnt used?
 	assertDefined(function_sig);
 	ISSTRING(filename0)
@@ -5668,9 +5668,9 @@ var var::listindex(in filename0, in fieldname0) const {
 	return result;
 }
 
-var var::reccount(in filename0) const {
+var  var::reccount(in filename0) const {
 
-	THISIS("var var::reccount(in filename_or_handle_or_null) const")
+	THISIS("var  var::reccount(in filename_or_handle_or_null) const")
 	// could allow undefined usage since *this isnt used?
 	assertDefined(function_sig);
 	ISSTRING(filename0)
@@ -5704,9 +5704,9 @@ var var::reccount(in filename0) const {
 	return reccount;
 }
 
-var var::flushindex(in filename) const {
+var  var::flushindex(in filename) const {
 
-	THISIS("var var::flushindex(in filename=) const")
+	THISIS("var  var::flushindex(in filename=) const")
 	// could allow undefined usage since *this isnt used?
 	assertDefined(function_sig);
 	ISSTRING(filename)
@@ -5736,7 +5736,7 @@ var var::flushindex(in filename) const {
 	return flushresult;
 }
 
-var var::setlasterror(in msg) const {
+var  var::setlasterror(in msg) const {
 	// no checking for speed
 	// THISIS("void var::lasterror(in msg")
 	// ISSTRING(msg)
@@ -5755,12 +5755,12 @@ var var::setlasterror(in msg) const {
 	return lasterror();
 }
 
-var var::lasterror() const {
+var  var::lasterror() const {
 	//TRACE(thread_file_handles.size());
 	return thread_lasterror;
 }
 
-var var::loglasterror(in source) const {
+var  var::loglasterror(in source) const {
 	return thread_lasterror.logputl(source ^ " ");
 }
 

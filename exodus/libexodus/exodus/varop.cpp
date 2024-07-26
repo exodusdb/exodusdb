@@ -316,13 +316,13 @@ tryagain:
 
 //Forward to var_base
 
-var var::operator++(int) & {
+var  var::operator++(int) & {
 	var orig = this->clone();
 	var_base::operator++();
 	return orig;
 }
 
-var var::operator--(int) & {
+var  var::operator--(int) & {
 	var orig = this->clone();
 	var_base::operator--(0);
 	return orig;

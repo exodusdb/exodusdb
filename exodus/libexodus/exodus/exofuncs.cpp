@@ -58,7 +58,7 @@ THE SOFTWARE.
 
 namespace exo {
 
-//ND PUBLIC var var::format(SV format_str) const {
+//ND PUBLIC var  var::format(SV format_str) const {
 //	return vformat(format_str,*this);
 //}
 

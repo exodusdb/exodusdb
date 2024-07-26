@@ -305,12 +305,12 @@ static REGEX& get_regex_engine(SV regex, SV regex_options) {
 ////////
 
 // should be in mvfuncs.cpp - here really because boost regex is included here for file matching
-var var::match(SV regex, SV regex_options) const {
+var  var::match(SV regex, SV regex_options) const {
 
 	// VISUALISE REGULAR EXPRESSIONS GRAPHICALLY
 	// https:www.debuggex.com
 
-	THISIS("var var::match(SV regex, SV regex_options) const")
+	THISIS("var  var::match(SV regex, SV regex_options) const")
 	assertString(function_sig);
 	//ISSTRING(regex)
 
@@ -423,9 +423,9 @@ var var::match(SV regex, SV regex_options) const {
 /////////
 
 // should be in mvfuncs.cpp - here really because boost regex is included here for file matching
-var var::search(SV regex, io startchar1, SV regex_options) const {
+var  var::search(SV regex, io startchar1, SV regex_options) const {
 
-	THISIS("var var::search(SV regex, int startchar1, SV regex_options) const")
+	THISIS("var  var::search(SV regex, int startchar1, SV regex_options) const")
 	assertString(function_sig);
 
 	// Note that option f - first only is deliberately not implemented in search
@@ -570,16 +570,16 @@ var var::search(SV regex, io startchar1, SV regex_options) const {
 // Simple non-regex case sensitive substr replacement
 
 // constant
-var var::replace(SV what, SV with) const& {
+var  var::replace(SV what, SV with) const& {
 
 	//return this->clone().replacer(what, with);}
 	return boost::algorithm::replace_all_copy(var_str, what, with);
 }
 
 // mutator
-io var::replacer(SV what, SV with) {
+io   var::replacer(SV what, SV with) {
 
-	THISIS("io var::replacer(SV what, SV with)")
+	THISIS("io   var::replacer(SV what, SV with)")
 	assertStringMutator(function_sig);
 
 	// nothing to do if oldstr is ""
@@ -598,15 +598,15 @@ io var::replacer(SV what, SV with) {
 // only here really because boost regex is included here for file matching
 
 // mutator
-io var::replacer(const rex& regex, SV replacement) {
+io   var::replacer(const rex& regex, SV replacement) {
 	*this = this->replace(regex, replacement);
 	return *this;
 }
 
 // const
-var var::replace(const rex& regex, SV replacement) const& {
+var  var::replace(const rex& regex, SV replacement) const& {
 
-	THISIS("var var::replace(const rex& regex, SV replacement) const")
+	THISIS("var  var::replace(const rex& regex, SV replacement) const")
 	assertString(function_sig);
 
 	// http://www.boost.org/doc/libs/1_38_0/libs/regex/doc/html/boost_regex/syntax/basic_syntax.html
@@ -675,9 +675,9 @@ var var::replace(const rex& regex, SV replacement) const& {
 ///////////
 
 // regular expressions for ICONV_MT
-// var var::iconv_MT(const char* conversion) const
-var var::iconv_MT() const {
-	//THISIS("var var::iconv_MT() const")
+// var  var::iconv_MT(const char* conversion) const
+var  var::iconv_MT() const {
+	//THISIS("var  var::iconv_MT() const")
 	//assertString(function_sig);
 	// ignore everything else and just get first three groups of digits "99 99 99"
 	// remove leading and trailing non-digits and replace internal strings of non-digits with
@@ -715,8 +715,8 @@ var var::iconv_MT() const {
 ///////////
 
 // regular expressions for ICONV_MC
-io var::oconv_MR(const char* conversion) {
-	//THISIS("io var::oconv_MR(const char* conversionchar)")
+io   var::oconv_MR(const char* conversion) {
+	//THISIS("io   var::oconv_MR(const char* conversionchar)")
 	//assertString(function_sig);
 	// conversionchar arrives pointing to 3rd character (eg A in MCA)
 
