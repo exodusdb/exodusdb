@@ -40,9 +40,9 @@ namespace exo {
 /////////
 
 //warning put() is not threadsafe whereas output(), errput() and logput() are threadsafe
-CVR var::put(std::ostream& ostream1) const {
+CVR  var::put(std::ostream& ostream1) const {
 
-	THISIS("CVR var::put(std::ostream& ostream1) const")
+	THISIS("CVR  var::put(std::ostream& ostream1) const")
 	assertString(function_sig);
 
 	// prevent output to cout suppressing output to cout (by non-exodus routines)
@@ -64,14 +64,14 @@ CVR var::put(std::ostream& ostream1) const {
 ///////////////////////////////////////////////////
 
 // output() buffered threadsafe output to standard output
-CVR var::output() const {
+CVR  var::output() const {
 	LOCKIOSTREAM_OR_NOT
 	return this->put(std::cout);
 }
 
 // outputl() flushed threadsafe output to standard output
 // adds \n and flushes so is slower than output("\n")
-CVR var::outputl() const {
+CVR  var::outputl() const {
 	LOCKIOSTREAM_OR_NOT
 	this->put(std::cout);
 	std::cout << std::endl;
@@ -80,7 +80,7 @@ CVR var::outputl() const {
 
 // outputt() buffered threadsafe output to standard output
 // adds \t
-CVR var::outputt() const {
+CVR  var::outputt() const {
 	LOCKIOSTREAM_OR_NOT
 	this->put(std::cout);
 	std::cout << '\t';
@@ -88,14 +88,14 @@ CVR var::outputt() const {
 }
 
 // overloaded output() outputs a prefix str
-CVR var::output(in str) const {
+CVR  var::output(in str) const {
 	LOCKIOSTREAM_OR_NOT
 	str.put(std::cout);
 	return this->put(std::cout);
 }
 
 // oveloaded outputl() outputs a prefix str
-CVR var::outputl(in str) const {
+CVR  var::outputl(in str) const {
 	LOCKIOSTREAM_OR_NOT
 	str.put(std::cout);
 	this->put(std::cout);
@@ -104,7 +104,7 @@ CVR var::outputl(in str) const {
 }
 
 // overloaded outputt() outputs a prefix str
-CVR var::outputt(in str) const {
+CVR  var::outputt(in str) const {
 	LOCKIOSTREAM_OR_NOT
 	std::cout << "\t";
 	str.put(std::cout);
@@ -117,7 +117,7 @@ CVR var::outputt(in str) const {
 ////////////////////////////////////////////////////
 
 // errput() unbuffered threadsafe output to standard error
-CVR var::errput() const {
+CVR  var::errput() const {
 	LOCKIOSTREAM_OR_NOT
 	//return put(std::cerr);
 	std::cerr << *this;
@@ -126,7 +126,7 @@ CVR var::errput() const {
 
 // errputl() unbuffered threadsafe output to standard error
 // adds "\n"
-CVR var::errputl() const {
+CVR  var::errputl() const {
 	LOCKIOSTREAM_OR_NOT
 	//this->put(std::cerr);
 	std::cerr << *this;
@@ -135,7 +135,7 @@ CVR var::errputl() const {
 }
 
 // overloaded errput outputs a prefix str
-CVR var::errput(in str) const {
+CVR  var::errput(in str) const {
 	LOCKIOSTREAM_OR_NOT
 	//str.put(std::cerr);
 	//return this->put(std::cerr);
@@ -145,7 +145,7 @@ CVR var::errput(in str) const {
 }
 
 // overloaded errputl outputs a prefix str
-CVR var::errputl(in str) const {
+CVR  var::errputl(in str) const {
 	LOCKIOSTREAM_OR_NOT
 	//str.put(std::cerr);
 	//this->put(std::cerr);
@@ -159,7 +159,7 @@ CVR var::errputl(in str) const {
 ///////////////////////////////////////////////////////////////////////////
 
 // logput() buffered threadsafe output to standard log
-CVR var::logput() const {
+CVR  var::logput() const {
 	LOCKIOSTREAM_OR_NOT
 	//this->put(std::clog);
 	std::clog << *this;
@@ -168,7 +168,7 @@ CVR var::logput() const {
 }
 
 // logputl() flushed threadsafe output to standard log
-CVR var::logputl() const {
+CVR  var::logputl() const {
 	LOCKIOSTREAM_OR_NOT
 	//this->put(std::clog);
 	std::clog << *this;
@@ -177,7 +177,7 @@ CVR var::logputl() const {
 }
 
 // overloaded logput with a prefix str
-CVR var::logput(in str) const {
+CVR  var::logput(in str) const {
 	LOCKIOSTREAM_OR_NOT
 	//str.put(std::clog);
 	std::clog << str;
@@ -186,7 +186,7 @@ CVR var::logput(in str) const {
 }
 
 // overloaded logputl with a prefix str
-CVR var::logputl(in str) const {
+CVR  var::logputl(in str) const {
 	LOCKIOSTREAM_OR_NOT
 	//str.put(std::clog);
 	//this->put(std::clog);

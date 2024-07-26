@@ -235,7 +235,7 @@ auto get_timeacno(const std::string_view arg1) -> int {
 	else if ((arg1 == "void var::initrnd() const")) acno = 144;
 	else if ((arg1 == "bool var::osgetenv(const char* envcode)")) acno = 145;
 	else if ((arg1 == "bool var::ossetenv(const char* envcode) const")) acno = 146;
-	else if ((arg1 == "CVR var::put(std::ostream& ostream1) const")) acno = 147;
+	else if ((arg1 == "CVR  var::put(std::ostream& ostream1) const")) acno = 147;
 	else if ((arg1 == "var  var::match(SV regex, SV regex_options) const")) acno = 148;
 	else if ((arg1 == "io   var::replacer(SV what, SV with)")) acno = 149;
 	else if ((arg1 == "var  var::replace(const rex& regex, SV replacement) const")) acno = 150;
@@ -274,7 +274,7 @@ auto get_timeacno(const std::string_view arg1) -> int {
 	else if ((arg1 == "io   var::quoter()")) acno = 183;
 	else if ((arg1 == "io   var::squoter()")) acno = 184;
 	else if ((arg1 == "io   var::unquoter()")) acno = 185;
-	else if ((arg1 == "CVR var::swap(in var2) const")) acno = 186;
+	else if ((arg1 == "CVR  var::swap(in var2) const")) acno = 186;
 	else if ((arg1 == "io   var::swap(io var2)")) acno = 187;
 	else if ((arg1 == "var  var::textwidth() const")) acno = 188;
 	else if ((arg1 == "var  var::first() const")) acno = 189;

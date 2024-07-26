@@ -1245,7 +1245,7 @@ template<> PUBLIC VBR1 VARBASE1::move(VBX tovar) {
 // const version needed in calculatex
 template<> PUBLIC CBR VARBASE1::swap(CBX var2) const {
 
-	THISIS("CVR var::swap(in var2) const")
+	THISIS("CVR  var::swap(in var2) const")
 	// Works on unassigned vars
 	assertDefined(function_sig);
 	ISDEFINED(var2)

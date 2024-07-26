@@ -144,7 +144,7 @@
 643 void var::initrnd() const 
 644 bool var::osgetenv(const char* envcode) 
 645 bool var::ossetenv(const char* envcode) const 
-646 CVR var::put(std::ostream& ostream1) const 
+646 CVR  var::put(std::ostream& ostream1) const 
 647 var  var::match(SV regex, SV regex_options) const 
 648 io   var::replacer(SV what, SV with) 
 649 var  var::replace(const rex& regex, SV replacement) const 
@@ -183,7 +183,7 @@
 682 io   var::quoter() 
 683 io   var::squoter() 
 684 io   var::unquoter() 
-685 CVR var::swap(in var2) const 
+685 CVR  var::swap(in var2) const 
 686 io   var::swap(io var2) 
 687 var  var::textwidth() const 
 688 var  var::first() const 
