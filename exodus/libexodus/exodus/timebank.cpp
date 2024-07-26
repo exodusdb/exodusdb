@@ -58,7 +58,8 @@ TimeBank::~TimeBank() {
 			// Print column headings
 			if (naccs++ == 0) {
 				std::cout << std::endl;
-				std::cerr << "A/c.       n      ms   ms/op        μs     μs/op          ns       ns/op name" << std::endl;
+//				std::cerr << "A/c.       n      ms   ms/op        μs     μs/op          ns       ns/op name" << std::endl;
+				std::cerr << "A/c.       n      ms = ms/op        μs   = μs/op          ns     = ns/op  Account" << std::endl;
 			}
 
 			// Print a row
@@ -94,7 +95,7 @@ TimeBank::~TimeBank() {
 
 			//ns/op
 			<< std::right << std::setw(12)
-			<< ns/count << " "
+			<< ns/count << "  "
 
 			// timeacc name
 			<< timeacc_names_[time_acno]
