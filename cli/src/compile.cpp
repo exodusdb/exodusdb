@@ -49,6 +49,7 @@ programinit()
 	var exodus_include_dir_info = "";
 	var exodus_libfile1_info = "";
 	var exodus_libfile2_info = "";
+	var exodus_libfile3_info = "";
 	var nasterisks = 0;
 
 	//.def file is one way on msvc to force library function names to be "undecorated"
@@ -323,7 +324,7 @@ function main() {
 
 		// Precompiled modules need -f ... var.pcm and -l ... libexovar.so
 #if EXO_MODULE
-		linkoptions ^= " -lexovar -lstd";
+		linkoptions ^= " -lexovar -lexoprog -lstd";
 #endif
 
 		// Mandatory c++ library and file system library
@@ -393,8 +394,10 @@ function main() {
 		basicoptions ^= " -DEXO_MODULE=1";
 
 		// Add path to var and std modules
+		// std exovar exoprog
 		basicoptions ^= " -fmodule-file=var=/usr/local/lib/var.pcm";
 		basicoptions ^= " -fmodule-file=std=/usr/local/lib/std.pcm";
+		basicoptions ^= " -fmodule-file=exoprog=/usr/local/lib/exoprog.pcm";
 #endif
 		if (color_option)
 			basicoptions ^= " -fdiagnostics-color=always";
@@ -553,6 +556,7 @@ function main() {
 		// TODO Dont hard code for typical Ubuntu
 		exodus_libfile1_info = osfile("/usr/local/lib/libexodus.so");
 		exodus_libfile2_info = osfile("/usr/local/lib/libexovar.so");
+		exodus_libfile3_info = osfile("/usr/local/lib/libexovar.so");
 		exodus_include_dir_info = osdir("/usr/local/include/exodus");
 
 	} else {
@@ -1544,6 +1548,7 @@ function main() {
 				and is_newer(outfileinfo, exodus_include_dir_info)
 				and is_newer(outfileinfo, exodus_libfile1_info)
 				and is_newer(outfileinfo, exodus_libfile2_info)
+				and is_newer(outfileinfo, exodus_libfile3_info)
 				) {
 
 				// Recompile is required if any include file is younger than the current output binary

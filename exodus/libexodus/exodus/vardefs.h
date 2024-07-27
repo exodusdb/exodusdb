@@ -3,6 +3,9 @@
 
 #define BACKTRACE_MAXADDRESSES 100
 
+#define DUMPDEFINE(x) DUMPDEFINE0(x)
+#define DUMPDEFINE0(x) #x
+
 namespace exo {
 	using VAR    =       exo::var;
 	using VARREF =       exo::var&;
@@ -97,7 +100,13 @@ namespace exo {
 #define DEFAULT_VM = VM_
 #define DEFAULT_NULL = nullptr
 
+// [[nodiscard]]
+//
+#define ND [[nodiscard]]
+
 #define EXO_REGEX_BOOST
+
+#define PUBLIC __attribute__((visibility("default")))
 
 #endif //EXO_VARDEFS_H
 

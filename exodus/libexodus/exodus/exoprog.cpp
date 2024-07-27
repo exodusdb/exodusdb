@@ -5,6 +5,7 @@
 #endif
 
 #include <exodus/exoprog.h>
+#include <exodus/exocallable.h>
 
 #include <exodus/exoimpl.h>
 

@@ -688,21 +688,21 @@ void logput(const Printable&... values) {
 
 // printl(void) to cout
 
-void printl(void) {
+inline void printl(void) {
 	LOCKIOSTREAM_SLOW
 	std::cout << std::endl;
 }
 
 // errputl(void) to cerr
 
-void errputl(void) {
+inline void errputl(void) {
 	LOCKIOSTREAM_SLOW
 	std::cerr << std::endl;
 }
 
 // logputl(void) to clog
 
-void logputl(void) {
+inline void logputl(void) {
 	LOCKIOSTREAM_FAST
 	std::clog << std::endl;
 }

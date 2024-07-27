@@ -38,6 +38,8 @@ THE SOFTWARE.
 //#include <vector>
 //#define eq ==
 
+#include <version> // Only for __cpp_lib_constexpr_string >= 201907L TODO remove
+
 #if EXO_MODULE
 	import std;
 
@@ -187,6 +189,10 @@ namespace exo {
 	// 21 some c++23
 	// 23 c++23
 	// 24 some c++26
+
+
+//#pragma message "CONSTINIT_OR_CONSTEXPR == " DUMPDEFINE(CONSTINIT_OR_CONSTEXPR)
+
 	PUBLIC inline CONSTINIT_OR_CONSTEXPR auto _CPP_STANDARD=__cplusplus / 100 % 1000;
 
 #if defined(_WIN64) or defined(_LP64)

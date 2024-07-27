@@ -73,6 +73,7 @@ THE SOFTWARE.
 #undef function
 #undef subroutine
 #undef subroutine_noreturn
+
 #define function public: var
 #define subroutine public: void
 #define subroutine_noreturn public: [[noreturn]] void

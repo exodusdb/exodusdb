@@ -35,15 +35,23 @@ THE SOFTWARE.
 #	include <exodus/dim.h>
 #	include <exodus/rex.h>
 #endif
+
 #include <exodus/vardefs.h>
 
-#include <exodus/exoimpl.h>
-#include <exodus/exocallable.h>
-#include <exodus/exoprog.h>
+#if EXO_MODULE
+	import exoprog;
+#else
+#	include <exodus/exoimpl.h>
+#	include <exodus/exoprog.h>
+#	include <exodus/exocallable.h>
+#	include <exodus/exofuncs.h>
+#	include <exodus/range.h>
+#endif
 
-#include <exodus/exofuncs.h>
+#include <exodus/program.h>
+#include <exodus/library.h>
+#include <exodus/common.h>
 #include <exodus/exomacros.h>
-#include <exodus/range.h>
 
 // It usually poor practice to "pollute" the global space of the header user
 // but in this case the header user is an exodus application programmer

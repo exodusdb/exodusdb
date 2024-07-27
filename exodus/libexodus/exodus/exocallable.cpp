@@ -54,8 +54,8 @@ constexpr int TRACING = 0;
 #	include <string>
 #endif
 
-#include <exodus/exocallable.h>
 #include <exodus/exoenv.h>
+#include <exodus/exocallable.h>
 
 //////////
 // WINDOWS

@@ -8,7 +8,11 @@
 //import var;
 //#include <exodus/var.h>
 
-#include <exodus/exoprog.h>
+#if EXO_MODULE
+	import exoprog;
+#else
+#	include <exodus/exoprog.h>
+#endif
 
 namespace exo {
 

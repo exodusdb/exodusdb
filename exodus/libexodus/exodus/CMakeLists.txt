@@ -211,6 +211,27 @@
 		target_link_libraries(exovar fmt::fmt)
 	endif()
 #
+# module?
+# #######
+#
+	if (EXO_MODULE)
+		add_library(exoprog)
+		target_include_directories(exoprog PRIVATE ${PostgreSQL_INCLUDE_DIRS} ${BOOST_INCLUDE_DIR})
+		target_include_directories(exoprog PRIVATE ${FMT_INCLUDE})
+		#target_include_directories(exoprog PRIVATE exodus/include)
+		#target_compile_features(exoprog PUBLIC cxx_std_23)
+		target_sources(exoprog
+			PUBLIC
+			FILE_SET modules_public
+			TYPE CXX_MODULES
+			FILES
+				exoprog.cppm
+		)
+		target_link_libraries(exoprog std)
+		target_link_libraries(exoprog exovar)
+#		target_link_libraries(exovar fmt::fmt)
+	endif()
+#
 # libexodus source
 ##################
 #
@@ -269,6 +290,7 @@
 	if (EXO_MODULE)
 		target_link_libraries(exodus
 			exovar
+			exoprog
 		)
 	endif()
 
@@ -317,7 +339,7 @@
 
 	if (EXO_MODULE)
 		install(
-			TARGETS exovar std
+			TARGETS std exovar exoprog
 			DESTINATION lib
 		)
 	endif()

@@ -30,8 +30,12 @@ THE SOFTWARE.
 #	include <map>
 #endif
 
-#include <exodus/exoimpl.h>
-#include <exodus/exocallable.h>
+#if EXO_MODULE
+	import var;
+#else
+#	include <exodus/exoimpl.h>
+#	include <exodus/exocallable.h>
+#endif
 #include <exodus/vardefs.h>
 
 namespace exo {
