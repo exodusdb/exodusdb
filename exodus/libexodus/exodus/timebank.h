@@ -236,7 +236,7 @@ auto get_timeacno(const std::string_view arg1) -> int {
 	else if ((arg1 == "bool var::osgetenv(const char* envcode)")) acno = 145;
 	else if ((arg1 == "bool var::ossetenv(const char* envcode) const")) acno = 146;
 	else if ((arg1 == "CVR  var::put(std::ostream& ostream1) const")) acno = 147;
-	else if ((arg1 == "var  var::match(SV regex, SV regex_options) const")) acno = 148;
+	else if ((arg1 == "var  var::match(SV regex_str, SV regex_options) const")) acno = 148;
 	else if ((arg1 == "io   var::replacer(SV what, SV with)")) acno = 149;
 	else if ((arg1 == "var  var::replace(const rex& regex, SV replacement) const")) acno = 150;
 	else if ((arg1 == "var  var::field(SV separatorx, const int fieldnx, const int nfieldsx) const")) acno = 151;
@@ -281,7 +281,7 @@ auto get_timeacno(const std::string_view arg1) -> int {
 	else if ((arg1 == "var  var::last() const")) acno = 190;
 	else if ((arg1 == "io   var::firster()")) acno = 191;
 	else if ((arg1 == "io   var::laster()")) acno = 192;
-	else if ((arg1 == "var  var::search(SV regex, int startchar1, SV regex_options) const")) acno = 193;
+	else if ((arg1 == "var  var::search(SV regex_str, int startchar1, SV regex_options) const")) acno = 193;
 	else if ((arg1 == "std::wstring var::to_wstring() const")) acno = 194;
 	else if ((arg1 == "const char* var::c_str() const")) acno = 195;
 

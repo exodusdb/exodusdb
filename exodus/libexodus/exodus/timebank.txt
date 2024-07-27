@@ -145,7 +145,7 @@
 644 bool var::osgetenv(const char* envcode) 
 645 bool var::ossetenv(const char* envcode) const 
 646 CVR  var::put(std::ostream& ostream1) const 
-647 var  var::match(SV regex, SV regex_options) const 
+647 var  var::match(SV regex_str, SV regex_options) const 
 648 io   var::replacer(SV what, SV with) 
 649 var  var::replace(const rex& regex, SV replacement) const 
 650 var  var::field(SV separatorx, const int fieldnx, const int nfieldsx) const 
@@ -190,6 +190,6 @@
 689 var  var::last() const 
 690 io   var::firster() const
 691 io   var::laster() const 
-692 var  var::search(SV regex, int startchar1, SV regex_options) const 
+692 var  var::search(SV regex_str, int startchar1, SV regex_options) const 
 693 std::wstring var::to_wstring() const 
 694 const char* var::c_str() const 

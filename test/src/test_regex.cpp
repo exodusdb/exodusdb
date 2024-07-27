@@ -259,13 +259,13 @@ programinit()
 
 		// MATCHING
 
-		// bad data
+		printl("\n-- Test bad data in match");
 		try {
 			notutf8.match("X").errputl();
 			assert(false);
 		} catch (VarError& e) {errputl(e.description);}
 
-		// bad target
+		printl("\n-- Test bad target in match");
 		try {
 			utf8.match(notutf8).errputl();
 			assert(false);
@@ -273,19 +273,19 @@ programinit()
 
 		// REPLACING
 
-		// bad data
+		printl("\n-- Test bad data in replace using _rex");
 		try {
 			notutf8.replace("X"_rex, "Y").errputl();
 			assert(false);
 		} catch (VarError& e) {errputl(e.description);}
 
-		// bad target
+		printl("\n-- Test bad target in replace using rex()");
 		try {
 			utf8.replace(rex(notutf8), "Y").errputl();
 			assert(false);
 		} catch (VarError& e) {errputl(e.description);}
 
-		// bad replacement
+		printl("\n-- Test bad replacement in replace using _rex");
 		try {
 			utf8.replace("X"_rex, notutf8).errputl();
 			assert(false);

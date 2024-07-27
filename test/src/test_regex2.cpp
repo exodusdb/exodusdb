@@ -169,6 +169,25 @@ function main() {
 		assert(v1.replace(rex(rv, "s" ), R"/(\(\1\))/").outputl() == v1); // ECMA           depth first
 	}
 
+	{
+		// rex object - rex
+		// Private copy on heap - 160 ns/op
+		// but prone to bad programming in loop
+		rex rex1("def(abc)|ghf|[abc]+.*?def(abc)|ghf|[abc]+.*$");
+		var t = "abc500";
+		for (auto i [[maybe_unused]]: range(0, 1'000'000)) {
+			t.replacer(rex1, "");
+		}
+	}
+	{
+		// User literal - _rex
+		// Caching in std:: map - 190 ns/op
+		var t = "abc500";
+		for (auto i [[maybe_unused]]: range(0, 1'000'000)) {
+			t.replacer("def(abc)|ghf|[abc]+.*?def(abc)|ghf|[abc]+.*$"_rex, "");
+		}
+	}
+
 	printl(elapsedtimetext());
 	printl("Test passed");
 

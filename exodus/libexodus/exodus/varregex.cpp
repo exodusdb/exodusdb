@@ -100,16 +100,6 @@ allowing it to interface correctly with UTF-8, UTF-16, and UTF-32 data:
 
 namespace exo {
 
-///////////////////
-// rex constructors
-///////////////////
-
-rex::rex(SV expression) :expression_(expression) {
-}
-
-rex::rex(SV expression, SV options) :expression_(expression), options_(options) {
-}
-
 // From here on we need to use Boost's u32_regex, u32_match, u32_replace
 // in order to correctly process no-ASCII/multibyte characters
 
@@ -177,14 +167,17 @@ constexpr static syntax_flags_typ get_syntax_flags(SV regex_options) {
 	// i - case insensitive
 
 	// p - ECMAScript/Perl default
-	// b - basic POSIX (same as sed)
-	// e - extended POSIX
+	// b - Basic POSIX (same as sed)
+	// e - Extended POSIX
 	// a - awk
 	// g - grep
 	// eg - egrep or grep -E
 
-	// m - multiline. Default in boost (and therefore exodus)
-	// s - single line. Default in std::regex
+	// m - Multiline. Default in boost (and therefore exodus)
+	// s - Single line. Default in std::regex
+
+	// c - Use cache to store regex engine (for rex constructed objects)
+	//     ""_rex constructed objects always use the cache of regex engines. One entry per regex_str and options combination.
 
 	// default - collate - Character ranges of the form "[a-b]" will be locale sensitive.
 	// IF? the normal/ECMAScript/perl engine is selected.
@@ -257,42 +250,32 @@ constexpr static syntax_flags_typ get_syntax_flags(SV regex_options) {
 	return regex_syntax_flags;
 }
 
-//////////////////
-// getregex_engine helper/cache
-//////////////////
+/////////////////////
+// regex_engine maker
+/////////////////////
 
-static thread_local std::map<std::string, REGEX> thread_regexes;
+static REGEX varregex_make_regex_engine(SV regex_str, SV regex_options) {
 
-// Caches regex giving very approx 10x speed up
-// TODO merge with get_syntax_flags?
-// TODO arg should be just a rex?
-static REGEX& get_regex_engine(SV regex, SV regex_options) {
-
-	// cache with regex and regex_options since regex_options change the effect
-	auto cache_key = std::string(regex);
-	cache_key.push_back(FM_);
-	cache_key += regex_options;
-
-	auto mapiter = thread_regexes.find(cache_key);
-	if (mapiter != thread_regexes.end())
-		return mapiter->second;
+	//u32regex engine
+	//TRACE(sizeof(REGEX)) // 16 bytes
 
 	try {
-		[[maybe_unused]] auto [mapiter, success] = thread_regexes.emplace(
-			cache_key,
-			boost::make_u32regex(
-				std::string(regex),
-				// Analyse the regex_options requested
-				get_syntax_flags(regex_options)
-			)
+		return boost::make_u32regex(
+//				std::string(regex_str),
+			regex_str.begin(),
+			regex_str.end(),
+			// Analyse the regex_options requested
+			get_syntax_flags(regex_options)
 		);
-		return mapiter->second;
 	}
 	catch (boost::wrapexcept<std::out_of_range>& e) {
-		throw VarError("Error: (1) Invalid data during match of " ^ var(regex).quote() ^ ". " ^ var(e.what()));
+		throw VarError("Error: (1) Invalid data during match of " ^ var(regex_str).first(512).quote() ^ ". " ^ var(e.what()));
 	}
 	catch (std_boost::regex_error& e) {
-		throw VarError("Error: Invalid regex string " ^ var(regex).quote() ^ ". " ^ var(e.what()).quote());
+		throw VarError("Error: Invalid regex string " ^ var(regex_str).first(128).first(512).quote() ^ ". " ^ var(e.what()).quote());
+	}
+	catch (...) {
+		throw VarError("Error: Unknown error in regex string " ^ var(regex_str).first(128).first(512).quote() ^ ".");
 	}
 
 	// Cannot get here
@@ -300,19 +283,67 @@ static REGEX& get_regex_engine(SV regex, SV regex_options) {
 	//throw VarError("getreg");
 }
 
+//////////////////
+// getregex_engine helper/cache
+//////////////////
+
+// Thread_local cache
+static thread_local std::map<std::string, REGEX> thread_regexes;
+
+// Caching regex giving very approx 10x speed up
+static REGEX& varregex_get_regex_engine(SV regex_str, SV regex_options) {
+
+	// TODO merge with get_syntax_flags?
+	// TODO arg should be just a rex?
+
+	// Prepare key to search cache
+	// cache with regex_str and regex_options since regex_options change the effect
+	auto cache_key = std::string(regex_str);
+	if (! regex_options.empty()) {
+		cache_key.push_back(FM_);
+		cache_key += regex_options;
+	}
+
+	//u32regex engine
+	//TRACE(sizeof(REGEX)) // 16 bytes
+
+	// Find and return a pre built regex engine
+	auto mapiter1 = thread_regexes.find(cache_key);
+	if (mapiter1 != thread_regexes.end())
+		return mapiter1->second;
+
+//	TRACE("make cache")
+
+	// Make and save a new regex engine
+	// https://en.cppreference.com/w/cpp/container/map/emplace
+	auto [mapiter2, success] = thread_regexes.emplace(
+		cache_key,
+
+		// Throws VarError if regex_str is invalid
+		varregex_make_regex_engine(regex_str, regex_options)
+	);
+
+	// Can only fail if key already exists but we already checked that it did not.
+	// Can normally throw above if regex_str is invalid.
+	if (! success)
+		throw VarError("Error: " ^ var(__PRETTY_FUNCTION__) ^ " failed to add regex cache " ^ var(regex_str).first(512).quote() ^ ".");
+
+	return mapiter2->second;
+}
+
 ////////
 // match
 ////////
 
 // should be in mvfuncs.cpp - here really because boost regex is included here for file matching
-var  var::match(SV regex, SV regex_options) const {
+var  var::match(SV regex_str, SV regex_options) const {
 
 	// VISUALISE REGULAR EXPRESSIONS GRAPHICALLY
 	// https:www.debuggex.com
 
-	THISIS("var  var::match(SV regex, SV regex_options) const")
+	THISIS("var  var::match(SV regex_str, SV regex_options) const")
 	assertString(function_sig);
-	//ISSTRING(regex)
+	//ISSTRING(regex_str)
 
 	// wild cards like
 	// *.* or *.???
@@ -338,7 +369,7 @@ var  var::match(SV regex, SV regex_options) const {
 #endif
 
 		//std::string regex2 = std_boost::regex_replace(regex.var_str, regex_special_chars,
-		std::string regex2 = std_boost::regex_replace(std::string(regex), regex_special_chars,
+		std::string regex2 = std_boost::regex_replace(std::string(regex_str), regex_special_chars,
 											  replacement_for_regex_special);
 
 		// 1. force to match whole string
@@ -355,7 +386,7 @@ var  var::match(SV regex, SV regex_options) const {
 		return this->match(regex3);
 	}
 
-	REGEX& regex_engine = get_regex_engine(regex, regex_options);
+	REGEX& regex_engine = varregex_get_regex_engine(regex_str, regex_options);
 
 	// construct our iterators:
 #ifdef EXO_BOOST_REGEX
@@ -363,7 +394,7 @@ var  var::match(SV regex, SV regex_options) const {
 	try {
 		iter = boost::make_u32regex_iterator(var_str, regex_engine);
 	} catch (boost::wrapexcept<std::out_of_range>& e) {
-		throw VarError("Error: (2) Invalid match string " ^ var(regex).quote() ^ ". " ^ var(e.what()));
+		throw VarError("Error: (2a) Invalid match string " ^ var(regex_str).quote() ^ ". " ^ var(e.what()));
 	}
 #else
 	std::regex_iterator<std::string::const_iterator> iter(var_str.begin(), var_str.end(), regex_engine);
@@ -423,9 +454,9 @@ var  var::match(SV regex, SV regex_options) const {
 /////////
 
 // should be in mvfuncs.cpp - here really because boost regex is included here for file matching
-var  var::search(SV regex, io startchar1, SV regex_options) const {
+var  var::search(SV regex_str, io startchar1, SV regex_options) const {
 
-	THISIS("var  var::search(SV regex, int startchar1, SV regex_options) const")
+	THISIS("var  var::search(SV regex_str, int startchar1, SV regex_options) const")
 	assertString(function_sig);
 
 	// Note that option f - first only is deliberately not implemented in search
@@ -462,7 +493,7 @@ var  var::search(SV regex, io startchar1, SV regex_options) const {
 #endif
 
 		//std::string regex2 = std_boost::regex_replace(regex.var_str, regex_special_chars,
-		std::string regex2 = std_boost::regex_replace(std::string(regex), regex_special_chars,
+		std::string regex2 = std_boost::regex_replace(std::string(regex_str), regex_special_chars,
 											  replacement_for_regex_special);
 
 		// 1. force to match whole string
@@ -479,7 +510,7 @@ var  var::search(SV regex, io startchar1, SV regex_options) const {
 		return this->search(regex3, startchar1);
 	}
 
-	REGEX& regex_engine = get_regex_engine(regex, regex_options);
+	REGEX& regex_engine = varregex_get_regex_engine(regex_str, regex_options);
 
 	// https://stackoverflow.com/questions/26320987/what-is-the-difference-between-regex-token-iterator-and-regex-iterator
 	// boost::u32regex_token_iterator<std::string::const_iterator>
@@ -520,7 +551,7 @@ var  var::search(SV regex, io startchar1, SV regex_options) const {
 		iter = boost::make_u32regex_iterator(var_str.data() + startchar1.var_int - 1, regex_engine);
 #pragma clang diagnostic pop
 	} catch (boost::wrapexcept<std::out_of_range>& e) {
-		throw VarError("Error: (2) Invalid match string " ^ var(regex).quote() ^ ". " ^ var(e.what()));
+		throw VarError("Error: (2b) Invalid match string " ^ var(regex_str).quote() ^ ". " ^ var(e.what()));
 	}
 #else
 	std::regex_iterator<std::string::const_iterator> iter(std::advance(var_str.begin(), startchar1 - 1), var_str.end(), regex_engine);
@@ -606,13 +637,20 @@ io   var::replacer(const rex& regex, SV replacement) {
 // const
 var  var::replace(const rex& regex, SV replacement) const& {
 
+//	std::cout << "\n" << &regex << " " << __PRETTY_FUNCTION__ << std::endl;
+
 	THISIS("var  var::replace(const rex& regex, SV replacement) const")
 	assertString(function_sig);
 
 	// http://www.boost.org/doc/libs/1_38_0/libs/regex/doc/html/boost_regex/syntax/basic_syntax.html
 
 	// Build the regex object with the given regex_options
-	REGEX& regex_engine = get_regex_engine(regex.expression_, regex.options_);
+//	REGEX& regex_engine = varregex_get_regex_engine(regex.regex_str_, regex.options_);
+
+	// Get the engine from the rex if present otherwise get one from the cache (or construct one in the cache)
+//	std::cout << &regex << std::endl;
+//	TRACE(regex.pimpl_ == nullptr)
+	REGEX& regex_engine = regex.pimpl_ ? *static_cast<boost::u32regex*>(regex.pimpl_) : varregex_get_regex_engine(regex.regex_str_, regex.options_);
 
 	// Get an ostringstream object and an iterator on it
 	std::ostringstream oss1(std::ios::out | std::ios::binary);
@@ -653,7 +691,7 @@ var  var::replace(const rex& regex, SV replacement) const& {
 	} catch (boost::wrapexcept<std::out_of_range>& e) {
 		var errmsg =
 			"Error: (3) Invalid data or replacement during regex replace of "
-			^ var(regex.expression_).quote()
+			^ var(regex.regex_str_).quote()
 			^ " with "
 			^ var(replacement).quote()
 			^ ". "
@@ -844,13 +882,64 @@ io   var::oconv_MR(const char* conversion) {
 	return *this;
 }
 
-//////////////////////////////
-// User defined literal "_rex"
-//////////////////////////////
+//////
+// rex
+//////
 
-// "[a-z]"_rex
+// Private default constructor
+rex::rex() {
+//	std::cout << "\n" << this << " " << __PRETTY_FUNCTION__ << std::endl;
+}
+
+// Public constructor
+rex::rex(SV regex_str, SV options)
+	:
+	regex_str_(regex_str),
+	options_(options) {
+
+	// Skip creation of regex engine and use the regex cache
+	// every time this rex is used
+	if (options.find('c') == std::string::npos)
+		return;
+
+	// Create a regex engine on the heap
+	// and store a pointer to it in our member data "pimpl_"
+	// Destructor deletes it from the heap
+
+//	std::cout << "\n" << this << " " << __PRETTY_FUNCTION__ << std::endl;
+
+	pimpl_ = static_cast<boost::u32regex*>(
+		new boost::u32regex(
+			varregex_make_regex_engine(regex_str, options)
+		)
+	);
+}
+
+// Destructor
+rex::~rex() {
+//	std::cout << "\n" << this << " " << __PRETTY_FUNCTION__ << std::endl;
+	delete static_cast<boost::u32regex*>(pimpl_);
+}
+
+// User defined literal suffix "_rex" e.g. "[a-z]"_rex
 ND rex operator""_rex(const char* cstr, std::size_t size) {
-	return rex(std::string_view(cstr, size));
+
+	// For user defined literal suffix _rex will will
+	// using on the fly creation and caching of regex engines
+	// since suffixes are typically used in throw-away contexts
+	// e.g. as arguments of replace function
+	// return rex(std::string_view(cstr, size));
+
+	// Use private default constructor
+	// Does not create a private regex engine on the stack like the other constructor does
+	rex rex1;
+
+	// Capture the given regex str. It will be used to get the regex engine
+	// from the cache or make it on demand and save it in the cache
+	rex1.regex_str_ = cstr;
+
+//	std::cout << "\n" << &rex1 << " " << __PRETTY_FUNCTION__ << std::endl;
+	return rex1;
 }
 
 } // namespace exo
