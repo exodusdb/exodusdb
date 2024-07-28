@@ -715,6 +715,9 @@ var  var::replace(const rex& regex, SV replacement) const& {
 // regular expressions for ICONV_MT
 // var  var::iconv_MT(const char* conversion) const
 var  var::iconv_MT() const {
+
+	THISIS("var  var::iconv_MT() const")
+
 	//THISIS("var  var::iconv_MT() const")
 	//assertString(function_sig);
 	// ignore everything else and just get first three groups of digits "99 99 99"
@@ -752,8 +755,11 @@ var  var::iconv_MT() const {
 // OCONV_MR can be moved back to mvioconv.cpp if it stops using regular expressions
 ///////////
 
-// regular expressions for ICONV_MC
+// regular expressions for ICONV_MC - Note: io and non-const
 io   var::oconv_MR(const char* conversion) {
+
+	THISIS("io   var::oconv_MR(const char* conversion) const")
+
 	//THISIS("io   var::oconv_MR(const char* conversionchar)")
 	//assertString(function_sig);
 	// conversionchar arrives pointing to 3rd character (eg A in MCA)

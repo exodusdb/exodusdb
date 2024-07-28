@@ -928,7 +928,7 @@ template<class... Args>
 	ND std::string oconv_MT(const char* conversion) const;
 	// MD: Decimal -> Decimal
 	ND std::string oconv_MD(const char* conversion) const;
-	// MR: Character replacement
+	// MR: Character replacement // WHY is this replacer, io, non-const
 	ND io   oconv_MR(const char* conversion);
 	// HEX: Chars -> Hex
 	ND std::string oconv_HEX(const int ioratio) const;

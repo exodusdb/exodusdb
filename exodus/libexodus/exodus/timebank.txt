@@ -64,8 +64,8 @@
 563 io   var::default_to(in defaultvalue) const 
 564 io   var::default_from(in defaultvalue) 
 565 char var::toChar() const 
-566 std::string var::toString() && 
-567 std::string var::toString() const& 
+566 str  var::toString() && 
+567 str  var::toString() const& 
 568 var  var::len() const 
 569 var  var::textlen() 
 570 std::u32string var::to_u32string() const 
@@ -193,3 +193,12 @@
 692 var  var::search(SV regex_str, int startchar1, SV regex_options) const 
 693 std::wstring var::to_wstring() const 
 694 const char* var::c_str() const 
+695 str  var::oconv_T(in format) const
+696 str  var::oconv_MD(const char* conversion) const
+697 str  var::oconv_LRC(in format) const 
+698 str  var::oconv_TX(const char* conversion) const 
+699 str  var::oconv_HEX(const int) const 
+700 var  var::iconv_D(const char* conversion) const 
+701 str  var::oconv_D(const char* conversion) const 
+702 io   var::oconv_MR(const char* conversion) 
+703 var  var::iconv_MT() const

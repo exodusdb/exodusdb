@@ -285,6 +285,8 @@ var  var::iconv(const char* conversion) const {
 
 std::string var::oconv_T(in format) const {
 
+	THISIS("str  var::oconv_T(in format) const")
+
 	// expecting only "T#99" with no mask at the moment
 
 	// TODO to pure c++ for speed
@@ -411,6 +413,8 @@ std::string var::oconv_T(in format) const {
 }
 
 std::string var::oconv_MD(const char* conversion) const {
+
+	THISIS("str  var::oconv_MD(const char* conversion) const")
 
 	// http://www.d3ref.com/index.php?token=basic.masking.function
 
@@ -675,6 +679,8 @@ std::string var::oconv_MD(const char* conversion) const {
 }
 
 std::string var::oconv_LRC(in format) const {
+
+	THISIS("str  var::oconv_LRC(in format) const")
 
 	// TODO convert to C instead of var for speed
 	// and implement full mask options eg L#2-#3-#4 etc
@@ -1150,6 +1156,8 @@ var  var::oconv(const char* conversion_in) const {
 
 std::string var::oconv_TX(const char* conversion) const {
 
+	THISIS("str  var::oconv_TX(const char* conversion) const")
+
 	var result = this->var_str;
 
 	// Backslashes before NL are going to be used to indicate VM, SM etc
@@ -1220,7 +1228,9 @@ var  var::iconv_TX(const char* conversion) const {
 	CONSTINIT_OR_CONSTEXPR
 	std::array hex_digits {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
 
-std::string var::oconv_HEX([[maybe_unused]] const int ioratio) const {
+std::string var::oconv_HEX(const int /*ioratio*/) const {
+
+	THISIS("str  var::oconv_HEX(const int) const")
 
 	std::string result;
 	for (auto byte : var_str) {

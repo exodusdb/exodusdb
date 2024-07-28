@@ -236,6 +236,8 @@ var  var::timestamp(in ostime) const {
 
 var  var::iconv_D(const char* conversion) const {
 
+	THISIS("var  var::iconv_D(const char* conversion) const")
+
 	// should perhaps ONLY implement only ISO8601 which is in xml
 	// yyyy-mm-ddTHH:MM:SS.SSS
 
@@ -453,6 +455,8 @@ var  var::iconv_D(const char* conversion) const {
 #pragma GCC diagnostic push
 #pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
 std::string var::oconv_D(const char* conversion) const {
+
+	THISIS("str  var::oconv_D(const char* conversion) const")
 
 	// by this time *this is known to be numeric and not an empty string
 

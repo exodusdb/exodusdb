@@ -457,7 +457,7 @@ template<> PUBLIC char VARBASE1::toChar() const {
 // temporary var can return move its string into the output
 template<> PUBLIC std::string VARBASE1::toString() && {
 
-	THISIS("std::string var::toString() &&")
+	THISIS("str  var::toString() &&")
 	assertString(function_sig);
 
 	return std::move(var_str);
@@ -466,7 +466,7 @@ template<> PUBLIC std::string VARBASE1::toString() && {
 // non-temporary var can return a const ref to its string
 template<> PUBLIC const std::string& VARBASE1::toString() const& {
 
-	THISIS("std::string var::toString() const&")
+	THISIS("str  var::toString() const&")
 	assertString(function_sig);
 
 	return var_str;

@@ -155,8 +155,8 @@ auto get_timeacno(const std::string_view arg1) -> int {
 	else if ((arg1 == "io   var::default_to(in defaultvalue) const")) acno = 64;
 	else if ((arg1 == "io   var::default_from(in defaultvalue)")) acno = 65;
 	else if ((arg1 == "char var::toChar() const")) acno = 66;
-	else if ((arg1 == "std::string var::toString() &&")) acno = 67;
-	else if ((arg1 == "std::string var::toString() const&")) acno = 68;
+	else if ((arg1 == "str  var::toString() &&")) acno = 67;
+	else if ((arg1 == "str  var::toString() const&")) acno = 68;
 	else if ((arg1 == "var  var::len() const")) acno = 69;
 	else if ((arg1 == "var  var::textlen()")) acno = 70;
 	else if ((arg1 == "std::u32string var::to_u32string() const")) acno = 71;
@@ -284,6 +284,20 @@ auto get_timeacno(const std::string_view arg1) -> int {
 	else if ((arg1 == "var  var::search(SV regex_str, int startchar1, SV regex_options) const")) acno = 193;
 	else if ((arg1 == "std::wstring var::to_wstring() const")) acno = 194;
 	else if ((arg1 == "const char* var::c_str() const")) acno = 195;
+
+	else if ((arg1 == "str  var::oconv_T(in format) const")) acno = 196;
+	else if ((arg1 == "str  var::oconv_MD(const char* conversion) const")) acno = 197;
+	else if ((arg1 == "str  var::oconv_LRC(in format) const")) acno = 198;
+	else if ((arg1 == "str  var::oconv_TX(const char* conversion) const")) acno = 199;
+	else if ((arg1 == "str  var::oconv_HEX(const int) const")) acno = 200;
+
+	else if ((arg1 == "var  var::iconv_D(const char* conversion) const")) acno = 201;
+	else if ((arg1 == "str  var::oconv_D(const char* conversion) const")) acno = 202;
+	else if ((arg1 == "io   var::oconv_MR(const char* conversion) const")) acno = 203;
+	else if ((arg1 == "var  var::iconv_MT() const")) acno = 204;
+
+//	else if ((arg1 == "")) acno = ;
+
 
 	else {
 
