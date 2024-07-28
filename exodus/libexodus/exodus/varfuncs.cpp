@@ -1339,7 +1339,7 @@ var  var::space() const {
 }
 
 
-//crop() - remove superfluous FM, VM etc.
+//crop() - Remove superfluous FM, VM. e.g. VM before FM etc.
 
 // mutate
 io   var::cropper() {
@@ -1357,15 +1357,15 @@ io   var::cropper() {
 		char charx = (*iter);
 		++iter;
 
-		// simply append ordinary characters
-		if (charx < ST_ || charx > RM_) {
+		// Simply append ordinary characters
+		if (charx > RM_ || charx < ST_) {
 			newstr.push_back(charx);
 			continue;
 		}
 
-		// found a separator
+		// Found a separator
 
-		// remove any lower separators from the end of the string
+		// Remove any lower separators from the end of the string
 		while (!newstr.empty()) {
 			char lastchar = newstr.back();
 			if (lastchar >= ST_ && lastchar < charx)
@@ -1374,16 +1374,16 @@ io   var::cropper() {
 				break;
 		}
 
-		// append the separator
+		// Append the separator
 		newstr.push_back(charx);
 	}
 
-	// remove any trailing separators
-	while (!newstr.empty() && newstr.back() >= ST_ && newstr.back() <= RM_) {
+	// Remove any trailing separators
+	while (!newstr.empty() && newstr.back() <= RM_ && newstr.back() >= ST_) {
 		newstr.pop_back();
 	}
 
-	var_str = newstr;
+	var_str = std::move(newstr);
 	// replace(var_str,newstr);
 
 	return *this;
