@@ -686,7 +686,6 @@ io   var::inverter() {
 	return *this;
 }
 
-
 // ucase() - upper case
 
 // mutate
@@ -694,42 +693,50 @@ io   var::ucaser() {
 
 	THISIS("io   var::ucaser()")
 	assertStringMutator(function_sig);
-	//assertString(function_sig);
 
-	// optimise for ASCII
-	// try ASCII uppercase to start with for speed
-	// this may not be correct for all locales. eg Turkish I i İ ı mixing Latin and Turkish
-	// letters.
-	bool allASCII = false;
+	// <2ns to "convert" an empty string.
+	// + ~0.33ns per ASCII character IF pure ASCII .. regardless of upper/lower case state.
+
+	// return localeAwareChangeCase(1);
+
+	// Optimise for ASCII
+	// Try ASCII uppercase to start with for speed
+	// TODO This may not be correct for all locales.
+	// e.g. Turkish I i İ ı mixing ASCII Latin and UNICODE Turkish letters.
+	// Perhaps only detect ASCII if the default locale is currently C.
+	auto allASCII = true;
 	for (char& c : var_str) {
+
+		// On x86 char is generally signed.
+		// On ARM char is generally unsigned except IOS
+		// Setting the lower 7 bits to zero will produce a zero if ASCII
 		allASCII = (c & ~0x7f) == 0;
 		if (!allASCII)
 			break;
+
+		// Using std::toupper - 2ns/char
 		// toupper returns an int despite being given a char
 		// Presumably safe to cast back to char
-		c = static_cast<char>(std::toupper(c));
+		// c = static_cast<char>(std::toupper(c));
+
+		// Hand written code ~.33ns/op
+//		if (static_cast<unsigned char>(c) >= 'a' && static_cast<unsigned char>(c) <= 'z')
+		if (c >= 'a' && c <= 'z')
+			c -= 'z' - 'Z';
 	}
 	if (allASCII)
 		return *this;
 
+	// ~6ms! For very first call for non-ASCII string ucaser or lcaser
+	// ~ 70ns for a one char non-ASCII string
+	// ~ 2.5ns per additional char in non-ASCII string
 	init_boost_locale1();
 
+	// Using boost (which calls icu)
 	var_str = boost::locale::to_upper(var_str, thread_boost_locale1);
 
 	return *this;
-
-	/*
-	int32_t ucasemap_utf8ToLower (
-			const UCaseMap* csm,
-			char*           dest,
-			int32_t         destCapacity,
-			const char*     src,
-			int32_t         srcLength,
-			UErrorCode*     pErrorCode
-		)
-	*/
 }
-
 
 // lcase() - lower case
 
@@ -738,23 +745,19 @@ io   var::lcaser() {
 
 	THISIS("io   var::lcaser()")
 	assertStringMutator(function_sig);
-	//assertString(function_sig);
 
-	// return localeAwareChangeCase(1);
+	// For comments, see ucaser above.
 
-	// optimise for ASCII
-	// try ASCII uppercase to start with for speed
-	// this may not be correct for all locales. eg Turkish I i İ ı mixing Latin and Turkish
-	// letters.
-	auto allASCII = false;
-	//for (char& c : var_str) {
-	for (auto& c : var_str) {
+	auto allASCII = true;
+	for (char& c : var_str) {
+
 		allASCII = (c & ~0x7f) == 0;
 		if (!allASCII)
 			break;
-		// tolower returns an int despite being given a char
-		// Presumably safe to cast back to char
-		c = static_cast<char>(std::tolower(c));
+
+//		if (static_cast<unsigned char>(c) <= 'Z' && static_cast<unsigned char>(c) >= 'A')
+		if (c <= 'Z' && c >= 'A')
+			c += 'z' - 'Z';
 	}
 	if (allASCII)
 		return *this;
