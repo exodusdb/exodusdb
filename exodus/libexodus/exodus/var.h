@@ -1284,6 +1284,6 @@ PUBLIC var  operator""_var(long double d);
 
 }  // namespace exo
 
-// clang-format off
+// clang-format on
 
 #endif //EXODUS_LIBEXODUS_EXODUS_VAR_H_
