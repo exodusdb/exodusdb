@@ -212,10 +212,10 @@ programinit()
 	}
 
 	{
-		assert(quote("")  eq "\"\"");
-		assert(squote("") eq "''");
+		assert(quote("").outputl()  eq _DQ _DQ);
+		assert(squote("").outputl() eq "''");
 
-		assert(quote(" ")  eq "\" \"");
+		assert(quote(" ")  eq _DQ " " _DQ);
 		assert(squote(" ") eq "' '");
 
 		assert(unquote(quote(""))  eq "");

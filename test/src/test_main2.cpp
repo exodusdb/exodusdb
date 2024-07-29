@@ -336,25 +336,68 @@ programinit()
 		assert(x eq "abc");
 	}
 
+	// lower and raise - const
+	//////////////////
+
 	{
+		// all 6 DONT round trip lower+raise
+		var seps = _RM _FM _VM _SM _TM _ST;
+		TRACE(seps)
+		TRACE(lower(seps))
+		assert(lower(seps)         eq _FM _VM _SM _TM _ST _ST);
+		assert(lower(seps).raise() != seps); // no round trip
+
+		// all 6 DONT round trip raise+lower
+		seps = _RM _FM _VM _SM _TM _ST;
+		assert(raise(seps)         eq _RM _RM _FM _VM _SM _TM);
+		assert(raise(seps).lower() != seps); // no round trip
+	}
+
+	{
+		// top 5 DO round trip lower + lower OK
 		var seps = _RM _FM _VM _SM _TM;
 		assert(lower(seps)         eq _FM _VM _SM _TM _ST);
 		assert(lower(seps).raise() eq seps);
 
+		// bottom 5 DO round trip raise+lower OK
 		seps = _FM _VM _SM _TM _ST;
 		assert(raise(seps)         eq _RM _FM _VM _SM _TM);
 		assert(raise(seps).lower() eq seps);
 	}
 
+	// lowerer and raiser - mutators
+	/////////////////////
+
 	{
-		var seps					 = _RM _FM _VM _SM _TM;
-		var						   x = seps;
+		// all 6 DONT round trip lowerer+raiser OK
+		var seps    =  _RM _FM _VM _SM _TM _ST;
+		var	x       =  seps;
+		lowerer(x);
+		assert(x    eq _FM _VM _SM _TM _ST _ST);
+		raiser(x);
+		assert(x != seps);//no round trip
+
+		// all 6 DONT round trip raiser+lower OK
+		seps     =  _RM _FM _VM _SM _TM _ST;
+		x        =  seps;
+		//raiser.dump().outputl();
+		raiser(x);
+		assert(x == _RM _RM _FM _VM _SM _TM);
+		lowerer(x);
+		assert(x != seps); //no round trip
+	}
+
+	{
+		// top 5 round trip lowerer+raiser OK
+		var seps         =  _RM _FM _VM _SM _TM;
+		var x            =  seps;
 		lowerer(x);
 		assert(x         eq _FM _VM _SM _TM _ST);
 		assert(raiser(x) eq seps);
 
-		seps = _FM _VM _SM _TM _ST;
-		x	 = seps;
+		// bottom 5 round trip raiser+lower OK
+		seps     =  _FM _VM _SM _TM _ST;
+		x	     =  seps;
 		raiser(x);
 		assert(x eq _RM _FM _VM _SM _TM);
 		lowerer(x);

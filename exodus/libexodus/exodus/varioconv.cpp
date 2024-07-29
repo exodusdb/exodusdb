@@ -1193,6 +1193,8 @@ std::string var::oconv_TX(const char* conversion) const {
 
 var  var::iconv_TX(const char* conversion) const {
 
+	THISIS("var  var::iconv_TX(const char* conversion) const");
+
 	var record = this->var_str;
 	// \ + LF -> VM
 	// \\ + LF -> SM
@@ -1257,6 +1259,9 @@ std::string var::oconv_HEX(const int /*ioratio*/) const {
 	outchar += nybble;
 
 var  var::iconv_HEX(const int ioratio) const {
+
+	THISIS("var  var::iconv_HEX(const int ioratio) const")
+
 	// ioratio
 	// 2 hex digits to one char
 	// 4 hex digits to one wchar of size 2

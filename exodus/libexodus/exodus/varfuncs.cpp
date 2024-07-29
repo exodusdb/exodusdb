@@ -133,6 +133,46 @@ static void init_boost_locale1() {
 	}
 }
 
+//generic helper to handle char and u32_char wise conversion (mapping)
+template<typename T1, typename T2, typename T3>
+static void string_converter(T1& var_str, const T2 fromchars, const T3 tochars) {
+	typename T1::size_type pos = T1::npos;
+
+	// Optimise for single character replacement
+	// No observable speedup
+	//if (fromchars.len() == 1 and tochars.len() == 1) {
+	//	std::replace(var_str.begin(), var_str.end(), fromchars[0], tochars[0]);
+	//}
+
+	auto tochars_size = tochars.size();
+	while (true) {
+		// locate (backwards) any of the from characters
+		// because we might be removing characters
+		// and it is faster to remove last character first
+		pos = var_str.find_last_of(fromchars, pos);
+
+		if (pos == T1::npos)
+			break;
+
+		// find which from character we have found
+		//int fromcharn = static_cast<int>(fromchars.find(var_str[pos]));
+		auto fromcharn = fromchars.find(var_str[pos]);
+
+		if (fromcharn < tochars_size)
+			//var_str.replace(pos, 1, tochars.substr(fromcharn, 1));
+			var_str[pos] = tochars[fromcharn];
+			//var_str.replace(pos, 1, tochars[fromcharn]);
+		else
+			var_str.erase(pos, 1);
+
+		if (pos == 0)
+			break;
+
+		pos--;
+	}
+	return;
+}
+
 static inline bool is_ascii(std::string_view str1) {
 	// optimise for ASCII
 	// try ASCII uppercase to start with for speed
@@ -564,7 +604,7 @@ var  var::textlen() const {
 
 // trim
 
-// const
+// Const
 var  var::trim(SV trimchars DEFAULT_SPACE) const& {
 
 	THISIS("io   var::trim(SV trimchars)")
@@ -573,7 +613,7 @@ var  var::trim(SV trimchars DEFAULT_SPACE) const& {
 	return boost::algorithm::trim_all_copy_if(var_str, boost::algorithm::is_any_of(trimchars));
 }
 
-// mutate
+// Mutate
 io   var::trimmer(SV trimchars DEFAULT_SPACE) {
 
 	// TODO reimplement with boost string trim_if algorithm
@@ -593,7 +633,7 @@ io   var::trimmer(SV trimchars DEFAULT_SPACE) {
 
 // trimfirst - remove leading/left bytes
 
-// const
+// Const
 var  var::trimfirst(SV trimchars DEFAULT_SPACE) const& {
 
 	THISIS("io   var::trimfirst(SV trimchars) const&")
@@ -602,7 +642,7 @@ var  var::trimfirst(SV trimchars DEFAULT_SPACE) const& {
 	return boost::algorithm::trim_left_copy_if(var_str, boost::algorithm::is_any_of(trimchars));
 }
 
-// mutate
+// Mutate
 io   var::trimmerfirst(SV trimchars DEFAULT_SPACE) {
 
 	THISIS("io   var::trimmerfirst(SV trimchars)")
@@ -615,7 +655,7 @@ io   var::trimmerfirst(SV trimchars DEFAULT_SPACE) {
 
 // trimlast() - trim trailing/right bytes
 
-// const
+// Const
 var  var::trimlast(SV trimchars DEFAULT_SPACE) const& {
 
 	THISIS("io   var::trimlast(SV trimchars) const&")
@@ -624,7 +664,7 @@ var  var::trimlast(SV trimchars DEFAULT_SPACE) const& {
 	return boost::algorithm::trim_right_copy_if(var_str, boost::algorithm::is_any_of(trimchars));
 }
 
-// mutate
+// Mutate
 io   var::trimmerlast(SV trimchars DEFAULT_SPACE) {
 
 	THISIS("io   var::trimmerlast(SV trimchars)")
@@ -638,7 +678,7 @@ io   var::trimmerlast(SV trimchars DEFAULT_SPACE) {
 
 //trimboth() - remove leading and trailing spaces/characters but not inner
 
-// const
+// Const
 var  var::trimboth(SV trimchars DEFAULT_SPACE) const& {
 
 	THISIS("io   var::trimboth(SV trimchars) const&")
@@ -647,7 +687,7 @@ var  var::trimboth(SV trimchars DEFAULT_SPACE) const& {
 	return boost::algorithm::trim_copy_if(var_str, boost::algorithm::is_any_of(trimchars));
 }
 
-// mutate
+// Mutate
 io   var::trimmerboth(SV trimchars DEFAULT_SPACE) {
 
 	THISIS("io   var::trimmerboth(SV trimchars)")
@@ -660,7 +700,7 @@ io   var::trimmerboth(SV trimchars DEFAULT_SPACE) {
 
 // invert() - inverts lower 8 bits of UTF8 codepoints (not bytes)
 
-// mutate
+// Mutate
 io   var::inverter() {
 
 	THISIS("io   var::inverter()")
@@ -688,7 +728,7 @@ io   var::inverter() {
 
 // ucase() - upper case
 
-// mutate
+// Mutate
 io   var::ucaser() {
 
 	THISIS("io   var::ucaser()")
@@ -740,7 +780,7 @@ io   var::ucaser() {
 
 // lcase() - lower case
 
-// mutate
+// Mutate
 io   var::lcaser() {
 
 	THISIS("io   var::lcaser()")
@@ -772,7 +812,7 @@ io   var::lcaser() {
 
 // tcase() - title case
 
-// mutate
+// Mutate
 io   var::tcaser() {
 
 	THISIS("io   var::tcaser()")
@@ -807,7 +847,7 @@ io   var::tcaser() {
 // For example case folding for a word "Grüßen" is "grüssen"
 // where the letter "ß" is represented in case independent way as "ss".
 
-// mutate
+// Mutate
 io   var::fcaser() {
 
 	THISIS("io   var::fcaser()")
@@ -834,7 +874,7 @@ io   var::fcaser() {
 // have any unassigned characters is normalized under one version of Unicode,
 // it must remain normalized under all future versions of Unicode."
 
-// mutate
+// Mutate
 io   var::normalizer() {
 
 	THISIS("io   var::normalizer()")
@@ -860,13 +900,13 @@ io   var::normalizer() {
 
 // There is no memory or performance advantage for mutable call, only a consistent syntax for user
 
-// mutate
+// Mutate
 io   var::uniquer() {
 	*this = this->unique();
 	return *this;
 }
 
-// constant
+// Constant
 var  var::unique() const& {
 
 	THISIS("var  var::unique()")
@@ -965,15 +1005,29 @@ var  var::textchr(const int utf_codepoint) const {
 // QUOTE - wrap with double quotes
 ////////
 
-// mutate
+// Const
+var var::quote() const& {
+
+	THISIS("var  var::quote() const&")
+	assertString(function_sig);
+
+	var rvo = DQ_;
+	rvo.var_str.append(var_str);
+	rvo.var_str.push_back(DQ_);
+
+	return rvo;
+}
+
+// Mutate
 io   var::quoter() {
 
 	THISIS("io   var::quoter()")
 	assertStringMutator(function_sig);
 
-	// NB this is std::string "replace" not var field replace
+	// Use std::string "replace" to insert
 	var_str.replace(0, 0, _DQ);
 	var_str.push_back(DQ_);
+
 	return *this;
 }
 
@@ -982,13 +1036,26 @@ io   var::quoter() {
 // SQUOTE - wrap with single quotes
 /////////
 
-// mutate
+// Const
+var  var::squote() const& {
+
+	THISIS("var  var::squote() const&")
+	assertString(function_sig);
+
+	var rvo = SQ_;
+	rvo.var_str.append(var_str);
+	rvo.var_str.push_back(SQ_);
+
+	return rvo;
+}
+
+// Mutate
 io   var::squoter() {
 
 	THISIS("io   var::squoter()")
 	assertStringMutator(function_sig);
 
-	// NB this is std::string "replace" not var field replace
+	// std::string "replace" to insert
 	var_str.replace(0, 0, _SQ);
 	var_str.push_back('\'');
 
@@ -1000,7 +1067,49 @@ io   var::squoter() {
 // UNQUOTE - remove outer double or single quotes
 //////////
 
-// mutate
+// Const
+var   var::unquote() const& {
+
+	THISIS("var  var::unquote() const&")
+	assertString(function_sig);
+
+	// Removes MATCHING beginning and terminating " or ' characters.
+	// Also removes a SINGLE " or ' on the grounds that you probably want to eliminate all such
+	// characters.
+
+	var rvo;
+	rvo.var_typ = VARTYP_STR;
+	char char0;
+
+	// No change if no length
+	std::size_t len = var_str.size();
+	if (len < 2) {
+return_this:
+		rvo.var_str = var_str;
+		return rvo;
+	}
+
+	char0 = var_str[0];
+
+	// No change if not starting " or '
+	if (char0 != DQ_ && char0 != SQ_)
+		goto return_this;
+
+	// No change if terminating character ne starting character
+	if (var_str.back() != char0)
+		goto return_this;
+
+	// Copy over all except the first character
+	rvo.var_str = var_str.substr(1);
+
+	// Remove the last char if any
+	if (!rvo.var_str.empty())
+		rvo.var_str.pop_back();
+
+	return rvo;
+}
+
+// Mutate
 io   var::unquoter() {
 
 	THISIS("io   var::unquoter()")
@@ -1040,7 +1149,7 @@ io   var::unquoter() {
 
 // 1. paste replace
 
-// mutate
+// Mutate
 io   var::paster(const int pos1, const int length, SV insertstr) {
 
 	THISIS("io   var::paster(const int pos1, const int length, SV insertstr)")
@@ -1108,13 +1217,13 @@ io   var::paster(const int pos1, const int length, SV insertstr) {
 //
 //// 2. paste over to end
 //
-//// constant
+//// Constant
 //var  var::pasteall(const int pos1, SV insertstr) const& {
 //	// TODO avoid copy
 //	return var(*this).pasterall(pos1, insertstr);
 //}
 //
-//// mutate
+//// Mutate
 //io   var::pasterall(const int pos1, SV insertstr) {
 //
 //	THISIS("io   var::pasterall(const int pos1, SV insertstr)")
@@ -1142,7 +1251,7 @@ io   var::paster(const int pos1, const int length, SV insertstr) {
 
 // 3. paste insert at
 
-// mutate
+// Mutate
 io   var::paster(const int pos1, SV insertstr) {
 
 	THISIS("io   var::paster(const int pos1, SV insertstr)")
@@ -1182,7 +1291,7 @@ io   var::paster(const int pos1, SV insertstr) {
 // PREFIX - insert at beginning
 /////////
 
-// constant
+// Constant
 var  var::prefix(SV insertstr) const& {
 
 	THISIS("var  var::prefix(SV insertstr)")
@@ -1195,7 +1304,7 @@ var  var::prefix(SV insertstr) const& {
 	return nrvo;
 }
 
-// mutate
+// Mutate
 io   var::prefixer(SV insertstr) {
 
 	THISIS("io   var::prefixer(SV insertstr)")
@@ -1211,7 +1320,7 @@ io   var::prefixer(SV insertstr) {
 // POP -remove last byte of string
 //////
 
-// mutate
+// Mutate
 io   var::popper() {
 
 	THISIS("io   var::popper()")
@@ -1245,7 +1354,7 @@ template<> PUBLIC VBR1 VARBASE1::move(VBX tovar) {
 	return tovar;
 }
 
-// const version needed in calculatex
+// Const version needed in calculatex
 template<> PUBLIC CBR VARBASE1::swap(CBX var2) const {
 
 	THISIS("CVR  var::swap(in var2) const")
@@ -1341,7 +1450,7 @@ var  var::space() const {
 
 //crop() - Remove superfluous FM, VM. e.g. VM before FM etc.
 
-// mutate
+// Mutate
 io   var::cropper() {
 
 	THISIS("io   var::cropper()")
@@ -1392,7 +1501,7 @@ io   var::cropper() {
 
 // lower() drops FM to VM, VM to SM etc.
 
-// mutate
+// Mutate
 io   var::lowerer() {
 
 	THISIS("io   var::lowerer()")
@@ -1404,14 +1513,34 @@ io   var::lowerer() {
 
 	//bottom marks get crushed together but ST is infrequently used
 	// reversible by raiser only if no ST chars are present - which are not common
-	this->converter(_RM _FM _VM _SM _TM, _FM _VM _SM _TM _ST);
+//	this->converter(_RM _FM _VM _SM _TM, _FM _VM _SM _TM _ST);
+//	string_converter(var_str, _RM _FM _VM _SM _TM, _FM _VM _SM _TM _ST);
+
+	for (char& c : var_str) {
+
+		// static_cast<unsigned char>(c) is well-defined ONLY if the value of c is within the range of unsigned char which is 0-127.
+		// If the value is outside the range 0-127, the behavior is implementation-defined.
+		// In other words you cannot work with non-ASCII characters reliably.
+
+		// Skip non-ASCII
+		if ((c & ~0x7f) != 0)
+			continue;
+
+		// Skip > RM_
+		if (c > RM_) LIKELY
+			continue;
+
+		// Bump DOWN all field marks except the bottom one (ST_)
+		if (c > ST_)
+			c -=1;
+	}
 
 	return *this;
 }
 
 // raise() lifts VM to FM, SM to VM etc.
 
-// mutate
+// Mutate
 io   var::raiser() {
 
 	THISIS("io   var::raiser()")
@@ -1424,49 +1553,29 @@ io   var::raiser() {
 
 	// top two marks get crushed together but RM is rarely used
 	// reversible by lowerer only if no RM are present - which are rare
-	this->converter(_FM _VM _SM _TM _ST, _RM _FM _VM _SM _TM);
+//	this->converter(_FM _VM _SM _TM _ST, _RM _FM _VM _SM _TM);
+//	string_converter(var_str, _FM _VM _SM _TM _ST, _RM _FM _VM _SM _TM);
+
+	for (char& c : var_str) {
+
+		// static_cast<unsigned char>(c) is well-defined ONLY if the value of c is within the range of unsigned char which is 0-127.
+		// If the value is outside the range 0-127, the behavior is implementation-defined.
+		// In other words you cannot work with non-ASCII characters reliably.
+
+		// Skip non-ASCII
+		if ((c & ~0x7f) != 0)
+			continue;
+
+		// Skip > FM_
+		if (c > FM_) LIKELY
+			continue;
+
+		// Bump UP all field marks except the top one (RT_)
+		if (c >= ST_)
+			c +=1;
+	}
 
 	return *this;
-}
-
-//generic helper to handle char and u32_char wise conversion (mapping)
-template<typename T1, typename T2, typename T3>
-static void string_converter(T1& var_str, const T2 fromchars, const T3 tochars) {
-	typename T1::size_type pos = T1::npos;
-
-	// Optimise for single character replacement
-	// No observable speedup
-	//if (fromchars.len() == 1 and tochars.len() == 1) {
-	//	std::replace(var_str.begin(), var_str.end(), fromchars[0], tochars[0]);
-	//}
-
-	auto tochars_size = tochars.size();
-	while (true) {
-		// locate (backwards) any of the from characters
-		// because we might be removing characters
-		// and it is faster to remove last character first
-		pos = var_str.find_last_of(fromchars, pos);
-
-		if (pos == T1::npos)
-			break;
-
-		// find which from character we have found
-		//int fromcharn = static_cast<int>(fromchars.find(var_str[pos]));
-		auto fromcharn = fromchars.find(var_str[pos]);
-
-		if (fromcharn < tochars_size)
-			//var_str.replace(pos, 1, tochars.substr(fromcharn, 1));
-			var_str[pos] = tochars[fromcharn];
-			//var_str.replace(pos, 1, tochars[fromcharn]);
-		else
-			var_str.erase(pos, 1);
-
-		if (pos == 0)
-			break;
-
-		pos--;
-	}
-	return;
 }
 
 
@@ -1474,7 +1583,7 @@ static void string_converter(T1& var_str, const T2 fromchars, const T3 tochars) 
 // if the target list is shorter than the source list of characters then characters are deleted
 //var  var::convert(in fromchars, in tochars) const& {
 
-// mutate
+// Mutate
 //io   var::converter(in fromchars, in tochars) {
 io   var::converter(SV fromchars, SV tochars) {
 
@@ -1488,7 +1597,7 @@ io   var::converter(SV fromchars, SV tochars) {
 }
 
 
-//// mutate for const char*
+//// Mutate for const char*
 //io   var::converter(const char* fromchars, const char* tochars) {
 //
 //	THISIS("io   var::converter(const char* fromchars, const char* tochars)")
@@ -1499,7 +1608,7 @@ io   var::converter(SV fromchars, SV tochars) {
 //	return *this;
 //}
 
-// mutate
+// Mutate
 io   var::textconverter(SV fromchars, SV tochars) {
 
 	THISIS("io   var::converter(in fromchars, in tochars)")
@@ -1535,7 +1644,7 @@ io   var::textconverter(SV fromchars, SV tochars) {
 // parse() - replaces seps with FMs except inside double and single quotes. Backslash escapes.
 
 
-// mutate
+// Mutate
 io   var::parser(char sepchar) {
 
 	THISIS("io   var::parser(char sepchar)")
@@ -1980,9 +2089,9 @@ var  var::lower()                               const& {return this->clone().low
 var  var::raise()                               const& {return this->clone().raiser();}
 var  var::crop()                                const& {return this->clone().cropper();}
 
-var  var::quote()                               const& {return this->clone().quoter();}
-var  var::squote()                              const& {return this->clone().squoter();}
-var  var::unquote()                             const& {return this->clone().unquoter();}
+//var  var::quote()                               const& {return this->clone().quoter();}
+//var  var::squote()                              const& {return this->clone().squoter();}
+//var  var::unquote()                             const& {return this->clone().unquoter();}
 
 var  var::convert(SV fromchars, SV tochars)     const& {return this->clone().converter(fromchars,tochars);}
 var  var::textconvert(SV fromchars, SV tochars) const& {return this->clone().textconverter(fromchars,tochars);}

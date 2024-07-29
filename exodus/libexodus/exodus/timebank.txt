@@ -201,4 +201,10 @@
 700 var  var::iconv_D(const char* conversion) const 
 701 str  var::oconv_D(const char* conversion) const 
 702 io   var::oconv_MR(const char* conversion) 
-703 var  var::iconv_MT() const
+703 var  var::iconv_MT() const 
+704 str  var::oconv_MT(const char* conversion) const 
+705 var  var::iconv_HEX(const int ioratio) const 
+706 var  var::iconv_TX(const char* conversion) const 
+707 var  var::quote() const& 
+708 var  var::squote() const& 
+710 var  var::quote() const& 
