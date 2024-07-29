@@ -704,7 +704,10 @@ programinit()
 		assert(crop(_VM _FM)       eq "");
 		assert(crop("xxx" _VM _FM) eq "xxx");
 		assert(crop("aaa" _VM _FM "bbb") eq("aaa" _FM "bbb"));
+		printl(crop("aaa" _FM "bbb" _FM _VM _SM _FM "ddd"));
 		assert(crop("aaa" _FM "bbb" _FM _VM _SM _FM "ddd") eq("aaa" _FM "bbb" _FM _FM "ddd"));
+
+		printl(crop("aaa" _FM "bbb" _FM _VM _SM _FM _RM "ddd"));
 		assert(crop("aaa" _FM "bbb" _FM _VM _SM _FM _RM "ddd") eq("aaa" _FM "bbb" _RM "ddd"));
 
 		assert(crop("aa" _VM _FM "bb" _FM)             eq "aa" _FM "bb");

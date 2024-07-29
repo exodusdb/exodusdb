@@ -133,7 +133,33 @@ static void init_boost_locale1() {
 	}
 }
 
-//generic helper to handle char and u32_char wise conversion (mapping)
+// Utility to check char ASCII (0-127)
+
+static inline bool char_is_ASCII(char c1) {
+	// c++ char type signedness is implementation defined. typically unsigned on x86 and signed on arm except IOS
+	// Therefore must NOT do comparisons < unless we know the chars are ASCII 0-127, nor do arithmetic outside 0-127.
+	// 8th/top bit indicates non-ASCII. Could be signed or unsigned depending on compiler
+	return (c1 & 0b1000'0000) == 0;
+}
+
+// Utility to check std::string for ASCII (0-127)
+
+static inline bool sv_is_ASCII(std::string_view str1) {
+	// Optimise for ASCII
+	// try ASCII uppercase to start with for speed
+	// this may not be correct for all locales. eg Turkish I i İ ı mixing Latin and Turkish
+	// letters.
+	//for (const char& c : str1) {
+	for (const char c : str1) {
+//		if ((c & ~0x7f) != 0)
+		if (! char_is_ASCII(c))
+			return false;
+	}
+	return true;
+}
+
+// Generic helper to handle char and u32_char wise conversion (mapping)
+
 template<typename T1, typename T2, typename T3>
 static void string_converter(T1& var_str, const T2 fromchars, const T3 tochars) {
 	typename T1::size_type pos = T1::npos;
@@ -171,19 +197,6 @@ static void string_converter(T1& var_str, const T2 fromchars, const T3 tochars) 
 		pos--;
 	}
 	return;
-}
-
-static inline bool is_ascii(std::string_view str1) {
-	// optimise for ASCII
-	// try ASCII uppercase to start with for speed
-	// this may not be correct for all locales. eg Turkish I i İ ı mixing Latin and Turkish
-	// letters.
-	//for (const char& c : str1) {
-	for (const char c : str1) {
-		if ((c & ~0x7f) != 0)
-			return false;
-	}
-	return true;
 }
 
 template<> PUBLIC bool VARBASE1::assigned() const {
@@ -882,7 +895,7 @@ io   var::normalizer() {
 	//assertString(function_sig);
 
 	// optimise for ASCII which needs no normalisation
-	if (is_ascii(var_str))
+	if (sv_is_ASCII(var_str))
 		return (*this);
 
 	init_boost_locale1();
@@ -1456,44 +1469,50 @@ io   var::cropper() {
 	THISIS("io   var::cropper()")
 	assertStringMutator(function_sig);
 
-	std::string newstr;
+	auto cur_iter = var_str.begin();
+	auto end_iter = var_str.end();
 
-	std::string::iterator iter = var_str.begin();
-	std::string::iterator iterend = var_str.end();
+	auto beg_iter = var_str.begin();
+	auto out_iter = beg_iter;
 
-	while (iter != iterend) {
+	while (cur_iter != end_iter) {
 
-		char charx = (*iter);
-		++iter;
+		char charx = *cur_iter++;
 
 		// Simply append ordinary characters
-		if (charx > RM_ || charx < ST_) {
-			newstr.push_back(charx);
+		if (!char_is_ASCII(charx) || charx > RM_ || charx < ST_) {
+			*out_iter++ = charx;
 			continue;
 		}
 
-		// Found a separator
+		// Found one of the fms
 
-		// Remove any lower separators from the end of the string
-		while (!newstr.empty()) {
-			char lastchar = newstr.back();
-			if (lastchar >= ST_ && lastchar < charx)
-				newstr.pop_back();
+		// "Remove" all lower separators from the end of the current output
+		// by decrementing the output iterator
+		// e.g. aaa]]]^bbb -> aaa^bbb
+		while (out_iter != beg_iter) {
+			char lastchar = *(out_iter-1);
+			if (char_is_ASCII(lastchar) && lastchar >= ST_ && lastchar < charx)
+				out_iter--;
 			else
 				break;
 		}
 
-		// Append the separator
-		newstr.push_back(charx);
+		// "Append" the separator by incrementing the output iterator
+		*out_iter++ = charx;
 	}
 
-	// Remove any trailing separators
-	while (!newstr.empty() && newstr.back() <= RM_ && newstr.back() >= ST_) {
-		newstr.pop_back();
-	}
+	// Trim the string to its new size
+	// Determined by the output iterator
+	var_str.resize(static_cast<std::size_t>(out_iter - var_str.begin()));
 
-	var_str = std::move(newstr);
-	// replace(var_str,newstr);
+	// Remove all trailing fms.
+	// The above algorithm only trims superfluous fms within the string.
+	auto last_not_fm = var_str.find_last_not_of(_RM _FM _VM _SM _TM _ST);
+	if (last_not_fm == std::string::npos)
+		var_str.clear();
+	else
+		var_str.resize(last_not_fm + 1);
 
 	return *this;
 }
@@ -1615,7 +1634,7 @@ io   var::textconverter(SV fromchars, SV tochars) {
 	assertStringMutator(function_sig);
 
 	// all ASCII -> bytewise conversion for speed
-	if (is_ascii(fromchars) && is_ascii(tochars)) {
+	if (sv_is_ASCII(fromchars) && sv_is_ASCII(tochars)) {
 		string_converter(var_str, fromchars, tochars);
 	}
 
