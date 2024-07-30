@@ -709,48 +709,56 @@ var  var::replace(const rex& regex, SV replacement) const& {
 
 }
 
-// ICONV_MT can be moved back to mvioconv.cpp if it stops using regular expressions
-///////////
-
-// regular expressions for ICONV_MT
-// var  var::iconv_MT(const char* conversion) const
-var  var::iconv_MT() const {
-
-	THISIS("var  var::iconv_MT() const")
-
-	//THISIS("var  var::iconv_MT() const")
-	//assertString(function_sig);
-	// ignore everything else and just get first three groups of digits "99 99 99"
-	// remove leading and trailing non-digits and replace internal strings of non-digits with
-	// single space
-
-	// var time=(*this).replace("^\\D+|\\D+$", "", "r").replace("\\D+", " ", "r");
-
-	static const std_boost::regex surrounding_nondigits_regex("^\\D+|\\D+$",
-														std_boost::regex_constants::icase);
-
-	static const std_boost::regex inner_nondigits_regex("\\D+", std_boost::regex_constants::icase);
-
-	var time = var(std_boost::regex_replace(var_str, surrounding_nondigits_regex, ""));
-	time = var(std_boost::regex_replace(time.var_str, inner_nondigits_regex, " "));
-
-	int hours = time.field(" ", 1).toInt();
-	int mins = time.field(" ", 2).toInt();
-	int secs = time.field(" ", 3).toInt();
-
-	int inttime = hours * 3600 + mins * 60 + secs;
-
-	if (inttime >= 86400)
-		return "";
-
-	// PM
-	if (inttime < 43200 && (*this).contains("P"))
-		inttime += 43200;
-	else if (inttime >= 43200 && (*this).contains("A"))
-		inttime -= 43200;
-
-	return inttime;
-}
+//// ICONV_MT can be moved back to mvioconv.cpp if it stops using regular expressions
+/////////////
+//
+//int extract_first_digits_as_int(std::string::iterator& iter, std::string::iterator end) {
+//
+//    while (iter != end) {
+//        if (std::isdigit(*iter)) {
+//            int num = 0;
+//            while (iter != end && std::isdigit(*iter)) {
+//                num = num * 10 + (*iter - '0');
+//                ++iter;
+//            }
+//			return num;
+//        } else {
+//            ++iter;
+//        }
+//    }
+//	// Not found;
+//    return 0;
+//}
+//
+//var  var::iconv_MT() const {
+//
+//	THISIS("var  var::iconv_MT() const")
+//	assertString(function_sig);
+////	assertString("var  var::iconv_MT() const");
+//
+//	// Get the first three groups of digits "...99...99...99..."
+//	// regardless of all other leading, inner or trailing characters
+//	auto iter = var_str.begin();
+//	auto end = var_str.end();
+//	int hours = extract_first_digits_as_int(iter, end);
+//	int mins  = extract_first_digits_as_int(iter, end);
+//	int secs  = extract_first_digits_as_int(iter, end);
+//
+//	int inttime = hours * 3600 + mins * 60 + secs;
+//
+//	if (inttime >= 86400)
+//		return "";
+//
+//	// P anywhere in the input indicated AM or PM
+//	// PM
+//	if (inttime < 43200 && (*this).contains("P"))
+//		inttime += 43200;
+//	// AM
+//	else if (inttime >= 43200 && (*this).contains("A"))
+//		inttime -= 43200;
+//
+//	return inttime;
+//}
 
 // OCONV_MR can be moved back to mvioconv.cpp if it stops using regular expressions
 ///////////
