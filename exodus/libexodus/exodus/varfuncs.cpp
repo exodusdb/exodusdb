@@ -747,6 +747,74 @@ io   var::inverter() {
 
 // ucase() - upper case
 
+// Const
+var  var::ucase() const& {
+
+// Performance testing indicates 20% faster to
+// bulk clone a string and then amend it char by char.
+// than copy the characters one by one to the new location.
+// When there are few char conversions required, the
+// performance advantage seems to be up to 50%.
+//
+// so we will use clone and ucaser.
+//
+//#if __cpp_lib_string_resize_and_overwrite < 202110L
+	return this->clone().ucaser();
+//#else
+//
+//	THISIS("var  var::ucase() const&")
+//	assertString(function_sig);
+//
+//	var rvo;
+//	rvo.var_typ = VARTYP_STR;
+//
+//	rvo.var_str.resize_and_overwrite(
+//		var_str.size(),
+//		[this](char* buf, std::size_t /*buf_size*/) noexcept {
+//
+////			assert(buf_size == var_str.size());
+//
+//			for (char c : var_str) {
+//
+//				// Quit if any non-ASCII
+//				if (!char_is_ASCII(c))
+//					return std::size_t(0);
+//
+//				// ASCII ucase
+//				if (c >= 'a' && c <= 'z')
+//					c -= 'z' - 'Z';
+//
+//				// rvo.var_str
+//				*buf++ = c;
+//			}
+//
+//			// Flag to resize_and_overwrite its new string size
+//			// which we arrange to be the same as the requested buffer size.
+//			return var_str.size();
+//		}
+//	);
+//
+//	//  If any unicode then run full unicode uppercase
+//
+////	// On unconverted remainder of var_str
+////	if (rvo.var_str.size() != var_str.size())
+////		rvo.var_str += unicode_to_upper(var_str.substr(rvo.var_str.size()));
+//
+//	if (rvo.var_str.size() != var_str.size()) {
+//
+//		// ~6ms! For very first call for non-ASCII string ucaser or lcaser
+//		// ~ 70ns for a one char non-ASCII string
+//		// ~ 2.5ns per additional char in non-ASCII string
+//		init_boost_locale1();
+//
+//		// Using boost (which calls icu)
+//		rvo.var_str = boost::locale::to_upper(var_str, thread_boost_locale1);
+//	}
+//
+//	return rvo;
+//#endif
+}
+
 // Mutate
 io   var::ucaser() {
 
@@ -2103,7 +2171,7 @@ var  var::numberinwords(in langname_or_locale_id) {
 
 // Many of the non-mutating functions are forwarded with a clone to the mutating function
 
-var  var::ucase()                               const& {return this->clone().ucaser();}
+//var  var::ucase()                               const& {return this->clone().ucaser();}
 var  var::lcase()                               const& {return this->clone().lcaser();}
 var  var::tcase()                               const& {return this->clone().tcaser();}
 var  var::fcase()                               const& {return this->clone().fcaser();}

@@ -207,5 +207,5 @@
 706 var  var::iconv_TX(const char* conversion) const 
 707 var  var::quote() const& 
 708 var  var::squote() const& 
-710 var  var::quote() const& 
-711 str  var::oconv_MT(const char* conversion) const 
+709 var  var::quote() const& 
+710 str  var::oconv_MT(const char* conversion) const 

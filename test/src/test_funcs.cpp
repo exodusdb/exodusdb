@@ -137,7 +137,7 @@ programinit()
 	}
 	{
 		var g = "Γιάννης";
-		assert(ucase(g) eq "ΓΙΆΝΝΗΣ");
+		assert(ucase(g).outputl("Uppercase " ^ g.quote() ^ " = ") eq "ΓΙΆΝΝΗΣ");
 		ucaser(g).outputl("ucaser=");
 		assert(g        eq "ΓΙΆΝΝΗΣ");
 	}
