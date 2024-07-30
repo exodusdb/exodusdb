@@ -302,6 +302,7 @@ auto get_timeacno(const std::string_view arg1) -> int {
 	else if ((arg1 == "var  var::quote() const&")) acno = 208;
 	else if ((arg1 == "var  var::squote() const&")) acno = 209;
 	else if ((arg1 == "var  var::unquote() const&")) acno = 210;
+	else if ((arg1 == "str  var::oconv_MT(const char* conversion) const")) acno = 211;
 
 //	else if ((arg1 == "")) acno = ;
 

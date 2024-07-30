@@ -643,6 +643,9 @@ std::string var::oconv_D(const char* conversion) const {
 #pragma GCC diagnostic push
 #pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
 std::string var::oconv_MT(const char* conversion) const {
+
+	THISIS("str  var::oconv_MT(const char* conversion) const")
+
 	// MT, MTH, MTS, MTx, MTHx, MTSx MTHS MTHSx where x is a sep char
 
 	// MT2... also a 2 digit may be inserted in all cases just after MT

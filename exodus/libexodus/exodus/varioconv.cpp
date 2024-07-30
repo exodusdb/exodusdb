@@ -761,6 +761,8 @@ std::string var::oconv_LRC(in format) const {
    but only padding, not truncating
 std::string var::oconv_LRC(in format) const {
 
+	THISIS("str  var::oconv_LRC(in format) const")
+
 	// TODO convert to C instead of var for speed
 	// and implement full mask options eg L#2-#3-#4 etc
 
