@@ -327,7 +327,10 @@ var  var::iconv_MT() const {
 	if (inttime >= 86400)
 		return "";
 
-	// P anywhere in the input indicated AM or PM
+	// TODO
+	// 15:00PM should perhaps be invalid
+	// 15:00AM should perhaps be invalid
+
 	// PM
 	if (inttime < 43200 && (*this).contains("P"))
 		inttime += 43200;

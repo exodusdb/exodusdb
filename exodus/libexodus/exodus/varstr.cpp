@@ -1381,7 +1381,7 @@ bool var::ends(SV str) const {
 	THISIS("bool var::ends(SV str) const")
 	assertString(function_sig);
 
-	// Differ from c++, javascript, python3 - see comment on var:contains
+	// DIFFERS from c++, javascript, python3 - see comment on var:contains
 	if (str.empty()) {
 		var(function_sig).errputl();
 //		VarError e(__PRETTY_FUNCTION__);
@@ -1398,7 +1398,7 @@ bool var::contains(SV str) const {
 	THISIS("bool var::contains(SV str) const")
 	assertString(function_sig);
 
-	// Differ from c++, javascript, python3
+	// DIFFERS from c++, javascript, python3
 	//
 	// Human logic: "" is not equal to "x" therefore x does not contain "".
 	//
@@ -1416,6 +1416,7 @@ bool var::contains(SV str) const {
 #else
 	return var_str.find(str) != std::string::npos;
 #endif
+
 }
 
 ////////

@@ -135,6 +135,13 @@ static void init_boost_locale1() {
 
 // Utility to check char ASCII (0-127)
 
+// On x86, comparing a char for equality with an int is generally quicker than comparing it with another char.
+
+// This is because on x86, int is the native word size, so operations on ints are usually faster than operations
+// on smaller types like char. When comparing a char with an int, the char is usually sign-extended to an int
+// (if it's a signed char) or zero-extended to an int (if it's an unsigned char),
+// and then the comparison is performed as an int comparison. This can be done with a single instruction.
+
 static inline bool char_is_ASCII(char c1) {
 	// c++ char type signedness is implementation defined. typically unsigned on x86 and signed on arm except IOS
 	// Therefore must NOT do comparisons < unless we know the chars are ASCII 0-127, nor do arithmetic outside 0-127.
