@@ -151,7 +151,6 @@ static inline bool sv_is_ASCII(std::string_view str1) {
 	// letters.
 	//for (const char& c : str1) {
 	for (const char c : str1) {
-//		if ((c & ~0x7f) != 0)
 		if (! char_is_ASCII(c))
 			return false;
 	}
@@ -548,7 +547,7 @@ var  var::textwidth() const {
 	// If all ASCII then return count of non-control chars
 	auto size = var_str.size();
 	for (const unsigned char c : var_str) {
-		if (c > '\x7f') UNLIKELY
+		if (!char_is_ASCII(c)) UNLIKELY
 			goto unicode;
 		if (c < '\x20') UNLIKELY
 			size--;
@@ -763,7 +762,7 @@ io   var::ucaser() {
 		// On x86 char is generally signed.
 		// On ARM char is generally unsigned except IOS
 		// Setting the lower 7 bits to zero will produce a zero if ASCII
-		allASCII = (c & ~0x7f) == 0;
+		allASCII = char_is_ASCII(c);
 		if (!allASCII)
 			break;
 
@@ -804,7 +803,7 @@ io   var::lcaser() {
 	auto allASCII = true;
 	for (char& c : var_str) {
 
-		allASCII = (c & ~0x7f) == 0;
+		allASCII = char_is_ASCII(c);
 		if (!allASCII)
 			break;
 
@@ -1542,7 +1541,7 @@ io   var::lowerer() {
 		// In other words you cannot work with non-ASCII characters reliably.
 
 		// Skip non-ASCII
-		if ((c & ~0x7f) != 0)
+		if (!char_is_ASCII(c))
 			continue;
 
 		// Skip > RM_
@@ -1582,7 +1581,7 @@ io   var::raiser() {
 		// In other words you cannot work with non-ASCII characters reliably.
 
 		// Skip non-ASCII
-		if ((c & ~0x7f) != 0)
+		if (!char_is_ASCII(c))
 			continue;
 
 		// Skip > FM_
