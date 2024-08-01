@@ -93,6 +93,7 @@ Binary    Hex          Comments
 //#include <memory>   //for unique_ptr
 
 #include <boost/locale.hpp>
+//#include <boost/algorithm/string.hpp>
 #include <boost/algorithm/string/trim_all.hpp>
 
 #include <exodus/varimpl.h>
@@ -821,24 +822,50 @@ io   var::ucaser() {
 	THISIS("io   var::ucaser()")
 	assertStringMutator(function_sig);
 
-	// <2ns to "convert" an empty string.
-	// + ~0.33ns per ASCII character IF pure ASCII .. regardless of upper/lower case state.
-
-	// return localeAwareChangeCase(1);
+#define EXO_ULCASE_TRY_ASCII
+#ifdef EXO_ULCASE_TRY_ASCII
 
 	// Optimise for ASCII
+	// Attempt fast byte-wise conversion of ASCII
 	// Try ASCII uppercase to start with for speed
 	// TODO This may not be correct for all locales.
 	// e.g. Turkish I i İ ı mixing ASCII Latin and UNICODE Turkish letters.
 	// Perhaps only detect ASCII if the default locale is currently C.
+
+	// If pure ASCII
+	//
+	// ~ 10 times faster than unicode case conversion
+	//
+	// 'in function' time measured using timebank/RAII)
+
+	// 100,000 chars with no conversion required.
+
+	// gcc 14 Ubuntu 24.04
+	// 0.45 ns/char ucase and lcase regardless of if need to convert or not
+
+	// clang 18 Ubuntu 24.04
+	//      ~ 1ns to "convert" an empty string
+	// + ~ 0.33ns per ASCII character unconverted (clang 18)
+	// + ~ 0.45ns per ASCII character converted (all other compilers and versions)
+
+	// Strangely clang 18 can ucase faster when no conversion is required
+	// but lcase does not show the same ability.
+	// Putting LIKELY destroys this optimisation.
+
+	// return localeAwareChangeCase(1);
+
 	auto allASCII = true;
 	for (char& c : var_str) {
 
-		// On x86 char is generally signed.
-		// On ARM char is generally unsigned except IOS
-		// Setting the lower 7 bits to zero will produce a zero if ASCII
-		allASCII = char_is_ASCII(c);
-		if (!allASCII)
+		// C/C++ standard says that it is implementation defined whether char is signed or unsigned.
+		// On x86 char is generally signed and char is numerically from 0 up to +255
+		// On ARM char is generally unsigned (except IOS) and char is numerically -128 up to +127
+		// So char < char is implementation defined.
+
+		// Check for ASCII by setting the lower 7 bits to zero and checking if 0.
+		// Checking for ASCII will eliminate the need for static_cast<signed char>(c) below
+
+		if (!(allASCII = char_is_ASCII(c)))
 			break;
 
 		// Using std::toupper - 2ns/char
@@ -846,21 +873,40 @@ io   var::ucaser() {
 		// Presumably safe to cast back to char
 		// c = static_cast<char>(std::toupper(c));
 
-		// Hand written code ~.33ns/op
-//		if (static_cast<unsigned char>(c) >= 'a' && static_cast<unsigned char>(c) <= 'z')
-		if (c >= 'a' && c <= 'z')
-			c -= 'z' - 'Z';
+		// Hand written code ~.33ns/op 5-6 times faster than std::toupper (which returns an int)
+//		if (std::islower(c))
+//			c = std::toupper(c);
+		// Focus on lower case ASAP by testing >= 'a' 1st
+		// 0x41 = A
+		// 0x61 = a
+		if (c >= 'a' && c <= 'z') {
+			// LIKELY   // Stops clang 18 optimising ucase when no conversion is required
+			// UNLIKELY // No change in performance
+			c -= '\x20'; // 'a' - 'A';
+		}
 	}
 	if (allASCII)
 		return *this;
+#endif
 
 	// ~6ms! For very first call for non-ASCII string ucaser or lcaser
 	// ~ 70ns for a one char non-ASCII string
 	// ~ 2.5ns per additional char in non-ASCII string
 	init_boost_locale1();
 
-	// Using boost (which calls icu)
+	// boost calls icu
+
+//	// Using boost locale
+//	// gcc 14 100,000 chars with no conversion required and no ASCII preconv above
+//	// 5.2 ns/char ucase
+//	// 5.0 ns/char lcase
 	var_str = boost::locale::to_upper(var_str, thread_boost_locale1);
+
+	// Using boost algorithm - doesnt work
+	// gcc 14 100,000 chars with no conversion required and no ASCII preconv above.
+	// 4.2 ns/char ucase
+	// 4.0 ns/char lcase
+//	boost::algorithm::to_upper(var_str, thread_boost_locale1);
 
 	return *this;
 }
@@ -875,23 +921,29 @@ io   var::lcaser() {
 
 	// For comments, see ucaser above.
 
+#ifdef EXO_ULCASE_TRY_ASCII
+
 	auto allASCII = true;
 	for (char& c : var_str) {
 
-		allASCII = char_is_ASCII(c);
-		if (!allASCII)
+		if (!(allASCII = char_is_ASCII(c)))
 			break;
 
-//		if (static_cast<unsigned char>(c) <= 'Z' && static_cast<unsigned char>(c) >= 'A')
-		if (c <= 'Z' && c >= 'A')
-			c += 'z' - 'Z';
+		// Skip already lower case ASAP by testing <= 'Z' 1st
+		if (c <= 'Z' && c >= 'A') {
+			c += '\x20';
+			continue;
+		}
+
 	}
 	if (allASCII)
 		return *this;
+#endif
 
 	init_boost_locale1();
 
 	var_str = boost::locale::to_lower(var_str, thread_boost_locale1);
+//	boost::algorithm::to_lower(var_str, thread_boost_locale1);
 
 	return *this;
 }
