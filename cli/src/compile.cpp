@@ -72,13 +72,20 @@ function main() {
 		options ^= secondword;
 	}
 
+#if EXO_MODULE
+	let exo_module = EXO_MODULE;
+#else
+	let exo_module = false;
+#endif
+
 	// Options
 	verbose = contains(options, "V");
 	let silent = count(options, "S");
 	let debugging = not contains(options, "R");  //no symbols for backtrace
+	// Add one optimisation level if EXO_MODULE
 	// Default optimisation level from Oct 2023 is 1. Can be reduced to 0 by option o.
 	// Also compile will recognise "export CXX_options--O0" in shell
-	let optimise = 1 + count(options, "O") - count(options, "o");
+	let optimise = 1 + count(options, "O") - count(options, "o") + (!!exo_module);
 	let generateheadersonly = contains(options, "h");
 	let force = contains(options, "F");
 	let color_option = contains(options, "C");
@@ -1576,7 +1583,7 @@ function main() {
 				// Only skip compilation if all headers are older than the current output file
 				if (not recompile_required) {
 					if (verbose)
-						printl("Skipping compilation since the output file is newer than both the source code, its include files and libexodus, and no (F)orce option provided.");
+						printl("Skipping compilation since the output file is newer than both the source code, its include files and libraries, and no (F)orce option provided.");
 					//continue;
 					return;
 				}
