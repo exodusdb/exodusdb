@@ -48,6 +48,7 @@ export namespace std {
 	using std::operator!=;
 	using std::operator<;
 	using std::operator>;
+	using std::operator<=>;
 
 	using std::string;
 	using std::u32string;
@@ -103,7 +104,9 @@ export namespace std {
 	using std::chars_format;
 
 	// really? since we are providing fmt::format
-	using std::format;
+	// Causes "error: call to 'format' is ambiguous"
+	// Should not cause problems since we are using in the std namespace ... but it does.
+	//using std::format;
 
 	using std::pair;
 	using std::initializer_list;
@@ -208,13 +211,28 @@ export namespace std {
 		using std::filesystem::remove;
 		using std::filesystem::read_symlink;
 	}
+
 	using std::ratio;
 	using std::ratio_multiply;
+	using std::common_type;
+	using std::hash;
+
 	namespace chrono {
+		using std::chrono::clock_time_conversion;
+		using std::chrono::sys_time;
 		using std::chrono::high_resolution_clock;
 		using std::chrono::system_clock;
+		using std::chrono::time_point;
+		using std::chrono::time_point_cast;
+		using std::chrono::clock_cast;
 		using std::chrono::duration;
+		using std::chrono::treat_as_floating_point;
+		using std::chrono::duration_values;
 		using std::chrono::duration_cast;
+//		using std::chrono::years;
+//		using std::chrono::months;
+//		using std::chrono::weeks;
+//		using std::chrono::days;
 		using std::chrono::hours;
 		using std::chrono::minutes;
 		using std::chrono::seconds;
@@ -255,6 +273,9 @@ export namespace std {
 	using std::cos;
 	using std::tan;
 	using std::atan;
+	using std::floor;
+	using std::ceil;
+	using std::round;
 
 	using std::strcmp;
 	using std::strlen;

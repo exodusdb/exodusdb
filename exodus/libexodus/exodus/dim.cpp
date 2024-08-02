@@ -345,12 +345,12 @@ var dim::join(SV sepchar) const {
 }
 
 // dim=var.split()
-dim var::split(SV sepchar) const {
+dim  var::split(SV sepchar) const {
 
 	//TODO provide a version that can split on any utf8 character - perhaps if sepchar is ""
 
-	THISIS("dim var::split(SV sepchar = FM)")
-	assertString(function_sig);
+//	THISIS("dim  var::split(SV sepchar = FM)")
+	assertString("dim  var::split(SV sepchar) const");
 
 	// an undimensioned dim will be dimensioned automatically
 	return dim().splitter(*this, sepchar);
@@ -362,7 +362,7 @@ dim& dim::splitter(in str1, SV sepchar) {
 	//TODO provide a version that can split on any utf8 character
 	// Perhaps if sepchar is ""
 
-	THISIS("var dim::split(in str1, SV sepchar = FM)")
+	THISIS("dim& dim::splitter(in str1, SV sepchar = FM)")
 	ISSTRING(str1)
 
 	EXO_DIM_RECALC_NROWS(*this)

@@ -292,7 +292,6 @@ static void SIGHUP_handler(int) {
 	RELOAD_req = true;
 }
 
-//void var::breakoff() const {
 PUBLIC void breakoff() {
 	// ignore more of this signal
 	signal(SIGINT, SIG_IGN);
@@ -407,7 +406,6 @@ static void SIGINT_handler(int sig [[maybe_unused]]) {
 }
 
 //called in exodus_main to initialise signals
-//void var::breakon() const {
 PUBLIC void breakon()  {
 	signal(SIGINT, SIGINT_handler);	   // Ctrl+C from termio
 	signal(SIGTERM, SIGTERM_handler);  // a polite request to TERMINATE
@@ -426,9 +424,7 @@ ND PUBLIC var backtrace() {
 	return e.stack();
 }
 
-//void var::debug(in var1) const {
 PUBLIC void debug(in var1) {
-	// THISIS("var  var::debug() const")
 
 	std::clog << "debug(" << var1 << ")" << std::endl;
 	std::cout << std::flush;

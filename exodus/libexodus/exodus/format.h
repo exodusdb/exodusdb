@@ -59,7 +59,7 @@ THE SOFTWARE.
 #   pragma clang diagnostic ignored "-Wduplicate-enum" //18 20.04
 #	pragma GCC diagnostic ignored "-Winline"
 #	pragma GCC diagnostic ignored "-Wswitch-default"
-//#	include <fmt/core.h>
+#	include <fmt/core.h>
 #	include <fmt/format.h> // for fmt::formatter<std::string_view> etc.
 #	include <fmt/args.h> // only for fmt::dynamic_format_arg_store which we are not using ATM
 //module #	include <variant>

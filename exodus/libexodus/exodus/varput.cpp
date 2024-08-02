@@ -24,6 +24,7 @@ THE SOFTWARE.
 
 #include <exodus/varimpl.h>
 #include <exodus/vardefs.h>
+#include <exodus/timebank.h>
 
 static bool desynced_with_stdio = false;
 

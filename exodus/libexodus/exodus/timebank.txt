@@ -1,5 +1,5 @@
-500 dim var::split(SV sepchar = FM) 
-501 var dim::split(in str1, SV sepchar = FM) 
+500 dim& dim::splitter(in str1, SV sepchar = FM) 
+501 unused
 502 bool dim::read(in filevar, in key) 
 503 bool dim::write(in filevar, in key) const 
 504 bool dim::osread(in osfilename, const char* codepage DEFAULT_EMPTY) 
@@ -209,3 +209,6 @@
 708 var  var::squote() const& 
 709 var  var::quote() const& 
 710 str  var::oconv_MT(const char* conversion) const 
+711 var  var::format(SV fmt_str, Args&&... args) const 
+712 var  format(SV fmt_str, Args&&... args)
+713 auto fmt::formatter::format(var) const 

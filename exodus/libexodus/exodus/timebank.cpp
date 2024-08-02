@@ -12,7 +12,7 @@
 
 namespace exo {
 
-void get_timeacc0();
+void get_timebank_acc0();
 
 TimeBank::~TimeBank() {
 
@@ -21,7 +21,7 @@ TimeBank::~TimeBank() {
 
 		// Work out the time for a pure deposit
 		// to be deducted from every time account x ndeposits
-		get_timeacc0();
+		get_timebank_acc0();
 		auto pure_deposit_time =timeaccs_[0].ns/100;
 		// If we cannot call the above program during destructor/program termination
 		// auto pure_deposit_time = 50;//very crude underestimate probably
@@ -36,17 +36,17 @@ TimeBank::~TimeBank() {
 		}
 
 		// Print out all the time accounts
-		// Skip time_acno 0
+		// Skip timebank_acno 0
 		int naccs = 0;
-		for (unsigned time_acno = 1; time_acno < timeaccs_.size(); time_acno++) {
-			auto count = timeaccs_[time_acno].count;
+		for (unsigned timebank_acno = 1; timebank_acno < timeaccs_.size(); timebank_acno++) {
+			auto count = timeaccs_[timebank_acno].count;
 			if (not count)
 				continue;
 
-			auto ns = timeaccs_[time_acno].ns;
+			auto ns = timeaccs_[timebank_acno].ns;
 
 			// Deduct pure deposit time * ndeposits
-			if (time_acno) {
+			if (timebank_acno) {
 				auto tot_pure_deposit_time = pure_deposit_time * count;
 				if (ns > tot_pure_deposit_time)
 					ns -= tot_pure_deposit_time;
@@ -65,9 +65,9 @@ TimeBank::~TimeBank() {
 			// Print a row
 			std::cerr
 
-			// time_acno
+			// timebank_acno
 			<< std::right << std::setw(4)
-			<< time_acno
+			<< timebank_acno
 
 			// Count
 			<< std::right << std::setw(8)
@@ -98,13 +98,13 @@ TimeBank::~TimeBank() {
 			<< ns/count << "  "
 
 			// timeacc name
-			<< timeacc_names_[time_acno]
+			<< timeacc_names_[timebank_acno]
 
 			<< std::endl;
 		} // next timeacc
 	} // ~TimeBank
 
-void get_timeacc0() {
+void get_timebank_acc0() {
 
 	// 100 deposits to estimate pure deposit time
 	{Timer {0};}

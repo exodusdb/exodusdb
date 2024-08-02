@@ -36,7 +36,7 @@ THE SOFTWARE.
 // var_base provides the basic var-like functionality for var
 //
 #include <exodus/format.h>
-//// Support var::format and var::println
+//// Support var format and var println
 ////
 //#if __GNUC__  > 11 || __clang_major__ > 1
 //#	define EXO_FORMAT
@@ -50,9 +50,9 @@ THE SOFTWARE.
 //#	endif
 //#endif
 
+#include <exodus/vardefs.h>
 #include <exodus/vartyp.h>
 #include <exodus/varb.h>
-#include <exodus/vardefs.h>
 
 namespace exo {
 
@@ -86,6 +86,7 @@ public:
 
 // Forward declarations
 //
+class var;
 class rex;
 class dim;
 class var_iter;
@@ -99,6 +100,15 @@ class var_proxy3;
 // using VARREF =       var_base&;
 // using CVR    = const var_base&;
 // using TVR    =       var_base&&;
+
+    using VAR    =       var;
+    using VARREF =       var&;
+    using CVR    = const var&;
+    using TVR    =       var&&;
+
+    using in     = const var&;
+    using out    =       var&;
+    using io     =       var&;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 //                                               VAR
@@ -592,55 +602,74 @@ public:
 	ND var  oconv(const char* convstr) const;
 	ND var  iconv(const char* convstr) const;
 
+
 #ifdef EXO_FORMAT
 
-// Replicated in var.h and exofuncs.h - KEEP IN SYNC
-#if __GNUC__ >= 7 || __clang_major__ > 15
-	// Works at compile time (only? or if possible)
-#	define EXO_FORMAT_STRING_TYPE1 fmt::format_string<var, Args...>
-#	define EXO_FORMAT_STRING_TYPE2 fmt::format_string<Args...>
-#else
-	// Always run time
-#	define EXO_FORMAT_STRING_TYPE1 SV
-#	define EXO_FORMAT_STRING_TYPE2 SV
-#endif
-
-template<class... Args>
-	ND CONSTEXPR
-	   var  format(EXO_FORMAT_STRING_TYPE1&& fmt_str, Args&&... args) const {
-
-//error: call to consteval function 'fmt::basic_format_string<char, exo::var &>
-//::basic_format_string<fmt::basic_format_string<char, const exo::var &>, 0>' is not a constant expression
-// 2033 |                         return fmt::format(fmt_str, *this, args... );
-//      |                                            ^
-
-#if __clang_major__ == 0
-#if __cpp_if_consteval >= 202106L
-		if consteval {
-#else
-		if (std::is_constant_evaluated()) {
-#endif
-// OK in 2404 g++ but not OK in 2404 clang
-// clang on 22.04 cannot accept compile time format string even if a cstr
-///root/exodus/test/src/test_format.cpp:14:18: error: call to consteval function 'fmt::basic_format_string<char, exo::var>::basic_format_string<ch
-//ar[7], 0>' is not a constant expression
-//        assert(x.format("{:.2f}").outputl() == "12.35");
-
-			return fmt::format(std::forward<EXO_FORMAT_STRING_TYPE1>(fmt_str), *this, std::forward<Args>(args)... );
-		} else
-#endif
-
-		{
-			return fmt::vformat(fmt_str, fmt::make_format_args(*this, std::forward<Args>(args)...) );
-		}
-	}
+//// Replicated in var.h and exofuncs.h - KEEP IN SYNC
+//#if __GNUC__ >= 7 || __clang_major__ > 15
+//	// Works at compile time (only? or if possible)
+//#	define EXO_FORMAT_STRING_TYPE1 fmt::format_string<var, Args...>
+//#	define EXO_FORMAT_STRING_TYPE2 fmt::format_string<Args...>
+//#else
+//	// Always run time
+//#	define EXO_FORMAT_STRING_TYPE1 SV
+//#	define EXO_FORMAT_STRING_TYPE2 SV
+//#endif
+//
+//
+//template<class... Args>
+//	ND CONSTEXPR
+//	   var  format(EXO_FORMAT_STRING_TYPE1&& fmt_str, Args&&... args) const {
+//
+////error: call to consteval function 'fmt::basic_format_string<char, exo::var &>
+////::basic_format_string<fmt::basic_format_string<char, const exo::var &>, 0>' is not a constant expression
+//// 2033 |                         return fmt::format(fmt_str, *this, args... );
+////      |                                            ^
+//
+//#if __clang_major__ == 0
+//#if __cpp_if_consteval >= 202106L
+//		if consteval {
+//#else
+//		if (std::is_constant_evaluated()) {
+//#endif
+//// OK in 2404 g++ but not OK in 2404 clang
+//// clang on 22.04 cannot accept compile time format string even if a cstr
+/////root/exodus/test/src/test_format.cpp:14:18: error: call to consteval function 'fmt::basic_format_string<char, exo::var>::basic_format_string<ch
+////ar[7], 0>' is not a constant expression
+////        assert(x.format("{:.2f}").outputl() == "12.35");
+//
+//			THISIS("var  format(SV fmt_str, Args&&... args) const");
+//			return fmt::format(std::forward<EXO_FORMAT_STRING_TYPE1>(fmt_str), *this, std::forward<Args>(args)... );
+//		} else
+//#endif
+//
+//		{
+////#pragma message "EXO_FORMAT_STRING_TYPE1 == " DUMPDEFINE0(EXO_FORMAT_STRING_TYPE1)
+////			THISIS("var  format(" DUMPDEFINE0(EXO_FORMAT_STRING_TYPE1) "&& fmt_str, Args&&... args) const");
+//			THISIS("var  format(SV fmt_str, Args&&... args) const");
+//			assertString(function_sig);
+//			return fmt::vformat(fmt_str, fmt::make_format_args(*this, std::forward<Args>(args)...) );
+//		}
+//	}
+//
+//	template<class... Args>
+////	ND var  format(in fmt_str, Args&&... args) const {
+//	ND var  vformat(SV fmt_str, Args&&... args) const {
+//		THISIS("var  vformat(SV fmt_str, Args&&... args) const");
+//		assertString(function_sig);
+//		return fmt::vformat(fmt_str, fmt::make_format_args(*this, args...) );
+//	}
 
 	template<class... Args>
-	ND var  vformat(SV fmt_str, Args&&... args) const {
-		return fmt::vformat(fmt_str, fmt::make_format_args(*this, args...) );
+	ND var  format(in fmt_str, Args&&... args) const {
+		THISIS("var  var::format(SV fmt_str, Args&&... args) const");
+		assertString(function_sig);
+		// *this becomes the first format argument and any additional arguments become additionl format arguments
+		return fmt::vformat(std::string_view(fmt_str), fmt::make_format_args(*this, args...) );
 	}
 
 #endif //EXO_FORMAT
+
 
 	ND var  from_codepage(const char* codepage) const;
 	ND var  to_codepage(const char* codepage) const;

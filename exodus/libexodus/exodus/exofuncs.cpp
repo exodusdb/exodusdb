@@ -30,6 +30,7 @@ THE SOFTWARE.
 #	include <exodus/dim.h>
 #	include <exodus/rex.h>
 #endif
+#include <exodus/vardefs.h>
 
 #include <exodus/format.h>
 

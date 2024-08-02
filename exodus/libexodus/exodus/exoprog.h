@@ -17,9 +17,9 @@
 #	include <exodus/var.h>
 #endif
 
+#include <exodus/vardefs.h>
 #include <exodus/exoimpl.h>
 #include <exodus/exoenv.h>
-#include <exodus/vardefs.h>
 #include <exodus/exocallable.h>
 
 namespace exo {

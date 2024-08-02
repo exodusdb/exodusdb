@@ -1307,7 +1307,7 @@ bool var::open(in filename, in connection /*DEFAULTNULL*/) {
 
 #ifdef EXO_TIMEBANK
 	//Timer t2(245);//open cache_miss
-	Timer timer1(get_timeacno("bool var::open cache_miss"));
+	Timer timer1(get_timebank_acno("bool var::open cache_miss"));
 	//if (DBTRACE) {
 	//	connection2.logputl("DBTR var::open-1 ");
 	//}
@@ -1463,7 +1463,7 @@ bool var::readc(in filehandle, in key) {
 
 #ifdef EXO_TIMEBANK
 	//Timer t2(247);//readc cache_miss
-	Timer timer1(get_timeacno("bool var::reado cache_miss"));
+	Timer timer1(get_timebank_acno("bool var::reado cache_miss"));
 #endif
 	// Ordinary read from the database
 	bool result = this->read(filehandle, key);

@@ -50,79 +50,87 @@ THE SOFTWARE.
 //#include <exodus/rex.h>
 #endif
 
-#include <exodus/vardefs.h>
+//#include <exodus/vardefs.h>
+    using VAR    =       exo::var;
+    using VARREF =       exo::var&;
+    using CVR    = const exo::var&;
+    using TVR    =       exo::var&&;
 
-// Visibility
+    using in     = const exo::var&;
+    using out    =       exo::var&;
+    using io     =       exo::var&;
+
+//// Visibility
+////
+//// If using g++ -fvisibility=hidden to make all hidden except those marked PUBLIC ie "default"
+//// "Weak" template functions seem to get excluded if visiblity is hidden, despite being marked as PUBLIC
+//// so we explictly instantiate them as non-template functions with "template<> ..." syntax.
+//// nm -C *so |&grep -F "exo::var_base<exo::var_mid<exo::var> >::"
+//// nm -D libexodus.so --demangle |grep T -w
+//#define PUBLIC __attribute__((visibility("default")))
 //
-// If using g++ -fvisibility=hidden to make all hidden except those marked PUBLIC ie "default"
-// "Weak" template functions seem to get excluded if visiblity is hidden, despite being marked as PUBLIC
-// so we explictly instantiate them as non-template functions with "template<> ..." syntax.
-// nm -C *so |&grep -F "exo::var_base<exo::var_mid<exo::var> >::"
-// nm -D libexodus.so --demangle |grep T -w
-#define PUBLIC __attribute__((visibility("default")))
-
-using SV = std::string_view;
-
-// constinit/consteval where possible otherwise constexpt
+//using SV = std::string_view;
 //
-// constinit https://en.cppreference.com/w/cpp/language/constinit
+//// constinit/consteval where possible otherwise constexpt
+////
+//// constinit https://en.cppreference.com/w/cpp/language/constinit
+////
+//// constinit - asserts that a variable has static initialization,
+//// i.e. zero initialization and constant initialization, otherwise the program is ill-formed.
+////
+//// The constinit specifier declares a variable with static or thread storage duration.
+//// If a variable is declared with constinit, its initializing declaration must be applied with constinit.
+//// If a variable declared with constinit has dynamic initialization
+//// (even if it is performed as static initialization), the program is ill-formed.
+//// If no constinit declaration is reachable at the point of the initializing declaration,
+//// the program is ill-formed, no diagnostic required.
+////
+//// constinit cannot be used together with constexpr.
+//// When the declared variable is a reference, constinit is equivalent to constexpr.
+//// When the declared variable is an object, constexpr mandates that the object must
+//// have static initialization and constant destruction and makes the object const-qualified,
+//// however, constinit does not mandate constant destruction and const-qualification.
+//// As a result, an object of a type which has constexpr constructors and no constexpr destructor
+//// (e.g. std::shared_ptr<T>) might be declared with constinit but not constexpr.
 //
-// constinit - asserts that a variable has static initialization,
-// i.e. zero initialization and constant initialization, otherwise the program is ill-formed.
+//// Make var constinit/constexpr if std::string is constexpr (c++20 but g++-12 has some limitation)
+////
+//#if __cpp_lib_constexpr_string >= 201907L
+//#	define CONSTEXPR constexpr
+//#	define CONSTINIT_OR_CONSTEXPR constinit const // const because constexpr implies const
 //
-// The constinit specifier declares a variable with static or thread storage duration.
-// If a variable is declared with constinit, its initializing declaration must be applied with constinit.
-// If a variable declared with constinit has dynamic initialization
-// (even if it is performed as static initialization), the program is ill-formed.
-// If no constinit declaration is reachable at the point of the initializing declaration,
-// the program is ill-formed, no diagnostic required.
+//#if ( __GNUC__  >= 13 ) || ( __clang_major__ > 1)
+//#		define CONSTINIT_VAR constinit
+//#	else
+//		// Ubuntu 22.04 g++12 doesnt support constinit var
+//#		define CONSTINIT_VAR
+//#	endif
 //
-// constinit cannot be used together with constexpr.
-// When the declared variable is a reference, constinit is equivalent to constexpr.
-// When the declared variable is an object, constexpr mandates that the object must
-// have static initialization and constant destruction and makes the object const-qualified,
-// however, constinit does not mandate constant destruction and const-qualification.
-// As a result, an object of a type which has constexpr constructors and no constexpr destructor
-// (e.g. std::shared_ptr<T>) might be declared with constinit but not constexpr.
-
-// Make var constinit/constexpr if std::string is constexpr (c++20 but g++-12 has some limitation)
+//#else
+//#	define CONSTEXPR
+//#	define CONSTINIT_OR_CONSTEXPR constexpr
+//#	define CONSTINIT_VAR
+//#endif
 //
-#if __cpp_lib_constexpr_string >= 201907L
-#	define CONSTEXPR constexpr
-#	define CONSTINIT_OR_CONSTEXPR constinit const // const because constexpr implies const
-
-#if ( __GNUC__  >= 13 ) || ( __clang_major__ > 1)
-#		define CONSTINIT_VAR constinit
-#	else
-		// Ubuntu 22.04 g++12 doesnt support constinit var
-#		define CONSTINIT_VAR
-#	endif
-
-#else
-#	define CONSTEXPR
-#	define CONSTINIT_OR_CONSTEXPR constexpr
-#	define CONSTINIT_VAR
-#endif
-
-#if __cpp_consteval >= 201811L
-#	define CONSTEVAL_OR_CONSTEXPR consteval
-#else
-#	define CONSTEVAL_OR_CONSTEXPR constexpr
-#endif
-
-// [[likely]] [[unlikely]]
+//#if __cpp_consteval >= 201811L
+//#	define CONSTEVAL_OR_CONSTEXPR consteval
+//#else
+//#	define CONSTEVAL_OR_CONSTEXPR constexpr
+//#endif
 //
-#if __has_cpp_attribute(likely)
-#	define LIKELY [[likely]]
-#	define UNLIKELY [[unlikely]]
-#else
-#	define LIKELY
-#	define UNLIKELY
-#endif
-
-// [[nodiscard]]
+//// [[likely]] [[unlikely]]
+////
+//#if __has_cpp_attribute(likely)
+//#	define LIKELY [[likely]]
+//#	define UNLIKELY [[unlikely]]
+//#else
+//#	define LIKELY
+//#	define UNLIKELY
+//#endif
 //
-#define ND [[nodiscard]]
+//// [[nodiscard]]
+////
+//#define ND [[nodiscard]]
 
 namespace exo {
 

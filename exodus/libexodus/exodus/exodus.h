@@ -29,6 +29,10 @@ THE SOFTWARE.
 /////////////////////////////////////////////////////////////
 
 #if EXO_MODULE
+	import std; // only for std::string_view in timebank get_timebank_acno?
+#endif
+
+#if EXO_MODULE
 	import var;
 #else
 #	include <exodus/var.h>

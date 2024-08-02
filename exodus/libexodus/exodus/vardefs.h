@@ -1,29 +1,12 @@
 #ifndef EXO_VARDEFS_H
 #define EXO_VARDEFS_H
 
+//#include <version> // for __cpp_consteval
+
 #define BACKTRACE_MAXADDRESSES 100
 
 #define DUMPDEFINE(x) DUMPDEFINE0(x)
 #define DUMPDEFINE0(x) #x
-
-namespace exo {
-	using VAR    =       exo::var;
-	using VARREF =       exo::var&;
-	using CVR    = const exo::var&;
-	using TVR    =       exo::var&&;
-
-	using in     = const exo::var&;
-	using out    =       exo::var&;
-	using io     =       exo::var&;
-
-//	Note:
-//	Inside class var_base
-//	using VAR    =       var_base;
-//	using VARREF =       var_base&;
-//	using CVR    = const var_base&;
-//	using TVR    =       var_base&&;
-}
-
 
 // Info used in cli/compile
 //
@@ -100,13 +83,124 @@ namespace exo {
 #define DEFAULT_VM = VM_
 #define DEFAULT_NULL = nullptr
 
+//// string::view
+////
+//using SV = std::string_view;
+
 // [[nodiscard]]
 //
 #define ND [[nodiscard]]
 
+// EXO_REGEX_BOOST
+//
 #define EXO_REGEX_BOOST
 
+// EXO_CONCEPTS
+//
+#if __cpp_lib_concepts >= 201907L && ( __GNUC__ > 10 || __clang_major__ > 1 )
+#	define EXO_CONCEPTS
+#endif
+
+#pragma GCC diagnostic ignored "-Winline"
+
+// Visibility
+//
+// If using g++ -fvisibility=hidden to make all hidden except those marked PUBLIC ie "default"
+// "Weak" template functions seem to get excluded if visiblity is hidden, despite being marked as PUBLIC
+// so we explictly instantiate them as non-template functions with "template<> ..." syntax.
+// nm -C *so |&grep -F "exo::var_base<exo::var_mid<exo::var> >::"
+// nm -D libexodus.so --demangle |grep T -w
 #define PUBLIC __attribute__((visibility("default")))
 
-#endif //EXO_VARDEFS_H
+// [[likely]] [[unlikely]]
+//
+#if __has_cpp_attribute(likely)
+#	define LIKELY [[likely]]
+#	define UNLIKELY [[unlikely]]
+#else
+#	define LIKELY
+#	define UNLIKELY
+#endif
 
+// [[nodiscard]]
+//
+#define ND [[nodiscard]]
+
+// constinit/consteval where possible otherwise constexpt
+//
+// constinit https://en.cppreference.com/w/cpp/language/constinit
+//
+// constinit - asserts that a variable has static initialization,
+// i.e. zero initialization and constant initialization, otherwise the program is ill-formed.
+//
+// The constinit specifier declares a variable with static or thread storage duration.
+// If a variable is declared with constinit, its initializing declaration must be applied with constinit.
+// If a variable declared with constinit has dynamic initialization
+// (even if it is performed as static initialization), the program is ill-formed.
+// If no constinit declaration is reachable at the point of the initializing declaration,
+// the program is ill-formed, no diagnostic required.
+//
+// constinit cannot be used together with constexpr.
+// When the declared variable is a reference, constinit is equivalent to constexpr.
+// When the declared variable is an object, constexpr mandates that the object must
+// have static initialization and constant destruction and makes the object const-qualified,
+// however, constinit does not mandate constant destruction and const-qualification.
+// As a result, an object of a type which has constexpr constructors and no constexpr destructor
+// (e.g. std::shared_ptr<T>) might be declared with constinit but not constexpr.
+
+// Make var constinit/constexpr if std::string is constexpr (c++20 but g++-12 has some limitation)
+//
+#if __cpp_lib_constexpr_string >= 201907L
+#	define CONSTEXPR constexpr
+#	define CONSTINIT_OR_CONSTEXPR constinit const // const because constexpr implies const
+
+#if ( __GNUC__  >= 13 ) || ( __clang_major__ > 1)
+#		define CONSTINIT_VAR constinit
+#	else
+		// Ubuntu 22.04 g++12 doesnt support constinit var
+#		define CONSTINIT_VAR
+#	endif
+
+#else
+#	define CONSTEXPR
+#	define CONSTINIT_OR_CONSTEXPR constexpr
+#	define CONSTINIT_VAR
+#endif
+
+#if __cpp_consteval >= 201811L
+#	define CONSTEVAL_OR_CONSTEXPR consteval
+#else
+#	define CONSTEVAL_OR_CONSTEXPR constexpr
+#endif
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wreserved-id-macro"
+
+#ifdef EXO_TIMEBANK
+#	define THISIS(FUNC_DESC) [[maybe_unused]] static const char* function_sig = FUNC_DESC;exo::Timer thisistimer(exo::get_timebank_acno(FUNC_DESC));
+#else
+#	define THISIS(FUNC_DESC) [[maybe_unused]] static const char* function_sig = FUNC_DESC;
+#endif
+
+#define ISDEFINED(VARNAME) (VARNAME).assertDefined(function_sig, #VARNAME);
+#define ISASSIGNED(VARNAME) (VARNAME).assertAssigned(function_sig, #VARNAME);
+#define ISSTRING(VARNAME) (VARNAME).assertString(function_sig, #VARNAME);
+#define ISNUMERIC(VARNAME) (VARNAME).assertNumeric(function_sig, #VARNAME);
+
+#pragma clang diagnostic pop
+
+// tracing ctor/dtor/assign/conversions
+// Use cmake -DEXO_SNITCH=1 to enable
+//
+#ifdef EXO_SNITCH
+#	undef EXO_SNITCH
+//#include <iomanip>
+#	define EXO_SNITCH(FUNC) std::clog << this << " " << FUNC << " " << var_typ << " " << std::setw(10) << var_int << " " << std::setw(10) << var_dbl << " '" << var_str << "' " << std::endl;
+#	define EXO_SNITCHING
+#else
+#	define EXO_SNITCH(FUNC)
+#endif
+
+//#include <exodus/timebank.h>
+
+#endif //EXO_VARDEFS_H

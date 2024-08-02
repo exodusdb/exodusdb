@@ -9,10 +9,52 @@ function main() {
     logputl("Note: libexodus was not built with cmake ... -DEXO_TIMEBANK=1 so test_timebank will not collect or output any timings");
 #endif
 
+
+//	// Verify catch format error
+//	try {
+//		var x = 12.3456;
+//		var fmt = "{.:.3f}";
+//		assert(xvformat(fmt, x) == "12.346");
+//		assert(false && fmt ^ " should throw a format error");
+//	} catch (VarError e) {
+//		errputl("Caught format error: " + e.description);
+//	}
+
 	var v1 = 12.3456;
 	var v2;
-	for (auto i [[maybe_unused]] : range(1, 1'000)) {
+	var n = 1'000;
+	for (auto i [[maybe_unused]] : range(1, n)) {
 
+		{
+
+			var x = 12.3456;
+
+			// Poor performance?
+			//
+			// var  var::format(SV fmt_str, Args&&... args) const
+			//
+			// 34'000 ns 1st op + 400 ns/op for 1'000 ops (exodus cached)
+			assert(x.format("{:.2f}") == "12.35");
+
+//			// auto fmt::formatter::format
+//			//
+//			// formatting a var using a var
+//			var fmt = "{:.3f}";
+//			// 6000 ns 1st op + 110 ns/op for 1'000 ops (exodus cached?)
+//			assert(xvformat(fmt, x) == "12.346");
+
+			// Compile time format is very fast even for the 1st one
+
+			// TODO should be compile time
+			// auto fmt::formatter::format(...) const
+			// 4148 ns 1st op + 106 ns/op for 1000 ops
+//			assert(xformat("{:.4f}", x) == "12.3456");
+	continue;
+//
+//			assert(xvformat(fmt, 12.3456).outputl() == "12.35");
+//			assert(x.vformat(fmt).outputl() == "12.35");
+		}
+#if 0
 		var v3;
 
 		v3 = var("abc").len();
@@ -102,7 +144,7 @@ function main() {
 			v3.lcaser();
 	//		TRACE(v3)
 
-	}
+		}
 
 //		printl(oconv(-20, "MX"));
 
@@ -123,7 +165,9 @@ function main() {
 //			assert(v3b == str("abcdefghij", n));
 //			assert(v3b == str("", 1000));
 		}
-	}
+#endif
+
+	} // for loop
 
 	printl(elapsedtimetext());
 	printl("Test passed");
