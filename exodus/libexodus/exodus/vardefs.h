@@ -110,12 +110,6 @@
 //
 #define EXO_REGEX_BOOST
 
-// EXO_CONCEPTS
-//
-#if __cpp_lib_concepts >= 201907L && ( __GNUC__ > 10 || __clang_major__ > 1 )
-#	define EXO_CONCEPTS
-#endif
-
 #pragma GCC diagnostic ignored "-Winline"
 
 // Visibility
@@ -204,18 +198,15 @@
 
 #pragma clang diagnostic pop
 
-// tracing ctor/dtor/assign/conversions
+// Tracing ctor/dtor/assign/conversions
 // Use cmake -DEXO_SNITCH=1 to enable
 //
 #ifdef EXO_SNITCH
 #	undef EXO_SNITCH
-//#include <iomanip>
 #	define EXO_SNITCH(FUNC) std::clog << this << " " << FUNC << " " << var_typ << " " << std::setw(10) << var_int << " " << std::setw(10) << var_dbl << " '" << var_str << "' " << std::endl;
 #	define EXO_SNITCHING
 #else
 #	define EXO_SNITCH(FUNC)
 #endif
-
-//#include <exodus/timebank.h>
 
 #endif //EXO_VARDEFS_H

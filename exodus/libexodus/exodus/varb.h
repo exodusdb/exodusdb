@@ -32,7 +32,7 @@ THE SOFTWARE.
 
 #if EXO_MODULE
 	import std;
-#	include <iomanip> // Here only to solve some inability to manually create a std module
+//#	include <iomanip> // Here only to solve some inability to manually create a std module
 #else
 #	include <cstdint> // for std::int64_t etc.
 //#	include <cmath>   // for std::fmod etc.
@@ -46,6 +46,17 @@ THE SOFTWARE.
 #	if __has_include(<concepts>)
 #		include <concepts>
 #	endif
+#endif
+
+// Verify __cpp_ macros are available from #include <version>
+#ifndef  __cpp_constexpr
+#	error "#include <version>" is missing
+#endif
+
+// EXO_CONCEPTS
+//
+#if __cpp_lib_concepts >= 201907L && ( __GNUC__ > 10 || __clang_major__ > 1 )
+#	define EXO_CONCEPTS
 #endif
 
 namespace exo {

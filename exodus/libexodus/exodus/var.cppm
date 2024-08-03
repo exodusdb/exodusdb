@@ -1,8 +1,3 @@
-//module;
-//export module exo;
-//export import :var;
-//export import :dim;
-
 module;
 
 #include <exodus/var.h>
@@ -12,16 +7,18 @@ module;
 export module var;
 
 namespace exo {
-    export using exo::var;
-    export using exo::var_iter;
-//    export using exo::begin;
-//    export using exo::end;
-    export using exo::dim;
-//    export using exo::dim_iter;
-    export using exo::rex;
-    export using exo::VarError;
+	export using exo::var_base;
+	export using exo::var_mid;
+	export using exo::var;
+	export using exo::var_iter;
+//	export using exo::begin;
+//	export using exo::end;
+	export using exo::dim;
+//	export using exo::dim_iter;
+	export using exo::rex;
+	export using exo::VarError;
 	export using exo::operator""_var;
-    export using exo::operator""_rex;
+	export using exo::operator""_rex;
 	export using exo::SMALLEST_NUMBER;
 
 	export using exo::varint_t;
@@ -43,9 +40,9 @@ namespace exo {
 	export using exo::DimIndexOutOfBounds;
 	export using exo::DimNotDimensioned;
 
-    export using exo::CVR;
-    export using exo::VARREF;
-    export using exo::SV;
+	export using exo::CVR;
+	export using exo::VARREF;
+	export using exo::SV;
 
 //	export using exo::EOL;
 //	export using exo::OSSLASH;
