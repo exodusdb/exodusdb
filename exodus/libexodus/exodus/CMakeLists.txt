@@ -31,6 +31,21 @@
 	endif(EXO_TIMEBANK)
 
 #
+# Patch ostream - See vardefs.h for more info.
+# #############
+#
+# Similar code in install.sh and CMakeLists.txt - KEEP IN SYNC
+# Warning. Using sudo which is strange inside cmake.
+# Warning. Only doing c++ 14 here. TODO patch all.
+#
+	execute_process(
+		COMMAND
+			sudo sed -i "s|# include <format>|# ifndef EXO_FORMAT\\n#  include <format>\\n# endif|" /usr/include/c++/14/ostream
+		COMMAND
+			sudo sed -i "s|#if __cpp_lib_print|#if !defined(EXO_FORMAT) \\&\\& __cpp_lib_print|" /usr/include/c++/14/ostream
+	)
+
+#
 # Coverage testing
 # ################
 #
@@ -415,16 +430,6 @@
 	install (
 		FILES timebank.txt
 		DESTINATION share/exodus
-	)
-
-# Patch ostream
-# #############
-#
-	execute_process(
-		COMMAND
-			sed -i "s|# include <format>|# ifndef EXO_FORMAT\\n#  include <format>\\n# endif|" /usr/include/c++/14/ostream
-		COMMAND
-			sed -i "s|#if __cpp_lib_print|#if !defined(EXO_FORMAT) \\&\\& __cpp_lib_print|" /usr/include/c++/14/ostream
 	)
 
 #

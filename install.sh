@@ -485,6 +485,19 @@ function build_and_install {
 	APT_GET sudo apt-get install -y cmake $BUILD_DEPS
 
 :
+: Patch /usr/include/c++/*/ostream
+: --------------------------------
+:
+: Duplicate code in install.sh and CMakeLists.txt - KEEP IN SYNC
+:
+: For more info, see vardefs.h
+:
+	for FILENAME in `ls /usr/include/c++/*/ostream || true`; do
+		sudo sed -i "s|^# include <format>|# ifndef EXO_FORMAT\\n#  include <format>\\n# endif|" $FILENAME
+		sudo sed -i "s|^#if __cpp_lib_print|#if !defined(EXO_FORMAT) \\&\\& __cpp_lib_print|" $FILENAME
+	done
+
+:
 : Build exodus
 : ------------
 :
