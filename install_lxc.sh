@@ -246,7 +246,7 @@ function do_one_stage {
 :
 :	tar local exodus dir
 :
-			TAR_FILENAME=${ALL_TAR_FILENAME:-lxc_$$_exodus.tar.z}
+			TAR_FILENAME=${ALL_TAR_FILENAME:-../lxc_$$_exodus.tar.z}
 			if [[ ! -f $TAR_FILENAME ]]; then
 				tar cfz $TAR_FILENAME ../exodus
 			fi

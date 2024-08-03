@@ -492,6 +492,11 @@ function main() {
 		assert(format("a {} b {} c", 100, 200).outputl() == "a 100 b 200 c");
 
 	}
+
+	printl(format("test free function print ... {}", var(3.5)));
+	print("test free function print ... {}", var(3.5));
+	println("test exo free function println ... {}", var(3.5));
+
 #endif // EXO_FORMAT
 
 	printl(elapsedtimetext());

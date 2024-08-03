@@ -859,13 +859,23 @@ void printt(void) {
 template<class... Args>
 ND var  format(SV fmt_str, Args&&... args) {
 	THISIS("var  format(SV fmt_str, Args&&... args)");
+#if __clang_major__ and __clang_major__ <= 15
+	// Dont forward if the format library cannot handle it
+	return fmt::vformat(fmt_str, fmt::make_format_args(args...));
+#else
 	return fmt::vformat(fmt_str, fmt::make_format_args(std::forward<Args>(args)...));
+#endif
 }
 
 // print
 template<class... Args>
    void print(SV fmt_str, Args&&... args) {
+#if __clang_major__ and __clang_major__ <= 15
+	// Dont forward if the format library cannot handle it
+	fmt::vprint(fmt_str, fmt::make_format_args(args...));
+#else
 	fmt::vprint(fmt_str, fmt::make_format_args(std::forward<Args>(args)...));
+#endif
 }
 
 // println
