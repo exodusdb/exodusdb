@@ -856,6 +856,9 @@ void printt(void) {
 //}
 
 // Returns a var instead of a std::string
+// WARNING: In gcc 14 on ubuntu 24.04
+// this REQUIRES A PATCHED VERSION OF /usr/include/c++/14/ostream
+// See comment in vardefs.h about EXO_FORMAT
 template<class... Args>
 ND var  format(SV fmt_str, Args&&... args) {
 	THISIS("var  format(SV fmt_str, Args&&... args)");

@@ -417,6 +417,16 @@
 		DESTINATION share/exodus
 	)
 
+# Patch ostream
+# #############
+#
+	execute_process(
+		COMMAND
+			sed -i "s|# include <format>|# ifndef EXO_FORMAT\\n#  include <format>\\n# endif|" /usr/include/c++/14/ostream
+		COMMAND
+			sed -i "s|#if __cpp_lib_print|#if !defined(EXO_FORMAT) \\&\\& __cpp_lib_print|" /usr/include/c++/14/ostream
+	)
+
 #
 # Trigger ldconfig
 # ################

@@ -13,6 +13,21 @@
 #define EXODUS_RELEASE "24.07"
 #define EXODUS_PATCH "24.07.0"
 
+// Used in patch of /usr/include/c++/14/ostream to exclude std::format
+// which is ambiguous with exo::format despite different namespace due to argument dependent lookup
+// https://en.wikipedia.org/wiki/Argument-dependent_name_lookup
+// Patched in CMakeLists.txt
+//    execute_process(
+//        COMMAND
+//            sed -i "s|# include <format>|# ifndef EXO_FORMAT\\n#  include <format>\\n# endif|" /usr/include/c++/14/ostream
+//        COMMAND
+//            sed -i "s|#if __cpp_lib_print|#if !defined(EXO_FORMAT) \\&\\& __cpp_lib_print|" /usr/include/c++/14/ostream
+//    )
+// Probably converted to EXO_FORMAT 2 after inclusion of exodus/format.h
+#ifndef EXO_FORMAT
+#	define EXO_FORMAT 1
+#endif
+
 // Use ASCII 0x1A-0x1F for PickOS separator chars instead
 // of PickOS 0xFA-0xFF which are illegal utf-8 bytes
 

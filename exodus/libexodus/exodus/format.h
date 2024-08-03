@@ -50,6 +50,7 @@ THE SOFTWARE.
 
 //#elif __has_include(<fmt/core.h>)
 // Not available in libfmt6 which doesnt compile with exodus
+#undef EXO_FORMAT
 #if __has_include(<fmt/args.h>)
 //#	warning Using fmt library instead std::format
 #	define EXO_FORMAT 2

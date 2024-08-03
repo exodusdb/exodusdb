@@ -27,9 +27,9 @@ function main() {
 	printl("EXO_FORMAT is not available so std::format a var is not possible.");
 #else
 
-#ifndef EXO_MODULE_INITIAL_BUILD
-	printl(std::format("EXO_FORMAT is defined so formatting a var using std::format is possible. e.g. {}", "'hello'"));
-#endif
+//#ifndef EXO_MODULE_INITIAL_BUILD
+//	printl(std::format("EXO_FORMAT is defined so formatting a var using std::format is possible. e.g. {}", "'hello'"));
+//#endif
 
 	var x = 12.3456;
 	assert(x.format("{:.2f}").outputl() == "12.35");
@@ -59,7 +59,7 @@ function main() {
 //	assert(format(s1, "yyy") == "xxx yyy zzz");
 //	assert(format(c1, "yyy") == "xxx yyy zzz");
 	assert(format(v1, "jjj") == "iii jjj kkk");
-	format(s1, "yyy");
+	if (format(s1, "yyy")) {};
 	assert(format(s1, "yyy") == "xxx yyy zzz");
 	assert(format(c1, "yyy") == "xxx yyy zzz");
 	assert(var("jjj").format(v1) == "iii jjj kkk");

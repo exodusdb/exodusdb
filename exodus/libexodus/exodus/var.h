@@ -24,6 +24,10 @@ THE SOFTWARE.
 
 // clang-format off
 
+// Purely #define so can done before any declarations
+// Always need to be run because modules dont export #define
+#include <exodus/vardefs.h>
+
 #if EXO_MODULE
 	import std;
 #else
@@ -50,7 +54,6 @@ THE SOFTWARE.
 //#	endif
 //#endif
 
-#include <exodus/vardefs.h>
 #include <exodus/vartyp.h>
 #include <exodus/varb.h>
 
