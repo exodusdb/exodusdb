@@ -15,7 +15,7 @@
 // exodus format/println functions
 // Require this additional header BEFORE any other exodus_header.
 // Slows down compilation a bit so not included in standard exodus headers
-#include <exodus/format.h>
+//#include <exodus/format.h>
 
 #include <exodus/program.h>
 
@@ -59,6 +59,7 @@ function main() {
 //	assert(format(s1, "yyy") == "xxx yyy zzz");
 //	assert(format(c1, "yyy") == "xxx yyy zzz");
 	assert(format(v1, "jjj") == "iii jjj kkk");
+	format(s1, "yyy");
 	assert(format(s1, "yyy") == "xxx yyy zzz");
 	assert(format(c1, "yyy") == "xxx yyy zzz");
 	assert(var("jjj").format(v1) == "iii jjj kkk");

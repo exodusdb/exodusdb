@@ -4,7 +4,7 @@
 #	endif
 #endif
 
-#include <exodus/format.h>
+//#include <exodus/format.h>
 
 #include <exodus/program.h>
 programinit()
