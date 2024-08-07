@@ -1595,7 +1595,7 @@ function main() {
 			// xxx cannot be used in the same statement that it is being defined
 			// var xxx = osread(xxx, yyy, zzz);
 			if (warnings ge 0) {
-				let matches = text.match("[\\n \\t]{2,}(var|let) (\\b[a-zA-Z0-9_]+\\b) [^\n:;]*?\\b\\2\\b");
+				let matches = text.match("[\\n \\t]{2,}(var|let)\\s+(\\b[a-zA-Z0-9_]+\\b)\\s+[^\n:;]*?\\b\\2\\b");
 				if (matches) {
 					var nmatches = 0;
 					for (var match : matches) {
