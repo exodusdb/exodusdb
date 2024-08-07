@@ -36,7 +36,9 @@ function main() {
 			// var  var::format(SV fmt_str, Args&&... args) const
 			//
 			// 34'000 ns 1st op + 400 ns/op for 1'000 ops (exodus cached)
+#if EXO_FORMAT
 			assert(x.format("{:.2f}") == "12.35");
+#endif
 
 //			// auto fmt::formatter::format
 //			//

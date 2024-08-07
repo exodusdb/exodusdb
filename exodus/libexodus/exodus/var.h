@@ -37,23 +37,9 @@ THE SOFTWARE.
 #	include <array> // used in operator<<
 #endif
 
-// var_base provides the basic var-like functionality for var
-//
 #include <exodus/format.h>
-//// Support var format and var println
-////
-//#if __GNUC__  > 11 || __clang_major__ > 1
-//#	define EXO_FORMAT
-//#	ifdef EXO_FORMAT
-//#		pragma GCC diagnostic ignored "-Winline"
-//#		pragma clang diagnostic ignored "-Wswitch-default" //18 24.04
-//#		pragma clang diagnostic ignored "-Wunsafe-buffer-usage" //18 24.04
-//#		pragma clang diagnostic ignored "-Wreserved-id-macro" //18 20.04
-//#		pragma clang diagnostic ignored "-Wduplicate-enum" //18 20.04
-//#		include <fmt/format.h>
-//#	endif
-//#endif
 
+// var_base provides the basic var-like functionality for var
 #include <exodus/vartyp.h>
 #include <exodus/varb.h>
 
@@ -608,18 +594,6 @@ public:
 
 #ifdef EXO_FORMAT
 
-//// Replicated in var.h and exofuncs.h - KEEP IN SYNC
-//#if __GNUC__ >= 7 || __clang_major__ > 15
-//	// Works at compile time (only? or if possible)
-//#	define EXO_FORMAT_STRING_TYPE1 fmt::format_string<var, Args...>
-//#	define EXO_FORMAT_STRING_TYPE2 fmt::format_string<Args...>
-//#else
-//	// Always run time
-//#	define EXO_FORMAT_STRING_TYPE1 SV
-//#	define EXO_FORMAT_STRING_TYPE2 SV
-//#endif
-//
-//
 //template<class... Args>
 //	ND CONSTEXPR
 //	   var  format(EXO_FORMAT_STRING_TYPE1&& fmt_str, Args&&... args) const {
