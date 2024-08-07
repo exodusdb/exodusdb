@@ -430,7 +430,13 @@ function main() {
 
 #ifdef VAR_SAFE_DESTRUCTOR
 		try {
-			var v	 = v + 1;
+			var v1	 = v1 + 1;
+			var v2	 = v2 + 1;
+			var v3	 = v3 + 1;
+			var v4	 = v4 + 1;
+			var v5	 = v5 + 1;
+			var v6	 = v6 + 1;
+			var v7	 = v7 + 1;
 			uncaught = "VarUndefined";
 		} catch (VarUndefined& e) {
 			printl(e.description);
