@@ -403,8 +403,8 @@ function main() {
 		printl("string:   ", sizeof(std::string));
 		printl("long long:", sizeof(long long));
 		printl("double:   ", sizeof(double));
-		printl("uint:	 ", sizeof(std::uint));
-		printl("uint:	 ", sizeof(std::uint), " padding1");
+		printl("uint:	 ", sizeof(unsigned int));
+		printl("uint:	 ", sizeof(unsigned int), " padding1");
 		printl("long long:", sizeof(long long), " padding2");
 		printl("		   ==");
 		printl("var:	  ", sizeof(var));
