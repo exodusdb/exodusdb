@@ -523,7 +523,8 @@ function main() {
 
 					// exodus var doesnt initialise all its members but does copy/move them
 					// TODO disable the warning in code so real warnings can be show in general
-					basicoptions ^= " -Wno-uninitialized";
+					//basicoptions ^= " -Wno-uninitialized";
+					basicoptions ^= " -Wuninitialized";
 
 					// Ignore these warnings caused by [[no-discard]] for now
 					// TODO Remove when all such code in exodus service and apps is replaced
