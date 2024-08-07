@@ -16,16 +16,27 @@ namespace exo {
 // whereas "for (var var1 : dim1)" gives a copy of each element which is slower allows updating var1 without updating dim1
 // Both cases are useful
 
+// for (in v1 : d1)  ... v1 is a constant reference to the dim's vars ... efficient read only access to array elements
+// for (io v1 : d1)  ... v1 is a ordinary reference to the dim's vars ... efficient read/write access to array elements
+// for (var v1 : d1) ... v1 is a copy of the dim's vars               ... slower access and updating v1 does not update the array
+
 //class dim final
 class PUBLIC dim final {
 
-friend class var;
+friend class dim_iter;
 
  private:
 
 	mutable /*unsigned*/ int nrows_, ncols_;
 	std::vector<var> data_;
+//	std::vector<exo::var, std::allocator<exo::var>> data_;
 	bool initialised_ = false;
+
+//    private:
+//        std::vector<var>::iterator it_;
+
+//	typename std::vector<var>::iterator it_;
+//	using iterator = dim_iter;
 
  public:
 
@@ -125,7 +136,7 @@ friend class var;
 		// Allow arbitrary copying of element zero without throwing variable not assigned
 		//data_[0].var_typ = VARTYP_STR;
 
-		int itemno = 1;
+		std::size_t itemno = 1;
 		for (auto item : list) {
 			data_[itemno++] = item;
 		}
@@ -147,6 +158,9 @@ friend class var;
 	////////////
 	// ACCESSORS
 	////////////
+
+	ND dim_iter begin();
+	ND dim_iter end();
 
 	ND var join(SV sepchar = _FM) const;
 
@@ -209,7 +223,8 @@ friend class var;
 	dim& shuffler();
 
 	dim& splitter(in str1, SV sepchar = _FM);
-	dim& eraser(std::vector<var>::iterator iter1, std::vector<var>::iterator iter2) {data_.erase(iter1, iter2); return *this;}
+//	dim& eraser(std::vector<var>::iterator iter1, std::vector<var>::iterator iter2) {data_.erase(iter1, iter2); return *this;}
+//	dim& eraser(dim_iter dim_iter1, dim_iter dim_iter2) {data_.erase(&*dim_iter1, &*dim_iter2); return *this;}
 
 	/////////////
 	// READ/WRITE
@@ -237,8 +252,16 @@ friend class var;
 	// because dim uses 1 based indexing
 	// but we still allow use of vestigial dim(0)/dim(0, 0)
 	//
-	PUBLIC auto begin() {return ++data_.begin();}
-	PUBLIC auto end()   {return data_.end();}
+//	PUBLIC auto begin() {return ++data_.begin();}
+//	PUBLIC auto end()   {return data_.end();}
+//	PUBLIC std::iterator<var*, std::vector<var>> begin() {return ++data_.begin();}
+//	PUBLIC __gnu_cxx::__normal_iterator<exo::var *, std::vector<exo::var>> begin() {return ++data_.begin();}
+//	PUBLIC __gnu_cxx::__normal_iterator<exo::var *, std::vector<exo::var>> end()   {return data_.end();}
+//	typedef typename std::vector<var>::iterator iter;
+//	PUBLIC dim_iter begin() {return ++data_.begin();}
+//	PUBLIC dim_iter end()   {return data_.end();}
+
+	PUBLIC void push_back(var&& var1) {data_.push_back(std::move(var1));}
 
  private:
 

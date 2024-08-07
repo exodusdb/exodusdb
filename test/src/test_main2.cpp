@@ -1,9 +1,15 @@
 #undef NDEBUG  //because we are using assert to check actual operations that cannot be skipped in release mode testing
+
 #include <cassert>
-#include <cmath>  //for fmod
-#include <array>
+#if EXO_MODULE
+	import std;
+#else
+#	include <cmath>  //for fmod
+#	include <array>
+#endif
 
 #include <exodus/program.h>
+programinit()
 
 // TESTING
 // =======
@@ -27,9 +33,7 @@
 //
 //   test_main2 &> test_main2.out
 
-programinit()
-
-	function main() {
+function main() {
 
 	{
 		// range based for loop

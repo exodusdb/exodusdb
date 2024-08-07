@@ -1,5 +1,4 @@
 #undef NDEBUG  //because we are using assert to check actual operations that cannot be skipped in release mode testing
-
 #include <cassert>
 
 #ifdef EXO_MODULE

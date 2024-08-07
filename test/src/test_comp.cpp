@@ -2,11 +2,10 @@
 #include <cassert>
 
 #include <exodus/program.h>
+programinit()
 
 //exodus/c++ gt uses SMALLEST_NUMBER to compare equality
 ////0.0001 for pick/arev compatibility
-
-programinit()
 
 	//#include <l2.h>
 

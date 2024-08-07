@@ -1,9 +1,8 @@
 #undef NDEBUG  //because we are using assert to check actual operations that cannot be skipped in release mode testing
 #include <cassert>
-//#include <sstream>
-//#include <cmath>
 
 #include <exodus/program.h>
+programinit()
 
 // TESTING
 // =======
@@ -27,9 +26,7 @@
 //
 //   test_main1 &> test_main1.out
 
-programinit()
-
-	function main() {
+function main() {
 
 	//EXODUS syntax directions
 	//

@@ -4,7 +4,7 @@
 #include <exodus/program.h>
 programinit()
 
-	function main() {
+function main() {
 
 	{
 		// Demo simplicity of exodus regex

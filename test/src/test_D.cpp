@@ -2,10 +2,9 @@
 #include <cassert>
 
 #include <exodus/program.h>
-
 programinit()
 
-	function main() {
+function main() {
 
 	// pickos day zero is "1968/12/31"
 	// "1968/12/31" <-> 0

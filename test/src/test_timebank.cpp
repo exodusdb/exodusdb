@@ -1,4 +1,6 @@
+#undef NDEBUG
 #include <cassert>
+
 #include <exodus/program.h>
 programinit()
 

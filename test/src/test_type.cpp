@@ -1,11 +1,14 @@
 #undef NDEBUG  //because we are using assert to check actual operations that cannot be skipped in release mode testing
 #include <cassert>
-#include <limits>
 
-#include <iomanip>
+#if EXO_MODULE
+	import std;
+#else
+#	include <limits>
+#	include <iomanip>
+#endif
 
 #include <exodus/program.h>
-
 programinit()
 
 // Test for IMPLICIT round trip type -> var -> type

@@ -4,7 +4,7 @@
 #include <exodus/program.h>
 programinit()
 
-	var totndifferences = 0;
+var totndifferences = 0;
 
 function main() {
 

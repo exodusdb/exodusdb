@@ -4,7 +4,7 @@
 #include <exodus/program.h>
 programinit()
 
-	function main() {
+function main() {
 
 	if (not TERMINAL) {
 		stop("Test passed - Not really. It is impossible to test without TERMINAL");

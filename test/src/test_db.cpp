@@ -1,8 +1,8 @@
 #undef NDEBUG  //because we are using assert to check actual operations that cannot be skipped in release mode testing
 #include <cassert>
-//#include <sstream>
 
 #include <exodus/program.h>
+programinit()
 
 // TESTING
 
@@ -21,8 +21,6 @@
 // test_main 1> test_main.out
 
 // Create all temporary files ending _temp so that they are deleted on disconnection
-
-programinit()
 
 	function main() {
 

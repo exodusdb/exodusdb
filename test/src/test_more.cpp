@@ -1,10 +1,15 @@
 #undef NDEBUG  //because we are using assert to check actual operations that cannot be skipped in release mode testing
 #include <cassert>
-#include <functional>
-#include <limits>
 
-#include <string>  //for ""_s suffix
-using namespace std::string_literals;
+#if EXO_MODULE
+	import std;
+#else
+#	include <functional>
+#	include <limits>
+#	include <string>  //for ""_s suffix
+#endif
+
+using namespace std::literals;
 
 #include <exodus/program.h>
 

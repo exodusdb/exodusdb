@@ -1,13 +1,17 @@
 #undef NDEBUG  //because we are using assert to check actual operations that cannot be skipped in release mode testing
 #include <cassert>
-#include <functional>
-#include <limits>
+
+#if EXO_MODULE
+	import std;
+#else
+#	include <functional>
+#	include <limits>
+#endif
 
 #include <exodus/program.h>
-
 programinit()
 
-	function main() {
+function main() {
 
 	printl("test_more3 says 'Hello World!'");
 
@@ -353,6 +357,26 @@ programinit()
 		} catch (VarNonNumeric&) {
 		}
 
+		// Overflow on conversion from signed
+		try {
+			printl("std::numeric_limits<unsigned long long>::max() = ", std::numeric_limits<unsigned long long>::max());
+//			assert(![] () {var x(std::numeric_limits<unsigned long long>::max());return x;}());
+			var x = std::numeric_limits<unsigned long long>::max();
+			uncaught = "VarNumOverflow unsigned long long";
+		} catch (VarNumOverflow& e) {
+			printl(e.description);
+		}
+
+//		// Underflow on conversion from signed
+//		try {
+//			printl("std::numeric_limits<signed long long>::min() = ", std::numeric_limits<signed long long>::min());
+////			assert(![] () {var x(std::numeric_limits<unsigned long long>::max());return x;}());
+//			var x = std::numeric_limits<signed long long>::min();
+//			uncaught = "VarNumUnderflow unsigned long long";
+//		} catch (VarNumOverflow& e) {
+//			printl(e.description);
+//		}
+
 		// Overflow on inc/dec
 
 		try {
@@ -377,12 +401,6 @@ programinit()
 			printl(e.description);
 		}
 		try {
-			++maxint;
-			uncaught = "VarNumUnderflow";
-		} catch (VarNumOverflow& e) {
-			printl(e.description);
-		}
-		try {
 			minint--;
 			uncaught = "VarNumUnderflow";
 		} catch (VarNumUnderflow& e) {
@@ -390,7 +408,7 @@ programinit()
 		}
 		try {
 			maxint++;
-			uncaught = "VarNumUnderflow";
+			uncaught = "VarNumOverflow";
 		} catch (VarNumOverflow& e) {
 			printl(e.description);
 		}

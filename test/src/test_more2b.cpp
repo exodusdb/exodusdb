@@ -1,13 +1,14 @@
 #undef NDEBUG  //because we are using assert to check actual operations that cannot be skipped in release mode testing
 #include <cassert>
-//#include <functional>
-//#include <limits>
+
+//#if EXO_MODULE
+//	import std;
+//#endif
 
 #include <exodus/program.h>
-
 programinit()
 
-	function main() {
+function main() {
 	printl("test_more2b says 'Hello World!'");
 
 	{

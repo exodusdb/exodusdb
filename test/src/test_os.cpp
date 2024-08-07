@@ -1,10 +1,10 @@
 #undef NDEBUG  //because we are using assert to check actual operations that cannot be skipped in release mode testing
-#include <exodus/program.h>
 #include <cassert>
 
+#include <exodus/program.h>
 programinit()
 
-	function main() {
+function main() {
 
 	var tempdir		 = "t_exotemp746.dir";
 	var tempfilename = tempdir ^ _OSSLASH "temp1";

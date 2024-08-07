@@ -1,7 +1,12 @@
 #undef NDEBUG  //because we are using assert to check actual operations that cannot be skipped in release mode testing
 #include <cassert>
-//#include <range>
-#include <algorithm>
+
+#if EXO_MODULE
+	import std;
+//#	include <vector>
+#else
+#	include <algorithm>
+#endif
 
 #include <exodus/program.h>
 programinit()
@@ -346,9 +351,17 @@ TRACE("x")
 		d1 = "1^2^4^5^3"_var.split();
 		TRACE(d1.join())
 		//std::erase_if(d.begin(), d.end(), [](auto i){return i lt 3;});
-		d1.eraser(std::remove_if(d1.begin(), d1.end(), [](auto i){return i lt 3;}), d1.end());
-		TRACE(d1.join())
-		assert(d1.join() eq "4^5^3"_var);
+// Removed dim::eraser(dim_iter, dim_iter) due to difficulty of converting a dim_iter to a vector::iterator
+//		d1.eraser(
+//			std::remove_if(
+//				d1.begin(),
+//				d1.end(),
+//				[](auto i){return i lt 3;}
+//			),
+//			d1.end()
+//		);
+//		TRACE(d1.join())
+//		assert(d1.join() eq "4^5^3"_var);
 
 	}
 

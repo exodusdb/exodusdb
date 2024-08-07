@@ -1,10 +1,15 @@
 #undef NDEBUG  //because we are using assert to check actual operations that cannot be skipped in release mode testing
 #include <cassert>
 
+//Ignore compiler warnings when testing that first(-1) etc. throw a runtime error.
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wsign-conversion"
+#pragma GCC diagnostic push
+
 #include <exodus/program.h>
 programinit()
 
-	function main() {
+function main() {
 
 	{
         // using using SNITCH in var.h

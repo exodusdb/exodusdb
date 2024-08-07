@@ -211,6 +211,7 @@ VarError::VarError(std::string description_)
 	if (description.find("var_") != std::string::npos) {
 	    varb_replace_string(description, "exo::var_base<exo::var_mid<exo::var>>", "var");
     	varb_replace_string(description, " [var = exo::var_mid<exo::var>]", "");
+    	varb_replace_string(description, " [var = exo::var_mid<exo::var>, ", "[");
 	}
 
 	// Break into debugger if EXO_DEBUG is set to non-zero

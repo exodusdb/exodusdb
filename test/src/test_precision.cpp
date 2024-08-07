@@ -1,20 +1,25 @@
 #undef NDEBUG  //because we are using assert to check actual operations that cannot be skipped in release mode testing
 #include <cassert>
-#include <cmath>
-#include <iomanip>
-#include <limits>
-#include <sstream>
+
+#if EXO_MODULE
+	import std;
+#else
+#	include <cmath>
+#	include <iomanip>
+#	include <limits>
+#	include <sstream>
+#endif
 
 // 1. TO_CHARS from Ubuntu 22.04
 // Duplicated in varnum.cpp, testnum.cpp and test_precision.cpp. Keep in sync.
 #if __GNUC__ >= 11 || __clang_major__ >=  14
-#define USE_TO_CHARS
+#	define EXO_USE_TO_CHARS
 //#include <array>
 
 // 2. RYU
 #elif __has_include(<ryu/ryu.h>)
-#define USE_RYU
-#include <ryu/ryu.h>
+#	define EXO_USE_RYU
+#	include <ryu/ryu.h>
 
 // 3. STRINGSTREAM
 #else
@@ -92,7 +97,7 @@ function main() {
 		assert((var(9.36749) ^ "x").outputl()         eq "9.36749x");
 		assert(((var("9.36749") + 0) ^ "x").outputl() eq "9.36749x");
 
-#ifdef USE_TO_CHARS
+#ifdef EXO_USE_TO_CHARS
 		//assert((var(1234567890123456789.)  ^ "x").outputl() eq "1234567890123456768x");
 		//assert((var(12345678901234567890.) ^ "x").outputl() eq "12345678901234567168x");
 		assert((var(1234567890123456789.) ^ "x").outputl()  eq "1.234567890123457e+18x");
@@ -101,7 +106,7 @@ function main() {
 		assert((var("999999999999999.9") + 0).outputl().toString()  eq "999999999999999.9");
 		assert((var("9999999999999999.9") + 0).outputl().toString() eq "1e+16");
 
-#elif defined(USE_TO_CHARS_S)
+#elif defined(EXO_USE_TO_CHARS_S)
 		assert((var(1234567890123456789.) ^ "x").outputl()  eq "1.2345678901234568e+18x");
 		assert((var(12345678901234567890.) ^ "x").outputl() eq "1.2345678901234567e+19x");
 
@@ -109,7 +114,7 @@ function main() {
 		//assert((var("9999999999999999.9")   + 0).outputl().toString() eq "1.0e16");
 		assert((var("9999999999999999.9") + 0).outputl().toString() eq "1e+16");
 
-#elif defined(USE_RYU)
+#elif defined(EXO_USE_RYU)
 		assert((var(1234567890123456789.) ^ "x").outputl()  eq "1.2345678901234568e+18x");
 		assert((var(12345678901234567890.) ^ "x").outputl() eq "1.2345678901234567e+19x");
 #else
@@ -122,7 +127,7 @@ function main() {
 		assert((var(12345678901234567890.) ^ "x").outputl() eq "1.234567890123457e+19x");
 #endif
 
-#ifndef USE_TO_CHARS
+#ifndef EXO_USE_TO_CHARS
 		assert((var("999999999999999.9") + 0).outputl().toString()  eq "999999999999999.9");
 		printl(var(9999999999999999.9).toDouble());
 		TRACE(var("9999999999999999.9") + 0)
@@ -151,7 +156,7 @@ function main() {
 		dv2 = "0.00005678901234567890d";
 		sv1 = dv1 ^ "x";
 		//var sv2 = "0.00005678901235x";
-#ifdef USE_TO_CHARS
+#ifdef EXO_USE_TO_CHARS
 		//sv2 = "5.67890123456789e-05x";
 		sv2 = "0.0000567890123456789x";
 #else
@@ -169,9 +174,9 @@ function main() {
 		TRACE(var(dv1))
 		TRACE(var(dv2))
 
-//#if defined(USE_TO_CHARS)
+//#if defined(EXO_USE_TO_CHARS)
 //		sv2 = "1234567890.0000567x";
-#if defined(USE_RYU)
+#if defined(EXO_USE_RYU)
 		sv2 = "1234567890.0000567x";
 #else
 		sv2 = "1234567890.000057x";
@@ -188,7 +193,7 @@ function main() {
 		dv1 = dd1;
 		dv2 = "0.00005678d";
 		sv1 = dv1 ^ "x";
-		//#ifdef USE_TO_CHARS
+		//#ifdef EXO_USE_TO_CHARS
 		//		sv2 = "5.678e-05x";
 		//#else
 		sv2 = "0.00005678x";
@@ -201,7 +206,7 @@ function main() {
 		dv1 = dd1;
 		dv2 = "0.0000000000001d";
 		sv1 = dv1 ^ "x";
-		//#ifdef USE_TO_CHARS
+		//#ifdef EXO_USE_TO_CHARS
 		//		sv2="1e-13x";
 		sv2 = "0.0000000000001x";
 		//#else
@@ -246,7 +251,7 @@ function main() {
 		dv1 = dd1;
 		dv2 = "12345678901234567890123456789.0d";
 		sv1 = dv1 ^ "x";
-#if defined(USE_RYU)
+#if defined(EXO_USE_RYU)
 		sv2 = "1.2345678901234568e+28x";
 #else
 		sv2 = "1.234567890123457e+28x";
@@ -259,7 +264,7 @@ function main() {
 		dv1 = dd1;
 		dv2 = "99999999999999.9d";
 		sv1 = dv1 ^ "x";
-#ifdef USE_RYU
+#ifdef EXO_USE_RYU
 		sv2 = "99999999999999.9x";
 #else
 		//sv2="99999999999999.9x";
@@ -274,7 +279,7 @@ function main() {
 
 		assert(test2("-0", "0x"));
 		//assert(test2("+0", "0x"));
-		//#ifdef USE_RYU
+		//#ifdef EXO_USE_RYU
 		//		assert(test2("-1", "-1.0x"));
 		//#else
 		assert(test2("-1", "-1x"));
@@ -336,8 +341,8 @@ function main() {
 programexit()
 */
 
-#ifdef USE_RYU
-#elif defined(USE_RYU)
+#ifdef EXO_USE_RYU
+#elif defined(EXO_USE_RYU)
 		assert(test2("12345678901234567890123456789000000000000000000000000000000.", "1.2345678901234568e+58x"));
 		assert(test2("1234567890123456789012345678900000000000000000000000000000.", "1.2345678901234568e+57x"));
 		assert(test2("123456789012345678901234567890000000000000000000000000000.", "1.2345678901234569e+56x"));
@@ -428,7 +433,7 @@ programexit()
 		assert(test2(".000000000000000000000000000012345678901234567890123456789", "1.2345678901234567e-29x"));
 		assert(test2(".0000000000000000000000000000012345678901234567890123456789", "1.2345678901234568e-30x"));
 #else
-		//#if defined(USE_TO_CHARS)
+		//#if defined(EXO_USE_TO_CHARS)
 		assert(test2("123456789012345678901234567890000000000000000000000000000000.", "1.234567890123457e+59x"));
 		assert(test2("12345678901234567890123456789000000000000000000000000000000.", "1.234567890123457e+58x"));
 		assert(test2("1234567890123456789012345678900000000000000000000000000000.", "1.234567890123457e+57x"));
@@ -617,9 +622,9 @@ programexit()
 	assert(var(1e-11f).outputl().toString() eq "0.000000000009999999960041972");
 	printl(var(1e-11));
 
-	//#ifdef USE_TO_CHARS
+	//#ifdef EXO_USE_TO_CHARS
 	//	assert(var(1e-11).outputl().toString() eq "1e-11");
-	//#elif defined(USE_RYU)
+	//#elif defined(EXO_USE_RYU)
 	//	assert(var(1e-11).outputl().toString() eq "1e-11");
 	//#else
 	//	assert(var(1e-11).outputl().toString() eq "9.999999999999999e-12");
@@ -639,7 +644,7 @@ programexit()
 	assert(var(1e-13f).outputl().toString() eq "0.000000000000099999998245167");
 	assert(var(1e-14f).outputl().toString() eq "0.0000000000000099999998245167");
 
-	//#ifdef USE_TO_CHARS
+	//#ifdef EXO_USE_TO_CHARS
 	//	assert(var(1e-12 ).outputl().toString() eq "1e-12");
 	//	assert(var(1e-13 ).outputl().toString() eq "1e-13");
 	//	assert(var(1e-14 ).outputl().toString() eq "1e-14");
@@ -681,7 +686,7 @@ programexit()
 
 	//assert((var(pwr(10,-26)) ^ "x").outputl() =="0.00000000000000000000000001x");//better calculation of 10^-26
 	//assert((var(1/pwr(10,26)) ^ "x").outputl() =="0.000000000000000000000000009999999999999999x");//poorer calculation of 1/10^26
-#ifdef USE_TO_CHARS
+#ifdef EXO_USE_TO_CHARS
 	assert((var(pwr(10, -26)) ^ "x").outputl() eq "1e-26x");  //better calculation of 10^-26
 #else
 	assert((var(pwr(10, -26)) ^ "x").outputl() eq "1e-26x");										   //better calculation of 10^-26
@@ -689,10 +694,10 @@ programexit()
 	assert((var(1 / pwr(10, 26)) ^ "x").outputl() eq "9.999999999999999e-27x");	 //poorer calculation of 1/10^26
 
 	printl(((var(pwr(10, -26)) - var(1 / pwr(10, 26))) ^ "x"));
-//#if defined(USE_RYU) or defined(USE_TO_CHARS)
+//#if defined(EXO_USE_RYU) or defined(EXO_USE_TO_CHARS)
 //	assert(((var(pwr(10,-26)) - var(1/pwr(10,26))) ^ "x").outputl() eq "1.4349296274686127e-42x");//ryu
 //#else
-#ifdef USE_RYU
+#ifdef EXO_USE_RYU
 	assert(((var(pwr(10, -26)) - var(1 / pwr(10, 26))) ^ "x").outputl() eq "1.4349296274686127e-42x");	//sstream
 #else
 	assert(((var(pwr(10, -26)) - var(1 / pwr(10, 26))) ^ "x").outputl() eq "1.434929627468613e-42x");  //sstream
@@ -704,7 +709,7 @@ programexit()
 	//assert((var(1/pwr(10,26)) ^ "x").outputl() eq "0.000000000000000000000000009999999999999999x");
 	//assert((var(pwr(10,-27)) ^ "x")  eq "0.000000000000000000000000001x");
 
-#ifdef USE_TO_CHARS
+#ifdef EXO_USE_TO_CHARS
 	assert((var(pwr(10, -26)) ^ "x").output()     eq "1e-26x");
 	assert((var(pwr(10, -27)) ^ "x").output()     eq "1e-27x");
 #else
@@ -718,7 +723,7 @@ programexit()
 		assert(var(1000).outputl().toString()       eq "1000");
 		assert(var(10'000'000).outputl().toString() eq "10000000");
 
-		//#ifdef USE_TO_CHARS
+		//#ifdef EXO_USE_TO_CHARS
 		//		assert(var(0.0001)       .outputl().toString() eq "1e-04");
 		//		assert(var(0.000'000'01) .outputl().toString() eq "1e-08");
 		//		assert(var(-0.000'000'01).outputl().toString() eq "-1e-08");
@@ -767,7 +772,7 @@ subroutine out() {
 }
 
 function test2(const std::string str1, const std::string str2 = std::string()) {
-	dd1		= stod(str1);
+	dd1		= std::stod(str1);
 	dv1		= dd1;
 	dv2		= str1;
 	sv1		= dv1 ^ "x";
@@ -785,7 +790,7 @@ function test2(const std::string str1, const std::string str2 = std::string()) {
 
 			//also test negative
 			if (str1[0] ne '-' and str1[0] ne '+') {
-				if (var(str1).toDouble()) {
+				if (bool(var(str1).toDouble())) {
 					//not zero
 					return test2("-" + str1, "-" + str2);
 				} else {

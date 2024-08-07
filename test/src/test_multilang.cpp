@@ -9,10 +9,9 @@
 // NOTES.
 //
 #include <exodus/program.h>
-
 programinit()
 
-	function main() {
+function main() {
 	var cmd;
 
 //    {

@@ -4,7 +4,7 @@
 #include <exodus/program.h>
 programinit()
 
-	var xo_dict	 = "xo_dict";
+var xo_dict	 = "xo_dict";
 var dict_xo_test = "dict.xo_test";
 var default_conn;
 var xo_dict_conn;

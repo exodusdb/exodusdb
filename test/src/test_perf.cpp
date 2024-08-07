@@ -1,16 +1,15 @@
 #undef NDEBUG  //because we are using assert to check actual operations that cannot be skipped in release mode testing
-//#include <ranges>
-#include <boost/range/irange.hpp>
 #include <cassert>
+
+#include <boost/range/irange.hpp>
 
 //void extract(char * instring, int inlength, int fieldno, int valueno, int subvalueno, int* outstart, int* outlength);
 //void extract2(char * instring, int inlength, int fieldno, int valueno, int subvalueno, int* outstart, int* outlength);
 
 #include <exodus/program.h>
-
 programinit()
 
-	function main() {
+function main() {
 
 //	// Quit if running under make since there are no tests
 //	if (osgetenv("MAKELEVEL")) {

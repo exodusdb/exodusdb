@@ -1,15 +1,20 @@
 #undef NDEBUG  //because we are using assert to check actual operations that cannot be skipped in release mode testing
 #include <cassert>
-#include <cmath>	// for nextafter
-#include <iomanip>	// for setprecision
+
+#if EXO_MODULE
+	import std;
+#else
+#	include <cmath>	// for nextafter
+#	include <iomanip>	// for setprecision
+#endif
 
 // 1. TO_CHARS from Ubuntu 22.04
 #if __GNUC__ >=11
-#define USE_TO_CHARS_G
+#define EXO_USE_TO_CHARS_G
 
 // 2. RYU
 #elif __has_include(<ryu/ryu.h>)
-#define USE_RYU
+#define EXO_USE_RYU
 
 // 3. STRINGSTREAM
 #else
@@ -18,8 +23,8 @@
 #include <exodus/program.h>
 programinit()
 
-	// Function to generate code to be asserted
-	function print_assert(double d1, in /*v2*/) {
+// Function to generate code to be asserted
+function print_assert(double d1, in /*v2*/) {
 
 	printl("assert(var(", d1, ").squote().outputl() eq ", var(d1).squote().quote(), ");");
 	return true;
@@ -93,7 +98,7 @@ function main() {
 		assert(var(1000).squote().outputl()  eq "'1000'");
 		assert(var(10000).squote().outputl() eq "'10000'");
 
-#ifdef USE_TO_CHARS_G
+#ifdef EXO_USE_TO_CHARS_G
 		printl();
 		//printl("DIFFERENT FORMATTING FOR INT AND DOUBLE?! to_chars(in) to_chars(double)");
 		//assert(var( 100000.0 ).squote().outputl() eq  "'1e+05'" );

@@ -1045,16 +1045,19 @@ public:
 // or, if you do want to concatenate the result of a comparison do this
 // a^var(b>c)
 
+class PUBLIC var_iter {
+
 /////////////////////////////////
 // var_iter - iterate over fields
 /////////////////////////////////
-class PUBLIC var_iter {
 
 	const var* pvar_;
 	mutable std::size_t startpos_ = 0;
 	mutable std::size_t endpos_ = std::string::npos;
 
  public:
+	using value_type = var*;
+
 	// Default constructor
 	var_iter() = default;
 
@@ -1067,16 +1070,180 @@ class PUBLIC var_iter {
 	// Convert to var
 	var  operator*() const;
 
-	// Iter++
+	// ++Iter prefix
 	var_iter operator++();
 
-	// Iter-- prefix
+	// Iter++ postfix
+	var_iter operator++(int);
+
+	// --Iter prefix
 	var_iter operator--();
 
-	// --iter postfix
+	// iter++ postfix
 	var_iter operator--(int);
 
 };
+
+// Only declared here to allow them to be exported in var.cppm for tidyness but
+// since they are already declared by friending them in var
+// they will be exported/found by ADL even without exporting them.
+ND var_iter begin(in v);
+ND var_iter end(in v);
+
+///////////////////////////////////
+//// dim_iter - iterate over fields
+///////////////////////////////////
+//class PUBLIC dim_iter {
+//
+//	var* pvar_;
+//
+// public:
+//	// Default constructor
+//	//dim_iter() = default;
+//
+//	// Construct from var and point to it
+//	dim_iter(var& var1);
+//
+//	// Check iter != iter (i.e. iter != string::npos)
+//	   bool operator!=(const dim_iter& vi);
+//
+//	// Access a specific var
+//	var& operator*() const;
+//
+//	// ++Iter prefix
+//	dim_iter operator++();
+//
+//	// Iter++ postfix
+//	dim_iter operator++(int);
+//
+//	// --Iter prefix
+//	dim_iter operator--();
+//
+//	// iter++ postfix
+//	dim_iter operator--(int);
+//
+//	// +
+//	int operator+(const dim_iter&) const;
+//
+//	// -
+//	int operator-(const dim_iter&) const;
+//
+//	// +
+//	dim_iter operator+(const int) const;
+//
+//	// -
+//	dim_iter operator-(const int) const;
+//
+//};
+
+class PUBLIC dim_iter {
+public:
+
+    using iterator_category = std::random_access_iterator_tag;
+    using value_type        = var;
+    using reference         = var&;
+    using pointer           = var*;
+    using difference_type   = unsigned long long;
+
+    dim_iter(var* ptr) : ptr_(ptr) {}
+
+//	operator std::vector<var>::iterator() {
+//		return std::vector<var>(*ptr_);
+//	}
+
+    var& operator*() {
+        return *ptr_;
+    }
+
+    var* operator->() {
+        return ptr_;
+    }
+
+    dim_iter& operator++() {
+        ++ptr_;
+        return *this;
+    }
+
+    dim_iter operator++(int) {
+        dim_iter tmp(*this);
+        ++ptr_;
+        return tmp;
+    }
+
+    dim_iter& operator--() {
+        --ptr_;
+        return *this;
+    }
+
+    dim_iter operator--(int) {
+        dim_iter tmp(*this);
+        --ptr_;
+        return tmp;
+    }
+
+    bool operator==(const dim_iter& rhs) const {
+        return ptr_ == rhs.ptr_;
+    }
+
+    bool operator!=(const dim_iter& rhs) const {
+        return !(*this == rhs);
+    }
+
+    var& operator[](int n) {
+        return ptr_[n];
+    }
+
+    dim_iter& operator+=(int n) {
+        ptr_ += n;
+        return *this;
+    }
+
+    dim_iter operator+(int n) const {
+        dim_iter tmp(*this);
+        tmp += n;
+        return tmp;
+    }
+
+    dim_iter& operator-=(int n) {
+        ptr_ -= n;
+        return *this;
+    }
+
+    dim_iter operator-(int n) const {
+        dim_iter tmp(*this);
+        tmp -= n;
+        return tmp;
+    }
+
+    int operator-(const dim_iter& rhs) const {
+        return ptr_ - rhs.ptr_;
+    }
+
+    bool operator<(const dim_iter& rhs) const {
+        return ptr_ < rhs.ptr_;
+    }
+
+    bool operator>(const dim_iter& rhs) const {
+        return ptr_ > rhs.ptr_;
+    }
+
+    bool operator<=(const dim_iter& rhs) const {
+        return ptr_ <= rhs.ptr_;
+    }
+
+    bool operator>=(const dim_iter& rhs) const {
+        return ptr_ >= rhs.ptr_;
+    }
+
+private:
+    var* ptr_;
+};
+
+// Only declared here to allow them to be exported in var.cppm for tidyness but
+// since they are already declared by friending them in var
+// they will be exported/found by ADL even without exporting them.
+//ND dim_iter begin(dim&);
+//ND dim_iter end(dim&);
 
 ///////////////////////////////////////////////////////
 // var_proxy1 - replace or extract fields by fn, vn, sv

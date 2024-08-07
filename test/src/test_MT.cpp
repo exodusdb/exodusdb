@@ -4,7 +4,7 @@
 #include <exodus/program.h>
 programinit()
 
-	function main() {
+function main() {
 	printl("test_MT says 'Hello World!'");
 
 	// Fractional seconds using floor function where

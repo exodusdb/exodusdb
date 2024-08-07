@@ -2,13 +2,13 @@
 #include <cassert>
 
 #include <exodus/program.h>
+programinit()
+
+function main() {
 
 // clang-format off
 
 #define LOOPS 1
-programinit()
-
-	function main() {
 
 	var begin, end;
 

@@ -543,18 +543,51 @@ class PUBLIC var_base {
 	CONSTEXPR
 	var_base(Integer rhs)
 		:
-		var_int(rhs),
+//		var_int(rhs),
+		var_int(static_cast<std::make_signed_t<varint_t>>(rhs)),
 		var_typ(VARTYP_INT) {
 
 		// Prevent overlarge unsigned ints resulting in negative ints
-		if (std::is_unsigned<Integer>::value) {
-			if (this->var_int < 0)
+		// Reject at compiletime or runtime
+		// Only check if either a) the incoming int is same size and unsigned, or b) it is greater in size
+		// Note: Since varint_t is long long int (8 bytes),
+		// we are really only protecting against *unsigned* long long ints > varint_t max
+		// unless int128 appears
+		if ((std::is_unsigned<Integer>::value && sizeof(rhs) >= sizeof(varint_t)) || sizeof(rhs) > sizeof(varint_t)) {
+			if (this->var_int < 0) {
 				[[unlikely]]
-				throw VarNumOverflow(var_base(__PRETTY_FUNCTION__)/*.field(";", 1)*/);
+				//throw VarNumOverflow(var_base(__PRETTY_FUNCTION__)/*.field(";", 1)*/);
+				throw VarNumOverflow(
+					" In "
+					+ std::string(__PRETTY_FUNCTION__)
+					+ " int '"
+					+ std::to_string(rhs)
+					+ "' but var range is " + std::to_string(std::numeric_limits<varint_t>::min())
+					+ " to +" + std::to_string(std::numeric_limits<varint_t>::max())
+				);
+			}
 		}
+
+//		if ((!std::is_signed<Integer>() && sizeof(rhs) >= sizeof(varint_t)) || sizeof(rhs) > sizeof(varint_t)) {
+//			// Check for high bit or any higher bit set
+//			if (rhs & ~static_cast<Integer>(0x7FFFFFFFFFFFFFFFLL)) {
+////			if (rhs & ~std::numeric_limits<varint_t>::max()) {
+////			if (rhs & ~std::make_signed_t<varint_t>(std::numeric_limits<varint_t>::max())) {
+////			if (rhs & ~static_cast<Integer>(std::numeric_limits<varint_t>::max())) {
+//				UNLIKELY
+//				throw VarNumOverflow(
+//					" In "
+//					+ std::string(__PRETTY_FUNCTION__)
+//					+ " int '"
+//					+ std::to_string(rhs)
+//					+ "' but var range is " + std::to_string(std::numeric_limits<varint_t>::min())
+//					+ " to +" + std::to_string(std::numeric_limits<varint_t>::max())
+//				);
+//			}
+//		}
+//
 		EXO_SNITCH("var_base Int ")
 	}
-
 
 	//////////////////////////////
 	// FLOATING POINT CONSTRUCTORS

@@ -190,7 +190,7 @@ bool dim::redim(/*unsigned*/ int rows, /*unsigned*/ int cols) {
 	}
 	catch (const std::bad_alloc& e) {
 		UNLIKELY
-		throw VarOutOfMemory("redim("_var ^ var(rows) ^ ", " ^ var(cols) ^ ") " ^ e.what());
+		throw VarOutOfMemory("redim(" ^ var(rows) ^ ", " ^ var(cols) ^ ") " ^ e.what());
 	}
 
 	initialised_ = true;
@@ -706,5 +706,20 @@ io   var::shuffler(SV sepchar) {
 var  var::shuffle(SV sepchar) const& {
 	return this->split(sepchar).shuffler().join(sepchar);
 }
+
+dim_iter dim::begin() {
+	// Skip over zero'th element since dim access uses 1 based indexing
+	return &(data_[0]) + 1;
+}
+
+dim_iter dim::end() {
+	return &(data_[0])+data_.size();
+}
+
+//dim_iter begin() {
+//}
+//
+//dim_iter end() {
+//}
 
 }  // namespace exo

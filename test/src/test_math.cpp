@@ -1,6 +1,11 @@
 #undef NDEBUG  //because we are using assert to check actual operations that cannot be skipped in release mode testing
 #include <cassert>
-#include <cmath>
+
+#if EXO_MODULE
+	import std;
+#else
+#	include <cmath>
+#endif
 
 #include <exodus/program.h>
 programinit()
@@ -327,7 +332,7 @@ subroutine test2(in as, in bs) {
 		assert(x eq 1.23 / 1.12);
 		x = "1.23";
 		x %= var("1.12");
-		assert(x eq fmod(1.23, 1.12));
+		assert(x eq std::fmod(1.23, 1.12));
 
 		x = "1.23";
 		x += 1.12;
@@ -343,7 +348,7 @@ subroutine test2(in as, in bs) {
 		assert(x eq 1.23 / 1.12);
 		x = "1.23";
 		x %= 1.12;
-		assert(x eq fmod(1.23, 1.12));
+		assert(x eq std::fmod(1.23, 1.12));
 
 		x = "1.23";
 		x += 112;
@@ -359,7 +364,7 @@ subroutine test2(in as, in bs) {
 		assert(x eq 1.23 / 112);
 		x = "1.23";
 		x %= 112;
-		assert(x eq fmod(1.23, 112));
+		assert(x eq std::fmod(1.23, 112));
 	}
 	{
 
@@ -491,7 +496,7 @@ subroutine test2(in as, in bs) {
 		assert(mod(-0.0, -3.0) eq 0);
 		assert(mod(0.0, -3.0)  eq 0);
 		TRACE(mod(1.0, -3.0))
-		TRACE(fmod(1.0, -3.0))
+		TRACE(std::fmod(1.0, -3.0))
 		TRACE(1 % -3)
 		TRACE(-1 % 3)
 		assert(mod(1.0, -3.0)  eq -2);

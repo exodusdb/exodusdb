@@ -119,7 +119,7 @@
 #	Only needed for speed on older compilers pre Ubuntu 22.04 which dont have floating point to_chars
 #	See varnum.cpp
 #	#if __GNUC__ >= 11 || __clang_major__ >=  14
-#		#define USE_TO_CHARS
+#		#define EXO_USE_TO_CHARS
 	message("BOOST")
 
 	find_library(RYU_LIBRARIES NAMES ryu)
@@ -271,6 +271,7 @@
 		gettimeofday.cpp
 		varoshandle.cpp vardbconn.cpp
 		variter.cpp
+#		dimiter.cpp
 		varput.cpp
 		timebank.cpp
 		extract_v2.cpp # Duplicated in pgexodus as extract.c

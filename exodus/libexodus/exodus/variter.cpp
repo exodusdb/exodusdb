@@ -6,8 +6,8 @@
 #endif
 
 #include <exodus/var.h>
-#include <exodus/dim.h>
-#include <exodus/rex.h>
+//#include <exodus/dim.h>
+//#include <exodus/rex.h>
 
 //mv_iter class enables c++ range based programming over a dynamic array
 //
@@ -124,6 +124,14 @@ var_iter var_iter::operator--() {
 		startpos_++;
 
 	return *this;
+}
+
+//INCREMENT POSTFIX
+var_iter var_iter::operator++(int) {
+	//std::cerr << __PRETTY_FUNCTION__ << std::endl;
+	var_iter before = *this;
+	++*this;
+	return before;
 }
 
 //DECREMENT POSTFIX

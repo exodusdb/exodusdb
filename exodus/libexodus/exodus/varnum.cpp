@@ -44,12 +44,12 @@ THE SOFTWARE.
 // 1. TO_CHARS from Ubuntu 22.04
 // Duplicated in varnum.cpp, testnum.cpp and test_precision.cpp. Keep in sync.
 #if __GNUC__ >= 11 || __clang_major__ >=  14
-#define USE_TO_CHARS
+#define EXO_USE_TO_CHARS
 //#include <array>
 
 // 2. RYU
 #elif __has_include(<ryu/ryu.h>)
-#define USE_RYU
+#define EXO_USE_RYU
 #include <ryu/ryu.h>
 
 // 3. STRINGSTREAM
@@ -107,7 +107,7 @@ THE SOFTWARE.
 
 namespace exo {
 
-#ifdef USE_TO_CHARS
+#ifdef EXO_USE_TO_CHARS
 /////////////////////////////////////
 // Wrapper function for std::to_chars
 /////////////////////////////////////
@@ -156,9 +156,9 @@ static std::string double_to_string(double double1) {
 	//Precision on fixed output only controls the precision after the decimal point
 	//so the precision needs to be huge to cater for very small numbers eg < 10E-20
 
-#ifdef USE_TO_CHARS
+#ifdef EXO_USE_TO_CHARS
 
-	// 1) USE_TO_CHARS
+	// 1) EXO_USE_TO_CHARS
 
 	// Use the new low level high performance double to chars converter
 	// https://en.cppreference.com/w/cpp/utility/to_chars
@@ -196,7 +196,7 @@ static std::string double_to_string(double double1) {
 	if (epos == std::string::npos)
 		return resultstr;
 
-#elif defined(USE_RYU)
+#elif defined(EXO_USE_RYU)
 
 	//std::cout << "ryu_printf decimal oconv" << std::endl;
 
@@ -204,8 +204,8 @@ static std::string double_to_string(double double1) {
 	std::string resultstr;
 	resultstr.resize(24);
 
-//#define USE_RYU_D2S
-//#ifdef USE_RYU_D2S
+//#define EXO_USE_RYU_D2S
+//#ifdef EXO_USE_RYU_D2S
 
 	// 500ns using ryu d2s() which always outputs scientific even 0E0 for zero.
 
@@ -290,7 +290,7 @@ static std::string double_to_string(double double1) {
 
 #else //USE_SSTREAM
 
-	//1800ns //NOT USE_TO_CHARS or USE_RYU
+	//1800ns //NOT EXO_USE_TO_CHARS or EXO_USE_RYU
 
 	//std::cout << "std:sstream decimal oconv" << std::endl;
 
@@ -342,7 +342,7 @@ static std::string double_to_string(double double1) {
 #endif
 		//std::cout << "xxxxxxxxxxxxxxxxxxxxxxxxxxxx" << std::endl;
 
-#endif	//USE_RYU / do not use RYU
+#endif	//EXO_USE_RYU / do not use RYU
 
 // PROCESS THE OUTPUT OF THE ABOVE 3 ALTERNATIVES
 /////////////////////////////////////////////////
@@ -360,14 +360,14 @@ static std::string double_to_string(double double1) {
 	// Exponent 0 special treatment and exit
 	if (!exponent) {
 
-//#ifndef USE_RYU_D2S
+//#ifndef EXO_USE_RYU_D2S
 		//remove trailing zeros and decimal point
 		while (resultstr.back() == '0')
 			resultstr.pop_back();
 		if (resultstr.back() == '.')
 			resultstr.pop_back();
 			//resultstr.push_back('0');
-//#ifdef USE_RYU
+//#ifdef EXO_USE_RYU
 		//single zero if none
 		//if (resultstr.size() == std::size_t(minus))
 		if (resultstr.empty() || resultstr == "-")
@@ -863,7 +863,7 @@ var  var::round(const int ndecimals) const {
 	//TRACE(diff)
 	//TRACE(rounded_double)
 
-#ifdef USE_TO_CHARS
+#ifdef EXO_USE_TO_CHARS
 
 	// Use the new low level high performance double to chars converter
 	// https://en.cppreference.com/w/cpp/utility/to_chars

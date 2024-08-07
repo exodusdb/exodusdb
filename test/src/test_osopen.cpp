@@ -2,10 +2,9 @@
 #include <cassert>
 
 #include <exodus/program.h>
-
 programinit()
 
-	function main() {
+function main() {
 
 	var filename = "t_hello.txt";
 	assert(oswrite("xyz", filename));

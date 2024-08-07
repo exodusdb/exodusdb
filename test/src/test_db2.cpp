@@ -2,10 +2,9 @@
 #include <cassert>
 
 #include <exodus/program.h>
-
 programinit()
 
-	function main() {
+function main() {
 
 	// Quit if no default database connection
 	if (not connect()) {

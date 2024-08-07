@@ -2,7 +2,6 @@
 #include <cassert>
 
 #include <exodus/program.h>
-
 programinit()
 
 function test_ioconv(in ovar, in ivar) {

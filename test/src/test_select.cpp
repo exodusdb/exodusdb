@@ -2,10 +2,9 @@
 #include <cassert>
 
 #include <exodus/program.h>
-
 programinit()
 
-	var testfilename;
+var testfilename;
 var dictfilename;
 var testfile;
 

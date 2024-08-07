@@ -1,28 +1,31 @@
 #undef NDEBUG  //because we are using assert to check actual operations that cannot be skipped in release mode testing
 #include <cassert>
 
+#if EXO_MODULE
+	import std;
+#endif
+
 // 1. TO_CHARS from Ubuntu 22.04
 // Duplicated in varnum.cpp, testnum.cpp and test_precision.cpp. Keep in sync.
 #if __GNUC__ >= 11 || __clang_major__ >=  14
-#define USE_TO_CHARS
+#define EXO_USE_TO_CHARS
 //#include <array>
 
 // 2. RYU
 #elif __has_include(<ryu/ryu.h>)
-#define USE_RYU
+#define EXO_USE_RYU
 #include <ryu/ryu.h>
 
 // 3. STRINGSTREAM
 #else
 #endif
 
-#include <exodus/program.h>
-
 using namespace std;
 
+#include <exodus/program.h>
 programinit()
 
-	function test(in str, in str2o = "") {
+function test(in str, in str2o = "") {
 
 	printx(str, "==", str.quote());
 	printl((str eq str) ? " is true" : " is false", "and ");
@@ -69,7 +72,7 @@ programinit()
 	//var z=quote(str2);
 	//if (quote(str+0) ne quote(str2))
 	//	debug();
-#ifdef USE_RYU
+#ifdef EXO_USE_RYU
 	assert(quote(str + 0) eq quote(str2));	//RYU converts 99.9+0 (99.90000000000000006) to 99.9
 #else
 	assert((str + 0) eq str2);	//numerical comparison to avoid 99.9+0 = 99.90000000000000006 without using RYU

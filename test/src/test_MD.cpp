@@ -2,10 +2,9 @@
 #include <cassert>
 
 #include <exodus/program.h>
-
 programinit()
 
-	function main() {
+function main() {
 
 	{
 		TRACE(oconv(1234.56, "MD0"))

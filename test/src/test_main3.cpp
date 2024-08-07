@@ -1,9 +1,14 @@
 #undef NDEBUG  //because we are using assert to check actual operations that cannot be skipped in release mode testing
 #include <cassert>
-#include <sstream>
-//#include <cmath>
+
+#if EXO_MODULE
+	import std;
+#else
+#	include <sstream>
+#endif
 
 #include <exodus/program.h>
+programinit()
 
 // TESTING
 // =======
@@ -27,9 +32,7 @@
 //
 //   test_main1 &> test_main1.out
 
-programinit()
-
-	function main() {
+function main() {
 
 	{
 		printl("Check randomness of rnd(10)");
@@ -400,8 +403,8 @@ programinit()
 		printl("string:   ", sizeof(std::string));
 		printl("long long:", sizeof(long long));
 		printl("double:   ", sizeof(double));
-		printl("uint:	 ", sizeof(uint));
-		printl("uint:	 ", sizeof(uint), " padding1");
+		printl("uint:	 ", sizeof(std::uint));
+		printl("uint:	 ", sizeof(std::uint), " padding1");
 		printl("long long:", sizeof(long long), " padding2");
 		printl("		   ==");
 		printl("var:	  ", sizeof(var));
@@ -435,7 +438,7 @@ programinit()
 	}
 
 	{
-		//exodus currently configured to use 2. for very great speed (see mv.cpp USE_RYU) BUT it will include over accurate figures without any rounding
+		//exodus currently configured to use 2. for very great speed (see mv.cpp EXO_USE_RYU) BUT it will include over accurate figures without any rounding
 		//1. precision 16 using sstring. SLOW (1850ns)
 		//2. full precision using VERY FAST ryu algorithm (450ns)
 		//full accuracy of ryu shows why calculations always must be rounded after every calculation because every calculation introduces more inaccuracies.

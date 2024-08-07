@@ -1,7 +1,14 @@
 #undef NDEBUG  //because we are using assert to check actual operations that cannot be skipped in release mode testing
-#include <exodus/var.h>
 
-//using namespace exodus;
+#ifdef EXO_MODULE
+	import var;
+#else
+#	include <exodus/var.h>
+#endif
+
+// We could bring the whole of exo namespace
+//using namespace exo;
+//or just the var with all its many member functions 
 using exo::var;
 
 int main() {

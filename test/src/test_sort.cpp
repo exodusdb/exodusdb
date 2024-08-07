@@ -4,7 +4,7 @@
 #include <exodus/program.h>
 programinit()
 
-	function main() {
+function main() {
 
 	// Also tests var::reverse
 
