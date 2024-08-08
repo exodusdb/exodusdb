@@ -654,41 +654,44 @@ public:
 	// CLASSIC MV STRING FUNCTIONS
 	//////////////////////////////
 
-	// this function hardly occurs anywhere in exodus code and should probably be renamed to
-	// something better it was called replace() in Pick Basic but we are now using "replace()" to
-	// change substrings using regex (similar to the old Pick Basic replace function) its mutator function
-	// is .r()
-//	ND var  pickreplace(const int fieldno, const int valueno, const int subvalueno, in replacement) const;
-//	ND var  pickreplace(const int fieldno, const int valueno, in replacement) const;
-//	ND var  pickreplace(const int fieldno, in replacement) const;
-	ND var  pickreplace(const int fieldno, const int valueno, const int subvalueno, in replacement) const {return var(*this).r(fieldno, valueno, subvalueno, replacement);}
-	ND var  pickreplace(const int fieldno, const int valueno, in replacement) const {return var(*this).r(fieldno, valueno, 0, replacement);}
-	ND var  pickreplace(const int fieldno, in replacement) const {return var(*this).r(fieldno, 0, 0, replacement);}
-
-	// cf mutator inserter()
-	ND var  insert(const int fieldno, const int valueno, const int subvalueno, in insertion) const& {return var(*this).inserter(fieldno, valueno, subvalueno, insertion);}
-	ND var  insert(const int fieldno, const int valueno, in insertion) const& {return this->insert(fieldno, valueno, 0, insertion);}
-	ND var  insert(const int fieldno, in insertion) const& {return this->insert(fieldno, 0, 0, insertion);}
-
-	/// remove() was delete() in Pick Basic
-	// var  erase(const int fieldno, const int valueno=0, const int subvalueno=0) const;
-//	ND var  remove(const int fieldno, const int valueno = 0, const int subvalueno = 0) const;
-	ND var  remove(const int fieldno, const int valueno = 0, const int subvalueno = 0) const {return var(*this).remover(fieldno, valueno, subvalueno);}
-
 	//.f(...) stands for .attribute(...) or extract(...)
 	// Pick Basic
 	// xxx=yyy<10>";
 	// becomes c++
 	// xxx=yyy.f(10);
-	ND var  f(const int fieldno, const int valueno = 0, const int subvalueno = 0) const;
-	ND var  extract(const int fieldno, const int valueno = 0, const int subvalueno = 0) const {return this->f(fieldno, valueno, subvalueno);}
+	ND var  f(const int fieldno, const int valueno = 0, const int subvalueno = 0)            const;
+	ND var  extract(const int fieldno, const int valueno = 0, const int subvalueno = 0)      const {return this->f(fieldno, valueno, subvalueno);}
 
-	// SAME AS ABOVE ON TEMPORARIES
-	///////////////////////////////
+	// this function hardly occurs anywhere in exodus code and should probably be renamed to
+	// something better it was called replace() in Pick Basic but we are now using "replace()" to
+	// change substrings using regex (similar to the old Pick Basic replace function) its mutator function
+	// is .r()
+	ND var  pickreplace(const int fieldno, const int valueno, const int subvalueno, in replacement) const {return var(*this).r(fieldno, valueno, subvalueno, replacement);}
+	ND var  pickreplace(const int fieldno, const int valueno, in replacement)                       const {return var(*this).r(fieldno, valueno, 0, replacement);}
+	ND var  pickreplace(const int fieldno, in replacement)                                          const {return var(*this).r(fieldno, 0, 0, replacement);}
 
-	ND io   insert(const int fieldno, const int valueno, const int subvalueno, in insertion) && {return this->inserter(fieldno, valueno, subvalueno, insertion);}
-	ND io   insert(const int fieldno, const int valueno, in insertion) && {return this->inserter(fieldno, valueno, 0, insertion);}
-	ND io   insert(const int fieldno, in insertion) && {return this->inserter(fieldno, 0, 0, insertion);}
+	// cf mutator inserter()
+	ND var  insert(const int fieldno, const int valueno, const int subvalueno, in insertion) const& {return var(*this).inserter(fieldno, valueno, subvalueno, insertion);}
+	ND var  insert(const int fieldno, const int valueno, in insertion)                       const& {return var(*this).inserter(fieldno, valueno, 0, insertion);}
+	ND var  insert(const int fieldno, in insertion)                                          const& {return var(*this).inserter(fieldno, 0, 0, insertion);}
+
+	/// remove() was delete() in Pick Basic
+	// var  erase(const int fieldno, const int valueno=0, const int subvalueno=0) const;
+//	ND var  remove(const int fieldno, const int valueno = 0, const int subvalueno = 0) const;
+	ND var  remove(const int fieldno, const int valueno = 0, const int subvalueno = 0)       const {return var(*this).remover(fieldno, valueno, subvalueno);}
+
+	// SAME AS ABOVE ON TEMPORARIES TO USE MUTATING
+	///////////////////////////////////////////////
+
+	ND io   pickreplace(const int fieldno, const int valueno, const int subvalueno, in replacement) && {return this->r(fieldno, valueno, subvalueno, replacement);}
+	ND io   pickreplace(const int fieldno, const int valueno, in replacement)                       && {return this->r(fieldno, valueno, 0, replacement);}
+	ND io   pickreplace(const int fieldno, in replacement)                                          && {return this->r(fieldno, 0, 0, replacement);}
+
+	ND io   insert(const int fieldno, const int valueno, const int subvalueno, in insertion)        && {return this->inserter(fieldno, valueno, subvalueno, insertion);}
+	ND io   insert(const int fieldno, const int valueno, in insertion)                              && {return this->inserter(fieldno, valueno, 0, insertion);}
+	ND io   insert(const int fieldno, in insertion)                                                 && {return this->inserter(fieldno, 0, 0, insertion);}
+
+	ND io   remove(const int fieldno, const int valueno = 0, const int subvalueno = 0)              && {return this->remover(fieldno, valueno, subvalueno);}
 
 	// MV STRING FILTERS
 	////////////////////
