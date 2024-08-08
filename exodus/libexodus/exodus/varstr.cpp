@@ -570,7 +570,8 @@ static bool locatex(const std::string& var_str, const std::string& target, const
 	// find the end of the value (or string)
 	std::size_t value_end_pos;
 	value_end_pos = var_str.find(VM_, start_pos);
-	if (value_end_pos == std::string::npos || value_end_pos > field_end_pos)
+//	if (value_end_pos == std::string::npos || value_end_pos > field_end_pos)
+	if (value_end_pos > field_end_pos)
 		value_end_pos = field_end_pos;
 
 	// FIND SUBVALUE
@@ -618,7 +619,8 @@ static bool locatex(const std::string& var_str, const std::string& target, const
 	// find the end of the subvalue (or string)
 	std::size_t subvalue_end_pos;
 	subvalue_end_pos = var_str.find(SM_, start_pos);
-	if (subvalue_end_pos == std::string::npos || subvalue_end_pos > value_end_pos) {
+//	if (subvalue_end_pos == std::string::npos || subvalue_end_pos > value_end_pos) {
+	if (subvalue_end_pos > value_end_pos) {
 		return locateat(var_str, target, start_pos, value_end_pos, ordermode, usingchar,
 						setting);
 	}
@@ -889,7 +891,8 @@ var  var::f(const int argfieldn, const int argvaluen/*=0*/, const int argsubvalu
 	// find the end of the value (or string)
 	std::size_t value_end_pos;
 	value_end_pos = var_str.find(VM_, start_pos);
-	if (value_end_pos == std::string::npos || value_end_pos > field_end_pos)
+//	if (value_end_pos == std::string::npos || value_end_pos > field_end_pos)
+	if (value_end_pos > field_end_pos)
 		value_end_pos = field_end_pos;
 
 	// FIND SUBVALUE
@@ -919,7 +922,8 @@ var  var::f(const int argfieldn, const int argvaluen/*=0*/, const int argsubvalu
 	// find the end of the subvalue (or string)
 	std::size_t subvalue_end_pos;
 	subvalue_end_pos = var_str.find(SM_, start_pos);
-	if (subvalue_end_pos == std::string::npos || subvalue_end_pos > value_end_pos)
+//	if (subvalue_end_pos == std::string::npos || subvalue_end_pos > value_end_pos)
+	if (subvalue_end_pos > value_end_pos)
 		return var_str.substr(start_pos, value_end_pos - start_pos);
 
 	return var_str.substr(start_pos, subvalue_end_pos - start_pos);
@@ -996,7 +1000,8 @@ io   var::remover(int fieldno, int valueno, int subvalueno) {
 		while (valuen2 < valueno) {
 			start_pos = var_str.find(VM_, start_pos);
 			// past end of string or field?
-			if (start_pos >= field_end_pos || start_pos == std::string::npos) {
+//			if (start_pos >= field_end_pos || start_pos == std::string::npos) {
+			if (start_pos >= field_end_pos) {
 				return *this;
 			}
 			start_pos++;
@@ -1005,7 +1010,8 @@ io   var::remover(int fieldno, int valueno, int subvalueno) {
 
 		// find the end of the value (or string)
 		value_end_pos = var_str.find(VM_, start_pos);
-		if (value_end_pos == std::string::npos || value_end_pos > field_end_pos)
+//		if (value_end_pos == std::string::npos || value_end_pos > field_end_pos)
+		if (value_end_pos > field_end_pos)
 			value_end_pos = field_end_pos;
 	}
 
@@ -1030,7 +1036,8 @@ io   var::remover(int fieldno, int valueno, int subvalueno) {
 		while (subvaluen2 < subvalueno) {
 			start_pos = var_str.find(SM_, start_pos);
 			// past end of string or value
-			if (start_pos >= value_end_pos || start_pos == std::string::npos) {
+//			if (start_pos >= value_end_pos || start_pos == std::string::npos) {
+			if (start_pos >= value_end_pos) {
 				return *this;
 			}
 			start_pos++;
@@ -1039,7 +1046,8 @@ io   var::remover(int fieldno, int valueno, int subvalueno) {
 
 		// find the end of the subvalue (or string)
 		subvalue_end_pos = var_str.find(SM_, start_pos);
-		if (subvalue_end_pos == std::string::npos || subvalue_end_pos > value_end_pos)
+//		if (subvalue_end_pos == std::string::npos || subvalue_end_pos > value_end_pos)
+		if (subvalue_end_pos > value_end_pos)
 			subvalue_end_pos = value_end_pos;
 	}
 	// wcout<<start_pos<<" "<<subvalue_end_pos<<" "<<subvalue_end_pos-start_pos<<endl;
@@ -1132,7 +1140,8 @@ io   var::r(int fieldno, int valueno, int subvalueno, in replacement) {
 		while (valuen2 < valueno) {
 			start_pos = var_str.find(VM_, start_pos);
 			// past end of string or field?
-			if (start_pos >= field_end_pos || start_pos == std::string::npos) {
+//			if (start_pos >= field_end_pos || start_pos == std::string::npos) {
+			if (start_pos >= field_end_pos) {
 				// start_pos = field_end_pos;
 				// var_str.insert(field_end_pos,std::string(valueno-valuen2,VM_));
 				var_str.insert(field_end_pos, valueno - valuen2, VM_);
@@ -1146,7 +1155,8 @@ io   var::r(int fieldno, int valueno, int subvalueno, in replacement) {
 
 		// find the end of the value (or string)
 		value_end_pos = var_str.find(VM_, start_pos);
-		if (value_end_pos == std::string::npos || value_end_pos > field_end_pos)
+//		if (value_end_pos == std::string::npos || value_end_pos > field_end_pos)
+		if (value_end_pos > field_end_pos)
 			value_end_pos = field_end_pos;
 	}
 
@@ -1170,7 +1180,8 @@ io   var::r(int fieldno, int valueno, int subvalueno, in replacement) {
 		while (subvaluen2 < subvalueno) {
 			start_pos = var_str.find(SM_, start_pos);
 			// past end of string or value
-			if (start_pos >= value_end_pos || start_pos == std::string::npos) {
+//			if (start_pos >= value_end_pos || start_pos == std::string::npos) {
+			if (start_pos >= value_end_pos) {
 				// start_pos = value_end_pos;
 				// var_str.insert(value_end_pos,std::string(subvalueno-subvaluen2,SM_));
 				var_str.insert(value_end_pos, subvalueno - subvaluen2, SM_);
@@ -1184,7 +1195,8 @@ io   var::r(int fieldno, int valueno, int subvalueno, in replacement) {
 
 		// find the end of the subvalue (or string)
 		subvalue_end_pos = var_str.find(SM_, start_pos);
-		if (subvalue_end_pos == std::string::npos || subvalue_end_pos > value_end_pos)
+//		if (subvalue_end_pos == std::string::npos || subvalue_end_pos > value_end_pos)
+		if (subvalue_end_pos > value_end_pos)
 			subvalue_end_pos = value_end_pos;
 	}
 	// wcout<<start_pos<<" "<<subvalue_end_pos<<" "<<subvalue_end_pos-start_pos<<endl;
@@ -1282,7 +1294,8 @@ io   var::inserter(const int fieldno, const int valueno, const int subvalueno, i
 		while (valuen2 < valueno) {
 			start_pos = var_str.find(VM_, start_pos);
 			// past end of string or field?
-			if (start_pos >= field_end_pos || start_pos == std::string::npos) {
+//			if (start_pos >= field_end_pos || start_pos == std::string::npos) {
+			if (start_pos >= field_end_pos) {
 				pad = true;
 				// start_pos = field_end_pos;
 				// var_str.insert(field_end_pos,std::string(valueno-valuen2,VM_));
@@ -1297,7 +1310,8 @@ io   var::inserter(const int fieldno, const int valueno, const int subvalueno, i
 
 		// find the end of the value (or string)
 		value_end_pos = var_str.find(VM_, start_pos);
-		if (value_end_pos == std::string::npos || value_end_pos > field_end_pos)
+//		if (value_end_pos == std::string::npos || value_end_pos > field_end_pos)
+		if (value_end_pos > field_end_pos)
 			value_end_pos = field_end_pos;
 	}
 
@@ -1325,7 +1339,8 @@ io   var::inserter(const int fieldno, const int valueno, const int subvalueno, i
 		while (subvaluen2 < subvalueno) {
 			start_pos = var_str.find(SM_, start_pos);
 			// past end of string or value
-			if (start_pos >= value_end_pos || start_pos == std::string::npos) {
+//			if (start_pos >= value_end_pos || start_pos == std::string::npos) {
+			if (start_pos >= value_end_pos) {
 				pad = true;
 				// start_pos = value_end_pos;
 				// var_str.insert(value_end_pos,std::string(subvalueno-subvaluen2,SM_));
@@ -1341,7 +1356,7 @@ io   var::inserter(const int fieldno, const int valueno, const int subvalueno, i
 		//not required
 		// find the end of the subvalue (or string)
 		//subvalue_end_pos = var_str.find(SM_, start_pos);
-		//if (subvalue_end_pos == std::string::npos || subvalue_end_pos > value_end_pos)
+		//if (subvalue_end_pos > value_end_pos)
 		//	subvalue_end_pos = value_end_pos;
 	}
 
