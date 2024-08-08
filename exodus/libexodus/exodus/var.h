@@ -1279,9 +1279,21 @@ class PUBLIC var_proxy1 {
 	//  x<1,2,3> = y // Replace field 1, value 2, subvalue 3 (var_proxy3)
 	//  x<-1>    = y // Append a field
 	//
-	   void operator=(in replacement) {
+	void operator=(in replacement) {
 		var_.r(fn_, replacement);
 	}
+
+	void operator=(var_proxy1 rhs);
+	void operator=(var_proxy2 rhs);
+	void operator=(var_proxy3 rhs);
+
+//	void operator=(var_proxy2 rhs) {
+//		var_.r(fn_, var(rhs));
+//	}
+//
+//	void operator=(var_proxy3 rhs) {
+//		var_.r(fn_, var(rhs));
+//	}
 
 	// Operator bool
 	//
@@ -1332,9 +1344,13 @@ class PUBLIC var_proxy2 {
 		return var_.f(fn_, vn_);
 	}
 
-	   void operator=(in replacement) {
+	void operator=(in replacement) {
 		var_.r(fn_, vn_, replacement);
 	}
+
+	void operator=(var_proxy1 rhs);
+	void operator=(var_proxy2 rhs);
+	void operator=(var_proxy3 rhs);
 
 	explicit operator bool() const {
 		return var_.f(fn_, vn_);
@@ -1372,9 +1388,13 @@ class PUBLIC var_proxy3 {
 		return var_.f(fn_, vn_, sn_);
 	}
 
-	   void operator=(in replacement) {
+	void operator=(in replacement) {
 		var_.r(fn_, vn_, sn_, replacement);
 	}
+
+	void operator=(var_proxy1 rhs);
+	void operator=(var_proxy2 rhs);
+	void operator=(var_proxy3 rhs);
 
 	explicit operator bool() const {
 		return var_.f(fn_, vn_, sn_);
@@ -1393,6 +1413,18 @@ class PUBLIC var_proxy3 {
 ND inline var_proxy1 var::operator()(int fieldno) {return var_proxy1(*this, fieldno);}
 ND inline var_proxy2 var::operator()(int fieldno, int valueno) {return var_proxy2(*this, fieldno, valueno);}
 ND inline var_proxy3 var::operator()(int fieldno, int valueno, int subvalueno) {return var_proxy3(*this, fieldno, valueno, subvalueno);}
+
+   inline void var_proxy1::operator=(var_proxy1 rhs) {var_.r(fn_, var(rhs));}
+   inline void var_proxy1::operator=(var_proxy2 rhs) {var_.r(fn_, var(rhs));}
+   inline void var_proxy1::operator=(var_proxy3 rhs) {var_.r(fn_, var(rhs));}
+
+   inline void var_proxy2::operator=(var_proxy1 rhs) {var_.r(fn_, vn_, var(rhs));}
+   inline void var_proxy2::operator=(var_proxy2 rhs) {var_.r(fn_, vn_, var(rhs));}
+   inline void var_proxy2::operator=(var_proxy3 rhs) {var_.r(fn_, vn_, var(rhs));}
+
+   inline void var_proxy3::operator=(var_proxy1 rhs) {var_.r(fn_, vn_, sn_, var(rhs));}
+   inline void var_proxy3::operator=(var_proxy2 rhs) {var_.r(fn_, vn_, sn_, var(rhs));}
+   inline void var_proxy3::operator=(var_proxy3 rhs) {var_.r(fn_, vn_, sn_, var(rhs));}
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wexit-time-destructors"

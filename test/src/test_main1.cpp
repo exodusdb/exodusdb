@@ -77,6 +77,75 @@ function main() {
 		assert(x(2).at(-2) eq "y");
 	}
 
+	// Check var_proxy = var_proxy
+	{
+		var a = "a1^a21]a221}a222}a223"_var;
+		var b = "b1^b21]b221}b222}b223"_var;
+
+		// field
+		{
+			{
+				var x = a;
+				x(2) = b(2);
+				assert(x.outputl() == a.pickreplace(2, b.f(2)));
+			}
+
+			{
+				var x = a;
+				x(2) = b(2, 1);
+				assert(x.outputl() == a.pickreplace(2, b.f(2, 1)));
+			}
+
+			{
+				var x = a;
+				x(2) = b(2, 2, 2);
+				assert(x.outputl() == a.pickreplace(2, b.f(2, 2, 2)));
+			}
+		}
+
+		// field, value
+		{
+			{
+				var x = a;
+				x(2, 1) = b(2);
+				assert(x.outputl() == a.pickreplace(2, 1, b.f(2)));
+			}
+
+			{
+				var x = a;
+				x(2, 1) = b(2, 1);
+				assert(x.outputl() == a.pickreplace(2, 1, b.f(2, 1)));
+			}
+
+			{
+				var x = a;
+				x(2, 1) = b(2, 2, 2);
+				assert(x.outputl() == a.pickreplace(2, 1, b.f(2, 2, 2)));
+			}
+		}
+
+		// field, value, subvalue
+		{
+			{
+				var x = a;
+				x(2, 1, 3) = b(2);
+				assert(x.outputl() == a.pickreplace(2, 1, 3, b.f(2)));
+			}
+
+			{
+				var x = a;
+				x(2, 1, 3) = b(2, 1);
+				assert(x.outputl() == a.pickreplace(2, 1, 3, b.f(2, 1)));
+			}
+
+			{
+				var x = a;
+				x(2, 1, 3) = b(2, 2, 2);
+				assert(x.outputl() == a.pickreplace(2, 1, 3, b.f(2, 2, 2)));
+			}
+		}
+	} // check var_proxy = var_proxy
+
 	/* UBUNTU locale-gen
 	locale-gen de_DE.UTF-8
 	locale-gen en_GB.UTF-8
