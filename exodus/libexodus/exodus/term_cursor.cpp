@@ -1,13 +1,3 @@
-//import std;
-//#include <iomanip>
-//#include <iostream>
-//#include <stdio.h>
-//#include <termios.h>
-//#include <unistd.h> // for isatty
-
-//import var;
-//#include <exodus/var.h>
-
 #if EXO_MODULE
 	import exoprog;
 #else
@@ -15,11 +5,6 @@
 #endif
 
 namespace exo {
-
-// Moved to term_echo.cpp
-//bool var::isterminal() const {
-//	return isatty(fileno(stdin));
-//}
 
 var ExodusProgramBase::getcursor() const {
 

@@ -1,10 +1,12 @@
 // https://stackoverflow.com/questions/14322430/how-to-do-console-input-like-in-the-top-linux-command
-
-#include <fcntl.h>		 //fcntl()
+//#if EXO_MODULE
+//	import std;
+//#endif
 #include <stdio.h>		 //fileno(), stdin
+#include <unistd.h>		 //read()
+#include <fcntl.h>		 //fcntl()
 #include <sys/select.h>	 //select()
 #include <termios.h>	 //termios
-#include <unistd.h>		 //read()
 //#include <sys/ioctl.h>
 //#include <sys/time.h>
 //#include <sys/types.h>

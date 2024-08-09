@@ -1,15 +1,15 @@
 #if EXO_MODULE
 	import std;
+#else
+#	include <unistd.h>
+#	include <errno.h>
+#	include <stdlib.h> // for EXIT_FAILURE
+#	include <cstdio> // for stderr
 #endif
 
-#include <poll.h>
 #include <sys/inotify.h>
+#include <poll.h>
 #include <termios.h>
-#include <unistd.h>
-#include <errno.h>
-
-#include <stdlib.h> // for EXIT_FAILURE
-#include <cstdio> // for stderr
 
 #include <exodus/cargs.h>
 #include <exodus/var.h>
