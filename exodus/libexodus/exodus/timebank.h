@@ -134,7 +134,7 @@ auto get_timebank_acno(const std::string_view arg1) -> int {
 	     if (++acno && arg1 == "dim& dim::splitter(in str1, SV sepchar = FM)") {}
 	else if (++acno && arg1 == "xxxxxxxx unused") {}
 	else if (++acno && arg1 == "bool dim::read(in filevar, in key)") {}
-	else if (++acno && arg1 == "bool dim::write(in filevar, in key) const") {}
+	else if (++acno && arg1 == "void dim::write(in filevar, in key) const") {}
 	else if (++acno && arg1 == "bool dim::osread(in osfilename, const char* codepage DEFAULT_EMPTY)") {}
 	else if (++acno && arg1 == "bool dim::oswrite(in osfilename, const char* codepage DEFAULT_EMPTY)") {}
 	else if (++acno && arg1 == "var  var::sort(SV sepchar = FM)") {}
@@ -158,8 +158,8 @@ auto get_timebank_acno(const std::string_view arg1) -> int {
 	else if (++acno && arg1 == "void var::unlock(in key) const") {}
 	else if (++acno && arg1 == "void var::unlockall() const") {}
 	else if (++acno && arg1 == "bool var::sqlexec(in sqlcmd, io response) const") {}
-	else if (++acno && arg1 == "bool var::writef(in filehandle, in key, const int fieldno) const") {}
-	else if (++acno && arg1 == "bool var::write(in filehandle, in key) const") {}
+	else if (++acno && arg1 == "void var::writef(in filehandle, in key, const int fieldno) const") {}
+	else if (++acno && arg1 == "void var::write(in filehandle, in key) const") {}
 	else if (++acno && arg1 == "bool var::updaterecord(in filehandle, in key) const") {}
 	else if (++acno && arg1 == "bool var::insertrecord(in filehandle, in key) const") {}
 	else if (++acno && arg1 == "bool var::deleterecord(in key) const") {}

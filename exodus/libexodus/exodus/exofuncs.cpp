@@ -418,14 +418,14 @@ ND PUBLIC bool read(io record, in dbfilevar, in key) {return record.read(dbfilev
 ND PUBLIC bool readc(io record, in dbfilevar, in key) {return record.readc(dbfilevar, key);}
 ND PUBLIC bool readf(io record, in dbfilevar, in key, in fieldnumber) {return record.readf(dbfilevar, key, fieldnumber);}
 
-   PUBLIC bool write(in record, in dbfilevar, in key) {return record.write(dbfilevar, key);}
-   PUBLIC bool writec(in record, in dbfilevar, in key) {return record.writec(dbfilevar, key);}
-   PUBLIC bool writef(in record, in dbfilevar, in key, const int fieldno) {return record.writef(dbfilevar, key, fieldno);}
+   PUBLIC void write(in record, in dbfilevar, in key) {record.write(dbfilevar, key);}
+   PUBLIC void writec(in record, in dbfilevar, in key) {record.writec(dbfilevar, key);}
+   PUBLIC void writef(in record, in dbfilevar, in key, const int fieldno) {record.writef(dbfilevar, key, fieldno);}
 ND PUBLIC bool updaterecord(in record, in dbfilevar, in key) {return record.updaterecord(dbfilevar, key);}
 ND PUBLIC bool insertrecord(in record, in dbfilevar, in key) {return record.insertrecord(dbfilevar, key);}
 
 ND PUBLIC bool dimread(dim& dimrecord, in dbfilevar, in key) {return dimrecord.read(dbfilevar, key);}
-ND PUBLIC bool dimwrite(const dim& dimrecord, in dbfilevar, in key) {return dimrecord.write(dbfilevar, key);}
+   PUBLIC void dimwrite(const dim& dimrecord, in dbfilevar, in key) {dimrecord.write(dbfilevar, key);}
 
 ND PUBLIC var  xlate(in dbfilename, in key, in fieldno, const char* mode);
 ND PUBLIC var  xlate(in dbfilename, in key, in fieldno, in mode);

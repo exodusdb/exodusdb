@@ -493,16 +493,16 @@ bool dim::read(in filevar, in key) {
 	return true;
 }
 
-bool dim::write(in filevar, in key) const {
+void dim::write(in filevar, in key) const {
 
-	THISIS("bool dim::write(in filevar, in key) const")
+	THISIS("void dim::write(in filevar, in key) const")
 	ISSTRING(filevar)
 	ISSTRING(key)
 
 	var temprecord = this->join().trimlast(_FM);
 
-	return temprecord.write(filevar, key);
-
+	temprecord.write(filevar, key);
+	return;
 }
 
 bool dim::osread(in osfilename, const char* codepage) {

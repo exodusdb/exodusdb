@@ -58,9 +58,9 @@ function main() {
 	assert(open(testfilename, testfile));
 	assert(open(dictfilename, DICT));
 
-	assert(write(convert("AA BB CC DD", " ", VM), testfile, "A"));
-	assert(write(convert("BB CC DD EE", " ", VM), testfile, "B"));
-	assert(write(convert("CC DD EE FF", " ", VM), testfile, "C"));
+	write(convert("AA BB CC DD", " ", VM), testfile, "A");
+	write(convert("BB CC DD EE", " ", VM), testfile, "B");
+	write(convert("CC DD EE FF", " ", VM), testfile, "C");
 
 	test();
 

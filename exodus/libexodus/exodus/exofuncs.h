@@ -502,14 +502,14 @@ ND bool read(io record, in dbfilevar, in key);
 ND bool readc(io record, in dbfilevar, in key);
 ND bool readf(io record, in dbfilevar, in key, in fieldnumber);
 
-   bool write(in record, in dbfilevar, in key);
-   bool writec(in record, in dbfilevar, in key);
-   bool writef(in record, in dbfilevar, in key, const int fieldno);
+   void write(in record, in dbfilevar, in key);
+   void writec(in record, in dbfilevar, in key);
+   void writef(in record, in dbfilevar, in key, const int fieldno);
 ND bool updaterecord(in record, in dbfilevar, in key);
 ND bool insertrecord(in record, in dbfilevar, in key);
 
 ND bool dimread(dim& dimrecord, in dbfilevar, in key);
-ND bool dimwrite(const dim& dimrecord, in dbfilevar, in key);
+ND void dimwrite(const dim& dimrecord, in dbfilevar, in key);
 
 // moved to exoprog so they have access to default cursor in mv.CURSOR
 // bool select(in sortselectclause DEFAULT_EMPTY);

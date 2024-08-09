@@ -232,7 +232,7 @@ friend class dim_iter;
 
 	// db
 	ND bool read(in filevar, in key);
-	bool write(in filevar, in key) const;
+	void write(in filevar, in key) const;
 
 	// os
 	ND bool osread(in osfilename, const char* codepage DEFAULT_EMPTY);

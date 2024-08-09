@@ -1,7 +1,7 @@
 500 dim& dim::splitter(in str1, SV sepchar = FM) 
 501 unused
 502 bool dim::read(in filevar, in key) 
-503 bool dim::write(in filevar, in key) const 
+503 void dim::write(in filevar, in key) const 
 504 bool dim::osread(in osfilename, const char* codepage DEFAULT_EMPTY) 
 505 bool dim::oswrite(in osfilename, const char* codepage DEFAULT_EMPTY) 
 506 var  var::sort(SV sepchar = FM) 
@@ -25,8 +25,8 @@
 524 void var::unlock(in key) const 
 525 void var::unlockall() const 
 526 bool var::sqlexec(in sqlcmd, io response) const 
-527 bool var::writef(in filehandle, in key, const int fieldno) const 
-528 bool var::write(in filehandle, in key) const 
+527 void var::writef(in filehandle, in key, const int fieldno) const 
+528 void var::write(in filehandle, in key) const 
 529 bool var::updaterecord(in filehandle, in key) const 
 530 bool var::insertrecord(in filehandle, in key) const 
 531 bool var::deleterecord(in key) const 

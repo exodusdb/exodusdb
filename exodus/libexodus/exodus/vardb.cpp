@@ -1484,7 +1484,7 @@ bool var::readc(in filehandle, in key) {
 	return result;
 }
 
-bool var::writec(in filehandle, in key) const {
+void var::writec(in filehandle, in key) const {
 
 	THISIS("void var::writec(in filehandle, in key)")
 	assertString(function_sig);
@@ -1502,7 +1502,7 @@ bool var::writec(in filehandle, in key) const {
 	//TRACE("writec " ^ filehandle ^ " " ^ key ^ " " ^ var(hash64 % 1'000'000'000)) //modulo to bring the uint64 into range that var can handle without throwing overflow
 	thread_dbconnector.putrecord(dbconn_no, hash64, var_str);
 
-	return true;
+	return;
 }
 
 bool var::deletec(in key) const {
@@ -1980,12 +1980,15 @@ bool var::sqlexec(in sqlcmd, io response) const {
 
 // writef writes a specific field number in a record
 //(why it is "writef" instead of "writef" isnt known!
-bool var::writef(in filehandle, in key, const int fieldno) const {
+void var::writef(in filehandle, in key, const int fieldno) const {
 
-	if (fieldno <= 0) UNLIKELY
-		return write(filehandle, key);
+	if (fieldno <= 0) {
+		UNLIKELY
+		write(filehandle, key);
+		return;
+	}
 
-	THISIS("bool var::writef(in filehandle, in key, const int fieldno) const")
+	THISIS("void var::writef(in filehandle, in key, const int fieldno) const")
 	// will be duplicated in read and write but do here to present the correct function name on
 	// error
 	assertString(function_sig);
@@ -2001,17 +2004,19 @@ bool var::writef(in filehandle, in key, const int fieldno) const {
 	record(fieldno) = var_str;
 
 	// write it back
-	return record.write(filehandle, key);
+	record.write(filehandle, key);
+
+	return;
 }
 
 /* "prepared statement" version doesnt seem to make much difference approx -10% - possibly because
-two field file is so simple bool var::write(in filehandle, in key) const {}
+two field file is so simple void var::write(in filehandle, in key) const {}
 */
 
 //"update if present or insert if not" is handled in postgres using ON CONFLICT clause
-bool var::write(in filehandle, in key) const {
+void var::write(in filehandle, in key) const {
 
-	THISIS("bool var::write(in filehandle, in key) const")
+	THISIS("void var::write(in filehandle, in key) const")
 	assertString(function_sig);
 	ISSTRING(filehandle)
 	ISSTRING(key)
@@ -2028,7 +2033,8 @@ bool var::write(in filehandle, in key) const {
 	if (filehandle.var_str.size() == 3 && (filehandle.var_str == "dos" || filehandle.var_str == "DOS")) UNLIKELY {
 		//this->oswrite(key2); //.convert("\\",OSSLASH));
 		//use osfilenames unnormalised so we can read and write as is
-		return this->oswrite(key);
+		this->oswrite(key);
+		return;
 	}
 
 	var sql;
@@ -2084,7 +2090,7 @@ bool var::write(in filehandle, in key) const {
 	// success if inserted or updated 1 record
 	//return std::strcmp(PQcmdTuples(dbresult), "1") != 0;
 
-	return true;
+	return;
 }
 
 //"updaterecord" is non-standard for pick - but allows "write only if already exists" logic

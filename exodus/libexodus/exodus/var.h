@@ -811,18 +811,18 @@ public:
 
 	// db file i/o
 	ND bool read(in filehandle, in key);
-	   bool write(in filehandle, in key) const;
+	   void write(in filehandle, in key) const;
 	   bool deleterecord(in key) const;
 	ND bool updaterecord(in filehandle, in key) const;
 	ND bool insertrecord(in filehandle, in key) const;
 
 	// specific db field i/o
 	ND bool readf(in filehandle, in key, const int fieldno);
-	   bool writef(in filehandle, in key, const int fieldno) const;
+	   void writef(in filehandle, in key, const int fieldno) const;
 
 	// cached db file i/o
 	ND bool readc(in filehandle, in key);
-	   bool writec(in filehandle, in key) const;
+	   void writec(in filehandle, in key) const;
 	   bool deletec(in key) const;
 
 	// ExoEnv function now to allow access to RECORD ID DICT etc. and call external

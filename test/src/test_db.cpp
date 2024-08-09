@@ -55,7 +55,8 @@ programinit()
 	var dosfile;
 	assert(open("DOS", dosfile));
 	assert(open("dos", dosfile));
-	assert(write("xyz", dosfile, "t_xyz.txt"));
+//	assert(write("xyz", dosfile, "t_xyz.txt"));
+	write("xyz", dosfile, "t_xyz.txt");
 	assert(read(RECORD, dosfile, "t_xyz.txt"));
 	assert(RECORD eq "xyz");
 	assert(deleterecord(dosfile, "t_xyz.txt"));
@@ -128,7 +129,8 @@ programinit()
 
 		//write to cache
 		var xyz = "xyz";
-		assert(xyz.writec(filename, k1));
+//		assert(xyz.writec(filename, k1));
+		xyz.writec(filename, k1);
 
 		//ensure wasnt written to real file
 		assert(not xyz.read(filename, k1));
@@ -144,7 +146,8 @@ programinit()
 
 		//writing empty record to cache is like a deletion
 		xyz = "";
-		assert(xyz.writec(filename, k1));
+//		assert(xyz.writec(filename, k1));
+		xyz.writec(filename, k1);
 		assert(not xyz.readc(filename, k1));
 		//and ensure failure to readc results in unassigned variable
 		//assert(unassigned(xyz));
@@ -155,10 +158,12 @@ programinit()
 
 		//writing to real file also clears cache forcing a real reread
 		xyz = "abc";
-		assert(xyz.writec(filename, k1));
+//		assert(xyz.writec(filename, k1));
+		xyz.writec(filename, k1);
 		assert(xyz.readc(filename, k1));
 		xyz = "123";
-		assert(xyz.write(filename, k1));
+//		assert(xyz.write(filename, k1));
+		xyz.write(filename, k1);
 		assert(xyz.readc(filename, k1));
 		assert(xyz eq "123");
 
@@ -171,7 +176,8 @@ programinit()
 
 		//writing empty record to cache is like a deletion
 		xyz = "";
-		assert(xyz.writec(filename, k1));
+//		assert(xyz.writec(filename, k1));
+		xyz.writec(filename, k1);
 		//deletion from cache
 		assert(not xyz.readc(filename, k1));
 
@@ -185,9 +191,11 @@ programinit()
 		if (not deletefile(tempfile)) {}
 		assert(createfile(tempfile));
 		assert(not read(RECORD from tempfile, "%RECORDS%"));
-		for (int i = 1; i le 10; ++i)
+		for (int i = 1; i le 10; ++i) {
 			//assert(write(i on tempfile, i));
-			assert(write(var(i) on tempfile, var(i)));
+//			assert(write(var(i) on tempfile, var(i)));
+			write(var(i) on tempfile, var(i));
+		}
 
 		// Check reading magic key %RECORDS% returns all keys in natural order
 		assert(read(RECORD from tempfile, "%RECORDS%"));
@@ -209,11 +217,13 @@ programinit()
 		assert(tempfile.reccount() eq 1);
 
 		printl("Prepare a test record");
-		assert(write("aa^bb^cc"_var on tempfile, "X"));
+//		assert(write("aa^bb^cc"_var on tempfile, "X"));
+		write("aa^bb^cc"_var on tempfile, "X");
 
 		{
 			printl("Update single field");
-			assert(writef("22" on tempfile, "X", 2));
+//			assert(writef("22" on tempfile, "X", 2));
+			writef("22" on tempfile, "X", 2);
 			var rec;
 			assert(read(rec from tempfile, "X"));
 			assert(rec eq "aa^22^cc"_var);
@@ -223,7 +233,8 @@ programinit()
 			assert(rec eq "22"_var);
 
 			printl("writef on empty record");
-			assert(writef("22" on tempfile, "Y", 2));
+//			assert(writef("22" on tempfile, "Y", 2));
+			writef("22" on tempfile, "Y", 2);
 			assert(read(rec from tempfile, "Y"));
 			assert(rec eq "^22"_var);
 
@@ -260,7 +271,8 @@ programinit()
 			assert(not readnext(ID));
 
 			printl("Make an active list from a multivalued record field");
-			assert(write("aa^bb^c1]c2]c3^dd"_var on tempfile, "ZZZ"));
+//			assert(write("aa^bb^c1]c2]c3^dd"_var on tempfile, "ZZZ"));
+			write("aa^bb^c1]c2]c3^dd"_var on tempfile, "ZZZ");
 			assert(formlist(tempfile, "ZZZ", 3));
 			assert(LISTACTIVE);
 
@@ -308,7 +320,8 @@ programinit()
 	{
 		printl("Check can write a whole dim array to one record");
 		dim d1 = {11, 22, 33};
-		assert(d1.write(filename, "D1"));
+//		assert(d1.write(filename, "D1"));
+		d1.write(filename, "D1");
 		var rec;
 
 		printl("Verify record back into a var");
@@ -326,7 +339,8 @@ programinit()
 
 		printl("Check can write a whole dim array to one record");
 		dim d1 = {11, 22, 33};
-		assert(dimwrite(d1 on filename, "D1"));
+//		assert(dimwrite(d1 on filename, "D1"));
+		dimwrite(d1 on filename, "D1");
 		var rec;
 
 		printl("Verify record back into a var");

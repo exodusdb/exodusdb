@@ -68,16 +68,16 @@ BIRTHDAY     Type 'F', Data Field 1
 AGE IN DAYS  Type 'S', Source Code needs a dictionary subroutine library called dict_xo_users
 AGE IN YEARS Type 'S', Source Code ditto
 )");
-	assert(write(convert("F|0|Person No||||||R|10", "|", FM), DICT, "PERSON_NO"));
-	assert(write(convert("F|1|Birthday||||D||R|12", "|", FM), DICT, "BIRTHDAY"));
-	assert(write(convert("S||Age in Days||||||R|10", "|", FM), DICT, "AGE_IN_DAYS"));
-	assert(write(convert("S||Age in Years||||||R|10", "|", FM), DICT, "AGE_IN_YEARS"));
+	write(convert("F|0|Person No||||||R|10", "|", FM), DICT, "PERSON_NO");
+	write(convert("F|1|Birthday||||D||R|12", "|", FM), DICT, "BIRTHDAY");
+	write(convert("S||Age in Days||||||R|10", "|", FM), DICT, "AGE_IN_DAYS");
+	write(convert("S||Age in Years||||||R|10", "|", FM), DICT, "AGE_IN_YEARS");
 
 	printl("Create some users and their birthdays 11000=11 FEB 1998 .... 14000=30 APR 2006");
-	assert(write("11000", FILE, "1"));
-	assert(write("12000", FILE, "2"));
-	assert(write("13000", FILE, "3"));
-	assert(write("14000", FILE, "4"));
+	write("11000", FILE, "1");
+	write("12000", FILE, "2");
+	write("13000", FILE, "3");
+	write("14000", FILE, "4");
 
 	printl("Check via dictionary giving a specific RECORD");
 	//DICT.cleardbcache();
@@ -269,8 +269,9 @@ dict(AGE_IN_YEARS) {
 	dictrec(1)	= "F";
 	dictrec(2)	= "3";
 	dictrec(3)	= "Brand Code";
-	if (not dictrec.write("dict.xo_ads", "BRAND_CODE"))
-		printl("cannot write dict_ads, BRAND_CODE");
+//	if (not dictrec.write("dict.xo_ads", "BRAND_CODE"))
+//		printl("cannot write dict_ads, BRAND_CODE");
+	dictrec.write("dict.xo_ads", "BRAND_CODE");
 
 	//oo style
 	if (not ads.deleteindex("BRAND_CODE")) {}
@@ -403,8 +404,8 @@ dict(AGE_IN_YEARS) {
 		//committrans();
 		//rollbacktrans();
 
-		assert(write("Client XB1^10000"_var on myclients, "XB1"));
-		assert(write("Client XB2^20000"_var on myclients, "XB2"));
+		write("Client XB1^10000"_var on myclients, "XB1");
+		write("Client XB2^20000"_var on myclients, "XB2");
 
 		// Check mvprogram's xlate using X and C mode9
 		assert(xlate(clients_filename, "XB1", 1, "C")  eq "Client XB1");
@@ -436,8 +437,8 @@ dict(AGE_IN_YEARS) {
 
 		printl("Check open/read/write");
 		assert(open(filename to file));
-		//assert(write(1 on file, 1));
-		assert(write(1 on file, "1"));
+		//write(1 on file, 1));
+		write(1 on file, "1");
 		//assert(read(RECORD from file, 1));
 		assert(read(RECORD from file, "1"));
 		assert(RECORD eq 1);
@@ -446,8 +447,8 @@ dict(AGE_IN_YEARS) {
 		assert(begintrans());
 
 		printl("Check write within transaction can be seen within transaction");
-		//assert(write(11 on file, 1));
-		assert(write(11 on file, "1"));
+		//write(11 on file, 1));
+		write(11 on file, "1");
 		//assert(read(RECORD from file, 1));
 		assert(read(RECORD from file, "1"));
 		assert(RECORD eq 11);
@@ -484,9 +485,9 @@ dict(AGE_IN_YEARS) {
 		//assert(naturalorder(alphanum1.toString()) gt naturalorder(alphanum2.toString()));
 
 		// NOTE if any argument is not proper var them might call global stdio write function and give NONNUMERIC ERROR
-		//assert(write(++key on naturals, alphanum1));
+		//write(++key on naturals, alphanum1));
 		exo::write(++key on naturals, alphanum1);
-		assert(write(++key on naturals, alphanum2));
+		write(++key on naturals, alphanum2);
 		assert(key == 2);
 		var rec;
 		assert(read(rec from naturals, alphanum2));
@@ -496,43 +497,43 @@ dict(AGE_IN_YEARS) {
 		alphanum2 = "Part A-2";
 		//Part A-2 is before Part A-10
 		//assert(naturalorder(alphanum1.toString()) gt naturalorder(alphanum2.toString()));
-		assert(write(++key on naturals, alphanum1));
-		assert(write(++key on naturals, alphanum2));
+		write(++key on naturals, alphanum1);
+		write(++key on naturals, alphanum2);
 
 		alphanum1 = "Xart -10";
 		alphanum2 = "Xart -2";
 		//Part -10 is before Part -2
 		//assert(naturalorder(alphanum1.toString()) lt naturalorder(alphanum2.toString()));
-		assert(write(++key on naturals, alphanum1));
-		assert(write(++key on naturals, alphanum2));
+		write(++key on naturals, alphanum1);
+		write(++key on naturals, alphanum2);
 
 		alphanum1 = "-10";
 		alphanum2 = "-2";
 		//-10 is before -2
 		//assert(naturalorder(alphanum1.toString()) lt naturalorder(alphanum2.toString()));
-		assert(write(++key on naturals, alphanum1));
-		assert(write(++key on naturals, alphanum2));
+		write(++key on naturals, alphanum1);
+		write(++key on naturals, alphanum2);
 
 		alphanum1 = "-1.11";
 		alphanum2 = "-1.2";
 		//-1.2 is before -1.11
 		//assert(naturalorder(alphanum1.toString()) gt naturalorder(alphanum2.toString()));
-		assert(write(++key on naturals, alphanum1));
-		assert(write(++key on naturals, alphanum2));
+		write(++key on naturals, alphanum1);
+		write(++key on naturals, alphanum2);
 
 		alphanum1 = "01.10";
 		alphanum2 = "1.1";
 		//01.10 is equal to 1.1
 		//assert(naturalorder(alphanum1.toString()) eq naturalorder(alphanum2.toString()));
-		assert(write(++key on naturals, alphanum1));
-		assert(write(++key on naturals, alphanum2));
+		write(++key on naturals, alphanum1);
+		write(++key on naturals, alphanum2);
 
 		alphanum1 = "A B C..C+";
 		alphanum2 = "A B C.C";
 		//A B C..C+ is before A B C.C
 		//assert(naturalorder(alphanum1.toString()) lt naturalorder(alphanum2.toString()));
-		assert(write(++key on naturals, alphanum1));
-		assert(write(++key on naturals, alphanum2));
+		write(++key on naturals, alphanum1);
+		write(++key on naturals, alphanum2);
 
 		//numbers in quotes?
 		alphanum1 = "'2'";
@@ -542,14 +543,14 @@ dict(AGE_IN_YEARS) {
 		//printl(oconv(naturalorder(alphanum1), "HEX"));
 		//printl(oconv(naturalorder(alphanum2), "HEX"));
 		//assert(naturalorder(alphanum1.toString()) gt naturalorder(alphanum2.toString()));
-		assert(write(++key on naturals, alphanum1));
-		assert(write(++key on naturals, alphanum2));
+		write(++key on naturals, alphanum1);
+		write(++key on naturals, alphanum2);
 
 		alphanum1 = "10a";
 		alphanum2 = "2b";
 		//assert(naturalorder(alphanum1) gt naturalorder(alphanum2));
-		assert(write(++key on naturals, alphanum1));
-		assert(write(++key on naturals, alphanum2));
+		write(++key on naturals, alphanum1);
+		write(++key on naturals, alphanum2);
 
 		//var sortable = naturalorder("-2 +2 -2.0 +2.0 -10 +10 -10.0 +10.0");
 		//TRACE(sortable)
@@ -561,23 +562,23 @@ dict(AGE_IN_YEARS) {
 
 		alphanum1 = " .";
 		alphanum2 = "   .";
-		assert(write(++key on naturals, alphanum1));
-		assert(write(++key on naturals, alphanum2));
+		write(++key on naturals, alphanum1);
+		write(++key on naturals, alphanum2);
 
 		alphanum1 = " abc ";
 		alphanum2 = "abc";
-		assert(write(++key on naturals, alphanum1));
-		assert(write(++key on naturals, alphanum2));
+		write(++key on naturals, alphanum1);
+		write(++key on naturals, alphanum2);
 
 		alphanum1 = " abc";
 		alphanum2 = "abc ";
-		assert(write(++key on naturals, alphanum1));
-		assert(write(++key on naturals, alphanum2));
+		write(++key on naturals, alphanum1);
+		write(++key on naturals, alphanum2);
 
 		alphanum1 = "a";
 		alphanum2 = "aa";
-		assert(write(++key on naturals, alphanum1));
-		assert(write(++key on naturals, alphanum2));
+		write(++key on naturals, alphanum1);
+		write(++key on naturals, alphanum2);
 
 		assert(select("select " ^ filename ^ " by id"));
 

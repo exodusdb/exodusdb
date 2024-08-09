@@ -125,9 +125,15 @@ function main() {
 // recordexit
 /////////////
 
-		// actually write should crash if not successful, but program defensively
-		if (not write(RECORD on tofile, tokey))
-			abort(lasterror());
+//		if (not write(RECORD on tofile, tokey))
+//			abort(lasterror());
+		if (tofile == "DOS") {
+			if (not oswrite(RECORD on tokey))
+				abort(lasterror());
+		} else {
+			// Always returns true and throws on system error
+			write(RECORD on tofile, tokey);
+		}
 
 		if (not silent_opt)
 			printl(tokey.quote() ^ " written");

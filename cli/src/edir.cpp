@@ -177,7 +177,13 @@ function main() {
 				//at least temp file will be left in the directory
 				while (ucase(reply).starts("Y") and true) {
 
-					if (write(newrecord, file, ID)) {
+//					if (write(newrecord, file, ID)) {
+					bool ok = true;
+					if (file == "DOS")
+						ok = oswrite(newrecord on ID);
+					else
+						write(newrecord, file, ID);
+					if (ok) {
 						printl(filename ^ " " ^ ID ^ " > db");
 
 						//generate/update database functions if saved a symbolic dictionary record
