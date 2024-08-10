@@ -37,35 +37,36 @@ var_iter::var_iter(in var1)
 	: pvar_(&var1){
 	if (!var1.len())
 		startpos_ = std::string::npos;
-	//std::cerr << __PRETTY_FUNCTION__ << std::endl;
 }
 
 //check iter != iter (i.e. iter != end()
 bool var_iter::operator!=([[maybe_unused]] const var_iter& var_iter1) {
-	//std::cerr << __PRETTY_FUNCTION__ << std::endl;
 	//no need to use var_iter1 since the end is always string::npos;
 	return this->startpos_ != std::string::npos;
 }
 
 //CONVERSION - conversion to var
 var var_iter::operator*() const {
-	//std::cerr << __PRETTY_FUNCTION__ << std::endl;
 
 	//find the end of the field if not already known
 	if (endpos_ == std::string::npos) {
 		endpos_ = pvar_->var_str.find(FM_, startpos_);
 	}
 
+	var rvo;
+	rvo.var_typ = VARTYP_STR;
+
 	//extract the field
 	if (endpos_ == std::string::npos)
-		return pvar_->var_str.substr(startpos_);
+		rvo.var_str = pvar_->var_str.substr(startpos_);
 	else
-		return pvar_->var_str.substr(startpos_, endpos_ - startpos_);
+		rvo.var_str = pvar_->var_str.substr(startpos_, endpos_ - startpos_);
+
+	return rvo;
 }
 
 //INCREMENT
 var_iter var_iter::operator++() {
-	//std::cerr << __PRETTY_FUNCTION__ << std::endl;
 
 	//find the end of the field if not already found from a call to above CONVERSION
 	if (endpos_ == std::string::npos)
@@ -93,7 +94,6 @@ var_iter var_iter::operator++() {
 
 //DECREMENT PREFIX
 var_iter var_iter::operator--() {
-	//std::cerr << __PRETTY_FUNCTION__ << std::endl;
 
 	// Decrement below zero is not allowed and throws if attempted
 	if (startpos_ < 1)
@@ -128,7 +128,6 @@ var_iter var_iter::operator--() {
 
 //INCREMENT POSTFIX
 var_iter var_iter::operator++(int) {
-	//std::cerr << __PRETTY_FUNCTION__ << std::endl;
 	var_iter before = *this;
 	++*this;
 	return before;
@@ -136,7 +135,6 @@ var_iter var_iter::operator++(int) {
 
 //DECREMENT POSTFIX
 var_iter var_iter::operator--(int) {
-	//std::cerr << __PRETTY_FUNCTION__ << std::endl;
 	var_iter before = *this;
 	--*this;
 	return before;
@@ -144,13 +142,11 @@ var_iter var_iter::operator--(int) {
 
 //BEGIN - free function to create an iterator -> begin
 PUBLIC var_iter begin(in var1) {
-	//std::cerr << __PRETTY_FUNCTION__ << std::endl;
 	return var_iter(var1);
 }
 
 //END - free function to create an interator -> end
 PUBLIC var_iter end(in /*var1*/) {
-	//std::cerr << __PRETTY_FUNCTION__ << std::endl;
 	// No need to use var1 since the end is always string::npos
 	// so var_iter!=var_iter is implemented in terms of startpos_ != string::npos;
 	return var_iter();

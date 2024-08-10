@@ -48,11 +48,11 @@ function main() {
 			assert(false && "move assign from unassigned rvalue");
 		}
 
-		var uncaught = "";
+		//var uncaught = "";
 
 		try {
 			var v	 = var("x") + 1;
-			uncaught = "VarNonNumeric";
+			throw VarError("Uncaught error VarNonNumeric");
 		} catch (VarNonNumeric&) {
 		}
 
@@ -61,44 +61,44 @@ function main() {
 		try {
 			var v	 = 1;
 			v		 = v / var(0);
-			uncaught = "VarDivideByZero";
+			throw VarError("Uncaught error VarDivideByZero");
 		} catch (VarDivideByZero&) {
 		}
 		try {
 			var v	 = 1;
 			v		 = v / 0;
-			uncaught = "VarDivideByZero";
+			throw VarError("Uncaught error VarDivideByZero");
 		} catch (VarDivideByZero&) {
 		}
 		try {
 			var v	 = 1;
 			v		 = v / "0";
-			uncaught = "VarDivideByZero";
+			throw VarError("Uncaught error VarDivideByZero");
 		} catch (VarDivideByZero&) {
 		}
 		try {
 			var v	 = 1;
 			v		 = v / 0.0;
-			uncaught = "VarDivideByZero";
+			throw VarError("Uncaught error VarDivideByZero");
 		} catch (VarDivideByZero&) {
 		}
 		try {
 			var v	 = 1;
 			v		 = v / "0.0";
-			uncaught = "VarDivideByZero";
+			throw VarError("Uncaught error VarDivideByZero");
 		} catch (VarDivideByZero&) {
 		}
 
 		try {
 			var v = 1;
 			v %= var(0.0);
-			uncaught = "VarDivideByZero";
+			throw VarError("Uncaught error VarDivideByZero");
 		} catch (VarDivideByZero&) {
 		}
 		try {
 			var v = 1;
 			v %= var(0);
-			uncaught = "VarDivideByZero";
+			throw VarError("Uncaught error VarDivideByZero");
 		} catch (VarDivideByZero&) {
 		}
 
@@ -107,13 +107,13 @@ function main() {
 		try {
 			var v;
 			v		 = -v;
-			uncaught = "VarUnassigned";
+			throw VarError("Uncaught error VarUnassigned");
 		} catch (VarUnassigned&) {
 		}
 		try {
 			var v	 = "x";
 			v		 = -v;
-			uncaught = "VarNonNumeric";
+			throw VarError("Uncaught error VarNonNumeric");
 		} catch (VarNonNumeric&) {
 		}
 
@@ -122,50 +122,50 @@ function main() {
 		try {
 			var v;
 			v++;
-			uncaught = "VarUnassigned";
+			throw VarError("Uncaught error VarUnassigned");
 		} catch (VarUnassigned&) {
 		}
 		try {
 			var v;
 			v--;
-			uncaught = "VarUnassigned";
+			throw VarError("Uncaught error VarUnassigned");
 		} catch (VarUnassigned&) {
 		}
 		try {
 			var v;
 			++v;
-			uncaught = "VarUnassigned";
+			throw VarError("Uncaught error VarUnassigned");
 		} catch (VarUnassigned&) {
 		}
 		try {
 			var v;
 			--v;
-			uncaught = "VarUnassigned";
+			throw VarError("Uncaught error VarUnassigned");
 		} catch (VarUnassigned&) {
 		}
 
 		try {
 			var v = "x";
 			v++;
-			uncaught = "VarNonNumeric";
+			throw VarError("Uncaught error VarNonNumeric");
 		} catch (VarNonNumeric&) {
 		}
 		try {
 			var v = "x";
 			v--;
-			uncaught = "VarNonNumeric";
+			throw VarError("Uncaught error VarNonNumeric");
 		} catch (VarNonNumeric&) {
 		}
 		try {
 			var v = "x";
 			++v;
-			uncaught = "VarNonNumeric";
+			throw VarError("Uncaught error VarNonNumeric");
 		} catch (VarNonNumeric&) {
 		}
 		try {
 			var v = "x";
 			--v;
-			uncaught = "VarNonNumeric";
+			throw VarError("Uncaught error VarNonNumeric");
 		} catch (VarNonNumeric&) {
 		}
 
@@ -174,186 +174,186 @@ function main() {
 		try {
 			var v;
 			v += 1.1;
-			uncaught = "VarUnassigned";
+			throw VarError("Uncaught error VarUnassigned");
 		} catch (VarUnassigned&) {
 		}
 		try {
 			var v;
 			v -= 1.1;
-			uncaught = "VarUnassigned";
+			throw VarError("Uncaught error VarUnassigned");
 		} catch (VarUnassigned&) {
 		}
 		try {
 			var v;
 			v *= 1.1;
-			uncaught = "VarUnassigned";
+			throw VarError("Uncaught error VarUnassigned");
 		} catch (VarUnassigned&) {
 		}
 		try {
 			var v;
 			v /= 1.1;
-			uncaught = "VarUnassigned";
+			throw VarError("Uncaught error VarUnassigned");
 		} catch (VarUnassigned&) {
 		}
 		try {
 			var v;
 			v %= 1.1;
-			uncaught = "VarUnassigned";
+			throw VarError("Uncaught error VarUnassigned");
 		} catch (VarUnassigned&) {
 		}
 
 		try {
 			var v = "x";
 			v += 1.1;
-			uncaught = "VarNonNumeric";
+			throw VarError("Uncaught error VarNonNumeric");
 		} catch (VarNonNumeric&) {
 		}
 		try {
 			var v = "x";
 			v -= 1.1;
-			uncaught = "VarNonNumeric";
+			throw VarError("Uncaught error VarNonNumeric");
 		} catch (VarNonNumeric&) {
 		}
 		try {
 			var v = "x";
 			v *= 1.1;
-			uncaught = "VarNonNumeric";
+			throw VarError("Uncaught error VarNonNumeric");
 		} catch (VarNonNumeric&) {
 		}
 		try {
 			var v = "x";
 			v /= 1.1;
-			uncaught = "VarNonNumeric";
+			throw VarError("Uncaught error VarNonNumeric");
 		} catch (VarNonNumeric&) {
 		}
 		try {
 			var v = "x";
 			v %= 1.1;
-			uncaught = "VarNonNumeric";
+			throw VarError("Uncaught error VarNonNumeric");
 		} catch (VarNonNumeric&) {
 		}
 
 		try {
 			var v;
 			v += 1;
-			uncaught = "VarUnassigned";
+			throw VarError("Uncaught error VarUnassigned");
 		} catch (VarUnassigned&) {
 		}
 		try {
 			var v;
 			v -= 1;
-			uncaught = "VarUnassigned";
+			throw VarError("Uncaught error VarUnassigned");
 		} catch (VarUnassigned&) {
 		}
 		try {
 			var v;
 			v *= 1;
-			uncaught = "VarUnassigned";
+			throw VarError("Uncaught error VarUnassigned");
 		} catch (VarUnassigned&) {
 		}
 		try {
 			var v;
 			v /= 1;
-			uncaught = "VarUnassigned";
+			throw VarError("Uncaught error VarUnassigned");
 		} catch (VarUnassigned&) {
 		}
 		try {
 			var v;
 			v %= 1;
-			uncaught = "VarUnassigned";
+			throw VarError("Uncaught error VarUnassigned");
 		} catch (VarUnassigned&) {
 		}
 
 		try {
 			var v = "x";
 			v += 1;
-			uncaught = "VarNonNumeric";
+			throw VarError("Uncaught error VarNonNumeric");
 		} catch (VarNonNumeric&) {
 		}
 		try {
 			var v = "x";
 			v -= 1;
-			uncaught = "VarNonNumeric";
+			throw VarError("Uncaught error VarNonNumeric");
 		} catch (VarNonNumeric&) {
 		}
 		try {
 			var v = "x";
 			v *= 1;
-			uncaught = "VarNonNumeric";
+			throw VarError("Uncaught error VarNonNumeric");
 		} catch (VarNonNumeric&) {
 		}
 		try {
 			var v = "x";
 			v /= 1;
-			uncaught = "VarNonNumeric";
+			throw VarError("Uncaught error VarNonNumeric");
 		} catch (VarNonNumeric&) {
 		}
 		try {
 			var v = "x";
 			v %= 1;
-			uncaught = "VarNonNumeric";
+			throw VarError("Uncaught error VarNonNumeric");
 		} catch (VarNonNumeric&) {
 		}
 
 		try {
 			var v;
 			v += "1";
-			uncaught = "VarUnassigned";
+			throw VarError("Uncaught error VarUnassigned");
 		} catch (VarUnassigned&) {
 		}
 		try {
 			var v;
 			v -= "1";
-			uncaught = "VarUnassigned";
+			throw VarError("Uncaught error VarUnassigned");
 		} catch (VarUnassigned&) {
 		}
 		try {
 			var v;
 			v *= "1";
-			uncaught = "VarUnassigned";
+			throw VarError("Uncaught error VarUnassigned");
 		} catch (VarUnassigned&) {
 		}
 		try {
 			var v;
 			v /= "1";
-			uncaught = "VarUnassigned";
+			throw VarError("Uncaught error VarUnassigned");
 		} catch (VarUnassigned&) {
 		}
 		try {
 			var v;
 			v %= "1";
-			uncaught = "VarUnassigned";
+			throw VarError("Uncaught error VarUnassigned");
 		} catch (VarUnassigned&) {
 		}
 
 		try {
 			var v = "x";
 			v += "1";
-			uncaught = "VarNonNumeric";
+			throw VarError("Uncaught error VarNonNumeric");
 		} catch (VarNonNumeric&) {
 		}
 		try {
 			var v = "x";
 			v -= "1";
-			uncaught = "VarNonNumeric";
+			throw VarError("Uncaught error VarNonNumeric");
 		} catch (VarNonNumeric&) {
 		}
 		try {
 			var v = "x";
 			v *= "1";
-			uncaught = "VarNonNumeric";
+			throw VarError("Uncaught error VarNonNumeric");
 		} catch (VarNonNumeric&) {
 		}
 		try {
 			var v = "x";
 			v /= "1";
-			uncaught = "VarNonNumeric";
+			throw VarError("Uncaught error VarNonNumeric");
 		} catch (VarNonNumeric&) {
 		}
 		try {
 			var v = "x";
 			v %= "1";
-			uncaught = "VarNonNumeric";
+			throw VarError("Uncaught error VarNonNumeric");
 		} catch (VarNonNumeric&) {
 		}
 
@@ -362,7 +362,7 @@ function main() {
 			printl("std::numeric_limits<unsigned long long>::max() = ", std::numeric_limits<unsigned long long>::max());
 //			assert(![] () {var x(std::numeric_limits<unsigned long long>::max());return x;}());
 			var x = std::numeric_limits<unsigned long long>::max();
-			uncaught = "VarNumOverflow unsigned long long";
+			throw VarError("Uncaught error VarNumOverflow unsigned long long");
 		} catch (VarNumOverflow& e) {
 			printl(e.description);
 		}
@@ -372,7 +372,7 @@ function main() {
 //			printl("std::numeric_limits<signed long long>::min() = ", std::numeric_limits<signed long long>::min());
 ////			assert(![] () {var x(std::numeric_limits<unsigned long long>::max());return x;}());
 //			var x = std::numeric_limits<signed long long>::min();
-//			uncaught = "VarNumUnderflow unsigned long long";
+//			throw VarError("Uncaught error VarNumUnderflow unsigned long long");
 //		} catch (VarNumOverflow& e) {
 //			printl(e.description);
 //		}
@@ -381,7 +381,7 @@ function main() {
 
 		try {
 			var x	 = "xyz"_var.locateby("XX", "xyz", MV);
-			uncaught = "VarError locateby";
+			throw VarError("Uncaught error VarError locateby");
 		} catch (VarError& e) {
 			printl(e.description);
 		}
@@ -389,26 +389,26 @@ function main() {
 		try {
 			throw VarError("test");
 			//std::unreachable();
-			//uncaught = "VarError";
+			//throw VarError("Uncaught error VarError");
 		} catch (VarError& e) {
 			printl(e.description);
 		}
 
 		try {
 			--minint;
-			uncaught = "VarNumUnderflow";
+			throw VarError("Uncaught error VarNumUnderflow");
 		} catch (VarNumUnderflow& e) {
 			printl(e.description);
 		}
 		try {
 			minint--;
-			uncaught = "VarNumUnderflow";
+			throw VarError("Uncaught error VarNumUnderflow");
 		} catch (VarNumUnderflow& e) {
 			printl(e.description);
 		}
 		try {
 			maxint++;
-			uncaught = "VarNumOverflow";
+			throw VarError("Uncaught error VarNumOverflow");
 		} catch (VarNumOverflow& e) {
 			printl(e.description);
 		}
@@ -437,7 +437,7 @@ function main() {
 			var v5	 = v5 + 1;
 			var v6	 = v6 + 1;
 			var v7	 = v7 + 1;
-			uncaught = "VarUndefined";
+			throw VarError("Uncaught error VarUndefined");
 		} catch (VarUndefined& e) {
 			printl(e.description);
 		} catch (VarUnassigned& e) {
@@ -450,7 +450,7 @@ function main() {
 
 		try {
 			var v	 = var("x").oconv("QQQ");
-			uncaught = "VarOconvNotImplemented";
+			throw VarError("Uncaught error VarOconvNotImplemented");
 		} catch (VarNotImplemented& e) {
 			printl(e.description);
 		}
@@ -461,28 +461,44 @@ function main() {
 		try {
 			dim x(10);
 			printl(x[11]);
-			uncaught = "DimIndexOutofBounds";
+			throw VarError("DimIndexOutofBounds");
 		} catch (DimIndexOutOfBounds& e) {
 			printl(e.description);
 		}
+
+		// Exceeding 
 		try {
 			dim x(10);
 			printl(x(1, 2));
-			uncaught = "DimIndexOutofBounds";
+
+#define FLEXIBLE_ROW_COL 0
+#if FLEXIBLE_ROW_COL
+			throw VarError("Uncaught error VarUnassigned");
+		} catch (VarUnassigned& e) {
+			printl(e.description);
+		}
+#else
+			throw VarError("Uncaught error VarDimIndexOutofBounds");
 		} catch (DimIndexOutOfBounds& e) {
 			printl(e.description);
 		}
+#endif
+		catch (VarError e) {
+			throw VarError("Unexpected error using dim x(1,2)" ^ var(e.description));
+		}
+
 		try {
 			const dim x(10);
 			printl(x[11]);
-			uncaught = "DimIndexOutofBounds";
+			throw VarError("Uncaught error DimIndexOutofBounds");
 		} catch (DimIndexOutOfBounds& e) {
 			printl(e.description);
 		}
+
 		try {
 			const dim x(10);
 			printl(x(1, 2));
-			uncaught = "DimIndexOutofBounds";
+			throw VarError("Uncaught error DimIndexOutofBounds");
 		} catch (DimIndexOutOfBounds& e) {
 			printl(e.description);
 		}
@@ -490,42 +506,42 @@ function main() {
 		try {
 			dim x;
 			var y	 = x.join();
-			uncaught = "DimNotDimensioned 1";
+			throw VarError("Uncaught error DimNotDimensioned 1");
 		} catch (DimNotDimensioned& e) {
 			printl(e.description);
 		}
 		try {
 			dim x;
 			dim y	 = x;
-			uncaught = "DimNotDimensioned 2";
+			throw VarError("Uncaught error DimNotDimensioned 2");
 		} catch (DimNotDimensioned& e) {
 			printl(e.description);
 		}
 		try {
 			dim x;
 			x		 = dim();
-			uncaught = "DimNotDimensioned 3";
+			throw VarError("Uncaught error DimNotDimensioned 3");
 		} catch (DimNotDimensioned& e) {
 			printl(e.description);
 		}
 		try {
 			dim x;
 			var y	 = x.cols();
-			uncaught = "DimNotDimensioned 4";
+			throw VarError("Uncaught error DimNotDimensioned 4");
 		} catch (DimNotDimensioned& e) {
 			printl(e.description);
 		}
 		try {
 			dim x;
 			var y	 = x.rows();
-			uncaught = "DimNotDimensioned 5";
+			throw VarError("Uncaught error DimNotDimensioned 5");
 		} catch (DimNotDimensioned& e) {
 			printl(e.description);
 		}
 		try {
 			dim x;
 			x		 = "q";
-			uncaught = "DimNotDimensioned 5";
+			throw VarError("Uncaught error DimNotDimensioned 5");
 		} catch (DimNotDimensioned& e) {
 			printl(e.description);
 		}
@@ -534,38 +550,38 @@ function main() {
 #pragma GCC diagnostic ignored "-Wunreachable-code"
 		try {
 			stop();
-			uncaught = "MVStop";
+			throw VarError("Uncaught error MVStop");
 			//std::unreachable();
 		} catch (MVStop& e) {
 			printl("Caught MVStop", e.description);
 		}
 		try {
 			abort(99);
-			uncaught = "MVAbort";
+			throw VarError("Uncaught error MVAbort");
 			//std::unreachable();
 		} catch (MVAbort& e) {
 			printl("Caught MVAbort", e.description);
 		}
 		try {
 			abortall();
-			uncaught = "MVAbortAll";
+			throw VarError("Uncaught error MVAbortAll");
 			//std::unreachable();
 		} catch (MVAbortAll& e) {
 			printl("Caught MVAbortAll", e.description);
 		}
 		try {
 			logoff();
-			uncaught = "MVLogoff";
+			throw VarError("Uncaught error MVLogoff");
 			//std::unreachable();
 		} catch (MVLogoff& e) {
 			printl("Caught MVlogoff", e.description);
 		}
 #pragma GCC diagnostic pop
 
-		if (uncaught) {
-			TRACE(uncaught)
-			assert(uncaught eq "");
-		}
+//		if (uncaught) {
+//			TRACE(uncaught)
+//			assert(uncaught eq "");
+//		}
 		//	try {throw Var("test");} catch (Var& e){};
 	}
 

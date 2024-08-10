@@ -27,7 +27,7 @@ friend class dim_iter;
 
  private:
 
-	mutable /*unsigned*/ int nrows_, ncols_;
+	mutable /*unsigned*/ int ncols_;
 	std::vector<var> data_;
 //	std::vector<exo::var, std::allocator<exo::var>> data_;
 	bool initialised_ = false;

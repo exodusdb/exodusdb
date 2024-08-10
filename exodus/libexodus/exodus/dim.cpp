@@ -71,7 +71,8 @@ void dim::operator=(const dim& sourcedim) &{
 
 	//this->redim(sourcedim.nrows_, sourcedim.ncols_);
 	EXO_DIM_RECALC_NROWS(sourcedim)
-	this->redim(sourcedim.nrows_, sourcedim.ncols_);
+	int nrows = (sourcedim.data_.size() - 1) / sourcedim.ncols_;
+	this->redim(nrows, sourcedim.ncols_);
 
 	// Copy element 0 as well to allow a degree
 	// zero-based indexing although split/join/sort/read/write
@@ -84,10 +85,10 @@ void dim::operator=(const dim& sourcedim) &{
 	//std::size_t ncells = nrows_ * ncols_ + 1;
 	std::size_t ncells = data_.size();
 
-	//for (/*unsigned*/ int celln = 0; celln < ncells; ++celln)
-	for (std::size_t celln = 1; celln < ncells; ++celln)
-		data_[celln] = sourcedim.data_[celln].clone();
-		//data_[celln] = sourcedim.data_[celln];
+	//for (/*unsigned*/ int cell_index = 0; cell_index < ncells; ++cell_index)
+	for (std::size_t cell_index = 1; cell_index < ncells; ++cell_index)
+		data_[cell_index] = sourcedim.data_[cell_index].clone();
+		//data_[cell_index] = sourcedim.data_[cell_index];
 	return;
 }
 
@@ -103,9 +104,8 @@ void dim::operator=(dim&& sourcedim) & {
 		throw DimNotDimensioned("");
 
 	EXO_DIM_RECALC_NROWS(sourcedim)
-	nrows_ = sourcedim.nrows_;
 	ncols_ = sourcedim.ncols_;
-	initialised_ = sourcedim.ncols_;
+	initialised_ = ncols_;
 	std::swap(data_, sourcedim.data_);
 
 	return;
@@ -120,7 +120,7 @@ void dim::operator=(dim&& sourcedim) & {
 /////////////////////////////////////////////
 
 dim::dim(const /*unsigned*/ int rows, const /*unsigned*/ int cols)
-	: nrows_(rows), ncols_(cols), initialised_(true)
+	: ncols_(cols), initialised_(true)
 // data_ <--initialized below (after the 'if/throw' statement)
 {
 	// Partially allow a kind of zero based indexing scheme to work for
@@ -153,7 +153,8 @@ var dim::rows() const {
 		UNLIKELY
 		throw DimNotDimensioned("");
 	EXO_DIM_RECALC_NROWS(*this)
-	return nrows_;
+	var nrows = (data_.size() - 1 ) / ncols_;
+	return nrows;
 }
 
 var dim::cols() const {
@@ -194,7 +195,7 @@ bool dim::redim(/*unsigned*/ int rows, /*unsigned*/ int cols) {
 	}
 
 	initialised_ = true;
-	nrows_ = rows;
+//	nrows_ = rows;
 	ncols_ = cols;
 
 	return true;
@@ -232,20 +233,29 @@ CVR dim::getelementref(/*unsigned*/ int rowno, /*unsigned*/ int colno) const {
 
 	// check bounds
 	//if (rowno > nrows_ || rowno < 0)
-	if (rowno > nrows_)
-		UNLIKELY
-		throw DimIndexOutOfBounds("row:" ^ var(rowno) ^ " > " ^ var(nrows_));
 
-	//if (colno > ncols_ || colno < 0)
-	if (colno > ncols_)
-		UNLIKELY
-		throw DimIndexOutOfBounds("col:" ^ var(colno) ^ " > " ^ var(ncols_));
+	int cell_index = ncols_ * (rowno - 1) + colno;
 
-	if (rowno == 0 || colno == 0) {
-		return (data_)[0];
+	// Handle out of range
+	int ncells = data_.size();
+	if (cell_index >= ncells || rowno < 1 || colno < 1 || colno > ncols_) {
+		UNLIKELY
+
+		// Allow access to special zero'th element
+		if (rowno == 0 || colno == 0) {
+			return (data_)[0];
+		}
+
+		// Verify within range
+		// Prevent negative for now
+		int nrows = (ncells - 2) / ncols_;
+		if (rowno < 0 || rowno > nrows)
+			throw DimIndexOutOfBounds("row:" ^ var(rowno) ^ " > " ^ var(nrows));
+		if (colno < 0 || colno > ncols_)
+			throw DimIndexOutOfBounds("col:" ^ var(colno) ^ " > " ^ var(ncols_));
+		throw DimIndexOutOfBounds("col:" ^ var(colno) ^ " row:" ^ var(rowno) ^ " but only " ^ var(data_.size() - 1) ^ "elements");
 	}
-
-	return data_[ncols_ * (rowno - 1) + colno];
+	return data_[cell_index];
 }
 
 dim& dim::init(in sourcevar) {
@@ -387,7 +397,8 @@ dim& dim::splitter(in str1, SV sepchar) {
 	std::size_t sepsize = sepchar.size();
 	//std::size_t fieldno;
 	int fieldno;
-	for (fieldno = 1; fieldno <= this->nrows_; fieldno++) {
+	int nrows = (data_.size() - 1) / ncols_;
+	for (fieldno = 1; fieldno <= nrows; fieldno++) {
 
 		// find the next sepchar delimiter
 		next_pos = str1.var_str.find(sepchar, start_pos);
@@ -412,13 +423,13 @@ dim& dim::splitter(in str1, SV sepchar) {
 
 		// stuff any excess fields into the last element
 		//this->data_[this->nrows_] ^= sepchar;
-		this->data_[this->nrows_].var_str.append(sepchar).append(str1.var_str.substr(start_pos));
+		this->data_[nrows].var_str.append(sepchar).append(str1.var_str.substr(start_pos));
 
 	} else {
 
 		// fill any remaining array elements with empty string
 		++fieldno;
-		for (; fieldno <= (this->nrows_); ++fieldno)
+		for (; fieldno <= (nrows); ++fieldno)
 			this->data_[fieldno] = "";
 	}
 
