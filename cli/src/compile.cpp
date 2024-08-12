@@ -79,18 +79,19 @@ function main() {
 #endif
 
 	// Options
-	verbose = contains(options, "V");
-	let silent = count(options, "S");
-	let debugging = not contains(options, "R");  //no symbols for backtrace
+	verbose = options.contains("V");
+	let silent = options.count("S");
+	let debugging = not options.contains("R");  //no symbols for backtrace
 	// Add one optimisation level if EXO_MODULE
 	// Default optimisation level from Oct 2023 is 1. Can be reduced to 0 by option o.
 	// Also compile will recognise "export CXX_options--O0" in shell
-	let optimise = 1 + count(options, "O") - count(options, "o") + (!!exo_module);
-	let generateheadersonly = contains(options, "h");
-	let force = contains(options, "F");
-	let color_option = contains(options, "C");
-	let warnings = count(options, "W") - count(options, "w");
-	let warnings_are_errors = count(options, "E") - count(options, "e");
+	let optimise = 1 + options.count("O") - options.count("o") + (!!exo_module);
+	let generateheadersonly = options.contains("h");
+	let force = options.contains("F") or options.contains("P");
+	let color_option = options.contains("C");
+	let warnings = options.count("W") - options.count("w");
+	let warnings_are_errors = options.count("E") - options.count("e");
+	let preprocess_only = options.count("P");
 
 	// Skip compile for option X - allows disabling compilations unless generating headers
 	if (options.contains("X") and not options.contains("h"))
@@ -124,12 +125,13 @@ function main() {
 			"	S = Silent (stars only)\n"
 			"	h = Generate headers only\n"
 			"	F = Force compilation even if output file is newer than all input files\n"
+			"	P = Preprocessor output only, PP = cleanup, PPP reformat (and reindent if 'indent' is installed).\n"
 			"	X = Skip compilation\n"
 			"ENVIRONMENT\n"
-			"	EXO_COMPILE_OPTIONS as above`"
-			"	CXX_OPTIONS depends on c++ compiler used`"
-			"	CXX e.g. g++, clang, c++ with or without full path`"
-			"	EXO_POST_COMPILE can be something like 'tac|fixdeprecated'"	
+			"	EXO_COMPILE_OPTIONS As above\n"
+			"	CXX_OPTIONS         Depends on c++ compiler used\n"
+			"	CXX                 e.g. g++, clang, c++ with or without full path\n"
+			"	EXO_POST_COMPILE    Can be something like 'tac|fixdeprecated'"
 		);
 
 
@@ -1702,6 +1704,7 @@ function static compile(
 	in basicoptions,
 	in compileoptions,
 	in outputoption,
+	in preprocess_only,
 	in linkoptions,
 	in installcmd) {
 
@@ -1722,6 +1725,7 @@ function static compile(
 	basicoptions,
 	compileoptions,
 	outputoption,
+	preprocess_only,
 	linkoptions,
 	installcmd);
 
@@ -1746,6 +1750,7 @@ function static compile2(
 	in basicoptions,
 	in compileoptions,
 	in outputoption,
+	in preprocess_only,
 	in linkoptions,
 	in installcmd) {
 
@@ -1781,14 +1786,34 @@ function static compile2(
 
 	// Build the compiler command
 	var compilecmd = compiler ^ " " ^ srcfilename ^ " " ^ basicoptions ^ " " ^ compileoptions;
-	if (outputoption)
-		compilecmd ^= " " ^ outputoption ^ " " ^ objfilename;
-	compilecmd ^= linkoptions;
+	if (preprocess_only)
+		compilecmd ^= " -E ";
+	else {
+		 if (outputoption)
+			compilecmd ^= " " ^ outputoption ^ " " ^ objfilename;
+		compilecmd ^= linkoptions;
+	}
 
 	// Capture warnings and errors for post compilation processing
 	let exo_post_compile = osgetenv("EXO_POST_COMPILE");
 	if (exo_post_compile) {
 		compilecmd ^= " 2>&1";
+	}
+
+	if (preprocess_only) {
+
+		// Remove lines starting # which indicate source file and line number
+		if (preprocess_only > 1)
+			compilecmd ^= " 2>&1 | grep -v ^# | uniq";
+
+		// Expand single line macro code (all ; unfortunately) TODO do only macro code
+		if (preprocess_only > 2) {
+			compilecmd ^= " | sed 's/;/;\\n/g' | uniq";
+				// indent properly if available
+				if (osshellread("which indent"))
+					compilecmd ^= " | indent";
+		}
+
 	}
 
 	////////////////////
@@ -1800,6 +1825,11 @@ function static compile2(
 	let compileok = osshellread(compileoutput, compilecmd);
 	if (not compileok) {
 		atomic_ncompilation_failures++;
+	}
+
+	if (preprocess_only) {
+		compileoutput.outputl();
+		return "";
 	}
 
 	// Handle compile output
