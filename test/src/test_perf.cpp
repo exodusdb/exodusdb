@@ -1,7 +1,10 @@
 #undef NDEBUG  //because we are using assert to check actual operations that cannot be skipped in release mode testing
 #include <cassert>
 
-#include <boost/range/irange.hpp>
+#include <stdio.h>
+#include <string.h>
+
+//#include <boost/range/irange.hpp>
 
 //void extract(char * instring, int inlength, int fieldno, int valueno, int subvalueno, int* outstart, int* outlength);
 //void extract2(char * instring, int inlength, int fieldno, int valueno, int subvalueno, int* outstart, int* outlength);
@@ -216,12 +219,12 @@ function main() {
 
 						break;
 					case 4:
-						if (repeatn eq 0)
-							printl("Exp: 0.840 ns - new int method using boost - for (int:range)");
-						for (int i2 : boost::irange(0, nn)) {
-							i1 = i2;
-						}
-
+//						if (repeatn eq 0)
+//							printl("Exp: 0.840 ns - new int method using boost - for (int:range)");
+//						for (int i2 : boost::irange(0, nn)) {
+//							i1 = i2;
+//						}
+//
 						break;
 //					case 21:
 //						if (repeatn eq 0)
@@ -392,9 +395,6 @@ function main() {
 	return 0;
 }
 
-
-#include <stdio.h>
-#include <string.h>
 
 #pragma GCC diagnostic push
 #pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
