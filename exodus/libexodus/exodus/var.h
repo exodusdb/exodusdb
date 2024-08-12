@@ -160,7 +160,7 @@ public:
 	// TODO Take a reference and make an internal copy if any FM need to be converted
 	// Causes ambiguous overload for some unknown reason despite being a hidden friend
 	// friend std::ostream& operator<<(std::ostream& ostream1, TVR var1);
-	friend std::ostream& operator<<(std::ostream& ostream1, var outvar) {
+	friend std::ostream& operator<<(std::ostream& ostream1, const var&& outvar) {
 
 		outvar.assertString(__PRETTY_FUNCTION__);
 
@@ -169,18 +169,42 @@ public:
 		// Replace various unprintable field marks with unusual ASCII characters
 		// Leave ESC as \x1B because it is used to control ANSI terminal control sequences
 		// std::string str = "\x1A\x1B\x1C\x1D\x1E\x1F";
-		// |\x1B}]^~  or in high to low ~^]}\x1B|     or in TRACE() ... ~^]}_|
-		for (auto& charx : outvar.var_str) {
+		// |\x1B}]^~  or in high to low ~^]}\x1B|	 or in TRACE() ... ~^]}_|
+
+		// Default configuration: Output the incoming var_str if no conversion is required
+		const std::string* outstr = &outvar.var_str;
+
+		// Check if any conversion required
+		std::string converted_str;
+		char charx;
+		for (auto citer = outvar.var_str.cbegin(); (charx = *citer); citer++) {
+
+			// Conversion required - Copy, convert and break out
 			if (charx <= 0x1F && charx >= 0x1A) {
 				UNLIKELY
-				//charx = "|\x1B}]^~"[charx - 0x1A];
-				charx = VISIBLE_FMS_EXCEPT_ESC[charx - 0x1A];
+
+				// Replicate the output str
+				converted_str = std::forward<CVR>(outvar).var_str;
+
+				// Reconfigure output of the copied and converted
+				outstr = &converted_str;
+
+				// Convert the first char that needs converting and bump the iterator
+				auto iter2 = converted_str.begin() + std::distance(outvar.var_str.cbegin(), citer);
+				*iter2 = VISIBLE_FMS_EXCEPT_ESC[std::size_t(charx - 0x1A)];
+
+				// Convert the rest of the chars
+				while ((charx = *++iter2)) {
+					if (charx <= 0x1F && charx >= 0x1A) {
+						UNLIKELY
+						*iter2 = VISIBLE_FMS_EXCEPT_ESC[std::size_t(charx - 0x1A)];
+					}
+				}
+				break;
 			}
 		}
 
-		// use toString() to avoid creating a constructor which logs here recursively
-		// should this use a ut16/32 -> UTF8 code facet? or convert to UTF8 and output to ostream?
-		ostream1 << outvar.var_str;
+		ostream1 << *outstr;
 		return ostream1;
 	}
 
