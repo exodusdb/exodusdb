@@ -1001,10 +1001,16 @@ function main() {
 				loadtimelinking,
 				objfileextension,
 				outputoption,
+				preprocess_only,
 				srcfilename,
 				updateinusebinposix
 */
 			]() mutable -> void {
+
+			// big lamda
+
+			//threads need to catch errors otherwise they will terminate the program without printing any error.
+			try {
 
 			// Ticker
 			if (verbose)
@@ -1073,7 +1079,14 @@ function main() {
 			// Determine if program or subroutine/function
 			// and decide compile/link options
 			let isprogram =
-				contains(text, "<exodus/program.h>") or contains(text, "int main(") or contains(text, "program()");
+//				text.contains("exodus/program.h") or text.contains("int main(") or text.contains("programinit(");
+//				 text.contains("exodus/program.h")
+//				 or text.contains("int main(")
+//				 or text.contains("programinit(")
+				 text.match("^\\s*#\\s*include\\s*[<\"]exodus/program.h")
+				 or text.match("^\\s*int\\s*main\\s*\\(")
+				 or text.match("^\\s*programinit\\s*\\(")
+				;
 			if (verbose)
 				printl("Type=", isprogram ? "Program" : "Subroutine");
 			var outputdir;
@@ -1641,9 +1654,16 @@ function main() {
 				basicoptions,
 				compileoptions,
 				outputoption,
+				preprocess_only,
 				linkoptions,
 				installcmd
 			);
+
+		// Must catch all errors because crashing a thread will crash the whole program
+		} catch (VarError& e) {
+			errputl(e.description);
+			errputl(var(e.stack()).convert(_FM, _EOL));
+		}
 
 		} // end of big lambda
 
