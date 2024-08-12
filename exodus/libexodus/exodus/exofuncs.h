@@ -509,7 +509,7 @@ ND bool updaterecord(in record, in dbfilevar, in key);
 ND bool insertrecord(in record, in dbfilevar, in key);
 
 ND bool dimread(dim& dimrecord, in dbfilevar, in key);
-ND void dimwrite(const dim& dimrecord, in dbfilevar, in key);
+   void dimwrite(const dim& dimrecord, in dbfilevar, in key);
 
 // moved to exoprog so they have access to default cursor in mv.CURSOR
 // bool select(in sortselectclause DEFAULT_EMPTY);

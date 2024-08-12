@@ -2026,16 +2026,18 @@ void var::write(in filehandle, in key) const {
 	std::string key2 = key.normalize().var_str;
 	std::string data2 = this->normalize().var_str;
 
-	// clear any cache
-	filehandle.deletec(key2);
-
 	// filehandle dos or DOS means osread/oswrite/osremove
 	if (filehandle.var_str.size() == 3 && (filehandle.var_str == "dos" || filehandle.var_str == "DOS")) UNLIKELY {
 		//this->oswrite(key2); //.convert("\\",OSSLASH));
 		//use osfilenames unnormalised so we can read and write as is
-		this->oswrite(key);
+		if (not this->oswrite(key)) {
+			throw VarError("Could not oswrite " ^ key.squote() ^ ". " ^ this->lasterror());
+		};
 		return;
 	}
+
+	// clear any cache
+	filehandle.deletec(key2);
 
 	var sql;
 
