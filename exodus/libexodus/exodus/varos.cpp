@@ -176,13 +176,13 @@ static const std::string to_path_string(in str1) {
 
 static const std::string to_oscmd_string(in cmd) {
 
-	// while converting from DOS convert all backslashes in first word to forward slashes on
-	// linux or leave as if exodus on windows
-
-	// warning if any backslashes unless at least one of them is followed by $ which indicates
-	// valid usage as an escape character aiming to recode all old windows-only code
-	if (cmd.contains("\\") && !cmd.contains("\\$"))
-		cmd.errputl("WARNING BACKSLASHES IN OS COMMAND:");
+//	// while converting from DOS convert all backslashes in first word to forward slashes on
+//	// linux or leave as if exodus on windows
+//
+//	// warning if any backslashes unless at least one of them is followed by $ which indicates
+//	// valid usage as an escape character aiming to recode all old windows-only code
+//	if (cmd.contains("\\") && !cmd.contains("\\$"))
+//		cmd.errputl("WARNING BACKSLASHES IN OS COMMAND:");
 
 	return to_path_string(cmd.field(" ", 1)) + " " + cmd.field(" ", 2, 999999).toString();
 }
