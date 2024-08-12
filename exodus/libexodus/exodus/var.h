@@ -666,9 +666,9 @@ public:
 	// something better it was called replace() in Pick Basic but we are now using "replace()" to
 	// change substrings using regex (similar to the old Pick Basic replace function) its mutator function
 	// is .r()
-	ND var  pickreplace(const int fieldno, const int valueno, const int subvalueno, in replacement) const {return var(*this).r(fieldno, valueno, subvalueno, replacement);}
-	ND var  pickreplace(const int fieldno, const int valueno, in replacement)                       const {return var(*this).r(fieldno, valueno, 0, replacement);}
-	ND var  pickreplace(const int fieldno, in replacement)                                          const {return var(*this).r(fieldno, 0, 0, replacement);}
+	ND var  pickreplace(const int fieldno, const int valueno, const int subvalueno, in replacement) const& {return var(*this).r(fieldno, valueno, subvalueno, replacement);}
+	ND var  pickreplace(const int fieldno, const int valueno, in replacement)                       const& {return var(*this).r(fieldno, valueno, 0, replacement);}
+	ND var  pickreplace(const int fieldno, in replacement)                                          const& {return var(*this).r(fieldno, 0, 0, replacement);}
 
 	// cf mutator inserter()
 	ND var  insert(const int fieldno, const int valueno, const int subvalueno, in insertion) const& {return var(*this).inserter(fieldno, valueno, subvalueno, insertion);}
@@ -678,7 +678,7 @@ public:
 	/// remove() was delete() in Pick Basic
 	// var  erase(const int fieldno, const int valueno=0, const int subvalueno=0) const;
 //	ND var  remove(const int fieldno, const int valueno = 0, const int subvalueno = 0) const;
-	ND var  remove(const int fieldno, const int valueno = 0, const int subvalueno = 0)       const {return var(*this).remover(fieldno, valueno, subvalueno);}
+	ND var  remove(const int fieldno, const int valueno = 0, const int subvalueno = 0)       const& {return var(*this).remover(fieldno, valueno, subvalueno);}
 
 	// SAME AS ABOVE ON TEMPORARIES TO USE MUTATING
 	///////////////////////////////////////////////
