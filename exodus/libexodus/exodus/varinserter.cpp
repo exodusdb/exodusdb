@@ -1,3 +1,7 @@
+
+// Similar code in three files. Use editor in parallel to keep in sync.
+// nano varreplacer.cpp varinserter.cpp varremover.cpp
+
 io   var::inserter(const int fieldno, const int valueno, const int subvalueno, in insertion) {
 
 	THISIS("io   var::inserter(const int fieldno, const int valueno, const int subvalueno, in insertion)")
