@@ -259,7 +259,7 @@ function main() {
 		// INCREMENTING ITER (var_iter)
 
 		var rec = "^aa^^cc^"_var;
-		auto i = begin(rec);
+		auto i = rec.begin();
 
 		TRACE(*i)//
 		assert(*i eq "");

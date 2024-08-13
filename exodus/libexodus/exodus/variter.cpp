@@ -140,13 +140,13 @@ var_iter var_iter::operator--(int) {
 	return before;
 }
 
-//BEGIN - free function to create an iterator -> begin
-PUBLIC var_iter begin(in var1) {
-	return var_iter(var1);
+//BEGIN - var member function to create an iterator -> begin
+var_iter var::begin() const {
+	return var_iter(*this);
 }
 
-//END - free function to create an interator -> end
-PUBLIC var_iter end(in /*var1*/) {
+//END - var member function to create an interator -> end
+var_iter var::end() const {
 	// No need to use var1 since the end is always string::npos
 	// so var_iter!=var_iter is implemented in terms of startpos_ != string::npos;
 	return var_iter();

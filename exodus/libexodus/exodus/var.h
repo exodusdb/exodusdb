@@ -931,11 +931,14 @@ public:
 	ND bool osgetenv(const char* code);
 	   void ossetenv(const char* code) const;
 
+	// Iterator over fields
+	//////////////////////
+
 	// friend class to iterate over the fields of a var
-	//BEGIN/END - free functions to create iterators over a var
 	friend class var_iter;
-	friend var_iter begin(in v);
-	friend var_iter end(in v);
+
+	ND var_iter begin() const;
+	ND var_iter end() const;
 
 	///////////////////////////
 	// PRIVATE MEMBER FUNCTIONS
@@ -1051,12 +1054,6 @@ class PUBLIC var_iter {
 	//void operator=(SV replacement);
 
 };
-
-// Only declared here to allow them to be exported in var.cppm for tidyness but
-// since they are already declared by friending them in var
-// they will be exported/found by ADL even without exporting them.
-ND var_iter begin(in v);
-ND var_iter end(in v);
 
 ///////////////////////////////////
 //// dim_iter - iterate over fields
@@ -1206,12 +1203,6 @@ public:
 private:
     var* ptr_;
 };
-
-// Only declared here to allow them to be exported in var.cppm for tidyness but
-// since they are already declared by friending them in var
-// they will be exported/found by ADL even without exporting them.
-//ND dim_iter begin(dim&);
-//ND dim_iter end(dim&);
 
 ///////////////////////////////////////////////////////
 // var_proxy1 - replace or extract fields by fn, vn, sv

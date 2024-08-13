@@ -28,8 +28,8 @@ export namespace exo {
 	// Not actually required to export since they will be exported along with all var members anyway
 	// Only available for specific export if specifically listed in var.h
 	// Not sufficient if only declared via friendship
-	using exo::begin;
-	using exo::end;
+//	using exo::begin;
+//	using exo::end;
 
 	// Exported automatically since they are friended in class var
 	// and cannot be reexported since they are not actually declared outside of the friend declarations?
