@@ -152,4 +152,23 @@ PUBLIC var_iter end(in /*var1*/) {
 	return var_iter();
 }
 
+//PUBLIC void var_iter::operator=(SV replacementstr) {
+//
+//	// Find the end of the field if not already found from a call to above CONVERSION
+//	if (endpos_ == std::string::npos)
+//		endpos_ = pvar_->var_str.find(FM_, startpos_);
+//
+//	// Replace the field
+//	if (endpos_ == std::string::npos) {
+//		pvar_->var_str.resize(startpos_);
+//		pvar_->var_str.append(replacementstr);
+//		endpos_ = std::string::npos;
+//	}
+//	else {
+//		pvar_->var_str.replace(startpos_, endpos_ - startpos_, replacementstr);
+//		endpos_ = startpos_ + replacementstr.size() + 1;
+//	}
+//}
+//
+
 }  //namespace exo

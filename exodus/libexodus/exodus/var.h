@@ -1023,11 +1023,17 @@ class PUBLIC var_iter {
 	// Construct from var
 	var_iter(in v);
 
+//	var_iter(var_iter&) = delete;
+//	var_iter(var_iter&&) = delete;
+
 	// Check iter != iter (i.e. iter != string::npos)
 	   bool operator!=(const var_iter& vi);
 
-	// Convert to var
+	// Convert to var (copy)
 	var  operator*() const;
+
+//	// Convert to var reference
+//	var&  operator*();
 
 	// ++Iter prefix
 	var_iter operator++();
@@ -1040,6 +1046,9 @@ class PUBLIC var_iter {
 
 	// iter++ postfix
 	var_iter operator--(int);
+
+	// assign
+	//void operator=(SV replacement);
 
 };
 
