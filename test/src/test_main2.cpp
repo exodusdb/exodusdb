@@ -648,26 +648,6 @@ function main() {
 		}
 	}
 
-	/*
-	for (double xx=-5;xx<=5;++xx)
-	{
-		ostringstream ostringstream1;
-
-		appenddouble2sortstring(xx,ostringstream1);
-
-		cout.width(3);
-		cout<<xx<<" "<<ostringstream1.str()<<endl;
-	}
-	stop();
-	*/
-
-	//var steve;steve.input(1);
-
-	//catching errors - doesnt work now that backtrace aborts (to prevent system crashes ... maybe better solution is to trap in main()
-	//var unass;
-	//try{unass+1;}
-	//catch(...){};
-
 	//bool cannot be used numerically ON MSVC (unlike in pick)
 	//could change all logical ops to return var or find a way to allow void* pointer to promote to bool
 	//or perhaps add bool to the list of automatic constructors?

@@ -195,9 +195,9 @@ public:
 
 				// Convert the rest of the chars
 				while ((charx = *++iter2)) {
-					if (charx <= 0x1F && charx >= 0x1A) {
+					if (charx <= RM_ && charx >= ST_) {
 						UNLIKELY
-						*iter2 = VISIBLE_FMS_EXCEPT_ESC[std::size_t(charx - 0x1A)];
+						*iter2 = VISIBLE_FMS_EXCEPT_ESC[std::size_t(charx - ST_)];
 					}
 				}
 				break;
@@ -983,48 +983,6 @@ public:
 	ND std::fstream* osopenx(in osfilename, const char* locale) const;
 
 	   bool THIS_IS_OSFILE() const { return ((var_typ & VARTYP_OSFILE) != VARTYP_UNA); }
-
-	// Convert _VISIBLE_FMS to _ALL_FMS
-	// In header to perhaps aid runtime string literal conversion for operator""_var
-	// since currently it cannot be CONSTEXPR due to var containing a std::string
-	ND CONSTEXPR
-	   io   fmiconverter() {
-		for (char& c : this->var_str) {
-			switch (c) {
-				// Most common first to perhaps aid optimisation
-				case VISIBLE_FM_: c = FM_; break;
-				case VISIBLE_VM_: c = VM_; break;
-				case VISIBLE_SM_: c = SM_; break;
-				case VISIBLE_TM_: c = TM_; break;
-				case VISIBLE_ST_: c = ST_; break;
-				case VISIBLE_RM_: c = RM_; break;
-				// All other chars left unconverted
-				default:;
-			}
-		}
-		return *this;
-	}
-
-	// Convert _ALL_FMS to _VISIBLE_FMS
-	ND CONSTEXPR
-	   io   fmoconverter() {
-		for (char& c : this->var_str) {
-			if (c > RM_ || c > RM_) {
-				switch (c) {
-					// In order to perhaps aid optimisation
-					case RM_: c = VISIBLE_RM_; break;
-					case FM_: c = VISIBLE_FM_; break;
-					case VM_: c = VISIBLE_VM_; break;
-					case SM_: c = VISIBLE_SM_; break;
-					case TM_: c = VISIBLE_TM_; break;
-					case ST_: c = VISIBLE_ST_; break;
-					// All other chars left unconverted;
-					default:;
-				}
-			}
-		}
-		return *this;
-	}
 
 };  // class "var"
 

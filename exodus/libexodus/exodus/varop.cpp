@@ -983,7 +983,26 @@ RETVAR cstr_cat_var(const char* lhs, CBR rhs) {
 
 // "abc^def"_var
 ND var operator""_var(const char* cstr, std::size_t size) {
-    return var(cstr, size).fmiconverter();
+
+	var rvo = var(cstr, size);
+
+	// Convert _VISIBLE_FMS to _ALL_FMS
+	for (char& c : rvo.var_str) {
+		switch (c) {
+			// Most common first to perhaps aid optimisation
+			case VISIBLE_FM_: c = FM_; break;
+			case VISIBLE_VM_: c = VM_; break;
+			case VISIBLE_SM_: c = SM_; break;
+			case VISIBLE_TM_: c = TM_; break;
+			case VISIBLE_ST_: c = ST_; break;
+			case VISIBLE_RM_: c = RM_; break;
+			// All other chars left unconverted
+			default:;
+		}
+	}
+
+	return rvo;
+
 }
 
 // 123456_var
