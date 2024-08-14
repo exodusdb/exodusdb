@@ -252,8 +252,11 @@
 	else()
 
 		add_compile_options(-pedantic)
+
 		add_compile_options(-Weverything)
-		add_compile_options(-fsafe-buffer-usage-suggestions)
+		add_compile_options(-Wno-unsafe_buffer_usage)
+		add_compile_options(-Wno-reserved-id-macro)
+#		add_compile_options(-fsafe-buffer-usage-suggestions)  # not available in clang 14 on Ubuntu 22.04
 
 #	add_compile_options(-Wno-undefined-inline)
 #	#/root/exodus/test/src/../../exodus/libexodus/exodus/var.h:1819:7: warning: inline function 'exodus::var::isnum' is not defined [-Wundefined-inline]
@@ -285,8 +288,6 @@
 								-Wno-exit-time-destructors
 								-Wno-global-constructors
 								-Wno-missing-prototypes
-								-Wno-unsafe-buffer-usage
-#								-fsafe-buffer-usage-suggestions # not available in clang 14 on Ubuntu 22.04
 								-Wno-shadow-field
 								-Wno-float-equal
 								-Wno-cast-align

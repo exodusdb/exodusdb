@@ -35,6 +35,7 @@ THE SOFTWARE.
 #	include <string>
 #	include <string_view>
 #	include <array> // used in operator<<
+#	include <vector>
 #endif
 
 #include <exodus/format.h>

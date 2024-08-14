@@ -204,7 +204,6 @@ function main() {
 		std::cout << "error in main2.cpp2\n";
 		printx(error.description);
 	}
-#pragma GCC diagnostic pop
 
 #ifdef VAR_SAFE_DESTRUCTOR
 	printl("\nVerify that exodus catches c++ defect at runtime");
@@ -228,6 +227,8 @@ function main() {
 		throw;
 	}
 #endif
+
+#pragma GCC diagnostic pop
 
 	//this turns on tracing SQL statements to postgres
 	//DBTRACE=true;

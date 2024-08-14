@@ -21,7 +21,7 @@ static std::atomic<int> atomic_ncompilation_failures;
 
 // EXO_FORMAT required to append -lfmt to compile and link command
 #pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunsafe-buffer-usage"
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
 #include <exodus/format.h>
 #pragma GCC diagnostic pop
 
