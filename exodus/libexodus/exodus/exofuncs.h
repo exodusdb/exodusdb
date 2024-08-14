@@ -861,7 +861,7 @@ void printt(void) {
 // See comment in vardefs.h about EXO_FORMAT
 template<class... Args>
 ND var  format(SV fmt_str, Args&&... args) {
-	THISIS("var  format(SV fmt_str, Args&&... args)");
+	THISIS("var  format(SV fmt_str, Args&&... args)")
 #if __clang_major__ and __clang_major__ <= 15
 	// Dont forward if the format library cannot handle it
 	return fmt::vformat(fmt_str, fmt::make_format_args(args...));
@@ -891,7 +891,7 @@ template<class... Args>
 
 //    template<class... Args>
 //    ND var  format(in fmt_str, Args&&... args) const {
-//        THISIS("var  format(SV fmt_str, Args&&... args) const");
+//        THISIS("var  format(SV fmt_str, Args&&... args) const")
 //        assertString(function_sig);
 //        return fmt::vformat(std::string_view(fmt_str), fmt::make_format_args(*this, args...) );
 //    }
@@ -986,8 +986,6 @@ constexpr auto parse(ParseContext& ctx) {
 
 	//std::cerr << " \n>>> exofuncs.h parse  '" << std::string(ctx.begin(), ctx.end()) << "'" << std::endl;
 
-#pragma GCC diagnostic push
-#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
 	auto it = ctx.begin();
 
 	// We might have been given nothing if pattern was {}
@@ -1119,7 +1117,7 @@ constexpr auto parse(ParseContext& ctx) {
 template <typename FormatContext>
 auto format(const exo::var& var1, FormatContext& ctx) const {
 
-	THISIS("auto fmt::formatter::format(var) const");
+	THISIS("auto fmt::formatter::format(var) const")
 	//std::cerr << ">>> exofuncs.h format '" << fmt_str_ << "' '" << fmt_code_ << "' '" << var1 << "'\n";
 
 	switch (fmt_code_) {

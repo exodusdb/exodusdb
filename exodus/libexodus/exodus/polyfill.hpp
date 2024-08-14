@@ -44,23 +44,23 @@ namespace std {
 EXPORT
 template <typename... T>
 void println(std::format_string<T...> fmt, T&&... args) {
-    auto _Text = std::format(fmt, std::forward<T>(args)...);
-    _Text.push_back('\n');
+    auto x_Text = std::format(fmt, std::forward<T>(args)...);
+    x_Text.push_back('\n');
 #ifdef _WIN32
     constexpr auto CP_UTF8 = 65001;
     const int _Required =
         ::MultiByteToWideChar(CP_UTF8, 0,
-            _Text.data(), static_cast<int>(_Text.size()),
+            x_Text.data(), static_cast<int>(x_Text.size()),
             nullptr, 0);
-    std::wstring _WText(_Required, L'\0');
+    std::wstring x_WText(_Required, L'\0');
     ::MultiByteToWideChar(CP_UTF8, 0,
-        _Text.data(), static_cast<int>(_Text.size()),
-        _WText.data(), static_cast<int>(_WText.size()));
+        x_Text.data(), static_cast<int>(x_Text.size()),
+        x_WText.data(), static_cast<int>(x_WText.size()));
     ::WriteConsoleW(_get_osfhandle(_fileno(stdout)),
-        _WText.data(), static_cast<unsigned>(_WText.size()),
+        x_WText.data(), static_cast<unsigned>(x_WText.size()),
         nullptr, nullptr);
 #else
-    std::fwrite(_Text.data(), sizeof(char), _Text.size(), stdout);
+    std::fwrite(x_Text.data(), sizeof(char), x_Text.size(), stdout);
 #endif
 }
 

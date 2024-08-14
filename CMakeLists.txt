@@ -237,81 +237,82 @@
 	#switch off nodiscard warnings
 	#add_compile_options(-Wno-unused-result)
 
-#	if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-#
-#		# GCC
-#		add_compile_options(-Wno-cast-function-type)
-#		add_compile_options(-Wno-maybe-uninitialized)
-#		add_compile_options(-Wno-unknown-pragmas)
-#
-#		# only for g++ 9.4.0 etc. on Ubuntu 20.04
-#		if (CMAKE_CXX_COMPILER_VERSION MATCHES "^9.")
-#			add_compile_options(-Wno-inline)
+	if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+
+		# GCC
+		add_compile_options(-Wno-cast-function-type)
+		add_compile_options(-Wno-maybe-uninitialized)
+		add_compile_options(-Wno-unknown-pragmas)
+
+		# only for g++ 9.4.0 etc. on Ubuntu 20.04
+		if (CMAKE_CXX_COMPILER_VERSION MATCHES "^9.")
+			add_compile_options(-Wno-inline)
+		endif()
+
+	else()
+
+		add_compile_options(-pedantic)
+		add_compile_options(-Weverything)
+		add_compile_options(-fsafe-buffer-usage-suggestions)
+
+#	add_compile_options(-Wno-undefined-inline)
+#	#/root/exodus/test/src/../../exodus/libexodus/exodus/var.h:1819:7: warning: inline function 'exodus::var::isnum' is not defined [-Wundefined-inline]
+#	# 1819 |         bool isnum() const;
+#	#      |              ^
+
+		# only for older clang 10.* etc. on Ubuntu 20.04
+#		if (CMAKE_CXX_COMPILER_VERSION MATCHES "^10.")
+			add_compile_options(-Wno-undef)
 #		endif()
-#
-#	else()
-#
-##	add_compile_options(-Wno-undefined-inline)
-##	#/root/exodus/test/src/../../exodus/libexodus/exodus/var.h:1819:7: warning: inline function 'exodus::var::isnum' is not defined [-Wundefined-inline]
-##	# 1819 |         bool isnum() const;
-##	#      |              ^
-#
-#		# only for older clang 10.* etc. on Ubuntu 20.04
-##		if (CMAKE_CXX_COMPILER_VERSION MATCHES "^10.")
-#			add_compile_options(-Wno-undef)
-##		endif()
-#
-#		add_compile_options(-Wno-unknown-warning-option)
-#
-#		## CLANG
-#		# Suppress GNU warning about elvis operator ?:
-#		# warning: use of GNU ?: conditional expression extension, omitting middle operand [-Wgnu-conditional-omitted-operand]
-#		add_compile_options (
-#								-Weverything
-#
-#								-Wno-c++98-compat
-#								-Wno-c++98-compat-pedantic
-#								-Wno-reserved-macro-identifier
-#								-Wno-disabled-macro-expansion
-#								-Wno-date-time
-#								-Wno-ctad-maybe-unsupported
-#								-Wno-padded
-#								-Wno-unreachable-code-break
-#								-Wno-weak-vtables
-#								-Wno-double-promotion
-#								-Wno-shadow
-#								-Wno-exit-time-destructors
-#								-Wno-global-constructors
-#								-Wno-missing-prototypes
-#							#-Wno-unsafe-buffer-usage
-#							# -fsafe-buffer-usage-suggestions # not available in clang 14 on Ubuntu 22.04
-#								-Wno-shadow-field
-#								-Wno-float-equal
-#								-Wno-cast-align
-#								-Wno-unused-macros
-#								-Wno-missing-variable-declarations
-#								-Wno-return-std-move-in-c++11
-#
-#								# building fmt
-#								-Wno-documentation-unknown-command
-#								-Wno-switch-enum
-#								-Wno-undefined-func-template
-#								#-Wno-reserved-id-macro
-#								-Wno-c++20-compat
-#
-#							)
-#		add_compile_options(-pedantic)
-#		add_compile_options(-Wno-gnu-conditional-omitted-operand)
-#
-#		#add_compile_options(-Wno-bad-function-cast)
+
+		add_compile_options(-Wno-unknown-warning-option)
+
+		## CLANG
+		# Suppress GNU warning about elvis operator ?:
+		# warning: use of GNU ?: conditional expression extension, omitting middle operand [-Wgnu-conditional-omitted-operand]
+		add_compile_options (
+								-Wno-c++98-compat
+								-Wno-c++98-compat-pedantic
+								-Wno-reserved-macro-identifier
+								-Wno-disabled-macro-expansion
+								-Wno-date-time
+								-Wno-ctad-maybe-unsupported
+								-Wno-padded
+								-Wno-unreachable-code-break
+								-Wno-weak-vtables
+								-Wno-double-promotion
+								-Wno-shadow
+								-Wno-exit-time-destructors
+								-Wno-global-constructors
+								-Wno-missing-prototypes
+								-Wno-unsafe-buffer-usage
+#								-fsafe-buffer-usage-suggestions # not available in clang 14 on Ubuntu 22.04
+								-Wno-shadow-field
+								-Wno-float-equal
+								-Wno-cast-align
+								-Wno-unused-macros
+								-Wno-missing-variable-declarations
+								-Wno-return-std-move-in-c++11
+
+								# building fmt
+								-Wno-documentation-unknown-command
+								-Wno-switch-enum
+								-Wno-undefined-func-template
+								#-Wno-reserved-id-macro
+								-Wno-c++20-compat
+
+							)
+		add_compile_options(-Wno-gnu-conditional-omitted-operand)
+
+		#add_compile_options(-Wno-bad-function-cast)
 #		add_compile_options(-Wno-uninitialized)
-#		#add_compile_options(-Wno-unused-value) ## allow things like 'osremove(temposfilename) or true;'
-#		add_compile_options(-Wno-sign-conversion) # We dont care about signed to unsigned?
-#		add_compile_options(-Wno-unknown-attributes) # likely unlikely
-#		add_compile_options(-Wno-ignored-attributes) # likely unlikely
-#		add_compile_options(-Wno-float-conversion) # We dont care about float to bool?
-#	endif()
-#
+		#add_compile_options(-Wno-unused-value) ## allow things like 'osremove(temposfilename) or true;'
+		add_compile_options(-Wno-sign-conversion) # We dont care about signed to unsigned?
+		add_compile_options(-Wno-unknown-attributes) # likely unlikely
+		add_compile_options(-Wno-ignored-attributes) # likely unlikely
+		add_compile_options(-Wno-float-conversion) # We dont care about float to bool?
+	endif()
+
 #
 # Coverage testing
 # ################

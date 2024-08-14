@@ -1977,14 +1977,13 @@ var  var::indexr(SV substr, const int startindex) const {
 
 	if (startindex == 0) {
 		start_pos = std::string::npos;
-	}
-	else if (startindex > 0) {
-		//if (static_cast<std::size_t>(startindex) > var_str.size())
-	      //  start_pos = std::string::npos;
-    	//else
-			start_pos = startindex - 1;
-	}
-	else if (startindex < 1) {
+
+	} else if (startindex > 0) {
+		start_pos = startindex - 1;
+
+	} else {
+
+		// startindex < 1
 
 		// prevent negative index starting before beginning of string
 		// e.g. -startindex(-2) > strsize(1) is true

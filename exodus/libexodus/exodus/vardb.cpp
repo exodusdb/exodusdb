@@ -2032,7 +2032,7 @@ void var::write(in filehandle, in key) const {
 		//use osfilenames unnormalised so we can read and write as is
 		if (not this->oswrite(key)) {
 			throw VarError("Could not oswrite " ^ key.squote() ^ ". " ^ this->lasterror());
-		};
+		}
 		return;
 	}
 

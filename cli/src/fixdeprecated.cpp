@@ -190,7 +190,7 @@ function main() {
 		}
 
 		if (verbose)
-			TRACE(compline);
+			TRACE(compline)
 
 		// Identify where in the source the warning occurs
 		let srcloc = compline.field(" ",1);
@@ -226,7 +226,7 @@ function main() {
 		//////////////////////////////////////////////////////////////////////////////////////////
 		// Find charno2 of opening "(" or ")"
 		// or return 0
-		auto find_char = [this, &srcline, charno](in char_to_find, in direction) -> var {
+		auto find_char = [&srcline, charno](in char_to_find, in direction) -> var {
 			var opposite_char = srcline.at(charno);
 			var charno2 = charno;
 			var depth = 0;
@@ -256,7 +256,7 @@ function main() {
 					depth++;
 				}
 			}
-			abort("error: fixdeprecated: Should not get here");
+//			throw VarError("fixdeprecated: Should not get here");
 //			return 0;
 		};
 
@@ -264,7 +264,7 @@ function main() {
 		// gcc warning points to closing ")" or "]"
 		// clang warning points to opening "(" or "["
 
-		
+
 		// Verify the target character is indeed ")" "]" (for gcc) or "(" "[" (for clang)
 		let char2 = srcline.at(charno);
 		var charno2;

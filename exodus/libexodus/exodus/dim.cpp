@@ -71,7 +71,8 @@ void dim::operator=(const dim& sourcedim) &{
 
 	//this->redim(sourcedim.nrows_, sourcedim.ncols_);
 	EXO_DIM_RECALC_NROWS(sourcedim)
-	int nrows = (sourcedim.data_.size() - 1) / sourcedim.ncols_;
+	// warning: implicit conversion loses integer precision: 'size_type' (aka 'unsigned long') to 'int' [-Wshorten-64-to-32]
+	int nrows = static_cast<int>(sourcedim.data_.size() - 1) / sourcedim.ncols_;
 	this->redim(nrows, sourcedim.ncols_);
 
 	// Copy element 0 as well to allow a degree
@@ -237,7 +238,7 @@ CVR dim::getelementref(/*unsigned*/ int rowno, /*unsigned*/ int colno) const {
 	int cell_index = ncols_ * (rowno - 1) + colno;
 
 	// Handle out of range
-	int ncells = data_.size();
+	int ncells = static_cast<int>(data_.size());
 	if (cell_index >= ncells || rowno < 1 || colno < 1 || colno > ncols_) {
 		UNLIKELY
 
@@ -397,7 +398,7 @@ dim& dim::splitter(in str1, SV sepchar) {
 	std::size_t sepsize = sepchar.size();
 	//std::size_t fieldno;
 	int fieldno;
-	int nrows = (data_.size() - 1) / ncols_;
+	int nrows = static_cast<int>(data_.size() - 1) / ncols_;
 	for (fieldno = 1; fieldno <= nrows; fieldno++) {
 
 		// find the next sepchar delimiter
@@ -705,32 +706,28 @@ var  var::reverse(SV sepchar) const& {
 // var shuffler
 ///////////////
 
-// no speed or memory advantage since not shuffling in place
+// No speed or memory advantage since not shuffling in place
 // but provided for syntactical convenience avoiding need to assign output of shuffle()
 io   var::shuffler(SV sepchar) {
 	(*this) = this->split(sepchar).shuffler().join(sepchar);
 	return *this;
 }
 
-// no speed or memory advantage since not shuffling in place
+// No speed or memory advantage since not shuffling in place
 // but provided for syntactical convenience avoiding need to assign output of shuffle()
 var  var::shuffle(SV sepchar) const& {
 	return this->split(sepchar).shuffler().join(sepchar);
 }
 
 dim_iter dim::begin() {
-	// Skip over zero'th element since dim access uses 1 based indexing
-	return &(data_[0]) + 1;
+	// + 1 to skip over zero'th element since dim access uses 1 based indexing
+//	return &(data_[0]) + 1;
+	return ++data_.begin();
 }
 
 dim_iter dim::end() {
-	return &(data_[0])+data_.size();
+//	return &(data_[0])+data_.size();
+	return data_.end();
 }
-
-//dim_iter begin() {
-//}
-//
-//dim_iter end() {
-//}
 
 }  // namespace exo

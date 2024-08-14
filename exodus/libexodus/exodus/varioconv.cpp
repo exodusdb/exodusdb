@@ -1253,7 +1253,7 @@ std::string var::oconv_TX(const char* conversion) const {
 
 var  var::iconv_TX(const char* conversion) const {
 
-	THISIS("var  var::iconv_TX(const char* conversion) const");
+	THISIS("var  var::iconv_TX(const char* conversion) const")
 
 	var record = this->var_str;
 	// \ + LF -> VM

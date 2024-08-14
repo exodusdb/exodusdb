@@ -902,7 +902,6 @@ io   var::oconv_MR(const char* conversion) {
 
 // Private default constructor
 rex::rex() {
-//	std::cout << "\n" << this << " " << __PRETTY_FUNCTION__ << std::endl;
 }
 
 // Public constructor
@@ -920,8 +919,6 @@ rex::rex(SV regex_str, SV options)
 	// and store a pointer to it in our member data "pimpl_"
 	// Destructor deletes it from the heap
 
-//	std::cout << "\n" << this << " " << __PRETTY_FUNCTION__ << std::endl;
-
 	pimpl_ = static_cast<boost::u32regex*>(
 		new boost::u32regex(
 			varregex_make_regex_engine(regex_str, options)
@@ -929,31 +926,27 @@ rex::rex(SV regex_str, SV options)
 	);
 }
 
-// Destructor
+// Destructor - Removes regex engine, if any, from the heap
 rex::~rex() {
-//	std::cout << "\n" << this << " " << __PRETTY_FUNCTION__ << std::endl;
 	delete static_cast<boost::u32regex*>(pimpl_);
 }
 
 // User defined literal suffix "_rex" e.g. "[a-z]"_rex
 ND rex operator""_rex(const char* cstr, std::size_t size) {
 
-	// For user defined literal suffix _rex will will
+	// For user defined literal suffix _rex we will
 	// using on the fly creation and caching of regex engines
 	// since suffixes are typically used in throw-away contexts
 	// e.g. as arguments of replace function
 	// return rex(std::string_view(cstr, size));
+	// so there is no point in creating a regex engine on the heap
 
-	// Use private default constructor
-	// Does not create a private regex engine on the stack like the other constructor does
-	rex rex1;
+	// Capture the given regex str.
+	// It will be used later on demand to get the regex engine
+	// from the cache (or make it and save it in the cache)
+	// Arguments reversed to avoid ambiguity between constructors
+	return rex(cstr, size, true);
 
-	// Capture the given regex str. It will be used to get the regex engine
-	// from the cache or make it on demand and save it in the cache
-	rex1.regex_str_ = cstr;
-
-//	std::cout << "\n" << &rex1 << " " << __PRETTY_FUNCTION__ << std::endl;
-	return rex1;
 }
 
 } // namespace exo

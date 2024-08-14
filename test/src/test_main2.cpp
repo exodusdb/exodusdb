@@ -181,6 +181,8 @@ function main() {
 		assert(x eq "abcxyz200");
 	}
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wuninitialized"
 	var xyz;
 	//xyz=xyz;
 	printl("\nTest catching VarError");
@@ -202,6 +204,7 @@ function main() {
 		std::cout << "error in main2.cpp2\n";
 		printx(error.description);
 	}
+#pragma GCC diagnostic pop
 
 #ifdef VAR_SAFE_DESTRUCTOR
 	printl("\nVerify that exodus catches c++ defect at runtime");

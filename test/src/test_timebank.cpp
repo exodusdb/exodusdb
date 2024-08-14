@@ -2,6 +2,7 @@
 #include <cassert>
 
 #include <exodus/program.h>
+//#pragma clangx diagnostic ignored "-Wunsafe-buffer-usage"
 programinit()
 
 function main() {

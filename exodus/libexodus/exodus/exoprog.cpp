@@ -617,7 +617,7 @@ bool ExodusProgramBase::pushselect(in /*v1*/, io v2, io /*v3*/, io /*v4*/) {
 }
 
 // popselect
-bool ExodusProgramBase::popselect(in v1, io v2, io /*v3*/, io /*v4*/) {
+bool ExodusProgramBase::popselect(in /*v1*/, io v2, io /*v3*/, io /*v4*/) {
 	// CURSOR.quote().logputl("CURSOR=");
 	// CURSOR--;
 	v2.move(CURSOR);

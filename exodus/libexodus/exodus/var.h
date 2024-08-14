@@ -90,14 +90,14 @@ class var_proxy3;
 // using CVR    = const var_base&;
 // using TVR    =       var_base&&;
 
-    using VAR    =       var;
-    using VARREF =       var&;
-    using CVR    = const var&;
-    using TVR    =       var&&;
+	using VAR    =       var;
+	using VARREF =       var&;
+	using CVR    = const var&;
+	using TVR    =       var&&;
 
-    using in     = const var&;
-    using out    =       var&;
-    using io     =       var&;
+	using in     = const var&;
+	using out    =       var&;
+	using io     =       var&;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 //                                               VAR
@@ -639,15 +639,15 @@ public:
 ////ar[7], 0>' is not a constant expression
 ////        assert(x.format("{:.2f}").outputl() == "12.35");
 //
-//			THISIS("var  format(SV fmt_str, Args&&... args) const");
+//			THISIS("var  format(SV fmt_str, Args&&... args) const")
 //			return fmt::format(std::forward<EXO_FORMAT_STRING_TYPE1>(fmt_str), *this, std::forward<Args>(args)... );
 //		} else
 //#endif
 //
 //		{
 ////#pragma message "EXO_FORMAT_STRING_TYPE1 == " DUMPDEFINE0(EXO_FORMAT_STRING_TYPE1)
-////			THISIS("var  format(" DUMPDEFINE0(EXO_FORMAT_STRING_TYPE1) "&& fmt_str, Args&&... args) const");
-//			THISIS("var  format(SV fmt_str, Args&&... args) const");
+////			THISIS("var  format(" DUMPDEFINE0(EXO_FORMAT_STRING_TYPE1) "&& fmt_str, Args&&... args) const")
+//			THISIS("var  format(SV fmt_str, Args&&... args) const")
 //			assertString(function_sig);
 //			return fmt::vformat(fmt_str, fmt::make_format_args(*this, std::forward<Args>(args)...) );
 //		}
@@ -656,14 +656,14 @@ public:
 //	template<class... Args>
 ////	ND var  format(in fmt_str, Args&&... args) const {
 //	ND var  vformat(SV fmt_str, Args&&... args) const {
-//		THISIS("var  vformat(SV fmt_str, Args&&... args) const");
+//		THISIS("var  vformat(SV fmt_str, Args&&... args) const")
 //		assertString(function_sig);
 //		return fmt::vformat(fmt_str, fmt::make_format_args(*this, args...) );
 //	}
 
 	template<class... Args>
 	ND var  format(in fmt_str, Args&&... args) const {
-		THISIS("var  var::format(SV fmt_str, Args&&... args) const");
+		THISIS("var  var::format(SV fmt_str, Args&&... args) const")
 		assertString(function_sig);
 		// *this becomes the first format argument and any additional arguments become additionl format arguments
 		return fmt::vformat(std::string_view(fmt_str), fmt::make_format_args(*this, args...) );
@@ -1055,153 +1055,112 @@ class PUBLIC var_iter {
 
 };
 
-///////////////////////////////////
-//// dim_iter - iterate over fields
-///////////////////////////////////
-//class PUBLIC dim_iter {
-//
-//	var* pvar_;
-//
-// public:
-//	// Default constructor
-//	//dim_iter() = default;
-//
-//	// Construct from var and point to it
-//	dim_iter(var& var1);
-//
-//	// Check iter != iter (i.e. iter != string::npos)
-//	   bool operator!=(const dim_iter& vi);
-//
-//	// Access a specific var
-//	var& operator*() const;
-//
-//	// ++Iter prefix
-//	dim_iter operator++();
-//
-//	// Iter++ postfix
-//	dim_iter operator++(int);
-//
-//	// --Iter prefix
-//	dim_iter operator--();
-//
-//	// iter++ postfix
-//	dim_iter operator--(int);
-//
-//	// +
-//	int operator+(const dim_iter&) const;
-//
-//	// -
-//	int operator-(const dim_iter&) const;
-//
-//	// +
-//	dim_iter operator+(const int) const;
-//
-//	// -
-//	dim_iter operator-(const int) const;
-//
-//};
-
+/////////////////////////////////
+//// dim_iter - iterate over vars
+/////////////////////////////////
 class PUBLIC dim_iter {
+private:
+//	var* ptr_;
+	std::vector<var>::iterator ptr_;
 public:
 
-    using iterator_category = std::random_access_iterator_tag;
-    using value_type        = var;
-    using reference         = var&;
-    using pointer           = var*;
-    using difference_type   = unsigned long long;
+	using iterator_category = std::random_access_iterator_tag;
+	using value_type        = var;
+	using reference         = var&;
+	using pointer           = var*;
+	using difference_type   = unsigned long long;
 
-    dim_iter(var* ptr) : ptr_(ptr) {}
+//	dim_iter(var* ptr) : ptr_(ptr) {}
+	dim_iter(std::vector<var>::iterator iter) : ptr_(iter) {}
 
 //	operator std::vector<var>::iterator() {
 //		return std::vector<var>(*ptr_);
 //	}
 
-    var& operator*() {
-        return *ptr_;
-    }
+	var& operator*() {
+		return *ptr_;
+	}
 
-    var* operator->() {
-        return ptr_;
-    }
+	std::vector<var>::iterator operator->() {
+		return ptr_;
+	}
 
-    dim_iter& operator++() {
-        ++ptr_;
-        return *this;
-    }
+	dim_iter& operator++() {
+		++ptr_;
+		return *this;
+	}
 
-    dim_iter operator++(int) {
-        dim_iter tmp(*this);
-        ++ptr_;
-        return tmp;
-    }
+	dim_iter operator++(int) {
+		dim_iter tmp(*this);
+		++ptr_;
+		return tmp;
+	}
 
-    dim_iter& operator--() {
-        --ptr_;
-        return *this;
-    }
+	dim_iter& operator--() {
+		--ptr_;
+		return *this;
+	}
 
-    dim_iter operator--(int) {
-        dim_iter tmp(*this);
-        --ptr_;
-        return tmp;
-    }
+	dim_iter operator--(int) {
+		dim_iter tmp(*this);
+		--ptr_;
+		return tmp;
+	}
 
-    bool operator==(const dim_iter& rhs) const {
-        return ptr_ == rhs.ptr_;
-    }
+	bool operator==(const dim_iter& rhs) const {
+		return ptr_ == rhs.ptr_;
+	}
 
-    bool operator!=(const dim_iter& rhs) const {
-        return !(*this == rhs);
-    }
+	bool operator!=(const dim_iter& rhs) const {
+		return !(*this == rhs);
+	}
 
-    var& operator[](int n) {
-        return ptr_[n];
-    }
+	var& operator[](int n) {
+		return ptr_[n];
+	}
 
-    dim_iter& operator+=(int n) {
-        ptr_ += n;
-        return *this;
-    }
+	dim_iter& operator+=(int n) {
+		ptr_ += n;
+		return *this;
+	}
 
-    dim_iter operator+(int n) const {
-        dim_iter tmp(*this);
-        tmp += n;
-        return tmp;
-    }
+	dim_iter operator+(int n) const {
+		dim_iter tmp(*this);
+		tmp += n;
+		return tmp;
+	}
 
-    dim_iter& operator-=(int n) {
-        ptr_ -= n;
-        return *this;
-    }
+	dim_iter& operator-=(int n) {
+		ptr_ -= n;
+		return *this;
+	}
 
-    dim_iter operator-(int n) const {
-        dim_iter tmp(*this);
-        tmp -= n;
-        return tmp;
-    }
+	dim_iter operator-(int n) const {
+		dim_iter tmp(*this);
+		tmp -= n;
+		return tmp;
+	}
 
-    int operator-(const dim_iter& rhs) const {
-        return ptr_ - rhs.ptr_;
-    }
+	long int operator-(const dim_iter& rhs) const {
+		return ptr_ - rhs.ptr_;
+	}
 
-    bool operator<(const dim_iter& rhs) const {
-        return ptr_ < rhs.ptr_;
-    }
+	bool operator<(const dim_iter& rhs) const {
+		return ptr_ < rhs.ptr_;
+	}
 
-    bool operator>(const dim_iter& rhs) const {
-        return ptr_ > rhs.ptr_;
-    }
+	bool operator>(const dim_iter& rhs) const {
+		return ptr_ > rhs.ptr_;
+	}
 
-    bool operator<=(const dim_iter& rhs) const {
-        return ptr_ <= rhs.ptr_;
-    }
+	bool operator<=(const dim_iter& rhs) const {
+		return ptr_ <= rhs.ptr_;
+	}
 
-    bool operator>=(const dim_iter& rhs) const {
-        return ptr_ >= rhs.ptr_;
-    }
+	bool operator>=(const dim_iter& rhs) const {
+		return ptr_ >= rhs.ptr_;
+	}
 
-private:
-    var* ptr_;
 };
 
 ///////////////////////////////////////////////////////

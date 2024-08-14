@@ -57,7 +57,7 @@ function main() {
 //	assert(format(s1, "yyy") == "xxx yyy zzz");
 //	assert(format(c1, "yyy") == "xxx yyy zzz");
 	assert(format(v1, "jjj") == "iii jjj kkk");
-	if (format(s1, "yyy")) {};
+	if (format(s1, "yyy")) {}
 	assert(format(s1, "yyy") == "xxx yyy zzz");
 	assert(format(c1, "yyy") == "xxx yyy zzz");
 	assert(var("jjj").format(v1) == "iii jjj kkk");

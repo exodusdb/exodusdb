@@ -20,7 +20,10 @@ static boost::asio::thread_pool threadpool1(std::thread::hardware_concurrency() 
 static std::atomic<int> atomic_ncompilation_failures;
 
 // EXO_FORMAT required to append -lfmt to compile and link command
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunsafe-buffer-usage"
 #include <exodus/format.h>
+#pragma GCC diagnostic pop
 
 #include <exodus/program.h>
 programinit()
