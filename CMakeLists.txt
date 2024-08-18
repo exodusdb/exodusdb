@@ -244,6 +244,10 @@
 		add_compile_options(-Wno-maybe-uninitialized)
 		add_compile_options(-Wno-unknown-pragmas)
 
+		# Suppress some warnings for fmt while using g++14
+		add_compile_options(-Walloc-size-larger-than=1GB)
+		add_compile_options(-Wno-stringop-overflow)
+
 		# only for g++ 9.4.0 etc. on Ubuntu 20.04
 		if (CMAKE_CXX_COMPILER_VERSION MATCHES "^9.")
 			add_compile_options(-Wno-inline)
