@@ -531,7 +531,10 @@ function build_and_install {
 :
 : Also installs pgexodus.so to /usr/lib/postgresql but not actually required.
 :
-	sudo cmake --install $EXODUS_DIR/build
+	NO_INSTALL=${NO_INSTALL:-}
+	if [ "$NO_INSTALL" = '' ]; then
+		sudo cmake --install $EXODUS_DIR/build
+	fi
 
 :
 : Add \~/bin to all users PATH
