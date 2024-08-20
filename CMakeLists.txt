@@ -257,7 +257,8 @@
 
 		add_compile_options(-pedantic)
 
-		add_compile_options(-Weverything)
+# Removed because causes unstoppable unsafe_buffer_usage warnings in exofuncs.h in clang 18 on Ubuntu 24.04 (c++ module bug?)
+#		add_compile_options(-Weverything)
 		add_compile_options(-Wno-unsafe_buffer_usage)
 		add_compile_options(-Wno-reserved-id-macro)
 #		add_compile_options(-fsafe-buffer-usage-suggestions)  # not available in clang 14 on Ubuntu 22.04
