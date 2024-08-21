@@ -21,7 +21,7 @@ function main() {
 		}
 	}
 
-	// Save edic history
+	// Create edic history dir
 	//if (not osdir(edic_hist_dir))
 	//	osmkdir(edic_hist_dir);
 	if (not osdir(edic_hist_dir)) {
@@ -29,10 +29,15 @@ function main() {
 			abort(lasterror());
 		}
 	}
-	if (not COMMAND.f(2).starts(OSSLASH))
-		COMMAND(2) = oscwd() ^ OSSLASH ^ COMMAND.f(2);
-	if (not oswrite(lower(COMMAND) ^ FM ^ OPTIONS on edic_hist))
-		printl("Cannot write to ", edic_hist);
+	// Save edic command with absolute path
+	//if (not COMMAND.f(2).starts(OSSLASH))
+	//	COMMAND(2) = oscwd() ^ OSSLASH ^ COMMAND.f(2);
+	//if (not oswrite(lower(COMMAND) ^ FM ^ OPTIONS on edic_hist))
+	//	printl("Cannot write to ", edic_hist);
+	// Tricks edic into thinking the correct absolute path was provided
+	// thus doesn't look for absolute path in .cpp header file
+	// moved COMMAND update when file absolute path is found
+	// moved history write to after all filenames updated
 
 	// Look for installed nano or other editor
 	var editor;
@@ -136,6 +141,13 @@ function main() {
 					filename = filename2;
 			}
 		}
+
+		// Update filename with absolute path in COMMAND
+		// COMMAND written to edic history at end of file loop
+		var origfilename = filenames.f(filen).unquote();
+		if (not origfilename.f(2).starts(OSSLASH))
+			COMMAND.replacer(origfilename, filename);
+
 
 		// Make path absolute in case EDITOR changes current working directory
 		var editcmd = editor;
@@ -393,6 +405,11 @@ function main() {
 		} // next edit/compile
 
 	} // next filen
+
+	// Save edic command with updated absolute path filenames
+	if (not oswrite(lower(COMMAND) ^ FM ^ OPTIONS on edic_hist))
+		printl("Cannot write to ", edic_hist);
+
 
 	return 0;
 }
