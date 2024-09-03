@@ -179,7 +179,7 @@ set -euxo pipefail
 :
 		LE_PUBCERT=/etc/letsencrypt/live/$DN/fullchain.pem
 		LE_PRIVKEY=/etc/letsencrypt/live/$DN/privkey.pem
-		if sudo test -f $LE_PUBCERT && sudo test -f LE_PRIVKEY; then
+		if sudo test -f $LE_PUBCERT && sudo test -f $LE_PRIVKEY; then
 :
 : Use LetsEncrypt cert/key "'$DN'"
 :
@@ -221,37 +221,37 @@ set -euxo pipefail
 		ServerSignature Off
 		ServerTokens Prod
 		<VirtualHost *:443>
-#			SSLCertificateFile    /etc/ssl/certs/$HOST_NAME-cert.pem
-#			SSLCertificateKeyFile /etc/ssl/private/$HOST_NAME-key.pem
-			SSLCertificateFile    $PUBCERT_LINK
-			SSLCertificateKeyFile $PRIVKEY_LINK
-			SSLEngine on
-			ServerName $SUFFIXED_FQDN
-			DocumentRoot $HOME/hosts/$HOST_DIR/www/
-			Alias /data/ $HOME/hosts/$HOST_DIR/data/
-			Alias /images/ $HOME/hosts/$HOST_DIR/images/
-			#emerg/alert/crit/error/warn/notice/info/debug/trace1/.../trace8
-			LogLevel info
-			AddDefaultCharset utf-8
-			Header set Cache-Control "max-age=300, public"
-			<Directory $HOME/hosts/$HOST_DIR/www/>
-				Options +FollowSymLinks
-				AllowOverride All
-				Require all granted
-			</Directory>
-			<Directory $HOME/hosts/$HOST_DIR/data/>
-				Options +FollowSymLinks
-				AllowOverride All
-				Require all granted
-			</Directory>
-			<Directory $HOME/hosts/$HOST_DIR/images/>
-				#case insensitivity
-				CheckSpelling On
-				CheckCaseOnly On
-				Options +FollowSymLinks
-				AllowOverride All
-				Require all granted
-			</Directory>
+		    #SSLCertificateFile    /etc/ssl/certs/$HOST_NAME-cert.pem
+		    #SSLCertificateKeyFile /etc/ssl/private/$HOST_NAME-key.pem
+		    SSLCertificateFile    $PUBCERT_LINK
+		    SSLCertificateKeyFile $PRIVKEY_LINK
+		    SSLEngine on
+		    ServerName $SUFFIXED_FQDN
+		    DocumentRoot $HOME/hosts/$HOST_DIR/www/
+		    Alias /data/ $HOME/hosts/$HOST_DIR/data/
+		    Alias /images/ $HOME/hosts/$HOST_DIR/images/
+		    #emerg/alert/crit/error/warn/notice/info/debug/trace1/.../trace8
+		    LogLevel info
+		    AddDefaultCharset utf-8
+		    Header set Cache-Control "max-age=300, public"
+		    <Directory $HOME/hosts/$HOST_DIR/www/>
+		        Options +FollowSymLinks
+		        AllowOverride All
+		        Require all granted
+		    </Directory>
+		    <Directory $HOME/hosts/$HOST_DIR/data/>
+		        Options +FollowSymLinks
+		        AllowOverride All
+		        Require all granted
+		    </Directory>
+		    <Directory $HOME/hosts/$HOST_DIR/images/>
+		        #case insensitivity
+		        CheckSpelling On
+		        CheckCaseOnly On
+		        Options +FollowSymLinks
+		        AllowOverride All
+		        Require all granted
+		    </Directory>
 		</VirtualHost>
 		V0G0N
 	sudo mv $TMPFILE $APACHE_SITE_CONF
