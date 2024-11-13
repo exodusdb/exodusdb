@@ -1,9 +1,5 @@
-
-
 #include <exodus/program.h>
 programinit()
-
-#include <ioconv.h>
 
 var redcolour="\033[1;31m";
 var endcolour = "\033[0m";
@@ -110,7 +106,7 @@ function main() {
 		line ^= dictfieldno.oconv("R#3") ^ "|";
 		line ^= dictvaluetype.oconv("T#4") ^ "|";
 		line ^= ID.first(25).oconv("T#25") ^ "|";
-		line ^= datarec.f(dictfieldno).converter(TM, "|");
+		line ^= datarec.f(dictfieldno).converter(_ALL_FMS, _VISIBLE_FMS);
 		printl(line);
 	}
 

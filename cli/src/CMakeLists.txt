@@ -68,6 +68,7 @@
 	add_executable(deletefile deletefile.cpp)
 	add_executable(deleteindex deleteindex.cpp)
 	add_executable(edir edir.cpp)
+	add_executable(ddview ddview.cpp)
 	add_executable(listindex listindex.cpp)
 	add_executable(testsort testsort.cpp)
 	add_executable(syncdat syncdat.cpp)
@@ -125,6 +126,7 @@
 	target_link_libraries(deletefile exodus stdc++fs ${LIBS})
 	target_link_libraries(deleteindex exodus stdc++fs ${LIBS})
 	target_link_libraries(edir exodus stdc++fs ${LIBS})
+	target_link_libraries(ddview exodus stdc++fs ${LIBS})
 	target_link_libraries(exodus-cli exodus stdc++fs ${LIBS})
 	target_link_libraries(listfiles exodus stdc++fs ${LIBS})
 	target_link_libraries(listdict exodus stdc++fs ${LIBS})
@@ -169,6 +171,7 @@
 			deleteindex
 			edir
 			edic
+			ddview
 			dict2sql
 			exodus-cli
 			list
