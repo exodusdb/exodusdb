@@ -116,33 +116,44 @@ function main(in request1, in request2, in request3, in request4, io request5, i
 
 		// see also removal of "username and/or " below
 		var invalidlogin = "";
-		// invalidlogin:='<div style="text-align:left;width:400px;margin-left:auto;margin-right:auto">'
-		invalidlogin ^= "<div style=\"text-align:left\">";
-		invalidlogin ^= "Sorry, your login has been refused.";
-		invalidlogin ^= "|<b><font color=red>Please choose one of the following options.</font></b>";
-		invalidlogin ^= "|";
-		invalidlogin ^= "|Maybe mistyped password?";
-		invalidlogin ^= "|or using a multilingual keyboard?";
-		invalidlogin ^= "|<b>&rarr;Click \"Show Password\", check it and try again</b>";
-		invalidlogin ^= "|";
-		invalidlogin ^= "|Wrong database selected?";
-		invalidlogin ^= "|<b>&rarr;Select the right DATABASE and try again.</b>";
-		invalidlogin ^= "|";
-		invalidlogin ^= "|First time logging in?";
-		invalidlogin ^= "|or not 100% certain of your password?";
-		invalidlogin ^= "|<b><font color=red>or three or more failed login attempts?</font></b>";
-		invalidlogin ^= "|or password has expired?";
-		invalidlogin ^= "|<b>&rarr;Click Password Reset to get a new password.</b>";
-		invalidlogin ^= "|";
-		invalidlogin ^= "|Don't have a username?";
-		invalidlogin ^= "|or not 100% certain what your username is?";
-		invalidlogin ^= "|or not 100% certain what your email address <b>IS IN EXODUS</b>?";
-		invalidlogin ^= "|<b>&rarr;Contact your manager.<b>||";
-		invalidlogin ^= "</div>";
-		// invalidlogin:='||If you know and have access to the email address of this account'
-		// invalidlogin:='|<b>you can click Password Reset to get a new password.<b>'
-		// NB make sure "Password Reset" does not appear exactly in message
-		invalidlogin.replacer("Password Reset", "Password&nbsp;Reset");
+		//// invalidlogin:='<div style="text-align:left;width:400px;margin-left:auto;margin-right:auto">'
+		//invalidlogin ^= "<div style=\"text-align:left\">";
+		//invalidlogin ^= "Sorry, your login has been refused.";
+		//invalidlogin ^= "|<b><font color=red>Please choose one of the following options.</font></b>";
+		//invalidlogin ^= "|";
+		//invalidlogin ^= "|Maybe mistyped password?";
+		//invalidlogin ^= "|or using a multilingual keyboard?";
+		//invalidlogin ^= "|<b>&rarr;Click \"Show Password\", check it and try again</b>";
+		//invalidlogin ^= "|";
+		//invalidlogin ^= "|Wrong database selected?";
+		//invalidlogin ^= "|<b>&rarr;Select the right DATABASE and try again.</b>";
+		//invalidlogin ^= "|";
+		//invalidlogin ^= "|First time logging in?";
+		//invalidlogin ^= "|or not 100% certain of your password?";
+		//invalidlogin ^= "|<b><font color=red>or three or more failed login attempts?</font></b>";
+		//invalidlogin ^= "|or password has expired?";
+		//invalidlogin ^= "|<b>&rarr;Click Password Reset to get a new password.</b>";
+		//invalidlogin ^= "|";
+		//invalidlogin ^= "|Don't have a username?";
+		//invalidlogin ^= "|or not 100% certain what your username is?";
+		//invalidlogin ^= "|or not 100% certain what your email address <b>IS IN EXODUS</b>?";
+		//invalidlogin ^= "|<b>&rarr;Contact your manager.<b>||";
+		//invalidlogin ^= "</div>";
+		//// invalidlogin:='||If you know and have access to the email address of this account'
+		//// invalidlogin:='|<b>you can click Password Reset to get a new password.<b>'
+		//// NB make sure "Password Reset" does not appear exactly in message
+		//invalidlogin.replacer("Password Reset", "Password&nbsp;Reset");
+
+		// Simplify login failure msg, as users ignored previous wall of text
+		invalidlogin ^= "<div style=\"text-align:left\">" ;
+		invalidlogin ^= "|<b>Login failed!</b>";
+		invalidlogin ^= "||<b>Wrong username, password or database</b>";
+		invalidlogin ^= "|&rarr;Check details and try again";
+		invalidlogin ^= "||<b>Reset password if:</b>";
+		invalidlogin ^= "|&rarr;3 or more failed attempts";
+		invalidlogin ^= "|&rarr;Forgot password";
+		invalidlogin ^= "|&rarr;Password expired";
+		invalidlogin ^= "</div>" ;
 
 		var realreason = "";
 

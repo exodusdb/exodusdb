@@ -354,7 +354,8 @@ function* login_onclick() {
         }
         else {
             if (db.response.toLowerCase().indexOf('password')>=0) {
-                var choice=yield* exodusconfirm(db.response.split('|').join('\n'),1,'Try a different password, database or user code','Reset Password')
+                //var choice=yield* exodusconfirm(db.response.split('|').join('\n'),1,'Try a different password, database or user code','Reset Password')
+                var choice=yield* exodusinvalid(db.response.split('|').join('\n'))
             } else {
                 var choice=yield* exodusinvalid(db.response.split('|').join('\n'))
             }
