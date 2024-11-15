@@ -53,7 +53,9 @@ set -euxo pipefail
 : Kill any test process running the target database
 : =================================================
 :
-	PIDFILENAME=/run/serve_${APP_CODE}/${APP_CODE}_test@${DB_CODE}.pid
+	#PIDFILENAME=/run/serve_${APP_CODE}/${APP_CODE}_test@${DB_CODE}.pid
+	#save having to assign DB_CODE when executing restore_db directly in cli
+	PIDFILENAME=/run/serve_${APP_CODE}/${APP_CODE}_test@${TEST_EXO_DATA/_test/}.pid
 	if [ -f $PIDFILENAME ]; then
 		kill -TERM `cat $PIDFILENAME` || true
 	fi
@@ -104,6 +106,24 @@ set -euxo pipefail
 : ==========================
 :
 	EXO_DATA=$TEST_EXO_DATA dict2sql > /dev/null
+
+:
+: Remove all foreign database connections and attachments
+: =======================================================
+:
+	if EXO_DATA=$TEST_EXO_DATA dbattach {L} |& egrep "[a-z ]" ; then
+		sudo -u postgres psql -c "ALTER ROLE exodus WITH SUPERUSER;"
+		EXO_DATA=$TEST_EXO_DATA dbattach {RRR} || true #ensure access is revoked
+		sudo -u postgres psql -c "ALTER ROLE exodus WITH NOSUPERUSER;"
+		if EXO_DATA=$TEST_EXO_DATA dbattach {L} |& egrep "[a-z ]" ; then
+			:
+			: "FAILED to remove all foreign database connections and attachments"
+			:
+			exit 1
+		fi
+	fi
+
+	if dblist | grep gg
 
 :
 : Optionally restart the target database
