@@ -108,22 +108,42 @@ set -euxo pipefail
 	EXO_DATA=$TEST_EXO_DATA dict2sql > /dev/null
 
 :
-: Remove all foreign database connections and attachments
-: =======================================================
+: Reattach to foreign test database
+: =================================
+: 'because pg_dump/restore preservers foreign table attachments'
+: 'leaving foreign tables in test databases access to update tables in live databases'
+: 'users of databases with foreign tables are restricted from updating but EXODUS is not!'
 :
-	if EXO_DATA=$TEST_EXO_DATA dbattach {L} |& egrep "[a-z ]" ; then
-		sudo -u postgres psql -c "ALTER ROLE exodus WITH SUPERUSER;"
-		EXO_DATA=$TEST_EXO_DATA dbattach {RRR} || true #ensure access is revoked
-		sudo -u postgres psql -c "ALTER ROLE exodus WITH NOSUPERUSER;"
-		if EXO_DATA=$TEST_EXO_DATA dbattach {L} |& egrep "[a-z ]" ; then
-			:
-			: "FAILED to remove all foreign database connections and attachments"
-			:
-			exit 1
+	#Ensure reattach is only done on test databases because
+	#sometimes we highjack restore_db to restore a backup into live database
+	if [[ $TEST_EXO_DATA =~ _test ]]; then
+
+		if sudo -u postgres psql $TEST_EXO_DATA -t -c "\det+" | grep "table_name"; then
+
+			#Get foreign server name
+			FOREIGN_SERVER=`sudo -u postgres psql $TEST_EXO_DATA -t -c "\des+" | awk '{ print $1}'`
+			if [ "`echo $FOREIGN_SERVER | wc -l`" -gt 1 ]; then
+				echo "Reattaching foreign tables expects only one foreign server!"
+			fi
+
+			#Get foreign table names
+			FOREIGN_TABLES=`sudo -u postgres psql $TEST_EXO_DATA -t \
+				-c "SELECT foreign_table_name FROM information_schema.foreign_tables;" \
+				| tr '\n' ' '`
+
+			sudo -u postgres psql -c "ALTER ROLE exodus WITH SUPERUSER;"
+			#Remove foreign server/tables attachment to other live database:
+			EXO_DATA=$TEST_EXO_DATA dbattach {RRR}
+
+			#Reattach to other TEST database
+			EXO_DATA=$TEST_EXO_DATA dbattach ${FOREIGN_SERVER}_test $FOREIGN_TABLES
+
+			#Print proof
+			EXO_DATA=$TEST_EXO_DATA dbattach \{L\}
+			sudo -u postgres psql -c "ALTER ROLE exodus WITH NOSUPERUSER;"
 		fi
 	fi
 
-	if dblist | grep gg
 
 :
 : Optionally restart the target database
