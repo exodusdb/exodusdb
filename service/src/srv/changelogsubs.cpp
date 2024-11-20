@@ -192,6 +192,24 @@ function main(in mode0) {
 	} else if (mode.f(1) == "LIST") {
 
 		gosub list(mode);
+
+	} else if (mode.f(1) == "POSTWRITE") {
+
+		// After writing new entry to changelog database file
+		// also write entry to new dat osfile can be distributed
+		// to other installations by adding to git
+
+		let path = "/root/neosys/src/dat/changelog/";
+		if (not osdir(path)) {
+			call mssg("ERROR in CHANGELOGSUBS | " ^ path ^ " is missing");
+			return 0;
+		}
+
+		let osrecord = RECORD.convert(FM, "\n");
+		if (not osrecord.oswrite(path ^ ID)) {
+			call mssg(lasterror());
+			return 0;
+		}
 	}
 
 	return 0;
