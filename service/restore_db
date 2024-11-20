@@ -123,19 +123,37 @@ set -euxo pipefail
 			#Get foreign server name
 			FOREIGN_SERVER=`sudo -u postgres psql $TEST_EXO_DATA -t -c "\des+" | awk '{ print $1}'`
 			if [ "`echo $FOREIGN_SERVER | wc -l`" -gt 1 ]; then
-				echo "Reattaching foreign tables expects only one foreign server!"
+				: "ERROR: Reattaching foreign tables expects only one foreign server!"
+				exit 1
 			fi
 
-			#Get foreign table names
+			#Get foreign table names before detaching
 			FOREIGN_TABLES=`sudo -u postgres psql $TEST_EXO_DATA -t \
 				-c "SELECT foreign_table_name FROM information_schema.foreign_tables;" \
 				| tr '\n' ' '`
 
 			sudo -u postgres psql -c "ALTER ROLE exodus WITH SUPERUSER;"
 			#Remove foreign server/tables attachment to other live database:
-			EXO_DATA=$TEST_EXO_DATA dbattach {RRR}
+			EXO_DATA=$TEST_EXO_DATA dbattach \{RRR\}
 
 			#Reattach to other TEST database
+			TIMEOUT=3600
+			ELAPSED=0
+			#Wait until source test database is finished being restore before dbattaching target/source test databases
+			#otherwise dbcomp will fail because source db data not complete
+			while ps -ef | egrep "backup_db $FOREIGN_SERVER" | grep -v 'grep'; do
+				:
+				: "Waiting for "$FOREIGN_SERVER"'s backup_db to finish before reattaching to "${FOREIGN_SERVER}_test
+				:
+				if [ $ELAPSED -ge $TIMEOUT ]; then
+					: "TIMEOUT (60mins)"
+					exit 1
+				fi
+				ELAPSED=$((ELAPSED + 60))
+				sleep 60
+			done
+
+			#Reattach to source's TEST database
 			EXO_DATA=$TEST_EXO_DATA dbattach ${FOREIGN_SERVER}_test $FOREIGN_TABLES
 
 			#Print proof
@@ -143,7 +161,6 @@ set -euxo pipefail
 			sudo -u postgres psql -c "ALTER ROLE exodus WITH NOSUPERUSER;"
 		fi
 	fi
-
 
 :
 : Optionally restart the target database
