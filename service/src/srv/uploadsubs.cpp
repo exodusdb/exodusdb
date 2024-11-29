@@ -355,7 +355,9 @@ postuploadfail:
 		//	return invalid(msg);
 		//}
 
-		if (osfile(tt) and not tt.osremove()) {
+		//if (osfile(tt) and not tt.osremove()) {
+		// use method since osfile used as a var
+		if (tt.osfile() and not tt.osremove()) {
 			msg = (tt ^ " file cannot be deleted").quote();
 			return invalid(msg);
 		}
