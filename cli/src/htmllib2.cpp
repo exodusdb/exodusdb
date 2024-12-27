@@ -679,16 +679,24 @@ td.nx {border-top:none;border-bottom:none}
 .num {text-align:right;mso-number-format:General;white-space:nowrap;}
 
 table.exodustable {
- border-collapse:collapse;
  margin:0px;
  padding:0px;
- border-spacing:0px;}
+ //border-spacing:0px;
+ border-collapse:collapse;}
 
 table.exodustable th {
  //background-color:#ffff80;
  background-color:#fff099;
  padding:2px;
  border:1px solid #808080;}
+
+table.exodustable > thead th {
+ top: 0;
+ z-index: 2;
+ position: sticky;
+ outline: 1px solid #808080;
+ outline-offset: -0.5px;
+ box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);}
 
 table.exodustable > tbody > tr > td {
  //background-color:#ffffc0;
