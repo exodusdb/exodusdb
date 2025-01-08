@@ -18,7 +18,8 @@ var msg;
 var file;
 var errors;
 var lengthx;  // num
-var osfile;
+//var osfile;
+var osfilex;
 var temposfilename83;
 var nimported;	// num
 var fileptr;	// num
@@ -355,9 +356,7 @@ postuploadfail:
 		//	return invalid(msg);
 		//}
 
-		//if (osfile(tt) and not tt.osremove()) {
-		// use method since osfile used as a var
-		if (tt.osfile() and not tt.osremove()) {
+		if (osfile(tt) and not tt.osremove()) {
 			msg = (tt ^ " file cannot be deleted").quote();
 			return invalid(msg);
 		}
@@ -381,7 +380,10 @@ postuploadfail:
 		let datewords		 = RECORD.f(15);
 		let timewords		 = RECORD.f(16);
 		let validating		 = RECORD.f(17);
-		osfile				 = "";
+		//osfile				 = "";
+		// Rename var to avoid conflict with function call vs field access
+		// e.g osfile(filename) vs osfile(fn) = x
+		osfilex				 = "";
 
 		if (uploadpath.cut(2).contains("..")) {
 			msg = uploadpath.quote() ^ " .. is not allowed";
@@ -445,7 +447,8 @@ postuploadfail:
 			return 0;
 		}
 
-		if (not osfile.osopen(temposfilename83)) {
+		//if (not osfile.osopen(temposfilename83)) {
+		if (not osfilex.osopen(temposfilename83)) {
 			gosub invalid(msg);
 			gosub cleanup();
 			return 0;
@@ -667,7 +670,8 @@ nextline:
 
 subroutine cleanup() {
 
-	osfile.osclose();
+	//osfile.osclose();
+	osfilex.osclose();
 	//temposfilename83.osremove();
 	if (osfile(temposfilename83) and not temposfilename83.osremove()) {
 		loglasterror();
@@ -684,7 +688,8 @@ addbuff:
 // //////
 		//call osbread(temp, osfile, fileptr, lengthx);
 		var chunk;
-		if (not osbread(chunk, osfile, fileptr, lengthx)) {
+		//if (not osbread(chunk, osfile, fileptr, lengthx)) {
+		if (not osbread(chunk, osfilex, fileptr, lengthx)) {
 			abort(lasterror());
 		}
 		chunk.converter("\n\f", "\r\r");

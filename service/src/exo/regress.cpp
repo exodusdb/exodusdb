@@ -7,8 +7,12 @@ programinit()
 function main() {
 	printl("regress says 'Hello World!'");
 	let osfilename = field(SENTENCE, " ", 2);
-	var osfile;
-	if (not osopen(osfilename, osfile))
+	//var osfile;
+	// Rename var to avoid conflict with function call vs field access
+	// e.g osfile(filename) vs osfile(fn) = x
+	var osfilex;
+	//if (not osopen(osfilename, osfile))
+	if (not osopen(osfilename, osfilex))
 		stop("cant open " ^ osfilename);
 	var data;
 	if (not osread(data, osfilename))
