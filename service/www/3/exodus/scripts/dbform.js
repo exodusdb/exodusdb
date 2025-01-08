@@ -1404,8 +1404,11 @@ function* formfunctions_onload() {
 
     //login details (database/username)
     var loginhtml = ''
+
     //loginhtml+='<div style="float:left; white-space:nowrap">'
-    loginhtml += '<span style="float:left; vertical-align:middle">'
+    //loginhtml += '<span style="float:left; vertical-align:middle">'
+    // Right side login details, disappears if zoomed in to avoid menu extending vertically
+    loginhtml += '<span style="float:right; margin: 5px 10px; vertical-align:middle">'
     loginhtml += gdatasetname + ' - ' + gdataset + ' - ' + gusername + '</span>'
     if (gKeyNodes)
         buttonhtml += loginhtml
@@ -1441,10 +1444,11 @@ function* formfunctions_onload() {
         //document.body.insertBefore(formbuttons, document.body.firstChild)
         gexodus_menubar.insertBefore(formbuttons, gexodus_menubar.firstChild)
     else {
-
-        //login status at the top
+        // login details "database-username" at the top left of
+        // unbounded screens eg. search.htm, voucher allocation
         var temp = document.createElement('span')
-        temp.style.float = 'left'
+        //temp.style.float = 'left'
+        temp.style.float = 'right'
         temp.innerHTML = loginhtml
         //temp.style.textAlign='CENTER'
         //document.body.insertBefore(temp, document.body.firstChild)

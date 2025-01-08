@@ -1433,6 +1433,21 @@ function add_exodus_menubar() {
     if (!gexodus_menubar) {
         var span = document.createElement('SPAN')
         span.id = 'exodus_menu'
+        // menubar design
+        //span.style.backgroundColor = '#e3e3e3';
+        span.style.backgroundColor = '#f4f4f4';
+        span.style.color = 'black';           // Text color
+        span.style.display = 'block';
+        span.style.width = '100%';            // Span full width
+        span.style.position = 'fixed';
+        span.style.top = '0';                 // Align to the top
+        span.style.left = '0';                // Align to the left
+//        span.style.zIndex = '100';            // Cannot be overlapped
+        span.style.padding = '5px 0';
+        span.style.margin = '0';
+        span.style.boxSizing = 'border-box';  // Ensure padding doesn't affect width
+        span.style.outline = '1px solid lightgrey'
+
         var navbar1 = document.getElementsByClassName('navbar')[0];
         if (navbar1)
             navbar1.parentNode.insertBefore(span, navbar1.nextSibling)
@@ -1440,7 +1455,15 @@ function add_exodus_menubar() {
             document.body.insertBefore(span, document.body.firstChild)
         gexodus_menubar = document.getElementById('exodus_menu')
     }
+}
 
+// Adjust the body's top margin dynamically so that body is never overlapped by the menubar
+function adjust_bodymargin() {
+    gexodus_menubar = document.getElementById('exodus_menu')
+    if (gexodus_menubar) {
+	    var menuheight = gexodus_menubar.offsetHeight;
+	    document.body.style.marginTop = (menuheight + 10) + 'px';
+	}
 }
 
 function* clientfunctions_windowonload() {
@@ -1483,7 +1506,34 @@ function* clientfunctions_windowonload() {
     //    exodussettimeout('exodusautofitwindow()', 10)
     //exodussetinterval('exodusautofitwindow()', 10)
 
-    add_exodus_menubar()
+	//add_exodus_menubar()
+	// Dont add menubar on login page where link doesnt end in .htm)
+	if (document.URL.includes(".htm")) {
+		// Also no menubar in other pages
+		if (!document.URL.match(/index|confirm|upload/)) {
+			add_exodus_menubar();
+		}
+	}
+
+	// Adjust the body's top margin dynamically so that body is never overlapped by the menubar
+	gexodus_menubar = document.getElementById('exodus_menu')
+	if (gexodus_menubar) {
+		// Adjust on load - for any new window that opens from current window eg. search.htm
+		adjust_bodymargin();
+
+		// Adjust on resize - in case menu height changes
+		window.addEventListener('resize', adjust_bodymargin);
+
+		// Adjust if number of buttons or button size cause menu height to change
+		const observer = new MutationObserver(() => {
+			adjust_bodymargin();
+		});
+		observer.observe(gexodus_menubar, {
+			attributes: true, // Detect style changes
+			childList: true,  // Detect added/removed menu items
+			subtree: true     // Detect deep changes in child elements
+		});
+	}
 
     //add menu, logout and refresh buttons if not a popup, depending on gshowmenu, not /exodus/ location and no navbar elements
     //if no exodus_menu span (even if no menu, it is a holder for EXODUS form buttons New/Save etc.)
@@ -1500,6 +1550,7 @@ function* clientfunctions_windowonload() {
             //document.body.insertBefore(temp2, document.body.firstChild)
             gexodus_menubar.insertBefore(temp2, gexodus_menubar.firstChild)
             temp2.style.float = 'left'
+            temp2.style.paddingLeft = '5px'
             //if no dbform
             if (typeof gdictfilename == 'undefined')
                 addeventlistener(temp2, 'click', 'refreshcache_onclick')
@@ -1510,7 +1561,12 @@ function* clientfunctions_windowonload() {
         temp2.innerHTML = menubuttonhtml('exoduslogout', glogoutimage, 'Lo<u>g</u>out', 'Logout. ' + ctrlalt + '+G', 'G')
         //document.body.insertBefore(temp2, document.body.firstChild)
         gexodus_menubar.insertBefore(temp2, gexodus_menubar.firstChild)
-        temp2.style.float = 'left'
+        //temp2.style.float = 'left
+        temp2.style.float = 'right'
+        temp2.style.marginRight = '10px'
+        temp2.style.paddingLeft = '5px'
+        temp2.style.borderLeft = '0.2px solid lightgrey'
+
         if (!gusername) {
             var temp = $$('exoduslogoutbutton')
             temp.innerText = 'Login'
@@ -1526,6 +1582,8 @@ function* clientfunctions_windowonload() {
             menu_span.style.float = 'left'
             menu_span.style.maxWidth = '65px'//stop first button flashing very wide initially
             menu_span.innerHTML = menubuttonhtml('menu', gmenuimage, '<u>M</u>enu', 'Menu. ' + ctrlalt + '+M', 'M')
+            menu_span.style.paddingLeft = '5px'
+            menu_span.style.borderRight = '0.2px solid lightgrey'
             //document.body.insertBefore(menu_span, document.body.firstChild)
             gexodus_menubar.insertBefore(menu_span, gexodus_menubar.firstChild)
 
@@ -3859,9 +3917,9 @@ function* sorttable(event, order) {
 
 }
 
-//******
-//*MENU*
-//******
+//******//
+//*MENU*//
+//******//
 
 function menuhide(element) {
 
@@ -3916,7 +3974,8 @@ function menuhide(element) {
                 //child.onfocus=menuonmouseover
                 //child.onblur=menuonmouseout
                 child.className = 'menuitem'
-                child.style.paddingLeft = '0px'
+                //child.style.paddingLeft = '0px'
+                child.style.paddingLeft = '5px'
 
                 if (typeof child.exodussubmenuoption == 'undefined') {
 
@@ -4311,23 +4370,37 @@ function menubuttonhtml(id, imagesrc, name, title, accesskey, align) {
     if (id)
         tx += ' id="' + id + 'button' + '"'
 
-    tx += ' class=graphicbutton'
-    tx += ' onmousedown=this.style.borderStyle="inset"'
-    tx += ' onmouseup=this.style.borderStyle="outset"'
-    tx += ' onmouseout=this.style.borderStyle="outset"'
-
     if (title)
         tx += ' title="' + title + '"'
 
+    //tx += ' class=graphicbutton'
+    //tx += ' onmousedown=this.style.borderStyle="inset"'
+    //tx += ' onmouseup=this.style.borderStyle="outset"'
+    //tx += ' onmouseout=this.style.borderStyle="outset"'
+
     //there is no float:center?!
-    var style = 'white-space:nowrap'
-    if (align == 'center')
+    //var style = 'white-space:nowrap'
+    // logout button should not have a border on the right like the other buttons
+    if (id != 'exoduslogout' && align != 'center') {
+        //var style = 'white-space:nowrap; padding-right: 7.5px;';
+        var style = 'white-space:nowrap; padding: 5px;';
+	}
+
+    if (align == 'center') {
+        // eg. Ok, Cancel, List and Save buttons
+        tx += ' class=graphicbutton'
         //tx+=' style="float:'+align+'"'
         //tx+=' style="margin:0 auto"'
         //switch off the default from graphicbutton class?
         style += ';float:none;clear:both;overflow:hidden'
-    else if (align)
+//    } else if (align) {
+//        style += ''//';float:' + align
+	} else {
+        // eg. Refresh, New etc.
+        tx += ' class=menubutton'
         style += ''//';float:' + align
+	}
+
     //style=''
     if (style)
         tx += ' style="' + style + '"'
@@ -4363,7 +4436,9 @@ function menubuttonhtml(id, imagesrc, name, title, accesskey, align) {
     //http://kb.mozillazine.org/Ui.key.contentAccess
     //so ALSO implemented in onkeydown
     if (accesskey) {
-        tx += '<button xtabindex=-1 style="background-color:white; height:1px; width:1px; border-style:none; margin:0px ;padding:0px"'
+        //tx += '<button xtabindex=-1 style="background-color:white; height:1px; width:1px; border-style:none; margin:0px ;padding:0px"'
+        // hide access keys on screen
+        tx += '<button xtabindex=-1 style="display:none;"'
         tx += ' accesskey="' + accesskey + '"'
         /* yield */ tx += 'yield * '
         tx += ' exodusonclick="' + id + '_onclick(event)"'
@@ -5081,7 +5156,8 @@ function* exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negativebut
     //create a centralised div with the appropriate buttons or input box
     var div = document.createElement('div')
     div.id = 'exodusconfirmdiv'
-    div.style.zIndex = 200
+    // popups should overlap menubar which has 100zIndex
+    div.style.zIndex = '200'
     div.style.position = 'fixed'
     div.style.textAlign = 'center'
     div.style.background = 'lightgrey'
@@ -5181,10 +5257,15 @@ function* exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negativebut
         html += ' class="graphicbutton"'
 
         //mouse events down/up/out/click
-        html += ' onmousedown="this.style.borderStyle=\'inset\'"'
-        html += ' onmouseup="this.style.borderStyle=\'outset\'"'
-        html += ' onmouseout="this.style.borderStyle=\'outset\'"'
+        //html += ' onmousedown="this.style.borderStyle=\'inset\'"'
+        //html += ' onmouseup="this.style.borderStyle=\'outset\'"'
+        //html += ' onmouseout="this.style.borderStyle=\'outset\'"'
+        // discontinued inset/outset styles
+        html += ' onmousedown="this.style.borderStyle=\'solid\'"'
+        html += ' onmouseup="this.style.borderStyle=\'solid\'"'
+        html += ' onmouseout="this.style.borderStyle=\'solid\'"'
         html += ' onclick="exodus_confirm_function' + buttonn + '()"'
+
 
         //letter
         var letter = buttontext.match(/(<[uU]>)(.)/)
