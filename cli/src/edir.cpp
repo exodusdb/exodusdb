@@ -16,6 +16,7 @@ function main() {
 			"edir OSFILEPATH [LINENO] [OPTIONS]\n"
 			"\n"
 			"OPTION 'R' = Show raw tm/sm etc."
+			"OPTION 'T' = Print to standard output (terminal)"
 		);
 
 	// Allow for first argument to be an os file path
@@ -65,6 +66,16 @@ function main() {
 	// Treat VMs as FMs etc if editing a specific field
 	if (fieldno)
 		text.raiser();
+
+	// print record to standard output (terminal)
+	// useful (and standardises) reading records from bash scripts
+	if (OPTIONS.contains("T")) {
+		text.converter(_ALL_FMS, _VISIBLE_FMS);
+		if (not osshell("echo " ^ text.quote())) {
+			loglasterror();
+		}
+		return 0;
+	}
 
 	// Escape data format to text format
 	let converttext = filename != "DOS" or text.contains(FM);
