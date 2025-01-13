@@ -1408,7 +1408,9 @@ function* formfunctions_onload() {
     //loginhtml+='<div style="float:left; white-space:nowrap">'
     //loginhtml += '<span style="float:left; vertical-align:middle">'
     // Right side login details, disappears if zoomed in to avoid menu extending vertically
-    loginhtml += '<span style="float:right; margin: 5px 10px; vertical-align:middle">'
+    //loginhtml += '<span style="float:right; margin: 5px 10px; vertical-align:middle">'
+    // Adjust margin to center element vertically. Not exact middle due to settings in client.js
+    loginhtml += '<span style="float:right; margin: 7px 10px; vertical-align:middle">'
     loginhtml += gdatasetname + ' - ' + gdataset + ' - ' + gusername + '</span>'
     if (gKeyNodes)
         buttonhtml += loginhtml
