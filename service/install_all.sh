@@ -117,8 +117,7 @@ set -euxo pipefail
 :	mailutils	NOT installed. like bsd-mailx but doesnt have identical options
 :	qrencode	used in htmllib2 for KSA invoices
 :
-	DEBIAN_FRONTEND=noninteractive sudo apt-get -y install whois postfix bsd-mailx
-
+    sudo DEBIAN_FRONTEND=noninteractive apt-get -y install whois postfix bsd-mailx
 :
 : Configure postfix
 : =================
