@@ -271,7 +271,7 @@ static bool locateat(const std::string& var_str, const std::string& target, std:
 
 	// find the starting position of the value or return ""
 	// using pos and end_pos of
-	int targetlen = static_cast<int>((target.size()));
+	auto targetsize = target.size();
 	int valuen2 = 1;
 	do {
 
@@ -375,12 +375,11 @@ static bool locateat(const std::string& var_str, const std::string& target, std:
 		// but pickos (by accidental error?) at least checks for the whole target
 		// even if the target contains the sep character
 		// if (var_str.substr(pos,nextpos-pos)==target)
-		//static_cast<int> is to avoid warning of unsigned integer
 		switch (order) {
 			// No order
 			case '\x00':
-				if (var_str.substr(pos, targetlen) == target) {
-					bool x = static_cast<int>(nextpos - pos) <= targetlen;
+				if (var_str.substr(pos, targetsize) == target) {
+					bool x = (nextpos - pos) <= targetsize;
 					if (x) {
 						setting = valuen2;
 						return true;
@@ -392,7 +391,7 @@ static bool locateat(const std::string& var_str, const std::string& target, std:
 			case '\x01':
 				//				//pickos strangeness? to locate a field whereever
 				//it is regardless of order even ""? if
-				// (!targetlen&&nextpos==pos) break;
+				// (!targetsize&&nextpos==pos) break;
 
 				//if (var_str.substr(pos, nextpos - pos) >= target)
 				comp = var::localeAwareCompare(var_str.substr(pos, nextpos - pos), target);
@@ -410,7 +409,7 @@ static bool locateat(const std::string& var_str, const std::string& target, std:
 			case '\x02':
 				//				//pickos strangeness? to locate a field whereever
 				//it is regardless of order even ""? if
-				// (!targetlen&&nextpos==pos) break;
+				// (!targetsize&&nextpos==pos) break;
 
 				value = var_str.substr(pos, nextpos - pos);
 				if (value >= target) {
@@ -428,7 +427,7 @@ static bool locateat(const std::string& var_str, const std::string& target, std:
 			case '\x03':
 				//				//pickos strangeness? to locate a field whereever
 				//it is regardless of order even ""? if
-				// (!targetlen&&nextpos==pos) break;
+				// (!targetsize&&nextpos==pos) break;
 
 				if (var_str.substr(pos, nextpos - pos) <= target) {
 					setting = valuen2;
@@ -458,7 +457,7 @@ static bool locateat(const std::string& var_str, const std::string& target, std:
 			case '\x04':
 				//				//pickos strangeness? to locate a field whereever
 				//it is regardless of order even ""? if
-				// (!targetlen&&nextpos==pos) break;
+				// (!targetsize&&nextpos==pos) break;
 
 				value = var_str.substr(pos, nextpos - pos);
 				if (value <= target2) {
@@ -1189,78 +1188,174 @@ io   var::laster(const std::size_t length) {
 // CUT
 //////
 
+// Pick OS equivalent
 // var[1,length] = ""         cut first n bytes
 // var[-length, length] = ""  cut last n bytes
+
 var  var::cut(const int length) const& {
 
 	THISIS("var  var::cut(const int length) const")
 	assertString(function_sig);
 
-	var nrvo;
-	nrvo.var_typ = VARTYP_STR;
+	// Positive or zero. Trim first n bytes
 
-	// Assume var_str size is <= max int
+	if (length >= 0) {
+		LIKELY
 
-	if (length >= static_cast<int>(var_str.size())) {
-		// Example "ab".cut(2) return ""
-		// Example "ab".cut(3) return ""
-		// return empty string
+		if (static_cast<size_t>(length) >= var_str.length()) {
+
+			// Number of bytes to trim matches or exceeds string length.
+			// Example "ab".cut(2) return ""
+			// Example "ab".cut(3) return ""
+			return "";
+		}
+
+		// Example "ab".cut(0) return "ab"
+		// Example "ab".cut(1) return "b"
+		return var_str.substr(length);
+
 	}
 
-	else if (length >= 0) {
-		// Positive - Copy from middle to end
-		// Example "ab".cut(0) , append from pos 0, return "ab"
-		// Example "ab".cut(1) , append from pos 1, return "b"
-		nrvo.var_str.append(var_str, length, std::string::npos);
+	// Negative. Trim last n bytes
 
-	} else {
-		// Negative = Copy first n chars
-		// Example "ab".cut(-1) copyn = -1 + 2 = 1, return "a"
-		// Example "ab".cut(-2) copyn = -2 + 2 = 0, return ""
-		// Example "ab".cut(-3) copyn = -3 + 2 = -1, return ""
-		auto copyn = length + static_cast<int>(var_str.size());
-		if (copyn > 0)
-			nrvo.var_str.append(var_str, 0, copyn);
+	size_t nbytes_to_trim = static_cast<size_t>(-length);
+
+	// Number of bytes to trim matches or exceeds string length.
+	if (nbytes_to_trim >= var_str.length()) {
+		// Example "ab".cut(-2) return ""
+		// Example "ab".cut(-3) return ""
+		return "";
 	}
 
-	return nrvo;
+	// Example "ab".cut(-1) return "a"
+	return var_str.substr(0, var_str.length() - nbytes_to_trim);
+
 }
 
+// Pick OS equivalent
 // x[1, length] = ""
 // x[-length, length] = ""
+
 io   var::cutter(const int length) {
 
 	THISIS("io   var::cutter(const int length)")
 	assertStringMutator(function_sig);
 
-	if (length >= 0 ) {
+	if (length >= 0) {
+		LIKELY
 
-		// Positive - cut first n chars. Erase from first char.
-		// Example "ab".cutter(0) , erase 0, return "ab"
-		// Example "ab".cutter(1) , erase 1, return "b"
-		// Example "ab".cutter(2) , erase 2, return ""
-		// Example "ab".cutter(3) , erase 3, return ""
-		var_str.erase(0, length);
+		// Positive or zero. Trim first n bytes
 
-	}
-	// warning: comparison of integer expressions of different signedness: ‘int’ and ‘std::__cxx11::basic_string<char>::size_t’ {aka ‘long unsigned int’} [-Wsign-compare]
-	else if (-length >= static_cast<int>(var_str.size())) {
+		if (static_cast<size_t>(length) >= var_str.length()) {
 
-		// Negative = cut last n chars. Erase from middle to end.
-		// Example "ab".cutter(-2) pos = -2 + 2 = erase_pos 0, return ""
-		// Example "ab".cutter(-3) pos = -3 + 2 = erase_pos -1, return ""
-		var_str.clear();
+			// Number of bytes to trim matches or exceeds string length.
+			// Example "ab".cutter(2) return ""
+			// Example "ab".cutter(3) return ""
+			var_str.clear();
+
+		} else {
+
+			// Example "ab".cutter(0) return "ab"
+			// Example "ab".cutter(1) return "b"
+			var_str.erase(0, length);
+		}
 
 	} else {
 
-		// Negative = cut last n chars. Erase from middle to end.
-		// Example "ab".cutter(-1) pos = -1 + 2 = erase_pos 1, return "a"
-		auto erase_pos = length + var_str.size();
-		var_str.erase(erase_pos, std::string::npos);
+		// Negative. Trim last n bytes
+
+		size_t nbytes_to_trim = static_cast<size_t>(-length);
+		if (nbytes_to_trim >= var_str.length()) {
+
+			// Number of bytes to trim matches or exceeds string length.
+			// Example "ab".cutter(-2) return ""
+			// Example "ab".cutter(-3) return ""
+			var_str.clear();
+
+		} else {
+
+			// Example "ab".cutter(-1) return "a"
+			var_str.erase(var_str.length() - nbytes_to_trim);
+		}
 	}
 
 	return *this;
 }
+
+// Old versions
+
+//// var[1,length] = ""         cut first n bytes
+//// var[-length, length] = ""  cut last n bytes
+//var  var::cut(const int length) const& {
+//
+//	THISIS("var  var::cut(const int length) const")
+//	assertString(function_sig);
+//
+//	var nrvo;
+//	nrvo.var_typ = VARTYP_STR;
+//
+//	// Assume var_str size is <= max int
+//
+//	if (length >= static_cast<int>(var_str.size())) {
+//		// Example "ab".cut(2) return ""
+//		// Example "ab".cut(3) return ""
+//		// return empty string
+//	}
+//
+//	else if (length >= 0) {
+//		// Positive - Copy from middle to end
+//		// Example "ab".cut(0) , append from pos 0, return "ab"
+//		// Example "ab".cut(1) , append from pos 1, return "b"
+//		nrvo.var_str.append(var_str, length, std::string::npos);
+//
+//	} else {
+//		// Negative = Copy first n chars
+//		// Example "ab".cut(-1) copyn = -1 + 2 = 1, return "a"
+//		// Example "ab".cut(-2) copyn = -2 + 2 = 0, return ""
+//		// Example "ab".cut(-3) copyn = -3 + 2 = -1, return ""
+//		auto copyn = length + static_cast<int>(var_str.size());
+//		if (copyn > 0)
+//			nrvo.var_str.append(var_str, 0, copyn);
+//	}
+//
+//	return nrvo;
+//}
+
+//// x[1, length] = ""
+//// x[-length, length] = ""
+//io   var::cutter(const int length) {
+//
+//	THISIS("io   var::cutter(const int length)")
+//	assertStringMutator(function_sig);
+//
+//	if (length >= 0 ) {
+//
+//		// Positive - cut first n chars. Erase from first char.
+//		// Example "ab".cutter(0) , erase 0, return "ab"
+//		// Example "ab".cutter(1) , erase 1, return "b"
+//		// Example "ab".cutter(2) , erase 2, return ""
+//		// Example "ab".cutter(3) , erase 3, return ""
+//		var_str.erase(0, length);
+//
+//	}
+//	// warning: comparison of integer expressions of different signedness: ‘int’ and ‘std::__cxx11::basic_string<char>::size_t’ {aka ‘long unsigned int’} [-Wsign-compare]
+//	else if (-length >= static_cast<int>(var_str.size())) {
+//
+//		// Negative = cut last n chars. Erase from middle to end.
+//		// Example "ab".cutter(-2) pos = -2 + 2 = erase_pos 0, return ""
+//		// Example "ab".cutter(-3) pos = -3 + 2 = erase_pos -1, return ""
+//		var_str.clear();
+//
+//	} else {
+//
+//		// Negative = cut last n chars. Erase from middle to end.
+//		// Example "ab".cutter(-1) pos = -1 + 2 = erase_pos 1, return "a"
+//		auto erase_pos = length + var_str.size();
+//		var_str.erase(erase_pos, std::string::npos);
+//	}
+//
+//	return *this;
+//}
 
 
 /////////
