@@ -1434,15 +1434,15 @@ function add_exodus_menubar() {
         var span = document.createElement('SPAN')
         span.id = 'exodus_menu'
         // menubar design
-        //span.style.backgroundColor = '#e3e3e3';
-        span.style.backgroundColor = '#f4f4f4';
+        //span.style.backgroundColor = '#f4f4f4';
+        span.style.backgroundColor = '#EEEEEE';
         span.style.color = 'black';           // Text color
         span.style.display = 'block';
         span.style.width = '100%';            // Span full width
         span.style.position = 'fixed';
         span.style.top = '0';                 // Align to the top
         span.style.left = '0';                // Align to the left
-//        span.style.zIndex = '100';            // Cannot be overlapped
+        //span.style.zIndex = '100';            // Cannot be overlapped
         span.style.padding = '5px 0';
         span.style.margin = '0';
         span.style.boxSizing = 'border-box';  // Ensure padding doesn't affect width

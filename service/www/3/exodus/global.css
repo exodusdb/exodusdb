@@ -205,9 +205,9 @@ H6
     /*font-size: inherit;*/
     font-size: 15px;
     position: absolute;
-    /*background-color: #F0F0F0;*/
-    background-color: #F4F4F4;
-    opacity: 0.97;
+    /*background-color: #F4F4F4;*/
+    background-color: #EEEEEE;
+    opacity: 0.98;
     /*color: black;*/
     color: #b0b0b0;
     /*border-width: 2px;*/
@@ -219,6 +219,7 @@ H6
     /*z-index: 999;*/
     padding-left: 3px;
     padding: 5px;
+    box-shadow: 5px 5px 1px rgba(0, 0, 0, 0.25);
 }
 
 .menuitem
