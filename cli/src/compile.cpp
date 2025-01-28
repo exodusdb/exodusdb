@@ -1586,10 +1586,20 @@ function main() {
 					if (not line.contains("#include"))
 						continue;
 
-					// Acquire include file date/time
-					let incfilename = incdir ^ OSSLASH ^ line.field("<", 2).field(">", 1);
-					let incfileinfo = osfile(incfilename);
+					let incfilename = line.field("<", 2).field(">", 1);
 
+					// TODO also handle include filename in quotes
+					if (incfilename)
+						continue;
+
+					// Acquire include file date/time
+					var incfileinfo = incdir ^ OSSLASH ^ osfile(incfilename);
+
+					// Also check system include dir
+					if (not incfileinfo)
+						incfileinfo = osfile("/usr/local/include/" ^ incfilename);
+
+					// Force compilation if include file is newer
 					if (incfileinfo) {
 						if (is_newer(incfileinfo, outfileinfo)) {
 							recompile_required = true;
