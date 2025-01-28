@@ -1435,7 +1435,7 @@ function add_exodus_menubar() {
         span.id = 'exodus_menu'
         // menubar design
         //span.style.backgroundColor = '#f4f4f4';
-        span.style.backgroundColor = '#EEEEEE';
+        span.style.backgroundColor = '#f0f0f0';
         span.style.color = 'black';           // Text color
         span.style.display = 'block';
         span.style.width = '100%';            // Span full width
@@ -4344,9 +4344,9 @@ function menuchangeoption(menu, newmenuoption) {
     //highlight new menu item
     //newmenuoption.style.backgroundColor='#d0d0d0'
 
-    newmenuoption.style.backgroundColor = 'highlight'
-    newmenuoption.style.color = 'highlighttext'
-
+    //newmenuoption.style.backgroundColor = 'highlight'
+    //newmenuoption.style.color = 'highlighttext'
+    newmenuoption.style.backgroundColor = 'lightgrey'
     //record new highlighted item in the menu
     menu.highlightedelement = newmenuoption
 

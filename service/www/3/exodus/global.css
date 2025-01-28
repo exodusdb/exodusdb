@@ -106,7 +106,7 @@ A:visited
 }
 A:hover
 {
-    text-decoration: underline;
+    /*text-decoration: underline;*/
 }
 
 
@@ -224,15 +224,16 @@ H6
 
 .menuitem
 {
-    border: thin;
+    /*border: thin;*/
     border-radius: 0.3rem;
     white-space: nowrap;
-    width: 100%;
+    /*width: 100%;*/
     box-sizing: border-box;
     color: black;
-    padding-left: 5px;
+    /*padding-left: 5px;*/
     padding: 5px; /*z-index: 999;*/ /*should be double the font-size programmatically*/
-    line-height: 16pt;
+    /*line-height: 16pt;*/
+    line-height: 18pt;
     cursor: pointer;
 }
 
@@ -291,8 +292,9 @@ H6
 }
 
 .menubutton:hover {
-    background-color: highlight;
-    color: highlighttext;
+    /*background-color: highlight;*/
+    /*color: highlighttext;*/
+    background-color: lightgrey;
 }
 
 
