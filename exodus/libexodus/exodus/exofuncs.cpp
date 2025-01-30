@@ -142,7 +142,7 @@ ND PUBLIC var  osshellread(in command) {var result = ""; if (not result.osshellr
 
 ND PUBLIC var  backtrace();
 
-   PUBLIC bool setxlocale(const char* locale) {return var(locale).setxlocale();}
+ND PUBLIC bool setxlocale(const char* locale) {return var(locale).setxlocale();}
 ND PUBLIC var  getxlocale() {return var().getxlocale();}
 
 // MATH
