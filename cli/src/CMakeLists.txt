@@ -78,6 +78,7 @@
 	add_executable(var2let var2let.cpp)
 	add_executable(redefine redefine.cpp)
 	add_executable(fire fire.cpp)
+	add_executable(gendoc gendoc.cpp)
 
 	#name is name only ... input and output files are exodus
 	add_executable(exodus-cli exodus.cpp)
@@ -139,6 +140,7 @@
 	target_link_libraries(var2let exodus stdc++fs ${LIBS})
 	target_link_libraries(redefine exodus stdc++fs ${LIBS})
 	target_link_libraries(fire exodus stdc++fs ${LIBS})
+	target_link_libraries(gendoc exodus stdc++fs ${LIBS})
 
 	# REQUIRED only for c++ module discovery
 	target_link_libraries(htmllib2 exodus ${LIBS})
@@ -187,6 +189,7 @@
 			var2let
 			redefine
 			fire
+			gendoc
 
 		DESTINATION
 			bin
