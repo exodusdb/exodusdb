@@ -68,7 +68,8 @@ static void addbacktraceline(in frameno, in sourcefilename, in lineno, io return
 		return;
 
 	// Change DOS/WIN and MAC line ends to lf only
-	filetext.replacer("\x0D\x0A", "\x0A").converter("\x0D", "\x0A");
+	filetext.replacer("\x0D\x0A", "\x0A");
+	filetext.converter("\x0D", "\x0A");
 
 	// Extract the source line
 	var line = filetext.field("\x0A", lineno).trimfirst(" \t");
@@ -275,7 +276,8 @@ var exo_backtrace(void* stack_addresses[BACKTRACE_MAXADDRESSES], std::size_t sta
 	// Handled automatically by unique_ptr
 	//::free(strings);
 
-	return returnlines.popper();
+	returnlines.popper();
+	return returnlines;
 
 }
 

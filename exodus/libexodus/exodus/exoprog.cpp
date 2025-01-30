@@ -211,9 +211,11 @@ bool ExodusProgramBase::select(in sortselectclause_or_filehandle) {
 
 		//reqivalues
 		if (op == "in" and ovalue.starts("(") and ovalue.ends(")")) {
-			ovalue.cutter(1).popper();
+			ovalue.cutter(1);
+			ovalue.popper();
 			ovalue.replacer("', '", VM);
-			ovalue.trimmerboth().unquoter();
+			ovalue.trimmerboth();
+			ovalue.unquoter();
 			//ovalue.convert(VM,"]").logputl("ovalue=");
 		}
 
@@ -281,10 +283,12 @@ bool ExodusProgramBase::select(in sortselectclause_or_filehandle) {
 
 	if (baseinsertsql.ends(",")) {
 
-		baseinsertsql.popper() ^= ")";
+		baseinsertsql.popper();
+		baseinsertsql ^= ")";
 		baseinsertsql ^= " VALUES (";
 
-		createtablesql.popper() ^= ")";
+		createtablesql.popper();
+		createtablesql ^= ")";
 		//createtablesql.logputl();
 
 		//clear the table in case we are reusing it
@@ -307,7 +311,7 @@ bool ExodusProgramBase::select(in sortselectclause_or_filehandle) {
 		bool allok = true;
 
 		//var id2 = MV ? (ID ^ "*" ^ MV) : ID;
-		var insertsql = baseinsertsql ^ ID.replacer("'", "''").squote() ^ ",";
+		var insertsql = baseinsertsql ^ ID.replace("'", "''").squote() ^ ",";
 
 		//some or all fields may have filters on them
 		//some or all fields may not have filters, if 'order by' calculated fields
@@ -428,7 +432,7 @@ bool ExodusProgramBase::select(in sortselectclause_or_filehandle) {
 			var ovalues;
 			if (sqltype == "DATE" || sqltype == "TIME" || sqltype == "TIMESTAMP") {
 				if (ivalues) {
-					ovalues = oconv(ivalues,ioconvs[fieldn]).squoter();
+					ovalues = oconv(ivalues,ioconvs[fieldn]).squote();
 				}
 				else
 					//ovalues = "nullptr";
@@ -436,7 +440,7 @@ bool ExodusProgramBase::select(in sortselectclause_or_filehandle) {
 			}
 			else {
 				//ivalueS (41472, 'Practical PostgreSQL', 1212, 4);
-				ovalues = ivalues.replace("'", "''").squoter();
+				ovalues = ivalues.replace("'", "''").squote();
 			}
 
 			insertsql ^= " " ^ ovalues ^ ",";
@@ -454,7 +458,8 @@ bool ExodusProgramBase::select(in sortselectclause_or_filehandle) {
 		// Replace final comma with a closing bracket and additional SQL
 		// Ignore any duplicates due to multivalues
 		// TODO insert stage2 records with MV as par of the key?
-		insertsql.popper() ^= ") ON CONFLICT (key) DO NOTHING";
+		insertsql.popper();
+		insertsql ^= ") ON CONFLICT (key) DO NOTHING";
 
 		//insertsql.logputl();
 
@@ -497,7 +502,8 @@ bool ExodusProgramBase::formlist(in filename_or_command, in keys /*=""*/, const 
 	var filename2 = filename_or_command;
 	if (filename2.ends(")")) {
 		var options = filename2.field2(" ", -1);
-		filename2.cutter(-options.len()).trimmerlast();
+		filename2.cutter(-options.len());
+		filename2.trimmerlast();
 	}
 
 	//optionally get keys from filename or command
@@ -662,7 +668,8 @@ void ExodusProgramBase::mssg(in msg, in options, io buffer, in params) const {
 	for (var ii = 1; ii <= 9; ++ii)
 		msg1.replacer("%" ^ ii, params.f(ii));
 
-	msg1.converter(_FM _VM "|", "\n\n\n").trimmer("\n");
+	msg1.converter(_FM _VM "|", "\n\n\n");
+	msg1.trimmer("\n");
 
 	std::cout << msg1 << std::endl;
 
@@ -1205,7 +1212,8 @@ var ExodusProgramBase::perform(in sentence) {
 			// Remove last field of COMMAND. TODO fpopper command or remover(-1)?
 			COMMAND.cutter(-OPTIONS.len() - 1);
 			// Remove first { or ( and last ) } chars of OPTIONS
-			OPTIONS.cutter(1).popper();
+			OPTIONS.cutter(1);
+			OPTIONS.popper();
 		} else {
 			OPTIONS = "";
 		}
@@ -1979,7 +1987,7 @@ bool ExodusProgramBase::loginnet(in /*dataset*/, in username, io cookie, io msg)
 				menu = FM ^ FM ^ FM ^ FM ^ FM ^
 					   "MEDIA|ADPRODUCTION|ACCS|ANALMENU|TIMESHEETS|FILESMENU|"
 					   "GENERAL|EXIT2";
-				menu = menu.converter("|", VM);
+				menu.converter("|", VM);
 			}
 		}
 	}
