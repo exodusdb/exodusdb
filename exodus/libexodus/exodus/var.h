@@ -485,17 +485,17 @@ public:
 	ND io   squote() &&;
 	ND io   unquote() &&;
 
-	ND io   trim(SV trimchars DEFAULT_SPACE) &&;
-	ND io   trimfirst(SV trimchars DEFAULT_SPACE) &&;
-	ND io   trimlast(SV trimchars DEFAULT_SPACE) &&;
-	ND io   trimboth(SV trimchars DEFAULT_SPACE) &&;
+	ND io   trim(SV trimchars = " ") &&;
+	ND io   trimfirst(SV trimchars = " ") &&;
+	ND io   trimlast(SV trimchars = " ") &&;
+	ND io   trimboth(SV trimchars = " ") &&;
 
 	ND io   first() &&;
 	ND io   last() &&;
 	ND io   first(const std::size_t length) &&;
 	ND io   last(const std::size_t length) &&;
 	ND io   cut(const int length) &&;
-	ND io   paste(const int pos1, const int length, SV insertstr) &&;
+	ND io   paste(const int pos1, const int length, SV replacestr) &&;
 	ND io   paste(const int pos1, SV insertstr) &&;
 	ND io   prefix(SV insertstr) &&;
 //	ND io   append(SV appendstr) &&;
@@ -509,7 +509,7 @@ public:
 	ND io   textconvert(SV fromchars, SV tochars) &&;
 	ND io   replace(const rex& regex, SV tostr) &&;
 	ND io   replace(SV fromstr, SV tostr) &&;
-//	ND io   regex_replace(SV regex, SV replacement, SV regex_options DEFAULT_EMPTY) &&;
+//	ND io   regex_replace(SV regex, SV replacement, SV regex_options = "") &&;
 
 	ND io   unique() &&;
 	ND io   sort(SV sepchar = _FM) &&;

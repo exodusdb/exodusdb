@@ -634,12 +634,12 @@ var  var::trim(SV trimchars DEFAULT_SPACE) const& {
 }
 
 // Mutate
-io   var::trimmer(SV trimchars DEFAULT_SPACE) {
+IO   var::trimmer(SV trimchars DEFAULT_SPACE) REF {
 
 	// TODO reimplement with boost string trim_if algorithm
 	// http://www.boost.org/doc/libs/1_39_0/doc/html/string_algo/reference.html
 
-	THISIS("io   var::trimmer(SV trimchars)")
+	THISIS("void var::trimmer(SV trimchars) &")
 	assertStringMutator(function_sig);
 
 //	trimmerlast_helper(var_str, trimchars);
@@ -648,7 +648,7 @@ io   var::trimmer(SV trimchars DEFAULT_SPACE) {
 //	trimmerinner_helper(var_str, trimchars);
 	boost::algorithm::trim_all_if(var_str, boost::algorithm::is_any_of(trimchars));
 
-	return *this;
+	return THIS;
 }
 
 // trimfirst - remove leading/left bytes
@@ -663,14 +663,14 @@ var  var::trimfirst(SV trimchars DEFAULT_SPACE) const& {
 }
 
 // Mutate
-io   var::trimmerfirst(SV trimchars DEFAULT_SPACE) {
+IO   var::trimmerfirst(SV trimchars DEFAULT_SPACE) REF {
 
-	THISIS("io   var::trimmerfirst(SV trimchars)")
+	THISIS("void var::trimmerfirst(SV trimchars) &")
 	assertStringMutator(function_sig);
 
 	boost::algorithm::trim_left_if(var_str, boost::algorithm::is_any_of(trimchars));
 
-	return *this;
+	return THIS;
 }
 
 // trimlast() - trim trailing/right bytes
@@ -685,15 +685,15 @@ var  var::trimlast(SV trimchars DEFAULT_SPACE) const& {
 }
 
 // Mutate
-io   var::trimmerlast(SV trimchars DEFAULT_SPACE) {
+IO   var::trimmerlast(SV trimchars DEFAULT_SPACE) REF {
 
-	THISIS("io   var::trimmerlast(SV trimchars)")
+	THISIS("void var::trimmerlast(SV trimchars) &")
 	assertStringMutator(function_sig);
 
 	//trimmerlast_helper(var_str, trimchars);
 	boost::algorithm::trim_right_if(var_str, boost::algorithm::is_any_of(trimchars));
 
-	return *this;
+	return THIS;
 }
 
 //trimboth() - remove leading and trailing spaces/characters but not inner
@@ -708,22 +708,22 @@ var  var::trimboth(SV trimchars DEFAULT_SPACE) const& {
 }
 
 // Mutate
-io   var::trimmerboth(SV trimchars DEFAULT_SPACE) {
+IO   var::trimmerboth(SV trimchars DEFAULT_SPACE) REF {
 
-	THISIS("io   var::trimmerboth(SV trimchars)")
+	THISIS("void var::trimmerboth(SV trimchars) &")
 	assertStringMutator(function_sig);
 
 	boost::algorithm::trim_if(var_str, boost::algorithm::is_any_of(trimchars));
 
-	return *this;
+	return THIS;
 }
 
 // invert() - inverts lower 8 bits of UTF8 codepoints (not bytes)
 
 // Mutate
-io   var::inverter() {
+IO   var::inverter() REF {
 
-	THISIS("io   var::inverter()")
+	THISIS("void var::inverter() &")
 	assertStringMutator(function_sig);
 
 	// xor each unicode code point, with the bits we want to toggle ... ie the bottom 8
@@ -743,7 +743,7 @@ io   var::inverter() {
 	//this->from_u32string(u32_str1);
 	*this = var(u32_str1);
 
-	return *this;
+	return THIS;
 }
 
 // ucase() - upper case
@@ -819,9 +819,9 @@ var  var::ucase() const& {
 }
 
 // Mutate
-io   var::ucaser() {
+IO   var::ucaser() REF {
 
-	THISIS("io   var::ucaser()")
+	THISIS("void var::ucaser() &")
 	assertStringMutator(function_sig);
 
 #define EXO_ULCASE_TRY_ASCII
@@ -888,7 +888,7 @@ io   var::ucaser() {
 		}
 	}
 	if (allASCII)
-		return *this;
+		return THIS;
 #endif
 
 	// ~6ms! For very first call for non-ASCII string ucaser or lcaser
@@ -910,15 +910,15 @@ io   var::ucaser() {
 	// 4.0 ns/char lcase
 //	boost::algorithm::to_upper(var_str, thread_boost_locale1);
 
-	return *this;
+	return THIS;
 }
 
 // lcase() - lower case
 
 // Mutate
-io   var::lcaser() {
+IO   var::lcaser() REF {
 
-	THISIS("io   var::lcaser()")
+	THISIS("void var::lcaser() &")
 	assertStringMutator(function_sig);
 
 	// For comments, see ucaser above.
@@ -939,7 +939,7 @@ io   var::lcaser() {
 
 	}
 	if (allASCII)
-		return *this;
+		return THIS;
 #endif
 
 	init_boost_locale1();
@@ -947,16 +947,16 @@ io   var::lcaser() {
 	var_str = boost::locale::to_lower(var_str, thread_boost_locale1);
 //	boost::algorithm::to_lower(var_str, thread_boost_locale1);
 
-	return *this;
+	return THIS;
 }
 
 
 // tcase() - title case
 
 // Mutate
-io   var::tcaser() {
+IO   var::tcaser() REF {
 
-	THISIS("io   var::tcaser()")
+	THISIS("void var::tcaser() &")
 	assertStringMutator(function_sig);
 	//assertString(function_sig);
 
@@ -972,7 +972,7 @@ io   var::tcaser() {
 
 	var_str = boost::locale::to_title(var_str, thread_boost_locale1);
 
-	return *this;
+	return THIS;
 }
 
 
@@ -989,9 +989,9 @@ io   var::tcaser() {
 // where the letter "ß" is represented in case independent way as "ss".
 
 // Mutate
-io   var::fcaser() {
+IO   var::fcaser() REF {
 
-	THISIS("io   var::fcaser()")
+	THISIS("void var::fcaser() &")
 	assertStringMutator(function_sig);
 	//assertString(function_sig);
 
@@ -999,7 +999,7 @@ io   var::fcaser() {
 
 	var_str = boost::locale::fold_case(var_str, thread_boost_locale1);
 
-	return *this;
+	return THIS;
 }
 
 // *** USED TO NORMALISE ALL KEYS BEFORE READING OR WRITING ***
@@ -1016,15 +1016,15 @@ io   var::fcaser() {
 // it must remain normalized under all future versions of Unicode."
 
 // Mutate
-io   var::normalizer() {
+IO   var::normalizer() REF {
 
-	THISIS("io   var::normalizer()")
+	THISIS("void var::normalizer() &")
 	assertStringMutator(function_sig);
 	//assertString(function_sig);
 
 	// optimise for ASCII which needs no normalisation
 	if (sv_is_ASCII(var_str))
-		return (*this);
+		return THIS;
 
 	init_boost_locale1();
 
@@ -1035,16 +1035,16 @@ io   var::normalizer() {
 	// norm_nfc
 	var_str = boost::locale::normalize(var_str, boost::locale::norm_nfc, thread_boost_locale1);
 
-	return *this;
+	return THIS;
 }
 
 
 // There is no memory or performance advantage for mutable call, only a consistent syntax for user
 
 // Mutate
-io   var::uniquer() {
+IO   var::uniquer() REF {
 	*this = this->unique();
-	return *this;
+	return THIS;
 }
 
 // Constant
@@ -1160,16 +1160,16 @@ var var::quote() const& {
 }
 
 // Mutate
-io   var::quoter() {
+IO   var::quoter() REF {
 
-	THISIS("io   var::quoter()")
+	THISIS("void var::quoter() &")
 	assertStringMutator(function_sig);
 
 	// Use std::string "replace" to insert
 	var_str.replace(0, 0, _DQ);
 	var_str.push_back(DQ_);
 
-	return *this;
+	return THIS;
 }
 
 
@@ -1191,16 +1191,16 @@ var  var::squote() const& {
 }
 
 // Mutate
-io   var::squoter() {
+IO   var::squoter() REF {
 
-	THISIS("io   var::squoter()")
+	THISIS("void var::squoter() &")
 	assertStringMutator(function_sig);
 
 	// std::string "replace" to insert
 	var_str.replace(0, 0, _SQ);
 	var_str.push_back('\'');
 
-	return *this;
+	return THIS;
 }
 
 
@@ -1251,9 +1251,9 @@ return_this:
 }
 
 // Mutate
-io   var::unquoter() {
+IO   var::unquoter() REF {
 
-	THISIS("io   var::unquoter()")
+	THISIS("void var::unquoter() &")
 	assertStringMutator(function_sig);
 
 	// removes MATCHING beginning and terminating " or ' characters
@@ -1263,24 +1263,24 @@ io   var::unquoter() {
 	// no change if no length
 	std::size_t len = var_str.size();
 	if (len < 2)
-		return *this;
+		return THIS;
 
 	char char0 = var_str[0];
 
 	// no change if not starting " or '
 	if (char0 != '\"' && char0 != '\'')
-		return *this;
+		return THIS;
 
 	// no change if terminating character ne starting character
 	if (var_str[len - 1] != char0)
-		return *this;
+		return THIS;
 
 	// erase first (and last character if more than one)
 	var_str.erase(0, 1);
 	if (len)
 		var_str.erase(len - 2, 1);
 
-	return *this;
+	return THIS;
 }
 
 
@@ -1291,9 +1291,9 @@ io   var::unquoter() {
 // 1. paste replace
 
 // Mutate
-io   var::paster(const int pos1, const int length, SV insertstr) {
+IO   var::paster(const int pos1, const int length, SV replacestr) REF {
 
-	THISIS("io   var::paster(const int pos1, const int length, SV insertstr)")
+	THISIS("void var::paster(const int pos1, const int length, SV replacestr) &")
 	assertStringMutator(function_sig);
 	//ISSTRING(insertstr)
 
@@ -1345,15 +1345,15 @@ io   var::paster(const int pos1, const int length, SV insertstr) {
 
 	if (static_cast<unsigned int>(start0) >= var_str.size()) {
 		//if (newstr.var_str.size())
-			var_str += insertstr;
+			var_str += replacestr;
 	} else {
-		//if (insertstr.var_str.size())
-			var_str.replace(start0, lengthb, insertstr);
+		//if (replacestr.var_str.size())
+			var_str.replace(start0, lengthb, replacestr);
 		//else
 		//	var_str.erase(start0,lengthb);
 	}
 
-	return *this;
+	return THIS;
 }
 //
 //// 2. paste over to end
@@ -1393,9 +1393,9 @@ io   var::paster(const int pos1, const int length, SV insertstr) {
 // 3. paste insert at
 
 // Mutate
-io   var::paster(const int pos1, SV insertstr) {
+IO   var::paster(const int pos1, SV insertstr) REF {
 
-	THISIS("io   var::paster(const int pos1, SV insertstr)")
+	THISIS("void var::paster(const int pos1, SV insertstr) &")
 	assertStringMutator(function_sig);
 	//ISSTRING(insertstr)
 
@@ -1425,7 +1425,7 @@ io   var::paster(const int pos1, SV insertstr) {
 		// abc(0, x) -> xabc
 		var_str.insert(0, insertstr);
 
-	return *this;
+	return THIS;
 }
 
 /////////
@@ -1446,14 +1446,14 @@ var  var::prefix(SV insertstr) const& {
 }
 
 // Mutate
-io   var::prefixer(SV insertstr) {
+IO   var::prefixer(SV prefixstr) REF {
 
-	THISIS("io   var::prefixer(SV insertstr)")
+	THISIS("void var::prefixer(SV prefixstr) &")
 	assertStringMutator(function_sig);
 
-	var_str.insert(0, insertstr);
+	var_str.insert(0, prefixstr);
 
-	return *this;
+	return THIS;
 }
 
 
@@ -1462,15 +1462,15 @@ io   var::prefixer(SV insertstr) {
 //////
 
 // Mutate
-io   var::popper() {
+IO   var::popper() REF {
 
-	THISIS("io   var::popper()")
+	THISIS("void var::popper() &")
 	assertStringMutator(function_sig);
 
 	if (!var_str.empty())
 		var_str.pop_back();
 
-	return *this;
+	return THIS;
 }
 
 
@@ -1592,9 +1592,9 @@ var  var::space() const {
 //crop() - Remove superfluous FM, VM. e.g. VM before FM etc.
 
 // Mutate
-io   var::cropper() {
+IO   var::cropper() REF {
 
-	THISIS("io   var::cropper()")
+	THISIS("void var::cropper() &")
 	assertStringMutator(function_sig);
 
 	auto cur_iter = var_str.begin();
@@ -1642,16 +1642,16 @@ io   var::cropper() {
 	else
 		var_str.resize(last_not_fm + 1);
 
-	return *this;
+	return THIS;
 }
 
 
 // lower() drops FM to VM, VM to SM etc.
 
 // Mutate
-io   var::lowerer() {
+IO   var::lowerer() REF {
 
-	THISIS("io   var::lowerer()")
+	THISIS("void var::lowerer() &")
 	assertStringMutator(function_sig);
 	//assertString(function_sig);
 
@@ -1682,15 +1682,15 @@ io   var::lowerer() {
 			c -=1;
 	}
 
-	return *this;
+	return THIS;
 }
 
 // raise() lifts VM to FM, SM to VM etc.
 
 // Mutate
-io   var::raiser() {
+IO   var::raiser() REF {
 
-	THISIS("io   var::raiser()")
+	THISIS("void var::raiser() &")
 	assertStringMutator(function_sig);
 	//assertString(function_sig);
 
@@ -1722,7 +1722,7 @@ io   var::raiser() {
 			c +=1;
 	}
 
-	return *this;
+	return THIS;
 }
 
 
@@ -1731,23 +1731,23 @@ io   var::raiser() {
 //var  var::convert(in fromchars, in tochars) const& {
 
 // Mutate
-//io   var::converter(in fromchars, in tochars) {
-io   var::converter(SV fromchars, SV tochars) {
+//io   var::converter(in fromchars, in tochars) & {
+IO   var::converter(SV fromchars, SV tochars) REF {
 
-	THISIS("io   var::converter(SV fromchars, SV tochars)")
+	THISIS("void var::converter(SV fromchars, SV tochars) &")
 	assertStringMutator(function_sig);
 
 	//string_converter(var_str, fromchars.var_str, tochars.var_str);
 	string_converter(var_str, fromchars, tochars);
 
-	return *this;
+	return THIS;
 }
 
 
 //// Mutate for const char*
-//io   var::converter(const char* fromchars, const char* tochars) {
+//io   var::converter(const char* fromchars, const char* tochars) & {
 //
-//	THISIS("io   var::converter(const char* fromchars, const char* tochars)")
+//	THISIS("void var::converter(const char* fromchars, const char* tochars) &")
 //	assertStringMutator(function_sig);
 //
 //	string_converter(var_str, std::string(fromchars), std::string(tochars));
@@ -1756,9 +1756,9 @@ io   var::converter(SV fromchars, SV tochars) {
 //}
 
 // Mutate
-io   var::textconverter(SV fromchars, SV tochars) {
+IO   var::textconverter(SV fromchars, SV tochars) REF {
 
-	THISIS("io   var::converter(in fromchars, in tochars)")
+	THISIS("void var::converter(in fromchars, in tochars) &")
 	assertStringMutator(function_sig);
 
 	// all ASCII -> bytewise conversion for speed
@@ -1785,16 +1785,16 @@ io   var::textconverter(SV fromchars, SV tochars) {
 		//this->from_u32string(u32_str1);
 		*this = var(u32_str1);
 	}
-	return *this;
+	return THIS;
 }
 
 // parse() - replaces seps with FMs except inside double and single quotes. Backslash escapes.
 
 
 // Mutate
-io   var::parser(char sepchar) {
+IO   var::parser(char sepchar) REF {
 
-	THISIS("io   var::parser(char sepchar)")
+	THISIS("void var::parser(char sepchar) &")
 	assertStringMutator(function_sig);
 
 //	//std::string s = "abc 'def gh'qwe";
@@ -1804,7 +1804,7 @@ io   var::parser(char sepchar) {
 
 	std::size_t len = var_str.size();
 	if (!len)
-		return *this;
+		return THIS;
 
 	// The following bytes can be escaped so spaces, double and single quotes are ignored
 	std::size_t pos = 0;
@@ -2224,81 +2224,81 @@ var  var::numberinwords(in langname_or_locale_id) {
 
 // Many of the non-mutating functions are forwarded with a clone to the mutating function
 
-//var  var::ucase()                               const& {return this->clone().ucaser();}
-var  var::lcase()                               const& {return this->clone().lcaser();}
-var  var::tcase()                               const& {return this->clone().tcaser();}
-var  var::fcase()                               const& {return this->clone().fcaser();}
-var  var::normalize()                           const& {return this->clone().normalizer();}
-var  var::invert()                              const& {return this->clone().inverter();}
+//var  var::ucase()                               const& {var nrvo = this->clone(); nrvo.ucaser(); return nrvo;}
+var  var::lcase()                               const& {var nrvo = this->clone(); nrvo.lcaser(); return nrvo;}
+var  var::tcase()                               const& {var nrvo = this->clone(); nrvo.tcaser(); return nrvo;}
+var  var::fcase()                               const& {var nrvo = this->clone(); nrvo.fcaser(); return nrvo;}
+var  var::normalize()                           const& {var nrvo = this->clone(); nrvo.normalizer(); return nrvo;}
+var  var::invert()                              const& {var nrvo = this->clone(); nrvo.inverter(); return nrvo;}
 
-var  var::lower()                               const& {return this->clone().lowerer();}
-var  var::raise()                               const& {return this->clone().raiser();}
-var  var::crop()                                const& {return this->clone().cropper();}
+var  var::lower()                               const& {var nrvo = this->clone(); nrvo.lowerer(); return nrvo;}
+var  var::raise()                               const& {var nrvo = this->clone(); nrvo.raiser(); return nrvo;}
+var  var::crop()                                const& {var nrvo = this->clone(); nrvo.cropper(); return nrvo;}
 
-//var  var::quote()                               const& {return this->clone().quoter();}
-//var  var::squote()                              const& {return this->clone().squoter();}
-//var  var::unquote()                             const& {return this->clone().unquoter();}
+//var  var::quote()                               const& {var nrvo = this->clone(); nrvo.quoter(); return nrvo;}
+//var  var::squote()                              const& {var nrvo = this->clone(); nrvo.squoter(); return nrvo;}
+//var  var::unquote()                             const& {var nrvo = this->clone(); nrvo.unquoter(); return nrvo;}
 
-var  var::convert(SV fromchars, SV tochars)     const& {return this->clone().converter(fromchars,tochars);}
-var  var::textconvert(SV fromchars, SV tochars) const& {return this->clone().textconverter(fromchars,tochars);}
-var  var::parse(char sepchar)                   const& {return this->clone().parser(sepchar);}
+var  var::convert(SV fromchars, SV tochars)     const& {var nrvo = this->clone(); nrvo.converter(fromchars,tochars); return nrvo;}
+var  var::textconvert(SV fromchars, SV tochars) const& {var nrvo = this->clone(); nrvo.textconverter(fromchars,tochars); return nrvo;}
+var  var::parse(char sepchar)                   const& {var nrvo = this->clone(); nrvo.parser(sepchar); return nrvo;}
 
-var  var::pop()                                 const& {return this->clone().popper();}
+var  var::pop()                                 const& {var nrvo = this->clone(); nrvo.popper(); return nrvo;}
 
-var  var::paste(const int pos1, const int length, SV insertstr)
-                                               const& {return this->clone().paster(pos1, length, insertstr);}
-var  var::paste(const int pos1, SV insertstr)   const& {return this->clone().paster(pos1, insertstr);}
+var  var::paste(const int pos1, const int length, SV replacestr)
+                                               const& {var nrvo = this->clone(); nrvo.paster(pos1, length, replacestr); return nrvo;}
+var  var::paste(const int pos1, SV insertstr)   const& {var nrvo = this->clone(); nrvo.paster(pos1, insertstr); return nrvo;}
 
 // on temporaries the mutator function is called to avoid creating a temporary in many cases
 
-ND io   var::ucase()                                   && {return ucaser();}
-ND io   var::lcase()                                   && {return lcaser();}
-ND io   var::tcase()                                   && {return tcaser();}
-ND io   var::fcase()                                   && {return fcaser();}
-ND io   var::normalize()                               && {return normalizer();}
-ND io   var::invert()                                  && {return inverter();}
+ND io   var::ucase()                                   && {ucaser(); return *this;}
+ND io   var::lcase()                                   && {lcaser(); return *this;}
+ND io   var::tcase()                                   && {tcaser(); return *this;}
+ND io   var::fcase()                                   && {fcaser(); return *this;}
+ND io   var::normalize()                               && {normalizer(); return *this;}
+ND io   var::invert()                                  && {inverter(); return *this;}
 
-ND io   var::lower()                                   && {return lowerer();}
-ND io   var::raise()                                   && {return raiser();}
-ND io   var::crop()                                    && {return cropper();}
+ND io   var::lower()                                   && {lowerer(); return *this;}
+ND io   var::raise()                                   && {raiser(); return *this;}
+ND io   var::crop()                                    && {cropper(); return *this;}
 
-ND io   var::quote()                                   && {return quoter();}
-ND io   var::squote()                                  && {return squoter();}
-ND io   var::unquote()                                 && {return unquoter();}
+ND io   var::quote()                                   && {quoter(); return *this;}
+ND io   var::squote()                                  && {squoter(); return *this;}
+ND io   var::unquote()                                 && {unquoter(); return *this;}
 
-ND io   var::trim(     SV trimchars DEFAULT_SPACE)     && {return trimmer(trimchars);}
-ND io   var::trimfirst(SV trimchars DEFAULT_SPACE)     && {return trimmerfirst(trimchars);}
-ND io   var::trimlast( SV trimchars DEFAULT_SPACE)     && {return trimmerlast(trimchars);}
-ND io   var::trimboth( SV trimchars DEFAULT_SPACE)     && {return trimmerboth(trimchars);}
+ND io   var::trim(     SV trimchars DEFAULT_SPACE)     && {trimmer(trimchars); return *this;}
+ND io   var::trimfirst(SV trimchars DEFAULT_SPACE)     && {trimmerfirst(trimchars); return *this;}
+ND io   var::trimlast( SV trimchars DEFAULT_SPACE)     && {trimmerlast(trimchars); return *this;}
+ND io   var::trimboth( SV trimchars DEFAULT_SPACE)     && {trimmerboth(trimchars); return *this;}
 
-ND io   var::first()                                   && {return firster();}
-ND io   var::last()                                    && {return laster();}
-ND io   var::first(const std::size_t length)           && {return firster(length);}
-ND io   var::last( const std::size_t length)           && {return laster(length);}
-ND io   var::cut(  const int    length)                && {return cutter(length);}
+ND io   var::first()                                   && {firster(); return *this;}
+ND io   var::last()                                    && {laster(); return *this;}
+ND io   var::first(const std::size_t length)           && {firster(length); return *this;}
+ND io   var::last( const std::size_t length)           && {laster(length); return *this;}
+ND io   var::cut(  const int    length)                && {cutter(length); return *this;}
 ND io   var::paste(const int    pos1, const int length,
-                                        SV insertstr)    && {return paster(pos1, length, insertstr);}
-ND io   var::paste(const int    pos1, SV insertstr)    && {return paster(pos1, insertstr);}
-ND io   var::prefix(                  SV insertstr)    && {return prefixer(insertstr);}
-//ND io append(SV appendstr)                         && {return appender(appendstr);}
-ND io   var::pop()                                     && {return popper();}
+                                        SV replacestr) && {paster(pos1, length, replacestr); return *this;}
+ND io   var::paste(const int    pos1, SV insertstr)    && {paster(pos1, insertstr); return *this;}
+ND io   var::prefix(                  SV prefixstr)    && {prefixer(prefixstr); return *this;}
+//ND io append(SV appendstr)                         && {appender(appendstr); return *this;}
+ND io   var::pop()                                     && {popper(); return *this;}
 
 ND io   var::fieldstore(SV sepchar, const int fieldno, const int nfields, in replacement)
-                                                         && {return fieldstorer(sepchar, fieldno, nfields, replacement);}
+                                                       && {fieldstorer(sepchar, fieldno, nfields, replacement); return *this;}
 
-ND io   var::substr(const int pos1, const int length)  && {return substrer(pos1, length);}
-ND io   var::substr(const int pos1)                    && {return substrer(pos1);}
+ND io   var::substr(const int pos1, const int length)  && {substrer(pos1, length); return *this;}
+ND io   var::substr(const int pos1)                    && {substrer(pos1); return *this;}
 
-ND io   var::convert(    SV fromchars, SV tochars)     && {return converter(fromchars, tochars);}
-ND io   var::textconvert(SV fromchars, SV tochars)     && {return textconverter(fromchars, tochars);}
-ND io   var::replace(    SV fromstr,   SV tostr)       && {return replacer(fromstr, tostr);}
-ND io   var::replace(const rex& regex, SV replacement) && {return replacer(regex, replacement);}
+ND io   var::convert(    SV fromchars, SV tochars)     && {this->converter(fromchars, tochars); return *this;}
+ND io   var::textconvert(SV fromchars, SV tochars)     && {textconverter(fromchars, tochars); return *this;}
+ND io   var::replace(    SV fromstr,   SV tostr)       && {replacer(fromstr, tostr); return *this;}
+ND io   var::replace(const rex& regex, SV replacement) && {replacer(regex, replacement); return *this;}
 
-ND io   var::unique()                                  && {return uniquer();}
-ND io   var::sort(   SV sepchar DEFAULT_FM)            && {return sorter(sepchar);}
-ND io   var::reverse(SV sepchar DEFAULT_FM)            && {return reverser(sepchar);}
-ND io   var::shuffle(SV sepchar DEFAULT_FM)            && {return shuffler(sepchar);}
-ND io   var::parse(char sepchar DEFAULT_FM)            && {return parser(sepchar);}
+ND io   var::unique()                                  && {uniquer(); return *this;}
+ND io   var::sort(   SV sepchar DEFAULT_FM)            && {sorter(sepchar); return *this;}
+ND io   var::reverse(SV sepchar DEFAULT_FM)            && {reverser(sepchar); return *this;}
+ND io   var::shuffle(SV sepchar DEFAULT_FM)            && {shuffler(sepchar); return *this;}
+ND io   var::parse(char sepchar DEFAULT_FM)            && {parser(sepchar); return *this;}
 
 // clang-format on
 

@@ -1,10 +1,11 @@
 
 // Similar code in three files. Use editor in parallel to keep in sync.
 // nano varreplacer.cpp varinserter.cpp varremover.cpp
+// alt+, and alt+. to switch file in nano
 
-io   var::remover(int fieldno, int valueno, int subvalueno) {
+IO   var::remover(int fieldno, int valueno, int subvalueno) REF {
 
-	THISIS("io   var::remover(int fieldno, int valueno, int subvalueno)")
+	THISIS("void var::remover(int fieldno, int valueno, int subvalueno) &")
 	assertStringMutator(function_sig);
 
 
@@ -16,7 +17,7 @@ io   var::remover(int fieldno, int valueno, int subvalueno) {
 		var_str.clear();
 		var_typ = VARTYP_STR;
 
-		return *this;
+		return THIS;
 	}
 
 	/////////////   FIND FIELD  /////////////////
@@ -27,7 +28,7 @@ io   var::remover(int fieldno, int valueno, int subvalueno) {
 
 	// negative means remove nothing
 	if (fieldno < 0) {
-		return *this;
+		return THIS;
 
 
 
@@ -51,7 +52,7 @@ io   var::remover(int fieldno, int valueno, int subvalueno) {
 
 
 
-				return *this;
+				return THIS;
 			}
 			pos++;
 			fieldn2++;
@@ -73,7 +74,7 @@ io   var::remover(int fieldno, int valueno, int subvalueno) {
 
 	// zero means remove all values, negative means remove nothing
 	if (valueno < 0) {
-		return *this;
+		return THIS;
 
 
 
@@ -88,7 +89,7 @@ io   var::remover(int fieldno, int valueno, int subvalueno) {
 			field_end_pos++;
 
 		var_str.erase(pos, field_end_pos - pos);
-		return *this;
+		return THIS;
 
 	} else {
 
@@ -106,7 +107,7 @@ io   var::remover(int fieldno, int valueno, int subvalueno) {
 
 
 
-				return *this;
+				return THIS;
 			}
 			pos++;
 			valuen2++;
@@ -131,7 +132,7 @@ io   var::remover(int fieldno, int valueno, int subvalueno) {
 
 
 
-		return *this;
+		return THIS;
 
 	} else if (subvalueno == 0) {
 
@@ -141,7 +142,7 @@ io   var::remover(int fieldno, int valueno, int subvalueno) {
 			value_end_pos++;
 
 		var_str.erase(pos, value_end_pos - pos);
-		return *this;
+		return THIS;
 
 	} else {
 		// find the starting position of the subvalue or quit
@@ -153,7 +154,7 @@ io   var::remover(int fieldno, int valueno, int subvalueno) {
 //			if (pos >= value_end_pos || pos == std::string::npos) {
 			if (pos >= value_end_pos) {
 
-				return *this;
+				return THIS;
 
 
 
@@ -181,5 +182,5 @@ io   var::remover(int fieldno, int valueno, int subvalueno) {
 
 	var_str.erase(pos, subvalue_end_pos - pos);
 
-	return *this;
+	return THIS;
 }
