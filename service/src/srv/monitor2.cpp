@@ -187,7 +187,8 @@ function main() {
 	if (not hostid) {
 		hostid = SYSTEM.f(44);
 	}
-	hostid.trimmer().lcaser();
+	hostid.trimmer();
+	hostid.lcaser();
 
 	installid = SYSTEM.f(139) ^ hostid ^ "_" ^ cidx;
 

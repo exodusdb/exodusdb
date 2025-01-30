@@ -97,7 +97,8 @@ subroutine definemacro() {
 
 subroutine writedict() {
 
-	block.lowerer().trimmerlast(VM);
+	block.lowerer();
+	block.trimmerlast(VM);
 
 	if (not block.contains("function main()"))
 		block ^= VM ^ "\treturn ANS;";

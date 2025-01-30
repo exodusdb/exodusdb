@@ -349,7 +349,8 @@ function main(in mode, in request, in tempfilename, out datax, out msg) {
 
 		// catches option errors
 		if (errors) {
-			errors.converter("\r\n", _FM _FM).trimmer(_FM);
+			errors.converter("\r\n", _FM _FM);
+			errors.trimmer(_FM);
 			call note(trim(errors, _FM));
 		}
 
@@ -441,7 +442,8 @@ subroutine getlog(in logfilename, in cleanup, out log) {
 				loglasterror();
 			}
 		}
-		log.converter("\r\n", _FM _FM).trimmer(_FM);
+		log.converter("\r\n", _FM _FM);
+		log.trimmer(_FM);
 		log.replacer("<br />", _FM);
 		log = trim(log, _FM);
 		log = field2(log, _FM, -1);
