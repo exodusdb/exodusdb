@@ -8,7 +8,7 @@ function main() {
 	// SENTENCE
 	// waiting filepattern seconds milliseconds globalend newfilename newfilepath portno?
 	// eg for a database called devdtest and process 3
-	// waiting ../data/devdtest/*.1 10 10 ../../global.end neos0000.3 ../data/devdtest/ 5700
+	// waiting ../data/devdtest/ *.1 10 10 ../../global.end neos0000.3 ../data/devdtest/ 5700
 	// printl(SENTENCE);
 	let filepattern			= field(SENTENCE, " ", 2);
 	let waitsecs			= field(SENTENCE, " ", 3);
@@ -49,7 +49,9 @@ function main() {
 
 		// oswait doesnt support file pattern yet
 		// printl(++n , " ", oswaitsecs," ", remainingsecs);
-		var().oswait(oswaitsecs * 1000, field(filepattern, "*", 1));
+		// TODO use returned events and file list from oswait
+		//var events = oswait(oswaitsecs * 1000, field(filepattern, "*", 1));
+		let events = field(filepattern, "*", 1).oswait(oswaitsecs * 1000);
 
 		// quit if any key pressed (not possible if running as a service)
 		if (var().hasinput())

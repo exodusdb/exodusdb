@@ -472,15 +472,15 @@ public:
 	//  textlen("Γιάννης"_var); // ditto`
 	ND var  textlen() const;
 
-	// Returns the number of fields separated by sepstr present.
-	// It is the same as var.count(sepstr) + 1 except that and empty string returns 0
-	// `"a1**c3"_var.fcount("*"); // 3
-	//  fcount("a1**c3"_var, "*"); // ditto`
+	// Returns the number of fields determined by presence of sepstr.
+	// It is the same as var.count(sepstr) + 1 except that fcount returns 0 for an empty string.
+	// `"aa**cc"_var.fcount("*"); // 3
+	//  fcount("aa**cc"_var, "*"); // ditto`
 	ND var  fcount(SV sepstr) const;
 
 	// Return the number of sepstr found
-	// `"a1*b2*c3"_var.count("*"); // 3
-	//  count("a1*b2*c3"_var, "*"); // ditto`
+	// `"aa**cc"_var.count("*"); // 2
+	//  count("aa**cc"_var, "*"); // ditto`
 	ND var  count(SV sepstr) const;
 
 	// Exodus   Javascript   PHP             Python       Go          Rust          C++
@@ -1452,11 +1452,39 @@ public:
 	//  ossleep(3000);`
 	   void ossleep(const int milliseconds) const;
 
-	// Sleep/pause/wait for any activity in a file system directory for a number of milliseconds
-	// `var().oswait(3000, "."); // max 3 seconds
-	//  // or just
-	//  oswait(3000, ".");`
-	   var  oswait(const int milliseconds, SV directory) const;
+	// Sleep/pause/wait up to a given number of milliseconds or until any changes occur in an FM delimited list of directories and/or files.
+	// If a terminal is present then any input available (key press) will also terminate the wait.
+	// If any changes occur on the specified files or directories an FM array of event information is returned. See below.
+	// obj is file_dir_list
+	// `var v1 = ".^/etc/hosts"_var.oswait(3000); // e.g. "IN_CLOSE_WRITE^/etc^hosts^f"_var
+	//  // or
+	//  var v2 = oswait(".^/etc/hosts"_var, 3000);`
+	//
+	// Returned array fields
+	//
+	// In the case of multiple events being captured then each field is multivalued.
+	//
+	// 1. Event type codes
+	// 2. dirpaths
+	// 3. filenames
+	// 4. d=dir, f=file
+	//
+	// Possible evemt type codes are as follows:
+	//
+	// "IN_CLOSE_WRITE" //A file opened for writing was closed
+	// "IN_ACCESS"      //Data was read from file
+	// "IN_MODIFY"      //Data was written to file
+	// "IN_ATTRIB"      //File attributes changed
+	// "IN_CLOSE"       //File was closed (read or write)
+	// "IN_MOVED_FROM"  //File was moved away from watched directory
+	// "IN_MOVED_TO"    //File was moved into watched directory
+	// "IN_MOVE"        //File was moved (in or out of directory)
+	// "IN_CREATE"      //A file was created in the directory
+	// "IN_DELETE"      //A file was deleted from the directory
+	// "IN_DELETE_SELF" //Directory or file under observation was deleted
+	// "IN_MOVE_SELF"   //Directory or file under observation was moved
+
+	   var  oswait(const int milliseconds) const;
 
 	///// OS FILE IO:
 	////////////////

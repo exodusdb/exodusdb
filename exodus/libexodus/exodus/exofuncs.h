@@ -161,7 +161,7 @@ ND var timestamp(in date, in time);
 //ND var timedate(void);
 
    void ossleep(const int milliseconds);
-ND var  oswait(const int milliseconds, SV dirpath);
+ND var  oswait(SV file_dir_list, const int milliseconds);
 
 // 4 argument version for statement format
 // osbread(data from x at y length z)

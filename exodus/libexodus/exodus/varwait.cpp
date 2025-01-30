@@ -104,6 +104,12 @@ static var handle_events(int inotify_fd, int* wd, const int argc, const char* ar
 			else
 				continue;
 
+			// Multivalued if multiple events caught
+			// 1 Event type code
+			// 2 dirpath
+			// 3 filename
+			// 4 d=dir, f=file
+
 			// The name of the watched directory
 			for (i = 1; i < argc; ++i) {
 				if (wd[i] == event->wd) {
@@ -312,16 +318,13 @@ static var wait_main(const int argc, const char* argv[], const int wait_time_ms)
 	return events;
 }
 
-var  var::oswait(const int milliseconds, SV directory) const {
+var  var::oswait(const int milliseconds) const {
 
-//	THISIS("void var::oswait(const int milliseconds, const var directory) const")
-//	// doesnt use *this - should syntax be changed to setcwd? and getcwd()?
-//	//assertDefined(function_sig); // not needed if *this not used
-//	ISSTRING(directory)
+	THISIS("var var::oswait(const int milliseconds) const")
+	assertString(function_sig);
 
-	Cargs cargs(FM ^ directory);
-
-	//	var("oswait ").outputl(directory);
+	// Create a cstr structure from the FM list of files and or dirs provided.
+	Cargs cargs(FM ^ var_str);
 
 	return wait_main(cargs.argc(), cargs.argv(), milliseconds);
 }

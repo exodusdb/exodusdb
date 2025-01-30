@@ -172,11 +172,11 @@
 671 void var::laster(const std::size_t length) &
 672 var  var::cut(const int length) const
 673 void var::cutter(const int length) &
-674 void var::substrer(const int startindex1, const int length) &
+674 void var::substrer(const int pos1, const int length) &
 675 var  var::at(const int charno) const
 676 var  var::multivalued(const char* opcode, in var2) const
-677 var  var::substr(const int startindex1, io delimiterchars, int& pos2) const
-678 var  var::substr2(io startindex1, io delimiterno) const
+677 var  var::substr(const int pos1, io delimiterchars, int& pos2) const
+678 var  var::substr2(io pos1, io delimiterno) const
 679 var  var::sumall() const
 680 var  var::sum() const
 681 var  var::sum(SV separator) const
@@ -231,4 +231,5 @@
 730 CVR  var::logputl() const
 731 CVR  var::logput(in prefix) const
 732 CVR  var::logputl(in prefix) const
+733 var  var::oswait(const int milliseconds) const
     
