@@ -55,7 +55,7 @@ namespace exo {
 
 //PICKOS modulo limits the value instead of doing a kind of remainder as per c++ % operator
 // [0 , limit) if limit is positive
-// (limit, 0] if limit is positive
+// (limit, 0] if limit is negative
 // unlike c++ which is acts more like a divisor/remainder function
 // Note that PICKOS definition is symmetrical about 0 the limit of 0
 //i.e. mod(x,y) == -(mod(-x,-y))
@@ -169,6 +169,13 @@ template<> PUBLIC RETVAR VARBASE1::mod(const int limit) const {
 	var loge() const;
 */
 
+/**
+ * \param[in]  val Initialising parameter for data.
+ * \param[out] dat Data pointer where the new object should be stored.
+ *
+ * \return True if the object was created, false if not
+ *         (i.e., we're out of memory)
+ */
 var  var::abs() const {
 
 	THISIS("var  var::abs() const")

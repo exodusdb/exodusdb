@@ -334,9 +334,9 @@ bool var::hasinput(int milliseconds) const {
 // In a terminal - Backspace and \n (\r\n for MS) are lost.
 //                 Pressing Ctrl+d (Ctrl+z fro MS) indicates eof
 //
-io   var::input() {
+out  var::input() {
 
-	THISIS("bool var::input()")
+	THISIS("out  var::input()")
 	assertDefined(function_sig);
 
 	var_str.clear();
@@ -351,9 +351,9 @@ io   var::input() {
 }
 
 // input with prompt allows default value and editing if isterminal
-io   var::input(in prompt) {
+out  var::input(in prompt) {
 
-	THISIS("bool var::input(in prompt")
+	THISIS("out  var::input(in prompt")
 	assertDefined(function_sig);
 	ISSTRING(prompt)
 
@@ -390,9 +390,9 @@ io   var::input(in prompt) {
 
 // for nchars, use int instead of var to trigger error at point of calling not here
 // not binary safe if nchars = 0 because we allow line editing assuming terminal console
-io   var::inputn(const int nchars) {
+out  var::inputn(const int nchars) {
 
-	THISIS("bool var::inputn(const int nchars")
+	THISIS("out  var::inputn(const int nchars")
 	assertDefined(function_sig);
 
 	//LOCKIOSTREAM_OR_NOT
@@ -531,6 +531,33 @@ template<> PUBLIC const std::string& VARBASE1::toString() const& {
 
 	return var_str;
 }
+
+//////////////
+// PICKREPLACE
+//////////////
+
+var  var::pickreplace(const int fieldno, const int valueno, const int subvalueno, in replacement) const& {var nrvo = this->clone(); nrvo.r(fieldno, valueno, subvalueno, replacement); return nrvo;}
+var  var::pickreplace(const int fieldno, const int valueno, in replacement)                       const& {var nrvo = this->clone(); nrvo.r(fieldno, valueno, 0, replacement); return nrvo;}
+var  var::pickreplace(const int fieldno, in replacement)                                          const& {var nrvo = this->clone(); nrvo.r(fieldno, 0, 0, replacement); return nrvo;}
+
+/////////
+// INSERT
+/////////
+
+	// cf mutator inserter()
+var  var::insert(const int fieldno, const int valueno, const int subvalueno, in insertion) const& {var nrvo = this->clone(); nrvo.inserter(fieldno, valueno, subvalueno, insertion); return nrvo;}
+var  var::insert(const int fieldno, const int valueno, in insertion)                       const& {var nrvo = this->clone(); nrvo.inserter(fieldno, valueno, 0, insertion); return nrvo;}
+var  var::insert(const int fieldno, in insertion)                                          const& {var nrvo = this->clone(); nrvo.inserter(fieldno, 0, 0, insertion); return nrvo;}
+
+/////////
+// REMOVE
+/////////
+
+/// remove() was delete() in Pick Basic
+// var  erase(const int fieldno, const int valueno=0, const int subvalueno=0) const;
+//	ND var  remove(const int fieldno, const int valueno = 0, const int subvalueno = 0) const;
+var  var::remove(const int fieldno, const int valueno /* = 0*/, const int subvalueno /* = 0*/)       const& {var nrvo = this->clone(); nrvo.remover(fieldno, valueno, subvalueno); return nrvo;}
+
 
 // synonym for length for compatibility with pick's len() which is bytes
 var  var::len() const {
@@ -1433,12 +1460,12 @@ IO   var::paster(const int pos1, SV insertstr) REF {
 /////////
 
 // Constant
-var  var::prefix(SV insertstr) const& {
+var  var::prefix(SV prefixstr) const& {
 
-	THISIS("var  var::prefix(SV insertstr)")
+	THISIS("var  var::prefix(SV prefixstr)")
 	assertString(function_sig);
 
-	var nrvo = insertstr;
+	var nrvo = prefixstr;
 
 	nrvo.var_str.append(this->var_str);
 
@@ -1887,46 +1914,46 @@ next_unquoted:
 
 		} // switch
 	}
-	return *this;
+	return THIS;
 }
 
 ////////
 // FCOUNT
 ////////
 // TODO make a char and char version for speed
-var  var::fcount(SV sep) const {
+var  var::fcount(SV sepstr) const {
 
-	THISIS("var  var::fcount(SV sep) const")
+	THISIS("var  var::fcount(SV sepstr) const")
 	assertString(function_sig);
 	//ISSTRING(sep)
 
 	if (var_str.empty())
 		return 0;
 
-	if (sep.empty())
+	if (sepstr.empty())
 		return "";
 
-	return this->count(sep) + 1;
+	return this->count(sepstr) + 1;
 }
 ////////
 // COUNT
 ////////
 
-var  var::count(SV str) const {
+var  var::count(SV sepstr) const {
 
-	THISIS("var  var::count(SV str) const")
+	THISIS("var  var::count(SV sepstr) const")
 	assertString(function_sig);
 
-	if (str.empty())
+	if (sepstr.empty())
 		return "";
 
-	std::size_t substr_len = str.size();
+	std::size_t substr_len = sepstr.size();
 
 	// find the starting position of the field or return ""
 	std::size_t start_pos = 0;
 	int fieldno = 0;
 	while (true) {
-		start_pos = var_str.find(str, start_pos);
+		start_pos = var_str.find(sepstr, start_pos);
 		// past of of string?
 		if (start_pos == std::string::npos)
 			return fieldno;
@@ -2131,7 +2158,7 @@ var  var::xlate(in filename, in fieldno, const char* mode) const {
 
 var  var::numberinwords(in langname_or_locale_id) {
 
-	THISIS("var  var::numberinwords(in number, in langname_or_locale_id)")
+	THISIS("var  var::numberinwords(in langname_or_locale_id)")
 	assertNumeric(function_sig);
 	langname_or_locale_id.assertString(function_sig);
 

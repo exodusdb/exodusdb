@@ -233,7 +233,7 @@ IO   var::fieldstorer(SV separator, const int fieldnx, const int nfieldsx, in re
 /////////
 
 // hardcore string locate function given a section of a string and all parameters
-static bool locateat(const std::string& var_str, const std::string& target, std::size_t pos, std::size_t end_pos, const int order, SV usingchar, io setting) {
+static bool locateat(const std::string& var_str, const std::string& target, std::size_t pos, std::size_t end_pos, const int order, SV usingchar, out setting) {
 	// private - assume everything is defined/assigned correctly
 
 	//
@@ -482,7 +482,7 @@ static bool locateat(const std::string& var_str, const std::string& target, std:
 }
 
 // locate within extraction
-static bool locatex(const std::string& var_str, const std::string& target, const char* ordercode, SV usingchar, io setting, int fieldno, int valueno, const int subvalueno) {
+static bool locatex(const std::string& var_str, const std::string& target, const char* ordercode, SV usingchar, out setting, int fieldno, int valueno, const int subvalueno) {
 	// private - assume everything is defined/assigned correctly
 
 	// any negatives at all returns ""
@@ -653,9 +653,9 @@ static bool locatex(const std::string& var_str, const std::string& target, const
 }
 
 // default locate using VM
-bool var::locate(in target, io setting) const {
+bool var::locate(in target, out setting) const {
 
-	THISIS("bool var::locate(in target, io setting, const int fieldno/*=0*/, const int valueno/*=0*/) const")
+	THISIS("bool var::locate(in target, out setting, const int fieldno/*=0*/, const int valueno/*=0*/) const")
 	assertString(function_sig);
 	ISSTRING(target)
 	ISDEFINED(setting)
@@ -663,9 +663,9 @@ bool var::locate(in target, io setting) const {
 	return locatex(var_str, target.var_str, "", _VM, setting, 0, 0, 0);
 }
 
-bool var::locate(in target, io setting, const int fieldno, const int valueno /*=0*/) const {
+bool var::locate(in target, out setting, const int fieldno, const int valueno /*=0*/) const {
 
-	THISIS("bool var::locate(in target, io setting, const int fieldno/*=0*/, const int valueno/*=0*/) const")
+	THISIS("bool var::locate(in target, out setting, const int fieldno/*=0*/, const int valueno/*=0*/) const")
 	assertString(function_sig);
 	ISSTRING(target)
 	ISDEFINED(setting)
@@ -700,22 +700,22 @@ bool var::locate(in target) const {
 ////////////
 
 //// 1. rare syntax where the order is given as a variable
-//bool var::locateby(in ordercode, in target, io setting, const int fieldno, const int valueno /*=0*/) const {
+//bool var::locateby(in ordercode, in target, out setting, const int fieldno, const int valueno /*=0*/) const {
 //	return locateby(ordercode.toString().c_str(), target, setting, fieldno, valueno);
 //}
 
 //// 2. no fieldno or valueno means locate using character VM
 //// caters for the rare syntax where the order is given as a variable
-//bool var::locateby(in ordercode, in target, io setting) const {
+//bool var::locateby(in ordercode, in target, out setting) const {
 //	return locateby(ordercode.toString().c_str(), target, setting);
 //}
 
 // 3. no fieldno or valueno means locate using character VM
 // specialised const char version of ordercode for speed of usual syntax where ordermode is given as
 // string it avoids the conversion from string to var and back again
-bool var::locateby(const char* ordercode, in target, io setting) const {
+bool var::locateby(const char* ordercode, in target, out setting) const {
 
-	THISIS("bool var::locateby(const char* ordercode, in target, io setting) const")
+	THISIS("bool var::locateby(const char* ordercode, in target, out setting) const")
 	assertString(function_sig);
 	ISSTRING(target)
 	ISDEFINED(setting)
@@ -734,9 +734,9 @@ bool var::locateby(const char* ordercode, in target, io setting) const {
 
 // 4. specialised const char version of ordercode for speed of usual syntax where ordermode is given as
 // string it avoids the conversion from string to var and back again
-bool var::locateby(const char* ordercode, in target, io setting, const int fieldno, const int valueno /*=0*/) const {
+bool var::locateby(const char* ordercode, in target, out setting, const int fieldno, const int valueno /*=0*/) const {
 
-	THISIS("bool var::locateby(const char* ordercode, in target, io setting, const int fieldno, const int valueno/*=0*/) const")
+	THISIS("bool var::locateby(const char* ordercode, in target, out setting, const int fieldno, const int valueno/*=0*/) const")
 	assertString(function_sig);
 	ISSTRING(target)
 	ISDEFINED(setting)
@@ -767,9 +767,9 @@ bool var::locateby(const char* ordercode, in target, io setting, const int field
 // LOCATE BY, USING
 ///////////////////
 
-bool var::locatebyusing(const char* ordercode, const char* usingchar, in target, io setting, const int fieldno /*=0*/, const int valueno /*=0*/, const int subvalueno /*=0*/) const {
+bool var::locatebyusing(const char* ordercode, const char* usingchar, in target, out setting, const int fieldno /*=0*/, const int valueno /*=0*/, const int subvalueno /*=0*/) const {
 
-	THISIS("bool var::locatebyusing(const char* ordercode, const char* usingchar, in target, io setting, const int fieldno=0, const int valueno=0, const int valueno=0) const")
+	THISIS("bool var::locatebyusing(const char* ordercode, const char* usingchar, in target, out setting, const int fieldno=0, const int valueno=0, const int valueno=0) const")
 	assertString(function_sig);
 	ISSTRING(target)
 	ISDEFINED(setting)
@@ -802,9 +802,9 @@ bool var::locateusing(const char* usingchar, in target) const {
 }
 
 // 2. specify field/value/subvalue and return position
-bool var::locateusing(const char* usingchar, in target, io setting, const int fieldno /*=0*/, const int valueno /*=0*/, const int subvalueno /*=0*/) const {
+bool var::locateusing(const char* usingchar, in target, out setting, const int fieldno /*=0*/, const int valueno /*=0*/, const int subvalueno /*=0*/) const {
 
-	THISIS("bool var::locateusing(const char* usingchar, in target, io setting, const int fieldno/*=0*/, const int valueno/*=0*/, const int subvalueno/*=0*/) const")
+	THISIS("bool var::locateusing(const char* usingchar, in target, out setting, const int fieldno/*=0*/, const int valueno/*=0*/, const int subvalueno/*=0*/) const")
 	assertString(function_sig);
 	ISSTRING(target)
 	ISDEFINED(setting)
@@ -963,13 +963,13 @@ var  var::f(const int argfieldn, const int argvaluen/*=0*/, const int argsubvalu
 //starting is equivalent to x::index(y) == 1
 //contains is equivalent to x::index(y) != 0
 
-bool var::starts(SV str) const {
+bool var::starts(SV prefix) const {
 
-	THISIS("bool var::starts(SV str) const")
+	THISIS("bool var::starts(SV prefix) const")
 	assertString(function_sig);
 
 	// Differ from c++, javascript, python3 - see comment on var::contains
-	if (str.empty()) {
+	if (prefix.empty()) {
 		var(function_sig).errputl();
 //		VarError e(__PRETTY_FUNCTION__);
 //		e.description.errput();
@@ -977,16 +977,16 @@ bool var::starts(SV str) const {
 		return false;
 	}
 
-	return var_str.starts_with(str);
+	return var_str.starts_with(prefix);
 }
 
-bool var::ends(SV str) const {
+bool var::ends(SV suffix) const {
 
-	THISIS("bool var::ends(SV str) const")
+	THISIS("bool var::ends(SV suffix) const")
 	assertString(function_sig);
 
 	// DIFFERS from c++, javascript, python3 - see comment on var:contains
-	if (str.empty()) {
+	if (suffix.empty()) {
 		var(function_sig).errputl();
 //		VarError e(__PRETTY_FUNCTION__);
 //		e.description.errput();
@@ -994,12 +994,12 @@ bool var::ends(SV str) const {
 		return false;
 	}
 
-	return var_str.ends_with(str);
+	return var_str.ends_with(suffix);
 }
 
-bool var::contains(SV str) const {
+bool var::contains(SV substr) const {
 
-	THISIS("bool var::contains(SV str) const")
+	THISIS("bool var::contains(SV substr) const")
 	assertString(function_sig);
 
 	// DIFFERS from c++, javascript, python3
@@ -1010,15 +1010,15 @@ bool var::contains(SV str) const {
 	//
 	// Programmer logic: Compare as many characters as are in the search string for presence in the list of characters and return success if there are no failures.
 	//
-	if (str.empty()) {
+	if (substr.empty()) {
 		return false;
 	}
 
 #ifdef __cpp_lib_string_contains
 	//C++23
-	return var_str.contains(str);
+	return var_str.contains(substr);
 #else
-	return var_str.find(str) != std::string::npos;
+	return var_str.find(substr) != std::string::npos;
 #endif
 
 }
@@ -1720,7 +1720,7 @@ var  var::substr2(io pos1, io delimiterno) const {
 	// past of of string?
 	if (end_pos == std::string::npos) {
 		// wont work if string is the maximum string length but that cant occur
-		startindex1 = static_cast<int>(var_str.size() + 2);
+		pos1 = static_cast<int>(var_str.size() + 2);
 		delimiterno = 0;
 		return var_str.substr(pos, var_str.size() - pos);
 		//returnable = (var_str.substr(pos, var_str.size() - pos));
@@ -1734,7 +1734,7 @@ var  var::substr2(io pos1, io delimiterno) const {
 	// point AFTER the found separator or TWO after the length of the string (TODO shouldnt this
 	// be one??/bug in pickos) wont work if string is the maximum string length but that cant
 	// occur
-	startindex1 = static_cast<int>(end_pos + 2);
+	pos1 = static_cast<int>(end_pos + 2);
 
 	// extract and return the substr as well
 	return var_str.substr(pos, end_pos - pos);

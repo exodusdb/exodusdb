@@ -85,7 +85,7 @@
 // Useful TRACE() function for debugging
 //
 #define TRACE(EXPRESSION) \
-	var(EXPRESSION).convert(_ALL_FMS, _VISIBLE_FMS).quote().logputl("TRACE: " #EXPRESSION "=");
+	var(EXPRESSION).convert(_ALL_FMS, _VISIBLE_FMS).quote().logputl("TRACE: " #EXPRESSION "; /" "/ ");
 #define TRACE2(EXPRESSION) \
 	std::cerr << (EXPRESSION) << std::endl;
 
