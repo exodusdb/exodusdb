@@ -63,8 +63,10 @@ function main() {
 //
 //			newcpp.replacer(rex(oldcode), newcode);
 
-			if (name.ends("+"))
-				name.popper() ^= value;
+			if (name.ends("+")) {
+				name.popper();
+				name ^= value;
+			}
 
 			value.replacer("(", "\\(");
 			value.replacer(")", "\\)");

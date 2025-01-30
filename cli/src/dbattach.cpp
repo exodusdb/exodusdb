@@ -160,7 +160,8 @@ function main() {
 	//\psql -h localhost -p 5432 adlinec3 exodus
 
 	// Convert filenames to a comma separated list
-	filenames.converter(",", FM).trimmer(FM);
+	filenames.converter(",", FM);
+	filenames.trimmer(FM);
 
 	for (var filename : filenames) {
 

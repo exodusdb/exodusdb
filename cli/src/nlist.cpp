@@ -756,7 +756,8 @@ phraseinit:
 				if (limitx) {
 					if (word.starts(DQ) or word.starts(SQ)) {
 						if (word.starts(word.last())) {
-							word.cutter(1).popper();
+							word.cutter(1);
+							word.popper();
 						}
 					}
 					if (word == "") {
