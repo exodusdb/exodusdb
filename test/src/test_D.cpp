@@ -6,6 +6,20 @@ programinit()
 
 function main() {
 
+	{
+		// oconv D failure returns the original
+		assert(var("sss").oconv("D") == "sss");
+
+		// iconv D failure returns ""
+		assert(var("sss").iconv("D") == "");
+
+		// oconv MD failure returns the original
+		assert(var("sss").oconv("MD20P") == "sss");
+
+		// iconv MD/MC implemented yet
+		//  assert(var("sss").iconv("MD20P") == "");
+	}
+
 	// pickos day zero is "1968/12/31"
 	// "1968/12/31" <-> 0
 	// Fractional days eg 1.5 are handled by floor() function

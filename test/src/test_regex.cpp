@@ -66,11 +66,23 @@ function main() {
 		var n = 6;
 		printl("Words longer than", n, "characters:");
 		var index = 1;
+		var words = "";
+		// Unfortunately no implicit conversion from strings to regex because we have two separate replace methods
+		//rex word_regex = "\\w+";
+		rex word_regex = "\\w+"_rex;
 		while (index < v1.len()) {
-			var word = v1.search("\\w+", index);
-			if (word.len() > n)
-				printl(word);
+			var index2 = index;
+			var word1 = v1.search("\\w+", index);
+			// Test passing a predefined regex
+			var word2 = v1.search(word_regex, index2);
+			assert(word1 == word2);
+			if (word1.len() > n)
+				printl(word1);
+			words ^= word1 ^ " ";
 		}
+		words.popper();
+		assert(words == v1.convert(".,'\"", "     ").trim().errputl());
+
 		// Although could just use match "\w{7,}"
 		//printl("Words longer than", n, "characters:\n" ^ v1.match("\\w{7,}").convert(FM, "\n"));
 
@@ -371,6 +383,22 @@ function main() {
 		index = -99;
 		assert(let("aaabBbccc").search("b", index, "i").outputl(index ^ " ") == "b");
 		assert(index == 5);
+
+		// Check can pass predefined rex object into match for slightly faster performance
+		{
+			rex re1 = rex("b+");
+			assert(let("aaabbbcccbb").match(re1) == "bbb^bb"_var);
+
+			// First only
+			rex re2 = rex("b+", "f");
+			assert(let("aaabbbcccbb").match(re2) == "bbb"_var);
+
+			// Note that b* matches "" between every character because b* includes zero b's
+			rex re3 = rex("b*");
+	//		TRACE(let("aaabbbcccbb").match(re2));
+	//		printl(let("aaabbbcccbb").match(re2));
+			assert(let("aaabbbcccbb").match(re3) == "^^^bbb^^^^bb^"_var);
+		}
 
 	}
 

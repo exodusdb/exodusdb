@@ -20,13 +20,13 @@ function main() {
 
 		//lvalues mutator
 		var x = "ab";
-		x="ab";assert(x.cutter(-3) eq "");assert(x eq "");
-		x="ab";assert(x.cutter(-2) eq "");assert(x eq "");
-		x="ab";assert(x.cutter(-1) eq "a");assert(x eq "a");
-		x="ab";assert(x.cutter(-0) eq "ab");assert(x eq "ab");
-		x="ab";assert(x.cutter(-1) eq "a");assert(x eq "a");
-		x="ab";assert(x.cutter(-2) eq "");assert(x eq "");
-		x="ab";assert(x.cutter(-3) eq "");assert(x eq "");
+		x="ab";x.cutter(-3);assert(x eq "");
+		x="ab";x.cutter(-2);assert(x eq "");
+		x="ab";x.cutter(-1);assert(x eq "a");
+		x="ab";x.cutter(-0);assert(x eq "ab");
+		x="ab";x.cutter(-1);assert(x eq "a");
+		x="ab";x.cutter(-2);assert(x eq "");
+		x="ab";x.cutter(-3);assert(x eq "");
 		//assert(c.cutter(-3) eq "");assert(x eq ""); // doesnt compile
 
 		//rvalues (doesnt make a copy)
@@ -38,14 +38,6 @@ function main() {
 		assert(var("ab").cut(-2) eq "");
 		assert(var("ab").cut(-3) eq "");
 
-		//rvalues (no detectable difference)
-		assert(var("ab").cutter(-3) eq "");
-		assert(var("ab").cutter(-2) eq "");
-		assert(var("ab").cutter(-1) eq "a");
-		assert(var("ab").cutter(-0) eq "ab");
-		assert(var("ab").cutter(-1) eq "a");
-		assert(var("ab").cutter(-2) eq "");
-		assert(var("ab").cutter(-3) eq "");
 	}
 
 	printl(elapsedtimetext());

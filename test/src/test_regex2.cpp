@@ -187,6 +187,41 @@ function main() {
 		}
 	}
 
+	// Default regex options is multiline in exodus (because boost::regex was)
+	// Whereas std::regex is default single line
+
+	assert("abc\ndef\nhij"_var.match("^def$") == "def");
+	assert("abc\ndef\nhij"_var.search("^def$") == "def");
+
+	{	// options using rex()
+
+		assert("abc\ndef\nhij"_var.match(rex("^def$", "")) == "def");
+		assert("abc\ndef\nhij"_var.search(rex("^def$", "")) == "def");
+
+		assert("abc\ndef\nhij"_var.match(rex("^def$", "m")) == "def");
+		assert("abc\ndef\nhij"_var.search(rex("^def$", "m")) == "def");
+
+		// fails on single line matching
+		assert("abc\ndef\nhij"_var.match(rex("^def$", "s")) == "");
+		assert("abc\ndef\nhij"_var.search(rex("^def$", "s")) == "");
+	}
+	{
+		// options not using rex()
+
+		assert("abc\ndef\nhij"_var.match("^def$", "") == "def");
+		var pos = 0;
+		assert("abc\ndef\nhij"_var.search("^def$", pos, "") == "def");
+
+		assert("abc\ndef\nhij"_var.match("^def$", "m") == "def");
+		pos = 0;
+		assert("abc\ndef\nhij"_var.search("^def$", pos, "m") == "def");
+
+		// fails on single line matching
+		assert("abc\ndef\nhij"_var.match("^def$", "s") == "");
+		pos = 0;
+		assert("abc\ndef\nhij"_var.search("^def$", pos, "s") == "");
+	}
+
 	printl(elapsedtimetext());
 	printl("Test passed");
 
