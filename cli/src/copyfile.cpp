@@ -134,8 +134,10 @@ function main() {
 	}
 
 	//go through files one by one if source is a db
-	if (sourcedb)
-		sourcefilenames.trimmer(",").converter(",", FM);
+	if (sourcedb) {
+		sourcefilenames.trimmer(",");
+		sourcefilenames.converter(",", FM);
+	}
 
 	for (const var& temp : sourcefilenames) {
 

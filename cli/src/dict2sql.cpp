@@ -531,7 +531,8 @@ subroutine create_function(in functionname_and_args, in return_sqltype, in sql, 
 		let fieldname = filename.convert("abcdefghijklmnopqrstuvwxyz", "").trim("_");
 		//filename = filename.convert(UPPERCASE, "").trim("_");
 		if (filename and fieldname) {
-			filename.converter("ABCDEFGHIJKLMNOPQRSTUVWXYZ", "").trimmer("_");
+			filename.converter("ABCDEFGHIJKLMNOPQRSTUVWXYZ", "");
+			filename.trimmer("_");
 			if (filename.listindex(filename, fieldname)) {
 				logputl("Deleting index " ^ filename ^ " " ^ fieldname);
 				//filename.deleteindex(fieldname);
@@ -963,7 +964,8 @@ $RETVAR := array_to_string
 	sql.replacer("${SQLFILENAME}", dictfilename.cut(5));
 
 	//convert to text
-	sql.trimmerfirst(VM).trimmerlast(VM);
+	sql.trimmerfirst(VM);
+	sql.trimmerlast(VM);
 	sql.converter(VM, "\n");
 
 	var sqltemplate =

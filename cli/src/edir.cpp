@@ -85,7 +85,8 @@ function main() {
 	//put the text on a temp file in order to edit it
 	var temposfilename = filename ^ "~" ^ ID;
 	let invalidfilechars = "/ \"\'\u00A3$%^&*(){}[]:;#<>?,./\\|";
-	temposfilename.lcaser().converter(invalidfilechars, str("-", len(invalidfilechars)));
+	temposfilename.lcaser();
+	temposfilename.converter(invalidfilechars, str("-", len(invalidfilechars)));
 	temposfilename ^= "-pid" ^ ospid();
 	if (filename.starts("dict.") and fieldno)
 		temposfilename ^= ".sql";

@@ -105,7 +105,7 @@ function main() {
 		line ^= dictfieldno.oconv("R#3") ^ "|";
 		line ^= dictvaluetype.oconv("T#4") ^ "|";
 		line ^= ID.first(25).oconv("T#25") ^ "|";
-		line ^= datarec.f(dictfieldno).converter(_ALL_FMS, _VISIBLE_FMS);
+		line ^= datarec.f(dictfieldno).convert(_ALL_FMS, _VISIBLE_FMS);
 		printl(line);
 	}
 

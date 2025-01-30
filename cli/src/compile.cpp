@@ -1178,7 +1178,8 @@ function main() {
 
 						// Allow for unused arguments to be annotated or commented out to avoid warnings
 						// Wrapping parameter names in /* */ also works
-						funcargsdecl.replacer("[[maybe_unused]]", "").trimmer();
+						funcargsdecl.replacer("[[maybe_unused]]", "");
+						funcargsdecl.trimmer();
 
 						// Cut after the closing ), ignoring any additional pairs of ( ) beforehand
 						{
@@ -1199,10 +1200,8 @@ function main() {
 //						funcargsdecl.firster(charn - 1);
 
 						// Replace comment outs like /*arg1*/ with arg1
-						funcargsdecl
-							.replacer(rex("/" "\\*"), "")
-							.replacer(rex("\\*" "/"), "")
-						;
+						funcargsdecl.replacer(rex("/" "\\*"), "");
+						funcargsdecl.replacer(rex("\\*" "/"), "");
 
 						//work out the function arguments without declaratives
 						//to be inserted in the calling brackets.
@@ -1643,7 +1642,7 @@ function main() {
 							logputl(srcfilename ^ ":9999:99: warning: Use before constructed is undefined behaviour.");
 							atomic_ncompilation_failures++;
 						}
-						logputl(match.f(1,1).trimmer(" \t\n").quote());
+						logputl(match.f(1,1).trim(" \t\n").quote());
 					}
 				}
 			}
@@ -1990,7 +1989,8 @@ function set_environment() {
 	searchdirs ^= FM ^ "\\Program Files\\Microsoft Visual Studio\\Common\\Tools\\";
 	searchdirs ^= FM ^ osgetenv("VS60COMNTOOLS");
 
-	searchdirs.cutter(1).trimmer(FM);
+	searchdirs.cutter(1);
+	searchdirs.trimmer(FM);
 	var searched = "";
 	var batfilename = "";
 
@@ -2075,7 +2075,7 @@ function set_environment() {
 	var result;
 	if (osread(result, tempfilenamebase ^ ".$$$")) {
 
-		dim vars = split(result.converter("\r\n", _FM _FM));
+		dim vars = result.convert("\r\n", _FM _FM).split();
 		for (in line : vars) {
 			ossetenv(
 				field(line, "=", 1), field(line, "=", 2, 999999));

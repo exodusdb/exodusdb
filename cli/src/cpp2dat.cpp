@@ -60,7 +60,7 @@ function main() {
 
 			// We are interested in dict source between libraryinit and libraryexit statements
 			if (line.starts("libraryinit")) {
-				dictid = line.field("(",2).field(")",1).ucaser();
+				dictid = line.field("(",2).field(")",1).ucase();
 
 //				dictid.outputl("dict: ");
 
@@ -88,7 +88,8 @@ function main() {
 					newdictsrc.cutter(-2);
 				}
 
-				newdictsrc.trimmerfirst(VM).trimmerlast(VM);
+				newdictsrc.trimmerfirst(VM);
+				newdictsrc.trimmerlast(VM);
 
 //				// Remove trailing RETURN ANS;
 //				let nlines = fcount(newdictsrc, VM);
