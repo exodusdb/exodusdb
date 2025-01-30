@@ -105,7 +105,8 @@ function main() {
 	{
 		//convert complex utf8 characters to utf8 characters
 		var yiannis = "Γιάννης";
-		assert(textconverter(yiannis, "άης", "12") eq "Γι1νν2");
+		textconverter(yiannis, "άης", "12");
+		assert(yiannis eq "Γι1νν2");
 
 		// on temporaries
 		assert("Γιάννης"_var.textconvert("άης", "12") eq "Γι1νν2");
@@ -114,9 +115,11 @@ function main() {
 	{
 		//swap byte strings with byte strings
 		var yiannis = "Γιάννης";
-		assert(replacer(yiannis, "Γιά", "ννης") eq "ννηςννης");
+		replacer(yiannis, "Γιά", "ννης");
+		assert(yiannis eq "ννηςννης");
 		var str1 = "go to heaven";
-		assert(replacer(str1, "o ", "___")      eq "g___t___heaven");
+		replacer(str1, "o ", "___");
+		assert(str1 eq "g___t___heaven");
 	}
 	{
 		// \d \D and [:number:]
@@ -139,26 +142,27 @@ function main() {
 	{
 		var g = "Γιάννης";
 		assert(ucase(g).outputl("Uppercase " ^ g.quote() ^ " = ") eq "ΓΙΆΝΝΗΣ");
-		ucaser(g).outputl("ucaser=");
+		ucaser(g);
+		g.outputl("ucaser=");
 		assert(g        eq "ΓΙΆΝΝΗΣ");
 	}
 	{
 		var g = "Γιάννης AbCd";
 		assert(lcase(g) eq "γιάννης abcd");
-		lcaser(g).outputl("lcaser=");
-		assert(g        eq "γιάννης abcd");
+		lcaser(g);
+		assert(g.outputl("lcaser=")        eq "γιάννης abcd");
 	}
 	{
 		var g = "γιάννης γιάννης abcd";
 		assert(tcase(g) eq "Γιάννης Γιάννης Abcd");
-		tcaser(g).outputl("tcaser=");
-		assert(g        eq "Γιάννης Γιάννης Abcd");
+		tcaser(g);
+		assert(g.outputl("tcaser=")        eq "Γιάννης Γιάννης Abcd");
 	}
 	{
 		var g = "Γιάννης Γιάννης Abcd";
 		assert(fcase(g) eq "γιάννησ γιάννησ abcd");
-		fcaser(g).outputl("fcaser=");
-		assert(g        eq "γιάννησ γιάννησ abcd");
+		fcaser(g);
+		assert(g.outputl("fcaser=")        eq "γιάννησ γιάννησ abcd");
 	}
 
 	{
@@ -318,10 +322,12 @@ function main() {
 
 	{
 		var x = "abcdef";
-		x.cutter(-3) ^= "Q";
+		x.cutter(-3);
+		x ^= "Q";
 		assert(x eq "abcQ");
 
-		x.cutter(-1) ^= "XYZ";
+		x.cutter(-1);
+		x ^= "XYZ";
 		assert(x eq "abcXYZ");
 	}
 
@@ -358,12 +364,12 @@ function main() {
 
 		var y = "abc";
 		assert(y.prefix("") eq y);
-		assert(y.prefixer("") eq "abc");
+		y.prefixer("");
 		assert(y eq "abc");
 
 		var z = "";
 		assert(z.prefix("") eq z);
-		assert(z.prefixer("") eq "");
+		z.prefixer("");
 		assert(z eq "");
 
 	}

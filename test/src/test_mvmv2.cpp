@@ -42,20 +42,20 @@ function main() {
 		assert(pickreplace(rec, 2, 4, "24r") eq "1" _FM "21" _VM "22" _VM _VM "24r" _FM "311" _SM "312" _VM "32" _FM "4");
 	}
 
-	//.r()
+	//.pickreplace()
 
 	//plain replace subvalue in the middle of subvalues
 	var v123 = "f100" _FM "f210" _VM "f221" _SM "f222" _SM;
-	assert(v123.r(2, 2, 2, "n222")                                               eq "f100" _FM "f210" _VM "f221" _SM "n222" _SM);
+	assert(v123.pickreplace(2, 2, 2, "n222")                                               eq "f100" _FM "f210" _VM "f221" _SM "n222" _SM);
 	v123(2, 2, 2) = "n222";
 	assert(v123                                                                  eq "f100" _FM "f210" _VM "f221" _SM "n222" _SM);
-	assert(var("f100" _FM "f210" _VM "f221" _SM "f222" _SM).r(2, 2, 2, "n222")   eq "f100" _FM "f210" _VM "f221" _SM "n222" _SM);
+	assert(var("f100" _FM "f210" _VM "f221" _SM "f222" _SM).pickreplace(2, 2, 2, "n222")   eq "f100" _FM "f210" _VM "f221" _SM "n222" _SM);
 	//plain replace subvalue in the middle of subvalues with null, smaller and larger
-	assert(var("f100" _FM "f210" _VM "f221" _SM "f222" _SM).r(2, 2, 2, "")       eq "f100" _FM "f210" _VM "f221" _SM "" _SM);
-	assert(var("f100" _FM "f210" _VM "f221" _SM "f222" _SM).r(2, 2, 2, "x")      eq "f100" _FM "f210" _VM "f221" _SM "x" _SM);
-	assert(var("f100" _FM "f210" _VM "f221" _SM "f222" _SM).r(2, 2, 2, "xyz123") eq "f100" _FM "f210" _VM "f221" _SM "xyz123" _SM);
+	assert(var("f100" _FM "f210" _VM "f221" _SM "f222" _SM).pickreplace(2, 2, 2, "")       eq "f100" _FM "f210" _VM "f221" _SM "" _SM);
+	assert(var("f100" _FM "f210" _VM "f221" _SM "f222" _SM).pickreplace(2, 2, 2, "x")      eq "f100" _FM "f210" _VM "f221" _SM "x" _SM);
+	assert(var("f100" _FM "f210" _VM "f221" _SM "f222" _SM).pickreplace(2, 2, 2, "xyz123") eq "f100" _FM "f210" _VM "f221" _SM "xyz123" _SM);
 
-	assert(var("f100" _FM "f210" _VM "f221" _SM "f222" _SM).r(2, "xyz123") eq "f100" _FM "xyz123");
+	assert(var("f100" _FM "f210" _VM "f221" _SM "f222" _SM).pickreplace(2, "xyz123") eq "f100" _FM "xyz123");
 
 	//replace field zero
 	assert(pickreplace(rec, 0, "f000")       eq "f000");
@@ -76,15 +76,18 @@ function main() {
 
 	//replace field 2 with "R2"
 	da2 = "";
-	assert(pickreplacer(da2, 2, "R2") eq(_FM "R2"));
+	pickreplacer(da2, 2, "R2");
+	assert(da2 eq(_FM "R2"));
 
 	//replace field 2, value 3 with "R22"
 	da2 = "";
-	assert(pickreplacer(da2, 2, 3, "R23") eq(_FM _VM _VM "R23"));
+	pickreplacer(da2, 2, 3, "R23");
+	assert(da2 eq(_FM _VM _VM "R23"));
 
 	//replace field 2, value 3, subvalue 4 with "R234"
 	da2 = "";
-	assert(pickreplacer(da2, 2, 3, 4, "R234") eq(_FM _VM _VM _SM _SM _SM "R234"));
+	pickreplacer(da2, 2, 3, 4, "R234");
+	assert(da2 eq(_FM _VM _VM _SM _SM _SM "R234"));
 
 	/////////
 	//extract
@@ -352,8 +355,8 @@ function main() {
 	assert(insert(t1, 2, 1, "xyz").convert(_FM _VM _SM, "^]}") eq "aa^xyz");
 	assert(insert(t1, 2, 2, "xyz").convert(_FM _VM _SM, "^]}") eq "aa^]xyz");
 
-	assert(var("f110" _VM "f120" _VM "f130" _VM "f140" _FM "f211" _VM "f212").inserter(1, 3, "xyz").convert(_FM _VM _SM, "^]}") eq "f110]f120]xyz]f130]f140^f211]f212");
-	assert(var(t1).inserter(1, "xyz").convert(_FM _VM _SM, "^]}")                                                               eq "xyz^aa");
+	assert(var("f110" _VM "f120" _VM "f130" _VM "f140" _FM "f211" _VM "f212").insert(1, 3, "xyz").convert(_FM _VM _SM, "^]}") eq "f110]f120]xyz]f130]f140^f211]f212");
+	assert(var(t1).insert(1, "xyz").convert(_FM _VM _SM, "^]}")                                                               eq "xyz^aa");
 
 	// free function
 	{
@@ -368,7 +371,8 @@ function main() {
 	}
 	{
 		var x = "f110" _VM "f120" _VM "f130" _VM "f140" _FM "f211" _VM "f212";
-		inserter(x, 1, 3, 1, "xyz").dump().outputl();
+		inserter(x, 1, 3, 1, "xyz");
+		x.dump().outputl();
 		assert(x.convert(_FM _VM _SM, "^]}") eq "f110]f120]xyz}f130]f140^f211]f212");
 	}
 
@@ -417,7 +421,7 @@ function main() {
 	//remove field 1
 	da1 = "f1" _FM "f2";
 	assert(remove(da1, 1) eq("f2"));
-	assert(remover(da1, 1) eq("f2"));
+	remover(da1, 1);
 	assert(da1 eq "f2");
 
 	//remove field 1, value 2

@@ -426,12 +426,14 @@ function main() {
 		var g = "Grüßen";
 		assert(g.fcase()             eq "grüssen");
 		assert(var("Grüßen").fcase() eq "grüssen");
-		assert(g.fcaser()            eq "grüssen");
+		g.fcaser();
+		assert(g eq "grüssen");
 
 		var v = "top of the world";
 		assert(v.tcase()                       eq "Top Of The World");
 		assert(var("top of the world").tcase() eq "Top Of The World");
-		assert(v.tcaser()                      eq "Top Of The World");
+		v.tcaser();
+		assert(v eq "Top Of The World");
 
 		printl(round(var("6000.50") / 20, 2));
 		assert(round(var("6000.50") / 20, 2) eq 300.03);
