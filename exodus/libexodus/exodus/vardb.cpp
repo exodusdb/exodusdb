@@ -881,7 +881,8 @@ static inline void unquoter_inline(io iovar) {
 	if (quotecharacters.contains(iovar.first()))
 		//string = string.b(2, string.len() - 2);
 		//iovar = iovar.cut(1).popper();
-		iovar.cutter(1).popper();
+		iovar.cutter(1);
+		iovar.popper();
 }
 
 static void tosqlstring(io string1) {
@@ -2950,7 +2951,7 @@ TRACE: "QQQ"="QQQ"
 			var xlatefromfieldname = function_src.field(",", 2).trim();
 
 			// arg3 = target field number/name
-			var xlatetargetfieldname = function_src.field(",", 3).trim().unquoter();
+			var xlatetargetfieldname = function_src.field(",", 3).trim().unquote();
 
 			// arg4 = mode X or C
 			var xlatemode = function_src.field(",", 4).trim().convert("'\" )", "");
@@ -3021,7 +3022,8 @@ TRACE: "QQQ"="QQQ"
 			// TODO if
 			// (xlatefromfieldname.starts(FIELD(@ID))
 			else if (xlatefromfieldname.starts("{")) {
-				xlatefromfieldname.cutter(1).popper();
+				xlatefromfieldname.cutter(1);
+				xlatefromfieldname.popper();
 				bool isdatetime;
 				xlatekeyexpression = get_dictexpression(cursor,
 					filename, filename, dictfilename, dictfile,
@@ -3777,7 +3779,8 @@ bool var::selectx(in fieldnames, in sortselectclause) {
 					//calc_fields.r(3, calc_fieldn, word1.lowerer());
 					//calc_fields.r(4, calc_fieldn, word2);
 					calc_fields(2, calc_fieldn) = opid;
-					calc_fields(3, calc_fieldn) = word1.lowerer();
+					word1.lowerer();
+					calc_fields(3, calc_fieldn) = word1;
 					calc_fields(4, calc_fieldn) = word2;
 
 					// Place holder for stage 1 of stage2 select
@@ -4272,7 +4275,8 @@ bool var::selectx(in fieldnames, in sortselectclause) {
 					//multivalues are searched using "OR" which is the | pipe character in ts_query syntax
 					//words separated by spaces (or & characters) are searched for uing "AND" which is & in ts_query syntax
 					var values="";
-					value.unquoter().converter(VM,FM);
+					value.unquoter();
+					value.converter(VM,FM);
 					for (var partvalue : value) {
 
 						//remove all single quotes
@@ -5036,7 +5040,8 @@ bool var::getlist(in listname) {
 	this->r(5, 0);
 
 	// keys separated by vm. each key may be followed by a sm and the mv no for readnext
-	this->r(6, keys.lowerer());
+	keys.lowerer();
+	this->r(6, keys);
 
 	return true;
 }
@@ -5063,7 +5068,7 @@ bool var::formlist(in keys, in fieldno) {
 
 	//optional field extract
 	if (fieldno)
-		record = record.f(fieldno).converter(VM, FM);
+		record = record.f(fieldno).convert(VM, FM);
 
 	if (not this->makelist("", record)) UNLIKELY
 		throw VarDBException(this->lasterror());
@@ -5178,7 +5183,8 @@ bool var::hasnext() {
 		// might as well cache the next block for the next readnext
 		this->r(4, listno);
 		this->r(5, 0);
-		this->r(6, block.lowerer());
+		block.lowerer();
+		this->r(6, block);
 
 		return true;
 	}
@@ -5304,7 +5310,8 @@ bool var::readnext(io record, io key, io valueno) {
 
 				this->r(4, listno);
 				this->r(5, 0);
-				this->r(6, block.lowerer());
+				block.lowerer();
+				this->r(6, block);
 				continue;
 			}
 
@@ -5656,7 +5663,8 @@ var  var::listindex(in filename0, in fieldname0) const {
 			var indexname = getpgresultcell(dbresult, indexn, 0);
 			if (indexname.starts("index_")) {
 				if (indexname.contains("__")) {
-					indexname.substrer(8, 999999).replacer("__", VM);
+					indexname.substrer(8, 999999);
+					indexname.replacer("__", VM);
 					if (fieldname && indexname.f(1, 2) != lc_fieldname)
 						continue;
 

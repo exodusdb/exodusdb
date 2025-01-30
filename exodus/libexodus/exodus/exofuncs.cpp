@@ -442,7 +442,10 @@ ND PUBLIC bool createfile(in dbfilename) {
 	var dbfilename2 = dbfilename.field("(", 1).trim();
 
 	//remove pickos volume locations
-	dbfilename2.replacer("DATA ", "").replacer("REVBOOT ", "").replacer("DATAVOL ", "").trimmer();
+	dbfilename2.replacer("DATA ", "");
+	dbfilename2.replacer("REVBOOT ", "");
+	dbfilename2.replacer("DATAVOL ", "");
+	dbfilename2.trimmer();
 
 	return dbfilename2.createfile(dbfilename2);
 }
@@ -452,7 +455,8 @@ ND PUBLIC bool deletefile(in dbfilename_or_var) {
 	var dbfilename2 = dbfilename_or_var.field(" ", 1).trim();
 
 	//exodus doesnt automatically create dict files
-	dbfilename2.replacer("DATA ", "").trimmer();
+	dbfilename2.replacer("DATA ", "");
+	dbfilename2.trimmer();
 
 	return dbfilename_or_var.deletefile(dbfilename2);
 }
@@ -462,7 +466,8 @@ ND PUBLIC bool clearfile(in dbfilename_or_var) {
 	var dbfilename2 = dbfilename_or_var.field("(", 1).trim();
 
 	//exodus doesnt automatically create dict files
-	dbfilename2.replacer("DATA ", "").trimmer();
+	dbfilename2.replacer("DATA ", "");
+	dbfilename2.trimmer();
 
 	return dbfilename_or_var.clearfile(dbfilename2);
 }
@@ -562,7 +567,8 @@ PUBLIC int exodus_main(int exodus_argc, const char* exodus_argv[], ExoEnv& mv, i
 		// Remove last field of COMMAND TODO fpopper command?
 		mv.COMMAND.cutter(-mv.OPTIONS.len() - 1);
 		// Remove first { or ( and last ) } chars of OPTIONS
-		mv.OPTIONS.cutter(1).popper();
+		mv.OPTIONS.cutter(1);
+		mv.OPTIONS.popper();
 	} else {
 		mv.OPTIONS = "";
 	}

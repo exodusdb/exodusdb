@@ -32,7 +32,7 @@ int DBConnector::add_dbconn(PGconn* conn_to_cache, const std::string conninfo) {
 #pragma GCC diagnostic pop
 
 	if (TRACING >= 3) {
-		var(conninfo).replacer(R"(password\s*=\s*\w*)"_rex, "").errputl("DBConnector::add_dbconn: " ^ var(dbconn_no_) ^ " conninfo: ");
+		var(conninfo).replace(R"(password\s*=\s*\w*)"_rex, "").errputl("DBConnector::add_dbconn: " ^ var(dbconn_no_) ^ " conninfo: ");
 	}
 
 	return dbconn_no_;

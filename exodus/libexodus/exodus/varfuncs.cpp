@@ -760,7 +760,9 @@ var  var::ucase() const& {
 // so we will use clone and ucaser.
 //
 //#if __cpp_lib_string_resize_and_overwrite < 202110L
-	return this->clone().ucaser();
+	var nrvo = this->clone();
+	nrvo.ucaser();
+	return nrvo;
 //#else
 //
 //	THISIS("var  var::ucase() const&")

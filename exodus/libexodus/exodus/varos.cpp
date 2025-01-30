@@ -1320,8 +1320,9 @@ var  var::oslist(SV globpattern0, const int mode) const {
 		}
 	}
 
-	// delete last separator
-	filelist.popper();
+	// Delete last separator
+	if (! filelist.var_str.empty())
+		filelist.var_str.pop_back();
 
 	return filelist;
 }
