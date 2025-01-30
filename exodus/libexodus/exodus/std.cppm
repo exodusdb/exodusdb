@@ -226,6 +226,7 @@ export namespace std {
 		using std::filesystem::create_directories;
 		using std::filesystem::directory_iterator;
 		using std::filesystem::exists;
+		using std::filesystem::rename;
 		using std::filesystem::copy;
 		using std::filesystem::copy_options;
 		using std::filesystem::copy_options::overwrite_existing;

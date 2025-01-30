@@ -61,7 +61,10 @@ bool var::setxlocale() const {
 #endif
 }
 
-io   var::getxlocale() {
+out  var::getxlocale() {
+
+	THISIS("out  var::getxlocale()")
+
 #if defined(_MSC_VER) && defined(UNICODE)
 	*this = static_cast<int>GetThreadLocale();
 	return *this;

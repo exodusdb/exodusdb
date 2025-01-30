@@ -117,18 +117,9 @@ CONSTEVAL_OR_CONSTEXPR
 auto get_timebank_acno(const std::string_view arg1) -> int {
 	int acno = 0;
 
-	// To renumber timebank.txt sequentially e.g. after inserting new elements
+	// Remember to regenerate timebank.txt after amending this list
 	/*
-		cut -d' ' -f2-999 timebank.txt > x
-		awk '{print NR+499 " " $0}' x > timebank.txt
-	*/
-
-	// Create this code block using
-	/*
-		cut -d' ' -f2-999 timebank.txt > p
-		sed 's#\s*$##g' p > q
-//		awk '{print "else if (++acno && arg1 == \"" $0 "\")) acno = " ++i ";"}' q > r
-		awk '{print "else if (++acno && arg1 == \"" $0 "\") \{\}"}' q > r
+		\grep -P 'arg1 == "(.*)"' timebank.h -o|cut -d'"' -f2 | nl -v 500 -s' ' -w3 > timebank.txt
 	*/
 
 	     if (++acno && arg1 == "dim& dim::splitter(in str1, SV sepchar = FM)") {}
@@ -148,20 +139,20 @@ auto get_timebank_acno(const std::string_view arg1) -> int {
 	else if (++acno && arg1 == "bool var::open(in filename, in connection)") {}
 	else if (++acno && arg1 == "bool var::open cache_miss") {}
 	else if (++acno && arg1 == "void var::close()") {}
-	else if (++acno && arg1 == "bool var::readc(in filehandle, in key)") {}
-	else if (++acno && arg1 == "void var::writec(in filehandle, in key)") {}
+	else if (++acno && arg1 == "bool var::readc(in file, in key)") {}
+	else if (++acno && arg1 == "void var::writec(in file, in key)") {}
 	else if (++acno && arg1 == "bool var::deletec(in key)") {}
-	else if (++acno && arg1 == "bool var::read(in filehandle, in key)") {}
-	else if (++acno && arg1 == "bool var::reado cache_miss") {}
+	else if (++acno && arg1 == "bool var::read(in file, in key)") {}
+	else if (++acno && arg1 == "bool var::readc cache_miss") {}
 	else if (++acno && arg1 == "var  var::hash() const") {}
 	else if (++acno && arg1 == "var  var::lock(in key) const") {}
 	else if (++acno && arg1 == "void var::unlock(in key) const") {}
 	else if (++acno && arg1 == "void var::unlockall() const") {}
 	else if (++acno && arg1 == "bool var::sqlexec(in sqlcmd, io response) const") {}
-	else if (++acno && arg1 == "void var::writef(in filehandle, in key, const int fieldno) const") {}
-	else if (++acno && arg1 == "void var::write(in filehandle, in key) const") {}
-	else if (++acno && arg1 == "bool var::updaterecord(in filehandle, in key) const") {}
-	else if (++acno && arg1 == "bool var::insertrecord(in filehandle, in key) const") {}
+	else if (++acno && arg1 == "void var::writef(in file, in key, const int fieldno) const") {}
+	else if (++acno && arg1 == "void var::write(in file, in key) const") {}
+	else if (++acno && arg1 == "bool var::updaterecord(in file, in key) const") {}
+	else if (++acno && arg1 == "bool var::insertrecord(in file, in key) const") {}
 	else if (++acno && arg1 == "bool var::deleterecord(in key) const") {}
 	else if (++acno && arg1 == "bool var::cleardbcache() const") {}
 	else if (++acno && arg1 == "bool var::begintrans() const") {}
@@ -190,10 +181,10 @@ auto get_timebank_acno(const std::string_view arg1) -> int {
 	else if (++acno && arg1 == "bool var::cursorexists()") {}
 	else if (++acno && arg1 == "var  var::listindex(in filename) const") {}
 	else if (++acno && arg1 == "var  var::reccount(in filename_or_handle_or_null) const") {}
-	else if (++acno && arg1 == "var  var::flushindex(in filename=) const") {}
-	else if (++acno && arg1 == "bool var::input()") {}
-	else if (++acno && arg1 == "bool var::input(in prompt") {}
-	else if (++acno && arg1 == "bool var::inputn(const int nchars") {}
+	else if (++acno && arg1 == "bool var::flushindex(in filename=) const") {}
+	else if (++acno && arg1 == "out  var::input()") {}
+	else if (++acno && arg1 == "out  var::input(in prompt") {}
+	else if (++acno && arg1 == "out  var::inputn(const int nchars") {}
 	else if (++acno && arg1 == "io   var::default_to(in defaultvalue) const") {}
 	else if (++acno && arg1 == "io   var::default_from(in defaultvalue)") {}
 	else if (++acno && arg1 == "char var::toChar() const") {}
@@ -203,43 +194,43 @@ auto get_timebank_acno(const std::string_view arg1) -> int {
 	else if (++acno && arg1 == "var  var::textlen()") {}
 	else if (++acno && arg1 == "std::u32string var::to_u32string() const") {}
 	else if (++acno && arg1 == "io   var::trim(SV trimchars)") {}
-	else if (++acno && arg1 == "io   var::trimmer(SV trimchars)") {}
+	else if (++acno && arg1 == "void var::trimmer(SV trimchars) &") {}
 	else if (++acno && arg1 == "io   var::trimfirst(SV trimchars) const&") {}
-	else if (++acno && arg1 == "io   var::trimmerfirst(SV trimchars)") {}
+	else if (++acno && arg1 == "void var::trimmerfirst(SV trimchars) &") {}
 	else if (++acno && arg1 == "io   var::trimlast(SV trimchars) const&") {}
-	else if (++acno && arg1 == "io   var::trimmerlast(SV trimchars)") {}
+	else if (++acno && arg1 == "void var::trimmerlast(SV trimchars) &") {}
 	else if (++acno && arg1 == "io   var::trimboth(SV trimchars) const&") {}
-	else if (++acno && arg1 == "io   var::trimmerboth(SV trimchars)") {}
-	else if (++acno && arg1 == "io   var::inverter()") {}
-	else if (++acno && arg1 == "io   var::ucaser()") {}
-	else if (++acno && arg1 == "io   var::lcaser()") {}
-	else if (++acno && arg1 == "io   var::tcaser()") {}
-	else if (++acno && arg1 == "io   var::fcaser()") {}
-	else if (++acno && arg1 == "io   var::normalizer()") {}
+	else if (++acno && arg1 == "void var::trimmerboth(SV trimchars) &") {}
+	else if (++acno && arg1 == "void var::inverter() &") {}
+	else if (++acno && arg1 == "void var::ucaser() &") {}
+	else if (++acno && arg1 == "void var::lcaser() &") {}
+	else if (++acno && arg1 == "void var::tcaser() &") {}
+	else if (++acno && arg1 == "void var::fcaser() &") {}
+	else if (++acno && arg1 == "void var::normalizer() &") {}
 	else if (++acno && arg1 == "var  var::unique()") {}
 	else if (++acno && arg1 == "var  var::seq() const") {}
 	else if (++acno && arg1 == "var  var::textseq() const") {}
-	else if (++acno && arg1 == "io   var::paster(const int pos1, const int length, SV insertstr)") {}
-	else if (++acno && arg1 == "io   var::paster(const int pos1, SV insertstr)") {}
-	else if (++acno && arg1 == "var  var::prefix(SV insertstr)") {}
-	else if (++acno && arg1 == "io   var::prefixer(SV insertstr)") {}
-	else if (++acno && arg1 == "io   var::popper()") {}
+	else if (++acno && arg1 == "void var::paster(const int pos1, const int length, SV replacestr) &") {}
+	else if (++acno && arg1 == "void var::paster(const int pos1, SV insertstr) &") {}
+	else if (++acno && arg1 == "var  var::prefix(SV prefixstr)") {}
+	else if (++acno && arg1 == "void var::prefixer(SV prefixstr) &") {}
+	else if (++acno && arg1 == "void var::popper() &") {}
 	else if (++acno && arg1 == "io   var::move(io tovar)") {}
 	else if (++acno && arg1 == "var  var::str(const int num) const") {}
 	else if (++acno && arg1 == "var  var::space() const") {}
-	else if (++acno && arg1 == "io   var::cropper()") {}
-	else if (++acno && arg1 == "io   var::lowerer()") {}
-	else if (++acno && arg1 == "io   var::raiser()") {}
-	else if (++acno && arg1 == "io   var::converter(SV fromchars, SV tochars)") {}
-	else if (++acno && arg1 == "io   var::converter(in fromchars, in tochars)") {}
-	else if (++acno && arg1 == "io   var::parser(char sepchar)") {}
-	else if (++acno && arg1 == "var  var::fcount(SV sep) const") {}
-	else if (++acno && arg1 == "var  var::count(SV str) const") {}
+	else if (++acno && arg1 == "void var::cropper() &") {}
+	else if (++acno && arg1 == "void var::lowerer() &") {}
+	else if (++acno && arg1 == "void var::raiser() &") {}
+	else if (++acno && arg1 == "void var::converter(SV fromchars, SV tochars) &") {}
+	else if (++acno && arg1 == "void var::converter(in fromchars, in tochars) &") {}
+	else if (++acno && arg1 == "void var::parser(char sepchar) &") {}
+	else if (++acno && arg1 == "var  var::fcount(SV sepstr) const") {}
+	else if (++acno && arg1 == "var  var::count(SV sepstr) const") {}
 	else if (++acno && arg1 == "var  var::index(SV substr, const int startindex) const") {}
 	else if (++acno && arg1 == "var  var::indexr(SV substr, const int startindex) const") {}
 	else if (++acno && arg1 == "var  var::index(SV substr) const") {}
 	else if (++acno && arg1 == "var  var::xlate(in filename, in fieldno, const char* mode) const") {}
-	else if (++acno && arg1 == "var  var::numberinwords(in number, in langname_or_locale_id)") {}
+	else if (++acno && arg1 == "var  var::numberinwords(in langname_or_locale_id)") {}
 	else if (++acno && arg1 == "var  var::iconv(const char* conversion) const") {}
 	else if (++acno && arg1 == "var  var::oconv(const char* conversion) const") {}
 	else if (++acno && arg1 == "var  var::mod(in limit) const") {}
@@ -279,50 +270,50 @@ auto get_timebank_acno(const std::string_view arg1) -> int {
 	else if (++acno && arg1 == "bool var::ossetenv(const char* envcode) const") {}
 	else if (++acno && arg1 == "CVR  var::put(std::ostream& ostream1) const") {}
 	else if (++acno && arg1 == "var  var::match(SV regex_str, SV regex_options) const") {}
-	else if (++acno && arg1 == "io   var::replacer(SV what, SV with)") {}
+	else if (++acno && arg1 == "void var::replacer(SV what, SV with) &") {}
 	else if (++acno && arg1 == "var  var::replace(const rex& regex, SV replacement) const") {}
 	else if (++acno && arg1 == "var  var::field(SV separatorx, const int fieldnx, const int nfieldsx) const") {}
-	else if (++acno && arg1 == "io   var::fieldstorer(SV separator0, const int fieldnx, const int nfieldsx, in replacementx)") {}
-	else if (++acno && arg1 == "bool var::locate(in target, io setting, const int fieldno/*=0*/, const int valueno/*=0*/) const") {}
-	else if (++acno && arg1 == "bool var::locate(in target, io setting, const int fieldno/*=0*/, const int valueno/*=0*/) const") {}
+	else if (++acno && arg1 == "void var::fieldstorer(SV separator0, const int fieldnx, const int nfieldsx, in replacementx) &") {}
+	else if (++acno && arg1 == "bool var::locate(in target, out setting, const int fieldno/*=0*/, const int valueno/*=0*/) const") {}
+	else if (++acno && arg1 == "bool var::locate(in target, out setting, const int fieldno/*=0*/, const int valueno/*=0*/) const") {}
 	else if (++acno && arg1 == "bool var::locate(in target) const") {}
-	else if (++acno && arg1 == "bool var::locateby(const char* ordercode, in target, io setting) const") {}
-	else if (++acno && arg1 == "bool var::locateby(const char* ordercode, in target, io setting, const int fieldno, const int valueno/*=0*/) const") {}
-	else if (++acno && arg1 == "bool var::locatebyusing(const char* ordercode, const char* usingchar, in target, io setting, const int fieldno=0, const int valueno=0, const int valueno=0) const") {}
+	else if (++acno && arg1 == "bool var::locateby(const char* ordercode, in target, out setting) const") {}
+	else if (++acno && arg1 == "bool var::locateby(const char* ordercode, in target, out setting, const int fieldno, const int valueno/*=0*/) const") {}
+	else if (++acno && arg1 == "bool var::locatebyusing(const char* ordercode, const char* usingchar, in target, out setting, const int fieldno=0, const int valueno=0, const int valueno=0) const") {}
 	else if (++acno && arg1 == "bool var::locateusing(const char* usingchar, in target) const") {}
-	else if (++acno && arg1 == "bool var::locateusing(const char* usingchar, in target, io setting, const int fieldno/*=0*/, const int valueno/*=0*/, const int subvalueno/*=0*/) const") {}
+	else if (++acno && arg1 == "bool var::locateusing(const char* usingchar, in target, out setting, const int fieldno/*=0*/, const int valueno/*=0*/, const int subvalueno/*=0*/) const") {}
 	else if (++acno && arg1 == "var  var::f(const int argfieldn, const int argvaluen, const int argsubvaluen) const") {}
-	else if (++acno && arg1 == "io   var::remover(int fieldno, int valueno, int subvalueno)") {}
-	else if (++acno && arg1 == "io   var::r(int fieldno, int valueno, int subvalueno, in replacement)") {}
-	else if (++acno && arg1 == "io   var::inserter(const int fieldno, const int valueno, const int subvalueno, in insertion)") {}
-	else if (++acno && arg1 == "bool var::starts(SV str) const") {}
-	else if (++acno && arg1 == "bool var::ends(SV str) const") {}
-	else if (++acno && arg1 == "bool var::contains(SV str) const") {}
+	else if (++acno && arg1 == "void var::remover(int fieldno, int valueno, int subvalueno) &") {}
+	else if (++acno && arg1 == "void var::r(int fieldno, int valueno, int subvalueno, in replacement) &") {}
+	else if (++acno && arg1 == "void var::inserter(const int fieldno, const int valueno, const int subvalueno, in insertion) &") {}
+	else if (++acno && arg1 == "bool var::starts(SV prefix) const") {}
+	else if (++acno && arg1 == "bool var::ends(SV suffix) const") {}
+	else if (++acno && arg1 == "bool var::contains(SV substr) const") {}
 	else if (++acno && arg1 == "var  var::first(const std::size_t length) const") {}
-	else if (++acno && arg1 == "io   var::firster(const std::size_t length)") {}
+	else if (++acno && arg1 == "void var::firster(const std::size_t length) &") {}
 	else if (++acno && arg1 == "var  var::last(const std::size_t length) const") {}
-	else if (++acno && arg1 == "io   var::laster(const std::size_t length)") {}
+	else if (++acno && arg1 == "void var::laster(const std::size_t length) &") {}
 	else if (++acno && arg1 == "var  var::cut(const int length) const") {}
-	else if (++acno && arg1 == "io   var::cutter(const int length)") {}
-	else if (++acno && arg1 == "io   var::substrer(const int startindex1, const int length)") {}
+	else if (++acno && arg1 == "void var::cutter(const int length) &") {}
+	else if (++acno && arg1 == "void var::substrer(const int pos1, const int length) &") {}
 	else if (++acno && arg1 == "var  var::at(const int charno) const") {}
 	else if (++acno && arg1 == "var  var::multivalued(const char* opcode, in var2) const") {}
-	else if (++acno && arg1 == "var  var::substr(const int startindex1, io delimiterchars, int& endindex) const") {}
-	else if (++acno && arg1 == "var  var::substr2(io startindex1, io delimiterno) const") {}
+	else if (++acno && arg1 == "var  var::substr(const int pos1, io delimiterchars, int& pos2) const") {}
+	else if (++acno && arg1 == "var  var::substr2(io pos1, io delimiterno) const") {}
 	else if (++acno && arg1 == "var  var::sumall() const") {}
 	else if (++acno && arg1 == "var  var::sum() const") {}
 	else if (++acno && arg1 == "var  var::sum(SV separator) const") {}
 	else if (++acno && arg1 == "bool var::setxlocale() const") {}
-	else if (++acno && arg1 == "io   var::quoter()") {}
-	else if (++acno && arg1 == "io   var::squoter()") {}
-	else if (++acno && arg1 == "io   var::unquoter()") {}
+	else if (++acno && arg1 == "void var::quoter() &") {}
+	else if (++acno && arg1 == "void var::squoter() &") {}
+	else if (++acno && arg1 == "void var::unquoter() &") {}
 	else if (++acno && arg1 == "CVR  var::swap(in var2) const") {}
 	else if (++acno && arg1 == "io   var::swap(io var2)") {}
 	else if (++acno && arg1 == "var  var::textwidth() const") {}
 	else if (++acno && arg1 == "var  var::first() const") {}
 	else if (++acno && arg1 == "var  var::last() const") {}
-	else if (++acno && arg1 == "io   var::firster()") {}
-	else if (++acno && arg1 == "io   var::laster()") {}
+	else if (++acno && arg1 == "void var::firster() &") {}
+	else if (++acno && arg1 == "void var::laster() &") {}
 	else if (++acno && arg1 == "var  var::search(SV regex_str, int startchar1, SV regex_options) const") {}
 	else if (++acno && arg1 == "std::wstring var::to_wstring() const") {}
 	else if (++acno && arg1 == "const char* var::c_str() const") {}
@@ -351,8 +342,31 @@ auto get_timebank_acno(const std::string_view arg1) -> int {
 	//else if (++acno && arg1 == "auto fmt::formatter::parse(...)") {}
 	else if (++acno && arg1 == "auto fmt::formatter::format(var) const") {}
 
-//	else if (++acno && arg1 == "")) acno = ;
+	else if (++acno && arg1 == "var  var::match(const rex& regex) const") {}
+	else if (++acno && arg1 == "var  var::search(const rex& regex, int startchar1) const") {}
+	else if (++acno && arg1 == "out  var::getxlocale()") {}
 
+	else if (++acno && arg1 == "CVR  var::output() const") {}
+	else if (++acno && arg1 == "CVR  var::outputl() const") {}
+	else if (++acno && arg1 == "CVR  var::outputt() const") {}
+	else if (++acno && arg1 == "CVR  var::output(in prefix) const") {}
+	else if (++acno && arg1 == "CVR  var::outputl(in prefix) const") {}
+	else if (++acno && arg1 == "CVR  var::outputt(in prefix) const") {}
+	else if (++acno && arg1 == "CVR  var::errput() const") {}
+	else if (++acno && arg1 == "CVR  var::errputl() const") {}
+	else if (++acno && arg1 == "CVR  var::errput(in prefix) const") {}
+	else if (++acno && arg1 == "CVR  var::errputl(in prefix) const") {}
+	else if (++acno && arg1 == "CVR  var::logput() const") {}
+	else if (++acno && arg1 == "CVR  var::logputl() const") {}
+	else if (++acno && arg1 == "CVR  var::logput(in prefix) const") {}
+	else if (++acno && arg1 == "CVR  var::logputl(in prefix) const") {}
+
+	// MUST REGENERATE timebank.txt after amending this list
+	//////////////////
+	// Otherwise timebank output will be wrong
+	// See instructions above
+
+//	else if (++acno && arg1 == "") {}
 
 	else {
 

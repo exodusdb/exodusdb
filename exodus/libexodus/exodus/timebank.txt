@@ -1,214 +1,234 @@
-500 dim& dim::splitter(in str1, SV sepchar = FM) 
-501 unused
-502 bool dim::read(in filevar, in key) 
-503 void dim::write(in filevar, in key) const 
-504 bool dim::osread(in osfilename, const char* codepage DEFAULT_EMPTY) 
-505 bool dim::oswrite(in osfilename, const char* codepage DEFAULT_EMPTY) 
-506 var  var::sort(SV sepchar = FM) 
-507 var  var::reverse(SV sepchar = FM) 
-508 var  var::timestamp(in ostime) const 
-509 bool var::connect(in conninfo 
-510 bool var::attach(in filenames 
-511 bool var::detach(in filenames 
-512 bool var::disconnect() 
-513 bool var::disconnectall() 
-514 bool var::open(in filename, in connection) 
-515 bool var::open cache_miss
-516 void var::close() 
-517 bool var::readc(in filehandle, in key) 
-518 void var::writec(in filehandle, in key) 
-519 bool var::deletec(in key) 
-520 bool var::read(in filehandle, in key) 
-521 bool var::reado cache_miss
-522 var  var::hash() const 
-523 var  var::lock(in key) const 
-524 void var::unlock(in key) const 
-525 void var::unlockall() const 
-526 bool var::sqlexec(in sqlcmd, io response) const 
-527 void var::writef(in filehandle, in key, const int fieldno) const 
-528 void var::write(in filehandle, in key) const 
-529 bool var::updaterecord(in filehandle, in key) const 
-530 bool var::insertrecord(in filehandle, in key) const 
-531 bool var::deleterecord(in key) const 
-532 bool var::cleardbcache() const 
-533 bool var::begintrans() const 
-534 bool var::rollbacktrans() const 
-535 bool var::committrans() const 
-536 bool var::statustrans() const 
-537 bool var::dbcreate(in from_dbname, in to_dbname) 
-538 bool var::dbdelete(in dbname) 
-539 bool var::createfile(in filename) 
-540 bool var::renamefile(in filename, in newfilename) 
-541 bool var::deletefile(in filename) 
-542 bool var::clearfile(in filename) 
-543 bool var::select(in sortselectclause) const 
-544 bool var::deletelist(in listname) const 
-545 bool var::savelist(in listname) 
-546 bool var::getlist(in listname) const 
-547 bool var::formlist(in keys, in fieldno) 
-548 bool var::makelist(in listname)
-549 bool var::hasnext() const
-550 bool var::readnext(io key, io valueno) const 
-551 bool var::readnext(io record, io key, io valueno) const 
-552 bool var::createindex(in fieldname, in dictfile) const 
-553 bool var::deleteindex(in fieldname) const 
-554 var  var::listfiles() const 
-555 var  var::dblist() const 
-556 bool var::cursorexists() 
-557 var  var::listindex(in filename) const 
-558 var  var::reccount(in filename_or_handle_or_null) const 
-559 var  var::flushindex(in filename=) const 
-560 bool var::input() 
-561 bool var::input(in prompt 
-562 bool var::inputn(const int nchars 
-563 io   var::default_to(in defaultvalue) const 
-564 io   var::default_from(in defaultvalue) 
-565 char var::toChar() const 
-566 str  var::toString() && 
-567 str  var::toString() const& 
-568 var  var::len() const 
-569 var  var::textlen() 
-570 std::u32string var::to_u32string() const 
-571 io   var::trim(SV trimchars) 
-572 io   var::trimmer(SV trimchars) 
-573 io   var::trimfirst(SV trimchars) const& 
-574 io   var::trimmerfirst(SV trimchars) 
-575 io   var::trimlast(SV trimchars) const& 
-576 io   var::trimmerlast(SV trimchars) 
-577 io   var::trimboth(SV trimchars) const& 
-578 io   var::trimmerboth(SV trimchars) 
-579 io   var::inverter() 
-580 io   var::ucaser() 
-581 io   var::lcaser() 
-582 io   var::tcaser() 
-583 io   var::fcaser() 
-584 io   var::normalizer() 
-585 var  var::unique() 
-586 var  var::seq() const 
-587 var  var::textseq() const 
-588 io   var::paster(const int pos1, const int length, SV insertstr) 
-589 io   var::paster(const int pos1, SV insertstr) 
-590 var  var::prefix(SV insertstr) 
-591 io   var::prefixer(SV insertstr) 
-592 io   var::popper() 
-593 io   var::move(io tovar) 
-594 var  var::str(const int num) const 
-595 var  var::space() const 
-596 io   var::cropper() 
-597 io   var::lowerer() 
-598 io   var::raiser() 
-599 io   var::converter(SV fromchars, SV tochars) 
-600 io   var::converter(in fromchars, in tochars) 
-601 io   var::parser(char sepchar) 
-602 var  var::fcount(SV sep) const 
-603 var  var::count(SV str) const 
-604 var  var::index(SV substr, const int startindex) const 
-605 var  var::indexr(SV substr, const int startindex) const 
-606 var  var::index(SV substr) const 
-607 var  var::xlate(in filename, in fieldno, const char* mode) const 
-608 var  var::numberinwords(in number, in langname_or_locale_id) 
-609 var  var::iconv(const char* conversion) const 
-610 var  var::oconv(const char* conversion) const 
-611 var  var::mod(in limit) const 
-612 var  var::mod(double limit) const 
-613 var  var::mod(const int limit) const 
-614 var  var::abs() const 
-615 var  var::sin() const 
-616 var  var::cos() const 
-617 var  var::tan() const 
-618 var  var::atan() const 
-619 var  var::loge() const 
-620 var  var::sqrt() const 
-621 var  var::pwr(in exponent) const 
-622 var  var::exp() const 
-623 var  var::osshell() const 
-624 var  var::osshellread() const 
-625 var  var::osshellwrite(in oscmd) const 
-626 bool var::osopen(in osfilename, const char* locale) 
-627 bool var::osopenx(in osfilename, const char* locale) 
-628 bool var::osread(const char* osfilename, const char* codepage 
-629 bool var::to_codepage(const char* codepage) const 
-630 bool var::from_codepage(const char* codepage) const 
-631 bool var::oswrite(in osfilename, const char* codepage) const 
-632 bool var::osbwrite(in osfilevar, io offset) const 
-633 bool var::osbread(in osfilevar, io offset, const int bytesize 
-634 bool var::osrename(in new_dirpath_or_filepath) const 
-635 bool var::oscopy(in new_dirpath_or_filepath) const 
-636 bool var::osmove(in new_dirpath_or_filepath) const 
-637 bool var::osrmdir(bool evenifnotempty) const 
-638 var  var::oslist(in globpattern, const int mode) const 
-639 var  var::oscwd(const char* newpath) const 
-640 var  var::oscwd() const 
-641 void var::ossleep(const int milliseconds) const 
-642 var  var::rnd() const 
-643 void var::initrnd() const 
-644 bool var::osgetenv(const char* envcode) 
-645 bool var::ossetenv(const char* envcode) const 
-646 CVR  var::put(std::ostream& ostream1) const 
-647 var  var::match(SV regex_str, SV regex_options) const 
-648 io   var::replacer(SV what, SV with) 
-649 var  var::replace(const rex& regex, SV replacement) const 
-650 var  var::field(SV separatorx, const int fieldnx, const int nfieldsx) const 
-651 io   var::fieldstorer(SV separator0, const int fieldnx, const int nfieldsx, in replacementx) 
-652 bool var::locate(in target, io setting, const int fieldno/*=0*/, const int valueno/*=0*/) const 
-653 bool var::locate(in target, io setting, const int fieldno/*=0*/, const int valueno/*=0*/) const 
-654 bool var::locate(in target) const 
-655 bool var::locateby(const char* ordercode, in target, io setting) const 
-656 bool var::locateby(const char* ordercode, in target, io setting, const int fieldno, const int valueno/*=0*/) const 
-657 bool var::locatebyusing(const char* ordercode, const char* usingchar, in target, io setting, const int fieldno=0, const int valueno=0, const int valueno=0) const 
-658 bool var::locateusing(const char* usingchar, in target) const 
-659 bool var::locateusing(const char* usingchar, in target, io setting, const int fieldno/*=0*/, const int valueno/*=0*/, const int subvalueno/*=0*/) const 
-660 var  var::f(const int argfieldn, const int argvaluen, const int argsubvaluen) const 
-661 io   var::remover(int fieldno, int valueno, int subvalueno) 
-662 io   var::r(int fieldno, int valueno, int subvalueno, in replacement) 
-663 io   var::inserter(const int fieldno, const int valueno, const int subvalueno, in insertion) 
-664 bool var::starts(SV str) const 
-665 bool var::ends(SV str) const 
-666 bool var::contains(SV str) const 
-667 var  var::first(const std::size_t length) const 
-668 io   var::firster(const std::size_t length) 
-669 var  var::last(const std::size_t length) const 
-670 io   var::laster(const std::size_t length) 
-671 var  var::cut(const int length) const 
-672 io   var::cutter(const int length) 
-673 io   var::substrer(const int startindex1, const int length) 
-674 var  var::at(const int charno) const 
-675 var  var::multivalued(const char* opcode, in var2) const 
-676 var  var::substr(const int startindex1, io delimiterchars, int& endindex) const 
-677 var  var::substr2(io startindex1, io delimiterno) const 
-678 var  var::sumall() const 
-679 var  var::sum() const 
-680 var  var::sum(SV separator) const 
-681 bool var::setxlocale() const 
-682 io   var::quoter() 
-683 io   var::squoter() 
-684 io   var::unquoter() 
-685 CVR  var::swap(in var2) const 
-686 io   var::swap(io var2) 
-687 var  var::textwidth() const 
-688 var  var::first() const 
-689 var  var::last() const 
-690 io   var::firster() const
-691 io   var::laster() const 
-692 var  var::search(SV regex_str, int startchar1, SV regex_options) const 
-693 std::wstring var::to_wstring() const 
-694 const char* var::c_str() const 
-695 str  var::oconv_T(in format) const
-696 str  var::oconv_MD(const char* conversion) const
-697 str  var::oconv_LRC(in format) const 
-698 str  var::oconv_TX(const char* conversion) const 
-699 str  var::oconv_HEX(const int) const 
-700 var  var::iconv_D(const char* conversion) const 
-701 str  var::oconv_D(const char* conversion) const 
-702 io   var::oconv_MR(const char* conversion) 
-703 var  var::iconv_MT() const 
-704 str  var::oconv_MT(const char* conversion) const 
-705 var  var::iconv_HEX(const int ioratio) const 
-706 var  var::iconv_TX(const char* conversion) const 
-707 var  var::quote() const& 
-708 var  var::squote() const& 
-709 var  var::quote() const& 
-710 str  var::oconv_MT(const char* conversion) const 
-711 var  var::format(SV fmt_str, Args&&... args) const 
-712 var  format(SV fmt_str, Args&&... args)
-713 auto fmt::formatter::format(var) const 
+500 (.*)
+501 dim& dim::splitter(in str1, SV sepchar = FM)
+502 xxxxxxxx unused
+503 bool dim::read(in filevar, in key)
+504 void dim::write(in filevar, in key) const
+505 bool dim::osread(in osfilename, const char* codepage DEFAULT_EMPTY)
+506 bool dim::oswrite(in osfilename, const char* codepage DEFAULT_EMPTY)
+507 var  var::sort(SV sepchar = FM)
+508 var  var::reverse(SV sepchar = FM)
+509 var  var::timestamp(in ostime) const
+510 bool var::connect(in conninfo
+511 bool var::attach(in filenames
+512 bool var::detach(in filenames
+513 bool var::disconnect()
+514 bool var::disconnectall()
+515 bool var::open(in filename, in connection)
+516 bool var::open cache_miss
+517 void var::close()
+518 bool var::readc(in file, in key)
+519 void var::writec(in file, in key)
+520 bool var::deletec(in key)
+521 bool var::read(in file, in key)
+522 bool var::readc cache_miss
+523 var  var::hash() const
+524 var  var::lock(in key) const
+525 void var::unlock(in key) const
+526 void var::unlockall() const
+527 bool var::sqlexec(in sqlcmd, io response) const
+528 void var::writef(in file, in key, const int fieldno) const
+529 void var::write(in file, in key) const
+530 bool var::updaterecord(in file, in key) const
+531 bool var::insertrecord(in file, in key) const
+532 bool var::deleterecord(in key) const
+533 bool var::cleardbcache() const
+534 bool var::begintrans() const
+535 bool var::rollbacktrans() const
+536 bool var::committrans() const
+537 bool var::statustrans() const
+538 bool var::dbcreate(in from_dbname, in to_dbname)
+539 bool var::dbdelete(in dbname)
+540 bool var::createfile(in filename)
+541 bool var::renamefile(in filename, in newfilename)
+542 bool var::deletefile(in filename)
+543 bool var::clearfile(in filename)
+544 bool var::select(in sortselectclause) const
+545 bool var::deletelist(in listname) const
+546 bool var::savelist(in listname)
+547 bool var::getlist(in listname) const
+548 bool var::formlist(in keys, in fieldno)
+549 bool var::makelist(in listname)
+550 bool var::hasnext() const
+551 bool var::readnext(io key, io valueno) const
+552 bool var::readnext(io record, io key, io valueno) const
+553 bool var::createindex(in fieldname, in dictfile) const
+554 bool var::deleteindex(in fieldname) const
+555 var  var::listfiles() const
+556 var  var::dblist() const
+557 bool var::cursorexists()
+558 var  var::listindex(in filename) const
+559 var  var::reccount(in filename_or_handle_or_null) const
+560 bool var::flushindex(in filename=) const
+561 out  var::input()
+562 out  var::input(in prompt
+563 out  var::inputn(const int nchars
+564 io   var::default_to(in defaultvalue) const
+565 io   var::default_from(in defaultvalue)
+566 char var::toChar() const
+567 str  var::toString() &&
+568 str  var::toString() const&
+569 var  var::len() const
+570 var  var::textlen()
+571 std::u32string var::to_u32string() const
+572 io   var::trim(SV trimchars)
+573 void var::trimmer(SV trimchars) &
+574 io   var::trimfirst(SV trimchars) const&
+575 void var::trimmerfirst(SV trimchars) &
+576 io   var::trimlast(SV trimchars) const&
+577 void var::trimmerlast(SV trimchars) &
+578 io   var::trimboth(SV trimchars) const&
+579 void var::trimmerboth(SV trimchars) &
+580 void var::inverter() &
+581 void var::ucaser() &
+582 void var::lcaser() &
+583 void var::tcaser() &
+584 void var::fcaser() &
+585 void var::normalizer() &
+586 var  var::unique()
+587 var  var::seq() const
+588 var  var::textseq() const
+589 void var::paster(const int pos1, const int length, SV replacestr) &
+590 void var::paster(const int pos1, SV insertstr) &
+591 var  var::prefix(SV prefixstr)
+592 void var::prefixer(SV prefixstr) &
+593 void var::popper() &
+594 io   var::move(io tovar)
+595 var  var::str(const int num) const
+596 var  var::space() const
+597 void var::cropper() &
+598 void var::lowerer() &
+599 void var::raiser() &
+600 void var::converter(SV fromchars, SV tochars) &
+601 void var::converter(in fromchars, in tochars) &
+602 void var::parser(char sepchar) &
+603 var  var::fcount(SV sepstr) const
+604 var  var::count(SV sepstr) const
+605 var  var::index(SV substr, const int startindex) const
+606 var  var::indexr(SV substr, const int startindex) const
+607 var  var::index(SV substr) const
+608 var  var::xlate(in filename, in fieldno, const char* mode) const
+609 var  var::numberinwords(in langname_or_locale_id)
+610 var  var::iconv(const char* conversion) const
+611 var  var::oconv(const char* conversion) const
+612 var  var::mod(in limit) const
+613 var  var::mod(double limit) const
+614 var  var::mod(const int limit) const
+615 var  var::abs() const
+616 var  var::sin() const
+617 var  var::cos() const
+618 var  var::tan() const
+619 var  var::atan() const
+620 var  var::loge() const
+621 var  var::sqrt() const
+622 var  var::pwr(in exponent) const
+623 var  var::exp() const
+624 var  var::osshell() const
+625 var  var::osshellread() const
+626 var  var::osshellwrite(in oscmd) const
+627 bool var::osopen(in osfilename, const char* locale)
+628 bool var::osopenx(in osfilename, const char* locale)
+629 bool var::osread(const char* osfilename, const char* codepage
+630 bool var::to_codepage(const char* codepage) const
+631 bool var::from_codepage(const char* codepage) const
+632 bool var::oswrite(in osfilename, const char* codepage) const
+633 bool var::osbwrite(in osfilevar, io offset) const
+634 bool var::osbread(in osfilevar, io offset, const int bytesize
+635 bool var::osrename(in new_dirpath_or_filepath) const
+636 bool var::oscopy(in new_dirpath_or_filepath) const
+637 bool var::osmove(in new_dirpath_or_filepath) const
+638 bool var::osrmdir(bool evenifnotempty) const
+639 var  var::oslist(in globpattern, const int mode) const
+640 var  var::oscwd(const char* newpath) const
+641 var  var::oscwd() const
+642 void var::ossleep(const int milliseconds) const
+643 var  var::rnd() const
+644 void var::initrnd() const
+645 bool var::osgetenv(const char* envcode)
+646 bool var::ossetenv(const char* envcode) const
+647 CVR  var::put(std::ostream& ostream1) const
+648 var  var::match(SV regex_str, SV regex_options) const
+649 void var::replacer(SV what, SV with) &
+650 var  var::replace(const rex& regex, SV replacement) const
+651 var  var::field(SV separatorx, const int fieldnx, const int nfieldsx) const
+652 void var::fieldstorer(SV separator0, const int fieldnx, const int nfieldsx, in replacementx) &
+653 bool var::locate(in target, out setting, const int fieldno/*=0*/, const int valueno/*=0*/) const
+654 bool var::locate(in target, out setting, const int fieldno/*=0*/, const int valueno/*=0*/) const
+655 bool var::locate(in target) const
+656 bool var::locateby(const char* ordercode, in target, out setting) const
+657 bool var::locateby(const char* ordercode, in target, out setting, const int fieldno, const int valueno/*=0*/) const
+658 bool var::locatebyusing(const char* ordercode, const char* usingchar, in target, out setting, const int fieldno=0, const int valueno=0, const int valueno=0) const
+659 bool var::locateusing(const char* usingchar, in target) const
+660 bool var::locateusing(const char* usingchar, in target, out setting, const int fieldno/*=0*/, const int valueno/*=0*/, const int subvalueno/*=0*/) const
+661 var  var::f(const int argfieldn, const int argvaluen, const int argsubvaluen) const
+662 void var::remover(int fieldno, int valueno, int subvalueno) &
+663 void var::r(int fieldno, int valueno, int subvalueno, in replacement) &
+664 void var::inserter(const int fieldno, const int valueno, const int subvalueno, in insertion) &
+665 bool var::starts(SV prefix) const
+666 bool var::ends(SV suffix) const
+667 bool var::contains(SV substr) const
+668 var  var::first(const std::size_t length) const
+669 void var::firster(const std::size_t length) &
+670 var  var::last(const std::size_t length) const
+671 void var::laster(const std::size_t length) &
+672 var  var::cut(const int length) const
+673 void var::cutter(const int length) &
+674 void var::substrer(const int startindex1, const int length) &
+675 var  var::at(const int charno) const
+676 var  var::multivalued(const char* opcode, in var2) const
+677 var  var::substr(const int startindex1, io delimiterchars, int& pos2) const
+678 var  var::substr2(io startindex1, io delimiterno) const
+679 var  var::sumall() const
+680 var  var::sum() const
+681 var  var::sum(SV separator) const
+682 bool var::setxlocale() const
+683 void var::quoter() &
+684 void var::squoter() &
+685 void var::unquoter() &
+686 CVR  var::swap(in var2) const
+687 io   var::swap(io var2)
+688 var  var::textwidth() const
+689 var  var::first() const
+690 var  var::last() const
+691 void var::firster() &
+692 void var::laster() &
+693 var  var::search(SV regex_str, int startchar1, SV regex_options) const
+694 std::wstring var::to_wstring() const
+695 const char* var::c_str() const
+696 str  var::oconv_T(in format) const
+697 str  var::oconv_MD(const char* conversion) const
+698 str  var::oconv_LRC(in format) const
+699 str  var::oconv_TX(const char* conversion) const
+700 str  var::oconv_HEX(const int) const
+701 var  var::iconv_D(const char* conversion) const
+702 str  var::oconv_D(const char* conversion) const
+703 io   var::oconv_MR(const char* conversion) const
+704 var  var::iconv_MT() const
+705 str  var::oconv_MT(const char* conversion) const
+706 var  var::iconv_HEX(const int ioratio) const
+707 var  var::iconv_TX(const char* conversion) const
+708 var  var::quote() const&
+709 var  var::squote() const&
+710 var  var::unquote() const&
+711 str  var::oconv_MT(const char* conversion) const
+712 var  var::format(SV fmt_str, Args&&... args) const
+713 var  format(SV fmt_str, Args&&... args)
+714 auto fmt::formatter::parse(...)
+715 auto fmt::formatter::format(var) const
+716 var  var::match(const rex& regex) const
+717 var  var::search(const rex& regex, int startchar1) const
+718 out  var::getxlocale()
+719 CVR  var::output() const
+720 CVR  var::outputl() const
+721 CVR  var::outputt() const
+722 CVR  var::output(in prefix) const
+723 CVR  var::outputl(in prefix) const
+724 CVR  var::outputt(in prefix) const
+725 CVR  var::errput() const
+726 CVR  var::errputl() const
+727 CVR  var::errput(in prefix) const
+728 CVR  var::errputl(in prefix) const
+729 CVR  var::logput() const
+730 CVR  var::logputl() const
+731 CVR  var::logput(in prefix) const
+732 CVR  var::logputl(in prefix) const
+    

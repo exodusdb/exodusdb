@@ -906,7 +906,27 @@ bool var::osrename(in new_dirpath_or_filepath) const {
 		return false;
 	}
 
-	return !std::rename(path1.c_str(), path2.c_str());
+//	if (!std::rename(path1.c_str(), path2.c_str())) {
+//	// TODO problem no informative error message
+//		this->setlasterror("osrename failed. " ^ this->quote() ^ " to " ^ new_dirpath_or_filepath.quote() ^ " unknown error.");
+//		return false;
+//	}
+
+	//https://en.cppreference.com/w/cpp/filesystem/rename
+	std::error_code error_code;
+	std::filesystem::rename(
+		path1.c_str(),
+		path2.c_str(),
+		error_code
+	);
+
+    // Handle error
+    if (error_code) {
+		this->setlasterror("osrename failed. " ^ this->quote() ^ " to " ^ new_dirpath_or_filepath.quote() ^ " Error: 0" ^ error_code.message());
+		return false;
+    }
+
+	return true;
 }
 
 bool var::oscopy(in new_dirpath_or_filepath) const {
@@ -940,7 +960,7 @@ bool var::oscopy(in new_dirpath_or_filepath) const {
 
     // Handle error
     if (error_code) {
-		this->setlasterror("oscopy failed. " ^ this->quote() ^ " to " ^ new_dirpath_or_filepath.quote());
+		this->setlasterror("oscopy failed. " ^ this->quote() ^ " to " ^ new_dirpath_or_filepath.quote() ^ " Error: " ^ error_code.message());
 		return false;
     }
 
@@ -1105,7 +1125,8 @@ void time_t_to_pick_date_time(time_t time, int* pick_date, int* pick_time);
 //	return system_clock::to_time_t(sctp);
 //}
 
-var  var::osinfo(const int mode) const {
+// Return for a file or dir, a short string containing modified_date ^ FM ^ modified_time ^ FM ^size
+var  var::osinfo(const int mode /*=0*/) const {
 
 	assertString(__PRETTY_FUNCTION__);
 
@@ -1177,50 +1198,6 @@ var  var::osdir() const {
 	return this->osinfo(2);
 }
 
-// old slower implementation using std::filesystem
-//var  var::osdir() const {
-//
-//	THISIS("var  var::osdir() const")
-//	assertString(function_sig);
-//
-//	// get a handle and return "" if doesnt exist or is NOT a directory
-//	// std::filesystem::wpath pathx(toTstring((*this)).c_str());
-//	try {
-//
-//		std::filesystem::path pathx(to_path_string(*this).c_str());
-//
-//		if (!std::filesystem::exists(pathx))
-//			return "";
-//		if (!std::filesystem::is_directory(pathx))
-//			return "";
-//
-//		//not using low level interface
-//		//https://stackoverflow.com/questions/21159047/get-the-creation-date-of-file-or-folder-in-c#21159305
-//
-//		// SIMILAR CODE IN OSFILE AND OSDIR
-//
-//		// get last write datetime
-//		//std::time_t last_write_time = std::chrono::system_clock::to_time_t(std::filesystem::last_write_time(pathx));
-//		std::filesystem::file_time_type file_time = std::filesystem::last_write_time(pathx);
-//		std::time_t last_write_time = to_time_t(file_time);
-//
-//		// convert to posix time
-//		boost::posix_time::ptime ptimex = boost::posix_time::from_time_t(last_write_time);
-//		//std::filesystem::file_time_type ptimex = std::filesystem::last_write_time(pathx);
-//
-//		// convert posix time to mv date and time
-//		int mvdate, mvtime;
-//		ptime2mvdatetime(ptimex, mvdate, mvtime);
-//
-//		//file_size() is only available for files not directories
-//		//return int(std::filesystem::file_size(pathx)) ^ FM ^ mvdate ^ FM ^ int(mvtime);
-//		return FM ^ mvdate ^ FM ^ int(mvtime);
-//
-//	} catch (...) {
-//		return "";
-//	}
-//}
-
 var  var::oslistf(SV globpattern) const {
 	return this->oslist(globpattern, 1);
 }
@@ -1242,16 +1219,16 @@ var  var::oslist(SV globpattern0, const int mode) const {
 	//ISSTRING(path0)
 	//ISSTRING(globpattern0)
 
-	// returns an fm separated list of files and/or folders
+	// returns an FM separated list of files and/or folders
 
 	// http://www.boost.org/libs/filesystem/example/simple_ls.cpp
 
-	var path = to_path_string(*this);
+	var this_path = to_path_string(*this);
 	var globpattern;
 	if (globpattern0.size()) {
 		globpattern = globpattern0;
 	}
-	// file globbing can and must be passed as tail end of path
+	// File globbing can and must be passed as tail end of path
 	// perhaps could use <glob.h> in linux instead of regex
 	// TODO bash-like globbing using something like
 	// https://github.com/MrGriefs/glob-cpp/blob/main/README.md
@@ -1259,39 +1236,39 @@ var  var::oslist(SV globpattern0, const int mode) const {
 
 		// If the last part of path looks like a glob
 		// (has * or ?) use it.
-		globpattern = path.field2(_OSSLASH, -1);
+		globpattern = this_path.field2(_OSSLASH, -1);
 		if (globpattern.convert("*?", "") != globpattern)
-			path.firster(path.len() - globpattern.len());
+			this_path.firster(this_path.len() - globpattern.len());
 		else
 			globpattern = "";
 	}
 
-	bool getfiles = true;
-	bool getfolders = true;
-	if (mode == 1)
-		getfolders = false;
-	else if (mode == 2)
-		getfiles = false;
+	const bool getfiles = mode != 2;
+	const bool getfolders = mode != 1;
 
+	// nrvo
 	var filelist = "";
+
+	// Work out the full absolute path
 	std::filesystem::path full_path(std::filesystem::current_path());
-	if (path.len()) {
-		//full_path = std::filesystem::absolute(std::filesystem::path(path.to_path_string().c_str()));
+	if (this_path.len()) {
+		//full_path = std::filesystem::absolute(std::filesystem::path(this_path.to_path_string().c_str()));
 		std::error_code error_code;
-		std::filesystem::path pathx = std::filesystem::path(to_path_string(path).c_str());
+		std::filesystem::path pathx = std::filesystem::path(to_path_string(this_path).c_str());
 		full_path = std::filesystem::absolute(pathx, error_code);
 		if (error_code) {
-			std::cerr << "'" << to_path_string(path) << "' path : " << error_code.message() << std::endl;
+			std::cerr << "'" << to_path_string(this_path) << "' path : " << error_code.message() << std::endl;
 			return filelist;
 		}
 
 	}
+
 	if (globpattern == "*")
 		globpattern = "";
 
 	//std::clog << "fullpath='" << full_path << "'" <<std::endl;
 
-	// quit if it isnt a folder
+	// Quit if it isnt a folder
 	if (!std::filesystem::is_directory(full_path))
 		return filelist;
 
@@ -1299,20 +1276,26 @@ var  var::oslist(SV globpattern0, const int mode) const {
 	for (std::filesystem::directory_iterator dir_itr(full_path); dir_itr != end_iter; ++dir_itr) {
 		try {
 
-			// skip unwanted items
+			// Skip unwanted items not matching the glob if provided
 			//TRACE(dir_itr->path().filename().string())
 			//TRACE(globpattern)
 			if (globpattern && fnmatch(globpattern.var_str.c_str(), dir_itr->path().filename().c_str(), 0) != 0)
 				continue;
 
-			// work/efficiently if (std::filesystem::is_directory(dir_itr->status() ) )
+			// Work/efficiently if (std::filesystem::is_directory(dir_itr->status() ) )
 			if (std::filesystem::is_directory(*dir_itr)) {
-				if (getfolders)
-					filelist ^= dir_itr->path().filename().string() ^ FM;
+				if (getfolders) {
+append_it:
+//					filelist ^= dir_itr->path().filename().string() ^ FM;
+					filelist.var_str += dir_itr->path().filename().string();
+					filelist.var_str.push_back(FM_);
+				}
 			}
 			else {
-				if (getfiles)
-					filelist ^= dir_itr->path().filename().string() ^ FM;
+				if (getfiles) {
+//					filelist ^= dir_itr->path().filename().string() ^ FM;
+					goto append_it;
+				}
 			}
 		} catch ([[maybe_unused]] const std::exception& ex) {
 			//++err_count;

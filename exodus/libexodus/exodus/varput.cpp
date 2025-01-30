@@ -66,6 +66,7 @@ CVR  var::put(std::ostream& ostream1) const {
 
 // output() buffered threadsafe output to standard output
 CVR  var::output() const {
+	THISIS("CVR  var::output() const")
 	LOCKIOSTREAM_OR_NOT
 	return this->put(std::cout);
 }
@@ -73,6 +74,7 @@ CVR  var::output() const {
 // outputl() flushed threadsafe output to standard output
 // adds \n and flushes so is slower than output("\n")
 CVR  var::outputl() const {
+	THISIS("CVR  var::outputl() const")
 	LOCKIOSTREAM_OR_NOT
 	this->put(std::cout);
 	std::cout << std::endl;
@@ -82,6 +84,7 @@ CVR  var::outputl() const {
 // outputt() buffered threadsafe output to standard output
 // adds \t
 CVR  var::outputt() const {
+	THISIS("CVR  var::outputt() const")
 	LOCKIOSTREAM_OR_NOT
 	this->put(std::cout);
 	std::cout << '\t';
@@ -89,26 +92,29 @@ CVR  var::outputt() const {
 }
 
 // overloaded output() outputs a prefix str
-CVR  var::output(in str) const {
+CVR  var::output(in prefix) const {
+	THISIS("CVR  var::output(in prefix) const")
 	LOCKIOSTREAM_OR_NOT
-	str.put(std::cout);
+	prefix.put(std::cout);
 	return this->put(std::cout);
 }
 
 // oveloaded outputl() outputs a prefix str
-CVR  var::outputl(in str) const {
+CVR  var::outputl(in prefix) const {
+	THISIS("CVR  var::outputl(in prefix) const")
 	LOCKIOSTREAM_OR_NOT
-	str.put(std::cout);
+	prefix.put(std::cout);
 	this->put(std::cout);
 	std::cout << std::endl;
 	return *this;
 }
 
 // overloaded outputt() outputs a prefix str
-CVR  var::outputt(in str) const {
+CVR  var::outputt(in prefix) const {
+	THISIS("CVR  var::outputt(in prefix) const")
 	LOCKIOSTREAM_OR_NOT
 	std::cout << "\t";
-	str.put(std::cout);
+	prefix.put(std::cout);
 	std::cout << "\t";
 	this->put(std::cout);
 	return *this;
@@ -119,6 +125,7 @@ CVR  var::outputt(in str) const {
 
 // errput() unbuffered threadsafe output to standard error
 CVR  var::errput() const {
+	THISIS("CVR  var::errput() const")
 	LOCKIOSTREAM_OR_NOT
 	//return put(std::cerr);
 	std::cerr << *this;
@@ -128,6 +135,7 @@ CVR  var::errput() const {
 // errputl() unbuffered threadsafe output to standard error
 // adds "\n"
 CVR  var::errputl() const {
+	THISIS("CVR  var::errputl() const")
 	LOCKIOSTREAM_OR_NOT
 	//this->put(std::cerr);
 	std::cerr << *this;
@@ -136,21 +144,23 @@ CVR  var::errputl() const {
 }
 
 // overloaded errput outputs a prefix str
-CVR  var::errput(in str) const {
+CVR  var::errput(in prefix) const {
+	THISIS("CVR  var::errput(in prefix) const")
 	LOCKIOSTREAM_OR_NOT
-	//str.put(std::cerr);
+	//prefix.put(std::cerr);
 	//return this->put(std::cerr);
-	std::cerr << str;
+	std::cerr << prefix;
 	std::cerr << *this;
 	return *this;
 }
 
 // overloaded errputl outputs a prefix str
-CVR  var::errputl(in str) const {
+CVR  var::errputl(in prefix) const {
+	THISIS("CVR  var::errputl(in prefix) const")
 	LOCKIOSTREAM_OR_NOT
-	//str.put(std::cerr);
+	//prefix.put(std::cerr);
 	//this->put(std::cerr);
-	std::cerr << str;
+	std::cerr << prefix;
 	std::cerr << *this;
 	std::cerr << std::endl;
 	return *this;
@@ -161,6 +171,7 @@ CVR  var::errputl(in str) const {
 
 // logput() buffered threadsafe output to standard log
 CVR  var::logput() const {
+	THISIS("CVR  var::logput() const")
 	LOCKIOSTREAM_OR_NOT
 	//this->put(std::clog);
 	std::clog << *this;
@@ -170,6 +181,7 @@ CVR  var::logput() const {
 
 // logputl() flushed threadsafe output to standard log
 CVR  var::logputl() const {
+	THISIS("CVR  var::logputl() const")
 	LOCKIOSTREAM_OR_NOT
 	//this->put(std::clog);
 	std::clog << *this;
@@ -178,20 +190,22 @@ CVR  var::logputl() const {
 }
 
 // overloaded logput with a prefix str
-CVR  var::logput(in str) const {
+CVR  var::logput(in prefix) const {
+	THISIS("CVR  var::logput(in prefix) const")
 	LOCKIOSTREAM_OR_NOT
-	//str.put(std::clog);
-	std::clog << str;
+	//prefix.put(std::clog);
+	std::clog << prefix;
 	std::clog << *this;
 	return *this;
 }
 
 // overloaded logputl with a prefix str
-CVR  var::logputl(in str) const {
+CVR  var::logputl(in prefix) const {
+	THISIS("CVR  var::logputl(in prefix) const")
 	LOCKIOSTREAM_OR_NOT
-	//str.put(std::clog);
+	//prefix.put(std::clog);
 	//this->put(std::clog);
-	std::clog << str;
+	std::clog << prefix;
 	std::clog << *this;
 	std::clog << std::endl;
 	return *this;

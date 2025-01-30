@@ -374,10 +374,10 @@ static std::uint64_t mvdbpostgres_hash_stdstr(std::string str1) {
 /////////////////////////////
 // Create a cross platform stable unique lock number per filename & key to manipulate advisory locks on a postgres connection
 // TODO Provide an endian identical version. required if and when exodus processes connect to postgres from different endian hosts
-static std::uint64_t mvdbpostgres_hash_file_and_key(in filehandle, in key) {
+static std::uint64_t mvdbpostgres_hash_file_and_key(in file, in key) {
 
 	// Use the pure filename and disregard any connection number
-	std::string fileandkey = get_normal_filename(filehandle);
+	std::string fileandkey = get_normal_filename(file);
 
 	// Separate the filename from the key to avoid alternative interpretations
 	// eg "FILENAMEKEY" could be FILE, NAMEKEY or FILENAME, KEY
@@ -1187,12 +1187,12 @@ void var::disconnect() {
 	std::erase_if(
 		thread_file_handles,
 		[dbconn_no](auto iter){
-			var filehandle = iter.second;
+			var file = iter.second;
 			// Don't erase if not the desired dbconn_no
-			if (filehandle.f(2) != dbconn_no) UNLIKELY
+			if (file.f(2) != dbconn_no) UNLIKELY
 				return false;
 			if (DBTRACE_CONN >= 3) {
-				var(iter.second).logputl("var::disconnect() remove cached filehandle ");
+				var(iter.second).logputl("var::disconnect() remove cached file ");
 			}
 			// Do erase this file handle cache entry
 			return true;
@@ -1246,9 +1246,9 @@ void var::disconnectall() {
 	return;
 }
 
-// open filehandle given a filename on current thread-default connection
-// we are using strict filename/filehandle syntax (even though we could use one variable for both!)
-// we store the filename in the filehandle since that is what we need to generate read/write sql
+// open file given a filename on current thread-default connection
+// we are using strict filename/file syntax (even though we could use one variable for both!)
+// we store the filename in the file since that is what we need to generate read/write sql
 // later usage example:
 // var file;
 // var filename="customers";
@@ -1375,7 +1375,7 @@ bool var::open(in filename, in connection /*DEFAULTNULL*/) {
 	// */
 
 	//this->setlasterror();
-	// var becomes a filehandle containing the filename and connection no
+	// var becomes a file containing the filename and connection no
 //	(*this) = normal_filename ^ FM ^ get_dbconn_no_or_default(connection2);
 //	normal_filename.var_str.push_back(FM_);
 //	normal_filename.var_str.append(std::to_string(get_dbconn_no_or_default(connection2)));
@@ -1386,7 +1386,7 @@ bool var::open(in filename, in connection /*DEFAULTNULL*/) {
 	var_str.append(std::to_string(get_dbconn_no_or_default(connection2)));
 	var_typ = VARTYP_NANSTR;
 
-	// Cache the filehandle so future opens return the same
+	// Cache the file so future opens return the same
 	// Similar code in dbattach and open
 	thread_file_handles[normal_filename] = var_str;
 
@@ -1405,32 +1405,33 @@ void var::close() {
 	*/
 }
 
-bool var::readf(in filehandle, in key, const int fieldno) {
-	//THISIS("bool var::readf(in filehandle, in key, const int fieldno)")
-	//assertDefined(function_sig);
-	//ISSTRING(filehandle)
-	//ISSTRING(key)
+bool var::readf(in file, in key, const int fieldno) {
 
-	if (!this->read(filehandle, key)) UNLIKELY
+	// Read the whole record first
+	if (!this->read(file, key)) UNLIKELY
 		return false;
 
-	var_str = this->f(fieldno).var_str;
-	var_typ = VARTYP_STR;
+	// Extract the required field
+	if (fieldno >= 0) {
+		LIKELY
+		var_str = this->f(fieldno).var_str;
+//		var_typ = VARTYP_STR;
+	}
 
 	return true;
 }
 
-bool var::readc(in filehandle, in key) {
+bool var::readc(in file, in key) {
 
-	THISIS("bool var::readc(in filehandle, in key)")
+	THISIS("bool var::readc(in file, in key)")
 	assertDefined(function_sig);
-	//ISSTRING(filehandle)
+	//ISSTRING(file)
 	//ISSTRING(key)
-	ISSTRING(filehandle)
+	ISSTRING(file)
 	ISSTRING(key)
 
 	// check cache first, and return any cached record
-	int dbconn_no = get_dbconn_no_or_default(filehandle);
+	int dbconn_no = get_dbconn_no_or_default(file);
 	if (!dbconn_no) UNLIKELY
 		throw VarDBException("get_dbconn_no() failed");
 
@@ -1446,8 +1447,8 @@ bool var::readc(in filehandle, in key) {
 
 	// Attempt to get record from the cache
 	// TODO cache non-existent records as empty
-	auto hash64 = mvdbpostgres_hash_file_and_key(filehandle, key);
-	//TRACE("readc " ^ filehandle ^ " " ^ key ^ " " ^ var(hash64 % 1'000'000'000)) //modulo to bring the uint64 into range that var can handle without throwing overflow
+	auto hash64 = mvdbpostgres_hash_file_and_key(file, key);
+	//TRACE("readc " ^ file ^ " " ^ key ^ " " ^ var(hash64 % 1'000'000'000)) //modulo to bring the uint64 into range that var can handle without throwing overflow
 	std::string cachedrecord;
 	if (thread_dbconnector.getrecord(dbconn_no, hash64, cachedrecord)) {
 		if (cachedrecord.empty()) LIKELY {
@@ -1464,19 +1465,19 @@ bool var::readc(in filehandle, in key) {
 
 #ifdef EXO_TIMEBANK
 	//Timer t2(247);//readc cache_miss
-	Timer timer1(get_timebank_acno("bool var::reado cache_miss"));
+	Timer timer1(get_timebank_acno("bool var::readc cache_miss"));
 #endif
 	// Ordinary read from the database
-	bool result = this->read(filehandle, key);
+	bool result = this->read(file, key);
 
 	if (result) {
 		// Cache the ordinary read
-		//this->writec(filehandle, key);
+		//this->writec(file, key);
 		//TRACE("cache add+ " ^ key);
 		thread_dbconnector.putrecord(dbconn_no, hash64, var_str);
 	} else {
 		// Empty if failure
-		var("").writec(filehandle, key);
+		var("").writec(file, key);
 		//TRACE("cache add-" ^ key);
 		thread_dbconnector.putrecord(dbconn_no, hash64, "");
 
@@ -1485,22 +1486,22 @@ bool var::readc(in filehandle, in key) {
 	return result;
 }
 
-void var::writec(in filehandle, in key) const {
+void var::writec(in file, in key) const {
 
-	THISIS("void var::writec(in filehandle, in key)")
+	THISIS("void var::writec(in file, in key)")
 	assertString(function_sig);
-	ISSTRING(filehandle)
+	ISSTRING(file)
 	ISSTRING(key)
 
 	// update cache
 	// virtually identical code in read and write/update/insert/delete
-	int dbconn_no = get_dbconn_no_or_default(filehandle);
+	int dbconn_no = get_dbconn_no_or_default(file);
 	if (!dbconn_no)
 		UNLIKELY
 		throw VarDBException("get_dbconn_no() failed");
 
-	auto hash64 = mvdbpostgres_hash_file_and_key(filehandle, key);
-	//TRACE("writec " ^ filehandle ^ " " ^ key ^ " " ^ var(hash64 % 1'000'000'000)) //modulo to bring the uint64 into range that var can handle without throwing overflow
+	auto hash64 = mvdbpostgres_hash_file_and_key(file, key);
+	//TRACE("writec " ^ file ^ " " ^ key ^ " " ^ var(hash64 % 1'000'000'000)) //modulo to bring the uint64 into range that var can handle without throwing overflow
 	thread_dbconnector.putrecord(dbconn_no, hash64, var_str);
 
 	return;
@@ -1524,11 +1525,11 @@ bool var::deletec(in key) const {
 	return thread_dbconnector.delrecord(dbconn_no, hash64);
 }
 
-bool var::read(in filehandle, in key) {
+bool var::read(in file, in key) {
 
-	THISIS("bool var::read(in filehandle, in key)")
+	THISIS("bool var::read(in file, in key)")
 	assertDefined(function_sig);
-	ISSTRING(filehandle)
+	ISSTRING(file)
 	ISSTRING(key)
 
 	//amending var_str invalidates all flags
@@ -1548,21 +1549,21 @@ bool var::read(in filehandle, in key) {
 
 	// lower case key if reading from dictionary
 	// std::string key2;
-	// if (filehandle.lcase().starts("dict.)")
+	// if (file.lcase().starts("dict.)")
 	//	key2=key.lcase().var_str;
 	// else
 	//	key2=key.var_str;
 	std::string key2 = key.normalize().var_str;
 
-	// dos or DOS filehandle means osread/oswrite/osremove
-	if (filehandle.var_str.size() == 3 && (filehandle.var_str == "dos" || filehandle.var_str == "DOS")) UNLIKELY {
+	// dos or DOS file means osread/oswrite/osremove
+	if (file.var_str.size() == 3 && (file.var_str == "dos" || file.var_str == "DOS")) UNLIKELY {
 		//return this->osread(key2);  //.convert("\\",OSSLASH));
 		//use osfilenames unnormalised so we can read and write as is
 		return this->osread(key);  //.convert("\\",OSSLASH));
 	}
 
 	// asking to read DOS file! do osread using key as osfilename!
-	if (filehandle == "") UNLIKELY {
+	if (file == "") UNLIKELY {
 		var errmsg = "read(...) filename not specified, probably not opened.";
 		this->setlasterror(errmsg);
 		throw VarDBException(errmsg);
@@ -1570,9 +1571,9 @@ bool var::read(in filehandle, in key) {
 
 	// reading a magic special key returns all keys in the file in natural order
 	if (key == "%RECORDS%") UNLIKELY {
-		var sql = "SELECT key from " ^ get_normal_filename(filehandle) ^ ";";
+		var sql = "SELECT key from " ^ get_normal_filename(file) ^ ";";
 
-		auto pgconn = get_pgconn(filehandle);
+		auto pgconn = get_pgconn(file);
 		if (! pgconn) UNLIKELY
 			return false;
 
@@ -1611,10 +1612,10 @@ bool var::read(in filehandle, in key) {
 		return true;
 	}
 
-	// get filehandle specific connection or fail
-	auto pgconn = get_pgconn(filehandle);
+	// get file specific connection or fail
+	auto pgconn = get_pgconn(file);
 	if (!pgconn) UNLIKELY {
-		var errmsg = "var::read() get_pgconn() failed for " ^ filehandle;
+		var errmsg = "var::read() get_pgconn() failed for " ^ file;
 		this->setlasterror(errmsg);
 		// // this->loglasterror(errmsg);
 		throw VarDBException(errmsg);
@@ -1623,7 +1624,7 @@ bool var::read(in filehandle, in key) {
 	const char* paramValues[] = {key2.data()};
 	int paramLengths[] = {static_cast<int>(key2.size())};
 
-	var sql = "SELECT data FROM " ^ get_normal_filename(filehandle) ^ " WHERE key = $1";
+	var sql = "SELECT data FROM " ^ get_normal_filename(file) ^ " WHERE key = $1";
 
 	DEBUG_LOG_SQL1
 	//DBresult dbresult = PQexecParams(pgconn,
@@ -1639,7 +1640,7 @@ bool var::read(in filehandle, in key) {
 	if (PQresultStatus(dbresult) != PGRES_TUPLES_OK) UNLIKELY {
 		var sqlstate = var(PQresultErrorField(dbresult, PG_DIAG_SQLSTATE));
 		var errmsg =
-			"read(" ^ filehandle.convert("." _FM, "_^").replace("dict_","dict.").quote() ^ ", " ^ key.quote() ^ ")";
+			"read(" ^ file.convert("." _FM, "_^").replace("dict_","dict.").quote() ^ ", " ^ key.quote() ^ ")";
 		if (sqlstate == "42P01")
 			errmsg ^= " File doesnt exist";
 		else
@@ -1980,46 +1981,46 @@ bool var::sqlexec(in sqlcmd, io response) const {
 }
 
 // writef writes a specific field number in a record
-//(why it is "writef" instead of "writef" isnt known!
-void var::writef(in filehandle, in key, const int fieldno) const {
+void var::writef(in file, in key, const int fieldno) const {
 
+	// Just write the whole record if field no isnt positive
 	if (fieldno <= 0) {
 		UNLIKELY
-		write(filehandle, key);
+		write(file, key);
 		return;
 	}
 
-	THISIS("void var::writef(in filehandle, in key, const int fieldno) const")
-	// will be duplicated in read and write but do here to present the correct function name on
-	// error
+	THISIS("void var::writef(in file, in key, const int fieldno) const")
 	assertString(function_sig);
-	ISSTRING(filehandle)
-	ISSTRING(key)
+//	// will be duplicated in read and write but do here to present the correct function name on
+//	// error
+//	ISSTRING(file)
+//	ISSTRING(key)
 
-	// get the old record
+	// Get the old record or use ""
 	var record;
-	if (!record.read(filehandle, key))
+	if (!record.read(file, key))
 		record = "";
 
-	// replace the field
+	// Replace the field
 	record(fieldno) = var_str;
 
-	// write it back
-	record.write(filehandle, key);
+	// Write it back
+	record.write(file, key);
 
 	return;
 }
 
 /* "prepared statement" version doesnt seem to make much difference approx -10% - possibly because
-two field file is so simple void var::write(in filehandle, in key) const {}
+two field file is so simple void var::write(in file, in key) const {}
 */
 
 //"update if present or insert if not" is handled in postgres using ON CONFLICT clause
-void var::write(in filehandle, in key) const {
+void var::write(in file, in key) const {
 
-	THISIS("void var::write(in filehandle, in key) const")
+	THISIS("void var::write(in file, in key) const")
 	assertString(function_sig);
-	ISSTRING(filehandle)
+	ISSTRING(file)
 	ISSTRING(key)
 
 	// std::string key2=key.var_str;
@@ -2027,8 +2028,8 @@ void var::write(in filehandle, in key) const {
 	std::string key2 = key.normalize().var_str;
 	std::string data2 = this->normalize().var_str;
 
-	// filehandle dos or DOS means osread/oswrite/osremove
-	if (filehandle.var_str.size() == 3 && (filehandle.var_str == "dos" || filehandle.var_str == "DOS")) UNLIKELY {
+	// file dos or DOS means osread/oswrite/osremove
+	if (file.var_str.size() == 3 && (file.var_str == "dos" || file.var_str == "DOS")) UNLIKELY {
 		//this->oswrite(key2); //.convert("\\",OSSLASH));
 		//use osfilenames unnormalised so we can read and write as is
 		if (not this->oswrite(key)) {
@@ -2037,8 +2038,9 @@ void var::write(in filehandle, in key) const {
 		return;
 	}
 
-	// clear any cache
-	filehandle.deletec(key2);
+	// Clear any cache when writing actual records
+	// to prevent any future readc() getting known obsolete records
+	file.deletec(key2);
 
 	var sql;
 
@@ -2046,14 +2048,14 @@ void var::write(in filehandle, in key) const {
 	// but performance gain is probably not great since the sql we use to read and write is
 	// quite simple (could PREPARE once per file/table)
 
-	sql = "INSERT INTO " ^ get_normal_filename(filehandle) ^ " (key,data) values( $1 , $2)";
+	sql = "INSERT INTO " ^ get_normal_filename(file) ^ " (key,data) values( $1 , $2)";
 	sql ^= " ON CONFLICT (key)";
 	sql ^= " DO UPDATE SET data = $2";
 
-	auto pgconn = get_pgconn(filehandle);
+	auto pgconn = get_pgconn(file);
 	if (!pgconn) UNLIKELY {
 		var errmsg = "var::write() get_pgconn() failed. ";
-		errmsg ^= filehandle ^ ", " ^ key;
+		errmsg ^= file ^ ", " ^ key;
 		this->setlasterror(errmsg);
 		// this->loglasterror();
 		throw VarDBException(errmsg);
@@ -2076,7 +2078,7 @@ void var::write(in filehandle, in key) const {
 	// Handle serious errors
 	if (PQresultStatus(dbresult) != PGRES_COMMAND_OK) UNLIKELY {
 		var sqlstate = var(PQresultErrorField(dbresult, PG_DIAG_SQLSTATE));
-		var errmsg = "ERROR: mvdbpostgres write(" ^ filehandle.convert(_FM, "^") ^
+		var errmsg = "ERROR: mvdbpostgres write(" ^ file.convert(_FM, "^") ^
 					", " ^ key ^ ") failed: SQLERROR:" ^ sqlstate ^ " PQresultStatus=" ^
 					var(PQresStatus(PQresultStatus(dbresult))) ^ " " ^
 					var(PQerrorMessage(pgconn));
@@ -2098,15 +2100,16 @@ void var::write(in filehandle, in key) const {
 
 //"updaterecord" is non-standard for pick - but allows "write only if already exists" logic
 
-bool var::updaterecord(in filehandle, in key) const {
+bool var::updaterecord(in file, in key) const {
 
-	THISIS("bool var::updaterecord(in filehandle, in key) const")
+	THISIS("bool var::updaterecord(in file, in key) const")
 	assertString(function_sig);
-	ISSTRING(filehandle)
+	ISSTRING(file)
 	ISSTRING(key)
 
-	// clear any cache
-	filehandle.deletec(key);
+	// Clear any cache when updating actual records
+	// to prevent any future readc getting known obsolete records
+	file.deletec(key);
 
 	// std::string key2=key.var_str;
 	// std::string data2=var_str;
@@ -2117,12 +2120,12 @@ bool var::updaterecord(in filehandle, in key) const {
 	const char* paramValues[] = {key2.data(), data2.data()};
 	int paramLengths[] = {static_cast<int>(key2.size()), static_cast<int>(data2.size())};
 
-	var sql = "UPDATE "  ^ get_normal_filename(filehandle) ^ " SET data = $2 WHERE key = $1";
+	var sql = "UPDATE "  ^ get_normal_filename(file) ^ " SET data = $2 WHERE key = $1";
 
-	auto pgconn = get_pgconn(filehandle);
+	auto pgconn = get_pgconn(file);
 	if (!pgconn) UNLIKELY {
 		var errmsg = "var::updaterecord() get_pgconn() failed. ";
-		errmsg ^= filehandle ^ ", " ^ key;
+		errmsg ^= file ^ ", " ^ key;
 		this->setlasterror(errmsg);
 		// this->loglasterror();
 		throw VarDBException(errmsg);
@@ -2141,7 +2144,7 @@ bool var::updaterecord(in filehandle, in key) const {
 	// Handle serious errors
 	if (PQresultStatus(dbresult) != PGRES_COMMAND_OK) UNLIKELY {
 		var sqlstate = var(PQresultErrorField(dbresult, PG_DIAG_SQLSTATE));
-		var errmsg = "ERROR: mvdbpostgres update(" ^ filehandle.convert(_FM, "^") ^
+		var errmsg = "ERROR: mvdbpostgres update(" ^ file.convert(_FM, "^") ^
 				", " ^ key ^ ") SQLERROR: " ^ sqlstate ^ " Failed: " ^ var(PQntuples(dbresult)) ^ " " ^
 				var(PQerrorMessage(pgconn));
 		this->setlasterror(errmsg);
@@ -2151,7 +2154,7 @@ bool var::updaterecord(in filehandle, in key) const {
 
 	// if not updated 1 then fail
 	if (std::strcmp(PQcmdTuples(dbresult), "1") != 0) UNLIKELY {
-		var("ERROR: mvdbpostgres update(" ^ filehandle.convert(_FM, "^") ^
+		var("ERROR: mvdbpostgres update(" ^ file.convert(_FM, "^") ^
 			", " ^ key ^ ") Failed: " ^ var(PQntuples(dbresult)) ^ " " ^
 			var(PQerrorMessage(pgconn)))
 			.errputl();
@@ -2164,15 +2167,17 @@ bool var::updaterecord(in filehandle, in key) const {
 //"insertrecord" is non-standard for pick - but allows faster writes under "write only if doesnt
 // already exist" logic
 
-bool var::insertrecord(in filehandle, in key) const {
+bool var::insertrecord(in file, in key) const {
 
-	THISIS("bool var::insertrecord(in filehandle, in key) const")
+	THISIS("bool var::insertrecord(in file, in key) const")
 	assertString(function_sig);
-	ISSTRING(filehandle)
+	ISSTRING(file)
 	ISSTRING(key)
 
-	// clear any cache
-	filehandle.deletec(key);
+	// Clear any cache when inserting actual records
+	// although there should be none when inserting new records
+	// to prevent any future readc getting known obsolete records
+	file.deletec(key);
 
 	// std::string key2=key.var_str;
 	// std::string data2=var_str;
@@ -2184,12 +2189,12 @@ bool var::insertrecord(in filehandle, in key) const {
 	int paramLengths[] = {static_cast<int>(key2.size()), static_cast<int>(data2.size())};
 
 	var sql =
-		"INSERT INTO " ^ get_normal_filename(filehandle) ^ " (key,data) values( $1 , $2)";
+		"INSERT INTO " ^ get_normal_filename(file) ^ " (key,data) values( $1 , $2)";
 
-	auto pgconn = get_pgconn(filehandle);
+	auto pgconn = get_pgconn(file);
 	if (!pgconn) UNLIKELY {
 		var errmsg = "var::insertrecord() get_pgconn() failed. ";
-		errmsg ^= filehandle ^ ", " ^ key;
+		errmsg ^= file ^ ", " ^ key;
 		this->setlasterror(errmsg);
 		// this->loglasterror();
 		throw VarDBException(errmsg);
@@ -2214,7 +2219,7 @@ bool var::insertrecord(in filehandle, in key) const {
 			return false;
 
 		var errmsg = "ERROR: mvdbpostgres insertrecord(" ^
-				filehandle.convert(_FM, "^") ^ ", " ^ key ^ ") Failed: " ^
+				file.convert(_FM, "^") ^ ", " ^ key ^ ") Failed: " ^
 				var(PQntuples(dbresult)) ^ " SQLERROR:" ^ sqlstate ^ " " ^
 				var(PQerrorMessage(pgconn));
 		this->setlasterror(errmsg);
@@ -2224,7 +2229,7 @@ bool var::insertrecord(in filehandle, in key) const {
 
 	// if not updated 1 then fail
 	if (std::strcmp(PQcmdTuples(dbresult), "1") != 0) UNLIKELY {
-		var("ERROR: mvdbpostgres insertrecord(" ^ filehandle.convert(_FM, "^") ^
+		var("ERROR: mvdbpostgres insertrecord(" ^ file.convert(_FM, "^") ^
 			", " ^ key ^ ") Failed: " ^ var(PQntuples(dbresult)) ^ " " ^
 			var(PQerrorMessage(pgconn)))
 			.errputl();
@@ -2240,13 +2245,14 @@ bool var::deleterecord(in key) const {
 	assertString(function_sig);
 	ISSTRING(key)
 
-	// clear any cache
+	// Clear any cache when deleting actual records
+	// to prevent and future readc getting known non-existent records
 	this->deletec(key);
 
 	// std::string key2=key.var_str;
 	std::string key2 = key.normalize().var_str;
 
-	// filehandle dos or DOS means osread/oswrite/osremove
+	// file dos or DOS means osread/oswrite/osremove
 	if (var_str.size() == 3 && (var_str == "dos" || var_str == "DOS")) UNLIKELY {
 		//return this->osremove(key2);
 		//use osfilenames unnormalised so we can read and write as is
@@ -2525,21 +2531,21 @@ bool var::renamefile(in filename, in newfilename) const {
 	// Fail neatly if the old file does not exist.
 	// SQL errors during a transaction cause the whole transaction to fail.
 	// Make sure we use the right connection
-	var filehandle = this->clone();
-	if (!filehandle.open(filename)) UNLIKELY {
+	var file = this->clone();
+	if (!file.open(filename)) UNLIKELY {
 		setlasterror(filename.quote() ^ " cannot be renamed because it does not exist.");
 		return false;
 	}
 
 	// Fail neatly if the new file exists
 	// SQL errors during a transaction cause the whole transaction to fail.
-	if (filehandle.open(newfilename)) UNLIKELY {
+	if (file.open(newfilename)) UNLIKELY {
 		setlasterror(filename.quote() ^ " cannot be renamed because " ^ newfilename.quote() ^ " already exists.");
 		return false;
 	}
 
 	// Remove from the cache of file handles
-	filehandle.detach(filename);
+	file.detach(filename);
 
 	var sql = "ALTER TABLE " ^ filename ^ " RENAME TO " ^ newfilename;
 
@@ -2547,7 +2553,7 @@ bool var::renamefile(in filename, in newfilename) const {
 //		return this->sqlexec(sql);
 //	else
 //		return filename.sqlexec(sql);
-	if (!filehandle.sqlexec(sql)) UNLIKELY
+	if (!file.sqlexec(sql)) UNLIKELY
 		throw VarDBException(this->lasterror());
 
 	return true;
@@ -2562,13 +2568,13 @@ bool var::deletefile(in filename) const {
 	// Fail neatly if the file does not exist
 	// SQL errors during a transaction cause the whole transaction to fail.
 	// Delete the file on whatever connection it exists;
-	var filehandle = this->clone();
-	if (!filehandle.open(filename)) UNLIKELY {
+	var file = this->clone();
+	if (!file.open(filename)) UNLIKELY {
 		setlasterror(filename.quote() ^ " cannot be deleted because it does not exist.");
 		return false;
 	}
 
-	// Remove from filehandle cache regardless of success or failure to deletefile
+	// Remove from file cache regardless of success or failure to deletefile
 	// Delete from cache AFTER the above open which will place it in the cache
 	// Similar code in detach and deletefile
 	if (thread_file_handles.erase(get_normal_filename(filename))) {
@@ -2584,7 +2590,7 @@ bool var::deletefile(in filename) const {
 //		return this->sqlexec(sql);
 //	else
 //		return filename.sqlexec(sql);
-	if (!filehandle.sqlexec(sql)) UNLIKELY
+	if (!file.sqlexec(sql)) UNLIKELY
 		throw VarDBException(this->lasterror());
 
 	return true;
@@ -2598,8 +2604,8 @@ bool var::clearfile(in filename) const {
 
 	// Fail neatly if the file does not exist
 	// SQL errors during a transaction cause the whole transaction to fail.
-	var filehandle = this->clone();
-	if (!filehandle.open(filename, *this)) UNLIKELY {
+	var file = this->clone();
+	if (!file.open(filename, *this)) UNLIKELY {
 		setlasterror(filename.quote() ^ " cannot be cleared because it does not exist.");
 		return false;
 	}
@@ -2609,7 +2615,7 @@ bool var::clearfile(in filename) const {
 //		return this->sqlexec(sql);
 //	else
 //		return filename.sqlexec(sql);
-	if (!filehandle.sqlexec(sql)) UNLIKELY
+	if (!file.sqlexec(sql)) UNLIKELY
 		throw VarDBException(this->lasterror());
 
 	return true;
@@ -3453,11 +3459,11 @@ bool var::selectx(in fieldnames, in sortselectclause) {
 		throw VarDBException(errmsg);
 	}
 
-	// sortselect clause can be a filehandle in which case we extract the filename from field1
-	// omitted if filename.select() or filehandle.select()
+	// sortselect clause can be a file in which case we extract the filename from field1
+	// omitted if filename.select() or file.select()
 	// cursor.select(...) where ...
 	// SELECT (or SSELECT) nnn filename with .... and with ... by ... by
-	// filename can be omitted if calling like filename.select(...) or filehandle.select(...)
+	// filename can be omitted if calling like filename.select(...) or file.select(...)
 	// nnn is optional limit to number of records returned
 	// TODO only convert \t\r\n outside single and double quotes
 	//var remaining = sortselectclause.f(1).convert("\t\r\n", "   ").trim();
@@ -5720,36 +5726,37 @@ var  var::reccount(in filename0) const {
 	return reccount;
 }
 
-var  var::flushindex(in filename) const {
+bool var::flushindex(in filename) const {
 
-	THISIS("var  var::flushindex(in filename=) const")
+	THISIS("bool var::flushindex(in filename=) const")
 	// could allow undefined usage since *this isnt used?
 	assertDefined(function_sig);
 	ISSTRING(filename)
 
 	var sql = "VACUUM";
 	if (filename)
-		// attribute 1 in case passed a filehandle instead of just filename
+		// attribute 1 in case passed a file instead of just filename
 		sql ^= " " ^ filename.f(1).lcase();
 	sql ^= ";";
 	// sql.logputl("sql=");
 
-	// TODO perhaps should get connection from filehandle if passed a filehandle
+	// TODO perhaps should get connection from file if passed a file
 	auto pgconn = get_pgconn(*this);
 	if (! pgconn) UNLIKELY
-		return "";
+		return false;
 
-	// execute command or return empty string
+	// execute command or return false
 	DBresult dbresult;
 	if (!get_dbresult(sql, dbresult, pgconn)) UNLIKELY
-		return "";
+		return false;
 
-	var flushresult = "";
+//	var flushresult = "";
 	if (PQntuples(dbresult)) {
-		flushresult = true;
+//		flushresult = true;
 	}
 
-	return flushresult;
+//	return flushresult;
+	return true;
 }
 
 var  var::setlasterror(in msg) const {

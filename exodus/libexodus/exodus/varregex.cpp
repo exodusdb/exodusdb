@@ -38,6 +38,9 @@ browsers follow the spec. In std::regex all the shorthands are ASCII-only when u
 of char.
 */
 
+// VISUALISE REGULAR EXPRESSIONS GRAPHICALLY
+// https:www.debuggex.com
+
 // U32REGEX/MATCH/SEARCH/REPLACE/TOKEN_ITERATOR ARE THIN ITERATOR WRAPPERS TO MAKE UTF8 ETC
 // APPEAR LIKE UTF32
 ////////////////////////////////////////////////////////////////////////////////////////////
@@ -151,27 +154,27 @@ constexpr static syntax_flags_typ get_syntax_flags(SV regex_options) {
 	// https://www.boost.org/doc/libs/1_80_0/libs/regex/doc/html/boost_regex/ref/syntax_option_type/syntax_option_type_perl.html
 	// https://en.cppreference.com/w/cpp/regex/syntax_option_type
 
+	// Determine regex_options from string
+
 	// Using only c++11 std::regex standardized syntax options
 	// Except for w - wild cards/globs and l - literal
 
-	// Note that match_flags e.g. (f for first only) are only used in regex_replace
+	// f - first only. Only for replace (not match or search)
 
-	// determine regex_options from string
+	// w - wildcard glob style (e.g. *.cfg) not regex. Only for match and search. Not replace.
 
-	// char ranges like a-z will be locale sensitive if ECMAScript
-
-	// w - glob not regex (for match and search only ATM)
-
-	// l - literal
+	// l - literal (any regex chars are treated as normal chars)
 
 	// i - case insensitive
 
-	// p - ECMAScript/Perl default
+	// p - ECMAScript/Perl (the default)
 	// b - Basic POSIX (same as sed)
 	// e - Extended POSIX
 	// a - awk
 	// g - grep
 	// eg - egrep or grep -E
+
+	// char ranges like a-z will be locale sensitive if ECMAScript
 
 	// m - Multiline. Default in boost (and therefore exodus)
 	// s - Single line. Default in std::regex
@@ -338,9 +341,6 @@ static REGEX& varregex_get_regex_engine(SV regex_str, SV regex_options) {
 // should be in mvfuncs.cpp - here really because boost regex is included here for file matching
 var  var::match(SV regex_str, SV regex_options) const {
 
-	// VISUALISE REGULAR EXPRESSIONS GRAPHICALLY
-	// https:www.debuggex.com
-
 	THISIS("var  var::match(SV regex_str, SV regex_options) const")
 	assertString(function_sig);
 	//ISSTRING(regex_str)
@@ -386,7 +386,22 @@ var  var::match(SV regex_str, SV regex_options) const {
 		return this->match(regex3);
 	}
 
-	REGEX& regex_engine = varregex_get_regex_engine(regex_str, regex_options);
+	return this->match(rex(regex_str, regex_options));
+}
+
+// should be in mvfuncs.cpp - here really because boost regex is included here for file matching
+var  var::match(const rex& regex) const {
+
+	// VISUALISE REGULAR EXPRESSIONS GRAPHICALLY
+	// https:www.debuggex.com
+
+	THISIS("var  var::match(const rex& regex) const")
+	assertString(function_sig);
+
+	// Get the engine from the rex if present otherwise get one from the cache (or construct one in the cache)
+//	std::cout << &regex << std::endl;
+//	TRACE(regex.pimpl_ == nullptr)
+	REGEX& regex_engine = regex.pimpl_ ? *static_cast<boost::u32regex*>(regex.pimpl_) : varregex_get_regex_engine(regex.regex_str_, regex.options_);
 
 	// construct our iterators:
 #ifdef EXO_BOOST_REGEX
@@ -394,7 +409,7 @@ var  var::match(SV regex_str, SV regex_options) const {
 	try {
 		iter = boost::make_u32regex_iterator(var_str, regex_engine);
 	} catch (boost::wrapexcept<std::out_of_range>& e) {
-		throw VarError("Error: (2a) Invalid match string " ^ var(regex_str).quote() ^ ". " ^ var(e.what()));
+		throw VarError("Error: (2a) Invalid match string " ^ var(regex.regex_str_).quote() ^ ". " ^ var(e.what()));
 	}
 #else
 	std::regex_iterator<std::string::const_iterator> iter(var_str.begin(), var_str.end(), regex_engine);
@@ -410,7 +425,8 @@ var  var::match(SV regex_str, SV regex_options) const {
 //	std::for_each(iter, end,
 //		[&result](auto match_results) {
 
-	bool firstonly = regex_options.find('f') != std::string::npos;
+//	bool firstonly = regex.options_.find('f') != std::string::npos;
+	bool firstonly = regex.options_.contains("f");
 	while (iter != end) {
 
 		auto match_results = *iter;
@@ -510,7 +526,20 @@ var  var::search(SV regex_str, io startchar1, SV regex_options) const {
 		return this->search(regex3, startchar1);
 	}
 
-	REGEX& regex_engine = varregex_get_regex_engine(regex_str, regex_options);
+    return this->search(rex(regex_str, regex_options), startchar1);
+
+}
+
+// Version that accepts a rex object for speed
+var  var::search(const rex& regex, io startchar1) const {
+
+	THISIS("var  var::search(const rex& regex, int startchar1) const")
+	assertString(function_sig);
+
+	// Get the engine from the rex if present otherwise get one from the cache (or construct one in the cache)
+//	std::cout << &regex << std::endl;
+//	TRACE(regex.pimpl_ == nullptr)
+	REGEX& regex_engine = regex.pimpl_ ? *static_cast<boost::u32regex*>(regex.pimpl_) : varregex_get_regex_engine(regex.regex_str_, regex.options_);
 
 	// https://stackoverflow.com/questions/26320987/what-is-the-difference-between-regex-token-iterator-and-regex-iterator
 	// boost::u32regex_token_iterator<std::string::const_iterator>
@@ -551,7 +580,7 @@ var  var::search(SV regex_str, io startchar1, SV regex_options) const {
 		iter = boost::make_u32regex_iterator(var_str.data() + startchar1.var_int - 1, regex_engine);
 #pragma clang diagnostic pop
 	} catch (boost::wrapexcept<std::out_of_range>& e) {
-		throw VarError("Error: (2b) Invalid match string " ^ var(regex_str).quote() ^ ". " ^ var(e.what()));
+		throw VarError("Error: (2b) Invalid match string " ^ var(regex.regex_str_).quote() ^ ". " ^ var(e.what()));
 	}
 #else
 	std::regex_iterator<std::string::const_iterator> iter(std::advance(var_str.begin(), startchar1 - 1), var_str.end(), regex_engine);
