@@ -10,8 +10,8 @@ function main() {
 	var tempfilename = tempdir ^ _OSSLASH "temp1";
 
 	{
-		printl("test_os waiting for 500ms for any event on the log dir - for quiet period to attempt to avoid interactions?");
-		var events = oswait(500, "/var/log");
+		printl("test_os waiting for 100ms for any event on the log dir - for quiet period to attempt to avoid interactions?");
+		var events = oswait("/var/log^/etc/hosts"_var, 100);
 		TRACE(events)
 	}
 

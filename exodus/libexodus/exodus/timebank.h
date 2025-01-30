@@ -360,6 +360,7 @@ auto get_timebank_acno(const std::string_view arg1) -> int {
 	else if (++acno && arg1 == "CVR  var::logputl() const") {}
 	else if (++acno && arg1 == "CVR  var::logput(in prefix) const") {}
 	else if (++acno && arg1 == "CVR  var::logputl(in prefix) const") {}
+	else if (++acno && arg1 == "var  var::oswait(const int milliseconds) const") {}
 
 	// MUST REGENERATE timebank.txt after amending this list
 	//////////////////

@@ -88,7 +88,7 @@ ND PUBLIC var  timestamp(in date, in time) {return date.timestamp(time);}
 //ND PUBLIC var  timedate();
 
    PUBLIC void ossleep(const int milliseconds) {var().ossleep(milliseconds);}
-ND PUBLIC var  oswait(const int milliseconds, SV dirpath) {return var().oswait(milliseconds, dirpath);}
+ND PUBLIC var  oswait(SV file_dir_list, const int milliseconds) {return var(file_dir_list).oswait(milliseconds);}
 
 // 4 argument version for statement format
 // osbread(data from x at y length z)
