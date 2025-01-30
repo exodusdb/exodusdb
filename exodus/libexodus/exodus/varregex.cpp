@@ -608,18 +608,18 @@ var  var::replace(SV what, SV with) const& {
 }
 
 // mutator
-io   var::replacer(SV what, SV with) {
+IO   var::replacer(SV what, SV with) REF {
 
-	THISIS("io   var::replacer(SV what, SV with)")
+	THISIS("void var::replacer(SV what, SV with) &")
 	assertStringMutator(function_sig);
 
 	// nothing to do if oldstr is ""
 	if (what.empty())
-		return *this;
+		return THIS;
 
 	boost::algorithm::replace_all(var_str, what, with);
 
-	return *this;
+	return THIS;
 
 }
 
@@ -629,9 +629,9 @@ io   var::replacer(SV what, SV with) {
 // only here really because boost regex is included here for file matching
 
 // mutator
-io   var::replacer(const rex& regex, SV replacement) {
+IO   var::replacer(const rex& regex, SV replacement) REF {
 	*this = this->replace(regex, replacement);
-	return *this;
+	return THIS;
 }
 
 // const

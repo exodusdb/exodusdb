@@ -1,10 +1,11 @@
 
 // Similar code in three files. Use editor in parallel to keep in sync.
 // nano varreplacer.cpp varinserter.cpp varremover.cpp
+// alt+, and alt+. to switch file in nano
 
-io   var::inserter(const int fieldno, const int valueno, const int subvalueno, in insertion) {
+IO   var::inserter(const int fieldno, const int valueno, const int subvalueno, in insertion) REF {
 
-	THISIS("io   var::inserter(const int fieldno, const int valueno, const int subvalueno, in insertion)")
+	THISIS("void var::inserter(const int fieldno, const int valueno, const int subvalueno, in insertion) &")
 	assertStringMutator(function_sig);
 	ISSTRING(insertion)
 
@@ -16,7 +17,7 @@ io   var::inserter(const int fieldno, const int valueno, const int subvalueno, i
 			var_str.insert(0, insertion.var_str + FM_);
 		else
 			var_str = insertion.var_str;
-		return *this;
+		return THIS;
 	}
 
 	/////////////   FIND FIELD  /////////////////
@@ -88,7 +89,7 @@ io   var::inserter(const int fieldno, const int valueno, const int subvalueno, i
 			var_str.insert(pos, _FM);
 
 		var_str.insert(pos, insertion.var_str);
-		return *this;
+		return THIS;
 
 	} else {
 
@@ -142,7 +143,7 @@ io   var::inserter(const int fieldno, const int valueno, const int subvalueno, i
 
 
 		var_str.insert(pos, insertion.var_str);
-		return *this;
+		return THIS;
 
 	} else {
 		// find the starting position of the subvalue or insert enough SM_ to satisfy
@@ -183,5 +184,5 @@ io   var::inserter(const int fieldno, const int valueno, const int subvalueno, i
 
 	var_str.insert(pos, insertion.var_str);
 
-	return *this;
+	return THIS;
 }

@@ -131,13 +131,15 @@ var  var::field(SV separatorx, const int fieldnx, const int nfieldsx) const {
 
 // Constant
 ND var  var::fieldstore(SV separator, const int fieldno, const int nfields, in replacement) const& {
-	return var(*this).fieldstorer(separator, fieldno, nfields, replacement);
+	var nrvo = this->clone();
+	nrvo.fieldstorer(separator, fieldno, nfields, replacement);
+	return nrvo;
 }
 
 // Mutator
-io   var::fieldstorer(SV separator, const int fieldnx, const int nfieldsx, in replacementx) {
+IO   var::fieldstorer(SV separator, const int fieldnx, const int nfieldsx, in replacementx) REF {
 
-	THISIS("io   var::fieldstorer(SV separator0, const int fieldnx, const int nfieldsx, in replacementx)")
+	THISIS("void var::fieldstorer(SV separator0, const int fieldnx, const int nfieldsx, in replacementx) &")
 	assertStringMutator(function_sig);
 
 	if (separator.empty())
@@ -188,7 +190,7 @@ io   var::fieldstorer(SV separator, const int fieldnx, const int nfieldsx, in re
 				fieldn2++;
 			} while (fieldn2 < fieldno);
 			var_str += replacement.var_str;
-			return *this;
+			return THIS;
 		}
 		// pos++;
 		pos += separator_len;
@@ -203,7 +205,7 @@ io   var::fieldstorer(SV separator, const int fieldnx, const int nfieldsx, in re
 		// past of of string?
 		if (end_pos == std::string::npos) {
 			var_str.replace(pos, std::string::npos, replacement.var_str);
-			return *this;
+			return THIS;
 		}
 		// end_pos++;
 		end_pos += separator_len;
@@ -223,7 +225,7 @@ io   var::fieldstorer(SV separator, const int fieldnx, const int nfieldsx, in re
 		var_str.replace(pos, end_pos - pos - 1, replacement.var_str);
 	}
 
-	return *this;
+	return THIS;
 }
 
 /////////
@@ -1045,9 +1047,9 @@ var  var::first() const& {
 
 //[1,1]
 // .substr(1,1)
-io   var::firster() {
+IO   var::firster() REF {
 
-	THISIS("io   var::firster()")
+	THISIS("void var::firster() &")
 	assertStringMutator(function_sig);
 
 	// Reduce the size of this string to max 1
@@ -1055,7 +1057,7 @@ io   var::firster() {
 		var_str.resize(1);
 	}
 
-	return *this;
+	return THIS;
 }
 
 var  var::first(const std::size_t  length) const& {
@@ -1076,9 +1078,9 @@ var  var::first(const std::size_t  length) const& {
 
 //[1,y]
 // var.substr(1,length)
-io   var::firster(const std::size_t length) {
+IO   var::firster(const std::size_t length) REF {
 
-	THISIS("io   var::firster(const std::size_t length)")
+	THISIS("void var::firster(const std::size_t length) &")
 	assertStringMutator(function_sig);
 
 	// Assume high half of std::size_t is c++ unblockable conversion
@@ -1092,7 +1094,7 @@ io   var::firster(const std::size_t length) {
 		this->var_str.resize(length);
 	}
 
-	return *this;
+	return THIS;
 }
 
 ///////
@@ -1117,16 +1119,16 @@ var  var::last() const& {
 
 //[-1]
 // .substr(-1,1)
-io   var::laster() {
+IO   var::laster() REF {
 
-	THISIS("io   var::laster()")
+	THISIS("void var::laster() &")
 	assertStringMutator(function_sig);
 
 	// Leave only the last char
 	if (var_str.size() > 1)
 		var_str = var_str.back();
 
-	return *this;
+	return THIS;
 }
 
 
@@ -1160,9 +1162,9 @@ var  var::last(const std::size_t  length) const& {
 
 //[-y]
 // var.s(-length) substring
-io   var::laster(const std::size_t length) {
+IO   var::laster(const std::size_t length) REF {
 
-	THISIS("io   var::laster(const std::size_t length)")
+	THISIS("void var::laster(const std::size_t length) &")
 	assertStringMutator(function_sig);
 
 	// Assume high half of std::size_t is c++ unblockable conversion
@@ -1180,7 +1182,7 @@ io   var::laster(const std::size_t length) {
 		this->var_str.erase(0, this->var_str.size() - length);
 	}
 
-	return *this;
+	return THIS;
 }
 
 
@@ -1236,9 +1238,9 @@ var  var::cut(const int length) const& {
 // x[1, length] = ""
 // x[-length, length] = ""
 
-io   var::cutter(const int length) {
+IO   var::cutter(const int length) REF {
 
-	THISIS("io   var::cutter(const int length)")
+	THISIS("void var::cutter(const int length) &")
 	assertStringMutator(function_sig);
 
 	if (length >= 0) {
@@ -1279,7 +1281,7 @@ io   var::cutter(const int length) {
 		}
 	}
 
-	return *this;
+	return THIS;
 }
 
 // Old versions
@@ -1363,57 +1365,51 @@ io   var::cutter(const int length) {
 /////////
 
 //ND var substr(const int pos1, const int length) const&; // byte pos1, length
-ND var  var::substr(const int startindex1, const int length) const& {
-	return var(*this).substrer(startindex1, length);
+ND var  var::substr(const int pos1, const int length) const& {
+	var nrvo = this->clone();
+	nrvo.substrer(pos1, length);
+	return nrvo;
 }
 //ND var substr(const int pos1) const&;                   // byte pos1
-ND var  var::substr(const int startindex1) const& {
-	return var(*this).substrer(startindex1);
-}
-
-// byte pos1, length
-[[deprecated("EXODUS: Replace all xxx.b(start, len) with xxx.subst(start, len)")]]
-ND var  var::b(const int pos1, const int length) const& {
-	return substr(pos1, length);
-}
-// byte pos1
-ND var  var::b(const int pos1) const& {
-	return substr(pos1);
+ND var  var::substr(const int pos1) const& {
+	var nrvo = this->clone();
+	nrvo.substrer(pos1);
+	return nrvo;
 }
 
 //[x,y]
 // var.s(start,length) substring
-io   var::substrer(const int startindex1, const int length) {
+IO   var::substrer(const int pos1, const int length) REF {
 
-	THISIS("io   var::substrer(const int startindex1, const int length)")
+	THISIS("void var::substrer(const int pos1, const int length) &")
 	assertStringMutator(function_sig);
 
 	// return "" for ""
 	int max = static_cast<int>(var_str.size());
 	if (max == 0) {
 		var_str.clear();
-		return *this;
+		return THIS;
 	}
 
-	int start = startindex1;
+	int start = pos1;
 
 	// negative length means reverse the string
 	if (length <= 0) {
 		if (length == 0) {
 			var_str.clear();
-			return *this;
+			return THIS;
 		}
 
 		// sya
 		if (start < 1) {
 			if (start == 0) {
 				var_str.clear();
-				return *this;
+				return THIS;
 			}
 			start = max + start + 1;
 			if (start < 1) {
 				var_str.clear();
-				return *this;
+				return THIS;
 			}
 		} else if (start > max) {
 			start = max;
@@ -1428,7 +1424,7 @@ io   var::substrer(const int startindex1, const int length) {
 			result += var_str[ii - 1];
 
 		var_str = result;
-		return *this;
+		return THIS;
 	}
 
 	if (start < 1) {
@@ -1441,7 +1437,7 @@ io   var::substrer(const int startindex1, const int length) {
 		}
 	} else if (start > max) {
 		var_str.clear();
-		return *this;
+		return THIS;
 	}
 	int stop = start + length;
 
@@ -1450,7 +1446,7 @@ io   var::substrer(const int startindex1, const int length) {
 	// TODO use erase for speed instead of copying whole string
 	var_str = var_str.substr(start - 1, stop - start);
 
-	return *this;
+	return THIS;
 }
 
 //////
@@ -1636,29 +1632,29 @@ getnextp2:
 
 // returns the characters up to the next delimiter
 // also returns the index of the next delimiter discovered or 1 after the string if none (like
-// COL2() in pickos) NOTE startindex1 is 1 based not 0. anything less than 1 is treated as 1
-var  var::substr(const int startindex1, in delimiterchars, int& endindex) const {
+// COL2() in pickos) NOTE pos1 is 1 based not 0. anything less than 1 is treated as 1
+var  var::substr(const int pos1, in delimiterchars, int& pos2) const {
 
-	THISIS("var  var::substr(const int startindex1, io delimiterchars, int& endindex) const")
+	THISIS("var  var::substr(const int pos1, io delimiterchars, int& pos2) const")
 	assertString(function_sig);
 	ISSTRING(delimiterchars)
 
 	std::size_t pos;
 
-	// domain check min startindex1
+	// domain check min pos1
 	// handle before start of string
-	// startindex1 arg is 1 based per mv/pick standard
+	// pos1 arg is 1 based per mv/pick standard
 	// remove treats anything below 1 as 1
 	// pos variable is zero based standard c++ logic
-	if (startindex1 > 0)
-		pos = startindex1 - 1;
+	if (pos1 > 0)
+		pos = pos1 - 1;
 	else
 		pos = 0;
 
-	// domain check max startindex1
+	// domain check max pos1
 	// handle after end of string
 	if (pos >= var_str.size()) {
-		endindex = static_cast<int>(var_str.size() + 1);
+		pos2 = static_cast<int>(var_str.size() + 1);
 		return "";
 	}
 
@@ -1668,14 +1664,14 @@ var  var::substr(const int startindex1, in delimiterchars, int& endindex) const 
 
 	// past of of string?
 	if (end_pos == std::string::npos) {
-		endindex = static_cast<int>(var_str.size() + 1);
+		pos2 = static_cast<int>(var_str.size() + 1);
 		//return var_str.substr(pos, var_str.size() - pos);
 		return var_str.substr(pos);
 	}
 
 	// return the index of the dicovered delimiter
 	// unlike remove which returns the index of one AFTER the discovered delimiter
-	endindex = static_cast<int>(end_pos + 1);
+	pos2 = static_cast<int>(end_pos + 1);
 
 	// extract and return the substr as well
 	return var_str.substr(pos, end_pos - pos);
@@ -1687,22 +1683,22 @@ var  var::substr(const int startindex1, in delimiterchars, int& endindex) const 
 
 // returns the characters up to the next delimiter
 // delimiter returned as numbers RM=1F=1 FM=1E=2, VM=1D=3 SM=1C=4 TM=1B=5 to ST=1A=6 or 0 if not found
-// NOTE startindex1 is 1 based not 0. anything less than 1 is treated as 1
-var  var::substr2(io startindex1, io delimiterno) const {
+// NOTE pos1 is 1 based not 0. anything less than 1 is treated as 1
+var  var::substr2(io pos1, io delimiterno) const {
 
-	THISIS("var  var::substr2(io startindex1, io delimiterno) const")
+	THISIS("var  var::substr2(io pos1, io delimiterno) const")
 	assertString(function_sig);
-	ISNUMERIC(startindex1)
+	ISNUMERIC(pos1)
 	ISDEFINED(delimiterno)
 
-	int startindex0 = startindex1.toInt() - 1;
+	int startindex0 = pos1.toInt() - 1;
 	std::size_t pos = (startindex0 >= 0) ? startindex0 : 0;
 
 	//var returnable = "";
 
 	// domain check
 	// handle before start of string
-	// startindex1 arg is 1 based per mv/pick standard
+	// pos1 arg is 1 based per mv/pick standard
 	// treats anything below 1 as 1
 	// pos variable is zero based standard c++ logic
 	// pos cannot be < 0

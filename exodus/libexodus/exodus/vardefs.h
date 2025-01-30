@@ -209,4 +209,18 @@
 #	define EXO_SNITCH(FUNC)
 #endif
 
+// Allow x.cutter().x.popper() ?
+//#define EXO_ALLOW_CHAINING
+#ifdef EXO_ALLOW_CHAINING
+#	define IO io
+#	define THIS *this
+#	define IOSTRING iostring
+#	define REF
+#else
+#	define IO void
+#	define THIS
+#	define IOSTRING
+#	define REF &
+#endif
+
 #endif //EXO_VARDEFS_H

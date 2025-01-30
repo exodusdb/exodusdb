@@ -1,10 +1,11 @@
 
 // Similar code in three files. Use editor in parallel to keep in sync.
 // nano varreplacer.cpp varinserter.cpp varremover.cpp
+// alt+, and alt+. to switch file in nano
 
-io   var::r(int fieldno, int valueno, int subvalueno, in replacement) {
+IO   var::r(int fieldno, int valueno, int subvalueno, in replacement) REF {
 
-	THISIS("io   var::r(int fieldno, int valueno, int subvalueno, in replacement)")
+	THISIS("void var::r(int fieldno, int valueno, int subvalueno, in replacement) &")
 	assertStringMutator(function_sig);
 	ISSTRING(replacement)
 
@@ -16,7 +17,7 @@ io   var::r(int fieldno, int valueno, int subvalueno, in replacement) {
 
 
 		var_str = replacement.var_str;
-		return *this;
+		return THIS;
 	}
 
 	/////////////   FIND FIELD  /////////////////
@@ -88,7 +89,7 @@ io   var::r(int fieldno, int valueno, int subvalueno, in replacement) {
 
 
 		var_str.replace(pos, field_end_pos - pos, replacement.var_str);
-		return *this;
+		return THIS;
 
 	} else {
 
@@ -142,7 +143,7 @@ io   var::r(int fieldno, int valueno, int subvalueno, in replacement) {
 
 
 		var_str.replace(pos, value_end_pos - pos, replacement.var_str);
-		return *this;
+		return THIS;
 
 	} else {
 		// find the starting position of the subvalue or insert enough SM_ to satisfy
@@ -183,5 +184,5 @@ io   var::r(int fieldno, int valueno, int subvalueno, in replacement) {
 
 	var_str.replace(pos, subvalue_end_pos - pos, replacement.var_str);
 
-	return *this;
+	return THIS;
 }
