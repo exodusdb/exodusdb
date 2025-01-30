@@ -5,7 +5,8 @@ S
 
 
 
-	return RECORD.ucaser();\
+	RECORD.ucaser();\
+	return RECORD;\
 \
 /*pgsql\
 	return upper(data);\

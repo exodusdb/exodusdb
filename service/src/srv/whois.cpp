@@ -100,7 +100,8 @@ returnzero:
 			text ^= errors;
 		}
 
-		text.converter("\r\n", _FM _FM).trimmer(_FM);
+		text.converter("\r\n", _FM _FM);
+		text.trimmer(_FM);
 	}
 
 	return 0;

@@ -123,7 +123,8 @@ function main(in toaddress0, in ccaddress0, in subject0, in body0, in attachfile
 			call mssg(errormsg);
 		} else {
 			var msg = "STEP 1 OK. Mail for " ^ toaddress ^ " accepted by mail server.";
-			params.converter("\r\n", _FM _FM).trimmer(_FM);
+			params.converter("\r\n", _FM _FM);
+			params.trimmer(_FM);
 			msg(-1) = _FM "Sent using:" _FM ^ params;
 			msg(-1) = "STEP 2. Now check if actually received by recipient to verify";
 			msg(-1) = " that the mail server can actually deliver email to " ^ toaddress;
@@ -229,7 +230,8 @@ forcedemail:
 		}
 		// cut off after end of file character
 		// params2=field(params2,char(26),1)
-		params2.converter("\r\n", _FM _FM).trimmer(_FM);
+		params2.converter("\r\n", _FM _FM);
+		params2.trimmer(_FM);
 		for (const var ii : range(1, 9)) {
 			if (params2.f(ii)) {
 				params1(ii) = params2.f(ii);
@@ -341,10 +343,12 @@ forcedemail:
 //	if (subject.first(8) != "EXODUS: ") {
 	if (not subject.starts("EXODUS: ")) {
 		if (subject.starts("EXODUS")) {
-			subject.cutter(6).trimmerfirst();
+			subject.cutter(6);
+			subject.trimmerfirst();
 		}
 		if (subject.starts("System:")) {
-			subject.cutter(7).trimmerfirst();
+			subject.cutter(7);
+			subject.trimmerfirst();
 		}
 		subject.prefixer("EXODUS: ");
 	}
