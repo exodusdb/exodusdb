@@ -177,7 +177,8 @@ function main() {
 
 		// This is allowed because ^= (self append) is working on x, not a temporary
 		x = "xyz";
-		x.prefixer("abc") ^= "200";
+		x.prefixer("abc");
+		x ^= "200";
 		assert(x eq "abcxyz200");
 	}
 
@@ -401,7 +402,8 @@ function main() {
 		var x            =  seps;
 		lowerer(x);
 		assert(x         eq _FM _VM _SM _TM _ST);
-		assert(raiser(x) eq seps);
+		raiser(x);
+		assert(x eq seps);
 
 		// bottom 5 round trip raiser+lower OK
 		seps     =  _FM _VM _SM _TM _ST;
@@ -494,51 +496,68 @@ function main() {
 	//global function trimmer/f/b
 
 	str1 = str0;
-	assert(trimmer(str1)  eq "xxx xxx");
+	trimmer(str1);
+	assert(str1  eq "xxx xxx");
 	assert(str1 ne str0);
 	str1 = str0;
-	assert(trimmerfirst(str1) eq "xxx  xxx  ");
+	trimmerfirst(str1);
+	assert(str1 eq "xxx  xxx  ");
 	assert(str1 ne str0);
 	str1 = str0;
-	assert(trimmerlast(str1) eq "  xxx  xxx");
+	trimmerlast(str1);
+	assert(str1 eq "  xxx  xxx");
 	assert(str1 ne str0);
 
 	str1 = str0;
-	assert(trimmer(str1, " ")   eq "xxx xxx");
+	trimmer(str1, " ");
+	assert(str1   eq "xxx xxx");
 	assert(str1 ne str0);
+
 	str1 = str0;
-	assert(trimmerfirst(str1, " ")  eq "xxx  xxx  ");
+	trimmerfirst(str1, " ");
+	assert(str1  eq "xxx  xxx  ");
 	assert(str1 ne str0);
+
 	str1 = str0;
-	assert(trimmerlast(str1, " ")  eq "  xxx  xxx");
+	trimmerlast(str1, " ");
+	assert(str1  eq "  xxx  xxx");
 	assert(str1 ne str0);
+
 	str1 = str0;
-	assert(trimmerboth(str1, " ") eq "xxx  xxx");
+	trimmerboth(str1, " ");
+	assert(str1 eq "xxx  xxx");
 	assert(str1 ne str0);
 
 	//member function trimmer/f/b
 
 	str1 = str0;
-	assert(str1.trimmer()  eq "xxx xxx");
+	str1.trimmer();
+	assert(str1 eq "xxx xxx");
 	assert(str1 ne str0);
 	str1 = str0;
-	assert(str1.trimmerfirst() eq "xxx  xxx  ");
+	str1.trimmerfirst();
+	assert(str1 eq "xxx  xxx  ");
 	assert(str1 ne str0);
 	str1 = str0;
-	assert(str1.trimmerlast() eq "  xxx  xxx");
+	str1.trimmerlast();
+	assert(str1 eq "  xxx  xxx");
 	assert(str1 ne str0);
 
 	str1 = str0;
-	assert(str1.trimmer(" ")   eq "xxx xxx");
+	str1.trimmer(" ");
+	assert(str1 eq "xxx xxx");
 	assert(str1 ne str0);
 	str1 = str0;
-	assert(str1.trimmerfirst(" ")  eq "xxx  xxx  ");
+	str1.trimmerfirst(" ");
+	assert(str1 eq "xxx  xxx  ");
 	assert(str1 ne str0);
 	str1 = str0;
-	assert(str1.trimmerlast(" ")  eq "  xxx  xxx");
+	str1.trimmerlast(" ");
+	assert(str1 eq "  xxx  xxx");
 	assert(str1 ne str0);
 	str1 = str0;
-	assert(str1.trimmerboth(" ") eq "xxx  xxx");
+	str1.trimmerboth(" ");
+	assert(str1 eq "xxx  xxx");
 	assert(str1 ne str0);
 
 #define BOOST_TRIM
@@ -874,16 +893,16 @@ TRACE("qqqa")
 		assert(x.pop() eq "ab");
 		assert(x       eq "abc");
 
-		assert(x.popper() eq "ab");
+		x.popper();
 		assert(x          eq "ab");
 
-		assert(x.popper() eq "a");
+		x.popper();
 		assert(x          eq "a");
 
-		assert(x.popper() eq "");
+		x.popper();
 		assert(x          eq "");
 
-		assert(x.popper() eq "");
+		x.popper();
 		assert(x          eq "");
 
 		assert(var("abc").pop() eq "ab");
@@ -902,7 +921,8 @@ TRACE("qqqa")
 
 		//test procedural free functions
 		var y = "abc";
-		assert(popper(y) eq "ab");
+		popper(y);
+		assert(y eq "ab");
 		assert(y         eq "ab");
 		assert(pop(y)    eq "a");
 		assert(y         eq "ab");

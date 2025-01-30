@@ -339,71 +339,134 @@ programinit()
 		//check various xxxxxxxx-er functions
 		var v1_01;
 		v1_01 = 1.01;
-		assert(converter(v1_01, ".", "_").outputl().toString()          eq "1_01");
+		converter(v1_01, ".", "_");
+		assert(v1_01.outputl().toString()          eq "1_01");
+
 		v1_01 = 1.01;
-		assert(textconverter(v1_01, ".", "_").outputl().toString()      eq "1_01");
+		textconverter(v1_01, ".", "_");
+		assert(v1_01.outputl().toString()      eq "1_01");
+
 		v1_01 = 1.01;
-		assert(replacer(v1_01, ".", "_").outputl().toString()            eq "1_01");
+		replacer(v1_01, ".", "_");
+		assert(v1_01.outputl().toString()            eq "1_01");
+
 		v1_01 = 1.01;
-		assert(replacer(v1_01, "."_rex, "_").outputl().toString()     eq "____");
+		replacer(v1_01, "."_rex, "_");
+		assert(v1_01.outputl().toString()     eq "____");
+
 		v1_01 = 1.01;
-		assert(replacer(v1_01, "."_rex, "_").outputl().toString() eq "____");
+		replacer(v1_01, "."_rex, "_");
+		assert(v1_01.outputl().toString() eq "____");
+
 		v1_01 = 1.01;
-		assert(paster(v1_01, 2, 1, "_").outputl().toString()           eq "1_01");
+		paster(v1_01, 2, 1, "_");
+		assert(v1_01.outputl().toString()           eq "1_01");
+
 		v1_01 = 1.01;
 		//assert(pasterall(v1_01, -1, "_").outputl().toString()             eq "1.0_");
-		assert(paster(v1_01, -1, 999999, "_").outputl().toString()             eq "1.0_");
+		paster(v1_01, -1, 999999, "_");
+		assert(v1_01.outputl().toString()             eq "1.0_");
+
 		v1_01 = 1.01;
-		assert(popper(v1_01).outputl().toString()                       eq "1.0");
+		popper(v1_01);
+		assert(v1_01.outputl().toString()                       eq "1.0");
+
 		v1_01 = 1.01;
-		assert(quoter(v1_01).outputl().toString()                       eq "\"1.01\"");
+		quoter(v1_01);
+		assert(v1_01.outputl().toString()                       eq "\"1.01\"");
+
 		v1_01 = 1.01;
-		assert(squoter(v1_01).outputl().toString()                      eq "'1.01'");
+		squoter(v1_01);
+		assert(v1_01.outputl().toString()                      eq "'1.01'");
+
 		v1_01 = 1.01;
-		assert(unquoter(v1_01).outputl().toString()                     eq "1.01");
+		unquoter(v1_01);
+		assert(v1_01.outputl().toString()                     eq "1.01");
+
 		v1_01 = 1.01;
-		assert(ucaser(v1_01).outputl().toString() eq "1.01");  // utf8
+		ucaser(v1_01);  // utf8
+		assert(v1_01.outputl().toString() eq "1.01");  // utf8
+
 		v1_01 = 1.01;
-		assert(lcaser(v1_01).outputl().toString() eq "1.01");  // utf8
+		lcaser(v1_01);  // utf8
+		assert(v1_01.outputl().toString() eq "1.01");  // utf8
+
 		v1_01 = 1.01;
-		assert(tcaser(v1_01).outputl().toString() eq "1.01");  // utf8
+		tcaser(v1_01);  // utf8
+		assert(v1_01.outputl().toString() eq "1.01");  // utf8
+
 		v1_01 = 1.01;
-		assert(fcaser(v1_01).outputl().toString() eq "1.01");  // utf8
+		fcaser(v1_01);  // utf8
+		assert(v1_01.outputl().toString() eq "1.01");  // utf8
+
 		v1_01 = 1.01;
-		assert(normalizer(v1_01).outputl().toString() eq "1.01");  // utf8
+		normalizer(v1_01);  // utf8
+		assert(v1_01.outputl().toString() eq "1.01");  // utf8
+
 		v1_01 = 1.01;
-		assert(inverter(v1_01).outputl().toString() eq "ÎÑÏÎ");	 // utf8
+		inverter(v1_01);	 // utf8
+		assert(v1_01.outputl().toString() eq "ÎÑÏÎ");	 // utf8
+
 		v1_01 = 1.01;
-		assert(trimmer(v1_01).outputl().toString()                      eq "1.01");
+		trimmer(v1_01);
+		assert(v1_01.outputl().toString()                      eq "1.01");
+
 		v1_01 = 1.01;
-		assert(trimmerfirst(v1_01).outputl().toString()                     eq "1.01");
+		trimmerfirst(v1_01);
+		assert(v1_01.outputl().toString()                     eq "1.01");
+
 		v1_01 = 1.01;
-		assert(trimmerlast(v1_01).outputl().toString()                     eq "1.01");
+		trimmerlast(v1_01);
+		assert(v1_01.outputl().toString()                     eq "1.01");
+
 		v1_01 = 1.01;
-		assert(trimmer(v1_01, var(" ")).outputl().toString()            eq "1.01");
+		trimmer(v1_01, var(" "));
+		assert(v1_01.outputl().toString()            eq "1.01");
+
 		v1_01 = 1.01;
 //		assert(trimmer(v1_01, var(" "), "FB").outputl().toString()      eq "1.01");
-		assert(trimmerboth(v1_01, var(" ")).outputl().toString()      eq "1.01");
+		trimmerboth(v1_01, var(" "));
+		assert(v1_01.outputl().toString()      eq "1.01");
+
 		v1_01 = 1.01;
-		assert(trimmerfirst(v1_01, var(" ")).outputl().toString()           eq "1.01");
+		trimmerfirst(v1_01, var(" "));
+		assert(v1_01.outputl().toString()           eq "1.01");
+
 		v1_01 = 1.01;
-		assert(trimmerlast(v1_01, var(" ")).outputl().toString()           eq "1.01");
+		trimmerlast(v1_01, var(" "));
+		assert(v1_01.outputl().toString()           eq "1.01");
+
 		v1_01 = 1.01;
-		assert(fieldstorer(v1_01, ".", 1, 1, "_").outputl().toString()  eq "_.01");
+		fieldstorer(v1_01, ".", 1, 1, "_");
+		assert(v1_01.outputl().toString()  eq "_.01");
+
 		v1_01 = 1.01;
-		assert(substrer(v1_01, 2, 2).outputl().toString()               eq ".0");
+		substrer(v1_01, 2, 2);
+		assert(v1_01.outputl().toString()               eq ".0");
+
 		v1_01 = 1.01;
-		assert(substrer(v1_01, 3).outputl().toString()                  eq "01");
+		substrer(v1_01, 3);
+		assert(v1_01.outputl().toString()                  eq "01");
+
 		v1_01 = 1.01;
-		assert(substrer(v1_01, 1).outputl().toString()                  eq "1.01");
+		substrer(v1_01, 1);
+		assert(v1_01.outputl().toString()                  eq "1.01");
+
 		v1_01 = 1.01;
-		assert(sorter(v1_01).outputl().toString()                       eq "1.01");
+		sorter(v1_01);
+		assert(v1_01.outputl().toString()                       eq "1.01");
+
 		v1_01 = 1.01;
-		assert(lowerer(v1_01).outputl().toString()                      eq "1.01");
+		lowerer(v1_01);
+		assert(v1_01.outputl().toString()                      eq "1.01");
+
 		v1_01 = 1.01;
-		assert(raiser(v1_01).outputl().toString()                       eq "1.01");
+		raiser(v1_01);
+		assert(v1_01.outputl().toString()                       eq "1.01");
+
 		v1_01 = 1.01;
-		assert(cropper(v1_01).outputl().toString()                      eq "1.01");
+		cropper(v1_01);
+		assert(v1_01.outputl().toString()                      eq "1.01");
 	}
 
 	{
@@ -426,21 +489,21 @@ programinit()
 		// take the first if multiple inner
 		assert(trim(x      , ".,").outputl() eq "1,2");
 
-		var x2 = ".,1,.2.,";trimmer(x2     , ".,").outputl(); assert(x2 eq "1,2");
+		var x2 = ".,1,.2.,";trimmer(x2     , ".,"); assert(x2.outputl() eq "1,2");
 #else
 		// take the last if multiple inner
 		assert(trim(x      , ".,").outputl() eq "1.2");
 
-		var x2 = ".,1,.2.,";trimmer(x2     , ".,").outputl(); assert(x2 eq "1.2");
+		var x2 = ".,1,.2.,";trimmer(x2     , ".,"); assert(x2.outputl() eq "1.2");
 
 #endif
 		assert(trimfirst(x , ".,").outputl() eq "1,.2.,");
 		assert(trimlast(x  , ".,").outputl() eq ".,1,.2");
 		assert(trimboth(x  , ".,").outputl() eq "1,.2");
 
-		x = ".,1,.2.,";trimmerfirst(x, ".,").outputl(); assert(x eq "1,.2.,");
-		x = ".,1,.2.,";trimmerlast(x , ".,").outputl(); assert(x eq ".,1,.2");
-		x = ".,1,.2.,";trimmerboth(x , ".,").outputl(); assert(x eq "1,.2");
+		x = ".,1,.2.,";trimmerfirst(x, ".,"); assert(x.outputl() eq "1,.2.,");
+		x = ".,1,.2.,";trimmerlast(x , ".,"); assert(x.outputl() eq ".,1,.2");
+		x = ".,1,.2.,";trimmerboth(x , ".,"); assert(x.outputl() eq "1,.2");
 	}
 
 	printl(elapsedtimetext());

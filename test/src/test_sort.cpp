@@ -182,7 +182,8 @@ function main() {
 		var cards2 = cards1.shuffle(VM);
 
 		initrnd(123);
-		var cardsy = cardsx.shuffler(VM);
+		cardsx.shuffler(VM);
+		var cardsy = cardsx;
 
 		initrnd(1234);
 		var cards3 = cards1.shuffle(VM);
@@ -211,7 +212,8 @@ function main() {
 		var cards2 = shuffle(cards1, VM);
 
 		initrnd(123);
-		var cardsy = shuffler(cardsx, VM);
+		shuffler(cardsx, VM);
+		var cardsy = cardsx;
 
 		initrnd(1234);
 		var cards3 = shuffle(cards1, VM);
