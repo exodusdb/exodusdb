@@ -1498,10 +1498,6 @@ function* clientfunctions_windowonload() {
 
     yield* clientfunctions_setstyle()
 
-    //trigger formfunctions_onload
-    if (typeof formfunctions_onload == 'function')
-        yield* formfunctions_onload()
-
     //if (gautofitwindow && document.getElementById('autofitwindowelement'))
     //    exodussettimeout('exodusautofitwindow()', 10)
     //exodussetinterval('exodusautofitwindow()', 10)
@@ -1515,6 +1511,7 @@ function* clientfunctions_windowonload() {
 		}
 	}
 
+	// Should be done before form_functions_onload or else window is hidden behind menubar, until popup is selected
 	// Adjust the body's top margin dynamically so that body is never overlapped by the menubar
 	gexodus_menubar = document.getElementById('exodus_menu')
 	if (gexodus_menubar) {
@@ -1534,6 +1531,10 @@ function* clientfunctions_windowonload() {
 			subtree: true     // Detect deep changes in child elements
 		});
 	}
+
+    //trigger formfunctions_onload
+    if (typeof formfunctions_onload == 'function')
+        yield* formfunctions_onload()
 
     //add menu, logout and refresh buttons if not a popup, depending on gshowmenu, not /exodus/ location and no navbar elements
     //if no exodus_menu span (even if no menu, it is a holder for EXODUS form buttons New/Save etc.)
