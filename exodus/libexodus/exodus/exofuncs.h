@@ -167,7 +167,7 @@ ND var  oswait(SV file_dir_list, const int milliseconds);
 // 4 argument version for statement format
 // osbread(data from x at y length z)
 // Read/write osfile at specified offset. Must open/close.
-ND bool osopen(in osfilepath, io osfilevar, const char* locale DEFAULT_EMPTY);
+ND bool osopen(in osfilepath, out osfilevar, const bool utf8 DEFAULT_TRUE);
    void osclose(in osfilevar);
 // Versions where offset is input and output
 ND bool osbread(io data, in osfilevar, io offset, const int length);
@@ -218,8 +218,11 @@ ND var  osshellread(in command);
 //void debug(in DEFAULT_EMPTY);
 ND var backtrace(void);
 
-   bool setxlocale(const char* locale);
+   bool setxlocale(SV locale);
 ND var  getxlocale(void);
+
+ND var  from_codepage(in instring, const char* codepage);
+ND var  to_codepage(in instring, const char* codepage);
 
 // MATH
 
@@ -373,7 +376,20 @@ ND var last(in instring, const int nbytes);
 
 ND var chr(const int integer);
 ND var textchr(const int integer);
-ND var match(in instring, in matchstr, in options DEFAULT_EMPTY);
+
+// Match
+ND var match(in instring, SV regex_str, SV options DEFAULT_EMPTY);
+ND var match(in instring, const rex& regex);
+
+// Search
+ND var  search(in instring, SV regex_str, io startchar1, SV regex_options = "");
+// Ditto starting from first char
+ND var  search(in instring, SV regex_str);
+// Ditto given a rex
+ND var  search(in instring, const rex& regex, io startchar1);
+// Ditto starting from first char.
+ND var  search(in instring, const rex& regex);
+
 ND var seq(in char1);
 ND var textseq(in char1);
 ND var str(in instring, const int number);
@@ -385,6 +401,9 @@ ND var substr(in instring, const int startindex);
 ND var substr(in instring, const int startindex, const int length);
 IO substrer(io iostring, const int startindex);
 IO substrer(io iostring, const int startindex, const int length);
+
+ND var substr(in instring, const int startindex, SV delimiterchars, io pos2);
+//IO substrer(io iostring, const int startindex, SV delimiterchars, io pos2);
 
 ND bool starts(in instring, SV substr);
 ND bool end(in instring, SV substr);
@@ -446,6 +465,7 @@ ND bool locateusing(in usingchar, in target, in instring, io setting, const int 
 
 ND var sum(in instring, SV sepchar);
 ND var sum(in instring);
+ND var sumall(in instring);
 
 ND var crop(in instring);
 IO cropper(io iostring);

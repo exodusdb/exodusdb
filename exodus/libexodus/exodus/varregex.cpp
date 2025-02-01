@@ -360,12 +360,12 @@ var  var::match(SV regex_str, SV regex_options) const {
 		// const std_boost::regex esc("[.^$|()\\[\\]{}*+?\\\\]");
 		// allow * and ? in glob expressions
 		// Special chars ". ^ $ | ( ) [ ] { } + \"
-		const std_boost::regex regex_special_chars{R"raw([.^$|()\[\]{}+\\])raw"};
+		const std_boost::regex regex_special_chars{R"__([.^$|()\[\]{}+\\])__"};
 
 #ifdef EXO_BOOST_REGEX
-		const std::string replacement_for_regex_special = R"raw(\\$&)raw";
+		const std::string replacement_for_regex_special = R"__(\\$&)__";
 #else
-		const std::string replacement_for_regex_special = R"raw(\$&)raw";
+		const std::string replacement_for_regex_special = R"__(\$&)__";
 #endif
 
 		//std::string regex2 = std_boost::regex_replace(regex.var_str, regex_special_chars,
@@ -500,12 +500,12 @@ var  var::search(SV regex_str, io startchar1, SV regex_options) const {
 		// const std_boost::regex esc("[.^$|()\\[\\]{}*+?\\\\]");
 		// allow * and ? in glob expressions
 		// Special chars ". ^ $ | ( ) [ ] { } + \"
-		const std_boost::regex regex_special_chars{R"raw([.^$|()\[\]{}+\\])raw"};
+		const std_boost::regex regex_special_chars{R"__([.^$|()\[\]{}+\\])__"};
 
 #ifdef EXO_BOOST_REGEX
-		const std::string replacement_for_regex_special = R"raw(\\$&)raw";
+		const std::string replacement_for_regex_special = R"__(\\$&)__";
 #else
-		const std::string replacement_for_regex_special = R"raw(\$&)raw";
+		const std::string replacement_for_regex_special = R"__(\$&)__";
 #endif
 
 		//std::string regex2 = std_boost::regex_replace(regex.var_str, regex_special_chars,

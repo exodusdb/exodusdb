@@ -47,6 +47,7 @@ THE SOFTWARE.
 #undef DEFAULT_0
 #undef DEFAULT_1
 #undef DEFAULT_M1
+#undef DEFAULT_TRUE
 #undef DEFAULT_FALSE
 
 #define DEFAULT_EMPTY
@@ -57,6 +58,7 @@ THE SOFTWARE.
 #define DEFAULT_0
 #define DEFAULT_1
 #define DEFAULT_M1
+#define DEFAULT_TRUE
 #define DEFAULT_FALSE
 
 namespace exo {
@@ -93,7 +95,7 @@ ND PUBLIC var  oswait(SV file_dir_list, const int milliseconds) {return var(file
 // 4 argument version for statement format
 // osbread(data from x at y length z)
 // Read/write osfile at specified offset. Must open/close.
-ND PUBLIC bool osopen(in osfilepath, io osfilevar, const char* locale DEFAULT_EMPTY) {return osfilevar.osopen(osfilepath, locale);}
+ND PUBLIC bool osopen(in osfilepath, out osfilevar, const bool utf8 DEFAULT_TRUE) {return osfilevar.osopen(osfilepath, utf8);}
    PUBLIC void osclose(in osfilevar) {osfilevar.osclose();}
 // Versions where offset is input and output
 ND PUBLIC bool osbread(io data, in osfilevar, io offset, const int length) {return data.osbread(osfilevar, offset, length);}
@@ -142,8 +144,11 @@ ND PUBLIC var  osshellread(in command) {var result = ""; if (not result.osshellr
 
 ND PUBLIC var  backtrace();
 
-ND PUBLIC bool setxlocale(const char* locale) {return var(locale).setxlocale();}
+ND PUBLIC bool setxlocale(SV locale) {return var(locale).setxlocale();}
 ND PUBLIC var  getxlocale() {return var().getxlocale();}
+
+ND PUBLIC var  from_codepage(in instring, const char* codepage) {return instring.from_codepage(codepage);}
+ND PUBLIC var  to_codepage(in instring, const char* codepage) {return instring.to_codepage(codepage);}
 
 // MATH
 
@@ -293,7 +298,20 @@ ND PUBLIC var  last(in instring, const int nbytes) {return instring.last(nbytes)
 
 ND PUBLIC var  chr(const int integer) {return var().chr(integer);}
 ND PUBLIC var  textchr(const int integer) {return var().textchr(integer);}
-ND PUBLIC var  match(in instring, in matchstr, in options DEFAULT_EMPTY) {return instring.match(matchstr, options);}
+
+// Match
+ND PUBLIC var  match(in instring, SV regex_str, SV regex_options DEFAULT_EMPTY) {return instring.match(regex_str, regex_options);}
+ND PUBLIC var  match(in instring, const rex& regex) {return instring.match(regex);}
+
+// Search
+ND PUBLIC var  search(in instring, SV regex_str, io startchar1, SV regex_options DEFAULT_EMPTY) {return instring.search(regex_str, startchar1, regex_options);}
+// Ditto starting from first char
+ND PUBLIC var  search(in instring, SV regex_str) {return instring.search(regex_str);}
+// Ditto given a rex
+ND PUBLIC var  search(in instring, const rex& regex, io startchar1) {return instring.search(regex, startchar1);}
+// Ditto starting from first char.
+ND PUBLIC var  search(in instring, const rex& regex) {return instring.search(regex);}
+
 ND PUBLIC var  seq(in char1) {return char1.seq();}
 ND PUBLIC var  textseq(in char1) {return char1.textseq();}
 ND PUBLIC var  str(in instring, const int number) {return instring.str(number);}
@@ -305,6 +323,9 @@ ND PUBLIC var  substr(in instring, const int startindex) {return instring.substr
 ND PUBLIC var  substr(in instring, const int startindex, const int length) {return instring.b(startindex, length);}
    PUBLIC IO   substrer(io iostring, const int startindex) {iostring.substrer(startindex); return IOSTRING;}
    PUBLIC IO   substrer(io iostring, const int startindex, const int length) {iostring.substrer(startindex, length); return IOSTRING;}
+
+ND PUBLIC var  substr(in instring, const int startindex, SV delimiterchars, io pos2){return instring.substr(startindex, delimiterchars, pos2);}
+//   PUBLIC IO   substrer(io iostring, const int startindex, SV delimiterchars, int& pos2) {iostring.substrer(startindex, delimiterchars, pos2) return IOSTRING;}
 
 ND PUBLIC bool starts(in instring, SV substr) {return instring.starts(substr);}
 ND PUBLIC bool end(in instring, SV substr) {return instring.ends(substr);}
@@ -362,6 +383,7 @@ ND PUBLIC bool locateusing(in usingchar, in target, in instring, io setting, con
 
 ND PUBLIC var  sum(in instring, SV sepchar) {return instring.sum(sepchar);}
 ND PUBLIC var  sum(in instring) {return instring.sum();}
+ND PUBLIC var  sumall(in instring) {return instring.sumall();}
 
 ND PUBLIC var  crop(in instring) {return instring.crop();}
    PUBLIC IO   cropper(io iostring) {iostring.cropper(); return IOSTRING;}

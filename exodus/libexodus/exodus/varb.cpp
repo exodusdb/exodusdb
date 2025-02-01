@@ -138,12 +138,23 @@ template<> PUBLIC RETVAR VARBASE1::dump() const {
 
 	if (var_typ & VARTYP_STR)
 		nrvo ^= "str: " _DQ ^ var_base(var_str).first_(1024).convert(_ALL_FMS, _VISIBLE_FMS) ^ _DQ " ";
-	if (var_typ & VARTYP_INT)
-		nrvo ^= "int:" ^ var_base(var_int) ^ " ";
-	if (var_typ & VARTYP_DBL)
+
+	if (var_typ & VARTYP_OSFILE) {
+		nrvo ^= "osfile int:" ^ var_base(var_int) ^ " ";
 		nrvo ^= "dbl:" ^ var_base(var_dbl) ^ " ";
+
+	} else {
+
+		if (var_typ & VARTYP_INT)
+			nrvo ^= "int:" ^ var_base(var_int) ^ " ";
+
+		if (var_typ & VARTYP_DBL)
+			nrvo ^= "dbl:" ^ var_base(var_dbl) ^ " ";
+	}
+
 //	nrvo ^= "typ:" ^ (var_base(int(var_typ)).oconv("MB").trimfirst("0") + 0);
 	nrvo ^= "typ:" ^ (var_base(int(var_typ))/*.oconv("MB").trimfirst("0") + 0*/);
+
 	return nrvo;
 }
 

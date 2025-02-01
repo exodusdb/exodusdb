@@ -83,9 +83,13 @@
 #define _ALL_FMS _RM _FM _VM _SM _TM _ST
 
 // Useful TRACE() function for debugging
-//
 #define TRACE(EXPRESSION) \
-	var(EXPRESSION).convert(_ALL_FMS, _VISIBLE_FMS).quote().logputl("TRACE: " #EXPRESSION "; /" "/ ");
+	try{ \
+		var(EXPRESSION).convert(_ALL_FMS, _VISIBLE_FMS).quote().errputl("TRACE: " #EXPRESSION "; /" "/ "); \
+	} catch (VarError e) { \
+		var(e.stack()).errputl(e.description); \
+	};
+
 #define TRACE2(EXPRESSION) \
 	std::cerr << (EXPRESSION) << std::endl;
 

@@ -347,31 +347,37 @@ public:
 
     // Truncate decimal numbers towards zero
     // `var v1 = var(2.9).integer(); // 2
-    //  var v2 = var(-2.9).integer(); // -2
     //  // or
-    //  var v3 = integer(2.9); // 2
-    //  var v4 = integer(-2.9); // -2`
+    //  var v2 = integer(2.9);
+	//
+    //  var v3 = var(-2.9).integer(); // -2
+    //  // or
+    //  var v4 = integer(-2.9);`
     ND var  integer() const;
 
     // Truncate decimal numbers towards negative
     // `var v1 = var(2.9).floor(); // 2
-    //  var v2 = var(-2.9).floor(); // -3
     //  // or
-    //  var v3 = floor(2.9); // 2
-    //  var v4 = floor(-2.9); // -3`
+    //  var v2 = floor(2.9);
+	//
+    //  var v3 = var(-2.9).floor(); // -3
+    //  // or
+    //  var v4 = floor(-2.9);`
     ND var  floor() const;
 
     // Round decimal numbers to a desired number of decimal places
     // .5 always rounds away from zero.
     // `var v1 = var(0.455).round(2); // 0.46
-    //  var v2 = var(-0.455).round(2); // -0.46
     //  // or
-    //  var v3 = round(1.455, 2); // 1.46
-    //  var v4 = round(-1.455, 2); // -1.46`
+    //  var v2 = round(1.455, 2);
+	//
+    //  var v3 = var(-0.455).round(2); // -0.46
+    //  // or
+    //  var v4 = round(-1.455, 2);`
     ND var  round(const int ndecimals = 0) const;
 
-    /* implemented in var_base but documented here
-    // Remainder function
+    /* Actually implemented in var_base but documented here
+    // Modulus or Remainder function similar to C++ %
     // Result is between [0 , limit) if limit is positive
     // Result is between (limit, 0] if limit is negative
     // `var v1 = var(7).mod(5); // 2
@@ -390,14 +396,16 @@ public:
 	// obj is var
 
 	// Gets the current thread's default locale codepage code
-	// `var().getxlocale(); // e.g. "en_US.utf8"
-	//  getxlocale(); // ditto`
+	// `var v1 = var().getxlocale(); // e.g. "en_US.utf8"
+	//  // or
+	//  var v2 = getxlocale();`
 	ND out  getxlocale();
 
 	// Sets the current thread's default locale codepage code
 	// obj is str
 	// `if (not "de_DE.utf8"_var.setxlocale()) ... // true if successful
-	//  if (setxlocale("de_DE.utf8")) ... // ditto`
+	//  // or
+	//  if (setxlocale("de_DE.utf8"))`
 	   bool setxlocale() const;
 
 	///// STRING CREATION:
@@ -407,33 +415,36 @@ public:
 
 	// Create a string of a single char (byte) given an integer 0-255.
 	// 0-127 -> ASCII, 128-255 -> invalid UTF-8 so cannot be written to database or used various exodus string operations
-	// `var().chr(0x61); // "a"
-	//  chr(0x61); // ditto`
+	// `var v1 = var().chr(0x61); // "a"
+	//  // or
+	//  var v2 = chr(0x61);`
 	ND var  chr(const int num) const;
 
 	// Create a string of a single unicode code point in utf8 encoding.
 	// To get utf codepoints > 2^63 you must provide negative ints
 	// Not providing implicit constructor from var to unsigned int due to getting ambigious conversions
 	// since int and unsigned int are parallel priority in c++ implicit conversions
-	// `var().textchr(171416); // "𩶘" or "\xF0A9B698"
-	//  textchr(171416); // ditto`
+	// `var v1 = var().textchr(171416); // "𩶘" or "\xF0A9B698"
+	//  // or
+	//  var v2 = textchr(171416);`
 	ND var  textchr(const int num) const;
 
 	// Create a string by repeating a given character or string
-	// `"ab"_var.str(3); // "ababab"
-	//  str("ab"_var, 3); // ditto`
+	// `var v1 = "ab"_var.str(3); // "ababab"
+	//  // or
+	//  var v2 = str("ab", 3);`
 	ND var  str(const int num) const;
 
 	// Create string of space characters.
 	// obj is num
-	// `var(3).space(); // "␣␣␣"
-	//  space(3); // ditto`
+	// `var v1 = var(3).space(); // "␣␣␣"
+	//  // or
+	//  var v2 = space(3);`
 	ND var  space() const;
 
 	// Create a string describing a given number in words
 	// obj is num
-	// `var(123.45).numberinwords("de_DE");
-	// //"ein­hundert­drei­und­zwanzig Komma vier fünf"`
+	// `var v1 = var(123.45).numberinwords("de_DE"); // "ein­hundert­drei­und­zwanzig Komma vier fünf"`
 	ND var  numberinwords(in languagename_or_locale_id = "");
 
 	////////////
@@ -446,41 +457,48 @@ public:
 	// obj is str
 
 	// Returns the character number of the first char.
-	// `"abc"_var.seq(); // 0x61 97
-	//  seq("abc"_var); // 0x61 97`
+	// `var v1 = "abc"_var.seq(); // 0x61 97
+	//  // or
+	//  var v2 = seq("abc");`
 	ND var  seq() const;
 
 	// Returns the Unicode character number of the first unicode code point.
-	// `"Γ"_var.textseq(); // 915 U+0393: Greek Capital Letter Gamma (Unicode Character)
-	//  textseq("Γ"); // ditto`
+	// `var v1 = "Γ"_var.textseq(); // 915 U+0393: Greek Capital Letter Gamma (Unicode Character)
+	//  // or
+	//  var v2 = textseq("Γ");`
 	ND var  textseq() const;
 
 	// Returns the length of a string in number of chars
-	// `"abc"_var.len(); // 3
-	//  len("abc"_var); // ditto`
+	// `var v1 = "abc"_var.len(); // 3
+	//  // or
+	//  var v2 = len("abc");`
 	ND var  len() const;
 
 	// Returns the number of output columns.
 	// Allows multi column unicode and reduces combining characters etc. like e followed by grave accent
 	// Possibly does not properly calculate combining sequences of graphemes e.g. face followed by colour
-	// `"🤡x🤡"_var.textwidth(); // 5
-	// textwidth("🤡x🤡"_var); // ditto`
+	// `var v1 = "🤡x🤡"_var.textwidth(); // 5
+	//  // or
+	//  var v2 = textwidth("🤡x🤡");`
 	ND var  textwidth() const;
 
 	// Returns the number of Unicode code points
-	// `"Γιάννης"_var.textlen(); // 7
-	//  textlen("Γιάννης"_var); // ditto`
+	// `var v1 = "Γιάννης"_var.textlen(); // 7
+	//  // or
+	//  var v2 = textlen("Γιάννης");`
 	ND var  textlen() const;
 
 	// Returns the number of fields determined by presence of sepstr.
 	// It is the same as var.count(sepstr) + 1 except that fcount returns 0 for an empty string.
-	// `"aa**cc"_var.fcount("*"); // 3
-	//  fcount("aa**cc"_var, "*"); // ditto`
+	// `var v1 = "aa**cc"_var.fcount("*"); // 3
+	//  // or
+	//  var v2 = fcount("aa**cc", "*");`
 	ND var  fcount(SV sepstr) const;
 
 	// Return the number of sepstr found
-	// `"aa**cc"_var.count("*"); // 2
-	//  count("aa**cc"_var, "*"); // ditto`
+	// `var v1 = "aa**cc"_var.count("*"); // 2
+	//  // or
+	//  var v2 = count("aa**cc", "*");`
 	ND var  count(SV sepstr) const;
 
 	// Exodus   Javascript   PHP             Python       Go          Rust          C++
@@ -489,35 +507,49 @@ public:
 	// contains includes()   str_contains    contains()   Contains()  contains()    contains
 
 	// Returns true if starts with prefix
-	// `"abc"_var.starts("ab"); // true`
+	// `var v1 = "abc"_var.starts("ab"); // true
+	//  // or
+	//  var v2 = starts("abc", "ab");`
 	ND bool starts(SV prefix) const;
 
 	// Returns true if ends with suffix
-	// `"abc"_var.ends("bc"); // true`
+	// `var v1 = "abc"_var.ends("bc"); // true
+	//  // or
+	//  var v2 = ends("abc", "bc");`
 	ND bool ends(SV suffix) const;
 
 	// Returns true if starts, ends or contains substr
-	// `"abcd"_var.contains("bc"); // true`
+	// `var v1 = "abcd"_var.contains("bc"); // true
+	//  // or
+	//  var v2 = contains("abcd", "bc");`
 	ND bool contains(SV substr) const;
 
 	//https://en.wikipedia.org/wiki/Comparison_of_programming_languages_(string_functions)#Find
 
 	// Returns char no if found or 0 if not. startchar1 is byte no to start at.
-	// `"abcd"_var.index("bc"); // 2`
+	// `var v1 = "abcd"_var.index("bc"); // 2
+	//  // or
+	//  var v2 = index("abcd", "bc");`
 	ND var  index(SV substr, const int startchar1 = 1) const;
 
 	// ditto. Occurrence 1 = find first occurrence
-	// `"abcabc"_var.index("bc", 2); // 5`
+	// `var v1 = "abcabc"_var.index("bc", 2); // 5
+	//  // or
+	//  var v2 = index("abcabc", "bc", 2);`
 	ND var  indexn(SV substr, const int occurrence) const;
 
 	// ditto. Reverse search.
-	// startchar1 defaults to -1 meaning start searching from the last byte
-	// `"abcabc"_var.indexr("bc"); // 5`
+	// startchar1 defaults to -1 meaning start searching from the last byte (towards the first byte).
+	// `var v1 = "abcabc"_var.indexr("bc"); // 5
+	//  // or
+	//  var v2 = indexr("abcabc", "bc");`
 	ND var  indexr(SV substr, const int startchar1 = -1) const;
 
 	// Returns all results of regex matching
 	// Multiple matches are in fields. Groups are in values
-	// `"abc1abc2"_var.match("bc(\\d)"); // "bc1]1^bc2]2"`
+	// `var v1 = "abc1abc2"_var.match("BC(\\d)", "i"); // "bc1]1^bc2]2"
+	//  // or
+	//  var v2 = match("abc1abc2", "BC(\\d)", "i");`
 	//
 	// regex_options:
 	//
@@ -540,7 +572,7 @@ public:
 	// f - First only. Only for replace() (not match() or search())
 	//
     // w - Wildcard glob style (e.g. *.cfg) not regex style. Only for match() and search(). Not replace().
-	ND var  match(SV regex, SV regex_options = "") const;
+	ND var  match(SV regex_str, SV regex_options = "") const;
 
 	// Ditto
 	ND var  match(const rex& regex) const;
@@ -549,12 +581,14 @@ public:
 	// Updates startchar1 ready to search for the next match
 	// regex_options as for match()
 	// `var startchar1 = 1;
-	//  "abc1abc2"_var.search("bc(\\d)", startchar1); // returns "bc1]1"
-	//                                                // startchar1 becomes 5 ready for the next search`
-	ND var  search(SV regex, io startchar1, SV regex_options = "") const;
+	//  var v1 = "abc1abc2"_var.search("BC(\\d)", startchar1, "i"); // returns "bc1]1" and startchar1 is updated to 5 ready for the next search
+	//  // or
+	//  startchar1 = 1;
+	//  var v2 = search("abc1abc2", "BC(\\d)", startchar1, "i");`
+	ND var  search(SV regex_str, io startchar1, SV regex_options = "") const;
 
 	// Ditto starting from first char
-	ND var  search(SV regex) const {var startchar1 = 1; return this->search(regex, startchar1);}
+	ND var  search(SV regex_str) const {var startchar1 = 1; return this->search(regex_str, startchar1);}
 
 	// Ditto given a rex
 	ND var  search(const rex& regex, io startchar1) const;
@@ -572,15 +606,21 @@ public:
 	// obj is str
 
 	// Upper case
-	// `"Γιάννης"_var.ucase(); // "ΓΙΆΝΝΗΣ"`
+	// `var v1 = "Γιάννης"_var.ucase(); // "ΓΙΆΝΝΗΣ"
+	//  // or
+	//  var v2 = ucase("Γιάννης");`
 	ND var  ucase() const&;
 
 	// Lower case
-	// `"ΓΙΆΝΝΗΣ"_var.lcase(); // "γιάννης"`
+	// `var v1 = "ΓΙΆΝΝΗΣ"_var.lcase(); // "γιάννης"
+	//  // or
+	//  var v2 = lcase("ΓΙΆΝΝΗΣ");`
 	ND var  lcase() const&;
 
 	// Title case (first letters)
-	// `"γιάννης"_var.tcase(); // "Γιάννης"`
+	// `var v1 = "γιάννης"_var.tcase(); // "Γιάννης"
+	//  // or
+	//  var v2 = tcase("γιάννης");`
 	ND var  tcase() const&;
 
 	// Fold case (lower case and remove accents for indexing)
@@ -590,149 +630,223 @@ public:
 	ND var  normalize() const&;
 
 	// Simple reversible disguising of text
-	// `"abc"_var.invert(); // "\x{C29EC29DC29C}"`
+	// `var v1 = "abc"_var.invert(); // "\x{C29EC29DC29C}"
+	//  // or
+	//  var v2 = invert("abc");`
 	ND var  invert() const&;
 
 	// Convert all FM to VM, VM to SM etc.
-	// `"a1^b2^c3"_var.lower(); // "a1]b2]c3"`
+	// `var v1 = "a1^b2^c3"_var.lower(); // "a1]b2]c3"
+	//  // or
+	//  var v2 = lower("a1^b2^c3"_var);`
 	ND var  lower() const&;
 
 	// Convert all VM to FM, SM to VM etc.
-	// `"a1]b2]c3"_var.raise(); // "a1^b2^c3"`
+	// `var v1 = "a1]b2]c3"_var.raise(); // "a1^b2^c3"
+	//  // or
+	//  var v2 = "a1]b2]c3"_var);`
 	ND var  raise() const&;
 
 	// Remove any redundant FM, VM etc. characters (Trailing FM; VM before FM etc.)
-	// `"a1^b2]]^c3^^"_var.crop(); // "a1^b2^c3"`
+	// `var v1 = "a1^b2]]^c3^^"_var.crop(); // "a1^b2^c3"
+	//  // or
+	//  var v2 = crop("a1^b2]]^c3^^"_var);`
 	ND var  crop() const&;
 
 	// Wrap in double quotes
-	// `"abc"_var.quote(); // ""abc""`
+	// `var v1 = "abc"_var.quote(); // ""abc""
+	//  // or
+	//  var v2 = quote("abc");`
 	ND var  quote() const&;
 
 	// Wrap in single quotes
-	// `"abc"_var.squote(); // "'abc'"`
+	// `var v1 = "abc"_var.squote(); // "'abc'"
+	//  // or
+	//  var v2 = squote("abc");`
 	ND var  squote() const&;
 
 	// Remove one pair of double or single quotes
-	// `"'abc'"_var.unquote(); // "abc"`
+	// `var v1 = "'abc'"_var.unquote(); // "abc"
+	//  // or
+	//  var v2 = unquote("'abc'");`
 	ND var  unquote() const&;
 
 	// Remove leading, trailing and excessive inner bytes
-	// `"␣␣a1␣␣b2␣c3␣␣"_var.trim(); // "a1␣b2␣c3"`
+	// `var v1 = "␣␣a1␣␣b2␣c3␣␣"_var.trim(); // "a1␣b2␣c3"
+	//  // or
+	//  var v2 = trim("␣␣a1␣␣b2␣c3␣␣");`
 	ND var  trim(SV trimchars = " ") const&;
 
 	// Ditto leading
-	// `"␣␣a1␣␣b2␣c3␣␣"_var.trimfirst(); // "a1␣␣b2␣c3␣␣"`
+	// `var v1 = "␣␣a1␣␣b2␣c3␣␣"_var.trimfirst(); // "a1␣␣b2␣c3␣␣"
+	//  // or
+	//  var v2 = trimfirst("␣␣a1␣␣b2␣c3␣␣");`
 	ND var  trimfirst(SV trimchars = " ") const&;
 
 	// Ditto trailing
-	// `"␣␣a1␣␣b2␣c3␣␣"_var.trimlast(); // "␣␣a1␣␣b2␣c3"`
+	// `var v1 = "␣␣a1␣␣b2␣c3␣␣"_var.trimlast(); // "␣␣a1␣␣b2␣c3"
+	//  // or
+	//  var v2 = trimlast("␣␣a1␣␣b2␣c3␣␣");`
 	ND var  trimlast(SV trimchars = " ") const&;
 
 	// Ditto leading, trailing but not inner
-	// `"␣␣a1␣␣b2␣c3␣␣"_var.trimboth(); // "a1␣␣b2␣c3"`
+	// `var v1 = "␣␣a1␣␣b2␣c3␣␣"_var.trimboth(); // "a1␣␣b2␣c3"
+	//  // or
+	//  var v2 = trimboth("␣␣a1␣␣b2␣c3␣␣");`
 	ND var  trimboth(SV trimchars = " ") const&;
 
 	// Extract first char or "" if empty
-	// `"abc"_var.first(); // "a"`
+	// `var v1 = "abc"_var.first(); // "a"
+	//  // or
+	//  var v2 = first("abc");`
 	ND var  first() const&;
 
 	// Extract last char or "" if empty
-	// `"abc"_var.last(); // "c"`
+	// `var v1 = "abc"_var.last(); // "c"
+	//  // or
+	//  var v2 = last("abc")`
 	ND var  last() const&;
 
 	// Extract up to length leading chars
-	// `"abc"_var.first(2); // "ab"`
+	// `var v1 = "abc"_var.first(2); // "ab"
+	//  // or
+	//  var v2 = first("abc", 2);`
 	ND var  first(const std::size_t length) const&;
 
 	// Extract up to length trailing chars
-	// `"abc"_var.last(2); // "bc"`
+	// `var v1 = "abc"_var.last(2); // "bc"
+	//  // or
+	//  var v2 = last("abc", 2)`
 	ND var  last(const std::size_t length) const&;
 
 	// Remove length leading chars
-	// `"abcd"_var.cut(2); // "cd"`
+	// `var v1 = "abcd"_var.cut(2); // "cd"
+	//  // or
+	//  var v2 = cut("abcd", 2)`
 	ND var  cut(const int length) const&;
 
 	// Insert text at char position overwriting length chars
-	// `"abcd"_var.paste(2, 2, "XYZ"); // "aXYZd"`
+	// `var v1 = "abcd"_var.paste(2, 2, "XYZ"); // "aXYZd"
+	//  // or
+	//  var v2 = paste("abcd", 2, 2, "XYZ");`
 	ND var  paste(const int pos1, const int length, SV insertstr) const&;
 
 	// Insert text at char position without overwriting any following characters
-	// `"abcd"_var.paste(2, "XYZ"); // "aXYbcd"`
+	// `var v1 = "abcd"_var.paste(2, "XYZ"); // "aXYbcd"
+	//  // or
+	//  var v2 = paste("abcd", 2, "XYZ");`
 	ND var  paste(const int pos1, SV insertstr) const&;
 
 	// Insert text at the beginning
-	// `"abc"_var.prefix("XY"); // "XYabc"`
+	// `var v1 = "abc"_var.prefix("XY"); // "XYabc"
+	//  // or
+	//  var v2 = prefix("abc", "XY");`
 	ND var  prefix(SV insertstr) const&;
 
 	// ND var  append(SV appendstr) const&;
 
 	// Remove one trailing char
-	// `"abc"_var.pop(); // "ab"`
+	// `var v1 = "abc"_var.pop(); // "ab"
+	//  // or
+	//  var v2 = pop("abc")`
 	ND var  pop() const&;
 
 	// fieldstore() replaces nfields of subfield(s) in a string.
-	// `"aa*bb*cc*dd"_var.fieldstore("*", 2, 3, "X*Y"); // "aa*X*Y*"`
+	// `var v1 = "aa*bb*cc*dd"_var.fieldstore("*", 2, 3, "X*Y"); // "aa*X*Y*"
+	//  // or
+	//  var v2 = fieldstore("aa*bb*cc*dd", "*", 2, 3, "X*Y");
+	//
 	// If nfields is 0 then insert fields before fieldno
-	// `"a1*b2*c3*d4"_var.fieldstore("*", 2, 0, "X*Y"); // "a1*X*Y*b2*c3*d4"`
+	//  var v3 = "a1*b2*c3*d4"_var.fieldstore("*", 2, 0, "X*Y"); // "a1*X*Y*b2*c3*d4"
+	//  // or
+	//  var v4 = fieldstore("a1*b2*c3*d4", "*", 2, 0, "X*Y");
+	//
 	// If nfields is negative then delete nfields before inserting.
-	// `"a1*b2*c3*d4"_var.fieldstore("*", 2, -3, "X*Y"); // "a1*X*Y"`
+	//  var v5 = "a1*b2*c3*d4"_var.fieldstore("*", 2, -3, "X*Y"); // "a1*X*Y"
+	//  // or
+	//  var v6 = fieldstore("a1*b2*c3*d4", "*", 2, -3, "X*Y");`
 	ND var  fieldstore(SV separator, const int fieldno, const int nfields, in replacement) const&;
 
 	// substr version 1. Extract length chars starting at pos1
-	// `"abcd"_var.substr(2, 2); // "bc"`
+	// `var v1 = "abcd"_var.substr(2, 2); // "bc"
+	//  // or
+	//  var v2 = substr("abcd", 2, 2);`
+	//
 	// If length is negative then work backwards and return chars reversed
-	// `"abcd"_var.substr(3, -2); // "cb"`
+	// `var v3 = "abcd"_var.substr(3, -2); // "cb"`
+	//  // or
+	//  var v4 = substr("abcd", 3, -2);`
 	ND var  substr(const int pos1, const int length) const&;
 
 	// substr version 2. Extract all chars from pos1 up to the end
-	// `"abcd"_var.substr(2); // "bcd"`
+	// `var v1 = "abcd"_var.substr(2); // "bcd"
+	//  // or
+	//  var v2 = substr("abcd", 2);`
 	ND var  substr(const int pos1) const&;
 
-	//[[deprecated("EXODUS: Replace all xxx.b(startpos1, len) with xxx.subst(startpos1, len)")]]
+	//[[deprecated("EXODUS: Replace all xxx.b(pos1, len) with xxx.subst(pos1, len)")]]
 	// Same as substr version 1.
 	ND var  b(const int pos1, const int length) const& {return this->substr(pos1, length);}
 
-	//[[deprecated("EXODUS: Replace all xxx.b(startpos1) with xxx.substr(startpos1)")]]
+	//[[deprecated("EXODUS: Replace all xxx.b(pos1) with xxx.substr(pos1)")]]
 	// Same as substr version 2.
 	ND var  b(const int pos1) const& {return this->substr(pos1);}
 
 	// Convert chars to other chars one for one or delete where tochars is shorter.
-	// `"abcde"_var.convert("aZd", "XY"); // "Xbce" (a is replaced and d is removed)`
+	// `var v1 = "abcde"_var.convert("aZd", "XY"); // "Xbce" (a is replaced and d is removed)
+	//  // or
+	//  var v2 = convert("abcde", "aZd", "XY");`
 	ND var  convert(SV fromchars, SV tochars) const&;
 
 	// Ditto for Unicode code points.
-	// `"a🤡b😀c🌍d"_var.textconvert("🤡😀", "👋"); // "a👋bc🌍d"`
+	// `var v1 = "a🤡b😀c🌍d"_var.textconvert("🤡😀", "👋"); // "a👋bc🌍d"
+	//  // or
+	//  var v2 = textconvert("a🤡b😀c🌍d", "🤡😀", "👋");`
 	ND var  textconvert(SV fromchars, SV tochars) const&;
 
 	// Replace all occurrences of a substr with another. Case sensitive
-	// `"Abc Abc"_var.replace("bc", "X"); // "AX AX"`
+	// `var v1 = "Abc Abc"_var.replace("bc", "X"); // "AX AX"
+	//  // or
+	//  var v2 = replace("Abc Abc", "bc", "X");`
 	ND var  replace(SV fromstr, SV tostr) const&;
 
 	// Replace substring(s) using a regular expression.
 	// Use $0, $1, $2 in tostr to refer to groups defined in the regex.
-	// `"A a B b"_var.replace("[A-Z]"_rex, "'$0'"); // "'A' a 'B' b"`
+	// `var v1 = "A a B b"_var.replace("[A-Z]"_rex, "'$0'"); // "'A' a 'B' b"
+	//  // or
+	//  var v2 = replace("A a B b", "[A-Z]"_rex, "'$0'");`
 	ND var  replace(const rex& regex, SV tostr) const&;
 
 	// Remove duplicate fields in an FM or VM etc. separated list
-	// `"a1^b2^a1^c2"_var.unique(); // "a1^b2^c2"`
+	// `var v1 = "a1^b2^a1^c2"_var.unique(); // "a1^b2^c2"
+	//  // or
+	//  var v2 = unique("a1^b2^a1^c2"_var);`
 	ND var  unique() const&;
 
 	// Reorder fields in an FM or VM etc. separated list in ascending order
-	// `"20^10^2^1^1.1"_var.sort(); // "1^1.1^2^10^20"`
-	// `"b1^a1^c20^c10^c2^c1^b2"_var.sort(); // "a1^b1^b2^c1^c10^c2^c20"`
+	// `var v1 = "20^10^2^1^1.1"_var.sort(); // "1^1.1^2^10^20"
+	//  var v2 = sort("20^10^2^1^1.1"_var);
+	//  //
+	//  var v3 = "b1^a1^c20^c10^c2^c1^b2"_var.sort(); // "a1^b1^b2^c1^c10^c2^c20"
+	//  var v4 = sort("b1^a1^c20^c10^c2^c1^b2"_var);`
 	ND var  sort(SV sepchar = _FM) const&;
 
 	// Reorder fields in an FM or VM etc. separated list in descending order
-	// `"20^10^2^1^1.1"_var.reverse(); // "1.1^1^2^10^20"`
+	// `var v1 = "20^10^2^1^1.1"_var.reverse(); // "1.1^1^2^10^20"
+	//  // or
+	//  var v2 = reverse("20^10^2^1^1.1"_var);`
 	ND var  reverse(SV sepchar = _FM) const&;
 
 	// Randomise the order of fields in an FM, VM separated list
-	// `"20^10^2^1^1.1"_var.shuffle(); // "2^1^20^1.1^10" (random order depending on initrand())`
+	// `var v1 = "20^10^2^1^1.1"_var.shuffle(); // "2^1^20^1.1^10" (random order depending on initrand())`
+	//  // or
+	//  var v2 = shuffle("20^10^2^1^1.1"_var);`
 	ND var  shuffle(SV sepchar = _FM) const&;
 
 	// Replace separator characters with FM char except inside double or single quotes ignoring escaped quotes \\" \&squot;
-	// `"abc,\"def,\"123\" fgh\",12.34"_var.parse(','); // "abc^"def,"123" fgh"^12.34"`
+	// `var v1 = "abc,\"def,\"123\" fgh\",12.34"_var.parse(','); // "abc^"def,"123" fgh"^12.34"
+	//  // or
+	//  var v2 = parse("abc,\"def,\"123\" fgh\",12.34", ',');`
 	ND var  parse(char sepchar = ' ') const&;
 
 	// SAME ON TEMPORARIES - MUTATE FOR SPEED (not documenting)
@@ -779,7 +893,7 @@ public:
 	ND io   textconvert(SV fromchars, SV tochars) &&;
 	ND io   replace(const rex& regex, SV tostr) &&;
 	ND io   replace(SV fromstr, SV tostr) &&;
-//	ND io   regex_replace(SV regex, SV replacement, SV regex_options = "") &&;
+//	ND io   regex_replace(SV regex_str, SV replacement, SV regex_options = "") &&;
 
 	ND io   unique() &&;
 	ND io   sort(SV sepchar = _FM) &&;
@@ -792,9 +906,8 @@ public:
 
 	// obj is str
 
-	// utf8/byte as for accessors
-
 	   IO   ucaser() REF ;
+
 	   IO   lcaser() REF ;
 	   IO   tcaser() REF ;
 	   IO   fcaser() REF ;
@@ -849,22 +962,31 @@ public:
 	// obj is str
 
 	// MurmurHash3 hashing.
-	// `"abc"_var.hash(); // 6715211243465481821`
+	// `var v1 = "abc"_var.hash(); // 6715211243465481821
+	//  // or
+	//  var v2 = hash("abc");`
 	ND var  hash(const std::uint64_t modulus = 0) const;
 
 	// Split a FM etc. separated string into a dim array.
-	// `dim d1 = "a^b^c"_var.split(); //a dimensioned array with three elements (vars)`
+	// `dim d1 = "a^b^c"_var.split(); //a dimensioned array with three elements (vars)
+	//  // or
+	//  dim d1 = split("a^b^c"_var);`
 	ND dim  split(SV sepchar = _FM) const;
 
 	// v3 - returns bytes from some byte number upto the first of a given list of bytes
 	// this is something like std::string::find_first_of but doesnt return the delimiter found
 
 	// substr version 3.
-	// Extract a substr starting from pos1 up to any one of the given delimiter chars also returning the next pos1 after the delimiter found
-	   var  substr(const int pos1, in delimiterchars, int& pos2) const;
+	// Extract a substr starting from pos1 up to any one of some given delimiter chars
+	// Also returns in pos2 the pos of the following delimiter or one past the end of the string if not found.
+	// Add 1 to pos2 start the next search if continuing.
+	// `var pos1a = 4, pos2a; var v1 = "aa,bb,cc"_var.substr(pos1a, ",", pos2a); // "bb" and pos2 -> 6
+	//  // or
+	//  var pos1b = 4, pos2b; var v2 = substr("aa,bb,cc", pos1b, ",", pos2b);`
+	   var  substr(const int pos1, SV delimiterchars, io pos2) const;
 
 	// Alias of substr version 3.
-	   var  b(const int pos1, in delimiterchars, int& pos2) const {return this->substr(pos1, delimiterchars, pos2);}
+	   var  b(const int pos1, SV delimiterchars, io pos2) const {return this->substr(pos1, delimiterchars, pos2);}
 
 	// v4 - like v3. was named "remove" in pick. notably used in nlist to print parallel columns
 	// of mixed combinations of multivalues/subvalues and text marks
@@ -881,19 +1003,26 @@ public:
 
 	// substr version 4.
 	// Returns a substr from a given pos1  up to the next RM/FM/VM/SM/TM/STM delimiter char. Also returns the next index/offset and the delimiter no. found 1-6 or 0 if not found.
-	   var  substr2(io pos1, io delimiterno) const;
+	// `var pos1a = 4, delim1; var v1 = "aa^bb^cc"_var.substr2(pos1a, delim1); // "bb", pos1a -> 7, delim -> 2 (FM)
+	//  // or
+	//  var pos1b = 4, delim2; var v2 = subtr2("aa^bb^cc"_var, delim2);`
+	   var  substr2(io pos1, out delimiterno) const;
 
 	// Alias of substr version 4
-	   var  b2(io pos1, io delimiterno) const {return this->substr2(pos1, delimiterno);}
+	   var  b2(io pos1, out delimiterno) const {return this->substr2(pos1, delimiterno);}
 
 	// Extract one or more consecutive fields given a delimiter char or substr.
-	// `"aa*bb*cc"_var.field("*", 2);m // "bb"`
+	// `var v1 = "aa*bb*cc"_var.field("*", 2); // "bb"
+	//  // or
+	//  var v2 = field("aa*bb*cc", "*", 2);`
 	ND var  field(SV strx, const int fieldnx = 1, const int nfieldsx = 1) const;
 
 	// field2 is a version that treats fieldn -1 as the last field, -2 the penultimate field etc. -
 	// TODO Should probably make field() do this (since -1 is basically an erroneous call) and remove field2
 	// Same as var.field() but negative fieldnos work backwards from the last field.
-	// `"aa*bb*cc"_var.field("*", -1); // "cc"
+	// `var v1 = "aa*bb*cc"_var.field2("*", -1); // "cc"
+	//  // or
+	//  var v2 = field2("aa*bb*cc", "*", -1);`
 	ND var  field2(SV separator, const int fieldno, const int nfields = 1) const
 	{
 		if (fieldno >= 0) LIKELY
@@ -910,14 +1039,18 @@ public:
 	// If the internal data is invalid and cannot be converted then most conversions return the ORIGINAL data unconverted
 	// Throws a runtime error VarNotImplemented if convstr is invalid
 	// See [[#ICONV/OCONV PATTERNS]]
-	// `var(30123).oconv("D/E"); // "21/06/2050"`
+	// `var v1 = var(30123).oconv("D/E"); // "21/06/2050"
+	//  // or
+	//  var v2 = oconv(30123, "D/E");`
 	ND var  oconv(const char* convstr) const;
 
 	// Converts external data to internal format according to a given conversion code or pattern
 	// If the external data is invalid and cannot be converted then most conversions return the EMPTY STRING ""
 	// Throws a runtime error VarNotImplemented if convstr is invalid
 	// See [[#ICONV/OCONV PATTERNS]]
-	// `"21 JUN 2050"_var.iconv("D/E"); // 30123`
+	// `var v1 = "21 JUN 2050"_var.iconv("D/E"); // 30123
+	//  // or
+	//  var v2 = iconv("21 JUN 2050", "D/E");`
 	ND var  iconv(const char* convstr) const;
 
 #ifdef EXO_FORMAT
@@ -969,11 +1102,11 @@ public:
 	// Classic format function in printf style
 	// vars can be formatted either with C++ format codes e.g. {:_>8.2f}
 	// or with exodus oconv codes e.g. {::MD20P|R(_)#8} as in the below example.
-	// `var(12.345).format("'{:_>8.2f}' should match '{::MD20P|R(_)#8}'", var(12.345));
-	// // -> "'___12.35' should match '___12.35'"
-	//
-	// // or
-	//  format("'{:_>8.2f}' should match '{::MD20P|R(_)#8}'", var(12.345), var(12.345));
+	// `var v1 = var(12.345).format("'{:_>8.2f}'"); // "'___12.35'"
+	//  var v2 = var(12.345).format("'{::MD20P|R(_)#8}'");
+	//  // or
+	//  var v3 = format("'{:_>8.2f}'", var(12.345)); // "'___12.35'"
+	//  var v4 = format("'{::MD20P|R(_)#8}'", var(12.345));`
 	ND var  format(in fmt_str, Args&&... args) const
 	{
 		THISIS("var  var::format(SV fmt_str, Args&&... args) const")
@@ -989,12 +1122,16 @@ public:
 	// Converts from codepage encoded text to UTF-8 encoded text
 	// e.g. Codepage "CP1124" (Ukrainian).
 	// Use Linux command "iconv -l" for complete list of code pages and encodings.
-	// `"\xa4"_var.from_codepage("CP1124"); // "Є"
-	//  // U+0404 Cyrillic Capital Letter Ukrainian Ie Unicode Character
+	// `var v1 = "\xa4"_var.from_codepage("CP1124"); // "Є"
+	//  // or
+	//  var v2 = from_codepage("\xa4", "CP1124");
+	//  // U+0404 Cyrillic Capital Letter Ukrainian Ie Unicode Character`
 	ND var  from_codepage(const char* codepage) const;
 
 	// Converts to codepage encoded text from UTF-8 encoded text
-	// `"Є"_var.to_codepage("CP1124").oconv("HEX"); // "A4"`
+	// `var v1 = "Є"_var.to_codepage("CP1124").oconv("HEX"); // "A4"
+	//  // or
+	//  var v2 = to_codepage("Є", "CP1124").oconv("HEX");`
 	ND var  to_codepage(const char* codepage) const;
 
 	///// BASIC DYNAMIC ARRAY FUNCTIONS:
@@ -1014,11 +1151,12 @@ public:
 	// "f()" can be thought of as "field" although the function can extract values and subvalues as well.
 	// The convenient PICK OS angle bracket syntax for field extraction (e.g. xxx<20>) is not available in C++.
 	// The abbreviated exodus field extraction function (e.g. xxx.f(20)) is provided instead since field access is extremely heavily used in source code.
-	// `"f1^f2v1]f2v2]f2v3^f2"_var.f(2, 2); // "f2v2"`
+	// `var v1 = "f1^f2v1]f2v2]f2v3^f2"_var.f(2, 2); // "f2v2"`
 	ND var  f(const int fieldno, const int valueno = 0, const int subvalueno = 0)            const;
 
 	// Extract a specific field, value or subvalue from a dynamic array.
 	// The alias "f" is usually used instead
+	// `var v1 = extract("f1^f2v1]f2v2]f2v3^f2"_var, 2, 2); // "f2v2"`
 	ND var  extract(const int fieldno, const int valueno = 0, const int subvalueno = 0)      const {return this->f(fieldno, valueno, subvalueno);}
 
 	// PICKREPLACE
@@ -1074,19 +1212,25 @@ public:
 	// obj is str
 
 	// Sum up multiple values into one higher level
-	// `"1]2]3^4]5]6"_var.sum(); // "6^15"`
+	// `var v1 = "1]2]3^4]5]6"_var.sum(); // "6^15"
+	//  // or
+	//  var v2 = sum("1]2]3^4]5]6"_var);`
 	ND var  sum() const;
 
 	// Sum up all levels into a single figure
-	// `"1]2]3^4]5]6"_var.sumall(); // "21"`
+	// `var v1 = "1]2]3^4]5]6"_var.sumall(); // "21"
+	//  // or
+	//  var v2 = sumall("1]2]3^4]5]6"_var);`
 	ND var  sumall() const;
 
 	// Ditto allowing commas etc.
-	// `"10,20,33"_var.sum(","); // "60"`
+	// `var v1 = "10,20,33"_var.sum(","); // "60"
+	//  // or
+	//  var v2 = sum("10,20,33");`
 	ND var  sum(SV sepchar) const;
 
 	// Binary ops (+, -, *, /) in parallel on multiple values
-	// `"10]20]30"_var.mv("+","2]3]4"); // "12]23]34"`
+	// `var v1 = "10]20]30"_var.mv("+","2]3]4"); // "12]23]34"`
 	ND var  mv(const char* opcode, in var2) const;
 
 	///// DYNAMIC ARRAY MUTATORS (Standalone and cannot be chained):
@@ -1096,7 +1240,8 @@ public:
 
 	// Mutable versions update lvalue vars and dont return anything so that they cannot be chained. This is to prevent accidental misuse and bugs.
 	//
-	// r() stands for "replacer" abbreviated due to high incidience in code. However the actual exodus replacer function has a different function replacing substrings
+	// r() stands for "replacer" abbreviated due to high incidience in code.
+	// However the actual exodus replacer function has a different function replacing substrings, not fields, values and subvalues.
 	//
 	// Pick Basic
 	//   xyz<10> = "abc";
@@ -1120,22 +1265,30 @@ public:
 
 	// Insert a specific field in a dynamic array, moving all other fields up.
 	// `var v1 = "f1^v1]v2}s2}s3^f3"_var;
-	//  v1.inserter(2, "X"); // v1 -> "f1^X^v1]v2}s2}s3^f3"`
+	//  v1.inserter(2, "X"); // v1 -> "f1^X^v1]v2}s2}s3^f3"
+	//  // or
+	//  inserter(v1, 2, "X");`
 	   IO   inserter(const int fieldno, in insertion) REF {this->inserter(fieldno, 0, 0, insertion); return THIS;}
 
-	// Ditto for a specific value in a specific field, moving all other fields up.
+	// Ditto for a specific value in a specific field, moving all other values up.
 	// `var v1 = "f1^v1]v2}s2}s3^f3"_var;
-	//  v1.inserter(2, 2, "X"); // v1 -> "f1^v1]X]v2}s2}s3^f3"`
+	//  v1.inserter(2, 2, "X"); // v1 -> "f1^v1]X]v2}s2}s3^f3"
+	// or
+	//  inserter(v1, 2, 2, "X");`
 	   IO   inserter(const int fieldno, const int valueno, in insertion) REF {this->inserter(fieldno, valueno, 0, insertion); return THIS;}
 
 	// Ditto for a specific subvalue in a dynamic array, moving all other subvalues up.
 	// `var v1 = "f1^v1]v2}s2}s3^f3"_var;
-	//  v1.inserter(2, 2, 2, "X"); // v1 -> "f1^v1]v2}X}s2}s3^f3"`
+	//  v1.inserter(2, 2, 2, "X"); // v1 -> "f1^v1]v2}X}s2}s3^f3"
+	//  // or
+	//  v1.inserter(2, 2, 2, "X");`
 	   IO   inserter(const int fieldno, const int valueno, const int subvalueno, in insertion) REF;
 
 	// Remove a specific field (or value, or subvalue) from a dynamic array, moving all other fields (or values, or subvalues)  down.
 	// `var v1 = "f1^v1]v2}s2}s3^f3"_var;
-	//  v1.remover(2, 2); // v1 -> "f1^v1^f3"`
+	//  v1.remover(2, 2); // v1 -> "f1^v1^f3"
+	//  // or
+	//  remover(v1, 2, 2);`
 	   IO   remover(const int fieldno, const int valueno = 0, const int subvalueno = 0) REF;
 
 	//-er version could be extract and erase in one go
@@ -1150,7 +1303,8 @@ public:
 
 	// locate() with only the target substr argument provided searches unordered values separated by VM chars.
 	// Returns true if found and false if not.
-	// `if ("UK]US]UA"_var.locate("US")) ... // true`
+	// `if ("UK]US]UA"_var.locate("US")) ... // true
+	//  if locate("US", "UK]US]UA"_var) ...`
 	ND bool locate(in target) const;
 
 	// locate() with only the target substr and valueno arguments provided searches unordered values separated by VM chars.
@@ -1416,39 +1570,39 @@ public:
 
 	// Number of whole days since pick epoch 1967-12-31 00:00:00 UTC. Negative for dates before.
 	// `var today1 = var().date(); // e.g. was 20821 from 2025-01-01 00:00:00 UTC
-	//  // or just
+	//  // or
 	//  var today2 = date();`
 	ND var  date() const;
 
 	// Number of whole seconds since last 00:00:00 (UTC).
 	// `var now1 = var().time(); // range 0 - 86399 since there are 24*60*60 (86400) seconds in a day.
-	//  // or just
+	//  // or
 	//  var now2 = time();`
 	ND var  time() const;
 
 	// Number of fractional seconds since last 00:00:00 (UTC).
 	// A floating point with approx. nanosecond resolution depending on hardware.
 	// `var now1 = var().ostime(); // e.g. 23343.704387955 approx. 06:29:03 UTC
-	//  // or just
+	//  // or
 	//  var now2 = ostime();`
 	ND var  ostime() const;
 
 	// Number of fractional days since pick epoch 1967-12-31 00:00:00 UTC. Negative for dates before.
 	// A floating point with approx. nanosecond resolution depending on hardware.
 	// `var now1 = var().timestamp(); // was 20821.99998842593 around 2025-01-01 23:59:59 UTC
-	//  // or just
+	//  // or
 	//  var now2 = ostimestamp();`
 	ND var  timestamp() const;
 
 	// Construct a timestamp from a date and time
 	// `var ts1 = var().timestamp(iconv("2025-01-01", "D"), iconv("23:59:59", "MT")); // 20821.99998842593
-	//  // or just
+	//  // or
 	// var ts2 = timestamp(somedate, sometime);`
 	ND var  timestamp(in ostime) const;
 
 	// Sleep/pause/wait for a number of milliseconds
 	// `var().ossleep(3000); // sleep for 3 seconds
-	//  // or just
+	//  // or
 	//  ossleep(3000);`
 	   void ossleep(const int milliseconds) const;
 
@@ -1496,11 +1650,12 @@ public:
 	// File will be opened for writing if possible otherwise for reading.
 	// Returns true if successful or false if not possible for any reason.
 	// e.g. Target doesnt exist, permissions etc.
+	// Default locale is 'utf8' which causes trimming of partial utf-8 unicode byte sequences from osbreads. For raw untrimmed osbreads pass locale = "C"
 	// `var hostsfile;
 	//  if (not hostsfile.osopen("/etc/hosts") ...
 	//  // or
 	//  if (not osopen("/etc/hosts" to hostsfile) ...`
-	ND bool osopen(in osfilename, const char* locale = "") const;
+	ND bool osopen(in osfilename, const bool utf8 = true) const;
 
 	// Reads length bytes from an existing os file starting at a given byte offset (0 based).
 	// The osfilevar file handle may either be initialised by osopen (optionally with a locale/codepage) or be just a normal string variable holding the path and name of the os file.
@@ -1602,7 +1757,7 @@ public:
 	// Returns a FM delimited string containing all matching dir entries given a dir path
 	// A glob pattern (e.g. *.conf) can be appended to the path or passed as argument.
 	// `var entries1 = "/etc/"_var.oslist("*.cfg"); // "adduser.conf^ca-certificates.conf^ ..."
-	//  // or just
+	//  // or
 	//  var entries2 = oslist("/etc/" "*.conf";`
 	ND var  oslist(SV globpattern = "", const int mode = 0) const;
 
@@ -1619,7 +1774,7 @@ public:
 	// mode 2 returns "" if not a dir
 	// See also osfile() and osdir()
 	// `var info1 = "/etc/hosts"_var.osinfo(); // "221^20597^78309"
-	//  // or just
+	//  // or
 	//  var info2 = osinfo("/etc/hosts");`
 	// obj is osfileordirpath
 	ND var  osinfo(const int mode = 0) const;
@@ -1628,7 +1783,7 @@ public:
 	// A short string containing size ^ FM ^ modified_time ^ FM ^ modified_time
 	// Alias for osinfo(1)
 	// `var fileinfo1 = "/etc/hosts"_var.osfile(); // "221^20597^78309"
-	//  // or just
+	//  // or
 	//  var fileinfo2 = osfile("/etc/hosts");`
 	// obj is osfilename
 	ND var  osfile() const;
@@ -1637,21 +1792,21 @@ public:
 	// A short string containing FM ^ modified_time ^ FM ^ modified_time
 	// Alias for osinfo(2)
 	// `var dirinfo1 = "/etc/"_var.osdir(); // "^20848^44464"
-	//  // or just
+	//  // or
 	//  var dirinfo2 = osfile("/etc/");`
 	ND var  osdir() const;
 
 	// Makes a new directory and returns true if successful.
 	// Including parent dirs if necessary.
 	// `if (not "abc/def"_var.osmkdir()) ...
-	//  // or just
+	//  // or
 	//  if (not osmkdir("abc/def")) ...`
 	ND bool osmkdir() const;
 
 	// Removes a os dir and returns true if successful.
 	// Optionally even if not empty. Including subdirs.
 	// `if (not "abc/def"_var.osrmdir()) ...
-	//  // or just
+	//  // or
 	//  if (not osrmdir("abc/def")) ...`
 	ND bool osrmdir(bool evenifnotempty = false) const;
 
@@ -1659,13 +1814,13 @@ public:
 
 	// Returns the current working directory
 	// `var cwd1 = var().oscwd(); // "/home/exodus"
-	//  // or just
+	//  // or
 	//  var cwd2 = oscwd();`
 	ND var  oscwd() const;
 
 	// Changes the current working dir and returns true if successful.
 	// `if (not "abc/def"_var.oscwd()) ...
-	//  // or just
+	//  // or
 	//  if (not oscwd("abc/def")) ...`
 	ND bool oscwd(in newpath) const;
 
@@ -1685,7 +1840,7 @@ public:
 	// `var intext;
 	//  if (not intext.osshellread("ls -l xyz")) ...
 	//
-	//  // or just capturing stdout but ignoring exit status
+	//  // or capturing stdout but ignoring exit status
 	//  intext = osshellread("ls -l xyz");`
 	// obj is instr
 	ND bool osshellread(in oscmd);
@@ -1700,14 +1855,14 @@ public:
 
 	// Get the path of the tmp dir
 	// `var v1 = var().ostempdirpath(); // "/tmp/"
-	//  // or just
+	//  // or
 	//  var v1 = ostempdirpath();`
 	// obj is var()
 	ND var  ostempdirpath() const;
 
 	// Create and get a temporary file
 	// `var tempfilename1 = var().ostempfilename(); // "/tmp/~exoEcLj3C"
-	//  // or just
+	//  // or
 	//  var tempfilename2 = ostempfilename();`
 	// obj is var()
 	ND var  ostempfilename() const;
@@ -1734,13 +1889,13 @@ public:
 
 	// Get the os process id
 	// `let pid = var().ospid(); // 663237
-	//  // or just
+	//  // or
 	//  let pid = ospid();`
 	ND var  ospid() const;
 
 	// Get the os thread process id
 	// `let tid = var().ostid(); // 663237
-	//  // or just
+	//  // or
 	//  let tid = ostid();`
 	ND var  ostid() const;
 
@@ -1784,7 +1939,7 @@ public:
 
 	// Flushes any buffered output to stdout/cout
 	// `var().osflush();
-	//  // or just
+	//  // or
 	//  osflush();`
 	// obj is var()
 	   void osflush() const;
@@ -1860,7 +2015,7 @@ public:
 	// TX: Record (FM) <- text (\n) and \ line endings
 	ND var  iconv_TX(const char* conversion) const;
 
-	ND std::fstream* osopenx(in osfilename, const char* locale) const;
+	ND std::fstream* osopenx(in osfilename, const bool utf8 = true) const;
 
 	   bool THIS_IS_OSFILE() const { return ((var_typ & VARTYP_OSFILE) != VARTYP_UNA); }
 

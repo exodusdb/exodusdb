@@ -313,9 +313,10 @@ function main() {
 	//var var::substr(const int startindex1, const var& delimiterchars, int& endindex) const
 	////////////////////////////////////////////////////////////////////////////////////////
 
-	int pos;
+	var pos;
 	//from beginning of string (char 1) or zero or negative the same
-	assert(var("abc/:cde").b(-1, ":/", pos) eq "abc");
+	TRACE(var("abc/:cde").b(-1, ":/", pos))
+	assert(var("abc/:cde").b(-1, ":/", pos).errputl("qqqqqqqqqqqqq=") eq "abc");
 	assert(var("abc/:cde").b(0, ":/", pos)  eq "abc");
 	assert(var("abc/:cde").b(1, ":/", pos)  eq "abc");
 
