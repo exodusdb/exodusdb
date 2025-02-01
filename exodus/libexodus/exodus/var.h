@@ -1464,23 +1464,37 @@ public:
 	// 1. Provided in connect()'s conninfo argument. See 4. for the complete list of parameters.
 	// 2. Any environment variables EXO_HOST EXO_PORT EXO_USER EXO_DATA EXO_PASS EXO_TIME
 	// 3. Any parameters found in a configuration file at ~/.config/exodus/exodus.cfg
-	// 4. The defaults "host=127.0.0.1 port=5432 dbname=exodus user=exodus password=somesillysecret connect_timeout=10"
+	// 4. The default conninfo is "host=127.0.0.1 port=5432 dbname=exodus user=exodus password=somesillysecret connect_timeout=10"
 	//
 	// `var db="mydb";
 	//  if (not db.connect()) abort(db.lasterror());
 	//  db.version().outputl();
-	//  db.disconnect();`
+	//  db.disconnect();
+	//  // or
+	//  if (not connect("mydb") ...
+	//  // or
+	//  if (not connect() ...
 	ND bool connect(in conninfo = "");
 
 	// Closes db connection and frees process resources both locally and in the database server.
+	//
+	// `conn.disconnect();
+	//  // or
+	//  disconnect();
 	   void disconnect();
 
 	// Closes all connections and frees process resources both locally and in the database server(s).
+	// All connections are closed automatically when a process terminates.
+	//
+	// `conn.disconnectall();
+	//  // or
+	//  disconnectall();
 	   void disconnectall();
 
 	// Attach (connect) specific files by name to specific connections.
-	// For the remainder of the session, opening the file by name without specifying the connection will automatically use the specified connection applicable during the attach command.
-	// If conn is not specified then the default connection is used.
+	// It is not necessary to attach files before opening them. Attach is meant to control the defaults.
+	// For the remainder of the session, opening the file by name without specifying a connection will automatically use the specified connection applicable during the attach command.
+	// If conn is not specified then filename will be attached to the default connection.
 	//
 	// `if (not conn.attach(filenames)) ...
 	//  // or
@@ -1544,35 +1558,77 @@ public:
 	// obj is conn
 
 	// Create a named database on a particular connection.
+	//
+	// `if (not conn.dbcreate("mydb")) ...
+	//  // or
+	//  if (not dbcreate("mydb")) ...`
 	ND bool dbcreate(in dbname) const;
 
 	// Return a list of available databases on a particular connection.
+	//
+	// `var v1 = conn.dblist();
+	//  // or
+	//  var v2 = dblist();`
 	ND var  dblist() const;
 
 	// Create a named database from an existing database.
+	// The source database cannot have any current connections.
+	//
+	// `if (not conn.dbcopy("mydb", "mydb2")) ...
+	//  // or
+	//  if (not dbcopy("mydb", "mydb2")) ...`
 	ND bool dbcopy(in from_dbname, in to_dbname) const;
 
 	// Delete (drop) a named database.
+	// The target database cannot have any current connections.
+	//
+	// `if (not conn.dbdelete("mydb")) ...
+	//  // or
+	//  if (not dbdelete("mydb")) ...`
 	ND bool dbdelete(in dbname) const;
 
 	// Create a named db file.
+	//
+	// `if (not conn.createfile("myfile")) ...
+	//  // or
+	//  if (not createfile("myfile")) ...`
 	ND bool createfile(in filename) const;
 
 	// Rename a db file.
+	//
+	// `if (not conn.renamefile("myfile", "myfile2")) ...
+	//  // or
+	//  if (not renamefile("myfile", "myfile2")) ...`
 	ND bool renamefile(in filename, in newfilename) const;
 
 	// Delete (drop) a db file
+	//
+	// `if (not conn.deletefile("myfile")) ...
+	//  // or
+	//  if (not deletefile("myfile")) ...`
 	ND bool deletefile(in filename) const;
 
 	// Delete all records in a db file
+	//
+	// `if (not conn.clearfile("myfile")) ...
+	//  // or
+	//  if (not clearfile("myfile")) ...`
 	ND bool clearfile(in filename) const;
 
 	// Return a list of all files in a database
+	//
+	// `if (not conn.listfiles()) ...
+	//  // or
+	//  if (not listfiles()) ...`
 	ND var  listfiles() const;
 
 	// obj is conn|file
 
 	// Returns the approx. number of records in a file
+	//
+	// `var nrecs1 = file.reccount();
+	//  // or
+	//  var nrecs2 = reccount("myfile");`
 	ND var  reccount(in filename = "") const;
 
 	// Calls db maintenance function (vacuum)
