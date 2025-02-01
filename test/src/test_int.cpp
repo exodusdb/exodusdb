@@ -11,7 +11,7 @@
 programinit()
 
 function main() {
-	printl("p1 says 'Hello World!'");
+	printl("test_int says 'Hello World!'");
 
 	{
 
@@ -19,7 +19,7 @@ function main() {
 		TRACE(65536L * 65536L * 65536L)
 
 		try {
-			TRACE(0xffffffffffffffff)	// minus 1
+			var(0xffffffffffffffff).errputl();	// minus 1 should br runtime error
 			assert(false);
 		} catch (VarNumOverflow& e) {
 			printl(e.description);
@@ -28,7 +28,7 @@ function main() {
 		TRACE(0x7fffffffffffffff)	// max int64
 
 		try {
-			TRACE(0x8000000000000000)	// min int64
+			var(0x8000000000000000).errputl();	// min int64 should be runtime error
 			assert(false);
 		} catch (VarNumOverflow& e) {
 			printl(e.description);
@@ -37,7 +37,7 @@ function main() {
 		try {
 			var i64 = 0xefffffffffffffff;
 			i64.dump().outputl();
-			TRACE(i64)
+			var(i64).errputl();// should be runtime error
 			assert(false);
 		} catch (VarNumOverflow& e) {
 			printl(e.description);

@@ -358,8 +358,15 @@ function main() {
 	assert(osfile(testfilename).f(1) eq 2);
 	var offsetx = 0;
 	var testfilex;
-	assert(osopen(testfilename, testfilex));
+	printl("-----osopen utf8-------");
+//	assert(osopen(testfilename, testfilex, "Greek"));
+//	assert(osopen(testfilename, testfilex, "en_US.UTF-8"));
+//	assert(osopen(testfilename, testfilex, "utf8"));
+
+	// test osopen with default utf = true
+	assert(osopen(testfilename to testfilex /*utf8 = true*/));
 	TRACE(testfilex)
+	TRACE(testfilex.dump())
 	assert(testfilex);
 	var testdata;
 	//assert(testdata.osbread(testfilex,offsetx=0,1) eq GreekSmallGamma);
@@ -368,8 +375,9 @@ function main() {
 	assert(oswrite(charout ^ charout, testfilename));
 	//xxd t_vm.txt
 	//00000000: ceb3 ceb3                                ....
+	assert(osfile(testfilename).f(1) == 4);
 
-	//check reading 5 bytes results in 2 unicode characters (4 bytes)
+	//check reading 5 bytes results in 2 unicode characters (4 bytes) and offset is 4
 	offsetx = 0;
 	assert(testdata.osbread(testfilex, offsetx, 5));
 	assert(testdata               eq (charout ^ charout));
@@ -377,7 +385,9 @@ function main() {
 	assert(testdata.oconv("HEX2") eq "CEB3CEB3");
 	assert(offsetx                eq 4);
 
-	//check reading 4 bytes results in 2 unicode characters (4 bytes)
+	// Testing if reading part of a UTF-8 sequence is truncated to exact UTF-8 sequences
+
+	//check reading 4 bytes results in 2 unicode characters (4 bytes) and offset is 4
 	offsetx = 0;
 	assert(testdata.osbread(testfilex, offsetx, 4));
 	assert(testdata               eq (charout ^ charout));
@@ -385,16 +395,18 @@ function main() {
 	assert(testdata.oconv("HEX2") eq "CEB3CEB3");
 	assert(offsetx                eq 4);
 
-	//check reading 3 bytes results in 1 unicode character (2 bytes)
+	//check reading 3 bytes results in 1 unicode character (2 bytes) and offset is 2
 	offsetx = 0;
 	assert(testdata.osbread(testfilex, offsetx, 3));
+	TRACE(testdata.oconv("HEX"))
+	TRACE(charout.oconv("HEX"))
 	assert(testdata               eq charout);
 	assert(testdata.len()         eq 2);
 	assert(testdata.oconv("HEX2") eq "CEB3");
 	printl(offsetx);
 	assert(offsetx                eq 2);
 
-	//check reading 2 bytes results in 1 unicode character (2 bytes)
+	//check reading 2 bytes results in 1 unicode character (2 bytes) and offset is 2
 	offsetx = 0;
 	assert(testdata.osbread(testfilex, offsetx, 2));
 	assert(testdata               eq charout);
@@ -402,7 +414,7 @@ function main() {
 	assert(testdata.oconv("HEX2") eq "CEB3");
 	assert(offsetx                eq 2);
 
-	//check reading 1 byte results in nothing (and result is false)
+	//check reading 1 byte results in nothing (and result is false) and offset is 0
 	TRACE(testfilex)
 	TRACE(offsetx)
 	offsetx = 0;
@@ -573,16 +585,18 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 		//output as utf8 to t_temp5.txt
 		var tempfilename5 = "t_temp5.txt";
 		//greek2.outputl();
+//		assert(oswrite(greek2, tempfilename5, "utf8"));
 		assert(oswrite(greek2, tempfilename5, "utf8"));
 
 		//open t_temp5.txt as utf8 for random access
 		var tempfile;
-		assert(osopen(tempfilename5, tempfile, "utf8"));
+//		assert(osopen(tempfilename5, tempfile, "utf8"));
+		assert(osopen(tempfilename5 to tempfile));
 		//test reading from beyond end of file - returns ""
 		//offset2 is BYTE OFFSET NOT CHARACTER OFFSET!!!
 		var data, offset2;
 		offset2 = 4;
-		assert(not data.osbread(tempfile, offset2, 2));
+		assert(not data.osbread(tempfile from offset2, 2));
 		assert(data eq "");
 
 		//reading from middle of utf8 sequence -> invalid data TODO check valid UTF8
@@ -597,8 +611,8 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 		data.oconv("HEX").outputl("test reading from middle of utf8 byte sequence test=");
 		//assert(data.osbread(tempfile,offset2=3,2) eq "");
 
-		//test reading in C/binary mode (not UTF8)
-		assert(osopen(tempfilename5, tempfile, "C"));
+		//test reading in raw binary mode (not UTF8)
+		assert(osopen(tempfilename5 to tempfile, /*utf8=*/ false));
 		//assert(data.osbread(tempfile,offset2=0,1) eq greek2[1]);
 		//assert(data.osbread(tempfile,offset2=1,1) eq greek2[2]);
 		//assert(data.osbread(tempfile,offset2=2,1) eq greek2[3]);
@@ -799,7 +813,7 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 		var offset = 2;
 		assert(not osbwrite(GreekSmallFinalSigma, tempfilename5, offset));
 		//check can write codepage characters
-		assert(osopen(tempfilename5, tempfilename5, "Greek"));
+		assert(osopen(tempfilename5, tempfilename5));
 		offset = 2;
 		assert(osbwrite(GreekSmallFinalSigma, tempfilename5, offset));
 		assert(osremove(tempfilename5));

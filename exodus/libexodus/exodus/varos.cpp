@@ -206,7 +206,7 @@ var  var::ostempdirpath() const {
 //
 // SOLUTION:
 // TODO 1. Remove this function from exodus
-//         REPLACE it with some kind of osopen(anonymoustempfile) that must be osclosed and will exist but can never be referred to by name
+//         REPLACE it with some kind of  osopen(anonymoustempfile) that must be osclosed and will exist but can never be referred to by name
 //         You could create ANOTHER file with the same name but that would be a different inode/file in the file system.
 //      2. Provide osopen without filename to get a filehandle without name that will be automatically deleted when osclose is called.
 //
@@ -368,33 +368,33 @@ void var::osflush() const {
 }
 
 // optional locale (not the same as codepage)
-bool var::osopen(in osfilename, const char* locale) const {
+bool var::osopen(in osfilename, const bool utf8 /*=true*/) const {
 
-	THISIS("bool var::osopen(in osfilename, const char* locale)")
+	THISIS("bool var::osopen(in osfilename, const bool utf8 = true)")
 	assertDefined(function_sig);
 	ISSTRING(osfilename)
 
 	// if reopening an osfile that is already opened then close and reopen
 	if (THIS_IS_OSFILE())
-		osclose();
+		this->osclose();
 
-	return this->osopenx(osfilename, locale) != nullptr;
+	return this->osopenx(osfilename, utf8) != nullptr;
 }
 
 static void del_fstream(void* handle) {
 	delete static_cast<std::fstream*>(handle);
 }
 
-std::fstream* var::osopenx(in osfilename, const char* locale) const {
+std::fstream* var::osopenx(in osfilename, const bool utf8) const {
 
 	// Try to get the cached file handle. the usual case is that you osopen a file before doing
 	// osbwrite/osbread Using fstream instead of ofstream so that we can mix reads and writes on
 	// the same filehandle
-	std::fstream* pmyfile = nullptr;
+	std::fstream* pfstreamfile1 = nullptr;
 	if (THIS_IS_OSFILE()) {
-		pmyfile =
+		pfstreamfile1 =
 			static_cast<std::fstream*>(mv_handles_cache.get_handle(static_cast<int>(var_int), var_str));
-		if (pmyfile == nullptr)  // nonvalid handle
+		if (pfstreamfile1 == nullptr)  // nonvalid handle
 		{
 			var_int = 0;
 			//			var_typ ^= VARTYP_OSFILE;	// clear bit
@@ -403,51 +403,56 @@ std::fstream* var::osopenx(in osfilename, const char* locale) const {
 	}
 
 	// If not already cached
-	if (pmyfile == nullptr) {
+	if (pfstreamfile1 == nullptr) {
 
 		// The file has NOT already been opened so open it now with the current default locale
 		// and add it to the cache. but normally the filehandle will have been previously opened
 		// with osopen and perhaps a specific locale.
 
 		// Delay checking until necessary
-		THISIS("bool var::osopenx(in osfilename, const char* locale)")
+		THISIS("bool var::osopenx(in osfilename, const bool utf8 = true)")
 		ISSTRING(osfilename)
 
 		// TODO replace new/delete with some object
-		pmyfile = new std::fstream;
+		pfstreamfile1 = new std::fstream;
 
-		// Apply the locale
-		if (locale)
-			pmyfile->imbue(get_locale(locale));
+//		// Apply the locale
+//		if (locale)
+//			pfstreamfile1->imbue(get_locale(locale));
 
 		// Open the file for i/o (fail if the file doesnt exist and do NOT delete any
 		// existing file) binary and in/out to allow reading and writing from same file
 		// handle
-		pmyfile->open(to_path_string(osfilename).c_str(), std::ios::out | std::ios::in | std::ios::binary);
-		if (!(*pmyfile)) {
+		pfstreamfile1->open(to_path_string(osfilename).c_str(), std::ios::out | std::ios::in | std::ios::binary);
+		if (!(*pfstreamfile1)) {
 
 			// Cannot open for output. Try to open read-only
-			pmyfile->open(to_path_string(osfilename).c_str(),
+			pfstreamfile1->open(to_path_string(osfilename).c_str(),
 						  std::ios::in | std::ios::binary);
 
 			// Fail if cannot open read-only
-			if (!(*pmyfile)) {
+			if (!(*pfstreamfile1)) {
 				this->setlasterror(osfilename.quote() ^ " cannot be opened.");
-				delete pmyfile;
+				delete pfstreamfile1;
 				return nullptr;
 			}
 		}
 
-		// Cache the file handle (we use the int to store the "file number"
-		// and NAN to prevent isnum trashing mvint in the possible case that the osfilename
-		// is an integer can addhandle fail?
-		var_int =
-			mv_handles_cache.add_handle(pmyfile, del_fstream, osfilename.var_str);
-		var_typ = VARTYP_NANSTR_OSFILE;
+		// Cache
+		// 1. var_str <- osfilename
+		// 2. var_int <- the exodus os file cache handle no
+		// 3. var_dbl <- the utf8 flag
 		var_str = osfilename.var_str;
+		var_int =mv_handles_cache.add_handle(pfstreamfile1, del_fstream, osfilename.var_str);
+		var_dbl = utf8;
+
+		// VARTYP_OSFILE
+		// VARTYP_NAN is set to prevent isnum trashing var_int or var_dbl
+		// in the possible case that the osfilename a number
+		var_typ = VARTYP_NANSTR_OSFILE;
 	}
 
-	return pmyfile;
+	return pfstreamfile1;
 }
 
 // on unix or with iconv we could convert to or any character format
@@ -574,11 +579,6 @@ bool var::osread(const char* osfilename, const char* codepage) {
 		return false;
 	}
 
-	// ALN:JFI: actually we could use std::string 'tempstr' in place of 'memblock' by hacking
-	//	.data member and reserve() or resize(), thus avoiding buffer-to-buffer-copying
-	// var_str=std::string(memblock.get(), (unsigned int) bytesize);
-	// SJB Done 20190604
-
 	if (*codepage)
 		// var_str=boost::locale::conv::to_utf<char>(var_str,"ISO-8859-5")};
 		var_str = boost::locale::conv::to_utf<char>(var_str, codepage);
@@ -675,40 +675,40 @@ bool var::osbwrite(in osfilevar, io offset) const {
 	ISNUMERIC(offset)
 
 	// get the buffered file handle/open on the fly
-	std::fstream* pmyfile = osfilevar.osopenx(osfilevar, "");
-	if (pmyfile == nullptr) UNLIKELY {
+	std::fstream* pfstreamfile1 = osfilevar.osopenx(osfilevar);
+	if (pfstreamfile1 == nullptr) UNLIKELY {
 		//throw VarError(this->setlasterror(osfilevar.quote() ^ " osbwrite open failed"));
 		this->setlasterror("osbwrite failed. " ^ this->lasterror());
 		return false;
 	}
-	// std::cout << pmyfile->getloc().name();
+//	TRACE(pfstreamfile1->getloc().name())
 
 	// NOTE 1/2 seekp goes by bytes regardless of the fact that it is a wide stream
 	// myfile.seekp (offset*sizeof(char));
 	// offset should be in bytes except for fixed multibyte code pages like UTF16 and UTF32
 	if (offset < 0)
-		pmyfile->seekp(offset.toInt() + 1, std::ios_base::end);
+		pfstreamfile1->seekp(offset.toInt() + 1, std::ios_base::end);
 	else
-		pmyfile->seekp(offset.toInt());
+		pfstreamfile1->seekp(offset.toInt());
 
 	// NOTE 2/2 but write length goes by number of wide characters (not bytes)
-	pmyfile->write(var_str.data(), var_str.size());
+	pfstreamfile1->write(var_str.data(), var_str.size());
 
 	// on windows, fstream will try to convert to current locale codepage so
 	// if you are trying to write an exodus string containing a GREEK CAPITAL GAMMA
 	// unicode \x0393 and current codepage is *NOT* CP1253 (Greek)
 	// then c++ wiofstream cannot convert \x0393 to a single byte (in CP1253)
-	if (pmyfile->fail()) UNLIKELY {
+	if (pfstreamfile1->fail()) UNLIKELY {
 		// saved in cache, DO NOT CLOSE!
 		// myfile.close();
 		throw VarError(this->setlasterror(osfilevar.quote() ^ " osbwrite write failed"));
 	}
 
 	// pass back the file pointer offset
-	offset = static_cast<int>(pmyfile->tellp());
+	offset = static_cast<int>(pfstreamfile1->tellp());
 
 	// although slow, ensure immediate visibility of osbwrites
-	pmyfile->flush();
+	pfstreamfile1->flush();
 
 	// saved in cache, DO NOT CLOSE!
 	// myfile.close();
@@ -716,7 +716,7 @@ bool var::osbwrite(in osfilevar, io offset) const {
 	return true;
 }
 
-static unsigned count_excess_UTF8_bytes(const std::string& str) {
+static unsigned count_invalid_trailing_UTF8_bytes(const std::string& str) {
 
 	// Scans backward from the end of string.
 #pragma GCC diagnostic push
@@ -795,8 +795,8 @@ bool var::osbread(in osfilevar, io offset, const int bytesize) {
 		return true;
 
 	// get the buffered file handle/open on the fly
-	std::fstream* pmyfile = osfilevar.osopenx(osfilevar, "");
-	if (pmyfile == nullptr) {
+	std::fstream* pfstreamfile1 = osfilevar.osopenx(osfilevar);
+	if (pfstreamfile1 == nullptr) {
 		this->setlasterror("osbread failed. " ^ this->lasterror());
 		return false;
 	}
@@ -804,7 +804,7 @@ bool var::osbread(in osfilevar, io offset, const int bytesize) {
 		//NB all file sizes are in bytes NOT characters despite this being a wide character
 	fstream
 		// Position get pointer at the end of file, as expected it to be if we open file
-	anew pmyfile->seekg(0, std::ios::end); unsigned int maxsize = pmyfile->tellg();
+	anew pfstreamfile1->seekg(0, std::ios::end); unsigned int maxsize = pfstreamfile1->tellg();
 
 	var(maxsize).outputl("maxsize=");
 		//return "" if start reading past end of file
@@ -813,16 +813,16 @@ bool var::osbread(in osfilevar, io offset, const int bytesize) {
 
 	*/
 	// seek to the offset
-	// if (pmyfile->tellg() != static_cast<long> (offset.var_int))
+	// if (pfstreamfile1->tellg() != static_cast<long> (offset.var_int))
 	{
-		if (pmyfile->fail())
-			pmyfile->clear();
-		// pmyfile->seekg (static_cast<long> (offset.var_int), std::ios::beg);	//
+		if (pfstreamfile1->fail())
+			pfstreamfile1->clear();
+		// pfstreamfile1->seekg (static_cast<long> (offset.var_int), std::ios::beg);	//
 		// 'std::streampos' usually 'long' seekg always seems to result in tellg being -1 in
 		// linux (Ubunut 10.04 64bit)
-		pmyfile->rdbuf()->pubseekpos(static_cast<std::uint64_t>(offset.var_int));
+		pfstreamfile1->rdbuf()->pubseekpos(static_cast<std::uint64_t>(offset.var_int));
 	}
-	// var((int) pmyfile->tellg()).outputl("2 tellg=");
+	// var((int) pfstreamfile1->tellg()).outputl("2 tellg=");
 
 	// get a memory block to read into
 	std::unique_ptr<char[]> memblock(new char[bytesize]);
@@ -833,33 +833,40 @@ bool var::osbread(in osfilevar, io offset, const int bytesize) {
 	}
 
 	// read the data (converting characters on the fly)
-	pmyfile->read(memblock.get(), bytesize);
+	pfstreamfile1->read(memblock.get(), bytesize);
 
-	// bool failed = pmyfile.fail();
-	if (pmyfile->fail()) {
-		pmyfile->clear();
-		pmyfile->seekg(0, std::ios::end);
+	// bool failed = pfstreamfile1.fail();
+	if (pfstreamfile1->fail()) {
+		pfstreamfile1->clear();
+		pfstreamfile1->seekg(0, std::ios::end);
 	}
 
 	// update the offset function argument
 	// if (readsize > 0)
-	offset = static_cast<int>(pmyfile->tellg());
+	offset = static_cast<int>(pfstreamfile1->tellg());
 
 	// transfer the memory block to this variable's string
 	//(is is possible to read directly into string data() avoiding a memory copy?
 	// get the number of CHARACTERS read - utf8 bytes (except ASCII) convert to fewer wchar
-	// characters. int readsize = pmyfile->gcount(); #pragma warning( disable: 4244 )
+	// characters. int readsize = pfstreamfile1->gcount(); #pragma warning( disable: 4244 )
 	// warning C4244: '=' : conversion from 'std::streamoff' to 'unsigned int', possible loss of
 	// data
-	var_str.assign(memblock.get(), static_cast<unsigned int>(pmyfile->gcount()));
+	var_str.assign(memblock.get(), static_cast<unsigned int>(pfstreamfile1->gcount()));
 
-	// trim off any excess utf8 bytes if utf8
-	//	var(pmyfile->getloc().name()).outputl(L"loc name=");;
-	if (pmyfile->getloc().name() != "C") {
-		auto nextrabytes = count_excess_UTF8_bytes(var_str);
-		if (nextrabytes) {
-			offset -= static_cast<int>(nextrabytes);
-			var_str.resize(var_str.size() - nextrabytes);
+	// If the file is not ? locale, trim off any excess utf8 bytes
+//	TRACE(pfstreamfile1->getloc().name())
+//	if (pfstreamfile1->getloc().name() != "C") {
+//	if (pfstreamfile1->getloc().name() != "*") {
+	// var_dbl stores the utf8 flag set in osopenx
+//	TRACE(osfilevar.var_dbl)
+	if (osfilevar.var_dbl) {
+		auto nextra_bytes = count_invalid_trailing_UTF8_bytes(var_str);
+//		TRACE(nextra_bytes)
+		if (nextra_bytes) {
+			// Reduce the offset
+			offset -= static_cast<int>(nextra_bytes);
+			// Cut off the excess bytes from var_str
+			var_str.resize(var_str.size() - nextra_bytes);
 		}
 	}
 

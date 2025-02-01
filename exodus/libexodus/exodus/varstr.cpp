@@ -1630,14 +1630,14 @@ getnextp2:
 // SUBSTR upto any specified characters - similar to var::substr3
 ////////
 
-// returns the characters up to the next delimiter
+// version 3 returns the characters up to the next delimiter
 // also returns the index of the next delimiter discovered or 1 after the string if none (like
 // COL2() in pickos) NOTE pos1 is 1 based not 0. anything less than 1 is treated as 1
-var  var::substr(const int pos1, in delimiterchars, int& pos2) const {
+var  var::substr(const int pos1, SV delimiterchars, io pos2) const {
 
-	THISIS("var  var::substr(const int pos1, io delimiterchars, int& pos2) const")
+	THISIS("var  var::substr(const int pos1, SV delimiterchars, io pos2) const")
 	assertString(function_sig);
-	ISSTRING(delimiterchars)
+//	ISSTRING(delimiterchars)
 
 	std::size_t pos;
 
@@ -1660,7 +1660,7 @@ var  var::substr(const int pos1, in delimiterchars, int& pos2) const {
 
 	// find the end of the field (or string)
 	std::size_t end_pos;
-	end_pos = var_str.find_first_of(delimiterchars.var_str, pos);
+	end_pos = var_str.find_first_of(delimiterchars, pos);
 
 	// past of of string?
 	if (end_pos == std::string::npos) {
@@ -1684,9 +1684,9 @@ var  var::substr(const int pos1, in delimiterchars, int& pos2) const {
 // returns the characters up to the next delimiter
 // delimiter returned as numbers RM=1F=1 FM=1E=2, VM=1D=3 SM=1C=4 TM=1B=5 to ST=1A=6 or 0 if not found
 // NOTE pos1 is 1 based not 0. anything less than 1 is treated as 1
-var  var::substr2(io pos1, io delimiterno) const {
+var  var::substr2(io pos1, out delimiterno) const {
 
-	THISIS("var  var::substr2(io pos1, io delimiterno) const")
+	THISIS("var  var::substr2(io pos1, out delimiterno) const")
 	assertString(function_sig);
 	ISNUMERIC(pos1)
 	ISDEFINED(delimiterno)

@@ -125,8 +125,8 @@
 624 var  var::osshell() const
 625 var  var::osshellread() const
 626 var  var::osshellwrite(in oscmd) const
-627 bool var::osopen(in osfilename, const char* locale)
-628 bool var::osopenx(in osfilename, const char* locale)
+627 bool var::osopen(in osfilename, const bool utf8 = true)
+628 bool var::osopenx(in osfilename, const bool utf8 = true)
 629 bool var::osread(const char* osfilename, const char* codepage
 630 bool var::to_codepage(const char* codepage) const
 631 bool var::from_codepage(const char* codepage) const
@@ -176,7 +176,7 @@
 675 var  var::at(const int charno) const
 676 var  var::multivalued(const char* opcode, in var2) const
 677 var  var::substr(const int pos1, io delimiterchars, int& pos2) const
-678 var  var::substr2(io pos1, io delimiterno) const
+678 var  var::substr2(io pos1, out delimiterno) const
 679 var  var::sumall() const
 680 var  var::sum() const
 681 var  var::sum(SV separator) const

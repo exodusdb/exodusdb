@@ -248,8 +248,8 @@ auto get_timebank_acno(const std::string_view arg1) -> int {
 	else if (++acno && arg1 == "var  var::osshell() const") {}
 	else if (++acno && arg1 == "var  var::osshellread() const") {}
 	else if (++acno && arg1 == "var  var::osshellwrite(in oscmd) const") {}
-	else if (++acno && arg1 == "bool var::osopen(in osfilename, const char* locale)") {}
-	else if (++acno && arg1 == "bool var::osopenx(in osfilename, const char* locale)") {}
+	else if (++acno && arg1 == "bool var::osopen(in osfilename, const bool utf8 = true)") {}
+	else if (++acno && arg1 == "bool var::osopenx(in osfilename, const bool utf8 = true)") {}
 	else if (++acno && arg1 == "bool var::osread(const char* osfilename, const char* codepage") {}
 	else if (++acno && arg1 == "bool var::to_codepage(const char* codepage) const") {}
 	else if (++acno && arg1 == "bool var::from_codepage(const char* codepage) const") {}
@@ -299,7 +299,7 @@ auto get_timebank_acno(const std::string_view arg1) -> int {
 	else if (++acno && arg1 == "var  var::at(const int charno) const") {}
 	else if (++acno && arg1 == "var  var::multivalued(const char* opcode, in var2) const") {}
 	else if (++acno && arg1 == "var  var::substr(const int pos1, io delimiterchars, int& pos2) const") {}
-	else if (++acno && arg1 == "var  var::substr2(io pos1, io delimiterno) const") {}
+	else if (++acno && arg1 == "var  var::substr2(io pos1, out delimiterno) const") {}
 	else if (++acno && arg1 == "var  var::sumall() const") {}
 	else if (++acno && arg1 == "var  var::sum() const") {}
 	else if (++acno && arg1 == "var  var::sum(SV separator) const") {}

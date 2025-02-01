@@ -2177,7 +2177,7 @@ var  var::numberinwords(in langname_or_locale_id) {
 		"fr_FR";
 
 	// Determine locale_id
-	//const char* locale_name = "ar_AE.utf8";
+	//SV locale_name = "ar_AE.utf8";
 	var langn;
 	var langcode;
 	if (exo_languages.locate(langname_or_locale_id.lcase(),langn))
