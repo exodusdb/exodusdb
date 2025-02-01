@@ -143,8 +143,8 @@
 642 void var::ossleep(const int milliseconds) const
 643 var  var::rnd() const
 644 void var::initrnd() const
-645 bool var::osgetenv(const char* envcode)
-646 bool var::ossetenv(const char* envcode) const
+645 bool var::osgetenv(SV envcode)
+646 bool var::ossetenv(SV envcode) const
 647 CVR  var::put(std::ostream& ostream1) const
 648 var  var::match(SV regex_str, SV regex_options) const
 649 void var::replacer(SV what, SV with) &

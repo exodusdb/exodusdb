@@ -266,8 +266,8 @@ auto get_timebank_acno(const std::string_view arg1) -> int {
 	else if (++acno && arg1 == "void var::ossleep(const int milliseconds) const") {}
 	else if (++acno && arg1 == "var  var::rnd() const") {}
 	else if (++acno && arg1 == "void var::initrnd() const") {}
-	else if (++acno && arg1 == "bool var::osgetenv(const char* envcode)") {}
-	else if (++acno && arg1 == "bool var::ossetenv(const char* envcode) const") {}
+	else if (++acno && arg1 == "bool var::osgetenv(SV envcode)") {}
+	else if (++acno && arg1 == "bool var::ossetenv(SV envcode) const") {}
 	else if (++acno && arg1 == "CVR  var::put(std::ostream& ostream1) const") {}
 	else if (++acno && arg1 == "var  var::match(SV regex_str, SV regex_options) const") {}
 	else if (++acno && arg1 == "void var::replacer(SV what, SV with) &") {}
