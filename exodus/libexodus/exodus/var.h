@@ -396,6 +396,7 @@ public:
 	// obj is var
 
 	// Gets the current thread's default locale codepage code
+	//
 	// `var v1 = var().getxlocale(); // e.g. "en_US.utf8"
 	//  // or
 	//  var v2 = getxlocale();`
@@ -403,6 +404,7 @@ public:
 
 	// Sets the current thread's default locale codepage code
 	// obj is str
+	//
 	// `if (not "de_DE.utf8"_var.setxlocale()) ... // true if successful
 	//  // or
 	//  if (setxlocale("de_DE.utf8"))`
@@ -415,6 +417,7 @@ public:
 
 	// Create a string of a single char (byte) given an integer 0-255.
 	// 0-127 -> ASCII, 128-255 -> invalid UTF-8 so cannot be written to database or used various exodus string operations
+	//
 	// `var v1 = var().chr(0x61); // "a"
 	//  // or
 	//  var v2 = chr(0x61);`
@@ -424,12 +427,14 @@ public:
 	// To get utf codepoints > 2^63 you must provide negative ints
 	// Not providing implicit constructor from var to unsigned int due to getting ambigious conversions
 	// since int and unsigned int are parallel priority in c++ implicit conversions
+	//
 	// `var v1 = var().textchr(171416); // "𩶘" or "\xF0A9B698"
 	//  // or
 	//  var v2 = textchr(171416);`
 	ND var  textchr(const int num) const;
 
 	// Create a string by repeating a given character or string
+	//
 	// `var v1 = "ab"_var.str(3); // "ababab"
 	//  // or
 	//  var v2 = str("ab", 3);`
@@ -437,6 +442,7 @@ public:
 
 	// Create string of space characters.
 	// obj is num
+	//
 	// `var v1 = var(3).space(); // "␣␣␣"
 	//  // or
 	//  var v2 = space(3);`
@@ -444,6 +450,7 @@ public:
 
 	// Create a string describing a given number in words
 	// obj is num
+	//
 	// `var v1 = var(123.45).numberinwords("de_DE"); // "ein­hundert­drei­und­zwanzig Komma vier fünf"`
 	ND var  numberinwords(in languagename_or_locale_id = "");
 
@@ -457,18 +464,21 @@ public:
 	// obj is str
 
 	// Returns the character number of the first char.
+	//
 	// `var v1 = "abc"_var.seq(); // 0x61 97
 	//  // or
 	//  var v2 = seq("abc");`
 	ND var  seq() const;
 
 	// Returns the Unicode character number of the first unicode code point.
+	//
 	// `var v1 = "Γ"_var.textseq(); // 915 U+0393: Greek Capital Letter Gamma (Unicode Character)
 	//  // or
 	//  var v2 = textseq("Γ");`
 	ND var  textseq() const;
 
 	// Returns the length of a string in number of chars
+	//
 	// `var v1 = "abc"_var.len(); // 3
 	//  // or
 	//  var v2 = len("abc");`
@@ -477,12 +487,14 @@ public:
 	// Returns the number of output columns.
 	// Allows multi column unicode and reduces combining characters etc. like e followed by grave accent
 	// Possibly does not properly calculate combining sequences of graphemes e.g. face followed by colour
+	//
 	// `var v1 = "🤡x🤡"_var.textwidth(); // 5
 	//  // or
 	//  var v2 = textwidth("🤡x🤡");`
 	ND var  textwidth() const;
 
 	// Returns the number of Unicode code points
+	//
 	// `var v1 = "Γιάννης"_var.textlen(); // 7
 	//  // or
 	//  var v2 = textlen("Γιάννης");`
@@ -490,12 +502,14 @@ public:
 
 	// Returns the number of fields determined by presence of sepstr.
 	// It is the same as var.count(sepstr) + 1 except that fcount returns 0 for an empty string.
+	//
 	// `var v1 = "aa**cc"_var.fcount("*"); // 3
 	//  // or
 	//  var v2 = fcount("aa**cc", "*");`
 	ND var  fcount(SV sepstr) const;
 
 	// Return the number of sepstr found
+	//
 	// `var v1 = "aa**cc"_var.count("*"); // 2
 	//  // or
 	//  var v2 = count("aa**cc", "*");`
@@ -507,18 +521,21 @@ public:
 	// contains includes()   str_contains    contains()   Contains()  contains()    contains
 
 	// Returns true if starts with prefix
+	//
 	// `var v1 = "abc"_var.starts("ab"); // true
 	//  // or
 	//  var v2 = starts("abc", "ab");`
 	ND bool starts(SV prefix) const;
 
 	// Returns true if ends with suffix
+	//
 	// `var v1 = "abc"_var.ends("bc"); // true
 	//  // or
 	//  var v2 = ends("abc", "bc");`
 	ND bool ends(SV suffix) const;
 
 	// Returns true if starts, ends or contains substr
+	//
 	// `var v1 = "abcd"_var.contains("bc"); // true
 	//  // or
 	//  var v2 = contains("abcd", "bc");`
@@ -527,12 +544,14 @@ public:
 	//https://en.wikipedia.org/wiki/Comparison_of_programming_languages_(string_functions)#Find
 
 	// Returns char no if found or 0 if not. startchar1 is byte no to start at.
+	//
 	// `var v1 = "abcd"_var.index("bc"); // 2
 	//  // or
 	//  var v2 = index("abcd", "bc");`
 	ND var  index(SV substr, const int startchar1 = 1) const;
 
 	// ditto. Occurrence 1 = find first occurrence
+	//
 	// `var v1 = "abcabc"_var.index("bc", 2); // 5
 	//  // or
 	//  var v2 = index("abcabc", "bc", 2);`
@@ -540,6 +559,7 @@ public:
 
 	// ditto. Reverse search.
 	// startchar1 defaults to -1 meaning start searching from the last byte (towards the first byte).
+	//
 	// `var v1 = "abcabc"_var.indexr("bc"); // 5
 	//  // or
 	//  var v2 = indexr("abcabc", "bc");`
@@ -547,6 +567,7 @@ public:
 
 	// Returns all results of regex matching
 	// Multiple matches are in fields. Groups are in values
+	//
 	// `var v1 = "abc1abc2"_var.match("BC(\\d)", "i"); // "bc1]1^bc2]2"
 	//  // or
 	//  var v2 = match("abc1abc2", "BC(\\d)", "i");`
@@ -580,6 +601,7 @@ public:
 	// Search for first match of a regular expression starting at startchar1
 	// Updates startchar1 ready to search for the next match
 	// regex_options as for match()
+	//
 	// `var startchar1 = 1;
 	//  var v1 = "abc1abc2"_var.search("BC(\\d)", startchar1, "i"); // returns "bc1]1" and startchar1 is updated to 5 ready for the next search
 	//  // or
@@ -606,18 +628,21 @@ public:
 	// obj is str
 
 	// Upper case
+	//
 	// `var v1 = "Γιάννης"_var.ucase(); // "ΓΙΆΝΝΗΣ"
 	//  // or
 	//  var v2 = ucase("Γιάννης");`
 	ND var  ucase() const&;
 
 	// Lower case
+	//
 	// `var v1 = "ΓΙΆΝΝΗΣ"_var.lcase(); // "γιάννης"
 	//  // or
 	//  var v2 = lcase("ΓΙΆΝΝΗΣ");`
 	ND var  lcase() const&;
 
 	// Title case (first letters)
+	//
 	// `var v1 = "γιάννης"_var.tcase(); // "Γιάννης"
 	//  // or
 	//  var v2 = tcase("γιάννης");`
@@ -630,114 +655,133 @@ public:
 	ND var  normalize() const&;
 
 	// Simple reversible disguising of text
+	//
 	// `var v1 = "abc"_var.invert(); // "\x{C29EC29DC29C}"
 	//  // or
 	//  var v2 = invert("abc");`
 	ND var  invert() const&;
 
 	// Convert all FM to VM, VM to SM etc.
+	//
 	// `var v1 = "a1^b2^c3"_var.lower(); // "a1]b2]c3"
 	//  // or
 	//  var v2 = lower("a1^b2^c3"_var);`
 	ND var  lower() const&;
 
 	// Convert all VM to FM, SM to VM etc.
+	//
 	// `var v1 = "a1]b2]c3"_var.raise(); // "a1^b2^c3"
 	//  // or
 	//  var v2 = "a1]b2]c3"_var);`
 	ND var  raise() const&;
 
 	// Remove any redundant FM, VM etc. characters (Trailing FM; VM before FM etc.)
+	//
 	// `var v1 = "a1^b2]]^c3^^"_var.crop(); // "a1^b2^c3"
 	//  // or
 	//  var v2 = crop("a1^b2]]^c3^^"_var);`
 	ND var  crop() const&;
 
 	// Wrap in double quotes
+	//
 	// `var v1 = "abc"_var.quote(); // ""abc""
 	//  // or
 	//  var v2 = quote("abc");`
 	ND var  quote() const&;
 
 	// Wrap in single quotes
+	//
 	// `var v1 = "abc"_var.squote(); // "'abc'"
 	//  // or
 	//  var v2 = squote("abc");`
 	ND var  squote() const&;
 
 	// Remove one pair of double or single quotes
+	//
 	// `var v1 = "'abc'"_var.unquote(); // "abc"
 	//  // or
 	//  var v2 = unquote("'abc'");`
 	ND var  unquote() const&;
 
 	// Remove leading, trailing and excessive inner bytes
+	//
 	// `var v1 = "␣␣a1␣␣b2␣c3␣␣"_var.trim(); // "a1␣b2␣c3"
 	//  // or
 	//  var v2 = trim("␣␣a1␣␣b2␣c3␣␣");`
 	ND var  trim(SV trimchars = " ") const&;
 
 	// Ditto leading
+	//
 	// `var v1 = "␣␣a1␣␣b2␣c3␣␣"_var.trimfirst(); // "a1␣␣b2␣c3␣␣"
 	//  // or
 	//  var v2 = trimfirst("␣␣a1␣␣b2␣c3␣␣");`
 	ND var  trimfirst(SV trimchars = " ") const&;
 
 	// Ditto trailing
+	//
 	// `var v1 = "␣␣a1␣␣b2␣c3␣␣"_var.trimlast(); // "␣␣a1␣␣b2␣c3"
 	//  // or
 	//  var v2 = trimlast("␣␣a1␣␣b2␣c3␣␣");`
 	ND var  trimlast(SV trimchars = " ") const&;
 
 	// Ditto leading, trailing but not inner
+	//
 	// `var v1 = "␣␣a1␣␣b2␣c3␣␣"_var.trimboth(); // "a1␣␣b2␣c3"
 	//  // or
 	//  var v2 = trimboth("␣␣a1␣␣b2␣c3␣␣");`
 	ND var  trimboth(SV trimchars = " ") const&;
 
 	// Extract first char or "" if empty
+	//
 	// `var v1 = "abc"_var.first(); // "a"
 	//  // or
 	//  var v2 = first("abc");`
 	ND var  first() const&;
 
 	// Extract last char or "" if empty
+	//
 	// `var v1 = "abc"_var.last(); // "c"
 	//  // or
 	//  var v2 = last("abc")`
 	ND var  last() const&;
 
 	// Extract up to length leading chars
+	//
 	// `var v1 = "abc"_var.first(2); // "ab"
 	//  // or
 	//  var v2 = first("abc", 2);`
 	ND var  first(const std::size_t length) const&;
 
 	// Extract up to length trailing chars
+	//
 	// `var v1 = "abc"_var.last(2); // "bc"
 	//  // or
 	//  var v2 = last("abc", 2)`
 	ND var  last(const std::size_t length) const&;
 
 	// Remove length leading chars
+	//
 	// `var v1 = "abcd"_var.cut(2); // "cd"
 	//  // or
 	//  var v2 = cut("abcd", 2)`
 	ND var  cut(const int length) const&;
 
 	// Insert text at char position overwriting length chars
+	//
 	// `var v1 = "abcd"_var.paste(2, 2, "XYZ"); // "aXYZd"
 	//  // or
 	//  var v2 = paste("abcd", 2, 2, "XYZ");`
 	ND var  paste(const int pos1, const int length, SV insertstr) const&;
 
 	// Insert text at char position without overwriting any following characters
+	//
 	// `var v1 = "abcd"_var.paste(2, "XYZ"); // "aXYbcd"
 	//  // or
 	//  var v2 = paste("abcd", 2, "XYZ");`
 	ND var  paste(const int pos1, SV insertstr) const&;
 
 	// Insert text at the beginning
+	//
 	// `var v1 = "abc"_var.prefix("XY"); // "XYabc"
 	//  // or
 	//  var v2 = prefix("abc", "XY");`
@@ -746,36 +790,43 @@ public:
 	// ND var  append(SV appendstr) const&;
 
 	// Remove one trailing char
+	//
 	// `var v1 = "abc"_var.pop(); // "ab"
 	//  // or
 	//  var v2 = pop("abc")`
 	ND var  pop() const&;
 
 	// fieldstore() replaces n fields of subfield(s) in a string.
+	//
 	// `var v1 = "aa*bb*cc*dd"_var.fieldstore("*", 2, 3, "X*Y"); // "aa*X*Y*"
 	//  // or
 	//  var v2 = fieldstore("aa*bb*cc*dd", "*", 2, 3, "X*Y");`
 	// If nfields is 0 then insert fields before fieldno
+	//
 	// `var v1 = "a1*b2*c3*d4"_var.fieldstore("*", 2, 0, "X*Y"); // "a1*X*Y*b2*c3*d4"
 	//  // or
 	//  var v2 = fieldstore("a1*b2*c3*d4", "*", 2, 0, "X*Y");`
 	// If nfields is negative then delete nfields before inserting.
+	//
 	// `var v1 = "a1*b2*c3*d4"_var.fieldstore("*", 2, -3, "X*Y"); // "a1*X*Y"
 	//  // or
 	//  var v2 = fieldstore("a1*b2*c3*d4", "*", 2, -3, "X*Y");`
 	ND var  fieldstore(SV separator, const int fieldno, const int nfields, in replacement) const&;
 
 	// substr version 1. Extract length chars starting at pos1
+	//
 	// `var v1 = "abcd"_var.substr(2, 2); // "bc"
 	//  // or
 	//  var v2 = substr("abcd", 2, 2);`
 	// If length is negative then work backwards and return chars reversed
+	//
 	// `var v1 = "abcd"_var.substr(3, -2); // "cb"`
 	//  // or
 	//  var v2 = substr("abcd", 3, -2);`
 	ND var  substr(const int pos1, const int length) const&;
 
 	// substr version 2. Extract all chars from pos1 up to the end
+	//
 	// `var v1 = "abcd"_var.substr(2); // "bcd"
 	//  // or
 	//  var v2 = substr("abcd", 2);`
@@ -790,18 +841,21 @@ public:
 	ND var  b(const int pos1) const& {return this->substr(pos1);}
 
 	// Convert chars to other chars one for one or delete where tochars is shorter.
+	//
 	// `var v1 = "abcde"_var.convert("aZd", "XY"); // "Xbce" (a is replaced and d is removed)
 	//  // or
 	//  var v2 = convert("abcde", "aZd", "XY");`
 	ND var  convert(SV fromchars, SV tochars) const&;
 
 	// Ditto for Unicode code points.
+	//
 	// `var v1 = "a🤡b😀c🌍d"_var.textconvert("🤡😀", "👋"); // "a👋bc🌍d"
 	//  // or
 	//  var v2 = textconvert("a🤡b😀c🌍d", "🤡😀", "👋");`
 	ND var  textconvert(SV fromchars, SV tochars) const&;
 
 	// Replace all occurrences of a substr with another. Case sensitive
+	//
 	// `var v1 = "Abc Abc"_var.replace("bc", "X"); // "AX AX"
 	//  // or
 	//  var v2 = replace("Abc Abc", "bc", "X");`
@@ -809,12 +863,14 @@ public:
 
 	// Replace substring(s) using a regular expression.
 	// Use $0, $1, $2 in tostr to refer to groups defined in the regex.
+	//
 	// `var v1 = "A a B b"_var.replace("[A-Z]"_rex, "'$0'"); // "'A' a 'B' b"
 	//  // or
 	//  var v2 = replace("A a B b", "[A-Z]"_rex, "'$0'");`
 	ND var  replace(const rex& regex, SV tostr) const&;
 
 	// Remove duplicate fields in an FM or VM etc. separated list
+	//
 	// `var v1 = "a1^b2^a1^c2"_var.unique(); // "a1^b2^c2"
 	//  // or
 	//  var v2 = unique("a1^b2^a1^c2"_var);`
@@ -822,6 +878,7 @@ public:
 
 	// Reorder fields in an FM or VM etc. separated list in ascending order
 	// Numerical
+	//
 	// `var v1 = "20^10^2^1^1.1"_var.sort(); // "1^1.1^2^10^20"
 	//  // or
 	//  var v2 = sort("20^10^2^1^1.1"_var);`
@@ -832,18 +889,21 @@ public:
 	ND var  sort(SV sepchar = _FM) const&;
 
 	// Reorder fields in an FM or VM etc. separated list in descending order
+	//
 	// `var v1 = "20^10^2^1^1.1"_var.reverse(); // "1.1^1^2^10^20"
 	//  // or
 	//  var v2 = reverse("20^10^2^1^1.1"_var);`
 	ND var  reverse(SV sepchar = _FM) const&;
 
 	// Randomise the order of fields in an FM, VM separated list
+	//
 	// `var v1 = "20^10^2^1^1.1"_var.shuffle(); // "2^1^20^1.1^10" (random order depending on initrand())`
 	//  // or
 	//  var v2 = shuffle("20^10^2^1^1.1"_var);`
 	ND var  shuffle(SV sepchar = _FM) const&;
 
 	// Replace separator characters with FM char except inside double or single quotes ignoring escaped quotes \\" \&squot;
+	//
 	// `var v1 = "abc,\"def,\"123\" fgh\",12.34"_var.parse(','); // "abc^"def,"123" fgh"^12.34"
 	//  // or
 	//  var v2 = parse("abc,\"def,\"123\" fgh\",12.34", ',');`
@@ -964,12 +1024,14 @@ public:
 	// Hashing.
 	// If a modulus is provided then the result is limited to (0, modulus]
 	// MurmurHash3 is used.
+	//
 	// `var v1 = "abc"_var.hash(); // 6715211243465481821
 	//  // or
 	//  var v2 = hash("abc");`
 	ND var  hash(const std::uint64_t modulus = 0) const;
 
 	// Split a FM etc. separated string into a dim array.
+	//
 	// `dim d1 = "a^b^c"_var.split(); //a dimensioned array with three elements (vars)
 	//  // or
 	//  dim d1 = split("a^b^c"_var);`
@@ -982,6 +1044,7 @@ public:
 	// Extract a substr starting from pos1 up to any one of some given delimiter chars
 	// Also returns in pos2 the pos of the following delimiter or one past the end of the string if not found.
 	// Add 1 to pos2 start the next search if continuing.
+	//
 	// `var pos1a = 4, pos2a; var v1 = "aa,bb,cc"_var.substr(pos1a, ",", pos2a); // "bb" and pos2 -> 6
 	//  // or
 	//  var pos1b = 4, pos2b; var v2 = substr("aa,bb,cc", pos1b, ",", pos2b);`
@@ -1005,6 +1068,7 @@ public:
 
 	// substr version 4.
 	// Returns a substr from a given pos1  up to the next RM/FM/VM/SM/TM/STM delimiter char. Also returns the next index/offset and the delimiter no. found 1-6 or 0 if not found.
+	//
 	// `var pos1a = 4, delim1; var v1 = "aa^bb^cc"_var.substr2(pos1a, delim1); // "bb", pos1a -> 7, delim -> 2 (FM)
 	//  // or
 	//  var pos1b = 4, delim2; var v2 = subtr2("aa^bb^cc"_var, delim2);`
@@ -1014,6 +1078,7 @@ public:
 	   var  b2(io pos1, out delimiterno) const {return this->substr2(pos1, delimiterno);}
 
 	// Extract one or more consecutive fields given a delimiter char or substr.
+	//
 	// `var v1 = "aa*bb*cc"_var.field("*", 2); // "bb"
 	//  // or
 	//  var v2 = field("aa*bb*cc", "*", 2);`
@@ -1022,6 +1087,7 @@ public:
 	// field2 is a version that treats fieldn -1 as the last field, -2 the penultimate field etc. -
 	// TODO Should probably make field() do this (since -1 is basically an erroneous call) and remove field2
 	// Same as var.field() but negative fieldnos work backwards from the last field.
+	//
 	// `var v1 = "aa*bb*cc"_var.field2("*", -1); // "cc"
 	//  // or
 	//  var v2 = field2("aa*bb*cc", "*", -1);`
@@ -1041,6 +1107,7 @@ public:
 	// If the internal data is invalid and cannot be converted then most conversions return the ORIGINAL data unconverted
 	// Throws a runtime error VarNotImplemented if convstr is invalid
 	// See [[#ICONV/OCONV PATTERNS]]
+	//
 	// `var v1 = var(30123).oconv("D/E"); // "21/06/2050"
 	//  // or
 	//  var v2 = oconv(30123, "D/E");`
@@ -1050,6 +1117,7 @@ public:
 	// If the external data is invalid and cannot be converted then most conversions return the EMPTY STRING ""
 	// Throws a runtime error VarNotImplemented if convstr is invalid
 	// See [[#ICONV/OCONV PATTERNS]]
+	//
 	// `var v1 = "21 JUN 2050"_var.iconv("D/E"); // 30123
 	//  // or
 	//  var v2 = iconv("21 JUN 2050", "D/E");`
@@ -1104,6 +1172,7 @@ public:
 	// Classic format function in printf style
 	// vars can be formatted either with C++ format codes e.g. {:_>8.2f}
 	// or with exodus oconv codes e.g. {::MD20P|R(_)#8} as in the below example.
+	//
 	// `var v1 = var(12.345).format("'{:_>8.2f}'"); // "'___12.35'"
 	//  var v2 = var(12.345).format("'{::MD20P|R(_)#8}'");
 	//  // or
@@ -1124,6 +1193,7 @@ public:
 	// Converts from codepage encoded text to UTF-8 encoded text
 	// e.g. Codepage "CP1124" (Ukrainian).
 	// Use Linux command "iconv -l" for complete list of code pages and encodings.
+	//
 	// `var v1 = "\xa4"_var.from_codepage("CP1124"); // "Є"
 	//  // or
 	//  var v2 = from_codepage("\xa4", "CP1124");
@@ -1131,6 +1201,7 @@ public:
 	ND var  from_codepage(const char* codepage) const;
 
 	// Converts to codepage encoded text from UTF-8 encoded text
+	//
 	// `var v1 = "Є"_var.to_codepage("CP1124").oconv("HEX"); // "A4"
 	//  // or
 	//  var v2 = to_codepage("Є", "CP1124").oconv("HEX");`
@@ -1153,11 +1224,13 @@ public:
 	// "f()" can be thought of as "field" although the function can extract values and subvalues as well.
 	// The convenient PICK OS angle bracket syntax for field extraction (e.g. xxx<20>) is not available in C++.
 	// The abbreviated exodus field extraction function (e.g. xxx.f(20)) is provided instead since field access is extremely heavily used in source code.
+	//
 	// `var v1 = "f1^f2v1]f2v2]f2v3^f2"_var;
 	//  var v2 = v1.f(2, 2); // "f2v2"`
 	ND var  f(const int fieldno, const int valueno = 0, const int subvalueno = 0)            const;
 
 	// Extract a specific field, value or subvalue from a dynamic array.
+	//
 	// `var v1 = "f1^f2v1]f2v2]f2v3^f2"_var;
 	//  var v2 = v1.extract(2, 2); // "f2v2"
 	//  //
@@ -1218,24 +1291,28 @@ public:
 	// obj is str
 
 	// Sum up multiple values into one higher level
+	//
 	// `var v1 = "1]2]3^4]5]6"_var.sum(); // "6^15"
 	//  // or
 	//  var v2 = sum("1]2]3^4]5]6"_var);`
 	ND var  sum() const;
 
 	// Sum up all levels into a single figure
+	//
 	// `var v1 = "1]2]3^4]5]6"_var.sumall(); // "21"
 	//  // or
 	//  var v2 = sumall("1]2]3^4]5]6"_var);`
 	ND var  sumall() const;
 
 	// Ditto allowing commas etc.
+	//
 	// `var v1 = "10,20,33"_var.sum(","); // "60"
 	//  // or
 	//  var v2 = sum("10,20,33");`
 	ND var  sum(SV sepchar) const;
 
 	// Binary ops (+, -, *, /) in parallel on multiple values
+	//
 	// `var v1 = "10]20]30"_var.mv("+","2]3]4"); // "12]23]34"`
 	ND var  mv(const char* opcode, in var2) const;
 
@@ -1255,21 +1332,25 @@ public:
 	//   xyz.r(10, "abc");
 
 	// Replaces a specific field in a dynamic array
+	//
 	// `var v1 = "f1^v1]v2}s2}s3^f3"_var;
 	//  v1.r(2, 2, "X"); // v1 -> "f1^X^f3"`
 	   IO   r(const int fieldno, in replacement) REF {this->r(fieldno, 0, 0, replacement); return THIS;}
 
 	// Ditto for specific value in a specific field.
+	//
 	// `var v1 = "f1^v1]v2}s2}s3^f3"_var;
 	//  v1.r(2, 2, "X"); // v1 -> "f1^v1]X^f3"`
 	   IO   r(const int fieldno, const int valueno, in replacement) REF {this->r(fieldno, valueno, 0, replacement); return THIS;}
 
 	// Ditto for a specific subvalue in a specific value of a specific field
+	//
 	// `var v1 = "f1^v1]v2}s2}s3^f3"_var;
 	//  v1.r(2, 2, 2, "X"); // v1 -> "f1^v1]v2}X}s3^f3"`
 	   IO   r(const int fieldno, const int valueno, const int subvalueno, in replacement) REF;
 
 	// Insert a specific field in a dynamic array, moving all other fields up.
+	//
 	// `var v1 = "f1^v1]v2}s2}s3^f3"_var;
 	//  v1.inserter(2, "X"); // v1 -> "f1^X^v1]v2}s2}s3^f3"
 	//  // or
@@ -1277,6 +1358,7 @@ public:
 	   IO   inserter(const int fieldno, in insertion) REF {this->inserter(fieldno, 0, 0, insertion); return THIS;}
 
 	// Ditto for a specific value in a specific field, moving all other values up.
+	//
 	// `var v1 = "f1^v1]v2}s2}s3^f3"_var;
 	//  v1.inserter(2, 2, "X"); // v1 -> "f1^v1]X]v2}s2}s3^f3"
 	// or
@@ -1284,6 +1366,7 @@ public:
 	   IO   inserter(const int fieldno, const int valueno, in insertion) REF {this->inserter(fieldno, valueno, 0, insertion); return THIS;}
 
 	// Ditto for a specific subvalue in a dynamic array, moving all other subvalues up.
+	//
 	// `var v1 = "f1^v1]v2}s2}s3^f3"_var;
 	//  v1.inserter(2, 2, 2, "X"); // v1 -> "f1^v1]v2}X}s2}s3^f3"
 	//  // or
@@ -1291,6 +1374,7 @@ public:
 	   IO   inserter(const int fieldno, const int valueno, const int subvalueno, in insertion) REF;
 
 	// Remove a specific field (or value, or subvalue) from a dynamic array, moving all other fields (or values, or subvalues)  down.
+	//
 	// `var v1 = "f1^v1]v2}s2}s3^f3"_var;
 	//  v1.remover(2, 2); // v1 -> "f1^v1^f3"
 	//  // or
@@ -1309,6 +1393,7 @@ public:
 
 	// locate() with only the target substr argument provided searches unordered values separated by VM chars.
 	// Returns true if found and false if not.
+	//
 	// `if ("UK]US]UA"_var.locate("US")) ... // true
 	//  if locate("US", "UK]US]UA"_var) ...`
 	ND bool locate(in target) const;
@@ -1316,13 +1401,17 @@ public:
 	// locate() with only the target substr and valueno arguments provided searches unordered values separated by VM chars.
 	// Returns true if found and with the value number in valueno.
 	// Returns false if not found and with the max value number + 1 in setting. Suitable for additiom of new values
-	// `var valueno; if ("UK]US]UA"_var.locate("US", valueno)) ... // returns true and valueno = 2`
+	//
+	// `var valueno;
+	//  if ("UK]US]UA"_var.locate("US", valueno)) ... // returns true and valueno = 2`
 	ND bool locate(in target, out valueno) const;
 
 	// locate() the target in unordered fields if fieldno is 0, or values if a fieldno is specified, or subvalues if the valueno argument is provided.
 	// Returns true if found and with the field, value or subvalue number in setting.
 	// Returns false if not found and with the max field, value or subvalue number found + 1 in setting. Suitable for replacement of new fields, values or subvalues.
-	// `var setting; if ("f1^f2v1]f2v2]s1}s2}s3}s4^f3^f4"_var.locate("s4", setting, 2, 3)) ... // returns true and setting = 4`
+	//
+	// `var setting;
+	//  if ("f1^f2v1]f2v2]s1}s2}s3}s4^f3^f4"_var.locate("s4", setting, 2, 3)) ... // returns true and setting = 4`
 	ND bool locate(in target, out setting, const int fieldno, const int valueno = 0) const;
 
 	// LOCATE BY
@@ -1334,11 +1423,14 @@ public:
 	// Data must be in the correct order for searching to work properly.
 	// Returns true if found.
 	// In case the target is not exactly found then the correct value no for inserting the target is returned in setting.
+	//
 	// `var valueno; if ("aaa]bbb]ccc"_var.locateby("AL", "bb", valueno)) ... // returns false and valueno = 2 where it could be correctly inserted.`
 	ND bool locateby(const char* ordercode, in target, out valueno) const;
 
 	// locateby() ordered as above but in fields if fieldno is 0, or values in a specific fieldno, or subvalues in a specific valueno.
-	// `var setting; if ("f1^f2^aaa]bbb]ccc^f4"_var.locateby("AL", "bb", setting, 3)) ... // returns false and setting = 2 where it could be correctly inserted.`
+	//
+	// `var setting;
+	//  if ("f1^f2^aaa]bbb]ccc^f4"_var.locateby("AL", "bb", setting, 3)) ... // returns false and setting = 2 where it could be correctly inserted.`
 	ND bool locateby(const char* ordercode, in target, out setting, const int fieldno, const int valueno = 0) const;
 
 	// LOCATE USING
@@ -1351,7 +1443,9 @@ public:
 	// Returns true If found and returns in setting the number of the delimited field found.
 	// Returns false if not found and returns in setting the maximum number of delimited fields + 1 if not found.
 	// This is similar to the main locate command but the delimiter char can be specified e.g. a comma or TM etc.
-	// `var setting; if ("f1^f2^f3c1,f3c2,f3c3^f4"_var.locateusing(",", "f3c2", setting, 3)) ... // returns true and setting = 2`
+	//
+	// `var setting;
+	//  if ("f1^f2^f3c1,f3c2,f3c3^f4"_var.locateusing(",", "f3c2", setting, 3)) ... // returns true and setting = 2`
 	ND bool locateusing(const char* usingchar, in target, out setting, const int fieldno = 0, const int valueno = 0, const int subvalueno = 0) const;
 
 	// LOCATE BY, USING
@@ -1371,21 +1465,23 @@ public:
 	// 2. Any environment variables EXO_HOST EXO_PORT EXO_USER EXO_DATA EXO_PASS EXO_TIME
 	// 3. Any parameters found in a configuration file at ~/.config/exodus/exodus.cfg
 	// 4. The defaults "host=127.0.0.1 port=5432 dbname=exodus user=exodus password=somesillysecret connect_timeout=10"
+	//
 	// `var db="mydb";
 	//  if (not db.connect()) abort(db.lasterror());
 	//  db.version().outputl();
 	//  db.disconnect();`
 	ND bool connect(in conninfo = "");
 
-	// Removes a db connection and frees resources.
+	// Closes db connection and frees process resources both locally and in the database server.
 	   void disconnect();
 
-	// Removes all db connection and frees resources.
+	// Closes all connections and frees process resources both locally and in the database server(s).
 	   void disconnectall();
 
 	// Attach (connect) specific files by name to specific connections.
 	// For the remainder of the session, opening the file by name without specifying the connection will automatically use the specified connection applicable during the attach command.
 	// If conn is not specified then the default connection is used.
+	//
 	// `if (not conn.attach(filenames)) ...
 	//  // or
 	//  if (not attach(filenames)) ...`
@@ -1395,36 +1491,42 @@ public:
 	   void detach(in filenames);
 
 	// Begin a db transaction.
+	//
 	// `if (not conn.begintrans()) ...
 	//  // or
 	//  if (not begintrans()) ...`
 	ND bool begintrans() const;
 
 	// Rollback a db transaction.
+	//
 	// `if (not conn.rollbacktrans()) ...
 	//  // or
 	//  if (not rollbacktrans()) ...`
 	ND bool rollbacktrans() const;
 
 	// Commit a db transaction.
+	//
 	// `if (not conn.committrans()) ...
 	//  // or
 	//  if (not committrans()) ...`
 	ND bool committrans() const;
 
 	// Check if a db transaction is in progress.
+	//
 	// `if (not conn.statustrans()) ...
 	//  // or
 	//  if (not statustrans()) ...`
 	ND bool statustrans() const;
 
 	// Execute an sql command.
+	//
 	// `if (not conn.sqlexec()) ...
 	//  // or
 	//  if (not sqlexec()) ...`
 	ND bool sqlexec(in sqlcmd) const;
 
 	// Execute an SQL command and capture the response.
+	//
 	// `if (not conn.sqlexec()) ...
 	//  // or
 	//  if (not sqlexec()) ...`
@@ -1482,31 +1584,89 @@ public:
 
 	// obj is file
 
+	// Opens database file to a var which can be used in subsequent functions to work on the specified file and database connection.
+	//
+	// `var file;
+	//  if (not file.open(filename)) ...
+	//  // or
+	//  if (not open(filename to file)) ...`
 	ND bool open(in dbfilename, in connection = "");
+
+	// Closes database file var
+	// Does nothing since database file vars consume no resources and 
+	//  if (not file.close()) ...
+	//  // or
+	//  if (not close(file)) ...`
 	   void close();
 
+	// Creates a secondary index for a specific dictionary field name on a specific file
+	//
+	// `if (not file.createindex(fieldname)) ...
+	//  // or
+	//  if (not createindex(fieldname, filename)) ...`
 	ND bool createindex(in fieldname, in dictfile = "") const;
+
+	// Deletes a secondary index for a specific dictionary field name on a specific file
+	//
+	// `if (not file.deleteindex(fieldname)) ...
+	//  // or
+	//  if (not deleteindex(fieldname, filename)) ...`
 	ND bool deleteindex(in fieldname) const;
+
+	// Lists secondary indexes in a database or file
+	// obj is file|conn
+	//
+	// `if (not file.deleteindex(fieldname)) ...
+	//  // or
+	//  if (not deleteindex(fieldname, filename)) ...`
 	ND var  listindex(in filename = "", in fieldname = "") const;
 
-	// Returns 1=ok, 0=failed, ""=already locked
+	// Obtains a metaphorical unique lock for a particular file and key on a particular database.
+	// This is a advisory lock, not physical, and only restricts other connections to the same database if they respect it.
+	// The key does not have to be of an existing record.
+	// Returns:
+	// * 1 = ok
+	// * 0 = failed
+	// * "" = already locked by self
+	//
+	// `if (not file.lock(key)) ...
+	//  // or
+	//  if (not lock(file, key)) ...`
 	ND var  lock(in key) const;
+
+	// Releases a lock obtained by the lock function.
+	// Locks cannot be released while in a transaction.
+	//
+	// `if (not file.unlock(key)) ...
+	//  // or
+	//  if (not unlock(file, key)) ...`
 	   bool unlock(in key) const;
+
+	// Releases all locks obtained by the lock function for the related connection.
+	// Locks cannot be released while in a transaction.
+	// obj is file|conn
+	//
+	// `if (not conn.unlockall()) ...
+	//  // or
+	//  if (not unlock(conn)) ...`
 	   bool unlockall() const;
 
 	// obj is rec
 
 	// Reads a record from a file given its unique primary key.
 	// Returns false if the key doesnt exist
-	// `var rec; if (not rec.read(file, key)) ...
+	//
+	// `var rec;
+	//  if (not rec.read(file, key)) ...
 	//  // or
 	//  if (not read(rec from file, key)) ...`
 	ND bool read(in file, in key);
 
 	// Writes a record to a file.
-	// It updates an existing record if the key already exists or inserts a new record.
+	// Updates an existing record if the key already exists or inserts a new record.
 	// It always succeeds so no result code is returned.
 	// Any memory cached record is deleted.
+	//
 	// `rec.write(file, key);
 	//  // or
 	//  write(rec on file, key);`
@@ -1515,6 +1675,7 @@ public:
 	// Updates an existing record in a file.
 	// Returns false if the key doesnt already exist
 	// Any memory cached record is deleted.
+	//
 	// `if (not rec.updaterecord(file, key)) ...
 	//  // or
 	//  if (not updaterecord(rec on file, key)) ...`
@@ -1523,6 +1684,7 @@ public:
 	// Inserts a new record in a file.
 	// Returns false if the key already exists
 	// Any memory cached record is deleted.
+	//
 	// `if (not rec.insertrecord(file, key)) ...
 	//  // or
 	//  if (not insertrecord(rec on file, key)) ...`
@@ -1532,6 +1694,7 @@ public:
 	// Returns false if the key doesnt exist
 	// Any memory cached record is deleted.
 	// obj is file
+	//
 	// `if (not file.deleterecord(key)) ...
 	//  // or
 	// if (not deleterecord(file, key)) ...`
@@ -1540,12 +1703,15 @@ public:
 	// obj is str
 
 	// Same as read() but only returns a specific field no from the record
-	// `var field; if (not field.readf(file, key, fieldno)) ...
+	//
+	// `var field;
+	//  if (not field.readf(file, key, fieldno)) ...
 	//  // or
 	//  if (not readf(field from file, key, fieldno)) ...`
 	ND bool readf(in file, in key, const int fieldno);
 
 	// Same as write() but only writes a specific field no to the record
+	//
 	// `field.writef(file, key, fieldno);
 	//  // or
 	//  write(field on file, key, fieldno);`
@@ -1558,7 +1724,9 @@ public:
 	// 2. Reads to read from the actual file and returns false if unsuccessful.
 	// 3. Writes the record and key to the memory cache and returns true.
 	// Cached db file data lives in exodus process memory not the database.
-	// `var rec; if (not rec.readc(file, key)) ...
+	//
+	// `var rec;
+	//  if (not rec.readc(file, key)) ...
 	//  // or
 	//  if (not readc(rec from file, key)) ...`
 	ND bool readc(in file, in key);
@@ -1567,6 +1735,7 @@ public:
 	// The actual file is NOT updated.
 	// It either updates an existing record if the key already exists or otherwise inserts a new record.
 	// It always succeeds so no result code is returned.
+	//
 	// `rec.writec(file, key);
 	//  // or
 	//  writec(rec on file, key);`
@@ -1577,6 +1746,7 @@ public:
 	// Deletes a record and key from a memory cached "file".
 	// The actual file is NOT updated.
 	// Returns false if the key doesnt exist
+	//
 	// `if (not file.deletec(key)) ...
 	//  // or
 	//  if (not deletec(file, key)) ...`
@@ -1586,6 +1756,7 @@ public:
 
 	// Clears the memory cache of all records for the given connection
 	// All future cache readc() function calls will be forced to obtain records from the actual database and refresh the cache.
+	//
 	// `conn.cleardbcache();
 	//  // or
 	// cleardbcache(conn);`
@@ -1593,6 +1764,23 @@ public:
 
 	// obj is str
 
+	// The xlate ("translate") function is similar to readf() but, in its exodus program member form, it can be used efficiently with exodus file dictionaries using column names and functions and multivalued data.
+	// ''Arguments:''
+	// '''str:''' Used as the primary key to lookup a field in a given file and field no or field name.
+	// '''filename:''' The file in which to look up data.
+	// If var key is multivalued then a multivalued field is returned.
+	// '''fieldno:''' Determines which field of the record is returned.
+	// * Integer returns that field number
+	// * 0 means return the key unchanged.
+	// * "" means return the whole record.
+	// '''mode:''' Determines what is returned if the record does not exist for the given key and file.
+	// * "X" returns ""
+	// * "C" returns the key unconverted.
+	//
+	// `var partno = "A1000-1";
+	//  var partname = partno.xlate("PARTS", 3, "X");
+	//  // or
+	//  var partname = xlate(partno, "PARTS", "PART_NAME", "X");`
 	ND var  xlate(in filename, in fieldno, const char* mode) const;
 
 	///// DATABASE SORT/SELECT:
@@ -1619,12 +1807,14 @@ public:
 	// obj is var()
 
 	// Number of whole days since pick epoch 1967-12-31 00:00:00 UTC. Negative for dates before.
+	//
 	// `var today1 = var().date(); // e.g. was 20821 from 2025-01-01 00:00:00 UTC
 	//  // or
 	//  var today2 = date();`
 	ND var  date() const;
 
 	// Number of whole seconds since last 00:00:00 (UTC).
+	//
 	// `var now1 = var().time(); // range 0 - 86399 since there are 24*60*60 (86400) seconds in a day.
 	//  // or
 	//  var now2 = time();`
@@ -1632,6 +1822,7 @@ public:
 
 	// Number of fractional seconds since last 00:00:00 (UTC).
 	// A floating point with approx. nanosecond resolution depending on hardware.
+	//
 	// `var now1 = var().ostime(); // e.g. 23343.704387955 approx. 06:29:03 UTC
 	//  // or
 	//  var now2 = ostime();`
@@ -1639,18 +1830,21 @@ public:
 
 	// Number of fractional days since pick epoch 1967-12-31 00:00:00 UTC. Negative for dates before.
 	// A floating point with approx. nanosecond resolution depending on hardware.
+	//
 	// `var now1 = var().timestamp(); // was 20821.99998842593 around 2025-01-01 23:59:59 UTC
 	//  // or
 	//  var now2 = ostimestamp();`
 	ND var  timestamp() const;
 
 	// Construct a timestamp from a date and time
+	//
 	// `var ts1 = var().timestamp(iconv("2025-01-01", "D"), iconv("23:59:59", "MT")); // 20821.99998842593
 	//  // or
 	// var ts2 = timestamp(somedate, sometime);`
 	ND var  timestamp(in ostime) const;
 
 	// Sleep/pause/wait for a number of milliseconds
+	//
 	// `var().ossleep(3000); // sleep for 3 seconds
 	//  // or
 	//  ossleep(3000);`
@@ -1660,6 +1854,7 @@ public:
 	// If a terminal is present then any input available (key press) will also terminate the wait.
 	// If any changes occur on the specified files or directories an FM array of event information is returned. See below.
 	// obj is file_dir_list
+	//
 	// `var v1 = ".^/etc/hosts"_var.oswait(3000); // e.g. "IN_CLOSE_WRITE^/etc^hosts^f"_var
 	//  // or
 	//  var v2 = oswait(".^/etc/hosts"_var, 3000);`
@@ -1700,6 +1895,7 @@ public:
 	// File will be opened for writing if possible otherwise for reading.
 	// Returns true if successful or false if not possible for any reason.
 	// e.g. Target doesnt exist, permissions etc.
+	//
 	// `var hostsfile;
 	//  if (not hostsfile.osopen("/etc/hosts") ...
 	//  // or
@@ -1710,6 +1906,7 @@ public:
 	// The osfilevar file handle may either be initialised by osopen or be just be a normal string variable holding the path and name of the os file.
 	// After reading, the offset is updated to point to the correct offset for a subsequent sequential read.
 	// If reading utf8 data (the default) then the length of data actually returned may be a few bytes shorter than requested in order to be a complete number of UTF-8 code points.
+	//
 	// `var text, hostsfile = "/etc/hosts", offset = 0;
 	//  if (not text.osbread(hostsfile, offset, 1024) ...
 	//  // or
@@ -1718,6 +1915,7 @@ public:
 
 	// Writes data to an existing os file starting at a given byte offset (0 based).
 	// See osbread for more info.
+	//
 	// `let text = "\n#comment", xyzfile = "../xyz.conf";
 	//  var offset = osfile(xyzfile).f(1); // size of file -> append
 	//  if (not text.osbwrite(xyzfile, offset)) abort(lasterror());
@@ -1727,6 +1925,7 @@ public:
 
 	// Removes an osfilevar handle from the internal memory cache of os file handles. This frees up both exodus process memory and operating system resources.
 	// It is advisable to osclose any file handles after use, regardless of whether they were specifically opened using osopen or not, especially in long running programs. Exodus performs caching of internal os file handles per thread and os file. If not closed, then the operating system will probably not flush deleted files from storage until the process is terminated. This can potentially create an memory issue or file system resource issue especially if osopening/osreading/oswriting many perhaps temporary files in a long running process.
+	//
 	// `osfilevar.osclose();
 	//  // or
 	//  osclose(osfilevar);`
@@ -1738,6 +1937,7 @@ public:
 	// If codepage is specified then input is converted from that codepage to utf-8 otherwise no conversion is done.
 	// Returns true if successful or false if not possible for any reason.
 	// e.g. File doesnt exist, permissions etc.
+	//
 	// `var text;
 	//  if (not text.osread("/etc/hosts")) ...
 	//  // or
@@ -1749,6 +1949,7 @@ public:
 	// Returns true if successful or false if not possible for any reason.
 	// e.g. Path is not writeable, permissions etc.
 	// If codepage is specified then output is converted from utf-8 to that codepage. Otherwise no conversion is done.
+	//
 	// `let text = "xyz = 123\n", osfilename="../xyz.conf";
 	//  if (not text.oswrite(osfilename)) abort(lasterror());
 	//  // or
@@ -1763,6 +1964,7 @@ public:
 	// Will not remove directories. Use osrmdir() to remove directories
 	// Returns true if successful or false if not possible for any reason.
 	// e.g. Target doesnt exist, path is not writeable, permissions etc.
+	//
 	// `if (not "../xyz.conf"_var.osfilevar.osremove()) abort(lasterror());
 	//  // or
 	//  if (not osremove("../xyz.conf") ...`
@@ -1776,6 +1978,7 @@ public:
 	// Returns true if successful or false if not possible for any reason.
 	// e.g. Target already exists, path is not writeable, permissions etc.
 	// Uses std::filesystem::rename internally.
+	//
 	// `if (not "../xyz.conf"_var.osfilevar.osrename("../abc.conf")) abort(lasterror());
 	//  // or
 	//  if (not osrename("../xyz.conf", "../abc.conf") ...`
@@ -1783,6 +1986,7 @@ public:
 
 	// Copies a file or directory recursively within the file system.
 	// Uses std::filesystem::copy internally with recursive and overwrite options
+	//
 	// `if (not "../xyz.conf"_var.osfilevar.oscopy("../abc.conf")) abort(lasterror());
 	//  // or
 	//  if (not oscopy("../xyz.conf", "../abc.conf") ...`
@@ -1793,6 +1997,7 @@ public:
 	// Returns true if successful or false if not possible for any reason.
 	// e.g. Source doesnt exist or cannot be accessed, target already exists, source or target is not writeable, permissions etc.
 	// Attempts osrename first then oscopy followed by osremove original.
+	//
 	// `if (not "../xyz.conf"_var.osfilevar.osmove("../abc.conf")) abort(lasterror());
 	//  // or
 	//  if (not osmove("../xyz.conf", "../abc.conf") ...`
@@ -1807,6 +2012,7 @@ public:
 
 	// Returns a FM delimited string containing all matching dir entries given a dir path
 	// A glob pattern (e.g. *.conf) can be appended to the path or passed as argument.
+	//
 	// `var entries1 = "/etc/"_var.oslist("*.cfg"); // "adduser.conf^ca-certificates.conf^ ..."
 	//  // or
 	//  var entries2 = oslist("/etc/" "*.conf";`
@@ -1824,6 +2030,7 @@ public:
 	// mode 1 returns "" if not a file
 	// mode 2 returns "" if not a dir
 	// See also osfile() and osdir()
+	//
 	// `var info1 = "/etc/hosts"_var.osinfo(); // "221^20597^78309"
 	//  // or
 	//  var info2 = osinfo("/etc/hosts");`
@@ -1833,6 +2040,7 @@ public:
 	// Return dir info for a file
 	// A short string containing size ^ FM ^ modified_time ^ FM ^ modified_time
 	// Alias for osinfo(1)
+	//
 	// `var fileinfo1 = "/etc/hosts"_var.osfile(); // "221^20597^78309"
 	//  // or
 	//  var fileinfo2 = osfile("/etc/hosts");`
@@ -1842,6 +2050,7 @@ public:
 	// Return dir info for a dir.
 	// A short string containing FM ^ modified_time ^ FM ^ modified_time
 	// Alias for osinfo(2)
+	//
 	// `var dirinfo1 = "/etc/"_var.osdir(); // "^20848^44464"
 	//  // or
 	//  var dirinfo2 = osfile("/etc/");`
@@ -1849,6 +2058,7 @@ public:
 
 	// Makes a new directory and returns true if successful.
 	// Including parent dirs if necessary.
+	//
 	// `if (not "abc/def"_var.osmkdir()) ...
 	//  // or
 	//  if (not osmkdir("abc/def")) ...`
@@ -1856,6 +2066,7 @@ public:
 
 	// Removes a os dir and returns true if successful.
 	// Optionally even if not empty. Including subdirs.
+	//
 	// `if (not "abc/def"_var.osrmdir()) ...
 	//  // or
 	//  if (not osrmdir("abc/def")) ...`
@@ -1864,12 +2075,14 @@ public:
 	// obj is var()
 
 	// Returns the current working directory
+	//
 	// `var cwd1 = var().oscwd(); // "/home/exodus"
 	//  // or
 	//  var cwd2 = oscwd();`
 	ND var  oscwd() const;
 
 	// Changes the current working dir and returns true if successful.
+	//
 	// `if (not "abc/def"_var.oscwd()) ...
 	//  // or
 	//  if (not oscwd("abc/def")) ...`
@@ -1880,6 +2093,7 @@ public:
 
 	// Execute a shell command
 	// Returns true if the process terminates with error status 0 and false otherwise.
+	//
 	// `let cmd = "ls -l xyz";
 	//  if (not cmd.osshell()) ...
 	//  // or
@@ -1888,6 +2102,7 @@ public:
 	ND bool osshell() const;
 
 	// Same as osshell but captures stdout
+	//
 	// `var intext;
 	//  if (not intext.osshellread("ls -l xyz")) ...
 	//
@@ -1897,6 +2112,7 @@ public:
 	ND bool osshellread(in oscmd);
 
 	// Same as osshell but provides stdin to the process
+	//
 	// `var outtext = ...
 	//  if (not outtext.osshellwrite("grep xyz")) ...
 	//  // or
@@ -1905,6 +2121,7 @@ public:
 	ND bool osshellwrite(in oscmd) const;
 
 	// Get the path of the tmp dir
+	//
 	// `var v1 = var().ostempdirpath(); // "/tmp/"
 	//  // or
 	//  var v1 = ostempdirpath();`
@@ -1912,6 +2129,7 @@ public:
 	ND var  ostempdirpath() const;
 
 	// Create and get a temporary file
+	//
 	// `var tempfilename1 = var().ostempfilename(); // "/tmp/~exoEcLj3C"
 	//  // or
 	//  var tempfilename2 = ostempfilename();`
@@ -1921,6 +2139,7 @@ public:
 	// obj is envvalue
 
 	// Get the value of an environment variable
+	//
 	// `var envvalue1;
 	//  if (not envvalue1.osgetenv("HOME")) ... // "/home/exodus"
 	//  // or
@@ -1928,6 +2147,7 @@ public:
 	ND bool osgetenv(SV envcode);
 
 	// Set the value of an environment variable code
+	//
 	// `envvalue.ossetenv(envcode);
 	//  // or
 	//  ossetenv(envcode, envvalue);`
@@ -1939,18 +2159,21 @@ public:
 	// obj is var()
 
 	// Get the os process id
+	//
 	// `let pid = var().ospid(); // 663237
 	//  // or
 	//  let pid = ospid();`
 	ND var  ospid() const;
 
 	// Get the os thread process id
+	//
 	// `let tid = var().ostid(); // 663237
 	//  // or
 	//  let tid = ostid();`
 	ND var  ostid() const;
 
 	// Get the libexodus build date and time
+	//
 	// `var().version(); // "29 JAN 2025 14:56:52"`
 	ND var  version() const;
 
@@ -1989,6 +2212,7 @@ public:
 	   CVR put(std::ostream& ostream1) const;
 
 	// Flushes any Buffered. output to stdout/cout
+	//
 	// `var().osflush();
 	//  // or
 	//  osflush();`
