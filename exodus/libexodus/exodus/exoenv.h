@@ -185,7 +185,7 @@ class PUBLIC ExoEnv final {
 
 	// Per string access
 	int COL1 = 0;
-	int COL2 = 0;
+	var COL2 = 0;
 
 	// define a type of object that holds many NamedCommons
 	NamedCommon* namedcommon[99] = {nullptr};
@@ -214,7 +214,7 @@ class PUBLIC ExoEnv final {
 
  private:
 
-var osgetenv(const char* envcode) {
+var osgetenv(SV envcode) {
 	var envvalue;
 	if (envvalue.osgetenv(envcode))
 		return envvalue;

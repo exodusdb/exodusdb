@@ -165,13 +165,13 @@ void var::initrnd() const {
 
 static thread_local std::string thread_environ;
 
-bool var::osgetenv(const char* envcode) {
+bool var::osgetenv(SV envcode) {
 
 	// TIP if you cant seem to set osgetenv vars in bash/sh
 	// then ensure you set them with "export"
 	// otherwise child processes don't see them.
 
-	THISIS("bool var::osgetenv(const char* envcode)")
+	THISIS("bool var::osgetenv(SV envcode)")
 	assertDefined(function_sig);
 	//assertStringMutator(function_sig);
 	//ISSTRING(envcode)
@@ -206,7 +206,7 @@ bool var::osgetenv(const char* envcode) {
 	}
 
 	// return whole environment if blank envcode
-	if (*envcode == 0) {
+	if (envcode.empty()) {
 
 		// Return a copy of the cached list of pairs
 		if (thread_environ.size() >= 2)
@@ -272,9 +272,9 @@ bool var::osgetenv(const char* envcode) {
 
 }
 
-void var::ossetenv(const char* envcode) const {
+void var::ossetenv(SV envcode) const {
 
-	THISIS("bool var::ossetenv(const char* envcode) const")
+	THISIS("bool var::ossetenv(SV envcode) const")
 	assertString(function_sig);
 
 	// Create the new pair like "^a=c"

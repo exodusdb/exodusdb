@@ -134,13 +134,14 @@ PUBLIC std::mutex global_mutex_threadstream;
 #define DEFAULT_0 = 0
 #define DEFAULT_1  = 1
 #define DEFAULT_M1 = -1
+#define DEFAULT_TRUE = true
 #define DEFAULT_FALSE = false
 
 int exodus_main(int exodus_argc, const char* exodus_argv[], ExoEnv& mv, int threadno);
 
-ND var  osgetenv(in envcode DEFAULT_EMPTY);
-ND bool osgetenv(in code, io value);
-   void ossetenv(in code, in value);
+ND var  osgetenv(SV envcode DEFAULT_EMPTY);
+ND bool osgetenv(SV code, io value);
+   void ossetenv(SV code, in value);
 
 ND var ostempdirpath(void);
 ND var ostempfilename(void);

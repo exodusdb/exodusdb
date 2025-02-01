@@ -65,9 +65,9 @@ namespace exo {
 //	return vformat(format_str,*this);
 //}
 
-ND PUBLIC var  osgetenv(in envcode DEFAULT_EMPTY) {var envvalue = ""; if (not envvalue.osgetenv(envcode)) {} return envvalue;}
-ND PUBLIC bool osgetenv(in code, io value) {return value.osgetenv(code);}
-   PUBLIC void ossetenv(in code, in value) {return value.ossetenv(code);}
+ND PUBLIC var  osgetenv(SV envcode DEFAULT_EMPTY) {var envvalue = ""; if (not envvalue.osgetenv(envcode)) {} return envvalue;}
+ND PUBLIC bool osgetenv(SV code, io value) {return value.osgetenv(code);}
+   PUBLIC void ossetenv(SV code, in value) {return value.ossetenv(code);}
 
 ND PUBLIC var  ostempdirpath() {return var().ostempdirpath();}
 ND PUBLIC var  ostempfilename() {return var().ostempfilename();}

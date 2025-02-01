@@ -1717,16 +1717,16 @@ public:
 	// Get the value of an environment variable
 	// `var envvalue1;
 	//  if (not envvalue1.osgetenv("HOME")) ... // "/home/exodus"
-	//  // or just
+	//  // or
 	//  var envvalue2 = osgetenv("HOME");`
-	ND bool osgetenv(const char* envcode);
+	ND bool osgetenv(SV envcode);
 
 	// Set the value of an environment variable code
 	// `envvalue.ossetenv(envcode);
-	//  // or just
+	//  // or
 	//  ossetenv(envcode, envvalue);`
 	// obj is envvalue
-	   void ossetenv(const char* envcode) const;
+	   void ossetenv(SV envcode) const;
 
 	// TODO check for threadsafe
 
