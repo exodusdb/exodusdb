@@ -571,6 +571,11 @@ bool ExodusProgramBase::deleterecord(in filename_or_handle_or_command, in key) {
 
 	// Complex deleterecord command
 
+	////////////////////////////////////////////////////////
+	// THIS CODE SHOULD BE REMOVED AFTER REFACTORING IT OUT
+	// of createanalysis and eliminating it listcollections
+	////////////////////////////////////////////////////////
+
 	var command = filename_or_handle_or_command.f(1);
 
 	var filename = command.field(" ", 1);

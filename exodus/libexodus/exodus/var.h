@@ -751,31 +751,28 @@ public:
 	//  var v2 = pop("abc")`
 	ND var  pop() const&;
 
-	// fieldstore() replaces nfields of subfield(s) in a string.
+	// fieldstore() replaces n fields of subfield(s) in a string.
 	// `var v1 = "aa*bb*cc*dd"_var.fieldstore("*", 2, 3, "X*Y"); // "aa*X*Y*"
 	//  // or
-	//  var v2 = fieldstore("aa*bb*cc*dd", "*", 2, 3, "X*Y");
-	//
+	//  var v2 = fieldstore("aa*bb*cc*dd", "*", 2, 3, "X*Y");`
 	// If nfields is 0 then insert fields before fieldno
-	//  var v3 = "a1*b2*c3*d4"_var.fieldstore("*", 2, 0, "X*Y"); // "a1*X*Y*b2*c3*d4"
+	// `var v1 = "a1*b2*c3*d4"_var.fieldstore("*", 2, 0, "X*Y"); // "a1*X*Y*b2*c3*d4"
 	//  // or
-	//  var v4 = fieldstore("a1*b2*c3*d4", "*", 2, 0, "X*Y");
-	//
+	//  var v2 = fieldstore("a1*b2*c3*d4", "*", 2, 0, "X*Y");`
 	// If nfields is negative then delete nfields before inserting.
-	//  var v5 = "a1*b2*c3*d4"_var.fieldstore("*", 2, -3, "X*Y"); // "a1*X*Y"
+	// `var v1 = "a1*b2*c3*d4"_var.fieldstore("*", 2, -3, "X*Y"); // "a1*X*Y"
 	//  // or
-	//  var v6 = fieldstore("a1*b2*c3*d4", "*", 2, -3, "X*Y");`
+	//  var v2 = fieldstore("a1*b2*c3*d4", "*", 2, -3, "X*Y");`
 	ND var  fieldstore(SV separator, const int fieldno, const int nfields, in replacement) const&;
 
 	// substr version 1. Extract length chars starting at pos1
 	// `var v1 = "abcd"_var.substr(2, 2); // "bc"
 	//  // or
 	//  var v2 = substr("abcd", 2, 2);`
-	//
 	// If length is negative then work backwards and return chars reversed
-	// `var v3 = "abcd"_var.substr(3, -2); // "cb"`
+	// `var v1 = "abcd"_var.substr(3, -2); // "cb"`
 	//  // or
-	//  var v4 = substr("abcd", 3, -2);`
+	//  var v2 = substr("abcd", 3, -2);`
 	ND var  substr(const int pos1, const int length) const&;
 
 	// substr version 2. Extract all chars from pos1 up to the end
@@ -824,11 +821,14 @@ public:
 	ND var  unique() const&;
 
 	// Reorder fields in an FM or VM etc. separated list in ascending order
+	// Numerical
 	// `var v1 = "20^10^2^1^1.1"_var.sort(); // "1^1.1^2^10^20"
-	//  var v2 = sort("20^10^2^1^1.1"_var);
-	//  //
-	//  var v3 = "b1^a1^c20^c10^c2^c1^b2"_var.sort(); // "a1^b1^b2^c1^c10^c2^c20"
-	//  var v4 = sort("b1^a1^c20^c10^c2^c1^b2"_var);`
+	//  // or
+	//  var v2 = sort("20^10^2^1^1.1"_var);`
+	// Alphabetical
+	//  `var v1 = "b1^a1^c20^c10^c2^c1^b2"_var.sort(); // "a1^b1^b2^c1^c10^c2^c20"
+	//  // or
+	//  var v2 = sort("b1^a1^c20^c10^c2^c1^b2"_var);`
 	ND var  sort(SV sepchar = _FM) const&;
 
 	// Reorder fields in an FM or VM etc. separated list in descending order
@@ -849,7 +849,7 @@ public:
 	//  var v2 = parse("abc,\"def,\"123\" fgh\",12.34", ',');`
 	ND var  parse(char sepchar = ' ') const&;
 
-	// SAME ON TEMPORARIES - MUTATE FOR SPEED (not documenting)
+	// SAME ON TEMPORARIES - CALL MUTATORS FOR SPEED (not documenting since programmer interface is the same)
 	/////////////////////////////////////////
 
 	// utf8/byte as for accessors
@@ -961,7 +961,9 @@ public:
 
 	// obj is str
 
-	// MurmurHash3 hashing.
+	// Hashing.
+	// If a modulus is provided then the result is limited to (0, modulus]
+	// MurmurHash3 is used.
 	// `var v1 = "abc"_var.hash(); // 6715211243465481821
 	//  // or
 	//  var v2 = hash("abc");`
@@ -1151,12 +1153,16 @@ public:
 	// "f()" can be thought of as "field" although the function can extract values and subvalues as well.
 	// The convenient PICK OS angle bracket syntax for field extraction (e.g. xxx<20>) is not available in C++.
 	// The abbreviated exodus field extraction function (e.g. xxx.f(20)) is provided instead since field access is extremely heavily used in source code.
-	// `var v1 = "f1^f2v1]f2v2]f2v3^f2"_var.f(2, 2); // "f2v2"`
+	// `var v1 = "f1^f2v1]f2v2]f2v3^f2"_var;
+	//  var v2 = v1.f(2, 2); // "f2v2"`
 	ND var  f(const int fieldno, const int valueno = 0, const int subvalueno = 0)            const;
 
 	// Extract a specific field, value or subvalue from a dynamic array.
-	// The alias "f" is usually used instead
-	// `var v1 = extract("f1^f2v1]f2v2]f2v3^f2"_var, 2, 2); // "f2v2"`
+	// `var v1 = "f1^f2v1]f2v2]f2v3^f2"_var;
+	//  var v2 = v1.extract(2, 2); // "f2v2"
+	//  //
+	//  // The alias "f" is normally used instead for brevity
+	//  var v3 = v1.f(2, 2);`
 	ND var  extract(const int fieldno, const int valueno = 0, const int subvalueno = 0)      const {return this->f(fieldno, valueno, subvalueno);}
 
 	// PICKREPLACE
@@ -1378,28 +1384,50 @@ public:
 	   void disconnectall();
 
 	// Attach (connect) specific files by name to specific connections.
-	// For the remainder of the session, opening the file by name will automatically use the specified connection.
+	// For the remainder of the session, opening the file by name without specifying the connection will automatically use the specified connection applicable during the attach command.
+	// If conn is not specified then the default connection is used.
+	// `if (not conn.attach(filenames)) ...
+	//  // or
+	//  if (not attach(filenames)) ...`
 	ND bool attach(in filenames);
 
 	// Detach (disconnect) files that have been attached using attach().
 	   void detach(in filenames);
 
 	// Begin a db transaction.
+	// `if (not conn.begintrans()) ...
+	//  // or
+	//  if (not begintrans()) ...`
 	ND bool begintrans() const;
 
 	// Rollback a db transaction.
+	// `if (not conn.rollbacktrans()) ...
+	//  // or
+	//  if (not rollbacktrans()) ...`
 	ND bool rollbacktrans() const;
 
 	// Commit a db transaction.
+	// `if (not conn.committrans()) ...
+	//  // or
+	//  if (not committrans()) ...`
 	ND bool committrans() const;
 
 	// Check if a db transaction is in progress.
+	// `if (not conn.statustrans()) ...
+	//  // or
+	//  if (not statustrans()) ...`
 	ND bool statustrans() const;
 
 	// Execute an sql command.
+	// `if (not conn.sqlexec()) ...
+	//  // or
+	//  if (not sqlexec()) ...`
 	ND bool sqlexec(in sqlcmd) const;
 
 	// Execute an SQL command and capture the response.
+	// `if (not conn.sqlexec()) ...
+	//  // or
+	//  if (not sqlexec()) ...`
 	ND bool sqlexec(in sqlcmd, io response) const;
 
 	// Get the last os or db error message.
@@ -1446,7 +1474,7 @@ public:
 	ND var  reccount(in filename = "") const;
 
 	// Calls db maintenance function (vacuum)
-	// This doesnt flush any indexes any longer but does make sure that reccount() function is reasonably accurate.
+	// This doesnt actually flush any indexes but does make sure that reccount() function is reasonably accurate.
 	   bool flushindex(in filename = "") const;
 
 	///// DATABASE FILE I/O:
@@ -1470,43 +1498,57 @@ public:
 
 	// Reads a record from a file given its unique primary key.
 	// Returns false if the key doesnt exist
-	// `var rec; if (not rec.read(file, key)) ...`
+	// `var rec; if (not rec.read(file, key)) ...
+	//  // or
+	//  if (not read(rec from file, key)) ...`
 	ND bool read(in file, in key);
 
 	// Writes a record to a file.
 	// It updates an existing record if the key already exists or inserts a new record.
 	// It always succeeds so no result code is returned.
 	// Any memory cached record is deleted.
-	// `rec.write(file, key);`
+	// `rec.write(file, key);
+	//  // or
+	//  write(rec on file, key);`
 	   void write(in file, in key) const;
 
 	// Updates an existing record in a file.
 	// Returns false if the key doesnt already exist
 	// Any memory cached record is deleted.
-	// `if (not rec.updaterecord(file, key)) ...`
+	// `if (not rec.updaterecord(file, key)) ...
+	//  // or
+	//  if (not updaterecord(rec on file, key)) ...`
 	ND bool updaterecord(in file, in key) const;
 
 	// Inserts a new record in a file.
 	// Returns false if the key already exists
 	// Any memory cached record is deleted.
-	// `if (not rec.insertrecord(file, key)) ...`
+	// `if (not rec.insertrecord(file, key)) ...
+	//  // or
+	//  if (not insertrecord(rec on file, key)) ...`
 	ND bool insertrecord(in file, in key) const;
 
 	// Deletes a record from a file given its key.
 	// Returns false if the key doesnt exist
 	// Any memory cached record is deleted.
 	// obj is file
-	// `if (not file.deleterecord(key)) ...`
+	// `if (not file.deleterecord(key)) ...
+	//  // or
+	// if (not deleterecord(file, key)) ...`
 	   bool deleterecord(in key) const;
 
 	// obj is str
 
 	// Same as read() but only returns a specific field no from the record
-	// `var field; if (not field.readf(file, key, fieldno)) ...`
+	// `var field; if (not field.readf(file, key, fieldno)) ...
+	//  // or
+	//  if (not readf(field from file, key, fieldno)) ...`
 	ND bool readf(in file, in key, const int fieldno);
 
 	// Same as write() but only writes a specific field no to the record
-	// `field.writef(file, key, fieldno);`
+	// `field.writef(file, key, fieldno);
+	//  // or
+	//  write(field on file, key, fieldno);`
 	   void writef(in file, in key, const int fieldno) const;
 
 	// obj is rec
@@ -1516,14 +1558,18 @@ public:
 	// 2. Reads to read from the actual file and returns false if unsuccessful.
 	// 3. Writes the record and key to the memory cache and returns true.
 	// Cached db file data lives in exodus process memory not the database.
-	// `var rec; if (not rec.readc(file, key)) ...`
+	// `var rec; if (not rec.readc(file, key)) ...
+	//  // or
+	//  if (not readc(rec from file, key)) ...`
 	ND bool readc(in file, in key);
 
 	// Cache write a record and key into a memory cached "file".
 	// The actual file is NOT updated.
 	// It either updates an existing record if the key already exists or otherwise inserts a new record.
 	// It always succeeds so no result code is returned.
-	// `rec.writec(file, key);`
+	// `rec.writec(file, key);
+	//  // or
+	//  writec(rec on file, key);`
 	   void writec(in file, in key) const;
 
 	// obj is dbfile
@@ -1531,14 +1577,18 @@ public:
 	// Deletes a record and key from a memory cached "file".
 	// The actual file is NOT updated.
 	// Returns false if the key doesnt exist
-	// `if (not file.deletec(key)) ...`
+	// `if (not file.deletec(key)) ...
+	//  // or
+	//  if (not deletec(file, key)) ...`
 	   bool deletec(in key) const;
 
 	// obj is conn
 
 	// Clears the memory cache of all records for the given connection
 	// All future cache readc() function calls will be forced to obtain records from the actual database and refresh the cache.
-	// `conn.cleardbcache();`
+	// `conn.cleardbcache();
+	//  // or
+	// cleardbcache(conn);`
 	   void cleardbcache() const;
 
 	// obj is str
@@ -1645,12 +1695,11 @@ public:
 
 	// obj is osfilevar
 
-	// Given the name of an existing file name including path, initialises a var that can be used in random access osbread and osbwrite functions.
-	// Optionally allows specifying a locale/codepage to which and from which all writes and reads will be converted (?) from a assumed internal UTF8 encoding.
+	// Given the name of an existing file name including path, initialises a file handle var that can be used in random access osbread and osbwrite functions.
+	// The utf8 option defaults to true which causes trimming of partial utf-8 unicode byte sequences from the end of osbreads. For raw untrimmed osbreads pass utf8 = false;
 	// File will be opened for writing if possible otherwise for reading.
 	// Returns true if successful or false if not possible for any reason.
 	// e.g. Target doesnt exist, permissions etc.
-	// Default locale is 'utf8' which causes trimming of partial utf-8 unicode byte sequences from osbreads. For raw untrimmed osbreads pass locale = "C"
 	// `var hostsfile;
 	//  if (not hostsfile.osopen("/etc/hosts") ...
 	//  // or
@@ -1658,9 +1707,9 @@ public:
 	ND bool osopen(in osfilename, const bool utf8 = true) const;
 
 	// Reads length bytes from an existing os file starting at a given byte offset (0 based).
-	// The osfilevar file handle may either be initialised by osopen (optionally with a locale/codepage) or be just a normal string variable holding the path and name of the os file.
+	// The osfilevar file handle may either be initialised by osopen or be just be a normal string variable holding the path and name of the os file.
 	// After reading, the offset is updated to point to the correct offset for a subsequent sequential read.
-	// If reading utf8 data then the length of data actually returned may be a few bytes shorter than requested in order to be a complete number of UTF-8 code points.
+	// If reading utf8 data (the default) then the length of data actually returned may be a few bytes shorter than requested in order to be a complete number of UTF-8 code points.
 	// `var text, hostsfile = "/etc/hosts", offset = 0;
 	//  if (not text.osbread(hostsfile, offset, 1024) ...
 	//  // or
@@ -1676,7 +1725,7 @@ public:
 	//  if (not osbwrite(text on xyzfile, offset) ...`
 	ND bool osbwrite(in osfilevar, io offset) const;
 
-	// Removes an osfilevar handle from the internal memory cache of os file handles freeing up both exodus process memory and operating system resources.
+	// Removes an osfilevar handle from the internal memory cache of os file handles. This frees up both exodus process memory and operating system resources.
 	// It is advisable to osclose any file handles after use, regardless of whether they were specifically opened using osopen or not, especially in long running programs. Exodus performs caching of internal os file handles per thread and os file. If not closed, then the operating system will probably not flush deleted files from storage until the process is terminated. This can potentially create an memory issue or file system resource issue especially if osopening/osreading/oswriting many perhaps temporary files in a long running process.
 	// `osfilevar.osclose();
 	//  // or
@@ -1685,7 +1734,8 @@ public:
 
 	// obj is str
 
-	// Read a complete os file into a var
+	// Read a complete os file into a var.
+	// If codepage is specified then input is converted from that codepage to utf-8 otherwise no conversion is done.
 	// Returns true if successful or false if not possible for any reason.
 	// e.g. File doesnt exist, permissions etc.
 	// `var text;
@@ -1698,6 +1748,7 @@ public:
 	// Any existing file is removed first.
 	// Returns true if successful or false if not possible for any reason.
 	// e.g. Path is not writeable, permissions etc.
+	// If codepage is specified then output is converted from utf-8 to that codepage. Otherwise no conversion is done.
 	// `let text = "xyz = 123\n", osfilename="../xyz.conf";
 	//  if (not text.oswrite(osfilename)) abort(lasterror());
 	//  // or
@@ -1908,36 +1959,36 @@ public:
 
 	// obj is var
 
-	// To stdout/cout buffered
-	   CVR output() const;      // stdout no new line, buffered
-	   CVR outputl() const;     // stdout starts a new line, flushed
-	   CVR outputt() const;     // stdout adds a tab, buffered
+	// To stdout/cout Buffered.
+	   CVR output() const;      // To stdout. No new line. Buffered.
+	   CVR outputl() const;     // To stdout. Starts a new line. Flushed.
+	   CVR outputt() const;     // To stdout. Adds a tab. Buffered.
 
-	// To stdlog/clog buffered
-	   CVR logput() const;  // stdlog no new line, buffered
-	   CVR logputl() const; // stdlog starts a new line, flushed
+	// To stdlog/clog Buffered.
+	   CVR logput() const;  // To stdlog. No new line. Buffered.
+	   CVR logputl() const; // To stdlog. Starts a new line. Flushed.
 
-	// To stderr/cerr usually unbuffered
-	   CVR errput() const;  // stderr no new line, flushed
-	   CVR errputl() const; // stderr starts a new line, flushed
-
-	// As above but with a prefix
-	   CVR output(in prefix) const;  // stdout with a prefix, no new line, buffered
-	   CVR outputl(in prefix) const; // stdout with a prefix, starts a new line, flushed
-	   CVR outputt(in prefix) const; // stdout with a prefix, adds a tab, buffered
+	// To stderr/cerr usually unBuffered.
+	   CVR errput() const;  // To stderr. No new line. Flushed.
+	   CVR errputl() const; // To stderr. Starts a new line. Flushed.
 
 	// As above but with a prefix
-	   CVR logput(in prefix) const;  // stdlog with a prefix, no new line, buffered
-	   CVR logputl(in prefix) const; // stdlog with a prefix, starts a new line, flushed
+	   CVR output(in prefix) const;  // To stdout. With a prefix. No new line. Buffered.
+	   CVR outputl(in prefix) const; // To stdout. With a prefix. Starts a new line. Flushed.
+	   CVR outputt(in prefix) const; // To stdout. With a prefix. Adds a tab. Buffered.
 
 	// As above but with a prefix
-	   CVR errput(in prefix) const;  // stderr with a prefix, no new line, flushed
-	   CVR errputl(in prefix) const; // stderr with a prefix, starts a new line, flushed
+	   CVR logput(in prefix) const;  // To stdlog. With a prefix. No new line. Buffered.
+	   CVR logputl(in prefix) const; // To stdlog. With a prefix. Starts a new line. Flushed.
+
+	// As above but with a prefix
+	   CVR errput(in prefix) const;  // To stderr. With a prefix. No new line. Flushed.
+	   CVR errputl(in prefix) const; // To stderr. With a prefix. Starts a new line. Flushed.
 
 	// Output to a given stream
 	   CVR put(std::ostream& ostream1) const;
 
-	// Flushes any buffered output to stdout/cout
+	// Flushes any Buffered. output to stdout/cout
 	// `var().osflush();
 	//  // or
 	//  osflush();`

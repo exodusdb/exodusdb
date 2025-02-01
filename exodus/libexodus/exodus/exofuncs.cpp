@@ -429,25 +429,26 @@ ND PUBLIC bool rollbacktrans() {return var().rollbacktrans();}
 ND PUBLIC bool committrans() {return var().committrans();}
    PUBLIC void cleardbcache() {var().cleardbcache();}
 
-ND PUBLIC bool lock(in dbfilevar, in key) {return static_cast<bool>(dbfilevar.lock(key));}
-   PUBLIC void unlock(in dbfilevar, in key) {dbfilevar.unlock(key);}
+ND PUBLIC bool lock(in dbfile, in key) {return static_cast<bool>(dbfile.lock(key));}
+   PUBLIC void unlock(in dbfile, in key) {dbfile.unlock(key);}
    PUBLIC void unlockall() {var().unlockall();}
 
-ND PUBLIC bool open(in dbfilename, io dbfilevar) {return dbfilevar.open(dbfilename);}
+ND PUBLIC bool open(in dbfilename, io dbfile) {return dbfile.open(dbfilename);}
 ND PUBLIC bool open(in dbfilename) {return var().open(dbfilename);}
 
-ND PUBLIC bool read(io record, in dbfilevar, in key) {return record.read(dbfilevar, key);}
-ND PUBLIC bool readc(io record, in dbfilevar, in key) {return record.readc(dbfilevar, key);}
-ND PUBLIC bool readf(io record, in dbfilevar, in key, in fieldnumber) {return record.readf(dbfilevar, key, fieldnumber);}
+ND PUBLIC bool read(io record, in dbfile, in key) {return record.read(dbfile, key);}
+ND PUBLIC bool readc(io record, in dbfile, in key) {return record.readc(dbfile, key);}
+ND PUBLIC bool readf(io record, in dbfile, in key, in fieldnumber) {return record.readf(dbfile, key, fieldnumber);}
 
-   PUBLIC void write(in record, in dbfilevar, in key) {record.write(dbfilevar, key);}
-   PUBLIC void writec(in record, in dbfilevar, in key) {record.writec(dbfilevar, key);}
-   PUBLIC void writef(in record, in dbfilevar, in key, const int fieldno) {record.writef(dbfilevar, key, fieldno);}
-ND PUBLIC bool updaterecord(in record, in dbfilevar, in key) {return record.updaterecord(dbfilevar, key);}
-ND PUBLIC bool insertrecord(in record, in dbfilevar, in key) {return record.insertrecord(dbfilevar, key);}
+   PUBLIC void write(in record, in dbfile, in key) {record.write(dbfile, key);}
+   PUBLIC void writec(in record, in dbfile, in key) {record.writec(dbfile, key);}
+   PUBLIC void writef(in record, in dbfile, in key, const int fieldno) {record.writef(dbfile, key, fieldno);}
+ND PUBLIC bool updaterecord(in record, in dbfile, in key) {return record.updaterecord(dbfile, key);}
+ND PUBLIC bool insertrecord(in record, in dbfile, in key) {return record.insertrecord(dbfile, key);}
+ND PUBLIC bool deletec(in dbfile, in key);
 
-ND PUBLIC bool dimread(dim& dimrecord, in dbfilevar, in key) {return dimrecord.read(dbfilevar, key);}
-   PUBLIC void dimwrite(const dim& dimrecord, in dbfilevar, in key) {dimrecord.write(dbfilevar, key);}
+ND PUBLIC bool dimread(dim& dimrecord, in dbfile, in key) {return dimrecord.read(dbfile, key);}
+   PUBLIC void dimwrite(const dim& dimrecord, in dbfile, in key) {dimrecord.write(dbfile, key);}
 
 ND PUBLIC var  xlate(in dbfilename, in key, in fieldno, const char* mode);
 ND PUBLIC var  xlate(in dbfilename, in key, in fieldno, in mode);
