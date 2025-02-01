@@ -140,6 +140,7 @@ class PUBLIC ExodusProgramBase {
 	bool pushselect(in v1, io v2, io v3, io v4);
 	bool popselect(in v1, io v2, io v3, io v4);
 	void clearselect();
+	// THIS should be removed from exoprog and made a free function that doesnt use CURSOR
 	bool deleterecord(in filename_or_handle_or_command, in key DEFAULT_EMPTY);
 
 	bool savelist(in listname);

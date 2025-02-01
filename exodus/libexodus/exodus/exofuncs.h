@@ -511,26 +511,27 @@ ND bool rollbacktrans(void);
 ND bool committrans(void);
    void cleardbcache(void);
 
-ND bool lock(in dbfilevar, in key);
-   void unlock(in dbfilevar, in key);
+ND bool lock(in dbfile, in key);
+   void unlock(in dbfile, in key);
    void unlockall(void);
 
-ND bool open(in dbfilename, io dbfilevar);
+ND bool open(in dbfilename, io dbfile);
 ND bool open(in dbfilename);
-// bool open(in dictdata, in dbfilename, io dbfilevar);
+// bool open(in dictdata, in dbfilename, io dbfile);
 
-ND bool read(io record, in dbfilevar, in key);
-ND bool readc(io record, in dbfilevar, in key);
-ND bool readf(io record, in dbfilevar, in key, in fieldnumber);
+ND bool read(io record, in dbfile, in key);
+ND bool readc(io record, in dbfile, in key);
+ND bool readf(io record, in dbfile, in key, in fieldnumber);
 
-   void write(in record, in dbfilevar, in key);
-   void writec(in record, in dbfilevar, in key);
-   void writef(in record, in dbfilevar, in key, const int fieldno);
-ND bool updaterecord(in record, in dbfilevar, in key);
-ND bool insertrecord(in record, in dbfilevar, in key);
+   void write(in record, in dbfile, in key);
+   void writec(in record, in dbfile, in key);
+   void writef(in record, in dbfile, in key, const int fieldno);
+ND bool deletec(in dbfile, in key);
+ND bool updaterecord(in record, in dbfile, in key);
+ND bool insertrecord(in record, in dbfile, in key);
 
-ND bool dimread(dim& dimrecord, in dbfilevar, in key);
-   void dimwrite(const dim& dimrecord, in dbfilevar, in key);
+ND bool dimread(dim& dimrecord, in dbfile, in key);
+   void dimwrite(const dim& dimrecord, in dbfile, in key);
 
 // moved to exoprog so they have access to default cursor in mv.CURSOR
 // bool select(in sortselectclause DEFAULT_EMPTY);
@@ -538,6 +539,7 @@ ND bool dimread(dim& dimrecord, in dbfilevar, in key);
 // bool readnext(io key);
 // bool readnext(io key, io valueno);
 // bool readnext(io record, io key, io value);
+// deleterecord should be made a free function that doesnt use CURSOR
 // bool deleterecord(in dbfilename_or_var_or_command, in key DEFAULT_EMPTY);
 
 ND var xlate(in dbfilename, in key, in fieldno, const char* mode);
