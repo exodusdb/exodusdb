@@ -107,7 +107,7 @@ function main() {
 
 					// Get default obj name from thrown away comments, not function comments
 					// only match "obj is" at the start of the first line of comment
-					let new_default_objname = lastcomment.match("^obj is ([a-zA-Z_][a-zA-Z0-9_()]+)").f(1, 2);
+					let new_default_objname = lastcomment.match("^obj is ([a-zA-Z_][a-zA-Z0-9_()|]+)").f(1, 2);
 					if (new_default_objname)
 						default_objname = new_default_objname;
 
@@ -170,7 +170,7 @@ function main() {
 
 			comment.replacer(_FM, "<br>\n");
 
-			let objmatch = comment.match("\\bobj is ([a-zA-Z_][a-zA-Z0-9_]+)");
+			let objmatch = comment.match("\\bobj is ([a-zA-Z_][a-zA-Z0-9_|]+)");
 			if (objmatch)
 				comment.replacer("\n" ^ objmatch.f(1, 1), "");
 			let objname = objmatch.f(1,2);
