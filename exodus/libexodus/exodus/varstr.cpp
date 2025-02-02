@@ -655,7 +655,7 @@ static bool locatex(const std::string& var_str, const std::string& target, const
 // default locate using VM
 bool var::locate(in target, out setting) const {
 
-	THISIS("bool var::locate(in target, out setting, const int fieldno/*=0*/, const int valueno/*=0*/) const")
+	THISIS("bool var::locate(in target, out setting, const int fieldno, const int valueno) const")
 	assertString(function_sig);
 	ISSTRING(target)
 	ISDEFINED(setting)
@@ -665,7 +665,7 @@ bool var::locate(in target, out setting) const {
 
 bool var::locate(in target, out setting, const int fieldno, const int valueno /*=0*/) const {
 
-	THISIS("bool var::locate(in target, out setting, const int fieldno/*=0*/, const int valueno/*=0*/) const")
+	THISIS("bool var::locate(in target, out setting, const int fieldno, const int valueno) const")
 	assertString(function_sig);
 	ISSTRING(target)
 	ISDEFINED(setting)
@@ -736,7 +736,7 @@ bool var::locateby(const char* ordercode, in target, out setting) const {
 // string it avoids the conversion from string to var and back again
 bool var::locateby(const char* ordercode, in target, out setting, const int fieldno, const int valueno /*=0*/) const {
 
-	THISIS("bool var::locateby(const char* ordercode, in target, out setting, const int fieldno, const int valueno/*=0*/) const")
+	THISIS("bool var::locateby(const char* ordercode, in target, out setting, const int fieldno, const int valueno) const")
 	assertString(function_sig);
 	ISSTRING(target)
 	ISDEFINED(setting)
@@ -769,7 +769,7 @@ bool var::locateby(const char* ordercode, in target, out setting, const int fiel
 
 bool var::locatebyusing(const char* ordercode, const char* usingchar, in target, out setting, const int fieldno /*=0*/, const int valueno /*=0*/, const int subvalueno /*=0*/) const {
 
-	THISIS("bool var::locatebyusing(const char* ordercode, const char* usingchar, in target, out setting, const int fieldno=0, const int valueno=0, const int valueno=0) const")
+	THISIS("bool var::locatebyusing(const char* ordercode, const char* usingchar, in target, out setting, const int fieldno, const int valueno, const int valueno) const")
 	assertString(function_sig);
 	ISSTRING(target)
 	ISDEFINED(setting)
@@ -804,7 +804,8 @@ bool var::locateusing(const char* usingchar, in target) const {
 // 2. specify field/value/subvalue and return position
 bool var::locateusing(const char* usingchar, in target, out setting, const int fieldno /*=0*/, const int valueno /*=0*/, const int subvalueno /*=0*/) const {
 
-	THISIS("bool var::locateusing(const char* usingchar, in target, out setting, const int fieldno/*=0*/, const int valueno/*=0*/, const int subvalueno/*=0*/) const")
+//	THISIS("bool var::locateusing(const char* usingchar, in target, out setting, const int fieldno, const int valueno, const int subvalueno) const")
+	THISIS("bool var::locateusing(const char* usingchar, in target, out setting, const int fieldno, const int valueno, const int subvalueno) const")
 	assertString(function_sig);
 	ISSTRING(target)
 	ISDEFINED(setting)

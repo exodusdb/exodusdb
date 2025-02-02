@@ -5624,7 +5624,7 @@ bool var::cursorexists() {
 
 var  var::listindex(in filename0, in fieldname0) const {
 
-	THISIS("var  var::listindex(in filename) const")
+	THISIS("var  var::listindex(in filename, in fieldname) const")
 	// could allow undefined usage since *this isnt used?
 	assertDefined(function_sig);
 	ISSTRING(filename0)
@@ -5692,7 +5692,7 @@ var  var::listindex(in filename0, in fieldname0) const {
 
 var  var::reccount(in filename0) const {
 
-	THISIS("var  var::reccount(in filename_or_handle_or_null) const")
+	THISIS("var  var::reccount(in file_or_filename) const")
 	// could allow undefined usage since *this isnt used?
 	assertDefined(function_sig);
 	ISSTRING(filename0)
@@ -5728,7 +5728,7 @@ var  var::reccount(in filename0) const {
 
 bool var::flushindex(in filename) const {
 
-	THISIS("bool var::flushindex(in filename=) const")
+	THISIS("bool var::flushindex(in filename) const")
 	// could allow undefined usage since *this isnt used?
 	assertDefined(function_sig);
 	ISSTRING(filename)

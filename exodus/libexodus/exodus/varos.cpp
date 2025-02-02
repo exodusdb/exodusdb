@@ -370,7 +370,7 @@ void var::osflush() const {
 // optional locale (not the same as codepage)
 bool var::osopen(in osfilename, const bool utf8 /*=true*/) const {
 
-	THISIS("bool var::osopen(in osfilename, const bool utf8 = true)")
+	THISIS("bool var::osopen(in osfilename, const bool utf8)")
 	assertDefined(function_sig);
 	ISSTRING(osfilename)
 
@@ -410,7 +410,7 @@ std::fstream* var::osopenx(in osfilename, const bool utf8) const {
 		// with osopen and perhaps a specific locale.
 
 		// Delay checking until necessary
-		THISIS("bool var::osopenx(in osfilename, const bool utf8 = true)")
+		THISIS("bool var::osopenx(in osfilename, const bool utf8)")
 		ISSTRING(osfilename)
 
 		// TODO replace new/delete with some object

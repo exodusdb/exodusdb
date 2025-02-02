@@ -376,18 +376,24 @@ public:
     //  var v4 = round(-1.455, 2);`
     ND var  round(const int ndecimals = 0) const;
 
-    /* Actually implemented in var_base but documented here
-    // Modulus or Remainder function similar to C++ %
-    // Result is between [0 , limit) if limit is positive
-    // Result is between (limit, 0] if limit is negative
-    // `var v1 = var(7).mod(5); // 2
-    //  // or
-    //  var v2 = mod(7, 5);`
-    ND var  mod(in divisor) const;
+	/* Actually implemented in var_base but documented here
+	// Modulus function
+	// Identical to C++ % operator only for positive numbers and modulus
+	// Negative denominators are considered as periodic with positiive numbers
+	// Result is between [0 , modulus) if modulus is positive
+	// Result is between (modulus, 0] if modulus is negative (symmetric)
+	// mod(11, 5); // "1"
+	// mod(-11, 5); // "4"
+	// mod(11, -5); // "-4"
+	// mod(-11, -5); // "-1"
+	// `var v1 = var(11).mod(5); // 1
+	//  // or
+	//  var v2 = mod(11, 5);`
+	ND var  mod(in modulus) const;
 
-    // Not documenting the overloaded versions
-    //ND var  mod(double divisor) const;
-    //ND var  mod(const int divisor) const;
+	// Not documenting the overloaded versions
+	//ND var  mod(double modulus) const;
+	//ND var  mod(const int modulus) const;
     */
 
 	///// LOCALE:
@@ -806,7 +812,7 @@ public:
 	// `var v1 = "a1*b2*c3*d4"_var.fieldstore("*", 2, 0, "X*Y"); // "a1*X*Y*b2*c3*d4"
 	//  // or
 	//  var v2 = fieldstore("a1*b2*c3*d4", "*", 2, 0, "X*Y");`
-	// If nfields is negative then delete nfields before inserting.
+	// If nfields is negative then delete abs(n) fields before inserting.
 	//
 	// `var v1 = "a1*b2*c3*d4"_var.fieldstore("*", 2, -3, "X*Y"); // "a1*X*Y"
 	//  // or
@@ -902,7 +908,7 @@ public:
 	//  var v2 = shuffle("20^10^2^1^1.1"_var);`
 	ND var  shuffle(SV sepchar = _FM) const&;
 
-	// Replace separator characters with FM char except inside double or single quotes ignoring escaped quotes \\" \&squot;
+	// Replace separator characters with FM char except inside double or single quotes ignoring escaped quotes &bsol;" &bsol;'
 	//
 	// `var v1 = "abc,\"def,\"123\" fgh\",12.34"_var.parse(','); // "abc^"def,"123" fgh"^12.34"
 	//  // or
@@ -961,11 +967,18 @@ public:
 	ND io   shuffle(SV sepchar = _FM) &&;
 	ND io   parse(char sepchar = ' ') &&;
 
-	///// STRING MUTATORS Not chainable. All similar to Non-Mutators:
-	////////////////////////////////////////////////////////////////
+	///// STRING MUTATOR standalone commands. All similar to Non-Mutators:
+	/////////////////////////////////////////////////////////////////////
 
 	// obj is str
 
+	// Upper case
+	// All following string mutators follow the same pattern. See the non-mutating functions for details.
+	//
+	// `var v1 = "abc";
+	// v1.ucase(); // "ABC"
+	// or
+	// ucaser(v1);`
 	   IO   ucaser() REF ;
 
 	   IO   lcaser() REF ;
@@ -1021,8 +1034,8 @@ public:
 
 	// obj is str
 
-	// Hashing.
-	// If a modulus is provided then the result is limited to (0, modulus]
+	// Hash by default returns a 64 bit signed integer as a var.
+	// If a modulus is provided then the result is limited to [0, modulus)
 	// MurmurHash3 is used.
 	//
 	// `var v1 = "abc"_var.hash(); // 6715211243465481821
@@ -1316,7 +1329,7 @@ public:
 	// `var v1 = "10]20]30"_var.mv("+","2]3]4"); // "12]23]34"`
 	ND var  mv(const char* opcode, in var2) const;
 
-	///// DYNAMIC ARRAY MUTATORS (Standalone and cannot be chained):
+	///// DYNAMIC ARRAY MUTATORS Standalone commands:
 	////////////////////////////
 
 	// obj is str
@@ -1459,7 +1472,7 @@ public:
 
 	// obj is conn
 
-	// For all db operations, var() can be db connection created with dbconnect() or any var will perform a default connection.
+	// For all db operations, the operative var can either be a db connection created with dbconnect() or be any var and a default connection will be established on the fly.
 	// The db connection string (conninfo) parameters are merged from the following places in descending priority.
 	// 1. Provided in connect()'s conninfo argument. See 4. for the complete list of parameters.
 	// 2. Any environment variables EXO_HOST EXO_PORT EXO_USER EXO_DATA EXO_PASS EXO_TIME
@@ -1467,13 +1480,14 @@ public:
 	// 4. The default conninfo is "host=127.0.0.1 port=5432 dbname=exodus user=exodus password=somesillysecret connect_timeout=10"
 	//
 	// `var db="mydb";
-	//  if (not db.connect()) abort(db.lasterror());
+	//  if (not db.connect("user=exodus password=somesillysecret")) abort(lasterror());
 	//  db.version().outputl();
 	//  db.disconnect();
 	//  // or
-	//  if (not connect("mydb") ...
+	//  if (not connect("mydb")) ...
 	//  // or
-	//  if (not connect() ...
+	//  if (not connect()) ...
+	//  disconnect();
 	ND bool connect(in conninfo = "");
 
 	// Closes db connection and frees process resources both locally and in the database server.
@@ -1493,7 +1507,7 @@ public:
 
 	// Attach (connect) specific files by name to specific connections.
 	// It is not necessary to attach files before opening them. Attach is meant to control the defaults.
-	// For the remainder of the session, opening the file by name without specifying a connection will automatically use the specified connection applicable during the attach command.
+	// For the remainder of the session, opening the file by name without specifying a connection will automatically use the specified connection applies during the attach command.
 	// If conn is not specified then filename will be attached to the default connection.
 	//
 	// `if (not conn.attach(filenames)) ...
@@ -1649,62 +1663,80 @@ public:
 	ND bool open(in dbfilename, in connection = "");
 
 	// Closes database file var
-	// Does nothing since database file vars consume no resources and 
-	//  if (not file.close()) ...
+	// Does nothing since database file vars consume no resources
+	//
+	// `file.close();
 	//  // or
-	//  if (not close(file)) ...`
+	//  close(file);`
 	   void close();
 
-	// Creates a secondary index for a specific dictionary field name on a specific file
+	// Creates a secondary index for a field name and file.
+	// The fieldname must exist in a dictionary file. The default dictionary is "dict." ^ filename.
+	// Returns false if the index cannot be created for any reason.
+	// * Index already exists
+	// * File does not exist
+	// * The dictionary file does not have a record with a key of the given field name.
+	// * The dictionary file does not exist. Default is "dict." ^ filename.
+	// * The dictionary field defines a calculated field that uses an exodus function. Using a psql function is OK.
 	//
 	// `if (not file.createindex(fieldname)) ...
 	//  // or
-	//  if (not createindex(fieldname, filename)) ...`
+	//  if (not createindex(filename, fieldname)) ...`
 	ND bool createindex(in fieldname, in dictfile = "") const;
 
-	// Deletes a secondary index for a specific dictionary field name on a specific file
+	// Deletes a secondary index for a field name and file
+	// Returns false if the index cannot be deleted for any reason
+	// * File does not exist
+	// * Index does not already exists
 	//
 	// `if (not file.deleteindex(fieldname)) ...
 	//  // or
-	//  if (not deleteindex(fieldname, filename)) ...`
+	//  if (not deleteindex(file, fieldname)) ...`
 	ND bool deleteindex(in fieldname) const;
 
 	// Lists secondary indexes in a database or file
+	// Returns false if the file or fieldname are given and do not exist
 	// obj is file|conn
 	//
-	// `if (not file.deleteindex(fieldname)) ...
+	// `if (not conn.listindex()) ...
 	//  // or
-	//  if (not deleteindex(fieldname, filename)) ...`
-	ND var  listindex(in filename = "", in fieldname = "") const;
+	//  if (not listindex()) ...`
+	ND var  listindex(in file_or_filename = "", in fieldname = "") const;
 
-	// Obtains a metaphorical unique lock for a particular file and key on a particular database.
-	// This is a advisory lock, not physical, and only restricts other connections to the same database if they respect it.
-	// The key does not have to be of an existing record.
+	// Places a metaphorical lock on a particular file and key in a database.
+	// This is a advisory lock, not a physical lock, since it makes no restriction on the access or modification of data by other connections.
+	// Neither the file nor the record key need to actually exist since a lock is just a hash of the filename and key combined.
+	// If another connection attempts to place an identical lock on the same database it will be denied.
+	// Locks can be removed by unlock() or unlockall() or will be automatically removed at the end of a transaction or when the connection is closed.
+	// If the same process attempts to place an identical lock more than once it may be denied (if not in a transaction) or succeed but be ignored (if in a transaction).
+	// Locks can be used to avoid processing a transaction simultaneously with another connection only to have one of them failing due to mutually updating the same records.
 	// Returns:
-	// * 1 = ok
-	// * 0 = failed
-	// * "" = already locked by self
+	// * 0: Failure: Another connection has already placed the same lock.
+	// * "" Failure: The lock has already been placed.
+	// * 1: Success: A new lock has been placed.
+	// * 2: Success: The lock has already been placed and the connection is in a transaction.
 	//
 	// `if (not file.lock(key)) ...
 	//  // or
 	//  if (not lock(file, key)) ...`
 	ND var  lock(in key) const;
 
-	// Releases a lock obtained by the lock function.
-	// Locks cannot be released while in a transaction.
+	// Removes a lock placed by the lock function.
+	// Only locks placed on the specified connection can be removed.
+	// Locks cannot be removed while a connection is in a transaction.
+	// Returns false if the lock is not present in a connection.
 	//
 	// `if (not file.unlock(key)) ...
 	//  // or
 	//  if (not unlock(file, key)) ...`
 	   bool unlock(in key) const;
 
-	// Releases all locks obtained by the lock function for the related connection.
-	// Locks cannot be released while in a transaction.
-	// obj is file|conn
+	// Removes all locks placed by the lock function in the specified connection.
+	// Locks cannot be removed while in a transaction.
 	//
 	// `if (not conn.unlockall()) ...
 	//  // or
-	//  if (not unlock(conn)) ...`
+	//  if (not unlockall(conn)) ...`
 	   bool unlockall() const;
 
 	// obj is rec
@@ -1820,7 +1852,7 @@ public:
 
 	// obj is str
 
-	// The xlate ("translate") function is similar to readf() but, in its exodus program member form, it can be used efficiently with exodus file dictionaries using column names and functions and multivalued data.
+	// The xlate ("translate") function is similar to readf() but, when called as an exodus program member function, it can be used efficiently with exodus file dictionaries using column names and functions and multivalued data.
 	// ''Arguments:''
 	// '''str:''' Used as the primary key to lookup a field in a given file and field no or field name.
 	// '''filename:''' The file in which to look up data.
@@ -1907,8 +1939,9 @@ public:
 	   void ossleep(const int milliseconds) const;
 
 	// Sleep/pause/wait up to a given number of milliseconds or until any changes occur in an FM delimited list of directories and/or files.
-	// If a terminal is present then any input available (key press) will also terminate the wait.
-	// If any changes occur on the specified files or directories an FM array of event information is returned. See below.
+	// Any terminal input (e.g. a key press) will also terminate the wait.
+	// An FM array of event information is returned. See below.
+	// Multiple events are returned in multivalues.
 	// obj is file_dir_list
 	//
 	// `var v1 = ".^/etc/hosts"_var.oswait(3000); // e.g. "IN_CLOSE_WRITE^/etc^hosts^f"_var
@@ -1916,33 +1949,28 @@ public:
 	//  var v2 = oswait(".^/etc/hosts"_var, 3000);`
 	//
 	// Returned array fields
-	//
-	// In the case of multiple events being captured then each field is multivalued.
-	//
 	// 1. Event type codes
 	// 2. dirpaths
 	// 3. filenames
 	// 4. d=dir, f=file
 	//
-	// Possible evemt type codes are as follows:
-	//
-	// "IN_CLOSE_WRITE" //A file opened for writing was closed
-	// "IN_ACCESS"      //Data was read from file
-	// "IN_MODIFY"      //Data was written to file
-	// "IN_ATTRIB"      //File attributes changed
-	// "IN_CLOSE"       //File was closed (read or write)
-	// "IN_MOVED_FROM"  //File was moved away from watched directory
-	// "IN_MOVED_TO"    //File was moved into watched directory
-	// "IN_MOVE"        //File was moved (in or out of directory)
-	// "IN_CREATE"      //A file was created in the directory
-	// "IN_DELETE"      //A file was deleted from the directory
-	// "IN_DELETE_SELF" //Directory or file under observation was deleted
-	// "IN_MOVE_SELF"   //Directory or file under observation was moved
-
+	// Possible event type codes are as follows:
+	// * IN_CLOSE_WRITE - A file opened for writing was closed
+	// * IN_ACCESS      - Data was read from file
+	// * IN_MODIFY      - Data was written to file
+	// * IN_ATTRIB      - File attributes changed
+	// * IN_CLOSE       - File was closed (read or write)
+	// * IN_MOVED_FROM  - File was moved away from watched directory
+	// * IN_MOVED_TO    - File was moved into watched directory
+	// * IN_MOVE        - File was moved (in or out of directory)
+	// * IN_CREATE      - A file was created in the directory
+	// * IN_DELETE      - A file was deleted from the directory
+	// * IN_DELETE_SELF - Directory or file under observation was deleted
+	// * IN_MOVE_SELF   - Directory or file under observation was moved
 	   var  oswait(const int milliseconds) const;
 
-	///// OS FILE IO:
-	////////////////
+	///// OS FILE I/O:
+	/////////////////
 
 	// obj is osfilevar
 
