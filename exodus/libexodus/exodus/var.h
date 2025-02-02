@@ -278,21 +278,21 @@ public:
 	// obj is num
 
     // Absolute value
-    // `var v1 = var(-12.34).abs(); // 12.34
+    // `let v1 = var(-12.34).abs(); // 12.34
     //  // or
-    //  var v2 = abs(-12.34);`
+    //  let v2 = abs(-12.34);`
     ND var  abs() const;
 
     // Power
-    // `var v1 = var(2).pwr(8); // 256
+    // `let v1 = var(2).pwr(8); // 256
     //  // or
-    //  var v2 = pwr(2, 8);`
+    //  let v2 = pwr(2, 8);`
     ND var  pwr(in exponent) const;
 
     // Pseudo random number generator
-    // `var v1 = var(100).rnd(); // 0 to 99 pseudo random
+    // `let v1 = var(100).rnd(); // 0 to 99 pseudo random
     //  // or
-    //  var v2 = rnd(100);`
+    //  let v2 = rnd(100);`
     ND var  rnd()     const;
 
     // Initialise the seed for rnd()
@@ -302,53 +302,53 @@ public:
            void initrnd() const;
 
     // Power of e
-    // `var v1 = var(1).exp(); // 2.718281828459045
+    // `let v1 = var(1).exp(); // 2.718281828459045
     //  // or
-    //  var v2 = exp(1);`
+    //  let v2 = exp(1);`
     ND var  exp()     const;
 
     // Square root
-    // `var v1 = var(100).sqrt(); // 10
+    // `let v1 = var(100).sqrt(); // 10
     //  // or
-    //  var v2 = sqrt(100);`
+    //  let v2 = sqrt(100);`
     ND var  sqrt()    const;
 
     // Sine of degrees
-    // `var v1 = var(30).sin(); // 0.5
+    // `let v1 = var(30).sin(); // 0.5
     //  // or
-    //  var v2 = sin(30);`
+    //  let v2 = sin(30);`
     ND var  sin()     const;
 
     // Cosine of degrees
-    // `var v1 = var(60).cos(); // 0.5
+    // `let v1 = var(60).cos(); // 0.5
     //  // or
-    //  var v2 = cos(60);`
+    //  let v2 = cos(60);`
     ND var  cos()     const;
 
     // Tangent of degrees
-    // `var v1 = var(45).tan(); // 1
+    // `let v1 = var(45).tan(); // 1
     //  // or
-    //  var v2 = tan(45);`
+    //  let v2 = tan(45);`
     ND var  tan()     const;
 
     // Arctangent of degrees
-    // `var v1 = var(1).atan(); // 45
+    // `let v1 = var(1).atan(); // 45
     //  // or
-    //  var v2 = atan(1);`
+    //  let v2 = atan(1);`
     ND var  atan()    const;
 
     // Natural logarithm
-    // `var v1 = var(2.718281828459045).loge(); // 1
+    // `let v1 = var(2.718281828459045).loge(); // 1
     //  // or
-    //  var v2 = loge(2.718281828459045);`
+    //  let v2 = loge(2.718281828459045);`
     ND var  loge()    const;
 
     //  ND var  int() const;//reserved word
 
     // Truncate decimal numbers towards zero
-    // `var v1 = var(2.9).integer(); // 2
+    // `let v1 = var(2.9).integer(); // 2
     //  // or
-    //  var v2 = integer(2.9);
+    //  let v2 = integer(2.9);
 	//
     //  var v3 = var(-2.9).integer(); // -2
     //  // or
@@ -356,9 +356,9 @@ public:
     ND var  integer() const;
 
     // Truncate decimal numbers towards negative
-    // `var v1 = var(2.9).floor(); // 2
+    // `let v1 = var(2.9).floor(); // 2
     //  // or
-    //  var v2 = floor(2.9);
+    //  let v2 = floor(2.9);
 	//
     //  var v3 = var(-2.9).floor(); // -3
     //  // or
@@ -367,9 +367,9 @@ public:
 
     // Round decimal numbers to a desired number of decimal places
     // .5 always rounds away from zero.
-    // `var v1 = var(0.455).round(2); // 0.46
+    // `let v1 = var(0.455).round(2); // 0.46
     //  // or
-    //  var v2 = round(1.455, 2);
+    //  let v2 = round(1.455, 2);
 	//
     //  var v3 = var(-0.455).round(2); // -0.46
     //  // or
@@ -386,9 +386,9 @@ public:
 	// mod(-11, 5); // "4"
 	// mod(11, -5); // "-4"
 	// mod(-11, -5); // "-1"
-	// `var v1 = var(11).mod(5); // 1
+	// `let v1 = var(11).mod(5); // 1
 	//  // or
-	//  var v2 = mod(11, 5);`
+	//  let v2 = mod(11, 5);`
 	ND var  mod(in modulus) const;
 
 	// Not documenting the overloaded versions
@@ -403,17 +403,17 @@ public:
 
 	// Gets the current thread's default locale codepage code
 	//
-	// `var v1 = var().getxlocale(); // e.g. "en_US.utf8"
+	// `let v1 = var().getxlocale(); // e.g. "en_US.utf8"
 	//  // or
-	//  var v2 = getxlocale();`
+	//  let v2 = getxlocale();`
 	ND out  getxlocale();
 
 	// Sets the current thread's default locale codepage code
-	// obj is str
+	//  obj is strvar
 	//
 	// `if (not "de_DE.utf8"_var.setxlocale()) ... // true if successful
 	//  // or
-	//  if (setxlocale("de_DE.utf8"))`
+	//  if (setxlocale("de_DE.utf8")) ...`
 	   bool setxlocale() const;
 
 	///// STRING CREATION:
@@ -424,9 +424,9 @@ public:
 	// Create a string of a single char (byte) given an integer 0-255.
 	// 0-127 -> ASCII, 128-255 -> invalid UTF-8 so cannot be written to database or used various exodus string operations
 	//
-	// `var v1 = var().chr(0x61); // "a"
+	// `let v1 = var().chr(0x61); // "a"
 	//  // or
-	//  var v2 = chr(0x61);`
+	//  let v2 = chr(0x61);`
 	ND var  chr(const int num) const;
 
 	// Create a string of a single unicode code point in utf8 encoding.
@@ -434,30 +434,30 @@ public:
 	// Not providing implicit constructor from var to unsigned int due to getting ambigious conversions
 	// since int and unsigned int are parallel priority in c++ implicit conversions
 	//
-	// `var v1 = var().textchr(171416); // "𩶘" or "\xF0A9B698"
+	// `let v1 = var().textchr(171416); // "𩶘" or "\xF0A9B698"
 	//  // or
-	//  var v2 = textchr(171416);`
+	//  let v2 = textchr(171416);`
 	ND var  textchr(const int num) const;
 
 	// Create a string by repeating a given character or string
 	//
-	// `var v1 = "ab"_var.str(3); // "ababab"
+	// `let v1 = "ab"_var.str(3); // "ababab"
 	//  // or
-	//  var v2 = str("ab", 3);`
+	//  let v2 = str("ab", 3);`
 	ND var  str(const int num) const;
 
 	// Create string of space characters.
 	// obj is num
 	//
-	// `var v1 = var(3).space(); // "␣␣␣"
+	// `let v1 = var(3).space(); // "␣␣␣"
 	//  // or
-	//  var v2 = space(3);`
+	//  let v2 = space(3);`
 	ND var  space() const;
 
 	// Create a string describing a given number in words
 	// obj is num
 	//
-	// `var v1 = var(123.45).numberinwords("de_DE"); // "ein­hundert­drei­und­zwanzig Komma vier fünf"`
+	// `let v1 = var(123.45).numberinwords("de_DE"); // "ein­hundert­drei­und­zwanzig Komma vier fünf"`
 	ND var  numberinwords(in languagename_or_locale_id = "");
 
 	////////////
@@ -467,58 +467,58 @@ public:
 	///// STRING SCANNING:
 	/////////////////////
 
-	// obj is str
+	//  obj is strvar
 
-	// Returns the character number of the first char.
+	// <em>Returns:</em> The character number of the first char.
 	//
-	// `var v1 = "abc"_var.seq(); // 0x61 97
+	// `let v1 = "abc"_var.seq(); // 0x61 97
 	//  // or
-	//  var v2 = seq("abc");`
+	//  let v2 = seq("abc");`
 	ND var  seq() const;
 
-	// Returns the Unicode character number of the first unicode code point.
+	// <em>Returns:</em> The Unicode character number of the first unicode code point.
 	//
-	// `var v1 = "Γ"_var.textseq(); // 915 U+0393: Greek Capital Letter Gamma (Unicode Character)
+	// `let v1 = "Γ"_var.textseq(); // 915 U+0393: Greek Capital Letter Gamma (Unicode Character)
 	//  // or
-	//  var v2 = textseq("Γ");`
+	//  let v2 = textseq("Γ");`
 	ND var  textseq() const;
 
-	// Returns the length of a string in number of chars
+	// <em>Returns:</em> The length of a string in number of chars
 	//
-	// `var v1 = "abc"_var.len(); // 3
+	// `let v1 = "abc"_var.len(); // 3
 	//  // or
-	//  var v2 = len("abc");`
+	//  let v2 = len("abc");`
 	ND var  len() const;
 
-	// Returns the number of output columns.
+	// <em>Returns:</em> The number of output columns.
 	// Allows multi column unicode and reduces combining characters etc. like e followed by grave accent
 	// Possibly does not properly calculate combining sequences of graphemes e.g. face followed by colour
 	//
-	// `var v1 = "🤡x🤡"_var.textwidth(); // 5
+	// `let v1 = "🤡x🤡"_var.textwidth(); // 5
 	//  // or
-	//  var v2 = textwidth("🤡x🤡");`
+	//  let v2 = textwidth("🤡x🤡");`
 	ND var  textwidth() const;
 
-	// Returns the number of Unicode code points
+	// <em>Returns:</em> The number of Unicode code points
 	//
-	// `var v1 = "Γιάννης"_var.textlen(); // 7
+	// `let v1 = "Γιάννης"_var.textlen(); // 7
 	//  // or
-	//  var v2 = textlen("Γιάννης");`
+	//  let v2 = textlen("Γιάννης");`
 	ND var  textlen() const;
 
-	// Returns the number of fields determined by presence of sepstr.
+	// <em>Returns:</em> The number of fields determined by presence of sepstr.
 	// It is the same as var.count(sepstr) + 1 except that fcount returns 0 for an empty string.
 	//
-	// `var v1 = "aa**cc"_var.fcount("*"); // 3
+	// `let v1 = "aa**cc"_var.fcount("*"); // 3
 	//  // or
-	//  var v2 = fcount("aa**cc", "*");`
+	//  let v2 = fcount("aa**cc", "*");`
 	ND var  fcount(SV sepstr) const;
 
 	// Return the number of sepstr found
 	//
-	// `var v1 = "aa**cc"_var.count("*"); // 2
+	// `let v1 = "aa**cc"_var.count("*"); // 2
 	//  // or
-	//  var v2 = count("aa**cc", "*");`
+	//  let v2 = count("aa**cc", "*");`
 	ND var  count(SV sepstr) const;
 
 	// Exodus   Javascript   PHP             Python       Go          Rust          C++
@@ -526,57 +526,57 @@ public:
 	// ends     endsWith     str_ends_with   endswith     HasSuffix() ends_with()   ends_with
 	// contains includes()   str_contains    contains()   Contains()  contains()    contains
 
-	// Returns true if starts with prefix
+	// <em>Returns:</em> True if starts with prefix
 	//
-	// `var v1 = "abc"_var.starts("ab"); // true
+	// `let v1 = "abc"_var.starts("ab"); // true
 	//  // or
-	//  var v2 = starts("abc", "ab");`
+	//  let v2 = starts("abc", "ab");`
 	ND bool starts(SV prefix) const;
 
-	// Returns true if ends with suffix
+	// <em>Returns:</em> True if ends with suffix
 	//
-	// `var v1 = "abc"_var.ends("bc"); // true
+	// `let v1 = "abc"_var.ends("bc"); // true
 	//  // or
-	//  var v2 = ends("abc", "bc");`
+	//  let v2 = ends("abc", "bc");`
 	ND bool ends(SV suffix) const;
 
-	// Returns true if starts, ends or contains substr
+	// <em>Returns:</em> True if starts, ends or contains substr
 	//
-	// `var v1 = "abcd"_var.contains("bc"); // true
+	// `let v1 = "abcd"_var.contains("bc"); // true
 	//  // or
-	//  var v2 = contains("abcd", "bc");`
+	//  let v2 = contains("abcd", "bc");`
 	ND bool contains(SV substr) const;
 
 	//https://en.wikipedia.org/wiki/Comparison_of_programming_languages_(string_functions)#Find
 
-	// Returns char no if found or 0 if not. startchar1 is byte no to start at.
+	// <em>Returns:</em> Char no if found or 0 if not. startchar1 is byte no to start at.
 	//
-	// `var v1 = "abcd"_var.index("bc"); // 2
+	// `let v1 = "abcd"_var.index("bc"); // 2
 	//  // or
-	//  var v2 = index("abcd", "bc");`
+	//  let v2 = index("abcd", "bc");`
 	ND var  index(SV substr, const int startchar1 = 1) const;
 
 	// ditto. Occurrence 1 = find first occurrence
 	//
-	// `var v1 = "abcabc"_var.index("bc", 2); // 5
+	// `let v1 = "abcabc"_var.index("bc", 2); // 5
 	//  // or
-	//  var v2 = index("abcabc", "bc", 2);`
+	//  let v2 = index("abcabc", "bc", 2);`
 	ND var  indexn(SV substr, const int occurrence) const;
 
 	// ditto. Reverse search.
 	// startchar1 defaults to -1 meaning start searching from the last byte (towards the first byte).
 	//
-	// `var v1 = "abcabc"_var.indexr("bc"); // 5
+	// `let v1 = "abcabc"_var.indexr("bc"); // 5
 	//  // or
-	//  var v2 = indexr("abcabc", "bc");`
+	//  let v2 = indexr("abcabc", "bc");`
 	ND var  indexr(SV substr, const int startchar1 = -1) const;
 
-	// Returns all results of regex matching
+	// <em>Returns:</em> All results of regex matching
 	// Multiple matches are in fields. Groups are in values
 	//
-	// `var v1 = "abc1abc2"_var.match("BC(\\d)", "i"); // "bc1]1^bc2]2"
+	// `let v1 = "abc1abc2"_var.match("BC(\\d)", "i"); // "bc1]1^bc2]2"
 	//  // or
-	//  var v2 = match("abc1abc2", "BC(\\d)", "i");`
+	//  let v2 = match("abc1abc2", "BC(\\d)", "i");`
 	//
 	// regex_options:
 	//
@@ -609,10 +609,10 @@ public:
 	// regex_options as for match()
 	//
 	// `var startchar1 = 1;
-	//  var v1 = "abc1abc2"_var.search("BC(\\d)", startchar1, "i"); // returns "bc1]1" and startchar1 is updated to 5 ready for the next search
+	//  let v1 = "abc1abc2"_var.search("BC(\\d)", startchar1, "i"); // returns "bc1]1" and startchar1 is updated to 5 ready for the next search
 	//  // or
 	//  startchar1 = 1;
-	//  var v2 = search("abc1abc2", "BC(\\d)", startchar1, "i");`
+	//  let v2 = search("abc1abc2", "BC(\\d)", startchar1, "i");`
 	ND var  search(SV regex_str, io startchar1, SV regex_options = "") const;
 
 	// Ditto starting from first char
@@ -631,27 +631,27 @@ public:
 	///// STRING CONVERSION - Chainable. Non-mutating:
 	//////////////////////
 
-	// obj is str
+	//  obj is strvar
 
 	// Upper case
 	//
-	// `var v1 = "Γιάννης"_var.ucase(); // "ΓΙΆΝΝΗΣ"
+	// `let v1 = "Γιάννης"_var.ucase(); // "ΓΙΆΝΝΗΣ"
 	//  // or
-	//  var v2 = ucase("Γιάννης");`
+	//  let v2 = ucase("Γιάννης");`
 	ND var  ucase() const&;
 
 	// Lower case
 	//
-	// `var v1 = "ΓΙΆΝΝΗΣ"_var.lcase(); // "γιάννης"
+	// `let v1 = "ΓΙΆΝΝΗΣ"_var.lcase(); // "γιάννης"
 	//  // or
-	//  var v2 = lcase("ΓΙΆΝΝΗΣ");`
+	//  let v2 = lcase("ΓΙΆΝΝΗΣ");`
 	ND var  lcase() const&;
 
 	// Title case (first letters)
 	//
-	// `var v1 = "γιάννης"_var.tcase(); // "Γιάννης"
+	// `let v1 = "γιάννης"_var.tcase(); // "Γιάννης"
 	//  // or
-	//  var v2 = tcase("γιάννης");`
+	//  let v2 = tcase("γιάννης");`
 	ND var  tcase() const&;
 
 	// Fold case (lower case and remove accents for indexing)
@@ -662,180 +662,180 @@ public:
 
 	// Simple reversible disguising of text
 	//
-	// `var v1 = "abc"_var.invert(); // "\x{C29EC29DC29C}"
+	// `let v1 = "abc"_var.invert(); // "\x{C29EC29DC29C}"
 	//  // or
-	//  var v2 = invert("abc");`
+	//  let v2 = invert("abc");`
 	ND var  invert() const&;
 
 	// Convert all FM to VM, VM to SM etc.
 	//
-	// `var v1 = "a1^b2^c3"_var.lower(); // "a1]b2]c3"
+	// `let v1 = "a1^b2^c3"_var.lower(); // "a1]b2]c3"
 	//  // or
-	//  var v2 = lower("a1^b2^c3"_var);`
+	//  let v2 = lower("a1^b2^c3"_var);`
 	ND var  lower() const&;
 
 	// Convert all VM to FM, SM to VM etc.
 	//
-	// `var v1 = "a1]b2]c3"_var.raise(); // "a1^b2^c3"
+	// `let v1 = "a1]b2]c3"_var.raise(); // "a1^b2^c3"
 	//  // or
-	//  var v2 = "a1]b2]c3"_var);`
+	//  let v2 = "a1]b2]c3"_var;`
 	ND var  raise() const&;
 
 	// Remove any redundant FM, VM etc. characters (Trailing FM; VM before FM etc.)
 	//
-	// `var v1 = "a1^b2]]^c3^^"_var.crop(); // "a1^b2^c3"
+	// `let v1 = "a1^b2]]^c3^^"_var.crop(); // "a1^b2^c3"
 	//  // or
-	//  var v2 = crop("a1^b2]]^c3^^"_var);`
+	//  let v2 = crop("a1^b2]]^c3^^"_var);`
 	ND var  crop() const&;
 
 	// Wrap in double quotes
 	//
-	// `var v1 = "abc"_var.quote(); // ""abc""
+	// `let v1 = "abc"_var.quote(); // ""abc""
 	//  // or
-	//  var v2 = quote("abc");`
+	//  let v2 = quote("abc");`
 	ND var  quote() const&;
 
 	// Wrap in single quotes
 	//
-	// `var v1 = "abc"_var.squote(); // "'abc'"
+	// `let v1 = "abc"_var.squote(); // "'abc'"
 	//  // or
-	//  var v2 = squote("abc");`
+	//  let v2 = squote("abc");`
 	ND var  squote() const&;
 
 	// Remove one pair of double or single quotes
 	//
-	// `var v1 = "'abc'"_var.unquote(); // "abc"
+	// `let v1 = "'abc'"_var.unquote(); // "abc"
 	//  // or
-	//  var v2 = unquote("'abc'");`
+	//  let v2 = unquote("'abc'");`
 	ND var  unquote() const&;
 
 	// Remove leading, trailing and excessive inner bytes
 	//
-	// `var v1 = "␣␣a1␣␣b2␣c3␣␣"_var.trim(); // "a1␣b2␣c3"
+	// `let v1 = "␣␣a1␣␣b2␣c3␣␣"_var.trim(); // "a1␣b2␣c3"
 	//  // or
-	//  var v2 = trim("␣␣a1␣␣b2␣c3␣␣");`
+	//  let v2 = trim("␣␣a1␣␣b2␣c3␣␣");`
 	ND var  trim(SV trimchars = " ") const&;
 
 	// Ditto leading
 	//
-	// `var v1 = "␣␣a1␣␣b2␣c3␣␣"_var.trimfirst(); // "a1␣␣b2␣c3␣␣"
+	// `let v1 = "␣␣a1␣␣b2␣c3␣␣"_var.trimfirst(); // "a1␣␣b2␣c3␣␣"
 	//  // or
-	//  var v2 = trimfirst("␣␣a1␣␣b2␣c3␣␣");`
+	//  let v2 = trimfirst("␣␣a1␣␣b2␣c3␣␣");`
 	ND var  trimfirst(SV trimchars = " ") const&;
 
 	// Ditto trailing
 	//
-	// `var v1 = "␣␣a1␣␣b2␣c3␣␣"_var.trimlast(); // "␣␣a1␣␣b2␣c3"
+	// `let v1 = "␣␣a1␣␣b2␣c3␣␣"_var.trimlast(); // "␣␣a1␣␣b2␣c3"
 	//  // or
-	//  var v2 = trimlast("␣␣a1␣␣b2␣c3␣␣");`
+	//  let v2 = trimlast("␣␣a1␣␣b2␣c3␣␣");`
 	ND var  trimlast(SV trimchars = " ") const&;
 
 	// Ditto leading, trailing but not inner
 	//
-	// `var v1 = "␣␣a1␣␣b2␣c3␣␣"_var.trimboth(); // "a1␣␣b2␣c3"
+	// `let v1 = "␣␣a1␣␣b2␣c3␣␣"_var.trimboth(); // "a1␣␣b2␣c3"
 	//  // or
-	//  var v2 = trimboth("␣␣a1␣␣b2␣c3␣␣");`
+	//  let v2 = trimboth("␣␣a1␣␣b2␣c3␣␣");`
 	ND var  trimboth(SV trimchars = " ") const&;
 
 	// Extract first char or "" if empty
 	//
-	// `var v1 = "abc"_var.first(); // "a"
+	// `let v1 = "abc"_var.first(); // "a"
 	//  // or
-	//  var v2 = first("abc");`
+	//  let v2 = first("abc");`
 	ND var  first() const&;
 
 	// Extract last char or "" if empty
 	//
-	// `var v1 = "abc"_var.last(); // "c"
+	// `let v1 = "abc"_var.last(); // "c"
 	//  // or
-	//  var v2 = last("abc")`
+	//  let v2 = last("abc");`
 	ND var  last() const&;
 
 	// Extract up to length leading chars
 	//
-	// `var v1 = "abc"_var.first(2); // "ab"
+	// `let v1 = "abc"_var.first(2); // "ab"
 	//  // or
-	//  var v2 = first("abc", 2);`
+	//  let v2 = first("abc", 2);`
 	ND var  first(const std::size_t length) const&;
 
 	// Extract up to length trailing chars
 	//
-	// `var v1 = "abc"_var.last(2); // "bc"
+	// `let v1 = "abc"_var.last(2); // "bc"
 	//  // or
-	//  var v2 = last("abc", 2)`
+	//  let v2 = last("abc", 2);`
 	ND var  last(const std::size_t length) const&;
 
 	// Remove length leading chars
 	//
-	// `var v1 = "abcd"_var.cut(2); // "cd"
+	// `let v1 = "abcd"_var.cut(2); // "cd"
 	//  // or
-	//  var v2 = cut("abcd", 2)`
+	//  let v2 = cut("abcd", 2);`
 	ND var  cut(const int length) const&;
 
 	// Insert text at char position overwriting length chars
 	//
-	// `var v1 = "abcd"_var.paste(2, 2, "XYZ"); // "aXYZd"
+	// `let v1 = "abcd"_var.paste(2, 2, "XYZ"); // "aXYZd"
 	//  // or
-	//  var v2 = paste("abcd", 2, 2, "XYZ");`
+	//  let v2 = paste("abcd", 2, 2, "XYZ");`
 	ND var  paste(const int pos1, const int length, SV insertstr) const&;
 
 	// Insert text at char position without overwriting any following characters
 	//
-	// `var v1 = "abcd"_var.paste(2, "XYZ"); // "aXYbcd"
+	// `let v1 = "abcd"_var.paste(2, "XYZ"); // "aXYbcd"
 	//  // or
-	//  var v2 = paste("abcd", 2, "XYZ");`
+	//  let v2 = paste("abcd", 2, "XYZ");`
 	ND var  paste(const int pos1, SV insertstr) const&;
 
 	// Insert text at the beginning
 	//
-	// `var v1 = "abc"_var.prefix("XY"); // "XYabc"
+	// `let v1 = "abc"_var.prefix("XY"); // "XYabc"
 	//  // or
-	//  var v2 = prefix("abc", "XY");`
+	//  let v2 = prefix("abc", "XY");`
 	ND var  prefix(SV insertstr) const&;
 
 	// ND var  append(SV appendstr) const&;
 
 	// Remove one trailing char
 	//
-	// `var v1 = "abc"_var.pop(); // "ab"
+	// `let v1 = "abc"_var.pop(); // "ab"
 	//  // or
-	//  var v2 = pop("abc")`
+	//  let v2 = pop("abc");`
 	ND var  pop() const&;
 
 	// fieldstore() replaces n fields of subfield(s) in a string.
 	//
-	// `var v1 = "aa*bb*cc*dd"_var.fieldstore("*", 2, 3, "X*Y"); // "aa*X*Y*"
+	// `let v1 = "aa*bb*cc*dd"_var.fieldstore("*", 2, 3, "X*Y"); // "aa*X*Y*"
 	//  // or
-	//  var v2 = fieldstore("aa*bb*cc*dd", "*", 2, 3, "X*Y");`
+	//  let v2 = fieldstore("aa*bb*cc*dd", "*", 2, 3, "X*Y");`
 	// If nfields is 0 then insert fields before fieldno
 	//
-	// `var v1 = "a1*b2*c3*d4"_var.fieldstore("*", 2, 0, "X*Y"); // "a1*X*Y*b2*c3*d4"
+	// `let v1 = "a1*b2*c3*d4"_var.fieldstore("*", 2, 0, "X*Y"); // "a1*X*Y*b2*c3*d4"
 	//  // or
-	//  var v2 = fieldstore("a1*b2*c3*d4", "*", 2, 0, "X*Y");`
+	//  let v2 = fieldstore("a1*b2*c3*d4", "*", 2, 0, "X*Y");`
 	// If nfields is negative then delete abs(n) fields before inserting.
 	//
-	// `var v1 = "a1*b2*c3*d4"_var.fieldstore("*", 2, -3, "X*Y"); // "a1*X*Y"
+	// `let v1 = "a1*b2*c3*d4"_var.fieldstore("*", 2, -3, "X*Y"); // "a1*X*Y"
 	//  // or
-	//  var v2 = fieldstore("a1*b2*c3*d4", "*", 2, -3, "X*Y");`
+	//  let v2 = fieldstore("a1*b2*c3*d4", "*", 2, -3, "X*Y");`
 	ND var  fieldstore(SV separator, const int fieldno, const int nfields, in replacement) const&;
 
 	// substr version 1. Extract length chars starting at pos1
 	//
-	// `var v1 = "abcd"_var.substr(2, 2); // "bc"
+	// `let v1 = "abcd"_var.substr(2, 2); // "bc"
 	//  // or
-	//  var v2 = substr("abcd", 2, 2);`
+	//  let v2 = substr("abcd", 2, 2);`
 	// If length is negative then work backwards and return chars reversed
 	//
-	// `var v1 = "abcd"_var.substr(3, -2); // "cb"`
+	// `let v1 = "abcd"_var.substr(3, -2); // "cb"`
 	//  // or
-	//  var v2 = substr("abcd", 3, -2);`
+	//  let v2 = substr("abcd", 3, -2);`
 	ND var  substr(const int pos1, const int length) const&;
 
 	// substr version 2. Extract all chars from pos1 up to the end
 	//
-	// `var v1 = "abcd"_var.substr(2); // "bcd"
+	// `let v1 = "abcd"_var.substr(2); // "bcd"
 	//  // or
-	//  var v2 = substr("abcd", 2);`
+	//  let v2 = substr("abcd", 2);`
 	ND var  substr(const int pos1) const&;
 
 	//[[deprecated("EXODUS: Replace all xxx.b(pos1, len) with xxx.subst(pos1, len)")]]
@@ -848,71 +848,71 @@ public:
 
 	// Convert chars to other chars one for one or delete where tochars is shorter.
 	//
-	// `var v1 = "abcde"_var.convert("aZd", "XY"); // "Xbce" (a is replaced and d is removed)
+	// `let v1 = "abcde"_var.convert("aZd", "XY"); // "Xbce" (a is replaced and d is removed)
 	//  // or
-	//  var v2 = convert("abcde", "aZd", "XY");`
+	//  let v2 = convert("abcde", "aZd", "XY");`
 	ND var  convert(SV fromchars, SV tochars) const&;
 
 	// Ditto for Unicode code points.
 	//
-	// `var v1 = "a🤡b😀c🌍d"_var.textconvert("🤡😀", "👋"); // "a👋bc🌍d"
+	// `let v1 = "a🤡b😀c🌍d"_var.textconvert("🤡😀", "👋"); // "a👋bc🌍d"
 	//  // or
-	//  var v2 = textconvert("a🤡b😀c🌍d", "🤡😀", "👋");`
+	//  let v2 = textconvert("a🤡b😀c🌍d", "🤡😀", "👋");`
 	ND var  textconvert(SV fromchars, SV tochars) const&;
 
 	// Replace all occurrences of a substr with another. Case sensitive
 	//
-	// `var v1 = "Abc Abc"_var.replace("bc", "X"); // "AX AX"
+	// `let v1 = "Abc Abc"_var.replace("bc", "X"); // "AX AX"
 	//  // or
-	//  var v2 = replace("Abc Abc", "bc", "X");`
+	//  let v2 = replace("Abc Abc", "bc", "X");`
 	ND var  replace(SV fromstr, SV tostr) const&;
 
 	// Replace substring(s) using a regular expression.
 	// Use $0, $1, $2 in tostr to refer to groups defined in the regex.
 	//
-	// `var v1 = "A a B b"_var.replace("[A-Z]"_rex, "'$0'"); // "'A' a 'B' b"
+	// `let v1 = "A a B b"_var.replace("[A-Z]"_rex, "'$0'"); // "'A' a 'B' b"
 	//  // or
-	//  var v2 = replace("A a B b", "[A-Z]"_rex, "'$0'");`
+	//  let v2 = replace("A a B b", "[A-Z]"_rex, "'$0'");`
 	ND var  replace(const rex& regex, SV tostr) const&;
 
 	// Remove duplicate fields in an FM or VM etc. separated list
 	//
-	// `var v1 = "a1^b2^a1^c2"_var.unique(); // "a1^b2^c2"
+	// `let v1 = "a1^b2^a1^c2"_var.unique(); // "a1^b2^c2"
 	//  // or
-	//  var v2 = unique("a1^b2^a1^c2"_var);`
+	//  let v2 = unique("a1^b2^a1^c2"_var);`
 	ND var  unique() const&;
 
 	// Reorder fields in an FM or VM etc. separated list in ascending order
 	// Numerical
 	//
-	// `var v1 = "20^10^2^1^1.1"_var.sort(); // "1^1.1^2^10^20"
+	// `let v1 = "20^10^2^1^1.1"_var.sort(); // "1^1.1^2^10^20"
 	//  // or
-	//  var v2 = sort("20^10^2^1^1.1"_var);`
+	//  let v2 = sort("20^10^2^1^1.1"_var);`
 	// Alphabetical
-	//  `var v1 = "b1^a1^c20^c10^c2^c1^b2"_var.sort(); // "a1^b1^b2^c1^c10^c2^c20"
+	//  `let v1 = "b1^a1^c20^c10^c2^c1^b2"_var.sort(); // "a1^b1^b2^c1^c10^c2^c20"
 	//  // or
-	//  var v2 = sort("b1^a1^c20^c10^c2^c1^b2"_var);`
+	//  let v2 = sort("b1^a1^c20^c10^c2^c1^b2"_var);`
 	ND var  sort(SV sepchar = _FM) const&;
 
 	// Reorder fields in an FM or VM etc. separated list in descending order
 	//
-	// `var v1 = "20^10^2^1^1.1"_var.reverse(); // "1.1^1^2^10^20"
+	// `let v1 = "20^10^2^1^1.1"_var.reverse(); // "1.1^1^2^10^20"
 	//  // or
-	//  var v2 = reverse("20^10^2^1^1.1"_var);`
+	//  let v2 = reverse("20^10^2^1^1.1"_var);`
 	ND var  reverse(SV sepchar = _FM) const&;
 
 	// Randomise the order of fields in an FM, VM separated list
 	//
-	// `var v1 = "20^10^2^1^1.1"_var.shuffle(); // "2^1^20^1.1^10" (random order depending on initrand())`
+	// `let v1 = "20^10^2^1^1.1"_var.shuffle(); // "2^1^20^1.1^10" (random order depending on initrand())`
 	//  // or
-	//  var v2 = shuffle("20^10^2^1^1.1"_var);`
+	//  let v2 = shuffle("20^10^2^1^1.1"_var);`
 	ND var  shuffle(SV sepchar = _FM) const&;
 
 	// Replace separator characters with FM char except inside double or single quotes ignoring escaped quotes &bsol;" &bsol;'
 	//
-	// `var v1 = "abc,\"def,\"123\" fgh\",12.34"_var.parse(','); // "abc^"def,"123" fgh"^12.34"
+	// `let v1 = "abc,\"def,\"123\" fgh\",12.34"_var.parse(','); // "abc^"def,"123" fgh"^12.34"
 	//  // or
-	//  var v2 = parse("abc,\"def,\"123\" fgh\",12.34", ',');`
+	//  let v2 = parse("abc,\"def,\"123\" fgh\",12.34", ',');`
 	ND var  parse(char sepchar = ' ') const&;
 
 	// SAME ON TEMPORARIES - CALL MUTATORS FOR SPEED (not documenting since programmer interface is the same)
@@ -970,14 +970,14 @@ public:
 	///// STRING MUTATOR standalone commands. All similar to Non-Mutators:
 	/////////////////////////////////////////////////////////////////////
 
-	// obj is str
+	//  obj is strvar
 
 	// Upper case
 	// All following string mutators follow the same pattern. See the non-mutating functions for details.
 	//
 	// `var v1 = "abc";
-	// v1.ucase(); // "ABC"
-	// or
+	// v1.ucaser(); // "ABC"
+	// // or
 	// ucaser(v1);`
 	   IO   ucaser() REF ;
 
@@ -1027,20 +1027,20 @@ public:
 	   IO   sorter(SV sepchar = _FM) REF ;
 	   IO   reverser(SV sepchar = _FM) REF ;
 	   IO   shuffler(SV sepchar = _FM) REF ;
-	   IO   parser(char sepchar = ' ') REF ;
+	   IO   parser(char sepchar DEFAULT_CSPACE) REF ;
 
 	///// OTHER STRING ACCESS:
 	/////////////////////////
 
-	// obj is str
+	//  obj is strvar
 
 	// Hash by default returns a 64 bit signed integer as a var.
 	// If a modulus is provided then the result is limited to [0, modulus)
 	// MurmurHash3 is used.
 	//
-	// `var v1 = "abc"_var.hash(); // 6715211243465481821
+	// `let v1 = "abc"_var.hash(); // 6715211243465481821
 	//  // or
-	//  var v2 = hash("abc");`
+	//  let v2 = hash("abc");`
 	ND var  hash(const std::uint64_t modulus = 0) const;
 
 	// Split a FM etc. separated string into a dim array.
@@ -1058,9 +1058,9 @@ public:
 	// Also returns in pos2 the pos of the following delimiter or one past the end of the string if not found.
 	// Add 1 to pos2 start the next search if continuing.
 	//
-	// `var pos1a = 4, pos2a; var v1 = "aa,bb,cc"_var.substr(pos1a, ",", pos2a); // "bb" and pos2 -> 6
+	// `var pos1a = 4, pos2a; let v1 = "aa,bb,cc"_var.substr(pos1a, ",", pos2a); // "bb" and pos2 -> 6
 	//  // or
-	//  var pos1b = 4, pos2b; var v2 = substr("aa,bb,cc", pos1b, ",", pos2b);`
+	//  var pos1b = 4, pos2b; let v2 = substr("aa,bb,cc", pos1b, ",", pos2b);`
 	   var  substr(const int pos1, SV delimiterchars, io pos2) const;
 
 	// Alias of substr version 3.
@@ -1080,11 +1080,13 @@ public:
 	// delimiterno) const;
 
 	// substr version 4.
-	// Returns a substr from a given pos1  up to the next RM/FM/VM/SM/TM/STM delimiter char. Also returns the next index/offset and the delimiter no. found 1-6 or 0 if not found.
+	// <em>Returns:</em> A substr from a given pos1  up to the next RM/FM/VM/SM/TM/STM delimiter char. Also returns the next index/offset and the delimiter no. found 1-6 or 0 if not found.
 	//
-	// `var pos1a = 4, delim1; var v1 = "aa^bb^cc"_var.substr2(pos1a, delim1); // "bb", pos1a -> 7, delim -> 2 (FM)
+	// `var pos1a = 4, delim1;
+	//  let v1 = "aa^bb^cc"_var.substr2(pos1a, delim1); // "bb", pos1a -> 7, delim -> 2 (FM)
 	//  // or
-	//  var pos1b = 4, delim2; var v2 = subtr2("aa^bb^cc"_var, delim2);`
+	//  var pos1b = 4, delim2;
+	//  let v2 = substr2("aa^bb^cc"_var, pos1b, delim2);`
 	   var  substr2(io pos1, out delimiterno) const;
 
 	// Alias of substr version 4
@@ -1092,18 +1094,18 @@ public:
 
 	// Extract one or more consecutive fields given a delimiter char or substr.
 	//
-	// `var v1 = "aa*bb*cc"_var.field("*", 2); // "bb"
+	// `let v1 = "aa*bb*cc"_var.field("*", 2); // "bb"
 	//  // or
-	//  var v2 = field("aa*bb*cc", "*", 2);`
+	//  let v2 = field("aa*bb*cc", "*", 2);`
 	ND var  field(SV strx, const int fieldnx = 1, const int nfieldsx = 1) const;
 
 	// field2 is a version that treats fieldn -1 as the last field, -2 the penultimate field etc. -
 	// TODO Should probably make field() do this (since -1 is basically an erroneous call) and remove field2
 	// Same as var.field() but negative fieldnos work backwards from the last field.
 	//
-	// `var v1 = "aa*bb*cc"_var.field2("*", -1); // "cc"
+	// `let v1 = "aa*bb*cc"_var.field2("*", -1); // "cc"
 	//  // or
-	//  var v2 = field2("aa*bb*cc", "*", -1);`
+	//  let v2 = field2("aa*bb*cc", "*", -1);`
 	ND var  field2(SV separator, const int fieldno, const int nfields = 1) const
 	{
 		if (fieldno >= 0) LIKELY
@@ -1121,9 +1123,9 @@ public:
 	// Throws a runtime error VarNotImplemented if convstr is invalid
 	// See [[#ICONV/OCONV PATTERNS]]
 	//
-	// `var v1 = var(30123).oconv("D/E"); // "21/06/2050"
+	// `let v1 = var(30123).oconv("D/E"); // "21/06/2050"
 	//  // or
-	//  var v2 = oconv(30123, "D/E");`
+	//  let v2 = oconv(30123, "D/E");`
 	ND var  oconv(const char* convstr) const;
 
 	// Converts external data to internal format according to a given conversion code or pattern
@@ -1131,9 +1133,9 @@ public:
 	// Throws a runtime error VarNotImplemented if convstr is invalid
 	// See [[#ICONV/OCONV PATTERNS]]
 	//
-	// `var v1 = "21 JUN 2050"_var.iconv("D/E"); // 30123
+	// `let v1 = "21 JUN 2050"_var.iconv("D/E"); // 30123
 	//  // or
-	//  var v2 = iconv("21 JUN 2050", "D/E");`
+	//  let v2 = iconv("21 JUN 2050", "D/E");`
 	ND var  iconv(const char* convstr) const;
 
 #ifdef EXO_FORMAT
@@ -1186,8 +1188,8 @@ public:
 	// vars can be formatted either with C++ format codes e.g. {:_>8.2f}
 	// or with exodus oconv codes e.g. {::MD20P|R(_)#8} as in the below example.
 	//
-	// `var v1 = var(12.345).format("'{:_>8.2f}'"); // "'___12.35'"
-	//  var v2 = var(12.345).format("'{::MD20P|R(_)#8}'");
+	// `let v1 = var(12.345).format("'{:_>8.2f}'"); // "'___12.35'"
+	//  let v2 = var(12.345).format("'{::MD20P|R(_)#8}'");
 	//  // or
 	//  var v3 = format("'{:_>8.2f}'", var(12.345)); // "'___12.35'"
 	//  var v4 = format("'{::MD20P|R(_)#8}'", var(12.345));`
@@ -1201,29 +1203,29 @@ public:
 
 #endif //EXO_FORMAT
 
-	// obj is str
+	//  obj is strvar
 
 	// Converts from codepage encoded text to UTF-8 encoded text
 	// e.g. Codepage "CP1124" (Ukrainian).
 	// Use Linux command "iconv -l" for complete list of code pages and encodings.
 	//
-	// `var v1 = "\xa4"_var.from_codepage("CP1124"); // "Є"
+	// `let v1 = "\xa4"_var.from_codepage("CP1124"); // "Є"
 	//  // or
-	//  var v2 = from_codepage("\xa4", "CP1124");
+	//  let v2 = from_codepage("\xa4", "CP1124");
 	//  // U+0404 Cyrillic Capital Letter Ukrainian Ie Unicode Character`
 	ND var  from_codepage(const char* codepage) const;
 
 	// Converts to codepage encoded text from UTF-8 encoded text
 	//
-	// `var v1 = "Є"_var.to_codepage("CP1124").oconv("HEX"); // "A4"
+	// `let v1 = "Є"_var.to_codepage("CP1124").oconv("HEX"); // "A4"
 	//  // or
-	//  var v2 = to_codepage("Є", "CP1124").oconv("HEX");`
+	//  let v2 = to_codepage("Є", "CP1124").oconv("HEX");`
 	ND var  to_codepage(const char* codepage) const;
 
 	///// BASIC DYNAMIC ARRAY FUNCTIONS:
 	///////////////////////////////////
 
-	// obj is str
+	//  obj is strvar
 
 	// EXTRACT() AND F()
 
@@ -1238,14 +1240,14 @@ public:
 	// The convenient PICK OS angle bracket syntax for field extraction (e.g. xxx<20>) is not available in C++.
 	// The abbreviated exodus field extraction function (e.g. xxx.f(20)) is provided instead since field access is extremely heavily used in source code.
 	//
-	// `var v1 = "f1^f2v1]f2v2]f2v3^f2"_var;
-	//  var v2 = v1.f(2, 2); // "f2v2"`
+	// `let v1 = "f1^f2v1]f2v2]f2v3^f2"_var;
+	//  let v2 = v1.f(2, 2); // "f2v2"`
 	ND var  f(const int fieldno, const int valueno = 0, const int subvalueno = 0)            const;
 
 	// Extract a specific field, value or subvalue from a dynamic array.
 	//
-	// `var v1 = "f1^f2v1]f2v2]f2v3^f2"_var;
-	//  var v2 = v1.extract(2, 2); // "f2v2"
+	// `let v1 = "f1^f2v1]f2v2]f2v3^f2"_var;
+	//  let v2 = v1.extract(2, 2); // "f2v2"
 	//  //
 	//  // The alias "f" is normally used instead for brevity
 	//  var v3 = v1.f(2, 2);`
@@ -1301,38 +1303,38 @@ public:
 	///// DYNAMIC ARRAY FILTERS:
 	///////////////////////////
 
-	// obj is str
+	//  obj is strvar
 
 	// Sum up multiple values into one higher level
 	//
-	// `var v1 = "1]2]3^4]5]6"_var.sum(); // "6^15"
+	// `let v1 = "1]2]3^4]5]6"_var.sum(); // "6^15"
 	//  // or
-	//  var v2 = sum("1]2]3^4]5]6"_var);`
+	//  let v2 = sum("1]2]3^4]5]6"_var);`
 	ND var  sum() const;
 
 	// Sum up all levels into a single figure
 	//
-	// `var v1 = "1]2]3^4]5]6"_var.sumall(); // "21"
+	// `let v1 = "1]2]3^4]5]6"_var.sumall(); // "21"
 	//  // or
-	//  var v2 = sumall("1]2]3^4]5]6"_var);`
+	//  let v2 = sumall("1]2]3^4]5]6"_var);`
 	ND var  sumall() const;
 
 	// Ditto allowing commas etc.
 	//
-	// `var v1 = "10,20,33"_var.sum(","); // "60"
+	// `let v1 = "10,20,33"_var.sum(","); // "60"
 	//  // or
-	//  var v2 = sum("10,20,33");`
+	//  let v2 = sum("10,20,33");`
 	ND var  sum(SV sepchar) const;
 
 	// Binary ops (+, -, *, /) in parallel on multiple values
 	//
-	// `var v1 = "10]20]30"_var.mv("+","2]3]4"); // "12]23]34"`
+	// `let v1 = "10]20]30"_var.mv("+","2]3]4"); // "12]23]34"`
 	ND var  mv(const char* opcode, in var2) const;
 
 	///// DYNAMIC ARRAY MUTATORS Standalone commands:
 	////////////////////////////
 
-	// obj is str
+	//  obj is strvar
 
 	// Mutable versions update lvalue vars and dont return anything so that they cannot be chained. This is to prevent accidental misuse and bugs.
 	//
@@ -1374,7 +1376,7 @@ public:
 	//
 	// `var v1 = "f1^v1]v2}s2}s3^f3"_var;
 	//  v1.inserter(2, 2, "X"); // v1 -> "f1^v1]X]v2}s2}s3^f3"
-	// or
+	//  // or
 	//  inserter(v1, 2, 2, "X");`
 	   IO   inserter(const int fieldno, const int valueno, in insertion) REF {this->inserter(fieldno, valueno, 0, insertion); return THIS;}
 
@@ -1400,28 +1402,28 @@ public:
 	///// DYNAMIC ARRAY SEARCH:
 	//////////////////////////
 
-	// obj is str
+	//  obj is strvar
 
 	// LOCATE
 
 	// locate() with only the target substr argument provided searches unordered values separated by VM chars.
-	// Returns true if found and false if not.
-	//
+	// <em>Returns:</em> True if found and false if not.
 	// `if ("UK]US]UA"_var.locate("US")) ... // true
-	//  if locate("US", "UK]US]UA"_var) ...`
+	//  // or
+	//  if (locate("US", "UK]US]UA"_var)) ...`
 	ND bool locate(in target) const;
 
 	// locate() with only the target substr and valueno arguments provided searches unordered values separated by VM chars.
-	// Returns true if found and with the value number in valueno.
-	// Returns false if not found and with the max value number + 1 in setting. Suitable for additiom of new values
+	// <em>Returns:</em> True if found and with the value number in valueno.
+	// <em>Returns:</em> False if not found and with the max value number + 1 in setting. Suitable for additiom of new values
 	//
 	// `var valueno;
 	//  if ("UK]US]UA"_var.locate("US", valueno)) ... // returns true and valueno = 2`
 	ND bool locate(in target, out valueno) const;
 
 	// locate() the target in unordered fields if fieldno is 0, or values if a fieldno is specified, or subvalues if the valueno argument is provided.
-	// Returns true if found and with the field, value or subvalue number in setting.
-	// Returns false if not found and with the max field, value or subvalue number found + 1 in setting. Suitable for replacement of new fields, values or subvalues.
+	// <em>Returns:</em> True if found and with the field, value or subvalue number in setting.
+	// <em>Returns:</em> False if not found and with the max field, value or subvalue number found + 1 in setting. Suitable for replacement of new fields, values or subvalues.
 	//
 	// `var setting;
 	//  if ("f1^f2v1]f2v2]s1}s2}s3}s4^f3^f4"_var.locate("s4", setting, 2, 3)) ... // returns true and setting = 4`
@@ -1434,7 +1436,7 @@ public:
 	// Left is used to indicate alphabetic order where 10 < 2.
 	// Right is used to indicate numeric order where 10 > 2.
 	// Data must be in the correct order for searching to work properly.
-	// Returns true if found.
+	// <em>Returns:</em> True if found.
 	// In case the target is not exactly found then the correct value no for inserting the target is returned in setting.
 	//
 	// `var valueno; if ("aaa]bbb]ccc"_var.locateby("AL", "bb", valueno)) ... // returns false and valueno = 2 where it could be correctly inserted.`
@@ -1449,12 +1451,12 @@ public:
 	// LOCATE USING
 
 	// locate() a target substr in the whole unordered string using a given delimiter char returning true if found.
-	// if (`"AB,EF,CD"_var.locateusing(",", "EF")) ... // true
+	// `if ("AB,EF,CD"_var.locateusing(",", "EF")) ... // true`
 	ND bool locateusing(const char* usingchar, in target) const;
 
 	// locate() the target in a specific field, value or subvalue using a specified delimiter and unordered data
-	// Returns true If found and returns in setting the number of the delimited field found.
-	// Returns false if not found and returns in setting the maximum number of delimited fields + 1 if not found.
+	// <em>Returns:</em> True If found and returns in setting the number of the delimited field found.
+	// <em>Returns:</em> False if not found and returns in setting the maximum number of delimited fields + 1 if not found.
 	// This is similar to the main locate command but the delimiter char can be specified e.g. a comma or TM etc.
 	//
 	// `var setting;
@@ -1464,7 +1466,7 @@ public:
 	// LOCATE BY, USING
 
 	// locatebyusing() supports all the above features in a single function.
-	// Returns true if found.
+	// <em>Returns:</em> True if found.
 	ND bool locatebyusing(const char* ordercode, const char* usingchar, in target, out setting, const int fieldno = 0, const int valueno = 0, const int subvalueno = 0) const;
 
 	///// DATABASE ACCESS:
@@ -1478,13 +1480,14 @@ public:
 	// 2. Any environment variables EXO_HOST EXO_PORT EXO_USER EXO_DATA EXO_PASS EXO_TIME
 	// 3. Any parameters found in a configuration file at ~/.config/exodus/exodus.cfg
 	// 4. The default conninfo is "host=127.0.0.1 port=5432 dbname=exodus user=exodus password=somesillysecret connect_timeout=10"
+	// Setting environment variable EXO_DBTRACE=1 will cause tracing of db interface including SQL commands.
 	//
-	// `var db="mydb";
-	//  if (not db.connect("user=exodus password=somesillysecret")) abort(lasterror());
-	//  db.version().outputl();
+	// `let conninfo = "dbname=exodus user=exodus password=somesillysecret";
+	//  var db;
+	//  if (not db.connect(conninfo)) abort(lasterror());
 	//  db.disconnect();
 	//  // or
-	//  if (not connect("mydb")) ...
+	//  if (not connect("exodus")) ...
 	//  // or
 	//  if (not connect()) ...
 	//  disconnect();
@@ -1509,8 +1512,10 @@ public:
 	// It is not necessary to attach files before opening them. Attach is meant to control the defaults.
 	// For the remainder of the session, opening the file by name without specifying a connection will automatically use the specified connection applies during the attach command.
 	// If conn is not specified then filename will be attached to the default connection.
+	// Multiple file names must be separated by FM
 	//
-	// `if (not conn.attach(filenames)) ...
+	// `let filenames = "definitions^dict.definitions"_var;
+	//  if (not conn.attach(filenames)) ...
 	//  // or
 	//  if (not attach(filenames)) ...`
 	ND bool attach(in filenames);
@@ -1548,16 +1553,18 @@ public:
 
 	// Execute an sql command.
 	//
-	// `if (not conn.sqlexec()) ...
+	// `var sqlcmd = "select 2 + 2;", response;
+	//  if (not conn.sqlexec("select 2 + 2;")) ... // True
 	//  // or
-	//  if (not sqlexec()) ...`
+	//  if (not sqlexec(sqlcmd)) ...`
 	ND bool sqlexec(in sqlcmd) const;
 
 	// Execute an SQL command and capture the response.
 	//
-	// `if (not conn.sqlexec()) ...
+	// `var sqlcmd = "select 2 + 2;", response;
+	//  if (not conn.sqlexec(sqlcmd, response)) ... // True and response = 4
 	//  // or
-	//  if (not sqlexec()) ...`
+	//  if (not sqlexec(sqlcmd, response)) ...`
 	ND bool sqlexec(in sqlcmd, io response) const;
 
 	// Get the last os or db error message.
@@ -1580,9 +1587,9 @@ public:
 
 	// Return a list of available databases on a particular connection.
 	//
-	// `var v1 = conn.dblist();
+	// `let v1 = conn.dblist();
 	//  // or
-	//  var v2 = dblist();`
+	//  let v2 = dblist();`
 	ND var  dblist() const;
 
 	// Create a named database from an existing database.
@@ -1636,11 +1643,12 @@ public:
 	//  if (not listfiles()) ...`
 	ND var  listfiles() const;
 
-	// obj is conn|file
+	// obj is conn_or_file
 
-	// Returns the approx. number of records in a file
+	// <em>Returns:</em> The approx. number of records in a file
 	//
-	// `var nrecs1 = file.reccount();
+	// `let file = "definitions";
+	//  var nrecs1 = file.reccount();
 	//  // or
 	//  var nrecs2 = reccount("myfile");`
 	ND var  reccount(in filename = "") const;
@@ -1656,7 +1664,7 @@ public:
 
 	// Opens database file to a var which can be used in subsequent functions to work on the specified file and database connection.
 	//
-	// `var file;
+	// `var file, filename = "definitions";
 	//  if (not file.open(filename)) ...
 	//  // or
 	//  if (not open(filename to file)) ...`
@@ -1668,34 +1676,36 @@ public:
 	// `file.close();
 	//  // or
 	//  close(file);`
-	   void close();
+	   void close() const;
 
-	// Creates a secondary index for a field name and file.
+	// Creates a secondary index for a given file and field name.
 	// The fieldname must exist in a dictionary file. The default dictionary is "dict." ^ filename.
-	// Returns false if the index cannot be created for any reason.
+	// <em>Returns:</em> False if the index cannot be created for any reason.
 	// * Index already exists
 	// * File does not exist
 	// * The dictionary file does not have a record with a key of the given field name.
 	// * The dictionary file does not exist. Default is "dict." ^ filename.
 	// * The dictionary field defines a calculated field that uses an exodus function. Using a psql function is OK.
 	//
-	// `if (not file.createindex(fieldname)) ...
+	// `var filename = "definitions", fieldname;
+	//  if (not file.createindex(fieldname)) ...
 	//  // or
 	//  if (not createindex(filename, fieldname)) ...`
 	ND bool createindex(in fieldname, in dictfile = "") const;
 
-	// Deletes a secondary index for a field name and file
-	// Returns false if the index cannot be deleted for any reason
+	// Deletes a secondary index for a file and field name.
+	// <em>Returns:</em> False if the index cannot be deleted for any reason
 	// * File does not exist
 	// * Index does not already exists
 	//
-	// `if (not file.deleteindex(fieldname)) ...
+	// `var file = "definitions", fieldname = "some_name";
+	//  if (not file.deleteindex(fieldname)) ...
 	//  // or
 	//  if (not deleteindex(file, fieldname)) ...`
 	ND bool deleteindex(in fieldname) const;
 
 	// Lists secondary indexes in a database or file
-	// Returns false if the file or fieldname are given and do not exist
+	// <em>Returns:</em> False if the file or fieldname are given and do not exist
 	// obj is file|conn
 	//
 	// `if (not conn.listindex()) ...
@@ -1709,14 +1719,15 @@ public:
 	// If another connection attempts to place an identical lock on the same database it will be denied.
 	// Locks can be removed by unlock() or unlockall() or will be automatically removed at the end of a transaction or when the connection is closed.
 	// If the same process attempts to place an identical lock more than once it may be denied (if not in a transaction) or succeed but be ignored (if in a transaction).
-	// Locks can be used to avoid processing a transaction simultaneously with another connection only to have one of them failing due to mutually updating the same records.
-	// Returns:
+	// Locks can be used to avoid processing a transaction simultaneously with another connection only to have one of them fail due to mutually updating the same records.
+	// <em>Returns:</em>:
 	// * 0: Failure: Another connection has already placed the same lock.
 	// * "" Failure: The lock has already been placed.
 	// * 1: Success: A new lock has been placed.
 	// * 2: Success: The lock has already been placed and the connection is in a transaction.
 	//
-	// `if (not file.lock(key)) ...
+	// `var file = "definitions", key = "1000";
+	//  if (not file.lock(key)) ...
 	//  // or
 	//  if (not lock(file, key)) ...`
 	ND var  lock(in key) const;
@@ -1724,9 +1735,10 @@ public:
 	// Removes a lock placed by the lock function.
 	// Only locks placed on the specified connection can be removed.
 	// Locks cannot be removed while a connection is in a transaction.
-	// Returns false if the lock is not present in a connection.
+	// <em>Returns:</em> False if the lock is not present in a connection.
 	//
-	// `if (not file.unlock(key)) ...
+	// `var file = "definitions", key = "1000";
+	//  if (not file.unlock(key)) ...
 	//  // or
 	//  if (not unlock(file, key)) ...`
 	   bool unlock(in key) const;
@@ -1742,9 +1754,9 @@ public:
 	// obj is rec
 
 	// Reads a record from a file given its unique primary key.
-	// Returns false if the key doesnt exist
+	// <em>Returns:</em> False if the key doesnt exist
 	//
-	// `var rec;
+	// `var rec, file = "definitions", key = "1000";
 	//  if (not rec.read(file, key)) ...
 	//  // or
 	//  if (not read(rec from file, key)) ...`
@@ -1755,44 +1767,48 @@ public:
 	// It always succeeds so no result code is returned.
 	// Any memory cached record is deleted.
 	//
+	// `var rec = "f1^f2^f3"_var, file = "definitions", key = "1000";
 	// `rec.write(file, key);
 	//  // or
 	//  write(rec on file, key);`
 	   void write(in file, in key) const;
 
 	// Updates an existing record in a file.
-	// Returns false if the key doesnt already exist
+	// <em>Returns:</em> False if the key doesnt already exist
 	// Any memory cached record is deleted.
 	//
-	// `if (not rec.updaterecord(file, key)) ...
+	// `var rec = "f1^f2^f3"_var, file = "definitions", key = "1000";
+	//  if (not rec.updaterecord(file, key)) ...
 	//  // or
 	//  if (not updaterecord(rec on file, key)) ...`
 	ND bool updaterecord(in file, in key) const;
 
 	// Inserts a new record in a file.
-	// Returns false if the key already exists
+	// <em>Returns:</em> False if the key already exists
 	// Any memory cached record is deleted.
 	//
-	// `if (not rec.insertrecord(file, key)) ...
+	// `var rec = "f1^f2^f3"_var, file = "definitions", key = "1000";
+	//  if (not rec.insertrecord(file, key)) ...
 	//  // or
 	//  if (not insertrecord(rec on file, key)) ...`
 	ND bool insertrecord(in file, in key) const;
 
 	// Deletes a record from a file given its key.
-	// Returns false if the key doesnt exist
+	// <em>Returns:</em> False if the key doesnt exist
 	// Any memory cached record is deleted.
 	// obj is file
 	//
-	// `if (not file.deleterecord(key)) ...
+	// `var file = "definitions", key = "1000";
+	//  if (not file.deleterecord(key)) ...
 	//  // or
 	// if (not deleterecord(file, key)) ...`
 	   bool deleterecord(in key) const;
 
-	// obj is str
+	//  obj is strvar
 
 	// Same as read() but only returns a specific field no from the record
 	//
-	// `var field;
+	// `var field, file = "definitions", key = "1000", fieldno = 3;
 	//  if (not field.readf(file, key, fieldno)) ...
 	//  // or
 	//  if (not readf(field from file, key, fieldno)) ...`
@@ -1800,9 +1816,10 @@ public:
 
 	// Same as write() but only writes a specific field no to the record
 	//
-	// `field.writef(file, key, fieldno);
+	// `var field = "f3", file = "definitions", key = "1000", fieldno = 3;
+	//  field.writef(file, key, fieldno);
 	//  // or
-	//  write(field on file, key, fieldno);`
+	//  writef(field on file, key, fieldno);`
 	   void writef(in file, in key, const int fieldno) const;
 
 	// obj is rec
@@ -1813,7 +1830,7 @@ public:
 	// 3. Writes the record and key to the memory cache and returns true.
 	// Cached db file data lives in exodus process memory not the database.
 	//
-	// `var rec;
+	// `var rec, file = "definitions", key = "1000";
 	//  if (not rec.readc(file, key)) ...
 	//  // or
 	//  if (not readc(rec from file, key)) ...`
@@ -1824,7 +1841,8 @@ public:
 	// It either updates an existing record if the key already exists or otherwise inserts a new record.
 	// It always succeeds so no result code is returned.
 	//
-	// `rec.writec(file, key);
+	// `var rec = "f1^f2^f3"_var, file = "definitions", key = "1000";
+	//  rec.writec(file, key);
 	//  // or
 	//  writec(rec on file, key);`
 	   void writec(in file, in key) const;
@@ -1833,9 +1851,10 @@ public:
 
 	// Deletes a record and key from a memory cached "file".
 	// The actual file is NOT updated.
-	// Returns false if the key doesnt exist
+	// <em>Returns:</em> False if the key doesnt exist
 	//
-	// `if (not file.deletec(key)) ...
+	// `var file = "definitions", key = "1000";
+	//  if (not file.deletec(key)) ...
 	//  // or
 	//  if (not deletec(file, key)) ...`
 	   bool deletec(in key) const;
@@ -1850,7 +1869,7 @@ public:
 	// cleardbcache(conn);`
 	   void cleardbcache() const;
 
-	// obj is str
+	//  obj is strvar
 
 	// The xlate ("translate") function is similar to readf() but, when called as an exodus program member function, it can be used efficiently with exodus file dictionaries using column names and functions and multivalued data.
 	// ''Arguments:''
@@ -1866,9 +1885,9 @@ public:
 	// * "C" returns the key unconverted.
 	//
 	// `var partno = "A1000-1";
-	//  var partname = partno.xlate("PARTS", 3, "X");
+	//  var partname1 = partno.xlate("PARTS", 3, "X");
 	//  // or
-	//  var partname = xlate(partno, "PARTS", "PART_NAME", "X");`
+	//  var partname2 = xlate(partno, "PARTS", "PART_NAME", "X");`
 	ND var  xlate(in filename, in fieldno, const char* mode) const;
 
 	///// DATABASE SORT/SELECT:
@@ -1921,14 +1940,15 @@ public:
 	//
 	// `var now1 = var().timestamp(); // was 20821.99998842593 around 2025-01-01 23:59:59 UTC
 	//  // or
-	//  var now2 = ostimestamp();`
+	//  var now2 = timestamp();`
 	ND var  timestamp() const;
 
 	// Construct a timestamp from a date and time
 	//
-	// `var ts1 = var().timestamp(iconv("2025-01-01", "D"), iconv("23:59:59", "MT")); // 20821.99998842593
+	// `var idate = iconv("2025-01-01", "D"), itime = iconv("23:59:59", "MT");
+	//  var ts1 = idate.timestamp(itime); // 20821.99998842593
 	//  // or
-	// var ts2 = timestamp(somedate, sometime);`
+	// var ts2 = timestamp(idate, itime);`
 	ND var  timestamp(in ostime) const;
 
 	// Sleep/pause/wait for a number of milliseconds
@@ -1944,9 +1964,9 @@ public:
 	// Multiple events are returned in multivalues.
 	// obj is file_dir_list
 	//
-	// `var v1 = ".^/etc/hosts"_var.oswait(3000); // e.g. "IN_CLOSE_WRITE^/etc^hosts^f"_var
+	// `let v1 = ".^/etc/hosts"_var.oswait(3000); // e.g. "IN_CLOSE_WRITE^/etc^hosts^f"_var
 	//  // or
-	//  var v2 = oswait(".^/etc/hosts"_var, 3000);`
+	//  let v2 = oswait(".^/etc/hosts"_var, 3000);`
 	//
 	// Returned array fields
 	// 1. Event type codes
@@ -1977,13 +1997,13 @@ public:
 	// Given the name of an existing file name including path, initialises a file handle var that can be used in random access osbread and osbwrite functions.
 	// The utf8 option defaults to true which causes trimming of partial utf-8 unicode byte sequences from the end of osbreads. For raw untrimmed osbreads pass utf8 = false;
 	// File will be opened for writing if possible otherwise for reading.
-	// Returns true if successful or false if not possible for any reason.
+	// <em>Returns:</em> True if successful or false if not possible for any reason.
 	// e.g. Target doesnt exist, permissions etc.
 	//
 	// `var hostsfile;
-	//  if (not hostsfile.osopen("/etc/hosts") ...
+	//  if (not hostsfile.osopen("/etc/hosts")) ...
 	//  // or
-	//  if (not osopen("/etc/hosts" to hostsfile) ...`
+	//  if (not osopen("/etc/hosts" to hostsfile)) ...`
 	ND bool osopen(in osfilename, const bool utf8 = true) const;
 
 	// Reads length bytes from an existing os file starting at a given byte offset (0 based).
@@ -1992,9 +2012,9 @@ public:
 	// If reading utf8 data (the default) then the length of data actually returned may be a few bytes shorter than requested in order to be a complete number of UTF-8 code points.
 	//
 	// `var text, hostsfile = "/etc/hosts", offset = 0;
-	//  if (not text.osbread(hostsfile, offset, 1024) ...
+	//  if (not text.osbread(hostsfile, offset, 1024)) ...
 	//  // or
-	//  if (not osbread(text from hostsfile, offset, 1024) ...`
+	//  if (not osbread(text from hostsfile, offset, 1024)) ...`
 	ND bool osbread(in osfilevar, io offset, const int length);
 
 	// Writes data to an existing os file starting at a given byte offset (0 based).
@@ -2004,7 +2024,7 @@ public:
 	//  var offset = osfile(xyzfile).f(1); // size of file -> append
 	//  if (not text.osbwrite(xyzfile, offset)) abort(lasterror());
 	//  // or
-	//  if (not osbwrite(text on xyzfile, offset) ...`
+	//  if (not osbwrite(text on xyzfile, offset)) ...`
 	ND bool osbwrite(in osfilevar, io offset) const;
 
 	// Removes an osfilevar handle from the internal memory cache of os file handles. This frees up both exodus process memory and operating system resources.
@@ -2015,11 +2035,11 @@ public:
 	//  osclose(osfilevar);`
 	   void osclose() const;
 
-	// obj is str
+	//  obj is strvar
 
 	// Read a complete os file into a var.
 	// If codepage is specified then input is converted from that codepage to utf-8 otherwise no conversion is done.
-	// Returns true if successful or false if not possible for any reason.
+	// <em>Returns:</em> True if successful or false if not possible for any reason.
 	// e.g. File doesnt exist, permissions etc.
 	//
 	// `var text;
@@ -2030,7 +2050,7 @@ public:
 
 	// Create a complete os file from a var.
 	// Any existing file is removed first.
-	// Returns true if successful or false if not possible for any reason.
+	// <em>Returns:</em> True if successful or false if not possible for any reason.
 	// e.g. Path is not writeable, permissions etc.
 	// If codepage is specified then output is converted from utf-8 to that codepage. Otherwise no conversion is done.
 	//
@@ -2046,12 +2066,12 @@ public:
 
 	// Removes/deletes an os file from the OS file system given path and name.
 	// Will not remove directories. Use osrmdir() to remove directories
-	// Returns true if successful or false if not possible for any reason.
+	// <em>Returns:</em> True if successful or false if not possible for any reason.
 	// e.g. Target doesnt exist, path is not writeable, permissions etc.
 	//
-	// `if (not "../xyz.conf"_var.osfilevar.osremove()) abort(lasterror());
+	// `if (not "../xyz.conf"_var.osremove()) abort(lasterror());
 	//  // or
-	//  if (not osremove("../xyz.conf") ...`
+	//  if (not osremove("../xyz.conf")) ...`
 	ND bool osremove() const;
 
 	// obj is osfileordirname
@@ -2059,32 +2079,32 @@ public:
 	// Renames an os file or dir in the OS file system.
 	// Will not overwrite an existing file or dir.
 	// Source and target must exist in the same storage device.
-	// Returns true if successful or false if not possible for any reason.
+	// <em>Returns:</em> True if successful or false if not possible for any reason.
 	// e.g. Target already exists, path is not writeable, permissions etc.
 	// Uses std::filesystem::rename internally.
 	//
-	// `if (not "../xyz.conf"_var.osfilevar.osrename("../abc.conf")) abort(lasterror());
+	// `if (not "../xyz.conf"_var.osrename("../abc.conf")) abort(lasterror());
 	//  // or
-	//  if (not osrename("../xyz.conf", "../abc.conf") ...`
+	//  if (not osrename("../xyz.conf", "../abc.conf")) ...`
 	ND bool osrename(in new_dirpath_or_filepath) const;
 
 	// Copies a file or directory recursively within the file system.
 	// Uses std::filesystem::copy internally with recursive and overwrite options
 	//
-	// `if (not "../xyz.conf"_var.osfilevar.oscopy("../abc.conf")) abort(lasterror());
+	// `if (not "../xyz.conf"_var.oscopy("../abc.conf")) abort(lasterror());
 	//  // or
-	//  if (not oscopy("../xyz.conf", "../abc.conf") ...`
+	//  if (not oscopy("../xyz.conf", "../abc.conf")) ...`
 	ND bool oscopy(in to_osfilename) const;
 
 	// "Moves" a file or dir within the os file system.
 	// Will not overwrite an existing file or dir.
-	// Returns true if successful or false if not possible for any reason.
+	// <em>Returns:</em> True if successful or false if not possible for any reason.
 	// e.g. Source doesnt exist or cannot be accessed, target already exists, source or target is not writeable, permissions etc.
 	// Attempts osrename first then oscopy followed by osremove original.
 	//
-	// `if (not "../xyz.conf"_var.osfilevar.osmove("../abc.conf")) abort(lasterror());
+	// `if (not "../xyz.conf"_var.osmove("../abc.conf")) abort(lasterror());
 	//  // or
-	//  if (not osmove("../xyz.conf", "../abc.conf") ...`
+	//  if (not osmove("../xyz.conf", "../abc.conf")) ...`
 	ND bool osmove(in to_osfilename) const;
 
 	///// OS DIRECTORIES:
@@ -2094,12 +2114,12 @@ public:
 
 	// obj is dirpath
 
-	// Returns a FM delimited string containing all matching dir entries given a dir path
+	// <em>Returns:</em> A FM delimited string containing all matching dir entries given a dir path
 	// A glob pattern (e.g. *.conf) can be appended to the path or passed as argument.
 	//
 	// `var entries1 = "/etc/"_var.oslist("*.cfg"); // "adduser.conf^ca-certificates.conf^ ..."
 	//  // or
-	//  var entries2 = oslist("/etc/" "*.conf";`
+	//  var entries2 = oslist("/etc/" "*.conf");`
 	ND var  oslist(SV globpattern = "", const int mode = 0) const;
 
 	// Same as oslist for files only
@@ -2158,7 +2178,7 @@ public:
 
 	// obj is var()
 
-	// Returns the current working directory
+	// <em>Returns:</em> The current working directory
 	//
 	// `var cwd1 = var().oscwd(); // "/home/exodus"
 	//  // or
@@ -2176,7 +2196,7 @@ public:
 	//////////////////////////
 
 	// Execute a shell command
-	// Returns true if the process terminates with error status 0 and false otherwise.
+	// <em>Returns:</em> True if the process terminates with error status 0 and false otherwise.
 	//
 	// `let cmd = "ls -l xyz";
 	//  if (not cmd.osshell()) ...
@@ -2206,9 +2226,9 @@ public:
 
 	// Get the path of the tmp dir
 	//
-	// `var v1 = var().ostempdirpath(); // "/tmp/"
+	// `let v1 = var().ostempdirpath(); // "/tmp/"
 	//  // or
-	//  var v1 = ostempdirpath();`
+	//  let v2 = ostempdirpath();`
 	// obj is var()
 	ND var  ostempdirpath() const;
 
@@ -2232,7 +2252,8 @@ public:
 
 	// Set the value of an environment variable code
 	//
-	// `envvalue.ossetenv(envcode);
+	// `var envvalue, envcode = "HOME";
+	//  envvalue.ossetenv(envcode);
 	//  // or
 	//  ossetenv(envcode, envvalue);`
 	// obj is envvalue
@@ -2244,21 +2265,21 @@ public:
 
 	// Get the os process id
 	//
-	// `let pid = var().ospid(); // 663237
+	// `let pid1 = var().ospid(); // 663237
 	//  // or
-	//  let pid = ospid();`
+	//  let pid2 = ospid();`
 	ND var  ospid() const;
 
 	// Get the os thread process id
 	//
-	// `let tid = var().ostid(); // 663237
+	// `let tid1 = var().ostid(); // 663237
 	//  // or
-	//  let tid = ostid();`
+	//  let tid2 = ostid();`
 	ND var  ostid() const;
 
 	// Get the libexodus build date and time
 	//
-	// `var().version(); // "29 JAN 2025 14:56:52"`
+	// `let v1 = var().version(); // "29 JAN 2025 14:56:52"`
 	ND var  version() const;
 
 	///// OUTPUT:

@@ -145,6 +145,7 @@ export namespace exo {
 //	using exo::begintrans;
 //	using exo::breakoff;
 //	using exo::breakon;
+//	using exo::str;
 //	using exo::chr;
 //	using exo::cleardbcache;
 //	using exo::clearfile;
@@ -265,6 +266,8 @@ export namespace exo {
 //	using exo::ostime;
 //	using exo::oswait;
 //	using exo::oswrite;
+//	using exo::cut;
+//	using exo::cutter;
 //	using exo::parser;
 //	using exo::paste;
 //	using exo::paster;

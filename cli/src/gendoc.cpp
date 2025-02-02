@@ -15,6 +15,12 @@ function main() {
 
 		let osfilename0 = osfilename.field2(OSSLASH, -1);
 
+		let codetxt_filename = replace("gendoc.{orig}.cpp", "{orig}", osfilename0);
+		var codetxtfile;
+		var codetxtptr = 0;
+		var new_objs = "";
+		var defined_objs = "";
+
 		// Lines like "///... some text:"
 		rex doc_rex("^(/{3,})\\s+(.*):$");
 
@@ -108,8 +114,10 @@ function main() {
 					// Get default obj name from thrown away comments, not function comments
 					// only match "obj is" at the start of the first line of comment
 					let new_default_objname = lastcomment.match("^obj is ([a-zA-Z_][a-zA-Z0-9_()|]+)").f(1, 2);
-					if (new_default_objname)
+					if (new_default_objname) {
+						new_objs ^= new_default_objname ^ FM;
 						default_objname = new_default_objname;
+					}
 
 					// Throw away collected comments if not contiguous
 					lastcomment = "";
@@ -127,6 +135,7 @@ function main() {
 //			var comment = srcline.field("{", 1).field(";", 2, 9999).trimmerfirst("/ ");
 			var comment = srcline.field("/" "/", 2, 99999).trimfirst();
 			srcline = srcline.field("/" "/", 1).field("{", 1).trimlast();
+//			let funcname = srcline.field("(", 1);
 
 			if (not comment and lastcomment) {
 				lastcomment.popper();
@@ -136,6 +145,14 @@ function main() {
 				comment = lastcomment;
 				lastcomment = "";
 			}
+
+			// Extract obj for specific function if any
+			let objmatch = comment.match("\\bobj is ([a-zA-Z_][a-zA-Z0-9_|]+)");
+			if (objmatch) {
+				comment.replacer("\n" ^ objmatch.f(1, 1), "");
+				new_objs ^= objmatch.f(1, 2).convert("|", FM);
+			}
+			let objname = objmatch.f(1,2);
 
 			// Format backticked source code fragments
 			if (comment.contains("`")) {
@@ -165,15 +182,53 @@ function main() {
 
 				// Wrap backticked code in <pre> </pre> tags
 				static rex backquoted {"`([^`]*)`"};
+
+				var codematches = comment.match(backquoted);
+				for (var codematch : codematches) {
+					codematch = codematch.f(1, 2);
+
+					codematch.replacer(" ...", " {};");
+
+					codematch.replacer("\n", "\n\t\t");
+					codematch.replacer("\n\t\t\n", "\n");
+
+					// Wrap in {}
+					codematch.prefixer("\n\t{\n\t\t");
+					codematch ^= "\n\t}\n";
+					codematch.prefixer("\n\t/" "/" ^ srcline);
+
+					// Global definitions;
+					for (var objname : new_objs) {
+						objname.converter("()", "");
+						if (not objname or objname == "var")
+							continue;
+						if (not locate(objname, defined_objs)) {
+							codematch.prefixer("\n\tvar " ^ objname ^ ";\n");
+							defined_objs ^= objname ^ VM;
+						}
+					}
+					new_objs = "";
+
+					// Start the code output file
+					if (not codetxtptr) {
+						if (not oswrite("" on codetxt_filename))
+							abort(lasterror());
+						if (not osopen(codetxt_filename to codetxtfile))
+							abort(lasterror());
+
+						let progheader = "#include <exodus/program.h>\nprograminit()\n\nfunction main() {\n";
+						if (not osbwrite(progheader on codetxtfile, codetxtptr))
+							abort(lasterror());
+					}
+
+					if (not osbwrite(codematch on codetxtfile, codetxtptr))
+						abort(lasterror());
+				}
+
 				comment.replacer(backquoted, "<syntaxhighlight lang=\"c++\">\n$1</syntaxhighlight>");
 			}
 
 			comment.replacer(_FM, "<br>\n");
-
-			let objmatch = comment.match("\\bobj is ([a-zA-Z_][a-zA-Z0-9_|]+)");
-			if (objmatch)
-				comment.replacer("\n" ^ objmatch.f(1, 1), "");
-			let objname = objmatch.f(1,2);
 
 			var line2 = srcline.field(";", 1);
 			line2.replacer("\\bstd::size_t\\b", "");
@@ -225,6 +280,14 @@ function main() {
 		// Close prior table
 		if (in_table)
 			printl("|}:");
+
+		// Close the output source capture program
+		if (codetxtptr) {
+			let progfooter = "\n\n\treturn 0;\n}\n\nprogramexit()\n";
+			if (not osbwrite(progfooter on codetxtfile, codetxtptr))
+				abort(lasterror());
+			osclose(codetxtfile);
+		}
 
 	} // osfilename
 

@@ -198,7 +198,7 @@ var  var::ostime() const {
 
 }
 
-// -> decimal fractional days since pick epoch 1967-12-31 00:00:00 (up to micro or nano second accuracy)
+// Returns decimal fractional days since pick epoch 1967-12-31 00:00:00 (up to micro or nano second accuracy)
 var  var::timestamp() const {
 
 	var datenow = this->date();

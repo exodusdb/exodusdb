@@ -53,8 +53,6 @@ export namespace exo {
 	using exo::date;
 	using exo::time;
 	using exo::ostime;
-	using exo::timestamp;
-	using exo::timestamp;
 	using exo::ossleep;
 	using exo::oswait;
 	using exo::osopen;
@@ -178,6 +176,9 @@ export namespace exo {
 	using exo::last;
 	using exo::first;
 	using exo::last;
+	using exo::cut;
+	using exo::str;
+	using exo::hash;
 	using exo::chr;
 	using exo::textchr;
 	using exo::match;
@@ -192,7 +193,7 @@ export namespace exo {
 	using exo::substrer;
 	using exo::substrer;
 	using exo::starts;
-	using exo::end;
+	using exo::ends;
 	using exo::contains;
 	using exo::index;
 	using exo::indexn;
@@ -237,11 +238,13 @@ export namespace exo {
 	using exo::reverser;
 	using exo::shuffle;
 	using exo::shuffler;
-	using exo::parser;
+	using exo::parse;
 	using exo::parser;
 	using exo::connect;
 	using exo::disconnect;
 	using exo::disconnectall;
+	using exo::sqlexec;
+	using exo::attach;
 	using exo::dbcreate;
 	using exo::dblist;
 	using exo::dbcopy;
@@ -264,12 +267,13 @@ export namespace exo {
 	using exo::unlock;
 	using exo::unlockall;
 	using exo::open;
-	using exo::open;
+	using exo::close;
 	using exo::read;
 	using exo::readc;
 	using exo::readf;
 	using exo::write;
 	using exo::writec;
+	using exo::deletec;
 	using exo::writef;
 	using exo::updaterecord;
 	using exo::insertrecord;
@@ -411,6 +415,7 @@ export namespace exo {
 	using exo::loglasterror;
 	using exo::lower;
 	using exo::lowerer;
+	using exo::search;
 	using exo::match;
 	using exo::mod;
 	using exo::move;
@@ -451,7 +456,6 @@ export namespace exo {
 	using exo::ostime;
 	using exo::oswait;
 	using exo::oswrite;
-	using exo::parser;
 	using exo::paste;
 	using exo::paster;
 	using exo::pickreplace;
@@ -498,6 +502,7 @@ export namespace exo {
 	using exo::substr;
 	using exo::substrer;
 	using exo::sum;
+	using exo::sumall;
 	using exo::swap;
 	using exo::tan;
 	using exo::tcase;
@@ -510,6 +515,8 @@ export namespace exo {
 	using exo::textwidth;
 	using exo::time;
 	using exo::timestamp;
+	using exo::to_codepage;
+	using exo::from_codepage;
 	using exo::trim;
 	using exo::trimboth;
 	using exo::trimfirst;

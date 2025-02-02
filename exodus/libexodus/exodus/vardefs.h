@@ -99,6 +99,7 @@
 #define DEFAULT_EMPTY = ""
 #define DEFAULT_DOT = "."
 #define DEFAULT_SPACE = " "
+#define DEFAULT_CSPACE = ' '
 #define DEFAULT_VM = VM_
 #define DEFAULT_NULL = nullptr
 

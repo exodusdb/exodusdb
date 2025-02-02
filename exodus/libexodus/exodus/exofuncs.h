@@ -36,13 +36,14 @@ THE SOFTWARE.
 
 #include <exodus/exoimpl.h>
 
+// clang-format off
+
 //#include <exodus/format.h>
 
 // add global function type syntax to the exodus users
 // SIMILAR code in exofuncs.h and varimpl.h
 namespace exo {
 //
-//	// clang-format off
 //
 //#pragma clang diagnostic push
 //#pragma clang diagnostic ignored "-Wexit-time-destructors"
@@ -139,6 +140,8 @@ PUBLIC std::mutex global_mutex_threadstream;
 
 int exodus_main(int exodus_argc, const char* exodus_argv[], ExoEnv& mv, int threadno);
 
+ND var  hash(in instring, const std::uint64_t modulus = 0);
+
 ND var  osgetenv(SV envcode DEFAULT_EMPTY);
 ND bool osgetenv(SV code, io value);
    void ossetenv(SV code, in value);
@@ -216,7 +219,7 @@ ND var  osshellread(in command);
 //var execute(in command);
 
 //void debug(in DEFAULT_EMPTY);
-ND var backtrace(void);
+ND var  backtrace(void);
 
    bool setxlocale(SV locale);
 ND var  getxlocale(void);
@@ -227,43 +230,43 @@ ND var  to_codepage(in instring, const char* codepage);
 // MATH
 
 ND bool isnum(in num1);
-ND var num(in num1);
+ND var  num(in num1);
 
-ND var abs(in num1);
-ND var pwr(in base, in exponent);
-ND var exp(in power);
-ND var sqrt(in num1);
-ND var sin(in degrees);
-ND var cos(in degrees);
-ND var tan(in degrees);
-ND var atan(in degrees);
-ND var loge(in num1);
-ND var mod(in dividend, in divisor);
-ND var mod(in dividend, const double divisor);
-ND var mod(in dividend, const int divisor);
+ND var  abs(in num1);
+ND var  pwr(in base, in exponent);
+ND var  exp(in power);
+ND var  sqrt(in num1);
+ND var  sin(in degrees);
+ND var  cos(in degrees);
+ND var  tan(in degrees);
+ND var  atan(in degrees);
+ND var  loge(in num1);
+ND var  mod(in dividend, in divisor);
+ND var  mod(in dividend, const double divisor);
+ND var  mod(in dividend, const int divisor);
 
 // integer(void) represents pick int(void) because int(void) is reserved word in c/c++
 // Note that integer like pick int(void) is the same as floor(void)
 // whereas the usual c/c++ int(void) simply take the next integer nearest 0 (ie cuts of any fractional
 // decimal places) to get the usual c/c++ effect use toInt(void) (although toInt(void) returns an int
 // instead of a var like normal exodus functions)
-ND var integer(in num1);
-ND var floor(in num1);
-ND var round(in num1, const int ndecimals DEFAULT_0);
+ND var  integer(in num1);
+ND var  floor(in num1);
+ND var  round(in num1, const int ndecimals DEFAULT_0);
 
-ND var rnd(const int number);
+ND var  rnd(const int number);
    void initrnd(in seed DEFAULT_0);
 
 // INPUT
 
-ND var getprompt(void);
+ND var  getprompt(void);
    void setprompt(in prompt);
 
-var input(void);
+   var  input(void);
 
-var input(in prompt);
+   var  input(in prompt);
 
-var inputn(const int nchars);
+   var  inputn(const int nchars);
 
 ND bool isterminal(void);
 ND bool hasinput(const int millisecs DEFAULT_0);
@@ -279,107 +282,112 @@ ND var len(in var1);
 ND var textlen(in var1);
 ND var textwidth(in var1);
 
-ND var convert(in instring, SV fromchars, SV tochars);
-IO converter(io iostring, SV fromchars, SV tochars);
+ND var  convert(in instring, SV fromchars, SV tochars);
+   IO   converter(io iostring, SV fromchars, SV tochars);
 
-ND var textconvert(in instring, SV fromchars, SV tochars);
-IO textconverter(io iostring, SV fromchars, SV tochars);
+ND var  textconvert(in instring, SV fromchars, SV tochars);
+   IO   textconverter(io iostring, SV fromchars, SV tochars);
 
-ND var replace(in instring, SV fromstr, SV tostr);
-IO replacer(io iostring, SV fromstr, SV tostr);
+ND var  replace(in instring, SV fromstr, SV tostr);
+   IO   replacer(io iostring, SV fromstr, SV tostr);
 
-ND var replace(in instring, const rex& regex, SV replacement);
-IO replacer(io iostring, const rex& regex, SV replacement);
+ND var  replace(in instring, const rex& regex, SV replacement);
+   IO   replacer(io iostring, const rex& regex, SV replacement);
 
-ND var ucase(in instring);
-IO ucaser(io iostring);
+ND var  ucase(in instring);
+   IO   ucaser(io iostring);
 
-ND var lcase(in instring);
-IO lcaser(io iostring);
+ND var  lcase(in instring);
+   IO   lcaser(io iostring);
 
-ND var tcase(in instring);
-IO tcaser(io iostring);
+ND var  tcase(in instring);
+   IO   tcaser(io iostring);
 
-ND var fcase(in instring);
-IO fcaser(io iostring);
+ND var  fcase(in instring);
+   IO   fcaser(io iostring);
 
-ND var normalize(in instring);
-IO normalizer(io iostring);
+ND var  normalize(in instring);
+   IO   normalizer(io iostring);
 
-IO uniquer(io iostring);
-ND var unique(in instring);
+   IO   uniquer(io iostring);
+ND var  unique(in instring);
 
-ND var invert(in instring);
-IO inverter(io iostring);
-ND var invert(var&& instring);
+ND var  invert(in instring);
+   IO   inverter(io iostring);
+ND var  invert(var&& instring);
 //IO inverter(io iostring);;
 //ND var invert(in instring);;
 //ND var invert(var&& instring);;
 //template<typename T> T invert(var && instring);
 
-ND var lower(in instring);
-IO lowerer(io iostring);
+ND var  lower(in instring);
+   IO   lowerer(io iostring);
 
-ND var raise(in instring);
-IO raiser(io iostring);
+ND var  raise(in instring);
+   IO   raiser(io iostring);
+
+// CUT
+
+ND var  cut(in instring, const int length);
+   IO   cutter(io instring, const int length);
 
 // PASTER
 
 // 1. paste replace
-ND var paste(in instring, const int pos1, const int length, in str);
-IO paster(io iostring, const int pos1, const int length, in str);
+ND var  paste(in instring, const int pos1, const int length, in str);
+   IO   paster(io iostring, const int pos1, const int length, in str);
 
 //// 2. paste over to end
 //IO pasterall(io iostring, const int pos1, in str);
 //ND var pasteall(in instring, const int pos1, in str);
 
 // 3. paste insert at pos1
-ND var paste(in instring, const int pos1, in str);
-IO paster(io iostring, const int pos1, in str);
+ND var  paste(in instring, const int pos1, in str);
+   IO   paster(io iostring, const int pos1, in str);
 
 // PREFIX
-ND var prefix(in instring, in str);
-IO prefixer(io iostring, in str);
+ND var  prefix(in instring, in str);
+   IO   prefixer(io iostring, in str);
 
-ND var pop(in instring);
-IO popper(io iostring);
-
-
-ND var quote(in instring);
-IO quoter(io iostring);
-
-ND var squote(in instring);
-IO squoter(io iostring);
-
-ND var unquote(in instring);
-IO unquoter(io iostring);
+ND var  pop(in instring);
+   IO   popper(io iostring);
 
 
-ND var fieldstore(in instring, SV sepchar, const int fieldno, const int nfields, in replacement);
-IO fieldstorer(io iostring, SV sepchar, const int fieldno, const int nfields, in replacement);
+ND var  quote(in instring);
+   IO   quoter(io iostring);
+
+ND var  squote(in instring);
+   IO   squoter(io iostring);
+
+ND var  unquote(in instring);
+   IO   unquoter(io iostring);
 
 
-ND var trim(in instring, SV trimchars DEFAULT_SPACE);
-ND var trimfirst(in instring, SV trimchars DEFAULT_SPACE);
-ND var trimlast(in instring, SV trimchars DEFAULT_SPACE);
-ND var trimboth(in instring, SV trimchars DEFAULT_SPACE);
+ND var  fieldstore(in instring, SV sepchar, const int fieldno, const int nfields, in replacement);
+   IO   fieldstorer(io iostring, SV sepchar, const int fieldno, const int nfields, in replacement);
 
-IO trimmer(io iostring, SV trimchars DEFAULT_SPACE);
-IO trimmerfirst(io iostring, SV trimchars DEFAULT_SPACE);
-IO trimmerlast(io iostring, SV trimchars DEFAULT_SPACE);
-IO trimmerboth(io iostring, SV trimchars DEFAULT_SPACE);
 
-ND var first(in instring);
-ND var last(in instring);
-ND var first(in instring, const int nbytes);
-ND var last(in instring, const int nbytes);
+ND var  trim(in instring, SV trimchars DEFAULT_SPACE);
+ND var  trimfirst(in instring, SV trimchars DEFAULT_SPACE);
+ND var  trimlast(in instring, SV trimchars DEFAULT_SPACE);
+ND var  trimboth(in instring, SV trimchars DEFAULT_SPACE);
 
-ND var chr(const int integer);
-ND var textchr(const int integer);
+   IO   trimmer(io iostring, SV trimchars DEFAULT_SPACE);
+   IO   trimmerfirst(io iostring, SV trimchars DEFAULT_SPACE);
+   IO   trimmerlast(io iostring, SV trimchars DEFAULT_SPACE);
+   IO   trimmerboth(io iostring, SV trimchars DEFAULT_SPACE);
+
+ND var  first(in instring);
+ND var  last(in instring);
+ND var  first(in instring, const int nbytes);
+ND var  last(in instring, const int nbytes);
+
+ND var  chr(const int integer);
+ND var  textchr(const int integer);
 
 // Match
-ND var match(in instring, SV regex_str, SV options DEFAULT_EMPTY);
-ND var match(in instring, const rex& regex);
+ND var  match(in instring, SV regex_str, SV options DEFAULT_EMPTY);
+ND var  match(in instring, const rex& regex);
 
 // Search
 ND var  search(in instring, SV regex_str, io startchar1, SV regex_options = "");
@@ -390,64 +398,64 @@ ND var  search(in instring, const rex& regex, io startchar1);
 // Ditto starting from first char.
 ND var  search(in instring, const rex& regex);
 
-ND var seq(in char1);
-ND var textseq(in char1);
-ND var str(in instring, const int number);
-ND var space(const int number);
-ND var fcount(in instring, SV substr);
-ND var count(in instring, SV substr);
+ND var  seq(in char1);
+ND var  textseq(in char1);
+ND var  str(in instring, const int number);
+ND var  space(const int number);
+ND var  fcount(in instring, SV substr);
+ND var  count(in instring, SV substr);
 
-ND var substr(in instring, const int startindex);
-ND var substr(in instring, const int startindex, const int length);
-IO substrer(io iostring, const int startindex);
-IO substrer(io iostring, const int startindex, const int length);
+ND var  substr(in instring, const int startindex);
+ND var  substr(in instring, const int startindex, const int length);
+   IO   substrer(io iostring, const int startindex);
+   IO   substrer(io iostring, const int startindex, const int length);
 
-ND var substr(in instring, const int startindex, SV delimiterchars, io pos2);
+ND var  substr(in instring, const int startindex, SV delimiterchars, io pos2);
 //IO substrer(io iostring, const int startindex, SV delimiterchars, io pos2);
 
 ND bool starts(in instring, SV substr);
-ND bool end(in instring, SV substr);
+ND bool ends(in instring, SV substr);
 ND bool contains(in instring, SV substr);
 
-ND var index(in instring, SV substr, const int startindex DEFAULT_1);
-ND var indexn(in instring, SV substr, int occurrence);
-ND var indexr(in instring, SV substr, const int startindex DEFAULT_M1);
+ND var  index(in instring, SV substr, const int startindex DEFAULT_1);
+ND var  indexn(in instring, SV substr, int occurrence);
+ND var  indexr(in instring, SV substr, const int startindex DEFAULT_M1);
 
-ND var field(in instring, SV substr, const int fieldno, const int nfields DEFAULT_1);
-ND var field2(in instring, SV substr, const int fieldno, const int nfields DEFAULT_1);
+ND var  field(in instring, SV substr, const int fieldno, const int nfields DEFAULT_1);
+ND var  field2(in instring, SV substr, const int fieldno, const int nfields DEFAULT_1);
 
 // STRINGS WITH FIELD MARKS
 
-ND var substr2(in fromstr, io startindex, io delimiterno);
+ND var  substr2(in fromstr, io startindex, io delimiterno);
 
-ND dim split(in sourcevar, SV sepchar DEFAULT__FM);
-ND var join(const dim& sourcedim, SV sepchar DEFAULT__FM);
+ND dim  split(in sourcevar, SV sepchar DEFAULT__FM);
+ND var  join(const dim& sourcedim, SV sepchar DEFAULT__FM);
 
-ND var pickreplace(in instring, const int fieldno, const int valueno, const int subvalueno, in replacement);
-ND var pickreplace(in instring, const int fieldno, const int valueno, in replacement);
-ND var pickreplace(in instring, const int fieldno, in replacement);
+ND var  pickreplace(in instring, const int fieldno, const int valueno, const int subvalueno, in replacement);
+ND var  pickreplace(in instring, const int fieldno, const int valueno, in replacement);
+ND var  pickreplace(in instring, const int fieldno, in replacement);
 
-ND var extract(in instring, const int fieldno DEFAULT_0, const int valueno DEFAULT_0, const int subvalueno DEFAULT_0);
+ND var  extract(in instring, const int fieldno DEFAULT_0, const int valueno DEFAULT_0, const int subvalueno DEFAULT_0);
 
-ND var insert(in instring, const int fieldno, const int valueno, const int subvalueno, in insertion);
-ND var insert(in instring, const int fieldno, const int valueno, in insertion);
-ND var insert(in instring, const int fieldno, in insertion);
+ND var  insert(in instring, const int fieldno, const int valueno, const int subvalueno, in insertion);
+ND var  insert(in instring, const int fieldno, const int valueno, in insertion);
+ND var  insert(in instring, const int fieldno, in insertion);
 
 // var erase(in instring, const int fieldno, const int valueno=0, const int
 // subvalueno=0);
-ND var remove(in instring, const int fieldno, const int valueno DEFAULT_0, const int subvalueno DEFAULT_0);
+ND var  remove(in instring, const int fieldno, const int valueno DEFAULT_0, const int subvalueno DEFAULT_0);
 
-IO pickreplacer(io iostring, const int fieldno, const int valueno, const int subvalueno, in replacement);
-IO pickreplacer(io iostring, const int fieldno, const int valueno, in replacement);
-IO pickreplacer(io iostring, const int fieldno, in replacement);
+   IO   pickreplacer(io iostring, const int fieldno, const int valueno, const int subvalueno, in replacement);
+   IO   pickreplacer(io iostring, const int fieldno, const int valueno, in replacement);
+   IO   pickreplacer(io iostring, const int fieldno, in replacement);
 
-IO inserter(io iostring, const int fieldno, const int valueno, const int subvalueno, in insertion);
-IO inserter(io iostring, const int fieldno, const int valueno, in insertion);
-IO inserter(io iostring, const int fieldno, in insertion);
+   IO   inserter(io iostring, const int fieldno, const int valueno, const int subvalueno, in insertion);
+   IO   inserter(io iostring, const int fieldno, const int valueno, in insertion);
+   IO   inserter(io iostring, const int fieldno, in insertion);
 
 // IO eraser(io iostring, const int fieldno, const int valueno=0, const int
 // subvalueno=0);
-IO remover(io iostring, const int fieldno, const int valueno DEFAULT_0, const int subvalueno DEFAULT_0);
+   IO   remover(io iostring, const int fieldno, const int valueno DEFAULT_0, const int subvalueno DEFAULT_0);
 
 ND bool locate(in target, in instring);
 ND bool locate(in target, in instring, io setting);
@@ -463,30 +471,35 @@ ND bool locateusing(in usingchar, in target, in instring);
 ND bool locateusing(in usingchar, in target, in instring, io setting);
 ND bool locateusing(in usingchar, in target, in instring, io setting, const int fieldno, const int valueno DEFAULT_0, const int subvalueno DEFAULT_0);
 
-ND var sum(in instring, SV sepchar);
-ND var sum(in instring);
-ND var sumall(in instring);
+ND var  sum(in instring, SV sepchar);
+ND var  sum(in instring);
+ND var  sumall(in instring);
 
-ND var crop(in instring);
-IO cropper(io iostring);
+ND var  crop(in instring);
+   IO   cropper(io iostring);
 
-ND var sort(in instring, SV sepchar DEFAULT__FM);
-IO sorter(io iostring, SV sepchar DEFAULT__FM);
+ND var  sort(in instring, SV sepchar DEFAULT__FM);
+   IO   sorter(io iostring, SV sepchar DEFAULT__FM);
 
-ND var reverse(in instring, SV sepchar DEFAULT__FM);
-IO reverser(io iostring, SV sepchar DEFAULT__FM);
+ND var  reverse(in instring, SV sepchar DEFAULT__FM);
+   IO   reverser(io iostring, SV sepchar DEFAULT__FM);
 
-ND var shuffle(in instring, SV sepchar DEFAULT__FM);
-IO shuffler(io iostring, SV sepchar DEFAULT__FM);
+ND var  shuffle(in instring, SV sepchar DEFAULT__FM);
+   IO   shuffler(io iostring, SV sepchar DEFAULT__FM);
 
-ND var parser(in instring, char sepchar DEFAULT_CSPACE);
-IO parser(io iostring, char sepchar DEFAULT_CSPACE);
+ND var  parse(in instring, char sepchar DEFAULT_CSPACE);
+   IO   parser(io instring, char sepchar DEFAULT_CSPACE);
 
 // DATABASE
 
 ND bool connect(in connectioninfo DEFAULT_EMPTY);
    void disconnect(void);
    void disconnectall(void);
+
+ND bool sqlexec(in sqlcmd);
+ND bool sqlexec(in sqlcmd, out response);
+
+ND bool attach(in filenames);
 
 ND bool dbcreate(in dbname);
 ND var  dblist(void);
@@ -512,11 +525,14 @@ ND bool committrans(void);
    void cleardbcache(void);
 
 ND bool lock(in dbfile, in key);
-   void unlock(in dbfile, in key);
-   void unlockall(void);
+   bool unlock(in dbfile, in key);
+   bool unlockall(in conn DEFAULT_EMPTY);
+
+   void cleardbcache(in conn DEFAULT_EMPTY);
 
 ND bool open(in dbfilename, io dbfile);
 ND bool open(in dbfilename);
+ND void close(in dbfile);
 // bool open(in dictdata, in dbfilename, io dbfile);
 
 ND bool read(io record, in dbfile, in key);
@@ -1218,6 +1234,8 @@ auto format(const exo::var& var1, FormatContext& ctx) const {
 //} // namespace fmt
 
 #endif	// EXO_FORMAT
+
+// clang-format on
 
 #endif	// EXODUSFUNCS_H
 
