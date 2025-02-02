@@ -1,12 +1,12 @@
 500 (.*)
-501 dim& dim::splitter(in str1, SV sepchar = FM)
+501 dim& dim::splitter(in str1, SV sepchar)
 502 xxxxxxxx unused
 503 bool dim::read(in filevar, in key)
 504 void dim::write(in filevar, in key) const
 505 bool dim::osread(in osfilename, const char* codepage DEFAULT_EMPTY)
 506 bool dim::oswrite(in osfilename, const char* codepage DEFAULT_EMPTY)
-507 var  var::sort(SV sepchar = FM)
-508 var  var::reverse(SV sepchar = FM)
+507 var  var::sort(SV sepchar)
+508 var  var::reverse(SV sepchar)
 509 var  var::timestamp(in ostime) const
 510 bool var::connect(in conninfo
 511 bool var::attach(in filenames
@@ -56,9 +56,9 @@
 555 var  var::listfiles() const
 556 var  var::dblist() const
 557 bool var::cursorexists()
-558 var  var::listindex(in filename) const
-559 var  var::reccount(in filename_or_handle_or_null) const
-560 bool var::flushindex(in filename=) const
+558 var  var::listindex(in filename, in fieldname) const
+559 var  var::reccount(in file_or_filename) const
+560 bool var::flushindex(in filename) const
 561 out  var::input()
 562 out  var::input(in prompt
 563 out  var::inputn(const int nchars
@@ -125,8 +125,8 @@
 624 var  var::osshell() const
 625 var  var::osshellread() const
 626 var  var::osshellwrite(in oscmd) const
-627 bool var::osopen(in osfilename, const bool utf8 = true)
-628 bool var::osopenx(in osfilename, const bool utf8 = true)
+627 bool var::osopen(in osfilename, const bool utf8)
+628 bool var::osopenx(in osfilename, const bool utf8)
 629 bool var::osread(const char* osfilename, const char* codepage
 630 bool var::to_codepage(const char* codepage) const
 631 bool var::from_codepage(const char* codepage) const
@@ -151,14 +151,14 @@
 650 var  var::replace(const rex& regex, SV replacement) const
 651 var  var::field(SV separatorx, const int fieldnx, const int nfieldsx) const
 652 void var::fieldstorer(SV separator0, const int fieldnx, const int nfieldsx, in replacementx) &
-653 bool var::locate(in target, out setting, const int fieldno/*=0*/, const int valueno/*=0*/) const
-654 bool var::locate(in target, out setting, const int fieldno/*=0*/, const int valueno/*=0*/) const
+653 bool var::locate(in target, out setting, const int fieldno, const int valueno) const
+654 bool var::locate(in target, out setting, const int fieldno, const int valueno) const
 655 bool var::locate(in target) const
 656 bool var::locateby(const char* ordercode, in target, out setting) const
-657 bool var::locateby(const char* ordercode, in target, out setting, const int fieldno, const int valueno/*=0*/) const
-658 bool var::locatebyusing(const char* ordercode, const char* usingchar, in target, out setting, const int fieldno=0, const int valueno=0, const int valueno=0) const
+657 bool var::locateby(const char* ordercode, in target, out setting, const int fieldno, const int valueno) const
+658 bool var::locatebyusing(const char* ordercode, const char* usingchar, in target, out setting, const int fieldno, const int valueno, const int valueno) const
 659 bool var::locateusing(const char* usingchar, in target) const
-660 bool var::locateusing(const char* usingchar, in target, out setting, const int fieldno/*=0*/, const int valueno/*=0*/, const int subvalueno/*=0*/) const
+660 bool var::locateusing(const char* usingchar, in target, out setting, const int fieldno, const int valueno, const int subvalueno) const
 661 var  var::f(const int argfieldn, const int argvaluen, const int argsubvaluen) const
 662 void var::remover(int fieldno, int valueno, int subvalueno) &
 663 void var::r(int fieldno, int valueno, int subvalueno, in replacement) &
@@ -175,7 +175,7 @@
 674 void var::substrer(const int pos1, const int length) &
 675 var  var::at(const int charno) const
 676 var  var::multivalued(const char* opcode, in var2) const
-677 var  var::substr(const int pos1, io delimiterchars, int& pos2) const
+677 var  var::substr(const int pos1, SV delimiterchars, io pos2) const
 678 var  var::substr2(io pos1, out delimiterno) const
 679 var  var::sumall() const
 680 var  var::sum() const

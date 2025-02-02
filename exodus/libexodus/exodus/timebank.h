@@ -122,14 +122,14 @@ auto get_timebank_acno(const std::string_view arg1) -> int {
 		\grep -P 'arg1 == "(.*)"' timebank.h -o|cut -d'"' -f2 | nl -v 500 -s' ' -w3 > timebank.txt
 	*/
 
-	     if (++acno && arg1 == "dim& dim::splitter(in str1, SV sepchar = FM)") {}
+	     if (++acno && arg1 == "dim& dim::splitter(in str1, SV sepchar)") {}
 	else if (++acno && arg1 == "xxxxxxxx unused") {}
 	else if (++acno && arg1 == "bool dim::read(in filevar, in key)") {}
 	else if (++acno && arg1 == "void dim::write(in filevar, in key) const") {}
 	else if (++acno && arg1 == "bool dim::osread(in osfilename, const char* codepage DEFAULT_EMPTY)") {}
 	else if (++acno && arg1 == "bool dim::oswrite(in osfilename, const char* codepage DEFAULT_EMPTY)") {}
-	else if (++acno && arg1 == "var  var::sort(SV sepchar = FM)") {}
-	else if (++acno && arg1 == "var  var::reverse(SV sepchar = FM)") {}
+	else if (++acno && arg1 == "var  var::sort(SV sepchar)") {}
+	else if (++acno && arg1 == "var  var::reverse(SV sepchar)") {}
 	else if (++acno && arg1 == "var  var::timestamp(in ostime) const") {}
 	else if (++acno && arg1 == "bool var::connect(in conninfo") {}
 	else if (++acno && arg1 == "bool var::attach(in filenames") {}
@@ -179,9 +179,9 @@ auto get_timebank_acno(const std::string_view arg1) -> int {
 	else if (++acno && arg1 == "var  var::listfiles() const") {}
 	else if (++acno && arg1 == "var  var::dblist() const") {}
 	else if (++acno && arg1 == "bool var::cursorexists()") {}
-	else if (++acno && arg1 == "var  var::listindex(in filename) const") {}
-	else if (++acno && arg1 == "var  var::reccount(in filename_or_handle_or_null) const") {}
-	else if (++acno && arg1 == "bool var::flushindex(in filename=) const") {}
+	else if (++acno && arg1 == "var  var::listindex(in filename, in fieldname) const") {}
+	else if (++acno && arg1 == "var  var::reccount(in file_or_filename) const") {}
+	else if (++acno && arg1 == "bool var::flushindex(in filename) const") {}
 	else if (++acno && arg1 == "out  var::input()") {}
 	else if (++acno && arg1 == "out  var::input(in prompt") {}
 	else if (++acno && arg1 == "out  var::inputn(const int nchars") {}
@@ -248,8 +248,8 @@ auto get_timebank_acno(const std::string_view arg1) -> int {
 	else if (++acno && arg1 == "var  var::osshell() const") {}
 	else if (++acno && arg1 == "var  var::osshellread() const") {}
 	else if (++acno && arg1 == "var  var::osshellwrite(in oscmd) const") {}
-	else if (++acno && arg1 == "bool var::osopen(in osfilename, const bool utf8 = true)") {}
-	else if (++acno && arg1 == "bool var::osopenx(in osfilename, const bool utf8 = true)") {}
+	else if (++acno && arg1 == "bool var::osopen(in osfilename, const bool utf8)") {}
+	else if (++acno && arg1 == "bool var::osopenx(in osfilename, const bool utf8)") {}
 	else if (++acno && arg1 == "bool var::osread(const char* osfilename, const char* codepage") {}
 	else if (++acno && arg1 == "bool var::to_codepage(const char* codepage) const") {}
 	else if (++acno && arg1 == "bool var::from_codepage(const char* codepage) const") {}
@@ -274,14 +274,15 @@ auto get_timebank_acno(const std::string_view arg1) -> int {
 	else if (++acno && arg1 == "var  var::replace(const rex& regex, SV replacement) const") {}
 	else if (++acno && arg1 == "var  var::field(SV separatorx, const int fieldnx, const int nfieldsx) const") {}
 	else if (++acno && arg1 == "void var::fieldstorer(SV separator0, const int fieldnx, const int nfieldsx, in replacementx) &") {}
-	else if (++acno && arg1 == "bool var::locate(in target, out setting, const int fieldno/*=0*/, const int valueno/*=0*/) const") {}
-	else if (++acno && arg1 == "bool var::locate(in target, out setting, const int fieldno/*=0*/, const int valueno/*=0*/) const") {}
+	else if (++acno && arg1 == "bool var::locate(in target, out setting, const int fieldno, const int valueno) const") {}
+	else if (++acno && arg1 == "bool var::locate(in target, out setting, const int fieldno, const int valueno) const") {}
 	else if (++acno && arg1 == "bool var::locate(in target) const") {}
 	else if (++acno && arg1 == "bool var::locateby(const char* ordercode, in target, out setting) const") {}
-	else if (++acno && arg1 == "bool var::locateby(const char* ordercode, in target, out setting, const int fieldno, const int valueno/*=0*/) const") {}
-	else if (++acno && arg1 == "bool var::locatebyusing(const char* ordercode, const char* usingchar, in target, out setting, const int fieldno=0, const int valueno=0, const int valueno=0) const") {}
+	else if (++acno && arg1 == "bool var::locateby(const char* ordercode, in target, out setting, const int fieldno, const int valueno) const") {}
+	else if (++acno && arg1 == "bool var::locatebyusing(const char* ordercode, const char* usingchar, in target, out setting, const int fieldno, const int valueno, const int valueno) const") {}
 	else if (++acno && arg1 == "bool var::locateusing(const char* usingchar, in target) const") {}
-	else if (++acno && arg1 == "bool var::locateusing(const char* usingchar, in target, out setting, const int fieldno/*=0*/, const int valueno/*=0*/, const int subvalueno/*=0*/) const") {}
+//                                bool var::locateusing(const char* usingchar, in target, out setting, const int fieldno, const int valueno, const int subvalueno) const
+	else if (++acno && arg1 == "bool var::locateusing(const char* usingchar, in target, out setting, const int fieldno, const int valueno, const int subvalueno) const") {}
 	else if (++acno && arg1 == "var  var::f(const int argfieldn, const int argvaluen, const int argsubvaluen) const") {}
 	else if (++acno && arg1 == "void var::remover(int fieldno, int valueno, int subvalueno) &") {}
 	else if (++acno && arg1 == "void var::r(int fieldno, int valueno, int subvalueno, in replacement) &") {}
@@ -298,7 +299,7 @@ auto get_timebank_acno(const std::string_view arg1) -> int {
 	else if (++acno && arg1 == "void var::substrer(const int pos1, const int length) &") {}
 	else if (++acno && arg1 == "var  var::at(const int charno) const") {}
 	else if (++acno && arg1 == "var  var::multivalued(const char* opcode, in var2) const") {}
-	else if (++acno && arg1 == "var  var::substr(const int pos1, io delimiterchars, int& pos2) const") {}
+	else if (++acno && arg1 == "var  var::substr(const int pos1, SV delimiterchars, io pos2) const") {}
 	else if (++acno && arg1 == "var  var::substr2(io pos1, out delimiterno) const") {}
 	else if (++acno && arg1 == "var  var::sumall() const") {}
 	else if (++acno && arg1 == "var  var::sum() const") {}

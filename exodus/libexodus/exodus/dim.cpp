@@ -360,7 +360,7 @@ dim  var::split(SV sepchar) const {
 
 	//TODO provide a version that can split on any utf8 character - perhaps if sepchar is ""
 
-//	THISIS("dim  var::split(SV sepchar = FM)")
+//	THISIS("dim  var::split(SV sepchar)")
 	assertString("dim  var::split(SV sepchar) const");
 
 	// an undimensioned dim will be dimensioned automatically
@@ -373,7 +373,7 @@ dim& dim::splitter(in str1, SV sepchar) {
 	//TODO provide a version that can split on any utf8 character
 	// Perhaps if sepchar is ""
 
-	THISIS("dim& dim::splitter(in str1, SV sepchar = FM)")
+	THISIS("dim& dim::splitter(in str1, SV sepchar)")
 	ISSTRING(str1)
 
 	EXO_DIM_RECALC_NROWS(*this)
@@ -438,7 +438,7 @@ dim& dim::splitter(in str1, SV sepchar) {
 }
 
 dim& dim::sorter(bool reverseorder) {
-	//THISIS("var dim::sorter(bool reverseorder = false)")
+	//THISIS("var dim::sorter(bool reverseorder)")
 
 	// There is no different between sort and stable_sort here because we are using the default var < var operation to sort
 	// std::sort(d.begin(), d.end() , [](auto x){return xxxxxx}) could be used to sort on part of each var
@@ -582,7 +582,7 @@ IO   var::sorter(SV sepchar) REF {
 //sorting var - using temporary dim
 var  var::sort(SV sepchar) const& {
 
-	THISIS("var  var::sort(SV sepchar = FM)")
+	THISIS("var  var::sort(SV sepchar)")
 	assertString(function_sig);
 
 	//perhaps is slower but sorts testing var < var linguistically but not natural numbers like 10a 2b
@@ -609,7 +609,7 @@ IO   var::reverser(SV sepchar) REF {
 //reversing var - using temporary dim
 var  var::reverse(SV sepchar) const& {
 
-	THISIS("var  var::reverse(SV sepchar = FM)")
+	THISIS("var  var::reverse(SV sepchar)")
 	assertString(function_sig);
 
 	//split into a temporary dim array for reversing
