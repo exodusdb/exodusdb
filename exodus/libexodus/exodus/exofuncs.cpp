@@ -245,6 +245,11 @@ ND PUBLIC var  lower(in instring) {return instring.lower();}
 ND PUBLIC var  raise(in instring) {return instring.raise();}
    PUBLIC IO   raiser(io iostring) {iostring.raiser(); return IOSTRING;}
 
+// CUT
+
+ND PUBLIC var  cut(in instring, const int length) {return instring.cut(length);}
+          IO   cutter(io instring, const int length) {return instring.cutter(length);}
+
 // PASTER
 
 // 1. paste replace
@@ -328,7 +333,7 @@ ND PUBLIC var  substr(in instring, const int startindex, SV delimiterchars, io p
 //   PUBLIC IO   substrer(io iostring, const int startindex, SV delimiterchars, int& pos2) {iostring.substrer(startindex, delimiterchars, pos2) return IOSTRING;}
 
 ND PUBLIC bool starts(in instring, SV substr) {return instring.starts(substr);}
-ND PUBLIC bool end(in instring, SV substr) {return instring.ends(substr);}
+ND PUBLIC bool ends(in instring, SV substr) {return instring.ends(substr);}
 ND PUBLIC bool contains(in instring, SV substr) {return instring.contains(substr);}
 
 ND PUBLIC var  index(in instring, SV substr, const int startindex DEFAULT_1) {return instring.index(substr, startindex);}
@@ -385,6 +390,8 @@ ND PUBLIC var  sum(in instring, SV sepchar) {return instring.sum(sepchar);}
 ND PUBLIC var  sum(in instring) {return instring.sum();}
 ND PUBLIC var  sumall(in instring) {return instring.sumall();}
 
+ND PUBLIC var  hash(in instring, const std::uint64_t modulus) {return instring.hash(modulus);}
+
 ND PUBLIC var  crop(in instring) {return instring.crop();}
    PUBLIC IO   cropper(io iostring) {iostring.cropper(); return IOSTRING;}
 
@@ -397,14 +404,19 @@ ND PUBLIC var  reverse(in instring, SV sepchar DEFAULT__FM) {return instring.rev
 ND PUBLIC var  shuffle(in instring, SV sepchar DEFAULT__FM) {return instring.shuffle(sepchar);}
    PUBLIC IO   shuffler(io iostring, SV sepchar DEFAULT__FM) {iostring.shuffler(sepchar); return IOSTRING;}
 
-ND PUBLIC var  parser(in instring, char sepchar DEFAULT_CSPACE) {return instring.parse(sepchar);}
-   PUBLIC IO   parser(io iostring, char sepchar DEFAULT_CSPACE) {iostring.parser(sepchar); return IOSTRING;}
+ND PUBLIC var  parse(in instring, char sepchar DEFAULT_CSPACE) {return instring.parse(sepchar);}
+   PUBLIC IO   parser(io iostring, char sepchar DEFAULT_CSPACE) {iostring.parser(sepchar);}
 
 // DATABASE
 
 ND PUBLIC bool connect(in connectioninfo DEFAULT_EMPTY) {var conn1; return conn1.connect(connectioninfo);}
    PUBLIC void disconnect() {var().disconnect();}
    PUBLIC void disconnectall() {var().disconnectall();}
+
+ND PUBLIC bool sqlexec(in sqlcmd) {return var().sqlexec(sqlcmd);}
+ND PUBLIC bool sqlexec(in sqlcmd, out response) {return var().sqlexec(sqlcmd, response);}
+
+ND PUBLIC bool attach(in filenames) {return var().attach(filenames);}
 
 ND PUBLIC bool dbcreate(in dbname) {return dbname.dbcreate(dbname);}
 ND PUBLIC var  dblist() {return var().dblist();}
@@ -430,11 +442,15 @@ ND PUBLIC bool committrans() {return var().committrans();}
    PUBLIC void cleardbcache() {var().cleardbcache();}
 
 ND PUBLIC bool lock(in dbfile, in key) {return static_cast<bool>(dbfile.lock(key));}
-   PUBLIC void unlock(in dbfile, in key) {dbfile.unlock(key);}
-   PUBLIC void unlockall() {var().unlockall();}
+   PUBLIC bool unlock(in dbfile, in key) {return dbfile.unlock(key);}
+   PUBLIC bool unlockall(in conn) {return conn.unlockall();}
+
+   PUBLIC void cleardbcache(in conn) {return conn.cleardbcache();}
 
 ND PUBLIC bool open(in dbfilename, io dbfile) {return dbfile.open(dbfilename);}
 ND PUBLIC bool open(in dbfilename) {return var().open(dbfilename);}
+
+ND PUBLIC void close(in dbfile) {return dbfile.close();}
 
 ND PUBLIC bool read(io record, in dbfile, in key) {return record.read(dbfile, key);}
 ND PUBLIC bool readc(io record, in dbfile, in key) {return record.readc(dbfile, key);}
@@ -445,7 +461,7 @@ ND PUBLIC bool readf(io record, in dbfile, in key, in fieldnumber) {return recor
    PUBLIC void writef(in record, in dbfile, in key, const int fieldno) {record.writef(dbfile, key, fieldno);}
 ND PUBLIC bool updaterecord(in record, in dbfile, in key) {return record.updaterecord(dbfile, key);}
 ND PUBLIC bool insertrecord(in record, in dbfile, in key) {return record.insertrecord(dbfile, key);}
-ND PUBLIC bool deletec(in dbfile, in key);
+ND PUBLIC bool deletec(in dbfile, in key) {return dbfile.deletec(key);}
 
 ND PUBLIC bool dimread(dim& dimrecord, in dbfile, in key) {return dimrecord.read(dbfile, key);}
    PUBLIC void dimwrite(const dim& dimrecord, in dbfile, in key) {dimrecord.write(dbfile, key);}

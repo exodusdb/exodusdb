@@ -934,25 +934,26 @@ static void to_extract_text(io dictexpression) {
 bool var::connect(in conninfo) {
 
 	THISIS("bool var::connect(in conninfo")
-	// nb dont log/trace or otherwise output the full connection info without HIDING the
-	// password
 	assertDefined(function_sig);
 	ISSTRING(conninfo)
 
-	if (DBTRACE or DBTRACE_CONN) {
-		TRACE(__PRETTY_FUNCTION__)
-		TRACE(conninfo)
-	}
+//	// NB DONT log/trace or otherwise output the full connection info without HIDING the
+//	// password
+//	if (DBTRACE or DBTRACE_CONN) {
+//		TRACE(__PRETTY_FUNCTION__)
+//		TRACE(conninfo)
+//	}
+
 	var fullconninfo = conninfo.trimboth();
 
-	//use *this if conninfo not specified;
+	// Use *this if conninfo not specified;
 	bool isdefault = false;
 	if (!fullconninfo) {
 		if (this->assigned())
 			fullconninfo = *this;
 		isdefault = !fullconninfo;
 		if (DBTRACE_CONN) {
-			TRACE(fullconninfo)
+//			TRACE(fullconninfo)
 			TRACE(isdefault)
 			TRACE(thread_default_data_dbconn_no)
 		}
@@ -961,12 +962,14 @@ bool var::connect(in conninfo) {
 		}
 	}
 
-	//add dbname= if missing
-	if (fullconninfo && !fullconninfo.contains("="))
+	// Prefix "dbname=" if only dbname provided
+	if (fullconninfo &&  not fullconninfo.contains("="))
 		fullconninfo = "dbname=" ^ fullconninfo.lcase();
 
+	// Build all connection defaults
 	fullconninfo = build_conn_info(fullconninfo);
 
+	// Log the conninfo without password
 	if (DBTRACE_CONN) {
 		//fullconninfo.replace(R"(password\s*=\s*\w*)", "password=**********").logputl("var::connect( ) ");
 		//fullconninfo.regex_replace(R"(password\s*=\s*\w*)", "password=**********").logputl("\nvar::connect( ) ");
@@ -976,21 +979,22 @@ bool var::connect(in conninfo) {
 	PGconn* pgconn;
 	for (;;) {
 
-#if defined _MSC_VER  //|| defined __CYGWIN__ || defined __MINGW32__
-		if (not msvc_PQconnectdb(&pgconn, fullconninfo.var_str)) UNLIKELY {
-			var libname = "libpq.dl";
-			// var libname="libpq.so";
-			var errmsg="ERROR: mvdbpostgres connect() Cannot load shared library " ^ libname ^
-				". Verify configuration PATH contains postgres's \\bin.";
-			this->setlasterror(errmsg);
-			return false;
-		}
-#else
-		//connect
-		pgconn = PQconnectdb(fullconninfo.var_str.c_str());
-#endif
+//#if defined _MSC_VER  //|| defined __CYGWIN__ || defined __MINGW32__
+//		if (not msvc_PQconnectdb(&pgconn, fullconninfo.var_str)) UNLIKELY {
+//			var libname = "libpq.dl";
+//			// var libname="libpq.so";
+//			var errmsg="ERROR: mvdbpostgres connect() Cannot load shared library " ^ libname ^
+//				". Verify configuration PATH contains postgres's \\bin.";
+//			this->setlasterror(errmsg);
+//			return false;
+//		}
+//#else
 
-		//connected OK
+		// Attempt connection
+		pgconn = PQconnectdb(fullconninfo.var_str.c_str());
+//#endif
+
+		// Connected OK
 		if (PQstatus(pgconn) == CONNECTION_OK || fullconninfo)
 			break;
 
@@ -1015,8 +1019,8 @@ bool var::connect(in conninfo) {
 		return false;
 	}
 
-// abort if multithreading and it is not supported
 #ifdef PQisthreadsafe
+	// Abort if multithreading and it is not supported
 	if (!PQisthreadsafe()) UNLIKELY {
 		// TODO only abort if environmentn>0
 		var errmsg = "connect(): Postgres PQ library is not threadsafe";
@@ -1025,22 +1029,24 @@ bool var::connect(in conninfo) {
 	}
 #endif
 
-	// at this point we have good new connection to database
+	// At this point we have good new connection to database
 
-	// cache the new connection handle
+	// Cache the new connection handle and get the cache index no (starting 1)
 	int dbconn_no = thread_dbconnector.add_dbconn(pgconn, fullconninfo.var_str);
 	if (DBTRACE_CONN) {
 		TRACE(thread_default_data_dbconn_no)
 		TRACE(thread_default_dict_dbconn_no)
 	}
+
+	// Save the db name and connection numbers
 	//(*this) = conninfo ^ FM ^ conn_no;
 	if (!this->assigned())
 		(*this) = "";
-	if (not this->f(1))
+//	if (not this->f(1))
 		//this->r(1,fullconninfo.field(" ",1));
 		this->r(1,fullconninfo.field2("dbname=", -1).field(" ", 1));
-	(*this)(2) = dbconn_no;
-	(*this)(3) = dbconn_no;
+	this->r(2, dbconn_no);
+	this->r(3, dbconn_no);
 
 	if (DBTRACE_CONN) {
 		//fullconninfo.regex_replace(R"(password\s*=\s*\w*)", "password=**********").logputl("var::connect() OK ");
@@ -1051,7 +1057,7 @@ bool var::connect(in conninfo) {
 
 	// this->outputl("new connection=");
 
-	// set default connection - ONLY IF THERE ISNT ONE ALREADY
+	// Set default connection - ONLY IF THERE ISNT ONE ALREADY
 	if (isdefault && !thread_default_data_dbconn_no) {
 		thread_default_data_dbconn_no = dbconn_no;
 		if (DBTRACE_CONN) {
@@ -1396,7 +1402,7 @@ bool var::open(in filename, in connection /*DEFAULTNULL*/) {
 	return true;
 }
 
-void var::close() {
+void var::close() const {
 
 	THISIS("void var::close()")
 	assertString(function_sig);
