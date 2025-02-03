@@ -22,9 +22,9 @@ function main() {
 		var defined_objs = "";
 
 		// Lines like "///... some text:"
-		rex doc_rex("^(/{3,})\\s+(.*):$");
+		rex doc_rex(R"__(^(/{3,})\s+(.*):$)__");
 
-		//rex func_rex("^(var|io|bool|void)");
+		//rex func_rex(R"__(^(var|io|bool|void))__");
 
 		auto skipping = true;
 		auto in_table = false;
@@ -107,13 +107,14 @@ function main() {
 			else {
 
 				if (prefix == "/" "/") {
-					// Collect up comments starting //
+					// Collect up comments starting // (two slashes, not more)
 					lastcomment ^= srcline.substr(4) ^ FM_;
 				} else {
 
-					// Get default obj name from thrown away comments, not function comments
-					// only match "obj is" at the start of the first line of comment
-					let new_default_objname = lastcomment.match("^obj is ([a-zA-Z_][a-zA-Z0-9_()|]+)").f(1, 2);
+					// From thrown away comments, get the default obj name for all following functions
+					// except where overridden in specific function comments.
+					// Only match "obj is xxx|yyy|zzz()" at the start of the first line of comment.
+					let new_default_objname = lastcomment.match(R"__(^obj is ([a-zA-Z_][a-zA-Z0-9_()|]+))__").f(1, 2);
 					if (new_default_objname) {
 						new_objs ^= new_default_objname ^ FM;
 						default_objname = new_default_objname;
@@ -132,58 +133,63 @@ function main() {
 			}
 
 			srcline = srcline.field(" ", 2, 9999);
-//			var comment = srcline.field("{", 1).field(";", 2, 9999).trimmerfirst("/ ");
-			var comment = srcline.field("/" "/", 2, 99999).trimfirst();
+//			var comments = srcline.field("{", 1).field(";", 2, 9999).trimmerfirst("/ ");
+			var comments = srcline.field("/" "/", 2, 99999).trimfirst();
 			srcline = srcline.field("/" "/", 1).field("{", 1).trimlast();
 //			let funcname = srcline.field("(", 1);
 
-			if (not comment and lastcomment) {
+			// If no end of line comment use the lead in comments before the function declaration
+			if (not comments and lastcomment) {
 				lastcomment.popper();
-
-				//lastcomment.move(lastcomment);
-//				comment = std::move(lastcomment);
-				comment = lastcomment;
-				lastcomment = "";
+//				lastcomment.move(comments);
+				comments = std::move(lastcomment);
+//				comments = lastcomment;
+//				lastcomment = "";
 			}
 
-			// Extract obj for specific function if any
-			let objmatch = comment.match("\\bobj is ([a-zA-Z_][a-zA-Z0-9_|]+)");
+			// Extract and remove any "obj is xxx|yyy|zzz()" lines in comments for specific functions
+			// comments is FM separated at this point (dont forget that \s matches FM chars)
+			let objmatch = comments.match(R"__([ \t]*obj is ([a-zA-Z_][a-zA-Z0-9_()|]+)[^\n)__" _FM "]*");
 			if (objmatch) {
-				comment.replacer("\n" ^ objmatch.f(1, 1), "");
-				new_objs ^= objmatch.f(1, 2).convert("|", FM);
+//				TRACE(objmatch.at(1).oconv("HEX"))
+				comments.replacer(FM ^ objmatch.f(1, 1), "");
+				new_objs ^= objmatch.f(1, 2).convert("|()", FM) ^ FM_;
 			}
 			let objname = objmatch.f(1,2);
 
+			// Emphasise "Returns:"
+			comments.replacer("Returns:", "<em>Returns:</em>");
+
 			// Format backticked source code fragments
-			if (comment.contains("`")) {
+			if (comments.contains("`")) {
 
 				// FMs inside backticks (c++ code) become simple "\n"
 				bool backtick = false;
-				for (int charn : range(1, comment.len())) {
-					char charx = comment.substr(charn, 1).toChar();
+				for (int charn : range(1, comments.len())) {
+					char charx = comments.substr(charn, 1).toChar();
 					if (charx == '`') {
 						backtick = not backtick;
 						continue;
 					}
 					if (backtick && charx == FM_) {
-						comment.paster(charn, 1, "\n");
+						comments.paster(charn, 1, "\n");
 					}
 				}
 
 				// Prevent extra <br> before or after `
-				static rex rex1 {"`\\s*" _FM};
-				static rex rex2 {_FM "\\s*`"};
-				comment.replacer(rex1, "`\n");
-				comment.replacer(rex2, "\n`");
+				static rex rex1 {R"__(`\s*)__" _FM};
+				static rex rex2 {_FM R"__(\s*`)__"};
+				comments.replacer(rex1, "`\n");
+				comments.replacer(rex2, "\n`");
 
 				// Add a backtick if an odd numbers is present indicating forgot to close c++ code
-				if (comment.count("`") % 2)
-					comment ^= "`";
+				if (comments.count("`") % 2)
+					comments ^= "`";
 
 				// Wrap backticked code in <pre> </pre> tags
-				static rex backquoted {"`([^`]*)`"};
+				static rex backquoted {R"__(`([^`]*)`)__"};
 
-				var codematches = comment.match(backquoted);
+				var codematches = comments.match(backquoted);
 				for (var codematch : codematches) {
 					codematch = codematch.f(1, 2);
 
@@ -225,10 +231,10 @@ function main() {
 						abort(lasterror());
 				}
 
-				comment.replacer(backquoted, "<syntaxhighlight lang=\"c++\">\n$1</syntaxhighlight>");
+				comments.replacer(backquoted, "<syntaxhighlight lang=\"c++\">\n$1</syntaxhighlight>");
 			}
 
-			comment.replacer(_FM, "<br>\n");
+			comments.replacer(_FM, "<br>\n");
 
 			var line2 = srcline.field(";", 1);
 			line2.replacer("\\bstd::size_t\\b", "");
@@ -260,8 +266,9 @@ function main() {
 				line2.trimmerlast();
 			}
 
-			line2.replacer("DEFAULT_SPACE", "= \" \"");
-			line2.replacer("DEFAULT_EMPTY", "= \"\"");
+			line2.replacer("DEFAULT_SPACE", R"__(= "")__");
+			line2.replacer("DEFAULT_EMPTY", R"__(= "")__");
+			line2.replacer("DEFAULT_CSPACE", R"__(= ' ')__");
 
 			printl("|-");
 
@@ -269,11 +276,11 @@ function main() {
 			line2.prefixer("<em>");
 			line2.paster(line2.index("("), "</em>");
 
-			line2 = "|" ^ prefix ^ "||" ^ (objname ?: default_objname) ^ "." ^ line2 ^ "||" ^ comment;
+			line2 = "|" ^ prefix ^ "||" ^ (objname ?: default_objname) ^ "." ^ line2 ^ "||" ^ comments;
 			printl(line2);
 // format() slows compilation a lot for one off compilations (2.8/0.73 secs i.e x4)
 // so maybe wait for a modules version of fmt library
-//			println("|" "{}" "||" "<em>" "{}" "</em>" "." "{}" "||" "{}", prefix, objname, line2, comment);
+//			println("|" "{}" "||" "<em>" "{}" "</em>" "." "{}" "||" "{}", prefix, objname, line2, comments);
 
 		} // srcline
 

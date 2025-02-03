@@ -7,6 +7,15 @@ programinit()
 function main() {
 
 	{
+		// Unfortunately RM FM VM and SM are all considered as white space characters by regex rules
+		// Therefore use something like "[\r\n\t ]" instead of "\s" in regex where field mark chars are used
+		assert(match(_RM, "\\s") == _RM);
+		assert(match(_FM, "\\s") == _FM);
+		assert(match(_VM, "\\s") == _VM);
+		assert(match(_SM, "\\s") == _SM);
+		assert(match(_TM, "\\s") == "");
+		assert(match(_ST, "\\s") == "");
+
 		// Demo simplicity of exodus regex
 		//
 		// Compare to standard c++ example of the same at
