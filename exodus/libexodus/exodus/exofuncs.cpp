@@ -418,7 +418,7 @@ ND PUBLIC bool sqlexec(in sqlcmd, out response) {return var().sqlexec(sqlcmd, re
 
 ND PUBLIC bool attach(in filenames) {return var("").attach(filenames);}
 
-ND PUBLIC bool dbcreate(in dbname) {return dbname.dbcreate(dbname);}
+ND PUBLIC bool dbcreate(in dbname, in from_dbname) {return dbname.dbcreate(dbname, from_dbname);}
 ND PUBLIC var  dblist() {return var().dblist();}
 ND PUBLIC bool dbcopy(in from_dbname, in to_dbname) {return var().dbcopy(from_dbname, to_dbname);}
 ND PUBLIC bool dbdelete(in dbname) {return var().dbdelete(dbname);}
