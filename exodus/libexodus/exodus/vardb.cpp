@@ -5564,7 +5564,13 @@ var  var::listfiles() const {
 		if (!PQgetisnull(dbresult, filen, 0)) {
 			var filename = getpgresultcell(dbresult, filen, 0);
 			var schema = getpgresultcell(dbresult, filen, 1);
-			if (schema == "public")
+
+			// if (schema == "public")
+			// Perhaps should ignore all schemas in postgresql's schema search_path
+			// Early versions of exodus created all files in public.
+			// Now created in default (first element of search path $user, public) i.e. exodus
+			// See postgresql.conf search_path = $user, public
+			if (schema == "public" || schema == "exodus")
 				filenames ^= filename;
 			else
 				filenames ^= schema ^ "." ^ filename;
