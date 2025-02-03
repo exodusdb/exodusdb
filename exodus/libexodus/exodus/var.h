@@ -409,7 +409,7 @@ public:
 	ND out  getxlocale();
 
 	// Sets the current thread's default locale codepage code
-	//  obj is strvar
+	// obj is strvar
 	//
 	// `if (not "de_DE.utf8"_var.setxlocale()) ... // true if successful
 	//  // or
@@ -469,28 +469,28 @@ public:
 
 	//  obj is strvar
 
-	// <em>Returns:</em> The character number of the first char.
+	// Returns: The character number of the first char.
 	//
 	// `let v1 = "abc"_var.seq(); // 0x61 97
 	//  // or
 	//  let v2 = seq("abc");`
 	ND var  seq() const;
 
-	// <em>Returns:</em> The Unicode character number of the first unicode code point.
+	// Returns: The Unicode character number of the first unicode code point.
 	//
 	// `let v1 = "Γ"_var.textseq(); // 915 U+0393: Greek Capital Letter Gamma (Unicode Character)
 	//  // or
 	//  let v2 = textseq("Γ");`
 	ND var  textseq() const;
 
-	// <em>Returns:</em> The length of a string in number of chars
+	// Returns: The length of a string in number of chars
 	//
 	// `let v1 = "abc"_var.len(); // 3
 	//  // or
 	//  let v2 = len("abc");`
 	ND var  len() const;
 
-	// <em>Returns:</em> The number of output columns.
+	// Returns: The number of output columns.
 	// Allows multi column unicode and reduces combining characters etc. like e followed by grave accent
 	// Possibly does not properly calculate combining sequences of graphemes e.g. face followed by colour
 	//
@@ -499,14 +499,14 @@ public:
 	//  let v2 = textwidth("🤡x🤡");`
 	ND var  textwidth() const;
 
-	// <em>Returns:</em> The number of Unicode code points
+	// Returns: The number of Unicode code points
 	//
 	// `let v1 = "Γιάννης"_var.textlen(); // 7
 	//  // or
 	//  let v2 = textlen("Γιάννης");`
 	ND var  textlen() const;
 
-	// <em>Returns:</em> The number of fields determined by presence of sepstr.
+	// Returns: The number of fields determined by presence of sepstr.
 	// It is the same as var.count(sepstr) + 1 except that fcount returns 0 for an empty string.
 	//
 	// `let v1 = "aa**cc"_var.fcount("*"); // 3
@@ -514,7 +514,7 @@ public:
 	//  let v2 = fcount("aa**cc", "*");`
 	ND var  fcount(SV sepstr) const;
 
-	// Return the number of sepstr found
+	// <em>Returns</em> the number of sepstr found
 	//
 	// `let v1 = "aa**cc"_var.count("*"); // 2
 	//  // or
@@ -526,21 +526,21 @@ public:
 	// ends     endsWith     str_ends_with   endswith     HasSuffix() ends_with()   ends_with
 	// contains includes()   str_contains    contains()   Contains()  contains()    contains
 
-	// <em>Returns:</em> True if starts with prefix
+	// Returns: True if starts with prefix
 	//
 	// `let v1 = "abc"_var.starts("ab"); // true
 	//  // or
 	//  let v2 = starts("abc", "ab");`
 	ND bool starts(SV prefix) const;
 
-	// <em>Returns:</em> True if ends with suffix
+	// Returns: True if ends with suffix
 	//
 	// `let v1 = "abc"_var.ends("bc"); // true
 	//  // or
 	//  let v2 = ends("abc", "bc");`
 	ND bool ends(SV suffix) const;
 
-	// <em>Returns:</em> True if starts, ends or contains substr
+	// Returns: True if starts, ends or contains substr
 	//
 	// `let v1 = "abcd"_var.contains("bc"); // true
 	//  // or
@@ -549,7 +549,7 @@ public:
 
 	//https://en.wikipedia.org/wiki/Comparison_of_programming_languages_(string_functions)#Find
 
-	// <em>Returns:</em> Char no if found or 0 if not. startchar1 is byte no to start at.
+	// Returns: Char no if found or 0 if not. startchar1 is byte no to start at.
 	//
 	// `let v1 = "abcd"_var.index("bc"); // 2
 	//  // or
@@ -571,7 +571,7 @@ public:
 	//  let v2 = indexr("abcabc", "bc");`
 	ND var  indexr(SV substr, const int startchar1 = -1) const;
 
-	// <em>Returns:</em> All results of regex matching
+	// Returns: All results of regex matching
 	// Multiple matches are in fields. Groups are in values
 	//
 	// `let v1 = "abc1abc2"_var.match("BC(\\d)", "i"); // "bc1]1^bc2]2"
@@ -973,7 +973,7 @@ public:
 	//  obj is strvar
 
 	// Upper case
-	// All following string mutators follow the same pattern. See the non-mutating functions for details.
+	// All string mutators follow the same pattern as ucaser. See the non-mutating functions for details.
 	//
 	// `var v1 = "abc";
 	// v1.ucaser(); // "ABC"
@@ -1080,7 +1080,7 @@ public:
 	// delimiterno) const;
 
 	// substr version 4.
-	// <em>Returns:</em> A substr from a given pos1  up to the next RM/FM/VM/SM/TM/STM delimiter char. Also returns the next index/offset and the delimiter no. found 1-6 or 0 if not found.
+	// Returns: A substr from a given pos1  up to the next RM/FM/VM/SM/TM/ST delimiter char. Also returns the next index/offset and the delimiter no. found 1-6 or 0 if not found.
 	//
 	// `var pos1a = 4, delim1;
 	//  let v1 = "aa^bb^cc"_var.substr2(pos1a, delim1); // "bb", pos1a -> 7, delim -> 2 (FM)
@@ -1323,12 +1323,12 @@ public:
 	//
 	// `let v1 = "10,20,33"_var.sum(","); // "60"
 	//  // or
-	//  let v2 = sum("10,20,33");`
+	//  let v2 = sum("10,20,33", ",");`
 	ND var  sum(SV sepchar) const;
 
 	// Binary ops (+, -, *, /) in parallel on multiple values
 	//
-	// `let v1 = "10]20]30"_var.mv("+","2]3]4"); // "12]23]34"`
+	// `let v1 = "10]20]30"_var.mv("+","2]3]4"_var); // "12]23]34"`
 	ND var  mv(const char* opcode, in var2) const;
 
 	///// DYNAMIC ARRAY MUTATORS Standalone commands:
@@ -1407,23 +1407,23 @@ public:
 	// LOCATE
 
 	// locate() with only the target substr argument provided searches unordered values separated by VM chars.
-	// <em>Returns:</em> True if found and false if not.
+	// Returns: True if found and false if not.
 	// `if ("UK]US]UA"_var.locate("US")) ... // true
 	//  // or
 	//  if (locate("US", "UK]US]UA"_var)) ...`
 	ND bool locate(in target) const;
 
 	// locate() with only the target substr and valueno arguments provided searches unordered values separated by VM chars.
-	// <em>Returns:</em> True if found and with the value number in valueno.
-	// <em>Returns:</em> False if not found and with the max value number + 1 in setting. Suitable for additiom of new values
+	// Returns: True if found and with the value number in valueno.
+	// Returns: False if not found and with the max value number + 1 in setting. Suitable for additiom of new values
 	//
 	// `var valueno;
 	//  if ("UK]US]UA"_var.locate("US", valueno)) ... // returns true and valueno = 2`
 	ND bool locate(in target, out valueno) const;
 
 	// locate() the target in unordered fields if fieldno is 0, or values if a fieldno is specified, or subvalues if the valueno argument is provided.
-	// <em>Returns:</em> True if found and with the field, value or subvalue number in setting.
-	// <em>Returns:</em> False if not found and with the max field, value or subvalue number found + 1 in setting. Suitable for replacement of new fields, values or subvalues.
+	// Returns: True if found and with the field, value or subvalue number in setting.
+	// Returns: False if not found and with the max field, value or subvalue number found + 1 in setting. Suitable for replacement of new fields, values or subvalues.
 	//
 	// `var setting;
 	//  if ("f1^f2v1]f2v2]s1}s2}s3}s4^f3^f4"_var.locate("s4", setting, 2, 3)) ... // returns true and setting = 4`
@@ -1436,7 +1436,7 @@ public:
 	// Left is used to indicate alphabetic order where 10 < 2.
 	// Right is used to indicate numeric order where 10 > 2.
 	// Data must be in the correct order for searching to work properly.
-	// <em>Returns:</em> True if found.
+	// Returns: True if found.
 	// In case the target is not exactly found then the correct value no for inserting the target is returned in setting.
 	//
 	// `var valueno; if ("aaa]bbb]ccc"_var.locateby("AL", "bb", valueno)) ... // returns false and valueno = 2 where it could be correctly inserted.`
@@ -1455,8 +1455,8 @@ public:
 	ND bool locateusing(const char* usingchar, in target) const;
 
 	// locate() the target in a specific field, value or subvalue using a specified delimiter and unordered data
-	// <em>Returns:</em> True If found and returns in setting the number of the delimited field found.
-	// <em>Returns:</em> False if not found and returns in setting the maximum number of delimited fields + 1 if not found.
+	// Returns: True If found and returns in setting the number of the delimited field found.
+	// Returns: False if not found and returns in setting the maximum number of delimited fields + 1 if not found.
 	// This is similar to the main locate command but the delimiter char can be specified e.g. a comma or TM etc.
 	//
 	// `var setting;
@@ -1466,7 +1466,7 @@ public:
 	// LOCATE BY, USING
 
 	// locatebyusing() supports all the above features in a single function.
-	// <em>Returns:</em> True if found.
+	// Returns: True if found.
 	ND bool locatebyusing(const char* ordercode, const char* usingchar, in target, out setting, const int fieldno = 0, const int valueno = 0, const int subvalueno = 0) const;
 
 	///// DATABASE ACCESS:
@@ -1585,7 +1585,7 @@ public:
 	//  if (not dbcreate("mydb")) ...`
 	ND bool dbcreate(in dbname) const;
 
-	// Return a list of available databases on a particular connection.
+	// Returns: A list of available databases on a particular connection.
 	//
 	// `let v1 = conn.dblist();
 	//  // or
@@ -1636,7 +1636,7 @@ public:
 	//  if (not clearfile("myfile")) ...`
 	ND bool clearfile(in filename) const;
 
-	// Return a list of all files in a database
+	// Returns: A list of all files in a database
 	//
 	// `if (not conn.listfiles()) ...
 	//  // or
@@ -1645,7 +1645,7 @@ public:
 
 	// obj is conn_or_file
 
-	// <em>Returns:</em> The approx. number of records in a file
+	// Returns: The approx. number of records in a file
 	//
 	// `let file = "definitions";
 	//  var nrecs1 = file.reccount();
@@ -1680,7 +1680,7 @@ public:
 
 	// Creates a secondary index for a given file and field name.
 	// The fieldname must exist in a dictionary file. The default dictionary is "dict." ^ filename.
-	// <em>Returns:</em> False if the index cannot be created for any reason.
+	// Returns: False if the index cannot be created for any reason.
 	// * Index already exists
 	// * File does not exist
 	// * The dictionary file does not have a record with a key of the given field name.
@@ -1694,7 +1694,7 @@ public:
 	ND bool createindex(in fieldname, in dictfile = "") const;
 
 	// Deletes a secondary index for a file and field name.
-	// <em>Returns:</em> False if the index cannot be deleted for any reason
+	// Returns: False if the index cannot be deleted for any reason
 	// * File does not exist
 	// * Index does not already exists
 	//
@@ -1705,7 +1705,7 @@ public:
 	ND bool deleteindex(in fieldname) const;
 
 	// Lists secondary indexes in a database or file
-	// <em>Returns:</em> False if the file or fieldname are given and do not exist
+	// Returns: False if the file or fieldname are given and do not exist
 	// obj is file|conn
 	//
 	// `if (not conn.listindex()) ...
@@ -1720,7 +1720,7 @@ public:
 	// Locks can be removed by unlock() or unlockall() or will be automatically removed at the end of a transaction or when the connection is closed.
 	// If the same process attempts to place an identical lock more than once it may be denied (if not in a transaction) or succeed but be ignored (if in a transaction).
 	// Locks can be used to avoid processing a transaction simultaneously with another connection only to have one of them fail due to mutually updating the same records.
-	// <em>Returns:</em>:
+	// Returns::
 	// * 0: Failure: Another connection has already placed the same lock.
 	// * "" Failure: The lock has already been placed.
 	// * 1: Success: A new lock has been placed.
@@ -1735,7 +1735,7 @@ public:
 	// Removes a lock placed by the lock function.
 	// Only locks placed on the specified connection can be removed.
 	// Locks cannot be removed while a connection is in a transaction.
-	// <em>Returns:</em> False if the lock is not present in a connection.
+	// Returns: False if the lock is not present in a connection.
 	//
 	// `var file = "definitions", key = "1000";
 	//  if (not file.unlock(key)) ...
@@ -1754,7 +1754,7 @@ public:
 	// obj is rec
 
 	// Reads a record from a file given its unique primary key.
-	// <em>Returns:</em> False if the key doesnt exist
+	// Returns: False if the key doesnt exist
 	//
 	// `var rec, file = "definitions", key = "1000";
 	//  if (not rec.read(file, key)) ...
@@ -1774,7 +1774,7 @@ public:
 	   void write(in file, in key) const;
 
 	// Updates an existing record in a file.
-	// <em>Returns:</em> False if the key doesnt already exist
+	// Returns: False if the key doesnt already exist
 	// Any memory cached record is deleted.
 	//
 	// `var rec = "f1^f2^f3"_var, file = "definitions", key = "1000";
@@ -1784,7 +1784,7 @@ public:
 	ND bool updaterecord(in file, in key) const;
 
 	// Inserts a new record in a file.
-	// <em>Returns:</em> False if the key already exists
+	// Returns: False if the key already exists
 	// Any memory cached record is deleted.
 	//
 	// `var rec = "f1^f2^f3"_var, file = "definitions", key = "1000";
@@ -1794,7 +1794,7 @@ public:
 	ND bool insertrecord(in file, in key) const;
 
 	// Deletes a record from a file given its key.
-	// <em>Returns:</em> False if the key doesnt exist
+	// Returns: False if the key doesnt exist
 	// Any memory cached record is deleted.
 	// obj is file
 	//
@@ -1851,7 +1851,7 @@ public:
 
 	// Deletes a record and key from a memory cached "file".
 	// The actual file is NOT updated.
-	// <em>Returns:</em> False if the key doesnt exist
+	// Returns: False if the key doesnt exist
 	//
 	// `var file = "definitions", key = "1000";
 	//  if (not file.deletec(key)) ...
@@ -1997,7 +1997,7 @@ public:
 	// Given the name of an existing file name including path, initialises a file handle var that can be used in random access osbread and osbwrite functions.
 	// The utf8 option defaults to true which causes trimming of partial utf-8 unicode byte sequences from the end of osbreads. For raw untrimmed osbreads pass utf8 = false;
 	// File will be opened for writing if possible otherwise for reading.
-	// <em>Returns:</em> True if successful or false if not possible for any reason.
+	// Returns: True if successful or false if not possible for any reason.
 	// e.g. Target doesnt exist, permissions etc.
 	//
 	// `var hostsfile;
@@ -2039,7 +2039,7 @@ public:
 
 	// Read a complete os file into a var.
 	// If codepage is specified then input is converted from that codepage to utf-8 otherwise no conversion is done.
-	// <em>Returns:</em> True if successful or false if not possible for any reason.
+	// Returns: True if successful or false if not possible for any reason.
 	// e.g. File doesnt exist, permissions etc.
 	//
 	// `var text;
@@ -2050,7 +2050,7 @@ public:
 
 	// Create a complete os file from a var.
 	// Any existing file is removed first.
-	// <em>Returns:</em> True if successful or false if not possible for any reason.
+	// Returns: True if successful or false if not possible for any reason.
 	// e.g. Path is not writeable, permissions etc.
 	// If codepage is specified then output is converted from utf-8 to that codepage. Otherwise no conversion is done.
 	//
@@ -2066,7 +2066,7 @@ public:
 
 	// Removes/deletes an os file from the OS file system given path and name.
 	// Will not remove directories. Use osrmdir() to remove directories
-	// <em>Returns:</em> True if successful or false if not possible for any reason.
+	// Returns: True if successful or false if not possible for any reason.
 	// e.g. Target doesnt exist, path is not writeable, permissions etc.
 	//
 	// `if (not "../xyz.conf"_var.osremove()) abort(lasterror());
@@ -2079,7 +2079,7 @@ public:
 	// Renames an os file or dir in the OS file system.
 	// Will not overwrite an existing file or dir.
 	// Source and target must exist in the same storage device.
-	// <em>Returns:</em> True if successful or false if not possible for any reason.
+	// Returns: True if successful or false if not possible for any reason.
 	// e.g. Target already exists, path is not writeable, permissions etc.
 	// Uses std::filesystem::rename internally.
 	//
@@ -2098,7 +2098,7 @@ public:
 
 	// "Moves" a file or dir within the os file system.
 	// Will not overwrite an existing file or dir.
-	// <em>Returns:</em> True if successful or false if not possible for any reason.
+	// Returns: True if successful or false if not possible for any reason.
 	// e.g. Source doesnt exist or cannot be accessed, target already exists, source or target is not writeable, permissions etc.
 	// Attempts osrename first then oscopy followed by osremove original.
 	//
@@ -2114,7 +2114,7 @@ public:
 
 	// obj is dirpath
 
-	// <em>Returns:</em> A FM delimited string containing all matching dir entries given a dir path
+	// Returns: A FM delimited string containing all matching dir entries given a dir path
 	// A glob pattern (e.g. *.conf) can be appended to the path or passed as argument.
 	//
 	// `var entries1 = "/etc/"_var.oslist("*.cfg"); // "adduser.conf^ca-certificates.conf^ ..."
@@ -2128,7 +2128,7 @@ public:
 	// Same as oslist for files only
 	ND var  oslistd(SV globpattern = "") const;
 
-	// Return dir info for any dir entry or "" if it doesnt exist
+	// Returns: Dir info for any dir entry or "" if it doesnt exist
 	// A short string containing size ^ FM ^ modified_time ^ FM ^ modified_time
 	// mode 0 default
 	// mode 1 returns "" if not a file
@@ -2141,7 +2141,7 @@ public:
 	// obj is osfileordirpath
 	ND var  osinfo(const int mode = 0) const;
 
-	// Return dir info for a file
+	// Returns: Dir info for a file
 	// A short string containing size ^ FM ^ modified_time ^ FM ^ modified_time
 	// Alias for osinfo(1)
 	//
@@ -2151,7 +2151,7 @@ public:
 	// obj is osfilename
 	ND var  osfile() const;
 
-	// Return dir info for a dir.
+	// Returns: Dir info for a dir.
 	// A short string containing FM ^ modified_time ^ FM ^ modified_time
 	// Alias for osinfo(2)
 	//
@@ -2178,7 +2178,7 @@ public:
 
 	// obj is var()
 
-	// <em>Returns:</em> The current working directory
+	// Returns: The current working directory
 	//
 	// `var cwd1 = var().oscwd(); // "/home/exodus"
 	//  // or
@@ -2196,7 +2196,7 @@ public:
 	//////////////////////////
 
 	// Execute a shell command
-	// <em>Returns:</em> True if the process terminates with error status 0 and false otherwise.
+	// Returns: True if the process terminates with error status 0 and false otherwise.
 	//
 	// `let cmd = "ls -l xyz";
 	//  if (not cmd.osshell()) ...
