@@ -155,10 +155,13 @@ static bool checknotabsoluterootfolder(std::string dirpath) {
 	// NB copy/same code in osrmdir and osrename
 	//if (!dirpath.ends_with(OSSLASH_))
 	//	return true;
-	if ((!SLASH_IS_BACKSLASH && dirpath[0] == OSSLASH_ &&
-		 //std::count(dirpath.begin(), dirpath.end(), OSSLASH_) < 3) ||
-		 var(dirpath).count(_OSSLASH) < 3) ||
+
+	if ((!SLASH_IS_BACKSLASH && dirpath[0] == OSSLASH_ && var(dirpath).count(_OSSLASH) < 3) ||
 		(SLASH_IS_BACKSLASH && (dirpath[1] == ':') && (dirpath[2] == OSSLASH_))) {
+
+		// Only check existing dirs
+		if (not var(dirpath).osdir())
+			return true;
 
 		std::cerr
 			<< "Forced removal/renaming of top two level directories by absolute path is "

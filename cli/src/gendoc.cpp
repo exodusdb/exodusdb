@@ -222,7 +222,13 @@ function main() {
 						if (not osopen(codetxt_filename to codetxtfile))
 							abort(lasterror());
 
-						let progheader = "#include <exodus/program.h>\nprograminit()\n\nfunction main() {\n";
+						let progheader =
+R"__(#include <cassert>
+#include <exodus/program.h>
+programinit()
+
+function main() {
+)__";
 						if (not osbwrite(progheader on codetxtfile, codetxtptr))
 							abort(lasterror());
 					}
