@@ -1110,7 +1110,7 @@ bool var::attach(in filenames) const {
 	for (var filename : filenames2) {
 		const var normal_filename = get_normal_filename(filename);
 		var file;
-		if (file.open(normal_filename,*this)) {
+		if (file.open(normal_filename, *this)) {
 			// Similar code in dbattach and open
 			thread_file_handles[normal_filename] = file.var_str;
 			if (DBTRACE)
@@ -2549,15 +2549,15 @@ bool var::renamefile(in filename, in newfilename) const {
 	// Fail neatly if the old file does not exist.
 	// SQL errors during a transaction cause the whole transaction to fail.
 	// Make sure we use the right connection
-	var file = this->clone();
-	if (!file.open(filename)) UNLIKELY {
+	var file;
+	if (!file.open(filename, *this)) UNLIKELY {
 		setlasterror(filename.quote() ^ " cannot be renamed because it does not exist.");
 		return false;
 	}
 
 	// Fail neatly if the new file exists
 	// SQL errors during a transaction cause the whole transaction to fail.
-	if (file.open(newfilename)) UNLIKELY {
+	if (file.open(newfilename, *this)) UNLIKELY {
 		setlasterror(filename.quote() ^ " cannot be renamed because " ^ newfilename.quote() ^ " already exists.");
 		return false;
 	}
@@ -2586,8 +2586,8 @@ bool var::deletefile(in filename) const {
 	// Fail neatly if the file does not exist
 	// SQL errors during a transaction cause the whole transaction to fail.
 	// Delete the file on whatever connection it exists;
-	var file = this->clone();
-	if (!file.open(filename)) UNLIKELY {
+	var file;
+	if (!file.open(filename, *this)) UNLIKELY {
 		setlasterror(filename.quote() ^ " cannot be deleted because it does not exist.");
 		return false;
 	}
@@ -2622,7 +2622,7 @@ bool var::clearfile(in filename) const {
 
 	// Fail neatly if the file does not exist
 	// SQL errors during a transaction cause the whole transaction to fail.
-	var file = this->clone();
+	var file;
 	if (!file.open(filename, *this)) UNLIKELY {
 		setlasterror(filename.quote() ^ " cannot be cleared because it does not exist.");
 		return false;

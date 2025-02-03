@@ -452,6 +452,86 @@ programinit()
 		disconnect();  // global connection
 	}
 
+	{
+		let db1x = "test_db1x";
+		let db2x = "test_db2x";
+		let fname = "dbf1";
+
+		// Preclean 1
+		auto _ = dbdelete(db1x);
+		assert(not dblist().locateusing(FM, db1x));
+
+		// Preclean 2
+		auto _ = dbdelete(db2x);
+		assert(not dblist().locateusing(FM, db2x));
+
+		// dbcreate 1 and connect
+		assert(dbcreate(db1x));
+		assert(not dbcreate(db1x));
+		assert(dblist().locateusing(FM, db1x));
+		var conn1;
+		assert(conn1.connect(db1x));
+
+		// Create a file on 1 and disconnect
+		assert(conn1.createfile(fname));
+		assert(not conn1.createfile(fname));
+		assert(conn1.listfiles().locateusing(FM, fname));
+		conn1.disconnect();
+
+		// dbcopy 1 to 2 and connect to 2
+		assert(dbcopy(db1x, db2x));
+		assert(dblist().locateusing(FM, db2x));
+
+		// Check the file exists on 2
+		{
+			var conn2;
+			assert(conn2.connect(db2x));
+			assert(conn2.listfiles().locateusing(FM, fname));
+			var file;
+			assert(file.open(fname, conn2));
+
+			// Rename file on 2
+			let fname2 = fname ^ "_2";
+			assert(conn2.renamefile(fname, fname2));
+			assert(conn2.listfiles().locateusing(FM, fname2));
+			assert(not conn2.listfiles().locateusing(FM, fname));
+			assert(not conn2.deletefile(fname));
+
+			// Delete the renamed file on 2 and disconnect
+			assert(conn2.deletefile(fname2));
+			assert(not conn2.listfiles().locateusing(FM, fname2));
+			conn2.disconnect();
+		}
+
+		// Connect to 1, delete the file and disconnect
+		{
+			var conn1;
+			assert(conn1.connect(db1x));
+			assert(conn1.deletefile(fname));
+			conn1.disconnect();
+		}
+
+		// Delete 2
+		assert(dbdelete(db2x));
+		assert(not dbdelete(db2x));
+
+		// Verify to is required in dbcopy
+		assert(not dbcopy(db1x, ""));
+
+		// Create 2 from 1 using 2 argument version of dbcreate
+		assert(dbcreate(db2x, db1x));
+		assert(dblist().locateusing(FM, db2x));
+
+		// Delete 2
+		assert(dbdelete(db2x));
+		assert(not dbdelete(db2x));
+
+		// Delete 1
+		assert(dbdelete(db1x));
+		assert(not dbdelete(db1x));
+
+	}
+
 	printl(elapsedtimetext());
 	printl("Test passed");
 
