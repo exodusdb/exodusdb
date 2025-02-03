@@ -501,7 +501,7 @@ ND bool sqlexec(in sqlcmd, out response);
 
 ND bool attach(in filenames);
 
-ND bool dbcreate(in dbname);
+ND bool dbcreate(in dbname, in from_dbname DEFAULT_EMPTY);
 ND var  dblist(void);
 ND bool dbcopy(in from_dbname, in to_dbname);
 ND bool dbdelete(in dbname);

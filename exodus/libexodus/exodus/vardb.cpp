@@ -2432,6 +2432,17 @@ bool var::statustrans() const {
 // connectionhandle.dbcreate("mynewdb");
 
 bool var::dbcopy(in from_dbname, in to_dbname) const {
+	THISIS("bool var::dbcopy(in from_dbname, in new_dbname) const")
+	assertDefined(function_sig);
+	ISSTRING(from_dbname)
+	ISSTRING(to_dbname)
+
+	// Ensure to_dbname is provided to avoid bugs in app code
+	if (!to_dbname) {
+		this->setlasterror("dbcopy() requires new_dbname");
+		return false;
+	}
+
 	return this->dbcreate(to_dbname, from_dbname);
 }
 
