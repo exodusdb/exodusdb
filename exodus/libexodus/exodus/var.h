@@ -1514,11 +1514,11 @@ public:
 	// If conn is not specified then filename will be attached to the default connection.
 	// Multiple file names must be separated by FM
 	//
-	// `let filenames = "definitions^dict.definitions"_var;
+	// `let filenames = "definitions^dict.definitions"_var, conn = "exodus";
 	//  if (not conn.attach(filenames)) ...
 	//  // or
 	//  if (not attach(filenames)) ...`
-	ND bool attach(in filenames);
+	ND bool attach(in filenames) const;
 
 	// Detach (disconnect) files that have been attached using attach().
 	   void detach(in filenames);
@@ -1579,21 +1579,17 @@ public:
 	// obj is conn
 
 	// Create a named database on a particular connection.
+	// The target database cannot already exist.
+	// Optionally copies an existing database from the same connection and which cannot have any current connections.
 	//
 	// `if (not conn.dbcreate("mydb")) ...
 	//  // or
 	//  if (not dbcreate("mydb")) ...`
-	ND bool dbcreate(in dbname) const;
+	ND bool dbcreate(in new_dbname, in old_dbname = "") const;
 
-	// Returns: A list of available databases on a particular connection.
-	//
-	// `let v1 = conn.dblist();
-	//  // or
-	//  let v2 = dblist();`
-	ND var  dblist() const;
-
-	// Create a named database from an existing database.
-	// The source database cannot have any current connections.
+	// Create a named database as a copy of an existing database.
+	// The target database cannot already exist.
+	// The source database must exist on the same connection and cannot have any current connections.
 	//
 	// `if (not conn.dbcopy("mydb", "mydb2")) ...
 	//  // or
@@ -1601,12 +1597,19 @@ public:
 	ND bool dbcopy(in from_dbname, in to_dbname) const;
 
 	// Delete (drop) a named database.
-	// The target database cannot have any current connections.
+	// The target database must exist and cannot have any current connections.
 	//
 	// `if (not conn.dbdelete("mydb")) ...
 	//  // or
 	//  if (not dbdelete("mydb")) ...`
 	ND bool dbdelete(in dbname) const;
+
+	// Returns: A list of available databases on a particular connection.
+	//
+	// `let v1 = conn.dblist();
+	//  // or
+	//  let v2 = dblist();`
+	ND var  dblist() const;
 
 	// Create a named db file.
 	//

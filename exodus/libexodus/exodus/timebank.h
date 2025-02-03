@@ -159,7 +159,7 @@ auto get_timebank_acno(const std::string_view arg1) -> int {
 	else if (++acno && arg1 == "bool var::rollbacktrans() const") {}
 	else if (++acno && arg1 == "bool var::committrans() const") {}
 	else if (++acno && arg1 == "bool var::statustrans() const") {}
-	else if (++acno && arg1 == "bool var::dbcreate(in from_dbname, in to_dbname)") {}
+	else if (++acno && arg1 == "bool var::dbcreate(in new_dbname, in old_dbname) const") {}
 	else if (++acno && arg1 == "bool var::dbdelete(in dbname)") {}
 	else if (++acno && arg1 == "bool var::createfile(in filename)") {}
 	else if (++acno && arg1 == "bool var::renamefile(in filename, in newfilename)") {}
