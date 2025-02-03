@@ -416,7 +416,7 @@ ND PUBLIC bool connect(in connectioninfo DEFAULT_EMPTY) {var conn1; return conn1
 ND PUBLIC bool sqlexec(in sqlcmd) {return var().sqlexec(sqlcmd);}
 ND PUBLIC bool sqlexec(in sqlcmd, out response) {return var().sqlexec(sqlcmd, response);}
 
-ND PUBLIC bool attach(in filenames) {return var().attach(filenames);}
+ND PUBLIC bool attach(in filenames) {return var("").attach(filenames);}
 
 ND PUBLIC bool dbcreate(in dbname) {return dbname.dbcreate(dbname);}
 ND PUBLIC var  dblist() {return var().dblist();}

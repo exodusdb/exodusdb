@@ -1083,7 +1083,7 @@ bool var::connect(in conninfo) {
 }
 
 // conn1.attach("filename1^filename2...");
-bool var::attach(in filenames) {
+bool var::attach(in filenames) const {
 
 	THISIS("bool var::attach(in filenames")
 	assertDefined(function_sig);
@@ -1151,6 +1151,7 @@ void var::disconnect() {
 
 	THISIS("bool var::disconnect()")
 	assertDefined(function_sig);
+//	assertString(function_sig);
 
 	if (DBTRACE or DBTRACE_CONN)
 		(this->assigned() ? *this : var("")).logputl("DBTR var::disconnect() ");
@@ -2430,26 +2431,26 @@ bool var::statustrans() const {
 // connectionhandle.connect("connection string pars");
 // connectionhandle.dbcreate("mynewdb");
 
-bool var::dbcreate(in dbname) const {
-	return this->dbcopy(var(""), dbname);
+bool var::dbcopy(in from_dbname, in to_dbname) const {
+	return this->dbcreate(to_dbname, from_dbname);
 }
 
-bool var::dbcopy(in from_dbname, in to_dbname) const {
+bool var::dbcreate(in new_dbname, in old_dbname /* = "" */) const {
 
-	THISIS("bool var::dbcreate(in from_dbname, in to_dbname)")
+	THISIS("bool var::dbcreate(in new_dbname, in old_dbname) const")
 	assertDefined(function_sig);
-	ISSTRING(from_dbname)
-	ISSTRING(to_dbname)
+	ISSTRING(new_dbname)
+	ISSTRING(old_dbname)
 
 	// TODO Fail neatly if the source db doesnt exist or the target db already exists
 
 	// Prepare the SQL
-	var sql = "CREATE DATABASE " ^ to_dbname ^ " WITH";
+	var sql = "CREATE DATABASE " ^ new_dbname ^ " WITH";
 	sql ^= " ENCODING='UTF8' ";
 
 	// Optionally copy from an existing database
-	if (from_dbname)
-		sql ^= " TEMPLATE " ^ from_dbname;
+	if (old_dbname)
+		sql ^= " TEMPLATE " ^ old_dbname;
 
 	// Create the database
 	if (!this->sqlexec(sql)) UNLIKELY {
@@ -2459,7 +2460,7 @@ bool var::dbcopy(in from_dbname, in to_dbname) const {
 
 	// Connect to the new db
 	var newdb;
-	if (not newdb.connect(to_dbname)) UNLIKELY {
+	if (not newdb.connect(new_dbname)) UNLIKELY {
 		//newdb.lasterror().errputl();
 		return false;
 	}

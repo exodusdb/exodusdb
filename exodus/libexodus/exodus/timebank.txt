@@ -36,7 +36,7 @@
 535 bool var::rollbacktrans() const
 536 bool var::committrans() const
 537 bool var::statustrans() const
-538 bool var::dbcreate(in from_dbname, in to_dbname)
+538 bool var::dbcreate(in new_dbname, in old_dbname) const
 539 bool var::dbdelete(in dbname)
 540 bool var::createfile(in filename)
 541 bool var::renamefile(in filename, in newfilename)
