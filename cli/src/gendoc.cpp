@@ -184,10 +184,10 @@ function main() {
 
 				// Add a backtick if an odd numbers is present indicating forgot to close c++ code
 				if (comments.count("`") % 2) {
-					let msg = "Odd number of backticks in " ^ funcname.quote();
-					if (comments.count("`") > 1 )
-						abort(msg);
-					logputl(msg);
+					if (comments.count("`") > 1 ) {
+						abort("Error: Odd number of backticks in " ^ funcname.quote());
+					}
+					logputl("Warning: Missing closing backtick in " ^ funcname.quote());
 					comments ^= "`";
 				}
 
