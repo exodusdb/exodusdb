@@ -4,6 +4,7 @@
 #include <cassert>
 
 //#include <cctype> // for std::isdigit
+#include "ASCIIutil.h" // for ASCII_isdigit ASCII_isalpha ASCII_toupper
 
 #include <exodus/var.h>
 
@@ -230,7 +231,7 @@ naturalorderbegin:
 	for (;;) {
 		if (iter == iterend)
 			goto naturalorderexit;
-		if (!std::isdigit(*iter))
+		if (!ASCII_isdigit(*iter))
 			break;
 		hasdigit = true;
 		val = 10.0 * val + (*iter - '0');
@@ -246,7 +247,7 @@ naturalorderbegin:
 	for (;;) {
 		if (iter == iterend)
 			goto naturalorderexit;
-		if (!std::isdigit(*iter))
+		if (!ASCII_isdigit(*iter))
 			break;
 		hasdigit = true;
 		val = 10.0 * val + (*iter - '0');

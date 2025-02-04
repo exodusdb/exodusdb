@@ -55,7 +55,7 @@ class VarOSHandlesCache {
 #ifndef INSIDE_VAR_OSHANDLE_CPP
 extern
 #endif								  // INSIDE_VAR_OSHANDLE_CPP
-	thread_local VarOSHandlesCache mv_handles_cache;  // global table (intended usage: mvos.cpp and mvdbpostgres.cpp)
+	thread_local VarOSHandlesCache mv_handles_cache;  // global table (intended usage: mvos.cpp and vardb.cpp)
 
 }  // namespace exo
 

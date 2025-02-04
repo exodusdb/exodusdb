@@ -34,6 +34,8 @@ THE SOFTWARE.
 //#include <stdexcept> // for std::invalid_argument
 #endif
 
+#include "ASCIIutil.h" // for ASCII_isdigit ASCII_isalpha ASCII_toupper
+
 #include <exodus/var.h>
 #include <exodus/varimpl.h>
 #include <exodus/rex.h>
@@ -286,16 +288,18 @@ var  var::iconv(const char* conversion) const {
 // ICONV_MT
 ///////////
 
-inline static bool varioconv_is_digit(char c) {
-	return (c & 0b1000'0000) == 0 and c >= '0' and c <= '9';
-}
+//inline static bool varioconv_is_digit(char c) {
+//	return (c & 0b1000'0000) == 0 and c >= '0' and c <= '9';
+//}
 
 int extract_first_digits_as_int(std::string::iterator& iter, std::string::iterator end) {
 
     while (iter != end) {
-        if (varioconv_is_digit(*iter)) {
+//        if (varioconv_is_digit(*iter)) {
+        if (ASCII_isdigit(*iter)) {
             int num = 0;
-            while (iter != end && varioconv_is_digit(*iter)) {
+//            while (iter != end && varioconv_is_digit(*iter)) {
+            while (iter != end && ASCII_isdigit(*iter)) {
                 num = num * 10 + (*iter - '0');
                 ++iter;
             }
@@ -517,7 +521,7 @@ std::string var::oconv_MD(const char* conversion) const {
 	// following up to two digits are ndecimals, or ndecimals and movedecimals
 	// look for a digit
 	//TODO allow A-I to act like 10 to 19 digits
-	if (std::isdigit(nextchar)) {
+	if (ASCII_isdigit(nextchar)) {
 
 		// first digit is either ndecimals or ndecimals and movedecimals
 		ndecimals = nextchar - '0';
@@ -530,7 +534,7 @@ std::string var::oconv_MD(const char* conversion) const {
 		// look for a second digit
 		pconversion++;
 		nextchar = *pconversion;
-		if (std::isdigit(nextchar)) {
+		if (ASCII_isdigit(nextchar)) {
 			// get movedecimals
 			movedecs = nextchar - '0';
 
