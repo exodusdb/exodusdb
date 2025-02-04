@@ -136,7 +136,7 @@ function main() {
 //			var comments = srcline.field("{", 1).field(";", 2, 9999).trimmerfirst("/ ");
 			var comments = srcline.field("/" "/", 2, 99999).trimfirst();
 			srcline = srcline.field("/" "/", 1).field("{", 1).trimlast();
-//			let funcname = srcline.field("(", 1);
+			let funcname = srcline.field("(", 1);
 
 			// If no end of line comment use the lead in comments before the function declaration
 			if (not comments and lastcomment) {
@@ -183,8 +183,13 @@ function main() {
 				comments.replacer(rex2, "\n`");
 
 				// Add a backtick if an odd numbers is present indicating forgot to close c++ code
-				if (comments.count("`") % 2)
+				if (comments.count("`") % 2) {
+					let msg = "Odd number of backticks in " ^ funcname.quote();
+					if (comments.count("`") > 1 )
+						abort(msg);
+					logputl(msg);
 					comments ^= "`";
+				}
 
 				// Wrap backticked code in <pre> </pre> tags
 				static rex backquoted {R"__(`([^`]*)`)__"};
@@ -193,7 +198,10 @@ function main() {
 				for (var codematch : codematches) {
 					codematch = codematch.f(1, 2);
 
-					codematch.replacer(" ...", " {};");
+					let aborting = " {abort(" ^ funcname.quote() ^ " \": \" ^ lasterror());}";
+					codematch.replacer(") ... ok", ") {/" "*ok*" "/} else " ^ aborting);
+//					codematch.replacer(") ...", ") {abort();}");
+					codematch.replacer(" ...", aborting);
 
 					codematch.replacer("\n", "\n\t\t");
 					codematch.replacer("\n\t\t\n", "\n");
@@ -201,7 +209,10 @@ function main() {
 					// Wrap in {}
 					codematch.prefixer("\n\t{\n\t\t");
 					codematch ^= "\n\t}\n";
-					codematch.prefixer("\n\t/" "/" ^ srcline);
+
+					// Lead with function name
+//					codematch.prefixer("\n\t/" "/" ^ srcline);
+					codematch.prefixer("\n\tprintl(" ^ srcline.quote() ^ ");");
 
 					// Global definitions;
 					for (var objname : new_objs) {
@@ -228,6 +239,9 @@ R"__(#include <cassert>
 programinit()
 
 function main() {
+	// Clean up before starting
+	if (not dbdelete("xo_gendoc_testdb")) {};
+	if (not dbdelete("xo_gendoc_testdb2")) {};
 )__";
 						if (not osbwrite(progheader on codetxtfile, codetxtptr))
 							abort(lasterror());
