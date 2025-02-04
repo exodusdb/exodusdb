@@ -32,11 +32,14 @@ THE SOFTWARE.
 #	include <iostream> //for cerr
 #	include <chrono>
 #	include <sstream>
-#	include <cctype> // for std::isdigit
+//#	include <cctype> // for std::isdigit
 
 #	include <ctime> // for std::time_t
-#	include <cctype> // for std::isalpha std::toupper
+//#	include <cctype> // for std::isalpha std::toupper
+
 #endif
+
+#	include "ASCIIutil.h" // for ASCII_isdigit ASCII_isalpha ASCII_toupper
 
 #pragma GCC diagnostic push
 #pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
@@ -309,7 +312,7 @@ var  var::iconv_D(const char* conversion) const {
 	auto iter = var_str.begin();
 	const auto end = var_str.end();
 	while (iter != end) {
-		if (std::isdigit(*iter)) {
+		if (ASCII_isdigit(*iter)) {
 
 			partn++;
 
@@ -318,13 +321,13 @@ var  var::iconv_D(const char* conversion) const {
 
 			// Accumulate any additional digits as ints
 			// after multipying prior accumulation by 10
-			while (std::isdigit(*iter))
+			while (ASCII_isdigit(*iter))
 				parts[partn] = (parts[partn] * 10) + ((*iter++) - '0');
 
 			continue;
 		}
 
-		else if (std::isalpha(*iter)) {
+		else if (ASCII_isalpha(*iter)) {
 
 			// Alphabetic months must only appear once
 			if (month != 0)
@@ -335,8 +338,8 @@ var  var::iconv_D(const char* conversion) const {
 			do {
 				// toupper returns an int despite being given a char
 				// Presumably safe to cast back to char
-				word.push_back(static_cast<char>(std::toupper(*iter++)));
-			} while (std::isalpha(*iter));
+				word.push_back(static_cast<char>(ASCII_toupper(*iter++)));
+			} while (ASCII_isalpha(*iter));
 
 //			// determine the month number 1 - 12
 //			for (int ii = 0; ii < 12 * 4; ii += 4) {

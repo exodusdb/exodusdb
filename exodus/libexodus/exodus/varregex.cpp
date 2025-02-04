@@ -738,61 +738,10 @@ var  var::replace(const rex& regex, SV replacement) const& {
 
 }
 
-//// ICONV_MT can be moved back to mvioconv.cpp if it stops using regular expressions
-/////////////
-//
-//int extract_first_digits_as_int(std::string::iterator& iter, std::string::iterator end) {
-//
-//    while (iter != end) {
-//        if (std::isdigit(*iter)) {
-//            int num = 0;
-//            while (iter != end && std::isdigit(*iter)) {
-//                num = num * 10 + (*iter - '0');
-//                ++iter;
-//            }
-//			return num;
-//        } else {
-//            ++iter;
-//        }
-//    }
-//	// Not found;
-//    return 0;
-//}
-//
-//var  var::iconv_MT() const {
-//
-//	THISIS("var  var::iconv_MT() const")
-//	assertString(function_sig);
-////	assertString("var  var::iconv_MT() const");
-//
-//	// Get the first three groups of digits "...99...99...99..."
-//	// regardless of all other leading, inner or trailing characters
-//	auto iter = var_str.begin();
-//	auto end = var_str.end();
-//	int hours = extract_first_digits_as_int(iter, end);
-//	int mins  = extract_first_digits_as_int(iter, end);
-//	int secs  = extract_first_digits_as_int(iter, end);
-//
-//	int inttime = hours * 3600 + mins * 60 + secs;
-//
-//	if (inttime >= 86400)
-//		return "";
-//
-//	// P anywhere in the input indicated AM or PM
-//	// PM
-//	if (inttime < 43200 && (*this).contains("P"))
-//		inttime += 43200;
-//	// AM
-//	else if (inttime >= 43200 && (*this).contains("A"))
-//		inttime -= 43200;
-//
-//	return inttime;
-//}
-
 // OCONV_MR can be moved back to mvioconv.cpp if it stops using regular expressions
 ///////////
 
-// regular expressions for ICONV_MC - Note: io and non-const
+// Regular expressions for ICONV_MC - Note: io and non-const
 io   var::oconv_MR(const char* conversion) {
 
 	THISIS("io   var::oconv_MR(const char* conversion) const")

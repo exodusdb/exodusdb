@@ -325,10 +325,12 @@ export namespace std {
 	using std::time_t;
 
 	// <cctype>
-	using std::isdigit;
-	using std::isalpha;
-	using std::toupper;
-	using std::tolower;
+// Should not be using these since they are not fully threadsafe even for narrow chars
+// Replaced by ASCII_isdigit ASCII_isalpha ASCII_toupper in exodus/ASCIIutil.h
+//	using std::isdigit;
+//	using std::isalpha;
+//	using std::toupper;
+//	using std::tolower;
 
 	// <stdexcept>
 	using std::invalid_argument;

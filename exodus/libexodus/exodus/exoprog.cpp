@@ -192,7 +192,7 @@ bool ExodusProgramBase::select(in sortselectclause_or_filehandle) {
 
 		var op = calc_fields.f(2, fieldn);
 
-		//multivalued selections are not well supported from mvdbpostgresql. handle the obvious cases"
+		//multivalued selections are not well supported. handle the obvious cases"
 		if (ovalue.contains(VM)) {
 			if (op == "=")
 				op = "in";
