@@ -335,7 +335,7 @@ static const var valuechars("\"'.0123456789-+");
 
 // hash64 a std::string
 ///////////////////////
-static std::uint64_t mvdbpostgres_hash_stdstr(std::string str1) {
+static std::uint64_t vardb_hash_stdstr(std::string str1) {
 
 #if defined(USE_WYHASH)
 	return wyhash(str1.data(), str1.size(), 0, _wyp);
@@ -374,7 +374,7 @@ static std::uint64_t mvdbpostgres_hash_stdstr(std::string str1) {
 /////////////////////////////
 // Create a cross platform stable unique lock number per filename & key to manipulate advisory locks on a postgres connection
 // TODO Provide an endian identical version. required if and when exodus processes connect to postgres from different endian hosts
-static std::uint64_t mvdbpostgres_hash_file_and_key(in file, in key) {
+static std::uint64_t vardb_hash_file_and_key(in file, in key) {
 
 	// Use the pure filename and disregard any connection number
 	std::string fileandkey = get_normal_filename(file);
@@ -388,7 +388,7 @@ static std::uint64_t mvdbpostgres_hash_file_and_key(in file, in key) {
 	// Normalise all alternative utf8 encodings of the same unicode points so they hash identically
 	fileandkey.append(key.normalize().toString());
 
-	return mvdbpostgres_hash_stdstr(fileandkey);
+	return vardb_hash_stdstr(fileandkey);
 
 }
 
@@ -543,7 +543,7 @@ static int get_dbconn_no_or_default(in dbhandle) {
 		//3. the default db connection
 		if (isdict) {
 			if (not defaultdb.osgetenv("EXO_DICT") or not defaultdb)
-				//must be the same in mvdbpostgres.cpp and dict2sql
+				//must be the same in vardb.cpp and dict2sql
 				defaultdb="exodus";
 		} else {
 			defaultdb = "";
@@ -678,7 +678,7 @@ static bool get_dbresult(in sql, DBresult& dbresult, PGconn* pgconn) {
 
 	// Handle serious error. Why not throw?
 	if (!dbresult) UNLIKELY {
-		var("ERROR: mvdbpostgres PQexec command failed, no error code: ").errputl();
+		var("ERROR: vardb: PQexec command failed, no error code: ").errputl();
 		return false;
 	}
 
@@ -693,7 +693,7 @@ static bool get_dbresult(in sql, DBresult& dbresult, PGconn* pgconn) {
 
 		case PGRES_NONFATAL_ERROR:
 
-			var("ERROR: mvdbpostgres SQL non-fatal error code " ^
+			var("ERROR: vardb: SQL non-fatal error code " ^
 				var(PQresStatus(PQresultStatus(dbresult))) ^ ", " ^
 				var(PQresultErrorMessage(dbresult)))
 				.errputl();
@@ -717,8 +717,8 @@ static bool get_dbresult(in sql, DBresult& dbresult, PGconn* pgconn) {
 #pragma clang diagnostic ignored "-Wcovered-switch-default"
 		default:
 			UNLIKELY
-			var("ERROR: mvdbpostgres pqexec " ^ var(sql)).errputl();
-			var("ERROR: mvdbpostgres pqexec " ^
+			var("ERROR: vardb: pqexec " ^ var(sql)).errputl();
+			var("ERROR: vardb: pqexec " ^
 				var(PQresStatus(PQresultStatus(dbresult))) ^ ": " ^
 				var(PQresultErrorMessage(dbresult)))
 				.errputl();
@@ -742,7 +742,7 @@ LONG WINAPI DelayLoadDllExceptionFilter(PEXCEPTION_POINTERS pExcPointers) {
 
 	switch (pExcPointers->ExceptionRecord->ExceptionCode) {
 		case VcppException(ERROR_SEVERITY_ERROR, ERROR_MOD_NOT_FOUND):
-			printf("mvdbpostgres: %s was not found\n", pDelayLoadInfo->szDll);
+			printf("vardb:: %s was not found\n", pDelayLoadInfo->szDll);
 			break;
 			/*
 			case VcppException(ERROR_SEVERITY_ERROR, ERROR_PROC_NOT_FOUND):
@@ -983,7 +983,7 @@ bool var::connect(in conninfo) {
 //		if (not msvc_PQconnectdb(&pgconn, fullconninfo.var_str)) UNLIKELY {
 //			var libname = "libpq.dl";
 //			// var libname="libpq.so";
-//			var errmsg="ERROR: mvdbpostgres connect() Cannot load shared library " ^ libname ^
+//			var errmsg="ERROR: vardb: connect() Cannot load shared library " ^ libname ^
 //				". Verify configuration PATH contains postgres's \\bin.";
 //			this->setlasterror(errmsg);
 //			return false;
@@ -1009,7 +1009,7 @@ bool var::connect(in conninfo) {
 	// failed to connect so return false
 	if (PQstatus(pgconn) != CONNECTION_OK) UNLIKELY {
 
-		var errmsg = "ERROR: mvdbpostgres connect() Connection to database failed: " ^ var(PQerrorMessage(pgconn));
+		var errmsg = "ERROR: vardb: connect() Connection to database failed: " ^ var(PQerrorMessage(pgconn));
 
 		this->setlasterror(errmsg);
 
@@ -1123,7 +1123,7 @@ bool var::attach(in filenames) const {
 
 	//fail if anything not attached
 	if (notattached_filenames) UNLIKELY {
-		var errmsg = "ERROR: mvdbpostgres/attach: " ^ notattached_filenames ^ "cannot be attached on connection " ^ this->f(1).quote();
+		var errmsg = "ERROR: vardb:/attach: " ^ notattached_filenames ^ "cannot be attached on connection " ^ this->f(1).quote();
 		this->setlasterror(errmsg);
 		return false;
 	}
@@ -1374,7 +1374,7 @@ bool var::open(in filename, in connection /*DEFAULTNULL*/) {
 
 	//failure if not found
 	if (not result.ends("t")) UNLIKELY {
-		var errmsg = "ERROR: mvdbpostgres 2 open(" ^ filename.quote() ^
+		var errmsg = "ERROR: vardb: 2 open(" ^ filename.quote() ^
 					") file does not exist.";
 		this->setlasterror(errmsg);
 		return false;
@@ -1454,7 +1454,7 @@ bool var::readc(in file, in key) {
 
 	// Attempt to get record from the cache
 	// TODO cache non-existent records as empty
-	auto hash64 = mvdbpostgres_hash_file_and_key(file, key);
+	auto hash64 = vardb_hash_file_and_key(file, key);
 	//TRACE("readc " ^ file ^ " " ^ key ^ " " ^ var(hash64 % 1'000'000'000)) //modulo to bring the uint64 into range that var can handle without throwing overflow
 	std::string cachedrecord;
 	if (thread_dbconnector.getrecord(dbconn_no, hash64, cachedrecord)) {
@@ -1507,7 +1507,7 @@ void var::writec(in file, in key) const {
 		UNLIKELY
 		throw VarDBException("get_dbconn_no() failed");
 
-	auto hash64 = mvdbpostgres_hash_file_and_key(file, key);
+	auto hash64 = vardb_hash_file_and_key(file, key);
 	//TRACE("writec " ^ file ^ " " ^ key ^ " " ^ var(hash64 % 1'000'000'000)) //modulo to bring the uint64 into range that var can handle without throwing overflow
 	thread_dbconnector.putrecord(dbconn_no, hash64, var_str);
 
@@ -1527,7 +1527,7 @@ bool var::deletec(in key) const {
 		UNLIKELY
 		throw VarDBException("get_dbconn_no() failed");
 
-	auto hash64 = mvdbpostgres_hash_file_and_key(*this, key);
+	auto hash64 = vardb_hash_file_and_key(*this, key);
 	//TRACE("deletec " ^ *this ^ " " ^ key ^ " " ^ var(hash64 % 1'000'000'000)) //modulo to bring the uint64 into range that var can handle without throwing overflow
 	return thread_dbconnector.delrecord(dbconn_no, hash64);
 }
@@ -1664,14 +1664,14 @@ bool var::read(in file, in key) {
 		//leave record (this) untouched if record cannot be read
 		// *this = "";
 
-		this->setlasterror("ERROR: mvdbpostgres read() record does not exist " ^
+		this->setlasterror("ERROR: vardb: read() record does not exist " ^
 					key.quote());
 		return false;
 	}
 
 	// A serious error
 	if (PQntuples(dbresult) > 1) UNLIKELY {
-		var errmsg = "ERROR: mvdbpostgres read() SELECT returned more than one record";
+		var errmsg = "ERROR: vardb: read() SELECT returned more than one record";
 		this->setlasterror(errmsg);
 		// this->loglasterror();
 		throw VarDBException(errmsg);
@@ -1704,7 +1704,7 @@ var  var::hash(const std::uint64_t modulus) const {
 //	std::uint64_t hash64 = std::hash<std::string>{}(var_str);
 //#endif
 //
-	std::uint64_t hash64 = mvdbpostgres_hash_stdstr(this->var_str);
+	std::uint64_t hash64 = vardb_hash_stdstr(this->var_str);
 
 	if (modulus)
 		return var_int = hash64 % modulus;
@@ -1745,7 +1745,7 @@ var  var::lock(in key) const {
 	auto dbconn = get_dbconn(*this);
 
 	// TODO consider preventing begintrans if lock cache not empty
-	auto hash64 = mvdbpostgres_hash_file_and_key(*this, key);
+	auto hash64 = vardb_hash_file_and_key(*this, key);
 
 	// if already in lock cache
 	//
@@ -1812,7 +1812,7 @@ bool var::unlock(in key) const {
 	assertDefined(function_sig);
 	ISSTRING(key)
 
-	auto hash64 = mvdbpostgres_hash_file_and_key(*this, key);
+	auto hash64 = vardb_hash_file_and_key(*this, key);
 
 	auto pgconn = get_pgconn(*this);
 	if (!pgconn) UNLIKELY {
@@ -2085,11 +2085,11 @@ void var::write(in file, in key) const {
 	// Handle serious errors
 	if (PQresultStatus(dbresult) != PGRES_COMMAND_OK) UNLIKELY {
 		var sqlstate = var(PQresultErrorField(dbresult, PG_DIAG_SQLSTATE));
-		var errmsg = "ERROR: mvdbpostgres write(" ^ file.convert(_FM, "^") ^
+		var errmsg = "ERROR: vardb: write(" ^ file.convert(_FM, "^") ^
 					", " ^ key ^ ") failed: SQLERROR:" ^ sqlstate ^ " PQresultStatus=" ^
 					var(PQresStatus(PQresultStatus(dbresult))) ^ " " ^
 					var(PQerrorMessage(pgconn));
-		// ERROR: mvdbpostgres write(definitions^1, LAST_SYNCDATE_TIME*DAT) failed: SQLERROR:25P02
+		// ERROR: vardb: write(definitions^1, LAST_SYNCDATE_TIME*DAT) failed: SQLERROR:25P02
 		// PQresultStatus=PGRES_FATAL_ERROR ERROR:  current transaction is aborted, commands ignored until end of transaction block
 
 		//errmsg.logputl();
@@ -2151,7 +2151,7 @@ bool var::updaterecord(in file, in key) const {
 	// Handle serious errors
 	if (PQresultStatus(dbresult) != PGRES_COMMAND_OK) UNLIKELY {
 		var sqlstate = var(PQresultErrorField(dbresult, PG_DIAG_SQLSTATE));
-		var errmsg = "ERROR: mvdbpostgres update(" ^ file.convert(_FM, "^") ^
+		var errmsg = "ERROR: vardb: update(" ^ file.convert(_FM, "^") ^
 				", " ^ key ^ ") SQLERROR: " ^ sqlstate ^ " Failed: " ^ var(PQntuples(dbresult)) ^ " " ^
 				var(PQerrorMessage(pgconn));
 		this->setlasterror(errmsg);
@@ -2161,7 +2161,7 @@ bool var::updaterecord(in file, in key) const {
 
 	// if not updated 1 then fail
 	if (std::strcmp(PQcmdTuples(dbresult), "1") != 0) UNLIKELY {
-		var("ERROR: mvdbpostgres update(" ^ file.convert(_FM, "^") ^
+		var("ERROR: vardb: update(" ^ file.convert(_FM, "^") ^
 			", " ^ key ^ ") Failed: " ^ var(PQntuples(dbresult)) ^ " " ^
 			var(PQerrorMessage(pgconn)))
 			.errputl();
@@ -2225,7 +2225,7 @@ bool var::insertrecord(in file, in key) const {
 		if (sqlstate == 23505) UNLIKELY
 			return false;
 
-		var errmsg = "ERROR: mvdbpostgres insertrecord(" ^
+		var errmsg = "ERROR: vardb: insertrecord(" ^
 				file.convert(_FM, "^") ^ ", " ^ key ^ ") Failed: " ^
 				var(PQntuples(dbresult)) ^ " SQLERROR:" ^ sqlstate ^ " " ^
 				var(PQerrorMessage(pgconn));
@@ -2236,7 +2236,7 @@ bool var::insertrecord(in file, in key) const {
 
 	// if not updated 1 then fail
 	if (std::strcmp(PQcmdTuples(dbresult), "1") != 0) UNLIKELY {
-		var("ERROR: mvdbpostgres insertrecord(" ^ file.convert(_FM, "^") ^
+		var("ERROR: vardb: insertrecord(" ^ file.convert(_FM, "^") ^
 			", " ^ key ^ ") Failed: " ^ var(PQntuples(dbresult)) ^ " " ^
 			var(PQerrorMessage(pgconn)))
 			.errputl();
@@ -2294,7 +2294,7 @@ bool var::deleterecord(in key) const {
 	// Handle serious errors
 	if (PQresultStatus(dbresult) != PGRES_COMMAND_OK) UNLIKELY {
 		var sqlstate = var(PQresultErrorField(dbresult, PG_DIAG_SQLSTATE));
-		var errmsg = "ERROR: mvdbpostgres deleterecord(" ^ this->convert(_FM, "^") ^
+		var errmsg = "ERROR: vardb: deleterecord(" ^ this->convert(_FM, "^") ^
 				", " ^ key ^ ") SQLERROR: " ^ sqlstate ^ " Failed: " ^ var(PQntuples(dbresult)) ^ " " ^
 				var(PQerrorMessage(pgconn));
 		this->setlasterror(errmsg);
@@ -2717,7 +2717,7 @@ static var get_dictexpression(in cursor, in mainfilename, in filename, in dictfi
 								" or \"dict.voc\"";
 							throw VarDBException(errmsg);
 							//					exo::errputl("ERROR:
-							// mvdbpostgres get_dictexpression() cannot
+							// vardb: get_dictexpression() cannot
 							// read " ^ fieldname.quote() ^ " from " ^
 							// actualdictfile.quote());
 							//return "";
@@ -3060,7 +3060,7 @@ TRACE: "QQQ"="QQQ"
 				// throw  VarDBException("get_dictexpression() " ^
 				// filename.quote() ^ " " ^ fieldname.quote() ^ " - INVALID
 				// DICTIONARY EXPRESSION - " ^ dictrec.f(8).quote());
-				var("ERROR: mvdbpostgres get_dictexpression() " ^
+				var("ERROR: vardb: get_dictexpression() " ^
 					filename.quote() ^ " " ^ fieldname.quote() ^
 					" - INVALID DICTIONARY EXPRESSION - " ^
 					dictrec.f(8).quote())
@@ -3116,7 +3116,7 @@ exodus_call:
 			// FOLLOWING IS CURRENTLY DISABLED since postgres has no way to call exodus
 			// if we get here then we were unable to work out any sql expression or function
 			// so originally we instructed postgres to CALL EXODUS VIA IPC to run exodus
-			// subroutines in the context of the calling program. exodus mvdbpostgres.cpp setup
+			// subroutines in the context of the calling program. exodus vardb.cpp setup
 			// a separate listening thread with a separate pgconnection before calling postgres.
 			// BUT exodus subroutines cannot make request to the db while it is handling a
 			// request FROM the db - unless it were to setup ANOTHER threada and pgconnection to
@@ -3143,7 +3143,7 @@ exodus_call:
 		// throw  filename ^ " " ^ fieldname ^ " - INVALID DICTIONARY ITEM";
 		// throw  VarDBException("get_dictexpression(" ^ filename.quote() ^ ", " ^
 		// fieldname.quote() ^ ") invalid dictionary type " ^ dicttype.quote());
-		var("ERROR: mvdbpostgres get_dictexpression(" ^ filename.quote() ^ ", " ^
+		var("ERROR: vardb: get_dictexpression(" ^ filename.quote() ^ ", " ^
 			fieldname.quote() ^ ") invalid dictionary type " ^
 			dicttype.quote())
 			.errputl();
@@ -3158,7 +3158,7 @@ exodus_call:
 	// vector (for GIN or indexing/filtering multivalue fields)
 	//if ((ismv1 and !forsort) || fieldname.ucase().ends("_XREF")) {
 	if ((ismv1 and !forsort) || fieldname.ucase().ends("XREF")) {
-		//this is the sole creation of to_tsvector in mvdbpostgres.cpp
+		//this is the sole creation of to_tsvector in vardb.cpp
 		//it will be used like to_tsvector(...) @@ to_tsquery(...)
 		if (fieldname.ucase().ends("XREF"))
 			sqlexpression = "immutable_unaccent(" ^ sqlexpression ^ ")";
@@ -4351,7 +4351,7 @@ bool var::selectx(in fieldnames, in sortselectclause) {
 				//use "english" dictionary for stemming (or "simple" dictionary for none)
 				// MUST use the SAME in both to_tsvector AND to_tsquery
 				//https://www.postgresql.org/docs/10/textsearch-dictionaries.html
-				//this is the sole occurrence of to_tsquery in mvdbpostgres.cpp
+				//this is the sole occurrence of to_tsquery in vardb.cpp
 				//it will be used like to_tsvector(...) @@ to_tsquery(...)
 				if (value) {
 					if (dictexpression_isfulltext)

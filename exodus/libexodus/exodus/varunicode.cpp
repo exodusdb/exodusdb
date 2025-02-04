@@ -25,26 +25,6 @@ namespace exo {
 
 bool var::setxlocale() const {
 
-#if defined(_MSC_VER) && defined(UNICODE)
-
-	/* http://msdn.microsoft.com/en-us/library/dd374051%28v=VS.85%29.aspx
-	//locale list
-	//XP 2003 http://msdn.microsoft.com/en-us/goglobal/bb895996.aspx
-	//http://msdn.microsoft.com/en-us/goglobal/bb964664.aspx
-	BOOL SetThreadLocale(
-		__in  LCID Locale
-	);
-	*/
-	// GetSystemDefaultLCID()
-	// GetUserDefaultLCID()
-	// LCID locale_lcid=1031;//German Standard
-	// LCID locale_lcid=1032;//Greek
-	// LCID locale_lcid=1055;//Turkish
-
-	return SetThreadLocale((*this).toInt()) != nullptr;
-
-#else
-
 	THISIS("bool var::setxlocale() const")
 	assertString(function_sig);
 
@@ -55,10 +35,33 @@ bool var::setxlocale() const {
 //	if (uselocale(nullptr) == uselocale(LC_GLOBAL_LOCALE))
 //		uselocale(duplocale(uselocale(LC_GLOBAL_LOCALE)));
 
-	return setlocale(LC_ALL, (*this).toString().c_str()) != nullptr;
-	// return setlocale(LC_CTYPE,(*this).toString().c_str())!=nullptr;
+//	return std::setlocale(LC_ALL, (*this).toString().c_str()) != nullptr;
+	if (std::setlocale(LC_ALL, var_str.c_str()) == nullptr) {
+		this->setlasterror(var(function_sig) ^ "Error: " ^ this->quote() ^ " is invalid");
+	}
+	return true;
 
-#endif
+//#if defined(_MSC_VER) && defined(UNICODE)
+//
+//	//http://msdn.microsoft.com/en-us/library/dd374051%28v=VS.85%29.aspx
+//	////locale list
+//	////XP 2003 http://msdn.microsoft.com/en-us/goglobal/bb895996.aspx
+//	////http://msdn.microsoft.com/en-us/goglobal/bb964664.aspx
+//	//BOOL SetThreadLocale(
+//	//	__in  LCID Locale
+//	//);
+//	//
+//	// GetSystemDefaultLCID()
+//	// GetUserDefaultLCID()
+//	// LCID locale_lcid=1031;//German Standard
+//	// LCID locale_lcid=1032;//Greek
+//	// LCID locale_lcid=1055;//Turkish
+//
+//	return SetThreadLocale((*this).toInt()) != nullptr;
+//
+//#else
+
+//#endif
 }
 
 out  var::getxlocale() {
@@ -66,11 +69,11 @@ out  var::getxlocale() {
 	THISIS("out  var::getxlocale()")
 
 #if defined(_MSC_VER) && defined(UNICODE)
-	*this = static_cast<int>GetThreadLocale();
-	return *this;
+	return var(static_cast<int>GetThreadLocale());
 #else
 	// return "";
-	*this = var(setlocale(LC_ALL, nullptr));
+	// cppref: Make a "deep copy" of current locale name.
+	*this = std::setlocale(LC_ALL, nullptr);
 	return *this;
 #endif
 }

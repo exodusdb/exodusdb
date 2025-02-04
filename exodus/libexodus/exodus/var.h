@@ -411,9 +411,9 @@ public:
 	// Sets the current thread's default locale codepage code
 	// obj is strvar
 	//
-	// `if (not "de_DE.utf8"_var.setxlocale()) ... // true if successful
+	// `if ("en_US.utf8"_var.setxlocale()) ... ok // true if successful
 	//  // or
-	//  if (setxlocale("de_DE.utf8")) ...`
+	//  if (setxlocale("en_US.utf8")) ... ok`
 	   bool setxlocale() const;
 
 	///// STRING CREATION:
@@ -826,7 +826,7 @@ public:
 	//  let v2 = substr("abcd", 2, 2);`
 	// If length is negative then work backwards and return chars reversed
 	//
-	// `let v1 = "abcd"_var.substr(3, -2); // "cb"`
+	// `let v1 = "abcd"_var.substr(3, -2); // "cb"
 	//  // or
 	//  let v2 = substr("abcd", 3, -2);`
 	ND var  substr(const int pos1, const int length) const&;
@@ -903,7 +903,7 @@ public:
 
 	// Randomise the order of fields in an FM, VM separated list
 	//
-	// `let v1 = "20^10^2^1^1.1"_var.shuffle(); // "2^1^20^1.1^10" (random order depending on initrand())`
+	// `let v1 = "20^10^2^1^1.1"_var.shuffle(); // "2^1^20^1.1^10" (random order depending on initrand())
 	//  // or
 	//  let v2 = shuffle("20^10^2^1^1.1"_var);`
 	ND var  shuffle(SV sepchar = _FM) const&;
@@ -1408,9 +1408,9 @@ public:
 
 	// locate() with only the target substr argument provided searches unordered values separated by VM chars.
 	// Returns: True if found and false if not.
-	// `if ("UK]US]UA"_var.locate("US")) ... // true
+	// `if ("UK]US]UA"_var.locate("US")) ... ok // true
 	//  // or
-	//  if (locate("US", "UK]US]UA"_var)) ...`
+	//  if (locate("US", "UK]US]UA"_var)) ... ok`
 	ND bool locate(in target) const;
 
 	// locate() with only the target substr and valueno arguments provided searches unordered values separated by VM chars.
@@ -1418,7 +1418,7 @@ public:
 	// Returns: False if not found and with the max value number + 1 in setting. Suitable for additiom of new values
 	//
 	// `var valueno;
-	//  if ("UK]US]UA"_var.locate("US", valueno)) ... // returns true and valueno = 2`
+	//  if ("UK]US]UA"_var.locate("US", valueno)) ... ok // returns true and valueno = 2`
 	ND bool locate(in target, out valueno) const;
 
 	// locate() the target in unordered fields if fieldno is 0, or values if a fieldno is specified, or subvalues if the valueno argument is provided.
@@ -1426,7 +1426,7 @@ public:
 	// Returns: False if not found and with the max field, value or subvalue number found + 1 in setting. Suitable for replacement of new fields, values or subvalues.
 	//
 	// `var setting;
-	//  if ("f1^f2v1]f2v2]s1}s2}s3}s4^f3^f4"_var.locate("s4", setting, 2, 3)) ... // returns true and setting = 4`
+	//  if ("f1^f2v1]f2v2]s1}s2}s3}s4^f3^f4"_var.locate("s4", setting, 2, 3)) ... ok // returns true and setting = 4`
 	ND bool locate(in target, out setting, const int fieldno, const int valueno = 0) const;
 
 	// LOCATE BY
@@ -1451,7 +1451,7 @@ public:
 	// LOCATE USING
 
 	// locate() a target substr in the whole unordered string using a given delimiter char returning true if found.
-	// `if ("AB,EF,CD"_var.locateusing(",", "EF")) ... // true`
+	// `if ("AB,EF,CD"_var.locateusing(",", "EF")) ... ok // true`
 	ND bool locateusing(const char* usingchar, in target) const;
 
 	// locate() the target in a specific field, value or subvalue using a specified delimiter and unordered data
@@ -1460,7 +1460,7 @@ public:
 	// This is similar to the main locate command but the delimiter char can be specified e.g. a comma or TM etc.
 	//
 	// `var setting;
-	//  if ("f1^f2^f3c1,f3c2,f3c3^f4"_var.locateusing(",", "f3c2", setting, 3)) ... // returns true and setting = 2`
+	//  if ("f1^f2^f3c1,f3c2,f3c3^f4"_var.locateusing(",", "f3c2", setting, 3)) ... ok // returns true and setting = 2`
 	ND bool locateusing(const char* usingchar, in target, out setting, const int fieldno = 0, const int valueno = 0, const int subvalueno = 0) const;
 
 	// LOCATE BY, USING
@@ -1483,15 +1483,73 @@ public:
 	// Setting environment variable EXO_DBTRACE=1 will cause tracing of db interface including SQL commands.
 	//
 	// `let conninfo = "dbname=exodus user=exodus password=somesillysecret";
-	//  var db;
-	//  if (not db.connect(conninfo)) abort(lasterror());
-	//  db.disconnect();
-	//  // or
-	//  if (not connect("exodus")) ...
+	//  if (not conn.connect(conninfo)) ...;
 	//  // or
 	//  if (not connect()) ...
-	//  disconnect();
+	//  // or
+	//  if (not connect("exodus")) ...`
 	ND bool connect(in conninfo = "");
+
+	// Attach (connect) specific files by name to specific connections.
+	// It is not necessary to attach files before opening them. Attach is meant to control the defaults.
+	// For the remainder of the session, opening the file by name without specifying a connection will automatically use the specified connection applies during the attach command.
+	// If conn is not specified then filename will be attached to the default connection.
+	// Multiple file names must be separated by FM
+	//
+	// `let filenames = "definitions^dict.definitions"_var, conn = "exodus";
+	//  if (conn.attach(filenames)) ... ok
+	//  // or
+	//  if (attach(filenames)) ... ok`
+	ND bool attach(in filenames) const;
+
+	// Detach (disconnect) files that have been attached using attach().
+	   void detach(in filenames);
+
+	// Begin a db transaction.
+	//
+	// `if (not conn.begintrans()) ...
+	//  // or
+	//  if (not begintrans()) ...`
+	ND bool begintrans() const;
+
+	// Check if a db transaction is in progress.
+	//
+	// `if (conn.statustrans()) ... ok
+	//  // or
+	//  if (statustrans()) ... ok`
+	ND bool statustrans() const;
+
+	// Rollback a db transaction.
+	//
+	// `if (conn.rollbacktrans()) ... ok
+	//  // or
+	//  if (rollbacktrans()) ... ok`
+	ND bool rollbacktrans() const;
+
+	// Commit a db transaction.
+	// Returns true if successfully committed or if there is no transaction in progress
+	//
+	// `if (conn.committrans()) ... ok
+	//  // or
+	//  if (committrans()) ... ok`
+	ND bool committrans() const;
+
+	// Execute an sql command.
+	//
+	// `var sqlcmd = "select 2 + 2;", response;
+	//  if (conn.sqlexec("select 2 + 2;")) ... ok
+	//  // or
+	//  if (sqlexec(sqlcmd)) ... ok`
+	ND bool sqlexec(in sqlcmd) const;
+
+	// Execute an SQL command and capture the response.
+	//
+	// `var sqlcmd = "select 2 + 2;", response;
+	//  if (not conn.sqlexec(sqlcmd, response)) ... ok // True and response = 4
+	//  // or
+	//  if (not sqlexec(sqlcmd, response)) ...`
+
+	ND bool sqlexec(in sqlcmd, io response) const;
 
 	// Closes db connection and frees process resources both locally and in the database server.
 	//
@@ -1507,69 +1565,6 @@ public:
 	//  // or
 	//  disconnectall();
 	   void disconnectall();
-
-	// Attach (connect) specific files by name to specific connections.
-	// It is not necessary to attach files before opening them. Attach is meant to control the defaults.
-	// For the remainder of the session, opening the file by name without specifying a connection will automatically use the specified connection applies during the attach command.
-	// If conn is not specified then filename will be attached to the default connection.
-	// Multiple file names must be separated by FM
-	//
-	// `let filenames = "definitions^dict.definitions"_var, conn = "exodus";
-	//  if (not conn.attach(filenames)) ...
-	//  // or
-	//  if (not attach(filenames)) ...`
-	ND bool attach(in filenames) const;
-
-	// Detach (disconnect) files that have been attached using attach().
-	   void detach(in filenames);
-
-	// Begin a db transaction.
-	//
-	// `var conn = "exodus";
-	//  if (not conn.begintrans()) ...
-	//  // or
-	//  if (not begintrans()) ...`
-	ND bool begintrans() const;
-
-	// Rollback a db transaction.
-	//
-	// `var conn = "exodus";
-	//  if (not conn.rollbacktrans()) ...
-	//  // or
-	//  if (not rollbacktrans()) ...`
-	ND bool rollbacktrans() const;
-
-	// Commit a db transaction.
-	//
-	// `var conn = "exodus";
-	//  if (not conn.committrans()) ...
-	//  // or
-	//  if (not committrans()) ...`
-	ND bool committrans() const;
-
-	// Check if a db transaction is in progress.
-	//
-	// `var conn = "exodus";
-	//  if (not conn.statustrans()) ...
-	//  // or
-	//  if (not statustrans()) ...`
-	ND bool statustrans() const;
-
-	// Execute an sql command.
-	//
-	// `var sqlcmd = "select 2 + 2;", response, conn = "exodus";
-	//  if (not conn.sqlexec("select 2 + 2;")) ... // True
-	//  // or
-	//  if (not sqlexec(sqlcmd)) ...`
-	ND bool sqlexec(in sqlcmd) const;
-
-	// Execute an SQL command and capture the response.
-	//
-	// `var sqlcmd = "select 2 + 2;", response, conn = "exodus";
-	//  if (not conn.sqlexec(sqlcmd, response)) ... // True and response = 4
-	//  // or
-	//  if (not sqlexec(sqlcmd, response)) ...`
-	ND bool sqlexec(in sqlcmd, io response) const;
 
 	// Get the last os or db error message.
 	ND var  lasterror() const;
@@ -1587,9 +1582,9 @@ public:
 	// Optionally copies an existing database from the same connection and which cannot have any current connections.
 	//
 	// `var conn = "exodus";
-	//  if (not conn.dbcreate("mydb")) ...
+	//  if (conn.dbcreate("xo_gendoc_testdb")) ... ok
 	//  // or
-	//  if (not dbcreate("mydb")) ...`
+	//  if (dbcreate("xo_gendoc_testdb")) ...`
 	ND bool dbcreate(in new_dbname, in old_dbname = "") const;
 
 	// Create a named database as a copy of an existing database.
@@ -1597,19 +1592,10 @@ public:
 	// The source database must exist on the same connection and cannot have any current connections.
 	//
 	// `var conn = "exodus";
-	//  if (not conn.dbcopy("mydb", "mydb2")) ...
+	//  if (conn.dbcopy("xo_gendoc_testdb", "xo_gendoc_testdb2")) ... ok
 	//  // or
-	//  if (not dbcopy("mydb", "mydb2")) ...`
+	//  if (dbcopy("xo_gendoc_testdb", "xo_gendoc_testdb2")) ...`
 	ND bool dbcopy(in from_dbname, in to_dbname) const;
-
-	// Delete (drop) a named database.
-	// The target database must exist and cannot have any current connections.
-	//
-	// `var conn = "exodus";
-	//  if (not conn.dbdelete("mydb")) ...
-	//  // or
-	//  if (not dbdelete("mydb")) ...`
-	ND bool dbdelete(in dbname) const;
 
 	// Returns: A list of available databases on a particular connection.
 	//
@@ -1618,20 +1604,29 @@ public:
 	//  let v2 = dblist();`
 	ND var  dblist() const;
 
+	// Delete (drop) a named database.
+	// The target database must exist and cannot have any current connections.
+	//
+	// `var conn = "exodus";
+	//  if (conn.dbdelete("xo_gendoc_testdb2")) ... ok
+	//  // or
+	//  if (dbdelete("xo_gendoc_testdb2")) ...`
+	ND bool dbdelete(in dbname) const;
+
 	// Create a named db file.
 	//
-	// `let filename = "gendoc_temp", conn = "exodus";
-	//  if (not conn.createfile(filename)) ...
+	// `let filename = "xo_gendoc_temp", conn = "exodus";
+	//  if (conn.createfile(filename)) ... ok
 	//  // or
-	//  if (not createfile(filename)) ...`
+	//  if (createfile(filename)) ...`
 	ND bool createfile(in filename) const;
 
 	// Rename a db file.
 	//
-	// `let conn = "exodus", filename = "gendoc_temp", new_filename = "gendoc_temp2";
-	//  if (not conn.renamefile(filename, new_filename)) ...
+	// `let conn = "exodus", filename = "xo_gendoc_temp", new_filename = "xo_gendoc_temp2";
+	//  if (conn.renamefile(filename, new_filename)) ... ok
 	//  // or
-	//  if (not renamefile(filename, new_filename)) ...`
+	//  if (renamefile(filename, new_filename)) ...`
 	ND bool renamefile(in filename, in newfilename) const;
 
 	// Returns: A list of all files in a database
@@ -1644,7 +1639,7 @@ public:
 
 	// Delete all records in a db file
 	//
-	// `let conn = "exodus", filename = "gendoc_temp2";
+	// `let conn = "exodus", filename = "xo_gendoc_temp2";
 	//  if (not conn.clearfile(filename)) ...
 	//  // or
 	//  if (not clearfile(filename)) ...`
@@ -1652,17 +1647,17 @@ public:
 
 	// Delete a db file
 	//
-	// `let conn = "exodus", filename = "gendoc_temp2";
-	//  if (not conn.deletefile(filename)) ...
+	// `let conn = "exodus", filename = "xo_gendoc_temp2";
+	//  if (conn.deletefile(filename)) ... ok
 	//  // or
-	//  if (not deletefile(filename)) ...`
+	//  if (deletefile(filename)) ...`
 	ND bool deletefile(in filename) const;
 
 	// obj is conn_or_file
 
 	// Returns: The approx. number of records in a file
 	//
-	// `let conn = "exodus", filename = "definitions";
+	// `let conn = "exodus", filename = "xo_clients";
 	//  var nrecs1 = conn.reccount(filename);
 	//  // or
 	//  var nrecs2 = reccount(filename);`
@@ -1677,7 +1672,7 @@ public:
 
 	// obj is file
 
-	// Opens database file to a var which can be used in subsequent functions to work on the specified file and database connection.
+	// Opens a db file to a var which can be used in subsequent functions to work on the specified file and database connection.
 	//
 	// `var file, filename = "definitions";
 	//  if (not file.open(filename)) ...
@@ -1685,7 +1680,7 @@ public:
 	//  if (not open(filename to file)) ...`
 	ND bool open(in dbfilename, in connection = "");
 
-	// Closes database file var
+	// Closes db file var
 	// Does nothing currently since database file vars consume no resources
 	//
 	// `var file = "definitions";
@@ -1694,7 +1689,7 @@ public:
 	//  close(file);`
 	   void close() const;
 
-	// Creates a secondary index for a given file and field name.
+	// Creates a secondary index for a given db file and field name.
 	// The fieldname must exist in a dictionary file. The default dictionary is "dict." ^ filename.
 	// Returns: False if the index cannot be created for any reason.
 	// * Index already exists
@@ -1704,33 +1699,34 @@ public:
 	// * The dictionary field defines a calculated field that uses an exodus function. Using a psql function is OK.
 	//
 	// `var filename = "definitions", fieldname = "DATE_TIME";
-	//  if (not filename.createindex(fieldname)) ...
+	//  if (not filename.deleteindex(fieldname)) {}; // Cleanup first
+	//  if (filename.createindex(fieldname)) ... ok
 	//  // or
-	//  if (not createindex(filename, fieldname)) ...`
+	//  if (createindex(filename, fieldname)) ...`
 	ND bool createindex(in fieldname, in dictfile = "") const;
 
-	// Deletes a secondary index for a file and field name.
+	// Lists secondary indexes in a database or for a db file
+	// Returns: False if the file or fieldname are given and do not exist
+	// obj is file|conn
+	//
+	// `var conn = "exodus";
+	//  if (conn.listindex()) ... ok // includes xo_clients__date_time
+	//  // or
+	//  if (listindex()) ... ok`
+	ND var  listindex(in file_or_filename = "", in fieldname = "") const;
+
+	// Deletes a secondary index for a db file and field name.
 	// Returns: False if the index cannot be deleted for any reason
 	// * File does not exist
 	// * Index does not already exists
 	//
 	// `var file = "definitions", fieldname = "DATE_TIME";
-	//  if (not file.deleteindex(fieldname)) ...
+	//  if (file.deleteindex(fieldname)) ... ok
 	//  // or
-	//  if (not deleteindex(file, fieldname)) ...`
+	//  if (deleteindex(file, fieldname)) ...`
 	ND bool deleteindex(in fieldname) const;
 
-	// Lists secondary indexes in a database or file
-	// Returns: False if the file or fieldname are given and do not exist
-	// obj is file|conn
-	//
-	// `var conn = "exodus";
-	//  if (not conn.listindex()) ...
-	//  // or
-	//  if (not listindex()) ...`
-	ND var  listindex(in file_or_filename = "", in fieldname = "") const;
-
-	// Places a metaphorical lock on a particular file and key in a database.
+	// Places a metaphorical db lock on a particular record given a file and key.
 	// This is a advisory lock, not a physical lock, since it makes no restriction on the access or modification of data by other connections.
 	// Neither the file nor the record key need to actually exist since a lock is just a hash of the filename and key combined.
 	// If another connection attempts to place an identical lock on the same database it will be denied.
@@ -1743,24 +1739,24 @@ public:
 	// * 1: Success: A new lock has been placed.
 	// * 2: Success: The lock has already been placed and the connection is in a transaction.
 	//
-	// `var file = "definitions", key = "1000";
-	//  if (not file.lock(key)) ...
+	// `var file = "xo_clients", key = "1000";
+	//  if (file.lock(key)) ... ok
 	//  // or
-	//  if (not lock(file, key)) ...`
+	//  if (lock(file, key)) ...`
 	ND var  lock(in key) const;
 
-	// Removes a lock placed by the lock function.
+	// Removes a db lock placed by the lock function.
 	// Only locks placed on the specified connection can be removed.
 	// Locks cannot be removed while a connection is in a transaction.
 	// Returns: False if the lock is not present in a connection.
 	//
-	// `var file = "definitions", key = "1000";
-	//  if (not file.unlock(key)) ...
+	// `var file = "xo_clients", key = "1000";
+	//  if (file.unlock(key)) ... ok
 	//  // or
-	//  if (not unlock(file, key)) ...`
+	//  if (unlock(file, key)) ...`
 	   bool unlock(in key) const;
 
-	// Removes all locks placed by the lock function in the specified connection.
+	// Removes all db locks placed by the lock function in the specified connection.
 	// Locks cannot be removed while in a transaction.
 	//
 	// `var conn = "exodus";
@@ -1771,68 +1767,73 @@ public:
 
 	// obj is rec
 
-	// Reads a record from a file given its unique primary key.
-	// Returns: False if the key doesnt exist
-	//
-	// `var rec, file = "definitions", key = "1000";
-	//  if (not rec.read(file, key)) ...
-	//  // or
-	//  if (not read(rec from file, key)) ...`
-	ND bool read(in file, in key);
-
-	// Writes a record to a file.
-	// Updates an existing record if the key already exists or inserts a new record.
+	// Writes a record into a db file given a unique primary key.
+	// Either inserts a new record or updates an existing record.
 	// It always succeeds so no result code is returned.
 	// Any memory cached record is deleted.
 	//
-	// `var rec = "f1^f2^f3"_var, file = "definitions", key = "1000";
-	// `rec.write(file, key);
+	// `let rec = "Client GD^G^20855^30000^1001.00^20855.76539"_var;
+	//  let file = "xo_clients", key = "GD001";
+	//  if (not file.deleterecord(key)) {}; // Cleanup first
+	//  rec.write(file, key);
 	//  // or
 	//  write(rec on file, key);`
 	   void write(in file, in key) const;
 
-	// Updates an existing record in a file.
+	// Reads a record from a db file for a given key.
+	// Returns: False if the key doesnt exist
+	//
+	// `var rec;
+	//  let file = "xo_clients", key = "GD001";
+	//  if (not rec.read(file, key)) ... // rec -> "Client GD^G^20855^30000^1001.00^20855.76539"_var
+	//  // or
+	//  if (not read(rec from file, key)) ...`
+	ND bool read(in file, in key);
+
+	// Deletes a record from a db file given a key.
+	// Returns: False if the key doesnt exist
+	// Any memory cached record is deleted.
+	// obj is file
+	//
+	// `let file = "xo_clients", key = "GD001";
+	//  if (file.deleterecord(key)) ... ok
+	//  // or
+	// if (deleterecord(file, key)) ...`
+	   bool deleterecord(in key) const;
+
+	// Inserts a new record in a db file.
+	// Returns: False if the key already exists
+	// Any memory cached record is deleted.
+	//
+	// `let rec = "Client GD^G^20855^30000^1001.00^20855.76539"_var;
+	//  let file = "xo_clients", key = "GD001";
+	//  if (rec.insertrecord(file, key)) ... ok
+	//  // or
+	//  if (insertrecord(rec on file, key)) ...`
+	ND bool insertrecord(in file, in key) const;
+
+	// Updates an existing record in a db file.
 	// Returns: False if the key doesnt already exist
 	// Any memory cached record is deleted.
 	//
-	// `var rec = "f1^f2^f3"_var, file = "definitions", key = "1000";
+	// `let rec = "Client GD^G^20855^30000^1001.00^20855.76539"_var;
+	//  let file = "xo_clients", key = "GD001";
 	//  if (not rec.updaterecord(file, key)) ...
 	//  // or
 	//  if (not updaterecord(rec on file, key)) ...`
 	ND bool updaterecord(in file, in key) const;
 
-	// Inserts a new record in a file.
-	// Returns: False if the key already exists
-	// Any memory cached record is deleted.
-	//
-	// `var rec = "f1^f2^f3"_var, file = "definitions", key = "1000";
-	//  if (not rec.insertrecord(file, key)) ...
-	//  // or
-	//  if (not insertrecord(rec on file, key)) ...`
-	ND bool insertrecord(in file, in key) const;
-
-	// Deletes a record from a file given its key.
-	// Returns: False if the key doesnt exist
-	// Any memory cached record is deleted.
-	// obj is file
-	//
-	// `var file = "definitions", key = "1000";
-	//  if (not file.deleterecord(key)) ...
-	//  // or
-	// if (not deleterecord(file, key)) ...`
-	   bool deleterecord(in key) const;
-
 	//  obj is strvar
 
-	// Same as read() but only returns a specific field no from the record
+	// "Read field" Same as read() but only returns a specific field from the record
 	//
-	// `var field, file = "definitions", key = "1000", fieldno = 3;
-	//  if (not field.readf(file, key, fieldno)) ...
+	// `var field, file = "xo_clients", key = "GD001", fieldno = 2;
+	//  if (not field.readf(file, key, fieldno)) ... // field -> "G"
 	//  // or
 	//  if (not readf(field from file, key, fieldno)) ...`
 	ND bool readf(in file, in key, const int fieldno);
 
-	// Same as write() but only writes a specific field no to the record
+	// "write field" Same as write() but only writes to a specific field in the record
 	//
 	// `var field = "f3", file = "definitions", key = "1000", fieldno = 3;
 	//  field.writef(file, key, fieldno);
@@ -1842,28 +1843,34 @@ public:
 
 	// obj is rec
 
-	// Cache read a record from a memory cache "file" given its key.
-	// 1. Tries to read from a memory cache and returns true if successful.
-	// 2. Reads to read from the actual file and returns false if unsuccessful.
-	// 3. Writes the record and key to the memory cache and returns true.
-	// Cached db file data lives in exodus process memory not the database.
-	//
-	// `var rec, file = "definitions", key = "1000";
-	//  if (not rec.readc(file, key)) ...
-	//  // or
-	//  if (not readc(rec from file, key)) ...`
-	ND bool readc(in file, in key);
-
-	// Cache write a record and key into a memory cached "file".
+	// "Write cache" Writes a record and key into a memory cached "db file".
 	// The actual file is NOT updated.
-	// It either updates an existing record if the key already exists or otherwise inserts a new record.
+	// writec() either updates an existing cache record if the key already exists or otherwise inserts a new record into the cache.
 	// It always succeeds so no result code is returned.
+	// Neither the file nor the record key need to actually exist in the actual db.
 	//
-	// `var rec = "f1^f2^f3"_var, file = "definitions", key = "1000";
+    // `let rec = "Client XD^X^20855^30000^1001.00^20855.76539"_var;
+    //  let file = "xo_clients", key = "XD001";
 	//  rec.writec(file, key);
 	//  // or
 	//  writec(rec on file, key);`
 	   void writec(in file, in key) const;
+
+	// "Read cache" Same as "read() but first reads from a memory cache.
+	// 1. Tries to read from a memory cache. Returns true if successful.
+	// 2a. Tries to read from the actual db file and returns false if unsuccessful.
+	// 2b. Writes the record and key to the memory cache and returns true.
+	// Cached db file data lives in exodus process memory and is lost when the process terminates or cleardbcache() is called.
+	//
+    // `var rec;
+    //  let file = "xo_clients", key = "XD001";
+	//  if (rec.readc(file, key)) ... ok
+	//  // or
+	//  if (readc(rec from file, key)) ... ok
+	//
+	//  // Verify not in actual file by using read() not readc()
+	//  if (read(rec from file, key)) abort("Error: " ^ key ^ " should not be in the actual file"); // error`
+	ND bool readc(in file, in key);
 
 	// obj is dbfile
 
@@ -1871,10 +1878,10 @@ public:
 	// The actual file is NOT updated.
 	// Returns: False if the key doesnt exist
 	//
-	// `var file = "definitions", key = "1000";
-	//  if (not file.deletec(key)) ...
+	// `var file = "xo_clients", key = "XD001";
+	//  if (file.deletec(key)) ... ok
 	//  // or
-	//  if (not deletec(file, key)) ...`
+	//  if (deletec(file, key)) ...`
 	   bool deletec(in key) const;
 
 	// obj is conn
@@ -2018,55 +2025,46 @@ public:
 	// Returns: True if successful or false if not possible for any reason.
 	// e.g. Target doesnt exist, permissions etc.
 	//
-	// `var hostsfile;
-	//  if (not hostsfile.osopen("/etc/hosts")) ...
+	// `let osfilename = ostempdirpath() ^ "xo_gendoc_test.conf";
+	//  if (oswrite("" on osfilename)) ... ok // Create an empty os file
+	//  var ostempfile;
+	//  if (ostempfile.osopen(osfilename)) ... ok
 	//  // or
-	//  if (not osopen("/etc/hosts" to hostsfile)) ...`
+	//  if (osopen(osfilename to ostempfile)) ... ok`
 	ND bool osopen(in osfilename, const bool utf8 = true) const;
+
+	// Writes data to an existing os file starting at a given byte offset (0 based).
+	// See osbread for more info.
+	//
+	// `let osfilename = ostempdirpath() ^ "xo_gendoc_test.conf";
+	//  let text = "aaa=123\nbbb=456\n";
+	//  var offset = osfile(osfilename).f(1); // size of file -> append
+	//  if (text.osbwrite(osfilename, offset)) ... ok // offset -> 16
+	//  // or
+	//  if (not osbwrite(text on osfilename, offset)) ...`
+	ND bool osbwrite(in osfilevar, io offset) const;
 
 	// Reads length bytes from an existing os file starting at a given byte offset (0 based).
 	// The osfilevar file handle may either be initialised by osopen or be just be a normal string variable holding the path and name of the os file.
 	// After reading, the offset is updated to point to the correct offset for a subsequent sequential read.
 	// If reading utf8 data (the default) then the length of data actually returned may be a few bytes shorter than requested in order to be a complete number of UTF-8 code points.
 	//
-	// `let hostsfile = "/etc/hosts";
+	// `let osfilename = ostempdirpath() ^ "xo_gendoc_test.conf";
 	//  var text, offset = 0;
-	//  if (not text.osbread(hostsfile, offset, 1024)) ...
+	//  if (text.osbread(osfilename, offset, 8)) ... ok // text -> "aaa=123\n", offset = 8
 	//  // or
-	//  if (not osbread(text from hostsfile, offset, 1024)) ...`
+	//  if (osbread(text from osfilename, offset, 1024)) ... ok // text -> "bbb=456\n"), offset = 16
 	ND bool osbread(in osfilevar, io offset, const int length);
-
-	// Writes data to an existing os file starting at a given byte offset (0 based).
-	// See osbread for more info.
-	//
-	// `let text = "\n#comment", tempfilename = ostempfilename();
-	//  var offset = osfile(tempfilename).f(1); // size of file -> append
-	//  if (not text.osbwrite(tempfilename, offset)) abort(lasterror()); // offset -> 9
-	//  // or
-	//  if (not osbwrite(text on tempfilename, offset)) ...`
-	ND bool osbwrite(in osfilevar, io offset) const;
 
 	// Removes an osfilevar handle from the internal memory cache of os file handles. This frees up both exodus process memory and operating system resources.
 	// It is advisable to osclose any file handles after use, regardless of whether they were specifically opened using osopen or not, especially in long running programs. Exodus performs caching of internal os file handles per thread and os file. If not closed, then the operating system will probably not flush deleted files from storage until the process is terminated. This can potentially create an memory issue or file system resource issue especially if osopening/osreading/oswriting many perhaps temporary files in a long running process.
 	//
-	// `if (not osfilevar.open("/etc/hosts")) ...
-	//  osfilevar.osclose();
+	// `osfilevar.osclose();
 	//  // or
 	//  osclose(osfilevar);`
 	   void osclose() const;
 
 	//  obj is strvar
-
-	// Read a complete os file into a var.
-	// If codepage is specified then input is converted from that codepage to utf-8 otherwise no conversion is done.
-	// Returns: True if successful or false if not possible for any reason.
-	// e.g. File doesnt exist, permissions etc.
-	//
-	// `var text;
-	//  if (not text.osread("/etc/hosts")) ...
-	//  // or
-	//  if (not osread(text from "/etc/hosts")) ...`
-	ND bool osread(const char* osfilename, const char* codepage = "");
 
 	// Create a complete os file from a var.
 	// Any existing file is removed first.
@@ -2074,27 +2072,26 @@ public:
 	// e.g. Path is not writeable, permissions etc.
 	// If codepage is specified then output is converted from utf-8 to that codepage. Otherwise no conversion is done.
 	//
-	// `let text = "aaa = 123\nbbb = 234";
-	//  let osfilename = ostempdirpath() ^ "xo.conf";
-	//  if (not text.oswrite(osfilename)) abort(lasterror());
+	// `let text = "aaa = 123\nbbb = 456";
+	//  let osfilename = ostempdirpath() ^ "xo_gendoc_test.conf";
+	//  if (text.oswrite(osfilename)) ... ok
 	//  // or
-	//  if (not oswrite(text on osfilename)) ...`
+	//  if (oswrite(text on osfilename)) ... ok`
 	ND bool oswrite(in osfilename, const char* codepage = "") const;
 
-	// TODO check if it calls osclose on itself in case removing a varfile
-
-	// obj is osfilename
-
-	// Removes/deletes an os file from the OS file system given path and name.
-	// Will not remove directories. Use osrmdir() to remove directories
+	// Read a complete os file into a var.
+	// If codepage is specified then input is converted from that codepage to utf-8 otherwise no conversion is done.
 	// Returns: True if successful or false if not possible for any reason.
-	// e.g. Target doesnt exist, path is not writeable, permissions etc.
+	// e.g. File doesnt exist, permissions etc.
 	//
-	// `let osfilename = ostempfilename();
-	//  if (not osfilename.osremove()) abort(lasterror());
+	// `var text;
+	//  let osfilename = ostempdirpath() ^ "xo_gendoc_test.conf";
+	//  if (text.osread(osfilename)) ... ok // text -> "aaa = 123\nbbb = 456"
 	//  // or
-	//  if (not osremove(osfilename)) ...`
-	ND bool osremove() const;
+	//  if (osread(text from osfilename)) ... ok`
+	ND bool osread(const char* osfilename, const char* codepage = "");
+
+	// TODO check if it calls osclose on itself in case removing a varfile
 
 	// obj is osfileordirname
 
@@ -2105,20 +2102,14 @@ public:
 	// e.g. Target already exists, path is not writeable, permissions etc.
 	// Uses std::filesystem::rename internally.
 	//
-	// `let osfilename = ostempfilename();
-	//  if (not osfilename.osrename(osfilename ^ ".bak")) abort(lasterror());
-	//  // or
-	//  if (not osrename(osfilename, osfilename ^ ".bak")) ...`
-	ND bool osrename(in new_dirpath_or_filepath) const;
-
-	// Copies a file or directory recursively within the file system.
-	// Uses std::filesystem::copy internally with recursive and overwrite options
+	// `let from_osfilename = ostempdirpath() ^ "xo_gendoc_test.conf";
+	//  let to_osfilename = from_osfilename ^ ".bak";
+	//  if (not osremove(to_osfilename)) {}; // Cleanup first
 	//
-	// `let osfilename = ostempfilename();
-	//  if (not osfilename.oscopy(osfilename ^ ".bak")) abort(lasterror());
+	//  if (from_osfilename.osrename(to_osfilename)) ... ok
 	//  // or
-	//  if (not oscopy(osfilename, osfilename ^ ".bak")) ...`
-	ND bool oscopy(in to_osfilename) const;
+	//  if (osrename(from_osfilename, to_osfilename)) ...`
+	ND bool osrename(in new_dirpath_or_filepath) const;
 
 	// "Moves" a file or dir within the os file system.
 	// Will not overwrite an existing file or dir.
@@ -2126,11 +2117,39 @@ public:
 	// e.g. Source doesnt exist or cannot be accessed, target already exists, source or target is not writeable, permissions etc.
 	// Attempts osrename first then oscopy followed by osremove original.
 	//
-	// `let osfilename = ostempfilename();
-	//  if (not osfilename.osmove(osfilename ^ ".bak")) abort(lasterror());
+	// `let from_osfilename = ostempdirpath() ^ "xo_gendoc_test.conf.bak";
+	//  let to_osfilename = from_osfilename.cut(-4);
+	//
+	//  if (not osremove(to_osfilename)) {}; // Cleanup first
+	//  if (from_osfilename.osmove(to_osfilename)) ... ok
 	//  // or
-	//  if (not osmove(osfilename, osfilename ^ ".bak")) ...`
+	//  if (osmove(from_osfilename, to_osfilename)) ...`
 	ND bool osmove(in to_osfilename) const;
+
+	// Copies a file or directory recursively within the file system.
+	// Will overwrite an existing file or dir.
+	// Uses std::filesystem::copy internally with recursive and overwrite options
+	//
+	// `let from_osfilename = ostempdirpath() ^ "xo_gendoc_test.conf";
+	//  let to_osfilename = from_osfilename ^ ".bak";
+	//
+	//  if (from_osfilename.oscopy(to_osfilename)) ... ok;
+	//  // or
+	//  if (oscopy(from_osfilename, to_osfilename)) ... ok`
+	ND bool oscopy(in to_osfilename) const;
+
+	// obj is osfilename
+
+	// Removes/deletes an os file from the OS file system given path and name.
+	// Will not remove directories. Use osrmdir() to remove directories
+	// Returns: True if successful or false if not possible for any reason.
+	// e.g. Target doesnt exist, path is not writeable, permissions etc.
+	//
+	// `let osfilename = ostempdirpath() ^ "xo_gendoc_test.conf";
+	//  if (osfilename.osremove()) ... ok
+	//  // or
+	//  if (osremove(osfilename)) ...`
+	ND bool osremove() const;
 
 	///// OS DIRECTORIES:
 	////////////////////
@@ -2188,68 +2207,77 @@ public:
 	// Makes a new directory and returns true if successful.
 	// Including parent dirs if necessary.
 	//
-	// `if (not "abc/def"_var.osmkdir()) ...
+	// `let osdirname = "xo_test/aaa";
+	//  if (osrmdir(osdirname)) {}; // Cleanup first
+	//  if (osdirname.osmkdir()) ... ok
 	//  // or
-	//  if (not osmkdir("abc/def")) ...`
+	//  if (osmkdir(osdirname)) ...`
 	ND bool osmkdir() const;
 
-	// Removes a os dir and returns true if successful.
-	// Optionally even if not empty. Including subdirs.
+	// Changes the current working dir and returns true if successful.
 	//
-	// `if (not "abc/def"_var.osrmdir()) ...
+	// `let osdirname = "xo_test/aaa";
+	//  if (osdirname.oscwd()) ... ok
 	//  // or
-	//  if (not osrmdir("abc/def")) ...`
-	ND bool osrmdir(bool evenifnotempty = false) const;
-
-	// obj is var()
+	//  if (oscwd(osdirname)) ... ok`
+	ND bool oscwd(in newpath) const;
 
 	// Returns: The current working directory
 	//
-	// `var cwd1 = var().oscwd(); // "/home/exodus"
+	// `var cwd1 = var().oscwd(); // ... "xo_test/aaa"
 	//  // or
 	//  var cwd2 = oscwd();`
 	ND var  oscwd() const;
 
-	// Changes the current working dir and returns true if successful.
+	// Removes a os dir and returns true if successful.
+	// Optionally even if not empty. Including subdirs.
 	//
-	// `if (not "abc/def"_var.oscwd()) ...
+	// `let osdirname = "xo_test/aaa";
+	//  if (oscwd("../..")) ... ok // Change up before removing
+	//  if (osdirname.osrmdir()) ... ok
 	//  // or
-	//  if (not oscwd("abc/def")) ...`
-	ND bool oscwd(in newpath) const;
+	//  if (osrmdir(osdirname)) ...`
+	ND bool osrmdir(bool evenifnotempty = false) const;
 
 	///// OS SHELL/ENVIRONMENT:
 	//////////////////////////
 
-	// Execute a shell command
+	// Execute a shell command.
 	// Returns: True if the process terminates with error status 0 and false otherwise.
-	//
-	// `let cmd = "ls -l xyz";
-	//  if (not cmd.osshell()) ...
-	//  // or
-	//  if (not osshell(cmd)) ...`
+	// Append "&>/dev/null" to the command to suppress terminal output.
 	// obj is command
+	//
+	// `let cmd = "echo $HOME";
+	//  if (cmd.osshell()) ... ok
+	//  // or
+	//  if (osshell(cmd)) ... ok`
 	ND bool osshell() const;
 
-	// Same as osshell but captures stdout
+	// Same as osshell but captures and returns stdout
+	// Returns: The stout of the shell command.
+	// Append "2>&1" to the command to capture stderr/stdlog output as well.
 	// obj is instr
 	//
-	// `var text;
-	//  if (not text.osshellread("ls -l")) ...
+	// `let cmd = "echo $HOME";
+	//  var text;
+	//  if (text.osshellread(cmd)) ... ok
 	//
 	//  // or capturing stdout but ignoring exit status
-	//  text = osshellread("ls -l");`
+	//  text = osshellread(cmd);`
 	ND bool osshellread(in oscmd);
 
 	// Same as osshell but provides stdin to the process
-	//
-	// `let text = "abc xyz";
-	//  if (not text.osshellwrite("grep xyz")) ...
-	//  // or
-	//  if (not osshellwrite(text, "grep xyz")) ...`
+	// Returns: True if the process terminates with error status 0 and false otherwise.
+	// Append "&> somefile" to the command to suppress and/or capture output.
 	// obj is outstr
+	//
+	// `let outtext = "abc xyz";
+	//  if (outtext.osshellwrite("grep xyz")) ... ok
+	//  // or
+	//  if (osshellwrite(outtext, "grep xyz")) ... ok`
 	ND bool osshellwrite(in oscmd) const;
 
-	// Get the path of the tmp dir
+	// Returns: The path of the tmp dir
 	// obj is var()
 	//
 	// `let v1 = var().ostempdirpath(); // e.g. "/tmp/"
@@ -2257,12 +2285,12 @@ public:
 	//  let v2 = ostempdirpath();`
 	ND var  ostempdirpath() const;
 
-	// Create and get a temporary file
+	// Returns: The name of a new temporary file
 	// obj is var()
 	//
-	// `var tempfilename1 = var().ostempfilename(); // "/tmp/~exoEcLj3C"
+	// `var temposfilename1 = var().ostempfilename(); // "/tmp/~exoEcLj3C"
 	//  // or
-	//  var tempfilename2 = ostempfilename();`
+	//  var temposfilename2 = ostempfilename();`
 	ND var  ostempfilename() const;
 
 	// obj is envvalue
@@ -2279,7 +2307,7 @@ public:
 	// Get the value of an environment variable
 	//
 	// `var envvalue1;
-	//  if (not envvalue1.osgetenv("HOME")) ... // e.g. "/home/exodus"
+	//  if (envvalue1.osgetenv("HOME")) ... ok // e.g. "/home/exodus"
 	//  // or
 	//  var envvalue2 = osgetenv("EXO_ABC"); // "XYZ"`
 	ND bool osgetenv(SV envcode);
@@ -2290,14 +2318,14 @@ public:
 
 	// Get the os process id
 	//
-	// `let pid1 = var().ospid(); // 663237
+	// `let pid1 = var().ospid(); // e.g. 663237
 	//  // or
 	//  let pid2 = ospid();`
 	ND var  ospid() const;
 
 	// Get the os thread process id
 	//
-	// `let tid1 = var().ostid(); // 663237
+	// `let tid1 = var().ostid(); // e.g. 663237
 	//  // or
 	//  let tid2 = ostid();`
 	ND var  ostid() const;
@@ -2342,11 +2370,11 @@ public:
 	   CVR put(std::ostream& ostream1) const;
 
 	// Flushes any Buffered. output to stdout/cout
+	// obj is var()
 	//
 	// `var().osflush();
 	//  // or
 	//  osflush();`
-	// obj is var()
 	   void osflush() const;
 
 	///// STANDARD INPUT:
@@ -2850,7 +2878,7 @@ ND inline var_proxy3 var::operator()(int fieldno, int valueno, int subvalueno) {
 #endif // EXO_VAR_CPP
 
 /////////////////////////////////////
-// A global flag used in mvdbpostgres
+// A global flag used in vardb:
 /////////////////////////////////////
 [[maybe_unused]] static inline int DBTRACE = var().osgetenv("EXO_DBTRACE");
 
