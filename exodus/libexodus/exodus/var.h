@@ -272,152 +272,21 @@ public:
 
 	// Tabular documentation is generated for comments starting /// or more and ending with a colon
 
-	///// MATH/BOOLEAN:
-	//////////////////
-
-	// obj is num
-
-    // Absolute value
-    // `let v1 = var(-12.34).abs(); // 12.34
-    //  // or
-    //  let v2 = abs(-12.34);`
-    ND var  abs() const;
-
-    // Power
-    // `let v1 = var(2).pwr(8); // 256
-    //  // or
-    //  let v2 = pwr(2, 8);`
-    ND var  pwr(in exponent) const;
-
-    // Pseudo random number generator
-    // `let v1 = var(100).rnd(); // 0 to 99 pseudo random
-    //  // or
-    //  let v2 = rnd(100);`
-    ND var  rnd()     const;
-
-    // Initialise the seed for rnd()
-    // `var(123).initrnd(); // Set seed to 123
-    //  // or
-    //  initrnd(123);`
-           void initrnd() const;
-
-    // Power of e
-    // `let v1 = var(1).exp(); // 2.718281828459045
-    //  // or
-    //  let v2 = exp(1);`
-    ND var  exp()     const;
-
-    // Square root
-    // `let v1 = var(100).sqrt(); // 10
-    //  // or
-    //  let v2 = sqrt(100);`
-    ND var  sqrt()    const;
-
-    // Sine of degrees
-    // `let v1 = var(30).sin(); // 0.5
-    //  // or
-    //  let v2 = sin(30);`
-    ND var  sin()     const;
-
-    // Cosine of degrees
-    // `let v1 = var(60).cos(); // 0.5
-    //  // or
-    //  let v2 = cos(60);`
-    ND var  cos()     const;
-
-    // Tangent of degrees
-    // `let v1 = var(45).tan(); // 1
-    //  // or
-    //  let v2 = tan(45);`
-    ND var  tan()     const;
-
-    // Arctangent of degrees
-    // `let v1 = var(1).atan(); // 45
-    //  // or
-    //  let v2 = atan(1);`
-    ND var  atan()    const;
-
-    // Natural logarithm
-    // `let v1 = var(2.718281828459045).loge(); // 1
-    //  // or
-    //  let v2 = loge(2.718281828459045);`
-    ND var  loge()    const;
-
-    //  ND var  int() const;//reserved word
-
-    // Truncate decimal numbers towards zero
-    // `let v1 = var(2.9).integer(); // 2
-    //  // or
-    //  let v2 = integer(2.9);
-	//
-    //  var v3 = var(-2.9).integer(); // -2
-    //  // or
-    //  var v4 = integer(-2.9);`
-    ND var  integer() const;
-
-    // Truncate decimal numbers towards negative
-    // `let v1 = var(2.9).floor(); // 2
-    //  // or
-    //  let v2 = floor(2.9);
-	//
-    //  var v3 = var(-2.9).floor(); // -3
-    //  // or
-    //  var v4 = floor(-2.9);`
-    ND var  floor() const;
+	///// STRING CREATION:
+	/////////////////////
 
     // Round decimal numbers to a desired number of decimal places
+	// Returns: A var ASCII string with exact decimal places requested.
     // .5 always rounds away from zero.
-    // `let v1 = var(0.455).round(2); // 0.46
+	// obj is num
+    // `let v1 = var(0.455).round(2); // "0.46"
     //  // or
     //  let v2 = round(1.455, 2);
 	//
-    //  var v3 = var(-0.455).round(2); // -0.46
+    //  var v3 = var(-0.455).round(2); // "-0.46"
     //  // or
     //  var v4 = round(-1.455, 2);`
     ND var  round(const int ndecimals = 0) const;
-
-	/* Actually implemented in var_base but documented here
-	// Modulus function
-	// Identical to C++ % operator only for positive numbers and modulus
-	// Negative denominators are considered as periodic with positiive numbers
-	// Result is between [0 , modulus) if modulus is positive
-	// Result is between (modulus, 0] if modulus is negative (symmetric)
-	// mod(11, 5); // "1"
-	// mod(-11, 5); // "4"
-	// mod(11, -5); // "-4"
-	// mod(-11, -5); // "-1"
-	// `let v1 = var(11).mod(5); // 1
-	//  // or
-	//  let v2 = mod(11, 5);`
-	ND var  mod(in modulus) const;
-
-	// Not documenting the overloaded versions
-	//ND var  mod(double modulus) const;
-	//ND var  mod(const int modulus) const;
-    */
-
-	///// LOCALE:
-	////////////
-
-	// obj is var
-
-	// Gets the current thread's default locale codepage code
-	//
-	// `let v1 = var().getxlocale(); // e.g. "en_US.utf8"
-	//  // or
-	//  let v2 = getxlocale();`
-	ND out  getxlocale();
-
-	// Sets the current thread's default locale codepage code
-	// obj is strvar
-	//
-	// `if ("en_US.utf8"_var.setxlocale()) ... ok // true if successful
-	//  // or
-	//  if (setxlocale("en_US.utf8")) ... ok`
-	   bool setxlocale() const;
-
-	///// STRING CREATION:
-	/////////////////////
 
 	// obj is var()
 
@@ -628,8 +497,8 @@ public:
 //	static int localeAwareCompare(const std::string& str1, const std::string& str2);
 //	//int localeAwareCompare(const std::string& str2) const;
 
-	///// STRING CONVERSION - Chainable. Non-mutating:
-	//////////////////////
+	///// STRING CONVERSION - Non-mutating - Chainable:
+	//////////////////////////////////////////////////
 
 	//  obj is strvar
 
@@ -967,8 +836,8 @@ public:
 	ND io   shuffle(SV sepchar = _FM) &&;
 	ND io   parse(char sepchar = ' ') &&;
 
-	///// STRING MUTATOR standalone commands. All similar to Non-Mutators:
-	/////////////////////////////////////////////////////////////////////
+	///// STRING CONVERSION - Mutating - Standalone commands:
+	////////////////////////////////////////////////////////
 
 	//  obj is strvar
 
@@ -1492,7 +1361,7 @@ public:
 
 	// Attach (connect) specific files by name to specific connections.
 	// It is not necessary to attach files before opening them. Attach is meant to control the defaults.
-	// For the remainder of the session, opening the file by name without specifying a connection will automatically use the specified connection applies during the attach command.
+	// For the remainder of the session, opening the db file by name without specifying a connection will automatically use the specified connection applies during the attach command.
 	// If conn is not specified then filename will be attached to the default connection.
 	// Multiple file names must be separated by FM
 	//
@@ -1545,17 +1414,16 @@ public:
 	// Execute an SQL command and capture the response.
 	//
 	// `var sqlcmd = "select 2 + 2;", response;
-	//  if (not conn.sqlexec(sqlcmd, response)) ... ok // True and response = 4
+	//  if (conn.sqlexec(sqlcmd, response)) ... ok // response = 4
 	//  // or
-	//  if (not sqlexec(sqlcmd, response)) ...`
-
+	//  if (sqlexec(sqlcmd, response)) ... ok`
 	ND bool sqlexec(in sqlcmd, io response) const;
 
 	// Closes db connection and frees process resources both locally and in the database server.
 	//
 	// `conn.disconnect();
 	//  // or
-	//  disconnect();
+	//  disconnect();`
 	   void disconnect();
 
 	// Closes all connections and frees process resources both locally and in the database server(s).
@@ -1563,7 +1431,7 @@ public:
 	//
 	// `conn.disconnectall();
 	//  // or
-	//  disconnectall();
+	//  disconnectall();`
 	   void disconnectall();
 
 	// Get the last os or db error message.
@@ -1655,7 +1523,7 @@ public:
 
 	// obj is conn_or_file
 
-	// Returns: The approx. number of records in a file
+	// Returns: The approx. number of records in a db file
 	//
 	// `let conn = "exodus", filename = "xo_clients";
 	//  var nrecs1 = conn.reccount(filename);
@@ -1706,7 +1574,7 @@ public:
 	ND bool createindex(in fieldname, in dictfile = "") const;
 
 	// Lists secondary indexes in a database or for a db file
-	// Returns: False if the file or fieldname are given and do not exist
+	// Returns: False if the db file or fieldname are given and do not exist
 	// obj is file|conn
 	//
 	// `var conn = "exodus";
@@ -1726,9 +1594,9 @@ public:
 	//  if (deleteindex(file, fieldname)) ...`
 	ND bool deleteindex(in fieldname) const;
 
-	// Places a metaphorical db lock on a particular record given a file and key.
+	// Places a metaphorical db lock on a particular record given a db file and key.
 	// This is a advisory lock, not a physical lock, since it makes no restriction on the access or modification of data by other connections.
-	// Neither the file nor the record key need to actually exist since a lock is just a hash of the filename and key combined.
+	// Neither the db file nor the record key need to actually exist since a lock is just a hash of the db file name and key combined.
 	// If another connection attempts to place an identical lock on the same database it will be denied.
 	// Locks can be removed by unlock() or unlockall() or will be automatically removed at the end of a transaction or when the connection is closed.
 	// If the same process attempts to place an identical lock more than once it may be denied (if not in a transaction) or succeed but be ignored (if in a transaction).
@@ -1847,7 +1715,7 @@ public:
 	// The actual file is NOT updated.
 	// writec() either updates an existing cache record if the key already exists or otherwise inserts a new record into the cache.
 	// It always succeeds so no result code is returned.
-	// Neither the file nor the record key need to actually exist in the actual db.
+	// Neither the db file nor the record key need to actually exist in the actual db.
 	//
     // `let rec = "Client XD^X^20855^30000^1001.00^20855.76539"_var;
     //  let file = "xo_clients", key = "XD001";
@@ -1899,7 +1767,7 @@ public:
 	// The xlate ("translate") function is similar to readf() but, when called as an exodus program member function, it can be used efficiently with exodus file dictionaries using column names and functions and multivalued data.
 	// ''Arguments:''
 	// '''str:''' Used as the primary key to lookup a field in a given file and field no or field name.
-	// '''filename:''' The file in which to look up data.
+	// '''filename:''' The db file in which to look up data.
 	// If var key is multivalued then a multivalued field is returned.
 	// '''fieldno:''' Determines which field of the record is returned.
 	// * Integer returns that field number
@@ -2019,7 +1887,7 @@ public:
 
 	// obj is osfilevar
 
-	// Given the name of an existing file name including path, initialises a file handle var that can be used in random access osbread and osbwrite functions.
+	// Given the name of an existing os file name including path, initialises an os file handle var that can be used in random access osbread and osbwrite functions.
 	// The utf8 option defaults to true which causes trimming of partial utf-8 unicode byte sequences from the end of osbreads. For raw untrimmed osbreads pass utf8 = false;
 	// File will be opened for writing if possible otherwise for reading.
 	// Returns: True if successful or false if not possible for any reason.
@@ -2053,7 +1921,7 @@ public:
 	//  var text, offset = 0;
 	//  if (text.osbread(osfilename, offset, 8)) ... ok // text -> "aaa=123\n", offset = 8
 	//  // or
-	//  if (osbread(text from osfilename, offset, 1024)) ... ok // text -> "bbb=456\n"), offset = 16
+	//  if (osbread(text from osfilename, offset, 1024)) ... ok // text -> "bbb=456\n"), offset = 16`
 	ND bool osbread(in osfilevar, io offset, const int length);
 
 	// Removes an osfilevar handle from the internal memory cache of os file handles. This frees up both exodus process memory and operating system resources.
@@ -2067,7 +1935,7 @@ public:
 	//  obj is strvar
 
 	// Create a complete os file from a var.
-	// Any existing file is removed first.
+	// Any existing os file is removed first.
 	// Returns: True if successful or false if not possible for any reason.
 	// e.g. Path is not writeable, permissions etc.
 	// If codepage is specified then output is converted from utf-8 to that codepage. Otherwise no conversion is done.
@@ -2093,10 +1961,10 @@ public:
 
 	// TODO check if it calls osclose on itself in case removing a varfile
 
-	// obj is osfileordirname
+	// obj is osfile_or_dirname
 
 	// Renames an os file or dir in the OS file system.
-	// Will not overwrite an existing file or dir.
+	// Will not overwrite an existing os file or dir.
 	// Source and target must exist in the same storage device.
 	// Returns: True if successful or false if not possible for any reason.
 	// e.g. Target already exists, path is not writeable, permissions etc.
@@ -2111,8 +1979,8 @@ public:
 	//  if (osrename(from_osfilename, to_osfilename)) ...`
 	ND bool osrename(in new_dirpath_or_filepath) const;
 
-	// "Moves" a file or dir within the os file system.
-	// Will not overwrite an existing file or dir.
+	// "Moves" an os file or dir within the os file system.
+	// Will not overwrite an existing os file or dir.
 	// Returns: True if successful or false if not possible for any reason.
 	// e.g. Source doesnt exist or cannot be accessed, target already exists, source or target is not writeable, permissions etc.
 	// Attempts osrename first then oscopy followed by osremove original.
@@ -2126,8 +1994,8 @@ public:
 	//  if (osmove(from_osfilename, to_osfilename)) ...`
 	ND bool osmove(in to_osfilename) const;
 
-	// Copies a file or directory recursively within the file system.
-	// Will overwrite an existing file or dir.
+	// Copies an os file or directory recursively within the os file system.
+	// Will overwrite an existing os file or dir.
 	// Uses std::filesystem::copy internally with recursive and overwrite options
 	//
 	// `let from_osfilename = ostempdirpath() ^ "xo_gendoc_test.conf";
@@ -2175,17 +2043,17 @@ public:
 	// Returns: Dir info for any dir entry or "" if it doesnt exist
 	// A short string containing size ^ FM ^ modified_time ^ FM ^ modified_time
 	// mode 0 default
-	// mode 1 returns "" if not a file
-	// mode 2 returns "" if not a dir
+	// mode 1 returns "" if not an os file
+	// mode 2 returns "" if not an os dir
 	// See also osfile() and osdir()
 	//
 	// `var info1 = "/etc/hosts"_var.osinfo(); // "221^20597^78309"
 	//  // or
 	//  var info2 = osinfo("/etc/hosts");`
-	// obj is osfileordirpath
+	// obj is osfile_or_dirpath
 	ND var  osinfo(const int mode = 0) const;
 
-	// Returns: Dir info for a file
+	// Returns: Dir info for a os file
 	// A short string containing size ^ FM ^ modified_time ^ FM ^ modified_time
 	// Alias for osinfo(1)
 	//
@@ -2332,8 +2200,25 @@ public:
 
 	// Get the libexodus build date and time
 	//
-	// `let v1 = var().version(); // "29 JAN 2025 14:56:52"`
+	// `let v1 = var().version(); // e.g. "29 JAN 2025 14:56:52"`
 	ND var  version() const;
+
+	// obj is var
+
+	// Sets the current thread's default locale codepage code
+	// obj is strvar
+	//
+	// `if ("en_US.utf8"_var.setxlocale()) ... ok // true if successful
+	//  // or
+	//  if (setxlocale("en_US.utf8")) ... ok`
+	   bool setxlocale() const;
+
+	// Gets the current thread's default locale codepage code
+	//
+	// `let v1 = var().getxlocale(); // "en_US.utf8"
+	//  // or
+	//  let v2 = getxlocale();`
+	ND out  getxlocale();
 
 	///// OUTPUT:
 	////////////
@@ -2369,7 +2254,7 @@ public:
 	// Output to a given stream
 	   CVR put(std::ostream& ostream1) const;
 
-	// Flushes any Buffered. output to stdout/cout
+	// Flushes any buffered output to stdout/cout
 	// obj is var()
 	//
 	// `var().osflush();
@@ -2391,6 +2276,122 @@ public:
 
 	   void breakon() const;  // Allow interrupt Ctrl+C
 	   void breakoff() const; // Prevent interrupt Ctr+C
+
+	///// MATH/BOOLEAN:
+	//////////////////
+
+	// obj is num
+
+    // Absolute value
+    // `let v1 = var(-12.34).abs(); // 12.34
+    //  // or
+    //  let v2 = abs(-12.34);`
+    ND var  abs() const;
+
+    // Power
+    // `let v1 = var(2).pwr(8); // 256
+    //  // or
+    //  let v2 = pwr(2, 8);`
+    ND var  pwr(in exponent) const;
+
+    // Pseudo random number generator
+    // `let v1 = var(100).rnd(); // 0 to 99 pseudo random
+    //  // or
+    //  let v2 = rnd(100);`
+    ND var  rnd()     const;
+
+    // Initialise the seed for rnd()
+    // `var(123).initrnd(); // Set seed to 123
+    //  // or
+    //  initrnd(123);`
+           void initrnd() const;
+
+    // Power of e
+    // `let v1 = var(1).exp(); // 2.718281828459045
+    //  // or
+    //  let v2 = exp(1);`
+    ND var  exp()     const;
+
+    // Square root
+    // `let v1 = var(100).sqrt(); // 10
+    //  // or
+    //  let v2 = sqrt(100);`
+    ND var  sqrt()    const;
+
+    // Sine of degrees
+    // `let v1 = var(30).sin(); // 0.5
+    //  // or
+    //  let v2 = sin(30);`
+    ND var  sin()     const;
+
+    // Cosine of degrees
+    // `let v1 = var(60).cos(); // 0.5
+    //  // or
+    //  let v2 = cos(60);`
+    ND var  cos()     const;
+
+    // Tangent of degrees
+    // `let v1 = var(45).tan(); // 1
+    //  // or
+    //  let v2 = tan(45);`
+    ND var  tan()     const;
+
+    // Arctangent of degrees
+    // `let v1 = var(1).atan(); // 45
+    //  // or
+    //  let v2 = atan(1);`
+    ND var  atan()    const;
+
+    // Natural logarithm
+	// Returns: Floating point ver (double)
+    // `let v1 = var(2.718281828459045).loge(); // 1
+    //  // or
+    //  let v2 = loge(2.718281828459045);`
+    ND var  loge()    const;
+
+    //  ND var  int() const;//reserved word
+
+    // Truncate decimal numbers towards zero
+	// Returns: A var integer
+    // `let v1 = var(2.9).integer(); // 2
+    //  // or
+    //  let v2 = integer(2.9);
+	//
+    //  var v3 = var(-2.9).integer(); // -2
+    //  // or
+    //  var v4 = integer(-2.9);`
+    ND var  integer() const;
+
+    // Truncate decimal numbers towards negative
+	// Returns: A var integer
+    // `let v1 = var(2.9).floor(); // 2
+    //  // or
+    //  let v2 = floor(2.9);
+	//
+    //  var v3 = var(-2.9).floor(); // -3
+    //  // or
+    //  var v4 = floor(-2.9);`
+    ND var  floor() const;
+
+	/* Actually implemented in var_base but documented here
+	// Modulus function
+	// Identical to C++ % operator only for positive numbers and modulus
+	// Negative denominators are considered as periodic with positiive numbers
+	// Result is between [0 , modulus) if modulus is positive
+	// Result is between (modulus, 0] if modulus is negative (symmetric)
+	// mod(11, 5); // 1
+	// mod(-11, 5); // 4
+	// mod(11, -5); // -4
+	// mod(-11, -5); // -1
+	// `let v1 = var(11).mod(5); // 1
+	//  // or
+	//  let v2 = mod(11, 5);`
+	ND var  mod(in modulus) const;
+
+	// Not documenting the overloaded versions
+	//ND var  mod(double modulus) const;
+	//ND var  mod(const int modulus) const;
+    */
 
 	// Close documentation
 	/// :

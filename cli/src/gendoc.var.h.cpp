@@ -9,134 +9,14 @@ function main() {
 
 	var num;
 
-	printl("abs() const;");
-	{
-		let v1 = var(-12.34).abs(); // 12.34
-		// or
-		let v2 = abs(-12.34);
-	}
-
-	printl("pwr(in exponent) const;");
-	{
-		let v1 = var(2).pwr(8); // 256
-		// or
-		let v2 = pwr(2, 8);
-	}
-
-	printl("rnd() const;");
-	{
-		let v1 = var(100).rnd(); // 0 to 99 pseudo random
-		// or
-		let v2 = rnd(100);
-	}
-
-	printl("initrnd() const;");
-	{
-		var(123).initrnd(); // Set seed to 123
-		// or
-		initrnd(123);
-	}
-
-	printl("exp() const;");
-	{
-		let v1 = var(1).exp(); // 2.718281828459045
-		// or
-		let v2 = exp(1);
-	}
-
-	printl("sqrt() const;");
-	{
-		let v1 = var(100).sqrt(); // 10
-		// or
-		let v2 = sqrt(100);
-	}
-
-	printl("sin() const;");
-	{
-		let v1 = var(30).sin(); // 0.5
-		// or
-		let v2 = sin(30);
-	}
-
-	printl("cos() const;");
-	{
-		let v1 = var(60).cos(); // 0.5
-		// or
-		let v2 = cos(60);
-	}
-
-	printl("tan() const;");
-	{
-		let v1 = var(45).tan(); // 1
-		// or
-		let v2 = tan(45);
-	}
-
-	printl("atan() const;");
-	{
-		let v1 = var(1).atan(); // 45
-		// or
-		let v2 = atan(1);
-	}
-
-	printl("loge() const;");
-	{
-		let v1 = var(2.718281828459045).loge(); // 1
-		// or
-		let v2 = loge(2.718281828459045);
-	}
-
-	printl("integer() const;");
-	{
-		let v1 = var(2.9).integer(); // 2
-		// or
-		let v2 = integer(2.9);
-		var v3 = var(-2.9).integer(); // -2
-		// or
-		var v4 = integer(-2.9);
-	}
-
-	printl("floor() const;");
-	{
-		let v1 = var(2.9).floor(); // 2
-		// or
-		let v2 = floor(2.9);
-		var v3 = var(-2.9).floor(); // -3
-		// or
-		var v4 = floor(-2.9);
-	}
-
 	printl("round(const int ndecimals = 0) const;");
 	{
-		let v1 = var(0.455).round(2); // 0.46
+		let v1 = var(0.455).round(2); // "0.46"
 		// or
 		let v2 = round(1.455, 2);
-		var v3 = var(-0.455).round(2); // -0.46
+		var v3 = var(-0.455).round(2); // "-0.46"
 		// or
 		var v4 = round(-1.455, 2);
-	}
-
-	printl("mod(in modulus) const;");
-	{
-		let v1 = var(11).mod(5); // 1
-		// or
-		let v2 = mod(11, 5);
-	}
-
-	printl("getxlocale();");
-	{
-		let v1 = var().getxlocale(); // e.g. "en_US.utf8"
-		// or
-		let v2 = getxlocale();
-	}
-
-	var strvar;
-
-	printl("setxlocale() const;");
-	{
-		if ("en_US.utf8"_var.setxlocale()) {/*ok*/} else  {abort("setxlocale" ": " ^ lasterror());} // true if successful
-		// or
-		if (setxlocale("en_US.utf8")) {/*ok*/} else  {abort("setxlocale" ": " ^ lasterror());}
 	}
 
 	printl("chr(const int num) const;");
@@ -171,6 +51,8 @@ function main() {
 	{
 		let v1 = var(123.45).numberinwords("de_DE"); // "ein­hundert­drei­und­zwanzig Komma vier fünf"
 	}
+
+	var strvar;
 
 	printl("seq() const;");
 	{
@@ -823,6 +705,14 @@ function main() {
 		if (sqlexec(sqlcmd)) {/*ok*/} else  {abort("sqlexec" ": " ^ lasterror());}
 	}
 
+	printl("sqlexec(in sqlcmd, io response) const;");
+	{
+		var sqlcmd = "select 2 + 2;", response;
+		if (conn.sqlexec(sqlcmd, response)) {/*ok*/} else  {abort("sqlexec" ": " ^ lasterror());} // response = 4
+		// or
+		if (sqlexec(sqlcmd, response)) {/*ok*/} else  {abort("sqlexec" ": " ^ lasterror());}
+	}
+
 	printl("disconnect();");
 	{
 		conn.disconnect();
@@ -1201,7 +1091,7 @@ function main() {
 		if (osread(text from osfilename)) {/*ok*/} else  {abort("osread" ": " ^ lasterror());}
 	}
 
-	var osfileordirname;
+	var osfile_or_dirname;
 
 	printl("osrename(in new_dirpath_or_filepath) const;");
 	{
@@ -1251,7 +1141,7 @@ function main() {
 		var entries2 = oslist("/etc/" "*.conf");
 	}
 
-	var osfileordirpath;
+	var osfile_or_dirpath;
 
 	printl("osinfo(const int mode = 0) const;");
 	{
@@ -1386,7 +1276,21 @@ function main() {
 
 	printl("version() const;");
 	{
-		let v1 = var().version(); // "29 JAN 2025 14:56:52"
+		let v1 = var().version(); // e.g. "29 JAN 2025 14:56:52"
+	}
+
+	printl("setxlocale() const;");
+	{
+		if ("en_US.utf8"_var.setxlocale()) {/*ok*/} else  {abort("setxlocale" ": " ^ lasterror());} // true if successful
+		// or
+		if (setxlocale("en_US.utf8")) {/*ok*/} else  {abort("setxlocale" ": " ^ lasterror());}
+	}
+
+	printl("getxlocale();");
+	{
+		let v1 = var().getxlocale(); // "en_US.utf8"
+		// or
+		let v2 = getxlocale();
 	}
 
 	printl("osflush() const;");
@@ -1394,6 +1298,110 @@ function main() {
 		var().osflush();
 		// or
 		osflush();
+	}
+
+	printl("abs() const;");
+	{
+		let v1 = var(-12.34).abs(); // 12.34
+		// or
+		let v2 = abs(-12.34);
+	}
+
+	printl("pwr(in exponent) const;");
+	{
+		let v1 = var(2).pwr(8); // 256
+		// or
+		let v2 = pwr(2, 8);
+	}
+
+	printl("rnd() const;");
+	{
+		let v1 = var(100).rnd(); // 0 to 99 pseudo random
+		// or
+		let v2 = rnd(100);
+	}
+
+	printl("initrnd() const;");
+	{
+		var(123).initrnd(); // Set seed to 123
+		// or
+		initrnd(123);
+	}
+
+	printl("exp() const;");
+	{
+		let v1 = var(1).exp(); // 2.718281828459045
+		// or
+		let v2 = exp(1);
+	}
+
+	printl("sqrt() const;");
+	{
+		let v1 = var(100).sqrt(); // 10
+		// or
+		let v2 = sqrt(100);
+	}
+
+	printl("sin() const;");
+	{
+		let v1 = var(30).sin(); // 0.5
+		// or
+		let v2 = sin(30);
+	}
+
+	printl("cos() const;");
+	{
+		let v1 = var(60).cos(); // 0.5
+		// or
+		let v2 = cos(60);
+	}
+
+	printl("tan() const;");
+	{
+		let v1 = var(45).tan(); // 1
+		// or
+		let v2 = tan(45);
+	}
+
+	printl("atan() const;");
+	{
+		let v1 = var(1).atan(); // 45
+		// or
+		let v2 = atan(1);
+	}
+
+	printl("loge() const;");
+	{
+		let v1 = var(2.718281828459045).loge(); // 1
+		// or
+		let v2 = loge(2.718281828459045);
+	}
+
+	printl("integer() const;");
+	{
+		let v1 = var(2.9).integer(); // 2
+		// or
+		let v2 = integer(2.9);
+		var v3 = var(-2.9).integer(); // -2
+		// or
+		var v4 = integer(-2.9);
+	}
+
+	printl("floor() const;");
+	{
+		let v1 = var(2.9).floor(); // 2
+		// or
+		let v2 = floor(2.9);
+		var v3 = var(-2.9).floor(); // -3
+		// or
+		var v4 = floor(-2.9);
+	}
+
+	printl("mod(in modulus) const;");
+	{
+		let v1 = var(11).mod(5); // 1
+		// or
+		let v2 = mod(11, 5);
 	}
 
 
