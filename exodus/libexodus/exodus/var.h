@@ -279,13 +279,14 @@ public:
 	// Returns: A var ASCII string with exact decimal places requested.
     // .5 always rounds away from zero.
 	// obj is num
-    // `let v1 = var(0.455).round(2); // "0.46"
-    //  // or
-    //  let v2 = round(1.455, 2);
 	//
-    //  var v3 = var(-0.455).round(2); // "-0.46"
+    // `let v1 = var(0.295).round(2);  // "0.30"
     //  // or
-    //  var v4 = round(-1.455, 2);`
+    //  let v2 = round(1.295, 2);      // "1.30"
+	//
+    //  var v3 = var(-0.295).round(2); // "-0.30"
+    //  // or
+    //  var v4 = round(-1.295, 2);     // "-1.30"`
     ND var  round(const int ndecimals = 0) const;
 
 	// obj is var()
@@ -303,7 +304,7 @@ public:
 	// Not providing implicit constructor from var to unsigned int due to getting ambigious conversions
 	// since int and unsigned int are parallel priority in c++ implicit conversions
 	//
-	// `let v1 = var().textchr(171416); // "𩶘" or "\xF0A9B698"
+	// `let v1 = var().textchr(171416); // "𩶘" // or "\xF0A9B698"
 	//  // or
 	//  let v2 = textchr(171416);`
 	ND var  textchr(const int num) const;
@@ -326,7 +327,9 @@ public:
 	// Create a string describing a given number in words
 	// obj is num
 	//
-	// `let v1 = var(123.45).numberinwords("de_DE"); // "ein­hundert­drei­und­zwanzig Komma vier fünf"`
+	// ein hundert drei und zwanzig Komma vier fünf
+	// `let softhyphen = "\xc2\xad";
+	//  let v1 = var(123.45).numberinwords("de_DE").replace(softhyphen, " "); // "ein␣hundert␣drei␣und␣zwanzig␣Komma␣vier␣fünf"`
 	ND var  numberinwords(in languagename_or_locale_id = "");
 
 	////////////
@@ -340,14 +343,14 @@ public:
 
 	// Returns: The character number of the first char.
 	//
-	// `let v1 = "abc"_var.seq(); // 0x61 97
+	// `let v1 = "abc"_var.seq(); // 0x61 // decimal 97
 	//  // or
 	//  let v2 = seq("abc");`
 	ND var  seq() const;
 
 	// Returns: The Unicode character number of the first unicode code point.
 	//
-	// `let v1 = "Γ"_var.textseq(); // 915 U+0393: Greek Capital Letter Gamma (Unicode Character)
+	// `let v1 = "Γ"_var.textseq(); // 915 // U+0393: Greek Capital Letter Gamma (Unicode Character)
 	//  // or
 	//  let v2 = textseq("Γ");`
 	ND var  textseq() const;
@@ -397,23 +400,23 @@ public:
 
 	// Returns: True if starts with prefix
 	//
-	// `let v1 = "abc"_var.starts("ab"); // true
+	// `if ("abc"_var.starts("ab")) ... true
 	//  // or
-	//  let v2 = starts("abc", "ab");`
+	//  if (starts("abc", "ab")) ... true`
 	ND bool starts(SV prefix) const;
 
 	// Returns: True if ends with suffix
 	//
-	// `let v1 = "abc"_var.ends("bc"); // true
+	// `if ("abc"_var.ends("bc")) ... true
 	//  // or
-	//  let v2 = ends("abc", "bc");`
+	//  if (ends("abc", "bc")) ... true`
 	ND bool ends(SV suffix) const;
 
 	// Returns: True if starts, ends or contains substr
 	//
-	// `let v1 = "abcd"_var.contains("bc"); // true
+	// `if ("abcd"_var.contains("bc")) ... true
 	//  // or
-	//  let v2 = contains("abcd", "bc");`
+	//  if (contains("abcd", "bc")) ... true`
 	ND bool contains(SV substr) const;
 
 	//https://en.wikipedia.org/wiki/Comparison_of_programming_languages_(string_functions)#Find
@@ -427,7 +430,7 @@ public:
 
 	// ditto. Occurrence 1 = find first occurrence
 	//
-	// `let v1 = "abcabc"_var.index("bc", 2); // 5
+	// `let v1 = "abcabc"_var.index("bc", 2); // 2
 	//  // or
 	//  let v2 = index("abcabc", "bc", 2);`
 	ND var  indexn(SV substr, const int occurrence) const;
@@ -443,7 +446,7 @@ public:
 	// Returns: All results of regex matching
 	// Multiple matches are in fields. Groups are in values
 	//
-	// `let v1 = "abc1abc2"_var.match("BC(\\d)", "i"); // "bc1]1^bc2]2"
+	// `let v1 = "abc1abc2"_var.match("BC(\\d)", "i"); // "bc1]1^bc2]2"_var
 	//  // or
 	//  let v2 = match("abc1abc2", "BC(\\d)", "i");`
 	//
@@ -478,7 +481,7 @@ public:
 	// regex_options as for match()
 	//
 	// `var startchar1 = 1;
-	//  let v1 = "abc1abc2"_var.search("BC(\\d)", startchar1, "i"); // returns "bc1]1" and startchar1 is updated to 5 ready for the next search
+	//  let v1 = "abc1abc2"_var.search("BC(\\d)", startchar1, "i"); // "bc1]1"_var // startchar1.outputl() -> 5 /// Ready for the next search
 	//  // or
 	//  startchar1 = 1;
 	//  let v2 = search("abc1abc2", "BC(\\d)", startchar1, "i");`
@@ -531,35 +534,35 @@ public:
 
 	// Simple reversible disguising of text
 	//
-	// `let v1 = "abc"_var.invert(); // "\x{C29EC29DC29C}"
+	// `let v1 = "abc"_var.invert(); // "\xC2" "\x9E" "\xC2" "\x9D" "\xC2" "\x9C"
 	//  // or
 	//  let v2 = invert("abc");`
 	ND var  invert() const&;
 
 	// Convert all FM to VM, VM to SM etc.
 	//
-	// `let v1 = "a1^b2^c3"_var.lower(); // "a1]b2]c3"
+	// `let v1 = "a1^b2^c3"_var.lower(); // "a1]b2]c3"_var
 	//  // or
 	//  let v2 = lower("a1^b2^c3"_var);`
 	ND var  lower() const&;
 
 	// Convert all VM to FM, SM to VM etc.
 	//
-	// `let v1 = "a1]b2]c3"_var.raise(); // "a1^b2^c3"
+	// `let v1 = "a1]b2]c3"_var.raise(); // "a1^b2^c3"_var
 	//  // or
 	//  let v2 = "a1]b2]c3"_var;`
 	ND var  raise() const&;
 
 	// Remove any redundant FM, VM etc. characters (Trailing FM; VM before FM etc.)
 	//
-	// `let v1 = "a1^b2]]^c3^^"_var.crop(); // "a1^b2^c3"
+	// `let v1 = "a1^b2]]^c3^^"_var.crop(); // "a1^b2^c3"_var
 	//  // or
 	//  let v2 = crop("a1^b2]]^c3^^"_var);`
 	ND var  crop() const&;
 
 	// Wrap in double quotes
 	//
-	// `let v1 = "abc"_var.quote(); // ""abc""
+	// `let v1 = "abc"_var.quote(); // "\"abc\""
 	//  // or
 	//  let v2 = quote("abc");`
 	ND var  quote() const&;
@@ -650,16 +653,16 @@ public:
 
 	// Insert text at char position without overwriting any following characters
 	//
-	// `let v1 = "abcd"_var.paste(2, "XYZ"); // "aXYbcd"
+	// `let v1 = "abcd"_var.paste(2, "XYZ"); // "aXYZbcd"
 	//  // or
 	//  let v2 = paste("abcd", 2, "XYZ");`
 	ND var  paste(const int pos1, SV insertstr) const&;
 
 	// Insert text at the beginning
 	//
-	// `let v1 = "abc"_var.prefix("XY"); // "XYabc"
+	// `let v1 = "abc"_var.prefix("XYZ"); // "XYZabc"
 	//  // or
-	//  let v2 = prefix("abc", "XY");`
+	//  let v2 = prefix("abc", "XYZ");`
 	ND var  prefix(SV insertstr) const&;
 
 	// ND var  append(SV appendstr) const&;
@@ -717,7 +720,7 @@ public:
 
 	// Convert chars to other chars one for one or delete where tochars is shorter.
 	//
-	// `let v1 = "abcde"_var.convert("aZd", "XY"); // "Xbce" (a is replaced and d is removed)
+	// `let v1 = "abcde"_var.convert("aZd", "XY"); // "Xbce" // a is replaced and d is removed
 	//  // or
 	//  let v2 = convert("abcde", "aZd", "XY");`
 	ND var  convert(SV fromchars, SV tochars) const&;
@@ -731,7 +734,7 @@ public:
 
 	// Replace all occurrences of a substr with another. Case sensitive
 	//
-	// `let v1 = "Abc Abc"_var.replace("bc", "X"); // "AX AX"
+	// `let v1 = "Abc.Abc"_var.replace("bc", "X"); // "AX.AX"
 	//  // or
 	//  let v2 = replace("Abc Abc", "bc", "X");`
 	ND var  replace(SV fromstr, SV tostr) const&;
@@ -746,7 +749,7 @@ public:
 
 	// Remove duplicate fields in an FM or VM etc. separated list
 	//
-	// `let v1 = "a1^b2^a1^c2"_var.unique(); // "a1^b2^c2"
+	// `let v1 = "a1^b2^a1^c2"_var.unique(); // "a1^b2^c2"_var
 	//  // or
 	//  let v2 = unique("a1^b2^a1^c2"_var);`
 	ND var  unique() const&;
@@ -754,32 +757,32 @@ public:
 	// Reorder fields in an FM or VM etc. separated list in ascending order
 	// Numerical
 	//
-	// `let v1 = "20^10^2^1^1.1"_var.sort(); // "1^1.1^2^10^20"
+	// `let v1 = "20^10^2^1^1.1"_var.sort(); // "1^1.1^2^10^20"_var
 	//  // or
 	//  let v2 = sort("20^10^2^1^1.1"_var);`
 	// Alphabetical
-	//  `let v1 = "b1^a1^c20^c10^c2^c1^b2"_var.sort(); // "a1^b1^b2^c1^c10^c2^c20"
+	//  `let v1 = "b1^a1^c20^c10^c2^c1^b2"_var.sort(); // "a1^b1^b2^c1^c10^c2^c20"_var
 	//  // or
 	//  let v2 = sort("b1^a1^c20^c10^c2^c1^b2"_var);`
 	ND var  sort(SV sepchar = _FM) const&;
 
 	// Reorder fields in an FM or VM etc. separated list in descending order
 	//
-	// `let v1 = "20^10^2^1^1.1"_var.reverse(); // "1.1^1^2^10^20"
+	// `let v1 = "20^10^2^1^1.1"_var.reverse(); // "1.1^1^2^10^20"_var
 	//  // or
 	//  let v2 = reverse("20^10^2^1^1.1"_var);`
 	ND var  reverse(SV sepchar = _FM) const&;
 
 	// Randomise the order of fields in an FM, VM separated list
 	//
-	// `let v1 = "20^10^2^1^1.1"_var.shuffle(); // "2^1^20^1.1^10" (random order depending on initrand())
+	// `let v1 = "20^10^2^1^1.1"_var.shuffle(); /// e.g. "2^1^20^1.1^10" (random order depending on initrand())
 	//  // or
 	//  let v2 = shuffle("20^10^2^1^1.1"_var);`
 	ND var  shuffle(SV sepchar = _FM) const&;
 
 	// Replace separator characters with FM char except inside double or single quotes ignoring escaped quotes &bsol;" &bsol;'
 	//
-	// `let v1 = "abc,\"def,\"123\" fgh\",12.34"_var.parse(','); // "abc^"def,"123" fgh"^12.34"
+	// `let v1 = "abc,\"def,\"123\" fgh\",12.34"_var.parse(','); // "abc^\"def,\"123\" fgh\"^12.34"_var
 	//  // or
 	//  let v2 = parse("abc,\"def,\"123\" fgh\",12.34", ',');`
 	ND var  parse(char sepchar = ' ') const&;
@@ -907,14 +910,14 @@ public:
 	// If a modulus is provided then the result is limited to [0, modulus)
 	// MurmurHash3 is used.
 	//
-	// `let v1 = "abc"_var.hash(); // 6715211243465481821
+	// `let v1 = "abc"_var.hash(); assert(v1 == var(6'715'211'243'465'481'821));
 	//  // or
 	//  let v2 = hash("abc");`
 	ND var  hash(const std::uint64_t modulus = 0) const;
 
 	// Split a FM etc. separated string into a dim array.
 	//
-	// `dim d1 = "a^b^c"_var.split(); //a dimensioned array with three elements (vars)
+	// `dim d1 = "a^b^c"_var.split(); // A dimensioned array with three elements (vars)
 	//  // or
 	//  dim d1 = split("a^b^c"_var);`
 	ND dim  split(SV sepchar = _FM) const;
@@ -927,9 +930,11 @@ public:
 	// Also returns in pos2 the pos of the following delimiter or one past the end of the string if not found.
 	// Add 1 to pos2 start the next search if continuing.
 	//
-	// `var pos1a = 4, pos2a; let v1 = "aa,bb,cc"_var.substr(pos1a, ",", pos2a); // "bb" and pos2 -> 6
+	// `var pos1a = 4, pos2a;
+	//  let v1 = "aa,bb,cc"_var.substr(pos1a, ",", pos2a); // "bb" // pos2a -> 6
 	//  // or
-	//  var pos1b = 4, pos2b; let v2 = substr("aa,bb,cc", pos1b, ",", pos2b);`
+	//  var pos1b = 4, pos2b;
+	//  let v2 = substr("aa,bb,cc", pos1b, ",", pos2b);`
 	   var  substr(const int pos1, SV delimiterchars, io pos2) const;
 
 	// Alias of substr version 3.
@@ -949,10 +954,11 @@ public:
 	// delimiterno) const;
 
 	// substr version 4.
-	// Returns: A substr from a given pos1  up to the next RM/FM/VM/SM/TM/ST delimiter char. Also returns the next index/offset and the delimiter no. found 1-6 or 0 if not found.
+	// Returns: A substr from a given pos1  up to the next RM/FM/VM/SM/TM/ST delimiter char.
+	// Also returns the next index/offset and the delimiter no. found (1-6) or 0 if not found.
 	//
 	// `var pos1a = 4, delim1;
-	//  let v1 = "aa^bb^cc"_var.substr2(pos1a, delim1); // "bb", pos1a -> 7, delim -> 2 (FM)
+	//  let v1 = "aa^bb^cc"_var.substr2(pos1a, delim1); // "bb" // pos1a -> 7 // delim1 -> 2
 	//  // or
 	//  var pos1b = 4, delim2;
 	//  let v2 = substr2("aa^bb^cc"_var, pos1b, delim2);`
@@ -1118,7 +1124,7 @@ public:
 	// `let v1 = "f1^f2v1]f2v2]f2v3^f2"_var;
 	//  let v2 = v1.extract(2, 2); // "f2v2"
 	//  //
-	//  // The alias "f" is normally used instead for brevity
+	//  // For brevity the function alias "f()" (standing for "field") is normally used instead of "extract()" as follows:
 	//  var v3 = v1.f(2, 2);`
 	ND var  extract(const int fieldno, const int valueno = 0, const int subvalueno = 0)      const {return this->f(fieldno, valueno, subvalueno);}
 
@@ -1176,28 +1182,28 @@ public:
 
 	// Sum up multiple values into one higher level
 	//
-	// `let v1 = "1]2]3^4]5]6"_var.sum(); // "6^15"
+	// `let v1 = "1]2]3^4]5]6"_var.sum(); // "6^15"_var
 	//  // or
 	//  let v2 = sum("1]2]3^4]5]6"_var);`
 	ND var  sum() const;
 
 	// Sum up all levels into a single figure
 	//
-	// `let v1 = "1]2]3^4]5]6"_var.sumall(); // "21"
+	// `let v1 = "1]2]3^4]5]6"_var.sumall(); // 21
 	//  // or
 	//  let v2 = sumall("1]2]3^4]5]6"_var);`
 	ND var  sumall() const;
 
 	// Ditto allowing commas etc.
 	//
-	// `let v1 = "10,20,33"_var.sum(","); // "60"
+	// `let v1 = "10,20,30"_var.sum(","); // 60
 	//  // or
-	//  let v2 = sum("10,20,33", ",");`
+	//  let v2 = sum("10,20,30", ",");`
 	ND var  sum(SV sepchar) const;
 
 	// Binary ops (+, -, *, /) in parallel on multiple values
 	//
-	// `let v1 = "10]20]30"_var.mv("+","2]3]4"_var); // "12]23]34"`
+	// `let v1 = "10]20]30"_var.mv("+","2]3]4"_var); // "12]23]34"_var`
 	ND var  mv(const char* opcode, in var2) const;
 
 	///// DYNAMIC ARRAY MUTATORS Standalone commands:
@@ -1218,25 +1224,25 @@ public:
 	// Replaces a specific field in a dynamic array
 	//
 	// `var v1 = "f1^v1]v2}s2}s3^f3"_var;
-	//  v1.r(2, 2, "X"); // v1 -> "f1^X^f3"`
+	//  v1.r(2, "X"); // "f1^X^f3"_var`
 	   IO   r(const int fieldno, in replacement) REF {this->r(fieldno, 0, 0, replacement); return THIS;}
 
 	// Ditto for specific value in a specific field.
 	//
 	// `var v1 = "f1^v1]v2}s2}s3^f3"_var;
-	//  v1.r(2, 2, "X"); // v1 -> "f1^v1]X^f3"`
+	//  v1.r(2, 2, "X"); // "f1^v1]X^f3"_var`
 	   IO   r(const int fieldno, const int valueno, in replacement) REF {this->r(fieldno, valueno, 0, replacement); return THIS;}
 
 	// Ditto for a specific subvalue in a specific value of a specific field
 	//
 	// `var v1 = "f1^v1]v2}s2}s3^f3"_var;
-	//  v1.r(2, 2, 2, "X"); // v1 -> "f1^v1]v2}X}s3^f3"`
+	//  v1.r(2, 2, 2, "X"); // "f1^v1]v2}X}s3^f3"_var`
 	   IO   r(const int fieldno, const int valueno, const int subvalueno, in replacement) REF;
 
 	// Insert a specific field in a dynamic array, moving all other fields up.
 	//
 	// `var v1 = "f1^v1]v2}s2}s3^f3"_var;
-	//  v1.inserter(2, "X"); // v1 -> "f1^X^v1]v2}s2}s3^f3"
+	//  v1.inserter(2, "X"); // "f1^X^v1]v2}s2}s3^f3"_var
 	//  // or
 	//  inserter(v1, 2, "X");`
 	   IO   inserter(const int fieldno, in insertion) REF {this->inserter(fieldno, 0, 0, insertion); return THIS;}
@@ -1244,7 +1250,7 @@ public:
 	// Ditto for a specific value in a specific field, moving all other values up.
 	//
 	// `var v1 = "f1^v1]v2}s2}s3^f3"_var;
-	//  v1.inserter(2, 2, "X"); // v1 -> "f1^v1]X]v2}s2}s3^f3"
+	//  v1.inserter(2, 2, "X"); // "f1^v1]X]v2}s2}s3^f3"_var
 	//  // or
 	//  inserter(v1, 2, 2, "X");`
 	   IO   inserter(const int fieldno, const int valueno, in insertion) REF {this->inserter(fieldno, valueno, 0, insertion); return THIS;}
@@ -1252,7 +1258,7 @@ public:
 	// Ditto for a specific subvalue in a dynamic array, moving all other subvalues up.
 	//
 	// `var v1 = "f1^v1]v2}s2}s3^f3"_var;
-	//  v1.inserter(2, 2, 2, "X"); // v1 -> "f1^v1]v2}X}s2}s3^f3"
+	//  v1.inserter(2, 2, 2, "X"); // "f1^v1]v2}X}s2}s3^f3"_var
 	//  // or
 	//  v1.inserter(2, 2, 2, "X");`
 	   IO   inserter(const int fieldno, const int valueno, const int subvalueno, in insertion) REF;
@@ -1260,7 +1266,7 @@ public:
 	// Remove a specific field (or value, or subvalue) from a dynamic array, moving all other fields (or values, or subvalues)  down.
 	//
 	// `var v1 = "f1^v1]v2}s2}s3^f3"_var;
-	//  v1.remover(2, 2); // v1 -> "f1^v1^f3"
+	//  v1.remover(2, 2); // "f1^v1^f3"_var
 	//  // or
 	//  remover(v1, 2, 2);`
 	   IO   remover(const int fieldno, const int valueno = 0, const int subvalueno = 0) REF;
@@ -1277,7 +1283,7 @@ public:
 
 	// locate() with only the target substr argument provided searches unordered values separated by VM chars.
 	// Returns: True if found and false if not.
-	// `if ("UK]US]UA"_var.locate("US")) ... ok // true
+	// `if ("UK]US]UA"_var.locate("US")) ... ok
 	//  // or
 	//  if (locate("US", "UK]US]UA"_var)) ... ok`
 	ND bool locate(in target) const;
@@ -1287,7 +1293,7 @@ public:
 	// Returns: False if not found and with the max value number + 1 in setting. Suitable for additiom of new values
 	//
 	// `var valueno;
-	//  if ("UK]US]UA"_var.locate("US", valueno)) ... ok // returns true and valueno = 2`
+	//  if ("UK]US]UA"_var.locate("US", valueno)) ... ok // valueno -> 2`
 	ND bool locate(in target, out valueno) const;
 
 	// locate() the target in unordered fields if fieldno is 0, or values if a fieldno is specified, or subvalues if the valueno argument is provided.
@@ -1295,7 +1301,7 @@ public:
 	// Returns: False if not found and with the max field, value or subvalue number found + 1 in setting. Suitable for replacement of new fields, values or subvalues.
 	//
 	// `var setting;
-	//  if ("f1^f2v1]f2v2]s1}s2}s3}s4^f3^f4"_var.locate("s4", setting, 2, 3)) ... ok // returns true and setting = 4`
+	//  if ("f1^f2v1]f2v2]s1}s2}s3}s4^f3^f4"_var.locate("s4", setting, 2, 3)) ... ok // setting -> 4 // returns true`
 	ND bool locate(in target, out setting, const int fieldno, const int valueno = 0) const;
 
 	// LOCATE BY
@@ -1308,19 +1314,19 @@ public:
 	// Returns: True if found.
 	// In case the target is not exactly found then the correct value no for inserting the target is returned in setting.
 	//
-	// `var valueno; if ("aaa]bbb]ccc"_var.locateby("AL", "bb", valueno)) ... // returns false and valueno = 2 where it could be correctly inserted.`
+	// `var valueno; if ("aaa]bbb]ccc"_var.locateby("AL", "bb", valueno)) ... // valueno -> 2 // returns false and valueno = where it could be correctly inserted.`
 	ND bool locateby(const char* ordercode, in target, out valueno) const;
 
 	// locateby() ordered as above but in fields if fieldno is 0, or values in a specific fieldno, or subvalues in a specific valueno.
 	//
 	// `var setting;
-	//  if ("f1^f2^aaa]bbb]ccc^f4"_var.locateby("AL", "bb", setting, 3)) ... // returns false and setting = 2 where it could be correctly inserted.`
+	//  if ("f1^f2^aaa]bbb]ccc^f4"_var.locateby("AL", "bb", setting, 3)) ... // setting -> 2 // return false and where it could be correctly inserted.`
 	ND bool locateby(const char* ordercode, in target, out setting, const int fieldno, const int valueno = 0) const;
 
 	// LOCATE USING
 
 	// locate() a target substr in the whole unordered string using a given delimiter char returning true if found.
-	// `if ("AB,EF,CD"_var.locateusing(",", "EF")) ... ok // true`
+	// `if ("AB,EF,CD"_var.locateusing(",", "EF")) ... ok`
 	ND bool locateusing(const char* usingchar, in target) const;
 
 	// locate() the target in a specific field, value or subvalue using a specified delimiter and unordered data
@@ -1329,7 +1335,7 @@ public:
 	// This is similar to the main locate command but the delimiter char can be specified e.g. a comma or TM etc.
 	//
 	// `var setting;
-	//  if ("f1^f2^f3c1,f3c2,f3c3^f4"_var.locateusing(",", "f3c2", setting, 3)) ... ok // returns true and setting = 2`
+	//  if ("f1^f2^f3c1,f3c2,f3c3^f4"_var.locateusing(",", "f3c2", setting, 3)) ... ok // setting -> 2 // returns true`
 	ND bool locateusing(const char* usingchar, in target, out setting, const int fieldno = 0, const int valueno = 0, const int subvalueno = 0) const;
 
 	// LOCATE BY, USING
@@ -1396,7 +1402,7 @@ public:
 	ND bool rollbacktrans() const;
 
 	// Commit a db transaction.
-	// Returns true if successfully committed or if there is no transaction in progress
+	// Returns: True if successfully committed or if there was no transaction in progress, otherwise false.
 	//
 	// `if (conn.committrans()) ... ok
 	//  // or
@@ -1404,17 +1410,21 @@ public:
 	ND bool committrans() const;
 
 	// Execute an sql command.
+	// Returns: True if there was no sql error otherwise lasterror() returns a detailed error message.
 	//
-	// `var sqlcmd = "select 2 + 2;", response;
-	//  if (conn.sqlexec("select 2 + 2;")) ... ok
+	// `if (conn.sqlexec("vacuum")) ... ok
 	//  // or
-	//  if (sqlexec(sqlcmd)) ... ok`
+	//  if (sqlexec("vacuum")) ... ok`
 	ND bool sqlexec(in sqlcmd) const;
 
 	// Execute an SQL command and capture the response.
+	// Returns: True if there was no sql error otherwise ''response'' contains a detailed error message.
+	// response: Any rows and columns returned are separated by RM and FM respectively. The first row is the column names.
+	// Recommended: Don't use sql directly unless you must to manage or configure a database.
 	//
-	// `var sqlcmd = "select 2 + 2;", response;
-	//  if (conn.sqlexec(sqlcmd, response)) ... ok // response = 4
+	// `let sqlcmd = "select 'xxx' as col1, 'yyy' as col2";
+	//  var response;
+	//  if (conn.sqlexec(sqlcmd, response)) ... ok // response -> "col1^col2\x1fxxx^yyy"_var /// \x1f is the Record Mark (RM) character. The backtick character is used here by gendoc to deliminate source code.
 	//  // or
 	//  if (sqlexec(sqlcmd, response)) ... ok`
 	ND bool sqlexec(in sqlcmd, io response) const;
@@ -1435,9 +1445,18 @@ public:
 	   void disconnectall();
 
 	// Get the last os or db error message.
+	// `var v1 = var().lasterror();
+	//  // or
+	//  var v2 = lasterror();`
 	ND var  lasterror() const;
 
 	// Log the last os or db error message.
+	// Output: to stdlog
+	// Prefixes the output with ''source'' if provided.
+	//
+	// `var().loglasterror("main:");
+	//  // or
+	//  loglasterror("main:");`
 	   var  loglasterror(in source = "") const;
 
 	///// DATABASE MANAGEMENT:
@@ -1450,6 +1469,7 @@ public:
 	// Optionally copies an existing database from the same connection and which cannot have any current connections.
 	//
 	// `var conn = "exodus";
+    //  if (not dbdelete("xo_gendoc_testdb")) {}; // Cleanup first
 	//  if (conn.dbcreate("xo_gendoc_testdb")) ... ok
 	//  // or
 	//  if (dbcreate("xo_gendoc_testdb")) ...`
@@ -1460,6 +1480,7 @@ public:
 	// The source database must exist on the same connection and cannot have any current connections.
 	//
 	// `var conn = "exodus";
+    //  if (not dbdelete("xo_gendoc_testdb2")) {}; // Cleanup first
 	//  if (conn.dbcopy("xo_gendoc_testdb", "xo_gendoc_testdb2")) ... ok
 	//  // or
 	//  if (dbcopy("xo_gendoc_testdb", "xo_gendoc_testdb2")) ...`
@@ -1567,7 +1588,7 @@ public:
 	// * The dictionary field defines a calculated field that uses an exodus function. Using a psql function is OK.
 	//
 	// `var filename = "definitions", fieldname = "DATE_TIME";
-	//  if (not filename.deleteindex(fieldname)) {}; // Cleanup first
+	//  if (not deleteindex("definitions", "DATE_TIME")) {}; // Cleanup first
 	//  if (filename.createindex(fieldname)) ... ok
 	//  // or
 	//  if (createindex(filename, fieldname)) ...`
@@ -1578,7 +1599,7 @@ public:
 	// obj is file|conn
 	//
 	// `var conn = "exodus";
-	//  if (conn.listindex()) ... ok // includes xo_clients__date_time
+	//  if (conn.listindex()) ... ok // includes "xo_clients__date_time"
 	//  // or
 	//  if (listindex()) ... ok`
 	ND var  listindex(in file_or_filename = "", in fieldname = "") const;
@@ -1642,7 +1663,7 @@ public:
 	//
 	// `let rec = "Client GD^G^20855^30000^1001.00^20855.76539"_var;
 	//  let file = "xo_clients", key = "GD001";
-	//  if (not file.deleterecord(key)) {}; // Cleanup first
+	//  if (not deleterecord("xo_clients", "GD001")) {}; // Cleanup first
 	//  rec.write(file, key);
 	//  // or
 	//  write(rec on file, key);`
@@ -1778,9 +1799,9 @@ public:
 	// * "C" returns the key unconverted.
 	//
 	// `let key = "SB001";
-	//  let client_name = key.xlate("xo_clients", 1, "X"); assert(client_name == "Client AAA");
+	//  let client_name = key.xlate("xo_clients", 1, "X"); // "Client AAA"
 	//  // or
-	//  let name_and_type = xlate("xo_clients", key, "NAME_AND_TYPE", "X"); assert("Client AAA (A)");`
+	//  let name_and_type = xlate("xo_clients", key, "NAME_AND_TYPE", "X"); // "Client AAA (A)"`
 	ND var  xlate(in filename, in fieldno, const char* mode) const;
 
 	///// DATABASE SORT/SELECT:
@@ -1807,44 +1828,50 @@ public:
 	// obj is var()
 
 	// Number of whole days since pick epoch 1967-12-31 00:00:00 UTC. Negative for dates before.
+	// e.g. was 20821 from 2025-01-01 00:00:00 UTC for 24 hours
 	//
-	// `var today1 = var().date(); // e.g. was 20821 from 2025-01-01 00:00:00 UTC
+	// `let today1 = var().date();
 	//  // or
-	//  var today2 = date();`
+	//  let today2 = date();`
 	ND var  date() const;
 
 	// Number of whole seconds since last 00:00:00 (UTC).
+	// e.g. 43200 if time is 12:00
+	// Range 0 - 86399 since there are 24*60*60 (86400) seconds in a day.
 	//
-	// `var now1 = var().time(); // range 0 - 86399 since there are 24*60*60 (86400) seconds in a day.
+	// `let now1 = var().time();
 	//  // or
-	//  var now2 = time();`
+	//  let now2 = time();`
 	ND var  time() const;
 
 	// Number of fractional seconds since last 00:00:00 (UTC).
 	// A floating point with approx. nanosecond resolution depending on hardware.
+	// e.g. 23343.704387955 approx. 06:29:03 UTC
 	//
-	// `var now1 = var().ostime(); // e.g. 23343.704387955 approx. 06:29:03 UTC
+	// `let now1 = var().ostime();
 	//  // or
-	//  var now2 = ostime();`
+	//  let now2 = ostime();`
 	ND var  ostime() const;
 
 	// Number of fractional days since pick epoch 1967-12-31 00:00:00 UTC. Negative for dates before.
 	// A floating point with approx. nanosecond resolution depending on hardware.
+	// e.g. Was 20821.99998842593 around 2025-01-01 23:59:59 UTC
 	//
-	// `var now1 = var().timestamp(); // was 20821.99998842593 around 2025-01-01 23:59:59 UTC
+	// `let now1 = var().timestamp();
 	//  // or
-	//  var now2 = timestamp();`
+	//  let now2 = timestamp();`
 	ND var  timestamp() const;
 
 	// Construct a timestamp from a date and time
 	//
-	// `var idate = iconv("2025-01-01", "D"), itime = iconv("23:59:59", "MT");
-	//  var ts1 = idate.timestamp(itime); // 20821.99998842593
+	// `let idate = iconv("2025-01-01", "D"), itime = iconv("23:59:59", "MT");
+	//  let ts1 = idate.timestamp(itime); // 20821.99998842593
 	//  // or
-	// var ts2 = timestamp(idate, itime);`
+	//  let ts2 = timestamp(idate, itime);`
 	ND var  timestamp(in ostime) const;
 
 	// Sleep/pause/wait for a number of milliseconds
+	// Releases the processor if not needed for a period of time or a delay is required.
 	//
 	// `var().ossleep(500); // sleep for 500ms
 	//  // or
@@ -1857,7 +1884,7 @@ public:
 	// Multiple events are returned in multivalues.
 	// obj is file_dir_list
 	//
-	// `let v1 = ".^/etc/hosts"_var.oswait(500); // e.g. "IN_CLOSE_WRITE^/etc^hosts^f"_var
+	// `let v1 = ".^/etc/hosts"_var.oswait(500); /// e.g. "IN_CLOSE_WRITE^/etc^hosts^f"_var
 	//  // or
 	//  let v2 = oswait(".^/etc/hosts"_var, 500);`
 	//
@@ -1894,7 +1921,7 @@ public:
 	// e.g. Target doesnt exist, permissions etc.
 	//
 	// `let osfilename = ostempdirpath() ^ "xo_gendoc_test.conf";
-	//  if (oswrite("" on osfilename)) ... ok // Create an empty os file
+	//  if (oswrite("" on osfilename)) ... ok /// Create an empty os file
 	//  var ostempfile;
 	//  if (ostempfile.osopen(osfilename)) ... ok
 	//  // or
@@ -1906,7 +1933,7 @@ public:
 	//
 	// `let osfilename = ostempdirpath() ^ "xo_gendoc_test.conf";
 	//  let text = "aaa=123\nbbb=456\n";
-	//  var offset = osfile(osfilename).f(1); // size of file -> append
+	//  var offset = osfile(osfilename).f(1); /// Size of file therefore append
 	//  if (text.osbwrite(osfilename, offset)) ... ok // offset -> 16
 	//  // or
 	//  if (not osbwrite(text on osfilename, offset)) ...`
@@ -1919,9 +1946,9 @@ public:
 	//
 	// `let osfilename = ostempdirpath() ^ "xo_gendoc_test.conf";
 	//  var text, offset = 0;
-	//  if (text.osbread(osfilename, offset, 8)) ... ok // text -> "aaa=123\n", offset = 8
+	//  if (text.osbread(osfilename, offset, 8)) ... ok // text -> "aaa=123\n" // offset -> 8
 	//  // or
-	//  if (osbread(text from osfilename, offset, 1024)) ... ok // text -> "bbb=456\n"), offset = 16`
+	//  if (osbread(text from osfilename, offset, 8)) ... ok // text -> "bbb=456\n" // offset -> 16`
 	ND bool osbread(in osfilevar, io offset, const int length);
 
 	// Removes an osfilevar handle from the internal memory cache of os file handles. This frees up both exodus process memory and operating system resources.
@@ -1972,7 +1999,7 @@ public:
 	//
 	// `let from_osfilename = ostempdirpath() ^ "xo_gendoc_test.conf";
 	//  let to_osfilename = from_osfilename ^ ".bak";
-	//  if (not osremove(to_osfilename)) {}; // Cleanup first
+	//  if (not osremove(ostempdirpath() ^ "xo_gendoc_test.conf.bak")) {}; // Cleanup first
 	//
 	//  if (from_osfilename.osrename(to_osfilename)) ... ok
 	//  // or
@@ -1988,7 +2015,7 @@ public:
 	// `let from_osfilename = ostempdirpath() ^ "xo_gendoc_test.conf.bak";
 	//  let to_osfilename = from_osfilename.cut(-4);
 	//
-	//  if (not osremove(to_osfilename)) {}; // Cleanup first
+	//  if (not osremove(ostempdirpath() ^ "xo_gendoc_test.conf")) {}; // Cleanup first
 	//  if (from_osfilename.osmove(to_osfilename)) ... ok
 	//  // or
 	//  if (osmove(from_osfilename, to_osfilename)) ...`
@@ -2029,7 +2056,7 @@ public:
 	// Returns: A FM delimited string containing all matching dir entries given a dir path
 	// A glob pattern (e.g. *.conf) can be appended to the path or passed as argument.
 	//
-	// `var entries1 = "/etc/"_var.oslist("*.cfg"); // "adduser.conf^ca-certificates.conf^ ..."
+	// `var entries1 = "/etc/"_var.oslist("*.cfg"); /// e.g. "adduser.conf^ca-certificates.conf^ ..."
 	//  // or
 	//  var entries2 = oslist("/etc/" "*.conf");`
 	ND var  oslist(SV globpattern = "", const int mode = 0) const;
@@ -2047,7 +2074,7 @@ public:
 	// mode 2 returns "" if not an os dir
 	// See also osfile() and osdir()
 	//
-	// `var info1 = "/etc/hosts"_var.osinfo(); // "221^20597^78309"
+	// `var info1 = "/etc/hosts"_var.osinfo(); /// e.g. "221^20597^78309"_var
 	//  // or
 	//  var info2 = osinfo("/etc/hosts");`
 	// obj is osfile_or_dirpath
@@ -2057,7 +2084,7 @@ public:
 	// A short string containing size ^ FM ^ modified_time ^ FM ^ modified_time
 	// Alias for osinfo(1)
 	//
-	// `var fileinfo1 = "/etc/hosts"_var.osfile(); // "221^20597^78309"
+	// `var fileinfo1 = "/etc/hosts"_var.osfile(); /// e.g. "221^20597^78309"_var
 	//  // or
 	//  var fileinfo2 = osfile("/etc/hosts");`
 	// obj is osfilename
@@ -2067,7 +2094,7 @@ public:
 	// A short string containing FM ^ modified_time ^ FM ^ modified_time
 	// Alias for osinfo(2)
 	//
-	// `var dirinfo1 = "/etc/"_var.osdir(); // "^20848^44464"
+	// `var dirinfo1 = "/etc/"_var.osdir(); /// e.g. "^20848^44464"_var
 	//  // or
 	//  var dirinfo2 = osfile("/etc/");`
 	ND var  osdir() const;
@@ -2076,7 +2103,7 @@ public:
 	// Including parent dirs if necessary.
 	//
 	// `let osdirname = "xo_test/aaa";
-	//  if (osrmdir(osdirname)) {}; // Cleanup first
+	//  if (osrmdir("xo_test/aaa")) {}; // Cleanup first
 	//  if (osdirname.osmkdir()) ... ok
 	//  // or
 	//  if (osmkdir(osdirname)) ...`
@@ -2091,8 +2118,9 @@ public:
 	ND bool oscwd(in newpath) const;
 
 	// Returns: The current working directory
+	// e.g. "/root/exodus/cli/src/xo_test/aaa"
 	//
-	// `var cwd1 = var().oscwd(); // ... "xo_test/aaa"
+	// `var cwd1 = var().oscwd();
 	//  // or
 	//  var cwd2 = oscwd();`
 	ND var  oscwd() const;
@@ -2101,7 +2129,7 @@ public:
 	// Optionally even if not empty. Including subdirs.
 	//
 	// `let osdirname = "xo_test/aaa";
-	//  if (oscwd("../..")) ... ok // Change up before removing
+	//  if (oscwd("../..")) ... ok /// Change up before removing because cannot remove dir while it is current
 	//  if (osdirname.osrmdir()) ... ok
 	//  // or
 	//  if (osrmdir(osdirname)) ...`
@@ -2146,17 +2174,19 @@ public:
 	ND bool osshellwrite(in oscmd) const;
 
 	// Returns: The path of the tmp dir
+	// e.g. "/tmp/"
 	// obj is var()
 	//
-	// `let v1 = var().ostempdirpath(); // e.g. "/tmp/"
+	// `let v1 = var().ostempdirpath();
 	//  // or
 	//  let v2 = ostempdirpath();`
 	ND var  ostempdirpath() const;
 
 	// Returns: The name of a new temporary file
+	// e.g. Something like "/tmp/~exoEcLj3C"
 	// obj is var()
 	//
-	// `var temposfilename1 = var().ostempfilename(); // "/tmp/~exoEcLj3C"
+	// `var temposfilename1 = var().ostempfilename();
 	//  // or
 	//  var temposfilename2 = ostempfilename();`
 	ND var  ostempfilename() const;
@@ -2186,29 +2216,30 @@ public:
 
 	// Get the os process id
 	//
-	// `let pid1 = var().ospid(); // e.g. 663237
+	// `let pid1 = var().ospid(); /// e.g. 663237
 	//  // or
 	//  let pid2 = ospid();`
 	ND var  ospid() const;
 
 	// Get the os thread process id
 	//
-	// `let tid1 = var().ostid(); // e.g. 663237
+	// `let tid1 = var().ostid(); /// e.g. 663237
 	//  // or
 	//  let tid2 = ostid();`
 	ND var  ostid() const;
 
 	// Get the libexodus build date and time
 	//
-	// `let v1 = var().version(); // e.g. "29 JAN 2025 14:56:52"`
+	// `let v1 = var().version(); /// e.g. "29 JAN 2025 14:56:52"`
 	ND var  version() const;
 
 	// obj is var
 
 	// Sets the current thread's default locale codepage code
+	// true if successful
 	// obj is strvar
 	//
-	// `if ("en_US.utf8"_var.setxlocale()) ... ok // true if successful
+	// `if ("en_US.utf8"_var.setxlocale()) ... ok
 	//  // or
 	//  if (setxlocale("en_US.utf8")) ... ok`
 	   bool setxlocale() const;
@@ -2294,17 +2325,23 @@ public:
     //  let v2 = pwr(2, 8);`
     ND var  pwr(in exponent) const;
 
-    // Pseudo random number generator
-    // `let v1 = var(100).rnd(); // 0 to 99 pseudo random
-    //  // or
-    //  let v2 = rnd(100);`
-    ND var  rnd()     const;
-
     // Initialise the seed for rnd()
-    // `var(123).initrnd(); // Set seed to 123
+	// Allows the stream of pseudo random numbers generated by rnd() to be reproduced.
+	// Seeded from std::chrono::high_resolution_clock::now() if the argument is 0;
+	//
+    // `var(123).initrnd(); /// Set seed to 123
     //  // or
     //  initrnd(123);`
            void initrnd() const;
+
+    // Pseudo random number generator
+	// Returns: a pseudo random integer between 0 and the provided maximum minus 1.
+	// Uses std::mt19937 and std::uniform_int_distribution<int>
+	//
+    // `let v1 = var(100).rnd().outputl();
+    //  // or
+    //  let v2 = rnd(100);`
+    ND var  rnd()     const;
 
     // Power of e
     // `let v1 = var(1).exp(); // 2.718281828459045
