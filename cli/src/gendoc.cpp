@@ -1,6 +1,10 @@
 #include <exodus/program.h>
 programinit()
 
+var code_filename;
+var codefile;
+var codeptr;
+
 function main() {
 //	printl("gendoc says 'Hello World!'");
 
@@ -15,11 +19,12 @@ function main() {
 
 		let osfilename0 = osfilename.field2(OSSLASH, -1);
 
-		let codetxt_filename = replace("gendoc.{orig}.cpp", "{orig}", osfilename0);
-		var codetxtfile;
-		var codetxtptr = 0;
+		code_filename = replace("gendoc.{orig}.cpp", "{orig}", osfilename0);
+		codeptr = 0;
+
 		var new_objs = "";
 		var defined_objs = "";
+		var all_cleanups = "";
 
 		// Lines like "///... some text:"
 		rex doc_rex(R"__(^(/{3,})\s+(.*):$)__");
@@ -69,9 +74,10 @@ function main() {
 
 				let short_title = table_title.f(1, 3).tcase().replace("Mv", "MV").replace("Os", "OS");
 
-				printl(fileheader);
-				printl();
-				fileheader = "";
+				if (not codeptr) {
+					printl(fileheader);
+					printl();
+				}
 
 				let wiki_title = str("=", table_title.f(1, 2).len());
 				printl(wiki_title ^ " " ^ short_title ^ " " ^ wiki_title);
@@ -198,13 +204,59 @@ function main() {
 				for (var codematch : codematches) {
 					codematch = codematch.f(1, 2);
 
-					let aborting = " {abort(" ^ funcname.quote() ^ " \": \" ^ lasterror());}";
+					// ... becomes proper code
+					let aborting = " abort(\"" ^ funcname ^ ": \" ^ lasterror());";
 					codematch.replacer(") ... ok", ") {/" "*ok*" "/} else " ^ aborting);
+					codematch.replacer(") ... true", ") {/" "*true*" "/} else " ^ aborting);
 //					codematch.replacer(") ...", ") {abort();}");
 					codematch.replacer(" ...", aborting);
 
 					codematch.replacer("\n", "\n\t\t");
 					codematch.replacer("\n\t\t\n", "\n");
+
+					// Remove cleanup lines to be put in heading of
+					static rex cleanup_pattern {R"__(^[^\n]*// Cleanup[^\n]*)__"};
+					var cleanups = codematch.match(cleanup_pattern);
+					if (cleanups) {
+						for (let cleanup : cleanups) {
+							all_cleanups ^= cleanup ^ "\n";
+						}
+						codematch.replacer(cleanup_pattern, "");
+					}
+
+					// Convert some comments to assertions
+					// USE ␣ to indicate spaces. They will be converted to spaces in any assert.
+					// Warning: Doesnt handle double quotes inside double quote)?
+
+//					// IMPLICT ASSERTS
+//					// e.g. 'let|var v1 = xxxxxxx ... // yyyy // zzzz'
+////					static rex rex3 = rex(R"__((let|var)\s+([a-z0-9A-Z_]+)([^/\n]*)//\s+([^/\n]*)([^\n]*))__");
+////					codematch.replacer(rex3, "$1 $2$3;assert\\($2 == $4\\);$5");
+//					// e.g. '   let|var v1 = xxxxxxx ; // yyyy // zzzz'
+//					//      '1112222222 3344444444444     555556666666'
+					static rex rex3 = rex(R"__(^(\s*)(let|var)\s+([a-z0-9A-Z_]+)([^\n]*?);[ \t]*//\s+(["0-9.-][^\n]*?)([ \t]//[^\n]*?)?$)__", "m");
+					codematch.replacer(rex3, "$1$2 $3$4; assert\\($3 == $5\\);$6");
+
+//					// ARROW ASSERTS
+////				// e.g. '  // v1 -> "f1^X^f3"_var // v2 -> "a b c"'
+					//        if (not field.readf(file, key, fieldno)) abort("readf" ": " ^ lasterror()); // field -> "G"
+					static rex rex5 = rex(R"__(([^/])//\s*([a-zA-Z0-9_.()]+)\s*->\s*([^/\n]*))__");
+					codematch.replacer(rex5, "$1 assert\\($2 == $3\\);");
+					// Why does it need multiple?
+					codematch.replacer(rex5, "$1 assert\\($2 == $3\\); ");
+					codematch.replacer(rex5, "$1 assert\\($2 == $3\\); ");
+					codematch.replacer(rex5, "$1 assert\\($2 == $3\\); ");
+					codematch.replacer(rex5, "$1 assert\\($2 == $3\\); ");
+
+
+//					// MUTATOR ASSERTS
+//					// e.g. 'v1.xxx xxx xxx // zzzz // xxxxxx'
+//					// e.g. 'v1.ucaser(); // "ABC"'
+					static rex rex4 = rex(R"__(^(\s*)([a-z0-9A-Z_]+)\.([^/\n]*)//\s+([^/\n]*)([^\n]*))__");
+					codematch.replacer(rex4, "$1$2.$3;assert\\($2 == $4\\);$5");
+
+					// Replace hacked spaces ␣ with real spaces " "
+					codematch.textconverter("␣", " ");
 
 					// Wrap in {}
 					codematch.prefixer("\n\t{\n\t\t");
@@ -227,11 +279,13 @@ function main() {
 					new_objs = "";
 
 					// Start the code output file
-					if (not codetxtptr) {
-						if (not oswrite("" on codetxt_filename))
+					if (not codeptr) {
+						if (not oswrite("" on code_filename))
 							abort(lasterror());
-						if (not osopen(codetxt_filename to codetxtfile))
+						if (not osopen(code_filename to codefile))
 							abort(lasterror());
+
+						outputcode("//" ^ fileheader ^ "\n\n");
 
 						let progheader =
 R"__(#include <cassert>
@@ -239,16 +293,15 @@ R"__(#include <cassert>
 programinit()
 
 function main() {
+
 	// Clean up before starting
-	if (not dbdelete("xo_gendoc_testdb")) {};
-	if (not dbdelete("xo_gendoc_testdb2")) {};
+	gosub cleanup();
 )__";
-						if (not osbwrite(progheader on codetxtfile, codetxtptr))
-							abort(lasterror());
+
+						outputcode(progheader);
 					}
 
-					if (not osbwrite(codematch on codetxtfile, codetxtptr))
-						abort(lasterror());
+					outputcode(codematch);
 				}
 
 				comments.replacer(backquoted, "<syntaxhighlight lang=\"c++\">\n$1</syntaxhighlight>");
@@ -308,17 +361,28 @@ function main() {
 		if (in_table)
 			printl("|}:");
 
-		// Close the output source capture program
-		if (codetxtptr) {
-			let progfooter = "\n\n\treturn 0;\n}\n\nprogramexit()\n";
-			if (not osbwrite(progfooter on codetxtfile, codetxtptr))
-				abort(lasterror());
-			osclose(codetxtfile);
+		// Finalise the code output
+		if (codeptr) {
+			outputcode("\n\n\tgosub cleanup();\n");
+			outputcode("\n\treturn 0;\n}");
+			outputcode("\nsubroutine cleanup() {\n");
+			outputcode("\n\t//Note that all '// Cleanup' lines in the original source code must use literals and not variables\n");
+			outputcode("\t//otherwise the generated code will VNA on cleanup\n");
+			outputcode(all_cleanups);
+			outputcode("};");
+			outputcode("\n\nprogramexit()\n");
 		}
+
+		osclose(codefile);
 
 	} // osfilename
 
 	return 0;
+}
+
+subroutine outputcode(in text) {
+	if (not osbwrite(text on codefile, codeptr))
+		abort(lasterror());
 }
 
 programexit()
