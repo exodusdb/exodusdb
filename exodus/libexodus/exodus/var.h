@@ -2410,7 +2410,7 @@ public:
 	// Result is between [0, modulus) if modulus is positive
 	// Result is between (modulus, 0] if modulus is negative (symmetric)
 	// Throws: VarDivideByZero if modulus is zero.
-	// FLoating point works.
+	// Floating point works.
 	// mod(11, 5); // 1
 	// mod(-11, 5); // 4
 	// mod(11, -5); // -4
