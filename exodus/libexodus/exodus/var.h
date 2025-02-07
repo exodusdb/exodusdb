@@ -275,7 +275,7 @@ public:
 	///// STRING CREATION:
 	/////////////////////
 
-    // Round decimal numbers to a desired number of decimal places
+    // Returns: A string representation of a decimal number rounded to a desired number of decimal places
 	// Returns: A var ASCII string with exact decimal places requested.
     // .5 always rounds away from zero.
 	// obj is num
@@ -291,7 +291,7 @@ public:
 
 	// obj is var()
 
-	// Create a string of a single char (byte) given an integer 0-255.
+	// Returns: A string containing a single char (byte) given an integer 0-255.
 	// 0-127 -> ASCII, 128-255 -> invalid UTF-8 so cannot be written to database or used various exodus string operations
 	//
 	// `let v1 = var().chr(0x61); // "a"
@@ -299,7 +299,7 @@ public:
 	//  let v2 = chr(0x61);`
 	ND var  chr(const int num) const;
 
-	// Create a string of a single unicode code point in utf8 encoding.
+	// Returns: A string of a single unicode code point in utf8 encoding.
 	// To get utf codepoints > 2^63 you must provide negative ints
 	// Not providing implicit constructor from var to unsigned int due to getting ambigious conversions
 	// since int and unsigned int are parallel priority in c++ implicit conversions
@@ -309,14 +309,14 @@ public:
 	//  let v2 = textchr(171416);`
 	ND var  textchr(const int num) const;
 
-	// Create a string by repeating a given character or string
+	// Returns: A string of repeating characters or strings
 	//
 	// `let v1 = "ab"_var.str(3); // "ababab"
 	//  // or
 	//  let v2 = str("ab", 3);`
 	ND var  str(const int num) const;
 
-	// Create string of space characters.
+	// Returns: A string of space characters.
 	// obj is num
 	//
 	// `let v1 = var(3).space(); // "␣␣␣"
@@ -324,10 +324,9 @@ public:
 	//  let v2 = space(3);`
 	ND var  space() const;
 
-	// Create a string describing a given number in words
+	// Returns: A string representing a given number written in words instead of digits.
 	// obj is num
 	//
-	// ein hundert drei und zwanzig Komma vier fünf
 	// `let softhyphen = "\xc2\xad";
 	//  let v1 = var(123.45).numberinwords("de_DE").replace(softhyphen, " "); // "ein␣hundert␣drei␣und␣zwanzig␣Komma␣vier␣fünf"`
 	ND var  numberinwords(in languagename_or_locale_id = "");
@@ -378,15 +377,15 @@ public:
 	//  let v2 = textlen("Γιάννης");`
 	ND var  textlen() const;
 
-	// Returns: The number of fields determined by presence of sepstr.
-	// It is the same as var.count(sepstr) + 1 except that fcount returns 0 for an empty string.
+	// Returns: The count of the number of fields separated by a given sepstr.
+	// It is the same as var.count(sepstr) + 1 except that it returns 0 for an empty string.
 	//
 	// `let v1 = "aa**cc"_var.fcount("*"); // 3
 	//  // or
 	//  let v2 = fcount("aa**cc", "*");`
 	ND var  fcount(SV sepstr) const;
 
-	// <em>Returns</em> the number of sepstr found
+	// Returns: The count of the number of sepstr found.
 	//
 	// `let v1 = "aa**cc"_var.count("*"); // 2
 	//  // or
@@ -421,22 +420,25 @@ public:
 
 	//https://en.wikipedia.org/wiki/Comparison_of_programming_languages_(string_functions)#Find
 
-	// Returns: Char no if found or 0 if not. startchar1 is byte no to start at.
+	// Returns: The index (1 based position) of a given substr on or after a given starting char number if present
+	// Returns: 0 if not present.
 	//
 	// `let v1 = "abcd"_var.index("bc"); // 2
 	//  // or
 	//  let v2 = index("abcd", "bc");`
 	ND var  index(SV substr, const int startchar1 = 1) const;
 
-	// ditto. Occurrence 1 = find first occurrence
+	// Returns: The index (1 based position) of the nth occurrence of a given substr if present
+	// Returns: 0 if not present.
 	//
 	// `let v1 = "abcabc"_var.index("bc", 2); // 2
 	//  // or
 	//  let v2 = index("abcabc", "bc", 2);`
 	ND var  indexn(SV substr, const int occurrence) const;
 
-	// ditto. Reverse search.
-	// startchar1 defaults to -1 meaning start searching from the last byte (towards the first byte).
+	// Reverse substr search.
+	// Returns: The index (1 based position) of the substr on or before a given starting char number if present
+	// startchar1 defaults to -1 meaning start searching from the last char (towards the first char).
 	//
 	// `let v1 = "abcabc"_var.indexr("bc"); // 5
 	//  // or
@@ -444,7 +446,7 @@ public:
 	ND var  indexr(SV substr, const int startchar1 = -1) const;
 
 	// Returns: All results of regex matching
-	// Multiple matches are in fields. Groups are in values
+	// Multiple matches are returns in fields. Groups are in values
 	//
 	// `let v1 = "abc1abc2"_var.match("BC(\\d)", "i"); // "bc1]1^bc2]2"_var
 	//  // or
@@ -496,9 +498,14 @@ public:
 	// Ditto starting from first char.
 	ND var  search(const rex& regex) const {var startchar1 = 1; return this->search(regex, startchar1);}
 
-//	//static member for speed on std strings because of underlying boost implementation
-//	static int localeAwareCompare(const std::string& str1, const std::string& str2);
-//	//int localeAwareCompare(const std::string& str2) const;
+	// Hash by default returns a 64 bit signed integer as a var.
+	// If a modulus is provided then the result is limited to [0, modulus)
+	// MurmurHash3 is used.
+	//
+	// `let v1 = "abc"_var.hash(); assert(v1 == var(6'715'211'243'465'481'821));
+	//  // or
+	//  let v2 = hash("abc");`
+	ND var  hash(const std::uint64_t modulus = 0) const;
 
 	///// STRING CONVERSION - Non-mutating - Chainable:
 	//////////////////////////////////////////////////
@@ -674,6 +681,27 @@ public:
 	//  let v2 = pop("abc");`
 	ND var  pop() const&;
 
+	// Extract one or more consecutive fields given a delimiter char or substr.
+	//
+	// `let v1 = "aa*bb*cc"_var.field("*", 2); // "bb"
+	//  // or
+	//  let v2 = field("aa*bb*cc", "*", 2);`
+	ND var  field(SV strx, const int fieldnx = 1, const int nfieldsx = 1) const;
+
+	// field2 is a version that treats fieldn -1 as the last field, -2 the penultimate field etc. -
+	// TODO Should probably make field() do this (since -1 is basically an erroneous call) and remove field2
+	// Same as var.field() but negative fieldnos work backwards from the last field.
+	//
+	// `let v1 = "aa*bb*cc"_var.field2("*", -1); // "cc"
+	//  // or
+	//  let v2 = field2("aa*bb*cc", "*", -1);`
+	ND var  field2(SV separator, const int fieldno, const int nfields = 1) const
+	{
+		if (fieldno >= 0) LIKELY
+			return field(separator, fieldno, nfields);
+		return field(separator, this->count(separator) + 1 + fieldno + 1, nfields);
+	}
+
 	// fieldstore() replaces n fields of subfield(s) in a string.
 	//
 	// `let v1 = "aa*bb*cc*dd"_var.fieldstore("*", 2, 3, "X*Y"); // "aa*X*Y*"
@@ -703,6 +731,10 @@ public:
 	//  let v2 = substr("abcd", 3, -2);`
 	ND var  substr(const int pos1, const int length) const&;
 
+	//[[deprecated("EXODUS: Replace all xxx.b(pos1, len) with xxx.subst(pos1, len)")]]
+	// Same as substr version 1.
+	ND var  b(const int pos1, const int length) const& {return this->substr(pos1, length);}
+
 	// substr version 2. Extract all chars from pos1 up to the end
 	//
 	// `let v1 = "abcd"_var.substr(2); // "bcd"
@@ -710,13 +742,54 @@ public:
 	//  let v2 = substr("abcd", 2);`
 	ND var  substr(const int pos1) const&;
 
-	//[[deprecated("EXODUS: Replace all xxx.b(pos1, len) with xxx.subst(pos1, len)")]]
-	// Same as substr version 1.
-	ND var  b(const int pos1, const int length) const& {return this->substr(pos1, length);}
-
 	//[[deprecated("EXODUS: Replace all xxx.b(pos1) with xxx.substr(pos1)")]]
 	// Same as substr version 2.
 	ND var  b(const int pos1) const& {return this->substr(pos1);}
+
+	// v3 - returns bytes from some byte number upto the first of a given list of bytes
+	// this is something like std::string::find_first_of but doesnt return the delimiter found
+
+	// substr version 3.
+	// Extract a substr starting from pos1 up to any one of some given delimiter chars
+	// Also returns in pos2 the pos of the following delimiter or one past the end of the string if not found.
+	// Add 1 to pos2 start the next search if continuing.
+	//
+	// `var pos1a = 4, pos2a;
+	//  let v1 = "aa,bb,cc"_var.substr(pos1a, ",", pos2a); // "bb" // pos2a -> 6
+	//  // or
+	//  var pos1b = 4, pos2b;
+	//  let v2 = substr("aa,bb,cc", pos1b, ",", pos2b);`
+	   var  substr(const int pos1, SV delimiterchars, io pos2) const;
+
+	// Alias of substr version 3.
+	   var  b(const int pos1, SV delimiterchars, io pos2) const {return this->substr(pos1, delimiterchars, pos2);}
+
+	// v4 - like v3. was named "remove" in pick. notably used in nlist to print parallel columns
+	// of mixed combinations of multivalues/subvalues and text marks
+	// correctly lined up mv to mv, sv to sv, tm to tm even when particular columns were missing
+	// some vm/sm/tm
+	// it is like substr(pos1,delimiterbytes,pos2) except that the delimiter bytes are
+	// hard coded as the usual RM/FM/VM/SM/TM/ST
+	// except that it updates the offset to point one after found delimiter byte and
+	// returns the delimiter no (1-6)
+	// if no delimiter byte is found then it returns bytes up to the end of the string, sets
+	// offset to after tne end of the string and returns delimiter no 0 NOTE that it
+	// does NOT remove anything from the source string var remove(io pos1, io
+	// delimiterno) const;
+
+	// substr version 4.
+	// Returns: A substr from a given pos1  up to the next RM/FM/VM/SM/TM/ST delimiter char.
+	// Also returns the next index/offset and the delimiter no. found (1-6) or 0 if not found.
+	//
+	// `var pos1a = 4, delim1;
+	//  let v1 = "aa^bb^cc"_var.substr2(pos1a, delim1); // "bb" // pos1a -> 7 // delim1 -> 2
+	//  // or
+	//  var pos1b = 4, delim2;
+	//  let v2 = substr2("aa^bb^cc"_var, pos1b, delim2);`
+	   var  substr2(io pos1, out delimiterno) const;
+
+	// Alias of substr version 4
+	   var  b2(io pos1, out delimiterno) const {return this->substr2(pos1, delimiterno);}
 
 	// Convert chars to other chars one for one or delete where tochars is shorter.
 	//
@@ -755,12 +828,12 @@ public:
 	ND var  unique() const&;
 
 	// Reorder fields in an FM or VM etc. separated list in ascending order
-	// Numerical
+	// Numerical:
 	//
 	// `let v1 = "20^10^2^1^1.1"_var.sort(); // "1^1.1^2^10^20"_var
 	//  // or
 	//  let v2 = sort("20^10^2^1^1.1"_var);`
-	// Alphabetical
+	// Alphabetical:
 	//  `let v1 = "b1^a1^c20^c10^c2^c1^b2"_var.sort(); // "a1^b1^b2^c1^c10^c2^c20"_var
 	//  // or
 	//  let v2 = sort("b1^a1^c20^c10^c2^c1^b2"_var);`
@@ -786,6 +859,13 @@ public:
 	//  // or
 	//  let v2 = parse("abc,\"def,\"123\" fgh\",12.34", ',');`
 	ND var  parse(char sepchar = ' ') const&;
+
+	// Split a FM etc. separated string into a dim array.
+	//
+	// `dim d1 = "a^b^c"_var.split(); // A dimensioned array with three elements (vars)
+	//  // or
+	//  dim d1 = split("a^b^c"_var);`
+	ND dim  split(SV sepchar = _FM) const;
 
 	// SAME ON TEMPORARIES - CALL MUTATORS FOR SPEED (not documenting since programmer interface is the same)
 	/////////////////////////////////////////
@@ -845,7 +925,7 @@ public:
 	//  obj is strvar
 
 	// Upper case
-	// All string mutators follow the same pattern as ucaser. See the non-mutating functions for details.
+	// All string mutators follow the same pattern as ucaser.<br>See the non-mutating functions for details.
 	//
 	// `var v1 = "abc";
 	// v1.ucaser(); // "ABC"
@@ -900,93 +980,6 @@ public:
 	   IO   reverser(SV sepchar = _FM) REF ;
 	   IO   shuffler(SV sepchar = _FM) REF ;
 	   IO   parser(char sepchar DEFAULT_CSPACE) REF ;
-
-	///// OTHER STRING ACCESS:
-	/////////////////////////
-
-	//  obj is strvar
-
-	// Hash by default returns a 64 bit signed integer as a var.
-	// If a modulus is provided then the result is limited to [0, modulus)
-	// MurmurHash3 is used.
-	//
-	// `let v1 = "abc"_var.hash(); assert(v1 == var(6'715'211'243'465'481'821));
-	//  // or
-	//  let v2 = hash("abc");`
-	ND var  hash(const std::uint64_t modulus = 0) const;
-
-	// Split a FM etc. separated string into a dim array.
-	//
-	// `dim d1 = "a^b^c"_var.split(); // A dimensioned array with three elements (vars)
-	//  // or
-	//  dim d1 = split("a^b^c"_var);`
-	ND dim  split(SV sepchar = _FM) const;
-
-	// v3 - returns bytes from some byte number upto the first of a given list of bytes
-	// this is something like std::string::find_first_of but doesnt return the delimiter found
-
-	// substr version 3.
-	// Extract a substr starting from pos1 up to any one of some given delimiter chars
-	// Also returns in pos2 the pos of the following delimiter or one past the end of the string if not found.
-	// Add 1 to pos2 start the next search if continuing.
-	//
-	// `var pos1a = 4, pos2a;
-	//  let v1 = "aa,bb,cc"_var.substr(pos1a, ",", pos2a); // "bb" // pos2a -> 6
-	//  // or
-	//  var pos1b = 4, pos2b;
-	//  let v2 = substr("aa,bb,cc", pos1b, ",", pos2b);`
-	   var  substr(const int pos1, SV delimiterchars, io pos2) const;
-
-	// Alias of substr version 3.
-	   var  b(const int pos1, SV delimiterchars, io pos2) const {return this->substr(pos1, delimiterchars, pos2);}
-
-	// v4 - like v3. was named "remove" in pick. notably used in nlist to print parallel columns
-	// of mixed combinations of multivalues/subvalues and text marks
-	// correctly lined up mv to mv, sv to sv, tm to tm even when particular columns were missing
-	// some vm/sm/tm
-	// it is like substr(pos1,delimiterbytes,pos2) except that the delimiter bytes are
-	// hard coded as the usual RM/FM/VM/SM/TM/ST
-	// except that it updates the offset to point one after found delimiter byte and
-	// returns the delimiter no (1-6)
-	// if no delimiter byte is found then it returns bytes up to the end of the string, sets
-	// offset to after tne end of the string and returns delimiter no 0 NOTE that it
-	// does NOT remove anything from the source string var remove(io pos1, io
-	// delimiterno) const;
-
-	// substr version 4.
-	// Returns: A substr from a given pos1  up to the next RM/FM/VM/SM/TM/ST delimiter char.
-	// Also returns the next index/offset and the delimiter no. found (1-6) or 0 if not found.
-	//
-	// `var pos1a = 4, delim1;
-	//  let v1 = "aa^bb^cc"_var.substr2(pos1a, delim1); // "bb" // pos1a -> 7 // delim1 -> 2
-	//  // or
-	//  var pos1b = 4, delim2;
-	//  let v2 = substr2("aa^bb^cc"_var, pos1b, delim2);`
-	   var  substr2(io pos1, out delimiterno) const;
-
-	// Alias of substr version 4
-	   var  b2(io pos1, out delimiterno) const {return this->substr2(pos1, delimiterno);}
-
-	// Extract one or more consecutive fields given a delimiter char or substr.
-	//
-	// `let v1 = "aa*bb*cc"_var.field("*", 2); // "bb"
-	//  // or
-	//  let v2 = field("aa*bb*cc", "*", 2);`
-	ND var  field(SV strx, const int fieldnx = 1, const int nfieldsx = 1) const;
-
-	// field2 is a version that treats fieldn -1 as the last field, -2 the penultimate field etc. -
-	// TODO Should probably make field() do this (since -1 is basically an erroneous call) and remove field2
-	// Same as var.field() but negative fieldnos work backwards from the last field.
-	//
-	// `let v1 = "aa*bb*cc"_var.field2("*", -1); // "cc"
-	//  // or
-	//  let v2 = field2("aa*bb*cc", "*", -1);`
-	ND var  field2(SV separator, const int fieldno, const int nfields = 1) const
-	{
-		if (fieldno >= 0) LIKELY
-			return field(separator, fieldno, nfields);
-		return field(separator, this->count(separator) + 1 + fieldno + 1, nfields);
-	}
 
 	///// I/O CONVERSION:
 	////////////////////
@@ -1097,8 +1090,8 @@ public:
 	//  let v2 = to_codepage("Є", "CP1124").oconv("HEX");`
 	ND var  to_codepage(const char* codepage) const;
 
-	///// BASIC DYNAMIC ARRAY FUNCTIONS:
-	///////////////////////////////////
+	///// DYNAMIC ARRAY FUNCTIONS:
+	/////////////////////////////
 
 	//  obj is strvar
 
@@ -1418,7 +1411,7 @@ public:
 	ND bool sqlexec(in sqlcmd) const;
 
 	// Execute an SQL command and capture the response.
-	// Returns: True if there was no sql error otherwise ''response'' contains a detailed error message.
+	// Returns: True if there was no sql error otherwise response contains a detailed error message.
 	// response: Any rows and columns returned are separated by RM and FM respectively. The first row is the column names.
 	// Recommended: Don't use sql directly unless you must to manage or configure a database.
 	//
@@ -1444,7 +1437,7 @@ public:
 	//  disconnectall();`
 	   void disconnectall();
 
-	// Get the last os or db error message.
+	// Returns: The last os or db error message.
 	// `var v1 = var().lasterror();
 	//  // or
 	//  var v2 = lasterror();`
@@ -1452,7 +1445,7 @@ public:
 
 	// Log the last os or db error message.
 	// Output: to stdlog
-	// Prefixes the output with ''source'' if provided.
+	// Prefixes the output with source if provided.
 	//
 	// `var().loglasterror("main:");
 	//  // or
@@ -1786,15 +1779,15 @@ public:
 	//  obj is strvar
 
 	// The xlate ("translate") function is similar to readf() but, when called as an exodus program member function, it can be used efficiently with exodus file dictionaries using column names and functions and multivalued data.
-	// ''Arguments:''
-	// '''str:''' Used as the primary key to lookup a field in a given file and field no or field name.
-	// '''filename:''' The db file in which to look up data.
+	// Arguments:
+	// str: Used as the primary key to lookup a field in a given file and field no or field name.
+	// filename: The db file in which to look up data.
 	// If var key is multivalued then a multivalued field is returned.
-	// '''fieldno:''' Determines which field of the record is returned.
+	// fieldno: Determines which field of the record is returned.
 	// * Integer returns that field number
 	// * 0 means return the key unchanged.
 	// * "" means return the whole record.
-	// '''mode:''' Determines what is returned if the record does not exist for the given key and file.
+	// mode: Determines what is returned if the record does not exist for the given key and file.
 	// * "X" returns ""
 	// * "C" returns the key unconverted.
 	//
@@ -2056,7 +2049,7 @@ public:
 	// Returns: A FM delimited string containing all matching dir entries given a dir path
 	// A glob pattern (e.g. *.conf) can be appended to the path or passed as argument.
 	//
-	// `var entries1 = "/etc/"_var.oslist("*.cfg"); /// e.g. "adduser.conf^ca-certificates.conf^ ..."
+	// `var entries1 = "/etc/"_var.oslist("*.cfg"); /// e.g. "adduser.conf^ca-certificates.con^... etc."
 	//  // or
 	//  var entries2 = oslist("/etc/" "*.conf");`
 	ND var  oslist(SV globpattern = "", const int mode = 0) const;
@@ -2236,7 +2229,7 @@ public:
 	// obj is var
 
 	// Sets the current thread's default locale codepage code
-	// true if successful
+	// True if successful
 	// obj is strvar
 	//
 	// `if ("en_US.utf8"_var.setxlocale()) ... ok
@@ -2244,7 +2237,7 @@ public:
 	//  if (setxlocale("en_US.utf8")) ... ok`
 	   bool setxlocale() const;
 
-	// Gets the current thread's default locale codepage code
+	// Returns: The current thread's default locale codepage code
 	//
 	// `let v1 = var().getxlocale(); // "en_US.utf8"
 	//  // or
@@ -2293,16 +2286,16 @@ public:
 	//  osflush();`
 	   void osflush() const;
 
-	///// STANDARD INPUT:
-	////////////////////
+	///// INPUT:
+	///////////
 
 	   out  input();                  // Wait for stdin until cr or eof
 	   out  input(in prompt);         // Ditto after outputting prompt to stdout
 	   out  inputn(const int nchars); // Wait for nbytes from stdin
 
-	ND bool isterminal() const;                   // true if terminal is available
-	ND bool hasinput(int milliseconds = 0) const; // true if stdin bytes available within milliseconds
-	ND bool eof() const;                          // true if stdin is at end of file
+	ND bool isterminal() const;                   // True if terminal is available
+	ND bool hasinput(int milliseconds = 0) const; // True if stdin bytes available within milliseconds
+	ND bool eof() const;                          // True if stdin is at end of file
 	   bool echo(const int on_off) const;         // Reflect all stdin to stdout if terminal available
 
 	   void breakon() const;  // Allow interrupt Ctrl+C
@@ -2414,8 +2407,10 @@ public:
 	// Modulus function
 	// Identical to C++ % operator only for positive numbers and modulus
 	// Negative denominators are considered as periodic with positiive numbers
-	// Result is between [0 , modulus) if modulus is positive
+	// Result is between [0, modulus) if modulus is positive
 	// Result is between (modulus, 0] if modulus is negative (symmetric)
+	// Throws: VarDivideByZero if modulus is zero.
+	// FLoating point works.
 	// mod(11, 5); // 1
 	// mod(-11, 5); // 4
 	// mod(11, -5); // -4

@@ -1446,7 +1446,43 @@ class PUBLIC var_base {
 
 #pragma GCC diagnostic pop
 
-	// UTILITY
+/////////////////////////////////////////////////////////////////////////////////////////////////
+//                                         IOSTREAM FRIENDS
+/////////////////////////////////////////////////////////////////////////////////////////////////
+
+	// OSTREAM
+	//////////
+
+	// Causes ambiguous overload for some unknown reason despite being a hidden friend
+	// friend std::ostream& operator<<(std::ostream& ostream1, TVR var1);
+
+	// Note replicated for var but that one converts FM, VM etc. to visible chars before output
+	friend std::ostream& operator<<(std::ostream& ostream1, CBR outvar) {
+		outvar.assertString(__PRETTY_FUNCTION__);
+		ostream1 << outvar.var_str;
+		return ostream1;
+	}
+
+	// ISTREAM
+	//////////
+
+	friend std::istream& operator>>(std::istream& istream1, VARREF invar) {
+
+		invar.assertDefined(__PRETTY_FUNCTION__);
+
+		invar.var_str.clear();
+		invar.var_typ = VARTYP_STR;
+
+		//std::string tempstr;
+		istream1 >> std::noskipws >> invar.var_str;
+
+		// this would verify all input is valid utf8
+		// in_str1.var_str=boost::locale::conv::utf_to_utf<char>(in_str1)
+
+		return istream1;
+	}
+
+	/// UTILITY:
 	//////////
 
 	// integer or floating point. optional prefix -, + disallowed, solitary . and - not allowed. Empty string is numeric 0
@@ -1484,76 +1520,71 @@ class PUBLIC var_base {
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
-//                                         IOSTREAM FRIENDS
-/////////////////////////////////////////////////////////////////////////////////////////////////
-
-	// OSTREAM
-	//////////
-
-	// Causes ambiguous overload for some unknown reason despite being a hidden friend
-	// friend std::ostream& operator<<(std::ostream& ostream1, TVR var1);
-
-	// Note replicated for var but that one converts FM, VM etc. to visible chars before output
-	friend std::ostream& operator<<(std::ostream& ostream1, CBR outvar) {
-		outvar.assertString(__PRETTY_FUNCTION__);
-		ostream1 << outvar.var_str;
-		return ostream1;
-	}
-
-	// ISTREAM
-	//////////
-
-	friend std::istream& operator>>(std::istream& istream1, VARREF invar) {
-
-		invar.assertDefined(__PRETTY_FUNCTION__);
-
-		invar.var_str.clear();
-		invar.var_typ = VARTYP_STR;
-
-		//std::string tempstr;
-		istream1 >> std::noskipws >> invar.var_str;
-
-		// this would verify all input is valid utf8
-		// in_str1.var_str=boost::locale::conv::utf_to_utf<char>(in_str1)
-
-		return istream1;
-	}
-
-/////////////////////////////////////////////////////////////////////////////////////////////////
 //                                         PUBLIC MEMBER FUNCTIONS
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
 	// Housekeeping functions
 	/////////////////////////
 
+	// Returns: True if the var is assigned, otherwise false
 	ND bool assigned() const;
+
+	// Returns: True if the var is unassigned, otherwise false
 	ND bool unassigned() const;
+
+	// If the var is unassigned, assigns the default value to it, otherwise does nothing.
+	// Mutator. Perhaps better called "defaulter()"
 	void default_to(CVR defaultvalue);
+
+	// Returns: A copy of the var if it is assigned otherwise it returns a copy of the default var
+	// If ''defaultvalue'' is unassigned then then a VarUnassigned error is thrown.
 	ND RETVAR default_from(CVR defaultvalue) const;
 
-	VARREF move(VARREF destinationvar);
+	// "moves" the var to the destination var leaving the source var unassigned.
+	// This is useful for performance with vars which own strings larger than can be fitted inside a std::string object, which is 15 bytes on linux.
+	// The ownership of a heap allocated string can be transferred from one var to another if it is no longer required in the original var.
+	// Transferring ownership of strings only requires copying a pointer instead of performing heap allocation and deallocation and also, in the case of very large strings, copying of large areas of memory.
+	// If the source var is unassigned then then a VarUnassigned error is thrown.
+	void move(VARREF destinationvar);
 
-	// swap is marked as const despite it replaceping the var with var2
+	// Swaps the contents of two variables.
+	// Useful for stashing large strings quicky.
+	// Works on unassigned variables without triggering an error
+	// If the source is unassigned then the target is unassigned too.
+	void swap(VARREF var2);
+
+	// Swaps the contents of two variables.
+	// This version works on const vars
+	// This version of swap is marked as const despite it replacing the var with var2
 	// Currently this is required in rare cases where functions like exoprog::calculate
 	// temporarily require member variables to be something else but switch back before exiting
-	// if such function throws then it would leave the member variables in a changed state.
-	CBR swap(CVR var2) const;//version that works on const vars
-	VARREF swap(VARREF var2);//version that works on non-const vars
+	// If such functions throw an error without catching then it would leave the member variables in a changed state.
+	// Either or both vars may be unassigned without triggering a VarUnnassigned error.
+	void swap(CVR var2) const;
 
-	// Create a var
+	// Returns a copy of the var but works on unassigned vars without triggering an error
+	// If the source is unassigned then the copy is unassigned too.
 	RETVAR clone() const;
+
+	// "moves" the var into a new temporary var while making the var unassigned.
+	// This can be used to transfer ownership of a heap allocated string instead of replicaing it.
 	RETVAR move();
 
-	// Text representation of var_base internals
+	// Text representation of var_base internals. Works on unassigned vars.
 	ND RETVAR dump() const;
-
-	// basic string function on var_base for throwing errors
-	ND RETVAR first_(int nchars) const;
 
 	// Needed in operator%
 	ND RETVAR mod(CVR divisor) const;
 	ND RETVAR mod(double divisor) const;
 	ND RETVAR mod(const int divisor) const;
+
+	////////////////////
+	/// Stop documenting
+	/// :
+	////////////////////
+
+	// basic string function on var_base for throwing errors
+	ND RETVAR first_(int nchars) const;
 
 	// Static member for speed on std strings because of underlying boost implementation
 	// Unprotected currently because it is used in free function locateat

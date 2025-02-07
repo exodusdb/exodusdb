@@ -471,7 +471,7 @@ template<> PUBLIC void VARBASE1::default_to(CBX defaultvalue) {
 	// see explanation above in assigned
 	// assertDefined(function_sig);
 
-	THISIS("io   var::default_to(in defaultvalue) const")
+	THISIS("void var::default_to(in defaultvalue)")
 	ISASSIGNED(defaultvalue)
 
 	//?allow undefined usage like var xyz=xyz.readnext();
@@ -485,7 +485,7 @@ template<> PUBLIC void VARBASE1::default_to(CBX defaultvalue) {
 
 template<> PUBLIC RETVAR VARBASE1::default_from(CBX defaultvalue) const {
 
-	THISIS("io   var::default_from(in defaultvalue)")
+	THISIS("var  var::default_from(in defaultvalue) const")
 	ISASSIGNED(defaultvalue)
 
 	if (this->unassigned()) {
@@ -1501,9 +1501,9 @@ IO   var::popper() REF {
 }
 
 
-template<> PUBLIC VBR1 VARBASE1::move(VBX tovar) {
+template<> PUBLIC void VARBASE1::move(VBX tovar) {
 
-	THISIS("io   var::move(io tovar)")
+	THISIS("void var::move(io tovar)")
 	assertAssigned(function_sig);
 	ISDEFINED(tovar)
 
@@ -1519,13 +1519,16 @@ template<> PUBLIC VBR1 VARBASE1::move(VBX tovar) {
 	tovar.var_int = var_int;
 	tovar.var_dbl = var_dbl;
 
-	return tovar;
+//	return tovar;
 }
 
 // Const version needed in calculatex
-template<> PUBLIC CBR VARBASE1::swap(CBX var2) const {
+// Identical code except signature is not const
+//template<> PUBLIC CBR VARBASE1::swap(CBX var2) const {
+template<> PUBLIC void VARBASE1::swap(CBX var2) const {
 
 	THISIS("CVR  var::swap(in var2) const")
+
 	// Works on unassigned vars
 	assertDefined(function_sig);
 	ISDEFINED(var2)
@@ -1548,13 +1551,15 @@ template<> PUBLIC CBR VARBASE1::swap(CBX var2) const {
 	var_int = mvintx;
 	var_dbl = mvdblx;
 
-	return *this;
+//	return *this;
 }
 
 // non-const version
-template<> PUBLIC VBR1 VARBASE1::swap(VBX var2) {
+//template<> PUBLIC VBR1 VARBASE1::swap(VBX var2) {
+template<> PUBLIC void VARBASE1::swap(VBX var2) {
 
 	THISIS("io   var::swap(io var2)")
+
 	// Works on unassigned vars
 	assertDefined(function_sig);
 	ISDEFINED(var2)
@@ -1577,7 +1582,7 @@ template<> PUBLIC VBR1 VARBASE1::swap(VBX var2) {
 	var_int = mvintx;
 	var_dbl = mvdblx;
 
-	return *this;
+//	return *this;
 }
 
 var  var::str(const int num) const {

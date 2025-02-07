@@ -62,8 +62,8 @@
 561 out  var::input()
 562 out  var::input(in prompt
 563 out  var::inputn(const int nchars
-564 io   var::default_to(in defaultvalue) const
-565 io   var::default_from(in defaultvalue)
+564 void var::default_to(in defaultvalue)
+565 var  var::default_from(in defaultvalue) const
 566 char var::toChar() const
 567 str  var::toString() &&
 568 str  var::toString() const&
@@ -92,7 +92,7 @@
 591 var  var::prefix(SV prefixstr)
 592 void var::prefixer(SV prefixstr) &
 593 void var::popper() &
-594 io   var::move(io tovar)
+594 void var::move(io tovar)
 595 var  var::str(const int num) const
 596 var  var::space() const
 597 void var::cropper() &
