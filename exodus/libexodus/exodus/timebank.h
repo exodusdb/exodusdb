@@ -185,8 +185,8 @@ auto get_timebank_acno(const std::string_view arg1) -> int {
 	else if (++acno && arg1 == "out  var::input()") {}
 	else if (++acno && arg1 == "out  var::input(in prompt") {}
 	else if (++acno && arg1 == "out  var::inputn(const int nchars") {}
-	else if (++acno && arg1 == "io   var::default_to(in defaultvalue) const") {}
-	else if (++acno && arg1 == "io   var::default_from(in defaultvalue)") {}
+	else if (++acno && arg1 == "void var::default_to(in defaultvalue)") {}
+	else if (++acno && arg1 == "var  var::default_from(in defaultvalue) const") {}
 	else if (++acno && arg1 == "char var::toChar() const") {}
 	else if (++acno && arg1 == "str  var::toString() &&") {}
 	else if (++acno && arg1 == "str  var::toString() const&") {}
@@ -215,7 +215,7 @@ auto get_timebank_acno(const std::string_view arg1) -> int {
 	else if (++acno && arg1 == "var  var::prefix(SV prefixstr)") {}
 	else if (++acno && arg1 == "void var::prefixer(SV prefixstr) &") {}
 	else if (++acno && arg1 == "void var::popper() &") {}
-	else if (++acno && arg1 == "io   var::move(io tovar)") {}
+	else if (++acno && arg1 == "void var::move(io tovar)") {}
 	else if (++acno && arg1 == "var  var::str(const int num) const") {}
 	else if (++acno && arg1 == "var  var::space() const") {}
 	else if (++acno && arg1 == "void var::cropper() &") {}
