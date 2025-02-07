@@ -402,6 +402,13 @@ function get_dependencies_for_build_and_install {
 	if [[ $COMPILER =~ ^clang ]]; then
 
 :
+: Clang module building needs its scan tools in the path
+: ------------------------------------------------------
+:
+	CLANG_VERSION=`c++ --version | head -n1|cut -d'.' -f 1|grep -Po '\d+'`
+	APT-GET sudo apt-get install -y clang-tools-$CLANG_VERSION
+
+:
 : Prevent clang from using later versions of gcc tool chains which are troublesome
 : Force clang to use same version of the gcc tool chain as gcc
 : See initial info on libstdc++ in install log - Build stage, above and below.
