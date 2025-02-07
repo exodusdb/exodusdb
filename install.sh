@@ -405,8 +405,9 @@ function get_dependencies_for_build_and_install {
 : Clang module building needs its scan tools in the path
 : ------------------------------------------------------
 :
+:	Avoid "CMAKE_CXX_COMPILER_CLANG_SCAN_DEPS" error
 	CLANG_VERSION=`c++ --version | head -n1|cut -d'.' -f 1|grep -Po '\d+'`
-	APT-GET sudo apt-get install -y clang-tools-$CLANG_VERSION
+	APT_GET sudo apt-get install -y clang-tools-$CLANG_VERSION
 
 :
 : Prevent clang from using later versions of gcc tool chains which are troublesome
