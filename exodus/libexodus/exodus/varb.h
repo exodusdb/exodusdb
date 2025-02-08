@@ -1415,18 +1415,7 @@ class PUBLIC var_base {
 
 //	friend bool var_lt_bool (      CBR    lhs,   const bool   bool1) = delete;
 //	friend bool bool_lt_var (const bool  bool1,       CBR     rhs  ) = delete;
-
-	// Concatenation
-
-	friend RETVAR var_cat_var(       CBR   lhs,       CBR    rhs);
-
-	// Specialisations for speed
-
-	friend RETVAR var_cat_cstr(      CBR   lhs, const char* rhs);
-	friend RETVAR var_cat_char(      CBR   lhs, const char  rhs);
-	friend RETVAR cstr_cat_var(const char* lhs,       CBR   rhs);
-
-	//friend var operator""_var(const char* cstr, std::size_t size);
+//	friend var operator""_var(const char* cstr, std::size_t size);
 
 	//////////////////////////////////////
 	// Declare friendship within the class
