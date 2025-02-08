@@ -64,17 +64,15 @@ bool var::setxlocale() const {
 //#endif
 }
 
-out  var::getxlocale() {
+var  var::getxlocale() {
 
 	THISIS("out  var::getxlocale()")
 
 #if defined(_MSC_VER) && defined(UNICODE)
 	return var(static_cast<int>GetThreadLocale());
 #else
-	// return "";
 	// cppref: Make a "deep copy" of current locale name.
-	*this = std::setlocale(LC_ALL, nullptr);
-	return *this;
+	return std::setlocale(LC_ALL, nullptr);
 #endif
 }
 

@@ -154,6 +154,8 @@ export namespace exo {
 	using exo::paster;
 	using exo::prefix;
 	using exo::prefixer;
+	using exo::append;
+	using exo::appender;
 	using exo::pop;
 	using exo::popper;
 	using exo::quote;

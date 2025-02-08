@@ -158,10 +158,6 @@ template<> PUBLIC RETVAR VARBASE1::dump() const {
 	return nrvo;
 }
 
-// free functions defined in mvdebug.cpp
-//
-void save_stack_addresses();
-
 // Exception constructors
 //
 // clang-format off
@@ -209,6 +205,9 @@ VarError::VarError(std::string description_)
 	// Capture the stack at point of creation i.e. when thrown
 	// TODO capture in caller using default argument to VarError?
 	exo_savestack(stack_addresses_, &stack_size_);
+
+	// Flush any stdout error messages out
+	std::cout << std::flush;
 
 //	this->stack = exo_backtrace();
 //	((description.assigned() ? description : "") ^ "\n" ^ stack.convert(FM, "\n") ^ "\n").put(std::cerr);

@@ -446,7 +446,7 @@ public:
 	ND var  indexr(SV substr, const int startchar1 = -1) const;
 
 	// Returns: All results of regex matching
-	// Multiple matches are returns in fields. Groups are in values
+	// Multiple matches are returned separated by FMs. Groups are in VMs.
 	//
 	// `let v1 = "abc1abc2"_var.match("BC(\\d)", "i"); // "bc1]1^bc2]2"_var
 	//  // or
@@ -672,7 +672,17 @@ public:
 	//  let v2 = prefix("abc", "XYZ");`
 	ND var  prefix(SV insertstr) const&;
 
-	// ND var  append(SV appendstr) const&;
+	template <typename... ARGS>
+	// Append text at the end
+	//
+	// `let v1 = "abc"_var.append(" is ", 10, " ok", '.'); // "abc is 10 ok."
+	//  // or
+	//  let v2 = append("abc", " is ", 10, " ok", '.');`
+	ND var  append(const ARGS&... appendable) const& {
+		var nrvo = *this;
+		(nrvo ^= ... ^= appendable);
+		return nrvo;
+	}
 
 	// Remove one trailing char
 	//
@@ -900,7 +910,11 @@ public:
 	ND io   paste(const int pos1, const int length, SV replacestr) &&;
 	ND io   paste(const int pos1, SV insertstr) &&;
 	ND io   prefix(SV insertstr) &&;
-//	ND io   append(SV appendstr) &&;
+			template <typename... ARGS>
+	ND io   append(const ARGS&... appendable) && {
+				((*this) ^= ... ^= appendable);
+				return *this;
+			}
 	ND io   pop() &&;
 
 	ND io   fieldstore(SV sepchar, const int fieldno, const int nfields, in replacement) &&;
@@ -960,7 +974,11 @@ public:
 	   IO   paster(const int pos1, const int length, SV insertstr) REF ;
 	   IO   paster(const int pos1, SV insertstr) REF ;
 	   IO   prefixer(SV insertstr) REF ;
-//	   IO   appender(SV appendstr) REF ;
+			template <typename... ARGS>
+	   IO   appender(const ARGS&... appendable) REF {
+				((*this) ^= ... ^= appendable);
+//				return void;
+			}
 
 	   IO   popper() REF ;
 
@@ -2242,7 +2260,7 @@ public:
 	// `let v1 = var().getxlocale(); // "en_US.utf8"
 	//  // or
 	//  let v2 = getxlocale();`
-	ND out  getxlocale();
+	ND var  getxlocale();
 
 	///// OUTPUT:
 	////////////

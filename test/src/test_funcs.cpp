@@ -458,6 +458,89 @@ function main() {
 //		assert(pasterall(x, -4, "XYZ") eq "XYZ");
 //	}
 //
+
+	printl("append/appender member and free functions");
+	{
+		// + - * / % self assign functions do not return a value so cannot be used in expressions or chained.
+		var x = "";
+		var y = "2";
+		x += 1;
+		//(x += 1) += "2"; // does not compile
+
+		// ^= is different
+
+		// Chaining appends efficiently
+		///////////////////////////////
+
+		// Appending large strings requires execution efficiency to avoid making unnecessary copies of strings and use of the heap.
+		var v1, v2;
+		v1 = "", v2 = "xxx";
+
+		// Efficient coding as long as vars are being used on the rhs
+		// INEFFICINT execution since a temporary (v2 ^ "yyy") is formed first
+		v1 = "a", v2 = "xxx";
+		v1 ^= v2 ^ "yyy" ^ 3 ^ 'q' ^ 2.3;
+		assert(v1.outputl("v1=") == "axxxyyy3q2.3");
+
+		// Compromise sadly doesnt compile because of wrong operator association of ^=.
+		//v1 ^= v2 ^= "yyy";
+	//	assert(v1.outputl("v1=") == "axxxyyy");
+
+		// INEFFICIENT coding. Both writing and reading
+		// Efficient execution
+		v1 = "a", v2 = "xxx";
+		v1 ^= v2;
+		v1 ^= "yyy";
+		v1 ^= 3;
+		v1 ^= 'q';
+		v1 ^= 2.3;
+		assert(v1.outputl("v1=") == "axxxyyy3q2.3");
+
+		// INEFFICIENT coding. Both writing and reading
+		// Efficient execution.
+		v1 = "a", v2 = "xxx";
+		((((v1 ^= v2) ^= "yyy") ^= 3) ^= 'q') ^= 2.3;
+		assert(v1.outputl("v1=") == "axxxyyy3q2.3");
+
+		// THEREFORE USE multiargument append() or appender()
+
+		// Very fast even with mixed types. var, cstr, char, int and double
+		// The only speed issue is that it checks for VNA on every operation.
+
+		// var member functions
+
+		v1 = "a", v2 = "xxx";
+		v1 = v1.append(v2, "yyy", 3, 'q', 2.3);
+		assert(v1.outputl("v1=") == "axxxyyy3q2.3");
+
+		v1 = "a", v2 = "xxx";
+		v1.appender(v2, "yyy", 3, 'q', 2.3);
+		assert(v1.outputl("v1=") == "axxxyyy3q2.3");
+
+		// oxodus free functions
+
+		v1 = "a", v2 = "xxx";
+		v1 = append(v1, v2, "yyy", 3, 'q', 2.3);
+		assert(v1.outputl("v1=") == "axxxyyy3q2.3");
+
+		v1 = "a", v2 = "xxx";
+		appender(v1, v2, "yyy", 3, 'q', 2.3);
+		assert(v1.outputl("v1=") == "axxxyyy3q2.3");
+
+		// var member functions on temporaries
+
+		v1 = "a", v2 = "xxx";
+		v1 = var("qqq").append(v2, "yyy", 3, 'q', 2.3);
+		assert(v1.outputl("v1=") == "qqqxxxyyy3q2.3");
+
+		// oxodus free functions on temporaries
+
+		v1 = "a", v2 = "xxx";
+		v1 = append("qqq", v2, "yyy", 3, 'q', 2.3);
+		assert(v1.outputl("v1=") == "qqqxxxyyy3q2.3");
+
+	}
+
 	printl(elapsedtimetext());
 	printl("Test passed");
 	return 0;
