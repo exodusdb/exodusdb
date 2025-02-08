@@ -108,11 +108,13 @@ RETVAR cstr_cat_var(const char* lhs, CBR rhs) {
 	return result;
 }
 
+
 ////////////////////
-// _var user literal
+// USER LITERAL _var
 ////////////////////
 
 // "abc^def"_var
+
 ND var operator""_var(const char* cstr, std::size_t size) {
 
 	var rvo = var(cstr, size);
@@ -137,20 +139,26 @@ ND var operator""_var(const char* cstr, std::size_t size) {
 }
 
 // 123456_var
+/////////////
+
 ND var operator""_var(unsigned long long int i) {
     return var(i);
 }
 
 // 123.456_var
+//////////////
+
 ND var operator""_var(long double d) {
     return var(d);
 }
+
 
 ///////////////////
 // UNARY PLUS/MINUS
 ///////////////////
 
 // +var
+
 template<> PUBLIC RETVAR VARBASE1::operator+() const {
 
 	assertDefined(__PRETTY_FUNCTION__);
@@ -161,6 +169,7 @@ template<> PUBLIC RETVAR VARBASE1::operator+() const {
 }
 
 // -var
+
 template<> PUBLIC RETVAR VARBASE1::operator-() const {
 
 	assertDefined(__PRETTY_FUNCTION__);
@@ -186,12 +195,14 @@ template<> PUBLIC RETVAR VARBASE1::operator-() const {
 	throw VarNonNumeric("+(" ^ this->first_(128) ^ ")");
 }
 
+
 /////////////////
 // SELF CONCAT ^=
 /////////////////
 
-//^=var
-// The assignment operator must always return a reference to *this.
+// ^= var
+
+// The assignment operator must always return a reference to *this. Why?
 template<> PUBLIC VBR1 VARBASE1::operator^=(CBX rhs) & {
 
 	assertString(__PRETTY_FUNCTION__);
@@ -204,8 +215,8 @@ template<> PUBLIC VBR1 VARBASE1::operator^=(CBX rhs) & {
 	return *this;
 }
 
-//^=int
-// The assignment operator must always return a reference to *this.
+// ^= int
+
 template<> PUBLIC VBR1 VARBASE1::operator^=(const int int1) & {
 
 	assertString(__PRETTY_FUNCTION__);
@@ -217,8 +228,8 @@ template<> PUBLIC VBR1 VARBASE1::operator^=(const int int1) & {
 	return *this;
 }
 
-//^=double
-// The assignment operator must always return a reference to *this.
+// ^= double
+
 template<> PUBLIC VBR1 VARBASE1::operator^=(const double double1) & {
 
 	assertString(__PRETTY_FUNCTION__);
@@ -233,8 +244,8 @@ template<> PUBLIC VBR1 VARBASE1::operator^=(const double double1) & {
 	return *this;
 }
 
-//^=char
-// The assignment operator must always return a reference to *this.
+// ^= char
+
 template<> PUBLIC VBR1 VARBASE1::operator^=(const char char1) & {
 
 	assertString(__PRETTY_FUNCTION__);
@@ -248,7 +259,8 @@ template<> PUBLIC VBR1 VARBASE1::operator^=(const char char1) & {
 
 #ifdef NOT_TEMPLATED_APPEND
 
-//^=char*
+// ^= char*
+
 // The assignment operator must always return a reference to *this.
 template<> PUBLIC VBR1 VARBASE1::operator^=(const char* cstr) & {
 
@@ -262,7 +274,8 @@ template<> PUBLIC VBR1 VARBASE1::operator^=(const char* cstr) & {
 	return *this;
 }
 
-//^=std::string
+// ^= std::string
+
 // The assignment operator must always return a reference to *this.
 template<> PUBLIC VBR1 VARBASE1::operator^=(const std::string& string1) & {
 
@@ -275,7 +288,8 @@ template<> PUBLIC VBR1 VARBASE1::operator^=(const std::string& string1) & {
 	return *this;
 }
 
-//^=std::string_view
+// ^= std::string_view
+
 // The assignment operator must always return a reference to *this.
 template<> PUBLIC VBR1 VARBASE1::operator^=(SV sv1) & {
 
@@ -287,17 +301,21 @@ template<> PUBLIC VBR1 VARBASE1::operator^=(SV sv1) & {
 
 	return *this;
 }
+
 #endif // NOT_TEMPLATED_APPEND
 
-/////////////////
-// SELF INCREMENT
-/////////////////
+
+///////////////////////////////////
+// SELF INCREMENT/DECREMENT POSTFIX
+///////////////////////////////////
+
+// VAR ++
 
 // You must *not* make the postfix version return the 'this' object by reference
 //
 // *** YOU HAVE BEEN WARNED ***
-// not returning void so is usable in expressions
-// int argument indicates that this is POSTFIX override v++
+// Not returning void so is usable in expressions
+// The int argument indicates that this is POSTFIX override v++
 template<> PUBLIC RETVAR VARBASE1::operator++(int) & {
 
 	// full check done below to avoid double checking number type
@@ -337,8 +355,10 @@ tryagain:
 	return priorvalue;
 }
 
-// not returning void so is usable in expressions
-// int argument indicates that this is POSTFIX override v--
+// VAR --
+
+// Not returning void so is usable in expressions
+// The int argument indicates that this is POSTFIX override v--
 template<> PUBLIC RETVAR VARBASE1::operator--(int) & {
 
 	// full check done below to avoid double checking number type
@@ -377,8 +397,14 @@ tryagain:
 	return priorvalue;
 }
 
-// not returning void so is usable in expressions
-// no argument indicates that this is prefix override ++var
+//////////////////////////////////
+// SELF INCREMENT/DECREMENT PREFIX
+//////////////////////////////////
+
+// ++ VAR
+
+// Not returning void so is usable in expressions
+// No argument indicates that this is prefix override ++var
 template<> PUBLIC VBR1 VARBASE1::operator++() & {
 
 	// full check done below to avoid double checking number type
@@ -412,12 +438,10 @@ tryagain:
 	return *this;
 }
 
-/////////////////
-// SELF DECREMENT
-/////////////////
+// -- VAR
 
-// not returning void so is usable in expressions
-// no argument indicates that this is prefix override --var
+// Not returning void so is usable in expressions
+// No argument indicates that this is prefix override --var
 template<> PUBLIC VBR1 VARBASE1::operator--() & {
 
 	// full check done below to avoid double checking number type
@@ -457,7 +481,9 @@ tryagain:
 // SELF INCREMENT/DECREMENT var versions
 ////////////////////////////////////////
 
-//Forward to var_base
+// All forwarded to var_base
+
+// var ++
 
 var  var::operator++(int) & {
 	var orig = this->clone();
@@ -465,21 +491,28 @@ var  var::operator++(int) & {
 	return orig;
 }
 
+// var --
+
 var  var::operator--(int) & {
 	var orig = this->clone();
 	var_base::operator--(0);
 	return orig;
 }
 
+// ++ var
+
 var& var::operator++() & {
 	var_base::operator++(0);
 	return *this;
 }
 
+// -- var
+
 var& var::operator--() & {
 	var_base::operator--();
 	return *this;
 }
+
 
 //////////////////
 // SELF ASSIGN VAR
@@ -842,7 +875,7 @@ tryagain:
 	return *this;
 }
 
-// VAR %/ double
+// VAR %= double
 ////////////////
 
 template<> PUBLIC VBR1 VARBASE1::operator%=(const double rhs) & {
