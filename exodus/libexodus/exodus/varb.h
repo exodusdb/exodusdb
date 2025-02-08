@@ -1199,51 +1199,60 @@ class PUBLIC var_base {
 //                                   SELF ASSIGN OPERATOR ON LVALUES
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
-	VARREF operator+=(CVR) &;
-	VARREF operator*=(CVR) &;
-	VARREF operator-=(CVR) &;
-	VARREF operator/=(CVR) &;
-	VARREF operator%=(CVR) &;
-	VARREF operator^=(CVR) &;
+#ifdef SELF_OP_ARE_CHAINABLE
+#	define VARREF1 VARREF
+#	define VARREF1_RETURN *this
+#else
+#	define VARREF1 void
+#	define VARREF1_RETURN
+#endif
+	VARREF1 operator+=(CVR) &;
+	VARREF1 operator*=(CVR) &;
+	VARREF1 operator-=(CVR) &;
+	VARREF1 operator/=(CVR) &;
+	VARREF1 operator%=(CVR) &;
 
 	// Specialisations for speed to avoid a) unnecessary converting to a var and then b) having to decide what type of var we have
 
 	// Addvar_base(
-	VARREF operator+=(const int) &;
-	VARREF operator+=(const double) &;
-	VARREF operator+=(const char  char1) & {(*this) += var_base(char1); return *this;}
-	VARREF operator+=(const char* chars) & {(*this) += var_base(chars); return *this;}
-	VARREF operator+=(const bool) &;
+	VARREF1 operator+=(const int) &;
+	VARREF1 operator+=(const double) &;
+	VARREF1 operator+=(const char  char1) & {(*this) += var_base(char1); return VARREF1_RETURN;}
+	VARREF1 operator+=(const char* chars) & {(*this) += var_base(chars); return VARREF1_RETURN;}
+	VARREF1 operator+=(const bool) &;
 
 	// Multiply
-	VARREF operator*=(const int) &;
-	VARREF operator*=(const double) &;
-	VARREF operator*=(const char  char1) & {(*this) *= var_base(char1); return *this;}
-	VARREF operator*=(const char* chars) & {(*this) *= var_base(chars); return *this;}
-	VARREF operator*=(const bool) &;
+	VARREF1 operator*=(const int) &;
+	VARREF1 operator*=(const double) &;
+	VARREF1 operator*=(const char  char1) & {(*this) *= var_base(char1); return VARREF1_RETURN;}
+	VARREF1 operator*=(const char* chars) & {(*this) *= var_base(chars); return VARREF1_RETURN;}
+	VARREF1 operator*=(const bool) &;
 
 	// Subtract
-	VARREF operator-=(const int) &;
-	VARREF operator-=(const double) &;
-	VARREF operator-=(const char  char1) & {(*this) -= var_base(char1); return *this;}
-	VARREF operator-=(const char* chars) & {(*this) -= var_base(chars); return *this;}
-	VARREF operator-=(const bool) &;
+	VARREF1 operator-=(const int) &;
+	VARREF1 operator-=(const double) &;
+	VARREF1 operator-=(const char  char1) & {(*this) -= var_base(char1); return VARREF1_RETURN;}
+	VARREF1 operator-=(const char* chars) & {(*this) -= var_base(chars); return VARREF1_RETURN;}
+	VARREF1 operator-=(const bool) &;
 
 	// Divide
-	VARREF operator/=(const int) &;
-	VARREF operator/=(const double) &;
-	VARREF operator/=(const char  char1) & {(*this) /= var_base(char1); return *this;}
-	VARREF operator/=(const char* chars) & {(*this) /= var_base(chars); return *this;}
-	VARREF operator/=(const bool) &;
+	VARREF1 operator/=(const int) &;
+	VARREF1 operator/=(const double) &;
+	VARREF1 operator/=(const char  char1) & {(*this) /= var_base(char1); return VARREF1_RETURN;}
+	VARREF1 operator/=(const char* chars) & {(*this) /= var_base(chars); return VARREF1_RETURN;}
+	VARREF1 operator/=(const bool) &;
 
 	// Modulo
-	VARREF operator%=(const int) &;
-	VARREF operator%=(const double dbl1) &;
-	VARREF operator%=(const char  char1) & {(*this) %= var_base(char1); return *this;}
-	VARREF operator%=(const char* chars) & {(*this) %= var_base(chars); return *this;}
-	VARREF operator%=(const bool  bool1) & {(*this) %= var_base(bool1); return *this;}
+	VARREF1 operator%=(const int) &;
+	VARREF1 operator%=(const double dbl1) &;
+	VARREF1 operator%=(const char  char1) & {(*this) %= var_base(char1); return VARREF1_RETURN;}
+	VARREF1 operator%=(const char* chars) & {(*this) %= var_base(chars); return VARREF1_RETURN;}
+	VARREF1 operator%=(const bool  bool1) & {(*this) %= var_base(bool1); return VARREF1_RETURN;}
 
-	// Concat
+	// Concat self assign is different.
+	// It does return *this in order for chainable efficient multiple concatentation.
+
+	VARREF operator^=(CVR) &;
 	VARREF operator^=(const int) &;
 	VARREF operator^=(const double) &;
 	VARREF operator^=(const char) &;
@@ -1282,7 +1291,7 @@ class PUBLIC var_base {
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
 	// Prevent accidental, unusual and unnecessary coding
-
+/*
 	#define DEPRECATE [[deprecated("Using self assign operators on temporaries is pointless. Use the operator by itself, without the = sign, to achieve the same.")]]
 
 	DEPRECATE VARREF operator+=(CVR rhs) && {(*this) += rhs; return *this;}// = delete;
@@ -1338,6 +1347,7 @@ class PUBLIC var_base {
 	DEPRECATE VARREF operator^=(const std::string_view rhs) && {(*this) ^= rhs; return *this;}// = delete;
 
 	#undef DEPRECATE
+*/
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 //                                      UNARY OPERATORS

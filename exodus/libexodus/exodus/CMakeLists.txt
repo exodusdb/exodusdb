@@ -261,6 +261,7 @@
 		var.cpp dim.cpp varnum.cpp varmath.cpp exodebug.cpp
 		varcompare.cpp
 		varop.cpp
+		varop2.cpp
 		varchrono.cpp
 		varfuncs.cpp varioconv.cpp
 		exoenv.cpp exofuncs.cpp
