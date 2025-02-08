@@ -53,7 +53,142 @@ namespace exo {
 // which is effectively about makeing objects behave like ordinary variable syntactically
 // implementing smartpointers
 
-//^= is not templated since slightly slower to go through the creation of an var()
+///////////////////////////////////////////////////////////
+// UTILITY CONCATS FOR VAR/VAR VAR/CHAR* VAR/CHAR CHAR*/VAR
+///////////////////////////////////////////////////////////
+
+// var^var we reassign the logical xor operator ^ to be string concatenate!!!
+// slightly wrong precedence but at least we have a reliable concat operator to replace the + which
+// is now reserved for forced ADDITION both according to fundamental PickOS principle
+RETVAR var_cat_var(CBR lhs, CBR rhs) {
+
+	lhs.assertString(__PRETTY_FUNCTION__);
+	rhs.assertString(__PRETTY_FUNCTION__);
+	// return lhs.var_str + rhs.var_str;
+
+	var result(lhs.var_str);
+	result.var_str.append(rhs.var_str);
+
+	return result;
+}
+
+RETVAR var_cat_cstr(CBR lhs, const char* rhs) {
+
+	lhs.assertString(__PRETTY_FUNCTION__);
+
+	//return lhs.var_str + cstr;
+
+	var result(lhs.var_str);
+	result.var_str.append(rhs);
+
+	return result;
+}
+
+RETVAR var_cat_char(CBR lhs, const char rhs) {
+
+	lhs.assertString(__PRETTY_FUNCTION__);
+
+	//return lhs.var_str + char2;
+
+	var result(lhs.var_str);
+	result.var_str.push_back(rhs);
+
+	return result;
+}
+
+RETVAR cstr_cat_var(const char* lhs, CBR rhs) {
+
+	rhs.assertString(__PRETTY_FUNCTION__);
+
+	//return cstr + rhs.var_str;
+
+	var result(lhs);
+	result.var_str.append(rhs.var_str);
+
+	return result;
+}
+
+////////////////////
+// _var user literal
+////////////////////
+
+// "abc^def"_var
+ND var operator""_var(const char* cstr, std::size_t size) {
+
+	var rvo = var(cstr, size);
+
+	// Convert _VISIBLE_FMS to _ALL_FMS
+	for (char& c : rvo.var_str) {
+		switch (c) {
+			// Most common first to perhaps aid optimisation
+			case VISIBLE_FM_: c = FM_; break;
+			case VISIBLE_VM_: c = VM_; break;
+			case VISIBLE_SM_: c = SM_; break;
+			case VISIBLE_TM_: c = TM_; break;
+			case VISIBLE_ST_: c = ST_; break;
+			case VISIBLE_RM_: c = RM_; break;
+			// All other chars left unconverted
+			default:;
+		}
+	}
+
+	return rvo;
+
+}
+
+// 123456_var
+ND var operator""_var(unsigned long long int i) {
+    return var(i);
+}
+
+// 123.456_var
+ND var operator""_var(long double d) {
+    return var(d);
+}
+
+///////////////////
+// UNARY PLUS/MINUS
+///////////////////
+
+// +var
+template<> PUBLIC RETVAR VARBASE1::operator+() const {
+
+	assertDefined(__PRETTY_FUNCTION__);
+	assertNumeric(__PRETTY_FUNCTION__);
+
+	//return static_cast<RETVAR>(*this);
+	return *static_cast<const RETVAR*>(this);
+}
+
+// -var
+template<> PUBLIC RETVAR VARBASE1::operator-() const {
+
+	assertDefined(__PRETTY_FUNCTION__);
+
+	do LIKELY {
+		// dbl
+		if (var_typ & VARTYP_DBL)
+			return -var_dbl;
+
+		// int
+		if (var_typ & VARTYP_INT)
+			return -var_int;
+
+		// Try to convert to number and try again
+		// Will check unassigned
+
+	} while (this->isnum());
+
+	// non-numeric
+	this->assertNumeric(__PRETTY_FUNCTION__);
+
+	// will never get here
+	throw VarNonNumeric("+(" ^ this->first_(128) ^ ")");
+}
+
+/////////////////
+// SELF CONCAT ^=
+/////////////////
 
 //^=var
 // The assignment operator must always return a reference to *this.
@@ -153,6 +288,10 @@ template<> PUBLIC VBR1 VARBASE1::operator^=(SV sv1) & {
 	return *this;
 }
 #endif // NOT_TEMPLATED_APPEND
+
+/////////////////
+// SELF INCREMENT
+/////////////////
 
 // You must *not* make the postfix version return the 'this' object by reference
 //
@@ -273,6 +412,10 @@ tryagain:
 	return *this;
 }
 
+/////////////////
+// SELF DECREMENT
+/////////////////
+
 // not returning void so is usable in expressions
 // no argument indicates that this is prefix override --var
 template<> PUBLIC VBR1 VARBASE1::operator--() & {
@@ -310,9 +453,9 @@ tryagain:
 	return *this;
 }
 
-/////////////////////////////////////////
-// VAR Prefix/Postfix increment/decrement
-/////////////////////////////////////////
+////////////////////////////////////////
+// SELF INCREMENT/DECREMENT var versions
+////////////////////////////////////////
 
 //Forward to var_base
 
@@ -338,15 +481,12 @@ var& var::operator--() & {
 	return *this;
 }
 
-//////////////
-// SELF ASSIGN
-//////////////
+//////////////////
+// SELF ASSIGN VAR
+//////////////////
 
-//////
-// VAR
-//////
-
-// ADD VAR
+// VAR += VAR
+/////////////
 
 template<> PUBLIC VBR1 VARBASE1::operator+=(CBX rhs) & {
 
@@ -394,55 +534,8 @@ tryagain:
 	throw VarNonNumeric(this->first_(128) ^ "+= ");
 }
 
-// MULTIPLY VAR
-
-template<> PUBLIC VBR1 VARBASE1::operator*=(CBX rhs) & {
-
-	rhs.assertNumeric(__PRETTY_FUNCTION__);
-
-tryagain:
-
-	// lhs double
-	if (var_typ & VARTYP_DBL) {
-		// use rhs double if available otherwise use its int
-		// warning: conversion from ‘exo::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
-		var_dbl *= (rhs.var_typ & VARTYP_DBL) ? rhs.var_dbl : static_cast<double>(rhs.var_int);
-		// reset lhs to one unique type
-		var_typ = VARTYP_DBL;
-		return *this;
-	}
-
-	// lhs int
-	else if (var_typ & VARTYP_INT) {
-
-		// rhs double
-		if (rhs.var_typ & VARTYP_DBL) {
-			//warning: conversion from ‘exo::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
-			var_dbl = static_cast<double>(var_int) * rhs.var_dbl;
-			// reset lhs to one unique type
-			var_typ = VARTYP_DBL;
-			return *this;
-		}
-
-		// both are ints
-		var_int *= rhs.var_int;
-		// reset lhs to one unique type
-		var_typ = VARTYP_INT;
-		return *this;
-	}
-
-	// try to convert to numeric
-	if (isnum())
-		LIKELY
-		goto tryagain;
-
-	assertNumeric(__PRETTY_FUNCTION__);
-
-	// Cant get here
-	throw VarNonNumeric(this->first_(128) ^ "+= ");
-}
-
-// SUBTRACT VAR
+// VAR -= VAR
+/////////////
 
 template<> PUBLIC VBR1 VARBASE1::operator-=(CBX rhs) & {
 
@@ -490,8 +583,57 @@ tryagain:
 	throw VarNonNumeric(this->first_(128) ^ "+= ");
 }
 
+// VAR *= VAR
+/////////////
 
-// DIVIDE VAR
+template<> PUBLIC VBR1 VARBASE1::operator*=(CBX rhs) & {
+
+	rhs.assertNumeric(__PRETTY_FUNCTION__);
+
+tryagain:
+
+	// lhs double
+	if (var_typ & VARTYP_DBL) {
+		// use rhs double if available otherwise use its int
+		// warning: conversion from ‘exo::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
+		var_dbl *= (rhs.var_typ & VARTYP_DBL) ? rhs.var_dbl : static_cast<double>(rhs.var_int);
+		// reset lhs to one unique type
+		var_typ = VARTYP_DBL;
+		return *this;
+	}
+
+	// lhs int
+	else if (var_typ & VARTYP_INT) {
+
+		// rhs double
+		if (rhs.var_typ & VARTYP_DBL) {
+			//warning: conversion from ‘exo::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
+			var_dbl = static_cast<double>(var_int) * rhs.var_dbl;
+			// reset lhs to one unique type
+			var_typ = VARTYP_DBL;
+			return *this;
+		}
+
+		// both are ints
+		var_int *= rhs.var_int;
+		// reset lhs to one unique type
+		var_typ = VARTYP_INT;
+		return *this;
+	}
+
+	// try to convert to numeric
+	if (isnum())
+		LIKELY
+		goto tryagain;
+
+	assertNumeric(__PRETTY_FUNCTION__);
+
+	// Cant get here
+	throw VarNonNumeric(this->first_(128) ^ "+= ");
+}
+
+// VAR /= VAR
+/////////////
 
 template<> PUBLIC VBR1 VARBASE1::operator/=(CBX rhs) & {
 
@@ -564,19 +706,20 @@ tryagain:
 	return *this;
 }
 
-
-// MODULO VAR
+// VAR %= VAR
+/////////////
 
 template<> PUBLIC VBR1 VARBASE1::operator%=(CBX rhs) & {
 	*this = this->mod(rhs);
 	return *this;
 }
 
-/////////
-// DOUBLE
-/////////
+/////////////////////
+// SELF ASSIGN DOUBLE
+/////////////////////
 
-// ADD DOUBLE
+// VAR += double
+////////////////
 
 template<> PUBLIC VBR1 VARBASE1::operator+=(const double dbl1) & {
 
@@ -607,35 +750,8 @@ tryagain:
 	return *this;
 }
 
-// MULTIPLY DOUBLE
-
-template<> PUBLIC VBR1 VARBASE1::operator*=(const double dbl1) & {
-
-tryagain:
-
-	// lhs double
-	if (var_typ & VARTYP_DBL)
-		var_dbl *= dbl1;
-
-	// lhs int
-	else if (var_typ & VARTYP_INT)
-		// warning: conversion from ‘exo::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
-		var_dbl = static_cast<double>(var_int) * dbl1;
-
-	// try to convert to numeric
-	else if (isnum())
-		goto tryagain;
-
-	else
-		assertNumeric(__PRETTY_FUNCTION__);
-
-	// reset to one unique type
-	var_typ = VARTYP_DBL;
-
-	return *this;
-}
-
-// SUBTRACT DOUBLE
+// VAR -= DOUBLE
+////////////////
 
 template<> PUBLIC VBR1 VARBASE1::operator-=(const double dbl1) & {
 
@@ -663,8 +779,37 @@ tryagain:
 	return *this;
 }
 
+// VAR *= DOUBLE
+////////////////
 
-// DIVIDE DOUBLE
+template<> PUBLIC VBR1 VARBASE1::operator*=(const double dbl1) & {
+
+tryagain:
+
+	// lhs double
+	if (var_typ & VARTYP_DBL)
+		var_dbl *= dbl1;
+
+	// lhs int
+	else if (var_typ & VARTYP_INT)
+		// warning: conversion from ‘exo::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
+		var_dbl = static_cast<double>(var_int) * dbl1;
+
+	// try to convert to numeric
+	else if (isnum())
+		goto tryagain;
+
+	else
+		assertNumeric(__PRETTY_FUNCTION__);
+
+	// reset to one unique type
+	var_typ = VARTYP_DBL;
+
+	return *this;
+}
+
+// VAR /= double
+////////////////
 
 template<> PUBLIC VBR1 VARBASE1::operator/=(const double dbl1) & {
 
@@ -697,19 +842,20 @@ tryagain:
 	return *this;
 }
 
-
-// MODULO DOUBLE
+// VAR %/ double
+////////////////
 
 template<> PUBLIC VBR1 VARBASE1::operator%=(const double rhs) & {
 	*this = this->mod(rhs);
 	return *this;
 }
 
-//////
-// INT
-//////
+//////////////////
+// SELF ASSIGN INT
+//////////////////
 
-// ADD INT
+// VAR += int
+/////////////
 
 template<> PUBLIC VBR1 VARBASE1::operator+=(const int int1) & {
 
@@ -743,41 +889,8 @@ tryagain:
 	throw VarNonNumeric(this->first_(128) ^ "+= ");
 }
 
-// MULTIPLY INT
-
-template<> PUBLIC VBR1 VARBASE1::operator*=(const int int1) & {
-
-tryagain:
-
-	// lhs double
-	if (var_typ & VARTYP_DBL) {
-		// warning: conversion from ‘exo::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
-		var_dbl *= static_cast<double>(int1);
-		// reset to one unique type
-		var_typ = VARTYP_DBL;
-		return *this;
-	}
-
-	// both int
-	else if (var_typ & VARTYP_INT) {
-		var_int *= int1;
-		// reset to one unique type
-		var_typ = VARTYP_INT;
-		return *this;
-	}
-
-	// try to convert to numeric
-	if (isnum())
-		LIKELY
-		goto tryagain;
-
-	assertNumeric(__PRETTY_FUNCTION__);
-
-	// Cant get here
-	throw VarNonNumeric(this->first_(128) ^ "+= ");
-}
-
-//SUBTRACT INT
+// VAR -= int
+/////////////
 
 template<> PUBLIC VBR1 VARBASE1::operator-=(const int int1) & {
 
@@ -812,7 +925,43 @@ tryagain:
 }
 
 
-//DIVIDE INT
+// VAR *= int
+/////////////
+
+template<> PUBLIC VBR1 VARBASE1::operator*=(const int int1) & {
+
+tryagain:
+
+	// lhs double
+	if (var_typ & VARTYP_DBL) {
+		// warning: conversion from ‘exo::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
+		var_dbl *= static_cast<double>(int1);
+		// reset to one unique type
+		var_typ = VARTYP_DBL;
+		return *this;
+	}
+
+	// both int
+	else if (var_typ & VARTYP_INT) {
+		var_int *= int1;
+		// reset to one unique type
+		var_typ = VARTYP_INT;
+		return *this;
+	}
+
+	// try to convert to numeric
+	if (isnum())
+		LIKELY
+		goto tryagain;
+
+	assertNumeric(__PRETTY_FUNCTION__);
+
+	// Cant get here
+	throw VarNonNumeric(this->first_(128) ^ "+= ");
+}
+
+// VAR /= int
+/////////////
 
 template<> PUBLIC VBR1 VARBASE1::operator/=(const int int1) & {
 
@@ -848,18 +997,19 @@ tryagain:
 }
 
 
-//MODULO INT
+// VAR %= int
+/////////////
 
 template<> PUBLIC VBR1 VARBASE1::operator%=(const int rhs) & {
 	*this = this->mod(rhs);
 	return *this;
 }
 
-///////
-// BOOL
-///////
+///////////////////
+// SELF ASSIGN BOOL
+///////////////////
 
-// ADD BOOL
+// VAR += bool
 
 template<> PUBLIC VBR1 VARBASE1::operator+=(const bool bool1) & {
 	if (bool1)
@@ -869,7 +1019,17 @@ template<> PUBLIC VBR1 VARBASE1::operator+=(const bool bool1) & {
 	return *this;
 }
 
-// MULTIPLY BOOL
+// VAR -= bool
+
+template<> PUBLIC VBR1 VARBASE1::operator-=(const bool bool1) & {
+	if (bool1)
+		(*this)--;
+	else
+		assertNumeric(__PRETTY_FUNCTION__);
+	return *this;
+}
+
+// VAR *= bool
 
 template<> PUBLIC VBR1 VARBASE1::operator*=(const bool bool1) & {
 	assertNumeric(__PRETTY_FUNCTION__);
@@ -880,139 +1040,8 @@ template<> PUBLIC VBR1 VARBASE1::operator*=(const bool bool1) & {
 	return *this;
 }
 
-// SUBTRACT BOOL
+// VAR /= bool
 
-template<> PUBLIC VBR1 VARBASE1::operator-=(const bool bool1) & {
-	if (bool1)
-		(*this)--;
-	else
-		assertNumeric(__PRETTY_FUNCTION__);
-	return *this;
-}
-
-// +var
-template<> PUBLIC RETVAR VARBASE1::operator+() const {
-
-	assertDefined(__PRETTY_FUNCTION__);
-	assertNumeric(__PRETTY_FUNCTION__);
-
-	//return static_cast<RETVAR>(*this);
-	return *static_cast<const RETVAR*>(this);
-}
-
-// -var
-template<> PUBLIC RETVAR VARBASE1::operator-() const {
-
-	assertDefined(__PRETTY_FUNCTION__);
-
-	do LIKELY {
-		// dbl
-		if (var_typ & VARTYP_DBL)
-			return -var_dbl;
-
-		// int
-		if (var_typ & VARTYP_INT)
-			return -var_int;
-
-		// Try to convert to number and try again
-		// Will check unassigned
-
-	} while (this->isnum());
-
-	// non-numeric
-	this->assertNumeric(__PRETTY_FUNCTION__);
-
-	// will never get here
-	throw VarNonNumeric("+(" ^ this->first_(128) ^ ")");
-}
-
-// var^var we reassign the logical xor operator ^ to be string concatenate!!!
-// slightly wrong precedence but at least we have a reliable concat operator to replace the + which
-// is now reserved for forced ADDITION both according to fundamental PickOS principle
-RETVAR var_cat_var(CBR lhs, CBR rhs) {
-
-	lhs.assertString(__PRETTY_FUNCTION__);
-	rhs.assertString(__PRETTY_FUNCTION__);
-	// return lhs.var_str + rhs.var_str;
-
-	var result(lhs.var_str);
-	result.var_str.append(rhs.var_str);
-
-	return result;
-}
-
-RETVAR var_cat_cstr(CBR lhs, const char* rhs) {
-
-	lhs.assertString(__PRETTY_FUNCTION__);
-
-	//return lhs.var_str + cstr;
-
-	var result(lhs.var_str);
-	result.var_str.append(rhs);
-
-	return result;
-}
-
-RETVAR var_cat_char(CBR lhs, const char rhs) {
-
-	lhs.assertString(__PRETTY_FUNCTION__);
-
-	//return lhs.var_str + char2;
-
-	var result(lhs.var_str);
-	result.var_str.push_back(rhs);
-
-	return result;
-}
-
-RETVAR cstr_cat_var(const char* lhs, CBR rhs) {
-
-	rhs.assertString(__PRETTY_FUNCTION__);
-
-	//return cstr + rhs.var_str;
-
-	var result(lhs);
-	result.var_str.append(rhs.var_str);
-
-	return result;
-}
-
-////////////////////
-// _var user literal
-////////////////////
-
-// "abc^def"_var
-ND var operator""_var(const char* cstr, std::size_t size) {
-
-	var rvo = var(cstr, size);
-
-	// Convert _VISIBLE_FMS to _ALL_FMS
-	for (char& c : rvo.var_str) {
-		switch (c) {
-			// Most common first to perhaps aid optimisation
-			case VISIBLE_FM_: c = FM_; break;
-			case VISIBLE_VM_: c = VM_; break;
-			case VISIBLE_SM_: c = SM_; break;
-			case VISIBLE_TM_: c = TM_; break;
-			case VISIBLE_ST_: c = ST_; break;
-			case VISIBLE_RM_: c = RM_; break;
-			// All other chars left unconverted
-			default:;
-		}
-	}
-
-	return rvo;
-
-}
-
-// 123456_var
-ND var operator""_var(unsigned long long int i) {
-    return var(i);
-}
-
-// 123.456_var
-ND var operator""_var(long double d) {
-    return var(d);
-}
+// Doesnt exist because divide by zero if false is runtime error
 
 } // namespace exo
