@@ -132,7 +132,12 @@ function main() {
 
 			// Only interested in certain function declarations and comments starting exactly //
 			var prefix = srcline.field(" ", 1);
-			if (prefix == "var")       prefix ^= "=";
+
+			// Include lines starting var but not
+			// lines like "var xxx = 123;" that are not function declarations
+			if (prefix == "var" && srcline.match(R"__(^[\sa-zA-Z0-9_]+\()__"))
+				prefix ^= "=";
+
 			else if (prefix == "RETVAR") prefix = "="; // from var_base
 
 			// const var&
@@ -178,6 +183,10 @@ function main() {
 				deprecated = false;
 				continue;
 			}
+
+///////////////////////////////
+// Found a function declaration
+///////////////////////////////
 
 			srcline = srcline.field(" ", 2, 9999);
 //			var comments = srcline.field("{", 1).field(";", 2, 9999).trimmerfirst("/ ");
@@ -346,12 +355,19 @@ function main() {
 				if (wiki)
 					comments.replacer(backquoted, "<syntaxhighlight lang=\"c++\">\n$1</syntaxhighlight>");
 				else
-					comments.replacer(backquoted, "\n<pre><code>$1</code></pre>\n");
+					// Javascript instead of cpp because it gives better highlighting for exodus c++. See above too.
+					// (All function calls are highlighted)
+//					comments.replacer(backquoted, "\n<pre><code class='gendoc_funcdecl language-javascript'>$1</code></pre>\n");
+					comments.replacer(backquoted, "\n<pre><code class='hljs-ncdecl language-javascript'>$1</code></pre>\n");
 			}
 
 			comments.replacer(_FM, "</p>\n");
 
 			var line2 = srcline.field(";", 1);
+
+			// "ARGS&... appendable" -> "appendable, ..."
+			line2.replacer(R"__(\b[a-zA-Z][a-zA-Z0-9]*\s*&{1,2}\s*\.\.\.\s*\b([a-zA-Z][a-zA-Z0-9]*))__"_rex, "$1, ...");
+
 			line2.replacer("\\bstd::size_t\\b", "");
 			line2.replacer("\\bconst&&\\b", "");
 			line2.replacer("\\bconst&\\b", "");
@@ -389,16 +405,25 @@ function main() {
 			line2.replacer("DEFAULT_CSPACE", R"__(= ' ')__");
 
 			// bold the function name
-			line2.prefixer("<em>");
-			line2.paster(line2.index("("), "</em>");
+			if (wiki) {
+				line2.prefixer("<em>");
+				line2.paster(line2.index("("), "</em>");
+			} else {
+				line2.prefixer("<span class='gendoc_function'>");
+				line2.paster(line2.index("("), "</span>");
+			}
+
+			let func_decl = (objname ?: default_objname) ^ "." ^ line2;
 
 			if (wiki) {
 //				line2 = "|" ^ prefix ^ "||" ^ (objname ?: default_objname) ^ "." ^ line2 ^ "||" ^ comments;
 //				doc_outputl(line2);
 				doc_outputl("|-");
-				doc_outputl("|", prefix, "||", (objname ?: default_objname), ".", line2, "||", comments);
+				doc_outputl("|", prefix, "||", func_decl, "||", comments);
 			} else {
-				doc_outputl("<tr><td>", prefix, "</td><td>", (objname ?: default_objname), ".", line2,  "</td><td>", comments, "</td></tr>");
+				// Using javascript see below too
+//				doc_outputl("<tr><td>", prefix, "</td><td><pre><code class=language-javascript>", func_decl,  "</code></pre></td><td>", comments, "</td></tr>");
+				doc_outputl("<tr><td>", prefix, "</td><td>", func_decl,  "</td><td>", comments, "</td></tr>");
 			}
 
 // format() slows compilation a lot for one off compilations (2.8/0.73 secs i.e x4)
@@ -664,6 +689,11 @@ p {
         margin-bottom: 0.1em
     }
 
+.gendoc_function {
+    color: #800;
+    font-weight: 700;
+}
+
 </style>
 
 )__";
@@ -683,7 +713,7 @@ subroutine outputcode(in text) {
 //////////////////////////////////////////////////
 template <typename... Args>
 void doc_outputl(const Args&... args) {
-    (doc_text ^= ... ^= args);
+	doc_text.appender(args...);
 	doc_text ^= '\n';
 }
 

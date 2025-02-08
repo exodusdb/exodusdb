@@ -349,6 +349,18 @@ ND var  paste(in instring, const int pos1, in str);
 ND var  prefix(in instring, in str);
    IO   prefixer(io iostring, in str);
 
+template<typename... ARGS>
+ND var  append(var instring, const ARGS&... appendable) {
+	instring.appender(appendable...);
+	return instring;
+}
+
+template<typename... ARGS>
+   IO   appender(io iostring, const ARGS&... appendable) {
+	(iostring ^= ... ^= appendable);
+	//return void;
+}
+
 ND var  pop(in instring);
    IO   popper(io iostring);
 
