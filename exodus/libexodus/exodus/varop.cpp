@@ -53,61 +53,6 @@ namespace exo {
 // which is effectively about makeing objects behave like ordinary variable syntactically
 // implementing smartpointers
 
-///////////////////////////////////////////////////////////
-// UTILITY CONCATS FOR VAR/VAR VAR/CHAR* VAR/CHAR CHAR*/VAR
-///////////////////////////////////////////////////////////
-
-// var^var we reassign the logical xor operator ^ to be string concatenate!!!
-// slightly wrong precedence but at least we have a reliable concat operator to replace the + which
-// is now reserved for forced ADDITION both according to fundamental PickOS principle
-RETVAR var_cat_var(CBR lhs, CBR rhs) {
-
-	lhs.assertString(__PRETTY_FUNCTION__);
-	rhs.assertString(__PRETTY_FUNCTION__);
-	// return lhs.var_str + rhs.var_str;
-
-	var result(lhs.var_str);
-	result.var_str.append(rhs.var_str);
-
-	return result;
-}
-
-RETVAR var_cat_cstr(CBR lhs, const char* rhs) {
-
-	lhs.assertString(__PRETTY_FUNCTION__);
-
-	//return lhs.var_str + cstr;
-
-	var result(lhs.var_str);
-	result.var_str.append(rhs);
-
-	return result;
-}
-
-RETVAR var_cat_char(CBR lhs, const char rhs) {
-
-	lhs.assertString(__PRETTY_FUNCTION__);
-
-	//return lhs.var_str + char2;
-
-	var result(lhs.var_str);
-	result.var_str.push_back(rhs);
-
-	return result;
-}
-
-RETVAR cstr_cat_var(const char* lhs, CBR rhs) {
-
-	rhs.assertString(__PRETTY_FUNCTION__);
-
-	//return cstr + rhs.var_str;
-
-	var result(lhs);
-	result.var_str.append(rhs.var_str);
-
-	return result;
-}
-
 
 ////////////////////
 // USER LITERAL _var
