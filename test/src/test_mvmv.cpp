@@ -348,7 +348,7 @@ function main() {
 	assert(!ascints.locate(10, MV, -1));
 	assert(!ascints.convert(VM, SM).locate(10, MV, 1, -1));
 
-	assert(ascints.locate(10) eq 1);
+	assert(ascints.locate(10) eq 4);
 	assert(ascints.locate(10));
 
 	assert(ascints.locate(9) eq 0);
@@ -478,7 +478,7 @@ function main() {
 	converter(ascints, ",", VM);
 	converter(revints, ",", VM);
 
-	assert(locate(10, ascints) eq 1);
+	assert(locate(10, ascints) eq 4);
 
 	assert(locate(30, ascints, locii));
 	assert(locii eq 6);
@@ -521,6 +521,133 @@ function main() {
 
 	assert(locateusing(locsep, 30, ascints, locii));
 	assert(locii eq 6);
+
+	{
+
+		// Check simple locate works with ANY of the field mark chars
+
+		// Without setting
+		//////////////////
+
+		// Return field no if found
+		assert(locate("X", "A^X^C"_var) == 2);
+		assert("A^X^C"_var.locate("X") == 2);
+
+		// Return 0 if not found
+		assert(locate("X", "A^Q^C"_var) == 0);
+		assert("A^Q^C"_var.locate("X") == 0);
+
+		// With setting
+		///////////////
+		{
+			var setting;
+			// Return true if found
+			assert(locate("X", "A|X|C"_var, setting) == 1);
+			// and field no in setting
+			assert(setting == 2);
+
+			// Return false if not found
+			assert(locate("X", "A|Q|C"_var, setting) == 0);
+			// and returns next field no in setting
+			assert(setting == 4);
+		}
+
+		{
+			var setting;
+			// Return true if found
+			assert("A|X|C"_var.locate("X", setting) == 1);
+			// and field no in setting
+			assert(setting == 2);
+
+			// Return false if not found
+			assert("A|Q|C"_var.locate("X", setting) == 0);
+			// and returns next field no in setting
+			assert(setting == 4);
+		}
+
+		TRACE(_VISIBLE_FMS)
+		TRACE(locate("abc~QQ`def"_var, "QQ"))
+
+		{
+			// Poor or undefined behaviour when target has any of the field mark characters
+
+			assert(locate("^QQ^", "abc^QQ^def"_var) == 0); // the character BEFORE ^QQ^ is not a field mark so it is not "found"
+
+			// Kind of works if target doesnt start or end with any of the field mark chars
+			assert(locate( "11]22]33"_var, "abc^11]22]33^QQ^def"_var) == 2);
+			// But it doesnt understand field mark heirarchy
+			assert(locate( "11^22^33"_var, "abc]11^22^33]QQ]def"_var) == 2);
+		}
+
+		// Find in any mixture of field marks
+		assert(locate("QQ", "abc|QQ^def"_var) == 2);
+		assert(locate("QQ", "abc}QQ]def"_var) == 2);
+		assert(locate("QQ", "abc]QQ}def"_var) == 2);
+		assert(locate("QQ", "abc^QQ|def"_var) == 2);
+		assert(locate("QQ", "abc`QQ~def"_var) == 2);
+
+		assert(locate("abc", "abc`QQ`def"_var) == 1);
+		assert(locate("abc", "abc^QQ^def"_var) == 1);
+		assert(locate("abc", "abc]QQ]def"_var) == 1);
+		assert(locate("abc", "abc}QQ}def"_var) == 1);
+		assert(locate("abc", "abc|QQ|def"_var) == 1);
+		assert(locate("abc", "abc~QQ~def"_var) == 1);
+
+		assert(locate("QQ", "abc`QQ`def"_var) == 2);
+		assert(locate("QQ", "abc^QQ^def"_var) == 2);
+		assert(locate("QQ", "abc]QQ]def"_var) == 2);
+		assert(locate("QQ", "abc}QQ}def"_var) == 2);
+		assert(locate("QQ", "abc|QQ|def"_var) == 2);
+		assert(locate("QQ", "abc~QQ~def"_var) == 2);
+
+		assert(locate("def", "abc`QQ`def"_var) == 3);
+		assert(locate("def", "abc^QQ^def"_var) == 3);
+		assert(locate("def", "abc]QQ]def"_var) == 3);
+		assert(locate("def", "abc}QQ}def"_var) == 3);
+		assert(locate("def", "abc|QQ|def"_var) == 3);
+		assert(locate("def", "abc~QQ~def"_var) == 3);
+
+		// Find at the beginning, middle  or end
+		assert(! locate("a", "abc]QQ]def"_var));
+		assert(! locate("ab", "abc]QQ]def"_var));
+		assert(! locate("b", "abc]QQ]def"_var));
+		assert(! locate("bc", "abc]QQ]def"_var));
+		assert(! locate("Q", "abc]QQ]def"_var));
+		assert(! locate("QQQ", "abc]QQ]def"_var));
+		assert(! locate("d", "abc]QQ]def"_var));
+		assert(! locate("e", "abc]QQ]def"_var));
+		assert(! locate("f", "abc]QQ]def"_var));
+		assert(! locate("deff", "abc]QQ]def"_var));
+
+		// Find at the beginning, middle  or end
+		assert(locate("abc", "abc]QQ]def"_var));
+
+		assert(locate("abc", "abc]QQ]def"_var) == 1);
+		assert(locate("QQ", "abc]QQ]def"_var) == 2);
+		assert(locate("def", "abc]QQ]def"_var) == 3);
+
+		// Dont find at the beginning or end
+		assert(! locate("ab", "abc]QQ]def"_var));
+		assert(! locate("Q", "abc]QQ]def"_var));
+		assert(! locate("de", "abc]QQ]def"_var));
+
+		assert(! locate("", ""_var));
+		assert(! locate("", "abc]QQ]def"_var));
+		assert(! locate("000", ""_var));
+
+		// Missing beginning, middle and end
+		assert(! locate("Q", "]QQ]def"_var));
+		assert(! locate("ef", "abc]]def"_var));
+		assert(! locate("bc", "abc]QQ]"_var));
+
+		// Missing beginning, middle and end
+		assert(locate("QQ", "]QQ]def"_var) == 2);
+		assert(locate("def", "abc]]def"_var) == 3);
+		assert(locate("QQ", "abc]QQ]"_var) == 2);
+
+		assert(locate("QQ", "abc]QQ]"_var) == 2);
+
+	}
 
 	printl(elapsedtimetext());
 	printl("Test passed");

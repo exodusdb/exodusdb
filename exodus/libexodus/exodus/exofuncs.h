@@ -469,7 +469,7 @@ ND var  remove(in instring, const int fieldno, const int valueno DEFAULT_0, cons
 // subvalueno=0);
    IO   remover(io iostring, const int fieldno, const int valueno DEFAULT_0, const int subvalueno DEFAULT_0);
 
-ND bool locate(in target, in instring);
+ND var  locate(in target, in instring);
 ND bool locate(in target, in instring, io setting);
 ND bool locate(in target, in instring, io setting, const int fieldno, const int valueno DEFAULT_0);
 

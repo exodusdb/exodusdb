@@ -652,17 +652,6 @@ static bool locatex(const std::string& var_str, const std::string& target, const
 					setting);
 }
 
-// default locate using VM
-bool var::locate(in target, out setting) const {
-
-	THISIS("bool var::locate(in target, out setting, const int fieldno, const int valueno) const")
-	assertString(function_sig);
-	ISSTRING(target)
-	ISDEFINED(setting)
-
-	return locatex(var_str, target.var_str, "", _VM, setting, 0, 0, 0);
-}
-
 bool var::locate(in target, out setting, const int fieldno, const int valueno /*=0*/) const {
 
 	THISIS("bool var::locate(in target, out setting, const int fieldno, const int valueno) const")
@@ -684,15 +673,181 @@ bool var::locate(in target, out setting, const int fieldno, const int valueno /*
 	return locatex(var_str, target.var_str, "", usingchar, setting, fieldno, valueno, 0);
 }
 
-// without setting
-bool var::locate(in target) const {
+//// default locate using VM
+//bool var::locate(in target, out setting) const {
+//
+//	THISIS("bool var::locate(in target, out setting, const int fieldno, const int valueno) const")
+//	assertString(function_sig);
+//	ISSTRING(target)
+//	ISDEFINED(setting)
+//
+//	return locatex(var_str, target.var_str, "", _VM, setting, 0, 0, 0);
+//}
+//
+//// without setting
+//bool var::locate(in target) const {
+//
+//	THISIS("bool var::locate(in target) const")
+//	assertString(function_sig);
+//	ISSTRING(target)
+//
+//	var setting;
+//	return locatex(var_str, target.var_str, "", _VM, setting, 0, 0, 0);
+//}
 
-	THISIS("bool var::locate(in target) const")
+//// without setting
+//bool var::locate(in target) const {
+//
+//	THISIS("bool var::locate(in target) const")
+//	assertString(function_sig);
+//	ISSTRING(target)
+//
+//	// locate "" always false
+//	if (!target.var_str.size())
+//		return false;
+//
+//	std::size_t pos = 0;
+//	std::size_t size = var_str.size();
+//
+//	while (pos < var_str.size()) {
+//
+////		printl();
+////		TRACE(pos)
+//
+//		std::size_t nextpos = var_str.find_first_of("\x1a\x1b\x1c\x1d\x1e\x1f", pos);
+////		TRACE(nextpos)
+//
+//		if (nextpos == std::string::npos) {
+////			TRACE(var_str.substr(pos, size - pos))
+//			return (target.var_str == var_str.substr(pos, size - pos));
+//		}
+//
+////		TRACE(var_str.substr(pos, nextpos - pos))
+//
+//		// nextpos - pos = 6 - 4 = 2
+//		if (target.var_str == var_str.substr(pos, nextpos - pos))
+//			return true;
+//
+//		pos = nextpos;
+//		pos++;
+//	}
+//
+//	// find anything in "" always false
+//	return false;
+//}
+
+// Utility to count any and all field marks in string
+static inline std::size_t count_all_field_marks(std::string_view sv1) {
+
+	// Count any of the field marks before our found substr
+	auto iter = sv1.begin();
+	auto end2 = sv1.end();
+	std::size_t result = 0;
+
+	while (iter != end2) {
+		if ((*iter) <= RM_ && (*iter) >= ST_) {
+			result++;
+		}
+		iter++;
+	}
+	return result;
+}
+
+// locate with setting.
+// Returns nfields + 1 in setting if not found
+bool var::locate(in target, out setting) const {
+
+//	THISIS("bool var::locate(in target, out setting) const")
+//	assertString(function_sig);
+//	ISSTRING(target)
+//	ISDEFINED(setting)
+//	return locatex(var_str, target.var_str, "", _VM, setting, 0, 0, 0);
+
+	setting = this->locate(target);
+
+	if (setting)
+		return true;
+
+	// If not found then return next number (nfields + 1) in setting
+	setting = count_all_field_marks(var_str);
+	if (not var_str.empty())
+		setting++;
+	setting++;
+
+	return false;
+}
+
+// locate without setting.
+// Returns field number if found else 0
+var var::locate(in target) const {
+
+	THISIS("var var::locate(in target) const")
 	assertString(function_sig);
 	ISSTRING(target)
 
-	var setting;
-	return locatex(var_str, target.var_str, "", _VM, setting, 0, 0, 0);
+	// Find "" always false
+	const std::size_t size2 = target.var_str.size();
+	if (!size2)
+		return 0;
+
+	std::size_t pos = 0;
+	const std::size_t size1 = var_str.size();
+	while (pos < size1) {
+
+//TRACE("Searching");
+//TRACE(pos)
+
+		pos = var_str.find(target.var_str, pos);
+
+		// Fail if not found
+		if (pos == std::string::npos) {
+//TRACE("not found")
+			return 0;
+		}
+//TRACE(pos)
+
+		std::size_t pos2 = pos + size2;
+		std::size_t result;
+		char c;
+
+		// Skip if pos > 0 and prior char is not any one of the field marks
+		if (pos > 0) {
+			c = var_str[pos - 1];
+			if (c > RM_ || c < ST_) {
+				goto next_search;
+			}
+		}
+
+		// At this point, pos is at the beginning of the source or just after a field mark
+
+		// Success if at the end
+		if (pos2 >= size1) {
+found:
+			return count_all_field_marks(std::string_view(var_str.data(), pos)) + 1;
+		}
+
+//		TRACE(pos2)
+
+		// Success if the following char is any one of the field marks
+		c = var_str[pos2];
+		if (c <= RM_ && c >= ST_)
+			goto found;
+
+next_search:
+		// Search for any one of the field marks and fail if not found
+		// TODO Can we start next search from pos2 to jump over our matched string?
+		// pos = var_str.find_first_of("\x1a\x1b\x1c\x1d\x1e\x1f", pos);
+		pos = var_str.find_first_of("\x1a\x1b\x1c\x1d\x1e\x1f", pos2);
+		if (pos == std::string::npos)
+			return 0;
+
+		// Start the next search one char after the next field mark found
+		pos++;
+
+	}
+
+	// find anything in "" always false
+	return 0;
 }
 
 ////////////
