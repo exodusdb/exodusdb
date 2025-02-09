@@ -1589,6 +1589,7 @@ class PUBLIC var_base {
 	// Unprotected currently because it is used in free function locateat
 	// TODO verify if static function is thread safe
 	static int localeAwareCompare(const std::string& str1, const std::string& str2);
+//	static int localeAwareCompare(const std::string_view str1, const std::string_view str2);
 	//int localeAwareCompare(const std::string& str2) const;
 
 

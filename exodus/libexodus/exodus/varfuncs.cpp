@@ -273,7 +273,10 @@ template<> PUBLIC VARBASE1::var_base(const std::wstring& wstr1) {
 }
 
 //int var::localeAwareCompare(const std::string& str1, const std::string& str2) {
+//template<> PUBLIC int VARBASE1::localeAwareCompare(const std::string& str1, const std::string& str2) {
 template<> PUBLIC int VARBASE1::localeAwareCompare(const std::string& str1, const std::string& str2) {
+///template<> PUBLIC int VARBASE1::localeAwareCompare(const std::string_view str1, const std::string_view str2) {
+
 	// https://www.boost.org/doc/libs/1_70_0/libs/locale/doc/html/collation.html
 	// eg ensure lower case sorts before uppercase (despite "A" \x41 is less than "a" \x61)
 	init_boost_locale1();
