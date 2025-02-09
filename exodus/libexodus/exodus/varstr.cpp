@@ -233,7 +233,7 @@ IO   var::fieldstorer(SV separator, const int fieldnx, const int nfieldsx, in re
 /////////
 
 // hardcore string locate function given a section of a string and all parameters
-static bool locateat(const std::string& var_str, const std::string& target, std::size_t pos, std::size_t end_pos, const int order, SV usingchar, out setting) {
+static bool locateat(const std::string& var_str, const std::string& target, std::size_t pos, std::size_t end_pos, const char* ordercode, SV usingchar, out setting) {
 	// private - assume everything is defined/assigned correctly
 
 	//
@@ -244,17 +244,35 @@ static bool locateat(const std::string& var_str, const std::string& target, std:
 	//	return true;
 	//}
 
+	int ordermode;
+	if (std::strlen(ordercode) == 0)
+		ordermode = 0;
+	else {
+		// locate the order code in a list of the four possible order codes
+		// and throw if not found
+		const char* ordercodes = "ALARDLDR";
+		const char* orderindex = std::strstr(ordercodes, ordercode);
+		if (orderindex == nullptr)
+			UNLIKELY
+			throw VarError("locateby('" ^ var(ordercode) ^ "') is invalid");
+
+		// convert the memory address to the char position within the codes
+		ordermode = static_cast<int>(orderindex - ordercodes);
+		// add two and divide by two to get the order no AL=1 AR=2 DL=3 DR=4
+		ordermode = (ordermode + 2) >> 1;
+	}
+
 	// pickos strangeness? locate even if out of order
 	// if this is the pickos standard and needs to be implemented properly it should be
 	// implemented as continue to search to end instead of search twice like this this will
 	// probably be switched off as unnecessary and slow behaviour for EXODUS applications
-	if (order) {
+	if (ordermode) {
 		// THISIS(...)
 		// ISSTRING(usingchar)
 		//bool nrvo = locateat(var_str, target, pos, end_pos, 0, usingchar, setting);
 		//if (nrvo)
 		//	return nrvo;
-		if (locateat(var_str, target, pos, end_pos, 0, usingchar, setting))
+		if (locateat(var_str, target, pos, end_pos, "", usingchar, setting))
 			return true;
 	}
 
@@ -289,8 +307,8 @@ static bool locateat(const std::string& var_str, const std::string& target, std:
 		int comp;
 		if (nextpos >= end_pos) {
 			nextpos = end_pos;
-			switch (order) {
-				// No order
+			switch (ordermode) {
+				// No ordermode
 				case '\x00':
 					if (var_str.substr(pos, end_pos - pos) == target) {
 						setting = valuen2;
@@ -368,7 +386,7 @@ static bool locateat(const std::string& var_str, const std::string& target, std:
 
 				default:
 					UNLIKELY
-					throw VarError("locateat() invalid mode " ^ var(order));
+					throw VarError("locateat() invalid mode " ^ var(ordermode));
 			}
 		}
 
@@ -377,8 +395,8 @@ static bool locateat(const std::string& var_str, const std::string& target, std:
 		// but pickos (by accidental error?) at least checks for the whole target
 		// even if the target contains the sep character
 		// if (var_str.substr(pos,nextpos-pos)==target)
-		switch (order) {
-			// No order
+		switch (ordermode) {
+			// No ordermode
 			case '\x00':
 				if (var_str.substr(pos, targetsize) == target) {
 					bool x = (nextpos - pos) <= targetsize;
@@ -392,7 +410,7 @@ static bool locateat(const std::string& var_str, const std::string& target, std:
 			// AL Ascending Left Justified
 			case '\x01':
 				//				//pickos strangeness? to locate a field whereever
-				//it is regardless of order even ""? if
+				//it is regardless of ordermode even ""? if
 				// (!targetsize&&nextpos==pos) break;
 
 				//if (var_str.substr(pos, nextpos - pos) >= target)
@@ -473,7 +491,7 @@ static bool locateat(const std::string& var_str, const std::string& target, std:
 
 			default:
 				UNLIKELY
-				throw VarError("locateat() invalid order" ^ var(order));
+				throw VarError("locateat() invalid ordermode" ^ var(ordermode));
 		}
 		// skip over any sep character
 		pos = nextpos + usingchar_len;
@@ -489,24 +507,6 @@ static bool locatex(const std::string& var_str, const std::string& target, const
 	// done inline since unusual
 	// if (fieldno<0||valueno<0||subvalueno<0) return ""
 
-	int ordermode;
-	if (std::strlen(ordercode) == 0)
-		ordermode = 0;
-	else {
-		// locate the order code in a list of the four possible order codes
-		// and throw if not found
-		const char* ordercodes = "ALARDLDR";
-		const char* orderindex = std::strstr(ordercodes, ordercode);
-		if (orderindex == nullptr)
-			UNLIKELY
-			throw VarError("locateby('" ^ var(ordercode) ^ "') is invalid");
-
-		// convert the memory address to the char position within the codes
-		ordermode = static_cast<int>(orderindex - ordercodes);
-		// add two and divide by two to get the order no AL=1 AR=2 DL=3 DR=4
-		ordermode = (ordermode + 2) >> 1;
-	}
-
 	// zero means all, negative return ""
 	// if (fieldno<=0)     (but locate x<0> using VM should work too
 	if (fieldno <= 0) {
@@ -519,7 +519,7 @@ static bool locatex(const std::string& var_str, const std::string& target, const
 		if (valueno || subvalueno)
 			fieldno = 1;
 		else {
-			return locateat(var_str, target, std::size_t(0), var_str.size(), ordermode,
+			return locateat(var_str, target, std::size_t(0), var_str.size(), ordercode,
 							usingchar, setting);
 		}
 	}
@@ -562,7 +562,7 @@ static bool locatex(const std::string& var_str, const std::string& target, const
 		if (subvalueno)
 			valueno = 1;
 		else
-			return locateat(var_str, target, pos, field_end_pos, ordermode,
+			return locateat(var_str, target, pos, field_end_pos, ordercode,
 							usingchar, setting);
 	}
 
@@ -607,7 +607,7 @@ static bool locatex(const std::string& var_str, const std::string& target, const
 
 		// zero means all
 		if (subvalueno == 0)
-			return locateat(var_str, target, pos, value_end_pos, ordermode, usingchar,
+			return locateat(var_str, target, pos, value_end_pos, ordercode, usingchar,
 							setting);
 
 		// negative means ""
@@ -644,11 +644,11 @@ static bool locatex(const std::string& var_str, const std::string& target, const
 	subvalue_end_pos = sv2.find(SM_, pos);
 //	if (subvalue_end_pos == std::string::npos || subvalue_end_pos > value_end_pos) {
 	if (subvalue_end_pos > value_end_pos) {
-		return locateat(var_str, target, pos, value_end_pos, ordermode, usingchar,
+		return locateat(var_str, target, pos, value_end_pos, ordercode, usingchar,
 						setting);
 	}
 
-	return locateat(var_str, target, pos, subvalue_end_pos, ordermode, usingchar,
+	return locateat(var_str, target, pos, subvalue_end_pos, ordercode, usingchar,
 					setting);
 }
 
@@ -884,7 +884,8 @@ bool var::locateby(const char* ordercode, in target, out setting) const {
 	// if field number is given then locate in values of that field
 	// otherwise locate in fields of the string
 
-	return locatex(var_str, target.var_str, ordercode, _VM, setting, 0, 0, 0);
+//	return locatex(var_str, target.var_str, ordercode, _VM, setting, 0, 0, 0);
+	return locateat(var_str, target, std::size_t(0), var_str.size(), ordercode, _VM, setting);
 }
 
 // 4. specialised const char version of ordercode for speed of usual syntax where ordermode is given as
@@ -953,7 +954,9 @@ bool var::locateusing(const char* usingchar, in target) const {
 	ISSTRING(target)
 
 	var setting = "";
-	return locatex(var_str, target.var_str, "", usingchar, setting, 0, 0, 0);
+//	return locatex(var_str, target.var_str, "", usingchar, setting, 0, 0, 0);
+	return locateat(var_str, target, std::size_t(0), var_str.size(), "", usingchar, setting);
+
 }
 
 // 2. specify field/value/subvalue and return position
