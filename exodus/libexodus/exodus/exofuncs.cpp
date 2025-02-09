@@ -372,7 +372,7 @@ ND PUBLIC var  remove(in instring, const int fieldno, const int valueno DEFAULT_
 
    PUBLIC IO   remover(io iostring, const int fieldno, const int valueno DEFAULT_0, const int subvalueno DEFAULT_0) {iostring.remover(fieldno, valueno, subvalueno); return IOSTRING;}
 
-ND PUBLIC bool locate(in target, in instring) {return instring.locate(target);}
+ND PUBLIC var  locate(in target, in instring) {return instring.locate(target);}
 ND PUBLIC bool locate(in target, in instring, io setting) {return instring.locate(target, setting);}
 ND PUBLIC bool locate(in target, in instring, io setting, const int fieldno, const int valueno DEFAULT_0) {return instring.locate(target, setting, fieldno, valueno);}
 

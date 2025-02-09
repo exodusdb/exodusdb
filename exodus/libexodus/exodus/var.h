@@ -325,6 +325,7 @@ public:
 	ND var  space() const;
 
 	// Returns: A string representing a given number written in words instead of digits.
+	// locale: Something like en_GB, ar_AE, el_CY, es_US, fr_FR etc.
 	// obj is num
 	//
 	// `let softhyphen = "\xc2\xad";
@@ -1292,19 +1293,21 @@ public:
 
 	// LOCATE
 
-	// locate() with only the target substr argument provided searches unordered values separated by VM chars.
-	// Returns: True if found and false if not.
-	// `if ("UK]US]UA"_var.locate("US")) ... ok
+	// locate() with only the target substr argument provided searches unordered values separated by any of the field mark chars.
+	// Returns: The field, value, subvalue etc. number if found or 0 if not.
+	// `if ("UK^US^UA"_var.locate("US")) ... ok // 2
 	//  // or
-	//  if (locate("US", "UK]US]UA"_var)) ... ok`
-	ND bool locate(in target) const;
+	//  if (locate("US", "UK^US^UA"_var)) ... ok`
+	ND var locate(in target) const;
 
-	// locate() with only the target substr and valueno arguments provided searches unordered values separated by VM chars.
-	// Returns: True if found and with the value number in valueno.
-	// Returns: False if not found and with the max value number + 1 in setting. Suitable for additiom of new values
+	// locate() with only the target substr provided and setting returned searches unordered values separated by any type of field mark chars.
+	// Returns: True if found
+	// Setting: Field, value, subvalue etc. number if found or the max number + 1 if not. Suitable for additiom of new values
 	//
-	// `var valueno;
-	//  if ("UK]US]UA"_var.locate("US", valueno)) ... ok // valueno -> 2`
+	// `var setting;
+	//  if ("UK]US]UA"_var.locate("US", setting)) ... ok // setting -> 2
+	//  // or
+	//  if (locate("US", "UK]US]UA"_var, setting)) ... ok`
 	ND bool locate(in target, out valueno) const;
 
 	// locate() the target in unordered fields if fieldno is 0, or values if a fieldno is specified, or subvalues if the valueno argument is provided.

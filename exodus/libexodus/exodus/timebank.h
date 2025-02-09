@@ -119,7 +119,7 @@ auto get_timebank_acno(const std::string_view arg1) -> int {
 
 	// Remember to regenerate timebank.txt after amending this list
 	/*
-		\grep -P 'arg1 == "(.*)"' timebank.h -o|cut -d'"' -f2 | nl -v 500 -s' ' -w3 > timebank.txt
+		\grep -P -v '^\s*//' timebank.h|\grep -P 'arg1 == "(.*)"' -o|cut -d'"' -f2 | nl -v 500 -s' ' -w3 > timebank.txt
 	*/
 
 	     if (++acno && arg1 == "dim& dim::splitter(in str1, SV sepchar)") {}
@@ -275,13 +275,11 @@ auto get_timebank_acno(const std::string_view arg1) -> int {
 	else if (++acno && arg1 == "var  var::field(SV separatorx, const int fieldnx, const int nfieldsx) const") {}
 	else if (++acno && arg1 == "void var::fieldstorer(SV separator0, const int fieldnx, const int nfieldsx, in replacementx) &") {}
 	else if (++acno && arg1 == "bool var::locate(in target, out setting, const int fieldno, const int valueno) const") {}
-	else if (++acno && arg1 == "bool var::locate(in target, out setting, const int fieldno, const int valueno) const") {}
-	else if (++acno && arg1 == "bool var::locate(in target) const") {}
+	else if (++acno && arg1 == "var  var::locate(in target) const") {}
 	else if (++acno && arg1 == "bool var::locateby(const char* ordercode, in target, out setting) const") {}
 	else if (++acno && arg1 == "bool var::locateby(const char* ordercode, in target, out setting, const int fieldno, const int valueno) const") {}
 	else if (++acno && arg1 == "bool var::locatebyusing(const char* ordercode, const char* usingchar, in target, out setting, const int fieldno, const int valueno, const int valueno) const") {}
 	else if (++acno && arg1 == "bool var::locateusing(const char* usingchar, in target) const") {}
-//                                bool var::locateusing(const char* usingchar, in target, out setting, const int fieldno, const int valueno, const int subvalueno) const
 	else if (++acno && arg1 == "bool var::locateusing(const char* usingchar, in target, out setting, const int fieldno, const int valueno, const int subvalueno) const") {}
 	else if (++acno && arg1 == "var  var::f(const int argfieldn, const int argvaluen, const int argsubvaluen) const") {}
 	else if (++acno && arg1 == "void var::remover(int fieldno, int valueno, int subvalueno) &") {}
