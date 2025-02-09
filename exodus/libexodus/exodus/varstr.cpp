@@ -304,83 +304,6 @@ static bool locateat(const std::string_view var_str, const std::string& target, 
 
 		if (nextpos >= end_pos) {
 			nextpos = end_pos;
-			switch (ordermode) {
-
-				// No ordermode
-				case '\x00':
-					if (var_str.substr(pos, end_pos - pos) == target) {
-//					if (std::string_view(var_str.data() + pos, end_pos - pos) == sv_target) {
-						setting = valuen2;
-						return true;
-					}
-					setting = valuen2 + 1;
-					return false;
-
-				// AL Ascending Left Justified (ALPHABETIC)
-				case '\x01':
-
-//					comp = var::localeAwareCompare(var_str.substr(pos, nextpos - pos), target);
-					comp = var::localeAwareCompare(std::string(var_str.substr(pos, nextpos - pos)), target);
-					if (comp == 1) {
-						setting = valuen2;
-						if (comp == 0)
-							return true;
-						else
-							return false;
-					}
-					setting = valuen2 + 1;
-					return false;
-
-				// AR Ascending Right Justified (NUMERIC)
-				case '\x02':
-
-					var_value = var_str.substr(pos, nextpos - pos);
-//					var_value = var(var_str.data() + pos, nextpos - pos);
-					if (var_value >= var_target) {
-						if (var_value == var_target) {
-							setting = valuen2;
-							return true;
-						} else {
-							setting = valuen2;
-							return false;
-						}
-					}
-					setting = valuen2 + 1;
-					return false;
-
-				// DL Descending Left Justified (ALPHABETIC)
-				case '\x03':
-
-//					if (var_str.substr(pos, nextpos - pos) <= target) {
-					if (std::string_view(var_str.data() + pos, nextpos - pos) <= sv_target) {
-						setting = valuen2;
-//						if (var_str.substr(pos, nextpos - pos) == sv_target)
-						if (std::string_view(var_str.data() + pos, nextpos - pos) == sv_target)
-							return true;
-						else
-							return false;
-					}
-					setting = valuen2 + 1;
-					return false;
-
-				// DR Descending Right Justified (NUMERIC)
-				case '\x04':
-
-					var_value = var_str.substr(pos, nextpos - pos);
-					if (var_value <= var_target) {
-						setting = valuen2;
-						if (var_value == var_target)
-							return true;
-						else
-							return false;
-					}
-					setting = valuen2 + 1;
-					return false;
-
-				default:
-					UNLIKELY
-					throw VarError("locateat() invalid mode " ^ var(ordermode));
-			}
 		}
 
 		switch (ordermode) {
@@ -388,19 +311,17 @@ static bool locateat(const std::string_view var_str, const std::string& target, 
 			// No ordermode
 			case '\x00':
 
-//				if (var_str.substr(pos, targetsize) == target) {
-				if (std::string(var_str.data() + pos, targetsize) == sv_target) {
-					if ((nextpos - pos) <= targetsize ) {
-						setting = valuen2;
-						return true;
-					}
+				// Compare using sv for binary sort
+				if (var_str.substr(pos, nextpos - pos) == sv_target) {
+					setting = valuen2;
+					return true;
 				}
 				break;
 
 			// AL Ascending Left Justified (ALPHABETIC)
 			case '\x01':
 
-//				comp = var::localeAwareCompare(var_str.substr(pos, nextpos - pos), target);
+				// Unicode sort?
 				comp = var::localeAwareCompare(std::string(var_str.substr(pos, nextpos - pos)), target);
 				if (comp == 1) {
 					setting = valuen2;
@@ -414,9 +335,8 @@ static bool locateat(const std::string_view var_str, const std::string& target, 
 			// AR Ascending Right Justified (NUMERIC)
 			case '\x02':
 
+				// Compare using var for proper numerical comparison
 				var_value = var_str.substr(pos, nextpos - pos);
-				// This not using var_target so would be doing a numerical conversion on every comparison. Fixed 2024-01-09
-//				if (var_value >= target) {
 				if (var_value >= var_target) {
 					setting = valuen2;
 					if (var_value == target)
@@ -429,11 +349,11 @@ static bool locateat(const std::string_view var_str, const std::string& target, 
 			// DL Descending Left Justified (ALPHABETIC)
 			case '\x03':
 
-//				if (var_str.substr(pos, nextpos - pos) <= target) {
-				if (std::string_view(var_str.data() + pos, nextpos - pos) <= sv_target) {
+				// Compare using sv
+				// TODO use same as AL sort?
+				if (var_str.substr(pos, nextpos - pos) <= sv_target) {
 					setting = valuen2;
-//					if (var_str.substr(pos, nextpos - pos) == target)
-					if (std::string_view(var_str.data() + pos, nextpos - pos) == sv_target)
+					if (var_str.substr(pos, nextpos - pos) == sv_target)
 						return true;
 					else
 						return false;
@@ -443,6 +363,7 @@ static bool locateat(const std::string_view var_str, const std::string& target, 
 			// DR Descending Right Justified (NUMERIC)
 			case '\x04':
 
+				// Compare using var for proper numerical comparison
 				var_value = var_str.substr(pos, nextpos - pos);
 				if (var_value <= var_target) {
 					setting = valuen2;
@@ -457,6 +378,11 @@ static bool locateat(const std::string_view var_str, const std::string& target, 
 				UNLIKELY
 				throw VarError("locateat() invalid ordermode" ^ var(ordermode));
 
+		}
+
+		if (nextpos == end_pos) {
+			setting = valuen2 + 1;
+			return false;
 		}
 
 		// Skip over the sep character
