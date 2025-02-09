@@ -233,22 +233,26 @@ IO   var::fieldstorer(SV separator, const int fieldnx, const int nfieldsx, in re
 /////////
 
 // hardcore string locate function given a section of a string and all parameters
+
 static bool locateat(const std::string& var_str, const std::string& target, std::size_t pos, std::size_t end_pos, const char* ordercode, SV usingchar, out setting) {
-	// private - assume everything is defined/assigned correctly
+//static bool locateat(const std::string& var_str, const std::string_view target, std::size_t pos, std::size_t end_pos, const char* ordercode, SV usingchar, out setting) {
 
-	//
-	// if (target.size()==0&&pos==end_pos)
-	// if (target.size()==0)
-	//{
-	//	setting=1;
-	//	return true;
-	//}
+	// private - assume everything is defined/assigned correctly except ordercode
 
+	// Use vars in AR/DR for numerical comparison
+	var var_value;
+	var var_target;
+
+	// Use string_views for performance in non-AR/DR alphabetic comparison.
+	std::string_view sv_target = target;
+
+	// Analyse order code "", "AL", "AR", "DL", "DR" -> order mode 0 - 4
 	int ordermode;
 	if (std::strlen(ordercode) == 0)
 		ordermode = 0;
 	else {
-		// locate the order code in a list of the four possible order codes
+
+		// Locate the order code in a list of the four possible order codes
 		// and throw if not found
 		const char* ordercodes = "ALARDLDR";
 		const char* orderindex = std::strstr(ordercodes, ordercode);
@@ -256,24 +260,23 @@ static bool locateat(const std::string& var_str, const std::string& target, std:
 			UNLIKELY
 			throw VarError("locateby('" ^ var(ordercode) ^ "') is invalid");
 
-		// convert the memory address to the char position within the codes
+		// Convert the memory address to the char position within the codes
 		ordermode = static_cast<int>(orderindex - ordercodes);
 		// add two and divide by two to get the order no AL=1 AR=2 DL=3 DR=4
 		ordermode = (ordermode + 2) >> 1;
-	}
 
-	// pickos strangeness? locate even if out of order
-	// if this is the pickos standard and needs to be implemented properly it should be
-	// implemented as continue to search to end instead of search twice like this this will
-	// probably be switched off as unnecessary and slow behaviour for EXODUS applications
-	if (ordermode) {
-		// THISIS(...)
-		// ISSTRING(usingchar)
-		//bool nrvo = locateat(var_str, target, pos, end_pos, 0, usingchar, setting);
-		//if (nrvo)
-		//	return nrvo;
+		// Initial pass to return position REGARDLESS of order IF target can be found
+		// pickos strangeness? locate even if out of order
+		// if this is the pickos standard and needs to be implemented properly it should be
+		// implemented as continue to search to end instead of search twice like this this will
+		// probably be switched off as unnecessary and slow behaviour for EXODUS applications
+		// TODO implement as additional check on remainder of fields if returning false in the middle
 		if (locateat(var_str, target, pos, end_pos, "", usingchar, setting))
 			return true;
+
+		// Use if AR/DR for numerical comparison.
+		var_target = target;
+
 	}
 
 	// find null in a null field
@@ -284,68 +287,51 @@ static bool locateat(const std::string& var_str, const std::string& target, std:
 
 	std::size_t usingchar_len = usingchar.size();
 
-	// for use in AR/DR;
-	var value;
-	var target2;
-	target2 = target;
-
-	// find the starting position of the value or return ""
+	// Find the starting position of the value or return ""
 	// using pos and end_pos of
 	auto targetsize = target.size();
 	int valuen2 = 1;
 	do {
 
-		std::size_t nextpos = var_str.find(usingchar, pos);
-		// past end of string?
-		// if (nextpos==string::npos)
-		//{
-		//	setting=valuen2+1;
-		//	return false;
-		//}
-		// nextpos++;
-		// past end of field?
 		int comp;
+		std::size_t nextpos = var_str.find(usingchar, pos);
+
 		if (nextpos >= end_pos) {
 			nextpos = end_pos;
 			switch (ordermode) {
+
 				// No ordermode
 				case '\x00':
 					if (var_str.substr(pos, end_pos - pos) == target) {
+//					if (std::string_view(var_str.data() + pos, end_pos - pos) == sv_target) {
 						setting = valuen2;
 						return true;
 					}
 					setting = valuen2 + 1;
 					return false;
-					//break;
 
-				// AL Ascending Left Justified
+				// AL Ascending Left Justified (ALPHABETIC)
 				case '\x01':
-					//if (var_str.substr(pos, nextpos - pos) >= target)
+
 					comp = var::localeAwareCompare(var_str.substr(pos, nextpos - pos), target);
 					if (comp == 1) {
 						setting = valuen2;
-						//if (var_str.substr(pos, nextpos - pos) ==
-						//    target)
 						if (comp == 0)
 							return true;
 						else
-							// pickos error strangeness? empty is not greater than
-							// any target except empty
-							//						if
-							//(pos==end_pos) setting+=1;
 							return false;
 					}
 					setting = valuen2 + 1;
 					return false;
-					//break;
 
-				// AR Ascending Right Justified
+				// AR Ascending Right Justified (NUMERIC)
 				case '\x02':
-					value = var_str.substr(pos, nextpos - pos);
-					if (value >= target2) {
-						if (value == target2) {
+
+					var_value = var_str.substr(pos, nextpos - pos);
+//					var_value = var(var_str.data() + pos, nextpos - pos);
+					if (var_value >= var_target) {
+						if (var_value == var_target) {
 							setting = valuen2;
-							//setting = valuen2 + (value.size() < target2.size());
 							return true;
 						} else {
 							setting = valuen2;
@@ -354,35 +340,35 @@ static bool locateat(const std::string& var_str, const std::string& target, std:
 					}
 					setting = valuen2 + 1;
 					return false;
-					//break;
 
-				// DL Descending Left Justified
+				// DL Descending Left Justified (ALPHABETIC)
 				case '\x03':
-					if (var_str.substr(pos, nextpos - pos) <= target) {
-						setting = valuen2;
-						if (var_str.substr(pos, nextpos - pos) ==
-							target)
-							return true;
-						else
-							return false;
-					}
-					setting = valuen2 + 1;
-					return false;
-					//break;
 
-				// DR Descending Right Justified
-				case '\x04':
-					value = var_str.substr(pos, nextpos - pos);
-					if (value <= target2) {
+//					if (var_str.substr(pos, nextpos - pos) <= target) {
+					if (std::string_view(var_str.data() + pos, nextpos - pos) <= sv_target) {
 						setting = valuen2;
-						if (value == target2)
+//						if (var_str.substr(pos, nextpos - pos) == sv_target)
+						if (std::string_view(var_str.data() + pos, nextpos - pos) == sv_target)
 							return true;
 						else
 							return false;
 					}
 					setting = valuen2 + 1;
 					return false;
-					//break;
+
+				// DR Descending Right Justified (NUMERIC)
+				case '\x04':
+
+					var_value = var_str.substr(pos, nextpos - pos);
+					if (var_value <= var_target) {
+						setting = valuen2;
+						if (var_value == var_target)
+							return true;
+						else
+							return false;
+					}
+					setting = valuen2 + 1;
+					return false;
 
 				default:
 					UNLIKELY
@@ -390,34 +376,26 @@ static bool locateat(const std::string& var_str, const std::string& target, std:
 			}
 		}
 
-		// if (var_str.substr(pos,nextpos-pos)==target)
-		// should only test for target up to next sep
-		// but pickos (by accidental error?) at least checks for the whole target
-		// even if the target contains the sep character
-		// if (var_str.substr(pos,nextpos-pos)==target)
 		switch (ordermode) {
+
 			// No ordermode
 			case '\x00':
-				if (var_str.substr(pos, targetsize) == target) {
-					bool x = (nextpos - pos) <= targetsize;
-					if (x) {
+
+//				if (var_str.substr(pos, targetsize) == target) {
+				if (std::string(var_str.data() + pos, targetsize) == sv_target) {
+					if ((nextpos - pos) <= targetsize ) {
 						setting = valuen2;
 						return true;
 					}
 				}
 				break;
 
-			// AL Ascending Left Justified
+			// AL Ascending Left Justified (ALPHABETIC)
 			case '\x01':
-				//				//pickos strangeness? to locate a field whereever
-				//it is regardless of ordermode even ""? if
-				// (!targetsize&&nextpos==pos) break;
 
-				//if (var_str.substr(pos, nextpos - pos) >= target)
 				comp = var::localeAwareCompare(var_str.substr(pos, nextpos - pos), target);
 				if (comp == 1) {
 					setting = valuen2;
-					//if (var_str.substr(pos, nextpos - pos) == target)
 					if (comp == 0)
 						return true;
 					else
@@ -425,64 +403,42 @@ static bool locateat(const std::string& var_str, const std::string& target, std:
 				}
 				break;
 
-			// DL Descending Left Justified
+			// AR Ascending Right Justified (NUMERIC)
 			case '\x02':
-				//				//pickos strangeness? to locate a field whereever
-				//it is regardless of order even ""? if
-				// (!targetsize&&nextpos==pos) break;
 
-				value = var_str.substr(pos, nextpos - pos);
-				if (value >= target) {
-					//if (value >= target2) {
+				var_value = var_str.substr(pos, nextpos - pos);
+				// This not using var_target so would be doing a numerical conversion on every comparison. Fixed 2024-01-09
+//				if (var_value >= target) {
+				if (var_value >= var_target) {
 					setting = valuen2;
-					if (value == target)
-						//if (value == target2)
+					if (var_value == target)
 						return true;
 					else
 						return false;
 				}
 				break;
 
-			// AR Ascending Right Justified
+			// DL Descending Left Justified (ALPHABETIC)
 			case '\x03':
-				//				//pickos strangeness? to locate a field whereever
-				//it is regardless of order even ""? if
-				// (!targetsize&&nextpos==pos) break;
 
-				if (var_str.substr(pos, nextpos - pos) <= target) {
+//				if (var_str.substr(pos, nextpos - pos) <= target) {
+				if (std::string_view(var_str.data() + pos, nextpos - pos) <= sv_target) {
 					setting = valuen2;
-					if (var_str.substr(pos, nextpos - pos) == target)
+//					if (var_str.substr(pos, nextpos - pos) == target)
+					if (std::string_view(var_str.data() + pos, nextpos - pos) == sv_target)
 						return true;
 					else
 						return false;
 				}
-
-				/*
-				value = var_str.substr(pos, nextpos - pos);
-				if (value <= target2) {
-					if (value == target2) {
-						//setting = valuen2;
-						setting = valuen2;//(value.size() < target2.size());
-						return true;
-					}
-					else {
-						setting = valuen2;
-						return false;
-					}
-				}
-				*/
 				break;
 
-			// DR Descending Right Justified
+			// DR Descending Right Justified (NUMERIC)
 			case '\x04':
-				//				//pickos strangeness? to locate a field whereever
-				//it is regardless of order even ""? if
-				// (!targetsize&&nextpos==pos) break;
 
-				value = var_str.substr(pos, nextpos - pos);
-				if (value <= target2) {
+				var_value = var_str.substr(pos, nextpos - pos);
+				if (var_value <= var_target) {
 					setting = valuen2;
-					if (value == target2)
+					if (var_value == var_target)
 						return true;
 					else
 						return false;
@@ -492,10 +448,14 @@ static bool locateat(const std::string& var_str, const std::string& target, std:
 			default:
 				UNLIKELY
 				throw VarError("locateat() invalid ordermode" ^ var(ordermode));
+
 		}
-		// skip over any sep character
+
+		// Skip over the sep character
 		pos = nextpos + usingchar_len;
+
 		valuen2++;
+
 	} while (true);
 }
 
