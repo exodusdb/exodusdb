@@ -234,10 +234,16 @@ IO   var::fieldstorer(SV separator, const int fieldnx, const int nfieldsx, in re
 
 // hardcore string locate function given a section of a string and all parameters
 
-static bool locateat(const std::string& var_str, const std::string& target, std::size_t pos, std::size_t end_pos, const char* ordercode, SV usingchar, out setting) {
+static bool locateat(const std::string_view var_str, const std::string& target, const char* ordercode, SV usingchar, out setting) {
 //static bool locateat(const std::string& var_str, const std::string_view target, std::size_t pos, std::size_t end_pos, const char* ordercode, SV usingchar, out setting) {
 
 	// private - assume everything is defined/assigned correctly except ordercode
+
+//	if (var_str.size() != end_pos0 - pos0)
+//		throw "bugg";
+
+	std::size_t pos = 0;
+	std::size_t end_pos = var_str.size();
 
 	// Use vars in AR/DR for numerical comparison
 	var var_value;
@@ -271,7 +277,7 @@ static bool locateat(const std::string& var_str, const std::string& target, std:
 		// implemented as continue to search to end instead of search twice like this this will
 		// probably be switched off as unnecessary and slow behaviour for EXODUS applications
 		// TODO implement as additional check on remainder of fields if returning false in the middle
-		if (locateat(var_str, target, pos, end_pos, "", usingchar, setting))
+		if (locateat(var_str, target, "", usingchar, setting))
 			return true;
 
 		// Use if AR/DR for numerical comparison.
@@ -313,7 +319,8 @@ static bool locateat(const std::string& var_str, const std::string& target, std:
 				// AL Ascending Left Justified (ALPHABETIC)
 				case '\x01':
 
-					comp = var::localeAwareCompare(var_str.substr(pos, nextpos - pos), target);
+//					comp = var::localeAwareCompare(var_str.substr(pos, nextpos - pos), target);
+					comp = var::localeAwareCompare(std::string(var_str.substr(pos, nextpos - pos)), target);
 					if (comp == 1) {
 						setting = valuen2;
 						if (comp == 0)
@@ -393,7 +400,8 @@ static bool locateat(const std::string& var_str, const std::string& target, std:
 			// AL Ascending Left Justified (ALPHABETIC)
 			case '\x01':
 
-				comp = var::localeAwareCompare(var_str.substr(pos, nextpos - pos), target);
+//				comp = var::localeAwareCompare(var_str.substr(pos, nextpos - pos), target);
+				comp = var::localeAwareCompare(std::string(var_str.substr(pos, nextpos - pos)), target);
 				if (comp == 1) {
 					setting = valuen2;
 					if (comp == 0)
@@ -479,8 +487,7 @@ static bool locatex(const std::string& var_str, const std::string& target, const
 		if (valueno || subvalueno)
 			fieldno = 1;
 		else {
-			return locateat(var_str, target, std::size_t(0), var_str.size(), ordercode,
-							usingchar, setting);
+			return locateat(std::string_view(var_str), target, ordercode, usingchar, setting);
 		}
 	}
 
@@ -522,8 +529,7 @@ static bool locatex(const std::string& var_str, const std::string& target, const
 		if (subvalueno)
 			valueno = 1;
 		else
-			return locateat(var_str, target, pos, field_end_pos, ordercode,
-							usingchar, setting);
+			return locateat(std::string_view(var_str.data() + pos, field_end_pos - pos), target, ordercode, usingchar, setting);
 	}
 
 	// find the starting position of the value or return ""
@@ -567,8 +573,7 @@ static bool locatex(const std::string& var_str, const std::string& target, const
 
 		// zero means all
 		if (subvalueno == 0)
-			return locateat(var_str, target, pos, value_end_pos, ordercode, usingchar,
-							setting);
+			return locateat(std::string_view(var_str.data() + pos, value_end_pos - pos), target, ordercode, usingchar, setting);
 
 		// negative means ""
 		else {
@@ -604,12 +609,10 @@ static bool locatex(const std::string& var_str, const std::string& target, const
 	subvalue_end_pos = sv2.find(SM_, pos);
 //	if (subvalue_end_pos == std::string::npos || subvalue_end_pos > value_end_pos) {
 	if (subvalue_end_pos > value_end_pos) {
-		return locateat(var_str, target, pos, value_end_pos, ordercode, usingchar,
-						setting);
+		return locateat(std::string_view(var_str.data() + pos, value_end_pos - pos), target, ordercode, usingchar, setting);
 	}
 
-	return locateat(var_str, target, pos, subvalue_end_pos, ordercode, usingchar,
-					setting);
+	return locateat(std::string_view(var_str.data() + pos, subvalue_end_pos - pos), target, ordercode, usingchar, setting);
 }
 
 bool var::locate(in target, out setting, const int fieldno, const int valueno /*=0*/) const {
@@ -845,7 +848,7 @@ bool var::locateby(const char* ordercode, in target, out setting) const {
 	// otherwise locate in fields of the string
 
 //	return locatex(var_str, target.var_str, ordercode, _VM, setting, 0, 0, 0);
-	return locateat(var_str, target, std::size_t(0), var_str.size(), ordercode, _VM, setting);
+	return locateat(std::string_view(var_str), target, ordercode, _VM, setting);
 }
 
 // 4. specialised const char version of ordercode for speed of usual syntax where ordermode is given as
@@ -915,7 +918,7 @@ bool var::locateusing(const char* usingchar, in target) const {
 
 	var setting = "";
 //	return locatex(var_str, target.var_str, "", usingchar, setting, 0, 0, 0);
-	return locateat(var_str, target, std::size_t(0), var_str.size(), "", usingchar, setting);
+	return locateat(std::string_view(var_str), target, "", usingchar, setting);
 
 }
 
