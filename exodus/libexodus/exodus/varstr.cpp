@@ -234,29 +234,17 @@ IO   var::fieldstorer(SV separator, const int fieldnx, const int nfieldsx, in re
 
 // hardcore string locate function given a section of a string and all parameters
 
-static bool locateat(const std::string_view var_str, const std::string& target, const char* ordercode, SV usingchar, out setting) {
-//static bool locateat(const std::string& var_str, const std::string_view target, std::size_t pos, std::size_t end_pos, const char* ordercode, SV usingchar, out setting) {
+static bool locateat(SV sv_source, SV sv_target, const char* ordercode, SV usingchar, out setting) {
 
-	// private - assume everything is defined/assigned correctly except ordercode
-
-//	if (var_str.size() != end_pos0 - pos0)
-//		throw "bugg";
-
-	std::size_t pos = 0;
-	std::size_t end_pos = var_str.size();
-
-	// Use vars in AR/DR for numerical comparison
-	var var_value;
+	// Use vars in AR/DR for numerical ordering
 	var var_target;
 
-	// Use string_views for performance in non-AR/DR alphabetic comparison.
-	std::string_view sv_target = target;
+	// AL localeAwareCompare requires a std::string
+	std::string str_target;
 
 	// Analyse order code "", "AL", "AR", "DL", "DR" -> order mode 0 - 4
-	int ordermode;
-	if (std::strlen(ordercode) == 0)
-		ordermode = 0;
-	else {
+	int ordermode = 0;
+	if (*ordercode) {
 
 		// Locate the order code in a list of the four possible order codes
 		// and throw if not found
@@ -277,102 +265,126 @@ static bool locateat(const std::string_view var_str, const std::string& target, 
 		// implemented as continue to search to end instead of search twice like this this will
 		// probably be switched off as unnecessary and slow behaviour for EXODUS applications
 		// TODO implement as additional check on remainder of fields if returning false in the middle
-		if (locateat(var_str, target, "", usingchar, setting))
+		//////////////////////////////////////////////////////
+		// FIRST PASS
+		//////////////////////////////////////////////////////
+		if (locateat(sv_source, sv_target, "", usingchar, setting))
 			return true;
+		//////////////////////////////////////////////////////
 
 		// Use if AR/DR for numerical comparison.
-		var_target = target;
+		var_target = sv_target;
 
+		// Use for AL localeAwareCompare
+		str_target = sv_target;
 	}
+
+	// Initialise positions
+	std::size_t pos = 0;
+	std::size_t end_pos = sv_source.size();
 
 	// find null in a null field
 	if (pos >= end_pos) {
 		setting = 1;
-		return !target.size();
+		return sv_target.empty();
 	}
 
+	// May be searching for multi byte separators
 	std::size_t usingchar_len = usingchar.size();
 
 	// Find the starting position of the value or return ""
 	// using pos and end_pos of
-	auto targetsize = target.size();
+	auto targetsize = sv_target.size();
 	int valuen2 = 1;
 	do {
 
 		int comp;
-		std::size_t nextpos = var_str.find(usingchar, pos);
+		std::size_t nextpos = sv_source.find(usingchar, pos);
 
+		// if sep not found then next field conceptually starts one after the end of the string
 		if (nextpos >= end_pos) {
 			nextpos = end_pos;
 		}
 
+		SV sv_value = sv_source.substr(pos, nextpos - pos);
+
 		switch (ordermode) {
 
 			// No ordermode
-			case '\x00':
+			case '\x00': {
 
 				// Compare using sv for binary sort
-				if (var_str.substr(pos, nextpos - pos) == sv_target) {
+				if (sv_value == sv_target) {
 					setting = valuen2;
 					return true;
 				}
 				break;
+			}
 
 			// AL Ascending Left Justified (ALPHABETIC)
-			case '\x01':
+			case '\x01': {
 
 				// Unicode sort?
-				comp = var::localeAwareCompare(std::string(var_str.substr(pos, nextpos - pos)), target);
-				if (comp == 1) {
+				auto str_value = std::string(sv_value);
+				auto three_way_comparison = var::localeAwareCompare(str_value, str_target);
+				if (three_way_comparison >= 0) {
 					setting = valuen2;
-					if (comp == 0)
+					if (three_way_comparison == 0)
+						// Should not happen since PASS1 also checks strings not vars
 						return true;
 					else
 						return false;
 				}
 				break;
+			}
 
 			// AR Ascending Right Justified (NUMERIC)
-			case '\x02':
+			case '\x02': {
 
 				// Compare using var for proper numerical comparison
-				var_value = var_str.substr(pos, nextpos - pos);
+				var var_value = sv_value;
 				if (var_value >= var_target) {
 					setting = valuen2;
-					if (var_value == target)
+					if (var_value == var_target)
+						// Should not happen but PASS1 only checks strings not vars
 						return true;
 					else
 						return false;
 				}
 				break;
+			}
 
 			// DL Descending Left Justified (ALPHABETIC)
-			case '\x03':
+			case '\x03': {
 
 				// Compare using sv
 				// TODO use same as AL sort?
-				if (var_str.substr(pos, nextpos - pos) <= sv_target) {
+				if (sv_value <= sv_target) {
 					setting = valuen2;
-					if (var_str.substr(pos, nextpos - pos) == sv_target)
+					if (sv_value == sv_target)
+						// Should not happen since PASS1 also checks strings not vars
 						return true;
 					else
 						return false;
 				}
 				break;
+			}
 
 			// DR Descending Right Justified (NUMERIC)
-			case '\x04':
+			case '\x04': {
 
 				// Compare using var for proper numerical comparison
-				var_value = var_str.substr(pos, nextpos - pos);
+				var var_value = sv_value;
 				if (var_value <= var_target) {
 					setting = valuen2;
 					if (var_value == var_target)
+						// Should not happen but PASS1 only checks strings not vars
 						return true;
 					else
 						return false;
 				}
 				break;
+			}
 
 			default:
 				UNLIKELY
@@ -380,6 +392,7 @@ static bool locateat(const std::string_view var_str, const std::string& target, 
 
 		}
 
+		// If we just processed the last field then quit with false and point to n + 1 field number
 		if (nextpos == end_pos) {
 			setting = valuen2 + 1;
 			return false;
@@ -394,7 +407,7 @@ static bool locateat(const std::string_view var_str, const std::string& target, 
 }
 
 // locate within extraction
-static bool locatex(const std::string& var_str, const std::string& target, const char* ordercode, SV usingchar, out setting, int fieldno, int valueno, const int subvalueno) {
+static bool locatex(SV source, SV target, const char* ordercode, SV usingchar, out setting, int fieldno, int valueno, const int subvalueno) {
 	// private - assume everything is defined/assigned correctly
 
 	// any negatives at all returns ""
@@ -413,7 +426,7 @@ static bool locatex(const std::string& var_str, const std::string& target, const
 		if (valueno || subvalueno)
 			fieldno = 1;
 		else {
-			return locateat(std::string_view(var_str), target, ordercode, usingchar, setting);
+			return locateat(source, target, ordercode, usingchar, setting);
 		}
 	}
 
@@ -421,7 +434,7 @@ static bool locatex(const std::string& var_str, const std::string& target, const
 	std::size_t pos = 0;
 	int fieldn2 = 1;
 	while (fieldn2 < fieldno) {
-		pos = var_str.find(FM_, pos);
+		pos = source.find(FM_, pos);
 		// past of of string?
 		if (pos == std::string::npos) {
 			// if (valueno||subvalueno) setting=1;
@@ -435,9 +448,9 @@ static bool locatex(const std::string& var_str, const std::string& target, const
 
 	// find the end of the field (or string)
 	std::size_t field_end_pos;
-	field_end_pos = var_str.find(FM_, pos);
+	field_end_pos = source.find(FM_, pos);
 	if (field_end_pos == std::string::npos)
-		field_end_pos = var_str.size();
+		field_end_pos = source.size();
 
 	// FIND VALUE
 
@@ -455,13 +468,13 @@ static bool locatex(const std::string& var_str, const std::string& target, const
 		if (subvalueno)
 			valueno = 1;
 		else
-			return locateat(std::string_view(var_str.data() + pos, field_end_pos - pos), target, ordercode, usingchar, setting);
+			return locateat(SV(source.data() + pos, field_end_pos - pos), target, ordercode, usingchar, setting);
 	}
 
 	// find the starting position of the value or return ""
 	// using pos and end_pos of
 	int valuen2 = 1;
-	auto sv1 = std::string_view(var_str.data(), field_end_pos);
+	SV sv1 = SV(source.data(), field_end_pos);
 	while (valuen2 < valueno) {
 		pos = sv1.find(VM_, pos);
 		// past end of string?
@@ -499,7 +512,7 @@ static bool locatex(const std::string& var_str, const std::string& target, const
 
 		// zero means all
 		if (subvalueno == 0)
-			return locateat(std::string_view(var_str.data() + pos, value_end_pos - pos), target, ordercode, usingchar, setting);
+			return locateat(SV(source.data() + pos, value_end_pos - pos), target, ordercode, usingchar, setting);
 
 		// negative means ""
 		else {
@@ -511,7 +524,7 @@ static bool locatex(const std::string& var_str, const std::string& target, const
 	// find the starting position of the subvalue or return ""
 	// using pos and end_pos of
 	int subvaluen2 = 1;
-	auto sv2 = std::string_view(var_str.data(), value_end_pos);
+	SV sv2 = SV(source.data(), value_end_pos);
 	while (subvaluen2 < subvalueno) {
 		pos = sv2.find(SM_, pos);
 		// past end of string?
@@ -535,10 +548,10 @@ static bool locatex(const std::string& var_str, const std::string& target, const
 	subvalue_end_pos = sv2.find(SM_, pos);
 //	if (subvalue_end_pos == std::string::npos || subvalue_end_pos > value_end_pos) {
 	if (subvalue_end_pos > value_end_pos) {
-		return locateat(std::string_view(var_str.data() + pos, value_end_pos - pos), target, ordercode, usingchar, setting);
+		return locateat(SV(source.data() + pos, value_end_pos - pos), target, ordercode, usingchar, setting);
 	}
 
-	return locateat(std::string_view(var_str.data() + pos, subvalue_end_pos - pos), target, ordercode, usingchar, setting);
+	return locateat(SV(source.data() + pos, subvalue_end_pos - pos), target, ordercode, usingchar, setting);
 }
 
 bool var::locate(in target, out setting, const int fieldno, const int valueno /*=0*/) const {
@@ -626,7 +639,7 @@ bool var::locate(in target, out setting, const int fieldno, const int valueno /*
 //}
 
 // Utility to count any and all field marks in string
-static inline std::size_t count_all_field_marks(std::string_view sv1) {
+static inline std::size_t count_all_field_marks(SV sv1) {
 
 	// Count any of the field marks before our found substr
 	auto iter = sv1.begin();
@@ -712,7 +725,7 @@ var var::locate(in target) const {
 		// Success if at the end
 		if (pos2 >= size1) {
 found:
-			return count_all_field_marks(std::string_view(var_str.data(), pos)) + 1;
+			return count_all_field_marks(SV(var_str.data(), pos)) + 1;
 		}
 
 //		TRACE(pos2)
@@ -774,7 +787,7 @@ bool var::locateby(const char* ordercode, in target, out setting) const {
 	// otherwise locate in fields of the string
 
 //	return locatex(var_str, target.var_str, ordercode, _VM, setting, 0, 0, 0);
-	return locateat(std::string_view(var_str), target, ordercode, _VM, setting);
+	return locateat(var_str, target, ordercode, _VM, setting);
 }
 
 // 4. specialised const char version of ordercode for speed of usual syntax where ordermode is given as
@@ -844,7 +857,7 @@ bool var::locateusing(const char* usingchar, in target) const {
 
 	var setting = "";
 //	return locatex(var_str, target.var_str, "", usingchar, setting, 0, 0, 0);
-	return locateat(std::string_view(var_str), target, "", usingchar, setting);
+	return locateat(var_str, target, "", usingchar, setting);
 
 }
 
@@ -947,7 +960,7 @@ var  var::f(const int argfieldn, const int argvaluen/*=0*/, const int argsubvalu
 	// find the starting position of the value or return ""
 	// using pos and end_pos of
 	int valuen2 = 1;
-	auto sv1 = std::string_view(var_str.data(), field_end_pos);
+	SV sv1 = SV(var_str.data(), field_end_pos);
 	while (valuen2 < valueno) {
 		pos = sv1.find(VM_, pos);
 		// past end of string?
@@ -979,7 +992,7 @@ var  var::f(const int argfieldn, const int argvaluen/*=0*/, const int argsubvalu
 	// find the starting position of the subvalue or return ""
 	// using pos and end_pos of
 	int subvaluen2 = 1;
-	auto sv2 = std::string_view(var_str.data(), value_end_pos);
+	SV sv2 = SV(var_str.data(), value_end_pos);
 	while (subvaluen2 < subvalueno) {
 		pos = sv2.find(SM_, pos);
 		// past end of string?
