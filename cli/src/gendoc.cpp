@@ -13,6 +13,10 @@ var codeptr;
 var doc_text;
 
 bool wiki = OPTIONS.contains("w");
+bool man = OPTIONS.contains("m");
+bool html = not (wiki or man);
+
+var tableno = 0;
 
 function main() {
 //	doc_outputl("gendoc says 'Hello World!'");
@@ -77,7 +81,8 @@ function main() {
 
 				// Close prior table
 				if (in_table) {
-					if (wiki) {
+					if (man) {}
+					else if (wiki) {
 						doc_outputl("|}");
 					} else {
 						doc_outputl("</table>");
@@ -95,7 +100,13 @@ function main() {
 				let short_title = table_title.f(1, 3).tcase().replace("Mv", "MV").replace("Os", "OS");
 
 				let level = table_title.f(1, 2).len();
-				if (wiki) {
+				if (man) {
+					// Section header
+					doc_outputl(".SH ", ++tableno, ". ", short_title.ucase());
+					doc_outputl(".SH");
+					doc_outputl("");
+				}
+				else if (wiki) {
 					let wiki_title = str("=", level);
 					doc_outputl(wiki_title, " ", short_title, " ", wiki_title);
 					doc_outputl("");
@@ -161,6 +172,7 @@ function main() {
 				if (prefix == "/" "/") {
 					// Collect up comments starting // (two slashes, not more)
 					lastcomment ^= srcline.substr(4) ^ FM_;
+
 				} else {
 
 					// From thrown away comments, get the default obj name for all following functions
@@ -214,7 +226,9 @@ function main() {
 			let objname = objmatch.f(1,2);
 
 			// Emphasise "Returns:"
-			comments.replacer("Returns:", "<em>Returns:</em>");
+			if (man) {}
+			else
+				comments.replacer("Returns:", "<em>Returns:</em>");
 
 			// Format backticked source code fragments
 			if (comments.contains("`")) {
@@ -348,11 +362,27 @@ function main() {
 						outputcode(progheader);
 					}
 
+					// Move rhs asserts onto separate lines
+					codematch.replacer(rex(R"__(;\s*assert([^\n;]*))__"), ";\n\t\tassert\\1\n");
+
+					// Tidy up
+					codematch.replacer(rex(R"__(\n;)__"), ";\n");
+					codematch.replacer(rex(R"__(\n(\n[\t ]*assert))__"), "\\1");
+					codematch.replacer(rex(R"__([\t ]*\n)__"), "\n");
+
 					outputcode(codematch);
 				}
 
 				// tag backticked code as c++
-				if (wiki)
+				if (man) {
+					// Man page codes
+					// .RS Right shift
+					// .nf No format
+					// .RE REturn (left shift)
+					// .fi formatting
+					comments.replacer(backquoted, ".RS\n.nf\n\n$1\n.fi\n.RE\n");
+				}
+				else if (wiki)
 					comments.replacer(backquoted, "<syntaxhighlight lang=\"c++\">\n$1</syntaxhighlight>");
 				else
 					// Javascript instead of cpp because it gives better highlighting for exodus c++. See above too.
@@ -361,7 +391,10 @@ function main() {
 					comments.replacer(backquoted, "\n<pre><code class='hljs-ncdecl language-javascript'>$1</code></pre>\n");
 			}
 
-			comments.replacer(_FM, "</p>\n");
+			if (man)
+				comments.replacer(_FM, "\n\n");
+			else
+				comments.replacer(_FM, "</p>\n");
 
 			var line2 = srcline.field(";", 1);
 
@@ -405,7 +438,8 @@ function main() {
 			line2.replacer("DEFAULT_CSPACE", R"__(= ' ')__");
 
 			// bold the function name
-			if (wiki) {
+			if (man) {}
+			else if (wiki) {
 				line2.prefixer("<em>");
 				line2.paster(line2.index("("), "</em>");
 			} else {
@@ -415,7 +449,30 @@ function main() {
 
 			let func_decl = (objname ?: default_objname) ^ "." ^ line2;
 
-			if (wiki) {
+			if (man) {
+
+				var func_decl2 = func_decl;
+				if (prefix == "if")
+					func_decl2 = "if (" ^ func_decl ^ ") ...";
+				else if (prefix == "var=")
+					func_decl2 = "var v1 = " ^ func_decl ^ ";";
+
+				// Subsection header
+				doc_outputl(".SS");
+				// Put on a separate line to avoid suppression of double quote chars
+				doc_outputl(func_decl2);
+
+				// Hack to defeat man's stubborn insistence on suppressing blank lines between section title and section text
+				doc_outputl(".nf");
+//				doc_outputl(" ");
+//				doc_outputl("\u000A");
+				doc_outputl("\u2003"); //U+2003 EM SPACE
+				doc_outputl(".fi");
+
+				doc_outputl(comments);
+				doc_outputl("");
+			}
+			else if (wiki) {
 //				line2 = "|" ^ prefix ^ "||" ^ (objname ?: default_objname) ^ "." ^ line2 ^ "||" ^ comments;
 //				doc_outputl(line2);
 				doc_outputl("|-");
@@ -434,7 +491,8 @@ function main() {
 
 		// Close prior table
 		if (in_table) {
-			if (wiki)
+			if (man) {}
+			else if (wiki)
 				doc_outputl("|}:");
 			else
 				doc_outputl("</table>");
@@ -457,7 +515,9 @@ function main() {
 		// Finally actually output the doc text
 
 		// After outputing css and contents
-		if (not wiki) {
+		if (man) {}
+		else if (wiki) {}
+		else if (html) {
 
 			// c++ syntax highlighter - highlight.js
 			outputl(highlight_js);
@@ -478,8 +538,16 @@ function main() {
 		}
 
 		// Header
-		outputl(fileheader);
-		outputl("");
+		if (man) {
+			outputl(".TH ", "var");
+			outputl("");
+			outputl(fileheader);
+			outputl("");
+		}
+		else {
+			outputl(fileheader);
+			outputl("");
+		}
 
 		// Text
 		outputl(doc_text);

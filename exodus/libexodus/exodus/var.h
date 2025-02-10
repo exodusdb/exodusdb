@@ -513,34 +513,36 @@ public:
 
 	//  obj is strvar
 
-	// Upper case
+	// To upper case
 	//
 	// `let v1 = "Γιάννης"_var.ucase(); // "ΓΙΆΝΝΗΣ"
 	//  // or
 	//  let v2 = ucase("Γιάννης");`
 	ND var  ucase() const&;
 
-	// Lower case
+	// To lower case
 	//
 	// `let v1 = "ΓΙΆΝΝΗΣ"_var.lcase(); // "γιάννης"
 	//  // or
 	//  let v2 = lcase("ΓΙΆΝΝΗΣ");`
 	ND var  lcase() const&;
 
-	// Title case (first letters)
+	// To title case (first letters are capitalised)
 	//
 	// `let v1 = "γιάννης"_var.tcase(); // "Γιάννης"
 	//  // or
 	//  let v2 = tcase("γιάννης");`
 	ND var  tcase() const&;
 
-	// Fold case (lower case and remove accents for indexing)
+	// To folded case (lower case and remove accents for indexing)
 	ND var  fcase() const&;
 
-	// Normalise Unicode to NFC to eliminate different code combinations of the same character
+	// Normalises unicode code points sequences to their standardised NFC form making them binary comparable.
 	ND var  normalize() const&;
 
 	// Simple reversible disguising of text
+	// invert(invert()) returns to original.
+	// Flips bit 8 of unicode code points. Note that ASCII bytes become multibyte UTF-8 so string sizes change.
 	//
 	// `let v1 = "abc"_var.invert(); // "\xC2" "\x9E" "\xC2" "\x9D" "\xC2" "\x9C"
 	//  // or
@@ -978,6 +980,8 @@ public:
 			template <typename... ARGS>
 	   IO   appender(const ARGS&... appendable) REF {
 				((*this) ^= ... ^= appendable);
+
+				false && (*this);
 //				return void;
 			}
 
@@ -2432,13 +2436,12 @@ public:
 	// Result is between (modulus, 0] if modulus is negative (symmetric)
 	// Throws: VarDivideByZero if modulus is zero.
 	// Floating point works.
-	// mod(11, 5); // 1
-	// mod(-11, 5); // 4
-	// mod(11, -5); // -4
-	// mod(-11, -5); // -1
 	// `let v1 = var(11).mod(5); // 1
 	//  // or
-	//  let v2 = mod(11, 5);`
+	//  let v2 = mod(11, 5); // 1
+	//  let v3 = mod(-11, 5); // 4
+	//  let v4 = mod(11, -5); // -4
+	//  let v5 = mod(-11, -5); // -1`
 	ND var  mod(in modulus) const;
 
 	// Not documenting the overloaded versions

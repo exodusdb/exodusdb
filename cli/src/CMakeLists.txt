@@ -250,7 +250,13 @@
 			include/exodus
 	)
 
-# 6. CLEAN OUT ANY EDIC/COMPILE libs in ~/lib THAT WILL SHADOW THE REAL FILE IN /usr/local/lib
+# 6. Install man pages
+######################
+install(FILES var.1
+        DESTINATION ${CMAKE_INSTALL_PREFIX}/share/man/man1
+        COMPONENT man)
+
+# 7. CLEAN OUT ANY EDIC/COMPILE libs in ~/lib THAT WILL SHADOW THE REAL FILE IN /usr/local/lib
 #############################################
 	install(
 		CODE "
