@@ -47,6 +47,7 @@
 #define _TM "\x1B"  // Text Mark
 #define _ST "\x1A"  // Subtext Mark
 
+#define _NL "\n"
 #define _BS "\\"
 #define _DQ "\""
 #define _SQ "\'"
@@ -61,6 +62,7 @@
 #define TM_ '\x1B'     // Text Mark
 #define ST_ '\x1A'     // Subtext Mark
 
+#define NL_ '\n'
 #define BS_ '\\'
 #define DQ_ '\"'
 #define SQ_ '\''

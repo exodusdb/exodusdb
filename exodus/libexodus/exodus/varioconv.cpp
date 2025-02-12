@@ -127,20 +127,23 @@ var  var::iconv(const char* conversion) const {
 					// check second character
 					switch (*pconversion) {
 
-						// "MT"
-						case 'T':
+						// "MT" - Time of day. May be MT\0 or MT2 MT2...
+						case 'T': {
 							// result ^= part.iconv_MT(conversion);
-							result ^= part.iconv_MT();
+							auto strict = *(pconversion + 1) != '2';
+							result ^= part.iconv_MT(strict);
 							break;
+						}
 
 						// "MR" - replace iconv is same as oconv!
-						case 'R':
+						case 'R': {
 							//result ^= part.oconv_MR(pconversion);
 							result ^= part.oconv_MR(conversion);
 							break;
+						}
 
 						// "MX" number to hex (not string to hex)
-						case 'X': UNLIKELY
+						case 'X': UNLIKELY {
 							throw VarNotImplemented("iconv('MX')");
 							// std::ostringstream ss;
 							// ss << std::hex << std::uppercase << part.round().toInt();
@@ -148,10 +151,11 @@ var  var::iconv(const char* conversion) const {
 							// break;
 							//std::unreachable();
 							break;
+						}
 
 						// "MD" "MC" - Decimal places
 						case 'D':
-						case 'C': UNLIKELY
+						case 'C': UNLIKELY {
 
 							throw VarError(
 								"iconv MD and MC are not implemented yet");
@@ -159,9 +163,10 @@ var  var::iconv(const char* conversion) const {
 							//^= part.iconv_MD(conversion);
 							//std::unreachable();
 							break;
+						}
 
 						// "MB" binary to decimal
-						case 'B':
+						case 'B': {
 
 							// var_str is like "101010110" max 64 digits;
 							part.trimmerfirst("0");
@@ -186,9 +191,11 @@ var  var::iconv(const char* conversion) const {
 							}
 
 							break;
+						}
 
 						// No conversion unless one of MT, MR, MX, MD, MC, MB"
-						default:;
+						default: {
+						};
 					}
 				}
 
@@ -312,11 +319,24 @@ int extract_first_digits_as_int(std::string::iterator& iter, std::string::iterat
     return 0;
 }
 
-var  var::iconv_MT() const {
+var  var::iconv_MT(bool strict) const {
 
 	THISIS("var  var::iconv_MT() const")
 	assertString(function_sig);
 //	assertString("var  var::iconv_MT() const");
+
+
+//	00:00 AM does not exist conventionally. Here's why:
+//
+//		Midnight: The transition from one day to the next happens at midnight. In this system:
+//			Midnight at the start of the day is typically represented as 12:00 AM.
+//			Midnight at the end of the day, or the beginning of the next day, is also 12:00 AM.
+//
+//		Therefore, 00:00 AM would be an ambiguous or non-standard way to denote midnight, as it's not used in standard time notation for the 12-hour clock system. Instead:
+//			12:00 AM is used for midnight at the start of the day.
+//			12:00 PM is used for noon.
+//
+//	24-Hour Clock: In contrast, in the 24-hour clock system, 00:00 does exist and represents the exact moment of midnight at the start of the day.
 
 	// Get the first three groups of digits "...99...99...99..."
 	// regardless of all other leading, inner or trailing characters
@@ -336,14 +356,56 @@ var  var::iconv_MT() const {
 	// 15:00AM should perhaps be invalid
 
 	// PM
-	if (inttime < 43200 && (*this).contains("P"))
+	if (inttime < 43200 && (*this).contains("P")) {
 		inttime += 43200;
+	}
 	// AM
-	else if (inttime >= 43200 && (*this).contains("A"))
+	else if (inttime >= 43200 && (*this).contains("A")) {
+	// 15:00AM should perhaps be invalid
+//		return "";
 		inttime -= 43200;
+	}
 
 	return inttime;
 }
+
+/* New stricter version
+var  var::iconv_MT() const {
+
+	THISIS("var  var::iconv_MT() const")
+	assertString(function_sig);
+//	assertString("var  var::iconv_MT() const");
+
+	// Get the first three groups of digits "...99...99...99..."
+	// regardless of all other leading, inner or trailing characters
+	auto iter = var_str.begin();
+	auto end = var_str.end();
+	int hours = extract_first_digits_as_int(iter, end);
+	int mins  = extract_first_digits_as_int(iter, end);
+	int secs  = extract_first_digits_as_int(iter, end);
+
+	int inttime = hours * 3600 + mins * 60 + secs;
+
+	// Strict limiter limits on hours and seconds and "AM" from 2025/02/12
+
+//	if (inttime >= 86400)
+	if (mins > 60 || secs > 60 || inttime >= 86400)
+		return "";
+
+	// PM
+	if (inttime < 43200 && (*this).contains("P"))
+		// 15:00PM OK
+		inttime += 43200;
+
+	// AM
+	else if (inttime >= 43200 && (*this).contains("A"))
+		// 15:00AM NOT OK
+//		inttime -= 43200;
+		return "";
+
+	return inttime;
+}
+*/
 
 std::string var::oconv_T(in format) const {
 
@@ -548,6 +610,25 @@ std::string var::oconv_MD(const char* conversion) const {
 		}
 	}
 
+	//1st digit = decimal places to display. Also decimal places to move if 2nd digit not present and no point in the data and no P flag present
+	//2nd digit = decimal places to move left
+
+	// P dont move point
+
+	//. or , mean separate thousands depending on MD or MC
+
+	// D C - < Negative handling
+
+	//Z Zero flag - output blank instead of zero
+
+	// X No conversion - return as is.
+
+	//If any trailer char
+	//1. > means wrap negative in <>
+	//2. - means suffix '-' if negative or ' ' if positive
+	//3. C means suffix CR if negative or DR if positive
+	//4. D means suffix DR if negative or CR if positive
+
 	while (nextchar) {
 
 		switch (nextchar) {
@@ -684,7 +765,7 @@ std::string var::oconv_MD(const char* conversion) const {
 
 	}
 
-	// trailing minus, DB or CR or wrap negative with "<...>"
+	// trailing minus or space, DB or CR or wrap negative with "<...>"
 	switch (trailer) {
 		case '\0':
 			break;
@@ -740,6 +821,8 @@ std::string var::oconv_MD(const char* conversion) const {
 	return strpart1;
 }
 
+/// xxxxxxx:
+
 std::string var::oconv_LRC(in format) const {
 
 	THISIS("str  var::oconv_LRC(in format) const")
@@ -747,8 +830,8 @@ std::string var::oconv_LRC(in format) const {
 	// TODO convert to C instead of var for speed
 	// and implement full mask options eg L#2-#3-#4 etc
 
+	var just = format.first();
 	var varwidth = format.field("#", 2, 1);
-	var just = (format.field("#", 1, 1)).first();
 
 	if (!varwidth.isnum() or varwidth < 0)
 		return *this;
@@ -1069,6 +1152,7 @@ var  var::oconv(const char* conversion_in) const {
 
 										// Convert 64 bits to string of up to 64 chars '1' or '0'
 										part = std::bitset<64>(part.var_int).to_string();
+										part.trimmerfirst("0");
 									}
 
 									break;

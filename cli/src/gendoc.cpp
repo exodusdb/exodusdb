@@ -1,6 +1,12 @@
 #include <exodus/program.h>
 programinit()
 
+// Note: man pages are generated with a Unicode FOUR-PER-EM SPACE for fixed layout.
+// man pages comments.replacer("\u22c5", "\u2005"); // "⋅" Unicode operator point operator -> " " FOUR-PER-EM SPACE
+// comments.replacer("␣", "\u2005");
+// Source code comments contain "\u22c5+"; "⋅" Unicode operator point operator and "␣" space indicater
+// man_page_white_space_code_point = "\u2005"; // " " FOUR-PER-EM SPACE
+
 let syntax =
 R"__(gendoc osfilename ... [{OPTIONS}]
 Option: w = output format for wiki instead of html.
@@ -73,13 +79,18 @@ function main() {
 				continue;
 			}
 
+			////////////////////////////
+			// Start a section and table
+			////////////////////////////
+
 			// Match lines starting // and ending ":"
 			var table_title = srcline.match(doc_rex);
 			if (table_title) {
-//TRACE(table_title)
-//				doc_outputl(osfilename0, srcline);
 
-				// Close prior table
+
+				skipping = false;
+
+				// Close any prior table
 				if (in_table) {
 					if (man) {}
 					else if (wiki) {
@@ -128,7 +139,7 @@ function main() {
 				continue;
 			}
 
-			// Skip class private sections
+			// private declaration turns off documentation
 			if (srcline == "private:")
 				skipping = true;
 			else if(srcline == "public:")
@@ -141,13 +152,24 @@ function main() {
 			if (no_discard)
 				srcline.cutter(3);
 
+			///////////////////////////////////////
+			// Find a function declaration (tricky)
+			///////////////////////////////////////
+
 			// Only interested in certain function declarations and comments starting exactly //
 			var prefix = srcline.field(" ", 1);
 
-			// Include lines starting var but not
-			// lines like "var xxx = 123;" that are not function declarations
-			if (prefix == "var" && srcline.match(R"__(^[\sa-zA-Z0-9_]+\()__"))
+			// Suppress lines that are not comments or function declarations
+			if (not prefix.starts("/") and not srcline.match(R"__(^[\sa-zA-Z0-9_:]+\()__"))
+				prefix = "";
+
+			// Include lines starting var
+			// Warning: lines like "var xxx = 123;" are NOT function declarations
+			if (prefix == "var")
+//			if (prefix == "var" && srcline.match(R"__(^[\sa-zA-Z0-9_]+\()__"))
 				prefix ^= "=";
+
+			else if (prefix == "std::string") prefix = "var="; // i/oconv private
 
 			else if (prefix == "RETVAR") prefix = "="; // from var_base
 
@@ -170,10 +192,15 @@ function main() {
 			else {
 
 				if (prefix == "/" "/") {
-					// Collect up comments starting // (two slashes, not more)
+
+					// Collect possible function preamble comments
+					// Exactly // (two slashes, not more)
 					lastcomment ^= srcline.substr(4) ^ FM_;
 
 				} else {
+
+					// Throw away non-function preamble comments
+					////////////////////////////////////////////
 
 					// From thrown away comments, get the default obj name for all following functions
 					// except where overridden in specific function comments.
@@ -196,9 +223,9 @@ function main() {
 				continue;
 			}
 
-///////////////////////////////
-// Found a function declaration
-///////////////////////////////
+			///////////////////////////////
+			// Found a function declaration
+			///////////////////////////////
 
 			srcline = srcline.field(" ", 2, 9999);
 //			var comments = srcline.field("{", 1).field(";", 2, 9999).trimmerfirst("/ ");
@@ -229,6 +256,11 @@ function main() {
 			if (man) {}
 			else
 				comments.replacer("Returns:", "<em>Returns:</em>");
+
+
+			/////////////////////
+			// Handle code blocks
+			/////////////////////
 
 			// Format backticked source code fragments
 			if (comments.contains("`")) {
@@ -265,6 +297,10 @@ function main() {
 				static rex backquoted {R"__(`([^`]*)`)__"};
 
 				var codematches = comments.match(backquoted);
+
+				// Replace space formatting with single space
+				codematches.replacer("\u22c5+"_rex, " "); // "⋅" Unicode operator point operator -> space
+
 				for (var codematch : codematches) {
 					codematch = codematch.f(1, 2);
 
@@ -375,6 +411,11 @@ function main() {
 
 				// tag backticked code as c++
 				if (man) {
+
+					// hide dot/space formatting
+					comments.replacer("\u22c5", "\u2005"); // "⋅" Unicode operator point operator -> " " FOUR-PER-EM SPACE
+					comments.replacer("␣", "\u2005");
+
 					// Man page codes
 					// .RS Right shift
 					// .nf No format
@@ -390,6 +431,10 @@ function main() {
 //					comments.replacer(backquoted, "\n<pre><code class='gendoc_funcdecl language-javascript'>$1</code></pre>\n");
 					comments.replacer(backquoted, "\n<pre><code class='hljs-ncdecl language-javascript'>$1</code></pre>\n");
 			}
+
+			////////////////////////////////
+			// Output function documentation
+			////////////////////////////////
 
 			if (man)
 				comments.replacer(_FM, "\n\n");
@@ -447,7 +492,10 @@ function main() {
 				line2.paster(line2.index("("), "</span>");
 			}
 
-			let func_decl = (objname ?: default_objname) ^ "." ^ line2;
+			// i/oconv_MD(const char* conversion) -> i/oconv("MD")
+			let func_decl0 = line2.replace(R"__(([io])conv_([A-Z]+)\([a-zA-Z0-0_*]*\))__"_rex, "$1conv\\(\"$2\"\\)");
+
+			let func_decl = (objname ?: default_objname) ^ "." ^ func_decl0;
 
 			if (man) {
 
@@ -462,11 +510,14 @@ function main() {
 				// Put on a separate line to avoid suppression of double quote chars
 				doc_outputl(func_decl2);
 
+//				doc_outputl(".sp"); // ignored
 				// Hack to defeat man's stubborn insistence on suppressing blank lines between section title and section text
 				doc_outputl(".nf");
-//				doc_outputl(" ");
-//				doc_outputl("\u000A");
-				doc_outputl("\u2003"); //U+2003 EM SPACE
+//				doc_outputl(" "); // ignored
+//				doc_outputl(".sp"); // ignored
+//				doc_outputl("\u000A"); // ignored
+//				doc_outputl("\u2003"); //U+2003 EM SPACE
+				doc_outputl("\u2005"); //U+2005 Four-Per-Em Space
 				doc_outputl(".fi");
 
 				doc_outputl(comments);
@@ -488,6 +539,15 @@ function main() {
 //			println("|" "{}" "||" "<em>" "{}" "</em>" "." "{}" "||" "{}", prefix, objname, line2, comments);
 
 		} // srcline
+
+		////////////
+		// File exit
+		////////////
+
+		// Escape back slashes for man pages
+		if (man) {
+			doc_text.replacer("\\", "\\" "\\");
+		}
 
 		// Close prior table
 		if (in_table) {
@@ -513,6 +573,7 @@ function main() {
 		osclose(codefile);
 
 		// Finally actually output the doc text
+		///////////////////////////////////////
 
 		// After outputing css and contents
 		if (man) {}

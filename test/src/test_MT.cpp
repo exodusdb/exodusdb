@@ -25,7 +25,7 @@ function main() {
 
 	//check times around noon and midnight round trip ok
 	for (const var ii : range(0, 61)) {
-		assert(var(ii).oconv("MTHS").iconv("MTHS") eq ii);
+		assert(var(ii).outputl().oconv("MTHS").outputl().iconv("MTHS") eq ii);
 	}
 	for (const var ii : range(43200 - 61, 43200 + 61)) {
 		assert(var(ii).oconv("MTHS").iconv("MTHS") eq ii);

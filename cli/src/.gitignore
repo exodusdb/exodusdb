@@ -1,4 +1,6 @@
 *
 !*.cpp
 !*.h
+!*.1
+!*.html
 !.gitignore

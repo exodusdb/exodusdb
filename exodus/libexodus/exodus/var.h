@@ -278,7 +278,7 @@ public:
     // Returns: A string representation of a decimal number rounded to a desired number of decimal places
 	// Returns: A var ASCII string with exact decimal places requested.
     // .5 always rounds away from zero.
-	// obj is num
+	// obj is varnum
 	//
     // `let v1 = var(0.295).round(2);  // "0.30"
     //  // or
@@ -317,7 +317,7 @@ public:
 	ND var  str(const int num) const;
 
 	// Returns: A string of space characters.
-	// obj is num
+	// obj is varnum
 	//
 	// `let v1 = var(3).space(); // "␣␣␣"
 	//  // or
@@ -326,7 +326,7 @@ public:
 
 	// Returns: A string representing a given number written in words instead of digits.
 	// locale: Something like en_GB, ar_AE, el_CY, es_US, fr_FR etc.
-	// obj is num
+	// obj is varnum
 	//
 	// `let softhyphen = "\xc2\xad";
 	//  let v1 = var(123.45).numberinwords("de_DE").replace(softhyphen, " "); // "ein␣hundert␣drei␣und␣zwanzig␣Komma␣vier␣fünf"`
@@ -484,7 +484,7 @@ public:
 	// regex_options as for match()
 	//
 	// `var startchar1 = 1;
-	//  let v1 = "abc1abc2"_var.search("BC(\\d)", startchar1, "i"); // "bc1]1"_var // startchar1.outputl() -> 5 /// Ready for the next search
+	//  let v1 = "abc1abc2"_var.search("BC(\\d)", startchar1, "i"); // "bc1]1"_var // startchar1 -> 5 /// Ready for the next search
 	//  // or
 	//  startchar1 = 1;
 	//  let v2 = search("abc1abc2", "BC(\\d)", startchar1, "i");`
@@ -1050,7 +1050,7 @@ public:
 //// clang on 22.04 cannot accept compile time format string even if a cstr
 /////root/exodus/test/src/test_format.cpp:14:18: error: call to consteval function 'fmt::basic_format_string<char, exo::var>::basic_format_string<ch
 ////ar[7], 0>' is not a constant expression
-////        assert(x.format("{:.2f}").outputl() == "12.35");
+////        assert(x.format("{:.2f}") == "12.35");
 //
 //			THISIS("var  format(SV fmt_str, Args&&... args) const")
 //			return fmt::format(std::forward<EXO_FORMAT_STRING_TYPE1>(fmt_str), *this, std::forward<Args>(args)... );
@@ -2329,7 +2329,7 @@ public:
 	///// MATH/BOOLEAN:
 	//////////////////
 
-	// obj is num
+	// obj is varnum
 
     // Absolute value
     // `let v1 = var(-12.34).abs(); // 12.34
@@ -2356,7 +2356,7 @@ public:
 	// Returns: a pseudo random integer between 0 and the provided maximum minus 1.
 	// Uses std::mt19937 and std::uniform_int_distribution<int>
 	//
-    // `let v1 = var(100).rnd().outputl();
+    // `let v1 = var(100).rnd();
     //  // or
     //  let v2 = rnd(100);`
     ND var  rnd()     const;
@@ -2407,7 +2407,7 @@ public:
     //  ND var  int() const;//reserved word
 
     // Truncate decimal numbers towards zero
-	// Returns: A var integer
+	// Returns: An integer var
     // `let v1 = var(2.9).integer(); // 2
     //  // or
     //  let v2 = integer(2.9);
@@ -2418,7 +2418,7 @@ public:
     ND var  integer() const;
 
     // Truncate decimal numbers towards negative
-	// Returns: A var integer
+	// Returns: An integer var
     // `let v1 = var(2.9).floor(); // 2
     //  // or
     //  let v2 = floor(2.9);
@@ -2475,35 +2475,302 @@ public:
 
 	// TODO check if can speed up by returning reference to converted self like MC
 
-	// Faster primitive oconv
-	// L/R/C: Text -> left/right/center padded and truncated
-	ND std::string oconv_LRC(in format) const;
-	// T: Text -> justified and folded
-	ND std::string oconv_T(in format) const;
-	// D: Int -> Date
-	ND std::string oconv_D(const char* conversion) const;
-	// MT: Int -> Time
-	ND std::string oconv_MT(const char* conversion) const;
-	// MD: Decimal -> Decimal
-	ND std::string oconv_MD(const char* conversion) const;
+	// Internal primitive oconvs
+
 	// MR: Character replacement // WHY is this replacer, io, non-const
 	ND io   oconv_MR(const char* conversion);
-	// HEX: Chars -> Hex
+
+	/// I/O Conversion Codes :
+
+	// Date output: Convert internal date format to human readable date or calendar info in text format.
+	// Returns: Human readable date or calendar info, or the original value unconverted if non-numeric.
+	// Flags: See examples below.
+	// Any multifield/multivalue structure is preserved.
+	// obj is vardate
+	//
+	//  `let v1 = 12345;
+	//   assert( v1.oconv( "D"⋅⋅⋅) == "18 OCT 2001"⋅⋅); // Default
+	//	 assert( v1.oconv( "D/"⋅⋅) == "10/18/2001"⋅⋅⋅); // / separator
+	//	 assert( v1.oconv( "D-"⋅⋅) == "10-18-2001"⋅⋅⋅); // - separator
+	//	 assert( v1.oconv( "D2"⋅⋅) == "18 OCT 01"⋅⋅⋅⋅); // 2 digit year
+	//	 assert( v1.oconv( "D/E"⋅) == "18/10/2001"⋅⋅⋅); // International order with /
+	//	 assert( v1.oconv( "DS"⋅⋅) == "2001 OCT 18"⋅⋅); // ISO Year first
+	//	 assert( v1.oconv( "DS-"⋅) == "2001-10-18"⋅⋅⋅); // ISO Year first with -
+	//	 assert( v1.oconv( "DM"⋅⋅) == "10"⋅⋅⋅⋅⋅⋅⋅⋅⋅⋅⋅); // Month number
+	//	 assert( v1.oconv( "DMA"⋅) == "OCTOBER"⋅⋅⋅⋅⋅⋅); // Month name
+	//	 assert( v1.oconv( "DY"⋅⋅) == "2001"⋅⋅⋅⋅⋅⋅⋅⋅⋅); // Year number
+	//	 assert( v1.oconv( "DY2"⋅) == "01"⋅⋅⋅⋅⋅⋅⋅⋅⋅⋅⋅); // Year 2 digits
+	//	 assert( v1.oconv( "DD"⋅⋅) == "18"⋅⋅⋅⋅⋅⋅⋅⋅⋅⋅⋅); // Day number in month (1-31)
+	//	 assert( v1.oconv( "DW"⋅⋅) == "4"⋅⋅⋅⋅⋅⋅⋅⋅⋅⋅⋅⋅); // Weekday number (1-7)
+	//	 assert( v1.oconv( "DWA"⋅) == "THURSDAY"⋅⋅⋅⋅⋅); // Weekday name
+	//	 assert( v1.oconv( "DQ"⋅⋅) == "4"⋅⋅⋅⋅⋅⋅⋅⋅⋅⋅⋅⋅); // Quarter number
+	//	 assert( v1.oconv( "DJ"⋅⋅) == "291"⋅⋅⋅⋅⋅⋅⋅⋅⋅⋅); // Day number in year
+	//	 assert( v1.oconv( "DL"⋅⋅) == "31"⋅⋅⋅⋅⋅⋅⋅⋅⋅⋅⋅); // Last day number of month (28-31)
+	//
+	//  // Multifield/multivalue
+	//  var v2 = "12345^12346]12347"_var;
+	//  assert(v2.oconv("D") == "18 OCT 2001^19 OCT 2001]20 OCT 2001"_var);
+	//
+	//   // or
+	//   assert( oconv(v1, "D"⋅⋅⋅) == "18 OCT 2001"⋅⋅);`
+	ND std::string oconv_D(const char* conversion) const;
+
+	// Date input: Convert human readable date to internal date format.
+	// Returns: Internal date or "" if the input is an invalid date.
+	// Internal date format is whole days since 1967-12-31 00:00:00 which is day 0.
+	// Any multifield/multivalue structure is preserved.
+	// obj is varstr
+	//
+	// `// International order "DE"
+	//  assert(⋅⋅⋅⋅⋅⋅⋅⋅⋅⋅⋅⋅oconv(19005, "DE") == "12 JAN 2020");
+	//  assert(⋅⋅⋅"12/1/2020"_var.iconv("DE") == 19005);
+	//  assert(⋅⋅⋅"12 1 2020"_var.iconv("DE") == 19005);
+	//  assert(⋅⋅⋅"12-1-2020"_var.iconv("DE") == 19005);
+	//  assert(⋅"12 JAN 2020"_var.iconv("DE") == 19005);
+	//  assert(⋅"jan 12 2020"_var.iconv("DE") == 19005);
+	//
+	//  // American order "D"
+	//  assert(⋅⋅⋅⋅⋅⋅⋅⋅⋅⋅⋅⋅oconv(19329, "D") == "01 DEC 2020");
+	//  assert(⋅⋅⋅"12/1/2020"_var.iconv("D") == 19329);
+	//  assert(⋅⋅"DEC 1 2020"_var.iconv("D") == 19329);
+	//  assert(⋅⋅"1 dec 2020"_var.iconv("D") == 19329);
+	//
+	//  // Reverse order
+	//  assert(⋅⋅"2020/12/1"_var.iconv("DE") == 19329);
+	//  assert(⋅⋅⋅"2020-12-1"_var.iconv("D") == 19329);
+	//  assert(⋅⋅"2020 1 dec"_var.iconv("D") == 19329);
+	//
+	//  //Invalid date
+	//  assert(⋅⋅⋅"2/29/2021"_var.iconv("D") == "");
+	//  assert(⋅⋅"29/2/2021"_var.iconv("DE") == "");
+	//
+	//  // or
+	//  assert(iconv("12/1/2020"_var, "DE") == 19005);`
+	ND var  iconv_D(const char* conversion) const;
+
+	// Time output: Convert internal time format to human readable time e.g. "10:30:59".
+	// Returns: Human readable time or the original value unconverted if non-numeric.
+	// Conversion code (e.g. "MTHS") is "MT" + flags ...
+	// Flags:
+	// "H" - Show AM/PM otherwise 24 hour clock is used.
+	// "S" - Output seconds
+	// "2" = Ignored (used in iconv)
+	// ":" - Any other flag is used as the separator character instead of ":"
+	// Any multifield/multivalue structure is preserved.
+	// obj is vartime
+	//
+	//  `var v1 = 234800;
+	//	 assert( v1.oconv( "MT"⋅⋅⋅) == "17:13"⋅⋅⋅⋅⋅⋅);
+	//	 assert( v1.oconv( "MTH"⋅⋅) == "05:13PM"⋅⋅⋅⋅);
+	//	 assert( v1.oconv( "MTS"⋅⋅) == "17:13:20"⋅⋅⋅);
+	//	 assert( v1.oconv( "MTHS"⋅) == "05:13:20PM"⋅);
+	//
+	//   var v2 = 0;
+	//	 assert( v2.oconv( "MT"⋅⋅⋅) == "00:00"⋅⋅⋅⋅⋅⋅);
+	//	 assert( v2.oconv( "MTH"⋅⋅) == "12:00AM"⋅⋅⋅⋅);
+	//	 assert( v2.oconv( "MTS"⋅⋅) == "00:00:00"⋅⋅⋅);
+	//	 assert( v2.oconv( "MTHS"⋅) == "12:00:00AM"⋅);
+	//
+	//  // Multifield/multivalue
+	//  var v3 = "234800^234860]234920"_var;
+	//  assert(v3.oconv("MT") == "17:13^17:14]17:15"_var);
+	//
+	//   // or
+	//   assert( oconv(v1, "MT"⋅⋅⋅) == "17:13"⋅⋅⋅⋅⋅⋅);`
+	ND std::string oconv_MT(const char* conversion) const;
+
+	// Time input: Convert human readable time (e.g. "10:30:59") to internal time format.
+	// Returns: Internal time or "" if the input is an invalid time.
+	// Internal time format is whole seconds since midnight.
+	// Accepts: Two or three groups of digits surrounded and separated by any non-digits character(s).
+	// Any multifield/multivalue structure is preserved.
+	// obj is varstr
+	//
+	// `assert(⋅⋅⋅⋅⋅⋅"17:13"_var.iconv( "MT" ) == 61980);
+	//  assert(⋅⋅⋅⋅"05:13PM"_var.iconv( "MT" ) == 61980);
+	//  assert(⋅⋅⋅"17:13:20"_var.iconv( "MT" ) == 62000);
+	//  assert(⋅"05:13:20PM"_var.iconv( "MT" ) == 62000);
+	//
+	//  assert(⋅⋅⋅⋅⋅⋅"00:00"_var.iconv( "MT" ) == 0);
+	//  assert(⋅⋅⋅⋅"12:00AM"_var.iconv( "MT" ) == 0);⋅⋅⋅⋅⋅// Midnight
+	//  assert(⋅⋅⋅⋅"12:00PM"_var.iconv( "MT" ) == 43200);⋅// Noon
+	//  assert(⋅⋅⋅"00:00:00"_var.iconv( "MT" ) == 0);
+	//  assert(⋅"12:00:00AM"_var.iconv( "MT" ) == 0);
+	//
+	//  // Multifield/multivalue
+	//  assert("17:13^05:13PM]17:13:20"_var.iconv("MT") == "61980^61980]62000"_var);
+	//
+	//  // or
+	//  assert(iconv("17:13", "MT") == 61980);`
+	ND var  iconv_MT(bool strict) const;
+
+	// Number output: Convert internal numbers to external text format after rounding and optional scaling.
+	// Returns: A string or, if the value is not numeric, then no conversion is performed and the original value is returned.
+	// Conversion code (e.g. "MD20") is "MD" or "MC", 1st digit, 2nd digit, flags ...
+	//
+	// MD outputs like 123.45 (International)
+	// MC outputs like 123,45 (European)
+	//
+	// 1st digit = Decimal places to display. Also decimal places to move if 2nd digit not present and no P flag present.
+	// 2nd digit = Optional decimal places to move left if P flag not present.
+	//
+	// Flags:
+	// "P" - Preserve decimal places. Same as 2nd digit = 0;
+	// "Z" - Zero flag - return "" if zero.
+	// "X" - No conversion - return as is.
+	// "." or "," - Separate thousands depending on MD or MC.
+	// "-" means suffix negatives with "-" and positives with " " (space).
+	// "<" means wrap negatives in "<" and ">" characters.
+	// "C" means suffix negatives with "CR" and positives or zero with "DB".
+	// "D" means suffix negatives with "DB" and positives or zero with "CR".
+	//
+	//  Any multifield/multivalue structure is preserved.
+	// obj is varnum
+	//
+	//  `var v1 = -1234.567;
+	//	 assert( v1.oconv( "MD20"⋅⋅⋅) ==⋅⋅"-1234.57"⋅⋅⋅);
+	//	 assert( v1.oconv( "MD20,"⋅⋅) ==⋅"-1,234.57"⋅⋅⋅); // , flag
+	//	 assert( v1.oconv( "MC20,"⋅⋅) ==⋅"-1.234,57"⋅⋅⋅); // MC code
+	//	 assert( v1.oconv( "MD20,-"⋅) ==⋅⋅"1,234.57-"⋅⋅); // - flag
+	//	 assert( v1.oconv( "MD20,<"⋅) ==⋅"<1,234.57>"⋅⋅); // < flag
+	//	 assert( v1.oconv( "MD20,C"⋅) ==⋅⋅"1,234.57CR"⋅); // C flag
+	//	 assert( v1.oconv( "MD20,D"⋅) ==⋅⋅"1,234.57DB"⋅); // D flag
+	//
+	//   // Multifield/multivalue
+	//   var v2 = "1.1^2.1]2.2"_var;
+	//   assert( v2.oconv( "MD20"⋅⋅⋅) == "1.10^2.10]2.20"_var);
+	//
+	//   // or
+	//	 assert( oconv(v1, "MD20"⋅⋅⋅) ==⋅⋅"-1234.57"⋅⋅⋅);`
+	ND std::string oconv_MD(const char* conversion) const;
+
+	//	 assert( v1.oconv( "MD2"⋅⋅⋅) ==⋅⋅⋅⋅"12.34"⋅);
+
+	// Text justification: Left, right and center. Padding and truncating. See Procrustes.
+	// e.g. "L#10", "R#10", "C#10"
+	// Useful when outputting to terminal devices where spaces are used for alignment.
+	// Multifield/multivalue structure is preserved.
+	// ASCII only.
+	// obj is var
+	//
+	// `assert(⋅⋅⋅⋅⋅"abcde"_var.oconv(⋅"L#3"⋅) == "abc"⋅); // Truncating
+	//  assert(⋅⋅⋅⋅⋅"abcde"_var.oconv(⋅"R#3"⋅) == "cde"⋅);
+	//  assert(⋅⋅⋅⋅⋅"abcde"_var.oconv(⋅"C#3"⋅) == "abc"⋅);
+	//
+	//  assert(⋅⋅⋅⋅⋅"ab"_var.oconv(⋅"L#6"⋅) == "ab␣␣␣␣"⋅); // Padding
+	//  assert(⋅⋅⋅⋅⋅"ab"_var.oconv(⋅"R#6"⋅) == "␣␣␣␣ab"⋅);
+	//  assert(⋅⋅⋅⋅⋅"ab"_var.oconv(⋅"C#6"⋅) == "␣␣ab␣␣"⋅);
+	//
+	//  assert(⋅⋅⋅⋅⋅⋅var(42).oconv(⋅"L(0)#5"⋅) == "42000"⋅); // Padding character (x)
+	//  assert(⋅⋅⋅⋅⋅⋅var(42).oconv(⋅"R(0)#5"⋅) == "00042"⋅);
+	//  assert(⋅⋅⋅⋅⋅⋅var(42).oconv(⋅"C(0)#5"⋅) == "04200"⋅);
+	//  assert(⋅⋅⋅⋅⋅⋅var(42).oconv(⋅"C(0)#5"⋅) == "04200"⋅);
+	//
+	//  // Multifield/multivalue
+	//  assert(⋅⋅⋅⋅⋅⋅"f1^v1]v2"_var.oconv("L(_)#5") == "f1___^v1___]v2___"_var);
+	//
+	//  // Fail for non-ASCII (Should be 5)
+	//  assert(⋅⋅⋅⋅⋅"🐱"_var.oconv("L#5").textwidth() == 3);
+	//
+	//  // or
+	//  assert(⋅⋅⋅⋅⋅oconv("abcd", "L#3"⋅) == "abc"⋅);`
+	ND std::string oconv_LRC(in format) const;
+
+	// Text folding and justification.
+	// e.g. T#20
+	// Useful when outputting to terminal devices where spaces are used for alignment.
+	// Splits text into multiple fixed length lines by inserting spaces and TM characters.
+	// ASCII only.
+	// obj is varstr
+	//
+	// `var v1 = "Have a nice day";
+	//  assert( v1.oconv("T#10") == "Have a␣␣␣␣|nice day␣␣"_var);
+	//  // or
+	//  assert( oconv(v1, "T#10"⋅) == "Have a␣␣␣␣|nice day␣␣"_var⋅);`
+	ND std::string oconv_T(in format) const;
+
+	// Convert string to hexadecimal.
+	// Multifield/multivalue structure is not preserved. Field marks are converted to HEX as for all other bytes.
+	// obj is varstr
+	//
+	// `assert(⋅⋅⋅⋅⋅"ab01"_var.oconv(⋅"HEX"⋅) == "61" "62" "30" "31"⋅);
+	//  assert(⋅"\xff\x00"_var.oconv(⋅"HEX"⋅) == "FF" "00"⋅⋅⋅⋅⋅⋅⋅⋅⋅⋅⋅); // Any bytes are ok.
+	//  assert(⋅⋅⋅⋅⋅⋅⋅⋅var(10).oconv(⋅"HEX"⋅) == "31" "30"⋅⋅⋅⋅⋅⋅⋅⋅⋅⋅⋅); // Uses ASCII string equivalent of 10 i.e. "10".
+	//  assert(⋅⋅⋅"\u0393"_var.oconv(⋅"HEX"⋅) == "CE" "93"⋅⋅⋅⋅⋅⋅⋅⋅⋅⋅⋅); // Greek capital Gamma in utf8 bytes.
+	//  assert(⋅⋅⋅⋅⋅"a^]b"_var.oconv(⋅"HEX"⋅) == "61" "1E" "1D" "62"⋅); // Field and value marks.
+	//  // or
+	//  assert(⋅⋅⋅⋅⋅⋅oconv("ab01"_var, "HEX") == "61" "62" "30" "31");`
 	ND std::string oconv_HEX(const int ioratio) const;
-	// TX: Record (FM) -> text (\n) and \ line endings
+
+	// Convert hexadecimal to string.
+	// Reverse of oconv("HEX") above.
+	// obj is varstr
+	ND var  iconv_HEX(const int ioratio) const;
+
+/* fake code to generate documentation
+
+	// Numeric hex format: Convert number to hexadecimal string
+	// If the value is not numeric then no conversion is performed and the original value is returned.
+	// obj is varnum
+	//
+	// `assert( var("255").oconv("MX") == "FF");
+	//  // or
+	//  assert( oconv(var("255"), "MX") == "FF");`
+	ND std::string oconv_MX() const;
+
+	// Numeric binary format: Convert number to strings of 1s and 0s
+	// If the value is not numeric then no conversion is performed and the original value is returned.
+	// obj is varnum
+	//
+	// `assert( var(255).oconv("MB") == 1111'1111);
+	//  // or
+	//  assert( oconv(var(255), "MB") == 1111'1111);`
+	ND std::string oconv_MB() const;
+*/
+
+	// Convert dynamic arrays to standard text format.
+	// Useful for using text editors on dynamic arrays.
+	// FMs -> NL after escaping any embedded NL
+	// obj is varstr
+	//
+	// `  // backslash in text remains backslash
+	//    assert(var(_BS).oconv("TX") == _BS);
+	//
+	//    // 1. Double escape any _BS "n" -> _BS _BS "n"
+	//    assert(var(_BS "n").oconv("TX") == _BS _BS "n");
+	//
+	//    // 2. Single escape any _NL -> _BS "n"
+	//    assert(var(_NL).oconv("TX") == _BS "n");
+	//
+	//    // 3. FMs -> _NL (⏎)
+	//    assert("🌍^🌍"_var.oconv("TX") == "🌍" _NL "🌍");
+	//
+	//    // 4. VMs -> _BS _NL (\⏎)
+	//    assert("🌍]🌍"_var.oconv("TX") == "🌍" _BS _NL "🌍");
+	//
+	//    // 5. SMs -> _BS _BS _NL (\\⏎)
+	//    assert("🌍}🌍"_var.oconv("TX") == "🌍" _BS _BS _NL "🌍");
+	//
+	//    // 6. TMs -> _BS _BS _BS _NL (\\\⏎)
+	//    assert("🌍|🌍"_var.oconv("TX") == "🌍" _BS _BS _BS _NL "🌍");
+	//
+	//    // 7. STs -> _BS _BS _BS _BS _NL (\\\\⏎)
+	//    assert("🌍~🌍"_var.oconv("TX") == "🌍" _BS _BS _BS _BS _NL "🌍");`
 	ND std::string oconv_TX(const char* conversion) const;
 
-	// Faster primitive iconv
-	// D: Int <- Date
-	ND var  iconv_D(const char* conversion) const;
-	// MT: Int <- Time
-	ND var  iconv_MT() const;
-	// MD_ Decimal <- Decimal
-	ND var  iconv_MD(const char* conversion) const;
-	// Chars <- Hex
-	ND var  iconv_HEX(const int ioratio) const;
-	// TX: Record (FM) <- text (\n) and \ line endings
+	// Convert standard text format to dynamic array.
+	// Reverse of oconv("TX") above.
+	// obj is varstr
 	ND var  iconv_TX(const char* conversion) const;
+
+	/////////////////////
+	// Stop documentation
+	/// :
+	/////////////////////
+
+	// MD_ Decimal <- Decimal - Not implemented yet
+	//  Any multifield/multivalue structure is preserved.
+	ND var  iconv_MD(const char* conversion) const;
 
 	ND std::fstream* osopenx(in osfilename, const bool utf8 = true) const;
 
