@@ -559,14 +559,6 @@ function main() {
 		var value = R"('1')";
 		assert(value.replace("'", R"(\')") eq "\\'1\\'");
 
-		//check conversion of unprintable field marks to unusual ASCII characters
-		//except TM which is ESC
-		std::ostringstream stringstr;
-		//stringstr << var(_RM _FM _VM _SM _TM _ST);
-		stringstr << var(_ST _TM _SM _VM _FM _RM);
-		std::cout << stringstr.str() << std::endl;
-		//assert(var(stringstr.str()) eq "~^]\\[|");
-		assert(var(stringstr.str()) == var({VISIBLE_ST_, TM_, VISIBLE_SM_, VISIBLE_VM_, VISIBLE_FM_, VISIBLE_RM_}).convert(FM, ""));
 	}
 
 	{

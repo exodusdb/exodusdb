@@ -75,6 +75,7 @@
 //#define _VISIBLE_FMS "_^]}`~" //all uncommon in natural language. first 3 _^] are identical to pickos
 //#define _VISIBLE_FMS "_^]}|~"   //all uncommon in natural language. first 3 _^] are identical to pickos
 #define _VISIBLE_FMS "`^]}|~"   //all uncommon in natural language. ^] are identical to pickos. Using ` for RM since _ common in IT
+
 #define VISIBLE_RM_ '`'
 #define VISIBLE_FM_ '^'
 #define VISIBLE_VM_ ']'
@@ -82,12 +83,19 @@
 #define VISIBLE_TM_ '|'
 #define VISIBLE_ST_ '~'
 
+#define _VISIBLE_RM "`"
+#define _VISIBLE_FM "^"
+#define _VISIBLE_VM "]"
+#define _VISIBLE_SM "}"
+#define _VISIBLE_TM "|"
+#define _VISIBLE_ST "~"
+
 #define _ALL_FMS _RM _FM _VM _SM _TM _ST
 
 // Useful TRACE() function for debugging
 #define TRACE(EXPRESSION) \
 	try{ \
-		var(EXPRESSION).convert(_ALL_FMS, _VISIBLE_FMS).quote().errputl("TRACE: " #EXPRESSION "; /" "/ "); \
+		var(EXPRESSION).quote().errputl("TRACE: " #EXPRESSION " = "); \
 	} catch (VarError e) { \
 		var(e.stack()).errputl(e.description); \
 	};

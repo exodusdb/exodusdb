@@ -150,64 +150,35 @@ public:
 			var_str.pop_back();
 	}
 
-/////////////////////////////////////////////////////////////////////////////////////////////////
-//                                         IOSTREAM FRIENDS
-/////////////////////////////////////////////////////////////////////////////////////////////////
-
-	// OSTREAM
-	//////////
-
-	// WARNING: MUST PASS A COPY of var_base in since it will may be modified before being output
-	// TODO Take a reference and make an internal copy if any FM need to be converted
-	// Causes ambiguous overload for some unknown reason despite being a hidden friend
-	// friend std::ostream& operator<<(std::ostream& ostream1, TVR var1);
-	friend std::ostream& operator<<(std::ostream& ostream1, const var&& outvar) {
-
-		outvar.assertString(__PRETTY_FUNCTION__);
-
-		CONSTEXPR std::array VISIBLE_FMS_EXCEPT_ESC {VISIBLE_ST_, TM_, VISIBLE_SM_, VISIBLE_VM_, VISIBLE_FM_, VISIBLE_RM_};
-
-		// Replace various unprintable field marks with unusual ASCII characters
-		// Leave ESC as \x1B because it is used to control ANSI terminal control sequences
-		// std::string str = "\x1A\x1B\x1C\x1D\x1E\x1F";
-		// |\x1B}]^~  or in high to low ~^]}\x1B|	 or in TRACE() ... ~^]}_|
-
-		// Default configuration: Output the incoming var_str if no conversion is required
-		const std::string* outstr = &outvar.var_str;
-
-		// Check if any conversion required
-		std::string converted_str;
-		char charx;
-		for (auto citer = outvar.var_str.cbegin(); (charx = *citer); citer++) {
-
-			// Conversion required - Copy, convert and break out
-			if (charx <= 0x1F && charx >= 0x1A) {
-				UNLIKELY
-
-				// Replicate the output str
-				converted_str = std::forward<CVR>(outvar).var_str;
-
-				// Reconfigure output of the copied and converted
-				outstr = &converted_str;
-
-				// Convert the first char that needs converting and bump the iterator
-				auto iter2 = converted_str.begin() + std::distance(outvar.var_str.cbegin(), citer);
-				*iter2 = VISIBLE_FMS_EXCEPT_ESC[std::size_t(charx - 0x1A)];
-
-				// Convert the rest of the chars
-				while ((charx = *++iter2)) {
-					if (charx <= RM_ && charx >= ST_) {
-						UNLIKELY
-						*iter2 = VISIBLE_FMS_EXCEPT_ESC[std::size_t(charx - ST_)];
-					}
-				}
-				break;
-			}
-		}
-
-		ostream1 << *outstr;
-		return ostream1;
-	}
+///////////////////////////////////////////////////////////////////////////////////////////////////
+////                                         IOSTREAM FRIENDS
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//	// OSTREAM
+//	//////////
+//
+//
+//	// rvalue
+//	friend std::ostream& operator<<(std::ostream& ostream1, const var&& outvar) {
+//
+//		outvar.assertString(__PRETTY_FUNCTION__);
+//
+//		CONSTEXPR std::array VISIBLE_FMS_EXCEPT_ESC {VISIBLE_ST_, TM_, VISIBLE_SM_, VISIBLE_VM_, VISIBLE_FM_, VISIBLE_RM_};
+//
+//		// Replace various unprintable field marks with unusual ASCII characters
+//		// Leave ESC as \x1B because it is used to control ANSI terminal control sequences
+//		// std::string str = "\x1A\x1B\x1C\x1D\x1E\x1F";
+//		// |\x1B}]^~  or in high to low ~^]}\x1B|	 or in TRACE() ... ~^]}_|
+//		for (auto iter = outvar.var_str.begin(); iter != outvar.var_str.end(); iter++) {
+//			if (*iter <= RM_ && *iter >= ST_) {
+//				UNLIKELY
+//				*iter = VISIBLE_FMS_EXCEPT_ESC[std::size_t(*iter - ST_)];
+//			}
+//		}
+//
+//		ostream1 << outvar.var_str;
+//		return ostream1;
+//	}
 
 	/////////////////
 	// PARENTHESIS ()
@@ -2274,31 +2245,18 @@ public:
 
 	// obj is var
 
-	// To stdout/cout Buffered.
-	   CVR output() const;      // To stdout. No new line. Buffered.
-	   CVR outputl() const;     // To stdout. Starts a new line. Flushed.
-	   CVR outputt() const;     // To stdout. Adds a tab. Buffered.
-
-	// To stdlog/clog Buffered.
-	   CVR logput() const;  // To stdlog. No new line. Buffered.
-	   CVR logputl() const; // To stdlog. Starts a new line. Flushed.
-
-	// To stderr/cerr usually unBuffered.
-	   CVR errput() const;  // To stderr. No new line. Flushed.
-	   CVR errputl() const; // To stderr. Starts a new line. Flushed.
+	// As above but with a prefix
+	   CVR output(in prefix = "") const;  // To stdout. With a prefix. No new line. Buffered.
+	   CVR outputl(in prefix = "") const; // To stdout. With a prefix. Starts a new line. Flushed.
+	   CVR outputt(in prefix = "") const; // To stdout. With a prefix. Adds a tab. Buffered.
 
 	// As above but with a prefix
-	   CVR output(in prefix) const;  // To stdout. With a prefix. No new line. Buffered.
-	   CVR outputl(in prefix) const; // To stdout. With a prefix. Starts a new line. Flushed.
-	   CVR outputt(in prefix) const; // To stdout. With a prefix. Adds a tab. Buffered.
+	   CVR logput(in prefix = "") const;  // To stdlog. With a prefix. No new line. Buffered.
+	   CVR logputl(in prefix = "") const; // To stdlog. With a prefix. Starts a new line. Flushed.
 
 	// As above but with a prefix
-	   CVR logput(in prefix) const;  // To stdlog. With a prefix. No new line. Buffered.
-	   CVR logputl(in prefix) const; // To stdlog. With a prefix. Starts a new line. Flushed.
-
-	// As above but with a prefix
-	   CVR errput(in prefix) const;  // To stderr. With a prefix. No new line. Flushed.
-	   CVR errputl(in prefix) const; // To stderr. With a prefix. Starts a new line. Flushed.
+	   CVR errput(in prefix = "") const;  // To stderr. With a prefix. No new line. Flushed.
+	   CVR errputl(in prefix = "") const; // To stderr. With a prefix. Starts a new line. Flushed.
 
 	// Output to a given stream
 	   CVR put(std::ostream& ostream1) const;
@@ -2356,7 +2314,7 @@ public:
 	// Returns: a pseudo random integer between 0 and the provided maximum minus 1.
 	// Uses std::mt19937 and std::uniform_int_distribution<int>
 	//
-    // `let v1 = var(100).rnd();
+    // `let v1 = var(100).rnd(); /// Random 0 to 99
     //  // or
     //  let v2 = rnd(100);`
     ND var  rnd()     const;
