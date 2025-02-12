@@ -64,33 +64,6 @@ CVR  var::put(std::ostream& ostream1) const {
 // output -> cout which is buffered standard output
 ///////////////////////////////////////////////////
 
-// output() buffered threadsafe output to standard output
-CVR  var::output() const {
-	THISIS("CVR  var::output() const")
-	LOCKIOSTREAM_OR_NOT
-	return this->put(std::cout);
-}
-
-// outputl() flushed threadsafe output to standard output
-// adds \n and flushes so is slower than output("\n")
-CVR  var::outputl() const {
-	THISIS("CVR  var::outputl() const")
-	LOCKIOSTREAM_OR_NOT
-	this->put(std::cout);
-	std::cout << std::endl;
-	return *this;
-}
-
-// outputt() buffered threadsafe output to standard output
-// adds \t
-CVR  var::outputt() const {
-	THISIS("CVR  var::outputt() const")
-	LOCKIOSTREAM_OR_NOT
-	this->put(std::cout);
-	std::cout << '\t';
-	return *this;
-}
-
 // overloaded output() outputs a prefix str
 CVR  var::output(in prefix) const {
 	THISIS("CVR  var::output(in prefix) const")
@@ -123,26 +96,6 @@ CVR  var::outputt(in prefix) const {
 // errput -> cerr which is unbuffered standard error
 ////////////////////////////////////////////////////
 
-// errput() unbuffered threadsafe output to standard error
-CVR  var::errput() const {
-	THISIS("CVR  var::errput() const")
-	LOCKIOSTREAM_OR_NOT
-	//return put(std::cerr);
-	std::cerr << *this;
-	return *this;
-}
-
-// errputl() unbuffered threadsafe output to standard error
-// adds "\n"
-CVR  var::errputl() const {
-	THISIS("CVR  var::errputl() const")
-	LOCKIOSTREAM_OR_NOT
-	//this->put(std::cerr);
-	std::cerr << *this;
-	std::cerr << std::endl;
-	return *this;
-}
-
 // overloaded errput outputs a prefix str
 CVR  var::errput(in prefix) const {
 	THISIS("CVR  var::errput(in prefix) const")
@@ -150,7 +103,7 @@ CVR  var::errput(in prefix) const {
 	//prefix.put(std::cerr);
 	//return this->put(std::cerr);
 	std::cerr << prefix;
-	std::cerr << *this;
+	std::cerr << this->convert(_ALL_FMS, _VISIBLE_FMS);
 	return *this;
 }
 
@@ -161,7 +114,7 @@ CVR  var::errputl(in prefix) const {
 	//prefix.put(std::cerr);
 	//this->put(std::cerr);
 	std::cerr << prefix;
-	std::cerr << *this;
+	std::cerr << this->convert(_ALL_FMS, _VISIBLE_FMS);
 	std::cerr << std::endl;
 	return *this;
 }
@@ -169,33 +122,13 @@ CVR  var::errputl(in prefix) const {
 // logput -> clog which is a buffered version of cerr standard error output
 ///////////////////////////////////////////////////////////////////////////
 
-// logput() buffered threadsafe output to standard log
-CVR  var::logput() const {
-	THISIS("CVR  var::logput() const")
-	LOCKIOSTREAM_OR_NOT
-	//this->put(std::clog);
-	std::clog << *this;
-	//std::clog.flush();
-	return *this;
-}
-
-// logputl() flushed threadsafe output to standard log
-CVR  var::logputl() const {
-	THISIS("CVR  var::logputl() const")
-	LOCKIOSTREAM_OR_NOT
-	//this->put(std::clog);
-	std::clog << *this;
-	std::clog << std::endl;
-	return *this;
-}
-
 // overloaded logput with a prefix str
 CVR  var::logput(in prefix) const {
 	THISIS("CVR  var::logput(in prefix) const")
 	LOCKIOSTREAM_OR_NOT
 	//prefix.put(std::clog);
 	std::clog << prefix;
-	std::clog << *this;
+	std::clog << this->convert(_ALL_FMS, _VISIBLE_FMS);
 	return *this;
 }
 
@@ -206,7 +139,8 @@ CVR  var::logputl(in prefix) const {
 	//prefix.put(std::clog);
 	//this->put(std::clog);
 	std::clog << prefix;
-	std::clog << *this;
+//	std::clog << *this;
+	std::clog << this->convert(_ALL_FMS, _VISIBLE_FMS);
 	std::clog << std::endl;
 	return *this;
 }

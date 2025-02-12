@@ -1452,9 +1452,6 @@ class PUBLIC var_base {
 	// OSTREAM
 	//////////
 
-	// Causes ambiguous overload for some unknown reason despite being a hidden friend
-	// friend std::ostream& operator<<(std::ostream& ostream1, TVR var1);
-
 	// Note replicated for var but that one converts FM, VM etc. to visible chars before output
 	friend std::ostream& operator<<(std::ostream& ostream1, CBR outvar) {
 		outvar.assertString(__PRETTY_FUNCTION__);

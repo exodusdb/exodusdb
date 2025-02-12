@@ -666,7 +666,7 @@ void printl(const Printable& value, const Additional&... values) {
 template <typename... Printable>
 void errputl(const Printable&... values) {
 	LOCKIOSTREAM_SLOW
-	((std::cerr << values), ...);
+	((std::cerr << var(values).convert(_ALL_FMS, _VISIBLE_FMS)), ...);
 	std::cerr << std::endl;
 }
 
@@ -675,7 +675,7 @@ void errputl(const Printable&... values) {
 template <typename... Printable>
 void logputl(const Printable&... values) {
 	LOCKIOSTREAM_SLOW
-	((std::clog << values), ...);
+	((std::clog << var(values).convert(_ALL_FMS, _VISIBLE_FMS)), ...);
 	std::clog << std::endl;
 }
 
@@ -720,7 +720,7 @@ void printx(const Printable& value, const Additional&... values) {
 template <typename... Printable>
 void errput(const Printable&... values) {
 	LOCKIOSTREAM_SLOW
-	((std::cerr << values), ...);
+	((std::cerr << var(values).convert(_ALL_FMS, _VISIBLE_FMS)), ...);
 }
 
 // logput(args) to clog
@@ -728,7 +728,7 @@ void errput(const Printable&... values) {
 template <typename... Printable>
 void logput(const Printable&... values) {
 	LOCKIOSTREAM_SLOW
-	((std::clog << values), ...);
+	((std::clog << var(values).convert(_ALL_FMS, _VISIBLE_FMS)), ...);
 }
 
 /////////////////////////////////
