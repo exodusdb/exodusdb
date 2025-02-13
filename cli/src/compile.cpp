@@ -100,7 +100,7 @@ function main() {
 	let optimise = 1 + options.count("O") - options.count("o") + (!!exo_module);
 	let generateheadersonly = options.contains("h");
 	let force = options.contains("F") or options.contains("P");
-	let color_option = options.contains("C");
+	let color_option = options.count("C") - options.count("c");
 	let warnings = options.count("W") - options.count("w");
 	let warnings_are_errors = options.count("E") - options.count("e");
 	let preprocess_only = options.count("P");
@@ -132,18 +132,19 @@ OPTIONS
 	o/oo/ooo = Deoptimise (cancels 'O's)
 	W/WW/WWW = Increase warnings
 	w/ww/www = Reduce warnings
-	E  = Warnings are errors
-	e  = Warnings are not errors (default)/cancel E
-	V  = Verbose
-	S  = Silent (stars only)
-	SS = Super silent (no stars)
-	h  = Generate headers only
-	h  = Generate headers only
-	F  = Force compilation even if output file is newer than all input files
-	P  = C++ preprocessor output only, PP = cleanup, PPP reformat (and reindent if 'indent' is installed).
-	X  = Skip compilation
-	L  = Clean (remove) object and header files that compile installed.
-	i  = Inline code
+	E	= Warnings are errors
+	e	= Warnings are not errors (default)/cancel E
+	V	= Verbose
+	S	= Silent (stars only)
+	SS	= Super silent (no stars)
+	C/c	= Color diagnostics on/off
+	h	= Generate headers only
+	h	= Generate headers only
+	F	= Force compilation even if output file is newer than all input files
+	P	= C++ preprocessor output only, PP = cleanup, PPP reformat (and reindent if 'indent' is installed).
+	X	= Skip compilation
+	L	= Clean (remove) object and header files that compile installed.
+	i	= Inline code
 			compile 'oconv("date()", "D")' {i}                        // Simple expression. NO semicolon"
 			compile 'write("f1^f2"_var on "definitions", "abc");' {i} // Raw source code.   MANDATORY semicolon(s).
 ENVIRONMENT
@@ -426,8 +427,10 @@ ENVIRONMENT
 		basicoptions ^= " -fmodule-file=std=/usr/local/lib/std.pcm";
 		basicoptions ^= " -fmodule-file=exoprog=/usr/local/lib/exoprog.pcm";
 #endif
-		if (color_option)
-			basicoptions ^= " -fdiagnostics-color=always";
+		if (color_option) {
+			basicoptions ^= " -fdiagnostics-color=";
+			basicoptions ^= color_option > 0 ? "always" : "never";
+		}
 
 		// Show various warnings by default or by command
 		if (warnings >= 0) {

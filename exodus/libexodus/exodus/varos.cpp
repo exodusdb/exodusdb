@@ -367,6 +367,8 @@ bool var::osshellwrite(in oscmd) const {
 
 void var::osflush() const {
 	std::cout << std::flush;
+//	std::cerr << std::flush; // self flushing
+	std::clog << std::flush;
 	return;
 }
 
