@@ -26,6 +26,9 @@ static std::atomic<int> atomic_ncompilation_failures;
 #pragma GCC diagnostic pop
 
 #include <exodus/program.h>
+var verbose;
+var cleaning;
+
 programinit()
 
 	// CONSTANTS
@@ -63,9 +66,11 @@ programinit()
 	//more complicated so for now use extern "C" and not .def files
 	//#define EXODUS_EXPORT_USING_DEF
 
-	var verbose;
-
 function main() {
+
+	// i - inline source code
+	if (OPTIONS.contains("i"))
+		return eeval_main();
 
 	// Get more options from environment and possibly the second word of the command
 	var options = OPTIONS ^ osgetenv("EXO_COMPILE_OPTIONS");
@@ -81,8 +86,12 @@ function main() {
 	let exo_module = false;
 #endif
 
-	// Options
+	// Global options
 	verbose = options.contains("V");
+	cleaning = options.contains("L");
+
+	// Options
+	let cleaning = options.contains("L");
 	let silent = options.count("S");
 	let debugging = not options.contains("R");  //no symbols for backtrace
 	// Add one optimisation level if EXO_MODULE
@@ -110,33 +119,39 @@ function main() {
 	}
 
 	// Extract file/dirnames
-	var filenames = field(COMMAND, FM, 2, 999999999);
+	var filenames = COMMAND.remove(1);
 	var nfiles = fcount(filenames, FM);
 	if (not filenames or options.contains("H"))
 		abort(
-			"SYNTAX\n"
-			"	compile FILENAME|DIRNAME ... [{OPTION...}]\n"
-			"OPTIONS\n"
-			"	R = Release (No symbols)\n"
-			"	O/OO/OOO = Optimisation levels (Default 'O') (Poorer debugging/backtrace)\n"
-			"	o/oo/ooo = Deoptimise (cancels 'O's)\n"
-			"	W/WW/WWW = Increase warnings\n"
-			"	w/ww/www = Reduce warnings\n"
-			"	E = Warnings are errors\n"
-			"	e = Warnings are not errors (default)/cancel E\n"
-			"	V = Verbose\n"
-			"	S = Silent (stars only)\n"
-			"	h = Generate headers only\n"
-			"	F = Force compilation even if output file is newer than all input files\n"
-			"	P = Preprocessor output only, PP = cleanup, PPP reformat (and reindent if 'indent' is installed).\n"
-			"	X = Skip compilation\n"
-			"ENVIRONMENT\n"
-			"	EXO_COMPILE_OPTIONS As above\n"
-			"	CXX_OPTIONS         Depends on c++ compiler used\n"
-			"	CXX                 e.g. g++, clang, c++ with or without full path\n"
-			"	EXO_POST_COMPILE    Can be something like 'tac|fixdeprecated'"
-		);
-
+R"V0G0N(
+SYNTAX
+	compile FILENAME|DIRNAME ... [{OPTION...}]
+OPTIONS
+	R  = Release (No symbols)
+	O/OO/OOO = Optimisation levels (Default 'O') (Poorer debugging/backtrace)
+	o/oo/ooo = Deoptimise (cancels 'O's)
+	W/WW/WWW = Increase warnings
+	w/ww/www = Reduce warnings
+	E  = Warnings are errors
+	e  = Warnings are not errors (default)/cancel E
+	V  = Verbose
+	S  = Silent (stars only)
+	SS = Super silent (no stars)
+	h  = Generate headers only
+	h  = Generate headers only
+	F  = Force compilation even if output file is newer than all input files
+	P  = C++ preprocessor output only, PP = cleanup, PPP reformat (and reindent if 'indent' is installed).
+	X  = Skip compilation
+	L  = Clean (remove) object and header files that compile installed.
+	i  = Inline code
+			compile 'oconv("date()", "D")' {i}                        // Simple expression. NO semicolon"
+			compile 'write("f1^f2"_var on "definitions", "abc");' {i} // Raw source code.   MANDATORY semicolon(s).
+ENVIRONMENT
+	EXO_COMPILE_OPTIONS As above
+	CXX_OPTIONS         Depends on c++ compiler used
+	CXX                 e.g. g++, clang, c++ with or without full path
+	EXO_POST_COMPILE    Can be something like 'tac|fixdeprecated'
+)V0G0N");
 
 	// DETERMINE COMPILER/LINKER OPTIONS AND FLAGS
 	//////////////////////////////////////////////
@@ -818,7 +833,8 @@ function main() {
 			//filepath_without_ext = srcfilename.cut(-len(fileext) - 1);
 		}
 
-		//install/copy header files to inc directory
+		// Install/copy and header files found to inc directory
+		// .h files are not compiled. They are COPIED.
 		else if (inc_extensions.locateusing(" ", fileext)) {
 			var srctext = osread(srcfilename);
 
@@ -827,10 +843,22 @@ function main() {
 				abs_srcfilename.prefixer(oscwd() ^ OSSLASH);
 			srctext.prefixer("/" "/copied by exodus \"compile " ^ abs_srcfilename ^ DQ ^ EOL);
 
+			let targetfilename = incdir ^ OSSLASH ^ srcfilename.field2(OSSLASH, -1);
+
+			if (cleaning) {
+				if (osfile(targetfilename)) {
+					if (not osremove(targetfilename)) {
+						loglasterror();
+						continue;
+					}
+					if (verbose)
+						logputl(targetfilename ^ " removed.");
+				}
+				continue;
+			}
+
 			//create include directory if doesnt already exist
 			call make_include_dir(incdir);
-
-			let targetfilename = incdir ^ OSSLASH ^ srcfilename.field2(OSSLASH, -1);
 
 			if (osread(targetfilename) != srctext) {
 				if (not srctext.oswrite(targetfilename)) {
@@ -1515,7 +1543,18 @@ function main() {
 				osflush();
 				if (not osread(oldheadertext, headerfilename, locale)) {
 				}
-				if (oldheadertext ne newheadertext) {
+
+				// Cleaning
+				if (cleaning) {
+					if (osfile(headerfilename)) {
+						if (not osremove(headerfilename))
+							loglasterror();
+						else if (verbose)
+							logputl(headerfilename ^ " cleaned.");
+					}
+				}
+
+				else if (oldheadertext ne newheadertext) {
 
 //					TRACE(headerfilename)
 //					TRACE(newheadertext)
@@ -1609,7 +1648,7 @@ function main() {
 				}
 
 				// Only skip compilation if all headers are older than the current output file
-				if (not recompile_required) {
+				if (not cleaning and not recompile_required) {
 					if (verbose)
 						printl("Skipping compilation since the output file is newer than both the source code, its include files and libraries, and no (F)orce option provided.");
 					//continue;
@@ -1828,6 +1867,19 @@ function static compile2(
 
 	}
 
+	var outputpathandfile = outputdir ^ field2(binfilename, OSSLASH, -1);
+
+	// If cleaning, not compiling
+	if (cleaning) {
+		if (osfile(outputpathandfile)) {
+			if (not osremove(outputpathandfile))
+				loglasterror();
+			else if (verbose)
+				errputl(outputpathandfile ^ " cleaned.");
+		}
+		return "";
+	}
+
 	////////////////////
 	// Call the compiler - Dont forget that we are probably doing many in parallel threads
 	////////////////////
@@ -1914,7 +1966,6 @@ function static compile2(
 				}
 
 				// Check can install file
-				var outputpathandfile = outputdir ^ field2(binfilename, OSSLASH, -1);
 				if (osfile(outputpathandfile)) {
 					if (osopen(outputpathandfile, outputpathandfile)) {
 						osclose(outputpathandfile);
@@ -2125,6 +2176,65 @@ function is_newer(in new_file_info, in old_file_info) {
 
 	return new_file_info.f(3) > old_file_info.f(3);
 
+}
+
+function eeval_main() {
+
+//	var source = SENTENCE.fieldstore(" ", 1, -1, "");
+	var source = COMMAND.remove(1).convert(FM, " ");
+
+	if (not source)
+		abort(
+R"__(
+Syntax is compile 'EXPRESSION' or 'COMMAND;... {i}'
+e.g.
+	compile 'oconv("date()", "D")' {i}                        // Simple expression. NO semicolon.
+	compile 'write("f1^f2"_var on "definitions", "abc");' {i} // Raw source code.   MANDATORY semicolon(s).
+)__"
+		);
+
+	// source ending with a ; is assumed to be one or more commands which dont return a value
+	// and is compiled as is, otherwise wrap in TRACE() to display the output
+	let source_is_expression = not source.ends(";");
+	if (source_is_expression)
+		source = "TRACE(" ^ source ^ ")";
+
+	// Generate exodus program source code
+	let prog =
+		"#include <exodus/program.h>\n"
+		"programinit()\n"
+		"\n"
+		"function main() {\n" ^
+			source ^ "\n" ^
+			"\n"
+			"return 0;\n"
+		"}\n"
+		"programexit()\n";
+
+	// Create a tmp cpp file
+	let tempfilebase = ostempfilename();
+//	let tempfilebase = ostempdirpath() ^ "~eeval";
+	let tempfilesrc	 = tempfilebase ^ ".cpp";
+	if (not oswrite(prog, tempfilesrc))
+		abort(lasterror());
+
+	// Compile it
+	if (not osshell("compile " ^ tempfilesrc ^ " {SS}"))
+		abort(lasterror());
+
+	// Run it
+	if (not osshell(tempfilebase.field2("/", -1)))
+		loglasterror();
+
+	// Start a new line in case output left the cursor hanging mid line.
+	if (not source_is_expression)
+		printl();
+
+	// Cleanup {L} removes ~/bin and ~/inc files
+	if (not osshell("compile " ^ tempfilesrc ^ " {LSS}"))
+		loglasterror();
+
+	return 0;
 }
 
 programexit()

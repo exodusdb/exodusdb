@@ -48,7 +48,7 @@ function main() {
 // initfile:
 ////////////
 
-	let filenames = field(COMMAND, FM, 2, 99999);
+	let filenames = COMMAND.remove(1);
 	let nfiles = fcount(filenames, FM);
 
 ////////////
