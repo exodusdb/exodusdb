@@ -3,8 +3,8 @@
 502 xxxxxxxx unused
 503 bool dim::read(in filevar, in key)
 504 void dim::write(in filevar, in key) const
-505 bool dim::osread(in osfilename, const char* codepage DEFAULT_EMPTY)
-506 bool dim::oswrite(in osfilename, const char* codepage DEFAULT_EMPTY)
+505 bool dim::osread(in osfilename, const char* codepage = "")
+506 bool dim::oswrite(in osfilename, const char* codepage = "")
 507 var  var::sort(SV sepchar)
 508 var  var::reverse(SV sepchar)
 509 var  var::timestamp(in ostime) const

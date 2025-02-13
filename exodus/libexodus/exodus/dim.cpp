@@ -519,7 +519,7 @@ void dim::write(in filevar, in key) const {
 
 bool dim::osread(in osfilename, const char* codepage) {
 
-	THISIS("bool dim::osread(in osfilename, const char* codepage DEFAULT_EMPTY)")
+	THISIS("bool dim::osread(in osfilename, const char* codepage = "")")
 	ISSTRING(osfilename)
 
 	var txt;
@@ -548,7 +548,7 @@ bool dim::osread(in osfilename, const char* codepage) {
 
 bool dim::oswrite(in osfilename, const char* codepage) const {
 
-	THISIS("bool dim::oswrite(in osfilename, const char* codepage DEFAULT_EMPTY)")
+	THISIS("bool dim::oswrite(in osfilename, const char* codepage = "")")
 	ISSTRING(osfilename)
 //	ISSTRING(codepage)
 

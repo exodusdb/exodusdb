@@ -100,14 +100,6 @@ Binary    Hex          Comments
 //#include <exodus/mvutf.h>
 //#include <exodus/varlocale.h>
 
-// Keep doxygen happy
-#undef DEFAULT_SPACE
-#define DEFAULT_SPACE
-#undef DEFAULT_EMPTY
-#define DEFAULT_EMPTY
-#undef DEFAULT_FM
-#define DEFAULT_FM
-
 // std::ios::sync_with_stdio(false);
 //static bool desynced_with_stdio = false;
 
@@ -655,7 +647,7 @@ var  var::textlen() const {
 // trim
 
 // Const
-var  var::trim(SV trimchars DEFAULT_SPACE) const& {
+var  var::trim(SV trimchars /*= " "*/) const& {
 
 	THISIS("io   var::trim(SV trimchars)")
 	assertString(function_sig);
@@ -664,7 +656,7 @@ var  var::trim(SV trimchars DEFAULT_SPACE) const& {
 }
 
 // Mutate
-IO   var::trimmer(SV trimchars DEFAULT_SPACE) REF {
+IO   var::trimmer(SV trimchars /*= " "*/) REF {
 
 	// TODO reimplement with boost string trim_if algorithm
 	// http://www.boost.org/doc/libs/1_39_0/doc/html/string_algo/reference.html
@@ -684,7 +676,7 @@ IO   var::trimmer(SV trimchars DEFAULT_SPACE) REF {
 // trimfirst - remove leading/left bytes
 
 // Const
-var  var::trimfirst(SV trimchars DEFAULT_SPACE) const& {
+var  var::trimfirst(SV trimchars /*= " "*/) const& {
 
 	THISIS("io   var::trimfirst(SV trimchars) const&")
 	assertString(function_sig);
@@ -693,7 +685,7 @@ var  var::trimfirst(SV trimchars DEFAULT_SPACE) const& {
 }
 
 // Mutate
-IO   var::trimmerfirst(SV trimchars DEFAULT_SPACE) REF {
+IO   var::trimmerfirst(SV trimchars /*= " "*/) REF {
 
 	THISIS("void var::trimmerfirst(SV trimchars) &")
 	assertStringMutator(function_sig);
@@ -706,7 +698,7 @@ IO   var::trimmerfirst(SV trimchars DEFAULT_SPACE) REF {
 // trimlast() - trim trailing/right bytes
 
 // Const
-var  var::trimlast(SV trimchars DEFAULT_SPACE) const& {
+var  var::trimlast(SV trimchars /*= " "*/) const& {
 
 	THISIS("io   var::trimlast(SV trimchars) const&")
 	assertString(function_sig);
@@ -715,7 +707,7 @@ var  var::trimlast(SV trimchars DEFAULT_SPACE) const& {
 }
 
 // Mutate
-IO   var::trimmerlast(SV trimchars DEFAULT_SPACE) REF {
+IO   var::trimmerlast(SV trimchars /*= " "*/) REF {
 
 	THISIS("void var::trimmerlast(SV trimchars) &")
 	assertStringMutator(function_sig);
@@ -729,7 +721,7 @@ IO   var::trimmerlast(SV trimchars DEFAULT_SPACE) REF {
 //trimboth() - remove leading and trailing spaces/characters but not inner
 
 // Const
-var  var::trimboth(SV trimchars DEFAULT_SPACE) const& {
+var  var::trimboth(SV trimchars /*= " "*/) const& {
 
 	THISIS("io   var::trimboth(SV trimchars) const&")
 	assertString(function_sig);
@@ -738,7 +730,7 @@ var  var::trimboth(SV trimchars DEFAULT_SPACE) const& {
 }
 
 // Mutate
-IO   var::trimmerboth(SV trimchars DEFAULT_SPACE) REF {
+IO   var::trimmerboth(SV trimchars /*= " "*/) REF {
 
 	THISIS("void var::trimmerboth(SV trimchars) &")
 	assertStringMutator(function_sig);
@@ -2301,10 +2293,10 @@ ND io   var::quote()                                   && {quoter(); return *thi
 ND io   var::squote()                                  && {squoter(); return *this;}
 ND io   var::unquote()                                 && {unquoter(); return *this;}
 
-ND io   var::trim(     SV trimchars DEFAULT_SPACE)     && {trimmer(trimchars); return *this;}
-ND io   var::trimfirst(SV trimchars DEFAULT_SPACE)     && {trimmerfirst(trimchars); return *this;}
-ND io   var::trimlast( SV trimchars DEFAULT_SPACE)     && {trimmerlast(trimchars); return *this;}
-ND io   var::trimboth( SV trimchars DEFAULT_SPACE)     && {trimmerboth(trimchars); return *this;}
+ND io   var::trim(     SV trimchars /*= " "*/)     && {trimmer(trimchars); return *this;}
+ND io   var::trimfirst(SV trimchars /*= " "*/)     && {trimmerfirst(trimchars); return *this;}
+ND io   var::trimlast( SV trimchars /*= " "*/)     && {trimmerlast(trimchars); return *this;}
+ND io   var::trimboth( SV trimchars /*= " "*/)     && {trimmerboth(trimchars); return *this;}
 
 ND io   var::first()                                   && {firster(); return *this;}
 ND io   var::last()                                    && {laster(); return *this;}
@@ -2330,10 +2322,10 @@ ND io   var::replace(    SV fromstr,   SV tostr)       && {replacer(fromstr, tos
 ND io   var::replace(const rex& regex, SV replacement) && {replacer(regex, replacement); return *this;}
 
 ND io   var::unique()                                  && {uniquer(); return *this;}
-ND io   var::sort(   SV sepchar DEFAULT_FM)            && {sorter(sepchar); return *this;}
-ND io   var::reverse(SV sepchar DEFAULT_FM)            && {reverser(sepchar); return *this;}
-ND io   var::shuffle(SV sepchar DEFAULT_FM)            && {shuffler(sepchar); return *this;}
-ND io   var::parse(char sepchar DEFAULT_FM)            && {parser(sepchar); return *this;}
+ND io   var::sort(   SV sepchar /*= FM_*/)                 && {sorter(sepchar); return *this;}
+ND io   var::reverse(SV sepchar /*= FM_*/)                 && {reverser(sepchar); return *this;}
+ND io   var::shuffle(SV sepchar /*= FM_*/)                 && {shuffler(sepchar); return *this;}
+ND io   var::parse(char sepchar /*= FM_*/)                 && {parser(sepchar); return *this;}
 
 // clang-format on
 

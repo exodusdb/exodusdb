@@ -126,8 +126,8 @@ auto get_timebank_acno(const std::string_view arg1) -> int {
 	else if (++acno && arg1 == "xxxxxxxx unused") {}
 	else if (++acno && arg1 == "bool dim::read(in filevar, in key)") {}
 	else if (++acno && arg1 == "void dim::write(in filevar, in key) const") {}
-	else if (++acno && arg1 == "bool dim::osread(in osfilename, const char* codepage DEFAULT_EMPTY)") {}
-	else if (++acno && arg1 == "bool dim::oswrite(in osfilename, const char* codepage DEFAULT_EMPTY)") {}
+	else if (++acno && arg1 == "bool dim::osread(in osfilename, const char* codepage = "")") {}
+	else if (++acno && arg1 == "bool dim::oswrite(in osfilename, const char* codepage = "")") {}
 	else if (++acno && arg1 == "var  var::sort(SV sepchar)") {}
 	else if (++acno && arg1 == "var  var::reverse(SV sepchar)") {}
 	else if (++acno && arg1 == "var  var::timestamp(in ostime) const") {}

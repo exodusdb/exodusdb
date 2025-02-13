@@ -103,16 +103,6 @@
 #define TRACE2(EXPRESSION) \
 	std::cerr << (EXPRESSION) << std::endl;
 
-// Readability for defaults
-//
-#define DEFAULT_UNASSIGNED = var()
-#define DEFAULT_EMPTY = ""
-#define DEFAULT_DOT = "."
-#define DEFAULT_SPACE = " "
-#define DEFAULT_CSPACE = ' '
-#define DEFAULT_VM = VM_
-#define DEFAULT_NULL = nullptr
-
 //// string::view
 ////
 //using SV = std::string_view;

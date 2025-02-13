@@ -128,21 +128,11 @@ PUBLIC std::mutex global_mutex_threadstream;
 //      = output/outputl/outputt, logput/logputl
 #define LOCKIOSTREAM_FAST
 
-#define DEFAULT_EMPTY = ""
-#define DEFAULT_DOT = "."
-#define DEFAULT_CSPACE = ' '
-#define DEFAULT__FM = _FM
-#define DEFAULT_0 = 0
-#define DEFAULT_1  = 1
-#define DEFAULT_M1 = -1
-#define DEFAULT_TRUE = true
-#define DEFAULT_FALSE = false
-
 int exodus_main(int exodus_argc, const char* exodus_argv[], ExoEnv& mv, int threadno);
 
 ND var  hash(in instring, const std::uint64_t modulus = 0);
 
-ND var  osgetenv(SV envcode DEFAULT_EMPTY);
+ND var  osgetenv(SV envcode = "" );
 ND bool osgetenv(SV code, io value);
    void ossetenv(SV code, in value);
 
@@ -170,7 +160,7 @@ ND var  oswait(SV file_dir_list, const int milliseconds);
 // 4 argument version for statement format
 // osbread(data from x at y length z)
 // Read/write osfile at specified offset. Must open/close.
-ND bool osopen(in osfilepath, out osfilevar, const bool utf8 DEFAULT_TRUE);
+ND bool osopen(in osfilepath, out osfilevar, const bool utf8 = true );
    void osclose(in osfilevar);
 // Versions where offset is input and output
 ND bool osbread(io data, in osfilevar, io offset, const int length);
@@ -182,8 +172,8 @@ ND bool osbwrite(in data, in osfilevar, in offset);
 #endif
 
 // Read/Write whole osfile
-ND bool oswrite(in data, in osfilepath, const char* codepage DEFAULT_EMPTY);
-ND bool osread(io data, in osfilepath, const char* codepage DEFAULT_EMPTY);
+ND bool oswrite(in data, in osfilepath, const char* codepage = "" );
+ND bool osread(io data, in osfilepath, const char* codepage = "" );
 // Simple version without codepage returns the contents or "" if file cannot be read
 // one argument returns the contents directly to be used in assignments
 ND var  osread(in osfilepath);
@@ -193,16 +183,16 @@ ND bool osrename(in old_ospath, in new_ospath);
 ND bool oscopy(in from_ospath, in to_ospath);
 ND bool osmove(in from_ospath, in to_ospath);
 
-ND var  oslist(in path DEFAULT_DOT, SV globpattern DEFAULT_EMPTY, const int mode DEFAULT_0);
-ND var  oslistf(in filepath DEFAULT_DOT, SV globpattern DEFAULT_EMPTY);
-ND var  oslistd(in dirpath DEFAULT_DOT, SV globpattern DEFAULT_EMPTY);
+ND var  oslist(in path = "." , SV globpattern = "" , const int mode = 0 );
+ND var  oslistf(in filepath = "." , SV globpattern = "" );
+ND var  oslistd(in dirpath = "." , SV globpattern = "" );
 
-ND var  osinfo(in path, const int mode DEFAULT_0);
+ND var  osinfo(in path, const int mode = 0 );
 ND var  osfile(in filepath);
 ND var  osdir(in dirpath);
 
 ND bool osmkdir(in dirpath);
-ND bool osrmdir(in dirpath, const bool evenifnotempty DEFAULT_FALSE);
+ND bool osrmdir(in dirpath, const bool evenifnotempty = false );
 
 ND var  oscwd(void);
 ND var  oscwd(in dirpath);
@@ -218,7 +208,7 @@ ND var  osshellread(in command);
 
 //var execute(in command);
 
-//void debug(in DEFAULT_EMPTY);
+//void debug(in = "" );
 ND var  backtrace(void);
 
    bool setxlocale(SV locale);
@@ -252,10 +242,10 @@ ND var  mod(in dividend, const int divisor);
 // instead of a var like normal exodus functions)
 ND var  integer(in num1);
 ND var  floor(in num1);
-ND var  round(in num1, const int ndecimals DEFAULT_0);
+ND var  round(in num1, const int ndecimals = 0 );
 
 ND var  rnd(const int number);
-   void initrnd(in seed DEFAULT_0);
+   void initrnd(in seed = 0 );
 
 // INPUT
 
@@ -269,7 +259,7 @@ ND var  getprompt(void);
    var  inputn(const int nchars);
 
 ND bool isterminal(void);
-ND bool hasinput(const int millisecs DEFAULT_0);
+ND bool hasinput(const int millisecs = 0 );
 ND bool eof(void);
    bool echo(const int on_off);
 
@@ -379,15 +369,15 @@ ND var  fieldstore(in instring, SV sepchar, const int fieldno, const int nfields
    IO   fieldstorer(io iostring, SV sepchar, const int fieldno, const int nfields, in replacement);
 
 
-ND var  trim(in instring, SV trimchars DEFAULT_SPACE);
-ND var  trimfirst(in instring, SV trimchars DEFAULT_SPACE);
-ND var  trimlast(in instring, SV trimchars DEFAULT_SPACE);
-ND var  trimboth(in instring, SV trimchars DEFAULT_SPACE);
+ND var  trim(in instring, SV trimchars = " ");
+ND var  trimfirst(in instring, SV trimchars = " ");
+ND var  trimlast(in instring, SV trimchars = " ");
+ND var  trimboth(in instring, SV trimchars = " ");
 
-   IO   trimmer(io iostring, SV trimchars DEFAULT_SPACE);
-   IO   trimmerfirst(io iostring, SV trimchars DEFAULT_SPACE);
-   IO   trimmerlast(io iostring, SV trimchars DEFAULT_SPACE);
-   IO   trimmerboth(io iostring, SV trimchars DEFAULT_SPACE);
+   IO   trimmer(io iostring, SV trimchars = " ");
+   IO   trimmerfirst(io iostring, SV trimchars = " ");
+   IO   trimmerlast(io iostring, SV trimchars = " ");
+   IO   trimmerboth(io iostring, SV trimchars = " ");
 
 ND var  first(in instring);
 ND var  last(in instring);
@@ -398,7 +388,7 @@ ND var  chr(const int integer);
 ND var  textchr(const int integer);
 
 // Match
-ND var  match(in instring, SV regex_str, SV options DEFAULT_EMPTY);
+ND var  match(in instring, SV regex_str, SV options = "" );
 ND var  match(in instring, const rex& regex);
 
 // Search
@@ -429,25 +419,25 @@ ND bool starts(in instring, SV substr);
 ND bool ends(in instring, SV substr);
 ND bool contains(in instring, SV substr);
 
-ND var  index(in instring, SV substr, const int startindex DEFAULT_1);
+ND var  index(in instring, SV substr, const int startindex = 1 );
 ND var  indexn(in instring, SV substr, int occurrence);
-ND var  indexr(in instring, SV substr, const int startindex DEFAULT_M1);
+ND var  indexr(in instring, SV substr, const int startindex = -1 );
 
-ND var  field(in instring, SV substr, const int fieldno, const int nfields DEFAULT_1);
-ND var  field2(in instring, SV substr, const int fieldno, const int nfields DEFAULT_1);
+ND var  field(in instring, SV substr, const int fieldno, const int nfields = 1 );
+ND var  field2(in instring, SV substr, const int fieldno, const int nfields = 1 );
 
 // STRINGS WITH FIELD MARKS
 
 ND var  substr2(in fromstr, io startindex, io delimiterno);
 
-ND dim  split(in sourcevar, SV sepchar DEFAULT__FM);
-ND var  join(const dim& sourcedim, SV sepchar DEFAULT__FM);
+ND dim  split(in sourcevar, SV sepchar = _FM );
+ND var  join(const dim& sourcedim, SV sepchar = _FM );
 
 ND var  pickreplace(in instring, const int fieldno, const int valueno, const int subvalueno, in replacement);
 ND var  pickreplace(in instring, const int fieldno, const int valueno, in replacement);
 ND var  pickreplace(in instring, const int fieldno, in replacement);
 
-ND var  extract(in instring, const int fieldno DEFAULT_0, const int valueno DEFAULT_0, const int subvalueno DEFAULT_0);
+ND var  extract(in instring, const int fieldno = 0 , const int valueno = 0 , const int subvalueno = 0 );
 
 ND var  insert(in instring, const int fieldno, const int valueno, const int subvalueno, in insertion);
 ND var  insert(in instring, const int fieldno, const int valueno, in insertion);
@@ -455,7 +445,7 @@ ND var  insert(in instring, const int fieldno, in insertion);
 
 // var erase(in instring, const int fieldno, const int valueno=0, const int
 // subvalueno=0);
-ND var  remove(in instring, const int fieldno, const int valueno DEFAULT_0, const int subvalueno DEFAULT_0);
+ND var  remove(in instring, const int fieldno, const int valueno = 0 , const int subvalueno = 0 );
 
    IO   pickreplacer(io iostring, const int fieldno, const int valueno, const int subvalueno, in replacement);
    IO   pickreplacer(io iostring, const int fieldno, const int valueno, in replacement);
@@ -467,21 +457,21 @@ ND var  remove(in instring, const int fieldno, const int valueno DEFAULT_0, cons
 
 // IO eraser(io iostring, const int fieldno, const int valueno=0, const int
 // subvalueno=0);
-   IO   remover(io iostring, const int fieldno, const int valueno DEFAULT_0, const int subvalueno DEFAULT_0);
+   IO   remover(io iostring, const int fieldno, const int valueno = 0 , const int subvalueno = 0 );
 
 ND var  locate(in target, in instring);
 ND bool locate(in target, in instring, io setting);
-ND bool locate(in target, in instring, io setting, const int fieldno, const int valueno DEFAULT_0);
+ND bool locate(in target, in instring, io setting, const int fieldno, const int valueno = 0 );
 
 ND bool locateby(const char* ordercode, in target, in instring, io setting);
-ND bool locateby(const char* ordercode, in target, in instring, io setting, const int fieldno, const int valueno DEFAULT_0);
+ND bool locateby(const char* ordercode, in target, in instring, io setting, const int fieldno, const int valueno = 0 );
 
 ND bool locateby(in ordercode, in target, in instring, io setting);
-ND bool locateby(in ordercode, in target, in instring, io setting, const int fieldno, const int valueno DEFAULT_0);
+ND bool locateby(in ordercode, in target, in instring, io setting, const int fieldno, const int valueno = 0 );
 
 ND bool locateusing(in usingchar, in target, in instring);
 ND bool locateusing(in usingchar, in target, in instring, io setting);
-ND bool locateusing(in usingchar, in target, in instring, io setting, const int fieldno, const int valueno DEFAULT_0, const int subvalueno DEFAULT_0);
+ND bool locateusing(in usingchar, in target, in instring, io setting, const int fieldno, const int valueno = 0 , const int subvalueno = 0 );
 
 ND var  sum(in instring, SV sepchar);
 ND var  sum(in instring);
@@ -490,21 +480,21 @@ ND var  sumall(in instring);
 ND var  crop(in instring);
    IO   cropper(io iostring);
 
-ND var  sort(in instring, SV sepchar DEFAULT__FM);
-   IO   sorter(io iostring, SV sepchar DEFAULT__FM);
+ND var  sort(in instring, SV sepchar = _FM );
+   IO   sorter(io iostring, SV sepchar = _FM );
 
-ND var  reverse(in instring, SV sepchar DEFAULT__FM);
-   IO   reverser(io iostring, SV sepchar DEFAULT__FM);
+ND var  reverse(in instring, SV sepchar = _FM );
+   IO   reverser(io iostring, SV sepchar = _FM );
 
-ND var  shuffle(in instring, SV sepchar DEFAULT__FM);
-   IO   shuffler(io iostring, SV sepchar DEFAULT__FM);
+ND var  shuffle(in instring, SV sepchar = _FM );
+   IO   shuffler(io iostring, SV sepchar = _FM );
 
-ND var  parse(in instring, char sepchar DEFAULT_CSPACE);
-   IO   parser(io instring, char sepchar DEFAULT_CSPACE);
+ND var  parse(in instring, char sepchar = ' ');
+   IO   parser(io instring, char sepchar = ' ');
 
 // DATABASE
 
-ND bool connect(in connectioninfo DEFAULT_EMPTY);
+ND bool connect(in connectioninfo = "" );
    void disconnect(void);
    void disconnectall(void);
 
@@ -513,7 +503,7 @@ ND bool sqlexec(in sqlcmd, out response);
 
 ND bool attach(in filenames);
 
-ND bool dbcreate(in dbname, in from_dbname DEFAULT_EMPTY);
+ND bool dbcreate(in dbname, in from_dbname = "" );
 ND var  dblist(void);
 ND bool dbcopy(in from_dbname, in to_dbname);
 ND bool dbdelete(in dbname);
@@ -526,9 +516,9 @@ ND var  listfiles(void);
 
 ND var  reccount(in dbfilename_or_var);
 
-ND bool createindex(in dbfilename_or_var, in fieldname DEFAULT_EMPTY, in dictfilename DEFAULT_EMPTY);
-ND bool deleteindex(in dbfilename_or_var, in fieldname DEFAULT_EMPTY);
-ND var  listindex(in dbfilename DEFAULT_EMPTY, in fieldname DEFAULT_EMPTY);
+ND bool createindex(in dbfilename_or_var, in fieldname = "" , in dictfilename = "" );
+ND bool deleteindex(in dbfilename_or_var, in fieldname = "" );
+ND var  listindex(in dbfilename = "" , in fieldname = "" );
 
 ND bool begintrans(void);
 ND bool statustrans(void);
@@ -538,9 +528,9 @@ ND bool committrans(void);
 
 ND bool lock(in dbfile, in key);
    bool unlock(in dbfile, in key);
-   bool unlockall(in conn DEFAULT_EMPTY);
+   bool unlockall(in conn = "" );
 
-   void cleardbcache(in conn DEFAULT_EMPTY);
+   void cleardbcache(in conn = "" );
 
 ND bool open(in dbfilename, io dbfile);
 ND bool open(in dbfilename);
@@ -562,19 +552,19 @@ ND bool dimread(dim& dimrecord, in dbfile, in key);
    void dimwrite(const dim& dimrecord, in dbfile, in key);
 
 // moved to exoprog so they have access to default cursor in mv.CURSOR
-// bool select(in sortselectclause DEFAULT_EMPTY);
+// bool select(in sortselectclause = "" );
 // void clearselect(void);
 // bool readnext(io key);
 // bool readnext(io key, io valueno);
 // bool readnext(io record, io key, io value);
 // deleterecord should be made a free function that doesnt use CURSOR
-// bool deleterecord(in dbfilename_or_var_or_command, in key DEFAULT_EMPTY);
+// bool deleterecord(in dbfilename_or_var_or_command, in key = "" );
 
 ND var xlate(in dbfilename, in key, in fieldno, const char* mode);
 ND var xlate(in dbfilename, in key, in fieldno, in mode);
 
 ND var lasterror(void);
-   var loglasterror(in source DEFAULT_SPACE);
+   var loglasterror(in source = " ");
 
 ////////////////////////////////////////////
 //output(args), outputl(args), outputt(args)
@@ -633,7 +623,7 @@ void outputt(const Printable&... value) {
 
 // printl(args) to cout
 
-template <auto sep DEFAULT_CSPACE, typename Printable, typename... Additional>
+template <auto sep = ' ', typename Printable, typename... Additional>
 void printl(const Printable& value, const Additional&... values) {
 	LOCKIOSTREAM_SLOW
 	std::cout << value;
@@ -643,7 +633,7 @@ void printl(const Printable& value, const Additional&... values) {
 
 //// errputl(args) to cerr
 //
-//template <auto sep DEFAULT_CSPACE, typename Printable, typename... Additional>
+//template <auto sep = ' ', typename Printable, typename... Additional>
 //void errputl(const Printable& value, const Additional&... values) {
 //	LOCKIOSTREAM_SLOW
 //	std::cerr << value;
@@ -653,7 +643,7 @@ void printl(const Printable& value, const Additional&... values) {
 //
 //// logputl(args) to clog
 //
-//template <auto sep DEFAULT_CSPACE, typename Printable, typename... Additional>
+//template <auto sep = ' ', typename Printable, typename... Additional>
 //void logputl(const Printable& value, const Additional&... values) {
 //	LOCKIOSTREAM_FAST
 //	std::clog << value;
@@ -691,7 +681,7 @@ void logputl(const Printable&... values) {
 
 // printx(args) to cout
 
-template <auto sep DEFAULT_CSPACE, typename Printable, typename... Additional>
+template <auto sep = ' ', typename Printable, typename... Additional>
 void printx(const Printable& value, const Additional&... values) {
 	LOCKIOSTREAM_SLOW
 	std::cout << value;
@@ -700,7 +690,7 @@ void printx(const Printable& value, const Additional&... values) {
 
 //// errput(args) to cerr
 //
-//template <auto sep DEFAULT_CSPACE, typename Printable, typename... Additional>
+//template <auto sep = ' ', typename Printable, typename... Additional>
 //void errput(const Printable& value, const Additional&... values) {
 //	LOCKIOSTREAM_SLOW
 //	std::cerr << value;
@@ -709,7 +699,7 @@ void printx(const Printable& value, const Additional&... values) {
 //
 //// logput(args) to clog
 //
-//template <auto sep DEFAULT_CSPACE, typename Printable, typename... Additional>
+//template <auto sep = ' ', typename Printable, typename... Additional>
 //void logput(const Printable& value, const Additional&... values) {
 //	LOCKIOSTREAM_FAST
 //	std::clog << value;
