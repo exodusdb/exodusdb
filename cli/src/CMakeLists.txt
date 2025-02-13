@@ -250,11 +250,11 @@
 			include/exodus
 	)
 
-# 6. Install man pages
-######################
-install(FILES var.1
-        DESTINATION ${CMAKE_INSTALL_PREFIX}/share/man/man1
-        COMPONENT man)
+## 6. Install man pages
+#######################
+#install(FILES var.1
+#        DESTINATION ${CMAKE_INSTALL_PREFIX}/share/man/man1
+#        COMPONENT man)
 
 # 7. CLEAN OUT ANY EDIC/COMPILE libs in ~/lib THAT WILL SHADOW THE REAL FILE IN /usr/local/lib
 #############################################
@@ -274,3 +274,35 @@ install(FILES var.1
 # ####
 #
 #	message("--EXODUS CLI CMAKE EXIT --")
+
+#
+# Use gendoc to make var.1 man page ans install it
+##################################################
+#
+
+# Assuming man_page_generator is already built and available at this point
+# Man page generation should happen during the build process
+
+# Define the output file for the man page
+set(MAN_PAGE_OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/var.1")
+
+# Custom command to generate the man page
+add_custom_command(OUTPUT ${MAN_PAGE_OUTPUT}
+                   COMMAND gendoc  ${CMAKE_CURRENT_SOURCE_DIR}/../../exodus/libexodus/exodus/var.h {m} >  ${MAN_PAGE_OUTPUT}
+#                   ARGS ${CMAKE_CURRENT_SOURCE_DIR}/source_for_man_page.txt ${MAN_PAGE_OUTPUT}
+                   DEPENDS gendoc
+# source_for_man_page.txt
+                   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+                   COMMENT "Generating man page"
+)
+
+# Add a custom target that depends on the man page generation
+add_custom_target(man_page_target ALL DEPENDS ${MAN_PAGE_OUTPUT})
+
+# Ensure man_page_generator is built before running this command
+add_dependencies(man_page_target gendoc)
+
+# Install the generated man page
+install(FILES ${MAN_PAGE_OUTPUT}
+        DESTINATION ${CMAKE_INSTALL_PREFIX}/share/man/man1
+)
