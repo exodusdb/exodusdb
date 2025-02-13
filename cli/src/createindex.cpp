@@ -4,7 +4,7 @@ programinit()
 function main() {
 
 	let force = OPTIONS.contains("F");
-	var indexnames = COMMAND.field(FM, 2, 999999);
+	var indexnames = COMMAND.remove(1);
 
 	if (not indexnames)
 		abort("Syntax is 'createindex [filename] [filename__]fieldname... {F=Force}'");

@@ -3,7 +3,7 @@ programinit()
 
 function main() {
 
-	let filenames = COMMAND.field(FM, 2, 999999);
+	let filenames = COMMAND.remove(1);
 
 	if (not filenames)
 		abort("Syntax is deletefile filename ...");

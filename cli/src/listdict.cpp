@@ -56,16 +56,12 @@ function main() {
 
 	var cmd = "list " ^ filename;
 
-	// Need to escape/add quotes for bash
-	//cmd ^= " " ^ COMMAND.field(FM, 3, 999999999).convert(FM, " ");
-
 	if (filename == "dict.all")
 		cmd ^= " ID-SUPP FILE_NAME FIELD_NAME @CRT BY FILE_NAME";
 
 	cmd ^= " by TYPE by FMC by PART by MASTER_FLAG";
 	//cmd ^= " by TYPE by-dsnd MASTER_FLAG by FMC by PART";
 
-	//cmd ^= " " ^ COMMAND.field(FM, 3, 999999999).convert(FM, " ");
 	cmd ^= " {" ^ OPTIONS ^ "}";
 
 	if (OPTIONS.contains("V"))
