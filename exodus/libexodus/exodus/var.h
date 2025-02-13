@@ -2243,25 +2243,48 @@ public:
 	///// OUTPUT:
 	////////////
 
-	// obj is var
+	// obj is varstr
 
-	// As above but with a prefix
-	   CVR output(in prefix = "") const;  // To stdout. With a prefix. No new line. Buffered.
-	   CVR outputl(in prefix = "") const; // To stdout. With a prefix. Starts a new line. Flushed.
-	   CVR outputt(in prefix = "") const; // To stdout. With a prefix. Adds a tab. Buffered.
+	// Output to stdout with optional prefix.
+	// Appends an NL char.
+	// Is FLUSHED, not buffered.
+	// The raw string bytes are output. No character or byte conversion is performed.
+	//
+	// `"abc"_var.outputl("xyz = "); /// Sends "xyz = abc\n" to stdout and flushes.
+	//  // or
+	//  outputl("xyz = ", "abc"); /// Any number of arguments is allowed. All will be output.`
+	   CVR outputl(in prefix = "") const;
+	   CVR output(in prefix = "") const;  // Same as outputl() but doesnt append an NL char and is BUFFERED, not flushed.
+	   CVR outputt(in prefix = "") const; // Same as outputl() but appends a tab char instead of an NL char and is BUFFERED, not flushed.
 
-	// As above but with a prefix
-	   CVR logput(in prefix = "") const;  // To stdlog. With a prefix. No new line. Buffered.
-	   CVR logputl(in prefix = "") const; // To stdlog. With a prefix. Starts a new line. Flushed.
+	// Output to stdlog with optional prefix.
+	// Appends an NL char.
+	// Is BUFFERED not flushed.
+	// Any of the six types of field mark characters present are converted to their visible versions,
+	//
+	// `"abc"_var.logputl("xyz = "); /// Sends "xyz = abc\n" to stdlog buffer and is not flushed.
+	//  // or
+	//  logputl("xyz = ", "abc");; /// Any number of arguments is allowed. All will be output.`
+	   CVR logputl(in prefix = "") const;
+	   CVR logput(in prefix = "") const; // Same as logputl() but doesnt append an NL char.
 
-	// As above but with a prefix
-	   CVR errput(in prefix = "") const;  // To stderr. With a prefix. No new line. Flushed.
-	   CVR errputl(in prefix = "") const; // To stderr. With a prefix. Starts a new line. Flushed.
+	// Output to stderr with optional prefix.
+	// Appends an NL char.
+	// Is FLUSHED not buffered.
+	// Any of the six types of field mark characters present are converted to their visible versions,
+	//
+	// `"abc"_var.errputl("xyz = "); /// Sends "xyz = abc\n" to stderr
+	//  // or
+	//  errputl("xyz = ", "abc"); /// Any number of arguments is allowed. All will be output.`
+	   CVR errputl(in prefix = "") const;
+	   CVR errput(in prefix = "") const; // Same as errputl() but doesnt append an NL char and is BUFFERED not flushed.
 
-	// Output to a given stream
+	// Output to a given stream.
+	// Is BUFFERED not flushed.
+	// The raw string bytes are output. No character or byte conversion is performed.
 	   CVR put(std::ostream& ostream1) const;
 
-	// Flushes any buffered output to stdout/cout
+	// Flush any and all buffered output to stdout/stdlog
 	// obj is var()
 	//
 	// `var().osflush();
@@ -2272,9 +2295,13 @@ public:
 	///// INPUT:
 	///////////
 
+	// obj is var
+
 	   out  input();                  // Wait for stdin until cr or eof
 	   out  input(in prompt);         // Ditto after outputting prompt to stdout
 	   out  inputn(const int nchars); // Wait for nbytes from stdin
+
+	// obj is var()
 
 	ND bool isterminal() const;                   // True if terminal is available
 	ND bool hasinput(int milliseconds = 0) const; // True if stdin bytes available within milliseconds

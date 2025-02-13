@@ -676,7 +676,8 @@ template <typename... Printable>
 void logputl(const Printable&... values) {
 	LOCKIOSTREAM_SLOW
 	((std::clog << var(values).convert(_ALL_FMS, _VISIBLE_FMS)), ...);
-	std::clog << std::endl;
+//	std::clog << std::endl;
+	std::clog << "\n";
 }
 
 //////////////////////////////////////////
@@ -756,7 +757,8 @@ inline void errputl(void) {
 
 inline void logputl(void) {
 	LOCKIOSTREAM_FAST
-	std::clog << std::endl;
+//	std::clog << std::endl;
+	std::clog << "\n";
 }
 
 ///////////////
