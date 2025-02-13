@@ -33,7 +33,7 @@ namespace exo {
 // output/errput/logput not threadsafe but probably not a problem
 //inline std::mutex global_mutex_threadstream;
 //#define LOCKIOSTREAM_OR_NOT std::lock_guard guard(global_mutex_threadstream);
-#define LOCKIOSTREAM_OR_NOT
+//#define LOCKIOSTREAM_OR_NOT
 
 
 /////////
@@ -67,7 +67,6 @@ CVR  var::put(std::ostream& ostream1) const {
 // output()
 CVR  var::output(in prefix) const {
 	THISIS("CVR  var::output(in prefix) const")
-	LOCKIOSTREAM_OR_NOT
 	prefix.put(std::cout);
 	return this->put(std::cout);
 }
@@ -76,7 +75,6 @@ CVR  var::output(in prefix) const {
 CVR  var::outputl(in prefix) const {
 	// FLUSHED not buffered
 	THISIS("CVR  var::outputl(in prefix) const")
-	LOCKIOSTREAM_OR_NOT
 	prefix.put(std::cout);
 	this->put(std::cout);
 	std::cout << std::endl;
@@ -87,7 +85,6 @@ CVR  var::outputl(in prefix) const {
 CVR  var::outputt(in prefix) const {
 	// BUFFERED not flushed
 	THISIS("CVR  var::outputt(in prefix) const")
-	LOCKIOSTREAM_OR_NOT
 	std::cout << "\t";
 	prefix.put(std::cout);
 	std::cout << "\t";
@@ -102,7 +99,6 @@ CVR  var::outputt(in prefix) const {
 CVR  var::errput(in prefix) const {
 	// BUFFERED? not flushed
 	THISIS("CVR  var::errput(in prefix) const")
-	LOCKIOSTREAM_OR_NOT
 	//prefix.put(std::cerr);
 	//return this->put(std::cerr);
 	std::cerr << prefix;
@@ -114,7 +110,6 @@ CVR  var::errput(in prefix) const {
 CVR  var::errputl(in prefix) const {
 	// FLUSHED not buffered
 	THISIS("CVR  var::errputl(in prefix) const")
-	LOCKIOSTREAM_OR_NOT
 	//prefix.put(std::cerr);
 	//this->put(std::cerr);
 	std::cerr << prefix;
@@ -130,7 +125,6 @@ CVR  var::errputl(in prefix) const {
 CVR  var::logput(in prefix) const {
 	// BUFFERED not flushed
 	THISIS("CVR  var::logput(in prefix) const")
-	LOCKIOSTREAM_OR_NOT
 	//prefix.put(std::clog);
 	std::clog << prefix;
 	std::clog << this->convert(_ALL_FMS, _VISIBLE_FMS);
@@ -141,7 +135,6 @@ CVR  var::logput(in prefix) const {
 CVR  var::logputl(in prefix) const {
 	// BUFFERED not flushed
 	THISIS("CVR  var::logputl(in prefix) const")
-	LOCKIOSTREAM_OR_NOT
 	//prefix.put(std::clog);
 	//this->put(std::clog);
 	std::clog << prefix;
