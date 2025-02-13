@@ -127,52 +127,64 @@ set -euxo pipefail
 	#postconf relayhost=?
 	#postconf inet_interfaces=all|loopback-only?
 
-:
-: Install html2pdf
-: ================
-:
-: https://wkhtmltopdf.org/downloads.html
-:
-: 20.04/bionic and 18.04/focal are available
-:
-: 22.04/jammy available as at 2022/06/29
-:
-: 24.04/noble is not available as at 2024/06/09 - but 22.04 version compiles and seems to work
-:
-	RELEASE=`lsb_release -cs`
+#:
+#: Install html2pdf
+#: ================
+#:
+#: https://wkhtmltopdf.org/downloads.html
+#:
+#: 20.04/bionic and 18.04/focal are available
+#:
+#: 22.04/jammy available as at 2022/06/29
+#:
+#: 24.04/noble is not available as at 2024/06/09 - but 22.04 version compiles and seems to work
+#:
+#	RELEASE=`lsb_release -cs`
+#
+##	if [[ $RELEASE == focal ]]; then
+#	if [[ `lsb_release -rs` < "22.04" ]]; then
+#		VERSION=0.12.6-1
+#	else
+#		VERSION=0.12.6.1-2
+#	fi
+#	#if curl --fail -LO https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6-1/wkhtmltox_0.12.6-1.${RELEASE}_amd64.deb; then
+#	if ! curl --fail -LO https://github.com/wkhtmltopdf/packaging/releases/download/$VERSION/wkhtmltox_$VERSION.${RELEASE}_amd64.deb; then
+#:
+#: Fall back to jammy which works on 24.04/noble, at least on the simple html test below.
+#:
+#		#RELEASE=bionic
+#		#VERSION=0.12.6-1
+#		RELEASE=jammy
+#		VERSION=0.12.6.1-2
+#		curl --fail -LO https://github.com/wkhtmltopdf/packaging/releases/download/$VERSION/wkhtmltox_$VERSION.${RELEASE}_amd64.deb
+#	fi
+#:
+#: Install the deb package
+#:
+#	sudo dpkg -i wkhtmltox_$VERSION.${RELEASE}_amd64.deb || true
+#:
+#: The package is missing dependencies but those will and must be fixed as follows:
+#:
+#	sudo apt-get -y --fix-broken install
+#:
+#: Verify html2pdf works
+#:
+##	/usr/local/bin/wkhtmltopdf http://google.com google.pdf
+#	printf "<html><body>Nothing Special</body></html>\n" > wkhtmltopdf.html
+#	/usr/local/bin/wkhtmltopdf --enable-local-file-access wkhtmltopdf.html wkhtmltopdf.pdf
+#	rm wkhtmltopdf.html wkhtmltopdf.pdf
 
-#	if [[ $RELEASE == focal ]]; then
-	if [[ `lsb_release -rs` < "22.04" ]]; then
-		VERSION=0.12.6-1
-	else
-		VERSION=0.12.6.1-2
-	fi
-	#if curl --fail -LO https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6-1/wkhtmltox_0.12.6-1.${RELEASE}_amd64.deb; then
-	if ! curl --fail -LO https://github.com/wkhtmltopdf/packaging/releases/download/$VERSION/wkhtmltox_$VERSION.${RELEASE}_amd64.deb; then
 :
-: Fall back to jammy which works on 23.04/lunar, at least on the simple html test below.
+: Install chromium to convert html to pdf
+: =======================================
 :
-		#RELEASE=bionic
-		#VERSION=0.12.6-1
-		RELEASE=jammy
-		VERSION=0.12.6.1-2
-		curl --fail -LO https://github.com/wkhtmltopdf/packaging/releases/download/$VERSION/wkhtmltox_$VERSION.${RELEASE}_amd64.deb
-	fi
+	sudo snap services chromium 2> /dev/null || sudo snap install chromium
 :
-: Install the deb package
+: Verify chromium pdf converter works
 :
-	sudo dpkg -i wkhtmltox_$VERSION.${RELEASE}_amd64.deb || true
-:
-: The package is missing dependencies but those will and must be fixed as follows:
-:
-	sudo apt-get -y --fix-broken install
-:
-: Verify html2pdf works
-:
-#	/usr/local/bin/wkhtmltopdf http://google.com google.pdf
-	printf "<html><body>Nothing Special</body></html>\n" > wkhtmltopdf.html
-	/usr/local/bin/wkhtmltopdf --enable-local-file-access wkhtmltopdf.html wkhtmltopdf.pdf
-	rm wkhtmltopdf.html wkhtmltopdf.pdf
+	printf "<html><body>Nothing Special</body></html>\n" > chromium2pdf.html
+	chromium --no-sandbox --headless --disable-gpu --print-to-pdf=chromium2pdf.pdf chromium2pdf.html
+	rm chromium2pdf.html chromium2pdf.pdf
 
 :
 : Determine local ip number for info

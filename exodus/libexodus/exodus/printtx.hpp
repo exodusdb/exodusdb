@@ -40,11 +40,51 @@ subroutine sendmail(in, in, in, in, in, in, out errormsg, in = var(), in = var()
 #   define xselect select
 #endif
 
+var stationery;
+var letterhead;
+var printptr;	// num
+var topmargin;	// num
+var printfilename;
+var html;
+//var ownprintfile;  // num
+//var ptx_filenamelen;
+//var ptx_random;
+var printfile;
+var pagelns;
+var bodyln;		// num
+var realpagen;	// num
+var pagen;		// num
+var newpage;	// num
+var bottomline;
+var printtxmark;
+var rfmt;
+var head;
+var foot;
+//var ntxlns;  // num
+var nbodylns;  // num
+//var ptx_temp;
+var headx;
+var newpagetag;
+//var ptx_css;
+var cssver;
+var style;
+//var stylennx;  // num
+var htmltitle;
+var head_or_foot;
+//var footx;
+//var head1;
+//var optioncharn;  // num
+//var optionchars;
+//var optionchar;
+//var newoptions;
+//var printtx_ii;	 // num
+//var spaceoptionsize;
+
 /////////////////////////////////////////////////////
 // STUBS to pass old function calls to htmllib2 modes
 /////////////////////////////////////////////////////
 subroutine getcss(io css, in version = "") {
-	call htmllib2("GETCSS", css, version);
+	call htmllib2("GETCSS", css, version, stationery);
 	return;
 }
 
@@ -87,7 +127,7 @@ subroutine printtx() {
 		if (printfilename.lcase().ends(".htm"))
 			html = 1;
 
-		var ownprintfile = 0;
+		//var ownprintfile = 0;
 		//if (printfilename == "") {
 		//	printfilename = var(999999999).rnd().last(8);
 		//	//printfilename:=if html then '.htm' else '.txt'

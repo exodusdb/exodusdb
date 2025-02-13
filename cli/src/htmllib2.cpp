@@ -398,8 +398,9 @@ function main(in mode, io dataio, in params0 = "", in params20 = "", in glang = 
 
 		//wire up accurate names to the given parameters
 		let& version = params0;
+		let& stationery = params20;
 
-		gosub getcss(dataio, version);
+		gosub getcss(dataio, version, stationery);
 
 	} else if (mode == "COLROWSPAN") {
 
@@ -422,7 +423,8 @@ function main(in mode, io dataio, in params0 = "", in params20 = "", in glang = 
 
 	} else if (mode == "DOCMODS") {
 
-		gosub docmods(dataio, params0);
+		let& stationery = params20;
+		gosub docmods(dataio, stationery);
 
 	} else if (mode == "GETMARK") {
 
@@ -581,7 +583,7 @@ if (!document.swapNode) {
 
 }
 
-function getcss(io css, in version = "") {
+function getcss(io css, in version = "", in stationery = "") {
 
 	//NB quirk in ie mimiced by mozilla table dont inherit size
 	//but work around is TABLE {FONT-SIZE:100%} in css
@@ -597,13 +599,55 @@ function getcss(io css, in version = "") {
 		css = "<!-- no " ^ SYSTEM.f(17) ^ " charset found -->\n";
 	}
 
+	// stationery option
+	// 1 - No letterhead
+	// 2 - Letterhead
+	// P - pdf Portrait
+	// L - pdf Landsdape
+	// If converting to pdf using chromium, then add css to configure paper size A4, orientation and header/footer
+	// since they cannot be configured on command line as for the obsolete wkhtmltopdf converter
+	// and using the chromium scripting interface requires the installation of complex dependencies
+	// Test for chromium is duplicated in convpdf.cpp and htmllib2.cpp
+
+	let pdfcmd = "chromium";
+	if (stationery.assigned() and stationery > 2 and osshell("which " ^ pdfcmd ^ " > /dev/null")) {
+
+		// Override and use below css properties when printing or converting to pdf
+		css ^= "<style type=\"text/css\" media=\"print\">\n";
+		css ^= "	@page {\n";
+
+		// Force A4
+		css ^= "		size: A4";
+		// Landscape/Portrait
+		if (stationery == "L") {
+			css ^= " landscape;\n";
+		} else {
+			css ^= " portrait;\n";
+		}
+
+		// Suppress top left, center and right headings
+		css ^= "		@top-left {\n";
+		css ^= "			content: \"\";\n";
+		css ^= "		}\n";
+
+		// Bottom left show page n of N as "9/99"
+		css ^= "		@bottom-left {\n";
+		css ^= "			content: counter(page) \"/\" counter(pages);\n";
+		css ^= "		}\n";
+		css ^= "	}\n";
+
+		// Resize chromium default size to match old wkhtml2pdf
+		// nb printjob.cpp overrides this zoom
+		css ^= "    body {zoom: 85% !important;}\n";
+
+		css ^= "</style>\n";
+	}
+
 	css ^= getvogonpoetry_css(version);
 
 	gosub replace_literal_comparison_operators(css);
 
-	let thcolor = SYSTEM.f(46, 1);
-	let tdcolor = SYSTEM.f(46, 2);
-
+	// get system config report font, font size and colour
 	var font = SYSTEM.f(46, 3);
 	if (font == "Default") {
 		font = "";
@@ -611,7 +655,6 @@ function getcss(io css, in version = "") {
 	if (font) {
 		font ^= ",";
 	}
-
 	var fontsize = SYSTEM.f(46, 8);
 	if (not fontsize) {
 		fontsize = 100;
@@ -619,6 +662,10 @@ function getcss(io css, in version = "") {
 	if (fontsize and fontsize.isnum()) {
 		fontsize ^= "%";
 	}
+
+	let thcolor = SYSTEM.f(46, 1);
+	let tdcolor = SYSTEM.f(46, 2);
+
 	if (thcolor) {
 		//css.replacer("#ffff80", "%thcol%");
 		css.replacer("#fff099", "%thcol%");
@@ -719,10 +766,11 @@ table.hashtable td {padding:0px; margin:0px; text-align:left; vertical-align:top
 </style>
 
 <style type="text/css" media="print">
-.exodustable {}
-/* #Header, #Footer { display: none !important; } */
-.noprint {display:none}
+ /*.exodustable {}*/
+ /* #Header, #Footer { display: none !important; } */
+ .noprint {display:none}
 </style>
+
 <script type="text/javascript">
 var togglendisplayed=0
 function toggle(t,mode)
@@ -1137,11 +1185,11 @@ subroutine addunits(in a0, io bb, in sep) {
 	return;
 }
 
-subroutine docmods(io tx, in letterheadopts) {
+subroutine docmods(io tx, in stationery) {
 
 	//html2pdf.exe messes up repeating headers on continuation pages
 	//so turn thead into additional tbody
-	if (not(letterheadopts.isnum())) {
+	if (not(stationery.isnum())) {
 
 		//swap 'THEAD>' with 'thead>' in tx
 		//swap 'TBODY>' with 'body>' in tx

@@ -81,7 +81,7 @@ var blockn;//num
 var fromtimestamp;
 bool usecols;//num
 //var decimalchar;
-bool html;//num
+//bool html;//num
 var td0;
 var nbsp;
 var td;
@@ -95,8 +95,8 @@ var tdz;
 var thcolor;
 var tdcolor;
 var reportfont;
-var printptr;//num
-var cssver;//num
+//var printptr;//num
+//var cssver;//num
 var sentencex;
 int maxncols;//num
 int maxnrecs;
@@ -122,7 +122,7 @@ dim scol;
 dim icol;
 var bheadfn;//num
 //int coln;//num
-var head;
+//var head;
 var foot2;
 int nbreaks;//num
 var breakcolns;
@@ -133,7 +133,7 @@ var hrown;//num
 var hcoln;//num
 var replacements;
 int nreplacements;//num
-var topmargin;//num
+//var topmargin;//num
 var totalflag;//num
 var breakonflag;//num
 var anytotals;//num
@@ -157,7 +157,7 @@ var word;
 var filename;
 var dictfilename;
 var xx;
-var printtxmark;
+//var printtxmark;
 var nextword;
 var dictrec;
 var limitx;
@@ -184,7 +184,7 @@ dim breakvalue;
 dim oldbreakvalue;
 var colhdg;
 var coltags;
-var style;
+//var style;
 var coln2;//num
 int vmcount;//num
 var thproperties;
@@ -211,7 +211,7 @@ var readerr;//num
 var limitvals;
 //var mvx;
 var newhead;
-var printfilename;
+//var printfilename;
 int breakleveln;//num
 int leveln;//num
 int previousmarklevel;//num
@@ -221,17 +221,17 @@ var str2;
 var str3;
 var tx1;
 var oconvx;
-int bodyln;//num
-var bottomline;
+//int bodyln;//num
+//var bottomline;
 var lastrecord;//num
-var printfile;
+//var printfile;
 int storewordn;
 int storecharn;
 var storeword;
 var storedictrec;
 int startcharn;//num
 var searchchar;
-var letterhead;
+//var letterhead;
 var wordexpanded;//num
 int breakcoln;
 var storetx;
@@ -251,25 +251,25 @@ var ownprintfile;//num
 var ptx_filenamelen;
 var ptx_random;
 
-int pagelns;
-int realpagen;//num
-int pagen;//num
-var newpage;//num
-var rfmt;
-var foot;
-int ntxlns;//num
-int nbodylns;//num
-var ptx_temp;
-var headx;
-var newpagetag;
-var ptx_css;
-var stylennx;//num
-var htmltitle;
-var head_or_foot;
-var footx;
-var head1;
-var newoptions;
-int printtx_ii;//num
+//int pagelns;
+//int realpagen;//num
+//int pagen;//num
+//var newpage;//num
+//var rfmt;
+//var foot;
+//int ntxlns;//num
+//int nbodylns;//num
+//var ptx_temp;
+//var headx;
+//var newpagetag;
+//var ptx_css;
+//var stylennx;//num
+//var htmltitle;
+//var head_or_foot;
+//var footx;
+//var head1;
+//var newoptions;
+//int printtx_ii;//num
 //var spaceoptionsize;
 
 let ulchar = "-";
@@ -392,6 +392,9 @@ function main() {
 //	}
 
 	html = SYSTEM.f(2).lcase().ends("htm") or OPTIONS.contains("h");
+
+	// Extract pdf options. Portrait and Landscape
+	stationery = OPTIONS.replace("[^12PL]"_rex, "").first();
 
 	if (html) {
 

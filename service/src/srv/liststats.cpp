@@ -11,7 +11,7 @@ libraryinit()
 #include <srv_common.h>
 
 var msg;
-var html;
+//var html;
 var reqdate;
 var vn;
 var output;
@@ -19,35 +19,35 @@ var usercoln;  // num
 var tx;
 var userx;
 
-var printptr;	// num
-var topmargin;	// num
-var printfilename;
+//var printptr;	// num
+//var topmargin;	// num
+//var printfilename;
 var ownprintfile;  // num
 var ptx_filenamelen;
 var ptx_random;
-var printfile;
-var letterhead;
-var pagelns;
-var bodyln;		// num
-var realpagen;	// num
-var pagen;		// num
-var newpage;	// num
-var bottomline;
-var printtxmark;
-var rfmt;
-var head;
-var foot;
+//var printfile;
+//var letterhead;
+//var pagelns;
+//var bodyln;		// num
+//var realpagen;	// num
+//var pagen;		// num
+//var newpage;	// num
+//var bottomline;
+//var printtxmark;
+//var rfmt;
+//var head;
+//var foot;
 var ntxlns;	   // num
-var nbodylns;  // num
+//var nbodylns;  // num
 var ptx_temp;
-var headx;
-var newpagetag;
+//var headx;
+//var newpagetag;
 var ptx_css;
-var cssver;
-var style;
+//var cssver;
+//var style;
 var stylennx;  // num
-var htmltitle;
-var head_or_foot;
+//var htmltitle;
+//var head_or_foot;
 var footx;
 var head1;
 var optioncharn;  // num
