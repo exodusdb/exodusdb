@@ -973,7 +973,7 @@ public:
 	   IO   sorter(SV sepchar = _FM) REF ;
 	   IO   reverser(SV sepchar = _FM) REF ;
 	   IO   shuffler(SV sepchar = _FM) REF ;
-	   IO   parser(char sepchar DEFAULT_CSPACE) REF ;
+	   IO   parser(char sepchar = ' ') REF ;
 
 	///// I/O CONVERSION:
 	////////////////////

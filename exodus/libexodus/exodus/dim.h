@@ -235,8 +235,8 @@ friend class dim_iter;
 	void write(in filevar, in key) const;
 
 	// os
-	ND bool osread(in osfilename, const char* codepage DEFAULT_EMPTY);
-	ND bool oswrite(in osfilename, const char* codepage DEFAULT_EMPTY) const;
+	ND bool osread(in osfilename, const char* codepage = "");
+	ND bool oswrite(in osfilename, const char* codepage = "") const;
 
 	////////////
 	// ITERATORS

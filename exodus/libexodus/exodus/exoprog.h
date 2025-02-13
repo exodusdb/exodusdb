@@ -132,7 +132,7 @@ class PUBLIC ExodusProgramBase {
 	virtual ~ExodusProgramBase();
 
 	// work on CURSOR
-	bool select(in sortselectclause_or_filehandle DEFAULT_EMPTY);
+	bool select(in sortselectclause_or_filehandle = "");
 	ND bool hasnext();
 	bool readnext(io key);
 	bool readnext(io key, io valueno);
@@ -141,7 +141,7 @@ class PUBLIC ExodusProgramBase {
 	bool popselect(in v1, io v2, io v3, io v4);
 	void clearselect();
 	// THIS should be removed from exoprog and made a free function that doesnt use CURSOR
-	bool deleterecord(in filename_or_handle_or_command, in key DEFAULT_EMPTY);
+	bool deleterecord(in filename_or_handle_or_command, in key = "");
 
 	bool savelist(in listname);
 	bool getlist(in listname);
@@ -236,21 +236,21 @@ class PUBLIC ExodusProgramBase {
 	// Return to parent exoprog
 	// or quit to OS WITHOUT an error
 	// bool to allow "or stop()"
-	[[noreturn]] bool stop(in description DEFAULT_EMPTY) const;
+	[[noreturn]] bool stop(in description = "") const;
 
 	// Return to parent exoprog
 	// or quit to OS WITH an error 1
 	// bool to allow "or abort()"
-	[[noreturn]] bool abort(in description DEFAULT_EMPTY) const;
+	[[noreturn]] bool abort(in description = "") const;
 
 	// Quit to OS WITH an error 2
 	// bool to allow "or abortall()"
-	[[noreturn]] bool abortall(in description DEFAULT_EMPTY) const;
+	[[noreturn]] bool abortall(in description = "") const;
 
 	// Quit to OS WITHOUT an error
 	// bool to allow "or logoff()"
 	//[[deprecated("Deprecated is a great way to highlight all uses of something!")]]
-	[[noreturn]] bool logoff(in description DEFAULT_EMPTY) const;
+	[[noreturn]] bool logoff(in description = "") const;
 
  private:
 
@@ -262,10 +262,10 @@ class PUBLIC ExodusProgramBase {
 
 // clang-format off
 
-class PUBLIC MVStop     {public:explicit MVStop    (in var1 DEFAULT_EMPTY); var description;};
-class PUBLIC MVAbort    {public:explicit MVAbort   (in var1 DEFAULT_EMPTY); var description;};
-class PUBLIC MVAbortAll {public:explicit MVAbortAll(in var1 DEFAULT_EMPTY); var description;};
-class PUBLIC MVLogoff   {public:explicit MVLogoff  (in var1 DEFAULT_EMPTY); var description;};
+class PUBLIC MVStop     {public:explicit MVStop    (in var1 = ""); var description;};
+class PUBLIC MVAbort    {public:explicit MVAbort   (in var1 = ""); var description;};
+class PUBLIC MVAbortAll {public:explicit MVAbortAll(in var1 = ""); var description;};
+class PUBLIC MVLogoff   {public:explicit MVLogoff  (in var1 = ""); var description;};
 
 // clang-format on
 
