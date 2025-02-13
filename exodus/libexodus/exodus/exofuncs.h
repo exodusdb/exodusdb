@@ -122,11 +122,11 @@ PUBLIC std::mutex global_mutex_threadstream;
 //
 // SLOW = threadsafe. With locking.  Output all arguments together.
 //      = printx/printl/printt, errput/errputl
-#define LOCKIOSTREAM_SLOW std::lock_guard guard(global_mutex_threadstream);
+//#define LOCKIOSTREAM_YES std::lock_guard guard(global_mutex_threadstream);
 //
 // FAST = not threadsafe. No locking. As fast as possible. Intermingled output.
 //      = output/outputl/outputt, logput/logputl
-#define LOCKIOSTREAM_FAST
+//#define LOCKIOSTREAM_NO
 
 int exodus_main(int exodus_argc, const char* exodus_argv[], ExoEnv& mv, int threadno);
 
@@ -581,7 +581,6 @@ ND var lasterror(void);
 
 template <typename... Printable>
 void output(const Printable&... value) {
-	LOCKIOSTREAM_FAST
 	(var(value).output(), ...);
 }
 
@@ -589,7 +588,6 @@ void output(const Printable&... value) {
 
 template <typename... Printable>
 void outputl(const Printable&... value) {
-	LOCKIOSTREAM_FAST
 	(var(value).output(), ...);
 	var("").outputl();
 }
@@ -598,7 +596,6 @@ void outputl(const Printable&... value) {
 
 template <typename... Printable>
 void outputt(const Printable&... value) {
-	LOCKIOSTREAM_FAST
 	(var(value).outputt(), ...);
 	//var("").outputt();
 }
@@ -625,7 +622,6 @@ void outputt(const Printable&... value) {
 
 template <auto sep = ' ', typename Printable, typename... Additional>
 void printl(const Printable& value, const Additional&... values) {
-	LOCKIOSTREAM_SLOW
 	std::cout << value;
 	((std::cout << sep << values), ...);
 	std::cout << std::endl;
@@ -635,7 +631,6 @@ void printl(const Printable& value, const Additional&... values) {
 //
 //template <auto sep = ' ', typename Printable, typename... Additional>
 //void errputl(const Printable& value, const Additional&... values) {
-//	LOCKIOSTREAM_SLOW
 //	std::cerr << value;
 //	((std::cerr << sep << values), ...);
 //	std::cerr << std::endl;
@@ -645,7 +640,6 @@ void printl(const Printable& value, const Additional&... values) {
 //
 //template <auto sep = ' ', typename Printable, typename... Additional>
 //void logputl(const Printable& value, const Additional&... values) {
-//	LOCKIOSTREAM_FAST
 //	std::clog << value;
 //	((std::clog << sep << values), ...);
 //	std::clog << std::endl;
@@ -655,7 +649,6 @@ void printl(const Printable& value, const Additional&... values) {
 
 template <typename... Printable>
 void errputl(const Printable&... values) {
-	LOCKIOSTREAM_SLOW
 	((std::cerr << var(values).convert(_ALL_FMS, _VISIBLE_FMS)), ...);
 	std::cerr << std::endl;
 }
@@ -664,7 +657,6 @@ void errputl(const Printable&... values) {
 
 template <typename... Printable>
 void logputl(const Printable&... values) {
-	LOCKIOSTREAM_SLOW
 	((std::clog << var(values).convert(_ALL_FMS, _VISIBLE_FMS)), ...);
 //	std::clog << std::endl;
 	std::clog << "\n";
@@ -683,7 +675,6 @@ void logputl(const Printable&... values) {
 
 template <auto sep = ' ', typename Printable, typename... Additional>
 void printx(const Printable& value, const Additional&... values) {
-	LOCKIOSTREAM_SLOW
 	std::cout << value;
 	((std::cout << sep << values), ...);
 }
@@ -692,7 +683,6 @@ void printx(const Printable& value, const Additional&... values) {
 //
 //template <auto sep = ' ', typename Printable, typename... Additional>
 //void errput(const Printable& value, const Additional&... values) {
-//	LOCKIOSTREAM_SLOW
 //	std::cerr << value;
 //	((std::cerr << sep << values), ...);
 //}
@@ -701,7 +691,6 @@ void printx(const Printable& value, const Additional&... values) {
 //
 //template <auto sep = ' ', typename Printable, typename... Additional>
 //void logput(const Printable& value, const Additional&... values) {
-//	LOCKIOSTREAM_FAST
 //	std::clog << value;
 //	((std::clog << sep << values), ...);
 //}
@@ -710,7 +699,6 @@ void printx(const Printable& value, const Additional&... values) {
 
 template <typename... Printable>
 void errput(const Printable&... values) {
-	LOCKIOSTREAM_SLOW
 	((std::cerr << var(values).convert(_ALL_FMS, _VISIBLE_FMS)), ...);
 }
 
@@ -718,7 +706,6 @@ void errput(const Printable&... values) {
 
 template <typename... Printable>
 void logput(const Printable&... values) {
-	LOCKIOSTREAM_SLOW
 	((std::clog << var(values).convert(_ALL_FMS, _VISIBLE_FMS)), ...);
 }
 
@@ -732,21 +719,18 @@ void logput(const Printable&... values) {
 // printl(void) to cout
 
 inline void printl(void) {
-	LOCKIOSTREAM_SLOW
 	std::cout << std::endl;
 }
 
 // errputl(void) to cerr
 
 inline void errputl(void) {
-	LOCKIOSTREAM_SLOW
 	std::cerr << std::endl;
 }
 
 // logputl(void) to clog
 
 inline void logputl(void) {
-	LOCKIOSTREAM_FAST
 //	std::clog << std::endl;
 	std::clog << "\n";
 }
@@ -764,7 +748,6 @@ inline void logputl(void) {
 
 template <auto sep = '\t', typename... Printable>
 void printt(const Printable&... values) {
-	LOCKIOSTREAM_SLOW
 	((std::cout << values << sep), ...);
 }
 
@@ -781,7 +764,6 @@ void printt(const Printable&... values) {
 
 template <auto sep = '\t'>
 void printt(void) {
-	LOCKIOSTREAM_SLOW
 	std::cout << sep;
 }
 
@@ -799,7 +781,6 @@ void printt(void) {
 //using fmt::vprintln;
 
 //void println() {
-//	LOCKIOSTREAM_SLOW
 //	std::cout << std::endl;
 //}
 
@@ -809,14 +790,12 @@ void printt(void) {
 //
 //template <typename... Args>
 //void vprint(std::string_view fmt_str, Args&&... args) {
-//	LOCKIOSTREAM_SLOW
 //	std::cout << fmt::vformat(fmt_str, fmt::make_format_args(args...));
 ////	fmt::vformat_to(std::cout, fmt_str, fmt::make_format_args(args...));
 //}
 //
 //template <typename... Args>
 //void vprintln(std::string_view fmt_str, Args&&... args) {
-//	LOCKIOSTREAM_SLOW
 //	std::cout << fmt::vformat(fmt_str, fmt::make_format_args(args...)) << std::endl;
 ////	fmt::vformat_to(std::cout, fmt_str, fmt::make_format_args(args...));
 ////	std::cout << std::endl;

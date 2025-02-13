@@ -110,7 +110,7 @@ namespace exo {
 // output/errput/logput not threadsafe but probably not a problem
 //inline std::mutex global_mutex_threadstream;
 //#define LOCKIOSTREAM_OR_NOT std::lock_guard guard(global_mutex_threadstream);
-#define LOCKIOSTREAM_OR_NOT
+//#define LOCKIOSTREAM_OR_NOT
 
 // exodus uses one locale per thread
 #pragma clang diagnostic push
@@ -319,8 +319,6 @@ bool var::hasinput(int milliseconds) const {
 	//declare in haskey.cpp
 	bool haskey(int milliseconds);
 
-	//LOCKIOSTREAM_OR_NOT
-
 	return haskey(milliseconds);
 }
 
@@ -337,8 +335,6 @@ out  var::input() {
 	var_str.clear();
 	var_typ = VARTYP_STR;
 
-	//LOCKIOSTREAM_OR_NOT
-
 	if (!std::cin.eof())
 		std::getline(std::cin, var_str);
 
@@ -351,8 +347,6 @@ out  var::input(in prompt) {
 	THISIS("out  var::input(in prompt")
 	assertDefined(function_sig);
 	ISSTRING(prompt)
-
-	//LOCKIOSTREAM_OR_NOT
 
 	var default_input = this->assigned() ? (*this) : "";
 
@@ -390,8 +384,6 @@ out  var::inputn(const int nchars) {
 	THISIS("out  var::inputn(const int nchars")
 	assertDefined(function_sig);
 
-	//LOCKIOSTREAM_OR_NOT
-
 	var_str.clear();
 	var_typ = VARTYP_STR;
 
@@ -405,7 +397,6 @@ out  var::inputn(const int nchars) {
 		for (;;) {
 			char char1;
 			{
-				//LOCKIOSTREAM_OR_NOT
 				char1 = getkey();
 			}
 
@@ -427,7 +418,6 @@ out  var::inputn(const int nchars) {
 
 			char char1;
 			{
-				//LOCKIOSTREAM_OR_NOT
 				char1 = getkey();
 			}
 
