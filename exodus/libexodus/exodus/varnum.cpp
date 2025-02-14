@@ -36,25 +36,12 @@ THE SOFTWARE.
 #	include <charconv>
 #endif
 
+// EXO_USE_TO_CHARS and EXO_USE_RYU are decided in vardefs.h
 // Use ryu if GNUC < 11 and ryu include available
+
 //ryu            1234.5678 -> "1234.5678" 500ns
 //ryu_printf     1234.5678 -> "1234.5678" 800ns
 //sstream/printf 1234.5678 -> "1234.5678" 1800ns
-
-// 1. TO_CHARS from Ubuntu 22.04
-// Duplicated in varnum.cpp, testnum.cpp and test_precision.cpp. Keep in sync.
-#if __GNUC__ >= 11 || __clang_major__ >=  14
-#define EXO_USE_TO_CHARS
-//#include <array>
-
-// 2. RYU
-#elif __has_include(<ryu/ryu.h>)
-#define EXO_USE_RYU
-#include <ryu/ryu.h>
-
-// 3. STRINGSTREAM
-#else
-#endif
 
 //#include <limits> //for std::numeric_limits<double>::digits10
 
