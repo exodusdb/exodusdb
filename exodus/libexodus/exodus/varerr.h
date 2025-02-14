@@ -39,14 +39,14 @@ class PUBLIC VarError {
 // Individual exceptions type are made public so that EXODUS programmers can
 // catch specific types of errors and/or stop, abort, or debug as they choose
 // clang-format off
+class PUBLIC VarUnconstructed   : public VarError {public: explicit VarUnconstructed(   std::string message);};
+class PUBLIC VarUnassigned      : public VarError {public: explicit VarUnassigned(      std::string message);};
 class PUBLIC VarDivideByZero    : public VarError {public: explicit VarDivideByZero(    std::string message);};
 class PUBLIC VarNonNumeric      : public VarError {public: explicit VarNonNumeric(      std::string message);};
 class PUBLIC VarNonPositive     : public VarError {public: explicit VarNonPositive(     std::string message);};
 class PUBLIC VarNumOverflow     : public VarError {public: explicit VarNumOverflow(     std::string message);};
 class PUBLIC VarNumUnderflow    : public VarError {public: explicit VarNumUnderflow(    std::string message);};
 class PUBLIC VarOutOfMemory     : public VarError {public: explicit VarOutOfMemory(     std::string message);};
-class PUBLIC VarUnassigned      : public VarError {public: explicit VarUnassigned(      std::string message);};
-class PUBLIC VarUndefined       : public VarError {public: explicit VarUndefined(       std::string message);};
 class PUBLIC VarInvalidPointer  : public VarError {public: explicit VarInvalidPointer(  std::string message);};
 class PUBLIC VarDBException     : public VarError {public: explicit VarDBException(     std::string message);};
 class PUBLIC VarNotImplemented  : public VarError {public: explicit VarNotImplemented(  std::string message);};

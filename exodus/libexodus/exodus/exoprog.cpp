@@ -1272,7 +1272,7 @@ var ExodusProgramBase::perform(in sentence) {
 		}
 
 		// TODO reimplement this
-//		} catch (const VarUndefined&) {
+//		} catch (const VarUnconstructed&) {
 //			// if return "" is missing then default ANS to ""
 //			ANS = "";
 

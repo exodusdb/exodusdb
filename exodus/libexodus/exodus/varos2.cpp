@@ -44,7 +44,7 @@ namespace exo {
 void var::ossleep(const int milliseconds) const {
 
 	THISIS("void var::ossleep(const int milliseconds) const")
-	assertDefined(function_sig);	 // not needed if *this not used
+	assertVar(function_sig);	 // not needed if *this not used
 
 	std::this_thread::sleep_for(std::chrono::milliseconds(milliseconds));
 
@@ -172,7 +172,7 @@ bool var::osgetenv(SV envcode) {
 	// otherwise child processes don't see them.
 
 	THISIS("bool var::osgetenv(SV envcode)")
-	assertDefined(function_sig);
+	assertVar(function_sig);
 	//assertStringMutator(function_sig);
 	//ISSTRING(envcode)
 

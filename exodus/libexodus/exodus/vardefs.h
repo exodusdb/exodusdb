@@ -196,7 +196,7 @@
 #	define THISIS(FUNC_DESC) [[maybe_unused]] static const char* function_sig = FUNC_DESC;
 #endif
 
-#define ISDEFINED(VARNAME) (VARNAME).assertDefined(function_sig, #VARNAME);
+#define ISVAR(VARNAME) (VARNAME).assertVar(function_sig, #VARNAME);
 #define ISASSIGNED(VARNAME) (VARNAME).assertAssigned(function_sig, #VARNAME);
 #define ISSTRING(VARNAME) (VARNAME).assertString(function_sig, #VARNAME);
 #define ISNUMERIC(VARNAME) (VARNAME).assertNumeric(function_sig, #VARNAME);

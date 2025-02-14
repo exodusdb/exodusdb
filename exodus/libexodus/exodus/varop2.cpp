@@ -106,7 +106,7 @@ ND var operator""_var(long double d) {
 
 template<> PUBLIC RETVAR VARBASE1::operator+() const {
 
-	assertDefined(__PRETTY_FUNCTION__);
+	assertVar(__PRETTY_FUNCTION__);
 	assertNumeric(__PRETTY_FUNCTION__);
 
 	//return static_cast<RETVAR>(*this);
@@ -117,7 +117,7 @@ template<> PUBLIC RETVAR VARBASE1::operator+() const {
 
 template<> PUBLIC RETVAR VARBASE1::operator-() const {
 
-	assertDefined(__PRETTY_FUNCTION__);
+	assertVar(__PRETTY_FUNCTION__);
 
 	do LIKELY {
 		// dbl
@@ -264,7 +264,7 @@ template<> PUBLIC VBR1 VARBASE1::operator^=(SV sv1) & {
 template<> PUBLIC RETVAR VARBASE1::operator++(int) & {
 
 	// full check done below to avoid double checking number type
-	assertDefined(__PRETTY_FUNCTION__);
+	assertVar(__PRETTY_FUNCTION__);
 
 	var priorvalue;
 
@@ -307,7 +307,7 @@ tryagain:
 template<> PUBLIC RETVAR VARBASE1::operator--(int) & {
 
 	// full check done below to avoid double checking number type
-	assertDefined(__PRETTY_FUNCTION__);
+	assertVar(__PRETTY_FUNCTION__);
 
 	var priorvalue;
 
@@ -353,7 +353,7 @@ tryagain:
 template<> PUBLIC VBR1 VARBASE1::operator++() & {
 
 	// full check done below to avoid double checking number type
-	assertDefined(__PRETTY_FUNCTION__);
+	assertVar(__PRETTY_FUNCTION__);
 
 tryagain:
 	// prefer int since -- nearly always on integers
@@ -390,7 +390,7 @@ tryagain:
 template<> PUBLIC VBR1 VARBASE1::operator--() & {
 
 	// full check done below to avoid double checking number type
-	assertDefined(__PRETTY_FUNCTION__);
+	assertVar(__PRETTY_FUNCTION__);
 
 tryagain:
 	// prefer int since -- nearly always on integers

@@ -106,8 +106,8 @@ bool bool_lt_bool(const bool lhs, const bool rhs) {
 // NOTE doubles compare only to 0.0001 accuracy)
 bool var_eq_var(CBR lhs, CBR rhs) {
 
-	lhs.assertDefined(__PRETTY_FUNCTION__);
-	rhs.assertDefined(__PRETTY_FUNCTION__);
+	lhs.assertVar(__PRETTY_FUNCTION__);
+	rhs.assertVar(__PRETTY_FUNCTION__);
 
 	// NB empty string is always less than anything except another empty string
 
@@ -225,8 +225,8 @@ bool var_eq_var(CBR lhs, CBR rhs) {
 // NOTE doubles compare only to 0.0001 accuracy)
 bool var_lt_var(CBR lhs, CBR rhs) {
 
-	lhs.assertDefined(__PRETTY_FUNCTION__);
-	rhs.assertDefined(__PRETTY_FUNCTION__);
+	lhs.assertVar(__PRETTY_FUNCTION__);
+	rhs.assertVar(__PRETTY_FUNCTION__);
 
 	// NB empty string is always less than anything except another empty string
 
@@ -311,7 +311,7 @@ bool var_lt_var(CBR lhs, CBR rhs) {
 // NOTE doubles compare only to 0.0001 accuracy)
 bool var_lt_int(CBR lhs, const int rhs_int) {
 
-	lhs.assertDefined(__PRETTY_FUNCTION__);
+	lhs.assertVar(__PRETTY_FUNCTION__);
 
 	// Empty string is always less than anything except another empty string
 	if (lhs.var_typ & VARTYP_STR && lhs.var_str.empty())
@@ -341,7 +341,7 @@ bool var_lt_int(CBR lhs, const int rhs_int) {
 // NOTE doubles compare only to 0.0001 accuracy)
 bool int_lt_var(const int lhs_int, CBR rhs) {
 
-	rhs.assertDefined(__PRETTY_FUNCTION__);
+	rhs.assertVar(__PRETTY_FUNCTION__);
 
 	// Empty string is always less than anything except another empty string
 	if (rhs.var_typ & VARTYP_STR && rhs.var_str.empty())
@@ -372,7 +372,7 @@ bool int_lt_var(const int lhs_int, CBR rhs) {
 // NOTE doubles compare only to 0.0001 accuracy)
 bool var_lt_dbl(CBR lhs, const double rhs_dbl) {
 
-	lhs.assertDefined(__PRETTY_FUNCTION__);
+	lhs.assertVar(__PRETTY_FUNCTION__);
 
 	// Empty string is always less than anything except another empty string
 	if (lhs.var_typ & VARTYP_STR && lhs.var_str.empty())
@@ -404,7 +404,7 @@ bool var_lt_dbl(CBR lhs, const double rhs_dbl) {
 // NOTE doubles compare only to 0.0001 accuracy)
 bool dbl_lt_var(const double lhs_dbl, CBR rhs) {
 
-	rhs.assertDefined(__PRETTY_FUNCTION__);
+	rhs.assertVar(__PRETTY_FUNCTION__);
 
 	// Empty string is always less than anything except another empty string
 	if (rhs.var_typ & VARTYP_STR && rhs.var_str.empty())
@@ -436,7 +436,7 @@ bool dbl_lt_var(const double lhs_dbl, CBR rhs) {
 // NOTE doubles compare only to 0.0001 accuracy)
 bool var_eq_dbl(CBR lhs, const double rhs_dbl) {
 
-	lhs.assertDefined(__PRETTY_FUNCTION__);
+	lhs.assertVar(__PRETTY_FUNCTION__);
 
 	// NB empty string is always less than anything except another empty string
 
@@ -489,7 +489,7 @@ bool var_eq_dbl(CBR lhs, const double rhs_dbl) {
 // NOTE doubles compare only to 0.0001 accuracy)
 bool var_eq_bool(CBR lhs, const bool rhs_bool) {
 
-	lhs.assertDefined(__PRETTY_FUNCTION__);
+	lhs.assertVar(__PRETTY_FUNCTION__);
 
 	// 1. EMPTY STRING equates to false
 	if (lhs.var_typ & VARTYP_STR && lhs.var_str.empty()) {
@@ -538,7 +538,7 @@ bool var_eq_bool(CBR lhs, const bool rhs_bool) {
 // NOTE doubles compare only to 0.0001 accuracy)
 bool var_eq_int(CBR lhs, const int rhs_int) {
 
-	lhs.assertDefined(__PRETTY_FUNCTION__);
+	lhs.assertVar(__PRETTY_FUNCTION__);
 
 	// 1. EMPTY STRING always false
 	if (lhs.var_typ & VARTYP_STR && lhs.var_str.empty()) {

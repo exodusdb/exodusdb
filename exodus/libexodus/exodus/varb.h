@@ -165,7 +165,7 @@ namespace exo {
 //#	define THISIS(FUNC_DESC) [[maybe_unused]] static const char* function_sig = FUNC_DESC;
 //#endif
 //
-//#define ISDEFINED(VARNAME) (VARNAME).assertDefined(function_sig, #VARNAME);
+//#define ISVAR(VARNAME) (VARNAME).assertVar(function_sig, #VARNAME);
 //#define ISASSIGNED(VARNAME) (VARNAME).assertAssigned(function_sig, #VARNAME);
 //#define ISSTRING(VARNAME) (VARNAME).assertString(function_sig, #VARNAME);
 //#define ISNUMERIC(VARNAME) (VARNAME).assertNumeric(function_sig, #VARNAME);
@@ -335,7 +335,7 @@ class PUBLIC var_base {
 		// and not even a compiler warning in msvc8 or g++4.1.2
 
 		// so the following test is put everywhere to protect against this type of accidental
-		// programming if (var_typ&VARTYP_MASK) throw VarUndefined("funcname()"); should really
+		// programming if (var_typ&VARTYP_MASK) throw VarUnconstructed("funcname()"); should really
 		// ensure a magic number and not just HOPE for some binary digits above bottom four 0-15
 		// decimal 1111binary this could be removed in production code perhaps
 
@@ -443,7 +443,7 @@ class PUBLIC var_base {
 	CONSTEXPR // but new std::string?
 	void operator=(CVR rhs) & {
 
-		//assertDefined(__PRETTY_FUNCTION__);  //could be skipped for speed?
+		//assertVar(__PRETTY_FUNCTION__);  //could be skipped for speed?
 		rhs.assertAssigned(__PRETTY_FUNCTION__);
 
 		// Prevent self assign
@@ -482,7 +482,7 @@ class PUBLIC var_base {
 	void operator=(TVR rhs) & noexcept {
 
 		// Skipped for speed
-		//assertDefined(__PRETTY_FUNCTION__);
+		//assertVar(__PRETTY_FUNCTION__);
 
 		// Skipped for speed since temporaries are unlikely to be unassigned
 		//rhs.assertAssigned(__PRETTY_FUNCTION__);
@@ -1119,7 +1119,7 @@ class PUBLIC var_base {
 		// var undefinedassign=undefinedassign=L'X';
 		// this causes crash due to bad memory access due to setting string that doesnt exist
 		// slows down all string settings so consider NOT CHECKING in production code
-		//THISISDEFINED()	 // ALN:TODO: this definition kind of misleading, try to find
+		//THISISVAR()	 // ALN:TODO: this definition kind of misleading, try to find
 		// ALN:TODO: or change name to something like: THISISNOTDEAD :)
 		// ALN:TODO: argumentation: var with mvtyp=0 is NOT defined
 
@@ -1143,7 +1143,7 @@ class PUBLIC var_base {
 		// var undefinedassign=undefinedassign="xxx";
 		// this causes crash due to bad memory access due to setting string that doesnt exist
 		// slows down all string settings so consider NOT CHECKING in production code
-		//THISISDEFINED()
+		//THISISVAR()
 
 		var_str = cstr;
 
@@ -1164,7 +1164,7 @@ class PUBLIC var_base {
 //		// var undefinedassign=undefinedassign=std::string("xxx"";
 //		// this causes crash due to bad memory access due to setting string that doesnt exist
 //		// slows down all string settings so consider NOT CHECKING in production code
-//		//THISISDEFINED()
+//		//THISISVAR()
 //		var_str = string2;
 //		var_typ = VARTYP_STR;  // reset to one unique type
 //
@@ -1184,7 +1184,7 @@ class PUBLIC var_base {
 		// var undefinedassign=undefinedassign=std::string("xxx"";
 		// this causes crash due to bad memory access due to setting string that doesnt exist
 		// slows down all string settings so consider NOT CHECKING in production code
-		//THISISDEFINED()
+		//THISISVAR()
 
 		var_str = std::forward<std::string>(string2);
 
@@ -1464,7 +1464,7 @@ class PUBLIC var_base {
 
 	friend std::istream& operator>>(std::istream& istream1, VARREF invar) {
 
-		invar.assertDefined(__PRETTY_FUNCTION__);
+		invar.assertVar(__PRETTY_FUNCTION__);
 
 		invar.var_str.clear();
 		invar.var_typ = VARTYP_STR;
@@ -1604,22 +1604,30 @@ protected:
 	//CONSTEXPR
 	void createString() const;
 
-	// assertDefined
+	// ::assertVar
 
-	// WARNING: MUST NOT use any var when checking Undefined
+	///////////
+	// WARNING: MUST NOT use any var while in assertVar
 	// OTHERWISE *WILL* get recursion/segfault
+	///////////
 	CONSTEXPR
-	void assertDefined(const char* message, const char* varname = "") const {
+	void assertVar(const char* message, const char* varname = "") const {
+////#if __GNUC__ >= 99 || __clang_major__ > 18
+////#else
+//#if defined(__OPTIMIZE__) && !defined(__NO_INLINE__)
+//    // Code for when optimization is on, but not -O0
+//#else
 		if (var_typ & VARTYP_MASK)
 			[[unlikely]]
-			throw VarUndefined(std::string(varname) + " in " + message);
+			throw VarUnconstructed(std::string(varname) + " in " + message);
+//#endif
 	}
 
-	// assertAssigned
+	// ::assertAssigned
 
 	CONSTEXPR
 	void assertAssigned(const char* message, const char* varname = "") const {
-		assertDefined(message, varname);
+		assertVar(message, varname);
 		if (!var_typ)
 			[[unlikely]]
 			throw VarUnassigned(var_base(varname) ^ " in " ^ message);
@@ -1630,7 +1638,7 @@ protected:
 	//CONSTEXPR
 	void assertNumeric(const char* message, const char* varname = "") const;
 
-	// assertDecimal
+	// ::assertDecimal
 
 	CONSTEXPR
 	void assertDecimal(const char* message, const char* varname = "") const {
@@ -1642,7 +1650,7 @@ protected:
 		}
 	}
 
-	// assertInteger
+	// ::assertInteger
 
 	CONSTEXPR
 	void assertInteger(const char* message, const char* varname = "") const {
@@ -1670,11 +1678,11 @@ protected:
 		}
 	}
 
-	// assertString
+	// ::assertString
 
 	CONSTEXPR
 	void assertString(const char* message, const char* varname = "") const {
-		assertDefined(message, varname);
+		assertVar(message, varname);
 		if (!(var_typ & VARTYP_STR)) {
 			if (!var_typ)
 				[[unlikely]]
@@ -1683,7 +1691,7 @@ protected:
 		}
 	}
 
-	// assertStringMutator
+	// ::assertStringMutator
 
 	CONSTEXPR
 	void assertStringMutator(const char* message, const char* varname = "") const {
