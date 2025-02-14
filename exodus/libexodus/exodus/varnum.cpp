@@ -143,7 +143,9 @@ static std::string double_to_string(double double1) {
 	//Precision on fixed output only controls the precision after the decimal point
 	//so the precision needs to be huge to cater for very small numbers eg < 10E-20
 
-#ifdef EXO_USE_TO_CHARS
+///////////////////////////////////
+#ifdef EXO_USE_TO_CHARS // METHOD 1
+///////////////////////////////////
 
 	// 1) EXO_USE_TO_CHARS
 
@@ -178,21 +180,22 @@ static std::string double_to_string(double double1) {
 
 	// Find the exponent if any
 	const std::size_t epos = resultstr.find('e');
-
 	// We are done if there is no exponent
 	if (epos == std::string::npos)
 		return resultstr;
 
-#elif defined(EXO_USE_RYU)
+//std::cout << "double1  =" << double1 << std::endl;
+//std::cout << "resultstr=" << resultstr << std::endl;
+
+//////////////////////////////////////
+#elif defined(EXO_USE_RYU) // METHOD 2
+//////////////////////////////////////
 
 	//std::cout << "ryu_printf decimal oconv" << std::endl;
 
 	// TODO use std::array to avoid std::string going to the heap?
 	std::string resultstr;
 	resultstr.resize(24);
-
-//#define EXO_USE_RYU_D2S
-//#ifdef EXO_USE_RYU_D2S
 
 	// 500ns using ryu d2s() which always outputs scientific even 0E0 for zero.
 
@@ -232,50 +235,10 @@ static std::string double_to_string(double double1) {
 		resultstr.insert(2, ".0");
 		epos += 2;
 	}
-//#elif 0
-//
-//	//740ns ryu d2exp() always output scientific
-//
-//	//ryu_printf compatible with nice rounding of all doubles but not perfect round tripping
-//
-//	//ryu_printf %e equivalent (always scientific format to properly control precision)
-//	//followed by conversion to fixed format below
-//	//using precision 15 (which means 16 digits in scientific format)
-//	const int n = d2exp_buffered_n(double1, 15, resultstr.data());
-//	resultstr.resize(n);
-//	//resultstr is now something like "1.234567800000000e+03"
-//	//std::cout << resultstr << std::endl;
-//	//return resultstr;//650ns here. 743ns after changing to fixed point below (93ns)
-//	const std::size_t epos = resultstr.find('e');
-//
-//#else
-//
-//	//???ns ryu d2fixed() always output fixed decimal point with fixed precision
-//
-//	//ryu_printf %f equivalent (always fixed format)
-//	//
-//	//But this suffers from precision being after decimal point instead of overall number of digits
-//	// eg 1234.5678 -> "1234.56780000000003"
-//	//printl( var("999999999999999.9")    + 0);
-//	//             999999999999999.875
-//	//Could truncate after 15 digits but this would not be rounded properly
-//	const int n = d2fixed_buffered_n(double1, 16, resultstr.data());
-//	resultstr.resize(n);
-//	//remove trailing zeros
-//	//while (resultstr.back() == '0')
-//	//	resultstr.pop_back();
-//	std::size_t lastdigit = resultstr.find_last_not_of('0');
-//	if (lastdigit != std::string::npos)
-//		resultstr.resize(lastdigit);
-//	//remove trailing decimal point
-//	if (resultstr.back() == '.')
-//		resultstr.pop_back();
-//	return resultstr;
-//	const std::size_t epos = std::string::npos;
-//#endif
-//	//std::cout << resultstr << std::endl;
 
-#else //USE_SSTREAM
+////////////////////////////////
+#else // USE_SSTREAM // OPTION 3
+////////////////////////////////
 
 	//1800ns //NOT EXO_USE_TO_CHARS or EXO_USE_RYU
 
@@ -320,7 +283,6 @@ static std::string double_to_string(double double1) {
 
 	std::size_t epos = resultstr.find('e');
 
-	////////////////////////////////////////////
 	//if not scientific format then return as is
 	////////////////////////////////////////////
 #ifndef ALWAYS_VIA_SCIENTIFIC
@@ -331,18 +293,22 @@ static std::string double_to_string(double double1) {
 
 #endif	//EXO_USE_RYU / do not use RYU
 
-// PROCESS THE OUTPUT OF THE ABOVE 3 ALTERNATIVES
-/////////////////////////////////////////////////
 
-	// Get exponent as a signed int from -308 to 308
+////////////////////////////////////////////////////////////
+// PROCESS THE SCIENTIFIC OUTPUT OF THE ABOVE 3 ALTERNATIVES
+////////////////////////////////////////////////////////////
+
+	// Get trailing exponent as a signed int from -308 to 308
 	auto exponent = stoi(resultstr.substr(epos + 1));
 
-	// Get the exponent as text with its leading + or - char
+	// Get the exponent substring with its leading + or - char
 	auto exponent_text = resultstr.substr(epos);
 
-	//Remove the exponent (everything starting at the E/e)
+	//Remove the trailing exponent from the result (everything starting at the E/e)
 	if (epos != std::string::npos)
 		resultstr.erase(epos);
+
+//std::cerr << "SCIENTIFIC=" << resultstr << std::endl;
 
 	// Exponent 0 special treatment and exit
 	if (!exponent) {

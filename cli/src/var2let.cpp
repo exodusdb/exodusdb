@@ -34,7 +34,7 @@ function main() {
 		var nchanges = 0;
 		for (int varn = 1; varn <= nvars; ++varn) {
 
-			if (isterminal() and esctoexit())
+			if (isterminal(0) and esctoexit())
 				break;
 
 			// Change a var to let

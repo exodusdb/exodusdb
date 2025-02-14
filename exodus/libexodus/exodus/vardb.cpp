@@ -2680,7 +2680,8 @@ static var get_dictexpression(in cursor, in mainfilename, in filename, in dictfi
 		// Create a pseudo look up to SELECT_CURSOR_STAGE2 temporary file created by stage 1/2 select
 		// which has the fields stored in sql columns and not in the usual data column
 		stage2_calculated = "/" "/@ANS=XLATE(\"" ^ stage2_filename ^ "\",@ID," ^ fieldname ^ "_calc,\"X\")";
-		stage2_calculated.logputl("stage2_calculated simulation --------------------->");
+		if (not var().isterminal())
+			stage2_calculated.logputl("stage2_calculated simulation --------------------->");
 	}
 
 	// given a file and dictionary id

@@ -1127,7 +1127,7 @@ dictrecexit:
 
 	} else {
 		tt = word.quote() ^ " is an unrecognized word.";
-		if (isterminal()) {
+		if (isterminal(0)) {
 			tt ^= " Replace with? (Enter to cancel):";
 		}
 		let oldword = word;
@@ -1634,7 +1634,7 @@ nextrec:
 			//first recn will be 2
 			//similar in recinit and x2exit
 			if (TERMINAL) {
-				logput(AT(-40), recn, ". ", ID, " ", MV);
+//				logput(AT(-40), recn, ". ", ID, " ", MV);
 				osflush();
 			}
 		}
@@ -1848,7 +1848,7 @@ x2exit:
 
 	// Similar in recinit and x2exit
 	if (TERMINAL) {
-		logput(AT(-40), recn, ". ");
+//		logput(AT(-40), recn, ". ");
 		osflush();
 	}
 

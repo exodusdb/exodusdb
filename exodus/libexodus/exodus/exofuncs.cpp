@@ -169,7 +169,7 @@ ND PUBLIC var  getprompt();
 
    PUBLIC var  inputn(const int nchars) {var v; v.inputn(nchars); return v;}
 
-ND PUBLIC bool isterminal() {return var().isterminal();}
+ND PUBLIC bool isterminal(const int in_out_err) {return var().isterminal(in_out_err);}
 ND PUBLIC bool hasinput(const int millisecs /*=0*/) {return var().hasinput(millisecs);}
 ND PUBLIC bool eof() {return var().eof();}
    PUBLIC bool echo(const int on_off) {return var().echo(on_off);}
