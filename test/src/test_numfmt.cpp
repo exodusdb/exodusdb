@@ -5,21 +5,6 @@
 	import std;
 #endif
 
-// 1. TO_CHARS from Ubuntu 22.04
-// Duplicated in varnum.cpp, testnum.cpp and test_precision.cpp. Keep in sync.
-#if __GNUC__ >= 11 || __clang_major__ >=  14
-#define EXO_USE_TO_CHARS
-//#include <array>
-
-// 2. RYU
-#elif __has_include(<ryu/ryu.h>)
-#define EXO_USE_RYU
-#include <ryu/ryu.h>
-
-// 3. STRINGSTREAM
-#else
-#endif
-
 using namespace std;
 
 #include <exodus/program.h>

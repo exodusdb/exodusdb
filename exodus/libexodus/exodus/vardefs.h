@@ -13,6 +13,20 @@
 #define EXODUS_RELEASE "24.07"
 #define EXODUS_PATCH "24.07.0"
 
+
+// 1. TO_CHARS from Ubuntu 22.04
+// Duplicated in varnum.cpp, testnum.cpp and test_precision.cpp. Keep in sync.
+#if __GNUC__ >= 11 || __clang_major__ >=  14
+#	define EXO_USE_TO_CHARS
+//#include <array>
+// 2. RYU
+#elif __has_include(<ryu/ryu.h>)
+#	define EXO_USE_RYU
+#	include <ryu/ryu.h>
+// 3. STRINGSTREAM
+#else
+#endif
+
 // Used in patch of /usr/include/c++/14/ostream to exclude std::format
 // which is ambiguous with exo::format despite different namespace due to argument dependent lookup
 // https://en.wikipedia.org/wiki/Argument-dependent_name_lookup
