@@ -52,8 +52,8 @@ THE SOFTWARE.
 #	include <exodus/range.h>
 #endif
 
-#include <exodus/program.h>
-#include <exodus/library.h>
+//#include <exodus/program.h>
+//#include <exodus/library.h>
 #include <exodus/common.h>
 #include <exodus/exomacros.h>
 

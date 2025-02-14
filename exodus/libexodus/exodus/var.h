@@ -2303,13 +2303,27 @@ public:
 
 	// obj is var()
 
-	ND bool isterminal() const;                   // True if terminal is available
-	ND bool hasinput(int milliseconds = 0) const; // True if stdin bytes available within milliseconds
-	ND bool eof() const;                          // True if stdin is at end of file
-	   bool echo(const int on_off) const;         // Reflect all stdin to stdout if terminal available
+	// Checks if stdin/stdout/stderr is a terminal or is a file/pipe.
+	// Argument: file_no = 0 - stdin, 1 - stdout (default), 2 - stderr.
+	// Returns: True if it is a terminal or false if it is a file or pipe
+	ND bool isterminal(const int file_no = 1) const;
 
-	   void breakon() const;  // Allow interrupt Ctrl+C
-	   void breakoff() const; // Prevent interrupt Ctr+C
+	ND bool hasinput(int milliseconds = 0) const;       // True if stdin bytes available within milliseconds
+
+	ND bool eof() const;                                // True if stdin is at end of file
+
+	   bool echo(const bool on_off = true) const;       // True to reflect all stdin to stdout if terminal available
+
+	// Install various interrupt handlers.
+	// SIGINT - Ctrl+C -> "Interrupted. (C)ontinue (Q)uit (B)acktrace (D)ebug (A)bort ?"
+	// SIGHUP - Sets a static variable "RELOAD_req" which may be handled or ignored by the program.
+	// SIGTERM - Sets a static variable "TERMINATE_req" which may be handled or ignored by the program.
+	// Automatically called in exodus_main program/thread initialisation.
+	   void breakon() const;
+
+	// Disable keyboard interrupt.
+	// Ctrl+C becomes inactive in terminal.
+	   void breakoff() const;
 
 	///// MATH/BOOLEAN:
 	//////////////////

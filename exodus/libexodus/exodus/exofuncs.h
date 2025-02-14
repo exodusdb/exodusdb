@@ -258,7 +258,7 @@ ND var  getprompt(void);
 
    var  inputn(const int nchars);
 
-ND bool isterminal(void);
+ND bool isterminal(const int in_out_log = 1); // 0, 1, 2 = stdin, stdout, stderr
 ND bool hasinput(const int millisecs = 0 );
 ND bool eof(void);
    bool echo(const int on_off);

@@ -295,7 +295,7 @@ static void SIGHUP_handler(int) {
 }
 
 PUBLIC void breakoff() {
-	// ignore more of this signal
+	// ignore this signal (Typically Ctrl+C) until breakon
 	signal(SIGINT, SIG_IGN);
 }
 
@@ -409,9 +409,12 @@ static void SIGINT_handler(int sig [[maybe_unused]]) {
 
 //called in exodus_main to initialise signals
 PUBLIC void breakon()  {
+
 	signal(SIGINT, SIGINT_handler);	   // Ctrl+C from termio
+
 	signal(SIGTERM, SIGTERM_handler);  // a polite request to TERMINATE
 									   // probably followed by SIGABORT after some delay
+
 	signal(SIGHUP, SIGHUP_handler);	   // a request to reload
 
 	//turn off text input and output signals to prevent breaking out into gdb debugger

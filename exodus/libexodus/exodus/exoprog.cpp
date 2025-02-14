@@ -97,8 +97,10 @@ bool ExodusProgramBase::select(in sortselectclause_or_filehandle) {
 	//stage 2 "2stage"
 	//////////////////
 
-	CURSOR.convert(_ALL_FMS, _VISIBLE_FMS).logputl("2 Stage Select:");
-	sortselectclause.logputl();
+	if (not TERMINAL) {
+		CURSOR.convert(_ALL_FMS, _VISIBLE_FMS).logputl("2 Stage Select:");
+		sortselectclause.logputl();
+	}
 
 	//secondary sort/select on fields that could not be calculated by the database
 
@@ -479,7 +481,8 @@ bool ExodusProgramBase::select(in sortselectclause_or_filehandle) {
 
 	}//readnext
 
-	sortselectclause.errputl("\nstage2=");
+	if (not TERMINAL)
+		sortselectclause.errputl("\nstage2=");
 
 	bool result = CURSOR.select(sortselectclause);
 
