@@ -421,6 +421,10 @@ function main() {
 					// Javascript instead of cpp because it gives better highlighting for exodus c++. See above too.
 					// (All function calls are highlighted)
 					comments.replacer(backquoted, "\n<pre><code class='hljs-ncdecl language-javascript'>$1</code></pre>\n");
+
+				// Ordinary spaces for aligning code in html and wiki
+				if (not man)
+					comments.replacer("\u22c5", " "); // "⋅" Unicode operator point operator -> " "
 			}
 
 			////////////////////////////////
