@@ -559,7 +559,7 @@ bool var::locate(in target, out setting, const int fieldno, const int valueno /*
 	THISIS("bool var::locate(in target, out setting, const int fieldno, const int valueno) const")
 	assertString(function_sig);
 	ISSTRING(target)
-	ISDEFINED(setting)
+	ISVAR(setting)
 
 	std::string usingchar;
 	if (valueno != 0)
@@ -581,7 +581,7 @@ bool var::locate(in target, out setting, const int fieldno, const int valueno /*
 //	THISIS("bool var::locate(in target, out setting, const int fieldno, const int valueno) const")
 //	assertString(function_sig);
 //	ISSTRING(target)
-//	ISDEFINED(setting)
+//	ISVAR(setting)
 //
 //	return locatex(var_str, target.var_str, "", _VM, setting, 0, 0, 0);
 //}
@@ -662,7 +662,7 @@ bool var::locate(in target, out setting) const {
 //	THISIS("bool var::locate(in target, out setting) const")
 //	assertString(function_sig);
 //	ISSTRING(target)
-//	ISDEFINED(setting)
+//	ISVAR(setting)
 //	return locatex(var_str, target.var_str, "", _VM, setting, 0, 0, 0);
 
 	setting = this->locate(target);
@@ -775,7 +775,7 @@ bool var::locateby(const char* ordercode, in target, out setting) const {
 	THISIS("bool var::locateby(const char* ordercode, in target, out setting) const")
 	assertString(function_sig);
 	ISSTRING(target)
-	ISDEFINED(setting)
+	ISVAR(setting)
 
 	// TODO either make a "locatefrom" version of the above where the locate STARTS its search
 	// from the last numbered subvalue (add a new parameter), value or field. OR possibly modify
@@ -797,7 +797,7 @@ bool var::locateby(const char* ordercode, in target, out setting, const int fiel
 	THISIS("bool var::locateby(const char* ordercode, in target, out setting, const int fieldno, const int valueno) const")
 	assertString(function_sig);
 	ISSTRING(target)
-	ISDEFINED(setting)
+	ISVAR(setting)
 
 	// TODO either make a "locatefrom" version of the above where the locate STARTS its search
 	// from the last numbered subvalue (add a new parameter), value or field. OR possibly modify
@@ -830,7 +830,7 @@ bool var::locatebyusing(const char* ordercode, const char* usingchar, in target,
 	THISIS("bool var::locatebyusing(const char* ordercode, const char* usingchar, in target, out setting, const int fieldno, const int valueno, const int valueno) const")
 	assertString(function_sig);
 	ISSTRING(target)
-	ISDEFINED(setting)
+	ISVAR(setting)
 
 	// TODO either make a "locatefrom" version of the above where the locate STARTS its search
 	// from the last numbered subvalue (add a new parameter), value or field. OR possibly modify
@@ -868,7 +868,7 @@ bool var::locateusing(const char* usingchar, in target, out setting, const int f
 	THISIS("bool var::locateusing(const char* usingchar, in target, out setting, const int fieldno, const int valueno, const int subvalueno) const")
 	assertString(function_sig);
 	ISSTRING(target)
-	ISDEFINED(setting)
+	ISVAR(setting)
 
 	return locatex(var_str, target.var_str, "", usingchar, setting, fieldno, valueno,
 				   subvalueno);
@@ -1750,7 +1750,7 @@ var  var::substr2(io pos1, out delimiterno) const {
 	THISIS("var  var::substr2(io pos1, out delimiterno) const")
 	assertString(function_sig);
 	ISNUMERIC(pos1)
-	ISDEFINED(delimiterno)
+	ISVAR(delimiterno)
 
 	int startindex0 = pos1.toInt() - 1;
 	std::size_t pos = (startindex0 >= 0) ? startindex0 : 0;

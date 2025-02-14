@@ -204,7 +204,7 @@ template<> PUBLIC bool VARBASE1::assigned() const {
 	// treat undefined as unassigned
 	// undefined is a state where we are USING the variable before its contructor has been
 	// called! which is possible (in syntax like var xx.osread()?) and also when passing default
-	// variables to functions in the callables on ISDEFINED(gcc)
+	// variables to functions in the callables on ISVAR(gcc)
 
 	if (var_typ & VARTYP_MASK)
 		return false;
@@ -215,7 +215,7 @@ template<> PUBLIC bool VARBASE1::assigned() const {
 template<> PUBLIC bool VARBASE1::unassigned() const {
 	// see explanation above in assigned
 	// THISIS("bool var::unassigned() const")
-	// assertDefined(function_sig);
+	// assertVar(function_sig);
 
 	if (var_typ & VARTYP_MASK)
 		return true;
@@ -252,7 +252,7 @@ template<> PUBLIC std::wstring VARBASE1::to_wstring() const {
 template<> PUBLIC void VARBASE1::from_u32string(std::u32string u32str) const {
 	// for speed, dont validate
 	// THISIS("void var::from_u32tring() const")
-	// assertDefined(function_sig);
+	// assertVar(function_sig);
 	var_typ = VARTYP_STR;
 
 	var_str = boost::locale::conv::utf_to_utf<char>(u32str);
@@ -310,7 +310,7 @@ var  var::version() const {
 
 bool var::eof() const {
 	// THISIS("bool var::eof() const")
-	// assertDefined(function_sig);
+	// assertVar(function_sig);
 
 	return std::cin.eof();
 }
@@ -330,7 +330,7 @@ bool var::hasinput(int milliseconds) const {
 out  var::input() {
 
 	THISIS("out  var::input()")
-	assertDefined(function_sig);
+	assertVar(function_sig);
 
 	var_str.clear();
 	var_typ = VARTYP_STR;
@@ -345,7 +345,7 @@ out  var::input() {
 out  var::input(in prompt) {
 
 	THISIS("out  var::input(in prompt")
-	assertDefined(function_sig);
+	assertVar(function_sig);
 	ISSTRING(prompt)
 
 	var default_input = this->assigned() ? (*this) : "";
@@ -382,7 +382,7 @@ out  var::input(in prompt) {
 out  var::inputn(const int nchars) {
 
 	THISIS("out  var::inputn(const int nchars")
-	assertDefined(function_sig);
+	assertVar(function_sig);
 
 	var_str.clear();
 	var_typ = VARTYP_STR;
@@ -454,7 +454,7 @@ out  var::inputn(const int nchars) {
 template<> PUBLIC void VARBASE1::default_to(CBX defaultvalue) {
 
 	// see explanation above in assigned
-	// assertDefined(function_sig);
+	// assertVar(function_sig);
 
 	THISIS("void var::default_to(in defaultvalue)")
 	ISASSIGNED(defaultvalue)
@@ -1490,7 +1490,7 @@ template<> PUBLIC void VARBASE1::move(VBX tovar) {
 
 	THISIS("void var::move(io tovar)")
 	assertAssigned(function_sig);
-	ISDEFINED(tovar)
+	ISVAR(tovar)
 
 	// move the string
 	tovar.var_str = std::move(var_str);
@@ -1515,8 +1515,8 @@ template<> PUBLIC void VARBASE1::swap(CBX var2) const {
 	THISIS("CVR  var::swap(in var2) const")
 
 	// Works on unassigned vars
-	assertDefined(function_sig);
-	ISDEFINED(var2)
+	assertVar(function_sig);
+	ISVAR(var2)
 
 	// copy var2 to temp
 	auto mvtypex = var2.var_typ;
@@ -1546,8 +1546,8 @@ template<> PUBLIC void VARBASE1::swap(VBX var2) {
 	THISIS("io   var::swap(io var2)")
 
 	// Works on unassigned vars
-	assertDefined(function_sig);
-	ISDEFINED(var2)
+	assertVar(function_sig);
+	ISVAR(var2)
 
 	// copy var2 to temp
 	auto mvtypex = var2.var_typ;

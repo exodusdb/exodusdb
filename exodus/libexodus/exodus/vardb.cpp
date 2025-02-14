@@ -934,7 +934,7 @@ static void to_extract_text(io dictexpression) {
 bool var::connect(in conninfo) {
 
 	THISIS("bool var::connect(in conninfo")
-	assertDefined(function_sig);
+	assertVar(function_sig);
 	ISSTRING(conninfo)
 
 //	// NB DONT log/trace or otherwise output the full connection info without HIDING the
@@ -1086,7 +1086,7 @@ bool var::connect(in conninfo) {
 bool var::attach(in filenames) const {
 
 	THISIS("bool var::attach(in filenames")
-	assertDefined(function_sig);
+	assertVar(function_sig);
 	ISSTRING(filenames)
 
 	//option to attach all dict files
@@ -1135,7 +1135,7 @@ bool var::attach(in filenames) const {
 void var::detach(in filenames) {
 
 	THISIS("bool var::detach(in filenames")
-	assertDefined(function_sig);
+	assertVar(function_sig);
 	ISSTRING(filenames)
 
 	for (var filename : filenames) {
@@ -1150,7 +1150,7 @@ void var::detach(in filenames) {
 void var::disconnect() {
 
 	THISIS("bool var::disconnect()")
-	assertDefined(function_sig);
+	assertVar(function_sig);
 //	assertString(function_sig);
 
 	if (DBTRACE or DBTRACE_CONN)
@@ -1212,7 +1212,7 @@ void var::disconnect() {
 void var::disconnectall() {
 
 	THISIS("bool var::disconnectall()")
-	assertDefined(function_sig);
+	assertVar(function_sig);
 
 	var dbconn_no = get_dbconn_no(*this);
 	if (!dbconn_no)
@@ -1265,7 +1265,7 @@ void var::disconnectall() {
 bool var::open(in filename, in connection /*DEFAULTNULL*/) {
 
 	THISIS("bool var::open(in filename, in connection)")
-	assertDefined(function_sig);
+	assertVar(function_sig);
 	ISSTRING(filename)
 
 	const var normal_filename = get_normal_filename(filename);
@@ -1431,7 +1431,7 @@ bool var::readf(in file, in key, const int fieldno) {
 bool var::readc(in file, in key) {
 
 	THISIS("bool var::readc(in file, in key)")
-	assertDefined(function_sig);
+	assertVar(function_sig);
 	//ISSTRING(file)
 	//ISSTRING(key)
 	ISSTRING(file)
@@ -1535,7 +1535,7 @@ bool var::deletec(in key) const {
 bool var::read(in file, in key) {
 
 	THISIS("bool var::read(in file, in key)")
-	assertDefined(function_sig);
+	assertVar(function_sig);
 	ISSTRING(file)
 	ISSTRING(key)
 
@@ -1685,7 +1685,7 @@ bool var::read(in file, in key) {
 var  var::hash(const std::uint64_t modulus) const {
 
 	THISIS("var  var::hash() const")
-	assertDefined(function_sig);
+	assertVar(function_sig);
 	assertString(function_sig);
 	// ISNUMERIC(modulus)
 
@@ -1728,7 +1728,7 @@ var  var::lock(in key) const {
 
 
 	THISIS("var  var::lock(in key) const")
-	assertDefined(function_sig);
+	assertVar(function_sig);
 	ISSTRING(key)
 
 	PGconn* pgconn = get_pgconn(*this);
@@ -1809,7 +1809,7 @@ bool var::unlock(in key) const {
 
 
 	THISIS("void var::unlock(in key) const")
-	assertDefined(function_sig);
+	assertVar(function_sig);
 	ISSTRING(key)
 
 	auto hash64 = vardb_hash_file_and_key(*this, key);
@@ -1875,7 +1875,7 @@ bool var::unlock(in key) const {
 bool var::unlockall() const {
 
 	THISIS("void var::unlockall() const")
-	assertDefined(function_sig);
+	assertVar(function_sig);
 
 	auto pgconn = get_pgconn(*this);
 	if (!pgconn) UNLIKELY {
@@ -2319,7 +2319,7 @@ bool var::deleterecord(in key) const {
 void var::cleardbcache() const {
 
 	THISIS("bool var::cleardbcache() const")
-	assertDefined(function_sig);
+	assertVar(function_sig);
 
 	int dbconn_no = get_dbconn_no_or_default(*this);
 	if (!dbconn_no) UNLIKELY
@@ -2341,7 +2341,7 @@ void var::cleardbcache() const {
 bool var::begintrans() const {
 
 	THISIS("bool var::begintrans() const")
-	assertDefined(function_sig);
+	assertVar(function_sig);
 
 	// Clear the record cache
 	this->cleardbcache();
@@ -2367,7 +2367,7 @@ bool var::begintrans() const {
 bool var::rollbacktrans() const {
 
 	THISIS("bool var::rollbacktrans() const")
-	assertDefined(function_sig);
+	assertVar(function_sig);
 
 	// Clear the record cache
 	this->cleardbcache();
@@ -2390,7 +2390,7 @@ bool var::rollbacktrans() const {
 bool var::committrans() const {
 
 	THISIS("bool var::committrans() const")
-	assertDefined(function_sig);
+	assertVar(function_sig);
 
 	// Clear the record cache
 	this->cleardbcache();
@@ -2414,7 +2414,7 @@ bool var::committrans() const {
 bool var::statustrans() const {
 
 	THISIS("bool var::statustrans() const")
-	assertDefined(function_sig);
+	assertVar(function_sig);
 
 	auto dbconn = get_dbconn(*this);
 
@@ -2433,7 +2433,7 @@ bool var::statustrans() const {
 
 bool var::dbcopy(in from_dbname, in to_dbname) const {
 	THISIS("bool var::dbcopy(in from_dbname, in new_dbname) const")
-	assertDefined(function_sig);
+	assertVar(function_sig);
 	ISSTRING(from_dbname)
 	ISSTRING(to_dbname)
 
@@ -2449,7 +2449,7 @@ bool var::dbcopy(in from_dbname, in to_dbname) const {
 bool var::dbcreate(in new_dbname, in old_dbname /* = "" */) const {
 
 	THISIS("bool var::dbcreate(in new_dbname, in old_dbname) const")
-	assertDefined(function_sig);
+	assertVar(function_sig);
 	ISSTRING(new_dbname)
 	ISSTRING(old_dbname)
 
@@ -2495,7 +2495,7 @@ bool var::dbcreate(in new_dbname, in old_dbname /* = "" */) const {
 bool var::dbdelete(in dbname) const {
 
 	THISIS("bool var::dbdelete(in dbname)")
-	assertDefined(function_sig);
+	assertVar(function_sig);
 	ISSTRING(dbname)
 
 	// Fail neatly if the database does not exist.
@@ -2511,7 +2511,7 @@ bool var::dbdelete(in dbname) const {
 bool var::createfile(in filename) const {
 
 	THISIS("bool var::createfile(in filename)")
-	assertDefined(function_sig);
+	assertVar(function_sig);
 	ISSTRING(filename)
 
 	// var tablename = "TEMP" ^ var(100000000).rnd();
@@ -2542,7 +2542,7 @@ bool var::createfile(in filename) const {
 bool var::renamefile(in filename, in newfilename) const {
 
 	THISIS("bool var::renamefile(in filename, in newfilename)")
-	assertDefined(function_sig);
+	assertVar(function_sig);
 	ISSTRING(filename)
 	ISSTRING(newfilename)
 
@@ -2580,7 +2580,7 @@ bool var::renamefile(in filename, in newfilename) const {
 bool var::deletefile(in filename) const {
 
 	THISIS("bool var::deletefile(in filename)")
-	assertDefined(function_sig);
+	assertVar(function_sig);
 	ISSTRING(filename)
 
 	// Fail neatly if the file does not exist
@@ -2617,7 +2617,7 @@ bool var::deletefile(in filename) const {
 bool var::clearfile(in filename) const {
 
 	THISIS("bool var::clearfile(in filename)")
-	assertDefined(function_sig);
+	assertVar(function_sig);
 	ISSTRING(filename)
 
 	// Fail neatly if the file does not exist
@@ -3366,8 +3366,7 @@ static var getword(io remainingwords, io ucword) {
 //bool var::saveselect(in filename) {
 //
 //	THISIS("bool var::saveselect(in filename) const")
-//	//?allow undefined usage like var xyz=xyz.select();
-//	assertDefined(function_sig);
+//	assertVar(function_sig);
 //	ISSTRING(filename)
 //
 //	if (DBTRACE)
@@ -3403,8 +3402,7 @@ static var getword(io remainingwords, io ucword) {
 bool var::select(in sortselectclause) {
 
 	THISIS("bool var::select(in sortselectclause) const")
-	//?allow undefined usage like var xyz=xyz.select();
-	assertDefined(function_sig);
+	assertVar(function_sig);
 	ISSTRING(sortselectclause)
 	auto started = var().ostime();
 	bool result;
@@ -3421,13 +3419,14 @@ bool var::select(in sortselectclause) {
 // currently only called from select, selectrecord and getlist
 // TODO merge into plain select()?
 bool var::selectx(in fieldnames, in sortselectclause) {
-	// private - and arguments are left unchecked for speed
-	//?allow undefined usage like var xyz=xyz.select();
-	if (var_typ & VARTYP_MASK) {
-		// throw VarUndefined("selectx()");
-		var_str.clear();
-		var_typ = VARTYP_STR;
-	}
+
+//	// private - and arguments are left unchecked for speed
+//	//?allow unconstructed usage like var xyz=xyz.select();
+//	if (var_typ & VARTYP_MASK) {
+//		// throw VarUnconstructed("selectx()");
+//		var_str.clear();
+//		var_typ = VARTYP_STR;
+//	}
 
 	// fieldnames.logputl("fieldnames=");
 	// sortselectclause.logputl("sortselectclause=");
@@ -4910,8 +4909,7 @@ static bool readnextx(in cursor, PGconn* pgconn, int  direction, PGresult*& pgre
 bool var::deletelist(in listname) const {
 
 	THISIS("bool var::deletelist(in listname) const")
-	//?allow undefined usage like var xyz=xyz.select();
-	assertDefined(function_sig);
+	assertVar(function_sig);
 	ISSTRING(listname)
 
 	if (DBTRACE)
@@ -4941,8 +4939,7 @@ bool var::deletelist(in listname) const {
 bool var::savelist(in listname) {
 
 	THISIS("bool var::savelist(in listname)")
-	//?allow undefined usage like var xyz=xyz.select();
-	assertDefined(function_sig);
+	assertVar(function_sig);
 	ISSTRING(listname)
 
 	if (DBTRACE)
@@ -5025,8 +5022,7 @@ bool var::savelist(in listname) {
 bool var::getlist(in listname) {
 
 	THISIS("bool var::getlist(in listname) const")
-	//?allow undefined usage like var xyz=xyz.select();
-	assertDefined(function_sig);
+	assertVar(function_sig);
 	ISSTRING(listname)
 
 	if (DBTRACE)
@@ -5074,7 +5070,6 @@ bool var::getlist(in listname) {
 bool var::formlist(in keys, in fieldno) {
 
 	THISIS("bool var::formlist(in keys, in fieldno)")
-	//?allow undefined usage like var xyz=xyz.select();
 	assertString(function_sig);
 	ISSTRING(keys)
 	ISNUMERIC(fieldno)
@@ -5107,8 +5102,7 @@ bool var::formlist(in keys, in fieldno) {
 bool var::makelist(in listname, in keys) {
 
 	THISIS("bool var::makelist(in listname)")
-	//?allow undefined usage like var xyz=xyz.select();
-	assertDefined(function_sig);
+	assertVar(function_sig);
 	ISSTRING(listname)
 	ISSTRING(keys)
 
@@ -5249,19 +5243,19 @@ bool var::readnext(io key) {
 
 bool var::readnext(io key, io valueno) {
 
-	//?allow undefined usage like var xyz=xyz.readnext();
-	if (var_typ & VARTYP_MASK) {
-		// throw VarUndefined("readnext()");
-		var_str.clear();
-		var_typ = VARTYP_STR;
-	}
+	THISIS("bool var::readnext(io key, io valueno) const")
+	assertVar(function_sig);
+
+//	//?allow unxonstructed usage like var xyz=xyz.readnext();
+//	if (var_typ & VARTYP_MASK) {
+//		// throw VarUnconstructed("readnext()");
+//		var_str.clear();
+//		var_typ = VARTYP_STR;
+//	}
 
 	// default cursor is ""
 	this->default_to("");
 
-
-	THISIS("bool var::readnext(io key, io valueno) const")
-	assertString(function_sig);
 
 	var record;
 	return this->readnext(record, key, valueno);
@@ -5269,20 +5263,20 @@ bool var::readnext(io key, io valueno) {
 
 bool var::readnext(io record, io key, io valueno) {
 
-	//?allow undefined usage like var xyz=xyz.readnext();
-	if (var_typ & VARTYP_MASK || !var_typ) {
-		// throw VarUndefined("readnext()");
-		var_str.clear();
-		var_typ = VARTYP_STR;
-	}
+	THISIS("bool var::readnext(io record, io key, io valueno) const")
+	assertVar(function_sig);
+	ISVAR(key)
+	ISVAR(record)
+
+//	//?allow unconstructed usage like var xyz=xyz.readnext();
+//	if (var_typ & VARTYP_MASK || !var_typ) {
+//		// throw VarUnconstructed("readnext()");
+//		var_str.clear();
+//		var_typ = VARTYP_STR;
+//	}
 
 	// default cursor is ""
 	this->default_to("");
-
-	THISIS("bool var::readnext(io record, io key, io valueno) const")
-	assertString(function_sig);
-	ISDEFINED(key)
-	ISDEFINED(record)
 
 	// readnext through string of keys if provided
 	// Note: code similarity between hasnext and readnext
@@ -5535,7 +5529,7 @@ bool var::deleteindex(in fieldname0) const {
 var  var::listfiles() const {
 
 	THISIS("var  var::listfiles() const")
-	assertDefined(function_sig);
+	assertVar(function_sig);
 
 	// from http://www.alberton.info/postgresql_meta_info.html
 
@@ -5585,7 +5579,7 @@ var  var::listfiles() const {
 var  var::dblist() const {
 
 	THISIS("var  var::dblist() const")
-	assertDefined(function_sig);
+	assertVar(function_sig);
 
 	var sql = "SELECT datname FROM pg_database";
 
@@ -5617,8 +5611,7 @@ var  var::dblist() const {
 bool var::cursorexists() {
 
 	THISIS("bool var::cursorexists()")
-	// could allow undefined usage since *this isnt used?
-	assertDefined(function_sig);
+	assertVar(function_sig);
 
     // Avoid generating sql errors since they abort transactions
 
@@ -5649,8 +5642,7 @@ bool var::cursorexists() {
 var  var::listindex(in filename0, in fieldname0) const {
 
 	THISIS("var  var::listindex(in filename, in fieldname) const")
-	// could allow undefined usage since *this isnt used?
-	assertDefined(function_sig);
+	assertVar(function_sig);
 	ISSTRING(filename0)
 	ISSTRING(fieldname0)
 
@@ -5717,8 +5709,7 @@ var  var::listindex(in filename0, in fieldname0) const {
 var  var::reccount(in filename0) const {
 
 	THISIS("var  var::reccount(in file_or_filename) const")
-	// could allow undefined usage since *this isnt used?
-	assertDefined(function_sig);
+	assertVar(function_sig);
 	ISSTRING(filename0)
 
 	var filename = filename0 ?: (*this);
@@ -5753,8 +5744,7 @@ var  var::reccount(in filename0) const {
 bool var::flushindex(in filename) const {
 
 	THISIS("bool var::flushindex(in filename) const")
-	// could allow undefined usage since *this isnt used?
-	assertDefined(function_sig);
+	assertVar(function_sig);
 	ISSTRING(filename)
 
 	var sql = "VACUUM";

@@ -461,9 +461,9 @@ removetrailing:
 // mainly called in ISSTRING when not already a string
 template<> PUBLIC void VARBASE1::createString() const {
 
-	// TODO ensure ISDEFINED is called everywhere in advance
-	// to avoid wasting time doing multiple calls to ISDEFINED
-	// this->assertDefined(__PRETTY_FUNCTION__);
+	// TODO ensure ISVAR is called everywhere in advance
+	// to avoid wasting time doing multiple calls to ISVAR
+	// this->assertVar(__PRETTY_FUNCTION__);
 
 	// dbl - create string from dbl
 	// prefer double
@@ -521,9 +521,9 @@ template<> PUBLIC void VARBASE1::createString() const {
 
 template<> PUBLIC bool VARBASE1::isnum(void) const {
 
-	// TODO make isnum private and ensure ISDEFINED is checked before all calls to isnum
+	// TODO make isnum private and ensure ISVAR is checked before all calls to isnum
 	// to save the probably double check here
-	this->assertDefined(__PRETTY_FUNCTION__);
+	this->assertVar(__PRETTY_FUNCTION__);
 
 	// Known to be numeric already
 	if (var_typ & VARTYP_INTDBL)
@@ -662,7 +662,7 @@ template<> PUBLIC bool VARBASE1::toBool() const {
 
 	// could be skipped for speed assuming that people will not write unusual "var x=f(x)" type
 	// syntax as follows: var xx=xx?11:22;
-	this->assertDefined(__PRETTY_FUNCTION__);
+	this->assertVar(__PRETTY_FUNCTION__);
 
 	// identical code in void* and bool except returns void* and bool respectively
 	while (true) {

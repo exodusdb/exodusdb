@@ -376,7 +376,7 @@ void var::osflush() const {
 bool var::osopen(in osfilename, const bool utf8 /*=true*/) const {
 
 	THISIS("bool var::osopen(in osfilename, const bool utf8)")
-	assertDefined(function_sig);
+	assertVar(function_sig);
 	ISSTRING(osfilename)
 
 	// if reopening an osfile that is already opened then close and reopen
@@ -513,7 +513,7 @@ WINDOWS-1258
 bool var::osread(const char* osfilename, const char* codepage) {
 
 	THISIS("bool var::osread(const char* osfilename, const char* codepage")
-	assertDefined(function_sig);
+	assertVar(function_sig);
 
 	// osread returns empty string in any case
 	var_str.clear();
@@ -788,7 +788,7 @@ static unsigned count_invalid_trailing_UTF8_bytes(const std::string& str) {
 bool var::osbread(in osfilevar, io offset, const int bytesize) {
 
 	THISIS("bool var::osbread(in osfilevar, io offset, const int bytesize")
-	assertDefined(function_sig);
+	assertVar(function_sig);
 	ISNUMERIC(offset)
 
 	// default is to return empty string in any case
@@ -1038,7 +1038,7 @@ bool var::osmove(in new_dirpath_or_filepath) const {
 
 bool var::osremove() const {
 
-	assertDefined(__PRETTY_FUNCTION__);
+	assertVar(__PRETTY_FUNCTION__);
 	this->osclose();  // in case this is cached opened file handle
 
 	// Prevent removal of dirs. Use osrmdir for that.
@@ -1227,7 +1227,7 @@ var  var::oslistd(SV globpattern) const {
 var  var::oslist(SV globpattern0, const int mode) const {
 
 	THISIS("var  var::oslist(in globpattern, const int mode) const")
-	assertDefined(function_sig);
+	assertVar(function_sig);
 	//ISSTRING(path0)
 	//ISSTRING(globpattern0)
 
@@ -1326,7 +1326,7 @@ bool var::oscwd(in newpath) const {
 
 	THISIS("var  var::oscwd(const char* newpath) const")
 	// doesnt use *this - should syntax be changed to setcwd? and getcwd()?
-	assertDefined(function_sig);	 // not needed if *this not used
+	assertVar(function_sig);	 // not needed if *this not used
 	ISSTRING(newpath)
 
 	try {
@@ -1346,7 +1346,7 @@ var  var::oscwd() const {
 
 	THISIS("var  var::oscwd() const")
 	// doesnt use *this - should syntax be changed to ossetcwd? and osgetcwd()?
-	assertDefined(function_sig);	 // not needed if *this not used
+	assertVar(function_sig);	 // not needed if *this not used
 
 	// TODO consider using complete() or system_complete()
 	//"[Note: When portable behavior is required, use complete(). When operating system

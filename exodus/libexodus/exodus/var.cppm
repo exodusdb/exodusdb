@@ -55,7 +55,7 @@ export namespace exo {
 	using exo::VarNumUnderflow;
 	using exo::VarOutOfMemory;
 	using exo::VarUnassigned;
-	using exo::VarUndefined;
+	using exo::VarUnconstructed;
 
 	using exo::DimDimensionedZero;
 	using exo::DimIndexOutOfBounds;
