@@ -110,8 +110,8 @@ export namespace exo {
 	using exo::getprompt;
 	using exo::setprompt;
 	using exo::input;
-	using exo::input;
 	using exo::inputn;
+	using exo::keypressed;
 	using exo::isterminal;
 	using exo::hasinput;
 	using exo::eof;

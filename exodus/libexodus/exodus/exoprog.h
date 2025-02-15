@@ -189,7 +189,7 @@ class PUBLIC ExodusProgramBase {
 	var decide(in question, in options, io reply, const int defaultreply = 1) const;
 
 	void savescreen(io origscrn, io origattr) const;
-	var keypressed(int milliseconds = 0) const;
+//	var keypressed(int milliseconds = 0) const;
 	ND bool esctoexit() const;
 
 	void flushindex(in filename);
