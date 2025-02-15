@@ -315,34 +315,32 @@ bool var::eof() const {
 	return std::cin.eof();
 }
 
-bool var::hasinput(int milliseconds) const {
+bool var::hasinput(const int milliseconds) const {
 	//declare in haskey.cpp
 	bool haskey(int milliseconds);
 
 	return haskey(milliseconds);
 }
 
-// Not in a terminal - Binary safe except for \n (\r\n for MS)
+//out  var::input() {
+//
+//	THISIS("out  var::input()")
+//	assertVar(function_sig);
+//
+//	var_str.clear();
+//	var_typ = VARTYP_STR;
+//
+//	return *this;
+//}
+
+// input with prompt allows default value and editing if isterminal
+// or
+// if not in a terminal - Binary safe except for \n (\r\n for MS)
 //
 // In a terminal - Backspace and \n (\r\n for MS) are lost.
 //                 Pressing Ctrl+d (Ctrl+z fro MS) indicates eof
 //
-out  var::input() {
-
-	THISIS("out  var::input()")
-	assertVar(function_sig);
-
-	var_str.clear();
-	var_typ = VARTYP_STR;
-
-	if (!std::cin.eof())
-		std::getline(std::cin, var_str);
-
-	return *this;
-}
-
-// input with prompt allows default value and editing if isterminal
-out  var::input(in prompt) {
+out  var::input(in prompt /*=""*/) {
 
 	THISIS("out  var::input(in prompt")
 	assertVar(function_sig);
@@ -357,9 +355,12 @@ out  var::input(in prompt) {
 	if (prompt.len())
 		prompt.output().osflush();
 
-	//windows currently doesnt allow line editing
-	if (not this->isterminal() or SLASH_IS_BACKSLASH) {
-		this->input();
+	// Not a terminal
+	if (not this->isterminal(0) or SLASH_IS_BACKSLASH) {
+//		this->input();
+		if (!std::cin.eof())
+			std::getline(std::cin, var_str);
+		return *this;
 	}
 
 	//linux terminal input line editing
@@ -368,8 +369,14 @@ out  var::input(in prompt) {
 		default_input.replacer("\"", "\\\"");
 		var cmd = "bash -c 'read -i " ^ default_input.quote() ^ " -e EXO_TEMP_READ && printf \"%s\" \"$EXO_TEMP_READ\"'";
 		//cmd.outputl("cmd=");
-		if (not this->osshellread(cmd))
-			lasterror().logputl();
+		if (not this->osshellread(cmd)) {
+			// Report any error
+			// except bash terminal read returns 256 if Ctrl+D provided.
+			const var msg = lasterror();
+			const var exit_status = msg.field(" ", 2);
+			if (exit_status != 256)
+				msg.logputl();
+		}
 		if ((*this) == "")
 			std::cout << std::endl;
 	}
@@ -384,41 +391,110 @@ out  var::inputn(const int nchars) {
 	THISIS("out  var::inputn(const int nchars")
 	assertVar(function_sig);
 
+	// Return empty string by default
 	var_str.clear();
 	var_typ = VARTYP_STR;
 
-	//declare function in getkey.cpp
-	char getkey(void);
+	// nchars is 1
+	//////////////
 
-	//input whatever characters are available into this var a return true if more than none
-	// quit if error or EOF
-	if (nchars < 0) {
-
-		for (;;) {
-			char char1;
-			{
-				char1 = getkey();
-			}
-
-			// Quit if no (more) characters available
-			// really should test for EOF which is usually -1
-			// Ctrl+D usually terminates input in posix
-			if (char1 < 0)
-				break;
-
-			//var_str += char1;
-			var_str.push_back(char1);
-		}
+	// Wait for a key to be pressed and return it immediately.
+	if (nchars == 1) {
+		return this->keypressed(true);
 	}
 
-	//input a certain number of characters input this var and return true if more than none
-	else if (nchars > 0) {
+	// nchars < 0
+	/////////////
+
+	// Return current key pressed or "" if no key currently pressed.
+	else if (nchars < 0) {
+		return this->keypressed(false);
+	}
+
+	// chars > 1
+	////////////
+
+	// Wait for and return up to chars bytes
+	else if (nchars > 1) {
+
+		// Reserve space
+		var_str.resize(nchars);
+
+		// cin.read
+		std::cin.read(var_str.data(), nchars);
+
+		// Trim space in case not all chars available
+		var_str.resize(std::cin.gcount());
+
+	}
+
+	// nchars = 0
+	/////////////
+
+	// Return all bytes available
+	else if (nchars == 0) {
+
+		// How many bytes available?
+		std::streamsize bytes_available = std::cin.rdbuf()->in_avail();
+
+		// Try to read only in std::string SSO (15 bytes)
+		// Plus 1 to trigger fast exit
+		int blocksize = bytes_available ?: 15;
+
+		//	std::streamsize available = std::cin.rdbuf()->in_avail();
+		int offset = 0;
+		while (!std::cin.eof()) {
+
+			// Reserve space/more space
+			var_str.resize(offset + blocksize);
+
+			std::cin.read(var_str.data() + offset, blocksize);
+
+			// Trim space in case not all chars available
+			int nchars_read = std::cin.gcount();
+			if (nchars_read < blocksize) {
+				var_str.resize(offset + nchars_read);
+				break;
+			}
+
+			offset += blocksize;
+
+			// Exponential increase in block size read
+			//blocksize *= 2;
+
+		}
+
+	}
+
+	return *this;
+}
+
+out  var::keypressed(const bool wait /*wait=false*/) {
+
+	THISIS("out  var::keypressed(const bool wait")
+	assertVar(function_sig);
+
+	// Function declared in term_getkey.cpp
+	char term_getkey(void);
+
+	// Return empty string by default
+	var_str.clear();
+	var_typ = VARTYP_STR;
+
+	// Quit if not a terminal
+	if (!this->isterminal())
+		return *this;
+
+	// Wait for and return a single byte immediately a key is pressed.
+	if (wait) {
+
+		const int nchars = 1;
 
 		while (!eof()) {
 
 			char char1;
 			{
-				char1 = getkey();
+				char1 = term_getkey();
 			}
 
 			// try again after a short delay if no key and not enough characters yet
@@ -444,12 +520,33 @@ out  var::inputn(const int nchars) {
 				break;
 		}
 
-	} else {
-		this->input();
+	}
+
+	// Input whatever key is currently pressed or "" if no key is currently pressed.
+	// Can be multibyte for e.g. PgUp -> and Esc sequence
+	////////////////////////////////////////////////////////////////////////////////
+	else {
+
+		for (;;) {
+			char char1;
+			{
+				char1 = term_getkey();
+			}
+
+			// Quit if no (more) characters available
+			// really should test for EOF which is usually -1
+			// Ctrl+D usually terminates input in posix
+			if (char1 < 0)
+				break;
+
+			//var_str += char1;
+			var_str.push_back(char1);
+		}
 	}
 
 	return *this;
 }
+
 
 template<> PUBLIC void VARBASE1::default_to(CBX defaultvalue) {
 

@@ -46,13 +46,13 @@ CVR  var::put(std::ostream& ostream1) const {
 	THISIS("CVR  var::put(std::ostream& ostream1) const")
 	assertString(function_sig);
 
-	// prevent output to cout suppressing output to cout (by non-exodus routines)
-	// http://gcc.gnu.org/ml/gcc-bugs/2006-05/msg01196.html
-	// TODO optimise by calling once instead of every call to output()
-	if (!desynced_with_stdio) {
-		std::ios::sync_with_stdio(false);
-		desynced_with_stdio = true;
-	}
+//	// prevent output to cout suppressing output to cout (by non-exodus routines)
+//	// http://gcc.gnu.org/ml/gcc-bugs/2006-05/msg01196.html
+//	// TODO optimise by calling once instead of every call to output()
+//	if (!desynced_with_stdio) {
+//		std::ios::sync_with_stdio(false);
+//		desynced_with_stdio = true;
+//	}
 
 	// verify conversion to UTF8
 	// std::string tempstr=(*this).toString();

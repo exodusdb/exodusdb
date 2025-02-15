@@ -296,7 +296,8 @@ bool var::osshellread(in oscmd) {
 	// but put it here so any unassigned error shows in osshell
 	ISSTRING(oscmd)
 
-	// default is to return empty string in any case
+	// THIS = ""
+	// In case popen or pclose fail
 	var_str.clear();
 	var_typ = VARTYP_STR;
 
@@ -307,8 +308,10 @@ bool var::osshellread(in oscmd) {
 	auto* pfile = popen(to_oscmd_string(oscmd).c_str(), "r");
 
 	// Detect program failure.
+	// Use status 0 to indicate that the program could not be started.
+	// Not that it returned exit status 0
 	if (pfile == nullptr) {
-		this->setlasterror("osshellread failed. " ^ oscmd.quote());
+		this->setlasterror("Status: 0 osshellread:. " ^ oscmd.quote());
 		return false;
 	}
 
@@ -324,12 +327,14 @@ bool var::osshellread(in oscmd) {
 		var_str += cstr1;
 	}
 
+	// Get the exit status
 	int shellresult = pclose(pfile);
 
+	// Return the exit status in last error if not 0
 	if (shellresult)
-		setlasterror("osshellread failed. " ^ oscmd.quote());
+		setlasterror("Status: " ^ var(shellresult) ^ " osshellread: " ^ oscmd.quote());
 
-	//return true if no error code
+	// Return true if the exit status was 0
 	return !shellresult;
 
 }

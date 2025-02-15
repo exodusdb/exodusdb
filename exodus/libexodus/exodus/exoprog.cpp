@@ -1733,14 +1733,16 @@ void ExodusProgramBase::savescreen(io /*origscrn*/, io /*origattr*/) const {
 	std::cout << "ExodusProgramBase::savescreen not implemented" << std::endl;
 }
 
-// keypressed
-var ExodusProgramBase::keypressed(int milliseconds) const {
-	return var().hasinput(milliseconds);
-}
+//// keypressed
+//var ExodusProgramBase::keypressed(int milliseconds) const {
+//	return var().hasinput(milliseconds);
+//}
 
 // esctoexzit
 bool ExodusProgramBase::esctoexit() const {
-	if (not keypressed())
+
+//	if (not var().keypressed())
+	if (not var().hasinput())
 		return false;
 
 	//std::cout << "Press Esc again to cancel or any other key to continue " << std::endl;

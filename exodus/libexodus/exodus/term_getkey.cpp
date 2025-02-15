@@ -12,7 +12,7 @@
 //#include <sys/types.h>
 
 //------------------------------------------------------------------------------
-// getkey() returns the next char in the stdin buffer if available, otherwise
+// term_getkey() returns the next char in the stdin buffer if available, otherwise
 //          it returns -1 immediately.
 //
 // it turns ECHO off and turns ECHO ON afterwards
@@ -20,7 +20,7 @@
 
 namespace exo {
 
-char getkey(void) {
+char term_getkey(void) {
 	char ch = 0;
 	int error;
 	struct termios oldAttr, newAttr;

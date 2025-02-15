@@ -252,13 +252,14 @@ ND var  rnd(const int number);
 ND var  getprompt(void);
    void setprompt(in prompt);
 
-   var  input(void);
+//   var  input(void);
 
-   var  input(in prompt);
+   var  input(in prompt = "");
 
    var  inputn(const int nchars);
+   var  keypressed(const bool wait = false);
 
-ND bool isterminal(const int in_out_log = 1); // 0, 1, 2 = stdin, stdout, stderr
+ND bool isterminal(const int in_out_log = 1); // 0, 1, 2 = stdin, stdout (default), stderr
 ND bool hasinput(const int millisecs = 0 );
 ND bool eof(void);
    bool echo(const int on_off);

@@ -1884,18 +1884,18 @@ public:
 	// 4. d=dir, f=file
 	//
 	// Possible event type codes are as follows:
-	// * IN_CLOSE_WRITE - A file opened for writing was closed
-	// * IN_ACCESS      - Data was read from file
-	// * IN_MODIFY      - Data was written to file
-	// * IN_ATTRIB      - File attributes changed
-	// * IN_CLOSE       - File was closed (read or write)
-	// * IN_MOVED_FROM  - File was moved away from watched directory
-	// * IN_MOVED_TO    - File was moved into watched directory
-	// * IN_MOVE        - File was moved (in or out of directory)
-	// * IN_CREATE      - A file was created in the directory
-	// * IN_DELETE      - A file was deleted from the directory
-	// * IN_DELETE_SELF - Directory or file under observation was deleted
-	// * IN_MOVE_SELF   - Directory or file under observation was moved
+	// * IN_CLOSE_WRITE⋅- A file opened for writing was closed
+	// * IN_ACCESS⋅⋅⋅⋅⋅⋅- Data was read from file
+	// * IN_MODIFY⋅⋅⋅⋅⋅⋅- Data was written to file
+	// * IN_ATTRIB⋅⋅⋅⋅⋅⋅- File attributes changed
+	// * IN_CLOSE⋅⋅⋅⋅⋅⋅⋅- File was closed (read or write)
+	// * IN_MOVED_FROM⋅⋅- File was moved away from watched directory
+	// * IN_MOVED_TO⋅⋅⋅⋅- File was moved into watched directory
+	// * IN_MOVE⋅⋅⋅⋅⋅⋅⋅⋅- File was moved (in or out of directory)
+	// * IN_CREATE⋅⋅⋅⋅⋅⋅- A file was created in the directory
+	// * IN_DELETE⋅⋅⋅⋅⋅⋅- A file was deleted from the directory
+	// * IN_DELETE_SELF⋅- Directory or file under observation was deleted
+	// * IN_MOVE_SELF⋅⋅⋅- Directory or file under observation was moved
 	   var  oswait(const int milliseconds) const;
 
 	///// OS FILE I/O:
@@ -2284,7 +2284,7 @@ public:
 	// The raw string bytes are output. No character or byte conversion is performed.
 	   CVR put(std::ostream& ostream1) const;
 
-	// Flush any and all buffered output to stdout/stdlog
+	// Flush any and all buffered output to stdout and stdlog.
 	// obj is var()
 	//
 	// `var().osflush();
@@ -2297,28 +2297,60 @@ public:
 
 	// obj is var
 
-	   out  input();                  // Wait for stdin until cr or eof
-	   out  input(in prompt);         // Ditto after outputting prompt to stdout
-	   out  inputn(const int nchars); // Wait for nbytes from stdin
+	// Returns one line of input from stdin.
+	// Returns raw bytes up to but excluding the first new line character.
+	// Prompt: Optional. Will be displayed before the input field if provided.
+	// If stdin is a terminal then the initial value of the var, if any, is the default value and can be edited with cursor keys like an OS command line. Pressing Enter or Ctrl+D will complete the input.
+	   out  input(in prompt = "");
+
+    // Get raw bytes from standard input.
+	// Any new line characters are treated like any other bytes.
+	// Care must be taken to handle incomplete UTF8 byte sequences at the end of one block and the beginning of the next block.
+	// Returns: The requested number of bytes or fewer if not available.
+	// nchars:
+	// 99 : Get up to 99 bytes or fewer if not available
+	// ⋅0 : Get all bytes presently available.
+	// ⋅1 : Same as keypressed(true). Deprecated.
+	// -1 : Same as keypressed(false). Deprecated.
+	   out  inputn(const int nchars);
+
+	// Return the code of the current terminal key pressed.
+	// wait: Optional. True means wait for a key to be pressed if not already pressed. Defaults to false.
+	// Returns: ASCII or key code defined according to terminal protocol or "" if stdin is not a terminal.
+	// e.g. The PgDn key if pressed might return an escape sequence like "\x1b[6~"
+	   out  keypressed(const bool wait = false);
 
 	// obj is var()
 
-	// Checks if stdin/stdout/stderr is a terminal or is a file/pipe.
-	// Argument: file_no = 0 - stdin, 1 - stdout (default), 2 - stderr.
-	// Returns: True if it is a terminal or false if it is a file or pipe
-	ND bool isterminal(const int file_no = 1) const;
+	// Checks if one of stdin, stdout, stderr is a terminal or a file/pipe.
+	// arg: 0 - stdin, 1 - stdout (Default), 2 - stderr.
+	// Returns: True if it is a terminal or false if it is a file or pipe.
+	// Note that if the process is at the start or end of a pipeline, then only stdin or stdout will be a terminal.
+	// The type of stdout terminal can be obtained from the TERM environment variable.
+	// `var v1 = var().isterminal()); /// 1 or 0
+	//  // or
+	//  var v2 = isterminal();`
+	ND bool isterminal(const int arg = 1) const;
 
-	ND bool hasinput(int milliseconds = 0) const;       // True if stdin bytes available within milliseconds
+	// Checks if stdin has any bytes available for input.
+	// If no bytes are immediately available, the process sleeps for up to the given number of milliseconds, returning true immediately any bytes become available or false if the period expires without any bytes becoming available.
+	// Returns: True if any bytes are available otherwise false.
+	ND bool hasinput(const int milliseconds = 0) const;
 
-	ND bool eof() const;                                // True if stdin is at end of file
+	// True if stdin is at end of file
+	ND bool eof() const;
 
-	   bool echo(const bool on_off = true) const;       // True to reflect all stdin to stdout if terminal available
+	// Sets terminal echo on or off.
+	// "On" causes all stdin characters to be reflected to stdout if stdin is a terminal.
+	// Turning terminal echo off can be used to prevent display of confidential information.
+	// Returns: True if successful.
+	   bool echo(const bool on_off = true) const;
 
 	// Install various interrupt handlers.
+	// Automatically called in program/thread initialisation by exodus_main.
 	// SIGINT - Ctrl+C -> "Interrupted. (C)ontinue (Q)uit (B)acktrace (D)ebug (A)bort ?"
 	// SIGHUP - Sets a static variable "RELOAD_req" which may be handled or ignored by the program.
 	// SIGTERM - Sets a static variable "TERMINATE_req" which may be handled or ignored by the program.
-	// Automatically called in exodus_main program/thread initialisation.
 	   void breakon() const;
 
 	// Disable keyboard interrupt.

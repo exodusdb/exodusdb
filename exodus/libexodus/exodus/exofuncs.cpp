@@ -163,11 +163,12 @@ ND PUBLIC var  rnd(const int number) {return var(number).rnd();}
 ND PUBLIC var  getprompt();
    PUBLIC void setprompt(in prompt);
 
-   PUBLIC var  input() {var v; v.input(); return v;}
+//   PUBLIC var  input() {var v; v.input(); return v;}
 
    PUBLIC var  input(in prompt) {var v; v.input(prompt); return v;}
 
    PUBLIC var  inputn(const int nchars) {var v; v.inputn(nchars); return v;}
+   PUBLIC var  keypressed(const bool wait /*= false*/) {var v; v.keypressed(wait); return v;}
 
 ND PUBLIC bool isterminal(const int in_out_err) {return var().isterminal(in_out_err);}
 ND PUBLIC bool hasinput(const int millisecs /*=0*/) {return var().hasinput(millisecs);}

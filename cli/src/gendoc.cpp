@@ -404,10 +404,6 @@ function main() {
 				// tag backticked code as c++
 				if (man) {
 
-					// hide dot/space formatting
-					comments.replacer("\u22c5", "\u2005"); // "⋅" Unicode operator point operator -> " " FOUR-PER-EM SPACE
-					comments.replacer("␣", "\u2005");
-
 					// Man page codes
 					// .RS Right shift
 					// .nf No format
@@ -431,10 +427,15 @@ function main() {
 			// Output function documentation
 			////////////////////////////////
 
-			if (man)
+			if (man) {
+				// hide dot/space formatting
+				comments.replacer("\u22c5", "\u2005"); // "⋅" Unicode operator point operator -> " " FOUR-PER-EM SPACE
+				comments.replacer("␣", "\u2005");
+
 				comments.replacer(_FM, "\n\n");
-			else
+			} else {
 				comments.replacer(_FM, "</p>\n");
+			}
 
 			var line2 = srcline.field(";", 1);
 
