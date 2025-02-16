@@ -495,7 +495,8 @@ function main() {
 		assert(
 			var(10.0 / 3.0).toString()
 				//old exodus crude reduction in precision to 16 using sstream hides inaccuracies when there are only few calculations.
-				== "3.333333333333333"
+//				== "3.333333333333333" // 16
+				== "3.33333333333" // 12
 
 			||
 			var(10.0 / 3.0).toString()
@@ -508,7 +509,8 @@ function main() {
 			//		  eq  "3.333333333333335"
 		);
 
-		assert(var(10.0 / 3.0 * 2.0).toString() eq "6.666666666666667");
+//		assert(var(10.0 / 3.0 * 2.0).toString() eq "6.666666666666667"); // 16
+		assert(var(10.0 / 3.0 * 2.0).toString() eq "6.66666666667"); // 12
 		assert(var(10.0 / 3.0 * 3.0).toString() eq "10");
 
 		var x = 10;
