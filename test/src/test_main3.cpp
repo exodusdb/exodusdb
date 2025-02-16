@@ -468,6 +468,14 @@ function main() {
 		g.fcaser();
 		assert(g eq "grüssen");
 
+		// Accents are significant at least in some cases
+		assert(fcase("cote").outputl() == "cote");// (rating)
+		assert(fcase("coté").outputl() == "coté");// (highly regarded)
+		assert(fcase("côte").outputl() == "côte");// (coast)
+		assert(fcase("côté").outputl() == "côté");// (side)
+		assert(fcase("é").outputl() == "é");// random
+		assert(fcase("ô").outputl() == "ô");// random
+
 		var v = "top of the world";
 		assert(v.tcase()                       eq "Top Of The World");
 		assert(var("top of the world").tcase() eq "Top Of The World");

@@ -236,11 +236,29 @@ function main() {
 
 	printl("tcase() const&;");
 	{
-		let v1 = "γιάννης"_var.tcase();
-		assert(v1 == "Γιάννης");
+		let v1 = "γιάννης παππάς"_var.tcase();
+		assert(v1 == "Γιάννης Παππάς");
 
 		// or
-		let v2 = tcase("γιάννης");
+		let v2 = tcase("γιάννης παππάς");
+	}
+
+	printl("fcase() const&;");
+	{
+		let v1 = "Grüßen"_var.fcase();
+		assert(v1 == "grüssen");
+
+		// or
+		let v2 = tcase("Grüßen");
+	}
+
+	printl("normalize() const&;");
+	{
+		let v1 = "u¨"_var.normalize();
+		assert(v1 == "ü");
+
+		// or
+
 	}
 
 	printl("invert() const&;");
@@ -1561,6 +1579,13 @@ function main() {
 		var().osflush();
 		// or
 		osflush();
+	}
+
+	printl("isterminal(const int arg = 1) const;");
+	{
+		var v1 = var().isterminal(); /// 1 or 0
+		// or
+		var v2 = isterminal();
 	}
 
 	printl("abs() const;");
