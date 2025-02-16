@@ -498,21 +498,39 @@ public:
 	//  let v2 = lcase("ΓΙΆΝΝΗΣ");`
 	ND var  lcase() const&;
 
-	// To title case (first letters are capitalised)
+	// To title case. The first letter of each word is capitalised.
 	//
-	// `let v1 = "γιάννης"_var.tcase(); // "Γιάννης"
+	// `let v1 = "γιάννης παππάς"_var.tcase(); // "Γιάννης Παππάς"
 	//  // or
-	//  let v2 = tcase("γιάννης");`
+	//  let v2 = tcase("γιάννης παππάς");`
 	ND var  tcase() const&;
 
-	// To folded case (lower case and remove accents for indexing)
+	// To folded case to enable standardised indexing and searching,
+	//
+	// Case folding is a process of converting a text to case independent representation.
+	// https://www.w3.org/International/wiki/Case_folding
+	// Accents can be significant. As in French cote, coté, côte and côté.
+	// Normalization is not locale-dependent.
+	//
+	// `let v1 = "Grüßen"_var.fcase(); // "grüssen"
+	//  // or
+	//  let v2 = tcase("Grüßen");`
 	ND var  fcase() const&;
 
 	// Normalises unicode code points sequences to their standardised NFC form making them binary comparable.
+	//
+	// Unicode normalization is the process of converting strings to a standard form, suitable for text processing and comparison.
+	// For example, character "ü" can be represented by a single code point or a combination of the character "u" and the diaeresis "¨".
+	// Normalization is an important part of Unicode text processing.
+	// Normalization is not locale-dependent.
+	//
+	// `let v1 = "u¨"_var.normalize(); // "ü"
+	//  // or
+	// `let v2 = normalize("u¨"); // "ü"
 	ND var  normalize() const&;
 
 	// Simple reversible disguising of text
-	// invert(invert()) returns to original.
+	// invert(invert()) returns to the original text.
 	// Flips bit 8 of unicode code points. Note that ASCII bytes become multibyte UTF-8 so string sizes change.
 	//
 	// `let v1 = "abc"_var.invert(); // "\xC2" "\x9E" "\xC2" "\x9D" "\xC2" "\x9C"
@@ -2327,7 +2345,7 @@ public:
 	// Returns: True if it is a terminal or false if it is a file or pipe.
 	// Note that if the process is at the start or end of a pipeline, then only stdin or stdout will be a terminal.
 	// The type of stdout terminal can be obtained from the TERM environment variable.
-	// `var v1 = var().isterminal()); /// 1 or 0
+	// `var v1 = var().isterminal(); /// 1 or 0
 	//  // or
 	//  var v2 = isterminal();`
 	ND bool isterminal(const int arg = 1) const;

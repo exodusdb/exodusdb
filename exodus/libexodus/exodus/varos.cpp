@@ -736,6 +736,12 @@ static unsigned count_invalid_trailing_UTF8_bytes(const std::string& str) {
 	int num = 1;
 	int numBytesToTruncate = 0;
 
+	// UTF8 bytes sequences
+	// 1 byte  for U+0000 tp U+007f:    0xxxxxxx
+	// 2 bytes for U+0080 to U+07FF:    110xxxxx 10xxxxxx
+	// 3 bytes for U+0800 to U+FFFF:    1110xxxx 10xxxxxx 10xxxxxx
+	// 4 bytes for U+10000 to U+10FFFF: 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
+
 	for (int i = 0; 6 > i; ++i) {
 		numBytesToTruncate += 1;
 		if ((*cptr & 0x80) == 0x80) {
