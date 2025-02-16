@@ -99,10 +99,28 @@ namespace exo {
 // Wrapper function for std::to_chars
 /////////////////////////////////////
 
+// Regarding random walk on accumulating floating point errors
+// over many calculations as can happen in report totals.
+// The total error over many operations is proportional to the square root of the number of operations.
+// "How many ops (e.g. additions) are required to have a 90% chance of total error > 10^3 x a single error"
+// if x = 10^3 x single error then    63,290,144 ops
+// if x = 10^4 x single error then 6,329,014,300 ops
+// Grok response to
+// "if I move one cm left or right at random, how long before there is a 90% chance that I will have moved 10 meters away from my starting point?'
+
+// Given the above then I choose to discard three digits of decimal accuracy
+// from double when converting to strings to avoid floating point inaccuracy compared to decimal digits.
+#define EXO_MAX_PRECISION std::numeric_limits<double>::digits10 // 15 for IEEE 8 byte double
+#define EXO_PRECISION EXO_MAX_PRECISION - 3 // 12 digits total e.g. 1.234'567'890'12
+
+// Used by:
+// 1. var::createString() (via double_to_string) using std::chars_format::general and given ndecs
+// 2. var::round()                               using std::chars_format::fixed and default precision (ndecs)
 static std::string double_to_chars_to_string(
 		double double1,
 		std::chars_format format = std::chars_format::general,
-		int decimals = std::numeric_limits<double>::digits10 + 1
+//		int decimals = std::numeric_limits<double>::digits10 + 1
+		int decimals = EXO_PRECISION
 	) {
 
 	// Local stack working space for to_chars
