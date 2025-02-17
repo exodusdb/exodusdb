@@ -49,7 +49,6 @@ function main() {
 		filterfieldnos.trimmer(",");
 		filterfieldnos.replacer(",", "\" \"");
 		filterfieldnos.quoter();
-		TRACE(filterfieldnos)
 
 	} else {
 		filterfieldnos = "";
