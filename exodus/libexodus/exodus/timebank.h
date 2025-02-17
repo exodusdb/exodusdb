@@ -117,10 +117,12 @@ CONSTEVAL_OR_CONSTEXPR
 auto get_timebank_acno(const std::string_view arg1) -> int {
 	int acno = 0;
 
+	//////////
 	// Remember to regenerate timebank.txt after amending this list
-	/*
-		\grep -P -v '^\s*//' timebank.h|\grep -P 'arg1 == "(.*)"' -o|cut -d'"' -f2 | nl -v 500 -s' ' -w3 > timebank.txt
-	*/
+	///////////
+	// Done automatically in CMakeLists.txt by timebank.h.to_txt.sh
+
+	// Must be in the following format for automatic generation of timebank.txt
 
 	     if (++acno && arg1 == "dim& dim::splitter(in str1, SV sepchar)") {}
 	else if (++acno && arg1 == "xxxxxxxx unused") {}
@@ -160,6 +162,7 @@ auto get_timebank_acno(const std::string_view arg1) -> int {
 	else if (++acno && arg1 == "bool var::committrans() const") {}
 	else if (++acno && arg1 == "bool var::statustrans() const") {}
 	else if (++acno && arg1 == "bool var::dbcreate(in new_dbname, in old_dbname) const") {}
+	else if (++acno && arg1 == "bool var::dbcopy(in from_dbname, in new_dbname) const") {}
 	else if (++acno && arg1 == "bool var::dbdelete(in dbname)") {}
 	else if (++acno && arg1 == "bool var::createfile(in filename)") {}
 	else if (++acno && arg1 == "bool var::renamefile(in filename, in newfilename)") {}
@@ -185,6 +188,8 @@ auto get_timebank_acno(const std::string_view arg1) -> int {
 	else if (++acno && arg1 == "out  var::input()") {}
 	else if (++acno && arg1 == "out  var::input(in prompt") {}
 	else if (++acno && arg1 == "out  var::inputn(const int nchars") {}
+	else if (++acno && arg1 == "out  var::keypressed(const bool wait = false)") {}
+	else if (++acno && arg1 == "bool var::eof() const") {}
 	else if (++acno && arg1 == "void var::default_to(in defaultvalue)") {}
 	else if (++acno && arg1 == "var  var::default_from(in defaultvalue) const") {}
 	else if (++acno && arg1 == "char var::toChar() const") {}
@@ -193,6 +198,7 @@ auto get_timebank_acno(const std::string_view arg1) -> int {
 	else if (++acno && arg1 == "var  var::len() const") {}
 	else if (++acno && arg1 == "var  var::textlen()") {}
 	else if (++acno && arg1 == "std::u32string var::to_u32string() const") {}
+	else if (++acno && arg1 == "bool var::empty() const") {}
 	else if (++acno && arg1 == "io   var::trim(SV trimchars)") {}
 	else if (++acno && arg1 == "void var::trimmer(SV trimchars) &") {}
 	else if (++acno && arg1 == "io   var::trimfirst(SV trimchars) const&") {}

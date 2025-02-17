@@ -252,8 +252,6 @@ ND var  rnd(const int number);
 ND var  getprompt(void);
    void setprompt(in prompt);
 
-//   var  input(void);
-
    var  input(in prompt = "");
 
    var  inputn(const int nchars);
@@ -269,9 +267,11 @@ ND bool eof(void);
 
 // SIMPLE STRINGS
 
-ND var len(in var1);
-ND var textlen(in var1);
-ND var textwidth(in var1);
+ND var  len(in var1);
+ND var  textlen(in var1);
+ND var  textwidth(in var1);
+
+ND bool empty(in var1);
 
 ND var  convert(in instring, SV fromchars, SV tochars);
    IO   converter(io iostring, SV fromchars, SV tochars);

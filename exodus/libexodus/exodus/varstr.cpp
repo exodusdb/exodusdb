@@ -683,7 +683,7 @@ bool var::locate(in target, out setting) const {
 // Returns field number if found else 0
 var var::locate(in target) const {
 
-	THISIS("var var::locate(in target) const")
+	THISIS("var  var::locate(in target) const")
 	assertString(function_sig);
 	ISSTRING(target)
 

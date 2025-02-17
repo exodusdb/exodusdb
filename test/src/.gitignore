@@ -1,8 +1,9 @@
 t_*.txt
-t_*.bin
+t_*.bin*
 t_*.html
 t_*.dir
 t_*.cpp
+t_*.txt.expected
 
 test_*
 !test_*.cpp

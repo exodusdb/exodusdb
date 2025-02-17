@@ -57,8 +57,8 @@ TimeBank::~TimeBank() {
 
 			// Print column headings
 			if (naccs++ == 0) {
-				std::cout << std::endl;
-//				std::cerr << "A/c.       n      ms   ms/op        μs     μs/op          ns       ns/op name" << std::endl;
+				std::cerr << std::endl;
+				// WARNING. If you change this then also change it in test_output.cpp
 				std::cerr << "A/c.       n      ms = ms/op        μs   = μs/op          ns     = ns/op  Account" << std::endl;
 			}
 

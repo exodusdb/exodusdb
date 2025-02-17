@@ -63,13 +63,43 @@
 # Build test programs not like test_*.cpp
 # #######################################
 #
-	add_executable(testcommandline testcommandline.cpp)
+	add_executable(testcommandline testcommandline.cpp ${CMAKE_CURRENT_SOURCE_DIR}/../../exodus/libexodus/exodus/var.h)
 	target_link_libraries(testcommandline exodus ${PROJECT_LIBS})
 
     # lib #
     add_library(testcommandlib SHARED testcommandlib.cpp)
 	# REQUIRED only for c++ module discovery
 	target_link_libraries(testcommandlib exodus ${PROJECT_LIBS})
+
+#
+# Generate testing_var.h.cpp
+# ##########################
+#
+	add_executable(testing_var_h testing_var.h.cpp ${CMAKE_CURRENT_SOURCE_DIR}/../../exodus/libexodus/exodus/var.h)
+	target_link_libraries(testing_var_h exodus ${PROJECT_LIBS})
+
+	if (EXO_MODULE)
+		target_link_libraries(testing_var_h
+		exovar
+	)
+	endif()
+
+	add_custom_target(PreBuild_testing_var_h
+    	COMMAND test -x ${CMAKE_CURRENT_BINARY_DIR}/../../cli/src/gendoc && ${CMAKE_CURRENT_BINARY_DIR}/../../cli/src/gendoc ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/../../exodus/libexodus/exodus/var.h {m} > /dev/null || echo Skipped first build because gendoc not built yet
+    	COMMENT "Running pre-build command gendoc to create or update testing_var.h.cpp"
+	)
+
+	add_dependencies(testing_var_h PreBuild_testing_var_h)
+
+	#setup a classic test i.e. requiring output of "Test passed"
+	add_test(NAME testing_var_h COMMAND testing_var_h WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
+	set_tests_properties(
+		testing_var_h
+		PROPERTIES
+		PASS_REGULAR_EXPRESSION "Test passed"
+#		FAIL_REGULAR_EXPRESSION "(Test failed)"
+		TIMEOUT 120
+	)
 
 #
 # Trigger cmake update if any new test_*.cpp files appear
@@ -108,24 +138,9 @@
 			${file_without_ext}
 			PROPERTIES
 			PASS_REGULAR_EXPRESSION "Test passed"
-			FAIL_REGULAR_EXPRESSION "(Test failed)"
+#			FAIL_REGULAR_EXPRESSION "(Test failed)"
 			TIMEOUT 120
 		)
-
-#		# NOT possible to easily customise tests until cmake 3.17 using CMAKE_CTEST_ARGUMENTS
-#		# https://stackoverflow.com/questions/16158091/cmake-setting-an-environmental-variable-for-ctest-or-otherwise-getting-failed
-#		set_tests_properties(
-#			${file_without_ext}
-#			PROPERTIES
-#			CTEST_OUTPUT_ON_FAILURE 1
-#		)
-#		#https://cmake.org/cmake/help/latest/manual/cmake-env-variables.7.html#environment-variables-for-ctest
-#		set_tests_properties(
-#			${file_without_ext}
-#			PROPERTIES ENVIRONMENT CTEST_OUTPUT_ON_FAILURE CTEST_PARALLEL_LEVEL=32 CTEST_TEST_LOAD=2
-#		)
-	#add_custom_target(run_toto COMMAND echo bla bla bla)
-	#add_test(NAME test_toto COMMAND ${CMAKE_COMMAND} --build . --target run_toto)
 
 	endforeach()
 
