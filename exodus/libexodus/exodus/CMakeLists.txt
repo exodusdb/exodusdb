@@ -40,9 +40,9 @@
 #
 	execute_process(
 		COMMAND
-			sudo sed -i "s|# include <format>|# ifndef EXO_FORMAT\\n#  include <format>\\n# endif|" /usr/include/c++/14/ostream
+			sudo test -f  /usr/include/c++/14/ostream && sed -i "s|# include <format>|# ifndef EXO_FORMAT\\n#  include <format>\\n# endif|" /usr/include/c++/14/ostream
 		COMMAND
-			sudo sed -i "s|#if __cpp_lib_print|#if !defined(EXO_FORMAT) \\&\\& __cpp_lib_print|" /usr/include/c++/14/ostream
+			sudo test -f  /usr/include/c++/14/ostream && sed -i "s|#if __cpp_lib_print|#if !defined(EXO_FORMAT) \\&\\& __cpp_lib_print|" /usr/include/c++/14/ostream
 	)
 
 #
@@ -342,6 +342,30 @@
 #
 	#set_target_properties(exodus PROPERTIES SOVERSION "${MAJOR_VERSION}.${MINOR_VERSION}.${BUILD_VERSION}")
 	set_target_properties(exodus PROPERTIES SOVERSION "24.07")
+
+#
+# Create timebank.txt from timebank.h
+# ###################################
+#
+	add_custom_command(
+	    OUTPUT timebank.txt
+	    COMMAND cd ${CMAKE_CURRENT_SOURCE_DIR} && ./timebank.h.to_txt.sh
+	    DEPENDS timebank.h
+	    COMMENT "Updating timebank.txt if necessary"
+	)
+
+# Custom target to make this command part of the build system
+#
+	add_custom_target(
+	    update_timebank_txt
+	    ALL
+	    DEPENDS timebank.txt
+	)
+
+# Optionally, if you want this to run every time you build:
+#
+	add_dependencies(exodus update_timebank_txt)
+
 
 #
 # Install libexodus.so and exovar

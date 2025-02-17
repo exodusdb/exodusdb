@@ -102,6 +102,17 @@ function main() {
 		let v2 = len("abc");
 	}
 
+	printl("empty() const;");
+	{
+		let v1 = "0"_var.empty();
+		assert(v1 == false);
+
+		// or
+		let v2 = empty("");
+		assert(v2 == true);
+
+	}
+
 	printl("textwidth() const;");
 	{
 		let v1 = "🤡x🤡"_var.textwidth();
@@ -254,11 +265,11 @@ function main() {
 
 	printl("normalize() const&;");
 	{
-		let v1 = "u¨"_var.normalize();
-		assert(v1 == "ü");
+		let v1 = "cafe\u0301"_var.normalize();
+		assert(v1 == "café");
 
 		// or
-
+		let v2 = normalize("cafe\u0301");
 	}
 
 	printl("invert() const&;");
@@ -1265,18 +1276,18 @@ function main() {
 
 	printl("ossleep(const int milliseconds) const;");
 	{
-		var().ossleep(500); // sleep for 500ms
+		var().ossleep(100); // sleep for 100ms
 		// or
-		ossleep(500);
+		ossleep(100);
 	}
 
 	var file_dir_list;
 
 	printl("oswait(const int milliseconds) const;");
 	{
-		let v1 = ".^/etc/hosts"_var.oswait(500); /// e.g. "IN_CLOSE_WRITE^/etc^hosts^f"_var
+		let v1 = ".^/etc/hosts"_var.oswait(100); /// e.g. "IN_CLOSE_WRITE^/etc^hosts^f"_var
 		// or
-		let v2 = oswait(".^/etc/hosts"_var, 500);
+		let v2 = oswait(".^/etc/hosts"_var, 100);
 	}
 
 	var osfilevar;
@@ -1579,6 +1590,20 @@ function main() {
 		var().osflush();
 		// or
 		osflush();
+	}
+
+	printl("input(in prompt = "");");
+	{
+		// var v1 = "default"; v1.input("Prompt:");
+		// or
+		// var v2 = input();
+	}
+
+	printl("keypressed(const bool wait = false);");
+	{
+		var v1; v1.keypressed();
+		// or
+		var v2 = keypressed();
 	}
 
 	printl("isterminal(const int arg = 1) const;");
@@ -1933,6 +1958,8 @@ function main() {
 
 
 	gosub cleanup();
+
+	printl("Test passed.");
 
 	return 0;
 }

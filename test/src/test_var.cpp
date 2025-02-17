@@ -24,6 +24,9 @@ int main() {
 	//  g++ test_var.cpp -std=c++17 -lexodus
 	//  g++ test_var.cpp -std=c++20 -lexodus
 
+	// If exodus was built with clang modules on Ubuntu 24.04
+	//	c++ test_var.cpp  -std=c++2c  -DEXO_MODULE=1 -fmodule-file=var=/usr/local/lib/var.pcm -fmodule-file=std=/usr/local/lib/std.pcm -lexodus
+
 	// Exodus programming environment is not available
 	//printl(elapsedtimetext());
 

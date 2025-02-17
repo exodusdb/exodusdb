@@ -163,8 +163,6 @@ ND PUBLIC var  rnd(const int number) {return var(number).rnd();}
 ND PUBLIC var  getprompt();
    PUBLIC void setprompt(in prompt);
 
-//   PUBLIC var  input() {var v; v.input(); return v;}
-
    PUBLIC var  input(in prompt) {var v; v.input(prompt); return v;}
 
    PUBLIC var  inputn(const int nchars) {var v; v.inputn(nchars); return v;}
@@ -183,6 +181,8 @@ ND PUBLIC bool eof() {return var().eof();}
 ND PUBLIC var  len(in var1) {return var1.len();}
 ND PUBLIC var  textlen(in var1) {return var1.textlen();}
 ND PUBLIC var  textwidth(in var1) {return var1.textwidth();}
+
+ND PUBLIC bool empty(in var1) {return var1.empty();}
 
 ND PUBLIC var  convert(in instring, SV fromchars, SV tochars) {return instring.convert(fromchars, tochars);}
    PUBLIC IO   converter(io iostring, SV fromchars, SV tochars) {iostring.converter(fromchars, tochars); return IOSTRING;}

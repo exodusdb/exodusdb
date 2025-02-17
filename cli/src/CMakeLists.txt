@@ -78,7 +78,7 @@
 	add_executable(var2let var2let.cpp)
 	add_executable(redefine redefine.cpp)
 	add_executable(fire fire.cpp)
-	add_executable(gendoc gendoc.cpp)
+	add_executable(gendoc gendoc.cpp ${CMAKE_CURRENT_SOURCE_DIR}/../../exodus/libexodus/exodus/var.h)
 
 	#name is name only ... input and output files are exodus
 	add_executable(exodus-cli exodus.cpp)
@@ -275,34 +275,20 @@
 #
 #	message("--EXODUS CLI CMAKE EXIT --")
 
-#
-# Use gendoc to make var.1 man page ans install it
-##################################################
-#
+##
+## Use gendoc to make var.1 man page ans install it
+## Also create test_var.h.cpp in the test/src dir
+###################################################
 
-# Assuming man_page_generator is already built and available at this point
-# Man page generation should happen during the build process
-
-# Define the output file for the man page
-set(MAN_PAGE_OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/var.1")
-
-# Custom command to generate the man page
-add_custom_command(OUTPUT ${MAN_PAGE_OUTPUT}
-                   COMMAND gendoc  ${CMAKE_CURRENT_SOURCE_DIR}/../../exodus/libexodus/exodus/var.h {m} >  ${MAN_PAGE_OUTPUT}
-#                   ARGS ${CMAKE_CURRENT_SOURCE_DIR}/source_for_man_page.txt ${MAN_PAGE_OUTPUT}
-                   DEPENDS gendoc
-# source_for_man_page.txt
-                   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-                   COMMENT "Generating man page"
+# Define a custom command that will run after the target is built
+add_custom_command(
+    TARGET gendoc
+    POST_BUILD
+    COMMAND ${CMAKE_CURRENT_BINARY_DIR}/gendoc . ${CMAKE_CURRENT_SOURCE_DIR}/../../exodus/libexodus/exodus/var.h {m} > var.1
+    COMMENT "Executing cli post-build command for gendoc to generate var.1"
 )
 
-# Add a custom target that depends on the man page generation
-add_custom_target(man_page_target ALL DEPENDS ${MAN_PAGE_OUTPUT})
-
-# Ensure man_page_generator is built before running this command
-add_dependencies(man_page_target gendoc)
-
-# Install the generated man page
-install(FILES ${MAN_PAGE_OUTPUT}
+# Install the generated man page var.1
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/var.1
         DESTINATION ${CMAKE_INSTALL_PREFIX}/share/man/man1
 )

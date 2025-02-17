@@ -309,13 +309,15 @@ var  var::version() const {
 }
 
 bool var::eof() const {
-	// THISIS("bool var::eof() const")
+	THISIS("bool var::eof() const")
 	// assertVar(function_sig);
 
 	return std::cin.eof();
 }
 
+// 3 usecs
 bool var::hasinput(const int milliseconds) const {
+
 	//declare in haskey.cpp
 	bool haskey(int milliseconds);
 
@@ -469,9 +471,9 @@ out  var::inputn(const int nchars) {
 	return *this;
 }
 
-out  var::keypressed(const bool wait /*wait=false*/) {
+out  var::keypressed(const bool wait /*=false*/) {
 
-	THISIS("out  var::keypressed(const bool wait")
+	THISIS("out  var::keypressed(const bool wait = false)")
 	assertVar(function_sig);
 
 	// Function declared in term_getkey.cpp
@@ -501,8 +503,9 @@ out  var::keypressed(const bool wait /*wait=false*/) {
 			// TODO implement as poll/epoll/select
 			// Really should test for EOF which is usually -1
 			// Ctrl+D usually terminates input in posix
+			// TODO Use waitfor()
 			if (char1 < 0) {
-				this->ossleep(100);
+				this->ossleep(10);
 				continue;
 			}
 
@@ -526,6 +529,9 @@ out  var::keypressed(const bool wait /*wait=false*/) {
 	// Can be multibyte for e.g. PgUp -> and Esc sequence
 	////////////////////////////////////////////////////////////////////////////////
 	else {
+
+		if (not this->hasinput())
+			return *this;
 
 		for (;;) {
 			char char1;
@@ -641,6 +647,10 @@ var  var::insert(const int fieldno, in insertion)                               
 var  var::remove(const int fieldno, const int valueno /* = 0*/, const int subvalueno /* = 0*/)       const& {var nrvo = this->clone(); nrvo.remover(fieldno, valueno, subvalueno); return nrvo;}
 
 
+//////
+// LEN
+//////
+
 // synonym for length for compatibility with pick's len() which is bytes
 var  var::len() const {
 
@@ -648,6 +658,18 @@ var  var::len() const {
 	assertString(function_sig);
 
 	return var_str.size();
+}
+
+////////
+// EMPTY
+////////
+
+bool  var::empty() const {
+
+	THISIS("bool var::empty() const")
+	assertString(function_sig);
+
+	return var_str.empty();
 }
 
 // Implementation of os wcswidth for terminal output of wide characters
@@ -1143,6 +1165,7 @@ IO   var::normalizer() REF {
 
 	// norm_nfc
 	var_str = boost::locale::normalize(var_str, boost::locale::norm_nfc, thread_boost_locale1);
+//	var_str = boost::locale::normalize(var_str, boost::locale::norm_default, thread_boost_locale1);
 
 	return THIS;
 }

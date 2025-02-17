@@ -62,6 +62,14 @@ function main() {
 		abort();
 	}
 
+	// Cut off any timebank reporting at the end of stderr
+	let timebank_pos = current_stderr.index("A/c.       n      ms = ms/op        μs   = μs/op          ns     = ns/op  Account");
+	TRACE(timebank_pos)
+	if (timebank_pos) {
+		current_stderr.firster(timebank_pos - 2);
+		//oswrite(current_stderr on filename2);
+	}
+
 	if (current_stderr ne expected_stderr) {
 		outputl(filename2 ^ " has changed. See ", filename2 ^ ".expected");
 		if (not oswrite(expected_stderr on filename2 ^ ".expected")) {};

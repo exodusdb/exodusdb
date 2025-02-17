@@ -121,6 +121,7 @@ export namespace exo {
 	using exo::len;
 	using exo::textlen;
 	using exo::textwidth;
+	using exo::empty;
 	using exo::convert;
 	using exo::converter;
 	using exo::textconvert;

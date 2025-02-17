@@ -922,6 +922,25 @@ programexit()
 //TRACE: (var(0.2)+var(0.1)).round(22) = "0.3000000000000000444089"
 //
 
+	{	// Check division by 10 manually
+		for (var i : range(10, 1000)) {
+
+			// FLoating point division by 10
+			let f = i / 10;
+
+			// Manual floating point division by 10 by removing a trailing zero or inserting a point
+			// 10 -> 1
+			// 11 -> 1.1
+			let s = i.last() == "0" ? i.cut(-1) : i.paste(-1, 0, ".");
+
+			// Check text versions match
+			if (quote(f) != quote(s)) {
+				printl(i ^ " / 10 = " ^ f);
+				assert(quote(f) == quote(s));
+			}
+		}
+	}
+
 	printl(elapsedtimetext());
 	printl("Test passed");
 

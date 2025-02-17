@@ -333,6 +333,15 @@ public:
 	//  let v2 = len("abc");`
 	ND var  len() const;
 
+	// Returns: true if the var is an empty string.
+	// This is a shorthand and more expressive way of writing 'if (var == "")' or 'if (var.len() == 0)' or 'if (not var.len())'
+	// Note that 'if (var.empty())' is not the same as 'if (not var)' because 'if (var("0.0")' is defined as false because the string can be converted to a 0 which is always considered to be false. Compare thia with common scripting languages where 'if (var("0"))' is defined as true.
+	//
+	// `let v1 = "0"_var.empty(); // false
+	//  // or
+	//  let v2 = empty(""); // true`
+	ND bool empty() const;
+
 	// Returns: The number of output columns.
 	// Allows multi column unicode and reduces combining characters etc. like e followed by grave accent
 	// Possibly does not properly calculate combining sequences of graphemes e.g. face followed by colour
@@ -510,7 +519,7 @@ public:
 	// Case folding is a process of converting a text to case independent representation.
 	// https://www.w3.org/International/wiki/Case_folding
 	// Accents can be significant. As in French cote, coté, côte and côté.
-	// Normalization is not locale-dependent.
+	// Case folding is not locale-dependent.
 	//
 	// `let v1 = "Grüßen"_var.fcase(); // "grüssen"
 	//  // or
@@ -519,14 +528,13 @@ public:
 
 	// Normalises unicode code points sequences to their standardised NFC form making them binary comparable.
 	//
-	// Unicode normalization is the process of converting strings to a standard form, suitable for text processing and comparison.
-	// For example, character "ü" can be represented by a single code point or a combination of the character "u" and the diaeresis "¨".
-	// Normalization is an important part of Unicode text processing.
+	// Unicode normalization is the process of converting strings to a standard form, suitable for text processing and comparison, and is an important part of Unicode text processing.
+	// For example, character "é" can be represented by a single code point "\u00E9" (Latin Small Letter E with Acute) or a combination of the character "e" and the combining acute accent "\u0301".
 	// Normalization is not locale-dependent.
 	//
-	// `let v1 = "u¨"_var.normalize(); // "ü"
+	// `let v1 = "cafe\u0301"_var.normalize(); // "café"
 	//  // or
-	// `let v2 = normalize("u¨"); // "ü"
+	//  let v2 = normalize("cafe\u0301");`
 	ND var  normalize() const&;
 
 	// Simple reversible disguising of text
@@ -1794,7 +1802,7 @@ public:
 
 	// The xlate ("translate") function is similar to readf() but, when called as an exodus program member function, it can be used efficiently with exodus file dictionaries using column names and functions and multivalued data.
 	// Arguments:
-	// str: Used as the primary key to lookup a field in a given file and field no or field name.
+	// strvar: Used as the primary key to lookup a field in a given file and field no or field name.
 	// filename: The db file in which to look up data.
 	// If var key is multivalued then a multivalued field is returned.
 	// fieldno: Determines which field of the record is returned.
@@ -1880,9 +1888,9 @@ public:
 	// Sleep/pause/wait for a number of milliseconds
 	// Releases the processor if not needed for a period of time or a delay is required.
 	//
-	// `var().ossleep(500); // sleep for 500ms
+	// `var().ossleep(100); // sleep for 100ms
 	//  // or
-	//  ossleep(500);`
+	//  ossleep(100);`
 	   void ossleep(const int milliseconds) const;
 
 	// Sleep/pause/wait up to a given number of milliseconds or until any changes occur in an FM delimited list of directories and/or files.
@@ -1891,9 +1899,9 @@ public:
 	// Multiple events are returned in multivalues.
 	// obj is file_dir_list
 	//
-	// `let v1 = ".^/etc/hosts"_var.oswait(500); /// e.g. "IN_CLOSE_WRITE^/etc^hosts^f"_var
+	// `let v1 = ".^/etc/hosts"_var.oswait(100); /// e.g. "IN_CLOSE_WRITE^/etc^hosts^f"_var
 	//  // or
-	//  let v2 = oswait(".^/etc/hosts"_var, 500);`
+	//  let v2 = oswait(".^/etc/hosts"_var, 100);`
 	//
 	// Returned array fields
 	// 1. Event type codes
@@ -2319,6 +2327,9 @@ public:
 	// Returns raw bytes up to but excluding the first new line character.
 	// Prompt: Optional. Will be displayed before the input field if provided.
 	// If stdin is a terminal then the initial value of the var, if any, is the default value and can be edited with cursor keys like an OS command line. Pressing Enter or Ctrl+D will complete the input.
+	// `// var v1 = "default"; v1.input("Prompt:");
+	//  // or
+	//  // var v2 = input();`
 	   out  input(in prompt = "");
 
     // Get raw bytes from standard input.
@@ -2326,16 +2337,21 @@ public:
 	// Care must be taken to handle incomplete UTF8 byte sequences at the end of one block and the beginning of the next block.
 	// Returns: The requested number of bytes or fewer if not available.
 	// nchars:
-	// 99 : Get up to 99 bytes or fewer if not available
+	// 99 : Get up to 99 bytes or fewer if not available. Caution required with UTF8.
 	// ⋅0 : Get all bytes presently available.
 	// ⋅1 : Same as keypressed(true). Deprecated.
-	// -1 : Same as keypressed(false). Deprecated.
+	// -1 : Same as keypressed(). Deprecated.
 	   out  inputn(const int nchars);
 
 	// Return the code of the current terminal key pressed.
-	// wait: Optional. True means wait for a key to be pressed if not already pressed. Defaults to false.
-	// Returns: ASCII or key code defined according to terminal protocol or "" if stdin is not a terminal.
+	// wait: Defaults to false. True means wait for a key to be pressed if not already pressed.
+	// Returns: ASCII or key code defined according to terminal protocol.
+	// Returns: "" if stdin is not a terminal.
 	// e.g. The PgDn key if pressed might return an escape sequence like "\x1b[6~"
+	// It only takes a few µsecs to return false if no key is pressed.
+	// `var v1; v1.keypressed();
+	//  // or
+	//  var v2 = keypressed();`
 	   out  keypressed(const bool wait = false);
 
 	// obj is var()
@@ -2353,6 +2369,7 @@ public:
 	// Checks if stdin has any bytes available for input.
 	// If no bytes are immediately available, the process sleeps for up to the given number of milliseconds, returning true immediately any bytes become available or false if the period expires without any bytes becoming available.
 	// Returns: True if any bytes are available otherwise false.
+	// It only takes a few µsecs to return false if no bytes are available and no wait time has been requested.
 	ND bool hasinput(const int milliseconds = 0) const;
 
 	// True if stdin is at end of file
