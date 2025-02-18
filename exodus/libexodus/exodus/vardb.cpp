@@ -4490,7 +4490,7 @@ bool var::selectx(in fieldnames, in sortselectclause) {
 	}
 
 	// if any active select, convert to a file and use as an additional filter on key
-	// or correctly named savelistfilename exists from getselect or makeselect
+	// or correctly named savelistfilename exists from getselect or selectkeys
 	var listname = "";
 	// see also listname below
 	//	if (this->hasnext()) {
@@ -4694,8 +4694,8 @@ void var::clearselect() {
 	this->default_to("");
 
 	/// if readnext through string
-	//3/4/5/6 setup in makeselect. cleared in clearselect
-	//if (this->f(3) == "%MAKESELECT%")
+	//3/4/5/6 setup in selectkeys. cleared in clearselect
+	//if (this->f(3) == "%SELECTKEYS%")
 	{
 		this->r(6, "");
 		this->r(5, "");
@@ -5089,14 +5089,14 @@ bool var::getlist(SV listname) {
 //	if (fieldno)
 //		record = record.f(fieldno).convert(VM, FM);
 //
-//	if (not this->makeselect(record)) UNLIKELY
+//	if (not this->selectkeys(record)) UNLIKELY
 //		throw VarDBException(this->lasterror());
 //
 //	return true;
 //}
 //
 // Making a list can be done simply by writing the keys into the list file
-// Empty list makes this function call makeselect
+// Empty list makes this function call selectkeys
 // This function is not often used since can be achieved by writing keys to lists file directly
 //bool var::makelist(SV listname, in keys) {
 //
@@ -5107,10 +5107,10 @@ bool var::getlist(SV listname) {
 //	if (DBTRACE)
 //		this->logputl("DBTR var::makelist(" ^ keys.field(_FM, 1, 3).quote() ^ "...) ");
 //
-//	// Call makeselect instead.
+//	// Call selectkeys instead.
 //	// TODO Deprecate and remove
 //	if (listname.empty()) {
-//		return this->makeselect(keys);
+//		return this->selectkeys(keys);
 //	}
 //
 //	this->deletelist(listname);
@@ -5128,36 +5128,31 @@ bool var::getlist(SV listname) {
 //	return true;
 //}
 
-// MAKELIST would be much better called MAKESELECT
-// since the most common usage is to omit listname in which case the keys will be used to simulate a
-// supplementary blocks of keys are stored with suffix *2, *3 etc)
-// SELECT statement Making a list can be done simply by writing the keys into the list file without
-// using this function
-bool var::makeselect(in keys) {
+bool var::selectkeys(in keys) {
 
-	THISIS("bool var::makeselect(in keys)")
+	THISIS("bool var::selectkeys(in keys)")
 	assertVar(function_sig);
 	ISSTRING(keys)
 
 	if (DBTRACE)
-		this->logputl("DBTR var::makeselect(" ^ keys.field(_FM, 1, 3).quote() ^ "...) ");
+		this->logputl("DBTR var::selectkeys(" ^ keys.field(_FM, 1, 3).quote() ^ "...) ");
 
 	this->clearselect();
 
 	// Keys must be provided
 	if (keys.empty()) {
-		const var errmsg = "makeselect() keys cannot be empty";
+		const var errmsg = "selectkeys() keys cannot be empty";
 		this->setlasterror(errmsg);
 		return false;
 	}
 
 	// provide a block of keys for readnext
-	//3/4/5/6 setup in makeselect. cleared in clearselect
+	//3/4/5/6 setup in selectkeys. cleared in clearselect
 
 	// listid in the lists file must be set for readnext to work, but not exist in the file
-	// readnext will look for %MAKESELECT%*2 in the lists file when it reaches the end of the
+	// readnext will look for %SELECTKEYS%*2 in the lists file when it reaches the end of the
 	// block of keys provided and must not find it
-	this->r(3, "%MAKESELECT%");
+	this->r(3, "%SELECTKEYS%");
 
 	// list number for readnext to get next block of keys from lists file
 	// suffix for first block is nothing (not *1) and then *2, *3 etc
@@ -5321,8 +5316,8 @@ bool var::readnext(io record, io key, io valueno) {
 			// if no more keys, try to get next block of keys, otherwise return false
 			if (key_and_mv.len() == 0) {
 
-				// makeselect provides one block of keys and nothing in the lists file
-				if (listid == "%MAKESELECT%") UNLIKELY {
+				// selectkeys provides one block of keys and nothing in the lists file
+				if (listid == "%SELECTKEYS%") UNLIKELY {
 					this->r(3, "");
 					this->r(4, "");
 					this->r(5, "");

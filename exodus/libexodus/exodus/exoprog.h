@@ -133,7 +133,7 @@ class PUBLIC ExodusProgramBase {
 
 	// work on CURSOR
 	bool select(in sortselectclause_or_filehandle = "");
-	bool makeselect(in keys);
+	bool selectkeys(in keys);
 	ND bool hasnext();
 	bool readnext(io key);
 	bool readnext(io key, io valueno);
@@ -148,10 +148,10 @@ class PUBLIC ExodusProgramBase {
 	bool getlist(SV listname);
 	bool deletelist(SV listname);
 
-	[[deprecated ("exoprog:::formlist() Resolve by refactoring. Read keys directly and call makeselect(keys)")]]
+	[[deprecated ("exoprog:::formlist() Resolve by refactoring. Read keys directly and call selectkeys(keys)")]]
 	bool formlist(SV filename_or_command, in keys = "", const int fieldno = 0);
 
-	[[deprecated ("exoprog::makelist() Refactor makelist(\"\", keys) as makeselect(keys) or use fixdeprecated")]]
+	[[deprecated ("exoprog::makelist() Refactor makelist(\"\", keys) as selectkeys(keys) or use fixdeprecated")]]
 	bool makelist(SV listname, in keys);
 
 	void note(in msg, in options = "") const;

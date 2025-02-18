@@ -536,7 +536,7 @@ bool ExodusProgramBase::formlist(SV filename_or_command, in keys /*=""*/, const 
 	if (fieldno)
 		record = record.f(fieldno).convert(VM, FM);
 
-	if (not this->makeselect(record)) UNLIKELY
+	if (not this->selectkeys(record)) UNLIKELY
 		throw VarDBException(CURSOR.lasterror());
 
 	return true;
@@ -546,12 +546,12 @@ bool ExodusProgramBase::formlist(SV filename_or_command, in keys /*=""*/, const 
 bool ExodusProgramBase::makelist(SV listname, in keys) {
 	if (not listname.empty())
 		throw VarDBException("makelist() with listname is not longer supported. Write to the lists file directly instead.");
-	return CURSOR.makeselect(keys);
+	return CURSOR.selectkeys(keys);
 }
 
 // makelist
-bool ExodusProgramBase::makeselect(in keys) {
-	return CURSOR.makeselect(keys);
+bool ExodusProgramBase::selectkeys(in keys) {
+	return CURSOR.selectkeys(keys);
 }
 
 // deletelist

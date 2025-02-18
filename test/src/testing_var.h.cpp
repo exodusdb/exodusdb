@@ -1201,8 +1201,8 @@ function main() {
 		 if (rec.readc(file, key)) {/*ok*/} else  abort("readc: " ^ lasterror());
 		 // or
 		 if (readc(rec from file, key)) {/*ok*/} else  abort("readc: " ^ lasterror());
-		 // Verify not in actual file by using read() not readc()
-		 if (read(rec from file, key)) abort("Error: " ^ key ^ " should not be in the actual file"); // error
+		 // Verify not in actual database file by using read() not readc()
+		 if (read(rec from file, key)) abort("Error: " ^ key ^ " should not be in the actual database file"); // error
 	}
 
 	var dbfile;
@@ -1246,15 +1246,15 @@ function main() {
 		         println("Client code is {}", ID);
 	}
 
-	printl("makeselect(in keys);");
+	printl("selectkeys(in keys);");
 	{
 		var dbfile = "";
 		 let keys = "A01^B02^C03"_var;
-		 if (dbfile.makeselect(keys)) {/*ok*/} else  abort("makeselect: " ^ lasterror());
+		 if (dbfile.selectkeys(keys)) {/*ok*/} else  abort("selectkeys: " ^ lasterror());
 		assert(conn.readnext(ID) and ID == "A01");
 
 		 // or
-		 if (makeselect(keys)) {/*ok*/} else  abort("makeselect: " ^ lasterror());
+		 if (selectkeys(keys)) {/*ok*/} else  abort("selectkeys: " ^ lasterror());
 		assert(readnext(ID) and ID == "A01");
 
 	}
@@ -1919,7 +1919,7 @@ function main() {
 		assert( v1.oconv( "MTS" ) == "17:13:20" );
 		assert( v1.oconv( "MTHS" ) == "05:13:20PM" );
 
-		  var v2 = 0;
+		 var v2 = 0;
 		assert( v2.oconv( "MT" ) == "00:00" );
 		assert( v2.oconv( "MTH" ) == "12:00AM" );
 		assert( v2.oconv( "MTS" ) == "00:00:00" );
@@ -1929,8 +1929,8 @@ function main() {
 		 var v3 = "234800^234860]234920"_var;
 		assert(v3.oconv("MT") == "17:13^17:14]17:15"_var);
 
-		  // or
-		  assert( oconv(v1, "MT" ) == "17:13" );
+		 // or
+		 assert( oconv(v1, "MT" ) == "17:13" );
 	}
 
 	printl(" iconv_MT(bool strict) const;");
@@ -1958,17 +1958,17 @@ function main() {
 		assert( v1.oconv( "MD20" ) == "-1234.57" );
 		assert( v1.oconv( "MD20," ) == "-1,234.57" );
  // , flag
-		    assert( v1.oconv( "MC20," ) == "-1.234,57" ); // MC code
-		    assert( v1.oconv( "MD20,-" ) == "1,234.57-" ); // - flag
-		    assert( v1.oconv( "MD20,<" ) == "<1,234.57>" ); // < flag
-		    assert( v1.oconv( "MD20,C" ) == "1,234.57CR" ); // C flag
-		    assert( v1.oconv( "MD20,D" ) == "1,234.57DB" ); // D flag
-		  // Multifield/multivalue
-		  var v2 = "1.1^2.1]2.2"_var;
+		 assert( v1.oconv( "MC20," ) == "-1.234,57" ); // MC code
+		 assert( v1.oconv( "MD20,-" ) == "1,234.57-" ); // - flag
+		 assert( v1.oconv( "MD20,<" ) == "<1,234.57>" ); // < flag
+		 assert( v1.oconv( "MD20,C" ) == "1,234.57CR" ); // C flag
+		 assert( v1.oconv( "MD20,D" ) == "1,234.57DB" ); // D flag
+		 // Multifield/multivalue
+		 var v2 = "1.1^2.1]2.2"_var;
 		assert( v2.oconv( "MD20" ) == "1.10^2.10]2.20"_var);
 
-		  // or
-		    assert( oconv(v1, "MD20" ) == "-1234.57" );
+		 // or
+		 assert( oconv(v1, "MD20" ) == "-1234.57" );
 	}
 
 	printl("oconv_LRC(in format) const;");

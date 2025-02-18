@@ -386,7 +386,7 @@ dict(AGE_IN_YEARS) {
 		printl("4. Normally the following select would output all records but it only shows 3 keys from makelist");
 		var keys = "SB1" _FM "JB2" _FM "SB001";
 //		assert(myclients.makelist("", keys));
-		assert(myclients.makeselect(keys));
+		assert(myclients.selectkeys(keys));
 		myclients.outputl();
 		//      myclients.select();
 		//while(myclients.readnext(key)) {
