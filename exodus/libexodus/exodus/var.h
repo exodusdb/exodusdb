@@ -942,9 +942,9 @@ public:
 	// All string mutators follow the same pattern as ucaser.<br>See the non-mutating functions for details.
 	//
 	// `var v1 = "abc";
-	// v1.ucaser(); // "ABC"
-	// // or
-	// ucaser(v1);`
+	//  v1.ucaser(); // "ABC"
+	//  // or
+	//  ucaser(v1);`
 	   IO   ucaser() REF ;
 
 	   IO   lcaser() REF ;
@@ -1822,20 +1822,176 @@ public:
 	///// DATABASE SORT/SELECT:
 	//////////////////////////
 
-	// obj is file
+	// obj is dbfile
 
-	ND bool select(in sortselectclause = "");
-	   void clearselect();
+	// Create an active select list of keys of a database file.
+	// dbfile: A opened database file or file name, or an open connection or an empty var for default connections. Subsequent readnext calls must use the same.
+	// sort_select_command: A natural language command using dictionary field names. The command can be blank if a dbfile or filename is given in dbfile or just a file name and all keys will be selected in undefined order.
+	// Example: "select xo_clients with type 'B' and with balance ge 100 by type by name"
+	// Option: "(R)" appended to the sort_select_command acquires the database records as well.
+	// Returns: True if any records are selected or false if none.
+	// Throws: VarDBException in case of any syntax error in the command.
+	// The select(command) function searches and orders database records for subsequent processing given an English language command.
+	// The primary job of a database, beyond mere storage and retrieval of information, is to allow rapid searching and ordering of information on demand.
+	// In Exodus, searching and ordering of information is known as sort/select and is performed by the select() function.
+	// Executing a select() function creates an "active select list" which can be consumed by the readnext() function.
+	// Active select lists created using var.select()'s member function syntax cannot be consumed by the free function form of readnext() and vice versa.
+	//
+	// `var clients = "xo_clients";
+	//  if (clients.select("with type 'B' and with balance ge 100 by type by name"))
+	//      while (clients.readnext(ID))
+	//          println("Client code is {}", ID);
+	//  // or
+	//  if (select("xo_clients with type 'B' and with balance ge 100 by type by name"))
+	//      while (readnext(ID))
+	//          println("Client code is {}", ID);`
+	ND bool select(in sort_select_command = "");
+
+	// Create an active select list from a string of keys.
+	// Similar to select() but creates the list directly from a var.
+	// keys: An FM separated list of keys or key^VM^valueno pairs.
+	// Returns: True if any keys are provided or false if not.
+	//
+	// `var dbfile = "";
+	//  let keys = "A01^B02^C03"_var;
+	//  if (dbfile.makeselect(keys)) ... ok
+	//  assert(conn.readnext(ID) and ID == "A01");
+	//  // or
+	//  if (makeselect(keys)) ... ok
+	//  assert(readnext(ID) and ID == "A01");`
+	ND bool makeselect(in keys);
+
+	// Checks if a select list is active.
+	// dbfile: A file or connection var used in a prior select, makeselect or getlist function call.
+	// Returns: True if a select list is active and false if not.
+	// If it returns true then a call to readnext() will return a database record key, otherwise not.
+	//
+	// `var clients = "xo_clients", key;
+	//  if (clients.select()) {
+	//      assert(clients.hasnext());
+	//  }
+	//  // or
+	//  if (select("xo_clients")) {
+	//      assert(hasnext());
+	//  }`
 	ND bool hasnext();
+
+	// Acquires and consumes one key from an active select list of database record keys.
+	// dbfile: A file or connection var used in a prior select, makeselect or getlist function call.
+	// key: Returns the first (next) key present in an active select list or "" if no select list is active.
+	// Returns: True if a list is active and a key is available, false if not.
+	// Each call to readnext consumes one key from the list.
+	// Once all the keys in an active select list have been consumed by calls to readnext, the list becomes inactive.
+	// See select() for example code.
 	ND bool readnext(out key);
+
+	// Similar to readnext(key) but multivalued.
+	// If the active list was ordered by multivalued database fields then pairs of key and multivalue number will be available to the readnext function.
 	ND bool readnext(out key, out valueno);
+
+	// Similar to readnext(key) but acquires the database record as well.
+	// record: Returns the next database record from the select list assuming that the select list was created with the (R) option otherwise "" if not.
+	// key: Returns the next database record key in the select list.
+	// valueno: The multivalue number if the select list was ordered on multivalued database record fields or 1 if not.
+	//
+	// `var clients = "xo_clients";
+	//  if (clients.select("with type 'B' and with balance ge 100 by type by name (R)"))
+	//      while (clients.readnext(RECORD, ID, MV))
+	//          println("Code is {}, Name is {}", ID, RECORD.f(1));
+	//  // or
+	//  DICT = "dict.xo_clients";
+	//  if (select("xo_clients with type 'B' and with balance ge 100 by type by name (R)"))
+	//      while (readnext(RECORD, ID, MV))
+	//          println("Code is {}, Name is {}", calculate("CODE"), calculate("NAME"));`
 	ND bool readnext(out record, out key, out valueno);
 
-	   bool savelist(in listname);
-	ND bool getlist(in listname);
-	ND bool makelist(in listname, in keys);
-	   bool deletelist(in listname) const;
-	ND bool formlist(in keys, in fieldno = 0);
+	// Deactivates an active select list.
+	// dbfile: A file or connection var used in a prior select, makeselect or getlist function call.
+	// Returns: Nothing
+	// Has no effect if no select list is active for dbfile.
+	//
+	// `var clients = "xo_clients";
+	//  clients.clearselect();
+	//  if (not clients.hasnext()) ... ok
+	//  // or
+	//  clearselect();
+	//  if (not hasnext()) ... ok`
+	   void clearselect();
+
+	// Stores an active select list for later retrieval.
+	// dbfile: A file or connection var used in a prior select, makeselect or getlist function call.
+	// listname: A suitable name that will be required for later retrieval.
+	// Returns: True if saved successfully or false if there was no active list to be saved.
+	// Any existing list with the same name will be overwritten.
+	// Only the remaining unconsumed part of the active select list is saved.
+	// Saved lists are stand-alone and are not tied to specific database files although they usually hold keys related to specific files.
+	// Saved lists can be created from one file and used to access another.
+	// savelist() merely writes an FM separated string of keys as a record in the "lists" database file using the list name as the key of the record.
+	// If a saved list is very long, additional blocks of keys for the same list may be stored with keys like listname*2, listname*3 etc.
+	// Select lists saved in the lists database file may be created, deleted and listed like database records in any other database file.
+	//
+	// `var clients = "xo_clients";
+	//  if (clients.select("with type 'B' by name")) {
+	//  }
+	//  // or
+	//  if (select("xo_clients with type 'B' by name")) {
+	//      if (savelist("mylist")) ... ok
+	//  }`
+	   bool savelist(SV listname);
+
+	// Retrieve and reactivate a saved select list.
+	// dbfile: A file or connection var to be used by subsequent readnext function calls.
+	// listname: The name of an existing list in the "lists" database file, either created by savelist or manually.
+	// Returns: True if the list was successfully retrieved and activated, or false if the list name doesnt exist.
+	// Any currently active select list is replaced.
+	// Retrieving a list does not delete it and a list can be retrieved more than once until specifically deleted.
+	//
+	// `var file = "";
+	//  if (file.getlist("mylist")) {
+	//      while (file.readnext(ID))
+	//          println("Key is {}", ID);
+	//  }
+	//  // or
+	//  if (getlist("mylist")) {
+	//      while (readnext(ID))
+	//          println("Key is {}", ID);
+	//  }`
+	ND bool getlist(SV listname);
+
+	// Delete a saved select list.
+	// dbfile: A file or connection to the desired database.
+	// listname: The name of an existing list in the "lists" database file.
+	// Returns: True if successful or false if the list name doesnt exist.
+	//
+	// `var conn = "";
+	//  if (conn.deletelist("mylist")) ... ok
+	//  // or
+	//  if (deletelist("mylist")) ... ok`
+	   bool deletelist(SV listname) const;
+
+//	// Create a saved list from a string of keys.
+//	// Any existing list with the same name will be overwritten.
+//	// keys: An FM separated list of keys or key^VM^valueno pairs.
+//	// Returns: True if successful or false if no keys were provided.
+//	// If the listname is empty then makeselect() is called instead. This is obsolete and deprecated behaviour.
+//	//
+//	// `var conn = ""; let keys = "A01^B02^C03"_var;
+//	//  if (conn.makelist("mylist", keys)) ... ok
+//	//  // or
+//	//  if (makelist("mylist", keys)) ... ok`
+//	ND bool makelist(SV listname, in keys);
+//
+//	// Create an active select list from a database file record.
+//	//
+//	// `var lists = "lists";
+//	//  if (lists.formlist("mylist")) ... ok
+//	//  while (lists.readnext(ID))
+//	//      println("Key is {}", ID);
+//	//  // or
+//	//  if (formlist("lists", "mylist")) ... ok
+//	//  while (readnext(ID))
+//	//      println("Key is {}, MV is {}", ID, MV);`
+//	ND bool formlist(in keys, const int fieldno = 0);
 
 	///// OS TIME/DATE:
 	//////////////////

@@ -569,7 +569,7 @@ subroutine onefile(in dictfilename, in dictids) {
 subroutine onefileonedict(in dictfile, in dictfilename, in reqdictid) {
 
 	if (reqdictid)
-		makelist("", reqdictid);
+		makeselect(reqdictid);
 	else
 		select(dictfilename ^ " by ID");
 

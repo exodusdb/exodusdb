@@ -11,95 +11,93 @@ function main() {
 
 	var varnum;
 
-	printl("round(const int ndecimals = 0) const;");
+	printl(" round(const int ndecimals = 0) const;");
 	{
 		let v1 = var(0.295).round(2);
 		assert(v1 == "0.30");
 
-		// or
-		let v2 = round(1.295, 2);
+		 // or
+		 let v2 = round(1.295, 2);
 		assert(v2 == "1.30");
 
-		var v3 = var(-0.295).round(2);
+		 var v3 = var(-0.295).round(2);
 		assert(v3 == "-0.30");
 
-		// or
-		var v4 = round(-1.295, 2);
+		 // or
+		 var v4 = round(-1.295, 2);
 		assert(v4 == "-1.30");
 
 	}
 
-	printl("chr(const int num) const;");
+	printl(" chr(const int num) const;");
 	{
 		let v1 = var().chr(0x61);
 		assert(v1 == "a");
 
-		// or
-		let v2 = chr(0x61);
+		 // or
+		 let v2 = chr(0x61);
 	}
 
-	printl("textchr(const int num) const;");
+	printl(" textchr(const int num) const;");
 	{
 		let v1 = var().textchr(171416);
 		assert(v1 == "𩶘");
  // or "\xF0A9B698"
-		// or
-		let v2 = textchr(171416);
+		 // or
+		 let v2 = textchr(171416);
 	}
 
-	printl("str(const int num) const;");
+	printl(" str(const int num) const;");
 	{
 		let v1 = "ab"_var.str(3);
 		assert(v1 == "ababab");
 
-		// or
-		let v2 = str("ab", 3);
+		 // or
+		 let v2 = str("ab", 3);
 	}
 
-	printl("space() const;");
+	printl(" space() const;");
 	{
 		let v1 = var(3).space();
 		assert(v1 == "   ");
 
-		// or
-		let v2 = space(3);
+		 // or
+		 let v2 = space(3);
 	}
 
-	printl("numberinwords(in languagename_or_locale_id = "");");
+	printl(" numberinwords(in languagename_or_locale_id = "");");
 	{
 		let softhyphen = "\xc2\xad";
-		let v1 = var(123.45).numberinwords("de_DE").replace(softhyphen, " ");
+		 let v1 = var(123.45).numberinwords("de_DE").replace(softhyphen, " ");
 		assert(v1 == "ein hundert drei und zwanzig Komma vier fünf");
 
 	}
 
-	var strvar;
-
-	printl("seq() const;");
+	printl(" seq() const;");
 	{
 		let v1 = "abc"_var.seq();
 		assert(v1 == 0x61);
  // decimal 97
-		// or
-		let v2 = seq("abc");
+		 // or
+		 let v2 = seq("abc");
 	}
 
-	printl("textseq() const;");
+	printl(" textseq() const;");
 	{
 		let v1 = "Γ"_var.textseq();
 		assert(v1 == 915);
  // U+0393: Greek Capital Letter Gamma (Unicode Character)
-		// or
-		let v2 = textseq("Γ");
+		 // or
+		 let v2 = textseq("Γ");
 	}
 
-	printl("len() const;");
+	printl(" len() const;");
 	{
 		let v1 = "abc"_var.len();
 		assert(v1 == 3);
 
-		// or
-		let v2 = len("abc");
+		 // or
+		 let v2 = len("abc");
 	}
 
 	printl("empty() const;");
@@ -107,743 +105,743 @@ function main() {
 		let v1 = "0"_var.empty();
 		assert(v1 == false);
 
-		// or
-		let v2 = empty("");
+		 // or
+		 let v2 = empty("");
 		assert(v2 == true);
 
 	}
 
-	printl("textwidth() const;");
+	printl(" textwidth() const;");
 	{
 		let v1 = "🤡x🤡"_var.textwidth();
 		assert(v1 == 5);
 
-		// or
-		let v2 = textwidth("🤡x🤡");
+		 // or
+		 let v2 = textwidth("🤡x🤡");
 	}
 
-	printl("textlen() const;");
+	printl(" textlen() const;");
 	{
 		let v1 = "Γιάννης"_var.textlen();
 		assert(v1 == 7);
 
-		// or
-		let v2 = textlen("Γιάννης");
+		 // or
+		 let v2 = textlen("Γιάννης");
 	}
 
-	printl("fcount(SV sepstr) const;");
+	printl(" fcount(SV sepstr) const;");
 	{
 		let v1 = "aa**cc"_var.fcount("*");
 		assert(v1 == 3);
 
-		// or
-		let v2 = fcount("aa**cc", "*");
+		 // or
+		 let v2 = fcount("aa**cc", "*");
 	}
 
-	printl("count(SV sepstr) const;");
+	printl(" count(SV sepstr) const;");
 	{
 		let v1 = "aa**cc"_var.count("*");
 		assert(v1 == 2);
 
-		// or
-		let v2 = count("aa**cc", "*");
+		 // or
+		 let v2 = count("aa**cc", "*");
 	}
 
 	printl("starts(SV prefix) const;");
 	{
 		if ("abc"_var.starts("ab")) {/*true*/} else  abort("starts: " ^ lasterror());
-		// or
-		if (starts("abc", "ab")) {/*true*/} else  abort("starts: " ^ lasterror());
+		 // or
+		 if (starts("abc", "ab")) {/*true*/} else  abort("starts: " ^ lasterror());
 	}
 
 	printl("ends(SV suffix) const;");
 	{
 		if ("abc"_var.ends("bc")) {/*true*/} else  abort("ends: " ^ lasterror());
-		// or
-		if (ends("abc", "bc")) {/*true*/} else  abort("ends: " ^ lasterror());
+		 // or
+		 if (ends("abc", "bc")) {/*true*/} else  abort("ends: " ^ lasterror());
 	}
 
 	printl("contains(SV substr) const;");
 	{
 		if ("abcd"_var.contains("bc")) {/*true*/} else  abort("contains: " ^ lasterror());
-		// or
-		if (contains("abcd", "bc")) {/*true*/} else  abort("contains: " ^ lasterror());
+		 // or
+		 if (contains("abcd", "bc")) {/*true*/} else  abort("contains: " ^ lasterror());
 	}
 
-	printl("index(SV substr, const int startchar1 = 1) const;");
+	printl(" index(SV substr, const int startchar1 = 1) const;");
 	{
 		let v1 = "abcd"_var.index("bc");
 		assert(v1 == 2);
 
-		// or
-		let v2 = index("abcd", "bc");
+		 // or
+		 let v2 = index("abcd", "bc");
 	}
 
-	printl("indexn(SV substr, const int occurrence) const;");
+	printl(" indexn(SV substr, const int occurrence) const;");
 	{
 		let v1 = "abcabc"_var.index("bc", 2);
 		assert(v1 == 2);
 
-		// or
-		let v2 = index("abcabc", "bc", 2);
+		 // or
+		 let v2 = index("abcabc", "bc", 2);
 	}
 
-	printl("indexr(SV substr, const int startchar1 = -1) const;");
+	printl(" indexr(SV substr, const int startchar1 = -1) const;");
 	{
 		let v1 = "abcabc"_var.indexr("bc");
 		assert(v1 == 5);
 
-		// or
-		let v2 = indexr("abcabc", "bc");
+		 // or
+		 let v2 = indexr("abcabc", "bc");
 	}
 
-	printl("match(SV regex_str, SV regex_options = "") const;");
+	printl(" match(SV regex_str, SV regex_options = "") const;");
 	{
 		let v1 = "abc1abc2"_var.match("BC(\\d)", "i");
 		assert(v1 == "bc1]1^bc2]2"_var);
 
-		// or
-		let v2 = match("abc1abc2", "BC(\\d)", "i");
+		 // or
+		 let v2 = match("abc1abc2", "BC(\\d)", "i");
 	}
 
-	printl("search(SV regex_str, io startchar1, SV regex_options = "") const;");
+	printl(" search(SV regex_str, io startchar1, SV regex_options = "") const;");
 	{
 		var startchar1 = 1;
-		let v1 = "abc1abc2"_var.search("BC(\\d)", startchar1, "i");
+		 let v1 = "abc1abc2"_var.search("BC(\\d)", startchar1, "i");
 		assert(v1 == "bc1]1"_var);
 		assert(startchar1 == 5 );
 /// Ready for the next search
-		// or
-		startchar1 = 1;
-		let v2 = search("abc1abc2", "BC(\\d)", startchar1, "i");
+		 // or
+		 startchar1 = 1;
+		 let v2 = search("abc1abc2", "BC(\\d)", startchar1, "i");
 	}
 
-	printl("hash(const std::uint64_t modulus = 0) const;");
+	printl(" hash(const std::uint64_t modulus = 0) const;");
 	{
 		let v1 = "abc"_var.hash();
 		assert(v1 == var(6'715'211'243'465'481'821));
 
-		// or
-		let v2 = hash("abc");
+		 // or
+		 let v2 = hash("abc");
 	}
 
-	printl("ucase() const&;");
+	printl(" ucase() const&;");
 	{
 		let v1 = "Γιάννης"_var.ucase();
 		assert(v1 == "ΓΙΆΝΝΗΣ");
 
-		// or
-		let v2 = ucase("Γιάννης");
+		 // or
+		 let v2 = ucase("Γιάννης");
 	}
 
-	printl("lcase() const&;");
+	printl(" lcase() const&;");
 	{
 		let v1 = "ΓΙΆΝΝΗΣ"_var.lcase();
 		assert(v1 == "γιάννης");
 
-		// or
-		let v2 = lcase("ΓΙΆΝΝΗΣ");
+		 // or
+		 let v2 = lcase("ΓΙΆΝΝΗΣ");
 	}
 
-	printl("tcase() const&;");
+	printl(" tcase() const&;");
 	{
 		let v1 = "γιάννης παππάς"_var.tcase();
 		assert(v1 == "Γιάννης Παππάς");
 
-		// or
-		let v2 = tcase("γιάννης παππάς");
+		 // or
+		 let v2 = tcase("γιάννης παππάς");
 	}
 
-	printl("fcase() const&;");
+	printl(" fcase() const&;");
 	{
 		let v1 = "Grüßen"_var.fcase();
 		assert(v1 == "grüssen");
 
-		// or
-		let v2 = tcase("Grüßen");
+		 // or
+		 let v2 = tcase("Grüßen");
 	}
 
-	printl("normalize() const&;");
+	printl(" normalize() const&;");
 	{
 		let v1 = "cafe\u0301"_var.normalize();
 		assert(v1 == "café");
 
-		// or
-		let v2 = normalize("cafe\u0301");
+		 // or
+		 let v2 = normalize("cafe\u0301");
 	}
 
-	printl("invert() const&;");
+	printl(" invert() const&;");
 	{
 		let v1 = "abc"_var.invert();
 		assert(v1 == "\xC2" "\x9E" "\xC2" "\x9D" "\xC2" "\x9C");
 
-		// or
-		let v2 = invert("abc");
+		 // or
+		 let v2 = invert("abc");
 	}
 
-	printl("lower() const&;");
+	printl(" lower() const&;");
 	{
 		let v1 = "a1^b2^c3"_var.lower();
 		assert(v1 == "a1]b2]c3"_var);
 
-		// or
-		let v2 = lower("a1^b2^c3"_var);
+		 // or
+		 let v2 = lower("a1^b2^c3"_var);
 	}
 
-	printl("raise() const&;");
+	printl(" raise() const&;");
 	{
 		let v1 = "a1]b2]c3"_var.raise();
 		assert(v1 == "a1^b2^c3"_var);
 
-		// or
-		let v2 = "a1]b2]c3"_var;
+		 // or
+		 let v2 = "a1]b2]c3"_var;
 	}
 
-	printl("crop() const&;");
+	printl(" crop() const&;");
 	{
 		let v1 = "a1^b2]]^c3^^"_var.crop();
 		assert(v1 == "a1^b2^c3"_var);
 
-		// or
-		let v2 = crop("a1^b2]]^c3^^"_var);
+		 // or
+		 let v2 = crop("a1^b2]]^c3^^"_var);
 	}
 
-	printl("quote() const&;");
+	printl(" quote() const&;");
 	{
 		let v1 = "abc"_var.quote();
 		assert(v1 == "\"abc\"");
 
-		// or
-		let v2 = quote("abc");
+		 // or
+		 let v2 = quote("abc");
 	}
 
-	printl("squote() const&;");
+	printl(" squote() const&;");
 	{
 		let v1 = "abc"_var.squote();
 		assert(v1 == "'abc'");
 
-		// or
-		let v2 = squote("abc");
+		 // or
+		 let v2 = squote("abc");
 	}
 
-	printl("unquote() const&;");
+	printl(" unquote() const&;");
 	{
 		let v1 = "'abc'"_var.unquote();
 		assert(v1 == "abc");
 
-		// or
-		let v2 = unquote("'abc'");
+		 // or
+		 let v2 = unquote("'abc'");
 	}
 
-	printl("trim(SV trimchars = " ") const&;");
+	printl(" trim(SV trimchars = " ") const&;");
 	{
 		let v1 = "  a1  b2 c3  "_var.trim();
 		assert(v1 == "a1 b2 c3");
 
-		// or
-		let v2 = trim("  a1  b2 c3  ");
+		 // or
+		 let v2 = trim("  a1  b2 c3  ");
 	}
 
-	printl("trimfirst(SV trimchars = " ") const&;");
+	printl(" trimfirst(SV trimchars = " ") const&;");
 	{
 		let v1 = "  a1  b2 c3  "_var.trimfirst();
 		assert(v1 == "a1  b2 c3  ");
 
-		// or
-		let v2 = trimfirst("  a1  b2 c3  ");
+		 // or
+		 let v2 = trimfirst("  a1  b2 c3  ");
 	}
 
-	printl("trimlast(SV trimchars = " ") const&;");
+	printl(" trimlast(SV trimchars = " ") const&;");
 	{
 		let v1 = "  a1  b2 c3  "_var.trimlast();
 		assert(v1 == "  a1  b2 c3");
 
-		// or
-		let v2 = trimlast("  a1  b2 c3  ");
+		 // or
+		 let v2 = trimlast("  a1  b2 c3  ");
 	}
 
-	printl("trimboth(SV trimchars = " ") const&;");
+	printl(" trimboth(SV trimchars = " ") const&;");
 	{
 		let v1 = "  a1  b2 c3  "_var.trimboth();
 		assert(v1 == "a1  b2 c3");
 
-		// or
-		let v2 = trimboth("  a1  b2 c3  ");
+		 // or
+		 let v2 = trimboth("  a1  b2 c3  ");
 	}
 
-	printl("first() const&;");
+	printl(" first() const&;");
 	{
 		let v1 = "abc"_var.first();
 		assert(v1 == "a");
 
-		// or
-		let v2 = first("abc");
+		 // or
+		 let v2 = first("abc");
 	}
 
-	printl("last() const&;");
+	printl(" last() const&;");
 	{
 		let v1 = "abc"_var.last();
 		assert(v1 == "c");
 
-		// or
-		let v2 = last("abc");
+		 // or
+		 let v2 = last("abc");
 	}
 
-	printl("first(const std::size_t length) const&;");
+	printl(" first(const std::size_t length) const&;");
 	{
 		let v1 = "abc"_var.first(2);
 		assert(v1 == "ab");
 
-		// or
-		let v2 = first("abc", 2);
+		 // or
+		 let v2 = first("abc", 2);
 	}
 
-	printl("last(const std::size_t length) const&;");
+	printl(" last(const std::size_t length) const&;");
 	{
 		let v1 = "abc"_var.last(2);
 		assert(v1 == "bc");
 
-		// or
-		let v2 = last("abc", 2);
+		 // or
+		 let v2 = last("abc", 2);
 	}
 
-	printl("cut(const int length) const&;");
+	printl(" cut(const int length) const&;");
 	{
 		let v1 = "abcd"_var.cut(2);
 		assert(v1 == "cd");
 
-		// or
-		let v2 = cut("abcd", 2);
+		 // or
+		 let v2 = cut("abcd", 2);
 	}
 
-	printl("paste(const int pos1, const int length, SV insertstr) const&;");
+	printl(" paste(const int pos1, const int length, SV insertstr) const&;");
 	{
 		let v1 = "abcd"_var.paste(2, 2, "XYZ");
 		assert(v1 == "aXYZd");
 
-		// or
-		let v2 = paste("abcd", 2, 2, "XYZ");
+		 // or
+		 let v2 = paste("abcd", 2, 2, "XYZ");
 	}
 
-	printl("paste(const int pos1, SV insertstr) const&;");
+	printl(" paste(const int pos1, SV insertstr) const&;");
 	{
 		let v1 = "abcd"_var.paste(2, "XYZ");
 		assert(v1 == "aXYZbcd");
 
-		// or
-		let v2 = paste("abcd", 2, "XYZ");
+		 // or
+		 let v2 = paste("abcd", 2, "XYZ");
 	}
 
-	printl("prefix(SV insertstr) const&;");
+	printl(" prefix(SV insertstr) const&;");
 	{
 		let v1 = "abc"_var.prefix("XYZ");
 		assert(v1 == "XYZabc");
 
-		// or
-		let v2 = prefix("abc", "XYZ");
+		 // or
+		 let v2 = prefix("abc", "XYZ");
 	}
 
-	printl("append(const ARGS&... appendable) const&");
+	printl(" append(const ARGS&... appendable) const&");
 	{
 		let v1 = "abc"_var.append(" is ", 10, " ok", '.');
 		assert(v1 == "abc is 10 ok.");
 
-		// or
-		let v2 = append("abc", " is ", 10, " ok", '.');
+		 // or
+		 let v2 = append("abc", " is ", 10, " ok", '.');
 	}
 
-	printl("pop() const&;");
+	printl(" pop() const&;");
 	{
 		let v1 = "abc"_var.pop();
 		assert(v1 == "ab");
 
-		// or
-		let v2 = pop("abc");
+		 // or
+		 let v2 = pop("abc");
 	}
 
-	printl("field(SV strx, const int fieldnx = 1, const int nfieldsx = 1) const;");
+	printl(" field(SV strx, const int fieldnx = 1, const int nfieldsx = 1) const;");
 	{
 		let v1 = "aa*bb*cc"_var.field("*", 2);
 		assert(v1 == "bb");
 
-		// or
-		let v2 = field("aa*bb*cc", "*", 2);
+		 // or
+		 let v2 = field("aa*bb*cc", "*", 2);
 	}
 
-	printl("field2(SV separator, const int fieldno, const int nfields = 1) const");
+	printl(" field2(SV separator, const int fieldno, const int nfields = 1) const");
 	{
 		let v1 = "aa*bb*cc"_var.field2("*", -1);
 		assert(v1 == "cc");
 
-		// or
-		let v2 = field2("aa*bb*cc", "*", -1);
+		 // or
+		 let v2 = field2("aa*bb*cc", "*", -1);
 	}
 
-	printl("fieldstore(SV separator, const int fieldno, const int nfields, in replacement) const&;");
+	printl(" fieldstore(SV separator, const int fieldno, const int nfields, in replacement) const&;");
 	{
 		let v1 = "aa*bb*cc*dd"_var.fieldstore("*", 2, 3, "X*Y");
 		assert(v1 == "aa*X*Y*");
 
-		// or
-		let v2 = fieldstore("aa*bb*cc*dd", "*", 2, 3, "X*Y");
+		 // or
+		 let v2 = fieldstore("aa*bb*cc*dd", "*", 2, 3, "X*Y");
 	}
 
-	printl("fieldstore(SV separator, const int fieldno, const int nfields, in replacement) const&;");
+	printl(" fieldstore(SV separator, const int fieldno, const int nfields, in replacement) const&;");
 	{
 		let v1 = "a1*b2*c3*d4"_var.fieldstore("*", 2, 0, "X*Y");
 		assert(v1 == "a1*X*Y*b2*c3*d4");
 
-		// or
-		let v2 = fieldstore("a1*b2*c3*d4", "*", 2, 0, "X*Y");
+		 // or
+		 let v2 = fieldstore("a1*b2*c3*d4", "*", 2, 0, "X*Y");
 	}
 
-	printl("fieldstore(SV separator, const int fieldno, const int nfields, in replacement) const&;");
+	printl(" fieldstore(SV separator, const int fieldno, const int nfields, in replacement) const&;");
 	{
 		let v1 = "a1*b2*c3*d4"_var.fieldstore("*", 2, -3, "X*Y");
 		assert(v1 == "a1*X*Y");
 
-		// or
-		let v2 = fieldstore("a1*b2*c3*d4", "*", 2, -3, "X*Y");
+		 // or
+		 let v2 = fieldstore("a1*b2*c3*d4", "*", 2, -3, "X*Y");
 	}
 
-	printl("substr(const int pos1, const int length) const&;");
+	printl(" substr(const int pos1, const int length) const&;");
 	{
 		let v1 = "abcd"_var.substr(2, 2);
 		assert(v1 == "bc");
 
-		// or
-		let v2 = substr("abcd", 2, 2);
+		 // or
+		 let v2 = substr("abcd", 2, 2);
 	}
 
-	printl("substr(const int pos1, const int length) const&;");
+	printl(" substr(const int pos1, const int length) const&;");
 	{
 		let v1 = "abcd"_var.substr(3, -2);
 		assert(v1 == "cb");
 
-		// or
-		let v2 = substr("abcd", 3, -2);
+		 // or
+		 let v2 = substr("abcd", 3, -2);
 	}
 
-	printl("substr(const int pos1) const&;");
+	printl(" substr(const int pos1) const&;");
 	{
 		let v1 = "abcd"_var.substr(2);
 		assert(v1 == "bcd");
 
-		// or
-		let v2 = substr("abcd", 2);
+		 // or
+		 let v2 = substr("abcd", 2);
 	}
 
-	printl("substr(const int pos1, SV delimiterchars, io pos2) const;");
+	printl(" substr(const int pos1, SV delimiterchars, io pos2) const;");
 	{
 		var pos1a = 4, pos2a;
-		let v1 = "aa,bb,cc"_var.substr(pos1a, ",", pos2a);
+		 let v1 = "aa,bb,cc"_var.substr(pos1a, ",", pos2a);
 		assert(v1 == "bb");
 		assert(pos2a == 6);
 
-		// or
-		var pos1b = 4, pos2b;
-		let v2 = substr("aa,bb,cc", pos1b, ",", pos2b);
+		 // or
+		 var pos1b = 4, pos2b;
+		 let v2 = substr("aa,bb,cc", pos1b, ",", pos2b);
 	}
 
-	printl("substr2(io pos1, out delimiterno) const;");
+	printl(" substr2(io pos1, out delimiterno) const;");
 	{
 		var pos1a = 4, delim1;
-		let v1 = "aa^bb^cc"_var.substr2(pos1a, delim1);
+		 let v1 = "aa^bb^cc"_var.substr2(pos1a, delim1);
 		assert(v1 == "bb");
 		assert(pos1a == 7 );
 		assert(delim1 == 2);
 
-		// or
-		var pos1b = 4, delim2;
-		let v2 = substr2("aa^bb^cc"_var, pos1b, delim2);
+		 // or
+		 var pos1b = 4, delim2;
+		 let v2 = substr2("aa^bb^cc"_var, pos1b, delim2);
 	}
 
-	printl("convert(SV fromchars, SV tochars) const&;");
+	printl(" convert(SV fromchars, SV tochars) const&;");
 	{
 		let v1 = "abcde"_var.convert("aZd", "XY");
 		assert(v1 == "Xbce");
  // a is replaced and d is removed
-		// or
-		let v2 = convert("abcde", "aZd", "XY");
+		 // or
+		 let v2 = convert("abcde", "aZd", "XY");
 	}
 
-	printl("textconvert(SV fromchars, SV tochars) const&;");
+	printl(" textconvert(SV fromchars, SV tochars) const&;");
 	{
 		let v1 = "a🤡b😀c🌍d"_var.textconvert("🤡😀", "👋");
 		assert(v1 == "a👋bc🌍d");
 
-		// or
-		let v2 = textconvert("a🤡b😀c🌍d", "🤡😀", "👋");
+		 // or
+		 let v2 = textconvert("a🤡b😀c🌍d", "🤡😀", "👋");
 	}
 
-	printl("replace(SV fromstr, SV tostr) const&;");
+	printl(" replace(SV fromstr, SV tostr) const&;");
 	{
 		let v1 = "Abc.Abc"_var.replace("bc", "X");
 		assert(v1 == "AX.AX");
 
-		// or
-		let v2 = replace("Abc Abc", "bc", "X");
+		 // or
+		 let v2 = replace("Abc Abc", "bc", "X");
 	}
 
-	printl("replace(const rex& regex, SV tostr) const&;");
+	printl(" replace(const rex& regex, SV tostr) const&;");
 	{
 		let v1 = "A a B b"_var.replace("[A-Z]"_rex, "'$0'");
 		assert(v1 == "'A' a 'B' b");
 
-		// or
-		let v2 = replace("A a B b", "[A-Z]"_rex, "'$0'");
+		 // or
+		 let v2 = replace("A a B b", "[A-Z]"_rex, "'$0'");
 	}
 
-	printl("unique() const&;");
+	printl(" unique() const&;");
 	{
 		let v1 = "a1^b2^a1^c2"_var.unique();
 		assert(v1 == "a1^b2^c2"_var);
 
-		// or
-		let v2 = unique("a1^b2^a1^c2"_var);
+		 // or
+		 let v2 = unique("a1^b2^a1^c2"_var);
 	}
 
-	printl("sort(SV sepchar = _FM) const&;");
+	printl(" sort(SV sepchar = _FM) const&;");
 	{
 		let v1 = "20^10^2^1^1.1"_var.sort();
 		assert(v1 == "1^1.1^2^10^20"_var);
 
-		// or
-		let v2 = sort("20^10^2^1^1.1"_var);
+		 // or
+		 let v2 = sort("20^10^2^1^1.1"_var);
 	}
 
-	printl("sort(SV sepchar = _FM) const&;");
+	printl(" sort(SV sepchar = _FM) const&;");
 	{
 		let v1 = "b1^a1^c20^c10^c2^c1^b2"_var.sort();
 		assert(v1 == "a1^b1^b2^c1^c10^c2^c20"_var);
 
-		// or
-		let v2 = sort("b1^a1^c20^c10^c2^c1^b2"_var);
+		 // or
+		 let v2 = sort("b1^a1^c20^c10^c2^c1^b2"_var);
 	}
 
-	printl("reverse(SV sepchar = _FM) const&;");
+	printl(" reverse(SV sepchar = _FM) const&;");
 	{
 		let v1 = "20^10^2^1^1.1"_var.reverse();
 		assert(v1 == "1.1^1^2^10^20"_var);
 
-		// or
-		let v2 = reverse("20^10^2^1^1.1"_var);
+		 // or
+		 let v2 = reverse("20^10^2^1^1.1"_var);
 	}
 
-	printl("shuffle(SV sepchar = _FM) const&;");
+	printl(" shuffle(SV sepchar = _FM) const&;");
 	{
 		let v1 = "20^10^2^1^1.1"_var.shuffle(); /// e.g. "2^1^20^1.1^10" (random order depending on initrand())
-		// or
-		let v2 = shuffle("20^10^2^1^1.1"_var);
+		 // or
+		 let v2 = shuffle("20^10^2^1^1.1"_var);
 	}
 
-	printl("parse(char sepchar = ' ') const&;");
+	printl(" parse(char sepchar = ' ') const&;");
 	{
 		let v1 = "abc,\"def,\"123\" fgh\",12.34"_var.parse(',');
 		assert(v1 == "abc^\"def,\"123\" fgh\"^12.34"_var);
 
-		// or
-		let v2 = parse("abc,\"def,\"123\" fgh\",12.34", ',');
+		 // or
+		 let v2 = parse("abc,\"def,\"123\" fgh\",12.34", ',');
 	}
 
-	printl("ucaser() REF ;");
+	printl("  ucaser() REF ;");
 	{
 		var v1 = "abc";
-		v1.ucaser(); ;
+		 v1.ucaser(); ;
 		assert(v1 == "ABC");
 
-		// or
-		ucaser(v1);
+		 // or
+		 ucaser(v1);
 	}
 
-	printl("oconv(const char* convstr) const;");
+	printl(" oconv(const char* convstr) const;");
 	{
 		let v1 = var(30123).oconv("D/E");
 		assert(v1 == "21/06/2050");
 
-		// or
-		let v2 = oconv(30123, "D/E");
+		 // or
+		 let v2 = oconv(30123, "D/E");
 	}
 
-	printl("iconv(const char* convstr) const;");
+	printl(" iconv(const char* convstr) const;");
 	{
 		let v1 = "21 JUN 2050"_var.iconv("D/E");
 		assert(v1 == 30123);
 
-		// or
-		let v2 = iconv("21 JUN 2050", "D/E");
+		 // or
+		 let v2 = iconv("21 JUN 2050", "D/E");
 	}
 
-	printl("format(in fmt_str, Args&&... args) const");
+	printl(" format(in fmt_str, Args&&... args) const");
 	{
 		let v1 = var(12.345).format("'{:_>8.2f}'");
 		assert(v1 == "'___12.35'");
 
-		let v2 = var(12.345).format("'{::MD20P|R(_)#8}'");
-		// or
-		var v3 = format("'{:_>8.2f}'", var(12.345));
+		 let v2 = var(12.345).format("'{::MD20P|R(_)#8}'");
+		 // or
+		 var v3 = format("'{:_>8.2f}'", var(12.345));
 		assert(v3 == "'___12.35'");
 
-		var v4 = format("'{::MD20P|R(_)#8}'", var(12.345));
+		 var v4 = format("'{::MD20P|R(_)#8}'", var(12.345));
 	}
 
-	printl("from_codepage(const char* codepage) const;");
+	printl(" from_codepage(const char* codepage) const;");
 	{
 		let v1 = "\xa4"_var.from_codepage("CP1124");
 		assert(v1 == "Є");
 
-		// or
-		let v2 = from_codepage("\xa4", "CP1124");
-		// U+0404 Cyrillic Capital Letter Ukrainian Ie Unicode Character
+		 // or
+		 let v2 = from_codepage("\xa4", "CP1124");
+		 // U+0404 Cyrillic Capital Letter Ukrainian Ie Unicode Character
 	}
 
-	printl("to_codepage(const char* codepage) const;");
+	printl(" to_codepage(const char* codepage) const;");
 	{
 		let v1 = "Є"_var.to_codepage("CP1124").oconv("HEX");
 		assert(v1 == "A4");
 
-		// or
-		let v2 = to_codepage("Є", "CP1124").oconv("HEX");
+		 // or
+		 let v2 = to_codepage("Є", "CP1124").oconv("HEX");
 	}
 
-	printl("f(const int fieldno, const int valueno = 0, const int subvalueno = 0) const;");
+	printl(" f(const int fieldno, const int valueno = 0, const int subvalueno = 0)            const;");
 	{
 		let v1 = "f1^f2v1]f2v2]f2v3^f2"_var;
-		let v2 = v1.f(2, 2);
+		 let v2 = v1.f(2, 2);
 		assert(v2 == "f2v2");
 
 	}
 
-	printl("extract(const int fieldno, const int valueno = 0, const int subvalueno = 0) const");
+	printl(" extract(const int fieldno, const int valueno = 0, const int subvalueno = 0)      const");
 	{
 		let v1 = "f1^f2v1]f2v2]f2v3^f2"_var;
-		let v2 = v1.extract(2, 2);
+		 let v2 = v1.extract(2, 2);
 		assert(v2 == "f2v2");
 
-		//
-		// For brevity the function alias "f()" (standing for "field") is normally used instead of "extract()" as follows:
-		var v3 = v1.f(2, 2);
+		 //
+		 // For brevity the function alias "f()" (standing for "field") is normally used instead of "extract()" as follows:
+		 var v3 = v1.f(2, 2);
 	}
 
-	printl("sum() const;");
+	printl(" sum() const;");
 	{
 		let v1 = "1]2]3^4]5]6"_var.sum();
 		assert(v1 == "6^15"_var);
 
-		// or
-		let v2 = sum("1]2]3^4]5]6"_var);
+		 // or
+		 let v2 = sum("1]2]3^4]5]6"_var);
 	}
 
-	printl("sumall() const;");
+	printl(" sumall() const;");
 	{
 		let v1 = "1]2]3^4]5]6"_var.sumall();
 		assert(v1 == 21);
 
-		// or
-		let v2 = sumall("1]2]3^4]5]6"_var);
+		 // or
+		 let v2 = sumall("1]2]3^4]5]6"_var);
 	}
 
-	printl("sum(SV sepchar) const;");
+	printl(" sum(SV sepchar) const;");
 	{
 		let v1 = "10,20,30"_var.sum(",");
 		assert(v1 == 60);
 
-		// or
-		let v2 = sum("10,20,30", ",");
+		 // or
+		 let v2 = sum("10,20,30", ",");
 	}
 
-	printl("mv(const char* opcode, in var2) const;");
+	printl(" mv(const char* opcode, in var2) const;");
 	{
 		let v1 = "10]20]30"_var.mv("+","2]3]4"_var);
 		assert(v1 == "12]23]34"_var);
 
 	}
 
-	printl("r(const int fieldno, in replacement) REF");
+	printl("  r(const int fieldno, in replacement) REF");
 	{
 		var v1 = "f1^v1]v2}s2}s3^f3"_var;
-		v1.r(2, "X"); ;
+		 v1.r(2, "X"); ;
 		assert(v1 == "f1^X^f3"_var);
 
 	}
 
-	printl("r(const int fieldno, const int valueno, in replacement) REF");
+	printl("  r(const int fieldno, const int valueno, in replacement) REF");
 	{
 		var v1 = "f1^v1]v2}s2}s3^f3"_var;
-		v1.r(2, 2, "X"); ;
+		 v1.r(2, 2, "X"); ;
 		assert(v1 == "f1^v1]X^f3"_var);
 
 	}
 
-	printl("r(const int fieldno, const int valueno, const int subvalueno, in replacement) REF;");
+	printl("  r(const int fieldno, const int valueno, const int subvalueno, in replacement) REF;");
 	{
 		var v1 = "f1^v1]v2}s2}s3^f3"_var;
-		v1.r(2, 2, 2, "X"); ;
+		 v1.r(2, 2, 2, "X"); ;
 		assert(v1 == "f1^v1]v2}X}s3^f3"_var);
 
 	}
 
-	printl("inserter(const int fieldno, in insertion) REF");
+	printl("  inserter(const int fieldno, in insertion) REF");
 	{
 		var v1 = "f1^v1]v2}s2}s3^f3"_var;
-		v1.inserter(2, "X"); ;
+		 v1.inserter(2, "X"); ;
 		assert(v1 == "f1^X^v1]v2}s2}s3^f3"_var);
 
-		// or
-		inserter(v1, 2, "X");
+		 // or
+		 inserter(v1, 2, "X");
 	}
 
-	printl("inserter(const int fieldno, const int valueno, in insertion) REF");
+	printl("  inserter(const int fieldno, const int valueno, in insertion) REF");
 	{
 		var v1 = "f1^v1]v2}s2}s3^f3"_var;
-		v1.inserter(2, 2, "X"); ;
+		 v1.inserter(2, 2, "X"); ;
 		assert(v1 == "f1^v1]X]v2}s2}s3^f3"_var);
 
-		// or
-		inserter(v1, 2, 2, "X");
+		 // or
+		 inserter(v1, 2, 2, "X");
 	}
 
-	printl("inserter(const int fieldno, const int valueno, const int subvalueno, in insertion) REF;");
+	printl("  inserter(const int fieldno, const int valueno, const int subvalueno, in insertion) REF;");
 	{
 		var v1 = "f1^v1]v2}s2}s3^f3"_var;
-		v1.inserter(2, 2, 2, "X"); ;
+		 v1.inserter(2, 2, 2, "X"); ;
 		assert(v1 == "f1^v1]v2}X}s2}s3^f3"_var);
 
-		// or
-		v1.inserter(2, 2, 2, "X");
+		 // or
+		 v1.inserter(2, 2, 2, "X");
 	}
 
-	printl("remover(const int fieldno, const int valueno = 0, const int subvalueno = 0) REF;");
+	printl("  remover(const int fieldno, const int valueno = 0, const int subvalueno = 0) REF;");
 	{
 		var v1 = "f1^v1]v2}s2}s3^f3"_var;
-		v1.remover(2, 2); ;
+		 v1.remover(2, 2); ;
 		assert(v1 == "f1^v1^f3"_var);
 
-		// or
-		remover(v1, 2, 2);
+		 // or
+		 remover(v1, 2, 2);
 	}
 
 	printl("locate(in target) const;");
 	{
 		if ("UK^US^UA"_var.locate("US")) {/*ok*/} else  abort("locate: " ^ lasterror()); // 2
-		// or
-		if (locate("US", "UK^US^UA"_var)) {/*ok*/} else  abort("locate: " ^ lasterror());
+		 // or
+		 if (locate("US", "UK^US^UA"_var)) {/*ok*/} else  abort("locate: " ^ lasterror());
 	}
 
 	printl("locate(in target, out valueno) const;");
 	{
 		var setting;
-		if ("UK]US]UA"_var.locate("US", setting)) {/*ok*/} else  abort("locate: " ^ lasterror());
+		 if ("UK]US]UA"_var.locate("US", setting)) {/*ok*/} else  abort("locate: " ^ lasterror());
 		assert(setting == 2);
 
-		// or
-		if (locate("US", "UK]US]UA"_var, setting)) {/*ok*/} else  abort("locate: " ^ lasterror());
+		 // or
+		 if (locate("US", "UK]US]UA"_var, setting)) {/*ok*/} else  abort("locate: " ^ lasterror());
 	}
 
 	printl("locate(in target, out setting, const int fieldno, const int valueno = 0) const;");
 	{
 		var setting;
-		if ("f1^f2v1]f2v2]s1}s2}s3}s4^f3^f4"_var.locate("s4", setting, 2, 3)) {/*ok*/} else  abort("locate: " ^ lasterror());
+		 if ("f1^f2v1]f2v2]s1}s2}s3}s4^f3^f4"_var.locate("s4", setting, 2, 3)) {/*ok*/} else  abort("locate: " ^ lasterror());
 		assert(setting == 4 );
 // returns true
 	}
@@ -858,7 +856,7 @@ function main() {
 	printl("locateby(const char* ordercode, in target, out setting, const int fieldno, const int valueno = 0) const;");
 	{
 		var setting;
-		if ("f1^f2^aaa]bbb]ccc^f4"_var.locateby("AL", "bb", setting, 3)) abort("locateby: " ^ lasterror());
+		 if ("f1^f2^aaa]bbb]ccc^f4"_var.locateby("AL", "bb", setting, 3)) abort("locateby: " ^ lasterror());
 		assert(setting == 2 );
 // return false and where it could be correctly inserted.
 	}
@@ -871,7 +869,7 @@ function main() {
 	printl("locateusing(const char* usingchar, in target, out setting, const int fieldno = 0, const int valueno = 0, const int subvalueno = 0) const;");
 	{
 		var setting;
-		if ("f1^f2^f3c1,f3c2,f3c3^f4"_var.locateusing(",", "f3c2", setting, 3)) {/*ok*/} else  abort("locateusing: " ^ lasterror());
+		 if ("f1^f2^f3c1,f3c2,f3c3^f4"_var.locateusing(",", "f3c2", setting, 3)) {/*ok*/} else  abort("locateusing: " ^ lasterror());
 		assert(setting == 2 );
 // returns true
 	}
@@ -881,176 +879,176 @@ function main() {
 	printl("connect(in conninfo = "");");
 	{
 		let conninfo = "dbname=exodus user=exodus password=somesillysecret";
-		if (not conn.connect(conninfo)) abort("connect: " ^ lasterror());;
-		// or
-		if (not connect()) abort("connect: " ^ lasterror());
-		// or
-		if (not connect("exodus")) abort("connect: " ^ lasterror());
+		 if (not conn.connect(conninfo)) abort("connect: " ^ lasterror());;
+		 // or
+		 if (not connect()) abort("connect: " ^ lasterror());
+		 // or
+		 if (not connect("exodus")) abort("connect: " ^ lasterror());
 	}
 
 	printl("attach(in filenames) const;");
 	{
 		let filenames = "definitions^dict.definitions"_var, conn = "exodus";
-		if (conn.attach(filenames)) {/*ok*/} else  abort("attach: " ^ lasterror());
-		// or
-		if (attach(filenames)) {/*ok*/} else  abort("attach: " ^ lasterror());
+		 if (conn.attach(filenames)) {/*ok*/} else  abort("attach: " ^ lasterror());
+		 // or
+		 if (attach(filenames)) {/*ok*/} else  abort("attach: " ^ lasterror());
 	}
 
 	printl("begintrans() const;");
 	{
 		if (not conn.begintrans()) abort("begintrans: " ^ lasterror());
-		// or
-		if (not begintrans()) abort("begintrans: " ^ lasterror());
+		 // or
+		 if (not begintrans()) abort("begintrans: " ^ lasterror());
 	}
 
 	printl("statustrans() const;");
 	{
 		if (conn.statustrans()) {/*ok*/} else  abort("statustrans: " ^ lasterror());
-		// or
-		if (statustrans()) {/*ok*/} else  abort("statustrans: " ^ lasterror());
+		 // or
+		 if (statustrans()) {/*ok*/} else  abort("statustrans: " ^ lasterror());
 	}
 
 	printl("rollbacktrans() const;");
 	{
 		if (conn.rollbacktrans()) {/*ok*/} else  abort("rollbacktrans: " ^ lasterror());
-		// or
-		if (rollbacktrans()) {/*ok*/} else  abort("rollbacktrans: " ^ lasterror());
+		 // or
+		 if (rollbacktrans()) {/*ok*/} else  abort("rollbacktrans: " ^ lasterror());
 	}
 
 	printl("committrans() const;");
 	{
 		if (conn.committrans()) {/*ok*/} else  abort("committrans: " ^ lasterror());
-		// or
-		if (committrans()) {/*ok*/} else  abort("committrans: " ^ lasterror());
+		 // or
+		 if (committrans()) {/*ok*/} else  abort("committrans: " ^ lasterror());
 	}
 
 	printl("sqlexec(in sqlcmd) const;");
 	{
 		if (conn.sqlexec("vacuum")) {/*ok*/} else  abort("sqlexec: " ^ lasterror());
-		// or
-		if (sqlexec("vacuum")) {/*ok*/} else  abort("sqlexec: " ^ lasterror());
+		 // or
+		 if (sqlexec("vacuum")) {/*ok*/} else  abort("sqlexec: " ^ lasterror());
 	}
 
 	printl("sqlexec(in sqlcmd, io response) const;");
 	{
 		let sqlcmd = "select 'xxx' as col1, 'yyy' as col2";
-		var response;
-		if (conn.sqlexec(sqlcmd, response)) {/*ok*/} else  abort("sqlexec: " ^ lasterror());
+		 var response;
+		 if (conn.sqlexec(sqlcmd, response)) {/*ok*/} else  abort("sqlexec: " ^ lasterror());
 		assert(response == "col1^col2\x1fxxx^yyy"_var );
 /// \x1f is the Record Mark (RM) character. The backtick character is used here by gendoc to deliminate source code.
-		// or
-		if (sqlexec(sqlcmd, response)) {/*ok*/} else  abort("sqlexec: " ^ lasterror());
+		 // or
+		 if (sqlexec(sqlcmd, response)) {/*ok*/} else  abort("sqlexec: " ^ lasterror());
 	}
 
 	printl("disconnect();");
 	{
 		conn.disconnect();
-		// or
-		disconnect();
+		 // or
+		 disconnect();
 	}
 
 	printl("disconnectall();");
 	{
 		conn.disconnectall();
-		// or
-		disconnectall();
+		 // or
+		 disconnectall();
 	}
 
-	printl("lasterror() const;");
+	printl(" lasterror() const;");
 	{
 		var v1 = var().lasterror();
-		// or
-		var v2 = lasterror();
+		 // or
+		 var v2 = lasterror();
 	}
 
-	printl("loglasterror(in source = "") const;");
+	printl(" loglasterror(in source = "") const;");
 	{
 		var().loglasterror("main:");
-		// or
-		loglasterror("main:");
+		 // or
+		 loglasterror("main:");
 	}
 
 	printl("dbcreate(in new_dbname, in old_dbname = "") const;");
 	{
 		var conn = "exodus";
 
-		if (conn.dbcreate("xo_gendoc_testdb")) {/*ok*/} else  abort("dbcreate: " ^ lasterror());
-		// or
-		if (dbcreate("xo_gendoc_testdb")) abort("dbcreate: " ^ lasterror());
+		 if (conn.dbcreate("xo_gendoc_testdb")) {/*ok*/} else  abort("dbcreate: " ^ lasterror());
+		 // or
+		 if (dbcreate("xo_gendoc_testdb")) abort("dbcreate: " ^ lasterror());
 	}
 
 	printl("dbcopy(in from_dbname, in to_dbname) const;");
 	{
 		var conn = "exodus";
 
-		if (conn.dbcopy("xo_gendoc_testdb", "xo_gendoc_testdb2")) {/*ok*/} else  abort("dbcopy: " ^ lasterror());
-		// or
-		if (dbcopy("xo_gendoc_testdb", "xo_gendoc_testdb2")) abort("dbcopy: " ^ lasterror());
+		 if (conn.dbcopy("xo_gendoc_testdb", "xo_gendoc_testdb2")) {/*ok*/} else  abort("dbcopy: " ^ lasterror());
+		 // or
+		 if (dbcopy("xo_gendoc_testdb", "xo_gendoc_testdb2")) abort("dbcopy: " ^ lasterror());
 	}
 
-	printl("dblist() const;");
+	printl(" dblist() const;");
 	{
 		let v1 = conn.dblist();
-		// or
-		let v2 = dblist();
+		 // or
+		 let v2 = dblist();
 	}
 
 	printl("dbdelete(in dbname) const;");
 	{
 		var conn = "exodus";
-		if (conn.dbdelete("xo_gendoc_testdb2")) {/*ok*/} else  abort("dbdelete: " ^ lasterror());
-		// or
-		if (dbdelete("xo_gendoc_testdb2")) abort("dbdelete: " ^ lasterror());
+		 if (conn.dbdelete("xo_gendoc_testdb2")) {/*ok*/} else  abort("dbdelete: " ^ lasterror());
+		 // or
+		 if (dbdelete("xo_gendoc_testdb2")) abort("dbdelete: " ^ lasterror());
 	}
 
 	printl("createfile(in filename) const;");
 	{
 		let filename = "xo_gendoc_temp", conn = "exodus";
-		if (conn.createfile(filename)) {/*ok*/} else  abort("createfile: " ^ lasterror());
-		// or
-		if (createfile(filename)) abort("createfile: " ^ lasterror());
+		 if (conn.createfile(filename)) {/*ok*/} else  abort("createfile: " ^ lasterror());
+		 // or
+		 if (createfile(filename)) abort("createfile: " ^ lasterror());
 	}
 
 	printl("renamefile(in filename, in newfilename) const;");
 	{
 		let conn = "exodus", filename = "xo_gendoc_temp", new_filename = "xo_gendoc_temp2";
-		if (conn.renamefile(filename, new_filename)) {/*ok*/} else  abort("renamefile: " ^ lasterror());
-		// or
-		if (renamefile(filename, new_filename)) abort("renamefile: " ^ lasterror());
+		 if (conn.renamefile(filename, new_filename)) {/*ok*/} else  abort("renamefile: " ^ lasterror());
+		 // or
+		 if (renamefile(filename, new_filename)) abort("renamefile: " ^ lasterror());
 	}
 
-	printl("listfiles() const;");
+	printl(" listfiles() const;");
 	{
 		var conn = "exodus";
-		if (not conn.listfiles()) abort("listfiles: " ^ lasterror());
-		// or
-		if (not listfiles()) abort("listfiles: " ^ lasterror());
+		 if (not conn.listfiles()) abort(" listfiles: " ^ lasterror());
+		 // or
+		 if (not listfiles()) abort(" listfiles: " ^ lasterror());
 	}
 
 	printl("clearfile(in filename) const;");
 	{
 		let conn = "exodus", filename = "xo_gendoc_temp2";
-		if (not conn.clearfile(filename)) abort("clearfile: " ^ lasterror());
-		// or
-		if (not clearfile(filename)) abort("clearfile: " ^ lasterror());
+		 if (not conn.clearfile(filename)) abort("clearfile: " ^ lasterror());
+		 // or
+		 if (not clearfile(filename)) abort("clearfile: " ^ lasterror());
 	}
 
 	printl("deletefile(in filename) const;");
 	{
 		let conn = "exodus", filename = "xo_gendoc_temp2";
-		if (conn.deletefile(filename)) {/*ok*/} else  abort("deletefile: " ^ lasterror());
-		// or
-		if (deletefile(filename)) abort("deletefile: " ^ lasterror());
+		 if (conn.deletefile(filename)) {/*ok*/} else  abort("deletefile: " ^ lasterror());
+		 // or
+		 if (deletefile(filename)) abort("deletefile: " ^ lasterror());
 	}
 
 	var conn_or_file;
 
-	printl("reccount(in filename = "") const;");
+	printl(" reccount(in filename = "") const;");
 	{
 		let conn = "exodus", filename = "xo_clients";
-		var nrecs1 = conn.reccount(filename);
-		// or
-		var nrecs2 = reccount(filename);
+		 var nrecs1 = conn.reccount(filename);
+		 // or
+		 var nrecs2 = reccount(filename);
 	}
 
 	var file;
@@ -1058,66 +1056,66 @@ function main() {
 	printl("open(in dbfilename, in connection = "");");
 	{
 		var file, filename = "definitions";
-		if (not file.open(filename)) abort("open: " ^ lasterror());
-		// or
-		if (not open(filename to file)) abort("open: " ^ lasterror());
+		 if (not file.open(filename)) abort("open: " ^ lasterror());
+		 // or
+		 if (not open(filename to file)) abort("open: " ^ lasterror());
 	}
 
 	printl("close() const;");
 	{
 		var file = "definitions";
-		file.close();
-		// or
-		close(file);
+		 file.close();
+		 // or
+		 close(file);
 	}
 
 	printl("createindex(in fieldname, in dictfile = "") const;");
 	{
 		var filename = "definitions", fieldname = "DATE_TIME";
 
-		if (filename.createindex(fieldname)) {/*ok*/} else  abort("createindex: " ^ lasterror());
-		// or
-		if (createindex(filename, fieldname)) abort("createindex: " ^ lasterror());
+		 if (filename.createindex(fieldname)) {/*ok*/} else  abort("createindex: " ^ lasterror());
+		 // or
+		 if (createindex(filename, fieldname)) abort("createindex: " ^ lasterror());
 	}
 
-	printl("listindex(in file_or_filename = "", in fieldname = "") const;");
+	printl(" listindex(in file_or_filename = "", in fieldname = "") const;");
 	{
 		var conn = "exodus";
-		if (conn.listindex()) {/*ok*/} else  abort("listindex: " ^ lasterror()); // includes "xo_clients__date_time"
-		// or
-		if (listindex()) {/*ok*/} else  abort("listindex: " ^ lasterror());
+		 if (conn.listindex()) {/*ok*/} else  abort(" listindex: " ^ lasterror()); // includes "xo_clients__date_time"
+		 // or
+		 if (listindex()) {/*ok*/} else  abort(" listindex: " ^ lasterror());
 	}
 
 	printl("deleteindex(in fieldname) const;");
 	{
 		var file = "definitions", fieldname = "DATE_TIME";
-		if (file.deleteindex(fieldname)) {/*ok*/} else  abort("deleteindex: " ^ lasterror());
-		// or
-		if (deleteindex(file, fieldname)) abort("deleteindex: " ^ lasterror());
+		 if (file.deleteindex(fieldname)) {/*ok*/} else  abort("deleteindex: " ^ lasterror());
+		 // or
+		 if (deleteindex(file, fieldname)) abort("deleteindex: " ^ lasterror());
 	}
 
-	printl("lock(in key) const;");
+	printl(" lock(in key) const;");
 	{
 		var file = "xo_clients", key = "1000";
-		if (file.lock(key)) {/*ok*/} else  abort("lock: " ^ lasterror());
-		// or
-		if (lock(file, key)) abort("lock: " ^ lasterror());
+		 if (file.lock(key)) {/*ok*/} else  abort(" lock: " ^ lasterror());
+		 // or
+		 if (lock(file, key)) abort(" lock: " ^ lasterror());
 	}
 
 	printl("unlock(in key) const;");
 	{
 		var file = "xo_clients", key = "1000";
-		if (file.unlock(key)) {/*ok*/} else  abort("unlock: " ^ lasterror());
-		// or
-		if (unlock(file, key)) abort("unlock: " ^ lasterror());
+		 if (file.unlock(key)) {/*ok*/} else  abort("unlock: " ^ lasterror());
+		 // or
+		 if (unlock(file, key)) abort("unlock: " ^ lasterror());
 	}
 
 	printl("unlockall() const;");
 	{
 		var conn = "exodus";
-		if (not conn.unlockall()) abort("unlockall: " ^ lasterror());
-		// or
-		if (not unlockall(conn)) abort("unlockall: " ^ lasterror());
+		 if (not conn.unlockall()) abort("unlockall: " ^ lasterror());
+		 // or
+		 if (not unlockall(conn)) abort("unlockall: " ^ lasterror());
 	}
 
 	var rec;
@@ -1125,86 +1123,86 @@ function main() {
 	printl("write(in file, in key) const;");
 	{
 		let rec = "Client GD^G^20855^30000^1001.00^20855.76539"_var;
-		let file = "xo_clients", key = "GD001";
+		 let file = "xo_clients", key = "GD001";
 
-		rec.write(file, key);
-		// or
-		write(rec on file, key);
+		 rec.write(file, key);
+		 // or
+		 write(rec on file, key);
 	}
 
 	printl("read(in file, in key);");
 	{
 		var rec;
-		let file = "xo_clients", key = "GD001";
-		if (not rec.read(file, key)) abort("read: " ^ lasterror());
+		 let file = "xo_clients", key = "GD001";
+		 if (not rec.read(file, key)) abort("read: " ^ lasterror());
 		assert(rec == "Client GD^G^20855^30000^1001.00^20855.76539"_var);
 
-		// or
-		if (not read(rec from file, key)) abort("read: " ^ lasterror());
+		 // or
+		 if (not read(rec from file, key)) abort("read: " ^ lasterror());
 	}
 
 	printl("deleterecord(in key) const;");
 	{
 		let file = "xo_clients", key = "GD001";
-		if (file.deleterecord(key)) {/*ok*/} else  abort("deleterecord: " ^ lasterror());
-		// or
+		 if (file.deleterecord(key)) {/*ok*/} else  abort("deleterecord: " ^ lasterror());
+		 // or
 		if (deleterecord(file, key)) abort("deleterecord: " ^ lasterror());
 	}
 
 	printl("insertrecord(in file, in key) const;");
 	{
 		let rec = "Client GD^G^20855^30000^1001.00^20855.76539"_var;
-		let file = "xo_clients", key = "GD001";
-		if (rec.insertrecord(file, key)) {/*ok*/} else  abort("insertrecord: " ^ lasterror());
-		// or
-		if (insertrecord(rec on file, key)) abort("insertrecord: " ^ lasterror());
+		 let file = "xo_clients", key = "GD001";
+		 if (rec.insertrecord(file, key)) {/*ok*/} else  abort("insertrecord: " ^ lasterror());
+		 // or
+		 if (insertrecord(rec on file, key)) abort("insertrecord: " ^ lasterror());
 	}
 
 	printl("updaterecord(in file, in key) const;");
 	{
 		let rec = "Client GD^G^20855^30000^1001.00^20855.76539"_var;
-		let file = "xo_clients", key = "GD001";
-		if (not rec.updaterecord(file, key)) abort("updaterecord: " ^ lasterror());
-		// or
-		if (not updaterecord(rec on file, key)) abort("updaterecord: " ^ lasterror());
+		 let file = "xo_clients", key = "GD001";
+		 if (not rec.updaterecord(file, key)) abort("updaterecord: " ^ lasterror());
+		 // or
+		 if (not updaterecord(rec on file, key)) abort("updaterecord: " ^ lasterror());
 	}
 
 	printl("readf(in file, in key, const int fieldno);");
 	{
 		var field, file = "xo_clients", key = "GD001", fieldno = 2;
-		if (not field.readf(file, key, fieldno)) abort("readf: " ^ lasterror());
+		 if (not field.readf(file, key, fieldno)) abort("readf: " ^ lasterror());
 		assert(field == "G");
 
-		// or
-		if (not readf(field from file, key, fieldno)) abort("readf: " ^ lasterror());
+		 // or
+		 if (not readf(field from file, key, fieldno)) abort("readf: " ^ lasterror());
 	}
 
 	printl("writef(in file, in key, const int fieldno) const;");
 	{
 		var field = "f3", file = "definitions", key = "1000", fieldno = 3;
-		field.writef(file, key, fieldno);
-		// or
-		writef(field on file, key, fieldno);
+		 field.writef(file, key, fieldno);
+		 // or
+		 writef(field on file, key, fieldno);
 	}
 
 	printl("writec(in file, in key) const;");
 	{
 		let rec = "Client XD^X^20855^30000^1001.00^20855.76539"_var;
-		let file = "xo_clients", key = "XD001";
-		rec.writec(file, key);
-		// or
-		writec(rec on file, key);
+		 let file = "xo_clients", key = "XD001";
+		 rec.writec(file, key);
+		 // or
+		 writec(rec on file, key);
 	}
 
 	printl("readc(in file, in key);");
 	{
 		var rec;
-		let file = "xo_clients", key = "XD001";
-		if (rec.readc(file, key)) {/*ok*/} else  abort("readc: " ^ lasterror());
-		// or
-		if (readc(rec from file, key)) {/*ok*/} else  abort("readc: " ^ lasterror());
-		// Verify not in actual file by using read() not readc()
-		if (read(rec from file, key)) abort("Error: " ^ key ^ " should not be in the actual file"); // error
+		 let file = "xo_clients", key = "XD001";
+		 if (rec.readc(file, key)) {/*ok*/} else  abort("readc: " ^ lasterror());
+		 // or
+		 if (readc(rec from file, key)) {/*ok*/} else  abort("readc: " ^ lasterror());
+		 // Verify not in actual file by using read() not readc()
+		 if (read(rec from file, key)) abort("Error: " ^ key ^ " should not be in the actual file"); // error
 	}
 
 	var dbfile;
@@ -1212,82 +1210,175 @@ function main() {
 	printl("deletec(in key) const;");
 	{
 		var file = "xo_clients", key = "XD001";
-		if (file.deletec(key)) {/*ok*/} else  abort("deletec: " ^ lasterror());
-		// or
-		if (deletec(file, key)) abort("deletec: " ^ lasterror());
+		 if (file.deletec(key)) {/*ok*/} else  abort("deletec: " ^ lasterror());
+		 // or
+		 if (deletec(file, key)) abort("deletec: " ^ lasterror());
 	}
 
 	printl("cleardbcache() const;");
 	{
 		conn.cleardbcache();
-		// or
+		 // or
 		cleardbcache(conn);
 	}
 
-	printl("xlate(in filename, in fieldno, const char* mode) const;");
+	printl(" xlate(in filename, in fieldno, const char* mode) const;");
 	{
 		let key = "SB001";
-		let client_name = key.xlate("xo_clients", 1, "X");
+		 let client_name = key.xlate("xo_clients", 1, "X");
 		assert(client_name == "Client AAA");
 
-		// or
-		let name_and_type = xlate("xo_clients", key, "NAME_AND_TYPE", "X");
+		 // or
+		 let name_and_type = xlate("xo_clients", key, "NAME_AND_TYPE", "X");
 		assert(name_and_type == "Client AAA (A)");
 
 	}
 
-	printl("date() const;");
+	printl("select(in sort_select_command = "");");
+	{
+		var clients = "xo_clients";
+		 if (clients.select("with type 'B' and with balance ge 100 by type by name"))
+		     while (clients.readnext(ID))
+		         println("Client code is {}", ID);
+		 // or
+		 if (select("xo_clients with type 'B' and with balance ge 100 by type by name"))
+		     while (readnext(ID))
+		         println("Client code is {}", ID);
+	}
+
+	printl("makeselect(in keys);");
+	{
+		var dbfile = "";
+		 let keys = "A01^B02^C03"_var;
+		 if (dbfile.makeselect(keys)) {/*ok*/} else  abort("makeselect: " ^ lasterror());
+		assert(conn.readnext(ID) and ID == "A01");
+
+		 // or
+		 if (makeselect(keys)) {/*ok*/} else  abort("makeselect: " ^ lasterror());
+		assert(readnext(ID) and ID == "A01");
+
+	}
+
+	printl("hasnext();");
+	{
+		var clients = "xo_clients", key;
+		 if (clients.select()) {
+		     assert(clients.hasnext());
+		 }
+		 // or
+		 if (select("xo_clients")) {
+		     assert(hasnext());
+		 }
+	}
+
+	printl("readnext(out record, out key, out valueno);");
+	{
+		var clients = "xo_clients";
+		 if (clients.select("with type 'B' and with balance ge 100 by type by name (R)"))
+		     while (clients.readnext(RECORD, ID, MV))
+		         println("Code is {}, Name is {}", ID, RECORD.f(1));
+		 // or
+		 DICT = "dict.xo_clients";
+		 if (select("xo_clients with type 'B' and with balance ge 100 by type by name (R)"))
+		     while (readnext(RECORD, ID, MV))
+		         println("Code is {}, Name is {}", calculate("CODE"), calculate("NAME"));
+	}
+
+	printl("clearselect();");
+	{
+		var clients = "xo_clients";
+		 clients.clearselect();
+		 if (not clients.hasnext()) {/*ok*/} else  abort("clearselect: " ^ lasterror());
+		 // or
+		 clearselect();
+		 if (not hasnext()) {/*ok*/} else  abort("clearselect: " ^ lasterror());
+	}
+
+	printl("savelist(SV listname);");
+	{
+		var clients = "xo_clients";
+		 if (clients.select("with type 'B' by name")) {
+		 }
+		 // or
+		 if (select("xo_clients with type 'B' by name")) {
+		     if (savelist("mylist")) {/*ok*/} else  abort("savelist: " ^ lasterror());
+		 }
+	}
+
+	printl("getlist(SV listname);");
+	{
+		var file = "";
+		 if (file.getlist("mylist")) {
+		     while (file.readnext(ID))
+		         println("Key is {}", ID);
+		 }
+		 // or
+		 if (getlist("mylist")) {
+		     while (readnext(ID))
+		         println("Key is {}", ID);
+		 }
+	}
+
+	printl("deletelist(SV listname) const;");
+	{
+		var conn = "";
+		 if (conn.deletelist("mylist")) {/*ok*/} else  abort("deletelist: " ^ lasterror());
+		 // or
+		 if (deletelist("mylist")) {/*ok*/} else  abort("deletelist: " ^ lasterror());
+	}
+
+	printl(" date() const;");
 	{
 		let today1 = var().date();
-		// or
-		let today2 = date();
+		 // or
+		 let today2 = date();
 	}
 
-	printl("time() const;");
+	printl(" time() const;");
 	{
 		let now1 = var().time();
-		// or
-		let now2 = time();
+		 // or
+		 let now2 = time();
 	}
 
-	printl("ostime() const;");
+	printl(" ostime() const;");
 	{
 		let now1 = var().ostime();
-		// or
-		let now2 = ostime();
+		 // or
+		 let now2 = ostime();
 	}
 
-	printl("timestamp() const;");
+	printl(" timestamp() const;");
 	{
 		let now1 = var().timestamp();
-		// or
-		let now2 = timestamp();
+		 // or
+		 let now2 = timestamp();
 	}
 
-	printl("timestamp(in ostime) const;");
+	printl(" timestamp(in ostime) const;");
 	{
 		let idate = iconv("2025-01-01", "D"), itime = iconv("23:59:59", "MT");
-		let ts1 = idate.timestamp(itime);
+		 let ts1 = idate.timestamp(itime);
 		assert(ts1 == 20821.99998842593);
 
-		// or
-		let ts2 = timestamp(idate, itime);
+		 // or
+		 let ts2 = timestamp(idate, itime);
 	}
 
 	printl("ossleep(const int milliseconds) const;");
 	{
 		var().ossleep(100); // sleep for 100ms
-		// or
-		ossleep(100);
+		 // or
+		 ossleep(100);
 	}
 
 	var file_dir_list;
 
-	printl("oswait(const int milliseconds) const;");
+	printl(" oswait(const int milliseconds) const;");
 	{
 		let v1 = ".^/etc/hosts"_var.oswait(100); /// e.g. "IN_CLOSE_WRITE^/etc^hosts^f"_var
-		// or
-		let v2 = oswait(".^/etc/hosts"_var, 100);
+		 // or
+		 let v2 = oswait(".^/etc/hosts"_var, 100);
 	}
 
 	var osfilevar;
@@ -1295,35 +1386,35 @@ function main() {
 	printl("osopen(in osfilename, const bool utf8 = true) const;");
 	{
 		let osfilename = ostempdirpath() ^ "xo_gendoc_test.conf";
-		if (oswrite("" on osfilename)) {/*ok*/} else  abort("osopen: " ^ lasterror()); /// Create an empty os file
-		var ostempfile;
-		if (ostempfile.osopen(osfilename)) {/*ok*/} else  abort("osopen: " ^ lasterror());
-		// or
-		if (osopen(osfilename to ostempfile)) {/*ok*/} else  abort("osopen: " ^ lasterror());
+		 if (oswrite("" on osfilename)) {/*ok*/} else  abort("osopen: " ^ lasterror()); /// Create an empty os file
+		 var ostempfile;
+		 if (ostempfile.osopen(osfilename)) {/*ok*/} else  abort("osopen: " ^ lasterror());
+		 // or
+		 if (osopen(osfilename to ostempfile)) {/*ok*/} else  abort("osopen: " ^ lasterror());
 	}
 
 	printl("osbwrite(in osfilevar, io offset) const;");
 	{
 		let osfilename = ostempdirpath() ^ "xo_gendoc_test.conf";
-		let text = "aaa=123\nbbb=456\n";
-		var offset = osfile(osfilename).f(1); /// Size of file therefore append
-		if (text.osbwrite(osfilename, offset)) {/*ok*/} else  abort("osbwrite: " ^ lasterror());
+		 let text = "aaa=123\nbbb=456\n";
+		 var offset = osfile(osfilename).f(1); /// Size of file therefore append
+		 if (text.osbwrite(osfilename, offset)) {/*ok*/} else  abort("osbwrite: " ^ lasterror());
 		assert(offset == 16);
 
-		// or
-		if (not osbwrite(text on osfilename, offset)) abort("osbwrite: " ^ lasterror());
+		 // or
+		 if (not osbwrite(text on osfilename, offset)) abort("osbwrite: " ^ lasterror());
 	}
 
 	printl("osbread(in osfilevar, io offset, const int length);");
 	{
 		let osfilename = ostempdirpath() ^ "xo_gendoc_test.conf";
-		var text, offset = 0;
-		if (text.osbread(osfilename, offset, 8)) {/*ok*/} else  abort("osbread: " ^ lasterror());
+		 var text, offset = 0;
+		 if (text.osbread(osfilename, offset, 8)) {/*ok*/} else  abort("osbread: " ^ lasterror());
 		assert(text == "aaa=123\n" );
 		assert(offset == 8);
 
-		// or
-		if (osbread(text from osfilename, offset, 8)) {/*ok*/} else  abort("osbread: " ^ lasterror());
+		 // or
+		 if (osbread(text from osfilename, offset, 8)) {/*ok*/} else  abort("osbread: " ^ lasterror());
 		assert(text == "bbb=456\n" );
 		assert(offset == 16);
 
@@ -1332,28 +1423,28 @@ function main() {
 	printl("osclose() const;");
 	{
 		osfilevar.osclose();
-		// or
-		osclose(osfilevar);
+		 // or
+		 osclose(osfilevar);
 	}
 
 	printl("oswrite(in osfilename, const char* codepage = "") const;");
 	{
 		let text = "aaa = 123\nbbb = 456";
-		let osfilename = ostempdirpath() ^ "xo_gendoc_test.conf";
-		if (text.oswrite(osfilename)) {/*ok*/} else  abort("oswrite: " ^ lasterror());
-		// or
-		if (oswrite(text on osfilename)) {/*ok*/} else  abort("oswrite: " ^ lasterror());
+		 let osfilename = ostempdirpath() ^ "xo_gendoc_test.conf";
+		 if (text.oswrite(osfilename)) {/*ok*/} else  abort("oswrite: " ^ lasterror());
+		 // or
+		 if (oswrite(text on osfilename)) {/*ok*/} else  abort("oswrite: " ^ lasterror());
 	}
 
 	printl("osread(const char* osfilename, const char* codepage = "");");
 	{
 		var text;
-		let osfilename = ostempdirpath() ^ "xo_gendoc_test.conf";
-		if (text.osread(osfilename)) {/*ok*/} else  abort("osread: " ^ lasterror());
+		 let osfilename = ostempdirpath() ^ "xo_gendoc_test.conf";
+		 if (text.osread(osfilename)) {/*ok*/} else  abort("osread: " ^ lasterror());
 		assert(text == "aaa = 123\nbbb = 456");
 
-		// or
-		if (osread(text from osfilename)) {/*ok*/} else  abort("osread: " ^ lasterror());
+		 // or
+		 if (osread(text from osfilename)) {/*ok*/} else  abort("osread: " ^ lasterror());
 	}
 
 	var osfile_or_dirname;
@@ -1361,30 +1452,30 @@ function main() {
 	printl("osrename(in new_dirpath_or_filepath) const;");
 	{
 		let from_osfilename = ostempdirpath() ^ "xo_gendoc_test.conf";
-		let to_osfilename = from_osfilename ^ ".bak";
+		 let to_osfilename = from_osfilename ^ ".bak";
 
-		if (from_osfilename.osrename(to_osfilename)) {/*ok*/} else  abort("osrename: " ^ lasterror());
-		// or
-		if (osrename(from_osfilename, to_osfilename)) abort("osrename: " ^ lasterror());
+		 if (from_osfilename.osrename(to_osfilename)) {/*ok*/} else  abort("osrename: " ^ lasterror());
+		 // or
+		 if (osrename(from_osfilename, to_osfilename)) abort("osrename: " ^ lasterror());
 	}
 
 	printl("osmove(in to_osfilename) const;");
 	{
 		let from_osfilename = ostempdirpath() ^ "xo_gendoc_test.conf.bak";
-		let to_osfilename = from_osfilename.cut(-4);
+		 let to_osfilename = from_osfilename.cut(-4);
 
-		if (from_osfilename.osmove(to_osfilename)) {/*ok*/} else  abort("osmove: " ^ lasterror());
-		// or
-		if (osmove(from_osfilename, to_osfilename)) abort("osmove: " ^ lasterror());
+		 if (from_osfilename.osmove(to_osfilename)) {/*ok*/} else  abort("osmove: " ^ lasterror());
+		 // or
+		 if (osmove(from_osfilename, to_osfilename)) abort("osmove: " ^ lasterror());
 	}
 
 	printl("oscopy(in to_osfilename) const;");
 	{
 		let from_osfilename = ostempdirpath() ^ "xo_gendoc_test.conf";
-		let to_osfilename = from_osfilename ^ ".bak";
-		if (from_osfilename.oscopy(to_osfilename)) {/*ok*/} else  abort("oscopy: " ^ lasterror());;
-		// or
-		if (oscopy(from_osfilename, to_osfilename)) {/*ok*/} else  abort("oscopy: " ^ lasterror());
+		 let to_osfilename = from_osfilename ^ ".bak";
+		 if (from_osfilename.oscopy(to_osfilename)) {/*ok*/} else  abort("oscopy: " ^ lasterror());;
+		 // or
+		 if (oscopy(from_osfilename, to_osfilename)) {/*ok*/} else  abort("oscopy: " ^ lasterror());
 	}
 
 	var osfilename;
@@ -1392,74 +1483,74 @@ function main() {
 	printl("osremove() const;");
 	{
 		let osfilename = ostempdirpath() ^ "xo_gendoc_test.conf";
-		if (osfilename.osremove()) {/*ok*/} else  abort("osremove: " ^ lasterror());
-		// or
-		if (osremove(osfilename)) abort("osremove: " ^ lasterror());
+		 if (osfilename.osremove()) {/*ok*/} else  abort("osremove: " ^ lasterror());
+		 // or
+		 if (osremove(osfilename)) abort("osremove: " ^ lasterror());
 	}
 
 	var dirpath;
 
-	printl("oslist(SV globpattern = "", const int mode = 0) const;");
+	printl(" oslist(SV globpattern = "", const int mode = 0) const;");
 	{
 		var entries1 = "/etc/"_var.oslist("*.cfg"); /// e.g. "adduser.conf^ca-certificates.con^... etc."
-		// or
-		var entries2 = oslist("/etc/" "*.conf");
+		 // or
+		 var entries2 = oslist("/etc/" "*.conf");
 	}
 
 	var osfile_or_dirpath;
 
-	printl("osinfo(const int mode = 0) const;");
+	printl(" osinfo(const int mode = 0) const;");
 	{
 		var info1 = "/etc/hosts"_var.osinfo(); /// e.g. "221^20597^78309"_var
-		// or
-		var info2 = osinfo("/etc/hosts");
+		 // or
+		 var info2 = osinfo("/etc/hosts");
 	}
 
-	printl("osfile() const;");
+	printl(" osfile() const;");
 	{
 		var fileinfo1 = "/etc/hosts"_var.osfile(); /// e.g. "221^20597^78309"_var
-		// or
-		var fileinfo2 = osfile("/etc/hosts");
+		 // or
+		 var fileinfo2 = osfile("/etc/hosts");
 	}
 
-	printl("osdir() const;");
+	printl(" osdir() const;");
 	{
 		var dirinfo1 = "/etc/"_var.osdir(); /// e.g. "^20848^44464"_var
-		// or
-		var dirinfo2 = osfile("/etc/");
+		 // or
+		 var dirinfo2 = osfile("/etc/");
 	}
 
 	printl("osmkdir() const;");
 	{
 		let osdirname = "xo_test/aaa";
 
-		if (osdirname.osmkdir()) {/*ok*/} else  abort("osmkdir: " ^ lasterror());
-		// or
-		if (osmkdir(osdirname)) abort("osmkdir: " ^ lasterror());
+		 if (osdirname.osmkdir()) {/*ok*/} else  abort("osmkdir: " ^ lasterror());
+		 // or
+		 if (osmkdir(osdirname)) abort("osmkdir: " ^ lasterror());
 	}
 
 	printl("oscwd(in newpath) const;");
 	{
 		let osdirname = "xo_test/aaa";
-		if (osdirname.oscwd()) {/*ok*/} else  abort("oscwd: " ^ lasterror());
-		// or
-		if (oscwd(osdirname)) {/*ok*/} else  abort("oscwd: " ^ lasterror());
+		 if (osdirname.oscwd()) {/*ok*/} else  abort("oscwd: " ^ lasterror());
+		 // or
+		 if (oscwd(osdirname)) {/*ok*/} else  abort("oscwd: " ^ lasterror());
 	}
 
-	printl("oscwd() const;");
+	printl(" oscwd() const;");
 	{
 		var cwd1 = var().oscwd();
-		// or
-		var cwd2 = oscwd();
+		 // or
+		 var cwd2 = oscwd();
 	}
 
 	printl("osrmdir(bool evenifnotempty = false) const;");
 	{
 		let osdirname = "xo_test/aaa";
-		if (oscwd("../..")) {/*ok*/} else  abort("osrmdir: " ^ lasterror()); /// Change up before removing because cannot remove dir while it is current
-		if (osdirname.osrmdir()) {/*ok*/} else  abort("osrmdir: " ^ lasterror());
-		// or
-		if (osrmdir(osdirname)) abort("osrmdir: " ^ lasterror());
+		 if (oscwd("../..")) {/*ok*/} else  abort("osrmdir: " ^ lasterror()); /// Change up before removing because cannot remove dir while it is current
+		 if (osdirname.osrmdir()) {/*ok*/} else  abort("osrmdir: " ^ lasterror());
+		 // or
+		 if (osrmdir(osdirname)) abort("osrmdir: " ^ lasterror());
 	}
 
 	var command;
@@ -1467,9 +1558,9 @@ function main() {
 	printl("osshell() const;");
 	{
 		let cmd = "echo $HOME";
-		if (cmd.osshell()) {/*ok*/} else  abort("osshell: " ^ lasterror());
-		// or
-		if (osshell(cmd)) {/*ok*/} else  abort("osshell: " ^ lasterror());
+		 if (cmd.osshell()) {/*ok*/} else  abort("osshell: " ^ lasterror());
+		 // or
+		 if (osshell(cmd)) {/*ok*/} else  abort("osshell: " ^ lasterror());
 	}
 
 	var instr;
@@ -1477,10 +1568,10 @@ function main() {
 	printl("osshellread(in oscmd);");
 	{
 		let cmd = "echo $HOME";
-		var text;
-		if (text.osshellread(cmd)) {/*ok*/} else  abort("osshellread: " ^ lasterror());
-		// or capturing stdout but ignoring exit status
-		text = osshellread(cmd);
+		 var text;
+		 if (text.osshellread(cmd)) {/*ok*/} else  abort("osshellread: " ^ lasterror());
+		 // or capturing stdout but ignoring exit status
+		 text = osshellread(cmd);
 	}
 
 	var outstr;
@@ -1488,23 +1579,23 @@ function main() {
 	printl("osshellwrite(in oscmd) const;");
 	{
 		let outtext = "abc xyz";
-		if (outtext.osshellwrite("grep xyz")) {/*ok*/} else  abort("osshellwrite: " ^ lasterror());
-		// or
-		if (osshellwrite(outtext, "grep xyz")) {/*ok*/} else  abort("osshellwrite: " ^ lasterror());
+		 if (outtext.osshellwrite("grep xyz")) {/*ok*/} else  abort("osshellwrite: " ^ lasterror());
+		 // or
+		 if (osshellwrite(outtext, "grep xyz")) {/*ok*/} else  abort("osshellwrite: " ^ lasterror());
 	}
 
-	printl("ostempdirpath() const;");
+	printl(" ostempdirpath() const;");
 	{
 		let v1 = var().ostempdirpath();
-		// or
-		let v2 = ostempdirpath();
+		 // or
+		 let v2 = ostempdirpath();
 	}
 
-	printl("ostempfilename() const;");
+	printl(" ostempfilename() const;");
 	{
 		var temposfilename1 = var().ostempfilename();
-		// or
-		var temposfilename2 = ostempfilename();
+		 // or
+		 var temposfilename2 = ostempfilename();
 	}
 
 	var envvalue;
@@ -1512,54 +1603,56 @@ function main() {
 	printl("ossetenv(SV envcode) const;");
 	{
 		let envcode = "EXO_ABC", envvalue = "XYZ";
-		envvalue.ossetenv(envcode);
-		// or
-		ossetenv(envcode, envvalue);
+		 envvalue.ossetenv(envcode);
+		 // or
+		 ossetenv(envcode, envvalue);
 	}
 
 	printl("osgetenv(SV envcode);");
 	{
 		var envvalue1;
-		if (envvalue1.osgetenv("HOME")) {/*ok*/} else  abort("osgetenv: " ^ lasterror()); // e.g. "/home/exodus"
-		// or
-		var envvalue2 = osgetenv("EXO_ABC");
+		 if (envvalue1.osgetenv("HOME")) {/*ok*/} else  abort("osgetenv: " ^ lasterror()); // e.g. "/home/exodus"
+		 // or
+		 var envvalue2 = osgetenv("EXO_ABC");
 		assert(envvalue2 == "XYZ");
 
 	}
 
-	printl("ospid() const;");
+	printl(" ospid() const;");
 	{
 		let pid1 = var().ospid(); /// e.g. 663237
-		// or
-		let pid2 = ospid();
+		 // or
+		 let pid2 = ospid();
 	}
 
-	printl("ostid() const;");
+	printl(" ostid() const;");
 	{
 		let tid1 = var().ostid(); /// e.g. 663237
-		// or
-		let tid2 = ostid();
+		 // or
+		 let tid2 = ostid();
 	}
 
-	printl("version() const;");
+	printl(" version() const;");
 	{
 		let v1 = var().version(); /// e.g. "29 JAN 2025 14:56:52"
 	}
 
+	var strvar;
+
 	printl("setxlocale() const;");
 	{
 		if ("en_US.utf8"_var.setxlocale()) {/*ok*/} else  abort("setxlocale: " ^ lasterror());
-		// or
-		if (setxlocale("en_US.utf8")) {/*ok*/} else  abort("setxlocale: " ^ lasterror());
+		 // or
+		 if (setxlocale("en_US.utf8")) {/*ok*/} else  abort("setxlocale: " ^ lasterror());
 	}
 
-	printl("getxlocale();");
+	printl(" getxlocale();");
 	{
 		let v1 = var().getxlocale();
 		assert(v1 == "en_US.utf8");
 
-		// or
-		let v2 = getxlocale();
+		 // or
+		 let v2 = getxlocale();
 	}
 
 	var varstr;
@@ -1567,191 +1660,191 @@ function main() {
 	printl("outputl(in prefix = "") const;");
 	{
 		"abc"_var.outputl("xyz = "); /// Sends "xyz = abc\n" to stdout and flushes.
-		// or
-		outputl("xyz = ", "abc"); /// Any number of arguments is allowed. All will be output.
+		 // or
+		 outputl("xyz = ", "abc"); /// Any number of arguments is allowed. All will be output.
 	}
 
 	printl("logputl(in prefix = "") const;");
 	{
 		"abc"_var.logputl("xyz = "); /// Sends "xyz = abc\n" to stdlog buffer and is not flushed.
-		// or
-		logputl("xyz = ", "abc");; /// Any number of arguments is allowed. All will be output.
+		 // or
+		 logputl("xyz = ", "abc");; /// Any number of arguments is allowed. All will be output.
 	}
 
 	printl("errputl(in prefix = "") const;");
 	{
 		"abc"_var.errputl("xyz = "); /// Sends "xyz = abc\n" to stderr
-		// or
-		errputl("xyz = ", "abc"); /// Any number of arguments is allowed. All will be output.
+		 // or
+		 errputl("xyz = ", "abc"); /// Any number of arguments is allowed. All will be output.
 	}
 
 	printl("osflush() const;");
 	{
 		var().osflush();
-		// or
-		osflush();
+		 // or
+		 osflush();
 	}
 
-	printl("input(in prompt = "");");
+	printl(" input(in prompt = "");");
 	{
 		// var v1 = "default"; v1.input("Prompt:");
-		// or
-		// var v2 = input();
+		 // or
+		 // var v2 = input();
 	}
 
-	printl("keypressed(const bool wait = false);");
+	printl(" keypressed(const bool wait = false);");
 	{
 		var v1; v1.keypressed();
-		// or
-		var v2 = keypressed();
+		 // or
+		 var v2 = keypressed();
 	}
 
 	printl("isterminal(const int arg = 1) const;");
 	{
 		var v1 = var().isterminal(); /// 1 or 0
-		// or
-		var v2 = isterminal();
+		 // or
+		 var v2 = isterminal();
 	}
 
-	printl("abs() const;");
+	printl(" abs() const;");
 	{
 		let v1 = var(-12.34).abs();
 		assert(v1 == 12.34);
 
-		// or
-		let v2 = abs(-12.34);
+		 // or
+		 let v2 = abs(-12.34);
 	}
 
-	printl("pwr(in exponent) const;");
+	printl(" pwr(in exponent) const;");
 	{
 		let v1 = var(2).pwr(8);
 		assert(v1 == 256);
 
-		// or
-		let v2 = pwr(2, 8);
+		 // or
+		 let v2 = pwr(2, 8);
 	}
 
 	printl("initrnd() const;");
 	{
 		var(123).initrnd(); /// Set seed to 123
-		// or
-		initrnd(123);
+		 // or
+		 initrnd(123);
 	}
 
-	printl("rnd() const;");
+	printl(" rnd()     const;");
 	{
 		let v1 = var(100).rnd(); /// Random 0 to 99
-		// or
-		let v2 = rnd(100);
+		 // or
+		 let v2 = rnd(100);
 	}
 
-	printl("exp() const;");
+	printl(" exp()     const;");
 	{
 		let v1 = var(1).exp();
 		assert(v1 == 2.718281828459045);
 
-		// or
-		let v2 = exp(1);
+		 // or
+		 let v2 = exp(1);
 	}
 
-	printl("sqrt() const;");
+	printl(" sqrt()    const;");
 	{
 		let v1 = var(100).sqrt();
 		assert(v1 == 10);
 
-		// or
-		let v2 = sqrt(100);
+		 // or
+		 let v2 = sqrt(100);
 	}
 
-	printl("sin() const;");
+	printl(" sin()     const;");
 	{
 		let v1 = var(30).sin();
 		assert(v1 == 0.5);
 
-		// or
-		let v2 = sin(30);
+		 // or
+		 let v2 = sin(30);
 	}
 
-	printl("cos() const;");
+	printl(" cos()     const;");
 	{
 		let v1 = var(60).cos();
 		assert(v1 == 0.5);
 
-		// or
-		let v2 = cos(60);
+		 // or
+		 let v2 = cos(60);
 	}
 
-	printl("tan() const;");
+	printl(" tan()     const;");
 	{
 		let v1 = var(45).tan();
 		assert(v1 == 1);
 
-		// or
-		let v2 = tan(45);
+		 // or
+		 let v2 = tan(45);
 	}
 
-	printl("atan() const;");
+	printl(" atan()    const;");
 	{
 		let v1 = var(1).atan();
 		assert(v1 == 45);
 
-		// or
-		let v2 = atan(1);
+		 // or
+		 let v2 = atan(1);
 	}
 
-	printl("loge() const;");
+	printl(" loge()    const;");
 	{
 		let v1 = var(2.718281828459045).loge();
 		assert(v1 == 1);
 
-		// or
-		let v2 = loge(2.718281828459045);
+		 // or
+		 let v2 = loge(2.718281828459045);
 	}
 
-	printl("integer() const;");
+	printl(" integer() const;");
 	{
 		let v1 = var(2.9).integer();
 		assert(v1 == 2);
 
-		// or
-		let v2 = integer(2.9);
-		var v3 = var(-2.9).integer();
+		 // or
+		 let v2 = integer(2.9);
+		 var v3 = var(-2.9).integer();
 		assert(v3 == -2);
 
-		// or
-		var v4 = integer(-2.9);
+		 // or
+		 var v4 = integer(-2.9);
 	}
 
-	printl("floor() const;");
+	printl(" floor() const;");
 	{
 		let v1 = var(2.9).floor();
 		assert(v1 == 2);
 
-		// or
-		let v2 = floor(2.9);
-		var v3 = var(-2.9).floor();
+		 // or
+		 let v2 = floor(2.9);
+		 var v3 = var(-2.9).floor();
 		assert(v3 == -3);
 
-		// or
-		var v4 = floor(-2.9);
+		 // or
+		 var v4 = floor(-2.9);
 	}
 
-	printl("mod(in modulus) const;");
+	printl(" mod(in modulus) const;");
 	{
 		let v1 = var(11).mod(5);
 		assert(v1 == 1);
 
-		// or
-		let v2 = mod(11, 5);
+		 // or
+		 let v2 = mod(11, 5);
 		assert(v2 == 1);
 
-		let v3 = mod(-11, 5);
+		 let v3 = mod(-11, 5);
 		assert(v3 == 4);
 
-		let v4 = mod(11, -5);
+		 let v4 = mod(11, -5);
 		assert(v4 == -4);
 
-		let v5 = mod(-11, -5);
+		 let v5 = mod(-11, -5);
 		assert(v5 == -1);
 
 	}
@@ -1763,57 +1856,57 @@ function main() {
 		let v1 = 12345;
 		assert( v1.oconv( "D" ) == "18 OCT 2001" );
  // Default
-		assert( v1.oconv( "D/" ) == "10/18/2001" ); // / separator
-		assert( v1.oconv( "D-" ) == "10-18-2001" ); // - separator
-		assert( v1.oconv( "D2" ) == "18 OCT 01" ); // 2 digit year
-		assert( v1.oconv( "D/E" ) == "18/10/2001" ); // International order with /
-		assert( v1.oconv( "DS" ) == "2001 OCT 18" ); // ISO Year first
-		assert( v1.oconv( "DS-" ) == "2001-10-18" ); // ISO Year first with -
-		assert( v1.oconv( "DM" ) == "10" ); // Month number
-		assert( v1.oconv( "DMA" ) == "OCTOBER" ); // Month name
-		assert( v1.oconv( "DY" ) == "2001" ); // Year number
-		assert( v1.oconv( "DY2" ) == "01" ); // Year 2 digits
-		assert( v1.oconv( "DD" ) == "18" ); // Day number in month (1-31)
-		assert( v1.oconv( "DW" ) == "4" ); // Weekday number (1-7)
-		assert( v1.oconv( "DWA" ) == "THURSDAY" ); // Weekday name
-		assert( v1.oconv( "DQ" ) == "4" ); // Quarter number
-		assert( v1.oconv( "DJ" ) == "291" ); // Day number in year
-		assert( v1.oconv( "DL" ) == "31" ); // Last day number of month (28-31)
-		// Multifield/multivalue
-		var v2 = "12345^12346]12347"_var;
+		    assert( v1.oconv( "D/" ) == "10/18/2001" ); // / separator
+		    assert( v1.oconv( "D-" ) == "10-18-2001" ); // - separator
+		    assert( v1.oconv( "D2" ) == "18 OCT 01" ); // 2 digit year
+		    assert( v1.oconv( "D/E" ) == "18/10/2001" ); // International order with /
+		    assert( v1.oconv( "DS" ) == "2001 OCT 18" ); // ISO Year first
+		    assert( v1.oconv( "DS-" ) == "2001-10-18" ); // ISO Year first with -
+		    assert( v1.oconv( "DM" ) == "10" ); // Month number
+		    assert( v1.oconv( "DMA" ) == "OCTOBER" ); // Month name
+		    assert( v1.oconv( "DY" ) == "2001" ); // Year number
+		    assert( v1.oconv( "DY2" ) == "01" ); // Year 2 digits
+		    assert( v1.oconv( "DD" ) == "18" ); // Day number in month (1-31)
+		    assert( v1.oconv( "DW" ) == "4" ); // Weekday number (1-7)
+		    assert( v1.oconv( "DWA" ) == "THURSDAY" ); // Weekday name
+		    assert( v1.oconv( "DQ" ) == "4" ); // Quarter number
+		    assert( v1.oconv( "DJ" ) == "291" ); // Day number in year
+		    assert( v1.oconv( "DL" ) == "31" ); // Last day number of month (28-31)
+		 // Multifield/multivalue
+		 var v2 = "12345^12346]12347"_var;
 		assert(v2.oconv("D") == "18 OCT 2001^19 OCT 2001]20 OCT 2001"_var);
 
-		// or
-		assert( oconv(v1, "D" ) == "18 OCT 2001" );
+		  // or
+		  assert( oconv(v1, "D" ) == "18 OCT 2001" );
 	}
 
-	printl("iconv_D(const char* conversion) const;");
+	printl(" iconv_D(const char* conversion) const;");
 	{
 		// International order "DE"
-		assert( oconv(19005, "DE") == "12 JAN 2020");
+		 assert( oconv(19005, "DE") == "12 JAN 2020");
 		assert( "12/1/2020"_var.iconv("DE") == 19005);
 		assert( "12 1 2020"_var.iconv("DE") == 19005);
 		assert( "12-1-2020"_var.iconv("DE") == 19005);
 		assert( "12 JAN 2020"_var.iconv("DE") == 19005);
 		assert( "jan 12 2020"_var.iconv("DE") == 19005);
 
-		// American order "D"
-		assert( oconv(19329, "D") == "01 DEC 2020");
+		 // American order "D"
+		 assert( oconv(19329, "D") == "01 DEC 2020");
 		assert( "12/1/2020"_var.iconv("D") == 19329);
 		assert( "DEC 1 2020"_var.iconv("D") == 19329);
 		assert( "1 dec 2020"_var.iconv("D") == 19329);
 
-		// Reverse order
-		assert( "2020/12/1"_var.iconv("DE") == 19329);
+		 // Reverse order
+		 assert( "2020/12/1"_var.iconv("DE") == 19329);
 		assert( "2020-12-1"_var.iconv("D") == 19329);
 		assert( "2020 1 dec"_var.iconv("D") == 19329);
 
-		//Invalid date
-		assert( "2/29/2021"_var.iconv("D") == "");
+		 //Invalid date
+		 assert( "2/29/2021"_var.iconv("D") == "");
 		assert( "29/2/2021"_var.iconv("DE") == "");
 
-		// or
-		assert(iconv("12/1/2020"_var, "DE") == 19005);
+		 // or
+		 assert(iconv("12/1/2020"_var, "DE") == 19005);
 	}
 
 	var vartime;
@@ -1826,21 +1919,21 @@ function main() {
 		assert( v1.oconv( "MTS" ) == "17:13:20" );
 		assert( v1.oconv( "MTHS" ) == "05:13:20PM" );
 
-		var v2 = 0;
+		  var v2 = 0;
 		assert( v2.oconv( "MT" ) == "00:00" );
 		assert( v2.oconv( "MTH" ) == "12:00AM" );
 		assert( v2.oconv( "MTS" ) == "00:00:00" );
 		assert( v2.oconv( "MTHS" ) == "12:00:00AM" );
 
-		// Multifield/multivalue
-		var v3 = "234800^234860]234920"_var;
+		 // Multifield/multivalue
+		 var v3 = "234800^234860]234920"_var;
 		assert(v3.oconv("MT") == "17:13^17:14]17:15"_var);
 
-		// or
-		assert( oconv(v1, "MT" ) == "17:13" );
+		  // or
+		  assert( oconv(v1, "MT" ) == "17:13" );
 	}
 
-	printl("iconv_MT(bool strict) const;");
+	printl(" iconv_MT(bool strict) const;");
 	{
 		assert( "17:13"_var.iconv( "MT" ) == 61980);
 		assert( "05:13PM"_var.iconv( "MT" ) == 61980);
@@ -1849,14 +1942,14 @@ function main() {
 		assert( "00:00"_var.iconv( "MT" ) == 0);
 		assert( "12:00AM"_var.iconv( "MT" ) == 0);
  // Midnight
-		assert( "12:00PM"_var.iconv( "MT" ) == 43200); // Noon
-		assert( "00:00:00"_var.iconv( "MT" ) == 0);
+		 assert( "12:00PM"_var.iconv( "MT" ) == 43200); // Noon
+		 assert( "00:00:00"_var.iconv( "MT" ) == 0);
 		assert( "12:00:00AM"_var.iconv( "MT" ) == 0);
 
-		// Multifield/multivalue
-		assert("17:13^05:13PM]17:13:20"_var.iconv("MT") == "61980^61980]62000"_var);
-		// or
-		assert(iconv("17:13", "MT") == 61980);
+		 // Multifield/multivalue
+		 assert("17:13^05:13PM]17:13:20"_var.iconv("MT") == "61980^61980]62000"_var);
+		 // or
+		 assert(iconv("17:13", "MT") == 61980);
 	}
 
 	printl("oconv_MD(const char* conversion) const;");
@@ -1865,40 +1958,40 @@ function main() {
 		assert( v1.oconv( "MD20" ) == "-1234.57" );
 		assert( v1.oconv( "MD20," ) == "-1,234.57" );
  // , flag
-		assert( v1.oconv( "MC20," ) == "-1.234,57" ); // MC code
-		assert( v1.oconv( "MD20,-" ) == "1,234.57-" ); // - flag
-		assert( v1.oconv( "MD20,<" ) == "<1,234.57>" ); // < flag
-		assert( v1.oconv( "MD20,C" ) == "1,234.57CR" ); // C flag
-		assert( v1.oconv( "MD20,D" ) == "1,234.57DB" ); // D flag
-		// Multifield/multivalue
-		var v2 = "1.1^2.1]2.2"_var;
+		    assert( v1.oconv( "MC20," ) == "-1.234,57" ); // MC code
+		    assert( v1.oconv( "MD20,-" ) == "1,234.57-" ); // - flag
+		    assert( v1.oconv( "MD20,<" ) == "<1,234.57>" ); // < flag
+		    assert( v1.oconv( "MD20,C" ) == "1,234.57CR" ); // C flag
+		    assert( v1.oconv( "MD20,D" ) == "1,234.57DB" ); // D flag
+		  // Multifield/multivalue
+		  var v2 = "1.1^2.1]2.2"_var;
 		assert( v2.oconv( "MD20" ) == "1.10^2.10]2.20"_var);
 
-		// or
-		assert( oconv(v1, "MD20" ) == "-1234.57" );
+		  // or
+		    assert( oconv(v1, "MD20" ) == "-1234.57" );
 	}
 
 	printl("oconv_LRC(in format) const;");
 	{
 		assert( "abcde"_var.oconv( "L#3" ) == "abc" ); // Truncating
-		assert( "abcde"_var.oconv( "R#3" ) == "cde" );
+		 assert( "abcde"_var.oconv( "R#3" ) == "cde" );
 		assert( "abcde"_var.oconv( "C#3" ) == "abc" );
 		assert( "ab"_var.oconv( "L#6" ) == "ab    " );
  // Padding
-		assert( "ab"_var.oconv( "R#6" ) == "    ab" );
+		 assert( "ab"_var.oconv( "R#6" ) == "    ab" );
 		assert( "ab"_var.oconv( "C#6" ) == "  ab  " );
 		assert( var(42).oconv( "L(0)#5" ) == "42000" );
  // Padding character (x)
-		assert( var(42).oconv( "R(0)#5" ) == "00042" );
+		 assert( var(42).oconv( "R(0)#5" ) == "00042" );
 		assert( var(42).oconv( "C(0)#5" ) == "04200" );
 		assert( var(42).oconv( "C(0)#5" ) == "04200" );
 
-		// Multifield/multivalue
-		assert( "f1^v1]v2"_var.oconv("L(_)#5") == "f1___^v1___]v2___"_var);
-		// Fail for non-ASCII (Should be 5)
-		assert( "🐱"_var.oconv("L#5").textwidth() == 3);
-		// or
-		assert( oconv("abcd", "L#3" ) == "abc" );
+		 // Multifield/multivalue
+		 assert( "f1^v1]v2"_var.oconv("L(_)#5") == "f1___^v1___]v2___"_var);
+		 // Fail for non-ASCII (Should be 5)
+		 assert( "🐱"_var.oconv("L#5").textwidth() == 3);
+		 // or
+		 assert( oconv("abcd", "L#3" ) == "abc" );
 	}
 
 	printl("oconv_T(in format) const;");
@@ -1906,8 +1999,8 @@ function main() {
 		var v1 = "Have a nice day";
 		assert( v1.oconv("T#10") == "Have a    |nice day  "_var);
 
-		// or
-		assert( oconv(v1, "T#10" ) == "Have a    |nice day  "_var );
+		 // or
+		 assert( oconv(v1, "T#10" ) == "Have a    |nice day  "_var );
 	}
 
 	printl("oconv_HEX(const int ioratio) const;");
@@ -1915,45 +2008,45 @@ function main() {
 		assert( "ab01"_var.oconv( "HEX" ) == "61" "62" "30" "31" );
 		assert( "\xff\x00"_var.oconv( "HEX" ) == "FF" "00" );
  // Any bytes are ok.
-		assert( var(10).oconv( "HEX" ) == "31" "30" ); // Uses ASCII string equivalent of 10 i.e. "10".
-		assert( "\u0393"_var.oconv( "HEX" ) == "CE" "93" ); // Greek capital Gamma in utf8 bytes.
-		assert( "a^]b"_var.oconv( "HEX" ) == "61" "1E" "1D" "62" ); // Field and value marks.
-		// or
-		assert( oconv("ab01"_var, "HEX") == "61" "62" "30" "31");
+		 assert( var(10).oconv( "HEX" ) == "31" "30" ); // Uses ASCII string equivalent of 10 i.e. "10".
+		 assert( "\u0393"_var.oconv( "HEX" ) == "CE" "93" ); // Greek capital Gamma in utf8 bytes.
+		 assert( "a^]b"_var.oconv( "HEX" ) == "61" "1E" "1D" "62" ); // Field and value marks.
+		 // or
+		 assert( oconv("ab01"_var, "HEX") == "61" "62" "30" "31");
 	}
 
 	printl("oconv_MX() const;");
 	{
 		assert( var("255").oconv("MX") == "FF");
-		// or
-		assert( oconv(var("255"), "MX") == "FF");
+		 // or
+		 assert( oconv(var("255"), "MX") == "FF");
 	}
 
 	printl("oconv_MB() const;");
 	{
 		assert( var(255).oconv("MB") == 1111'1111);
-		// or
-		assert( oconv(var(255), "MB") == 1111'1111);
+		 // or
+		 assert( oconv(var(255), "MB") == 1111'1111);
 	}
 
 	printl("oconv_TX(const char* conversion) const;");
 	{
-		 // backslash in text remains backslash
-		assert(var(_BS).oconv("TX") == _BS);
-		// 1. Double escape any _BS "n" -> _BS _BS "n"
-		assert(var(_BS "n").oconv("TX") == _BS _BS "n");
-		// 2. Single escape any _NL -> _BS "n"
-		assert(var(_NL).oconv("TX") == _BS "n");
-		// 3. FMs -> _NL (⏎)
-		assert("🌍^🌍"_var.oconv("TX") == "🌍" _NL "🌍");
-		// 4. VMs -> _BS _NL (\⏎)
-		assert("🌍]🌍"_var.oconv("TX") == "🌍" _BS _NL "🌍");
-		// 5. SMs -> _BS _BS _NL (\\⏎)
-		assert("🌍}🌍"_var.oconv("TX") == "🌍" _BS _BS _NL "🌍");
-		// 6. TMs -> _BS _BS _BS _NL (\\\⏎)
-		assert("🌍|🌍"_var.oconv("TX") == "🌍" _BS _BS _BS _NL "🌍");
-		// 7. STs -> _BS _BS _BS _BS _NL (\\\\⏎)
-		assert("🌍~🌍"_var.oconv("TX") == "🌍" _BS _BS _BS _BS _NL "🌍");
+		  // backslash in text remains backslash
+		   assert(var(_BS).oconv("TX") == _BS);
+		   // 1. Double escape any _BS "n" -> _BS _BS "n"
+		   assert(var(_BS "n").oconv("TX") == _BS _BS "n");
+		   // 2. Single escape any _NL -> _BS "n"
+		   assert(var(_NL).oconv("TX") == _BS "n");
+		   // 3. FMs -> _NL (⏎)
+		   assert("🌍^🌍"_var.oconv("TX") == "🌍" _NL "🌍");
+		   // 4. VMs -> _BS _NL (\⏎)
+		   assert("🌍]🌍"_var.oconv("TX") == "🌍" _BS _NL "🌍");
+		   // 5. SMs -> _BS _BS _NL (\\⏎)
+		   assert("🌍}🌍"_var.oconv("TX") == "🌍" _BS _BS _NL "🌍");
+		   // 6. TMs -> _BS _BS _BS _NL (\\\⏎)
+		   assert("🌍|🌍"_var.oconv("TX") == "🌍" _BS _BS _BS _NL "🌍");
+		   // 7. STs -> _BS _BS _BS _BS _NL (\\\\⏎)
+		   assert("🌍~🌍"_var.oconv("TX") == "🌍" _BS _BS _BS _BS _NL "🌍");
 	}
 
 
@@ -1967,13 +2060,13 @@ subroutine cleanup() {
 
 	//Note that all '// Cleanup' lines in the original source code must use literals and not variables
 	//otherwise the generated code will VNA on cleanup
-		if (not dbdelete("xo_gendoc_testdb")) {}; // Cleanup first
-		if (not dbdelete("xo_gendoc_testdb2")) {}; // Cleanup first
-		if (not deleteindex("definitions", "DATE_TIME")) {}; // Cleanup first
-		if (not deleterecord("xo_clients", "GD001")) {}; // Cleanup first
-		if (not osremove(ostempdirpath() ^ "xo_gendoc_test.conf.bak")) {}; // Cleanup first
-		if (not osremove(ostempdirpath() ^ "xo_gendoc_test.conf")) {}; // Cleanup first
-		if (osrmdir("xo_test/aaa")) {}; // Cleanup first
+		 if (not dbdelete("xo_gendoc_testdb")) {}; // Cleanup first
+		 if (not dbdelete("xo_gendoc_testdb2")) {}; // Cleanup first
+		 if (not deleteindex("definitions", "DATE_TIME")) {}; // Cleanup first
+		 if (not deleterecord("xo_clients", "GD001")) {}; // Cleanup first
+		 if (not osremove(ostempdirpath() ^ "xo_gendoc_test.conf.bak")) {}; // Cleanup first
+		 if (not osremove(ostempdirpath() ^ "xo_gendoc_test.conf")) {}; // Cleanup first
+		 if (osrmdir("xo_test/aaa")) {}; // Cleanup first
 };
 
 programexit()

@@ -133,6 +133,7 @@ class PUBLIC ExodusProgramBase {
 
 	// work on CURSOR
 	bool select(in sortselectclause_or_filehandle = "");
+	bool makeselect(in keys);
 	ND bool hasnext();
 	bool readnext(io key);
 	bool readnext(io key, io valueno);
@@ -143,11 +144,15 @@ class PUBLIC ExodusProgramBase {
 	// THIS should be removed from exoprog and made a free function that doesnt use CURSOR
 	bool deleterecord(in filename_or_handle_or_command, in key = "");
 
-	bool savelist(in listname);
-	bool getlist(in listname);
-	bool formlist(in filename_or_command, in keys = "", const var fieldno = 0);
-	bool makelist(in listname, in keys);
-	bool deletelist(in listname);
+	bool savelist(SV listname);
+	bool getlist(SV listname);
+	bool deletelist(SV listname);
+
+	[[deprecated ("exoprog:::formlist() Resolve by refactoring. Read keys directly and call makeselect(keys)")]]
+	bool formlist(SV filename_or_command, in keys = "", const int fieldno = 0);
+
+	[[deprecated ("exoprog::makelist() Refactor makelist(\"\", keys) as makeselect(keys) or use fixdeprecated")]]
+	bool makelist(SV listname, in keys);
 
 	void note(in msg, in options = "") const;
 	void note(in msg, in options, io buffer, in params = "") const;

@@ -256,7 +256,8 @@ programinit()
 			assert(rec eq "aa^bb^cc"_var);
 
 			printl("Make an active list from a record");
-			assert(formlist(tempfile, "ZZZ"));
+//			assert(formlist(tempfile, "ZZZ"));
+			assert(makeselect(rec));
 			assert(LISTACTIVE);
 
 			assert(readnext(ID));
@@ -272,8 +273,9 @@ programinit()
 
 			printl("Make an active list from a multivalued record field");
 //			assert(write("aa^bb^c1]c2]c3^dd"_var on tempfile, "ZZZ"));
-			write("aa^bb^c1]c2]c3^dd"_var on tempfile, "ZZZ");
-			assert(formlist(tempfile, "ZZZ", 3));
+//			write("aa^bb^c1]c2]c3^dd"_var on tempfile, "ZZZ");
+			makeselect("aa^bb^c1]c2]c3^dd"_var.f(3).raise());
+//			assert(formlist(tempfile, "ZZZ", 3));
 			assert(LISTACTIVE);
 
 			assert(readnext(ID));

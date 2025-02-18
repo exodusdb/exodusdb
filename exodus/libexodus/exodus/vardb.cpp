@@ -4490,7 +4490,7 @@ bool var::selectx(in fieldnames, in sortselectclause) {
 	}
 
 	// if any active select, convert to a file and use as an additional filter on key
-	// or correctly named savelistfilename exists from getselect or makelist
+	// or correctly named savelistfilename exists from getselect or makeselect
 	var listname = "";
 	// see also listname below
 	//	if (this->hasnext()) {
@@ -4694,8 +4694,8 @@ void var::clearselect() {
 	this->default_to("");
 
 	/// if readnext through string
-	//3/4/5/6 setup in makelist. cleared in clearselect
-	//if (this->f(3) == "%MAKELIST%")
+	//3/4/5/6 setup in makeselect. cleared in clearselect
+	//if (this->f(3) == "%MAKESELECT%")
 	{
 		this->r(6, "");
 		this->r(5, "");
@@ -4907,14 +4907,13 @@ static bool readnextx(in cursor, PGconn* pgconn, int  direction, PGresult*& pgre
 	return true;
 }
 
-bool var::deletelist(in listname) const {
+bool var::deletelist(SV listname) const {
 
-	THISIS("bool var::deletelist(in listname) const")
+	THISIS("bool var::deletelist(SV listname) const")
 	assertVar(function_sig);
-	ISSTRING(listname)
 
 	if (DBTRACE)
-		this->logputl("DBTR var::deletelist(" ^ listname ^ ") ");
+		this->logputl("DBTR var::deletelist(" ^ var(listname) ^ ") ");
 
 	// open the lists file on the same connection
 	var lists = *this;
@@ -4928,23 +4927,23 @@ bool var::deletelist(in listname) const {
 
 	// supplementary blocks of keys are stored with suffix *2, *3 etc)
 	for (int listno = 2;; ++listno) {
+		const var listname2 = listname;
 		var xx;
-		if (!xx.read(lists, listname ^ "*" ^ listno))
+		if (!xx.read(lists, listname2 ^ "*" ^ listno))
 			break;
-		lists.deleterecord(listname ^ "*" ^ listno);
+		lists.deleterecord(listname2 ^ "*" ^ listno);
 	}
 
 	return true;
 }
 
-bool var::savelist(in listname) {
+bool var::savelist(SV listname) {
 
-	THISIS("bool var::savelist(in listname)")
+	THISIS("bool var::savelist(SV listname)")
 	assertVar(function_sig);
-	ISSTRING(listname)
 
 	if (DBTRACE)
-		this->logputl("DBTR var::savelist(" ^ listname ^ ") ");
+		this->logputl("DBTR var::savelist(" ^ var(listname) ^ ") ");
 
 	// open the lists file on the same connection
 	var lists = *this;
@@ -4957,6 +4956,7 @@ bool var::savelist(in listname) {
 
 	var listno = 1;
 	var listkey = listname;
+	const var listname2 = listname;
 	var list = "";
 	// Limit maximum number of keys in one block to 1Mb
 	constexpr int maxlistsize = 1024 * 1024;
@@ -4985,7 +4985,7 @@ bool var::savelist(in listname) {
 		// first list block is listno 1 but has no suffix
 		// 2nd list block is listno 2 and has suffice *2
 		listno++;
-		listkey = listname ^ "*" ^ listno;
+		listkey = listname2 ^ "*" ^ listno;
 		list = "";
 	};
 
@@ -5020,19 +5020,19 @@ bool var::savelist(in listname) {
 	return listno > 1;
 }
 
-bool var::getlist(in listname) {
+bool var::getlist(SV listname) {
 
-	THISIS("bool var::getlist(in listname) const")
+	THISIS("bool var::getlist(SV listname) const")
 	assertVar(function_sig);
-	ISSTRING(listname)
 
 	if (DBTRACE)
-		listname.logputl("DBTR var::getlist(" ^ listname ^ ") ");
+		this->logputl("DBTR var::getlist(" ^ var(listname) ^ ") ");
 
 	//int recn = 0;
 	var key;
 	var mv;
-	var listfilename = "savelist_" ^ listname.field(" ", 1);
+	const var listname2 = listname;
+	var listfilename = "savelist_" ^ listname2.field(" ", 1);
 	listfilename.converter("-.*/", "____");
 	// return this->selectx("key, mv::integer",listfilename);
 
@@ -5067,73 +5067,97 @@ bool var::getlist(in listname) {
 	return true;
 }
 
-//TODO make it work for multiple keys or select list
-bool var::formlist(in keys, in fieldno) {
-
-	THISIS("bool var::formlist(in keys, in fieldno)")
-	assertString(function_sig);
-	ISSTRING(keys)
-	ISNUMERIC(fieldno)
-
-	if (DBTRACE)
-		keys.logputl("DBTR var::formlist() ");
-
-	this->clearselect();
-
-	var record;
-	if (not record.read(*this, keys)) UNLIKELY {
-		keys.errputl("formlist() cannot read on handle(" ^ *this ^ ") ");
-		return false;
-	}
-
-	//optional field extract
-	if (fieldno)
-		record = record.f(fieldno).convert(VM, FM);
-
-	if (not this->makelist("", record)) UNLIKELY
-		throw VarDBException(this->lasterror());
-
-	return true;
-}
+////TODO make it work for multiple keys or select list
+//bool var::formlist(in keys, const int fieldno /*=0*/) {
+//
+//	THISIS("bool var::formlist(in keys, const int fieldno)")
+//	assertString(function_sig);
+//	ISSTRING(keys)
+//
+//	if (DBTRACE)
+//		keys.logputl("DBTR var::formlist() ");
+//
+//	this->clearselect();
+//
+//	var record;
+//	if (not record.read(*this, keys)) UNLIKELY {
+//		keys.errputl("formlist() cannot read on handle(" ^ *this ^ ") ");
+//		return false;
+//	}
+//
+//	//optional field extract
+//	if (fieldno)
+//		record = record.f(fieldno).convert(VM, FM);
+//
+//	if (not this->makeselect(record)) UNLIKELY
+//		throw VarDBException(this->lasterror());
+//
+//	return true;
+//}
+//
+// Making a list can be done simply by writing the keys into the list file
+// Empty list makes this function call makeselect
+// This function is not often used since can be achieved by writing keys to lists file directly
+//bool var::makelist(SV listname, in keys) {
+//
+//	THISIS("bool var::makelist(SV listname, in keys)")
+//	assertVar(function_sig);
+//	ISSTRING(keys)
+//
+//	if (DBTRACE)
+//		this->logputl("DBTR var::makelist(" ^ keys.field(_FM, 1, 3).quote() ^ "...) ");
+//
+//	// Call makeselect instead.
+//	// TODO Deprecate and remove
+//	if (listname.empty()) {
+//		return this->makeselect(keys);
+//	}
+//
+//	this->deletelist(listname);
+//
+//	// open the lists file on the same connection
+//	var lists = *this;
+//	if (!lists.open("LISTS")) UNLIKELY {
+//		var errmsg = "makelist() LISTS file cannot be opened";
+//		this->setlasterror(errmsg);
+//		// this->loglasterror();
+//		throw VarDBException(errmsg);
+//	}
+//
+//	keys.write(lists, listname);
+//	return true;
+//}
 
 // MAKELIST would be much better called MAKESELECT
 // since the most common usage is to omit listname in which case the keys will be used to simulate a
+// supplementary blocks of keys are stored with suffix *2, *3 etc)
 // SELECT statement Making a list can be done simply by writing the keys into the list file without
 // using this function
-bool var::makelist(in listname, in keys) {
+bool var::makeselect(in keys) {
 
-	THISIS("bool var::makelist(in listname)")
+	THISIS("bool var::makeselect(in keys)")
 	assertVar(function_sig);
-	ISSTRING(listname)
 	ISSTRING(keys)
 
 	if (DBTRACE)
-		this->logputl("DBTR var::makelist(" ^ listname ^ ") ");
+		this->logputl("DBTR var::makeselect(" ^ keys.field(_FM, 1, 3).quote() ^ "...) ");
 
-	// this is not often used since can be achieved by writing keys to lists file directly
-	if (listname) {
-		this->deletelist(listname);
+	this->clearselect();
 
-		// open the lists file on the same connection
-		var lists = *this;
-		if (!lists.open("LISTS")) UNLIKELY {
-			var errmsg = "makelist() LISTS file cannot be opened";
-			this->setlasterror(errmsg);
-			// this->loglasterror();
-			throw VarDBException(errmsg);
-		}
-
-		keys.write(lists, listname);
-		return true;
+	// Keys must be provided
+	if (keys.empty()) {
+		const var errmsg = "makeselect() keys cannot be empty";
+		this->setlasterror(errmsg);
+		return false;
 	}
 
 	// provide a block of keys for readnext
-	//3/4/5/6 setup in makelist. cleared in clearselect
+	//3/4/5/6 setup in makeselect. cleared in clearselect
 
 	// listid in the lists file must be set for readnext to work, but not exist in the file
-	// readnext will look for %MAKELIST%*2 in the lists file when it reaches the end of the
+	// readnext will look for %MAKESELECT%*2 in the lists file when it reaches the end of the
 	// block of keys provided and must not find it
-	this->r(3, "%MAKELIST%");
+	this->r(3, "%MAKESELECT%");
 
 	// list number for readnext to get next block of keys from lists file
 	// suffix for first block is nothing (not *1) and then *2, *3 etc
@@ -5297,8 +5321,8 @@ bool var::readnext(io record, io key, io valueno) {
 			// if no more keys, try to get next block of keys, otherwise return false
 			if (key_and_mv.len() == 0) {
 
-				// makelist provides one block of keys and nothing in the lists file
-				if (listid == "%MAKELIST%") UNLIKELY {
+				// makeselect provides one block of keys and nothing in the lists file
+				if (listid == "%MAKESELECT%") UNLIKELY {
 					this->r(3, "");
 					this->r(4, "");
 					this->r(5, "");

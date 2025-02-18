@@ -169,14 +169,15 @@ auto get_timebank_acno(const std::string_view arg1) -> int {
 	else if (++acno && arg1 == "bool var::deletefile(in filename)") {}
 	else if (++acno && arg1 == "bool var::clearfile(in filename)") {}
 	else if (++acno && arg1 == "bool var::select(in sortselectclause) const") {}
-	else if (++acno && arg1 == "bool var::deletelist(in listname) const") {}
-	else if (++acno && arg1 == "bool var::savelist(in listname)") {}
-	else if (++acno && arg1 == "bool var::getlist(in listname) const") {}
-	else if (++acno && arg1 == "bool var::formlist(in keys, in fieldno)") {}
-	else if (++acno && arg1 == "bool var::makelist(in listname)") {}
+	else if (++acno && arg1 == "bool var::makeselect(in keys)") {}
 	else if (++acno && arg1 == "bool var::hasnext() const") {}
 	else if (++acno && arg1 == "bool var::readnext(io key, io valueno) const") {}
 	else if (++acno && arg1 == "bool var::readnext(io record, io key, io valueno) const") {}
+	else if (++acno && arg1 == "bool var::savelist(SV listname)") {}
+	else if (++acno && arg1 == "bool var::getlist(SV listname) const") {}
+	else if (++acno && arg1 == "bool var::deletelist(SV listname) const") {}
+//	else if (++acno && arg1 == "bool var::formlist(in keys, const int fieldno)") {}
+//	else if (++acno && arg1 == "bool var::makelist(SV listname, in keys)") {}
 	else if (++acno && arg1 == "bool var::createindex(in fieldname, in dictfile) const") {}
 	else if (++acno && arg1 == "bool var::deleteindex(in fieldname) const") {}
 	else if (++acno && arg1 == "var  var::listfiles() const") {}
