@@ -36,7 +36,6 @@ function main() {
 		// Skip and capture output dir for examples .cpp
 		if (osdir(osfilename)) {
 			codefile_dir = osfilename;
-//			TRACE(codefile_dir)
 			continue;
 		}
 
@@ -55,7 +54,6 @@ function main() {
 		//////////////////////////////////////////////
 
 		let temp_code_filename = ostempfilename();
-//		TRACE(temp_code_filename)
 		std::ofstream codefile(temp_code_filename.toString());
 
 		// Start the code examples file
@@ -102,8 +100,10 @@ function main() {
 		for (var srcline : src) {
 
 			// tabs become spaces
-			srcline.replacer("\t", " ");
-			srcline.trimmer();
+//			srcline.replacer("\t", " ");
+			srcline.replacer("\t", "    ");
+//			srcline.trimmer();
+			srcline.trimmerboth();
 
 			// "[[Deprecated" flags that the following function line should not be documented
 			if (srcline.starts("[[deprecated")) {
@@ -261,7 +261,8 @@ function main() {
 
 			srcline = srcline.field(" ", 2, 9999);
 //			var comments = srcline.field("{", 1).field(";", 2, 9999).trimmerfirst("/ ");
-			var comments = srcline.field("/" "/", 2, 99999).trimfirst();
+//!!!			var comments = srcline.field("/" "/", 2, 99999).trimfirst();
+			var comments = srcline.field("/" "/", 2, 99999);
 			srcline = srcline.field("/" "/", 1).field("{", 1).trimlast();
 			let funcname = srcline.field("(", 1);
 
@@ -294,7 +295,6 @@ function main() {
 
 			// Format backticked source code fragments
 			if (comments.contains("`")) {
-
 				// FMs inside backticks (c++ code) become simple "\n"
 				bool backtick = false;
 				for (int charn : range(1, comments.len())) {
@@ -333,17 +333,15 @@ function main() {
 
 				for (var codematch : codematches) {
 					codematch = codematch.f(1, 2);
-
 					// ... becomes proper code
 					let aborting = " abort(\"" ^ funcname ^ ": \" ^ lasterror());";
 					codematch.replacer(") ... ok", ") {/" "*ok*" "/} else " ^ aborting);
 					codematch.replacer(") ... true", ") {/" "*true*" "/} else " ^ aborting);
 					codematch.replacer(" ...", aborting);
-
 					codematch.replacer("\n", "\n\t\t");
 					codematch.replacer("\n\t\t\n", "\n");
 
-					// Remove cleanup lines to be put in heading of
+					// Remove "// Cleanup" lines to be put in heading of
 					static rex cleanup_pattern {R"__(^[^\n]*// Cleanup[^\n]*)__"};
 					var cleanups = codematch.match(cleanup_pattern);
 					if (cleanups) {
@@ -422,7 +420,7 @@ function main() {
 					// .nf No format
 					// .RE REturn (left shift)
 					// .fi formatting
-					comments.replacer(backquoted, ".RS\n.nf\n\n$1\n.fi\n.RE\n");
+					comments.replacer(backquoted, "\nExample:\n.RS\n.nf\n $1\n.fi\n.RE\n");
 				}
 				else if (wiki)
 					comments.replacer(backquoted, "<syntaxhighlight lang=\"c++\">\n$1</syntaxhighlight>");

@@ -299,7 +299,7 @@ bool ExodusProgramBase::select(in sortselectclause_or_filehandle) {
 		//create the temporary table
 		if (!CURSOR.sqlexec(createtablesql))
 			UNLIKELY
-			throw VarError("ExodusProgramBase::select " ^ var().lasterror());
+			throw VarError("ExodusProgramBase::select " ^ CURSOR.lasterror());
 
 	} else
 		baseinsertsql = "";
@@ -490,17 +490,18 @@ bool ExodusProgramBase::select(in sortselectclause_or_filehandle) {
 }
 
 // savelist
-bool ExodusProgramBase::savelist(in listname) {
-	return CURSOR.savelist(listname.field(" ", 1));
+bool ExodusProgramBase::savelist(SV listname) {
+	return CURSOR.savelist(var(listname).field(" ", 1));
 }
 
 // getlist
-bool ExodusProgramBase::getlist(in listname) {
-	return CURSOR.getlist(listname.field(" ", 1));
+bool ExodusProgramBase::getlist(SV listname) {
+	return CURSOR.getlist(var(listname).field(" ", 1));
 }
 
 // formlist
-bool ExodusProgramBase::formlist(in filename_or_command, in keys /*=""*/, const var fieldno /*=0*/) {
+bool ExodusProgramBase::formlist(SV filename_or_command, in keys /*=""*/, const int fieldno /*=0*/) {
+
 	//remove any options from the filename or command
 	var filename2 = filename_or_command;
 	if (filename2.ends(")")) {
@@ -519,19 +520,43 @@ bool ExodusProgramBase::formlist(in filename_or_command, in keys /*=""*/, const 
 	clearselect();
 	if (not CURSOR.open(filename2))
 		UNLIKELY
-		throw VarError(filename2.quote() ^ " file cannot be opened in formlist(" ^ keys ^ ")");
+		throw VarDBException(filename2.quote() ^ " file cannot be opened in formlist(" ^ keys ^ ")");
 
-	return CURSOR.formlist(keys2, fieldno);
+// No longer available in vardb
+//	return CURSOR.formlist(keys2, fieldno);
+
+	var record;
+	if (not record.read(CURSOR, keys2)) UNLIKELY {
+//		throw VarError("formlist() cannot read on handle(" ^ CURSOR ^ ") ");
+		keys2.errputl("formlist() cannot read on handle(" ^ CURSOR ^ ") ");
+		return false;
+	}
+
+	//optional field extract
+	if (fieldno)
+		record = record.f(fieldno).convert(VM, FM);
+
+	if (not this->makeselect(record)) UNLIKELY
+		throw VarDBException(CURSOR.lasterror());
+
+	return true;
 }
 
 // makelist
-bool ExodusProgramBase::makelist(in listname, in keys) {
-	return CURSOR.makelist(listname.field(" ", 1), keys);
+bool ExodusProgramBase::makelist(SV listname, in keys) {
+	if (not listname.empty())
+		throw VarDBException("makelist() with listname is not longer supported. Write to the lists file directly instead.");
+	return CURSOR.makeselect(keys);
+}
+
+// makelist
+bool ExodusProgramBase::makeselect(in keys) {
+	return CURSOR.makeselect(keys);
 }
 
 // deletelist
-bool ExodusProgramBase::deletelist(in listname) {
-	return CURSOR.deletelist(listname.field(" ", 1));
+bool ExodusProgramBase::deletelist(SV listname) {
+	return CURSOR.deletelist(var(listname).field(" ", 1));
 }
 
 // clearselect
