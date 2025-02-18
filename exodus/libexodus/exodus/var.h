@@ -246,8 +246,7 @@ public:
 	///// STRING CREATION:
 	/////////////////////
 
-    // Returns: A string representation of a decimal number rounded to a desired number of decimal places
-	// Returns: A var ASCII string with exact decimal places requested.
+	// Returns: A var containing an ASCII string with the number of decimal places requested.
     // .5 always rounds away from zero.
 	// obj is varnum
 	//
@@ -258,12 +257,17 @@ public:
     //  var v3 = var(-0.295).round(2); // "-0.30"
     //  // or
     //  var v4 = round(-1.295, 2);     // "-1.30"`
+	//
+	// Negative number of decimals rounds to the left of the decimal point
+	// `let v1 = round(123456.789,  0); // "123457"
+	//  let v2 = round(123456.789, -1); // "123460"
+	//  let v3 = round(123456.789, -2); // "123500"`
     ND var  round(const int ndecimals = 0) const;
 
 	// obj is var()
 
 	// Returns: A string containing a single char (byte) given an integer 0-255.
-	// 0-127 -> ASCII, 128-255 -> invalid UTF-8 so cannot be written to database or used various exodus string operations
+	// 0-127 -> ASCII, 128-255 -> invalid UTF-8 which cannot be written to the database or used in many exodus string operations
 	//
 	// `let v1 = var().chr(0x61); // "a"
 	//  // or
@@ -271,9 +275,7 @@ public:
 	ND var  chr(const int num) const;
 
 	// Returns: A string of a single unicode code point in utf8 encoding.
-	// To get utf codepoints > 2^63 you must provide negative ints
-	// Not providing implicit constructor from var to unsigned int due to getting ambigious conversions
-	// since int and unsigned int are parallel priority in c++ implicit conversions
+	// To get utf codepoints > 2^63 you must provide negative ints because var doesnt provide an implicit constructor to unsigned int due to getting ambigious conversions because int and unsigned int are parallel priority in c++ implicit conversions.
 	//
 	// `let v1 = var().textchr(171416); // "𩶘" // or "\xF0A9B698"
 	//  // or
@@ -337,9 +339,10 @@ public:
 	// This is a shorthand and more expressive way of writing 'if (var == "")' or 'if (var.len() == 0)' or 'if (not var.len())'
 	// Note that 'if (var.empty())' is not the same as 'if (not var)' because 'if (var("0.0")' is defined as false because the string can be converted to a 0 which is always considered to be false. Compare thia with common scripting languages where 'if (var("0"))' is defined as true.
 	//
-	// `let v1 = "0"_var.empty(); // false
+	// `let v1 = "0";
+	//  if (not v1.empty()) ... ok /// true
 	//  // or
-	//  let v2 = empty(""); // true`
+	//  if (not empty(v1)) ... ok // true`
 	ND bool empty() const;
 
 	// Returns: The number of output columns.
@@ -434,11 +437,9 @@ public:
 	//  let v2 = match("abc1abc2", "BC(\\d)", "i");`
 	//
 	// regex_options:
-	//
+	// <pre>
     // l - Literal (any regex chars are treated as normal chars)
-	//
     // i - Case insensitive
-	//
     // p - ECMAScript/Perl (the default)
     // b - Basic POSIX (same as sed)
     // e - Extended POSIX
@@ -450,10 +451,9 @@ public:
 	//
     // m - Multiline. Default in boost (and therefore exodus)
     // s - Single line. Default in std::regex
-	//
 	// f - First only. Only for replace() (not match() or search())
-	//
     // w - Wildcard glob style (e.g. *.cfg) not regex style. Only for match() and search(). Not replace().
+	// </pre>
 	ND var  match(SV regex_str, SV regex_options = "") const;
 
 	// Ditto
@@ -1855,7 +1855,7 @@ public:
 	// `var dbfile = "";
 	//  let keys = "A01^B02^C03"_var;
 	//  if (dbfile.selectkeys(keys)) ... ok
-	//  assert(conn.readnext(ID) and ID == "A01");
+	//  assert(dbfile.readnext(ID) and ID == "A01");
 	//  // or
 	//  if (selectkeys(keys)) ... ok
 	//  assert(readnext(ID) and ID == "A01");`
@@ -2064,7 +2064,7 @@ public:
 	// 2. dirpaths
 	// 3. filenames
 	// 4. d=dir, f=file
-	//
+	// <pre>
 	// Possible event type codes are as follows:
 	// * IN_CLOSE_WRITE⋅- A file opened for writing was closed
 	// * IN_ACCESS⋅⋅⋅⋅⋅⋅- Data was read from file
@@ -2078,6 +2078,7 @@ public:
 	// * IN_DELETE⋅⋅⋅⋅⋅⋅- A file was deleted from the directory
 	// * IN_DELETE_SELF⋅- Directory or file under observation was deleted
 	// * IN_MOVE_SELF⋅⋅⋅- Directory or file under observation was moved
+	// </pre>
 	   var  oswait(const int milliseconds) const;
 
 	///// OS FILE I/O:
@@ -2710,31 +2711,31 @@ public:
 	// Any multifield/multivalue structure is preserved.
 	// obj is vardate
 	//
-	//  `let v1 = 12345;
-	//   assert( v1.oconv( "D"⋅⋅⋅) == "18 OCT 2001"⋅⋅); // Default
-	//	 assert( v1.oconv( "D/"⋅⋅) == "10/18/2001"⋅⋅⋅); // / separator
-	//	 assert( v1.oconv( "D-"⋅⋅) == "10-18-2001"⋅⋅⋅); // - separator
-	//	 assert( v1.oconv( "D2"⋅⋅) == "18 OCT 01"⋅⋅⋅⋅); // 2 digit year
-	//	 assert( v1.oconv( "D/E"⋅) == "18/10/2001"⋅⋅⋅); // International order with /
-	//	 assert( v1.oconv( "DS"⋅⋅) == "2001 OCT 18"⋅⋅); // ISO Year first
-	//	 assert( v1.oconv( "DS-"⋅) == "2001-10-18"⋅⋅⋅); // ISO Year first with -
-	//	 assert( v1.oconv( "DM"⋅⋅) == "10"⋅⋅⋅⋅⋅⋅⋅⋅⋅⋅⋅); // Month number
-	//	 assert( v1.oconv( "DMA"⋅) == "OCTOBER"⋅⋅⋅⋅⋅⋅); // Month name
-	//	 assert( v1.oconv( "DY"⋅⋅) == "2001"⋅⋅⋅⋅⋅⋅⋅⋅⋅); // Year number
-	//	 assert( v1.oconv( "DY2"⋅) == "01"⋅⋅⋅⋅⋅⋅⋅⋅⋅⋅⋅); // Year 2 digits
-	//	 assert( v1.oconv( "DD"⋅⋅) == "18"⋅⋅⋅⋅⋅⋅⋅⋅⋅⋅⋅); // Day number in month (1-31)
-	//	 assert( v1.oconv( "DW"⋅⋅) == "4"⋅⋅⋅⋅⋅⋅⋅⋅⋅⋅⋅⋅); // Weekday number (1-7)
-	//	 assert( v1.oconv( "DWA"⋅) == "THURSDAY"⋅⋅⋅⋅⋅); // Weekday name
-	//	 assert( v1.oconv( "DQ"⋅⋅) == "4"⋅⋅⋅⋅⋅⋅⋅⋅⋅⋅⋅⋅); // Quarter number
-	//	 assert( v1.oconv( "DJ"⋅⋅) == "291"⋅⋅⋅⋅⋅⋅⋅⋅⋅⋅); // Day number in year
-	//	 assert( v1.oconv( "DL"⋅⋅) == "31"⋅⋅⋅⋅⋅⋅⋅⋅⋅⋅⋅); // Last day number of month (28-31)
+	// `let v1 = 12345;
+	//  assert( v1.oconv( "D"   ) == "18 OCT 2001"  ); // Default
+	//  assert( v1.oconv( "D/"  ) == "10/18/2001"   ); // / separator
+	//  assert( v1.oconv( "D-"  ) == "10-18-2001"   ); // - separator
+	//  assert( v1.oconv( "D2"  ) == "18 OCT 01"    ); // 2 digit year
+	//  assert( v1.oconv( "D/E" ) == "18/10/2001"   ); // International order with /
+	//  assert( v1.oconv( "DS"  ) == "2001 OCT 18"  ); // ISO Year first
+	//  assert( v1.oconv( "DS-" ) == "2001-10-18"   ); // ISO Year first with -
+	//  assert( v1.oconv( "DM"  ) == "10"           ); // Month number
+	//  assert( v1.oconv( "DMA" ) == "OCTOBER"      ); // Month name
+	//  assert( v1.oconv( "DY"  ) == "2001"         ); // Year number
+	//  assert( v1.oconv( "DY2" ) == "01"           ); // Year 2 digits
+	//  assert( v1.oconv( "DD"  ) == "18"           ); // Day number in month (1-31)
+	//  assert( v1.oconv( "DW"  ) == "4"            ); // Weekday number (1-7)
+	//  assert( v1.oconv( "DWA" ) == "THURSDAY"     ); // Weekday name
+	//  assert( v1.oconv( "DQ"  ) == "4"            ); // Quarter number
+	//  assert( v1.oconv( "DJ"  ) == "291"          ); // Day number in year
+	//  assert( v1.oconv( "DL"  ) == "31"           ); // Last day number of month (28-31)
 	//
 	//  // Multifield/multivalue
 	//  var v2 = "12345^12346]12347"_var;
 	//  assert(v2.oconv("D") == "18 OCT 2001^19 OCT 2001]20 OCT 2001"_var);
 	//
 	//   // or
-	//   assert( oconv(v1, "D"⋅⋅⋅) == "18 OCT 2001"⋅⋅);`
+	//   assert( oconv(v1, "D"   ) == "18 OCT 2001"  );`
 	ND std::string oconv_D(const char* conversion) const;
 
 	// Date input: Convert human readable date to internal date format.
@@ -2744,27 +2745,27 @@ public:
 	// obj is varstr
 	//
 	// `// International order "DE"
-	//  assert(⋅⋅⋅⋅⋅⋅⋅⋅⋅⋅⋅⋅oconv(19005, "DE") == "12 JAN 2020");
-	//  assert(⋅⋅⋅"12/1/2020"_var.iconv("DE") == 19005);
-	//  assert(⋅⋅⋅"12 1 2020"_var.iconv("DE") == 19005);
-	//  assert(⋅⋅⋅"12-1-2020"_var.iconv("DE") == 19005);
-	//  assert(⋅"12 JAN 2020"_var.iconv("DE") == 19005);
-	//  assert(⋅"jan 12 2020"_var.iconv("DE") == 19005);
+	//  assert(            oconv(19005, "DE") == "12 JAN 2020");
+	//  assert(   "12/1/2020"_var.iconv("DE") == 19005);
+	//  assert(   "12 1 2020"_var.iconv("DE") == 19005);
+	//  assert(   "12-1-2020"_var.iconv("DE") == 19005);
+	//  assert( "12 JAN 2020"_var.iconv("DE") == 19005);
+	//  assert( "jan 12 2020"_var.iconv("DE") == 19005);
 	//
 	//  // American order "D"
-	//  assert(⋅⋅⋅⋅⋅⋅⋅⋅⋅⋅⋅⋅oconv(19329, "D") == "01 DEC 2020");
-	//  assert(⋅⋅⋅"12/1/2020"_var.iconv("D") == 19329);
-	//  assert(⋅⋅"DEC 1 2020"_var.iconv("D") == 19329);
-	//  assert(⋅⋅"1 dec 2020"_var.iconv("D") == 19329);
+	//  assert(            oconv(19329, "D") == "01 DEC 2020");
+	//  assert(   "12/1/2020"_var.iconv("D") == 19329);
+	//  assert(  "DEC 1 2020"_var.iconv("D") == 19329);
+	//  assert(  "1 dec 2020"_var.iconv("D") == 19329);
 	//
 	//  // Reverse order
-	//  assert(⋅⋅"2020/12/1"_var.iconv("DE") == 19329);
-	//  assert(⋅⋅⋅"2020-12-1"_var.iconv("D") == 19329);
-	//  assert(⋅⋅"2020 1 dec"_var.iconv("D") == 19329);
+	//  assert(  "2020/12/1"_var.iconv("DE") == 19329);
+	//  assert(   "2020-12-1"_var.iconv("D") == 19329);
+	//  assert(  "2020 1 dec"_var.iconv("D") == 19329);
 	//
 	//  //Invalid date
-	//  assert(⋅⋅⋅"2/29/2021"_var.iconv("D") == "");
-	//  assert(⋅⋅"29/2/2021"_var.iconv("DE") == "");
+	//  assert(   "2/29/2021"_var.iconv("D") == "");
+	//  assert(  "29/2/2021"_var.iconv("DE") == "");
 	//
 	//  // or
 	//  assert(iconv("12/1/2020"_var, "DE") == 19005);`
@@ -2782,23 +2783,23 @@ public:
 	// obj is vartime
 	//
 	// `var v1 = 234800;
-	//  assert( v1.oconv( "MT"⋅⋅⋅) == "17:13"⋅⋅⋅⋅⋅⋅);
-	//  assert( v1.oconv( "MTH"⋅⋅) == "05:13PM"⋅⋅⋅⋅);
-	//  assert( v1.oconv( "MTS"⋅⋅) == "17:13:20"⋅⋅⋅);
-	//  assert( v1.oconv( "MTHS"⋅) == "05:13:20PM"⋅);
+	//  assert( v1.oconv( "MT"   ) == "17:13"      ); // Default
+	//  assert( v1.oconv( "MTH"  ) == "05:13PM"    ); // 'H' flag for AM/PM
+	//  assert( v1.oconv( "MTS"  ) == "17:13:20"   ); // 'S' flag for seconds
+	//  assert( v1.oconv( "MTHS" ) == "05:13:20PM" ); // Both flags
 	//
 	//  var v2 = 0;
-	//  assert( v2.oconv( "MT"⋅⋅⋅) == "00:00"⋅⋅⋅⋅⋅⋅);
-	//  assert( v2.oconv( "MTH"⋅⋅) == "12:00AM"⋅⋅⋅⋅);
-	//  assert( v2.oconv( "MTS"⋅⋅) == "00:00:00"⋅⋅⋅);
-	//  assert( v2.oconv( "MTHS"⋅) == "12:00:00AM"⋅);
+	//  assert( v2.oconv( "MT"   ) == "00:00"      );
+	//  assert( v2.oconv( "MTH"  ) == "12:00AM"    );
+	//  assert( v2.oconv( "MTS"  ) == "00:00:00"   );
+	//  assert( v2.oconv( "MTHS" ) == "12:00:00AM" );
 	//
 	//  // Multifield/multivalue
 	//  var v3 = "234800^234860]234920"_var;
 	//  assert(v3.oconv("MT") == "17:13^17:14]17:15"_var);
 	//
 	//  // or
-	//  assert( oconv(v1, "MT"⋅⋅⋅) == "17:13"⋅⋅⋅⋅⋅⋅);`
+	//  assert( oconv(v1, "MT"   ) == "17:13"      );`
 	ND std::string oconv_MT(const char* conversion) const;
 
 	// Time input: Convert human readable time (e.g. "10:30:59") to internal time format.
@@ -2808,16 +2809,16 @@ public:
 	// Any multifield/multivalue structure is preserved.
 	// obj is varstr
 	//
-	// `assert(⋅⋅⋅⋅⋅⋅"17:13"_var.iconv( "MT" ) == 61980);
-	//  assert(⋅⋅⋅⋅"05:13PM"_var.iconv( "MT" ) == 61980);
-	//  assert(⋅⋅⋅"17:13:20"_var.iconv( "MT" ) == 62000);
-	//  assert(⋅"05:13:20PM"_var.iconv( "MT" ) == 62000);
+	// `assert(      "17:13"_var.iconv( "MT" ) == 61980);
+	//  assert(    "05:13PM"_var.iconv( "MT" ) == 61980);
+	//  assert(   "17:13:20"_var.iconv( "MT" ) == 62000);
+	//  assert( "05:13:20PM"_var.iconv( "MT" ) == 62000);
 	//
-	//  assert(⋅⋅⋅⋅⋅⋅"00:00"_var.iconv( "MT" ) == 0);
-	//  assert(⋅⋅⋅⋅"12:00AM"_var.iconv( "MT" ) == 0);⋅⋅⋅⋅⋅// Midnight
-	//  assert(⋅⋅⋅⋅"12:00PM"_var.iconv( "MT" ) == 43200);⋅// Noon
-	//  assert(⋅⋅⋅"00:00:00"_var.iconv( "MT" ) == 0);
-	//  assert(⋅"12:00:00AM"_var.iconv( "MT" ) == 0);
+	//  assert(      "00:00"_var.iconv( "MT" ) == 0);
+	//  assert(    "12:00AM"_var.iconv( "MT" ) == 0);     // Midnight
+	//  assert(    "12:00PM"_var.iconv( "MT" ) == 43200); // Noon
+	//  assert(   "00:00:00"_var.iconv( "MT" ) == 0);
+	//  assert( "12:00:00AM"_var.iconv( "MT" ) == 0);
 	//
 	//  // Multifield/multivalue
 	//  assert("17:13^05:13PM]17:13:20"_var.iconv("MT") == "61980^61980]62000"_var);
@@ -2850,23 +2851,23 @@ public:
 	// obj is varnum
 	//
 	// `var v1 = -1234.567;
-	//  assert( v1.oconv( "MD20"⋅⋅⋅) ==⋅⋅"-1234.57"⋅⋅⋅);
-	//  assert( v1.oconv( "MD20,"⋅⋅) ==⋅"-1,234.57"⋅⋅⋅); // , flag
-	//  assert( v1.oconv( "MC20,"⋅⋅) ==⋅"-1.234,57"⋅⋅⋅); // MC code
-	//  assert( v1.oconv( "MD20,-"⋅) ==⋅⋅"1,234.57-"⋅⋅); // - flag
-	//  assert( v1.oconv( "MD20,<"⋅) ==⋅"<1,234.57>"⋅⋅); // < flag
-	//  assert( v1.oconv( "MD20,C"⋅) ==⋅⋅"1,234.57CR"⋅); // C flag
-	//  assert( v1.oconv( "MD20,D"⋅) ==⋅⋅"1,234.57DB"⋅); // D flag
+	//  assert( v1.oconv( "MD20"   ) ==  "-1234.57"   );
+	//  assert( v1.oconv( "MD20,"  ) == "-1,234.57"   ); // , flag
+	//  assert( v1.oconv( "MC20,"  ) == "-1.234,57"   ); // MC code
+	//  assert( v1.oconv( "MD20,-" ) ==  "1,234.57-"  ); // - flag
+	//  assert( v1.oconv( "MD20,<" ) == "<1,234.57>"  ); // < flag
+	//  assert( v1.oconv( "MD20,C" ) ==  "1,234.57CR" ); // C flag
+	//  assert( v1.oconv( "MD20,D" ) ==  "1,234.57DB" ); // D flag
 	//
 	//  // Multifield/multivalue
 	//  var v2 = "1.1^2.1]2.2"_var;
-	//  assert( v2.oconv( "MD20"⋅⋅⋅) == "1.10^2.10]2.20"_var);
+	//  assert( v2.oconv( "MD20"   ) == "1.10^2.10]2.20"_var);
 	//
 	//  // or
-	//  assert( oconv(v1, "MD20"⋅⋅⋅) ==⋅⋅"-1234.57"⋅⋅⋅);`
+	//  assert( oconv(v1, "MD20"   ) ==  "-1234.57"   );`
 	ND std::string oconv_MD(const char* conversion) const;
 
-	//  assert( v1.oconv( "MD2"⋅⋅⋅) ==⋅⋅⋅⋅"12.34"⋅);
+	//  assert( v1.oconv( "MD2"   ) ==    "12.34" );
 
 	// Text justification: Left, right and center. Padding and truncating. See Procrustes.
 	// e.g. "L#10", "R#10", "C#10"
@@ -2875,27 +2876,27 @@ public:
 	// ASCII only.
 	// obj is var
 	//
-	// `assert(⋅⋅⋅⋅⋅"abcde"_var.oconv(⋅"L#3"⋅) == "abc"⋅); // Truncating
-	//  assert(⋅⋅⋅⋅⋅"abcde"_var.oconv(⋅"R#3"⋅) == "cde"⋅);
-	//  assert(⋅⋅⋅⋅⋅"abcde"_var.oconv(⋅"C#3"⋅) == "abc"⋅);
+	// `assert(     "abcde"_var.oconv( "L#3" ) == "abc" ); // Truncating
+	//  assert(     "abcde"_var.oconv( "R#3" ) == "cde" );
+	//  assert(     "abcde"_var.oconv( "C#3" ) == "abc" );
 	//
-	//  assert(⋅⋅⋅⋅⋅"ab"_var.oconv(⋅"L#6"⋅) == "ab␣␣␣␣"⋅); // Padding
-	//  assert(⋅⋅⋅⋅⋅"ab"_var.oconv(⋅"R#6"⋅) == "␣␣␣␣ab"⋅);
-	//  assert(⋅⋅⋅⋅⋅"ab"_var.oconv(⋅"C#6"⋅) == "␣␣ab␣␣"⋅);
+	//  assert(     "ab"_var.oconv( "L#6" ) == "ab␣␣␣␣" ); // Padding
+	//  assert(     "ab"_var.oconv( "R#6" ) == "␣␣␣␣ab" );
+	//  assert(     "ab"_var.oconv( "C#6" ) == "␣␣ab␣␣" );
 	//
-	//  assert(⋅⋅⋅⋅⋅⋅var(42).oconv(⋅"L(0)#5"⋅) == "42000"⋅); // Padding character (x)
-	//  assert(⋅⋅⋅⋅⋅⋅var(42).oconv(⋅"R(0)#5"⋅) == "00042"⋅);
-	//  assert(⋅⋅⋅⋅⋅⋅var(42).oconv(⋅"C(0)#5"⋅) == "04200"⋅);
-	//  assert(⋅⋅⋅⋅⋅⋅var(42).oconv(⋅"C(0)#5"⋅) == "04200"⋅);
+	//  assert(      var(42).oconv( "L(0)#5" ) == "42000" ); // Padding character (x)
+	//  assert(      var(42).oconv( "R(0)#5" ) == "00042" );
+	//  assert(      var(42).oconv( "C(0)#5" ) == "04200" );
+	//  assert(      var(42).oconv( "C(0)#5" ) == "04200" );
 	//
 	//  // Multifield/multivalue
-	//  assert(⋅⋅⋅⋅⋅⋅"f1^v1]v2"_var.oconv("L(_)#5") == "f1___^v1___]v2___"_var);
+	//  assert(      "f1^v1]v2"_var.oconv("L(_)#5") == "f1___^v1___]v2___"_var);
 	//
 	//  // Fail for non-ASCII (Should be 5)
-	//  assert(⋅⋅⋅⋅⋅"🐱"_var.oconv("L#5").textwidth() == 3);
+	//  assert(     "🐱"_var.oconv("L#5").textwidth() == 3);
 	//
 	//  // or
-	//  assert(⋅⋅⋅⋅⋅oconv("abcd", "L#3"⋅) == "abc"⋅);`
+	//  assert(     oconv("abcd", "L#3" ) == "abc" );`
 	ND std::string oconv_LRC(in format) const;
 
 	// Text folding and justification.
@@ -2906,25 +2907,25 @@ public:
 	// obj is varstr
 	//
 	// `var v1 = "Have a nice day";
-	//  assert( v1.oconv("T#10") == "Have a␣␣␣␣|nice day␣␣"_var);
+	//  assert(  v1.oconv("T#10") == "Have a␣␣␣␣|nice day␣␣"_var);
 	//  // or
-	//  assert( oconv(v1, "T#10"⋅) == "Have a␣␣␣␣|nice day␣␣"_var⋅);`
+	//  assert( oconv(v1, "T#10") == "Have a␣␣␣␣|nice day␣␣"_var );`
 	ND std::string oconv_T(in format) const;
 
-	// Convert string to hexadecimal.
+	// Convert a string of bytes to a string of hexadecimal digits. The size of the output is precisely double that of the input.
 	// Multifield/multivalue structure is not preserved. Field marks are converted to HEX as for all other bytes.
 	// obj is varstr
 	//
-	// `assert(⋅⋅⋅⋅⋅"ab01"_var.oconv(⋅"HEX"⋅) == "61" "62" "30" "31"⋅);
-	//  assert(⋅"\xff\x00"_var.oconv(⋅"HEX"⋅) == "FF" "00"⋅⋅⋅⋅⋅⋅⋅⋅⋅⋅⋅); // Any bytes are ok.
-	//  assert(⋅⋅⋅⋅⋅⋅⋅⋅var(10).oconv(⋅"HEX"⋅) == "31" "30"⋅⋅⋅⋅⋅⋅⋅⋅⋅⋅⋅); // Uses ASCII string equivalent of 10 i.e. "10".
-	//  assert(⋅⋅⋅"\u0393"_var.oconv(⋅"HEX"⋅) == "CE" "93"⋅⋅⋅⋅⋅⋅⋅⋅⋅⋅⋅); // Greek capital Gamma in utf8 bytes.
-	//  assert(⋅⋅⋅⋅⋅"a^]b"_var.oconv(⋅"HEX"⋅) == "61" "1E" "1D" "62"⋅); // Field and value marks.
+	// `assert(     "ab01"_var.oconv( "HEX" ) == "61" "62" "30" "31" );
+	//  assert( "\xff\x00"_var.oconv( "HEX" ) == "FF" "00"           ); // Any bytes are ok.
+	//  assert(        var(10).oconv( "HEX" ) == "31" "30"           ); // Uses ASCII string equivalent of 10 i.e. "10".
+	//  assert(   "\u0393"_var.oconv( "HEX" ) == "CE" "93"           ); // Greek capital Gamma in utf8 bytes.
+	//  assert(     "a^]b"_var.oconv( "HEX" ) == "61" "1E" "1D" "62" ); // Field and value marks.
 	//  // or
-	//  assert(⋅⋅⋅⋅⋅⋅oconv("ab01"_var, "HEX") == "61" "62" "30" "31");`
+	//  assert(      oconv("ab01"_var, "HEX") == "61" "62" "30" "31");`
 	ND std::string oconv_HEX(const int ioratio) const;
 
-	// Convert hexadecimal to string.
+	// Convert a string of hexadecimal digits to a string of bytes. After prefixing a "0" to an odd sized input, the size of the output is precisely half that of the input.
 	// Reverse of oconv("HEX") above.
 	// obj is varstr
 	ND var  iconv_HEX(const int ioratio) const;
