@@ -43,15 +43,15 @@
 542 bool var::deletefile(in filename)
 543 bool var::clearfile(in filename)
 544 bool var::select(in sortselectclause) const
-545 bool var::deletelist(SV listname) const
-546 bool var::savelist(SV listname)
-547 bool var::getlist(SV listname) const
-548 bool var::formlist(in keys, const int fieldno)
-549 bool var::makelist(SV listname, in keys)
-550 bool var::makeselect(in keys)
-551 bool var::hasnext() const
-552 bool var::readnext(io key, io valueno) const
-553 bool var::readnext(io record, io key, io valueno) const
+545 bool var::selectkeys(in keys)
+546 bool var::hasnext() const
+547 bool var::readnext(io key, io valueno) const
+548 bool var::readnext(io record, io key, io valueno) const
+549 bool var::savelist(SV listname)
+550 bool var::getlist(SV listname) const
+551 bool var::deletelist(SV listname) const
+552 bool var::formlist(in keys, const int fieldno)
+553 bool var::makelist(SV listname, in keys)
 554 bool var::createindex(in fieldname, in dictfile) const
 555 bool var::deleteindex(in fieldname) const
 556 var  var::listfiles() const

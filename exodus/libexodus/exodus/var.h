@@ -1748,7 +1748,7 @@ public:
 	// obj is rec
 
 	// "Write cache" Writes a record and key into a memory cached "db file".
-	// The actual file is NOT updated.
+	// The actual database file is NOT updated.
 	// writec() either updates an existing cache record if the key already exists or otherwise inserts a new record into the cache.
 	// It always succeeds so no result code is returned.
 	// Neither the db file nor the record key need to actually exist in the actual db.
@@ -1772,14 +1772,14 @@ public:
 	//  // or
 	//  if (readc(rec from file, key)) ... ok
 	//
-	//  // Verify not in actual file by using read() not readc()
-	//  if (read(rec from file, key)) abort("Error: " ^ key ^ " should not be in the actual file"); // error`
+	//  // Verify not in actual database file by using read() not readc()
+	//  if (read(rec from file, key)) abort("Error: " ^ key ^ " should not be in the actual database file"); // error`
 	ND bool readc(in file, in key);
 
 	// obj is dbfile
 
 	// Deletes a record and key from a memory cached "file".
-	// The actual file is NOT updated.
+	// The actual database file is NOT updated.
 	// Returns: False if the key doesnt exist
 	//
 	// `var file = "xo_clients", key = "XD001";
@@ -1825,16 +1825,16 @@ public:
 	// obj is dbfile
 
 	// Create an active select list of keys of a database file.
+	// The select(command) function searches and orders database records for subsequent processing given an English language-like command.
+	// The primary job of a database, beyond mere storage and retrieval of information, is to allow rapid searching and ordering of information on demand.
+	// In Exodus, searching and ordering of information is known as "sort/select" and is performed by the select() function.
+	// Executing the select() function creates an "active select list" which can then be consumed by the readnext() function.
 	// dbfile: A opened database file or file name, or an open connection or an empty var for default connections. Subsequent readnext calls must use the same.
 	// sort_select_command: A natural language command using dictionary field names. The command can be blank if a dbfile or filename is given in dbfile or just a file name and all keys will be selected in undefined order.
 	// Example: "select xo_clients with type 'B' and with balance ge 100 by type by name"
 	// Option: "(R)" appended to the sort_select_command acquires the database records as well.
 	// Returns: True if any records are selected or false if none.
 	// Throws: VarDBException in case of any syntax error in the command.
-	// The select(command) function searches and orders database records for subsequent processing given an English language command.
-	// The primary job of a database, beyond mere storage and retrieval of information, is to allow rapid searching and ordering of information on demand.
-	// In Exodus, searching and ordering of information is known as sort/select and is performed by the select() function.
-	// Executing a select() function creates an "active select list" which can be consumed by the readnext() function.
 	// Active select lists created using var.select()'s member function syntax cannot be consumed by the free function form of readnext() and vice versa.
 	//
 	// `var clients = "xo_clients";
@@ -1854,15 +1854,15 @@ public:
 	//
 	// `var dbfile = "";
 	//  let keys = "A01^B02^C03"_var;
-	//  if (dbfile.makeselect(keys)) ... ok
+	//  if (dbfile.selectkeys(keys)) ... ok
 	//  assert(conn.readnext(ID) and ID == "A01");
 	//  // or
-	//  if (makeselect(keys)) ... ok
+	//  if (selectkeys(keys)) ... ok
 	//  assert(readnext(ID) and ID == "A01");`
-	ND bool makeselect(in keys);
+	ND bool selectkeys(in keys);
 
 	// Checks if a select list is active.
-	// dbfile: A file or connection var used in a prior select, makeselect or getlist function call.
+	// dbfile: A file or connection var used in a prior select, selectkeys or getlist function call.
 	// Returns: True if a select list is active and false if not.
 	// If it returns true then a call to readnext() will return a database record key, otherwise not.
 	//
@@ -1877,7 +1877,7 @@ public:
 	ND bool hasnext();
 
 	// Acquires and consumes one key from an active select list of database record keys.
-	// dbfile: A file or connection var used in a prior select, makeselect or getlist function call.
+	// dbfile: A file or connection var used in a prior select, selectkeys or getlist function call.
 	// key: Returns the first (next) key present in an active select list or "" if no select list is active.
 	// Returns: True if a list is active and a key is available, false if not.
 	// Each call to readnext consumes one key from the list.
@@ -1906,7 +1906,7 @@ public:
 	ND bool readnext(out record, out key, out valueno);
 
 	// Deactivates an active select list.
-	// dbfile: A file or connection var used in a prior select, makeselect or getlist function call.
+	// dbfile: A file or connection var used in a prior select, selectkeys or getlist function call.
 	// Returns: Nothing
 	// Has no effect if no select list is active for dbfile.
 	//
@@ -1919,7 +1919,7 @@ public:
 	   void clearselect();
 
 	// Stores an active select list for later retrieval.
-	// dbfile: A file or connection var used in a prior select, makeselect or getlist function call.
+	// dbfile: A file or connection var used in a prior select, selectkeys or getlist function call.
 	// listname: A suitable name that will be required for later retrieval.
 	// Returns: True if saved successfully or false if there was no active list to be saved.
 	// Any existing list with the same name will be overwritten.
@@ -1973,7 +1973,7 @@ public:
 //	// Any existing list with the same name will be overwritten.
 //	// keys: An FM separated list of keys or key^VM^valueno pairs.
 //	// Returns: True if successful or false if no keys were provided.
-//	// If the listname is empty then makeselect() is called instead. This is obsolete and deprecated behaviour.
+//	// If the listname is empty then selectkeys() is called instead. This is obsolete and deprecated behaviour.
 //	//
 //	// `var conn = ""; let keys = "A01^B02^C03"_var;
 //	//  if (conn.makelist("mylist", keys)) ... ok
@@ -2781,24 +2781,24 @@ public:
 	// Any multifield/multivalue structure is preserved.
 	// obj is vartime
 	//
-	//  `var v1 = 234800;
-	//	 assert( v1.oconv( "MT"⋅⋅⋅) == "17:13"⋅⋅⋅⋅⋅⋅);
-	//	 assert( v1.oconv( "MTH"⋅⋅) == "05:13PM"⋅⋅⋅⋅);
-	//	 assert( v1.oconv( "MTS"⋅⋅) == "17:13:20"⋅⋅⋅);
-	//	 assert( v1.oconv( "MTHS"⋅) == "05:13:20PM"⋅);
+	// `var v1 = 234800;
+	//  assert( v1.oconv( "MT"⋅⋅⋅) == "17:13"⋅⋅⋅⋅⋅⋅);
+	//  assert( v1.oconv( "MTH"⋅⋅) == "05:13PM"⋅⋅⋅⋅);
+	//  assert( v1.oconv( "MTS"⋅⋅) == "17:13:20"⋅⋅⋅);
+	//  assert( v1.oconv( "MTHS"⋅) == "05:13:20PM"⋅);
 	//
-	//   var v2 = 0;
-	//	 assert( v2.oconv( "MT"⋅⋅⋅) == "00:00"⋅⋅⋅⋅⋅⋅);
-	//	 assert( v2.oconv( "MTH"⋅⋅) == "12:00AM"⋅⋅⋅⋅);
-	//	 assert( v2.oconv( "MTS"⋅⋅) == "00:00:00"⋅⋅⋅);
-	//	 assert( v2.oconv( "MTHS"⋅) == "12:00:00AM"⋅);
+	//  var v2 = 0;
+	//  assert( v2.oconv( "MT"⋅⋅⋅) == "00:00"⋅⋅⋅⋅⋅⋅);
+	//  assert( v2.oconv( "MTH"⋅⋅) == "12:00AM"⋅⋅⋅⋅);
+	//  assert( v2.oconv( "MTS"⋅⋅) == "00:00:00"⋅⋅⋅);
+	//  assert( v2.oconv( "MTHS"⋅) == "12:00:00AM"⋅);
 	//
 	//  // Multifield/multivalue
 	//  var v3 = "234800^234860]234920"_var;
 	//  assert(v3.oconv("MT") == "17:13^17:14]17:15"_var);
 	//
-	//   // or
-	//   assert( oconv(v1, "MT"⋅⋅⋅) == "17:13"⋅⋅⋅⋅⋅⋅);`
+	//  // or
+	//  assert( oconv(v1, "MT"⋅⋅⋅) == "17:13"⋅⋅⋅⋅⋅⋅);`
 	ND std::string oconv_MT(const char* conversion) const;
 
 	// Time input: Convert human readable time (e.g. "10:30:59") to internal time format.
@@ -2849,24 +2849,24 @@ public:
 	//  Any multifield/multivalue structure is preserved.
 	// obj is varnum
 	//
-	//  `var v1 = -1234.567;
-	//	 assert( v1.oconv( "MD20"⋅⋅⋅) ==⋅⋅"-1234.57"⋅⋅⋅);
-	//	 assert( v1.oconv( "MD20,"⋅⋅) ==⋅"-1,234.57"⋅⋅⋅); // , flag
-	//	 assert( v1.oconv( "MC20,"⋅⋅) ==⋅"-1.234,57"⋅⋅⋅); // MC code
-	//	 assert( v1.oconv( "MD20,-"⋅) ==⋅⋅"1,234.57-"⋅⋅); // - flag
-	//	 assert( v1.oconv( "MD20,<"⋅) ==⋅"<1,234.57>"⋅⋅); // < flag
-	//	 assert( v1.oconv( "MD20,C"⋅) ==⋅⋅"1,234.57CR"⋅); // C flag
-	//	 assert( v1.oconv( "MD20,D"⋅) ==⋅⋅"1,234.57DB"⋅); // D flag
+	// `var v1 = -1234.567;
+	//  assert( v1.oconv( "MD20"⋅⋅⋅) ==⋅⋅"-1234.57"⋅⋅⋅);
+	//  assert( v1.oconv( "MD20,"⋅⋅) ==⋅"-1,234.57"⋅⋅⋅); // , flag
+	//  assert( v1.oconv( "MC20,"⋅⋅) ==⋅"-1.234,57"⋅⋅⋅); // MC code
+	//  assert( v1.oconv( "MD20,-"⋅) ==⋅⋅"1,234.57-"⋅⋅); // - flag
+	//  assert( v1.oconv( "MD20,<"⋅) ==⋅"<1,234.57>"⋅⋅); // < flag
+	//  assert( v1.oconv( "MD20,C"⋅) ==⋅⋅"1,234.57CR"⋅); // C flag
+	//  assert( v1.oconv( "MD20,D"⋅) ==⋅⋅"1,234.57DB"⋅); // D flag
 	//
-	//   // Multifield/multivalue
-	//   var v2 = "1.1^2.1]2.2"_var;
-	//   assert( v2.oconv( "MD20"⋅⋅⋅) == "1.10^2.10]2.20"_var);
+	//  // Multifield/multivalue
+	//  var v2 = "1.1^2.1]2.2"_var;
+	//  assert( v2.oconv( "MD20"⋅⋅⋅) == "1.10^2.10]2.20"_var);
 	//
-	//   // or
-	//	 assert( oconv(v1, "MD20"⋅⋅⋅) ==⋅⋅"-1234.57"⋅⋅⋅);`
+	//  // or
+	//  assert( oconv(v1, "MD20"⋅⋅⋅) ==⋅⋅"-1234.57"⋅⋅⋅);`
 	ND std::string oconv_MD(const char* conversion) const;
 
-	//	 assert( v1.oconv( "MD2"⋅⋅⋅) ==⋅⋅⋅⋅"12.34"⋅);
+	//  assert( v1.oconv( "MD2"⋅⋅⋅) ==⋅⋅⋅⋅"12.34"⋅);
 
 	// Text justification: Left, right and center. Padding and truncating. See Procrustes.
 	// e.g. "L#10", "R#10", "C#10"

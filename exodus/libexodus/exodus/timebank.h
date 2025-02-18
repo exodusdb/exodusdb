@@ -169,7 +169,7 @@ auto get_timebank_acno(const std::string_view arg1) -> int {
 	else if (++acno && arg1 == "bool var::deletefile(in filename)") {}
 	else if (++acno && arg1 == "bool var::clearfile(in filename)") {}
 	else if (++acno && arg1 == "bool var::select(in sortselectclause) const") {}
-	else if (++acno && arg1 == "bool var::makeselect(in keys)") {}
+	else if (++acno && arg1 == "bool var::selectkeys(in keys)") {}
 	else if (++acno && arg1 == "bool var::hasnext() const") {}
 	else if (++acno && arg1 == "bool var::readnext(io key, io valueno) const") {}
 	else if (++acno && arg1 == "bool var::readnext(io record, io key, io valueno) const") {}
