@@ -261,7 +261,7 @@ function main() {
 
 			srcline = srcline.field(" ", 2, 9999);
 //			var comments = srcline.field("{", 1).field(";", 2, 9999).trimmerfirst("/ ");
-//!!!			var comments = srcline.field("/" "/", 2, 99999).trimfirst();
+//			var comments = srcline.field("/" "/", 2, 99999).trimfirst();
 			var comments = srcline.field("/" "/", 2, 99999);
 			srcline = srcline.field("/" "/", 1).field("{", 1).trimlast();
 			let funcname = srcline.field("(", 1);
@@ -280,14 +280,6 @@ function main() {
 				new_objs ^= objmatch.f(1, 2).convert("|()", FM) ^ FM_;
 			}
 			let objname = objmatch.f(1,2);
-
-			// Emphasise "Returns:"
-			if (man) {
-				// Do in final stage
-			}
-			else
-				comments.replacer("Returns:", "<em>Returns:</em>");
-
 
 			/////////////////////
 			// Handle code blocks
@@ -420,10 +412,11 @@ function main() {
 					// .nf No format
 					// .RE REturn (left shift)
 					// .fi formatting
+					// Prefix by a section title "Example:"
 					comments.replacer(backquoted, "\nExample:\n.RS\n.nf\n $1\n.fi\n.RE\n");
 				}
 				else if (wiki)
-					comments.replacer(backquoted, "<syntaxhighlight lang=\"c++\">\n$1</syntaxhighlight>");
+					comments.replacer(backquoted, "<syntaxhighlight lang=\"c++\">\n $1</syntaxhighlight>");
 				else
 					// Javascript instead of cpp because it gives better highlighting for exodus c++. See above too.
 					// (All function calls are highlighted)
@@ -443,6 +436,8 @@ function main() {
 				comments.replacer("\u22c5", "\u2005"); // "⋅" Unicode operator point operator -> " " FOUR-PER-EM SPACE
 				comments.replacer("␣", "\u2005");
 
+				comments.replacer(_FM, "\n\n");
+			} else if (wiki) {
 				comments.replacer(_FM, "\n\n");
 			} else {
 				comments.replacer(_FM, "</p>\n");
@@ -558,6 +553,18 @@ function main() {
 //			comments.replacer("Returns: ", "/fbReturns:/fr ");
 //			doc_text.replacer("^([a-zA-Z0-9_.]+): "_rex, R"__(\\fI$1:\\fR )__");
 			doc_text.replacer(R"__(^([a-zA-Z0-9_.]+):(\s+))__"_rex, R"__(\\fB$1:\\fR$2)__");
+
+			// Man page codes
+			// .RS Right shift
+			// .nf No format
+			// .RE REturn (left shift)
+			// .fi formatting
+			doc_text.replacer(R"__(^<pre>)__"_rex, R"__(.nf)__");
+			doc_text.replacer(R"__(^</pre>)__"_rex, R"__(.fi)__");
+
+		} else {
+//			comments.replacer("Returns:", "<em>Returns:</em>");
+			doc_text.replacer(R"__(^([a-zA-Z0-9_.]+):(\s+))__"_rex, R"__(<em>$1:</em>$2)__");
 		}
 
 		// Close prior table
