@@ -527,6 +527,13 @@ bool var::osread(const char* osfilename, const char* codepage) {
 	// get a file structure
 	std::ifstream myfile;
 
+    // Check if the file exists and is a regular file
+    if (!std::filesystem::is_regular_file(osfilename)) {
+//        std::cout << "Error: File '" << osfilename << "' does not exist.\n";
+		this->setlasterror("osread failed. " ^ var(osfilename).quote() ^ " does not exist, or cannot be accessed, or is not a regular file.");
+        return false;
+    }
+
 	// open in binary (and position "at end" to find the file size with tellg)
 	// TODO check myfile.close() on all exit paths or setup an object to do that
 	myfile.open(osfilename, std::ios::binary | std::ios::in | std::ios::ate);
