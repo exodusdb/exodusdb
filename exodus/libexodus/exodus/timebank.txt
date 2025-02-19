@@ -1,11 +1,11 @@
-500 dim& dim::splitter(in str1, SV sepchar)
+500 dim& dim::splitter(in str1, SV delimiter)
 501 xxxxxxxx unused
 502 bool dim::read(in filevar, in key)
 503 void dim::write(in filevar, in key) const
 504 bool dim::osread(in osfilename, const char* codepage = "")
 505 bool dim::oswrite(in osfilename, const char* codepage = "")
-506 var  var::sort(SV sepchar)
-507 var  var::reverse(SV sepchar)
+506 var  var::sort(SV delimiter)
+507 var  var::reverse(SV delimiter)
 508 var  var::timestamp(in ostime) const
 509 bool var::connect(in conninfo
 510 bool var::attach(in filenames

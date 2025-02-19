@@ -274,8 +274,8 @@ function main() {
 	printl(" normalize() const&;");
 	{
 		let v1 = "cafe\u0301"_var.normalize();
-		assert(v1 == "café");
-
+		assert(v1 == "caf\u00E9");
+ // "café"
 		 // or
 		 let v2 = normalize("cafe\u0301");
 	}
@@ -611,7 +611,7 @@ function main() {
 		 let v2 = unique("a1^b2^a1^c2"_var);
 	}
 
-	printl(" sort(SV sepchar = _FM) const&;");
+	printl(" sort(SV delimiter = _FM) const&;");
 	{
 		let v1 = "20^10^2^1^1.1"_var.sort();
 		assert(v1 == "1^1.1^2^10^20"_var);
@@ -620,7 +620,7 @@ function main() {
 		 let v2 = sort("20^10^2^1^1.1"_var);
 	}
 
-	printl(" sort(SV sepchar = _FM) const&;");
+	printl(" sort(SV delimiter = _FM) const&;");
 	{
 		let v1 = "b1^a1^c20^c10^c2^c1^b2"_var.sort();
 		assert(v1 == "a1^b1^b2^c1^c10^c2^c20"_var);
@@ -629,7 +629,7 @@ function main() {
 		 let v2 = sort("b1^a1^c20^c10^c2^c1^b2"_var);
 	}
 
-	printl(" reverse(SV sepchar = _FM) const&;");
+	printl(" reverse(SV delimiter = _FM) const&;");
 	{
 		let v1 = "20^10^2^1^1.1"_var.reverse();
 		assert(v1 == "1.1^1^2^10^20"_var);
@@ -638,7 +638,7 @@ function main() {
 		 let v2 = reverse("20^10^2^1^1.1"_var);
 	}
 
-	printl(" shuffle(SV sepchar = _FM) const&;");
+	printl(" shuffle(SV delimiter = _FM) const&;");
 	{
 		let v1 = "20^10^2^1^1.1"_var.shuffle(); /// e.g. "2^1^20^1.1^10" (random order depending on initrand())
 		 // or
@@ -751,7 +751,7 @@ function main() {
 		 let v2 = sumall("1]2]3^4]5]6"_var);
 	}
 
-	printl(" sum(SV sepchar) const;");
+	printl(" sum(SV delimiter) const;");
 	{
 		let v1 = "10,20,30"_var.sum(",");
 		assert(v1 == 60);
@@ -945,7 +945,7 @@ function main() {
 		 var response;
 		 if (conn.sqlexec(sqlcmd, response)) {/*ok*/} else  abort("sqlexec: " ^ lasterror());
 		assert(response == "col1^col2\x1fxxx^yyy"_var );
-/// \x1f is the Record Mark (RM) character. The backtick character is used here by gendoc to deliminate source code.
+/// \x1f is the Record Mark (RM) char. The backtick char is used here by gendoc to deliminate source code.
 		 // or
 		 if (sqlexec(sqlcmd, response)) {/*ok*/} else  abort("sqlexec: " ^ lasterror());
 	}
@@ -1991,7 +1991,7 @@ function main() {
 		 assert(     "ab"_var.oconv( "R#6" ) == "    ab" );
 		assert(     "ab"_var.oconv( "C#6" ) == "  ab  " );
 		assert(      var(42).oconv( "L(0)#5" ) == "42000" );
- // Padding character (x)
+ // Padding char (x)
 		 assert(      var(42).oconv( "R(0)#5" ) == "00042" );
 		assert(      var(42).oconv( "C(0)#5" ) == "04200" );
 		assert(      var(42).oconv( "C(0)#5" ) == "04200" );
