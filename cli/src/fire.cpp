@@ -14,7 +14,7 @@ function main() {
 	let repl = COMMAND.f(1);
 	COMMAND.remover(1);
 
-	if (not find or OPTIONS.convert("rsiU", "")) {
+	if (not find or OPTIONS.convert("rsiUV", "")) {
 		let syntax = "\n"
 			"SYNOPSIS\n"
 			"	fire FIND REPL filepath ... {OPTIONS}\n"
@@ -24,18 +24,23 @@ function main() {
 			"	r - raw find (not regex nor case insensitive)\n"
 			"	s - whole file as single line\n"
 			"	i - case insensitive\n"
-			"	U - Update files\n";
+			"	U - Update files\n"
+			"	V - Verbose\n";
 		abort(syntax);
 	}
 
 	let update = OPTIONS.contains("U");
 
 	const bool raw = OPTIONS.contains("r");
+	const bool verbose = OPTIONS.contains("V");
 
 	// Remove all non-regex options
-	let rxopts = OPTIONS.convert("rU", "");
+	let rxopts = OPTIONS.convert("rUV", "");
 
 	for (in osfilename : COMMAND) {
+
+		if (verbose)
+			TRACE(osfilename);
 
 		// Get text or skip
 		if (not RECORD.osread(osfilename)) {
