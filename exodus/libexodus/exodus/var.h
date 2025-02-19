@@ -246,17 +246,25 @@ public:
 	///// STRING CREATION:
 	/////////////////////
 
-	// Returns: A var containing an ASCII string with the number of decimal places requested.
-    // .5 always rounds away from zero.
+	// Convert a number into a string after rounding it to a given number of decimal places.
+	// var: The number to be converted.
+	// ndecimals: How many decimal places are required to the right of the decimal point or, if necimals is negative, how many 0's should preceed the decimal point.
+	// Returns: A var containing an ASCII string of digits and a decimal point "." unless ndecimals is 0.
+	// Trailing zeros are not omitted.
+    // 0.5 always rounds away from zero. i.e. 1.5 -> 2 and -1.5 -> -2
 	// obj is varnum
 	//
-    // `let v1 = var(0.295).round(2);  // "0.30"
+    // `let v1 = var(0.295).round(2);  //  "0.30"
     //  // or
-    //  let v2 = round(1.295, 2);      // "1.30"
+    //  let v2 = round(1.295, 2);      //  "1.30"
 	//
     //  var v3 = var(-0.295).round(2); // "-0.30"
     //  // or
     //  var v4 = round(-1.295, 2);     // "-1.30"`
+	//
+	//  var v4 = round(0, 1);           // "0.0";
+	//  var v5 = round(0, 0);           // "0";
+	//  var v6 = round(0, -1);          // "0";
 	//
 	// Negative number of decimals rounds to the left of the decimal point
 	// `let v1 = round(123456.789,  0); // "123457"
@@ -266,7 +274,8 @@ public:
 
 	// obj is var()
 
-	// Returns: A string containing a single char (byte) given an integer 0-255.
+	// Get a character (byte) given an integer 0-255.
+	// Returns: A string containing a single character (byte)
 	// 0-127 -> ASCII, 128-255 -> invalid UTF-8 which cannot be written to the database or used in many exodus string operations
 	//
 	// `let v1 = var().chr(0x61); // "a"
@@ -274,6 +283,7 @@ public:
 	//  let v2 = chr(0x61);`
 	ND var  chr(const int num) const;
 
+	// Get a UTF-8 encoded character given a Unicode Code Point (number)
 	// Returns: A string of a single unicode code point in utf8 encoding.
 	// To get utf codepoints > 2^63 you must provide negative ints because var doesnt provide an implicit constructor to unsigned int due to getting ambigious conversions because int and unsigned int are parallel priority in c++ implicit conversions.
 	//
@@ -282,13 +292,18 @@ public:
 	//  let v2 = textchr(171416);`
 	ND var  textchr(const int num) const;
 
-	// Returns: A string of repeating characters or strings
+	// Get a string of repeated substrings.
+	// var: The substring to be repeated
+	// num: How many times to repeat the substring
+	// Returns: A string
 	//
 	// `let v1 = "ab"_var.str(3); // "ababab"
 	//  // or
 	//  let v2 = str("ab", 3);`
 	ND var  str(const int num) const;
 
+	// Get a string containing a given number of spaces.
+	// var: The number of spaces required.
 	// Returns: A string of space characters.
 	// obj is varnum
 	//
@@ -314,28 +329,35 @@ public:
 
 	//  obj is strvar
 
-	// Returns: The character number of the first char.
+	// Get the character number of a character (byte)
+	// Returns: A number between 0 and 255.
+	// If given a string, then only the first character (byte) is considered.
 	//
 	// `let v1 = "abc"_var.seq(); // 0x61 // decimal 97
 	//  // or
 	//  let v2 = seq("abc");`
 	ND var  seq() const;
 
-	// Returns: The Unicode character number of the first unicode code point.
+	// Get the Unicode Code Point of a unicode character.
+	// Returns: A number.
+	// If given an string, then only the first unicode character is considered.
+	// UTF-8 encoding is assumed.
 	//
 	// `let v1 = "Γ"_var.textseq(); // 915 // U+0393: Greek Capital Letter Gamma (Unicode Character)
 	//  // or
 	//  let v2 = textseq("Γ");`
 	ND var  textseq() const;
 
-	// Returns: The length of a string in number of chars
+	// Get the length of a source string in number of characters *bytes
+	// Returns: A number
 	//
 	// `let v1 = "abc"_var.len(); // 3
 	//  // or
 	//  let v2 = len("abc");`
 	ND var  len() const;
 
-	// Returns: true if the var is an empty string.
+	// Checks if the var is an empty string.
+	// Returns: True if it is empty amd false if not.
 	// This is a shorthand and more expressive way of writing 'if (var == "")' or 'if (var.len() == 0)' or 'if (not var.len())'
 	// Note that 'if (var.empty())' is not the same as 'if (not var)' because 'if (var("0.0")' is defined as false because the string can be converted to a 0 which is always considered to be false. Compare thia with common scripting languages where 'if (var("0"))' is defined as true.
 	//
@@ -345,6 +367,7 @@ public:
 	//  if (not empty(v1)) ... ok // true`
 	ND bool empty() const;
 
+	// Count the number of output columns required for a given source string.
 	// Returns: The number of output columns.
 	// Allows multi column unicode and reduces combining characters etc. like e followed by grave accent
 	// Possibly does not properly calculate combining sequences of graphemes e.g. face followed by colour
@@ -354,22 +377,28 @@ public:
 	//  let v2 = textwidth("🤡x🤡");`
 	ND var  textwidth() const;
 
-	// Returns: The number of Unicode code points
+	// Count the number of Unicode code points in a source string.
+	// Returns: A count
 	//
 	// `let v1 = "Γιάννης"_var.textlen(); // 7
 	//  // or
 	//  let v2 = textlen("Γιάννης");`
 	ND var  textlen() const;
 
-	// Returns: The count of the number of fields separated by a given sepstr.
-	// It is the same as var.count(sepstr) + 1 except that it returns 0 for an empty string.
+	// Count the number of fields in a source string.
+	// sepstr: The separator character or substr that delimits individual fields.
+	// Returns: The count of the number of fields
+	// This is similar to "var.count(sepstr) + 1" but it returns 0 for an empty source string.
 	//
 	// `let v1 = "aa**cc"_var.fcount("*"); // 3
 	//  // or
 	//  let v2 = fcount("aa**cc", "*");`
 	ND var  fcount(SV sepstr) const;
 
+	// Count the number of occurrences of a given substr in a source string.
+	// substr: The substr to count.
 	// Returns: The count of the number of sepstr found.
+	// Overlapping substrings are not counted.
 	//
 	// `let v1 = "aa**cc"_var.count("*"); // 2
 	//  // or
@@ -381,21 +410,27 @@ public:
 	// ends     endsWith     str_ends_with   endswith     HasSuffix() ends_with()   ends_with
 	// contains includes()   str_contains    contains()   Contains()  contains()    contains
 
-	// Returns: True if starts with prefix
+	// Checks if a source string starts with a given prefix (substr).
+	// prefix: The substr to check for.
+	// Returns: True if the source string starts with the given prefix.
 	//
 	// `if ("abc"_var.starts("ab")) ... true
 	//  // or
 	//  if (starts("abc", "ab")) ... true`
 	ND bool starts(SV prefix) const;
 
-	// Returns: True if ends with suffix
+	// Checks if a source string ends with a given suffix (substr).
+	// suffix: The substr to check for.
+	// Returns: True if the source string ends with given suffix.
 	//
 	// `if ("abc"_var.ends("bc")) ... true
 	//  // or
 	//  if (ends("abc", "bc")) ... true`
 	ND bool ends(SV suffix) const;
 
-	// Returns: True if starts, ends or contains substr
+	// Checks if a given substr exists in a source string.
+	// substr: The substr to check for.
+	// Returns: True if the source string starts with, ends with or contains the given substr.
 	//
 	// `if ("abcd"_var.contains("bc")) ... true
 	//  // or
@@ -404,33 +439,37 @@ public:
 
 	//https://en.wikipedia.org/wiki/Comparison_of_programming_languages_(string_functions)#Find
 
-	// Returns: The index (1 based position) of a given substr on or after a given starting char number if present
-	// Returns: 0 if not present.
+	// Find a substr in a source string.
+	// substr: The substr to search for.
+	// startchar1: The character number (1 based) to start the search at. The default is 1, the first character.
+	// Returns: The character number (1 based) that the substr is found at or 0 if not present.
 	//
 	// `let v1 = "abcd"_var.index("bc"); // 2
 	//  // or
 	//  let v2 = index("abcd", "bc");`
 	ND var  index(SV substr, const int startchar1 = 1) const;
 
-	// Returns: The index (1 based position) of the nth occurrence of a given substr if present
-	// Returns: 0 if not present.
+	// Find the nth occurrence of a substr in a source string.
+	// substr: The string to search for.
+	// Returns: Character position (1 based) or 0 if not present.
 	//
 	// `let v1 = "abcabc"_var.index("bc", 2); // 2
 	//  // or
 	//  let v2 = index("abcabc", "bc", 2);`
 	ND var  indexn(SV substr, const int occurrence) const;
 
-	// Reverse substr search.
+	// Find the position of substr working backwards from the end of the string towards the beginning.
+	// substr: The string to search for.
 	// Returns: The index (1 based position) of the substr on or before a given starting char number if present
-	// startchar1 defaults to -1 meaning start searching from the last char (towards the first char).
+	// startchar1: defaults to -1 meaning start searching from the last char.
 	//
 	// `let v1 = "abcabc"_var.indexr("bc"); // 5
 	//  // or
 	//  let v2 = indexr("abcabc", "bc");`
 	ND var  indexr(SV substr, const int startchar1 = -1) const;
 
-	// Returns: All results of regex matching
-	// Multiple matches are returned separated by FMs. Groups are in VMs.
+	// Finds all matches of a given regular expression.
+	// Returns: Zero or more matching substrings separated by FMs. Any groups are in VMs.
 	//
 	// `let v1 = "abc1abc2"_var.match("BC(\\d)", "i"); // "bc1]1^bc2]2"_var
 	//  // or
@@ -459,8 +498,10 @@ public:
 	// Ditto
 	ND var  match(const rex& regex) const;
 
-	// Search for first match of a regular expression starting at startchar1
-	// Updates startchar1 ready to search for the next match
+	// Search for the first match of a regular expression.
+	// startchar1: [in] character number to start the search from
+	// startchar1: [out] character number to start the next search from
+	// Returns: The 1st match like match()
 	// regex_options as for match()
 	//
 	// `var startchar1 = 1;
@@ -479,8 +520,9 @@ public:
 	// Ditto starting from first char.
 	ND var  search(const rex& regex) const {var startchar1 = 1; return this->search(regex, startchar1);}
 
-	// Hash by default returns a 64 bit signed integer as a var.
-	// If a modulus is provided then the result is limited to [0, modulus)
+	// Get a hash of a source string.
+	// modulus: The result is limited to [0, modulus)
+	// Returns: A 64 bit signed integer.
 	// MurmurHash3 is used.
 	//
 	// `let v1 = "abc"_var.hash(); assert(v1 == var(6'715'211'243'465'481'821));
@@ -493,30 +535,31 @@ public:
 
 	//  obj is strvar
 
-	// To upper case
+	// Convert to upper case
 	//
 	// `let v1 = "Γιάννης"_var.ucase(); // "ΓΙΆΝΝΗΣ"
 	//  // or
 	//  let v2 = ucase("Γιάννης");`
 	ND var  ucase() const&;
 
-	// To lower case
+	// Convert to lower case
 	//
 	// `let v1 = "ΓΙΆΝΝΗΣ"_var.lcase(); // "γιάννης"
 	//  // or
 	//  let v2 = lcase("ΓΙΆΝΝΗΣ");`
 	ND var  lcase() const&;
 
-	// To title case. The first letter of each word is capitalised.
+	// Convert to title case.
+	// Returns: Original source string with the first letter of each word is capitalised.
 	//
 	// `let v1 = "γιάννης παππάς"_var.tcase(); // "Γιάννης Παππάς"
 	//  // or
 	//  let v2 = tcase("γιάννης παππάς");`
 	ND var  tcase() const&;
 
-	// To folded case to enable standardised indexing and searching,
-	//
-	// Case folding is a process of converting a text to case independent representation.
+	// Convert to folded case.
+	// Returns the source string converted to enable standardised indexing and searching,
+	// Case folding is the process of converting text to a case independent representation.
 	// https://www.w3.org/International/wiki/Case_folding
 	// Accents can be significant. As in French cote, coté, côte and côté.
 	// Case folding is not locale-dependent.
@@ -537,23 +580,32 @@ public:
 	//  let v2 = normalize("cafe\u0301");`
 	ND var  normalize() const&;
 
-	// Simple reversible disguising of text
+	// Simple reversible disguising of text.
+	// Returns: The source string converted by flipping bit 8 of all unicode code points.
 	// invert(invert()) returns to the original text.
-	// Flips bit 8 of unicode code points. Note that ASCII bytes become multibyte UTF-8 so string sizes change.
+	// ASCII bytes become multibyte UTF-8 so string sizes change.
 	//
 	// `let v1 = "abc"_var.invert(); // "\xC2" "\x9E" "\xC2" "\x9D" "\xC2" "\x9C"
 	//  // or
 	//  let v2 = invert("abc");`
 	ND var  invert() const&;
 
+	// Reduce all types of field mark characters by one level.
 	// Convert all FM to VM, VM to SM etc.
+	// Returns: The converted string.
+	// Note that subtext ST characters are not converted because they are already the lowest level.
+	// String size remains identical.
 	//
 	// `let v1 = "a1^b2^c3"_var.lower(); // "a1]b2]c3"_var
 	//  // or
 	//  let v2 = lower("a1^b2^c3"_var);`
 	ND var  lower() const&;
 
+	// Increase all types of field mark characters by one level.
 	// Convert all VM to FM, SM to VM etc.
+	// Returns: The converted string.
+	// The record mark character RM is not converted because it is already the highest level.
+	// String size remains identical.
 	//
 	// `let v1 = "a1]b2]c3"_var.raise(); // "a1^b2^c3"_var
 	//  // or
@@ -567,70 +619,75 @@ public:
 	//  let v2 = crop("a1^b2]]^c3^^"_var);`
 	ND var  crop() const&;
 
-	// Wrap in double quotes
+	// Wrap in double quotes.
 	//
 	// `let v1 = "abc"_var.quote(); // "\"abc\""
 	//  // or
 	//  let v2 = quote("abc");`
 	ND var  quote() const&;
 
-	// Wrap in single quotes
+	// Wrap in single quotes.
 	//
 	// `let v1 = "abc"_var.squote(); // "'abc'"
 	//  // or
 	//  let v2 = squote("abc");`
 	ND var  squote() const&;
 
-	// Remove one pair of double or single quotes
+	// Remove one pair of surrounding double or single quotes.
 	//
 	// `let v1 = "'abc'"_var.unquote(); // "abc"
 	//  // or
 	//  let v2 = unquote("'abc'");`
 	ND var  unquote() const&;
 
-	// Remove leading, trailing and excessive inner bytes
+	// Remove all leading, trailing and excessive inner bytes.
+	// trimchars: The characters (bytes) to remove. The default is space.
 	//
 	// `let v1 = "␣␣a1␣␣b2␣c3␣␣"_var.trim(); // "a1␣b2␣c3"
 	//  // or
 	//  let v2 = trim("␣␣a1␣␣b2␣c3␣␣");`
 	ND var  trim(SV trimchars = " ") const&;
 
-	// Ditto leading
+	// Ditto but only leading.
 	//
 	// `let v1 = "␣␣a1␣␣b2␣c3␣␣"_var.trimfirst(); // "a1␣␣b2␣c3␣␣"
 	//  // or
 	//  let v2 = trimfirst("␣␣a1␣␣b2␣c3␣␣");`
 	ND var  trimfirst(SV trimchars = " ") const&;
 
-	// Ditto trailing
+	// Ditto but only trailing.
 	//
 	// `let v1 = "␣␣a1␣␣b2␣c3␣␣"_var.trimlast(); // "␣␣a1␣␣b2␣c3"
 	//  // or
 	//  let v2 = trimlast("␣␣a1␣␣b2␣c3␣␣");`
 	ND var  trimlast(SV trimchars = " ") const&;
 
-	// Ditto leading, trailing but not inner
+	// Ditto but only leading and trailing, not inner.
 	//
 	// `let v1 = "␣␣a1␣␣b2␣c3␣␣"_var.trimboth(); // "a1␣␣b2␣c3"
 	//  // or
 	//  let v2 = trimboth("␣␣a1␣␣b2␣c3␣␣");`
 	ND var  trimboth(SV trimchars = " ") const&;
 
-	// Extract first char or "" if empty
+	// Get the first character (byte) of a string.
+	// Returns: A character, or "" if empty.
 	//
 	// `let v1 = "abc"_var.first(); // "a"
 	//  // or
 	//  let v2 = first("abc");`
 	ND var  first() const&;
 
-	// Extract last char or "" if empty
+	// Get the last character (byte) of a string.
+	// Returns: A character, or "" if empty.
 	//
 	// `let v1 = "abc"_var.last(); // "c"
 	//  // or
 	//  let v2 = last("abc");`
 	ND var  last() const&;
 
-	// Extract up to length leading chars
+	// Get the first n characters of a source string.
+	// length: The number of characters (bytes) to get.
+	// Returns: A string of up to n characters.
 	//
 	// `let v1 = "abc"_var.first(2); // "ab"
 	//  // or
@@ -644,14 +701,21 @@ public:
 	//  let v2 = last("abc", 2);`
 	ND var  last(const std::size_t length) const&;
 
-	// Remove length leading chars
+	// Remove n characters (bytes) from the source string.
+	// length: Positive to remove first n characters or negative to remove the last n characters.
+	// If the absolute value of length is >= the number of characters in the source string then all characters will be removed.
 	//
 	// `let v1 = "abcd"_var.cut(2); // "cd"
 	//  // or
 	//  let v2 = cut("abcd", 2);`
 	ND var  cut(const int length) const&;
 
-	// Insert text at char position overwriting length chars
+	// Insert a substr at an given position after removing a given number of characters.
+	//
+	// pos1: 0 or 1 : Remove length characters from the beginning and insert at the beginning.
+	// pos1: > than the length of the source string. Insert after the last character.
+	// pos1: -1 : Remove up to length characters before inserting.Insert on or before the last character.
+	// pos1: -2 : Insert on or before the penultimate character.
 	//
 	// `let v1 = "abcd"_var.paste(2, 2, "XYZ"); // "aXYZd"
 	//  // or
