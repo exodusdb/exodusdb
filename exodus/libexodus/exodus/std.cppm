@@ -235,6 +235,7 @@ export namespace std {
 		using std::filesystem::remove_all;
 		using std::filesystem::remove;
 		using std::filesystem::read_symlink;
+		using std::filesystem::is_regular_file;
 	} // namespace filesystem
 
 	using std::ratio;

@@ -165,7 +165,7 @@ public:
 //
 //		CONSTEXPR std::array VISIBLE_FMS_EXCEPT_ESC {VISIBLE_ST_, TM_, VISIBLE_SM_, VISIBLE_VM_, VISIBLE_FM_, VISIBLE_RM_};
 //
-//		// Replace various unprintable field marks with unusual ASCII characters
+//		// Replace various unprintable field marks with unusual ASCII chars
 //		// Leave ESC as \x1B because it is used to control ANSI terminal control sequences
 //		// std::string str = "\x1A\x1B\x1C\x1D\x1E\x1F";
 //		// |\x1B}]^~  or in high to low ~^]}\x1B|	 or in TRACE() ... ~^]}_|
@@ -274,8 +274,8 @@ public:
 
 	// obj is var()
 
-	// Get a character (byte) given an integer 0-255.
-	// Returns: A string containing a single character (byte)
+	// Get a char given an integer 0-255.
+	// Returns: A string containing a single char
 	// 0-127 -> ASCII, 128-255 -> invalid UTF-8 which cannot be written to the database or used in many exodus string operations
 	//
 	// `let v1 = var().chr(0x61); // "a"
@@ -283,9 +283,9 @@ public:
 	//  let v2 = chr(0x61);`
 	ND var  chr(const int num) const;
 
-	// Get a UTF-8 encoded character given a Unicode Code Point (number)
-	// Returns: A string of a single unicode code point in utf8 encoding.
-	// To get utf codepoints > 2^63 you must provide negative ints because var doesnt provide an implicit constructor to unsigned int due to getting ambigious conversions because int and unsigned int are parallel priority in c++ implicit conversions.
+	// Get a unicode character given a Unicode Code Point (Number)
+	// Returns: A single unicode character in utf8 encoding.
+	// To get UTF code points > 2^63 you must provide negative ints because var doesnt provide an implicit constructor to unsigned int due to getting ambigious conversions because int and unsigned int are parallel priority in c++ implicit conversions.
 	//
 	// `let v1 = var().textchr(171416); // "𩶘" // or "\xF0A9B698"
 	//  // or
@@ -304,7 +304,7 @@ public:
 
 	// Get a string containing a given number of spaces.
 	// var: The number of spaces required.
-	// Returns: A string of space characters.
+	// Returns: A string of space chars.
 	// obj is varnum
 	//
 	// `let v1 = var(3).space(); // "␣␣␣"
@@ -329,9 +329,9 @@ public:
 
 	//  obj is strvar
 
-	// Get the character number of a character (byte)
+	// Get the char number of a char
 	// Returns: A number between 0 and 255.
-	// If given a string, then only the first character (byte) is considered.
+	// If given a string, then only the first char is considered.
 	//
 	// `let v1 = "abc"_var.seq(); // 0x61 // decimal 97
 	//  // or
@@ -339,16 +339,15 @@ public:
 	ND var  seq() const;
 
 	// Get the Unicode Code Point of a unicode character.
+	// var: A UTF-8 string. Only the first unicode character is considered.
 	// Returns: A number.
-	// If given an string, then only the first unicode character is considered.
-	// UTF-8 encoding is assumed.
 	//
 	// `let v1 = "Γ"_var.textseq(); // 915 // U+0393: Greek Capital Letter Gamma (Unicode Character)
 	//  // or
 	//  let v2 = textseq("Γ");`
 	ND var  textseq() const;
 
-	// Get the length of a source string in number of characters *bytes
+	// Get the length of a source string in number of chars *bytes
 	// Returns: A number
 	//
 	// `let v1 = "abc"_var.len(); // 3
@@ -369,8 +368,8 @@ public:
 
 	// Count the number of output columns required for a given source string.
 	// Returns: The number of output columns.
-	// Allows multi column unicode and reduces combining characters etc. like e followed by grave accent
-	// Possibly does not properly calculate combining sequences of graphemes e.g. face followed by colour
+	// Allows multi column unicode and reduces combining characters etc. like "e" followed by grave accent
+	// Does not properly calculate combining sequences of graphemes e.g. face followed by colour
 	//
 	// `let v1 = "🤡x🤡"_var.textwidth(); // 5
 	//  // or
@@ -378,7 +377,8 @@ public:
 	ND var  textwidth() const;
 
 	// Count the number of Unicode code points in a source string.
-	// Returns: A count
+	// var: A UTF8 string.
+	// Returns: A number.
 	//
 	// `let v1 = "Γιάννης"_var.textlen(); // 7
 	//  // or
@@ -441,8 +441,8 @@ public:
 
 	// Find a substr in a source string.
 	// substr: The substr to search for.
-	// startchar1: The character number (1 based) to start the search at. The default is 1, the first character.
-	// Returns: The character number (1 based) that the substr is found at or 0 if not present.
+	// startchar1: The char number (1 based) to start the search at. The default is 1, the first char.
+	// Returns: The char number (1 based) that the substr is found at or 0 if not present.
 	//
 	// `let v1 = "abcd"_var.index("bc"); // 2
 	//  // or
@@ -451,7 +451,7 @@ public:
 
 	// Find the nth occurrence of a substr in a source string.
 	// substr: The string to search for.
-	// Returns: Character position (1 based) or 0 if not present.
+	// Returns: char position (1 based) or 0 if not present.
 	//
 	// `let v1 = "abcabc"_var.index("bc", 2); // 2
 	//  // or
@@ -499,8 +499,8 @@ public:
 	ND var  match(const rex& regex) const;
 
 	// Search for the first match of a regular expression.
-	// startchar1: [in] character number to start the search from
-	// startchar1: [out] character number to start the next search from
+	// startchar1: [in] char number to start the search from
+	// startchar1: [out] char number to start the next search from
 	// Returns: The 1st match like match()
 	// regex_options as for match()
 	//
@@ -569,31 +569,30 @@ public:
 	//  let v2 = tcase("Grüßen");`
 	ND var  fcase() const&;
 
-	// Normalises unicode code points sequences to their standardised NFC form making them binary comparable.
-	//
-	// Unicode normalization is the process of converting strings to a standard form, suitable for text processing and comparison, and is an important part of Unicode text processing.
-	// For example, character "é" can be represented by a single code point "\u00E9" (Latin Small Letter E with Acute) or a combination of the character "e" and the combining acute accent "\u0301".
+	// Replace Unicode character sequences with their standardised NFC form.
+	// Unicode normalization is the process of converting unicode strings to a standard form, making them binary comparable and suitable for text processing and comparison. It is an important part of Unicode text processing.
+	// For example, Unicode character "é" can be represented by either a single unicode character and code point (\u00E9" - Latin Small Letter E with Acute) or a combination of two unicode code points (the letter "e" and a combining acute accent "\u0301"). Normalization converts the pair of code points to the single code point.
 	// Normalization is not locale-dependent.
 	//
-	// `let v1 = "cafe\u0301"_var.normalize(); // "café"
+	// `let v1 = "cafe\u0301"_var.normalize(); // "caf\u00E9" // "café"
 	//  // or
 	//  let v2 = normalize("cafe\u0301");`
 	ND var  normalize() const&;
 
-	// Simple reversible disguising of text.
-	// Returns: The source string converted by flipping bit 8 of all unicode code points.
+	// Simple reversible disguising of string text.
+	// Returns: The source string converted by treating it as unicode code points and flipping bit 8 of their code points.
 	// invert(invert()) returns to the original text.
-	// ASCII bytes become multibyte UTF-8 so string sizes change.
+	// ASCII bytes become multibyte UTF-8 so string sizes increase.
 	//
 	// `let v1 = "abc"_var.invert(); // "\xC2" "\x9E" "\xC2" "\x9D" "\xC2" "\x9C"
 	//  // or
 	//  let v2 = invert("abc");`
 	ND var  invert() const&;
 
-	// Reduce all types of field mark characters by one level.
+	// Reduce all types of field mark chars by one level.
 	// Convert all FM to VM, VM to SM etc.
 	// Returns: The converted string.
-	// Note that subtext ST characters are not converted because they are already the lowest level.
+	// Note that subtext ST chars are not converted because they are already the lowest level.
 	// String size remains identical.
 	//
 	// `let v1 = "a1^b2^c3"_var.lower(); // "a1]b2]c3"_var
@@ -601,10 +600,10 @@ public:
 	//  let v2 = lower("a1^b2^c3"_var);`
 	ND var  lower() const&;
 
-	// Increase all types of field mark characters by one level.
+	// Increase all types of field mark chars by one level.
 	// Convert all VM to FM, SM to VM etc.
 	// Returns: The converted string.
-	// The record mark character RM is not converted because it is already the highest level.
+	// The record mark char RM is not converted because it is already the highest level.
 	// String size remains identical.
 	//
 	// `let v1 = "a1]b2]c3"_var.raise(); // "a1^b2^c3"_var
@@ -612,7 +611,7 @@ public:
 	//  let v2 = "a1]b2]c3"_var;`
 	ND var  raise() const&;
 
-	// Remove any redundant FM, VM etc. characters (Trailing FM; VM before FM etc.)
+	// Remove any redundant FM, VM etc. chars (Trailing FM; VM before FM etc.)
 	//
 	// `let v1 = "a1^b2]]^c3^^"_var.crop(); // "a1^b2^c3"_var
 	//  // or
@@ -641,7 +640,7 @@ public:
 	ND var  unquote() const&;
 
 	// Remove all leading, trailing and excessive inner bytes.
-	// trimchars: The characters (bytes) to remove. The default is space.
+	// trimchars: The chars (bytes) to remove. The default is space.
 	//
 	// `let v1 = "␣␣a1␣␣b2␣c3␣␣"_var.trim(); // "a1␣b2␣c3"
 	//  // or
@@ -669,25 +668,25 @@ public:
 	//  let v2 = trimboth("␣␣a1␣␣b2␣c3␣␣");`
 	ND var  trimboth(SV trimchars = " ") const&;
 
-	// Get the first character (byte) of a string.
-	// Returns: A character, or "" if empty.
+	// Get the first char of a string.
+	// Returns: A char, or "" if empty.
 	//
 	// `let v1 = "abc"_var.first(); // "a"
 	//  // or
 	//  let v2 = first("abc");`
 	ND var  first() const&;
 
-	// Get the last character (byte) of a string.
-	// Returns: A character, or "" if empty.
+	// Get the last char of a string.
+	// Returns: A char, or "" if empty.
 	//
 	// `let v1 = "abc"_var.last(); // "c"
 	//  // or
 	//  let v2 = last("abc");`
 	ND var  last() const&;
 
-	// Get the first n characters of a source string.
-	// length: The number of characters (bytes) to get.
-	// Returns: A string of up to n characters.
+	// Get the first n chars of a source string.
+	// length: The number of chars (bytes) to get.
+	// Returns: A string of up to n chars.
 	//
 	// `let v1 = "abc"_var.first(2); // "ab"
 	//  // or
@@ -701,28 +700,28 @@ public:
 	//  let v2 = last("abc", 2);`
 	ND var  last(const std::size_t length) const&;
 
-	// Remove n characters (bytes) from the source string.
-	// length: Positive to remove first n characters or negative to remove the last n characters.
-	// If the absolute value of length is >= the number of characters in the source string then all characters will be removed.
+	// Remove n chars (bytes) from the source string.
+	// length: Positive to remove first n chars or negative to remove the last n chars.
+	// If the absolute value of length is >= the number of chars in the source string then all chars will be removed.
 	//
 	// `let v1 = "abcd"_var.cut(2); // "cd"
 	//  // or
 	//  let v2 = cut("abcd", 2);`
 	ND var  cut(const int length) const&;
 
-	// Insert a substr at an given position after removing a given number of characters.
+	// Insert a substr at an given position after removing a given number of chars.
 	//
-	// pos1: 0 or 1 : Remove length characters from the beginning and insert at the beginning.
-	// pos1: > than the length of the source string. Insert after the last character.
-	// pos1: -1 : Remove up to length characters before inserting.Insert on or before the last character.
-	// pos1: -2 : Insert on or before the penultimate character.
+	// pos1: 0 or 1 : Remove length chars from the beginning and insert at the beginning.
+	// pos1: > than the length of the source string. Insert after the last char.
+	// pos1: -1 : Remove up to length chars before inserting.Insert on or before the last char.
+	// pos1: -2 : Insert on or before the penultimate char.
 	//
 	// `let v1 = "abcd"_var.paste(2, 2, "XYZ"); // "aXYZd"
 	//  // or
 	//  let v2 = paste("abcd", 2, 2, "XYZ");`
 	ND var  paste(const int pos1, const int length, SV insertstr) const&;
 
-	// Insert text at char position without overwriting any following characters
+	// Insert text at char position without overwriting any following chars
 	//
 	// `let v1 = "abcd"_var.paste(2, "XYZ"); // "aXYZbcd"
 	//  // or
@@ -737,7 +736,7 @@ public:
 	ND var  prefix(SV insertstr) const&;
 
 	template <typename... ARGS>
-	// Append text at the end
+	// Append anything at the end of a string
 	//
 	// `let v1 = "abc"_var.append(" is ", 10, " ok", '.'); // "abc is 10 ok."
 	//  // or
@@ -748,7 +747,7 @@ public:
 		return nrvo;
 	}
 
-	// Remove one trailing char
+	// Remove one trailing char.
 	//
 	// `let v1 = "abc"_var.pop(); // "ab"
 	//  // or
@@ -879,7 +878,8 @@ public:
 	//  let v2 = textconvert("a🤡b😀c🌍d", "🤡😀", "👋");`
 	ND var  textconvert(SV fromchars, SV tochars) const&;
 
-	// Replace all occurrences of a substr with another. Case sensitive
+	// Replace all occurrences of one substr with another.
+	// Case sensitive.
 	//
 	// `let v1 = "Abc.Abc"_var.replace("bc", "X"); // "AX.AX"
 	//  // or
@@ -902,44 +902,46 @@ public:
 	ND var  unique() const&;
 
 	// Reorder fields in an FM or VM etc. separated list in ascending order
-	// Numerical:
-	//
+	// Numeric data:
 	// `let v1 = "20^10^2^1^1.1"_var.sort(); // "1^1.1^2^10^20"_var
 	//  // or
 	//  let v2 = sort("20^10^2^1^1.1"_var);`
-	// Alphabetical:
+	// Alphabetic data:
 	//  `let v1 = "b1^a1^c20^c10^c2^c1^b2"_var.sort(); // "a1^b1^b2^c1^c10^c2^c20"_var
 	//  // or
 	//  let v2 = sort("b1^a1^c20^c10^c2^c1^b2"_var);`
-	ND var  sort(SV sepchar = _FM) const&;
+	ND var  sort(SV delimiter = _FM) const&;
 
 	// Reorder fields in an FM or VM etc. separated list in descending order
 	//
 	// `let v1 = "20^10^2^1^1.1"_var.reverse(); // "1.1^1^2^10^20"_var
 	//  // or
 	//  let v2 = reverse("20^10^2^1^1.1"_var);`
-	ND var  reverse(SV sepchar = _FM) const&;
+	ND var  reverse(SV delimiter = _FM) const&;
 
 	// Randomise the order of fields in an FM, VM separated list
 	//
 	// `let v1 = "20^10^2^1^1.1"_var.shuffle(); /// e.g. "2^1^20^1.1^10" (random order depending on initrand())
 	//  // or
 	//  let v2 = shuffle("20^10^2^1^1.1"_var);`
-	ND var  shuffle(SV sepchar = _FM) const&;
+	ND var  shuffle(SV delimiter = _FM) const&;
 
-	// Replace separator characters with FM char except inside double or single quotes ignoring escaped quotes &bsol;" &bsol;'
+	// Split a delimited string with embedded quotes into a dynamic array.
+	// Can be used to process CSV data.
+	// Replaces separator chars with FM chars except inside double or single quotes and ignoring escaped quotes &bsol;" &bsol;'
 	//
 	// `let v1 = "abc,\"def,\"123\" fgh\",12.34"_var.parse(','); // "abc^\"def,\"123\" fgh\"^12.34"_var
 	//  // or
 	//  let v2 = parse("abc,\"def,\"123\" fgh\",12.34", ',');`
 	ND var  parse(char sepchar = ' ') const&;
 
-	// Split a FM etc. separated string into a dim array.
+	// Split a delimited string into a dim array.
+	// The delimiter can be multibyte unicode.
 	//
 	// `dim d1 = "a^b^c"_var.split(); // A dimensioned array with three elements (vars)
 	//  // or
 	//  dim d1 = split("a^b^c"_var);`
-	ND dim  split(SV sepchar = _FM) const;
+	ND dim  split(SV delimiter = _FM) const;
 
 	// SAME ON TEMPORARIES - CALL MUTATORS FOR SPEED (not documenting since programmer interface is the same)
 	/////////////////////////////////////////
@@ -981,7 +983,7 @@ public:
 			}
 	ND io   pop() &&;
 
-	ND io   fieldstore(SV sepchar, const int fieldno, const int nfields, in replacement) &&;
+	ND io   fieldstore(SV delimiter, const int fieldno, const int nfields, in replacement) &&;
 	ND io   substr(const int pos1, const int length) &&;
 	ND io   substr(const int pos1) &&;
 
@@ -992,9 +994,9 @@ public:
 //	ND io   regex_replace(SV regex_str, SV replacement, SV regex_options = "") &&;
 
 	ND io   unique() &&;
-	ND io   sort(SV sepchar = _FM) &&;
-	ND io   reverse(SV sepchar = _FM) &&;
-	ND io   shuffle(SV sepchar = _FM) &&;
+	ND io   sort(SV delimiter = _FM) &&;
+	ND io   reverse(SV delimiter = _FM) &&;
+	ND io   shuffle(SV delimiter = _FM) &&;
 	ND io   parse(char sepchar = ' ') &&;
 
 	///// STRING CONVERSION - Mutating - Standalone commands:
@@ -1050,7 +1052,7 @@ public:
 
 	// TODO look at using erase to speed up
 
-	   IO   fieldstorer(SV sepchar, const int fieldno, const int nfields, in replacement) REF ;
+	   IO   fieldstorer(SV delimiter, const int fieldno, const int nfields, in replacement) REF ;
 	   IO   substrer(const int pos1, const int length) REF ;
 	   IO   substrer(const int pos1) REF {return this->substrer(pos1, this->len());}
 	   IO   converter(SV fromchars, SV tochars) REF;
@@ -1060,9 +1062,9 @@ public:
 //	   IO   regex_replacer(SV regex, SV replacement, SV regex_options = "") REF ;
 
 	   IO   uniquer() REF ;
-	   IO   sorter(SV sepchar = _FM) REF ;
-	   IO   reverser(SV sepchar = _FM) REF ;
-	   IO   shuffler(SV sepchar = _FM) REF ;
+	   IO   sorter(SV delimiter = _FM) REF ;
+	   IO   reverser(SV delimiter = _FM) REF ;
+	   IO   shuffler(SV delimiter = _FM) REF ;
 	   IO   parser(char sepchar = ' ') REF ;
 
 	///// I/O CONVERSION:
@@ -1276,7 +1278,7 @@ public:
 	// `let v1 = "10,20,30"_var.sum(","); // 60
 	//  // or
 	//  let v2 = sum("10,20,30", ",");`
-	ND var  sum(SV sepchar) const;
+	ND var  sum(SV delimiter) const;
 
 	// Binary ops (+, -, *, /) in parallel on multiple values
 	//
@@ -1503,7 +1505,7 @@ public:
 	//
 	// `let sqlcmd = "select 'xxx' as col1, 'yyy' as col2";
 	//  var response;
-	//  if (conn.sqlexec(sqlcmd, response)) ... ok // response -> "col1^col2\x1fxxx^yyy"_var /// \x1f is the Record Mark (RM) character. The backtick character is used here by gendoc to deliminate source code.
+	//  if (conn.sqlexec(sqlcmd, response)) ... ok // response -> "col1^col2\x1fxxx^yyy"_var /// \x1f is the Record Mark (RM) char. The backtick char is used here by gendoc to deliminate source code.
 	//  // or
 	//  if (sqlexec(sqlcmd, response)) ... ok`
 	ND bool sqlexec(in sqlcmd, io response) const;
@@ -2507,7 +2509,7 @@ public:
 	// Output to stdlog with optional prefix.
 	// Appends an NL char.
 	// Is BUFFERED not flushed.
-	// Any of the six types of field mark characters present are converted to their visible versions,
+	// Any of the six types of field mark chars present are converted to their visible versions,
 	//
 	// `"abc"_var.logputl("xyz = "); /// Sends "xyz = abc\n" to stdlog buffer and is not flushed.
 	//  // or
@@ -2518,7 +2520,7 @@ public:
 	// Output to stderr with optional prefix.
 	// Appends an NL char.
 	// Is FLUSHED not buffered.
-	// Any of the six types of field mark characters present are converted to their visible versions,
+	// Any of the six types of field mark chars present are converted to their visible versions,
 	//
 	// `"abc"_var.errputl("xyz = "); /// Sends "xyz = abc\n" to stderr
 	//  // or
@@ -2545,7 +2547,7 @@ public:
 	// obj is var
 
 	// Returns one line of input from stdin.
-	// Returns raw bytes up to but excluding the first new line character.
+	// Returns raw bytes up to but excluding the first new line char.
 	// Prompt: Optional. Will be displayed before the input field if provided.
 	// If stdin is a terminal then the initial value of the var, if any, is the default value and can be edited with cursor keys like an OS command line. Pressing Enter or Ctrl+D will complete the input.
 	// `// var v1 = "default"; v1.input("Prompt:");
@@ -2554,7 +2556,7 @@ public:
 	   out  input(in prompt = "");
 
     // Get raw bytes from standard input.
-	// Any new line characters are treated like any other bytes.
+	// Any new line chars are treated like any other bytes.
 	// Care must be taken to handle incomplete UTF8 byte sequences at the end of one block and the beginning of the next block.
 	// Returns: The requested number of bytes or fewer if not available.
 	// nchars:
@@ -2597,7 +2599,7 @@ public:
 	ND bool eof() const;
 
 	// Sets terminal echo on or off.
-	// "On" causes all stdin characters to be reflected to stdout if stdin is a terminal.
+	// "On" causes all stdin data to be reflected to stdout if stdin is a terminal.
 	// Turning terminal echo off can be used to prevent display of confidential information.
 	// Returns: True if successful.
 	   bool echo(const bool on_off = true) const;
@@ -2842,7 +2844,7 @@ public:
 	// "H" - Show AM/PM otherwise 24 hour clock is used.
 	// "S" - Output seconds
 	// "2" = Ignored (used in iconv)
-	// ":" - Any other flag is used as the separator character instead of ":"
+	// ":" - Any other flag is used as the separator char instead of ":"
 	// Any multifield/multivalue structure is preserved.
 	// obj is vartime
 	//
@@ -2869,7 +2871,7 @@ public:
 	// Time input: Convert human readable time (e.g. "10:30:59") to internal time format.
 	// Returns: Internal time or "" if the input is an invalid time.
 	// Internal time format is whole seconds since midnight.
-	// Accepts: Two or three groups of digits surrounded and separated by any non-digits character(s).
+	// Accepts: Two or three groups of digits surrounded and separated by any non-digits char(s).
 	// Any multifield/multivalue structure is preserved.
 	// obj is varstr
 	//
@@ -2907,7 +2909,7 @@ public:
 	// "X" - No conversion - return as is.
 	// "." or "," - Separate thousands depending on MD or MC.
 	// "-" means suffix negatives with "-" and positives with " " (space).
-	// "<" means wrap negatives in "<" and ">" characters.
+	// "<" means wrap negatives in "<" and ">" chars.
 	// "C" means suffix negatives with "CR" and positives or zero with "DB".
 	// "D" means suffix negatives with "DB" and positives or zero with "CR".
 	//
@@ -2948,7 +2950,7 @@ public:
 	//  assert(     "ab"_var.oconv( "R#6" ) == "␣␣␣␣ab" );
 	//  assert(     "ab"_var.oconv( "C#6" ) == "␣␣ab␣␣" );
 	//
-	//  assert(      var(42).oconv( "L(0)#5" ) == "42000" ); // Padding character (x)
+	//  assert(      var(42).oconv( "L(0)#5" ) == "42000" ); // Padding char (x)
 	//  assert(      var(42).oconv( "R(0)#5" ) == "00042" );
 	//  assert(      var(42).oconv( "C(0)#5" ) == "04200" );
 	//  assert(      var(42).oconv( "C(0)#5" ) == "04200" );
@@ -2966,7 +2968,7 @@ public:
 	// Text folding and justification.
 	// e.g. T#20
 	// Useful when outputting to terminal devices where spaces are used for alignment.
-	// Splits text into multiple fixed length lines by inserting spaces and TM characters.
+	// Splits text into multiple fixed length lines by inserting spaces and TM chars.
 	// ASCII only.
 	// obj is varstr
 	//
@@ -3326,13 +3328,13 @@ class PUBLIC var_proxy1 {
 		return var_.f(fn_);
 	}
 
-	// Operator []. Allow character extraction.
-	// xxx(fn)[cn]
-	// DONT change deprecation wordng without also changing it in cli/fixdeprecated
-	[[deprecated ("EXODUS: Replace single character accessors like xxx[n] with xxx.at(n)")]]
-	ND RETVAR operator[](const int pos1) const {
-		return this->at(pos1);
-	}
+//	// Operator []. Allow char extraction.
+//	// xxx(fn)[cn]
+//	// DONT change deprecation wording without also changing it in cli/fixdeprecated
+//	[[deprecated ("EXODUS: Replace single char accessors like xxx[n] with xxx.at(n)")]]
+//	ND RETVAR operator[](const int pos1) const {
+//		return this->at(pos1);
+//	}
 
 	// TODO replace .f with a version of .f that returns a string_view
 	// instead of wasting time constructing a temporary var only to extract a single char from it
@@ -3373,11 +3375,11 @@ class PUBLIC var_proxy2 {
 		return var_.f(fn_, vn_);
 	}
 
-	// DONT change deprecation wordng without also changing it in cli/fixdeprecated
-	[[deprecated ("EXODUS: Replace single character accessors like xxx[n] with xxx.at(n)")]]
-	ND var  operator[](const int pos1) const {
-		return this->at(pos1);
-	}
+//	// DONT change deprecation wordng without also changing it in cli/fixdeprecated
+//	[[deprecated ("EXODUS: Replace single char accessors like xxx[n] with xxx.at(n)")]]
+//	ND var  operator[](const int pos1) const {
+//		return this->at(pos1);
+//	}
 
 	ND var  at(const int pos1) const;
 
@@ -3417,11 +3419,11 @@ class PUBLIC var_proxy3 {
 		return var_.f(fn_, vn_, sn_);
 	}
 
-	// DONT change deprecation wordng without also changing it in cli/fixdeprecated
-	[[deprecated ("EXODUS: Replace single character accessors like xxx[n] with xxx.at(n)")]]
-	ND var  operator[](const int pos1) const {
-		return this->at(pos1);
-	}
+//	// DONT change deprecation wordng without also changing it in cli/fixdeprecated
+//	[[deprecated ("EXODUS: Replace single char accessors like xxx[n] with xxx.at(n)")]]
+//	ND var  operator[](const int pos1) const {
+//		return this->at(pos1);
+//	}
 
 	ND var  at(const int pos1) const;
 
@@ -3449,7 +3451,7 @@ ND inline var_proxy3 var::operator()(int fieldno, int valueno, int subvalueno) {
 #pragma clang diagnostic ignored "-Wreserved-identifier"
 
 ////////////////////////////////////////////////
-// var versions of various field mark characters
+// var versions of various field mark chars
 ////////////////////////////////////////////////
 
 	PUBLIC extern const var RM;

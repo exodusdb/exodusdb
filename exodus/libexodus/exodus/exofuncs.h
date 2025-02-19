@@ -366,8 +366,8 @@ ND var  unquote(in instring);
    IO   unquoter(io iostring);
 
 
-ND var  fieldstore(in instring, SV sepchar, const int fieldno, const int nfields, in replacement);
-   IO   fieldstorer(io iostring, SV sepchar, const int fieldno, const int nfields, in replacement);
+ND var  fieldstore(in instring, SV delimiter, const int fieldno, const int nfields, in replacement);
+   IO   fieldstorer(io iostring, SV delimiter, const int fieldno, const int nfields, in replacement);
 
 
 ND var  trim(in instring, SV trimchars = " ");
@@ -431,8 +431,8 @@ ND var  field2(in instring, SV substr, const int fieldno, const int nfields = 1 
 
 ND var  substr2(in fromstr, io startindex, io delimiterno);
 
-ND dim  split(in sourcevar, SV sepchar = _FM );
-ND var  join(const dim& sourcedim, SV sepchar = _FM );
+ND dim  split(in sourcevar, SV delimiter = _FM );
+ND var  join(const dim& sourcedim, SV delimiter = _FM );
 
 ND var  pickreplace(in instring, const int fieldno, const int valueno, const int subvalueno, in replacement);
 ND var  pickreplace(in instring, const int fieldno, const int valueno, in replacement);
@@ -474,21 +474,21 @@ ND bool locateusing(in usingchar, in target, in instring);
 ND bool locateusing(in usingchar, in target, in instring, io setting);
 ND bool locateusing(in usingchar, in target, in instring, io setting, const int fieldno, const int valueno = 0 , const int subvalueno = 0 );
 
-ND var  sum(in instring, SV sepchar);
+ND var  sum(in instring, SV delimiter);
 ND var  sum(in instring);
 ND var  sumall(in instring);
 
 ND var  crop(in instring);
    IO   cropper(io iostring);
 
-ND var  sort(in instring, SV sepchar = _FM );
-   IO   sorter(io iostring, SV sepchar = _FM );
+ND var  sort(in instring, SV delimiter = _FM );
+   IO   sorter(io iostring, SV delimiter = _FM );
 
-ND var  reverse(in instring, SV sepchar = _FM );
-   IO   reverser(io iostring, SV sepchar = _FM );
+ND var  reverse(in instring, SV delimiter = _FM );
+   IO   reverser(io iostring, SV delimiter = _FM );
 
-ND var  shuffle(in instring, SV sepchar = _FM );
-   IO   shuffler(io iostring, SV sepchar = _FM );
+ND var  shuffle(in instring, SV delimiter = _FM );
+   IO   shuffler(io iostring, SV delimiter = _FM );
 
 ND var  parse(in instring, char sepchar = ' ');
    IO   parser(io instring, char sepchar = ' ');

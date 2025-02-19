@@ -261,8 +261,8 @@ ND PUBLIC var  unquote(in instring) {return instring.unquote();}
    PUBLIC IO   unquoter(io iostring) {iostring.unquoter(); return IOSTRING;}
 
 
-ND PUBLIC var  fieldstore(in instring, SV sepchar, const int fieldno, const int nfields, in replacement) {return instring.fieldstore(sepchar, fieldno, nfields, replacement);}
-   PUBLIC IO   fieldstorer(io iostring, SV sepchar, const int fieldno, const int nfields, in replacement) {iostring.fieldstorer(sepchar, fieldno, nfields, replacement); return IOSTRING;}
+ND PUBLIC var  fieldstore(in instring, SV delimiter, const int fieldno, const int nfields, in replacement) {return instring.fieldstore(delimiter, fieldno, nfields, replacement);}
+   PUBLIC IO   fieldstorer(io iostring, SV delimiter, const int fieldno, const int nfields, in replacement) {iostring.fieldstorer(delimiter, fieldno, nfields, replacement); return IOSTRING;}
 
 
 ND PUBLIC var  trim(in instring, SV trimchars /*="*/) {return instring.trim(trimchars);}
@@ -326,8 +326,8 @@ ND PUBLIC var  field2(in instring, SV substr, const int fieldno, const int nfiel
 
 ND PUBLIC var  substr2(in fromstr, io startindex, io delimiterno) {return fromstr.substr2(startindex, delimiterno);}
 
-ND PUBLIC dim split(in sourcevar, SV sepchar /*=_FM*/) {return sourcevar.split(sepchar);}
-ND PUBLIC var  join(const dim& sourcedim, SV sepchar /*=_FM*/) {return sourcedim.join(sepchar);}
+ND PUBLIC dim split(in sourcevar, SV delimiter /*=_FM*/) {return sourcevar.split(delimiter);}
+ND PUBLIC var  join(const dim& sourcedim, SV delimiter /*=_FM*/) {return sourcedim.join(delimiter);}
 
 ND PUBLIC var  pickreplace(in instring, const int fieldno, const int valueno, const int subvalueno, in replacement) {return instring.pickreplace(fieldno, valueno, subvalueno, replacement);}
 ND PUBLIC var  pickreplace(in instring, const int fieldno, const int valueno, in replacement) {return instring.pickreplace(fieldno, valueno, replacement);}
@@ -365,7 +365,7 @@ ND PUBLIC bool locateusing(in usingchar, in target, in instring) {return instrin
 ND PUBLIC bool locateusing(in usingchar, in target, in instring, io setting) {return instring.locateusing(usingchar, target, setting);}
 ND PUBLIC bool locateusing(in usingchar, in target, in instring, io setting, const int fieldno, const int valueno /*=0*/, const int subvalueno /*=0*/) {return instring.locateusing(usingchar, target, setting, fieldno, valueno, subvalueno);}
 
-ND PUBLIC var  sum(in instring, SV sepchar) {return instring.sum(sepchar);}
+ND PUBLIC var  sum(in instring, SV delimiter) {return instring.sum(delimiter);}
 ND PUBLIC var  sum(in instring) {return instring.sum();}
 ND PUBLIC var  sumall(in instring) {return instring.sumall();}
 
@@ -374,14 +374,14 @@ ND PUBLIC var  hash(in instring, const std::uint64_t modulus) {return instring.h
 ND PUBLIC var  crop(in instring) {return instring.crop();}
    PUBLIC IO   cropper(io iostring) {iostring.cropper(); return IOSTRING;}
 
-ND PUBLIC var  sort(in instring, SV sepchar /*=_FM*/) {return instring.sort(sepchar);}
-   PUBLIC IO   sorter(io iostring, SV sepchar /*=_FM*/) {iostring.sorter(sepchar); return IOSTRING;}
+ND PUBLIC var  sort(in instring, SV delimiter /*=_FM*/) {return instring.sort(delimiter);}
+   PUBLIC IO   sorter(io iostring, SV delimiter /*=_FM*/) {iostring.sorter(delimiter); return IOSTRING;}
 
-ND PUBLIC var  reverse(in instring, SV sepchar /*=_FM*/) {return instring.reverse(sepchar);}
-   PUBLIC IO   reverser(io iostring, SV sepchar /*=_FM*/) {iostring.reverser(sepchar); return IOSTRING;}
+ND PUBLIC var  reverse(in instring, SV delimiter /*=_FM*/) {return instring.reverse(delimiter);}
+   PUBLIC IO   reverser(io iostring, SV delimiter /*=_FM*/) {iostring.reverser(delimiter); return IOSTRING;}
 
-ND PUBLIC var  shuffle(in instring, SV sepchar /*=_FM*/) {return instring.shuffle(sepchar);}
-   PUBLIC IO   shuffler(io iostring, SV sepchar /*=_FM*/) {iostring.shuffler(sepchar); return IOSTRING;}
+ND PUBLIC var  shuffle(in instring, SV delimiter /*=_FM*/) {return instring.shuffle(delimiter);}
+   PUBLIC IO   shuffler(io iostring, SV delimiter /*=_FM*/) {iostring.shuffler(delimiter); return IOSTRING;}
 
 ND PUBLIC var  parse(in instring, char sepchar /*=''*/) {return instring.parse(sepchar);}
    PUBLIC IO   parser(io iostring, char sepchar /*=''*/) {iostring.parser(sepchar);}

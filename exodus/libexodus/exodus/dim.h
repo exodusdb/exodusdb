@@ -162,7 +162,7 @@ friend class dim_iter;
 	ND dim_iter begin();
 	ND dim_iter end();
 
-	ND var join(SV sepchar = _FM) const;
+	ND var join(SV delimiter = _FM) const;
 
 	// brackets operators often come in pairs
 	// returns a reference to one var of the array
@@ -222,7 +222,7 @@ friend class dim_iter;
 	dim& reverser();
 	dim& shuffler();
 
-	dim& splitter(in str1, SV sepchar = _FM);
+	dim& splitter(in str1, SV delimiter = _FM);
 //	dim& eraser(std::vector<var>::iterator iter1, std::vector<var>::iterator iter2) {data_.erase(iter1, iter2); return *this;}
 //	dim& eraser(dim_iter dim_iter1, dim_iter dim_iter2) {data_.erase(&*dim_iter1, &*dim_iter2); return *this;}
 

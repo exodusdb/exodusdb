@@ -2420,8 +2420,8 @@ ND io   var::prefix(                  SV prefixstr)    && {prefixer(prefixstr); 
 //ND io append(SV appendstr)                         && {appender(appendstr); return *this;}
 ND io   var::pop()                                     && {popper(); return *this;}
 
-ND io   var::fieldstore(SV sepchar, const int fieldno, const int nfields, in replacement)
-                                                       && {fieldstorer(sepchar, fieldno, nfields, replacement); return *this;}
+ND io   var::fieldstore(SV delimiter, const int fieldno, const int nfields, in replacement)
+                                                       && {fieldstorer(delimiter, fieldno, nfields, replacement); return *this;}
 
 ND io   var::substr(const int pos1, const int length)  && {substrer(pos1, length); return *this;}
 ND io   var::substr(const int pos1)                    && {substrer(pos1); return *this;}
@@ -2432,10 +2432,10 @@ ND io   var::replace(    SV fromstr,   SV tostr)       && {replacer(fromstr, tos
 ND io   var::replace(const rex& regex, SV replacement) && {replacer(regex, replacement); return *this;}
 
 ND io   var::unique()                                  && {uniquer(); return *this;}
-ND io   var::sort(   SV sepchar /*= FM_*/)                 && {sorter(sepchar); return *this;}
-ND io   var::reverse(SV sepchar /*= FM_*/)                 && {reverser(sepchar); return *this;}
-ND io   var::shuffle(SV sepchar /*= FM_*/)                 && {shuffler(sepchar); return *this;}
-ND io   var::parse(char sepchar /*= FM_*/)                 && {parser(sepchar); return *this;}
+ND io   var::sort(   SV delimiter /*= _FM*/)           && {sorter(delimiter); return *this;}
+ND io   var::reverse(SV delimiter /*= _FM*/)           && {reverser(delimiter); return *this;}
+ND io   var::shuffle(SV delimiter /*= _FM*/)           && {shuffler(delimiter); return *this;}
+ND io   var::parse(char delimiter /*= _FM*/)           && {parser(delimiter); return *this;}
 
 // clang-format on
 

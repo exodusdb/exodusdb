@@ -124,14 +124,14 @@ auto get_timebank_acno(const std::string_view arg1) -> int {
 
 	// Must be in the following format for automatic generation of timebank.txt
 
-	     if (++acno && arg1 == "dim& dim::splitter(in str1, SV sepchar)") {}
+	     if (++acno && arg1 == "dim& dim::splitter(in str1, SV delimiter)") {}
 	else if (++acno && arg1 == "xxxxxxxx unused") {}
 	else if (++acno && arg1 == "bool dim::read(in filevar, in key)") {}
 	else if (++acno && arg1 == "void dim::write(in filevar, in key) const") {}
 	else if (++acno && arg1 == "bool dim::osread(in osfilename, const char* codepage = "")") {}
 	else if (++acno && arg1 == "bool dim::oswrite(in osfilename, const char* codepage = "")") {}
-	else if (++acno && arg1 == "var  var::sort(SV sepchar)") {}
-	else if (++acno && arg1 == "var  var::reverse(SV sepchar)") {}
+	else if (++acno && arg1 == "var  var::sort(SV delimiter)") {}
+	else if (++acno && arg1 == "var  var::reverse(SV delimiter)") {}
 	else if (++acno && arg1 == "var  var::timestamp(in ostime) const") {}
 	else if (++acno && arg1 == "bool var::connect(in conninfo") {}
 	else if (++acno && arg1 == "bool var::attach(in filenames") {}

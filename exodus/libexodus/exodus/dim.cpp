@@ -276,7 +276,7 @@ dim& dim::init(in sourcevar) {
 	return *this;
 }
 
-var dim::join(SV sepchar) const {
+var dim::join(SV delimiter) const {
 
 	if (!initialised_)
 		UNLIKELY
@@ -285,7 +285,7 @@ var dim::join(SV sepchar) const {
 	// Use vector size in case some algorithm has adjusted it
 	//std::size_t data_size = nrows_ * ncols_;
 	auto data_size = data_.size();
-	auto sepchar_size = sepchar.size();
+	auto delimiter_size = delimiter.size();
 
 	if (data_size < 2)
 		return "";
@@ -306,10 +306,10 @@ var dim::join(SV sepchar) const {
 		if (!data_element.assigned()) {
 			break;
 		}
-		nchars_joined += data_element.var_str.size() + sepchar_size;
+		nchars_joined += data_element.var_str.size() + delimiter_size;
 	}
 	--nelements;
-	// The additional trailing sepchar_size can be left in the total
+	// The additional trailing delimiter_size can be left in the total
 	// to allow for trailing char(0)
 	//TRACE(nelements)
 	//TRACE(nchars_joined)
@@ -330,24 +330,24 @@ var dim::join(SV sepchar) const {
 	// Ensure converted to a string by using concatenate operator
 	output ^= data_[1];
 
-	// When sepchar is one byte (usual case), use push_back for speed
-	if (sepchar_size == 1) {
+	// When delimiter is one byte (usual case), use push_back for speed
+	if (delimiter_size == 1) {
 
 		LIKELY;
 
-		char sepbyte = sepchar[0];
+		char sepchar = delimiter[0];
 
-		// Append any additional elements. Single byte sepchar
+		// Append any additional elements. Single byte delimiter
 		for (std::size_t elementn = 2; elementn <= nelements; ++elementn) {
-			output.var_str.push_back(sepbyte);
+			output.var_str.push_back(sepchar);
 			output ^= data_[elementn];
 		}
 
 	} else {
 
-		// Append any additional elements. Multibyte sepchar
+		// Append any additional elements. Multibyte delimiter
 		for (std::size_t elementn = 2; elementn <= nelements; ++elementn) {
-			output.var_str += sepchar;
+			output.var_str += delimiter;
 			output ^= data_[elementn];
 		}
 	}
@@ -356,24 +356,24 @@ var dim::join(SV sepchar) const {
 }
 
 // dim=var.split()
-dim  var::split(SV sepchar) const {
+dim  var::split(SV delimiter) const {
 
-	//TODO provide a version that can split on any utf8 character - perhaps if sepchar is ""
+	//TODO provide a version that can split on any utf8 character - perhaps if delimiter is ""
 
-//	THISIS("dim  var::split(SV sepchar)")
-	assertString("dim  var::split(SV sepchar) const");
+//	THISIS("dim  var::split(SV delimiter)")
+	assertString("dim  var::split(SV delimiter) const");
 
 	// an undimensioned dim will be dimensioned automatically
-	return dim().splitter(*this, sepchar);
+	return dim().splitter(*this, delimiter);
 }
 
 // d.splitter(v, sep)
-dim& dim::splitter(in str1, SV sepchar) {
+dim& dim::splitter(in str1, SV delimiter) {
 
 	//TODO provide a version that can split on any utf8 character
-	// Perhaps if sepchar is ""
+	// Perhaps if delimiter is ""
 
-	THISIS("dim& dim::splitter(in str1, SV sepchar)")
+	THISIS("dim& dim::splitter(in str1, SV delimiter)")
 	ISSTRING(str1)
 
 	EXO_DIM_RECALC_NROWS(*this)
@@ -382,7 +382,7 @@ dim& dim::splitter(in str1, SV sepchar) {
 	// do NOT redimension always since pick matread/matparse do not
 	// and we may get VNA accessing array elements if too few.
 	if (!this->initialised_ || this->ncols_ != 1)
-		this->redim(str1.count(sepchar) + 1);
+		this->redim(str1.count(delimiter) + 1);
 
 	// empty string just fills array with empty string
 	if (str1.var_str.empty()) {
@@ -392,17 +392,17 @@ dim& dim::splitter(in str1, SV sepchar) {
 
 	// split always fills starting from element[1] and ignores element[0]
 
-	// start at the beginning and look for sepchar delimiters
+	// start at the beginning and look for delimiter delimiters
 	std::size_t start_pos = 0;
 	std::size_t next_pos = 0;
-	std::size_t sepsize = sepchar.size();
+	std::size_t sepsize = delimiter.size();
 	//std::size_t fieldno;
 	int fieldno;
 	int nrows = static_cast<int>(data_.size() - 1) / ncols_;
 	for (fieldno = 1; fieldno <= nrows; fieldno++) {
 
-		// find the next sepchar delimiter
-		next_pos = str1.var_str.find(sepchar, start_pos);
+		// find the next delimiter delimiter
+		next_pos = str1.var_str.find(delimiter, start_pos);
 
 		// not found - past end of string?
 		if (next_pos == std::string::npos) {
@@ -423,8 +423,8 @@ dim& dim::splitter(in str1, SV sepchar) {
 	if (next_pos != std::string::npos) {
 
 		// stuff any excess fields into the last element
-		//this->data_[this->nrows_] ^= sepchar;
-		this->data_[nrows].var_str.append(sepchar).append(str1.var_str.substr(start_pos));
+		//this->data_[this->nrows_] ^= delimiter;
+		this->data_[nrows].var_str.append(delimiter).append(str1.var_str.substr(start_pos));
 
 	} else {
 
@@ -574,22 +574,22 @@ bool dim::oswrite(in osfilename, const char* codepage) const {
 
 // no speed or memory advantage since not sorting in place
 // but provided for syntactical convenience avoiding need to assign output of sort()
-IO   var::sorter(SV sepchar) REF {
-	(*this) = this->split(sepchar).sort().join(sepchar);
+IO   var::sorter(SV delimiter) REF {
+	(*this) = this->split(delimiter).sort().join(delimiter);
 	return THIS;
 }
 
 //sorting var - using temporary dim
-var  var::sort(SV sepchar) const& {
+var  var::sort(SV delimiter) const& {
 
-	THISIS("var  var::sort(SV sepchar)")
+	THISIS("var  var::sort(SV delimiter)")
 	assertString(function_sig);
 
 	//perhaps is slower but sorts testing var < var linguistically but not natural numbers like 10a 2b
 
 	//split into a temporary dim array for sorting
 	//then join it back up into a single string
-	var nrvo = this->split(sepchar).sort().join(sepchar);
+	var nrvo = this->split(delimiter).sort().join(delimiter);
 	return nrvo;
 
 
@@ -601,22 +601,22 @@ var  var::sort(SV sepchar) const& {
 
 // no speed or memory advantage since not sorting in place
 // but provided for syntactical convenience avoiding need to assign output of reverse()
-IO   var::reverser(SV sepchar) REF {
-	(*this) = this->split(sepchar).reverse().join(sepchar);
+IO   var::reverser(SV delimiter) REF {
+	(*this) = this->split(delimiter).reverse().join(delimiter);
 	return THIS;
 }
 
 //reversing var - using temporary dim
-var  var::reverse(SV sepchar) const& {
+var  var::reverse(SV delimiter) const& {
 
-	THISIS("var  var::reverse(SV sepchar)")
+	THISIS("var  var::reverse(SV delimiter)")
 	assertString(function_sig);
 
 	//split into a temporary dim array for reversing
 	//then join it back up into a single string
-	//var nrvo = this->split(sepchar).reverse().join(sepchar);
+	//var nrvo = this->split(delimiter).reverse().join(delimiter);
 
-	const auto sepcharsize = sepchar.size();
+	const auto delimitersize = delimiter.size();
 
 	var nrvo = "";
 
@@ -632,14 +632,14 @@ var  var::reverse(SV sepchar) const& {
 
 	std::size_t startpos = var_str.size() - 1;
 
-	if (sepcharsize == 1) {
+	if (delimitersize == 1) {
 
 		LIKELY;
 
 		// Single byte sepchar
 		//////////////////////
 
-		const char sepchar1 = sepchar[0];
+		const char sepchar1 = delimiter[0];
 
 		for (;;) {
 
@@ -668,27 +668,27 @@ var  var::reverse(SV sepchar) const& {
 
 	} else {
 
-		// Multi-byte sepchar
+		// Multi-byte delimiter
 		/////////////////////
 
 		for (;;) {
 
-			// if sepchar _FM
+			// if delimiter _FM
 			//  abc ... startpos = 2, nextpos = npos
-			auto nextpos = var_str.rfind(sepchar, startpos);
+			auto nextpos = var_str.rfind(delimiter, startpos);
 			if (nextpos == std::string::npos) {
 				nrvo_var_str.append(var_str, 0, startpos + 1);
 				break;
 			}
 
-			// if sepchar _FM
+			// if delimiter _FM
 			//  _FM     ... startpos = 0, nextpos = 0
 			//  _FM _FM ... startpos = 1, nextpos = 1
 
-			auto nextpos2 = nextpos + sepcharsize;
+			auto nextpos2 = nextpos + delimitersize;
 			nrvo_var_str.append(var_str, nextpos2, startpos - nextpos2 + 1);
 
-			nrvo_var_str.append(sepchar);
+			nrvo_var_str.append(delimiter);
 
 			if (nextpos == 0)
 				break;
@@ -696,7 +696,7 @@ var  var::reverse(SV sepchar) const& {
 			startpos = nextpos - 1;
 		}
 
-	}  // multibyte sepchar
+	}  // multibyte delimiter
 
 	return nrvo;
 
@@ -708,18 +708,18 @@ var  var::reverse(SV sepchar) const& {
 
 // No speed or memory advantage since not shuffling in place
 // but provided for syntactical convenience avoiding need to assign output of shuffle()
-IO   var::shuffler(SV sepchar) REF {
-	(*this) = this->split(sepchar).shuffler().join(sepchar);
+IO   var::shuffler(SV delimiter) REF {
+	(*this) = this->split(delimiter).shuffler().join(delimiter);
 	return THIS;
 }
 
 // No speed or memory advantage since not shuffling in place
 // but provided for syntactical convenience avoiding need to assign output of shuffle()
-var  var::shuffle(SV sepchar) const& {
-//	return this->split(sepchar).shuffler().join(sepchar);
-	auto _ = this->split(sepchar);
+var  var::shuffle(SV delimiter) const& {
+//	return this->split(delimiter).shuffler().join(delimiter);
+	auto _ = this->split(delimiter);
 	_.shuffler();
-	return _.join(sepchar);
+	return _.join(delimiter);
 }
 
 dim_iter dim::begin() {
