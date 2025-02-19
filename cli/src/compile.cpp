@@ -145,7 +145,7 @@ OPTIONS
 	X	= Skip compilation
 	L	= Clean (remove) object and header files that compile installed.
 	i	= Inline code
-			compile 'oconv("date()", "D")' {i}                        // Simple expression. NO semicolon"
+			compile 'oconv("date()", "D")' {i}                        // Simple expression. NO semicolon."
 			compile 'write("f1^f2"_var on "definitions", "abc");' {i} // Raw source code.   MANDATORY semicolon(s).
 ENVIRONMENT
 	EXO_COMPILE_OPTIONS As above
