@@ -3,13 +3,13 @@ programinit()
 
 let syntax = R"(
 SYNTAX
-	fixdeprecated file|dir ... {OPTIONS}
+	fixdeprecated [file|dir...] {OPTIONS}
+	Will read compiler output from standard input if available file|dir are not provided.
 OPTIONS
 	U - Actually update
 	C - Recompile after updated
 	V - Verbose
 	H - Help
-	X - Read compiler output from standard input (file|dir ignored)
 )";
 
 function main() {
@@ -19,22 +19,19 @@ function main() {
 	let update = OPTIONS.contains("U");
 	let recompile = OPTIONS.contains("C");
 	let verbose = OPTIONS.count("V");
-	let stdinput = OPTIONS.contains("X");
 
-	if (OPTIONS.convert("UCVX", "")) {
+	if (OPTIONS.convert("UCV", "")) {
 		abort(syntax);
 	}
+
+	// Use files/dirs otherwise stdin
+	let stdinput = not COMMAND.f(2);
 
 	// If any files provided on command line
 	// then recompile them to get any deprecation messages and pipe
 	// them into a another copy of this program in another process
 	///////////////////////////////////////////////////////////////
 	if (not stdinput) {
-
-		// Must specify some files/dirs
-		if (not COMMAND.count(FM)) {
-			abort(syntax);
-		}
 
 		// Compile all requested files to generate deprecation warnings
 		// Parallel compilation will speed matters up.
@@ -49,7 +46,7 @@ function main() {
 
 		// Pipe the compiler output into another process of this command
 		// F = Force recompilation to generate any deprecation warning messages
-		let pipedcmd = compilecmd ^ " {F} |& " ^ COMMAND.f(1) ^ " {X" ^ OPTIONS ^ "}";
+		let pipedcmd = compilecmd ^ " {F} |& " ^ COMMAND.f(1) ^ " {" ^ OPTIONS ^ "}";
 		if (verbose)
 			TRACE(pipedcmd)
 		if (not osshell("bash -c " ^ pipedcmd.squote()))
@@ -201,6 +198,7 @@ function main() {
 
 		// Skip invalid syntax
 		if (not num(lineno) or not num(charno)) {
+			logputl(compline);
 			logputl("fixdeprecated: Cannot determine source line and char nos");
 			continue;
 		}
@@ -227,7 +225,7 @@ function main() {
 		if (verbose)
 			TRACE(srcline);
 
-		srcline.replacer(R"__(makelist("", )__", "makeselect(");
+		srcline.replacer(R"__(makelist("", )__", "selectkeys(");
 
 		if (verbose)
 			TRACE(srcline);
@@ -374,7 +372,7 @@ function main() {
 	update_src();
 
 	if (nlinesupdated)
-		printl(nlinesupdated, "lines", update ? "updated." : "updateable. Option {U} to update.");
+		printl(nlinesupdated, "lines", update ? "updated." : "updateable. 'fixdeprecated {U}' to update.");
 	else
 		printl(nlinesupdated, "lines updated.");
 
