@@ -254,7 +254,7 @@ function main(in sentence0, in select0 = "", in filters0 = "") {
 	}
 
 	if (exportable) {
-		makelist("", exportable);
+		selectkeys(exportable);
 		// write exportable on lists,listkey
 		// perform 'GET-LIST ':listkey:' (S)'
 		// delete lists,listkey

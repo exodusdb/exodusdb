@@ -655,7 +655,7 @@ getvalues:
 		// and data passed to SELECT is assumed to be a selectlist
 
 		if (data_) {
-			makelist("", data_);
+			selectkeys(data_);
 			sortselect ^= "%SELECTLIST%";
 			data_ = "";
 		}
