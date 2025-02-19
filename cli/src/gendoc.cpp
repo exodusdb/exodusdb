@@ -548,6 +548,7 @@ function main() {
 
 		// Escape back slashes for man pages
 		if (man) {
+			doc_text.replacer("&bsol;", "\\");
 			doc_text.replacer("\\", "\\" "\\");
 
 //			comments.replacer("Returns: ", "/fbReturns:/fr ");
@@ -645,13 +646,13 @@ function main() {
 		}
 
 		// Only update if the text has changed
-		logput(code_filename, " ");
+		logput("gendoc: ", code_filename, " ");
 		if (newcode != oldcode) {
 			if (not oscopy(temp_code_filename to code_filename))
 				abort(lasterror());
-			logputl("Updated. gendoc");
+			logputl("Updated.");
 		} else
-			logputl("Not changed. gendoc");
+			logputl("Not changed.");
 
 	} // osfilename
 
