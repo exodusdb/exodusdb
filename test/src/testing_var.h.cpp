@@ -99,7 +99,7 @@ function main() {
 	{
 		let v1 = "Γ"_var.textseq();
 		assert(v1 == 915);
- // U+0393: Greek Capital Letter Gamma (Unicode Character)
+ // U+0393: Greek Capital Letter Gamma (Unicode character)
 		 // or
 		 let v2 = textseq("Γ");
 	}
@@ -525,11 +525,22 @@ function main() {
 
 	printl(" substr(const int pos1, const int length) const&;");
 	{
+		let v1 = "abcd"_var.substr(-3, 2);
+		assert(v1 == "bc");
+
+		 // or
+		 let v2 = substr("abcd", -3, 2);
+	}
+
+	printl(" substr(const int pos1, const int length) const&;");
+	{
 		let v1 = "abcd"_var.substr(3, -2);
 		assert(v1 == "cb");
 
 		 // or
 		 let v2 = substr("abcd", 3, -2);
+		assert(v2 == "cb");
+
 	}
 
 	printl(" substr(const int pos1) const&;");
@@ -543,27 +554,33 @@ function main() {
 
 	printl(" substr(const int pos1, SV delimiterchars, io pos2) const;");
 	{
-		var pos1a = 4, pos2a;
-		 let v1 = "aa,bb,cc"_var.substr(pos1a, ",", pos2a);
-		assert(v1 == "bb");
-		assert(pos2a == 6);
-
+		var pos1 = 4, pos2;
+		 let v1 = "12,45 78"_var.substr(pos1, ", ", pos2);
+		assert(v1 == "45" );
+		assert(pos2 == 6 );
+ // 6 is the position of the next delimiter char found.
 		 // or
-		 var pos1b = 4, pos2b;
-		 let v2 = substr("aa,bb,cc", pos1b, ",", pos2b);
+		 var pos3;
+		 let v2 = substr("12,45 78", pos2 + 1, ", ", pos3);
+		assert(v2 == "78" );
+		assert(pos3 == 9 );
+ // 9 is one after the end of the string meaning that none of the delimiter chars were found.
 	}
 
 	printl(" substr2(io pos1, out delimiterno) const;");
 	{
-		var pos1a = 4, delim1;
-		 let v1 = "aa^bb^cc"_var.substr2(pos1a, delim1);
-		assert(v1 == "bb");
-		assert(pos1a == 7 );
-		assert(delim1 == 2);
-
+		var pos1 = 4, field_mark_no;
+		 let v1 = "12^45^78"_var.substr2(pos1, field_mark_no);
+		assert(v1 == "45");
+		assert(pos1 == 7 );
+		assert(field_mark_no == 2 );
+ // field_mark_no 2 means that a FM was found.
 		 // or
-		 var pos1b = 4, delim2;
-		 let v2 = substr2("aa^bb^cc"_var, pos1b, delim2);
+		 let v2 = substr2("12^45^78"_var, pos1, field_mark_no);
+		assert(v2 == "78");
+		assert(pos1 == 9 );
+		assert(field_mark_no == 0 );
+ // field_mark_no 0 means that none of the standard field marks were found.
 	}
 
 	printl(" convert(SV fromchars, SV tochars) const&;");
@@ -702,7 +719,7 @@ function main() {
 
 		 // or
 		 let v2 = from_codepage("\xa4", "CP1124");
-		 // U+0404 Cyrillic Capital Letter Ukrainian Ie Unicode Character
+		 // U+0404 Cyrillic Capital Letter Ukrainian Ie Unicode character
 	}
 
 	printl(" to_codepage(const char* codepage) const;");

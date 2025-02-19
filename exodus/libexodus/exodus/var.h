@@ -248,9 +248,9 @@ public:
 
 	// Convert a number into a string after rounding it to a given number of decimal places.
 	// var: The number to be converted.
-	// ndecimals: How many decimal places are required to the right of the decimal point or, if necimals is negative, how many 0's should preceed the decimal point.
-	// Returns: A var containing an ASCII string of digits and a decimal point "." unless ndecimals is 0.
-	// Trailing zeros are not omitted.
+	// ndecimals: Determines how many decimal places are shown to the right of the decimal point or, if ndecimals is negative, how many 0's to the left of it.
+	// Returns: A var containing an ASCII string of digits with a leading "-" if negative, and a decimal point "." if ndecimals is > 0.
+	// Trailing zeros are not omitted. A leading "0." is shown where appropriate.
     // 0.5 always rounds away from zero. i.e. 1.5 -> 2 and -1.5 -> -2
 	// obj is varnum
 	//
@@ -283,8 +283,8 @@ public:
 	//  let v2 = chr(0x61);`
 	ND var  chr(const int num) const;
 
-	// Get a unicode character given a Unicode Code Point (Number)
-	// Returns: A single unicode character in utf8 encoding.
+	// Get a Unicode character given a Unicode Code Point (Number)
+	// Returns: A single Unicode character in UTF8 encoding.
 	// To get UTF code points > 2^63 you must provide negative ints because var doesnt provide an implicit constructor to unsigned int due to getting ambigious conversions because int and unsigned int are parallel priority in c++ implicit conversions.
 	//
 	// `let v1 = var().textchr(171416); // "𩶘" // or "\xF0A9B698"
@@ -321,7 +321,7 @@ public:
 	ND var  numberinwords(in languagename_or_locale_id = "");
 
 	////////////
-	// STRING // All utf8 unless char or byte mentioned
+	// STRING // All UTF8 unless char or byte mentioned
 	////////////
 
 	///// STRING SCANNING:
@@ -338,16 +338,16 @@ public:
 	//  let v2 = seq("abc");`
 	ND var  seq() const;
 
-	// Get the Unicode Code Point of a unicode character.
-	// var: A UTF-8 string. Only the first unicode character is considered.
+	// Get the Unicode Code Point of a Unicode character.
+	// var: A UTF-8 string. Only the first Unicode character is considered.
 	// Returns: A number.
 	//
-	// `let v1 = "Γ"_var.textseq(); // 915 // U+0393: Greek Capital Letter Gamma (Unicode Character)
+	// `let v1 = "Γ"_var.textseq(); // 915 // U+0393: Greek Capital Letter Gamma (Unicode character)
 	//  // or
 	//  let v2 = textseq("Γ");`
 	ND var  textseq() const;
 
-	// Get the length of a source string in number of chars *bytes
+	// Get the length of a source string in number of chars
 	// Returns: A number
 	//
 	// `let v1 = "abc"_var.len(); // 3
@@ -367,9 +367,10 @@ public:
 	ND bool empty() const;
 
 	// Count the number of output columns required for a given source string.
-	// Returns: The number of output columns.
-	// Allows multi column unicode and reduces combining characters etc. like "e" followed by grave accent
-	// Does not properly calculate combining sequences of graphemes e.g. face followed by colour
+	// Returns: A number
+	// Allows wide multi-column Unicode characters that occupy more than one space in a text file or terminal screen.
+	// Reduces combining characters to a single column. e.g. "e" followed by grave accent is multiple bytes but only occupies one output column.
+	// Does not properly calculate all possible combining sequences of graphemes e.g. face followed by colour
 	//
 	// `let v1 = "🤡x🤡"_var.textwidth(); // 5
 	//  // or
@@ -377,7 +378,6 @@ public:
 	ND var  textwidth() const;
 
 	// Count the number of Unicode code points in a source string.
-	// var: A UTF8 string.
 	// Returns: A number.
 	//
 	// `let v1 = "Γιάννης"_var.textlen(); // 7
@@ -441,8 +441,8 @@ public:
 
 	// Find a substr in a source string.
 	// substr: The substr to search for.
-	// startchar1: The char number (1 based) to start the search at. The default is 1, the first char.
-	// Returns: The char number (1 based) that the substr is found at or 0 if not present.
+	// startchar1: The char position (1 based) to start the search at. The default is 1, the first char.
+	// Returns: The char position (1 based) that the substr is found at or 0 if not present.
 	//
 	// `let v1 = "abcd"_var.index("bc"); // 2
 	//  // or
@@ -460,8 +460,8 @@ public:
 
 	// Find the position of substr working backwards from the end of the string towards the beginning.
 	// substr: The string to search for.
-	// Returns: The index (1 based position) of the substr on or before a given starting char number if present
-	// startchar1: defaults to -1 meaning start searching from the last char.
+	// Returns: The char position of the substr if found, or 0 if not.
+	// startchar1: defaults to -1 meaning start searching from the last char. Positive start1char1 counts from the beginning of the source string and negative startchar1 counts backwards from the last char.
 	//
 	// `let v1 = "abcabc"_var.indexr("bc"); // 5
 	//  // or
@@ -499,8 +499,8 @@ public:
 	ND var  match(const rex& regex) const;
 
 	// Search for the first match of a regular expression.
-	// startchar1: [in] char number to start the search from
-	// startchar1: [out] char number to start the next search from
+	// startchar1: [in] char position to start the search from
+	// startchar1: [out] char position to start the next search from
 	// Returns: The 1st match like match()
 	// regex_options as for match()
 	//
@@ -558,7 +558,7 @@ public:
 	ND var  tcase() const&;
 
 	// Convert to folded case.
-	// Returns the source string converted to enable standardised indexing and searching,
+	// Returns the source string standardised in a way to enable consistent indexing and searching,
 	// Case folding is the process of converting text to a case independent representation.
 	// https://www.w3.org/International/wiki/Case_folding
 	// Accents can be significant. As in French cote, coté, côte and côté.
@@ -570,8 +570,8 @@ public:
 	ND var  fcase() const&;
 
 	// Replace Unicode character sequences with their standardised NFC form.
-	// Unicode normalization is the process of converting unicode strings to a standard form, making them binary comparable and suitable for text processing and comparison. It is an important part of Unicode text processing.
-	// For example, Unicode character "é" can be represented by either a single unicode character and code point (\u00E9" - Latin Small Letter E with Acute) or a combination of two unicode code points (the letter "e" and a combining acute accent "\u0301"). Normalization converts the pair of code points to the single code point.
+	// Unicode normalization is the process of converting Unicode strings to a standard form, making them binary comparable and suitable for text processing and comparison. It is an important part of Unicode text processing.
+	// For example, Unicode character "é" can be represented by either a single Unicode character, which is Unicode Code Point (\u00E9" - Latin Small Letter E with Acute), or a combination of two Unicode code points i.e. the ASCII letter "e" and a combining acute accent (Unicode Code Point "\u0301"). Unicode NFC definition converts the pair of code points to the single code point.
 	// Normalization is not locale-dependent.
 	//
 	// `let v1 = "cafe\u0301"_var.normalize(); // "caf\u00E9" // "café"
@@ -580,9 +580,12 @@ public:
 	ND var  normalize() const&;
 
 	// Simple reversible disguising of string text.
-	// Returns: The source string converted by treating it as unicode code points and flipping bit 8 of their code points.
+	// It works by treating the string as UTF8 encoded Unicode code points and inverting the first 8 bits of their Unicode Code Points.
+	// Returns: A string.
 	// invert(invert()) returns to the original text.
 	// ASCII bytes become multibyte UTF-8 so string sizes increase.
+	// Inverted characters remain on their original Unicode Code Page but are jumbled up.
+	// Non-existant Unicode Code Points may be created but UTF8 encoding remains valid.
 	//
 	// `let v1 = "abc"_var.invert(); // "\xC2" "\x9E" "\xC2" "\x9D" "\xC2" "\x9C"
 	//  // or
@@ -792,91 +795,113 @@ public:
 	//  let v2 = fieldstore("a1*b2*c3*d4", "*", 2, -3, "X*Y");`
 	ND var  fieldstore(SV separator, const int fieldno, const int nfields, in replacement) const&;
 
-	// substr version 1. Extract length chars starting at pos1
+	// substr version 1.
+	// Copies a substr of length chars from a given a starting char position.
+	// Returns: A substr or "".
+	// pos1: The char position to start at. If negative then start from a position counting backwards from the last char
+	// length: The number of chars to copy. If negative then copy backwards. This reverses the order of the chars in the returned substr.
+	// Equivalent to var[start, length] in Pick OS
+	// Not Unicode friendly.
 	//
 	// `let v1 = "abcd"_var.substr(2, 2); // "bc"
 	//  // or
 	//  let v2 = substr("abcd", 2, 2);`
+	//
+	// If pos1 is negative then start counting backwards from the last char
+	//
+	// `let v1 = "abcd"_var.substr(-3, 2); // "bc"
+	//  // or
+	//  let v2 = substr("abcd", -3, 2);`
+	//
 	// If length is negative then work backwards and return chars reversed
 	//
 	// `let v1 = "abcd"_var.substr(3, -2); // "cb"
 	//  // or
-	//  let v2 = substr("abcd", 3, -2);`
+	//  let v2 = substr("abcd", 3, -2); // "cb"`
 	ND var  substr(const int pos1, const int length) const&;
 
-	//[[deprecated("EXODUS: Replace all xxx.b(pos1, len) with xxx.subst(pos1, len)")]]
-	// Same as substr version 1.
+	// Abbreviated alias of substr version 1.
 	ND var  b(const int pos1, const int length) const& {return this->substr(pos1, length);}
 
-	// substr version 2. Extract all chars from pos1 up to the end
+	// substr version 2.
+	// Copies a substr from a given char position up to the end of the source string
+	// Returns: A substr or "".
+	// pos1: The char position to start at. If negative then start from a position counting backwards from the last char
+	// Partially Unicode friendly but pos1 is in chars.
 	//
 	// `let v1 = "abcd"_var.substr(2); // "bcd"
 	//  // or
 	//  let v2 = substr("abcd", 2);`
 	ND var  substr(const int pos1) const&;
 
-	//[[deprecated("EXODUS: Replace all xxx.b(pos1) with xxx.substr(pos1)")]]
-	// Same as substr version 2.
+	// Shorthand alias of substr version 4.
 	ND var  b(const int pos1) const& {return this->substr(pos1);}
 
-	// v3 - returns bytes from some byte number upto the first of a given list of bytes
-	// this is something like std::string::find_first_of but doesnt return the delimiter found
-
 	// substr version 3.
-	// Extract a substr starting from pos1 up to any one of some given delimiter chars
-	// Also returns in pos2 the pos of the following delimiter or one past the end of the string if not found.
-	// Add 1 to pos2 start the next search if continuing.
+	// Copies a substr from a given char position up to (but excluding) any one of some given delimiter chars
+	// Returns: A substr or "".
+	// pos1: [in] The position of the first char to copy. Negative positions count backwards from the last char of the string.
+	// pos2: [out] The position of the next delimiter char, or one char position after the end of the source string if no subsequent delimiter chars are found.
+	// An empty string may be returned if pos1 [in] points to one of the delimiter chars or points beyond the end of the source string.
+	// Works with any encoding including UTF8 for the source string but the delimiter chars are bytes.
+	// Add 1 to pos2 to skip over the next delimiter char to copy the next substr
+	// Works with any encoding including UTF8 for the source string but the delimiter chars are bytes.
+	// This function is similar to std::string::find_first_of but that function only returns pos2.
 	//
-	// `var pos1a = 4, pos2a;
-	//  let v1 = "aa,bb,cc"_var.substr(pos1a, ",", pos2a); // "bb" // pos2a -> 6
+	// `var pos1 = 4, pos2;
+	//  let v1 = "12,45 78"_var.substr(pos1, ", ", pos2);  // v1 -> "45" // pos2 -> 6 // 6 is the position of the next delimiter char found.
 	//  // or
-	//  var pos1b = 4, pos2b;
-	//  let v2 = substr("aa,bb,cc", pos1b, ",", pos2b);`
+	//  var pos3;
+	//  let v2 = substr("12,45 78", pos2 + 1, ", ", pos3); // v2 -> "78" // pos3 -> 9 // 9 is one after the end of the string meaning that none of the delimiter chars were found.`
 	   var  substr(const int pos1, SV delimiterchars, io pos2) const;
 
-	// Alias of substr version 3.
+	// Shorthand alias of substr version 3.
 	   var  b(const int pos1, SV delimiterchars, io pos2) const {return this->substr(pos1, delimiterchars, pos2);}
 
-	// v4 - like v3. was named "remove" in pick. notably used in nlist to print parallel columns
-	// of mixed combinations of multivalues/subvalues and text marks
-	// correctly lined up mv to mv, sv to sv, tm to tm even when particular columns were missing
-	// some vm/sm/tm
-	// it is like substr(pos1,delimiterbytes,pos2) except that the delimiter bytes are
-	// hard coded as the usual RM/FM/VM/SM/TM/ST
-	// except that it updates the offset to point one after found delimiter byte and
-	// returns the delimiter no (1-6)
 	// if no delimiter byte is found then it returns bytes up to the end of the string, sets
 	// offset to after tne end of the string and returns delimiter no 0 NOTE that it
 	// does NOT remove anything from the source string var remove(io pos1, io
 	// delimiterno) const;
 
 	// substr version 4.
-	// Returns: A substr from a given pos1  up to the next RM/FM/VM/SM/TM/ST delimiter char.
-	// Also returns the next index/offset and the delimiter no. found (1-6) or 0 if not found.
+	// Copies a substr from a given char position up to (but excluding) the next field mark char (RM, FM, VM, SM, TM, ST).
+	// Returns: A substr or "".
+	// pos1: [in] The position of the first char to copy. Negative positions count backwards from the last char of the string.
+	// pos1: [out] The position of the first char of the next substr after whatever field mark char is found, or one char position after the end of the source string if no subsequent field mark char is found.
+	// field_mark_no: [out] A number (1-6) indicating which of the standard field mark chars was found, or 0 if not.
+	// An empty string may be returned if the pos1 [in] points to one of the field marks or beyond the end of the source string.
+	// pos1 [out] is correctly positioned to copy the next substr.
+	// Works with any encoding including UTF8. Was called "remove" in Pick OS.
+	// ...
+	// This function is valuable for high performance processing of dynamic arrays.
+	// It is notably used in "list" to print parallel columns of mixed combinations of multivalues/subvalues and text marks correctly lined up mv to mv, sv to sv, tm to tm even when particular values, subvalues and text fragments are missing from particular columns.
+	// It is similar to version 3 of substr - substr(pos1, delimiterchars, pos2) except that in this version the delimiter chars are hard coded as the standard field mark chars (RM, FM, VM, SM, TM, ST) and it returns the first char position of the next substr, not the char position of the next field mark char.
 	//
-	// `var pos1a = 4, delim1;
-	//  let v1 = "aa^bb^cc"_var.substr2(pos1a, delim1); // "bb" // pos1a -> 7 // delim1 -> 2
+	// `var pos1 = 4, field_mark_no;
+	//  let v1 = "12^45^78"_var.substr2(pos1, field_mark_no);  // "45" // pos1 -> 7 // field_mark_no -> 2 // field_mark_no 2 means that a FM was found.
 	//  // or
-	//  var pos1b = 4, delim2;
-	//  let v2 = substr2("aa^bb^cc"_var, pos1b, delim2);`
+	//  let v2 = substr2("12^45^78"_var, pos1, field_mark_no); // "78" // pos1 -> 9 // field_mark_no -> 0 // field_mark_no 0 means that none of the standard field marks were found.`
 	   var  substr2(io pos1, out delimiterno) const;
 
-	// Alias of substr version 4
-	   var  b2(io pos1, out delimiterno) const {return this->substr2(pos1, delimiterno);}
+	// Shorthand alias of substr version 4.
+	   var  b2(io pos1, out field_mark_no) const {return this->substr2(pos1, field_mark_no);}
 
-	// Convert chars to other chars one for one or delete where tochars is shorter.
+	// Convert or delete chars one for one to other chars
+	// from_chars: chars to convert. If longer than to_chars then delete those characters instead of converting them.
+	// to_chars: chars to convert to
+	// Not UTF8 compatible.
 	//
 	// `let v1 = "abcde"_var.convert("aZd", "XY"); // "Xbce" // a is replaced and d is removed
 	//  // or
 	//  let v2 = convert("abcde", "aZd", "XY");`
-	ND var  convert(SV fromchars, SV tochars) const&;
+	ND var  convert(SV from_chars, SV to_chars) const&;
 
 	// Ditto for Unicode code points.
 	//
 	// `let v1 = "a🤡b😀c🌍d"_var.textconvert("🤡😀", "👋"); // "a👋bc🌍d"
 	//  // or
 	//  let v2 = textconvert("a🤡b😀c🌍d", "🤡😀", "👋");`
-	ND var  textconvert(SV fromchars, SV tochars) const&;
+	ND var  textconvert(SV from_characters, SV to_characters) const&;
 
 	// Replace all occurrences of one substr with another.
 	// Case sensitive.
@@ -936,7 +961,7 @@ public:
 	ND var  parse(char sepchar = ' ') const&;
 
 	// Split a delimited string into a dim array.
-	// The delimiter can be multibyte unicode.
+	// The delimiter can be multibyte Unicode.
 	//
 	// `dim d1 = "a^b^c"_var.split(); // A dimensioned array with three elements (vars)
 	//  // or
@@ -946,7 +971,7 @@ public:
 	// SAME ON TEMPORARIES - CALL MUTATORS FOR SPEED (not documenting since programmer interface is the same)
 	/////////////////////////////////////////
 
-	// utf8/byte as for accessors
+	// UTF8/byte as for accessors
 
 	ND io   ucase() &&;
 	ND io   lcase() &&;
@@ -987,8 +1012,8 @@ public:
 	ND io   substr(const int pos1, const int length) &&;
 	ND io   substr(const int pos1) &&;
 
-	ND io   convert(SV fromchars, SV tochars) &&;
-	ND io   textconvert(SV fromchars, SV tochars) &&;
+	ND io   convert(SV from_chars, SV to_chars) &&;
+	ND io   textconvert(SV from_characters, SV to_characters) &&;
 	ND io   replace(const rex& regex, SV tostr) &&;
 	ND io   replace(SV fromstr, SV tostr) &&;
 //	ND io   regex_replace(SV regex_str, SV replacement, SV regex_options = "") &&;
@@ -1055,8 +1080,8 @@ public:
 	   IO   fieldstorer(SV delimiter, const int fieldno, const int nfields, in replacement) REF ;
 	   IO   substrer(const int pos1, const int length) REF ;
 	   IO   substrer(const int pos1) REF {return this->substrer(pos1, this->len());}
-	   IO   converter(SV fromchars, SV tochars) REF;
-	   IO   textconverter(SV fromchars, SV tochars) REF;
+	   IO   converter(SV from_chars, SV to_chars) REF;
+	   IO   textconverter(SV from_characters, SV to_characters) REF;
 	   IO   replacer(const rex& regex, SV tostr) REF;
 	   IO   replacer(SV fromstr, SV tostr) REF;
 //	   IO   regex_replacer(SV regex, SV replacement, SV regex_options = "") REF ;
@@ -1166,7 +1191,7 @@ public:
 	// `let v1 = "\xa4"_var.from_codepage("CP1124"); // "Є"
 	//  // or
 	//  let v2 = from_codepage("\xa4", "CP1124");
-	//  // U+0404 Cyrillic Capital Letter Ukrainian Ie Unicode Character`
+	//  // U+0404 Cyrillic Capital Letter Ukrainian Ie Unicode character`
 	ND var  from_codepage(const char* codepage) const;
 
 	// Converts to codepage encoded text from UTF-8 encoded text
@@ -1189,9 +1214,9 @@ public:
 	// becomes c++
 	//   xxx=yyy.f(10);
 
-	// f() is a highly abbreviated alias for the PICK OS field/value/subvalue extract() function.
+	// f() is a highly abbreviated alias for the Pick OS field/value/subvalue extract() function.
 	// "f()" can be thought of as "field" although the function can extract values and subvalues as well.
-	// The convenient PICK OS angle bracket syntax for field extraction (e.g. xxx<20>) is not available in C++.
+	// The convenient Pick OS angle bracket syntax for field extraction (e.g. xxx<20>) is not available in C++.
 	// The abbreviated exodus field extraction function (e.g. xxx.f(20)) is provided instead since field access is extremely heavily used in source code.
 	//
 	// `let v1 = "f1^f2v1]f2v2]f2v3^f2"_var;
@@ -2152,11 +2177,11 @@ public:
 
 	// obj is osfilevar
 
-	// Given the name of an existing os file name including path, initialises an os file handle var that can be used in random access osbread and osbwrite functions.
-	// The utf8 option defaults to true which causes trimming of partial utf-8 unicode byte sequences from the end of osbreads. For raw untrimmed osbreads pass utf8 = false;
-	// File will be opened for writing if possible otherwise for reading.
-	// Returns: True if successful or false if not possible for any reason.
-	// e.g. Target doesnt exist, permissions etc.
+	// Initialises an os file handle var that can be used in subsequent random access osbread and osbwrite functions.
+	// osfilename: The name of an existing os file name including path.
+	// utf8: Defaults to true which causes trimming of partial utf-8 Unicode byte sequences from the end of osbreads. For raw untrimmed osbreads pass tf8 = false;
+	// Returns: True if successful or false if not possible for any reason. e.g. Target doesnt exist, permissions etc.
+	// The file will be opened for writing if possible otherwise for reading.
 	//
 	// `let osfilename = ostempdirpath() ^ "xo_gendoc_test.conf";
 	//  if (oswrite("" on osfilename)) ... ok /// Create an empty os file
@@ -2180,7 +2205,7 @@ public:
 	// Reads length bytes from an existing os file starting at a given byte offset (0 based).
 	// The osfilevar file handle may either be initialised by osopen or be just be a normal string variable holding the path and name of the os file.
 	// After reading, the offset is updated to point to the correct offset for a subsequent sequential read.
-	// If reading utf8 data (the default) then the length of data actually returned may be a few bytes shorter than requested in order to be a complete number of UTF-8 code points.
+	// If reading UTF8 data (the default) then the length of data actually returned may be a few bytes shorter than requested in order to be a complete number of UTF-8 code points.
 	//
 	// `let osfilename = ostempdirpath() ^ "xo_gendoc_test.conf";
 	//  var text, offset = 0;
@@ -2985,7 +3010,7 @@ public:
 	// `assert(     "ab01"_var.oconv( "HEX" ) == "61" "62" "30" "31" );
 	//  assert( "\xff\x00"_var.oconv( "HEX" ) == "FF" "00"           ); // Any bytes are ok.
 	//  assert(        var(10).oconv( "HEX" ) == "31" "30"           ); // Uses ASCII string equivalent of 10 i.e. "10".
-	//  assert(   "\u0393"_var.oconv( "HEX" ) == "CE" "93"           ); // Greek capital Gamma in utf8 bytes.
+	//  assert(   "\u0393"_var.oconv( "HEX" ) == "CE" "93"           ); // Greek capital Gamma in UTF8 bytes.
 	//  assert(     "a^]b"_var.oconv( "HEX" ) == "61" "1E" "1D" "62" ); // Field and value marks.
 	//  // or
 	//  assert(      oconv("ab01"_var, "HEX") == "61" "62" "30" "31");`
