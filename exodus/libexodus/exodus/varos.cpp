@@ -423,6 +423,12 @@ std::fstream* var::osopenx(in osfilename, const bool utf8) const {
 		THISIS("bool var::osopenx(in osfilename, const bool utf8)")
 		ISSTRING(osfilename)
 
+	    // Check if the file exists and is a regular file
+	    if (!std::filesystem::is_regular_file(osfilename.c_str())) {
+			this->setlasterror("osopen failed. " ^ var(osfilename).quote() ^ " does not exist, or cannot be accessed, or is not a regular file.");
+	        return nullptr;
+	    }
+
 		// TODO replace new/delete with some object
 		pfstreamfile1 = new std::fstream;
 
