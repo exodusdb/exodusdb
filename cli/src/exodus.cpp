@@ -103,7 +103,7 @@ function main() {
 
 		//set EXO_PATH used by compile to find LIB and INCLUDE paths
 		var exoduspath = exodusbinpath;
-		if (exoduspath.field2(OSSLASH, -1) == "bin")
+		if (exoduspath.field(OSSLASH, -1) == "bin")
 			exoduspath = field(exoduspath, OSSLASH, 1, fcount(exoduspath, OSSLASH) - 1);
 		if (exoduspath)
 			ossetenv("EXO_PATH", exoduspath);

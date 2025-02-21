@@ -335,14 +335,7 @@ bool var::hasinput(const int milliseconds) const {
 //	return *this;
 //}
 
-// input with prompt allows default value and editing if isterminal
-// or
-// if not in a terminal - Binary safe except for \n (\r\n for MS)
-//
-// In a terminal - Backspace and \n (\r\n for MS) are lost.
-//                 Pressing Ctrl+d (Ctrl+z fro MS) indicates eof
-//
-out  var::input(in prompt /*=""*/) {
+bool var::input(in prompt /*=""*/) {
 
 	THISIS("out  var::input(in prompt")
 	assertVar(function_sig);
@@ -353,37 +346,40 @@ out  var::input(in prompt /*=""*/) {
 	var_str.clear();
 	var_typ = VARTYP_STR;
 
-	//output any prompt and flush
-	if (prompt.len())
-		prompt.output().osflush();
-
-	// Not a terminal
-	if (not this->isterminal(0) or SLASH_IS_BACKSLASH) {
-//		this->input();
+	// if stdin is not a terminal
+	if (not this->isterminal(0)) {
 		if (!std::cin.eof())
 			std::getline(std::cin, var_str);
 		return *this;
 	}
 
 	//linux terminal input line editing
-	else {
-		//replace double quotes with \"
-		default_input.replacer("\"", "\\\"");
-		var cmd = "bash -c 'read -i " ^ default_input.quote() ^ " -e EXO_TEMP_READ && printf \"%s\" \"$EXO_TEMP_READ\"'";
-		//cmd.outputl("cmd=");
-		if (not this->osshellread(cmd)) {
-			// Report any error
-			// except bash terminal read returns 256 if Ctrl+D provided.
-			const var msg = lasterror();
-			const var exit_status = msg.field(" ", 2);
-			if (exit_status != 256)
-				msg.logputl();
-		}
-		if ((*this) == "")
-			std::cout << std::endl;
-	}
 
-	return *this;
+//		//replace double quotes with \"
+//		default_input.replacer("\"", "\\\"");
+//		var cmd = "bash -c 'read -i " ^ default_input.quote() ^ " -e EXO_TEMP_READ && printf \"%s\" \"$EXO_TEMP_READ\"'";
+//		//cmd.outputl("cmd=");
+//		if (not this->osshellread(cmd)) {
+//			// Report any error
+//			// except bash terminal read returns 256 if Ctrl+D provided.
+//			const var msg = lasterror();
+//			const var exit_status = msg.field(" ", 2);
+//			if (exit_status != 256)
+//				msg.logputl();
+//		}
+//		if ((*this) == "")
+//			std::cout << std::endl;
+
+	//output any prompt and flush
+	//if (prompt.len())
+	//	prompt.output().osflush();
+
+	// Defined in readline.cpp
+	int input_readline(var&, const char* = "");
+
+	int exit_key = input_readline(*this, prompt);
+
+	return !exit_key;
 }
 
 // for nchars, use int instead of var to trigger error at point of calling not here

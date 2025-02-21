@@ -280,6 +280,7 @@
 		extract_v4.cpp # Failed attempt at optimisation
 		# Little ones last for quick parallel finishing
 		term_getkey.cpp term_haskey.cpp term_echo.cpp term_cursor.cpp
+		readline.cpp
 	)
 
 ##
@@ -335,6 +336,15 @@
 #	# This is probably not needed here. Maybe required by cli compile.cpp linkoptions?
 #	target_link_libraries(exodus ${FMT_LIBRARIES})
 	target_link_libraries(exodus fmt::fmt)
+
+
+#
+# readline
+##########
+#
+	target_link_libraries(exodus
+			readline
+	)
 
 #
 # Request .so versioning e.g. /usr/local/lib/libexodus.so -> libexodus.so.24.07

@@ -40,7 +40,7 @@ function main(in msg0, io time0) {
 
 		logfile.osclose();
 		datax.converter("\r\n", FM ^ FM);
-		time0 = logfilename ^ " " ^ field2(datax, FM, -3, 3);
+		time0 = logfilename ^ " " ^ field(datax, FM, -3, 3);
 		return 0;
 	}
 

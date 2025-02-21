@@ -70,20 +70,44 @@ namespace exo {
 ////////
 
 // var.field(separator,fieldno,nfields)
-var  var::field(SV separatorx, const int fieldnx, const int nfieldsx) const {
+var  var::field(SV delimiter, const int fieldnx, const int nfieldsx) const {
 
-	THISIS("var  var::field(SV separatorx, const int fieldnx, const int nfieldsx) const")
+	THISIS("var  var::field(SV delimiter, const int fieldnx, const int nfieldsx) const")
 	assertString(function_sig);
 
-	if (separatorx.empty())
+	if (delimiter.empty())
 		UNLIKELY
-		throw VarError("separator cannot be blank in field()");
+		throw VarError("delimiter cannot be blank in field()");
 
-	int fieldno = fieldnx > 0 ? fieldnx : 1;
+	// fieldno 0 -> 1
+	int fieldno;
+	if (fieldnx > 0) {
+		fieldno = fieldnx;
+	} else if (fieldnx < 0) {
+
+		// field -1 is quick
+		if (fieldnx == -1) {
+			std::size_t pos = var_str.rfind(delimiter);
+			if (pos == std::string::npos)
+				return var_str;
+			return var_str.substr(pos + 1);
+		}
+
+		fieldno = this->count(delimiter) + 1 + fieldnx + 1;
+
+		if (fieldno <= 0)
+			fieldno = 1;
+
+	} else {
+		// fieldno 0 -> fieldno 1
+		fieldno = 1;
+	}
+
+	// nfields 0 -> nfields 1
 	int nfields = nfieldsx > 0 ? nfieldsx : 1;
 
 	// separator might be multi-byte ... esp. for non-ASCII
-	std::size_t len_separator = separatorx.size();
+	std::size_t len_separator = delimiter.size();
 
 	// FIND FIELD
 
@@ -91,7 +115,7 @@ var  var::field(SV separatorx, const int fieldnx, const int nfieldsx) const {
 	std::size_t pos = 0;
 	int fieldn2 = 1;
 	while (fieldn2 < fieldno) {
-		pos = var_str.find(separatorx, pos);
+		pos = var_str.find(delimiter, pos);
 		// past of of string?
 		if (pos == std::string::npos)
 			return "";
@@ -104,7 +128,7 @@ var  var::field(SV separatorx, const int fieldnx, const int nfieldsx) const {
 	std::size_t end_pos = pos;
 	int pastfieldn = fieldno + nfields;
 	while (fieldn2 < pastfieldn) {
-		end_pos = var_str.find(separatorx, end_pos);
+		end_pos = var_str.find(delimiter, end_pos);
 		// past of of string?
 		if (end_pos == std::string::npos) {
 			//return var_str.substr(pos, var_str.size() - pos);
@@ -1694,13 +1718,13 @@ getnextp2:
 // version 3 returns the characters up to the next delimiter
 // also returns the index of the next delimiter discovered or 1 after the string if none (like
 // COL2() in pickos) NOTE pos1 is 1 based not 0. anything less than 1 is treated as 1
-var  var::substr(const int pos1, SV delimiterchars, io pos2) const {
+var  var::substr(const int pos1, SV delimiterchars, out pos2) const {
 
-	THISIS("var  var::substr(const int pos1, SV delimiterchars, io pos2) const")
+	THISIS("var  var::substr(const int pos1, SV delimiterchars, out pos2) const")
 	assertString(function_sig);
 //	ISSTRING(delimiterchars)
 
-	std::size_t pos;
+	std::size_t pos0;
 
 	// domain check min pos1
 	// handle before start of string
@@ -1708,26 +1732,30 @@ var  var::substr(const int pos1, SV delimiterchars, io pos2) const {
 	// remove treats anything below 1 as 1
 	// pos variable is zero based standard c++ logic
 	if (pos1 > 0)
-		pos = pos1 - 1;
+		pos0 = pos1 - 1;
 	else
-		pos = 0;
+		pos0 = 0;
 
 	// domain check max pos1
 	// handle after end of string
-	if (pos >= var_str.size()) {
+	if (pos0 >= var_str.size()) {
 		pos2 = static_cast<int>(var_str.size() + 1);
 		return "";
 	}
 
 	// find the end of the field (or string)
 	std::size_t end_pos;
-	end_pos = var_str.find_first_of(delimiterchars, pos);
+	if (delimiterchars.size() == 1)
+		end_pos = var_str.find(delimiterchars[0], pos0);
+	else
+		end_pos = var_str.find_first_of(delimiterchars, pos0);
+//		end_pos = var_str.find(delimiterchars, pos0);
 
 	// past of of string?
 	if (end_pos == std::string::npos) {
 		pos2 = static_cast<int>(var_str.size() + 1);
 		//return var_str.substr(pos, var_str.size() - pos);
-		return var_str.substr(pos);
+		return var_str.substr(pos0);
 	}
 
 	// return the index of the dicovered delimiter
@@ -1735,7 +1763,7 @@ var  var::substr(const int pos1, SV delimiterchars, io pos2) const {
 	pos2 = static_cast<int>(end_pos + 1);
 
 	// extract and return the substr as well
-	return var_str.substr(pos, end_pos - pos);
+	return var_str.substr(pos0, end_pos - pos0);
 }
 
 ////////

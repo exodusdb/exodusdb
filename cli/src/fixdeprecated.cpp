@@ -39,14 +39,14 @@ function main() {
 
 		// h = Generate all headers and install in ~/inc first
 		let headercmd = compilecmd ^ " {hS}";
-		if (verbose)
-			TRACE(headercmd)
+		TRACE(headercmd)
 		if (not osshell(headercmd))
 			abort(lasterror());
 
 		// Pipe the compiler output into another process of this command
 		// F = Force recompilation to generate any deprecation warning messages
-		let pipedcmd = compilecmd ^ " {F} |& " ^ COMMAND.f(1) ^ " {" ^ OPTIONS ^ "}";
+//		let pipedcmd = compilecmd ^ " {F} |& " ^ COMMAND.f(1) ^ " {" ^ OPTIONS ^ "}";
+		let pipedcmd = compilecmd ^ " {F} |& " ^ EXECPATH ^ " {" ^ OPTIONS ^ "}";
 		if (verbose)
 			TRACE(pipedcmd)
 		if (not osshell("bash -c " ^ pipedcmd.squote()))
@@ -78,6 +78,7 @@ function main() {
 	var updatereq = 0;
 	var srcfiles = "";
 	var nlinesupdated = 0;
+	var datfilenames = "";
 
 	// Duplicated from cli/compile
 	//let exo_HOME = osgetenv("EXO_HOME") ?: osgetenv("HOME");
@@ -121,25 +122,36 @@ function main() {
 //////////////////
 // Main input loop
 //////////////////
-
+//var allinp = "";
 	// Process all the warnings in the input sequentially
 	var compline;
 	while (not eof()) {
-		compline.input();
-
+		if (not compline.input()) {}
+//allinp.appender(compline, "\n");
+//oswrite(allinp on "allinp");
 		//warning: 'operator[]' is deprecated: EXODUS: Replace single character accessors like xxx[n]
-		if (not compline.contains("warning") or not compline.contains("deprecated"))
+//		if (not compline.contains("warning") and not compline.contains("deprecated"))
+		if (not compline.contains("warning") and not compline.contains("error:"))
 			continue;
 
 		compline.trimmerfirst("*");
-
-		if (verbose)
-			TRACE(compline)
 
 		// Example compile warning
 		//fin/ledger4.cpp:170:27: warning: ‘exodus::var& exodus::dim::operator()(int)’ is deprecated: EXODUS: Replace single dimensioned array accessors like () with [] e.g. dimarray(n) -> dimarray[n] [-Wdeprecated-declarations]
 		//  170 |   let taxcodes = lg.vch(24);
 		//      |                           ^
+		// Identify where in the source the warning occurs
+		let srcloc = compline.match("^([a-zA-Z0-9_./]+):([0-9]+):([0-9]+):");
+
+		if (not srcloc)
+			continue;
+
+		let filename = srcloc.f(1, 2);
+		let lineno = srcloc.f(1, 3);
+		let charno = srcloc.f(1, 4);
+
+		if (verbose)
+			TRACE(compline)
 
 //		var fixable = false;
 //		var old_open_char;
@@ -190,19 +202,6 @@ function main() {
 //			continue;
 //		}
 
-		// Identify where in the source the warning occurs
-		let srcloc = compline.field(" ",1);
-		let filename = srcloc.field(":", 1);
-		let lineno = srcloc.field(":", 2);
-		let charno = srcloc.field(":", 3);
-
-		// Skip invalid syntax
-		if (not num(lineno) or not num(charno)) {
-			logputl(compline);
-			logputl("fixdeprecated: Cannot determine source line and char nos");
-			continue;
-		}
-
 		// Switch to a new srcfile
 		if (filename != srcfile) {
 
@@ -216,6 +215,8 @@ function main() {
 			}
 
 			srcfile = filename;
+
+			datfilenames = "";
 		}
 
 		// Extract the src line
@@ -225,7 +226,26 @@ function main() {
 		if (verbose)
 			TRACE(srcline);
 
-		srcline.replacer(R"__(makelist("", )__", "selectkeys(");
+		//////////////////////////////////////////////////////////
+		// Lambda to update the source line.
+		// Will also be used to update a dat file for dict_xyz.cpp
+		//////////////////////////////////////////////////////////
+		auto source_fixer = [](io srcline) {
+			srcline.replacer(R"__(makelist("", )__", "selectkeys(");
+			srcline.replacer(R"__(field2()__", "field(");
+
+			// if (not lkfile.osopen(lkfilename, "C")) {
+			// if (not ovfile.osopen(osfile ^ ".OV", "C")) {
+//			srcline.replacer(R"__("C")__", R"__(false)__");
+			srcline.replacer(R"__((osopen\([^,]+,[^"]*)"C")__"_rex, R"__($1false)__");
+
+			// reply.input();
+			// if (not reply.input()) {}
+			srcline.replacer(R"__(^(\s*)([a-zA-Z0-9_.]+\.input\([^)]*\));)__"_rex, R"__($1if \(not $2\) {})__");
+
+		};
+
+		source_fixer(srcline);
 
 		if (verbose)
 			TRACE(srcline);
@@ -359,7 +379,59 @@ function main() {
 		if (verbose)
 			TRACE(compline)
 
-		printl(srcloc, srcline.trimfirst("\t "));
+		printl(srcloc.f(1,1), srcline.trimfirst("\t "));
+
+		// Try to update dat file as well
+		if (filename.contains("dict_")) {
+
+			// get dat file dir
+			// dic/dict_jobs.cpp
+			var datfiledir = filename.replace("dic/", "dat/").replace("/dict_", "/dict.").cut(-4);
+
+			// find dict id backwards
+			// libraryinit(date_created)
+			var lineno2 = lineno - 1;
+			var datfilename = "";
+			while (lineno2) {
+				var srcline2 = src.field(EOL, lineno2);
+				if (srcline2.match("libraryinit")) {
+					datfilename = datfiledir ^ "/" ^ srcline2.field("(", 2).field(")", 1).ucase();
+					break;
+				}
+				lineno2--;
+			}
+
+			bool dat_update = false;
+			if (datfilename) {
+				var datrec;
+				if (osread(datrec from datfilename)) {
+					let orig_datrec = datrec;
+
+					source_fixer(datrec);
+
+					if (datrec ne orig_datrec) {
+						print(datfilename, datrec);
+						if (update) {
+							if (oswrite(datrec on datfilename)) {
+								datfilenames ^= datfilename ^ FM;
+								printl(" Updated.");
+								dat_update = true;
+							} else
+								loglasterror();
+						} else {
+							dat_update = true;
+							printl(" Updatable.");
+						}
+					} else {
+						// Probably updated already.
+						dat_update = locate(datfilename, datfilenames);
+					}
+				}
+			}
+
+			if (not dat_update)
+				printl("MANUAL update required in ", filename, datfilename);
+		}
 
 		// Flag update required
 		nlinesupdated++;

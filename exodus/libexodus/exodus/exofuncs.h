@@ -413,8 +413,8 @@ ND var  substr(in instring, const int startindex, const int length);
    IO   substrer(io iostring, const int startindex);
    IO   substrer(io iostring, const int startindex, const int length);
 
-ND var  substr(in instring, const int startindex, SV delimiterchars, io pos2);
-//IO substrer(io iostring, const int startindex, SV delimiterchars, io pos2);
+ND var  substr(in instring, const int startindex, SV delimiterchars, out pos2);
+//IO substrer(io iostring, const int startindex, SV delimiterchars, out pos2);
 
 ND bool starts(in instring, SV substr);
 ND bool ends(in instring, SV substr);
@@ -425,6 +425,8 @@ ND var  indexn(in instring, SV substr, int occurrence);
 ND var  indexr(in instring, SV substr, const int startindex = -1 );
 
 ND var  field(in instring, SV substr, const int fieldno, const int nfields = 1 );
+
+[[deprecated ("Just use field() which now has the same behaviour as field()")]]
 ND var  field2(in instring, SV substr, const int fieldno, const int nfields = 1 );
 
 // STRINGS WITH FIELD MARKS

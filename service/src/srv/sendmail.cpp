@@ -492,7 +492,7 @@ forcedemail:
 			let mimetype = osshellread("file --mime-type '" ^ attachfilename ^ "' | sed 's/.*: //'").convert("\r\n", "");
 			// TRACE(mimetype)
 
-			let attachfilename_only = attachfilename.field2(_OSSLASH, -1);
+			let attachfilename_only = attachfilename.field(_OSSLASH, -1);
 			let mimetext =
 				"MIME-Version: 1.0\r\n"
 				"Content-Type: multipart/mixed;\r\n"

@@ -94,7 +94,7 @@ set -euxo pipefail
 	# Remove the phrase -latest since we treat enpty as meaning -latest
 	COMPILER=${COMPILER/-latest/}
 	CMAKE_BUILD_OPTIONS=-GNinja
-	BUILD_DEPS="ninja-build ${COMPILER/clang/clang-tools} libfmt-dev"
+	BUILD_DEPS="ninja-build ${COMPILER/clang/clang-tools} libfmt-dev libreadline-dev"
 
 :
 : Validate

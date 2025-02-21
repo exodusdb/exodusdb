@@ -614,7 +614,7 @@ bool ExodusProgramBase::deleterecord(in filename_or_handle_or_command, in key) {
 	//find and skip final options like (S)
 	bool silent = false;
 	if (command.ends(")") || command.ends("}")) {
-		silent = command.field2(" ", -1).contains("S");
+		silent = command.field(" ", -1).contains("S");
 		nwords--;
 	}
 
@@ -719,7 +719,7 @@ void ExodusProgramBase::mssg(in msg, in options, io buffer, in params) const {
 				buffer = "";
 
 			//input with empty prompt allows defaulting and editing
-			buffer.input("? ");
+			if (not buffer.input("? ")) {}
 
 			//default
 			//if (buffer == "")
@@ -1240,7 +1240,7 @@ var ExodusProgramBase::perform(in sentence) {
 		// 1. exofuncs.cpp exodus_main()
 		// 2. exoprog.cpp  perform()
 		// OPTIONS are in either (AbC) or {AbC} in the last field of COMMAND
-		OPTIONS = COMMAND.field2(FM, -1);
+		OPTIONS = COMMAND.field(FM, -1);
 		if ((OPTIONS.starts("{") and OPTIONS.ends("}")) or (OPTIONS.starts("(") and OPTIONS.ends(")"))) {
 			// Remove last field of COMMAND. TODO fpopper command or remover(-1)?
 			COMMAND.cutter(-OPTIONS.len() - 1);
@@ -1677,7 +1677,7 @@ void ExodusProgramBase::setprivilege(in errmsg) {
 // decide 2
 var ExodusProgramBase::decide(in question, in options) const {
 	var reply = "";
-	return decide(question, options, reply, 0);
+	return decide(question, options, reply);
 }
 
 // decide 4
@@ -1720,7 +1720,7 @@ inp:
 	reply = defaultreply;
 
 	if (interactive) {
-		reply.input("? ");
+		if (not reply.input("? ")) {}
 
 		//entering ESC anywhere in the input causes "no response"
 		if (reply.contains("\x1B"))
@@ -1776,7 +1776,7 @@ bool ExodusProgramBase::esctoexit() const {
 
 	//wait for ever
 	var key;
-	key.input();
+	if (not key.input()) {}
 
 	//key.logputl("key=");
 	//key.oconv("HEX").logputl("key=");

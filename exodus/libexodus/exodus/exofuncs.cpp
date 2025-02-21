@@ -163,7 +163,8 @@ ND PUBLIC var  rnd(const int number) {return var(number).rnd();}
 ND PUBLIC var  getprompt();
    PUBLIC void setprompt(in prompt);
 
-   PUBLIC var  input(in prompt) {var v; v.input(prompt); return v;}
+   PUBLIC var  
+input(in prompt) {var v; bool _ = v.input(prompt); return v;}
 
    PUBLIC var  inputn(const int nchars) {var v; v.inputn(nchars); return v;}
    PUBLIC var  keypressed(const bool wait /*= false*/) {var v; v.keypressed(wait); return v;}
@@ -308,8 +309,8 @@ ND PUBLIC var  substr(in instring, const int startindex, const int length) {retu
    PUBLIC IO   substrer(io iostring, const int startindex) {iostring.substrer(startindex); return IOSTRING;}
    PUBLIC IO   substrer(io iostring, const int startindex, const int length) {iostring.substrer(startindex, length); return IOSTRING;}
 
-ND PUBLIC var  substr(in instring, const int startindex, SV delimiterchars, io pos2){return instring.substr(startindex, delimiterchars, pos2);}
-//   PUBLIC IO   substrer(io iostring, const int startindex, SV delimiterchars, int& pos2) {iostring.substrer(startindex, delimiterchars, pos2) return IOSTRING;}
+ND PUBLIC var  substr(in instring, const int startindex, SV delimiterchars, out pos2){return instring.substr(startindex, delimiterchars, pos2);}
+//   PUBLIC IO   substrer(io iostring, const int startindex, SV delimiterchars, out pos2) {iostring.substrer(startindex, delimiterchars, pos2) return IOSTRING;}
 
 ND PUBLIC bool starts(in instring, SV substr) {return instring.starts(substr);}
 ND PUBLIC bool ends(in instring, SV substr) {return instring.ends(substr);}
@@ -320,7 +321,7 @@ ND PUBLIC var  indexn(in instring, SV substr, int occurrence) {return instring.i
 ND PUBLIC var  indexr(in instring, SV substr, const int startindex /*=-1*/) {return instring.indexr(substr, startindex);}
 
 ND PUBLIC var  field(in instring, SV substr, const int fieldno, const int nfields /*=1*/) {return instring.field(substr, fieldno, nfields);}
-ND PUBLIC var  field2(in instring, SV substr, const int fieldno, const int nfields /*=1*/) {return instring.field2(substr, fieldno, nfields);}
+ND PUBLIC var  field2(in instring, SV substr, const int fieldno, const int nfields /*=1*/) {return instring.field(substr, fieldno, nfields);}
 
 // STRINGS WITH FIELD MARKS
 
@@ -558,7 +559,7 @@ PUBLIC int exodus_main(int exodus_argc, const char* exodus_argv[], ExoEnv& mv, i
 	for (int ii = 0; ii < exodus_argc; ++ii) {
 		var word = var(exodus_argv[ii]);
 		if (ii == 0) {
-			word = word.field2(OSSLASH, -1);
+			word = word.field(OSSLASH, -1);
 			// remove trailing ".exe"
 			if (word.lcase().ends(".exe"))
 				word.cutter(-4);
@@ -580,7 +581,7 @@ PUBLIC int exodus_main(int exodus_argc, const char* exodus_argv[], ExoEnv& mv, i
 	// 1. exofuncs.cpp exodus_main()
 	// 2. exoprog.cpp  perform()
 	// OPTIONS are in either (AbC) or {AbC} in the last field of COMMAND
-	mv.OPTIONS = mv.COMMAND.field2(_FM, -1);
+	mv.OPTIONS = mv.COMMAND.field(_FM, -1);
 	if ((mv.OPTIONS.starts("{") and mv.OPTIONS.ends("}")) or (mv.OPTIONS.starts("(") and mv.OPTIONS.ends(")"))) {
 		// Remove last field of COMMAND TODO fpopper command?
 		mv.COMMAND.cutter(-mv.OPTIONS.len() - 1);

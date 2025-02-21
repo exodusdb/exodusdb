@@ -41,7 +41,7 @@ function main(in mode, in lockfilename, in lockkey, in lockdesc0, io locklist, i
 	if (var(0) and USERNAME == "EXODUS") {
 		printl(mode, " ", lockfilename, " ", lockkey, " ", locklist);
 		var reply;
-		reply.input();
+		if (not reply.input()) {};
 	}
 
 	if (mode == "LOCK") {

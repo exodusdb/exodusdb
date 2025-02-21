@@ -9,7 +9,7 @@ function main() {\
 	if (DICT.contains("VOC")) {\
 		ANS = xlate(RECORD.f(3), "$" ^ RECORD.f(4), "VERSION", "X");\
 	} else {\
-		ANS = field2(RECORD, FM, -1);\
+		ANS = field(RECORD, FM, -1);\
 	// IF @ANS[1,1] = 'V' THEN\
 	//  @ANS=@ANS[2,99]\
 	// END ELSE\

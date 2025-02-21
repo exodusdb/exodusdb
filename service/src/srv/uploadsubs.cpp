@@ -260,7 +260,7 @@ postuploadfail:
 		//////////////////////////////////////////////////////////////////////////////
 
 		// 1. Extract the file name part only
-		let filename_part = relative_file_part.field2(OSSLASH, -1);
+		let filename_part = relative_file_part.field(OSSLASH, -1);
 
 		// 2. Remove the trailing file name part
 		relative_file_part.cutter(-len(filename_part));
@@ -410,10 +410,10 @@ postuploadfail:
 		file = "";
 
 		if (not importcode) {
-			importcode = (field2(uploadpath, OSSLASH, -1)).ucase();
+			importcode = (field(uploadpath, OSSLASH, -1)).ucase();
 		}
 		if (importcode.contains(".")) {
-			let tt = field2(uploadpath, ".", -1);
+			let tt = field(uploadpath, ".", -1);
 			importcode.cutter(-tt.len() - 1);
 		}
 		importcode.converter(" .", "--");

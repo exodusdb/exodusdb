@@ -1575,7 +1575,7 @@ adddatasetcodename:
 	if (srv.documents.open("DOCUMENTS", "")) {
 		select(srv.documents);
 		while (readnext(docid)) {
-			let docid2 = docid.field2(OSSLASH, -1).field(".", 1);
+			let docid2 = docid.field(OSSLASH, -1).field(".", 1);
 			if (docid2 != docid) {
 				if (var doc; doc.read(srv.documents, docid)) {
 					doc.write(srv.documents, docid2);
@@ -1621,7 +1621,7 @@ adddatasetcodename:
 		//call osread(upgradelog, "UPGRADE.CFG");
 		//if (not osread(upgradelog, "UPGRADE.CFG"))
 		//	loglasterror();
-		var	 versionlastrun = field2(upgradelog, chr(10), -1);
+		var	 versionlastrun = field(upgradelog, chr(10), -1);
 
 		// if changed then log and email users
 		if (versioninstalled != versionlastrun) {

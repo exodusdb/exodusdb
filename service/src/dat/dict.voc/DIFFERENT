@@ -32,10 +32,10 @@ function main() {\
 			ANS = "";\
 		} else {\
 			if (ID.starts("$")) {\
-				var recdatetime = field2(RECORD, FM, -1);\
+				var recdatetime = field(RECORD, FM, -1);\
 				recdatetime = recdatetime.field(" ", 2, 9).trim() ^ " " ^ recdatetime.field(" ", 1);\
 				recdatetime = recdatetime.iconv("DT");\
-				var cmpdatetime = field2(rec, FM, -1);\
+				var cmpdatetime = field(rec, FM, -1);\
 				cmpdatetime = cmpdatetime.field(" ", 2, 9).trim() ^ " " ^ cmpdatetime.field(" ", 1);\
 				cmpdatetime = cmpdatetime.iconv("DT");\
 				if (not(recdatetime and cmpdatetime)) {\

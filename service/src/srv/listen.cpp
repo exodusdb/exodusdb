@@ -205,6 +205,7 @@ var compcode;
 var logid;
 
 var nextconnection;
+let interactive_prompt = "q to quit, x to execute commands";
 
 function main() {
 
@@ -230,6 +231,7 @@ function main() {
 					break;
 			}
 
+			// Command line is in here
 			if (!loop_exit())
 				break;
 		}
@@ -428,7 +430,9 @@ function main_init() {
 	// if count(subdirs,fm) else
 	tdir = "../logs/" ^ datasetcode;
 	tdir.converter("/", OSSLASH);
-	if (not var().osopen(tdir.lcase())) {
+	tdir.lcaser();
+//	if (not var().osopen(tdir.lcase())) {
+	if (not tdir.osdir()) {
 		if (STATUS != 2) {
 			//call osmkdir(tdir.lcase());
 			if (not osmkdir(tdir.lcase()))
@@ -438,7 +442,9 @@ function main_init() {
 
 	// check/make the annual log folder
 	// call shell('MD ':logpath)
-	if (not var().osopen(logpath)) {
+//	if (not var().osopen(logpath)) {
+	// osopen now only opens regular files
+	if (not logpath.osdir()) {
 		if (STATUS != 2) {
 			//call osmkdir(logpath);
 			if (not osmkdir(logpath))
@@ -503,6 +509,11 @@ function main_init() {
 	//nextconnection.connect(osgetenv("EXO_DATA"));
 	if (not nextconnection.connect(osgetenv("EXO_DATA")))
 		loglasterror();
+
+	// In init_main and loop_exit with commands
+	// q to quit, x to execute commands
+	if (isterminal(0))
+		outputl(interactive_prompt);
 
 	return true;
 
@@ -775,60 +786,76 @@ function loop_exit() {
 	// gosub exit
 	// end
 
-	// f5 or 'x' on linux
+	// 'x' execute commands
 	if (charx.lcase() == PRIORITYINT.f(2)) {
 		cmd = "";
-		cmd.input(oscwd() ^ " Command? ");
-		SYSTEM(2) = "";
 
-		// Check if something like ~/lib/libxxxxxxxx.so exists where xxxxxxxx is the first word of the command
-		if (not libinfo(cmd.field(" "))) {
-			errputl(cmd.field(" "), " does not exist.");
+		// Command loop
+		for (;;) {
 
-		} else {
-			try {
+			if (not cmd.input("Command? ") || not cmd)
+				break;
 
-				// Execute the command as user EXODUS
-				// TODO how to ensure that this gets restored below?
-				// Probably not important since the command line
-				// implies debugging by devops staff
-				let saveusername = USERNAME;
-				USERNAME	 = "EXODUS";
+			SYSTEM(2) = "";
 
-				if (not cmd.starts("list")) {
-					printl("Begin transaction");
-					//begintrans();
-					if (not begintrans())
-						abort(lasterror());
-				}
+			// Check if something like ~/lib/libxxxxxxxx.so exists where xxxxxxxx is the first word of the command
+			if (not libinfo(cmd.field(" "))) {
+				errputl(cmd.field(" "), " does not exist. Only executable and performable lib commands are allowed.");
 
-				// Manual commands
-				// ////////////////////
-				let ok = execute(cmd);
-				// ////////////////////
+			} else {
+				try {
 
-				if (statustrans()) {
-					if (decide("Commit any database updates ?", "Commit" _VM "Rollback") == "Commit") {
-						printx("Committing transaction ... ");
-						//committrans();
-						if (not committrans())
-							loglasterror();
-						printl("done.");
-					} else {
-						printx("*ROLLING BACK* transaction ... ");
-						//rollbacktrans();
-						if (not rollbacktrans())
-							loglasterror();
-						printl("done.");
+					// Execute the command as user EXODUS
+					// TODO how to ensure that this gets restored below?
+					// Probably not important since the command line
+					// implies debugging by devops staff
+					let saveusername = USERNAME;
+					USERNAME	 = "EXODUS";
+
+					if (not cmd.starts("list")) {
+						printl("Begin transaction");
+						//begintrans();
+						if (not begintrans()) {
+//							abort(lasterror());
+							loglasterror(lasterror());
+							break;
+						}
 					}
+
+					// Manual commands.
+					// Errors are caught in try/catch
+
+					// ////////////////////
+					let ok = execute(cmd);
+					// ////////////////////
+
+					if (statustrans()) {
+						if (decide("Commit any database updates ?", "Commit]Rollback"_var) == "Commit") {
+							printx("Committing transaction.");
+							if (committrans()) {}
+							else
+								loglasterror();
+						} else {
+							printx("*ROLLING BACK* transaction.");
+							if (rollbacktrans()) {}
+							else
+								loglasterror();
+						}
+					}
+
+					USERNAME = saveusername;
+
+				} catch (VarError& e) {
+					errputl(e.description);
+					if (statustrans() and not rollbacktrans())
+						loglasterror();
 				}
-
-				USERNAME = saveusername;
-
-			} catch (VarError& e) {
-				errputl(e.description);
 			}
-		}
+
+		} // command loop
+
+		// In main and commands exit
+		outputl(interactive_prompt);
 
 		osflush();
 		return true;
@@ -1210,7 +1237,7 @@ function request_init() {
 		tt ^= " Time=" ^ xmlquote(timex.oconv("MTS"));
 		tt ^= " DateTime=" ^ xmlquote(datex.oconv("D") ^ "T" ^ timex.oconv("MTS") ^ "." ^ timex.field(".", 2));
 		tt ^= " User=" ^ xmlquote(username);
-		tt ^= " File=" ^ xmlquote(field2(replyfilename, OSSLASH, -1));
+		tt ^= " File=" ^ xmlquote(field(replyfilename, OSSLASH, -1));
 		// REMOTE_ADDR REMOTE_HOST HTTPS
 		tt ^= " IP_NO=" ^ xmlquote(connection.f(1, 2));
 		tt ^= " Host=" ^ xmlquote(connection.f(1, 3));
@@ -2925,7 +2952,7 @@ subroutine rawlock() {
 
 	/*
 	// handle=handle[-1,'B':vm]
-	handle = field2(handle, VM, -1);
+	handle = field(handle, VM, -1);
 	*/
 
 	// keyorfilename = keyx;

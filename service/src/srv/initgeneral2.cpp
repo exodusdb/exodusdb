@@ -193,7 +193,7 @@ function main(in mode, io logtime, in menu) {
 			var baselink = baselinks.f(1, linkn);
 			if (baselink) {
 				// TODO This code looks strange, perhaps buggy
-				let lastpart = (field2(baselink, "/", -1)).lcase();
+				let lastpart = (field(baselink, "/", -1)).lcase();
 				if (lastpart.first(4).contains(".htm")) {
 					baselink.cutter(-lastpart.len());
 				}

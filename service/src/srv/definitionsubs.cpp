@@ -369,9 +369,9 @@ preventupdate:
 				}
 			}  // fn;
 
-			let t49	 = field2(RECORD.f(49), _VM, -1);
-			let t149 = field2(RECORD.f(149), _VM, -1);
-			let t150 = field2(RECORD.f(150), _VM, -1);
+			let t49	 = field(RECORD.f(49), _VM, -1);
+			let t149 = field(RECORD.f(149), _VM, -1);
+			let t150 = field(RECORD.f(150), _VM, -1);
 			if (t49 and t49 == t149) {
 				msg = "Media adjustment no pattern must be different from Media invoice no pattern, or left blank";
 				return invalid(msg);

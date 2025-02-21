@@ -1044,7 +1044,7 @@ bool var::connect(in conninfo) {
 		(*this) = "";
 //	if (not this->f(1))
 		//this->r(1,fullconninfo.field(" ",1));
-		this->r(1,fullconninfo.field2("dbname=", -1).field(" ", 1));
+		this->r(1,fullconninfo.field("dbname=", -1).field(" ", 1));
 	this->r(2, dbconn_no);
 	this->r(3, dbconn_no);
 
@@ -3490,7 +3490,7 @@ bool var::selectx(in fieldnames, in sortselectclause) {
 	// remaining.logputl("remaining=");
 
 	// remove trailing options eg (S) or {S}
-	var lastword = remaining.field2(" ", -1);
+	var lastword = remaining.field(" ", -1);
 	if ((lastword.starts("(") && lastword.ends(")")) ||
 		(lastword.starts("{") && lastword.ends("}"))) {
 		remaining.cutter(-lastword.len() - 1);
@@ -4430,7 +4430,7 @@ bool var::selectx(in fieldnames, in sortselectclause) {
 				TRACE(whereclause)
 			// Default to OR between with clauses
 			if (whereclause) {
-				var lastpart = whereclause.field2(" ", -1);
+				var lastpart = whereclause.field(" ", -1);
 				if (not var("OR AND (").locateusing(" ", lastpart))
 					whereclause ^= " or ";
 				if (DBTRACE_SELECT)

@@ -80,7 +80,7 @@ function main() {
 				startpos = 1;
 			}
 			//var leftcontext = RECORD.b(startpos - padding, padding).field2(FM, -1);
-			let leftcontext = RECORD.b(startpos2, padding).field2(FM, -1);
+			let leftcontext = RECORD.b(startpos2, padding).field(FM, -1);
 			let rightcontext = RECORD.b(startpos + len(reqtext), padding).f(1);
 
 			printl(filename, ID, leftcontext ^ colored_reqtext ^ rightcontext);

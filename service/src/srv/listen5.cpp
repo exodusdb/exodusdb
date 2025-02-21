@@ -233,7 +233,7 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 		// 		if (gbp.open("GBP", "")) {
 		// 			let listen;
 		// 			if (listen.read(gbp, "$LISTEN")) {
-		// 				listen = field2(listen, FM, -1);
+		// 				listen = field(listen, FM, -1);
 		// 				if (s100.f(1, 3)) {
 		// 					if (s100.f(1, 3) != listen) {
 		// 						// this will only restart listen, not the whole process/thread

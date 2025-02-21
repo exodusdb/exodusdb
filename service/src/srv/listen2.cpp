@@ -1022,7 +1022,7 @@ validateexit2:
 		// determine the responsefile name from the printfilename
 		// responsefilename=system<2>
 		// if responsefilename else return
-		// t=field2(responsefilename,'.',-1)
+		// t=field(responsefilename,'.',-1)
 		// responsefilename[-len(t),len(t)]='3'
 
 		// linkfilename3

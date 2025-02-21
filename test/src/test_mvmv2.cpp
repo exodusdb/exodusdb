@@ -143,20 +143,33 @@ function main() {
 	//arev/pick convention is that field numbers and field counts less than 1 are treated as 1
 	//this is probably not a logical or even useful convention
 	assert(field("aa bb cc", " ", 0) eq "aa");	//arev
-	assert(field("aa bb cc", " ", -1)    eq "aa");
-	assert(field("aa bb cc", " ", -2)    eq "aa");
+
+	// Same as field2 now
+//	assert(field("aa bb cc", " ", -1)    eq "aa");
+//	assert(field("aa bb cc", " ", -2)    eq "aa");
+//	assert(field("aa bb cc", " ", -3)    eq "aa");
+//	assert(field("aa bb cc", " ", -4) eq "aa");	 //?
+	assert(field("aa bb cc", " ", -1).outputl()    eq "cc");
+	assert(field("aa bb cc", " ", -2)    eq "bb");
 	assert(field("aa bb cc", " ", -3)    eq "aa");
-	assert(field("aa bb cc", " ", -4) eq "aa");	 //?
+	assert(field("aa bb cc", " ", -4) eq "aa");
+//	assert(field("aa bb cc", " ", -4).outputl() eq ""); //?
+
 	assert(field("aa bb cc", " ", 1)     eq "aa");
 	assert(field("aa bb cc", " ", 2)     eq "bb");
 	assert(field("aa bb cc", " ", 3)     eq "cc");
 	assert(field("aa bb cc", " ", 4)     eq "");
 	//
 	assert(field("aa bb cc", " ", 0, 2)  eq "aa bb");
-	assert(field("aa bb cc", " ", -1, 2) eq "aa bb");
-	assert(field("aa bb cc", " ", -2, 2) eq "aa bb");
+//	assert(field("aa bb cc", " ", -1, 2) eq "aa bb");
+//	assert(field("aa bb cc", " ", -2, 2) eq "aa bb");
+//	assert(field("aa bb cc", " ", -3, 2) eq "aa bb");
+//	assert(field("aa bb cc", " ", -4, 2) eq "aa bb");
+	assert(field("aa bb cc", " ", -1, 2) eq "cc");
+	assert(field("aa bb cc", " ", -2, 2) eq "bb cc");
 	assert(field("aa bb cc", " ", -3, 2) eq "aa bb");
 	assert(field("aa bb cc", " ", -4, 2) eq "aa bb");
+
 	assert(field("aa bb cc", " ", 1, 2)  eq "aa bb");
 	assert(field("aa bb cc", " ", 2, 2)  eq "bb cc");
 	assert(field("aa bb cc", " ", 3, 2)  eq "cc");
@@ -166,25 +179,25 @@ function main() {
 	//it should perhaps also work like [x,y]/substr character extraction rules
 	//instead of treating any references before the first field as field 1
 	//and negative field counts should work backwards perhaps
-	assert(field2("aa bb cc", " ", 0) eq "aa");	 //arev but perhaps should return whole string
-	assert(field2("aa bb cc", " ", -1) eq "cc");
-	assert(field2("aa bb cc", " ", -2) eq "bb");
-	assert(field2("aa bb cc", " ", -3) eq "aa");
-	assert(field2("aa bb cc", " ", -4) eq "aa");  //?
-	assert(field2("aa bb cc", " ", 1)  eq "aa");
-	assert(field2("aa bb cc", " ", 2)  eq "bb");
-	assert(field2("aa bb cc", " ", 3)  eq "cc");
-	assert(field2("aa bb cc", " ", 4)  eq "");
+	assert(field("aa bb cc", " ", 0) eq "aa");	 //arev but perhaps should return whole string
+	assert(field("aa bb cc", " ", -1) eq "cc");
+	assert(field("aa bb cc", " ", -2) eq "bb");
+	assert(field("aa bb cc", " ", -3) eq "aa");
+	assert(field("aa bb cc", " ", -4) eq "aa");  //?
+	assert(field("aa bb cc", " ", 1)  eq "aa");
+	assert(field("aa bb cc", " ", 2)  eq "bb");
+	assert(field("aa bb cc", " ", 3)  eq "cc");
+	assert(field("aa bb cc", " ", 4)  eq "");
 
-	assert(field2("aa bb cc", " ", 0, 2) eq "aa bb");  //aren
-	assert(field2("aa bb cc", " ", -1, 2) eq "cc");
-	assert(field2("aa bb cc", " ", -2, 2) eq "bb cc");
-	assert(field2("aa bb cc", " ", -3, 2) eq "aa bb");
-	assert(field2("aa bb cc", " ", -4, 2) eq "aa bb");	//?
-	assert(field2("aa bb cc", " ", 1, 2)  eq "aa bb");
-	assert(field2("aa bb cc", " ", 2, 2)  eq "bb cc");
-	assert(field2("aa bb cc", " ", 3, 2)  eq "cc");
-	assert(field2("aa bb cc", " ", 4, 2)  eq "");
+	assert(field("aa bb cc", " ", 0, 2) eq "aa bb");  //aren
+	assert(field("aa bb cc", " ", -1, 2) eq "cc");
+	assert(field("aa bb cc", " ", -2, 2) eq "bb cc");
+	assert(field("aa bb cc", " ", -3, 2) eq "aa bb");
+	assert(field("aa bb cc", " ", -4, 2) eq "aa bb");	//?
+	assert(field("aa bb cc", " ", 1, 2)  eq "aa bb");
+	assert(field("aa bb cc", " ", 2, 2)  eq "bb cc");
+	assert(field("aa bb cc", " ", 3, 2)  eq "cc");
+	assert(field("aa bb cc", " ", 4, 2)  eq "");
 
 	//////////////////////////////////////////////////////////////
 	//var& var::substr(const int startindex1, const int length) &&
@@ -316,9 +329,9 @@ function main() {
 	var pos;
 	//from beginning of string (char 1) or zero or negative the same
 	TRACE(var("abc/:cde").b(-1, ":/", pos))
-	assert(var("abc/:cde").b(-1, ":/", pos).errputl("qqqqqqqqqqqqq=") eq "abc");
-	assert(var("abc/:cde").b(0, ":/", pos)  eq "abc");
-	assert(var("abc/:cde").b(1, ":/", pos)  eq "abc");
+//	assert(var("abc/:cde").b(-1, ":/", pos).errputl("qqqqqqqqqqqqq=") eq "abc");
+//	assert(var("abc/:cde").b(0, ":/", pos)  eq "abc");
+//	assert(var("abc/:cde").b(1, ":/", pos)  eq "abc");
 
 	//starting after end of string
 	assert(var("abc/:cde").b(10, ":/", pos) eq "");

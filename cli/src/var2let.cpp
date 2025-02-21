@@ -44,7 +44,7 @@ function main() {
 			text.paster(pos, 5, "\tlet ");
 
 			// Write to /tmp
-			let tmpfilename = ostempdirpath() ^ "/" ^ osfilename.field2("/", -1);
+			let tmpfilename = ostempdirpath() ^ "/" ^ osfilename.field("/", -1);
 			if (not oswrite(text on tmpfilename)) {
 				loglasterror();
 				continue;

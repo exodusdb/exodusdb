@@ -446,7 +446,7 @@ subroutine getlog(in logfilename, in cleanup, out log) {
 		log.trimmer(_FM);
 		log.replacer("<br />", _FM);
 		log = trim(log, _FM);
-		log = field2(log, _FM, -1);
+		log = field(log, _FM, -1);
 		if (log) {
 			log.prefixer(_FM _FM);
 		}

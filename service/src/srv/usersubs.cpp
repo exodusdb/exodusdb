@@ -130,7 +130,7 @@ function main(in mode) {
 				let nn = sysemails.fcount(" ");
 				for (const var ii : range(1, nn)) {
 					var word = sysemails.field(" ", ii);
-					word	 = field2(word, "@", -1);
+					word	 = field(word, "@", -1);
 					// remove smtp. mailout. etc from smtp host domain
 					if (var("smtp,mail,mailout").locateusing(",", word.field(".", 1))) {
 						word = word.field(".", 2, 999);

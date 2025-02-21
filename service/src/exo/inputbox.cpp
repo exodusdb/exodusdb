@@ -7,7 +7,7 @@ function main(in msg, in /*maxlen*/, in /*show*/, in /*allowablechars*/, io data
 	if (!data.assigned())
 		data = "";
 
-	data.input(prompt);
+	if (not data.input(prompt)) {}
 
 	return 0;
 }

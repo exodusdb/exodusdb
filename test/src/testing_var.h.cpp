@@ -469,7 +469,7 @@ function main() {
 		 let v2 = pop("abc");
 	}
 
-	printl(" field(SV strx, const int fieldnx = 1, const int nfieldsx = 1) const;");
+	printl(" field(SV delimiter, const int fieldnx = 1, const int nfieldsx = 1) const;");
 	{
 		let v1 = "aa*bb*cc"_var.field("*", 2);
 		assert(v1 == "bb");
@@ -478,13 +478,13 @@ function main() {
 		 let v2 = field("aa*bb*cc", "*", 2);
 	}
 
-	printl(" field2(SV separator, const int fieldno, const int nfields = 1) const");
+	printl(" field(SV delimiter, const int fieldnx = 1, const int nfieldsx = 1) const;");
 	{
-		let v1 = "aa*bb*cc"_var.field2("*", -1);
+		let v1 = "aa*bb*cc"_var.field("*", -1);
 		assert(v1 == "cc");
 
 		 // or
-		 let v2 = field2("aa*bb*cc", "*", -1);
+		 let v2 = field("aa*bb*cc", "*", -1);
 	}
 
 	printl(" fieldstore(SV separator, const int fieldno, const int nfields, in replacement) const&;");
@@ -552,18 +552,17 @@ function main() {
 		 let v2 = substr("abcd", 2);
 	}
 
-	printl(" substr(const int pos1, SV delimiterchars, io pos2) const;");
+	printl(" substr(const int pos1, SV delimiterchars, out pos2) const;");
 	{
-		var pos1 = 4, pos2;
-		 let v1 = "12,45 78"_var.substr(pos1, ", ", pos2);
+		var pos1 = 4;
+		 let v1 = "12,45 78"_var.substr(pos1, ", ", COL2);
 		assert(v1 == "45" );
-		assert(pos2 == 6 );
+		assert(COL2 == 6 );
  // 6 is the position of the next delimiter char found.
 		 // or
-		 var pos3;
-		 let v2 = substr("12,45 78", pos2 + 1, ", ", pos3);
+		 let v2 = substr("12,45 78", COL2 + 1, ", ", COL2);
 		assert(v2 == "78" );
-		assert(pos3 == 9 );
+		assert(COL2 == 9 );
  // 9 is one after the end of the string meaning that none of the delimiter chars were found.
 	}
 
@@ -583,7 +582,7 @@ function main() {
  // field_mark_no 0 means that none of the standard field marks were found.
 	}
 
-	printl(" convert(SV fromchars, SV tochars) const&;");
+	printl(" convert(SV from_chars, SV to_chars) const&;");
 	{
 		let v1 = "abcde"_var.convert("aZd", "XY");
 		assert(v1 == "Xbce");
@@ -592,7 +591,7 @@ function main() {
 		 let v2 = convert("abcde", "aZd", "XY");
 	}
 
-	printl(" textconvert(SV fromchars, SV tochars) const&;");
+	printl(" textconvert(SV from_characters, SV to_characters) const&;");
 	{
 		let v1 = "a🤡b😀c🌍d"_var.textconvert("🤡😀", "👋");
 		assert(v1 == "a👋bc🌍d");
@@ -1712,9 +1711,10 @@ function main() {
 		 osflush();
 	}
 
-	printl(" input(in prompt = "");");
+	printl("input(in prompt = "");");
 	{
-		// var v1 = "default"; v1.input("Prompt:");
+		// var v1 = "defaultvalue";
+		 // if (v1.input("Prompt:")) {/*ok*/} else  abort("input: " ^ lasterror());
 		 // or
 		 // var v2 = input();
 	}
@@ -2036,7 +2036,7 @@ function main() {
 		assert( "\xff\x00"_var.oconv( "HEX" ) == "FF" "00"           );
  // Any bytes are ok.
 		 assert(        var(10).oconv( "HEX" ) == "31" "30"           ); // Uses ASCII string equivalent of 10 i.e. "10".
-		 assert(   "\u0393"_var.oconv( "HEX" ) == "CE" "93"           ); // Greek capital Gamma in utf8 bytes.
+		 assert(   "\u0393"_var.oconv( "HEX" ) == "CE" "93"           ); // Greek capital Gamma in UTF8 bytes.
 		 assert(     "a^]b"_var.oconv( "HEX" ) == "61" "1E" "1D" "62" ); // Field and value marks.
 		 // or
 		 assert(      oconv("ab01"_var, "HEX") == "61" "62" "30" "31");

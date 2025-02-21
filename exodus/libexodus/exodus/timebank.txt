@@ -153,7 +153,7 @@
 652 var  var::match(SV regex_str, SV regex_options) const
 653 void var::replacer(SV what, SV with) &
 654 var  var::replace(const rex& regex, SV replacement) const
-655 var  var::field(SV separatorx, const int fieldnx, const int nfieldsx) const
+655 var  var::field(SV delimiter, const int fieldnx, const int nfieldsx) const
 656 void var::fieldstorer(SV separator0, const int fieldnx, const int nfieldsx, in replacementx) &
 657 bool var::locate(in target, out setting, const int fieldno, const int valueno) const
 658 var  var::locate(in target) const
@@ -178,7 +178,7 @@
 677 void var::substrer(const int pos1, const int length) &
 678 var  var::at(const int charno) const
 679 var  var::multivalued(const char* opcode, in var2) const
-680 var  var::substr(const int pos1, SV delimiterchars, io pos2) const
+680 var  var::substr(const int pos1, SV delimiterchars, out pos2) const
 681 var  var::substr2(io pos1, out delimiterno) const
 682 var  var::sumall() const
 683 var  var::sum() const

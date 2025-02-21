@@ -14,7 +14,7 @@ function security2(in modex, in op0)
 	var op=op0.convert("_.", "  ");
 	var op2 = "";
 	if (op.ends(DQ)) {
-		op2=op.field2(DQ, -2);
+		op2=op.field(DQ, -2);
 		op.cutter(-op2.len());
 		op2.prefixer(" ");
 	}

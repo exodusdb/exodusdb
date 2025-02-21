@@ -90,7 +90,7 @@ static void addbacktraceline(in frameno, in sourcefilename, in lineno, io return
 
 	// Example output line:
 	// "8: p2.cpp:15: printl(v2);"
-	var linetext = (frameno) ^ ": " ^ sourcefilename.field2(_OSSLASH, -1) ^ ":" ^ lineno ^ ": " ^ line;
+	var linetext = (frameno) ^ ": " ^ sourcefilename.field(_OSSLASH, -1) ^ ":" ^ lineno ^ ": " ^ line;
 	//var linetext = std::format("{:0}: {:1}:{:2}: {:3}" , frameno, sourcefilename.field2(_OSSLASH, -1), lineno, line);
 
 	returnlines ^= linetext ^ FM;
@@ -193,7 +193,7 @@ var exo_backtrace(void* stack_addresses[BACKTRACE_MAXADDRESSES], std::size_t sta
 		if (not objfilename.osfile()) {
 			// loadable program
 			var which_out;
-			if (not which_out.osshellread("which " ^ objfilename.field2(_OSSLASH, -1))) {
+			if (not which_out.osshellread("which " ^ objfilename.field(_OSSLASH, -1))) {
 				//null
 			}
 			which_out = which_out.field("\n", 1).field("\r", 1);

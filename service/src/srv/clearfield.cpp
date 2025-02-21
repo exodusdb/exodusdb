@@ -13,7 +13,7 @@ function main() {
 	//
 
 	if (SENTENCE.contains("(")) {
-		options = field2(SENTENCE, "(", -1);
+		options = field(SENTENCE, "(", -1);
 		SENTENCE.cutter(-options.len() - 1);
 		SENTENCE.trimmerlast();
 	} else {

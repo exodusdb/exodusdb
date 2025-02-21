@@ -1272,7 +1272,7 @@ var  var::oslist(SV globpattern0, const int mode) const {
 
 		// If the last part of path looks like a glob
 		// (has * or ?) use it.
-		globpattern = this_path.field2(_OSSLASH, -1);
+		globpattern = this_path.field(_OSSLASH, -1);
 		if (globpattern.convert("*?", "") != globpattern)
 			this_path.firster(this_path.len() - globpattern.len());
 		else

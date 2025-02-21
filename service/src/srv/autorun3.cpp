@@ -645,7 +645,7 @@ nextsign:
 			let timetext = elapsedtimetext(start_timestamp, timestamp());
 
 			// if ucase(printfilename[-4,4])='.XLS' then
-			tt = (field2(printfilename, ".", -1)).lcase();
+			tt = (field(printfilename, ".", -1)).lcase();
 			if (tt.contains("htm") and srv.document.f(33) != "2") {
 				// insert body from file
 				body = "@" ^ printfilename;
@@ -753,7 +753,7 @@ subroutine exec2() {
 	printfilename.converter("/", OSSLASH);
 
 	// tt=printfilename[-1,'B.']
-	tt = field2(printfilename, ".", -1);
+	tt = field(printfilename, ".", -1);
 	printfilename.paster(-tt.len(), tt.len(), "htm");
 	SYSTEM(2) = printfilename;
 	// if tracing then

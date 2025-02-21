@@ -413,6 +413,7 @@ public:
 	// Checks if a source string starts with a given prefix (substr).
 	// prefix: The substr to check for.
 	// Returns: True if the source string starts with the given prefix.
+	// Returns: False if prefix is "". DIFFERS from c++, javascript, python3. See contains() for more info.
 	//
 	// `if ("abc"_var.starts("ab")) ... true
 	//  // or
@@ -422,6 +423,7 @@ public:
 	// Checks if a source string ends with a given suffix (substr).
 	// suffix: The substr to check for.
 	// Returns: True if the source string ends with given suffix.
+	// Returns: False if suffix is "". DIFFERS from c++, javascript, python3. See contains() for more info.
 	//
 	// `if ("abc"_var.ends("bc")) ... true
 	//  // or
@@ -431,7 +433,11 @@ public:
 	// Checks if a given substr exists in a source string.
 	// substr: The substr to check for.
 	// Returns: True if the source string starts with, ends with or contains the given substr.
-	//
+	// Returns: False if suffix is "". DIFFERS from c++, javascript, python3
+    // Human logic: "" is not equal to "x" therefore x does not contain "".
+    // Human logic: Check each item (character) in the list for equality with what I am looking for and return success if any are equal.
+    // Programmer logic: Compare as many characters as are in the search string for presence in the list of characters and return success if there are no failures.
+    //
 	// `if ("abcd"_var.contains("bc")) ... true
 	//  // or
 	//  if (contains("abcd", "bc")) ... true`
@@ -673,6 +679,7 @@ public:
 
 	// Get the first char of a string.
 	// Returns: A char, or "" if empty.
+	// Equivalent to var.substr(1,length) or var[1, length] in Pick OS
 	//
 	// `let v1 = "abc"_var.first(); // "a"
 	//  // or
@@ -681,6 +688,7 @@ public:
 
 	// Get the last char of a string.
 	// Returns: A char, or "" if empty.
+	// Equivalent to var.substr(-1, 1) or var[-1, 1] in Pick OS
 	//
 	// `let v1 = "abc"_var.last(); // "c"
 	//  // or
@@ -690,6 +698,7 @@ public:
 	// Get the first n chars of a source string.
 	// length: The number of chars (bytes) to get.
 	// Returns: A string of up to n chars.
+	// Equivalent to var.substr(1, length) or var[1, length] in Pick OS
 	//
 	// `let v1 = "abc"_var.first(2); // "ab"
 	//  // or
@@ -697,6 +706,7 @@ public:
 	ND var  first(const std::size_t length) const&;
 
 	// Extract up to length trailing chars
+	// Equivalent to var.substr(-length, length) or var[-length, length] in Pick OS
 	//
 	// `let v1 = "abc"_var.last(2); // "bc"
 	//  // or
@@ -706,6 +716,7 @@ public:
 	// Remove n chars (bytes) from the source string.
 	// length: Positive to remove first n chars or negative to remove the last n chars.
 	// If the absolute value of length is >= the number of chars in the source string then all chars will be removed.
+	// Equivalent to var.substr(length) or var[1, length] = "" in Pick OS
 	//
 	// `let v1 = "abcd"_var.cut(2); // "cd"
 	//  // or
@@ -718,6 +729,7 @@ public:
 	// pos1: > than the length of the source string. Insert after the last char.
 	// pos1: -1 : Remove up to length chars before inserting.Insert on or before the last char.
 	// pos1: -2 : Insert on or before the penultimate char.
+	// Equivalent to var[pos1, length] = substr in Pick OS
 	//
 	// `let v1 = "abcd"_var.paste(2, 2, "XYZ"); // "aXYZd"
 	//  // or
@@ -725,6 +737,7 @@ public:
 	ND var  paste(const int pos1, const int length, SV insertstr) const&;
 
 	// Insert text at char position without overwriting any following chars
+	// Equivalent to var[pos1, 0] = substr in Pick OS
 	//
 	// `let v1 = "abcd"_var.paste(2, "XYZ"); // "aXYZbcd"
 	//  // or
@@ -732,6 +745,7 @@ public:
 	ND var  paste(const int pos1, SV insertstr) const&;
 
 	// Insert text at the beginning
+	// Equivalent to var[0, 0] = substr in Pick OS
 	//
 	// `let v1 = "abc"_var.prefix("XYZ"); // "XYZabc"
 	//  // or
@@ -751,26 +765,32 @@ public:
 	}
 
 	// Remove one trailing char.
+	// Equivalent to var[-1, 1] = "" in Pick OS
 	//
 	// `let v1 = "abc"_var.pop(); // "ab"
 	//  // or
 	//  let v2 = pop("abc");`
 	ND var  pop() const&;
 
-	// Extract one or more consecutive fields given a delimiter char or substr.
+	// Copies one or more consecutive fields from a string given a delimiter
+	// delimiter: A Unicode character.
+	// fieldno: The first field is 1, the last field is -1.
+	// Returns: A substring
 	//
 	// `let v1 = "aa*bb*cc"_var.field("*", 2); // "bb"
 	//  // or
 	//  let v2 = field("aa*bb*cc", "*", 2);`
-	ND var  field(SV strx, const int fieldnx = 1, const int nfieldsx = 1) const;
+	//
+	// `let v1 = "aa*bb*cc"_var.field("*", -1); // "cc"
+	//  // or
+	//  let v2 = field("aa*bb*cc", "*", -1);`
+	ND var  field(SV delimiter, const int fieldnx = 1, const int nfieldsx = 1) const;
 
 	// field2 is a version that treats fieldn -1 as the last field, -2 the penultimate field etc. -
 	// TODO Should probably make field() do this (since -1 is basically an erroneous call) and remove field2
 	// Same as var.field() but negative fieldnos work backwards from the last field.
 	//
-	// `let v1 = "aa*bb*cc"_var.field2("*", -1); // "cc"
-	//  // or
-	//  let v2 = field2("aa*bb*cc", "*", -1);`
+	[[deprecated ("Just use field() which now has the same behaviour as field()")]]
 	ND var  field2(SV separator, const int fieldno, const int nfields = 1) const
 	{
 		if (fieldno >= 0) LIKELY
@@ -827,6 +847,7 @@ public:
 	// Copies a substr from a given char position up to the end of the source string
 	// Returns: A substr or "".
 	// pos1: The char position to start at. If negative then start from a position counting backwards from the last char
+	// Equivalent to var[pos1, 9999999] in Pick OS
 	// Partially Unicode friendly but pos1 is in chars.
 	//
 	// `let v1 = "abcd"_var.substr(2); // "bcd"
@@ -834,7 +855,7 @@ public:
 	//  let v2 = substr("abcd", 2);`
 	ND var  substr(const int pos1) const&;
 
-	// Shorthand alias of substr version 4.
+	// Shorthand alias of substr version 2.
 	ND var  b(const int pos1) const& {return this->substr(pos1);}
 
 	// substr version 3.
@@ -842,21 +863,22 @@ public:
 	// Returns: A substr or "".
 	// pos1: [in] The position of the first char to copy. Negative positions count backwards from the last char of the string.
 	// pos2: [out] The position of the next delimiter char, or one char position after the end of the source string if no subsequent delimiter chars are found.
+	// COL2: is a predefined variable that can be used for pos2 instead of declaring a variable.
 	// An empty string may be returned if pos1 [in] points to one of the delimiter chars or points beyond the end of the source string.
+	// Equivalent to var[pos1, ",."] in Pick OS (non-numeric length).
 	// Works with any encoding including UTF8 for the source string but the delimiter chars are bytes.
 	// Add 1 to pos2 to skip over the next delimiter char to copy the next substr
 	// Works with any encoding including UTF8 for the source string but the delimiter chars are bytes.
 	// This function is similar to std::string::find_first_of but that function only returns pos2.
 	//
-	// `var pos1 = 4, pos2;
-	//  let v1 = "12,45 78"_var.substr(pos1, ", ", pos2);  // v1 -> "45" // pos2 -> 6 // 6 is the position of the next delimiter char found.
+	// `var pos1 = 4;
+	//  let v1 = "12,45 78"_var.substr(pos1, ", ", COL2);  // v1 -> "45" // COL2 -> 6 // 6 is the position of the next delimiter char found.
 	//  // or
-	//  var pos3;
-	//  let v2 = substr("12,45 78", pos2 + 1, ", ", pos3); // v2 -> "78" // pos3 -> 9 // 9 is one after the end of the string meaning that none of the delimiter chars were found.`
-	   var  substr(const int pos1, SV delimiterchars, io pos2) const;
+	//  let v2 = substr("12,45 78", COL2 + 1, ", ", COL2); // v2 -> "78" // COL2 -> 9 // 9 is one after the end of the string meaning that none of the delimiter chars were found.`
+	   var  substr(const int pos1, SV delimiterchars, out pos2) const;
 
 	// Shorthand alias of substr version 3.
-	   var  b(const int pos1, SV delimiterchars, io pos2) const {return this->substr(pos1, delimiterchars, pos2);}
+	   var  b(const int pos1, SV delimiterchars, out pos2) const {return this->substr(pos1, delimiterchars, pos2);}
 
 	// if no delimiter byte is found then it returns bytes up to the end of the string, sets
 	// offset to after tne end of the string and returns delimiter no 0 NOTE that it
@@ -872,6 +894,7 @@ public:
 	// An empty string may be returned if the pos1 [in] points to one of the field marks or beyond the end of the source string.
 	// pos1 [out] is correctly positioned to copy the next substr.
 	// Works with any encoding including UTF8. Was called "remove" in Pick OS.
+	// The equivalent in Pick OS was the statement "Remove variable From string At column Setting flag"
 	// ...
 	// This function is valuable for high performance processing of dynamic arrays.
 	// It is notably used in "list" to print parallel columns of mixed combinations of multivalues/subvalues and text marks correctly lined up mv to mv, sv to sv, tm to tm even when particular values, subvalues and text fragments are missing from particular columns.
@@ -1777,6 +1800,7 @@ public:
 
 	// Reads a record from a db file for a given key.
 	// Returns: False if the key doesnt exist
+	// var: Contains the record if it exists or is unassigned if not.
 	//
 	// `var rec;
 	//  let file = "xo_clients", key = "GD001";
@@ -1820,7 +1844,7 @@ public:
 
 	//  obj is strvar
 
-	// "Read field" Same as read() but only returns a specific field from the record
+	// "Read field" Same as read() but only returns a specific field number from the record.
 	//
 	// `var field, file = "xo_clients", key = "GD001", fieldno = 2;
 	//  if (not field.readf(file, key, fieldno)) ... // field -> "G"
@@ -1828,7 +1852,7 @@ public:
 	//  if (not readf(field from file, key, fieldno)) ...`
 	ND bool readf(in file, in key, const int fieldno);
 
-	// "write field" Same as write() but only writes to a specific field in the record
+	// "write field" Same as write() but only writes to a specific field number in the record
 	//
 	// `var field = "f3", file = "definitions", key = "1000", fieldno = 3;
 	//  field.writef(file, key, fieldno);
@@ -2465,7 +2489,14 @@ public:
 	//  ossetenv(envcode, envvalue);`
 	   void ossetenv(SV envcode) const;
 
-	// Get the value of an environment variable
+	// Get the value of an environment variable.
+	// envcode: The code of the desired environment variable or "" for all.
+	// Returns: True if set or false if not.
+	// var: If envcode exists: var is set to the value of the environment variable
+	// var: If envcode doesnt exist: var is set to ""
+	// var: If envcode is "": var is set to an dynamic array of all environment variables LIKE CODE1=VALUE1^CODE2=VALUE2...
+	// osgetenv and ossetenv work with a per thread copy of the process environment. This avoids multithreading issues but not actually changing the process environment.
+	// For the actual system environment, see "man environ". extern char **environ; // environ is a pointer to an array of pointers to char* env pairs like xxx=yyy and the last pointer in the array is nullptr.
 	//
 	// `var envvalue1;
 	//  if (envvalue1.osgetenv("HOME")) ... ok // e.g. "/home/exodus"
@@ -2572,13 +2603,17 @@ public:
 	// obj is var
 
 	// Returns one line of input from stdin.
-	// Returns raw bytes up to but excluding the first new line char.
-	// Prompt: Optional. Will be displayed before the input field if provided.
-	// If stdin is a terminal then the initial value of the var, if any, is the default value and can be edited with cursor keys like an OS command line. Pressing Enter or Ctrl+D will complete the input.
-	// `// var v1 = "default"; v1.input("Prompt:");
+	// Returns: True if successful or false if EOF or user pressed Esc or Ctrl+X in a terminal.
+	// var: [in] The default value for terminal input and editing. Ignored if not a terminal.
+	// var: [out] Raw bytes up to but excluding the first new line char. In case of EOF or user pressed Esc or Ctrl+X in a terminal it will be changed to "".
+	// Prompt: If provided, it will be displayed on the terminal.
+	// Multibyte/UTF8 friendly.
+	//
+	// `// var v1 = "defaultvalue";
+	//  // if (v1.input("Prompt:")) ... ok
 	//  // or
 	//  // var v2 = input();`
-	   out  input(in prompt = "");
+	ND bool input(in prompt = "");
 
     // Get raw bytes from standard input.
 	// Any new line chars are treated like any other bytes.

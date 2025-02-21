@@ -148,7 +148,7 @@ subroutine printtx() {
 				lasterror().errputl("printtx:");
 
 			//create a new filename
-			var ptx_filenamelen = (field2(printfilename, "\\", -1)).len();
+			var ptx_filenamelen = (field(printfilename, "\\", -1)).len();
 			var ptx_random = var(10).pwr(15).rnd().first(8);
 			printfilename.paster(-ptx_filenamelen, ptx_filenamelen, ptx_random ^ ".htm");
 

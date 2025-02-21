@@ -2478,7 +2478,7 @@ subroutine emailing() {
 		} else {
 			tt3 = head.f(1, 1, 1).field("'", 1);
 			if (tt3.contains(">")) {
-				tt3 = field2(tt3, ">", -1);
+				tt3 = field(tt3, ">", -1);
 			}
 			tt3 = "EXODUS: " ^ tt3;
 		}

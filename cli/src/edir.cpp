@@ -10,21 +10,21 @@ function main() {
 	//quit if arguments
 	if (fcount(COMMAND, FM) < 2)
 		abort(
-			"Syntax is:\n"
-			"edir DBFILENAME KEY [FIELDNO]\n"
-			"or\n"
-			"edir OSFILEPATH [LINENO] [OPTIONS]\n"
+			"Syntax is:"
+			"\nedir DBFILENAME KEY [FIELDNO]"
+			"\nor"
+			"\nedir OSFILEPATH [LINENO] [OPTIONS]"
 			"\n"
-			"OPTION 'R' = Show raw tm/sm etc."
-			"OPTION 'T' = Print to standard output (terminal)"
+			"\nOPTION 'R' = Show raw tm/sm etc."
+			"\nOPTION 'T' = Print to standard output (terminal)"
 		);
 
 	// Allow for first argument to be an os file path
 	if (COMMAND.f(2).contains(OSSLASH))
 		COMMAND.inserter(2, "DOS");
 
-	//var filename = COMMAND.f(2).convert(".", "_");
-	let filename = COMMAND.f(2);
+	//var dbfilename = COMMAND.f(2).convert(".", "_");
+	let dbfilename = COMMAND.f(2);
 	ID = COMMAND.f(3).unquote().unquote();	 //spaces are quoted
 	let fieldno = COMMAND.f(4);
 
@@ -41,24 +41,28 @@ function main() {
 	//if (not connect())
 	//	stop("Please login");
 
-	//check the file exists
-	var file;
-	if (not open(filename, file))
-		abort("Cannot open file " ^ filename);
+	//check the dbfile exists
+	var dbfile;
+	if (not open(dbfilename, dbfile))
+//		abort("Cannot open db file " ^ dbfilename);
+		abort(lasterror());
 
-	//get the record from the database (or filesystem if "filename" is "DOS")
-	if (not read(RECORD, file, ID)) {
+	//get the record from the database (or filesystem if "dbfilename" is "DOS")
+	bool is_new_record = false;
+	if (not read(RECORD, dbfile, ID)) {
 		//check if exists in upper or lower case
 		var key2 = ID.ucase();
 		if (key2 == ID)
 			key2.lcaser();
-		if (read(RECORD, file, key2))
+		if (read(RECORD, dbfile, key2))
 			ID = key2;
-		else
+		else {
 			RECORD = "";
+			is_new_record = true;
+		}
 	}
 
-	if (not RECORD)
+	if (is_new_record)
 		printl("New record");
 
 	var text = RECORD.f(fieldno);
@@ -78,31 +82,34 @@ function main() {
 	}
 
 	// Escape data format to text format
-	let converttext = filename != "DOS" or text.contains(FM);
+	let converttext = dbfilename != "DOS" or text.contains(FM);
 	if (converttext)
 		text = text.oconv(txtfmt);
 
-	//put the text on a temp file in order to edit it
-	var temposfilename = filename ^ "~" ^ ID;
+	//put the text on a temp osfile in order to edit it
+	var temposfilename = dbfilename ^ "~" ^ ID;
 	let invalidfilechars = "/ \"\'\u00A3$%^&*(){}[]:;#<>?,./\\|";
 	temposfilename.lcaser();
 	temposfilename.converter(invalidfilechars, str("-", len(invalidfilechars)));
 	temposfilename ^= "-pid" ^ ospid();
-	if (filename.starts("dict.") and fieldno)
+	if (dbfilename.starts("dict.") and fieldno)
 		temposfilename ^= ".sql";
 	else
 		temposfilename ^= ".tmp";
 	//oswrite(text, temposfilename);
-	if (not oswrite(text, temposfilename)) {
+	temposfilename.prefixer(ostempdirpath());
+	if (osfile(temposfilename) && not osremove(temposfilename))
+		abort(lasterror());
+	if (not is_new_record and not oswrite(text, temposfilename)) {
 		abort(lasterror());
 	}
 
-	//record file update timedate
+	//record osfile update timedate
 	let fileinfo = osfile(temposfilename);
-	if (not fileinfo)
+	if (not is_new_record and not fileinfo)
 		abort("Could not write local copy for editing " ^ temposfilename);
 
-	let isdict = filename.starts("dict.") or (filename == "DOS" and ID.contains("dat/dict."));
+	let isdict = dbfilename.starts("dict.") or (dbfilename == "DOS" and ID.contains("dat/dict."));
 
 	let editcmd = editor ^ " " ^ temposfilename.quote();
 	while (true) {
@@ -116,22 +123,41 @@ function main() {
 
 		let fileinfo2 = osfile(temposfilename);
 
-		//get edited file info or abort
+		//get edited osfile info or abort if not new record (never saved)
 		if (not fileinfo2) {
-			abort("Could not read local copy after editing " ^ temposfilename);
+			if (not is_new_record)
+				abort("Could not read local copy after editing " ^ temposfilename);
+			stop();
 		}
 
-		//file has been edited
+		//osfile has been edited
 		else if (fileinfo2 != fileinfo) {
 
 			var text2 = osread(temposfilename);
 
 			if (text2 == "") {
-				abort("Could not read local copy after editing " ^ temposfilename);
+
+				//abort("Could not read local copy after editing " ^ temposfilename);
+				var reply;
+				var options = "Yes]No"_var;
+				if (not is_new_record)
+					options ^= VM ^ "Delete it.";
+				if (not decide("Warning: Writing an empty record.\nAre you sure?", options, reply, 2)) {
+					continue;
+				}
+				if (reply == 2)
+					break;
+
+				if (reply == 3) {
+					if (not dbfile.deleterecord(ID))
+						abort(lasterror());
+					printl(dbfilename, ID, "deleted.");
+					stop();
+				}
 			}
 
 			// Unescape text back to data format
-			//if (filename != "DOS") {
+			//if (dbfilename != "DOS") {
 			if (converttext) {
 
 				trimmerlast(text2, _EOL);
@@ -150,7 +176,7 @@ function main() {
 				var dictrec = text2;
 
 				// Convert to FMs to check dict item format
-				if (filename == "DOS") {
+				if (dbfilename == "DOS") {
 					trimmerlast(dictrec, _EOL);
 					dictrec = dictrec.iconv(txtfmt);
 				}
@@ -177,7 +203,7 @@ function main() {
 				}
 			}
 
-			if (text2 != text) {
+			if (text2 != text or is_new_record) {
 
 				//printx("Ok to update? ");
 				//var reply=inputl();
@@ -186,22 +212,22 @@ function main() {
 				let newrecord = fieldno ? RECORD.pickreplace(fieldno, text2) : text2;
 
 				//keep trying to update - perhaps futilely
-				//at least temp file will be left in the directory
+				//at least temp osfile will be left in the directory
 				while (ucase(reply).starts("Y") and true) {
 
-//					if (write(newrecord, file, ID)) {
+//					if (write(newrecord, dbfile, ID)) {
 					bool ok = true;
-					if (file == "DOS")
+					if (dbfile == "DOS")
 						ok = oswrite(newrecord on ID);
 					else
-						write(newrecord, file, ID);
+						write(newrecord, dbfile, ID);
 					if (ok) {
-						printl(filename ^ " " ^ ID ^ " > db");
+						printl(dbfilename ^ " " ^ ID ^ " > db");
 
 						//generate/update database functions if saved a symbolic dictionary record
 						if (isdict and newrecord.f(1) == "S" and newrecord.f(8).contains("/"
 																												"*pgsql")) {
-							let oscmd = "dict2sql " ^ filename ^ " " ^ ID;
+							let oscmd = "dict2sql " ^ dbfilename ^ " " ^ ID;
 							if (not osshell(oscmd))
 								lasterror().errputl("edir:");
 						}
@@ -209,14 +235,14 @@ function main() {
 						break;
 					}
 					var temp;
-					temp.input();
+					if (not temp.input()) {}
 				}
 			}
 		}
 		break;
 	}
 
-	//clean up any temporary file
+	//clean up any temporary osfile
 	if (osfile(temposfilename)) {
 		if (not osremove(temposfilename)) {
 			lasterror().errputl();

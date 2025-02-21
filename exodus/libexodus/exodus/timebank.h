@@ -279,7 +279,7 @@ auto get_timebank_acno(const std::string_view arg1) -> int {
 	else if (++acno && arg1 == "var  var::match(SV regex_str, SV regex_options) const") {}
 	else if (++acno && arg1 == "void var::replacer(SV what, SV with) &") {}
 	else if (++acno && arg1 == "var  var::replace(const rex& regex, SV replacement) const") {}
-	else if (++acno && arg1 == "var  var::field(SV separatorx, const int fieldnx, const int nfieldsx) const") {}
+	else if (++acno && arg1 == "var  var::field(SV delimiter, const int fieldnx, const int nfieldsx) const") {}
 	else if (++acno && arg1 == "void var::fieldstorer(SV separator0, const int fieldnx, const int nfieldsx, in replacementx) &") {}
 	else if (++acno && arg1 == "bool var::locate(in target, out setting, const int fieldno, const int valueno) const") {}
 	else if (++acno && arg1 == "var  var::locate(in target) const") {}
@@ -304,7 +304,7 @@ auto get_timebank_acno(const std::string_view arg1) -> int {
 	else if (++acno && arg1 == "void var::substrer(const int pos1, const int length) &") {}
 	else if (++acno && arg1 == "var  var::at(const int charno) const") {}
 	else if (++acno && arg1 == "var  var::multivalued(const char* opcode, in var2) const") {}
-	else if (++acno && arg1 == "var  var::substr(const int pos1, SV delimiterchars, io pos2) const") {}
+	else if (++acno && arg1 == "var  var::substr(const int pos1, SV delimiterchars, out pos2) const") {}
 	else if (++acno && arg1 == "var  var::substr2(io pos1, out delimiterno) const") {}
 	else if (++acno && arg1 == "var  var::sumall() const") {}
 	else if (++acno && arg1 == "var  var::sum() const") {}
