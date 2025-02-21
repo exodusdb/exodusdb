@@ -703,6 +703,22 @@ bool var::locate(in target, out setting) const {
 	return false;
 }
 
+// hard coded utility to find any of the field marks instead of find_first_of
+//pos = var_str.find_first_of("\x1a\x1b\x1c\x1d\x1e\x1f", pos2);
+//pos = find_first_fm(var_str, pos2);
+inline std::size_t find_first_fm(const std::string& s1, std::size_t pos) {
+	auto iter = s1.c_str() + pos;
+	for (;;) {
+		if (*iter <= RM_) {
+			if (*iter >= ST_)
+				return iter - s1.c_str();
+			if (*iter == 0)
+				return std::string::npos;
+		}
+		iter++;
+	}
+}
+
 // locate without setting.
 // Returns field number if found else 0
 var var::locate(in target) const {
@@ -763,7 +779,8 @@ next_search:
 		// Search for any one of the field marks and fail if not found
 		// TODO Can we start next search from pos2 to jump over our matched string?
 		// pos = var_str.find_first_of("\x1a\x1b\x1c\x1d\x1e\x1f", pos);
-		pos = var_str.find_first_of("\x1a\x1b\x1c\x1d\x1e\x1f", pos2);
+//		pos = var_str.find_first_of("\x1a\x1b\x1c\x1d\x1e\x1f", pos2);
+		pos = find_first_fm(var_str, pos2);
 		if (pos == std::string::npos)
 			return 0;
 
@@ -1624,7 +1641,8 @@ var  var::mv(const char* opcode, in var2) const {
 		// find the end of a value in var1 (this)
 		if (separator1 <= separator2) {
 getnextp1:
-			p1b = var_str.find_first_of(_RM _FM _VM _SM _TM _ST, p1a);
+//			p1b = var_str.find_first_of(_RM _FM _VM _SM _TM _ST, p1a);
+			p1b = find_first_fm(var_str, p1a);
 			if (p1b == std::string::npos) {
 				separator1 = RM_ + 1;
 			} else {
@@ -1637,7 +1655,8 @@ getnextp1:
 		// find the end of a value in var1 (this)
 		if (separator2 <= separator1_prior) {
 getnextp2:
-			p2b = var2.var_str.find_first_of(_RM _FM _VM _SM _TM _ST, p2a);
+//			p2b = var2.var_str.find_first_of(_RM _FM _VM _SM _TM _ST, p2a);
+			p2b = find_first_fm(var2.var_str, p2a);
 			if (p2b == std::string::npos) {
 				separator2 = RM_ + 1;
 			} else {
@@ -1804,7 +1823,8 @@ var  var::substr2(io pos1, out delimiterno) const {
 
 	// find the end of the field (or string)
 	std::size_t end_pos;
-	end_pos = var_str.find_first_of(_RM _FM _VM _SM _TM _ST, pos);
+//	end_pos = var_str.find_first_of(_RM _FM _VM _SM _TM _ST, pos);
+	end_pos = find_first_fm(var_str, pos);
 
 	// past of of string?
 	if (end_pos == std::string::npos) {
