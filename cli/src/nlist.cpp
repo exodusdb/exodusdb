@@ -1215,7 +1215,7 @@ x1exit:
 	for (auto coln : range(1, ncols)) {
 		var& dictrec = coldict[coln];
 		for (auto fn : range(1, maxdictfn)) {
-			coldict2(coln, fn) = dictrec.f(fn);
+			coldict2.at(coln, fn) = dictrec.f(fn);
 		}
 	}
 
@@ -1224,14 +1224,14 @@ x1exit:
 		underline = "";
 		colul = "";
 		for (int coln : range(1, ncols)) {
-			if (coldict2(coln, 10)) {
-				if (coldict2(coln, 12)) {
+			if (coldict2.at(coln, 10)) {
+				if (coldict2.at(coln, 12)) {
 					tt = ulchar;
 				} else {
 					tt = " ";
 				}
-				underline ^= tt.str(coldict2(coln, 10)) ^ " ";
-				colul ^= ulchar.str(coldict2(coln, 10)) ^ " ";
+				underline ^= tt.str(coldict2.at(coln, 10)) ^ " ";
+				colul ^= ulchar.str(coldict2.at(coln, 10)) ^ " ";
 			}
 		} //coln;
 		bar = ulchar.str(colul.len() - 1);
@@ -1269,21 +1269,21 @@ x1exit:
 
 		// Suppress drilldown if no totals or breakdown
 		if (not(anytotals) or not(nbreaks)) {
-			coldict2(coln, bheadfn) = "";
+			coldict2.at(coln, bheadfn) = "";
 		}
 
-		if (coldict2(coln, 10)) {
+		if (coldict2.at(coln, 10)) {
 			if (html) {
 				coln2 += 1;
 
 				// Suppressing non-totalled columns may not work well with multi-row colhdg
-				tt = coldict2(coln, bheadfn);
+				tt = coldict2.at(coln, bheadfn);
 
 				thproperties(coln2) = tt;
 
 				// Without the MULTIROW_COLHDG keyword,
 				// vm indicates folding, \\ indicates rows in column headings
-				tt = coldict2(coln, 3);
+				tt = coldict2.at(coln, 3);
 				if (not multirowcolhdg) {
 					tt.replacer(_VM, "<br />");
 				}
@@ -1295,7 +1295,7 @@ x1exit:
 				}
 
 				coltags(-1) = " <col";
-				align = coldict2(coln, 9);
+				align = coldict2.at(coln, 9);
 				if (align == "R") {
 					align = "right";
 					coltags ^= " style=\"text-align:right\"";
@@ -1306,7 +1306,7 @@ x1exit:
 					align = "center";
 				}
 				if (usecols) {
-					coltags ^= coldict2(coln, bheadfn);
+					coltags ^= coldict2.at(coln, bheadfn);
 				}
 				coltags ^= " />";
 
@@ -1319,7 +1319,7 @@ x1exit:
 			} else {
 				// L# R# C# T#
 				for (int ii = 1; ii <= 9; ++ii) {
-					colhdg(ii) = colhdg.f(ii) ^ oconv(coldict2(coln, 3).f(1, ii), coldict2(coln, 11)) ^ " ";
+					colhdg(ii) = colhdg.f(ii) ^ oconv(coldict2.at(coln, 3).f(1, ii), coldict2.at(coln, 11)) ^ " ";
 				}
 			}
 		}
@@ -1646,10 +1646,10 @@ nextrec:
 
 	for (int coln : range(1, ncols)) {
 
-		if (coldict2(coln, 9) == "T" and not(html)) {
+		if (coldict2.at(coln, 9) == "T" and not(html)) {
 
 			// T#
-			mcol[coln] = oconv(calculate(colname[coln]), coldict2(coln, 11));
+			mcol[coln] = oconv(calculate(colname[coln]), coldict2.at(coln, 11));
 
 		} else {
 
@@ -1707,22 +1707,22 @@ recexit:
 	// Break totals - add at the bottom level (1)
 	for (int coln : range(1, ncols)) {
 		// Only totalled columns
-		if (coldict2(coln, 12)) {
+		if (coldict2.at(coln, 12)) {
 			if (icol[coln]) {
 				if (html) {
-					//breaktotal(coln,1)+=i.col(coln)
-					//call addunits(icol[coln], breaktotal(coln, 1), VM);
+					//breaktotal.at(coln,1)+=i.col(coln)
+					//call addunits(icol[coln], breaktotal.at(coln, 1), VM);
 					// breaktotal <- icol
-					call htmllib2("ADDUNITS", breaktotal(coln, 1), icol[coln], _VM);
+					call htmllib2("ADDUNITS", breaktotal.at(coln, 1), icol[coln], _VM);
 				} else {
-					if (breaktotal(coln, 1).isnum() and icol[coln].isnum()) {
-						breaktotal(coln, 1) += icol[coln];
+					if (breaktotal.at(coln, 1).isnum() and icol[coln].isnum()) {
+						breaktotal.at(coln, 1) += icol[coln];
 					} else {
 						if (colname[coln] == "DATEGRID") {
 							str1 = icol[coln];
-							str2 = breaktotal(coln, 1);
+							str2 = breaktotal.at(coln, 1);
 							gosub addstr();
-							breaktotal(coln, 1) = str3;
+							breaktotal.at(coln, 1) = str3;
 						}
 					}
 				}
@@ -1763,7 +1763,7 @@ recexit:
 		}
 		for (int coln : range(1, ncols)) {
 			tt = scol[coln];
-			oconvx = coldict2(coln, 7);
+			oconvx = coldict2.at(coln, 7);
 			if (oconvx) {
 				tt = oconv(tt, oconvx);
 				if (html) {
@@ -1774,10 +1774,10 @@ recexit:
 					}
 				}
 			}
-			if (coldict2(coln, 10)) {
+			if (coldict2.at(coln, 10)) {
 				if (not html) {
 					// L# R# C# T#
-					tt = oconv(tt, coldict2(coln, 11));
+					tt = oconv(tt, coldict2.at(coln, 11));
 				}
 				if (tt == "") {
 					//tt=nbsp
@@ -2199,23 +2199,23 @@ subroutine printbreaks() {
 		for (int coln : range(1, ncols)) {
 
 			// Total column
-			if (coldict2(coln, 12)) {
-				cell = breaktotal(coln, leveln);
+			if (coldict2.at(coln, 12)) {
+				cell = breaktotal.at(coln, leveln);
 
 				// Add into the higher level
 				if (leveln <= nbreaks) {
 
 					if (cell) {
 						if (html) {
-							call htmllib2("ADDUNITS", breaktotal(coln, leveln + 1), cell, _VM);
+							call htmllib2("ADDUNITS", breaktotal.at(coln, leveln + 1), cell, _VM);
 						} else {
-							if (((breaktotal(coln, leveln + 1)).isnum()) and cell.isnum()) {
-								breaktotal(coln, leveln + 1) += cell;
+							if (((breaktotal.at(coln, leveln + 1)).isnum()) and cell.isnum()) {
+								breaktotal.at(coln, leveln + 1) += cell;
 							} else {
 								str1 = cell;
-								str2 = breaktotal(coln, leveln + 1);
+								str2 = breaktotal.at(coln, leveln + 1);
 								gosub addstr();
-								breaktotal(coln, leveln + 1) = str3;
+								breaktotal.at(coln, leveln + 1) = str3;
 							}
 						}
 					}
@@ -2224,7 +2224,7 @@ subroutine printbreaks() {
 				}
 
 				// Format it
-				oconvx = coldict2(coln, 7);
+				oconvx = coldict2.at(coln, 7);
 				if (oconvx) {
 					cell = oconv(cell, oconvx);
 				}
@@ -2234,14 +2234,14 @@ subroutine printbreaks() {
 				}
 
 				// and clear it
-				breaktotal(coln, leveln) = "";
+				breaktotal.at(coln, leveln) = "";
 
 			// Break column
 			} else if (coln == breakcoln) {
 
 				// Print the old break value
 				cell = breakvalue[coln];
-				oconvx = coldict2(coln, 7);
+				oconvx = coldict2.at(coln, 7);
 				if (oconvx) {
 					cell = oconv(cell, oconvx);
 				}
@@ -2281,7 +2281,7 @@ subroutine printbreaks() {
 			} else {
 				cell = "";
 
-				cell = oconv(oldbreakvalue[coln], coldict2(coln, 7));
+				cell = oconv(oldbreakvalue[coln], coldict2.at(coln, 7));
 				if (var colbreakn; breakcolns.locateusing(_FM, coln, colbreakn)) {
 					if (colbreakn < leveln) {
 						cell = "Total";
@@ -2290,23 +2290,23 @@ subroutine printbreaks() {
 
 			}
 
-			if (coldict2(coln, 10)) {
+			if (coldict2.at(coln, 10)) {
 
 				if (html) {
 					tx ^= td0 ^ "<th";
 				}
 				if (not usecols) {
-					tx ^= coldict2(coln, bheadfn);
+					tx ^= coldict2.at(coln, bheadfn);
 				}
 				if (html) {
-					if (coldict2(coln, 9) == "R") {
+					if (coldict2.at(coln, 9) == "R") {
 						tx ^= " style=\"text-align:right\"";
 					}
 					tx ^= ">";
 				}
 				// L# R# C# T#
 				if (not html) {
-					cell = oconv(cell, coldict2(coln, 11));
+					cell = oconv(cell, coldict2.at(coln, 11));
 				}
 				tx ^= cell;
 				if (html) {

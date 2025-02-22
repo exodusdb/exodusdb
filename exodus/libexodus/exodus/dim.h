@@ -27,7 +27,7 @@ friend class dim_iter;
 
  private:
 
-	mutable /*unsigned*/ int ncols_;
+	mutable int ncols_;
 	std::vector<var> data_;
 //	std::vector<exo::var, std::allocator<exo::var>> data_;
 	bool initialised_ = false;
@@ -116,9 +116,9 @@ friend class dim_iter;
 
 	// Constructor with number of rows and optional number of columns
 	/////////////////////////////////////////////////////////////////
-	dim(const /*unsigned*/ int nrows, const /*unsigned*/ int ncols = 1);
+	dim(const int nrows, const int ncols = 1);
 
-	bool redim(const /*unsigned*/ int nrows, const /*unsigned*/ int ncols = 1);
+	bool redim(const int nrows, const int ncols = 1);
 
     // Constructor from initializer_list for (int, double, cstr etc.)
 	/////////////////////////////////////////////////////////////////
@@ -130,8 +130,8 @@ friend class dim_iter;
 
 		//TRACE(var("dim constructor from initializer_list ") ^ int(list.size()));
 		// list rows, ncols = 1
-		// warning: conversion from ‘std::initializer_list<int>::size_type’ {aka ‘long /*unsigned*/ int’} to ‘/*unsigned*/ int’ may change value [-Wconversion]
-		redim(static_cast</*unsigned*/ int>(list.size()), 1);
+		// warning: conversion from ‘std::initializer_list<int>::size_type’ {aka ‘long int’} to ‘int’ may change value [-Wconversion]
+		redim(static_cast<int>(list.size()), 1);
 
 		// Allow arbitrary copying of element zero without throwing variable not assigned
 		//data_[0].var_typ = VARTYP_STR;
@@ -162,80 +162,134 @@ friend class dim_iter;
 	ND dim_iter begin();
 	ND dim_iter end();
 
-	ND var join(SV delimiter = _FM) const;
-
 	// brackets operators often come in pairs
 	// returns a reference to one var of the array
 	// and so allows lhs assignment like d1(1,2) = "x";
 	// or if on the rhs then use as a normal expression
-	ND VARREF operator[](/*unsigned*/ int rowno) {return getelementref(rowno, 1);}
+	ND VARREF operator[](int rowno) {return getelementref(rowno, 1);}
 
 	//following const version is called if we do () on a dim which was defined as const xx
-	ND CVR operator[](/*unsigned*/ int rowno) const {return getelementref(rowno, 1);}
+	ND CVR operator[](int rowno) const {return getelementref(rowno, 1);}
 
 	// Provide 2d version of bracket operator if c++23+
 	// and deprecate the parenthesis operator
 #if __cpp_multidimensional_subscript >= 202110L
-    // Don't change woring without also changing it in cli/convdeprecated
+    // Don't change woring without also changing it in cli/fixdeprecated
 #	define DEPRECATED_PARENS [[deprecated("EXODUS: Replace single dimensioned array accessors like () with [] e.g. dimarray(n) -> dimarray[n]")]]
-	ND VARREF operator[](/*unsigned*/ int rowno, /*unsigned*/ int colno) {return getelementref(rowno, colno);}
-	ND CVR operator[](/*unsigned*/ int rowno, /*unsigned*/ int colno) const {return getelementref(rowno, colno);}
+//#	define DEPRECATED_PARENS2
+#	define DEPRECATED_PARENS2 [[deprecated("EXODUS: Replace multiple dimensioned array accessors like (x,y) with [x,y] e.g. dimarray(x,y) -> dimarray[x,y]")]]
+	ND VARREF operator[](int rowno, int colno) {return getelementref(rowno, colno);}
+	ND CVR operator[](int rowno, int colno) const {return getelementref(rowno, colno);}
 #else
-//#	define DEPRECATED_PARENS
 #	define DEPRECATED_PARENS [[deprecated("EXODUS: Replace single dimensioned array accessors like () with [] e.g. dimarray(n) -> dimarray[n]")]]
+#	define DEPRECATED_PARENS2
 #endif
 
-	DEPRECATED_PARENS ND VARREF operator()(/*unsigned*/ int rowno) {return getelementref(rowno, 1);}
-	DEPRECATED_PARENS ND CVR operator()(/*unsigned*/ int rowno) const {return getelementref(rowno, 1);}
+	DEPRECATED_PARENS
+	ND VARREF operator()(int rowno) {return getelementref(rowno, 1);}
+	DEPRECATED_PARENS
+	ND CVR operator()(int rowno) const {return getelementref(rowno, 1);}
 
 	// parenthesis operators often come in pairs
 	// returns a reference to one var of the array
 	// and so allows lhs assignment like d1(1,2) = "x";
 	// or if on the rhs then use as a normal expression
 	//following const version is called if we do () on a dim which was defined as const xx
-	//DEPRECATED_PARENS
-	ND VARREF operator()(/*unsigned*/ int rowno, /*unsigned*/ int colno) {return getelementref(rowno, colno);}
-	//DEPRECATED_PARENS
-	ND CVR operator()(/*unsigned*/ int rowno, /*unsigned*/ int colno) const {return getelementref(rowno, colno);}
+	DEPRECATED_PARENS2
+	ND VARREF operator()(int rowno, int colno) {return getelementref(rowno, colno);}
+	DEPRECATED_PARENS2
+	ND CVR operator()(int rowno, int colno) const {return getelementref(rowno, colno);}
 
+	// Transition alternative for () and [] syntax to be used in libexodus, cli, service and test.
+	// Should be removed in 2028 when Ubuntu 24.04 is the oldest to be supported by exodus
+	ND VARREF at(int rowno, int colno) {return getelementref(rowno, colno);}
+	ND CVR at(int rowno, int colno) const {return getelementref(rowno, colno);}
+
+	///////////////
+	/// dim access:
+	///////////////
+
+	// obj is d1
+
+	// Get the number of rows in the dimensioned array
+	// Returns: A count
 	ND var rows() const;
+
+	// Get the number of columns in the dimensioned array
+	// Returns: A count
 	ND var cols() const;
 
 	// Q: why is this commented out?
 	// A: we dont want to COPY vars out of an array when using it in rhs expression
 	// var operator() (int row, int col=1) const;
 
-	ND dim sort(bool reverseorder = false) const& {return dim(*this).sorter(reverseorder);}
-	ND dim& sort(bool reverseorder = false) && {return this->sorter(reverseorder);}
+	// Joins all elements into a single delimited string
+	// Returns: A string var
+	ND var join(SV delimiter = _FM) const;
 
-	ND dim reverse() const& {return dim(*this).reverser();}
-	ND dim& reverse() && {return this->reverser();}
+	/////////////////
+	/// dim mutation:
+	/////////////////
 
-	ND dim shuffle() const& {return dim(*this).shuffler();}
-	ND dim& shuffle() && {return this->shuffler();}
+	// Creates the array from a given string and delimiter
+	// The existing array is replaced.
+	dim& splitter(in str1, SV delimiter = _FM);
 
-	///////////
-	// MUTATORS
-	///////////
-
+	// Sort the elements of the array in place.
+	// reverseorder: Defaults to false. If true, then the order is reversed.
 	dim& sorter(bool reverse = false);
+
+	// Reverse the elements of the array in place.
 	dim& reverser();
+
+	// Randomly shuffle the order of the elements of the array in place.
 	dim& shuffler();
 
-	dim& splitter(in str1, SV delimiter = _FM);
 //	dim& eraser(std::vector<var>::iterator iter1, std::vector<var>::iterator iter2) {data_.erase(iter1, iter2); return *this;}
 //	dim& eraser(dim_iter dim_iter1, dim_iter dim_iter2) {data_.erase(&*dim_iter1, &*dim_iter2); return *this;}
 
-	/////////////
-	// READ/WRITE
-	/////////////
+	///////////////////
+	/// dim conversion:
+	///////////////////
 
-	// db
-	ND bool read(in filevar, in key);
-	void write(in filevar, in key) const;
+	// Same as sorter() but returns a new array leaving the original untouched.
+	ND dim sort(bool reverseorder = false) const& {return dim(*this).sorter(reverseorder);}
 
-	// os
+	// Same as reverser() but returns a new array leaving the original untouched.
+	ND dim reverse() const& {return dim(*this).reverser();}
+
+	// Same as shuffler() but returns a new array leaving the original untouched.
+	ND dim shuffle() const& {return dim(*this).shuffler();}
+
+	// On temporaries the mutator functions are called.
+	ND dim& sort(bool reverseorder = false) && {return this->sorter(reverseorder);}
+	ND dim& reverse() && {return this->reverser();}
+	ND dim& shuffle() && {return this->shuffler();}
+
+	///////////////////
+	/// dim read/write:
+	///////////////////
+
+	// Read a db file record into the array.
+	// Each field in the database record becomes a single element in the array.
+	// Returns: True if the record exists or false if not
+	ND bool read(in dbfile, in key);
+
+	// Writes a db file record from the array.
+	// Each element in the array becomes a separate field in the db record.
+	void write(in dbfile, in key) const;
+
+	// Read an entire os file into the array.
+	// Each line in the os file, delimited by a NL char, becomes a separate element in the array.
+	// codepage: Optional. Data will be converted from the specified codepage/encoding to UTF8 after being read. If the conversion cannot be performed then return false.
+	// Returns: True if successful or false if not.
 	ND bool osread(in osfilename, const char* codepage = "");
+
+	// Creates an entire os file from the array;
+	// Each element of the array becomes one line of text, delimited by a NL char, in the os file.
+	// Any existing os file is replaced.
+	// codepage: Optional: Data is converted from UTF8 to the required codepage/encoding before output. If the conversion cannot be performed then return false.
+	// Returns: True if successful or false if not.
 	ND bool oswrite(in osfilename, const char* codepage = "") const;
 
 	////////////

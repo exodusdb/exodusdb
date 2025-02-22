@@ -988,7 +988,7 @@ public:
 	//
 	// `dim d1 = "a^b^c"_var.split(); // A dimensioned array with three elements (vars)
 	//  // or
-	//  dim d1 = split("a^b^c"_var);`
+	//  dim d2 = split("a^b^c"_var);`
 	ND dim  split(SV delimiter = _FM) const;
 
 	// SAME ON TEMPORARIES - CALL MUTATORS FOR SPEED (not documenting since programmer interface is the same)
@@ -1047,8 +1047,8 @@ public:
 	ND io   shuffle(SV delimiter = _FM) &&;
 	ND io   parse(char sepchar = ' ') &&;
 
-	///// STRING CONVERSION - Mutating - Standalone commands:
-	////////////////////////////////////////////////////////
+	///// STRING MUTATION - Standalone commands:
+	////////////////////////////////////////////
 
 	//  obj is strvar
 
@@ -1541,9 +1541,9 @@ public:
 	// Execute an sql command.
 	// Returns: True if there was no sql error otherwise lasterror() returns a detailed error message.
 	//
-	// `if (conn.sqlexec("vacuum")) ... ok
+	// `if (conn.sqlexec("select 1")) ... ok
 	//  // or
-	//  if (sqlexec("vacuum")) ... ok`
+	//  if (sqlexec("select 1")) ... ok`
 	ND bool sqlexec(in sqlcmd) const;
 
 	// Execute an SQL command and capture the response.

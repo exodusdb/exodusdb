@@ -163,7 +163,7 @@ function main() {
 		if (not firstcasen)
 			firstcasen = 0;
 
-		int ncases = 21;
+		int ncases = 22;
 
 		for (int casen = firstcasen; casen le ncases; casen++) {
 
@@ -180,6 +180,8 @@ function main() {
 				var			v1	= 1;
 				var			v2	= 1;
 				std::string ss1 = "x";
+
+				var aa_bb_cc_dd = "aa^bb^cc^dd"_var;
 
 				var started = ostime();
 
@@ -361,6 +363,7 @@ function main() {
 						}
 
 						break;
+
 					case 20:
 						if (repeatn eq 0)
 							printl("Exp: 22    ns - var + 0.1 + test");
@@ -368,6 +371,7 @@ function main() {
 							b1 = (v1 + 0.1).assigned();
 						}
 						break;
+
 					case 21:
 						if (repeatn eq 0)
 							printl("Exp: 150   ns - var.oconv(\"MD20\")");
@@ -375,6 +379,16 @@ function main() {
 							v2 = v1.oconv("MD20P");
 						}
 						break;
+							v2 = v1.oconv("MD20P");
+
+					case 22:
+						if (repeatn eq 0)
+							printl("Exp: 12   ns - aa_bb_cc_dd.substr(1, _FM)");
+						for (int i2 = 0; i2 le nn; i2++) {
+							var str = aa_bb_cc_dd.substr(1, _FM, v2);
+						}
+						break;
+
 					default:
 						throw VarError("test_perf Error: Invalid case " ^ var(casen));
 				}

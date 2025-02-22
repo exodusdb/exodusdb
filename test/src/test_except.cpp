@@ -469,7 +469,7 @@ function main() {
 		// Exceeding 
 		try {
 			dim x(10);
-			printl(x(1, 2));
+			printl(x.at(1, 2));
 
 #define FLEXIBLE_ROW_COL 0
 #if FLEXIBLE_ROW_COL
@@ -497,7 +497,7 @@ function main() {
 
 		try {
 			const dim x(10);
-			printl(x(1, 2));
+			printl(x.at(1, 2));
 			throw VarError("Uncaught error DimIndexOutofBounds");
 		} catch (DimIndexOutOfBounds& e) {
 			printl(e.description);

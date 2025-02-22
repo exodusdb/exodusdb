@@ -670,6 +670,13 @@ function main() {
 		 let v2 = parse("abc,\"def,\"123\" fgh\",12.34", ',');
 	}
 
+	printl(" split(SV delimiter = _FM) const;");
+	{
+		dim d1 = "a^b^c"_var.split(); // A dimensioned array with three elements (vars)
+		 // or
+		 dim d2 = split("a^b^c"_var);
+	}
+
 	printl("  ucaser() REF ;");
 	{
 		var v1 = "abc";
@@ -950,9 +957,9 @@ function main() {
 
 	printl("sqlexec(in sqlcmd) const;");
 	{
-		if (conn.sqlexec("vacuum")) {/*ok*/} else  abort("sqlexec: " ^ lasterror());
+		if (conn.sqlexec("select 1")) {/*ok*/} else  abort("sqlexec: " ^ lasterror());
 		 // or
-		 if (sqlexec("vacuum")) {/*ok*/} else  abort("sqlexec: " ^ lasterror());
+		 if (sqlexec("select 1")) {/*ok*/} else  abort("sqlexec: " ^ lasterror());
 	}
 
 	printl("sqlexec(in sqlcmd, io response) const;");

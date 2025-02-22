@@ -134,24 +134,24 @@ function main() {
 		dim d1(3, 2);
 		d1 = "x";
 		TRACE(d1.join())
-		assert(d1(1, 1) eq "x");
-		assert(d1(2, 1) eq "x");
-		assert(d1(3, 1) eq "x");
-		assert(d1(1, 2) eq "x");
-		assert(d1(2, 2) eq "x");
-		assert(d1(3, 2) eq "x");
+		assert(d1.at(1, 1) eq "x");
+		assert(d1.at(2, 1) eq "x");
+		assert(d1.at(3, 1) eq "x");
+		assert(d1.at(1, 2) eq "x");
+		assert(d1.at(2, 2) eq "x");
+		assert(d1.at(3, 2) eq "x");
 
 		const dim d2 = {1, 2, 3, 4, 5, 6};
-		assert(d2(6, 1) eq 6);
+		assert(d2.at(6, 1) eq 6);
 
 		const dim d3 = {1, 2, 3, 4, 5, 6};
-		assert(d2(6, 1) eq 6);
+		assert(d2.at(6, 1) eq 6);
 
-		d1(0, 0) = "qwe";
-		assert(d1(0, 0) eq "qwe");
+		d1.at(0, 0) = "qwe";
+		assert(d1.at(0, 0) eq "qwe");
 
 		//const dim d4 = {{1,2},{3,4},{5,6}};
-		//assert(d2(6,1) eq 6);
+		//assert(d2.at(6,1) eq 6);
 	}
 	{
 		// Cannot dim(0,0)
@@ -372,21 +372,21 @@ function main() {
 
 	for (int ii = 1; ii le 2; ++ii) {
 		for (int jj = 1; jj le 3; ++jj) {
-			a7(ii, jj) = ii ^ var(".") ^ jj;
+			a7.at(ii, jj) = ii ^ var(".") ^ jj;
 		}
 	}
 
 	dim a8(4, 5);
 	for (int ii = 1; ii le 4; ++ii) {
 		for (int jj = 1; jj le 5; ++jj) {
-			a8(ii, jj) = ii ^ var(".") ^ jj;
+			a8.at(ii, jj) = ii ^ var(".") ^ jj;
 		}
 	}
 	a8 = 2.2;
 
 	for (int ii = 1; ii le 4; ++ii) {
 		for (int jj = 1; jj le 5; ++jj) {
-			a8(ii, jj).outputt("=");
+			a8.at(ii, jj).outputt("=");
 		}
 		//		printl();
 	}
@@ -395,8 +395,8 @@ function main() {
 
 	for (int ii = 1; ii le 2; ++ii) {
 		for (int jj = 1; jj le 3; ++jj) {
-			a8(ii, jj).outputt("=");
-			assert(a8(ii, jj) eq a7(ii, jj));
+			a8.at(ii, jj).outputt("=");
+			assert(a8.at(ii, jj) eq a7.at(ii, jj));
 			//		printl();
 		}
 	}
@@ -409,31 +409,31 @@ function main() {
 
 	dim arrx(2, 2), arry;
 	arrx	   = "";
-	arrx(1, 1) = "11";
-	assert(arrx(1, 1) eq "11");
-	arrx(1, 2) = arrx(1, 1);
-	assert(arrx(1, 2) eq "11");
+	arrx.at(1, 1) = "11";
+	assert(arrx.at(1, 1) eq "11");
+	arrx.at(1, 2) = arrx.at(1, 1);
+	assert(arrx.at(1, 2) eq "11");
 	arry = arrx;
-	assert(arry(1, 2) eq "11");
+	assert(arry.at(1, 2) eq "11");
 
 	//using mv dimensioned arrays
 	//mv dimensioned arrays have a zero element that is
 	//used in case either or both of the indexes are zero
 	dim arr1(3), arr2(3, 3);
 	arr1[0]	   = 0;
-	arr1(0, 0) = 0;
+	arr1.at(0, 0) = 0;
 	for (int ii = 1; ii le 3; ++ii) {
 		arr1[ii] = ii;
 		for (int jj = 1; jj le 3; ++jj) {
-			arr2(ii, jj) = ii * 3 + jj;
+			arr2.at(ii, jj) = ii * 3 + jj;
 		}
 	}
 	assert(arr1[0]        eq "0");
-	assert(arr1(0, 0)     eq "0");
+	assert(arr1.at(0, 0)     eq "0");
 	for (int ii = 1; ii le 3; ++ii) {
 		assert(arr1[ii]      eq ii);
 		for (int jj = 1; jj le 3; ++jj) {
-			assert(arr2(ii, jj) eq ii * 3 + jj);
+			assert(arr2.at(ii, jj) eq ii * 3 + jj);
 		}
 	}
 

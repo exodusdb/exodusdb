@@ -14,7 +14,7 @@ OPTIONS
 
 function main() {
 //
-//	let option_d = 2;//OPTIONS.count("d");
+	let option_d = 2;//OPTIONS.count("d");
 //	let option_s = 1;//OPTIONS.count("s");
 	let update = OPTIONS.contains("U");
 	let recompile = OPTIONS.contains("C");
@@ -152,55 +152,67 @@ function main() {
 
 		if (verbose)
 			TRACE(compline)
+//		bool option_d = 2;
+//		bool option_s = false;
 
-//		var fixable = false;
-//		var old_open_char;
-//		var old_close_char;
-//		var new_open;
-//		var new_close;
-//		var new_prefix = "";
-//
-//		// Deprecation of single and multiple dimensioned access at the moment
-//		// ddd(i) -> ddd[i]
-//		// ddd(i, j) -> ddd[i, j]
-//		if (option_d) {
-//
-//			// {d} or {dd}
-//			if (compline.contains("EXODUS: Replace single dimensioned array")) {
-//				fixable = 1;
-//			}
-//			// {dd}
-//			else if (option_d > 1 and compline.contains("EXODUS: Replace multiple dimensioned")) {
-//				fixable = 1;
-//			}
-//			if (fixable) {
-//				old_open_char = "(";
-//				old_close_char = ")";
-//				new_open = "[";
-//				new_close = "]";
-//			}
-//		}
+		var fixable = false;
+		var old_open_char;
+		var old_close_char;
+		var new_open;
+		var new_close;
+		var new_prefix = "";
+		if (option_d) {
+//			var fixable = false;
+//			var old_open_char;
+//			var old_close_char;
+//			var new_open;
+//			var new_close;
+//			var new_prefix = "";
 
-//		// s - deprecation of single char access using []
-//		// xxx[n] -> xxx.at(n)
-//		if (not fixable and option_s) {
-//
-//			if (compline.contains("EXODUS: Replace single character accessors")) {
-//				fixable = 1;
-//				old_open_char = "[";
-//				old_close_char = "]";
-//				new_open = "(";
-//				new_close = ")";
-//
-//				new_prefix = ".at";
-//			}
-//		}
+			// Deprecation of single and multiple dimensioned access at the moment
+			// ddd(i) -> ddd[i]
+			// ddd(i, j) -> ddd[i, j]
+			if (option_d) {
 
-//		// No fixable deprecations found
-//		if (not fixable) {
-//			logputl("fixdeprecated: Not fixable.");
-//			continue;
-//		}
+//				// {d} or {dd}
+//				if (compline.contains("EXODUS: Replace single dimensioned array")) {
+//					fixable = 1;
+//				}
+//				// {dd}
+//				else
+				if (option_d > 1 and compline.contains("EXODUS: Replace multiple dimensioned")) {
+					fixable = 1;
+				}
+				if (fixable) {
+					old_open_char = "(";
+					old_close_char = ")";
+					new_open = "[";
+					new_close = "]";
+				}
+			}
+
+//			// s - deprecation of single char access using []
+//			// xxx[n] -> xxx.at(n)
+//			if (not fixable and option_s) {
+//
+//				if (compline.contains("EXODUS: Replace single character accessors")) {
+//					fixable = 1;
+//					old_open_char = "[";
+//					old_close_char = "]";
+//					new_open = "(";
+//					new_close = ")";
+//
+//					new_prefix = ".at";
+//				}
+//			}
+
+//			// No fixable deprecations found
+//			if (not fixable) {
+//				logputl("fixdeprecated: Not fixable.");
+//				continue;
+//			}
+
+		} // fixing brackets
 
 		// Switch to a new srcfile
 		if (filename != srcfile) {
@@ -250,128 +262,129 @@ function main() {
 		if (verbose)
 			TRACE(srcline);
 
-//		{ // old code related to changing use of brackets
-//
-//			// Lambda function to search forwards for closing bracket or backwards for opening bracket
-//			//////////////////////////////////////////////////////////////////////////////////////////
-//			// Find charno2 of opening "(" or ")"
-//			// or return 0
-//			auto find_char = [&srcline, charno](in char_to_find, in direction) -> var {
-//				var opposite_char = srcline.at(charno);
-//				var charno2 = charno;
-//				var depth = 0;
-//				var ch;
-//				int nchars = srcline.len();
-//
-//				// break out if gone down to zero
-//				while (true) {
-//
-//					charno2 += direction;
-//
-//					// Break out if out of range
-//					if (not charno2 or charno > nchars) {
-//						logputl("error: fixdeprecated: Could not find " ^ char_to_find.quote());
-//						return 0;
-//					}
-//
-//					ch = srcline.at(charno2);
-//					if (ch == char_to_find) {
-//
-//						// break out if found
-//						if (depth == 0)
-//							return charno2;
-//
-//						depth--;
-//					} else if (ch == opposite_char) {
-//						depth++;
-//					}
-//				}
-//	//			throw VarError("fixdeprecated: Should not get here");
-//	//			return 0;
-//			};
-//
-//			// Note:
-//			// gcc warning points to closing ")" or "]"
-//			// clang warning points to opening "(" or "["
-//
-//
-//			// Verify the target character is indeed ")" "]" (for gcc) or "(" "[" (for clang)
-//			let char2 = srcline.at(charno);
-//			var charno2;
-//			if (char2 == old_open_char) {
-//
-//				// Clang - Find closing ")" or "]" to the right
-//				charno2 = find_char(old_close_char, 1);
-//
-//				// Skip on error
-//				if (not charno2) {
-//					if (verbose)
-//						errputl(srcloc, " could not find '" ^ old_close_char ^ "'. Already converted clang?\n" ^ srcline.convert("\t", " ") ^ "\n" ^ space(charno - 1) ^ "^");
-//					continue;
-//				}
-//
-//				// Expected below in reverse order, so swap them
-//				// charno2 is opening and charno is closing
-//				charno.swap(charno2);
-//
-//			} else {
-//
-//				// gcc
-//				if (char2 != old_close_char) {
-//					if (char2 == new_close)
-//						// Already converted. Maybe some race condition
-//						continue;
-//					// Skip on error
-//					if (verbose) {
-//						var msg = srcloc ^ " (1) char should be '" ^ old_open_char ^ "' or '" ^ old_close_char ^ "' but is actually " ^ srcline.at(charno).squote() ^ ".";
-//						if (char2 == new_open or char2 == new_close)
-//							msg ^= "Already converted?";
-//						else
-//							msg ^= "Maybe #define hides it. Find and change the #define manually.";
-//						msg ^= "\n" ^ srcline.convert("\t", " ") ^ "\n" ^ space(charno - 1) ^ "^\n";
-//						logputl(msg);
-//					}
-//					continue;
-//				}
-//
-//				// gcc - Find opening "(" to the left
-//				// TODO use above lambda function to deduplicate code
-//				charno2 = charno;
-//				var depth = 0;
-//				var ch;
-//				while (--charno2) {
-//					ch = srcline.at(charno2);
-//					if (ch == old_open_char) {
-//						if (depth == 0)
-//							break;
-//						depth--;
-//					} else if (ch == old_close_char) {
-//						depth++;
-//					}
-//				}
-//
-//				// Skip if not found
-//				if (depth or not charno2 or ch != old_open_char) {
-//					if (verbose)
-//						errputl(srcloc, " (2) char should be '" ^ old_close_char ^ "' but is actually " ^ srcline.at(charno).squote() ^ ". Already converted?\n" ^ srcline.convert("\t", " ") ^ "\n" ^ space(charno - 1) ^ "^");
-//				}
-//
-//			}
-//
-//			// If found matching "(" or ")" then replace both ( and ) with [ and ]
-//			// charno2 points to opening (
-//			// charno points to closing )
-//			nlinesupdated++;
-//
-//			// Change them together or not at all
-//			srcline.paster(charno, 1, new_close);
-//			// MUST replace opener 2nd since it may be more than one character
-//			srcline.paster(charno2, 1, new_open);
-//
-//			// e.g. "xyz[n] xyz.at(n)
-//			if (new_prefix)
-//				srcline.paster(charno2, new_prefix);
-//		}
+		// code related to changing use of brackets
+		if (fixable) {
+
+			// Lambda function to search forwards for closing bracket or backwards for opening bracket
+			//////////////////////////////////////////////////////////////////////////////////////////
+			// Find charno2 of opening "(" or ")"
+			// or return 0
+			auto find_char = [&srcline, charno](in char_to_find, in direction) -> var {
+				var opposite_char = srcline.at(charno);
+				var charno2 = charno;
+				var depth = 0;
+				var ch;
+				int nchars = srcline.len();
+
+				// break out if gone down to zero
+				while (true) {
+
+					charno2 += direction;
+
+					// Break out if out of range
+					if (not charno2 or charno > nchars) {
+						logputl("error: fixdeprecated: Could not find " ^ char_to_find.quote());
+						return 0;
+					}
+
+					ch = srcline.at(charno2);
+					if (ch == char_to_find) {
+
+						// break out if found
+						if (depth == 0)
+							return charno2;
+
+						depth--;
+					} else if (ch == opposite_char) {
+						depth++;
+					}
+				}
+	//			throw VarError("fixdeprecated: Should not get here");
+	//			return 0;
+			};
+
+			// Note:
+			// gcc warning points to closing ")" or "]"
+			// clang warning points to opening "(" or "["
+
+
+			// Verify the target character is indeed ")" "]" (for gcc) or "(" "[" (for clang)
+			let char2 = srcline.at(charno);
+			var charno2;
+			if (char2 == old_open_char) {
+
+				// Clang - Find closing ")" or "]" to the right
+				charno2 = find_char(old_close_char, 1);
+
+				// Skip on error
+				if (not charno2) {
+					if (verbose)
+						errputl(srcloc, " could not find '" ^ old_close_char ^ "'. Already converted clang?\n" ^ srcline.convert("\t", " ") ^ "\n" ^ space(charno - 1) ^ "^");
+					continue;
+				}
+
+				// Expected below in reverse order, so swap them
+				// charno2 is opening and charno is closing
+				charno.swap(charno2);
+
+			} else {
+
+				// gcc
+				if (char2 != old_close_char) {
+					if (char2 == new_close)
+						// Already converted. Maybe some race condition
+						continue;
+					// Skip on error
+					if (verbose) {
+						var msg = srcloc ^ " (1) char should be '" ^ old_open_char ^ "' or '" ^ old_close_char ^ "' but is actually " ^ srcline.at(charno).squote() ^ ".";
+						if (char2 == new_open or char2 == new_close)
+							msg ^= "Already converted?";
+						else
+							msg ^= "Maybe #define hides it. Find and change the #define manually.";
+						msg ^= "\n" ^ srcline.convert("\t", " ") ^ "\n" ^ space(charno - 1) ^ "^\n";
+						logputl(msg);
+					}
+					continue;
+				}
+
+				// gcc - Find opening "(" to the left
+				// TODO use above lambda function to deduplicate code
+				charno2 = charno;
+				var depth = 0;
+				var ch;
+				while (--charno2) {
+					ch = srcline.at(charno2);
+					if (ch == old_open_char) {
+						if (depth == 0)
+							break;
+						depth--;
+					} else if (ch == old_close_char) {
+						depth++;
+					}
+				}
+
+				// Skip if not found
+				if (depth or not charno2 or ch != old_open_char) {
+					if (verbose)
+						errputl(srcloc, " (2) char should be '" ^ old_close_char ^ "' but is actually " ^ srcline.at(charno).squote() ^ ". Already converted?\n" ^ srcline.convert("\t", " ") ^ "\n" ^ space(charno - 1) ^ "^");
+				}
+
+			}
+
+			// If found matching "(" or ")" then replace both ( and ) with [ and ]
+			// charno2 points to opening (
+			// charno points to closing )
+			nlinesupdated++;
+
+			// Change them together or not at all
+			srcline.paster(charno, 1, new_close);
+			// MUST replace opener 2nd since it may be more than one character
+			srcline.paster(charno2, 1, new_open);
+
+			// e.g. "xyz[n] xyz.at(n)
+			if (new_prefix)
+				srcline.paster(charno2, new_prefix);
+		}
 
 		if (srcline == orig_srcline)
 			continue;

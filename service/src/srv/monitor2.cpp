@@ -238,8 +238,8 @@ nextstatistic:
 			hourn	 = ((currenttime - RECORD.f(1)) * 24).floor() + 1;
 			hourn	 = (hourn - 1).mod(24) + 1;
 			for (const int ii : range(1, 3)) {
-				if (not usertab(hourn, ii).locate(netid[ii])) {
-					usertab(hourn, ii)(1, -1) = netid[ii];
+				if (not usertab.at(hourn, ii).locate(netid[ii])) {
+					usertab.at(hourn, ii)(1, -1) = netid[ii];
 				}
 			}  // ii;
 
@@ -699,9 +699,9 @@ nextdbasen:;
 	// find max nusersperhour by type
 	for (const int ii : range(1, 24)) {
 		for (const int jj : range(1, 3)) {
-			usertab(ii, jj) = usertab(ii, jj).fcount(VM);
-			if (usertab(ii, jj) > usertab(25, jj)) {
-				usertab(25, jj) = usertab(ii, jj);
+			usertab.at(ii, jj) = usertab.at(ii, jj).fcount(VM);
+			if (usertab.at(ii, jj) > usertab.at(25, jj)) {
+				usertab.at(25, jj) = usertab.at(ii, jj);
 			}
 		}  // jj;
 	}	   // ii;
@@ -710,7 +710,7 @@ nextdbasen:;
 	hostdescriptions ^= " - Users:";
 	hourn = 1;
 	for (const int ii : range(1, 3)) {
-		let hourlyusers = usertab(hourn, ii);
+		let hourlyusers = usertab.at(hourn, ii);
 		if (hourlyusers) {
 			anyusers = 1;
 		}
@@ -724,11 +724,11 @@ nextdbasen:;
 	hostdescriptions ^= " - Max:";
 	hourn = 25;
 	for (const int ii : range(1, 3)) {
-		//let tt = usertab(1, ii);
+		//let tt = usertab[1, ii];
 		if (ii > 1) {
 			hostdescriptions ^= "/";
 		}
-		hostdescriptions ^= usertab(hourn, ii);
+		hostdescriptions ^= usertab.at(hourn, ii);
 	}  // ii;
 
 	// os description

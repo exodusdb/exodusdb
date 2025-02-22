@@ -69,8 +69,8 @@ function main(in sentence0, in select0 = "", in filters0 = "") {
 		let filtervalues = filters0.f(3);
 		filters.redim(3, nfilters);
 		for (const var filtern : range(1, nfilters)) {
-			filters(1, filtern) = filterfields.f(1, filtern).convert(SM, VM);
-			filters(3, filtern) = filtervalues.f(1, filtern).convert(SM, VM);
+			filters.at(1, filtern) = filterfields.f(1, filtern).convert(SM, VM);
+			filters.at(3, filtern) = filtervalues.f(1, filtern).convert(SM, VM);
 		}  // filtern;
 	}
 
@@ -477,14 +477,13 @@ nextrec:
 
 	// skip multivalues
 	for (const var filtern : range(1, nfilters)) {
-		let value = calculate(filters(1, filtern));
-		if (filters(3, filtern).len()) {
+		let value = calculate(filters.at(1, filtern));
+		if (filters.at(3, filtern).len()) {
 
 			// if reqvalue then skip if not matching
-			if (not filters(3, filtern).locate(value)) {
+			if (not filters.at(3, filtern).locate(value)) {
 				goto nextrec;
 			}
-
 			// no reqvalues means skip if no value present
 		} else if (not value) {
 			goto nextrec;

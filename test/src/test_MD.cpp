@@ -131,6 +131,15 @@ function main() {
 		assert(var(-0.00001).oconv("MD60P").squote()       eq "'-0.000010'");
 		assert(var(-0.0001).oconv("MD60P").squote()        eq "'-0.000100'");
 
+		assert(var(0.000000000001).oconv("MD90Z").squote() eq "''");
+		assert(var(0.000000000500).oconv("MD90Z").squote() eq "'0.000000001'");
+		assert(var(0.000001).oconv("MD90Z").squote()       eq "'0.000001000'");
+		assert(var(0.00001).oconv("MD90Z").squote()        eq "'0.000010000'");
+		assert(var(0.0001).oconv("MD90Z").squote()         eq "'0.000100000'");
+		assert(var(-0.000001).oconv("MD90Z").squote()      eq "'-0.000001000'");
+		assert(var(-0.00001).oconv("MD90Z").squote()       eq "'-0.000010000'");
+		assert(var(-0.0001).oconv("MD90Z").squote()        eq "'-0.000100000'");
+
 		assert(var(1E9).oconv("MD60P").squote()  eq "'1000000000.000000'");
 		assert(var(1E10).oconv("MD60P").squote() eq "'10000000000.000000'");
 		assert(var(1E11).oconv("MD60P").squote() eq "'100000000000.000000'");

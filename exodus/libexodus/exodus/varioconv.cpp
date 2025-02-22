@@ -536,6 +536,20 @@ std::string var::oconv_T(in format) const {
 	return result;
 }
 
+// hard coded utility to test for any digit 1-9 instead of find_first_of
+inline bool has_digit_1_to_9(const std::string& s1) {
+	auto iter = s1.c_str();
+	for (;;) {
+		if (*iter >= '1') {
+			if (*iter <= '9')
+				return true;
+		} else if (*iter == 0) {
+				return false;
+		}
+		iter++;
+	}
+}
+
 std::string var::oconv_MD(const char* conversion) const {
 
 	THISIS("str  var::oconv_MD(const char* conversion) const")
@@ -660,8 +674,12 @@ std::string var::oconv_MD(const char* conversion) const {
 			case 'Z':
 				//Z means return empty string in the case of zero
 				z_flag = true;
-				//if (!(this->toBool()))
-				//	return "";
+				// toBool is false for very small numbers that MD90 can still print as > 0
+//				if (!(this->toBool()))
+//					return "";
+				// Skip on absolute zero. Skip after rounding is also checked.
+				if ((var_typ & VARTYP_INT && ! var_int) || (var_typ & VARTYP_DBL && ! var_dbl))
+					return "";
 				break;
 
 			case 'X':
@@ -701,8 +719,9 @@ std::string var::oconv_MD(const char* conversion) const {
 		newmv.createString();
 	//}
 
-	// Option to suppress zeros - if no digits 1-9
-	if (z_flag and newmv.var_str.find_first_of("123456789") == std::string::npos) {
+	// Option to suppress zeros - if no digits 1-9 (after rounding)
+//	if (z_flag and newmv.var_str.find_first_of("123456789") == std::string::npos) {
+	if (z_flag and not has_digit_1_to_9(newmv.var_str)) {
 		newmv.var_str.clear();
 		return newmv;
 	}
