@@ -753,6 +753,164 @@ function main() {
 		} catch (DimNotDimensioned& e) { var(e.description).errputl();}
 	}
 
+	{
+		// Testing two dimensional esp. negative row and col
+
+		dim d(3,2);
+		d[1,1]=11;
+		d[1,2]="aa";
+		d[2,1]=22;
+		d[2,2]="bb";
+		d[3,1]=33;
+		d[3,2]="cc";
+
+		//TODO could be ] and ^
+		assert(d.join().outputl() == "11^aa^22^bb^33^cc"_var);
+
+		assert(d.rows().outputl() == 3);
+		assert(d.cols().outputl() == 2);
+
+		{
+			// coln = 1
+
+			assert((d[-3,1].outputl() == "11"));
+			assert((d[-2,1].outputl() == "22"));
+			assert((d[-1,1].outputl() == "33"));
+
+			assert((d[1,1].outputl() == "11"));
+			assert((d[2,1].outputl() == "22"));
+			assert((d[3,1].outputl() == "33"));
+
+			//DimIndexOutOfBounds:row:-4 can be -3 to +3 - Aborting.
+			try {
+				assert((d[-4,1] == ""));
+				assert(false);
+			}
+			catch (DimIndexOutOfBounds e) {};
+			try {
+				assert((d[4,1] == ""));
+				assert(false);
+			}
+			catch (DimIndexOutOfBounds e) {};
+
+		}
+
+		{
+			// coln 2
+
+			assert((d[-3, 2].outputl() == "aa"));
+			assert((d[-2, 2].outputl() == "bb"));
+			assert((d[-1, 2].outputl() == "cc"));
+
+			assert((d[1, 2].outputl() == "aa"));
+			assert((d[2, 2].outputl() == "bb"));
+			assert((d[3, 2].outputl() == "cc"));
+
+		}
+
+		{
+			// coln 2 == -1
+
+			assert((d[-3, 2].outputl() == d[-3, -1]));
+			assert((d[-2, 2].outputl() == d[-2, -1]));
+			assert((d[-1, 2].outputl() == d[-1, -1]));
+
+			assert((d[1, 2].outputl() == d[1, -1]));
+			assert((d[2, 2].outputl() == d[2, -1]));
+			assert((d[3, 2].outputl() == d[3, -1]));
+
+		}
+
+		{
+			// coln 1 == -2
+
+			assert((d[-3, 1].outputl() == d[-3, -2]));
+			assert((d[-2, 1].outputl() == d[-2, -2]));
+			assert((d[-1, 1].outputl() == d[-1, -2]));
+
+			assert((d[1, 1].outputl() == d[1, -2]));
+			assert((d[2, 1].outputl() == d[2, -2]));
+			assert((d[3, 1].outputl() == d[3, -2]));
+
+		}
+
+		{
+			//col -3 and 3 error
+			//DimIndexOutOfBounds:row:-4 can be -3 to +3 - Aborting.
+
+			try {
+				assert((d[1,-3] == ""));
+				assert(false);
+			}
+			catch (DimIndexOutOfBounds e) {};
+			try {
+				assert((d[1,3] == ""));
+				assert(false);
+			}
+			catch (DimIndexOutOfBounds e) {};
+
+		}
+
+		{
+			// Row 0?
+			try {
+				assert((d[0,1] == ""));
+				assert(false);
+			}
+			catch (VarUnassigned e) {};
+
+			// Col 0?
+			try {
+				assert((d[1,0] == ""));
+				assert(false);
+			}
+			catch (VarUnassigned e) {};
+
+			// both 0?
+			try {
+				assert((d[0,0] == ""));
+				assert(false);
+			}
+			catch (VarUnassigned e) {};
+
+		}
+
+	}
+
+	{
+		// Single dim negative row and col
+
+		dim d {11,22,33};
+
+		assert(d[-3] == "11");
+		assert(d[-2] == "22");
+		assert(d[-1] == "33");
+
+		assert(d[1] == "11");
+		assert(d[2] == "22");
+		assert(d[3] == "33");
+
+		//DimIndexOutOfBounds:row:-4 can be -3 to +3 - Aborting.
+		try {
+			assert((d[-4] == ""));
+			assert(false);
+		}
+		catch (DimIndexOutOfBounds e) {};
+		try {
+			assert((d[4] == ""));
+			assert(false);
+		}
+		catch (DimIndexOutOfBounds e) {};
+
+		// Row 0?
+		try {
+			assert((d[0] == ""));
+			assert(false);
+		}
+		catch (VarUnassigned e) {};
+
+	}
+
 	printl(elapsedtimetext());
 	printl("Test passed");
 

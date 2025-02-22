@@ -120,17 +120,14 @@ void dim::operator=(dim&& sourcedim) & {
 // CONSTRUCTOR GIVEN NROWS AND OPTIONAL NCOLS
 /////////////////////////////////////////////
 
-dim::dim(const /*unsigned*/ int rows, const /*unsigned*/ int cols)
+dim::dim(const int rows, const int cols)
 	: ncols_(cols), initialised_(true)
 // data_ <--initialized below (after the 'if/throw' statement)
 {
 	// Partially allow a kind of zero based indexing scheme to work for
 	// Unidimensional arrays except that split/join/sort omit [0]th element
 
-	// Prevent 0 elements
-	//if (rows == 0 || cols == 0)
-	// throw DimDimensionedZero();
-
+	// Will throw an error if either is negative
 	this->redim(rows, cols);
 }
 
@@ -185,9 +182,15 @@ bool dim::redim(/*unsigned*/ int rows, /*unsigned*/ int cols) {
 //		// Ensure element zero will not throw unassigned during resizing/copying etc.
 //		data_[0] = "";
 
+	if (rows < 0)
+		throw DimIndexOutOfBounds("rows:" ^ var(rows));
+	if (cols < 0)
+		throw DimIndexOutOfBounds("cols:" ^ var(cols));
+
 	// how exception safe is this?
 	try {
-		data_.resize(rows * cols + 1);
+		int new_size = rows * cols + 1;
+		data_.resize(new_size);
 		//std::cout<< "created[] " << newdata << std::endl;
 	}
 	catch (const std::bad_alloc& e) {
@@ -228,32 +231,41 @@ VARREF dim::getelementref(/*unsigned*/ int rowno, /*unsigned*/ int colno) {
 }
 
 // Keep IDENTICAL body with the function above
-CVR dim::getelementref(/*unsigned*/ int rowno, /*unsigned*/ int colno) const {
+CVR dim::getelementref(int rowno1, int colno1) const {
 
 	EXO_DIM_RECALC_NROWS(*this)
+    int nrows = (data_.size() - 1 ) / ncols_;
+
+	// Allow access to special zero'th element
+	if (rowno1 == 0 || colno1 == 0) {
+		return (data_)[0];
+	}
+
+	int rowno = rowno1;
+	int colno = colno1;
+
+	// negative -1 -> last rown
+	if (rowno < 0)
+		rowno += nrows + 1;
+	if (rowno < 1 || rowno > nrows)
+		throw DimIndexOutOfBounds("row:" ^ var(rowno1) ^ " can be -" ^ var(nrows) ^ " to +" ^ nrows);
+
+	// negative -1 -> last coln
+	if (colno < 0)
+		colno += ncols_ + 1;
+	if (colno < 1 || colno > ncols_)
+		throw DimIndexOutOfBounds("col:" ^ var(colno1) ^ " can be -" ^ var(ncols_) ^  " to +" ^ ncols_);
 
 	// check bounds
 	//if (rowno > nrows_ || rowno < 0)
 
+	// row 1 col1 -> index 1
 	int cell_index = ncols_ * (rowno - 1) + colno;
 
 	// Handle out of range
 	int ncells = static_cast<int>(data_.size());
-	if (cell_index >= ncells || rowno < 1 || colno < 1 || colno > ncols_) {
+	if (cell_index >= ncells) {
 		UNLIKELY
-
-		// Allow access to special zero'th element
-		if (rowno == 0 || colno == 0) {
-			return (data_)[0];
-		}
-
-		// Verify within range
-		// Prevent negative for now
-		int nrows = (ncells - 2) / ncols_;
-		if (rowno < 0 || rowno > nrows)
-			throw DimIndexOutOfBounds("row:" ^ var(rowno) ^ " > " ^ var(nrows));
-		if (colno < 0 || colno > ncols_)
-			throw DimIndexOutOfBounds("col:" ^ var(colno) ^ " > " ^ var(ncols_));
 		throw DimIndexOutOfBounds("col:" ^ var(colno) ^ " row:" ^ var(rowno) ^ " but only " ^ var(data_.size() - 1) ^ "elements");
 	}
 	return data_[cell_index];
