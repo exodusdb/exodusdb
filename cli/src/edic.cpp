@@ -26,7 +26,7 @@ function main() {
 	//	osmkdir(edic_hist_dir);
 	if (not osdir(edic_hist_dir)) {
 		if (not osmkdir(edic_hist_dir)) {
-			abort(lasterror());
+			loglasterror();
 		}
 	}
 	// Save edic command with absolute path
@@ -396,7 +396,8 @@ function main() {
 					if (reply.convert("Yy\n", "") == "")
 						continue;
 
-					abort("");
+//					abort("");
+					break;
 				}
 
 			} // handle compile errors
@@ -411,8 +412,7 @@ function main() {
 
 	// Save edic command with updated absolute path filenames
 	if (not oswrite(lower(COMMAND) ^ FM ^ OPTIONS on edic_hist))
-		printl("Cannot write to ", edic_hist);
-
+		loglasterror();
 
 	return 0;
 }
