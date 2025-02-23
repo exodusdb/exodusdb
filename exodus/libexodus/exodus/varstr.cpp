@@ -720,76 +720,94 @@ inline std::size_t find_first_fm(const std::string& s1, std::size_t pos) {
 }
 
 // locate without setting.
-// Returns field number if found else 0
+// Returns field/value number etc. if found else 0
 var var::locate(in target) const {
 
 	THISIS("var  var::locate(in target) const")
 	assertString(function_sig);
 	ISSTRING(target)
 
-	// Find "" always false
-	const std::size_t size2 = target.var_str.size();
-	if (!size2)
-		return 0;
+	const std::size_t target_size = target.var_str.size();
 
-	std::size_t pos = 0;
-	const std::size_t size1 = var_str.size();
-	while (pos < size1) {
+//	if (!target_size)
+//		return 0;
+//	// Find empty multivalues.
+//	if (!target_size) {
+//		int result = 0;
+//		pos = find_first_fm(var_str, pos2);
+//		if (pos == std::string::npos)
+//			return 0;
+//		return 0;
+//	}
+
+	std::size_t target_pos = 0;
+	const std::size_t source_size = var_str.size();
+	while (target_pos < source_size) {
 
 //TRACE("Searching");
-//TRACE(pos)
+//TRACE(target_pos)
 
-		pos = var_str.find(target.var_str, pos);
+		target_pos = var_str.find(target.var_str, target_pos);
 
 		// Fail if not found
-		if (pos == std::string::npos) {
+		if (target_pos == std::string::npos) {
 //TRACE("not found")
 			return 0;
 		}
-//TRACE(pos)
+//TRACE(target_pos)
 
-		std::size_t pos2 = pos + size2;
+		std::size_t target_end = target_pos + target_size;
 		std::size_t result;
 		char c;
 
-		// Skip if pos > 0 and prior char is not any one of the field marks
-		if (pos > 0) {
-			c = var_str[pos - 1];
+		// Skip if target_pos > 0 and prior char is not any one of the field marks
+		if (target_pos > 0) {
+			c = var_str[target_pos - 1];
 			if (c > RM_ || c < ST_) {
 				goto next_search;
 			}
 		}
 
-		// At this point, pos is at the beginning of the source or just after a field mark
+		// At this point, target_pos is at the beginning of the source or just after a field mark
 
 		// Success if at the end
-		if (pos2 >= size1) {
+		if (target_end >= source_size) {
 found:
-			return count_all_field_marks(SV(var_str.data(), pos)) + 1;
+			return count_all_field_marks(SV(var_str.data(), target_pos)) + 1;
 		}
 
-//		TRACE(pos2)
+//		TRACE(target_end)
 
 		// Success if the following char is any one of the field marks
-		c = var_str[pos2];
+		c = var_str[target_end];
 		if (c <= RM_ && c >= ST_)
 			goto found;
 
 next_search:
 		// Search for any one of the field marks and fail if not found
-		// TODO Can we start next search from pos2 to jump over our matched string?
-		// pos = var_str.find_first_of("\x1a\x1b\x1c\x1d\x1e\x1f", pos);
-//		pos = var_str.find_first_of("\x1a\x1b\x1c\x1d\x1e\x1f", pos2);
-		pos = find_first_fm(var_str, pos2);
-		if (pos == std::string::npos)
+		// TODO Can we start next search from target_end to jump over our matched string?
+		// target_pos = var_str.find_first_of("\x1a\x1b\x1c\x1d\x1e\x1f", target_pos);
+//		target_pos = var_str.find_first_of("\x1a\x1b\x1c\x1d\x1e\x1f", target_end);
+		target_pos = find_first_fm(var_str, target_end);
+//		TRACE(target_pos)
+		if (target_pos == std::string::npos)
 			return 0;
 
 		// Start the next search one char after the next field mark found
-		pos++;
+		target_pos++;
 
 	}
 
 	// find anything in "" always false
+	// BUT find "" in "" is TRUE
+	//TRACE(target_size)
+	if (target_size == 0) {
+		if (var_str.size() == 0)
+			return 1;
+		char last_char = var_str.back();
+		if (last_char <= RM_ && last_char >= ST_)
+			return count_all_field_marks(SV(var_str)) + 1;
+	}
 	return 0;
 }
 

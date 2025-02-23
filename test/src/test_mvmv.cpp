@@ -166,6 +166,36 @@ function main() {
 
 	var vn;
 
+	{
+		// Searching for empty string
+
+		// originally
+		//TRACE: locate("", "")="1"
+		//TRACE: locate("", "x")="0"
+		//TRACE: locate("", "]"_var)="1"
+
+		// find empty in empty returns TRUE
+		// historical but of questionable value or accuracy
+		assert(locate("", ""));
+//		assert(not locate("", ""));
+
+		// Not found. Search for empty mv.
+		assert(not locate("", "x"));
+
+		// Find empty mv
+		assert(locate("", "]x"_var) == 1);   // empty mv begin
+		assert(locate("", "x]]x"_var) == 2); // empty mv middle
+		assert(locate("", "x]"_var) == 2);   // empty mv end
+
+		assert(locate("", "]"_var) == 1);   // empty mv begin
+		assert(locate("", "x]]"_var) == 2); // empty mv middle
+		assert(locate("", "x]"_var) == 2);   // empty mv end
+
+		assert(locate("", "]]"_var) == 1);   // empty mv begin
+		assert(locate("", "x]]]"_var) == 2); // empty mv middle
+		assert(locate("", "x]x]"_var) == 3);   // empty mv end
+	}
+
 	// BY cannot be XX
 	try {
 		var x = "xyz"_var.locateby("XX", "xyz", MV);
@@ -622,6 +652,7 @@ function main() {
 		// Find at the beginning, middle  or end
 		assert(locate("abc", "abc]QQ]def"_var));
 
+
 		assert(locate("abc", "abc]QQ]def"_var) == 1);
 		assert(locate("QQ", "abc]QQ]def"_var) == 2);
 		assert(locate("def", "abc]QQ]def"_var) == 3);
@@ -631,7 +662,10 @@ function main() {
 		assert(! locate("Q", "abc]QQ]def"_var));
 		assert(! locate("de", "abc]QQ]def"_var));
 
-		assert(! locate("", ""_var));
+		// questionable but historical. is it relied on anywhere?
+		assert(  locate("", ""_var));
+//		assert(! locate("", ""_var));
+
 		assert(! locate("", "abc]QQ]def"_var));
 		assert(! locate("000", ""_var));
 

@@ -23,6 +23,7 @@ function main() {
 	// Clean up before starting
 	gosub cleanup();
 
+
 	var varnum;
 
 	printl(" round(const int ndecimals = 0) const;");

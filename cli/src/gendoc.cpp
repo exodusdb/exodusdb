@@ -82,6 +82,7 @@ function main() {
 
 	// Clean up before starting
 	gosub cleanup();
+
 )__";
 		codefile << progheader;
 

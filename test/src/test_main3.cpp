@@ -501,13 +501,13 @@ function main() {
 		//assert(var(10.0/3.0).toString() eq "3.333333333333333");
 
 		assert(
-#ifdef EXO_USE_TO_CHARS
+//#ifdef EXO_USE_TO_CHARS
 			var(10.0 / 3.0).toString()
 				== "3.33333333333" // 12
-#else
-				//old exodus crude reduction in precision to 16 using sstream hides inaccuracies when there are only few calculations.
-				== "3.333333333333333" // 16
-#endif
+//#else
+//				//old exodus crude reduction in precision to 16 using sstream hides inaccuracies when there are only few calculations.
+//				== "3.333333333333333" // 16
+//#endif
 			||
 			var(10.0 / 3.0).toString()
 				//ryu full accuracy shows the inevitable inaccuracies inherent in using doubles for financial calculations
