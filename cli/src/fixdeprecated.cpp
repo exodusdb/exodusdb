@@ -423,7 +423,7 @@ function main() {
 					source_fixer(datrec);
 
 					if (datrec ne orig_datrec) {
-						print(datfilename, datrec);
+						printx(datfilename, datrec);
 						if (update) {
 							if (oswrite(datrec on datfilename)) {
 								datfilenames ^= datfilename ^ FM;

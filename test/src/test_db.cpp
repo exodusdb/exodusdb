@@ -464,7 +464,7 @@ programinit()
 		assert(not dblist().locateusing(FM, db1x));
 
 		// Preclean 2
-		auto _ = dbdelete(db2x);
+		auto __ = dbdelete(db2x);
 		assert(not dblist().locateusing(FM, db2x));
 
 		// dbcreate 1 and connect

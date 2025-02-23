@@ -190,13 +190,13 @@ function main() {
 	try {
 		//runtime errors instead of compiler error sadly
 
-//		var x1	   = x1 ^= 1;	//sadly c++ compiler allows this (some warn). Exodus catches it at runtime with VarUndefined
-		var x1	   = x1 + 1;	//sadly c++ compiler allows this (some warn). Exodus catches it at runtime with VarUndefined
-		var undefx = undefx++;	//sadly c++ compiler allows this (some warn). Exodus catches it at runtime with VarUndefined
-		var z	   = z + 1;		//sadly c++ compiler allows this (some warn). Exodus catches it at runtime with VarUndefined
+//		var x1	   = x1 ^= 1;	//sadly c++ compiler allows this (some warn). Exodus catches it at runtime with VarUnconstructed
+		var x1	   = x1 + 1;	//sadly c++ compiler allows this (some warn). Exodus catches it at runtime with VarUnconstructed
+		var undefx = undefx++;	//sadly c++ compiler allows this (some warn). Exodus catches it at runtime with VarUnconstructed
+		var z	   = z + 1;		//sadly c++ compiler allows this (some warn). Exodus catches it at runtime with VarUnconstructed
 		//var x++;				//doesnt compile
-//		var xx = xx.operator++();  //sadly c++ compiler allows this (some warn). Exodus catches it at runtime with VarUndefined
-		var xx = xx++;  //sadly c++ compiler allows this (some warn). Exodus catches it at runtime with VarUndefined
+//		var xx = xx.operator++();  //sadly c++ compiler allows this (some warn). Exodus catches it at runtime with VarUnconstructed
+		var xx = xx++;  //sadly c++ compiler allows this (some warn). Exodus catches it at runtime with VarUnconstructed
 ////var x = "x";
 ////printl(x + x);
 //		throw VarError("xxxxxx");
@@ -209,10 +209,10 @@ function main() {
 #ifdef VAR_SAFE_DESTRUCTOR
 	printl("\nVerify that exodus catches c++ defect at runtime");
 	try {
-		var abc = abc + 1; //sadly c++ compiler allows this (some warn). Exodus catches it at runtime with VarUndefined
+		var abc = abc + 1; //sadly c++ compiler allows this (some warn). Exodus catches it at runtime with VarUnconstructed
 		printl("should never get here because above should cause a runtime undefined error");
 		assert(false);
-	} catch (VarUndefined& e) {
+	} catch (VarUnconstructed& e) {
 		//g++ sees the above as undefined
 		var(e.description).outputl();
 	} catch (VarUnassigned& e) {
@@ -797,7 +797,7 @@ TRACE("qqqa")
 	//var temp2=temp2="xxx";
 
 	//undefined behaviour but decided to allow it in order not to slow down all copy construction
-	//show cause VarUndefined and not simply crash do to assigning an uninitialised string
+	//show cause VarUnconstructed and not simply crash do to assigning an uninitialised string
 	//var undefinedassign=undefinedassign="xxx";
 
 	//undefined behaviour but decided to allow it in order not to slow down all copy construction

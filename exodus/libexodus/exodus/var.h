@@ -2681,9 +2681,10 @@ public:
 	// obj is varnum
 
     // Absolute value
-    // `let v1 = var(-12.34).abs(); // 12.34
+    // `let v1 = -12.34;
+	//  let v2 = v1.abs(); // 12.34
     //  // or
-    //  let v2 = abs(-12.34);`
+    //  let v3 = abs(v1);`
     ND var  abs() const;
 
     // Power

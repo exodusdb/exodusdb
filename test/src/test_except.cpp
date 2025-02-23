@@ -437,8 +437,8 @@ function main() {
 			var v5	 = v5 + 1;
 			var v6	 = v6 + 1;
 			var v7	 = v7 + 1;
-			throw VarError("Uncaught error VarUndefined");
-		} catch (VarUndefined& e) {
+			throw VarError("Uncaught error VarUnconstructed");
+		} catch (VarUnconstructed& e) {
 			printl(e.description);
 		} catch (VarUnassigned& e) {
 			printl(e.description);
