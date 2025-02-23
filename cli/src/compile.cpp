@@ -421,6 +421,12 @@ ENVIRONMENT
 		liboptions ^= " -fvisibility=hidden -fvisibility-inlines-hidden ";
 #endif
 
+#ifdef EXO_FORMAT
+		// Bequeath/perpetuate the state of EXO_FORMAT to compiled programs
+		// as at original build time of the current compiler object
+		basicoptions ^= " -DEXO_FORMAT";
+#endif
+
 #if EXO_MODULE
 
 		// Bequeath/perpetuate the state of EXO_MODULE to compiled programs

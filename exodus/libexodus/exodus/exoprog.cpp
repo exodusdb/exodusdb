@@ -505,7 +505,7 @@ bool ExodusProgramBase::formlist(SV filename_or_command, in keys /*=""*/, const 
 	//remove any options from the filename or command
 	var filename2 = filename_or_command;
 	if (filename2.ends(")")) {
-		var options = filename2.field2(" ", -1);
+		var options = filename2.field(" ", -1);
 		filename2.cutter(-options.len());
 		filename2.trimmerlast();
 	}

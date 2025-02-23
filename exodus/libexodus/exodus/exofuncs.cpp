@@ -430,7 +430,7 @@ ND PUBLIC bool lock(in dbfile, in key) {return static_cast<bool>(dbfile.lock(key
 ND PUBLIC bool open(in dbfilename, io dbfile) {return dbfile.open(dbfilename);}
 ND PUBLIC bool open(in dbfilename) {return var().open(dbfilename);}
 
-ND PUBLIC void close(in dbfile) {return dbfile.close();}
+   PUBLIC void close(in dbfile) {return dbfile.close();}
 
 ND PUBLIC bool read(io record, in dbfile, in key) {return record.read(dbfile, key);}
 ND PUBLIC bool readc(io record, in dbfile, in key) {return record.readc(dbfile, key);}

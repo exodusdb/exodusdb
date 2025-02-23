@@ -537,7 +537,7 @@ ND bool lock(in dbfile, in key);
 
 ND bool open(in dbfilename, io dbfile);
 ND bool open(in dbfilename);
-ND void close(in dbfile);
+   void close(in dbfile);
 // bool open(in dictdata, in dbfilename, io dbfile);
 
 ND bool read(io record, in dbfile, in key);

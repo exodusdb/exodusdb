@@ -61,6 +61,10 @@ function main() {
 
 		let progheader =
 R"__(#include <cassert>
+#ifndef EXO_FORMAT
+#	define println printl
+#endif
+
 #include <exodus/program.h>
 programinit()
 
@@ -395,6 +399,12 @@ function main() {
 					codematch.prefixer("\n\t{\n\t\t");
 					codematch ^= "\n\t}\n";
 
+					// Exclude format from tests in old version of Ubuntu
+					bool uses_format = srcline.match("(print|println|format)\\(");
+					if (uses_format) {
+						codefile << "#ifdef EXO_FORMAT\n";
+					}
+
 					// Lead with function name
 					codematch.prefixer("\n\tprintl(" ^ srcline.quote() ^ ");");
 
@@ -419,6 +429,10 @@ function main() {
 					codematch.replacer(rex(R"__([\t ]*\n)__"), "\n");
 
 					codefile << codematch;
+
+					if (uses_format) {
+						codefile << "#endif\n";
+					}
 				}
 
 				// tag backticked code as c++
