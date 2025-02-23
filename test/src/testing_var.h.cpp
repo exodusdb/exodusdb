@@ -7,7 +7,7 @@ programinit()
 function main() {
 
 	// Quit if no default database connection
-	if (not connect()) {
+	if (not connect() or not reccount("xo_clients")) {
 		//Pass if allowed
 		if (osgetenv("EXO_NODATA") or true) {
 			printx("Test passed. Not really. ");
@@ -931,7 +931,7 @@ function main() {
 
 	printl("attach(in filenames) const;");
 	{
-		let filenames = "definitions^dict.definitions"_var, conn = "exodus";
+		let filenames = "xo_clients^dict.xo_clients"_var, conn = "exodus";
 		 if (conn.attach(filenames)) {/*ok*/} else  abort("attach: " ^ lasterror());
 		 // or
 		 if (attach(filenames)) {/*ok*/} else  abort("attach: " ^ lasterror());
@@ -1098,7 +1098,7 @@ function main() {
 
 	printl("open(in dbfilename, in connection = "");");
 	{
-		var file, filename = "definitions";
+		var file, filename = "xo_clients";
 		 if (not file.open(filename)) abort("open: " ^ lasterror());
 		 // or
 		 if (not open(filename to file)) abort("open: " ^ lasterror());
@@ -1106,7 +1106,7 @@ function main() {
 
 	printl("close() const;");
 	{
-		var file = "definitions";
+		var file = "xo_clients";
 		 file.close();
 		 // or
 		 close(file);
@@ -1114,7 +1114,7 @@ function main() {
 
 	printl("createindex(in fieldname, in dictfile = "") const;");
 	{
-		var filename = "definitions", fieldname = "DATE_TIME";
+		var filename = "xo_clients", fieldname = "DATE_CREATED";
 
 		 if (filename.createindex(fieldname)) {/*ok*/} else  abort("createindex: " ^ lasterror());
 		 // or
@@ -1124,14 +1124,14 @@ function main() {
 	printl(" listindex(in file_or_filename = "", in fieldname = "") const;");
 	{
 		var conn = "exodus";
-		 if (conn.listindex()) {/*ok*/} else  abort(" listindex: " ^ lasterror()); // includes "xo_clients__date_time"
+		 if (conn.listindex()) {/*ok*/} else  abort(" listindex: " ^ lasterror()); // includes "xo_clients__date_created"
 		 // or
 		 if (listindex()) {/*ok*/} else  abort(" listindex: " ^ lasterror());
 	}
 
 	printl("deleteindex(in fieldname) const;");
 	{
-		var file = "definitions", fieldname = "DATE_TIME";
+		var file = "xo_clients", fieldname = "DATE_CREATED";
 		 if (file.deleteindex(fieldname)) {/*ok*/} else  abort("deleteindex: " ^ lasterror());
 		 // or
 		 if (deleteindex(file, fieldname)) abort("deleteindex: " ^ lasterror());
@@ -1222,7 +1222,7 @@ function main() {
 
 	printl("writef(in file, in key, const int fieldno) const;");
 	{
-		var field = "f3", file = "definitions", key = "1000", fieldno = 3;
+		var field = "f3", file = "xo_clients", key = "1000", fieldno = 3;
 		 field.writef(file, key, fieldno);
 		 // or
 		 writef(field on file, key, fieldno);
@@ -2107,7 +2107,7 @@ subroutine cleanup() {
 	//otherwise the generated code will VNA on cleanup
 		 if (not dbdelete("xo_gendoc_testdb")) {}; // Cleanup first
 		 if (not dbdelete("xo_gendoc_testdb2")) {}; // Cleanup first
-		 if (not deleteindex("definitions", "DATE_TIME")) {}; // Cleanup first
+		 if (not deleteindex("xo_clients", "DATE_CREATED")) {}; // Cleanup first
 		 if (not deleterecord("xo_clients", "GD001")) {}; // Cleanup first
 		 if (not osremove(ostempdirpath() ^ "xo_gendoc_test.conf.bak")) {}; // Cleanup first
 		 if (not osremove(ostempdirpath() ^ "xo_gendoc_test.conf")) {}; // Cleanup first

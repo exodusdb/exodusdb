@@ -1500,7 +1500,7 @@ public:
 	// If conn is not specified then filename will be attached to the default connection.
 	// Multiple file names must be separated by FM
 	//
-	// `let filenames = "definitions^dict.definitions"_var, conn = "exodus";
+	// `let filenames = "xo_clients^dict.xo_clients"_var, conn = "exodus";
 	//  if (conn.attach(filenames)) ... ok
 	//  // or
 	//  if (attach(filenames)) ... ok`
@@ -1692,7 +1692,7 @@ public:
 
 	// Opens a db file to a var which can be used in subsequent functions to work on the specified file and database connection.
 	//
-	// `var file, filename = "definitions";
+	// `var file, filename = "xo_clients";
 	//  if (not file.open(filename)) ...
 	//  // or
 	//  if (not open(filename to file)) ...`
@@ -1701,7 +1701,7 @@ public:
 	// Closes db file var
 	// Does nothing currently since database file vars consume no resources
 	//
-	// `var file = "definitions";
+	// `var file = "xo_clients";
 	//  file.close();
 	//  // or
 	//  close(file);`
@@ -1716,8 +1716,8 @@ public:
 	// * The dictionary file does not exist. Default is "dict." ^ filename.
 	// * The dictionary field defines a calculated field that uses an exodus function. Using a psql function is OK.
 	//
-	// `var filename = "definitions", fieldname = "DATE_TIME";
-	//  if (not deleteindex("definitions", "DATE_TIME")) {}; // Cleanup first
+	// `var filename = "xo_clients", fieldname = "DATE_CREATED";
+	//  if (not deleteindex("xo_clients", "DATE_CREATED")) {}; // Cleanup first
 	//  if (filename.createindex(fieldname)) ... ok
 	//  // or
 	//  if (createindex(filename, fieldname)) ...`
@@ -1728,7 +1728,7 @@ public:
 	// obj is file|conn
 	//
 	// `var conn = "exodus";
-	//  if (conn.listindex()) ... ok // includes "xo_clients__date_time"
+	//  if (conn.listindex()) ... ok // includes "xo_clients__date_created"
 	//  // or
 	//  if (listindex()) ... ok`
 	ND var  listindex(in file_or_filename = "", in fieldname = "") const;
@@ -1738,7 +1738,7 @@ public:
 	// * File does not exist
 	// * Index does not already exists
 	//
-	// `var file = "definitions", fieldname = "DATE_TIME";
+	// `var file = "xo_clients", fieldname = "DATE_CREATED";
 	//  if (file.deleteindex(fieldname)) ... ok
 	//  // or
 	//  if (deleteindex(file, fieldname)) ...`
@@ -1854,7 +1854,7 @@ public:
 
 	// "write field" Same as write() but only writes to a specific field number in the record
 	//
-	// `var field = "f3", file = "definitions", key = "1000", fieldno = 3;
+	// `var field = "f3", file = "xo_clients", key = "1000", fieldno = 3;
 	//  field.writef(file, key, fieldno);
 	//  // or
 	//  writef(field on file, key, fieldno);`

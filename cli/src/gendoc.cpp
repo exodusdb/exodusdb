@@ -67,7 +67,7 @@ programinit()
 function main() {
 
 	// Quit if no default database connection
-	if (not connect()) {
+	if (not connect() or not reccount("xo_clients")) {
 		//Pass if allowed
 		if (osgetenv("EXO_NODATA") or true) {
 			printx("Test passed. Not really. ");

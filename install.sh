@@ -728,6 +728,13 @@ function test_exodus_and_database {
 	sudo systemctl start postgresql
 
 :
+: Run cli/testsort once to generate some test files like xo_clients
+: used in testing_var.h.cpp
+: -----------------------------------------------------------------
+:
+	testsort
+
+:
 : Many tests using ctest - In parallel. Output only on error
 : ----------------------
 :
