@@ -163,6 +163,12 @@ set -euxo pipefail
 	fi
 
 :
+: Repopulate pg_statistic to avoid unnecessary aggressive autovacuum, send it to background
+: =========================================================================================
+:
+       sudo -u postgres psql $TEST_EXO_DATA -c "ANALYZE;" &
+
+:
 : Optionally restart the target database
 : ======================================
 :
