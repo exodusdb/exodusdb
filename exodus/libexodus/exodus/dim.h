@@ -46,6 +46,12 @@ friend class dim_iter;
 	// SPECIAL MEMBER FUNCTIONS
 	///////////////////////////
 
+	//////////////////////
+	/// dim construction :
+	//////////////////////
+
+	// obj is dim
+
 	/////////////////////////
 	// 1. Default constructor
 	/////////////////////////
@@ -270,7 +276,7 @@ friend class dim_iter;
 	/// dim read/write:
 	///////////////////
 
-	// Read a db file record into the array.
+	// Read a db file record into an array.
 	// Each field in the database record becomes a single element in the array.
 	// Returns: True if the record exists or false if not
 	ND bool read(in dbfile, in key);
@@ -279,7 +285,7 @@ friend class dim_iter;
 	// Each element in the array becomes a separate field in the db record.
 	void write(in dbfile, in key) const;
 
-	// Read an entire os file into the array.
+	// Read an entire os file into an array.
 	// Each line in the os file, delimited by a NL char, becomes a separate element in the array.
 	// codepage: Optional. Data will be converted from the specified codepage/encoding to UTF8 after being read. If the conversion cannot be performed then return false.
 	// Returns: True if successful or false if not.

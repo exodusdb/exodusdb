@@ -366,6 +366,10 @@
 # Subdirs/submodules
 # ##################
 
+    set(LIBEXODUS_DIR ../../exodus/libexodus/exodus)
+    set(EXODUS_CLI_DIR ../../cli/src)
+    set(FASTFLOAT_DIR ../../fast_float)
+
 	message("")
 	add_subdirectory(exodus/libexodus/exodus)
 	#target_compile_options(exodus PUBLIC -Wall)

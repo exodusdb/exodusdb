@@ -798,21 +798,31 @@ public:
 		return field(separator, this->count(separator) + 1 + fieldno + 1, nfields);
 	}
 
-	// fieldstore() replaces n fields of subfield(s) in a string.
+	// fieldstore() replaces, inserts or deletes subfields in a string.
+	// fieldno: The field number to replace or, if not 1, the field number to start at. Negative fieldno counts backwards from the last field.
+	// nfields: The number of fields to replace or, if negative, the number of fields to delete first. Can be 0 to cause simple insertion of fields.
+	// replacement: A string that is the replacement field or fields.
+	// Returns: A modified copy of the original string.
+	// There is no way to simply delete n fields because the replacement argument cannot be omitted, however one could achieve the same effect by replacing n fields with the n+1th field.
 	//
-	// `let v1 = "aa*bb*cc*dd"_var.fieldstore("*", 2, 3, "X*Y"); // "aa*X*Y*"
-	//  // or
-	//  let v2 = fieldstore("aa*bb*cc*dd", "*", 2, 3, "X*Y");`
-	// If nfields is 0 then insert fields before fieldno
+	// The replacement can contain multiple fields itself. If replacing n fields and the replacement contains < n fields then the remaining fields become "". If the replacement contains more fields than are being replaced, then the additional fields are not used.
 	//
-	// `let v1 = "a1*b2*c3*d4"_var.fieldstore("*", 2, 0, "X*Y"); // "a1*X*Y*b2*c3*d4"
+	// `let v1 = "aa,bb,cc,dd,ee"_var.fieldstore(",", 2, 3, "11,22"); // "aa,11,22,,ee"
 	//  // or
-	//  let v2 = fieldstore("a1*b2*c3*d4", "*", 2, 0, "X*Y");`
-	// If nfields is negative then delete abs(n) fields before inserting.
+	//  let v2 = fieldstore("aa,bb,cc,dd,ee", ",", 2, 3, "11,22");`
 	//
-	// `let v1 = "a1*b2*c3*d4"_var.fieldstore("*", 2, -3, "X*Y"); // "a1*X*Y"
-	//  // or
-	//  let v2 = fieldstore("a1*b2*c3*d4", "*", 2, -3, "X*Y");`
+	// If nfields is 0 then insert the replacement field(s) before fieldno
+	//
+	// `let v1 = "aa,bb,cc,dd,ee"_var.fieldstore(",", 2, 0, "11,22"); // "aa,11,22,bb,cc,dd,ee"`
+	//
+	// If nfields is negative then delete abs(n) fields before inserting whatever fields the replacement has.
+	//
+	// `let v1 = "aa,bb,cc,dd,ee"_var.fieldstore(",", 2, -2, "11"); // "aa,11,dd,ee"`
+	//
+	// If nfields exceeds the number of fields in the input then additional empty fields are added.
+	//
+	// `let v1 = "aa,bb,cc"_var.fieldstore(",", 6, 2, "11"); // "aa,bb,cc,,,11,"`
+	//
 	ND var  fieldstore(SV separator, const int fieldno, const int nfields, in replacement) const&;
 
 	// substr version 1.
@@ -1410,6 +1420,8 @@ public:
 
 	// locate() with only the target substr argument provided searches unordered values separated by any of the field mark chars.
 	// Returns: The field, value, subvalue etc. number if found or 0 if not.
+	// Searching for empty fields, values etc. (i.e. "") will work. Locating "" in "]yy" will return 1, in "xx]]zz" 2, and in "xx]yy]" 3, however, locating "" in "xx" will return 0 because there is conceptually no empty value in "xx". Locate "" in "" will return 1.
+	//
 	// `if ("UK^US^UA"_var.locate("US")) ... ok // 2
 	//  // or
 	//  if (locate("US", "UK^US^UA"_var)) ... ok`

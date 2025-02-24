@@ -504,29 +504,32 @@ function main() {
 
 	printl(" fieldstore(SV separator, const int fieldno, const int nfields, in replacement) const&;");
 	{
-		let v1 = "aa*bb*cc*dd"_var.fieldstore("*", 2, 3, "X*Y");
-		assert(v1 == "aa*X*Y*");
+		let v1 = "aa,bb,cc,dd,ee"_var.fieldstore(",", 2, 3, "11,22");
+		assert(v1 == "aa,11,22,,ee");
 
 		 // or
-		 let v2 = fieldstore("aa*bb*cc*dd", "*", 2, 3, "X*Y");
+		 let v2 = fieldstore("aa,bb,cc,dd,ee", ",", 2, 3, "11,22");
 	}
 
 	printl(" fieldstore(SV separator, const int fieldno, const int nfields, in replacement) const&;");
 	{
-		let v1 = "a1*b2*c3*d4"_var.fieldstore("*", 2, 0, "X*Y");
-		assert(v1 == "a1*X*Y*b2*c3*d4");
+		let v1 = "aa,bb,cc,dd,ee"_var.fieldstore(",", 2, 0, "11,22");
+		assert(v1 == "aa,11,22,bb,cc,dd,ee");
 
-		 // or
-		 let v2 = fieldstore("a1*b2*c3*d4", "*", 2, 0, "X*Y");
 	}
 
 	printl(" fieldstore(SV separator, const int fieldno, const int nfields, in replacement) const&;");
 	{
-		let v1 = "a1*b2*c3*d4"_var.fieldstore("*", 2, -3, "X*Y");
-		assert(v1 == "a1*X*Y");
+		let v1 = "aa,bb,cc,dd,ee"_var.fieldstore(",", 2, -2, "11");
+		assert(v1 == "aa,11,dd,ee");
 
-		 // or
-		 let v2 = fieldstore("a1*b2*c3*d4", "*", 2, -3, "X*Y");
+	}
+
+	printl(" fieldstore(SV separator, const int fieldno, const int nfields, in replacement) const&;");
+	{
+		let v1 = "aa,bb,cc"_var.fieldstore(",", 6, 2, "11");
+		assert(v1 == "aa,bb,cc,,,11,");
+
 	}
 
 	printl(" substr(const int pos1, const int length) const&;");

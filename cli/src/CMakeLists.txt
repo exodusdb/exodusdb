@@ -20,8 +20,8 @@
 # ###############################
 #
 	cmake_policy(SET CMP0015 NEW)
-	include_directories(../../exodus/libexodus ${FMT_INCLUDE} ../../fmt/include)
-	link_directories(${CMAKE_CURRENT_SOURCE_DIR}../../exodus/libexodus/exodus)
+	include_directories(${LIBEXODUS_DIR}/.. ${FMT_INCLUDE} ../../fmt/include)
+	link_directories(${LIBEXODUS_DIR})
 
 #
 # 1. COMPILE
@@ -78,7 +78,9 @@
 	add_executable(var2let var2let.cpp)
 	add_executable(redefine redefine.cpp)
 	add_executable(fire fire.cpp)
-	add_executable(gendoc gendoc.cpp ${CMAKE_CURRENT_SOURCE_DIR}/../../exodus/libexodus/exodus/var.h)
+
+	# Rebuild and rerun if var.h changes to generate new man page
+	add_executable(gendoc gendoc.cpp ${CMAKE_CURRENT_SOURCE_DIR}/${LIBEXODUS_DIR}/var.h)
 
 	#name is name only ... input and output files are exodus
 	add_executable(exodus-cli exodus.cpp)
@@ -281,14 +283,19 @@
 ###################################################
 
 # Define a custom command that will run after the target is built
+# Generate man page var.1 next to libexodus/exodus/var.h
 add_custom_command(
     TARGET gendoc
     POST_BUILD
-    COMMAND ${CMAKE_CURRENT_BINARY_DIR}/gendoc . ${CMAKE_CURRENT_SOURCE_DIR}/../../exodus/libexodus/exodus/var.h {m} > var.1
-    COMMENT "Executing cli post-build command for gendoc to generate var.1"
+#	{mo} man page output to original dir as .1
+    COMMAND ${CMAKE_CURRENT_BINARY_DIR}/gendoc . ${CMAKE_CURRENT_SOURCE_DIR}/${LIBEXODUS_DIR}/var.h ${CMAKE_CURRENT_SOURCE_DIR}/${LIBEXODUS_DIR}/dim.h {mo}
+    COMMENT "Executing cli post-build command for gendoc to generate var.1 and dim.1"
 )
 
 # Install the generated man page var.1
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/var.1
+install(FILES
+		${CMAKE_CURRENT_SOURCE_DIR}/${LIBEXODUS_DIR}/var.1
+		${CMAKE_CURRENT_SOURCE_DIR}/${LIBEXODUS_DIR}/dim.1
+
         DESTINATION ${CMAKE_INSTALL_PREFIX}/share/man/man1
 )
