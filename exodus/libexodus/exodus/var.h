@@ -1795,30 +1795,30 @@ public:
 	//  if (not unlockall(conn)) ...`
 	   bool unlockall() const;
 
-	// obj is rec
+	// obj is record
 
 	// Writes a record into a db file given a unique primary key.
 	// Either inserts a new record or updates an existing record.
 	// It always succeeds so no result code is returned.
 	// Any memory cached record is deleted.
 	//
-	// `let rec = "Client GD^G^20855^30000^1001.00^20855.76539"_var;
+	// `let record = "Client GD^G^20855^30000^1001.00^20855.76539"_var;
 	//  let file = "xo_clients", key = "GD001";
 	//  if (not deleterecord("xo_clients", "GD001")) {}; // Cleanup first
-	//  rec.write(file, key);
+	//  record.write(file, key);
 	//  // or
-	//  write(rec on file, key);`
+	//  write(record on file, key);`
 	   void write(in file, in key) const;
 
 	// Reads a record from a db file for a given key.
 	// Returns: False if the key doesnt exist
 	// var: Contains the record if it exists or is unassigned if not.
 	//
-	// `var rec;
+	// `var record;
 	//  let file = "xo_clients", key = "GD001";
-	//  if (not rec.read(file, key)) ... // rec -> "Client GD^G^20855^30000^1001.00^20855.76539"_var
+	//  if (not record.read(file, key)) ... // record -> "Client GD^G^20855^30000^1001.00^20855.76539"_var
 	//  // or
-	//  if (not read(rec from file, key)) ...`
+	//  if (not read(record from file, key)) ...`
 	ND bool read(in file, in key);
 
 	// Deletes a record from a db file given a key.
@@ -1836,22 +1836,22 @@ public:
 	// Returns: False if the key already exists
 	// Any memory cached record is deleted.
 	//
-	// `let rec = "Client GD^G^20855^30000^1001.00^20855.76539"_var;
+	// `let record = "Client GD^G^20855^30000^1001.00^20855.76539"_var;
 	//  let file = "xo_clients", key = "GD001";
-	//  if (rec.insertrecord(file, key)) ... ok
+	//  if (record.insertrecord(file, key)) ... ok
 	//  // or
-	//  if (insertrecord(rec on file, key)) ...`
+	//  if (insertrecord(record on file, key)) ...`
 	ND bool insertrecord(in file, in key) const;
 
 	// Updates an existing record in a db file.
 	// Returns: False if the key doesnt already exist
 	// Any memory cached record is deleted.
 	//
-	// `let rec = "Client GD^G^20855^30000^1001.00^20855.76539"_var;
+	// `let record = "Client GD^G^20855^30000^1001.00^20855.76539"_var;
 	//  let file = "xo_clients", key = "GD001";
-	//  if (not rec.updaterecord(file, key)) ...
+	//  if (not record.updaterecord(file, key)) ...
 	//  // or
-	//  if (not updaterecord(rec on file, key)) ...`
+	//  if (not updaterecord(record on file, key)) ...`
 	ND bool updaterecord(in file, in key) const;
 
 	//  obj is strvar
@@ -1872,7 +1872,7 @@ public:
 	//  writef(field on file, key, fieldno);`
 	   void writef(in file, in key, const int fieldno) const;
 
-	// obj is rec
+	// obj is record
 
 	// "Write cache" Writes a record and key into a memory cached "db file".
 	// The actual database file is NOT updated.
@@ -1880,11 +1880,11 @@ public:
 	// It always succeeds so no result code is returned.
 	// Neither the db file nor the record key need to actually exist in the actual db.
 	//
-    // `let rec = "Client XD^X^20855^30000^1001.00^20855.76539"_var;
+    // `let record = "Client XD^X^20855^30000^1001.00^20855.76539"_var;
     //  let file = "xo_clients", key = "XD001";
-	//  rec.writec(file, key);
+	//  record.writec(file, key);
 	//  // or
-	//  writec(rec on file, key);`
+	//  writec(record on file, key);`
 	   void writec(in file, in key) const;
 
 	// "Read cache" Same as "read() but first reads from a memory cache.
@@ -1893,14 +1893,14 @@ public:
 	// 2b. Writes the record and key to the memory cache and returns true.
 	// Cached db file data lives in exodus process memory and is lost when the process terminates or cleardbcache() is called.
 	//
-    // `var rec;
+    // `var record;
     //  let file = "xo_clients", key = "XD001";
-	//  if (rec.readc(file, key)) ... ok
+	//  if (record.readc(file, key)) ... ok
 	//  // or
-	//  if (readc(rec from file, key)) ... ok
+	//  if (readc(record from file, key)) ... ok
 	//
 	//  // Verify not in actual database file by using read() not readc()
-	//  if (read(rec from file, key)) abort("Error: " ^ key ^ " should not be in the actual database file"); // error`
+	//  if (read(record from file, key)) abort("Error: " ^ key ^ " should not be in the actual database file"); // error`
 	ND bool readc(in file, in key);
 
 	// obj is dbfile

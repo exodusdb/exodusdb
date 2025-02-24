@@ -551,8 +551,11 @@ ND bool deletec(in dbfile, in key);
 ND bool updaterecord(in record, in dbfile, in key);
 ND bool insertrecord(in record, in dbfile, in key);
 
-ND bool dimread(dim& dimrecord, in dbfile, in key);
-   void dimwrite(const dim& dimrecord, in dbfile, in key);
+//ND bool dimread(dim& dimrecord, in dbfile, in key);
+//   void dimwrite(const dim& dimrecord, in dbfile, in key);
+
+ND bool read(dim& dimrecord, in dbfile, in key);
+   void write(const dim& dimrecord, in dbfile, in key);
 
 // moved to exoprog so they have access to default cursor in mv.CURSOR
 // bool select(in sortselectclause = "" );

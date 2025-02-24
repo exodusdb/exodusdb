@@ -3121,7 +3121,7 @@ Locks cannot be removed while in a transaction.
 
 
 .SS
-rec.write(file, key)
+record.write(file, key)
 .nf
  
 .fi
@@ -3136,18 +3136,18 @@ Any memory cached record is deleted.
 \fBExample:\fR
 .RS
 .nf
- let rec = "Client GD^G^20855^30000^1001.00^20855.76539"_var;
+ let record = "Client GD^G^20855^30000^1001.00^20855.76539"_var;
  let file = "xo_clients", key = "GD001";
  if (not deleterecord("xo_clients", "GD001")) {}; // Cleanup first
- rec.write(file, key);
+ record.write(file, key);
  // or
- write(rec on file, key);
+ write(record on file, key);
 .fi
 .RE
 
 
 .SS
-if (rec.read(file, key)) ...
+if (record.read(file, key)) ...
 .nf
  
 .fi
@@ -3160,11 +3160,11 @@ Reads a record from a db file for a given key.
 \fBExample:\fR
 .RS
 .nf
- var rec;
+ var record;
  let file = "xo_clients", key = "GD001";
- if (not rec.read(file, key)) ... // rec -> "Client GD^G^20855^30000^1001.00^20855.76539"_var
+ if (not record.read(file, key)) ... // record -> "Client GD^G^20855^30000^1001.00^20855.76539"_var
  // or
- if (not read(rec from file, key)) ...
+ if (not read(record from file, key)) ...
 .fi
 .RE
 
@@ -3192,7 +3192,7 @@ if (deleterecord(file, key)) ...
 
 
 .SS
-if (rec.insertrecord(file, key)) ...
+if (record.insertrecord(file, key)) ...
 .nf
  
 .fi
@@ -3205,17 +3205,17 @@ Any memory cached record is deleted.
 \fBExample:\fR
 .RS
 .nf
- let rec = "Client GD^G^20855^30000^1001.00^20855.76539"_var;
+ let record = "Client GD^G^20855^30000^1001.00^20855.76539"_var;
  let file = "xo_clients", key = "GD001";
- if (rec.insertrecord(file, key)) ... ok
+ if (record.insertrecord(file, key)) ... ok
  // or
- if (insertrecord(rec on file, key)) ...
+ if (insertrecord(record on file, key)) ...
 .fi
 .RE
 
 
 .SS
-if (rec.updaterecord(file, key)) ...
+if (record.updaterecord(file, key)) ...
 .nf
  
 .fi
@@ -3228,17 +3228,17 @@ Any memory cached record is deleted.
 \fBExample:\fR
 .RS
 .nf
- let rec = "Client GD^G^20855^30000^1001.00^20855.76539"_var;
+ let record = "Client GD^G^20855^30000^1001.00^20855.76539"_var;
  let file = "xo_clients", key = "GD001";
- if (not rec.updaterecord(file, key)) ...
+ if (not record.updaterecord(file, key)) ...
  // or
- if (not updaterecord(rec on file, key)) ...
+ if (not updaterecord(record on file, key)) ...
 .fi
 .RE
 
 
 .SS
-if (rec.readf(file, key, fieldno)) ...
+if (record.readf(file, key, fieldno)) ...
 .nf
  
 .fi
@@ -3256,7 +3256,7 @@ if (rec.readf(file, key, fieldno)) ...
 
 
 .SS
-rec.writef(file, key, fieldno)
+record.writef(file, key, fieldno)
 .nf
  
 .fi
@@ -3274,7 +3274,7 @@ rec.writef(file, key, fieldno)
 
 
 .SS
-rec.writec(file, key)
+record.writec(file, key)
 .nf
  
 .fi
@@ -3291,17 +3291,17 @@ Neither the db file nor the record key need to actually exist in the actual db.
 \fBExample:\fR
 .RS
 .nf
- let rec = "Client XD^X^20855^30000^1001.00^20855.76539"_var;
+ let record = "Client XD^X^20855^30000^1001.00^20855.76539"_var;
  let file = "xo_clients", key = "XD001";
- rec.writec(file, key);
+ record.writec(file, key);
  // or
- writec(rec on file, key);
+ writec(record on file, key);
 .fi
 .RE
 
 
 .SS
-if (rec.readc(file, key)) ...
+if (record.readc(file, key)) ...
 .nf
  
 .fi
@@ -3318,14 +3318,14 @@ Cached db file data lives in exodus process memory and is lost when the process 
 \fBExample:\fR
 .RS
 .nf
- var rec;
+ var record;
  let file = "xo_clients", key = "XD001";
- if (rec.readc(file, key)) ... ok
+ if (record.readc(file, key)) ... ok
  // or
- if (readc(rec from file, key)) ... ok
+ if (readc(record from file, key)) ... ok
 
  // Verify not in actual database file by using read() not readc()
- if (read(rec from file, key)) abort("Error: " ^ key ^ " should not be in the actual database file"); // error
+ if (read(record from file, key)) abort("Error: " ^ key ^ " should not be in the actual database file"); // error
 .fi
 .RE
 

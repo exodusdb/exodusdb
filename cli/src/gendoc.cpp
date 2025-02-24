@@ -225,8 +225,8 @@ function main() {
 			var prefix = srcline.field(" ", 1);
 
 			// Suppress lines that are not comments or function declarations
-			if (not prefix.starts("/") and not srcline.match(R"__(^[\sa-zA-Z0-9_:]+\()__"))
-//			if (not prefix.starts("/") and not srcline.match(R"__(^[\sa-zA-Z0-9_:&]+\()__"))
+//			if (not prefix.starts("/") and not srcline.match(R"__(^[\sa-zA-Z0-9_:]+\()__"))
+			if (not prefix.starts("/") and not srcline.match(R"__(^[\sa-zA-Z0-9_:&]+\()__"))
 				prefix = "";
 
 			// Include lines starting var
@@ -258,7 +258,7 @@ function main() {
 			else if (prefix == "dim") prefix = "dim";
 
 			// dim&
-			else if (prefix == "dim&") {prefix = "dim2"; TRACE(prefix)}// many return nothing
+			else if (prefix == "dim&") {prefix = "dim2";}// many return nothing
 
 			else {
 

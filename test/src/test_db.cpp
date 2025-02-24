@@ -342,7 +342,8 @@ programinit()
 		printl("Check can write a whole dim array to one record");
 		dim d1 = {11, 22, 33};
 //		assert(dimwrite(d1 on filename, "D1"));
-		dimwrite(d1 on filename, "D1");
+//		dimwrite(d1 on filename, "D1");
+		write(d1 on filename, "D1");
 		var rec;
 
 		printl("Verify record back into a var");
@@ -351,7 +352,8 @@ programinit()
 
 		printl("Verify record back into a dim");
 		dim d2;
-		assert(dimread(d2 from filename, "D1"));
+//		assert(dimread(d2 from filename, "D1"));
+		assert(read(d2 from filename, "D1"));
 		assert(d2.join() eq d1.join());
 	}
 

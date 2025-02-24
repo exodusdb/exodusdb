@@ -443,8 +443,10 @@ ND PUBLIC bool updaterecord(in record, in dbfile, in key) {return record.updater
 ND PUBLIC bool insertrecord(in record, in dbfile, in key) {return record.insertrecord(dbfile, key);}
 ND PUBLIC bool deletec(in dbfile, in key) {return dbfile.deletec(key);}
 
-ND PUBLIC bool dimread(dim& dimrecord, in dbfile, in key) {return dimrecord.read(dbfile, key);}
-   PUBLIC void dimwrite(const dim& dimrecord, in dbfile, in key) {dimrecord.write(dbfile, key);}
+//ND PUBLIC bool dimread(dim& dimrecord, in dbfile, in key) {return dimrecord.read(dbfile, key);
+//   PUBLIC void dimwrite(const dim& dimrecord, in dbfile, in key) {dimrecord.write(dbfile, key);}
+ND PUBLIC bool read(dim& dimrecord, in dbfile, in key) {return dimrecord.read(dbfile, key);}
+   PUBLIC void write(const dim& dimrecord, in dbfile, in key) {dimrecord.write(dbfile, key);}
 
 ND PUBLIC var  xlate(in dbfilename, in key, in fieldno, const char* mode);
 ND PUBLIC var  xlate(in dbfilename, in key, in fieldno, in mode);

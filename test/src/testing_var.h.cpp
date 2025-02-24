@@ -1174,27 +1174,27 @@ function main() {
 		 if (not unlockall(conn)) abort("unlockall: " ^ lasterror());
 	}
 
-	var rec;
+	var record;
 
 	printl("write(in file, in key) const;");
 	{
-		let rec = "Client GD^G^20855^30000^1001.00^20855.76539"_var;
+		let record = "Client GD^G^20855^30000^1001.00^20855.76539"_var;
 		 let file = "xo_clients", key = "GD001";
 
-		 rec.write(file, key);
+		 record.write(file, key);
 		 // or
-		 write(rec on file, key);
+		 write(record on file, key);
 	}
 
 	printl("read(in file, in key);");
 	{
-		var rec;
+		var record;
 		 let file = "xo_clients", key = "GD001";
-		 if (not rec.read(file, key)) abort("read: " ^ lasterror());
-		assert(rec == "Client GD^G^20855^30000^1001.00^20855.76539"_var);
+		 if (not record.read(file, key)) abort("read: " ^ lasterror());
+		assert(record == "Client GD^G^20855^30000^1001.00^20855.76539"_var);
 
 		 // or
-		 if (not read(rec from file, key)) abort("read: " ^ lasterror());
+		 if (not read(record from file, key)) abort("read: " ^ lasterror());
 	}
 
 	printl("deleterecord(in key) const;");
@@ -1207,20 +1207,20 @@ function main() {
 
 	printl("insertrecord(in file, in key) const;");
 	{
-		let rec = "Client GD^G^20855^30000^1001.00^20855.76539"_var;
+		let record = "Client GD^G^20855^30000^1001.00^20855.76539"_var;
 		 let file = "xo_clients", key = "GD001";
-		 if (rec.insertrecord(file, key)) {/*ok*/} else  abort("insertrecord: " ^ lasterror());
+		 if (record.insertrecord(file, key)) {/*ok*/} else  abort("insertrecord: " ^ lasterror());
 		 // or
-		 if (insertrecord(rec on file, key)) abort("insertrecord: " ^ lasterror());
+		 if (insertrecord(record on file, key)) abort("insertrecord: " ^ lasterror());
 	}
 
 	printl("updaterecord(in file, in key) const;");
 	{
-		let rec = "Client GD^G^20855^30000^1001.00^20855.76539"_var;
+		let record = "Client GD^G^20855^30000^1001.00^20855.76539"_var;
 		 let file = "xo_clients", key = "GD001";
-		 if (not rec.updaterecord(file, key)) abort("updaterecord: " ^ lasterror());
+		 if (not record.updaterecord(file, key)) abort("updaterecord: " ^ lasterror());
 		 // or
-		 if (not updaterecord(rec on file, key)) abort("updaterecord: " ^ lasterror());
+		 if (not updaterecord(record on file, key)) abort("updaterecord: " ^ lasterror());
 	}
 
 	printl("readf(in file, in key, const int fieldno);");
@@ -1243,22 +1243,22 @@ function main() {
 
 	printl("writec(in file, in key) const;");
 	{
-		let rec = "Client XD^X^20855^30000^1001.00^20855.76539"_var;
+		let record = "Client XD^X^20855^30000^1001.00^20855.76539"_var;
 		 let file = "xo_clients", key = "XD001";
-		 rec.writec(file, key);
+		 record.writec(file, key);
 		 // or
-		 writec(rec on file, key);
+		 writec(record on file, key);
 	}
 
 	printl("readc(in file, in key);");
 	{
-		var rec;
+		var record;
 		 let file = "xo_clients", key = "XD001";
-		 if (rec.readc(file, key)) {/*ok*/} else  abort("readc: " ^ lasterror());
+		 if (record.readc(file, key)) {/*ok*/} else  abort("readc: " ^ lasterror());
 		 // or
-		 if (readc(rec from file, key)) {/*ok*/} else  abort("readc: " ^ lasterror());
+		 if (readc(record from file, key)) {/*ok*/} else  abort("readc: " ^ lasterror());
 		 // Verify not in actual database file by using read() not readc()
-		 if (read(rec from file, key)) abort("Error: " ^ key ^ " should not be in the actual database file"); // error
+		 if (read(record from file, key)) abort("Error: " ^ key ^ " should not be in the actual database file"); // error
 	}
 
 	var dbfile;
@@ -2111,6 +2111,42 @@ function main() {
 // Code examples - dim.h
 ////////////////
 
+	var d1;
+
+	printl("splitter(in str1, SV delimiter = _FM);");
+	{
+		dim d1;
+		 d1.splitter("f1^f2^f3"_var);
+		assert(d1.rows() == 3);
+
+		 //
+		 dim d2(10);
+		 d2.splitter("f1^f2^f3"_var);
+		assert(d2.rows() == 10);
+
+	}
+
+	printl("write(in dbfile, in key) const;");
+	{
+		dim record = "Client GD^G^20855^30000^1001.00^20855.76539"_var.split();
+		 let file = "xo_clients", key = "GD001";
+
+		 record.write(file, key);
+		 // or
+		 write(record on file, key);
+	}
+
+	printl("read(in dbfile, in key);");
+	{
+		dim record(10);
+		 let file = "xo_clients", key = "GD001";
+		 if (not record.read(file, key)) abort("read: " ^ lasterror());
+		assert(record.join() == "Client GD^G^20855^30000^1001.00^20855.76539"_var);
+
+		 // or
+		 if (not read(record from file, key)) abort("read: " ^ lasterror());
+	}
+
 ////////
 // exit:
 ////////
@@ -2132,6 +2168,7 @@ subroutine cleanup() {
 		 if (not osremove(ostempdirpath() ^ "xo_gendoc_test.conf.bak")) {}; // Cleanup first
 		 if (not osremove(ostempdirpath() ^ "xo_gendoc_test.conf")) {}; // Cleanup first
 		 if (osrmdir("xo_test/aaa")) {}; // Cleanup first
+		 if (not deleterecord("xo_clients", "GD001")) {}; // Cleanup first
 };
 
 programexit()

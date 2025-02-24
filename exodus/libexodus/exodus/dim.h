@@ -50,7 +50,7 @@ friend class dim_iter;
 	/// dim construction :
 	//////////////////////
 
-	// obj is dim
+	// oxxxbj is dim
 
 	/////////////////////////
 	// 1. Default constructor
@@ -285,16 +285,29 @@ friend class dim_iter;
 	/// dim read/write:
 	///////////////////
 
+	// Writes a db file record created from an array.
+	// Each element in the array becomes a separate field in the db record. Any redundant trailing FMs are suppressed.
+	//
+    // `dim record = "Client GD^G^20855^30000^1001.00^20855.76539"_var.split();
+    //  let file = "xo_clients", key = "GD001";
+    //  if (not deleterecord("xo_clients", "GD001")) {}; // Cleanup first
+    //  record.write(file, key);
+    //  // or
+    //  write(record on file, key);`
+	void write(in dbfile, in key) const;
+
 	// Read a db file record into an array.
 	// Each field in the database record becomes a single element in the array.
 	// Returns: True if the record exists or false if not,
 	// If the array is predimensioned then any excess array elements are initialised to "" and any excess record fields are left unsplit in the final array element. See dim splitter for more info.
 	// If the array is not predimensioned (rows and cols = 0) then it will be dimensioned to have exactly the same number of rows as there are fields in the record being read.
+	//
+    // `dim record(10);
+    //  let file = "xo_clients", key = "GD001";
+    //  if (not record.read(file, key)) ... // record.join() -> "Client GD^G^20855^30000^1001.00^20855.76539"_var
+    //  // or
+    //  if (not read(record from file, key)) ...`
 	ND bool read(in dbfile, in key);
-
-	// Writes a db file record created from an array.
-	// Each element in the array becomes a separate field in the db record. Any redundant trailing FMs are suppressed.
-	void write(in dbfile, in key) const;
 
 	// Read an entire os text file into an array.
 	// Each line in the os file, delimited by \n or \r\n, becomes a separate element in the array.

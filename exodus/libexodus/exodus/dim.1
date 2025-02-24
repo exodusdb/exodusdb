@@ -5,14 +5,14 @@
 .SH
 
 .SS
-if (dim.redim(nrows, ncols = 1)) ...
+if (var.redim(nrows, ncols = 1)) ...
 .nf
  
 .fi
 
 
 .SS
-dim.at(rowno, colno)
+var.at(rowno, colno)
 .nf
  
 .fi
@@ -53,6 +53,56 @@ Joins all elements into a single delimited string
 .SH 24. DIM MUTATION
 .SH
 
+.SS
+d1.splitter(str1, delimiter = FM)
+.nf
+ 
+.fi
+Creates or updates the array from a given string and delimiter.
+
+If the dim array has not been dimensioned (nrows and ncols are 0), it will be dimensioned with the number of elements that the string has fields.
+
+If the dim array has already been dimensioned, and has more elements than there are fields in the string, the excess array elements are initialised to "". If the record has more fields than there are elements in the array, the excess fields are all left unsplit in the final element of the array.
+
+Predimensioning arrays allows efficient reuse of arrays in loops.
+
+In either case, all elements of the array are updated.
+
+\fBExample:\fR
+.RS
+.nf
+ dim d1;
+ d1.splitter("f1^f2^f3"_var); // d1.rows() -> 3
+ //
+ dim d2(10);
+ d2.splitter("f1^f2^f3"_var); // d2.rows() -> 10
+.fi
+.RE
+
+
+.SS
+d1.sorter(reverse = false)
+.nf
+ 
+.fi
+Sort the elements of the array in place.
+
+\fBreverseorder:\fR Defaults to false. If true, then the order is reversed.
+
+.SS
+d1.reverser()
+.nf
+ 
+.fi
+Reverse the elements of the array in place.
+
+.SS
+d1.shuffler()
+.nf
+ 
+.fi
+Randomly shuffle the order of the elements of the array in place.
+
 .SH 25. DIM CONVERSION
 .SH
 
@@ -81,6 +131,28 @@ Same as shuffler() but returns a new array leaving the original untouched.
 .SH
 
 .SS
+d1.write(dbfile, key)
+.nf
+ 
+.fi
+Writes a db file record created from an array.
+
+Each element in the array becomes a separate field in the db record. Any redundant trailing FMs are suppressed.
+
+\fBExample:\fR
+.RS
+.nf
+ dim record = "Client GD^G^20855^30000^1001.00^20855.76539"_var.split();
+ let file = "xo_clients", key = "GD001";
+ if (not deleterecord("xo_clients", "GD001")) {}; // Cleanup first
+ record.write(file, key);
+ // or
+ write(record on file, key);
+.fi
+.RE
+
+
+.SS
 if (d1.read(dbfile, key)) ...
 .nf
  
@@ -95,14 +167,17 @@ If the array is predimensioned then any excess array elements are initialised to
 
 If the array is not predimensioned (rows and cols = 0) then it will be dimensioned to have exactly the same number of rows as there are fields in the record being read.
 
-.SS
-d1.write(dbfile, key)
+\fBExample:\fR
+.RS
 .nf
- 
+ dim record(10);
+ let file = "xo_clients", key = "GD001";
+ if (not record.read(file, key)) ... // record.join() -> "Client GD^G^20855^30000^1001.00^20855.76539"_var
+ // or
+ if (not read(record from file, key)) ...
 .fi
-Writes a db file record created from an array.
+.RE
 
-Each element in the array becomes a separate field in the db record. Any redundant trailing FMs are suppressed.
 
 .SS
 if (d1.osread(osfilename, codepage = "")) ...

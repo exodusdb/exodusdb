@@ -280,8 +280,8 @@ export namespace exo {
 	using exo::writef;
 	using exo::updaterecord;
 	using exo::insertrecord;
-	using exo::dimread;
-	using exo::dimwrite;
+//	using exo::dimread;
+//	using exo::dimwrite;
 	using exo::xlate;
 	using exo::xlate;
 	using exo::lasterror;
@@ -361,8 +361,8 @@ export namespace exo {
 	using exo::debug;
 	using exo::deletefile;
 	using exo::deleteindex;
-	using exo::dimread;
-	using exo::dimwrite;
+//	using exo::dimread;
+//	using exo::dimwrite;
 	using exo::disconnect;
 	using exo::disconnectall;
 	using exo::echo;

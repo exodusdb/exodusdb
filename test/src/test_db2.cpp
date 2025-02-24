@@ -439,7 +439,7 @@ dict(AGE_IN_YEARS) {
 		printl("Check open/read/write");
 		assert(open(filename to file));
 		//write(1 on file, 1));
-		write(1 on file, "1");
+		write("1" on file, "1");
 		//assert(read(RECORD from file, 1));
 		assert(read(RECORD from file, "1"));
 		assert(RECORD eq 1);
@@ -449,7 +449,7 @@ dict(AGE_IN_YEARS) {
 
 		printl("Check write within transaction can be seen within transaction");
 		//write(11 on file, 1));
-		write(11 on file, "1");
+		write("11" on file, "1");
 		//assert(read(RECORD from file, 1));
 		assert(read(RECORD from file, "1"));
 		assert(RECORD eq 11);
