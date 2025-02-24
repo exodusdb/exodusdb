@@ -237,8 +237,17 @@ friend class dim_iter;
 	/// dim mutation:
 	/////////////////
 
-	// Creates the array from a given string and delimiter
-	// The existing array is replaced.
+	// Creates or updates the array from a given string and delimiter.
+	// If the dim array has not been dimensioned (nrows and ncols are 0), it will be dimensioned with the number of elements that the string has fields.
+	// If the dim array has already been dimensioned, and has more elements than there are fields in the string, the excess array elements are initialised to "". If the record has more fields than there are elements in the array, the excess fields are all left unsplit in the final element of the array.
+    // Predimensioning arrays allows efficient reuse of arrays in loops.
+	// In either case, all elements of the array are updated.
+	//
+	// `dim d1;
+	//  d1.splitter("f1^f2^f3"_var); // d1.rows() -> 3
+	//  //
+	//  dim d2(10);
+	//  d2.splitter("f1^f2^f3"_var); // d2.rows() -> 10`
 	dim& splitter(in str1, SV delimiter = _FM);
 
 	// Sort the elements of the array in place.
@@ -278,22 +287,25 @@ friend class dim_iter;
 
 	// Read a db file record into an array.
 	// Each field in the database record becomes a single element in the array.
-	// Returns: True if the record exists or false if not
+	// Returns: True if the record exists or false if not,
+	// If the array is predimensioned then any excess array elements are initialised to "" and any excess record fields are left unsplit in the final array element. See dim splitter for more info.
+	// If the array is not predimensioned (rows and cols = 0) then it will be dimensioned to have exactly the same number of rows as there are fields in the record being read.
 	ND bool read(in dbfile, in key);
 
-	// Writes a db file record from the array.
-	// Each element in the array becomes a separate field in the db record.
+	// Writes a db file record created from an array.
+	// Each element in the array becomes a separate field in the db record. Any redundant trailing FMs are suppressed.
 	void write(in dbfile, in key) const;
 
-	// Read an entire os file into an array.
-	// Each line in the os file, delimited by a NL char, becomes a separate element in the array.
+	// Read an entire os text file into an array.
+	// Each line in the os file, delimited by \n or \r\n, becomes a separate element in the array.
 	// codepage: Optional. Data will be converted from the specified codepage/encoding to UTF8 after being read. If the conversion cannot be performed then return false.
 	// Returns: True if successful or false if not.
+	// If the first \n in the file is \r\n then the whole file will be split using \r\n as delimiter.
 	ND bool osread(in osfilename, const char* codepage = "");
 
-	// Creates an entire os file from the array;
-	// Each element of the array becomes one line of text, delimited by a NL char, in the os file.
-	// Any existing os file is replaced.
+	// Creates an entire os text file from an array
+	// Each element of the array becomes one line in the os file delimited by \n (or \r\n if the array was originally osread with \r\n delimiter)
+	// Any existing os file is overwritten and replaced.
 	// codepage: Optional: Data is converted from UTF8 to the required codepage/encoding before output. If the conversion cannot be performed then return false.
 	// Returns: True if successful or false if not.
 	ND bool oswrite(in osfilename, const char* codepage = "") const;

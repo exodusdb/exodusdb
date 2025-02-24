@@ -83,7 +83,7 @@
 
 	# Generate test/src/testing_var.h.cpp from var.h
 	add_custom_target(PreBuild_testing_var_h
-    	COMMAND test -x ${CMAKE_CURRENT_BINARY_DIR}/${EXODUS_CLI_DIR}/gendoc && ${CMAKE_CURRENT_BINARY_DIR}/${EXODUS_CLI_DIR}/gendoc ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/${LIBEXODUS_DIR}/var.h > /dev/null || echo Skipped first build because gendoc not built yet
+    	COMMAND test -x ${CMAKE_CURRENT_BINARY_DIR}/${EXODUS_CLI_DIR}/gendoc && ${CMAKE_CURRENT_BINARY_DIR}/${EXODUS_CLI_DIR}/gendoc ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/${LIBEXODUS_DIR}/var.h ${CMAKE_CURRENT_SOURCE_DIR}/${LIBEXODUS_DIR}/dim.h > /dev/null || echo Skipped first build because gendoc not built yet
     	COMMENT "Running pre-build command gendoc to create or update test/src/testing_var.h.cpp"
 	)
 

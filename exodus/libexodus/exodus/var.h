@@ -803,9 +803,9 @@ public:
 	// nfields: The number of fields to replace or, if negative, the number of fields to delete first. Can be 0 to cause simple insertion of fields.
 	// replacement: A string that is the replacement field or fields.
 	// Returns: A modified copy of the original string.
-	// There is no way to simply delete n fields because the replacement argument cannot be omitted, however one could achieve the same effect by replacing n fields with the n+1th field.
+	// There is no way to simply delete n fields because the replacement argument cannot be omitted, however one can achieve the same result by replacing n+1 fields with the n+1th field.
 	//
-	// The replacement can contain multiple fields itself. If replacing n fields and the replacement contains < n fields then the remaining fields become "". If the replacement contains more fields than are being replaced, then the additional fields are not used.
+	// The replacement can contain multiple fields itself. If replacing n fields and the replacement contains < n fields then the remaining fields become "", and if the replacement contains more fields than are required, they are unused.
 	//
 	// `let v1 = "aa,bb,cc,dd,ee"_var.fieldstore(",", 2, 3, "11,22"); // "aa,11,22,,ee"
 	//  // or

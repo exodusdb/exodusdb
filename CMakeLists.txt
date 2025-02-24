@@ -368,6 +368,7 @@
 
     set(LIBEXODUS_DIR ../../exodus/libexodus/exodus)
     set(EXODUS_CLI_DIR ../../cli/src)
+    set(EXODUS_TEST_DIR ../../test/src)
     set(FASTFLOAT_DIR ../../fast_float)
 
 	message("")
