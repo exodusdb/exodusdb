@@ -852,16 +852,20 @@ function main() {
 			assert(result.outputl() == "bc");
 			assert(var(result ^ "|" ^ ptr ^ "|" ^ sep).outputl() eq "bc|5|2");
 
+			// Check points ONE after the end of the string if at the end
 			result = rem.substr2(ptr, sep);
-			assert(var(result ^ "|" ^ ptr ^ "|" ^ sep).outputl() eq "xyz|9|0");
+//			assert(var(result ^ "|" ^ ptr ^ "|" ^ sep).outputl() eq "xyz|9|0");
+			assert(var(result ^ "|" ^ ptr ^ "|" ^ sep).outputl() eq "xyz|8|0");
 
 			ptr = 0;
 
 			result = rem.substr2(ptr, sep);
 			assert(var(result ^ "|" ^ ptr ^ "|" ^ sep).outputl() eq "abc|5|2");
 
+			// ONE after, not two after
 			result = rem.substr2(ptr, sep);
-			assert(var(result ^ "|" ^ ptr ^ "|" ^ sep).outputl() eq "xyz|9|0");
+//			assert(var(result ^ "|" ^ ptr ^ "|" ^ sep).outputl() eq "xyz|9|0");
+			assert(var(result ^ "|" ^ ptr ^ "|" ^ sep).outputl() eq "xyz|8|0");
 
 			ptr = 999;
 
@@ -882,16 +886,20 @@ function main() {
 			var result = substr2(rem, ptr, sep);
 			assert(var(result ^ "|" ^ ptr ^ "|" ^ sep).outputl() eq "bc|5|2");
 
+			// ONE after not two after end
 			result = substr2(rem, ptr, sep);
-			assert(var(result ^ "|" ^ ptr ^ "|" ^ sep).outputl() eq "xyz|9|0");
+//			assert(var(result ^ "|" ^ ptr ^ "|" ^ sep).outputl() eq "xyz|9|0");
+			assert(var(result ^ "|" ^ ptr ^ "|" ^ sep).outputl() eq "xyz|8|0");
 
 			ptr = 0;
 
 			result = substr2(rem, ptr, sep);
 			assert(var(result ^ "|" ^ ptr ^ "|" ^ sep).outputl() eq "abc|5|2");
 
+			// ONE after not two after end
 			result = substr2(rem, ptr, sep);
-			assert(var(result ^ "|" ^ ptr ^ "|" ^ sep).outputl() eq "xyz|9|0");
+//			assert(var(result ^ "|" ^ ptr ^ "|" ^ sep).outputl() eq "xyz|9|0");
+			assert(var(result ^ "|" ^ ptr ^ "|" ^ sep).outputl() eq "xyz|8|0");
 
 			ptr = 999;
 

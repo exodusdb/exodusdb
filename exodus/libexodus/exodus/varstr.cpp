@@ -1847,7 +1847,8 @@ var  var::substr2(io pos1, out delimiterno) const {
 	// past of of string?
 	if (end_pos == std::string::npos) {
 		// wont work if string is the maximum string length but that cant occur
-		pos1 = static_cast<int>(var_str.size() + 2);
+//		pos1 = static_cast<int>(var_str.size() + 2);
+		pos1 = static_cast<int>(var_str.size() + 1);
 		delimiterno = 0;
 		return var_str.substr(pos, var_str.size() - pos);
 		//returnable = (var_str.substr(pos, var_str.size() - pos));
