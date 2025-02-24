@@ -2413,7 +2413,8 @@ public:
 	// `let osdirname = "xo_test/aaa";
 	//  if (osdirname.oscwd()) ... ok
 	//  // or
-	//  if (oscwd(osdirname)) ... ok`
+	//  if (oscwd(osdirname)) ... ok
+	//  if (oscwd("../..")) ... ok /// Change back to avoid errors in following code.`
 	ND bool oscwd(in newpath) const;
 
 	// Returns: The current working directory
@@ -2428,7 +2429,6 @@ public:
 	// Optionally even if not empty. Including subdirs.
 	//
 	// `let osdirname = "xo_test/aaa";
-	//  if (oscwd("../..")) ... ok /// Change up before removing because cannot remove dir while it is current
 	//  if (osdirname.osrmdir()) ... ok
 	//  // or
 	//  if (osrmdir(osdirname)) ...`

@@ -288,12 +288,12 @@ friend class dim_iter;
 	// Writes a db file record created from an array.
 	// Each element in the array becomes a separate field in the db record. Any redundant trailing FMs are suppressed.
 	//
-    // `dim record = "Client GD^G^20855^30000^1001.00^20855.76539"_var.split();
+    // `dim d1 = "Client GD^G^20855^30000^1001.00^20855.76539"_var.split();
     //  let file = "xo_clients", key = "GD001";
     //  if (not deleterecord("xo_clients", "GD001")) {}; // Cleanup first
-    //  record.write(file, key);
+    //  d1.write(file, key);
     //  // or
-    //  write(record on file, key);`
+    //  write(d1 on file, key);`
 	void write(in dbfile, in key) const;
 
 	// Read a db file record into an array.
@@ -302,26 +302,39 @@ friend class dim_iter;
 	// If the array is predimensioned then any excess array elements are initialised to "" and any excess record fields are left unsplit in the final array element. See dim splitter for more info.
 	// If the array is not predimensioned (rows and cols = 0) then it will be dimensioned to have exactly the same number of rows as there are fields in the record being read.
 	//
-    // `dim record(10);
+    // `dim d1(10);
     //  let file = "xo_clients", key = "GD001";
-    //  if (not record.read(file, key)) ... // record.join() -> "Client GD^G^20855^30000^1001.00^20855.76539"_var
+    //  if (not d1.read(file, key)) ... // d1.join() -> "Client GD^G^20855^30000^1001.00^20855.76539"_var
     //  // or
-    //  if (not read(record from file, key)) ...`
+    //  if (not read(d1 from file, key)) ...`
 	ND bool read(in dbfile, in key);
-
-	// Read an entire os text file into an array.
-	// Each line in the os file, delimited by \n or \r\n, becomes a separate element in the array.
-	// codepage: Optional. Data will be converted from the specified codepage/encoding to UTF8 after being read. If the conversion cannot be performed then return false.
-	// Returns: True if successful or false if not.
-	// If the first \n in the file is \r\n then the whole file will be split using \r\n as delimiter.
-	ND bool osread(in osfilename, const char* codepage = "");
 
 	// Creates an entire os text file from an array
 	// Each element of the array becomes one line in the os file delimited by \n (or \r\n if the array was originally osread with \r\n delimiter)
 	// Any existing os file is overwritten and replaced.
 	// codepage: Optional: Data is converted from UTF8 to the required codepage/encoding before output. If the conversion cannot be performed then return false.
 	// Returns: True if successful or false if not.
+	//
+	// `dim d1 = "aaa=1\nbbb=2\nccc=3\n"_var.split("\n");
+    //  if (not osremove("xo_conf.txt")) {}; // Cleanup first
+	//  let osfilename = "xo_conf.txt";
+	//  if (not d1.oswrite(osfilename)) ...
+	//  // or
+	//  if (not oswrite(d1 on osfilename)) ...`
 	ND bool oswrite(in osfilename, const char* codepage = "") const;
+
+	// Read an entire os text file into an array.
+	// Each line in the os file, delimited by \n or \r\n, becomes a separate element in the array.
+	// codepage: Optional. Data will be converted from the specified codepage/encoding to UTF8 after being read. If the conversion cannot be performed then return false.
+	// Returns: True if successful or false if not.
+	// If the first \n in the file is \r\n then the whole file will be split using \r\n as delimiter.
+	//
+	// `dim d1;
+	//  let osfilename = "xo_conf.txt";
+	//  if (not d1.osread(osfilename)) ... // d1.join("\n") -> "aaa=1\nbbb=2\nccc=3\n"_var0
+	//  // or
+	//  if (not osread(d1 from osfilename)) ...`
+	ND bool osread(in osfilename, const char* codepage = "");
 
 	////////////
 	// ITERATORS

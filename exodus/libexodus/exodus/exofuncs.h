@@ -133,7 +133,7 @@ int exodus_main(int exodus_argc, const char* exodus_argv[], ExoEnv& mv, int thre
 ND var  hash(in instring, const std::uint64_t modulus = 0);
 
 ND var  osgetenv(SV envcode = "" );
-ND bool osgetenv(SV code, io value);
+ND bool osgetenv(SV code, out value);
    void ossetenv(SV code, in value);
 
 ND var ostempdirpath(void);
@@ -163,20 +163,24 @@ ND var  oswait(SV file_dir_list, const int milliseconds);
 ND bool osopen(in osfilepath, out osfilevar, const bool utf8 = true );
    void osclose(in osfilevar);
 // Versions where offset is input and output
-ND bool osbread(io data, in osfilevar, io offset, const int length);
+ND bool osbread(out data, in osfilevar, io offset, const int length);
 ND bool osbwrite(in data, in osfilevar, io offset);
 // Versions where offset is const offset e.g. numeric ints
 #ifdef VAR_OSBREADWRITE_CONST_OFFSET
-ND bool osbread(io data, in osfilevar, in offset, const int length);
+ND bool osbread(out data, in osfilevar, in offset, const int length);
 ND bool osbwrite(in data, in osfilevar, in offset);
 #endif
 
-// Read/Write whole osfile
+// Read/Write var from/into whole osfile
 ND bool oswrite(in data, in osfilepath, const char* codepage = "" );
-ND bool osread(io data, in osfilepath, const char* codepage = "" );
+ND bool osread(out data, in osfilepath, const char* codepage = "" );
 // Simple version without codepage returns the contents or "" if file cannot be read
 // one argument returns the contents directly to be used in assignments
 ND var  osread(in osfilepath);
+
+// Read/Write dim from/into whole osfile
+ND bool oswrite(const dim& data, in osfilepath, const char* codepage = "" );
+ND bool osread(dim& data, in osfilepath, const char* codepage = "" );
 
 ND bool osremove(in ospath);
 ND bool osrename(in old_ospath, in new_ospath);
@@ -203,7 +207,7 @@ ND var  ostid(void);
 
 ND bool osshell(in command);
 ND bool osshellwrite(in writestr, in command);
-ND bool osshellread(io readstr, in command);
+ND bool osshellread(out readstr, in command);
 ND var  osshellread(in command);
 
 //var execute(in command);
@@ -431,7 +435,7 @@ ND var  field2(in instring, SV substr, const int fieldno, const int nfields = 1 
 
 // STRINGS WITH FIELD MARKS
 
-ND var  substr2(in fromstr, io startindex, io delimiterno);
+ND var  substr2(in fromstr, io startindex, out delimiterno);
 
 ND dim  split(in sourcevar, SV delimiter = _FM );
 ND var  join(const dim& sourcedim, SV delimiter = _FM );
@@ -463,18 +467,18 @@ ND var  remove(in instring, const int fieldno, const int valueno = 0 , const int
    IO   remover(io iostring, const int fieldno, const int valueno = 0 , const int subvalueno = 0 );
 
 ND var  locate(in target, in instring);
-ND bool locate(in target, in instring, io setting);
-ND bool locate(in target, in instring, io setting, const int fieldno, const int valueno = 0 );
+ND bool locate(in target, in instring, out setting);
+ND bool locate(in target, in instring, out setting, const int fieldno, const int valueno = 0 );
 
-ND bool locateby(const char* ordercode, in target, in instring, io setting);
-ND bool locateby(const char* ordercode, in target, in instring, io setting, const int fieldno, const int valueno = 0 );
+ND bool locateby(const char* ordercode, in target, in instring, out setting);
+ND bool locateby(const char* ordercode, in target, in instring, out setting, const int fieldno, const int valueno = 0 );
 
-ND bool locateby(in ordercode, in target, in instring, io setting);
-ND bool locateby(in ordercode, in target, in instring, io setting, const int fieldno, const int valueno = 0 );
+ND bool locateby(in ordercode, in target, in instring, out setting);
+ND bool locateby(in ordercode, in target, in instring, out setting, const int fieldno, const int valueno = 0 );
 
 ND bool locateusing(in usingchar, in target, in instring);
-ND bool locateusing(in usingchar, in target, in instring, io setting);
-ND bool locateusing(in usingchar, in target, in instring, io setting, const int fieldno, const int valueno = 0 , const int subvalueno = 0 );
+ND bool locateusing(in usingchar, in target, in instring, out setting);
+ND bool locateusing(in usingchar, in target, in instring, out setting, const int fieldno, const int valueno = 0 , const int subvalueno = 0 );
 
 ND var  sum(in instring, SV delimiter);
 ND var  sum(in instring);
@@ -540,9 +544,9 @@ ND bool open(in dbfilename);
    void close(in dbfile);
 // bool open(in dictdata, in dbfilename, io dbfile);
 
-ND bool read(io record, in dbfile, in key);
-ND bool readc(io record, in dbfile, in key);
-ND bool readf(io record, in dbfile, in key, in fieldnumber);
+ND bool read(out record, in dbfile, in key);
+ND bool readc(out record, in dbfile, in key);
+ND bool readf(out field, in dbfile, in key, in fieldnumber);
 
    void write(in record, in dbfile, in key);
    void writec(in record, in dbfile, in key);
@@ -560,9 +564,9 @@ ND bool read(dim& dimrecord, in dbfile, in key);
 // moved to exoprog so they have access to default cursor in mv.CURSOR
 // bool select(in sortselectclause = "" );
 // void clearselect(void);
-// bool readnext(io key);
-// bool readnext(io key, io valueno);
-// bool readnext(io record, io key, io value);
+// bool readnext(out key);
+// bool readnext(out key, out valueno);
+// bool readnext(out record, out key, out value);
 // deleterecord should be made a free function that doesnt use CURSOR
 // bool deleterecord(in dbfilename_or_var_or_command, in key = "" );
 

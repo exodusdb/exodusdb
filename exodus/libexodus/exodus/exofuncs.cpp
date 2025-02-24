@@ -46,7 +46,7 @@ namespace exo {
 //}
 
 ND PUBLIC var  osgetenv(SV envcode /*=""*/) {var envvalue = ""; if (not envvalue.osgetenv(envcode)) {} return envvalue;}
-ND PUBLIC bool osgetenv(SV code, io value) {return value.osgetenv(code);}
+ND PUBLIC bool osgetenv(SV code, out value) {return value.osgetenv(code);}
    PUBLIC void ossetenv(SV code, in value) {return value.ossetenv(code);}
 
 ND PUBLIC var  ostempdirpath() {return var().ostempdirpath();}
@@ -76,20 +76,24 @@ ND PUBLIC var  oswait(SV file_dir_list, const int milliseconds) {return var(file
 ND PUBLIC bool osopen(in osfilepath, out osfilevar, const bool utf8 /*=true*/) {return osfilevar.osopen(osfilepath, utf8);}
    PUBLIC void osclose(in osfilevar) {osfilevar.osclose();}
 // Versions where offset is input and output
-ND PUBLIC bool osbread(io data, in osfilevar, io offset, const int length) {return data.osbread(osfilevar, offset, length);}
+ND PUBLIC bool osbread(out data, in osfilevar, io offset, const int length) {return data.osbread(osfilevar, offset, length);}
 ND PUBLIC bool osbwrite(in data, in osfilevar, io offset) {return data.osbwrite(osfilevar, offset);}
 // Versions where offset is const offset e.g. numeric ints
 //#ifdef VAR_OSBREADWRITE_CONST_OFFSET
-//ND PUBLIC bool osbread(io data, in osfilevar, in offset, const int length) {return data.osbread(osfilevar, const_cast<io>(offset), length);}
+//ND PUBLIC bool osbread(out data, in osfilevar, in offset, const int length) {return data.osbread(osfilevar, const_cast<io>(offset), length);}
 //ND PUBLIC bool osbwrite(in data, in osfilevar, in offset) {return data.osbwrite(osfilevar, const_cast<io>(offset));}
 //#endif
 
-// Read/Write whole osfile
+// Read/Write var from/into whole osfile
 ND PUBLIC bool oswrite(in data, in osfilepath, const char* codepage /*=""*/) {return data.oswrite(osfilepath, codepage);}
-ND PUBLIC bool osread(io data, in osfilepath, const char* codepage /*=""*/) {return data.osread(osfilepath, codepage);}
+ND PUBLIC bool osread(out data, in osfilepath, const char* codepage /*=""*/) {return data.osread(osfilepath, codepage);}
 // Simple version without codepage returns the contents or "" if file cannot be read
 // one argument returns the contents directly to be used in assignments
 ND PUBLIC var  osread(in osfilepath) {var data; if (data.osread(osfilepath)) return data; else return "";}
+
+// Read/Write dim from/into whole osfile
+ND PUBLIC bool oswrite(const dim& data, in osfilepath, const char* codepage /*=""*/) {return data.oswrite(osfilepath, codepage);}
+ND PUBLIC bool osread(dim& data, in osfilepath, const char* codepage /*=""*/) {return data.osread(osfilepath, codepage);}
 
 ND PUBLIC bool osremove(in ospath) {return ospath.osremove();}
 ND PUBLIC bool osrename(in old_ospath, in new_ospath) {return old_ospath.osrename(new_ospath);}
@@ -117,7 +121,7 @@ ND PUBLIC var  ostid() {return var().ostid();}
 
 ND PUBLIC bool osshell(in command) {return command.osshell();}
 ND PUBLIC bool osshellwrite(in writestr, in command) {return writestr.osshellwrite(command);}
-ND PUBLIC bool osshellread(io readstr, in command) {return readstr.osshellread(command);}
+ND PUBLIC bool osshellread(out readstr, in command) {return readstr.osshellread(command);}
 ND PUBLIC var  osshellread(in command) {var result = ""; if (not result.osshellread(command)) {} return result;}
 
 ND PUBLIC var  backtrace();
@@ -353,18 +357,18 @@ ND PUBLIC var  remove(in instring, const int fieldno, const int valueno /*=0*/, 
    PUBLIC IO   remover(io iostring, const int fieldno, const int valueno /*=0*/, const int subvalueno /*=0*/) {iostring.remover(fieldno, valueno, subvalueno); return IOSTRING;}
 
 ND PUBLIC var  locate(in target, in instring) {return instring.locate(target);}
-ND PUBLIC bool locate(in target, in instring, io setting) {return instring.locate(target, setting);}
-ND PUBLIC bool locate(in target, in instring, io setting, const int fieldno, const int valueno /*=0*/) {return instring.locate(target, setting, fieldno, valueno);}
+ND PUBLIC bool locate(in target, in instring, out setting) {return instring.locate(target, setting);}
+ND PUBLIC bool locate(in target, in instring, out setting, const int fieldno, const int valueno /*=0*/) {return instring.locate(target, setting, fieldno, valueno);}
 
-ND PUBLIC bool locateby(const char* ordercode, in target, in instring, io setting) {return instring.locateby(ordercode, target, setting);}
-ND PUBLIC bool locateby(const char* ordercode, in target, in instring, io setting, const int fieldno, const int valueno /*=0*/) {return instring.locateby(ordercode, target, setting, fieldno, valueno);}
+ND PUBLIC bool locateby(const char* ordercode, in target, in instring, out setting) {return instring.locateby(ordercode, target, setting);}
+ND PUBLIC bool locateby(const char* ordercode, in target, in instring, out setting, const int fieldno, const int valueno /*=0*/) {return instring.locateby(ordercode, target, setting, fieldno, valueno);}
 
-ND PUBLIC bool locateby(in ordercode, in target, in instring, io setting) {return instring.locateby(ordercode, target, setting);}
-ND PUBLIC bool locateby(in ordercode, in target, in instring, io setting, const int fieldno, const int valueno /*=0*/) {return instring.locateby(ordercode, target, setting, fieldno, valueno);}
+ND PUBLIC bool locateby(in ordercode, in target, in instring, out setting) {return instring.locateby(ordercode, target, setting);}
+ND PUBLIC bool locateby(in ordercode, in target, in instring, out setting, const int fieldno, const int valueno /*=0*/) {return instring.locateby(ordercode, target, setting, fieldno, valueno);}
 
 ND PUBLIC bool locateusing(in usingchar, in target, in instring) {return instring.locateusing(usingchar, target);}
-ND PUBLIC bool locateusing(in usingchar, in target, in instring, io setting) {return instring.locateusing(usingchar, target, setting);}
-ND PUBLIC bool locateusing(in usingchar, in target, in instring, io setting, const int fieldno, const int valueno /*=0*/, const int subvalueno /*=0*/) {return instring.locateusing(usingchar, target, setting, fieldno, valueno, subvalueno);}
+ND PUBLIC bool locateusing(in usingchar, in target, in instring, out setting) {return instring.locateusing(usingchar, target, setting);}
+ND PUBLIC bool locateusing(in usingchar, in target, in instring, out setting, const int fieldno, const int valueno /*=0*/, const int subvalueno /*=0*/) {return instring.locateusing(usingchar, target, setting, fieldno, valueno, subvalueno);}
 
 ND PUBLIC var  sum(in instring, SV delimiter) {return instring.sum(delimiter);}
 ND PUBLIC var  sum(in instring) {return instring.sum();}
@@ -432,9 +436,9 @@ ND PUBLIC bool open(in dbfilename) {return var().open(dbfilename);}
 
    PUBLIC void close(in dbfile) {return dbfile.close();}
 
-ND PUBLIC bool read(io record, in dbfile, in key) {return record.read(dbfile, key);}
-ND PUBLIC bool readc(io record, in dbfile, in key) {return record.readc(dbfile, key);}
-ND PUBLIC bool readf(io record, in dbfile, in key, in fieldnumber) {return record.readf(dbfile, key, fieldnumber);}
+ND PUBLIC bool read(out record, in dbfile, in key) {return record.read(dbfile, key);}
+ND PUBLIC bool readc(out record, in dbfile, in key) {return record.readc(dbfile, key);}
+ND PUBLIC bool readf(out field, in dbfile, in key, in fieldnumber) {return field.readf(dbfile, key, fieldnumber);}
 
    PUBLIC void write(in record, in dbfile, in key) {record.write(dbfile, key);}
    PUBLIC void writec(in record, in dbfile, in key) {record.writec(dbfile, key);}

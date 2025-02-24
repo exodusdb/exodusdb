@@ -180,6 +180,34 @@ If the array is not predimensioned (rows and cols = 0) then it will be dimension
 
 
 .SS
+if (d1.oswrite(osfilename, codepage = "")) ...
+.nf
+ 
+.fi
+Creates an entire os text file from an array
+
+Each element of the array becomes one line in the os file delimited by \\n (or \\r\\n if the array was originally osread with \\r\\n delimiter)
+
+Any existing os file is overwritten and replaced.
+
+\fBcodepage:\fR Optional: Data is converted from UTF8 to the required codepage/encoding before output. If the conversion cannot be performed then return false.
+
+\fBReturns:\fR True if successful or false if not.
+
+\fBExample:\fR
+.RS
+.nf
+ dim d1 = "aaa=1\\nbbb=2\\nccc=3\\n"_var.split("\\n");
+ if (not osremove("xo_conf.txt")) {}; // Cleanup first
+ let osfilename = "xo_conf.txt";
+ if (not d1.oswrite(osfilename)) ...
+ // or
+ if (not oswrite(d1 on osfilename)) ...
+.fi
+.RE
+
+
+.SS
 if (d1.osread(osfilename, codepage = "")) ...
 .nf
  
@@ -194,19 +222,16 @@ Each line in the os file, delimited by \\n or \\r\\n, becomes a separate element
 
 If the first \\n in the file is \\r\\n then the whole file will be split using \\r\\n as delimiter.
 
-.SS
-if (d1.oswrite(osfilename, codepage = "")) ...
+\fBExample:\fR
+.RS
 .nf
- 
+ dim d1;
+ let osfilename = "xo_conf.txt";
+ if (not d1.osread(osfilename)) ... // d1.join("\\n") -> "aaa=1\\nbbb=2\\nccc=3\\n"_var0
+ // or
+ if (not osread(d1 from osfilename)) ...
 .fi
-Creates an entire os text file from an array
+.RE
 
-Each element of the array becomes one line in the os file delimited by \\n (or \\r\\n if the array was originally osread with \\r\\n delimiter)
-
-Any existing os file is overwritten and replaced.
-
-\fBcodepage:\fR Optional: Data is converted from UTF8 to the required codepage/encoding before output. If the conversion cannot be performed then return false.
-
-\fBReturns:\fR True if successful or false if not.
 
 

@@ -1591,6 +1591,7 @@ function main() {
 		 if (osdirname.oscwd()) {/*ok*/} else  abort("oscwd: " ^ lasterror());
 		 // or
 		 if (oscwd(osdirname)) {/*ok*/} else  abort("oscwd: " ^ lasterror());
+		 if (oscwd("../..")) {/*ok*/} else  abort("oscwd: " ^ lasterror()); /// Change back to avoid errors in following code.
 	}
 
 	printl(" oscwd() const;");
@@ -1603,7 +1604,6 @@ function main() {
 	printl("osrmdir(bool evenifnotempty = false) const;");
 	{
 		let osdirname = "xo_test/aaa";
-		 if (oscwd("../..")) {/*ok*/} else  abort("osrmdir: " ^ lasterror()); /// Change up before removing because cannot remove dir while it is current
 		 if (osdirname.osrmdir()) {/*ok*/} else  abort("osrmdir: " ^ lasterror());
 		 // or
 		 if (osrmdir(osdirname)) abort("osrmdir: " ^ lasterror());
@@ -2147,6 +2147,25 @@ function main() {
 		 if (not read(record from file, key)) abort("read: " ^ lasterror());
 	}
 
+	printl("oswrite(in osfilename, const char* codepage = "") const;");
+	{
+		dim d1 = "aaa=1\nbbb=2\nccc=3\n"_var.split("\n");
+
+		 let osfilename = "xo_conf.txt";
+		 if (not d1.oswrite(osfilename)) abort("oswrite: " ^ lasterror());
+		 // or
+		 if (not oswrite(d1 on osfilename)) abort("oswrite: " ^ lasterror());
+	}
+
+	printl("osread(in osfilename, const char* codepage = "");");
+	{
+		dim d1;
+		 let osfilename = "xo_conf.txt";
+		 if (not d1.osread(osfilename)) abort("osread: " ^ lasterror()); // d1.join("\n") -> "aaa=1\nbbb=2\nccc=3\n"_var0
+		 // or
+		 if (not osread(d1 from osfilename)) abort("osread: " ^ lasterror());
+	}
+
 ////////
 // exit:
 ////////
@@ -2169,6 +2188,7 @@ subroutine cleanup() {
 		 if (not osremove(ostempdirpath() ^ "xo_gendoc_test.conf")) {}; // Cleanup first
 		 if (osrmdir("xo_test/aaa")) {}; // Cleanup first
 		 if (not deleterecord("xo_clients", "GD001")) {}; // Cleanup first
+		 if (not osremove("xo_conf.txt")) {}; // Cleanup first
 };
 
 programexit()
