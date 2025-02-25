@@ -63,33 +63,24 @@ namespace exo {
 /////////////////////
 
 void dim::operator=(const dim& sourcedim) &{
+
 	//TRACE("CP ASS")
-	// cannot copy an undimensioned array
+	// Prevent copying an undimensioned array
 	if (!sourcedim.ncols_)
 		UNLIKELY
 		throw DimUndimensioned("");
 
-	//this->redim(sourcedim.nrows_, sourcedim.ncols_);
-	EXO_DIM_RECALC_NROWS(sourcedim)
-	// warning: implicit conversion loses integer precision: 'size_type' (aka 'unsigned long') to 'int' [-Wshorten-64-to-32]
-	int nrows = static_cast<int>(sourcedim.data_.size() - 1) / sourcedim.ncols_;
-	this->redim(nrows, sourcedim.ncols_);
+	std::size_t ncells = sourcedim.data_.size();
+	data_.clear();
+	data_.reserve(ncells);
 
-	// Copy element 0 as well to allow a degree
-	// zero-based indexing although split/join/sort/read/write
-	// ignore the zeroth element
-//	if (sourcedim.data_[0].assigned())
-//		data_[0] = sourcedim.data_[0];
-		data_[0] = sourcedim.data_[0].clone();
+	// Cant use ordinary vector copy since we want to clone unassigned vars
+	for (std::size_t cell_index = 0; cell_index < ncells; ++cell_index)
+//		data_[cell_index] = sourcedim.data_[cell_index].clone();
+		data_.emplace_back(sourcedim.data_[cell_index].clone());
 
-	// Use vector size in case some algorithm has adjusted it
-	//std::size_t ncells = nrows_ * ncols_ + 1;
-	std::size_t ncells = data_.size();
+	ncols_ = sourcedim.ncols_;
 
-	//for (/*unsigned*/ int cell_index = 0; cell_index < ncells; ++cell_index)
-	for (std::size_t cell_index = 1; cell_index < ncells; ++cell_index)
-		data_[cell_index] = sourcedim.data_[cell_index].clone();
-		//data_[cell_index] = sourcedim.data_[cell_index];
 	return;
 }
 
@@ -144,18 +135,20 @@ void dim::operator=(const double sourcedbl) {
 }
 
 var dim::rows() const {
-	if (!this->ncols_)
-		UNLIKELY
+
+	if (!this->ncols_) UNLIKELY
 		throw DimUndimensioned("");
-	EXO_DIM_RECALC_NROWS(*this)
-	var nrows = (data_.size() - 1 ) / ncols_;
+
+	var nrows = data_.size() / ncols_;
+
 	return nrows;
 }
 
 var dim::cols() const {
-	if (!this->ncols_)
-		UNLIKELY
+
+	if (!this->ncols_) UNLIKELY
 		throw DimUndimensioned("");
+
 	return ncols_;
 }
 
@@ -169,7 +162,7 @@ void dim::redim(/*unsigned*/ int rows, /*unsigned*/ int cols) {
 
 	// how exception safe is this?
 	try {
-		int new_size = rows * cols + 1;
+		int new_size = rows * cols;
 		data_.resize(new_size);
 		//std::cout<< "created[] " << newdata << std::endl;
 	}
@@ -190,68 +183,47 @@ VARREF dim::getelementref(/*unsigned*/ int rowno, /*unsigned*/ int colno) {
 	// TODO deduplicate code by calling the const function a la Scott Myers Effective C++
 	//return const_cast<int&>(const_cast<const Foo*>(this)->get());
 	return const_cast<var&>(const_cast<const dim*>(this)->getelementref(rowno, colno));
-/*
-	EXO_DIM_RECALC_NROWS(*this)
-
-	// check bounds
-	if (rowno > nrows_)
-		UNLIKELY
-		throw DimIndexOutOfBounds("row:" ^ var(rowno) ^ " > " ^ var(nrows_));
-	if (colno > ncols_)
-		UNLIKELY
-		throw DimIndexOutOfBounds("col:" ^ var(colno) ^ " > " ^ var(ncols_));
-
-	if (rowno == 0 || colno == 0)
-		return data_[0];
-
-	return data_[ncols_ * (rowno - 1) + colno];
-*/
 }
 
 // Keep IDENTICAL body with the function above
 CVR dim::getelementref(int rowno1, int colno1) const {
 
 	EXO_DIM_RECALC_NROWS(*this)
-    int nrows = (data_.size() - 1 ) / ncols_;
-
-	// Allow access to special zero'th element
-	if (rowno1 == 0 || colno1 == 0) {
-		return (data_)[0];
-	}
+    int nrows = data_.size() / ncols_;
 
 	int rowno = rowno1;
 	int colno = colno1;
 
-	// negative -1 -> last rown
+	// Throw error if rowno/coln not +/- nrows/ncols
+	// Negative -1 -> last rown/coln
+	// Convert negative into positive to access std::vector
+
 	if (rowno < 0)
 		rowno += nrows + 1;
 	if (rowno < 1 || rowno > nrows)
 		throw DimIndexOutOfBounds("row:" ^ var(rowno1) ^ " can be -" ^ var(nrows) ^ " to +" ^ nrows);
 
-	// negative -1 -> last coln
 	if (colno < 0)
 		colno += ncols_ + 1;
 	if (colno < 1 || colno > ncols_)
 		throw DimIndexOutOfBounds("col:" ^ var(colno1) ^ " can be -" ^ var(ncols_) ^  " to +" ^ ncols_);
 
-	// check bounds
-	//if (rowno > nrows_ || rowno < 0)
+	// Calculate index and throw error if out of range
+	// row 1 col1 -> index 0
+	int cell_index0 = ncols_ * (rowno - 1) + colno - 1;
 
-	// row 1 col1 -> index 1
-	int cell_index = ncols_ * (rowno - 1) + colno;
-
-	// Handle out of range
+	// Check bounds and throw DimIndexOutOfBounds
 	int ncells = static_cast<int>(data_.size());
-	if (cell_index >= ncells) {
-		UNLIKELY
-		throw DimIndexOutOfBounds("col:" ^ var(colno) ^ " row:" ^ var(rowno) ^ " but only " ^ var(data_.size() - 1) ^ "elements");
+	if (cell_index0 >= ncells) { UNLIKELY
+		throw DimIndexOutOfBounds("row:" ^ var(rowno) ^ " col:" ^ var(colno) ^ " not within bounds (" ^ var(nrows) ^ ", " ^ var(ncols_) ^ ")");
 	}
-	return data_[cell_index];
+
+	return data_[cell_index0];
 }
 
 dim& dim::init(in sourcevar) {
-	if (!ncols_)
-		UNLIKELY
+
+	if (!ncols_) UNLIKELY
 		throw DimUndimensioned("");
 
 	// Use vector size in case some algorithm has adjusted it
@@ -268,81 +240,83 @@ dim& dim::init(in sourcevar) {
 
 var dim::join(SV delimiter) const {
 
-	if (!ncols_)
-		UNLIKELY
+	THISIS("var dim::join(SV delimiter) const");
+
+	if (!ncols_) UNLIKELY
 		throw DimUndimensioned("");
 
 	// Use vector size in case some algorithm has adjusted it
 	//std::size_t data_size = nrows_ * ncols_;
-	auto data_size = data_.size();
+//	auto data_size = data_.size();
 	auto delimiter_size = delimiter.size();
 
-	if (data_size < 2)
-		return "";
-
-	// find the last assigned element
-	// and total output string size to we can reserve string size
-	// and convert all elements to string
-//	for (nelements = data_size; nelements > 0; --nelements) {
-//		//if (data_[nelements].assigned() && data_[nelements].len())
-//		if (data_[nelements].assigned())
+//	std::size_t max_element_index;
+//	for (max_element_index = 0; max_element_index < data_size; ++max_element_index) {
+//		const var& data_element = data_[max_element_index];
+//		// Stop at first
+//		if (!data_element.assigned()) {
 //			break;
+//		}
+//		nchars_joined += data_element.var_str.size() + delimiter_size;
 //	}
+
+	// Predict total string length, stopping at first unassigned element (var)
+	// Also ensures var_str is available
 	std::size_t nchars_joined = 0;
-	std::size_t nelements;
-	for (nelements = 1; nelements < data_size; ++nelements) {
-		//if (data_[nelements].assigned() && data_[nelements].len())
-		const var& data_element = data_[nelements];
-		if (!data_element.assigned()) {
-			break;
-		}
-		nchars_joined += data_element.var_str.size() + delimiter_size;
+//	auto iter1 = this->begin();
+//	auto iend = this->end();
+	const var* iter0 = &data_[0];
+	const var* iter1 = iter0;
+	const var* iend = iter0 + data_.size();
+	// Stop at first unassigned element (var)
+	for (;iter1 != iend && iter1->assigned(); ++iter1) {
+		nchars_joined += std::size_t(iter1->len());
+		nchars_joined += delimiter_size;
 	}
-	--nelements;
-	// The additional trailing delimiter_size can be left in the total
-	// to allow for trailing char(0)
-	//TRACE(nelements)
-	//TRACE(nchars_joined)
 
-	// join always starts from element[1] and ignores element[0]
-
-	// get the first element at least to ensure
-	// at least first element is assigned - even if it is an empty string
-	var output = "";
-
-	// if no elements
-	if (!nelements)
-		return output;
+	// Join with zero rows is OK but first row at least must be assigned
+	if (not nchars_joined and data_.size()) {
+		if (not data_[0].assigned())
+			throw VarUnassigned(function_sig);
+	}
 
 	// Reserve the total number of characters required. Avoid resizing/mallocs
-	output.var_str.reserve(nchars_joined);
-
-	// Ensure converted to a string by using concatenate operator
-	output ^= data_[1];
+	var nrvo = "";
+	nrvo.var_str.reserve(nchars_joined);
 
 	// When delimiter is one byte (usual case), use push_back for speed
 	if (delimiter_size == 1) {
-
 		LIKELY;
 
 		char sepchar = delimiter[0];
 
 		// Append any additional elements. Single byte delimiter
-		for (std::size_t elementn = 2; elementn <= nelements; ++elementn) {
-			output.var_str.push_back(sepchar);
-			output ^= data_[elementn];
+//		for (auto iter2 = this->begin(); iter2 != iter1; ++iter2 ) {
+		for (auto iter2 = iter0; iter2 != iter1; ++iter2 ) {
+			nrvo.var_str += iter2->var_str;
+			nrvo.var_str.push_back(sepchar);
 		}
+
+		// Remove one trailing sepchar
+		if (!nrvo.var_str.empty())
+			nrvo.var_str.pop_back();;
 
 	} else {
 
 		// Append any additional elements. Multibyte delimiter
-		for (std::size_t elementn = 2; elementn <= nelements; ++elementn) {
-			output.var_str += delimiter;
-			output ^= data_[elementn];
+//		for (auto iter2 = this->begin(); iter2 != iter1; ++iter2 ) {
+		for (auto iter2 = iter0; iter2 != iter1; ++iter2 ) {
+			nrvo.var_str += iter2->var_str;
+			nrvo.var_str += delimiter;
 		}
+
+		// Remove one trailing delimiter
+		if (!nrvo.var_str.empty())
+			nrvo.var_str.erase(nrvo.var_str.size() - delimiter_size);
+
 	}
 
-	return output;
+	return nrvo;
 }
 
 // dim=var.split()
@@ -371,7 +345,9 @@ dim& dim::splitter(in str1, SV delimiter) {
 	// maybe dimension to the size of the string
 	// do NOT redimension always since pick matread/matparse do not
 	// and we may get VNA accessing array elements if too few.
-	if (!this->ncols_ || this->ncols_ != 1)
+	// Always return at least 1 element even if input is ""
+	if (!this->ncols_)
+//		this->redim(str1.fcount(delimiter));
 		this->redim(str1.count(delimiter) + 1);
 
 	// empty string just fills array with empty string
@@ -380,16 +356,14 @@ dim& dim::splitter(in str1, SV delimiter) {
 		return *this;
 	}
 
-	// split always fills starting from element[1] and ignores element[0]
-
 	// start at the beginning and look for delimiter delimiters
 	std::size_t start_pos = 0;
 	std::size_t next_pos = 0;
 	std::size_t sepsize = delimiter.size();
 	//std::size_t fieldno;
 	int fieldno;
-	int nrows = static_cast<int>(data_.size() - 1) / ncols_;
-	for (fieldno = 1; fieldno <= nrows; fieldno++) {
+	int nrows = static_cast<int>(data_.size()) / ncols_;
+	for (fieldno = 0; fieldno < nrows; fieldno++) {
 
 		// find the next delimiter delimiter
 		next_pos = str1.var_str.find(delimiter, start_pos);
@@ -414,13 +388,13 @@ dim& dim::splitter(in str1, SV delimiter) {
 
 		// stuff any excess fields into the last element
 		//this->data_[this->nrows_] ^= delimiter;
-		this->data_[nrows].var_str.append(delimiter).append(str1.var_str.substr(start_pos));
+		this->data_[nrows - 1].var_str.append(delimiter).append(str1.var_str.substr(start_pos));
 
 	} else {
 
 		// fill any remaining array elements with empty string
 		++fieldno;
-		for (; fieldno <= (nrows); ++fieldno)
+		for (; fieldno < nrows; ++fieldno)
 			this->data_[fieldno] = "";
 	}
 
@@ -438,6 +412,7 @@ dim& dim::sorter(bool reverseorder) {
 	//std::cout<<nfields<<std::endl;
 	//std::cout<<data_[0]<<std::endl;
 	//std::sort(std::begin(data_), std::end(data_), reverseorder ? std::greater<var>{} : std::less<var>{});
+TRACE(data_.size())
 	if (!reverseorder)
 		//std::sort(std::begin(data_), std::end(data_));
 		//std::sort(this->begin(), this->end());
@@ -459,7 +434,6 @@ dim& dim::reverser() {
 
 dim& dim::shuffler() {
 
-	// We must use dim's custom begin to skip element zero
 	//std::random_device rd;
 	//std::mt19937 g(rd());
 	// Create a base generator per thread on the heap. Will be destroyed on thread termination.
@@ -483,7 +457,7 @@ bool dim::read(in filevar, in key) {
 	// Dont use following because it redimensions the array to the actual number of fields found
 	//(*this)=temprecord.split();
 
-	// dim::splitter does not adjust the length of the array
+	// dim::splitter does not adjust the length of the array if it has already been dimensioned.
 	// If the record has fewer fields than the size of the array then the rest of the array is set to ""
 	// If the record has more fields than the size of the array then they are crammed in the last element
 	// Allowing usage like record(30) even though there were not 30 fields in the specific record
@@ -520,18 +494,16 @@ bool dim::osread(in osfilename, const char* codepage) {
 
 	std::string linesep = "\n";
 
-	// Detect linesep \n or \r\n
+	// Detect \r\n from first \n
 	auto first_nl = txt.var_str.find('\n');
 	if (first_nl != std::string::npos && first_nl > 0 && txt.var_str[first_nl - 1] == '\r')
 		linesep = "\r\n";
 
-	//TRACE(txt.replace("\n", "|"))
 	*this = txt.split(linesep);
-	//TRACE(nrows_)
 
 	// Save the linesep in the unused element[0]
 	// Will be used for oswrite
-	data_[0] = linesep;
+//	data_[0] = linesep;
 
 	return true;
 }
@@ -544,9 +516,9 @@ bool dim::oswrite(in osfilename, const char* codepage) const {
 
 	//static char linesep = '\n';
 	std::string linesep;
-	if (data_[0].assigned() && data_[0].var_typ & VARTYP_STR)
-		linesep = data_[0].var_str;
-	else
+//	if (data_[0].assigned() && data_[0].var_typ & VARTYP_STR)
+//		linesep = data_[0].var_str;
+//	else
 		linesep = "\n";
 
 	var txt = this->join(linesep);
@@ -596,15 +568,11 @@ IO   var::reverser(SV delimiter) REF {
 	return THIS;
 }
 
-//reversing var - using temporary dim
+//reversing var - not using dim
 var  var::reverse(SV delimiter) const& {
 
 	THISIS("var  var::reverse(SV delimiter)")
 	assertString(function_sig);
-
-	//split into a temporary dim array for reversing
-	//then join it back up into a single string
-	//var nrvo = this->split(delimiter).reverse().join(delimiter);
 
 	const auto delimitersize = delimiter.size();
 
@@ -706,20 +674,16 @@ IO   var::shuffler(SV delimiter) REF {
 // No speed or memory advantage since not shuffling in place
 // but provided for syntactical convenience avoiding need to assign output of shuffle()
 var  var::shuffle(SV delimiter) const& {
-//	return this->split(delimiter).shuffler().join(delimiter);
 	auto _ = this->split(delimiter);
 	_.shuffler();
 	return _.join(delimiter);
 }
 
-dim_iter dim::begin() {
-	// + 1 to skip over zero'th element since dim access uses 1 based indexing
-//	return &(data_[0]) + 1;
-	return ++data_.begin();
+ND dim_iter dim::begin() {
+	return data_.begin();
 }
 
-dim_iter dim::end() {
-//	return &(data_[0])+data_.size();
+ND dim_iter dim::end() {
 	return data_.end();
 }
 

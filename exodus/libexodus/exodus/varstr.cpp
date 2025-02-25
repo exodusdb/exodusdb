@@ -1398,6 +1398,7 @@ IO   var::cutter(const int length) REF {
 
 			// Example "ab".cutter(-1) return "a"
 			var_str.erase(var_str.length() - nbytes_to_trim);
+//			var_str.resize(var_str.length() - nbytes_to_trim);
 		}
 	}
 

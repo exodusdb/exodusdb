@@ -47,6 +47,7 @@ function main() {
 		assert(d0.join() eq "");
 
 		d0.redim(2, 2);
+		try {assert(d0.join() == "");assert(false);} catch(VarUnassigned e) {};
 		d0 = "x";
 		assert(d0.join().outputl() eq "x^x^x^x"_var);
 
@@ -159,10 +160,24 @@ function main() {
 		assert(d2.at(6, 1) eq 6);
 
 		const dim d3 = {1, 2, 3, 4, 5, 6};
+		assert(d3.at(1, 1) eq d3[1]);
+		assert(d3.at(2, 1) eq d3[2]);
+		assert(d3.at(3, 1) eq d3[3]);
+		assert(d3.at(4, 1) eq d3[4]);
+		assert(d3.at(5, 1) eq d3[5]);
+		assert(d3.at(6, 1) eq d3[6]);
+
+		assert(d2.at(1, 1) eq 1);
+		assert(d2.at(2, 1) eq 2);
+		assert(d2.at(3, 1) eq 3);
+		assert(d2.at(4, 1) eq 4);
+		assert(d2.at(5, 1) eq 5);
 		assert(d2.at(6, 1) eq 6);
 
-		d1.at(0, 0) = "qwe";
-		assert(d1.at(0, 0) eq "qwe");
+		// Disallowed0
+		try{d1.at(0, 0) = "qwe";assert(false);} catch (DimIndexOutOfBounds e) {};
+		try{assert(d1.at(0, 0) == "qwe");assert(false);} catch (DimIndexOutOfBounds e) {};
+//		assert(d1.at(0, 0) eq "qwe");
 
 		//const dim d4 = {{1,2},{3,4},{5,6}};
 		//assert(d2.at(6,1) eq 6);
@@ -278,7 +293,7 @@ function main() {
 	assert(a11[1]  eq 1);
 	assert(a11[10] eq 1);
 	a11 = split("");	//fill all with "" TODO should this not just make an array of 1 element?
-	assert(a11.rows() eq 1);
+	assert(a11.rows().outputl() eq 1);
 //	assert(a11(1)  eq "");
 //	assert(a11(10) eq "");
 
@@ -408,14 +423,18 @@ function main() {
 		for (int jj = 1; jj le 5; ++jj) {
 			a8.at(ii, jj).outputt("=");
 		}
-		//		printl();
 	}
+	printl();
 
 	a8 = a7;
 
+	// Check all copied correctly
 	for (int ii = 1; ii le 2; ++ii) {
+		TRACE(ii)
 		for (int jj = 1; jj le 3; ++jj) {
-			a8.at(ii, jj).outputt("=");
+			TRACE(jj)
+			TRACE(a8.at(ii, jj))
+			TRACE(a7.at(ii, jj))
 			assert(a8.at(ii, jj) eq a7.at(ii, jj));
 			//		printl();
 		}
@@ -440,22 +459,26 @@ function main() {
 	//mv dimensioned arrays have a zero element that is
 	//used in case either or both of the indexes are zero
 	dim arr1(3), arr2(3, 3);
-	arr1[0]	   = 0;
-	arr1.at(0, 0) = 0;
-	for (int ii = 1; ii le 3; ++ii) {
-		arr1[ii] = ii;
-		for (int jj = 1; jj le 3; ++jj) {
-			arr2.at(ii, jj) = ii * 3 + jj;
+	try {
+		arr1[0]	   = 0;
+		assert(false);
+		arr1.at(0, 0) = 0;
+		for (int ii = 1; ii le 3; ++ii) {
+			arr1[ii] = ii;
+			for (int jj = 1; jj le 3; ++jj) {
+				arr2.at(ii, jj) = ii * 3 + jj;
+			}
+		}
+		assert(arr1[0]        eq "0");
+		assert(arr1.at(0, 0)     eq "0");
+		for (int ii = 1; ii le 3; ++ii) {
+			assert(arr1[ii]      eq ii);
+			for (int jj = 1; jj le 3; ++jj) {
+				assert(arr2.at(ii, jj) eq ii * 3 + jj);
+			}
 		}
 	}
-	assert(arr1[0]        eq "0");
-	assert(arr1.at(0, 0)     eq "0");
-	for (int ii = 1; ii le 3; ++ii) {
-		assert(arr1[ii]      eq ii);
-		for (int jj = 1; jj le 3; ++jj) {
-			assert(arr2.at(ii, jj) eq ii * 3 + jj);
-		}
-	}
+	catch(DimIndexOutOfBounds e) {};
 
 	/* 
 	//using c arrays UNSAFE! USE exodus dim INSTEAD;
@@ -502,7 +525,10 @@ function main() {
 		var tfilename = ostempfilename();
 		var tx = "\n\nA\n\nB\n\n";
 		assert(tx.split("\n").oswrite(tfilename));
-		assert(osfile(tfilename).f(1) eq 8);
+		var info = osfile(tfilename);
+		TRACE(tfilename)
+		TRACE(info)
+		assert(info.f(1) eq 8);
 
 		// Check dim.osread preserves line endings
 		dim d;
@@ -545,49 +571,45 @@ function main() {
 		//assert((d1.join("\n") ^ "\n") eq txt);
 		assert(d1.join("\n") eq txt);
 
-		printl("Make a wintext file");
-		var temposfilename = ostempfilename().outputl();
-		var wintext1 =
-			"aaa\r\n"
-			"bbb\r\n"
-			"ccc\r\n"
-			"ddd\r\n"
-			"eee"
-			"\r\n";
-		assert(oswrite(wintext1 on temposfilename));
+//		var temposfilename = ostempfilename().outputl();
+//		printl("Make a wintext file");
+//		var wintext1 =
+//			"aaa\r\n"
+//			"bbb\r\n"
+//			"ccc\r\n"
+//			"ddd\r\n"
+//			"eee"
+//			"\r\n";
+//		assert(oswrite(wintext1 on temposfilename));
+//
+//		printl("read wintext1 into dim array");
+//		dim d2;
+//		assert(d2.osread(temposfilename));
+//		TRACE(d2.join())
+//
+//		printl("verify dimmary array element (5) is eee");
+//		assert(d2[5] eq "eee");
+//
+//		printl("Check round trip");
+//		assert(d2.join("\r\n") eq wintext1);
+//
+//		printl("Check writing dim array to wintext file");
+//		var temposfilename2 = ostempfilename().outputl();
+//		assert(d2.oswrite(temposfilename2));
+//
+//		printl("Check round trip");
+//		var wintext2;
+//		assert(osread(wintext2 from temposfilename2));
+//		TRACE(wintext1)
+//		TRACE(wintext2)
+//		TRACE(wintext1.oconv("HEX"))
+//		TRACE(wintext2.oconv("HEX"))
+//		assert(wintext2 eq wintext1);
 
-		printl("read wintext1 into dim array");
-		dim d2;
-		assert(d2.osread(temposfilename));
-		TRACE(d2.join())
-
-		printl("verify dimmary array element (5) is eee");
-		assert(d2[5] eq "eee");
-
-		printl("Verify line ending \r\n has been remembered in array element 0");
-		TRACE(d2[0].oconv("HEX"))
-		assert(d2[0] eq "\r\n");
-
-		printl("Check round trip");
-		assert(d2.join("\r\n") eq wintext1);
-
-		printl("Check writing dim array to wintext file");
-		var temposfilename2 = ostempfilename().outputl();
-		assert(d2.oswrite(temposfilename2));
-
-		printl("Check round trip");
-		var wintext2;
-		assert(osread(wintext2 from temposfilename2));
-		TRACE(wintext1)
-		TRACE(wintext2)
-		TRACE(wintext1.oconv("HEX"))
-		TRACE(wintext2.oconv("HEX"))
-		assert(wintext2 eq wintext1);
-
-		// Check cannot read a non-existent osfile
-		assert(osremove(temposfilename));
-		assert(osremove(temposfilename2));
-		assert(not d1.osread(temposfilename));
+//		// Check cannot read a non-existent osfile
+//		assert(osremove(temposfilename));
+//		assert(osremove(temposfilename2));
+//		assert(not d1.osread(temposfilename));
 
 		//assert(osremove(osfilename));
 	}
@@ -877,21 +899,21 @@ function main() {
 				assert((d[0,1] == ""));
 				assert(false);
 			}
-			catch (VarUnassigned e) {};
+			catch (DimIndexOutOfBounds e) {};
 
 			// Col 0?
 			try {
 				assert((d[1,0] == ""));
 				assert(false);
 			}
-			catch (VarUnassigned e) {};
+			catch (DimIndexOutOfBounds e) {};
 
 			// both 0?
 			try {
 				assert((d[0,0] == ""));
 				assert(false);
 			}
-			catch (VarUnassigned e) {};
+			catch (DimIndexOutOfBounds e) {};
 
 		}
 
@@ -927,7 +949,7 @@ function main() {
 			assert((d[0] == ""));
 			assert(false);
 		}
-		catch (VarUnassigned e) {};
+		catch (DimIndexOutOfBounds e) {};
 
 	}
 

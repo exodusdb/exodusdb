@@ -3314,6 +3314,263 @@ public:
 
 };
 
+////#include <vector>
+////#include <iterator>
+//
+//class dim_iter {
+//private:
+//    std::vector<var>::iterator ptr_;
+//
+//public:
+//    using iterator_category = std::random_access_iterator_tag;
+//    using value_type        = var;
+//    using reference         = var&;
+//    using pointer           = var*;
+//    using difference_type   = std::ptrdiff_t; // Signed type for differences
+//
+//    // Default constructor (required for iterator_traits)
+//    dim_iter() : ptr_() {}
+//
+//    // Constructor from vector iterator
+//    dim_iter(std::vector<var>::iterator iter) : ptr_(iter) {}
+//
+//    // Copy constructor (good practice)
+//    dim_iter(const dim_iter& other) : ptr_(other.ptr_) {}
+//
+//    // Dereference: mutable and const versions
+//    var& operator*() {
+//        return *ptr_;
+//    }
+//    const var& operator*() const {
+//        return *ptr_;
+//    }
+//
+//    // Arrow operator: mutable and const versions (returns pointer, not iterator)
+//    var* operator->() {
+//        return &(*ptr_);
+//    }
+//    const var* operator->() const {
+//        return &(*ptr_);
+//    }
+//
+//    // Pre-increment
+//    dim_iter& operator++() {
+//        ++ptr_;
+//        return *this;
+//    }
+//
+//    // Post-increment
+//    dim_iter operator++(int) {
+//        dim_iter tmp(*this);
+//        ++ptr_;
+//        return tmp;
+//    }
+//
+//    // Pre-decrement
+//    dim_iter& operator--() {
+//        --ptr_;
+//        return *this;
+//    }
+//
+//    // Post-decrement
+//    dim_iter operator--(int) {
+//        dim_iter tmp(*this);
+//        --ptr_;
+//        return tmp;
+//    }
+//
+//    // Equality comparison
+//    bool operator==(const dim_iter& rhs) const {
+//        return ptr_ == rhs.ptr_;
+//    }
+//
+//    // Inequality comparison
+//    bool operator!=(const dim_iter& rhs) const {
+//        return !(*this == rhs);
+//    }
+//
+//    // Subscript: mutable and const versions
+//    var& operator[](difference_type n) {
+//        return ptr_[n];
+//    }
+//    const var& operator[](difference_type n) const {
+//        return ptr_[n];
+//    }
+//
+//    // In-place addition
+//    dim_iter& operator+=(difference_type n) {
+//        ptr_ += n;
+//        return *this;
+//    }
+//
+//    // Addition
+//    dim_iter operator+(difference_type n) const {
+//        dim_iter tmp(*this);
+//        tmp += n;
+//        return tmp;
+//    }
+//
+//    // In-place subtraction
+//    dim_iter& operator-=(difference_type n) {
+//        ptr_ -= n;
+//        return *this;
+//    }
+//
+//    // Subtraction
+//    dim_iter operator-(difference_type n) const {
+//        dim_iter tmp(*this);
+//        tmp -= n;
+//        return tmp;
+//    }
+//
+//    // Difference between iterators
+//    difference_type operator-(const dim_iter& rhs) const {
+//        return ptr_ - rhs.ptr_;
+//    }
+//
+//    // Less than
+//    bool operator<(const dim_iter& rhs) const {
+//        return ptr_ < rhs.ptr_;
+//    }
+//
+//    // Greater than
+//    bool operator>(const dim_iter& rhs) const {
+//        return ptr_ > rhs.ptr_;
+//    }
+//
+//    // Less than or equal
+//    bool operator<=(const dim_iter& rhs) const {
+//        return ptr_ <= rhs.ptr_;
+//    }
+//
+//    // Greater than or equal
+//    bool operator>=(const dim_iter& rhs) const {
+//        return ptr_ >= rhs.ptr_;
+//    }
+//};
+//
+// Optional: Free function for symmetry (e.g., n + iter)
+//inline dim_iter operator+(std::ptrdiff_t n, const dim_iter& it) {
+//    return it + n;
+//}
+
+
+//
+////#include <vector>
+////#include <iterator>
+//
+//class dim_const_iter; // Forward declaration for friendship
+//
+//class dim_iter {
+//private:
+//    std::vector<var>::iterator ptr_;
+//
+//    // Grant dim_const_iter access to ptr_
+//    friend class dim_const_iter;
+//
+//public:
+//    using iterator_category = std::random_access_iterator_tag;
+//    using value_type        = var;
+//    using reference         = var&;
+//    using pointer           = var*;
+//    using difference_type   = std::ptrdiff_t;
+//
+//    dim_iter() : ptr_() {}
+//    dim_iter(std::vector<var>::iterator iter) : ptr_(iter) {}
+//    dim_iter(const dim_iter& other) : ptr_(other.ptr_) {}
+//
+//    var& operator*() { return *ptr_; }
+//    const var& operator*() const { return *ptr_; }
+//
+//    var* operator->() { return &(*ptr_); }
+//    const var* operator->() const { return &(*ptr_); }
+//
+//    dim_iter& operator++() { ++ptr_; return *this; }
+//    dim_iter operator++(int) { dim_iter tmp(*this); ++ptr_; return tmp; }
+//
+//    dim_iter& operator--() { --ptr_; return *this; }
+//    dim_iter operator--(int) { dim_iter tmp(*this); --ptr_; return tmp; }
+//
+//    bool operator==(const dim_iter& rhs) const { return ptr_ == rhs.ptr_; }
+//    bool operator!=(const dim_iter& rhs) const { return !(*this == rhs); }
+//
+//    var& operator[](difference_type n) { return ptr_[n]; }
+//    const var& operator[](difference_type n) const { return ptr_[n]; }
+//
+//    dim_iter& operator+=(difference_type n) { ptr_ += n; return *this; }
+//    dim_iter operator+(difference_type n) const { dim_iter tmp(*this); tmp += n; return tmp; }
+//
+//    dim_iter& operator-=(difference_type n) { ptr_ -= n; return *this; }
+//    dim_iter operator-(difference_type n) const { dim_iter tmp(*this); tmp -= n; return tmp; }
+//
+//    difference_type operator-(const dim_iter& rhs) const { return ptr_ - rhs.ptr_; }
+//
+//    bool operator<(const dim_iter& rhs) const { return ptr_ < rhs.ptr_; }
+//    bool operator>(const dim_iter& rhs) const { return ptr_ > rhs.ptr_; }
+//    bool operator<=(const dim_iter& rhs) const { return ptr_ <= rhs.ptr_; }
+//    bool operator>=(const dim_iter& rhs) const { return ptr_ >= rhs.ptr_; }
+//};
+//
+//inline dim_iter operator+(std::ptrdiff_t n, const dim_iter& it) {
+//    return it + n;
+//}
+//
+//
+//
+//#include <vector>
+//#include <iterator>
+//
+//class dim_const_iter {
+//private:
+//    std::vector<var>::const_iterator ptr_;
+//
+//public:
+//    using iterator_category = std::random_access_iterator_tag;
+//    using value_type        = var;
+//    using reference         = const var&;
+//    using pointer           = const var*;
+//    using difference_type   = std::ptrdiff_t;
+//
+//    dim_const_iter() : ptr_() {}
+//    dim_const_iter(std::vector<var>::const_iterator iter) : ptr_(iter) {}
+//    dim_const_iter(const dim_const_iter& other) : ptr_(other.ptr_) {}
+//    // Conversion from dim_iter to dim_const_iter, now works with friendship
+//    dim_const_iter(const dim_iter& other) : ptr_(other.ptr_) {}
+//
+//    const var& operator*() const { return *ptr_; }
+//    const var* operator->() const { return &(*ptr_); }
+//
+//    dim_const_iter& operator++() { ++ptr_; return *this; }
+//    dim_const_iter operator++(int) { dim_const_iter tmp(*this); ++ptr_; return tmp; }
+//
+//    dim_const_iter& operator--() { --ptr_; return *this; }
+//    dim_const_iter operator--(int) { dim_const_iter tmp(*this); --ptr_; return tmp; }
+//
+//    bool operator==(const dim_const_iter& rhs) const { return ptr_ == rhs.ptr_; }
+//    bool operator!=(const dim_const_iter& rhs) const { return !(*this == rhs); }
+//
+//    const var& operator[](difference_type n) const { return ptr_[n]; }
+//
+//    dim_const_iter& operator+=(difference_type n) { ptr_ += n; return *this; }
+//    dim_const_iter operator+(difference_type n) const { dim_const_iter tmp(*this); tmp += n; return tmp; }
+//
+//    dim_const_iter& operator-=(difference_type n) { ptr_ -= n; return *this; }
+//    dim_const_iter operator-(difference_type n) const { dim_const_iter tmp(*this); tmp -= n; return tmp; }
+//
+//    difference_type operator-(const dim_const_iter& rhs) const { return ptr_ - rhs.ptr_; }
+//
+//    bool operator<(const dim_const_iter& rhs) const { return ptr_ < rhs.ptr_; }
+//    bool operator>(const dim_const_iter& rhs) const { return ptr_ > rhs.ptr_; }
+//    bool operator<=(const dim_const_iter& rhs) const { return ptr_ <= rhs.ptr_; }
+//    bool operator>=(const dim_const_iter& rhs) const { return ptr_ >= rhs.ptr_; }
+//};
+//
+//inline dim_const_iter operator+(std::ptrdiff_t n, const dim_const_iter& it) {
+//    return it + n;
+//}
+//
+
+
 ///////////////////////////////////////////////////////
 // var_proxy1 - replace or extract fields by fn, vn, sv
 ///////////////////////////////////////////////////////

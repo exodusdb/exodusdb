@@ -41,17 +41,17 @@ function main() {
 		var n	   = 10;
 		dim d1(n);
 		d1	  = 0;
-		d1[0] = 0;
 
 		for (auto i [[maybe_unused]] : range(1, ntests)) {
 			var r1 = rnd(n);
 			//printx(r1,"");
-			d1[r1] += 1;
+			if (r1)
+				d1[r1] += 1;
 		}
 		printl();
 
 		printl("Check each output frequency is between 99% and 101% of the average expected frequency\nShould really do a Chi test");
-		for (auto i : range(0, n - 1)) {
+		for (auto i : range(1, n - 1)) {
 			printt(i, d1[i], "\n");
 			assert(d1[i] gt ntests / n * 0.98);
 			assert(d1[i] lt ntests / n * 1.02);
@@ -65,18 +65,19 @@ function main() {
 		var n	   = 10;
 		dim d1(n);
 		d1	  = 0;
-		d1[0] = 0;
+//		d1[0] = 0;
 
 		for (auto i [[maybe_unused]] : range(1, ntests)) {
 			//var r1 = rnd(n);
 			var r1 = -rnd(-n);
 			//printx(r1,"");
-			d1[r1] += 1;
+			if (r1)
+				d1[r1] += 1;
 		}
 		printl();
 
 		printl("Check each output frequency is between 99% and 101% of the average expected frequency\nShould really do a Chi test");
-		for (auto i : range(0, n - 1)) {
+		for (auto i : range(1, n - 1)) {
 			printt(i, d1[i], "\n");
 			assert(d1[i] gt ntests / n * 0.98);
 			assert(d1[i] lt ntests / n * 1.02);

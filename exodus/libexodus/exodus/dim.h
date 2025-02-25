@@ -144,7 +144,7 @@ friend class dim_iter;
 		// Allow arbitrary copying of element zero without throwing variable not assigned
 		//data_[0].var_typ = VARTYP_STR;
 
-		std::size_t itemno = 1;
+		std::size_t itemno = 0;
 		for (auto item : list) {
 			data_[itemno++] = item;
 		}
@@ -169,6 +169,21 @@ friend class dim_iter;
 
 	ND dim_iter begin();
 	ND dim_iter end();
+//
+//	ND const dim_iter begin() const;
+//	ND const dim_iter end() const;
+
+//    // Mutable iterators
+//    dim_iter begin() { return dim_iter(data_.begin()); }
+//    dim_iter end() { return dim_iter(data_.end()); }
+//
+//    // Const iterators
+//    dim_const_iter begin() const { return dim_const_iter(data_.begin()); }
+//    dim_const_iter end() const { return dim_const_iter(data_.end()); }
+//
+//    // Explicit const iterators (cbegin/cend)
+//    dim_const_iter cbegin() const { return dim_const_iter(data_.begin()); }
+//    dim_const_iter cend() const { return dim_const_iter(data_.end()); }
 
 	// brackets operators often come in pairs
 	// returns a reference to one var of the array
@@ -310,7 +325,7 @@ friend class dim_iter;
 	ND bool read(in dbfile, in key);
 
 	// Creates an entire os text file from an array
-	// Each element of the array becomes one line in the os file delimited by \n (or \r\n if the array was originally osread with \r\n delimiter)
+	// Each element of the array becomes one line in the os file delimited by \n
 	// Any existing os file is overwritten and replaced.
 	// codepage: Optional: Data is converted from UTF8 to the required codepage/encoding before output. If the conversion cannot be performed then return false.
 	// Returns: True if successful or false if not.
