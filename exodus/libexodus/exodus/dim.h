@@ -122,6 +122,7 @@ friend class dim_iter;
 
 	// Resize an array to a different number of rows and columns.
 	// Existing data will be retained as far as possible. Any additional elements are unassigned.
+	// Resizing rows to 0 clears all data. Resizing cols to 0 clears all data and changes its status to "undimensioned".
 	// obj is d1
 	void redim(const int nrows, const int ncols = 1);
 
