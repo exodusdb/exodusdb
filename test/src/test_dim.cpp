@@ -36,8 +36,14 @@ function main() {
 	//dim array
 
 	{
-		// Empty array is allowed
-		dim d0(0, 0);
+		// Empty array with no rows is allowed. (Defaults to one column)
+		dim d0(0);
+		assert(d0.join() eq "");
+	}
+
+	{
+		// Empty array is allowed with zero rows but must have cols
+		dim d0(0, 1);
 		assert(d0.join() eq "");
 
 		d0.redim(2, 2);
@@ -46,7 +52,13 @@ function main() {
 
 		// Redim to empty array is allowed
 		d0.redim(0, 0);
-		assert(d0.join() eq "");
+
+		// It can no longer be used
+		try {
+			assert(d0.join() eq "");
+			assert(false);
+		}
+		catch (DimUndimensioned e) {};
 	}
 	{
 		// wll not compile since assignment function returns void
@@ -80,11 +92,11 @@ function main() {
 		dim d3(0, 1);
 		dim d4(0, 2);
 		d1 = "x";
-		d2 = "x";
+		//d2 = "x";
 		d3 = "x";
 		d4 = "x";
 		assert(join(d1)          eq "");
-		assert(join(d2)          eq "");
+//		assert(join(d2)          eq "");
 		assert(join(d3)          eq "");
 		assert(join(d4)          eq "");
 	}
@@ -93,14 +105,16 @@ function main() {
 		dim d2(0, 0);
 		dim d3(1, 0);
 		dim d4(2, 0);
+
 		d1 = "x";
-		d2 = "x";
-		d3 = "x";
-		d4 = "x";
-		assert(join(d1)          eq "");
-		assert(join(d2)          eq "");
-		assert(join(d3)          eq "");
-		assert(join(d4)          eq "");
+		try{d2 = "x";assert(false);} catch (DimUndimensioned e) {};
+		try{d3 = "x";assert(false);} catch (DimUndimensioned e) {};
+		try{d4 = "x";assert(false);} catch (DimUndimensioned e) {};
+
+		assert(join(d1) == "");
+		try{join(d2) = "x";assert(false);} catch (DimUndimensioned e) {};
+		try{join(d3) = "x";assert(false);} catch (DimUndimensioned e) {};
+		try{join(d4) = "x";assert(false);} catch (DimUndimensioned e) {};
 	}
 	{
 		//dim_iter
@@ -156,10 +170,16 @@ function main() {
 	{
 		// Cannot dim(0,0)
 		dim d1(1, 1);
-		// But can redim(0,0) to clear all data
-		d1.redim(0, 0);
-		//empty dim() join returns ""
+
+		// But can redim(0) to clear all rows (but ncols remains)
+		d1.redim(0);
 		assert(d1.join()         eq "");
+
+		// But can redim(0, 0) to clear all data
+		d1.redim(0, 0);
+
+		// but no longer use it
+		try{assert(d1.join()         eq ""); assert(false);} catch(DimUndimensioned e) {};
 	}
 	{
 		dim d1;
@@ -264,7 +284,7 @@ function main() {
 
 	{
 		dim d = {1,2,3};
-		d.redim(0, 0);
+		d.redim(0);
 		assert(d.join() eq "");
 	}
 	{
@@ -287,14 +307,14 @@ function main() {
 		try {
 			assert(d3.reverse().join(",") eq "");
 			assert(false);
-		} catch (DimNotDimensioned& e) { var(e.description).errputl();}
+		} catch (DimUndimensioned& e) { var(e.description).errputl();}
 
 		// Reverse - unassigned should be error
 		dim d4;
 		try {
 			assert(d4.reverse().join(",") eq "");
 			assert(false);
-		} catch (DimNotDimensioned& e) { var(e.description).errputl();}
+		} catch (DimUndimensioned& e) { var(e.description).errputl();}
 
 	}
 	{
@@ -750,7 +770,7 @@ function main() {
 		try {
 			var x = d1.join(",");
 			assert(false);
-		} catch (DimNotDimensioned& e) { var(e.description).errputl();}
+		} catch (DimUndimensioned& e) { var(e.description).errputl();}
 	}
 
 	{

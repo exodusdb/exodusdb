@@ -506,43 +506,43 @@ function main() {
 		try {
 			dim x;
 			var y	 = x.join();
-			throw VarError("Uncaught error DimNotDimensioned 1");
-		} catch (DimNotDimensioned& e) {
+			throw VarError("Uncaught error - DimIndexOutofBounds");
+		} catch (DimUndimensioned& e) {
 			printl(e.description);
 		}
 		try {
 			dim x;
 			dim y	 = x;
-			throw VarError("Uncaught error DimNotDimensioned 2");
-		} catch (DimNotDimensioned& e) {
+			throw VarError("Uncaught error DimUndimensioned 2");
+		} catch (DimUndimensioned& e) {
 			printl(e.description);
 		}
 		try {
 			dim x;
 			x		 = dim();
-			throw VarError("Uncaught error DimNotDimensioned 3");
-		} catch (DimNotDimensioned& e) {
+			throw VarError("Uncaught error DimUndimensioned 3");
+		} catch (DimUndimensioned& e) {
 			printl(e.description);
 		}
 		try {
 			dim x;
 			var y	 = x.cols();
-			throw VarError("Uncaught error DimNotDimensioned 4");
-		} catch (DimNotDimensioned& e) {
+			throw VarError("Uncaught error DimUndimensioned 4");
+		} catch (DimUndimensioned& e) {
 			printl(e.description);
 		}
 		try {
 			dim x;
 			var y	 = x.rows();
-			throw VarError("Uncaught error DimNotDimensioned 5");
-		} catch (DimNotDimensioned& e) {
+			throw VarError("Uncaught error DimUndimensioned 5");
+		} catch (DimUndimensioned& e) {
 			printl(e.description);
 		}
 		try {
 			dim x;
 			x		 = "q";
-			throw VarError("Uncaught error DimNotDimensioned 5");
-		} catch (DimNotDimensioned& e) {
+			throw VarError("Uncaught error DimUndimensioned 5");
+		} catch (DimUndimensioned& e) {
 			printl(e.description);
 		}
 

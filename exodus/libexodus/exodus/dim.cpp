@@ -65,9 +65,9 @@ namespace exo {
 void dim::operator=(const dim& sourcedim) &{
 	//TRACE("CP ASS")
 	// cannot copy an undimensioned array
-	if (!sourcedim.initialised_)
+	if (!sourcedim.ncols_)
 		UNLIKELY
-		throw DimNotDimensioned("");
+		throw DimUndimensioned("");
 
 	//this->redim(sourcedim.nrows_, sourcedim.ncols_);
 	EXO_DIM_RECALC_NROWS(sourcedim)
@@ -100,14 +100,13 @@ void dim::operator=(const dim& sourcedim) &{
 void dim::operator=(dim&& sourcedim) & {
 	//TRACE("MV ASS")
 	// cannot copy an undimensioned array
-	if (!sourcedim.initialised_)
+	if (!sourcedim.ncols_)
 		UNLIKELY
-		throw DimNotDimensioned("");
+		throw DimUndimensioned("");
 
-	EXO_DIM_RECALC_NROWS(sourcedim)
-	ncols_ = sourcedim.ncols_;
-	initialised_ = ncols_;
 	std::swap(data_, sourcedim.data_);
+	ncols_ = sourcedim.ncols_;
+	sourcedim.ncols_ = 0;
 
 	return;
 }
@@ -121,8 +120,6 @@ void dim::operator=(dim&& sourcedim) & {
 /////////////////////////////////////////////
 
 dim::dim(const int rows, const int cols)
-	: ncols_(cols), initialised_(true)
-// data_ <--initialized below (after the 'if/throw' statement)
 {
 	// Partially allow a kind of zero based indexing scheme to work for
 	// Unidimensional arrays except that split/join/sort omit [0]th element
@@ -147,43 +144,26 @@ void dim::operator=(const double sourcedbl) {
 }
 
 var dim::rows() const {
-	if (!this->initialised_)
+	if (!this->ncols_)
 		UNLIKELY
-		throw DimNotDimensioned("");
+		throw DimUndimensioned("");
 	EXO_DIM_RECALC_NROWS(*this)
 	var nrows = (data_.size() - 1 ) / ncols_;
 	return nrows;
 }
 
 var dim::cols() const {
-	if (!this->initialised_)
+	if (!this->ncols_)
 		UNLIKELY
-		throw DimNotDimensioned("");
+		throw DimUndimensioned("");
 	return ncols_;
 }
 
-bool dim::redim(/*unsigned*/ int rows, /*unsigned*/ int cols) {
-
-	// Allow redim(0, 0) to clear all date
-//	if (rows == 0 || cols == 0)
-//		UNLIKELY throw DimDimensionedZero();
-
-//	// do nothing if no change
-//	if (this->initialised_ && rows == nrows_ && cols == ncols_)
-//		return true;
-
-	//std::cout<<"rows:"<<rows<<" "<<nrows_<<std::endl;
-	//std::cout<<"cols:"<<cols<<" "<<ncols_<<std::endl;
-
-	//(var(initialised_)^" "^var(nrows_)^" "^var(ncols_)^" -> "^var(rows)^"
-	//"^var(cols)).outputl("redim=");
-
-//	if (initialised_ and data_[0].unassigned())
-//		// Ensure element zero will not throw unassigned during resizing/copying etc.
-//		data_[0] = "";
+void dim::redim(/*unsigned*/ int rows, /*unsigned*/ int cols) {
 
 	if (rows < 0)
 		throw DimIndexOutOfBounds("rows:" ^ var(rows));
+
 	if (cols < 0)
 		throw DimIndexOutOfBounds("cols:" ^ var(cols));
 
@@ -198,11 +178,9 @@ bool dim::redim(/*unsigned*/ int rows, /*unsigned*/ int cols) {
 		throw VarOutOfMemory("redim(" ^ var(rows) ^ ", " ^ var(cols) ^ ") " ^ e.what());
 	}
 
-	initialised_ = true;
-//	nrows_ = rows;
 	ncols_ = cols;
 
-	return true;
+	return;
 }
 
 // the same function is called regardless of being on LHS or RHS
@@ -272,9 +250,9 @@ CVR dim::getelementref(int rowno1, int colno1) const {
 }
 
 dim& dim::init(in sourcevar) {
-	if (!initialised_)
+	if (!ncols_)
 		UNLIKELY
-		throw DimNotDimensioned("");
+		throw DimUndimensioned("");
 
 	// Use vector size in case some algorithm has adjusted it
 	//std::size_t data_size = nrows_ * ncols_ + 1;
@@ -290,9 +268,9 @@ dim& dim::init(in sourcevar) {
 
 var dim::join(SV delimiter) const {
 
-	if (!initialised_)
+	if (!ncols_)
 		UNLIKELY
-		throw DimNotDimensioned("");
+		throw DimUndimensioned("");
 
 	// Use vector size in case some algorithm has adjusted it
 	//std::size_t data_size = nrows_ * ncols_;
@@ -393,7 +371,7 @@ dim& dim::splitter(in str1, SV delimiter) {
 	// maybe dimension to the size of the string
 	// do NOT redimension always since pick matread/matparse do not
 	// and we may get VNA accessing array elements if too few.
-	if (!this->initialised_ || this->ncols_ != 1)
+	if (!this->ncols_ || this->ncols_ != 1)
 		this->redim(str1.count(delimiter) + 1);
 
 	// empty string just fills array with empty string

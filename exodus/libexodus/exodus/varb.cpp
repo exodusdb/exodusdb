@@ -174,8 +174,7 @@ VarDBException     ::VarDBException     (std::string errmsg) : VarError("VarDBEx
 VarNotImplemented  ::VarNotImplemented  (std::string errmsg) : VarError("VarNotImplemented:"   + errmsg) {}
 VarDebug           ::VarDebug           (std::string errmsg) : VarError("VarDebug"             + errmsg) {}
 
-DimNotDimensioned  ::DimNotDimensioned  (std::string errmsg) : VarError("DimNotDimensioned"    + errmsg) {}
-DimDimensionedZero ::DimDimensionedZero (std::string errmsg) : VarError("DimDimensionedZero:"  + errmsg) {}
+DimUndimensioned   ::DimUndimensioned   (std::string errmsg) : VarError("DimUndimensioned"     + errmsg) {}
 DimIndexOutOfBounds::DimIndexOutOfBounds(std::string errmsg) : VarError("DimIndexOutOfBounds:" + errmsg) {}
 
 // clang-format on

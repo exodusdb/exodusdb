@@ -57,9 +57,8 @@ export namespace exo {
 	using exo::VarUnassigned;
 	using exo::VarUnconstructed;
 
-	using exo::DimDimensionedZero;
+	using exo::DimUndimensioned;
 	using exo::DimIndexOutOfBounds;
-	using exo::DimNotDimensioned;
 
 	using exo::CVR;
 	using exo::VARREF;

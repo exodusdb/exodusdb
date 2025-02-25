@@ -108,6 +108,8 @@ function main() {
 		var defined_objs = "";
 		var all_func_sigs = "";
 
+		var class_name = osfilename0.field(".", 1);
+
 		// Start a file for the documentation
 		/////////////////////////////////////
 
@@ -142,6 +144,18 @@ function main() {
 //				deprecated = true;
 //				continue;
 //			}
+
+			// class definitions
+			if (srcline.starts("class ")) {
+				srcline.replacer("PUBLIC ", "");
+				// Find class xxx : or { or final
+				let class_match = srcline.match(R"__(class\s+([a-zA-Z0-9_]+)\s*[:{f])__");
+				if (class_match) {
+					class_name = class_match.f(1, 2);
+					default_objname = class_name;
+				}
+				continue;
+			}
 
 			////////////////////////////
 			// Start a section and table
@@ -226,13 +240,20 @@ function main() {
 
 			// Suppress lines that are not comments or function declarations
 //			if (not prefix.starts("/") and not srcline.match(R"__(^[\sa-zA-Z0-9_:]+\()__"))
+//			if (not prefix.starts("/") and not srcline.match(R"__(^[\sa-zA-Z0-9_:&]+\()__"))
 			if (not prefix.starts("/") and not srcline.match(R"__(^[\sa-zA-Z0-9_:&]+\()__"))
 				prefix = "";
+
+			bool is_constructor = false;
 
 			// Include lines starting var
 			// Warning: lines like "var xxx = 123;" are NOT function declarations
 			if (prefix == "var")
 				prefix ^= "=";
+
+			else if (prefix.starts("dim(") or prefix.starts("var(")) {
+				is_constructor = true;
+			}
 
 			else if (prefix == "std::string") prefix = "var="; // i/oconv private
 
@@ -296,7 +317,9 @@ function main() {
 			// Found a function declaration
 			///////////////////////////////
 
-			srcline = srcline.field(" ", 2, 9999);
+			if (not is_constructor)
+				srcline = srcline.field(" ", 2, 9999);
+
 //			var comments = srcline.field("{", 1).field(";", 2, 9999).trimmerfirst("/ ");
 //			var comments = srcline.field("/" "/", 2, 99999).trimfirst();
 			var comments = srcline.field("/" "/", 2, 99999);
@@ -546,7 +569,50 @@ function main() {
 			// i/oconv_MD(const char* conversion) -> i/oconv("MD")
 			let func_decl0 = line2.replace(R"__(([io])conv_([A-Z]+)\([a-zA-Z0-0_*]*\))__"_rex, "$1conv\\(\"$2\"\\)");
 
-			let func_decl = (objname ?: default_objname) ^ "." ^ func_decl0;
+			// Prefix the object name
+			var func_decl;
+			if (not is_constructor) {
+				func_decl = (objname ?: default_objname) ^ "." ^ func_decl0;
+
+			} else {
+//TRACE(func_decl0)
+//TRACE: func_decl0 = "dim() = default"
+//TRACE: func_decl0 = "dim(dim& sourcedim)"
+//TRACE: func_decl0 = "dim(dim&& sourcedim)"
+//TRACE: func_decl0 = "dim(nrows, ncols = 1)"
+//TRACE: func_decl0 = "dim(std::initializer_list<T> list)"
+				// dim(xxx) -> dim d(xxx);
+				// dim() -> dim d;
+				var args = func_decl0.field("(", 2, 999999).field(")", 1);
+				var arg1 = args.field(" ", 1);
+				let class_letter = func_decl0.first(1);
+
+				// Default constructor
+				if (arg1 == "") {
+					// dim() -> dim d1;
+					func_decl = class_name ^ " " ^ func_decl0.first(1) ^ "1;";
+				}
+				// Move constructor
+				else if (arg1 == (class_name ^ "&&")) {
+					// dim(dim&&) -> dim d1 = dim();
+					func_decl = class_name ^ " " ^ class_letter ^ "1 = " ^ class_name ^ "();";
+				}
+				// Copy constructor
+				else if (arg1 == (class_name ^ "&")) {
+					// dim(dim&) -> dim d1 = d2;
+					func_decl = class_name ^ " " ^ class_letter ^ "1 = " ^ class_letter ^ "2;";
+				}
+				else if (arg1.starts("std::initializer_list")) {
+					// -> dim d1 = {"a", "b", "c", "d" ...};
+					func_decl = class_name ^ " " ^ class_letter ^ R"(1 = {"a", "b", "c" ...};)";
+				}
+				// Other constructors
+				else {
+					// dim(nrows, ncols = 1) -> "dim d1(nrows, ncols = 1);
+					func_decl = class_name ^ " " ^ class_letter ^ "1(" ^ args ^ ");";
+				}
+
+			}
 
 			if (man) {
 

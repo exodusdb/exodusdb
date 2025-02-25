@@ -1,26 +1,54 @@
 .TH dim.h
  Code examples - dim.h
 
-.SH 22. DIM CONSTRUCTION 
+.SH 22. ARRAY CONSTRUCTION 
 .SH
 
 .SS
-if (var.redim(nrows, ncols = 1)) ...
+dim d1;
 .nf
  
 .fi
-
+Create an undimensioned array.
 
 .SS
-var.at(rowno, colno)
+dim d1 = d2;
 .nf
  
 .fi
-Transition alternative for () and [] syntax to be used in libexodus, cli, service and test.
+Copy an array.
 
-Should be removed in 2028 when Ubuntu 24.04 is the oldest to be supported by exodus
+.SS
+dim d1 = dim();
+.nf
+ 
+.fi
+Save an array created elsewhere.
 
-.SH 23. DIM ACCESS
+.SS
+dim d1(nrows, ncols = 1);
+.nf
+ 
+.fi
+Create an array of vars with a fixed number of columns and rows. All elements are unassigned.
+
+.SS
+d1.redim(nrows, ncols = 1)
+.nf
+ 
+.fi
+Resize an array to a different number of rows and columns.
+
+Existing data will be retained as far as possible. Any additional elements are unassigned.
+
+.SS
+dim d1 = {"a", "b", "c" ...};
+.nf
+ 
+.fi
+Create an array from a list. All elements must be the same type, string, double or int.
+
+.SH 23. ARRAY ACCESS
 .SH
 
 .SS
@@ -50,7 +78,7 @@ Joins all elements into a single delimited string
 
 \fBReturns:\fR A string var
 
-.SH 24. DIM MUTATION
+.SH 24. ARRAY MUTATION
 .SH
 
 .SS
@@ -58,7 +86,7 @@ d1.splitter(str1, delimiter = FM)
 .nf
  
 .fi
-Creates or updates the array from a given string and delimiter.
+Creates or updates the array from a given string.
 
 If the dim array has not been dimensioned (nrows and ncols are 0), it will be dimensioned with the number of elements that the string has fields.
 
@@ -103,7 +131,7 @@ d1.shuffler()
 .fi
 Randomly shuffle the order of the elements of the array in place.
 
-.SH 25. DIM CONVERSION
+.SH 25. ARRAY CONVERSION
 .SH
 
 .SS
@@ -127,7 +155,7 @@ d1.shuffle()
 .fi
 Same as shuffler() but returns a new array leaving the original untouched.
 
-.SH 26. DIM READ/WRITE
+.SH 26. ARRAY READ/WRITE
 .SH
 
 .SS
@@ -142,12 +170,12 @@ Each element in the array becomes a separate field in the db record. Any redunda
 \fBExample:\fR
 .RS
 .nf
- dim record = "Client GD^G^20855^30000^1001.00^20855.76539"_var.split();
+ dim d1 = "Client GD^G^20855^30000^1001.00^20855.76539"_var.split();
  let file = "xo_clients", key = "GD001";
  if (not deleterecord("xo_clients", "GD001")) {}; // Cleanup first
- record.write(file, key);
+ d1.write(file, key);
  // or
- write(record on file, key);
+ write(d1 on file, key);
 .fi
 .RE
 
@@ -170,11 +198,11 @@ If the array is not predimensioned (rows and cols = 0) then it will be dimension
 \fBExample:\fR
 .RS
 .nf
- dim record(10);
+ dim d1(10);
  let file = "xo_clients", key = "GD001";
- if (not record.read(file, key)) ... // record.join() -> "Client GD^G^20855^30000^1001.00^20855.76539"_var
+ if (not d1.read(file, key)) ... // d1.join() -> "Client GD^G^20855^30000^1001.00^20855.76539"_var
  // or
- if (not read(record from file, key)) ...
+ if (not read(d1 from file, key)) ...
 .fi
 .RE
 

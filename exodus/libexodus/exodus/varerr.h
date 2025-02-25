@@ -52,9 +52,8 @@ class PUBLIC VarDBException     : public VarError {public: explicit VarDBExcepti
 class PUBLIC VarNotImplemented  : public VarError {public: explicit VarNotImplemented(  std::string message);};
 class PUBLIC VarDebug           : public VarError {public: explicit VarDebug(           std::string message);};
 
-class PUBLIC DimDimensionedZero : public VarError {public: explicit DimDimensionedZero( std::string message);};
+class PUBLIC DimUndimensioned : public VarError {public: explicit DimUndimensioned( std::string message);};
 class PUBLIC DimIndexOutOfBounds: public VarError {public: explicit DimIndexOutOfBounds(std::string message);};
-class PUBLIC DimNotDimensioned  : public VarError {public: explicit DimNotDimensioned(  std::string message);};
 
 // clang-format on
 

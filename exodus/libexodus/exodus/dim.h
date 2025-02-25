@@ -27,10 +27,8 @@ friend class dim_iter;
 
  private:
 
-	mutable int ncols_;
+	mutable int ncols_ = 0;
 	std::vector<var> data_;
-//	std::vector<exo::var, std::allocator<exo::var>> data_;
-	bool initialised_ = false;
 
 //    private:
 //        std::vector<var>::iterator it_;
@@ -46,18 +44,15 @@ friend class dim_iter;
 	// SPECIAL MEMBER FUNCTIONS
 	///////////////////////////
 
-	//////////////////////
-	/// dim construction :
-	//////////////////////
-
-	// oxxxbj is dim
+	////////////////////////
+	/// array construction :
+	////////////////////////
 
 	/////////////////////////
 	// 1. Default constructor
 	/////////////////////////
-	//
-	// allow syntax "dim d;" to create an "unassigned" dim
-	// allow default construction for class variables later resized in class methods
+
+	// Create an undimensioned array.
 	dim() = default;
 
 	////////////////
@@ -72,7 +67,8 @@ friend class dim_iter;
 	//////////////////////
 	// 3. Copy constructor - from lvalue
 	//////////////////////
-	//
+
+	// Copy an array.
 	dim(const dim& sourcedim) {
 		// use copy assign
 		*this = sourcedim;
@@ -81,7 +77,8 @@ friend class dim_iter;
 	//////////////////////
 	// 4. move constructor - from rvalue
 	//////////////////////
-	//
+
+	// Save an array created elsewhere.
 	dim(dim&& sourcedim) {
 		// use move assign
 		*this = std::move(sourcedim);
@@ -120,15 +117,19 @@ friend class dim_iter;
 	// Other constructors
 	/////////////////////
 
-	// Constructor with number of rows and optional number of columns
-	/////////////////////////////////////////////////////////////////
+	// Create an array of vars with a fixed number of columns and rows. All elements are unassigned.
 	dim(const int nrows, const int ncols = 1);
 
-	bool redim(const int nrows, const int ncols = 1);
+	// Resize an array to a different number of rows and columns.
+	// Existing data will be retained as far as possible. Any additional elements are unassigned.
+	// obj is d1
+	void redim(const int nrows, const int ncols = 1);
 
     // Constructor from initializer_list for (int, double, cstr etc.)
 	/////////////////////////////////////////////////////////////////
 	template<class T>
+
+	// Create an array from a list. All elements must be the same type, string, double or int.
 	dim(std::initializer_list<T> list) {
 
 		// Will not be called with zero elements
@@ -161,9 +162,9 @@ friend class dim_iter;
 	void operator=(const int sourceint);
 	void operator=(const double sourcedbl);
 
-	////////////
-	// ACCESSORS
-	////////////
+	/////////////////
+	/// array access:
+	/////////////////
 
 	ND dim_iter begin();
 	ND dim_iter end();
@@ -208,12 +209,10 @@ friend class dim_iter;
 
 	// Transition alternative for () and [] syntax to be used in libexodus, cli, service and test.
 	// Should be removed in 2028 when Ubuntu 24.04 is the oldest to be supported by exodus
+	// DEPRECATED
 	ND VARREF at(int rowno, int colno) {return getelementref(rowno, colno);}
+	// DEPRECATED
 	ND CVR at(int rowno, int colno) const {return getelementref(rowno, colno);}
-
-	///////////////
-	/// dim access:
-	///////////////
 
 	// obj is d1
 
@@ -233,11 +232,11 @@ friend class dim_iter;
 	// Returns: A string var
 	ND var join(SV delimiter = _FM) const;
 
-	/////////////////
-	/// dim mutation:
-	/////////////////
+	///////////////////
+	/// array mutation:
+	///////////////////
 
-	// Creates or updates the array from a given string and delimiter.
+	// Creates or updates the array from a given string.
 	// If the dim array has not been dimensioned (nrows and ncols are 0), it will be dimensioned with the number of elements that the string has fields.
 	// If the dim array has already been dimensioned, and has more elements than there are fields in the string, the excess array elements are initialised to "". If the record has more fields than there are elements in the array, the excess fields are all left unsplit in the final element of the array.
     // Predimensioning arrays allows efficient reuse of arrays in loops.
@@ -263,9 +262,9 @@ friend class dim_iter;
 //	dim& eraser(std::vector<var>::iterator iter1, std::vector<var>::iterator iter2) {data_.erase(iter1, iter2); return *this;}
 //	dim& eraser(dim_iter dim_iter1, dim_iter dim_iter2) {data_.erase(&*dim_iter1, &*dim_iter2); return *this;}
 
-	///////////////////
-	/// dim conversion:
-	///////////////////
+	/////////////////////
+	/// array conversion:
+	/////////////////////
 
 	// Same as sorter() but returns a new array leaving the original untouched.
 	ND dim sort(bool reverseorder = false) const& {return dim(*this).sorter(reverseorder);}
@@ -281,9 +280,9 @@ friend class dim_iter;
 	ND dim& reverse() && {return this->reverser();}
 	ND dim& shuffle() && {return this->shuffler();}
 
-	///////////////////
-	/// dim read/write:
-	///////////////////
+	/////////////////////
+	/// array read/write:
+	/////////////////////
 
 	// Writes a db file record created from an array.
 	// Each element in the array becomes a separate field in the db record. Any redundant trailing FMs are suppressed.

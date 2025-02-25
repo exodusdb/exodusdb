@@ -2128,23 +2128,23 @@ function main() {
 
 	printl("write(in dbfile, in key) const;");
 	{
-		dim record = "Client GD^G^20855^30000^1001.00^20855.76539"_var.split();
+		dim d1 = "Client GD^G^20855^30000^1001.00^20855.76539"_var.split();
 		 let file = "xo_clients", key = "GD001";
 
-		 record.write(file, key);
+		 d1.write(file, key);
 		 // or
-		 write(record on file, key);
+		 write(d1 on file, key);
 	}
 
 	printl("read(in dbfile, in key);");
 	{
-		dim record(10);
+		dim d1(10);
 		 let file = "xo_clients", key = "GD001";
-		 if (not record.read(file, key)) abort("read: " ^ lasterror());
-		assert(record.join() == "Client GD^G^20855^30000^1001.00^20855.76539"_var);
+		 if (not d1.read(file, key)) abort("read: " ^ lasterror());
+		assert(d1.join() == "Client GD^G^20855^30000^1001.00^20855.76539"_var);
 
 		 // or
-		 if (not read(record from file, key)) abort("read: " ^ lasterror());
+		 if (not read(d1 from file, key)) abort("read: " ^ lasterror());
 	}
 
 	printl("oswrite(in osfilename, const char* codepage = "") const;");
