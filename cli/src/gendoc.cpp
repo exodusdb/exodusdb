@@ -8,16 +8,28 @@ programinit()
 // man_page_white_space_code_point = "\u2005"; // " " FOUR-PER-EM SPACE
 
 let syntax =
-R"__(gendoc osfilename ... [{OPTIONS}]
-Option: w = wiki source format
-Option: m = man page
-otherwise html
+R"__(gendoc osfilename ... [codefile_dir] [{OPTIONS}]
+
+osfilename: e.g. ~/exodus/exodus/libexodus/exodus/{var.h,dim.h}
+
+codefile_dir: Optional output of testing_var_h.cpp
+
+Options:
+	w = wiki source    ext .wiki
+	m = man page       ext .1
+	h = html (default) ext .htm
+	o - Output to original dir
+	V - Verbose
 )__";
 
 bool wiki = OPTIONS.contains("w");
 bool man = OPTIONS.contains("m");
 bool html = not (wiki or man);
+let doc_ext = man ? "1" : (wiki ? "wiki" : "htm");
+
 bool output_to_orig_dir = OPTIONS.contains("o");
+
+let verbose = OPTIONS.count("V");
 
 var tableno = 0;
 
@@ -92,12 +104,12 @@ function main() {
 			first_osfilename0 = osfilename0;
 
 		// Start the code examples for this osfile
-		var fileheader = " Code examples - " ^ osfilename0;
+//		var file_header = osfilename0;
 		////////////////
 		// Code examples - from var.h
 		////////////////
 		codefile << "\n////////////////";
-		codefile << "\n/" "/" << fileheader;
+		codefile << "\n/" "/ Code examples " << osfilename0;
 		codefile << "\n////////////////";
 		codefile << "\n";
 
@@ -240,8 +252,11 @@ function main() {
 			// Suppress lines that are not comments or function declarations
 //			if (not prefix.starts("/") and not srcline.match(R"__(^[\sa-zA-Z0-9_:]+\()__"))
 //			if (not prefix.starts("/") and not srcline.match(R"__(^[\sa-zA-Z0-9_:&]+\()__"))
-			if (not prefix.starts("/") and not srcline.match(R"__(^[\sa-zA-Z0-9_:&]+\()__"))
-				prefix = "";
+			if (not prefix.starts("/") and not srcline.match(R"__(^[\sa-zA-Z0-9_:&]+\()__")) {
+				var remainder = srcline.field(" ", 2, 99999).trimfirst();
+				if (not remainder.starts("operator"))
+					prefix = "";
+			}
 
 			bool is_constructor = false;
 
@@ -290,6 +305,9 @@ function main() {
 
 				} else {
 
+					if (verbose == 2)
+						TRACE(srcline)
+
 					// Throw away non-function preamble comments
 					////////////////////////////////////////////
 
@@ -308,8 +326,9 @@ function main() {
 				continue;
 			}
 
-			// Skip deprecated functions
-			if (src[lineno - 1].ucase().contains("DEPRECATE"))
+			// Skip deprecated or UNDOCUMENTED functions
+			static rex undocumented("deprecate|undocumented", "i");
+			if (src[lineno - 1].ucase().match(undocumented))
 				continue;
 
 			///////////////////////////////
@@ -317,7 +336,7 @@ function main() {
 			///////////////////////////////
 
 			if (not is_constructor)
-				srcline = srcline.field(" ", 2, 9999);
+				srcline = srcline.field(" ", 2, 9999).trimfirst();
 
 //			var comments = srcline.field("{", 1).field(";", 2, 9999).trimmerfirst("/ ");
 //			var comments = srcline.field("/" "/", 2, 99999).trimfirst();
@@ -514,6 +533,10 @@ function main() {
 
 			var line2 = srcline.field(";", 1);
 
+			if (verbose == 1) {
+				TRACE(line2)
+			}
+
 			// "ARGS&... appendable" -> "appendable, ..."
 			line2.replacer(R"__(\b[a-zA-Z][a-zA-Z0-9]*\s*&{1,2}\s*\.\.\.\s*\b([a-zA-Z][a-zA-Z0-9]*))__"_rex, "$1, ...");
 
@@ -536,9 +559,29 @@ function main() {
 			line2.replacer("( ", "(");
 			line2.replacer(" )", ")");
 
-			// SKIP temporaries
-			if (line2.ends("&&"))
+//			line2.replacer("dim& ", "dim ");
+//			line2.replacer("dim& ", "");
+			line2.replacer("noexcept", "");
+
+			// SKIP temporaries and deleted functions
+			if (line2.ends("&&") || line2.ends("= delete"))
 				continue;
+
+			// Skip copy and move assignment
+			// void operator=(const dim& rhs) &;
+			// void operator=(dim&& rhs) & noexcept {
+//			if (line2.starts("operator=(const " ^ class_name ^ "&"))
+//				continue;
+//			if (line2.starts("operator=(" ^ class_name ^ "&&"))
+//				continue;
+			if (line2.match(R"__(\boperator\s*=\s*\(\s*(const)?\s*[a-zA-Z0-9_]+\s*&)__"))
+				continue;
+
+//			// operator=(v1)
+//			// dim d1 = v1;
+//			if (line2.match(R"__(\boperator\s*=)__")) {
+//				line2.replacer(R"__(\boperator=\(([a-zA-Z0-9_]+)\))__"_rex, class_name ^ " " ^ class_name.first() ^ "1 = $1;");
+//			}
 
 			if (line2.ends("&")) {
 				line2.popper();
@@ -553,7 +596,12 @@ function main() {
 			// SKIP if no comments and already output
 			if (not comments and locate(line2, all_func_sigs))
 				continue;
+
 			all_func_sigs ^= line2 ^ VM;
+
+			if (verbose == 1) {
+				TRACE(line2)
+			}
 
 			// bold the function name
 			if (man) {}
@@ -571,7 +619,25 @@ function main() {
 			// Prefix the object name
 			var func_decl;
 			if (not is_constructor) {
-				func_decl = (objname ?: default_objname) ^ "." ^ func_decl0;
+
+				if (line2.match(R"__(\boperator\s*=)__")) {
+
+					// "operator=(v1)" -> "dim d1 = v1;"
+					func_decl = func_decl0.replace(R"__(\boperator\s*=\s*\(\s*([a-zA-Z0-9_]+)\s*\))__"_rex, class_name ^ " " ^ class_name.first() ^ "1 = $1;");
+				}
+				else if (line2.match(R"__(\boperator\s*\[\])__")) {
+					// "operator[](rowno)" -> "var v1 = d1[rown]; /*and*/ d1[rown] = v1;"
+					// "operator[](rowno, colno)" ->
+//TRACE(func_decl0)
+					func_decl = func_decl0.replace(
+						R"__(\boperator\s*\[\]\s*\(\s*([^\)]+)\))__"_rex,
+						 "var v1 = " ^ class_name.first() ^ "1[$1];       " ^ class_name.first() ^ "1[$1] = v1;"
+					);
+//TRACE(func_decl)
+				} else {
+					// xxxxxxxxx -> var.xxxxxxxxx
+					func_decl = (objname ?: default_objname) ^ "." ^ func_decl0;
+				}
 
 			} else {
 //TRACE(func_decl0)
@@ -589,26 +655,26 @@ function main() {
 				// Default constructor
 				if (arg1 == "") {
 					// dim() -> dim d1;
-					func_decl = class_name ^ " " ^ func_decl0.first(1) ^ "1;";
-				}
-				// Move constructor
-				else if (arg1 == (class_name ^ "&&")) {
-					// dim(dim&&) -> dim d1 = dim();
-					func_decl = class_name ^ " " ^ class_letter ^ "1 = " ^ class_name ^ "();";
+					func_decl = class_name ^ " " ^ func_decl0.first(1) ^ "1; /" "/ Default";
 				}
 				// Copy constructor
 				else if (arg1 == (class_name ^ "&")) {
 					// dim(dim&) -> dim d1 = d2;
-					func_decl = class_name ^ " " ^ class_letter ^ "1 = " ^ class_letter ^ "2;";
+					func_decl = class_name ^ " " ^ class_letter ^ "1 = " ^ class_letter ^ "2; /" "/ Copy";
+				}
+				// Move constructor
+				else if (arg1 == (class_name ^ "&&")) {
+					// dim(dim&&) -> dim d1 = dim();
+					func_decl = class_name ^ " " ^ class_letter ^ "1 = " ^ class_name ^ "(); /" "/ Move";
 				}
 				else if (arg1.starts("std::initializer_list")) {
 					// -> dim d1 = {"a", "b", "c", "d" ...};
-					func_decl = class_name ^ " " ^ class_letter ^ R"(1 = {"a", "b", "c" ...};)";
+					func_decl = class_name ^ " " ^ class_letter ^ R"(1 = {"a", "b", "c" ...};)" " /" "/ Initializer list";
 				}
 				// Other constructors
 				else {
 					// dim(nrows, ncols = 1) -> "dim d1(nrows, ncols = 1);
-					func_decl = class_name ^ " " ^ class_letter ^ "1(" ^ args ^ ");";
+					func_decl = class_name ^ " " ^ class_letter ^ "1(" ^ args ^ "); /" "/ Constructor";
 				}
 
 			}
@@ -736,12 +802,12 @@ function main() {
 
 			if (man) {
 				doc_text ^= ".TH " ^ osfilename0;
-				doc_text ^= "\n";
-				doc_text ^= fileheader;
+//				doc_text ^= "\n";
+//				doc_text ^= file_header;
 				doc_text ^= "\n\n";
 			}
 			else {
-				doc_text ^= fileheader;
+//				doc_text ^= file_header;
 				doc_text ^= "\n\n";
 			}
 
@@ -753,8 +819,8 @@ function main() {
 			if (not output_to_orig_dir)
 				outputl(doc_text);
 			else {
-				// Change .h to .1
-				var doc_osfilename = osfilename.fieldstore(".", -1, 1, "1");
+				// Change .h to .1, .wiki. .htm etc.
+				var doc_osfilename = osfilename.fieldstore(".", -1, 1, doc_ext);
 
 				// Update doc if needed
 				var old_doc_text;
@@ -800,25 +866,29 @@ function main() {
 		////////////////////////////////////////////////////////
 
 		codefile.close();
-		var newcode = "";
-		if (not osread(newcode from temp_code_filename))
-			abort(lasterror());
 
-		let code_filename = codefile_dir ^ "/" ^ "testing_'orig'.cpp"_var.replace("'orig'", first_osfilename0);
-		var oldcode = "";
-		if (not osread(oldcode from code_filename)) {
-			oldcode = "";
-		}
+		if (codefile_dir) {
 
-		// Only update if the text has changed
-		logput("gendoc: ");
-		if (newcode != oldcode) {
-			if (not oscopy(temp_code_filename to code_filename))
+			var newcode = "";
+			if (not osread(newcode from temp_code_filename))
 				abort(lasterror());
-			logput("Installing:");
-		} else
-			logput("Up-to-date:");
-		logputl(" ", code_filename);
+
+			let code_filename = codefile_dir ^ "/" ^ "testing_'orig'.cpp"_var.replace("'orig'", first_osfilename0);
+			var oldcode = "";
+			if (not osread(oldcode from code_filename)) {
+				oldcode = "";
+			}
+
+			// Only update if the text has changed
+			logput("gendoc: ");
+			if (newcode != oldcode) {
+				if (not oscopy(temp_code_filename to code_filename))
+					abort(lasterror());
+				logput("Installing:");
+			} else
+				logput("Up-to-date:");
+			logputl(" ", code_filename);
+		}
 
 	} // code
 

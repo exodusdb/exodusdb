@@ -56,15 +56,15 @@ friend class dim_iter;
 	// SPECIAL MEMBER FUNCTIONS
 	///////////////////////////
 
-	////////////////////////
-	/// array construction :
-	////////////////////////
+	////////////////////////////////////
+	/// dimensioned array construction :
+	////////////////////////////////////
 
 	/////////////////////////
 	// 1. Default constructor
 	/////////////////////////
 
-	// Create an undimensioned array.
+	// Create an undimensioned array of var.
 	dim() = default;
 
 	// Default constructor
@@ -120,6 +120,7 @@ friend class dim_iter;
 	// because Howard Hinnant recommends against in our case
 
 	// Prevent assigning to temporaries
+
 	void operator=(const dim& rhs) && = delete;
 
 	// var& operator=(in rhs) & = default;
@@ -128,8 +129,9 @@ friend class dim_iter;
 	// b) doesnt check if rhs is assigned
 	// void operator=(const dim& rhs) &;
 
-	// Copy assignment operator (using var::clone())
 //	dim& operator=(const dim& rhs) {
+
+	// Copy assignment operator (using var::clone())
 	void operator=(const dim& rhs) &;
 
 	/////////////////////
@@ -137,6 +139,7 @@ friend class dim_iter;
 	/////////////////////
 
 	// Prevent assigning to temporaries
+
 	void operator=(dim&& rhs) && noexcept = delete;
 
 	// Cannot use default move assignment because
@@ -145,20 +148,15 @@ friend class dim_iter;
 	//var& operator=(TVR rhs) & noexcept = default;
 //	void operator=(dim&& rhs) &;
 
-	// Move assignment operator (using swap)
 //	dim& operator=(dim&& rhs) noexcept & {
+
+	// Move assignment operator (using swap)
 	void operator=(dim&& rhs) & noexcept {
 		if (this != &rhs) {
 			swap(rhs); // Swap all members
 		}
 //		return *this;
 		return;
-	}
-
-	// Swap member (handles both base and ncols_)
-	void swap(dim& rhs) noexcept {
-		base::swap(rhs);
-		std::swap(ncols_, rhs.ncols_);
 	}
 
 //	// Iterator overrides
@@ -168,6 +166,8 @@ friend class dim_iter;
 //	auto end() { return base::end();}
 //	auto begin() const { return base::begin();}
 //	auto end() const { return base::end();}
+//	auto cbegin() const { return base::cbegin();}
+//	auto cend() const { return base::cend();}
 	dim_iter begin() { return dim_iter(base::begin()); }
 	dim_iter end() { return dim_iter(base::end()); }
 	dim_const_iter begin() const { return dim_const_iter(base::begin()); }
@@ -182,17 +182,11 @@ friend class dim_iter;
 	// Create an array of vars with a fixed number of columns and rows. All vars are unassigned.
 	dim(const int nrows, const int ncols = 1);
 
-	// Resize an array to a different number of rows and columns.
-	// Existing data will be retained as far as possible. Any additional elements are unassigned.
-	// Resizing rows to 0 clears all data. Resizing cols to 0 clears all data and changes its status to "undimensioned".
-	// obj is d1
-	void redim(const int nrows, const int ncols = 1);
-
     // Constructor from initializer_list for (int, double, cstr etc.)
 	/////////////////////////////////////////////////////////////////
 	template<class T>
 
-	// Create an array from a list. All elements must be the same type, string, double or int.
+	// Create an array from a list. All elements must be the same type. var, string, double, int, etc..
 	dim(std::initializer_list<T> list) {
 //TRACE("------ INITIALIZER LIST ------")
 		ncols_ = 1;
@@ -230,9 +224,32 @@ friend class dim_iter;
 	// cant be (in var1) because seems to cause a problem with var1=var2 in function
 	// parameters unfortunately causes problem of passing var by value and thereby unnecessary
 	// contruction see also ^= etc
-	void operator=(in sourcevar);
+
+	// Initialise all elements of an array to some single value or constant. A var, "", 0 etc.
+	void operator=(in v1);
+
+	// Undocumented
 	void operator=(const int sourceint);
+
+	// Undocumented
 	void operator=(const double sourcedbl);
+
+	// Resize an array to a different number of rows and columns.
+	// Existing data will be retained as far as possible. Any additional elements are unassigned.
+	// Resizing rows to 0 clears all data.
+	// Resizing cols to 0 clears all data and changes its status to "undimensioned".
+	// obj is d1
+	void redim(const int nrows, const int ncols = 1);
+
+	// Swap member (handles both base and ncols_)
+
+	// Swap one array with another.
+	// Either or both may be undimensioned.
+	// obj is d1
+	void swap(dim& d2) noexcept {
+		base::swap(d2);
+		std::swap(ncols_, d2.ncols_);
+	}
 
 	/////////////////
 	/// array access:
@@ -272,6 +289,8 @@ friend class dim_iter;
 	// returns a reference to one var of the array
 	// and so allows lhs assignment like d1(1,2) = "x";
 	// or if on the rhs then use as a normal expression
+
+	// Access and update elements of a one dimensional array using [] brackets
 	ND VARREF operator[](int rowno) {return getelementref(rowno, 1);}
 
 	//following const version is called if we do () on a dim which was defined as const xx
@@ -284,7 +303,10 @@ friend class dim_iter;
 #	define DEPRECATED_PARENS [[deprecated("EXODUS: Replace single dimensioned array accessors like () with [] e.g. dimarray(n) -> dimarray[n]")]]
 //#	define DEPRECATED_PARENS2
 #	define DEPRECATED_PARENS2 [[deprecated("EXODUS: Replace multiple dimensioned array accessors like (x,y) with [x,y] e.g. dimarray(x,y) -> dimarray[x,y]")]]
+
+	// Access and update elements of an two dimensional array using [] brackets
 	ND VARREF operator[](int rowno, int colno) {return getelementref(rowno, colno);}
+
 	ND CVR operator[](int rowno, int colno) const {return getelementref(rowno, colno);}
 #else
 #	define DEPRECATED_PARENS [[deprecated("EXODUS: Replace single dimensioned array accessors like () with [] e.g. dimarray(n) -> dimarray[n]")]]
@@ -316,11 +338,11 @@ friend class dim_iter;
 	// obj is d1
 
 	// Get the number of rows in the dimensioned array
-	// Returns: A count
+	// Returns: A count. Can be zero, indicating an empty array.
 	ND var rows() const;
 
 	// Get the number of columns in the dimensioned array
-	// Returns: A count
+	// Returns: A count.  0 if the array is undimensioned.
 	ND var cols() const;
 
 	// Q: why is this commented out?
@@ -328,7 +350,7 @@ friend class dim_iter;
 	// var operator() (int row, int col=1) const;
 
 	// Joins all elements into a single delimited string
-	// Returns: A string var
+	// Returns: A string var.
 	ND var join(SV delimiter = _FM) const;
 
 	///////////////////
@@ -348,11 +370,11 @@ friend class dim_iter;
 	//  d2.splitter("f1^f2^f3"_var); // d2.rows() -> 10`
 	dim& splitter(in str1, SV delimiter = _FM);
 
-	// Sort the elements of the array in place.
-	// reverseorder: Defaults to false. If true, then the order is reversed.
+	// Sort the elements of the array. In place.
+	// reverse: Defaults to false. If true, then the order is reversed.
 	dim& sorter(bool reverse = false);
 
-	// Reverse the elements of the array in place.
+	// Reverse the elements of the array. In place.
 	dim& reverser();
 
 	// Randomly shuffle the order of the elements of the array in place.
@@ -366,7 +388,7 @@ friend class dim_iter;
 	/////////////////////
 
 	// Same as sorter() but returns a new array leaving the original untouched.
-	ND dim sort(bool reverseorder = false) const& {return dim(*this).sorter(reverseorder);}
+	ND dim sort(bool reverse = false) const& {return dim(*this).sorter(reverse);}
 
 	// Same as reverser() but returns a new array leaving the original untouched.
 	ND dim reverse() const& {return dim(*this).reverser();}
@@ -379,9 +401,9 @@ friend class dim_iter;
 	ND dim& reverse() && {return this->reverser();}
 	ND dim& shuffle() && {return this->shuffler();}
 
-	/////////////////////
-	/// array read/write:
-	/////////////////////
+	/////////////////
+	/// array DB I/O:
+	/////////////////
 
 	// Writes a db file record created from an array.
 	// Each element in the array becomes a separate field in the db record. Any redundant trailing FMs are suppressed.
@@ -406,6 +428,10 @@ friend class dim_iter;
     //  // or
     //  if (not read(d1 from file, key)) ...`
 	ND bool read(in dbfile, in key);
+
+	/////////////////
+	/// array OS I/O:
+	/////////////////
 
 	// Creates an entire os text file from an array
 	// Each element of the array becomes one line in the os file delimited by \n

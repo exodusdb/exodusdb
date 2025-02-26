@@ -1,43 +1,49 @@
 .TH dim.h
- Code examples - dim.h
 
-.SH 22. ARRAY CONSTRUCTION 
+.SH 22. DIMENSIONED ARRAY CONSTRUCTION 
 .SH
 
 .SS
-dim d1;
+dim d1; // Default
 .nf
  
 .fi
-Create an undimensioned array.
+Create an undimensioned array of var.
 
 .SS
-dim d1 = d2;
+dim d1 = d2; // Copy
 .nf
  
 .fi
 Copy an array.
 
 .SS
-dim d1 = dim();
+dim d1 = dim(); // Move
 .nf
  
 .fi
 Save an array created elsewhere.
 
 .SS
-dim.swap(dim& rhs) noexcept
-.nf
- 
-.fi
-Swap member (handles both base and ncols_)
-
-.SS
-dim d1(nrows, ncols = 1);
+dim d1(nrows, ncols = 1); // Constructor
 .nf
  
 .fi
 Create an array of vars with a fixed number of columns and rows. All vars are unassigned.
+
+.SS
+dim d1 = {"a", "b", "c" ...}; // Initializer list
+.nf
+ 
+.fi
+Create an array from a list. All elements must be the same type. var, string, double, int, etc..
+
+.SS
+dim d1 = v1;
+.nf
+ 
+.fi
+Assign all elements of an array to some single value or constant. A var, "", 0 etc.
 
 .SS
 d1.redim(nrows, ncols = 1)
@@ -48,17 +54,35 @@ Resize an array to a different number of rows and columns.
 
 Existing data will be retained as far as possible. Any additional elements are unassigned.
 
-Resizing rows to 0 clears all data. Resizing cols to 0 clears all data and changes its status to "undimensioned".
+Resizing rows to 0 clears all data.
+
+Resizing cols to 0 clears all data and changes its status to "undimensioned".
 
 .SS
-dim d1 = {"a", "b", "c" ...};
+d1.swap(dim& d2) 
 .nf
  
 .fi
-Create an array from a list. All elements must be the same type, string, double or int.
+Swap one array with another.
+
+Either or both may be undimensioned.
 
 .SH 23. ARRAY ACCESS
 .SH
+
+.SS
+var v1 = d1[rowno];       d1[rowno] = v1;
+.nf
+ 
+.fi
+Access and update elements of a one dimensional array using [] brackets
+
+.SS
+var v1 = d1[rowno, colno];       d1[rowno, colno] = v1;
+.nf
+ 
+.fi
+Access and update elements of an two dimensional array using [] brackets
 
 .SS
 var v1 = d1.rows();
@@ -67,7 +91,7 @@ var v1 = d1.rows();
 .fi
 Get the number of rows in the dimensioned array
 
-\fBReturns:\fR A count
+\fBReturns:\fR A count. Can be zero, indicating an empty array.
 
 .SS
 var v1 = d1.cols();
@@ -76,7 +100,7 @@ var v1 = d1.cols();
 .fi
 Get the number of columns in the dimensioned array
 
-\fBReturns:\fR A count
+\fBReturns:\fR A count.  0 if the array is undimensioned.
 
 .SS
 var v1 = d1.join(delimiter = FM);
@@ -85,7 +109,7 @@ var v1 = d1.join(delimiter = FM);
 .fi
 Joins all elements into a single delimited string
 
-\fBReturns:\fR A string var
+\fBReturns:\fR A string var.
 
 .SH 24. ARRAY MUTATION
 .SH
@@ -122,16 +146,16 @@ d1.sorter(reverse = false)
 .nf
  
 .fi
-Sort the elements of the array in place.
+Sort the elements of the array. In place.
 
-\fBreverseorder:\fR Defaults to false. If true, then the order is reversed.
+\fBreverse:\fR Defaults to false. If true, then the order is reversed.
 
 .SS
 d1.reverser()
 .nf
  
 .fi
-Reverse the elements of the array in place.
+Reverse the elements of the array. In place.
 
 .SS
 d1.shuffler()
@@ -144,7 +168,7 @@ Randomly shuffle the order of the elements of the array in place.
 .SH
 
 .SS
-d1.sort(reverseorder = false)
+d1.sort(reverse = false)
 .nf
  
 .fi
@@ -164,7 +188,7 @@ d1.shuffle()
 .fi
 Same as shuffler() but returns a new array leaving the original untouched.
 
-.SH 26. ARRAY READ/WRITE
+.SH 26. ARRAY DB I/O
 .SH
 
 .SS
@@ -215,6 +239,9 @@ If the array is not predimensioned (rows and cols = 0) then it will be dimension
 .fi
 .RE
 
+
+.SH 27. ARRAY OS I/O
+.SH
 
 .SS
 if (d1.oswrite(osfilename, codepage = "")) ...
