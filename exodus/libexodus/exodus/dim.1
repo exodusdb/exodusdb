@@ -1,6 +1,6 @@
 .TH dim.h
 
-.SH 22. DIMENSIONED ARRAY CONSTRUCTION 
+.SH 24. DIMENSIONED ARRAY CONSTRUCTION 
 .SH
 
 .SS
@@ -43,7 +43,7 @@ dim d1 = v1;
 .nf
  
 .fi
-Assign all elements of an array to some single value or constant. A var, "", 0 etc.
+Initialise all elements of an array to some single value or constant. A var, "", 0 etc.
 
 .SS
 d1.redim(nrows, ncols = 1)
@@ -67,7 +67,7 @@ Swap one array with another.
 
 Either or both may be undimensioned.
 
-.SH 23. ARRAY ACCESS
+.SH 25. ARRAY ACCESS
 .SH
 
 .SS
@@ -111,7 +111,7 @@ Joins all elements into a single delimited string
 
 \fBReturns:\fR A string var.
 
-.SH 24. ARRAY MUTATION
+.SH 26. ARRAY MUTATION
 .SH
 
 .SS
@@ -164,7 +164,7 @@ d1.shuffler()
 .fi
 Randomly shuffle the order of the elements of the array in place.
 
-.SH 25. ARRAY CONVERSION
+.SH 27. ARRAY CONVERSION
 .SH
 
 .SS
@@ -188,7 +188,7 @@ d1.shuffle()
 .fi
 Same as shuffler() but returns a new array leaving the original untouched.
 
-.SH 26. ARRAY DB I/O
+.SH 28. ARRAY DB I/O
 .SH
 
 .SS
@@ -240,7 +240,7 @@ If the array is not predimensioned (rows and cols = 0) then it will be dimension
 .RE
 
 
-.SH 27. ARRAY OS I/O
+.SH 29. ARRAY OS I/O
 .SH
 
 .SS

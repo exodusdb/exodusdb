@@ -27,6 +27,98 @@ function main() {
 // Code examples var.h
 ////////////////
 
+	printl("operator""_var(const char* cstr, std::size_t size);");
+	{
+		var v1 = "f1^f2^v1]v2^f4"_var;
+		assert(v1 == "f1" _FM "f2" _FM "v1" _VM "v2" _FM "f4");
+
+	}
+
+	printl("var(std::initializer_list<T> list)");
+	{
+		var v1 = {11, 22, 33};
+		assert(v1 == "11^22^33"_var);
+
+	}
+
+	printl("operator()(int fieldno) const;");
+	{
+		var v1 = "";
+		 v1(3) = "ccc";
+		assert(v1 == "^^ccc"_var);
+
+		 // Field number -1 causes appending a field when updating.
+		 v1(-1) = "ddd";
+		assert(v1 == "^^ccc^ddd"_var);
+
+	}
+
+	printl("operator+(var);");
+	{
+		var v2 = 0.1;
+		 var v1 = v2 + 0.2;
+		assert(v1 == 0.3);
+
+	}
+
+	printl("operator+=(var);");
+	{
+		var v1 = 0.1;
+		 v1 += 0.2; // 0.3
+	}
+
+	printl("operator++(int) &;");
+	{
+		var v1 = 3;
+		 var v2 = v1 ++;
+		assert(v2 == 3 );
+		assert(v1 == 4);
+
+	}
+
+	printl("operator--(int) &;");
+	{
+		var v1 = 3;
+		 var v2 = v1 --;
+		assert(v2 == 3 );
+		assert(v1 == 2);
+
+	}
+
+	printl("operator++() &;");
+	{
+		var v1 = 3;
+		 var v2 = ++ v1;
+		assert(v2 == 4 );
+		assert(v1 == 4);
+
+	}
+
+	printl("operator--() &;");
+	{
+		var v1 = 3;
+		 var v2 = -- v1;
+		assert(v2 == 2 );
+		assert(v1 == 2);
+
+	}
+
+	printl("operator^(var);");
+	{
+		var v2 = "aa";
+		 var v1 = v2 ^ 22;
+		assert(v1 == "aa22");
+
+	}
+
+	printl("operator^=(var);");
+	{
+		var v1 = "aa";
+		 v1 ^= 22;
+		assert(v1 == "aa22");
+
+	}
+
 	var varnum;
 
 	printl("round(const int ndecimals = 0) const;");

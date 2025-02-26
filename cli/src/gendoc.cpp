@@ -249,6 +249,12 @@ function main() {
 			// Only interested in certain function declarations and comments starting exactly //
 			var prefix = srcline.field(" ", 1);
 
+			if (prefix == "friend" || prefix.starts("CONST")) {
+//				TRACE(prefix)
+				srcline = srcline.field(" ", 2, 999999).trimfirst();
+				prefix = srcline.field(" ", 1);
+			}
+
 			// Suppress lines that are not comments or function declarations
 //			if (not prefix.starts("/") and not srcline.match(R"__(^[\sa-zA-Z0-9_:]+\()__"))
 //			if (not prefix.starts("/") and not srcline.match(R"__(^[\sa-zA-Z0-9_:&]+\()__"))
@@ -519,6 +525,9 @@ function main() {
 			// Output function documentation
 			////////////////////////////////
 
+			// After using backticks to delimit c++ code.
+			comments.replacer("{backtick}", "`");
+
 			if (man) {
 				// hide dot/space formatting
 				comments.replacer("\u22c5", "\u2005"); // "⋅" Unicode operator point operator -> " " FOUR-PER-EM SPACE
@@ -546,7 +555,8 @@ function main() {
 			line2.replacer("\\bconst\\b"_rex, "");
 			line2.replacer("\\bin\\b"_rex, "");
 			line2.replacer("\\bSV\\b"_rex, "");
-			line2.replacer("\\bint& "_rex, "out ");
+			line2.replacer("(int)", "(INT)"); // preserve operator++(int) for later analysis
+			line2.replacer("\\bint\\b"_rex, "");
 			line2.replacer("\\bint\\b"_rex, "");
 			line2.replacer("\\bchar\\*"_rex, "");
 			line2.replacer("\\bbool "_rex, "");
@@ -554,6 +564,7 @@ function main() {
 			line2.replacer("\\bCVR "_rex, "");
 			line2.replacer("\\bCBR "_rex, "");
 			line2.replacer("\\bVARREF "_rex, "io");
+			line2.replacer("\\bCONSTEXPR "_rex, "");
 			line2.replacer("= _", "= ");
 			line2.trimmer();
 			line2.replacer("( ", "(");
@@ -625,16 +636,81 @@ function main() {
 					// "operator=(v1)" -> "dim d1 = v1;"
 					func_decl = func_decl0.replace(R"__(\boperator\s*=\s*\(\s*([a-zA-Z0-9_]+)\s*\))__"_rex, class_name ^ " " ^ class_name.first() ^ "1 = $1;");
 				}
-				else if (line2.match(R"__(\boperator\s*\[\])__")) {
+
+				else if (line2.match(R"__(\boperator\s*\[\]\s*\()__")) {
 					// "operator[](rowno)" -> "var v1 = d1[rown]; /*and*/ d1[rown] = v1;"
 					// "operator[](rowno, colno)" ->
-//TRACE(func_decl0)
 					func_decl = func_decl0.replace(
 						R"__(\boperator\s*\[\]\s*\(\s*([^\)]+)\))__"_rex,
 						 "var v1 = " ^ class_name.first() ^ "1[$1];       " ^ class_name.first() ^ "1[$1] = v1;"
 					);
-//TRACE(func_decl)
-				} else {
+				}
+
+				else if (line2.contains("operator\"\"_")) {
+					// operator""_var(cstr, std::size_t size);
+					// ->
+					// var v1 = ""_var
+					func_decl = func_decl0.replace(
+						R"__(\boperator""_([a-zA-Z0-9_])([a-zA-Z0-9_]+).*)__"_rex,
+//						"$1$2 ${1}1 = \"\"_$1$2"
+						"\"\"_$1$2"
+					);
+
+				}
+				else if (line2.match(R"__(\boperator\s*\(\)\s*\()__")) {
+					//operator()(fieldno, valueno = 0, subvalueno = 0);
+					func_decl = func_decl0.replace(" = 0", "").replace(
+						R"__(\boperator\s*\(\)\s*\(\s*([^\)]+)\))__"_rex,
+						class_name.first() ^ "2\\($1\\);       " ^ class_name.first() ^ "1\\($1\\) = v2"
+					);
+				}
+
+				else if (line2.match(R"__(\boperator\s*[\+\-\*\/\%\^]\s*\(.*)__")) {
+					//operator+(var)
+					// v2 + v3
+					func_decl = func_decl0.replace(
+						R"__(\boperator\s*([\+\-\*\/\%\^])\s*\(.*)__"_rex,
+						class_name.first() ^ "2 $1 " ^ class_name.first() ^ "3"
+					);
+				}
+
+				else if (line2.match(R"__(\boperator\s*[\+\-\*\/\%\^]=\s*\(.*)__")) {
+					//operator+=(var)
+					// v1 += v2
+					func_decl = func_decl0.replace(
+						R"__(\boperator\s*([\+\-\*\/\%\^]=)\s*\(.*)__"_rex,
+						class_name.first() ^ "1 $1 " ^ class_name.first() ^ "2"
+					);
+
+					// Prevent prefixing with "var v1 = "
+					prefix = "";
+				}
+
+				else if (line2.match(R"__(\boperator\s*[\+\-]{2,2}\s*\(INT\))__")) {
+					//operator++(int);
+					// v1 ++
+					func_decl = func_decl0.replace(
+						R"__(\boperator\s*([\+\-]{2,2})\s*\(.*)__"_rex,
+						class_name.first() ^ "1 $1"
+					);
+
+					// Prevent prefixing with "var v1 = "
+					prefix = "";
+				}
+
+				else if (line2.match(R"__(\boperator\s*[\+\-]{2,2}\s*\(\))__")) {
+					//operator++();
+					// ++ v1
+					func_decl = func_decl0.replace(
+						R"__(\boperator\s*([\+\-]{2,2})\s*\(.*)__"_rex,
+						"$1 " ^ class_name.first() ^ "1"
+					);
+
+					// Prevent prefixing with "var v1 = "
+					prefix = "";
+				}
+
+				else {
 					// xxxxxxxxx -> var.xxxxxxxxx
 					func_decl = (objname ?: default_objname) ^ "." ^ func_decl0;
 				}

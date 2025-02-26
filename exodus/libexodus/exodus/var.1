@@ -1,7 +1,281 @@
 .TH var.h
 
-.SH 1. STRING CREATION
+.SH 1. VAR CREATION 
 .SH
+
+.SS
+var v1 = ""_var;
+.nf
+ 
+.fi
+The literal suffix "_var" allows dynamic arrays to be seamlessly embedded in code using the visible equivalents of unprintable field mark characters.
+
+
+
+RM ` Record mark
+
+FM ^ Field mark
+
+VM ] Value mark
+
+SM } Subvalue mark
+
+TM | Text mark
+
+ST ~ Subtext mark
+
+\fBExample:\fR
+.RS
+.nf
+ var v1 = "f1^f2^v1]v2^f4"_var; // "f1" _FM "f2" _FM "v1" _VM "v2" _FM "f4"
+.fi
+.RE
+
+
+.SS
+var v1 = {"a", "b", "c" ...}; // Initializer list
+.nf
+ 
+.fi
+Create an dynamic array var from a list. C++ constrains list elements to be all the same type. var, string, double, int, etc.
+
+\fBExample:\fR
+.RS
+.nf
+ var v1 = {11, 22, 33}; // "11^22^33"_var
+.fi
+.RE
+
+
+.SS
+var v1 = v2(fieldno);       v1(fieldno) = v2;
+.nf
+ 
+.fi
+Accessing and updating fields of dynamic arrays.
+
+\fBExample:\fR
+.RS
+.nf
+ var v1 = "";
+ v1(3) = "ccc"; // v1 -> "^^ccc"_var
+ // Field number -1 causes appending a field when updating.
+ v1(-1) = "ddd"; // v1 -> "^^ccc^ddd"_var
+.fi
+.RE
+
+
+.SS
+var v1 = v2(fieldno, valueno);       v1(fieldno, valueno) = v2;
+.nf
+ 
+.fi
+Accessing and updating values in dynamic arrays.
+
+.SS
+var v1 = v2(fieldno, valueno, subvalueno);       v1(fieldno, valueno, subvalueno) = v2;
+.nf
+ 
+.fi
+Accessing and updating subvalues in dynamic arrays.
+
+.SH 2. ARITHMETICAL OPERATORS 
+.SH
+
+.SS
+var v1 = v2 + v3;
+.nf
+ 
+.fi
+Addition
+
+Attempts to perform mumeric operations on non-numeric strings will throw a runtime error VarNonNumeric.
+
+\fBExample:\fR
+.RS
+.nf
+ var v2 = 0.1;
+ var v1 = v2 + 0.2; // 0.3
+.fi
+.RE
+
+
+.SS
+var v1 = v2 - v3;
+.nf
+ 
+.fi
+Subtraction
+
+.SS
+var v1 = v2 * v3;
+.nf
+ 
+.fi
+Multiplication
+
+.SS
+var v1 = v2 / v3;
+.nf
+ 
+.fi
+Division
+
+.SS
+var v1 = v2 % v3;
+.nf
+ 
+.fi
+Modulus
+
+.SS
+v1 += v2
+.nf
+ 
+.fi
+Self addition
+
+\fBExample:\fR
+.RS
+.nf
+ var v1 = 0.1;
+ v1 += 0.2; // 0.3
+.fi
+.RE
+
+
+.SS
+v1 -= v2
+.nf
+ 
+.fi
+Self subtraction
+
+.SS
+v1 *= v2
+.nf
+ 
+.fi
+Self multiplication
+
+.SS
+v1 /= v2
+.nf
+ 
+.fi
+Self division
+
+.SS
+v1 %= v2
+.nf
+ 
+.fi
+Self modulus
+
+.SS
+v1 ++
+.nf
+ 
+.fi
+Post increment
+
+\fBExample:\fR
+.RS
+.nf
+ var v1 = 3;
+ var v2 = v1 ++; // v2 -> 3 // v1 -> 4
+.fi
+.RE
+
+
+.SS
+v1 --
+.nf
+ 
+.fi
+Post decrement
+
+\fBExample:\fR
+.RS
+.nf
+ var v1 = 3;
+ var v2 = v1 --; // v2 -> 3 // v1 -> 2
+.fi
+.RE
+
+
+.SS
+++ v1
+.nf
+ 
+.fi
+Pre increment
+
+\fBExample:\fR
+.RS
+.nf
+ var v1 = 3;
+ var v2 = ++ v1; // v2 -> 4 // v1 -> 4
+.fi
+.RE
+
+
+.SS
+-- v1
+.nf
+ 
+.fi
+Pre decrement
+
+\fBExample:\fR
+.RS
+.nf
+ var v1 = 3;
+ var v2 = -- v1; // v2 -> 2 // v1 -> 2
+.fi
+.RE
+
+
+.SH 3. STRING CREATION 
+.SH
+
+.SS
+var v1 = v2 ^ v3;
+.nf
+ 
+.fi
+String concatention operator ^
+
+At least one side must be a var.
+
+"aa" ^ "22" will not compile but "aa" "22".
+
+Floating point numbers are converted to strings with up to 12 significant digits of precision. This practically eliminates all rounding errors.
+
+\fBExample:\fR
+.RS
+.nf
+ var v2 = "aa";
+ var v1 = v2 ^ 22; // "aa22"
+.fi
+.RE
+
+
+.SS
+v1 ^= v2
+.nf
+ 
+.fi
+String self concatention ^= (append)
+
+\fBExample:\fR
+.RS
+.nf
+ var v1 = "aa";
+ v1 ^= 22; // v1 -> "aa22"
+.fi
+.RE
+
 
 .SS
 var v1 = varnum.round(ndecimals = 0);
@@ -157,7 +431,7 @@ var v1 = varnum.numberinwords(languagename_or_locale_id = "");
 .RE
 
 
-.SH 2. STRING SCANNING
+.SH 4. STRING SCANNING
 .SH
 
 .SS
@@ -609,7 +883,7 @@ MurmurHash3 is used.
 .RE
 
 
-.SH 3. STRING CONVERSION - NON-MUTATING - CHAINABLE
+.SH 5. STRING CONVERSION - NON-MUTATING - CHAINABLE
 .SH
 
 .SS
@@ -1623,7 +1897,7 @@ The delimiter can be multibyte Unicode.
 .RE
 
 
-.SH 4. STRING MUTATION - STANDALONE COMMANDS
+.SH 6. STRING MUTATION - STANDALONE COMMANDS
 .SH
 
 .SS
@@ -1905,7 +2179,7 @@ var().parser(char sepchar = ' ')
 .fi
 
 
-.SH 5. I/O CONVERSION
+.SH 7. I/O CONVERSION
 .SH
 
 .SS
@@ -2016,7 +2290,7 @@ Converts to codepage encoded text from UTF-8 encoded text
 .RE
 
 
-.SH 6. DYNAMIC ARRAY FUNCTIONS
+.SH 8. DYNAMIC ARRAY FUNCTIONS
 .SH
 
 .SS
@@ -2111,7 +2385,7 @@ Same as var.remover() function but returns a new string instead of updating a va
 
 "remove" was called "delete" in Pick OS.
 
-.SH 7. DYNAMIC ARRAY FILTERS
+.SH 9. DYNAMIC ARRAY FILTERS
 .SH
 
 .SS
@@ -2180,7 +2454,7 @@ Binary ops (+, -, *, /) in parallel on multiple values
 .RE
 
 
-.SH 8. DYNAMIC ARRAY MUTATORS STANDALONE COMMANDS
+.SH 10. DYNAMIC ARRAY MUTATORS STANDALONE COMMANDS
 .SH
 
 .SS
@@ -2303,7 +2577,7 @@ Remove a specific field (or value, or subvalue) from a dynamic array, moving all
 .RE
 
 
-.SH 9. DYNAMIC ARRAY SEARCH
+.SH 11. DYNAMIC ARRAY SEARCH
 .SH
 
 .SS
@@ -2458,7 +2732,7 @@ locatebyusing() supports all the above features in a single function.
 
 \fBReturns:\fR True if found.
 
-.SH 10. DATABASE ACCESS
+.SH 12. DATABASE ACCESS
 .SH
 
 .SS
@@ -2714,7 +2988,7 @@ Prefixes the output with source if provided.
 .RE
 
 
-.SH 11. DATABASE MANAGEMENT
+.SH 13. DATABASE MANAGEMENT
 .SH
 
 .SS
@@ -2917,7 +3191,7 @@ Calls db maintenance function (vacuum)
 
 This doesnt actually flush any indexes but does make sure that reccount() function is reasonably accurate.
 
-.SH 12. DATABASE FILE I/O
+.SH 14. DATABASE FILE I/O
 .SH
 
 .SS
@@ -3410,7 +3684,7 @@ If var key is multivalued then a multivalued field is returned.
 .RE
 
 
-.SH 13. DATABASE SORT/SELECT
+.SH 15. DATABASE SORT/SELECT
 .SH
 
 .SS
@@ -3694,7 +3968,7 @@ Delete a saved select list.
 .RE
 
 
-.SH 14. OS TIME/DATE
+.SH 16. OS TIME/DATE
 .SH
 
 .SS
@@ -3878,7 +4152,7 @@ Possible event type codes are as follows:
 
 .fi
 
-.SH 15. OS FILE I/O
+.SH 17. OS FILE I/O
 .SH
 
 .SS
@@ -4135,7 +4409,7 @@ e.g. Target doesnt exist, path is not writeable, permissions etc.
 .RE
 
 
-.SH 16. OS DIRECTORIES
+.SH 18. OS DIRECTORIES
 .SH
 
 .SS
@@ -4319,7 +4593,7 @@ Optionally even if not empty. Including subdirs.
 .RE
 
 
-.SH 17. OS SHELL/ENVIRONMENT
+.SH 19. OS SHELL/ENVIRONMENT
 .SH
 
 .SS
@@ -4563,7 +4837,7 @@ var v1 = var.getxlocale();
 .RE
 
 
-.SH 18. OUTPUT
+.SH 20. OUTPUT
 .SH
 
 .SS
@@ -4691,7 +4965,7 @@ Flush any and all buffered output to stdout and stdlog.
 .RE
 
 
-.SH 19. INPUT
+.SH 21. INPUT
 .SH
 
 .SS
@@ -4831,7 +5105,7 @@ Disable keyboard interrupt.
 
 Ctrl+C becomes inactive in terminal.
 
-.SH 20. MATH/BOOLEAN
+.SH 22. MATH/BOOLEAN
 .SH
 
 .SS
@@ -5110,7 +5384,7 @@ Floating point works.
 .RE
 
 
-.SH 21. I/O CONVERSION CODES 
+.SH 23. I/O CONVERSION CODES 
 .SH
 
 .SS

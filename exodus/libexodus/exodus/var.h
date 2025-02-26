@@ -116,6 +116,20 @@ class PUBLIC var : public var_mid<var> {
 	friend class dim;
 	friend class rex;
 
+	//////////////////
+	/// var creation :
+	//////////////////
+
+	// The literal suffix "_var" allows dynamic arrays to be seamlessly embedded in code using the visible equivalents of unprintable field mark characters.
+	//
+	// RM {backtick} Record mark
+	// FM ^ Field mark
+	// VM ] Value mark
+	// SM } Subvalue mark
+	// TM | Text mark
+	// ST ~ Subtext mark
+	//
+	// `var v1 = "f1^f2^v1]v2^f4"_var; // "f1" _FM "f2" _FM "v1" _VM "v2" _FM "f4"`
 	friend var  operator""_var(const char* cstr, std::size_t size);
 
 public:
@@ -124,14 +138,10 @@ public:
 //	using var_base::var_base;
 	using var_mid<var>::var_mid;
 
-	////////////////////////////////////////////
-	// GENERAL CONSTRUCTOR FROM INITIALIZER LIST
-	////////////////////////////////////////////
-
-	// var_base{...}
-
-	// initializer lists can only be of one type int, double, cstr, char etc.
 	template <class T>
+    // Create an dynamic array var from a list. C++ constrains list elements to be all the same type. var, string, double, int, etc.
+	//
+	// `var v1 = {11, 22, 33}; // "11^22^33"_var`
 	CONSTEXPR var(std::initializer_list<T> list)
 	// This constructor assumes FM delimiter so keep it out of var_base.
 	//Therefore it cannot use var_base initializers
@@ -150,35 +160,20 @@ public:
 			var_str.pop_back();
 	}
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-////                                         IOSTREAM FRIENDS
-///////////////////////////////////////////////////////////////////////////////////////////////////
-//
-//	// OSTREAM
-//	//////////
-//
-//
-//	// rvalue
-//	friend std::ostream& operator<<(std::ostream& ostream1, const var&& outvar) {
-//
-//		outvar.assertString(__PRETTY_FUNCTION__);
-//
-//		CONSTEXPR std::array VISIBLE_FMS_EXCEPT_ESC {VISIBLE_ST_, TM_, VISIBLE_SM_, VISIBLE_VM_, VISIBLE_FM_, VISIBLE_RM_};
-//
-//		// Replace various unprintable field marks with unusual ASCII chars
-//		// Leave ESC as \x1B because it is used to control ANSI terminal control sequences
-//		// std::string str = "\x1A\x1B\x1C\x1D\x1E\x1F";
-//		// |\x1B}]^~  or in high to low ~^]}\x1B|	 or in TRACE() ... ~^]}_|
-//		for (auto iter = outvar.var_str.begin(); iter != outvar.var_str.end(); iter++) {
-//			if (*iter <= RM_ && *iter >= ST_) {
-//				UNLIKELY
-//				*iter = VISIBLE_FMS_EXCEPT_ESC[std::size_t(*iter - ST_)];
-//			}
-//		}
-//
-//		ostream1 << outvar.var_str;
-//		return ostream1;
-//	}
+	/* fake for gendoc
+
+	// Accessing and updating fields of dynamic arrays.
+	//
+	// `var v1 = "";
+	//  v1(3) = "ccc"; // v1 -> "^^ccc"_var
+	//  // Field number -1 causes appending a field when updating.
+	//  v1(-1) = "ddd"; // v1 -> "^^ccc^ddd"_var`
+	ND var  operator()(int fieldno) const;
+
+	// Accessing and updating values in dynamic arrays.
+	ND var  operator()(int fieldno, valueno) const;
+
+	*/
 
 	/////////////////
 	// PARENTHESIS ()
@@ -200,6 +195,8 @@ public:
 	// 1. () on const vars will extract the desired field/value/subvalue as a proper var
 	// Note that all  function "in" arguments are const vars
 	// so will work perfectly with () extraction
+
+	// Accessing and updating subvalues in dynamic arrays.
 	ND var  operator()(int fieldno, int valueno = 0, int subvalueno = 0) const {return this->f(fieldno, valueno, subvalueno);}
 //	ND var  operator()(int fieldno, int valueno = 0, int subvalueno = 0) &&      {return a(fieldno, valueno, subvalueno);}
 
@@ -224,6 +221,40 @@ public:
 	ND var_proxy2 operator()(int fieldno, int valueno);
 	ND var_proxy3 operator()(int fieldno, int valueno, int subvalueno);
 
+	////////////////////////////
+	/// Arithmetical operators :
+	////////////////////////////
+
+	/* fake for gendoc Defined for var_base in varb.h
+
+	// Addition
+	// Attempts to perform mumeric operations on non-numeric strings will throw a runtime error VarNonNumeric.
+	// `var v2 = 0.1;
+	//  var v1 = v2 + 0.2; // 0.3`
+	ND var operator+(var);
+	// Subtraction
+	ND var operator-(var);
+	// Multiplication
+	ND var operator*(var);
+	// Division
+	ND var operator/(var);
+	// Modulus
+	ND var operator%(var);
+
+	// Self addition
+	// `var v1 = 0.1;
+	//  v1 += 0.2; // 0.3`
+	ND var operator+=(var);
+	// Self subtraction
+	ND var operator-=(var);
+	// Self multiplication
+	ND var operator*=(var);
+	// Self division
+	ND var operator/=(var);
+	// Self modulus
+	ND var operator%=(var);
+	*/
+
 	// Prefix operators must be replicated in var
 	// //////////////////////////////////////////
 	//
@@ -235,16 +266,45 @@ public:
 	//
 	// Must have postfix operators if prefix operators are defined
 
+	// Post increment
+	// `var v1 = 3;
+	//  var v2 = v1 ++; // v2 -> 3 // v1 -> 4`
 	   var  operator++(int) &;
+	// Post decrement
+	// `var v1 = 3;
+	//  var v2 = v1 --; // v2 -> 3 // v1 -> 2`
 	   var  operator--(int) &;
 
+	// Pre increment
+	// `var v1 = 3;
+	//  var v2 = ++ v1; // v2 -> 4 // v1 -> 4`
 	   io   operator++() &;
+	// Pre decrement
+	// `var v1 = 3;
+	//  var v2 = -- v1; // v2 -> 2 // v1 -> 2`
 	   io   operator--() &;
 
 	// Tabular documentation is generated for comments starting /// or more and ending with a colon
 
-	///// STRING CREATION:
 	/////////////////////
+	/// String creation :
+	/////////////////////
+
+	/* fake for gendoc
+
+	// String concatention operator ^
+	// At least one side must be a var.
+	// "aa" ^ "22" will not compile but "aa" "22".
+	// Floating point numbers are converted to strings with up to 12 significant digits of precision. This practically eliminates all rounding errors.
+	// `var v2 = "aa";
+	//  var v1 = v2 ^ 22; // "aa22"`
+	ND var operator^(var);
+
+	// String self concatention ^= (append)
+	// `var v1 = "aa";
+	//  v1 ^= 22; // v1 -> "aa22"`
+	ND var operator^=(var);
+	*/
 
 	// Convert a number into a string after rounding it to a given number of decimal places.
 	// var: The number to be converted.
