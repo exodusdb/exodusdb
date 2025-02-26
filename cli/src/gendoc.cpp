@@ -85,7 +85,6 @@ function main() {
 			continue;
 		}
 //		src.converter("\n\r", _FM);
-
 		let osfilename0 = osfilename.field(OSSLASH, -1);
 
 		// code is output using the name of the first file

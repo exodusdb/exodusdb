@@ -223,10 +223,10 @@ VarError::VarError(std::string description_)
     	varb_replace_string(description, " [var = exo::var_mid<exo::var>, ", "[");
 	}
 
-	// Break into debugger if EXO_DEBUG is set to non-zero
+	// Break into debugger if EXO_DEBUG is set to 1
 	// otherwise allow catch at a higher level or terminate
 	var exo_debug;
-	if (exo_debug.osgetenv("EXO_DEBUG") and exo_debug) {
+	if (exo_debug.osgetenv("EXO_DEBUG") and exo_debug == 1) {
 		var(description).errputl("\n");
 		var(stack()).convert(FM, "\n").errputl();
 		debug();

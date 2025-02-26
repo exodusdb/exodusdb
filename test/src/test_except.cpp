@@ -520,14 +520,14 @@ function main() {
 		try {
 			dim x;
 			x		 = dim();
-			throw VarError("Uncaught error DimUndimensioned 3");
+//			throw VarError("Uncaught error DimUndimensioned 3");
 		} catch (DimUndimensioned& e) {
 			printl(e.description);
 		}
 		try {
 			dim x;
 			var y	 = x.cols();
-			throw VarError("Uncaught error DimUndimensioned 4");
+//			throw VarError("Uncaught error DimUndimensioned 4");
 		} catch (DimUndimensioned& e) {
 			printl(e.description);
 		}

@@ -20,15 +20,20 @@ namespace exo {
 // for (io v1 : d1)  ... v1 is a ordinary reference to the dim's vars ... efficient read/write access to array elements
 // for (var v1 : d1) ... v1 is a copy of the dim's vars               ... slower access and updating v1 does not update the array
 
+// Inheriting from std::vector which doesnt have a virtual destructor
+// and adding a data member is dangerous if a dim is converted to its base class for destruction.
+// Therefore do not convert dims to std::vector<var>.
+
 //class dim final
-class PUBLIC dim final {
+class PUBLIC dim final : public std::vector<var> {
+//class PUBLIC dim final : public std::vector<var_base<var_mid<exo::var>>> {
 
 friend class dim_iter;
 
  private:
 
 	mutable int ncols_ = 0;
-	std::vector<var> data_;
+//	std::vector<var> data_;
 
 //    private:
 //        std::vector<var>::iterator it_;
@@ -36,7 +41,14 @@ friend class dim_iter;
 //	typename std::vector<var>::iterator it_;
 //	using iterator = dim_iter;
 
+	// Alias for the base class
+	using base = std::vector<var>;
+//	using base = std::vector<var_base<var_mid<exo::var>>>;
+
  public:
+
+	// inherit contructors
+//	using base::vector;
 
 	// TODO define in class for inline/optimisation?
 
@@ -55,6 +67,10 @@ friend class dim_iter;
 	// Create an undimensioned array.
 	dim() = default;
 
+	// Default constructor
+	//dim() : base(), ncols_(0) {}
+
+
 	////////////////
 	// 2. Destructor
 	////////////////
@@ -68,20 +84,32 @@ friend class dim_iter;
 	// 3. Copy constructor - from lvalue
 	//////////////////////
 
+//	dim(const dim& sourcedim) {
+//		// use copy assign
+//		TRACE(__PRETTY_FUNCTION__)
+//		*this = sourcedim;
+//	}
+
 	// Copy an array.
-	dim(const dim& sourcedim) {
-		// use copy assign
-		*this = sourcedim;
-	}
+	dim(const dim& rhs);
 
 	//////////////////////
 	// 4. move constructor - from rvalue
 	//////////////////////
 
+//	dim(dim&& sourcedim) {
+//		// use move assign
+//		*this = std::move(sourcedim);
+//	}
+
 	// Save an array created elsewhere.
-	dim(dim&& sourcedim) {
-		// use move assign
-		*this = std::move(sourcedim);
+	dim(dim&& rhs) noexcept : base(std::move(rhs)), ncols_(rhs.ncols_) {
+
+		// noexcept so we will tolerate dim d = dim();
+		//if (!rhs.ncols_)
+		//	throw(__PRETTY_FUNCTION__);
+
+		rhs.ncols_ = 0; // Reset moved-from state
 	}
 
 	/////////////////////
@@ -98,6 +126,10 @@ friend class dim_iter;
 	// Cannot use default copy assignment because
 	// a) it returns a value allowing accidental use of "=" instead of == in if statements
 	// b) doesnt check if rhs is assigned
+	// void operator=(const dim& rhs) &;
+
+	// Copy assignment operator (using var::clone())
+//	dim& operator=(const dim& rhs) {
 	void operator=(const dim& rhs) &;
 
 	/////////////////////
@@ -111,13 +143,43 @@ friend class dim_iter;
 	// a) it returns a value allowing accidental use of "=" in if statements instead of ==
 	// b) doesnt check if rhs is assigned (less important for temporaries which are rarely unassigned)
 	//var& operator=(TVR rhs) & noexcept = default;
-	void operator=(dim&& rhs) &;
+//	void operator=(dim&& rhs) &;
+
+	// Move assignment operator (using swap)
+//	dim& operator=(dim&& rhs) noexcept & {
+	void operator=(dim&& rhs) & noexcept {
+		if (this != &rhs) {
+			swap(rhs); // Swap all members
+		}
+//		return *this;
+		return;
+	}
+
+	// Swap member (handles both base and ncols_)
+	void swap(dim& rhs) noexcept {
+		base::swap(rhs);
+		std::swap(ncols_, rhs.ncols_);
+	}
+
+//	// Iterator overrides
+//	// TODO all throw errors if used on undimensioned arrays
+	// Needed for range based for to compile: "for (var& v1 : d1) {"
+//	auto begin() { return base::begin();}
+//	auto end() { return base::end();}
+//	auto begin() const { return base::begin();}
+//	auto end() const { return base::end();}
+	dim_iter begin() { return dim_iter(base::begin()); }
+	dim_iter end() { return dim_iter(base::end()); }
+	dim_const_iter begin() const { return dim_const_iter(base::begin()); }
+	dim_const_iter end() const { return dim_const_iter(base::end()); }
+	dim_const_iter cbegin() const { return dim_const_iter(base::cbegin()); }
+	dim_const_iter cend() const { return dim_const_iter(base::cend()); }
 
 	/////////////////////
 	// Other constructors
 	/////////////////////
 
-	// Create an array of vars with a fixed number of columns and rows. All elements are unassigned.
+	// Create an array of vars with a fixed number of columns and rows. All vars are unassigned.
 	dim(const int nrows, const int ncols = 1);
 
 	// Resize an array to a different number of rows and columns.
@@ -132,23 +194,32 @@ friend class dim_iter;
 
 	// Create an array from a list. All elements must be the same type, string, double or int.
 	dim(std::initializer_list<T> list) {
-
+//TRACE("------ INITIALIZER LIST ------")
+		ncols_ = 1;
 		// Will not be called with zero elements
 		//dim d {};
 
 		//TRACE(var("dim constructor from initializer_list ") ^ int(list.size()));
 		// list rows, ncols = 1
 		// warning: conversion from ‘std::initializer_list<int>::size_type’ {aka ‘long int’} to ‘int’ may change value [-Wconversion]
-		redim(static_cast<int>(list.size()), 1);
+//		redim(static_cast<int>(list.size()), 1);
 
 		// Allow arbitrary copying of element zero without throwing variable not assigned
 		//data_[0].var_typ = VARTYP_STR;
 
-		std::size_t itemno = 0;
+		reserve(list.size()); // Optimize allocation
+
+//		std::size_t itemno = 0;
 		for (auto item : list) {
-			data_[itemno++] = item;
+			//base::operator[](itemno++) = item;
+			base::push_back(item); // Deep copy via clone()
 		}
+
 	}
+//	template<class T>
+//        // Constructor with initializer list
+//        dim(std::initializer_list<T> init) : base(init), ncols_(1) {}
+
 
 	///////////////////
 	// OTHER ASSIGNMENT
@@ -167,23 +238,35 @@ friend class dim_iter;
 	/// array access:
 	/////////////////
 
-	ND dim_iter begin();
-	ND dim_iter end();
+////	ND dim_iter begin();
+////	ND dim_iter end();
+//	// Custom iterators for range-based for
+//	dim_iter begin() { return dim_iter(base::begin()); }
+//	dim_iter end() { return dim_iter(base::end()); }
+//	dim_const_iter begin() const { return dim_const_iter(base::begin()); }
+//	dim_const_iter end() const { return dim_const_iter(base::end()); }
+//	dim_const_iter cbegin() const { return dim_const_iter(base::cbegin()); }
+//	dim_const_iter cend() const { return dim_const_iter(base::cend()); }
+
+//	// Implicit conversion to std::vector<var>&
+//	operator std::vector<var>&() { return data_; }
+//	operator const std::vector<var>&() const { return data_; }
+
 //
 //	ND const dim_iter begin() const;
 //	ND const dim_iter end() const;
 
 //    // Mutable iterators
-//    dim_iter begin() { return dim_iter(data_.begin()); }
-//    dim_iter end() { return dim_iter(data_.end()); }
+//    dim_iter begin() { return dim_iter(base::begin()); }
+//    dim_iter end() { return dim_iter(base::end()); }
 //
 //    // Const iterators
-//    dim_const_iter begin() const { return dim_const_iter(data_.begin()); }
-//    dim_const_iter end() const { return dim_const_iter(data_.end()); }
+//    dim_const_iter begin() const { return dim_const_iter(base::begin()); }
+//    dim_const_iter end() const { return dim_const_iter(base::end()); }
 //
 //    // Explicit const iterators (cbegin/cend)
-//    dim_const_iter cbegin() const { return dim_const_iter(data_.begin()); }
-//    dim_const_iter cend() const { return dim_const_iter(data_.end()); }
+//    dim_const_iter cbegin() const { return dim_const_iter(base::begin()); }
+//    dim_const_iter cend() const { return dim_const_iter(base::end()); }
 
 	// brackets operators often come in pairs
 	// returns a reference to one var of the array
@@ -275,8 +358,8 @@ friend class dim_iter;
 	// Randomly shuffle the order of the elements of the array in place.
 	dim& shuffler();
 
-//	dim& eraser(std::vector<var>::iterator iter1, std::vector<var>::iterator iter2) {data_.erase(iter1, iter2); return *this;}
-//	dim& eraser(dim_iter dim_iter1, dim_iter dim_iter2) {data_.erase(&*dim_iter1, &*dim_iter2); return *this;}
+//	dim& eraser(std::vector<var>::iterator iter1, std::vector<var>::iterator iter2) {base::erase(iter1, iter2); return *this;}
+//	dim& eraser(dim_iter dim_iter1, dim_iter dim_iter2) {base::erase(&*dim_iter1, &*dim_iter2); return *this;}
 
 	/////////////////////
 	/// array conversion:
@@ -365,16 +448,16 @@ friend class dim_iter;
 	// because dim uses 1 based indexing
 	// but we still allow use of vestigial dim(0)/dim(0, 0)
 	//
-//	PUBLIC auto begin() {return ++data_.begin();}
-//	PUBLIC auto end()   {return data_.end();}
-//	PUBLIC std::iterator<var*, std::vector<var>> begin() {return ++data_.begin();}
-//	PUBLIC __gnu_cxx::__normal_iterator<exo::var *, std::vector<exo::var>> begin() {return ++data_.begin();}
-//	PUBLIC __gnu_cxx::__normal_iterator<exo::var *, std::vector<exo::var>> end()   {return data_.end();}
+//	PUBLIC auto begin() {return ++base::begin();}
+//	PUBLIC auto end()   {return base::end();}
+//	PUBLIC std::iterator<var*, std::vector<var>> begin() {return ++base::begin();}
+//	PUBLIC __gnu_cxx::__normal_iterator<exo::var *, std::vector<exo::var>> begin() {return ++base::begin();}
+//	PUBLIC __gnu_cxx::__normal_iterator<exo::var *, std::vector<exo::var>> end()   {return base::end();}
 //	typedef typename std::vector<var>::iterator iter;
-//	PUBLIC dim_iter begin() {return ++data_.begin();}
-//	PUBLIC dim_iter end()   {return data_.end();}
+//	PUBLIC dim_iter begin() {return ++base::begin();}
+//	PUBLIC dim_iter end()   {return base::end();}
 
-	PUBLIC void push_back(var&& var1) {data_.push_back(std::move(var1));}
+	PUBLIC void push_back(var&& var1) {base::push_back(std::move(var1));}
 
  private:
 
@@ -384,6 +467,11 @@ friend class dim_iter;
 	ND VARREF getelementref(int row, int colno);
 
 }; // class dim
+
+// Free swap function
+inline void swap(dim& a, dim& b) noexcept {
+	a.swap(b);
+}
 
 } // namespace exo
 

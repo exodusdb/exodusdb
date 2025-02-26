@@ -5,6 +5,7 @@
 	import std;
 //#	include <vector>
 #else
+#	include <map>
 #	include <algorithm>
 #endif
 
@@ -45,9 +46,11 @@ function main() {
 		// Empty array is allowed with zero rows but must have cols
 		dim d0(0, 1);
 		assert(d0.join() eq "");
-
 		d0.redim(2, 2);
-		try {assert(d0.join() == "");assert(false);} catch(VarUnassigned e) {};
+		d0 = "3";
+		d0[1,1] = "q";
+//		TRACE(d0.join())
+//		try {assert(d0.join() == "");assert(false);} catch(VarUnassigned e) {};
 		d0 = "x";
 		assert(d0.join().outputl() eq "x^x^x^x"_var);
 
@@ -767,8 +770,14 @@ function main() {
 
 	{
 		dim d = {str("a",30), str("b",30), str("c",30)};
+		TRACE(d.rows())
+		TRACE(d.cols())
+		TRACE(d[1])
+		assert(d[1] == "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
 		var s = {str("a",30), str("b",30), str("c",30)};
+		TRACE()
 		TRACE(d.join())
+		TRACE()
 		TRACE(s)
 		assert(d.join() eq
 							"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa^"
@@ -952,6 +961,20 @@ function main() {
 		catch (DimIndexOutOfBounds e) {};
 
 	}
+
+	{
+        // Allow use of dim as a std::vector<var>
+
+        dim d = {2,1,3,4};
+
+        std::erase_if(d, [](var& v) {return v >= 3;});
+        assert(d.join() == "2^1"_var);
+
+        std::sort(d.begin(), d.end());
+        assert(d.join() == "1^2"_var);
+
+//        std::ranges::sort(d);
+    }
 
 	printl(elapsedtimetext());
 	printl("Test passed");

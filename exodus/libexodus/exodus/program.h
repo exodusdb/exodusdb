@@ -63,9 +63,9 @@ static int PROGRAMCLASSNAME##main2(int exodus_argc, const char* exodus_argv[], i
     int result = 0;                                                                                         \
     PROGRAMCLASSNAME##ExodusProgram exodusprogram1(mv);                                                     \
     if (osgetenv("EXO_DEBUG")) {                                                                            \
-        errputl("Debug Init Thread:", THREADNO, #PROGRAMCLASSNAME, SENTENCE);                               \
+        errputl("Debug Init Thread:", THREADNO, " ", #PROGRAMCLASSNAME, " ", SENTENCE);                     \
         result = exodusprogram1.main().toInt();                                                             \
-        errputl("Debug Exit Thread:", THREADNO, #PROGRAMCLASSNAME, SENTENCE);                               \
+        errputl("Debug Exit Thread:", THREADNO, " ", #PROGRAMCLASSNAME, " ", SENTENCE);                     \
     } else {                                                                                                \
         try {                                                                                               \
             result = exodusprogram1.main().toInt();                                                         \

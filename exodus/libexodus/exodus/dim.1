@@ -26,11 +26,18 @@ dim d1 = dim();
 Save an array created elsewhere.
 
 .SS
+dim.swap(dim& rhs) noexcept
+.nf
+ 
+.fi
+Swap member (handles both base and ncols_)
+
+.SS
 dim d1(nrows, ncols = 1);
 .nf
  
 .fi
-Create an array of vars with a fixed number of columns and rows. All elements are unassigned.
+Create an array of vars with a fixed number of columns and rows. All vars are unassigned.
 
 .SS
 d1.redim(nrows, ncols = 1)
