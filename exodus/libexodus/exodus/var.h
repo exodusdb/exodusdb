@@ -120,6 +120,79 @@ class PUBLIC var : public var_mid<var> {
 	/// var creation :
 	//////////////////
 
+	/* fake for gendoc
+
+    // Create an unassigned var.
+	// Whereever possible, variables should be assigned at their point of definition. However, due to the rules of scoping, vars must often be defined in advance of being assigned.
+	// For example a variable may be assigned on different branches of a conditional statement, or returned from a function.
+	// Despite lack of assignment, all "use before initialisation" bugs are eliminiated because a runtime error VarUnassigned is thrown in all cases when a var is used before being assigned.
+	//
+	// `let clients = "xo_clients", key = "SB001";
+	//  var client; // Unassigned var
+	//  if (not read(client from clients, key)) ...`
+	//
+    var() = default;
+
+	// Assign a var using a literal or an expression.
+	// `var v1 = 42;                 // Integer
+	//  var v2 = 42.3;               // Double
+	//  var v3 = "abc";              // String
+	//  var v4 = 'x';                // char
+	//  var v5 = true;               // bool
+	//  var v6 = v1 + 100;           // Arithmetic
+	//  var v7 = v3 ^ "xyz";         // Concatenation
+	//  var v8 = oslist(".").sort(); // Built in functions
+	//
+	//  var x = 0.1, y = "0.2", z = x + y; // z -> 0.3`
+	//
+	// "let v1 = ..."
+	// Whereever a var will not change value, it is good programming practice to indicate the same directly in code.
+	// Use "let" instead of "var" wherever possible. This is a shorthand way of writing "const var".
+	//
+	// `let v1 = osgetenv("HOME");`
+	//
+	void operator=(expression) &;
+
+	// obj is v1
+
+	// Returns: True if the var is assigned, otherwise false
+	ND bool assigned() const;
+
+	// Returns: True if the var is unassigned, otherwise false
+	ND bool unassigned() const;
+
+	// Swap the contents of one var with another.
+    // Useful for stashing large strings quickly since large strings are handled by moving pointers and without making unnecessary copies or allocating memory.
+	// Eiher or both variables may be unassigned.
+	//
+	// `var v1 = space(65'536);
+	//  var v2 = "";
+	//  v1.swap(v2); // v1 -> "" // v2.len() -> 65'536
+	//  // or
+	//  swap(v1, v2);`
+	void swap(io v2);
+
+	// Moves the contents of one var to another. The original var becomes an empty string.
+	// This allows large strings to be efficiently handled by moving pointers and without making unnecessary copies or allocating memory.
+    // The moved var must be assigned otherwise a VarUnassigned error is thrown.
+	// obj is v2
+	//
+	// `var v1 = space(65'536);
+	//  var v2 = v1.move(); // v2.len() -> 65'536 // v1 -> ""
+	//  // or
+	//  move(v1 to v2);`
+	ND var move();
+
+    // Returns a copy of the var.
+    // If the var is unassigned then the copy is unassigned also. No VarUnassigned error is thrown.
+	ND var clone() const;
+
+	*/
+
+	//////////////////////////////////////////////
+	/// Dynamic array creation, access and update:
+	//////////////////////////////////////////////
+
 	// The literal suffix "_var" allows dynamic arrays to be seamlessly embedded in code using the visible equivalents of unprintable field mark characters.
 	//
 	// RM {backtick} Record mark
@@ -162,15 +235,36 @@ public:
 
 	/* fake for gendoc
 
-	// Accessing and updating fields of dynamic arrays.
+	// Dynamic array - field update and append:
+	// See also inserter() and remover().
 	//
-	// `var v1 = "";
-	//  v1(3) = "ccc"; // v1 -> "^^ccc"_var
+	// `var v1 = "aa^bb"_var;
+	//  v1(4) = 44; // v1 -> "aa^bb^^44"_var
 	//  // Field number -1 causes appending a field when updating.
-	//  v1(-1) = "ddd"; // v1 -> "^^ccc^ddd"_var`
+	//  v1(-1) = "55"; // v1 -> "aa^bb^^44^55"_var`
+	//
+	// Field access:
+	// It is recommended to use "v1.f(fieldno)" syntax using a ".f(" prefix to access fields in expressions instead of plain "v1(fieldno)". The former syntax (using .f()) will always compile whereas the latter does not compile in all contexts. It will compile only if being called on a constant var or in a location which requires a var. This is due to C++ not making a clear distinction between usage on the left and right side of assignment operator =.
+	// Furthermore using plain round brackets without the leading .f can be confused with function call syntax.
+	//
+	// `var v1 = "aa^bb^cc"_var;
+	//  var v2 = v1.f(2); // "bb" /// .f() style access. Recommended.
+	//  var v3 =   v1(2); // "bb" ///   () style access. Not recommended.`
 	ND var  operator()(int fieldno) const;
 
-	// Accessing and updating values in dynamic arrays.
+	// Dynamic array - value update and append
+	// See also inserter() and remover().
+	//
+	// `var v1 = "aa^b1]b2^cc"_var;
+	//  v1(2, 4) = "44"; // v1 -> "aa^b1]b2]]44^cc"_var
+	//  // value number -1 causes appending a value when updating.
+	//  v1(2, -1) = 55; // v1 -> "aa^b1]b2]]44]55^cc"_var`
+	//
+	// Value access:
+	//
+	// `var v1 = "aa^b1]b2^cc"_var;
+	//  var v2 = v1.f(2,2); // "b2" /// .f() style access. Recommended.
+	//  var v3 =   v1(2,2); // "b2" ///   () style access. Not recommended.`
 	ND var  operator()(int fieldno, valueno) const;
 
 	*/
@@ -196,7 +290,19 @@ public:
 	// Note that all  function "in" arguments are const vars
 	// so will work perfectly with () extraction
 
-	// Accessing and updating subvalues in dynamic arrays.
+	// Dynamic array - subvalue update and append
+	// See also inserter() and remover().
+	//
+	// `var v1 = "aa^bb^cc"_var;
+	//  v1(2, 2, 2) = "22"; // v1 -> "aa^bb]}22^cc"_var
+	//  // subvalue number -1 causes appending a subvalue when updating.
+	//  v1(2, 2, -1) = 33; // v1 -> "aa^bb]}22}33^cc"_var`
+	//
+	// Subvalue access:
+	//
+	// `var v1 = "aa^b1]b2}s2^cc"_var;
+	//  var v2 = v1.f(2, 2, 2); // "s2" /// .f() style access. Recommended.
+	//  var v3 =   v1(2, 2, 2); // "s2" ///   () style access. Not recommended.`
 	ND var  operator()(int fieldno, int valueno = 0, int subvalueno = 0) const {return this->f(fieldno, valueno, subvalueno);}
 //	ND var  operator()(int fieldno, int valueno = 0, int subvalueno = 0) &&      {return a(fieldno, valueno, subvalueno);}
 
@@ -227,10 +333,35 @@ public:
 
 	/* fake for gendoc Defined for var_base in varb.h
 
+	// Checks if a var is numeric.
+	// Returns: True if it is.
+	// A string is defined to be numeric if it consists of one or more digits 0-9, with a optional decimal point placed anywhere, with an optional + or - sign prefix, or is the empty string "", which is defined to be zero.
+	//
+	// `if ("+123.45"_var.isnum()) ... ok
+	//  if (       ""_var.isnum()) ... ok
+	//  if (not   "."_var.isnum()) ... ok
+	//  // or
+	//  if (isnum("123.")) ... ok`
+	//
+	bool isnum() const;
+
+    // Returns a copy of the var if it is numeric or 0 otherwise.
+	// Returns: A guaranteed numeric var
+	// Allows working numerically with data that may be non-numeric.
+	//
+	// `var v1 = "123.45"_var.num(); // "123.45"
+	//  var v2 = "abc"_var.num(); // 0`
+	//
+	ND var num() const;
+
 	// Addition
 	// Attempts to perform mumeric operations on non-numeric strings will throw a runtime error VarNonNumeric.
-	// `var v2 = 0.1;
-	//  var v1 = v2 + 0.2; // 0.3`
+	// Floating point numbers are implicitly converted to strings with no more than 12 significant digits of precision. This practically eliminates all floatng point rounding errors.
+	// Internally, 0.1 + 0.2 looks like this using doubles.
+	// 0.10000000000000003 + 0.20000000000000004 -> 0.30000000000000004
+	//
+	// `var v1 = 0.1;
+	//  var v2 = v1 + 0.2; // 0.3`
 	ND var operator+(var);
 	// Subtraction
 	ND var operator-(var);
@@ -295,7 +426,7 @@ public:
 	// String concatention operator ^
 	// At least one side must be a var.
 	// "aa" ^ "22" will not compile but "aa" "22".
-	// Floating point numbers are converted to strings with up to 12 significant digits of precision. This practically eliminates all rounding errors.
+	// Floating point numbers are implicitly converted to strings with no more than 12 significant digits of precision. This practically eliminates all floatng point rounding errors.
 	// `var v2 = "aa";
 	//  var v1 = v2 ^ 22; // "aa22"`
 	ND var operator^(var);
@@ -387,13 +518,25 @@ public:
 	///// STRING SCANNING:
 	/////////////////////
 
-	//  obj is strvar
+	// obj is strvar
+
+	/* fake for gendoc from var_base in varb.h
+
+	// Get a single char from a string.
+	// pos1: First char is 1. Last char is -1.
+	// Returns: A single char if pos1 +/- the length of the string, or "" if greater. Returns the first char if pos1 is 0 or (-pos1) > length.
+	// `var v1 = "abc";
+	//  var v2 = v1.at(2);  // "b"
+	//  var v3 = v1.at(-3); // "a"
+	//  var v4 = v1.at(4);  // ""`
+    ND var  at(const int pos1) const;
+	*/
 
 	// Get the char number of a char
 	// Returns: A number between 0 and 255.
 	// If given a string, then only the first char is considered.
 	//
-	// `let v1 = "abc"_var.seq(); // 0x61 // decimal 97
+	// `let v1 = "abc"_var.seq(); // 0x61 // decimal 97, 'a'
 	//  // or
 	//  let v2 = seq("abc");`
 	ND var  seq() const;
@@ -599,7 +742,7 @@ public:
 	///// STRING CONVERSION - Non-mutating - Chainable:
 	//////////////////////////////////////////////////
 
-	//  obj is strvar
+	// obj is strvar
 
 	// Convert to upper case
 	//
@@ -1120,7 +1263,7 @@ public:
 	///// STRING MUTATION - Standalone commands:
 	////////////////////////////////////////////
 
-	//  obj is strvar
+	// obj is strvar
 
 	// Upper case
 	// All string mutators follow the same pattern as ucaser.<br>See the non-mutating functions for details.
@@ -1275,7 +1418,7 @@ public:
 
 #endif //EXO_FORMAT
 
-	//  obj is strvar
+	// obj is strvar
 
 	// Converts from codepage encoded text to UTF-8 encoded text
 	// e.g. Codepage "CP1124" (Ukrainian).
@@ -1297,7 +1440,7 @@ public:
 	///// DYNAMIC ARRAY FUNCTIONS:
 	/////////////////////////////
 
-	//  obj is strvar
+	// obj is strvar
 
 	// EXTRACT() AND F()
 
@@ -1375,7 +1518,7 @@ public:
 	///// DYNAMIC ARRAY FILTERS:
 	///////////////////////////
 
-	//  obj is strvar
+	// obj is strvar
 
 	// Sum up multiple values into one higher level
 	//
@@ -1406,7 +1549,7 @@ public:
 	///// DYNAMIC ARRAY MUTATORS Standalone commands:
 	////////////////////////////
 
-	//  obj is strvar
+	// obj is strvar
 
 	// Mutable versions update lvalue vars and dont return anything so that they cannot be chained. This is to prevent accidental misuse and bugs.
 	//
@@ -1474,7 +1617,7 @@ public:
 	///// DYNAMIC ARRAY SEARCH:
 	//////////////////////////
 
-	//  obj is strvar
+	// obj is strvar
 
 	// LOCATE
 
@@ -1914,7 +2057,7 @@ public:
 	//  if (not updaterecord(record on file, key)) ...`
 	ND bool updaterecord(in file, in key) const;
 
-	//  obj is strvar
+	// obj is strvar
 
 	// "Read field" Same as read() but only returns a specific field number from the record.
 	//
@@ -1985,7 +2128,7 @@ public:
 	// cleardbcache(conn);`
 	   void cleardbcache() const;
 
-	//  obj is strvar
+	// obj is strvar
 
 	// The xlate ("translate") function is similar to readf() but, when called as an exodus program member function, it can be used efficiently with exodus file dictionaries using column names and functions and multivalued data.
 	// Arguments:
@@ -2318,7 +2461,7 @@ public:
 	//  osclose(osfilevar);`
 	   void osclose() const;
 
-	//  obj is strvar
+	// obj is strvar
 
 	// Create a complete os file from a var.
 	// Any existing os file is removed first.
@@ -3131,7 +3274,7 @@ public:
 
 /* fake code to generate documentation
 
-	// Numeric hex format: Convert number to hexadecimal string
+	// Number to hex format: Convert number to hexadecimal string
 	// If the value is not numeric then no conversion is performed and the original value is returned.
 	// obj is varnum
 	//
@@ -3140,7 +3283,7 @@ public:
 	//  assert( oconv(var("255"), "MX") == "FF");`
 	ND std::string oconv_MX() const;
 
-	// Numeric binary format: Convert number to strings of 1s and 0s
+	// Number to binary format: Convert number to strings of 1s and 0s
 	// If the value is not numeric then no conversion is performed and the original value is returned.
 	// obj is varnum
 	//

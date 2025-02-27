@@ -237,23 +237,27 @@ function main() {
 			if (skipping or not in_table)
 				continue;
 
-			// Not documenting ND or not since mostly ND
-			auto no_discard = srcline.starts("ND ");
-			if (no_discard)
-				srcline.cutter(3);
-
 			///////////////////////////////////////
 			// Find a function declaration (tricky)
 			///////////////////////////////////////
 
-			// Only interested in certain function declarations and comments starting exactly //
-			var prefix = srcline.field(" ", 1);
+			// Not documenting ND or not since mostly ND
+			auto no_discard = srcline.starts("ND ");
+			if (no_discard)
+				srcline.cutter(3);
+//
+//			// Only interested in certain function declarations and comments starting exactly //
+//			var prefix = srcline.field(" ", 1);
+//
+//			if (prefix == "friend" || prefix.starts("CONST")) {
+////				TRACE(prefix)
+//				srcline = srcline.field(" ", 2, 999999).trimfirst();
+//				prefix = srcline.field(" ", 1);
+//			}
 
-			if (prefix == "friend" || prefix.starts("CONST")) {
-//				TRACE(prefix)
-				srcline = srcline.field(" ", 2, 999999).trimfirst();
-				prefix = srcline.field(" ", 1);
-			}
+            srcline.replacer(R"__(^((friend)|(CONST[^\s]*))\s)__"_rex, "");
+			srcline.trimmerfirst();
+            var prefix = srcline.field(" ", 1);
 
 			// Suppress lines that are not comments or function declarations
 //			if (not prefix.starts("/") and not srcline.match(R"__(^[\sa-zA-Z0-9_:]+\()__"))
@@ -320,7 +324,8 @@ function main() {
 					// From thrown away comments, get the default obj name for all following functions
 					// except where overridden in specific function comments.
 					// Only match "obj is xxx|yyy|zzz()" at the start of the first line of comment.
-					let new_default_objname = lastcomment.match(R"__(^obj is ([a-zA-Z_][a-zA-Z0-9_()|]+))__").f(1, 2);
+					let new_default_objname = lastcomment.match(R"__(^\s*obj is ([a-zA-Z_][a-zA-Z0-9_()|]+))__").f(1, 2);
+
 					if (new_default_objname) {
 						new_objs ^= new_default_objname ^ FM;
 						default_objname = new_default_objname;
@@ -353,7 +358,8 @@ function main() {
 			// If no end of line comment use the lead in comments before the function declaration
 			if (not comments and lastcomment) {
 				lastcomment.popper();
-				comments = std::move(lastcomment);
+//				comments = std::move(lastcomment);
+				comments = lastcomment.move();
 			}
 
 			// Extract and remove any "obj is xxx|yyy|zzz()" lines in comments for specific functions
@@ -416,6 +422,8 @@ function main() {
 					codematch.replacer(" ...", aborting);
 					codematch.replacer("\n", "\n\t\t");
 					codematch.replacer("\n\t\t\n", "\n");
+
+					codematch.replacer("\t ", "\t");
 
 					// Remove "// Cleanup" lines to be put in heading of
 					static rex cleanup_pattern {R"__(^[^\n]*// Cleanup[^\n]*)__"};
@@ -731,7 +739,7 @@ function main() {
 				// Default constructor
 				if (arg1 == "") {
 					// dim() -> dim d1;
-					func_decl = class_name ^ " " ^ func_decl0.first(1) ^ "1; /" "/ Default";
+					func_decl = class_name ^ " " ^ func_decl0.first(1) ^ "1;";
 				}
 				// Copy constructor
 				else if (arg1 == (class_name ^ "&")) {

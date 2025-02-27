@@ -500,6 +500,9 @@ class PUBLIC var_base {
 		var_int = rhs.var_int;
 		var_typ = rhs.var_typ;
 
+		// std::move on an lvalue to mark the lvalue as unassigned?
+//		rhs.var_typ = VARTYP_UNA;
+
 		EXO_SNITCH("var_base =mov")
 	}
 
@@ -1560,11 +1563,11 @@ class PUBLIC var_base {
 
 	// Returns a copy of the var but works on unassigned vars without triggering an error
 	// If the source is unassigned then the copy is unassigned too.
-	RETVAR clone() const;
+	ND RETVAR clone() const;
 
 	// "moves" the var into a new temporary var while making the var unassigned.
 	// This can be used to transfer ownership of a heap allocated string instead of replicaing it.
-	RETVAR move();
+	ND RETVAR move();
 
 	// Text representation of var_base internals. Works on unassigned vars.
 	ND RETVAR dump() const;

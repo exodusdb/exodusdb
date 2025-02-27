@@ -111,7 +111,8 @@ template<> PUBLIC RETVAR VARBASE1::move() {
 
 	// Clean up this source
 	var_str.clear();
-	var_typ = VARTYP_UNA;
+//	var_typ = VARTYP_UNA;
+	var_typ = VARTYP_STR;
 
 	// TODO
 	// Clear int and dbl?

@@ -243,6 +243,13 @@ function main() {
 		// Will also be used to update a dat file for dict_xyz.cpp
 		//////////////////////////////////////////////////////////
 		auto source_fixer = [](io srcline) {
+
+			// NOT doing move until brackets are fixed first
+////			srcline.replacer(R"__(\bmove\()__"_rex, "move_to\\(");
+//			// pp.dtext[pp.dn, pnx].move(tq);
+//			// response_.move(RECORD);
+//			srcline.replacer(R"__(([_\w.\[\]]+)\.move\(([_\w.\[\]]+)\);)__"_rex, "$2 = $1\\.move\\(\\);");
+
 			srcline.replacer(R"__(makelist("", )__", "selectkeys(");
 			srcline.replacer(R"__(field2()__", "field(");
 

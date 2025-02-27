@@ -1365,7 +1365,8 @@ x1exit:
 
 		htmlcode ^= colhdg ^ _FM "</thead>";
 		htmlcode ^= _FM "<tbody>";
-		htmlcode.move(colhdg);
+		//htmlcode.move(colhdg);
+		colhdg = htmlcode.move();
 
 		// Allow for single quotes
 		colhdg.replacer("'", "''");
@@ -1621,9 +1622,11 @@ nextrec:
 //////////
 
 	if (recn == 1) {
-		head.move(newhead);
+		//head.move(newhead);
+		newhead = head.move();
 		gosub newheadreplacements();
-		newhead.move(head);
+		//newhead.move(head);
+		head = newhead.move();
 	}
 
 	if (not(silent) and not(printfilename.unassigned())) {
@@ -2362,7 +2365,8 @@ subroutine printbreaks() {
 			if (bottomline.unassigned()) {
 				bottomline = "";
 			}
-			bottomline.move(bottomline2);
+//			bottomline.move(bottomline2);
+			bottomline2 = bottomline.move();
 
 			tx(-1) = bottomline2;
 
@@ -2470,7 +2474,8 @@ subroutine emailing() {
 		tt = emailto;
 		tt2 = emailcc;
 		if (not tt) {
-			tt2.move(tt);
+//			tt2.move(tt);
+			tt = tt2.move();
 		}
 
 		if (emailsubject) {

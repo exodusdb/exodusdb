@@ -30,14 +30,65 @@ function main() {
 		var y;
 		assert(unassigned(y));
 	}
+
 	{
-		// move
-		var s1 = "1";
-		var s2 = "2";
-		move(s1, s2);
-		assert(s1         eq "");
-		assert(s2         eq "1");
+		// var.move()
+
+		// .move() to a temporary leaves v1 as empty string guaranteed
+		var v1 = space(100);
+		var v2 = v1.move();
+//		assert(v1.unassigned());
+		assert(v1 == "");
+		assert(v2 == space(100));
 	}
+
+	{
+		// std::move is DIFFERENT
+
+		// MOVES the string
+		// but doesnt mark the source as unassigned
+		var v1 = space(100);
+		var v2 = std::move(v1);
+		assert(! v1.unassigned()); // Still assigned
+		assert(v1 == ""); // But var str is gone.
+		assert(v2 == space(100));
+	}
+
+    {
+		// free function
+		var v1 = "aa";
+		var v2 = "bb";
+		move(v1, v2);
+		assert(v1 == "");
+		assert(v2 == "aa");
+    }
+
+	{
+		var v1;
+		var v2 = "bb";
+		try {
+			move(v1, v2);
+			assert(false);
+		} catch (VarUnassigned e) {};
+		//      assert(v1 == "");
+		//      assert(v2 == "aa");
+	}
+
+	{
+		// swap on unassigned variables
+		var v1 = "q";
+		var v2;
+
+		v1.swap(v2);
+		assert(v1.unassigned());
+		assert(v2 == "q");
+
+		v1.swap(v2);
+		assert(v2.unassigned());
+		assert(v1 == "q");
+	}
+
+
 	{
 		// swap
 		var s1 = "1";
@@ -49,6 +100,10 @@ function main() {
 		std::swap(s1, s2);
 		assert(s1         eq "1");
 		assert(s2         eq "2");
+
+		s1.swap(s2);
+		assert(s1         eq "2");
+		assert(s2         eq "1");
 	}
 	{
 		var started = ostime().outputl("ostime=");

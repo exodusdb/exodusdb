@@ -4,6 +4,139 @@
 .SH
 
 .SS
+var v1;
+.nf
+ 
+.fi
+Create an unassigned var.
+
+Whereever possible, variables should be assigned at their point of definition. However, due to the rules of scoping, vars must often be defined in advance of being assigned.
+
+For example a variable may be assigned on different branches of a conditional statement, or returned from a function.
+
+Despite lack of assignment, all "use before initialisation" bugs are eliminiated because a runtime error VarUnassigned is thrown in all cases when a var is used before being assigned.
+
+\fBExample:\fR
+.RS
+.nf
+ let clients = "xo_clients", key = "SB001";
+ var client; // Unassigned var
+ if (not read(client from clients, key)) ...
+.fi
+.RE
+
+
+
+.SS
+var v1 = expression;
+.nf
+ 
+.fi
+Assign a var using a literal or an expression.
+
+\fBExample:\fR
+.RS
+.nf
+ var v1 = 42;                 // Integer
+ var v2 = 42.3;               // Double
+ var v3 = "abc";              // String
+ var v4 = 'x';                // char
+ var v5 = true;               // bool
+ var v6 = v1 + 100;           // Arithmetic
+ var v7 = v3 ^ "xyz";         // Concatenation
+ var v8 = oslist(".").sort(); // Built in functions
+
+ var x = 0.1, y = "0.2", z = x + y; // z -> 0.3
+.fi
+.RE
+
+"let v1 = ..."
+
+Whereever a var will not change value, it is good programming practice to indicate the same directly in code.
+
+Use "let" instead of "var" wherever possible. This is a shorthand way of writing "const var".
+
+\fBExample:\fR
+.RS
+.nf
+ let v1 = osgetenv("HOME");
+.fi
+.RE
+
+
+
+.SS
+if (v1.assigned()) ...
+.nf
+ 
+.fi
+\fBReturns:\fR True if the var is assigned, otherwise false
+
+.SS
+if (v1.unassigned()) ...
+.nf
+ 
+.fi
+\fBReturns:\fR True if the var is unassigned, otherwise false
+
+.SS
+v1.swap(io v2)
+.nf
+ 
+.fi
+Swap the contents of one var with another.
+
+Useful for stashing large strings quickly since large strings are handled by moving pointers and without making unnecessary copies or allocating memory.
+
+Eiher or both variables may be unassigned.
+
+\fBExample:\fR
+.RS
+.nf
+ var v1 = space(65'536);
+ var v2 = "";
+ v1.swap(v2); // v1 -> "" // v2.len() -> 65'536
+ // or
+ swap(v1, v2);
+.fi
+.RE
+
+
+.SS
+var v1 = v2.move();
+.nf
+ 
+.fi
+Moves the contents of one var to another. The original var becomes an empty string.
+
+This allows large strings to be efficiently handled by moving pointers and without making unnecessary copies or allocating memory.
+
+The moved var must be assigned otherwise a VarUnassigned error is thrown.
+
+\fBExample:\fR
+.RS
+.nf
+ var v1 = space(65'536);
+ var v2 = v1.move(); // v2.len() -> 65'536 // v1 -> ""
+ // or
+ move(v1 to v2);
+.fi
+.RE
+
+
+.SS
+var v1 = v1.clone();
+.nf
+ 
+.fi
+Returns a copy of the var.
+
+If the var is unassigned then the copy is unassigned also. No VarUnassigned error is thrown.
+
+.SH 2. DYNAMIC ARRAY CREATION, ACCESS AND UPDATE
+.SH
+
+.SS
 var v1 = ""_var;
 .nf
  
@@ -52,15 +185,32 @@ var v1 = v2(fieldno);       v1(fieldno) = v2;
 .nf
  
 .fi
-Accessing and updating fields of dynamic arrays.
+Dynamic array - field update and append:
+
+See also inserter() and remover().
 
 \fBExample:\fR
 .RS
 .nf
- var v1 = "";
- v1(3) = "ccc"; // v1 -> "^^ccc"_var
+ var v1 = "aa^bb"_var;
+ v1(4) = 44; // v1 -> "aa^bb^^44"_var
  // Field number -1 causes appending a field when updating.
- v1(-1) = "ddd"; // v1 -> "^^ccc^ddd"_var
+ v1(-1) = "55"; // v1 -> "aa^bb^^44^55"_var
+.fi
+.RE
+
+Field access:
+
+It is recommended to use "v1.f(fieldno)" syntax using a ".f(" prefix to access fields in expressions instead of plain "v1(fieldno)". The former syntax (using .f()) will always compile whereas the latter does not compile in all contexts. It will compile only if being called on a constant var or in a location which requires a var. This is due to C++ not making a clear distinction between usage on the left and right side of assignment operator =.
+
+Furthermore using plain round brackets without the leading .f can be confused with function call syntax.
+
+\fBExample:\fR
+.RS
+.nf
+ var v1 = "aa^bb^cc"_var;
+ var v2 = v1.f(2); // "bb" /// .f() style access. Recommended.
+ var v3 =   v1(2); // "bb" ///   () style access. Not recommended.
 .fi
 .RE
 
@@ -70,17 +220,110 @@ var v1 = v2(fieldno, valueno);       v1(fieldno, valueno) = v2;
 .nf
  
 .fi
-Accessing and updating values in dynamic arrays.
+Dynamic array - value update and append
+
+See also inserter() and remover().
+
+\fBExample:\fR
+.RS
+.nf
+ var v1 = "aa^b1]b2^cc"_var;
+ v1(2, 4) = "44"; // v1 -> "aa^b1]b2]]44^cc"_var
+ // value number -1 causes appending a value when updating.
+ v1(2, -1) = 55; // v1 -> "aa^b1]b2]]44]55^cc"_var
+.fi
+.RE
+
+Value access:
+
+\fBExample:\fR
+.RS
+.nf
+ var v1 = "aa^b1]b2^cc"_var;
+ var v2 = v1.f(2,2); // "b2" /// .f() style access. Recommended.
+ var v3 =   v1(2,2); // "b2" ///   () style access. Not recommended.
+.fi
+.RE
+
 
 .SS
 var v1 = v2(fieldno, valueno, subvalueno);       v1(fieldno, valueno, subvalueno) = v2;
 .nf
  
 .fi
-Accessing and updating subvalues in dynamic arrays.
+Dynamic array - subvalue update and append
 
-.SH 2. ARITHMETICAL OPERATORS 
+See also inserter() and remover().
+
+\fBExample:\fR
+.RS
+.nf
+ var v1 = "aa^bb^cc"_var;
+ v1(2, 2, 2) = "22"; // v1 -> "aa^bb]}22^cc"_var
+ // subvalue number -1 causes appending a subvalue when updating.
+ v1(2, 2, -1) = 33; // v1 -> "aa^bb]}22}33^cc"_var
+.fi
+.RE
+
+Subvalue access:
+
+\fBExample:\fR
+.RS
+.nf
+ var v1 = "aa^b1]b2}s2^cc"_var;
+ var v2 = v1.f(2, 2, 2); // "s2" /// .f() style access. Recommended.
+ var v3 =   v1(2, 2, 2); // "s2" ///   () style access. Not recommended.
+.fi
+.RE
+
+
+.SH 3. ARITHMETICAL OPERATORS 
 .SH
+
+.SS
+if (v1.isnum()) ...
+.nf
+ 
+.fi
+Checks if a var is numeric.
+
+\fBReturns:\fR True if it is.
+
+A string is defined to be numeric if it consists of one or more digits 0-9, with a optional decimal point placed anywhere, with an optional + or - sign prefix, or is the empty string "", which is defined to be zero.
+
+\fBExample:\fR
+.RS
+.nf
+ if ("+123.45"_var.isnum()) ... ok
+ if (       ""_var.isnum()) ... ok
+ if (not   "."_var.isnum()) ... ok
+ // or
+ if (isnum("123.")) ... ok
+.fi
+.RE
+
+
+
+.SS
+var v1 = v1.num();
+.nf
+ 
+.fi
+Returns a copy of the var if it is numeric or 0 otherwise.
+
+\fBReturns:\fR A guaranteed numeric var
+
+Allows working numerically with data that may be non-numeric.
+
+\fBExample:\fR
+.RS
+.nf
+ var v1 = "123.45"_var.num(); // "123.45"
+ var v2 = "abc"_var.num(); // 0
+.fi
+.RE
+
+
 
 .SS
 var v1 = v2 + v3;
@@ -91,11 +334,17 @@ Addition
 
 Attempts to perform mumeric operations on non-numeric strings will throw a runtime error VarNonNumeric.
 
+Floating point numbers are implicitly converted to strings with no more than 12 significant digits of precision. This practically eliminates all floatng point rounding errors.
+
+Internally, 0.1 + 0.2 looks like this using doubles.
+
+0.10000000000000003 + 0.20000000000000004 -> 0.30000000000000004
+
 \fBExample:\fR
 .RS
 .nf
- var v2 = 0.1;
- var v1 = v2 + 0.2; // 0.3
+ var v1 = 0.1;
+ var v2 = v1 + 0.2; // 0.3
 .fi
 .RE
 
@@ -236,7 +485,7 @@ Pre decrement
 .RE
 
 
-.SH 3. STRING CREATION 
+.SH 4. STRING CREATION 
 .SH
 
 .SS
@@ -250,7 +499,7 @@ At least one side must be a var.
 
 "aa" ^ "22" will not compile but "aa" "22".
 
-Floating point numbers are converted to strings with up to 12 significant digits of precision. This practically eliminates all rounding errors.
+Floating point numbers are implicitly converted to strings with no more than 12 significant digits of precision. This practically eliminates all floatng point rounding errors.
 
 \fBExample:\fR
 .RS
@@ -431,11 +680,33 @@ var v1 = varnum.numberinwords(languagename_or_locale_id = "");
 .RE
 
 
-.SH 4. STRING SCANNING
+.SH 5. STRING SCANNING
 .SH
 
 .SS
-var v1 = var().seq();
+var v1 = strvar.at(pos1);
+.nf
+ 
+.fi
+Get a single char from a string.
+
+\fBpos1:\fR First char is 1. Last char is -1.
+
+\fBReturns:\fR A single char if pos1 +/- the length of the string, or "" if greater. Returns the first char if pos1 is 0 or (-pos1) > length.
+
+\fBExample:\fR
+.RS
+.nf
+ var v1 = "abc";
+ var v2 = v1.at(2);  // "b"
+ var v3 = v1.at(-3); // "a"
+ var v4 = v1.at(4);  // ""
+.fi
+.RE
+
+
+.SS
+var v1 = strvar.seq();
 .nf
  
 .fi
@@ -448,7 +719,7 @@ If given a string, then only the first char is considered.
 \fBExample:\fR
 .RS
 .nf
- let v1 = "abc"_var.seq(); // 0x61 // decimal 97
+ let v1 = "abc"_var.seq(); // 0x61 // decimal 97, 'a'
  // or
  let v2 = seq("abc");
 .fi
@@ -456,7 +727,7 @@ If given a string, then only the first char is considered.
 
 
 .SS
-var v1 = var().textseq();
+var v1 = strvar.textseq();
 .nf
  
 .fi
@@ -477,7 +748,7 @@ Get the Unicode Code Point of a Unicode character.
 
 
 .SS
-var v1 = var().len();
+var v1 = strvar.len();
 .nf
  
 .fi
@@ -496,7 +767,7 @@ Get the length of a source string in number of chars
 
 
 .SS
-if (var().empty()) ...
+if (strvar.empty()) ...
 .nf
  
 .fi
@@ -520,7 +791,7 @@ Note that 'if (var.empty())' is not the same as 'if (not var)' because 'if (var(
 
 
 .SS
-var v1 = var().textwidth();
+var v1 = strvar.textwidth();
 .nf
  
 .fi
@@ -545,7 +816,7 @@ Does not properly calculate all possible combining sequences of graphemes e.g. f
 
 
 .SS
-var v1 = var().textlen();
+var v1 = strvar.textlen();
 .nf
  
 .fi
@@ -564,7 +835,7 @@ Count the number of Unicode code points in a source string.
 
 
 .SS
-var v1 = var().fcount(sepstr);
+var v1 = strvar.fcount(sepstr);
 .nf
  
 .fi
@@ -587,7 +858,7 @@ This is similar to "var.count(sepstr) + 1" but it returns 0 for an empty source 
 
 
 .SS
-var v1 = var().count(sepstr);
+var v1 = strvar.count(sepstr);
 .nf
  
 .fi
@@ -610,7 +881,7 @@ Overlapping substrings are not counted.
 
 
 .SS
-if (var().starts(prefix)) ...
+if (strvar.starts(prefix)) ...
 .nf
  
 .fi
@@ -633,7 +904,7 @@ Checks if a source string starts with a given prefix (substr).
 
 
 .SS
-if (var().ends(suffix)) ...
+if (strvar.ends(suffix)) ...
 .nf
  
 .fi
@@ -656,7 +927,7 @@ Checks if a source string ends with a given suffix (substr).
 
 
 .SS
-if (var().contains(substr)) ...
+if (strvar.contains(substr)) ...
 .nf
  
 .fi
@@ -685,7 +956,7 @@ Programmer logic: Compare as many characters as are in the search string for pre
 
 
 .SS
-var v1 = var().index(substr, startchar1 = 1);
+var v1 = strvar.index(substr, startchar1 = 1);
 .nf
  
 .fi
@@ -708,7 +979,7 @@ Find a substr in a source string.
 
 
 .SS
-var v1 = var().indexn(substr, occurrence);
+var v1 = strvar.indexn(substr, occurrence);
 .nf
  
 .fi
@@ -729,7 +1000,7 @@ Find the nth occurrence of a substr in a source string.
 
 
 .SS
-var v1 = var().indexr(substr, startchar1 = -1);
+var v1 = strvar.indexr(substr, startchar1 = -1);
 .nf
  
 .fi
@@ -752,7 +1023,7 @@ Find the position of substr working backwards from the end of the string towards
 
 
 .SS
-var v1 = var().match(regex_str, regex_options = "");
+var v1 = strvar.match(regex_str, regex_options = "");
 .nf
  
 .fi
@@ -806,14 +1077,14 @@ w - Wildcard glob style (e.g. *.cfg) not regex style. Only for match() and searc
 .fi
 
 .SS
-var v1 = var().match(regex);
+var v1 = strvar.match(regex);
 .nf
  
 .fi
 Ditto
 
 .SS
-var v1 = var().search(regex_str, io startchar1, regex_options = "");
+var v1 = strvar.search(regex_str, io startchar1, regex_options = "");
 .nf
  
 .fi
@@ -840,28 +1111,28 @@ regex_options as for match()
 
 
 .SS
-var v1 = var().search(regex_str);
+var v1 = strvar.search(regex_str);
 .nf
  
 .fi
 Ditto starting from first char
 
 .SS
-var v1 = var().search(regex, io startchar1);
+var v1 = strvar.search(regex, io startchar1);
 .nf
  
 .fi
 Ditto given a rex
 
 .SS
-var v1 = var().search(regex);
+var v1 = strvar.search(regex);
 .nf
  
 .fi
 Ditto starting from first char.
 
 .SS
-var v1 = var().hash(std::uint64_t modulus = 0);
+var v1 = strvar.hash(std::uint64_t modulus = 0);
 .nf
  
 .fi
@@ -883,11 +1154,11 @@ MurmurHash3 is used.
 .RE
 
 
-.SH 5. STRING CONVERSION - NON-MUTATING - CHAINABLE
+.SH 6. STRING CONVERSION - NON-MUTATING - CHAINABLE
 .SH
 
 .SS
-var v1 = var().ucase();
+var v1 = strvar.ucase();
 .nf
  
 .fi
@@ -904,7 +1175,7 @@ Convert to upper case
 
 
 .SS
-var v1 = var().lcase();
+var v1 = strvar.lcase();
 .nf
  
 .fi
@@ -921,7 +1192,7 @@ Convert to lower case
 
 
 .SS
-var v1 = var().tcase();
+var v1 = strvar.tcase();
 .nf
  
 .fi
@@ -940,7 +1211,7 @@ Convert to title case.
 
 
 .SS
-var v1 = var().fcase();
+var v1 = strvar.fcase();
 .nf
  
 .fi
@@ -967,7 +1238,7 @@ Case folding is not locale-dependent.
 
 
 .SS
-var v1 = var().normalize();
+var v1 = strvar.normalize();
 .nf
  
 .fi
@@ -990,7 +1261,7 @@ Normalization is not locale-dependent.
 
 
 .SS
-var v1 = var().invert();
+var v1 = strvar.invert();
 .nf
  
 .fi
@@ -1019,7 +1290,7 @@ Non-existant Unicode Code Points may be created but UTF8 encoding remains valid.
 
 
 .SS
-var v1 = var().lower();
+var v1 = strvar.lower();
 .nf
  
 .fi
@@ -1044,7 +1315,7 @@ String size remains identical.
 
 
 .SS
-var v1 = var().raise();
+var v1 = strvar.raise();
 .nf
  
 .fi
@@ -1069,7 +1340,7 @@ String size remains identical.
 
 
 .SS
-var v1 = var().crop();
+var v1 = strvar.crop();
 .nf
  
 .fi
@@ -1086,7 +1357,7 @@ Remove any redundant FM, VM etc. chars (Trailing FM; VM before FM etc.)
 
 
 .SS
-var v1 = var().quote();
+var v1 = strvar.quote();
 .nf
  
 .fi
@@ -1103,7 +1374,7 @@ Wrap in double quotes.
 
 
 .SS
-var v1 = var().squote();
+var v1 = strvar.squote();
 .nf
  
 .fi
@@ -1120,7 +1391,7 @@ Wrap in single quotes.
 
 
 .SS
-var v1 = var().unquote();
+var v1 = strvar.unquote();
 .nf
  
 .fi
@@ -1137,7 +1408,7 @@ Remove one pair of surrounding double or single quotes.
 
 
 .SS
-var v1 = var().trim(trimchars = " ");
+var v1 = strvar.trim(trimchars = " ");
 .nf
  
 .fi
@@ -1156,7 +1427,7 @@ Remove all leading, trailing and excessive inner bytes.
 
 
 .SS
-var v1 = var().trimfirst(trimchars = " ");
+var v1 = strvar.trimfirst(trimchars = " ");
 .nf
  
 .fi
@@ -1173,7 +1444,7 @@ Ditto but only leading.
 
 
 .SS
-var v1 = var().trimlast(trimchars = " ");
+var v1 = strvar.trimlast(trimchars = " ");
 .nf
  
 .fi
@@ -1190,7 +1461,7 @@ Ditto but only trailing.
 
 
 .SS
-var v1 = var().trimboth(trimchars = " ");
+var v1 = strvar.trimboth(trimchars = " ");
 .nf
  
 .fi
@@ -1207,7 +1478,7 @@ Ditto but only leading and trailing, not inner.
 
 
 .SS
-var v1 = var().first();
+var v1 = strvar.first();
 .nf
  
 .fi
@@ -1228,7 +1499,7 @@ Equivalent to var.substr(1,length) or var[1, length] in Pick OS
 
 
 .SS
-var v1 = var().last();
+var v1 = strvar.last();
 .nf
  
 .fi
@@ -1249,7 +1520,7 @@ Equivalent to var.substr(-1, 1) or var[-1, 1] in Pick OS
 
 
 .SS
-var v1 = var().first(std::size_t length);
+var v1 = strvar.first(std::size_t length);
 .nf
  
 .fi
@@ -1272,7 +1543,7 @@ Equivalent to var.substr(1, length) or var[1, length] in Pick OS
 
 
 .SS
-var v1 = var().last(std::size_t length);
+var v1 = strvar.last(std::size_t length);
 .nf
  
 .fi
@@ -1291,7 +1562,7 @@ Equivalent to var.substr(-length, length) or var[-length, length] in Pick OS
 
 
 .SS
-var v1 = var().cut(length);
+var v1 = strvar.cut(length);
 .nf
  
 .fi
@@ -1314,7 +1585,7 @@ Equivalent to var.substr(length) or var[1, length] = "" in Pick OS
 
 
 .SS
-var v1 = var().paste(pos1, length, insertstr);
+var v1 = strvar.paste(pos1, length, insertstr);
 .nf
  
 .fi
@@ -1343,7 +1614,7 @@ Equivalent to var[pos1, length] = substr in Pick OS
 
 
 .SS
-var v1 = var().paste(pos1, insertstr);
+var v1 = strvar.paste(pos1, insertstr);
 .nf
  
 .fi
@@ -1362,7 +1633,7 @@ Equivalent to var[pos1, 0] = substr in Pick OS
 
 
 .SS
-var v1 = var().prefix(insertstr);
+var v1 = strvar.prefix(insertstr);
 .nf
  
 .fi
@@ -1381,7 +1652,7 @@ Equivalent to var[0, 0] = substr in Pick OS
 
 
 .SS
-var v1 = var().append(appendable, ...);
+var v1 = strvar.append(appendable, ...);
 .nf
  
 .fi
@@ -1398,7 +1669,7 @@ Append anything at the end of a string
 
 
 .SS
-var v1 = var().pop();
+var v1 = strvar.pop();
 .nf
  
 .fi
@@ -1417,7 +1688,7 @@ Equivalent to var[-1, 1] = "" in Pick OS
 
 
 .SS
-var v1 = var().field(delimiter, fieldnx = 1, nfieldsx = 1);
+var v1 = strvar.field(delimiter, fieldnx = 1, nfieldsx = 1);
 .nf
  
 .fi
@@ -1450,7 +1721,7 @@ Copies one or more consecutive fields from a string given a delimiter
 
 
 .SS
-var v1 = var().fieldstore(separator, fieldno, nfields, replacement);
+var v1 = strvar.fieldstore(separator, fieldno, nfields, replacement);
 .nf
  
 .fi
@@ -1509,7 +1780,7 @@ If nfields exceeds the number of fields in the input then additional empty field
 
 
 .SS
-var v1 = var().substr(pos1, length);
+var v1 = strvar.substr(pos1, length);
 .nf
  
 .fi
@@ -1560,14 +1831,14 @@ If length is negative then work backwards and return chars reversed
 
 
 .SS
-var v1 = var().b(pos1, length);
+var v1 = strvar.b(pos1, length);
 .nf
  
 .fi
 Abbreviated alias of substr version 1.
 
 .SS
-var v1 = var().substr(pos1);
+var v1 = strvar.substr(pos1);
 .nf
  
 .fi
@@ -1594,14 +1865,14 @@ Partially Unicode friendly but pos1 is in chars.
 
 
 .SS
-var v1 = var().b(pos1);
+var v1 = strvar.b(pos1);
 .nf
  
 .fi
 Shorthand alias of substr version 2.
 
 .SS
-var v1 = var().substr(pos1, delimiterchars, out pos2);
+var v1 = strvar.substr(pos1, delimiterchars, out pos2);
 .nf
  
 .fi
@@ -1641,14 +1912,14 @@ This function is similar to std::string::find_first_of but that function only re
 
 
 .SS
-var v1 = var().b(pos1, delimiterchars, out pos2);
+var v1 = strvar.b(pos1, delimiterchars, out pos2);
 .nf
  
 .fi
 Shorthand alias of substr version 3.
 
 .SS
-var v1 = var().substr2(io pos1, out delimiterno);
+var v1 = strvar.substr2(io pos1, out delimiterno);
 .nf
  
 .fi
@@ -1692,14 +1963,14 @@ It is similar to version 3 of substr - substr(pos1, delimiterchars, pos2) except
 
 
 .SS
-var v1 = var().b2(io pos1, out field_mark_no);
+var v1 = strvar.b2(io pos1, out field_mark_no);
 .nf
  
 .fi
 Shorthand alias of substr version 4.
 
 .SS
-var v1 = var().convert(from_chars, to_chars);
+var v1 = strvar.convert(from_chars, to_chars);
 .nf
  
 .fi
@@ -1722,7 +1993,7 @@ Not UTF8 compatible.
 
 
 .SS
-var v1 = var().textconvert(from_characters, to_characters);
+var v1 = strvar.textconvert(from_characters, to_characters);
 .nf
  
 .fi
@@ -1739,7 +2010,7 @@ Ditto for Unicode code points.
 
 
 .SS
-var v1 = var().replace(fromstr, tostr);
+var v1 = strvar.replace(fromstr, tostr);
 .nf
  
 .fi
@@ -1758,7 +2029,7 @@ Case sensitive.
 
 
 .SS
-var v1 = var().replace(regex, tostr);
+var v1 = strvar.replace(regex, tostr);
 .nf
  
 .fi
@@ -1777,7 +2048,7 @@ Use $0, $1, $2 in tostr to refer to groups defined in the regex.
 
 
 .SS
-var v1 = var().unique();
+var v1 = strvar.unique();
 .nf
  
 .fi
@@ -1794,7 +2065,7 @@ Remove duplicate fields in an FM or VM etc. separated list
 
 
 .SS
-var v1 = var().sort(delimiter = FM);
+var v1 = strvar.sort(delimiter = FM);
 .nf
  
 .fi
@@ -1824,7 +2095,7 @@ Alphabetic data:
 
 
 .SS
-var v1 = var().reverse(delimiter = FM);
+var v1 = strvar.reverse(delimiter = FM);
 .nf
  
 .fi
@@ -1841,7 +2112,7 @@ Reorder fields in an FM or VM etc. separated list in descending order
 
 
 .SS
-var v1 = var().shuffle(delimiter = FM);
+var v1 = strvar.shuffle(delimiter = FM);
 .nf
  
 .fi
@@ -1858,7 +2129,7 @@ Randomise the order of fields in an FM, VM separated list
 
 
 .SS
-var v1 = var().parse(char sepchar = ' ');
+var v1 = strvar.parse(char sepchar = ' ');
 .nf
  
 .fi
@@ -1879,7 +2150,7 @@ Replaces separator chars with FM chars except inside double or single quotes and
 
 
 .SS
-var().split(delimiter = FM)
+strvar.split(delimiter = FM)
 .nf
  
 .fi
@@ -1897,11 +2168,11 @@ The delimiter can be multibyte Unicode.
 .RE
 
 
-.SH 6. STRING MUTATION - STANDALONE COMMANDS
+.SH 7. STRING MUTATION - STANDALONE COMMANDS
 .SH
 
 .SS
-var().ucaser()
+strvar.ucaser()
 .nf
  
 .fi
@@ -1921,265 +2192,265 @@ All string mutators follow the same pattern as ucaser.<br>See the non-mutating f
 
 
 .SS
-var().lcaser()
+strvar.lcaser()
 .nf
  
 .fi
 
 
 .SS
-var().tcaser()
+strvar.tcaser()
 .nf
  
 .fi
 
 
 .SS
-var().fcaser()
+strvar.fcaser()
 .nf
  
 .fi
 
 
 .SS
-var().normalizer()
+strvar.normalizer()
 .nf
  
 .fi
 
 
 .SS
-var().inverter()
+strvar.inverter()
 .nf
  
 .fi
 
 
 .SS
-var().quoter()
+strvar.quoter()
 .nf
  
 .fi
 
 
 .SS
-var().squoter()
+strvar.squoter()
 .nf
  
 .fi
 
 
 .SS
-var().unquoter()
+strvar.unquoter()
 .nf
  
 .fi
 
 
 .SS
-var().lowerer()
+strvar.lowerer()
 .nf
  
 .fi
 
 
 .SS
-var().raiser()
+strvar.raiser()
 .nf
  
 .fi
 
 
 .SS
-var().cropper()
+strvar.cropper()
 .nf
  
 .fi
 
 
 .SS
-var().trimmer(trimchars = " ")
+strvar.trimmer(trimchars = " ")
 .nf
  
 .fi
 
 
 .SS
-var().trimmerfirst(trimchars = " ")
+strvar.trimmerfirst(trimchars = " ")
 .nf
  
 .fi
 
 
 .SS
-var().trimmerlast(trimchars = " ")
+strvar.trimmerlast(trimchars = " ")
 .nf
  
 .fi
 
 
 .SS
-var().trimmerboth(trimchars = " ")
+strvar.trimmerboth(trimchars = " ")
 .nf
  
 .fi
 
 
 .SS
-var().firster()
+strvar.firster()
 .nf
  
 .fi
 
 
 .SS
-var().laster()
+strvar.laster()
 .nf
  
 .fi
 
 
 .SS
-var().firster(std::size_t length)
+strvar.firster(std::size_t length)
 .nf
  
 .fi
 
 
 .SS
-var().laster(std::size_t length)
+strvar.laster(std::size_t length)
 .nf
  
 .fi
 
 
 .SS
-var().cutter(length)
+strvar.cutter(length)
 .nf
  
 .fi
 
 
 .SS
-var().paster(pos1, length, insertstr)
+strvar.paster(pos1, length, insertstr)
 .nf
  
 .fi
 
 
 .SS
-var().paster(pos1, insertstr)
+strvar.paster(pos1, insertstr)
 .nf
  
 .fi
 
 
 .SS
-var().prefixer(insertstr)
+strvar.prefixer(insertstr)
 .nf
  
 .fi
 
 
 .SS
-var().appender(appendable, ...)
+strvar.appender(appendable, ...)
 .nf
  
 .fi
 
 
 .SS
-var().popper()
+strvar.popper()
 .nf
  
 .fi
 
 
 .SS
-var().fieldstorer(delimiter, fieldno, nfields, replacement)
+strvar.fieldstorer(delimiter, fieldno, nfields, replacement)
 .nf
  
 .fi
 
 
 .SS
-var().substrer(pos1, length)
+strvar.substrer(pos1, length)
 .nf
  
 .fi
 
 
 .SS
-var().substrer(pos1)
+strvar.substrer(pos1)
 .nf
  
 .fi
 
 
 .SS
-var().converter(from_chars, to_chars)
+strvar.converter(from_chars, to_chars)
 .nf
  
 .fi
 
 
 .SS
-var().textconverter(from_characters, to_characters)
+strvar.textconverter(from_characters, to_characters)
 .nf
  
 .fi
 
 
 .SS
-var().replacer(regex, tostr)
+strvar.replacer(regex, tostr)
 .nf
  
 .fi
 
 
 .SS
-var().replacer(fromstr, tostr)
+strvar.replacer(fromstr, tostr)
 .nf
  
 .fi
 
 
 .SS
-var().uniquer()
+strvar.uniquer()
 .nf
  
 .fi
 
 
 .SS
-var().sorter(delimiter = FM)
+strvar.sorter(delimiter = FM)
 .nf
  
 .fi
 
 
 .SS
-var().reverser(delimiter = FM)
+strvar.reverser(delimiter = FM)
 .nf
  
 .fi
 
 
 .SS
-var().shuffler(delimiter = FM)
+strvar.shuffler(delimiter = FM)
 .nf
  
 .fi
 
 
 .SS
-var().parser(char sepchar = ' ')
+strvar.parser(char sepchar = ' ')
 .nf
  
 .fi
 
 
-.SH 7. I/O CONVERSION
+.SH 8. I/O CONVERSION
 .SH
 
 .SS
@@ -2252,7 +2523,7 @@ or with exodus oconv codes e.g. {::MD20P|R(_)#8} as in the below example.
 
 
 .SS
-var v1 = var.from_codepage(codepage);
+var v1 = strvar.from_codepage(codepage);
 .nf
  
 .fi
@@ -2274,7 +2545,7 @@ Use Linux command "iconv -l" for complete list of code pages and encodings.
 
 
 .SS
-var v1 = var.to_codepage(codepage);
+var v1 = strvar.to_codepage(codepage);
 .nf
  
 .fi
@@ -2290,11 +2561,11 @@ Converts to codepage encoded text from UTF-8 encoded text
 .RE
 
 
-.SH 8. DYNAMIC ARRAY FUNCTIONS
+.SH 9. DYNAMIC ARRAY FUNCTIONS
 .SH
 
 .SS
-var v1 = var.f(fieldno, valueno = 0, subvalueno = 0);
+var v1 = strvar.f(fieldno, valueno = 0, subvalueno = 0);
 .nf
  
 .fi
@@ -2316,7 +2587,7 @@ The abbreviated exodus field extraction function (e.g. xxx.f(20)) is provided in
 
 
 .SS
-var v1 = var.extract(fieldno, valueno = 0, subvalueno = 0);
+var v1 = strvar.extract(fieldno, valueno = 0, subvalueno = 0);
 .nf
  
 .fi
@@ -2335,49 +2606,49 @@ Extract a specific field, value or subvalue from a dynamic array.
 
 
 .SS
-var v1 = var.pickreplace(fieldno, valueno, subvalueno, replacement);
+var v1 = strvar.pickreplace(fieldno, valueno, subvalueno, replacement);
 .nf
  
 .fi
 Same as var.r() function but returns a new string instead of updating a variable in place.<br>Rarely used.
 
 .SS
-var v1 = var.pickreplace(fieldno, valueno, replacement);
+var v1 = strvar.pickreplace(fieldno, valueno, replacement);
 .nf
  
 .fi
 Ditto for a specific multivalue
 
 .SS
-var v1 = var.pickreplace(fieldno, replacement);
+var v1 = strvar.pickreplace(fieldno, replacement);
 .nf
  
 .fi
 Ditto for a specific field
 
 .SS
-var v1 = var.insert(fieldno, valueno, subvalueno, insertion);
+var v1 = strvar.insert(fieldno, valueno, subvalueno, insertion);
 .nf
  
 .fi
 Same as var.inserter() function but returns a new string instead of updating a variable in place.
 
 .SS
-var v1 = var.insert(fieldno, valueno, insertion);
+var v1 = strvar.insert(fieldno, valueno, insertion);
 .nf
  
 .fi
 Ditto for a specific multivalue
 
 .SS
-var v1 = var.insert(fieldno, insertion);
+var v1 = strvar.insert(fieldno, insertion);
 .nf
  
 .fi
 Ditto for a specific field
 
 .SS
-var v1 = var.remove(fieldno, valueno = 0, subvalueno = 0);
+var v1 = strvar.remove(fieldno, valueno = 0, subvalueno = 0);
 .nf
  
 .fi
@@ -2385,11 +2656,11 @@ Same as var.remover() function but returns a new string instead of updating a va
 
 "remove" was called "delete" in Pick OS.
 
-.SH 9. DYNAMIC ARRAY FILTERS
+.SH 10. DYNAMIC ARRAY FILTERS
 .SH
 
 .SS
-var v1 = var.sum();
+var v1 = strvar.sum();
 .nf
  
 .fi
@@ -2406,7 +2677,7 @@ Sum up multiple values into one higher level
 
 
 .SS
-var v1 = var.sumall();
+var v1 = strvar.sumall();
 .nf
  
 .fi
@@ -2423,7 +2694,7 @@ Sum up all levels into a single figure
 
 
 .SS
-var v1 = var.sum(delimiter);
+var v1 = strvar.sum(delimiter);
 .nf
  
 .fi
@@ -2440,7 +2711,7 @@ Ditto allowing commas etc.
 
 
 .SS
-var v1 = var.mv(opcode, var2);
+var v1 = strvar.mv(opcode, var2);
 .nf
  
 .fi
@@ -2454,11 +2725,11 @@ Binary ops (+, -, *, /) in parallel on multiple values
 .RE
 
 
-.SH 10. DYNAMIC ARRAY MUTATORS STANDALONE COMMANDS
+.SH 11. DYNAMIC ARRAY MUTATORS STANDALONE COMMANDS
 .SH
 
 .SS
-var.r(fieldno, replacement)
+strvar.r(fieldno, replacement)
 .nf
  
 .fi
@@ -2474,7 +2745,7 @@ Replaces a specific field in a dynamic array
 
 
 .SS
-var.r(fieldno, valueno, replacement)
+strvar.r(fieldno, valueno, replacement)
 .nf
  
 .fi
@@ -2490,7 +2761,7 @@ Ditto for specific value in a specific field.
 
 
 .SS
-var.r(fieldno, valueno, subvalueno, replacement)
+strvar.r(fieldno, valueno, subvalueno, replacement)
 .nf
  
 .fi
@@ -2506,7 +2777,7 @@ Ditto for a specific subvalue in a specific value of a specific field
 
 
 .SS
-var.inserter(fieldno, insertion)
+strvar.inserter(fieldno, insertion)
 .nf
  
 .fi
@@ -2524,7 +2795,7 @@ Insert a specific field in a dynamic array, moving all other fields up.
 
 
 .SS
-var.inserter(fieldno, valueno, insertion)
+strvar.inserter(fieldno, valueno, insertion)
 .nf
  
 .fi
@@ -2542,7 +2813,7 @@ Ditto for a specific value in a specific field, moving all other values up.
 
 
 .SS
-var.inserter(fieldno, valueno, subvalueno, insertion)
+strvar.inserter(fieldno, valueno, subvalueno, insertion)
 .nf
  
 .fi
@@ -2560,7 +2831,7 @@ Ditto for a specific subvalue in a dynamic array, moving all other subvalues up.
 
 
 .SS
-var.remover(fieldno, valueno = 0, subvalueno = 0)
+strvar.remover(fieldno, valueno = 0, subvalueno = 0)
 .nf
  
 .fi
@@ -2577,11 +2848,11 @@ Remove a specific field (or value, or subvalue) from a dynamic array, moving all
 .RE
 
 
-.SH 11. DYNAMIC ARRAY SEARCH
+.SH 12. DYNAMIC ARRAY SEARCH
 .SH
 
 .SS
-var v1 = var.locate(target);
+var v1 = strvar.locate(target);
 .nf
  
 .fi
@@ -2602,7 +2873,7 @@ Searching for empty fields, values etc. (i.e. "") will work. Locating "" in "]yy
 
 
 .SS
-if (var.locate(target, out valueno)) ...
+if (strvar.locate(target, out valueno)) ...
 .nf
  
 .fi
@@ -2624,7 +2895,7 @@ locate() with only the target substr provided and setting returned searches unor
 
 
 .SS
-if (var.locate(target, out setting, fieldno, valueno = 0)) ...
+if (strvar.locate(target, out setting, fieldno, valueno = 0)) ...
 .nf
  
 .fi
@@ -2644,7 +2915,7 @@ locate() the target in unordered fields if fieldno is 0, or values if a fieldno 
 
 
 .SS
-if (var.locateby(ordercode, target, out valueno)) ...
+if (strvar.locateby(ordercode, target, out valueno)) ...
 .nf
  
 .fi
@@ -2671,7 +2942,7 @@ In case the target is not exactly found then the correct value no for inserting 
 
 
 .SS
-if (var.locateby(ordercode, target, out setting, fieldno, valueno = 0)) ...
+if (strvar.locateby(ordercode, target, out setting, fieldno, valueno = 0)) ...
 .nf
  
 .fi
@@ -2687,7 +2958,7 @@ locateby() ordered as above but in fields if fieldno is 0, or values in a specif
 
 
 .SS
-if (var.locateusing(usingchar, target)) ...
+if (strvar.locateusing(usingchar, target)) ...
 .nf
  
 .fi
@@ -2702,7 +2973,7 @@ locate() a target substr in the whole unordered string using a given delimiter c
 
 
 .SS
-if (var.locateusing(usingchar, target, out setting, fieldno = 0, valueno = 0, subvalueno = 0)) ...
+if (strvar.locateusing(usingchar, target, out setting, fieldno = 0, valueno = 0, subvalueno = 0)) ...
 .nf
  
 .fi
@@ -2724,7 +2995,7 @@ This is similar to the main locate command but the delimiter char can be specifi
 
 
 .SS
-if (var.locatebyusing(ordercode, usingchar, target, out setting, fieldno = 0, valueno = 0, subvalueno = 0)) ...
+if (strvar.locatebyusing(ordercode, usingchar, target, out setting, fieldno = 0, valueno = 0, subvalueno = 0)) ...
 .nf
  
 .fi
@@ -2732,7 +3003,7 @@ locatebyusing() supports all the above features in a single function.
 
 \fBReturns:\fR True if found.
 
-.SH 12. DATABASE ACCESS
+.SH 13. DATABASE ACCESS
 .SH
 
 .SS
@@ -2988,7 +3259,7 @@ Prefixes the output with source if provided.
 .RE
 
 
-.SH 13. DATABASE MANAGEMENT
+.SH 14. DATABASE MANAGEMENT
 .SH
 
 .SS
@@ -3191,7 +3462,7 @@ Calls db maintenance function (vacuum)
 
 This doesnt actually flush any indexes but does make sure that reccount() function is reasonably accurate.
 
-.SH 14. DATABASE FILE I/O
+.SH 15. DATABASE FILE I/O
 .SH
 
 .SS
@@ -3511,7 +3782,7 @@ Any memory cached record is deleted.
 
 
 .SS
-if (record.readf(file, key, fieldno)) ...
+if (strvar.readf(file, key, fieldno)) ...
 .nf
  
 .fi
@@ -3529,7 +3800,7 @@ if (record.readf(file, key, fieldno)) ...
 
 
 .SS
-record.writef(file, key, fieldno)
+strvar.writef(file, key, fieldno)
 .nf
  
 .fi
@@ -3645,7 +3916,7 @@ cleardbcache(conn);
 
 
 .SS
-var v1 = conn.xlate(filename, fieldno, mode);
+var v1 = strvar.xlate(filename, fieldno, mode);
 .nf
  
 .fi
@@ -3684,7 +3955,7 @@ If var key is multivalued then a multivalued field is returned.
 .RE
 
 
-.SH 15. DATABASE SORT/SELECT
+.SH 16. DATABASE SORT/SELECT
 .SH
 
 .SS
@@ -3968,7 +4239,7 @@ Delete a saved select list.
 .RE
 
 
-.SH 16. OS TIME/DATE
+.SH 17. OS TIME/DATE
 .SH
 
 .SS
@@ -4152,7 +4423,7 @@ Possible event type codes are as follows:
 
 .fi
 
-.SH 17. OS FILE I/O
+.SH 18. OS FILE I/O
 .SH
 
 .SS
@@ -4250,7 +4521,7 @@ It is advisable to osclose any file handles after use, regardless of whether the
 
 
 .SS
-if (osfilevar.oswrite(osfilename, codepage = "")) ...
+if (strvar.oswrite(osfilename, codepage = "")) ...
 .nf
  
 .fi
@@ -4277,7 +4548,7 @@ If codepage is specified then output is converted from utf-8 to that codepage. O
 
 
 .SS
-if (osfilevar.osread(osfilename, codepage = "")) ...
+if (strvar.osread(osfilename, codepage = "")) ...
 .nf
  
 .fi
@@ -4409,7 +4680,7 @@ e.g. Target doesnt exist, path is not writeable, permissions etc.
 .RE
 
 
-.SH 18. OS DIRECTORIES
+.SH 19. OS DIRECTORIES
 .SH
 
 .SS
@@ -4593,7 +4864,7 @@ Optionally even if not empty. Including subdirs.
 .RE
 
 
-.SH 19. OS SHELL/ENVIRONMENT
+.SH 20. OS SHELL/ENVIRONMENT
 .SH
 
 .SS
@@ -4837,7 +5108,7 @@ var v1 = var.getxlocale();
 .RE
 
 
-.SH 20. OUTPUT
+.SH 21. OUTPUT
 .SH
 
 .SS
@@ -4965,7 +5236,7 @@ Flush any and all buffered output to stdout and stdlog.
 .RE
 
 
-.SH 21. INPUT
+.SH 22. INPUT
 .SH
 
 .SS
@@ -5105,7 +5376,7 @@ Disable keyboard interrupt.
 
 Ctrl+C becomes inactive in terminal.
 
-.SH 22. MATH/BOOLEAN
+.SH 23. MATH/BOOLEAN
 .SH
 
 .SS
@@ -5384,7 +5655,7 @@ Floating point works.
 .RE
 
 
-.SH 23. I/O CONVERSION CODES 
+.SH 24. I/O CONVERSION CODES 
 .SH
 
 .SS
@@ -5738,7 +6009,7 @@ var v1 = varnum.oconv("MX");
 .nf
  
 .fi
-Numeric hex format: Convert number to hexadecimal string
+Number to hex format: Convert number to hexadecimal string
 
 If the value is not numeric then no conversion is performed and the original value is returned.
 
@@ -5757,7 +6028,7 @@ var v1 = varnum.oconv("MB");
 .nf
  
 .fi
-Numeric binary format: Convert number to strings of 1s and 0s
+Number to binary format: Convert number to strings of 1s and 0s
 
 If the value is not numeric then no conversion is performed and the original value is returned.
 
