@@ -17,16 +17,18 @@ function main(in programname0, in text0) {
 
 	let s33 = SYSTEM.f(33);
 
-	if (programname0.unassigned()) {
-		programname = "";
-	} else {
-		programname = programname0;
-	}
-	if (text0.unassigned()) {
-		text = "";
-	} else {
-		text = text0;
-	}
+//	if (programname0.unassigned()) {
+//		programname = "";
+//	} else {
+//		programname = programname0;
+//	}
+//	if (text0.unassigned()) {
+//		text = "";
+//	} else {
+//		text = text0;
+//	}
+	programname = programname0.or_default("");
+	text = text0.or_default("");
 
 	// update the log
 	// /////////////

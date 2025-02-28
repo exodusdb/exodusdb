@@ -29,11 +29,12 @@ var allowablechars;
 
 function main(in mode0) {
 
-	if (mode0.unassigned()) {
-		mode = "";
-	} else {
-		mode = mode0;
-	}
+//	if (mode0.unassigned()) {
+//		mode = "";
+//	} else {
+//		mode = mode0;
+//	}
+	mode = mode0.or_default("");
 
 	var().osflush();
 	// break off

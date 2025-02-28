@@ -57,41 +57,48 @@ var home = "";
 
 function main(in toaddress0, in ccaddress0, in subject0, in body0, in attachfilename0, in delete0, out errormsg, in replyto0 = var(), in params0 = var()) {
 
-	if (ccaddress0.unassigned()) {
-		ccaddress = "";
-	} else {
-		ccaddress = ccaddress0;
-	}
-	if (subject0.unassigned()) {
-		subject = "";
-	} else {
-		subject = subject0;
-	}
-	if (body0.unassigned()) {
-		body = "";
-	} else {
-		body = body0;
-	}
-	if (attachfilename0.unassigned()) {
-		attachfilename = "";
-	} else {
-		attachfilename = attachfilename0;
-	}
-	if (delete0.unassigned()) {
-		deletex = "";
-	} else {
-		deletex = delete0;
-	}
-	if (replyto0.unassigned()) {
-		replyto = "";
-	} else {
-		replyto = replyto0;
-	}
-	if (params0.unassigned()) {
-		params = "";
-	} else {
-		params = params0;
-	}
+//	if (ccaddress0.unassigned()) {
+//		ccaddress = "";
+//	} else {
+//		ccaddress = ccaddress0;
+//	}
+//	if (subject0.unassigned()) {
+//		subject = "";
+//	} else {
+//		subject = subject0;
+//	}
+//	if (body0.unassigned()) {
+//		body = "";
+//	} else {
+//		body = body0;
+//	}
+//	if (attachfilename0.unassigned()) {
+//		attachfilename = "";
+//	} else {
+//		attachfilename = attachfilename0;
+//	}
+//	if (delete0.unassigned()) {
+//		deletex = "";
+//	} else {
+//		deletex = delete0;
+//	}
+//	if (replyto0.unassigned()) {
+//		replyto = "";
+//	} else {
+//		replyto = replyto0;
+//	}
+//	if (params0.unassigned()) {
+//		params = "";
+//	} else {
+//		params = params0;
+//	}
+	ccaddress      = ccaddress0.or_default("");
+	subject        = subject0.or_default("");
+	body           = body0.or_default("");
+	attachfilename = attachfilename0.or_default("");
+	deletex        = delete0.or_default("");
+	replyto        = replyto0.or_default("");
+	params         = params0.or_default("");
 	if (not deletex) {
 		deletex = "";
 	}

@@ -78,31 +78,37 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 	// defaulting or value based arguments and setting them
 	// and this means calling listen2 would require passing variables for all
 	// in the few cases listen2 need to respond to caller, it sets @ans
-	if (request2in.unassigned()) {
-		request2 = "";
-	} else {
-		request2 = request2in;
-	}
-	if (request3in.unassigned()) {
-		request3 = "";
-	} else {
-		request3 = request3in;
-	}
-	if (request4in.unassigned()) {
-		request4 = "";
-	} else {
-		request4 = request4in;
-	}
-	if (request5in.unassigned()) {
-		request5 = "";
-	} else {
-		request5 = request5in;
-	}
-	if (request6in.unassigned()) {
-		request6 = "";
-	} else {
-		request6 = request6in;
-	}
+//	if (request2in.unassigned()) {
+//		request2 = "";
+//	} else {
+//		request2 = request2in;
+//	}
+//	if (request3in.unassigned()) {
+//		request3 = "";
+//	} else {
+//		request3 = request3in;
+//	}
+//	if (request4in.unassigned()) {
+//		request4 = "";
+//	} else {
+//		request4 = request4in;
+//	}
+//	if (request5in.unassigned()) {
+//		request5 = "";
+//	} else {
+//		request5 = request5in;
+//	}
+//	if (request6in.unassigned()) {
+//		request6 = "";
+//	} else {
+//		request6 = request6in;
+//	}
+	request2 = request2in.or_default("");
+	request3 = request3in.or_default("");
+	request4 = request4in.or_default("");
+	request5 = request5in.or_default("");
+	request6 = request6in.or_default("");
+
 	var logx = request2;
 
 	var isdevsys = var("exodus.id").osfile();

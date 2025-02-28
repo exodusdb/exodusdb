@@ -45,9 +45,10 @@ function main(in msg0, io time0) {
 	}
 
 	time2 = ostime();
-	if (time0.unassigned()) {
-		time0 = time2;
-	}
+//	if (time0.unassigned()) {
+//		time0 = time2;
+//	}
+	time0.defaulter(time2);
 
 	var entry = "";
 	if (TERMINAL) {

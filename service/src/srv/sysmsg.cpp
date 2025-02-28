@@ -40,16 +40,18 @@ function main(in msg0, in subject0 = "", in username0 = "") {
 	// ??? nice idea but it isnt in the MSG() routine???
 
 	var msg = msg0;
-	if (subject0.unassigned()) {
-		subjectin = "";
-	} else {
-		subjectin = subject0;
-	}
-	if (username0.unassigned()) {
-		username = "";
-	} else {
-		username = username0;
-	}
+//	if (subject0.unassigned()) {
+//		subjectin = "";
+//	} else {
+//		subjectin = subject0;
+//	}
+//	if (username0.unassigned()) {
+//		username = "";
+//	} else {
+//		username = username0;
+//	}
+	subjectin = subject0.or_default("");
+	username = username0.or_default("");
 
 	msg.replacer(chr(0), "%00");
 	subjectin.replacer(chr(0), "%00");

@@ -22,16 +22,19 @@ function main(in inputfilename, in encoding1i, in encoding2i, out result, out ms
 	//
 	// http://www.microsoft.com/globaldev/reference/cphome.mspx
 
-	if (encoding1i.unassigned()) {
-		encoding1 = "";
-	} else {
-		encoding1 = encoding1i;
-	}
-	if (encoding2i.unassigned()) {
-		encoding2 = "";
-	} else {
-		encoding2 = encoding2i;
-	}
+//	if (encoding1i.unassigned()) {
+//		encoding1 = "";
+//	} else {
+//		encoding1 = encoding1i;
+//	}
+//	if (encoding2i.unassigned()) {
+//		encoding2 = "";
+//	} else {
+//		encoding2 = encoding2i;
+//	}
+	encoding1 = encoding1i.or_default("");
+	encoding2 = encoding2i.or_default("");
+
 	result = 0;
 
 	// make cygwin command

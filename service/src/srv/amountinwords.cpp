@@ -43,11 +43,17 @@ function main(in amountfmlanguage, in currcode0) {
 		stop();
 	}
 
+//	if (currcode0.unassigned()) {
+//		currcode = "";
+//	} else {
+//		currcode = currcode0;
+//		if (not amountcurrency.read(srv.currencies, currcode)) {
+//			amountcurrency = "";
+//		}
+//	}
 	amountcurrency = "";
-	if (currcode0.unassigned()) {
-		currcode = "";
-	} else {
-		currcode = currcode0;
+	currcode = currcode0.or_default("");
+	if (currcode) {
 		if (not amountcurrency.read(srv.currencies, currcode)) {
 			amountcurrency = "";
 		}

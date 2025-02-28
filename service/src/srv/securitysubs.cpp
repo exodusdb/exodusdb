@@ -117,9 +117,10 @@ function main(in mode) {
 	} else if (mode == "SETUP") {
 
 		// check allowed access
-		if (req.templatex.unassigned()) {
-			req.templatex = "";
-		}
+//		if (req.templatex.unassigned()) {
+//			req.templatex = "";
+//		}
+		req.templatex.defaulter("");
 		var filename;
 		var defaultlock;
 		if (req.templatex == "SECURITY") {

@@ -23,34 +23,41 @@ function main(in mode0, in title0, in module, in request, in data0, in runasuser
 	// ABP none
 
 	// default unassigned parameters
-	if (mode0.unassigned()) {
-		mode = "";
-	} else {
-		mode = mode0;
-	}
-	if (data0.unassigned()) {
-		datax = "";
-	} else {
-		datax = data0;
-	}
-	if (runasusercode0.unassigned()) {
-		runasusercode = "";
-	} else {
-		runasusercode = runasusercode0;
-	}
-	if (targetusercodes0.unassigned()) {
-		targetusercodes = "";
-	} else {
-		targetusercodes = targetusercodes0;
-	}
-	if (document0.unassigned()) {
-		srv.document = "";
-	} else {
-		srv.document = document0;
-	}
-	if (docid.unassigned()) {
-		docid = "";
-	}
+//	if (mode0.unassigned()) {
+//		mode = "";
+//	} else {
+//		mode = mode0;
+//	}
+//	if (data0.unassigned()) {
+//		datax = "";
+//	} else {
+//		datax = data0;
+//	}
+//	if (runasusercode0.unassigned()) {
+//		runasusercode = "";
+//	} else {
+//		runasusercode = runasusercode0;
+//	}
+//	if (targetusercodes0.unassigned()) {
+//		targetusercodes = "";
+//	} else {
+//		targetusercodes = targetusercodes0;
+//	}
+//	if (document0.unassigned()) {
+//		srv.document = "";
+//	} else {
+//		srv.document = document0;
+//	}
+//	if (docid.unassigned()) {
+//		docid = "";
+//	}
+	mode            = mode0.or_default("");
+	datax           = data0.or_default("");
+	runasusercode   = runasusercode0.or_default("");
+	targetusercodes = targetusercodes0.or_default("");
+	srv.document    = document0.or_default("");
+	docid.defaulter("");
+
 	if (title0) {
 		title = title0;
 	} else {

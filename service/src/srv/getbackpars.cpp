@@ -49,11 +49,12 @@ var dbn;
 function main(out bakpars, in process0 = var()) {
 
 	// optonally get the backpars for a specific process if given
-	if (process0.unassigned()) {
-		process = SYSTEM;
-	} else {
-		process = process0;
-	}
+//	if (process0.unassigned()) {
+//		process = SYSTEM;
+//	} else {
+//		process = process0;
+//	}
+	process = process0.or_default(SYSTEM);
 
 	// by test data means any non-live data that doesnt require backup
 

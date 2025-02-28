@@ -17,19 +17,22 @@ var lockfile;
 
 function main(in mode, in lockfilename, in lockkey, in lockdesc0, io locklist, in ntries0, out msg) {
 
-	if (locklist.unassigned()) {
-		locklist = "";
-	}
-	if (ntries0.unassigned()) {
-		ntries = 100;
-	} else {
-		ntries = ntries0;
-	}
-	if (lockdesc0.unassigned()) {
-		lockdesc = "";
-	} else {
-		lockdesc = lockdesc0;
-	}
+//	if (locklist.unassigned()) {
+//		locklist = "";
+//	}
+//	if (ntries0.unassigned()) {
+//		ntries = 100;
+//	} else {
+//		ntries = ntries0;
+//	}
+//	if (lockdesc0.unassigned()) {
+//		lockdesc = "";
+//	} else {
+//		lockdesc = lockdesc0;
+//	}
+	locklist.defaulter("");
+	ntries = ntries0.or_default(100);
+	lockdesc = lockdesc0.or_default("");
 	if (not ntries) {
 		ntries = 100;
 	}

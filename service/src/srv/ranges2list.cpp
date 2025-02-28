@@ -28,17 +28,18 @@ function main(io ranges0, in basekey0 = "", in listid0 = "") {
 	// equ maxlistpartsize to 32000
 	let maxlistpartsize = maxstrsize_ / 2;
 
-	if (basekey0.unassigned()) {
-		basekey = "";
-	} else {
-		basekey = basekey0;
-	}
-
-	if (listid0.unassigned()) {
-		listid = "";
-	} else {
-		listid = listid0;
-	}
+//	if (basekey0.unassigned()) {
+//		basekey = "";
+//	} else {
+//		basekey = basekey0;
+//	}
+//	if (listid0.unassigned()) {
+//		listid = "";
+//	} else {
+//		listid = listid0;
+//	}
+	basekey = basekey0.or_default("");
+	listid = listid0.or_default("");
 
 	if (listid) {
 		if (not lists.open("LISTS", "")) {

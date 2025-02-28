@@ -60,11 +60,12 @@ function main(io osfilename, in printopts0, out errors) {
 	errors = "";
 
 	// X means dont convert
-	if (printopts0.unassigned()) {
-		printopts = "";
-	} else {
-		printopts = printopts0;
-	}
+//	if (printopts0.unassigned()) {
+//		printopts = "";
+//	} else {
+//		printopts = printopts0;
+//	}
+	printopts = printopts0.or_default("");
 	if (printopts.contains("X")) {
 		return 0;
 	}

@@ -5,12 +5,14 @@ function main(in fromdate, in fromtime, io uptodate, io uptotime) {
 
 	var text = "";
 
-	if (uptodate.unassigned()) {
-		uptodate = date();
-	}
-	if (uptotime.unassigned()) {
-		uptotime = ostime();
-	}
+//	if (uptodate.unassigned()) {
+//		uptodate = date();
+//	}
+//	if (uptotime.unassigned()) {
+//		uptotime = ostime();
+//	}
+	uptodate.defaulter(date());
+	uptotime.defaulter(ostime());
 	// uptodate=date()
 	// CALL DOSTIME(uptotime)
 

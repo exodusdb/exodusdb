@@ -7,16 +7,18 @@ var defaultperiod;
 
 function main(in fromquestion0, in uptoquestion0, io ifromdate, io iuptodate) {
 
-	if (fromquestion0.unassigned()) {
-		fromquestion = "";
-	} else {
-		fromquestion = fromquestion0;
-	}
-	if (uptoquestion0.unassigned()) {
-		uptoquestion = "";
-	} else {
-		uptoquestion = uptoquestion0;
-	}
+//	if (fromquestion0.unassigned()) {
+//		fromquestion = "";
+//	} else {
+//		fromquestion = fromquestion0;
+//	}
+//	if (uptoquestion0.unassigned()) {
+//		uptoquestion = "";
+//	} else {
+//		uptoquestion = uptoquestion0;
+//	}
+	fromquestion = fromquestion0.or_default("");
+	uptoquestion = uptoquestion0.or_default("");
 	if (ifromdate.unassigned()) {
 		let fromdate = "";
 	}
@@ -30,9 +32,10 @@ function main(in fromquestion0, in uptoquestion0, io ifromdate, io iuptodate) {
 	if (ifromdate == "") {
 		let fromdate = date();
 	}
-	if (defaultperiod.unassigned()) {
-		defaultperiod = "";
-	}
+//	if (defaultperiod.unassigned()) {
+//		defaultperiod = "";
+//	}
+	defaultperiod.defaulter("");
 
 	var fromdate = oconv(ifromdate, "[DATE,*4]");
 inpfromdate:

@@ -3,12 +3,12 @@ libraryinit()
 
 function main(in path0) {
 
-	var path;
-	if (path0.unassigned() or path0.contains(":") or not(path0))
-		// case we are presented with a DOS path
-		path = ".";
-	else
-		path = path0;
+	var path = path0.or_default(".");
+//	if (path0.unassigned() or path0.contains(":") or not(path0))
+//		// case we are presented with a DOS path
+//		path = ".";
+//	else
+//		path = path0;
 
 	let cmd = "df --output=avail " ^ path;
 	// TRACE(cmd)

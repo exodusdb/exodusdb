@@ -52,16 +52,18 @@ function main(in docids0 = "", in options0 = "") {
 	// LISTEN calls this every minute
 	// print 'autorun'
 
-	if (docids0.unassigned()) {
-		docids = "";
-	} else {
-		docids = docids0;
-	}
-	if (options0.unassigned()) {
-		options = "";
-	} else {
-		options = options0;
-	}
+//	if (docids0.unassigned()) {
+//		docids = "";
+//	} else {
+//		docids = docids0;
+//	}
+//	if (options0.unassigned()) {
+//		options = "";
+//	} else {
+//		options = options0;
+//	}
+	docids = docids0.or_default("");
+	options = options0.or_default("");
 
 	// used to email EXODUS if EXODUS user in list of recipients
 	let sysmsgatexodus = "sysmsg@neosys.com";

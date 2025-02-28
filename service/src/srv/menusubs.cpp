@@ -21,11 +21,12 @@ function main(in mode, io tx, in arg3, io arg4, in arg5) {
 	} else if (mode == "ADDMENU") {
 
 		var mainmenu = arg3;
-		if (arg4.unassigned()) {
-			id = "";
-		} else {
-			id = arg4;
-		}
+//		if (arg4.unassigned()) {
+//			id = "";
+//		} else {
+//			id = arg4;
+//		}
+		id = arg4.or_default("");
 
 		// <a id="menu_SUPPORT">_Support</a>
 		// <div class="menu">

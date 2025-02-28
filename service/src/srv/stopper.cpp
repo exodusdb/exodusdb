@@ -11,14 +11,16 @@ var mode;
 
 function main(in mode0, in time, in date, io /*buffer*/, out msg) {
 
-	if (msg.unassigned()) {
-		msg = "";
-	}
-	if (mode0.unassigned()) {
-		mode = "";
-	} else {
-		mode = mode0;
-	}
+//	if (msg.unassigned()) {
+//		msg = "";
+//	}
+//	if (mode0.unassigned()) {
+//		mode = "";
+//	} else {
+//		mode = mode0;
+//	}
+	msg.defaulter("");
+	mode = mode0.or_default("");
 
 	if (time.unassigned() or date.unassigned()) {
 		return 0;

@@ -204,9 +204,11 @@ nextcomp:
 	}
 
 	// main currencycode
-	if (maincurrcode.unassigned()) {
-		maincurrcode = "";
-	}
+//	if (maincurrcode.unassigned()) {
+//		maincurrcode = "";
+//	}
+	maincurrcode.defaulter("");
+
 	// if maincurrcode='' then maincurrcode=base.currency
 	if (maincurrcode == "") {
 		maincurrcode = SYSTEM.f(134);

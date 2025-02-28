@@ -58,7 +58,8 @@ function security2(in modex, in op0)
 
 function security3(in op, in op2)
 {
-	var op2b=op2.assigned()?op2:"";
+//	var op2b=op2.assigned()?op2:"";
+	var op2b=op2.or_default("");
 	var msgx;
 	if (!(authorised(op ^ op2b, msgx, "")))
 		return invalid(msgx);

@@ -1558,7 +1558,7 @@ subroutine process() {
 			if (not rollbacktrans())
 				loglasterror();
 			// Similar code in net.cpp and listen.cpp
-			response_ = var(e.description).default_from("No error message") ^ FM ^ e.stack();
+			response_ = var(e.description) ^ FM ^ e.stack();
 		}
 
 	return;

@@ -18,9 +18,10 @@ function main(in d1, in d2, out result, io lang) {
 	// Feb 2010 - Jan 2011
 	// 10 Mar 2010 - 5 Feb 2010
 
-	if (lang.unassigned()) {
-		lang = srv.glang;
-	}
+//	if (lang.unassigned()) {
+//		lang = srv.glang;
+//	}
+	lang.defaulter(srv.glang);
 
 	var t2 = d2.oconv("D/E");
 	var tt = d1.oconv("D/E") ^ "/" ^ t2;

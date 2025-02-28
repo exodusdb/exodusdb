@@ -18,17 +18,19 @@ function main(in databasecode0 = "", in usercode0 = "") {
 	if (SENTENCE.field(" ", 1) == "OTHERUSERS") {
 		databasecode = SENTENCE.field(" ", 2);
 	} else {
-		if (databasecode0.unassigned()) {
-			databasecode = "";
-		} else {
-			databasecode = databasecode0;
-		}
+//		if (databasecode0.unassigned()) {
+//			databasecode = "";
+//		} else {
+//			databasecode = databasecode0;
+//		}
+		databasecode = databasecode0.or_default("");
 	}
-	if (usercode0.unassigned()) {
-		usercode = "";
-	} else {
-		usercode = usercode0;
-	}
+//	if (usercode0.unassigned()) {
+//		usercode = "";
+//	} else {
+//		usercode = usercode0;
+//	}
+	usercode = usercode0.or_default("");
 
 	var processes = "";
 

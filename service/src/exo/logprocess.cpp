@@ -14,35 +14,41 @@ function main(io processid, in processcategory0, in /*sparevar*/ = "", in proces
 
 	// "heartbeat" called from messaging
 
-	if (processid.unassigned()) {
-		processid = "";
-	}
-	// 	if (sparevar.unassigned()) {
-	// 		sparevar = "";
-	// 	}
-	if (processcategory0.unassigned()) {
-		processcategory = "";
-	} else {
-		processcategory = processcategory0;
-	}
-	if (processrec.unassigned()) {
-		processrec = "";
-	}
-	if (processparameters0.unassigned()) {
-		processparameters = "";
-	} else {
-		processparameters = processparameters0;
-	}
-	if (processresult0.unassigned()) {
-		processresult = "";
-	} else {
-		processresult = processresult0;
-	}
-	if (processcomments0.unassigned()) {
-		processcomments = "";
-	} else {
-		processcomments = processcomments0;
-	}
+//	if (processid.unassigned()) {
+//		processid = "";
+//	}
+//	// 	if (sparevar.unassigned()) {
+//	// 		sparevar = "";
+//	// 	}
+//	if (processcategory0.unassigned()) {
+//		processcategory = "";
+//	} else {
+//		processcategory = processcategory0;
+//	}
+//	if (processrec.unassigned()) {
+//		processrec = "";
+//	}
+//	if (processparameters0.unassigned()) {
+//		processparameters = "";
+//	} else {
+//		processparameters = processparameters0;
+//	}
+//	if (processresult0.unassigned()) {
+//		processresult = "";
+//	} else {
+//		processresult = processresult0;
+//	}
+//	if (processcomments0.unassigned()) {
+//		processcomments = "";
+//	} else {
+//		processcomments = processcomments0;
+//	}
+	processid.defaulter("");
+	processcategory = processcategory0.or_default("");
+	processrec.defaulter("");
+	processparameters = processparameters0.or_default("");
+	processresult = processresult0.or_default("");
+	processcomments = processcomments0.or_default("");
 
 	// if definitions else
 	if (not DEFINITIONS.open("DEFINITIONS", "")) {

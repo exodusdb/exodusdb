@@ -13,11 +13,12 @@ var reply;	// num
 
 function main(in startmode0, out starttime, out startdate, out /*startbuffer*/) {
 
-	if (startmode0.unassigned()) {
-		startmode = "";
-	} else {
-		startmode = startmode0;
-	}
+//	if (startmode0.unassigned()) {
+//		startmode = "";
+//	} else {
+//		startmode = startmode0;
+//	}
+	startmode = startmode0.or_default("");
 	if (startmode) {
 		temp = "|" ^ startmode ^ "||";
 	} else {

@@ -25,16 +25,19 @@ var datasetcode;
 function main(in mode0, in dataset0) {
 
 	interactive = false;  //not(SYSTEM.f(33));
-	if (mode0.unassigned()) {
-		mode = "";
-	} else {
-		mode = mode0;
-	}
-	if (dataset0.unassigned()) {
-		dataset = "";
-	} else {
-		dataset = dataset0;
-	}
+//	if (mode0.unassigned()) {
+//		mode = "";
+//	} else {
+//		mode = mode0;
+//	}
+//	if (dataset0.unassigned()) {
+//		dataset = "";
+//	} else {
+//		dataset = dataset0;
+//	}
+	mode = mode0.or_default("");
+	dataset = dataset0.or_default("");
+
 	if (mode == "") {
 		mode = "LOCK";
 	}

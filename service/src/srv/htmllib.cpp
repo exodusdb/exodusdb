@@ -24,16 +24,18 @@ function main(in mode, io datax, in params0 = "", in params20 = "") {
 	let tr	= "<tr>";
 	let trx = "</tr>";
 
-	if (params0.unassigned()) {
-		params = "";
-	} else {
-		params = params0;
-	}
-	if (params20.unassigned()) {
-		params2 = "";
-	} else {
-		params2 = params20;
-	}
+//	if (params0.unassigned()) {
+//		params = "";
+//	} else {
+//		params = params0;
+//	}
+//	if (params20.unassigned()) {
+//		params2 = "";
+//	} else {
+//		params2 = params20;
+//	}
+	params = params0.or_default("");
+	params2 = params20.or_default("");
 
 	if (mode == "TABLE.MAKE") {
 		datax.trimmer();

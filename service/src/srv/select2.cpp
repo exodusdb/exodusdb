@@ -58,27 +58,31 @@ function main(in filenamex, in linkfilename2, in sortselect0, in dictids0, in op
 	var filename = filenamex;
 
 	var sortselect = sortselect0;
-	if (dictids0.unassigned()) {
-		dictids = "";
-	} else {
-		dictids = dictids0;
-	}
-	if (options0.unassigned()) {
-		options = "";
-	} else {
-		options = options0;
-	}
-	if (maxnrecs0.unassigned()) {
-		maxnrecs = "";
-	} else {
-		maxnrecs = maxnrecs0;
-	}
+//	if (dictids0.unassigned()) {
+//		dictids = "";
+//	} else {
+//		dictids = dictids0;
+//	}
+//	if (options0.unassigned()) {
+//		options = "";
+//	} else {
+//		options = options0;
+//	}
+//	if (maxnrecs0.unassigned()) {
+//		maxnrecs = "";
+//	} else {
+//		maxnrecs = maxnrecs0;
+//	}
+	dictids = dictids0.or_default("");
+	options = options0.or_default("");
+	maxnrecs = maxnrecs0.or_default("");
 	// 	if (limitfields.unassigned()) {
 	// 		nlimitfields = 0;
 	// 	} else {
 	// 		nlimitfields = limitfields.fcount(VM);
 	// 	}
-	let nlimitfields = limitfields.default_from("").fcount(VM);
+//	let nlimitfields = limitfields.default_from("").fcount(VM);
+	let nlimitfields = limitfields.or_default("").fcount(VM);
 
 	let xml		= options.contains("XML");
 	let rawread = options.contains("RAW");
@@ -192,9 +196,10 @@ nocommon:
 	}
 
 	var oconvsx = "";
-	if (dictids.unassigned()) {
-		dictids = "";
-	}
+//	if (dictids.unassigned()) {
+//		dictids = "";
+//	}
+	dictids.defaulter("");
 	if (dictids == "") {
 		dictids = "ID";
 	}

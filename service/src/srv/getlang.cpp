@@ -16,9 +16,10 @@ var codepage;
 function main(in origprogname, in languagecode0, in origdatatype, io languagefile, io lang) {
 
 	lang = "";
-	if (languagefile.unassigned()) {
-		languagefile = "";
-	}
+//	if (languagefile.unassigned()) {
+//		languagefile = "";
+//	}
+	languagefile.defaulter("");
 	if (languagefile == "") {
 		if (not languagefile.open("ALANGUAGE", "")) {
 			return 0;
