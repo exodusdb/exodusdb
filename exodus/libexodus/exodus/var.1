@@ -10,17 +10,19 @@ var v1;
 .fi
 Create an unassigned var.
 
-Whereever possible, variables should be assigned at their point of definition. However, due to the rules of scoping, vars must often be defined in advance of being assigned.
+Whereever possible, variables should be assigned an initial value immediately at their point of definition, and marked as const if appropriate. However variables often have no real single initial value and are commonly defined in advance of being assigned a particular value. For example, a variable may be assigned differently on different branches of a conditional statement, or be provided as an outbound argument of a function call.
 
-For example a variable may be assigned on different branches of a conditional statement, or returned from a function.
+Even when not assigned, "use before initialisation" bugs do not occur because a runtime error VarUnassigned is thrown if a var is used before it has been assigned a value.
 
-Despite lack of assignment, all "use before initialisation" bugs are eliminiated because a runtime error VarUnassigned is thrown in all cases when a var is used before being assigned.
+
+
+Use "let" instead of "var" as a shorthand way of writing "const var" whereever possible.
 
 \fBExample:\fR
 .RS
 .nf
- let clients = "xo_clients", key = "SB001";
- var client; // Unassigned var
+ let clients = "xo_clients", key = "SB001"; // const vars
+ var client;                                // Unassigned var
  if (not read(client from clients, key)) ...
 .fi
 .RE
@@ -32,7 +34,7 @@ var v1 = expression;
 .nf
  
 .fi
-Assign a var using a literal or an expression.
+Assign a var using a literal or an expression. Alternatively, use "let" instead of "var" as a shorthand way of writing "const var" where appropriate.
 
 \fBExample:\fR
 .RS
@@ -42,24 +44,18 @@ Assign a var using a literal or an expression.
  var v3 = "abc";              // String
  var v4 = 'x';                // char
  var v5 = true;               // bool
+
  var v6 = v1 + 100;           // Arithmetic
  var v7 = v3 ^ "xyz";         // Concatenation
  var v8 = oslist(".").sort(); // Built in functions
 
+ let v9 = 12345;              // A const var
+
+ var v10 = 12'345_var;        // A literal var integer
+ var v11 = 123.45_var;        // A literal var double
+ var v12 = "f1^v1]v2^f3"_var; // A literal var string
+
  var x = 0.1, y = "0.2", z = x + y; // z -> 0.3
-.fi
-.RE
-
-"let v1 = ..."
-
-Whereever a var will not change value, it is good programming practice to indicate the same directly in code.
-
-Use "let" instead of "var" wherever possible. This is a shorthand way of writing "const var".
-
-\fBExample:\fR
-.RS
-.nf
- let v1 = osgetenv("HOME");
 .fi
 .RE
 
@@ -80,13 +76,57 @@ if (v1.unassigned()) ...
 \fBReturns:\fR True if the var is unassigned, otherwise false
 
 .SS
+var v1 = v2.or_default(defaultvalue);
+.nf
+ 
+.fi
+\fBReturns:\fR A copy of the var if it is assigned or the default value if it is not.
+
+Can be used to handle optional arguments in functions.
+
+\fBdefaultvalue:\fR Cannot be unassigned.
+
+\fBExample:\fR
+.RS
+.nf
+ var v1; // Unassigned
+ var v2 = v1.or_default("abc"); // v2 -> "abc"
+ // or
+ var v3 = or_default(v1, "abc");
+.fi
+.RE
+
+
+
+.SS
+v1.defaulter(defaultvalue)
+.nf
+ 
+.fi
+If the var is unassigned then assign the default value to it, otherwise do nothing.
+
+\fBdefaultvalue:\fR Cannot be unassigned.
+
+\fBExample:\fR
+.RS
+.nf
+ var v1; // Unassigned
+ v1.defaulter("abc"); // v1 -> "abc"
+ // or
+ defaulter(v1, "abc");
+.fi
+.RE
+
+
+
+.SS
 v1.swap(io v2)
 .nf
  
 .fi
 Swap the contents of one var with another.
 
-Useful for stashing large strings quickly since large strings are handled by moving pointers and without making unnecessary copies or allocating memory.
+Useful for stashing large strings quickly. They are moved using pointers without making copies or allocating memory.
 
 Eiher or both variables may be unassigned.
 
@@ -107,9 +147,9 @@ var v1 = v2.move();
 .nf
  
 .fi
-Moves the contents of one var to another. The original var becomes an empty string.
+Force the contents of a var to be moved instead of copied. The moved var becomes an empty string.
 
-This allows large strings to be efficiently handled by moving pointers and without making unnecessary copies or allocating memory.
+This allows large strings to be handled efficiently. They are moved using pointers without making copies or allocating memory.
 
 The moved var must be assigned otherwise a VarUnassigned error is thrown.
 
@@ -125,159 +165,47 @@ The moved var must be assigned otherwise a VarUnassigned error is thrown.
 
 
 .SS
-var v1 = v1.clone();
+var v1 = v2.clone();
 .nf
  
 .fi
 Returns a copy of the var.
 
-If the var is unassigned then the copy is unassigned also. No VarUnassigned error is thrown.
-
-.SH 2. DYNAMIC ARRAY CREATION, ACCESS AND UPDATE
-.SH
+The cloned var may be unassigned, in which case the copy will be unassigned too.
 
 .SS
-var v1 = ""_var;
+var v1 = v1.dump();
 .nf
  
 .fi
-The literal suffix "_var" allows dynamic arrays to be seamlessly embedded in code using the visible equivalents of unprintable field mark characters.
+Return a string describing internal data of a var.
 
+If the str is located on the heap then its address is given.
 
+\fBtyp:\fR
 
-RM ` Record mark
+0x01 str is available.
 
-FM ^ Field mark
+0x02 int is available.
 
-VM ] Value mark
+0x04 dbl is available.
 
-SM } Subvalue mark
+0x08 nan: str is not a number.
 
-TM | Text mark
-
-ST ~ Subtext mark
-
-\fBExample:\fR
-.RS
-.nf
- var v1 = "f1^f2^v1]v2^f4"_var; // "f1" _FM "f2" _FM "v1" _VM "v2" _FM "f4"
-.fi
-.RE
-
-
-.SS
-var v1 = {"a", "b", "c" ...}; // Initializer list
-.nf
- 
-.fi
-Create an dynamic array var from a list. C++ constrains list elements to be all the same type. var, string, double, int, etc.
+0x16 osfile: str, int and dbl have special meaning.
 
 \fBExample:\fR
 .RS
 .nf
- var v1 = {11, 22, 33}; // "11^22^33"_var
+ var v1 = str("x", 32);
+ v1.dump().outputl(); // e.g. var:0x7ffea7462cd0 typ:1 str:0x584d9e9f6e70 "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+ // or
+ outputl(dump(v1));
 .fi
 .RE
 
 
-.SS
-var v1 = v2(fieldno);       v1(fieldno) = v2;
-.nf
- 
-.fi
-Dynamic array - field update and append:
-
-See also inserter() and remover().
-
-\fBExample:\fR
-.RS
-.nf
- var v1 = "aa^bb"_var;
- v1(4) = 44; // v1 -> "aa^bb^^44"_var
- // Field number -1 causes appending a field when updating.
- v1(-1) = "55"; // v1 -> "aa^bb^^44^55"_var
-.fi
-.RE
-
-Field access:
-
-It is recommended to use "v1.f(fieldno)" syntax using a ".f(" prefix to access fields in expressions instead of plain "v1(fieldno)". The former syntax (using .f()) will always compile whereas the latter does not compile in all contexts. It will compile only if being called on a constant var or in a location which requires a var. This is due to C++ not making a clear distinction between usage on the left and right side of assignment operator =.
-
-Furthermore using plain round brackets without the leading .f can be confused with function call syntax.
-
-\fBExample:\fR
-.RS
-.nf
- var v1 = "aa^bb^cc"_var;
- var v2 = v1.f(2); // "bb" /// .f() style access. Recommended.
- var v3 =   v1(2); // "bb" ///   () style access. Not recommended.
-.fi
-.RE
-
-
-.SS
-var v1 = v2(fieldno, valueno);       v1(fieldno, valueno) = v2;
-.nf
- 
-.fi
-Dynamic array - value update and append
-
-See also inserter() and remover().
-
-\fBExample:\fR
-.RS
-.nf
- var v1 = "aa^b1]b2^cc"_var;
- v1(2, 4) = "44"; // v1 -> "aa^b1]b2]]44^cc"_var
- // value number -1 causes appending a value when updating.
- v1(2, -1) = 55; // v1 -> "aa^b1]b2]]44]55^cc"_var
-.fi
-.RE
-
-Value access:
-
-\fBExample:\fR
-.RS
-.nf
- var v1 = "aa^b1]b2^cc"_var;
- var v2 = v1.f(2,2); // "b2" /// .f() style access. Recommended.
- var v3 =   v1(2,2); // "b2" ///   () style access. Not recommended.
-.fi
-.RE
-
-
-.SS
-var v1 = v2(fieldno, valueno, subvalueno);       v1(fieldno, valueno, subvalueno) = v2;
-.nf
- 
-.fi
-Dynamic array - subvalue update and append
-
-See also inserter() and remover().
-
-\fBExample:\fR
-.RS
-.nf
- var v1 = "aa^bb^cc"_var;
- v1(2, 2, 2) = "22"; // v1 -> "aa^bb]}22^cc"_var
- // subvalue number -1 causes appending a subvalue when updating.
- v1(2, 2, -1) = 33; // v1 -> "aa^bb]}22}33^cc"_var
-.fi
-.RE
-
-Subvalue access:
-
-\fBExample:\fR
-.RS
-.nf
- var v1 = "aa^b1]b2}s2^cc"_var;
- var v2 = v1.f(2, 2, 2); // "s2" /// .f() style access. Recommended.
- var v3 =   v1(2, 2, 2); // "s2" ///   () style access. Not recommended.
-.fi
-.RE
-
-
-.SH 3. ARITHMETICAL OPERATORS 
+.SH 2. ARITHMETICAL OPERATORS 
 .SH
 
 .SS
@@ -287,9 +215,9 @@ if (v1.isnum()) ...
 .fi
 Checks if a var is numeric.
 
-\fBReturns:\fR True if it is.
+\fBReturns:\fR True if a var holds a double, an integer, or a string that is defined as numeric.
 
-A string is defined to be numeric if it consists of one or more digits 0-9, with a optional decimal point placed anywhere, with an optional + or - sign prefix, or is the empty string "", which is defined to be zero.
+A string is defined as numeric only if it consists of one or more digits 0-9, with an optional decimal point "." placed anywhere, with an optional + or - sign prefix, or it is the empty string "", which is defined to be zero.
 
 \fBExample:\fR
 .RS
@@ -318,8 +246,8 @@ Allows working numerically with data that may be non-numeric.
 \fBExample:\fR
 .RS
 .nf
- var v1 = "123.45"_var.num(); // "123.45"
- var v2 = "abc"_var.num(); // 0
+ var v1 = "123.45"_var.num();    // 123.45
+ var v2 = "abc"_var.num() + 100; // 100
 .fi
 .RE
 
@@ -481,6 +409,150 @@ Pre decrement
 .nf
  var v1 = 3;
  var v2 = -- v1; // v2 -> 2 // v1 -> 2
+.fi
+.RE
+
+
+.SH 3. DYNAMIC ARRAY CREATION, ACCESS AND UPDATE
+.SH
+
+.SS
+var v1 = ""_var;
+.nf
+ 
+.fi
+The literal suffix "_var" allows dynamic arrays to be seamlessly embedded in code using the visible equivalents of unprintable field mark characters.
+
+
+
+RM ` Record mark
+
+FM ^ Field mark
+
+VM ] Value mark
+
+SM } Subvalue mark
+
+TM | Text mark
+
+ST ~ Subtext mark
+
+\fBExample:\fR
+.RS
+.nf
+ var v1 = "f1^f2^v1]v2^f4"_var; // "f1" _FM "f2" _FM "v1" _VM "v2" _FM "f4"
+.fi
+.RE
+
+
+.SS
+var v1 = {"a", "b", "c" ...}; // Initializer list
+.nf
+ 
+.fi
+Create an dynamic array var from a list. C++ constrains list elements to be all the same type. var, string, double, int, etc.
+
+\fBExample:\fR
+.RS
+.nf
+ var v1 = {11, 22, 33}; // "11^22^33"_var
+.fi
+.RE
+
+
+.SS
+var v1 = v2(fieldno);       v1(fieldno) = v2;
+.nf
+ 
+.fi
+Dynamic array - field update and append:
+
+See also inserter() and remover().
+
+\fBExample:\fR
+.RS
+.nf
+ var v1 = "aa^bb"_var;
+ v1(4) = 44; // v1 -> "aa^bb^^44"_var
+ // Field number -1 causes appending a field when updating.
+ v1(-1) = "55"; // v1 -> "aa^bb^^44^55"_var
+.fi
+.RE
+
+Field access:
+
+It is recommended to use "v1.f(fieldno)" syntax using a ".f(" prefix to access fields in expressions instead of plain "v1(fieldno)". The former syntax (using .f()) will always compile whereas the latter does not compile in all contexts. It will compile only if being called on a constant var or in a location which requires a var. This is due to C++ not making a clear distinction between usage on the left and right side of assignment operator =.
+
+Furthermore using plain round brackets without the leading .f can be confused with function call syntax.
+
+\fBExample:\fR
+.RS
+.nf
+ var v1 = "aa^bb^cc"_var;
+ var v2 = v1.f(2); // "bb" /// .f() style access. Recommended.
+ var v3 =   v1(2); // "bb" ///   () style access. Not recommended.
+.fi
+.RE
+
+
+.SS
+var v1 = v2(fieldno, valueno);       v1(fieldno, valueno) = v2;
+.nf
+ 
+.fi
+Dynamic array - value update and append
+
+See also inserter() and remover().
+
+\fBExample:\fR
+.RS
+.nf
+ var v1 = "aa^b1]b2^cc"_var;
+ v1(2, 4) = "44"; // v1 -> "aa^b1]b2]]44^cc"_var
+ // value number -1 causes appending a value when updating.
+ v1(2, -1) = 55; // v1 -> "aa^b1]b2]]44]55^cc"_var
+.fi
+.RE
+
+Value access:
+
+\fBExample:\fR
+.RS
+.nf
+ var v1 = "aa^b1]b2^cc"_var;
+ var v2 = v1.f(2,2); // "b2" /// .f() style access. Recommended.
+ var v3 =   v1(2,2); // "b2" ///   () style access. Not recommended.
+.fi
+.RE
+
+
+.SS
+var v1 = v2(fieldno, valueno, subvalueno);       v1(fieldno, valueno, subvalueno) = v2;
+.nf
+ 
+.fi
+Dynamic array - subvalue update and append
+
+See also inserter() and remover().
+
+\fBExample:\fR
+.RS
+.nf
+ var v1 = "aa^bb^cc"_var;
+ v1(2, 2, 2) = "22"; // v1 -> "aa^bb]}22^cc"_var
+ // subvalue number -1 causes appending a subvalue when updating.
+ v1(2, 2, -1) = 33; // v1 -> "aa^bb]}22}33^cc"_var
+.fi
+.RE
+
+Subvalue access:
+
+\fBExample:\fR
+.RS
+.nf
+ var v1 = "aa^b1]b2}s2^cc"_var;
+ var v2 = v1.f(2, 2, 2); // "s2" /// .f() style access. Recommended.
+ var v3 =   v1(2, 2, 2); // "s2" ///   () style access. Not recommended.
 .fi
 .RE
 

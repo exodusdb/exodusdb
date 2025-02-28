@@ -135,26 +135,44 @@ template<> PUBLIC RETVAR VARBASE1::first_(int nchars) const {
 // ::dump
 //
 template<> PUBLIC RETVAR VARBASE1::dump() const {
-	var nrvo = "var: ";
+	var nrvo = "var:";
 
-	if (var_typ & VARTYP_STR)
-		nrvo ^= "str: " _DQ ^ var_base(var_str).first_(1024).convert(_ALL_FMS, _VISIBLE_FMS) ^ _DQ " ";
+	// Append the var's address
+	const var var_addr = int64_t(static_cast<const void*>(this));
+	nrvo ^= "0x" ^ var_addr.oconv("MX").lcase();
+
+	// Append the var typ as a single int.
+//	nrvo ^= "typ:" ^ (var_base(int(var_typ)).oconv("MB").trimfirst("0") + 0);
+	nrvo ^= " typ:" ^ (var_base(int(var_typ))/*.oconv("MB").trimfirst("0") + 0*/);
 
 	if (var_typ & VARTYP_OSFILE) {
-		nrvo ^= "osfile int:" ^ var_base(var_int) ^ " ";
-		nrvo ^= "dbl:" ^ var_base(var_dbl) ^ " ";
-
+		nrvo ^= " osfile:";
+		nrvo ^= " int:" ^ var_base(var_int);
+		nrvo ^= " dbl:" ^ var_base(var_dbl);
 	} else {
 
 		if (var_typ & VARTYP_INT)
-			nrvo ^= "int:" ^ var_base(var_int) ^ " ";
+			nrvo ^= " int:" ^ var_base(var_int);
 
 		if (var_typ & VARTYP_DBL)
-			nrvo ^= "dbl:" ^ var_base(var_dbl) ^ " ";
+			nrvo ^= " dbl:" ^ var_base(var_dbl);
 	}
 
-//	nrvo ^= "typ:" ^ (var_base(int(var_typ)).oconv("MB").trimfirst("0") + 0);
-	nrvo ^= "typ:" ^ (var_base(int(var_typ))/*.oconv("MB").trimfirst("0") + 0*/);
+	if (var_typ & VARTYP_NAN)
+		nrvo ^= " nan:";
+
+	// Append the string if present
+	if (var_typ & VARTYP_STR) {
+
+		nrvo ^= " str:";
+
+		// Append the string's address if not within the var e.g. it on the heap. not SSO
+		const var cstr_addr = int64_t(static_cast<const void*>(var_str.c_str()));
+		if (abs(cstr_addr - var_addr) > 64)
+			nrvo ^= "0x" ^ cstr_addr.oconv("MX").lcase();
+
+		nrvo ^= " " _DQ ^ var_base(var_str).first_(1024).convert(_ALL_FMS, _VISIBLE_FMS) ^ _DQ;
+	}
 
 	return nrvo;
 }

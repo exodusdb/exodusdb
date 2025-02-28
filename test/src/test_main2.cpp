@@ -323,26 +323,36 @@ function main() {
 
 	{
 		var x;
-		x.default_to("zxc");
-		assert(x eq "zxc");
+		x.defaulter("zxc");
+		assert(x eq "zxc");// change
+
+		var y;
+		defaulter(y, "zxc");
+		assert(y eq "zxc");// change. free function
 	}
 
 	{
 		var x = "abc";
-		x.default_to("zxc");
-		assert(x eq "abc");
+		x.defaulter("zxc");
+		assert(x eq "abc");// no change
+
+		var y = "abc";
+		defaulter(y, "zxc");
+		assert(y eq "abc");// no change
 	}
 
 	{
 		var x;
-		assert(x.default_from("zxc") eq "zxc");
-		assert(x.unassigned());
+		assert(x.or_default("zxc") eq "zxc"); // member function defaults
+		assert(or_default(x, "zxc") eq "zxc"); // free function defaults
+		assert(x.unassigned()); // x remains untouched
 	}
 
 	{
 		var x = "abc";
-		assert(x.default_from("zxc") eq "abc");
-		assert(x eq "abc");
+		assert(x.or_default("zxc") eq "abc"); // no default
+		assert(or_default(x, "zxc") eq "abc"); // no default
+		assert(x eq "abc"); // x remains untouched
 	}
 
 	// lower and raise - const

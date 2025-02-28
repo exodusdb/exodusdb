@@ -142,8 +142,12 @@ ND var ostempfilename(void);
 ND bool assigned(in var1);
 ND bool unassigned(in var1);
 
+ND var  or_default(in var1, in defaultvar);
+   void defaulter(io var1, in defaultvar);
+
    void move(io fromvar, io tovar);
    void swap(io var1, io var2);
+ND var  dump(in var1);
 
 // OS
 

@@ -60,8 +60,8 @@
 559 out  var::inputn(const int nchars
 560 out  var::keypressed(const bool wait = false)
 561 bool var::eof() const
-562 void var::default_to(in defaultvalue)
-563 var  var::default_from(in defaultvalue) const
+562 void var::defaulter(in defaultvalue)
+563 var  var::or_default(in defaultvalue) const
 564 char var::toChar() const
 565 str  var::toString() &&
 566 str  var::toString() const&

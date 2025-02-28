@@ -8,6 +8,34 @@ function main() {
 
 	printl("test_funcs says 'Hello World!'");
 
+    {
+		// test dump()
+
+		var s1 = str("x", 32);
+		TRACE(dump(s1))
+
+		var s2 = s1.isnum();
+		TRACE(dump(s1))
+
+		var i1 = 123_var;
+		TRACE(dump(i1))
+
+		var d1 = 123.45_var;
+		TRACE(dump(d1))
+
+		var of1;
+		if (not osopen("/etc/hosts" to of1))
+			abort(lasterror());
+		TRACE(dump(of1))
+
+		//TRACE: dump(s1) = "var:0x7ffd25f72338 typ:1 str:0x6525ab29be70 "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx""
+		//TRACE: dump(s1) = "var:0x7ffd25f72338 typ:9 nan: str:0x6525ab29be70 "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx""
+		//TRACE: dump(i1) = "var:0x7ffd25f72270 typ:2 int:123"
+		//TRACE: dump(d1) = "var:0x7ffd25f721f8 typ:4 dbl:123.45"
+		//TRACE: dump(of1) = "var:0x7ffd25f721c0 typ:25 osfile: int:0 dbl:1 nan: str: "/etc/hosts""
+
+    }
+
 	{
 		printl("Tabbed output");
 		printt("a", "b", "c");
@@ -36,10 +64,19 @@ function main() {
 
 		// .move() to a temporary leaves v1 as empty string guaranteed
 		var v1 = space(100);
+		auto addr1 = static_cast<const void*>(v1.c_str()); // Where exactly are v1's 100 spaces
+
 		var v2 = v1.move();
 //		assert(v1.unassigned());
 		assert(v1 == "");
 		assert(v2 == space(100));
+
+		// Check that the spaces are still the same spaces
+		auto addr2 = static_cast<const void*>(v2.c_str()); // Where exactly are v2's 100 spaces
+
+		// Verify that the spaces themselves have NOT moved
+		assert(addr1 == addr2);
+
 	}
 
 	{

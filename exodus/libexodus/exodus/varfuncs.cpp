@@ -550,12 +550,12 @@ out  var::keypressed(const bool wait /*=false*/) {
 }
 
 
-template<> PUBLIC void VARBASE1::default_to(CBX defaultvalue) {
+template<> PUBLIC void VARBASE1::defaulter(CBX defaultvalue) {
 
 	// see explanation above in assigned
 	// assertVar(function_sig);
 
-	THISIS("void var::default_to(in defaultvalue)")
+	THISIS("void var::defaulter(in defaultvalue)")
 	ISASSIGNED(defaultvalue)
 
 	//?allow undefined usage like var xyz=xyz.readnext();
@@ -567,9 +567,9 @@ template<> PUBLIC void VARBASE1::default_to(CBX defaultvalue) {
 	return;// *this;
 }
 
-template<> PUBLIC RETVAR VARBASE1::default_from(CBX defaultvalue) const {
+template<> PUBLIC RETVAR VARBASE1::or_default(CBX defaultvalue) const {
 
-	THISIS("var  var::default_from(in defaultvalue) const")
+	THISIS("var  var::or_default(in defaultvalue) const")
 	ISASSIGNED(defaultvalue)
 
 	if (this->unassigned()) {

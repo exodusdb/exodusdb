@@ -29,8 +29,8 @@ function main() {
 
 	printl("var() = default;");
 	{
-		let clients = "xo_clients", key = "SB001";
-		var client; // Unassigned var
+		let clients = "xo_clients", key = "SB001"; // const vars
+		var client;                                // Unassigned var
 		if (not read(client from clients, key)) abort("var: " ^ lasterror());
 	}
 
@@ -44,17 +44,38 @@ function main() {
 		var v6 = v1 + 100;           // Arithmetic
 		var v7 = v3 ^ "xyz";         // Concatenation
 		var v8 = oslist(".").sort(); // Built in functions
+		let v9 = 12345;              // A const var
+		var v10 = 12'345_var;        // A literal var integer
+		var v11 = 123.45_var;        // A literal var double
+		var v12 = "f1^v1]v2^f3"_var; // A literal var string
 		var x = 0.1, y = "0.2", z = x + y;
 		assert(z == 0.3);
 
 	}
 
-	printl("operator=(expression) &;");
-	{
-		let v1 = osgetenv("HOME");
-	}
+	var v2;
 
 	var v1;
+
+	printl("or_default(in defaultvalue) const;");
+	{
+		var v1; // Unassigned
+		var v2 = v1.or_default("abc");
+		assert(v2 == "abc");
+
+		// or
+		var v3 = or_default(v1, "abc");
+	}
+
+	printl("defaulter(CVR defaultvalue);");
+	{
+		var v1; // Unassigned
+		v1.defaulter("abc");
+		assert(v1 == "abc");
+
+		// or
+		defaulter(v1, "abc");
+	}
 
 	printl("swap(io v2);");
 	{
@@ -68,8 +89,6 @@ function main() {
 		swap(v1, v2);
 	}
 
-	var v2;
-
 	printl("move();");
 	{
 		var v1 = space(65'536);
@@ -79,6 +98,85 @@ function main() {
 
 		// or
 		move(v1 to v2);
+	}
+
+	printl("dump() const;");
+	{
+		var v1 = str("x", 32);
+		v1.dump().outputl(); ;
+		assert(v1 == e.g. var:0x7ffea7462cd0 typ:1 str:0x584d9e9f6e70 "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+
+		// or
+		outputl(dump(v1));
+	}
+
+	printl("isnum() const;");
+	{
+		if ("+123.45"_var.isnum()) {/*ok*/} else  abort("isnum: " ^ lasterror());
+		if (       ""_var.isnum()) {/*ok*/} else  abort("isnum: " ^ lasterror());
+		if (not   "."_var.isnum()) {/*ok*/} else  abort("isnum: " ^ lasterror());
+		// or
+		if (isnum("123.")) {/*ok*/} else  abort("isnum: " ^ lasterror());
+	}
+
+	printl("num() const;");
+	{
+		var v1 = "123.45"_var.num();
+		assert(v1 == 123.45);
+
+		var v2 = "abc"_var.num() + 100;
+		assert(v2 == 100);
+
+	}
+
+	printl("operator+(var);");
+	{
+		var v1 = 0.1;
+		var v2 = v1 + 0.2;
+		assert(v2 == 0.3);
+
+	}
+
+	printl("operator+=(var);");
+	{
+		var v1 = 0.1;
+		v1 += 0.2; // 0.3
+	}
+
+	printl("operator++(int) &;");
+	{
+		var v1 = 3;
+		var v2 = v1 ++;
+		assert(v2 == 3 );
+		assert(v1 == 4);
+
+	}
+
+	printl("operator--(int) &;");
+	{
+		var v1 = 3;
+		var v2 = v1 --;
+		assert(v2 == 3 );
+		assert(v1 == 2);
+
+	}
+
+	printl("operator++() &;");
+	{
+		var v1 = 3;
+		var v2 = ++ v1;
+		assert(v2 == 4 );
+		assert(v1 == 4);
+
+	}
+
+	printl("operator--() &;");
+	{
+		var v1 = 3;
+		var v2 = -- v1;
+		assert(v2 == 2 );
+		assert(v1 == 2);
+
 	}
 
 	printl("operator""_var(const char* cstr, std::size_t size);");
@@ -162,75 +260,6 @@ function main() {
 		var v3 =   v1(2, 2, 2);
 		assert(v3 == "s2");
  ///   () style access. Not recommended.
-	}
-
-	printl("isnum() const;");
-	{
-		if ("+123.45"_var.isnum()) {/*ok*/} else  abort("isnum: " ^ lasterror());
-		if (       ""_var.isnum()) {/*ok*/} else  abort("isnum: " ^ lasterror());
-		if (not   "."_var.isnum()) {/*ok*/} else  abort("isnum: " ^ lasterror());
-		// or
-		if (isnum("123.")) {/*ok*/} else  abort("isnum: " ^ lasterror());
-	}
-
-	printl("num() const;");
-	{
-		var v1 = "123.45"_var.num();
-		assert(v1 == "123.45");
-
-		var v2 = "abc"_var.num();
-		assert(v2 == 0);
-
-	}
-
-	printl("operator+(var);");
-	{
-		var v1 = 0.1;
-		var v2 = v1 + 0.2;
-		assert(v2 == 0.3);
-
-	}
-
-	printl("operator+=(var);");
-	{
-		var v1 = 0.1;
-		v1 += 0.2; // 0.3
-	}
-
-	printl("operator++(int) &;");
-	{
-		var v1 = 3;
-		var v2 = v1 ++;
-		assert(v2 == 3 );
-		assert(v1 == 4);
-
-	}
-
-	printl("operator--(int) &;");
-	{
-		var v1 = 3;
-		var v2 = v1 --;
-		assert(v2 == 3 );
-		assert(v1 == 2);
-
-	}
-
-	printl("operator++() &;");
-	{
-		var v1 = 3;
-		var v2 = ++ v1;
-		assert(v2 == 4 );
-		assert(v1 == 4);
-
-	}
-
-	printl("operator--() &;");
-	{
-		var v1 = 3;
-		var v2 = -- v1;
-		assert(v2 == 2 );
-		assert(v1 == 2);
-
 	}
 
 	printl("operator^(var);");

@@ -186,8 +186,8 @@ auto get_timebank_acno(const std::string_view arg1) -> int {
 	else if (++acno && arg1 == "out  var::inputn(const int nchars") {}
 	else if (++acno && arg1 == "out  var::keypressed(const bool wait = false)") {}
 	else if (++acno && arg1 == "bool var::eof() const") {}
-	else if (++acno && arg1 == "void var::default_to(in defaultvalue)") {}
-	else if (++acno && arg1 == "var  var::default_from(in defaultvalue) const") {}
+	else if (++acno && arg1 == "void var::defaulter(in defaultvalue)") {}
+	else if (++acno && arg1 == "var  var::or_default(in defaultvalue) const") {}
 	else if (++acno && arg1 == "char var::toChar() const") {}
 	else if (++acno && arg1 == "str  var::toString() &&") {}
 	else if (++acno && arg1 == "str  var::toString() const&") {}

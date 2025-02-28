@@ -63,15 +63,6 @@ public:
 	// var_base::clone and move, like most var_base functions return a var
 	// since a var is usable as a var_base but not vice versa.
 
-//	// Implicitly convert var_base to var
-//	operator var() &{
-//		return this->clone();
-//	}
-//
-//	operator var() && {
-//		return this->move();
-//	}
-
 }; // class var_mid
 
 // Forward declarations
@@ -116,6 +107,14 @@ class PUBLIC var : public var_mid<var> {
 	friend class dim;
 	friend class rex;
 
+public:
+
+	// Inherit all constructors from var_base
+//	using var_base::var_base;
+	using var_mid<var>::var_mid;
+
+	// Tabular documentation is generated for comments starting /// or more and ending with a colon
+
 	//////////////////
 	/// var creation :
 	//////////////////
@@ -123,33 +122,36 @@ class PUBLIC var : public var_mid<var> {
 	/* fake for gendoc
 
     // Create an unassigned var.
-	// Whereever possible, variables should be assigned at their point of definition. However, due to the rules of scoping, vars must often be defined in advance of being assigned.
-	// For example a variable may be assigned on different branches of a conditional statement, or returned from a function.
-	// Despite lack of assignment, all "use before initialisation" bugs are eliminiated because a runtime error VarUnassigned is thrown in all cases when a var is used before being assigned.
+	// Whereever possible, variables should be assigned an initial value immediately at their point of definition, and marked as const if appropriate. However variables often have no real single initial value and are commonly defined in advance of being assigned a particular value. For example, a variable may be assigned differently on different branches of a conditional statement, or be provided as an outbound argument of a function call.
+	// Even when not assigned, "use before initialisation" bugs do not occur because a runtime error VarUnassigned is thrown if a var is used before it has been assigned a value.
 	//
-	// `let clients = "xo_clients", key = "SB001";
-	//  var client; // Unassigned var
+	// Use "let" instead of "var" as a shorthand way of writing "const var" whereever possible.
+	//
+	// `let clients = "xo_clients", key = "SB001"; // const vars
+	//  var client;                                // Unassigned var
 	//  if (not read(client from clients, key)) ...`
 	//
     var() = default;
 
-	// Assign a var using a literal or an expression.
+	// Assign a var using a literal or an expression. Alternatively, use "let" instead of "var" as a shorthand way of writing "const var" where appropriate.
+	//
 	// `var v1 = 42;                 // Integer
 	//  var v2 = 42.3;               // Double
 	//  var v3 = "abc";              // String
 	//  var v4 = 'x';                // char
 	//  var v5 = true;               // bool
+	//
 	//  var v6 = v1 + 100;           // Arithmetic
 	//  var v7 = v3 ^ "xyz";         // Concatenation
 	//  var v8 = oslist(".").sort(); // Built in functions
 	//
+	//  let v9 = 12345;              // A const var
+	//
+	//  var v10 = 12'345_var;        // A literal var integer
+	//  var v11 = 123.45_var;        // A literal var double
+	//  var v12 = "f1^v1]v2^f3"_var; // A literal var string
+	//
 	//  var x = 0.1, y = "0.2", z = x + y; // z -> 0.3`
-	//
-	// "let v1 = ..."
-	// Whereever a var will not change value, it is good programming practice to indicate the same directly in code.
-	// Use "let" instead of "var" wherever possible. This is a shorthand way of writing "const var".
-	//
-	// `let v1 = osgetenv("HOME");`
 	//
 	void operator=(expression) &;
 
@@ -161,8 +163,30 @@ class PUBLIC var : public var_mid<var> {
 	// Returns: True if the var is unassigned, otherwise false
 	ND bool unassigned() const;
 
+	// Returns: A copy of the var if it is assigned or the default value if it is not.
+	// Can be used to handle optional arguments in functions.
+	// defaultvalue: Cannot be unassigned.
+	// obj is v2
+	//
+	// `var v1; // Unassigned
+	//  var v2 = v1.or_default("abc"); // v2 -> "abc"
+	//  // or
+	//  var v3 = or_default(v1, "abc");`
+	//
+	ND var or_default(in defaultvalue) const;
+
+	// If the var is unassigned then assign the default value to it, otherwise do nothing.
+	// defaultvalue: Cannot be unassigned.
+	//
+	// `var v1; // Unassigned
+	//  v1.defaulter("abc"); // v1 -> "abc"
+	//  // or
+	//  defaulter(v1, "abc");`
+	//
+	void defaulter(CVR defaultvalue);
+
 	// Swap the contents of one var with another.
-    // Useful for stashing large strings quickly since large strings are handled by moving pointers and without making unnecessary copies or allocating memory.
+    // Useful for stashing large strings quickly. They are moved using pointers without making copies or allocating memory.
 	// Eiher or both variables may be unassigned.
 	//
 	// `var v1 = space(65'536);
@@ -172,8 +196,8 @@ class PUBLIC var : public var_mid<var> {
 	//  swap(v1, v2);`
 	void swap(io v2);
 
-	// Moves the contents of one var to another. The original var becomes an empty string.
-	// This allows large strings to be efficiently handled by moving pointers and without making unnecessary copies or allocating memory.
+	// Force the contents of a var to be moved instead of copied. The moved var becomes an empty string.
+	// This allows large strings to be handled efficiently. They are moved using pointers without making copies or allocating memory.
     // The moved var must be assigned otherwise a VarUnassigned error is thrown.
 	// obj is v2
 	//
@@ -184,10 +208,114 @@ class PUBLIC var : public var_mid<var> {
 	ND var move();
 
     // Returns a copy of the var.
-    // If the var is unassigned then the copy is unassigned also. No VarUnassigned error is thrown.
+    // The cloned var may be unassigned, in which case the copy will be unassigned too.
+	// obj is v2
 	ND var clone() const;
 
+	// Return a string describing internal data of a var.
+	// If the str is located on the heap then its address is given.
+	// typ:
+    // 0x01 str is available.
+    // 0x02 int is available.
+    // 0x04 dbl is available.
+    // 0x08 nan: str is not a number.
+    // 0x16 osfile: str, int and dbl have special meaning.
+	//
+	// `var v1 = str("x", 32);
+	//  v1.dump().outputl(); // e.g. var:0x7ffea7462cd0 typ:1 str:0x584d9e9f6e70 "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+	//  // or
+	//  outputl(dump(v1));`
+	ND var dump() const;
+
 	*/
+
+	////////////////////////////
+	/// Arithmetical operators :
+	////////////////////////////
+
+	/* fake for gendoc Defined for var_base in varb.h
+
+	// Checks if a var is numeric.
+	// Returns: True if a var holds a double, an integer, or a string that is defined as numeric.
+	// A string is defined as numeric only if it consists of one or more digits 0-9, with an optional decimal point "." placed anywhere, with an optional + or - sign prefix, or it is the empty string "", which is defined to be zero.
+	//
+	// `if ("+123.45"_var.isnum()) ... ok
+	//  if (       ""_var.isnum()) ... ok
+	//  if (not   "."_var.isnum()) ... ok
+	//  // or
+	//  if (isnum("123.")) ... ok`
+	//
+	bool isnum() const;
+
+    // Returns a copy of the var if it is numeric or 0 otherwise.
+	// Returns: A guaranteed numeric var
+	// Allows working numerically with data that may be non-numeric.
+	//
+	// `var v1 = "123.45"_var.num();    // 123.45
+	//  var v2 = "abc"_var.num() + 100; // 100`
+	//
+	ND var num() const;
+
+	// Addition
+	// Attempts to perform mumeric operations on non-numeric strings will throw a runtime error VarNonNumeric.
+	// Floating point numbers are implicitly converted to strings with no more than 12 significant digits of precision. This practically eliminates all floatng point rounding errors.
+	// Internally, 0.1 + 0.2 looks like this using doubles.
+	// 0.10000000000000003 + 0.20000000000000004 -> 0.30000000000000004
+	//
+	// `var v1 = 0.1;
+	//  var v2 = v1 + 0.2; // 0.3`
+	ND var operator+(var);
+	// Subtraction
+	ND var operator-(var);
+	// Multiplication
+	ND var operator*(var);
+	// Division
+	ND var operator/(var);
+	// Modulus
+	ND var operator%(var);
+
+	// Self addition
+	// `var v1 = 0.1;
+	//  v1 += 0.2; // 0.3`
+	ND var operator+=(var);
+	// Self subtraction
+	ND var operator-=(var);
+	// Self multiplication
+	ND var operator*=(var);
+	// Self division
+	ND var operator/=(var);
+	// Self modulus
+	ND var operator%=(var);
+	*/
+
+	// Prefix operators must be replicated in var
+	// //////////////////////////////////////////
+	//
+	// Cannot use the var_base version because it returns a var_base which
+	// cannot be used in place of a var and would stop the use of ++xxx and --xxx
+	// in places where a var is required. e.g. some function arguments.
+	//
+	// Will be forwarded to var_base behind the scenes
+	//
+	// Must have postfix operators if prefix operators are defined
+
+	// Post increment
+	// `var v1 = 3;
+	//  var v2 = v1 ++; // v2 -> 3 // v1 -> 4`
+	   var  operator++(int) &;
+	// Post decrement
+	// `var v1 = 3;
+	//  var v2 = v1 --; // v2 -> 3 // v1 -> 2`
+	   var  operator--(int) &;
+
+	// Pre increment
+	// `var v1 = 3;
+	//  var v2 = ++ v1; // v2 -> 4 // v1 -> 4`
+	   io   operator++() &;
+	// Pre decrement
+	// `var v1 = 3;
+	//  var v2 = -- v1; // v2 -> 2 // v1 -> 2`
+	   io   operator--() &;
 
 	//////////////////////////////////////////////
 	/// Dynamic array creation, access and update:
@@ -204,12 +332,6 @@ class PUBLIC var : public var_mid<var> {
 	//
 	// `var v1 = "f1^f2^v1]v2^f4"_var; // "f1" _FM "f2" _FM "v1" _VM "v2" _FM "f4"`
 	friend var  operator""_var(const char* cstr, std::size_t size);
-
-public:
-
-	// Inherit all constructors from var_base
-//	using var_base::var_base;
-	using var_mid<var>::var_mid;
 
 	template <class T>
     // Create an dynamic array var from a list. C++ constrains list elements to be all the same type. var, string, double, int, etc.
@@ -326,96 +448,6 @@ public:
 	ND var_proxy1 operator()(int fieldno);
 	ND var_proxy2 operator()(int fieldno, int valueno);
 	ND var_proxy3 operator()(int fieldno, int valueno, int subvalueno);
-
-	////////////////////////////
-	/// Arithmetical operators :
-	////////////////////////////
-
-	/* fake for gendoc Defined for var_base in varb.h
-
-	// Checks if a var is numeric.
-	// Returns: True if it is.
-	// A string is defined to be numeric if it consists of one or more digits 0-9, with a optional decimal point placed anywhere, with an optional + or - sign prefix, or is the empty string "", which is defined to be zero.
-	//
-	// `if ("+123.45"_var.isnum()) ... ok
-	//  if (       ""_var.isnum()) ... ok
-	//  if (not   "."_var.isnum()) ... ok
-	//  // or
-	//  if (isnum("123.")) ... ok`
-	//
-	bool isnum() const;
-
-    // Returns a copy of the var if it is numeric or 0 otherwise.
-	// Returns: A guaranteed numeric var
-	// Allows working numerically with data that may be non-numeric.
-	//
-	// `var v1 = "123.45"_var.num(); // "123.45"
-	//  var v2 = "abc"_var.num(); // 0`
-	//
-	ND var num() const;
-
-	// Addition
-	// Attempts to perform mumeric operations on non-numeric strings will throw a runtime error VarNonNumeric.
-	// Floating point numbers are implicitly converted to strings with no more than 12 significant digits of precision. This practically eliminates all floatng point rounding errors.
-	// Internally, 0.1 + 0.2 looks like this using doubles.
-	// 0.10000000000000003 + 0.20000000000000004 -> 0.30000000000000004
-	//
-	// `var v1 = 0.1;
-	//  var v2 = v1 + 0.2; // 0.3`
-	ND var operator+(var);
-	// Subtraction
-	ND var operator-(var);
-	// Multiplication
-	ND var operator*(var);
-	// Division
-	ND var operator/(var);
-	// Modulus
-	ND var operator%(var);
-
-	// Self addition
-	// `var v1 = 0.1;
-	//  v1 += 0.2; // 0.3`
-	ND var operator+=(var);
-	// Self subtraction
-	ND var operator-=(var);
-	// Self multiplication
-	ND var operator*=(var);
-	// Self division
-	ND var operator/=(var);
-	// Self modulus
-	ND var operator%=(var);
-	*/
-
-	// Prefix operators must be replicated in var
-	// //////////////////////////////////////////
-	//
-	// Cannot use the var_base version because it returns a var_base which
-	// cannot be used in place of a var and would stop the use of ++xxx and --xxx
-	// in places where a var is required. e.g. some function arguments.
-	//
-	// Will be forwarded to var_base behind the scenes
-	//
-	// Must have postfix operators if prefix operators are defined
-
-	// Post increment
-	// `var v1 = 3;
-	//  var v2 = v1 ++; // v2 -> 3 // v1 -> 4`
-	   var  operator++(int) &;
-	// Post decrement
-	// `var v1 = 3;
-	//  var v2 = v1 --; // v2 -> 3 // v1 -> 2`
-	   var  operator--(int) &;
-
-	// Pre increment
-	// `var v1 = 3;
-	//  var v2 = ++ v1; // v2 -> 4 // v1 -> 4`
-	   io   operator++() &;
-	// Pre decrement
-	// `var v1 = 3;
-	//  var v2 = -- v1; // v2 -> 2 // v1 -> 2`
-	   io   operator--() &;
-
-	// Tabular documentation is generated for comments starting /// or more and ending with a colon
 
 	/////////////////////
 	/// String creation :

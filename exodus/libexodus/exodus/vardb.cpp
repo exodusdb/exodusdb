@@ -597,7 +597,7 @@ static int get_dbconn_no_or_default(in dbhandle) {
 
 	//save the connection number in the dbhandle
 	//if (dbconn_no) {
-	//	dbhandle.default_to("");
+	//	dbhandle.defaulter("");
 	//	dbhandle.r(2, dbconn_no);
 	//}
 
@@ -4691,7 +4691,7 @@ void var::clearselect() {
 	// assertString(function_sig);
 
 	// default cursor is ""
-	this->default_to("");
+	this->defaulter("");
 
 	/// if readnext through string
 	//3/4/5/6 setup in selectkeys. cleared in clearselect
@@ -5177,7 +5177,7 @@ bool var::hasnext() {
 	// assertString(function_sig);
 
 	// default cursor is ""
-	this->default_to("");
+	this->defaulter("");
 
 	// readnext through string of keys if provided
 	// Note: code similarity between hasnext and readnext
@@ -5274,7 +5274,7 @@ bool var::readnext(io key, io valueno) {
 //	}
 
 	// default cursor is ""
-	this->default_to("");
+	this->defaulter("");
 
 
 	var record;
@@ -5296,7 +5296,7 @@ bool var::readnext(io record, io key, io valueno) {
 //	}
 
 	// default cursor is ""
-	this->default_to("");
+	this->defaulter("");
 
 	// readnext through string of keys if provided
 	// Note: code similarity between hasnext and readnext
@@ -5636,7 +5636,7 @@ bool var::cursorexists() {
     // Avoid generating sql errors since they abort transactions
 
 	// default cursor is ""
-	this->default_to("");
+	this->defaulter("");
 
 	var cursorcode = this->f(1).convert(".", "_");
 	var cursorid = this->f(2) ^ "_" ^ cursorcode;

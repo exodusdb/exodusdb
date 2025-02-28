@@ -1532,12 +1532,12 @@ class PUBLIC var_base {
 	ND bool unassigned() const;
 
 	// If the var is unassigned, assigns the default value to it, otherwise does nothing.
-	// Mutator. Perhaps better called "defaulter()"
-	void default_to(CVR defaultvalue);
+	// Mutator.
+	void defaulter(CVR defaultvalue);
 
 	// Returns: A copy of the var if it is assigned otherwise it returns a copy of the default var
 	// If ''defaultvalue'' is unassigned then then a VarUnassigned error is thrown.
-	ND RETVAR default_from(CVR defaultvalue) const;
+	ND RETVAR or_default(CVR defaultvalue) const;
 
 	// "moves" the var to the destination var leaving the source var unassigned.
 	// This is useful for performance with vars which own strings larger than can be fitted inside a std::string object, which is 15 bytes on linux.

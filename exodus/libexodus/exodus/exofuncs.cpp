@@ -57,6 +57,10 @@ ND PUBLIC bool unassigned(in var1) {return !var1.assigned();}
 
    PUBLIC void move(io fromvar, io tovar) {fromvar.move(tovar);}
    PUBLIC void swap(io var1, io var2) {var1.swap(var2);}
+ND PUBLIC var  dump(in var1) {return var1.dump();}
+
+ND PUBLIC var  or_default(in var1, in defaultvar) {return var1.or_default(defaultvar);}
+   PUBLIC void defaulter(io iovar1, in defaultvar) {iovar1.defaulter(defaultvar);}
 
 // OS
 
