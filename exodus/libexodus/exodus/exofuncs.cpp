@@ -55,7 +55,9 @@ ND PUBLIC var  ostempfilename() {return var().ostempfilename();}
 ND PUBLIC bool assigned(in var1) {return var1.assigned();}
 ND PUBLIC bool unassigned(in var1) {return !var1.assigned();}
 
-   PUBLIC void move(io fromvar, io tovar) {fromvar.move(tovar);}
+ND PUBLIC var  move(io fromvar) {return fromvar.move();}
+ND PUBLIC var  clone(in fromvar) {return fromvar.clone();}
+
    PUBLIC void swap(io var1, io var2) {var1.swap(var2);}
 ND PUBLIC var  dump(in var1) {return var1.dump();}
 

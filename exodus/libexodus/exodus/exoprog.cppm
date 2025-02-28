@@ -49,6 +49,7 @@ export namespace exo {
 	using exo::assigned;
 	using exo::unassigned;
 	using exo::move;
+	using exo::clone;
 	using exo::dump;
 	using exo::or_default;
 	using exo::defaulter;

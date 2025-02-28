@@ -85,6 +85,9 @@ template<> PUBLIC RETVAR VARBASE1::clone() const {
 //
 template<> PUBLIC RETVAR VARBASE1::move() {
 
+    THISIS("var var::move()")
+    assertAssigned(function_sig);
+
 	// Like clone but moves the std::string and sets the old var to UNA empty string.
 
 	RETVAR rvo;

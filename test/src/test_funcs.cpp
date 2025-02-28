@@ -8,6 +8,26 @@ function main() {
 
 	printl("test_funcs says 'Hello World!'");
 
+	{
+		//test clone unassigned
+		var v1;
+		var v2 = v1.clone();
+		var v3 = clone(v1);
+	}
+	{
+		//test clone assigned
+		var v1 = "qqq";
+		var v2 = v1.clone();
+		assert(v2 == "qqq");
+		var v3 = clone(v2);
+		assert(v3 == "qqq");
+	}
+	{
+		//test move unassigned fails
+		var v1;
+		try {var v2 = v1.move();assert(false);} catch (VarUnassigned e) {};
+		try {var v2 = move(v1);assert(false);} catch (VarUnassigned e) {};
+	}
     {
 		// test dump()
 
@@ -95,16 +115,17 @@ function main() {
 		// free function
 		var v1 = "aa";
 		var v2 = "bb";
-		move(v1, v2);
+		v2 = move(v1);
 		assert(v1 == "");
 		assert(v2 == "aa");
     }
 
 	{
+		// Move from unassigned variables is not allowed.
 		var v1;
 		var v2 = "bb";
 		try {
-			move(v1, v2);
+			v2 = move(v1);
 			assert(false);
 		} catch (VarUnassigned e) {};
 		//      assert(v1 == "");

@@ -204,12 +204,16 @@ public:
 	// `var v1 = space(65'536);
 	//  var v2 = v1.move(); // v2.len() -> 65'536 // v1 -> ""
 	//  // or
-	//  move(v1 to v2);`
+	//  var v3 = move(v2);`
 	ND var move();
 
     // Returns a copy of the var.
     // The cloned var may be unassigned, in which case the copy will be unassigned too.
 	// obj is v2
+	// `var v1 = "abc";
+	//  var v2 = v1.clone(); // "abc"
+	//  // or
+	//  var v3 = clone(v2);`
 	ND var clone() const;
 
 	// Return a string describing internal data of a var.

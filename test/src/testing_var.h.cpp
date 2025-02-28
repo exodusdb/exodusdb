@@ -97,7 +97,17 @@ function main() {
 		assert(v1 == "");
 
 		// or
-		move(v1 to v2);
+		var v3 = move(v2);
+	}
+
+	printl("clone() const;");
+	{
+		var v1 = "abc";
+		var v2 = v1.clone();
+		assert(v2 == "abc");
+
+		// or
+		var v3 = clone(v2);
 	}
 
 	printl("dump() const;");

@@ -218,6 +218,7 @@ auto get_timebank_acno(const std::string_view arg1) -> int {
 	else if (++acno && arg1 == "void var::prefixer(SV prefixstr) &") {}
 	else if (++acno && arg1 == "void var::popper() &") {}
 	else if (++acno && arg1 == "void var::move(io tovar)") {}
+	else if (++acno && arg1 == "var  var::move()") {}
 	else if (++acno && arg1 == "var  var::str(const int num) const") {}
 	else if (++acno && arg1 == "var  var::space() const") {}
 	else if (++acno && arg1 == "void var::cropper() &") {}
