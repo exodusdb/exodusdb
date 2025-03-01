@@ -306,6 +306,15 @@ function main() {
 		var v4 = round(-1.295, 2);
 		assert(v4 == "-1.30");
 
+		var v5 = round(0, 1);
+		assert(v5 == "0.0");
+
+		var v6 = round(0, 0);
+		assert(v6 == "0");
+
+		var v7 = round(0, -1);
+		assert(v7 == "0");
+
 	}
 
 	printl("round(const int ndecimals = 0) const;");
@@ -411,7 +420,7 @@ function main() {
 	printl("empty() const;");
 	{
 		let v1 = "0";
-		if (not v1.empty()) {/*ok*/} else  abort("empty: " ^ lasterror()); /// true
+		if (not v1.empty()) {/*ok*/} else  abort("empty: " ^ lasterror()); // true
 		// or
 		if (not empty(v1)) {/*ok*/} else  abort("empty: " ^ lasterror()); // true
 	}
@@ -1090,28 +1099,40 @@ function main() {
 
 	}
 
-	printl("r(const int fieldno, in replacement) REF");
+	printl("updater(const int fieldno, in replacement) REF");
 	{
 		var v1 = "f1^v1]v2}s2}s3^f3"_var;
-		v1.r(2, "X"); ;
+		v1.updater(2, "X"); ;
 		assert(v1 == "f1^X^f3"_var);
 
+		// or
+		v1(2) = "X"; /// Easiest.
+		// or
+		updater(v1, 2, "X");
 	}
 
-	printl("r(const int fieldno, const int valueno, in replacement) REF");
+	printl("updater(const int fieldno, const int valueno, in replacement) REF");
 	{
 		var v1 = "f1^v1]v2}s2}s3^f3"_var;
-		v1.r(2, 2, "X"); ;
+		v1.updater(2, 2, "X"); ;
 		assert(v1 == "f1^v1]X^f3"_var);
 
+		// or
+		v1(2, 2) = "X"; /// Easiest.
+		// or
+		updater(v1, 2, 2, "X");
 	}
 
-	printl("r(const int fieldno, const int valueno, const int subvalueno, in replacement) REF;");
+	printl("updater(const int fieldno, const int valueno, const int subvalueno, in replacement) REF;");
 	{
 		var v1 = "f1^v1]v2}s2}s3^f3"_var;
-		v1.r(2, 2, 2, "X"); ;
+		v1.updater(2, 2, 2, "X"); ;
 		assert(v1 == "f1^v1]v2}X}s3^f3"_var);
 
+		// or
+		v1(2, 2, 2) = "X"; /// Easiest.
+		// or
+		updater(v1, 2, 2, 2, "X");
 	}
 
 	printl("inserter(const int fieldno, in insertion) REF");

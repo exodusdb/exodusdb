@@ -35,7 +35,7 @@ function main() {
 
 		// Compile all requested files to generate deprecation warnings
 		// Parallel compilation will speed matters up.
-		let compilecmd = COMMAND.pickreplace(1, "compile").convert(FM, " ");
+		let compilecmd = COMMAND.update(1, "compile").convert(FM, " ");
 
 		// h = Generate all headers and install in ~/inc first
 		let headercmd = compilecmd ^ " {hS}";

@@ -446,9 +446,9 @@ ND var  substr2(in fromstr, io startindex, out delimiterno);
 ND dim  split(in sourcevar, SV delimiter = _FM );
 ND var  join(const dim& sourcedim, SV delimiter = _FM );
 
-ND var  pickreplace(in instring, const int fieldno, const int valueno, const int subvalueno, in replacement);
-ND var  pickreplace(in instring, const int fieldno, const int valueno, in replacement);
-ND var  pickreplace(in instring, const int fieldno, in replacement);
+ND var  update(in instring, const int fieldno, const int valueno, const int subvalueno, in replacement);
+ND var  update(in instring, const int fieldno, const int valueno, in replacement);
+ND var  update(in instring, const int fieldno, in replacement);
 
 ND var  extract(in instring, const int fieldno = 0 , const int valueno = 0 , const int subvalueno = 0 );
 
@@ -460,9 +460,9 @@ ND var  insert(in instring, const int fieldno, in insertion);
 // subvalueno=0);
 ND var  remove(in instring, const int fieldno, const int valueno = 0 , const int subvalueno = 0 );
 
-   IO   pickreplacer(io iostring, const int fieldno, const int valueno, const int subvalueno, in replacement);
-   IO   pickreplacer(io iostring, const int fieldno, const int valueno, in replacement);
-   IO   pickreplacer(io iostring, const int fieldno, in replacement);
+   IO   updater(io iostring, const int fieldno, const int valueno, const int subvalueno, in replacement);
+   IO   updater(io iostring, const int fieldno, const int valueno, in replacement);
+   IO   updater(io iostring, const int fieldno, in replacement);
 
    IO   inserter(io iostring, const int fieldno, const int valueno, const int subvalueno, in insertion);
    IO   inserter(io iostring, const int fieldno, const int valueno, in insertion);

@@ -24,7 +24,7 @@ Use "let" instead of "var" as a shorthand way of writing "const var" whereever p
 \fBExample:\fR
 .RS
 .nf
- let clients = "xo_clients", key = "SB001"; // const vars
+let clients = "xo_clients", key = "SB001"; // const vars
 var client;                                // Unassigned var
 if (not read(client from clients, key)) ...
 .fi
@@ -42,7 +42,7 @@ Assign a var using a literal or an expression. Alternatively, use "let" instead 
 \fBExample:\fR
 .RS
 .nf
- var v1 = 42;                 // Integer
+var v1 = 42;                 // Integer
 var v2 = 42.3;               // Double
 var v3 = "abc";              // String
 var v4 = 'x';                // char
@@ -92,7 +92,7 @@ Can be used to handle optional arguments in functions.
 \fBExample:\fR
 .RS
 .nf
- var v1; // Unassigned
+var v1; // Unassigned
 var v2 = v1.or_default("abc"); // v2 -> "abc"
 // or
 var v3 = or_default(v1, "abc");
@@ -113,7 +113,7 @@ If the var is unassigned then assign the default value to it, otherwise do nothi
 \fBExample:\fR
 .RS
 .nf
- var v1; // Unassigned
+var v1; // Unassigned
 v1.defaulter("abc"); // v1 -> "abc"
 // or
 defaulter(v1, "abc");
@@ -136,7 +136,7 @@ Eiher or both variables may be unassigned.
 \fBExample:\fR
 .RS
 .nf
- var v1 = space(65'536);
+var v1 = space(65'536);
 var v2 = "";
 v1.swap(v2); // v1 -> "" // v2.len() -> 65'536
 // or
@@ -159,7 +159,7 @@ The moved var must be assigned otherwise a VarUnassigned error is thrown.
 \fBExample:\fR
 .RS
 .nf
- var v1 = space(65'536);
+var v1 = space(65'536);
 var v2 = v1.move(); // v2.len() -> 65'536 // v1 -> ""
 // or
 var v3 = move(v2);
@@ -179,7 +179,7 @@ The cloned var may be unassigned, in which case the copy will be unassigned too.
 \fBExample:\fR
 .RS
 .nf
- var v1 = "abc";
+var v1 = "abc";
 var v2 = v1.clone(); // "abc"
 // or
 var v3 = clone(v2);
@@ -211,7 +211,7 @@ If the str is located on the heap then its address is given.
 \fBExample:\fR
 .RS
 .nf
- var v1 = str("x", 32);
+var v1 = str("x", 32);
 v1.dump().outputl(); // e.g. var:0x7ffea7462cd0 typ:1 str:0x584d9e9f6e70 "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 // or
 outputl(dump(v1));
@@ -236,7 +236,7 @@ A string is defined as numeric only if it consists of one or more digits 0-9, wi
 \fBExample:\fR
 .RS
 .nf
- if ("+123.45"_var.isnum()) ... ok
+if ("+123.45"_var.isnum()) ... ok
 if (       ""_var.isnum()) ... ok
 if (not   "."_var.isnum()) ... ok
 // or
@@ -260,7 +260,7 @@ Allows working numerically with data that may be non-numeric.
 \fBExample:\fR
 .RS
 .nf
- var v1 = "123.45"_var.num();    // 123.45
+var v1 = "123.45"_var.num();    // 123.45
 var v2 = "abc"_var.num() + 100; // 100
 .fi
 .RE
@@ -285,7 +285,7 @@ Internally, 0.1 + 0.2 looks like this using doubles.
 \fBExample:\fR
 .RS
 .nf
- var v1 = 0.1;
+var v1 = 0.1;
 var v2 = v1 + 0.2; // 0.3
 .fi
 .RE
@@ -329,7 +329,7 @@ Self addition
 \fBExample:\fR
 .RS
 .nf
- var v1 = 0.1;
+var v1 = 0.1;
 v1 += 0.2; // 0.3
 .fi
 .RE
@@ -373,7 +373,7 @@ Post increment
 \fBExample:\fR
 .RS
 .nf
- var v1 = 3;
+var v1 = 3;
 var v2 = v1 ++; // v2 -> 3 // v1 -> 4
 .fi
 .RE
@@ -389,7 +389,7 @@ Post decrement
 \fBExample:\fR
 .RS
 .nf
- var v1 = 3;
+var v1 = 3;
 var v2 = v1 --; // v2 -> 3 // v1 -> 2
 .fi
 .RE
@@ -405,7 +405,7 @@ Pre increment
 \fBExample:\fR
 .RS
 .nf
- var v1 = 3;
+var v1 = 3;
 var v2 = ++ v1; // v2 -> 4 // v1 -> 4
 .fi
 .RE
@@ -421,7 +421,7 @@ Pre decrement
 \fBExample:\fR
 .RS
 .nf
- var v1 = 3;
+var v1 = 3;
 var v2 = -- v1; // v2 -> 2 // v1 -> 2
 .fi
 .RE
@@ -435,26 +435,24 @@ var v1 = ""_var;
 .nf
  
 .fi
-The literal suffix "_var" allows dynamic arrays to be seamlessly embedded in code using the visible equivalents of unprintable field mark characters.
+The literal suffix "_var" allows dynamic arrays to be seamlessly embedded in code using a predefined set of visible equivalents of unprintable field mark characters as follows:
 
+` = RM, Record mark
 
+^ = FM, Field mark
 
-RM ` Record mark
+] = VM, Value mark
 
-FM ^ Field mark
+} = SM, Subvalue mark
 
-VM ] Value mark
+| = TM, Text mark
 
-SM } Subvalue mark
-
-TM | Text mark
-
-ST ~ Subtext mark
+~ = ST, Subtext mark
 
 \fBExample:\fR
 .RS
 .nf
- var v1 = "f1^f2^v1]v2^f4"_var; // "f1" _FM "f2" _FM "v1" _VM "v2" _FM "f4"
+var v1 = "f1^f2^v1]v2^f4"_var; // "f1" _FM "f2" _FM "v1" _VM "v2" _FM "f4"
 .fi
 .RE
 
@@ -464,12 +462,12 @@ var v1 = {"a", "b", "c" ...}; // Initializer list
 .nf
  
 .fi
-Create a dynamic array var from a list. C++ constrains list elements to be all the same type. var, string, double, int, etc.
+Create a dynamic array var from a list. C++ constrains list elements to be all the same type: var, string, double, int, etc. but they all end up as fields of a dynamic array string.
 
 \fBExample:\fR
 .RS
 .nf
- var v1 = {11, 22, 33}; // "11^22^33"_var
+var v1 = {11, 22, 33}; // "11^22^33"_var
 .fi
 .RE
 
@@ -486,7 +484,7 @@ See also inserter() and remover().
 \fBExample:\fR
 .RS
 .nf
- var v1 = "aa^bb"_var;
+var v1 = "aa^bb"_var;
 v1(4) = 44; // v1 -> "aa^bb^^44"_var
 // Field number -1 causes appending a field when updating.
 v1(-1) = "55"; // v1 -> "aa^bb^^44^55"_var
@@ -502,7 +500,7 @@ Furthermore using plain round brackets without the leading .f can be confused wi
 \fBExample:\fR
 .RS
 .nf
- var v1 = "aa^bb^cc"_var;
+var v1 = "aa^bb^cc"_var;
 var v2 = v1.f(2); // "bb" /// .f() style access. Recommended.
 var v3 =   v1(2); // "bb" ///   () style access. Not recommended.
 .fi
@@ -521,7 +519,7 @@ See also inserter() and remover().
 \fBExample:\fR
 .RS
 .nf
- var v1 = "aa^b1]b2^cc"_var;
+var v1 = "aa^b1]b2^cc"_var;
 v1(2, 4) = "44"; // v1 -> "aa^b1]b2]]44^cc"_var
 // value number -1 causes appending a value when updating.
 v1(2, -1) = 55; // v1 -> "aa^b1]b2]]44]55^cc"_var
@@ -533,7 +531,7 @@ Value access:
 \fBExample:\fR
 .RS
 .nf
- var v1 = "aa^b1]b2^cc"_var;
+var v1 = "aa^b1]b2^cc"_var;
 var v2 = v1.f(2,2); // "b2" /// .f() style access. Recommended.
 var v3 =   v1(2,2); // "b2" ///   () style access. Not recommended.
 .fi
@@ -552,7 +550,7 @@ See also inserter() and remover().
 \fBExample:\fR
 .RS
 .nf
- var v1 = "aa^bb^cc"_var;
+var v1 = "aa^bb^cc"_var;
 v1(2, 2, 2) = "22"; // v1 -> "aa^bb]}22^cc"_var
 // subvalue number -1 causes appending a subvalue when updating.
 v1(2, 2, -1) = 33; // v1 -> "aa^bb]}22}33^cc"_var
@@ -564,7 +562,7 @@ Subvalue access:
 \fBExample:\fR
 .RS
 .nf
- var v1 = "aa^b1]b2}s2^cc"_var;
+var v1 = "aa^b1]b2}s2^cc"_var;
 var v2 = v1.f(2, 2, 2); // "s2" /// .f() style access. Recommended.
 var v3 =   v1(2, 2, 2); // "s2" ///   () style access. Not recommended.
 .fi
@@ -590,7 +588,7 @@ Floating point numbers are implicitly converted to strings with no more than 12 
 \fBExample:\fR
 .RS
 .nf
- var v2 = "aa";
+var v2 = "aa";
 var v1 = v2 ^ 22; // "aa22"
 .fi
 .RE
@@ -606,7 +604,7 @@ String self concatention ^= (append)
 \fBExample:\fR
 .RS
 .nf
- var v1 = "aa";
+var v1 = "aa";
 v1 ^= 22; // v1 -> "aa22"
 .fi
 .RE
@@ -619,43 +617,39 @@ var v1 = varnum.round(ndecimals = 0);
 .fi
 Convert a number into a string after rounding it to a given number of decimal places.
 
+Trailing zeros are not omitted. A leading "0." is shown where appropriate.
+
+0.5 always rounds away from zero. i.e. 1.5 -> 2 and -2.5 -> -3
+
 \fBvar:\fR The number to be converted.
 
 \fBndecimals:\fR Determines how many decimal places are shown to the right of the decimal point or, if ndecimals is negative, how many 0's to the left of it.
 
 \fBReturns:\fR A var containing an ASCII string of digits with a leading "-" if negative, and a decimal point "." if ndecimals is > 0.
 
-Trailing zeros are not omitted. A leading "0." is shown where appropriate.
-
-0.5 always rounds away from zero. i.e. 1.5 -> 2 and -1.5 -> -2
-
 \fBExample:\fR
 .RS
 .nf
- let v1 = var(0.295).round(2);  //  "0.30"
+let v1 = var(0.295).round(2);  //  "0.30"
 // or
 let v2 = round(1.295, 2);      //  "1.30"
 
 var v3 = var(-0.295).round(2); // "-0.30"
 // or
 var v4 = round(-1.295, 2);     // "-1.30"
+
+var v5 = round(0, 1);           // "0.0"
+var v6 = round(0, 0);           // "0"
+var v7 = round(0, -1);          // "0"
 .fi
 .RE
-
-var v4 = round(0, 1);           // "0.0";
-
- var v5 = round(0, 0);           // "0";
-
- var v6 = round(0, -1);          // "0";
-
-
 
 Negative number of decimals rounds to the left of the decimal point
 
 \fBExample:\fR
 .RS
 .nf
- let v1 = round(123456.789,  0); // "123457"
+let v1 = round(123456.789,  0); // "123457"
 let v2 = round(123456.789, -1); // "123460"
 let v3 = round(123456.789, -2); // "123500"
 .fi
@@ -676,7 +670,7 @@ Get a char given an integer 0-255.
 \fBExample:\fR
 .RS
 .nf
- let v1 = var().chr(0x61); // "a"
+let v1 = var().chr(0x61); // "a"
 // or
 let v2 = chr(0x61);
 .fi
@@ -697,7 +691,7 @@ To get UTF code points > 2^63 you must provide negative ints because var doesnt 
 \fBExample:\fR
 .RS
 .nf
- let v1 = var().textchr(171416); // "𩶘" // or "\\xF0A9B698"
+let v1 = var().textchr(171416); // "𩶘" // or "\\xF0A9B698"
 // or
 let v2 = textchr(171416);
 .fi
@@ -720,7 +714,7 @@ Get a string of repeated substrings.
 \fBExample:\fR
 .RS
 .nf
- let v1 = "ab"_var.str(3); // "ababab"
+let v1 = "ab"_var.str(3); // "ababab"
 // or
 let v2 = str("ab", 3);
 .fi
@@ -741,7 +735,7 @@ Get a string containing a given number of spaces.
 \fBExample:\fR
 .RS
 .nf
- let v1 = var(3).space(); // "   "
+let v1 = var(3).space(); // "   "
 // or
 let v2 = space(3);
 .fi
@@ -760,7 +754,7 @@ var v1 = varnum.numberinwords(locale = "");
 \fBExample:\fR
 .RS
 .nf
- let softhyphen = "\\xc2\\xad";
+let softhyphen = "\\xc2\\xad";
 let v1 = var(123.45).numberinwords("de_DE").replace(softhyphen, " "); // "ein hundert drei und zwanzig Komma vier fünf"
 .fi
 .RE
@@ -783,7 +777,7 @@ Get a single char from a string.
 \fBExample:\fR
 .RS
 .nf
- var v1 = "abc";
+var v1 = "abc";
 var v2 = v1.at(2);  // "b"
 var v3 = v1.at(-3); // "a"
 var v4 = v1.at(4);  // ""
@@ -805,7 +799,7 @@ If given a string, then only the first char is considered.
 \fBExample:\fR
 .RS
 .nf
- let v1 = "abc"_var.seq(); // 0x61 // decimal 97, 'a'
+let v1 = "abc"_var.seq(); // 0x61 // decimal 97, 'a'
 // or
 let v2 = seq("abc");
 .fi
@@ -826,7 +820,7 @@ Get the Unicode Code Point of a Unicode character.
 \fBExample:\fR
 .RS
 .nf
- let v1 = "Γ"_var.textseq(); // 915 // U+0393: Greek Capital Letter Gamma (Unicode character)
+let v1 = "Γ"_var.textseq(); // 915 // U+0393: Greek Capital Letter Gamma (Unicode character)
 // or
 let v2 = textseq("Γ");
 .fi
@@ -845,7 +839,7 @@ Get the length of a source string in number of chars
 \fBExample:\fR
 .RS
 .nf
- let v1 = "abc"_var.len(); // 3
+let v1 = "abc"_var.len(); // 3
 // or
 let v2 = len("abc");
 .fi
@@ -863,13 +857,13 @@ Checks if the var is an empty string.
 
 This is a shorthand and more expressive way of writing 'if (var == "")' or 'if (var.len() == 0)' or 'if (not var.len())'
 
-Note that 'if (var.empty())' is not the same as 'if (not var)' because 'if (var("0.0")' is defined as false because the string can be converted to a 0 which is always considered to be false. Compare thia with common scripting languages where 'if (var("0"))' is defined as true.
+Note that 'if (var.empty())' is not exactly the same as 'if (not var)' because 'if (var("0.0")' is also defined as false. If a string can be converted to 0 then it is considered to be false. Contrast this with common scripting languages where 'if (var("0"))' is defined to be true.
 
 \fBExample:\fR
 .RS
 .nf
- let v1 = "0";
-if (not v1.empty()) ... ok /// true
+let v1 = "0";
+if (not v1.empty()) ... ok // true
 // or
 if (not empty(v1)) ... ok // true
 .fi
@@ -894,7 +888,7 @@ Does not properly calculate all possible combining sequences of graphemes e.g. f
 \fBExample:\fR
 .RS
 .nf
- let v1 = "🤡x🤡"_var.textwidth(); // 5
+let v1 = "🤡x🤡"_var.textwidth(); // 5
 // or
 let v2 = textwidth("🤡x🤡");
 .fi
@@ -913,7 +907,7 @@ Count the number of Unicode code points in a source string.
 \fBExample:\fR
 .RS
 .nf
- let v1 = "Γιάννης"_var.textlen(); // 7
+let v1 = "Γιάννης"_var.textlen(); // 7
 // or
 let v2 = textlen("Γιάννης");
 .fi
@@ -936,7 +930,7 @@ This is similar to "var.count(sepstr) + 1" but it returns 0 for an empty source 
 \fBExample:\fR
 .RS
 .nf
- let v1 = "aa**cc"_var.fcount("*"); // 3
+let v1 = "aa**cc"_var.fcount("*"); // 3
 // or
 let v2 = fcount("aa**cc", "*");
 .fi
@@ -959,7 +953,7 @@ Overlapping substrings are not counted.
 \fBExample:\fR
 .RS
 .nf
- let v1 = "aa**cc"_var.count("*"); // 2
+let v1 = "aa**cc"_var.count("*"); // 2
 // or
 let v2 = count("aa**cc", "*");
 .fi
@@ -982,7 +976,7 @@ Checks if a source string starts with a given prefix (substr).
 \fBExample:\fR
 .RS
 .nf
- if ("abc"_var.starts("ab")) ... true
+if ("abc"_var.starts("ab")) ... true
 // or
 if (starts("abc", "ab")) ... true
 .fi
@@ -1005,7 +999,7 @@ Checks if a source string ends with a given suffix (substr).
 \fBExample:\fR
 .RS
 .nf
- if ("abc"_var.ends("bc")) ... true
+if ("abc"_var.ends("bc")) ... true
 // or
 if (ends("abc", "bc")) ... true
 .fi
@@ -1034,7 +1028,7 @@ Programmer logic: Compare as many characters as are in the search string for pre
 \fBExample:\fR
 .RS
 .nf
- if ("abcd"_var.contains("bc")) ... true
+if ("abcd"_var.contains("bc")) ... true
 // or
 if (contains("abcd", "bc")) ... true
 .fi
@@ -1057,7 +1051,7 @@ Find a substr in a source string.
 \fBExample:\fR
 .RS
 .nf
- let v1 = "abcd"_var.index("bc"); // 2
+let v1 = "abcd"_var.index("bc"); // 2
 // or
 let v2 = index("abcd", "bc");
 .fi
@@ -1078,7 +1072,7 @@ Find the nth occurrence of a substr in a source string.
 \fBExample:\fR
 .RS
 .nf
- let v1 = "abcabc"_var.index("bc", 2); // 2
+let v1 = "abcabc"_var.index("bc", 2); // 2
 // or
 let v2 = index("abcabc", "bc", 2);
 .fi
@@ -1101,7 +1095,7 @@ Find the position of substr working backwards from the end of the string towards
 \fBExample:\fR
 .RS
 .nf
- let v1 = "abcabc"_var.indexr("bc"); // 5
+let v1 = "abcabc"_var.indexr("bc"); // 5
 // or
 let v2 = indexr("abcabc", "bc");
 .fi
@@ -1120,7 +1114,7 @@ Finds all matches of a given regular expression.
 \fBExample:\fR
 .RS
 .nf
- let v1 = "abc1abc2"_var.match("BC(\\\\d)", "i"); // "bc1]1^bc2]2"_var
+let v1 = "abc1abc2"_var.match("BC(\\\\d)", "i"); // "bc1]1^bc2]2"_var
 // or
 let v2 = match("abc1abc2", "BC(\\\\d)", "i");
 .fi
@@ -1187,7 +1181,7 @@ regex_options as for match()
 \fBExample:\fR
 .RS
 .nf
- var startchar1 = 1;
+var startchar1 = 1;
 let v1 = "abc1abc2"_var.search("BC(\\\\d)", startchar1, "i"); // "bc1]1"_var // startchar1 -> 5 /// Ready for the next search
 // or
 startchar1 = 1;
@@ -1233,7 +1227,7 @@ MurmurHash3 is used.
 \fBExample:\fR
 .RS
 .nf
- let v1 = "abc"_var.hash(); assert(v1 == var(6'715'211'243'465'481'821));
+let v1 = "abc"_var.hash(); assert(v1 == var(6'715'211'243'465'481'821));
 // or
 let v2 = hash("abc");
 .fi
@@ -1253,7 +1247,7 @@ Convert to upper case
 \fBExample:\fR
 .RS
 .nf
- let v1 = "Γιάννης"_var.ucase(); // "ΓΙΆΝΝΗΣ"
+let v1 = "Γιάννης"_var.ucase(); // "ΓΙΆΝΝΗΣ"
 // or
 let v2 = ucase("Γιάννης");
 .fi
@@ -1270,7 +1264,7 @@ Convert to lower case
 \fBExample:\fR
 .RS
 .nf
- let v1 = "ΓΙΆΝΝΗΣ"_var.lcase(); // "γιάννης"
+let v1 = "ΓΙΆΝΝΗΣ"_var.lcase(); // "γιάννης"
 // or
 let v2 = lcase("ΓΙΆΝΝΗΣ");
 .fi
@@ -1289,7 +1283,7 @@ Convert to title case.
 \fBExample:\fR
 .RS
 .nf
- let v1 = "γιάννης παππάς"_var.tcase(); // "Γιάννης Παππάς"
+let v1 = "γιάννης παππάς"_var.tcase(); // "Γιάννης Παππάς"
 // or
 let v2 = tcase("γιάννης παππάς");
 .fi
@@ -1316,7 +1310,7 @@ Case folding is not locale-dependent.
 \fBExample:\fR
 .RS
 .nf
- let v1 = "Grüßen"_var.fcase(); // "grüssen"
+let v1 = "Grüßen"_var.fcase(); // "grüssen"
 // or
 let v2 = tcase("Grüßen");
 .fi
@@ -1339,7 +1333,7 @@ Normalization is not locale-dependent.
 \fBExample:\fR
 .RS
 .nf
- let v1 = "cafe\\u0301"_var.normalize(); // "caf\\u00E9" // "café"
+let v1 = "cafe\\u0301"_var.normalize(); // "caf\\u00E9" // "café"
 // or
 let v2 = normalize("cafe\\u0301");
 .fi
@@ -1368,7 +1362,7 @@ Non-existant Unicode Code Points may be created but UTF8 encoding remains valid.
 \fBExample:\fR
 .RS
 .nf
- let v1 = "abc"_var.invert(); // "\\xC2" "\\x9E" "\\xC2" "\\x9D" "\\xC2" "\\x9C"
+let v1 = "abc"_var.invert(); // "\\xC2" "\\x9E" "\\xC2" "\\x9D" "\\xC2" "\\x9C"
 // or
 let v2 = invert("abc");
 .fi
@@ -1393,7 +1387,7 @@ String size remains identical.
 \fBExample:\fR
 .RS
 .nf
- let v1 = "a1^b2^c3"_var.lower(); // "a1]b2]c3"_var
+let v1 = "a1^b2^c3"_var.lower(); // "a1]b2]c3"_var
 // or
 let v2 = lower("a1^b2^c3"_var);
 .fi
@@ -1418,7 +1412,7 @@ String size remains identical.
 \fBExample:\fR
 .RS
 .nf
- let v1 = "a1]b2]c3"_var.raise(); // "a1^b2^c3"_var
+let v1 = "a1]b2]c3"_var.raise(); // "a1^b2^c3"_var
 // or
 let v2 = "a1]b2]c3"_var;
 .fi
@@ -1435,7 +1429,7 @@ Remove any redundant FM, VM etc. chars (Trailing FM; VM before FM etc.)
 \fBExample:\fR
 .RS
 .nf
- let v1 = "a1^b2]]^c3^^"_var.crop(); // "a1^b2^c3"_var
+let v1 = "a1^b2]]^c3^^"_var.crop(); // "a1^b2^c3"_var
 // or
 let v2 = crop("a1^b2]]^c3^^"_var);
 .fi
@@ -1452,7 +1446,7 @@ Wrap in double quotes.
 \fBExample:\fR
 .RS
 .nf
- let v1 = "abc"_var.quote(); // "\\"abc\\""
+let v1 = "abc"_var.quote(); // "\\"abc\\""
 // or
 let v2 = quote("abc");
 .fi
@@ -1469,7 +1463,7 @@ Wrap in single quotes.
 \fBExample:\fR
 .RS
 .nf
- let v1 = "abc"_var.squote(); // "'abc'"
+let v1 = "abc"_var.squote(); // "'abc'"
 // or
 let v2 = squote("abc");
 .fi
@@ -1486,7 +1480,7 @@ Remove one pair of surrounding double or single quotes.
 \fBExample:\fR
 .RS
 .nf
- let v1 = "'abc'"_var.unquote(); // "abc"
+let v1 = "'abc'"_var.unquote(); // "abc"
 // or
 let v2 = unquote("'abc'");
 .fi
@@ -1505,7 +1499,7 @@ Remove all leading, trailing and excessive inner bytes.
 \fBExample:\fR
 .RS
 .nf
- let v1 = "  a1  b2 c3  "_var.trim(); // "a1 b2 c3"
+let v1 = "  a1  b2 c3  "_var.trim(); // "a1 b2 c3"
 // or
 let v2 = trim("  a1  b2 c3  ");
 .fi
@@ -1522,7 +1516,7 @@ Ditto but only leading.
 \fBExample:\fR
 .RS
 .nf
- let v1 = "  a1  b2 c3  "_var.trimfirst(); // "a1  b2 c3  "
+let v1 = "  a1  b2 c3  "_var.trimfirst(); // "a1  b2 c3  "
 // or
 let v2 = trimfirst("  a1  b2 c3  ");
 .fi
@@ -1539,7 +1533,7 @@ Ditto but only trailing.
 \fBExample:\fR
 .RS
 .nf
- let v1 = "  a1  b2 c3  "_var.trimlast(); // "  a1  b2 c3"
+let v1 = "  a1  b2 c3  "_var.trimlast(); // "  a1  b2 c3"
 // or
 let v2 = trimlast("  a1  b2 c3  ");
 .fi
@@ -1556,7 +1550,7 @@ Ditto but only leading and trailing, not inner.
 \fBExample:\fR
 .RS
 .nf
- let v1 = "  a1  b2 c3  "_var.trimboth(); // "a1  b2 c3"
+let v1 = "  a1  b2 c3  "_var.trimboth(); // "a1  b2 c3"
 // or
 let v2 = trimboth("  a1  b2 c3  ");
 .fi
@@ -1577,7 +1571,7 @@ Equivalent to var.substr(1,length) or var[1, length] in Pick OS
 \fBExample:\fR
 .RS
 .nf
- let v1 = "abc"_var.first(); // "a"
+let v1 = "abc"_var.first(); // "a"
 // or
 let v2 = first("abc");
 .fi
@@ -1598,7 +1592,7 @@ Equivalent to var.substr(-1, 1) or var[-1, 1] in Pick OS
 \fBExample:\fR
 .RS
 .nf
- let v1 = "abc"_var.last(); // "c"
+let v1 = "abc"_var.last(); // "c"
 // or
 let v2 = last("abc");
 .fi
@@ -1621,7 +1615,7 @@ Equivalent to var.substr(1, length) or var[1, length] in Pick OS
 \fBExample:\fR
 .RS
 .nf
- let v1 = "abc"_var.first(2); // "ab"
+let v1 = "abc"_var.first(2); // "ab"
 // or
 let v2 = first("abc", 2);
 .fi
@@ -1640,7 +1634,7 @@ Equivalent to var.substr(-length, length) or var[-length, length] in Pick OS
 \fBExample:\fR
 .RS
 .nf
- let v1 = "abc"_var.last(2); // "bc"
+let v1 = "abc"_var.last(2); // "bc"
 // or
 let v2 = last("abc", 2);
 .fi
@@ -1663,7 +1657,7 @@ Equivalent to var.substr(length) or var[1, length] = "" in Pick OS
 \fBExample:\fR
 .RS
 .nf
- let v1 = "abcd"_var.cut(2); // "cd"
+let v1 = "abcd"_var.cut(2); // "cd"
 // or
 let v2 = cut("abcd", 2);
 .fi
@@ -1692,7 +1686,7 @@ Equivalent to var[pos1, length] = substr in Pick OS
 \fBExample:\fR
 .RS
 .nf
- let v1 = "abcd"_var.paste(2, 2, "XYZ"); // "aXYZd"
+let v1 = "abcd"_var.paste(2, 2, "XYZ"); // "aXYZd"
 // or
 let v2 = paste("abcd", 2, 2, "XYZ");
 .fi
@@ -1711,7 +1705,7 @@ Equivalent to var[pos1, 0] = substr in Pick OS
 \fBExample:\fR
 .RS
 .nf
- let v1 = "abcd"_var.paste(2, "XYZ"); // "aXYZbcd"
+let v1 = "abcd"_var.paste(2, "XYZ"); // "aXYZbcd"
 // or
 let v2 = paste("abcd", 2, "XYZ");
 .fi
@@ -1730,7 +1724,7 @@ Equivalent to var[0, 0] = substr in Pick OS
 \fBExample:\fR
 .RS
 .nf
- let v1 = "abc"_var.prefix("XYZ"); // "XYZabc"
+let v1 = "abc"_var.prefix("XYZ"); // "XYZabc"
 // or
 let v2 = prefix("abc", "XYZ");
 .fi
@@ -1747,7 +1741,7 @@ Append anything at the end of a string
 \fBExample:\fR
 .RS
 .nf
- let v1 = "abc"_var.append(" is ", 10, " ok", '.'); // "abc is 10 ok."
+let v1 = "abc"_var.append(" is ", 10, " ok", '.'); // "abc is 10 ok."
 // or
 let v2 = append("abc", " is ", 10, " ok", '.');
 .fi
@@ -1766,7 +1760,7 @@ Equivalent to var[-1, 1] = "" in Pick OS
 \fBExample:\fR
 .RS
 .nf
- let v1 = "abc"_var.pop(); // "ab"
+let v1 = "abc"_var.pop(); // "ab"
 // or
 let v2 = pop("abc");
 .fi
@@ -1789,7 +1783,7 @@ Copies one or more consecutive fields from a string given a delimiter
 \fBExample:\fR
 .RS
 .nf
- let v1 = "aa*bb*cc"_var.field("*", 2); // "bb"
+let v1 = "aa*bb*cc"_var.field("*", 2); // "bb"
 // or
 let v2 = field("aa*bb*cc", "*", 2);
 .fi
@@ -1799,7 +1793,7 @@ let v2 = field("aa*bb*cc", "*", 2);
 \fBExample:\fR
 .RS
 .nf
- let v1 = "aa*bb*cc"_var.field("*", -1); // "cc"
+let v1 = "aa*bb*cc"_var.field("*", -1); // "cc"
 // or
 let v2 = field("aa*bb*cc", "*", -1);
 .fi
@@ -1830,7 +1824,7 @@ The replacement can contain multiple fields itself. If replacing n fields and th
 \fBExample:\fR
 .RS
 .nf
- let v1 = "aa,bb,cc,dd,ee"_var.fieldstore(",", 2, 3, "11,22"); // "aa,11,22,,ee"
+let v1 = "aa,bb,cc,dd,ee"_var.fieldstore(",", 2, 3, "11,22"); // "aa,11,22,,ee"
 // or
 let v2 = fieldstore("aa,bb,cc,dd,ee", ",", 2, 3, "11,22");
 .fi
@@ -1841,7 +1835,7 @@ If nfields is 0 then insert the replacement field(s) before fieldno
 \fBExample:\fR
 .RS
 .nf
- let v1 = "aa,bb,cc,dd,ee"_var.fieldstore(",", 2, 0, "11,22"); // "aa,11,22,bb,cc,dd,ee"
+let v1 = "aa,bb,cc,dd,ee"_var.fieldstore(",", 2, 0, "11,22"); // "aa,11,22,bb,cc,dd,ee"
 .fi
 .RE
 
@@ -1850,7 +1844,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 \fBExample:\fR
 .RS
 .nf
- let v1 = "aa,bb,cc,dd,ee"_var.fieldstore(",", 2, -2, "11"); // "aa,11,dd,ee"
+let v1 = "aa,bb,cc,dd,ee"_var.fieldstore(",", 2, -2, "11"); // "aa,11,dd,ee"
 .fi
 .RE
 
@@ -1859,7 +1853,7 @@ If nfields exceeds the number of fields in the input then additional empty field
 \fBExample:\fR
 .RS
 .nf
- let v1 = "aa,bb,cc"_var.fieldstore(",", 6, 2, "11"); // "aa,bb,cc,,,11,"
+let v1 = "aa,bb,cc"_var.fieldstore(",", 6, 2, "11"); // "aa,bb,cc,,,11,"
 .fi
 .RE
 
@@ -1887,7 +1881,7 @@ Not Unicode friendly.
 \fBExample:\fR
 .RS
 .nf
- let v1 = "abcd"_var.substr(2, 2); // "bc"
+let v1 = "abcd"_var.substr(2, 2); // "bc"
 // or
 let v2 = substr("abcd", 2, 2);
 .fi
@@ -1898,7 +1892,7 @@ If pos1 is negative then start counting backwards from the last char
 \fBExample:\fR
 .RS
 .nf
- let v1 = "abcd"_var.substr(-3, 2); // "bc"
+let v1 = "abcd"_var.substr(-3, 2); // "bc"
 // or
 let v2 = substr("abcd", -3, 2);
 .fi
@@ -1909,7 +1903,7 @@ If length is negative then work backwards and return chars reversed
 \fBExample:\fR
 .RS
 .nf
- let v1 = "abcd"_var.substr(3, -2); // "cb"
+let v1 = "abcd"_var.substr(3, -2); // "cb"
 // or
 let v2 = substr("abcd", 3, -2); // "cb"
 .fi
@@ -1943,7 +1937,7 @@ Partially Unicode friendly but pos1 is in chars.
 \fBExample:\fR
 .RS
 .nf
- let v1 = "abcd"_var.substr(2); // "bcd"
+let v1 = "abcd"_var.substr(2); // "bcd"
 // or
 let v2 = substr("abcd", 2);
 .fi
@@ -1989,7 +1983,7 @@ This function is similar to std::string::find_first_of but that function only re
 \fBExample:\fR
 .RS
 .nf
- var pos1 = 4;
+var pos1 = 4;
 let v1 = "12,45 78"_var.substr(pos1, ", ", COL2);  // v1 -> "45" // COL2 -> 6 // 6 is the position of the next delimiter char found.
 // or
 let v2 = substr("12,45 78", COL2 + 1, ", ", COL2); // v2 -> "78" // COL2 -> 9 // 9 is one after the end of the string meaning that none of the delimiter chars were found.
@@ -2040,7 +2034,7 @@ It is similar to version 3 of substr - substr(pos1, delimiterchars, pos2) except
 \fBExample:\fR
 .RS
 .nf
- var pos1 = 4, field_mark_no;
+var pos1 = 4, field_mark_no;
 let v1 = "12^45^78"_var.substr2(pos1, field_mark_no);  // "45" // pos1 -> 7 // field_mark_no -> 2 // field_mark_no 2 means that a FM was found.
 // or
 let v2 = substr2("12^45^78"_var, pos1, field_mark_no); // "78" // pos1 -> 9 // field_mark_no -> 0 // field_mark_no 0 means that none of the standard field marks were found.
@@ -2071,7 +2065,7 @@ Not UTF8 compatible.
 \fBExample:\fR
 .RS
 .nf
- let v1 = "abcde"_var.convert("aZd", "XY"); // "Xbce" // a is replaced and d is removed
+let v1 = "abcde"_var.convert("aZd", "XY"); // "Xbce" // a is replaced and d is removed
 // or
 let v2 = convert("abcde", "aZd", "XY");
 .fi
@@ -2088,7 +2082,7 @@ Ditto for Unicode code points.
 \fBExample:\fR
 .RS
 .nf
- let v1 = "a🤡b😀c🌍d"_var.textconvert("🤡😀", "👋"); // "a👋bc🌍d"
+let v1 = "a🤡b😀c🌍d"_var.textconvert("🤡😀", "👋"); // "a👋bc🌍d"
 // or
 let v2 = textconvert("a🤡b😀c🌍d", "🤡😀", "👋");
 .fi
@@ -2107,7 +2101,7 @@ Case sensitive.
 \fBExample:\fR
 .RS
 .nf
- let v1 = "Abc.Abc"_var.replace("bc", "X"); // "AX.AX"
+let v1 = "Abc.Abc"_var.replace("bc", "X"); // "AX.AX"
 // or
 let v2 = replace("Abc Abc", "bc", "X");
 .fi
@@ -2126,7 +2120,7 @@ Use $0, $1, $2 in tostr to refer to groups defined in the regex.
 \fBExample:\fR
 .RS
 .nf
- let v1 = "A a B b"_var.replace("[A-Z]"_rex, "'$0'"); // "'A' a 'B' b"
+let v1 = "A a B b"_var.replace("[A-Z]"_rex, "'$0'"); // "'A' a 'B' b"
 // or
 let v2 = replace("A a B b", "[A-Z]"_rex, "'$0'");
 .fi
@@ -2143,7 +2137,7 @@ Remove duplicate fields in an FM or VM etc. separated list
 \fBExample:\fR
 .RS
 .nf
- let v1 = "a1^b2^a1^c2"_var.unique(); // "a1^b2^c2"_var
+let v1 = "a1^b2^a1^c2"_var.unique(); // "a1^b2^c2"_var
 // or
 let v2 = unique("a1^b2^a1^c2"_var);
 .fi
@@ -2162,7 +2156,7 @@ Numeric data:
 \fBExample:\fR
 .RS
 .nf
- let v1 = "20^10^2^1^1.1"_var.sort(); // "1^1.1^2^10^20"_var
+let v1 = "20^10^2^1^1.1"_var.sort(); // "1^1.1^2^10^20"_var
 // or
 let v2 = sort("20^10^2^1^1.1"_var);
 .fi
@@ -2173,7 +2167,7 @@ Alphabetic data:
 \fBExample:\fR
 .RS
 .nf
- let v1 = "b1^a1^c20^c10^c2^c1^b2"_var.sort(); // "a1^b1^b2^c1^c10^c2^c20"_var
+let v1 = "b1^a1^c20^c10^c2^c1^b2"_var.sort(); // "a1^b1^b2^c1^c10^c2^c20"_var
 // or
 let v2 = sort("b1^a1^c20^c10^c2^c1^b2"_var);
 .fi
@@ -2190,7 +2184,7 @@ Reorder fields in an FM or VM etc. separated list in descending order
 \fBExample:\fR
 .RS
 .nf
- let v1 = "20^10^2^1^1.1"_var.reverse(); // "1.1^1^2^10^20"_var
+let v1 = "20^10^2^1^1.1"_var.reverse(); // "1.1^1^2^10^20"_var
 // or
 let v2 = reverse("20^10^2^1^1.1"_var);
 .fi
@@ -2207,7 +2201,7 @@ Randomise the order of fields in an FM, VM separated list
 \fBExample:\fR
 .RS
 .nf
- let v1 = "20^10^2^1^1.1"_var.shuffle(); /// e.g. "2^1^20^1.1^10" (random order depending on initrand())
+let v1 = "20^10^2^1^1.1"_var.shuffle(); /// e.g. "2^1^20^1.1^10" (random order depending on initrand())
 // or
 let v2 = shuffle("20^10^2^1^1.1"_var);
 .fi
@@ -2228,7 +2222,7 @@ Replaces separator chars with FM chars except inside double or single quotes and
 \fBExample:\fR
 .RS
 .nf
- let v1 = "abc,\\"def,\\"123\\" fgh\\",12.34"_var.parse(','); // "abc^\\"def,\\"123\\" fgh\\"^12.34"_var
+let v1 = "abc,\\"def,\\"123\\" fgh\\",12.34"_var.parse(','); // "abc^\\"def,\\"123\\" fgh\\"^12.34"_var
 // or
 let v2 = parse("abc,\\"def,\\"123\\" fgh\\",12.34", ',');
 .fi
@@ -2247,7 +2241,7 @@ The delimiter can be multibyte Unicode.
 \fBExample:\fR
 .RS
 .nf
- dim d1 = "a^b^c"_var.split(); // A dimensioned array with three elements (vars)
+dim d1 = "a^b^c"_var.split(); // A dimensioned array with three elements (vars)
 // or
 dim d2 = split("a^b^c"_var);
 .fi
@@ -2269,7 +2263,7 @@ All string mutators follow the same pattern as ucaser.<br>See the non-mutating f
 \fBExample:\fR
 .RS
 .nf
- var v1 = "abc";
+var v1 = "abc";
 v1.ucaser(); // "ABC"
 // or
 ucaser(v1);
@@ -2555,7 +2549,7 @@ See [[#ICONV/OCONV PATTERNS]]
 \fBExample:\fR
 .RS
 .nf
- let v1 = var(30123).oconv("D/E"); // "21/06/2050"
+let v1 = var(30123).oconv("D/E"); // "21/06/2050"
 // or
 let v2 = oconv(30123, "D/E");
 .fi
@@ -2578,7 +2572,7 @@ See [[#ICONV/OCONV PATTERNS]]
 \fBExample:\fR
 .RS
 .nf
- let v1 = "21 JUN 2050"_var.iconv("D/E"); // 30123
+let v1 = "21 JUN 2050"_var.iconv("D/E"); // 30123
 // or
 let v2 = iconv("21 JUN 2050", "D/E");
 .fi
@@ -2599,7 +2593,7 @@ or with exodus oconv codes e.g. {::MD20P|R(_)#8} as in the below example.
 \fBExample:\fR
 .RS
 .nf
- let v1 = var(12.345).format("'{:_>8.2f}'"); // "'___12.35'"
+let v1 = var(12.345).format("'{:_>8.2f}'"); // "'___12.35'"
 let v2 = var(12.345).format("'{::MD20P|R(_)#8}'");
 // or
 var v3 = format("'{:_>8.2f}'", var(12.345)); // "'___12.35'"
@@ -2622,7 +2616,7 @@ Use Linux command "iconv -l" for complete list of code pages and encodings.
 \fBExample:\fR
 .RS
 .nf
- let v1 = "\\xa4"_var.from_codepage("CP1124"); // "Є"
+let v1 = "\\xa4"_var.from_codepage("CP1124"); // "Є"
 // or
 let v2 = from_codepage("\\xa4", "CP1124");
 // U+0404 Cyrillic Capital Letter Ukrainian Ie Unicode character
@@ -2640,7 +2634,7 @@ Converts to codepage encoded text from UTF-8 encoded text
 \fBExample:\fR
 .RS
 .nf
- let v1 = "Є"_var.to_codepage("CP1124").oconv("HEX"); // "A4"
+let v1 = "Є"_var.to_codepage("CP1124").oconv("HEX"); // "A4"
 // or
 let v2 = to_codepage("Є", "CP1124").oconv("HEX");
 .fi
@@ -2666,7 +2660,7 @@ The abbreviated exodus field extraction function (e.g. xxx.f(20)) is provided in
 \fBExample:\fR
 .RS
 .nf
- let v1 = "f1^f2v1]f2v2]f2v3^f2"_var;
+let v1 = "f1^f2v1]f2v2]f2v3^f2"_var;
 let v2 = v1.f(2, 2); // "f2v2"
 .fi
 .RE
@@ -2682,7 +2676,7 @@ Extract a specific field, value or subvalue from a dynamic array.
 \fBExample:\fR
 .RS
 .nf
- let v1 = "f1^f2v1]f2v2]f2v3^f2"_var;
+let v1 = "f1^f2v1]f2v2]f2v3^f2"_var;
 let v2 = v1.extract(2, 2); // "f2v2"
 //
 // For brevity the function alias "f()" (standing for "field") is normally used instead of "extract()" as follows:
@@ -2692,21 +2686,21 @@ var v3 = v1.f(2, 2);
 
 
 .SS
-var v1 = strvar.pickreplace(fieldno, valueno, subvalueno, replacement);
+var v1 = strvar.update(fieldno, valueno, subvalueno, replacement);
 .nf
  
 .fi
-Same as var.r() function but returns a new string instead of updating a variable in place.<br>Rarely used.
+Same as var.updater() function but returns a new string instead of updating a variable in place.<br>Rarely used.
 
 .SS
-var v1 = strvar.pickreplace(fieldno, valueno, replacement);
+var v1 = strvar.update(fieldno, valueno, replacement);
 .nf
  
 .fi
 Ditto for a specific multivalue
 
 .SS
-var v1 = strvar.pickreplace(fieldno, replacement);
+var v1 = strvar.update(fieldno, replacement);
 .nf
  
 .fi
@@ -2755,7 +2749,7 @@ Sum up multiple values into one higher level
 \fBExample:\fR
 .RS
 .nf
- let v1 = "1]2]3^4]5]6"_var.sum(); // "6^15"_var
+let v1 = "1]2]3^4]5]6"_var.sum(); // "6^15"_var
 // or
 let v2 = sum("1]2]3^4]5]6"_var);
 .fi
@@ -2772,7 +2766,7 @@ Sum up all levels into a single figure
 \fBExample:\fR
 .RS
 .nf
- let v1 = "1]2]3^4]5]6"_var.sumall(); // 21
+let v1 = "1]2]3^4]5]6"_var.sumall(); // 21
 // or
 let v2 = sumall("1]2]3^4]5]6"_var);
 .fi
@@ -2789,7 +2783,7 @@ Ditto allowing commas etc.
 \fBExample:\fR
 .RS
 .nf
- let v1 = "10,20,30"_var.sum(","); // 60
+let v1 = "10,20,30"_var.sum(","); // 60
 // or
 let v2 = sum("10,20,30", ",");
 .fi
@@ -2806,7 +2800,7 @@ Binary ops (+, -, *, /) in parallel on multiple values
 \fBExample:\fR
 .RS
 .nf
- let v1 = "10]20]30"_var.mv("+","2]3]4"_var); // "12]23]34"_var
+let v1 = "10]20]30"_var.mv("+","2]3]4"_var); // "12]23]34"_var
 .fi
 .RE
 
@@ -2815,49 +2809,61 @@ Binary ops (+, -, *, /) in parallel on multiple values
 .SH
 
 .SS
-strvar.r(fieldno, replacement)
+strvar.updater(fieldno, replacement)
 .nf
  
 .fi
-Replaces a specific field in a dynamic array
+Replace a specific field in a dynamic array
 
 \fBExample:\fR
 .RS
 .nf
- var v1 = "f1^v1]v2}s2}s3^f3"_var;
-v1.r(2, "X"); // "f1^X^f3"_var
+var v1 = "f1^v1]v2}s2}s3^f3"_var;
+v1.updater(2, "X"); // "f1^X^f3"_var
+// or
+v1(2) = "X"; /// Easiest.
+// or
+updater(v1, 2, "X");
 .fi
 .RE
 
 
 .SS
-strvar.r(fieldno, valueno, replacement)
+strvar.updater(fieldno, valueno, replacement)
 .nf
  
 .fi
-Ditto for specific value in a specific field.
+Replace a specific value of a specific field in a dynamic array.
 
 \fBExample:\fR
 .RS
 .nf
- var v1 = "f1^v1]v2}s2}s3^f3"_var;
-v1.r(2, 2, "X"); // "f1^v1]X^f3"_var
+var v1 = "f1^v1]v2}s2}s3^f3"_var;
+v1.updater(2, 2, "X"); // "f1^v1]X^f3"_var
+// or
+v1(2, 2) = "X"; /// Easiest.
+// or
+updater(v1, 2, 2, "X");
 .fi
 .RE
 
 
 .SS
-strvar.r(fieldno, valueno, subvalueno, replacement)
+strvar.updater(fieldno, valueno, subvalueno, replacement)
 .nf
  
 .fi
-Ditto for a specific subvalue in a specific value of a specific field
+Replace a specific subvalue of a specific value of a specific field in a dynamic array.
 
 \fBExample:\fR
 .RS
 .nf
- var v1 = "f1^v1]v2}s2}s3^f3"_var;
-v1.r(2, 2, 2, "X"); // "f1^v1]v2}X}s3^f3"_var
+var v1 = "f1^v1]v2}s2}s3^f3"_var;
+v1.updater(2, 2, 2, "X"); // "f1^v1]v2}X}s3^f3"_var
+// or
+v1(2, 2, 2) = "X"; /// Easiest.
+// or
+updater(v1, 2, 2, 2, "X");
 .fi
 .RE
 
@@ -2872,7 +2878,7 @@ Insert a specific field in a dynamic array, moving all other fields up.
 \fBExample:\fR
 .RS
 .nf
- var v1 = "f1^v1]v2}s2}s3^f3"_var;
+var v1 = "f1^v1]v2}s2}s3^f3"_var;
 v1.inserter(2, "X"); // "f1^X^v1]v2}s2}s3^f3"_var
 // or
 inserter(v1, 2, "X");
@@ -2890,7 +2896,7 @@ Ditto for a specific value in a specific field, moving all other values up.
 \fBExample:\fR
 .RS
 .nf
- var v1 = "f1^v1]v2}s2}s3^f3"_var;
+var v1 = "f1^v1]v2}s2}s3^f3"_var;
 v1.inserter(2, 2, "X"); // "f1^v1]X]v2}s2}s3^f3"_var
 // or
 inserter(v1, 2, 2, "X");
@@ -2908,7 +2914,7 @@ Ditto for a specific subvalue in a dynamic array, moving all other subvalues up.
 \fBExample:\fR
 .RS
 .nf
- var v1 = "f1^v1]v2}s2}s3^f3"_var;
+var v1 = "f1^v1]v2}s2}s3^f3"_var;
 v1.inserter(2, 2, 2, "X"); // "f1^v1]v2}X}s2}s3^f3"_var
 // or
 v1.inserter(2, 2, 2, "X");
@@ -2926,7 +2932,7 @@ Remove a specific field (or value, or subvalue) from a dynamic array, moving all
 \fBExample:\fR
 .RS
 .nf
- var v1 = "f1^v1]v2}s2}s3^f3"_var;
+var v1 = "f1^v1]v2}s2}s3^f3"_var;
 v1.remover(2, 2); // "f1^v1^f3"_var
 // or
 remover(v1, 2, 2);
@@ -2951,7 +2957,7 @@ Searching for empty fields, values etc. (i.e. "") will work. Locating "" in "]yy
 \fBExample:\fR
 .RS
 .nf
- if ("UK^US^UA"_var.locate("US")) ... ok // 2
+if ("UK^US^UA"_var.locate("US")) ... ok // 2
 // or
 if (locate("US", "UK^US^UA"_var)) ... ok
 .fi
@@ -2972,7 +2978,7 @@ locate() with only the target substr provided and setting returned searches unor
 \fBExample:\fR
 .RS
 .nf
- var setting;
+var setting;
 if ("UK]US]UA"_var.locate("US", setting)) ... ok // setting -> 2
 // or
 if (locate("US", "UK]US]UA"_var, setting)) ... ok
@@ -2994,7 +3000,7 @@ locate() the target in unordered fields if fieldno is 0, or values if a fieldno 
 \fBExample:\fR
 .RS
 .nf
- var setting;
+var setting;
 if ("f1^f2v1]f2v2]s1}s2}s3}s4^f3^f4"_var.locate("s4", setting, 2, 3)) ... ok // setting -> 4 // returns true
 .fi
 .RE
@@ -3022,7 +3028,7 @@ In case the target is not exactly found then the correct value no for inserting 
 \fBExample:\fR
 .RS
 .nf
- var valueno; if ("aaa]bbb]ccc"_var.locateby("AL", "bb", valueno)) ... // valueno -> 2 // returns false and valueno = where it could be correctly inserted.
+var valueno; if ("aaa]bbb]ccc"_var.locateby("AL", "bb", valueno)) ... // valueno -> 2 // returns false and valueno = where it could be correctly inserted.
 .fi
 .RE
 
@@ -3037,7 +3043,7 @@ locateby() ordered as above but in fields if fieldno is 0, or values in a specif
 \fBExample:\fR
 .RS
 .nf
- var setting;
+var setting;
 if ("f1^f2^aaa]bbb]ccc^f4"_var.locateby("AL", "bb", setting, 3)) ... // setting -> 2 // return false and where it could be correctly inserted.
 .fi
 .RE
@@ -3053,7 +3059,7 @@ locate() a target substr in the whole unordered string using a given delimiter c
 \fBExample:\fR
 .RS
 .nf
- if ("AB,EF,CD"_var.locateusing(",", "EF")) ... ok
+if ("AB,EF,CD"_var.locateusing(",", "EF")) ... ok
 .fi
 .RE
 
@@ -3074,7 +3080,7 @@ This is similar to the main locate command but the delimiter char can be specifi
 \fBExample:\fR
 .RS
 .nf
- var setting;
+var setting;
 if ("f1^f2^f3c1,f3c2,f3c3^f4"_var.locateusing(",", "f3c2", setting, 3)) ... ok // setting -> 2 // returns true
 .fi
 .RE
@@ -3114,7 +3120,7 @@ Setting environment variable EXO_DBTRACE=1 will cause tracing of db interface in
 \fBExample:\fR
 .RS
 .nf
- let conninfo = "dbname=exodus user=exodus password=somesillysecret";
+let conninfo = "dbname=exodus user=exodus password=somesillysecret";
 if (not conn.connect(conninfo)) ...;
 // or
 if (not connect()) ...
@@ -3142,7 +3148,7 @@ Multiple file names must be separated by FM
 \fBExample:\fR
 .RS
 .nf
- let filenames = "xo_clients^dict.xo_clients"_var, conn = "exodus";
+let filenames = "xo_clients^dict.xo_clients"_var, conn = "exodus";
 if (conn.attach(filenames)) ... ok
 // or
 if (attach(filenames)) ... ok
@@ -3167,7 +3173,7 @@ Begin a db transaction.
 \fBExample:\fR
 .RS
 .nf
- if (not conn.begintrans()) ...
+if (not conn.begintrans()) ...
 // or
 if (not begintrans()) ...
 .fi
@@ -3184,7 +3190,7 @@ Check if a db transaction is in progress.
 \fBExample:\fR
 .RS
 .nf
- if (conn.statustrans()) ... ok
+if (conn.statustrans()) ... ok
 // or
 if (statustrans()) ... ok
 .fi
@@ -3201,7 +3207,7 @@ Rollback a db transaction.
 \fBExample:\fR
 .RS
 .nf
- if (conn.rollbacktrans()) ... ok
+if (conn.rollbacktrans()) ... ok
 // or
 if (rollbacktrans()) ... ok
 .fi
@@ -3220,7 +3226,7 @@ Commit a db transaction.
 \fBExample:\fR
 .RS
 .nf
- if (conn.committrans()) ... ok
+if (conn.committrans()) ... ok
 // or
 if (committrans()) ... ok
 .fi
@@ -3239,7 +3245,7 @@ Execute an sql command.
 \fBExample:\fR
 .RS
 .nf
- if (conn.sqlexec("select 1")) ... ok
+if (conn.sqlexec("select 1")) ... ok
 // or
 if (sqlexec("select 1")) ... ok
 .fi
@@ -3262,7 +3268,7 @@ Execute an SQL command and capture the response.
 \fBExample:\fR
 .RS
 .nf
- let sqlcmd = "select 'xxx' as col1, 'yyy' as col2";
+let sqlcmd = "select 'xxx' as col1, 'yyy' as col2";
 var response;
 if (conn.sqlexec(sqlcmd, response)) ... ok // response -> "col1^col2\\x1fxxx^yyy"_var /// \\x1f is the Record Mark (RM) char. The backtick char is used here by gendoc to deliminate source code.
 // or
@@ -3281,7 +3287,7 @@ Closes db connection and frees process resources both locally and in the databas
 \fBExample:\fR
 .RS
 .nf
- conn.disconnect();
+conn.disconnect();
 // or
 disconnect();
 .fi
@@ -3300,7 +3306,7 @@ All connections are closed automatically when a process terminates.
 \fBExample:\fR
 .RS
 .nf
- conn.disconnectall();
+conn.disconnectall();
 // or
 disconnectall();
 .fi
@@ -3317,7 +3323,7 @@ var v1 = conn.lasterror();
 \fBExample:\fR
 .RS
 .nf
- var v1 = var().lasterror();
+var v1 = var().lasterror();
 // or
 var v2 = lasterror();
 .fi
@@ -3338,7 +3344,7 @@ Prefixes the output with source if provided.
 \fBExample:\fR
 .RS
 .nf
- var().loglasterror("main:");
+var().loglasterror("main:");
 // or
 loglasterror("main:");
 .fi
@@ -3362,7 +3368,7 @@ Optionally copies an existing database from the same connection and which cannot
 \fBExample:\fR
 .RS
 .nf
- var conn = "exodus";
+var conn = "exodus";
 if (not dbdelete("xo_gendoc_testdb")) {}; // Cleanup first
 if (conn.dbcreate("xo_gendoc_testdb")) ... ok
 // or
@@ -3385,7 +3391,7 @@ The source database must exist on the same connection and cannot have any curren
 \fBExample:\fR
 .RS
 .nf
- var conn = "exodus";
+var conn = "exodus";
 if (not dbdelete("xo_gendoc_testdb2")) {}; // Cleanup first
 if (conn.dbcopy("xo_gendoc_testdb", "xo_gendoc_testdb2")) ... ok
 // or
@@ -3404,7 +3410,7 @@ var v1 = conn.dblist();
 \fBExample:\fR
 .RS
 .nf
- let v1 = conn.dblist();
+let v1 = conn.dblist();
 // or
 let v2 = dblist();
 .fi
@@ -3423,7 +3429,7 @@ The target database must exist and cannot have any current connections.
 \fBExample:\fR
 .RS
 .nf
- var conn = "exodus";
+var conn = "exodus";
 if (conn.dbdelete("xo_gendoc_testdb2")) ... ok
 // or
 if (dbdelete("xo_gendoc_testdb2")) ...
@@ -3441,7 +3447,7 @@ Create a named db file.
 \fBExample:\fR
 .RS
 .nf
- let filename = "xo_gendoc_temp", conn = "exodus";
+let filename = "xo_gendoc_temp", conn = "exodus";
 if (conn.createfile(filename)) ... ok
 // or
 if (createfile(filename)) ...
@@ -3459,7 +3465,7 @@ Rename a db file.
 \fBExample:\fR
 .RS
 .nf
- let conn = "exodus", filename = "xo_gendoc_temp", new_filename = "xo_gendoc_temp2";
+let conn = "exodus", filename = "xo_gendoc_temp", new_filename = "xo_gendoc_temp2";
 if (conn.renamefile(filename, new_filename)) ... ok
 // or
 if (renamefile(filename, new_filename)) ...
@@ -3477,7 +3483,7 @@ var v1 = conn.listfiles();
 \fBExample:\fR
 .RS
 .nf
- var conn = "exodus";
+var conn = "exodus";
 if (not conn.listfiles()) ...
 // or
 if (not listfiles()) ...
@@ -3495,7 +3501,7 @@ Delete all records in a db file
 \fBExample:\fR
 .RS
 .nf
- let conn = "exodus", filename = "xo_gendoc_temp2";
+let conn = "exodus", filename = "xo_gendoc_temp2";
 if (not conn.clearfile(filename)) ...
 // or
 if (not clearfile(filename)) ...
@@ -3513,7 +3519,7 @@ Delete a db file
 \fBExample:\fR
 .RS
 .nf
- let conn = "exodus", filename = "xo_gendoc_temp2";
+let conn = "exodus", filename = "xo_gendoc_temp2";
 if (conn.deletefile(filename)) ... ok
 // or
 if (deletefile(filename)) ...
@@ -3531,7 +3537,7 @@ var v1 = conn_or_file.reccount(filename = "");
 \fBExample:\fR
 .RS
 .nf
- let conn = "exodus", filename = "xo_clients";
+let conn = "exodus", filename = "xo_clients";
 var nrecs1 = conn.reccount(filename);
 // or
 var nrecs2 = reccount(filename);
@@ -3561,7 +3567,7 @@ Opens a db file to a var which can be used in subsequent functions to work on th
 \fBExample:\fR
 .RS
 .nf
- var file, filename = "xo_clients";
+var file, filename = "xo_clients";
 if (not file.open(filename)) ...
 // or
 if (not open(filename to file)) ...
@@ -3581,7 +3587,7 @@ Does nothing currently since database file vars consume no resources
 \fBExample:\fR
 .RS
 .nf
- var file = "xo_clients";
+var file = "xo_clients";
 file.close();
 // or
 close(file);
@@ -3613,7 +3619,7 @@ The fieldname must exist in a dictionary file. The default dictionary is "dict."
 \fBExample:\fR
 .RS
 .nf
- var filename = "xo_clients", fieldname = "DATE_CREATED";
+var filename = "xo_clients", fieldname = "DATE_CREATED";
 if (not deleteindex("xo_clients", "DATE_CREATED")) {}; // Cleanup first
 if (filename.createindex(fieldname)) ... ok
 // or
@@ -3634,7 +3640,7 @@ Lists secondary indexes in a database or for a db file
 \fBExample:\fR
 .RS
 .nf
- var conn = "exodus";
+var conn = "exodus";
 if (conn.listindex()) ... ok // includes "xo_clients__date_created"
 // or
 if (listindex()) ... ok
@@ -3658,7 +3664,7 @@ Deletes a secondary index for a db file and field name.
 \fBExample:\fR
 .RS
 .nf
- var file = "xo_clients", fieldname = "DATE_CREATED";
+var file = "xo_clients", fieldname = "DATE_CREATED";
 if (file.deleteindex(fieldname)) ... ok
 // or
 if (deleteindex(file, fieldname)) ...
@@ -3698,7 +3704,7 @@ Returns::
 \fBExample:\fR
 .RS
 .nf
- var file = "xo_clients", key = "1000";
+var file = "xo_clients", key = "1000";
 if (file.lock(key)) ... ok
 // or
 if (lock(file, key)) ...
@@ -3722,7 +3728,7 @@ Locks cannot be removed while a connection is in a transaction.
 \fBExample:\fR
 .RS
 .nf
- var file = "xo_clients", key = "1000";
+var file = "xo_clients", key = "1000";
 if (file.unlock(key)) ... ok
 // or
 if (unlock(file, key)) ...
@@ -3742,7 +3748,7 @@ Locks cannot be removed while in a transaction.
 \fBExample:\fR
 .RS
 .nf
- var conn = "exodus";
+var conn = "exodus";
 if (not conn.unlockall()) ...
 // or
 if (not unlockall(conn)) ...
@@ -3766,7 +3772,7 @@ Any memory cached record is deleted.
 \fBExample:\fR
 .RS
 .nf
- let record = "Client GD^G^20855^30000^1001.00^20855.76539"_var;
+let record = "Client GD^G^20855^30000^1001.00^20855.76539"_var;
 let file = "xo_clients", key = "GD001";
 if (not deleterecord("xo_clients", "GD001")) {}; // Cleanup first
 record.write(file, key);
@@ -3790,7 +3796,7 @@ Reads a record from a db file for a given key.
 \fBExample:\fR
 .RS
 .nf
- var record;
+var record;
 let file = "xo_clients", key = "GD001";
 if (not record.read(file, key)) ... // record -> "Client GD^G^20855^30000^1001.00^20855.76539"_var
 // or
@@ -3813,7 +3819,7 @@ Any memory cached record is deleted.
 \fBExample:\fR
 .RS
 .nf
- let file = "xo_clients", key = "GD001";
+let file = "xo_clients", key = "GD001";
 if (file.deleterecord(key)) ... ok
 // or
 if (deleterecord(file, key)) ...
@@ -3835,7 +3841,7 @@ Any memory cached record is deleted.
 \fBExample:\fR
 .RS
 .nf
- let record = "Client GD^G^20855^30000^1001.00^20855.76539"_var;
+let record = "Client GD^G^20855^30000^1001.00^20855.76539"_var;
 let file = "xo_clients", key = "GD001";
 if (record.insertrecord(file, key)) ... ok
 // or
@@ -3858,7 +3864,7 @@ Any memory cached record is deleted.
 \fBExample:\fR
 .RS
 .nf
- let record = "Client GD^G^20855^30000^1001.00^20855.76539"_var;
+let record = "Client GD^G^20855^30000^1001.00^20855.76539"_var;
 let file = "xo_clients", key = "GD001";
 if (not record.updaterecord(file, key)) ...
 // or
@@ -3877,7 +3883,7 @@ if (strvar.readf(file, key, fieldno)) ...
 \fBExample:\fR
 .RS
 .nf
- var field, file = "xo_clients", key = "GD001", fieldno = 2;
+var field, file = "xo_clients", key = "GD001", fieldno = 2;
 if (not field.readf(file, key, fieldno)) ... // field -> "G"
 // or
 if (not readf(field from file, key, fieldno)) ...
@@ -3895,7 +3901,7 @@ strvar.writef(file, key, fieldno)
 \fBExample:\fR
 .RS
 .nf
- var field = "f3", file = "xo_clients", key = "1000", fieldno = 3;
+var field = "f3", file = "xo_clients", key = "1000", fieldno = 3;
 field.writef(file, key, fieldno);
 // or
 writef(field on file, key, fieldno);
@@ -3921,7 +3927,7 @@ Neither the db file nor the record key need to actually exist in the actual db.
 \fBExample:\fR
 .RS
 .nf
- let record = "Client XD^X^20855^30000^1001.00^20855.76539"_var;
+let record = "Client XD^X^20855^30000^1001.00^20855.76539"_var;
 let file = "xo_clients", key = "XD001";
 record.writec(file, key);
 // or
@@ -3948,7 +3954,7 @@ Cached db file data lives in exodus process memory and is lost when the process 
 \fBExample:\fR
 .RS
 .nf
- var record;
+var record;
 let file = "xo_clients", key = "XD001";
 if (record.readc(file, key)) ... ok
 // or
@@ -3974,7 +3980,7 @@ The actual database file is NOT updated.
 \fBExample:\fR
 .RS
 .nf
- var file = "xo_clients", key = "XD001";
+var file = "xo_clients", key = "XD001";
 if (file.deletec(key)) ... ok
 // or
 if (deletec(file, key)) ...
@@ -3994,7 +4000,7 @@ All future cache readc() function calls will be forced to obtain records from th
 \fBExample:\fR
 .RS
 .nf
- conn.cleardbcache();
+conn.cleardbcache();
 // or
 cleardbcache(conn);
 .fi
@@ -4033,7 +4039,7 @@ If var key is multivalued then a multivalued field is returned.
 \fBExample:\fR
 .RS
 .nf
- let key = "SB001";
+let key = "SB001";
 let client_name = key.xlate("xo_clients", 1, "X"); // "Client AAA"
 // or
 let name_and_type = xlate("xo_clients", key, "NAME_AND_TYPE", "X"); // "Client AAA (A)"
@@ -4076,7 +4082,7 @@ Active select lists created using var.select()'s member function syntax cannot b
 \fBExample:\fR
 .RS
 .nf
- var clients = "xo_clients";
+var clients = "xo_clients";
 if (clients.select("with type 'B' and with balance ge 100 by type by name"))
     while (clients.readnext(ID))
         println("Client code is {}", ID);
@@ -4104,7 +4110,7 @@ Similar to select() but creates the list directly from a var.
 \fBExample:\fR
 .RS
 .nf
- var dbfile = "";
+var dbfile = "";
 let keys = "A01^B02^C03"_var;
 if (dbfile.selectkeys(keys)) ... ok
 assert(dbfile.readnext(ID) and ID == "A01");
@@ -4131,7 +4137,7 @@ If it returns true then a call to readnext() will return a database record key, 
 \fBExample:\fR
 .RS
 .nf
- var clients = "xo_clients", key;
+var clients = "xo_clients", key;
 if (clients.select()) {
     assert(clients.hasnext());
 }
@@ -4187,7 +4193,7 @@ Similar to readnext(key) but acquires the database record as well.
 \fBExample:\fR
 .RS
 .nf
- var clients = "xo_clients";
+var clients = "xo_clients";
 if (clients.select("with type 'B' and with balance ge 100 by type by name (R)"))
     while (clients.readnext(RECORD, ID, MV))
         println("Code is {}, Name is {}", ID, RECORD.f(1));
@@ -4216,7 +4222,7 @@ Has no effect if no select list is active for dbfile.
 \fBExample:\fR
 .RS
 .nf
- var clients = "xo_clients";
+var clients = "xo_clients";
 clients.clearselect();
 if (not clients.hasnext()) ... ok
 // or
@@ -4256,7 +4262,7 @@ Select lists saved in the lists database file may be created, deleted and listed
 \fBExample:\fR
 .RS
 .nf
- var clients = "xo_clients";
+var clients = "xo_clients";
 if (clients.select("with type 'B' by name")) {
 }
 // or
@@ -4287,7 +4293,7 @@ Retrieving a list does not delete it and a list can be retrieved more than once 
 \fBExample:\fR
 .RS
 .nf
- var file = "";
+var file = "";
 if (file.getlist("mylist")) {
     while (file.readnext(ID))
         println("Key is {}", ID);
@@ -4317,7 +4323,7 @@ Delete a saved select list.
 \fBExample:\fR
 .RS
 .nf
- var conn = "";
+var conn = "";
 if (conn.deletelist("mylist")) ... ok
 // or
 if (deletelist("mylist")) ... ok
@@ -4340,7 +4346,7 @@ e.g. was 20821 from 2025-01-01 00:00:00 UTC for 24 hours
 \fBExample:\fR
 .RS
 .nf
- let today1 = var().date();
+let today1 = var().date();
 // or
 let today2 = date();
 .fi
@@ -4361,7 +4367,7 @@ Range 0 - 86399 since there are 24*60*60 (86400) seconds in a day.
 \fBExample:\fR
 .RS
 .nf
- let now1 = var().time();
+let now1 = var().time();
 // or
 let now2 = time();
 .fi
@@ -4382,7 +4388,7 @@ e.g. 23343.704387955 approx. 06:29:03 UTC
 \fBExample:\fR
 .RS
 .nf
- let now1 = var().ostime();
+let now1 = var().ostime();
 // or
 let now2 = ostime();
 .fi
@@ -4403,7 +4409,7 @@ e.g. Was 20821.99998842593 around 2025-01-01 23:59:59 UTC
 \fBExample:\fR
 .RS
 .nf
- let now1 = var().timestamp();
+let now1 = var().timestamp();
 // or
 let now2 = timestamp();
 .fi
@@ -4420,7 +4426,7 @@ Construct a timestamp from a date and time
 \fBExample:\fR
 .RS
 .nf
- let idate = iconv("2025-01-01", "D"), itime = iconv("23:59:59", "MT");
+let idate = iconv("2025-01-01", "D"), itime = iconv("23:59:59", "MT");
 let ts1 = idate.timestamp(itime); // 20821.99998842593
 // or
 let ts2 = timestamp(idate, itime);
@@ -4440,7 +4446,7 @@ Releases the processor if not needed for a period of time or a delay is required
 \fBExample:\fR
 .RS
 .nf
- var().ossleep(100); // sleep for 100ms
+var().ossleep(100); // sleep for 100ms
 // or
 ossleep(100);
 .fi
@@ -4463,7 +4469,7 @@ Multiple events are returned in multivalues.
 \fBExample:\fR
 .RS
 .nf
- let v1 = ".^/etc/hosts"_var.oswait(100); /// e.g. "IN_CLOSE_WRITE^/etc^hosts^f"_var
+let v1 = ".^/etc/hosts"_var.oswait(100); /// e.g. "IN_CLOSE_WRITE^/etc^hosts^f"_var
 // or
 let v2 = oswait(".^/etc/hosts"_var, 100);
 .fi
@@ -4530,7 +4536,7 @@ The file will be opened for writing if possible otherwise for reading.
 \fBExample:\fR
 .RS
 .nf
- let osfilename = ostempdirpath() ^ "xo_gendoc_test.conf";
+let osfilename = ostempdirpath() ^ "xo_gendoc_test.conf";
 if (oswrite("" on osfilename)) ... ok /// Create an empty os file
 var ostempfile;
 if (ostempfile.osopen(osfilename)) ... ok
@@ -4552,7 +4558,7 @@ See osbread for more info.
 \fBExample:\fR
 .RS
 .nf
- let osfilename = ostempdirpath() ^ "xo_gendoc_test.conf";
+let osfilename = ostempdirpath() ^ "xo_gendoc_test.conf";
 let text = "aaa=123\\nbbb=456\\n";
 var offset = osfile(osfilename).f(1); /// Size of file therefore append
 if (text.osbwrite(osfilename, offset)) ... ok // offset -> 16
@@ -4578,7 +4584,7 @@ If reading UTF8 data (the default) then the length of data actually returned may
 \fBExample:\fR
 .RS
 .nf
- let osfilename = ostempdirpath() ^ "xo_gendoc_test.conf";
+let osfilename = ostempdirpath() ^ "xo_gendoc_test.conf";
 var text, offset = 0;
 if (text.osbread(osfilename, offset, 8)) ... ok // text -> "aaa=123\\n" // offset -> 8
 // or
@@ -4599,7 +4605,7 @@ It is advisable to osclose any file handles after use, regardless of whether the
 \fBExample:\fR
 .RS
 .nf
- osfilevar.osclose();
+osfilevar.osclose();
 // or
 osclose(osfilevar);
 .fi
@@ -4624,7 +4630,7 @@ If codepage is specified then output is converted from utf-8 to that codepage. O
 \fBExample:\fR
 .RS
 .nf
- let text = "aaa = 123\\nbbb = 456";
+let text = "aaa = 123\\nbbb = 456";
 let osfilename = ostempdirpath() ^ "xo_gendoc_test.conf";
 if (text.oswrite(osfilename)) ... ok
 // or
@@ -4649,7 +4655,7 @@ e.g. File doesnt exist, permissions etc.
 \fBExample:\fR
 .RS
 .nf
- var text;
+var text;
 let osfilename = ostempdirpath() ^ "xo_gendoc_test.conf";
 if (text.osread(osfilename)) ... ok // text -> "aaa = 123\\nbbb = 456"
 // or
@@ -4678,7 +4684,7 @@ Uses std::filesystem::rename internally.
 \fBExample:\fR
 .RS
 .nf
- let from_osfilename = ostempdirpath() ^ "xo_gendoc_test.conf";
+let from_osfilename = ostempdirpath() ^ "xo_gendoc_test.conf";
 let to_osfilename = from_osfilename ^ ".bak";
 if (not osremove(ostempdirpath() ^ "xo_gendoc_test.conf.bak")) {}; // Cleanup first
 
@@ -4707,7 +4713,7 @@ Attempts osrename first then oscopy followed by osremove original.
 \fBExample:\fR
 .RS
 .nf
- let from_osfilename = ostempdirpath() ^ "xo_gendoc_test.conf.bak";
+let from_osfilename = ostempdirpath() ^ "xo_gendoc_test.conf.bak";
 let to_osfilename = from_osfilename.cut(-4);
 
 if (not osremove(ostempdirpath() ^ "xo_gendoc_test.conf")) {}; // Cleanup first
@@ -4732,7 +4738,7 @@ Uses std::filesystem::copy internally with recursive and overwrite options
 \fBExample:\fR
 .RS
 .nf
- let from_osfilename = ostempdirpath() ^ "xo_gendoc_test.conf";
+let from_osfilename = ostempdirpath() ^ "xo_gendoc_test.conf";
 let to_osfilename = from_osfilename ^ ".bak";
 
 if (from_osfilename.oscopy(to_osfilename)) ... ok;
@@ -4758,7 +4764,7 @@ e.g. Target doesnt exist, path is not writeable, permissions etc.
 \fBExample:\fR
 .RS
 .nf
- let osfilename = ostempdirpath() ^ "xo_gendoc_test.conf";
+let osfilename = ostempdirpath() ^ "xo_gendoc_test.conf";
 if (osfilename.osremove()) ... ok
 // or
 if (osremove(osfilename)) ...
@@ -4781,7 +4787,7 @@ A glob pattern (e.g. *.conf) can be appended to the path or passed as argument.
 \fBExample:\fR
 .RS
 .nf
- var entries1 = "/etc/"_var.oslist("*.cfg"); /// e.g. "adduser.conf^ca-certificates.con^... etc."
+var entries1 = "/etc/"_var.oslist("*.cfg"); /// e.g. "adduser.conf^ca-certificates.con^... etc."
 // or
 var entries2 = oslist("/etc/" "*.conf");
 .fi
@@ -4822,7 +4828,7 @@ See also osfile() and osdir()
 \fBExample:\fR
 .RS
 .nf
- var info1 = "/etc/hosts"_var.osinfo(); /// e.g. "221^20597^78309"_var
+var info1 = "/etc/hosts"_var.osinfo(); /// e.g. "221^20597^78309"_var
 // or
 var info2 = osinfo("/etc/hosts");
 .fi
@@ -4843,7 +4849,7 @@ Alias for osinfo(1)
 \fBExample:\fR
 .RS
 .nf
- var fileinfo1 = "/etc/hosts"_var.osfile(); /// e.g. "221^20597^78309"_var
+var fileinfo1 = "/etc/hosts"_var.osfile(); /// e.g. "221^20597^78309"_var
 // or
 var fileinfo2 = osfile("/etc/hosts");
 .fi
@@ -4864,7 +4870,7 @@ Alias for osinfo(2)
 \fBExample:\fR
 .RS
 .nf
- var dirinfo1 = "/etc/"_var.osdir(); /// e.g. "^20848^44464"_var
+var dirinfo1 = "/etc/"_var.osdir(); /// e.g. "^20848^44464"_var
 // or
 var dirinfo2 = osfile("/etc/");
 .fi
@@ -4883,7 +4889,7 @@ Including parent dirs if necessary.
 \fBExample:\fR
 .RS
 .nf
- let osdirname = "xo_test/aaa";
+let osdirname = "xo_test/aaa";
 if (osrmdir("xo_test/aaa")) {}; // Cleanup first
 if (osdirname.osmkdir()) ... ok
 // or
@@ -4902,7 +4908,7 @@ Changes the current working dir and returns true if successful.
 \fBExample:\fR
 .RS
 .nf
- let osdirname = "xo_test/aaa";
+let osdirname = "xo_test/aaa";
 if (osdirname.oscwd()) ... ok
 // or
 if (oscwd(osdirname)) ... ok
@@ -4923,7 +4929,7 @@ e.g. "/root/exodus/cli/src/xo_test/aaa"
 \fBExample:\fR
 .RS
 .nf
- var cwd1 = var().oscwd();
+var cwd1 = var().oscwd();
 // or
 var cwd2 = oscwd();
 .fi
@@ -4942,7 +4948,7 @@ Optionally even if not empty. Including subdirs.
 \fBExample:\fR
 .RS
 .nf
- let osdirname = "xo_test/aaa";
+let osdirname = "xo_test/aaa";
 if (osdirname.osrmdir()) ... ok
 // or
 if (osrmdir(osdirname)) ...
@@ -4967,7 +4973,7 @@ Append "&>/dev/null" to the command to suppress terminal output.
 \fBExample:\fR
 .RS
 .nf
- let cmd = "echo $HOME";
+let cmd = "echo $HOME";
 if (cmd.osshell()) ... ok
 // or
 if (osshell(cmd)) ... ok
@@ -4989,7 +4995,7 @@ Append "2>&1" to the command to capture stderr/stdlog output as well.
 \fBExample:\fR
 .RS
 .nf
- let cmd = "echo $HOME";
+let cmd = "echo $HOME";
 var text;
 if (text.osshellread(cmd)) ... ok
 
@@ -5013,7 +5019,7 @@ Append "&> somefile" to the command to suppress and/or capture output.
 \fBExample:\fR
 .RS
 .nf
- let outtext = "abc xyz";
+let outtext = "abc xyz";
 if (outtext.osshellwrite("grep xyz")) ... ok
 // or
 if (osshellwrite(outtext, "grep xyz")) ... ok
@@ -5033,7 +5039,7 @@ e.g. "/tmp/"
 \fBExample:\fR
 .RS
 .nf
- let v1 = var().ostempdirpath();
+let v1 = var().ostempdirpath();
 // or
 let v2 = ostempdirpath();
 .fi
@@ -5052,7 +5058,7 @@ e.g. Something like "/tmp/~exoEcLj3C"
 \fBExample:\fR
 .RS
 .nf
- var temposfilename1 = var().ostempfilename();
+var temposfilename1 = var().ostempfilename();
 // or
 var temposfilename2 = ostempfilename();
 .fi
@@ -5069,7 +5075,7 @@ Set the value of an environment variable code
 \fBExample:\fR
 .RS
 .nf
- let envcode = "EXO_ABC", envvalue = "XYZ";
+let envcode = "EXO_ABC", envvalue = "XYZ";
 envvalue.ossetenv(envcode);
 // or
 ossetenv(envcode, envvalue);
@@ -5101,7 +5107,7 @@ For the actual system environment, see "man environ". extern char **environ; // 
 \fBExample:\fR
 .RS
 .nf
- var envvalue1;
+var envvalue1;
 if (envvalue1.osgetenv("HOME")) ... ok // e.g. "/home/exodus"
 // or
 var envvalue2 = osgetenv("EXO_ABC"); // "XYZ"
@@ -5119,7 +5125,7 @@ Get the os process id
 \fBExample:\fR
 .RS
 .nf
- let pid1 = var().ospid(); /// e.g. 663237
+let pid1 = var().ospid(); /// e.g. 663237
 // or
 let pid2 = ospid();
 .fi
@@ -5136,7 +5142,7 @@ Get the os thread process id
 \fBExample:\fR
 .RS
 .nf
- let tid1 = var().ostid(); /// e.g. 663237
+let tid1 = var().ostid(); /// e.g. 663237
 // or
 let tid2 = ostid();
 .fi
@@ -5153,7 +5159,7 @@ Get the libexodus build date and time
 \fBExample:\fR
 .RS
 .nf
- let v1 = var().version(); /// e.g. "29 JAN 2025 14:56:52"
+let v1 = var().version(); /// e.g. "29 JAN 2025 14:56:52"
 .fi
 .RE
 
@@ -5170,7 +5176,7 @@ True if successful
 \fBExample:\fR
 .RS
 .nf
- if ("en_US.utf8"_var.setxlocale()) ... ok
+if ("en_US.utf8"_var.setxlocale()) ... ok
 // or
 if (setxlocale("en_US.utf8")) ... ok
 .fi
@@ -5187,7 +5193,7 @@ var v1 = var.getxlocale();
 \fBExample:\fR
 .RS
 .nf
- let v1 = var().getxlocale(); // "en_US.utf8"
+let v1 = var().getxlocale(); // "en_US.utf8"
 // or
 let v2 = getxlocale();
 .fi
@@ -5213,7 +5219,7 @@ The raw string bytes are output. No character or byte conversion is performed.
 \fBExample:\fR
 .RS
 .nf
- "abc"_var.outputl("xyz = "); /// Sends "xyz = abc\\n" to stdout and flushes.
+"abc"_var.outputl("xyz = "); /// Sends "xyz = abc\\n" to stdout and flushes.
 // or
 outputl("xyz = ", "abc"); /// Any number of arguments is allowed. All will be output.
 .fi
@@ -5250,7 +5256,7 @@ Any of the six types of field mark chars present are converted to their visible 
 \fBExample:\fR
 .RS
 .nf
- "abc"_var.logputl("xyz = "); /// Sends "xyz = abc\\n" to stdlog buffer and is not flushed.
+"abc"_var.logputl("xyz = "); /// Sends "xyz = abc\\n" to stdlog buffer and is not flushed.
 // or
 logputl("xyz = ", "abc");; /// Any number of arguments is allowed. All will be output.
 .fi
@@ -5280,7 +5286,7 @@ Any of the six types of field mark chars present are converted to their visible 
 \fBExample:\fR
 .RS
 .nf
- "abc"_var.errputl("xyz = "); /// Sends "xyz = abc\\n" to stderr
+"abc"_var.errputl("xyz = "); /// Sends "xyz = abc\\n" to stderr
 // or
 errputl("xyz = ", "abc"); /// Any number of arguments is allowed. All will be output.
 .fi
@@ -5315,7 +5321,7 @@ Flush any and all buffered output to stdout and stdlog.
 \fBExample:\fR
 .RS
 .nf
- var().osflush();
+var().osflush();
 // or
 osflush();
 .fi
@@ -5345,7 +5351,7 @@ Multibyte/UTF8 friendly.
 \fBExample:\fR
 .RS
 .nf
- // var v1 = "defaultvalue";
+// var v1 = "defaultvalue";
 // if (v1.input("Prompt:")) ... ok
 // or
 // var v2 = input();
@@ -5373,7 +5379,7 @@ It only takes a few µsecs to return false if no key is pressed.
 \fBExample:\fR
 .RS
 .nf
- var v1; v1.keypressed();
+var v1; v1.keypressed();
 // or
 var v2 = keypressed();
 .fi
@@ -5398,7 +5404,7 @@ The type of stdout terminal can be obtained from the TERM environment variable.
 \fBExample:\fR
 .RS
 .nf
- var v1 = var().isterminal(); /// 1 or 0
+var v1 = var().isterminal(); /// 1 or 0
 // or
 var v2 = isterminal();
 .fi
@@ -5475,7 +5481,7 @@ Absolute value
 \fBExample:\fR
 .RS
 .nf
- let v1 = -12.34;
+let v1 = -12.34;
 let v2 = v1.abs(); // 12.34
 // or
 let v3 = abs(v1);
@@ -5493,7 +5499,7 @@ Power
 \fBExample:\fR
 .RS
 .nf
- let v1 = var(2).pwr(8); // 256
+let v1 = var(2).pwr(8); // 256
 // or
 let v2 = pwr(2, 8);
 .fi
@@ -5514,7 +5520,7 @@ Seeded from std::chrono::high_resolution_clock::now() if the argument is 0;
 \fBExample:\fR
 .RS
 .nf
- var(123).initrnd(); /// Set seed to 123
+var(123).initrnd(); /// Set seed to 123
 // or
 initrnd(123);
 .fi
@@ -5535,7 +5541,7 @@ Uses std::mt19937 and std::uniform_int_distribution<int>
 \fBExample:\fR
 .RS
 .nf
- let v1 = var(100).rnd(); /// Random 0 to 99
+let v1 = var(100).rnd(); /// Random 0 to 99
 // or
 let v2 = rnd(100);
 .fi
@@ -5552,7 +5558,7 @@ Power of e
 \fBExample:\fR
 .RS
 .nf
- let v1 = var(1).exp(); // 2.718281828459045
+let v1 = var(1).exp(); // 2.718281828459045
 // or
 let v2 = exp(1);
 .fi
@@ -5569,7 +5575,7 @@ Square root
 \fBExample:\fR
 .RS
 .nf
- let v1 = var(100).sqrt(); // 10
+let v1 = var(100).sqrt(); // 10
 // or
 let v2 = sqrt(100);
 .fi
@@ -5586,7 +5592,7 @@ Sine of degrees
 \fBExample:\fR
 .RS
 .nf
- let v1 = var(30).sin(); // 0.5
+let v1 = var(30).sin(); // 0.5
 // or
 let v2 = sin(30);
 .fi
@@ -5603,7 +5609,7 @@ Cosine of degrees
 \fBExample:\fR
 .RS
 .nf
- let v1 = var(60).cos(); // 0.5
+let v1 = var(60).cos(); // 0.5
 // or
 let v2 = cos(60);
 .fi
@@ -5620,7 +5626,7 @@ Tangent of degrees
 \fBExample:\fR
 .RS
 .nf
- let v1 = var(45).tan(); // 1
+let v1 = var(45).tan(); // 1
 // or
 let v2 = tan(45);
 .fi
@@ -5637,7 +5643,7 @@ Arctangent of degrees
 \fBExample:\fR
 .RS
 .nf
- let v1 = var(1).atan(); // 45
+let v1 = var(1).atan(); // 45
 // or
 let v2 = atan(1);
 .fi
@@ -5656,7 +5662,7 @@ Natural logarithm
 \fBExample:\fR
 .RS
 .nf
- let v1 = var(2.718281828459045).loge(); // 1
+let v1 = var(2.718281828459045).loge(); // 1
 // or
 let v2 = loge(2.718281828459045);
 .fi
@@ -5675,7 +5681,7 @@ Truncate decimal numbers towards zero
 \fBExample:\fR
 .RS
 .nf
- let v1 = var(2.9).integer(); // 2
+let v1 = var(2.9).integer(); // 2
 // or
 let v2 = integer(2.9);
 
@@ -5698,7 +5704,7 @@ Truncate decimal numbers towards negative
 \fBExample:\fR
 .RS
 .nf
- let v1 = var(2.9).floor(); // 2
+let v1 = var(2.9).floor(); // 2
 // or
 let v2 = floor(2.9);
 
@@ -5731,7 +5737,7 @@ Floating point works.
 \fBExample:\fR
 .RS
 .nf
- let v1 = var(11).mod(5); // 1
+let v1 = var(11).mod(5); // 1
 // or
 let v2 = mod(11, 5); // 1
 let v3 = mod(-11, 5); // 4
@@ -5760,7 +5766,7 @@ Any multifield/multivalue structure is preserved.
 \fBExample:\fR
 .RS
 .nf
- let v1 = 12345;
+let v1 = 12345;
 assert( v1.oconv( "D"   ) == "18 OCT 2001"  ); // Default
 assert( v1.oconv( "D/"  ) == "10/18/2001"   ); // / separator
 assert( v1.oconv( "D-"  ) == "10-18-2001"   ); // - separator
@@ -5805,7 +5811,7 @@ Any multifield/multivalue structure is preserved.
 \fBExample:\fR
 .RS
 .nf
- // International order "DE"
+// International order "DE"
 assert(            oconv(19005, "DE") == "12 JAN 2020");
 assert(   "12/1/2020"_var.iconv("DE") == 19005);
 assert(   "12 1 2020"_var.iconv("DE") == 19005);
@@ -5860,7 +5866,7 @@ Any multifield/multivalue structure is preserved.
 \fBExample:\fR
 .RS
 .nf
- var v1 = 234800;
+var v1 = 234800;
 assert( v1.oconv( "MT"   ) == "17:13"      ); // Default
 assert( v1.oconv( "MTH"  ) == "05:13PM"    ); // 'H' flag for AM/PM
 assert( v1.oconv( "MTS"  ) == "17:13:20"   ); // 'S' flag for seconds
@@ -5900,7 +5906,7 @@ Any multifield/multivalue structure is preserved.
 \fBExample:\fR
 .RS
 .nf
- assert(      "17:13"_var.iconv( "MT" ) == 61980);
+assert(      "17:13"_var.iconv( "MT" ) == 61980);
 assert(    "05:13PM"_var.iconv( "MT" ) == 61980);
 assert(   "17:13:20"_var.iconv( "MT" ) == 62000);
 assert( "05:13:20PM"_var.iconv( "MT" ) == 62000);
@@ -5970,7 +5976,7 @@ MC outputs like 123,45 (European)
 \fBExample:\fR
 .RS
 .nf
- var v1 = -1234.567;
+var v1 = -1234.567;
 assert( v1.oconv( "MD20"   ) ==  "-1234.57"   );
 assert( v1.oconv( "MD20,"  ) == "-1,234.57"   ); // , flag
 assert( v1.oconv( "MC20,"  ) == "-1.234,57"   ); // MC code
@@ -6007,7 +6013,7 @@ ASCII only.
 \fBExample:\fR
 .RS
 .nf
- assert(     "abcde"_var.oconv( "L#3" ) == "abc" ); // Truncating
+assert(     "abcde"_var.oconv( "L#3" ) == "abc" ); // Truncating
 assert(     "abcde"_var.oconv( "R#3" ) == "cde" );
 assert(     "abcde"_var.oconv( "C#3" ) == "abc" );
 
@@ -6050,7 +6056,7 @@ ASCII only.
 \fBExample:\fR
 .RS
 .nf
- var v1 = "Have a nice day";
+var v1 = "Have a nice day";
 assert(  v1.oconv("T#10") == "Have a    |nice day  "_var);
 // or
 assert( oconv(v1, "T#10") == "Have a    |nice day  "_var );
@@ -6070,7 +6076,7 @@ Multifield/multivalue structure is not preserved. Field marks are converted to H
 \fBExample:\fR
 .RS
 .nf
- assert(     "ab01"_var.oconv( "HEX" ) == "61" "62" "30" "31" );
+assert(     "ab01"_var.oconv( "HEX" ) == "61" "62" "30" "31" );
 assert( "\\xff\\x00"_var.oconv( "HEX" ) == "FF" "00"           ); // Any bytes are ok.
 assert(        var(10).oconv( "HEX" ) == "31" "30"           ); // Uses ASCII string equivalent of 10 i.e. "10".
 assert(   "\\u0393"_var.oconv( "HEX" ) == "CE" "93"           ); // Greek capital Gamma in UTF8 bytes.
@@ -6102,7 +6108,7 @@ If the value is not numeric then no conversion is performed and the original val
 \fBExample:\fR
 .RS
 .nf
- assert( var("255").oconv("MX") == "FF");
+assert( var("255").oconv("MX") == "FF");
 // or
 assert( oconv(var("255"), "MX") == "FF");
 .fi
@@ -6121,7 +6127,7 @@ If the value is not numeric then no conversion is performed and the original val
 \fBExample:\fR
 .RS
 .nf
- assert( var(255).oconv("MB") == 1111'1111);
+assert( var(255).oconv("MB") == 1111'1111);
 // or
 assert( oconv(var(255), "MB") == 1111'1111);
 .fi
@@ -6142,7 +6148,7 @@ FMs -> NL after escaping any embedded NL
 \fBExample:\fR
 .RS
 .nf
-   // backslash in text remains backslash
+  // backslash in text remains backslash
   assert(var(_BS).oconv("TX") == _BS);
 
   // 1. Double escape any _BS "n" -> _BS _BS "n"

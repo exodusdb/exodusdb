@@ -87,19 +87,19 @@ function main() {
 			{
 				var x = a;
 				x(2) = b(2);
-				assert(x.outputl() == a.pickreplace(2, b.f(2)));
+				assert(x.outputl() == a.update(2, b.f(2)));
 			}
 
 			{
 				var x = a;
 				x(2) = b(2, 1);
-				assert(x.outputl() == a.pickreplace(2, b.f(2, 1)));
+				assert(x.outputl() == a.update(2, b.f(2, 1)));
 			}
 
 			{
 				var x = a;
 				x(2) = b(2, 2, 2);
-				assert(x.outputl() == a.pickreplace(2, b.f(2, 2, 2)));
+				assert(x.outputl() == a.update(2, b.f(2, 2, 2)));
 			}
 		}
 
@@ -108,19 +108,19 @@ function main() {
 			{
 				var x = a;
 				x(2, 1) = b(2);
-				assert(x.outputl() == a.pickreplace(2, 1, b.f(2)));
+				assert(x.outputl() == a.update(2, 1, b.f(2)));
 			}
 
 			{
 				var x = a;
 				x(2, 1) = b(2, 1);
-				assert(x.outputl() == a.pickreplace(2, 1, b.f(2, 1)));
+				assert(x.outputl() == a.update(2, 1, b.f(2, 1)));
 			}
 
 			{
 				var x = a;
 				x(2, 1) = b(2, 2, 2);
-				assert(x.outputl() == a.pickreplace(2, 1, b.f(2, 2, 2)));
+				assert(x.outputl() == a.update(2, 1, b.f(2, 2, 2)));
 			}
 		}
 
@@ -129,19 +129,19 @@ function main() {
 			{
 				var x = a;
 				x(2, 1, 3) = b(2);
-				assert(x.outputl() == a.pickreplace(2, 1, 3, b.f(2)));
+				assert(x.outputl() == a.update(2, 1, 3, b.f(2)));
 			}
 
 			{
 				var x = a;
 				x(2, 1, 3) = b(2, 1);
-				assert(x.outputl() == a.pickreplace(2, 1, 3, b.f(2, 1)));
+				assert(x.outputl() == a.update(2, 1, 3, b.f(2, 1)));
 			}
 
 			{
 				var x = a;
 				x(2, 1, 3) = b(2, 2, 2);
-				assert(x.outputl() == a.pickreplace(2, 1, 3, b.f(2, 2, 2)));
+				assert(x.outputl() == a.update(2, 1, 3, b.f(2, 2, 2)));
 			}
 		}
 	} // check var_proxy = var_proxy

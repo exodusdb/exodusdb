@@ -11,7 +11,7 @@ function main() {
 	/////////
 
 	//.r() is field/value/subvalue in place like x<1,2.3>='abc'
-	// but we use pickreplace which returns a temporary for convenience in testing
+	// but we use update which returns a temporary for convenience in testing
 	// note that replace() function in exodus is regular expression replace a with b
 
 	var rec = "1" _FM "21" _VM "22" _FM "311" _SM "312" _VM "32" _FM "4";
@@ -30,44 +30,44 @@ function main() {
 	}
 
 	{
-		assert(pickreplace(rec, 1, "1r") eq "1r" _FM "21" _VM "22" _FM "311" _SM "312" _VM "32" _FM "4");
-		printl(pickreplace(rec, 2, "2r"));	//1^2r^311}312]32^4
-		assert(pickreplace(rec, 2, "2r") eq "1" _FM "2r" _FM "311" _SM "312" _VM "32" _FM "4");
+		assert(update(rec, 1, "1r") eq "1r" _FM "21" _VM "22" _FM "311" _SM "312" _VM "32" _FM "4");
+		printl(update(rec, 2, "2r"));	//1^2r^311}312]32^4
+		assert(update(rec, 2, "2r") eq "1" _FM "2r" _FM "311" _SM "312" _VM "32" _FM "4");
 
-		assert(pickreplace(rec, -1, "5-1r")        eq "1" _FM "21" _VM "22" _FM "311" _SM "312" _VM "32" _FM "4" _FM "5-1r");
-		assert(pickreplace(rec, 2, -1, "2-1r")     eq "1" _FM "21" _VM "22" _VM "2-1r" _FM "311" _SM "312" _VM "32" _FM "4");
-		assert(pickreplace(rec, 3, 2, -1, "32-1r") eq "1" _FM "21" _VM "22" _FM "311" _SM "312" _VM "32" _SM "32-1r" _FM "4");
+		assert(update(rec, -1, "5-1r")        eq "1" _FM "21" _VM "22" _FM "311" _SM "312" _VM "32" _FM "4" _FM "5-1r");
+		assert(update(rec, 2, -1, "2-1r")     eq "1" _FM "21" _VM "22" _VM "2-1r" _FM "311" _SM "312" _VM "32" _FM "4");
+		assert(update(rec, 3, 2, -1, "32-1r") eq "1" _FM "21" _VM "22" _FM "311" _SM "312" _VM "32" _SM "32-1r" _FM "4");
 
-		assert(pickreplace(rec, 2, 1, "21r") eq "1" _FM "21r" _VM "22" _FM "311" _SM "312" _VM "32" _FM "4");
-		assert(pickreplace(rec, 2, 4, "24r") eq "1" _FM "21" _VM "22" _VM _VM "24r" _FM "311" _SM "312" _VM "32" _FM "4");
+		assert(update(rec, 2, 1, "21r") eq "1" _FM "21r" _VM "22" _FM "311" _SM "312" _VM "32" _FM "4");
+		assert(update(rec, 2, 4, "24r") eq "1" _FM "21" _VM "22" _VM _VM "24r" _FM "311" _SM "312" _VM "32" _FM "4");
 	}
 
-	//.pickreplace()
+	//.update()
 
 	//plain replace subvalue in the middle of subvalues
 	var v123 = "f100" _FM "f210" _VM "f221" _SM "f222" _SM;
-	assert(v123.pickreplace(2, 2, 2, "n222")                                               eq "f100" _FM "f210" _VM "f221" _SM "n222" _SM);
+	assert(v123.update(2, 2, 2, "n222")                                               eq "f100" _FM "f210" _VM "f221" _SM "n222" _SM);
 	v123(2, 2, 2) = "n222";
 	assert(v123                                                                  eq "f100" _FM "f210" _VM "f221" _SM "n222" _SM);
-	assert(var("f100" _FM "f210" _VM "f221" _SM "f222" _SM).pickreplace(2, 2, 2, "n222")   eq "f100" _FM "f210" _VM "f221" _SM "n222" _SM);
+	assert(var("f100" _FM "f210" _VM "f221" _SM "f222" _SM).update(2, 2, 2, "n222")   eq "f100" _FM "f210" _VM "f221" _SM "n222" _SM);
 	//plain replace subvalue in the middle of subvalues with null, smaller and larger
-	assert(var("f100" _FM "f210" _VM "f221" _SM "f222" _SM).pickreplace(2, 2, 2, "")       eq "f100" _FM "f210" _VM "f221" _SM "" _SM);
-	assert(var("f100" _FM "f210" _VM "f221" _SM "f222" _SM).pickreplace(2, 2, 2, "x")      eq "f100" _FM "f210" _VM "f221" _SM "x" _SM);
-	assert(var("f100" _FM "f210" _VM "f221" _SM "f222" _SM).pickreplace(2, 2, 2, "xyz123") eq "f100" _FM "f210" _VM "f221" _SM "xyz123" _SM);
+	assert(var("f100" _FM "f210" _VM "f221" _SM "f222" _SM).update(2, 2, 2, "")       eq "f100" _FM "f210" _VM "f221" _SM "" _SM);
+	assert(var("f100" _FM "f210" _VM "f221" _SM "f222" _SM).update(2, 2, 2, "x")      eq "f100" _FM "f210" _VM "f221" _SM "x" _SM);
+	assert(var("f100" _FM "f210" _VM "f221" _SM "f222" _SM).update(2, 2, 2, "xyz123") eq "f100" _FM "f210" _VM "f221" _SM "xyz123" _SM);
 
-	assert(var("f100" _FM "f210" _VM "f221" _SM "f222" _SM).pickreplace(2, "xyz123") eq "f100" _FM "xyz123");
+	assert(var("f100" _FM "f210" _VM "f221" _SM "f222" _SM).update(2, "xyz123") eq "f100" _FM "xyz123");
 
 	//replace field zero
-	assert(pickreplace(rec, 0, "f000")       eq "f000");
-	assert(pickreplace(rec, 0, 0, "f000")    eq "f000");
-	assert(pickreplace(rec, 0, 0, 0, "f000") eq "f000");
+	assert(update(rec, 0, "f000")       eq "f000");
+	assert(update(rec, 0, 0, "f000")    eq "f000");
+	assert(update(rec, 0, 0, 0, "f000") eq "f000");
 
 	var da2 = "aa" _FM "b1" _VM "b2" _SM "b22" _FM "cc";
 
 	//this shouldnt compile without a warning since it has no effect
-	//pickreplace(da2,3,"x");//or this
-	//pickreplace(da2,3,3,"x");//or this
-	//pickreplace(da2,3,3,3,"x");//or this
+	//update(da2,3,"x");//or this
+	//update(da2,3,3,"x");//or this
+	//update(da2,3,3,3,"x");//or this
 
 	//replacement
 	//da2(2)="x";//this will not compile because da2(2) is a temporary;
@@ -76,17 +76,17 @@ function main() {
 
 	//replace field 2 with "R2"
 	da2 = "";
-	pickreplacer(da2, 2, "R2");
+	updater(da2, 2, "R2");
 	assert(da2 eq(_FM "R2"));
 
 	//replace field 2, value 3 with "R22"
 	da2 = "";
-	pickreplacer(da2, 2, 3, "R23");
+	updater(da2, 2, 3, "R23");
 	assert(da2 eq(_FM _VM _VM "R23"));
 
 	//replace field 2, value 3, subvalue 4 with "R234"
 	da2 = "";
-	pickreplacer(da2, 2, 3, 4, "R234");
+	updater(da2, 2, 3, 4, "R234");
 	assert(da2 eq(_FM _VM _VM _SM _SM _SM "R234"));
 
 	/////////

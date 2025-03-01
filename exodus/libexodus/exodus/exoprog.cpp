@@ -72,14 +72,14 @@ bool ExodusProgramBase::select(in sortselectclause_or_filehandle) {
 	/////////
 
 	//force default connection
-	CURSOR.r(2, "");
+	CURSOR.updater(2, "");
 
 	//indicate there are no calculated fields
-	CURSOR.r(10, "");
+	CURSOR.updater(10, "");
 
 	//perform the select (stage 1 of possibly two stages)
 	//any fields requiring calculation that cannot be done by the database
-	//will be put skipped and put aside in CURSOR.r(10) for stage 2
+	//will be put skipped and put aside in CURSOR.updater(10) for stage 2
 
 	//select or fail
 	if (!CURSOR.select(sortselectclause)) {
@@ -107,7 +107,7 @@ bool ExodusProgramBase::select(in sortselectclause_or_filehandle) {
 	//calc_fields.oswrite("calc_fields=");
 
 	//clear the list of calculated fields
-	CURSOR.r(10, "");
+	CURSOR.updater(10, "");
 
 	//vms to fms etc in calculated fields
 	calc_fields.raiser();
@@ -753,7 +753,7 @@ void ExodusProgramBase::mssg(in msg, in options, io buffer, in params) const {
 				USER4 ^= FM ^ msg2;
 			}
 		} else {
-			USER4.r(-1, msg1);
+			USER4.updater(-1, msg1);
 		}
 	}
 }
@@ -871,7 +871,7 @@ updateprivs:
 					taskn -= 1;
 				}
 			}
-			SECURITY.r(10, taskn, defaultlock);
+			SECURITY.updater(10, taskn, defaultlock);
 			if (renaming) {
 				call note(task ^ "|TASK RENAMED|" ^ defaultlock);
 			}
@@ -881,7 +881,7 @@ updateprivs:
 			if (SECURITY.f(10).locate(defaultlock, taskn2)) {
 				tt = SECURITY.f(11, taskn2);
 			}
-			SECURITY.r(11, taskn, tt);
+			SECURITY.updater(11, taskn, tt);
 			goto updateprivs;
 		}
 	} else {
@@ -1012,7 +1012,7 @@ void ExodusProgramBase::readuserprivs() const {
 
 // writeuserprivs
 void ExodusProgramBase::writeuserprivs() const {
-	SECURITY.r(9, "");
+	SECURITY.updater(9, "");
 	if (DEFINITIONS) {
 		SECURITY.write(DEFINITIONS, "SECURITY");
 	}
@@ -1406,7 +1406,7 @@ var ExodusProgramBase::xlate(in filename, in key, in fieldno_or_name, const char
 
 		// If ordinary numeric or "" fieldno
 		if (is_fieldno) {
-			results.r(keyn, keyx.xlate(filename, fieldno_or_name, mode));
+			results.updater(keyn, keyx.xlate(filename, fieldno_or_name, mode));
 		}
 
 		// Otherwise handle non-numeric field_no ie dictionary field/column name
@@ -1419,13 +1419,13 @@ var ExodusProgramBase::xlate(in filename, in key, in fieldno_or_name, const char
 
 			// Handle record not found and mode C
 			if (*mode == 'C' && record == keyx) {
-				results.r(keyn, key);
+				results.updater(keyn, key);
 				continue;
 			}
 
 			// Handle record not found and mode X
 			if (not record.len()) {
-				results.r(keyn, "");
+				results.updater(keyn, "");
 				continue;
 			}
 
@@ -1434,7 +1434,7 @@ var ExodusProgramBase::xlate(in filename, in key, in fieldno_or_name, const char
 				calculate(fieldno_or_name, dictfile, keyx, record);
 			if (nkeys > 1)
 				result.lowerer();
-			results.r(keyn, result);
+			results.updater(keyn, result);
 		}
 
 	}
@@ -1528,7 +1528,7 @@ baddict:
 			// regardless of file xxxxxxxx/voc and upper/lower case key
 			// as if it was found in the initial file,key requested
 			// this will save repeated drill down searching on every access.
-			cached_dictrec_.r(16, indictvoc);
+			cached_dictrec_.updater(16, indictvoc);
 			cached_dictrec_.writec(DICT, dictid);
 		}
 		cached_dictid_ = curr_dictid;
@@ -2055,7 +2055,7 @@ bool ExodusProgramBase::loginnet(in /*dataset*/, in username, io cookie, io msg)
 	 nextcomp:
 	 var compcodex;
 	 if (var("").readnext(compcodex)) {
-	 temp.pickreplace(-1, 0, 0, compcodex);
+	 temp.updater(-1, 0, 0, compcodex);
 	 goto nextcomp;
 	 }
 	 }
@@ -2537,25 +2537,25 @@ var ExodusProgramBase::elapsedtimetext(in timestamp1, in timestamp2) const {
 	secs -= minutes * 60;
 
 	if (weeks) {
-		text.r(-1, weeks ^ " week");
+		text.updater(-1, weeks ^ " week");
 		if (weeks ne 1) {
 			text ^= "s";
 		}
 	}
 	if (days) {
-		text.r(-1, days ^ " day");
+		text.updater(-1, days ^ " day");
 		if (days ne 1) {
 			text ^= "s";
 		}
 	}
 	if (hours) {
-		text.r(-1, hours ^ " hour");
+		text.updater(-1, hours ^ " hour");
 		if (hours ne 1) {
 			text ^= "s";
 		}
 	}
 	if (minutes) {
-		text.r(-1, minutes ^ " min");
+		text.updater(-1, minutes ^ " min");
 		if (minutes ne 1) {
 			text ^= "s";
 		}
@@ -2572,23 +2572,23 @@ var ExodusProgramBase::elapsedtimetext(in timestamp1, in timestamp2) const {
 				}
 			}
 			if (secs) {
-				text.r(-1, secs ^ " sec");
+				text.updater(-1, secs ^ " sec");
 				if (secs ne 1) {
 					text ^= "s";
 				}
 			} else if (not minutes and not hours and not days and not weeks) {
 zero:
 				if (not text)
-					//text.r(-1, "< 1 ms");
+					//text.updater(-1, "< 1 ms");
 					text = "< 1 ms";
 			} else {
-				//text.r(-1, "exactly");
+				//text.updater(-1, "exactly");
 			}
 		} else {
 			if (not minutes and not hours and not days and not weeks) {
 				goto zero;
 			}
-			//text.r(3, "exactly");
+			//text.updater(3, "exactly");
 		}
 	}
 
@@ -2926,12 +2926,12 @@ void ExodusProgramBase::sortarray(io array, in fns, in orderby0) {
 
 	}	//vn;
 
-	array.r(sortfn, sorted);
+	array.updater(sortfn, sorted);
 
 	//put any parallel fields back into the original array
 	for (var fnn = 2; fnn <= nfns; ++fnn) {
 		fn = fns.f(1, fnn);
-		array.r(fn, newarray.f(fn));
+		array.updater(fn, newarray.f(fn));
 	}  //fnn;
 
 	return;
@@ -2961,7 +2961,7 @@ var ExodusProgramBase::invertarray(in input, in force0 /*=0*/) {
 			for (var vn = 1; vn <= maxnvs; ++vn) {
 				var cell = fieldx.field(VM, vn);
 				if (cell.len() or force) {
-					outx.r(vn, fn, cell);
+					outx.updater(vn, fn, cell);
 				}
 			}	//vn;
 		}

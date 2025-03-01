@@ -165,7 +165,7 @@ function onefile(in filename, in maxndifferences) {
 				break;
 
 			case 2:	 // r/replace
-				result = ARG0.pickreplace(ARG1, ARG2, ARG3, ARG4);
+				result = ARG0.update(ARG1, ARG2, ARG3, ARG4);
 				break;
 
 			case 3:	 //insert

@@ -43,7 +43,7 @@ namespace exo {
 
 // includes dim::split
 
-// and var::field,field2,locate,extract,remove,pickreplace,insert,substr,paste,remove
+// and var::field,field2,locate,extract,remove,update,insert,substr,paste,remove
 
 //////////////////////////////
 // REMOVE was PickOS "DELETE()"
@@ -53,7 +53,7 @@ namespace exo {
 #include "varremover.cpp"
 
 ///////////////////////////////////////////
-// PICKREPLACE int int int var
+// UPDATE int int int var
 ///////////////////////////////////////////
 
 #include "varreplacer.cpp"

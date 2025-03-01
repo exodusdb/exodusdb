@@ -169,7 +169,7 @@ function main() {
 
 				// Generate the new dat rec with the new source
 				var newdatrec = olddictrec;
-				newdatrec.r(8, newdictsrc);
+				newdatrec.updater(8, newdictsrc);
 
 				// Double escape literal "\n" -> "\\n"
 				newdatrec.replacer("\\n", "\\\\n");

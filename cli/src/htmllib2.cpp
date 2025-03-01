@@ -1000,7 +1000,7 @@ subroutine colrowspan(io colhdg, in thproperties, in nobase0, in basecurrcode) {
 				if (not((coln2 <= ncols2 and t3 == tt) and t3 != nocell)) break;
 				colspan += 1;
 				//colhdg(coln2, rown) = nocell;
-				pickreplacer(colhdg, coln2, rown, nocell);
+				updater(colhdg, coln2, rown, nocell);
 			}//loop;
 
 			//if usecols else t:=coldict(coln)<14>
@@ -1017,7 +1017,7 @@ subroutine colrowspan(io colhdg, in thproperties, in nobase0, in basecurrcode) {
 					if (not((rown2 <= nrows and ((t3 == tt or t3 == ""))) and t3 != nocell)) break;
 					rowspan += 1;
 					//colhdg(coln, rown2) = nocell;
-					pickreplacer(colhdg, coln, rown2, nocell);
+					updater(colhdg, coln, rown2, nocell);
 				}//loop;
 
 				if (rowspan > 1) {
@@ -1027,7 +1027,7 @@ subroutine colrowspan(io colhdg, in thproperties, in nobase0, in basecurrcode) {
 
 			t2 ^= ">" ^ tt ^ "</th>";
 			//colhdg(coln, rown) = t2;
-			pickreplacer(colhdg, coln, rown, t2);
+			updater(colhdg, coln, rown, t2);
 
 			coln += colspan - 1;
 
@@ -1157,10 +1157,10 @@ subroutine addunits(in a0, io bb, in sep) {
 						ndecs = bndecs;
 					}
 					if (anum.isnum() and bnum.isnum()) {
-						pickreplacer(bb, 1, bn, (bnum + anum).oconv("MD" ^ ndecs ^ "0P") ^ acode);
+						updater(bb, 1, bn, (bnum + anum).oconv("MD" ^ ndecs ^ "0P") ^ acode);
 					}
 				} else {
-					pickreplacer(bb, 1, bn, acode);
+					updater(bb, 1, bn, acode);
 				}
 				break;
 			}

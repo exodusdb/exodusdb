@@ -210,17 +210,13 @@ export namespace exo {
 	using exo::substr2;
 	using exo::split;
 	using exo::join;
-	using exo::pickreplace;
-	using exo::pickreplace;
-	using exo::pickreplace;
+	using exo::update;
 	using exo::extract;
 	using exo::insert;
 	using exo::insert;
 	using exo::insert;
 	using exo::remove;
-	using exo::pickreplacer;
-	using exo::pickreplacer;
-	using exo::pickreplacer;
+	using exo::updater;
 	using exo::inserter;
 	using exo::inserter;
 	using exo::inserter;
@@ -465,8 +461,6 @@ export namespace exo {
 	using exo::oswrite;
 	using exo::paste;
 	using exo::paster;
-	using exo::pickreplace;
-	using exo::pickreplacer;
 	using exo::pop;
 	using exo::popper;
 	using exo::prefix;

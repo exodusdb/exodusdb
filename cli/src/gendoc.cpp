@@ -519,7 +519,7 @@ function main() {
 					// .RE REturn (left shift)
 					// .fi formatting
 					// Prefix by a section title "Example:"
-					comments.replacer(backquoted, "\nExample:\n.RS\n.nf\n $1\n.fi\n.RE\n");
+					comments.replacer(backquoted, "\nExample:\n.RS\n.nf\n$1\n.fi\n.RE\n");
 				}
 				else if (wiki)
 					comments.replacer(backquoted, "<syntaxhighlight lang=\"c++\">\n$1</syntaxhighlight>");

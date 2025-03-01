@@ -325,20 +325,19 @@ public:
 	///// Dynamic array creation, access and update:
 	////////////////////////////////////////////////
 
-	// The literal suffix "_var" allows dynamic arrays to be seamlessly embedded in code using the visible equivalents of unprintable field mark characters.
-	//
-	// RM {backtick} Record mark
-	// FM ^ Field mark
-	// VM ] Value mark
-	// SM } Subvalue mark
-	// TM | Text mark
-	// ST ~ Subtext mark
+	// The literal suffix "_var" allows dynamic arrays to be seamlessly embedded in code using a predefined set of visible equivalents of unprintable field mark characters as follows:
+	// {backtick} = RM, Record mark
+	// ^ = FM, Field mark
+	// ] = VM, Value mark
+	// } = SM, Subvalue mark
+	// | = TM, Text mark
+	// ~ = ST, Subtext mark
 	//
 	// `var v1 = "f1^f2^v1]v2^f4"_var; // "f1" _FM "f2" _FM "v1" _VM "v2" _FM "f4"`
 	friend var  operator""_var(const char* cstr, std::size_t size);
 
 	template <class T>
-    // Create a dynamic array var from a list. C++ constrains list elements to be all the same type. var, string, double, int, etc.
+    // Create a dynamic array var from a list. C++ constrains list elements to be all the same type: var, string, double, int, etc. but they all end up as fields of a dynamic array string.
 	//
 	// `var v1 = {11, 22, 33}; // "11^22^33"_var`
 	CONSTEXPR var(std::initializer_list<T> list)
@@ -474,11 +473,11 @@ public:
 	*/
 
 	// Convert a number into a string after rounding it to a given number of decimal places.
+	// Trailing zeros are not omitted. A leading "0." is shown where appropriate.
+    // 0.5 always rounds away from zero. i.e. 1.5 -> 2 and -2.5 -> -3
 	// var: The number to be converted.
 	// ndecimals: Determines how many decimal places are shown to the right of the decimal point or, if ndecimals is negative, how many 0's to the left of it.
 	// Returns: A var containing an ASCII string of digits with a leading "-" if negative, and a decimal point "." if ndecimals is > 0.
-	// Trailing zeros are not omitted. A leading "0." is shown where appropriate.
-    // 0.5 always rounds away from zero. i.e. 1.5 -> 2 and -1.5 -> -2
 	// obj is varnum
 	//
     // `let v1 = var(0.295).round(2);  //  "0.30"
@@ -487,12 +486,11 @@ public:
 	//
     //  var v3 = var(-0.295).round(2); // "-0.30"
     //  // or
-    //  var v4 = round(-1.295, 2);     // "-1.30"`
+    //  var v4 = round(-1.295, 2);     // "-1.30"
 	//
-	//  var v4 = round(0, 1);           // "0.0";
-	//  var v5 = round(0, 0);           // "0";
-	//  var v6 = round(0, -1);          // "0";
-	//
+	//  var v5 = round(0, 1);           // "0.0"
+	//  var v6 = round(0, 0);           // "0"
+	//  var v7 = round(0, -1);          // "0"`
 	// Negative number of decimals rounds to the left of the decimal point
 	// `let v1 = round(123456.789,  0); // "123457"
 	//  let v2 = round(123456.789, -1); // "123460"
@@ -597,10 +595,10 @@ public:
 	// Checks if the var is an empty string.
 	// Returns: True if it is empty amd false if not.
 	// This is a shorthand and more expressive way of writing 'if (var == "")' or 'if (var.len() == 0)' or 'if (not var.len())'
-	// Note that 'if (var.empty())' is not the same as 'if (not var)' because 'if (var("0.0")' is defined as false because the string can be converted to a 0 which is always considered to be false. Compare thia with common scripting languages where 'if (var("0"))' is defined as true.
+	// Note that 'if (var.empty())' is not exactly the same as 'if (not var)' because 'if (var("0.0")' is also defined as false. If a string can be converted to 0 then it is considered to be false. Contrast this with common scripting languages where 'if (var("0"))' is defined to be true.
 	//
 	// `let v1 = "0";
-	//  if (not v1.empty()) ... ok /// true
+	//  if (not v1.empty()) ... ok // true
 	//  // or
 	//  if (not empty(v1)) ... ok // true`
 	ND bool empty() const;
@@ -1509,17 +1507,17 @@ public:
 	// This function hardly occurs anywhere in exodus code and should probably be renamed to
 	// something better. It was called replace() in Pick Basic but we are now using "replace()" to
 	// change substrings using regex (similar to the old Pick Basic replace function) its mutator function
-	// is .r()y
-	// Replaces a specific subvalue in a dynamic array. Normally one uses the r() function to replace in place.
+	// is .updater()
+	// Replaces a specific subvalue in a dynamic array. Normally one uses the updater() function to replace in place.
 
-	// Same as var.r() function but returns a new string instead of updating a variable in place.<br>Rarely used.
-	ND var  pickreplace(const int fieldno, const int valueno, const int subvalueno, in replacement) const&;
+	// Same as var.updater() function but returns a new string instead of updating a variable in place.<br>Rarely used.
+	ND var  update(const int fieldno, const int valueno, const int subvalueno, in replacement) const&;
 
 	// Ditto for a specific multivalue
-	ND var  pickreplace(const int fieldno, const int valueno, in replacement)                       const&;
+	ND var  update(const int fieldno, const int valueno, in replacement)                       const&;
 
 	// Ditto for a specific field
-	ND var  pickreplace(const int fieldno, in replacement)                                          const&;
+	ND var  update(const int fieldno, in replacement)                                          const&;
 
 	// INSERT
 
@@ -1541,9 +1539,9 @@ public:
 	// SAME AS ABOVE ON TEMPORARIES TO USE MUTATING (not documented because used difference in implementation is irrelevant to exodus users)
 	///////////////////////////////////////////////
 
-	ND io   pickreplace(const int fieldno, const int valueno, const int subvalueno, in replacement) && {this->r(fieldno, valueno, subvalueno, replacement); return *this;}
-	ND io   pickreplace(const int fieldno, const int valueno, in replacement)                       && {this->r(fieldno, valueno, 0, replacement); return *this;}
-	ND io   pickreplace(const int fieldno, in replacement)                                          && {this->r(fieldno, 0, 0, replacement); return *this;}
+	ND io   pickreplace(const int fieldno, const int valueno, const int subvalueno, in replacement) && {this->updater(fieldno, valueno, subvalueno, replacement); return *this;}
+	ND io   pickreplace(const int fieldno, const int valueno, in replacement)                       && {this->updater(fieldno, valueno, 0, replacement); return *this;}
+	ND io   pickreplace(const int fieldno, in replacement)                                          && {this->updater(fieldno, 0, 0, replacement); return *this;}
 
 	ND io   insert(const int fieldno, const int valueno, const int subvalueno, in insertion)        && {this->inserter(fieldno, valueno, subvalueno, insertion); return *this;}
 	ND io   insert(const int fieldno, const int valueno, in insertion)                              && {this->inserter(fieldno, valueno, 0, insertion); return *this;}
@@ -1589,31 +1587,44 @@ public:
 
 	// Mutable versions update lvalue vars and dont return anything so that they cannot be chained. This is to prevent accidental misuse and bugs.
 	//
-	// r() stands for "replacer" abbreviated due to high incidience in code.
-	// However the actual exodus replacer function has a different function replacing substrings, not fields, values and subvalues.
-	//
 	// Pick Basic
 	//   xyz<10> = "abc";
-	// becomes c++
-	//   xyz.r(10, "abc");
+	// becomes in exodus c++
+	//   xyz(10) = "abc";
+	// or
+	//   xyz.updater(10, "abc");
+	// or
+	//   updater(xyz, 10, "abc");
 
-	// Replaces a specific field in a dynamic array
+	// Replace a specific field in a dynamic array
 	//
 	// `var v1 = "f1^v1]v2}s2}s3^f3"_var;
-	//  v1.r(2, "X"); // "f1^X^f3"_var`
-	   IO   r(const int fieldno, in replacement) REF {this->r(fieldno, 0, 0, replacement); return THIS;}
+	//  v1.updater(2, "X"); // "f1^X^f3"_var
+	//  // or
+	//  v1(2) = "X"; /// Easiest.
+	//  // or
+	//  updater(v1, 2, "X");`
+	   IO   updater(const int fieldno, in replacement) REF {this->updater(fieldno, 0, 0, replacement); return THIS;}
 
-	// Ditto for specific value in a specific field.
+	// Replace a specific value of a specific field in a dynamic array.
 	//
 	// `var v1 = "f1^v1]v2}s2}s3^f3"_var;
-	//  v1.r(2, 2, "X"); // "f1^v1]X^f3"_var`
-	   IO   r(const int fieldno, const int valueno, in replacement) REF {this->r(fieldno, valueno, 0, replacement); return THIS;}
+	//  v1.updater(2, 2, "X"); // "f1^v1]X^f3"_var
+	//  // or
+	//  v1(2, 2) = "X"; /// Easiest.
+	//  // or
+	//  updater(v1, 2, 2, "X");`
+	   IO   updater(const int fieldno, const int valueno, in replacement) REF {this->updater(fieldno, valueno, 0, replacement); return THIS;}
 
-	// Ditto for a specific subvalue in a specific value of a specific field
+	// Replace a specific subvalue of a specific value of a specific field in a dynamic array.
 	//
 	// `var v1 = "f1^v1]v2}s2}s3^f3"_var;
-	//  v1.r(2, 2, 2, "X"); // "f1^v1]v2}X}s3^f3"_var`
-	   IO   r(const int fieldno, const int valueno, const int subvalueno, in replacement) REF;
+	//  v1.updater(2, 2, 2, "X"); // "f1^v1]v2}X}s3^f3"_var
+	//  // or
+	//  v1(2, 2, 2) = "X"; /// Easiest.
+	//  // or
+	//  updater(v1, 2, 2, 2, "X");`
+	   IO   updater(const int fieldno, const int valueno, const int subvalueno, in replacement) REF;
 
 	// Insert a specific field in a dynamic array, moving all other fields up.
 	//
@@ -3728,7 +3739,7 @@ class PUBLIC var_proxy1 {
 	//  x<-1>    = y // Append a field
 	//
 	void operator=(in replacement) {
-		var_.r(fn_, replacement);
+		var_.updater(fn_, replacement);
 	}
 
 	void operator=(var_proxy1 rhs);
@@ -3736,11 +3747,11 @@ class PUBLIC var_proxy1 {
 	void operator=(var_proxy3 rhs);
 
 //	void operator=(var_proxy2 rhs) {
-//		var_.r(fn_, var(rhs));
+//		var_.updater(fn_, var(rhs));
 //	}
 //
 //	void operator=(var_proxy3 rhs) {
-//		var_.r(fn_, var(rhs));
+//		var_.updater(fn_, var(rhs));
 //	}
 
 	// Operator bool
@@ -3793,7 +3804,7 @@ class PUBLIC var_proxy2 {
 	}
 
 	void operator=(in replacement) {
-		var_.r(fn_, vn_, replacement);
+		var_.updater(fn_, vn_, replacement);
 	}
 
 	void operator=(var_proxy1 rhs);
@@ -3837,7 +3848,7 @@ class PUBLIC var_proxy3 {
 	}
 
 	void operator=(in replacement) {
-		var_.r(fn_, vn_, sn_, replacement);
+		var_.updater(fn_, vn_, sn_, replacement);
 	}
 
 	void operator=(var_proxy1 rhs);
@@ -3862,17 +3873,17 @@ ND inline var_proxy1 var::operator()(int fieldno) {return var_proxy1(*this, fiel
 ND inline var_proxy2 var::operator()(int fieldno, int valueno) {return var_proxy2(*this, fieldno, valueno);}
 ND inline var_proxy3 var::operator()(int fieldno, int valueno, int subvalueno) {return var_proxy3(*this, fieldno, valueno, subvalueno);}
 
-   inline void var_proxy1::operator=(var_proxy1 rhs) {var_.r(fn_, var(rhs));}
-   inline void var_proxy1::operator=(var_proxy2 rhs) {var_.r(fn_, var(rhs));}
-   inline void var_proxy1::operator=(var_proxy3 rhs) {var_.r(fn_, var(rhs));}
+   inline void var_proxy1::operator=(var_proxy1 rhs) {var_.updater(fn_, var(rhs));}
+   inline void var_proxy1::operator=(var_proxy2 rhs) {var_.updater(fn_, var(rhs));}
+   inline void var_proxy1::operator=(var_proxy3 rhs) {var_.updater(fn_, var(rhs));}
 
-   inline void var_proxy2::operator=(var_proxy1 rhs) {var_.r(fn_, vn_, var(rhs));}
-   inline void var_proxy2::operator=(var_proxy2 rhs) {var_.r(fn_, vn_, var(rhs));}
-   inline void var_proxy2::operator=(var_proxy3 rhs) {var_.r(fn_, vn_, var(rhs));}
+   inline void var_proxy2::operator=(var_proxy1 rhs) {var_.updater(fn_, vn_, var(rhs));}
+   inline void var_proxy2::operator=(var_proxy2 rhs) {var_.updater(fn_, vn_, var(rhs));}
+   inline void var_proxy2::operator=(var_proxy3 rhs) {var_.updater(fn_, vn_, var(rhs));}
 
-   inline void var_proxy3::operator=(var_proxy1 rhs) {var_.r(fn_, vn_, sn_, var(rhs));}
-   inline void var_proxy3::operator=(var_proxy2 rhs) {var_.r(fn_, vn_, sn_, var(rhs));}
-   inline void var_proxy3::operator=(var_proxy3 rhs) {var_.r(fn_, vn_, sn_, var(rhs));}
+   inline void var_proxy3::operator=(var_proxy1 rhs) {var_.updater(fn_, vn_, sn_, var(rhs));}
+   inline void var_proxy3::operator=(var_proxy2 rhs) {var_.updater(fn_, vn_, sn_, var(rhs));}
+   inline void var_proxy3::operator=(var_proxy3 rhs) {var_.updater(fn_, vn_, sn_, var(rhs));}
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wexit-time-destructors"

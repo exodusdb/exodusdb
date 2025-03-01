@@ -209,7 +209,7 @@ function main() {
 				//var reply=inputl();
 				let reply = "Y";
 
-				let newrecord = fieldno ? RECORD.pickreplace(fieldno, text2) : text2;
+				let newrecord = fieldno ? RECORD.update(fieldno, text2) : text2;
 
 				//keep trying to update - perhaps futilely
 				//at least temp osfile will be left in the directory

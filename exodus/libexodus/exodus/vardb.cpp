@@ -1043,10 +1043,10 @@ bool var::connect(in conninfo) {
 	if (!this->assigned())
 		(*this) = "";
 //	if (not this->f(1))
-		//this->r(1,fullconninfo.field(" ",1));
-		this->r(1,fullconninfo.field("dbname=", -1).field(" ", 1));
-	this->r(2, dbconn_no);
-	this->r(3, dbconn_no);
+		//this->updater(1,fullconninfo.field(" ",1));
+		this->updater(1,fullconninfo.field("dbname=", -1).field(" ", 1));
+	this->updater(2, dbconn_no);
+	this->updater(3, dbconn_no);
 
 	if (DBTRACE_CONN) {
 		//fullconninfo.regex_replace(R"(password\s*=\s*\w*)", "password=**********").logputl("var::connect() OK ");
@@ -3469,7 +3469,7 @@ bool var::selectx(in fieldnames, in sortselectclause) {
 	//prepare to save calculated fields that cannot be calculated by postgresql for secondary processing
 	var calc_fields = "";
 	//var ncalc_fields=0;
-	this->r(10, "");
+	this->updater(10, "");
 
 	//catch bad FM character
 	if (sortselectclause.var_str.find(FM_) != std::string::npos) UNLIKELY {
@@ -4525,7 +4525,7 @@ bool var::selectx(in fieldnames, in sortselectclause) {
 	if (not this->f(2) || actualfilename.lcase().starts("dict.")) {
 		var actualfile;
 		if (actualfile.open(actualfilename))
-			this->r(2, actualfile.f(2));
+			this->updater(2, actualfile.f(2));
 		//TRACE(actualfile)
 	}
 	//TRACE(*this)
@@ -4673,7 +4673,7 @@ bool var::selectx(in fieldnames, in sortselectclause) {
 	if (calc_fields) {
 		//calc_fields.r(5, dictfilename.lower());
 		//calc_fields.r(6, maxnrecs);
-		//this->r(10, calc_fields.lower());
+		//this->updater(10, calc_fields.lower());
 		calc_fields(5) = dictfilename.lower();
 		calc_fields(6) = maxnrecs;
 		(*this)(10) = calc_fields.lower();
@@ -4697,10 +4697,10 @@ void var::clearselect() {
 	//3/4/5/6 setup in selectkeys. cleared in clearselect
 	//if (this->f(3) == "%SELECTKEYS%")
 	{
-		this->r(6, "");
-		this->r(5, "");
-		this->r(4, "");
-		this->r(3, "");
+		this->updater(6, "");
+		this->updater(5, "");
+		this->updater(4, "");
+		this->updater(3, "");
 		//		return;
 	}
 
@@ -5051,18 +5051,18 @@ bool var::getlist(SV listname) {
 		return false;
 
 	// provide first block of keys for readnext
-	this->r(3, listname);
+	this->updater(3, listname);
 
 	// list number for readnext to get next block of keys from lists file
 	// suffix for first block is nothing (not *1) and then *2, *3 etc
-	this->r(4, 1);
+	this->updater(4, 1);
 
 	// key pointer for readnext to remove next key from the block of keys
-	this->r(5, 0);
+	this->updater(5, 0);
 
 	// keys separated by vm. each key may be followed by a sm and the mv no for readnext
 	keys.lowerer();
-	this->r(6, keys);
+	this->updater(6, keys);
 
 	return true;
 }
@@ -5152,17 +5152,17 @@ bool var::selectkeys(in keys) {
 	// listid in the lists file must be set for readnext to work, but not exist in the file
 	// readnext will look for %SELECTKEYS%*2 in the lists file when it reaches the end of the
 	// block of keys provided and must not find it
-	this->r(3, "%SELECTKEYS%");
+	this->updater(3, "%SELECTKEYS%");
 
 	// list number for readnext to get next block of keys from lists file
 	// suffix for first block is nothing (not *1) and then *2, *3 etc
-	this->r(4, 1);
+	this->updater(4, 1);
 
 	// key pointer for readnext to find next key from the block of keys
-	this->r(5, 0);
+	this->updater(5, 0);
 
 	// keys separated by vm. each key may be followed by a sm and the mv no for readnext
-	this->r(6, keys.lower());
+	this->updater(6, keys.lower());
 
 	return true;
 }
@@ -5213,16 +5213,16 @@ bool var::hasnext() {
 		if (!block.read(lists, listid)) {
 
 			//clear the listid
-			this->r(3, "");
+			this->updater(3, "");
 
 			return false;
 		}
 
 		// might as well cache the next block for the next readnext
-		this->r(4, listno);
-		this->r(5, 0);
+		this->updater(4, listno);
+		this->updater(5, 0);
 		block.lowerer();
-		this->r(6, block);
+		this->updater(6, block);
 
 		return true;
 	}
@@ -5318,10 +5318,10 @@ bool var::readnext(io record, io key, io valueno) {
 
 				// selectkeys provides one block of keys and nothing in the lists file
 				if (listid == "%SELECTKEYS%") UNLIKELY {
-					this->r(3, "");
-					this->r(4, "");
-					this->r(5, "");
-					this->r(6, "");
+					this->updater(3, "");
+					this->updater(4, "");
+					this->updater(5, "");
+					this->updater(6, "");
 					return false;
 				}
 
@@ -5341,20 +5341,20 @@ bool var::readnext(io record, io key, io valueno) {
 				if (!block.read(lists, listid)) {
 
 					//clear the listid
-					this->r(3, "");
+					this->updater(3, "");
 
 					return false;
 				}
 
-				this->r(4, listno);
-				this->r(5, 0);
+				this->updater(4, listno);
+				this->updater(5, 0);
 				block.lowerer();
-				this->r(6, block);
+				this->updater(6, block);
 				continue;
 			}
 
 			// bump up the key no pointer
-			this->r(5, keyno);
+			this->updater(5, keyno);
 
 			// extract and return the key (and mv if present)
 			key = key_and_mv.f(1, 1, 1);

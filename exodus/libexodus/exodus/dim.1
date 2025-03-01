@@ -135,7 +135,7 @@ In either case, all elements of the array are updated.
 \fBExample:\fR
 .RS
 .nf
- dim d1;
+dim d1;
 d1.splitter("f1^f2^f3"_var); // d1.rows() -> 3
 //
 dim d2(10);
@@ -206,7 +206,7 @@ Each element in the array becomes a separate field in the db record. Any redunda
 \fBExample:\fR
 .RS
 .nf
- dim d1 = "Client GD^G^20855^30000^1001.00^20855.76539"_var.split();
+dim d1 = "Client GD^G^20855^30000^1001.00^20855.76539"_var.split();
 let file = "xo_clients", key = "GD001";
 if (not deleterecord("xo_clients", "GD001")) {}; // Cleanup first
 d1.write(file, key);
@@ -234,7 +234,7 @@ If the array is not predimensioned (rows and cols = 0) then it will be dimension
 \fBExample:\fR
 .RS
 .nf
- dim d1(10);
+dim d1(10);
 let file = "xo_clients", key = "GD001";
 if (not d1.read(file, key)) ... // d1.join() -> "Client GD^G^20855^30000^1001.00^20855.76539"_var
 // or
@@ -264,7 +264,7 @@ Any existing os file is overwritten and replaced.
 \fBExample:\fR
 .RS
 .nf
- dim d1 = "aaa=1\\nbbb=2\\nccc=3\\n"_var.split("\\n");
+dim d1 = "aaa=1\\nbbb=2\\nccc=3\\n"_var.split("\\n");
 if (not osremove("xo_conf.txt")) {}; // Cleanup first
 let osfilename = "xo_conf.txt";
 if (not d1.oswrite(osfilename)) ...
@@ -292,7 +292,7 @@ If the first \\n in the file is \\r\\n then the whole file will be split using \
 \fBExample:\fR
 .RS
 .nf
- dim d1;
+dim d1;
 let osfilename = "xo_conf.txt";
 if (not d1.osread(osfilename)) ... // d1.join("\\n") -> "aaa=1\\nbbb=2\\nccc=3\\n"_var0
 // or

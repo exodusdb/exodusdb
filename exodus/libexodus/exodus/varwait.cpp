@@ -76,31 +76,31 @@ static var handle_events(int inotify_fd, int* wd, const int argc, const char* ar
 
 			//printf("Print event type\n");
 			if (event->mask & IN_OPEN)
-				events.r(1, "IN_OPEN");
+				events.updater(1, "IN_OPEN");
 			else if (event->mask & IN_CLOSE_WRITE)
-				events.r(1, eventn, "IN_CLOSE_WRITE");
+				events.updater(1, eventn, "IN_CLOSE_WRITE");
 			else if (event->mask & IN_ACCESS)
-				events.r(1, eventn, "IN_ACCESS");  //Data was read from file.");
+				events.updater(1, eventn, "IN_ACCESS");  //Data was read from file.");
 			else if (event->mask & IN_MODIFY)
-				events.r(1, eventn, "IN_MODIFY");  //Data was written to file.");
+				events.updater(1, eventn, "IN_MODIFY");  //Data was written to file.");
 			else if (event->mask & IN_ATTRIB)
-				events.r(1, eventn, "IN_ATTRIB");  //File attributes changed.");
+				events.updater(1, eventn, "IN_ATTRIB");  //File attributes changed.");
 			else if (event->mask & IN_CLOSE)
-				events.r(1, eventn, "IN_CLOSE");  //File was closed (read or write).");
+				events.updater(1, eventn, "IN_CLOSE");  //File was closed (read or write).");
 			else if (event->mask & IN_MOVED_FROM)
-				events.r(1, eventn, "IN_MOVED_FROM");  //File was moved away from watched directory.");
+				events.updater(1, eventn, "IN_MOVED_FROM");  //File was moved away from watched directory.");
 			else if (event->mask & IN_MOVED_TO)
-				events.r(1, eventn, "IN_MOVED_TO");	 //File was moved into watched directory.");
+				events.updater(1, eventn, "IN_MOVED_TO");	 //File was moved into watched directory.");
 			else if (event->mask & IN_MOVE)
-				events.r(1, eventn, "IN_MOVE");	 //File was moved (in or out of directory).");
+				events.updater(1, eventn, "IN_MOVE");	 //File was moved (in or out of directory).");
 			else if (event->mask & IN_CREATE)
-				events.r(1, eventn, "IN_CREATE");  //A file was created in the directory.");
+				events.updater(1, eventn, "IN_CREATE");  //A file was created in the directory.");
 			else if (event->mask & IN_DELETE)
-				events.r(1, eventn, "IN_DELETE");  //A file was deleted from the directory.");
+				events.updater(1, eventn, "IN_DELETE");  //A file was deleted from the directory.");
 			else if (event->mask & IN_DELETE_SELF)
-				events.r(1, eventn, "IN_DELETE_SELF");	//Directory or file under observation was deleted.");
+				events.updater(1, eventn, "IN_DELETE_SELF");	//Directory or file under observation was deleted.");
 			else if (event->mask & IN_MOVE_SELF)
-				events.r(1, eventn, "IN_MOVE_SELF");  //Directory or file under observation was moved.");
+				events.updater(1, eventn, "IN_MOVE_SELF");  //Directory or file under observation was moved.");
 			else
 				continue;
 
@@ -113,20 +113,20 @@ static var handle_events(int inotify_fd, int* wd, const int argc, const char* ar
 			// The name of the watched directory
 			for (i = 1; i < argc; ++i) {
 				if (wd[i] == event->wd) {
-					events.r(2, eventn, argv[i]);
+					events.updater(2, eventn, argv[i]);
 					break;
 				}
 			}
 
 			// The name of the file
 			if (event->len)
-				events.r(3, eventn, event->name);
+				events.updater(3, eventn, event->name);
 
 			//The type of filesystem object
 			if (event->mask & IN_ISDIR)
-				events.r(4, eventn, "d");
+				events.updater(4, eventn, "d");
 			else
-				events.r(4, eventn, "f");
+				events.updater(4, eventn, "f");
 		}
 
 		//if (events)

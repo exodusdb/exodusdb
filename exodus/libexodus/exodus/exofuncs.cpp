@@ -340,9 +340,9 @@ ND PUBLIC var  substr2(in fromstr, io startindex, io delimiterno) {return fromst
 ND PUBLIC dim split(in sourcevar, SV delimiter /*=_FM*/) {return sourcevar.split(delimiter);}
 ND PUBLIC var  join(const dim& sourcedim, SV delimiter /*=_FM*/) {return sourcedim.join(delimiter);}
 
-ND PUBLIC var  pickreplace(in instring, const int fieldno, const int valueno, const int subvalueno, in replacement) {return instring.pickreplace(fieldno, valueno, subvalueno, replacement);}
-ND PUBLIC var  pickreplace(in instring, const int fieldno, const int valueno, in replacement) {return instring.pickreplace(fieldno, valueno, replacement);}
-ND PUBLIC var  pickreplace(in instring, const int fieldno, in replacement) {return instring.pickreplace(fieldno, replacement);}
+ND PUBLIC var  update(in instring, const int fieldno, const int valueno, const int subvalueno, in replacement) {return instring.update(fieldno, valueno, subvalueno, replacement);}
+ND PUBLIC var  update(in instring, const int fieldno, const int valueno, in replacement) {return instring.update(fieldno, valueno, replacement);}
+ND PUBLIC var  update(in instring, const int fieldno, in replacement) {return instring.update(fieldno, replacement);}
 
 ND PUBLIC var  extract(in instring, const int fieldno /*=0*/, const int valueno /*=0*/, const int subvalueno /*=0*/) {return instring.f(fieldno, valueno, subvalueno);}
 
@@ -352,9 +352,9 @@ ND PUBLIC var  insert(in instring, const int fieldno, in insertion) {return inst
 
 ND PUBLIC var  remove(in instring, const int fieldno, const int valueno /*=0*/, const int subvalueno /*=0*/) {return instring.remove(fieldno, valueno, subvalueno);}
 
-   PUBLIC IO   pickreplacer(io iostring, const int fieldno, const int valueno, const int subvalueno, in replacement) {iostring.r(fieldno, valueno, subvalueno, replacement); return IOSTRING;}
-   PUBLIC IO   pickreplacer(io iostring, const int fieldno, const int valueno, in replacement) {iostring.r(fieldno, valueno, replacement); return IOSTRING;}
-   PUBLIC IO   pickreplacer(io iostring, const int fieldno, in replacement) {iostring.r(fieldno, replacement); return IOSTRING;}
+   PUBLIC IO   updater(io iostring, const int fieldno, const int valueno, const int subvalueno, in replacement) {iostring.updater(fieldno, valueno, subvalueno, replacement); return IOSTRING;}
+   PUBLIC IO   updater(io iostring, const int fieldno, const int valueno, in replacement) {iostring.updater(fieldno, valueno, replacement); return IOSTRING;}
+   PUBLIC IO   updater(io iostring, const int fieldno, in replacement) {iostring.updater(fieldno, replacement); return IOSTRING;}
 
    PUBLIC IO   inserter(io iostring, const int fieldno, const int valueno, const int subvalueno, in insertion) {iostring.inserter(fieldno, valueno, subvalueno, insertion); return IOSTRING;}
    PUBLIC IO   inserter(io iostring, const int fieldno, const int valueno, in insertion) {iostring.inserter(fieldno, valueno, insertion); return IOSTRING;}

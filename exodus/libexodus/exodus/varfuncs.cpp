@@ -616,13 +616,14 @@ template<> PUBLIC const std::string& VARBASE1::toString() const& {
 	return var_str;
 }
 
-//////////////
-// PICKREPLACE
-//////////////
+/////////
+// UPDATE
+/////////
 
-var  var::pickreplace(const int fieldno, const int valueno, const int subvalueno, in replacement) const& {var nrvo = this->clone(); nrvo.r(fieldno, valueno, subvalueno, replacement); return nrvo;}
-var  var::pickreplace(const int fieldno, const int valueno, in replacement)                       const& {var nrvo = this->clone(); nrvo.r(fieldno, valueno, 0, replacement); return nrvo;}
-var  var::pickreplace(const int fieldno, in replacement)                                          const& {var nrvo = this->clone(); nrvo.r(fieldno, 0, 0, replacement); return nrvo;}
+/// update() was replace() in Pick Basic
+var  var::update(const int fieldno, const int valueno, const int subvalueno, in replacement) const& {var nrvo = this->clone(); nrvo.updater(fieldno, valueno, subvalueno, replacement); return nrvo;}
+var  var::update(const int fieldno, const int valueno, in replacement)                       const& {var nrvo = this->clone(); nrvo.updater(fieldno, valueno, 0, replacement); return nrvo;}
+var  var::update(const int fieldno, in replacement)                                          const& {var nrvo = this->clone(); nrvo.updater(fieldno, 0, 0, replacement); return nrvo;}
 
 /////////
 // INSERT
