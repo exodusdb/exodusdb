@@ -1,0 +1,337 @@
+
+
+	<!-- highlight.js for c++ syntax highlighting -->
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/cpp.min.js"></script>
+	<!-- done below <script>hljs.highlightAll();</script> -->
+
+<style>
+
+/* Change highlight.js comments from default grey to green */
+.hljs-comment,
+.hljs-quote {
+	color: #008000; /* This is green, you can adjust the shade as per your preference */
+	font-style: italic; /* Optional: You might want to keep comments italicized */
+}
+
+</style>
+
+<script>
+	//// Extend C++ language definition
+	//const cppLanguage = hljs.getLanguage('cpp');
+	//if (cppLanguage) {
+	//	// Adding custom keywords
+	//	cppLanguage.keywords = {
+	//		...cppLanguage.keywords,
+	//		keyword: cppLanguage.keywords.keyword + ' round chr textchr',
+	//		// You can also add to other categories like 'literal', 'built_in', etc.
+	//	};
+	//	// Register the modified language
+	//	hljs.registerLanguage('cpp', cppLanguage);
+	//}
+
+	// Initialize highlight.js
+	document.addEventListener('DOMContentLoaded', (event) => {
+	    hljs.highlightAll();
+	});
+</script>
+
+
+
+	<!-- bootstrap css. Is this necessary? -->
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+
+<style>
+
+body {
+	margin: 10px;
+}
+
+pre {
+	margin: 0px;
+	white-space: pre-wrap;
+	word-wrap: break-word;
+	white-space: -moz-pre-wrap;
+	white-space: -pre-wrap;
+	white-space: -o-pre-wrap;
+	overflow-wrap: break-word;
+	overflow-x: auto;
+}
+
+table, th, td {
+	border: 1px solid #a2a9b1;
+}
+
+th {
+	background-color: #eaecf0;
+	font-weight: bold;
+	text-align: left;
+	padding: 8px;
+}
+
+td {
+	padding: 0.2em 0.4em;
+	vertical-align: top;
+}
+
+p {
+  margin: 0.4em 0 0.5em 0;
+}
+
+.toc, .toccolours {
+	border: 1px solid #a2a9b1;
+	background-color: #f8f9fa;
+	padding: 5px;
+	font-size: 95%;
+}
+.toc {
+	display: table;
+	padding: 7px;
+}
+
+.wikitable {
+	background-color: #f8f9fa;
+	color: #202122;
+	margin: 1em 0;
+	border: 1px solid #a2a9b1;
+	border-collapse: collapse;
+}
+    img {
+        border: 0;
+        vertical-align: middle
+    }
+
+    hr {
+        height: 1px;
+        background-color: #a2a9b1;
+        border: 0;
+        margin: 0.2em 0
+    }
+
+    h1,h2,h3,h4,h5,h6 {
+        color: #000;
+        margin: 0;
+        padding-top: 0.5em;
+        padding-bottom: 0.17em;
+        overflow: hidden
+    }
+
+    h1,h2 {
+        margin-bottom: 0.6em;
+        border-bottom: 1px solid #a2a9b1
+    }
+
+    h3,h4,h5 {
+        margin-bottom: 0.3em
+    }
+
+    h1 {
+        font-size: 188%;
+        font-weight: normal
+    }
+
+    h2 {
+        font-size: 150%;
+        font-weight: normal
+    }
+
+    h3 {
+        font-size: 128%
+    }
+
+    h4 {
+        font-size: 116%
+    }
+
+    h5 {
+        font-size: 108%
+    }
+
+    h6 {
+        font-size: 100%
+    }
+
+    p {
+        margin: 0.4em 0 0.5em 0
+    }
+
+    p img {
+        margin: 0
+    }
+
+    ul {
+        margin: 0.3em 0 0 1.6em;
+        padding: 0
+    }
+
+    ol {
+        margin: 0.3em 0 0 3.2em;
+        padding: 0;
+        list-style-image: none
+    }
+
+    li {
+        margin-bottom: 0.1em
+    }
+
+    dt {
+        font-weight: bold;
+        margin-bottom: 0.1em
+    }
+
+    dl {
+        margin-top: 0.2em;
+        margin-bottom: 0.5em
+    }
+
+    dd {
+        margin-left: 1.6em;
+        margin-bottom: 0.1em
+    }
+
+.gendoc_function {
+    color: #800;
+    font-weight: 700;
+}
+
+</style>
+
+
+<div class=toc>
+<h4>Contents:</h4>
+<ol>
+<li><a href=#Dim_>Dim </a></li>
+<li><a href=#Dimensioned_Array_Construction_>Dimensioned Array Construction </a></li>
+<li><a href=#Array_Access>Array Access</a></li>
+<li><a href=#Array_Mutation>Array Mutation</a></li>
+<li><a href=#Array_Conversion>Array Conversion</a></li>
+<li><a href=#Array_DB_I/O>Array DB I/O</a></li>
+<li><a href=#Array_OS_I/O>Array OS I/O</a></li>
+
+</ol>
+</div>
+
+
+<h4 id=Dim_>Dim </h4>
+
+<table class=wikitable>
+<tr> <th>Use</th> <th>Function</th> <th>Description</th> </tr>
+</table>
+<h5 id=Dimensioned_Array_Construction_>Dimensioned Array Construction </h5>
+
+<table class=wikitable>
+<tr> <th>Use</th> <th>Function</th> <th>Description</th> </tr>
+<tr><td></td><td>dim d1;</td><td>Create an dimensioned array of vars pending actual dimensions.</td></tr>
+<tr><td></td><td>dim d1(nrows, ncols = 1);</td><td>Create an array of vars with a fixed number of columns and rows. All vars are unassigned.</td></tr>
+<tr><td></td><td>dim d1 = d2; // Copy</td><td>Create a copy of an array.</td></tr>
+<tr><td></td><td>dim d1 = dim(); // Move</td><td>Save an array created elsewhere.</td></tr>
+<tr><td></td><td>dim d1 = {"a", "b", "c" ...}; // Initializer list</td><td>Create an array from a list. All elements must be the same type. var, string, double, int, etc..</td></tr>
+<tr><td></td><td>dim d1 = v1;</td><td>Initialise all elements of an array to some single value or constant. A var, "", 0 etc.</td></tr>
+<tr><td></td><td>d1.redim(nrows, ncols = 1)</td><td>Resize an array to a different number of rows and columns.</p>
+Existing data will be retained as far as possible. Any additional elements are unassigned.</p>
+Resizing rows to 0 clears all data.</p>
+Resizing cols to 0 clears all data and changes its status to "undimensioned".</td></tr>
+<tr><td></td><td>d1.swap(d2) </td><td>Swap one array with another.</p>
+Either or both may be undimensioned.</td></tr>
+</table>
+<h5 id=Array_Access>Array Access</h5>
+
+<table class=wikitable>
+<tr> <th>Use</th> <th>Function</th> <th>Description</th> </tr>
+<tr><td></td><td>var v1 = d1[rowno];</br>d1[rowno] = v1;</td><td>Access and update elements of a one dimensional array using [] brackets</td></tr>
+<tr><td></td><td>var v1 = d1[rowno, colno];</br>d1[rowno, colno] = v1;</td><td>Access and update elements of an two dimensional array using [] brackets</td></tr>
+<tr><td>var=</td><td>d1.rows()</td><td>Get the number of rows in the dimensioned array</p>
+<em>Returns:</em> A count. Can be zero, indicating an empty array.</td></tr>
+<tr><td>var=</td><td>d1.cols()</td><td>Get the number of columns in the dimensioned array</p>
+<em>Returns:</em> A count.  0 if the array is undimensioned.</td></tr>
+<tr><td>var=</td><td>d1.join(delimiter = FM)</td><td>Joins all elements into a single delimited string</p>
+<em>Returns:</em> A string var.</td></tr>
+</table>
+<h5 id=Array_Mutation>Array Mutation</h5>
+
+<table class=wikitable>
+<tr> <th>Use</th> <th>Function</th> <th>Description</th> </tr>
+<tr><td></td><td>d1.splitter(str1, delimiter = FM)</td><td>Creates or updates the array from a given string.</p>
+If the dim array has not been dimensioned (nrows and ncols are 0), it will be dimensioned with the number of elements that the string has fields.</p>
+If the dim array has already been dimensioned, and has more elements than there are fields in the string, the excess array elements are initialised to "". If the record has more fields than there are elements in the array, the excess fields are all left unsplit in the final element of the array.</p>
+Predimensioning arrays allows efficient reuse of arrays in loops.</p>
+In either case, all elements of the array are updated.
+
+<pre><code class='hljs-ncdecl language-javascript'>dim d1;
+d1.splitter("f1^f2^f3"_var); // d1.rows() -> 3
+//
+dim d2(10);
+d2.splitter("f1^f2^f3"_var); // d2.rows() -> 10</code></pre>
+</td></tr>
+<tr><td></td><td>d1.sorter(reverse = false)</td><td>Sort the elements of the array. In place.</p>
+<em>reverse:</em> Defaults to false. If true, then the order is reversed.</td></tr>
+<tr><td></td><td>d1.reverser()</td><td>Reverse the elements of the array. In place.</td></tr>
+<tr><td></td><td>d1.shuffler()</td><td>Randomly shuffle the order of the elements of the array. In place.</td></tr>
+</table>
+<h5 id=Array_Conversion>Array Conversion</h5>
+
+<table class=wikitable>
+<tr> <th>Use</th> <th>Function</th> <th>Description</th> </tr>
+<tr><td>dim=</td><td>d1.sort(reverse = false)</td><td>Same as sorter() but returns a new array leaving the original untouched.</td></tr>
+<tr><td>dim=</td><td>d1.reverse()</td><td>Same as reverser() but returns a new array leaving the original untouched.</td></tr>
+<tr><td>dim=</td><td>d1.shuffle()</td><td>Same as shuffler() but returns a new array leaving the original untouched.</td></tr>
+</table>
+<h5 id=Array_DB_I/O>Array DB I/O</h5>
+
+<table class=wikitable>
+<tr> <th>Use</th> <th>Function</th> <th>Description</th> </tr>
+<tr><td></td><td>d1.write(dbfile, key)</td><td>Writes a db file record created from an array.</p>
+Each element in the array becomes a separate field in the db record. Any redundant trailing FMs are suppressed.
+
+<pre><code class='hljs-ncdecl language-javascript'>dim d1 = "Client GD^G^20855^30000^1001.00^20855.76539"_var.split();
+let file = "xo_clients", key = "GD001";
+if (not deleterecord("xo_clients", "GD001")) {}; // Cleanup first
+d1.write(file, key);
+// or
+write(d1 on file, key);</code></pre>
+</td></tr>
+<tr><td>if</td><td>d1.read(dbfile, key)</td><td>Read a db file record into an array.</p>
+Each field in the database record becomes a single element in the array.</p>
+<em>Returns:</em> True if the record exists or false if not,</p>
+If the array is predimensioned then any excess array elements are initialised to "" and any excess record fields are left unsplit in the final array element. See dim splitter for more info.</p>
+If the array is not predimensioned (rows and cols = 0) then it will be dimensioned to have exactly the same number of rows as there are fields in the record being read.
+
+<pre><code class='hljs-ncdecl language-javascript'>dim d1(10);
+let file = "xo_clients", key = "GD001";
+if (not d1.read(file, key)) ... // d1.join() -> "Client GD^G^20855^30000^1001.00^20855.76539"_var
+// or
+if (not read(d1 from file, key)) ...</code></pre>
+</td></tr>
+</table>
+<h5 id=Array_OS_I/O>Array OS I/O</h5>
+
+<table class=wikitable>
+<tr> <th>Use</th> <th>Function</th> <th>Description</th> </tr>
+<tr><td>if</td><td>d1.oswrite(osfilename, codepage = "")</td><td>Creates an entire os text file from an array</p>
+Each element of the array becomes one line in the os file delimited by \n</p>
+Any existing os file is overwritten and replaced.</p>
+<em>codepage:</em> Optional: Data is converted from UTF8 to the required codepage/encoding before output. If the conversion cannot be performed then return false.</p>
+<em>Returns:</em> True if successful or false if not.
+
+<pre><code class='hljs-ncdecl language-javascript'>dim d1 = "aaa=1\nbbb=2\nccc=3\n"_var.split("\n");
+if (not osremove("xo_conf.txt")) {}; // Cleanup first
+let osfilename = "xo_conf.txt";
+if (not d1.oswrite(osfilename)) ...
+// or
+if (not oswrite(d1 on osfilename)) ...</code></pre>
+</td></tr>
+<tr><td>if</td><td>d1.osread(osfilename, codepage = "")</td><td>Read an entire os text file into an array.</p>
+Each line in the os file, delimited by \n or \r\n, becomes a separate element in the array.</p>
+<em>codepage:</em> Optional. Data will be converted from the specified codepage/encoding to UTF8 after being read. If the conversion cannot be performed then return false.</p>
+<em>Returns:</em> True if successful or false if not.</p>
+If the first \n in the file is \r\n then the whole file will be split using \r\n as delimiter.
+
+<pre><code class='hljs-ncdecl language-javascript'>dim d1;
+let osfilename = "xo_conf.txt";
+if (not d1.osread(osfilename)) ... // d1.join("\n") -> "aaa=1\nbbb=2\nccc=3\n"_var0
+// or
+if (not osread(d1 from osfilename)) ...</code></pre>
+</td></tr>
+</table>
+
