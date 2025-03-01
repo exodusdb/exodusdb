@@ -273,7 +273,7 @@ nextmv:
 			if (nn > nrowvals) {
 				nrowvals = nn;
 			}
-			pickreplacer(rowvals, rowfn, tt);
+			updater(rowvals, rowfn, tt);
 		}  // rowfn;
 	} else {
 		rowvals	 = "Total";
@@ -300,7 +300,7 @@ nextmv:
 				} else {
 					tt = rowvals.f(rowfn, 1);
 				}
-				pickreplacer(rowval, 1, 1, rowfn, tt);
+				updater(rowval, 1, 1, rowfn, tt);
 			}  // rowfn;
 		} else {
 			rowval = rowvals;
@@ -349,14 +349,14 @@ nextmv:
 			oldval = output.f(rown + 1, colnx + 1);
 			// output(rown + 1, colnx + 1) = oldval + datavals;
 			// output(1, 1) = output.f(1, 1) + 1;
-			pickreplacer(output, rown + 1, colnx + 1, oldval + datavals);
-			pickreplacer(output, 1, 1, output.f(1, 1) + 1);
+			updater(output, rown + 1, colnx + 1, oldval + datavals);
+			updater(output, 1, 1, output.f(1, 1) + 1);
 
 			// total column at the end
 			if (not totcol) {
 				oldval = output.f(rown + 1, ncols + 2);
 				// output(rown + 1, ncols + 2) = oldval + datavals;
-				pickreplacer(output, rown + 1, ncols + 2, oldval + datavals);
+				updater(output, rown + 1, ncols + 2, oldval + datavals);
 			}
 
 		}  // colvaln;

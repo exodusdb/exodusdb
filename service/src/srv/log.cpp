@@ -67,8 +67,8 @@ getlogkey:
 		}
 
 		var entry = programname;
-		pickreplacer(entry, 2, text2);
-		pickreplacer(entry, 3, SYSTEM.f(17));
+		updater(entry, 2, text2);
+		updater(entry, 3, SYSTEM.f(17));
 		entry.write(log, logkey);
 	}
 

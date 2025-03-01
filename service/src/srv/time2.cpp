@@ -57,7 +57,7 @@ function main(in type, in input0, in mode0, out output) {
 			let nn = input0.fcount(VM);
 			for (const var ii : range(1, nn)) {
 				call time2(type, input0.f(1, ii), mode, outputx);
-				pickreplacer(output, 1, ii, outputx);
+				updater(output, 1, ii, outputx);
 			}  // ii;
 			return 0;
 		}

@@ -133,7 +133,7 @@ next:
 			if (RECORD.f(fns.f(ii)) != cleartovalue2) {
 				cleared = 1;
 				// RECORD(fns.f(ii)) = cleartovalue2;
-				pickreplacer(RECORD, fns.f(ii), cleartovalue2);
+				updater(RECORD, fns.f(ii), cleartovalue2);
 			}
 		}  // ii;
 		if (cleared) {
