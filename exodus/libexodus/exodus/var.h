@@ -91,9 +91,9 @@ class var_proxy3;
 	using out    =       var&;
 	using io     =       var&;
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-//                                               VAR
-///////////////////////////////////////////////////////////////////////////////////////////////////
+//////////
+//// var :
+//////////
 
 // class var
 // using CRTP to capture a customised base class that knows what a var is
@@ -115,14 +115,14 @@ public:
 
 	// Tabular documentation is generated for comments starting /// or more and ending with a colon
 
-	//////////////////
-	/// var creation :
-	//////////////////
+	////////////////////
+	///// var creation :
+	////////////////////
 
 	/* fake for gendoc
 
     // Create an unassigned var.
-	// Whereever possible, variables should be assigned an initial value immediately at their point of definition, and marked as const if appropriate. However variables often have no real single initial value and are commonly defined in advance of being assigned a particular value. For example, a variable may be assigned differently on different branches of a conditional statement, or be provided as an outbound argument of a function call.
+	// Where-ever possible, variables should be assigned an initial value immediately at their point of definition, and marked as const if appropriate. However variables often have no real single initial value and are commonly defined in advance of being assigned a particular value. For example, a variable may be assigned differently on different branches of a conditional statement, or be provided as an outbound argument of a function call.
 	// Even when not assigned, "use before initialisation" bugs do not occur because a runtime error VarUnassigned is thrown if a var is used before it has been assigned a value.
 	//
 	// Use "let" instead of "var" as a shorthand way of writing "const var" whereever possible.
@@ -233,9 +233,9 @@ public:
 
 	*/
 
-	////////////////////////////
-	/// Arithmetical operators :
-	////////////////////////////
+	//////////////////////////////
+	///// Arithmetical operators :
+	//////////////////////////////
 
 	/* fake for gendoc Defined for var_base in varb.h
 
@@ -261,7 +261,7 @@ public:
 	ND var num() const;
 
 	// Addition
-	// Attempts to perform mumeric operations on non-numeric strings will throw a runtime error VarNonNumeric.
+	// Attempts to perform numeric operations on non-numeric strings will throw a runtime error VarNonNumeric.
 	// Floating point numbers are implicitly converted to strings with no more than 12 significant digits of precision. This practically eliminates all floatng point rounding errors.
 	// Internally, 0.1 + 0.2 looks like this using doubles.
 	// 0.10000000000000003 + 0.20000000000000004 -> 0.30000000000000004
@@ -321,9 +321,9 @@ public:
 	//  var v2 = -- v1; // v2 -> 2 // v1 -> 2`
 	   io   operator--() &;
 
-	//////////////////////////////////////////////
-	/// Dynamic array creation, access and update:
-	//////////////////////////////////////////////
+	////////////////////////////////////////////////
+	///// Dynamic array creation, access and update:
+	////////////////////////////////////////////////
 
 	// The literal suffix "_var" allows dynamic arrays to be seamlessly embedded in code using the visible equivalents of unprintable field mark characters.
 	//
@@ -338,7 +338,7 @@ public:
 	friend var  operator""_var(const char* cstr, std::size_t size);
 
 	template <class T>
-    // Create an dynamic array var from a list. C++ constrains list elements to be all the same type. var, string, double, int, etc.
+    // Create a dynamic array var from a list. C++ constrains list elements to be all the same type. var, string, double, int, etc.
 	//
 	// `var v1 = {11, 22, 33}; // "11^22^33"_var`
 	CONSTEXPR var(std::initializer_list<T> list)
@@ -453,9 +453,9 @@ public:
 	ND var_proxy2 operator()(int fieldno, int valueno);
 	ND var_proxy3 operator()(int fieldno, int valueno, int subvalueno);
 
-	/////////////////////
-	/// String creation :
-	/////////////////////
+	///////////////////////
+	///// String creation :
+	///////////////////////
 
 	/* fake for gendoc
 
@@ -540,19 +540,19 @@ public:
 	ND var  space() const;
 
 	// Returns: A string representing a given number written in words instead of digits.
-	// locale: Something like en_GB, ar_AE, el_CY, es_US, fr_FR etc.
+	// locale: e.g. en_GB, ar_AE, el_CY, es_US, fr_FR etc or a language name e.g. "french".
 	// obj is varnum
 	//
 	// `let softhyphen = "\xc2\xad";
 	//  let v1 = var(123.45).numberinwords("de_DE").replace(softhyphen, " "); // "ein␣hundert␣drei␣und␣zwanzig␣Komma␣vier␣fünf"`
-	ND var  numberinwords(in languagename_or_locale_id = "");
+	ND var  numberinwords(in locale = "");
 
 	////////////
 	// STRING // All UTF8 unless char or byte mentioned
 	////////////
 
 	///// STRING SCANNING:
-	/////////////////////
+	//////////////////////
 
 	// obj is strvar
 
@@ -1044,7 +1044,7 @@ public:
 	// Returns: A modified copy of the original string.
 	// There is no way to simply delete n fields because the replacement argument cannot be omitted, however one can achieve the same result by replacing n+1 fields with the n+1th field.
 	//
-	// The replacement can contain multiple fields itself. If replacing n fields and the replacement contains < n fields then the remaining fields become "", and if the replacement contains more fields than are required, they are unused.
+	// The replacement can contain multiple fields itself. If replacing n fields and the replacement contains < n fields then the remaining fields become "". Conversely, if the replacement contains more fields than are required, they are discarded.
 	//
 	// `let v1 = "aa,bb,cc,dd,ee"_var.fieldstore(",", 2, 3, "11,22"); // "aa,11,22,,ee"
 	//  // or
@@ -3081,7 +3081,7 @@ public:
 	// MR: Character replacement // WHY is this replacer, io, non-const
 	ND io   oconv_MR(const char* conversion);
 
-	/// I/O Conversion Codes :
+	//// I/O Conversion Codes :
 
 	// Date output: Convert internal date format to human readable date or calendar info in text format.
 	// Returns: Human readable date or calendar info, or the original value unconverted if non-numeric.

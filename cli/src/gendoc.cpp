@@ -197,7 +197,7 @@ function main() {
 
 				in_table = true;
 
-				let short_title = table_title.f(1, 3).tcase().replace("Mv", "MV").replace("Os", "OS");
+				let short_title = table_title.f(1, 3).tcase().replace("Mv", "MV").replace("Os", "OS").replace("Db", "DB");
 
 				let level = table_title.f(1, 2).len();
 				if (man) {
@@ -213,7 +213,7 @@ function main() {
 					docfile << wiki_title << " " << short_title << " " << wiki_title << std::endl;
 					docfile << "" << std::endl;
 					docfile << "{|class=\"wikitable\"" << std::endl;
-					docfile << "!Usage!!Function!!Description" << std::endl;
+					docfile << "!Use!!Function!!Description" << std::endl;
 
 				} else {
 
@@ -224,7 +224,7 @@ function main() {
 					docfile << "<h" << level << " id=" << table_id << ">" << short_title << "</h" << level << ">" << std::endl;
 					docfile << "" << std::endl;
 					docfile << "<table class=wikitable>" << std::endl;
-					docfile << "<tr> <th>Usage</th> <th>Function</th> <th>Description</th> </tr>" << std::endl;
+					docfile << "<tr> <th>Use</th> <th>Function</th> <th>Description</th> </tr>" << std::endl;
 				}
 				continue;
 			}
@@ -300,10 +300,10 @@ function main() {
 			else if (prefix == "void") prefix = "cmd"; // many return nothing
 
 			// dim
-			else if (prefix == "dim") prefix = "dim";
+			else if (prefix == "dim") prefix = "dim=";
 
 			// dim&
-			else if (prefix == "dim&") {prefix = "dim2";}// many return nothing
+			else if (prefix == "dim&") {prefix = "&";}// many return nothing
 
 			else {
 
@@ -506,6 +506,10 @@ function main() {
 					}
 				}
 
+				// Remove one leading space (should only be from code)
+				comments.replacer("\n ", "\n");
+				//oswrite(comments on "x");
+
 				// tag backticked code as c++
 				if (man) {
 
@@ -518,7 +522,7 @@ function main() {
 					comments.replacer(backquoted, "\nExample:\n.RS\n.nf\n $1\n.fi\n.RE\n");
 				}
 				else if (wiki)
-					comments.replacer(backquoted, "<syntaxhighlight lang=\"c++\">\n $1</syntaxhighlight>");
+					comments.replacer(backquoted, "<syntaxhighlight lang=\"c++\">\n$1</syntaxhighlight>");
 				else
 					// Javascript instead of cpp because it gives better highlighting for exodus c++. See above too.
 					// (All function calls are highlighted)
@@ -569,6 +573,7 @@ function main() {
 			line2.replacer("\\bchar\\*"_rex, "");
 			line2.replacer("\\bbool "_rex, "");
 			line2.replacer("\\brex& "_rex, "");
+//			line2.replacer("\\bdim& "_rex, ""); // needed to create this text below "dim d1 = d2; // Copy"
 			line2.replacer("\\bCVR "_rex, "");
 			line2.replacer("\\bCBR "_rex, "");
 			line2.replacer("\\bVARREF "_rex, "io");
@@ -622,22 +627,14 @@ function main() {
 				TRACE(line2)
 			}
 
-			// bold the function name
-			if (man) {}
-			else if (wiki) {
-				line2.prefixer("<em>");
-				line2.paster(line2.index("("), "</em>");
-			} else {
-				line2.prefixer("<span class='gendoc_function'>");
-				line2.paster(line2.index("("), "</span>");
-			}
-
 			// i/oconv_MD(const char* conversion) -> i/oconv("MD")
-			let func_decl0 = line2.replace(R"__(([io])conv_([A-Z]+)\([a-zA-Z0-0_*]*\))__"_rex, "$1conv\\(\"$2\"\\)");
+			var func_decl0 = line2.replace(R"__(([io])conv_([A-Z]+)\([a-zA-Z0-0_*]*\))__"_rex, "$1conv\\(\"$2\"\\)");
 
 			// Prefix the object name
 			var func_decl;
 			if (not is_constructor) {
+
+				func_decl0.replacer("dim& ", "");
 
 				if (line2.match(R"__(\boperator\s*=)__")) {
 
@@ -646,13 +643,19 @@ function main() {
 				}
 
 				else if (line2.match(R"__(\boperator\s*\[\]\s*\()__")) {
-					// "operator[](rowno)" -> "var v1 = d1[rown]; /*and*/ d1[rown] = v1;"
-					// "operator[](rowno, colno)" ->
+					// "operator[](rowno)"
+					// "operator[](rowno, colno)"
+					// -> "var v1 = d1[rown];   d1[rown] = v1;"
+					// -> "var v1 = d1[rown, coln];   d1[rown, coln] = v1;"
 					func_decl = func_decl0.replace(
 						R"__(\boperator\s*\[\]\s*\(\s*([^\)]+)\))__"_rex,
 						 "var v1 = " ^ class_name.first() ^ "1[$1];       " ^ class_name.first() ^ "1[$1] = v1;"
 					);
-				}
+					if (html or wiki)
+						func_decl.replacer("       ", "</br>");
+					// Use on left and right hand side
+					prefix = "";
+					}
 
 				else if (line2.contains("operator\"\"_")) {
 					// operator""_var(cstr, std::size_t size);
@@ -740,28 +743,48 @@ function main() {
 				if (arg1 == "") {
 					// dim() -> dim d1;
 					func_decl = class_name ^ " " ^ func_decl0.first(1) ^ "1;";
+					prefix = "";
 				}
 				// Copy constructor
 				else if (arg1 == (class_name ^ "&")) {
 					// dim(dim&) -> dim d1 = d2;
+					prefix = "";
 					func_decl = class_name ^ " " ^ class_letter ^ "1 = " ^ class_letter ^ "2; /" "/ Copy";
 				}
 				// Move constructor
 				else if (arg1 == (class_name ^ "&&")) {
 					// dim(dim&&) -> dim d1 = dim();
+					prefix = "";
 					func_decl = class_name ^ " " ^ class_letter ^ "1 = " ^ class_name ^ "(); /" "/ Move";
 				}
 				else if (arg1.starts("std::initializer_list")) {
 					// -> dim d1 = {"a", "b", "c", "d" ...};
+					prefix = "";
 					func_decl = class_name ^ " " ^ class_letter ^ R"(1 = {"a", "b", "c" ...};)" " /" "/ Initializer list";
+//					func_decl = R"({"a", "b", "c" ...};)" " /" "/ Initializer list";
+//					prefix = class_name ^ "=";
 				}
 				// Other constructors
 				else {
 					// dim(nrows, ncols = 1) -> "dim d1(nrows, ncols = 1);
-					func_decl = class_name ^ " " ^ class_letter ^ "1(" ^ args ^ "); /" "/ Constructor";
+					func_decl = class_name ^ " " ^ class_letter ^ "1(" ^ args ^ ");";
+					prefix = "";
 				}
 
 			}
+
+//			// bold the function name
+//			if (man) {}
+//			else if (wiki) {
+//				line2.prefixer("<em>");
+//				line2.paster(line2.index("("), "</em>");
+//			} else {
+//				line2.prefixer("<span class='gendoc_function'>");
+//				line2.paster(line2.index("("), "</span>");
+//			}
+
+			if (prefix == "cmd" or prefix == "cmd2")
+				prefix = "";
 
 			if (man) {
 

@@ -1,6 +1,9 @@
 .TH dim.h
 
-.SH 25. DIMENSIONED ARRAY CONSTRUCTION 
+.SH 26. DIM 
+.SH
+
+.SH 27. DIMENSIONED ARRAY CONSTRUCTION 
 .SH
 
 .SS
@@ -8,14 +11,21 @@ dim d1;
 .nf
  
 .fi
-Create an undimensioned array of var.
+Create an dimensioned array of vars pending actual dimensions.
+
+.SS
+dim d1(nrows, ncols = 1);
+.nf
+ 
+.fi
+Create an array of vars with a fixed number of columns and rows. All vars are unassigned.
 
 .SS
 dim d1 = d2; // Copy
 .nf
  
 .fi
-Copy an array.
+Create a copy of an array.
 
 .SS
 dim d1 = dim(); // Move
@@ -23,13 +33,6 @@ dim d1 = dim(); // Move
  
 .fi
 Save an array created elsewhere.
-
-.SS
-dim d1(nrows, ncols = 1); // Constructor
-.nf
- 
-.fi
-Create an array of vars with a fixed number of columns and rows. All vars are unassigned.
 
 .SS
 dim d1 = {"a", "b", "c" ...}; // Initializer list
@@ -59,7 +62,7 @@ Resizing rows to 0 clears all data.
 Resizing cols to 0 clears all data and changes its status to "undimensioned".
 
 .SS
-d1.swap(dim& d2) 
+d1.swap(d2) 
 .nf
  
 .fi
@@ -67,7 +70,7 @@ Swap one array with another.
 
 Either or both may be undimensioned.
 
-.SH 26. ARRAY ACCESS
+.SH 28. ARRAY ACCESS
 .SH
 
 .SS
@@ -111,7 +114,7 @@ Joins all elements into a single delimited string
 
 \fBReturns:\fR A string var.
 
-.SH 27. ARRAY MUTATION
+.SH 29. ARRAY MUTATION
 .SH
 
 .SS
@@ -133,10 +136,10 @@ In either case, all elements of the array are updated.
 .RS
 .nf
  dim d1;
- d1.splitter("f1^f2^f3"_var); // d1.rows() -> 3
- //
- dim d2(10);
- d2.splitter("f1^f2^f3"_var); // d2.rows() -> 10
+d1.splitter("f1^f2^f3"_var); // d1.rows() -> 3
+//
+dim d2(10);
+d2.splitter("f1^f2^f3"_var); // d2.rows() -> 10
 .fi
 .RE
 
@@ -162,9 +165,9 @@ d1.shuffler()
 .nf
  
 .fi
-Randomly shuffle the order of the elements of the array in place.
+Randomly shuffle the order of the elements of the array. In place.
 
-.SH 28. ARRAY CONVERSION
+.SH 30. ARRAY CONVERSION
 .SH
 
 .SS
@@ -188,7 +191,7 @@ d1.shuffle()
 .fi
 Same as shuffler() but returns a new array leaving the original untouched.
 
-.SH 29. ARRAY DB I/O
+.SH 31. ARRAY DB I/O
 .SH
 
 .SS
@@ -204,11 +207,11 @@ Each element in the array becomes a separate field in the db record. Any redunda
 .RS
 .nf
  dim d1 = "Client GD^G^20855^30000^1001.00^20855.76539"_var.split();
- let file = "xo_clients", key = "GD001";
- if (not deleterecord("xo_clients", "GD001")) {}; // Cleanup first
- d1.write(file, key);
- // or
- write(d1 on file, key);
+let file = "xo_clients", key = "GD001";
+if (not deleterecord("xo_clients", "GD001")) {}; // Cleanup first
+d1.write(file, key);
+// or
+write(d1 on file, key);
 .fi
 .RE
 
@@ -232,15 +235,15 @@ If the array is not predimensioned (rows and cols = 0) then it will be dimension
 .RS
 .nf
  dim d1(10);
- let file = "xo_clients", key = "GD001";
- if (not d1.read(file, key)) ... // d1.join() -> "Client GD^G^20855^30000^1001.00^20855.76539"_var
- // or
- if (not read(d1 from file, key)) ...
+let file = "xo_clients", key = "GD001";
+if (not d1.read(file, key)) ... // d1.join() -> "Client GD^G^20855^30000^1001.00^20855.76539"_var
+// or
+if (not read(d1 from file, key)) ...
 .fi
 .RE
 
 
-.SH 30. ARRAY OS I/O
+.SH 32. ARRAY OS I/O
 .SH
 
 .SS
@@ -262,11 +265,11 @@ Any existing os file is overwritten and replaced.
 .RS
 .nf
  dim d1 = "aaa=1\\nbbb=2\\nccc=3\\n"_var.split("\\n");
- if (not osremove("xo_conf.txt")) {}; // Cleanup first
- let osfilename = "xo_conf.txt";
- if (not d1.oswrite(osfilename)) ...
- // or
- if (not oswrite(d1 on osfilename)) ...
+if (not osremove("xo_conf.txt")) {}; // Cleanup first
+let osfilename = "xo_conf.txt";
+if (not d1.oswrite(osfilename)) ...
+// or
+if (not oswrite(d1 on osfilename)) ...
 .fi
 .RE
 
@@ -290,10 +293,10 @@ If the first \\n in the file is \\r\\n then the whole file will be split using \
 .RS
 .nf
  dim d1;
- let osfilename = "xo_conf.txt";
- if (not d1.osread(osfilename)) ... // d1.join("\\n") -> "aaa=1\\nbbb=2\\nccc=3\\n"_var0
- // or
- if (not osread(d1 from osfilename)) ...
+let osfilename = "xo_conf.txt";
+if (not d1.osread(osfilename)) ... // d1.join("\\n") -> "aaa=1\\nbbb=2\\nccc=3\\n"_var0
+// or
+if (not osread(d1 from osfilename)) ...
 .fi
 .RE
 

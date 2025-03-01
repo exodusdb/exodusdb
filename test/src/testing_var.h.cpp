@@ -357,7 +357,7 @@ function main() {
 		let v2 = space(3);
 	}
 
-	printl("numberinwords(in languagename_or_locale_id = "");");
+	printl("numberinwords(in locale = "");");
 	{
 		let softhyphen = "\xc2\xad";
 		let v1 = var(123.45).numberinwords("de_DE").replace(softhyphen, " ");

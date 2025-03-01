@@ -3012,34 +3012,124 @@ var ExodusProgramBase::amountunit(in input0, out unitx) {
 	// 123.45e10M3 cubic meters TODO
 	// 123e10 means e+10 and no unit
 
-	// Find the last digit
-	std::string s = input0.toString();
-	std::size_t pos = s.find_last_of("0123456789");
+//	// Find the last digit
+//	std::string s = input0.toString();
+//	std::size_t pos = s.find_last_of("0123456789");
+//
+//	// If no digits are found, then return amount as "" and all input as unit
+//	// TODO Non-numeric error?
+//	if (pos == std::string::npos) {
+//		unitx = input0;
+//		return "";
+//	}
+//
+//	// If last char is digit, then return all as amount and unit is "
+//	// TODO Non-numeric error?
+//	if (pos + 1 == s.size()) {
+//		unitx = "";
+//		return input0;
+//	}
+//
+//	// Everything after the last digit is the unit
+//	// example "1ABC" pos = 0 and unit -> ABC
+//	unitx = s.substr(pos + 1);
+//
+//	// Everything up to and including the last digit is the number
+//	// example 1.23456E-6 -> 1.23456E-6
+//	// TODO Non-numeric error?
+//	return s.substr(0, pos + 1);
 
-	// If no digits are found, then return amount as "" and all input as unit
-	// TODO Non-numeric error?
-	if (pos == std::string::npos) {
-		unitx = input0;
-		return "";
-	}
+	std::string_view sv = input0;
 
-	// If last char is digit, then return all as amount and unit is "
-	// TODO Non-numeric error?
-	if (pos + 1 == s.size()) {
-		unitx = "";
-		return input0;
-	}
+    for (auto it = sv.rbegin(); it != sv.rend(); ++it) {
+        if (*it <= '9' and *it >= '0') {
 
-	// Everything after the last digit is the unit
-	// example "1ABC" pos = 0 and unit -> ABC
-	unitx = s.substr(pos + 1);
+			// it - s.begin()
+			// 123456 -> 0
+			// 123456XXX -> 3
 
-	// Everything up to and including the last digit is the number
-	// example 1.23456E-6 -> 1.23456E-6
-	// TODO Non-numeric error?
-	return s.substr(0, pos + 1);
+			auto pos = sv.size() - std::size_t(it - sv.rbegin());
+			unitx = sv.substr(pos);
+			return sv.substr(0, pos);
+        }
+    }
+	// All unit no digits
+	unitx = sv;
+	return "";
 
 }
+
+// simd implementation is 3-4x slower
+//#include <cstring>
+//#include <immintrin.h>
+//#include <string_view>
+//#include <iostream>
+//#include <cstdint>
+//
+//using SV = std::string_view;
+//
+//inline SV split_simd(SV s, SV& unit) {
+//    constexpr size_t SSE_SIZE = 16;
+//
+//    if (s.empty()) {
+//        unit = s;
+//        return "";
+//    }
+//
+//    if (s.size() <= SSE_SIZE) {
+//        alignas(16) char buffer[SSE_SIZE] = {0};
+//        std::memcpy(buffer, s.data(), s.size());
+//        __m128i chars = _mm_load_si128(reinterpret_cast<const __m128i*>(buffer));
+//
+//        __m128i min_digit = _mm_set1_epi8('0');
+//        __m128i max_digit = _mm_set1_epi8('9');
+//        __m128i lt_0 = _mm_cmplt_epi8(chars, min_digit);
+//        __m128i gt_9 = _mm_cmpgt_epi8(chars, max_digit);
+//        __m128i not_digit = _mm_or_si128(lt_0, gt_9);
+//        __m128i is_digit = _mm_andnot_si128(not_digit, _mm_set1_epi8(-1));
+//
+//        uint16_t mask = _mm_movemask_epi8(is_digit);
+//
+//        if (mask == 0) {
+//            unit = s;
+//            return "";
+//        }
+//
+//        size_t pos = 31 - __builtin_clz(static_cast<uint32_t>(mask));
+//        if (pos >= s.size()) {
+//            unit = s;
+//            return "";
+//        }
+//
+//        unit = s.substr(pos + 1);
+//        return s.substr(0, pos + 1);
+//    }
+//
+//    for (auto it = s.rbegin(); it != s.rend(); ++it) {
+//        if (*it <= '9' && *it >= '0') {
+//            auto pos = s.size() - std::size_t(it - s.rbegin());
+//            unit = s.substr(pos);
+//            return s.substr(0, pos);
+//        }
+//    }
+//    unit = s;
+//    return "";
+//}
+//
+//int main() {
+//    auto test = [](SV s) {
+//        SV unit;
+//        SV amount = split_simd(s, unit);
+//        std::cout << "Input: \"" << s << "\" -> Amount: \"" << amount << "\", Unit: \"" << unit << "\"\n";
+//    };
+//
+//    test("123abc");
+//    test("abc");
+//    test("12345");
+//    test("");
+//    test("12abc34de");
+//    return 0;
+//}
 
 // clang-format off
 

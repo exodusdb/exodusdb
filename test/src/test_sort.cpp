@@ -153,7 +153,9 @@ function main() {
 		dim cards2 = cards1.shuffle();
 
 		initrnd(123);
-		dim cardsy = cardsx.shuffler();
+//		dim cardsy = cardsx.shuffler();
+		cardsx.shuffler();
+		dim cardsy = cardsx;
 
 		initrnd(1234);
 		dim cards3 = dim(cards1).shuffle();

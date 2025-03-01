@@ -56,20 +56,28 @@ friend class dim_iter;
 	// SPECIAL MEMBER FUNCTIONS
 	///////////////////////////
 
-	////////////////////////////////////
-	/// dimensioned array construction :
-	////////////////////////////////////
+	//////////
+	//// dim :
+	//////////
+
+	//////////////////////////////////////
+	///// dimensioned array construction :
+	//////////////////////////////////////
 
 	/////////////////////////
 	// 1. Default constructor
 	/////////////////////////
 
-	// Create an undimensioned array of var.
+	// Create an dimensioned array of vars pending actual dimensions.
 	dim() = default;
 
 	// Default constructor
 	//dim() : base(), ncols_(0) {}
 
+	// FIXED CONSTRUCTOR
+
+	// Create an array of vars with a fixed number of columns and rows. All vars are unassigned.
+	dim(const int nrows, const int ncols = 1);
 
 	////////////////
 	// 2. Destructor
@@ -90,7 +98,7 @@ friend class dim_iter;
 //		*this = sourcedim;
 //	}
 
-	// Copy an array.
+	// Create a copy of an array.
 	dim(const dim& rhs);
 
 	//////////////////////
@@ -179,9 +187,6 @@ friend class dim_iter;
 	// Other constructors
 	/////////////////////
 
-	// Create an array of vars with a fixed number of columns and rows. All vars are unassigned.
-	dim(const int nrows, const int ncols = 1);
-
     // Constructor from initializer_list for (int, double, cstr etc.)
 	/////////////////////////////////////////////////////////////////
 	template<class T>
@@ -251,9 +256,9 @@ friend class dim_iter;
 		std::swap(ncols_, d2.ncols_);
 	}
 
-	/////////////////
-	/// array access:
-	/////////////////
+	///////////////////
+	///// array access:
+	///////////////////
 
 ////	ND dim_iter begin();
 ////	ND dim_iter end();
@@ -353,9 +358,9 @@ friend class dim_iter;
 	// Returns: A string var.
 	ND var join(SV delimiter = _FM) const;
 
-	///////////////////
-	/// array mutation:
-	///////////////////
+	/////////////////////
+	///// array mutation:
+	/////////////////////
 
 	// Creates or updates the array from a given string.
 	// If the dim array has not been dimensioned (nrows and ncols are 0), it will be dimensioned with the number of elements that the string has fields.
@@ -368,42 +373,42 @@ friend class dim_iter;
 	//  //
 	//  dim d2(10);
 	//  d2.splitter("f1^f2^f3"_var); // d2.rows() -> 10`
-	dim& splitter(in str1, SV delimiter = _FM);
+	void splitter(in str1, SV delimiter = _FM);
 
 	// Sort the elements of the array. In place.
 	// reverse: Defaults to false. If true, then the order is reversed.
-	dim& sorter(bool reverse = false);
+	void sorter(bool reverse = false);
 
 	// Reverse the elements of the array. In place.
-	dim& reverser();
+	void reverser();
 
-	// Randomly shuffle the order of the elements of the array in place.
-	dim& shuffler();
+	// Randomly shuffle the order of the elements of the array. In place.
+	void shuffler();
 
 //	dim& eraser(std::vector<var>::iterator iter1, std::vector<var>::iterator iter2) {base::erase(iter1, iter2); return *this;}
 //	dim& eraser(dim_iter dim_iter1, dim_iter dim_iter2) {base::erase(&*dim_iter1, &*dim_iter2); return *this;}
 
-	/////////////////////
-	/// array conversion:
-	/////////////////////
+	///////////////////////
+	///// array conversion:
+	///////////////////////
 
 	// Same as sorter() but returns a new array leaving the original untouched.
-	ND dim sort(bool reverse = false) const& {return dim(*this).sorter(reverse);}
+	ND dim sort(bool reverse = false) const& {dim d1(*this);d1.sorter(reverse); return d1;}
 
 	// Same as reverser() but returns a new array leaving the original untouched.
-	ND dim reverse() const& {return dim(*this).reverser();}
+	ND dim reverse() const& {dim d1(*this); d1.reverser(); return d1;}
 
 	// Same as shuffler() but returns a new array leaving the original untouched.
-	ND dim shuffle() const& {return dim(*this).shuffler();}
+	ND dim shuffle() const& {dim d1(*this); d1.shuffler();return d1;}
 
 	// On temporaries the mutator functions are called.
-	ND dim& sort(bool reverseorder = false) && {return this->sorter(reverseorder);}
-	ND dim& reverse() && {return this->reverser();}
-	ND dim& shuffle() && {return this->shuffler();}
+	ND dim& sort(bool reverseorder = false) && {this->sorter(reverseorder); return *this;}
+	ND dim& reverse() && {this->reverser(); return *this;}
+	ND dim& shuffle() && {this->shuffler(); return *this;}
 
-	/////////////////
-	/// array DB I/O:
-	/////////////////
+	///////////////////
+	///// array DB I/O:
+	///////////////////
 
 	// Writes a db file record created from an array.
 	// Each element in the array becomes a separate field in the db record. Any redundant trailing FMs are suppressed.
@@ -429,9 +434,9 @@ friend class dim_iter;
     //  if (not read(d1 from file, key)) ...`
 	ND bool read(in dbfile, in key);
 
-	/////////////////
-	/// array OS I/O:
-	/////////////////
+	///////////////////
+	///// array OS I/O:
+	///////////////////
 
 	// Creates an entire os text file from an array
 	// Each element of the array becomes one line in the os file delimited by \n

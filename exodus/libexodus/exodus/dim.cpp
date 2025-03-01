@@ -291,7 +291,7 @@ dim  var::split(SV delimiter) const {
 }
 
 // d.splitter(v, sep)
-dim& dim::splitter(in str1, SV delimiter) {
+void dim::splitter(in str1, SV delimiter) {
 
 	//TODO If delimiter is "" split every utf8 chararacter?
 
@@ -310,7 +310,7 @@ dim& dim::splitter(in str1, SV delimiter) {
 	// Empty string just fills array with empty string
 	if (str1.var_str.empty()) {
 		(*this) = "";
-		return *this;
+		return;
 	}
 
 	// Start at the beginning and look for delimiter delimiters
@@ -352,10 +352,10 @@ dim& dim::splitter(in str1, SV delimiter) {
 			base::operator[](fieldno) = "";
 	}
 
-	return *this;
+	return;
 }
 
-dim& dim::sorter(bool reverseorder) {
+void dim::sorter(bool reverseorder) {
 
 	THISIS("dim& dim::sorter(bool reverseorder)")
 	if (!ncols_) UNLIKELY
@@ -366,10 +366,10 @@ dim& dim::sorter(bool reverseorder) {
 	else
 		std::sort(base::begin(), base::end(), std::greater<var>());
 
-	return *this;
+	return;
 }
 
-dim& dim::reverser() {
+void dim::reverser() {
 
 	THISIS("dim& dim::reverser()")
 	if (!ncols_) UNLIKELY
@@ -377,10 +377,10 @@ dim& dim::reverser() {
 
 	std::reverse(base::begin(), base::end());
 
-	return *this;
+	return;
 }
 
-dim& dim::shuffler() {
+void dim::shuffler() {
 
 	THISIS("dim& dim::shuffler()")
 	if (!ncols_) UNLIKELY
@@ -393,7 +393,7 @@ dim& dim::shuffler() {
 
 	std::shuffle(base::begin(), base::end(), *thread_RNG);
 
-	return *this;
+	return;
 }
 
 bool dim::read(in filevar, in key) {
@@ -611,7 +611,7 @@ var  var::reverse(SV delimiter) const& {
 // No speed or memory advantage since not shuffling in place
 // but provided for syntactical convenience avoiding need to assign output of shuffle()
 IO   var::shuffler(SV delimiter) REF {
-	(*this) = this->split(delimiter).shuffler().join(delimiter);
+	*this = this->split(delimiter).shuffle().join(delimiter);
 	return THIS;
 }
 
