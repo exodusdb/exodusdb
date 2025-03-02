@@ -71,7 +71,6 @@ ND PUBLIC var  time() {return var().time();}
 ND PUBLIC var  ostime() {return var().ostime();}
 ND PUBLIC var  timestamp() {return var().timestamp();}
 ND PUBLIC var  timestamp(in date, in time) {return date.timestamp(time);}
-//ND PUBLIC var  timedate();
 
    PUBLIC void ossleep(const int milliseconds) {var().ossleep(milliseconds);}
 ND PUBLIC var  oswait(SV file_dir_list, const int milliseconds) {return var(file_dir_list).oswait(milliseconds);}

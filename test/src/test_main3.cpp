@@ -332,7 +332,6 @@ function main() {
 		time().oconv("MTS").errputl("Time is:");
 
 		//14:30:46 04 JAN 2021
-		//assert(timedate().match("\\d{2}:\\d{2}:\\d{2} \\d{2} [A-Z]{3} \\d{4}"));
 		// Check twice in case date() changes over midnight
 		assert(date() eq int(timestamp()) or date() eq int(timestamp()));
 

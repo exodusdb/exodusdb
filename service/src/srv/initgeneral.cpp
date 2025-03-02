@@ -492,7 +492,7 @@ nextreport:
 							if (not oldrecord.read(file, keyx)) {
 								oldrecord = "";
 							}
-							// only update documents if changed anything except update timedate
+							// only update documents if changed anything except update time
 							if (filename == "DOCUMENTS") {
 								oldrecord(8) = recordx.f(8);
 							}
@@ -1188,47 +1188,6 @@ nextreport:
 			call note("DO NOT CONTINUE UNLESS YOU KNOW WHAT YOU ARE DOING");
 		}
 	}
-
-	// 	if (VOLUMES) {
-	//
-	// 		call log2("*open processes own lists file", logtime);
-	//
-	// 		let workdir = "NEOS" ^ SYSTEM.f(24).oconv("R(0)#4");
-	// 		let workpath = "DATAVOL/" ^ workdir ^ "/";
-	// 		workpath.converter("/", OSSLASH);
-	//
-	// 		// check/create folder
-	// 		// initdir workpath:'REVMEDIA.*'
-	// 		// tt=dirlist()
-	// 		tt = oslistf(workpath ^ "REVMEDIA.*");
-	// 		if (not tt) {
-	// 			osshell("mkdir " ^ workpath);
-	// 			perform("NM " ^ workpath ^ " " ^ var().timedate() ^ "(S)");
-	// 		}
-	//
-	// 		// attach folder
-	// 		perform("ATTACH " ^ workpath ^ " (S)");
-	//
-	// 		// check/make LISTS file
-	// 		if (not lists.open("LISTS", "")) {
-	// 			lists = "";
-	// 		}
-	// 		if (not lists.contains(workpath)) {
-	// 			createfile("" ^ workpath ^ " LISTS (S)");
-	// 			if (not lists.open("LISTS", "")) {
-	// 				lists = "";
-	// 			}
-	// 			if (not lists.contains(workpath)) {
-	// 				// call note('FAILED TO MAKE LISTS FILE ON ':workpath
-	// 			}
-	// 		}
-	//
-	// 		call log2("*check lists file exists", logtime);
-	// 		if (not lists.open("LISTS", "")) {
-	// 			clearfile(lists);
-	// 		}
-	//
-	// 	}
 
 	if (not openfile("LISTS", lists, "DEFINITIONS")) {
 		// Ignore

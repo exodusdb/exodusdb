@@ -2157,7 +2157,7 @@ badwrite:
 			}
 
 			// double check that the record has not been updated since read
-			// Cannot do this unless during WRITE (not WRITEU) we pass back the new timedate
+			// Cannot do this unless during WRITE (not WRITEU) we pass back the new date time
 			// readf datetimefn from @dict,'DATE_TIME',2 then
 			// if @record<datetimefn> != orec<datetimefn> then
 			//  response='Somebody else has updated this record.|Your update cannot be applied'

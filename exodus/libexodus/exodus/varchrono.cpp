@@ -229,14 +229,6 @@ var  var::timestamp(in ostime) const {
 
 }
 
-//var  var::timedate() const {
-//	// output the current "HH:MM:SS  DD MMM YYYY" without quotes but note the double space
-//
-//	// TODO make this rely on a single timestamp instead of time and date
-//	// to avoid the slight chance of time and date being called different sides of midnight
-//	return time().oconv_MT("S") ^ " " ^ date().oconv_D("D");
-//}
-
 var  var::iconv_D(const char* conversion) const {
 
 	THISIS("var  var::iconv_D(const char* conversion) const")

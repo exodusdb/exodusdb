@@ -104,7 +104,7 @@ function main() {
 		abort(lasterror());
 	}
 
-	//record osfile update timedate
+	//record osfile update time
 	let fileinfo = osfile(temposfilename);
 	if (not is_new_record and not fileinfo)
 		abort("Could not write local copy for editing " ^ temposfilename);

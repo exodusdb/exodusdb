@@ -138,25 +138,20 @@ class PUBLIC ExodusProgramBase {
 	bool readnext(io key);
 	bool readnext(io key, io valueno);
 	bool readnext(io record, io key, io valueno);
-
 	void pushselect(out cursor);
 	void popselect(in cursor);
 //	[[deprecated("Replace with pushselect(out saved_cursor)")]]
 //	void pushselect(in v1, out v2, io v3, io v4);
 //	[[deprecated("Replace with pushselect(in saved_cursor)")]]
 //	void popselect(in v1, in v2, io v3, io v4);
-
 	void clearselect();
 	// THIS should be removed from exoprog and made a free function that doesnt use CURSOR
 	bool deleterecord(in filename_or_handle_or_command, in key = "");
-
 	bool savelist(SV listname);
 	bool getlist(SV listname);
 	bool deletelist(SV listname);
-
 	[[deprecated ("exoprog:::formlist() Resolve by refactoring. Read keys directly and call selectkeys(keys)")]]
 	bool formlist(SV filename_or_command, in keys = "", const int fieldno = 0);
-
 	[[deprecated ("exoprog::makelist() Refactor makelist(\"\", keys) as selectkeys(keys) or use fixdeprecated")]]
 	bool makelist(SV listname, in keys);
 
@@ -170,8 +165,7 @@ class PUBLIC ExodusProgramBase {
 	void readuserprivs() const;
 	void writeuserprivs() const;
 
-	ND var capitalise(in str0, in mode = var(), in wordseps = var()) const;
-
+	// Call an exodus library with a single var argument
 	var libinfo(in command);
 	var perform(in sentence);
 	[[noreturn]] void chain(in libraryname);
@@ -227,7 +221,12 @@ class PUBLIC ExodusProgramBase {
 	ND var oconv(in input, in conversion);
 	ND var iconv(in input, in conversion);
 
+	ND var capitalise(in str0, in mode = var(), in wordseps = var()) const;
+
+	// FMs become VMs and vice versa
 	ND var invertarray(in input, in force0 = (0));
+
+	// Sorts specific fields of multivalues in parallel
 	void sortarray(io array, in fns = 0, in orderby0 = "");
 
 	ND var timedate2() {return timedate2(var(), var());}
