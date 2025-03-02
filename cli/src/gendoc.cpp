@@ -164,6 +164,8 @@ function main() {
 				if (class_match) {
 					class_name = class_match.f(1, 2);
 					default_objname = class_name;
+					if (class_name == "ExodusProgramBase")
+						default_objname = "";
 				}
 				continue;
 			}
@@ -723,7 +725,10 @@ function main() {
 
 				else {
 					// xxxxxxxxx -> var.xxxxxxxxx
-					func_decl = (objname ?: default_objname) ^ "." ^ func_decl0;
+					if (default_objname) {
+						func_decl = (objname ?: default_objname) ^ "." ^ func_decl0;
+					} else
+						func_decl = func_decl0;
 				}
 
 			} else {

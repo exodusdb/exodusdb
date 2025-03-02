@@ -364,7 +364,7 @@ function main() {
 			var x = std::numeric_limits<unsigned long long>::max();
 			throw VarError("Uncaught error VarNumOverflow unsigned long long");
 		} catch (VarNumOverflow& e) {
-			printl(e.description);
+			printl(e.message);
 		}
 
 //		// Underflow on conversion from signed
@@ -374,7 +374,7 @@ function main() {
 //			var x = std::numeric_limits<signed long long>::min();
 //			throw VarError("Uncaught error VarNumUnderflow unsigned long long");
 //		} catch (VarNumOverflow& e) {
-//			printl(e.description);
+//			printl(e.message);
 //		}
 
 		// Overflow on inc/dec
@@ -383,7 +383,7 @@ function main() {
 			var x	 = "xyz"_var.locateby("XX", "xyz", MV);
 			throw VarError("Uncaught error VarError locateby");
 		} catch (VarError& e) {
-			printl(e.description);
+			printl(e.message);
 		}
 
 		try {
@@ -391,37 +391,37 @@ function main() {
 			//std::unreachable();
 			//throw VarError("Uncaught error VarError");
 		} catch (VarError& e) {
-			printl(e.description);
+			printl(e.message);
 		}
 
 		try {
 			--minint;
 			throw VarError("Uncaught error VarNumUnderflow");
 		} catch (VarNumUnderflow& e) {
-			printl(e.description);
+			printl(e.message);
 		}
 		try {
 			minint--;
 			throw VarError("Uncaught error VarNumUnderflow");
 		} catch (VarNumUnderflow& e) {
-			printl(e.description);
+			printl(e.message);
 		}
 		try {
 			maxint++;
 			throw VarError("Uncaught error VarNumOverflow");
 		} catch (VarNumOverflow& e) {
-			printl(e.description);
+			printl(e.message);
 		}
 
 		try {
 			throw VarOutOfMemory("Error: x");
 		} catch (VarOutOfMemory& e) {
-			printl(e.description);
+			printl(e.message);
 		}
 		try {
 			throw VarInvalidPointer("Error: x");
 		} catch (VarInvalidPointer& e) {
-			printl(e.description);
+			printl(e.message);
 		}
 
 			// We cannot test this because the output of the word "Exception" triggers testing to fail
@@ -439,9 +439,9 @@ function main() {
 			var v7	 = v7 + 1;
 			throw VarError("Uncaught error VarUnconstructed");
 		} catch (VarUnconstructed& e) {
-			printl(e.description);
+			printl(e.message);
 		} catch (VarUnassigned& e) {
-			printl(e.description);
+			printl(e.message);
 		}
 #endif
 		//unfortunately throw causes cmake test to fail so we skip them
@@ -452,7 +452,7 @@ function main() {
 			var v	 = var("x").oconv("QQQ");
 			throw VarError("Uncaught error VarOconvNotImplemented");
 		} catch (VarNotImplemented& e) {
-			printl(e.description);
+			printl(e.message);
 		}
 
 		// dim
@@ -463,7 +463,7 @@ function main() {
 			printl(x[11]);
 			throw VarError("DimIndexOutofBounds");
 		} catch (DimIndexOutOfBounds& e) {
-			printl(e.description);
+			printl(e.message);
 		}
 
 		// Exceeding 
@@ -475,16 +475,16 @@ function main() {
 #if FLEXIBLE_ROW_COL
 			throw VarError("Uncaught error VarUnassigned");
 		} catch (VarUnassigned& e) {
-			printl(e.description);
+			printl(e.message);
 		}
 #else
 			throw VarError("Uncaught error VarDimIndexOutofBounds");
 		} catch (DimIndexOutOfBounds& e) {
-			printl(e.description);
+			printl(e.message);
 		}
 #endif
 		catch (VarError e) {
-			throw VarError("Unexpected error using dim x(1,2)" ^ var(e.description));
+			throw VarError("Unexpected error using dim x(1,2)" ^ var(e.message));
 		}
 
 		try {
@@ -492,7 +492,7 @@ function main() {
 			printl(x[11]);
 			throw VarError("Uncaught error DimIndexOutofBounds");
 		} catch (DimIndexOutOfBounds& e) {
-			printl(e.description);
+			printl(e.message);
 		}
 
 		try {
@@ -500,7 +500,7 @@ function main() {
 			printl(x.at(1, 2));
 			throw VarError("Uncaught error DimIndexOutofBounds");
 		} catch (DimIndexOutOfBounds& e) {
-			printl(e.description);
+			printl(e.message);
 		}
 
 		try {
@@ -508,42 +508,42 @@ function main() {
 			var y	 = x.join();
 			throw VarError("Uncaught error - DimIndexOutofBounds");
 		} catch (DimUndimensioned& e) {
-			printl(e.description);
+			printl(e.message);
 		}
 		try {
 			dim x;
 			dim y	 = x;
 			throw VarError("Uncaught error DimUndimensioned 2");
 		} catch (DimUndimensioned& e) {
-			printl(e.description);
+			printl(e.message);
 		}
 		try {
 			dim x;
 			x		 = dim();
 //			throw VarError("Uncaught error DimUndimensioned 3");
 		} catch (DimUndimensioned& e) {
-			printl(e.description);
+			printl(e.message);
 		}
 		try {
 			dim x;
 			var y	 = x.cols();
 //			throw VarError("Uncaught error DimUndimensioned 4");
 		} catch (DimUndimensioned& e) {
-			printl(e.description);
+			printl(e.message);
 		}
 		try {
 			dim x;
 			var y	 = x.rows();
 			throw VarError("Uncaught error DimUndimensioned 5");
 		} catch (DimUndimensioned& e) {
-			printl(e.description);
+			printl(e.message);
 		}
 		try {
 			dim x;
 			x		 = "q";
 			throw VarError("Uncaught error DimUndimensioned 5");
 		} catch (DimUndimensioned& e) {
-			printl(e.description);
+			printl(e.message);
 		}
 
 #pragma GCC diagnostic push
@@ -553,28 +553,28 @@ function main() {
 			throw VarError("Uncaught error ExoStop");
 			//std::unreachable();
 		} catch (ExoStop& e) {
-			printl("Caught ExoStop", e.description);
+			printl("Caught ExoStop", e.message);
 		}
 		try {
 			abort(99);
 			throw VarError("Uncaught error ExoAbort");
 			//std::unreachable();
 		} catch (ExoAbort& e) {
-			printl("Caught ExoAbort", e.description);
+			printl("Caught ExoAbort", e.message);
 		}
 		try {
 			abortall();
 			throw VarError("Uncaught error ExoAbortAll");
 			//std::unreachable();
 		} catch (ExoAbortAll& e) {
-			printl("Caught ExoAbortAll", e.description);
+			printl("Caught ExoAbortAll", e.message);
 		}
 		try {
 			logoff();
 			throw VarError("Uncaught error ExoLogoff");
 			//std::unreachable();
 		} catch (ExoLogoff& e) {
-			printl("Caught MVlogoff", e.description);
+			printl("Caught MVlogoff", e.message);
 		}
 #pragma GCC diagnostic pop
 

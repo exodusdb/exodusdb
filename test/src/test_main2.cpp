@@ -203,7 +203,7 @@ function main() {
 								   //var xx=xx++;			//doesnt compile
 	} catch (VarError& error) {
 		std::cout << "error in main2.cpp2\n";
-		printx(error.description);
+		printx(error.message);
 	}
 
 #ifdef VAR_SAFE_DESTRUCTOR
@@ -214,13 +214,13 @@ function main() {
 		assert(false);
 	} catch (VarUnconstructed& e) {
 		//g++ sees the above as undefined
-		var(e.description).outputl();
+		var(e.message).outputl();
 	} catch (VarUnassigned& e) {
 		//clang sees the above as unassigned
-		var(e.description).outputl();
+		var(e.message).outputl();
 	}
 	//catch(VarNonNumeric& e) {
-	//	e.description.outputl();
+	//	e.message.outputl();
 	//}
 	catch (...) {
 		//should never get here because above should cause a runtime error
@@ -831,7 +831,7 @@ TRACE("qqqa")
 		printl(filehandle);
 	}
 	catch (VarError& error) {
-		error.description.outputl();
+		error.message.outputl();
 	}
 */
 

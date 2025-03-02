@@ -846,7 +846,7 @@ function loop_exit() {
 					USERNAME = saveusername;
 
 				} catch (VarError& e) {
-					errputl(e.description);
+					errputl(e.message);
 					if (statustrans() and not rollbacktrans())
 						loglasterror();
 				}
@@ -1558,7 +1558,7 @@ subroutine process() {
 			if (not rollbacktrans())
 				loglasterror();
 			// Similar code in net.cpp and listen.cpp
-			response_ = var(e.description) ^ FM ^ e.stack();
+			response_ = var(e.message) ^ FM ^ e.stack();
 		}
 
 	return;

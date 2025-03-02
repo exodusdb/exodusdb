@@ -111,7 +111,7 @@
 	try{ \
 		var(EXPRESSION).quote().errputl("TRACE: " #EXPRESSION " = "); \
 	} catch (VarError e) { \
-		var(e.stack()).errputl(e.description); \
+		var(e.stack()).errputl(e.message); \
 	};
 
 #define TRACE2(EXPRESSION) \

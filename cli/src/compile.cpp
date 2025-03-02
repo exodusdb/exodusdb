@@ -1729,7 +1729,7 @@ ENVIRONMENT
 
 		// Must catch all errors because crashing a thread will crash the whole program
 		} catch (VarError& e) {
-			errputl(e.description);
+			errputl(e.message);
 			errputl(var(e.stack()).convert(_FM, _EOL));
 		}
 

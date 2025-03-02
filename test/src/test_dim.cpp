@@ -325,14 +325,14 @@ function main() {
 		try {
 			assert(d3.reverse().join(",") eq "");
 			assert(false);
-		} catch (DimUndimensioned& e) { var(e.description).errputl();}
+		} catch (DimUndimensioned& e) { var(e.message).errputl();}
 
 		// Reverse - unassigned should be error
 		dim d4;
 		try {
 			assert(d4.reverse().join(",") eq "");
 			assert(false);
-		} catch (DimUndimensioned& e) { var(e.description).errputl();}
+		} catch (DimUndimensioned& e) { var(e.message).errputl();}
 
 	}
 	{
@@ -801,7 +801,7 @@ function main() {
 		try {
 			var x = d1.join(",");
 			assert(false);
-		} catch (DimUndimensioned& e) { var(e.description).errputl();}
+		} catch (DimUndimensioned& e) { var(e.message).errputl();}
 	}
 
 	{

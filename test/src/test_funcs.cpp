@@ -179,7 +179,7 @@ function main() {
 			abort("asd");
 			assert(false);
 		} catch (ExoAbort& e) {
-			printl(e.description);
+			printl(e.message);
 		}
 	}
 	{

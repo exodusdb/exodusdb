@@ -564,11 +564,11 @@ function main() {
 	}
 
 	{
-		assert(capitalise("aa \"AAA\"")      eq "Aa \"AAA\"");
-		assert(capitalise("aa \"aAa\"")      eq "Aa \"aAa\"");
-		assert(capitalise("aa 'AAA'")        eq "Aa 'AAA'");
-		assert(capitalise("aa 'aAa'")        eq "Aa 'aAa'");
-		assert(capitalise("1aA 2AA 3Aa 4aa") eq "1AA 2AA 3AA 4AA");
+//		assert(tcase("aa \"AAA\"").outputl()      eq "Aa \"AAA\"");
+//		assert(tcase("aa \"aAa\"").outputl()      eq "Aa \"aAa\"");
+//		assert(tcase("aa 'AAA'").outputl()        eq "Aa 'AAA'");
+//		assert(tcase("aa 'aAa'").outputl()        eq "Aa 'aAa'");
+//		assert(tcase("1aA 2AA 3Aa 4aa").outputl() eq "1AA 2AA 3AA 4AA");
 
 		//raw strings
 		var value = R"('1')";

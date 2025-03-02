@@ -160,7 +160,7 @@
 659 bool var::locateusing(const char* usingchar, in target, out setting, const int fieldno, const int valueno, const int subvalueno) const
 660 var  var::f(const int argfieldn, const int argvaluen, const int argsubvaluen) const
 661 void var::remover(int fieldno, int valueno, int subvalueno) &
-662 void var::r(int fieldno, int valueno, int subvalueno, in replacement) &
+662 void var::updater(int fieldno, int valueno, int subvalueno, in replacement) &
 663 void var::inserter(const int fieldno, const int valueno, const int subvalueno, in insertion) &
 664 bool var::starts(SV prefix) const
 665 bool var::ends(SV suffix) const

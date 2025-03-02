@@ -100,16 +100,4 @@ void ExodusProgramBase::setcursor(in cursor) const {
 	return;
 }
 
-var ExodusProgramBase::getprompt() const {
-	//std::cout << "ExodusProgramBase::getprompt() not implemented yet " << std::endl;
-	var("ExodusProgramBase::getprompt() not implemented yet ").outputl();
-	return "";
-}
-
-void ExodusProgramBase::setprompt(in /*prompt*/) const {
-	//std::cout << "ExodusProgramBase::setprompt() not implemented yet " << std::endl;
-	var("ExodusProgramBase::setprompt() not implemented yet ").outputl();
-	return;
-}
-
 }  // namespace exo

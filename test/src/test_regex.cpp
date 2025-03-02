@@ -284,13 +284,13 @@ function main() {
 		try {
 			notutf8.match("X").errputl();
 			assert(false);
-		} catch (VarError& e) {errputl(e.description);}
+		} catch (VarError& e) {errputl(e.message);}
 
 		printl("\n-- Test bad target in match");
 		try {
 			utf8.match(notutf8).errputl();
 			assert(false);
-		} catch (VarError& e) {errputl(e.description);}
+		} catch (VarError& e) {errputl(e.message);}
 
 		// REPLACING
 
@@ -298,19 +298,19 @@ function main() {
 		try {
 			notutf8.replace("X"_rex, "Y").errputl();
 			assert(false);
-		} catch (VarError& e) {errputl(e.description);}
+		} catch (VarError& e) {errputl(e.message);}
 
 		printl("\n-- Test bad target in replace using rex()");
 		try {
 			utf8.replace(rex(notutf8), "Y").errputl();
 			assert(false);
-		} catch (VarError& e) {errputl(e.description);}
+		} catch (VarError& e) {errputl(e.message);}
 
 		printl("\n-- Test bad replacement in replace using _rex");
 		try {
 			utf8.replace("X"_rex, notutf8).errputl();
 			assert(false);
-		} catch (VarError& e) {errputl(e.description);}
+		} catch (VarError& e) {errputl(e.message);}
 	}
 
 	{

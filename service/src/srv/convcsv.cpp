@@ -327,7 +327,7 @@ nextdict:
 					// t=title[1,1]
 					// convert @lower.case to @upper.case in t
 					// title[1,1]=t
-					title = capitalise(title);
+					title = tcase(title);
 
 					title.replacer("(Base)", "(" ^ srv.company.f(3) ^ ")");
 

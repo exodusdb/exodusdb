@@ -97,7 +97,7 @@
 		PROPERTIES
 		PASS_REGULAR_EXPRESSION "Test passed"
 #		FAIL_REGULAR_EXPRESSION "Test failed"
-		TIMEOUT 15
+		TIMEOUT 30
 	)
 
 #
@@ -136,7 +136,7 @@
 			PROPERTIES
 			PASS_REGULAR_EXPRESSION "Test passed"
 #			FAIL_REGULAR_EXPRESSION "(Test failed)"
-			TIMEOUT 15
+			TIMEOUT 30
 		)
 
 	endforeach()

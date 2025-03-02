@@ -14,17 +14,17 @@ namespace exo {
 class PUBLIC VarError {
  public:
 
-	//VarError(CBR description) = delete;
+	//VarError(CBR message) = delete;
 	//explicit
-	VarError(std::string description);
+	VarError(std::string message);
 
-	// Note: "description" is not const so that an exception handler (catch block)
+	// Note: "message" is not const so that an exception handler (catch block)
 	// can add any context (additional info only known in the handler)
-	// to the error description and rethrow the exception up to
+	// to the error message and rethrow the exception up to
 	// a higher exception handler.
 	// (using plain "throw;")
 	// Otherwise the only the stack track captured by the exception site will be available. 
-	std::string description;
+	std::string message;
 
 	// function to convert stack addresses to source code if available
 	std::string stack(const std::size_t limit = 0) const;

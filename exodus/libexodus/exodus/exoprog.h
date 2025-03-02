@@ -132,19 +132,21 @@ class PUBLIC ExodusProgramBase {
 	// Is this required?
 	virtual ~ExodusProgramBase();
 
-	// All work on CURSOR
+	///////////////////
+	///// Select lists:
+	///////////////////
+
+	// obj is
+
+	// All the following work on an environment variable CURSOR.
 	bool select(in sortselectclause_or_filehandle = "");
 	bool selectkeys(in keys);
 ND	bool hasnext();
-	bool readnext(io key);
-	bool readnext(io key, io valueno);
-	bool readnext(io record, io key, io valueno);
+	bool readnext(out key);
+	bool readnext(out key, out valueno);
+	bool readnext(out record, out key, out valueno);
 	void pushselect(out cursor);
 	void popselect(in cursor);
-//	[[deprecated("Replace with pushselect(out saved_cursor)")]]
-//	void pushselect(in v1, out v2, io v3, io v4);
-//	[[deprecated("Replace with pushselect(in saved_cursor)")]]
-//	void popselect(in v1, in v2, io v3, io v4);
 	void clearselect();
 	// THIS should be removed from exoprog and made a free function that doesnt use CURSOR
 	bool deleterecord(in filename_or_handle_or_command, in key = "");
@@ -156,11 +158,6 @@ ND	bool hasnext();
 	[[deprecated ("exoprog::makelist() Refactor makelist(\"\", keys) as selectkeys(keys) or use fixdeprecated")]]
 	bool makelist(SV listname, in keys);
 
-	void note(in msg, in options = "") const;
-	void note(in msg, in options, io buffer, in params = "") const;
-	void mssg(in msg, in options = "") const;
-	void mssg(in msg, in options, io buffer, in params = "") const;
-
 	////////////////////
 	///// User security:
 	////////////////////
@@ -168,14 +165,6 @@ ND	bool hasnext();
 	// User authorisation checks
 	var  authorised(in task0, io msg, in defaultlock = "", in username0 = "");
 	var  authorised(in task0);
-
-	// Get user security array SECURITY
-	void readuserprivs() const;
-
-	// Save user security array SECURITY
-	void writeuserprivs() const;
-
-ND	var  getuserdept(in usercode);
 
 ND	var  otherusers(in param);
 ND	var  otherdatasetusers(in param);
@@ -187,24 +176,33 @@ ND	var  otherdatasetusers(in param);
 	// Check if a command's first word  is a performable/executable exodus program.
 	var  libinfo(in command);
 
-	// Call an exodus library
-	// The following environment variables are initialised on entry to the performed library and restored on return to the calling program.
+	// Run an exodus library's main function using a command like syntax similar to that of executable programs.
+	// A "command line" is passed to the library in the usual COMMAND, SENTENCE and OPTIONS environment variables instead of function arguments.
+	// The library's main function should have zero arguments. Performing a library function with main arguments results in them being unassigned and in some case core dump may occur.
+	// The following environment variables are initialised on entry to the main function of the library. They are restored on return to the calling program.
 	// SENTENCE, COMMAND, OPTIONS: Initialised from the argument "sentence".
 	// RECUR0, RECUR1, RECUR2, RECUR3, RECUR4 to "".
 	// ID, RECORD, MV, DICT initialised to "".
-	// LEVEL is incremented.
-	// Select lists are shared.
-	// sentence: The first word of the sentence is the name of the library to be called. sentence is used to initialise COMMAND and OPTIONS.
-	// Returns: Whatever var the library returns, or "" if it calls "abort(()".
+	// LEVEL is incremented by one.
+	// Any active select list is passed to the performed program and can be consumed by it. Conversely any active select list created by the library will be returned to the calling program.
+	// sentence: The first word of this argument is used as the name of the library to be loaded and run. sentence is used to initialise the SENTENCE, COMMAND and OPTIONS environment variables.
+	// Returns: Whatever var the library returns, or "" if it calls stop() or abort(()".
+    // The return value can be ignored and discarded without any compiler warning.
+	// Note that library functions may also be directly called using ordinary function syntax with multiple arguments if necessary. An "#include <libname.h>" line is required after the "programinit()" line. In this case, stop() and abort() in the called library terminate the calling program as well unless caught using try/catch syntax.
 	var  perform(in sentence);
 
-	// Call an exodus library
-	// Identical to perform but any currently active select list is not accessible to the executed library and is preserved. Any select list created by the executed library is discarded when it terminates.
+	// Run an exodus library's main function.
+	// Identical to perform() but any currently active select list in the calling program is not accessible to the executed library and is preserved in the callng [program as is. Any select list created by the executed library is discarded when it terminates.
 	var  execute(in sentence);
 
-	// Call an exodus library
+	// Close the current program and run an exodus library's main function.
+	// Identical to perform().
 	[[noreturn]]
 	void chain(in libraryname);
+
+	//////////////////////////////////////
+	///// dictionaries and i/o conversion:
+	//////////////////////////////////////
 
 	// given dictid reads dictrec from DICT file and extracts from RECORD/ID or calls library
 	// called dict+DICT function dictid not const so we can mess with the library?
@@ -212,9 +210,22 @@ ND	var  calculate(in dictid);
 ND	var  calculate(in dictid, in dictfile, in id, in record, in mv = 0);
 ND	var  xlate(in filename, in key, in fieldno_or_name, const char* mode);
 
-	//bool fsmsg(in msg = "") const;	 // always returns false so can be used like return fsmsg();
-ND	var  sysvar(in var1, in var2, in mv3, in mv4);
-	void setprivilege(in var1);
+	// ioconv with access to all exoprog functionality and base ioconv
+	// Particularly the ability to call custom ioconv functions like "[xxxxxxxx]"
+ND	var  oconv(in input, in conversion);
+ND	var  iconv(in input, in conversion);
+
+[[deprecated("Replace with tcase()")]]
+ND	var  capitalise(in str0, in mode = var(), in wordseps = var()) const;
+
+	// Split combined amount and currency code string
+	// e.g. "123.45XYZ" -> "123.45" and "XYZ"
+	var  amountunit(in input0, out unitx);
+ND	var  amountunit(in input0);
+
+	/////////////////////
+	///// Record locking:
+	/////////////////////
 
 	// NB does not return record yet
 ND	bool lockrecord(in filename, io file, in keyx, in recordx, const int waitsecs = 0, const bool allowduplicate = false) const;
@@ -222,17 +233,21 @@ ND	bool lockrecord(in filename, io file, in keyx) const;
 	bool unlockrecord(in filename, io file, in key) const;
 	bool unlockrecord() const;
 
+//	void flushindex(in filename);
+
+	/////////////////////////////
+	///// Terminal i/o utilities:
+	/////////////////////////////
+
+	void note(in msg, in options = "") const;
+	void note(in msg, in options, io buffer, in params = "") const;
+	void mssg(in msg, in options = "") const;
+	void mssg(in msg, in options, io buffer, in params = "") const;
+
 ND	var  decide(in question, in options = "") const;
-	var  decide(in question, in options, io reply, const int defaultreply = 1) const;
+	var  decide(in question, in options, out reply, const int defaultreply = 1) const;
 
-	void savescreen(io origscrn, io origattr) const;
-//	var  keypressed(int milliseconds = 0) const;
 ND	bool esctoexit() const;
-
-	void flushindex(in filename);
-ND	var  encrypt2(in encrypt0) const;
-ND	var  xmlquote(in str) const;
-ND	bool loginnet(in dataset, in username, io cookie, io msg);
 
 	// TERMINAL specific terminal cursor control
 ND	var  AT(const int code) const;
@@ -241,23 +256,25 @@ ND	var  AT(const int x, const int y) const;
 ND	var  getcursor() const;
 	void setcursor(in cursor) const;
 
-ND	var  getprompt() const;
-	void setprompt(in prompt) const;
-
-ND	var  handlefilename(in handle);
-
-	// ioconv with access to all exoprog functionality and base ioconv
-	// Particularly the ability to call custom ioconv functions like "[xxxxxxxx]"
-ND	var  oconv(in input, in conversion);
-ND	var  iconv(in input, in conversion);
-
-ND	var  capitalise(in str0, in mode = var(), in wordseps = var()) const;
+	//////////////////////
+	///// Array utilities:
+	//////////////////////
 
 	// FMs become VMs and vice versa
 ND	var  invertarray(in input, in force0 = (0));
 
-	// Sorts specific fields of multivalues in parallel
+	// Sorts multiple fields of multivalues in parallel
+	// fns: VM separated list of field numbers to sort in parallel based on the first field number
+	// orderby:
+	// AL Ascending Alphabetic
+	// DL Descending Alphabetic
+	// AR Ascending Numeric
+	// DR Descending Numeric
 	void  sortarray(io array, in fns = 0, in orderby0 = "");
+
+	//////////////////////////
+	///// Time/date utilities:
+	//////////////////////////
 
 	// Returns: Text of date and time in users time zone
 	// e.g. 2MAR2025 11:52AM
@@ -267,62 +284,58 @@ ND	var  timedate2();
 	// Utility to return local, server and utc date and time
 	void  getdatetime(out localdate, out localtime, out sysdate, out systime, out utcdate, out utctime);
 
-	// Returns: Text of elapsed time since program started.
+	// Returns: Text of elapsed time since TIMESTAMP
+	// TIMESTAMP is initialised with ostimestamp() at program/thread startup.
 	// e.g. "< 1 ms"
-ND	var  elapsedtimetext() const; // Since TIMESTAMP
+ND	var  elapsedtimetext() const;
 
 	// Returns: Text of elapsed time since a given timestamp.
-	// Timestamps obtained from ostimestamp()
 ND	var  elapsedtimetext(in timestamp_difference) const;
 
-	// ReturnsL Text of elapsed time between two timestamps
-	// Timestamps obtained from ostimestamp()
+	// Returns: Text of elapsed time between two timestamps
 ND	var  elapsedtimetext(in timestamp1, in timestamp2) const;
 
-	// Splits "123.45XYZ" into "123.45" and "XYZ"
-	var  amountunit(in input0, out unitx);
-ND	var  amountunit(in input0);
-
-	// Program flow control
-	///////////////////////
+	///////////////////////////
+	///// Program flow control:
+	///////////////////////////
 
 	// Return to parent exoprog
 	// or quit to OS WITHOUT an error
 	// bool to allow "or stop()"
 	[[noreturn]]
-	bool stop(in description = "") const;
+	void stop(in message = "") const;
 
 	// Return to parent exoprog
 	// or quit to OS WITH an error 1
 	// bool to allow "or abort()"
 	[[noreturn]]
-	bool abort(in description = "") const;
+	void abort(in message = "") const;
 
 	// Quit to OS WITH an error 2
 	// bool to allow "or abortall()"
 	[[noreturn]]
-	bool abortall(in description = "") const;
+	void abortall(in message = "") const;
 
 	// Quit to OS WITHOUT an error
 	// bool to allow "or logoff()"
 	//[[deprecated("Deprecated is a great way to highlight all uses of something!")]]
 	[[noreturn]]
-	bool logoff(in description = "") const;
+	void logoff(in message = "") const;
 
  private:
 
 	// ioconv with a language specific month
-	var  exoprog_date(in type, in input0, in ndecs0, io output);
-	var  exoprog_number(in type, in input0, in ndecs0, io output);
+	var  exoprog_date(in type, in input0, in ndecs0, out output);
+	var  exoprog_number(in type, in input0, in ndecs0, out output);
 
 };
 
 // clang-format off
 
-class PUBLIC ExoStop     {public:explicit ExoStop    (in var1 = ""); var description;};
-class PUBLIC ExoAbort    {public:explicit ExoAbort   (in var1 = ""); var description;};
-class PUBLIC ExoAbortAll {public:explicit ExoAbortAll(in var1 = ""); var description;};
-class PUBLIC ExoLogoff   {public:explicit ExoLogoff  (in var1 = ""); var description;};
+class PUBLIC ExoStop     {public:explicit ExoStop    (in var1 = ""); var message;};
+class PUBLIC ExoAbort    {public:explicit ExoAbort   (in var1 = ""); var message;};
+class PUBLIC ExoAbortAll {public:explicit ExoAbortAll(in var1 = ""); var message;};
+class PUBLIC ExoLogoff   {public:explicit ExoLogoff  (in var1 = ""); var message;};
 
 // clang-format on
 

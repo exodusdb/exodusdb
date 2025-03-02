@@ -286,7 +286,7 @@ auto get_timebank_acno(const std::string_view arg1) -> int {
 	else if (++acno && arg1 == "bool var::locateusing(const char* usingchar, in target, out setting, const int fieldno, const int valueno, const int subvalueno) const") {}
 	else if (++acno && arg1 == "var  var::f(const int argfieldn, const int argvaluen, const int argsubvaluen) const") {}
 	else if (++acno && arg1 == "void var::remover(int fieldno, int valueno, int subvalueno) &") {}
-	else if (++acno && arg1 == "void var::r(int fieldno, int valueno, int subvalueno, in replacement) &") {}
+	else if (++acno && arg1 == "void var::updater(int fieldno, int valueno, int subvalueno, in replacement) &") {}
 	else if (++acno && arg1 == "void var::inserter(const int fieldno, const int valueno, const int subvalueno, in insertion) &") {}
 	else if (++acno && arg1 == "bool var::starts(SV prefix) const") {}
 	else if (++acno && arg1 == "bool var::ends(SV suffix) const") {}

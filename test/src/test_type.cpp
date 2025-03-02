@@ -56,7 +56,7 @@ function main() {
 			assert(x eq -2);
 			//		assert(x eq 18446744073709551614ULL)
 		} catch (VarNumOverflow& e) {
-			errputl(" thrown ", e.description);
+			errputl(" thrown ", e.message);
 		}
 	}
 
@@ -114,7 +114,7 @@ function main() {
 			assert(false && ui);
 		} catch (VarNonPositive& e) {
 			//} catch(VarNumUnderflow& e) {
-			errputl(" thrown ", e.description);
+			errputl(" thrown ", e.message);
 		}
 		//		std::cout << ui << std::endl;
 		//		assert(ui eq 4294967294);
@@ -126,7 +126,7 @@ function main() {
 			assert(false && ull);
 		} catch (VarNonPositive& e) {
 			//} catch(VarNumUnderflow& e) {
-			errputl(" thrown ", e.description);
+			errputl(" thrown ", e.message);
 		}
 		//		std::cout << ull << std::endl;
 		//		assert(ull eq 18446744073709551614ULL);
@@ -189,7 +189,7 @@ function main() {
 			std::cout << int(c2) << std::endl;
 			//assert(c2 ==?);
 		} catch (VarNonNumeric& e) {
-			errputl(" thrown ", e.description);
+			errputl(" thrown ", e.message);
 		}
 
 		printl("IMPLICIT conversion to std::string");
@@ -272,7 +272,7 @@ function main() {
 			assert(false);
 		}
 		catch (VarNumOverflow& e) {
-			errputl(" thrown ", e.description);
+			errputl(" thrown ", e.message);
 		}
 
 		// unsigned long int - Check too large var's SIGNED int64_t
@@ -281,7 +281,7 @@ function main() {
 			assert(false);
 		}
 		catch (VarNumOverflow& e) {
-			errputl(" thrown ", e.description);
+			errputl(" thrown ", e.message);
 		}
 
 		// uint64_t - Check too large var's SIGNED int64_t
@@ -290,7 +290,7 @@ function main() {
 			assert(false);
 		}
 		catch (VarNumOverflow& e) {
-			errputl(" thrown ", e.description);
+			errputl(" thrown ", e.message);
 		}
 	}
 	{
@@ -304,7 +304,7 @@ function main() {
 //			assert(false);
 //		}
 //		catch (VarNumUnderflow& e) {
-//			errputl(" thrown ", e.description);
+//			errputl(" thrown ", e.message);
 //		}
 //
 //		// unsigned long int - Check too low negative var's SIGNED int64_t
@@ -313,7 +313,7 @@ function main() {
 //			assert(false);
 //		}
 //		catch (VarNumUnderflow& e) {
-//			errputl(" thrown ", e.description);
+//			errputl(" thrown ", e.message);
 //		}
 //
 //		// uint64_t - Check too low negative var's SIGNED int64_t
@@ -322,7 +322,7 @@ function main() {
 //			assert(false);
 //		}
 //		catch (VarNumUnderflow& e) {
-//			errputl(" thrown ", e.description);
+//			errputl(" thrown ", e.message);
 //		}
 	}
 	{
@@ -342,7 +342,7 @@ function main() {
 			assert(false);
 		}
 		catch (VarNumOverflow& e) {
-			errputl(" thrown ", e.description);
+			errputl(" thrown ", e.message);
 		}
 
 		// Verify long double can cause underflow
@@ -353,7 +353,7 @@ function main() {
 			assert(false);
 		}
 		catch (VarNumUnderflow& e) {
-			errputl(" thrown ", e.description);
+			errputl(" thrown ", e.message);
 		}
 
 	}

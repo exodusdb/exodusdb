@@ -102,8 +102,8 @@ function main() {
 
 	{
 		// Not implemented?
-		var x = getprompt();
-		setprompt(x);
+//		var x = getprompt();
+//		setprompt(x);
 	}
 
 	{

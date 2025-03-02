@@ -22,7 +22,7 @@ function main() {
 			var(0xffffffffffffffff).errputl();	// minus 1 should br runtime error
 			assert(false);
 		} catch (VarNumOverflow& e) {
-			printl(e.description);
+			printl(e.message);
 		}
 
 		TRACE(0x7fffffffffffffff)	// max int64
@@ -31,7 +31,7 @@ function main() {
 			var(0x8000000000000000).errputl();	// min int64 should be runtime error
 			assert(false);
 		} catch (VarNumOverflow& e) {
-			printl(e.description);
+			printl(e.message);
 		}
 
 		try {
@@ -40,7 +40,7 @@ function main() {
 			var(i64).errputl();// should be runtime error
 			assert(false);
 		} catch (VarNumOverflow& e) {
-			printl(e.description);
+			printl(e.message);
 		}
 
 		{  //min int64
@@ -61,7 +61,7 @@ function main() {
 				assert(false and var("i64_min--"));
 				i64_min.dump().outputl();
 			} catch (VarNumUnderflow& e) {
-				printl("Successfully caught deliberate error", e.description);
+				printl("Successfully caught deliberate error", e.message);
 			}
 		}
 
@@ -110,7 +110,7 @@ function main() {
 				assert(false and var("i64_max++"));
 				i64_max.dump().outputl();
 			} catch (VarNumOverflow& e) {
-				printl("Successfully caught deliberate error", e.description);
+				printl("Successfully caught deliberate error", e.message);
 			}
 		}
 
@@ -189,7 +189,7 @@ function main() {
 			assert(x.toInt64());
 			assert(false);	//should not get here
 		} catch (VarNonNumeric& e) {
-			printl("OK", e.description);
+			printl("OK", e.message);
 		}
 		x.dump().outputl();
 	}
@@ -203,7 +203,7 @@ function main() {
 			assert(x.toInt64());
 			assert(false);	//should not get here
 		} catch (VarNonNumeric& e) {
-			printl("OK", e.description);
+			printl("OK", e.message);
 		}
 		x.dump().outputl();
 	}

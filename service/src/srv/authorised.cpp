@@ -201,15 +201,15 @@ updateprivs:
 notallowed:
 			// MSG=capitalise(TASK):'||Sorry ':capitalise(msgusername):', you are not authorised to do this.|'
 			if (msgusername != USERNAME) {
-				msg = capitalise(msgusername) ^ "is not";
+				msg = tcase(msgusername) ^ "is not";
 			} else {
-				msg = "Sorry " ^ capitalise(msgusername) ^ ", you are";
+				msg = "Sorry " ^ tcase(msgusername) ^ ", you are";
 			}
 			msg ^= " not";
 			if (positive) {
 				msg ^= " specifically";
 			}
-			msg ^= " authorised to do||" ^ capitalise(task);
+			msg ^= " authorised to do||" ^ tcase(task);
 			// RETURN 0
 			return "";
 		}

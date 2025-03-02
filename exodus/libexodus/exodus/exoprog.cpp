@@ -570,17 +570,17 @@ bool ExodusProgramBase::hasnext() {
 }
 
 // readnext 1
-bool ExodusProgramBase::readnext(io key) {
+bool ExodusProgramBase::readnext(out key) {
 	return CURSOR.readnext(key);
 }
 
 // readnext 2
-bool ExodusProgramBase::readnext(io key, io valueno) {
+bool ExodusProgramBase::readnext(out key, out valueno) {
 	return CURSOR.readnext(key, valueno);
 }
 
 // readnext 3
-bool ExodusProgramBase::readnext(io record, io key, io valueno) {
+bool ExodusProgramBase::readnext(out record, out key, out valueno) {
 	return CURSOR.readnext(record, key, valueno);
 }
 
@@ -642,18 +642,6 @@ bool ExodusProgramBase::deleterecord(in filename_or_handle_or_command, in key) {
 	return true;
 	//return filehandle.deleterecord(key);
 }
-
-//// pushselect deprecated
-//void ExodusProgramBase::pushselect(in /*v1*/, out saved_cursor, io /*v3*/, io /*v4*/) {
-//	pushselect(saved_cursor);
-//	return;
-//}
-//
-//// popselect deprecated
-//void ExodusProgramBase::popselect(in /*v1*/, in saved_cursor, io /*v3*/, io /*v4*/) {
-//	popselect(saved_cursor);
-//	return;
-//}
 
 // pushselect
 void ExodusProgramBase::pushselect(out saved_cursor) {
@@ -766,6 +754,25 @@ void ExodusProgramBase::mssg(in msg, in options, io buffer, in params) const {
 	}
 }
 
+// readuserprivs
+//void ExodusProgramBase::readuserprivs() const {
+void readuserprivs(in definitions, out security) {
+	if (not definitions or not(security.read(definitions, "SECURITY"))) {
+		security = "";
+	}
+	return;
+}
+
+// writeuserprivs
+//void ExodusProgramBase::writeuserprivs() const {
+void writeuserprivs(in definitions, io security) {
+	security.updater(9, "");
+	if (definitions) {
+		security.write(definitions, "SECURITY");
+	}
+	return;
+}
+
 // authorised 1
 var ExodusProgramBase::authorised(in task0) {
 	var msg;
@@ -866,7 +873,7 @@ var ExodusProgramBase::authorised(in task0, io msg, in defaultlock, in username0
 			SECURITY.remover(10, taskn);
 			SECURITY.remover(11, taskn);
 updateprivs:
-			gosub writeuserprivs();
+			gosub writeuserprivs(DEFINITIONS, SECURITY);
 			return 1;
 		} else if (renaming) {
 			// delete any existing rename target task
@@ -902,7 +909,7 @@ updateprivs:
 			return 1;
 		}
 		if (not noadd) {
-			gosub readuserprivs();
+			gosub readuserprivs(DEFINITIONS, SECURITY);
 			// if (SECURITY.len() < 65000) {
 			if (true) {
 				var x = var();
@@ -915,7 +922,7 @@ updateprivs:
 					}
 					SECURITY.inserter(10, taskn, task);
 					SECURITY.inserter(11, taskn, newlock);
-					gosub writeuserprivs();
+					gosub writeuserprivs(DEFINITIONS, SECURITY);
 					if (username == "EXODUS") {
 						call note(task ^ "|TASK ADDED");
 					}
@@ -932,15 +939,18 @@ notallowed:
 			// MSG=capitalise(TASK):'||Sorry, ':capitalise(msgusername):', you are not
 			// authorised to do this.|'
 			if (msgusername != USERNAME)
-				msg = capitalise(msgusername) ^ "is not";
+				//msg = capitalise(msgusername) ^ "is not";
+				msg = msgusername.tcase() ^ "is not";
 			else
-				msg = "Sorry, " ^ capitalise(msgusername) ^ ", you are";
+//				msg = "Sorry, " ^ capitalise(msgusername) ^ ", you are";
+				msg = "Sorry, " ^ msgusername.tcase() ^ ", you are";
 
 			msg ^= " not";
 			if (positive) {
 				msg ^= " specifically";
 			}
-			msg ^= " authorised to do||" ^ capitalise(task);
+//			msg ^= " authorised to do||" ^ capitalise(task);
+			msg ^= " authorised to do||" ^ task.tcase();
 
 			return 0;
 		} else
@@ -958,7 +968,7 @@ notallowed:
 	// surely this is not necessary since users are in already
 	if (not(SECURITY.f(1).locate(username, usern))) {
 		if (username != "EXODUS" and username != APPLICATION) {
-			gosub readuserprivs();
+			gosub readuserprivs(DEFINITIONS, SECURITY);
 			usern = (SECURITY.f(1)).fcount(VM) + 1;
 			if (SECURITY.len() < 65000) {
 				var users;
@@ -997,11 +1007,6 @@ notallowed:
 		if (keys.locateusing(" ", lockx)) {
 			// call note(task:' ok')
 		} else
-			// MSG=capitalise(TASK):'||Sorry, ':capitalise(msgusername):', you are not
-			// authorised to do this.|' MSG='Sorry, ':capitalise(msgusername):', you are
-			// not authorised to do||':capitalise(task)
-			// call note(task:' ko')
-			// RETURN 0
 			goto notallowed;
 	}	// lockn;
 
@@ -1010,24 +1015,7 @@ notallowed:
 	return 1;
 }
 
-// readuserprivs
-void ExodusProgramBase::readuserprivs() const {
-	if (not DEFINITIONS or not(SECURITY.read(DEFINITIONS, "SECURITY"))) {
-		SECURITY = "";
-	}
-	return;
-}
-
-// writeuserprivs
-void ExodusProgramBase::writeuserprivs() const {
-	SECURITY.updater(9, "");
-	if (DEFINITIONS) {
-		SECURITY.write(DEFINITIONS, "SECURITY");
-	}
-	return;
-}
-
-// capitalise
+// capitalise [[deprecated]]
 var ExodusProgramBase::capitalise(in str0, in mode0, in wordseps0) const {
 
 	var string2;
@@ -1328,7 +1316,7 @@ var ExodusProgramBase::perform(in sentence) {
 		catch (const ExoAbort& e) {
 			// similar to stop for the time being
 			// maybe it should set some error flag/messages
-			mssg(e.description);
+			mssg(e.message);
 			ANS = "";
 		}
 
@@ -1669,25 +1657,6 @@ baddict:
 //	return false;
 //}
 
-// sysvar
-var ExodusProgramBase::sysvar(in /*errmsg*/, in /*var2*/, in /*var3*/, in /*var4*/) {
-
-	std::cout << "sysvar() do nothing:";
-	//	var reply;
-	//	cin>>reply;
-	return "";
-}
-
-// setprivilege
-void ExodusProgramBase::setprivilege(in errmsg) {
-
-	PRIVILEGE = errmsg;
-	std::cout << "setprivilege(" << errmsg << ") do nothing" << std::endl;
-	//	var reply;
-	//	cin>>reply;
-	return;
-}
-
 // decide 2
 var ExodusProgramBase::decide(in question, in options) const {
 	var reply = "";
@@ -1695,7 +1664,7 @@ var ExodusProgramBase::decide(in question, in options) const {
 }
 
 // decide 4
-var ExodusProgramBase::decide(in questionx, in optionsx, io reply, const int defaultreply) const {
+var ExodusProgramBase::decide(in questionx, in optionsx, out reply, const int defaultreply) const {
 
 	// If default reply is 0 then there is no default
 	// and pressing Enter returns "" and reply is set to 0
@@ -1766,16 +1735,6 @@ inp:
 
 	return options.f(reply);
 }
-
-// savescreen
-void ExodusProgramBase::savescreen(io /*origscrn*/, io /*origattr*/) const {
-	std::cout << "ExodusProgramBase::savescreen not implemented" << std::endl;
-}
-
-//// keypressed
-//var ExodusProgramBase::keypressed(int milliseconds) const {
-//	return var().hasinput(milliseconds);
-//}
 
 // esctoexzit
 bool ExodusProgramBase::esctoexit() const {
@@ -1941,197 +1900,6 @@ bool ExodusProgramBase::unlockrecord(in /*filename*/, io file0, in key) const {
 	return 1;
 }
 
-// flushindex
-void ExodusProgramBase::flushindex(in /*filename*/) {
-	//std::cout << "ExodusProgramBase::std::flushindex not implemented yet, " << filename
-	//	  << std::endl;
-	return;
-}
-
-// encrypt2
-var ExodusProgramBase::encrypt2(in encrypt0) const {
-
-	var encrypt = encrypt0;
-	var encryptkey = 1234567;
-
-	// pass1
-	while (true) {
-		// BREAK;
-		if (!(encrypt != ""))
-			break;
-
-		encryptkey = (encryptkey % 390001) * (var(encrypt.first())).seq() + 1;
-		encrypt.cutter(1);
-	}  // loop;
-
-	// pass2
-	while (true) {
-		encrypt ^= var().chr(65 + (encryptkey % 50));
-		encryptkey = (encryptkey / 50).floor();
-		// BREAK;
-		if (!encryptkey)
-			break;
-
-	}  // loop;
-
-	return encrypt;
-}
-
-// xmlquote
-var ExodusProgramBase::xmlquote(in string0) const {
-
-	var string1;
-
-	if (string0.unassigned()) {
-		// de bug
-		string1 = "UNASSIGNED";
-	} else {
-		string1 = string0;
-	}
-
-	string1.replacer("&", "&amp;");
-	string1.replacer(DQ, "&quot;");
-	string1.replacer("<", "&lt;");
-	string1.replacer(">", "&gt;");
-
-	string1.converter(DQ, "\'");
-	string1.replacer(VM, "\" \"");
-	string1.replacer(FM, "\" \"");
-	return string1.quote();
-}
-
-// loginnet
-bool ExodusProgramBase::loginnet(in /*dataset*/, in username, io cookie, io msg) {
-
-	var menuid;
-	var usern;
-	var menun;
-	var xx;
-
-	// this is a custom login routine called from listen2
-	cookie = "";
-	var menus;
-	if (!menus.open("ADMENUS")) {
-		if (!menus.open("MENUS") && username != "EXODUS") {
-			msg = "Error: Cannot open MENUS file";
-			return false;
-		}
-	}
-
-	// return allowable menus
-	if (username == "EXODUS") {
-		menuid = "ADAGENCY";
-	} else {
-		if (!(SECURITY.f(1).locate(username, usern))) {
-			msg = "Error: " ^ username.quote() ^ " user is missing";
-			return false;
-		}
-		menuid = SECURITY.f(3, usern);
-	}
-
-	var menu = "";
-	if (!menu.read(menus, menuid)) {
-		if (username == "EXODUS") {
-			if (!menu.read(menus, "EXODUS")) {
-				menu = FM ^ FM ^ FM ^ FM ^ FM ^
-					   "MEDIA|ADPRODUCTION|ACCS|ANALMENU|TIMESHEETS|FILESMENU|"
-					   "GENERAL|EXIT2";
-				menu.converter("|", VM);
-			}
-		}
-	}
-	if (!menu) {
-		msg = "Error: " ^ menuid.quote() ^ " menu is missing";
-		return false;
-	}
-
-	var menucodes = menu.f(6) ^ VM ^ "HELP";
-	// remove local support menu
-	if (!authorised("SUPPORT MENU ACCESS", msg, "LS")) {
-		if (menucodes.f(1).locate("GENERA", menun))
-			// menucodes.eraser(1, menun, 0);
-			menucodes.remover(1, menun, 0);
-	}
-	menucodes.converter(VM ^ ".", ",_");
-
-	// prepare session cookie
-	cookie = "m=" ^ menucodes;
-
-	return true;
-
-	/* custom login per application
-	 var compcode = "";
-
-	 var temp;
-	 if (!(temp.read(companies, "%RECORDS%"))) {
-	 companies.select();
-	 temp = "";
-	 nextcomp:
-	 var compcodex;
-	 if (var("").readnext(compcodex)) {
-	 temp.updater(-1, 0, 0, compcodex);
-	 goto nextcomp;
-	 }
-	 }
-
-	 if (APPLICATION ne "ACCOUNTS") {
-	 for (int ii = 1; ii <= 9999; ii++) {
-	 compcode = temp.f(ii);
-	 //until validcode('company',compcode)
-	 //BREAK;
-	 if (validcode2(compcode, "", "")) break;
-	 };//ii;
-	 }else{
-	 compcode = temp.f(1);
-	 }
-
-	 if (!compcode) {
-	 msg = "Error: You are not authorised to access any companies";
-	 return false;
-	 }
-
-	 var tempcompany;
-	 if (!tempcompany.read(companies, compcode)) {
-	 msg = "Error: " ^ compcode.quote() ^ " company code is missing";
-	 return;
-	 }
-
-	 company = "";
-	 initcompany(compcode);
-
-	 force error here TODO: check trigraph following;
-	 var defmarketcode = (company.f(30)) ? (company.f(30)) : (agp.f(37));
-	 //if unassigned(markets) then markets=''
-
-	 //markets is not open in finance only module
-	 //readf maincurrcode from markets,defmarketcode,5 else maincurrcode=''
-	 var maincurrcode = "";
-	 if (FILES[0].locateusing(FM,"MARKETS", FM))
-	 maincurrcode = defmarketcode.xlate("MARKETS", 5, "X");
-
-	 if (maincurrcode.unassigned())
-	 maincurrcode = "";
-	 if (maincurrcode == "")
-	 maincurrcode = basecurrency;
-
-	 cookie ^= "&cc=" ^ compcode;
-	 cookie ^= "&pd=" ^ currperiod ^ "/" ^ addcent(curryear);
-	 cookie ^= "&bc=" ^ basecurrency;
-	 cookie ^= "&bf=" ^ USER2;
-	 cookie ^= "&mk=" ^ defmarketcode;
-	 cookie ^= "&mc=" ^ maincurrcode;
-	 temp = SYSTEM.f(23);
-	 temp.replace("&", " and ");
-	 cookie ^= "&db=" ^ temp;
-
-	 backupreminder(dataset, msg);
-
-	 changelogsubs("WHATSNEW" ^ FM ^ menucodes);
-	 cookie ^= "&wn=" ^ ANS;
-
-	 */
-}
-
 // WARNING/ pickos column and row numbering is 0 based but
 // in exodus we move to 1 based numbering to be consistent with
 // c/c++/linux/terminal standards. hopefully not too inconvenient
@@ -2189,41 +1957,6 @@ var ExodusProgramBase::AT(const int columnno) const {
 		return "\r\x1B[K";
 
 	return "";
-}
-
-// handlefilename
-var ExodusProgramBase::handlefilename(in handle) {
-	return handle.f(1);
-}
-
-//getuserdept
-var ExodusProgramBase::getuserdept(in usercode) {
-	// locate the user in the list of users
-	var usern;
-	if (!(SECURITY.f(1).locate(usercode, usern))) {
-		if (usercode == "EXODUS") {
-			ANS = "EXODUS";
-			return ANS;
-		} else {
-			ANS = "";
-			return ANS;
-		}
-	}
-
-	// locate divider, or usern+1
-	var nusers = (SECURITY.f(1)).count(VM) + 1;
-	var usernx;
-	for (usernx = 1; usernx <= nusers; usernx++) {
-		// BREAK;
-		if (SECURITY.f(1, usernx) == "---")
-			break;
-
-	}	// usern;
-
-	// get the department code
-	ANS = SECURITY.f(1, usernx - 1);
-
-	return ANS;
 }
 
 // oconv
@@ -2291,7 +2024,8 @@ var ExodusProgramBase::oconv(in input0, in conversion) {
 			}
 			//custom function "[CAPITALISE]" will use the standard exodus var oconv
 			else if (functionname == "capitalise") {
-				outx = capitalise(result, mode, "");
+//				outx = capitalise(result, mode, "");
+				outx = result.tcase();
 			} else {
 
 				// set the function name
@@ -2618,7 +2352,7 @@ zero:
 	//function main(in type, in input0, in ndecs0, out outx) {
 	//c xxx in,in,in,out
 
-var ExodusProgramBase::exoprog_date(in type, in in0, in mode0, io outx) {
+var ExodusProgramBase::exoprog_date(in type, in in0, in mode0, out outx) {
 //var ExodusProgramBase::number(in type, in input0, in ndecs0, io outx) {
 	//c sys in,in,in,out,in
 
@@ -2721,7 +2455,7 @@ ok:
 }
 
 // number
-var ExodusProgramBase::exoprog_number(in type, in input0, in ndecs0, io outx) {
+var ExodusProgramBase::exoprog_number(in type, in input0, in ndecs0, out outx) {
 	//function main(in type, in input0, in ndecs0, out outx) {
 	//c xxx in,in,in,out
 
@@ -3148,15 +2882,15 @@ var ExodusProgramBase::amountunit(in input0, out unitx) {
 
 // clang-format off
 
-ExoStop     ::ExoStop(in errmsg)     : description(errmsg) {}
-ExoAbort    ::ExoAbort(in errmsg)    : description(errmsg) {}
-ExoAbortAll ::ExoAbortAll(in errmsg) : description(errmsg) {}
-ExoLogoff   ::ExoLogoff(in errmsg)   : description(errmsg) {}
+ExoStop     ::ExoStop(in errmsg)     : message(errmsg) {}
+ExoAbort    ::ExoAbort(in errmsg)    : message(errmsg) {}
+ExoAbortAll ::ExoAbortAll(in errmsg) : message(errmsg) {}
+ExoLogoff   ::ExoLogoff(in errmsg)   : message(errmsg) {}
 
-[[noreturn]] bool ExodusProgramBase::stop(in errmsg)     const {throw ExoStop(errmsg);}
-[[noreturn]] bool ExodusProgramBase::abort(in errmsg)    const {throw ExoAbort(errmsg);}
-[[noreturn]] bool ExodusProgramBase::abortall(in errmsg) const {throw ExoAbortAll(errmsg);}
-[[noreturn]] bool ExodusProgramBase::logoff(in errmsg)   const {throw ExoLogoff(errmsg);}
+[[noreturn]] void ExodusProgramBase::stop(in errmsg)     const {throw ExoStop(errmsg);}
+[[noreturn]] void ExodusProgramBase::abort(in errmsg)    const {throw ExoAbort(errmsg);}
+[[noreturn]] void ExodusProgramBase::abortall(in errmsg) const {throw ExoAbortAll(errmsg);}
+[[noreturn]] void ExodusProgramBase::logoff(in errmsg)   const {throw ExoLogoff(errmsg);}
 
 // clang-format on
 

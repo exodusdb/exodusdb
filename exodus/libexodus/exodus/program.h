@@ -70,31 +70,31 @@ static int PROGRAMCLASSNAME##main2(int exodus_argc, const char* exodus_argv[], i
         try {                                                                                               \
             result = exodusprogram1.main().toInt();                                                         \
         } catch (const ExoStop& exceptionx) {                                                                \
-            if (exceptionx.description.len())                                                               \
-                exceptionx.description.outputl();                                                           \
-            if (exceptionx.description.isnum())                                                             \
-                result = exceptionx.description.toInt();                                                    \
+            if (exceptionx.message.len())                                                               \
+                exceptionx.message.outputl();                                                           \
+            if (exceptionx.message.isnum())                                                             \
+                result = exceptionx.message.toInt();                                                    \
         } catch (const ExoAbort& exceptionx) {                                                               \
-            if (exceptionx.description.len())                                                               \
-                exceptionx.description.errputl();                                                           \
-            if (exceptionx.description.isnum() && exceptionx.description)                                   \
-                result = exceptionx.description;                                                            \
+            if (exceptionx.message.len())                                                               \
+                exceptionx.message.errputl();                                                           \
+            if (exceptionx.message.isnum() && exceptionx.message)                                   \
+                result = exceptionx.message;                                                            \
             else                                                                                            \
                 result = 1;                                                                                 \
         } catch (const ExoAbortAll& exceptionx) {                                                            \
-            if (exceptionx.description.len())                                                               \
-                exceptionx.description.errputl();                                                           \
-            if (exceptionx.description.isnum() && exceptionx.description)                                   \
-                result = exceptionx.description.toInt();                                                    \
+            if (exceptionx.message.len())                                                               \
+                exceptionx.message.errputl();                                                           \
+            if (exceptionx.message.isnum() && exceptionx.message)                                   \
+                result = exceptionx.message.toInt();                                                    \
             else                                                                                            \
                 result = 2;                                                                                 \
         } catch (const ExoLogoff& exceptionx) {                                                              \
-            if (exceptionx.description.len())                                                               \
-                exceptionx.description.outputl();                                                           \
-            if (exceptionx.description.isnum())                                                             \
-                result = exceptionx.description.toInt();                                                    \
+            if (exceptionx.message.len())                                                               \
+                exceptionx.message.outputl();                                                           \
+            if (exceptionx.message.isnum())                                                             \
+                result = exceptionx.message.toInt();                                                    \
         } catch (const VarError& exceptionx) {                                                              \
-            errputl(exceptionx.description, " - Aborting.");                                                \
+            errputl(exceptionx.message, " - Aborting.");                                                \
             errputl(var(exceptionx.stack()).convert(FM, "\n"));                                             \
             result = OPTIONS.contains("I") ? 0 : 999;                                                       \
         }/* catch (const std::exception& exceptionx) {                                                      \

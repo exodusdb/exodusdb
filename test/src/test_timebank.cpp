@@ -20,7 +20,7 @@ function main() {
 //		assert(xvformat(fmt, x) == "12.346");
 //		assert(false && fmt ^ " should throw a format error");
 //	} catch (VarError e) {
-//		errputl("Caught format error: " + e.description);
+//		errputl("Caught format error: " + e.message);
 //	}
 
 	var v1 = 12.3456;

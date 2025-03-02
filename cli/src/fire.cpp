@@ -80,7 +80,8 @@ function main() {
 
 				// Diff
 				let tmpfilename = ostempdirpath() ^ osfilename.convert(OSSLASH, "_");
-				oswrite(RECORD on tmpfilename) or abort(lasterror());
+				if (not oswrite(RECORD on tmpfilename))
+					abort(lasterror());
 				// diff returns an error if there are differences
 				//if (not osshell("diff " ^ osfilename ^ " " ^ tmpfilename ^ " --color=always")) {
 				var cmd = "diff " ^ osfilename ^ " " ^ tmpfilename;
@@ -100,7 +101,8 @@ function main() {
 				if (not osshell(cmd)) {
 					//lasterror().outputl();
 				}
-				osremove(tmpfilename) or abort(lasterror());
+				if (not osremove(tmpfilename))
+					abort(lasterror());
 			}
 		}
 	}

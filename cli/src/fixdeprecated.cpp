@@ -265,6 +265,16 @@ function main() {
 			//call pushselect(0, v69, v70, v71);
 			//call popselect(0, v69, v70, v71);
 			srcline.replacer(R"__(\b(push|pop)select\([^,]+,\s*([a-zA-Z0-9_]+).*)__"_rex, "$1select\\($2\\);");
+
+			//MVLogoff -> ExoLogoff
+			srcline.replacer(R"__(\bMVLogoff\b)__"_rex, "ExoLogoff");
+
+			//tcase(mediacodes, "QUOTE");
+			//mediacode.replace(_VM, "\" \"").quote();
+			srcline.replacer(R"__(\bcapitalise\(([a-zA-Z0-9_]+), "QUOTE"\);)__"_rex, R"__($1.replace\(_VM, "\\" \\""\).quote\(\);)__");
+
+			//capitalise( -> tcase(
+			srcline.replacer(R"__(\bcapitalise\()__"_rex, "tcase\\(");
 		};
 
 		source_fixer(srcline);
@@ -449,6 +459,9 @@ function main() {
 						// Probably updated already.
 						dat_update = locate(datfilename, datfilenames);
 					}
+				} else {
+					// Assume someone else owns the dict element
+					dat_update = true;
 				}
 			}
 

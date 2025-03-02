@@ -557,7 +557,7 @@ nextline:
 				for (const var coln : range(1, ncols)) {
 					var dictrec = "F";
 					dictrec(2)	= coln + fieldoffset;
-					dictrec(3)	= capitalise(cols.f(coln, 1));
+					dictrec(3)	= tcase(cols.f(coln, 1));
 					dictrec(10) = "10";
 					let dictid	= dictcolprefix ^ "_" ^ cols.f(coln, 1).convert(" ", "_").ucase();
 

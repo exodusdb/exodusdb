@@ -1092,7 +1092,7 @@ bool var::starts(SV prefix) const {
 	if (prefix.empty()) {
 		var(function_sig).errputl();
 //		VarError e(__PRETTY_FUNCTION__);
-//		e.description.errput();
+//		e.message.errput();
 //		e.stack(1).f(1).errputl();
 		return false;
 	}
@@ -1109,7 +1109,7 @@ bool var::ends(SV suffix) const {
 	if (suffix.empty()) {
 		var(function_sig).errputl();
 //		VarError e(__PRETTY_FUNCTION__);
-//		e.description.errput();
+//		e.message.errput();
 //		e.stack(1).f(1).errputl();
 		return false;
 	}

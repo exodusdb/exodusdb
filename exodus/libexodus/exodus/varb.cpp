@@ -85,7 +85,7 @@ template<> PUBLIC RETVAR VARBASE1::clone() const {
 //
 template<> PUBLIC RETVAR VARBASE1::move() {
 
-    THISIS("var var::move()")
+    THISIS("var  var::move()")
     assertAssigned(function_sig);
 
 	// Like clone but moves the std::string and sets the old var to UNA empty string.
@@ -213,14 +213,14 @@ inline void varb_replace_string (std::string& subject, const std::string& search
 
 // VarError constructor
 //
-VarError::VarError(std::string description_)
-	: description(description_) {
+VarError::VarError(std::string message_)
+	: message(message_) {
 	// *** WARNING ***
 	// any errors in this constructor
 	// will cause recursion and hang/segfault
 
-//	if (description.assigned())
-//		description.put(std::cerr);
+//	if (message.assigned())
+//		message.put(std::cerr);
 //	var("\n").put(std::cerr);
 
 	// Capture the stack at point of creation i.e. when thrown
@@ -231,25 +231,25 @@ VarError::VarError(std::string description_)
 	std::cout << std::flush;
 
 //	this->stack = exo_backtrace();
-//	((description.assigned() ? description : "") ^ "\n" ^ stack.convert(FM, "\n") ^ "\n").put(std::cerr);
+//	((message.assigned() ? message : "") ^ "\n" ^ stack.convert(FM, "\n") ^ "\n").put(std::cerr);
 //	this->stack = "";
 
 //	stack.convert(FM, "\n").put(std::cerr);
 //	var("\n").put(std::cerr);
 
 	// Hide complexity
-//	if (description.contains("var_")) {
-	if (description.find("var_") != std::string::npos) {
-	    varb_replace_string(description, "exo::var_base<exo::var_mid<exo::var>>", "var");
-    	varb_replace_string(description, " [var = exo::var_mid<exo::var>]", "");
-    	varb_replace_string(description, " [var = exo::var_mid<exo::var>, ", "[");
+//	if (message.contains("var_")) {
+	if (message.find("var_") != std::string::npos) {
+	    varb_replace_string(message, "exo::var_base<exo::var_mid<exo::var>>", "var");
+    	varb_replace_string(message, " [var = exo::var_mid<exo::var>]", "");
+    	varb_replace_string(message, " [var = exo::var_mid<exo::var>, ", "[");
 	}
 
 	// Break into debugger if EXO_DEBUG is set to 1
 	// otherwise allow catch at a higher level or terminate
 	var exo_debug;
 	if (exo_debug.osgetenv("EXO_DEBUG") and exo_debug == 1) {
-		var(description).errputl("\n");
+		var(message).errputl("\n");
 		var(stack()).convert(FM, "\n").errputl();
 		debug();
 	}
