@@ -30,10 +30,10 @@ export namespace exo {
 
 	using exo::lasterror;
 
-	using exo::MVStop;
-	using exo::MVAbort;
-	using exo::MVAbortAll;
-	using exo::MVLogoff;
+	using exo::ExoStop;
+	using exo::ExoAbort;
+	using exo::ExoAbortAll;
+	using exo::ExoLogoff;
 
 	using exo::range;
 	using exo::reverse_range;
@@ -323,10 +323,10 @@ export namespace exo {
 	using exo::EOL;
 	using exo::ExoEnv;
 	using exo::ExodusProgramBase;
-	using exo::MVAbort;
-	using exo::MVAbortAll;
-	using exo::MVLogoff;
-	using exo::MVStop;
+	using exo::ExoAbort;
+	using exo::ExoAbortAll;
+	using exo::ExoLogoff;
+	using exo::ExoStop;
 	using exo::OSSLASH;
 	using exo::PLATFORM;
 	using exo::RELOAD_req;

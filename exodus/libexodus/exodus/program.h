@@ -69,26 +69,26 @@ static int PROGRAMCLASSNAME##main2(int exodus_argc, const char* exodus_argv[], i
     } else {                                                                                                \
         try {                                                                                               \
             result = exodusprogram1.main().toInt();                                                         \
-        } catch (const MVStop& exceptionx) {                                                                \
+        } catch (const ExoStop& exceptionx) {                                                                \
             if (exceptionx.description.len())                                                               \
                 exceptionx.description.outputl();                                                           \
             if (exceptionx.description.isnum())                                                             \
                 result = exceptionx.description.toInt();                                                    \
-        } catch (const MVAbort& exceptionx) {                                                               \
+        } catch (const ExoAbort& exceptionx) {                                                               \
             if (exceptionx.description.len())                                                               \
                 exceptionx.description.errputl();                                                           \
             if (exceptionx.description.isnum() && exceptionx.description)                                   \
                 result = exceptionx.description;                                                            \
             else                                                                                            \
                 result = 1;                                                                                 \
-        } catch (const MVAbortAll& exceptionx) {                                                            \
+        } catch (const ExoAbortAll& exceptionx) {                                                            \
             if (exceptionx.description.len())                                                               \
                 exceptionx.description.errputl();                                                           \
             if (exceptionx.description.isnum() && exceptionx.description)                                   \
                 result = exceptionx.description.toInt();                                                    \
             else                                                                                            \
                 result = 2;                                                                                 \
-        } catch (const MVLogoff& exceptionx) {                                                              \
+        } catch (const ExoLogoff& exceptionx) {                                                              \
             if (exceptionx.description.len())                                                               \
                 exceptionx.description.outputl();                                                           \
             if (exceptionx.description.isnum())                                                             \

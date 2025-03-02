@@ -4,7 +4,7 @@ libraryinit()
 function main() {
 	// printl("Goodbye");
 	// exit(0);
-	throw MVLogoff("Logoff");
+	throw ExoLogoff("Logoff");
 	//std::unreachable();
 }
 

@@ -550,30 +550,30 @@ function main() {
 #pragma GCC diagnostic ignored "-Wunreachable-code"
 		try {
 			stop();
-			throw VarError("Uncaught error MVStop");
+			throw VarError("Uncaught error ExoStop");
 			//std::unreachable();
-		} catch (MVStop& e) {
-			printl("Caught MVStop", e.description);
+		} catch (ExoStop& e) {
+			printl("Caught ExoStop", e.description);
 		}
 		try {
 			abort(99);
-			throw VarError("Uncaught error MVAbort");
+			throw VarError("Uncaught error ExoAbort");
 			//std::unreachable();
-		} catch (MVAbort& e) {
-			printl("Caught MVAbort", e.description);
+		} catch (ExoAbort& e) {
+			printl("Caught ExoAbort", e.description);
 		}
 		try {
 			abortall();
-			throw VarError("Uncaught error MVAbortAll");
+			throw VarError("Uncaught error ExoAbortAll");
 			//std::unreachable();
-		} catch (MVAbortAll& e) {
-			printl("Caught MVAbortAll", e.description);
+		} catch (ExoAbortAll& e) {
+			printl("Caught ExoAbortAll", e.description);
 		}
 		try {
 			logoff();
-			throw VarError("Uncaught error MVLogoff");
+			throw VarError("Uncaught error ExoLogoff");
 			//std::unreachable();
-		} catch (MVLogoff& e) {
+		} catch (ExoLogoff& e) {
 			printl("Caught MVlogoff", e.description);
 		}
 #pragma GCC diagnostic pop

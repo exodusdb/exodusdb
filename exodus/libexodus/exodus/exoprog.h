@@ -59,6 +59,7 @@ class PUBLIC ExodusProgramBase {
 	// A callable used in ExodusProgramBase::calculate to call dict items in dict_xxxxxx.cpp
 	mutable Callable* dict_callable_ = nullptr;
 
+	// A cache of Callables dict functions
 	std::map<std::string, Callable*> cached_dict_functions;
 
 	// A callable used in ExodusProgramBase::perform to call libraries WITH NO ARGUMENTS
@@ -131,10 +132,10 @@ class PUBLIC ExodusProgramBase {
 	// Is this required?
 	virtual ~ExodusProgramBase();
 
-	// work on CURSOR
+	// All work on CURSOR
 	bool select(in sortselectclause_or_filehandle = "");
 	bool selectkeys(in keys);
-	ND bool hasnext();
+ND	bool hasnext();
 	bool readnext(io key);
 	bool readnext(io key, io valueno);
 	bool readnext(io record, io key, io valueno);
@@ -160,86 +161,127 @@ class PUBLIC ExodusProgramBase {
 	void mssg(in msg, in options = "") const;
 	void mssg(in msg, in options, io buffer, in params = "") const;
 
-	var authorised(in task0, io msg, in defaultlock = "", in username0 = "");
-	var authorised(in task0);
+	////////////////////
+	///// User security:
+	////////////////////
+
+	// User authorisation checks
+	var  authorised(in task0, io msg, in defaultlock = "", in username0 = "");
+	var  authorised(in task0);
+
+	// Get user security array SECURITY
 	void readuserprivs() const;
+
+	// Save user security array SECURITY
 	void writeuserprivs() const;
 
-	// Call an exodus library with a single var argument
-	var libinfo(in command);
-	var perform(in sentence);
-	[[noreturn]] void chain(in libraryname);
-	var execute(in sentence);
+ND	var  getuserdept(in usercode);
+
+ND	var  otherusers(in param);
+ND	var  otherdatasetusers(in param);
+
+	//////////////////////
+	///// Perform/Execute:
+	//////////////////////
+
+	// Check if a command's first word  is a performable/executable exodus program.
+	var  libinfo(in command);
+
+	// Call an exodus library
+	// The following environment variables are initialised on entry to the performed library and restored on return to the calling program.
+	// SENTENCE, COMMAND, OPTIONS: Initialised from the argument "sentence".
+	// RECUR0, RECUR1, RECUR2, RECUR3, RECUR4 to "".
+	// ID, RECORD, MV, DICT initialised to "".
+	// LEVEL is incremented.
+	// Select lists are shared.
+	// sentence: The first word of the sentence is the name of the library to be called. sentence is used to initialise COMMAND and OPTIONS.
+	// Returns: Whatever var the library returns, or "" if it calls "abort(()".
+	var  perform(in sentence);
+
+	// Call an exodus library
+	// Identical to perform but any currently active select list is not accessible to the executed library and is preserved. Any select list created by the executed library is discarded when it terminates.
+	var  execute(in sentence);
+
+	// Call an exodus library
+	[[noreturn]]
+	void chain(in libraryname);
 
 	// given dictid reads dictrec from DICT file and extracts from RECORD/ID or calls library
 	// called dict+DICT function dictid not const so we can mess with the library?
-	ND var calculate(in dictid);
-	ND var calculate(in dictid, in dictfile, in id, in record, in mv = 0);
-	ND var xlate(in filename, in key, in fieldno_or_name, const char* mode);
-
-	ND var otherusers(in param);
-	ND var otherdatasetusers(in param);
+ND	var  calculate(in dictid);
+ND	var  calculate(in dictid, in dictfile, in id, in record, in mv = 0);
+ND	var  xlate(in filename, in key, in fieldno_or_name, const char* mode);
 
 	//bool fsmsg(in msg = "") const;	 // always returns false so can be used like return fsmsg();
-	ND var sysvar(in var1, in var2, in mv3, in mv4);
+ND	var  sysvar(in var1, in var2, in mv3, in mv4);
 	void setprivilege(in var1);
 
 	// NB does not return record yet
-	ND bool lockrecord(in filename, io file, in keyx, in recordx, const int waitsecs = 0, const bool allowduplicate = false) const;
-	ND bool lockrecord(in filename, io file, in keyx) const;
+ND	bool lockrecord(in filename, io file, in keyx, in recordx, const int waitsecs = 0, const bool allowduplicate = false) const;
+ND	bool lockrecord(in filename, io file, in keyx) const;
 	bool unlockrecord(in filename, io file, in key) const;
 	bool unlockrecord() const;
 
-	ND var decide(in question, in options = "") const;
-	var decide(in question, in options, io reply, const int defaultreply = 1) const;
+ND	var  decide(in question, in options = "") const;
+	var  decide(in question, in options, io reply, const int defaultreply = 1) const;
 
 	void savescreen(io origscrn, io origattr) const;
-//	var keypressed(int milliseconds = 0) const;
-	ND bool esctoexit() const;
+//	var  keypressed(int milliseconds = 0) const;
+ND	bool esctoexit() const;
 
 	void flushindex(in filename);
-	ND var encrypt2(in encrypt0) const;
-	ND var xmlquote(in str) const;
-	ND bool loginnet(in dataset, in username, io cookie, io msg);
+ND	var  encrypt2(in encrypt0) const;
+ND	var  xmlquote(in str) const;
+ND	bool loginnet(in dataset, in username, io cookie, io msg);
 
 	// TERMINAL specific terminal cursor control
-	ND var AT(const int code) const;
-	ND var AT(const int x, const int y) const;
+ND	var  AT(const int code) const;
+ND	var  AT(const int x, const int y) const;
 
-	ND var getcursor() const;
+ND	var  getcursor() const;
 	void setcursor(in cursor) const;
 
-	ND var getprompt() const;
+ND	var  getprompt() const;
 	void setprompt(in prompt) const;
 
-	ND var handlefilename(in handle);
-
-	ND var getuserdept(in usercode);
+ND	var  handlefilename(in handle);
 
 	// ioconv with access to all exoprog functionality and base ioconv
-	// Particularly the ability to call custom ioconv funcs like "[xxxxxxxx]"
-	ND var oconv(in input, in conversion);
-	ND var iconv(in input, in conversion);
+	// Particularly the ability to call custom ioconv functions like "[xxxxxxxx]"
+ND	var  oconv(in input, in conversion);
+ND	var  iconv(in input, in conversion);
 
-	ND var capitalise(in str0, in mode = var(), in wordseps = var()) const;
+ND	var  capitalise(in str0, in mode = var(), in wordseps = var()) const;
 
 	// FMs become VMs and vice versa
-	ND var invertarray(in input, in force0 = (0));
+ND	var  invertarray(in input, in force0 = (0));
 
 	// Sorts specific fields of multivalues in parallel
-	void sortarray(io array, in fns = 0, in orderby0 = "");
+	void  sortarray(io array, in fns = 0, in orderby0 = "");
 
-//	ND var timedate2() {return timedate2(var(), var());}
-//	ND var timedate2(in localdate0, in localtime0, in glang = "");
-	ND var timedate2();
-	void getdatetime(out localdate, out localtime, out sysdate, out systime, out utcdate, out utctime);
+	// Returns: Text of date and time in users time zone
+	// e.g. 2MAR2025 11:52AM
+	// Offset from UTC by SW seconds.
+ND	var  timedate2();
 
-	ND var elapsedtimetext() const; // Since TIMESTAMP
-	ND var elapsedtimetext(in timestamp_difference) const;
-	ND var elapsedtimetext(in timestamp1, in timestamp2) const;
+	// Utility to return local, server and utc date and time
+	void  getdatetime(out localdate, out localtime, out sysdate, out systime, out utcdate, out utctime);
 
-	ND var amountunit(in input0);
-	var amountunit(in input0, out unitx);
+	// Returns: Text of elapsed time since program started.
+	// e.g. "< 1 ms"
+ND	var  elapsedtimetext() const; // Since TIMESTAMP
+
+	// Returns: Text of elapsed time since a given timestamp.
+	// Timestamps obtained from ostimestamp()
+ND	var  elapsedtimetext(in timestamp_difference) const;
+
+	// ReturnsL Text of elapsed time between two timestamps
+	// Timestamps obtained from ostimestamp()
+ND	var  elapsedtimetext(in timestamp1, in timestamp2) const;
+
+	// Splits "123.45XYZ" into "123.45" and "XYZ"
+	var  amountunit(in input0, out unitx);
+ND	var  amountunit(in input0);
 
 	// Program flow control
 	///////////////////////
@@ -247,36 +289,40 @@ class PUBLIC ExodusProgramBase {
 	// Return to parent exoprog
 	// or quit to OS WITHOUT an error
 	// bool to allow "or stop()"
-	[[noreturn]] bool stop(in description = "") const;
+	[[noreturn]]
+	bool stop(in description = "") const;
 
 	// Return to parent exoprog
 	// or quit to OS WITH an error 1
 	// bool to allow "or abort()"
-	[[noreturn]] bool abort(in description = "") const;
+	[[noreturn]]
+	bool abort(in description = "") const;
 
 	// Quit to OS WITH an error 2
 	// bool to allow "or abortall()"
-	[[noreturn]] bool abortall(in description = "") const;
+	[[noreturn]]
+	bool abortall(in description = "") const;
 
 	// Quit to OS WITHOUT an error
 	// bool to allow "or logoff()"
 	//[[deprecated("Deprecated is a great way to highlight all uses of something!")]]
-	[[noreturn]] bool logoff(in description = "") const;
+	[[noreturn]]
+	bool logoff(in description = "") const;
 
  private:
 
 	// ioconv with a language specific month
-	var exoprog_date(in type, in input0, in ndecs0, io output);
-	var exoprog_number(in type, in input0, in ndecs0, io output);
+	var  exoprog_date(in type, in input0, in ndecs0, io output);
+	var  exoprog_number(in type, in input0, in ndecs0, io output);
 
 };
 
 // clang-format off
 
-class PUBLIC MVStop     {public:explicit MVStop    (in var1 = ""); var description;};
-class PUBLIC MVAbort    {public:explicit MVAbort   (in var1 = ""); var description;};
-class PUBLIC MVAbortAll {public:explicit MVAbortAll(in var1 = ""); var description;};
-class PUBLIC MVLogoff   {public:explicit MVLogoff  (in var1 = ""); var description;};
+class PUBLIC ExoStop     {public:explicit ExoStop    (in var1 = ""); var description;};
+class PUBLIC ExoAbort    {public:explicit ExoAbort   (in var1 = ""); var description;};
+class PUBLIC ExoAbortAll {public:explicit ExoAbortAll(in var1 = ""); var description;};
+class PUBLIC ExoLogoff   {public:explicit ExoLogoff  (in var1 = ""); var description;};
 
 // clang-format on
 

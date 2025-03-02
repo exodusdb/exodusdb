@@ -178,7 +178,7 @@ function main() {
 		try {
 			abort("asd");
 			assert(false);
-		} catch (MVAbort& e) {
+		} catch (ExoAbort& e) {
 			printl(e.description);
 		}
 	}

@@ -1316,7 +1316,7 @@ var ExodusProgramBase::perform(in sentence) {
 //			ANS = "";
 
 		// Stop
-		catch (const MVStop&) {
+		catch (const ExoStop&) {
 			// stop is normal way of stopping a perform
 			// functions can call it to terminate the whole "program"
 			// without needing to setup chains of returns
@@ -1325,7 +1325,7 @@ var ExodusProgramBase::perform(in sentence) {
 		}
 
 		// Abort
-		catch (const MVAbort& e) {
+		catch (const ExoAbort& e) {
 			// similar to stop for the time being
 			// maybe it should set some error flag/messages
 			mssg(e.description);
@@ -1333,7 +1333,7 @@ var ExodusProgramBase::perform(in sentence) {
 		}
 
 		// AbortAll
-		catch (const MVAbortAll&) {
+		catch (const ExoAbortAll&) {
 			// similar to stop for the time being
 			// maybe it should set some error flag/messages
 			// and abort multiple levels of perform?
@@ -1354,8 +1354,8 @@ var ExodusProgramBase::perform(in sentence) {
 			throw;
 		}
 
-		// Dont catch MVLogoff in perform/execute. leave it for exoprog top level exit
-		//catch (const MVLogoff& e)
+		// Dont catch ExoLogoff in perform/execute. leave it for exoprog top level exit
+		//catch (const ExoLogoff& e)
 		//{
 		//	// similar to stop for the time being
 		//	// maybe it should set some error flag/messages
@@ -3148,15 +3148,15 @@ var ExodusProgramBase::amountunit(in input0, out unitx) {
 
 // clang-format off
 
-MVStop     ::MVStop(in errmsg)     : description(errmsg) {}
-MVAbort    ::MVAbort(in errmsg)    : description(errmsg) {}
-MVAbortAll ::MVAbortAll(in errmsg) : description(errmsg) {}
-MVLogoff   ::MVLogoff(in errmsg)   : description(errmsg) {}
+ExoStop     ::ExoStop(in errmsg)     : description(errmsg) {}
+ExoAbort    ::ExoAbort(in errmsg)    : description(errmsg) {}
+ExoAbortAll ::ExoAbortAll(in errmsg) : description(errmsg) {}
+ExoLogoff   ::ExoLogoff(in errmsg)   : description(errmsg) {}
 
-[[noreturn]] bool ExodusProgramBase::stop(in errmsg)     const {throw MVStop(errmsg);}
-[[noreturn]] bool ExodusProgramBase::abort(in errmsg)    const {throw MVAbort(errmsg);}
-[[noreturn]] bool ExodusProgramBase::abortall(in errmsg) const {throw MVAbortAll(errmsg);}
-[[noreturn]] bool ExodusProgramBase::logoff(in errmsg)   const {throw MVLogoff(errmsg);}
+[[noreturn]] bool ExodusProgramBase::stop(in errmsg)     const {throw ExoStop(errmsg);}
+[[noreturn]] bool ExodusProgramBase::abort(in errmsg)    const {throw ExoAbort(errmsg);}
+[[noreturn]] bool ExodusProgramBase::abortall(in errmsg) const {throw ExoAbortAll(errmsg);}
+[[noreturn]] bool ExodusProgramBase::logoff(in errmsg)   const {throw ExoLogoff(errmsg);}
 
 // clang-format on
 
