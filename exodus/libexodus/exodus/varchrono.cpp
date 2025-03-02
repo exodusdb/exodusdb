@@ -165,8 +165,17 @@ var  var::date() const {
 
 }
 
-// -> number of whole seconds since midnight
+// -> number of whole seconds since midnight UTC
 var  var::time() const {
+
+//	Pure chrono solution (no mixing with C-style gmtime)
+//
+//	No manual hour/minute/second calculations
+//
+//	Potential considerations:
+//	It assumes system_clock is UTC-based (true on most modern systems, but technically implementation-defined)
+//
+//	Result is always positive (0 to 86,399)
 
 	// ASSUMPTION: td::chrono::system_clock() epoch is midnight
 
@@ -178,6 +187,11 @@ var  var::time() const {
 
 	// Modulo 86'400 to get seconds since midnight
 	return secs_since_epoch % 86'400;
+
+	// One liner;
+//	return std::chrono::duration_cast<std::chrono::seconds> (
+//    	std::chrono::system_clock::now().time_since_epoch()
+//	).count() % 86400;
 
 }
 

@@ -229,8 +229,9 @@ class PUBLIC ExodusProgramBase {
 	// Sorts specific fields of multivalues in parallel
 	void sortarray(io array, in fns = 0, in orderby0 = "");
 
-	ND var timedate2() {return timedate2(var(), var());}
-	ND var timedate2(in localdate0, in localtime0, in glang = "");
+//	ND var timedate2() {return timedate2(var(), var());}
+//	ND var timedate2(in localdate0, in localtime0, in glang = "");
+	ND var timedate2();
 	void getdatetime(out localdate, out localtime, out sysdate, out systime, out utcdate, out utctime);
 
 	ND var elapsedtimetext() const; // Since TIMESTAMP

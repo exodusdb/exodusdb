@@ -2405,11 +2405,11 @@ void ExodusProgramBase::getdatetime(out localdate, out localtime, out sysdate, o
 	//by ensuring time is not less than time1
 	//which could happen over midnight
 	while (true) {
-		var systime1 = var().time();
+		var systime0 = var().time();
 		sysdate = var().date();
 		systime = var().time();
 		///BREAK;
-		if (systime ge systime1) break;
+		if (systime ge systime0) break;
 	}//loop;
 
 	//no timezone info
@@ -2476,7 +2476,8 @@ exit:
 	return;
 }
 
-var ExodusProgramBase::timedate2(in localdate0, in localtime0, in glang) {
+//var ExodusProgramBase::timedate2(in localdate0, in localtime0, in glang) {
+var ExodusProgramBase::timedate2() {
 
 	//caserevised*
 
@@ -2488,12 +2489,12 @@ var ExodusProgramBase::timedate2(in localdate0, in localtime0, in glang) {
 	var x6;
 
 	//use parameters only if both are provided
-	if (localtime0.unassigned()) {
+//	if (localtime0.unassigned()) {
 		call getdatetime(localdate, localtime, x3, x4, x5, x6);
-	} else {
-		localdate = localdate0;
-		localtime = localtime0;
-	}
+//	} else {
+//		localdate = localdate0;
+//		localtime = localtime0;
+//	}
 
 	var temp = "";
 	if (not temp) {
@@ -2503,14 +2504,14 @@ var ExodusProgramBase::timedate2(in localdate0, in localtime0, in glang) {
 	if (temp.starts("0")) {
 		temp.cutter(1);
 	}
-	if (glang) {
-		if (temp.ends("AM")) {
-			temp.paster(-2, 2, glang.f(16));
-		}
-		if (temp.ends("PM")) {
-			temp.paster(-2, 2, glang.f(17));
-		}
-	}
+//	if (glang) {
+//		if (temp.ends("AM")) {
+//			temp.paster(-2, 2, glang.f(16));
+//		}
+//		if (temp.ends("PM")) {
+//			temp.paster(-2, 2, glang.f(17));
+//		}
+//	}
 
 	if (DATEFMT eq "") {
 		DATEFMT = "D/E";
