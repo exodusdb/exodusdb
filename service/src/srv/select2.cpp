@@ -108,7 +108,7 @@ function main(in filenamex, in linkfilename2, in sortselect0, in dictids0, in op
 	var givenkeyn = 0;
 
 	if (not useactivelist) {
-		call pushselect(0, v69, v70, v71);
+		call pushselect(v69);
 	}
 
 	RECORD.move(storer);
@@ -592,7 +592,7 @@ subroutine exit() {
 	storemv.move(MV);
 
 	if (not useactivelist) {
-		call popselect(0, v69, v70, v71);
+		call popselect(v69);
 	}
 
 	return;

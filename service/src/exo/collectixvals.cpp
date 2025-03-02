@@ -17,7 +17,7 @@ function main(in filename0, in dictid, in prefix = "", in orderby = "") {
 	var	 v69;
 	var	 v70;
 	var	 v71;
-	call pushselect(0, v69, v70, v71);
+	call pushselect(v69);
 
 	var cmd = "SELECT " ^ filename ^ " DISTINCT " ^ dictid;
 	if (prefix)
@@ -62,7 +62,7 @@ function main(in filename0, in dictid, in prefix = "", in orderby = "") {
 	PSEUDO = move(indexvalues);
 
 	clearselect();
-	call popselect(0, v69, v70, v71);
+	call popselect(v69);
 
 	return 0;
 }

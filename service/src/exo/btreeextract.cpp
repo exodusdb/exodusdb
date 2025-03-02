@@ -15,7 +15,7 @@ function main(in cmd, in filename, in /*dictfile*/, out hits) {
 	var	 v69;
 	var	 v70;
 	var	 v71;
-	call pushselect(0, v69, v70, v71);
+	call pushselect(v69);
 
 	hits = "";
 
@@ -68,7 +68,7 @@ nextrec:
 	}
 
 	clearselect();
-	call popselect(0, v69, v70, v71);
+	call popselect(v69);
 
 	return 0;
 }

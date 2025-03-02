@@ -138,8 +138,14 @@ class PUBLIC ExodusProgramBase {
 	bool readnext(io key);
 	bool readnext(io key, io valueno);
 	bool readnext(io record, io key, io valueno);
-	bool pushselect(in v1, io v2, io v3, io v4);
-	bool popselect(in v1, io v2, io v3, io v4);
+
+	void pushselect(out cursor);
+	void popselect(in cursor);
+//	[[deprecated("Replace with pushselect(out saved_cursor)")]]
+//	void pushselect(in v1, out v2, io v3, io v4);
+//	[[deprecated("Replace with pushselect(in saved_cursor)")]]
+//	void popselect(in v1, in v2, io v3, io v4);
+
 	void clearselect();
 	// THIS should be removed from exoprog and made a free function that doesnt use CURSOR
 	bool deleterecord(in filename_or_handle_or_command, in key = "");

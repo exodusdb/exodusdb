@@ -262,6 +262,9 @@ function main() {
 			// if (not reply.input()) {}
 			srcline.replacer(R"__(^(\s*)([a-zA-Z0-9_.]+\.input\([^)]*\));)__"_rex, R"__($1if \(not $2\) {})__");
 
+			//call pushselect(0, v69, v70, v71);
+			//call popselect(0, v69, v70, v71);
+			srcline.replacer(R"__(\b(push|pop)select\([^,]+,\s*([a-zA-Z0-9_]+).*)__"_rex, "$1select\\($2\\);");
 		};
 
 		source_fixer(srcline);

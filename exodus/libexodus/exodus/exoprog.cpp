@@ -643,24 +643,32 @@ bool ExodusProgramBase::deleterecord(in filename_or_handle_or_command, in key) {
 	//return filehandle.deleterecord(key);
 }
 
-// pushselect
-bool ExodusProgramBase::pushselect(in /*v1*/, io v2, io /*v3*/, io /*v4*/) {
+//// pushselect deprecated
+//void ExodusProgramBase::pushselect(in /*v1*/, out saved_cursor, io /*v3*/, io /*v4*/) {
+//	pushselect(saved_cursor);
+//	return;
+//}
+//
+//// popselect deprecated
+//void ExodusProgramBase::popselect(in /*v1*/, in saved_cursor, io /*v3*/, io /*v4*/) {
+//	popselect(saved_cursor);
+//	return;
+//}
 
-	// CURSOR.quote().logputl("CURSOR=");
-	// CURSOR++;
-	// CURSOR has connection number hidden in it, so it cannot be used as an ordinary variable
-	// ATM
-	CURSOR.move(v2);
+// pushselect
+void ExodusProgramBase::pushselect(out saved_cursor) {
+	// CURSOR has connection number hidden in it, and maybe other info, so it cannot be used as an ordinary variable
+	// saved_cursor = CURSOR.move();
+	saved_cursor = CURSOR;
 	CURSOR = var().date() ^ "_" ^ (var().ostime().convert(".", "_"));
-	return true;
+	return;
 }
 
 // popselect
-bool ExodusProgramBase::popselect(in /*v1*/, io v2, io /*v3*/, io /*v4*/) {
-	// CURSOR.quote().logputl("CURSOR=");
-	// CURSOR--;
-	v2.move(CURSOR);
-	return true;
+void ExodusProgramBase::popselect(in saved_cursor) {
+	// CURSOR = saved_cursor.move();
+	CURSOR = saved_cursor;
+	return;
 }
 
 // note 2
@@ -1137,14 +1145,17 @@ var ExodusProgramBase::capitalise(in str0, in mode0, in wordseps0) const {
 // execute
 var ExodusProgramBase::execute(in sentence) {
 
-	var v1, v2, v3, v4;
-	pushselect(v1, v2, v3, v4);
+//	var v1, v2, v3, v4;
+//	pushselect(v1, v2, v3, v4);
+	var saved_cursor;
+	pushselect(saved_cursor);
 
 	var sentence2 = sentence.fieldstore(" ", 1, 1, sentence.field(" ", 1).lcase());
 
 	var result = perform(sentence);
 
-	popselect(v1, v2, v3, v4);
+//	popselect(v1, v2, v3, v4);
+	pushselect(saved_cursor);
 
 	return result;
 }
@@ -1504,8 +1515,11 @@ var ExodusProgramBase::calculate(in dictid) {
 
 		if (not cached_dictrec_.readc(DICT, dictid)) {
 
-			// try lower case
-			if (not cached_dictrec_.readc(DICT, dictid.lcase())) {
+			// try other case
+			var othercase_dictid = dictid.lcase();
+			if (othercase_dictid == dictid)
+				othercase_dictid = dictid.ucase();
+			if (not cached_dictrec_.readc(DICT, othercase_dictid)) {
 
 				// try dict.voc
 				var dictvoc;  // TODO implement mv.DICTVOC to avoid opening
@@ -1517,8 +1531,8 @@ baddict:
 								  DICT.f(1).quote() ^ " nor in dict.voc");
 				}
 				if (not cached_dictrec_.readc(dictvoc, dictid)) {
-					// try lower case
-					if (not cached_dictrec_.readc(dictvoc, dictid.lcase())) {
+					// try other case
+					if (not cached_dictrec_.readc(dictvoc, othercase_dictid)) {
 						goto baddict;
 					}
 				}

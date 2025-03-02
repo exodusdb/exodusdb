@@ -252,7 +252,7 @@ function main(in sentence0, in select0 = "", in filters0 = "") {
 
 	let selectlist = LISTACTIVE;
 	if (selectlist) {
-		call pushselect(0, v69, v70, v71);
+		call pushselect(v69);
 	}
 
 	if (exportable) {
@@ -390,7 +390,7 @@ nextdict:
 	// if @username='EXODUS' then oswrite matunparse(dictids) on 'csv'
 
 	if (selectlist) {
-		call popselect(0, v69, v70, v71);
+		call popselect(v69);
 	}
 
 	//call oswrite("", outfilename);

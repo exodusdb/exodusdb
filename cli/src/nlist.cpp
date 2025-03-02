@@ -1447,7 +1447,7 @@ x1exit:
 
 	// Work out assoc mv fns for limits
 	if (nlimits) {
-		call pushselect(0, v69, v70, v71);
+		call pushselect(v69);
 		select(DICT);
 nextdict:
 		if (readnext(dictid)) {
@@ -1469,7 +1469,7 @@ nextdict:
 			} //limitn;
 			goto nextdict;
 		}
-		call popselect(0, v69, v70, v71);
+		call popselect(v69);
 	}
 
 //////////

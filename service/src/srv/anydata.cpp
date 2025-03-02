@@ -12,7 +12,7 @@ function main(in filenames0, out result) {
 
 	// $insert bp,agency.common
 
-	call pushselect(0, v69, v70, v71);
+	call pushselect(v69);
 
 	if (filenames0) {
 		filenamesx = filenames0;
@@ -36,7 +36,7 @@ function main(in filenames0, out result) {
 	result = 0;
 
 exit:
-	call popselect(0, v69, v70, v71);
+	call popselect(v69);
 	return 0;
 }
 
