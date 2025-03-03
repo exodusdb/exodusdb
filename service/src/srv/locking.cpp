@@ -93,7 +93,7 @@ tryagain:
 		gosub getlockdesc(lockdesc, lockfilename, lockkey);
 		if (interactive) {
 			var dummy;
-			call note(lockholder ^ " is using the " ^ lockdesc, "T1", dummy, "");
+			call note(lockholder ^ " is using the " ^ lockdesc, "T1", dummy);
 			if (esctoexit()) {
 				return 0;
 			} else {

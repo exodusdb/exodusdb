@@ -416,6 +416,9 @@ ENVIRONMENT
 		// Minor space savings
 		basicoptions ^= " -ffunction-sections -fdata-sections ";
 
+		// Help fixdeprecated get all errors and deprecations
+		basicoptions ^= " -ferror-limit=999";
+
 		// Use c++ (g++/clang) -fvisibility=hidden to make all hidden except those marked DLL_PUBLIC ie "default"
 #if __GNUC__ >= 4
 		liboptions ^= " -fvisibility=hidden -fvisibility-inlines-hidden ";

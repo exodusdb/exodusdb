@@ -659,26 +659,16 @@ void ExodusProgramBase::popselect(in saved_cursor) {
 	return;
 }
 
-// mssg 2
-void ExodusProgramBase::mssg(in msg, in options) const {
-	var buffer = "";
-	note(msg, options, buffer);
-}
-
-// mssg 4
-void ExodusProgramBase::mssg(in msg, in options, io buffer, in params) const {
-	note(msg, options, buffer, params);
-}
-
 // note 2
 void ExodusProgramBase::note(in msg, in options) const {
-	var buffer = "";
-	note(msg, options, buffer);
+	var response = "";
+	note(msg, options, response);
 }
 
-// note 4
-void ExodusProgramBase::note(in msg, in options, io buffer, in params) const {
+// note 3
+void ExodusProgramBase::note(in msg, in options, io response) const {
 
+	var params = "";
 	var interactive = !SYSTEM.f(33);
 	if (interactive)
 		std::cout << var("----------------------------------------") << std::endl;
@@ -702,40 +692,40 @@ void ExodusProgramBase::note(in msg, in options, io buffer, in params) const {
 
 	std::cout << msg1 << std::endl;
 
-	var origbuffer = buffer.assigned() ? buffer : "";
+	var origresponse = response.assigned() ? response : "";
 
-	//R=Reply required in buffer
+	//R=Reply required in response
 	if (options.contains("R")) {
 		if (interactive) {
 
 			//one space after the prompt
 			//std::cout << " ";
 
-			if (buffer.unassigned())
-				buffer = "";
+			if (response.unassigned())
+				response = "";
 
 			//input with empty prompt allows defaulting and editing
-			if (not buffer.input("? ")) {}
+			if (not response.input("? ")) {}
 
 			//default
-			//if (buffer == "")
-			//	buffer=origbuffer;
+			//if (response == "")
+			//	response=origresponse;
 
 			//escape anywhere in the input returned as a single ESC character
 			//or empty input with ESC option means ESC
-			if (options.contains("E") and (buffer == "" or buffer.contains("\x1B")))
-				buffer = "\x1B";  //esc
+			if (options.contains("E") and (response == "" or response.contains("\x1B")))
+				response = "\x1B";  //esc
 
 			std::cout << std::endl;
 		} else {
 
 			//input=output if not interactive
-			buffer = origbuffer;
+			response = origresponse;
 		}
 
 		//force upper case
 		if (options.contains("C"))
-			buffer.ucaser();
+			response.ucaser();
 
 		return;
 	}
@@ -754,388 +744,9 @@ void ExodusProgramBase::note(in msg, in options, io buffer, in params) const {
 	}
 }
 
-// readuserprivs
-//void ExodusProgramBase::readuserprivs() const {
-void readuserprivs(in definitions, out security) {
-	if (not definitions or not(security.read(definitions, "SECURITY"))) {
-		security = "";
-	}
-	return;
-}
-
-// writeuserprivs
-//void ExodusProgramBase::writeuserprivs() const {
-void writeuserprivs(in definitions, io security) {
-	security.updater(9, "");
-	if (definitions) {
-		security.write(definitions, "SECURITY");
-	}
-	return;
-}
-
-/*
-// authorised 1
-var ExodusProgramBase::authorised(in task0) {
-	var msg;
-	return authorised(task0, msg);
-}
-
-// authorised 4
-var ExodusProgramBase::authorised(in task0, io msg, in defaultlock, in username0) {
-
-	var username;
-	var msgusername;
-	var taskn;	// num
-	var taskn2;
-	var xx;
-	var usern;
-
-	var task = task0;
-	if (username0.unassigned() or username0 == "") {
-		// allow for username like FINANCE(STEVE)
-		// so security is done like FINANCE but record is kept of actual user
-		// this allows for example billing module users to post as finance module users
-		username = USERNAME.field("(", 1);
-		msgusername = USERNAME;
-	} else {
-		username = username0;
-		msgusername = username;
-	}
-
-	// if username='EXODUS' or username='STEVE' then call msg(task:'');
-
-	if (task.starts(" ")) {
-		call note(DQ ^ (task0 ^ DQ));
-	}
-	// Each task may have many "locks", each users may have many "keys"
-	// A user must have keys to all the locks in order to pass
-
-	if (not task) {
-		return 1;
-	}
-
-	task.ucaser();
-	task.converter(RM ^ FM ^ VM ^ SM, "\\\\\\");
-	task.replacer(" FILE ", " ");
-	task.replacer(" - ", " ");
-	task.converter(".", " ");
-	task.trimmer();
-
-	msg = "";
-	// **CALL note(' ':TASK)
-
-	if (task.starts("..")) {
-		// call note(task:'')
-		return 1;
-	}
-
-	var noadd = task.starts("!");
-	if (noadd) {
-		task.cutter(1);
-	}
-	// if noadd else NOADD=((TASK[-1,1]='"') and (len(userprivs)<10000))
-	if (not noadd) {
-		var lenuserprivs = SECURITY.len();
-		noadd = task.ends(DQ) or lenuserprivs > 48000;
-	}
-	var positive = task.first();
-	if (positive == "#")
-		task.cutter(1);
-	else
-		positive = "";
-
-	//? as first character of task (after positive) means
-	// security is being used as a configuration and user EXODUS has no special privs
-	var isadmin;
-	if (task.starts("?")) {
-		isadmin = 0;
-		task.cutter(1);
-	} else
-		isadmin = username == "EXODUS";
-
-	var deleting = task.starts("%DELETE%");
-	if (deleting) {
-		task.cutter(8);
-	}
-	var updating = task.starts("%UPDATE%");
-	if (updating) {
-		task.cutter(8);
-	}
-	var renaming = task.starts("%RENAME%");
-	if (renaming) {
-		task.cutter(8);
-	}
-
-	// find the task
-	if (SECURITY.f(10).locate(task, taskn)) {
-		if (deleting) {
-			// SECURITY.eraser(10, taskn);
-			// SECURITY.eraser(11, taskn);
-			SECURITY.remover(10, taskn);
-			SECURITY.remover(11, taskn);
-updateprivs:
-			gosub writeuserprivs(DEFINITIONS, SECURITY);
-			return 1;
-		} else if (renaming) {
-			// delete any existing rename target task
-			if (SECURITY.f(10).locate(defaultlock, taskn2)) {
-				// SECURITY.eraser(10, taskn2);
-				// SECURITY.eraser(11, taskn2);
-				SECURITY.remover(10, taskn2);
-				SECURITY.remover(11, taskn2);
-				if (taskn2 < taskn) {
-					taskn -= 1;
-				}
-			}
-			SECURITY.updater(10, taskn, defaultlock);
-			if (renaming) {
-				call note(task ^ "|TASK RENAMED|" ^ defaultlock);
-			}
-			goto updateprivs;
-		} else if (updating) {
-			var tt = defaultlock;
-			if (SECURITY.f(10).locate(defaultlock, taskn2)) {
-				tt = SECURITY.f(11, taskn2);
-			}
-			SECURITY.updater(11, taskn, tt);
-			goto updateprivs;
-		}
-	} else {
-		if (deleting) {
-			return 1;
-		}
-		if (renaming) {
-			// if the task to be renamed doesnt exist just add the target task
-			call authorised(defaultlock, msg);
-			return 1;
-		}
-		if (not noadd) {
-			gosub readuserprivs(DEFINITIONS, SECURITY);
-			// if (SECURITY.len() < 65000) {
-			if (true) {
-				var x = var();
-				if (not(SECURITY.f(10).locateby("A", task, taskn))) {
-					var newlock = defaultlock;
-					// get locks on default task if present otherwise new locks
-					// are none
-					if (newlock and SECURITY.f(10).locate(newlock)) {
-						newlock = SECURITY.f(11, xx);
-					}
-					SECURITY.inserter(10, taskn, task);
-					SECURITY.inserter(11, taskn, newlock);
-					gosub writeuserprivs(DEFINITIONS, SECURITY);
-					if (username == "EXODUS") {
-						call note(task ^ "|TASK ADDED");
-					}
-				}
-			}
-		}
-	}
-
-	// if no locks then pass ok unless positive locking required
-	var locks = SECURITY.f(11, taskn);
-	if (locks == "") {
-		if (positive and not isadmin) {
-notallowed:
-			// MSG=capitalise(TASK):'||Sorry, ':capitalise(msgusername):', you are not
-			// authorised to do this.|'
-			if (msgusername != USERNAME)
-				//msg = capitalise(msgusername) ^ "is not";
-				msg = msgusername.tcase() ^ "is not";
-			else
-//				msg = "Sorry, " ^ capitalise(msgusername) ^ ", you are";
-				msg = "Sorry, " ^ msgusername.tcase() ^ ", you are";
-
-			msg ^= " not";
-			if (positive) {
-				msg ^= " specifically";
-			}
-//			msg ^= " authorised to do||" ^ capitalise(task);
-			msg ^= " authorised to do||" ^ task.tcase();
-
-			return 0;
-		} else
-			return 1;
-	} else if (locks == "NOONE") {
-		goto notallowed;
-	}
-
-	// if index('012',@privilege,1) then goto ok
-	if (isadmin) {
-		return 1;
-	}
-
-	// find the user (add to bottom if not found)
-	// surely this is not necessary since users are in already
-	if (not(SECURITY.f(1).locate(username, usern))) {
-		if (username != "EXODUS" and username != APPLICATION) {
-			gosub readuserprivs(DEFINITIONS, SECURITY);
-			usern = (SECURITY.f(1)).fcount(VM) + 1;
-			if (SECURITY.len() < 65000) {
-				var users;
-				if (not(users.open("USERS"))) {
-					goto notallowed;
-				}
-				var USER;
-				if (not(USER.read(users, username))) {
-					goto notallowed;
-				}
-				SECURITY.inserter(1, usern, username);
-				SECURITY.inserter(2, usern, "");
-				// add in memory only
-				// gosub writeuserprivs
-			}
-		}
-	}
-
-	// user must have all the keys for all the locks on this task
-	// following users up to first blank line also have the same keys
-	var keys = SECURITY.f(2).field(VM, usern, 999);
-	var temp = keys.index("---");
-	if (temp) {
-		keys.paster(temp - 1, 999, "");
-	}
-	// convert ',' to vm in keys
-	// convert ',' to vm in locks
-	keys.converter("," _VM "", "  ");
-	locks.converter(",", " ");
-	// NLOCKS=COUNT(LOCKS,vm)+1
-	var nlocks = locks.count(" ") + 1;
-
-	for (var lockn = 1; lockn <= nlocks; ++lockn) {
-		// LOCKx=FIELD(LOCKS,vm,LOCKN)
-		var lockx = locks.field(" ", lockn);
-		if (keys.locateusing(" ", lockx)) {
-			// call note(task:' ok')
-		} else
-			goto notallowed;
-	}	// lockn;
-
-	// ok:
-	// CALL STATUP(2,3,TASK)
-	return 1;
-}
-*/
-// capitalise [[deprecated]]
-var ExodusProgramBase::capitalise(in str0, in mode0, in wordseps0) const {
-
-	var string2;
-
-	if (not str0) {
-		string2 = "";
-		return string2;
-	}
-
-	if (mode0.unassigned() || !mode0.len() || mode0 == "CAPITALISE") {
-		string2 = str0;
-		// convert @upper.case to @lower.case in string2
-		int nn = string2.len();
-		var numx = var("1234567890").contains(string2.first());
-		var cap = 1;
-		var wordseps;
-		var inquotes = 0;
-		// wordseps=' /-.()&'
-		if (wordseps0.unassigned())
-			wordseps = " .()&_" _RM _FM _VM _SM _TM _ST;
-		else
-			wordseps = wordseps0;
-		for (int ii = 1; ii <= nn; ii++) {
-			var tt = string2.b(ii, 1);
-
-			if (inquotes) {
-				inquotes = tt != inquotes;
-			} else {
-				//if (tt == DQ && (string2.count(DQ) > 1 || tt == "\'") &&
-				//	string2.count("\'") > 1) {
-				if ((tt == DQ and string2.count(DQ) gt 1) or ((tt == "'" and string2.count("'") gt 1))) {
-					inquotes = tt;
-				} else {
-					if (wordseps.contains(tt)) {
-						cap = 1;
-						if (tt == " ")
-							//numx = var("1234567890").contains(string2.b(ii + 1, 1), 1);
-							numx = var("1234567890").contains(string2.at(ii + 1));
-					} else {
-						if (cap || numx) {
-							tt.ucaser();
-							string2.paster(ii, 1, tt);
-							cap = 0;
-						} else {
-							tt.lcaser();
-							string2.paster(ii, 1, tt);
-						}
-					}
-				}
-			}
-
-		}	// ii;
-
-		string2.replacer("\'S ", "\'s ");
-		if (string2.ends("\'S"))
-			string2.paster(-2, 2, "\'s");
-	} else if (mode0 == "QUOTE") {
-		string2 = str0;
-		if (string2 != "") {
-			string2.converter(FM ^ VM ^ SM ^ TM, "    ");
-			string2.replacer(" ", "\" \"");
-			string2 = string2.quote();
-		}
-	} else if (mode0 == "UPPERCASE") {
-		string2 = str0;
-		string2.ucaser();
-	} else if (mode0 == "LOWERCASE") {
-		string2 = str0;
-		string2.lcaser();
-	} else if (mode0.starts("PARSE")) {
-
-		var uppercase = mode0.contains("UPPERCASE");
-
-		string2 = str0;
-
-		// convert to uppercase
-		var quoted = "";
-		for (int ii = 1; ii <= 99999; ii++) {
-			//var tt = string2.b(ii, 1);
-			var tt = string2.at(ii);
-			// BREAK;
-			if (!(tt != ""))
-				break;
-			if (tt == quoted) {
-				quoted = "";
-			} else {
-				if (!quoted) {
-					if ((DQ ^ "\'").contains(tt)) {
-						quoted = tt;
-					} else {
-						if (tt == " ") {
-							tt = FM;
-							string2.paster(ii, 1, tt);
-						} else {
-							if (uppercase) {
-								tt.ucaser();
-								string2.paster(ii, 1, tt);
-							}
-						}
-					}
-				}
-			}
-		}	// ii;
-
-		if (mode0.contains("TRIM")) {
-			string2.converter(" " _FM, _FM " ");
-			string2 = string2.trim();
-			string2.converter(" " _FM, _FM " ");
-		}
-	}
-
-	return string2;
-}
-
 // execute
 var ExodusProgramBase::execute(in sentence) {
 
-//	var v1, v2, v3, v4;
-//	pushselect(v1, v2, v3, v4);
 	var saved_cursor;
 	pushselect(saved_cursor);
 
@@ -1143,7 +754,6 @@ var ExodusProgramBase::execute(in sentence) {
 
 	var result = perform(sentence);
 
-//	popselect(v1, v2, v3, v4);
 	pushselect(saved_cursor);
 
 	return result;

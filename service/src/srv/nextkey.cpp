@@ -51,17 +51,17 @@ lockit:
 			temp.cutter(1);
 		}
 		if (not buffer) {
-			call note("WAITING TO GET THE NEXT " ^ temp ^ " NUMBER|PRESS ESCAPE TO EXIT.", "UB", buffer, "");
+			call note("WAITING TO GET THE NEXT " ^ temp ^ " NUMBER|PRESS ESCAPE TO EXIT.", "UB", buffer);
 		}
 		if (esctoexit()) {
-			call note("", "DB", buffer, "");
+			call note("", "DB", buffer);
 			return "";
 		}
 		call ossleep(1000 * 1);
 		goto lockit;
 	}
 	if (buffer) {
-		call note("", "DB", buffer, "");
+		call note("", "DB", buffer);
 	}
 
 	// get the initial next number

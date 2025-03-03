@@ -40,7 +40,7 @@ function main(in startmode0, out starttime, out startdate, out /*startbuffer*/) 
 	if (startmode == "CONFIRM") {
 		reply = "";
 inpreply:
-		call note("OK to start?|(Type Yes or No)", "RC", reply, "");
+		call note("OK to start?|(Type Yes or No)", "RC", reply);
 
 		if (reply == "YES") {
 			reply = 1;

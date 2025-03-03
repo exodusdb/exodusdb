@@ -91,6 +91,11 @@ function main() {
 
 	auto update_src = [&]() {
 
+//		if (src.contains("mssg(")) {
+//			src.replacer("mssg(", "note(");
+//			updatereq = true;
+//		}
+
 		// Quit if no update required
 		if (not updatereq)
 			return;
@@ -278,6 +283,15 @@ function main() {
 
 			//mssg( -> note(
 			srcline.replacer("mssg(", "note(");
+
+			// call note("Starting at what date ?", "RC", fromdate, "");
+			// call note(question, "RC", reply, 1);
+			// call note(msg, "", dummy, "%");
+			if (srcline.contains(" note(")) {
+				srcline.replacer(", \"\");", ");");
+				srcline.replacer(", 1);", ");");
+				srcline.replacer(", \"%\");", ");");
+			}
 		};
 
 		source_fixer(srcline);
@@ -446,7 +460,7 @@ function main() {
 					source_fixer(datrec);
 
 					if (datrec ne orig_datrec) {
-						printx(datfilename, datrec);
+						printx(datfilename, datrec.trim("\n"));
 						if (update) {
 							if (oswrite(datrec on datfilename)) {
 								datfilenames ^= datfilename ^ FM;

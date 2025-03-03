@@ -39,7 +39,7 @@ function main(in fromquestion0, in uptoquestion0, io ifromdate, io iuptodate) {
 
 	var fromdate = oconv(ifromdate, "[DATE,*4]");
 inpfromdate:
-	call note(fromquestion, "RCE", fromdate, "");
+	call note(fromquestion, "RCE", fromdate);
 	if (fromdate == "" or fromdate == chr(27)) {
 		// cancel:
 		ifromdate = "";
@@ -78,7 +78,7 @@ inpfromdate:
 
 	var uptodate = oconv(iuptodate, "[DATE,*4]");
 inpuptodate:
-	call note(uptoquestion, "RCE", uptodate, "");
+	call note(uptoquestion, "RCE", uptodate);
 	if (uptodate == "" or uptodate == chr(27)) {
 		goto inpfromdate;
 	}

@@ -179,7 +179,7 @@ fail:
 		let keyfail = 0;
 		// inp.key:
 		var	 keyx = "";
-		call note("The lock is " ^ (lockx.quote()) ^ "|What is the key ?", "RC", keyx, "");
+		call note("The lock is " ^ (lockx.quote()) ^ "|What is the key ?", "RC", keyx);
 
 		ok = keyx == secid(lockx,
 						   "1000"

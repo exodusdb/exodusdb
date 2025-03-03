@@ -1714,7 +1714,7 @@ subroutine_noreturn failsys() {
 	// onscreen message
 	s33		   = SYSTEM.f(33);
 	SYSTEM(33) = "";
-	call note(msgx ^ "", "T3", yy, "");
+	call note(msgx ^ "", "T3", yy);
 	SYSTEM(33) = s33;
 
 	// respond to user

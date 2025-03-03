@@ -268,9 +268,6 @@ ND	var  xlate(in filename, in key, in fieldno_or_name, const char* mode);
 ND	var  oconv(in input, in conversion);
 ND	var  iconv(in input, in conversion);
 
-[[deprecated("Replace with tcase()")]]
-ND	var  capitalise(in str0, in mode = var(), in wordseps = var()) const;
-
 	// Split combined amount and currency code string
 	// e.g. "123.45XYZ" -> "123.45" and "XYZ"
 	var  amountunit(in input0, out unitx);
@@ -280,13 +277,11 @@ ND	var  amountunit(in input0);
 	///// Terminal i/o utilities:
 	/////////////////////////////
 
+	// Output a message and optionally request a response
+	// options: R = Response requested. C upper case response.
+	// If no terminal is available then the response will be empty.
 	void note(in msg, in options = "") const;
-	void note(in msg, in options, io buffer, in params = "") const;
-
-	[[deprecated("Replace with note()")]]
-	void mssg(in msg, in options = "") const;
-	[[deprecated("Replace with note()")]]
-	void mssg(in msg, in options, io buffer, in params = "") const;
+	void note(in msg, in options, io response) const;
 
 ND	var  decide(in question, in options = "") const;
 	var  decide(in question, in options, out reply, const int defaultreply = 1) const;
@@ -315,12 +310,12 @@ ND	var  invertarray(in input, bool pad = false);
 
 	// Sorts fields of multivalues of dynamic arrays in parallel
 	// fns: VM separated list of field numbers to sort in parallel based on the first field number
-	// orderby:
+	// order:
 	// AL Ascending  - Left Justified  - Alphabetic
 	// DL Descending - Left Justfiied  - Alphabetic
 	// AR Ascending  - Right Justified - Numeric
 	// DR Descending - Right Justified - Numeric
-	void  sortarray(io array, in fns = 0, in orderby0 = "");
+	void  sortarray(io array, in fns = "", in order = "");
 
 	//////////////////////////
 	///// Time/date utilities:

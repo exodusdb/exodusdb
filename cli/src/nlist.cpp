@@ -1131,7 +1131,7 @@ dictrecexit:
 			tt ^= " Replace with? (Enter to cancel):";
 		}
 		let oldword = word;
-		call note(tt, "RCE", word, "");
+		call note(tt, "RCE", word);
 		if (word == oldword or word == "\x1B") {
 			abort();
 		}
