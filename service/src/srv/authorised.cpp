@@ -7,15 +7,6 @@ libraryinit()
 
 #include <srv_common.h>
 
-var username;
-var msgusername;
-var isexodus;  // num
-var taskn;	   // num
-var taskn2;
-//var xx;
-var newlock;
-var usern;
-
 function main(in task0, out msg, in defaultlock = "", in username0 = "") {
 
 	// NB de bugging afer recompile requires restart since SECURITY is in PRELOAD
@@ -23,6 +14,8 @@ function main(in task0, out msg, in defaultlock = "", in username0 = "") {
 
 	var task = task0;
 
+	var username;
+	var msgusername;
 	if (username0.unassigned()) {
 nousername0:
 		// allow for username like FINANCE(STEVE)
@@ -68,16 +61,19 @@ nousername0:
 	if (noadd) {
 		task.cutter(1);
 	}
+//    // if noadd else NOADD=((TASK[-1,1]='"') and (len(userprivs)<10000))
+//    if (not noadd) {
+//        var lenuserprivs = SECURITY.len();
+//        noadd = task.ends(DQ) or lenuserprivs > 48000;
+//    }
 
-	var positive = task.first();
-	if (positive == "#") {
+	let positive = task.starts("#") ? "#" : "";
+	if (positive)
 		task.cutter(1);
-	} else {
-		positive = "";
-	}
 
 	// ? as first character of task (after positive) means
 	// security is being used as a configuration and user exodus has no special privs
+	var isexodus;
 	if (task.starts("?")) {
 		isexodus = 0;
 		task.cutter(1);
@@ -99,6 +95,7 @@ nousername0:
 	}
 
 	// find the task
+	var taskn;
 	if (SECURITY.f(10).locate(task, taskn)) {
 
 		if (deleting) {
@@ -109,6 +106,7 @@ updateprivs:
 			return 1;
 		} else if (renaming) {
 			// delete any existing rename target task
+			var taskn2;
 			if (SECURITY.f(10).locate(defaultlock, taskn2)) {
 				SECURITY.remover(10, taskn2);
 				SECURITY.remover(11, taskn2);
@@ -128,6 +126,7 @@ updateprivs:
 			goto updateprivs;
 		} else if (updating) {
 			var tt = defaultlock;
+			var taskn2;
 			if (SECURITY.f(10).locate(defaultlock, taskn2)) {
 				tt = SECURITY.f(11, taskn2);
 			}
@@ -166,6 +165,7 @@ updateprivs:
 			// if len(userprivs) < 65000 then
 			if (SECURITY.len() < maxstrsize_ - 530) {
 				if (not SECURITY.f(10).locateby("AL", task, taskn)) {
+					var newlock;
 					if (defaultlock.unassigned()) {
 						newlock = "";
 					} else {
@@ -179,6 +179,9 @@ updateprivs:
 					SECURITY.inserter(10, taskn, task);
 					SECURITY.inserter(11, taskn, newlock);
 					gosub writeuserprivs();
+					if (username == "EXODUS") {
+						call note(task ^ "|TASK ADDED");
+					}
 				}
 			}
 		}
@@ -231,6 +234,7 @@ notallowed:
 	}
 
 	// find the user
+	var usern;
 	if (not SECURITY.f(1).locate(username, usern)) {
 	}
 

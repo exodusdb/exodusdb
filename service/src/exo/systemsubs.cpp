@@ -1,6 +1,7 @@
 #include <exodus/library.h>
 libraryinit()
 
+#include <authorised.h>
 
 #include <req_common.h>
 

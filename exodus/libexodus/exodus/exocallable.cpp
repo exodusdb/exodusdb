@@ -93,9 +93,10 @@ constexpr int TRACING = 0;
 #	define DLERROR
 #	include <dlfcn.h>
 	using library_t = void*;
-#	define EXODUSLIBPREFIX "~/lib/lib"
+#	define EXODUSLIBDIR "/lib/"
+#	define EXODUSLIBPREFIX "lib"
 //# define EXODUSLIBPREFIX "./lib"+
-# define EXODUSLIBEXT ".so"
+#	define EXODUSLIBEXT ".so"
 
 #endif
 
@@ -382,12 +383,28 @@ bool Callable::checkload(const std::string newlibname, const std::string newfunc
 	return true;
 }
 
+thread_local std::string libdir;
+
 std::string Callable::libfilepath(const std::string_view libname) const {
 
-	//look for lib file in ~/lib/libXXXXXX.so
-	std::string libfilepath = EXODUSLIBPREFIX;
+	if (not libdir.size()) {
+		var temp;
+		if (temp.osgetenv("EXO_LIBDIR")) {
+			libdir = temp.toString();
+			libdir.push_back('/');
+		} else {
+			if (temp.osgetenv("EXO_HOME") || temp.osgetenv("HOME")) {
+				libdir = temp.toString();
+				libdir += EXODUSLIBDIR; // /lib/
+			}
+		}
+	}
+
+	//look for libXXXXXX.so in ~/lib
+	std::string libfilepath = libdir;
+	libfilepath += EXODUSLIBPREFIX; // lib
 	libfilepath += libname;
-	libfilepath += EXODUSLIBEXT;
+	libfilepath += EXODUSLIBEXT; // .so
 	if (libfilepath[0] == '~') {
 		// env string is copied into string so following getenv usage is safe
 		var exo_HOME;
@@ -459,9 +476,13 @@ bool Callable::openlib(const std::string newlibname) {
 	// This may waste some processing if relocations are performed for functions that are never
 	// referenced. This behavior may be useful for applications that need to know as soon as an
 	// object is loaded that all symbols referenced during execution are available.
+
+	/////////
+	// dlopen
+	/////////
 	plib_ = static_cast<void*>(dlopen(libfilepath_.c_str(), RTLD_NOW));
 
-	// Try without path in case the library is system installed e.g. in /usr/local/lib
+	// Also try without path in case the library is system installed e.g. in /usr/local/lib
 	std::size_t fnpos0;
 	std::string purelibfilename;
 	if (plib_ == nullptr) {
@@ -473,6 +494,10 @@ bool Callable::openlib(const std::string newlibname) {
 			purelibfilename = libfilepath_.substr(fnpos0 + 1);
 
 			//TRACE(purelibraryfilename)
+
+			/////////
+			// dlopen
+			/////////
 			plib_ = static_cast<void*>(dlopen(purelibfilename.c_str(), RTLD_NOW));
 
 //			// Try on the same path as the executable
@@ -492,10 +517,12 @@ bool Callable::openlib(const std::string newlibname) {
 	if (plib_ == nullptr) {
 		var libfilepath = libfilepath_;
 		if (libfilepath.osfile()) {
+
 			throw VarError(libfilepath ^ " Cannot be linked/wrong version. Run with LD_DEBUG=libs for more info. Look for 'fatal'. Also run 'ldd "
 			^ libfilepath ^ "' to check its sublibs are available. Also run 'nm -C " ^ libfilepath ^ "' to check its content.)"
 			^ " To unmangle undefined symbols run 'c++filt _ZN6exodus3varC1Ev' for example to to see  exo::var::var()");
 		} else {
+
 			throw VarError(libfilepath ^ " does not exist or cannot be found, or " ^ purelibfilename ^ " cannot be linked/wrong version?");
 		}
 		//std::unreachable();

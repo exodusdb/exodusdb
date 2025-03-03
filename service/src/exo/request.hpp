@@ -1,6 +1,10 @@
 #ifndef EXO_REQUEST_HPP_
 #define EXO_REQUEST_HPP_
 
+#ifndef EXODUS_CALLABLE_AUTHORISED_H
+#	include <authorised.h>
+#endif
+
 #include <singular.h>
 
 function security(in modex)

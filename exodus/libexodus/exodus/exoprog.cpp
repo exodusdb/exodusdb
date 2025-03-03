@@ -773,6 +773,7 @@ void writeuserprivs(in definitions, io security) {
 	return;
 }
 
+/*
 // authorised 1
 var ExodusProgramBase::authorised(in task0) {
 	var msg;
@@ -1014,7 +1015,7 @@ notallowed:
 	// CALL STATUP(2,3,TASK)
 	return 1;
 }
-
+*/
 // capitalise [[deprecated]]
 var ExodusProgramBase::capitalise(in str0, in mode0, in wordseps0) const {
 
@@ -1757,17 +1758,17 @@ bool ExodusProgramBase::esctoexit() const {
 	return key.last().ucase() == "N";
 }
 
-// otherusers
-var ExodusProgramBase::otherusers(in /*param*/) {
-	std::cout << "ExodusProgramBase::otherusers not implemented yet";
-	return var("");
-}
-
-// otherdatasetusers
-var ExodusProgramBase::otherdatasetusers(in /*param*/) {
-	std::cout << "ExodusProgramBase::otherdatausers not implemented yet";
-	return var("");
-}
+//// otherusers
+//var ExodusProgramBase::otherusers(in /*param*/) {
+//	std::cout << "ExodusProgramBase::otherusers not implemented yet";
+//	return var("");
+//}
+//
+//// otherdatasetusers
+//var ExodusProgramBase::otherdatasetusers(in /*param*/) {
+//	std::cout << "ExodusProgramBase::otherdatausers not implemented yet";
+//	return var("");
+//}
 
 // lockrecord 3
 bool ExodusProgramBase::lockrecord(in filename, io file, in keyx) const {

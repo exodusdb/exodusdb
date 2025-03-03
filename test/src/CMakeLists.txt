@@ -73,7 +73,7 @@
 # Generate testing_var.h.cpp
 # ##########################
 #
-	add_executable(testing_var_h testing_var.h.cpp ${LIBEXODUS_DIR}/var.h)
+	add_executable(testing_var_h testing_var.h.cpp ${LIBEXODUS_DIR}/var.h ${LIBEXODUS_DIR}/dim.h)
 	target_link_libraries(testing_var_h exodus ${PROJECT_LIBS})
 	if (EXO_MODULE)
 		target_link_libraries(testing_var_h
@@ -91,12 +91,15 @@
 	add_dependencies(testing_var_h PreBuild_testing_var_h)
 
 	# Setup a test
-	add_test(NAME testing_var_h COMMAND testing_var_h WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
+	add_test(NAME testing_var_h
+		COMMAND testing_var_h
+		WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+	)
 	set_tests_properties(
 		testing_var_h
 		PROPERTIES
+		ENVIRONMENT "EXO_LIBDIR=${CMAKE_CURRENT_BINARY_DIR}/${EXODUS_CLI_DIR}"
 		PASS_REGULAR_EXPRESSION "Test passed"
-#		FAIL_REGULAR_EXPRESSION "Test failed"
 		TIMEOUT 30
 	)
 

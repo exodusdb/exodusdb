@@ -158,17 +158,6 @@ ND	bool hasnext();
 	[[deprecated ("exoprog::makelist() Refactor makelist(\"\", keys) as selectkeys(keys) or use fixdeprecated")]]
 	bool makelist(SV listname, in keys);
 
-	////////////////////
-	///// User security:
-	////////////////////
-
-	// User authorisation checks
-	var  authorised(in task0, io msg, in defaultlock = "", in username0 = "");
-	var  authorised(in task0);
-
-ND	var  otherusers(in param);
-ND	var  otherdatasetusers(in param);
-
 	//////////////////////
 	///// Perform/Execute:
 	//////////////////////
@@ -200,15 +189,46 @@ ND	var  otherdatasetusers(in param);
 	[[noreturn]]
 	void chain(in libraryname);
 
-	//////////////////////////////////////
-	///// dictionaries and i/o conversion:
-	//////////////////////////////////////
+	///////////////////////////
+	///// Program termination :
+	///////////////////////////
+
+	// Return to parent exoprog
+	// or quit to OS WITHOUT an error
+	// bool to allow "or stop()"
+	[[noreturn]]
+	void stop(in message = "") const;
+
+	// Return to parent exoprog
+	// or quit to OS WITH an error 1
+	// bool to allow "or abort()"
+	[[noreturn]]
+	void abort(in message = "") const;
+
+	// Quit to OS WITH an error 2
+	// bool to allow "or abortall()"
+	[[noreturn]]
+	void abortall(in message = "") const;
+
+	// Quit to OS WITHOUT an error
+	// bool to allow "or logoff()"
+	//[[deprecated("Deprecated is a great way to highlight all uses of something!")]]
+	[[noreturn]]
+	void logoff(in message = "") const;
+
+	///////////////////////////
+	///// db file dictionaries:
+	///////////////////////////
 
 	// given dictid reads dictrec from DICT file and extracts from RECORD/ID or calls library
 	// called dict+DICT function dictid not const so we can mess with the library?
 ND	var  calculate(in dictid);
 ND	var  calculate(in dictid, in dictfile, in id, in record, in mv = 0);
 ND	var  xlate(in filename, in key, in fieldno_or_name, const char* mode);
+
+	/////////////////////
+	///// i/o conversion:
+	/////////////////////
 
 	// ioconv with access to all exoprog functionality and base ioconv
 	// Particularly the ability to call custom ioconv functions like "[xxxxxxxx]"
@@ -222,18 +242,6 @@ ND	var  capitalise(in str0, in mode = var(), in wordseps = var()) const;
 	// e.g. "123.45XYZ" -> "123.45" and "XYZ"
 	var  amountunit(in input0, out unitx);
 ND	var  amountunit(in input0);
-
-	/////////////////////
-	///// Record locking:
-	/////////////////////
-
-	// NB does not return record yet
-ND	bool lockrecord(in filename, io file, in keyx, in recordx, const int waitsecs = 0, const bool allowduplicate = false) const;
-ND	bool lockrecord(in filename, io file, in keyx) const;
-	bool unlockrecord(in filename, io file, in key) const;
-	bool unlockrecord() const;
-
-//	void flushindex(in filename);
 
 	/////////////////////////////
 	///// Terminal i/o utilities:
@@ -260,16 +268,20 @@ ND	var  getcursor() const;
 	///// Array utilities:
 	//////////////////////
 
-	// FMs become VMs and vice versa
+	// FMs become VMs and vice versa.
+	//
+	// `let v1 = "a1]a2]a3^b1]b2]b3"_var;
+	//  let v2 = invertarray(v1); // "a1]b1^a2]b2^a3]b3"_var`
+	//
 ND	var  invertarray(in input, in force0 = (0));
 
-	// Sorts multiple fields of multivalues in parallel
+	// Sorts fields of multivalues of dynamic arrays in parallel
 	// fns: VM separated list of field numbers to sort in parallel based on the first field number
 	// orderby:
-	// AL Ascending Alphabetic
-	// DL Descending Alphabetic
-	// AR Ascending Numeric
-	// DR Descending Numeric
+	// AL Ascending  - Left Justified  - Alphabetic
+	// DL Descending - Left Justfiied  - Alphabetic
+	// AR Ascending  - Right Justified - Numeric
+	// DR Descending - Right Justified - Numeric
 	void  sortarray(io array, in fns = 0, in orderby0 = "");
 
 	//////////////////////////
@@ -281,46 +293,29 @@ ND	var  invertarray(in input, in force0 = (0));
 	// Offset from UTC by SW seconds.
 ND	var  timedate2();
 
-	// Utility to return local, server and utc date and time
+	// Get local, server and utc date and time
 	void  getdatetime(out localdate, out localtime, out sysdate, out systime, out utcdate, out utctime);
 
-	// Returns: Text of elapsed time since TIMESTAMP
+	// Get text of elapsed time since TIMESTAMP
 	// TIMESTAMP is initialised with ostimestamp() at program/thread startup.
 	// e.g. "< 1 ms"
 ND	var  elapsedtimetext() const;
 
-	// Returns: Text of elapsed time since a given timestamp.
+	// Get text of elapsed time since a given timestamp.
 ND	var  elapsedtimetext(in timestamp_difference) const;
 
-	// Returns: Text of elapsed time between two timestamps
+	// Get text of elapsed time between two timestamps
 ND	var  elapsedtimetext(in timestamp1, in timestamp2) const;
 
-	///////////////////////////
-	///// Program flow control:
-	///////////////////////////
+	/////////////////////
+	///// Record locking:
+	/////////////////////
 
-	// Return to parent exoprog
-	// or quit to OS WITHOUT an error
-	// bool to allow "or stop()"
-	[[noreturn]]
-	void stop(in message = "") const;
-
-	// Return to parent exoprog
-	// or quit to OS WITH an error 1
-	// bool to allow "or abort()"
-	[[noreturn]]
-	void abort(in message = "") const;
-
-	// Quit to OS WITH an error 2
-	// bool to allow "or abortall()"
-	[[noreturn]]
-	void abortall(in message = "") const;
-
-	// Quit to OS WITHOUT an error
-	// bool to allow "or logoff()"
-	//[[deprecated("Deprecated is a great way to highlight all uses of something!")]]
-	[[noreturn]]
-	void logoff(in message = "") const;
+	// Does not actually return record
+ND	bool lockrecord(in filename, io file, in keyx, in recordx, const int waitsecs = 0, const bool allowduplicate = false) const;
+ND	bool lockrecord(in filename, io file, in keyx) const;
+	bool unlockrecord(in filename, io file, in key) const;
+	bool unlockrecord() const;
 
  private:
 
