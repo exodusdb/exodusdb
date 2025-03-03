@@ -43,7 +43,7 @@ function main(in mode, io idate, in /*usercode*/, in userx, in /*marketcode*/, i
 		}  // loop;
 
 	} else {
-		call mssg(mode.quote() ^ " invalid mode in HOLIDAY()");
+		call note(mode.quote() ^ " invalid mode in HOLIDAY()");
 	}
 
 	return 0;

@@ -554,7 +554,7 @@ function main() {
 	gosub getword();
 
 	if (word != "LIST" and word != "SORT" and word != "NLIST" and word != "OLIST") {
-		call mssg(word.quote() ^ " first word must be LIST or SORT");
+		call note(word.quote() ^ " first word must be LIST or SORT");
 		abort();
 	}
 
@@ -585,7 +585,7 @@ function main() {
 	}
 
 	if (not word) {
-		call mssg("FILE NAME IS REQUIRED");
+		call note("FILE NAME IS REQUIRED");
 		abort();
 	}
 
@@ -706,12 +706,12 @@ phraseinit:
 		if (limitx) {
 			limits(1, nlimits) = word;
 			if (not(dictrec.readc(DICT, word))) {
-				call mssg(word.quote() ^ " is not a valid dictionary item (1)");
+				call note(word.quote() ^ " is not a valid dictionary item (1)");
 				abort();
 			}
 			tt = dictrec.f(4).field(".", 1);
 			if (not tt.starts("M")) {
-				call mssg(word.quote() ^ " limit must be a multivalued dict item");
+				call note(word.quote() ^ " limit must be a multivalued dict item");
 				abort();
 			}
 			limits(4, nlimits) = tt;
@@ -874,7 +874,7 @@ phraseinit:
 			nreplacements += 1;
 			if (not(rec.readc(DICT, tt))) {
 				if (not(rec.readc(dictvoc, tt))) {
-					call mssg(tt.quote() ^ " is not a valid dictionary item (2)");
+					call note(tt.quote() ^ " is not a valid dictionary item (2)");
 					abort();
 				}
 			}
@@ -921,7 +921,7 @@ phraseinit:
 	//justlen
 	} else if (word == "JL" or word == "JUSTLEN") {
 		if (not coln) {
-			call mssg("JUSTLEN/JL must follow a column name");
+			call note("JUSTLEN/JL must follow a column name");
 			abort();
 		}
 		// Skip if detsupp2 and column is being skipped
@@ -935,7 +935,7 @@ phraseinit:
 	//colhead
 	} else if (word == "CH" or word == "COLHEAD") {
 		if (not coln) {
-			call mssg("COLHEAD/CH must follow a column name");
+			call note("COLHEAD/CH must follow a column name");
 			abort();
 		}
 		gosub getquotedword();
@@ -947,7 +947,7 @@ phraseinit:
 
 	} else if (word == "OC" or word == "OCONV") {
 		if (not coln) {
-			call mssg("OCONV/OC must follow a column name");
+			call note("OCONV/OC must follow a column name");
 			abort();
 		}
 		gosub getquotedword();
@@ -1131,7 +1131,7 @@ dictrecexit:
 			tt ^= " Replace with? (Enter to cancel):";
 		}
 		let oldword = word;
-		call mssg(tt, "RCE", word, "");
+		call note(tt, "RCE", word, "");
 		if (word == oldword or word == "\x1B") {
 			abort();
 		}
@@ -1490,7 +1490,7 @@ nextdict:
 		if (not LISTACTIVE) {
 			// The words "No record" is hardcoded in autorun and maybe elsewhere
 			// so if you change it here, CHANGE IT THERE TOO
-			call mssg("No records found");
+			call note("No records found");
 			abort();
 		}
 
@@ -1946,7 +1946,7 @@ subroutine getquotedword2() {
 		word.cutter(1);
 		word.popper();
 	} else {
-		call mssg(lastword ^ " must be followed by a quoted phrase");
+		call note(lastword ^ " must be followed by a quoted phrase");
 	}
 	return;
 }

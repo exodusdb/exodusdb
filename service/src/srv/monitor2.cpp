@@ -132,12 +132,12 @@ function main() {
 	// upgradefilename = "upgrade.php";
 
 	if (not processes.open("PROCESSES", "")) {
-		call mssg(lasterror());
+		call note(lasterror());
 		return 0;
 	}
 
 	if (not DICT.open("DICT.PROCESSES", "")) {
-		// call mssg(lasterror());
+		// call note(lasterror());
 		return 0;
 	}
 

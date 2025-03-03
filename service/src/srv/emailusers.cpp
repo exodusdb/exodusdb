@@ -43,7 +43,7 @@ function main(in /*mode0*/, in subject0, in body0, in groupids0, in /*jobids0*/,
 		if (modex != "UPGRADE") {
 			let msg = modex.quote() ^ " is invalid in EMAILUSERS";
 			if (interactive) {
-				call mssg(msg);
+				call note(msg);
 			} else {
 				call sysmsg(msg);
 			}
@@ -143,7 +143,7 @@ function main(in /*mode0*/, in subject0, in body0, in groupids0, in /*jobids0*/,
 
 	var users;
 	if (not users.open("USERS", "")) {
-		call mssg(lasterror());
+		call note(lasterror());
 		return 0;
 	}
 

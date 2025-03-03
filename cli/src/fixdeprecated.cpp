@@ -275,6 +275,9 @@ function main() {
 
 			//capitalise( -> tcase(
 			srcline.replacer(R"__(\bcapitalise\()__"_rex, "tcase\\(");
+
+			//mssg( -> note(
+			srcline.replacer("mssg(", "note(");
 		};
 
 		source_fixer(srcline);

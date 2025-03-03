@@ -24,7 +24,7 @@ function main(in /*mode*/, in ipno, out text) {
 	if (SENTENCE.field(" ", 1) == "WHOIS") {
 		SENTENCE.move(sentencex);
 		call whois("", sentencex.field(" ", 2), text);
-		call mssg(text);
+		call note(text);
 		stop();
 	}
 

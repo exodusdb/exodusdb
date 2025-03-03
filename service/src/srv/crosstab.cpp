@@ -146,7 +146,7 @@ function main(in filename, in rowfields0, in colfield, in datafield, io output, 
 		rowfield = rowfields.f(1, rowfn);
 		if (not rowdict[rowfn].read(DICT, rowfield)) {
 			if (not rowdict[rowfn].read(dictvoc, rowfield)) {
-				call mssg(rowfield.quote() ^ " row field doesnt exist in " ^ filename);
+				call note(rowfield.quote() ^ " row field doesnt exist in " ^ filename);
 				stop();
 			}
 		}
@@ -163,7 +163,7 @@ function main(in filename, in rowfields0, in colfield, in datafield, io output, 
 	} else {
 		if (not coldict.read(DICT, colfield)) {
 			if (not coldict.read(dictvoc, colfield)) {
-				call mssg(colfield.quote() ^ " column field doesnt exist in " ^ filename);
+				call note(colfield.quote() ^ " column field doesnt exist in " ^ filename);
 				stop();
 			}
 		}
@@ -177,7 +177,7 @@ function main(in filename, in rowfields0, in colfield, in datafield, io output, 
 
 	if (not datadict.read(DICT, datafield)) {
 		if (not datadict.read(dictvoc, datafield)) {
-			call mssg(datafield.quote() ^ " data field doesnt exist in " ^ filename);
+			call note(datafield.quote() ^ " data field doesnt exist in " ^ filename);
 			stop();
 		}
 	}

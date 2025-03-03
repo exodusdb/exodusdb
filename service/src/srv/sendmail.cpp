@@ -127,7 +127,7 @@ function main(in toaddress0, in ccaddress0, in subject0, in body0, in attachfile
 		if (errormsg) {
 			errormsg = (toaddress ^ " " _FM ^ errormsg).oconv("T#60");
 			errormsg.converter(_TM, _FM);
-			call mssg(errormsg);
+			call note(errormsg);
 		} else {
 			var msg = "STEP 1 OK. Mail for " ^ toaddress ^ " accepted by mail server.";
 			params.converter("\r\n", _FM _FM);

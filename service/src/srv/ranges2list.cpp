@@ -109,7 +109,7 @@ function main(io ranges0, in basekey0 = "", in listid0 = "") {
 
 			if (finish < startx) {
 				ranges0 = "";
-				call mssg(startx ^ "-" ^ finish ^ " range is not consecutive");
+				call note(startx ^ "-" ^ finish ^ " range is not consecutive");
 				return 0;
 			}
 			var range2 = "";
@@ -136,7 +136,7 @@ function main(io ranges0, in basekey0 = "", in listid0 = "") {
 					// if (len(range)+len(ranges))>65000 then
 					if (range2.len() + ranges.len() > maxstrsize_ - 530) {
 						// call msg('Range exceeds maximum of 65,000 characters|Please enter a smaller range')
-						call mssg("Range exceeds maximum|Please enter a smaller range");
+						call note("Range exceeds maximum|Please enter a smaller range");
 						ranges = "";
 						goto exit;
 					}

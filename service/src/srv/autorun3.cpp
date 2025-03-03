@@ -78,7 +78,7 @@ function main(in docids0 = "", in options0 = "") {
 
 	var users;
 	if (not users.open("USERS", "")) {
-		call mssg(lasterror());
+		call note(lasterror());
 		return 0;
 	}
 

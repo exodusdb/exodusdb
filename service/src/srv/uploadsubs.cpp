@@ -530,13 +530,13 @@ nextline:
 			if (file == "") {
 
 				if (not file.open(filename, "")) {
-					call mssg(lasterror());
+					call note(lasterror());
 					req.valid = 0;
 					gosub cleanup();
 					return 0;
 				}
 				if (not dictfile.open(dictfilename, "")) {
-					call mssg(lasterror());
+					call note(lasterror());
 					req.valid = 0;
 					gosub cleanup();
 					return 0;
@@ -625,7 +625,7 @@ nextline:
 							cell = iconv(cell, CONV);
 						}
 						if (not cell.len()) {
-							call mssg(cell0.quote() ^ " cannot be converted in line " ^ linenox ^ " col " ^ coln);
+							call note(cell0.quote() ^ " cannot be converted in line " ^ linenox ^ " col " ^ coln);
 							// indicate strange but leave workable date/time
 							cell = "00";
 						}

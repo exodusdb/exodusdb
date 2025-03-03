@@ -170,7 +170,7 @@ function main(in mode0, out letterhead_out, in compcode0 = "", in qr_text0 = "")
 
 		// Check qrencoder installed
 		if (not osshell("which qrencode > /dev/null")) {
-			call mssg("qrencode not installed!");
+			call note("qrencode not installed!");
 		}
 
 		var svg = "";
@@ -209,7 +209,7 @@ function main(in mode0, out letterhead_out, in compcode0 = "", in qr_text0 = "")
 
 		// check simple HTML
 		if (letterhead.count("<") != letterhead.count(">")) {
-			call mssg(keyx.quote() ^ " page header is not valid HTML");
+			call note(keyx.quote() ^ " page header is not valid HTML");
 			letterhead = "";
 		}
 

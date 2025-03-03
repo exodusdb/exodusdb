@@ -431,7 +431,7 @@ nextrec:
 			}
 
 		} else {
-			call mssg(limitcheck.quote() ^ " invalid limitcheck in select2");
+			call note(limitcheck.quote() ^ " invalid limitcheck in select2");
 
 			// abort
 			gosub exit();

@@ -33,7 +33,7 @@ nousername0:
 	// if username='EXODUS' or username='STEVE' then call msg(task:'')
 
 	if (task.starts(" ")) {
-		call mssg(task.quote());
+		call note(task.quote());
 	}
 	// Each task may have many "locks", each users may have many "keys"
 	// A user must have keys to all the locks in order to pass

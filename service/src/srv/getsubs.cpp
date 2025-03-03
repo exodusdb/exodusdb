@@ -34,7 +34,7 @@ function main(in mode) {
 	if (srv.documents.unassigned()) {
 		if (not srv.documents.open("DOCUMENTS", "")) {
 			req.valid = 0;
-			mssg(lasterror());
+			note(lasterror());
 			return 0;
 		}
 	}
@@ -105,7 +105,7 @@ nextdoc:
 			// check if allowed to modify
 			if (taskprefix) {
 				if (not authorised(taskprefix ^ " UPDATE", msg, "")) {
-					call mssg(msg);
+					call note(msg);
 					unlockrecord(req.datafile, req.srcfile, ID);
 					req.wlocked = 0;
 				}
@@ -113,7 +113,7 @@ nextdoc:
 
 			// always prevent users from editing documents designed by EXODUS
 			if (RECORD.f(1).contains("EXODUS") and not(USERNAME.contains("EXODUS"))) {
-				call mssg("You cannot modify report designs created by EXODUS|Use the Copy button to copy them and modify the copy");
+				call note("You cannot modify report designs created by EXODUS|Use the Copy button to copy them and modify the copy");
 				unlockrecord(req.datafile, req.srcfile, ID);
 				req.wlocked = 0;
 			}
@@ -208,7 +208,7 @@ nextdoc:
 	} else if (mode == "POSTDELETE") {
 
 	} else {
-		call mssg(mode.quote() ^ " is invalid in GET.SUBS");
+		call note(mode.quote() ^ " is invalid in GET.SUBS");
 	}
 
 	return 0;

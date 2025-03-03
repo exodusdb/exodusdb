@@ -32,13 +32,13 @@ function main(in mode, in previous0 = "") {
 
 	var keyfile;
 	if (not keyfile.open(keyfilename, "")) {
-		call mssg(lasterror());
+		call note(lasterror());
 		return ANS;
 	}
 
 	var actfile;
 	if (not actfile.open(actfilename, "")) {
-		call mssg(lasterror());
+		call note(lasterror());
 		return ANS;
 	}
 
@@ -51,17 +51,17 @@ lockit:
 			temp.cutter(1);
 		}
 		if (not buffer) {
-			call mssg("WAITING TO GET THE NEXT " ^ temp ^ " NUMBER|PRESS ESCAPE TO EXIT.", "UB", buffer, "");
+			call note("WAITING TO GET THE NEXT " ^ temp ^ " NUMBER|PRESS ESCAPE TO EXIT.", "UB", buffer, "");
 		}
 		if (esctoexit()) {
-			call mssg("", "DB", buffer, "");
+			call note("", "DB", buffer, "");
 			return "";
 		}
 		call ossleep(1000 * 1);
 		goto lockit;
 	}
 	if (buffer) {
-		call mssg("", "DB", buffer, "");
+		call note("", "DB", buffer, "");
 	}
 
 	// get the initial next number

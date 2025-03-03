@@ -683,7 +683,7 @@ getvalues:
 		gosub getdostime();
 
 		if (not openfile("LOCKS", locks)) {
-			call mssg("LISTEN2 CANNOT OPEN LOCKS FILE");
+			call note("LISTEN2 CANNOT OPEN LOCKS FILE");
 			return 0;
 		}
 

@@ -232,7 +232,7 @@ function main() {
 				"\r" ^
 				emailresult;
 		} else {
-			call mssg("No users can be found to email,|or some problem with email server");
+			call note("No users can be found to email,|or some problem with email server");
 		}
 		data_ = "";
 
@@ -495,7 +495,7 @@ function main() {
 
 		} else {
 badsetcodepage:
-			call mssg("Request must be SETCODEPAGE SORTORDER|UPPERCASE|LOWERCASE codepage");
+			call note("Request must be SETCODEPAGE SORTORDER|UPPERCASE|LOWERCASE codepage");
 			return 0;
 		}
 
@@ -884,7 +884,7 @@ performreport:
 		data_ = ANS;
 
 	} else {
-		call mssg("System Error: " ^ (mode.quote()) ^ " invalid request in GENERALPROXY");
+		call note("System Error: " ^ (mode.quote()) ^ " invalid request in GENERALPROXY");
 	}
 
 // ///

@@ -25,7 +25,7 @@ function main() {
 	syntax(-1)	 = "CLEARFIELD filename fieldnoorname ... /\"clear to value\"";
 	syntax(-1)	 = "eg CLEARFIELD TASKS STATUS /\"Completed\"";
 	if (not filename) {
-		call mssg(syntax);
+		call note(syntax);
 		stop();
 	}
 
@@ -43,7 +43,7 @@ function main() {
 	}
 	var file;
 	if (not file.open(filename, "")) {
-		call mssg(filename.quote() ^ " FILE IS MISSING");
+		call note(filename.quote() ^ " FILE IS MISSING");
 		stop();
 	}
 	if (not DICT.open("DICT." ^ filename)) {
@@ -52,7 +52,7 @@ function main() {
 	nindexed = 0;
 
 	if (not fns) {
-		call mssg("FIELD NO ?" ^ FM ^ syntax);
+		call note("FIELD NO ?" ^ FM ^ syntax);
 		stop();
 	}
 	fns.converter(" ,", FM ^ FM);
@@ -65,7 +65,7 @@ tryagain:
 		var fn = fns.f(ii);
 		// prevent zero as in CLEARFIELD X Y Z 0 - needs CLEARFIELD X Y Z/0
 		if (not fn) {
-			call mssg(fn.quote() ^ " field number is not supported");
+			call note(fn.quote() ^ " field number is not supported");
 			stop();
 		}
 		if (not fn.isnum()) {
@@ -87,7 +87,7 @@ tryagain:
 			if (fn.isnum()) {
 				fns(ii) = fn;
 			} else {
-				call mssg(SENTENCE ^ "|FIELD NUMBER " ^ fn ^ " IS NOT NUMERIC AND|NOT AN \"F\" DICTIONARY ITEM!?" ^ FM ^ FM ^ syntax);
+				call note(SENTENCE ^ "|FIELD NUMBER " ^ fn ^ " IS NOT NUMERIC AND|NOT AN \"F\" DICTIONARY ITEM!?" ^ FM ^ FM ^ syntax);
 				stop();
 			}
 		}

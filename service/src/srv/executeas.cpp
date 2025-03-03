@@ -12,7 +12,7 @@ function main(in cmd, in username) {
 
 	if (username) {
 		if (not SECURITY.f(1).locate(username)) {
-			call mssg(username.quote() ^ " user does not exist in executeas()");
+			call note(username.quote() ^ " user does not exist in executeas()");
 			return 0;
 		}
 		origusername	= USERNAME;

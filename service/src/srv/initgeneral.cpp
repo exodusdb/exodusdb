@@ -944,7 +944,7 @@ nextreport:
 		reminder='';
 		if interactive and not(system<20>) and not(resetting) then;
 			call backupreminder(currdataset,msg);
-			if msg then call mssg(msg,'UB':FM:FM:FM:2,reminder,'');
+			if msg then call note(msg,'UB':FM:FM:FM:2,reminder,'');
 			end;
 	*/
 	call log2("*default date format is DD/MM/YY", logtime);
@@ -1501,7 +1501,7 @@ adddatasetcodename:
 	// end
 
 	// call log2('*take down the backup reminder',logtime)
-	// if reminder then call mssg('','DB',reminder,'')
+	// if reminder then call note('','DB',reminder,'')
 
 	if (not resetting) {
 
@@ -1714,7 +1714,7 @@ subroutine_noreturn failsys() {
 	// onscreen message
 	s33		   = SYSTEM.f(33);
 	SYSTEM(33) = "";
-	call mssg(msgx ^ "", "T3", yy, "");
+	call note(msgx ^ "", "T3", yy, "");
 	SYSTEM(33) = s33;
 
 	// respond to user

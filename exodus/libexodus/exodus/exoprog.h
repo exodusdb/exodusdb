@@ -168,11 +168,12 @@ ND	bool hasnext();
 	// Run an exodus library's main function using a command like syntax similar to that of executable programs.
 	// A "command line" is passed to the library in the usual COMMAND, SENTENCE and OPTIONS environment variables instead of function arguments.
 	// The library's main function should have zero arguments. Performing a library function with main arguments results in them being unassigned and in some case core dump may occur.
-	// The following environment variables are initialised on entry to the main function of the library. They are restored on return to the calling program.
+	// The following environment variables are initialised on entry to the main function of the library. They are preserved untouched in the calling program.
 	// SENTENCE, COMMAND, OPTIONS: Initialised from the argument "sentence".
 	// RECUR0, RECUR1, RECUR2, RECUR3, RECUR4 to "".
 	// ID, RECORD, MV, DICT initialised to "".
 	// LEVEL is incremented by one.
+	// All other environment variables are shared between the caller and callee. There is essentially only one environment in any one process or thread.
 	// Any active select list is passed to the performed program and can be consumed by it. Conversely any active select list created by the library will be returned to the calling program.
 	// sentence: The first word of this argument is used as the name of the library to be loaded and run. sentence is used to initialise the SENTENCE, COMMAND and OPTIONS environment variables.
 	// Returns: Whatever var the library returns, or "" if it calls stop() or abort(()".
@@ -181,7 +182,7 @@ ND	bool hasnext();
 	var  perform(in sentence);
 
 	// Run an exodus library's main function.
-	// Identical to perform() but any currently active select list in the calling program is not accessible to the executed library and is preserved in the callng [program as is. Any select list created by the executed library is discarded when it terminates.
+	// Identical to perform() but any currently active select list in the calling program is not accessible to the executed library and is preserved in the calling [program as is. Any select list created by the executed library is discarded when it terminates.
 	var  execute(in sentence);
 
 	// Close the current program and run an exodus library's main function.
@@ -230,8 +231,40 @@ ND	var  xlate(in filename, in key, in fieldno_or_name, const char* mode);
 	///// i/o conversion:
 	/////////////////////
 
-	// ioconv with access to all exoprog functionality and base ioconv
-	// Particularly the ability to call custom ioconv functions like "[xxxxxxxx]"
+	// iconv/oconv with access to specific exoprog conversions and also var's iconv/oconv patterns
+	// Unlike var's iconv/oconv, exoprog's iconv/oconv have the ability to call custom functions like "[funname,args...]"
+	//
+	// [NUMBER]
+	// [NUMBER,*]
+	// [NUMBER,0]
+	// [NUMBER,1]
+	// [NUMBER,2]
+	// [NUMBER,3]
+	// [NUMBER,BASE]
+	// [NUMBER,NDECS]
+	// [NUMBER,X]
+	//
+	// [DATE]
+	// [DATE,*]
+	// [DATE,4]
+	// [DATE,*4]
+	// [DATE,DS-]
+	//
+	// [DATEPERIOD]
+	// [DATEPERIOD," ^ adcompany.f(6) ^ "]
+	// [DATEPERIOD," ^ doccompany.f(6) ^ "]
+	// [DATEPERIOD," ^ firstmonth ^ "," ^ fin.maxperiod ^ "]
+	// [DATEPERIOD,1,12]
+	//
+	// [DATETIME]
+	// [DATETIME,4*]
+	// [DATETIME,4*,DOS]
+	// [DATETIME,4*,MTS]
+	//
+	// [TIME2]
+	// [TIME2,48]
+	// [TIME2,MT48]
+	// [TIME2,MTS48]
 ND	var  oconv(in input, in conversion);
 ND	var  iconv(in input, in conversion);
 
@@ -249,7 +282,10 @@ ND	var  amountunit(in input0);
 
 	void note(in msg, in options = "") const;
 	void note(in msg, in options, io buffer, in params = "") const;
+
+	[[deprecated("Replace with note()")]]
 	void mssg(in msg, in options = "") const;
+	[[deprecated("Replace with note()")]]
 	void mssg(in msg, in options, io buffer, in params = "") const;
 
 ND	var  decide(in question, in options = "") const;
@@ -268,12 +304,14 @@ ND	var  getcursor() const;
 	///// Array utilities:
 	//////////////////////
 
-	// FMs become VMs and vice versa.
+	// Dynamic array fields become values and vice versa
+	// Returns: The inverted dynamic array.
+	// pad: If true then on return, all fields will have the same number of values with superfluous trailing VMs where necessary.
 	//
-	// `let v1 = "a1]a2]a3^b1]b2]b3"_var;
-	//  let v2 = invertarray(v1); // "a1]b1^a2]b2^a3]b3"_var`
+	// `let v1 = "a]b]c^1]2]3"_var;
+	//  let v2 = invertarray(v1); // "a]1^b]2^c]3"_var`
 	//
-ND	var  invertarray(in input, in force0 = (0));
+ND	var  invertarray(in input, bool pad = false);
 
 	// Sorts fields of multivalues of dynamic arrays in parallel
 	// fns: VM separated list of field numbers to sort in parallel based on the first field number

@@ -50,7 +50,7 @@ function main(in mode0) {
 		;
 	else if (mode.field(",", 1) == "POSTDELETE") {
 	} else {
-		call mssg(DQ ^ (mode ^ DQ) ^ " - invalid mode ignored");
+		call note(DQ ^ (mode ^ DQ) ^ " - invalid mode ignored");
 		// valid=0
 	}
 

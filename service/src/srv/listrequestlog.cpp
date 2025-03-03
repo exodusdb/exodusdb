@@ -13,7 +13,7 @@ var msg;
 function main() {
 
 	if (not authorised("REQUESTLOG ACCESS", msg)) {
-		call mssg(msg);
+		call note(msg);
 		stop();
 	}
 
@@ -65,7 +65,7 @@ function main() {
 		var tt = containing.ucase();
 		if (tt.contains(DQ)) {
 			if (tt.contains("'")) {
-				call mssg("Cannot find text containing single AND double quotes");
+				call note("Cannot find text containing single AND double quotes");
 				stop();
 			} else {
 				tt = "'" ^ tt ^ "'";

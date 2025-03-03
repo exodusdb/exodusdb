@@ -156,7 +156,7 @@ next:
 		}
 
 	} else {
-		call mssg(mode.quote() ^ " - invalid mode ignored");
+		call note(mode.quote() ^ " - invalid mode ignored");
 		// valid=0
 	}
 
@@ -172,7 +172,7 @@ function getdatasets() {
 	var directory;
 	if (not directory.osread(dosfilename)) {
 		if (not directory.osread(APPLICATION ^ ".vox")) {
-			call mssg(APPLICATION ^ ".vol is missing");
+			call note(APPLICATION ^ ".vol is missing");
 			stop();
 		}
 	}

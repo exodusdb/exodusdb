@@ -98,7 +98,7 @@ function main(in sentence0, in select0 = "", in filters0 = "") {
 	let filename = sentencex.field(" ", 2);
 	var file;
 	if (not file.open(filename, "")) {
-		call mssg(lasterror());
+		call note(lasterror());
 		return 0;
 	}
 
@@ -134,7 +134,7 @@ function main(in sentence0, in select0 = "", in filters0 = "") {
 		tt = filename;
 	}
 	if (not DICT.open("DICT." ^ tt)) {
-		call mssg(lasterror());
+		call note(lasterror());
 		return 0;
 	}
 
@@ -235,7 +235,7 @@ function main(in sentence0, in select0 = "", in filters0 = "") {
 		abort(lasterror());
 	if (outfilename.osfile()) {
 		var	  msg = "CANNOT EXPORT BECAUSE " ^ outfilename ^ " IS ALREADY|OPEN IN ANOTHER PROGRAM, OR CANNOT BE ACCESSED";
-		call  mssg(msg);
+		call  note(msg);
 		gosub exit2();
 		return 0;
 	}
@@ -341,7 +341,7 @@ nextdict:
 					temp			 = dict.f(11).cut(1).field(">", 1);
 					xfilenames[colnx] = temp;
 					if (not xfiles[colnx].open(temp, "")) {
-						call  mssg(temp.quote() ^ " file cannot be found in dict " ^ (dictid.quote()));
+						call  note(temp.quote() ^ " file cannot be found in dict " ^ (dictid.quote()));
 						gosub exit2();
 						return 0;
 					}
@@ -397,7 +397,7 @@ nextdict:
 	if (not oswrite("", outfilename))
 		abort(lasterror());
 	if (not outfile.osopen(outfilename)) {
-		call  mssg(lasterror());
+		call  note(lasterror());
 		gosub exit2();
 		return 0;
 	}
@@ -418,7 +418,7 @@ nextdict:
 			//outfilename.osremove();
 			if (outfilename.osfile() and not outfilename.osremove())
 				abort(lasterror());
-			call mssg("No records found");
+			call note("No records found");
 			return 0;
 		}
 	} else {
@@ -720,7 +720,7 @@ subroutine exit3() {
 	// end
 
 	if (not ptr) {
-		call mssg("No records found");
+		call note("No records found");
 		stop();
 	}
 

@@ -357,7 +357,7 @@ function main(in mode, io datax, in params0 = "", in params20 = "") {
 		// returns agent in datax see equate above
 
 	} else {
-		call mssg(mode.quote() ^ " unknown mode in HTMLLIB");
+		call note(mode.quote() ^ " unknown mode in HTMLLIB");
 	}
 
 	return 0;

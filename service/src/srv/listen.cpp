@@ -349,7 +349,7 @@ function main_init() {
 	}
 	webpath.converter("/", OSSLASH);
 	if (not voc.open("VOC", "")) {
-		call mssg(lasterror());
+		call note(lasterror());
 		// gosub main_exit();
 		return false;
 	}
@@ -405,7 +405,7 @@ function main_init() {
 	// image=''
 
 	if (not openfile("LOCKS", locks1, "DEFINITIONS", 1)) {
-		call mssg(lasterror());
+		call note(lasterror());
 		// gosub main_exit();
 		return false;
 	}
@@ -757,7 +757,7 @@ function loop_exit() {
 	if (charx.contains(tt)) {
 		// leading space to avoid chars after ESC pressed being ANSI control sequences
 		tt.replacer(chr(27), "Esc");
-		call mssg("You have pressed the " ^ tt ^ " key to exit|press again to confirm|", "UB", buffer, "");
+		call note("You have pressed the " ^ tt ^ " key to exit|press again to confirm|", "UB", buffer, "");
 		// loop
 		// input reply,-1:
 		// until reply
@@ -767,7 +767,7 @@ function loop_exit() {
 		reply.inputn(1);
 		reply.lcaser();
 		echo(1);
-		call mssg("", "DB", buffer, "");
+		call note("", "DB", buffer, "");
 		if (reply == INTCONST.f(1)) {
 			// space to defeat ANSI control chars after pressing Esc
 			printx(" ");
@@ -2923,7 +2923,7 @@ nolock:
 	response_	  = "OK";
 	lockrec.write(leaselocks, lockkey);
 	if (FILEERROR) {
-		call  mssg(lasterror());
+		call  note(lasterror());
 		gosub geterrorresponse();
 	}
 
@@ -3062,7 +3062,7 @@ subroutine leaseunlock() {
 	leaselocks.deleterecord(lockkey);
 
 	if (FILEERROR) {
-		call  mssg(lasterror());
+		call  note(lasterror());
 		gosub geterrorresponse();
 	}
 

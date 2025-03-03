@@ -58,7 +58,7 @@ function main() {
 	} else {
 		if (not(silent or overwrite)) {
 			if (var().read(srv.documents, alertid)) {
-				call mssg(alertid.quote() ^ " already exists");
+				call note(alertid.quote() ^ " already exists");
 				stop();
 			}
 		}
@@ -72,7 +72,7 @@ syntax:
 		msg(-1) = FM ^ "module=GENERAL/FINANCE/AGENCY/MEDIA/JOB";
 		msg(-1) = "6 required parameters plus {} means optional";
 		msg(-1) = "options: O=Overwrite R=Remove S=Silent ROS=forget lastruntime";
-		call mssg(msg);
+		call note(msg);
 		stop();
 	}
 
@@ -96,12 +96,12 @@ syntax:
 		msg(-1) = "Examples:";
 		msg(-1) = "2,17 for noon and 5pm";
 		msg(-1) = "2,17:7,14 for noon and 5pm on the 7th and 14th";
-		call mssg(msg);
+		call note(msg);
 		stop();
 	}
 
 	if (runasusercode != "EXODUS" and not(runasusercode.xlate("USERS", 1, "X"))) {
-		call mssg(runasusercode.quote() ^ " runas user does not exist");
+		call note(runasusercode.quote() ^ " runas user does not exist");
 		stop();
 	}
 
@@ -125,7 +125,7 @@ syntax:
 			let task = authtasks.f(1, taskn);
 			if (not authorised(task, msg, "", runasusercode)) {
 				msg = "\"Runas\" user is not authorised to do " ^ task ^ FM ^ FM ^ msg;
-				call mssg(msg);
+				call note(msg);
 				stop();
 			}
 		}  // taskn;
@@ -148,7 +148,7 @@ syntax:
 	call autorun2("WRITE", title, module, request, datax, runasusercode, targetusercodes, srv.document, docid, msg);
 
 	if (msg) {
-		call mssg(msg);
+		call note(msg);
 		stop();
 	}
 

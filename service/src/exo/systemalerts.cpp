@@ -19,7 +19,7 @@ function main(in alerttype0, in /*runasuser*/, out tasks, out title, out request
 		datax	= "";
 
 	} else {
-		call mssg(DQ ^ (alerttype ^ DQ) ^ " unrecognised alert type in systemalerts");
+		call note(DQ ^ (alerttype ^ DQ) ^ " unrecognised alert type in systemalerts");
 		stop();
 	}
 	// L150:

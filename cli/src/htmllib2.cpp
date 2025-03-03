@@ -436,7 +436,7 @@ function main(in mode, io dataio, in params0 = "", in params20 = "", in glang = 
 		gosub getmark(getmarkmode, html, mark);
 
 	} else {
-		call mssg(mode.quote() ^ " unknown mode in HTMLLIB2");
+		call note(mode.quote() ^ " unknown mode in HTMLLIB2");
 	}
 
 ///////

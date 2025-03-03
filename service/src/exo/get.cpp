@@ -46,7 +46,7 @@ function main() {
 	if (not prnfile.osfile()) {
 		var msg = "OUTPUT FILE FOR PRINTOUT CANNOT BE CREATED.";
 		msg(-1) = "|" ^ (DQ ^ (oscwd() ^ prnfile ^ DQ)) ^ "|";
-		call mssg(msg);
+		call note(msg);
 		stop();
 	}
 

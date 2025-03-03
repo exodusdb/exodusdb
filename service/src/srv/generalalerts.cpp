@@ -23,7 +23,7 @@ function main(in alerttype0, in /*runasuser*/, out tasks, out title, out request
 		datax	= "";
 
 	} else {
-		call mssg(alerttype.quote() ^ " unrecognised alert type in GENERAL.ALERTS");
+		call note(alerttype.quote() ^ " unrecognised alert type in GENERAL.ALERTS");
 		stop();
 	}
 

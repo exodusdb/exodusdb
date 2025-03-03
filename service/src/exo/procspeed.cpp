@@ -59,7 +59,7 @@ function main() {
 	msg(-1) = "More is faster.";
 	msg(-1) = "Typical unoptimised speed for an entry level server in 2007 was 1";
 
-	call mssg(msg);
+	call note(msg);
 
 	return 0;
 

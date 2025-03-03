@@ -36,7 +36,7 @@ function main(in nextcompanycode) {
 	let oldcompany = srv.company;
 	if (srv.gcurrcompcode) {
 		if (not srv.company.read(srv.companies, srv.gcurrcompcode)) {
-			call mssg("COMPANY " ^ (srv.gcurrcompcode.quote()) ^ " IS MISSING - DO NOT PROCEED||USE \"SETTINGS\" TO|CHOOSE ANOTHER COMPANY|");
+			call note("COMPANY " ^ (srv.gcurrcompcode.quote()) ^ " IS MISSING - DO NOT PROCEED||USE \"SETTINGS\" TO|CHOOSE ANOTHER COMPANY|");
 			srv.company = srv.gcurrcompcode;
 		}
 	} else {

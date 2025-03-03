@@ -111,7 +111,7 @@ function main(io filename, in mode, out filetitle, out triggers) {
 	} else if (mode == "SELECT") {
 		// case mode='GETINDEXVALUES'
 	} else {
-		call mssg(mode.quote() ^ " is invalid in LISTEN3");
+		call note(mode.quote() ^ " is invalid in LISTEN3");
 		return 0;
 	}
 

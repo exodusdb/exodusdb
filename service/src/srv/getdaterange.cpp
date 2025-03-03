@@ -48,7 +48,7 @@ inpfromdate:
 	}
 	let ifromdate2 = iconv(fromdate, "[DATE,*4]");
 	if (not ifromdate2) {
-		call mssg(fromdate ^ "  is not a valid date");
+		call note(fromdate ^ "  is not a valid date");
 		goto inpfromdate;
 	}
 	fromdate = oconv(ifromdate2, "[DATE,*4]");
@@ -85,12 +85,12 @@ inpuptodate:
 
 	let iuptodate2 = iconv(uptodate, "[DATE,*4]");
 	if (not iuptodate2) {
-		call mssg(uptodate ^ "  is not a valid date");
+		call note(uptodate ^ "  is not a valid date");
 		goto inpuptodate;
 	}
 	uptodate = oconv(iuptodate2, "[DATE,*4]");
 	if (iuptodate2 < ifromdate2) {
-		call mssg("\"TO DATE\" " ^ uptodate ^ " CANNOT BE BEFORE \"FROM DATE\" " ^ fromdate);
+		call note("\"TO DATE\" " ^ uptodate ^ " CANNOT BE BEFORE \"FROM DATE\" " ^ fromdate);
 		goto inpuptodate;
 	}
 

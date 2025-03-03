@@ -43,7 +43,7 @@ function main() {
 
 	let key = dictfilename ^ ".txt";
 	if (not doc.read(file, key)) {
-		call mssg(key.quote() ^ " is missing from " ^ filename);
+		call note(key.quote() ^ " is missing from " ^ filename);
 		stop();
 	}
 	doc.converter("\n", FM);
@@ -75,7 +75,7 @@ function main() {
 			// ignore
 
 		} else {
-			call mssg(blocktype.quote() ^ " unknown blocktype");
+			call note(blocktype.quote() ^ " unknown blocktype");
 			stop();
 		}
 
@@ -123,11 +123,11 @@ subroutine writedict() {
 
 				var dictrec;
 				if (not dictrec.read(DICT, dictid)) {
-					call mssg(dictid.quote() ^ " is missing from DICT." ^ dictfilename);
+					call note(dictid.quote() ^ " is missing from DICT." ^ dictfilename);
 					stop();
 				}
 				if (not dictrec.osread(osdatfilename)) {
-					call mssg(osdatfilename.quote() ^ " is missing");
+					call note(osdatfilename.quote() ^ " is missing");
 					stop();
 				}
 				dictrec = dictrec.iconv("TX");
@@ -142,11 +142,11 @@ subroutine writedict() {
 
 		var dictrec;
 		if (not dictrec.read(DICT, dictid)) {
-			call mssg(dictid.quote() ^ " is missing from DICT." ^ dictfilename);
+			call note(dictid.quote() ^ " is missing from DICT." ^ dictfilename);
 			stop();
 		}
 		if (not dictrec.osread(osdatfilename)) {
-			call mssg(osdatfilename.quote() ^ " is missing");
+			call note(osdatfilename.quote() ^ " is missing");
 			stop();
 		}
 		dictrec = dictrec.iconv("TX");
@@ -346,7 +346,7 @@ nextmln:;
 									fields(3, -1) = lower(tempdict.f(3));
 								}
 							} else {
-								call mssg(fieldname.quote() ^ " field is missing from DICT " ^ DICT);
+								call note(fieldname.quote() ^ " field is missing from DICT " ^ DICT);
 							}
 						}
 					}  // loop;
@@ -372,7 +372,7 @@ nextmln:;
 					macrotext.move(line);
 
 				} else {
-					// call mssg(macroid.quote() ^ " macro is undefined in line " ^ ln ^ FM ^ doc.f(ln));
+					// call note(macroid.quote() ^ " macro is undefined in line " ^ ln ^ FM ^ doc.f(ln));
 					// stop();
 				}
 			}

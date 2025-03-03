@@ -89,7 +89,7 @@ function main(in mode0) {
 	// sleep
 	// if mode='SLEEP' then
 	// call clearscreen(buffer,attribute)
-	// call mssg('This computer workstation has gone to sleep,|please enter your password to wake it up,| or press Esc to exit EXODUS.','UB':fm:fm:fm:1,buff,'')
+	// call note('This computer workstation has gone to sleep,|please enter your password to wake it up,| or press Esc to exit EXODUS.','UB':fm:fm:fm:1,buff,'')
 	// end
 
 	// get the user name
@@ -179,7 +179,7 @@ fail:
 		let keyfail = 0;
 		// inp.key:
 		var	 keyx = "";
-		call mssg("The lock is " ^ (lockx.quote()) ^ "|What is the key ?", "RC", keyx, "");
+		call note("The lock is " ^ (lockx.quote()) ^ "|What is the key ?", "RC", keyx, "");
 
 		ok = keyx == secid(lockx,
 						   "1000"
@@ -264,7 +264,7 @@ okfail:
 		if (nfailures < nallowable) {
 			msg(-1) = "PLEASE TRY AGAIN.|";
 		}
-		call mssg(msg);
+		call note(msg);
 
 		if (nfailures < nallowable) {
 			goto inpname;
@@ -287,7 +287,7 @@ okfail:
 	SYSTEM(22) = timeoutx;
 
 	// if mode='SLEEP' then
-	// call mssg('','DB',buff,'')
+	// call note('','DB',buff,'')
 	// //call restorescreenbuffer,attribute)
 	// end
 	return 0;

@@ -62,7 +62,7 @@ function main() {
 	// for printtx
 
 	if (not authorised("STATISTICS ACCESS", msg, "LS")) {
-		call mssg(msg);
+		call note(msg);
 		stop();
 	}
 
@@ -85,7 +85,7 @@ function main() {
 		selectcmd ^= reqdate.oconv("D4").quote();
 		perform(selectcmd ^ " (S)");
 		if (not LISTACTIVE) {
-			call mssg("No records found");
+			call note("No records found");
 			stop();
 		}
 	}

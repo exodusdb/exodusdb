@@ -28,7 +28,7 @@ function main(in mode, io /*line*/, in params, in filename) {
 		}
 
 	} else {
-		call mssg(filename ^ " not handled in CONVERTER.CSV");
+		call note(filename ^ " not handled in CONVERTER.CSV");
 		stop();
 	}
 

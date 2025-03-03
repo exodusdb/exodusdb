@@ -41,11 +41,11 @@ function main(in mode0) {
 
 	var changelog;
 	if (not openfile("CHANGELOG", changelog)) {
-		call mssg(lasterror());
+		call note(lasterror());
 		return 0;
 	}
 	if (not openfile("DICT.CHANGELOG", DICT)) {
-		call mssg(lasterror());
+		call note(lasterror());
 		return 0;
 	}
 
@@ -61,7 +61,7 @@ function main(in mode0) {
 		// call changelog.subs('SELECT':fm:data)
 		gosub select0(mode);
 		if (not LISTACTIVE) {
-			call mssg("Error: No records found");
+			call note("Error: No records found");
 			return 0;
 		}
 
@@ -201,13 +201,13 @@ function main(in mode0) {
 
 		let path = "/root/neosys/src/dat/changelog/";
 		if (not osdir(path)) {
-			call mssg("ERROR in CHANGELOGSUBS | " ^ path ^ " is missing");
+			call note("ERROR in CHANGELOGSUBS | " ^ path ^ " is missing");
 			return 0;
 		}
 
 		let osrecord = RECORD.convert(FM, "\n");
 		if (not osrecord.oswrite(path ^ ID)) {
-			call mssg(lasterror());
+			call note(lasterror());
 			return 0;
 		}
 	}

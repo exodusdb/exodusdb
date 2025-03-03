@@ -659,25 +659,25 @@ void ExodusProgramBase::popselect(in saved_cursor) {
 	return;
 }
 
-// note 2
-void ExodusProgramBase::note(in msg, in options) const {
-	var buffer = "";
-	mssg(msg, options, buffer);
-}
-
-// note 4
-void ExodusProgramBase::note(in msg, in options, io buffer, in params) const {
-	mssg(msg, options, buffer, params);
-}
-
 // mssg 2
 void ExodusProgramBase::mssg(in msg, in options) const {
 	var buffer = "";
-	mssg(msg, options, buffer);
+	note(msg, options, buffer);
 }
 
 // mssg 4
 void ExodusProgramBase::mssg(in msg, in options, io buffer, in params) const {
+	note(msg, options, buffer, params);
+}
+
+// note 2
+void ExodusProgramBase::note(in msg, in options) const {
+	var buffer = "";
+	note(msg, options, buffer);
+}
+
+// note 4
+void ExodusProgramBase::note(in msg, in options, io buffer, in params) const {
 
 	var interactive = !SYSTEM.f(33);
 	if (interactive)
@@ -805,7 +805,7 @@ var ExodusProgramBase::authorised(in task0, io msg, in defaultlock, in username0
 	// if username='EXODUS' or username='STEVE' then call msg(task:'');
 
 	if (task.starts(" ")) {
-		call mssg(DQ ^ (task0 ^ DQ));
+		call note(DQ ^ (task0 ^ DQ));
 	}
 	// Each task may have many "locks", each users may have many "keys"
 	// A user must have keys to all the locks in order to pass
@@ -1317,7 +1317,7 @@ var ExodusProgramBase::perform(in sentence) {
 		catch (const ExoAbort& e) {
 			// similar to stop for the time being
 			// maybe it should set some error flag/messages
-			mssg(e.message);
+			note(e.message);
 			ANS = "";
 		}
 
@@ -1654,7 +1654,7 @@ baddict:
 
 // fsmg
 //bool ExodusProgramBase::fsmsg(in msg) const {
-//	mssg(msg ^ var().lasterror());
+//	note(msg ^ var().lasterror());
 //	return false;
 //}
 
@@ -1794,7 +1794,7 @@ bool ExodusProgramBase::lockrecord(in filename, io file, in keyx, in /*recordx*/
 
 	if (file.unassigned()) {
 		if (not file.open(filename)) {
-			call mssg(filename.quote() ^ " cannot be opened in LOCKRECORD " ^ keyx);
+			call note(filename.quote() ^ " cannot be opened in LOCKRECORD " ^ keyx);
 			this->abort();
 		}
 	}
@@ -2688,61 +2688,50 @@ void ExodusProgramBase::sortarray(io array, in fns, in orderby0) {
 }
 
 // invertarray
-var ExodusProgramBase::invertarray(in input, in force0 /*=0*/) {
-	//c sys in,=(0)
+var ExodusProgramBase::invertarray(in input, bool padded /*=false*/) {
 
-	var force = force0.unassigned() ? var(0) : force0;
+	// not forced
+	// TRACE: inp = "a^1]2]3]4^x"
+	// TRACE: out = "a]1]x^]2^]3^]4"
 
-	var outx = "";
-	var nfs = input.fcount(FM);
-	//for force to work, the first field must have full number of vns
-	var maxnvs = 0;
-	for (var fn = 1; fn <= nfs; ++fn) {
-		var fieldx = input.field(FM, fn);
-		if (fieldx.len() or force) {
-			var nvs = fieldx.count(VM) + 1;
-			if (force) {
-				if (nvs > maxnvs) {
-					maxnvs = nvs;
-				}
-			} else {
-				maxnvs = nvs;
-			}
-			for (var vn = 1; vn <= maxnvs; ++vn) {
-				var cell = fieldx.field(VM, vn);
-				if (cell.len() or force) {
-					outx.updater(vn, fn, cell);
-				}
-			}	//vn;
+	// force
+	// TRACE: inp = "a^1]2]3]4^x"
+	// TRACE: out = "a]1]x^]2]^]3]^]4]"
+
+	var result = "";
+	int maxvn = 0;
+	int fn = 0;
+	for (var fx : input) {
+		fn++;
+		int vn = 0;
+		dim vs = fx.split(_VM);
+		for (var vx : vs) {
+			vn++;
+			if (vx.len())
+				result(vn, fn) = vx;
 		}
-	}	//fn;
+		if (vn > maxvn)
+			maxvn = vn;
+	}
 
-	return outx;
+	// Optionally pad out so all fields have the same number of values
+	if (padded) {
+		for (int vn = 1; vn <= maxvn; vn++) {
+			result(vn, fn) = result(vn, fn);
+		}
+	}
+
+	return result;
 }
 
-// amountunit 1
+// amountunit 1 arg
 var ExodusProgramBase::amountunit(in input0) {
 	var unitcode;
 	return amountunit(input0, unitcode);
 }
 
-// amountunit 2
+// amountunit 2 arg
 var ExodusProgramBase::amountunit(in input0, out unitx) {
-	//c sys in,out
-
-	/*
-	unitx = input0;
-	unitx.converter(" -.0123456789", "");
-
-	var inputx = input0;
-	//convert ' ABCDEFGHIJKLMNOPQRSTUVWXYZ' to '' in inputx
-	//patsalides db PT0303 base currency code contains $,
-	//must be removed otherwise B16 in journal.subs4
-	inputx.converter(" ABCDEFGHIJKLMNOPQRSTUVWXYZ$", "");
-
-	return inputx;
-
-	*/
 
 	// TODO Consider runtime Non-numeric or other error if amount or unit is missing
 	// TODO Consider runtime error (Non-numeric?) if amount is not numeric
@@ -2760,41 +2749,14 @@ var ExodusProgramBase::amountunit(in input0, out unitx) {
 	// 123.45e-07USD
 	// 123.45M3 cubic meters TODO
 	// 123.45e10M3 cubic meters TODO
-	// 123e10 means e+10 and no unit
-
-//	// Find the last digit
-//	std::string s = input0.toString();
-//	std::size_t pos = s.find_last_of("0123456789");
-//
-//	// If no digits are found, then return amount as "" and all input as unit
-//	// TODO Non-numeric error?
-//	if (pos == std::string::npos) {
-//		unitx = input0;
-//		return "";
-//	}
-//
-//	// If last char is digit, then return all as amount and unit is "
-//	// TODO Non-numeric error?
-//	if (pos + 1 == s.size()) {
-//		unitx = "";
-//		return input0;
-//	}
-//
-//	// Everything after the last digit is the unit
-//	// example "1ABC" pos = 0 and unit -> ABC
-//	unitx = s.substr(pos + 1);
-//
-//	// Everything up to and including the last digit is the number
-//	// example 1.23456E-6 -> 1.23456E-6
-//	// TODO Non-numeric error?
-//	return s.substr(0, pos + 1);
+	// 123e10 means e+10 and no unit TODO
 
 	std::string_view sv = input0;
 
     for (auto it = sv.rbegin(); it != sv.rend(); ++it) {
         if (*it <= '9' and *it >= '0') {
 
-			// it - s.begin()
+			// it - s.rbegin()
 			// 123456 -> 0
 			// 123456XXX -> 3
 
@@ -2803,6 +2765,7 @@ var ExodusProgramBase::amountunit(in input0, out unitx) {
 			return sv.substr(0, pos);
         }
     }
+
 	// All unit no digits
 	unitx = sv;
 	return "";
