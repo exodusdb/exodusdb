@@ -393,18 +393,18 @@ friend class dim_iter;
 	///////////////////////
 
 	// Same as sorter() but returns a new array leaving the original untouched.
-	ND dim sort(bool reverse = false) const& {dim d1(*this);d1.sorter(reverse); return d1;}
+	ND dim sort(bool reverse = false) const& {dim d1(*this); d1.sorter(reverse); return d1;}
 
 	// Same as reverser() but returns a new array leaving the original untouched.
-	ND dim reverse() const& {dim d1(*this); d1.reverser(); return d1;}
+	ND dim reverse()                  const& {dim d1(*this); d1.reverser();      return d1;}
 
 	// Same as shuffler() but returns a new array leaving the original untouched.
-	ND dim shuffle() const& {dim d1(*this); d1.shuffler();return d1;}
+	ND dim shuffle()                  const& {dim d1(*this); d1.shuffler();      return d1;}
 
 	// On temporaries the mutator functions are called.
-	ND dim& sort(bool reverseorder = false) && {this->sorter(reverseorder); return *this;}
-	ND dim& reverse() && {this->reverser(); return *this;}
-	ND dim& shuffle() && {this->shuffler(); return *this;}
+	ND dim sort(bool reverseorder = false) && {sorter(reverseorder); return std::move(*this);}
+	ND dim reverse()                       && {reverser();           return std::move(*this);}
+	ND dim shuffle()                       && {shuffler();           return std::move(*this);}
 
 	///////////////////
 	///// array DB I/O:

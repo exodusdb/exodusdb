@@ -2385,55 +2385,55 @@ var  var::paste(const int pos1, SV insertstr)   const& {var nrvo = this->clone()
 
 // on temporaries the mutator function is called to avoid creating a temporary in many cases
 
-var&& var::ucase()                                   && {ucaser();     return std::move(*this);}
-var&& var::lcase()                                   && {lcaser();     return std::move(*this);}
-var&& var::tcase()                                   && {tcaser();     return std::move(*this);}
-var&& var::fcase()                                   && {fcaser();     return std::move(*this);}
-var&& var::normalize()                               && {normalizer(); return std::move(*this);}
-var&& var::invert()                                  && {inverter();   return std::move(*this);}
+var  var::ucase()                                   && {ucaser();     return std::move(*this);}
+var  var::lcase()                                   && {lcaser();     return std::move(*this);}
+var  var::tcase()                                   && {tcaser();     return std::move(*this);}
+var  var::fcase()                                   && {fcaser();     return std::move(*this);}
+var  var::normalize()                               && {normalizer(); return std::move(*this);}
+var  var::invert()                                  && {inverter();   return std::move(*this);}
 
-var&& var::lower()                                   && {lowerer();    return std::move(*this);}
-var&& var::raise()                                   && {raiser();     return std::move(*this);}
-var&& var::crop()                                    && {cropper();    return std::move(*this);}
+var  var::lower()                                   && {lowerer();    return std::move(*this);}
+var  var::raise()                                   && {raiser();     return std::move(*this);}
+var  var::crop()                                    && {cropper();    return std::move(*this);}
 
-var&& var::quote()                                   && {quoter();     return std::move(*this);}
-var&& var::squote()                                  && {squoter();    return std::move(*this);}
-var&& var::unquote()                                 && {unquoter();   return std::move(*this);}
+var  var::quote()                                   && {quoter();     return std::move(*this);}
+var  var::squote()                                  && {squoter();    return std::move(*this);}
+var  var::unquote()                                 && {unquoter();   return std::move(*this);}
 
-var&& var::trim(     SV trimchars /*= " "*/)         && {trimmer(trimchars);      return std::move(*this);}
-var&& var::trimfirst(SV trimchars /*= " "*/)         && {trimmerfirst(trimchars); return std::move(*this);}
-var&& var::trimlast( SV trimchars /*= " "*/)         && {trimmerlast(trimchars);  return std::move(*this);}
-var&& var::trimboth( SV trimchars /*= " "*/)         && {trimmerboth(trimchars);  return std::move(*this);}
+var  var::trim(     SV trimchars /*= " "*/)         && {trimmer(trimchars);      return std::move(*this);}
+var  var::trimfirst(SV trimchars /*= " "*/)         && {trimmerfirst(trimchars); return std::move(*this);}
+var  var::trimlast( SV trimchars /*= " "*/)         && {trimmerlast(trimchars);  return std::move(*this);}
+var  var::trimboth( SV trimchars /*= " "*/)         && {trimmerboth(trimchars);  return std::move(*this);}
 
-var&& var::first()                                   && {firster();               return std::move(*this);}
-var&& var::last()                                    && {laster();                return std::move(*this);}
-var&& var::first(const std::size_t length)           && {firster(length);         return std::move(*this);}
-var&& var::last( const std::size_t length)           && {laster(length);          return std::move(*this);}
-var&& var::cut(  const int    length)                && {cutter(length);          return std::move(*this);}
-var&& var::paste(const int    pos1, const int length, SV replacestr)
-                                                     && {paster(pos1, length, replacestr);    return std::move(*this);}
-var&& var::paste(const int    pos1, SV insertstr)    && {paster(pos1, insertstr);             return std::move(*this);}
-var&& var::prefix(                  SV prefixstr)    && {prefixer(prefixstr);                 return std::move(*this);}
-//var&& var::append(SV appendstr)                    && {appender(appendstr);                 return std::move(*this);}
-var&& var::pop()                                     && {popper();                            return std::move(*this);}
+var  var::first()                                   && {firster();               return std::move(*this);}
+var  var::last()                                    && {laster();                return std::move(*this);}
+var  var::first(const std::size_t length)           && {firster(length);         return std::move(*this);}
+var  var::last( const std::size_t length)           && {laster(length);          return std::move(*this);}
+var  var::cut(  const int    length)                && {cutter(length);          return std::move(*this);}
+var  var::paste(const int    pos1, const int length, SV replacestr)
+                                                     && {paster(pos1, length, replacestr);   return std::move(*this);}
+var  var::paste(const int    pos1, SV insertstr)    && {paster(pos1, insertstr);             return std::move(*this);}
+var  var::prefix(                  SV prefixstr)    && {prefixer(prefixstr);                 return std::move(*this);}
+//var  var::append(SV appendstr)                    && {appender(appendstr);                 return std::move(*this);}
+var  var::pop()                                     && {popper();                            return std::move(*this);}
 
-var&& var::fieldstore(SV delimiter, const int fieldno, const int nfields, in replacement)
+var  var::fieldstore(SV delimiter, const int fieldno, const int nfields, in replacement)
                                                      && {fieldstorer(delimiter, fieldno, nfields, replacement);
-                                                                                              return std::move(*this);}
+                                                                                             return std::move(*this);}
 
-var&& var::substr(const int pos1, const int length)  && {substrer(pos1, length);              return std::move(*this);}
-var&& var::substr(const int pos1)                    && {substrer(pos1);                      return std::move(*this);}
+var  var::substr(const int pos1, const int length)  && {substrer(pos1, length);              return std::move(*this);}
+var  var::substr(const int pos1)                    && {substrer(pos1);                      return std::move(*this);}
 
-var&& var::convert(    SV fromchars, SV tochars)     && {this->converter(fromchars, tochars); return std::move(*this);}
-var&& var::textconvert(SV fromchars, SV tochars)     && {textconverter(fromchars, tochars);   return std::move(*this);}
-var&& var::replace(    SV fromstr,   SV tostr)       && {replacer(fromstr, tostr);            return std::move(*this);}
-var&& var::replace(const rex& regex, SV replacement) && {replacer(regex, replacement);        return std::move(*this);}
+var  var::convert(    SV fromchars, SV tochars)     && {this->converter(fromchars, tochars); return std::move(*this);}
+var  var::textconvert(SV fromchars, SV tochars)     && {textconverter(fromchars, tochars);   return std::move(*this);}
+var  var::replace(    SV fromstr,   SV tostr)       && {replacer(fromstr, tostr);            return std::move(*this);}
+var  var::replace(const rex& regex, SV replacement) && {replacer(regex, replacement);        return std::move(*this);}
 
-var&& var::unique()                                  && {uniquer();           return std::move(*this);}
-var&& var::sort(   SV delimiter /*= _FM*/)           && {sorter(delimiter);   return std::move(*this);}
-var&& var::reverse(SV delimiter /*= _FM*/)           && {reverser(delimiter); return std::move(*this);}
-var&& var::shuffle(SV delimiter /*= _FM*/)           && {shuffler(delimiter); return std::move(*this);}
-var&& var::parse(char delimiter /*= _FM*/)           && {parser(delimiter);   return std::move(*this);}
+var  var::unique()                                  && {uniquer();           return std::move(*this);}
+var  var::sort(   SV delimiter /*= _FM*/)           && {sorter(delimiter);   return std::move(*this);}
+var  var::reverse(SV delimiter /*= _FM*/)           && {reverser(delimiter); return std::move(*this);}
+var  var::shuffle(SV delimiter /*= _FM*/)           && {shuffler(delimiter); return std::move(*this);}
+var  var::parse(char delimiter /*= _FM*/)           && {parser(delimiter);   return std::move(*this);}
 
 // clang-format on
 
