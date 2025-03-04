@@ -876,75 +876,75 @@ IO   var::inverter() REF {
 
 // ucase() - upper case
 
-// Const
-var  var::ucase() const& {
-
-// Performance testing indicates 20% faster to
-// bulk clone a string and then amend it char by char.
-// than copy the characters one by one to the new location.
-// When there are few char conversions required, the
-// performance advantage seems to be up to 50%.
+//// Const
+//var  var::ucase() const& {
 //
-// so we will use clone and ucaser.
-//
-//#if __cpp_lib_string_resize_and_overwrite < 202110L
-	var nrvo = this->clone();
-	nrvo.ucaser();
-	return nrvo;
-//#else
-//
-//	THISIS("var  var::ucase() const&")
-//	assertString(function_sig);
-//
-//	var rvo;
-//	rvo.var_typ = VARTYP_STR;
-//
-//	rvo.var_str.resize_and_overwrite(
-//		var_str.size(),
-//		[this](char* buf, std::size_t /*buf_size*/) noexcept {
-//
-////			assert(buf_size == var_str.size());
-//
-//			for (char c : var_str) {
-//
-//				// Quit if any non-ASCII
-//				if (!char_is_ASCII(c))
-//					return std::size_t(0);
-//
-//				// ASCII ucase
-//				if (c >= 'a' && c <= 'z')
-//					c -= 'z' - 'Z';
-//
-//				// rvo.var_str
-//				*buf++ = c;
-//			}
-//
-//			// Flag to resize_and_overwrite its new string size
-//			// which we arrange to be the same as the requested buffer size.
-//			return var_str.size();
-//		}
-//	);
-//
-//	//  If any unicode then run full unicode uppercase
-//
-////	// On unconverted remainder of var_str
-////	if (rvo.var_str.size() != var_str.size())
-////		rvo.var_str += unicode_to_upper(var_str.substr(rvo.var_str.size()));
-//
-//	if (rvo.var_str.size() != var_str.size()) {
-//
-//		// ~6ms! For very first call for non-ASCII string ucaser or lcaser
-//		// ~ 70ns for a one char non-ASCII string
-//		// ~ 2.5ns per additional char in non-ASCII string
-//		init_boost_locale1();
-//
-//		// Using boost (which calls icu)
-//		rvo.var_str = boost::locale::to_upper(var_str, thread_boost_locale1);
-//	}
-//
-//	return rvo;
-//#endif
-}
+//// Performance testing indicates 20% faster to
+//// bulk clone a string and then amend it char by char.
+//// than copy the characters one by one to the new location.
+//// When there are few char conversions required, the
+//// performance advantage seems to be up to 50%.
+////
+//// so we will use clone and ucaser.
+////
+////#if __cpp_lib_string_resize_and_overwrite < 202110L
+//	var nrvo = this->clone();
+//	nrvo.ucaser();
+//	return nrvo;
+////#else
+////
+////	THISIS("var  var::ucase() const&")
+////	assertString(function_sig);
+////
+////	var rvo;
+////	rvo.var_typ = VARTYP_STR;
+////
+////	rvo.var_str.resize_and_overwrite(
+////		var_str.size(),
+////		[this](char* buf, std::size_t /*buf_size*/) noexcept {
+////
+//////			assert(buf_size == var_str.size());
+////
+////			for (char c : var_str) {
+////
+////				// Quit if any non-ASCII
+////				if (!char_is_ASCII(c))
+////					return std::size_t(0);
+////
+////				// ASCII ucase
+////				if (c >= 'a' && c <= 'z')
+////					c -= 'z' - 'Z';
+////
+////				// rvo.var_str
+////				*buf++ = c;
+////			}
+////
+////			// Flag to resize_and_overwrite its new string size
+////			// which we arrange to be the same as the requested buffer size.
+////			return var_str.size();
+////		}
+////	);
+////
+////	//  If any unicode then run full unicode uppercase
+////
+//////	// On unconverted remainder of var_str
+//////	if (rvo.var_str.size() != var_str.size())
+//////		rvo.var_str += unicode_to_upper(var_str.substr(rvo.var_str.size()));
+////
+////	if (rvo.var_str.size() != var_str.size()) {
+////
+////		// ~6ms! For very first call for non-ASCII string ucaser or lcaser
+////		// ~ 70ns for a one char non-ASCII string
+////		// ~ 2.5ns per additional char in non-ASCII string
+////		init_boost_locale1();
+////
+////		// Using boost (which calls icu)
+////		rvo.var_str = boost::locale::to_upper(var_str, thread_boost_locale1);
+////	}
+////
+////	return rvo;
+////#endif
+//}
 
 // Mutate
 IO   var::ucaser() REF {
@@ -2358,81 +2358,82 @@ var  var::numberinwords(in langname_or_locale_id) {
 
 // Many of the non-mutating functions are forwarded with a clone to the mutating function
 
-//var  var::ucase()                               const& {var nrvo = this->clone(); nrvo.ucaser(); return nrvo;}
-var  var::lcase()                               const& {var nrvo = this->clone(); nrvo.lcaser(); return nrvo;}
-var  var::tcase()                               const& {var nrvo = this->clone(); nrvo.tcaser(); return nrvo;}
-var  var::fcase()                               const& {var nrvo = this->clone(); nrvo.fcaser(); return nrvo;}
+var  var::ucase()                               const& {var nrvo = this->clone(); nrvo.ucaser();     return nrvo;}
+var  var::lcase()                               const& {var nrvo = this->clone(); nrvo.lcaser();     return nrvo;}
+var  var::tcase()                               const& {var nrvo = this->clone(); nrvo.tcaser();     return nrvo;}
+var  var::fcase()                               const& {var nrvo = this->clone(); nrvo.fcaser();     return nrvo;}
 var  var::normalize()                           const& {var nrvo = this->clone(); nrvo.normalizer(); return nrvo;}
-var  var::invert()                              const& {var nrvo = this->clone(); nrvo.inverter(); return nrvo;}
+var  var::invert()                              const& {var nrvo = this->clone(); nrvo.inverter();   return nrvo;}
 
-var  var::lower()                               const& {var nrvo = this->clone(); nrvo.lowerer(); return nrvo;}
-var  var::raise()                               const& {var nrvo = this->clone(); nrvo.raiser(); return nrvo;}
-var  var::crop()                                const& {var nrvo = this->clone(); nrvo.cropper(); return nrvo;}
+var  var::lower()                               const& {var nrvo = this->clone(); nrvo.lowerer();    return nrvo;}
+var  var::raise()                               const& {var nrvo = this->clone(); nrvo.raiser();     return nrvo;}
+var  var::crop()                                const& {var nrvo = this->clone(); nrvo.cropper();    return nrvo;}
 
-//var  var::quote()                               const& {var nrvo = this->clone(); nrvo.quoter(); return nrvo;}
-//var  var::squote()                              const& {var nrvo = this->clone(); nrvo.squoter(); return nrvo;}
-//var  var::unquote()                             const& {var nrvo = this->clone(); nrvo.unquoter(); return nrvo;}
+//var  var::quote()                               const& {var nrvo = this->clone(); nrvo.quoter();     return nrvo;}
+//var  var::squote()                              const& {var nrvo = this->clone(); nrvo.squoter();    return nrvo;}
+//var  var::unquote()                             const& {var nrvo = this->clone(); nrvo.unquoter();   return nrvo;}
 
-var  var::convert(SV fromchars, SV tochars)     const& {var nrvo = this->clone(); nrvo.converter(fromchars,tochars); return nrvo;}
+var  var::convert(SV fromchars, SV tochars)     const& {var nrvo = this->clone(); nrvo.converter(fromchars,tochars);     return nrvo;}
 var  var::textconvert(SV fromchars, SV tochars) const& {var nrvo = this->clone(); nrvo.textconverter(fromchars,tochars); return nrvo;}
-var  var::parse(char sepchar)                   const& {var nrvo = this->clone(); nrvo.parser(sepchar); return nrvo;}
+var  var::parse(char sepchar)                   const& {var nrvo = this->clone(); nrvo.parser(sepchar);                  return nrvo;}
 
-var  var::pop()                                 const& {var nrvo = this->clone(); nrvo.popper(); return nrvo;}
+var  var::pop()                                 const& {var nrvo = this->clone(); nrvo.popper();                         return nrvo;}
 
 var  var::paste(const int pos1, const int length, SV replacestr)
-                                               const& {var nrvo = this->clone(); nrvo.paster(pos1, length, replacestr); return nrvo;}
-var  var::paste(const int pos1, SV insertstr)   const& {var nrvo = this->clone(); nrvo.paster(pos1, insertstr); return nrvo;}
+                                               const& {var nrvo = this->clone(); nrvo.paster(pos1, length, replacestr);  return nrvo;}
+var  var::paste(const int pos1, SV insertstr)   const& {var nrvo = this->clone(); nrvo.paster(pos1, insertstr);          return nrvo;}
 
 // on temporaries the mutator function is called to avoid creating a temporary in many cases
 
-ND io   var::ucase()                                   && {ucaser(); return *this;}
-ND io   var::lcase()                                   && {lcaser(); return *this;}
-ND io   var::tcase()                                   && {tcaser(); return *this;}
-ND io   var::fcase()                                   && {fcaser(); return *this;}
-ND io   var::normalize()                               && {normalizer(); return *this;}
-ND io   var::invert()                                  && {inverter(); return *this;}
+var&& var::ucase()                                   && {ucaser();     return std::move(*this);}
+var&& var::lcase()                                   && {lcaser();     return std::move(*this);}
+var&& var::tcase()                                   && {tcaser();     return std::move(*this);}
+var&& var::fcase()                                   && {fcaser();     return std::move(*this);}
+var&& var::normalize()                               && {normalizer(); return std::move(*this);}
+var&& var::invert()                                  && {inverter();   return std::move(*this);}
 
-ND io   var::lower()                                   && {lowerer(); return *this;}
-ND io   var::raise()                                   && {raiser(); return *this;}
-ND io   var::crop()                                    && {cropper(); return *this;}
+var&& var::lower()                                   && {lowerer();    return std::move(*this);}
+var&& var::raise()                                   && {raiser();     return std::move(*this);}
+var&& var::crop()                                    && {cropper();    return std::move(*this);}
 
-ND io   var::quote()                                   && {quoter(); return *this;}
-ND io   var::squote()                                  && {squoter(); return *this;}
-ND io   var::unquote()                                 && {unquoter(); return *this;}
+var&& var::quote()                                   && {quoter();     return std::move(*this);}
+var&& var::squote()                                  && {squoter();    return std::move(*this);}
+var&& var::unquote()                                 && {unquoter();   return std::move(*this);}
 
-ND io   var::trim(     SV trimchars /*= " "*/)     && {trimmer(trimchars); return *this;}
-ND io   var::trimfirst(SV trimchars /*= " "*/)     && {trimmerfirst(trimchars); return *this;}
-ND io   var::trimlast( SV trimchars /*= " "*/)     && {trimmerlast(trimchars); return *this;}
-ND io   var::trimboth( SV trimchars /*= " "*/)     && {trimmerboth(trimchars); return *this;}
+var&& var::trim(     SV trimchars /*= " "*/)         && {trimmer(trimchars);      return std::move(*this);}
+var&& var::trimfirst(SV trimchars /*= " "*/)         && {trimmerfirst(trimchars); return std::move(*this);}
+var&& var::trimlast( SV trimchars /*= " "*/)         && {trimmerlast(trimchars);  return std::move(*this);}
+var&& var::trimboth( SV trimchars /*= " "*/)         && {trimmerboth(trimchars);  return std::move(*this);}
 
-ND io   var::first()                                   && {firster(); return *this;}
-ND io   var::last()                                    && {laster(); return *this;}
-ND io   var::first(const std::size_t length)           && {firster(length); return *this;}
-ND io   var::last( const std::size_t length)           && {laster(length); return *this;}
-ND io   var::cut(  const int    length)                && {cutter(length); return *this;}
-ND io   var::paste(const int    pos1, const int length,
-                                        SV replacestr) && {paster(pos1, length, replacestr); return *this;}
-ND io   var::paste(const int    pos1, SV insertstr)    && {paster(pos1, insertstr); return *this;}
-ND io   var::prefix(                  SV prefixstr)    && {prefixer(prefixstr); return *this;}
-//ND io append(SV appendstr)                         && {appender(appendstr); return *this;}
-ND io   var::pop()                                     && {popper(); return *this;}
+var&& var::first()                                   && {firster();               return std::move(*this);}
+var&& var::last()                                    && {laster();                return std::move(*this);}
+var&& var::first(const std::size_t length)           && {firster(length);         return std::move(*this);}
+var&& var::last( const std::size_t length)           && {laster(length);          return std::move(*this);}
+var&& var::cut(  const int    length)                && {cutter(length);          return std::move(*this);}
+var&& var::paste(const int    pos1, const int length, SV replacestr)
+                                                     && {paster(pos1, length, replacestr);    return std::move(*this);}
+var&& var::paste(const int    pos1, SV insertstr)    && {paster(pos1, insertstr);             return std::move(*this);}
+var&& var::prefix(                  SV prefixstr)    && {prefixer(prefixstr);                 return std::move(*this);}
+//var&& var::append(SV appendstr)                    && {appender(appendstr);                 return std::move(*this);}
+var&& var::pop()                                     && {popper();                            return std::move(*this);}
 
-ND io   var::fieldstore(SV delimiter, const int fieldno, const int nfields, in replacement)
-                                                       && {fieldstorer(delimiter, fieldno, nfields, replacement); return *this;}
+var&& var::fieldstore(SV delimiter, const int fieldno, const int nfields, in replacement)
+                                                     && {fieldstorer(delimiter, fieldno, nfields, replacement);
+                                                                                              return std::move(*this);}
 
-ND io   var::substr(const int pos1, const int length)  && {substrer(pos1, length); return *this;}
-ND io   var::substr(const int pos1)                    && {substrer(pos1); return *this;}
+var&& var::substr(const int pos1, const int length)  && {substrer(pos1, length);              return std::move(*this);}
+var&& var::substr(const int pos1)                    && {substrer(pos1);                      return std::move(*this);}
 
-ND io   var::convert(    SV fromchars, SV tochars)     && {this->converter(fromchars, tochars); return *this;}
-ND io   var::textconvert(SV fromchars, SV tochars)     && {textconverter(fromchars, tochars); return *this;}
-ND io   var::replace(    SV fromstr,   SV tostr)       && {replacer(fromstr, tostr); return *this;}
-ND io   var::replace(const rex& regex, SV replacement) && {replacer(regex, replacement); return *this;}
+var&& var::convert(    SV fromchars, SV tochars)     && {this->converter(fromchars, tochars); return std::move(*this);}
+var&& var::textconvert(SV fromchars, SV tochars)     && {textconverter(fromchars, tochars);   return std::move(*this);}
+var&& var::replace(    SV fromstr,   SV tostr)       && {replacer(fromstr, tostr);            return std::move(*this);}
+var&& var::replace(const rex& regex, SV replacement) && {replacer(regex, replacement);        return std::move(*this);}
 
-ND io   var::unique()                                  && {uniquer(); return *this;}
-ND io   var::sort(   SV delimiter /*= _FM*/)           && {sorter(delimiter); return *this;}
-ND io   var::reverse(SV delimiter /*= _FM*/)           && {reverser(delimiter); return *this;}
-ND io   var::shuffle(SV delimiter /*= _FM*/)           && {shuffler(delimiter); return *this;}
-ND io   var::parse(char delimiter /*= _FM*/)           && {parser(delimiter); return *this;}
+var&& var::unique()                                  && {uniquer();           return std::move(*this);}
+var&& var::sort(   SV delimiter /*= _FM*/)           && {sorter(delimiter);   return std::move(*this);}
+var&& var::reverse(SV delimiter /*= _FM*/)           && {reverser(delimiter); return std::move(*this);}
+var&& var::shuffle(SV delimiter /*= _FM*/)           && {shuffler(delimiter); return std::move(*this);}
+var&& var::parse(char delimiter /*= _FM*/)           && {parser(delimiter);   return std::move(*this);}
 
 // clang-format on
 

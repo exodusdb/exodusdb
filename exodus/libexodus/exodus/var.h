@@ -1243,56 +1243,56 @@ public:
 
 	// UTF8/byte as for accessors
 
-	ND io   ucase() &&;
-	ND io   lcase() &&;
-	ND io   tcase() &&;
-	ND io   fcase() &&;
-	ND io   normalize() &&;
-	ND io   invert() &&;
+	ND var&& ucase() &&;
+	ND var&& lcase() &&;
+	ND var&& tcase() &&;
+	ND var&& fcase() &&;
+	ND var&& normalize() &&;
+	ND var&& invert() &&;
 
-	ND io   lower() &&;
-	ND io   raise() &&;
-	ND io   crop() &&;
+	ND var&& lower() &&;
+	ND var&& raise() &&;
+	ND var&& crop() &&;
 
-	ND io   quote() &&;
-	ND io   squote() &&;
-	ND io   unquote() &&;
+	ND var&& quote() &&;
+	ND var&& squote() &&;
+	ND var&& unquote() &&;
 
-	ND io   trim(SV trimchars = " ") &&;
-	ND io   trimfirst(SV trimchars = " ") &&;
-	ND io   trimlast(SV trimchars = " ") &&;
-	ND io   trimboth(SV trimchars = " ") &&;
+	ND var&& trim(SV trimchars = " ") &&;
+	ND var&& trimfirst(SV trimchars = " ") &&;
+	ND var&& trimlast(SV trimchars = " ") &&;
+	ND var&& trimboth(SV trimchars = " ") &&;
 
-	ND io   first() &&;
-	ND io   last() &&;
-	ND io   first(const std::size_t length) &&;
-	ND io   last(const std::size_t length) &&;
-	ND io   cut(const int length) &&;
-	ND io   paste(const int pos1, const int length, SV replacestr) &&;
-	ND io   paste(const int pos1, SV insertstr) &&;
-	ND io   prefix(SV insertstr) &&;
+	ND var&& first() &&;
+	ND var&& last() &&;
+	ND var&& first(const std::size_t length) &&;
+	ND var&& last(const std::size_t length) &&;
+	ND var&& cut(const int length) &&;
+	ND var&& paste(const int pos1, const int length, SV replacestr) &&;
+	ND var&& paste(const int pos1, SV insertstr) &&;
+	ND var&& prefix(SV insertstr) &&;
 			template <typename... ARGS>
-	ND io   append(const ARGS&... appendable) && {
+	ND var&& append(const ARGS&... appendable) && {
 				((*this) ^= ... ^= appendable);
-				return *this;
+				return std::move(*this);
 			}
-	ND io   pop() &&;
+	ND var&& pop() &&;
 
-	ND io   fieldstore(SV delimiter, const int fieldno, const int nfields, in replacement) &&;
-	ND io   substr(const int pos1, const int length) &&;
-	ND io   substr(const int pos1) &&;
+	ND var&& fieldstore(SV delimiter, const int fieldno, const int nfields, in replacement) &&;
+	ND var&& substr(const int pos1, const int length) &&;
+	ND var&& substr(const int pos1) &&;
 
-	ND io   convert(SV from_chars, SV to_chars) &&;
-	ND io   textconvert(SV from_characters, SV to_characters) &&;
-	ND io   replace(const rex& regex, SV tostr) &&;
-	ND io   replace(SV fromstr, SV tostr) &&;
-//	ND io   regex_replace(SV regex_str, SV replacement, SV regex_options = "") &&;
+	ND var&& convert(SV from_chars, SV to_chars) &&;
+	ND var&& textconvert(SV from_characters, SV to_characters) &&;
+	ND var&& replace(const rex& regex, SV tostr) &&;
+	ND var&& replace(SV fromstr, SV tostr) &&;
+//	ND var&& regex_replace(SV regex_str, SV replacement, SV regex_options = "") &&;
 
-	ND io   unique() &&;
-	ND io   sort(SV delimiter = _FM) &&;
-	ND io   reverse(SV delimiter = _FM) &&;
-	ND io   shuffle(SV delimiter = _FM) &&;
-	ND io   parse(char sepchar = ' ') &&;
+	ND var&& unique() &&;
+	ND var&& sort(SV delimiter = _FM) &&;
+	ND var&& reverse(SV delimiter = _FM) &&;
+	ND var&& shuffle(SV delimiter = _FM) &&;
+	ND var&& parse(char sepchar = ' ') &&;
 
 	///// STRING MUTATION - Standalone commands:
 	////////////////////////////////////////////
@@ -1502,7 +1502,7 @@ public:
 	//  var v3 = v1.f(2, 2);`
 	ND var  extract(const int fieldno, const int valueno = 0, const int subvalueno = 0)      const {return this->f(fieldno, valueno, subvalueno);}
 
-	// PICKREPLACE
+	// UPDATE
 
 	// This function hardly occurs anywhere in exodus code and should probably be renamed to
 	// something better. It was called replace() in Pick Basic but we are now using "replace()" to
@@ -1539,15 +1539,15 @@ public:
 	// SAME AS ABOVE ON TEMPORARIES TO USE MUTATING (not documented because used difference in implementation is irrelevant to exodus users)
 	///////////////////////////////////////////////
 
-	ND io   pickreplace(const int fieldno, const int valueno, const int subvalueno, in replacement) && {this->updater(fieldno, valueno, subvalueno, replacement); return *this;}
-	ND io   pickreplace(const int fieldno, const int valueno, in replacement)                       && {this->updater(fieldno, valueno, 0, replacement); return *this;}
-	ND io   pickreplace(const int fieldno, in replacement)                                          && {this->updater(fieldno, 0, 0, replacement); return *this;}
+	ND var&& update(const int fieldno, const int valueno, const int subvalueno, in replacement) && {this->updater(fieldno, valueno, subvalueno, replacement); return std::move(*this);}
+	ND var&& update(const int fieldno, const int valueno, in replacement)                       && {this->updater(fieldno, valueno, 0, replacement); return std::move(*this);}
+	ND var&& update(const int fieldno, in replacement)                                          && {this->updater(fieldno, 0, 0, replacement); return std::move(*this);}
 
-	ND io   insert(const int fieldno, const int valueno, const int subvalueno, in insertion)        && {this->inserter(fieldno, valueno, subvalueno, insertion); return *this;}
-	ND io   insert(const int fieldno, const int valueno, in insertion)                              && {this->inserter(fieldno, valueno, 0, insertion); return *this;}
-	ND io   insert(const int fieldno, in insertion)                                                 && {this->inserter(fieldno, 0, 0, insertion); return *this;}
+	ND var&& insert(const int fieldno, const int valueno, const int subvalueno, in insertion)        && {this->inserter(fieldno, valueno, subvalueno, insertion); return std::move(*this);}
+	ND var&& insert(const int fieldno, const int valueno, in insertion)                              && {this->inserter(fieldno, valueno, 0, insertion); return std::move(*this);}
+	ND var&& insert(const int fieldno, in insertion)                                                 && {this->inserter(fieldno, 0, 0, insertion); return std::move(*this);}
 
-	ND io   remove(const int fieldno, const int valueno = 0, const int subvalueno = 0)              && {this->remover(fieldno, valueno, subvalueno); return *this;}
+	ND var&& remove(const int fieldno, const int valueno = 0, const int subvalueno = 0)              && {this->remover(fieldno, valueno, subvalueno); return std::move(*this);}
 
 	///// DYNAMIC ARRAY FILTERS:
 	///////////////////////////
