@@ -51,6 +51,12 @@ function main() {
 
 	printl("\n========= test_precision ==========");
 
+	assert(squote(var(0.000'000'000'001)) == "'0.000000000001'");
+	assert(squote(var(0.000'000'000'000'1)) == "'0'");
+
+	// 5.55111512313e-17
+	assert(squote(var(0.1) + var(0.2) - var(0.3)) == "'0'");
+
 	{
 
 		printl("On 10 byte floats/doubles, 22/7 -> 3.14285714285714286");
@@ -222,7 +228,8 @@ function main() {
 		sv1 = dv1 ^ "x";
 		//#ifdef EXO_USE_TO_CHARS
 		//		sv2="1e-13x";
-		sv2 = "0.0000000000001x";
+//		sv2 = "0.0000000000001x";
+		sv2 = "0x";
 		//#else
 		//		sv2="1.0e-13x";
 		//#endif
@@ -553,21 +560,22 @@ programexit()
 //		assert(test2(".0000000000000012345678901234567890123456789", "0.000000000000001234567890123457x"));
 
 		// 1.234567890123457 -> 1.23456789012
-		assert(test2(".00000000000000012345678901234567890123456789", "1.23456789012e-16x"));
-		assert(test2(".000000000000000012345678901234567890123456789", "1.23456789012e-17x"));
-		assert(test2(".0000000000000000012345678901234567890123456789", "1.23456789012e-18x"));
-		assert(test2(".00000000000000000012345678901234567890123456789", "1.23456789012e-19x"));
-		assert(test2(".000000000000000000012345678901234567890123456789", "1.23456789012e-20x"));
-		assert(test2(".0000000000000000000012345678901234567890123456789", "1.23456789012e-21x"));
-		assert(test2(".00000000000000000000012345678901234567890123456789", "1.23456789012e-22x"));
-		assert(test2(".000000000000000000000012345678901234567890123456789", "1.23456789012e-23x"));
-		assert(test2(".0000000000000000000000012345678901234567890123456789", "1.23456789012e-24x"));
-		assert(test2(".00000000000000000000000012345678901234567890123456789", "1.23456789012e-25x"));
-		assert(test2(".000000000000000000000000012345678901234567890123456789", "1.23456789012e-26x"));
-		assert(test2(".0000000000000000000000000012345678901234567890123456789", "1.23456789012e-27x"));
-		assert(test2(".00000000000000000000000000012345678901234567890123456789", "1.23456789012e-28x"));
-		assert(test2(".000000000000000000000000000012345678901234567890123456789", "1.23456789012e-29x"));
-		assert(test2(".0000000000000000000000000000012345678901234567890123456789", "1.23456789012e-30x"));
+		assert(test2(".00000000000000012345678901234567890123456789", "0x"));
+//		assert(test2(".00000000000000012345678901234567890123456789", "1.23456789012e-16x"));
+//		assert(test2(".000000000000000012345678901234567890123456789", "1.23456789012e-17x"));
+//		assert(test2(".0000000000000000012345678901234567890123456789", "1.23456789012e-18x"));
+//		assert(test2(".00000000000000000012345678901234567890123456789", "1.23456789012e-19x"));
+//		assert(test2(".000000000000000000012345678901234567890123456789", "1.23456789012e-20x"));
+//		assert(test2(".0000000000000000000012345678901234567890123456789", "1.23456789012e-21x"));
+//		assert(test2(".00000000000000000000012345678901234567890123456789", "1.23456789012e-22x"));
+//		assert(test2(".000000000000000000000012345678901234567890123456789", "1.23456789012e-23x"));
+//		assert(test2(".0000000000000000000000012345678901234567890123456789", "1.23456789012e-24x"));
+//		assert(test2(".00000000000000000000000012345678901234567890123456789", "1.23456789012e-25x"));
+//		assert(test2(".000000000000000000000000012345678901234567890123456789", "1.23456789012e-26x"));
+//		assert(test2(".0000000000000000000000000012345678901234567890123456789", "1.23456789012e-27x"));
+//		assert(test2(".00000000000000000000000000012345678901234567890123456789", "1.23456789012e-28x"));
+//		assert(test2(".000000000000000000000000000012345678901234567890123456789", "1.23456789012e-29x"));
+//		assert(test2(".0000000000000000000000000000012345678901234567890123456789", "1.23456789012e-30x"));
 #endif
 	}
 
@@ -737,14 +745,19 @@ programexit()
 	//	assert(var(1e-11).outputl().toString() eq "9.999999999999999e-12");
 	//#endif
 //	assert(var(1e-12f).outputl().toString() eq "0.0000000000009999999960041972"); //16
-	assert(var(1e-12f).outputl().toString() eq "0.000000000000999999996004"); //12
+//	assert(var(1e-12f).outputl().toString() eq "0.000000000000999999996004"); //12
+	assert(var(1e-12f).outputl().toString() eq "0"); //12
 	assert(var(1e-12).outputl().toString()  eq "0.000000000001");
 //	assert(var(1e-13f).outputl().toString() eq "0.000000000000099999998245167"); //16
-	assert(var(1e-13f).outputl().toString() eq "0.0000000000000999999982452"); // 12
-	assert(var(1e-13).outputl().toString()  eq "0.0000000000001");
+//	assert(var(1e-13f).outputl().toString() eq "0.0000000000000999999982452"); // 12
+//	assert(var(1e-13).outputl().toString()  eq "0.0000000000001");
+	assert(var(1e-13f).outputl().toString() eq "0"); // 12
+	assert(var(1e-13).outputl().toString()  eq "0");
 //	assert(var(1e-14f).outputl().toString() eq "0.0000000000000099999998245167"); /16
-	assert(var(1e-14f).outputl().toString() eq "0.00000000000000999999982452"); // 12
-	assert(var(1e-14).outputl().toString()  eq "0.00000000000001");
+//	assert(var(1e-14f).outputl().toString() eq "0.00000000000000999999982452"); // 12
+//	assert(var(1e-14).outputl().toString()  eq "0.00000000000001");
+	assert(var(1e-14f).outputl().toString() eq "0"); // 12
+	assert(var(1e-14).outputl().toString()  eq "0");
 
 	//assert(var(1e-12f).outputl().toString() eq "9.999999960041972e-13");
 	//assert(var(1e-13f).outputl().toString() eq "9.9999998245167e-14");
@@ -756,10 +769,13 @@ programexit()
 //	assert(var(1e-14f).outputl().toString() eq "0.0000000000000099999998245167");
 
 	// 12
-	assert(var(1e-12f).outputl().toString() eq "0.000000000000999999996004");
-	assert(var(1e-13f).outputl().toString() eq "0.0000000000000999999982452");
+//	assert(var(1e-12f).outputl().toString() eq "0.000000000000999999996004");
+//	assert(var(1e-13f).outputl().toString() eq "0.0000000000000999999982452");
+	assert(var(1e-12f).outputl().toString() eq "0");
+	assert(var(1e-13f).outputl().toString() eq "0");
 //	assert(var(1e-14f).outputl().toString() eq "0.0000000000000099999998245167"); //16
-	assert(var(1e-14f).outputl().toString() eq "0.00000000000000999999982452"); //12
+//	assert(var(1e-14f).outputl().toString() eq "0.00000000000000999999982452"); //12
+	assert(var(1e-14f).outputl().toString() eq "0"); //12
 
 	//#ifdef EXO_USE_TO_CHARS
 	//	assert(var(1e-12 ).outputl().toString() eq "1e-12");
@@ -804,12 +820,15 @@ programexit()
 	//assert((var(pwr(10,-26)) ^ "x").outputl() =="0.00000000000000000000000001x");//better calculation of 10^-26
 	//assert((var(1/pwr(10,26)) ^ "x").outputl() =="0.000000000000000000000000009999999999999999x");//poorer calculation of 1/10^26
 #ifdef EXO_USE_TO_CHARS
-	assert((var(pwr(10, -26)) ^ "x").outputl() eq "1e-26x");  //better calculation of 10^-26
+//	assert((var(pwr(10, -26)) ^ "x").outputl() eq "1e-26x");  //better calculation of 10^-26
+	assert((var(pwr(10, -26)) ^ "x").outputl() eq "0x");  //better calculation of 10^-26
 #else
-	assert((var(pwr(10, -26)) ^ "x").outputl() eq "1e-26x");										   //better calculation of 10^-26
+//	assert((var(pwr(10, -26)) ^ "x").outputl() eq "1e-26x");										   //better calculation of 10^-26
+	assert((var(pwr(10, -26)) ^ "x").outputl() eq "0x");										   //better calculation of 10^-26
 #endif
 //	assert((var(1 / pwr(10, 26)) ^ "x").outputl() eq "9.999999999999999e-27x");	 //poorer calculation of 1/10^26 // 16
-	assert((var(1 / pwr(10, 26)) ^ "x").outputl() eq "1e-26x");	 //poorer calculation of 1/10^26 // 12
+//	assert((var(1 / pwr(10, 26)) ^ "x").outputl() eq "1e-26x");	 //poorer calculation of 1/10^26 // 12
+	assert((var(1 / pwr(10, 26)) ^ "x").outputl() eq "0x");	 //poorer calculation of 1/10^26 // 12
 
 	printl(((var(pwr(10, -26)) - var(1 / pwr(10, 26))) ^ "x"));
 //#if defined(EXO_USE_RYU) or defined(EXO_USE_TO_CHARS)
@@ -819,7 +838,8 @@ programexit()
 	assert(((var(pwr(10, -26)) - var(1 / pwr(10, 26))) ^ "x").outputl() eq "1.4349296274686127e-42x");	//sstream
 #else
 //	assert(((var(pwr(10, -26)) - var(1 / pwr(10, 26))) ^ "x").outputl() eq "1.434929627468613e-42x");  //sstream // 16
-	assert(((var(pwr(10, -26)) - var(1 / pwr(10, 26))) ^ "x").outputl() eq "1.43492962747e-42x");  //sstream // 12
+//	assert(((var(pwr(10, -26)) - var(1 / pwr(10, 26))) ^ "x").outputl() eq "1.43492962747e-42x");  //sstream // 12
+	assert(((var(pwr(10, -26)) - var(1 / pwr(10, 26))) ^ "x").outputl() eq "0x");  //sstream // 12
 #endif
 	//#endif
 	assert(var(pwr(10, -26)).outputl()                                  eq var(1 / pwr(10, 26)));
@@ -829,14 +849,19 @@ programexit()
 	//assert((var(pwr(10,-27)) ^ "x")  eq "0.000000000000000000000000001x");
 
 #ifdef EXO_USE_TO_CHARS
-	assert((var(pwr(10, -26)) ^ "x").output()     eq "1e-26x");
-	assert((var(pwr(10, -27)) ^ "x").output()     eq "1e-27x");
+//	assert((var(pwr(10, -26)) ^ "x").output()     eq "1e-26x");
+//	assert((var(pwr(10, -27)) ^ "x").output()     eq "1e-27x");
+	assert((var(pwr(10, -26)) ^ "x").output()     eq "0x");
+	assert((var(pwr(10, -27)) ^ "x").output()     eq "0x");
 #else
-	assert((var(pwr(10, -26)) ^ "x").output()     eq "1e-26x");
-	assert((var(pwr(10, -27)) ^ "x").output()     eq "1e-27x");
+//	assert((var(pwr(10, -26)) ^ "x").output()     eq "1e-26x");
+//	assert((var(pwr(10, -27)) ^ "x").output()     eq "1e-27x");
+	assert((var(pwr(10, -26)) ^ "x").output()     eq "0x");
+	assert((var(pwr(10, -27)) ^ "x").output()     eq "0x");
 #endif
 //	assert((var(1 / pwr(10, 26)) ^ "x").outputl() eq "9.999999999999999e-27x"); // 16
-	assert((var(1 / pwr(10, 26)) ^ "x").outputl("=") eq "1e-26x"); // 12
+//	assert((var(1 / pwr(10, 26)) ^ "x").outputl("=") eq "1e-26x"); // 12
+	assert((var(1 / pwr(10, 26)) ^ "x").outputl("=") eq "0x"); // 12
 
 	{
 		assert(var(1000.1).outputl().toString()     eq "1000.1");
@@ -975,8 +1000,10 @@ function test2(const std::string str1, const std::string str2 = std::string()) {
 			//also test negative
 			if (str1[0] ne '-' and str1[0] ne '+') {
 				if (bool(var(str1).toDouble())) {
-					//not zero
-					return test2("-" + str1, "-" + str2);
+					if (str2 != "0x") {
+						//not zero
+						return test2("-" + str1, "-" + str2);
+					}
 				} else {
 					//negative zero
 					return test2("-" + str1, str2);

@@ -69,10 +69,14 @@ function main() {
 
 	{  // generated code pasted back in
 
-		assert(var(1e-200).squote().outputl() eq "'1e-200'");
-		assert(var(1e-101).squote().outputl() eq "'1e-101'");
-		assert(var(1e-100).squote().outputl() eq "'1e-100'");
-		assert(var(1e-99).squote().outputl()  eq "'1e-99'");
+//		assert(var(1e-200).squote().outputl() eq "'1e-200'");
+//		assert(var(1e-101).squote().outputl() eq "'1e-101'");
+//		assert(var(1e-100).squote().outputl() eq "'1e-100'");
+//		assert(var(1e-99).squote().outputl()  eq "'1e-99'");
+		assert(var(1e-200).squote().outputl() eq "'0'");
+		assert(var(1e-101).squote().outputl() eq "'0'");
+		assert(var(1e-100).squote().outputl() eq "'0'");
+		assert(var(1e-99).squote().outputl()  eq "'0'");
 		assert(var(1e-10).squote().outputl()  eq "'0.0000000001'");
 		assert(var(1e-09).squote().outputl()  eq "'0.000000001'");
 		assert(var(1e-08).squote().outputl()  eq "'0.00000001'");

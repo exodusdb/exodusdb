@@ -117,29 +117,30 @@ namespace exo {
 // 1. var::createString() (via double_to_string) using std::chars_format::general and given ndecs
 // 2. var::round()                               using std::chars_format::fixed and default precision (ndecs)
 static std::string double_to_chars_to_string(
-		double double1,
-		std::chars_format format = std::chars_format::general,
+		double in_double,
+		std::chars_format in_format = std::chars_format::general,
 //		int decimals = std::numeric_limits<double>::digits10 + 1
-		int decimals = EXO_PRECISION
+		int in_decimals = EXO_PRECISION
 	) {
-
+//	std::cerr << "in double  " << in_double << std::endl;
+//	std::cerr << "in decimals" << in_decimals << std::endl;
 	// Local stack working space for to_chars
 	constexpr auto MAX_CHARS = 24;
-	std::array<char, MAX_CHARS> chars;
+	std::array<char, MAX_CHARS> out_chars;
 
 	// to_chars
 #pragma GCC diagnostic push
 #pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
-	auto [ptr, ec] = std::to_chars(chars.data(), chars.data() + chars.size(), double1, format, decimals);
+	auto [ptr, ec] = std::to_chars(out_chars.data(), out_chars.data() + out_chars.size(), in_double, in_format, in_decimals);
 #pragma GCC diagnostic pop
 
 	// Throw NON-NUMERIC if cannot convert
 	if (ec != std::errc())
-		throw VarNonNumeric("var::round: Cannot round " ^ var(double1) ^ " ndecimals: " ^ decimals ^ " to " ^ MAX_CHARS ^ " characters");
+		throw VarNonNumeric("var::round: Cannot round " ^ var(in_double) ^ " ndecimals: " ^ in_decimals ^ " to " ^ MAX_CHARS ^ " characters");
 
 	// Convert to a string.
 	// Hopefully using small string optimisation (SSO)
-	return std::string(chars.data(), ptr - chars.data());
+	return std::string(out_chars.data(), ptr - out_chars.data());
 }
 #endif
 
@@ -352,7 +353,8 @@ static std::string double_to_string(double double1) {
 	////////////////////////////////////////////
 	//if (exponent < -6 or exponent > 12) {
 	//if (abs(exponent> > 15) {
-	if (std::abs(exponent) > std::numeric_limits<double>::digits10) {
+//	if (std::abs(exponent) > std::numeric_limits<double>::digits10) {
+	if (exponent > std::numeric_limits<double>::digits10) {
 
 		//remove trailing zeros
 		while (resultstr.back() == '0')
@@ -399,6 +401,13 @@ static std::string double_to_string(double double1) {
 
 		//negative exponent
 	} else {
+
+		// c 'std::cerr << var(0.1) + var(0.2) - var(0.3) << std::endl;' {i}
+		// 5.55111512313e-17
+		if (-exponent > EXO_PRECISION) {
+			resultstr = "0";
+			return resultstr;
+		}
 
 		//remove decimal point
 		resultstr.erase(1 + minus, 1);
