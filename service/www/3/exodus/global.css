@@ -92,7 +92,8 @@ TH
 {
     font-weight: normal;
     text-align: left;
-    vertical-align: baseline;
+    /*deprecated in html5 - removed to fix alignment issue in schedules*/
+    /*vertical-align: baseline;*/
 }
 A:link
 {
@@ -169,30 +170,52 @@ H6
     font-size: 50%;
 }
 
-.clsNotRequired
+/*.clsNotRequired*/
+/*{*/
+/*    background-color: #ffffff;*/
+/*    border: solid 1px #E0E0E0;*/
+/*    margin: 0px;*/
+/*    padding: 0px;*/
+/*}*/
+/**/
+/*.clsRequired*/
+/*{*/
+/*    background-color: #FFFFFF;*/
+/*    border: solid 1px #333333;*/
+/*    margin: 0px;*/
+/*    padding: 0px;*/
+/*}*/
+/* Abandoned feature to differentiate between required/non-required fields (different border colors)
+1.For better aesthetics 2.Feature was unintuitive 3.UI anyway alerts users for empty required fields
+Considered marking required fields with red *, but it would clutter dense screens like schedules
+Did not remove clsRequired class since it is used in few places like index.html */
+.clsRequired, .clsNotRequired
 {
-    background-color: #ffffff; /*	background-color: #FFFFFF;*/
-    border: solid 1px #E0E0E0;
+    background-color: #F9F9F9;
+    border: solid 1px #CCCCCC;
+    border-radius: 5px;
     margin: 0px;
-    padding: 0px;
-}
-
-.clsRequired
-{
-    background-color: #FFFFFF;
-    border: solid 1px #333333;
-    margin: 0px;
-    padding: 0px;
+    padding: 0 1px;
 }
 
 .clsReadOnly
 {
-    background-color: #fbfbfb;/*transparent;*/ /*#fdfdfd;*/ /*background-color: #f4f400;*/ /*xborder: none;*/ /*	border: solid 1px #E0E0E0;*/
-    border: solid 1px #f4f4f4;
+    background-color: #F9F9F9;
+    border: solid 1px #F4F4F4;
+    border-radius: 5px;
     margin: 0px;
-    padding: 0px;
+    /*padding: 0px;*/
+    padding: 0 1px;
     /*filter: alpha(opacity=80);
     opacity: 0.80;*/
+}
+
+/*Removes the vertical white lines produced due to empty read-only fields*/
+/*Apply to span only since input type read-only fields need to show white empty field*/
+span.clsReadOnly:empty
+{
+    background-color: transparent;
+    border: none;
 }
 
 .menu:focus 
@@ -301,7 +324,8 @@ H6
 :root {
     --bg-color: #fff;
     --h-color: #000;
-    --text-color: black;
+    /*--text-color: black;*/
+    --text-color: #D4D4D4;
     --link-color: #006;
     --radio-color: rgba(0, 84, 187, 0.596);
     --border-color: #bbb;
@@ -368,7 +392,8 @@ input[type=checkbox] {
     /*top: 2px;*/
     background-color: var(--bg-color);
     vertical-align: middle;
-    border-radius: 20%;
+    /*border-radius: 20%;*/
+    border-radius: 5px;
 }
 
 input[type=checkbox]:checked {

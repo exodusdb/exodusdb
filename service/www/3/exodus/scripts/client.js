@@ -5163,6 +5163,7 @@ function* exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negativebut
     div.style.textAlign = 'center'
     div.style.background = 'lightgrey'
     div.style.border = '1px solid grey'
+    div.style.borderRadius = '10px'
     div.style.padding = '10px'
     div.style.boxShadow = '0px 0px 7px #666666'
     //div.style.fontSize=25//had no effect
@@ -6010,6 +6011,7 @@ function decide_onload(decide_args) {
         if (!element)
             return
 
+        // Highlight row in popup when hovering over it
         if (mode == 'over') {
             trtag.setAttribute('mousesave', trtag.style.backgroundColor)
             trtag.style.backgroundColor = 'lightgrey'
