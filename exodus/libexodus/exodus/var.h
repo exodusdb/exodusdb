@@ -3904,6 +3904,7 @@ ND inline var_proxy3 var::operator()(int fieldno, int valueno, int subvalueno) {
 	PUBLIC extern const var BS;
 	PUBLIC extern const var DQ;
 	PUBLIC extern const var SQ;
+	PUBLIC extern const var NL;
 
 	PUBLIC extern const char* const _OS_NAME;
 	PUBLIC extern const char* const _OS_VERSION;
@@ -3919,6 +3920,7 @@ ND inline var_proxy3 var::operator()(int fieldno, int valueno, int subvalueno) {
 	CONSTINIT_VAR const var BS = BS_;
 	CONSTINIT_VAR const var DQ = DQ_;
 	CONSTINIT_VAR const var SQ = SQ_;
+	CONSTINIT_VAR const var NL = NL_;
 
 #ifdef EXO_OS_NAME
 	const char* const _OS_NAME = EXO_OS_NAME;

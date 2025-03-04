@@ -117,7 +117,7 @@ namespace exo {
 #ifndef EXO_FUNCS_CPP
 	extern
 #endif
-PUBLIC std::mutex global_mutex_threadstream;
+std::mutex global_mutex_threadstream;
 
 //
 // SLOW = threadsafe. With locking.  Output all arguments together.

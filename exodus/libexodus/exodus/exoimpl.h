@@ -144,6 +144,7 @@ namespace exo {
 	PUBLIC extern const var BS;
 	PUBLIC extern const var DQ;
 	PUBLIC extern const var SQ;
+	PUBLIC extern const var NL;
 
 	PUBLIC extern const char* const _OS_NAME;
 	PUBLIC extern const char* const _OS_VERSION;
