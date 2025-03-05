@@ -253,7 +253,7 @@ bool ExodusProgramBase::select(in sortselectclause_or_filehandle) {
 			sqltype = "TIME";//TODO check if works
 		}
 		// Note that we aslo assume numeric if a filter value is present and is numeric (without quotes)
-		else if (ioconv.starts("[NUMBER") or (ovalue.len() and ovalue.isnum())) {
+		else if (ioconv.starts("[NUMBER") or (not ovalue.empty() and ovalue.isnum())) {
 			sqltype = "NUMERIC";
 		}
 		else {
@@ -594,7 +594,7 @@ bool ExodusProgramBase::deleterecord(in filename_or_handle_or_command, in key) {
 
 	// Simple deleterecord
 	//if (filename_or_handle_or_command.contains(" ") || key.len() == 0) {
-	if (not filename_or_handle_or_command.contains(" ") and key.len() != 0)
+	if (not filename_or_handle_or_command.contains(" ") and not key.empty())
 		return filename_or_handle_or_command.deleterecord(key);
 
 	// Complex deleterecord command
@@ -1034,7 +1034,7 @@ var ExodusProgramBase::xlate(in filename, in key, in fieldno_or_name, const char
 			}
 
 			// Handle record not found and mode X
-			if (not record.len()) {
+			if (record.empty()) {
 				results.updater(keyn, "");
 				continue;
 			}
@@ -1581,7 +1581,7 @@ var ExodusProgramBase::oconv(in input0, in conversion) {
 
 	//nothing in, nothing out
 	//unfortutely conversions like L# do convert ""
-	//if (result.len() == 0)
+	//if (result.empty())
 	//	return result;
 
 	var ptr = 1;
@@ -1609,7 +1609,7 @@ var ExodusProgramBase::oconv(in input0, in conversion) {
 			//for speed dont call custom conversions on empty strings
 			//nothing in, nothing out
 			//Unfortunately [taghtml,td] produces output from nothing
-			//if (result.len() == 0)
+			//if (result.empty())
 			//	continue;
 
 			//remove brackets
@@ -2067,25 +2067,29 @@ ok:
 
 // number
 var ExodusProgramBase::exoprog_number(in type, in input0, in ndecs0, out outx) {
-	//function main(in type, in input0, in ndecs0, out outx) {
-	//c xxx in,in,in,out
 
-	var fmtx;
-	var input1;	 //num
-	var delim;	 //num
-	var output1;
-
-	var ndecs = ndecs0;
-	var input = input0;
 	outx = "";
 
+	// oconv only
 	var zz = "";
+	var ndecs = ndecs0;
 	if (ndecs.contains("Z")) {
 		ndecs.converter("Z", "");
 		zz = "Z";
 	}
 
+	// Remove all thousands separators (comma or dot)
+	// depending on BASEFMT
+	// Also remove all spaces
+	var input;
+	if (BASEFMT.starts("MC")) {
+		input = input0.convert(". ", "");
+	} else {
+		input = input0.convert(", ", "");
+	}
+
 	if (type == "ICONV") {
+
 		var reciprocal = 0;
 		if (input.starts("/")) {
 			reciprocal = 1;
@@ -2097,49 +2101,87 @@ var ExodusProgramBase::exoprog_number(in type, in input0, in ndecs0, out outx) {
 			}
 		}
 
-		outx = input.trim();
-
-		//first get into a pickos number with dots not commas
-		if (BASEFMT.starts("MC")) {
-			outx.converter(",", ".");
-		} else {
-			outx.converter(",", "");
+		// NINO
+		if (input.empty()) {
+			STATUS = "";
+			outx = "";
+			return 0;
 		}
-		//nb [NUMBER,X] means no decimal place conversion to be done
-		//if ndecs is given then convert to that number of decimals
-		// if ndecs starts with a digit then use {NDECS} (use 2 if {NDECS}=null)
+
+		// Split off any trailing currency code/unit
+		var unitx;
+		outx = amountunit(input, unitx);
+
+		// Only handle numerics
+		if (not outx.isnum()) {
+			outx = "";
+			STATUS = 2;
+			return 0;
+		}
+
+		// Determine ndecs
+
+		// a. ndecs = ""
 		if (ndecs == "") {
+
 			if (DICT) {
+				// Get from RECORD via dictionary
+				// Could be anything but normally 1, 2 or 3 for currency decimal places
 				ndecs = calculate("NDECS");
 			} else {
+				// Use BASEFMT
+				// Cannot be negative
 				ndecs = BASEFMT.at(3);
 			}
+			// Fall back to 2 decimals
 			if (ndecs == "") {
 				ndecs = 2;
 			}
-			if (not(ndecs.match("^\\d$"))) {
-			}
-			//FMTX='MD':NDECS:'0P'
-			//outx=outx FMTX
 		}
-		if (ndecs == "*" or ndecs == "X") {
+
+		// b. ndecs "*" or "X"
+		// [NUMBER,X] means no decimal place conversion to be done
+		else if (ndecs == "*" or ndecs == "X") {
+			// Cannot be negative.
+			// Can be > 9
 			ndecs = outx.field(".", 2).len();
 		}
-		if (ndecs == "BASE") {
-			//fmtx = "MD" ^ BASEFMT[3] ^ "0P";
-			fmtx = "MD" ^ BASEFMT.at(3) ^ "0P";
-		} else {
-			fmtx = "MD" ^ ndecs ^ "0P";
-		}
-		outx = oconv(outx, fmtx);
-		STATUS = "";
-		if (outx.isnum()) {
-			if (reciprocal and outx) {
-				outx = ((1 / outx).oconv("MD90P")) + 0;
+
+		// c. ndecs = "BASE"
+		else if (ndecs == "BASE") {
+			// Cannot be negative
+			ndecs = BASEFMT.at(3);
+			// Fall back to 2 decimals
+			if (ndecs == "") {
+				ndecs = 2;
 			}
-		} else {
-			STATUS = 2;
 		}
+
+		// d. ndecs 0 1 2 3 etc.
+		else {
+			// Check numeric below
+			// Could be negative.
+		}
+
+		// ndecs must be >= 0
+		// Only dict NDECS could return negative so we will not check for that since it still has some meaning
+		if (!ndecs.isnum())
+			throw VarNonNumeric("In iconv([NUMBER," ^ ndecs0 ^ "]. ndecs: " ^ ndecs.quote() ^ " must be numeric.");
+
+		// Perform the reciprocal if requested
+		if (reciprocal and outx) {
+//			outx = ((1 / outx).oconv("MD90P")) + 0;
+			outx = 1 / outx;
+		}
+
+		// Round to the requested ndecs
+//		var fmtx = "MD" ^ ndecs ^ "0P";
+//		outx = outx.oconv(fmtx);
+		outx = outx.round(ndecs);
+
+		// Restore the trailing currency code/unit
+		outx ^= unitx;
+		STATUS = "";
 
 		return 0;
 	}
@@ -2147,80 +2189,102 @@ var ExodusProgramBase::exoprog_number(in type, in input0, in ndecs0, out outx) {
 	//oconv
 	//////
 
-	var divx = ndecs.field(",", 2);
-	if (divx.len()) {
-		ndecs = ndecs.field(",", 1);
-	}
+	// ndecs can be "ndecs_out,ndecs_shift__left" like MD20
+	var point_shift_left = ndecs.field(",", 2);
+	ndecs = ndecs.field(",", 1);
 
+	// Set to 2 if any cannot be converted because non-numeric
+	STATUS = "";
+
+	// Loop through fields, values, subvalues etc. are found in the input
 	var posn = 1;
 	while (true) {
-		input1 = input.substr2(posn, delim);
 
-		var perc = input1.last();
-		if (perc == "%") {
-			input1.popper();
-		} else {
-			perc = "";
-		}
-		var plus = input1.first();
-		if (plus == "+") {
-			input1.cutter(1);
-		} else {
-			plus = "";
-		}
+		// Get one field, value, subvalue etc.
+		var delim;
+		var input1 = input.substr2(posn, delim);
 
-		if (input.len()) {
+		if (not input1.empty()) {
 
-			if (divx) {
-				input1 = input1 / var(10).pwr(divx);
+			// Leading plus may be reinstated on output
+			let plus = input1.first() == "+" ? "+" : "";
+			if (plus)
+				input1.cutter(1);
+
+//			var temp = input1;
+//			temp.converter("0123456789-.", "            ");
+//			var numlen = input1.len() - temp.trimfirst().len();
+//			var unitx = input1.b(numlen + 1, 99);
+//			var numx = input1.first(numlen);
+			var unitx;
+			var numx = amountunit(input1, unitx);
+
+			if (not numx.isnum()) {
+				// Cant convert so output cleaned up number
+				outx ^= plus ^ input1;
+				STATUS = 2;
 			}
+			else {
 
-			if (input1.contains("E-")) {
-				if (input1.isnum()) {
-					input1 = input1.oconv("MD90P");
+				// Empty numx with unitx is treated as 0
+				if (numx.empty())
+					numx = 0;
+
+				// Work out required fmt code
+
+				if (point_shift_left) {
+					numx = input1 / var(10).pwr(point_shift_left);
 				}
-			}
 
-			var temp = input1;
-			temp.converter("0123456789-.", "            ");
-			var numlen = input1.len() - temp.trimfirst().len();
-			var unitx = input1.b(numlen + 1, 99);
-			var numx = input1.first(numlen);
+				if (numx.contains("E-")) {
+					if (numx.isnum()) {
+						numx = numx.oconv("MD90P");
+					}
+				}
 
-			if (ndecs == "BASE") {
-				output1 = oconv(numx, BASEFMT ^ zz) ^ unitx;
-			} else {
-				//if ndecs='' then ndecs=len(field(numx,'.',2))
-				//!ndecs could be X to mean no conversion at all!
-				//FMTX=@USER2[1,2]:ndecs:'0P,':z
-				if (ndecs == "") {
-					fmtx = BASEFMT.first(2) ^ numx.field(".", 2).len() ^ "0P," ^ zz;
+				var fmtx;
+				if (ndecs.len() == 1 and ndecs.isnum()) {
+					// Format to a given number of decimal places.
+					fmtx = BASEFMT.first(2) ^ ndecs ^ "0,";
+				}
+				else if (ndecs == "" or ndecs == "X" or ndecs == "*") {
+					// Retain previous number of decimal places.
+					fmtx = BASEFMT.first(2) ^ numx.field(".", 2).len() ^ "0,";
 				} else {
-					fmtx = BASEFMT.first(2) ^ ndecs ^ "0P," ^ zz;
+					// Default to BASEFMT
+//				else if (ndecs == "BASE") {
+					fmtx = BASEFMT;
 				}
-				if (numx.isnum()) {
-					numx += 0;
-				}
-				output1 = oconv(numx, fmtx) ^ unitx;
 
-			}
+				// Do the required formatting
+				var output1 = oconv(numx, fmtx ^ zz);
 
-			if (output1.len()) {
-				if (var(".,").count(output1.first())) {
+				// Restore trailing currency code/unit
+				output1 ^= unitx;
+
+				// Add leading 0 to prevent leading . or ,
+				if (not output1.empty() and ".,"_var.contains(output1.first())) {
 					output1.prefixer("0");
 				}
+
+				// Accumulate in output
+				// Restore any leading + prefix
+				outx ^= plus;
+				outx ^= output1;
 			}
 
-			outx ^= plus ^ output1 ^ perc;
-		}
+		} // input1 not empty
 
-		///BREAK;
+		// if no trailing delimiter then we are done
 		if (not delim)
 			break;
-		//outx:=char(256-delim)
-		outx ^= var().chr(RM.seq() + 1 - delim);
-	}  //loop;
 
+		// Append whatever trailing delimiter was found when extracting the current amount
+		outx ^= var().chr(RM.seq() + 1 - delim);
+
+	}  //loop next field, subvalue etc.
+
+//	STATUS = "";
 	return 0;
 }
 
@@ -2317,7 +2381,7 @@ var ExodusProgramBase::invertarray(in input, bool padded /*=false*/) {
 		dim vs = fx.split(_VM);
 		for (var vx : vs) {
 			vn++;
-			if (vx.len())
+			if (not vx.empty())
 				result(vn, fn) = vx;
 		}
 		if (vn > maxvn)

@@ -169,6 +169,9 @@ static void string_converter(T1& var_str, const T2 fromchars, const T3 tochars) 
 	//	std::replace(var_str.begin(), var_str.end(), fromchars[0], tochars[0]);
 	//}
 
+	// TODO separate algorithm for handling the removal of excess characters
+	// instead of erasing them one by one
+
 	auto tochars_size = tochars.size();
 	while (true) {
 		// locate (backwards) any of the from characters

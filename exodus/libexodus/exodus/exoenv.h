@@ -127,8 +127,9 @@ class PUBLIC ExoEnv final {
 
 	// i18n/l10n - basic internationalisation/localisation
 	var DATEFMT = "D/E";	 // international date format
-	var BASEFMT = "MD20P,";	 // base currency format
-	var SW = "";             // TZ offsets
+	//var BASEFMT = "MD20P,";	 // base currency format
+	var BASEFMT = "MD20,";	 // base currency format
+	var SW = "";             // User TZ offset from UTC in seconds
 
 	// Terminal key definitions
 	// INTCONST=hot keys in some places
