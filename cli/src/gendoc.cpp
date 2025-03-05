@@ -632,6 +632,12 @@ function main() {
 			// i/oconv_MD(const char* conversion) -> i/oconv("MD")
 			var func_decl0 = line2.replace(R"__(([io])conv_([A-Z]+)\([a-zA-Z0-0_*]*\))__"_rex, "$1conv\\(\"$2\"\\)");
 
+			//    var  exoprog_date(in type, in input0, in ndecs0, out output);
+			func_decl0 = func_decl0.replace(R"__(exoprog_date\(.*)__"_rex, "iconv|oconv\\(\"[DATE]\"\\)");
+
+			//    var  exoprog_number(in type, in input0, in ndecs0, out output);
+			func_decl0 = func_decl0.replace(R"__(exoprog_number\(.*)__"_rex, "iconv|oconv\\(\"[NUMBER]\"\\)");
+
 			// Prefix the object name
 			var func_decl;
 			if (not is_constructor) {

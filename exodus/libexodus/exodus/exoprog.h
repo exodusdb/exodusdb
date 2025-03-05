@@ -352,8 +352,59 @@ ND	bool lockrecord(in filename, io file, in keyx) const;
 
  private:
 
+	////////////////////////
+	///// ioconv date/time :
+	////////////////////////
+
 	// ioconv with a language specific month
 	var  exoprog_date(in type, in input0, in ndecs0, out output);
+
+	// Formatting for numbers with currency code/unit suffix.
+	// iconv/oconv("[NUMBER]")      oconv leaves ndecimals untouched as in the input. iconv see below.
+	// iconv/oconv("[NUMBER,2]")    Specified number of decimal places
+	// iconv/oconv("[NUMBER,BASE]") Decimal places as per BASEFMT
+	// iconv/oconv("[NUMBER,*]")    Leave decimal places untouched as in the input
+	// iconv/oconv("[NUMBER,X]")    Leave decimal places untouched as in the input
+	// iconv/oconv("[NUMBER,2Z]")   Z (suppress zero) combined with any other code for oconv results in empty output "" instead of "0.00" in case of zero input.
+	//
+	// Empty input "" gives empty output "".
+	//
+	// All leading, trailing and internal spaces are removed from the input.
+	//
+	// A trailing currency or unit code is ignored and returned on output.
+	//
+	// An exodus number is an optional leading + or - followed by one or more decimal digits 0-9 with a single optional decimal point placed anywhere.
+	//
+	// If the input is non-numeric then "" is returned and STATUS set to 2. In the case of oconv with multiple fields or values each field or value is processed separately but STATUS is set to 2 if any are non-numeric.
+	//
+	// iconv removes and oconv adds thousand separator chars. The thousands separator is  "," if BASEFMT starts with "MD" or "." if it starts with "MC".
+	//
+	// oconv:
+	//
+	// Add thousands separator chars and optionally standardise the number of decimal places.
+	//
+	// Multiple numbers in fields, values, subvalues etc. can be processed in one string.
+	//
+	// Any leading + character is preserved on output.
+	//
+	// Z suppresses zeros and returns empty string "" instead.
+	//
+	// Special format "[NUMBER,ndecs,move_ndecs]": move_ndecs causes decimal point to be shifted left if positive or right if negative.
+	//
+	// `var v1 = oconv("1234.5678USD", "[NUMBER,2]"); // "1,234.57USD"`
+	//
+	// iconv:
+	//
+	// Remove all thousands separator chars and optionally standardise the number of decimal places.
+	//
+	// If ndecs is not specified in the "[NUMBER]" pattern then ndecs is taken from the current RECORD using dictionary code NDECS if DICT is available otherwise it uses ndecs from BASEFMT.
+	//
+	// iconv only handles a single field/value.
+	//
+	// Optional prefix of "1/" or "/" causes the reciprocal of the number to be used. e.g. "1/100" or "/100" -> "0.01".
+	//
+	// `var v1 = iconv("1,234.5678USD", "[NUMBER]"); // "1234.57USD"`
+	//
 	var  exoprog_number(in type, in input0, in ndecs0, out output);
 
 };
