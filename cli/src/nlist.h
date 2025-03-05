@@ -26,15 +26,15 @@ var operator() ()
  if (this->pmemberfunc_ == nullptr)
   this->init();
 
- // Define a function type (pExodusProgramBaseMemberFunction)
+ // Define a function type (pExoProgramMemberFunction)
  // that can call the shared library object member function
  // with the right arguments and returning a var or void
- using pExodusProgramBaseMemberFunction = auto (ExodusProgramBase::*)() -> var;
+ using pExoProgramMemberFunction = auto (ExoProgram::*)() -> var;
 
  // Call the shared library object main function with the right args,
  //  returning a var or void
  return CALLMEMBERFUNCTION(*(this->plibobject_),
- ((pExodusProgramBaseMemberFunction) (this->pmemberfunc_)))
+ ((pExoProgramMemberFunction) (this->pmemberfunc_)))
   ();
 
 }

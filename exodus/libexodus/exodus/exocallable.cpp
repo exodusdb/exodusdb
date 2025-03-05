@@ -564,7 +564,7 @@ bool Callable::openfunc(const std::string newfuncname) {
 
 	// This is the only call to dlsym
 	/////////////////////////////////
-	pfunc_ = reinterpret_cast<ExodusProgramBaseCreateDeleteFunction>(
+	pfunc_ = reinterpret_cast<ExoProgramCreateDeleteFunction>(
 		dlsym(static_cast<library_t>(plib_), newfuncname.c_str())
 	);
 
@@ -614,10 +614,10 @@ bool Callable::openfunc(const std::string newfuncname) {
 
 // Call shared member function
 // Call the libobject's main member function with no args, returning a var
-// Define a function type (pExodusProgramBaseMemberFunction)
+// Define a function type (pExoProgramMemberFunction)
 // that can call the shared library object member function
 // with the right arguments and returning a var
-//using pExodusProgramBaseMemberFunction = var (ExodusProgramBase::*)();
+//using pExoProgramMemberFunction = var (ExoProgram::*)();
 var Callable::callsmf() {
 
 	if (TRACING >= 3) {
@@ -625,8 +625,8 @@ var Callable::callsmf() {
 	}
 
 	return CALLMEMBERFUNCTION(*(plibobject_),
-							  //((pExodusProgramBaseMemberFunction)(pmemberfunc_)))();
-							  ( static_cast<pExodusProgramBaseMemberFunction>(pmemberfunc_) ))();
+							  //((pExoProgramMemberFunction)(pmemberfunc_)))();
+							  ( static_cast<pExoProgramMemberFunction>(pmemberfunc_) ))();
 }
 
 // Does not actually close any library but does delete the libprogram object

@@ -164,7 +164,7 @@ function main() {
 				if (class_match) {
 					class_name = class_match.f(1, 2);
 					default_objname = class_name;
-					if (class_name == "ExodusProgramBase")
+					if (class_name == "ExoProgram")
 						default_objname = "";
 				}
 				continue;

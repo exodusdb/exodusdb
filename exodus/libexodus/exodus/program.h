@@ -32,11 +32,11 @@
 
 // A program is just a class with an following
 // int main() function that creates and calls it
-#define programinit(PROGRAMCLASSNAME)                  \
-_Pragma("GCC diagnostic push")                         \
-_Pragma("clang diagnostic ignored \"-Wweak-vtables\"") \
-_Pragma("GCC diagnostic ignored \"-Winline\"")         \
-class PROGRAMCLASSNAME##ExodusProgram : public ExodusProgramBase {  \
+#define programinit(PROGRAMCLASSNAME)                        \
+_Pragma("GCC diagnostic push")                               \
+_Pragma("clang diagnostic ignored \"-Wweak-vtables\"")       \
+_Pragma("GCC diagnostic ignored \"-Winline\"")               \
+class PROGRAMCLASSNAME##ExodusProgram : public ExoProgram {  \
 _Pragma("GCC diagnostic pop")
 
 //OPTION I=Ignore. Causes error exit to be suppressed
@@ -46,7 +46,7 @@ _Pragma("GCC diagnostic pop")
 _Pragma("GCC diagnostic push")                                                                 \
 _Pragma("clang diagnostic ignored \"-Wshadow-field\"")                                         \
                                                                                                \
-    PROGRAMCLASSNAME##ExodusProgram(ExoEnv& mv) : ExodusProgramBase(mv) {}                     \
+    PROGRAMCLASSNAME##ExodusProgram(ExoEnv& mv) : ExoProgram(mv) {}                            \
                                                                                                \
 _Pragma("GCC diagnostic pop")                                                                  \
 };                                                                                             \

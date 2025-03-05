@@ -89,18 +89,18 @@ dictexit(bbb)
 namespace exo {
 // using namespace exo;
 
-class ExodusProgramBase;
+class ExoProgram;
 class ExoEnv;
 
-// pExodusProgramBase - "pointer to exodus program" type
-using pExodusProgramBase = ExodusProgramBase*;
+// pExoProgram - "pointer to exodus program" type
+using pExoProgram = ExoProgram*;
 
-// pExodusProgramBaseMemberFunction - "pointer to exodus program" member function
-using pExodusProgramBaseMemberFunction = auto (ExodusProgramBase::*)() -> var;
+// pExoProgramMemberFunction - "pointer to exodus program" member function
+using pExoProgramMemberFunction = auto (ExoProgram::*)() -> var;
 
 // ExodusProgramCreateDeleteFunction - pointer to global function that creates and deletes exodus
 // programs
-using ExodusProgramBaseCreateDeleteFunction = auto (*)(pExodusProgramBase&, ExoEnv&, pExodusProgramBaseMemberFunction&) -> void;
+using ExoProgramCreateDeleteFunction = auto (*)(pExoProgram&, ExoEnv&, pExoProgramMemberFunction&) -> void;
 
 //class Callable
 class PUBLIC Callable {
@@ -124,14 +124,14 @@ class PUBLIC Callable {
 	// Handle on the opened shared lib
 	void* plib_;
 
-	// Pointer to a function used to create and delete a ExodusProgramBase object defined in the shared library.
+	// Pointer to a function used to create and delete a ExoProgram object defined in the shared library.
 	// Could also be used to call any global function in the shared library
-	ExodusProgramBaseCreateDeleteFunction pfunc_;
+	ExoProgramCreateDeleteFunction pfunc_;
 
  protected:
 
 	// Not used if callable is only calling global functions in the shared library
-	pExodusProgramBase plibobject_;
+	pExoProgram plibobject_;
 
 	/*
 		Note: We will be using the following pointer to member function to call
@@ -151,8 +151,8 @@ class PUBLIC Callable {
 		So we will be getting the following warning which will have to ignored.
 
 		warning: cast between incompatible pointer to member types from
-		‘exo::pExodusProgramBaseMemberFunction’ {aka ‘exo::var (exo::ExodusProgramBase::*)()’} to
-		        ‘pExodusProgramBaseMemberFunction’ {aka ‘exo::var (exo::ExodusProgramBase::*)(const exo::var&)’}
+		‘exo::pExoProgramMemberFunction’ {aka ‘exo::var (exo::ExoProgram::*)()’} to
+		        ‘pExoProgramMemberFunction’ {aka ‘exo::var (exo::ExoProgram::*)(const exo::var&)’}
 
 		We can ignore such warnings using something like [-Wcast-function-type] in gcc and clang.
 
@@ -161,7 +161,7 @@ class PUBLIC Callable {
 	*/
 
 	// Not used if callable is only calling global functions in the shared library
-	pExodusProgramBaseMemberFunction pmemberfunc_;
+	pExoProgramMemberFunction pmemberfunc_;
 
  public:
 

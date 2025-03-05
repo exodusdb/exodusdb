@@ -37,7 +37,7 @@
 _Pragma("GCC diagnostic push")                                     \
 _Pragma("clang diagnostic ignored \"-Wweak-vtables\"")             \
 _Pragma("GCC diagnostic ignored \"-Winline\"")                     \
-class PROGRAMCLASSNAME##ExodusProgram : public ExodusProgramBase { \
+class PROGRAMCLASSNAME##ExodusProgram : public ExoProgram { \
 _Pragma("GCC diagnostic pop")
 
 // to undo an ms optimisation that prevents casting between member function pointers
@@ -61,7 +61,7 @@ without the above pragma, in msvc 2005+ you get an error when compiling librarie
 follows:
 
 f1.cpp(12) : error C2440: 'type cast' : cannot convert from 'exo::var (__this
-call ExodusProgram::* )(exo::in)' to 'exo::pExodusProgramBaseMemberFunction';
+call ExodusProgram::* )(exo::in)' to 'exo::pExoProgramMemberFunction';
 Pointers to members have different representations; cannot cast between them
 */
 
@@ -69,14 +69,14 @@ Pointers to members have different representations; cannot cast between them
  public:                                                                                       \
 	_Pragma("clang diagnostic push")                                                           \
 	_Pragma("clang diagnostic ignored \"-Wshadow-field\"")                                     \
-	PROGRAMCLASSNAME##ExodusProgram(ExoEnv& mv) : ExodusProgramBase(mv) {}                     \
+	PROGRAMCLASSNAME##ExodusProgram(ExoEnv& mv) : ExoProgram(mv) {}                            \
 	_Pragma("clang diagnostic pop")                                                            \
 };                                                                                             \
 _Pragma("clang diagnostic push")                                                               \
 _Pragma("clang diagnostic ignored \"-Wmissing-prototypes\"")                                   \
 extern "C" PUBLIC void exodusprogrambasecreatedelete_##PROGRAMCLASSNAME(                       \
-		pExodusProgramBase& pexodusprogrambase, ExoEnv& mv,                                    \
-		pExodusProgramBaseMemberFunction& pmemberfunction) {                                   \
+		pExoProgram& pexodusprogrambase, ExoEnv& mv,                                           \
+		pExoProgramMemberFunction& pmemberfunction) {                                          \
 _Pragma("clang diagnostic pop")                                                                \
 		if (pexodusprogrambase) {                                                              \
 			delete pexodusprogrambase;                                                         \
@@ -87,8 +87,8 @@ _Pragma("clang diagnostic pop")                                                 
 			_Pragma("GCC diagnostic push")                                                     \
             _Pragma("GCC diagnostic ignored \"-Wcast-function-type\"")                         \
 				pmemberfunction =                                                              \
-					/*(pExodusProgramBaseMemberFunction)&PROGRAMCLASSNAME##ExodusProgram::main;*/  \
-					reinterpret_cast<pExodusProgramBaseMemberFunction>(&PROGRAMCLASSNAME##ExodusProgram::main);  \
+					/*(pExoProgramMemberFunction)&PROGRAMCLASSNAME##ExodusProgram::main;*/     \
+					reinterpret_cast<pExoProgramMemberFunction>(&PROGRAMCLASSNAME##ExodusProgram::main);  \
 			_Pragma("GCC diagnostic pop")                                                      \
 		}                                                                                      \
 		return;                                                                                \

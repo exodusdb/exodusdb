@@ -26,9 +26,9 @@ namespace exo {
 ///////////////////////////
 
 // 2. Destructor
-ExodusProgramBase::~ExodusProgramBase(){}
+ExoProgram::~ExoProgram(){}
 
-var ExodusProgramBase::libinfo(in command) {
+var ExoProgram::libinfo(in command) {
 	return var(perform_callable_.libfilepath(command.toString())).osfile();
 }
 
@@ -40,7 +40,7 @@ var ExodusProgramBase::libinfo(in command) {
 // mv is a reference to allow mv.xxxxxx syntax instead of mv->xxxxxx
 // However, being a reference, it must be provided at ExodusProgram construction time
 // and cannot be changed thereafter.
-ExodusProgramBase::ExodusProgramBase(ExoEnv& inmv)
+ExoProgram::ExoProgram(ExoEnv& inmv)
 	:
 	perform_callable_(inmv),
 	mv(inmv)
@@ -56,7 +56,7 @@ ExodusProgramBase::ExodusProgramBase(ExoEnv& inmv)
 //////////////////
 
 // select
-bool ExodusProgramBase::select(in sortselectclause_or_filehandle) {
+bool ExoProgram::select(in sortselectclause_or_filehandle) {
 
 	//TRACE(sortselectclause_or_filehandle)
 
@@ -299,7 +299,7 @@ bool ExodusProgramBase::select(in sortselectclause_or_filehandle) {
 		//create the temporary table
 		if (!CURSOR.sqlexec(createtablesql))
 			UNLIKELY
-			throw VarError("ExodusProgramBase::select " ^ CURSOR.lasterror());
+			throw VarError("ExoProgram::select " ^ CURSOR.lasterror());
 
 	} else
 		baseinsertsql = "";
@@ -490,17 +490,17 @@ bool ExodusProgramBase::select(in sortselectclause_or_filehandle) {
 }
 
 // savelist
-bool ExodusProgramBase::savelist(SV listname) {
+bool ExoProgram::savelist(SV listname) {
 	return CURSOR.savelist(var(listname).field(" ", 1));
 }
 
 // getlist
-bool ExodusProgramBase::getlist(SV listname) {
+bool ExoProgram::getlist(SV listname) {
 	return CURSOR.getlist(var(listname).field(" ", 1));
 }
 
 // formlist
-bool ExodusProgramBase::formlist(SV filename_or_command, in keys /*=""*/, const int fieldno /*=0*/) {
+bool ExoProgram::formlist(SV filename_or_command, in keys /*=""*/, const int fieldno /*=0*/) {
 
 	//remove any options from the filename or command
 	var filename2 = filename_or_command;
@@ -543,54 +543,54 @@ bool ExodusProgramBase::formlist(SV filename_or_command, in keys /*=""*/, const 
 }
 
 // makelist
-bool ExodusProgramBase::makelist(SV listname, in keys) {
+bool ExoProgram::makelist(SV listname, in keys) {
 	if (not listname.empty())
 		throw VarDBException("makelist() with listname is not longer supported. Write to the lists file directly instead.");
 	return CURSOR.selectkeys(keys);
 }
 
 // makelist
-bool ExodusProgramBase::selectkeys(in keys) {
+bool ExoProgram::selectkeys(in keys) {
 	return CURSOR.selectkeys(keys);
 }
 
 // deletelist
-bool ExodusProgramBase::deletelist(SV listname) {
+bool ExoProgram::deletelist(SV listname) {
 	return CURSOR.deletelist(var(listname).field(" ", 1));
 }
 
 // clearselect
-void ExodusProgramBase::clearselect() {
+void ExoProgram::clearselect() {
 	CURSOR.clearselect();
 }
 
 // hasnext
-bool ExodusProgramBase::hasnext() {
+bool ExoProgram::hasnext() {
 	return CURSOR.hasnext();
 }
 
 // readnext 1
-bool ExodusProgramBase::readnext(out key) {
+bool ExoProgram::readnext(out key) {
 	return CURSOR.readnext(key);
 }
 
 // readnext 2
-bool ExodusProgramBase::readnext(out key, out valueno) {
+bool ExoProgram::readnext(out key, out valueno) {
 	return CURSOR.readnext(key, valueno);
 }
 
 // readnext 3
-bool ExodusProgramBase::readnext(out record, out key, out valueno) {
+bool ExoProgram::readnext(out record, out key, out valueno) {
 	return CURSOR.readnext(record, key, valueno);
 }
 
 // deleterecord
-bool ExodusProgramBase::deleterecord(in filename_or_handle_or_command, in key) {
+bool ExoProgram::deleterecord(in filename_or_handle_or_command, in key) {
 
 	if (not filename_or_handle_or_command.assigned() || not key.assigned())
-		//throw VarUnassigned("bool ExodusProgramBase::deleterecord(in filename_or_handle_or_command, in key)");
+		//throw VarUnassigned("bool ExoProgram::deleterecord(in filename_or_handle_or_command, in key)");
 		UNLIKELY
-		throw VarError("bool ExodusProgramBase::deleterecord(in filename_or_handle_or_command, in key)");
+		throw VarError("bool ExoProgram::deleterecord(in filename_or_handle_or_command, in key)");
 
 	// Simple deleterecord
 	//if (filename_or_handle_or_command.contains(" ") || key.len() == 0) {
@@ -644,7 +644,7 @@ bool ExodusProgramBase::deleterecord(in filename_or_handle_or_command, in key) {
 }
 
 // pushselect
-void ExodusProgramBase::pushselect(out saved_cursor) {
+void ExoProgram::pushselect(out saved_cursor) {
 	// CURSOR has connection number hidden in it, and maybe other info, so it cannot be used as an ordinary variable
 	// saved_cursor = CURSOR.move();
 	saved_cursor = CURSOR;
@@ -653,20 +653,20 @@ void ExodusProgramBase::pushselect(out saved_cursor) {
 }
 
 // popselect
-void ExodusProgramBase::popselect(in saved_cursor) {
+void ExoProgram::popselect(in saved_cursor) {
 	// CURSOR = saved_cursor.move();
 	CURSOR = saved_cursor;
 	return;
 }
 
 // note 2
-void ExodusProgramBase::note(in msg, in options) const {
+void ExoProgram::note(in msg, in options) const {
 	var response = "";
 	note(msg, options, response);
 }
 
 // note 3
-void ExodusProgramBase::note(in msg, in options, io response) const {
+void ExoProgram::note(in msg, in options, io response) const {
 
 	var params = "";
 	var interactive = !SYSTEM.f(33);
@@ -745,7 +745,7 @@ void ExodusProgramBase::note(in msg, in options, io response) const {
 }
 
 // execute
-var ExodusProgramBase::execute(in sentence) {
+var ExoProgram::execute(in sentence) {
 
 	var saved_cursor;
 	pushselect(saved_cursor);
@@ -761,14 +761,14 @@ var ExodusProgramBase::execute(in sentence) {
 
 // chain
 [[noreturn]]
-void ExodusProgramBase::chain(in libraryname) {
+void ExoProgram::chain(in libraryname) {
 	CHAIN = libraryname;
 	this->stop();
 }
 
 // perform
-var ExodusProgramBase::perform(in sentence) {
-	// THISIS("var ExodusProgramBase::perform(in sentence)")
+var ExoProgram::perform(in sentence) {
+	// THISIS("var ExoProgram::perform(in sentence)")
 	// ISSTRING(sentence)
 
 	// return ID^"*"^dictid;
@@ -992,7 +992,7 @@ var ExodusProgramBase::perform(in sentence) {
 }
 
 // xlate
-var ExodusProgramBase::xlate(in filename, in key, in fieldno_or_name, const char* mode) {
+var ExoProgram::xlate(in filename, in key, in fieldno_or_name, const char* mode) {
 
 	// TODO implement additional MV argument
 
@@ -1006,7 +1006,7 @@ var ExodusProgramBase::xlate(in filename, in key, in fieldno_or_name, const char
 	if (not is_fieldno) {
 		if (not dictfile.open("dict." ^ filename.f(1))) {
 			UNLIKELY
-			throw VarError("ExodusProgramBase::xlate(filename:" ^ filename ^ ", key:" ^ key ^ ",field:" ^ fieldno_or_name ^ ") - dict." ^ filename ^ " does not exist.");
+			throw VarError("ExoProgram::xlate(filename:" ^ filename ^ ", key:" ^ key ^ ",field:" ^ fieldno_or_name ^ ") - dict." ^ filename ^ " does not exist.");
 		}
 	}
 
@@ -1058,7 +1058,7 @@ var ExodusProgramBase::xlate(in filename, in key, in fieldno_or_name, const char
 }
 
 // calculate 4
-var ExodusProgramBase::calculate(in dictid, in dictfile, in id, in record, in mvno) {
+var ExoProgram::calculate(in dictid, in dictfile, in id, in record, in mvno) {
 
 	//dictid @ID/@id is hard coded to return ID
 	//to avoid incessant lookup in main file dictionary and then defaulting to dict.voc
@@ -1092,8 +1092,8 @@ var ExodusProgramBase::calculate(in dictid, in dictfile, in id, in record, in mv
 }
 
 // calculate 1
-var ExodusProgramBase::calculate(in dictid) {
-	// THISIS("var ExodusProgramBase::calculate(in dictid)")
+var ExoProgram::calculate(in dictid) {
+	// THISIS("var ExoProgram::calculate(in dictid)")
 	// ISSTRING(dictid)
 
 	// return ID^"*"^dictid;
@@ -1109,7 +1109,7 @@ var ExodusProgramBase::calculate(in dictid) {
 
 		if (not DICT)
 			UNLIKELY
-			throw VarError("ExodusProgramBase::calculate(" ^ dictid ^
+			throw VarError("ExoProgram::calculate(" ^ dictid ^
 						  ") DICT file variable has not been set");
 
 		if (not cached_dictrec_.readc(DICT, dictid)) {
@@ -1125,7 +1125,7 @@ var ExodusProgramBase::calculate(in dictid) {
 				if (not dictvoc.open("dict.voc")) {
 baddict:
 					UNLIKELY
-					throw VarError("ExodusProgramBase::calculate(" ^ dictid ^
+					throw VarError("ExoProgram::calculate(" ^ dictid ^
 								  ") dictionary record not in DICT " ^
 								  DICT.f(1).quote() ^ " nor in dict.voc");
 				}
@@ -1212,7 +1212,7 @@ baddict:
 														str_funcname.c_str())
 													)
 					UNLIKELY
-					throw VarError("ExodusProgramBase::calculate() Cannot find Library " +
+					throw VarError("ExoProgram::calculate() Cannot find Library " +
 								  libname + ", or function " +
 								  dictid.lcase() + " is not present");
 
@@ -1246,12 +1246,12 @@ baddict:
 	}
 
 	UNLIKELY
-	throw VarError("ExodusProgramBase::calculate(" ^ dictid ^ ") " ^ DICT ^ " Invalid dictionary type " ^
+	throw VarError("ExoProgram::calculate(" ^ dictid ^ ") " ^ DICT ^ " Invalid dictionary type " ^
 				  dicttype.quote());
 }
 
 //// debug
-//void ExodusProgramBase::debug() const {
+//void ExoProgram::debug() const {
 //
 //	var reply;
 //	std::clog << "debug():";
@@ -1263,19 +1263,19 @@ baddict:
 //}
 
 // fsmg
-//bool ExodusProgramBase::fsmsg(in msg) const {
+//bool ExoProgram::fsmsg(in msg) const {
 //	note(msg ^ var().lasterror());
 //	return false;
 //}
 
 // decide 2
-var ExodusProgramBase::decide(in question, in options) const {
+var ExoProgram::decide(in question, in options) const {
 	var reply = "";
 	return decide(question, options, reply);
 }
 
 // decide 4
-var ExodusProgramBase::decide(in questionx, in optionsx, out reply, const int defaultreply) const {
+var ExoProgram::decide(in questionx, in optionsx, out reply, const int defaultreply) const {
 
 	// If default reply is 0 then there is no default
 	// and pressing Enter returns "" and reply is set to 0
@@ -1348,7 +1348,7 @@ inp:
 }
 
 // esctoexzit
-bool ExodusProgramBase::esctoexit() const {
+bool ExoProgram::esctoexit() const {
 
 //	if (not var().keypressed())
 	if (not var().hasinput())
@@ -1369,25 +1369,25 @@ bool ExodusProgramBase::esctoexit() const {
 }
 
 //// otherusers
-//var ExodusProgramBase::otherusers(in /*param*/) {
-//	std::cout << "ExodusProgramBase::otherusers not implemented yet";
+//var ExoProgram::otherusers(in /*param*/) {
+//	std::cout << "ExoProgram::otherusers not implemented yet";
 //	return var("");
 //}
 //
 //// otherdatasetusers
-//var ExodusProgramBase::otherdatasetusers(in /*param*/) {
-//	std::cout << "ExodusProgramBase::otherdatausers not implemented yet";
+//var ExoProgram::otherdatasetusers(in /*param*/) {
+//	std::cout << "ExoProgram::otherdatausers not implemented yet";
 //	return var("");
 //}
 
 // lockrecord 3
-bool ExodusProgramBase::lockrecord(in filename, io file, in keyx) const {
+bool ExoProgram::lockrecord(in filename, io file, in keyx) const {
 	var record;
 	return lockrecord(filename, file, keyx, record);
 }
 
 // lockrecord 6
-bool ExodusProgramBase::lockrecord(in filename, io file, in keyx, in /*recordx*/, const int waitsecs0, const bool allowduplicate) const {
+bool ExoProgram::lockrecord(in filename, io file, in keyx, in /*recordx*/, const int waitsecs0, const bool allowduplicate) const {
 
 	// linemark
 	// common /shadow.mfs/
@@ -1482,13 +1482,13 @@ lock:
 }
 
 // unlockrecord 0 = unlock all
-bool ExodusProgramBase::unlockrecord() const {
+bool ExoProgram::unlockrecord() const {
 	var xx;
 	return unlockrecord("", xx, "");
 }
 
 // unlockrecord
-bool ExodusProgramBase::unlockrecord(in /*filename*/, io file0, in key) const {
+bool ExoProgram::unlockrecord(in /*filename*/, io file0, in key) const {
 	var file;
 	if (file0.unassigned())
 		file = "";
@@ -1515,8 +1515,8 @@ bool ExodusProgramBase::unlockrecord(in /*filename*/, io file0, in key) const {
 // in exodus we move to 1 based numbering to be consistent with
 // c/c++/linux/terminal standards. hopefully not too inconvenient
 
-var ExodusProgramBase::AT(const int columnno, const int rowno) const {
-	// THISIS("var ExodusProgramBase::at(const int columnno, const int rowno) const")
+var ExoProgram::AT(const int columnno, const int rowno) const {
+	// THISIS("var ExoProgram::at(const int columnno, const int rowno) const")
 
 	std::string tempstr = "\x1B[";
 	tempstr += std::to_string(rowno);
@@ -1526,8 +1526,8 @@ var ExodusProgramBase::AT(const int columnno, const int rowno) const {
 	return tempstr;
 }
 
-var ExodusProgramBase::AT(const int columnno) const {
-	// THISIS("var ExodusProgramBase::at(const int columnno) const")
+var ExoProgram::AT(const int columnno) const {
+	// THISIS("var ExoProgram::at(const int columnno) const")
 
 	// hard coded for xterm at the moment
 	// http://www.xfree86.org/current/ctlseqs.html
@@ -1571,7 +1571,7 @@ var ExodusProgramBase::AT(const int columnno) const {
 }
 
 // oconv
-var ExodusProgramBase::oconv(in input0, in conversion) {
+var ExoProgram::oconv(in input0, in conversion) {
 
 	// call user conversion routine
 	// almost identical code in var::oconv and var::iconv
@@ -1674,7 +1674,7 @@ var ExodusProgramBase::oconv(in input0, in conversion) {
 }
 
 // iconv
-var ExodusProgramBase::iconv(in input, in conversion) {
+var ExoProgram::iconv(in input, in conversion) {
 
 	// call user conversion routine
 	// almost identical code in var::oconv and var::iconv
@@ -1737,7 +1737,7 @@ var ExodusProgramBase::iconv(in input, in conversion) {
 }
 
 
-void ExodusProgramBase::getdatetime(out localdate, out localtime, out sysdate, out systime, out utcdate, out utctime) {
+void ExoProgram::getdatetime(out localdate, out localtime, out sysdate, out systime, out utcdate, out utctime) {
 
 	//see CHANGETZ which seems to go through all times (dates?) and changes them
 	//this should be done ONCE to standardise on gmt/utc really
@@ -1821,8 +1821,8 @@ exit:
 	return;
 }
 
-//var ExodusProgramBase::timedate2(in localdate0, in localtime0, in glang) {
-var ExodusProgramBase::timedate2() {
+//var ExoProgram::timedate2(in localdate0, in localtime0, in glang) {
+var ExoProgram::timedate2() {
 
 	//caserevised*
 
@@ -1868,17 +1868,17 @@ var ExodusProgramBase::timedate2() {
 
 
 // elapsedtimetext 1 - from program start/TIMESTAMP
-var ExodusProgramBase::elapsedtimetext() const {
+var ExoProgram::elapsedtimetext() const {
 	return elapsedtimetext(TIMESTAMP, var().timestamp());
 }
 
 // elapsedtimetext 2 - from duration
-var ExodusProgramBase::elapsedtimetext(in timestamp_difference) const {
+var ExoProgram::elapsedtimetext(in timestamp_difference) const {
 	return elapsedtimetext(0, timestamp_difference);
 }
 
 // elapsedtimetext 3 - given two timestamps
-var ExodusProgramBase::elapsedtimetext(in timestamp1, in timestamp2) const {
+var ExoProgram::elapsedtimetext(in timestamp1, in timestamp2) const {
 
 	var text = "";
 
@@ -1963,8 +1963,8 @@ zero:
 	//function main(in type, in input0, in ndecs0, out outx) {
 	//c xxx in,in,in,out
 
-var ExodusProgramBase::exoprog_date(in type, in in0, in mode0, out outx) {
-//var ExodusProgramBase::number(in type, in input0, in ndecs0, io outx) {
+var ExoProgram::exoprog_date(in type, in in0, in mode0, out outx) {
+//var ExoProgram::number(in type, in input0, in ndecs0, io outx) {
 	//c sys in,in,in,out,in
 
 	//should really be sensitive to timezone in @SW
@@ -2066,7 +2066,7 @@ ok:
 }
 
 // number
-var ExodusProgramBase::exoprog_number(in type, in input0, in ndecs0, out outx) {
+var ExoProgram::exoprog_number(in type, in input0, in ndecs0, out outx) {
 
 	outx = "";
 
@@ -2289,7 +2289,7 @@ var ExodusProgramBase::exoprog_number(in type, in input0, in ndecs0, out outx) {
 }
 
 // sortarray
-void ExodusProgramBase::sortarray(io array, in fns, in orderby0) {
+void ExoProgram::sortarray(io array, in fns, in orderby0) {
 	//function main(io array, in fns=0, in orderby0="") {
 	//c sys io,0,""
 
@@ -2362,7 +2362,7 @@ void ExodusProgramBase::sortarray(io array, in fns, in orderby0) {
 }
 
 // invertarray
-var ExodusProgramBase::invertarray(in input, bool padded /*=false*/) {
+var ExoProgram::invertarray(in input, bool padded /*=false*/) {
 
 	// not forced
 	// TRACE: inp = "a^1]2]3]4^x"
@@ -2399,13 +2399,13 @@ var ExodusProgramBase::invertarray(in input, bool padded /*=false*/) {
 }
 
 // amountunit 1 arg
-var ExodusProgramBase::amountunit(in input0) {
+var ExoProgram::amountunit(in input0) {
 	var unitcode;
 	return amountunit(input0, unitcode);
 }
 
 // amountunit 2 arg
-var ExodusProgramBase::amountunit(in input0, out unitx) {
+var ExoProgram::amountunit(in input0, out unitx) {
 
 	// TODO Consider runtime Non-numeric or other error if amount or unit is missing
 	// TODO Consider runtime error (Non-numeric?) if amount is not numeric
@@ -2525,10 +2525,10 @@ ExoAbort    ::ExoAbort(in errmsg)    : message(errmsg) {}
 ExoAbortAll ::ExoAbortAll(in errmsg) : message(errmsg) {}
 ExoLogoff   ::ExoLogoff(in errmsg)   : message(errmsg) {}
 
-[[noreturn]] void ExodusProgramBase::stop(in errmsg)     const {throw ExoStop(errmsg);}
-[[noreturn]] void ExodusProgramBase::abort(in errmsg)    const {throw ExoAbort(errmsg);}
-[[noreturn]] void ExodusProgramBase::abortall(in errmsg) const {throw ExoAbortAll(errmsg);}
-[[noreturn]] void ExodusProgramBase::logoff(in errmsg)   const {throw ExoLogoff(errmsg);}
+[[noreturn]] void ExoProgram::stop(in errmsg)     const {throw ExoStop(errmsg);}
+[[noreturn]] void ExoProgram::abort(in errmsg)    const {throw ExoAbort(errmsg);}
+[[noreturn]] void ExoProgram::abortall(in errmsg) const {throw ExoAbortAll(errmsg);}
+[[noreturn]] void ExoProgram::logoff(in errmsg)   const {throw ExoLogoff(errmsg);}
 
 // clang-format on
 

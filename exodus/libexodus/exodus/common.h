@@ -5,20 +5,20 @@
 //
 // A common section is a just a C++ class that can be used by other programs.
 //
-// Named commons inherit from NamedCommon so that they can be stored in mv.namedcommon[]
+// Named commons inherit from ExoCommon so that they can be stored in mv.namedcommon[]
 //
 // An xxx_common.h file may have multiple commoninit/exit sections.
 //
 
 ////////////////////////////////////////
-// Open a class derived from NamedCommon
+// Open a class derived from ExoCommon
 ////////////////////////////////////////
 #define commoninit(COMMON_CODE, COMMON_NO)           \
                                                      \
 _Pragma("GCC diagnostic push")                       \
 _Pragma("GCC diagnostic ignored \"-Wweak-vtables\"") \
                                                      \
-class COMMON_CODE##_common : public NamedCommon {    \
+class COMMON_CODE##_common : public ExoCommon {      \
                                                      \
 _Pragma("GCC diagnostic push")                       \
                                                      \

@@ -27,18 +27,18 @@ class Functordict_myclients : public ExodusFunctorBase {
 		if (this->pmemberfunc_ == NULL)
 			this->init();
 
-		//define a function type (pExodusProgramBaseMemberFunction)
+		//define a function type (pExoProgramMemberFunction)
 		//that can call the shared library object member function
 		//with the right arguments and returning a var or void
-		//typedef var (ExodusProgramBase::*pExodusProgramBaseMemberFunction)();
-		using pExodusProgramBaseMemberFunction = auto (ExodusProgramBase::*)() -> var;
+		//typedef var (ExoProgram::*pExoProgramMemberFunction)();
+		using pExoProgramMemberFunction = auto (ExoProgram::*)() -> var;
 		//call the shared library object main function with the right args,
 		// returning a var or void
 		//return CALLMEMBERFUNCTION(*(Functordict_myclients.plibobject_),
-		//((pExodusProgramBaseMemberFunction) (Functordict_myclients.pmemberfunc_)))
+		//((pExoProgramMemberFunction) (Functordict_myclients.pmemberfunc_)))
 		// (mode);
 		return CALLMEMBERFUNCTION(*(this->plibobject_),
-								  ((pExodusProgramBaseMemberFunction)(this->pmemberfunc_)))();
+								  ((pExoProgramMemberFunction)(this->pmemberfunc_)))();
 	}
 };
 Functordict_myclients dict_myclients{mv};
@@ -68,18 +68,18 @@ class Functordict_myclients : public ExodusFunctorBase {
 		if (this->pmemberfunc_ == NULL)
 			this->init();
 
-		//define a function type (pExodusProgramBaseMemberFunction)
+		//define a function type (pExoProgramMemberFunction)
 		//that can call the shared library object member function
 		//with the right arguments and returning a var or void
-		typedef var (ExodusProgramBase::*pExodusProgramBaseMemberFunction)();
+		typedef var (ExoProgram::*pExoProgramMemberFunction)();
 
 		//call the shared library object main function with the right args,
 		// returning a var or void
 		//return CALLMEMBERFUNCTION(*(Functordict_myclients.plibobject_),
-		//((pExodusProgramBaseMemberFunction) (Functordict_myclients.pmemberfunc_)))
+		//((pExoProgramMemberFunction) (Functordict_myclients.pmemberfunc_)))
 		// (mode);
 		return CALLMEMBERFUNCTION(*(this->plibobject_),
-								  ((pExodusProgramBaseMemberFunction)(this->pmemberfunc_)))();
+								  ((pExoProgramMemberFunction)(this->pmemberfunc_)))();
 	}
 };
 Functordict_myclients dict_myclients{mv};

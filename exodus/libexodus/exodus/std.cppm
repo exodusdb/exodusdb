@@ -359,7 +359,7 @@ export namespace std {
 
 //using std::ExoEnv;
 //using std::ExodusProgram;
-//using std::ExodusProgramBase;
+//using std::ExoProgram;
 //using std::Init;
 using std::align_val_t;
 using std::allocator;

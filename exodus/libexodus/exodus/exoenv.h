@@ -74,10 +74,10 @@ extern PUBLIC std::vector<ExoEnv*> global_environments;
 // See man bash for more info
 
 // Abstract base class
-class NamedCommon {
+class ExoCommon {
  public:
 	// Virtual because derived class's members should be destructed
-	virtual ~NamedCommon(){}
+	virtual ~ExoCommon(){}
 };
 
 class PUBLIC ExoEnv final {
@@ -188,8 +188,8 @@ class PUBLIC ExoEnv final {
 	int COL1 = 0;
 	var COL2 = 0;
 
-	// define a type of object that holds many NamedCommons
-	NamedCommon* namedcommon[99] = {nullptr};
+	// define a type of object that holds many ExoCommons
+	ExoCommon* namedcommon[99] = {nullptr};
 
 	// Evade a warning from clang 18 when building with modules
 	// about some unused "less" function in the std::map<std::string, void*> that we use
@@ -222,7 +222,7 @@ var osgetenv(SV envcode) {
 	return "";
 }
 
-};
+}; // class ExoEnv
 
 }  // namespace exo
 

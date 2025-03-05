@@ -124,7 +124,6 @@ function main() {
 		TRACE(SW)
 		printl(timedate2());
 
-		stop();
 	}
 
 	{

@@ -47,8 +47,8 @@ namespace exo {
 // so that ID RECORD etc. continue to appear to the application programmer to be "threadsafe
 // global" variables
 
-//class ExodusProgramBase
-class PUBLIC ExodusProgramBase {
+//class ExoProgram
+class PUBLIC ExoProgram {
 
  private:
 
@@ -56,13 +56,13 @@ class PUBLIC ExodusProgramBase {
 	mutable std::string cached_dictid_;
 	mutable var cached_dictrec_ = "";
 
-	// A callable used in ExodusProgramBase::calculate to call dict items in dict_xxxxxx.cpp
+	// A callable used in ExoProgram::calculate to call dict items in dict_xxxxxx.cpp
 	mutable Callable* dict_callable_ = nullptr;
 
 	// A cache of Callables dict functions
 	std::map<std::string, Callable*> cached_dict_functions;
 
-	// A callable used in ExodusProgramBase::perform to call libraries WITH NO ARGUMENTS
+	// A callable used in ExoProgram::perform to call libraries WITH NO ARGUMENTS
 	mutable Callable perform_callable_;
 
  public:
@@ -116,21 +116,21 @@ class PUBLIC ExodusProgramBase {
 
 #include <exodus/ioconv_custom.h>
 
-	explicit ExodusProgramBase(ExoEnv& inmv);
-	//ExodusProgramBase(ExoEnv& mv);
-	//explicit ExodusProgramBase(ExoEnv&& inmv) = delete;
+	explicit ExoProgram(ExoEnv& inmv);
+	//ExoProgram(ExoEnv& mv);
+	//explicit ExoProgram(ExoEnv&& inmv) = delete;
 
 	// No default constructor
 	// data member mv is a reference and we only provide constructors for preexisting ExoEnv.
-	//ExodusProgramBase() = default;
-	ExodusProgramBase() = delete;
+	//ExoProgram() = default;
+	ExoProgram() = delete;
 
 	// doing virtual isnt much use because external functions (which are based on
-	// ExodusProgramBase) need to have complete freedom of arguments to main(...) virtual var
+	// ExoProgram) need to have complete freedom of arguments to main(...) virtual var
 	// main();
 
 	// Is this required?
-	virtual ~ExodusProgramBase();
+	virtual ~ExoProgram();
 
 	///////////////////
 	///// Select lists:

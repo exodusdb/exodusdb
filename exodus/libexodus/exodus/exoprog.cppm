@@ -69,8 +69,8 @@ export namespace exo {
 	using exo::ExoStop;
 
 	using exo::Callable;
-	using exo::ExodusProgramBase;
-	using exo::NamedCommon;
+	using exo::ExoProgram;
+	using exo::ExoCommon;
 
 	using exo::RELOAD_req;
 	using exo::TERMINATE_req;

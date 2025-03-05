@@ -6,7 +6,7 @@
 
 namespace exo {
 
-var ExodusProgramBase::getcursor() const {
+var ExoProgram::getcursor() const {
 
 	//no cursor if stdin is not a terminal
 	if (not var().isterminal())
@@ -93,7 +93,7 @@ var ExodusProgramBase::getcursor() const {
 
 }
 
-void ExodusProgramBase::setcursor(in cursor) const {
+void ExoProgram::setcursor(in cursor) const {
 	//std::cout << cursor << std::flush;
 	cursor.output();
 	cursor.osflush();

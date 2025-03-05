@@ -26,17 +26,17 @@ var operator() (in type, in input, in mode, out output)
  if (this->pmemberfunc_==nullptr)
   this->attach("ioconv_custom");
 
- // Define a function type (pExodusProgramBaseMemberFunction)
+ // Define a function type (pExoProgramMemberFunction)
  // that can call the shared library object member function
  // with the right arguments and returning a var or void
- using pExodusProgramBaseMemberFunction = auto (ExodusProgramBase::*)(in,in,in,out) -> var;
+ using pExoProgramMemberFunction = auto (ExoProgram::*)(in,in,in,out) -> var;
 
  // Call the shared library object main function with the right args,
  //  returning a var or void
  #pragma GCC diagnostic push
  #pragma GCC diagnostic ignored "-Wcast-function-type"
  return CALLMEMBERFUNCTION(*(this->plibobject_),
- (reinterpret_cast<pExodusProgramBaseMemberFunction>(this->pmemberfunc_)))
+ (reinterpret_cast<pExoProgramMemberFunction>(this->pmemberfunc_)))
   (type,input,mode,output);
  #pragma GCC diagnostic pop
 
