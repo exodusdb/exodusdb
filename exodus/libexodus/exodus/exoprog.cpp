@@ -868,7 +868,7 @@ var ExoProgram::perform(in sentence) {
 		if (!perform_callable_.initsmf(
 											mv,
 											libname.c_str(),
-											"exodusprogrambasecreatedelete_",
+											"exoprogram_createdelete_",
 											true  // forcenew each perform/execute
 											)) {
 			USER4 ^= "perform() Cannot find shared library \"" + libname +
@@ -1205,7 +1205,7 @@ baddict:
 				// Wire it up with the necessary ExoEnv mv
 				// and locate the correct function object in the library
 				std::string str_funcname =
-					("exodusprogrambasecreatedelete_" ^ dictid.lcase()).toString();
+					("exoprogram_createdelete_" ^ dictid.lcase()).toString();
 				if (!dict_callable_->initsmf(
 														mv,
 														libname.c_str(),

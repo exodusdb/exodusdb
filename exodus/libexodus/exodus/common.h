@@ -1,4 +1,3 @@
-#define BUILDING_LIBRARY
 #include <exodus/exodus.h>
 
 // Provides commoninit() and commonexit() which create blocks of "named common" variables.

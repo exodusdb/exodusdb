@@ -188,7 +188,7 @@ bool Callable::attach(const char* newlibname) {
 	//mv_ = &mv;
 
 	// Load the library and acquire pfunc_ that will create/delete a libobject
-	checkload(newlibname, "exodusprogrambasecreatedelete_");
+	checkload(newlibname, "exoprogram_createdelete_");
 
 	// Call a function in the shared library to create one of its "exodus program" objects
 	// Note We MUST call the same library function to delete the object
@@ -210,7 +210,7 @@ bool Callable::attach(const char* newlibname) {
 	return true;
 }
 
-//// Called from every library .h file if _pmemberfunction is nullptr
+//// Called from every library .h file if _pmemberfunc is nullptr
 //// atm designed to be called once only the first time an external function is called
 //// assuming library and function names and mv are already set
 //bool Callable::init() {
@@ -547,7 +547,7 @@ bool Callable::openlib(const std::string newlibname) {
 	return true;
 }
 
-// This currently mostly called to get access to the exodusprogrambasecreatedelete_ function
+// This currently mostly called to get access to the exoprogram_createdelete_ function
 // but could also be called to directly access any free functions in the library
 bool Callable::openfunc(const std::string newfuncname) {
 
@@ -578,7 +578,7 @@ bool Callable::openfunc(const std::string newfuncname) {
 	// Throw if symbol does not exist
 	if (pfunc_ == nullptr) {
 		UNLIKELY
-		throw VarError(var(newfuncname).replace("exodusprogrambasecreatedelete_", "").quote() ^ " function cannot be found in lib " ^
+		throw VarError(var(newfuncname).replace("exoprogram_createdelete_", "").quote() ^ " function cannot be found in lib " ^
 					  var(libfilepath_).quote());
 	}
 
@@ -614,10 +614,10 @@ bool Callable::openfunc(const std::string newfuncname) {
 
 // Call shared member function
 // Call the libobject's main member function with no args, returning a var
-// Define a function type (pExoProgramMemberFunction)
+// Define a function type (pExoProgram_MemberFunc)
 // that can call the shared library object member function
 // with the right arguments and returning a var
-//using pExoProgramMemberFunction = var (ExoProgram::*)();
+//using pExoProgram_MemberFunc = var (ExoProgram::*)();
 var Callable::callsmf() {
 
 	if (TRACING >= 3) {
@@ -625,8 +625,8 @@ var Callable::callsmf() {
 	}
 
 	return CALLMEMBERFUNCTION(*(plibobject_),
-							  //((pExoProgramMemberFunction)(pmemberfunc_)))();
-							  ( static_cast<pExoProgramMemberFunction>(pmemberfunc_) ))();
+							  //((pExoProgram_MemberFunc)(pmemberfunc_)))();
+							  ( static_cast<pExoProgram_MemberFunc>(pmemberfunc_) ))();
 }
 
 // Does not actually close any library but does delete the libprogram object

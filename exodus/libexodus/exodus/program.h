@@ -1,8 +1,9 @@
 #ifndef EXODUS_LIBEXODUS_EXODUS_PROGRAM_H_
 #define EXODUS_LIBEXODUS_EXODUS_PROGRAM_H_
+
 #include <exodus/exodus.h>
 
-// An Exodus command line program is just a C++ class that inherits from ExodusProgram and
+// An Exodus command line program is just a C++ class that inherits from _ExoProgram and
 // is followed by a standard free "int main()" function. int main instantiates an object
 // of the exodus program class and calls its int main member function.
 //
@@ -20,33 +21,28 @@
 // argument. Additional matching pairs of statements can delineate additional subprograms as long
 // as each pair has a unique argument since their argument names are used as part of the class name.
 
-//#undef function
-//#undef subroutine
-//#undef subroutine_noreturn
-//#define function public: var
-//#define subroutine public: void
-//#define subroutine_noreturn public: [[noreturn]] void
-
 // SIMILAR CODE IN
 // program.h library.h
 
 // A program is just a class with an following
 // int main() function that creates and calls it
-#define programinit(PROGRAMCLASSNAME)                        \
-_Pragma("GCC diagnostic push")                               \
-_Pragma("clang diagnostic ignored \"-Wweak-vtables\"")       \
-_Pragma("GCC diagnostic ignored \"-Winline\"")               \
-class PROGRAMCLASSNAME##ExodusProgram : public ExoProgram {  \
+
+#define programinit(EXOPROGRAM_PREFIX)                     \
+_Pragma("GCC diagnostic push")                             \
+_Pragma("clang diagnostic ignored \"-Wweak-vtables\"")     \
+_Pragma("GCC diagnostic ignored \"-Winline\"")             \
+class EXOPROGRAM_PREFIX##_ExoProgram : public ExoProgram { \
 _Pragma("GCC diagnostic pop")
 
 //OPTION I=Ignore. Causes error exit to be suppressed
 //OPTION D=Debug. Suppress try/catch exception handling so debuggers can catch errors
-#define programexit(PROGRAMCLASSNAME)                                                          \
+
+#define programexit(EXOPROGRAM_PREFIX)                                                         \
  public:                                                                                       \
 _Pragma("GCC diagnostic push")                                                                 \
 _Pragma("clang diagnostic ignored \"-Wshadow-field\"")                                         \
                                                                                                \
-    PROGRAMCLASSNAME##ExodusProgram(ExoEnv& mv) : ExoProgram(mv) {}                            \
+    EXOPROGRAM_PREFIX##_ExoProgram(ExoEnv& mv) : ExoProgram(mv) {}                             \
                                                                                                \
 _Pragma("GCC diagnostic pop")                                                                  \
 };                                                                                             \
@@ -55,20 +51,20 @@ _Pragma("GCC diagnostic push")                                                  
 _Pragma("clang diagnostic ignored \"-Wshadow-field\"")                                         \
 _Pragma("GCC diagnostic ignored \"-Winline\"")                                                 \
                                                                                                \
-static int PROGRAMCLASSNAME##main2(int exodus_argc, const char* exodus_argv[], int threadno) { \
+static int EXOPROGRAM_PREFIX##main2(int exodus_argc, const char* exodus_argv[], int threadno) {\
                                                                                                \
     ExoEnv mv;                                                                                 \
     exodus_main(exodus_argc, exodus_argv, mv, threadno);                                       \
                                                                                                \
     int result = 0;                                                                            \
-    PROGRAMCLASSNAME##ExodusProgram exodusprogram1(mv);                                        \
+    EXOPROGRAM_PREFIX##_ExoProgram exoprogram1(mv);                                            \
     if (osgetenv("EXO_DEBUG")) {                                                               \
-        errputl("Debug Init Thread:", THREADNO, " ", #PROGRAMCLASSNAME, " ", SENTENCE);        \
-        result = exodusprogram1.main().toInt();                                                \
-        errputl("Debug Exit Thread:", THREADNO, " ", #PROGRAMCLASSNAME, " ", SENTENCE);        \
+        errputl("Debug Init Thread:", THREADNO, " ", #EXOPROGRAM_PREFIX, " ", SENTENCE);       \
+        result = exoprogram1.main().toInt();                                                   \
+        errputl("Debug Exit Thread:", THREADNO, " ", #EXOPROGRAM_PREFIX, " ", SENTENCE);       \
     } else {                                                                                   \
         try {                                                                                  \
-            result = exodusprogram1.main().toInt();                                            \
+            result = exoprogram1.main().toInt();                                               \
         } catch (const ExoStop& exceptionx) {                                                  \
             if (exceptionx.message.len())                                                      \
                 exceptionx.message.outputl();                                                  \
@@ -118,9 +114,9 @@ static int PROGRAMCLASSNAME##main2(int exodus_argc, const char* exodus_argv[], i
                                                                                                \
 _Pragma("GCC diagnostic pop")                                                                  \
                                                                                                \
-int PROGRAMCLASSNAME##main(int exodus_argc, const char* exodus_argv[]);                        \
-int PROGRAMCLASSNAME##main(int exodus_argc, const char* exodus_argv[]) {                       \
-    return PROGRAMCLASSNAME##main2(exodus_argc, exodus_argv, 0);                               \
+int EXOPROGRAM_PREFIX##main(int exodus_argc, const char* exodus_argv[]);                       \
+int EXOPROGRAM_PREFIX##main(int exodus_argc, const char* exodus_argv[]) {                      \
+    return EXOPROGRAM_PREFIX##main2(exodus_argc, exodus_argv, 0);                              \
 }
 
 #endif // EXODUS_LIBEXODUS_EXODUS_PROGRAM_H_

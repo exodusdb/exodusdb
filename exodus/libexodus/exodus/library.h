@@ -1,6 +1,6 @@
 #ifndef EXODUS_LIBEXODUS_EXODUS_LIBRARY_H_
 #define EXODUS_LIBEXODUS_EXODUS_LIBRARY_H_
-#define BUILDING_LIBRARY
+
 #include <exodus/exodus.h>
 
 // A library section is a just a c++ class stored in an so/dll shared library that can be
@@ -33,67 +33,42 @@
 // a library section is just a class plus a global exported function that allows the class
 // to be instantiated and its main(...) called from another program via so/dll delay loading
 // AND share the mv environment variables of the calling program!
-#define libraryinit(PROGRAMCLASSNAME)                              \
-_Pragma("GCC diagnostic push")                                     \
-_Pragma("clang diagnostic ignored \"-Wweak-vtables\"")             \
-_Pragma("GCC diagnostic ignored \"-Winline\"")                     \
-class PROGRAMCLASSNAME##ExodusProgram : public ExoProgram { \
+
+#define libraryinit(EXOPROGRAM_PREFIX)                     \
+_Pragma("GCC diagnostic push")                             \
+_Pragma("clang diagnostic ignored \"-Wweak-vtables\"")     \
+_Pragma("GCC diagnostic ignored \"-Winline\"")             \
+class EXOPROGRAM_PREFIX##_ExoProgram : public ExoProgram { \
 _Pragma("GCC diagnostic pop")
 
-// to undo an ms optimisation that prevents casting between member function pointers
-// http://social.msdn.microsoft.com/Forums/en/vclanguage/thread/a9cfa5c4-d90b-4c33-89b1-9366e5fbae74
-//"VS compiler violates the standard in the name of optimization. It makes pointers-to-members
-// have different size depending on the complexity of the class hierarchy.
-// Print out sizeof(BaseMemPtr) and sizeof(&Derived::h) to see this.
-// http://msdn.microsoft.com/en-us/library/yad46a6z.aspx
-// http://msdn.microsoft.com/en-us/library/83cch5a6.aspx
-// http://msdn.microsoft.com/en-us/library/ck561bfk.aspx"
-//
-
-// the above requirement could be removed if libraryexit() generated the exactly
-// correct pointer to member WITH THE RIGHT ARGUMENTS
-// this could be done by generating special code in funcx.h and requiring
-//#include "funcx.h" in the bottom of every "funcx.cpp"
-
-/*
-without the above pragma, in msvc 2005+ you get an error when compiling libraries
-(exodus external subroutines) in the libraryexit() line containing "&ExodusProgram::main;" as
-follows:
-
-f1.cpp(12) : error C2440: 'type cast' : cannot convert from 'exo::var (__this
-call ExodusProgram::* )(exo::in)' to 'exo::pExoProgramMemberFunction';
-Pointers to members have different representations; cannot cast between them
-*/
-
-#define libraryexit(PROGRAMCLASSNAME)                                                          \
- public:                                                                                       \
-	_Pragma("clang diagnostic push")                                                           \
-	_Pragma("clang diagnostic ignored \"-Wshadow-field\"")                                     \
-	PROGRAMCLASSNAME##ExodusProgram(ExoEnv& mv) : ExoProgram(mv) {}                            \
-	_Pragma("clang diagnostic pop")                                                            \
-};                                                                                             \
-_Pragma("clang diagnostic push")                                                               \
-_Pragma("clang diagnostic ignored \"-Wmissing-prototypes\"")                                   \
-extern "C" PUBLIC void exodusprogrambasecreatedelete_##PROGRAMCLASSNAME(                       \
-		pExoProgram& pexodusprogrambase, ExoEnv& mv,                                           \
-		pExoProgramMemberFunction& pmemberfunction) {                                          \
-_Pragma("clang diagnostic pop")                                                                \
-		if (pexodusprogrambase) {                                                              \
-			delete pexodusprogrambase;                                                         \
-			pexodusprogrambase = nullptr;                                                      \
-			pmemberfunction = nullptr;                                                         \
-		} else {                                                                               \
-			pexodusprogrambase = new PROGRAMCLASSNAME##ExodusProgram(mv);                      \
-			_Pragma("GCC diagnostic push")                                                     \
-            _Pragma("GCC diagnostic ignored \"-Wcast-function-type\"")                         \
-				pmemberfunction =                                                              \
-					/*(pExoProgramMemberFunction)&PROGRAMCLASSNAME##ExodusProgram::main;*/     \
-					reinterpret_cast<pExoProgramMemberFunction>(&PROGRAMCLASSNAME##ExodusProgram::main);  \
-			_Pragma("GCC diagnostic pop")                                                      \
-		}                                                                                      \
-		return;                                                                                \
+#define libraryexit(EXOPROGRAM_PREFIX)                                                  \
+ public:                                                                                \
+	_Pragma("clang diagnostic push")                                                    \
+	_Pragma("clang diagnostic ignored \"-Wshadow-field\"")                              \
+	EXOPROGRAM_PREFIX##_ExoProgram(ExoEnv& mv) : ExoProgram(mv) {}                      \
+	_Pragma("clang diagnostic pop")                                                     \
+};                                                                                      \
+_Pragma("clang diagnostic push")                                                        \
+_Pragma("clang diagnostic ignored \"-Wmissing-prototypes\"")                            \
+extern "C" PUBLIC void exoprogram_createdelete_##EXOPROGRAM_PREFIX(                     \
+		pExoProgram& pexoprogram, ExoEnv& mv,                                           \
+		pExoProgram_MemberFunc& pmemberfunc) {                                          \
+_Pragma("clang diagnostic pop")                                                         \
+		if (pexoprogram) {                                                              \
+			delete pexoprogram;                                                         \
+			pexoprogram = nullptr;                                                      \
+			pmemberfunc = nullptr;                                                      \
+		} else {                                                                        \
+			pexoprogram = new EXOPROGRAM_PREFIX##_ExoProgram(mv);                       \
+			_Pragma("GCC diagnostic push")                                              \
+            _Pragma("GCC diagnostic ignored \"-Wcast-function-type\"")                  \
+				pmemberfunc =                                                           \
+					/*(pExoProgram_MemberFunc)&EXOPROGRAM_PREFIX##_ExoProgram::main;*/  \
+					reinterpret_cast<pExoProgram_MemberFunc>(&EXOPROGRAM_PREFIX##_ExoProgram::main);  \
+			_Pragma("GCC diagnostic pop")                                               \
+		}                                                                               \
+		return;                                                                         \
 	}
-	// purpose of the above is to either return a new exodusprogram object
-	// and a pointer to its main function - or to delete an exodusprogram object
+	// purpose of the above is to either return a new _ExoProgram object
+	// and a pointer to its main function - or to delete an _ExoProgram object
 #endif // EXODUS_LIBEXODUS_EXODUS_PROGRAM_H_
-

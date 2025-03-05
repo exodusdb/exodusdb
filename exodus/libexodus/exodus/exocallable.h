@@ -95,12 +95,12 @@ class ExoEnv;
 // pExoProgram - "pointer to exodus program" type
 using pExoProgram = ExoProgram*;
 
-// pExoProgramMemberFunction - "pointer to exodus program" member function
-using pExoProgramMemberFunction = auto (ExoProgram::*)() -> var;
+// pExoProgram_MemberFunc - "pointer to exodus program" member function
+using pExoProgram_MemberFunc = auto (ExoProgram::*)() -> var;
 
 // ExodusProgramCreateDeleteFunction - pointer to global function that creates and deletes exodus
 // programs
-using ExoProgramCreateDeleteFunction = auto (*)(pExoProgram&, ExoEnv&, pExoProgramMemberFunction&) -> void;
+using ExoProgramCreateDeleteFunction = auto (*)(pExoProgram&, ExoEnv&, pExoProgram_MemberFunc&) -> void;
 
 //class Callable
 class PUBLIC Callable {
@@ -151,8 +151,8 @@ class PUBLIC Callable {
 		So we will be getting the following warning which will have to ignored.
 
 		warning: cast between incompatible pointer to member types from
-		‘exo::pExoProgramMemberFunction’ {aka ‘exo::var (exo::ExoProgram::*)()’} to
-		        ‘pExoProgramMemberFunction’ {aka ‘exo::var (exo::ExoProgram::*)(const exo::var&)’}
+		‘exo::pExoProgram_MemberFunc’ {aka ‘exo::var (exo::ExoProgram::*)()’} to
+		        ‘pExoProgram_MemberFunc’ {aka ‘exo::var (exo::ExoProgram::*)(const exo::var&)’}
 
 		We can ignore such warnings using something like [-Wcast-function-type] in gcc and clang.
 
@@ -161,7 +161,7 @@ class PUBLIC Callable {
 	*/
 
 	// Not used if callable is only calling global functions in the shared library
-	pExoProgramMemberFunction pmemberfunc_;
+	pExoProgram_MemberFunc pmemberfunc_;
 
  public:
 

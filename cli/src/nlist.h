@@ -12,7 +12,7 @@ public:
 // 1. the name of the shared library to open,
 // 2. the name of the function within the shared library that will create an exodus program object,
 // 3. and the current program's mv environment to share with it.
-Callable_nlist(ExoEnv& mv) : Callable("nlist", "exodusprogrambasecreatedelete_", mv) {}
+Callable_nlist(ExoEnv& mv) : Callable("nlist", "exoprogram_createdelete_", mv) {}
 
 // Allow assignment of library name to override the default constructed
 using Callable::operator=;
@@ -26,15 +26,15 @@ var operator() ()
  if (this->pmemberfunc_ == nullptr)
   this->init();
 
- // Define a function type (pExoProgramMemberFunction)
+ // Define a function type (pExoProgram_MemberFunc)
  // that can call the shared library object member function
  // with the right arguments and returning a var or void
- using pExoProgramMemberFunction = auto (ExoProgram::*)() -> var;
+ using pExoProgram_MemberFunc = auto (ExoProgram::*)() -> var;
 
  // Call the shared library object main function with the right args,
  //  returning a var or void
  return CALLMEMBERFUNCTION(*(this->plibobject_),
- ((pExoProgramMemberFunction) (this->pmemberfunc_)))
+ ((pExoProgram_MemberFunc) (this->pmemberfunc_)))
   ();
 
 }

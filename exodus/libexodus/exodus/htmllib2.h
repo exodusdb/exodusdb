@@ -26,17 +26,17 @@ var operator() (in mode, io dataio, in params0 = "", in params20 = "", in glang 
  if (this->pmemberfunc_ == nullptr)
   this->attach("htmllib2");
 
- // Define a function type (pExoProgramMemberFunction)
+ // Define a function type (pExoProgram_MemberFunc)
  // that can call the shared library object member function
  // with the right arguments and returning a var or void
- using pExoProgramMemberFunction = auto (ExoProgram::*)(in,io,in,in,in) -> var;
+ using pExoProgram_MemberFunc = auto (ExoProgram::*)(in,io,in,in,in) -> var;
 
  // Call the shared library object main function with the right args,
  //  returning a var or void
  #pragma GCC diagnostic push
  #pragma GCC diagnostic ignored "-Wcast-function-type"
  return CALLMEMBERFUNCTION(*(this->plibobject_),
- (reinterpret_cast<pExoProgramMemberFunction>(this->pmemberfunc_)))
+ (reinterpret_cast<pExoProgram_MemberFunc>(this->pmemberfunc_)))
   (mode,dataio,params0,params20,glang);
  #pragma GCC diagnostic pop
 

@@ -7,7 +7,7 @@
 class Functordict_myclients : public ExodusFunctorBase {
    public:
 	Functordict_myclients(ExoEnv& mv)
-		: ExodusFunctorBase("dict_myclients", "exodusprogrambasecreatedelete_", mv) {}
+		: ExodusFunctorBase("dict_myclients", "exoprogram_createdelete_", mv) {}
 
 	Functordict_myclients& operator=(const var& newlibraryname) {
 		closelib();
@@ -23,22 +23,22 @@ class Functordict_myclients : public ExodusFunctorBase {
 		//first time link to the shared lib and create/cache an object from it
 		//passing current standard variables in mv
 		//if (Functorgetlang.pmemberfunc_==NULL)
-		// Functorgetlang.init("getlang","exodusprogrambasecreatedelete_",mv);
+		// Functorgetlang.init("getlang","exoprogram_createdelete_",mv);
 		if (this->pmemberfunc_ == NULL)
 			this->init();
 
-		//define a function type (pExoProgramMemberFunction)
+		//define a function type (pExoProgram_MemberFunc)
 		//that can call the shared library object member function
 		//with the right arguments and returning a var or void
-		//typedef var (ExoProgram::*pExoProgramMemberFunction)();
-		using pExoProgramMemberFunction = auto (ExoProgram::*)() -> var;
+		//typedef var (ExoProgram::*pExoProgram_MemberFunc)();
+		using pExoProgram_MemberFunc = auto (ExoProgram::*)() -> var;
 		//call the shared library object main function with the right args,
 		// returning a var or void
 		//return CALLMEMBERFUNCTION(*(Functordict_myclients.plibobject_),
-		//((pExoProgramMemberFunction) (Functordict_myclients.pmemberfunc_)))
+		//((pExoProgram_MemberFunc) (Functordict_myclients.pmemberfunc_)))
 		// (mode);
 		return CALLMEMBERFUNCTION(*(this->plibobject_),
-								  ((pExoProgramMemberFunction)(this->pmemberfunc_)))();
+								  ((pExoProgram_MemberFunc)(this->pmemberfunc_)))();
 	}
 };
 Functordict_myclients dict_myclients{mv};
@@ -48,7 +48,7 @@ Functordict_myclients dict_myclients{mv};
 class Functordict_myclients : public ExodusFunctorBase {
    public:
 	Functordict_myclients(ExoEnv& mv)
-		: ExodusFunctorBase("dict_myclients", "exodusprogrambasecreatedelete_", mv) {}
+		: ExodusFunctorBase("dict_myclients", "exoprogram_createdelete_", mv) {}
 
 	Functordict_myclients& operator=(const var& newlibraryname) {
 		closelib();
@@ -64,22 +64,22 @@ class Functordict_myclients : public ExodusFunctorBase {
 		//first time link to the shared lib and create/cache an object from it
 		//passing current standard variables in mv
 		//if (Functorgetlang.pmemberfunc_==NULL)
-		// Functorgetlang.init("getlang","exodusprogrambasecreatedelete_",mv);
+		// Functorgetlang.init("getlang","exoprogram_createdelete_",mv);
 		if (this->pmemberfunc_ == NULL)
 			this->init();
 
-		//define a function type (pExoProgramMemberFunction)
+		//define a function type (pExoProgram_MemberFunc)
 		//that can call the shared library object member function
 		//with the right arguments and returning a var or void
-		typedef var (ExoProgram::*pExoProgramMemberFunction)();
+		typedef var (ExoProgram::*pExoProgram_MemberFunc)();
 
 		//call the shared library object main function with the right args,
 		// returning a var or void
 		//return CALLMEMBERFUNCTION(*(Functordict_myclients.plibobject_),
-		//((pExoProgramMemberFunction) (Functordict_myclients.pmemberfunc_)))
+		//((pExoProgram_MemberFunc) (Functordict_myclients.pmemberfunc_)))
 		// (mode);
 		return CALLMEMBERFUNCTION(*(this->plibobject_),
-								  ((pExoProgramMemberFunction)(this->pmemberfunc_)))();
+								  ((pExoProgram_MemberFunc)(this->pmemberfunc_)))();
 	}
 };
 Functordict_myclients dict_myclients{mv};

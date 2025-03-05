@@ -1412,11 +1412,11 @@ ENVIRONMENT
 //							_EOL "  this->init();"
 							_EOL "  this->attach(\"funcx\");"
 							_EOL
-							_EOL " /" "/ Define a function type (funcx_pExoProgramMemberFunction)"
+							_EOL " /" "/ Define a function type (funcx_pExoProgram_MemberFunc)"
 							_EOL " /" "/ that can call the shared library object member function"
 							_EOL " /" "/ with the right arguments and returning a var or void"
-							//_EOL " typedef RETURNTYPE (ExoProgram::*funcx_pExoProgramMemberFunction)(IN,OUT,OUT);"
-							_EOL " using funcx_pExoProgramMemberFunction = auto (ExoProgram::*)(IN,OUT,OUT) -> RETURNTYPE;"
+							//_EOL " typedef RETURNTYPE (ExoProgram::*funcx_pExoProgram_MemberFunc)(IN,OUT,OUT);"
+							_EOL " using funcx_pExoProgram_MemberFunc = auto (ExoProgram::*)(IN,OUT,OUT) -> RETURNTYPE;"
 							_EOL
 							_EOL " /" "/ Call the shared library object main function with the right args,"
 							_EOL " /" "/  returning a var or void"
@@ -1424,8 +1424,8 @@ ENVIRONMENT
 							_EOL " return CALLMEMBERFUNCTION(*(this->plibobject_),"
 							// 2022-10-23
 							// Use reinterpret_cast instead of c-style cast for clarity in code review and assuming equivalence
-							//_EOL " ((funcx_pExoProgramMemberFunction) (this->pmemberfunc_)))"
-							_EOL " (reinterpret_cast<funcx_pExoProgramMemberFunction>(this->pmemberfunc_)))"
+							//_EOL " ((funcx_pExoProgram_MemberFunc) (this->pmemberfunc_)))"
+							_EOL " (reinterpret_cast<funcx_pExoProgram_MemberFunc>(this->pmemberfunc_)))"
 							_EOL "  (ARG1,ARG2,ARG3);"
 							_EOL " {after_call}"
 							_EOL
@@ -1439,7 +1439,7 @@ ENVIRONMENT
 							_EOL "Callable_funcx funcx{mv};";
 
 						replacer(inclusion, "funcx", field(libname, OSSLASH, -1));
-						//replacer(example,"exodusprogrambasecreatedelete_",funcname);
+						//replacer(example,"exoprogram_createdelete_",funcname);
 						replacer(inclusion, "in arg1=var(), out arg2=var(), out arg3=var()", funcargsdecl2);
 						replacer(inclusion, "IN,OUT,OUT", funcargstype);
 						replacer(inclusion, "ARG1,ARG2,ARG3", funcargs);
