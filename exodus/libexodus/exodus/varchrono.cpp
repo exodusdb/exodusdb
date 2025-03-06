@@ -274,13 +274,13 @@ var  var::iconv_D(const char* conversion) const {
 	bool yearfirst = false;
 	bool dayfirst = false;
 
-//	const char* conversionchar = conversion;
-////	if (*conversionchar != 'D')
+//	const char* conversion = conversion;
+////	if (*conversion != 'D')
 ////		return *this;
-//	++conversionchar;
+//	++conversion;
 //
-//	while (*conversionchar) {
-//		switch (*conversionchar) {
+//	while (*conversion) {
+//		switch (*conversion) {
 //			case 'E':
 //				dayfirst = true;
 //				break;
@@ -288,7 +288,7 @@ var  var::iconv_D(const char* conversion) const {
 //				yearfirst = true;
 //				break;
 //		}
-//		++conversionchar;
+//		++conversion;
 //	}
 
 	std::string_view sv = conversion;
@@ -480,36 +480,48 @@ std::string var::oconv_D(const char* conversion) const {
 	std::tie(civil_year, civil_month, civil_day) = hinnant::gregorian::civil_from_days(unixdayno);
 
 	// defaults
+
 	bool alphamonth = true;
 	int yeardigits = 4;
 	bool yearfirst = false;
 	bool dayfirst = false;
-	// bool leadingzeros=true;
+
+	// sepchar ! suppresses sepchars
+	// Any other sepchar switches off alpha month.
+	// Any sepchar followed by ! switches off alpha month and suppresses separators
+	// "!" followed by any sepchar switches off alpha month and sets the sepchar. (! is ignored)
 	char sepchar = ' ';
 
-	const char* conversionchar = conversion;
+	// 1st Z will change this to ' '
+	char pad_char = '0';
+
+	// ZZ will change this to false
+	bool padding = true;
+
+//	const char* conversion = conversion0;
 
 //	const zstring_range conversion2{conversion};
-//	auto conversionchar = conversion2.begin();
+//	auto conversion = conversion2.begin();
 
-	// This function is only called when the 1st character is "D"
-	// Bump to the next char
-	++conversionchar;
+	// Called pointing to the first character after the first "D"
+//	// This function is only called when the 1st character is "D"
+//	// Bump to the next char
+//	++conversion;
 
 	// DY means year only unless followed by a separator character
-	bool yearonly = (*conversionchar) == 'Y';
+	bool yearonly = (*conversion) == 'Y';
 
-	while (*conversionchar) {
+	while (*conversion) {
 
 		// digits anywhere indicate size of year
-		if ((*conversionchar) <= '9' && (*conversionchar) >= '0') {
-			yeardigits = (*conversionchar) - '0';
-			++conversionchar;
+		if ((*conversion) <= '9' && (*conversion) >= '0') {
+			yeardigits = (*conversion) - '0';
+			++conversion;
 			continue;
 		}
 
 		int dow;
-		switch (*conversionchar) {
+		switch (*conversion) {
 
 			//(E)uropean date - day first
 			case 'E':
@@ -520,8 +532,8 @@ std::string var::oconv_D(const char* conversion) const {
 			// DM returns month number
 			// DMA returns full month name
 			case 'M':
-				++conversionchar;
-				if (*conversionchar == 'A')
+				++conversion;
+				if (*conversion == 'A')
 					return &longmths[civil_month * 11 - 10];
 				return std::to_string(static_cast<int>(civil_month));
 
@@ -531,8 +543,8 @@ std::string var::oconv_D(const char* conversion) const {
 			case 'W':
 				// calculate directly from pick date (construction of date above is wasted
 				dow = (((*this).floor() - 1) % 7) + 1;
-				++conversionchar;
-				if (*conversionchar == 'A')
+				++conversion;
+				if (*conversion == 'A')
 					return &longdayofweeks[dow * 10 - 10];
 				return std::to_string(dow);
 
@@ -543,11 +555,11 @@ std::string var::oconv_D(const char* conversion) const {
 				yearfirst = true;
 				// yearonly=true;
 				// allow trailing digit as well to control ndigits
-				++conversionchar;
-				//if ((*conversionchar) <= '9' && (*conversionchar) >= '0')
-				if ((*conversionchar) >= '0' && (*conversionchar) <= '9')
-					yeardigits = (*conversionchar) - '0';
-				--conversionchar;
+				++conversion;
+				//if ((*conversion) <= '9' && (*conversion) >= '0')
+				if ((*conversion) >= '0' && (*conversion) <= '9')
+					yeardigits = (*conversion) - '0';
+				--conversion;
 				break;
 
 			// Not AREV
@@ -577,17 +589,33 @@ std::string var::oconv_D(const char* conversion) const {
 				//return var(static_cast<int>(desired_date.end_of_month().day()));
 				return std::to_string(static_cast<int>(hinnant::gregorian::last_day_of_month(civil_year, civil_month)));
 
+			// ! Empty separator char
+			case '!':
+				sepchar = '!';
+				break;
+
+			// Z  - Leading zeros become spaces
+			// ZZ - Leading zeros are omitted.
+			case 'Z':
+				if (pad_char == ' ')
+					// Second Z
+					padding = false;
+				else
+					// First Z
+					pad_char = ' ';
+				break;
+
 			default:
-				sepchar = *conversionchar;
+				sepchar = *conversion;
 				yearonly = false;
 				alphamonth = false;
 				break;
 		}
-		++conversionchar;
+		++conversion;
 	}
 
 	std::stringstream ss;
-	ss.fill('0');
+	ss.fill(pad_char);
 
 	// trim the right n year digits since width() will pad but not cut (is this really the C++
 	// way?)
@@ -600,13 +628,15 @@ std::string var::oconv_D(const char* conversion) const {
 
 	// year first
 	if (yearfirst) {
-		ss.width(yeardigits);
+		if (padding)
+			ss.width(yeardigits);
 		// ss << civil_year;
 		// above doesnt cut down number of characters
 		ss << yearstring;
 		if (yearonly)
 			return ss.str();
-		ss << sepchar;
+		if (sepchar != '!')
+			ss << sepchar;
 	}
 
 	//determine if day first if not forced
@@ -615,9 +645,11 @@ std::string var::oconv_D(const char* conversion) const {
 
 	// day first
 	if (dayfirst) {
-		ss.width(2);
+		if (padding)
+			ss.width(2);
 		ss << civil_day;
-		ss << sepchar;
+		if (sepchar != '!')
+			ss << sepchar;
 	}
 
 	// month
@@ -625,20 +657,24 @@ std::string var::oconv_D(const char* conversion) const {
 		// ss.width(3);
 		ss << shortmths.substr(civil_month * 4 - 4, 3);
 	} else {
-		ss.width(2);
+		if (padding)
+			ss.width(2);
 		ss << static_cast<int>(civil_month);
 	}
 
 	// day last
 	if (!dayfirst) {
-		ss << sepchar;
-		ss.width(2);
+		if (sepchar != '!')
+			ss << sepchar;
+		if (padding)
+			ss.width(2);
 		ss << civil_day;
 	}
 
 	// year last
 	if (!yearfirst && yeardigits) {
-		ss << sepchar;
+		if (sepchar != '!')
+			ss << sepchar;
 		// ss << civil_year;
 		// above doesnt cut down number of characters
 		ss.width(yeardigits);
@@ -671,17 +707,15 @@ std::string var::oconv_MT(const char* conversion) const {
 	bool input_is_hours = false;
 	char sepchar = ':';
 
-	const char* conversionchar = conversion;
-
 	// Skip over leading "MT"
-	conversionchar += 2;
+//	conversion += 2;
 
 	int timesecs;
 
 	// Analyse conversion characters
-	while (*conversionchar) {
+	while (*conversion) {
 
-		switch (*conversionchar) {
+		switch (*conversion) {
 
 			case '2':
 				input_is_hours = true;
@@ -710,11 +744,11 @@ std::string var::oconv_MT(const char* conversion) const {
 
 			// Any other character is the separator. First one only.
 			default:
-				sepchar = *conversionchar;
+				sepchar = *conversion;
 				goto after_analyse_conversion;
 				break;
 		}
-		conversionchar++;
+		conversion++;
 	}
 after_analyse_conversion:
 
@@ -783,7 +817,8 @@ after_analyse_conversion:
 	}
 
 	// separator
-	result.push_back(sepchar);
+	if (sepchar != '!')
+		result.push_back(sepchar);
 
 	// two digit minutes
 	//newmv ^= ("00" ^ var(mins)).last(2);
@@ -793,7 +828,8 @@ after_analyse_conversion:
 	if (showsecs) {
 
 		// separator
-		result.push_back(sepchar);
+		if (sepchar != '!')
+			result.push_back(sepchar);
 
 		// two digit seconds
 		//newmv ^= ("00" ^ var(secs)).last(2);

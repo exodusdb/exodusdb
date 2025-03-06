@@ -109,7 +109,7 @@
 // Useful TRACE() function for debugging
 #define TRACE(EXPRESSION) \
 	try{ \
-		var(EXPRESSION).quote().errputl("TRACE: " #EXPRESSION " = "); \
+		var(EXPRESSION).quote().errputl("TRACE(" #EXPRESSION ")\t/" "/ "); \
 	} catch (VarError e) { \
 		var(e.stack()).errputl(e.message); \
 	};

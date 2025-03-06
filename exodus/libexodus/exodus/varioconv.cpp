@@ -565,24 +565,26 @@ std::string var::oconv_MD(const char* conversion) const {
 
 	// 1. Analyse conversion
 
+	// Pointer arrives pointing to D or C after M
 	// get pointer to the third character (after the MD/MC bit)
-	const char* pconversion = conversion;
+//	const char* pconversion = conversion0;
+	// First letter must be D or C
+//	pconversion++;
 
-	// Second letter must be D or C
-	pconversion++;
 	char thousandsep;
 	char decimalsep;
-	if (*pconversion == 'D') LIKELY {
+	if (*conversion == 'D') LIKELY {
 		thousandsep = ',';
 		decimalsep = '.';
 	} else {
+		// TODO throw if not 'C'
 		thousandsep = '.';
 		decimalsep = ',';
 	}
 
-	// get the third character
-	pconversion++;
-	char nextchar = *pconversion;
+	// get the next character
+	conversion++;
+	char nextchar = *conversion;
 
 	// no conversion in the following cases
 	// 1. zero length string
@@ -615,8 +617,8 @@ std::string var::oconv_MD(const char* conversion) const {
 //			goto convert;
 
 		// look for a second digit
-		pconversion++;
-		nextchar = *pconversion;
+		conversion++;
+		nextchar = *conversion;
 		if (ASCII_isdigit(nextchar)) {
 			// get movedecimals
 			movedecs = nextchar - '0';
@@ -626,8 +628,8 @@ std::string var::oconv_MD(const char* conversion) const {
 //				goto convert;
 
 			// move to the next character
-			pconversion++;
-			nextchar = *pconversion;
+			conversion++;
+			nextchar = *conversion;
 		}
 	}
 
@@ -703,8 +705,8 @@ std::string var::oconv_MD(const char* conversion) const {
 				}
 				break;
 		}
-		pconversion++;
-		nextchar = *pconversion;
+		conversion++;
+		nextchar = *conversion;
 	}
 
 	// 2. Create output
@@ -1089,6 +1091,7 @@ var  var::oconv(const char* conversion_in) const {
 					} else {
 						// Note that D doesnt always return a date.
 						// e.g. "DQ" returns 1-4 for quarter
+						conversion++;
 						part = part.oconv_D(conversion);
 					}
 					break;
@@ -1127,7 +1130,7 @@ var  var::oconv(const char* conversion_in) const {
 								case 'D':
 								case 'C':
 									// Might treat empty string as zero (with Z option in conversion)
-									part = part.oconv_MD(conversion);
+									part = part.oconv_MD(pconversion);
 									break;
 
 								// "MT" - time e.g. 1 -> 1/1/1967
@@ -1136,7 +1139,8 @@ var  var::oconv(const char* conversion_in) const {
 									if (part.var_typ & VARTYP_STR && part.var_str.empty()) {
 										// Empty string returns empty string
 									} else {
-										part = part.oconv_MT(conversion);
+										pconversion ++;
+										part = part.oconv_MT(pconversion);
 									}
 									break;
 

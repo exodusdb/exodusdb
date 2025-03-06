@@ -314,7 +314,7 @@ RM= ;  FM= ;  VM= ;  SM= ;  TM= ;  ST= ;
 RM= ;  FM= ;  VM= ;  SM= ;  TM= ;  ST= ; 
 
 === TRACE ===
-TRACE: fms = "RM= `;  FM= ^;  VM= ];  SM= };  TM= |;  ST= ~; "
+TRACE(fms)	// "RM= `;  FM= ^;  VM= ];  SM= };  TM= |;  ST= ~; "
 )V0G0N";
 
 programexit()

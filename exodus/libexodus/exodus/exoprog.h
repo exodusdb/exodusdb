@@ -346,10 +346,22 @@ ND	bool lockrecord(in filename, io file, in keyx) const;
 	///// ioconv date/time :
 	////////////////////////
 
-	// ioconv with a language specific month
+	// Formatting for dates that is sensitive to the American/International setting in DATEFORMAT.
+	// Normally used for oconv() but can be used in reverse for iconv.
+	// var: An internal date (a number).
+	// Returns: A readable date in text format. e.g. "31 DEC 2020"
+	// Alternatively one can use the ordinary date conversion patterns starting "D" e.g. "DE/" for international date with / like 31/12/2020.
+	// `let v1 = iconv("JAN 9 2020", "D");
+	//  assert(v1, "[DATE]")   == " 9/ 1/2020");  // Same as date conversion "D/Z"  assuming E from DATEFMT
+	//  assert(v1, "[DATE,4]"  == " 9/ 1/2020");  // 4 is the default unless 2 is set in DATEFMT so may not not be needed.
+	//  assert(v1, "[DATE,*4]" == "9/1/2020");    // Same as date conversion "D/ZZ" assuming E from DATEFMT
+	//  assert(v1, "[DATE,*]"  == "9/1/2020");    // * means the same as date conversion "ZZ" (trim leading zeros and spaces)`
 	var  exoprog_date(in type, in input0, in ndecs0, out output);
 
 	// Formatting for numbers with currency code/unit suffix.
+	// Normally used for oconv() but can be used in reverse for iconv.
+	// var: A number with an optional currency code or unit suffix. e.g. "12345.67USD"
+	// Returns: A formatted number with thousands separated conventionally e.g. "12.345.67USD".
 	// iconv/oconv("[NUMBER]")      oconv leaves ndecimals untouched as in the input. iconv see below.
 	// iconv/oconv("[NUMBER,2]")    Specified number of decimal places
 	// iconv/oconv("[NUMBER,BASE]") Decimal places as per BASEFMT

@@ -2000,7 +2000,28 @@ var ExoProgram::exoprog_date(in type, in in0, in mode0, out outx) {
 		// 4 means force 4 digit year regardless of DATEFMT
 		if (mode eq "4") {
 			mode = DATEFMT;
-			mode.paster(2, 1, "4");
+			// The intent here is to replace a "2" in DATEFMT D2/E
+			// and the web service initialises DATEFMT to D2xxx
+			// srv/initcompany.cpp:    DATEFMT            = "D2/E";
+			// srv/initcompany.cpp:            DATEFMT = "D2/E";
+			// srv/initcompany.cpp:            DATEFMT = "D2/E";
+			// srv/initcompany.cpp:            DATEFMT = "D2-E";
+			// srv/initcompany.cpp:            DATEFMT = "D2E";
+			// srv/initcompany.cpp:            DATEFMT = "D2";
+			// srv/initcompany.cpp:            DATEFMT = "D2/";
+			// srv/initcompany.cpp:            DATEFMT = "D2-";
+			// srv/initcompany.cpp:            DATEFMT = "D2E";
+			// srv/initcompany.cpp:            DATEFMT = "D2";
+			// BUT the default initialisation of DATEFMT in exoprogram is to "D/E"
+			// but when DATEFMT changed to D/E it ended up
+			// overwriting the "/" and reverting to a alphabetic month
+			// resulting in [DATE,4*] [DATE,*4] and [DATE,4]
+			// outputing dates like "9JAN2020" which are at least unambiguous.
+			// Solution is to remove "2" if it is present since 4 is the default
+			// The alternative is to change DATEFMT initialisation to D4/E
+//			mode.paster(2, 1, "4");
+			if (mode.contains("2"))
+				mode.replacer("2", "");
 		}
 
 	} else {
