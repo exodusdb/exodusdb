@@ -156,8 +156,8 @@ ND var  dump(in var1);
 ND var date(void);
 ND var time(void);
 ND var ostime(void);
-ND var timestamp(void);
-ND var timestamp(in date, in time);
+ND var ostimestamp(void);
+ND var ostimestamp(in date, in time);
 
    void ossleep(const int milliseconds);
 ND var  oswait(SV file_dir_list, const int milliseconds);

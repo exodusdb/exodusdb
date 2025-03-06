@@ -160,7 +160,7 @@ var  var::date() const {
 	// Use std::chrono:days in new version of g++ c++20
 	//const auto duration_in_days = std::chrono::duration_cast<std::chrono::days>(duration_since_epoch).count();
 
-	// timestamp() assumes that the var returned is an int
+	// ostimestamp() assumes that the var returned is an int
 	return duration_in_days - PICK_UNIX_DATE_OFFSET;
 
 }
@@ -216,7 +216,7 @@ var  var::ostime() const {
 }
 
 // Returns decimal fractional days since pick epoch 1967-12-31 00:00:00 (up to micro or nano second accuracy)
-var  var::timestamp() const {
+var  var::ostimestamp() const {
 
 	var datenow = this->date();
 	var timenow = this->ostime();
@@ -233,9 +233,9 @@ var  var::timestamp() const {
 }
 
 // -> decimal fractional days since pick epoch 1967-12-31 00:00:00 (up to micro or nano second accuracy)
-var  var::timestamp(in ostime) const {
+var  var::ostimestamp(in ostime) const {
 
-	THISIS("var  var::timestamp(in ostime) const")
+	THISIS("var  var::ostimestamp(in ostime) const")
 	assertNumeric(function_sig);
 	assertNumeric(function_sig, ostime);
 

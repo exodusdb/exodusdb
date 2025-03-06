@@ -513,7 +513,7 @@ nextuser:;
 		printl("running as ", runasusercode);
 	}
 
-	start_timestamp	 = timestamp();
+	start_timestamp	 = ostimestamp();
 
 	ndocsprocessed += 1;
 
@@ -644,7 +644,7 @@ nextsign:
 
 		} else {
 
-			let timetext = elapsedtimetext(start_timestamp, timestamp());
+			let timetext = elapsedtimetext(start_timestamp, ostimestamp());
 
 			// if ucase(printfilename[-4,4])='.XLS' then
 			tt = (field(printfilename, ".", -1)).lcase();

@@ -46,7 +46,7 @@ S
 \
 	let fromdate = RECORD.f(27).floor() - 24873;\
 	let fromtime = ("." ^ RECORD.f(27).field(".", 2)) * 86400;\
-	return elapsedtimetext(fromdate.timestamp(fromtime), timestamp());
+	return elapsedtimetext(fromdate.ostimestamp(fromtime), ostimestamp());
 T
 10
 

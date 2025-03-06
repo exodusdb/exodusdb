@@ -93,7 +93,7 @@ class PUBLIC ExoEnv final {
 	// Per thread/exoprogram environment
 	// All performed/executed/xlated/called exoprograms (libraries) share the same exodus environment
 	var THREADNO  = "";
-	let TIMESTAMP = var().timestamp();
+	let TIMESTAMP = var().ostimestamp();
 	// Note that osgetenv is member function not a exofuncs free function
 	let TERMINAL  = var().isterminal() ? osgetenv("TERM") : "";
 	let EXECPATH  = getexecpath();

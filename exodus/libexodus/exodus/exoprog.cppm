@@ -378,7 +378,7 @@ export namespace exo {
 	using exo::textwidth;
 
 	using exo::time;
-	using exo::timestamp;
+	using exo::ostimestamp;
 
 	using exo::trim;
 	using exo::trimboth;

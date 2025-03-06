@@ -1747,12 +1747,11 @@ var ExoProgram::iconv(in input, in conversion) {
 }
 
 
-void ExoProgram::getdatetime(out localdate, out localtime, out sysdate, out systime, out utcdate, out utctime) {
+void ExoProgram::getdatetime(out user_date, out user_time, out system_date, out system_time, out UTC_date, out UTC_time) {
 
 	//see CHANGETZ which seems to go through all times (dates?) and changes them
 	//this should be done ONCE to standardise on gmt/utc really
 	//really need a DBTZ to determine datetime for storage in the database
-
 
 	var tt;//num
 
@@ -1760,58 +1759,58 @@ void ExoProgram::getdatetime(out localdate, out localtime, out sysdate, out syst
 	//by ensuring time is not less than time1
 	//which could happen over midnight
 	while (true) {
-		var systime0 = var().time();
-		sysdate = var().date();
-		systime = var().time();
+		var system_time0 = var().time();
+		system_date = var().date();
+		system_time = var().time();
 		///BREAK;
-		if (systime ge systime0) break;
+		if (system_time ge system_time0) break;
 	}//loop;
 
 	//no timezone info
 	if (not SW) {
-		localdate = sysdate;
-		localtime = systime;
+		user_date = system_date;
+		user_time = system_time;
 		//assume system is on gmt/utc or database contains non-gmt datetimes
-		utcdate = sysdate;
-		utctime = systime;
+		UTC_date = system_date;
+		UTC_time = system_time;
 		goto exit;
 	}
 
 	//@sw<1> is the ADJUSTMENT to get user time from server time, therefore add
-	localtime = systime;
-	localdate = sysdate;
+	user_time = system_time;
+	user_date = system_date;
 	tt = SW.f(1);
 	if (tt) {
-		localtime += tt;
-		if (localtime ge 86400) {
+		user_time += tt;
+		if (user_time ge 86400) {
 			//assume offset cannot be more than 24 hours!
-			localdate = sysdate + 1;
-			localtime -= 86400;
-		} else if (localtime lt 0) {
+			user_date = system_date + 1;
+			user_time -= 86400;
+		} else if (user_time lt 0) {
 			//assume offset cannot be less than 24 hours!
-			localdate = sysdate - 1;
-			localtime += 86400;
+			user_date = system_date - 1;
+			user_time += 86400;
 		}
 	}
 
 	//@sw<2> is the difference from gmt/utc to server time, therefore subtract
-	utctime = systime;
-	utcdate = sysdate;
+	UTC_time = system_time;
+	UTC_date = system_date;
 
 	//following is irrelevent until we support user tz when server tz ISNT gmt/utc
 	//
 	//remove server tz to get gmt/utc. if server is ahead of gmt then serv tz is +
 	tt = SW.f(2);
 	if (tt) {
-		utctime -= tt;
-		if (utctime ge 86400) {
+		UTC_time -= tt;
+		if (UTC_time ge 86400) {
 			//assume tz cannot be more than 24 hours!
-			utcdate = sysdate + 1;
-			utctime -= 86400;
-		} else if (utctime lt 0) {
+			UTC_date = system_date + 1;
+			UTC_time -= 86400;
+		} else if (UTC_time lt 0) {
 			//assume tz cannot be less than 24 hours!
-			utcdate = sysdate - 1;
-			utctime += 86400;
+			UTC_date = system_date - 1;
+			UTC_time += 86400;
 		}
 	}
 
@@ -1819,43 +1818,43 @@ void ExoProgram::getdatetime(out localdate, out localtime, out sysdate, out syst
 exit:
 /////
 	if (SENTENCE eq "GETDATETIME") {
-		var msg = "User:   " ^ localdate.oconv("D");
-		msg ^= " " ^ localtime.oconv("MTH");
-		msg ^= FM ^ "Server: " ^ sysdate.oconv("D");
-		msg ^= " " ^ systime.oconv("MTH");
-		msg ^= FM ^ "GMT/UTC:" ^ utcdate.oconv("D");
-		msg ^= " " ^ utctime.oconv("MTH");
+		var msg = "User:   " ^ user_date.oconv("D");
+		msg ^= " " ^ user_time.oconv("MTH");
+		msg ^= FM ^ "Server: " ^ system_date.oconv("D");
+		msg ^= " " ^ system_time.oconv("MTH");
+		msg ^= FM ^ "GMT/UTC:" ^ UTC_date.oconv("D");
+		msg ^= " " ^ UTC_time.oconv("MTH");
 		call note(msg);
 	}
 
 	return;
 }
 
-//var ExoProgram::timedate2(in localdate0, in localtime0, in glang) {
+//var ExoProgram::timedate2(in user_date0, in user_time0, in glang) {
 var ExoProgram::timedate2() {
 
 	//caserevised*
 
-	var localdate;
-	var localtime;
+	var user_date;
+	var user_time;
 	var x3;
 	var x4;
 	var x5;
 	var x6;
 
 	//use parameters only if both are provided
-//	if (localtime0.unassigned()) {
-		call getdatetime(localdate, localtime, x3, x4, x5, x6);
+//	if (user_time0.unassigned()) {
+		call getdatetime(user_date, user_time, x3, x4, x5, x6);
 //	} else {
-//		localdate = localdate0;
-//		localtime = localtime0;
+//		user_date = user_date0;
+//		user_time = user_time0;
 //	}
 
 	var temp = "";
 	if (not temp) {
 		temp = "MTH";
 	}
-	temp = oconv(localtime, temp);
+	temp = oconv(user_time, temp);
 	if (temp.starts("0")) {
 		temp.cutter(1);
 	}
@@ -1871,7 +1870,7 @@ var ExoProgram::timedate2() {
 	if (DATEFMT eq "") {
 		DATEFMT = "D/E";
 	}
-	temp.prefixer(oconv(localdate, "[DATE,*4]") ^ " ");
+	temp.prefixer(oconv(user_date, "[DATE,*4]") ^ " ");
 
 	return temp;
 }
@@ -1879,15 +1878,10 @@ var ExoProgram::timedate2() {
 
 // elapsedtimetext 1 - from program start/TIMESTAMP
 var ExoProgram::elapsedtimetext() const {
-	return elapsedtimetext(TIMESTAMP, var().timestamp());
+	return elapsedtimetext(TIMESTAMP, var().ostimestamp());
 }
 
-// elapsedtimetext 2 - from duration
-var ExoProgram::elapsedtimetext(in timestamp_difference) const {
-	return elapsedtimetext(0, timestamp_difference);
-}
-
-// elapsedtimetext 3 - given two timestamps
+// elapsedtimetext 2 - given two timestamps
 var ExoProgram::elapsedtimetext(in timestamp1, in timestamp2) const {
 
 	var text = "";

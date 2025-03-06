@@ -27,7 +27,7 @@ function main(in mode0, in time, in date, io /*buffer*/, out msg) {
 	}
 
 	// gosub gettext
-	var text = elapsedtimetext(date.timestamp(time), timestamp());
+	var text = elapsedtimetext(date.ostimestamp(time), ostimestamp());
 
 	printl();
 

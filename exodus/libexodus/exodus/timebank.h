@@ -59,7 +59,7 @@ struct PUBLIC TimeBank {
 
 } timebank;
 
-// Utility function to get a timestamp in ns
+// Utility function to get a ostimestamp in ns
 // Keep in mind that the precision of the clock_gettime function is not guaranteed to be nanosecond-level,
 // and the actual precision may vary depending on the system and the clock being used.
 static inline long long get_time_ns() {
@@ -83,7 +83,7 @@ struct Timer {
 //	Time_Point timebank_start_;
 //	Time_Point timebank_start_ = Clock::now();
 
-	// Default initialisation captures an initial ns timestamp
+	// Default initialisation captures an initial ns ostimestamp
 	long long timebank_start_ = get_time_ns();
 
 	// Prevent default construction. Is this necessary since we provide a specific constructor?
@@ -127,7 +127,7 @@ auto get_timebank_acno(const std::string_view arg1) -> int {
 	     if (++acno && arg1 == "xxxxxxxx unused") {}
 	else if (++acno && arg1 == "var  var::sort(SV delimiter)") {}
 	else if (++acno && arg1 == "var  var::reverse(SV delimiter)") {}
-	else if (++acno && arg1 == "var  var::timestamp(in ostime) const") {}
+	else if (++acno && arg1 == "var  var::ostimestamp(in ostime) const") {}
 	else if (++acno && arg1 == "bool var::connect(in conninfo") {}
 	else if (++acno && arg1 == "bool var::attach(in filenames") {}
 	else if (++acno && arg1 == "bool var::detach(in filenames") {}

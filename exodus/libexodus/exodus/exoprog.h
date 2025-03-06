@@ -231,35 +231,22 @@ ND	var  xlate(in filename, in key, in fieldno_or_name, const char* mode);
 	///// i/o conversion:
 	/////////////////////
 
-	// iconv/oconv with access to specific exoprog conversions and also var's iconv/oconv patterns
-	// Unlike var's iconv/oconv, exoprog's iconv/oconv have the ability to call custom functions like "[funname,args...]"
+	// iconv/oconv with access to exoprogram's environment variables.
+	// exoprog's iconv/oconv have the ability to call custom functions like "[funname,args...]"
 	//
-	// [DATE]
-	// [DATE,*]
-	// [DATE,4]
-	// [DATE,*4]
-	// [DATE,DS-]
-	//
+	// [NUMBER]  // built-in. See doc below.
+	// [DATE]    // built-in. See doc below.
 	// [DATEPERIOD]
-	// [DATEPERIOD," ^ adcompany.f(6) ^ "]
-	// [DATEPERIOD," ^ doccompany.f(6) ^ "]
-	// [DATEPERIOD," ^ firstmonth ^ "," ^ fin.maxperiod ^ "]
-	// [DATEPERIOD,1,12]
-	//
 	// [DATETIME]
-	// [DATETIME,4*]
-	// [DATETIME,4*,DOS]
-	// [DATETIME,4*,MTS]
-	//
 	// [TIME2]
-	// [TIME2,48]
-	// [TIME2,MT48]
-	// [TIME2,MTS48]
+	//
 ND	var  oconv(in input, in conversion);
 ND	var  iconv(in input, in conversion);
 
-	// Split combined amount and currency code string
-	// e.g. "123.45XYZ" -> "123.45" and "XYZ"
+	// Split amount+currency code/unit string into number and currency code/unit.
+	// var: "123.45USD"
+	// Returns: e.g. "123.45"
+	// unitx: [out] e.g. "USD"
 	var  amountunit(in input0, out unitx);
 ND	var  amountunit(in input0);
 
@@ -267,23 +254,53 @@ ND	var  amountunit(in input0);
 	///// Terminal i/o utilities:
 	/////////////////////////////
 
-	// Output a message and optionally request a response
+	// If stdin is a terminal, display a message to stdout. Optionally pause processing and request a response from the user, otherwise set the response to "" and continue.
 	// options: R = Response requested. C upper case response.
-	// If no terminal is available then the response will be empty.
 	void note(in msg, in options = "") const;
 	void note(in msg, in options, io response) const;
 
+	// If stdin is a terminal, pause processing, list some given options to stdout and request the user to make a choice, otherwise set the response to "" and continue.
+	// Returns: The chosen option (value not number) or "" if the user cancelled.
 ND	var  decide(in question, in options = "") const;
+
+	// Same as decide() above but extended.
+	// defaultreply: A default option if the user presses Enter.
+	// reply: [out] The option number that the user chose or "" if they cancelled.
 	var  decide(in question, in options, out reply, const int defaultreply = 1) const;
 
+	// If stdin is a terminal, check if a key has been pressed and, if so, pause execution and ask the user to confirm if they want to escape/cancel or resume processing.
+	// Returns: True if a key has been pressed and the user confirms to escape/cancel. False if no key has been pressed or the user chooses to resume and not escape/cancel.
 ND	bool esctoexit() const;
 
-	// TERMINAL specific terminal cursor control
+	// Returns: A string required to accomplish a task on the terminal determined by the code.
+	// The string should be actually output to the terminal in order to accomplish the stated aim.
+	// The terminal protocol is xterminal.
+	// code:
+	// n   Position the cursor to column number n
+	// 0   Position the cursor to column number 0
+	// -1  Clear the screen and home the cursor
+	// -2  Position the cursor to the top left home (x,y = 0,0)
+	// -3  Clear from the cursor to the end of screen
+	// -4  Clear from cursor to end of line
+	// -40 Position the cursor at columnno 0 and clear to end of line
 ND	var  AT(const int code) const;
+
+	// Returns: A string required to position the cursor at a given terminal screen x and y position.
+	// The string should be actually output to the terminal in order to accomplish the stated aim.
+	// The terminal protocol is xterminal.
 ND	var  AT(const int x, const int y) const;
 
+	// Returns: If stdin is a terminal, an FM delimited string containing the x and y coordinates of the current terminal cursor.
+	// The FM delimited string returned can be later passed to setcursor() to reposition the cursor back to its original position or it can be parsed and used accordingly.
 ND	var  getcursor() const;
-	void setcursor(in cursor) const;
+
+	// If stdin is a terminal, position the cursor at x and y as per the given coordinates.
+	// cursor_coordinates: An FM delimited string containing the x and y coordinates of the terminal cursor as can be obtained by getcursor().
+	// `let cursor = getcursor(); // Save the current cursor position.
+	//  TRACE(cursor)             // Show the saved cursor position.
+	//  print(AT(0,0));           // Position the cursor at 0,0.
+	//  setcursor(cursor);        // Restore its position`
+	void setcursor(in cursor_coordinates) const;
 
 	//////////////////////
 	///// Array utilities:
@@ -305,6 +322,9 @@ ND	var  invertarray(in input, bool pad = false);
 	// DL Descending - Left Justfiied  - Alphabetic
 	// AR Ascending  - Right Justified - Numeric
 	// DR Descending - Right Justified - Numeric
+	// `var v1 = "f1^10]20]2]1^ww]xx]yy]zz^f3^f4"_var;  // fields 2 and 3 are parallel multivalues and currently unordered.
+    //  sortarray(v1, "2]3"_var, "AR"); // v1 -> "f1^1]2]10]20^zz]yy]ww]xx^f3^f4"_var`
+	//
 	void  sortarray(io array, in fns = "", in order = "");
 
 	//////////////////////////
@@ -316,18 +336,19 @@ ND	var  invertarray(in input, bool pad = false);
 	// Offset from UTC by SW seconds.
 ND	var  timedate2();
 
-	// Get local, server and utc date and time
-	void  getdatetime(out localdate, out localtime, out sysdate, out systime, out utcdate, out utctime);
+	// Returns: User, server and UTC date and time
+	// User date and time is determined by adding the environment variable SW.f(1)'s TZ offset (in seconds) to UTC date/time obtained from the operating system.
+	// "system" date and time is normally the same as UTC date/time and is determined by adding the environment variable SW.f(2)'s TZ offset (in seconds) to UTC date/time obtained from the operating system.
+	void  getdatetime(out user_date, out user_time, out system_date, out system_time, out UTC_date, out UTC_time);
 
-	// Get text of elapsed time since TIMESTAMP
-	// TIMESTAMP is initialised with ostimestamp() at program/thread startup.
+	// Get text of elapsed time since environment variable TIMESTAMP was initialised with ostimestamp() at program/thread startup.
+	// TIMESTAMP can be updated using ostimestamp() as and when desired.
 	// e.g. "< 1 ms"
 ND	var  elapsedtimetext() const;
 
-	// Get text of elapsed time since a given timestamp.
-ND	var  elapsedtimetext(in timestamp_difference) const;
-
 	// Get text of elapsed time between two timestamps
+	// `let v1 = elapsedtimetext(0, 0.55))  // "13 hours, 12 mins"
+	//  let v2 = elapsedtimetext(0, 0.001)) // "1 min, 26 secs"`
 ND	var  elapsedtimetext(in timestamp1, in timestamp2) const;
 
 	/////////////////////
@@ -352,14 +373,14 @@ ND	bool lockrecord(in filename, io file, in keyx) const;
 	// Returns: A readable date in text format. e.g. "31 DEC 2020"
 	// Alternatively one can use the ordinary date conversion patterns starting "D" e.g. "DE/" for international date with / like 31/12/2020.
 	// `let v1 = iconv("JAN 9 2020", "D");
-	//  assert(v1, "[DATE]")   == " 9/ 1/2020");  // Same as date conversion "D/Z"  assuming E from DATEFMT
-	//  assert(v1, "[DATE,4]"  == " 9/ 1/2020");  // 4 is the default unless 2 is set in DATEFMT so may not not be needed.
-	//  assert(v1, "[DATE,*4]" == "9/1/2020");    // Same as date conversion "D/ZZ" assuming E from DATEFMT
-	//  assert(v1, "[DATE,*]"  == "9/1/2020");    // * means the same as date conversion "ZZ" (trim leading zeros and spaces)`
+	//  assert(oconv(v1, "[DATE]"   ) == " 9/ 1/2020");  // Same as date conversion "D/Z"  assuming E from DATEFMT
+	//  assert(oconv(v1, "[DATE,4]" ) == " 9/ 1/2020");  // 4 is the default unless 2 is set in DATEFMT so may not not be needed.
+	//  assert(oconv(v1, "[DATE,*4]") == "9/1/2020");    // Same as date conversion "D/ZZ" assuming E from DATEFMT
+	//  assert(oconv(v1, "[DATE,*]" ) == "9/1/2020");    // * means the same as date conversion "ZZ" (trim leading zeros and spaces)`
 	var  exoprog_date(in type, in input0, in ndecs0, out output);
 
-	// Formatting for numbers with currency code/unit suffix.
-	// Normally used for oconv() but can be used in reverse for iconv.
+	// Formatting for numbers with optional currency code/unit suffix and is sensitive to the International or European setting in BASEFMT regarding use of commas or dots for thousands separators and decimal points.
+	// Primarily used for oconv() but can be used in reverse for iconv.
 	// var: A number with an optional currency code or unit suffix. e.g. "12345.67USD"
 	// Returns: A formatted number with thousands separated conventionally e.g. "12.345.67USD".
 	// iconv/oconv("[NUMBER]")      oconv leaves ndecimals untouched as in the input. iconv see below.

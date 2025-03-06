@@ -254,7 +254,7 @@ function main(in msg0, in subject0 = "", in username0 = "") {
 
 		let requeststarttime = SYSTEM.f(25);
 		if (requeststarttime) {
-			body(-1) = oconv("Duration:", l9) ^ elapsedtimetext(date().timestamp(requeststarttime), timestamp());
+			body(-1) = oconv("Duration:", l9) ^ elapsedtimetext(date().ostimestamp(requeststarttime), ostimestamp());
 		}
 
 		body.converter(FM ^ VM ^ SM ^ TM ^ ST ^ "|",

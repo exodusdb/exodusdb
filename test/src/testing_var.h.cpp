@@ -1700,21 +1700,21 @@ function main() {
 		let now2 = ostime();
 	}
 
-	printl("timestamp() const;");
+	printl("ostimestamp() const;");
 	{
-		let now1 = var().timestamp();
+		let now1 = var().ostimestamp();
 		// or
-		let now2 = timestamp();
+		let now2 = ostimestamp();
 	}
 
-	printl("timestamp(in ostime) const;");
+	printl("ostimestamp(in ostime) const;");
 	{
 		let idate = iconv("2025-01-01", "D"), itime = iconv("23:59:59", "MT");
-		let ts1 = idate.timestamp(itime);
+		let ts1 = idate.ostimestamp(itime);
 		assert(ts1 == 20821.99998842593);
 
 		// or
-		let ts2 = timestamp(idate, itime);
+		let ts2 = ostimestamp(idate, itime);
 	}
 
 	printl("ossleep(const int milliseconds) const;");

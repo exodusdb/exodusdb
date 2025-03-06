@@ -871,7 +871,7 @@ function main() {
 
 			} else {
 	//			comments.replacer("Returns:", "<em>Returns:</em>");
-				doc_body.replacer(R"__(^([a-zA-Z0-9_.]+):(\s+))__"_rex, R"__(<em>$1:</em>$2)__");
+				doc_body.replacer(R"__(^([a-zA-Z0-9_.]+):(\s*))__"_rex, R"__(<em>$1:</em>$2)__");
 			}
 
 			// Close prior table

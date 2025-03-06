@@ -9,10 +9,10 @@ function main(in cmd) {
 		logputl();
 		logput(cmd, ":");
 	}
-	let started = timestamp();
+	let started = ostimestamp();
 	select(cmd);
 	if (SYSTEM.f(33) and not supersilent) {
-		logputl(" done", elapsedtimetext(started, timestamp()));
+		logputl(" done", elapsedtimetext(started, ostimestamp()));
 	}
 	return 0;
 }

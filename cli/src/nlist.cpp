@@ -377,9 +377,9 @@ function main() {
 	}
 
 	if (LISTACTIVE) {
-		fromtimestamp = date().timestamp(SYSTEM.f(25));
+		fromtimestamp = date().ostimestamp(SYSTEM.f(25));
 	} else {
-		fromtimestamp = timestamp();
+		fromtimestamp = ostimestamp();
 	}
 
 	// Use <COL> for hiding non-totalled cols in det-supp (slow)
@@ -1887,7 +1887,7 @@ x2exit:
 			}
 
 			if (fromtimestamp) {
-				tx ^= ", " ^ elapsedtimetext(fromtimestamp, timestamp());
+				tx ^= ", " ^ elapsedtimetext(fromtimestamp, ostimestamp());
 			}
 			if (html) {
 				tx ^= "</p>";

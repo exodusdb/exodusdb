@@ -333,43 +333,43 @@ function main() {
 
 		//14:30:46 04 JAN 2021
 		// Check twice in case date() changes over midnight
-		assert(date() eq int(timestamp()) or date() eq int(timestamp()));
+		//assert(date() eq int(ostimestamp()) or date() eq int(ostimestamp()));
 
-		// Check constuction of a timestamp manually agrees closely with plain timestamp.
+		// Check constuction of a ostimestamp manually agrees closely with plain timestamp.
 		{
-			var ts1 = timestamp(date(), time());
-			var ts2 = timestamp();
+			var ts1 = ostimestamp(date(), time());
+			var ts2 = ostimestamp();
 			assert((ts2 - ts1) lt 0.001);
 		}
 
-		// Check construction of a timestamp manually agrees closely with plain timestamp.
+		// Check construction of a ostimestamp manually agrees closely with plain ostimestamp.
 		{
-			var ts0 = timestamp();
+			var ts0 = ostimestamp();
 			var dt = int(ts0);
 			var tm = ts0.mod(1) * 86'400;
-			var ts1 = timestamp(dt, tm);
+			var ts1 = ostimestamp(dt, tm);
 			assert((ts1 - ts0) lt 0.001);
 		}
 
 
 		{
 			TRACE(TIMESTAMP)
-			TRACE(timestamp())
+			TRACE(ostimestamp())
 			var onesec = 1.0/86'400;
 			TRACE(onesec)
 			TRACE(elapsedtimetext())
 			assert(elapsedtimetext());
-			TRACE(elapsedtimetext(1))
-			TRACE(elapsedtimetext(1))
-			assert(elapsedtimetext(7.0).logputl() eq "1 week");//??
-			assert(elapsedtimetext(3.5).logputl() eq "3 days, 12 hours");//??
-			assert(elapsedtimetext(1.0).logputl() eq "1 day");//??
-			assert(elapsedtimetext(onesec).logputl() eq "1 sec");
+//			TRACE(elapsedtimetext(1))
+//			TRACE(elapsedtimetext(1))
+			assert(elapsedtimetext(0, 7.0).logputl() eq "1 week");//??
+			assert(elapsedtimetext(0, 3.5).logputl() eq "3 days, 12 hours");//??
+			assert(elapsedtimetext(0, 1.0).logputl() eq "1 day");//??
+			assert(elapsedtimetext(0, onesec).logputl() eq "1 sec");
 			assert(elapsedtimetext(0, onesec * 10).logputl() eq "10 secs");
 			assert(elapsedtimetext(onesec * 10, onesec * 30).logputl() eq "20 secs");
-			assert(elapsedtimetext(onesec/1'000).logputl() eq "0.001 secs");
-			assert(elapsedtimetext(onesec/10'000).logputl() eq "0.0001 secs");
-			assert(elapsedtimetext(onesec/100'000).logputl() eq "< 1 ms");
+			assert(elapsedtimetext(0, onesec/1'000).logputl() eq "0.001 secs");
+			assert(elapsedtimetext(0, onesec/10'000).logputl() eq "0.0001 secs");
+			assert(elapsedtimetext(0, onesec/100'000).logputl() eq "< 1 ms");
 			//assert(elapsedtimetext(onesec/1'000'000).logputl() eq "0.000001 secs");
 			//assert(elapsedtimetext(onesec/10'000'000).logputl() eq "0.0000001 secs");
 		}

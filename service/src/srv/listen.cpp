@@ -617,7 +617,7 @@ nextsearch0:
 	tt = time().oconv("MTS") ^ " " ^ datasetcode ^ " " ^ THREADNO ^ " " ^ nrequests ^
 		 " Listening"
 		 " " ^
-		 elapsedtimetext(lastrequestdate.timestamp(lastrequesttime), timestamp());
+		 elapsedtimetext(lastrequestdate.ostimestamp(lastrequesttime), ostimestamp());
 	//var(tt).oswrite("process." ^ THREADNO);
 	if (not var(tt).oswrite("process." ^ THREADNO))
 		loglasterror();

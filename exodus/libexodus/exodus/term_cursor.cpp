@@ -1,8 +1,49 @@
+#include <iostream>
+#include <cstdio>
+#include <termios.h>
+#include <unistd.h>
+
 #if EXO_MODULE
 	import exoprog;
 #else
 #	include <exodus/exoprog.h>
 #endif
+
+void getCursorPos(int& x, int& y) {
+    // Disable terminal echoing to avoid cluttering output
+    struct termios oldt, newt;
+    tcgetattr(STDIN_FILENO, &oldt); // Get current terminal settings
+    newt = oldt;
+    newt.c_lflag &= ~(ICANON | ECHO); // Disable canonical mode and echo
+    tcsetattr(STDIN_FILENO, TCSANOW, &newt); // Apply new settings
+
+    // Send the ANSI escape sequence to query cursor position
+    std::cout << "\033[6n" << std::flush;
+
+    // Read the response from the terminal
+    char buf[32];
+    int i = 0;
+    while (i < sizeof(buf) - 1) {
+        if (read(STDIN_FILENO, &buf[i], 1) != 1) break;
+        if (buf[i] == 'R') break; // Stop at the 'R' in the response
+        i++;
+    }
+    buf[i] = '\0'; // Null-terminate the string
+
+    // Parse the response (e.g., "\033[12;34R" -> row 12, col 34)
+    int row, col;
+    if (sscanf(buf, "\033[%d;%dR", &row, &col) == 2) {
+        x = col - 1; // Convert to 0-based column
+        y = row - 1; // Convert to 0-based row
+    } else {
+        x = -1; // Error case
+        y = -1;
+    }
+
+    // Restore original terminal settings
+    tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
+}
+
 
 namespace exo {
 
@@ -15,87 +56,16 @@ var ExoProgram::getcursor() const {
 	//force out any previous cursor control characters
 	var().osflush();
 
-	// quit because hangs sometimes
-	return AT(0,0);
+	int x, y;
+    getCursorPos(x, y);
 
-//	// Output
-//	/////////
-//
-//	//save the current input config or quit (not terminal)
-//	struct termios save;
-//	if (tcgetattr(STDIN_FILENO, &save)) {
-//		perror("tcgetattr(save) error");
-//		return false;
-//	}
-//	std::clog << "got save" << std::endl;
-//
-//	//switch input into raw io
-//	struct termios raw;
-//	cfmakeraw(&raw);
-//	if (tcsetattr(STDIN_FILENO, TCSANOW, &raw) != 0) {
-//		perror("tcsetattr(raw) error");
-//		return false;
-//	}
-//
-//	//output magic request
-//	//char cmd[] = "echo -e '\033[6n'";
-//	char cmd[] = "\x1b[6n";
-//	auto err = ::write(1, cmd, sizeof(cmd));
-//
-//	//failure to write
-//	if (false && err) {
-//		std::cerr << "Error: " << err << " getcursor could not output" << std::endl;
-//		//restore the current input config
-//		tcsetattr(STDIN_FILENO, TCSANOW, &save);
-//
-//		//restore the current output config
-//		//tcsetattr(STDOUT_FILENO, TCSANOW,&save1);
-//
-//		return false;
-//	}
-//
-//	// Input
-//	////////
-//
-//	//input magic response
-//	char buf[16];
-//	err = ::read(STDIN_FILENO, buf, sizeof(buf));
-//
-//	//restore the current input config
-//	if (tcsetattr(STDIN_FILENO, TCSANOW, &save) != 0) {
-//		perror("tcsetattr(save) error");
-//		return false;
-//	}
-//
-//	//restore the current output config
-//	//tcsetattr(STDOUT_FILENO, TCSANOW,&save1);
-//
-//	//failure to read
-//	if (false && err) {
-//		std::cerr << "getcursor could not read response" << std::endl;
-//		return false;
-//	}
-//
-//	// Parse response
-//	/////////////////
-//
-//	//response could be ESC[54;10R for x=54, y=10
-//	var response(buf, sizeof(buf));
-//	var y = response.field(";", 1).cut(2);
-//	var x = response.field(";", 2).field("R");
-//
-//	//x.outputl("x=");
-//	//y.outputl("y=");
-//	//x.oconv("HEX").outputl("x=");
-//	//y.oconv("HEX").outputl("y=");
-//
-//	return AT(x, y);
+	return x ^ FM ^ y;
 
 }
 
 void ExoProgram::setcursor(in cursor) const {
 	//std::cout << cursor << std::flush;
-	cursor.output();
+	AT(cursor.f(1), cursor.f(2)).output();
 	cursor.osflush();
 	return;
 }

@@ -2417,18 +2417,18 @@ public:
 	// A floating point with approx. nanosecond resolution depending on hardware.
 	// e.g. Was 20821.99998842593 around 2025-01-01 23:59:59 UTC
 	//
-	// `let now1 = var().timestamp();
+	// `let now1 = var().ostimestamp();
 	//  // or
-	//  let now2 = timestamp();`
-	ND var  timestamp() const;
+	//  let now2 = ostimestamp();`
+	ND var  ostimestamp() const;
 
 	// Construct a timestamp from a date and time
 	//
 	// `let idate = iconv("2025-01-01", "D"), itime = iconv("23:59:59", "MT");
-	//  let ts1 = idate.timestamp(itime); // 20821.99998842593
+	//  let ts1 = idate.ostimestamp(itime); // 20821.99998842593
 	//  // or
-	//  let ts2 = timestamp(idate, itime);`
-	ND var  timestamp(in ostime) const;
+	//  let ts2 = ostimestamp(idate, itime);`
+	ND var  ostimestamp(in ostime) const;
 
 	// Sleep/pause/wait for a number of milliseconds
 	// Releases the processor if not needed for a period of time or a delay is required.

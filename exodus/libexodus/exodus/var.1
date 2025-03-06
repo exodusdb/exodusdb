@@ -4407,7 +4407,7 @@ let now2 = ostime();
 
 
 .SS
-var v1 = var().timestamp();
+var v1 = var().ostimestamp();
 .nf
  
 .fi
@@ -4420,15 +4420,15 @@ e.g. Was 20821.99998842593 around 2025-01-01 23:59:59 UTC
 \fBExample:\fR
 .RS
 .nf
-let now1 = var().timestamp();
+let now1 = var().ostimestamp();
 // or
-let now2 = timestamp();
+let now2 = ostimestamp();
 .fi
 .RE
 
 
 .SS
-var v1 = var().timestamp(ostime);
+var v1 = var().ostimestamp(ostime);
 .nf
  
 .fi
@@ -4438,9 +4438,9 @@ Construct a timestamp from a date and time
 .RS
 .nf
 let idate = iconv("2025-01-01", "D"), itime = iconv("23:59:59", "MT");
-let ts1 = idate.timestamp(itime); // 20821.99998842593
+let ts1 = idate.ostimestamp(itime); // 20821.99998842593
 // or
-let ts2 = timestamp(idate, itime);
+let ts2 = ostimestamp(idate, itime);
 .fi
 .RE
 

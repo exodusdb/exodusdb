@@ -1,7 +1,7 @@
 500 xxxxxxxx unused
 501 var  var::sort(SV delimiter)
 502 var  var::reverse(SV delimiter)
-503 var  var::timestamp(in ostime) const
+503 var  var::ostimestamp(in ostime) const
 504 bool var::connect(in conninfo
 505 bool var::attach(in filenames
 506 bool var::detach(in filenames

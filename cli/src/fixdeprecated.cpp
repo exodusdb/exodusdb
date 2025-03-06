@@ -292,6 +292,10 @@ function main() {
 				srcline.replacer(", 1);", ");");
 				srcline.replacer(", \"%\");", ");");
 			}
+
+			//timestamp( -> ostimestamp(
+			srcline.replacer(R"__(\btimestamp\()__"_rex, "ostimestamp\\(");
+
 		};
 
 		source_fixer(srcline);
