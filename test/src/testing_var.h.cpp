@@ -113,9 +113,7 @@ function main() {
 	printl("dump() const;");
 	{
 		var v1 = str("x", 32);
-		v1.dump().outputl(); ;
-		assert(v1 == e.g. var:0x7ffea7462cd0 typ:1 str:0x584d9e9f6e70 "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
-
+		v1.dump().outputl(); /// e.g. var:0x7ffea7462cd0 typ:1 str:0x584d9e9f6e70 "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 		// or
 		outputl(dump(v1));
 	}
@@ -539,7 +537,7 @@ function main() {
 		let v2 = hash("abc");
 	}
 
-	printl("ucase() const&;");
+	printl("ucase() const&");
 	{
 		let v1 = "Γιάννης"_var.ucase();
 		assert(v1 == "ΓΙΆΝΝΗΣ");
@@ -548,7 +546,7 @@ function main() {
 		let v2 = ucase("Γιάννης");
 	}
 
-	printl("lcase() const&;");
+	printl("lcase() const&");
 	{
 		let v1 = "ΓΙΆΝΝΗΣ"_var.lcase();
 		assert(v1 == "γιάννης");
@@ -557,7 +555,7 @@ function main() {
 		let v2 = lcase("ΓΙΆΝΝΗΣ");
 	}
 
-	printl("tcase() const&;");
+	printl("tcase() const&");
 	{
 		let v1 = "γιάννης παππάς"_var.tcase();
 		assert(v1 == "Γιάννης Παππάς");
@@ -566,7 +564,7 @@ function main() {
 		let v2 = tcase("γιάννης παππάς");
 	}
 
-	printl("fcase() const&;");
+	printl("fcase() const&");
 	{
 		let v1 = "Grüßen"_var.fcase();
 		assert(v1 == "grüssen");
@@ -575,7 +573,7 @@ function main() {
 		let v2 = tcase("Grüßen");
 	}
 
-	printl("normalize() const&;");
+	printl("normalize() const&");
 	{
 		let v1 = "cafe\u0301"_var.normalize();
 		assert(v1 == "caf\u00E9");
@@ -584,7 +582,7 @@ function main() {
 		let v2 = normalize("cafe\u0301");
 	}
 
-	printl("invert() const&;");
+	printl("invert() const&");
 	{
 		let v1 = "abc"_var.invert();
 		assert(v1 == "\xC2" "\x9E" "\xC2" "\x9D" "\xC2" "\x9C");
@@ -593,7 +591,7 @@ function main() {
 		let v2 = invert("abc");
 	}
 
-	printl("lower() const&;");
+	printl("lower() const&");
 	{
 		let v1 = "a1^b2^c3"_var.lower();
 		assert(v1 == "a1]b2]c3"_var);
@@ -602,7 +600,7 @@ function main() {
 		let v2 = lower("a1^b2^c3"_var);
 	}
 
-	printl("raise() const&;");
+	printl("raise() const&");
 	{
 		let v1 = "a1]b2]c3"_var.raise();
 		assert(v1 == "a1^b2^c3"_var);
@@ -611,7 +609,7 @@ function main() {
 		let v2 = "a1]b2]c3"_var;
 	}
 
-	printl("crop() const&;");
+	printl("crop() const&");
 	{
 		let v1 = "a1^b2]]^c3^^"_var.crop();
 		assert(v1 == "a1^b2^c3"_var);
@@ -728,7 +726,7 @@ function main() {
 		let v2 = cut("abcd", 2);
 	}
 
-	printl("paste(const int pos1, const int length, SV insertstr) const&;");
+	printl("paste(const int pos1, const int length, SV replacestr) const&");
 	{
 		let v1 = "abcd"_var.paste(2, 2, "XYZ");
 		assert(v1 == "aXYZd");
@@ -737,7 +735,7 @@ function main() {
 		let v2 = paste("abcd", 2, 2, "XYZ");
 	}
 
-	printl("paste(const int pos1, SV insertstr) const&;");
+	printl("paste(const int pos1, SV insertstr) const&");
 	{
 		let v1 = "abcd"_var.paste(2, "XYZ");
 		assert(v1 == "aXYZbcd");
@@ -764,7 +762,7 @@ function main() {
 		let v2 = append("abc", " is ", 10, " ok", '.');
 	}
 
-	printl("pop() const&;");
+	printl("pop() const&");
 	{
 		let v1 = "abc"_var.pop();
 		assert(v1 == "ab");
@@ -791,7 +789,7 @@ function main() {
 		let v2 = field("aa*bb*cc", "*", -1);
 	}
 
-	printl("fieldstore(SV separator, const int fieldno, const int nfields, in replacement) const&;");
+	printl("fieldstore(SV separator, const int fieldno, const int nfields, in replacement) const&");
 	{
 		let v1 = "aa,bb,cc,dd,ee"_var.fieldstore(",", 2, 3, "11,22");
 		assert(v1 == "aa,11,22,,ee");
@@ -800,28 +798,28 @@ function main() {
 		let v2 = fieldstore("aa,bb,cc,dd,ee", ",", 2, 3, "11,22");
 	}
 
-	printl("fieldstore(SV separator, const int fieldno, const int nfields, in replacement) const&;");
+	printl("fieldstore(SV separator, const int fieldno, const int nfields, in replacement) const&");
 	{
 		let v1 = "aa,bb,cc,dd,ee"_var.fieldstore(",", 2, 0, "11,22");
 		assert(v1 == "aa,11,22,bb,cc,dd,ee");
 
 	}
 
-	printl("fieldstore(SV separator, const int fieldno, const int nfields, in replacement) const&;");
+	printl("fieldstore(SV separator, const int fieldno, const int nfields, in replacement) const&");
 	{
 		let v1 = "aa,bb,cc,dd,ee"_var.fieldstore(",", 2, -2, "11");
 		assert(v1 == "aa,11,dd,ee");
 
 	}
 
-	printl("fieldstore(SV separator, const int fieldno, const int nfields, in replacement) const&;");
+	printl("fieldstore(SV separator, const int fieldno, const int nfields, in replacement) const&");
 	{
 		let v1 = "aa,bb,cc"_var.fieldstore(",", 6, 2, "11");
 		assert(v1 == "aa,bb,cc,,,11,");
 
 	}
 
-	printl("substr(const int pos1, const int length) const&;");
+	printl("substr(const int pos1, const int length) const&");
 	{
 		let v1 = "abcd"_var.substr(2, 2);
 		assert(v1 == "bc");
@@ -830,7 +828,7 @@ function main() {
 		let v2 = substr("abcd", 2, 2);
 	}
 
-	printl("substr(const int pos1, const int length) const&;");
+	printl("substr(const int pos1, const int length) const&");
 	{
 		let v1 = "abcd"_var.substr(-3, 2);
 		assert(v1 == "bc");
@@ -839,7 +837,7 @@ function main() {
 		let v2 = substr("abcd", -3, 2);
 	}
 
-	printl("substr(const int pos1, const int length) const&;");
+	printl("substr(const int pos1, const int length) const&");
 	{
 		let v1 = "abcd"_var.substr(3, -2);
 		assert(v1 == "cb");
@@ -850,7 +848,7 @@ function main() {
 
 	}
 
-	printl("substr(const int pos1) const&;");
+	printl("substr(const int pos1) const&");
 	{
 		let v1 = "abcd"_var.substr(2);
 		assert(v1 == "bcd");
@@ -889,7 +887,7 @@ function main() {
  // field_mark_no 0 means that none of the standard field marks were found.
 	}
 
-	printl("convert(SV from_chars, SV to_chars) const&;");
+	printl("convert(SV fromchars, SV tochars) const&");
 	{
 		let v1 = "abcde"_var.convert("aZd", "XY");
 		assert(v1 == "Xbce");
@@ -898,7 +896,7 @@ function main() {
 		let v2 = convert("abcde", "aZd", "XY");
 	}
 
-	printl("textconvert(SV from_characters, SV to_characters) const&;");
+	printl("textconvert(SV fromchars, SV tochars) const&");
 	{
 		let v1 = "a🤡b😀c🌍d"_var.textconvert("🤡😀", "👋");
 		assert(v1 == "a👋bc🌍d");
@@ -968,7 +966,7 @@ function main() {
 		let v2 = shuffle("20^10^2^1^1.1"_var);
 	}
 
-	printl("parse(char sepchar = ' ') const&;");
+	printl("parse(char sepchar = ' ') const&");
 	{
 		let v1 = "abc,\"def,\"123\" fgh\",12.34"_var.parse(',');
 		assert(v1 == "abc^\"def,\"123\" fgh\"^12.34"_var);
@@ -2355,6 +2353,21 @@ function main() {
 
 		// or
 		assert( oconv(v1, "T#10") == "Have a    |nice day  "_var );
+	}
+
+	printl("oconv_MR(const char* conversion);");
+	{
+		let v1 = "123/abC.";
+		assert(v1.oconv("MRL") == "123/abc.");
+ // lcase
+		assert(v1.oconv("MRU") == "123/ABC."); // ucase
+		assert(v1.oconv("MRT") == "123/Abc."); // tcase
+		assert(v1.oconv("MRN") == "123");      // Return only digits
+		assert(v1.oconv("MRA") == "abC");      // Return only alphabetic
+		assert(v1.oconv("MRB") == "123abC");   // Return only alphanumeric
+		assert(v1.oconv("MR/N") == "/abC.");   // Remove digits
+		assert(v1.oconv("MR/A") == "123/.");   // Remove alphabetic
+		assert(v1.oconv("MR/B") == "/.");      // Remove alphanumeric
 	}
 
 	printl("oconv_HEX(const int ioratio) const;");

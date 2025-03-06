@@ -1629,14 +1629,18 @@ var ExoProgram::oconv(in input0, in conversion) {
 			if (functionname == "number") {
 				gosub exoprog_number("OCONV", result, mode, outx);
 			}
+
 			//custom function "[DATE]" will use the standard exodus var oconv
 			else if (functionname == "date") {
 				gosub exoprog_date("OCONV", result, mode, outx);
 			}
-			//custom function "[CAPITALISE]" will use the standard exodus var oconv
+
+			// Custom function "[CAPITALISE]" will use the standard exodus var oconv
+			// DEPRECATE and change to use oconv "MRT" available since 2025-03-05
 			else if (functionname == "capitalise") {
 //				outx = capitalise(result, mode, "");
 				outx = result.tcase();
+
 			} else {
 
 				// set the function name
@@ -1676,6 +1680,12 @@ var ExoProgram::oconv(in input0, in conversion) {
 // iconv
 var ExoProgram::iconv(in input, in conversion) {
 
+// TODO
+//	Value	Description
+//	0	Successful conversion.
+//	1	The data in string cannot be converted using conversion.
+//	2	conversion is not a recognized conversion specification.
+
 	// call user conversion routine
 	// almost identical code in var::oconv and var::iconv
 	// ENSURE synchronised if you change it
@@ -1712,7 +1722,7 @@ var ExoProgram::iconv(in input, in conversion) {
             else if (functionname == "date") {
                 gosub exoprog_date("ICONV", result, mode, outx);
 			}
-			//custom function "[CAPITALISE]" actually has a built in function
+			//custom function "[CAPITALISE]" DEPRECATE and replace with 
             else if (functionname == "capitalise") {
                 //gosub capitalise(result, mode, outx);
 				//result = result;
@@ -1964,19 +1974,22 @@ zero:
 	//c xxx in,in,in,out
 
 var ExoProgram::exoprog_date(in type, in in0, in mode0, out outx) {
-//var ExoProgram::number(in type, in input0, in ndecs0, io outx) {
-	//c sys in,in,in,out,in
 
-	//should really be sensitive to timezone in @SW
+	// Should really be sensitive to timezone in @SW but that requires time
+	// "time" is basically users time without a timezone
+	// "date" is basically users date without a timezone
+	// Use DATETIME for TZ sensitive conversion
 
 	var inx = in0;
 	var mode = mode0;
 
+	// NINO
 	if (inx eq "") {
 		outx = "";
 		return 0;
 	}
 
+	// * means remove spaces
 	var nospaces = mode.contains("*");
 	if (nospaces) {
 		mode.converter("*", "");
@@ -1984,6 +1997,7 @@ var ExoProgram::exoprog_date(in type, in in0, in mode0, out outx) {
 
 	if (mode) {
 
+		// 4 means force 4 digit year regardless of DATEFMT
 		if (mode eq "4") {
 			mode = DATEFMT;
 			mode.paster(2, 1, "4");
@@ -1991,9 +2005,11 @@ var ExoProgram::exoprog_date(in type, in in0, in mode0, out outx) {
 
 	} else {
 
+		// Use DATEFMT
 		if (DATEFMT) {
 			mode = DATEFMT;
 		} else {
+			// Default to 2 digit year
 			mode = "D2/E";
 		}
 
@@ -2002,6 +2018,7 @@ var ExoProgram::exoprog_date(in type, in in0, in mode0, out outx) {
 	//status=0
 	if (type eq "OCONV") {
 
+		// 1. if 3 or more digits
 		//dont oconv 1 or 2 digits as they are probably day of month being converted
 		// to proper dates
 		//IF len(inx) gt 2 and inx MATCHES '0N' OR inx MATCHES '"-"0N' OR inx MATCHES '0N.0N' THEN
@@ -2009,6 +2026,8 @@ var ExoProgram::exoprog_date(in type, in in0, in mode0, out outx) {
 			goto ok;
 		}
 
+		// 2. "-" or "-digits"
+		// 3. "digits.digits" or ".digits" or "digits."
 		if (inx.match("^-\\d*$") or inx.match("^\\d*\\.\\d*$")) {
 ok:
 			//language specific (date format could be a pattern in lang?)
@@ -2027,21 +2046,29 @@ ok:
 
 			} else {
 
+				// Do a basic date conversion
+				// Assuming 00/00/0000?
 				outx = oconv(inx, mode);
 
+				// leading 0 becomes a space
 				if (outx.starts("0")) {
 					outx.paster(1, 1, " ");
 				}
 
+				// 4th char 0 becomes a space
 				if (outx.at(4) eq "0") {
 					outx.paster(4, 1, " ");
 				}
 
+				// if ...XXX is 3 alphabetic chars
+				// .. XXX .... -> ..XXX....
 				if (outx.b(4, 3).match("^[A-Za-z]{3}$")) {
+					// remove 3rd and 7th chars
 					outx.paster(7, 1, "");
 					outx.paster(3, 1, "");
 				}
 
+				// Option to remove spaces
 				if (nospaces) {
 					outx.converter(" ", "");
 				}
@@ -2049,15 +2076,18 @@ ok:
 			}
 
 		} else {
+			// Cant convert if not three or more digits or digits with a decimal point somewhere
 			outx = inx;
 		}
 
 	} else if (type eq "ICONV") {
 
+		// 0-31 is converted to dd ^ MMM YYYY
 		if (inx.match("^\\d*$") and inx le 31) {
 			inx ^= var().date().oconv("D").b(4, 9);
 		}
 
+		// Ordinary D conversion which may or may not fail
 		outx = iconv(inx, mode);
 
 	}

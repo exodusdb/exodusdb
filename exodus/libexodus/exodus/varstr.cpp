@@ -153,12 +153,12 @@ var  var::field(SV delimiter, const int fieldnx, const int nfieldsx) const {
 //	return var(*this).fieldstorer(separator, fieldnx, nfieldsx, replacementx);
 //}
 
-// Constant
-ND var  var::fieldstore(SV separator, const int fieldno, const int nfields, in replacement) const& {
-	var nrvo = this->clone();
-	nrvo.fieldstorer(separator, fieldno, nfields, replacement);
-	return nrvo;
-}
+//// Constant
+//ND var  var::fieldstore(SV separator, const int fieldno, const int nfields, in replacement) const& {
+//	var nrvo = this->clone();
+//	nrvo.fieldstorer(separator, fieldno, nfields, replacement);
+//	return nrvo;
+//}
 
 // Mutator
 IO   var::fieldstorer(SV separator, const int fieldnx, const int nfieldsx, in replacementx) REF {
@@ -1485,18 +1485,18 @@ IO   var::cutter(const int length) REF {
 // SUBSTR
 /////////
 
-//ND var substr(const int pos1, const int length) const&; // byte pos1, length
-ND var  var::substr(const int pos1, const int length) const& {
-	var nrvo = this->clone();
-	nrvo.substrer(pos1, length);
-	return nrvo;
-}
+////ND var substr(const int pos1, const int length) const&; // byte pos1, length
+//ND var  var::substr(const int pos1, const int length) const& {
+//	var nrvo = this->clone();
+//	nrvo.substrer(pos1, length);
+//	return nrvo;
+//}
 //ND var substr(const int pos1) const&;                   // byte pos1
-ND var  var::substr(const int pos1) const& {
-	var nrvo = this->clone();
-	nrvo.substrer(pos1);
-	return nrvo;
-}
+//ND var  var::substr(const int pos1) const& {
+//	var nrvo = this->clone();
+//	nrvo.substrer(pos1);
+//	return nrvo;
+//}
 
 //[x,y]
 // var.s(start,length) substring
@@ -1871,91 +1871,91 @@ var  var::substr2(io pos1, out delimiterno) const {
 	//return returnable;
 }
 
-#if 0
-
-//class var_brackets_proxy
-class PUBLIC var_brackets_proxy {
-   public:
-	var& var_;
-	int index_;
-
-	// Constructor from a var and an index
-	var_brackets_proxy(io var1, int index) : var_(var1), index_(index) {
-	}
-
-	// Implicit conversion to var
-	operator var() const {
-		return var_.at(index_);
-	}
-
-//	// Implicit conversion to char
-//	operator char() const {
-//		return var_.at(index_).toChar();
+//#if 0
+//
+////class var_brackets_proxy
+//class PUBLIC var_brackets_proxy {
+//   public:
+//	var& var_;
+//	int index_;
+//
+//	// Constructor from a var and an index
+//	var_brackets_proxy(io var1, int index) : var_(var1), index_(index) {
 //	}
-
-	// Operator assign
-	void operator=(const char char1) {
-		var_.paster(index_, 1, char1);
-	}
-
-	// Operator ==
-	template<class T>
-	bool operator==(T compare) {
-		return var_.at(index_) == compare;
-	}
-
-	// Operator !=
-	template<class T>
-	bool operator!=(T compare) {
-		return var_.at(index_) != compare;
-	}
-
-	// Operator ^
-	template<class T>
-	var operator^(T appendage) {
-		return var_.at(index_) ^ appendage;
-	}
-
-}
-
-// could be used if var_brackets_proxy holds a string perhaps for performance
-
-//implicit conversion to var
-var_brackets_proxy::operator var() const {
-	//before first character?
-	if (index_ < 1) {
-		index_ += str_.size();
-		//overly negative - return ""
-		if (index_ < 1)
-			index_ = 1;
-	}
-	//off end - return ""
-	else if (static_cast<unsigned int>(index_) > str_.size())
-		return "";
-
-	//within range
-	return str_[index_ - 1];
-}
-
-//operator assign a char
-void var_brackets_proxy::operator=(char char1) {
-	//before first character?
-	if (index_ < 1) {
-		index_ += str_.size();
-		//overly negative - return ""
-		if (index_ < 1)
-			index_ = 1;
-	}
-	//off end - return ""
-	else if (static_cast<unsigned int>(index_) > str_.size()) {
-		str_.push_back(char1);
-	} else {
-		str_[index_ - 1] = char1;
-	}
-
-	return;
-}
-#endif
+//
+//	// Implicit conversion to var
+//	operator var() const {
+//		return var_.at(index_);
+//	}
+//
+////	// Implicit conversion to char
+////	operator char() const {
+////		return var_.at(index_).toChar();
+////	}
+//
+//	// Operator assign
+//	void operator=(const char char1) {
+//		var_.paster(index_, 1, char1);
+//	}
+//
+//	// Operator ==
+//	template<class T>
+//	bool operator==(T compare) {
+//		return var_.at(index_) == compare;
+//	}
+//
+//	// Operator !=
+//	template<class T>
+//	bool operator!=(T compare) {
+//		return var_.at(index_) != compare;
+//	}
+//
+//	// Operator ^
+//	template<class T>
+//	var operator^(T appendage) {
+//		return var_.at(index_) ^ appendage;
+//	}
+//
+//}
+//
+//// could be used if var_brackets_proxy holds a string perhaps for performance
+//
+////implicit conversion to var
+//var_brackets_proxy::operator var() const {
+//	//before first character?
+//	if (index_ < 1) {
+//		index_ += str_.size();
+//		//overly negative - return ""
+//		if (index_ < 1)
+//			index_ = 1;
+//	}
+//	//off end - return ""
+//	else if (static_cast<unsigned int>(index_) > str_.size())
+//		return "";
+//
+//	//within range
+//	return str_[index_ - 1];
+//}
+//
+////operator assign a char
+//void var_brackets_proxy::operator=(char char1) {
+//	//before first character?
+//	if (index_ < 1) {
+//		index_ += str_.size();
+//		//overly negative - return ""
+//		if (index_ < 1)
+//			index_ = 1;
+//	}
+//	//off end - return ""
+//	else if (static_cast<unsigned int>(index_) > str_.size()) {
+//		str_.push_back(char1);
+//	} else {
+//		str_[index_ - 1] = char1;
+//	}
+//
+//	return;
+//}
+//#endif
 
 //////
 // SUM

@@ -780,6 +780,7 @@ function main() {
 
 	assert(oconv("ABc.123", "MRL") eq "abc.123");
 	assert(oconv("ABc.123", "MRU") eq "ABC.123");
+	assert(oconv("ABc.123", "MRT") eq "Abc.123");
 
 	//test unicode regular expressions
 
@@ -836,6 +837,7 @@ function main() {
 #endif
 	assert(oconv("abc .DEF", "MRU") eq "ABC .DEF");
 	assert(oconv("abc .DEF", "MRL") eq "abc .def");
+	assert(oconv("abc .DEF", "MRT") eq "Abc .Def");
 
 	//uppercase/lowecase conversion only works for ascii at the moment
 	//case conversion is perhaps generally done in order to do case insensitive
@@ -855,6 +857,9 @@ function main() {
 	assert(oconv(uppercase, "MRU") eq uppercase);
 	assert(oconv(lowercase, "MRL") eq lowercase);
 
+	assert(oconv(uppercase, "MRT").outputl() eq uppercase);
+	assert(oconv(lowercase, "MRT").outputl() ne lowercase);
+
 	TRACE(letters)
 #ifdef EXO_REGEX_BOOST
 		oconv(letters, "MRA").outputl("Expected:" ^ letters ^ " Actual:");
@@ -866,6 +871,22 @@ function main() {
 		assert(oconv(letters, "MR/A") eq "");
 		assert(oconv(letters, "MR/N") eq letters);
 		assert(oconv(letters, "MR/B") eq "");
+
+		var mixed = "AaBb123...XXyyZZ";
+		assert(oconv(mixed, "MRA")  eq "AaBbXXyyZZ");
+		assert(oconv(mixed, "MRN")  eq "123");
+		assert(oconv(mixed, "MRB")  eq "AaBb123XXyyZZ");
+		assert(oconv(mixed, "MR/A") eq "123...");
+		assert(oconv(mixed, "MR/N") eq "AaBb...XXyyZZ");
+		assert(oconv(mixed, "MR/B") eq "...");
+
+		// Check iconv MR does nothing
+		assert(iconv(mixed, "MRA")  eq mixed);
+		assert(iconv(mixed, "MRN")  eq mixed);
+		assert(iconv(mixed, "MRB")  eq mixed);
+		assert(iconv(mixed, "MR/A") eq mixed);
+		assert(iconv(mixed, "MR/N") eq mixed);
+		assert(iconv(mixed, "MR/B") eq mixed);
 #endif
 
 	//lambda function

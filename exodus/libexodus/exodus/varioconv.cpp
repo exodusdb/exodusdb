@@ -135,12 +135,19 @@ var  var::iconv(const char* conversion) const {
 							break;
 						}
 
-						// "MR" - replace iconv is same as oconv!
+						// "MR" on iconv cannot logically reverse oconv "MR" so we do nothing
 						case 'R': {
-							//result ^= part.oconv_MR(pconversion);
-							result ^= part.oconv_MR(conversion);
+							result ^= part;
 							break;
 						}
+
+//						// "MR" - replace iconv is same as oconv!
+//						// Calling OCONV on ICONV is rather strange
+//						case 'R': {
+//							//result ^= part.oconv_MR(pconversion);
+//							result ^= part.oconv_MR(conversion);
+//							break;
+//						}
 
 						// "MX" number to hex (not string to hex)
 						case 'X': UNLIKELY {
@@ -1100,7 +1107,8 @@ var  var::oconv(const char* conversion_in) const {
 
 							} else {
 								// Various character replacements
-								part = part.oconv_MR(conversion).var_str;
+								pconversion++;
+								part = part.oconv_MR(pconversion).var_str;
 							}
 						}
 

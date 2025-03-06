@@ -226,7 +226,7 @@ public:
     // 0x16 osfile: str, int and dbl have special meaning.
 	//
 	// `var v1 = str("x", 32);
-	//  v1.dump().outputl(); // e.g. var:0x7ffea7462cd0 typ:1 str:0x584d9e9f6e70 "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+	//  v1.dump().outputl(); /// e.g. var:0x7ffea7462cd0 typ:1 str:0x584d9e9f6e70 "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 	//  // or
 	//  outputl(dump(v1));`
 	ND var dump() const;
@@ -783,14 +783,14 @@ public:
 	// `let v1 = "Γιάννης"_var.ucase(); // "ΓΙΆΝΝΗΣ"
 	//  // or
 	//  let v2 = ucase("Γιάννης");`
-	ND var  ucase() const&;
+	ND var  ucase() const& {var nrvo = this->clone(); nrvo.ucaser(); return nrvo;}
 
 	// Convert to lower case
 	//
 	// `let v1 = "ΓΙΆΝΝΗΣ"_var.lcase(); // "γιάννης"
 	//  // or
 	//  let v2 = lcase("ΓΙΆΝΝΗΣ");`
-	ND var  lcase() const&;
+	ND var  lcase() const& {var nrvo = this->clone(); nrvo.lcaser(); return nrvo;}
 
 	// Convert to title case.
 	// Returns: Original source string with the first letter of each word is capitalised.
@@ -798,7 +798,7 @@ public:
 	// `let v1 = "γιάννης παππάς"_var.tcase(); // "Γιάννης Παππάς"
 	//  // or
 	//  let v2 = tcase("γιάννης παππάς");`
-	ND var  tcase() const&;
+	ND var  tcase() const& {var nrvo = this->clone(); nrvo.tcaser(); return nrvo;}
 
 	// Convert to folded case.
 	// Returns the source string standardised in a way to enable consistent indexing and searching,
@@ -810,7 +810,7 @@ public:
 	// `let v1 = "Grüßen"_var.fcase(); // "grüssen"
 	//  // or
 	//  let v2 = tcase("Grüßen");`
-	ND var  fcase() const&;
+	ND var  fcase() const& {var nrvo = this->clone(); nrvo.fcaser(); return nrvo;}
 
 	// Replace Unicode character sequences with their standardised NFC form.
 	// Unicode normalization is the process of converting Unicode strings to a standard form, making them binary comparable and suitable for text processing and comparison. It is an important part of Unicode text processing.
@@ -820,7 +820,7 @@ public:
 	// `let v1 = "cafe\u0301"_var.normalize(); // "caf\u00E9" // "café"
 	//  // or
 	//  let v2 = normalize("cafe\u0301");`
-	ND var  normalize() const&;
+	ND var  normalize() const& {var nrvo = this->clone(); nrvo.normalizer(); return nrvo;}
 
 	// Simple reversible disguising of string text.
 	// It works by treating the string as UTF8 encoded Unicode code points and inverting the first 8 bits of their Unicode Code Points.
@@ -833,7 +833,7 @@ public:
 	// `let v1 = "abc"_var.invert(); // "\xC2" "\x9E" "\xC2" "\x9D" "\xC2" "\x9C"
 	//  // or
 	//  let v2 = invert("abc");`
-	ND var  invert() const&;
+	ND var  invert() const& {var nrvo = this->clone(); nrvo.inverter(); return nrvo;}
 
 	// Reduce all types of field mark chars by one level.
 	// Convert all FM to VM, VM to SM etc.
@@ -844,7 +844,7 @@ public:
 	// `let v1 = "a1^b2^c3"_var.lower(); // "a1]b2]c3"_var
 	//  // or
 	//  let v2 = lower("a1^b2^c3"_var);`
-	ND var  lower() const&;
+	ND var  lower() const& {var nrvo = this->clone(); nrvo.lowerer(); return nrvo;}
 
 	// Increase all types of field mark chars by one level.
 	// Convert all VM to FM, SM to VM etc.
@@ -855,14 +855,14 @@ public:
 	// `let v1 = "a1]b2]c3"_var.raise(); // "a1^b2^c3"_var
 	//  // or
 	//  let v2 = "a1]b2]c3"_var;`
-	ND var  raise() const&;
+	ND var  raise() const& {var nrvo = this->clone(); nrvo.raiser(); return nrvo;}
 
 	// Remove any redundant FM, VM etc. chars (Trailing FM; VM before FM etc.)
 	//
 	// `let v1 = "a1^b2]]^c3^^"_var.crop(); // "a1^b2^c3"_var
 	//  // or
 	//  let v2 = crop("a1^b2]]^c3^^"_var);`
-	ND var  crop() const&;
+	ND var  crop() const& {var nrvo = this->clone(); nrvo.cropper(); return nrvo;}
 
 	// Wrap in double quotes.
 	//
@@ -971,7 +971,7 @@ public:
 	// `let v1 = "abcd"_var.paste(2, 2, "XYZ"); // "aXYZd"
 	//  // or
 	//  let v2 = paste("abcd", 2, 2, "XYZ");`
-	ND var  paste(const int pos1, const int length, SV insertstr) const&;
+	ND var  paste(const int pos1, const int length, SV replacestr) const& {var nrvo = this->clone(); nrvo.paster(pos1, length, replacestr); return nrvo;}
 
 	// Insert text at char position without overwriting any following chars
 	// Equivalent to var[pos1, 0] = substr in Pick OS
@@ -979,7 +979,7 @@ public:
 	// `let v1 = "abcd"_var.paste(2, "XYZ"); // "aXYZbcd"
 	//  // or
 	//  let v2 = paste("abcd", 2, "XYZ");`
-	ND var  paste(const int pos1, SV insertstr) const&;
+	ND var  paste(const int pos1, SV insertstr) const& {var nrvo = this->clone(); nrvo.paster(pos1, insertstr); return nrvo;}
 
 	// Insert text at the beginning
 	// Equivalent to var[0, 0] = substr in Pick OS
@@ -1007,7 +1007,7 @@ public:
 	// `let v1 = "abc"_var.pop(); // "ab"
 	//  // or
 	//  let v2 = pop("abc");`
-	ND var  pop() const&;
+	ND var  pop() const& {var nrvo = this->clone(); nrvo.popper(); return nrvo;}
 
 	// Copies one or more consecutive fields from a string given a delimiter
 	// delimiter: A Unicode character.
@@ -1060,7 +1060,7 @@ public:
 	//
 	// `let v1 = "aa,bb,cc"_var.fieldstore(",", 6, 2, "11"); // "aa,bb,cc,,,11,"`
 	//
-	ND var  fieldstore(SV separator, const int fieldno, const int nfields, in replacement) const&;
+	ND var  fieldstore(SV separator, const int fieldno, const int nfields, in replacement) const& {var nrvo = this->clone(); nrvo.fieldstorer(separator, fieldno, nfields, replacement); return nrvo;}
 
 	// substr version 1.
 	// Copies a substr of length chars from a given a starting char position.
@@ -1085,7 +1085,7 @@ public:
 	// `let v1 = "abcd"_var.substr(3, -2); // "cb"
 	//  // or
 	//  let v2 = substr("abcd", 3, -2); // "cb"`
-	ND var  substr(const int pos1, const int length) const&;
+	ND var  substr(const int pos1, const int length) const& {var nrvo = this->clone(); nrvo.substrer(pos1, length); return nrvo;}
 
 	// Abbreviated alias of substr version 1.
 	ND var  b(const int pos1, const int length) const& {return this->substr(pos1, length);}
@@ -1100,7 +1100,7 @@ public:
 	// `let v1 = "abcd"_var.substr(2); // "bcd"
 	//  // or
 	//  let v2 = substr("abcd", 2);`
-	ND var  substr(const int pos1) const&;
+	ND var  substr(const int pos1) const& {var nrvo = this->clone(); nrvo.substrer(pos1); return nrvo;}
 
 	// Shorthand alias of substr version 2.
 	ND var  b(const int pos1) const& {return this->substr(pos1);}
@@ -1164,14 +1164,14 @@ public:
 	// `let v1 = "abcde"_var.convert("aZd", "XY"); // "Xbce" // a is replaced and d is removed
 	//  // or
 	//  let v2 = convert("abcde", "aZd", "XY");`
-	ND var  convert(SV from_chars, SV to_chars) const&;
+	ND var  convert(SV fromchars, SV tochars) const& {var nrvo = this->clone(); nrvo.converter(fromchars,tochars); return nrvo;}
 
 	// Ditto for Unicode code points.
 	//
 	// `let v1 = "a🤡b😀c🌍d"_var.textconvert("🤡😀", "👋"); // "a👋bc🌍d"
 	//  // or
 	//  let v2 = textconvert("a🤡b😀c🌍d", "🤡😀", "👋");`
-	ND var  textconvert(SV from_characters, SV to_characters) const&;
+	ND var  textconvert(SV fromchars, SV tochars) const& {var nrvo = this->clone(); nrvo.textconverter(fromchars,tochars); return nrvo;}
 
 	// Replace all occurrences of one substr with another.
 	// Case sensitive.
@@ -1228,10 +1228,11 @@ public:
 	// `let v1 = "abc,\"def,\"123\" fgh\",12.34"_var.parse(','); // "abc^\"def,\"123\" fgh\"^12.34"_var
 	//  // or
 	//  let v2 = parse("abc,\"def,\"123\" fgh\",12.34", ',');`
-	ND var  parse(char sepchar = ' ') const&;
+	ND var  parse(char sepchar = ' ') const& {var nrvo = this->clone(); nrvo.parser(sepchar); return nrvo;}
 
 	// Split a delimited string into a dim array.
 	// The delimiter can be multibyte Unicode.
+	// Returns: A dim array.
 	//
 	// `dim d1 = "a^b^c"_var.split(); // A dimensioned array with three elements (vars)
 	//  // or
@@ -1243,56 +1244,66 @@ public:
 
 	// UTF8/byte as for accessors
 
-	ND var   ucase() &&;
-	ND var   lcase() &&;
-	ND var   tcase() &&;
-	ND var   fcase() &&;
-	ND var   normalize() &&;
-	ND var   invert() &&;
+// clang-format off
 
-	ND var   lower() &&;
-	ND var   raise() &&;
-	ND var   crop() &&;
+// Many of the non-mutating functions are forwarded with a clone to the mutating function
 
-	ND var   quote() &&;
-	ND var   squote() &&;
-	ND var   unquote() &&;
+// On temporaries the mutator function is called to avoid creating a temporary in many cases
 
-	ND var   trim(SV trimchars = " ") &&;
-	ND var   trimfirst(SV trimchars = " ") &&;
-	ND var   trimlast(SV trimchars = " ") &&;
-	ND var   trimboth(SV trimchars = " ") &&;
+	ND var  ucase()                             && {ucaser();     return std::move(*this);}
+	ND var  lcase()                             && {lcaser();     return std::move(*this);}
+	ND var  tcase()                             && {tcaser();     return std::move(*this);}
+	ND var  fcase()                             && {fcaser();     return std::move(*this);}
+	ND var  normalize()                         && {normalizer(); return std::move(*this);}
+	ND var  invert()                            && {inverter();   return std::move(*this);}
 
-	ND var   first() &&;
-	ND var   last() &&;
-	ND var   first(const std::size_t length) &&;
-	ND var   last(const std::size_t length) &&;
-	ND var   cut(const int length) &&;
-	ND var   paste(const int pos1, const int length, SV replacestr) &&;
-	ND var   paste(const int pos1, SV insertstr) &&;
-	ND var   prefix(SV insertstr) &&;
-			template <typename... ARGS>
-	ND var   append(const ARGS&... appendable) && {
+	ND var  lower()                             && {lowerer();    return std::move(*this);}
+	ND var  raise()                             && {raiser();     return std::move(*this);}
+	ND var  crop()                              && {cropper();    return std::move(*this);}
+
+	ND var  quote()                             && {quoter();     return std::move(*this);}
+	ND var  squote()                            && {squoter();    return std::move(*this);}
+	ND var  unquote()                           && {unquoter();   return std::move(*this);}
+
+	ND var  trim(     SV trimchars = " ")       && {trimmer(trimchars);      return std::move(*this);}
+	ND var  trimfirst(SV trimchars = " ")       && {trimmerfirst(trimchars); return std::move(*this);}
+	ND var  trimlast( SV trimchars = " ")       && {trimmerlast(trimchars);  return std::move(*this);}
+	ND var  trimboth( SV trimchars = " ")       && {trimmerboth(trimchars);  return std::move(*this);}
+
+	ND var  first()                             && {firster();               return std::move(*this);}
+	ND var  last()                              && {laster();                return std::move(*this);}
+	ND var  first(const std::size_t length)     && {firster(length);         return std::move(*this);}
+	ND var  last( const std::size_t length)     && {laster(length);          return std::move(*this);}
+	ND var  cut(  const int length)             && {cutter(length);          return std::move(*this);}
+	ND var  paste(const int pos1, const int length, SV replacestr)
+                                                && {paster(pos1, length, replacestr);   return std::move(*this);}
+	ND var  paste(const int pos1, SV insertstr) && {paster(pos1, insertstr);             return std::move(*this);}
+	ND var  prefix(               SV prefixstr) && {prefixer(prefixstr);                 return std::move(*this);}
+	ND var  pop()                               && {popper();                            return std::move(*this);}
+//	ND var  append(SV appendstr)                && {appender(appendstr);                 return std::move(*this);}
+	template <typename... ARGS>
+	ND var  append(const ARGS&... appendable) && {
 				((*this) ^= ... ^= appendable);
 				return std::move(*this);
 			}
-	ND var   pop() &&;
 
-	ND var   fieldstore(SV delimiter, const int fieldno, const int nfields, in replacement) &&;
-	ND var   substr(const int pos1, const int length) &&;
-	ND var   substr(const int pos1) &&;
+	ND var  fieldstore(SV delimiter, const int fieldno, const int nfields, in replacement)
+                                                      && {fieldstorer(delimiter, fieldno, nfields, replacement);
+                                                                                             return std::move(*this);}
 
-	ND var   convert(SV from_chars, SV to_chars) &&;
-	ND var   textconvert(SV from_characters, SV to_characters) &&;
-	ND var   replace(const rex& regex, SV tostr) &&;
-	ND var   replace(SV fromstr, SV tostr) &&;
-//	ND var   regex_replace(SV regex_str, SV replacement, SV regex_options = "") &&;
+	ND var  substr(const int pos1, const int length)  && {substrer(pos1, length);              return std::move(*this);}
+	ND var  substr(const int pos1)                    && {substrer(pos1);                      return std::move(*this);}
 
-	ND var   unique() &&;
-	ND var   sort(SV delimiter = _FM) &&;
-	ND var   reverse(SV delimiter = _FM) &&;
-	ND var   shuffle(SV delimiter = _FM) &&;
-	ND var   parse(char sepchar = ' ') &&;
+	ND var  convert(    SV fromchars, SV tochars)     && {this->converter(fromchars, tochars); return std::move(*this);}
+	ND var  textconvert(SV fromchars, SV tochars)     && {textconverter(fromchars, tochars);   return std::move(*this);}
+	ND var  replace(    SV fromstr,   SV tostr)       && {replacer(fromstr, tostr);            return std::move(*this);}
+	ND var  replace(const rex& regex, SV replacement) && {replacer(regex, replacement);        return std::move(*this);}
+
+	ND var  unique()                                  && {uniquer();           return std::move(*this);}
+	ND var  sort(   SV delimiter = _FM)               && {sorter(delimiter);   return std::move(*this);}
+	ND var  reverse(SV delimiter = _FM)               && {reverser(delimiter); return std::move(*this);}
+	ND var  shuffle(SV delimiter = _FM)               && {shuffler(delimiter); return std::move(*this);}
+	ND var  parse(char delimiter = ' ')               && {parser(delimiter);   return std::move(*this);}
 
 	///// STRING MUTATION - Standalone commands:
 	////////////////////////////////////////////
@@ -1511,30 +1522,31 @@ public:
 	// Replaces a specific subvalue in a dynamic array. Normally one uses the updater() function to replace in place.
 
 	// Same as var.updater() function but returns a new string instead of updating a variable in place.<br>Rarely used.
-	ND var  update(const int fieldno, const int valueno, const int subvalueno, in replacement) const&;
+	// "update()" was called "replace()" in Pick OS/Basic.
+	ND var  update(const int fieldno, const int valueno, const int subvalueno, in replacement) const& {var nrvo = this->clone(); nrvo.updater(fieldno, valueno, subvalueno, replacement); return nrvo;}
 
 	// Ditto for a specific multivalue
-	ND var  update(const int fieldno, const int valueno, in replacement)                       const&;
+	ND var  update(const int fieldno, const int valueno, in replacement)                    const& {var nrvo = this->clone(); nrvo.updater(fieldno, valueno, 0, replacement); return nrvo;}
 
 	// Ditto for a specific field
-	ND var  update(const int fieldno, in replacement)                                          const&;
+	ND var  update(const int fieldno, in replacement)                                       const& {var nrvo = this->clone(); nrvo.updater(fieldno, 0, 0, replacement); return nrvo;}
 
 	// INSERT
 
 	// Same as var.inserter() function but returns a new string instead of updating a variable in place.
-	ND var  insert(const int fieldno, const int valueno, const int subvalueno, in insertion) const&;
+	ND var  insert(const int fieldno, const int valueno, const int subvalueno, in insertion) const& {var nrvo = this->clone(); nrvo.inserter(fieldno, valueno, subvalueno, insertion); return nrvo;}
 
 	// Ditto for a specific multivalue
-	ND var  insert(const int fieldno, const int valueno, in insertion)                       const&;
+	ND var  insert(const int fieldno, const int valueno, in insertion)                      const& {var nrvo = this->clone(); nrvo.inserter(fieldno, valueno, 0, insertion); return nrvo;}
 
 	// Ditto for a specific field
-	ND var  insert(const int fieldno, in insertion)                                          const&;
+	ND var  insert(const int fieldno, in insertion)                                         const& {var nrvo = this->clone(); nrvo.inserter(fieldno, 0, 0, insertion); return nrvo;}
 
 	// REMOVE
 
 	// Same as var.remover() function but returns a new string instead of updating a variable in place.
-	// "remove" was called "delete" in Pick OS.
-	ND var  remove(const int fieldno, const int valueno = 0, const int subvalueno = 0)       const&;
+	// "remove()" was called "delete()" in Pick OS/Basic.
+	ND var  remove(const int fieldno, const int valueno = 0, const int subvalueno = 0)      const& {var nrvo = this->clone(); nrvo.remover(fieldno, valueno, subvalueno); return nrvo;}
 
 	// SAME AS ABOVE ON TEMPORARIES TO USE MUTATING (not documented because used difference in implementation is irrelevant to exodus users)
 	///////////////////////////////////////////////
@@ -1543,11 +1555,11 @@ public:
 	ND var   update(const int fieldno, const int valueno, in replacement)                       && {this->updater(fieldno, valueno, 0, replacement); return std::move(*this);}
 	ND var   update(const int fieldno, in replacement)                                          && {this->updater(fieldno, 0, 0, replacement); return std::move(*this);}
 
-	ND var   insert(const int fieldno, const int valueno, const int subvalueno, in insertion)        && {this->inserter(fieldno, valueno, subvalueno, insertion); return std::move(*this);}
-	ND var   insert(const int fieldno, const int valueno, in insertion)                              && {this->inserter(fieldno, valueno, 0, insertion); return std::move(*this);}
-	ND var   insert(const int fieldno, in insertion)                                                 && {this->inserter(fieldno, 0, 0, insertion); return std::move(*this);}
+	ND var   insert(const int fieldno, const int valueno, const int subvalueno, in insertion)   && {this->inserter(fieldno, valueno, subvalueno, insertion); return std::move(*this);}
+	ND var   insert(const int fieldno, const int valueno, in insertion)                         && {this->inserter(fieldno, valueno, 0, insertion); return std::move(*this);}
+	ND var   insert(const int fieldno, in insertion)                                            && {this->inserter(fieldno, 0, 0, insertion); return std::move(*this);}
 
-	ND var   remove(const int fieldno, const int valueno = 0, const int subvalueno = 0)              && {this->remover(fieldno, valueno, subvalueno); return std::move(*this);}
+	ND var   remove(const int fieldno, const int valueno = 0, const int subvalueno = 0)         && {this->remover(fieldno, valueno, subvalueno); return std::move(*this);}
 
 	///// DYNAMIC ARRAY FILTERS:
 	///////////////////////////
@@ -3089,9 +3101,6 @@ public:
 
 	// Internal primitive oconvs
 
-	// MR: Character replacement // WHY is this replacer, io, non-const
-	ND io   oconv_MR(const char* conversion);
-
 	//// I/O Conversion Codes :
 
 	// Date output: Convert internal date format to human readable date or calendar info in text format.
@@ -3300,6 +3309,20 @@ public:
 	//  // or
 	//  assert( oconv(v1, "T#10") == "Have a␣␣␣␣|nice day␣␣"_var );`
 	ND std::string oconv_T(in format) const;
+
+	// Character replacement
+	// e.g. MRU
+	// `let v1 = "123/abC.";
+	//  assert(v1.oconv("MRL") == "123/abc."); // lcase
+	//  assert(v1.oconv("MRU") == "123/ABC."); // ucase
+	//  assert(v1.oconv("MRT") == "123/Abc."); // tcase
+	//  assert(v1.oconv("MRN") == "123");      // Return only digits
+	//  assert(v1.oconv("MRA") == "abC");      // Return only alphabetic
+	//  assert(v1.oconv("MRB") == "123abC");   // Return only alphanumeric
+	//  assert(v1.oconv("MR/N") == "/abC.");   // Remove digits
+	//  assert(v1.oconv("MR/A") == "123/.");   // Remove alphabetic
+	//  assert(v1.oconv("MR/B") == "/.");      // Remove alphanumeric`
+	ND io   oconv_MR(const char* conversion);
 
 	// Convert a string of bytes to a string of hexadecimal digits. The size of the output is precisely double that of the input.
 	// Multifield/multivalue structure is not preserved. Field marks are converted to HEX as for all other bytes.

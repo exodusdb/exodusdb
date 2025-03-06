@@ -741,25 +741,13 @@ var  var::replace(const rex& regex, SV replacement) const& {
 // OCONV_MR can be moved back to mvioconv.cpp if it stops using regular expressions
 ///////////
 
-// Regular expressions for ICONV_MC - Note: io and non-const
+// Regular expressions for OCONV_MR - Note: io and non-const
 io   var::oconv_MR(const char* conversion) {
 
 	THISIS("io   var::oconv_MR(const char* conversion) const")
 
-	//THISIS("io   var::oconv_MR(const char* conversionchar)")
-	//assertString(function_sig);
-	// conversionchar arrives pointing to 3rd character (eg A in MCA)
-
-#pragma GCC diagnostic push
-#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
-    const char* conversionchar = conversion;
-
-    // Skip over leading "MR"
-    conversionchar += 2;
-#pragma GCC diagnostic pop
-
 	// abort if no 3rd char
-	if (*conversionchar == '\0')
+	if (*conversion == '\0')
 		return (*this);
 
 	// in case changes to/from numeric
@@ -802,28 +790,29 @@ io   var::oconv_MR(const char* conversion) {
 	*/
 
 	// negate if /
-	if (*conversionchar == '/') {
+	if (*conversion == '/') {
 
 #pragma GCC diagnostic push
 #pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
-		++conversionchar;
+		++conversion;
 #pragma GCC diagnostic pop
 
-		switch (*conversionchar) {
-			// MC/N return everything except digits i.e. remove all digits 0123456789
+		switch (*conversion) {
+
+			// MR/N return everything except digits. Remove all digits 0123456789 (unicode digits?)
 			case 'N': {
 				//var_str=std_boost::regex_replace(toTstring((*this)),digits_regex, "");
 				var_str = REGEX_REPLACE(var_str, digits_regex, "");
 				break;
 			}
 
-			// MC/A return everything except "alphabetic" i.e remove all "alphabetic"
+			// MR/A return everything except "alphabetic". Remove all "alphabetic"
 			case 'A': {
 				//var_str=std_boost::regex_replace(toTstring((*this)),alpha_regex, "");
 				var_str = REGEX_REPLACE(var_str, alpha_regex, "");
 				break;
 			}
-			// MC/B return everything except "alphanumeric" remove all "alphanumeric"
+			// MR/B return everything except "alphanumeric". Remove all "alphanumeric"
 			case 'B': {
 				//var_str=std_boost::regex_replace(toTstring((*this)),alphanum_regex, "");
 				var_str = REGEX_REPLACE(var_str, alphanum_regex, "");
@@ -838,36 +827,41 @@ io   var::oconv_MR(const char* conversion) {
 	// http://www.boost.org/doc/libs/1_37_0/libs/regex/doc/html/boost_regex/ref/regex_replace.html
 	// std_boost::regex_replace
 
-	switch (*conversionchar) {
-		// MCN return only digits i.e. remove all non-digits
+	switch (*conversion) {
+		// MRN return only digits i.e. remove all non-digits
 		case 'N': {
 			// var_str=std_boost::regex_replace(toTstring((*this)),non_digits_regex, "");
 			var_str = REGEX_REPLACE(var_str, non_digits_regex, "");
 			break;
 		}
-		// MCA return only "alphabetic" i.e. remove all "non-alphabetic"
+		// MRA return only "alphabetic" i.e. remove all "non-alphabetic"
 		case 'A': {
 			// var_str=std_boost::regex_replace(toTstring((*this)),non_alpha_regex, "");
 			var_str = REGEX_REPLACE(var_str, non_alpha_regex, "");
 			break;
 		}
-		// MCB return only "alphanumeric" i.e. remove all "non-alphanumeric"
+		// MRB return only "alphanumeric" i.e. remove all "non-alphanumeric"
 		case 'B': {
 			// var_str=std_boost::regex_replace(toTstring((*this)),non_alphanum_regex, "");
 			var_str = REGEX_REPLACE(var_str, non_alphanum_regex, "");
 			break;
 		}
-		// MCL to lower case
+		// MRL to lower case
 		case 'L': {
 			lcaser();
 			break;
 		}
-		// MCU to upper case
+		// MRU to upper case
 		case 'U': {
 			ucaser();
 			break;
 		}
-		// No conversion if not N, A, B, L or U
+		// MRT to tcase (capitalise)
+		case 'T': {
+			tcaser();
+			break;
+		}
+		// No conversion if not N, A, B, L, U or T
 		default:;
 	}
 

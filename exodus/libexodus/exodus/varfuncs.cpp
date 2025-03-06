@@ -327,17 +327,6 @@ bool var::hasinput(const int milliseconds) const {
 	return haskey(milliseconds);
 }
 
-//out  var::input() {
-//
-//	THISIS("out  var::input()")
-//	assertVar(function_sig);
-//
-//	var_str.clear();
-//	var_typ = VARTYP_STR;
-//
-//	return *this;
-//}
-
 bool var::input(in prompt /*=""*/) {
 
 	THISIS("out  var::input(in prompt")
@@ -618,34 +607,6 @@ template<> PUBLIC const std::string& VARBASE1::toString() const& {
 
 	return var_str;
 }
-
-/////////
-// UPDATE
-/////////
-
-/// update() was replace() in Pick Basic
-var  var::update(const int fieldno, const int valueno, const int subvalueno, in replacement) const& {var nrvo = this->clone(); nrvo.updater(fieldno, valueno, subvalueno, replacement); return nrvo;}
-var  var::update(const int fieldno, const int valueno, in replacement)                       const& {var nrvo = this->clone(); nrvo.updater(fieldno, valueno, 0, replacement); return nrvo;}
-var  var::update(const int fieldno, in replacement)                                          const& {var nrvo = this->clone(); nrvo.updater(fieldno, 0, 0, replacement); return nrvo;}
-
-/////////
-// INSERT
-/////////
-
-	// cf mutator inserter()
-var  var::insert(const int fieldno, const int valueno, const int subvalueno, in insertion) const& {var nrvo = this->clone(); nrvo.inserter(fieldno, valueno, subvalueno, insertion); return nrvo;}
-var  var::insert(const int fieldno, const int valueno, in insertion)                       const& {var nrvo = this->clone(); nrvo.inserter(fieldno, valueno, 0, insertion); return nrvo;}
-var  var::insert(const int fieldno, in insertion)                                          const& {var nrvo = this->clone(); nrvo.inserter(fieldno, 0, 0, insertion); return nrvo;}
-
-/////////
-// REMOVE
-/////////
-
-/// remove() was delete() in Pick Basic
-// var  erase(const int fieldno, const int valueno=0, const int subvalueno=0) const;
-//	ND var  remove(const int fieldno, const int valueno = 0, const int subvalueno = 0) const;
-var  var::remove(const int fieldno, const int valueno /* = 0*/, const int subvalueno /* = 0*/)       const& {var nrvo = this->clone(); nrvo.remover(fieldno, valueno, subvalueno); return nrvo;}
-
 
 //////
 // LEN
@@ -1881,17 +1842,6 @@ IO   var::converter(SV fromchars, SV tochars) REF {
 }
 
 
-//// Mutate for const char*
-//io   var::converter(const char* fromchars, const char* tochars) & {
-//
-//	THISIS("void var::converter(const char* fromchars, const char* tochars) &")
-//	assertStringMutator(function_sig);
-//
-//	string_converter(var_str, std::string(fromchars), std::string(tochars));
-//
-//	return *this;
-//}
-
 // Mutate
 IO   var::textconverter(SV fromchars, SV tochars) REF {
 
@@ -2305,41 +2255,10 @@ var  var::numberinwords(in langname_or_locale_id) {
 	// 1. It is not necessary since boost::locale:generator seems to manage creation of all languages
 	// 2. It is slow and doesnt take effect until a new process is started
 
-	// Verify locale_id exists and create it
-	//var locale_id = langcode ^ ".UTF-8";
-//	var ok;
-//	try {
-//		std::locale mylocale(locale_id.toString());
-//		ok = true;
-//	} catch (std::runtime_error& re) {
-//		ok = false;
-//		//var(re.what()).errputl();
-//	}
-//
-//	// otherwise try to generate it and try again
-//	// otherwise use default probably english
-//	if (not ok) {
-//		var("number_in_words:get_locale: locale_id " ^ locale_id.quote() ^ " does not exist. Trying to generate it.").errputl();
-//		var cmd = "locale-gen " ^ locale_id;
-//		cmd.errputl();
-//		if (not cmd.osshell())
-//			this->lasterror().logputl();
-//		try {
-//			// Try again after attempted generation of locale
-//			std::locale mylocale(locale_id.toString());
-//		} catch (std::runtime_error& re) {
-//			// Fall back to default locale
-//			//std::locale mylocale("");
-//			throw VarError("number_in_words:get_locale: " ^ var(re.what()) ^ ". get_locale cannot create locale for " ^ locale_id);
-//		}
-//	}
-
 	// Create the right language locale
-	//TRACE(locale_id);
 	boost::locale::generator locale_generator1;
 	var result;
 	try {
-		//TRACE(locale_id)
 		std::locale boost_generated_locale1=locale_generator1(locale_id.toString());
 		// create a locale imbued stringstream
 		std::ostringstream ss;
@@ -2356,88 +2275,5 @@ var  var::numberinwords(in langname_or_locale_id) {
 	return result;
 
 }
-
-// clang-format off
-
-// Many of the non-mutating functions are forwarded with a clone to the mutating function
-
-var  var::ucase()                               const& {var nrvo = this->clone(); nrvo.ucaser();     return nrvo;}
-var  var::lcase()                               const& {var nrvo = this->clone(); nrvo.lcaser();     return nrvo;}
-var  var::tcase()                               const& {var nrvo = this->clone(); nrvo.tcaser();     return nrvo;}
-var  var::fcase()                               const& {var nrvo = this->clone(); nrvo.fcaser();     return nrvo;}
-var  var::normalize()                           const& {var nrvo = this->clone(); nrvo.normalizer(); return nrvo;}
-var  var::invert()                              const& {var nrvo = this->clone(); nrvo.inverter();   return nrvo;}
-
-var  var::lower()                               const& {var nrvo = this->clone(); nrvo.lowerer();    return nrvo;}
-var  var::raise()                               const& {var nrvo = this->clone(); nrvo.raiser();     return nrvo;}
-var  var::crop()                                const& {var nrvo = this->clone(); nrvo.cropper();    return nrvo;}
-
-//var  var::quote()                               const& {var nrvo = this->clone(); nrvo.quoter();     return nrvo;}
-//var  var::squote()                              const& {var nrvo = this->clone(); nrvo.squoter();    return nrvo;}
-//var  var::unquote()                             const& {var nrvo = this->clone(); nrvo.unquoter();   return nrvo;}
-
-var  var::convert(SV fromchars, SV tochars)     const& {var nrvo = this->clone(); nrvo.converter(fromchars,tochars);     return nrvo;}
-var  var::textconvert(SV fromchars, SV tochars) const& {var nrvo = this->clone(); nrvo.textconverter(fromchars,tochars); return nrvo;}
-var  var::parse(char sepchar)                   const& {var nrvo = this->clone(); nrvo.parser(sepchar);                  return nrvo;}
-
-var  var::pop()                                 const& {var nrvo = this->clone(); nrvo.popper();                         return nrvo;}
-
-var  var::paste(const int pos1, const int length, SV replacestr)
-                                               const& {var nrvo = this->clone(); nrvo.paster(pos1, length, replacestr);  return nrvo;}
-var  var::paste(const int pos1, SV insertstr)   const& {var nrvo = this->clone(); nrvo.paster(pos1, insertstr);          return nrvo;}
-
-// on temporaries the mutator function is called to avoid creating a temporary in many cases
-
-var  var::ucase()                                   && {ucaser();     return std::move(*this);}
-var  var::lcase()                                   && {lcaser();     return std::move(*this);}
-var  var::tcase()                                   && {tcaser();     return std::move(*this);}
-var  var::fcase()                                   && {fcaser();     return std::move(*this);}
-var  var::normalize()                               && {normalizer(); return std::move(*this);}
-var  var::invert()                                  && {inverter();   return std::move(*this);}
-
-var  var::lower()                                   && {lowerer();    return std::move(*this);}
-var  var::raise()                                   && {raiser();     return std::move(*this);}
-var  var::crop()                                    && {cropper();    return std::move(*this);}
-
-var  var::quote()                                   && {quoter();     return std::move(*this);}
-var  var::squote()                                  && {squoter();    return std::move(*this);}
-var  var::unquote()                                 && {unquoter();   return std::move(*this);}
-
-var  var::trim(     SV trimchars /*= " "*/)         && {trimmer(trimchars);      return std::move(*this);}
-var  var::trimfirst(SV trimchars /*= " "*/)         && {trimmerfirst(trimchars); return std::move(*this);}
-var  var::trimlast( SV trimchars /*= " "*/)         && {trimmerlast(trimchars);  return std::move(*this);}
-var  var::trimboth( SV trimchars /*= " "*/)         && {trimmerboth(trimchars);  return std::move(*this);}
-
-var  var::first()                                   && {firster();               return std::move(*this);}
-var  var::last()                                    && {laster();                return std::move(*this);}
-var  var::first(const std::size_t length)           && {firster(length);         return std::move(*this);}
-var  var::last( const std::size_t length)           && {laster(length);          return std::move(*this);}
-var  var::cut(  const int    length)                && {cutter(length);          return std::move(*this);}
-var  var::paste(const int    pos1, const int length, SV replacestr)
-                                                     && {paster(pos1, length, replacestr);   return std::move(*this);}
-var  var::paste(const int    pos1, SV insertstr)    && {paster(pos1, insertstr);             return std::move(*this);}
-var  var::prefix(                  SV prefixstr)    && {prefixer(prefixstr);                 return std::move(*this);}
-//var  var::append(SV appendstr)                    && {appender(appendstr);                 return std::move(*this);}
-var  var::pop()                                     && {popper();                            return std::move(*this);}
-
-var  var::fieldstore(SV delimiter, const int fieldno, const int nfields, in replacement)
-                                                     && {fieldstorer(delimiter, fieldno, nfields, replacement);
-                                                                                             return std::move(*this);}
-
-var  var::substr(const int pos1, const int length)  && {substrer(pos1, length);              return std::move(*this);}
-var  var::substr(const int pos1)                    && {substrer(pos1);                      return std::move(*this);}
-
-var  var::convert(    SV fromchars, SV tochars)     && {this->converter(fromchars, tochars); return std::move(*this);}
-var  var::textconvert(SV fromchars, SV tochars)     && {textconverter(fromchars, tochars);   return std::move(*this);}
-var  var::replace(    SV fromstr,   SV tostr)       && {replacer(fromstr, tostr);            return std::move(*this);}
-var  var::replace(const rex& regex, SV replacement) && {replacer(regex, replacement);        return std::move(*this);}
-
-var  var::unique()                                  && {uniquer();           return std::move(*this);}
-var  var::sort(   SV delimiter /*= _FM*/)           && {sorter(delimiter);   return std::move(*this);}
-var  var::reverse(SV delimiter /*= _FM*/)           && {reverser(delimiter); return std::move(*this);}
-var  var::shuffle(SV delimiter /*= _FM*/)           && {shuffler(delimiter); return std::move(*this);}
-var  var::parse(char delimiter /*= _FM*/)           && {parser(delimiter);   return std::move(*this);}
-
-// clang-format on
 
 }  // namespace exo

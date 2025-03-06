@@ -234,16 +234,6 @@ ND	var  xlate(in filename, in key, in fieldno_or_name, const char* mode);
 	// iconv/oconv with access to specific exoprog conversions and also var's iconv/oconv patterns
 	// Unlike var's iconv/oconv, exoprog's iconv/oconv have the ability to call custom functions like "[funname,args...]"
 	//
-	// [NUMBER]
-	// [NUMBER,*]
-	// [NUMBER,0]
-	// [NUMBER,1]
-	// [NUMBER,2]
-	// [NUMBER,3]
-	// [NUMBER,BASE]
-	// [NUMBER,NDECS]
-	// [NUMBER,X]
-	//
 	// [DATE]
 	// [DATE,*]
 	// [DATE,4]

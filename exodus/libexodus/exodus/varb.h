@@ -1716,6 +1716,7 @@ protected:
 // Forward declaration of some member functions to avoid errors like
 // error: explicit specialization of 'toBool' after instantiation
 template<> PUBLIC bool VARBASE1::toBool() const;
+template<> PUBLIC RETVAR VARBASE1::clone() const;
 template<> PUBLIC void VARBASE1::createString() const;
 template<> PUBLIC void VARBASE1::assertNumeric(const char* message, const char* varname/* = ""*/) const;
 
