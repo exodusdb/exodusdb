@@ -6,15 +6,19 @@ var2let [cppfilename ...] [{OPTIONS}]
 
 Converts '{tab}var xyz ' to '{tab}let xyz ' where possible by testing if it compiles.
 
-Option {U} - Update
+Option U - Update
+       V - Verbose
+       W - Ignore warnings
 )-";
 
 function main() {
 
 	let osfilenames = COMMAND.remove(1);
 	let update = OPTIONS.contains("U");
+	let verbose = OPTIONS.contains("V");
+	let ignore_warnings = OPTIONS.contains("W");
 
-	if (not osfilenames or OPTIONS.convert("U", ""))
+	if (not osfilenames or OPTIONS.convert("UVW", ""))
 		abort(syntax);
 
 	for (let osfilename : osfilenames) {
@@ -50,9 +54,17 @@ function main() {
 				continue;
 			}
 
-			// Restore to var if will not compile
-			let cmd = "CXX_OPTIONS=-fmax-errors=1 compile " ^ tmpfilename ^ " 2>/dev/null";
+			var cmd = "compile " ^ tmpfilename;
+			if (not verbose)
+				cmd ^= " 2>/dev/null";
+
+			var cxx_options = " -Wno-sign-conversion -Wno-shorten-64-to-32";
+			if (not ignore_warnings)
+				cxx_options ^= " -fmax-errors=1";
+			cmd.prefixer("CXX_OPTIONS=" ^ quote(cxx_options));
+
 			if (not DATA.osshellread(cmd)) {
+				// Restore "\tlet " to "\tvar " if will not compile
 				text.paster(pos, 5, "\tvar ");
 				printx("-");
 			} else {

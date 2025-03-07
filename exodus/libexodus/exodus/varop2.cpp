@@ -41,6 +41,8 @@ THE SOFTWARE.
 
 namespace exo {
 
+using let = const var;
+
 // Originally most help from Thinking in C++ Volume 1 Chapter 12
 // http://www.camtp.uni-mb.si/books/Thinking-in-C++/TIC2Vone-distribution/html/Chapter12.html
 
@@ -62,7 +64,7 @@ namespace exo {
 
 ND var operator""_var(const char* cstr, std::size_t size) {
 
-	var rvo = var(cstr, size);
+	let rvo = var(cstr, size);
 
 	// Convert _VISIBLE_FMS to _ALL_FMS
 	for (char& c : rvo.var_str) {
@@ -182,7 +184,7 @@ template<> PUBLIC VBR1 VARBASE1::operator^=(const double double1) & {
 	// var_str+=var(int1).var_str;
 	//var_str += mvd2s(double1);
 	//var_typ = VARTYP_STR;  // reset to one unique type
-	var temp(double1);
+	let temp(double1);
 	temp.createString();
 	var_str += temp.var_str;
 
@@ -432,7 +434,7 @@ tryagain:
 // var ++
 
 var  var::operator++(int) & {
-	var orig = this->clone();
+	let orig = this->clone();
 	var_base::operator++();
 	return orig;
 }
@@ -440,7 +442,7 @@ var  var::operator++(int) & {
 // var --
 
 var  var::operator--(int) & {
-	var orig = this->clone();
+	let orig = this->clone();
 	var_base::operator--(0);
 	return orig;
 }

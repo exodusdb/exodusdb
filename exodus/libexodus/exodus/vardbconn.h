@@ -47,7 +47,8 @@
 //for postgresql's PGconn connection handle type
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wreserved-identifier"
-#include <libpq-fe.h>
+//#include <libpq-fe.h>
+#include "libpq-fe.h"
 #pragma clang diagnostic push
 
 #include <exodus/var.h>

@@ -515,7 +515,7 @@ bool Callable::openlib(const std::string newlibname) {
 #endif
 
 	if (plib_ == nullptr) {
-		var libfilepath = libfilepath_;
+		let libfilepath = libfilepath_;
 		if (libfilepath.osfile()) {
 
 			throw VarError(libfilepath ^ " Cannot be linked/wrong version. Run with LD_DEBUG=libs for more info. Look for 'fatal'. Also run 'ldd "

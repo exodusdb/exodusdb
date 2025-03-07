@@ -37,6 +37,8 @@ THE SOFTWARE.
 
 namespace exo {
 
+	using let = const var;
+
 	using RNG_typ = std::mt19937;
 	extern thread_local std::unique_ptr<RNG_typ> thread_RNG;
 
@@ -108,7 +110,7 @@ var  dim::rows() const {
 	if (!this->ncols_) UNLIKELY
 		throw DimUndimensioned(function_sig);
 
-	var nrows = base::size() / ncols_;
+	let nrows = base::size() / ncols_;
 
 	return nrows;
 }
@@ -241,7 +243,7 @@ var  dim::join(SV delimiter) const {
 	}
 
 	// Reserve the total number of characters required to avoid multiple resizing/mallocs
-	var nrvo = "";
+	let nrvo = "";
 	nrvo.var_str.reserve(nchars_joined);
 
 	if (delimiter_size == 1) {
@@ -427,7 +429,7 @@ void dim::write(in filevar, in key) const {
 	ISSTRING(filevar)
 	ISSTRING(key)
 
-	var temprecord = this->join().trimlast(_FM);
+	let temprecord = this->join().trimlast(_FM);
 
 	temprecord.write(filevar, key);
 	return;
@@ -470,7 +472,7 @@ bool dim::oswrite(in osfilename, const char* codepage) const {
 
 	std::string linesep = "\n";
 
-	var txt = this->join(linesep);
+	let txt = this->join(linesep);
 
 	return txt.oswrite(osfilename, codepage);
 }
@@ -496,7 +498,7 @@ var  var::sort(SV delimiter) const& {
 
 	//split into a temporary dim array for sorting
 	//then join it back up into a single string
-	var nrvo = this->split(delimiter).sort().join(delimiter);
+	let nrvo = this->split(delimiter).sort().join(delimiter);
 	return nrvo;
 
 }
@@ -520,7 +522,7 @@ var  var::reverse(SV delimiter) const& {
 
 	const auto delimitersize = delimiter.size();
 
-	var nrvo = "";
+	let nrvo = "";
 
 	// Empty string
 	if (var_str.empty())

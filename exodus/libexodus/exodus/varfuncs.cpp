@@ -349,7 +349,7 @@ bool var::input(in prompt /*=""*/) {
 
 //		//replace double quotes with \"
 //		default_input.replacer("\"", "\\\"");
-//		var cmd = "bash -c 'read -i " ^ default_input.quote() ^ " -e EXO_TEMP_READ && printf \"%s\" \"$EXO_TEMP_READ\"'";
+//		let cmd = "bash -c 'read -i " ^ default_input.quote() ^ " -e EXO_TEMP_READ && printf \"%s\" \"$EXO_TEMP_READ\"'";
 //		//cmd.outputl("cmd=");
 //		if (not this->osshellread(cmd)) {
 //			// Report any error
@@ -852,7 +852,7 @@ IO   var::inverter() REF {
 //// so we will use clone and ucaser.
 ////
 ////#if __cpp_lib_string_resize_and_overwrite < 202110L
-//	var nrvo = this->clone();
+//	let nrvo = this->clone();
 //	nrvo.ucaser();
 //	return nrvo;
 ////#else
@@ -860,7 +860,7 @@ IO   var::inverter() REF {
 ////	THISIS("var  var::ucase() const&")
 ////	assertString(function_sig);
 ////
-////	var rvo;
+////	let rvo;
 ////	rvo.var_typ = VARTYP_STR;
 ////
 ////	rvo.var_str.resize_and_overwrite(

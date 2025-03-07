@@ -122,6 +122,8 @@ static constexpr std::string_view longdayofweeks =
 
 namespace exo {
 
+using let = const var;
+
 // std::time_t -> pick integer date, time
 void time_t_to_pick_date_time(const std::time_t time, int* pick_date, int* pick_time) noexcept {
 
@@ -218,7 +220,7 @@ var  var::ostime() const {
 // Returns decimal fractional days since pick epoch 1967-12-31 00:00:00 (up to micro or nano second accuracy)
 var  var::ostimestamp() const {
 
-	var datenow = this->date();
+	let datenow = this->date();
 	var timenow = this->ostime();
 
 	// 1. If the date flipped while we got the time then get the time again
@@ -429,9 +431,9 @@ var  var::iconv_D(const char* conversion) const {
 	// or refuse anything but four digit years
 	if (year <= 99) {
 		if (year >= year_50) {
-			var year2 = year;
+			let year2 = year;
 			year += year_2000 - 100;
-			var warning = "WARNING: 2 digit year " ^ year2.quote() ^ " between " ^ var(year_50) ^ " and 99 converted to " ^ var(year).quote();
+			let warning = "WARNING: 2 digit year " ^ year2.quote() ^ " between " ^ var(year_50) ^ " and 99 converted to " ^ var(year).quote();
 			warning.logputl();
 		} else
 			year += year_2000;
@@ -795,7 +797,7 @@ after_analyse_conversion:
 		}
 	}
 
-//	var newmv;
+//	let newmv;
 //	newmv.var_typ = VARTYP_STR;
 	std::string result;
 

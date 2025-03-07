@@ -52,6 +52,8 @@ THE SOFTWARE.
 
 namespace exo {
 
+using let = const var;
+
 static void addbacktraceline(in frameno, in sourcefilename, in lineno, io returnlines) {
 
 	//#ifdef TRACING
@@ -72,7 +74,7 @@ static void addbacktraceline(in frameno, in sourcefilename, in lineno, io return
 	filetext.converter("\x0D", "\x0A");
 
 	// Extract the source line
-	var line = filetext.field("\x0A", lineno).trimfirst(" \t");
+	let line = filetext.field("\x0A", lineno).trimfirst(" \t");
 	if (not line or line.match("^\\s*}"))
 		return;
 
@@ -90,7 +92,7 @@ static void addbacktraceline(in frameno, in sourcefilename, in lineno, io return
 
 	// Example output line:
 	// "8: p2.cpp:15: printl(v2);"
-	var linetext = (frameno) ^ ": " ^ sourcefilename.field(_OSSLASH, -1) ^ ":" ^ lineno ^ ": " ^ line;
+	let linetext = (frameno) ^ ": " ^ sourcefilename.field(_OSSLASH, -1) ^ ":" ^ lineno ^ ": " ^ line;
 	//var linetext = std::format("{:0}: {:1}:{:2}: {:3}" , frameno, sourcefilename.field2(_OSSLASH, -1), lineno, line);
 
 	returnlines ^= linetext ^ FM;
@@ -127,9 +129,9 @@ var exo_backtrace(void* stack_addresses[BACKTRACE_MAXADDRESSES], std::size_t sta
 
 	//var("backtrace()").errputl();
 
-	var internaladdresses = "";
+	let internaladdresses = "";
 
-//	var exo_debug;
+//	let exo_debug;
 //	exo_debug.osgetenv("EXO_DEBUG");
 
 	/* example of TRACE from osx 64
@@ -207,12 +209,12 @@ var exo_backtrace(void* stack_addresses[BACKTRACE_MAXADDRESSES], std::size_t sta
 		if ((not objaddress.starts("0")) || objaddress.at(2) != "x")
 			continue;
 
-		var startaddress = objaddress.paste(-3, 3, "000");
+		let startaddress = objaddress.paste(-3, 3, "000");
 
 		////////////////////////
 		//objdump_out = objdump_out.osshellread();
 		var objdump_out;
-		var cmd = "objdump --start-address=" ^ startaddress ^ " --stop-address=" ^
+		let cmd = "objdump --start-address=" ^ startaddress ^ " --stop-address=" ^
 //						 objaddress ^ " --disassemble -l " ^ objfilename;
 						 objaddress ^ " --source --line-numbers " ^ objfilename;
 #ifdef TRACING
@@ -228,11 +230,11 @@ var exo_backtrace(void* stack_addresses[BACKTRACE_MAXADDRESSES], std::size_t sta
 		/// root/exodus/exodus/libexodus/exodus/l1.cpp:7 (discriminator 3)
 		const var nn2 = objdump_out.fcount(FM);
 		var line = "";
-		var linesource = "";
+		let linesource = "";
 		//for (var ii2 = 1; ii2 < nn2; ++ii2) {
 		for (var ii2 : reverse_range(1, nn2)) {
 			if (objdump_out.f(ii2).contains(".cpp:")) {
-//				var nextline = objdump_out.f(ii2);
+//				let nextline = objdump_out.f(ii2);
 //				// Skip disassembly lines
 //				if (not nextline.match("    [0-9a-f]: ")) {
 //					// Skip lines like "return 1;" since they seem to be spurious
@@ -256,8 +258,8 @@ var exo_backtrace(void* stack_addresses[BACKTRACE_MAXADDRESSES], std::size_t sta
 
 		// append the source line text and number to the output
 		if (line) {
-			var sourcefilename = line.field(":", 1);
-			var lineno = line.field(":", 2).field(" ", 1);
+			let sourcefilename = line.field(":", 1);
+			let lineno = line.field(":", 2).field(" ", 1);
 			addbacktraceline(ii, sourcefilename, lineno, returnlines);
 			//7: p1.cpp:13: return 1;
 			//returnlines ^= var(ii + 1) ^ ": " ^ sourcefilename ^ ":" ^ lineno ^ ": " ^ linesource ^ FM;
@@ -337,7 +339,7 @@ static void SIGINT_handler(int sig [[maybe_unused]]) {
 		}
 
 		// only look at first character in uppercase
-		var cmd1 = var(cmd.first()).ucase();
+		let cmd1 = var(cmd.first()).ucase();
 
 		if (cmd1 == "C") {
 
@@ -373,8 +375,8 @@ static void SIGINT_handler(int sig [[maybe_unused]]) {
 
 			// Debugging
 			// duplicated in init and B
-			var pid = getpid();
-			var cmd = "gdb -p " ^ pid;
+			let pid = getpid();
+			let cmd = "gdb -p " ^ pid;
 			cmd.logputl(" ");
 			if (not cmd.osshell())
 				var().lasterror().logputl();

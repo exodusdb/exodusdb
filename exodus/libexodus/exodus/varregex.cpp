@@ -103,6 +103,8 @@ allowing it to interface correctly with UTF-8, UTF-16, and UTF-32 data:
 
 namespace exo {
 
+	using let = const var;
+
 // From here on we need to use Boost's u32_regex, u32_match, u32_replace
 // in order to correctly process no-ASCII/multibyte characters
 
@@ -417,7 +419,7 @@ var  var::match(const rex& regex) const {
 	decltype(iter) end{};
 
 	// Prepare to return empty string
-	var result;
+	let result;
 	result.var_typ = VARTYP_STR;
 
 	// NOT using declarative functional style "for_each with lambda" instead of "while (iter!=end)" loop
@@ -548,7 +550,7 @@ var  var::search(const rex& regex, io startchar1) const {
 	// but doesnt return an iterator with an array of groups
 
 	// Default return empty string
-	var result = "";
+	let result = "";
 	result.var_typ = VARTYP_STR;
 
 	// Negative start treated same as zero
@@ -718,7 +720,7 @@ var  var::replace(const rex& regex, SV replacement) const& {
 			match_flags
 		);
 	} catch (boost::wrapexcept<std::out_of_range>& e) {
-		var errmsg =
+		let errmsg =
 			"Error: (3) Invalid data or replacement during regex replace of "
 			^ var(regex.regex_str_).quote()
 			^ " with "
@@ -733,7 +735,7 @@ var  var::replace(const rex& regex, SV replacement) const& {
 	}
 
 	// Acquire and return the output
-	var result = std::move(oss1).str();
+	let result = std::move(oss1).str();
 	return result;
 
 }

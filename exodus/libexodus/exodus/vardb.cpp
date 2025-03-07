@@ -236,6 +236,8 @@ Within transactions, lock requests for locks that have already been obtained alw
 
 namespace exo {
 
+using let = const var;
+
 // the idea is for exodus to have access to one standard database without secret password
 static const var defaultconninfo =
 	"host=127.0.0.1 port=5432 dbname=exodus user=exodus "
@@ -494,7 +496,7 @@ static int get_dbconn_no(in dbhandle) {
 		// var("get_dbconn_no() returning 0 - unassigned").logputl();
 		return 0;
 	}
-	var dbconn_no = dbhandle.f(2);
+	let dbconn_no = dbhandle.f(2);
 	if (dbconn_no.isnum()) {
 		/// var("get_dbconn_no() returning " ^ dbconn_no).logputl();
 		return dbconn_no;
@@ -644,7 +646,7 @@ static PGconn* get_pgconn(in dbhandle) {
 static DBConn* get_dbconn(in dbhandle) {
 	int dbconn_no = get_dbconn_no_or_default(dbhandle);
 	if (!dbconn_no) UNLIKELY {
-		var errmsg = "get_dbconn() attempted when not connected";
+		let errmsg = "get_dbconn() attempted when not connected";
 		throw VarDBException(errmsg);
 	}
 	return thread_dbconnector.get_dbconn(dbconn_no);
@@ -878,11 +880,12 @@ static var build_conn_info(in conninfo) {
 static inline void unquoter_inline(io iovar) {
 	// remove "", '' and {}
 	static var quotecharacters("\"'{");
-	if (quotecharacters.contains(iovar.first()))
+	if (quotecharacters.contains(iovar.first())) {
 		//string = string.b(2, string.len() - 2);
 		//iovar = iovar.cut(1).popper();
 		iovar.cutter(1);
 		iovar.popper();
+	}
 }
 
 static void tosqlstring(io string1) {
@@ -981,9 +984,9 @@ bool var::connect(in conninfo) {
 
 //#if defined _MSC_VER  //|| defined __CYGWIN__ || defined __MINGW32__
 //		if (not msvc_PQconnectdb(&pgconn, fullconninfo.var_str)) UNLIKELY {
-//			var libname = "libpq.dl";
+//			let libname = "libpq.dl";
 //			// var libname="libpq.so";
-//			var errmsg="ERROR: vardb: connect() Cannot load shared library " ^ libname ^
+//			let errmsg="ERROR: vardb: connect() Cannot load shared library " ^ libname ^
 //				". Verify configuration PATH contains postgres's \\bin.";
 //			this->setlasterror(errmsg);
 //			return false;
@@ -1009,7 +1012,7 @@ bool var::connect(in conninfo) {
 	// failed to connect so return false
 	if (PQstatus(pgconn) != CONNECTION_OK) UNLIKELY {
 
-		var errmsg = "ERROR: vardb: connect() Connection to database failed: " ^ var(PQerrorMessage(pgconn));
+		let errmsg = "ERROR: vardb: connect() Connection to database failed: " ^ var(PQerrorMessage(pgconn));
 
 		this->setlasterror(errmsg);
 
@@ -1023,7 +1026,7 @@ bool var::connect(in conninfo) {
 	// Abort if multithreading and it is not supported
 	if (!PQisthreadsafe()) UNLIKELY {
 		// TODO only abort if environmentn>0
-		var errmsg = "connect(): Postgres PQ library is not threadsafe";
+		let errmsg = "connect(): Postgres PQ library is not threadsafe";
 		throw VarDBException(errmsg);
 
 	}
@@ -1042,9 +1045,11 @@ bool var::connect(in conninfo) {
 	//(*this) = conninfo ^ FM ^ conn_no;
 	if (!this->assigned())
 		(*this) = "";
+
 //	if (not this->f(1))
 		//this->updater(1,fullconninfo.field(" ",1));
-		this->updater(1,fullconninfo.field("dbname=", -1).field(" ", 1));
+	this->updater(1,fullconninfo.field("dbname=", -1).field(" ", 1));
+
 	this->updater(2, dbconn_no);
 	this->updater(3, dbconn_no);
 
@@ -1093,7 +1098,7 @@ bool var::attach(in filenames) const {
 	var filenames2;
 	if (filenames == "dict") {
 		filenames2 = "";
-		var allfilenames = this->listfiles();
+		let allfilenames = this->listfiles();
 		for (var filename : allfilenames) {
 			if (filename.starts("dict.")) {
 				filenames2 ^= filename ^ FM;
@@ -1123,7 +1128,7 @@ bool var::attach(in filenames) const {
 
 	//fail if anything not attached
 	if (notattached_filenames) UNLIKELY {
-		var errmsg = "ERROR: vardb:/attach: " ^ notattached_filenames ^ "cannot be attached on connection " ^ this->f(1).quote();
+		let errmsg = "ERROR: vardb:/attach: " ^ notattached_filenames ^ "cannot be attached on connection " ^ this->f(1).quote();
 		this->setlasterror(errmsg);
 		return false;
 	}
@@ -1194,7 +1199,7 @@ void var::disconnect() {
 	std::erase_if(
 		thread_file_handles,
 		[dbconn_no](auto iter){
-			var file = iter.second;
+			let file = iter.second;
 			// Don't erase if not the desired dbconn_no
 			if (file.f(2) != dbconn_no) UNLIKELY
 				return false;
@@ -1374,7 +1379,7 @@ bool var::open(in filename, in connection /*DEFAULTNULL*/) {
 
 	//failure if not found
 	if (not result.ends("t")) UNLIKELY {
-		var errmsg = "ERROR: vardb: 2 open(" ^ filename.quote() ^
+		let errmsg = "ERROR: vardb: 2 open(" ^ filename.quote() ^
 					") file does not exist.";
 		this->setlasterror(errmsg);
 		return false;
@@ -1571,14 +1576,14 @@ bool var::read(in file, in key) {
 
 	// asking to read DOS file! do osread using key as osfilename!
 	if (file == "") UNLIKELY {
-		var errmsg = "read(...) filename not specified, probably not opened.";
+		let errmsg = "read(...) filename not specified, probably not opened.";
 		this->setlasterror(errmsg);
 		throw VarDBException(errmsg);
 	}
 
 	// reading a magic special key returns all keys in the file in natural order
 	if (key == "%RECORDS%") UNLIKELY {
-		var sql = "SELECT key from " ^ get_normal_filename(file) ^ ";";
+		let sql = "SELECT key from " ^ get_normal_filename(file) ^ ";";
 
 		auto pgconn = get_pgconn(file);
 		if (! pgconn) UNLIKELY
@@ -1596,7 +1601,7 @@ bool var::read(in file, in key) {
 		int ntuples = PQntuples(dbresult);
 		for (int tuplen = 0; tuplen < ntuples; tuplen++) {
 			if (!PQgetisnull(dbresult, tuplen, 0)) {
-				var key = getpgresultcell(dbresult, tuplen, 0);
+				let key = getpgresultcell(dbresult, tuplen, 0);
 				//skip metadata keys starting and ending in % eg "%RECORDS%"
 				if (not key.starts("%") && not key.ends("%")) {
 					if (this->len() <= 65535) {
@@ -1622,7 +1627,7 @@ bool var::read(in file, in key) {
 	// get file specific connection or fail
 	auto pgconn = get_pgconn(file);
 	if (!pgconn) UNLIKELY {
-		var errmsg = "var::read() get_pgconn() failed for " ^ file;
+		let errmsg = "var::read() get_pgconn() failed for " ^ file;
 		this->setlasterror(errmsg);
 		// // this->loglasterror(errmsg);
 		throw VarDBException(errmsg);
@@ -1631,7 +1636,7 @@ bool var::read(in file, in key) {
 	const char* paramValues[] = {key2.data()};
 	int paramLengths[] = {static_cast<int>(key2.size())};
 
-	var sql = "SELECT data FROM " ^ get_normal_filename(file) ^ " WHERE key = $1";
+	let sql = "SELECT data FROM " ^ get_normal_filename(file) ^ " WHERE key = $1";
 
 	DEBUG_LOG_SQL1
 	//DBresult dbresult = PQexecParams(pgconn,
@@ -1645,7 +1650,7 @@ bool var::read(in file, in key) {
 
 	// Handle serious errors
 	if (PQresultStatus(dbresult) != PGRES_TUPLES_OK) UNLIKELY {
-		var sqlstate = var(PQresultErrorField(dbresult, PG_DIAG_SQLSTATE));
+		let sqlstate = var(PQresultErrorField(dbresult, PG_DIAG_SQLSTATE));
 		var errmsg =
 			"read(" ^ file.convert("." _FM, "_^").replace("dict_","dict.").quote() ^ ", " ^ key.quote() ^ ")";
 		if (sqlstate == "42P01")
@@ -1671,7 +1676,7 @@ bool var::read(in file, in key) {
 
 	// A serious error
 	if (PQntuples(dbresult) > 1) UNLIKELY {
-		var errmsg = "ERROR: vardb: read() SELECT returned more than one record";
+		let errmsg = "ERROR: vardb: read() SELECT returned more than one record";
 		this->setlasterror(errmsg);
 		// this->loglasterror();
 		throw VarDBException(errmsg);
@@ -1783,8 +1788,8 @@ var  var::lock(in key) const {
 
 	// Handle serious errors
 	if (PQresultStatus(dbresult) != PGRES_TUPLES_OK || PQntuples(dbresult) != 1) UNLIKELY {
-		var sqlstate = var(PQresultErrorField(dbresult, PG_DIAG_SQLSTATE));
-		var errmsg = "lock(" ^ *this ^ ", " ^ key ^ ")\n" ^
+		let sqlstate = var(PQresultErrorField(dbresult, PG_DIAG_SQLSTATE));
+		let errmsg = "lock(" ^ *this ^ ", " ^ key ^ ")\n" ^
 			var(PQerrorMessage(pgconn)) ^ "\nSQLERROR:" ^ sqlstate ^ " PQresultStatus=" ^
 			var(PQresStatus(PQresultStatus(dbresult))) ^ ", PQntuples=" ^
 			var(PQntuples(dbresult));
@@ -1858,8 +1863,8 @@ bool var::unlock(in key) const {
 
 	// Handle serious errors
 	if (PQresultStatus(dbresult) != PGRES_TUPLES_OK) UNLIKELY {
-		var sqlstate = var(PQresultErrorField(dbresult, PG_DIAG_SQLSTATE));
-		var errmsg = "unlock(" ^ this->convert(_FM, "^") ^ ", " ^ key ^ ")\n" ^
+		let sqlstate = var(PQresultErrorField(dbresult, PG_DIAG_SQLSTATE));
+		let errmsg = "unlock(" ^ this->convert(_FM, "^") ^ ", " ^ key ^ ")\n" ^
 				var(PQerrorMessage(pgconn)) ^ "\nSQLERROR:" ^ sqlstate ^ " PQresultStatus=" ^
 				var(PQresStatus(PQresultStatus(dbresult))) ^ ", PQntuples=" ^
 				var(PQntuples(dbresult));
@@ -1945,7 +1950,7 @@ bool var::sqlexec(in sqlcmd, io response) const {
 	if (PQresultStatus(dbresult) != PGRES_COMMAND_OK &&
 		PQresultStatus(dbresult) != PGRES_TUPLES_OK) UNLIKELY {
 		//int xx = PQresultStatus(dbresult);
-		var sqlstate = var(PQresultErrorField(dbresult, PG_DIAG_SQLSTATE));
+		let sqlstate = var(PQresultErrorField(dbresult, PG_DIAG_SQLSTATE));
 		// sql state 42P03 = duplicate_cursor
 		response = var(PQerrorMessage(pgconn)) ^ " sqlstate:" ^ sqlstate ^ " " ^ sqlcmd;
 		return false;
@@ -2084,8 +2089,8 @@ void var::write(in file, in key) const {
 
 	// Handle serious errors
 	if (PQresultStatus(dbresult) != PGRES_COMMAND_OK) UNLIKELY {
-		var sqlstate = var(PQresultErrorField(dbresult, PG_DIAG_SQLSTATE));
-		var errmsg = "ERROR: vardb: write(" ^ file.convert(_FM, "^") ^
+		let sqlstate = var(PQresultErrorField(dbresult, PG_DIAG_SQLSTATE));
+		let errmsg = "ERROR: vardb: write(" ^ file.convert(_FM, "^") ^
 					", " ^ key ^ ") failed: SQLERROR:" ^ sqlstate ^ " PQresultStatus=" ^
 					var(PQresStatus(PQresultStatus(dbresult))) ^ " " ^
 					var(PQerrorMessage(pgconn));
@@ -2127,7 +2132,7 @@ bool var::updaterecord(in file, in key) const {
 	const char* paramValues[] = {key2.data(), data2.data()};
 	int paramLengths[] = {static_cast<int>(key2.size()), static_cast<int>(data2.size())};
 
-	var sql = "UPDATE "  ^ get_normal_filename(file) ^ " SET data = $2 WHERE key = $1";
+	let sql = "UPDATE "  ^ get_normal_filename(file) ^ " SET data = $2 WHERE key = $1";
 
 	auto pgconn = get_pgconn(file);
 	if (!pgconn) UNLIKELY {
@@ -2150,8 +2155,8 @@ bool var::updaterecord(in file, in key) const {
 
 	// Handle serious errors
 	if (PQresultStatus(dbresult) != PGRES_COMMAND_OK) UNLIKELY {
-		var sqlstate = var(PQresultErrorField(dbresult, PG_DIAG_SQLSTATE));
-		var errmsg = "ERROR: vardb: update(" ^ file.convert(_FM, "^") ^
+		let sqlstate = var(PQresultErrorField(dbresult, PG_DIAG_SQLSTATE));
+		let errmsg = "ERROR: vardb: update(" ^ file.convert(_FM, "^") ^
 				", " ^ key ^ ") SQLERROR: " ^ sqlstate ^ " Failed: " ^ var(PQntuples(dbresult)) ^ " " ^
 				var(PQerrorMessage(pgconn));
 		this->setlasterror(errmsg);
@@ -2195,7 +2200,7 @@ bool var::insertrecord(in file, in key) const {
 	const char* paramValues[] = {key2.data(), data2.data()};
 	int paramLengths[] = {static_cast<int>(key2.size()), static_cast<int>(data2.size())};
 
-	var sql =
+	let sql =
 		"INSERT INTO " ^ get_normal_filename(file) ^ " (key,data) values( $1 , $2)";
 
 	auto pgconn = get_pgconn(file);
@@ -2221,11 +2226,11 @@ bool var::insertrecord(in file, in key) const {
 	if (PQresultStatus(dbresult) != PGRES_COMMAND_OK) UNLIKELY {
 
 		// "duplicate key value violates unique constraint"
-		var sqlstate = var(PQresultErrorField(dbresult, PG_DIAG_SQLSTATE));
+		let sqlstate = var(PQresultErrorField(dbresult, PG_DIAG_SQLSTATE));
 		if (sqlstate == 23505) UNLIKELY
 			return false;
 
-		var errmsg = "ERROR: vardb: insertrecord(" ^
+		let errmsg = "ERROR: vardb: insertrecord(" ^
 				file.convert(_FM, "^") ^ ", " ^ key ^ ") Failed: " ^
 				var(PQntuples(dbresult)) ^ " SQLERROR:" ^ sqlstate ^ " " ^
 				var(PQerrorMessage(pgconn));
@@ -2271,7 +2276,7 @@ bool var::deleterecord(in key) const {
 	const char* paramValues[] = {key2.data()};
 	int paramLengths[] = {static_cast<int>(key2.size())};
 
-	var sql = "DELETE FROM " ^ get_normal_filename(*this) ^ " WHERE KEY = $1";
+	let sql = "DELETE FROM " ^ get_normal_filename(*this) ^ " WHERE KEY = $1";
 
 	auto pgconn = get_pgconn(*this);
 	if (!pgconn) UNLIKELY {
@@ -2293,8 +2298,8 @@ bool var::deleterecord(in key) const {
 
 	// Handle serious errors
 	if (PQresultStatus(dbresult) != PGRES_COMMAND_OK) UNLIKELY {
-		var sqlstate = var(PQresultErrorField(dbresult, PG_DIAG_SQLSTATE));
-		var errmsg = "ERROR: vardb: deleterecord(" ^ this->convert(_FM, "^") ^
+		let sqlstate = var(PQresultErrorField(dbresult, PG_DIAG_SQLSTATE));
+		let errmsg = "ERROR: vardb: deleterecord(" ^ this->convert(_FM, "^") ^
 				", " ^ key ^ ") SQLERROR: " ^ sqlstate ^ " Failed: " ^ var(PQntuples(dbresult)) ^ " " ^
 				var(PQerrorMessage(pgconn));
 		this->setlasterror(errmsg);
@@ -2565,7 +2570,7 @@ bool var::renamefile(in filename, in newfilename) const {
 	// Remove from the cache of file handles
 	file.detach(filename);
 
-	var sql = "ALTER TABLE " ^ filename ^ " RENAME TO " ^ newfilename;
+	let sql = "ALTER TABLE " ^ filename ^ " RENAME TO " ^ newfilename;
 
 //	if (this->assigned())
 //		return this->sqlexec(sql);
@@ -2601,7 +2606,7 @@ bool var::deletefile(in filename) const {
 		//filename.errputl("::deletefile ==== Connection cache NONE    = ");
 	}
 
-	var sql = "DROP TABLE " ^ filename.f(1) ^ " CASCADE";
+	let sql = "DROP TABLE " ^ filename.f(1) ^ " CASCADE";
 	//var sql = "DROP TABLE IF EXISTS " ^ filename.f(1) ^ " CASCADE";
 
 //	if (this->assigned())
@@ -2628,7 +2633,7 @@ bool var::clearfile(in filename) const {
 		return false;
 	}
 
-	var sql = "DELETE FROM " ^ filename.f(1);
+	let sql = "DELETE FROM " ^ filename.f(1);
 //	if (this->assigned())
 //		return this->sqlexec(sql);
 //	else
@@ -2662,7 +2667,7 @@ static var get_dictexpression(in cursor, in mainfilename, in filename, in dictfi
 		if (!actualdictfile.open(dictfilename)) {
 			dictfilename = "dict.voc";
 			if (!actualdictfile.open(dictfilename)) UNLIKELY {
-				var errmsg = "get_dictexpression() cannot open " ^ dictfilename.quote();
+				let errmsg = "get_dictexpression() cannot open " ^ dictfilename.quote();
 				//this->setlasterror(errmsg);
 				//this->loglasterror();
 				throw VarDBException(errmsg);
@@ -2673,7 +2678,7 @@ static var get_dictexpression(in cursor, in mainfilename, in filename, in dictfi
 	//if doing 2nd pass then calculated fields have been placed in a parallel temporary file
 	//and their column names appended with a colon (:)
 	var stage2_calculated = fieldname.ends(":");
-	var stage2_filename = "SELECT_CURSOR_STAGE2_" ^ cursor.f(1);
+	let stage2_filename = "SELECT_CURSOR_STAGE2_" ^ cursor.f(1);
 
 	if (stage2_calculated) {
 		fieldname.popper();
@@ -2711,7 +2716,7 @@ static var get_dictexpression(in cursor, in mainfilename, in filename, in dictfi
 								FM ^ FM ^ FM ^ FM ^ FM ^ "" ^ FM ^
 								15;
 						else UNLIKELY {
-							var errmsg = "get_dictexpression() cannot read " ^
+							let errmsg = "get_dictexpression() cannot read " ^
 								fieldname.quote() ^ " from " ^
 								actualdictfile.convert(FM, "^")
 									.quote() ^
@@ -2736,9 +2741,9 @@ static var get_dictexpression(in cursor, in mainfilename, in filename, in dictfi
 		dictrec(8) = stage2_calculated;
 	}
 
-	var dicttype = dictrec.f(1);
-	var fieldno = dictrec.f(2);
-	var conversion = dictrec.f(7);
+	let dicttype = dictrec.f(1);
+	let fieldno = dictrec.f(2);
+	let conversion = dictrec.f(7);
 
 	bool isinteger = conversion == "[NUMBER,0]" || dictrec.f(11) == "0N" ||
 					dictrec.f(11).starts("0N_");
@@ -2772,7 +2777,7 @@ static var get_dictexpression(in cursor, in mainfilename, in filename, in dictfi
 				sqlexpression = get_fileexpression(mainfilename, filename, "key");
 
 			// Multipart key - extract relevent field based on "*" separator
-			var keypartn = dictrec.f(5);
+			let keypartn = dictrec.f(5);
 			if (keypartn) {
 				sqlexpression =
 					"split_part(" ^ sqlexpression ^ ", '*', " ^ keypartn ^ ")";
@@ -2800,7 +2805,7 @@ static var get_dictexpression(in cursor, in mainfilename, in filename, in dictfi
 
 		} // of key field, Fieldno = 0
 
-		var extractargs =
+		let extractargs =
 			get_fileexpression(mainfilename, filename, "data") ^ "," ^ fieldno ^ ", 0, 0)";
 
 		if (conversion.starts("[DATETIME"))
@@ -2887,9 +2892,9 @@ TRACE: "QQQ"="QQQ"
 
 			// Extract pgsql_line1
 			var delim;
-			var pgsql_line1 = function_src.substr2(pgsql_pos, delim);
+			let pgsql_line1 = function_src.substr2(pgsql_pos, delim);
 
-//			var keydictid = pgsql_line1.field(" ", 2);
+//			let keydictid = pgsql_line1.field(" ", 2);
 //			if (keydictid) {
 //				sqlexpression ^= get_dictexpression(
 //					cursor, filename, filename, dictfilename, dictfile,
@@ -2976,10 +2981,10 @@ TRACE: "QQQ"="QQQ"
 			var xlatefromfieldname = function_src.field(",", 2).trim();
 
 			// arg3 = target field number/name
-			var xlatetargetfieldname = function_src.field(",", 3).trim().unquote();
+			let xlatetargetfieldname = function_src.field(",", 3).trim().unquote();
 
 			// arg4 = mode X or C
-			var xlatemode = function_src.field(",", 4).trim().convert("'\" )", "");
+			let xlatemode = function_src.field(",", 4).trim().convert("'\" )", "");
 
 			// Error if fourth field is not "X", "C" or 'C'
 			if (xlatemode != "X" && xlatemode != "C") {
@@ -3015,10 +3020,10 @@ TRACE: "QQQ"="QQQ"
 				//	throw VarDBException("get_dictexpression() DICT" ^
 				// xlatetargetfilename ^ " file cannot be opened"); var
 				// ismv;
-				var xlatetargetdictfilename = "dict." ^ xlatetargetfilename;
+				let xlatetargetdictfilename = "dict." ^ xlatetargetfilename;
 				var xlatetargetdictfile;
 				if (!xlatetargetdictfile.open(xlatetargetdictfilename)) UNLIKELY {
-					var errmsg = xlatetargetdictfilename ^ " cannot be opened for " ^ function_src;
+					let errmsg = xlatetargetdictfilename ^ " cannot be opened for " ^ function_src;
 					throw VarDBException(errmsg);
 				}
 				bool isdatetime;
@@ -3085,7 +3090,7 @@ TRACE: "QQQ"="QQQ"
 			// joins needs to follow "FROM mainfilename" clause
 			// except for joins based on mv fields which need to follow the
 			// unnest function
-			var joinsectionn = ismv ? 2 : 1;
+			let joinsectionn = ismv ? 2 : 1;
 
 			// add the join
 			///similar code above/below
@@ -3097,7 +3102,7 @@ TRACE: "QQQ"="QQQ"
 			var join_part1 = stage2_calculated ? "RIGHT" : "LEFT";
 			join_part1 ^= " JOIN " ^ xlatetargetfilename ^ " ON ";
 
-			var join_part2 =
+			let join_part2 =
 				xlatetargetfilename ^ ".key = " ^ xlatekeyexpression;
 			// only allow one join per file for now.
 			// TODO allow multiple joins to the same file via different keys
@@ -3170,8 +3175,8 @@ exodus_call:
 
 		//multivalued prestage2_calculated field DUPLICATE CODE
 		if (fieldname0.ends(":")) {
-			var joinsectionn = 1;
-			var join = "RIGHT JOIN " ^ stage2_filename ^ " ON " ^ stage2_filename ^ ".key = " ^ filename ^ ".key";
+			let joinsectionn = 1;
+			let join = "RIGHT JOIN " ^ stage2_filename ^ " ON " ^ stage2_filename ^ ".key = " ^ filename ^ ".key";
 			//if (!joins.f(joinsectionn).contains(join))
 			if (!joins.contains(join))
 				//joins.r(joinsectionn, -1, join);
@@ -3229,8 +3234,8 @@ exodus_call:
 
 				//multivalued prestage2_calculated field DUPLICATE CODE
 				if (fieldname0.ends(":")) {
-					var joinsectionn = 1;
-					var join = "RIGHT JOIN " ^ stage2_filename ^ " ON " ^ stage2_filename ^ ".key = " ^ filename ^ ".key";
+					let joinsectionn = 1;
+					let join = "RIGHT JOIN " ^ stage2_filename ^ " ON " ^ stage2_filename ^ ".key = " ^ filename ^ ".key";
 					//if (!joins.f(joinsectionn).contains(join))
 					if (!joins.contains(join))
 						//joins.r(joinsectionn, -1, join);
@@ -3285,7 +3290,7 @@ static var getword(io remainingwords, io ucword) {
 	}
 
 	// join words within quote marks into one quoted phrase
-	var char1 = word1.first();
+	let char1 = word1.first();
 	if ((char1 == DQ || char1 == SQ)) {
 		while (not word1.ends(char1) || word1.len() <= 1) {
 			if (remainingwords.len()) {
@@ -3311,7 +3316,7 @@ static var getword(io remainingwords, io ucword) {
 		// to cater for WITH fieldname NOT 'X' AND 'Y' AND 'Z'
 		// duplicated above/below
 		if (nextword == "and") {
-			var nextword2 = remainingwords;
+			let nextword2 = remainingwords;
 			if (valuechars.contains(nextword2.first())) {
 				nextword = nextword2;
 				remainingwords = remainingwords.field(" ", 2, 99999);
@@ -3332,7 +3337,7 @@ static var getword(io remainingwords, io ucword) {
 			// to cater for WITH fieldname NOT 'X' AND 'Y' AND 'Z'
 			// duplicated above/below
 			if (nextword == "and") {
-				var nextword2 = remainingwords;
+				let nextword2 = remainingwords;
 				if (valuechars.contains(nextword2[1])) {
 					nextword = nextword2;
 					remainingwords = remainingwords.field(" ", 2, 99999);
@@ -3374,8 +3379,8 @@ static var getword(io remainingwords, io ucword) {
 //		filename.logputl("DBTR var::saveselect() ");
 //
 //	int recn = 0;
-//	var key;
-//	var mv;
+//	let key;
+//	let mv;
 //
 //	// save preselected keys into a file to be used with INNERJOIN on select()
 //
@@ -3386,7 +3391,7 @@ static var getword(io remainingwords, io ucword) {
 //	if (!this->createfile(filename))
 //		throw VarDBException("saveselect cannot create file " ^ filename);
 //
-//	var file;
+//	let file;
 //	if (!file.open(filename, (*this)))
 //		throw VarDBException("saveselect cannot open file " ^ filename);
 //
@@ -3451,7 +3456,7 @@ bool var::selectx(in fieldnames, in sortselectclause) {
 	var dictfile = "";
 	var keycodes = "";
 	bool bykey = false;
-	var wordn;
+	let wordn;
 	var distinctfieldnames = "";
 
 	var whereclause = "";
@@ -3467,13 +3472,13 @@ bool var::selectx(in fieldnames, in sortselectclause) {
 	var xx; // throwaway return value
 
 	//prepare to save calculated fields that cannot be calculated by postgresql for secondary processing
-	var calc_fields = "";
+	let calc_fields = "";
 	//var ncalc_fields=0;
 	this->updater(10, "");
 
 	//catch bad FM character
 	if (sortselectclause.var_str.find(FM_) != std::string::npos) UNLIKELY {
-		var errmsg = "Illegal FM character in " ^ sortselectclause;
+		let errmsg = "Illegal FM character in " ^ sortselectclause;
 		throw VarDBException(errmsg);
 	}
 
@@ -3490,7 +3495,7 @@ bool var::selectx(in fieldnames, in sortselectclause) {
 	// remaining.logputl("remaining=");
 
 	// remove trailing options eg (S) or {S}
-	var lastword = remaining.field(" ", -1);
+	let lastword = remaining.field(" ", -1);
 	if ((lastword.starts("(") && lastword.ends(")")) ||
 		(lastword.starts("{") && lastword.ends("}"))) {
 		remaining.cutter(-lastword.len() - 1);
@@ -3504,7 +3509,8 @@ bool var::selectx(in fieldnames, in sortselectclause) {
 			bykey = true;
 
 		// remove it
-		var xx = getword(remaining, xx);
+		var yy;
+		let xx = getword(remaining, yy);
 
 		firstucword = remaining.field(" ", 1).ucase();
 	}
@@ -3514,7 +3520,8 @@ bool var::selectx(in fieldnames, in sortselectclause) {
 		maxnrecs = firstucword;
 
 		// remove it
-		var xx = getword(remaining, xx);
+		var yy;
+		let xx = getword(remaining, yy);
 
 		firstucword = remaining.field(" ", 1).ucase();
 	}
@@ -3525,13 +3532,13 @@ bool var::selectx(in fieldnames, in sortselectclause) {
 		actualfilename = firstucword;
 		dictfilename = actualfilename;
 		// remove it
-		var xx = getword(remaining, firstucword);
+		let xx = getword(remaining, firstucword);
 	}
 
 	// actualfilename.logputl("actualfilename=");
 	if (!actualfilename) UNLIKELY {
 		// this->outputl("this=");
-		var errmsg = "filename missing from select statement:" ^ sortselectclause;
+		let errmsg = "filename missing from select statement:" ^ sortselectclause;
 		throw VarDBException(errmsg);
 	}
 
@@ -3573,7 +3580,7 @@ bool var::selectx(in fieldnames, in sortselectclause) {
 		else if (ucword == "USING" && remaining) {
 			dictfilename = getword(remaining, xx);
 			if (!dictfile.open("dict." ^ dictfilename)) UNLIKELY {
-				var errmsg = "select() dict_" ^ dictfilename ^ " file cannot be opened";
+				let errmsg = "select() dict_" ^ dictfilename ^ " file cannot be opened";
 				throw VarDBException(errmsg);
 			}
 			if (DBTRACE_SELECT)
@@ -3584,9 +3591,9 @@ bool var::selectx(in fieldnames, in sortselectclause) {
 		// distinct fieldname (returns a field instead of the key)
 		else if (ucword == "DISTINCT" && remaining) UNLIKELY {
 
-			var distinctfieldname = getword(remaining, xx);
-			var distinctexpression = get_dictexpression(*this, actualfilename, actualfilename, dictfilename, dictfile, distinctfieldname, joins, unnests, selects, ismv, isdatetime, false);
-			var naturalsort_distinctexpression = get_dictexpression(*this, actualfilename, actualfilename, dictfilename, dictfile, distinctfieldname, joins, unnests, selects, ismv, isdatetime, true);
+			let distinctfieldname = getword(remaining, xx);
+			let distinctexpression = get_dictexpression(*this, actualfilename, actualfilename, dictfilename, dictfile, distinctfieldname, joins, unnests, selects, ismv, isdatetime, false);
+			let naturalsort_distinctexpression = get_dictexpression(*this, actualfilename, actualfilename, dictfilename, dictfile, distinctfieldname, joins, unnests, selects, ismv, isdatetime, true);
 
 			if ((true)) {
 				// this produces the right values but in random order
@@ -3610,7 +3617,7 @@ bool var::selectx(in fieldnames, in sortselectclause) {
 		// by or by-dsnd
 		else if (ucword == "BY" || ucword == "BY-DSND") {
 			// next word must be dictid
-			var dictid = getword(remaining, xx);
+			let dictid = getword(remaining, xx);
 			var dictexpression =
 				get_dictexpression(*this, actualfilename, actualfilename, dictfilename, dictfile, dictid, joins, unnests, selects, ismv, isdatetime, true);
 
@@ -3704,19 +3711,19 @@ bool var::selectx(in fieldnames, in sortselectclause) {
 			//}
 
 			// process the dictionary id
-			var forsort =
+			let forsort =
 				false;	// because indexes are NOT created sortable (exodus_sort()
 			var dictexpression =
 				get_dictexpression(*this, actualfilename, actualfilename, dictfilename,
 							dictfile, word1, joins, unnests, selects, ismv, isdatetime, forsort);
 			//var usingnaturalorder = dictexpression.contains("exodus.extract_sort") or dictexpression.contains("exodus_natural");
-			var dictid = word1;
+			let dictid = word1;
 
 			//var dictexpression_isarray=dictexpression.contains("string_to_array(");
-			var dictexpression_isarray = dictexpression.contains("_array(");
+			let dictexpression_isarray = dictexpression.contains("_array(");
 			var dictexpression_isvector = dictexpression.contains("to_tsvector(");
 			//var dictexpression_isfulltext = dictid.ucase(),ends("_XREF");
-			var dictexpression_isfulltext = dictid.ucase().ends("XREF");
+			let dictexpression_isfulltext = dictid.ucase().ends("XREF");
 
 			// add the dictid expression
 			//if (dictexpression.contains("exodus_call"))
@@ -3752,7 +3759,7 @@ bool var::selectx(in fieldnames, in sortselectclause) {
 
 				//prevent BETWEEN being used on fields
 				if (dictexpression_isvector) UNLIKELY {
-					var errmsg = sortselectclause ^ " 'BETWEEN x AND y' and 'FROM x TO y' ... are not currently supported for mv or xref columns";
+					let errmsg = sortselectclause ^ " 'BETWEEN x AND y' and 'FROM x TO y' ... are not currently supported for mv or xref columns";
 					throw VarDBException(errmsg);
 				}
 
@@ -3769,7 +3776,7 @@ bool var::selectx(in fieldnames, in sortselectclause) {
 
 				// check we have two values (in word1 and word2)
 				if (!valuechars.contains(word1.first()) || !valuechars.contains(word2.first())) UNLIKELY {
-					var errmsg = sortselectclause ^ "BETWEEN x AND y/FROM x TO y must be followed by two values (x AND/TO y)";
+					let errmsg = sortselectclause ^ "BETWEEN x AND y/FROM x TO y must be followed by two values (x AND/TO y)";
 					throw VarDBException(errmsg);
 				}
 
@@ -3782,7 +3789,7 @@ bool var::selectx(in fieldnames, in sortselectclause) {
 				// no filtering in database on calculated items
 				//save then for secondary filtering
 				if (dictexpression.contains("exodus_call")) {
-					var opid = negative ? ">!<" : "><";
+					let opid = negative ? ">!<" : "><";
 
 					//almost identical code for exodus_call above/below
 					var calc_fieldn;
@@ -3795,7 +3802,7 @@ bool var::selectx(in fieldnames, in sortselectclause) {
 					//prevent WITH XXX appearing twice in the same sort/select clause
 					//unless and until implemented
 					if (calc_fields.f(2, calc_fieldn)) UNLIKELY {
-						var errmsg = "WITH " ^ dictid ^ " must not appear twice in " ^ sortselectclause.quote();
+						let errmsg = "WITH " ^ dictid ^ " must not appear twice in " ^ sortselectclause.quote();
 						throw VarDBException(errmsg);
 					}
 
@@ -3975,7 +3982,7 @@ bool var::selectx(in fieldnames, in sortselectclause) {
 				// if present in the search criteria, they need to be escaped with
 				// TWO backslashes.
 				word1.replacer("\\", "\\\\");
-				var special = "[^$.|?*+()";
+				let special = "[^$.|?*+()";
 				for (int ii = special.len(); ii > 0; --ii) {
 					if (special.contains(word1.at(ii)))
 						word1.paster(ii, "\\");
@@ -3988,7 +3995,7 @@ bool var::selectx(in fieldnames, in sortselectclause) {
 				if (op == "<>")
 					negative = !negative;
 				else if (op != "=" and op != "") UNLIKELY {
-					var errmsg = "SELECT ... WITH " ^ op ^ " " ^ word1 ^ " is not supported. " ^ prefix.quote() ^ " " ^ postfix.quote();
+					let errmsg = "SELECT ... WITH " ^ op ^ " " ^ word1 ^ " is not supported. " ^ prefix.quote() ^ " " ^ postfix.quote();
 					throw VarDBException(errmsg);
 				}
 
@@ -4070,7 +4077,7 @@ bool var::selectx(in fieldnames, in sortselectclause) {
 					calc_fields(1, calc_fieldn) = dictid;
 				}
 				if (calc_fields.f(2, calc_fieldn)) UNLIKELY {
-					var errmsg = "WITH " ^ dictid ^ " must not appear twice in " ^ sortselectclause.quote();
+					let errmsg = "WITH " ^ dictid ^ " must not appear twice in " ^ sortselectclause.quote();
 					throw VarDBException(errmsg);
 				}
 
@@ -4100,11 +4107,11 @@ bool var::selectx(in fieldnames, in sortselectclause) {
 				//op = "<>";
 				//value = "''";
 
-				var origdictexpression = dictexpression;
+				let origdictexpression = dictexpression;
 				//remove conversion to date/number etc
 				//i.e for non-symbolic dicts i.e exodus.extract_date() and not dict_clients_stopped2()
 				to_extract_text(dictexpression);
-				var replacedbyextracttext = dictexpression != origdictexpression;
+				let replacedbyextracttext = dictexpression != origdictexpression;
 
 				//remove conversion to array
 				//eg string_to_array(exodus.extract_text(JOBS.data,6, 0, 0), chr(29),'')
@@ -4430,7 +4437,7 @@ bool var::selectx(in fieldnames, in sortselectclause) {
 				TRACE(whereclause)
 			// Default to OR between with clauses
 			if (whereclause) {
-				var lastpart = whereclause.field(" ", -1);
+				let lastpart = whereclause.field(" ", -1);
 				if (not var("OR AND (").locateusing(" ", lastpart))
 					whereclause ^= " or ";
 				if (DBTRACE_SELECT)
@@ -4491,12 +4498,12 @@ bool var::selectx(in fieldnames, in sortselectclause) {
 
 	// if any active select, convert to a file and use as an additional filter on key
 	// or correctly named savelistfilename exists from getselect or selectkeys
-	var listname = "";
+	let listname = "";
 	// see also listname below
 	//	if (this->hasnext()) {
 	//		listname=this->f(1) ^ "_" ^ ospid() ^ "_tempx";
 	//		this->savelist(listname);
-	//		var savelistfilename="savelist_" ^ listname;
+	//		let savelistfilename="savelist_" ^ listname;
 	//		joins ^= " \nINNER JOIN\n " ^ savelistfilename ^ " ON " ^ actualfilename ^
 	//".key = " ^ savelistfilename ^ ".key";
 	//	}
@@ -4533,7 +4540,7 @@ bool var::selectx(in fieldnames, in sortselectclause) {
 	if (this->hasnext()) {
 
 		//create a temporary sql table to hold the preselected keys
-		var temptablename = "SELECT_CURSOR_" ^ this->f(1);
+		let temptablename = "SELECT_CURSOR_" ^ this->f(1);
 		//var createtablesql = "DROP TABLE IF EXISTS " ^ temptablename ^ ";\n";
 		//createtablesql ^= "CREATE TABLE " ^ temptablename ^ "\n";
 		var createtablesql = "CREATE TEMPORARY TABLE IF NOT EXISTS " ^ temptablename ^ "\n";
@@ -4636,9 +4643,9 @@ bool var::selectx(in fieldnames, in sortselectclause) {
 		sql2 ^= "CLOSE cursor1_";
 
 		if (this->assigned()) {
-			var cursorcode = this->f(1).convert(".", "_");
+			let cursorcode = this->f(1).convert(".", "_");
 			sql2 ^= cursorcode;
-			var cursorid = this->f(2) ^ "_" ^ cursorcode;
+			let cursorid = this->f(2) ^ "_" ^ cursorcode;
 			thread_dbresults.erase(cursorid);
 		}
 
@@ -4704,7 +4711,7 @@ void var::clearselect() {
 		//		return;
 	}
 
-	var listname = (*this) ^ "_" ^ ospid() ^ "_tempx";
+	let listname = (*this) ^ "_" ^ ospid() ^ "_tempx";
 
 	// if (DBTRACE)
 	//	exo::logputl("DBTRACE: ::clearselect() for " ^ listname);
@@ -4723,8 +4730,8 @@ void var::clearselect() {
 	//delete any temporary sql table created to hold preselected keys
 	//if (this->assigned())
 	//{
-	//	var temptablename="PRESELECT_CURSOR_" ^ this->f(1);
-	//	var deletetablesql = "DROP TABLE IF EXISTS " ^ temptablename ^ ";\n";
+	//	let temptablename="PRESELECT_CURSOR_" ^ this->f(1);
+	//	let deletetablesql = "DROP TABLE IF EXISTS " ^ temptablename ^ ";\n";
 	//	if (!this->sqlexec(deletetablesql, errors))
 	//	{
 	//		if (errors)
@@ -4734,8 +4741,8 @@ void var::clearselect() {
 	//}
 
 	//if (this->assigned())
-	var cursorcode = this->f(1).convert(".", "_");
-	var cursorid = this->f(2) ^ "_" ^ cursorcode;
+	let cursorcode = this->f(1).convert(".", "_");
+	let cursorid = this->f(2) ^ "_" ^ cursorcode;
 
 	// Clean up cursor cache
 	thread_dbresults.erase(cursorid);
@@ -4764,8 +4771,8 @@ void var::clearselect() {
 //bool readnextx(in cursor, PGresult* pgresult, PGconn* pgconn, int  nrows, int* rown) {
 static bool readnextx(in cursor, PGconn* pgconn, int  direction, PGresult*& pgresult, int* rown) {
 
-	var cursorcode = cursor.f(1).convert(".", "_");
-	var cursorid = cursor.f(2) ^ "_" ^ cursorcode;
+	let cursorcode = cursor.f(1).convert(".", "_");
+	let cursorid = cursor.f(2) ^ "_" ^ cursorcode;
 
 	DBresult* dbresult = nullptr;
 	auto entry = thread_dbresults.find(cursorid);
@@ -4812,7 +4819,7 @@ static bool readnextx(in cursor, PGconn* pgconn, int  direction, PGresult*& pgre
 
 	}
 
-	var fetch_nrecs=64;
+	let fetch_nrecs=64;
 
 	var sql;
 	//if (direction >= 0)
@@ -4948,7 +4955,7 @@ bool var::savelist(SV listname) {
 	// open the lists file on the same connection
 	var lists = *this;
 	if (!lists.open("LISTS")) UNLIKELY {
-		var errmsg = "savelist() LISTS file cannot be opened";
+		let errmsg = "savelist() LISTS file cannot be opened";
 		this->setlasterror(errmsg);
 		// this->loglasterror();
 		throw VarDBException(errmsg);
@@ -5029,8 +5036,8 @@ bool var::getlist(SV listname) {
 		this->logputl("DBTR var::getlist(" ^ var(listname) ^ ") ");
 
 	//int recn = 0;
-	var key;
-	var mv;
+	let key;
+	let mv;
 	const var listname2 = listname;
 	var listfilename = "savelist_" ^ listname2.field(" ", 1);
 	listfilename.converter("-.*/", "____");
@@ -5039,7 +5046,7 @@ bool var::getlist(SV listname) {
 	// open the lists file on the same connection
 	var lists = *this;
 	if (!lists.open("LISTS")) UNLIKELY {
-		var errmsg = "getlist() LISTS file cannot be opened";
+		let errmsg = "getlist() LISTS file cannot be opened";
 		this->setlasterror(errmsg);
 		// this->loglasterror();
 		throw VarDBException(errmsg);
@@ -5079,7 +5086,7 @@ bool var::getlist(SV listname) {
 //
 //	this->clearselect();
 //
-//	var record;
+//	let record;
 //	if (not record.read(*this, keys)) UNLIKELY {
 //		keys.errputl("formlist() cannot read on handle(" ^ *this ^ ") ");
 //		return false;
@@ -5116,9 +5123,9 @@ bool var::getlist(SV listname) {
 //	this->deletelist(listname);
 //
 //	// open the lists file on the same connection
-//	var lists = *this;
+//	let lists = *this;
 //	if (!lists.open("LISTS")) UNLIKELY {
-//		var errmsg = "makelist() LISTS file cannot be opened";
+//		let errmsg = "makelist() LISTS file cannot be opened";
 //		this->setlasterror(errmsg);
 //		// this->loglasterror();
 //		throw VarDBException(errmsg);
@@ -5186,7 +5193,7 @@ bool var::hasnext() {
 		var keyno = this->f(5);
 		keyno++;
 
-		var key_and_mv = this->f(6, keyno);
+		let key_and_mv = this->f(6, keyno);
 
 		// true if we have another key
 		if (key_and_mv.len()) LIKELY
@@ -5198,7 +5205,7 @@ bool var::hasnext() {
 		// otherwise try and get another block
 		var lists = *this;
 		if (!lists.open("LISTS")) UNLIKELY {
-			var errmsg = "var::hasnext(): LISTS file cannot be opened";
+			let errmsg = "var::hasnext(): LISTS file cannot be opened";
 			this->setlasterror(errmsg);
 			// this->loglasterror();
 			throw VarDBException(errmsg);
@@ -5234,7 +5241,7 @@ bool var::hasnext() {
 
 	auto pgconn = get_pgconn(*this);
 	if (!pgconn) UNLIKELY {
-		var errmsg = "var::hasnext() get_pgconn() failed for " ^ this->quote();
+		let errmsg = "var::hasnext() get_pgconn() failed for " ^ this->quote();
 		this->setlasterror(errmsg);
 		// this->loglasterror();
 		throw VarDBException(errmsg);
@@ -5311,7 +5318,7 @@ bool var::readnext(io record, io key, io valueno) {
 			var keyno = this->f(5);
 			keyno++;
 
-			var key_and_mv = this->f(6, keyno);
+			let key_and_mv = this->f(6, keyno);
 
 			// if no more keys, try to get next block of keys, otherwise return false
 			if (key_and_mv.len() == 0) {
@@ -5327,7 +5334,7 @@ bool var::readnext(io record, io key, io valueno) {
 
 				var lists = *this;
 				if (!lists.open("LISTS")) UNLIKELY {
-					var errmsg = "readnext() LISTS file cannot be opened";
+					let errmsg = "readnext() LISTS file cannot be opened";
 			        this->setlasterror(errmsg);
        				// this->loglasterror();
        				throw VarDBException(errmsg);
@@ -5428,8 +5435,8 @@ bool var::createindex(in fieldname0, in dictfile) const {
 	ISSTRING(fieldname0)
 	ISSTRING(dictfile)
 
-	var filename = get_normal_filename(*this);
-	var fieldname = fieldname0.convert(".", "_");
+	let filename = get_normal_filename(*this);
+	let fieldname = fieldname0.convert(".", "_");
 
 	// actual dictfile to use is either given or defaults to that of the filename
 	var actualdictfile;
@@ -5447,8 +5454,8 @@ bool var::createindex(in fieldname0, in dictfile) const {
 	var selects = "";
 	bool ismv;
 	bool isdatetime;
-	var forsort = false;
-	var dictexpression = get_dictexpression(*this, filename, filename, actualdictfile, actualdictfile,
+	let forsort = false;
+	let dictexpression = get_dictexpression(*this, filename, filename, actualdictfile, actualdictfile,
 									fieldname, joins, unnests, selects, ismv, isdatetime, forsort);
 	// dictexpression.logputl("dictexp=");stop();
 
@@ -5469,7 +5476,7 @@ bool var::createindex(in fieldname0, in dictfile) const {
 		/*
 
 		// add a manually calculated index field
-		var index_fieldname = "index_" ^ fieldname;
+		let index_fieldname = "index_" ^ fieldname;
 		sql = "alter table " ^ filename ^ " add " ^ index_fieldname ^ " text";
 		if (not var().sqlexec(sql))
 		{
@@ -5525,8 +5532,8 @@ bool var::deleteindex(in fieldname0) const {
 	assertString(function_sig);
 	ISSTRING(fieldname0)
 
-	var filename = get_normal_filename(*this);
-	var fieldname = fieldname0.convert(".", "_");
+	let filename = get_normal_filename(*this);
+	let fieldname = fieldname0.convert(".", "_");
 
 	// delete the index field (actually only present on calculated field indexes so ignore
 	// result) deleting the index field automatically deletes the index
@@ -5542,7 +5549,7 @@ bool var::deleteindex(in fieldname0) const {
 	}
 
 	// Delete the index.
-	var sql = "drop index index__" ^ filename ^ "__" ^ fieldname;
+	let sql = "drop index index__" ^ filename ^ "__" ^ fieldname;
 	return this->sqlexec(sql);
 }
 
@@ -5553,7 +5560,7 @@ var  var::listfiles() const {
 
 	// from http://www.alberton.info/postgresql_meta_info.html
 
-	var schemafilter = " NOT IN ('pg_catalog', 'information_schema') ";
+	let schemafilter = " NOT IN ('pg_catalog', 'information_schema') ";
 
 	var sql =
 		"SELECT table_name, table_schema FROM information_schema.tables"
@@ -5576,8 +5583,8 @@ var  var::listfiles() const {
 	int nfiles = PQntuples(dbresult);
 	for (int filen = 0; filen < nfiles; filen++) {
 		if (!PQgetisnull(dbresult, filen, 0)) {
-			var filename = getpgresultcell(dbresult, filen, 0);
-			var schema = getpgresultcell(dbresult, filen, 1);
+			let filename = getpgresultcell(dbresult, filen, 0);
+			let schema = getpgresultcell(dbresult, filen, 1);
 
 			// if (schema == "public")
 			// Perhaps should ignore all schemas in postgresql's schema search_path
@@ -5601,7 +5608,7 @@ var  var::dblist() const {
 	THISIS("var  var::dblist() const")
 	assertVar(function_sig);
 
-	var sql = "SELECT datname FROM pg_database";
+	let sql = "SELECT datname FROM pg_database";
 
 	auto pgconn = get_pgconn(*this);
 	if (! pgconn) UNLIKELY
@@ -5611,7 +5618,7 @@ var  var::dblist() const {
 	if (!get_dbresult(sql, dbresult, pgconn)) UNLIKELY
 		return "";
 
-	var dbnames = "";
+	let dbnames = "";
 	auto ndbs = PQntuples(dbresult);
 	for (auto dbn = 0; dbn < ndbs; dbn++) {
 		if (!PQgetisnull(dbresult, dbn, 0)) {
@@ -5638,8 +5645,8 @@ bool var::cursorexists() {
 	// default cursor is ""
 	this->defaulter("");
 
-	var cursorcode = this->f(1).convert(".", "_");
-	var cursorid = this->f(2) ^ "_" ^ cursorcode;
+	let cursorcode = this->f(1).convert(".", "_");
+	let cursorid = this->f(2) ^ "_" ^ cursorcode;
 
 	// true if exists in cursor cache
 	if (thread_dbresults.find(cursorid) != thread_dbresults.end()) LIKELY
@@ -5650,7 +5657,7 @@ bool var::cursorexists() {
 		return false;
 
 	// from http://www.alberton.info/postgresql_meta_info.html
-	var sql = "SELECT name from pg_cursors where name = 'cursor1_" ^ cursorcode ^ "'";
+	let sql = "SELECT name from pg_cursors where name = 'cursor1_" ^ cursorcode ^ "'";
 
 	DBresult dbresult;
 	if (!get_dbresult(sql, dbresult, pgconn)) UNLIKELY
@@ -5666,8 +5673,8 @@ var  var::listindex(in filename0, in fieldname0) const {
 	ISSTRING(filename0)
 	ISSTRING(fieldname0)
 
-	var filename = filename0.f(1);
-	var fieldname = fieldname0.convert(".", "_");
+	let filename = filename0.f(1);
+	let fieldname = fieldname0.convert(".", "_");
 
 	// TODO for some reason doesnt return the exodus index_file__fieldname records
 	// perhaps you have to be connected with sufficient postgres rights
@@ -5699,7 +5706,7 @@ var  var::listindex(in filename0, in fieldname0) const {
 
 	std::string indexnames = "";
 	int nindexes = PQntuples(dbresult);
-	var lc_fieldname = fieldname.lcase();
+	let lc_fieldname = fieldname.lcase();
 	for (int indexn = 0; indexn < nindexes; indexn++) {
 		if (!PQgetisnull(dbresult, indexn, 0)) {
 			var indexname = getpgresultcell(dbresult, indexn, 0);
@@ -5732,7 +5739,7 @@ var  var::reccount(in filename0) const {
 	assertVar(function_sig);
 	ISSTRING(filename0)
 
-	var filename = filename0 ?: (*this);
+	let filename = filename0 ?: (*this);
 
 	// vacuum otherwise unreliable
 	if (!this->statustrans())
@@ -5784,7 +5791,7 @@ bool var::flushindex(in filename) const {
 	if (!get_dbresult(sql, dbresult, pgconn)) UNLIKELY
 		return false;
 
-//	var flushresult = "";
+//	let flushresult = "";
 	if (PQntuples(dbresult)) {
 //		flushresult = true;
 	}

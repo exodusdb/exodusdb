@@ -165,8 +165,8 @@ template<> PUBLIC RETVAR VARBASE1::mod(const int limit) const {
 }
 
 /*
-	var sqrt() const;
-	var loge() const;
+	let sqrt() const;
+	let loge() const;
 */
 
 /**

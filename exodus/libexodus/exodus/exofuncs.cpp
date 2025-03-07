@@ -506,9 +506,9 @@ ND PUBLIC bool createindex(in dbfilename_or_var, in fieldname, in dictdbfilename
 
 	//virtually identical code in createindex and deleteindex
 	if (dbfilename_or_var.contains(" ")) {
-		var dbfilename2 = dbfilename_or_var.field(" ", 1);
+		let dbfilename2 = dbfilename_or_var.field(" ", 1);
 		var fieldname2 = dbfilename_or_var.field(" ", 2);
-		var indextype2 = dbfilename_or_var.field(" ", 3);
+		let indextype2 = dbfilename_or_var.field(" ", 3);
 		if (indextype2 && indextype2 != "BTREE")
 			fieldname2 ^= "_" ^ indextype2;
 		return dbfilename2.createindex(fieldname2, dictdbfilename);
@@ -520,9 +520,9 @@ ND PUBLIC bool createindex(in dbfilename_or_var, in fieldname, in dictdbfilename
 ND PUBLIC bool deleteindex(in dbfilename_or_var, in fieldname) {
 	//virtually identical code in createindex and deleteindex
 	if (dbfilename_or_var.contains(" ")) {
-		var dbfilename2 = dbfilename_or_var.field(" ", 1);
+		let dbfilename2 = dbfilename_or_var.field(" ", 1);
 		var fieldname2 = dbfilename_or_var.field(" ", 2);
-		var indextype2 = dbfilename_or_var.field(" ", 3);
+		let indextype2 = dbfilename_or_var.field(" ", 3);
 		if (indextype2 && indextype2 != "BTREE")
 			fieldname2 ^= "_" ^ indextype2;
 		return dbfilename2.deleteindex(fieldname2);
@@ -603,7 +603,7 @@ PUBLIC int exodus_main(int exodus_argc, const char* exodus_argv[], ExoEnv& mv, i
 		mv.OPTIONS = "";
 	}
 
-	var temp;
+	let temp;
 	// DBTRACE=osgetenv("EXO_DBTRACE",temp)?1:-1;
 
 	// would have to passed in as a function pointer

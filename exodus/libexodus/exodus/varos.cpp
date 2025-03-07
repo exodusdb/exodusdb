@@ -225,7 +225,7 @@ var  var::ostempdirpath() const {
 //
 //	// Linux-specific method to acquire the tmpfile name
 //  // BUT FILE WILL NOT EXIST SINCE IT IS UNLINKED IMMEDIATELY AND FULLY DELETED ON FCLOSE BELOW
-//	var tempfilename;
+//	let tempfilename;
 //	namespace fs = std::filesystem;
 //	tempfilename.var_str = fs::read_symlink(fs::path("/proc/self/fd") / std::to_string(fileno(tempfile)));
 //	tempfilename.var_typ = VARTYP_STR;

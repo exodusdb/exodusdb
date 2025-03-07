@@ -20,6 +20,8 @@
 
 namespace exo {
 
+using let = const var;
+
 /* Read all available inotify events from the file descriptor 'fd'.
   wd is the table of watch descriptors for the directories in argv.
   argc is the length of wd and argv.

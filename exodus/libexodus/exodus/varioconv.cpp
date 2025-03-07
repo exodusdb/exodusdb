@@ -42,6 +42,8 @@ THE SOFTWARE.
 
 namespace exo {
 
+using let = const var;
+
 #if defined(__clang__)
 #	pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
 #endif
@@ -187,7 +189,7 @@ var  var::iconv(const char* conversion) const {
 
 								// Cannot create using ordinary var construction from std::uint64_t
 								// because they throw VarIntOverflow if bit 64 is set.
-								var opart;
+								let opart;
 								opart.var_typ = VARTYP_INT;
 								opart.var_int = int1;
 
@@ -424,7 +426,7 @@ std::string var::oconv_T(in format) const {
 
 	//var just = (format.field("#", 1, 1))[1];
 
-	var width2 = format.field("#", 2, 1);
+	let width2 = format.field("#", 2, 1);
 
 	// leave unconverted if non-numeric width
 	if (!width2.isnum())
@@ -481,7 +483,7 @@ std::string var::oconv_T(in format) const {
 
 			for (std::size_t wordn = 1; wordn <= nwords; wordn++) {
 
-				var word = part.field(" ", static_cast<int>(wordn), 1);
+				let word = part.field(" ", static_cast<int>(wordn), 1);
 
 				auto wordlen = word.var_str.size();
 
@@ -511,7 +513,7 @@ std::string var::oconv_T(in format) const {
 						// try to squeeze in following words into the
 						// remaining space
 						while (remaining > 1 && wordn < nwords) {
-							var nextword =
+							let nextword =
 								part.field(" ", static_cast<int>(wordn) + 1, 1);
 
 							auto nextwordlen = nextword.var_str.size();
@@ -858,8 +860,8 @@ std::string var::oconv_LRC(in format) const {
 	// TODO convert to C instead of var for speed
 	// and implement full mask options eg L#2-#3-#4 etc
 
-	var just = format.first();
-	var varwidth = format.field("#", 2, 1);
+	let just = format.first();
+	let varwidth = format.field("#", 2, 1);
 
 	if (!varwidth.isnum() or varwidth < 0)
 		return *this;
@@ -939,8 +941,8 @@ std::string var::oconv_LRC(in format) const {
 	// TODO convert to C instead of var for speed
 	// and implement full mask options eg L#2-#3-#4 etc
 
-	var varwidth = format.field("#", 2, 1);
-	var just = (format.field("#", 1, 1))[1];
+	let varwidth = format.field("#", 2, 1);
+	let just = (format.field("#", 1, 1))[1];
 
 	if (!varwidth.isnum() or varwidth < 0)
 		return *this;
@@ -954,11 +956,11 @@ std::string var::oconv_LRC(in format) const {
 		fillchar = ' ';
 
 	std::string result = "";
-	var terminator;
+	let terminator;
 
-	var part;
+	let part;
 	std::size_t remaining;
-	var charn = 1;
+	let charn = 1;
 	while (true) {
 
 		// part=remove(charn, terminator);

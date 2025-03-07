@@ -143,7 +143,7 @@ bool ExoProgram::select(in sortselectclause_or_filehandle) {
 	//CREATE TABLE SELECT_STAGE2(
 	// KEY TEXT PRIMARY KEY,
 	// EXECUTIVE_CODE TEXT)
-	var temptablename = "SELECT_CURSOR_STAGE2_" ^ CURSOR.f(1);
+	let temptablename = "SELECT_CURSOR_STAGE2_" ^ CURSOR.f(1);
 	var createtablesql = "";
 	createtablesql ^= "DROP TABLE IF EXISTS " ^ temptablename ^ ";\n";
 	//createtablesql ^= "CREATE TABLE " ^ temptablename ^ "(\n";
@@ -186,7 +186,7 @@ bool ExoProgram::select(in sortselectclause_or_filehandle) {
 
 		dictid.converter(".", "_");
 		dictids[fieldn] = dictid;
-		var sqlcolid = dictid ^ "_calc";
+		let sqlcolid = dictid ^ "_calc";
 
 		//ops
 
@@ -221,12 +221,12 @@ bool ExoProgram::select(in sortselectclause_or_filehandle) {
 			//ovalue.convert(VM,"]").logputl("ovalue=");
 		}
 
-		var ovalue2 = calc_fields.f(4, fieldn).unquote();
+		let ovalue2 = calc_fields.f(4, fieldn).unquote();
 
 		//iconv
 		var ivalue;
 		var ivalue2;
-		var ioconv = ioconvs[fieldn];
+		let ioconv = ioconvs[fieldn];
 		if (ioconv) {
 			ivalue = iconv(ovalue, ioconv);
 			ivalue2 = iconv(ovalue2, ioconv);
@@ -276,8 +276,8 @@ bool ExoProgram::select(in sortselectclause_or_filehandle) {
 
 		//debug
 		if (calc_fields_file && dictid != "AUTHORISED") {
-			var key = dictfilename ^ "*" ^ dictid;
-			var rec = sortselectclause ^ FM ^ op ^ FM ^ ovalue ^ FM ^ ovalue2;
+			let key = dictfilename ^ "*" ^ dictid;
+			let rec = sortselectclause ^ FM ^ op ^ FM ^ ovalue ^ FM ^ ovalue2;
 			rec.write(calc_fields_file, key);
 			key.logput("written to calc_fields ");
 		}
@@ -319,7 +319,7 @@ bool ExoProgram::select(in sortselectclause_or_filehandle) {
 		//some or all fields may not have filters, if 'order by' calculated fields
 		for (int fieldn = 1; fieldn <= nfields; ++fieldn) {
 
-			var ivalues = calculate(dictids[fieldn]);
+			let ivalues = calculate(dictids[fieldn]);
 //			TRACE(ivalues)
 //			TRACE(opnos.join())
 //			TRACE(fieldn)
@@ -334,7 +334,7 @@ bool ExoProgram::select(in sortselectclause_or_filehandle) {
 
 				while (true) {
 
-					var ivalue = ivalues.substr2(pos,nextsep);
+					let ivalue = ivalues.substr2(pos,nextsep);
 //					TRACE(ivalue)
 
 					switch (int(opnos[fieldn])) {
@@ -430,7 +430,7 @@ bool ExoProgram::select(in sortselectclause_or_filehandle) {
 
 			}//if opno
 
-			var sqltype = sqltypes[fieldn];
+			let sqltype = sqltypes[fieldn];
 			var ovalues;
 			if (sqltype == "DATE" || sqltype == "TIME" || sqltype == "TIMESTAMP") {
 				if (ivalues) {
@@ -505,13 +505,13 @@ bool ExoProgram::formlist(SV filename_or_command, in keys /*=""*/, const int fie
 	//remove any options from the filename or command
 	var filename2 = filename_or_command;
 	if (filename2.ends(")")) {
-		var options = filename2.field(" ", -1);
+		let options = filename2.field(" ", -1);
 		filename2.cutter(-options.len());
 		filename2.trimmerlast();
 	}
 
 	//optionally get keys from filename or command
-	var keys2 = (keys == "") ? filename2.field(" ", 2, 999999999) : keys;
+	let keys2 = (keys == "") ? filename2.field(" ", 2, 999999999) : keys;
 
 	//remove any keys from the filename
 	filename2 = filename2.field(" ", 1);
@@ -604,9 +604,9 @@ bool ExoProgram::deleterecord(in filename_or_handle_or_command, in key) {
 	// of createanalysis and eliminating it listcollections
 	////////////////////////////////////////////////////////
 
-	var command = filename_or_handle_or_command.f(1);
+	let command = filename_or_handle_or_command.f(1);
 
-	var filename = command.field(" ", 1);
+	let filename = command.field(" ", 1);
 
 	//if any keys provided (remove quotes if present)
 	int nwords = command.fcount(" ");
@@ -620,7 +620,7 @@ bool ExoProgram::deleterecord(in filename_or_handle_or_command, in key) {
 
 	if (nwords >= 2) {
 		for (int wordn = 2; wordn <= nwords; ++wordn) {
-			var key = command.field(" ", wordn).unquote();
+			let key = command.field(" ", wordn).unquote();
 			if (filename.deleterecord(key)) {
 				silent || key.quote().logputl("Deleted ");
 			} else {
@@ -668,8 +668,8 @@ void ExoProgram::note(in msg, in options) const {
 // note 3
 void ExoProgram::note(in msg, in options, io response) const {
 
-	var params = "";
-	var interactive = !SYSTEM.f(33);
+	let params = "";
+	let interactive = !SYSTEM.f(33);
 	if (interactive)
 		std::cout << var("----------------------------------------") << std::endl;
 
@@ -692,7 +692,7 @@ void ExoProgram::note(in msg, in options, io response) const {
 
 	std::cout << msg1 << std::endl;
 
-	var origresponse = response.assigned() ? response : "";
+	let origresponse = response.assigned() ? response : "";
 
 	//R=Reply required in response
 	if (options.contains("R")) {
@@ -732,7 +732,7 @@ void ExoProgram::note(in msg, in options, io response) const {
 
 	if (!options.contains("U")) {
 		if (USER4.len() > 8000) {
-			var msg2 = "Aborted MSG()>8000";
+			let msg2 = "Aborted MSG()>8000";
 			if (not USER4.contains(msg2)) {
 				std::cout << msg2 << std::endl;
 				//std::cout << USER4 << std::endl;
@@ -750,11 +750,9 @@ var ExoProgram::execute(in sentence) {
 	var saved_cursor;
 	pushselect(saved_cursor);
 
-	var sentence2 = sentence.fieldstore(" ", 1, 1, sentence.field(" ", 1).lcase());
+	let result = perform(sentence);
 
-	var result = perform(sentence);
-
-	pushselect(saved_cursor);
+	popselect(saved_cursor);
 
 	return result;
 }
@@ -762,80 +760,67 @@ var ExoProgram::execute(in sentence) {
 // chain
 [[noreturn]]
 void ExoProgram::chain(in libraryname) {
+
+	// Pass an environment variable that the performing/executing program will run on termination of this program.
 	CHAIN = libraryname;
+
 	this->stop();
 }
 
 // perform
 var ExoProgram::perform(in sentence) {
-	// THISIS("var ExoProgram::perform(in sentence)")
-	// ISSTRING(sentence)
-
-	// return ID^"*"^dictid;
-
-	// wire up the the library linker to have the current exoenv
-	// if (!perform_callable_.mv_)
-	//	perform_callable_.mv_=this;
 
 	// lowercase all library functions to aid in conversion from pickos
 	// TODO remove after conversion complete
 
-	//perform_callable_.mv_ = (&mv);
+	// Save some environment variables
+	//////////////////////////////////
 
-	// Save some environment
-	////////////////////////
+	// Must take a *COPY* since sentence might be a reference to SENTENCE if called like 'perform(SENTENCE)'
+	//var savesentence = move(SENTENCE);
+	let saved_sentence = SENTENCE;
 
-	var savesentence = "";
-	var savecommand = "";
-	var saveoptions = "";
-	var saverecur0 = "";
-	var saverecur1 = "";
-	var saverecur2 = "";
-	var saverecur3 = "";
-	var saverecur4 = "";
-	//
-	var saveid = "";
-	var saverecord = "";
-	var savemv = "";
-	var savedict = "";
+	// Note that move sets the moved variable to an empty string "".
+	let saved_command = COMMAND.move();
+	let saved_options = OPTIONS.move();
 
-	//SENTENCE.swap(savesentence);
-	// Must take a *COPY* since sentence and SENTENCE might be the same variable
-	// if called like 'perform(SENTENCE)'
-	savesentence = SENTENCE;
+	let saved_recur0 = RECUR0.move();
+	let saved_recur1 = RECUR1.move();
+	let saved_recur2 = RECUR2.move();
+	let saved_recur3 = RECUR3.move();
+	let saved_recur4 = RECUR4.move();
 
-	COMMAND.swap(savecommand);
-	OPTIONS.swap(saveoptions);
-	RECUR0.swap(saverecur0);
-	RECUR1.swap(saverecur1);
-	RECUR2.swap(saverecur2);
-	RECUR3.swap(saverecur3);
-	RECUR4.swap(saverecur4);
+	let saved_id     = ID.move();
+	let saved_record = RECORD.move();
+	let saved_mv     = MV.move();
+	let saved_dict   = DICT.move();
+
+	// Increase the perform/execute "level"
 	LEVEL++;
-	//
-	ID.swap(saveid);
-	RECORD.swap(saverecord);
-	MV.swap(savemv);
-	DICT.swap(savedict);
 
 	// A function to restore the environment
 	////////////////////////////////////////
 	auto restore_environment = [&]() {
-		// restore some environment
-		savesentence.swap(SENTENCE);
-		savecommand.swap(COMMAND);
-		saveoptions.swap(OPTIONS);
-		saverecur0.swap(RECUR0);
-		saverecur1.swap(RECUR1);
-		saverecur2.swap(RECUR2);
-		saverecur3.swap(RECUR3);
-		saverecur4.swap(RECUR4);
+
+		// Restore the saved environment variables
+
+		saved_sentence.swap(SENTENCE);
+		saved_command.swap(COMMAND);
+		saved_options.swap(OPTIONS);
+
+		saved_recur0.swap(RECUR0);
+		saved_recur1.swap(RECUR1);
+		saved_recur2.swap(RECUR2);
+		saved_recur3.swap(RECUR3);
+		saved_recur4.swap(RECUR4);
+
+		saved_id.swap(ID);
+		saved_record.swap(RECORD);
+		saved_mv.swap(MV);
+		saved_dict.swap(DICT);
+
+		// Decrease the perform/execute "level"
 		LEVEL--;
-		//
-		saveid.swap(ID);
-		saverecord.swap(RECORD);
-		savemv.swap(MV);
-		savedict.swap(DICT);
 	};
 
 	// Do the perform
@@ -861,9 +846,8 @@ var ExoProgram::perform(in sentence) {
 			OPTIONS = "";
 		}
 
-
-		// Load the shared library file
-		var libid = SENTENCE.field(" ", 1).lcase();
+		// Load the shared library file (always lowercase)
+		let libid = SENTENCE.field(" ", 1).lcase();
 		std::string libname = libid.toString();
 		if (!perform_callable_.initsmf(
 											mv,
@@ -982,7 +966,7 @@ var ExoProgram::perform(in sentence) {
 //		TRACE("QWE2")
 //		ANS = "";
 //	}
-//	var bad;
+//	let bad;
 //	ANS.swap(bad);
 //	TRACE("QWE3")
 //	ANS = "";
@@ -998,9 +982,9 @@ var ExoProgram::xlate(in filename, in key, in fieldno_or_name, const char* mode)
 
 	// Key can be multivalued and will return a multivalued result
 	var results = "";
-	var nkeys = key.fcount(VM);
+	let nkeys = key.fcount(VM);
 
-	var is_fieldno = fieldno_or_name.isnum();
+	let is_fieldno = fieldno_or_name.isnum();
 
 	var dictfile;
 	if (not is_fieldno) {
@@ -1012,7 +996,7 @@ var ExoProgram::xlate(in filename, in key, in fieldno_or_name, const char* mode)
 
 	for (var keyn = 1; keyn <= nkeys; ++keyn) {
 
-		var keyx = key.f(1, keyn);
+		let keyx = key.f(1, keyn);
 
 		// If ordinary numeric or "" fieldno
 		if (is_fieldno) {
@@ -1023,7 +1007,7 @@ var ExoProgram::xlate(in filename, in key, in fieldno_or_name, const char* mode)
 		else {
 
 			// Get the whole record
-			var record = keyx.xlate(filename, "", mode);
+			let record = keyx.xlate(filename, "", mode);
 
 			// TODO what if key is multivalued?
 
@@ -1080,7 +1064,7 @@ var ExoProgram::calculate(in dictid, in dictfile, in id, in record, in mvno) {
 	MV.swap(mvno);
 
 	// Call the normal calculate function
-	var result = calculate(dictid);
+	let result = calculate(dictid);
 
 	// Restore the environment variables
 	DICT.swap(dictfile);
@@ -1152,14 +1136,14 @@ baddict:
 
 	}
 
-	var dicttype = cached_dictrec_.f(1);
+	let dicttype = cached_dictrec_.f(1);
 	bool ismv = cached_dictrec_.f(4).starts("M");
 
 	// F type dictionaries
 	if (dicttype == "F") {
 
 		// check field number is numeric
-		var fieldno = cached_dictrec_.f(2);
+		let fieldno = cached_dictrec_.f(2);
 		if (!fieldno.isnum())
 			return "";
 
@@ -1172,7 +1156,7 @@ baddict:
 
 			// field no 0
 		} else {
-			var keypart = cached_dictrec_.f(5);
+			let keypart = cached_dictrec_.f(5);
 			if (keypart && keypart.isnum())
 				return ID.field("*", keypart);
 			else
@@ -1253,7 +1237,7 @@ baddict:
 //// debug
 //void ExoProgram::debug() const {
 //
-//	var reply;
+//	let reply;
 //	std::clog << "debug():";
 //	if (OSSLASH == "/")
 //		asm("int $3");	//use gdb n commands to resume
@@ -1284,18 +1268,18 @@ var ExoProgram::decide(in questionx, in optionsx, out reply, const int defaultre
 	var question = questionx;
 	question.converter(_ALL_FMS "|", "\n\n\n\n\n\n\n");
 
-	var interactive = !SYSTEM.f(33);
+	let interactive = !SYSTEM.f(33);
 	if (interactive)
 		std::cout << var("========================================") << std::endl;
 
 	std::cout << question << std::endl;
 
-	//	var noptions = options.fcount(FM);
+	//	let noptions = options.fcount(FM);
 	var options = optionsx;
 	if (not options)
 		options = "Yes" _VM "No";
 	options.converter(VM ^ "|", FM ^ FM);
-	var noptions = options.fcount(FM);
+	let noptions = options.fcount(FM);
 	for (int optionn = 1; optionn <= noptions; optionn++) {
 		if (optionn == defaultreply)
 			std::cout << "*";
@@ -1382,7 +1366,7 @@ bool ExoProgram::esctoexit() const {
 
 // lockrecord 3
 bool ExoProgram::lockrecord(in filename, io file, in keyx) const {
-	var record;
+	let record;
 	return lockrecord(filename, file, keyx, record);
 }
 
@@ -1417,7 +1401,7 @@ lock:
 		return false;
 	}
 
-	var locked = file.lock(keyx);
+	let locked = file.lock(keyx);
 	if (locked || (allowduplicate && locked == "")) {
 
 		// fail if unexpired persistent lock exists in LOCKS file
@@ -1426,8 +1410,8 @@ lock:
 		var leaselocks;
 		if (leaselocks.open("LOCKS", file)) {
 
-			var filename_for_locks = (filename.assigned() && filename) ? filename : file.f(1);
-			var lockfilekey = filename_for_locks ^ "*" ^ keyx;
+			let filename_for_locks = (filename.assigned() && filename) ? filename : file.f(1);
+			let lockfilekey = filename_for_locks ^ "*" ^ keyx;
 
 			var lockrec;
 			if (lockrec.read(leaselocks, lockfilekey)) {
@@ -1618,10 +1602,10 @@ var ExoProgram::oconv(in input0, in conversion) {
 				subconversion.popper();
 
 			//determine the function name
-			var functionname = subconversion.field(",").lcase();
+			let functionname = subconversion.field(",").lcase();
 
 			// extract any params
-			var mode = subconversion.b(functionname.len() + 2);
+			let mode = subconversion.b(functionname.len() + 2);
 
 			var outx;
 
@@ -1696,7 +1680,7 @@ var ExoProgram::iconv(in input, in conversion) {
 	do {
 
 		// var subconversion=conversion.remove(ptr,delimiter);
-		var subconversion = conversion.substr2(ptr, delimiter);
+		let subconversion = conversion.substr2(ptr, delimiter);
 
 		// or call standard conversion methods
 		if (not subconversion.starts("[")) {
@@ -1707,10 +1691,10 @@ var ExoProgram::iconv(in input, in conversion) {
 		} else {
 
 			//determine the function name
-			var functionname = subconversion.cut(1).field(",", 1).field("]", 1).lcase();
+			let functionname = subconversion.cut(1).field(",", 1).field("]", 1).lcase();
 
 			// extract any params
-			var mode = subconversion.field(",", 2, 9999).field("]", 1);
+			let mode = subconversion.field(",", 2, 9999).field("]", 1);
 
 			var outx;
 
@@ -1759,7 +1743,7 @@ void ExoProgram::getdatetime(out user_date, out user_time, out system_date, out 
 	//by ensuring time is not less than time1
 	//which could happen over midnight
 	while (true) {
-		var system_time0 = var().time();
+		let system_time0 = var().time();
 		system_date = var().date();
 		system_time = var().time();
 		///BREAK;
@@ -1888,16 +1872,16 @@ var ExoProgram::elapsedtimetext(in timestamp1, in timestamp2) const {
 
 	var secs = (timestamp2 - timestamp1) * 86'400;
 
-	var weeks = (secs / 604800).floor();
+	let weeks = (secs / 604800).floor();
 	secs -= weeks * 604800;
 
-	var days = (secs / 86400).floor();
+	let days = (secs / 86400).floor();
 	secs -= days * 86400;
 
-	var hours = (secs / 3600).floor();
+	let hours = (secs / 3600).floor();
 	secs -= hours * 3600;
 
-	var minutes = (secs / 60).floor();
+	let minutes = (secs / 60).floor();
 	secs -= minutes * 60;
 
 	if (weeks) {
@@ -1984,7 +1968,7 @@ var ExoProgram::exoprog_date(in type, in in0, in mode0, out outx) {
 	}
 
 	// * means remove spaces
-	var nospaces = mode.contains("*");
+	let nospaces = mode.contains("*");
 	if (nospaces) {
 		mode.converter("*", "");
 	}
@@ -2048,10 +2032,10 @@ ok:
 			//language specific (date format could be a pattern in lang?)
 			if (mode eq "L") {
 
-//				var tt = inx.oconv("D4/E");
-//				var mth = glang.f(2).field("|", tt.field("/", 2));
-//				var day = tt.field("/", 1);
-//				var year = tt.field("/", 3);
+//				let tt = inx.oconv("D4/E");
+//				let mth = glang.f(2).field("|", tt.field("/", 2));
+//				let day = tt.field("/", 1);
+//				let year = tt.field("/", 3);
 //				//if 1 then
 //				outx = day ^ " " ^ mth ^ " " ^ year;
 //				//end else
@@ -2220,7 +2204,7 @@ var ExoProgram::exoprog_number(in type, in input0, in ndecs0, out outx) {
 		}
 
 		// Round to the requested ndecs
-//		var fmtx = "MD" ^ ndecs ^ "0P";
+//		let fmtx = "MD" ^ ndecs ^ "0P";
 //		outx = outx.oconv(fmtx);
 		outx = outx.round(ndecs);
 
@@ -2235,7 +2219,7 @@ var ExoProgram::exoprog_number(in type, in input0, in ndecs0, out outx) {
 	//////
 
 	// ndecs can be "ndecs_out,ndecs_shift__left" like MD20
-	var point_shift_left = ndecs.field(",", 2);
+	let point_shift_left = ndecs.field(",", 2);
 	ndecs = ndecs.field(",", 1);
 
 	// Set to 2 if any cannot be converted because non-numeric
@@ -2256,11 +2240,11 @@ var ExoProgram::exoprog_number(in type, in input0, in ndecs0, out outx) {
 			if (plus)
 				input1.cutter(1);
 
-//			var temp = input1;
+//			let temp = input1;
 //			temp.converter("0123456789-.", "            ");
-//			var numlen = input1.len() - temp.trimfirst().len();
-//			var unitx = input1.b(numlen + 1, 99);
-//			var numx = input1.first(numlen);
+//			let numlen = input1.len() - temp.trimfirst().len();
+//			let unitx = input1.b(numlen + 1, 99);
+//			let numx = input1.first(numlen);
 			var unitx;
 			var numx = amountunit(input1, unitx);
 
@@ -2351,7 +2335,7 @@ void ExoProgram::sortarray(io array, in fns, in orderby0) {
 
 	var orderby;
 	var fn;
-	var success;
+	let success;
 	var newvn;
 
 	if (orderby0.unassigned()) {
@@ -2360,18 +2344,18 @@ void ExoProgram::sortarray(io array, in fns, in orderby0) {
 		orderby = orderby0;
 	}
 
-	var nfns = fns.count(VM) + 1;
+	let nfns = fns.count(VM) + 1;
 
-	var sortfn = fns.f(1, 1);
-	var unsorted = array.f(sortfn);
+	let sortfn = fns.f(1, 1);
+	let unsorted = array.f(sortfn);
 	var sorted = "";
 
 	//count values in sorted and parallel fields
 	var nv = unsorted.fcount(VM);
 	for (var fnn = 2; fnn <= nfns; ++fnn) {
 		fn = fns.f(1, fnn);
-		var othervalues = array.f(fn);
-		var nv2 = array.f(fn).fcount(VM);
+		let othervalues = array.f(fn);
+		let nv2 = array.f(fn).fcount(VM);
 		if (nv2 > nv)
 			nv = nv2;
 	} //fnn;
@@ -2379,7 +2363,7 @@ void ExoProgram::sortarray(io array, in fns, in orderby0) {
 	//insert into a new array without other fields for speed
 	var newarray = "";
 	for (var vn = 1; vn <= nv; ++vn) {
-		var value = unsorted.f(1, vn);
+		let value = unsorted.f(1, vn);
 		if (not(sorted.locateby(orderby, value, newvn))) {
 			{
 			}
@@ -2389,7 +2373,7 @@ void ExoProgram::sortarray(io array, in fns, in orderby0) {
 		//insert any parallel fields
 		for (var fnn = 2; fnn <= nfns; ++fnn) {
 			fn = fns.f(1, fnn);
-			var othervalue = array.f(fn, vn);
+			let othervalue = array.f(fn, vn);
 			newarray.inserter(fn, newvn, othervalue);
 		}	//fnn;
 
@@ -2417,7 +2401,7 @@ var ExoProgram::invertarray(in input, bool padded /*=false*/) {
 	// TRACE: inp = "a^1]2]3]4^x"
 	// TRACE: out = "a]1]x^]2]^]3]^]4]"
 
-	var result = "";
+	let result = "";
 	int maxvn = 0;
 	int fn = 0;
 	for (var fx : input) {

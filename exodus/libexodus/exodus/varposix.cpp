@@ -15,12 +15,14 @@ namespace fs = std::filesystem;
 
 namespace exo {
 
+using let = const var;
+
 ND PUBLIC var getprocessn() {
 	return var(getpid());
 }
 
 ND PUBLIC var getexecpath() {
-//	var osenv;
+//	let osenv;
 //	if (not osenv.osgetenv("_"))
 //		osenv = "";
 //	return osenv;

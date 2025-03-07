@@ -27,7 +27,7 @@ TimeBank::~TimeBank() {
 		// auto pure_deposit_time = 50;//very crude underestimate probably
 
 		//TODO make independent of install location
-		var timeacc_list;
+		let timeacc_list;
 		if (timeacc_list.osread("/usr/local/share/exodus/timebank.txt")) {
 			timeacc_list.converter("\n ", _FM _VM);
 			for (var timeacc_item : timeacc_list) {

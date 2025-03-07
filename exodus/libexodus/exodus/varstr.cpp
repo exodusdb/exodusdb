@@ -41,6 +41,8 @@ void extract_v4(char * instring, int inlength, int fieldno, int valueno, int sub
 
 namespace exo {
 
+using let = const var;
+
 // includes dim::split
 
 // and var::field,field2,locate,extract,remove,update,insert,substr,paste,remove
@@ -155,7 +157,7 @@ var  var::field(SV delimiter, const int fieldnx, const int nfieldsx) const {
 
 //// Constant
 //ND var  var::fieldstore(SV separator, const int fieldno, const int nfields, in replacement) const& {
-//	var nrvo = this->clone();
+//	let nrvo = this->clone();
 //	nrvo.fieldstorer(separator, fieldno, nfields, replacement);
 //	return nrvo;
 //}
@@ -366,7 +368,7 @@ static bool locateat(SV sv_source, SV sv_target, const char* ordercode, SV using
 			case '\x02': {
 
 				// Compare using var for proper numerical comparison
-				var var_value = sv_value;
+				let var_value = sv_value;
 				if (var_value >= var_target) {
 					setting = valuen2;
 					if (var_value == var_target)
@@ -398,7 +400,7 @@ static bool locateat(SV sv_source, SV sv_target, const char* ordercode, SV using
 			case '\x04': {
 
 				// Compare using var for proper numerical comparison
-				var var_value = sv_value;
+				let var_value = sv_value;
 				if (var_value <= var_target) {
 					setting = valuen2;
 					if (var_value == var_target)
@@ -617,7 +619,7 @@ bool var::locate(in target, out setting, const int fieldno, const int valueno /*
 //	assertString(function_sig);
 //	ISSTRING(target)
 //
-//	var setting;
+//	let setting;
 //	return locatex(var_str, target.var_str, "", _VM, setting, 0, 0, 0);
 //}
 
@@ -1270,7 +1272,7 @@ var  var::last(const std::size_t  length) const& {
 //	std::size_t copylen = std::min(length, this->var_str.size());
 //
 //	// Construct a new var with the required number of chars from this
-//	var nrvo(this->var_str.data() + this->var_str.size() - copylen, copylen);
+//	let nrvo(this->var_str.data() + this->var_str.size() - copylen, copylen);
 //
 //	return nrvo;
 	if (length >= var_str.size())
@@ -1414,7 +1416,7 @@ IO   var::cutter(const int length) REF {
 //	THISIS("var  var::cut(const int length) const")
 //	assertString(function_sig);
 //
-//	var nrvo;
+//	let nrvo;
 //	nrvo.var_typ = VARTYP_STR;
 //
 //	// Assume var_str size is <= max int
@@ -1487,13 +1489,13 @@ IO   var::cutter(const int length) REF {
 
 ////ND var substr(const int pos1, const int length) const&; // byte pos1, length
 //ND var  var::substr(const int pos1, const int length) const& {
-//	var nrvo = this->clone();
+//	let nrvo = this->clone();
 //	nrvo.substrer(pos1, length);
 //	return nrvo;
 //}
 //ND var substr(const int pos1) const&;                   // byte pos1
 //ND var  var::substr(const int pos1) const& {
-//	var nrvo = this->clone();
+//	let nrvo = this->clone();
 //	nrvo.substrer(pos1);
 //	return nrvo;
 //}
@@ -1912,7 +1914,7 @@ var  var::substr2(io pos1, out delimiterno) const {
 //
 //	// Operator ^
 //	template<class T>
-//	var operator^(T appendage) {
+//	let operator^(T appendage) {
 //		return var_.at(index_) ^ appendage;
 //	}
 //
@@ -2011,8 +2013,8 @@ var  var::sum() const {
 	var nextsep;  //num
 	var accum;	  //num
 
-	var min_sep = ST.seq();  //26
-	var max_sep = RM.seq();	  //31
+	let min_sep = ST.seq();  //26
+	let max_sep = RM.seq();	  //31
 
 	var min_sep_present;
 	for (min_sep_present = min_sep; min_sep_present <= max_sep; ++min_sep_present) {

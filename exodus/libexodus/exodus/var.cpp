@@ -29,21 +29,23 @@ THE SOFTWARE.
 
 namespace exo {
 
+using let = const var;
+
 // TODO replace .f with a version of .f that returns a string_view
 // instead of wasting time constructing a temporary var only to extract a single char from it
 ND RETVAR var_proxy1::at(const int pos1) const {
 	//TODO! allow at() to work directly on var_str without extracting the required field first
-	var v1 = var_.f(fn_);
+	let v1 = var_.f(fn_);
 	return v1.at(pos1);
 }
 
 ND var var_proxy2::at(const int pos1) const {
-	var v1 = var_.f(fn_, vn_);
+	let v1 = var_.f(fn_, vn_);
 	return v1.at(pos1);
 }
 
 ND var var_proxy3::at(const int pos1) const {
-	var v1 = var_.f(fn_, vn_, sn_);
+	let v1 = var_.f(fn_, vn_, sn_);
 	return v1.at(pos1);
 }
 

@@ -332,7 +332,7 @@ ND	var  invertarray(in input, bool pad = false);
 	//////////////////////////
 
 	// Returns: Text of date and time in users time zone
-	// e.g. 2MAR2025 11:52AM
+	// e.g. "2MAR2025 11:52AM"
 	// Offset from UTC by SW seconds.
 ND	var  timedate2();
 

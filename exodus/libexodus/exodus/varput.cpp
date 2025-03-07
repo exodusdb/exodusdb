@@ -30,6 +30,8 @@ static bool desynced_with_stdio = false;
 
 namespace exo {
 
+using let = const var;
+
 // output/errput/logput not threadsafe but probably not a problem
 //inline std::mutex global_mutex_threadstream;
 //#define LOCKIOSTREAM_OR_NOT std::lock_guard guard(global_mutex_threadstream);
