@@ -2361,7 +2361,7 @@ var ExoProgram::invertarray(in input, bool padded /*=false*/) {
 	// TRACE: inp = "a^1]2]3]4^x"
 	// TRACE: out = "a]1]x^]2]^]3]^]4]"
 
-	let result = "";
+	var result = "";
 	int maxvn = 0;
 	int fn = 0;
 	for (var fx : input) {
@@ -2370,8 +2370,9 @@ var ExoProgram::invertarray(in input, bool padded /*=false*/) {
 		dim vs = fx.split(_VM);
 		for (var vx : vs) {
 			vn++;
-			if (not vx.empty())
+			if (not vx.empty()) {
 				result(vn, fn) = vx;
+			}
 		}
 		if (vn > maxvn)
 			maxvn = vn;

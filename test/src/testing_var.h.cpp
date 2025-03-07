@@ -247,29 +247,6 @@ function main() {
  ///   () style access. Not recommended.
 	}
 
-	printl("operator()(int fieldno, int valueno = 0, int subvalueno = 0) const");
-	{
-		var v1 = "aa^bb^cc"_var;
-		v1(2, 2, 2) = "22";
-		assert(v1 == "aa^bb]}22^cc"_var);
-
-		// subvalue number -1 causes appending a subvalue when updating.
-		v1(2, 2, -1) = 33;
-		assert(v1 == "aa^bb]}22}33^cc"_var);
-
-	}
-
-	printl("operator()(int fieldno, int valueno = 0, int subvalueno = 0) const");
-	{
-		var v1 = "aa^b1]b2}s2^cc"_var;
-		var v2 = v1.f(2, 2, 2);
-		assert(v2 == "s2");
- /// .f() style access. Recommended.
-		var v3 =   v1(2, 2, 2);
-		assert(v3 == "s2");
- ///   () style access. Not recommended.
-	}
-
 	printl("operator^(var);");
 	{
 		var v2 = "aa";
@@ -1676,7 +1653,7 @@ function main() {
 		var conn = "";
 		if (conn.deletelist("mylist")) {/*ok*/} else  abort("deletelist: " ^ lasterror());
 		// or
-		if (deletelist("mylist")) {/*ok*/} else  abort("deletelist: " ^ lasterror());
+		if (deletelist("mylist")) abort("deletelist: " ^ lasterror());
 	}
 
 	printl("date() const;");
@@ -2450,7 +2427,7 @@ function main() {
 		dim d1(10);
 		let file = "xo_clients", key = "GD001";
 		if (not d1.read(file, key)) abort("read: " ^ lasterror());
-		assert(d1.join() == "Client GD^G^20855^30000^1001.00^20855.76539"_var);
+		assert(d1.join() == "Client GD^G^20855^30000^1001.00^20855.76539^^^^"_var);
 
 		// or
 		if (not read(d1 from file, key)) abort("read: " ^ lasterror());
@@ -2473,6 +2450,174 @@ function main() {
 		if (not d1.osread(osfilename)) abort("osread: " ^ lasterror()); // d1.join("\n") -> "aaa=1\nbbb=2\nccc=3\n"_var0
 		// or
 		if (not osread(d1 from osfilename)) abort("osread: " ^ lasterror());
+	}
+
+////////////////
+// Code examples exoprog.h
+////////////////
+
+	printl("select(in sortselectclause_or_filehandle = "");");
+	{
+		select("xo_clients by name by type with type 'A' 'B' and with balance between 0 and 2000");
+		if (readnext(ID)) {/*ok*/} else  abort("select: " ^ lasterror());
+	}
+
+	printl("selectkeys(in keys);");
+	{
+		selectkeys("SB001^JB001^JB002"_var);
+		if (readnext(ID)) {/*ok*/} else  abort("selectkeys: " ^ lasterror());
+		assert(ID == "SB001");
+
+	}
+
+	printl("hasnext();");
+	{
+		if (hasnext()) {/*ok*/} else  abort("hasnext: " ^ lasterror());
+	}
+
+	printl("readnext(out key);");
+	{
+		selectkeys("SB001^JB001^JB002"_var);
+		if (readnext(ID)) {/*ok*/} else  abort("readnext: " ^ lasterror());
+		assert(ID == "SB001");
+
+	}
+
+	printl("readnext(out key, out valueno);");
+	{
+		selectkeys("SB001]2^SB001]1^JB001]2"_var);
+		if (readnext(ID, MV)) {/*ok*/} else  abort("readnext: " ^ lasterror());
+		assert(ID == "SB001" );
+		assert(MV == 2);
+
+	}
+
+	printl("readnext(out record, out key, out valueno);");
+	{
+		select("xo_clients by name (R)");
+		if (readnext(RECORD, ID, MV)) {/*ok*/} else  abort("readnext: " ^ lasterror());;
+		assert(not RECORD.empty());
+
+	}
+
+	printl("pushselect(out cursor);");
+	{
+		select("xo_clients by name");
+		var saved_xo_clients_cursor;
+		pushselect(saved_xo_clients_cursor);
+		//
+		// abort("pushselect: " ^ lasterror()); work with another select list abort("pushselect: " ^ lasterror());
+		//
+		popselect(saved_xo_clients_cursor); // Reactivate the original select list.
+	}
+
+	printl("clearselect();");
+	{
+		clearselect();
+	}
+
+	printl("deleterecord(in filename);");
+	{
+		if (select("xo_clients with type 'Q' and with balance between 0 and 100")) {
+		  if (deleterecord("xo_clients")) abort("deleterecord: " ^ lasterror());
+		}
+	}
+
+	printl("deleterecord(in dbfile, in key);");
+	{
+		let file = "xo_clients", key = "QQ001";
+		write("" on file, key);
+		if (not deleterecord(file, key)) abort("deleterecord: " ^ lasterror());
+		// or
+		write("" on file, key);
+		if (not file.deleterecord(key)) abort("deleterecord: " ^ lasterror());
+	}
+
+	printl("savelist(SV listname);");
+	{
+		selectkeys("SB001^SB002"_var);
+		if (not savelist("my_list")) abort("savelist: " ^ lasterror());
+	}
+
+	printl("getlist(SV listname);");
+	{
+		if (not getlist("my_list")) abort("getlist: " ^ lasterror());
+	}
+
+	printl("deletelist(SV listname);");
+	{
+		if (not deletelist("my_list")) abort("deletelist: " ^ lasterror());
+	}
+
+	printl("getcursor(out cursor, int delayms = 3000, int max_errors = 0) const;");
+	{
+		var cursor;
+		if (isterminal() and not getcursor(cursor)) abort("getcursor: " ^ lasterror()); // cursor becomes something like "0^20^0.012345"_var
+	}
+
+	printl("getcursor() const;");
+	{
+		let cursor = getcursor(); // If isterminal() then cursor becomes something like "0^20^0.012345"_var
+	}
+
+	printl("setcursor(in cursor_coordinates) const;");
+	{
+		if (isterminal()) {
+		    let cursor = getcursor(); // Save the current cursor position.
+		    TRACE(cursor)             // Show the saved cursor position.
+		    print(AT(0,0));           // Position the cursor at 0,0.
+		    setcursor(cursor);        // Restore its position
+		}
+	}
+
+	printl("invertarray(in input, bool pad = false);");
+	{
+		let v1 = "a]b]c^1]2]3"_var;
+		let v2 = invertarray(v1);
+		assert(v2 == "a]1^b]2^c]3"_var);
+
+	}
+
+	printl("sortarray(io array, in fns = "", in order = "");");
+	{
+		var v1 = "f1^10]20]2]1^ww]xx]yy]zz^f3^f4"_var;  // fields 2 and 3 are parallel multivalues and currently unordered.
+		sortarray(v1, "2]3"_var, "AR");
+		assert(v1 == "f1^1]2]10]20^zz]yy]ww]xx^f3^f4"_var);
+
+	}
+
+	printl("elapsedtimetext(in timestamp1, in timestamp2) const;");
+	{
+		let v1 = elapsedtimetext(0, 0.55);
+		assert(v1 == "13 hours, 12 mins");
+
+		let v2 = elapsedtimetext(0, 0.001);
+		assert(v2 == "1 min, 26 secs");
+
+	}
+
+	printl("exoprog_date(in type, in input0, in ndecs0, out output);");
+	{
+		let v1 = iconv("JAN 9 2020", "D");
+		assert(oconv(v1, "[DATE]"   ) == " 9/ 1/2020");
+  // Same as date conversion "D/Z"  assuming E from DATEFMT
+		assert(oconv(v1, "[DATE,4]" ) == " 9/ 1/2020");  // 4 is the default unless 2 is set in DATEFMT so may not not be needed.
+		assert(oconv(v1, "[DATE,*4]") == "9/1/2020");    // Same as date conversion "D/ZZ" assuming E from DATEFMT
+		assert(oconv(v1, "[DATE,*]" ) == "9/1/2020");    // * means the same as date conversion "ZZ" (trim leading zeros and spaces)
+	}
+
+	printl("exoprog_number(in type, in input0, in ndecs0, out output);");
+	{
+		var v1 = oconv("1234.5678USD", "[NUMBER,2]");
+		assert(v1 == "1,234.57USD");
+
+	}
+
+	printl("exoprog_number(in type, in input0, in ndecs0, out output);");
+	{
+		var v1 = iconv("1,234.5678USD", "[NUMBER]");
+		assert(v1 == "1234.57USD");
+
 	}
 
 ////////

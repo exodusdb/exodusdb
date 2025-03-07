@@ -429,7 +429,7 @@ friend class dim_iter;
 	//
     // `dim d1(10);
     //  let file = "xo_clients", key = "GD001";
-    //  if (not d1.read(file, key)) ... // d1.join() -> "Client GD^G^20855^30000^1001.00^20855.76539"_var
+    //  if (not d1.read(file, key)) ... // d1.join() -> "Client GD^G^20855^30000^1001.00^20855.76539^^^^"_var
     //  // or
     //  if (not read(d1 from file, key)) ...`
 	ND bool read(in dbfile, in key);

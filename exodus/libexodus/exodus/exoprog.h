@@ -144,7 +144,7 @@ class PUBLIC ExoProgram {
 	// Returns: True if an active select list was created, false otherwise.
 	// In the following examples, various environment variables like RECORD, ID and MV are used instead of declaring and using named vars. In actual code, either may be freely used.
 	//
-	// `perform("select xo_clients by name by type with type 'A' 'B' and with balance between 0 and 2000");
+	// `select("xo_clients by name by type with type 'A' 'B' and with balance between 0 and 2000");
 	//  if (readnext(ID)) ... ok`
 	//
 	bool select(in sortselectclause_or_filehandle = "");
@@ -188,7 +188,7 @@ ND	bool hasnext();
 	// valueno: [out] Is only available in select lists that have been created by sort/select commands that refer to multi-valued db dictionary fields where db records have multiple values for a specific field.
 	// Returns: True if an active select list was available and the next key in the list was obtained.
 	//
-	// `perform("select xo_clients by name (R)");
+	// `select("xo_clients by name (R)");
 	//  if (readnext(RECORD, ID, MV)) ... ok;
 	//  assert(not RECORD.empty());`
 	//
@@ -226,17 +226,17 @@ ND	bool hasnext();
 	// Returns: False if any records could not be deleted.
 	// Contrast this function with the two argument "deleterecord(file, key)" function that deletes a single record.
 	//
-	// `if (select("xo_clients with type 'Q' and balance between 0 and 100")) {
+	// `if (select("xo_clients with type 'Q' and with balance between 0 and 100")) {
 	//    if (deleterecord("xo_clients")) ...
 	//  }`
 	//
 	bool deleterecord(in filename);
 
-	// Delete a database file record.
+	// Delete a single database file record.
 	//
-	// `let file = "xo_clients", key = "QQ001;
+	// `let file = "xo_clients", key = "QQ001";
 	//  write("" on file, key);
-	//  if (not deleterecord(file, key) ...`
+	//  if (not deleterecord(file, key)) ...
 	//  // or
 	//  write("" on file, key);
 	//  if (not file.deleterecord(key)) ...`
@@ -423,23 +423,25 @@ ND	var  AT(const int x, const int y) const;
     // DISABLED - Terminal is disabled due to more errors than the maximum currently set.
 	//
 	// `var cursor;
-	//  if (not getcursor(cursor)) ... // cursor becomes something like "0^20^0.012345"_var`
+	//  if (isterminal() and not getcursor(cursor)) ... // cursor becomes something like "0^20^0.012345"_var`
 	//
 ND	bool getcursor(out cursor, int delayms = 3000, int max_errors = 0) const;
 
 	// Get the position of the terminal cursor.
 	// For more info see the main getcursor() function above.
 	//
-	// `let cursor = getcursor(); // cursor becomes something like "0^20^0.012345"_var`
+	// `let cursor = getcursor(); // If isterminal() then cursor becomes something like "0^20^0.012345"_var`
 	//
 ND	var  getcursor() const;
 
 	// If stdin is a terminal, position the cursor at x and y as per the given coordinates.
 	// cursor_coordinates: An FM delimited string containing the x and y coordinates of the terminal cursor as can be obtained by getcursor().
-	// `let cursor = getcursor(); // Save the current cursor position.
-	//  TRACE(cursor)             // Show the saved cursor position.
-	//  print(AT(0,0));           // Position the cursor at 0,0.
-	//  setcursor(cursor);        // Restore its position`
+	// `if (isterminal()) {
+	//      let cursor = getcursor(); // Save the current cursor position.
+	//      TRACE(cursor)             // Show the saved cursor position.
+	//      print(AT(0,0));           // Position the cursor at 0,0.
+	//      setcursor(cursor);        // Restore its position
+	//  }`
 	void setcursor(in cursor_coordinates) const;
 
 	//////////////////////

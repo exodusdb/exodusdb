@@ -288,14 +288,15 @@ add_custom_command(
     TARGET gendoc
     POST_BUILD
 #	{mo} man page output to original dir as .1
-    COMMAND ${CMAKE_CURRENT_BINARY_DIR}/gendoc ${CMAKE_CURRENT_SOURCE_DIR}/${LIBEXODUS_DIR}/var.h ${CMAKE_CURRENT_SOURCE_DIR}/${LIBEXODUS_DIR}/dim.h {mo}
-    COMMENT "Executing cli post-build command for gendoc to generate var.1 and dim.1"
+    COMMAND ${CMAKE_CURRENT_BINARY_DIR}/gendoc ${CMAKE_CURRENT_SOURCE_DIR}/${LIBEXODUS_DIR}/var.h ${CMAKE_CURRENT_SOURCE_DIR}/${LIBEXODUS_DIR}/dim.h ${CMAKE_CURRENT_SOURCE_DIR}/${LIBEXODUS_DIR}/exoprog.h {mo}
+    COMMENT "Executing cli post-build command for gendoc to generate var.1, dim.1 and exoprog.1"
 )
 
 # Install the generated man page var.1
 install(FILES
 		${CMAKE_CURRENT_SOURCE_DIR}/${LIBEXODUS_DIR}/var.1
 		${CMAKE_CURRENT_SOURCE_DIR}/${LIBEXODUS_DIR}/dim.1
+		${CMAKE_CURRENT_SOURCE_DIR}/${LIBEXODUS_DIR}/exoprog.1
 
         DESTINATION ${CMAKE_INSTALL_PREFIX}/share/man/man1
 )

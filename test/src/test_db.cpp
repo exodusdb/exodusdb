@@ -105,8 +105,9 @@ programinit()
 	printl("select list should still be active despite the above");
 	assert(LISTACTIVE);
 
-	printl("deletelist if doesnt exist is not an error");
-	assert(deletelist(listid));
+//	printl("deletelist if doesnt exist is not an error");
+	printl("deletelist if doesnt exist is now an error");
+	assert(not deletelist(listid));
 
 	printl("select list should still be active despite the above");
 	assert(LISTACTIVE);

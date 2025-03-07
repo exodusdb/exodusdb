@@ -3472,7 +3472,7 @@ bool var::selectx(in fieldnames, in sortselectclause) {
 	var xx; // throwaway return value
 
 	//prepare to save calculated fields that cannot be calculated by postgresql for secondary processing
-	let calc_fields = "";
+	var calc_fields = "";
 	//var ncalc_fields=0;
 	this->updater(10, "");
 
@@ -4930,7 +4930,7 @@ bool var::deletelist(SV listname) const {
 		//throw VarDBException("deletelist() LISTS file cannot be opened");
 
 	// initial block of keys are stored with no suffix (i.e. no *1)
-	lists.deleterecord(listname);
+	bool result = lists.deleterecord(listname);
 
 	// supplementary blocks of keys are stored with suffix *2, *3 etc)
 	for (int listno = 2;; ++listno) {
@@ -4941,7 +4941,7 @@ bool var::deletelist(SV listname) const {
 		lists.deleterecord(listname2 ^ "*" ^ listno);
 	}
 
-	return true;
+	return result;
 }
 
 bool var::savelist(SV listname) {

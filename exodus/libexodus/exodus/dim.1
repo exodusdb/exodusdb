@@ -1,9 +1,9 @@
 .TH dim.h
 
-.SH 26. DIM 
+.SH 1. DIM 
 .SH
 
-.SH 27. DIMENSIONED ARRAY CONSTRUCTION 
+.SH 2. DIMENSIONED ARRAY CONSTRUCTION 
 .SH
 
 .SS
@@ -70,7 +70,7 @@ Swap one array with another.
 
 Either or both may be undimensioned.
 
-.SH 28. ARRAY ACCESS
+.SH 3. ARRAY ACCESS
 .SH
 
 .SS
@@ -114,7 +114,7 @@ Joins all elements into a single delimited string
 
 \fBReturns:\fR A string var.
 
-.SH 29. ARRAY MUTATION
+.SH 4. ARRAY MUTATION
 .SH
 
 .SS
@@ -167,7 +167,7 @@ d1.shuffler()
 .fi
 Randomly shuffle the order of the elements of the array. In place.
 
-.SH 30. ARRAY CONVERSION
+.SH 5. ARRAY CONVERSION
 .SH
 
 .SS
@@ -191,7 +191,7 @@ d1.shuffle()
 .fi
 Same as shuffler() but returns a new array leaving the original untouched.
 
-.SH 31. ARRAY DB I/O
+.SH 6. ARRAY DB I/O
 .SH
 
 .SS
@@ -236,14 +236,14 @@ If the array is not predimensioned (rows and cols = 0) then it will be dimension
 .nf
 dim d1(10);
 let file = "xo_clients", key = "GD001";
-if (not d1.read(file, key)) ... // d1.join() -> "Client GD^G^20855^30000^1001.00^20855.76539"_var
+if (not d1.read(file, key)) ... // d1.join() -> "Client GD^G^20855^30000^1001.00^20855.76539^^^^"_var
 // or
 if (not read(d1 from file, key)) ...
 .fi
 .RE
 
 
-.SH 32. ARRAY OS I/O
+.SH 7. ARRAY OS I/O
 .SH
 
 .SS

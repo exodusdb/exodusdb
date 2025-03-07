@@ -73,7 +73,7 @@
 # Generate testing_var.h.cpp
 # ##########################
 #
-	add_executable(testing_var_h testing_var.h.cpp ${LIBEXODUS_DIR}/var.h ${LIBEXODUS_DIR}/dim.h)
+	add_executable(testing_var_h testing_var.h.cpp ${LIBEXODUS_DIR}/var.h ${LIBEXODUS_DIR}/dim.h ${LIBEXODUS_DIR}/exoprog.h)
 	target_link_libraries(testing_var_h exodus ${PROJECT_LIBS})
 	if (EXO_MODULE)
 		target_link_libraries(testing_var_h
@@ -83,7 +83,7 @@
 
 	# Generate test/src/testing_var.h.cpp from var.h
 	add_custom_target(PreBuild_testing_var_h
-    	COMMAND test -x ${CMAKE_CURRENT_BINARY_DIR}/${EXODUS_CLI_DIR}/gendoc && ${CMAKE_CURRENT_BINARY_DIR}/${EXODUS_CLI_DIR}/gendoc ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/${LIBEXODUS_DIR}/var.h ${CMAKE_CURRENT_SOURCE_DIR}/${LIBEXODUS_DIR}/dim.h > /dev/null || echo Skipped first build because gendoc not built yet
+    	COMMAND test -x ${CMAKE_CURRENT_BINARY_DIR}/${EXODUS_CLI_DIR}/gendoc && ${CMAKE_CURRENT_BINARY_DIR}/${EXODUS_CLI_DIR}/gendoc ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/${LIBEXODUS_DIR}/var.h ${CMAKE_CURRENT_SOURCE_DIR}/${LIBEXODUS_DIR}/dim.h ${CMAKE_CURRENT_SOURCE_DIR}/${LIBEXODUS_DIR}/exoprog.h > /dev/null || echo Skipped first build because gendoc not built yet
     	COMMENT "Running pre-build command gendoc to create or update test/src/testing_var.h.cpp"
 	)
 

@@ -118,6 +118,7 @@ function main() {
 		var new_objs = "";
 		var defined_objs = "";
 		var all_func_sigs = "";
+		tableno = 0;
 
 		var class_name = osfilename0.field(".", 1);
 

@@ -685,6 +685,7 @@ subroutine generate_xo_clients_dict_data(in filename) {
 //		"TIMESTAMP    |F|6|Timestamp    ||||[DATETIME]||L|12"	_FM
 		"TIMESTAMP    |F|6|Timestamp    ||||          ||R|12" _FM
 		"NAME_AND_TYPE|S| |Name and Type||||          ||L|20" _FM
+		"NDECS        |S| |NDECS        ||||          ||R|3"  _FM
 		"NAME_AND_CODE|S| |Name and Code||||          ||L|20" _FM
 		"@CRT         |G| |CODE NAME TYPE NAME_AND_TYPE BALANCE DATE_CREATED TIME_CREATED TIMESTAMP"
 	;

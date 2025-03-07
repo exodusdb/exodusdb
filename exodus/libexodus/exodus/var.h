@@ -2355,7 +2355,7 @@ public:
 	// `var conn = "";
 	//  if (conn.deletelist("mylist")) ... ok
 	//  // or
-	//  if (deletelist("mylist")) ... ok`
+	//  if (deletelist("mylist")) ...`
 	   bool deletelist(SV listname) const;
 
 //	// Create a saved list from a string of keys.

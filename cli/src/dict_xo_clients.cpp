@@ -26,3 +26,12 @@ function main() {
 }
 //--------------------
 libraryexit(name_and_code)
+
+libraryinit(ndecs)
+//--------------------
+function main() {
+	ANS = 2;
+	return ANS;
+}
+//--------------------
+libraryexit(ndecs)

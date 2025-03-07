@@ -538,37 +538,6 @@ var v3 =   v1(2,2); // "b2" ///   () style access. Not recommended.
 .RE
 
 
-.SS
-var v1 = v2(fieldno, valueno, subvalueno);       v1(fieldno, valueno, subvalueno) = v2;
-.nf
- 
-.fi
-Dynamic array - subvalue update and append
-
-See also inserter() and remover().
-
-\fBExample:\fR
-.RS
-.nf
-var v1 = "aa^bb^cc"_var;
-v1(2, 2, 2) = "22"; // v1 -> "aa^bb]}22^cc"_var
-// subvalue number -1 causes appending a subvalue when updating.
-v1(2, 2, -1) = 33; // v1 -> "aa^bb]}22}33^cc"_var
-.fi
-.RE
-
-Subvalue access:
-
-\fBExample:\fR
-.RS
-.nf
-var v1 = "aa^b1]b2}s2^cc"_var;
-var v2 = v1.f(2, 2, 2); // "s2" /// .f() style access. Recommended.
-var v3 =   v1(2, 2, 2); // "s2" ///   () style access. Not recommended.
-.fi
-.RE
-
-
 .SH 5. STRING CREATION 
 .SH
 
@@ -4337,7 +4306,7 @@ Delete a saved select list.
 var conn = "";
 if (conn.deletelist("mylist")) ... ok
 // or
-if (deletelist("mylist")) ... ok
+if (deletelist("mylist")) ...
 .fi
 .RE
 
