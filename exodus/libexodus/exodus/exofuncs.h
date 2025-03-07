@@ -572,8 +572,7 @@ ND bool read(dim& dimrecord, in dbfile, in key);
 // bool readnext(out key);
 // bool readnext(out key, out valueno);
 // bool readnext(out record, out key, out value);
-// deleterecord should be made a free function that doesnt use CURSOR
-// bool deleterecord(in dbfilename_or_var_or_command, in key = "" );
+// ND bool deleterecord(in dbfile, in key);
 
 ND var xlate(in dbfilename, in key, in fieldno, const char* mode);
 ND var xlate(in dbfilename, in key, in fieldno, in mode);

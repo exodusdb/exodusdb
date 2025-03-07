@@ -119,7 +119,7 @@ function main() {
 
 function test(in option) {
 
-	deleterecord(file, key);
+	file.deleterecord(key);
 
 	var cmd		= "";
 	var options = OPTIONS.convert("{}", "") ^ option;

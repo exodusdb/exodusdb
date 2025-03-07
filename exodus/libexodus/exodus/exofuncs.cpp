@@ -450,6 +450,7 @@ ND PUBLIC bool readf(out field, in dbfile, in key, in fieldnumber) {return field
    PUBLIC void writef(in record, in dbfile, in key, const int fieldno) {record.writef(dbfile, key, fieldno);}
 ND PUBLIC bool updaterecord(in record, in dbfile, in key) {return record.updaterecord(dbfile, key);}
 ND PUBLIC bool insertrecord(in record, in dbfile, in key) {return record.insertrecord(dbfile, key);}
+//ND PUBLIC bool deleterecord(in dbfile, in key) {return dbfile.deleterecord(key);}
 ND PUBLIC bool deletec(in dbfile, in key) {return dbfile.deletec(key);}
 
 //ND PUBLIC bool dimread(dim& dimrecord, in dbfile, in key) {return dimrecord.read(dbfile, key);

@@ -303,8 +303,10 @@ function main() {
 				if (RECORD == oldrecord) {
 					if (exists and RECORD.len() == 0) {
 						// Delete the RECORD
-						deleterecord(dbfile, ID);
-						printl(prefix, dbfilename, ID, "Deleted");
+						if (not deleterecord(dbfile, ID))
+							loglasterror();
+						else
+							printl(prefix, dbfilename, ID, "Deleted");
 					} else {
 						if (verbose)
 							printl("Not changed", dbfilename, ID);
@@ -312,8 +314,10 @@ function main() {
 				} else {
 					if (RECORD.len() == 0) {
 						// Delete the RECORD
-						deleterecord(dbfile, ID);
-						printl("syncdat:", dbfilename, ID, "Deleted");
+						if (not deleterecord(dbfile, ID))
+							loglasterror();
+						else
+							printl("syncdat:", dbfilename, ID, "Deleted");
 					} else {
 						// Write the RECORD
 						write(RECORD on dbfile, ID);

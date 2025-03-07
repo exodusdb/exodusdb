@@ -208,12 +208,14 @@ programinit()
 		deleterecord(tempfile);
 		assert(tempfile.reccount() eq 5);
 
-		printl("Check deleterecord works command style list of keys");
-		deleterecord(tempfilename ^ " '1' 2 \"3\"");
+//		printl("Check deleterecord works command style list of keys");
+//		deleterecord(tempfilename ^ " '1' 2 \"3\"");
+		selectkeys("1^2^3"_var);
+		deleterecord(tempfilename);
 		assert(tempfile.reccount() eq 2);
 
 		printl("Check deleterecord one key using 2nd parameter works");
-		deleterecord(tempfilename, "10");
+		assert(deleterecord(tempfilename, "10"));
 		assert(tempfile.reccount() eq 1);
 
 		printl("Prepare a test record");
@@ -300,7 +302,7 @@ programinit()
 	write("temp", filename, decomp_a);
 	assert(read(trec, filename, compact_a));
 	assert(trec eq "temp");
-	deleterecord(filename, compact_a);
+	assert(deleterecord(filename, compact_a));
 	assert(not read(trec, filename, compact_a));
 
 	//test write compact can be read by decomp and deleted by decomp
@@ -462,11 +464,13 @@ programinit()
 		let fname = "dbf1";
 
 		// Preclean 1
-		auto _ = dbdelete(db1x);
+		if (not dbdelete(db1x))
+			loglasterror();
 		assert(not dblist().locateusing(FM, db1x));
 
 		// Preclean 2
-		auto __ = dbdelete(db2x);
+		if (not dbdelete(db2x))
+			loglasterror();
 		assert(not dblist().locateusing(FM, db2x));
 
 		// dbcreate 1 and connect

@@ -584,63 +584,23 @@ bool ExoProgram::readnext(out record, out key, out valueno) {
 	return CURSOR.readnext(record, key, valueno);
 }
 
-// deleterecord
-bool ExoProgram::deleterecord(in filename_or_handle_or_command, in key) {
+// deleterecord. ONE argument. no key. Delete MANY records.
+// Uses CURSOR active select list to delete records.
+bool ExoProgram::deleterecord(in filename) {
 
-	if (not filename_or_handle_or_command.assigned() || not key.assigned())
-		//throw VarUnassigned("bool ExoProgram::deleterecord(in filename_or_handle_or_command, in key)");
-		UNLIKELY
-		throw VarError("bool ExoProgram::deleterecord(in filename_or_handle_or_command, in key)");
-
-	// Simple deleterecord
-	//if (filename_or_handle_or_command.contains(" ") || key.len() == 0) {
-	if (not filename_or_handle_or_command.contains(" ") and not key.empty())
-		return filename_or_handle_or_command.deleterecord(key);
-
-	// Complex deleterecord command
-
-	////////////////////////////////////////////////////////
-	// THIS CODE SHOULD BE REMOVED AFTER REFACTORING IT OUT
-	// of createanalysis and eliminating it listcollections
-	////////////////////////////////////////////////////////
-
-	let command = filename_or_handle_or_command.f(1);
-
-	let filename = command.field(" ", 1);
-
-	//if any keys provided (remove quotes if present)
-	int nwords = command.fcount(" ");
-
-	//find and skip final options like (S)
-	bool silent = false;
-	if (command.ends(")") || command.ends("}")) {
-		silent = command.field(" ", -1).contains("S");
-		nwords--;
+	let filename2 = filename.f(1).field(" ", 1);
+	bool any_failures = false;
+	var key;
+	while (CURSOR.readnext(key)) {
+		if (not filename2.deleterecord(key))
+			any_failures = true;
 	}
+	return any_failures;
+}
 
-	if (nwords >= 2) {
-		for (int wordn = 2; wordn <= nwords; ++wordn) {
-			let key = command.field(" ", wordn).unquote();
-			if (filename.deleterecord(key)) {
-				silent || key.quote().logputl("Deleted ");
-			} else {
-				silent || key.quote().errputl("NOT deleted ");
-			}
-		}
-	}
-	//delete keys provided in a select list
-	else {
-		var key;
-		while (CURSOR.readnext(key)) {
-			if (filename.deleterecord(key)) {
-				silent || key.quote().logputl("Deleted ");
-			} else {
-				silent || key.quote().errputl("NOT deleted ");
-			}
-		}
-	}
-	return true;
-	//return filehandle.deleterecord(key);
+// deleterecord. TWO arguments. Delete ONE record.
+bool ExoProgram::deleterecord(in dbfile, in key) {
+	return dbfile.deleterecord(key);
 }
 
 // pushselect

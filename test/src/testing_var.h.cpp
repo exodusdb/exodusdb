@@ -1498,7 +1498,7 @@ function main() {
 		let file = "xo_clients", key = "GD001";
 		if (file.deleterecord(key)) {/*ok*/} else  abort("deleterecord: " ^ lasterror());
 		// or
-		if (deleterecord(file, key)) abort("deleterecord: " ^ lasterror());
+		//if (deleterecord(file, key)) abort("deleterecord: " ^ lasterror());
 	}
 
 	printl("insertrecord(in file, in key) const;");
@@ -2492,7 +2492,7 @@ subroutine cleanup() {
 		if (not dbdelete("xo_gendoc_testdb")) {}; // Cleanup first
 		if (not dbdelete("xo_gendoc_testdb2")) {}; // Cleanup first
 		if (not deleteindex("xo_clients", "DATE_CREATED")) {}; // Cleanup first
-		if (not deleterecord("xo_clients", "GD001")) {}; // Cleanup first
+		//if (not "xo_clients"_var.deleterecord("GD001")) {}; // Cleanup first
 		if (not osremove(ostempdirpath() ^ "xo_gendoc_test.conf.bak")) {}; // Cleanup first
 		if (not osremove(ostempdirpath() ^ "xo_gendoc_test.conf")) {}; // Cleanup first
 		if (osrmdir("xo_test/aaa")) {}; // Cleanup first

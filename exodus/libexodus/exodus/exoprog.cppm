@@ -152,6 +152,7 @@ export namespace exo {
 	using exo::deletec;
 	using exo::deletefile;
 	using exo::deleteindex;
+//	using exo::deleterecord;
 
 	using exo::disconnect;
 	using exo::disconnectall;

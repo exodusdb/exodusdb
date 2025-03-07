@@ -2066,7 +2066,7 @@ public:
 	//
 	// `let record = "Client GD^G^20855^30000^1001.00^20855.76539"_var;
 	//  let file = "xo_clients", key = "GD001";
-	//  if (not deleterecord("xo_clients", "GD001")) {}; // Cleanup first
+	//  //if (not "xo_clients"_var.deleterecord("GD001")) {}; // Cleanup first
 	//  record.write(file, key);
 	//  // or
 	//  write(record on file, key);`
@@ -2091,7 +2091,7 @@ public:
 	// `let file = "xo_clients", key = "GD001";
 	//  if (file.deleterecord(key)) ... ok
 	//  // or
-	// if (deleterecord(file, key)) ...`
+	// //if (deleterecord(file, key)) ...`
 	   bool deleterecord(in key) const;
 
 	// Inserts a new record in a db file.

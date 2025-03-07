@@ -154,8 +154,55 @@ function main() {
 			printx(AT(col, row+i), "|12345|67890|");
 		printx(AT(col, row + 6), "+-----+-----+");
 
-		// Unfornately returns to row 0 (top)
+		// Unfortunately returns to row 0 (top)
 		setcursor(cursor);
+
+	}
+	if (isterminal()) {
+
+		// Default getcursor to be deprecated
+		var cursor = getcursor(); // Save the current cursor position.
+		TRACE(cursor)             // Show the saved cursor position.
+		if (cursor.f(1).empty())
+			abort();
+		assert(cursor.f(1).match("\\d+").len());    //x
+		assert(cursor.f(2).match("\\d+").len());    //y
+		assert(cursor.f(3).match("[\\d.]+").len()); //ms response time
+
+		// New ND bool getcursor
+		var cursor2;
+		assert(getcursor(cursor2));
+		TRACE(cursor2)
+		if (cursor2.f(1).empty())
+			abort();
+		assert(cursor2.f(1).match("\\d+").len());    //x
+		assert(cursor2.f(2).match("\\d+").len());    //y
+		assert(cursor2.f(3).match("[\\d.]+").len()); //ms response time
+
+		// Disable getcursor by setting max errors to -1
+		var cursor3;
+		assert(not getcursor(cursor3, 3000, -1));
+		TRACE(cursor3)
+		// Check disabled
+		assert(cursor3.f(4) == "DISABLED");
+
+		// Check it is disabled
+		var cursor4;
+		assert(not getcursor(cursor4));
+		assert(cursor4.f(4) == "DISABLED");
+		TRACE(cursor4)
+
+		// Reenable getcursor by setting max errors to 3
+		var cursor5;
+		assert(getcursor(cursor5, 3000, 3));
+		assert(cursor5.f(4) == "");
+		TRACE(cursor5)
+
+		// Check it is enabled
+		var cursor6;
+		assert(getcursor(cursor6));
+		assert(cursor6.f(4) == "");
+		TRACE(cursor6)
 
 	}
 

@@ -138,21 +138,139 @@ class PUBLIC ExoProgram {
 
 	// obj is
 
-	// All the following work on an environment variable CURSOR.
+	// Create an active select list using a natural language sort/select command.
+	// This and all the following exoprog member functions work on an environment variable CURSOR.
+	// Identical functions are available directly on plain var objects but vars have less functionality regarding dictionaries and environment variables which are built-in to exoprog.
+	// Returns: True if an active select list was created, false otherwise.
+	// In the following examples, various environment variables like RECORD, ID and MV are used instead of declaring and using named vars. In actual code, either may be freely used.
+	//
+	// `perform("select xo_clients by name by type with type 'A' 'B' and with balance between 0 and 2000");
+	//  if (readnext(ID)) ... ok`
+	//
 	bool select(in sortselectclause_or_filehandle = "");
+	// TODO make ND?
+
+	// Create an active select list from some given keys.
+	//
+	// `selectkeys("SB001^JB001^JB002"_var);
+	//  if (readnext(ID)) ... ok // ID -> "SB001"`
+	//
 	bool selectkeys(in keys);
+
+	// Check if a select list is active.
+	//
+	// `if (hasnext()) ... ok`
+	//
 ND	bool hasnext();
+
+	// Get the next key from an active select list.
+	// key: [out] A string. Typically the key of a db file record.
+	// Returns: True if an active select list was available and the next key in the list was obtained.
+	//
+	// `selectkeys("SB001^JB001^JB002"_var);
+	//  if (readnext(ID)) ... ok // ID -> "SB001"`
+	//
 	bool readnext(out key);
+
+	// Get the next key and value number pair from an active select list.
+	// key: [out] A string. Typically the key of a db file record.
+	// valueno: [out] Is only available in select lists that have been created by sort/select commands that refer to multi-valued db dictionary fields where db records have multiple values for a specific field. In this case, a record key will appear multiple times in the select list since each multivalue is exploded for the purpose of sorting and selecting. This can be viewed as a process of "normalising" multivalues so they appear as multiple records instead of being held in a single record.
+	// Returns: True if an active select list was available and the next key in the list was obtained.
+	//
+	// `selectkeys("SB001]2^SB001]1^JB001]2"_var);
+	//  if (readnext(ID, MV)) ... ok // ID -> "SB001" // MV -> 2`
+	//
 	bool readnext(out key, out valueno);
+
+	// Get the next record, key and value no from an active select list.
+	// record: [out] Is only available in select lists that have been created with the final (R) option. Otherwise the record will be returned as an empty string and must be obtained using a db read() function.
+	// key: [out] A string. Typically the key of a db file record.
+	// valueno: [out] Is only available in select lists that have been created by sort/select commands that refer to multi-valued db dictionary fields where db records have multiple values for a specific field.
+	// Returns: True if an active select list was available and the next key in the list was obtained.
+	//
+	// `perform("select xo_clients by name (R)");
+	//  if (readnext(RECORD, ID, MV)) ... ok;
+	//  assert(not RECORD.empty());`
+	//
 	bool readnext(out record, out key, out valueno);
+
+	// Saves a pointer to the currently active select list.
+	// This allows another select list to be activated and used temporarily before the original select list is reactivated.
+	// cursor: [out] A var that can be passed later on to the popselect() function to reactivate the saved list.
+	//
+	// `select("xo_clients by name");
+	//  var saved_xo_clients_cursor;
+	//  pushselect(saved_xo_clients_cursor);
+	//  //
+	//  // ... work with another select list ...
+	//  //
+	//  popselect(saved_xo_clients_cursor); // Reactivate the original select list.`
+	//
 	void pushselect(out cursor);
+	// TODO what happens if no list is active?
+
+	// Re-establish an active select list saved by pushselect().
+	// cursor: A var created by the pushselect() function.
+	// See pushselect() for more info.
 	void popselect(in cursor);
+	// TODO what happens if cursor is junk?
+
+	// Deactivate an active select list.
+	// If no select list is active then nothing is done.
+	//
+	// `clearselect();`
+	//
 	void clearselect();
-	// THIS should be removed from exoprog and made a free function that doesnt use CURSOR
-	bool deleterecord(in filename_or_handle_or_command, in key = "");
+
+	// Use an active select list to delete db records.
+	// Returns: False if any records could not be deleted.
+	// Contrast this function with the two argument "deleterecord(file, key)" function that deletes a single record.
+	//
+	// `if (select("xo_clients with type 'Q' and balance between 0 and 100")) {
+	//    if (deleterecord("xo_clients")) ...
+	//  }`
+	//
+	bool deleterecord(in filename);
+
+	// Delete a database file record.
+	//
+	// `let file = "xo_clients", key = "QQ001;
+	//  write("" on file, key);
+	//  if (not deleterecord(file, key) ...`
+	//  // or
+	//  write("" on file, key);
+	//  if (not file.deleterecord(key)) ...`
+	//
+	ND bool deleterecord(in dbfile, in key);
+
+	// Save a currently active select list under a given name.
+	// After saving, the list is no longer active and hasnext() will return false.
+	// Returns: True if an active select list was saved, false if there was no active select list.
+	// Lists are saved as a record in the "lists" file.
+	//
+	// `selectkeys("SB001^SB002"_var);
+	//  if (not savelist("my_list")) ...`
+	//
 	bool savelist(SV listname);
+	// TODO make it ND? void?
+
+	// Reactivate a saved select list of a given name.
+	// A saved list is obtained from the "lists" file and activated.
+	// Returns: True if an active select list was successfully reactivated, otherwise false.
+	//
+	// `if (not getlist("my_list")) ...`
+	//
 	bool getlist(SV listname);
+	// TODO make it ND
+
+	// Remove a saved select list by name.
+	// A saved list is deleted from the "lists" file.
+	//
+	// `if (not deletelist("my_list")) ...`
+	//
 	bool deletelist(SV listname);
+	// TODO make it ND
+
 	[[deprecated ("exoprog:::formlist() Resolve by refactoring. Read keys directly and call selectkeys(keys)")]]
 	bool formlist(SV filename_or_command, in keys = "", const int fieldno = 0);
 	[[deprecated ("exoprog::makelist() Refactor makelist(\"\", keys) as selectkeys(keys) or use fixdeprecated")]]
@@ -272,26 +390,48 @@ ND	var  decide(in question, in options = "") const;
 	// Returns: True if a key has been pressed and the user confirms to escape/cancel. False if no key has been pressed or the user chooses to resume and not escape/cancel.
 ND	bool esctoexit() const;
 
-	// Returns: A string required to accomplish a task on the terminal determined by the code.
-	// The string should be actually output to the terminal in order to accomplish the stated aim.
+	// Get a string to control terminal operation.
+	// Returns: A string to be output to the terminal in order to accomplish the desired operation.
 	// The terminal protocol is xterminal.
 	// code:
-	// n   Position the cursor to column number n
-	// 0   Position the cursor to column number 0
+	// n   Position the cursor at column number n
+	// 0   Position the cursor at column number 0
 	// -1  Clear the screen and home the cursor
-	// -2  Position the cursor to the top left home (x,y = 0,0)
-	// -3  Clear from the cursor to the end of screen
+	// -2  Position the cursor at the top left home (x,y = 0,0)
+	// -3  Clear from the cursor at the end of screen
 	// -4  Clear from cursor to end of line
 	// -40 Position the cursor at columnno 0 and clear to end of line
 ND	var  AT(const int code) const;
 
-	// Returns: A string required to position the cursor at a given terminal screen x and y position.
-	// The string should be actually output to the terminal in order to accomplish the stated aim.
+	// Get a terminal cursor positioning string.
+	// Returns: A string to be output to the terminal to position the cursor at the desired screen x and y position.
 	// The terminal protocol is xterminal.
 ND	var  AT(const int x, const int y) const;
 
-	// Returns: If stdin is a terminal, an FM delimited string containing the x and y coordinates of the current terminal cursor.
+	// Get the position of the terminal cursor.
+	// cursor: [out] If stdin is a terminal, an FM delimited string containing the x and y coordinates of the current terminal cursor.
+	// If stdin is not a terminatl then an empty string "" is returned.
+	// The cursor additionally contains a third field which contains the delay in ms from the terminal.
 	// The FM delimited string returned can be later passed to setcursor() to reposition the cursor back to its original position or it can be parsed and used accordingly.
+	// delayms: Default 3000ms. The maximum time to wait for terminal response.
+	// max_errors: Default is 0. If not zero, reset the number of times to error before automatically disabling getcursor(). max_errors is initialised to 3. If negative then max_errors has the the effect of disabling all future calls to getcursor().
+	// In case the terminal fails to respond correctly within the required timeout, or is currently disabled due to too many failures, or has been specifically disabled then the returned "cursor" var contains a 4th field:
+    // TIMEOUT - The terminal failed to respond within the timeout.
+    // READ_ERROR - Failed to read terminal response.
+    // INVALID_RESPONSE - Terminal response invalid.
+    // SETUP_ERROR - Terminal setup failed.
+    // DISABLED - Terminal is disabled due to more errors than the maximum currently set.
+	//
+	// `var cursor;
+	//  if (not getcursor(cursor)) ... // cursor becomes something like "0^20^0.012345"_var`
+	//
+ND	bool getcursor(out cursor, int delayms = 3000, int max_errors = 0) const;
+
+	// Get the position of the terminal cursor.
+	// For more info see the main getcursor() function above.
+	//
+	// `let cursor = getcursor(); // cursor becomes something like "0^20^0.012345"_var`
+	//
 ND	var  getcursor() const;
 
 	// If stdin is a terminal, position the cursor at x and y as per the given coordinates.
@@ -347,8 +487,8 @@ ND	var  timedate2();
 ND	var  elapsedtimetext() const;
 
 	// Get text of elapsed time between two timestamps
-	// `let v1 = elapsedtimetext(0, 0.55))  // "13 hours, 12 mins"
-	//  let v2 = elapsedtimetext(0, 0.001)) // "1 min, 26 secs"`
+	// `let v1 = elapsedtimetext(0, 0.55);  // "13 hours, 12 mins"
+	//  let v2 = elapsedtimetext(0, 0.001); // "1 min, 26 secs"`
 ND	var  elapsedtimetext(in timestamp1, in timestamp2) const;
 
 	/////////////////////
