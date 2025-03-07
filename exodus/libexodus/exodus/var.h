@@ -428,7 +428,7 @@ public:
 	// `var v1 = "aa^b1]b2}s2^cc"_var;
 	//  var v2 = v1.f(2, 2, 2); // "s2" /// .f() style access. Recommended.
 	//  var v3 =   v1(2, 2, 2); // "s2" ///   () style access. Not recommended.`
-	ND var  operator()(int fieldno, int valueno = 0, int subvalueno = 0) const {return this->f(fieldno, valueno, subvalueno);}
+	ND const var  operator()(int fieldno, int valueno = 0, int subvalueno = 0) const {return this->f(fieldno, valueno, subvalueno);}
 //	ND var  operator()(int fieldno, int valueno = 0, int subvalueno = 0) &&      {return a(fieldno, valueno, subvalueno);}
 
 	// DONT declare this so we force use of the above const version that produces a temporary
