@@ -1877,103 +1877,36 @@ IO   var::textconverter(SV fromchars, SV tochars) REF {
 
 // parse() - replaces seps with FMs except inside double and single quotes. Backslash escapes.
 
-
 // Mutate
 IO   var::parser(char sepchar) REF {
 
 	THISIS("void var::parser(char sepchar) &")
 	assertStringMutator(function_sig);
 
-//	//std::string s = "abc 'def gh'qwe";
-//	std::string s1 = R"___(abc 'def gh\' q'w "' e)___";
-//	//std::string s1 = R"___(a 'b c' d")___";
-//	std::string s2 = s1;
+	for (auto it = var_str.begin(); it != var_str.end(); ++it) {
+		char ch1 = *it;
+		if (ch1 == sepchar) {
+			*it = FM_; // Replace one sepchar
 
-	std::size_t len = var_str.size();
-	if (!len)
-		return THIS;
-
-	// The following bytes can be escaped so spaces, double and single quotes are ignored
-	std::size_t pos = 0;
-	char ch;
-
-next_unquoted:
-	while (pos < len) {
-
-		// Replace separator with FM and skip to the next char
-		ch = var_str[pos];
-		if (ch == sepchar) {
-			var_str[pos] = FM_;
-			pos++;
-			continue;
+		} else if (ch1 == '"' || ch1 == '\'') {
+			for (;;) {
+				if (++it == var_str.end()) return THIS;
+				char ch2 = *it;
+				if (ch2 == ch1) {
+					break; // Found closing quote
+				}
+				if (ch2 == '\\') {
+					++it; // Skip '\'
+					if (it == var_str.end()) return THIS;
+				}
+			}
+		} else if (ch1 == '\\') {
+			++it; // Skip '\'
+			if (it == var_str.end()) return THIS;
+		} else {
+			// Normal char
 		}
-
-		switch (ch) {
-
-			// Switch into double quoted mode
-			case DQ_:
-
-				// Skip over all following characters up to the next double quote
-				// Ignore escaped double quote
-				pos++;
-				while (pos < len) {
-					switch (var_str[pos]) {
-
-						case DQ_:
-							// Skip over double quote and looping inside quote
-							pos++;
-							goto next_unquoted;
-
-						case BS_:
-							// Skip over the BS and the following character if any
-							pos++;
-							pos++;
-							break;
-
-						default:
-							pos++;
-					}
-				} // inside quotes
-
-				continue;
-
-			// Switch into single quoted mode
-			case SQ_:
-
-				// Skip over all following characters up to the next single quote
-				// Ignore escaped single quote
-				pos++;
-				while (pos < len) {
-					switch (var_str[pos]) {
-
-						case SQ_:
-							// Skip over single quote and looping inside quote
-							pos++;
-							goto next_unquoted;
-
-						case BS_:
-							// Skip over the BS and the following character if any
-							pos++;
-							pos++;
-							break;
-
-						default:
-							pos++;
-					}
-				} // inside quotes
-
-				continue;
-
-			case BS_:
-				pos++;
-				pos++;
-				continue;
-
-			default:
-				pos++;
-
-		} // switch
-	}
+	} // it
 	return THIS;
 }
 
@@ -2264,7 +2197,7 @@ var  var::numberinwords(in langname_or_locale_id) {
 		std::ostringstream ss;
 		ss.imbue(boost_generated_locale1);
 
-	    ss << boost::locale::as::spellout << this->toDouble();
+		ss << boost::locale::as::spellout << this->toDouble();
 
 		result = ss.str();
 	}
