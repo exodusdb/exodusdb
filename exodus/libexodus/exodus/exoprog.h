@@ -287,26 +287,26 @@ ND	bool hasnext();
 	// A "command line" is passed to the library in the usual COMMAND, SENTENCE and OPTIONS environment variables instead of function arguments.
 	// The library's main function should have zero arguments. Performing a library function with main arguments results in them being unassigned and in some case core dump may occur.
 	// The following environment variables are initialised on entry to the main function of the library. They are preserved untouched in the calling program.
-	// SENTENCE, COMMAND, OPTIONS: Initialised from the argument "sentence".
+	// SENTENCE, COMMAND, OPTIONS: Initialised from the argument "command_line".
 	// RECUR0, RECUR1, RECUR2, RECUR3, RECUR4 to "".
 	// ID, RECORD, MV, DICT initialised to "".
 	// LEVEL is incremented by one.
 	// All other environment variables are shared between the caller and callee. There is essentially only one environment in any one process or thread.
 	// Any active select list is passed to the performed program and can be consumed by it. Conversely any active select list created by the library will be returned to the calling program.
-	// sentence: The first word of this argument is used as the name of the library to be loaded and run. sentence is used to initialise the SENTENCE, COMMAND and OPTIONS environment variables.
+	// command_line: The first word of this argument is used as the name of the library to be loaded and run. command_line is used to initialise the SENTENCE, COMMAND and OPTIONS environment variables.
 	// Returns: Whatever var the library returns, or "" if it calls stop() or abort(()".
     // The return value can be ignored and discarded without any compiler warning.
 	// Note that library functions may also be directly called using ordinary function syntax with multiple arguments if necessary. An "#include <libname.h>" line is required after the "programinit()" line. In this case, stop() and abort() in the called library terminate the calling program as well unless caught using try/catch syntax.
-	var  perform(in sentence);
+	var  perform(in command_line);
 
 	// Run an exodus library's main function.
 	// Identical to perform() but any currently active select list in the calling program is not accessible to the executed library and is preserved in the calling [program as is. Any select list created by the executed library is discarded when it terminates.
-	var  execute(in sentence);
+	var  execute(in command_line);
 
 	// Close the current program and run an exodus library's main function.
-	// Identical to perform().
+	// Identical to perform() except that the current program closes first.
 	[[noreturn]]
-	void chain(in libraryname);
+	void chain(in command_line);
 
 	///////////////////////////
 	///// Program termination :
@@ -361,12 +361,107 @@ ND	var  xlate(in filename, in key, in fieldno_or_name, const char* mode);
 ND	var  oconv(in input, in conversion);
 ND	var  iconv(in input, in conversion);
 
+ private:
+
+	////////////////////////
+	///// ioconv date/time :
+	////////////////////////
+
+	// Formatting for dates that is sensitive to the American/International setting in DATEFORMAT.
+	// Normally used for oconv() but can be used in reverse for iconv.
+	// var: An internal date (a number).
+	// Returns: A readable date in text format. e.g. "31 DEC 2020"
+	// Alternatively one can use the ordinary date conversion patterns starting "D" e.g. "DE/" for international date with / like 31/12/2020.
+	// `let v1 = iconv("JAN 9 2020", "D");
+	//  assert(oconv(v1, "[DATE]"   ) == " 9/ 1/2020");  // Same as date conversion "D/Z"  assuming E from DATEFMT
+	//  assert(oconv(v1, "[DATE,4]" ) == " 9/ 1/2020");  // 4 is the default unless 2 is set in DATEFMT so may not not be needed.
+	//  assert(oconv(v1, "[DATE,*4]") == "9/1/2020");    // Same as date conversion "D/ZZ" assuming E from DATEFMT
+	//  assert(oconv(v1, "[DATE,*]" ) == "9/1/2020");    // * means the same as date conversion "ZZ" (trim leading zeros and spaces)`
+	var  exoprog_date(in type, in input0, in ndecs0, out output);
+
+	// Formatting for numbers with optional currency code/unit suffix and is sensitive to the International or European setting in BASEFMT regarding use of commas or dots for thousands separators and decimal points.
+	// Primarily used for oconv() but can be used in reverse for iconv.
+	// var: A number with an optional currency code or unit suffix. e.g. "12345.67USD"
+	// Returns: A formatted number with thousands separated conventionally e.g. "12.345.67USD".
+	// iconv/oconv("[NUMBER]")      oconv leaves ndecimals untouched as in the input. iconv see below.
+	// iconv/oconv("[NUMBER,2]")    Specified number of decimal places
+	// iconv/oconv("[NUMBER,BASE]") Decimal places as per BASEFMT
+	// iconv/oconv("[NUMBER,*]")    Leave decimal places untouched as in the input
+	// iconv/oconv("[NUMBER,X]")    Leave decimal places untouched as in the input
+	// iconv/oconv("[NUMBER,2Z]")   Z (suppress zero) combined with any other code for oconv results in empty output "" instead of "0.00" in case of zero input.
+	//
+	// Empty input "" gives empty output "".
+	//
+	// All leading, trailing and internal spaces are removed from the input.
+	//
+	// A trailing currency or unit code is ignored and returned on output.
+	//
+	// An exodus number is an optional leading + or - followed by one or more decimal digits 0-9 with a single optional decimal point placed anywhere.
+	//
+	// If the input is non-numeric then "" is returned and STATUS set to 2. In the case of oconv with multiple fields or values each field or value is processed separately but STATUS is set to 2 if any are non-numeric.
+	//
+	// iconv removes and oconv adds thousand separator chars. The thousands separator is  "," if BASEFMT starts with "MD" or "." if it starts with "MC".
+	//
+	// oconv:
+	//
+	// Add thousands separator chars and optionally standardise the number of decimal places.
+	//
+	// Multiple numbers in fields, values, subvalues etc. can be processed in one string.
+	//
+	// Any leading + character is preserved on output.
+	//
+	// Z suppresses zeros and returns empty string "" instead.
+	//
+	// Special format "[NUMBER,ndecs,move_ndecs]": move_ndecs causes decimal point to be shifted left if positive or right if negative.
+	//
+	// `var v1 = oconv("1234.5678USD", "[NUMBER,2]"); // "1,234.57USD"`
+	//
+	// iconv:
+	//
+	// Remove all thousands separator chars and optionally standardise the number of decimal places.
+	//
+	// If ndecs is not specified in the "[NUMBER]" pattern then ndecs is taken from the current RECORD using dictionary code NDECS if DICT is available otherwise it uses ndecs from BASEFMT.
+	//
+	// iconv only handles a single field/value.
+	//
+	// Optional prefix of "1/" or "/" causes the reciprocal of the number to be used. e.g. "1/100" or "/100" -> "0.01".
+	//
+	// `var v1 = iconv("1,234.5678USD", "[NUMBER]"); // "1234.57USD"`
+	//
+	var  exoprog_number(in type, in input0, in ndecs0, out output);
+
+public:
+
 	// Split amount+currency code/unit string into number and currency code/unit.
 	// var: "123.45USD"
 	// Returns: e.g. "123.45"
 	// unitx: [out] e.g. "USD"
 	var  amountunit(in input0, out unitx);
 ND	var  amountunit(in input0);
+
+	//////////////////////////
+	///// Time/date utilities:
+	//////////////////////////
+
+	// Returns: Text of date and time in users time zone
+	// e.g. "2MAR2025 11:52AM"
+	// Offset from UTC by SW seconds.
+ND	var  timedate2();
+
+	// Returns: User, server and UTC date and time
+	// User date and time is determined by adding the environment variable SW.f(1)'s TZ offset (in seconds) to UTC date/time obtained from the operating system.
+	// "system" date and time is normally the same as UTC date/time and is determined by adding the environment variable SW.f(2)'s TZ offset (in seconds) to UTC date/time obtained from the operating system.
+	void  getdatetime(out user_date, out user_time, out system_date, out system_time, out UTC_date, out UTC_time);
+
+	// Get text of elapsed time since environment variable TIMESTAMP was initialised with ostimestamp() at program/thread startup.
+	// TIMESTAMP can be updated using ostimestamp() as and when desired.
+	// e.g. "< 1 ms"
+ND	var  elapsedtimetext() const;
+
+	// Get text of elapsed time between two timestamps
+	// `let v1 = elapsedtimetext(0, 0.55);  // "13 hours, 12 mins"
+	//  let v2 = elapsedtimetext(0, 0.001); // "1 min, 26 secs"`
+ND	var  elapsedtimetext(in timestamp1, in timestamp2) const;
 
 	/////////////////////////////
 	///// Terminal i/o utilities:
@@ -469,30 +564,6 @@ ND	var  invertarray(in input, bool pad = false);
 	//
 	void  sortarray(io array, in fns = "", in order = "");
 
-	//////////////////////////
-	///// Time/date utilities:
-	//////////////////////////
-
-	// Returns: Text of date and time in users time zone
-	// e.g. "2MAR2025 11:52AM"
-	// Offset from UTC by SW seconds.
-ND	var  timedate2();
-
-	// Returns: User, server and UTC date and time
-	// User date and time is determined by adding the environment variable SW.f(1)'s TZ offset (in seconds) to UTC date/time obtained from the operating system.
-	// "system" date and time is normally the same as UTC date/time and is determined by adding the environment variable SW.f(2)'s TZ offset (in seconds) to UTC date/time obtained from the operating system.
-	void  getdatetime(out user_date, out user_time, out system_date, out system_time, out UTC_date, out UTC_time);
-
-	// Get text of elapsed time since environment variable TIMESTAMP was initialised with ostimestamp() at program/thread startup.
-	// TIMESTAMP can be updated using ostimestamp() as and when desired.
-	// e.g. "< 1 ms"
-ND	var  elapsedtimetext() const;
-
-	// Get text of elapsed time between two timestamps
-	// `let v1 = elapsedtimetext(0, 0.55);  // "13 hours, 12 mins"
-	//  let v2 = elapsedtimetext(0, 0.001); // "1 min, 26 secs"`
-ND	var  elapsedtimetext(in timestamp1, in timestamp2) const;
-
 	/////////////////////
 	///// Record locking:
 	/////////////////////
@@ -502,75 +573,6 @@ ND	bool lockrecord(in filename, io file, in keyx, in recordx, const int waitsecs
 ND	bool lockrecord(in filename, io file, in keyx) const;
 	bool unlockrecord(in filename, io file, in key) const;
 	bool unlockrecord() const;
-
- private:
-
-	////////////////////////
-	///// ioconv date/time :
-	////////////////////////
-
-	// Formatting for dates that is sensitive to the American/International setting in DATEFORMAT.
-	// Normally used for oconv() but can be used in reverse for iconv.
-	// var: An internal date (a number).
-	// Returns: A readable date in text format. e.g. "31 DEC 2020"
-	// Alternatively one can use the ordinary date conversion patterns starting "D" e.g. "DE/" for international date with / like 31/12/2020.
-	// `let v1 = iconv("JAN 9 2020", "D");
-	//  assert(oconv(v1, "[DATE]"   ) == " 9/ 1/2020");  // Same as date conversion "D/Z"  assuming E from DATEFMT
-	//  assert(oconv(v1, "[DATE,4]" ) == " 9/ 1/2020");  // 4 is the default unless 2 is set in DATEFMT so may not not be needed.
-	//  assert(oconv(v1, "[DATE,*4]") == "9/1/2020");    // Same as date conversion "D/ZZ" assuming E from DATEFMT
-	//  assert(oconv(v1, "[DATE,*]" ) == "9/1/2020");    // * means the same as date conversion "ZZ" (trim leading zeros and spaces)`
-	var  exoprog_date(in type, in input0, in ndecs0, out output);
-
-	// Formatting for numbers with optional currency code/unit suffix and is sensitive to the International or European setting in BASEFMT regarding use of commas or dots for thousands separators and decimal points.
-	// Primarily used for oconv() but can be used in reverse for iconv.
-	// var: A number with an optional currency code or unit suffix. e.g. "12345.67USD"
-	// Returns: A formatted number with thousands separated conventionally e.g. "12.345.67USD".
-	// iconv/oconv("[NUMBER]")      oconv leaves ndecimals untouched as in the input. iconv see below.
-	// iconv/oconv("[NUMBER,2]")    Specified number of decimal places
-	// iconv/oconv("[NUMBER,BASE]") Decimal places as per BASEFMT
-	// iconv/oconv("[NUMBER,*]")    Leave decimal places untouched as in the input
-	// iconv/oconv("[NUMBER,X]")    Leave decimal places untouched as in the input
-	// iconv/oconv("[NUMBER,2Z]")   Z (suppress zero) combined with any other code for oconv results in empty output "" instead of "0.00" in case of zero input.
-	//
-	// Empty input "" gives empty output "".
-	//
-	// All leading, trailing and internal spaces are removed from the input.
-	//
-	// A trailing currency or unit code is ignored and returned on output.
-	//
-	// An exodus number is an optional leading + or - followed by one or more decimal digits 0-9 with a single optional decimal point placed anywhere.
-	//
-	// If the input is non-numeric then "" is returned and STATUS set to 2. In the case of oconv with multiple fields or values each field or value is processed separately but STATUS is set to 2 if any are non-numeric.
-	//
-	// iconv removes and oconv adds thousand separator chars. The thousands separator is  "," if BASEFMT starts with "MD" or "." if it starts with "MC".
-	//
-	// oconv:
-	//
-	// Add thousands separator chars and optionally standardise the number of decimal places.
-	//
-	// Multiple numbers in fields, values, subvalues etc. can be processed in one string.
-	//
-	// Any leading + character is preserved on output.
-	//
-	// Z suppresses zeros and returns empty string "" instead.
-	//
-	// Special format "[NUMBER,ndecs,move_ndecs]": move_ndecs causes decimal point to be shifted left if positive or right if negative.
-	//
-	// `var v1 = oconv("1234.5678USD", "[NUMBER,2]"); // "1,234.57USD"`
-	//
-	// iconv:
-	//
-	// Remove all thousands separator chars and optionally standardise the number of decimal places.
-	//
-	// If ndecs is not specified in the "[NUMBER]" pattern then ndecs is taken from the current RECORD using dictionary code NDECS if DICT is available otherwise it uses ndecs from BASEFMT.
-	//
-	// iconv only handles a single field/value.
-	//
-	// Optional prefix of "1/" or "/" causes the reciprocal of the number to be used. e.g. "1/100" or "/100" -> "0.01".
-	//
-	// `var v1 = iconv("1,234.5678USD", "[NUMBER]"); // "1234.57USD"`
-	//
-	var  exoprog_number(in type, in input0, in ndecs0, out output);
 
 };
 

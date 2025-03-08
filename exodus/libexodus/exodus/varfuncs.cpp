@@ -1883,11 +1883,37 @@ IO   var::parser(char sepchar) REF {
 	THISIS("void var::parser(char sepchar) &")
 	assertStringMutator(function_sig);
 
+	// e.g. parse words using spaces into an FM delimited string leaving quoted phrases intact.
+	//
+	// e.g. "select xo_clients with type = " " or name contains ' ' and with balance > 100 {R}"
+	// ---> "select^xo_clients^with^type^=^" "^or^name^contains^' '^and^with^balance^>^100^{R}"
+	//
+	// e.g. abc xyz qwe Spaces are used to parse fields.
+	// ---> abc^xyz^qwe
+	//
+	// e.g. abc " "      Spaces are preserved inside double quotes.
+	// ---> abc^" "
+	//
+	// e.g. abc ' '      Spaces are preserved inside single quotes.
+	// ---> abc^' '
+	//
+	// e.g. abc "a \"b " Escaped double quotes are preserved inside double quotes.
+	// ---> abc^"a \"b "
+	//
+	// e.g. abc 'a \'b ' Escaped single quotes are preserved inside single quotes.
+	// ---> abc^'a \'b '
+	//
+	// e.g. abc d\ ef    Escaped spaces are preserved as spaces.
+	// ---> abc^d\ ef
+	//
+	// e.g. abc a\b      All backslashes are preserved.
+	// ---> abc^a\b
+	//
+
 	for (auto it = var_str.begin(); it != var_str.end(); ++it) {
 		char ch1 = *it;
 		if (ch1 == sepchar) {
 			*it = FM_; // Replace one sepchar
-
 		} else if (ch1 == '"' || ch1 == '\'') {
 			for (;;) {
 				if (++it == var_str.end()) return THIS;

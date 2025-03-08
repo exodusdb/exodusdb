@@ -705,12 +705,12 @@ void ExoProgram::note(in msg, in options, io response) const {
 }
 
 // execute
-var ExoProgram::execute(in sentence) {
+var ExoProgram::execute(in command_line) {
 
 	var saved_cursor;
 	pushselect(saved_cursor);
 
-	let result = perform(sentence);
+	let result = perform(command_line);
 
 	popselect(saved_cursor);
 
@@ -719,16 +719,16 @@ var ExoProgram::execute(in sentence) {
 
 // chain
 [[noreturn]]
-void ExoProgram::chain(in libraryname) {
+void ExoProgram::chain(in command_line) {
 
 	// Pass an environment variable that the performing/executing program will run on termination of this program.
-	CHAIN = libraryname;
+	CHAIN = command_line;
 
 	this->stop();
 }
 
 // perform
-var ExoProgram::perform(in sentence) {
+var ExoProgram::perform(in command_line) {
 
 	// lowercase all library functions to aid in conversion from pickos
 	// TODO remove after conversion complete
@@ -736,7 +736,7 @@ var ExoProgram::perform(in sentence) {
 	// Save some environment variables
 	//////////////////////////////////
 
-	// Must take a *COPY* since sentence might be a reference to SENTENCE if called like 'perform(SENTENCE)'
+	// Must take a *COPY* since command_line might be a reference to SENTENCE if called like 'perform(SENTENCE)'
 	//var savesentence = move(SENTENCE);
 	let saved_sentence = SENTENCE;
 
@@ -786,15 +786,24 @@ var ExoProgram::perform(in sentence) {
 	// Do the perform
 	/////////////////
 
-	SENTENCE = sentence;
+	// CHAIN may be set by the performed library to execute a follow on SENTENCE/command_line
+	CHAIN = "";
+
+	SENTENCE = command_line;
 	while (SENTENCE) {
+
+		// Parse words using spaces into an FM delimited string leaving quoted phrases intact.
+		// Spaces are used to parse fields.
+		// Spaces and single quotes are preserved inside double quotes.
+		// Spaces are double quotes preserved inside single quotes.
+		// Backslashes and any character following a backslash (particularly spaces, double and single quotes and backslashes) are treated as non-special characters.
 		COMMAND = SENTENCE.parse(' ');
 
 		// Cut off OPTIONS from end of COMMAND if present
 		// *** SIMILAR code in
 		// 1. exofuncs.cpp exodus_main()
 		// 2. exoprog.cpp  perform()
-		// OPTIONS are in either (AbC) or {AbC} in the last field of COMMAND
+		// OPTIONS are in either (AbC) or {AbC} WITHOUT SPACES in the last field of COMMAND
 		OPTIONS = COMMAND.field(FM, -1);
 		if ((OPTIONS.starts("{") and OPTIONS.ends("}")) or (OPTIONS.starts("(") and OPTIONS.ends(")"))) {
 			// Remove last field of COMMAND. TODO fpopper command or remover(-1)?
@@ -806,7 +815,7 @@ var ExoProgram::perform(in sentence) {
 			OPTIONS = "";
 		}
 
-		// Load the shared library file (always lowercase)
+		// Load the shared library file (always lowercase) TODO allow mixed case
 		let libid = SENTENCE.field(" ", 1).lcase();
 		std::string libname = libid.toString();
 		if (!perform_callable_.initsmf(
@@ -909,8 +918,9 @@ var ExoProgram::perform(in sentence) {
 		// CHAIN is a kind of optional follow-on controlled by the library function
 		// to perform another function after the first
 		// Go round again if anything in CHAIN
-		CHAIN.move(SENTENCE);
-	}
+		SENTENCE = CHAIN.move();
+
+	} // 
 
 	// restore various environment variables
 	restore_environment();

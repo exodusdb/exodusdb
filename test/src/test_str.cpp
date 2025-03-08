@@ -233,6 +233,105 @@ function main() {
 
 	}
 
+	{
+		// Parse words using spaces into an FM delimited string leaving quoted phrases intact.
+
+		auto test = [](in a, in b, in comment) {
+			printl("---", comment, "---");
+			a.outputl("a=");
+			b.errputl("b=");
+
+			let c = a.parse();
+			c.errputl("c=");
+
+			if (c ne b) {
+				TRACE(c.oconv("HEX"))
+				TRACE(b.oconv("HEX"))
+			};
+
+			return c == b;
+		};
+
+	// } is converted to SM by _var
+	//	assert(test(R"__(select xo_clients with type = " " or name contains ' ' and with balance > 100 {R})__"
+	//		,R"__(select^xo_clients^with^type^=^" "^or^name^contains^' '^and^with^balance^>^100^{R})__"_var);
+
+		assert(test(R"__(select xo_clients with type = " " or name contains ' ' and with balance > 100 (R))__"
+			,R"__(select^xo_clients^with^type^=^" "^or^name^contains^' '^and^with^balance^>^100^(R))__"_var
+			, "Typical command line parsing"));
+
+		assert(test(R"__(abc xyz qwe)__"
+			,R"__(abc^xyz^qwe)__"_var
+			, "Spaces to field marks"));
+
+		assert(test(R"__(abc " ")__"
+			,R"__(abc^" ")__"_var
+			, "Spaces inside double quotes are preserved"));
+
+		assert(test(R"__(abc ' ')__"
+			,R"__(abc^' ')__"_var
+			, "Spaces inside single quotes are preserved"));
+
+		assert(test(R"__(abc "a \"b ")__"
+			,R"__(abc^"a \"b ")__"_var
+			, "Escaped double quotes are preserved."));
+
+		assert(test(R"__(abc 'a \'b ')__"
+			,R"__(abc^'a \'b ')__"_var
+			, "Escaped single quotes are preserved."));
+
+		assert(test(R"__(abc d\ ef)__"
+			,R"__(abc^d\ ef)__"_var
+			, "Escaped spaces are preserved."));
+
+		assert(test(R"__(abc a\b)__"
+			,R"__(abc^a\b)__"_var
+			, "Backslashes are preserved."));
+
+		assert(test(R"__(a "b\\" c)__"
+			,R"__(a^"b\\"^c)__"_var
+			, "Backslash makes even a following backslash a non-special character"));
+
+		// Edge cases
+
+		assert(test(R"__()__"
+			,R"__()__"_var
+			, "Empty"));
+
+		assert(test(R"__(\)__"
+			,R"__(\)__"_var
+			, "Sole backslash"));
+
+		assert(test(R"__(")__"
+			,R"__(")__"_var
+			, "Sole double quote"));
+
+		assert(test(R"__(')__"
+			,R"__(')__"_var
+			, "Sole '"));
+
+		assert(test(R"__("")__"
+			,R"__("")__"_var
+			, "Double double quote"));
+
+		assert(test(R"__('')__"
+			,R"__('')__"_var
+			, "Double '"));
+
+		assert(test(R"__(\\)__"
+			,R"__(\\)__"_var
+			, "Double backslash"));
+
+		assert(test(R"__("\)__"
+			,R"__("\)__"_var
+			, "Bad quote and \\"));
+
+		assert(test(R"__('\)__"
+			,R"__('\)__"_var
+			, "Bad quote and \\"));
+
+	}
+
 	printl(elapsedtimetext());
 	printl("Test passed");
 

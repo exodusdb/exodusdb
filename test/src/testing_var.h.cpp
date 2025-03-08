@@ -2549,6 +2549,40 @@ function main() {
 		if (not deletelist("my_list")) abort("deletelist: " ^ lasterror());
 	}
 
+	printl("exoprog_date(in type, in input0, in ndecs0, out output);");
+	{
+		let v1 = iconv("JAN 9 2020", "D");
+		assert(oconv(v1, "[DATE]"   ) == " 9/ 1/2020");
+  // Same as date conversion "D/Z"  assuming E from DATEFMT
+		assert(oconv(v1, "[DATE,4]" ) == " 9/ 1/2020");  // 4 is the default unless 2 is set in DATEFMT so may not not be needed.
+		assert(oconv(v1, "[DATE,*4]") == "9/1/2020");    // Same as date conversion "D/ZZ" assuming E from DATEFMT
+		assert(oconv(v1, "[DATE,*]" ) == "9/1/2020");    // * means the same as date conversion "ZZ" (trim leading zeros and spaces)
+	}
+
+	printl("exoprog_number(in type, in input0, in ndecs0, out output);");
+	{
+		var v1 = oconv("1234.5678USD", "[NUMBER,2]");
+		assert(v1 == "1,234.57USD");
+
+	}
+
+	printl("exoprog_number(in type, in input0, in ndecs0, out output);");
+	{
+		var v1 = iconv("1,234.5678USD", "[NUMBER]");
+		assert(v1 == "1234.57USD");
+
+	}
+
+	printl("elapsedtimetext(in timestamp1, in timestamp2) const;");
+	{
+		let v1 = elapsedtimetext(0, 0.55);
+		assert(v1 == "13 hours, 12 mins");
+
+		let v2 = elapsedtimetext(0, 0.001);
+		assert(v2 == "1 min, 26 secs");
+
+	}
+
 	printl("getcursor(out cursor, int delayms = 3000, int max_errors = 0) const;");
 	{
 		var cursor;
@@ -2583,40 +2617,6 @@ function main() {
 		var v1 = "f1^10]20]2]1^ww]xx]yy]zz^f3^f4"_var;  // fields 2 and 3 are parallel multivalues and currently unordered.
 		sortarray(v1, "2]3"_var, "AR");
 		assert(v1 == "f1^1]2]10]20^zz]yy]ww]xx^f3^f4"_var);
-
-	}
-
-	printl("elapsedtimetext(in timestamp1, in timestamp2) const;");
-	{
-		let v1 = elapsedtimetext(0, 0.55);
-		assert(v1 == "13 hours, 12 mins");
-
-		let v2 = elapsedtimetext(0, 0.001);
-		assert(v2 == "1 min, 26 secs");
-
-	}
-
-	printl("exoprog_date(in type, in input0, in ndecs0, out output);");
-	{
-		let v1 = iconv("JAN 9 2020", "D");
-		assert(oconv(v1, "[DATE]"   ) == " 9/ 1/2020");
-  // Same as date conversion "D/Z"  assuming E from DATEFMT
-		assert(oconv(v1, "[DATE,4]" ) == " 9/ 1/2020");  // 4 is the default unless 2 is set in DATEFMT so may not not be needed.
-		assert(oconv(v1, "[DATE,*4]") == "9/1/2020");    // Same as date conversion "D/ZZ" assuming E from DATEFMT
-		assert(oconv(v1, "[DATE,*]" ) == "9/1/2020");    // * means the same as date conversion "ZZ" (trim leading zeros and spaces)
-	}
-
-	printl("exoprog_number(in type, in input0, in ndecs0, out output);");
-	{
-		var v1 = oconv("1234.5678USD", "[NUMBER,2]");
-		assert(v1 == "1,234.57USD");
-
-	}
-
-	printl("exoprog_number(in type, in input0, in ndecs0, out output);");
-	{
-		var v1 = iconv("1,234.5678USD", "[NUMBER]");
-		assert(v1 == "1234.57USD");
 
 	}
 
