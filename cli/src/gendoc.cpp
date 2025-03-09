@@ -151,6 +151,9 @@ function main() {
 //			srcline.trimmer();
 			srcline.trimmerboth();
 
+			if (srcline.starts("[[noreturn") and srcline.ends("]]"))
+				continue;
+
 //			// "[[Deprecated" flags that the following function line should not be documented
 //			if (srcline.starts("[[deprecated")) {
 //				deprecated = true;

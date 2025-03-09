@@ -280,57 +280,55 @@ ND	bool hasnext();
 	///// Perform/Execute:
 	//////////////////////
 
-	// Check if a command's first word  is a performable/executable exodus program.
-	var  libinfo(in command);
-
-	// Run an exodus library's main function using a command like syntax similar to that of executable programs.
-	// A "command line" is passed to the library in the usual COMMAND, SENTENCE and OPTIONS environment variables instead of function arguments.
-	// The library's main function should have zero arguments. Performing a library function with main arguments results in them being unassigned and in some case core dump may occur.
-	// The following environment variables are initialised on entry to the main function of the library. They are preserved untouched in the calling program.
+	// Run an exodus program/library's main function using a command like syntax similar to that of executable programs.
+	// A "command line" is passed to the program/library in the usual COMMAND, SENTENCE and OPTIONS environment variables instead of function arguments.
+	// The program/library's main function should have zero arguments. Performing a program/library function with main arguments results in them being unassigned and in some case core dump may occur.
+	// The following environment variables are initialised on entry to the main function of the program/library. They are preserved untouched in the calling program.
 	// SENTENCE, COMMAND, OPTIONS: Initialised from the argument "command_line".
 	// RECUR0, RECUR1, RECUR2, RECUR3, RECUR4 to "".
 	// ID, RECORD, MV, DICT initialised to "".
 	// LEVEL is incremented by one.
 	// All other environment variables are shared between the caller and callee. There is essentially only one environment in any one process or thread.
-	// Any active select list is passed to the performed program and can be consumed by it. Conversely any active select list created by the library will be returned to the calling program.
-	// command_line: The first word of this argument is used as the name of the library to be loaded and run. command_line is used to initialise the SENTENCE, COMMAND and OPTIONS environment variables.
-	// Returns: Whatever var the library returns, or "" if it calls stop() or abort(()".
-    // The return value can be ignored and discarded without any compiler warning.
-	// Note that library functions may also be directly called using ordinary function syntax with multiple arguments if necessary. An "#include <libname.h>" line is required after the "programinit()" line. In this case, stop() and abort() in the called library terminate the calling program as well unless caught using try/catch syntax.
+	// Any active select list is passed to the performed program/library and can be consumed by it. Conversely any active select list created by the performed program/library will be returned to the calling program. In other words, both the performing and the performed programs/libraries share a single active select list environment. This is different from execute() which gets its own private active select list, initially inactive.
+	// command_line: The first word of this argument is used as the name of the program/library to be loaded and run. command_line is used to initialise the SENTENCE, COMMAND and OPTIONS environment variables.
+	// Returns: Whatever var the program/library returns, or "" if it calls stop() or abort(()".
+	// The return value can be ignored and discarded without any compiler warning.
+	// Exodus program/libraries may also be called directly using conventional function calling syntax. To call an exodus program/library called progname using either the syntax "call progname(args...);" or "var v1 = progname(args...);" you must "#include <progname.h>" after the "programinit()" or "libraryinit()" lines in your program/library.
 	var  perform(in command_line);
 
-	// Run an exodus library's main function.
-	// Identical to perform() but any currently active select list in the calling program is not accessible to the executed library and is preserved in the calling [program as is. Any select list created by the executed library is discarded when it terminates.
+	// Run an exodus program/library's main function.
+	// Identical to perform() but any currently active select list in the calling program/library is not accessible to the executed program/library and is preserved in the calling [program as is. Any select list created by the executed library is discarded when it terminates.
 	var  execute(in command_line);
 
-	// Close the current program and run an exodus library's main function.
+	// Run an exodus program/library's main function after closing the current program.
 	// Identical to perform() except that the current program closes first.
 	[[noreturn]]
 	void chain(in command_line);
+
+	// Check if a command's first word  is a performable/executable exodus program.
+	var  libinfo(in command);
 
 	///////////////////////////
 	///// Program termination :
 	///////////////////////////
 
-	// Return to parent exoprog
-	// or quit to OS WITHOUT an error
-	// bool to allow "or stop()"
+	// Stop the current exodus program/library normally and return to the parent exodus program/library, or return to the operating system if none.
+	// Calling stop() in an exodus OS command line executable program, or in a function called from the same, will terminate the OS process with an error status of 0 which is generally considered to indicate success.
+	// Calling stop() in a performed or executed exodus program/library, or in a function called from the same, will terminate the program/library being executed and return to the exodus program that performed or executed it.
 	[[noreturn]]
 	void stop(in message = "") const;
 
-	// Return to parent exoprog
-	// or quit to OS WITH an error 1
-	// bool to allow "or abort()"
+	// Abort the current exodus program/library abnormally and return to the parent exodus program/library, or return to the operating system if none.
+	// Similar to stop() but, if terminating the OS process, then return an error status of 1 which is generally considered to be an indication of failure.
 	[[noreturn]]
 	void abort(in message = "") const;
 
-	// Quit to OS WITH an error 2
-	// bool to allow "or abortall()"
+	// Abort the current exodus program/library abnormally and return to the parent exodus program/library, or return to the operating system if none.
+	// Similar to abort() but, if terminating the OS process, then return an error status of 2 which is generally considered to be an indication of failure.
 	[[noreturn]]
 	void abortall(in message = "") const;
 
 	// Quit to OS WITHOUT an error
-	// bool to allow "or logoff()"
 	//[[deprecated("Deprecated is a great way to highlight all uses of something!")]]
 	[[noreturn]]
 	void logoff(in message = "") const;
@@ -375,7 +373,7 @@ ND	var  iconv(in input, in conversion);
 	// `let v1 = iconv("JAN 9 2020", "D");
 	//  assert(oconv(v1, "[DATE]"   ) == " 9/ 1/2020");  // Same as date conversion "D/Z"  assuming E from DATEFMT
 	//  assert(oconv(v1, "[DATE,4]" ) == " 9/ 1/2020");  // 4 is the default unless 2 is set in DATEFMT so may not not be needed.
-	//  assert(oconv(v1, "[DATE,*4]") == "9/1/2020");    // Same as date conversion "D/ZZ" assuming E from DATEFMT
+	//  assert(oconv(v1, "[DATE,*4]") == "9/1/2020");	// Same as date conversion "D/ZZ" assuming E from DATEFMT
 	//  assert(oconv(v1, "[DATE,*]" ) == "9/1/2020");    // * means the same as date conversion "ZZ" (trim leading zeros and spaces)`
 	var  exoprog_date(in type, in input0, in ndecs0, out output);
 
@@ -414,7 +412,7 @@ ND	var  iconv(in input, in conversion);
 	//
 	// Special format "[NUMBER,ndecs,move_ndecs]": move_ndecs causes decimal point to be shifted left if positive or right if negative.
 	//
-	// `var v1 = oconv("1234.5678USD", "[NUMBER,2]"); // "1,234.57USD"`
+	// `var v1 = oconv("1234.5USD", "[NUMBER,2]"); // "1,234.50USD" // Comma added and decimal places corrected.`
 	//
 	// iconv:
 	//
@@ -426,7 +424,7 @@ ND	var  iconv(in input, in conversion);
 	//
 	// Optional prefix of "1/" or "/" causes the reciprocal of the number to be used. e.g. "1/100" or "/100" -> "0.01".
 	//
-	// `var v1 = iconv("1,234.5678USD", "[NUMBER]"); // "1234.57USD"`
+	// `var v1 = iconv("1,234.5678USD", "[NUMBER]"); // "1234.57USD" // Comma removed`
 	//
 	var  exoprog_number(in type, in input0, in ndecs0, out output);
 
@@ -511,11 +509,11 @@ ND	var  AT(const int x, const int y) const;
 	// delayms: Default 3000ms. The maximum time to wait for terminal response.
 	// max_errors: Default is 0. If not zero, reset the number of times to error before automatically disabling getcursor(). max_errors is initialised to 3. If negative then max_errors has the the effect of disabling all future calls to getcursor().
 	// In case the terminal fails to respond correctly within the required timeout, or is currently disabled due to too many failures, or has been specifically disabled then the returned "cursor" var contains a 4th field:
-    // TIMEOUT - The terminal failed to respond within the timeout.
-    // READ_ERROR - Failed to read terminal response.
-    // INVALID_RESPONSE - Terminal response invalid.
-    // SETUP_ERROR - Terminal setup failed.
-    // DISABLED - Terminal is disabled due to more errors than the maximum currently set.
+	// TIMEOUT - The terminal failed to respond within the timeout.
+	// READ_ERROR - Failed to read terminal response.
+	// INVALID_RESPONSE - Terminal response invalid.
+	// SETUP_ERROR - Terminal setup failed.
+	// DISABLED - Terminal is disabled due to more errors than the maximum currently set.
 	//
 	// `var cursor;
 	//  if (isterminal() and not getcursor(cursor)) ... // cursor becomes something like "0^20^0.012345"_var`
@@ -560,7 +558,7 @@ ND	var  invertarray(in input, bool pad = false);
 	// AR Ascending  - Right Justified - Numeric
 	// DR Descending - Right Justified - Numeric
 	// `var v1 = "f1^10]20]2]1^ww]xx]yy]zz^f3^f4"_var;  // fields 2 and 3 are parallel multivalues and currently unordered.
-    //  sortarray(v1, "2]3"_var, "AR"); // v1 -> "f1^1]2]10]20^zz]yy]ww]xx^f3^f4"_var`
+	//  sortarray(v1, "2]3"_var, "AR"); // v1 -> "f1^1]2]10]20^zz]yy]ww]xx^f3^f4"_var`
 	//
 	void  sortarray(io array, in fns = "", in order = "");
 
