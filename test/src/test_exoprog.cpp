@@ -102,6 +102,7 @@ function main() {
 	{
 		printl("Server and user on UTC");
 		TRACE(SW)
+		TRACE(DATEFMT)
 		printl(timedate2());
 
 		printl();

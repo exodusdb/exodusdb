@@ -352,9 +352,9 @@ ND	var  xlate(in filename, in key, in fieldno_or_name, const char* mode);
 	//
 	// [NUMBER]  // built-in. See doc below.
 	// [DATE]    // built-in. See doc below.
-	// [DATEPERIOD]
-	// [DATETIME]
-	// [TIME2]
+	// [DATEPERIOD]  e.g. [DATEPERIOD,1] [DATEPERIOD,1,12]
+	// [DATETIME]    e.g. [DATETIME,4*,DOS] [DATETIME,4*,MTS] [DATETIME,4*]
+	// [TIME2]       e.g. [TIME2,MT] [TIME2,MTS] [TIME2,MTS48]
 	//
 ND	var  oconv(in input, in conversion);
 ND	var  iconv(in input, in conversion);
@@ -371,10 +371,10 @@ ND	var  iconv(in input, in conversion);
 	// Returns: A readable date in text format. e.g. "31 DEC 2020"
 	// Alternatively one can use the ordinary date conversion patterns starting "D" e.g. "DE/" for international date with / like 31/12/2020.
 	// `let v1 = iconv("JAN 9 2020", "D");
-	//  assert(oconv(v1, "[DATE]"   ) == " 9/ 1/2020");  // Same as date conversion "D/Z"  assuming E from DATEFMT
-	//  assert(oconv(v1, "[DATE,4]" ) == " 9/ 1/2020");  // 4 is the default unless 2 is set in DATEFMT so may not not be needed.
-	//  assert(oconv(v1, "[DATE,*4]") == "9/1/2020");	// Same as date conversion "D/ZZ" assuming E from DATEFMT
-	//  assert(oconv(v1, "[DATE,*]" ) == "9/1/2020");    // * means the same as date conversion "ZZ" (trim leading zeros and spaces)`
+	//  assert(oconv(v1, "[DATE]"   ) == " 9/ 1/2020");  // "D/EZ" or "[DATE,D]" equivalent assuming D2/E in DATEFMT (replace leading zeros with spaces)
+	//  assert(oconv(v1, "[DATE,4]" ) == " 9/ 1/2020");  // "D4Z"  equivalent assuming D2/E in DATEFMT (replace leading zeros with spaces)
+	//  assert(oconv(v1, "[DATE,*4]") == "9/1/2020");    // "D4ZZ" equivalent assuming D2/E in DATEFMT (trim leading zeros and spaces)
+	//  assert(oconv(v1, "[DATE,*]" ) == "9/1/20");      // "DZZ"  equivalent assuming D2/E in DATEFMT (trim leading zeros and spaces)`
 	var  exoprog_date(in type, in input0, in ndecs0, out output);
 
 	// Formatting for numbers with optional currency code/unit suffix and is sensitive to the International or European setting in BASEFMT regarding use of commas or dots for thousands separators and decimal points.

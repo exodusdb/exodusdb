@@ -7,49 +7,6 @@ programinit()
 function main() {
 
 	{
-		var v1 = 19002;
-
-		auto test = [&](in v1, in pattern, in expected, in comment) {
-			printt(v1, pattern, expected, comment);
-			printl();
-			var actual = oconv(v1, pattern).squote();
-			if (actual != expected.squote())
-				TRACE(actual)
-			return oconv(v1, pattern).squote() == expected.squote();
-		};
-
-		assert(test(v1, "D"			, "09 JAN 2020",	" Bare ''"));
-		assert(test(v1, "DE"		, "09 JAN 2020",	" Bare E for international makes no difference without a separator"));
-		assert(test(v1, "D!"		, "09JAN2020",  	" No separator"));
-		assert(test(v1, "D/"		, "01/09/2020", 	" Separator - no E for international"));
-		assert(test(v1, "DE/"		, "09/01/2020", 	" Separator with E for international"));
-		assert(test(v1, "D/E"		, "09/01/2020", 	" Order doesnt matter"));
-
-		assert(test(v1, "DZ"		, " 9 JAN 2020",	" Z - Spaces instead of leading zeros"));
-		assert(test(v1, "DZZ"		, "9 JAN 2020", 	" ZZ - Trim leading leading zeros (no spaces)"));
-		assert(test(v1, "DE/Z"		, " 9/ 1/2020",		" International date with / and leading zeros replaced with spaces"));
-
-		assert(test(v1, "[DATE]" 	, " 9/ 1/2020",		" Same as D/Z  assuming E from DATEFMT"));
-		assert(test(v1, "[DATE,4]" 	, " 9/ 1/2020", 	" 4 is the default so is not needed"));
-		assert(test(v1, "[DATE,*4]" , "9/1/2020",    	" Same as D/ZZ assuming E from DATEFMT"));
-		assert(test(v1, "[DATE,*]" 	, "9/1/2020",     	" * means the same as ZZ (trim leading zeros and no spaces)"));
-
-		assert(test(v1, "D!Z"		, " 9JAN2020",		" No separator"));
-		assert(test(v1, "D!ZZ"		, "9JAN2020",		" No separator, trim leading zeros and spaces"));
-		assert(test(v1, "D/Z"		, " 1/ 9/2020",		" American date with Separator / and Z = replace leading zeros with spaces"));
-		assert(test(v1, "D/ZZ"		, "1/9/2020",		" American date with separator / and ZZ = remove leading zeros/spaces."));
-		assert(test(v1, "DE/Z"		, " 9/ 1/2020",  	" International date with separator / and leading zeros replaced with spaces."));
-		assert(test(v1, "DE/ZZ"		, "9/1/2020",		" International date with separator / Leading zeros and spaces removed."));
-		assert(test(v1, "D!ZZ"		, "9JAN2020",     	" Universal date with no separators. Leading zeros and spaces removed."));
-		assert(test(v1, "DE/ZZ"		, "9/1/2020",		" International date with / separator. Leading zeros and spaces removed."));
-		assert(test(v1, "DE!Z"		, " 9JAN2020",		" Universal date with no separator. Leading zero replaced with space."));
-
-		assert(test(v1, "D0"		, "09 JAN",			" Year last.  No year. Zero year digits"));
-		assert(test(v1, "DS0"		, "JAN 09",			" Year first. No year. Zero year digits"));
-
-	}
-
-	{
 		// oconv D failure returns the original
 		assert(var("sss").oconv("D") == "sss");
 
@@ -312,6 +269,80 @@ function main() {
 	assert(oconv(14591, "DQ")  eq "4");
 	assert(oconv(14591, "DD")  eq "12");
 	assert(oconv(14591, "DL")  eq "31");
+
+	{
+		var v1 = 19002;
+
+		auto test = [&](in v1, in pattern, in expected, in comment = "") {
+			printt(v1, pattern, expected, comment);
+			printl();
+			var actual = oconv(v1, pattern).squote();
+			if (actual != expected.squote())
+				TRACE(actual)
+			return oconv(v1, pattern).squote() == expected.squote();
+		};
+
+		assert(test(v1, "D"			, "09 JAN 2020",	" Bare ''"));
+		assert(test(v1, "DE"		, "09 JAN 2020",	" Bare E for international makes no difference without a separator"));
+		assert(test(v1, "D!"		, "09JAN2020",  	" No separator"));
+		assert(test(v1, "D/"		, "01/09/2020", 	" Separator - no E for international"));
+		assert(test(v1, "DE/"		, "09/01/2020", 	" Separator with E for international"));
+		assert(test(v1, "D/E"		, "09/01/2020", 	" Order doesnt matter"));
+
+		assert(test(v1, "DZ"		, " 9 JAN 2020",	" Z - Spaces instead of leading zeros"));
+		assert(test(v1, "DZZ"		, "9 JAN 2020", 	" ZZ - Trim leading leading zeros (no spaces)"));
+		assert(test(v1, "DE/Z"		, " 9/ 1/2020",		" International date with / and leading zeros replaced with spaces"));
+
+		assert(test(v1, "D!Z"		, " 9JAN2020",		" No separator"));
+		assert(test(v1, "D!ZZ"		, "9JAN2020",		" No separator, trim leading zeros and spaces"));
+		assert(test(v1, "D/Z"		, " 1/ 9/2020",		" American date with Separator / and Z = replace leading zeros with spaces"));
+		assert(test(v1, "D/ZZ"		, "1/9/2020",		" American date with separator / and ZZ = remove leading zeros/spaces."));
+		assert(test(v1, "DE/Z"		, " 9/ 1/2020",  	" International date with separator / and leading zeros replaced with spaces."));
+		assert(test(v1, "DE/ZZ"		, "9/1/2020",		" International date with separator / Leading zeros and spaces removed."));
+		assert(test(v1, "D!ZZ"		, "9JAN2020",     	" Universal date with no separators. Leading zeros and spaces removed."));
+		assert(test(v1, "DE/ZZ"		, "9/1/2020",		" International date with / separator. Leading zeros and spaces removed."));
+		assert(test(v1, "DE!Z"		, " 9JAN2020",		" Universal date with no separator. Leading zero replaced with space."));
+
+		assert(test(v1, "D0"		, "09 JAN",			" Year last.  No year. Zero year digits"));
+		assert(test(v1, "DS0"		, "JAN 09",			" Year first. No year. Zero year digits"));
+
+//		// Check no change to old style call to [DATE oconv
+		// New conversions on old style global DATEFMT
+		// Should respect any 2 but always convert 0 to spaces
+		printl();
+		var save_DATEFMT = DATEFMT;
+		DATEFMT = "D2/E";
+		TRACE(DATEFMT)
+		assert(test(v1, "[DATE]" 	, " 9/ 1/20",		" 1st Z assumed."));
+		assert(test(v1, "[DATE,4]" 	, " 9/ 1/2020", 	" 1st Z assumed. Demands 4 digit year."));
+		assert(test(v1, "[DATE,*4]" , "9/1/2020",    	" 1st Z assumed. * = 2nd Z option to remove spaces. Demands 4 digit year."));
+		assert(test(v1, "[DATE,*]" 	, "9/1/20",     	" 1st Z assumed. * = 2nd Z option to remove spaces."));
+		DATEFMT = save_DATEFMT;
+
+		// 1st Z is always assumed with "[DATE" (unless arg starts with a D)
+		// and it means remove leading zeros from day and month.
+
+		// With new global DATEFMT "DE"
+		printl();
+		TRACE(DATEFMT)
+		assert(test(v1, "[DATE]" 	, " 9 JAN 2020"	, "1st Z assumed. 4 digit year is the default."));
+		assert(test(v1, "[DATE,4]" 	, " 9 JAN 2020"	, "1st Z assumed. Demands 4 digit year but is already the default"));
+		assert(test(v1, "[DATE,*4]" , "9 JAN 2020"	, "1st Z assumed. * = 2nd Z option to remove spaces. Demands 4 digit year but it is already the default."));
+		assert(test(v1, "[DATE,*]" 	, "9 JAN 2020"	, "1st Z assumed. * = 2nd Z option to remove spaces. 4 digit year is the default"));
+
+		assert(test(v1, "[DATE,Z]" 	, "9 JAN 2020"	, "1st Z assumed. Z = 2nd Z option to remove spaces. 4 digit year is the default"));
+		assert(test(v1, "[DATE,Z!]" , "9JAN2020"	, "1st Z assumed. Z = 2nd Z option to remove spaces. 4 digit year is the default"));
+
+		// Only E is picked up from DATEFMT if the conv starts with a D
+		assert(test(v1, "[DATE,D]" , "09 JAN 2020"	, "Only E option from DATEFMT is used and without a separator does nothing on output"));
+		assert(test(v1, "[DATE,D!]" , "09JAN2020"	, "No separators"));
+		assert(test(v1, "[DATE,D!Z]" , " 9JAN2020"	, "No separators. Leading zeros become spaces."));
+		assert(test(v1, "[DATE,D!ZZ]" , "9JAN2020"	, "No separators. Leading zeros are removed."));
+
+		// Check "[DATE" still picks up E flavour from DATEFMT
+		assert(iconv("9 1 2020", "[DATE]") == 19002);
+		assert(iconv("9 1 2020", "[DATE,D]") == 19002);
+	}
 
 	printl(elapsedtimetext());
 	printl("Test passed");

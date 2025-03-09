@@ -2182,24 +2182,30 @@ function main() {
 
 	printl("oconv_D(const char* conversion) const;");
 	{
-		let v1 = 12345;
-		assert( v1.oconv( "D"   ) == "18 OCT 2001"  );
+		let v1 = 19002;
+		assert( v1.oconv( "D"   ) == "09 JAN 2020"  );
  // Default
-		assert( v1.oconv( "D/"  ) == "10/18/2001"   ); // / separator
-		assert( v1.oconv( "D-"  ) == "10-18-2001"   ); // - separator
-		assert( v1.oconv( "D2"  ) == "18 OCT 01"    ); // 2 digit year
-		assert( v1.oconv( "D/E" ) == "18/10/2001"   ); // International order with /
-		assert( v1.oconv( "DS"  ) == "2001 OCT 18"  ); // ISO Year first
-		assert( v1.oconv( "DS-" ) == "2001-10-18"   ); // ISO Year first with -
-		assert( v1.oconv( "DM"  ) == "10"           ); // Month number
-		assert( v1.oconv( "DMA" ) == "OCTOBER"      ); // Month name
-		assert( v1.oconv( "DY"  ) == "2001"         ); // Year number
-		assert( v1.oconv( "DY2" ) == "01"           ); // Year 2 digits
-		assert( v1.oconv( "DD"  ) == "18"           ); // Day number in month (1-31)
+		assert( v1.oconv( "D/"  ) == "01/09/2020"   ); // mm/dd/yyyy - American numeric
+		assert( v1.oconv( "D-"  ) == "01-09-2020"   ); // mm-dd-yyyy - American numeric
+		assert( v1.oconv( "D/E" ) == "09/01/2020"   ); // dd/mm/yyyy - International numeric
+		assert( v1.oconv( "D-E" ) == "09-01-2020"   ); // dd-mm-yyyy - International numeric
+		assert( v1.oconv( "D2"  ) == "09 JAN 20"    ); // 2 digit year
+		assert( v1.oconv( "D0"  ) == "09 JAN"       ); // No year
+		assert( v1.oconv( "DS"  ) == "2020 JAN 09"  ); // yyyy mmm dd - ISO year first, alpha month
+		assert( v1.oconv( "DS-" ) == "2020-01-09"   ); // yyyy-mm-dd  - ISO year first, numeric month
+		assert( v1.oconv( "DZ"  ) == " 9 JAN 2020"  ); // Leading 0 become spaces
+		assert( v1.oconv( "DZZ" ) == "9 JAN 2020"   ); // Leading 0 are suppressed
+		assert( v1.oconv( "D!"  ) == "09JAN2020"    ); // No separators
+		assert( v1.oconv( "DS-!") == "20200109"     ); // yyyymmdd packed
+		assert( v1.oconv( "DM"  ) == "1"            ); // Month number
+		assert( v1.oconv( "DMA" ) == "JANUARY"      ); // Month name
+		assert( v1.oconv( "DY"  ) == "2020"         ); // Year number
+		assert( v1.oconv( "DY2" ) == "20"           ); // Year 2 digits
+		assert( v1.oconv( "DD"  ) == "9"            ); // Day number in month (1-31)
 		assert( v1.oconv( "DW"  ) == "4"            ); // Weekday number (1-7)
 		assert( v1.oconv( "DWA" ) == "THURSDAY"     ); // Weekday name
-		assert( v1.oconv( "DQ"  ) == "4"            ); // Quarter number
-		assert( v1.oconv( "DJ"  ) == "291"          ); // Day number in year
+		assert( v1.oconv( "DQ"  ) == "1"            ); // Quarter number
+		assert( v1.oconv( "DJ"  ) == "9"            ); // Day number in year
 		assert( v1.oconv( "DL"  ) == "31"           ); // Last day number of month (28-31)
 		// Multifield/multivalue
 		var v2 = "12345^12346]12347"_var;
@@ -2553,10 +2559,10 @@ function main() {
 	{
 		let v1 = iconv("JAN 9 2020", "D");
 		assert(oconv(v1, "[DATE]"   ) == " 9/ 1/2020");
-  // Same as date conversion "D/Z"  assuming E from DATEFMT
-		assert(oconv(v1, "[DATE,4]" ) == " 9/ 1/2020");  // 4 is the default unless 2 is set in DATEFMT so may not not be needed.
-		assert(oconv(v1, "[DATE,*4]") == "9/1/2020");    // Same as date conversion "D/ZZ" assuming E from DATEFMT
-		assert(oconv(v1, "[DATE,*]" ) == "9/1/2020");    // * means the same as date conversion "ZZ" (trim leading zeros and spaces)
+  // "D/EZ" or "[DATE,D]" equivalent assuming D2/E in DATEFMT (replace leading zeros with spaces)
+		assert(oconv(v1, "[DATE,4]" ) == " 9/ 1/2020");  // "D4Z"  equivalent assuming D2/E in DATEFMT (replace leading zeros with spaces)
+		assert(oconv(v1, "[DATE,*4]") == "9/1/2020");    // "D4ZZ" equivalent assuming D2/E in DATEFMT (trim leading zeros and spaces)
+		assert(oconv(v1, "[DATE,*]" ) == "9/1/20");      // "DZZ"  equivalent assuming D2/E in DATEFMT (trim leading zeros and spaces)
 	}
 
 	printl("exoprog_number(in type, in input0, in ndecs0, out output);");

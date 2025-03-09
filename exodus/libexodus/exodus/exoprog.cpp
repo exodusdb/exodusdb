@@ -1926,7 +1926,10 @@ var ExoProgram::exoprog_date(in type, in in0, in mode0, out outx) {
 	// Should really be sensitive to timezone in @SW but that requires time
 	// "time" is basically users time without a timezone
 	// "date" is basically users date without a timezone
-	// Use DATETIME for TZ sensitive conversion
+	// Use DATETIME for TZ sensitive conversion.
+
+	// The job of "[DATE,arg]" is to append options to DATEFMT or
+	// if arg starts "D" then arg is used to replace DATEFMT but any E option from DATEFMT is retained.
 
 	var inx = in0;
 	var mode = mode0;
@@ -1937,55 +1940,90 @@ var ExoProgram::exoprog_date(in type, in in0, in mode0, out outx) {
 		return 0;
 	}
 
-	// * means remove spaces
-	let nospaces = mode.contains("*");
-	if (nospaces) {
-		mode.converter("*", "");
-	}
+	// "[DATE" has a special option "*" to remove spaces
+	// Equivalent to new "D" oconv option "Z"
+//	let nospaces = mode.contains("*");
+//	if (nospaces) {
+//		mode.converter("*", "");
+//	}
+//	mode.converter("*", "Z");
+
+	bool raw_D = false;
 
 	if (mode) {
 
-		// 4 means force 4 digit year regardless of DATEFMT
-		if (mode eq "4") {
-			mode = DATEFMT;
-			// The intent here is to replace a "2" in DATEFMT D2/E
-			// and the web service initialises DATEFMT to D2xxx
-			// srv/initcompany.cpp:    DATEFMT            = "D2/E";
-			// srv/initcompany.cpp:            DATEFMT = "D2/E";
-			// srv/initcompany.cpp:            DATEFMT = "D2/E";
-			// srv/initcompany.cpp:            DATEFMT = "D2-E";
-			// srv/initcompany.cpp:            DATEFMT = "D2E";
-			// srv/initcompany.cpp:            DATEFMT = "D2";
-			// srv/initcompany.cpp:            DATEFMT = "D2/";
-			// srv/initcompany.cpp:            DATEFMT = "D2-";
-			// srv/initcompany.cpp:            DATEFMT = "D2E";
-			// srv/initcompany.cpp:            DATEFMT = "D2";
-			// BUT the default initialisation of DATEFMT in exoprogram is to "D/E"
-			// but when DATEFMT changed to D/E it ended up
-			// overwriting the "/" and reverting to a alphabetic month
-			// resulting in [DATE,4*] [DATE,*4] and [DATE,4]
-			// outputing dates like "9JAN2020" which are at least unambiguous.
-			// Solution is to remove "2" if it is present since 4 is the default
-			// The alternative is to change DATEFMT initialisation to D4/E
-//			mode.paster(2, 1, "4");
-			if (mode.contains("2"))
-				mode.replacer("2", "");
+		if (mode.starts("D")) {
+
+			// Dont use DATEFMT except for its E if present
+			raw_D = true;
+
+			if (DATEFMT.contains("E"))
+				// Copy DATEFMT's E if present
+				mode ^= "E";
+
+		} else {
+
+			// Append to DATEFMT
+
+			// Suppress any 2 digit year in DATEFMT
+			// Can still get 2 digit year by using "DATE,2]"
+//			mode = DATEFMT.replace("2", "") ^ mode;
+			mode = DATEFMT ^ mode;
+
+//			// 4 means force 4 digit year regardless of DATEFMT
+//			if (mode eq "4") {
+//				mode = DATEFMT;
+//				// The intent here is to replace a "2" in DATEFMT D2/E
+//				// and the web service initialises DATEFMT to D2xxx
+//				// srv/initcompany.cpp:    DATEFMT            = "D2/E";
+//				// srv/initcompany.cpp:            DATEFMT = "D2/E";
+//				// srv/initcompany.cpp:            DATEFMT = "D2/E";
+//				// srv/initcompany.cpp:            DATEFMT = "D2-E";
+//				// srv/initcompany.cpp:            DATEFMT = "D2E";
+//				// srv/initcompany.cpp:            DATEFMT = "D2";
+//				// srv/initcompany.cpp:            DATEFMT = "D2/";
+//				// srv/initcompany.cpp:            DATEFMT = "D2-";
+//				// srv/initcompany.cpp:            DATEFMT = "D2E";
+//				// srv/initcompany.cpp:            DATEFMT = "D2";
+//				// BUT the default initialisation of DATEFMT in exoprogram is to "D/E"
+//				// but when DATEFMT changed to D/E it ended up
+//				// overwriting the "/" and reverting to a alphabetic month
+//				// resulting in [DATE,4*] [DATE,*4] and [DATE,4]
+//				// outputing dates like "9JAN2020" which are at least unambiguous.
+//				// Solution is to remove "2" if it is present since 4 is the default
+//				// The alternative is to change DATEFMT initialisation to D4/E
+//	//			mode.paster(2, 1, "4");
+//				if (mode.contains("2"))
+//					mode.replacer("2", "");
+//			}
+
 		}
+
+	} else if (DATEFMT) {
+		mode = DATEFMT;
 
 	} else {
+//		// Default to 2 digit year ?
+//		mode = "D2/E";
 
-		// Use DATEFMT
-		if (DATEFMT) {
-			mode = DATEFMT;
-		} else {
-			// Default to 2 digit year
-			mode = "D2/E";
-		}
-
+		// Default to alpha month for output conversion
+		// and international year for input conversion of numeric dates
+		mode ="DE";    // "09 JAN 2020" 11 chars
+//		mode ="DE!";   //   "09JAN2020"  9 chars
+//		mode ="DEZ!";  //   " 9JAN2020"  9 chars
+//		mode ="DEZZ!"; //    "9JAN2020"  8 or 9 chars
 	}
 
 	//status=0
 	if (type eq "OCONV") {
+
+		// [DATE always replaced leading zeros with spaces
+		// but we will not include it for hard coded D conversions
+		if (not raw_D)
+			mode ^= "Z";
+
+		// * is a [DATE option that means Z option
+		mode.converter("*", "Z");
 
 		// 1. if 3 or more digits
 		//dont oconv 1 or 2 digits as they are probably day of month being converted
@@ -2002,16 +2040,18 @@ ok:
 			//language specific (date format could be a pattern in lang?)
 			if (mode eq "L") {
 
-//				let tt = inx.oconv("D4/E");
-//				let mth = glang.f(2).field("|", tt.field("/", 2));
-//				let day = tt.field("/", 1);
-//				let year = tt.field("/", 3);
-//				//if 1 then
-//				outx = day ^ " " ^ mth ^ " " ^ year;
-//				//end else
-//				// outx=mth:' ':day:' ':year
-//				// end
-				outx = inx.oconv("D");
+				throw VarNotImplemented("oconv(" ^ mode0 ^ ") and \"L\"");
+
+////				let tt = inx.oconv("D4/E");
+////				let mth = glang.f(2).field("|", tt.field("/", 2));
+////				let day = tt.field("/", 1);
+////				let year = tt.field("/", 3);
+////				//if 1 then
+////				outx = day ^ " " ^ mth ^ " " ^ year;
+////				//end else
+////				// outx=mth:' ':day:' ':year
+////				// end
+//				outx = inx.oconv("D");
 
 			} else {
 
@@ -2019,28 +2059,34 @@ ok:
 				// Assuming 00/00/0000?
 				outx = oconv(inx, mode);
 
-				// leading 0 becomes a space
-				if (outx.starts("0")) {
-					outx.paster(1, 1, " ");
-				}
+//				// Always replace leading zeros with spaces
+//				// (Equivalent to Z option)
+//				// leading 0 becomes a space
+//				if (outx.starts("0")) {
+//					outx.paster(1, 1, " ");
+//				}
+//
+//				// 4th char 0 becomes a space
+//				// This is buggy since 4th digit of leading year 2000 will be removed
+//				if (outx.at(4) eq "0") {
+//					outx.paster(4, 1, " ");
+//				}
 
-				// 4th char 0 becomes a space
-				if (outx.at(4) eq "0") {
-					outx.paster(4, 1, " ");
-				}
+//				// This option is no longer the default
+//				// Always remove sepchar around alpha month
+//				// (equivalent to ! option prefixed and over)
+//				// dd/XXX/yyyy -> ddAAAyyyy
+//				if (outx.b(4, 3).match("^[A-Za-z]{3}$")) {
+//					// remove 3rd and 7th chars
+//					outx.paster(7, 1, "");
+//					outx.paster(3, 1, "");
+//				}
 
-				// if ...XXX is 3 alphabetic chars
-				// .. XXX .... -> ..XXX....
-				if (outx.b(4, 3).match("^[A-Za-z]{3}$")) {
-					// remove 3rd and 7th chars
-					outx.paster(7, 1, "");
-					outx.paster(3, 1, "");
-				}
-
-				// Option to remove spaces
-				if (nospaces) {
-					outx.converter(" ", "");
-				}
+//				// Option to remove spaces
+//				// Equivalent to ZZ option
+//				if (nospaces) {
+//					outx.converter(" ", "");
+//				}
 
 			}
 
