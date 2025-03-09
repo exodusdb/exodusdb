@@ -12,6 +12,9 @@ function main() {
 		auto test = [&](in v1, in pattern, in expected, in comment) {
 			printt(v1, pattern, expected, comment);
 			printl();
+			var actual = oconv(v1, pattern).squote();
+			if (actual != expected.squote())
+				TRACE(actual)
 			return oconv(v1, pattern).squote() == expected.squote();
 		};
 
@@ -40,6 +43,9 @@ function main() {
 		assert(test(v1, "D!ZZ"		, "9JAN2020",     	" Universal date with no separators. Leading zeros and spaces removed."));
 		assert(test(v1, "DE/ZZ"		, "9/1/2020",		" International date with / separator. Leading zeros and spaces removed."));
 		assert(test(v1, "DE!Z"		, " 9JAN2020",		" Universal date with no separator. Leading zero replaced with space."));
+
+		assert(test(v1, "D0"		, "09 JAN",			" Year last.  No year. Zero year digits"));
+		assert(test(v1, "DS0"		, "JAN 09",			" Year first. No year. Zero year digits"));
 
 	}
 

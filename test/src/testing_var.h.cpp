@@ -2561,16 +2561,16 @@ function main() {
 
 	printl("exoprog_number(in type, in input0, in ndecs0, out output);");
 	{
-		var v1 = oconv("1234.5678USD", "[NUMBER,2]");
-		assert(v1 == "1,234.57USD");
-
+		var v1 = oconv("1234.5USD", "[NUMBER,2]");
+		assert(v1 == "1,234.50USD");
+ // Comma added and decimal places corrected.
 	}
 
 	printl("exoprog_number(in type, in input0, in ndecs0, out output);");
 	{
 		var v1 = iconv("1,234.5678USD", "[NUMBER]");
 		assert(v1 == "1234.57USD");
-
+ // Comma removed
 	}
 
 	printl("elapsedtimetext(in timestamp1, in timestamp2) const;");

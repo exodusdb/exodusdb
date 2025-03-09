@@ -254,9 +254,14 @@ function main() {
 	{
 		// Not format but multivalued oconv is useful in format
 
-		assert("20000]]21000"_var.oconv("DY-4]R#12"_var) == "  2022-10-03]            ]  2025-06-29"_var);
-		assert("20000]]21000"_var.oconv("DY-4]L#12"_var) == "2022-10-03  ]            ]2025-06-29  "_var);
-		assert("20000]]21000"_var.oconv("DY-4]C#12"_var) == " 2022-10-03 ]            ] 2025-06-29 "_var);
+//		assert("20000]]21000"_var.oconv("DY-4]R#12"_var) == "  2022-10-03]            ]  2025-06-29"_var);
+//		assert("20000]]21000"_var.oconv("DY-4]L#12"_var) == "2022-10-03  ]            ]2025-06-29  "_var);
+//		assert("20000]]21000"_var.oconv("DY-4]C#12"_var) == " 2022-10-03 ]            ] 2025-06-29 "_var);
+
+		// DY means year only now
+		assert("20000]]21000"_var.oconv("DY-4]R#12"_var) == "        2022]            ]        2025"_var);
+		assert("20000]]21000"_var.oconv("DY-4]L#12"_var) == "2022        ]            ]2025        "_var);
+		assert("20000]]21000"_var.oconv("DY-4]C#12"_var) == "    2022    ]            ]    2025    "_var);
 
 		//TRACE("jsdgh cjhgs djhg sdjcg jsdhg cjsgdcjgsdjcgh jhg sjd ghc sdkjch kshj kj hskdjh cskjd hckjhkj kshdckhj ksdh "_var.oconv("T#12"))
 

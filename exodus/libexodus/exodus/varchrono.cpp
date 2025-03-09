@@ -476,17 +476,97 @@ std::string var::oconv_D(const char* conversion) const {
 
 	// convert to day, month and year
 	int unixdayno = pickdateno + PICK_UNIX_DATE_OFFSET;
-	int civil_year;
-	unsigned civil_month;
-	unsigned civil_day;
-	std::tie(civil_year, civil_month, civil_day) = hinnant::gregorian::civil_from_days(unixdayno);
+//	int civil_year;
+//	unsigned civil_month;
+//	unsigned civil_day;
+//	std::tie(civil_year, civil_month, civil_day) = hinnant::gregorian::civil_from_days(unixdayno);
+	auto [civil_year, civil_month, civil_day] = hinnant::gregorian::civil_from_days(unixdayno);
 
-	// defaults
+	int dow;
+	int year_digits = 4;
 
-	bool alphamonth = true;
-	int yeardigits = 4;
-	bool yearfirst = false;
-	bool dayfirst = false;
+	// Handle special char(s) immediately following the D if not '\0'
+	// All other first chars after the "D" are not special in the first position and are handled in a loop below.
+	//
+	// (D)ay of month             1-31
+	// (M)onth of year            1-12
+	// (Y)ear number              9999
+	// (W)eekday day of week      1-7
+	// (Q)uarter of year          1-4
+	// (J) Day number of year     1-366
+	// (L)ast day number of month 28-31
+	//
+	// MA Month name              January-December
+	// WA Week day name           Monday-Sunday
+	//
+	// DY2 Two digit year         99
+	// DD2 Day of month           01-31     TODO
+	// DM2 Month of year          01-12     TODO
+	// DJ3 Day of year            000-366   TODO
+	//
+	if (*conversion) {
+
+		std::string year_str;
+
+		// Can be '\0'
+		char nextchar = *(conversion + 1);
+
+		switch (*conversion) {
+
+			// DM  returns month number 1-12
+			// DMA returns full month name
+			// DM2 returns month number 01-12 TODO
+			case 'M':
+				if (nextchar == 'A')
+					return &longmths[civil_month * 11 - 10];
+				return std::to_string(static_cast<int>(civil_month));
+
+			// DW returns day of week number number 1-7 Mon-Sun
+			// DWA returns the day of week name
+			case 'W':
+				// calculate directly from pick date (construction of date above is wasted
+				dow = (((*this).floor() - 1) % 7) + 1;
+				if (nextchar == 'A')
+					return &longdayofweeks[dow * 10 - 10];
+				return std::to_string(dow);
+
+			// DY year any number of digits.
+			// DYn n = maximum number of year digits. Not padded.
+			case 'Y':
+				year_str = std::to_string(static_cast<int>(civil_year));
+				// Optional trailing digit to limit year ndigits
+				//if ((*conversion) <= '9' && (*conversion) >= '0')
+				if ((nextchar) >= '0' && (nextchar) <= '9')
+					year_digits = (nextchar) - '0';
+				if (std::size_t(year_digits) < year_str.size())
+					return year_str.substr(year_str.size() - year_digits);
+				return year_str;
+
+			// DD  day of month 1-12
+			// DD2 day of month 01-12 TODO
+			case 'D':
+				return std::to_string(static_cast<int>(civil_day));
+
+			// DQ returns quarter number 1-4
+			case 'Q':
+				return std::to_string(static_cast<int>((civil_month - 1) / 3) + 1);
+
+			// DJ  returns day of year 1-366
+			// DJ3 returns day of year 001-366 TODO
+			case 'J':
+				return std::to_string(unixdayno - hinnant::gregorian::days_from_civil(civil_year, 1, 1) + 1);
+
+			// DL LAST day of month 28-31
+			case 'L':
+				return std::to_string(static_cast<int>(hinnant::gregorian::last_day_of_month(civil_year, civil_month)));
+
+		} // Special chars
+
+	} // Special first char handler
+
+	bool alpha_month = true;
+	bool year_first = false;
+	bool day_first = false;
 
 	// sepchar ! suppresses sepchars
 	// Any other sepchar switches off alpha month.
@@ -495,7 +575,7 @@ std::string var::oconv_D(const char* conversion) const {
 	char sepchar = ' ';
 
 	// 1st Z will change this to ' '
-	char pad_char = '0';
+	char padchar = '0';
 
 	// ZZ will change this to false
 	bool padding = true;
@@ -517,79 +597,23 @@ std::string var::oconv_D(const char* conversion) const {
 
 		// digits anywhere indicate size of year
 		if ((*conversion) <= '9' && (*conversion) >= '0') {
-			yeardigits = (*conversion) - '0';
+			year_digits = (*conversion) - '0';
 			++conversion;
 			continue;
 		}
 
-		int dow;
+//		int dow;
 		switch (*conversion) {
 
 			//(E)uropean date - day first
 			case 'E':
-				dayfirst = true;
+				day_first = true;
 				break;
 
-			// Not AREV
-			// DM returns month number
-			// DMA returns full month name
-			case 'M':
-				++conversion;
-				if (*conversion == 'A')
-					return &longmths[civil_month * 11 - 10];
-				return std::to_string(static_cast<int>(civil_month));
-
-			// Not AREV
-			// DW returns day of week number number 1-7 Mon-Sun
-			// DWA returns the day of week name
-			case 'W':
-				// calculate directly from pick date (construction of date above is wasted
-				dow = (((*this).floor() - 1) % 7) + 1;
-				++conversion;
-				if (*conversion == 'A')
-					return &longdayofweeks[dow * 10 - 10];
-				return std::to_string(dow);
-
-			// Not AREV
-			// DY year (four digits or D2Y works too)
-			// DYn formatted
+			// Y not first char is out of place and ignored
 			case 'Y':
-				yearfirst = true;
-				// yearonly=true;
-				// allow trailing digit as well to control ndigits
-				++conversion;
-				//if ((*conversion) <= '9' && (*conversion) >= '0')
-				if ((*conversion) >= '0' && (*conversion) <= '9')
-					yeardigits = (*conversion) - '0';
-				--conversion;
+				year_first = true;
 				break;
-
-			// Not AREV
-			// DD day of month
-			case 'D':
-				return std::to_string(static_cast<int>(civil_day));
-
-			// Not AREV
-			// DQ returns quarter number
-			case 'Q':
-				return std::to_string(static_cast<int>((civil_month - 1) / 3) + 1);
-
-			// Not AREV
-			// DyJ returns day of year
-			case 'J':
-				//return static_cast<int>(desired_date.day_of_year());
-				return std::to_string(unixdayno - hinnant::gregorian::days_from_civil(civil_year, 1, 1) + 1);
-
-			// iso year format - at the beginning
-			case 'S':
-				// alphamonth=false;
-				yearfirst = true;
-				break;
-
-			// DL LAST day of month
-			case 'L':
-				//return var(static_cast<int>(desired_date.end_of_month().day()));
-				return std::to_string(static_cast<int>(hinnant::gregorian::last_day_of_month(civil_year, civil_month)));
 
 			// ! Empty separator char
 			case '!':
@@ -599,54 +623,60 @@ std::string var::oconv_D(const char* conversion) const {
 			// Z  - Leading zeros become spaces
 			// ZZ - Leading zeros are omitted.
 			case 'Z':
-				if (pad_char == ' ')
+				if (padchar == ' ')
 					// Second Z
 					padding = false;
 				else
 					// First Z
-					pad_char = ' ';
+					padchar = ' ';
+				break;
+
+			// iso year format
+			case 'S':
+				// alpha_month=false;
+				year_first = true;
 				break;
 
 			default:
 				sepchar = *conversion;
 				yearonly = false;
-				alphamonth = false;
+				alpha_month = false;
 				break;
 		}
 		++conversion;
 	}
 
 	std::stringstream ss;
-	ss.fill(pad_char);
+	ss.fill(padchar);
 
 	// trim the right n year digits since width() will pad but not cut (is this really the C++
 	// way?)
 	std::stringstream yearstream;
 	yearstream << civil_year;
 	std::string yearstring = yearstream.str();
-	int yearstringerase = static_cast<int>(yearstring.size() - yeardigits);
+	int yearstringerase = static_cast<int>(yearstring.size() - year_digits);
 	if (yearstringerase > 0)
 		yearstring.erase(0, yearstringerase);
 
 	// year first
-	if (yearfirst) {
+	if (year_first && year_digits) {
 		if (padding)
-			ss.width(yeardigits);
+			ss.width(year_digits);
 		// ss << civil_year;
 		// above doesnt cut down number of characters
 		ss << yearstring;
-		if (yearonly)
-			return ss.str();
+		//if (yearonly)
+		//	return ss.str();
 		if (sepchar != '!')
 			ss << sepchar;
 	}
 
 	//determine if day first if not forced
-	if (not dayfirst && alphamonth && not yearfirst)
-		dayfirst = true;
+	if (not day_first && alpha_month && not year_first)
+		day_first = true;
 
 	// day first
-	if (dayfirst) {
+	if (day_first) {
 		if (padding)
 			ss.width(2);
 		ss << civil_day;
@@ -655,7 +685,7 @@ std::string var::oconv_D(const char* conversion) const {
 	}
 
 	// month
-	if (alphamonth) {
+	if (alpha_month) {
 		// ss.width(3);
 		ss << shortmths.substr(civil_month * 4 - 4, 3);
 	} else {
@@ -665,7 +695,7 @@ std::string var::oconv_D(const char* conversion) const {
 	}
 
 	// day last
-	if (!dayfirst) {
+	if (!day_first) {
 		if (sepchar != '!')
 			ss << sepchar;
 		if (padding)
@@ -674,12 +704,12 @@ std::string var::oconv_D(const char* conversion) const {
 	}
 
 	// year last
-	if (!yearfirst && yeardigits) {
+	if (!year_first && year_digits) {
 		if (sepchar != '!')
 			ss << sepchar;
 		// ss << civil_year;
 		// above doesnt cut down number of characters
-		ss.width(yeardigits);
+		ss.width(year_digits);
 		ss << yearstring;
 	}
 	// outputl(var(ss.str()).quote());
