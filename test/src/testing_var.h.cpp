@@ -2594,6 +2594,17 @@ function main() {
 
 	}
 
+	printl("note(in msg, in options, io response) const;");
+	{
+		var response;
+		// call note("Enter something", "RC", response);
+	}
+
+	printl("note(in msg) const;");
+	{
+		call note("Hello world.");
+	}
+
 	printl("getcursor(out cursor, int delayms = 3000, int max_errors = 0) const;");
 	{
 		var cursor;

@@ -620,9 +620,10 @@ void ExoProgram::popselect(in saved_cursor) {
 }
 
 // note 2
-void ExoProgram::note(in msg, in options) const {
+//void ExoProgram::note(in msg, in options) const {
+void ExoProgram::note(in msg) const {
 	var response = "";
-	note(msg, options, response);
+	note(msg, "", response);
 }
 
 // note 3

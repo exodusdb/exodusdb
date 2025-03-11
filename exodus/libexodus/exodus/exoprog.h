@@ -449,32 +449,46 @@ ND	var  amountunit(in input0);
 
 	// Returns: Text of date and time in users time zone
 	// e.g. "2MAR2025 11:52AM"
-	// Offset from UTC by SW seconds.
+	// Offset from UTC by TZ seconds.
 ND	var  timedate2();
 
 	// Returns: User, server and UTC date and time
-	// User date and time is determined by adding the environment variable SW.f(1)'s TZ offset (in seconds) to UTC date/time obtained from the operating system.
-	// "system" date and time is normally the same as UTC date/time and is determined by adding the environment variable SW.f(2)'s TZ offset (in seconds) to UTC date/time obtained from the operating system.
+	// User date and time is determined by adding the environment variable TZ.f(1)'s TZ offset (in seconds) to UTC date/time obtained from the operating system.
+	// "system" date and time is normally the same as UTC date/time and is determined by adding the environment variable TZ.f(2)'s TZ offset (in seconds) to UTC date/time obtained from the operating system.
+	//
 	void  getdatetime(out user_date, out user_time, out system_date, out system_time, out UTC_date, out UTC_time);
 
 	// Get text of elapsed time since environment variable TIMESTAMP was initialised with ostimestamp() at program/thread startup.
 	// TIMESTAMP can be updated using ostimestamp() as and when desired.
-	// e.g. "< 1 ms"
+	//
+	// `var v1 = elapsedtimetext(); // e.g. "< 1ms"`
+	//
 ND	var  elapsedtimetext() const;
 
 	// Get text of elapsed time between two timestamps
+	//
 	// `let v1 = elapsedtimetext(0, 0.55);  // "13 hours, 12 mins"
 	//  let v2 = elapsedtimetext(0, 0.001); // "1 min, 26 secs"`
+	//
 ND	var  elapsedtimetext(in timestamp1, in timestamp2) const;
 
 	/////////////////////////////
 	///// Terminal i/o utilities:
 	/////////////////////////////
 
-	// If stdin is a terminal, display a message to stdout. Optionally pause processing and request a response from the user, otherwise set the response to "" and continue.
+	// If stdin is a terminal, output a message to stdout and optionally pause processing and request a response from the user, otherwise set the response to "" and continue.
 	// options: R = Response requested. C upper case response.
-	void note(in msg, in options = "") const;
+	//
+	// `var response;
+	//  // call note("Enter something", "RC", response);`
+	//
 	void note(in msg, in options, io response) const;
+
+	// Output a message to stdin and continue.
+	//
+	// `call note("Hello world.");`
+	//
+	void note(in msg) const;
 
 	// If stdin is a terminal, pause processing, list some given options to stdout and request the user to make a choice, otherwise set the response to "" and continue.
 	// Returns: The chosen option (value not number) or "" if the user cancelled.
