@@ -1,13 +1,15 @@
 #include <exodus/library.h>
+#include <srv_common.h>
+#include <req_common.h>
+
+#include <req_common.h>
+
 libraryinit()
 
 #include <autorun3.h>
 #include <listen2.h>
 
 #include <service_common.h>
-
-#include <srv_common.h>
-#include <req_common.h>
 
 //var xx;
 

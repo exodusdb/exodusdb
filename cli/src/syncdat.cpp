@@ -192,6 +192,8 @@ function main() {
 		var new_cpp_text = "#include <exodus/library.h>\n\n";
 		var dict2sql_ids = "";
 
+		var common_lines = "";
+
 		// Process each dat file/record in the subdir
 		for (var osfilename : osfilenames) {
 
@@ -241,6 +243,13 @@ function main() {
 
 				var dictsrc = RECORD(8);
 				dictsrc.converter(VM, "\n");
+
+                // Remove #include <xxx_common.h> lines
+				var lines = dictsrc.match(R"__(#include\s*[<"][a-z]{2,3}_common.h[>"]\s*\n)__").sort().unique();
+				if (lines) {
+					dictsrc.replacer(R"__(#include\s*[<"][a-z]{2,3}_common.h[>"]\s*\n)__"_rex, "");
+					common_lines ^= lines.convert("\n", "") ^ FM;
+				}
 
 				// Add dict function intro
 				var addfunctionmain = not dictsrc.contains("function main()");
@@ -396,6 +405,15 @@ function main() {
 
 			// Remove one of the /n/n appended after every libraryexit()
 			new_cpp_text.popper();
+
+			// All #insert <xxx.common.h> at the beginning.
+			if (common_lines) {
+				common_lines.uniquer();
+				common_lines.converter(FM, "\n");
+				common_lines ^= "\n";
+				//new_cpp_text.prefixer(common_lines);
+				new_cpp_text.fieldstorer("\n", 3, -1, common_lines);
+			}
 
 			// Update
 			if (new_cpp_text == old_cpp_text) {

@@ -69,12 +69,6 @@ programinit()
 
 function main() {
 
-	if (not exo_post_compile.osgetenv("EXO_POST_COMPILE")) {
-//		if (OPTIONS.contains("f"))
-			exo_post_compile = "tac | fixdeprecated {U}";
-	}
-
-
 	// i - inline source code
 	if (OPTIONS.contains("i"))
 		return eeval_main();
@@ -116,6 +110,13 @@ function main() {
 	if (options.contains("X") and not options.contains("h"))
 		return 0;
 
+	if (not exo_post_compile.osgetenv("EXO_POST_COMPILE")) {
+//		if (OPTIONS.contains("f"))
+			exo_post_compile = "tac | fixdeprecated {U}";
+			if (verbose)
+				exo_post_compile.paster(-1, 0, "V");
+	}
+
 	// If no file/dirnames then default to previous edic
 	// SIMILAR code in edic and compile
 	if (fcount(COMMAND, FM) < 2) {
@@ -144,7 +145,7 @@ OPTIONS
 	V	= Verbose
 	S	= Silent (stars only)
 	SS	= Super silent (no stars)
-	C/c	= Color diagnostics on/off
+	C/c	= Color diagnostics On/off
 	h	= Generate headers only
 	F	= Force compilation even if output file is newer than all input files
 	P	= C++ preprocessor output only, PP = cleanup, PPP reformat (and reindent if 'indent' is installed).
@@ -181,7 +182,7 @@ ENVIRONMENT
 		printl("Using CXX_LINK_OPTIONS environment variable " ^ addlinkoptions.quote());
 
 	var binoptions = "";
-	var liboptions = "";
+	var liboptions = " -DEXO_LIBRARY";
 
 	var bindir = "";
 	var libdir = "";
@@ -417,7 +418,7 @@ ENVIRONMENT
 		basicoptions ^= " -ffunction-sections -fdata-sections ";
 
 		// Help fixdeprecated get all errors and deprecations
-		basicoptions ^= " -ferror-limit=999";
+		basicoptions ^= " -ferror-limit=9999";
 
 		// Use c++ (g++/clang) -fvisibility=hidden to make all hidden except those marked DLL_PUBLIC ie "default"
 #if __GNUC__ >= 4
@@ -879,6 +880,7 @@ ENVIRONMENT
 			call make_include_dir(incdir);
 
 			if (osread(targetfilename) != srctext) {
+
 				if (not srctext.oswrite(targetfilename)) {
 					atomic_ncompilation_failures++;
 					errputl(" Error: Could not copy '" ^ srcfilename ^ "' to '" ^ targetfilename ^ "'");
@@ -886,14 +888,33 @@ ENVIRONMENT
 					printl(srcfilename);
 					//printx(srcfilename ^ _EOL);
 				}
-			} else {
-				if (not silent)
-					printl(srcfilename);
-					//printx(srcfilename ^ _EOL);
+
 			}
-			//osflush();
+
+			// Create .cpp files for xxx_common.h
+			if (targetfilename.match("\\b[a-z]{2,3}_common.h")) {
+
+				// .cpp for a common library is very simple
+				let hdrfilename = field(srcfilename, "/", -1);
+				let cpp =
+					"#define EXO_COMMON_EXTERN\n"
+					"#include <" ^ hdrfilename ^ ">\n";
+
+				// Update the cpp file only if changed
+				let cppfilename = fieldstore(srcfilename, ".", -1, 1, "cpp");
+				let oldcpp = osread(cppfilename);
+				if (cpp ne oldcpp) {
+					if (not oswrite(cpp on cppfilename)) {
+						atomic_ncompilation_failures++;
+						errputl(lasterror());
+					} else
+						outputl(" Created/updated:" ^ cppfilename);
+				}
+			}
+
 			continue;
-		}
+
+		} // .h file
 
 		//skip definitely non-compilable files
 		else if (noncompilable_extensions.locateusing(" ", fileext)) {
@@ -1182,6 +1203,8 @@ ENVIRONMENT
 			//detect libraryinit
 			var useclassmemberfunctions = false;
 
+			bool past_programinit_libraryinit = false;
+
 ///////////
 //nextline:
 ///////////
@@ -1196,12 +1219,20 @@ ENVIRONMENT
 				if (not isprogram and word1.starts("libraryinit"))
 					useclassmemberfunctions = true;
 
+				if (word1.starts("libraryinit(") or word1.starts("libraryinit("))
+					past_programinit_libraryinit = true;
+
 				/////////////////////////
 				// GENERATE HEADER IF LIB
 				/////////////////////////
 
-				if (not(isprogram) and (word1 eq "function" or word1 eq "subroutine") and not filename_without_ext.starts("dict_")) {
-
+				if (
+					not(isprogram)
+					and (word1 eq "function" or word1 eq "subroutine")
+					and not filename_without_ext.starts("dict_")
+//					and not srcfilename.ends("_common.h")
+				) {
+//TRACE(srcfilename)
 					//extract out the function declaration in including arguments
 					//eg "function xyz(in arg1, out arg2)"
 					let funcdecl = line.field("{", 1);
@@ -1507,6 +1538,21 @@ ENVIRONMENT
 
 				} // generate header if lib
 
+				// Add linker options like -lxxx_common for #include <xxx_common.h>
+				// iif the xxx_common.so lib exists
+				if (word1 eq "#include") {
+					let libname = line.match(R"__(\b[a-z]{2,3}_common.h)__").field(".h", 1);
+					if (libname and not srcfilename.contains(libname) and libinfo(libname)) {
+						if (past_programinit_libraryinit) {
+							errput("compile:" ^srcfilename ^ " Should not occur after programinit or libraryinit: ");
+							TRACE(line)
+						}
+						if (not linkoptions.contains(" -L" ^ libdir))
+							linkoptions ^= " -L" ^libdir;
+						linkoptions ^= " -l" ^ libname;
+					}
+				}
+
 				//build up list of loadtime libraries required by linker
 				if (loadtimelinking and word1 eq "#include") {
 					var word2 = line.field(" ", 2);
@@ -1537,6 +1583,9 @@ ENVIRONMENT
 			// Fake header files for executables end in .H instead of .h
 			// This allows libraries and programs to have the same base name
 			//if (newheadertext) {
+			// TODO only skip files containing common_init common_exit
+			// and continue to process agency_common.h
+			if (not srcfilename.match("\\b[a-z]{2,3}_common.cpp"))
 			{
 				var abs_srcfilename = srcfilename;
 				if (not abs_srcfilename.starts(OSSLASH))

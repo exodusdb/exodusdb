@@ -1,12 +1,13 @@
 #include <exodus/library.h>
+
+#include <req_common.h>
+
 libraryinit()
 
 #include <authorised.h>
 #include <generalsubs.h>
 #include <getsubs.h>
 #include <nextkey.h>
-
-#include <req_common.h>
 
 #include <request.hpp>
 

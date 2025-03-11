@@ -1,4 +1,9 @@
 #include <exodus/library.h>
+#include <srv_common.h>
+#include <req_common.h>
+
+#include <req_common.h>
+
 libraryinit()
 
 #include <authorised.h>
@@ -11,9 +16,6 @@ libraryinit()
 #include <usersubs.h>
 
 #include <service_common.h>
-
-#include <srv_common.h>
-#include <req_common.h>
 
 #include <request.hpp>
 

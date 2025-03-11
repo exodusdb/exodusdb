@@ -1,4 +1,9 @@
 #include <exodus/library.h>
+#include <srv_common.h>
+#include <req_common.h>
+
+#include <req_common.h>
+
 libraryinit()
 
 #include <authorised.h>
@@ -10,9 +15,6 @@ libraryinit()
 #include <sysmsg.h>
 
 #include <service_common.h>
-
-#include <srv_common.h>
-#include <req_common.h>
 
 var docids;
 var options;

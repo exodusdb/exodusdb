@@ -1,4 +1,6 @@
 #include <exodus/library.h>
+#include <srv_common.h>
+
 libraryinit()
 
 #include <hashpass.h>
@@ -8,7 +10,6 @@ libraryinit()
 
 #include <service_common.h>
 
-#include <srv_common.h>
 
 let prikey_ = {1000, 100};
 

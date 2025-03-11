@@ -1,4 +1,9 @@
 #include <exodus/program.h>
+#include <srv_common.h>
+#include <req_common.h>
+
+#include <req_common.h>
+
 programinit()
 
 #include <hashpass.h>
@@ -6,20 +11,17 @@ programinit()
 #include <initgeneral.h>
 #include <initgeneral2.h>
 
-#include <srv_common.h>
-#include <req_common.h>
-
 //var xx;
 
 function main() {
 
-	// NB numbers and names MUST match those in the matching common .h files
-#pragma GCC diagnostic push
-#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
-	mv.namedcommon[req_common_no] = new req_common;
-	mv.namedcommon[srv_common_no] = new srv_common;
-	// mv.namedcommon[agy_common_no]=new agy_common;
-#pragma GCC diagnostic pop
+//	// NB numbers and names MUST match those in the matching common .h files
+//#pragma GCC diagnostic push
+//#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
+//	mv.namedcommon[req_common_no] = new req_common;
+//	mv.namedcommon[srv_common_no] = new srv_common;
+//	// mv.namedcommon[agy_common_no]=new agy_common;
+//#pragma GCC diagnostic pop
 
 	/*cat ~/pickos/dic/ *.SQL | psql -h 127.0.0.1 -U exodus exodus*/
 

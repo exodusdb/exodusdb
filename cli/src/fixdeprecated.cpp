@@ -10,17 +10,20 @@ OPTIONS
 	C - Recompile after updated
 	V - Verbose
 	H - Help
+	c - Just fix common
 )";
+
+	let update = OPTIONS.contains("U");
+	let verbose = OPTIONS.count("V");
 
 function main() {
 //
 	let option_d = 2;//OPTIONS.count("d");
 //	let option_s = 1;//OPTIONS.count("s");
-	let update = OPTIONS.contains("U");
 	let recompile = OPTIONS.contains("C");
-	let verbose = OPTIONS.count("V");
+	let only_commons = OPTIONS.count("c");
 
-	if (OPTIONS.convert("UCV", "")) {
+	if (OPTIONS.convert("UCVc", "")) {
 		abort(syntax);
 	}
 
@@ -32,6 +35,11 @@ function main() {
 	// them into a another copy of this program in another process
 	///////////////////////////////////////////////////////////////
 	if (not stdinput) {
+
+		// First check if any #include <xxx_common.h> lines need moving above programinit/libraryinit
+		gosub fix_include_common(COMMAND.remove(1));
+		if (only_commons)
+			return 1;
 
 		// Compile all requested files to generate deprecation warnings
 		// Parallel compilation will speed matters up.
@@ -127,11 +135,29 @@ function main() {
 //////////////////
 // Main input loop
 //////////////////
+
+	var file_included_from = "";
+	var osfilenames_to_check_commons = "";
+
 //var allinp = "";
 	// Process all the warnings in the input sequentially
 	var compline;
 	while (not eof()) {
 		if (not compline.input()) {}
+
+		// In file included from alt/serve_agy.cpp:20:
+		if (compline.contains("file included from")) {
+			file_included_from = compline.field(" ", -1).field(":", 1);
+//			if (verbose)
+//				TRACE(file_included_from)
+			if (not osfilenames_to_check_commons.locate(file_included_from)) {
+				osfilenames_to_check_commons ^= file_included_from ^ FM;
+				if (verbose)
+					TRACE(osfilenames_to_check_commons)
+			}
+			continue;
+		}
+
 //allinp.appender(compline, "\n");
 //oswrite(allinp on "allinp");
 		//warning: 'operator[]' is deprecated: EXODUS: Replace single character accessors like xxx[n]
@@ -140,6 +166,18 @@ function main() {
 			continue;
 
 		compline.trimmerfirst("*");
+
+		// /root/inc/agy_common.h:28:1: error: storage class specified for a member declaration
+		if (file_included_from and compline.contains("storage class")) {
+//		if (file_included_from and compline.contains("storage class specified for a member declaration")) {
+//			if (not osfilenames_to_check_commons.locate(file_included_from)) {
+				osfilenames_to_check_commons ^= file_included_from ^ FM;
+				if (verbose)
+					TRACE(osfilenames_to_check_commons)
+//			}
+			continue;
+		}
+//		file_included_from = "";
 
 		// Example compile warning
 		//fin/ledger4.cpp:170:27: warning: ‘exodus::var& exodus::dim::operator()(int)’ is deprecated: EXODUS: Replace single dimensioned array accessors like () with [] e.g. dimarray(n) -> dimarray[n] [-Wdeprecated-declarations]
@@ -283,6 +321,11 @@ function main() {
 
 			//mssg( -> note(
 			srcline.replacer("mssg(", "note(");
+
+			// call note("WAITING TO GET NEXT VOUCHER NUMBER", "T");
+			// call note(msg, "T1");
+			if (srcline.contains("note("))
+				srcline.replacer(R"__(, "T1?"\);)__"_rex, R"__(\); ossleep\(1000\);)__");
 
 			// call note("Starting at what date ?", "RC", fromdate, "");
 			// call note(question, "RC", reply, 1);
@@ -505,7 +548,101 @@ function main() {
 	else
 		printl(nlinesupdated, "lines updated.");
 
+	// Finally check all files for any #include <xxx_common.h> lines
+	// That need moving above programinit/libraryinit
+	//
+	// In file included from alt/serve_agy.cpp:21:
+	// /root/inc/agy_common.h:28:1: error: storage class specified for a member declaration
+	gosub fix_include_common(osfilenames_to_check_commons.pop());
+
 	return 0;
+}
+
+subroutine fix_include_common(in osfilenames) {
+
+	if (verbose)
+		errputl("fixdeprecated: fix_include_common:", osfilenames);
+
+	for (var osfilename : osfilenames) {
+
+		if (verbose)
+			TRACE(osfilename)
+
+		var src = osread(osfilename);
+		src.converter("\n", _FM);
+
+		var programinit_libraryinit_fn = 0;
+		var ln = 0;
+//		var delete_lns = "";
+		var common_lines = "";
+		for (var line : src) {
+
+			ln++;
+			let origline = line;
+			line.trimmerboth(" \t");
+
+			if (not programinit_libraryinit_fn) {
+				if (line.starts("programinit(") or line.starts("libraryinit("))
+					programinit_libraryinit_fn = ln;
+				continue;
+			}
+			// Comment out any old style creation of common blocks
+			if (line.contains("mv.namedcommon")) {
+				src.updater(ln, "/" "/" ^ origline);
+				continue;
+			}
+
+			if (not line.starts("#include"))
+				continue;
+
+			var libname = line.match(R"__(\b[a-z]{2,3}_common.h)__").field(".h", 1);
+			if (not libname.ends("_common"))
+				continue;
+
+			if (libinfo(libname)) {
+				if (verbose)
+					logputl(osfilename, "\t", libname, "\tneeds moving up");
+//				delete_lns ^= ln ^ FM;
+
+				// Note: "for (var v : fields)" var iterator allows us to update the field that we are on.
+				// As long as we know its fieldno. It will still find the next field correctly.
+				//
+				// If we remove the field that we are on, var iter will skip over the "next" field.
+				// Unless we use "for (auto iter = fields.begin(); iter != fields.end(); ++iter)"
+				// and DECREMENT the iter in the loop.
+				// This works even on the first line since
+				// for var iter, decrement begin() i.e. (var.begin()--) -> var.end()
+				// and INCREMENT var.end() i.e. (var.end()++) -> var.begin().
+				src.updater(ln, "/" "/" ^ line);
+
+				line.trimmer();
+				if (not locate(line, common_lines))
+					common_lines ^= line ^ FM;
+			}
+//			else printl(osfilename, libname);
+		}
+		if (common_lines) {
+//			delete_lns.popper();
+//			common_lines.popper(); // Allow one extra ln
+			if (verbose) {
+				TRACE(osfilename)
+//				TRACE(delete_lns)
+				TRACE(programinit_libraryinit_fn)
+				TRACE(common_lines)
+			}
+//			for (var ln : delete_lns) {
+//				src.remover(ln);
+//			}
+			src.inserter(programinit_libraryinit_fn, common_lines);
+			src.converter(FM, "\n");
+			if (verbose)
+				printl(src);
+			if (update) {
+				if (not oswrite(src on osfilename))
+					abort(lasterror());
+			}
+		}
+	}
 }
 
 programexit()

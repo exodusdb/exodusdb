@@ -1,10 +1,11 @@
 #include <exodus/library.h>
+#include <srv_common.h>
+
 libraryinit()
 
 #include <otherusers.h>
 #include <shutdownothers.h>
 
-#include <srv_common.h>
 
 var interactive;
 var mode;

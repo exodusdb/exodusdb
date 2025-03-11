@@ -1,9 +1,10 @@
 #include <exodus/library.h>
+#include <req_common.h>
+
 libraryinit()
 
 #include <authorised.h>
 
-#include <req_common.h>
 
 #include <request.hpp>
 

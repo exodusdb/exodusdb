@@ -1,7 +1,8 @@
 #include <exodus/library.h>
+#include <srv_common.h>
+
 libraryinit()
 
-#include <srv_common.h>
 
 function main(in code, out fmtx) {
 	// jbase

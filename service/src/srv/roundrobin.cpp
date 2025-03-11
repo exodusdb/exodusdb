@@ -1,11 +1,12 @@
 #include <exodus/library.h>
+#include <srv_common.h>
+
 libraryinit()
 
 #include <roundrobin.h>
 
 #include <service_common.h>
 
-#include <srv_common.h>
 
 //eg 60 60 60 DOS EMAILS.DAT
 //means window of 60*60 seconds rolling every 60 seconds

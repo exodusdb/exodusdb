@@ -1,11 +1,12 @@
 #include <exodus/library.h>
+#include <srv_common.h>
+
 libraryinit()
 
 #include <authorised.h>
 #include <langdate.h>
 
 // For srv.gcurrcompcode (for compcode), srv.companies (to read letterheadcompany and imagecompany) and srv.glang (months for langdate)
-#include <srv_common.h>
 
 var modex = "";
 var hascompanies;

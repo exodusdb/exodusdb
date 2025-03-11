@@ -1,11 +1,12 @@
 #include <exodus/library.h>
+#include <srv_common.h>
+
 libraryinit()
 
 #include <shell2.h>
 
 #include <service_common.h>
 
-#include <srv_common.h>
 
 var encoding1;
 var encoding2;

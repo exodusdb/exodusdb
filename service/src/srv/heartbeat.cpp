@@ -1,11 +1,12 @@
 #include <exodus/library.h>
+#include <srv_common.h>
+
 libraryinit()
 
 #include <sysmsg.h>
 
 #include <service_common.h>
 
-#include <srv_common.h>
 
 var status;
 var processno;	// num

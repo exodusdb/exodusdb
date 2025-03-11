@@ -1,10 +1,11 @@
 #include <exodus/library.h>
+#include <srv_common.h>
+
 libraryinit()
 
 #include <flushindex.h>
 #include <giveway.h>
 
-#include <srv_common.h>
 
 var options;
 var nindexed;  // num

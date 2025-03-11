@@ -1,11 +1,12 @@
 #include <exodus/library.h>
+#include <srv_common.h>
+
 libraryinit()
 
 #include <btreeextract.h>
 
 #include <service_common.h>
 
-#include <srv_common.h>
 
 var foundkeys;
 

@@ -1,4 +1,9 @@
 #include <exodus/library.h>
+#include <srv_common.h>
+#include <req_common.h>
+
+#include <req_common.h>
+
 libraryinit()
 
 #include <listen3.h>
@@ -7,9 +12,6 @@ libraryinit()
 #include <systemsubs.h>
 
 #include <service_common.h>
-
-#include <srv_common.h>
-#include <req_common.h>
 
 var dictids;
 var options;

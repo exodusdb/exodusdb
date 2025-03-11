@@ -1,9 +1,10 @@
 #include <exodus/library.h>
+#include <srv_common.h>
+
 libraryinit()
 
 #include <service_common.h>
 
-#include <srv_common.h>
 
 function main(in d1, in d2, out result, io lang) {
 

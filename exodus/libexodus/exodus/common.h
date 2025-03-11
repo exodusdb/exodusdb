@@ -40,6 +40,17 @@ _Pragma("GCC diagnostic ignored \"-Wpadded\"")                                  
                                                                                                         \
 _Pragma("GCC diagnostic pop")
 
+//#ifdef EXO_LIBRARY
+//#	define EXO_COMMON_EXTERN extern
+//#else
+//#	define EXO_COMMON_EXTERN
+//#endif
+//
+//#define commonexit(COMMON_CODE, COMMON_NO)                                                              \
+//~COMMON_CODE##_common() = default;                                                                      \
+//};                                                                                                      \
+//EXO_COMMON_EXTERN thread_local COMMON_CODE##_common COMMON_CODE;
+
 //e.g.
 //	agy_common& agy = static_cast<agy_common&>(*mv.namedcommon[3]);
 

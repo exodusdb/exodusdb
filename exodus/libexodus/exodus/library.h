@@ -3,6 +3,10 @@
 
 #include <exodus/exodus.h>
 
+#ifndef EXO_LIBRARY
+#	define EXO_LIBRARY
+#endif
+
 // A library section is a just a c++ class stored in an so/dll shared library that can be
 // called like a function or subroutine from an exodus program or other library.
 //

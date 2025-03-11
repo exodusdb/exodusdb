@@ -1,9 +1,10 @@
 #include <exodus/library.h>
+#include <srv_common.h>
+
 libraryinit()
 
 #include <service_common.h>
 
-#include <srv_common.h>
 
 // clang-format off
 // Note: Defines are commented simply to avoid compiler warnings

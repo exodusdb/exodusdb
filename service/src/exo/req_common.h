@@ -1,12 +1,11 @@
-// dont use guard since may required multiple times eg in dict_xxxxx.cpp files
-//#ifndef SERVICE_SRC_EXO_REQ_COMMON_H_
-//#define SERVICE_SRC_EXO_REQ_COMMON_H_
+#ifndef SERVICE_SRC_EXO_REQ_COMMON_H_
+#define SERVICE_SRC_EXO_REQ_COMMON_H_
 
-#include <exodus/common.h>
+#include <exodus/common2.h>
 
-#define req_common_no 1
+//#define req_common_no 1
 
-commoninit(req,req_common_no)
+commoninit(req)
 
 	//not generated automatically - manually add whatever are required
 	var srcfile = "";
@@ -61,6 +60,6 @@ commoninit(req,req_common_no)
 		registerx.redim(10);
 	}
 
-commonexit(req,req_common_no)
+commonexit(req)
 
-//#endif // SERVICE_SRC_EXO_REQ_COMMON_H_
+#endif // SERVICE_SRC_EXO_REQ_COMMON_H_
