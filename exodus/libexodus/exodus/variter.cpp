@@ -42,16 +42,17 @@ var_iter::var_iter(in var1)
 //check iter != iter (i.e. iter != end()
 bool var_iter::operator!=([[maybe_unused]] const var_iter& var_iter1) {
 	//no need to use var_iter1 since the end is always string::npos;
-	return this->startpos_ != std::string::npos;
+//	return this->startpos_ != std::string::npos;
+	return this->startpos_ != std::string::npos && this->startpos_ < pvar_->var_str.size();
 }
 
 //CONVERSION - conversion to var
 var var_iter::operator*() const {
 
 	//find the end of the field if not already known
-	if (endpos_ == std::string::npos) {
-		endpos_ = pvar_->var_str.find(FM_, startpos_);
-	}
+//	if (endpos_ == std::string::npos) {
+	std::size_t	endpos_ = pvar_->var_str.find(FM_, startpos_);
+//	}
 
 	var rvo;
 	rvo.var_typ = VARTYP_STR;
@@ -65,12 +66,18 @@ var var_iter::operator*() const {
 	return rvo;
 }
 
-//INCREMENT
-var_iter var_iter::operator++() {
+//INCREMENT PREFIX
+var_iter& var_iter::operator++() {
+
+	// var iter allows loop between begin and end in both directions
+	if (startpos_ == std::string::npos) {
+		startpos_ = 0;
+		return *this;
+	}
 
 	//find the end of the field if not already found from a call to above CONVERSION
-	if (endpos_ == std::string::npos)
-		endpos_ = pvar_->var_str.find(FM_, startpos_);
+//	if (endpos_ == std::string::npos)
+	std::size_t	endpos_ = pvar_->var_str.find(FM_, startpos_);
 
 	//move up to the next field
 	startpos_ = endpos_;
@@ -87,23 +94,30 @@ var_iter var_iter::operator++() {
 	}
 
 	//indicate that the end of the next field is not yet known
-	endpos_ = std::string::npos;
+	//endpos_ = std::string::npos;
 
 	return *this;
 }
 
 //DECREMENT PREFIX
-var_iter var_iter::operator--() {
+var_iter& var_iter::operator--() {
 
-	// Decrement below zero is not allowed and throws if attempted
-	if (startpos_ < 1)
-		UNLIKELY
-		throw VarError(__PRETTY_FUNCTION__);
+//	// Decrement below zero is not allowed and throws if attempted
+//	if (startpos_ < 1)
+//		UNLIKELY
+//		throw VarError(__PRETTY_FUNCTION__);
+
+	// var iter allows begin()-- and end()++ to return end() and begin()
+	// This allow iter-- in a loop on the first iteration to request a redo of the first element after say a deletion
+	if (startpos_ < 1) {
+		startpos_ = std::string::npos;
+		return *this;
+	}
 
 	// Point to the separator before the current field
 	// and record the new endpos as that pos
 	startpos_--;
-	endpos_ = startpos_;
+//	endpos_ = startpos_;
 
 	// The first char could be a FM in which case startpos and endpos will be 0
 	// resulting in an empty field
@@ -148,7 +162,7 @@ var_iter var::begin() const {
 //END - var member function to create an interator -> end
 var_iter var::end() const {
 	// No need to use var1 since the end is always string::npos
-	// so var_iter!=var_iter is implemented in terms of startpos_ != string::npos;
+	// so var_iter!=var_iter is implemented in terms of startpos_ != string::npos && startpos_ < size()
 	return var_iter();
 }
 

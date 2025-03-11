@@ -3452,7 +3452,9 @@ class PUBLIC var_iter {
 
 	const var* pvar_;
 	mutable std::size_t startpos_ = 0;
-	mutable std::size_t endpos_ = std::string::npos;
+	// No longer storing endpos so the user can AMEND the current field
+	// and even perhaps decrement an iter after deleting a field.
+//	mutable std::size_t endpos_ = std::string::npos;
 
  public:
 	using value_type = var*;
@@ -3476,13 +3478,13 @@ class PUBLIC var_iter {
 //	var&  operator*();
 
 	// ++Iter prefix
-	var_iter operator++();
+	var_iter& operator++();
 
 	// Iter++ postfix
 	var_iter operator++(int);
 
 	// --Iter prefix
-	var_iter operator--();
+	var_iter& operator--();
 
 	// iter++ postfix
 	var_iter operator--(int);
