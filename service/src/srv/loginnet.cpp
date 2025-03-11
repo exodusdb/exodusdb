@@ -239,7 +239,7 @@ nextcomp:
 
 	cookie ^= "&mk=" ^ defmarketcode;
 	cookie ^= "&mc=" ^ maincurrcode;
-	cookie ^= "&tz=" ^ SW;
+	cookie ^= "&tz=" ^ TZ;
 	// cookie ^= "&ms=60000";
 	cookie ^= "&ms=1000000";
 

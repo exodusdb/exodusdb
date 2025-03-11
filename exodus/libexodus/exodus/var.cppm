@@ -85,6 +85,9 @@ export namespace exo {
 	using exo::DQ;
 	using exo::SQ;
 
+	using exo::BASEFMT;
+	using exo::DATEFMT;
+	using exo::TZ;
 
 // Generated using
 // nm -D -S -C /usr/local/lib/libexodus.so|\grep exo::[\\w]+ -oP|awk '{print "\tusing " $1 ";"}'|sort|uniq

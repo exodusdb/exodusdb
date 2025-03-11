@@ -365,18 +365,24 @@ ND	var  iconv(in input, in conversion);
 	///// ioconv date/time :
 	////////////////////////
 
-	// Formatting for dates that is sensitive to the American/International setting in DATEFORMAT.
-	// Normally used for oconv() but can be used in reverse for iconv.
-	// var: An internal date (a number).
-	// Returns: A readable date in text format. e.g. "31 DEC 2020"
-	// Alternatively one can use the ordinary date conversion patterns starting "D" e.g. "DE/" for international date with / like 31/12/2020.
+	// Use iconv/oconv code "[DATE,args]" when you want date conversion to depend on the environment variable DATEFMT, particularly its American/International setting. Otherwise use ordinary "D" conversion codes directly for slightly greater performance.
+	//
+	// var: [oconv] An internal date (a number).
+	// Returns: [oconv] A readable date in text format depending on "[DATE,args]" e.g. "31 DEC 2020" "31/12/2020" "12/31/2020"
+	// var: [iconv] A date in text format as above.
+	// Returns: [iconv] An internal date (a number) or "" if the input could not be understood as a valid date.
+	// args: If args is empty then DATEFMT is used as the conversion code. If args starts with "D" then args is used as the conversion codes but any E option in DATEFMT is appended. If args does not start with "D" then args are appended to DATEFMT, a "Z" option is appended, and the result used as the conversion code. A "*" option is equivalent to a second "Z" option.
+	// If you are calling iconv/oconv in code and DATEFMT is adequate for your needs then pass it directly as a function argument e.g. 'var v1 = iconv|oconv(v2, DATEFORMAT);' instead of indirectly like 'var v1 = iconv|oconv(v2, "[DATE]");'.
+	//
 	// `let v1 = iconv("JAN 9 2020", "D");
-	//  assert(oconv(v1, "[DATE]"   ) == " 9/ 1/2020");  // "D/EZ" or "[DATE,D]" equivalent assuming D2/E in DATEFMT (replace leading zeros with spaces)
-	//  assert(oconv(v1, "[DATE,4]" ) == " 9/ 1/2020");  // "D4Z"  equivalent assuming D2/E in DATEFMT (replace leading zeros with spaces)
-	//  assert(oconv(v1, "[DATE,*4]") == "9/1/2020");    // "D4ZZ" equivalent assuming D2/E in DATEFMT (trim leading zeros and spaces)
-	//  assert(oconv(v1, "[DATE,*]" ) == "9/1/20");      // "DZZ"  equivalent assuming D2/E in DATEFMT (trim leading zeros and spaces)`
+	//  assert(oconv(v1, "[DATE]"   ) == " 9/ 1/2020");  // "D/EZ" or "[DATE,D]" equivalent assuming D/E in DATEFMT (replace leading zeros with spaces)
+	//  assert(oconv(v1, "[DATE,4]" ) == " 9/ 1/2020");  // "D4Z"  equivalent assuming D/E in DATEFMT (replace leading zeros with spaces)
+	//  assert(oconv(v1, "[DATE,*4]") == "9/1/2020");    // "D4ZZ" equivalent assuming D/E in DATEFMT (trim leading zeros and spaces)
+	//  assert(oconv(v1, "[DATE,*]" ) == "9/1/20");      // "DZZ"  equivalent assuming D/E in DATEFMT (trim leading zeros and spaces)`
+	//
 	var  exoprog_date(in type, in input0, in ndecs0, out output);
 
+	// Use iconv/oconv "[NUMBER,args]" either when your numbers have currency or unit code suffixes or when you want number conversion to depend on the environment variable BASEFMT to determine thousands separator and decimal point. Otherwise use ordinary "MD" conversion codes directly for slightly greater performance.
 	// Formatting for numbers with optional currency code/unit suffix and is sensitive to the International or European setting in BASEFMT regarding use of commas or dots for thousands separators and decimal points.
 	// Primarily used for oconv() but can be used in reverse for iconv.
 	// var: A number with an optional currency code or unit suffix. e.g. "12345.67USD"

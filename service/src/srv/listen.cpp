@@ -606,7 +606,7 @@ nextsearch0:
 	// print @aw<30>
 	AW = AW.field(FM, 1, 30);
 
-	// @SW SQL win @sw<1> <2> <3> see init.general timezone
+	// @TZ SQL win @sw<1> <2> <3> see init.general timezone
 
 	// lets clear some standard stuff too
 	ID	   = "";

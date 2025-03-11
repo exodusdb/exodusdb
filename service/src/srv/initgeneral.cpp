@@ -747,7 +747,7 @@ nextreport:
 	// @sw<1> is the ADJUSTMENT to get display time from server time
 	// @sw<2> is the difference from gmt/utc to server time
 	// @sw<3> could be the adjustment to get dbtz from servertz
-	SW = "";
+	TZ = "";
 	// now ONLY supporting display time different from server time on gmt/utc servers
 	// if sysgmtoffset
 	if (SYSTEM.f(120)) {
@@ -757,9 +757,9 @@ nextreport:
 		// call note('WARNING: User time zone ignored and|Database storing non-GMT/UTC date/time|because current server is not GMT/UTC (is ':system<120>:')')
 		// end
 	} else {
-		SW(1) = SYSTEM.f(118);
+		TZ(1) = SYSTEM.f(118);
 		// if display time is not server/gmt/utc then adjust offset to server/gmt/utc
-		if (SW.f(1).len()) {
+		if (TZ.f(1).len()) {
 			// system time offset is currently automatically determined by CID()
 			// CID will tell you the current server tz
 			// but should this be recorded in the dataset in case it is moved

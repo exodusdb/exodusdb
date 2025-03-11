@@ -205,8 +205,8 @@ namespace exo {
 #define THREADNO    mv.THREADNO
 
 #define STATION     mv.STATION
-#define DATEFMT     mv.DATEFMT
-#define BASEFMT     mv.BASEFMT
+//#define DATEFMT     mv.DATEFMT
+//#define BASEFMT     mv.BASEFMT
 #define PRIVILEGE   mv.PRIVILEGE
 #define FILES       mv.FILES
 #define TCLSTACK    mv.TCLSTACK
@@ -226,7 +226,7 @@ namespace exo {
 #define HW mv.HW
 #define MW mv.MW
 #define PW mv.PW
-#define SW mv.SW
+//#define SW mv.SW
 #define VW mv.VW
 #define XW mv.XW
 

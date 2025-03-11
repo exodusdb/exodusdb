@@ -1721,7 +1721,7 @@ void ExoProgram::getdatetime(out user_date, out user_time, out system_date, out 
 	}//loop;
 
 	//no timezone info
-	if (not SW) {
+	if (not TZ) {
 		user_date = system_date;
 		user_time = system_time;
 		//assume system is on gmt/utc or database contains non-gmt datetimes
@@ -1733,7 +1733,7 @@ void ExoProgram::getdatetime(out user_date, out user_time, out system_date, out 
 	//@sw<1> is the ADJUSTMENT to get user time from server time, therefore add
 	user_time = system_time;
 	user_date = system_date;
-	tt = SW.f(1);
+	tt = TZ.f(1);
 	if (tt) {
 		user_time += tt;
 		if (user_time ge 86400) {
@@ -1754,7 +1754,7 @@ void ExoProgram::getdatetime(out user_date, out user_time, out system_date, out 
 	//following is irrelevent until we support user tz when server tz ISNT gmt/utc
 	//
 	//remove server tz to get gmt/utc. if server is ahead of gmt then serv tz is +
-	tt = SW.f(2);
+	tt = TZ.f(2);
 	if (tt) {
 		UTC_time -= tt;
 		if (UTC_time ge 86400) {
@@ -1923,7 +1923,7 @@ zero:
 
 var ExoProgram::exoprog_date(in type, in in0, in mode0, out outx) {
 
-	// Should really be sensitive to timezone in @SW but that requires time
+	// Should really be sensitive to timezone in @TZ but that requires time
 	// "time" is basically users time without a timezone
 	// "date" is basically users date without a timezone
 	// Use DATETIME for TZ sensitive conversion.

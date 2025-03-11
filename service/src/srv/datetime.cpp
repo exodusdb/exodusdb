@@ -47,8 +47,8 @@ function main(in type, in inx, in mode, out outx) {
 		}
 
 		// move time and date into the local date time
-		if (SW.f(1)) {
-			in2			= (in2 + SW.f(1) + 0.5).floor();
+		if (TZ.f(1)) {
+			in2			= (in2 + TZ.f(1) + 0.5).floor();
 			let in2orig = in2;
 			in2			= in2.mod(86400);
 			if (in2 < in2orig) {

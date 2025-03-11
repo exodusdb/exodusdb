@@ -3947,6 +3947,10 @@ ND inline var_proxy3 var::operator()(int fieldno, int valueno, int subvalueno) {
 	PUBLIC extern const char* const _OS_NAME;
 	PUBLIC extern const char* const _OS_VERSION;
 
+	PUBLIC extern thread_local var BASEFMT;
+	PUBLIC extern thread_local var DATEFMT;
+	PUBLIC extern thread_local var TZ;
+
 #ifdef EXO_VAR_CPP
 	CONSTINIT_VAR const var RM = RM_;
 	CONSTINIT_VAR const var FM = FM_;
@@ -3959,6 +3963,11 @@ ND inline var_proxy3 var::operator()(int fieldno, int valueno, int subvalueno) {
 	CONSTINIT_VAR const var DQ = DQ_;
 	CONSTINIT_VAR const var SQ = SQ_;
 	CONSTINIT_VAR const var NL = NL_;
+
+	// Basic time zone, date and number format
+	thread_local var BASEFMT = "MD20,"; // base currency decimals and and MD for 1,234.56 format
+	thread_local var DATEFMT = "DE";    // E for international numeric format on input
+	thread_local var TZ      = "";      // .f(1) user tz offset from UTC in secs, .f(2) system tz offset from UTC in secs
 
 #ifdef EXO_OS_NAME
 	const char* const _OS_NAME = EXO_OS_NAME;

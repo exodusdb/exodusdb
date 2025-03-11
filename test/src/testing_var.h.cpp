@@ -2559,10 +2559,10 @@ function main() {
 	{
 		let v1 = iconv("JAN 9 2020", "D");
 		assert(oconv(v1, "[DATE]"   ) == " 9/ 1/2020");
-  // "D/EZ" or "[DATE,D]" equivalent assuming D2/E in DATEFMT (replace leading zeros with spaces)
-		assert(oconv(v1, "[DATE,4]" ) == " 9/ 1/2020");  // "D4Z"  equivalent assuming D2/E in DATEFMT (replace leading zeros with spaces)
-		assert(oconv(v1, "[DATE,*4]") == "9/1/2020");    // "D4ZZ" equivalent assuming D2/E in DATEFMT (trim leading zeros and spaces)
-		assert(oconv(v1, "[DATE,*]" ) == "9/1/20");      // "DZZ"  equivalent assuming D2/E in DATEFMT (trim leading zeros and spaces)
+  // "D/EZ" or "[DATE,D]" equivalent assuming D/E in DATEFMT (replace leading zeros with spaces)
+		assert(oconv(v1, "[DATE,4]" ) == " 9/ 1/2020");  // "D4Z"  equivalent assuming D/E in DATEFMT (replace leading zeros with spaces)
+		assert(oconv(v1, "[DATE,*4]") == "9/1/2020");    // "D4ZZ" equivalent assuming D/E in DATEFMT (trim leading zeros and spaces)
+		assert(oconv(v1, "[DATE,*]" ) == "9/1/20");      // "DZZ"  equivalent assuming D/E in DATEFMT (trim leading zeros and spaces)
 	}
 
 	printl("exoprog_number(in type, in input0, in ndecs0, out output);");
@@ -2577,6 +2577,11 @@ function main() {
 		var v1 = iconv("1,234.5678USD", "[NUMBER]");
 		assert(v1 == "1234.57USD");
  // Comma removed
+	}
+
+	printl("elapsedtimetext() const;");
+	{
+		var v1 = elapsedtimetext(); // e.g. "< 1ms"
 	}
 
 	printl("elapsedtimetext(in timestamp1, in timestamp2) const;");

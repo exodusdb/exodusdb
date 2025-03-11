@@ -101,28 +101,28 @@ function main() {
 
 	{
 		printl("Server and user on UTC");
-		TRACE(SW)
+		TRACE(TZ)
 		TRACE(DATEFMT)
 		printl(timedate2());
 
 		printl();
 		printl("User is ahead of UTC by 60 minutes");
 		printl("Server is on UTC");
-		SW = "3600"_var;
-		TRACE(SW)
+		TZ = "3600"_var;
+		TRACE(TZ)
 		printl(timedate2());
 
 		printl();
 		printl("User is on UTC");
 		printl("Server is ahead of UTC by 60 minutes");
-		SW = "0^3600"_var;
-		TRACE(SW)
+		TZ = "0^3600"_var;
+		TRACE(TZ)
 		printl(timedate2());
 
 		printl();
 		printl("Both User and Server are ahead of UTC by 60 minutes");
-		SW = "3600^3600"_var;
-		TRACE(SW)
+		TZ = "3600^3600"_var;
+		TRACE(TZ)
 		printl(timedate2());
 
 	}

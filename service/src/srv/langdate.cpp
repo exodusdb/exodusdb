@@ -3,7 +3,7 @@ libraryinit()
 
 function main(in type, in in0, in mode0, out output, in glang) {
 
-	// should really be sensitive to timezone in @SW
+	// should really be sensitive to timezone in @TZ
 
 	var inx	 = in0;
 	var mode = mode0;
