@@ -1,0 +1,950 @@
+.TH exoprog.h
+
+.SH 1. SELECT LISTS
+.SH
+
+.SS
+if (select(sortselectclause_or_filehandle = "")) ...
+.nf
+ 
+.fi
+Create an active select list using a natural language sort/select command.
+
+This and all the following exoprog member functions work on an environment variable CURSOR.
+
+Identical functions are available directly on plain var objects but vars have less functionality regarding dictionaries and environment variables which are built-in to exoprog.
+
+\fBReturns:\fR True if an active select list was created, false otherwise.
+
+In the following examples, various environment variables like RECORD, ID and MV are used instead of declaring and using named vars. In actual code, either may be freely used.
+
+\fBExample:\fR
+.RS
+.nf
+select("xo_clients by name by type with type 'A' 'B' and with balance between 0 and 2000");
+if (readnext(ID)) ... ok
+.fi
+.RE
+
+
+
+.SS
+if (selectkeys(keys)) ...
+.nf
+ 
+.fi
+Create an active select list from some given keys.
+
+\fBExample:\fR
+.RS
+.nf
+selectkeys("SB001^JB001^JB002"_var);
+if (readnext(ID)) ... ok // ID -> "SB001"
+.fi
+.RE
+
+
+
+.SS
+if (hasnext()) ...
+.nf
+ 
+.fi
+Check if a select list is active.
+
+\fBExample:\fR
+.RS
+.nf
+if (hasnext()) ... ok
+.fi
+.RE
+
+
+
+.SS
+if (readnext(out key)) ...
+.nf
+ 
+.fi
+Get the next key from an active select list.
+
+\fBkey:\fR [out] A string. Typically the key of a db file record.
+
+\fBReturns:\fR True if an active select list was available and the next key in the list was obtained.
+
+\fBExample:\fR
+.RS
+.nf
+selectkeys("SB001^JB001^JB002"_var);
+if (readnext(ID)) ... ok // ID -> "SB001"
+.fi
+.RE
+
+
+
+.SS
+if (readnext(out key, out valueno)) ...
+.nf
+ 
+.fi
+Get the next key and value number pair from an active select list.
+
+\fBkey:\fR [out] A string. Typically the key of a db file record.
+
+\fBvalueno:\fR [out] Is only available in select lists that have been created by sort/select commands that refer to multi-valued db dictionary fields where db records have multiple values for a specific field. In this case, a record key will appear multiple times in the select list since each multivalue is exploded for the purpose of sorting and selecting. This can be viewed as a process of "normalising" multivalues so they appear as multiple records instead of being held in a single record.
+
+\fBReturns:\fR True if an active select list was available and the next key in the list was obtained.
+
+\fBExample:\fR
+.RS
+.nf
+selectkeys("SB001]2^SB001]1^JB001]2"_var);
+if (readnext(ID, MV)) ... ok // ID -> "SB001" // MV -> 2
+.fi
+.RE
+
+
+
+.SS
+if (readnext(out record, out key, out valueno)) ...
+.nf
+ 
+.fi
+Get the next record, key and value no from an active select list.
+
+\fBrecord:\fR [out] Is only available in select lists that have been created with the final (R) option. Otherwise the record will be returned as an empty string and must be obtained using a db read() function.
+
+\fBkey:\fR [out] A string. Typically the key of a db file record.
+
+\fBvalueno:\fR [out] Is only available in select lists that have been created by sort/select commands that refer to multi-valued db dictionary fields where db records have multiple values for a specific field.
+
+\fBReturns:\fR True if an active select list was available and the next key in the list was obtained.
+
+\fBExample:\fR
+.RS
+.nf
+select("xo_clients by name (R)");
+if (readnext(RECORD, ID, MV)) ... ok;
+assert(not RECORD.empty());
+.fi
+.RE
+
+
+
+.SS
+pushselect(out cursor)
+.nf
+ 
+.fi
+Saves a pointer to the currently active select list.
+
+This allows another select list to be activated and used temporarily before the original select list is reactivated.
+
+\fBcursor:\fR [out] A var that can be passed later on to the popselect() function to reactivate the saved list.
+
+\fBExample:\fR
+.RS
+.nf
+select("xo_clients by name");
+var saved_xo_clients_cursor;
+pushselect(saved_xo_clients_cursor);
+//
+// ... work with another select list ...
+//
+popselect(saved_xo_clients_cursor); // Reactivate the original select list.
+.fi
+.RE
+
+
+
+.SS
+popselect(cursor)
+.nf
+ 
+.fi
+Re-establish an active select list saved by pushselect().
+
+\fBcursor:\fR A var created by the pushselect() function.
+
+See pushselect() for more info.
+
+.SS
+clearselect()
+.nf
+ 
+.fi
+Deactivate an active select list.
+
+If no select list is active then nothing is done.
+
+\fBExample:\fR
+.RS
+.nf
+clearselect();
+.fi
+.RE
+
+
+
+.SS
+if (deleterecord(filename)) ...
+.nf
+ 
+.fi
+Use an active select list to delete db records.
+
+\fBReturns:\fR False if any records could not be deleted.
+
+Contrast this function with the two argument "deleterecord(file, key)" function that deletes a single record.
+
+\fBExample:\fR
+.RS
+.nf
+if (select("xo_clients with type 'Q' and with balance between 0 and 100")) {
+  if (deleterecord("xo_clients")) ...
+}
+.fi
+.RE
+
+
+
+.SS
+if (deleterecord(dbfile, key)) ...
+.nf
+ 
+.fi
+Delete a single database file record.
+
+\fBExample:\fR
+.RS
+.nf
+let file = "xo_clients", key = "QQ001";
+write("" on file, key);
+if (not deleterecord(file, key)) ...
+// or
+write("" on file, key);
+if (not file.deleterecord(key)) ...
+.fi
+.RE
+
+
+
+.SS
+if (savelist(listname)) ...
+.nf
+ 
+.fi
+Save a currently active select list under a given name.
+
+After saving, the list is no longer active and hasnext() will return false.
+
+\fBReturns:\fR True if an active select list was saved, false if there was no active select list.
+
+Lists are saved as a record in the "lists" file.
+
+\fBExample:\fR
+.RS
+.nf
+selectkeys("SB001^SB002"_var);
+if (not savelist("my_list")) ...
+.fi
+.RE
+
+
+
+.SS
+if (getlist(listname)) ...
+.nf
+ 
+.fi
+Reactivate a saved select list of a given name.
+
+A saved list is obtained from the "lists" file and activated.
+
+\fBReturns:\fR True if an active select list was successfully reactivated, otherwise false.
+
+\fBExample:\fR
+.RS
+.nf
+if (not getlist("my_list")) ...
+.fi
+.RE
+
+
+
+.SS
+if (deletelist(listname)) ...
+.nf
+ 
+.fi
+Remove a saved select list by name.
+
+A saved list is deleted from the "lists" file.
+
+\fBExample:\fR
+.RS
+.nf
+if (not deletelist("my_list")) ...
+.fi
+.RE
+
+
+
+.SH 2. PERFORM/EXECUTE
+.SH
+
+.SS
+var v1 = perform(command_line);
+.nf
+ 
+.fi
+Run an exodus program/library's main function using a command like syntax similar to that of executable programs.
+
+A "command line" is passed to the program/library in the usual COMMAND, SENTENCE and OPTIONS environment variables instead of function arguments.
+
+The program/library's main function should have zero arguments. Performing a program/library function with main arguments results in them being unassigned and in some case core dump may occur.
+
+The following environment variables are initialised on entry to the main function of the program/library. They are preserved untouched in the calling program.
+
+SENTENCE, COMMAND, OPTIONS: Initialised from the argument "command_line".
+
+RECUR0, RECUR1, RECUR2, RECUR3, RECUR4 to "".
+
+ID, RECORD, MV, DICT initialised to "".
+
+LEVEL is incremented by one.
+
+All other environment variables are shared between the caller and callee. There is essentially only one environment in any one process or thread.
+
+Any active select list is passed to the performed program/library and can be consumed by it. Conversely any active select list created by the performed program/library will be returned to the calling program. In other words, both the performing and the performed programs/libraries share a single active select list environment. This is different from execute() which gets its own private active select list, initially inactive.
+
+\fBcommand_line:\fR The first word of this argument is used as the name of the program/library to be loaded and run. command_line is used to initialise the SENTENCE, COMMAND and OPTIONS environment variables.
+
+\fBReturns:\fR Whatever var the program/library returns, or "" if it calls stop() or abort(()".
+
+The return value can be ignored and discarded without any compiler warning.
+
+Exodus program/libraries may also be called directly using conventional function calling syntax. To call an exodus program/library called progname using either the syntax "call progname(args...);" or "var v1 = progname(args...);" you must "#include <progname.h>" after the "programinit()" or "libraryinit()" lines in your program/library.
+
+.SS
+var v1 = execute(command_line);
+.nf
+ 
+.fi
+Run an exodus program/library's main function.
+
+Identical to perform() but any currently active select list in the calling program/library is not accessible to the executed program/library and is preserved in the calling [program as is. Any select list created by the executed library is discarded when it terminates.
+
+.SS
+chain(command_line)
+.nf
+ 
+.fi
+Run an exodus program/library's main function after closing the current program.
+
+Identical to perform() except that the current program closes first.
+
+.SS
+var v1 = libinfo(command);
+.nf
+ 
+.fi
+Check if a command's first word  is a performable/executable exodus program.
+
+.SH 3. PROGRAM TERMINATION 
+.SH
+
+.SS
+stop(message = "")
+.nf
+ 
+.fi
+Stop the current exodus program/library normally and return to the parent exodus program/library, or return to the operating system if none.
+
+Calling stop() in an exodus OS command line executable program, or in a function called from the same, will terminate the OS process with an error status of 0 which is generally considered to indicate success.
+
+Calling stop() in a performed or executed exodus program/library, or in a function called from the same, will terminate the program/library being executed and return to the exodus program that performed or executed it.
+
+.SS
+abort(message = "")
+.nf
+ 
+.fi
+Abort the current exodus program/library abnormally and return to the parent exodus program/library, or return to the operating system if none.
+
+Similar to stop() but, if terminating the OS process, then return an error status of 1 which is generally considered to be an indication of failure.
+
+.SS
+abortall(message = "")
+.nf
+ 
+.fi
+Abort the current exodus program/library abnormally and return to the parent exodus program/library, or return to the operating system if none.
+
+Similar to abort() but, if terminating the OS process, then return an error status of 2 which is generally considered to be an indication of failure.
+
+.SS
+logoff(message = "")
+.nf
+ 
+.fi
+
+
+.SH 4. DB FILE DICTIONARIES
+.SH
+
+.SS
+var v1 = calculate(dictid);
+.nf
+ 
+.fi
+given dictid reads dictrec from DICT file and extracts from RECORD/ID or calls library
+
+called dict+DICT function dictid not const so we can mess with the library?
+
+.SS
+var v1 = calculate(dictid, dictfile, id, record, mv = 0);
+.nf
+ 
+.fi
+
+
+.SS
+var v1 = xlate(filename, key, fieldno_or_name, mode);
+.nf
+ 
+.fi
+
+
+.SH 5. I/O CONVERSION
+.SH
+
+.SS
+var v1 = oconv(input, conversion);
+.nf
+ 
+.fi
+iconv/oconv with access to exoprogram's environment variables.
+
+exoprog's iconv/oconv have the ability to call custom functions like "[funname,args...]"
+
+
+
+[NUMBER]  // built-in. See doc below.
+
+[DATE]    // built-in. See doc below.
+
+[DATEPERIOD]  e.g. [DATEPERIOD,1] [DATEPERIOD,1,12]
+
+[DATETIME]    e.g. [DATETIME,4*,DOS] [DATETIME,4*,MTS] [DATETIME,4*]
+
+[TIME2]       e.g. [TIME2,MT] [TIME2,MTS] [TIME2,MTS48]
+
+
+
+.SS
+var v1 = iconv(input, conversion);
+.nf
+ 
+.fi
+
+
+.SH 6. IOCONV DATE/TIME 
+.SH
+
+.SS
+var v1 = iconv|oconv(var, "[DATE]");
+.nf
+ 
+.fi
+Use iconv/oconv code "[DATE,args]" when you want date conversion to depend on the environment variable DATEFMT, particularly its American/International setting. Otherwise use ordinary "D" conversion codes directly for slightly greater performance.
+
+
+
+\fBvar:\fR [oconv] An internal date (a number).
+
+\fBReturns:\fR [oconv] A readable date in text format depending on "[DATE,args]" e.g. "31 DEC 2020" "31/12/2020" "12/31/2020"
+
+\fBvar:\fR [iconv] A date in text format as above.
+
+\fBReturns:\fR [iconv] An internal date (a number) or "" if the input could not be understood as a valid date.
+
+\fBargs:\fR If args is empty then DATEFMT is used as the conversion code. If args starts with "D" then args is used as the conversion codes but any E option in DATEFMT is appended. If args does not start with "D" then args are appended to DATEFMT, a "Z" option is appended, and the result used as the conversion code. A "*" option is equivalent to a second "Z" option.
+
+If you are calling iconv/oconv in code and DATEFMT is adequate for your needs then pass it directly as a function argument e.g. 'var v1 = iconv|oconv(v2, DATEFORMAT);' instead of indirectly like 'var v1 = iconv|oconv(v2, "[DATE]");'.
+
+\fBExample:\fR
+.RS
+.nf
+let v1 = iconv("JAN 9 2020", "D");
+assert(oconv(v1, "[DATE]"   ) == " 9/ 1/2020");  // "D/EZ" or "[DATE,D]" equivalent assuming D/E in DATEFMT (replace leading zeros with spaces)
+assert(oconv(v1, "[DATE,4]" ) == " 9/ 1/2020");  // "D4Z"  equivalent assuming D/E in DATEFMT (replace leading zeros with spaces)
+assert(oconv(v1, "[DATE,*4]") == "9/1/2020");    // "D4ZZ" equivalent assuming D/E in DATEFMT (trim leading zeros and spaces)
+assert(oconv(v1, "[DATE,*]" ) == "9/1/20");      // "DZZ"  equivalent assuming D/E in DATEFMT (trim leading zeros and spaces)
+.fi
+.RE
+
+
+
+.SS
+var v1 = iconv|oconv(var, "[NUMBER]");
+.nf
+ 
+.fi
+Use iconv/oconv "[NUMBER,args]" either when your numbers have currency or unit code suffixes or when you want number conversion to depend on the environment variable BASEFMT to determine thousands separator and decimal point. Otherwise use ordinary "MD" conversion codes directly for slightly greater performance.
+
+Formatting for numbers with optional currency code/unit suffix and is sensitive to the International or European setting in BASEFMT regarding use of commas or dots for thousands separators and decimal points.
+
+Primarily used for oconv() but can be used in reverse for iconv.
+
+\fBvar:\fR A number with an optional currency code or unit suffix. e.g. "12345.67USD"
+
+\fBReturns:\fR A formatted number with thousands separated conventionally e.g. "12.345.67USD".
+
+iconv/oconv("[NUMBER]")      oconv leaves ndecimals untouched as in the input. iconv see below.
+
+iconv/oconv("[NUMBER,2]")    Specified number of decimal places
+
+iconv/oconv("[NUMBER,BASE]") Decimal places as per BASEFMT
+
+iconv/oconv("[NUMBER,*]")    Leave decimal places untouched as in the input
+
+iconv/oconv("[NUMBER,X]")    Leave decimal places untouched as in the input
+
+iconv/oconv("[NUMBER,2Z]")   Z (suppress zero) combined with any other code for oconv results in empty output "" instead of "0.00" in case of zero input.
+
+
+
+Empty input "" gives empty output "".
+
+
+
+All leading, trailing and internal spaces are removed from the input.
+
+
+
+A trailing currency or unit code is ignored and returned on output.
+
+
+
+An exodus number is an optional leading + or - followed by one or more decimal digits 0-9 with a single optional decimal point placed anywhere.
+
+
+
+If the input is non-numeric then "" is returned and STATUS set to 2. In the case of oconv with multiple fields or values each field or value is processed separately but STATUS is set to 2 if any are non-numeric.
+
+
+
+iconv removes and oconv adds thousand separator chars. The thousands separator is  "," if BASEFMT starts with "MD" or "." if it starts with "MC".
+
+
+
+\fBoconv:\fR
+
+
+
+Add thousands separator chars and optionally standardise the number of decimal places.
+
+
+
+Multiple numbers in fields, values, subvalues etc. can be processed in one string.
+
+
+
+Any leading + character is preserved on output.
+
+
+
+Z suppresses zeros and returns empty string "" instead.
+
+
+
+Special format "[NUMBER,ndecs,move_ndecs]": move_ndecs causes decimal point to be shifted left if positive or right if negative.
+
+\fBExample:\fR
+.RS
+.nf
+var v1 = oconv("1234.5USD", "[NUMBER,2]"); // "1,234.50USD" // Comma added and decimal places corrected.
+.fi
+.RE
+
+\fBiconv:\fR
+
+
+
+Remove all thousands separator chars and optionally standardise the number of decimal places.
+
+
+
+If ndecs is not specified in the "[NUMBER]" pattern then ndecs is taken from the current RECORD using dictionary code NDECS if DICT is available otherwise it uses ndecs from BASEFMT.
+
+
+
+iconv only handles a single field/value.
+
+
+
+Optional prefix of "1/" or "/" causes the reciprocal of the number to be used. e.g. "1/100" or "/100" -> "0.01".
+
+\fBExample:\fR
+.RS
+.nf
+var v1 = iconv("1,234.5678USD", "[NUMBER]"); // "1234.57USD" // Comma removed
+.fi
+.RE
+
+
+
+.SS
+var v1 = amountunit(input0, out unitx);
+.nf
+ 
+.fi
+Split amount+currency code/unit string into number and currency code/unit.
+
+\fBvar:\fR "123.45USD"
+
+\fBReturns:\fR e.g. "123.45"
+
+\fBunitx:\fR [out] e.g. "USD"
+
+.SS
+var v1 = amountunit(input0);
+.nf
+ 
+.fi
+
+
+.SH 7. TIME/DATE UTILITIES
+.SH
+
+.SS
+var v1 = timedate2();
+.nf
+ 
+.fi
+\fBReturns:\fR Text of date and time in users time zone
+
+e.g. "2MAR2025 11:52AM"
+
+Offset from UTC by TZ seconds.
+
+.SS
+getdatetime(out user_date, out user_time, out system_date, out system_time, out UTC_date, out UTC_time)
+.nf
+ 
+.fi
+\fBReturns:\fR User, server and UTC date and time
+
+User date and time is determined by adding the environment variable TZ.f(1)'s TZ offset (in seconds) to UTC date/time obtained from the operating system.
+
+"system" date and time is normally the same as UTC date/time and is determined by adding the environment variable TZ.f(2)'s TZ offset (in seconds) to UTC date/time obtained from the operating system.
+
+
+
+.SS
+var v1 = elapsedtimetext();
+.nf
+ 
+.fi
+Get text of elapsed time since environment variable TIMESTAMP was initialised with ostimestamp() at program/thread startup.
+
+TIMESTAMP can be updated using ostimestamp() as and when desired.
+
+\fBExample:\fR
+.RS
+.nf
+var v1 = elapsedtimetext(); // e.g. "< 1ms"
+.fi
+.RE
+
+
+
+.SS
+var v1 = elapsedtimetext(timestamp1, timestamp2);
+.nf
+ 
+.fi
+Get text of elapsed time between two timestamps
+
+\fBExample:\fR
+.RS
+.nf
+let v1 = elapsedtimetext(0, 0.55);  // "13 hours, 12 mins"
+let v2 = elapsedtimetext(0, 0.001); // "1 min, 26 secs"
+.fi
+.RE
+
+
+
+.SH 8. TERMINAL I/O UTILITIES
+.SH
+
+.SS
+note(msg, options, io response)
+.nf
+ 
+.fi
+If stdin is a terminal, output a message to stdout and optionally pause processing and request a response from the user, otherwise set the response to "" and continue.
+
+\fBoptions:\fR R = Response requested. C upper case response.
+
+\fBExample:\fR
+.RS
+.nf
+var response;
+// call note("Enter something", "RC", response);
+.fi
+.RE
+
+
+
+.SS
+note(msg)
+.nf
+ 
+.fi
+Output a message to stdin and continue.
+
+\fBExample:\fR
+.RS
+.nf
+call note("Hello world.");
+.fi
+.RE
+
+
+
+.SS
+var v1 = decide(question, options = "");
+.nf
+ 
+.fi
+If stdin is a terminal, pause processing, list some given options to stdout and request the user to make a choice, otherwise set the response to "" and continue.
+
+\fBReturns:\fR The chosen option (value not number) or "" if the user cancelled.
+
+.SS
+var v1 = decide(question, options, out reply, defaultreply = 1);
+.nf
+ 
+.fi
+Same as decide() above but extended.
+
+\fBdefaultreply:\fR A default option if the user presses Enter.
+
+\fBreply:\fR [out] The option number that the user chose or "" if they cancelled.
+
+.SS
+if (esctoexit()) ...
+.nf
+ 
+.fi
+If stdin is a terminal, check if a key has been pressed and, if so, pause execution and ask the user to confirm if they want to escape/cancel or resume processing.
+
+\fBReturns:\fR True if a key has been pressed and the user confirms to escape/cancel. False if no key has been pressed or the user chooses to resume and not escape/cancel.
+
+.SS
+var v1 = AT(code);
+.nf
+ 
+.fi
+Get a string to control terminal operation.
+
+\fBReturns:\fR A string to be output to the terminal in order to accomplish the desired operation.
+
+The terminal protocol is xterminal.
+
+\fBcode:\fR
+
+n   Position the cursor at column number n
+
+0   Position the cursor at column number 0
+
+-1  Clear the screen and home the cursor
+
+-2  Position the cursor at the top left home (x,y = 0,0)
+
+-3  Clear from the cursor at the end of screen
+
+-4  Clear from cursor to end of line
+
+-40 Position the cursor at columnno 0 and clear to end of line
+
+.SS
+var v1 = AT(x, y);
+.nf
+ 
+.fi
+Get a terminal cursor positioning string.
+
+\fBReturns:\fR A string to be output to the terminal to position the cursor at the desired screen x and y position.
+
+The terminal protocol is xterminal.
+
+.SS
+if (getcursor(out cursor, delayms = 3000, max_errors = 0)) ...
+.nf
+ 
+.fi
+Get the position of the terminal cursor.
+
+\fBcursor:\fR [out] If stdin is a terminal, an FM delimited string containing the x and y coordinates of the current terminal cursor.
+
+If stdin is not a terminatl then an empty string "" is returned.
+
+The cursor additionally contains a third field which contains the delay in ms from the terminal.
+
+The FM delimited string returned can be later passed to setcursor() to reposition the cursor back to its original position or it can be parsed and used accordingly.
+
+\fBdelayms:\fR Default 3000ms. The maximum time to wait for terminal response.
+
+\fBmax_errors:\fR Default is 0. If not zero, reset the number of times to error before automatically disabling getcursor(). max_errors is initialised to 3. If negative then max_errors has the the effect of disabling all future calls to getcursor().
+
+In case the terminal fails to respond correctly within the required timeout, or is currently disabled due to too many failures, or has been specifically disabled then the returned "cursor" var contains a 4th field:
+
+TIMEOUT - The terminal failed to respond within the timeout.
+
+READ_ERROR - Failed to read terminal response.
+
+INVALID_RESPONSE - Terminal response invalid.
+
+SETUP_ERROR - Terminal setup failed.
+
+DISABLED - Terminal is disabled due to more errors than the maximum currently set.
+
+\fBExample:\fR
+.RS
+.nf
+var cursor;
+if (isterminal() and not getcursor(cursor)) ... // cursor becomes something like "0^20^0.012345"_var
+.fi
+.RE
+
+
+
+.SS
+var v1 = getcursor();
+.nf
+ 
+.fi
+Get the position of the terminal cursor.
+
+For more info see the main getcursor() function above.
+
+\fBExample:\fR
+.RS
+.nf
+let cursor = getcursor(); // If isterminal() then cursor becomes something like "0^20^0.012345"_var
+.fi
+.RE
+
+
+
+.SS
+setcursor(cursor_coordinates)
+.nf
+ 
+.fi
+If stdin is a terminal, position the cursor at x and y as per the given coordinates.
+
+\fBcursor_coordinates:\fR An FM delimited string containing the x and y coordinates of the terminal cursor as can be obtained by getcursor().
+
+\fBExample:\fR
+.RS
+.nf
+if (isterminal()) {
+    let cursor = getcursor(); // Save the current cursor position.
+    TRACE(cursor)             // Show the saved cursor position.
+    print(AT(0,0));           // Position the cursor at 0,0.
+    setcursor(cursor);        // Restore its position
+}
+.fi
+.RE
+
+
+.SH 9. ARRAY UTILITIES
+.SH
+
+.SS
+var v1 = invertarray(input, pad = false);
+.nf
+ 
+.fi
+Dynamic array fields become values and vice versa
+
+\fBReturns:\fR The inverted dynamic array.
+
+\fBpad:\fR If true then on return, all fields will have the same number of values with superfluous trailing VMs where necessary.
+
+\fBExample:\fR
+.RS
+.nf
+let v1 = "a]b]c^1]2]3"_var;
+let v2 = invertarray(v1); // "a]1^b]2^c]3"_var
+.fi
+.RE
+
+
+
+.SS
+sortarray(io array, fns = "", order = "")
+.nf
+ 
+.fi
+Sorts fields of multivalues of dynamic arrays in parallel
+
+\fBfns:\fR VM separated list of field numbers to sort in parallel based on the first field number
+
+\fBorder:\fR
+
+AL Ascending  - Left Justified  - Alphabetic
+
+DL Descending - Left Justfiied  - Alphabetic
+
+AR Ascending  - Right Justified - Numeric
+
+DR Descending - Right Justified - Numeric
+
+\fBExample:\fR
+.RS
+.nf
+var v1 = "f1^10]20]2]1^ww]xx]yy]zz^f3^f4"_var;  // fields 2 and 3 are parallel multivalues and currently unordered.
+sortarray(v1, "2]3"_var, "AR"); // v1 -> "f1^1]2]10]20^zz]yy]ww]xx^f3^f4"_var
+.fi
+.RE
+
+
+
+.SH 10. RECORD LOCKING
+.SH
+
+.SS
+if (lockrecord(filename, io file, keyx, recordx, waitsecs = 0, allowduplicate = false)) ...
+.nf
+ 
+.fi
+Does not actually return record
+
+.SS
+if (lockrecord(filename, io file, keyx)) ...
+.nf
+ 
+.fi
+
+
+.SS
+if (unlockrecord(filename, io file, key)) ...
+.nf
+ 
+.fi
+
+
+.SS
+if (unlockrecord()) ...
+.nf
+ 
+.fi
+
+
+
