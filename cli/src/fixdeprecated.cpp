@@ -170,11 +170,11 @@ function main() {
 		// /root/inc/agy_common.h:28:1: error: storage class specified for a member declaration
 		if (file_included_from and compline.contains("storage class")) {
 //		if (file_included_from and compline.contains("storage class specified for a member declaration")) {
-//			if (not osfilenames_to_check_commons.locate(file_included_from)) {
+			if (not osfilenames_to_check_commons.locate(file_included_from)) {
 				osfilenames_to_check_commons ^= file_included_from ^ FM;
 				if (verbose)
 					TRACE(osfilenames_to_check_commons)
-//			}
+			}
 			continue;
 		}
 //		file_included_from = "";
@@ -507,7 +507,18 @@ function main() {
 					source_fixer(datrec);
 
 					if (datrec ne orig_datrec) {
-						printx(datfilename, datrec.trim("\n"));
+
+						// Output a diff
+//						printx(datfilename, datrec.trim("\n"));
+						let tmpdatfile = ostempdirpath() ^ datfilename.field("/", -1);
+						if (not oswrite(datrec on tmpdatfile))
+							loglasterror();
+						else {
+							if (osshell("diff " ^ datfilename ^ " " ^ tmpdatfile)) {};
+							if (not osremove(tmpdatfile))
+								loglasterror();
+						}
+
 						if (update) {
 							if (oswrite(datrec on datfilename)) {
 								datfilenames ^= datfilename ^ FM;
@@ -599,26 +610,30 @@ subroutine fix_include_common(in osfilenames) {
 			if (not libname.ends("_common"))
 				continue;
 
-			if (libinfo(libname)) {
-				if (verbose)
-					logputl(osfilename, "\t", libname, "\tneeds moving up");
+			if (not libinfo(libname)) {
+				errput("WARNING lib is not available yet. ");
+				TRACE("lib" ^ libname ^ ".so")
+				continue;
+			}
+
+			if (verbose)
+				logputl(osfilename, "\t", libname, "\tneeds moving up");
 //				delete_lns ^= ln ^ FM;
 
-				// Note: "for (var v : fields)" var iterator allows us to update the field that we are on.
-				// As long as we know its fieldno. It will still find the next field correctly.
-				//
-				// If we remove the field that we are on, var iter will skip over the "next" field.
-				// Unless we use "for (auto iter = fields.begin(); iter != fields.end(); ++iter)"
-				// and DECREMENT the iter in the loop.
-				// This works even on the first line since
-				// for var iter, decrement begin() i.e. (var.begin()--) -> var.end()
-				// and INCREMENT var.end() i.e. (var.end()++) -> var.begin().
-				src.updater(ln, "/" "/" ^ line);
+			// Note: "for (var v : fields)" var iterator allows us to update the field that we are on.
+			// As long as we know its fieldno. It will still find the next field correctly.
+			//
+			// If we remove the field that we are on, var iter will skip over the "next" field.
+			// Unless we use "for (auto iter = fields.begin(); iter != fields.end(); ++iter)"
+			// and DECREMENT the iter in the loop.
+			// This works even on the first line since
+			// for var iter, decrement begin() i.e. (var.begin()--) -> var.end()
+			// and INCREMENT var.end() i.e. (var.end()++) -> var.begin().
+			src.updater(ln, "/" "/" ^ line);
 
-				line.trimmer();
-				if (not locate(line, common_lines))
-					common_lines ^= line ^ FM;
-			}
+			line.trimmer();
+			if (not locate(line, common_lines))
+				common_lines ^= line ^ FM;
 //			else printl(osfilename, libname);
 		}
 		if (common_lines) {
@@ -630,10 +645,12 @@ subroutine fix_include_common(in osfilenames) {
 				TRACE(programinit_libraryinit_fn)
 				TRACE(common_lines)
 			}
-//			for (var ln : delete_lns) {
-//				src.remover(ln);
-//			}
+
+			printl("Moved", common_lines.fcount(FM), "#include common line(s) in", osfilename);
+			printl(common_lines.convert(FM, "\n"));
+
 			src.inserter(programinit_libraryinit_fn, common_lines);
+
 			src.converter(FM, "\n");
 			if (verbose)
 				printl(src);

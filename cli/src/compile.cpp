@@ -907,9 +907,18 @@ ENVIRONMENT
 					if (not oswrite(cpp on cppfilename)) {
 						atomic_ncompilation_failures++;
 						errputl(lasterror());
-					} else
+					} else {
 						outputl(" Created/updated:" ^ cppfilename);
+
+					}
 				}
+
+				// Compile it regardless in case something has changed
+				var cmd = "compile " ^ cppfilename ^ " {S" ^ OPTIONS ^ "}";
+//				if (verbose)
+//					cmd ^= " {V}";
+				if (not osshell(cmd))
+					loglasterror();
 			}
 
 			continue;
@@ -1544,8 +1553,8 @@ ENVIRONMENT
 					let libname = line.match(R"__(\b[a-z]{2,3}_common.h)__").field(".h", 1);
 					if (libname and not srcfilename.contains(libname) and libinfo(libname)) {
 						if (past_programinit_libraryinit) {
-							errput("compile:" ^srcfilename ^ " Should not occur after programinit or libraryinit: ");
-							TRACE(line)
+							//errput("compile:" ^srcfilename ^ " Should not occur after programinit or libraryinit: ");
+							//TRACE(line)
 						}
 						if (not linkoptions.contains(" -L" ^ libdir))
 							linkoptions ^= " -L" ^libdir;
