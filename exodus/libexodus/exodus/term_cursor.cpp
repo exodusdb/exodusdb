@@ -136,7 +136,7 @@ var ExoProgram::getcursor() const {
 	return cursor;
 }
 
-bool ExoProgram::getcursor(out cursor, int timeout_ms = 3000, int max_ignorable_errors = 0) const {
+bool ExoProgram::getcursor(out cursor, int timeout_ms /*= 3000*/, int max_ignorable_errors /*= 0*/) const {
 
 	// Set max errors if requested to do so.
 	// simultaneously reset the error_count

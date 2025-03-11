@@ -418,7 +418,10 @@ ENVIRONMENT
 		basicoptions ^= " -ffunction-sections -fdata-sections ";
 
 		// Help fixdeprecated get all errors and deprecations
-		basicoptions ^= " -ferror-limit=9999";
+		if (clang)
+			basicoptions ^= " -ferror-limit=9999";
+		else if (gcc)
+			basicoptions ^= " -fmax-errors=9999";
 
 		// Use c++ (g++/clang) -fvisibility=hidden to make all hidden except those marked DLL_PUBLIC ie "default"
 #if __GNUC__ >= 4
@@ -1551,11 +1554,13 @@ ENVIRONMENT
 				// iif the xxx_common.so lib exists
 				if (word1 eq "#include") {
 					let libname = line.match(R"__(\b[a-z]{2,3}_common.h)__").field(".h", 1);
-					if (libname and not srcfilename.contains(libname) and libinfo(libname)) {
+					if (libname and not srcfilename.contains(libname)) {
 						if (past_programinit_libraryinit) {
 							//errput("compile:" ^srcfilename ^ " Should not occur after programinit or libraryinit: ");
 							//TRACE(line)
 						}
+						if (not libinfo(libname))
+							errputl(libname.quote() ^ " required but missing for " ^ srcfilename);
 						if (not linkoptions.contains(" -L" ^ libdir))
 							linkoptions ^= " -L" ^libdir;
 						linkoptions ^= " -l" ^ libname;

@@ -128,20 +128,21 @@ function main() {
 	}
 
 	{
-		TRACE(CURSOR)
-		if (not CURSOR.select("xo_clients by name_and_type"))
-			abort(lasterror());
+		if (connect()) {
+			TRACE(CURSOR)
+			if (not CURSOR.select("xo_clients by name_and_type"))
+				abort(lasterror());
 
-		TRACE(CURSOR)
-		var v1, v2, v3, v4;
-		pushselect(v2);
-		TRACE(CURSOR)
-		popselect(v2);
-		TRACE(CURSOR)
+			TRACE(CURSOR)
+			var v1, v2, v3, v4;
+			pushselect(v2);
+			TRACE(CURSOR)
+			popselect(v2);
+			TRACE(CURSOR)
 
-		while(CURSOR.readnext(ID))
-			printl(ID);
-
+			while(CURSOR.readnext(ID))
+				printl(ID);
+		}
 	}
 
 	{

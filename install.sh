@@ -189,6 +189,8 @@ function download_submodules {
 : Update apt
 : ----------
 :
+#	rm /var/lib/dpkg/lock-frontend || true
+
 	ls -l /var/cache/apt/ 2> /dev/null || true
 	while ! ls /var/cache/apt/*.bin 2> /dev/null && ! sudo apt-get -y update; do
 		sleep 1
@@ -315,13 +317,13 @@ function get_dependencies_for_build_and_install {
 : List installed postgresql
 : -------------------------
 :
-	apt list postgresql* --installed |& grep postgresql
+	apt list postgresql* --installed |& grep postgresql || echo No postgresql
 
 :
 : List available postgresql
 : -------------------------
 :
-	apt list postgresql*dev* |& grep postgresql
+	apt list postgresql*dev* |& grep postgresql || echo No postgresql
 
 :
 : Remove local libfmt if installed

@@ -25,8 +25,14 @@ set -euxo pipefail
 	rsync -avz ./dat/* ~/dat/
 
 :
-: Generate all headers first
-: ==========================
+: Compile commons first
+: =====================
+:
+	compile */*_common.* {S$COMPILER_OPTIONS}
+
+:
+: Generate all headers second
+: ===========================
 :
 	compile alt exo srv {hS$COMPILER_OPTIONS}
 
