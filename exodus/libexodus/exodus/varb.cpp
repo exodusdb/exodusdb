@@ -270,6 +270,6 @@ std::string VarError::stack(const std::size_t limit) const {
 // error: explicit specialization of 'clone' after instantiation
 #undef VAR_FRIEND
 #define VAR_FRIEND
-#include "varfriends_impl.h"
+#include "varb_friends_impl.h"
 
 }  // namespace exo

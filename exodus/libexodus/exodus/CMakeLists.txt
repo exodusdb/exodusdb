@@ -415,7 +415,7 @@
 				var.h
 				vartyp.h
 				varerr.h
-				varfriends.h
+				varb_friends.h
 				dim.h
 				rex.h
 			DESTINATION include/exodus
@@ -433,7 +433,7 @@
 #			var.h
 #			vartyp.h
 #			varerr.h
-#			varfriends.h
+#			varb_friends.h
 #			dim.h
 #			rex.h
 

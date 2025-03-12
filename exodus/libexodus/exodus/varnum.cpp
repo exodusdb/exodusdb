@@ -676,7 +676,7 @@ template<> PUBLIC bool VARBASE1::toBool() const {
 		}
 
 		// must be string - try to convert to numeric and do all tests again
-		this->isnum();
+		if (this->isnum()) {}
 	}
 }
 

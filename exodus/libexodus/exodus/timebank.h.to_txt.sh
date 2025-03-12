@@ -20,7 +20,7 @@ set -euxo pipefail
 #:
 #: '504 void dim::write(in filevar, in key) const'
 #:
-	( diff timebank.txt.new timebank.txt && echo "No changes." ) || ( cp -v timebank.txt.new timebank.txt && echo Updated )
+	diff timebank.txt.new timebank.txt || ( cp -v timebank.txt.new timebank.txt && echo Updated )
 
 	rm timebank.txt.new -f
 #:

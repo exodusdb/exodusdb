@@ -67,7 +67,8 @@ function main() {
 	if (OPTIONS.contains("V"))
 		logputl(cmd);
 
-	osshell(cmd) or lasterror().errputl("listdict:");
+	if (not osshell(cmd))
+		lasterror().errputl("listdict:");
 
 	return 0;
 }

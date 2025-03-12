@@ -1350,7 +1350,7 @@ public:
 	   IO   appender(const ARGS&... appendable) REF {
 				((*this) ^= ... ^= appendable);
 
-				false && (*this);
+				//false && (*this);
 //				return void;
 			}
 

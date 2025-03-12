@@ -458,7 +458,7 @@ function main() {
 			// If found matching "(" or ")" then replace both ( and ) with [ and ]
 			// charno2 points to opening (
 			// charno points to closing )
-			nlinesupdated++;
+			//nlinesupdated++;
 
 			// Change them together or not at all
 			srcline.paster(charno, 1, new_close);

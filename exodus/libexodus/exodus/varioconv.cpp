@@ -1156,7 +1156,7 @@ var  var::oconv(const char* conversion_in) const {
 										// Convert decimal to long integer
 										if (!(part.var_typ & VARTYP_INT)) {
 											part = part.round();  //actually to var_int i.e. int64_t
-											part.toInt();
+											if (part.toInt()) {}
 										}
 
 										// Convert integer to hexadecimal
@@ -1180,7 +1180,7 @@ var  var::oconv(const char* conversion_in) const {
 										if (!(part.var_typ & VARTYP_INT)) {
 											part = part.round();  //actually to var_int i.e. int64_t
 											//part.toLong();
-											part.toInt();
+											if (part.toInt()) {}
 										}
 
 										// Convert 64 bits to string of up to 64 chars '1' or '0'

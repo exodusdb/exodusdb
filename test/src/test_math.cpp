@@ -216,8 +216,8 @@ subroutine test2(in as, in bs) {
 	printl(bs, bi.toInt(), round(bs, 0));
 	//assert(ai.toInt() eq round(as,0));
 	//assert(bi.toInt() eq round(bs,0));
-	ai.toInt();
-	bi.toInt();
+	TRACE(ai.toInt())
+	TRACE(bi.toInt())
 
 	var va, vb, vc;
 
@@ -636,7 +636,7 @@ subroutine test2(in as, in bs) {
 	{
 		// Check that double is used in preference to int for lt/gt
 		var v1 = 1.9;
-		v1.toInt();
+		TRACE(v1.toInt())
 		printl(v1);
 		printl(v1.dump());
 		assert(v1 < 2);
@@ -647,7 +647,7 @@ subroutine test2(in as, in bs) {
 	{
 		// Check that double is used in preference to int for lt/gt
 		var v1 = -1.9;
-		v1.toInt();
+		TRACE(v1.toInt())
 		printl(v1);
 		printl(v1.dump());
 		assert(v1 <  1);

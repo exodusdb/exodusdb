@@ -256,7 +256,7 @@ function main() {
 	dx = 1;
 	//check join
 	dx.join().outputl();
-	(1 ^ FM ^ 1 ^ FM ^ 1);
+	TRACE(1 ^ FM ^ 1 ^ FM ^ 1);
 	assert(dx.join().outputl() eq (1 ^ FM ^ 1 ^ FM ^ 1));
 
 	//test dim=var.split()

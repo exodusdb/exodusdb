@@ -834,6 +834,8 @@ ENVIRONMENT
 	// find files, scan directories
 	///////////////////////////////
 
+	var common_filenames = "";
+
 	// nfiles may increase during the loop as directories may be included
 	//for (const var fileno : range(1, nfiles)) {
 	for (var fileno = 1; fileno <= nfiles; fileno++) {
@@ -915,13 +917,7 @@ ENVIRONMENT
 
 					}
 				}
-
-				// Compile it regardless in case something has changed
-				var cmd = "compile " ^ cppfilename ^ " {S" ^ OPTIONS ^ "}";
-//				if (verbose)
-//					cmd ^= " {V}";
-				if (not osshell(cmd))
-					loglasterror();
+				common_filenames ^= cppfilename ^ FM;
 			}
 
 			continue;
@@ -1029,7 +1025,23 @@ ENVIRONMENT
 
 		srcfilenames ^= srcfilename ^ FM;
 
+	} // fileno
+
+	// Compile commons asynchronously in advance in case new or something has changed
+	/////////////////////////////////////////////////////////////////////////////////
+	//
+	// /~lib/libxxx_common.so
+	// lib file MUST be present and up to date when compiling and linking any cpp file
+	// that has "#include <xxx_common.h>"
+	//
+	if (common_filenames) {
+		var cmd = "compile " ^ common_filenames.pop().convert(FM, " ");
+		if (verbose)
+			cmd ^= " {V}";
+		if (not osshell(cmd))
+			loglasterror();
 	}
+
 	srcfilenames.popper();
 
 	// Sort by file size so that the largest files start compiling first
@@ -1038,8 +1050,17 @@ ENVIRONMENT
 	// Note that the compilation rate (compiled files per second) is slow
 	// to start with but speeds up towards the end on the smaller files.
 	var filesizes = "";
-	for (var srcfilename : srcfilenames)
-		filesizes ^= osfile(srcfilename).f(1) ^ VM;
+	var fn = 0;
+	for (var srcfilename : srcfilenames) {
+		fn++;
+		if (locate(srcfilename, common_filenames)) {
+			// Suppress xxx_common.cpp files already compiled above
+			srcfilenames.updater(fn, "");
+		} else {
+			filesizes ^= osfile(srcfilename).f(1);
+		}
+		filesizes ^= _VM;
+	}
 	filesizes.popper();
 	//sort array wants parallel mv fields
 	srcfilenames.converter(FM, VM);
@@ -1053,8 +1074,11 @@ ENVIRONMENT
 ///////////
 
 	// This loop consists of a single function call handled by a thread
-	// with a very long lambda function argument
+	// with a VERY long lambda function argument
 	for (var srcfilename : srcfilenames) {
+
+		if (srcfilename.empty())
+			continue;
 
 		// Post to the thread pool a lambda expression that does the rest of the work
 		//
@@ -1559,7 +1583,7 @@ ENVIRONMENT
 							//errput("compile:" ^srcfilename ^ " Should not occur after programinit or libraryinit: ");
 							//TRACE(line)
 						}
-						if (not libinfo(libname))
+						if (not generateheadersonly and not libinfo(libname))
 							errputl(libname.quote() ^ " required but missing for " ^ srcfilename);
 						if (not linkoptions.contains(" -L" ^ libdir))
 							linkoptions ^= " -L" ^libdir;

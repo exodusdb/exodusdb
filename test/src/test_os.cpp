@@ -60,8 +60,10 @@ function main() {
 	// Cannot oswrite to a file in a non-existent dir
 	assert(not oswrite("xxx" on "d2/abc"));
 
-	osrmdir("test_main.1") or lasterror().errputl("test_os:");
-	osrmdir("test_main.2") or lasterror().errputl("test_os:");
+	if (not osrmdir("test_main.1"))
+		lasterror().errputl("test_os:");
+	if (not osrmdir("test_main.2"))
+		lasterror().errputl("test_os:");
 
 	assert(osmkdir("test_main.1"));
 	assert(osmkdir("test_main.2"));
@@ -136,8 +138,10 @@ function main() {
 //		assert(oslistd("*").convert(FM, "") eq osshellread("find . -maxdepth 1 ! -path . -type d -printf '%f\n\'").convert("\n\r", ""));
 	}
 
-	osrmdir("test_main.1") or lasterror().errputl("test_os:");
-	osrmdir("test_main.2") or lasterror().errputl("test_os:");
+	if (not osrmdir("test_main.1"))
+		lasterror().errputl("test_os:");
+	if (not osrmdir("test_main.2"))
+		lasterror().errputl("test_os:");
 
 	printl();
 	assert(osdir(_OSSLASH).match(_FM "\\d{5}" _FM "\\d{1,5}"));
@@ -150,13 +154,18 @@ function main() {
 	var subdir2	 = topdir1 ^ _OSSLASH "abcd";
 	var subdir2b = topdir1b ^ _OSSLASH "abcd";
 
-	osrmdir(tempdir, true) or lasterror().errputl("test_os:");
+	if (not osrmdir(tempdir, true))
+		lasterror().errputl("test_os:");
 
 	//try to remove any old versions (subdir first to avoid problems)
-	osrmdir(topdir1b, true) or lasterror().errputl("test_os:");
-	osrmdir(topdir1) or lasterror().errputl("test_os:");
-	osrmdir(subdir2b, true) or lasterror().errputl("test_os:");
-	osrmdir(subdir2) or lasterror().errputl("test_os:");
+	if (not osrmdir(topdir1b, true))
+		lasterror().errputl("test_os:");
+	if (not osrmdir(topdir1))
+		lasterror().errputl("test_os:");
+	if (not osrmdir(subdir2b, true))
+		lasterror().errputl("test_os:");
+	if (not osrmdir(subdir2))
+		lasterror().errputl("test_os:");
 
 	//need oermission to test root directory access
 	if (osmkdir(subdir2)) {
@@ -219,8 +228,10 @@ function main() {
 
 	{
 		// Verify cannot move a dir to an existing dir
-		osrmdir("t_move1.dir") or lasterror().errputl("test_os:");
-		osrmdir("t_move2.dir") or lasterror().errputl("test_os:");
+		if (not osrmdir("t_move1.dir"))
+			lasterror().errputl("test_os:");
+		if (not osrmdir("t_move2.dir"))
+			lasterror().errputl("test_os:");
 		assert(osmkdir("t_move1.dir"));
 		assert(osmkdir("t_move2.dir"));
 		assert(not osmove("t_move1.dir", "t_move2.dir"));
@@ -437,8 +448,10 @@ function main() {
 		assert(oswrite("" on "t_qwe1.cpp"));
 		assert(oswrite("" on "t_qwe2.cpp"));
 
-		osrmdir("t_qwe1", true) or lasterror().errputl("test_os:");
-		osrmdir("t_qwe2", true) or lasterror().errputl("test_os:");
+		if (not osrmdir("t_qwe1", true))
+			lasterror().errputl("test_os:");
+		if (not osrmdir("t_qwe2", true))
+			lasterror().errputl("test_os:");
 		//assert(osmkdir("t_qwe1"));
 		//assert(osmkdir("t_qwe2"));
 		assert(osmkdir("t_qwe1/t_qwe1a"));

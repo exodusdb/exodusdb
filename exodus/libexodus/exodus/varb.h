@@ -856,7 +856,7 @@ class PUBLIC var_base {
 		unsigned long long (C++11)
 
 	*/
-	CONSTEXPR
+	ND CONSTEXPR
 	operator Integer() const {
 		assertInteger(__PRETTY_FUNCTION__);
 
@@ -885,7 +885,7 @@ class PUBLIC var_base {
 		double,
 		long double
 	*/
-	CONSTEXPR
+	ND CONSTEXPR
 	operator FloatingPoint() const {
 		assertDecimal(__PRETTY_FUNCTION__);
 		EXO_SNITCH("var_base >Fp ")
@@ -904,7 +904,7 @@ class PUBLIC var_base {
 	// http://www.informit.com/guides/content.aspx?g=cplusplus&seqNum=297
 	// necessary to allow var to be used standalone in "if (xxx)" but see mv.h for discussion of
 	// using void* instead of bool
-	CONSTEXPR
+	ND CONSTEXPR
 	operator void*() const {
 		// result in an attempt to convert an uninitialised object to void* since there is a bool
 		// conversion when does c++ use automatic conversion to void* note that exodus operator !
@@ -917,7 +917,7 @@ class PUBLIC var_base {
 	// bool <- var
 	//////////////
 
-	CONSTEXPR
+	ND CONSTEXPR
 	operator bool() const {
 		EXO_SNITCH("var_base >boo")
 		return this->toBool();
@@ -968,28 +968,28 @@ class PUBLIC var_base {
 //		//std::cerr << "var(str)" << std::endl;
 //	}
 
-	CONSTEXPR
+	ND CONSTEXPR
 	operator std::string() const {
 		assertString(__PRETTY_FUNCTION__);
 		EXO_SNITCH("var_base >Str")
 		return var_str;
 	}
 
-	CONSTEXPR
+	ND CONSTEXPR
 	operator std::string_view() const {
 		assertString(__PRETTY_FUNCTION__);
 		EXO_SNITCH("var_base >SV ")
 		return std::string_view(var_str);
 	}
 
-	CONSTEXPR
+	ND CONSTEXPR
 	operator const char*() const {
 		assertString(__PRETTY_FUNCTION__);
 		EXO_SNITCH("var_base >ch*")
 		return var_str.c_str();
 	}
 
-	CONSTEXPR
+	ND CONSTEXPR
 	operator std::u32string() const {
 		EXO_SNITCH("var_base >u32")
 		return this->to_u32string();
@@ -1357,9 +1357,9 @@ class PUBLIC var_base {
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
 	// Unary
-	RETVAR operator+() const;
-	RETVAR operator-() const;
-	bool operator!() const {return !this->toBool();}
+	ND RETVAR operator+() const;
+	ND RETVAR operator-() const;
+	ND bool operator!() const {return !this->toBool();}
 
 	// Postfix increment/decrement - only on lvalue because can use + 1 on temporaries and not risk wrong code e.g. x.f(1)++;
 	RETVAR operator++(int) &;
@@ -1434,17 +1434,17 @@ class PUBLIC var_base {
 	// Declare friendship within the class
 	//////////////////////////////////////
 
-	// and an edited version "varfriend_impl.h" which contains implementations is included in var.cpp
-	// ENSURE all changes in varfriends.h and varfriends_impl.h are replicated using sed commands listed in the files
-	// Implementations are in varfriends_impl.h included in var.cpp
+	// and an edited version "varb_friend_impl.h" which contains implementations is included in var.cpp
+	// ENSURE all changes in varb_friends.h and varb_friends_impl.h are replicated using sed commands listed in the files
+	// Implementations are in varb_friends_impl.h included in var.cpp
 
 #define VAR_FRIEND friend
 #undef TBR
 #define TBR var_base&&
-#include "varfriends.h"
+#include "varb_friends.h"
 #undef TBR
 #define TBR var_base<var_mid<var>>&&
-//#include "varfriends_impl.h"
+//#include "varb_friends_impl.h"
 
 #pragma GCC diagnostic pop
 
@@ -1486,7 +1486,7 @@ class PUBLIC var_base {
 
 	// integer or floating point. optional prefix -, + disallowed, solitary . and - not allowed. Empty string is numeric 0
 	//CONSTEXPR
-	bool isnum() const;
+	ND bool isnum() const;
 
 	// Returns a copy of the var or 0 if non-numeric
 	ND RETVAR num() const;
@@ -1709,16 +1709,31 @@ protected:
 
 }; // class var_base
 
+//    ND PUBLIC exo::var operator+(CBR  lhs, CBR rhs);
+
+// varb_friends again to add [[nodicard]] attribute
+#undef VAR_FRIEND
+#define VAR_FRIEND
+#undef PUBLIC
+#define PUBLIC [[nodiscard]] __attribute__((visibility("default")))
+#include "varb_friends.h"
+#undef PUBLIC
+#define PUBLIC __attribute__((visibility("default")))
+////#include "varb_friends_impl.h"
+
 ////////////////////////////////
 // var_base forward declarations
 ////////////////////////////////
 
 // Forward declaration of some member functions to avoid errors like
 // error: explicit specialization of 'toBool' after instantiation
-template<> PUBLIC bool VARBASE1::toBool() const;
-template<> PUBLIC RETVAR VARBASE1::clone() const;
-template<> PUBLIC void VARBASE1::createString() const;
-template<> PUBLIC void VARBASE1::assertNumeric(const char* message, const char* varname/* = ""*/) const;
+template<> ND PUBLIC bool        VARBASE1::toBool() const;
+template<> ND PUBLIC int         VARBASE1::toInt() const;
+template<> ND PUBLIC double      VARBASE1::toDouble() const;
+template<> ND PUBLIC std::string VARBASE1::toString() &&; // only from rvalues
+template<> ND PUBLIC RETVAR      VARBASE1::clone() const;
+template<> ND PUBLIC void        VARBASE1::createString() const;
+template<> ND PUBLIC void        VARBASE1::assertNumeric(const char* message, const char* varname/* = ""*/) const;
 
 } // namespace exo
 

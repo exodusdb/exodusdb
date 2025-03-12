@@ -1,16 +1,16 @@
 //
-// MUST keep this file virtually identical between "varfriends.h" and "varfriends_impl.h"
+// MUST keep this file virtually identical between "varb_friends.h" and "varb_friends_impl.h"
 // except for commenting in/out the implementation section on the right hand side
 //
-// Update one of the other recommend varfriends.h and CREATE the other using one of the following:
+// Update one of the other recommend varb_friends.h and CREATE the other using one of the following:
 //
-// 1. varfriends.h -> varfriends_impl.h
+// 1. varb_friends.h -> varb_friends_impl.h
 //
-//		sed 's# /*IMPL*/ # /\*IMPL\*/ #' varfriends.h > varfriends_impl.h
+//		sed 's# /*IMPL*/ # /\*IMPL\*/ #' varb_friends.h > varb_friends_impl.h
 //
-// 2. varfriends_impl.h -> varfriends.h
+// 2. varb_friends_impl.h -> varb_friends.h
 //
-//		sed 's# /\*IMPL\*/#;//IMPL#' varfriends_impl.h > varfriends.h
+//		sed 's# /\*IMPL\*/#;//IMPL#' varb_friends_impl.h > varb_friends.h
 //
 	//////////////////////////////
 	// OPERATOR FRIENDS - pure var
