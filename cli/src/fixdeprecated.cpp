@@ -646,7 +646,7 @@ subroutine fix_include_common(in osfilenames) {
 				TRACE(common_lines)
 			}
 
-			printl("Moved", common_lines.fcount(FM), "#include common line(s) in", osfilename);
+			printl("Moved", common_lines.fcount(FM) - 1, "#include common line(s) in", osfilename);
 			printl(common_lines.convert(FM, "\n"));
 
 			src.inserter(programinit_libraryinit_fn, common_lines);

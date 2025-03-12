@@ -12,7 +12,7 @@ function main(in cmd) {
 	let started = ostimestamp();
 	select(cmd);
 	if (SYSTEM.f(33) and not supersilent) {
-		logputl(" done", elapsedtimetext(started, ostimestamp()));
+		logputl(" done ", elapsedtimetext(started, ostimestamp()));
 	}
 	return 0;
 }

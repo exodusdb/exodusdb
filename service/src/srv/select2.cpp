@@ -17,7 +17,7 @@ var dictids;
 var options;
 var maxnrecs;
 //var nlimitfields; // num
-dim hexx;
+//dim hexx;
 var useactivelist;	// num
 var v69;
 var v70;
@@ -91,13 +91,13 @@ function main(in filenamex, in linkfilename2, in sortselect0, in dictids0, in op
 
 	datax = "";
 
-	if (linkfilename2) {
-		hexx.redim(8);
-		// changed to allow language characters to pass through x80-xF9
-		for (const var ii : range(249, 255)) {
-			hexx[ii - 249] = "%" ^ ii.oconv("MX").oconv("R(0)#2");
-		}  // ii;
-	}
+//	if (linkfilename2) {
+//		hexx.redim(8);
+//		// changed to allow language characters to pass through x80-xF9
+//		for (const var ii : range(249, 255)) {
+//			hexx[ii - 249] = "%" ^ ii.oconv("MX").oconv("R(0)#2");
+//		}  // ii;
+//	}
 
 	useactivelist = sortselect.contains("%SELECTLIST%");
 	sortselect.replacer("%SELECTLIST%", "");
@@ -547,12 +547,12 @@ nextrec:
 			if (not rowpart)
 				break;
 
-			rowpart.replacer("%", "%25");
-			// changed to allow language characters to pass through x80-xF9
-			for (const var ii : range(249, 255)) {
-				rowpart.replacer(chr(ii), hexx[ii - 249]);
-			}  // ii;
-
+//			rowpart.replacer("%", "%25");
+//			// changed to allow language characters to pass through x80-xF9
+//			for (const var ii : range(249, 255)) {
+//				rowpart.replacer(chr(ii), hexx[ii - 249]);
+//			}  // ii;
+//
 			// output converted row part
 			//call osbwrite(rowpart, linkfile2, dataptr);
 			if (not osbwrite(rowpart, linkfile2, dataptr)) {
