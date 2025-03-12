@@ -1,6 +1,6 @@
-*
-!*.cpp
-!*.h
-!*.1
-!*.html
-!.gitignore
+#*
+#!*.cpp
+#!*.h
+#!*.1
+#!*.html
+#!.gitignore

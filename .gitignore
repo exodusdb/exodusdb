@@ -26,10 +26,7 @@ x
 y
 z
 x.sh
-p1.cpp
-p2.cpp
-p3.cpp
-p4.cpp
-p5.cpp
-p6.cpp
 last.upgrade.txt
+p[0-9].cpp
+l[0-9].cpp
+t[0-9].cpp
