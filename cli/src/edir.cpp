@@ -11,7 +11,15 @@ function main() {
 	if (COMMAND.f(2).contains(OSSLASH))
 		COMMAND.inserter(2, "DOS");
 
-	// Try to activate a default select list if no ID provided
+	// Extract main args
+	let dbfilename = COMMAND.f(2);
+	let keys       = COMMAND.f(3).convert(",", FM);
+	let fieldno    = COMMAND.f(4);
+
+	// (R)aw option only converts FM to NL and leaves VM SM TM ST untouched
+	let txtfmt = OPTIONS.contains("R") ? "TX1" : "TX";
+
+	// Try to activate a default select list if no keys provided
 	var listid = "";
 	if (not COMMAND.f(3) and COMMAND.f(2) ne "DOS") {
 		listid = "default";
@@ -21,28 +29,20 @@ function main() {
 			listid = "";
 	}
 
-	//var dbfilename = COMMAND.f(2).convert(".", "_");
-	let dbfilename = COMMAND.f(2);
-	ID = COMMAND.f(3).unquote().unquote();	 //spaces are quoted
-	let fieldno = COMMAND.f(4);
-
-	//quit if arguments missing. ID is optional if a select is available
-	if (not dbfilename or (not ID and listid.empty()))
+	//quit if arguments missing. IDs is optional if a select is available
+	if (not dbfilename or (not keys and listid.empty()))
 		abort(
 			"Syntax is:"
-			"\nedir DBFILENAME KEY [FIELDNO]"
+			"\nedir DBFILENAME KEYS,... [FIELDNO]"
 			"\nor"
 			"\nedir OSFILEPATH [LINENO] [OPTIONS]"
+			"\n"
+			"\nMultiple keys must be separated by commas, not spaces."
+			"\nKeys with spaces in them must be quoted."
 			"\n"
 			"\nOPTION 'R' = Show raw tm/sm etc."
 			"\nOPTION 'T' = Print to standard output (terminal)"
 		);
-
-	// Raw
-	var txtfmt = "TX";
-	// Raw option only converts FM to NL and leaves VM SM TM ST as are
-	if (OPTIONS.contains("R"))
-		txtfmt ^= "1";
 
 	if (not fieldno.isnum())
 		abort("fieldno must be numeric");
@@ -58,8 +58,8 @@ function main() {
 		abort(lasterror());
 
 	// If ID from command line
-	if (ID)
-		selectkeys(ID);
+	if (keys)
+		selectkeys(keys);
 
 	// Maximum linux execution command line is crudely 130-140,000 short filename of 15 bytes
 	// getconf ARG_MAX
@@ -79,6 +79,8 @@ function main() {
 	var converttext;
 
 	while (readnext(ID)) {
+
+		ID.unquoter();	 //spaces in keys have to be quoted
 
 		//get the record from the database (or filesystem if "dbfilename" is "DOS")
 		bool is_new_record = false;
@@ -141,11 +143,12 @@ function main() {
 		if (not is_new_record and not fileinfo_old)
 			abort("Could not write local copy for editing " ^ temposfilename);
 
-		// Be careful to keep these lined up
-		IDs ^= ID ^ FM_;
-		osfilenames ^= temposfilename.quote() ^ " ";
-		fileinfo_olds ^= fileinfo_old.lower() ^ FM_;
+		// Keep these stricty in parallel for use in the post edit processing
+		IDs            ^= ID ^ FM_;
+		fileinfo_olds  ^= fileinfo_old.lower() ^ FM_;
 		is_new_records ^= is_new_record ^ FM_;
+
+		osfilenames ^= temposfilename.quote() ^ " ";
 
 	} // multiple IDs
 
@@ -164,8 +167,12 @@ function main() {
 
 		IDno ++;
 
+		// Recalculate the temp os file name of the record ID
 		let temposfilename = getosfilename(workdir, dbfilename, fieldno, ID);
+
+		// Extract saved info about the db record
 		bool is_new_record = is_new_records.f(IDno);
+		let fileinfo_old = fileinfo_olds.f(IDno).raise();
 
 		let editcmd = editor ^ " " ^ temposfilename.quote();
 		var passno = 0;
@@ -201,12 +208,8 @@ function main() {
 			}
 			let orig_unconverted_text = RECORD.f(fieldno);
 
-			//process after editor has been closed
-
-			let fileinfo_new = osfile(temposfilename);
-			let fileinfo_old = fileinfo_olds.f(IDno).raise();
-
 			//get edited osfile info or abort if not new record (never saved)
+			let fileinfo_new = osfile(temposfilename);
 			if (not fileinfo_new) {
 				if (not is_new_record)
 					abort("Could not read local copy after editing " ^ temposfilename);
