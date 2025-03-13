@@ -7,8 +7,27 @@ function main() {
 	//http://www.nano-editor.org/docs.php
 	let editor = "nano";
 
-	//quit if arguments
-	if (fcount(COMMAND, FM) < 2)
+	// Allow for first argument to be an os file path
+	if (COMMAND.f(2).contains(OSSLASH))
+		COMMAND.inserter(2, "DOS");
+
+	// Try to activate a default select list if no ID provided
+	var listid = "";
+	if (not COMMAND.f(3) and COMMAND.f(2) ne "DOS") {
+		listid = "default";
+		if (getlist(listid))
+			logputl("using list: ", listid);
+		else
+			listid = "";
+	}
+
+	//var dbfilename = COMMAND.f(2).convert(".", "_");
+	let dbfilename = COMMAND.f(2);
+	ID = COMMAND.f(3).unquote().unquote();	 //spaces are quoted
+	let fieldno = COMMAND.f(4);
+
+	//quit if arguments missing. ID is optional if a select is available
+	if (not dbfilename or (not ID and listid.empty()))
 		abort(
 			"Syntax is:"
 			"\nedir DBFILENAME KEY [FIELDNO]"
@@ -18,15 +37,6 @@ function main() {
 			"\nOPTION 'R' = Show raw tm/sm etc."
 			"\nOPTION 'T' = Print to standard output (terminal)"
 		);
-
-	// Allow for first argument to be an os file path
-	if (COMMAND.f(2).contains(OSSLASH))
-		COMMAND.inserter(2, "DOS");
-
-	//var dbfilename = COMMAND.f(2).convert(".", "_");
-	let dbfilename = COMMAND.f(2);
-	ID = COMMAND.f(3).unquote().unquote();	 //spaces are quoted
-	let fieldno = COMMAND.f(4);
 
 	// Raw
 	var txtfmt = "TX";
@@ -47,209 +57,321 @@ function main() {
 //		abort("Cannot open db file " ^ dbfilename);
 		abort(lasterror());
 
-	//get the record from the database (or filesystem if "dbfilename" is "DOS")
-	bool is_new_record = false;
-	if (not read(RECORD, dbfile, ID)) {
-		//check if exists in upper or lower case
-		var key2 = ID.ucase();
-		if (key2 == ID)
-			key2.lcaser();
-		if (read(RECORD, dbfile, key2))
-			ID = key2;
-		else {
-			RECORD = "";
-			is_new_record = true;
-		}
-	}
+	// If ID from command line
+	if (ID)
+		selectkeys(ID);
 
-	if (is_new_record)
-		printl("New record");
+	// Maximum linux execution command line is crudely 130-140,000 short filename of 15 bytes
+	// getconf ARG_MAX
+	// 2,097,152
 
-	var text = RECORD.f(fieldno);
-
-	// Treat VMs as FMs etc if editing a specific field
-	if (fieldno)
-		text.raiser();
-
-	// print record to standard output (terminal)
-	// useful (and standardises) reading records from bash scripts
-	if (OPTIONS.contains("T")) {
-		text.converter(_ALL_FMS, _VISIBLE_FMS);
-		if (not osshell("echo " ^ text.quote())) {
-			loglasterror();
-		}
-		return 0;
-	}
-
-	// Escape data format to text format
-	let converttext = dbfilename != "DOS" or text.contains(FM);
-	if (converttext)
-		text = text.oconv(txtfmt);
-
-	//put the text on a temp osfile in order to edit it
-	var temposfilename = dbfilename ^ "~" ^ ID;
-	let invalidfilechars = "/ \"\'\u00A3$%^&*(){}[]:;#<>?,./\\|";
-	temposfilename.lcaser();
-	temposfilename.converter(invalidfilechars, str("-", len(invalidfilechars)));
-	temposfilename ^= "-pid" ^ ospid();
-	if (dbfilename.starts("dict.") and fieldno)
-		temposfilename ^= ".sql";
-	else
-		temposfilename ^= ".tmp";
-	//oswrite(text, temposfilename);
-	temposfilename.prefixer(ostempdirpath());
-	if (osfile(temposfilename) && not osremove(temposfilename))
+	// Create and use a temporary work dir
+	let workdir = ostempdirpath() ^ "~e" ^ rnd(999'999);
+	if (not osmkdir(workdir))
 		abort(lasterror());
-	if (not is_new_record and not oswrite(text, temposfilename)) {
-		abort(lasterror());
-	}
 
-	//record osfile update time
-	let fileinfo = osfile(temposfilename);
-	if (not is_new_record and not fileinfo)
-		abort("Could not write local copy for editing " ^ temposfilename);
+	// Keep in parallel
+	var IDs = "";
+	var osfilenames = "";
+	var fileinfo_olds = "";
+	var is_new_records = "";
 
-	let isdict = dbfilename.starts("dict.") or (dbfilename == "DOS" and ID.contains("dat/dict."));
+	var converttext;
 
-	let editcmd = editor ^ " " ^ temposfilename.quote();
-	while (true) {
+	while (readnext(ID)) {
 
-		//fire up the editor
-		printl(editcmd);
-		if (not osshell(editor ^ " " ^ temposfilename))
-			lasterror().errputl("edir:");
-
-		//process after editor has been closed
-
-		let fileinfo2 = osfile(temposfilename);
-
-		//get edited osfile info or abort if not new record (never saved)
-		if (not fileinfo2) {
-			if (not is_new_record)
-				abort("Could not read local copy after editing " ^ temposfilename);
-			stop();
+		//get the record from the database (or filesystem if "dbfilename" is "DOS")
+		bool is_new_record = false;
+		if (not read(RECORD, dbfile, ID)) {
+			//check if exists in upper or lower case
+			var key2 = ID.ucase();
+			if (key2 == ID)
+				key2.lcaser();
+			if (read(RECORD, dbfile, key2))
+				ID = key2;
+			else {
+				RECORD = "";
+				is_new_record = true;
+			}
 		}
 
-		//osfile has been edited
-		else if (fileinfo2 != fileinfo) {
+		if (is_new_record)
+			printl("New record");
 
-			var text2 = osread(temposfilename);
+		// fieldno 0/"" means whole record
+		var text = RECORD.f(fieldno);
 
-			if (text2 == "") {
+		// Treat VMs as FMs etc if editing a specific field
+		if (fieldno)
+			text.raiser();
 
-				//abort("Could not read local copy after editing " ^ temposfilename);
-				var reply;
-				var options = "Yes]No"_var;
+		// print record to standard output (terminal)
+		// useful (and standardises) reading records from bash scripts
+		if (OPTIONS.contains("T")) {
+			text.converter(_ALL_FMS, _VISIBLE_FMS);
+			if (not osshell("echo " ^ text.quote())) {
+				loglasterror();
+			}
+			// TODO continue for select list?
+			return 0;
+		}
+
+		// Escape data format to text format
+		converttext = dbfilename != "DOS" or text.contains(FM);
+		if (converttext)
+			text = text.oconv(txtfmt);
+
+		//put the text on a temp osfile in order to edit it
+		let temposfilename = getosfilename(workdir, dbfilename, fieldno, ID);
+
+		// Remove any previous version of the OS file
+//		if (osfile(temposfilename) && not osremove(temposfilename))
+//			abort(lasterror());
+
+		// Check osfile does not already exist in the new dir
+		if (osfile(temposfilename))
+			abort(ID.quote() ^ " should not already exist in " ^ workdir.quote());
+
+		// Write the osfile
+		if (not is_new_record and not oswrite(text, temposfilename))
+			abort(lasterror());
+
+		// Record osfile update time
+		let fileinfo_old = osfile(temposfilename);
+		if (not is_new_record and not fileinfo_old)
+			abort("Could not write local copy for editing " ^ temposfilename);
+
+		// Be careful to keep these lined up
+		IDs ^= ID ^ FM_;
+		osfilenames ^= temposfilename.quote() ^ " ";
+		fileinfo_olds ^= fileinfo_old.lower() ^ FM_;
+		is_new_records ^= is_new_record ^ FM_;
+
+	} // multiple IDs
+
+	let isdict = not fieldno and ( dbfilename.starts("dict.") or (dbfilename == "DOS" and ID.contains("dat/dict.")));
+
+	//fire up the editor initially for all temposfilenames, IDs
+	if (not osshell(editor ^ " " ^ osfilenames))
+		lasterror().errputl("edir:");
+
+	var IDno = 0;
+
+	for (let id : IDs) {
+
+		// Ensure the real ID is available in case any future code starts relying on it
+		ID = id;
+
+		IDno ++;
+
+		let temposfilename = getosfilename(workdir, dbfilename, fieldno, ID);
+		bool is_new_record = is_new_records.f(IDno);
+
+		let editcmd = editor ^ " " ^ temposfilename.quote();
+		var passno = 0;
+
+		while (true) {
+
+			passno++;
+
+			//fire up the editor to handle issues
+			if (passno > 1) {
+				printl(editcmd);
+				if (not osshell(editor ^ " " ^ temposfilename))
+					lasterror().errputl("edir:");
+			}
+
+			// Get the original current unupdated dbrecord in case it has been updated since we started
+			if (not read(RECORD, dbfile, ID)) {
+				RECORD = "";
+				if (not is_new_record) {
+					logput("Warning: Record was deleted from db since we started editing it");
+					// TODO question user what to do.
+					is_new_record = true;
+//					var reply;
+//					var options = "Yes]No"_var;
+//					if (not is_new_record)
+//						options ^= VM ^ "Delete it.";
+//					if (not decide("Warning: Writing an empty record.\nAre you sure?", options, reply, 2)) {
+//						continue;
+//					}
+//					if (reply == 2)
+//						break;
+				}
+			}
+			let orig_unconverted_text = RECORD.f(fieldno);
+
+			//process after editor has been closed
+
+			let fileinfo_new = osfile(temposfilename);
+			let fileinfo_old = fileinfo_olds.f(IDno).raise();
+
+			//get edited osfile info or abort if not new record (never saved)
+			if (not fileinfo_new) {
 				if (not is_new_record)
-					options ^= VM ^ "Delete it.";
-				if (not decide("Warning: Writing an empty record.\nAre you sure?", options, reply, 2)) {
-					continue;
-				}
-				if (reply == 2)
-					break;
-
-				if (reply == 3) {
-					if (not dbfile.deleterecord(ID))
-						abort(lasterror());
-					printl(dbfilename, ID, "deleted.");
-					stop();
-				}
+					abort("Could not read local copy after editing " ^ temposfilename);
+				stop();
 			}
 
-			// Unescape text back to data format
-			//if (dbfilename != "DOS") {
-			if (converttext) {
+			//osfile has been edited
+			else if (fileinfo_new != fileinfo_old) {
 
-				trimmerlast(text2, _EOL);
+				let edited_text = osread(temposfilename);
 
-				//convert to original format
-				text2 = text2.iconv(txtfmt);
+				if (edited_text == "") {
 
-			}
-
-			// Convert FMs back to VMs etc. if editing a specific field
-			if (fieldno)
-				text2.lowerer();
-
-			// Validate dict F/S items
-			if (isdict) {
-				var dictrec = text2;
-
-				// Convert to FMs to check dict item format
-				if (dbfilename == "DOS") {
-					trimmerlast(dictrec, _EOL);
-					dictrec = dictrec.iconv(txtfmt);
-				}
-
-				// Very similar code in edir and syncdat
-				if (var("FS").contains(dictrec.f(1))) {
-
-					let options = "";
-					var reply = "";
-
-					// Check justification
-					if (not var("LRTC").contains(dictrec.f(9))) {
-						if (decide("Field 9 of F/S dict items cannot be " ^ dictrec.f(9).quote() ^ "\nField 9 of F/S dict items must be L, R, C, T.\nFix it?", options, reply, 1) != "Yes")
-							abort("");
+					//abort("Could not read local copy after editing " ^ temposfilename);
+					var reply;
+					var options = "Yes]No"_var;
+					if (not is_new_record)
+						options ^= VM ^ "Delete it.";
+					if (not decide("Warning: Writing an empty record.\nAre you sure?", options, reply, 2)) {
 						continue;
 					}
+					if (reply == 2)
+						break;
 
-					// Check width
-					if (not dictrec.f(10).isnum()) {
-						if (decide("Field 10 of F/S items cannot be " ^ dictrec.f(10).quote() ^ "\nField 10 of F/S items must be numeric\nFix it?", options, reply, 1) != "Yes")
-							abort("");
-						continue;
+					if (reply == 3) {
+						if (not dbfile.deleterecord(ID))
+							abort(lasterror());
+						printl(dbfilename, ID, "deleted.");
+						stop();
 					}
 				}
-			}
 
-			if (text2 != text or is_new_record) {
+				// lambda deconverter
+				auto deconverter = [](in edited_text, const bool converttext, in fieldno, in txtfmt) -> var {
 
-				//printx("Ok to update? ");
-				//var reply=inputl();
-				let reply = "Y";
+					// Unescape text back to data format
+					//if (dbfilename != "DOS") {
+					var deconverted_text = edited_text;
+					if (converttext) {
 
-				let newrecord = fieldno ? RECORD.update(fieldno, text2) : text2;
+						deconverted_text.trimmerlast(_EOL);
 
-				//keep trying to update - perhaps futilely
-				//at least temp osfile will be left in the directory
-				while (ucase(reply).starts("Y") and true) {
+						//convert to original format \n -> FM etc.
+						deconverted_text = deconverted_text.iconv(txtfmt);
 
-//					if (write(newrecord, dbfile, ID)) {
-					bool ok = true;
-					if (dbfile == "DOS")
-						ok = oswrite(newrecord on ID);
-					else
-						write(newrecord, dbfile, ID);
-					if (ok) {
-						printl(dbfilename ^ " " ^ ID ^ " > db");
+					}
 
-						//generate/update database functions if saved a symbolic dictionary record
-						if (isdict and newrecord.f(1) == "S" and newrecord.f(8).contains("/"
-																												"*pgsql")) {
-							let oscmd = "dict2sql " ^ dbfilename ^ " " ^ ID;
-							if (not osshell(oscmd))
-								lasterror().errputl("edir:");
+					// Convert FMs back to VMs etc. if editing a specific field
+					if (fieldno)
+						deconverted_text.lowerer();
+
+					return deconverted_text;
+				};
+
+				// Deconvert text
+				let deconverted_text = deconverter(edited_text, converttext, fieldno, txtfmt);
+
+				// Validate dict F/S items
+				if (isdict) {
+					var dictrec = deconverted_text;
+
+//					// Convert to FMs to check dict item format
+//					if (dbfilename == "DOS") {
+//						trimmerlast(dictrec, _EOL);
+//						dictrec = dictrec.iconv(txtfmt);
+//					}
+
+					// Very similar code in edir and syncdat
+					if (var("FS").contains(dictrec.f(1))) {
+
+						let options = "";
+						var reply = "";
+
+						// Check justification
+						if (not var("LRTC").contains(dictrec.f(9))) {
+							if (decide("Field 9 of F/S dict items cannot be " ^ dictrec.f(9).quote() ^ "\nField 9 of F/S dict items must be L, R, C, T.\nFix it?", options, reply, 1) != "Yes")
+								abort("");
+							continue;
 						}
 
-						break;
+						// Check width
+						if (not dictrec.f(10).isnum()) {
+							if (decide("Field 10 of F/S items cannot be " ^ dictrec.f(10).quote() ^ "\nField 10 of F/S items must be numeric\nFix it?", options, reply, 1) != "Yes")
+								abort("");
+							continue;
+						}
 					}
-					var temp;
-					if (not temp.input()) {}
+				} // validate dict
+
+				if (deconverted_text != orig_unconverted_text or is_new_record) {
+
+					//printx("Ok to update? ");
+					//var reply=inputl();
+					let reply = "Y";
+
+					let newrecord = fieldno ? RECORD.update(fieldno, deconverted_text) : deconverted_text;
+
+					//keep trying to update - perhaps futilely
+					//at least temp osfile will be left in the directory
+					while (ucase(reply).starts("Y") and true) {
+
+	//					if (write(newrecord, dbfile, ID)) {
+
+						bool ok = true;
+						if (dbfile == "DOS")
+							ok = oswrite(newrecord on ID);
+						else
+							write(newrecord, dbfile, ID);
+						if (ok) {
+							printl(dbfilename ^ " " ^ ID ^ " > db");
+
+							//generate/update database functions if saved a symbolic dictionary record
+							if (isdict and newrecord.f(1) == "S" and newrecord.f(8).contains("/"
+																													"*pgsql")) {
+								let oscmd = "dict2sql " ^ dbfilename ^ " " ^ ID;
+								if (not osshell(oscmd))
+									lasterror().errputl("edir:");
+							}
+
+							break;
+						}
+						var temp;
+						if (not temp.input("Press Enter:")) {}
+					}
 				}
 			}
+			break;
 		}
-		break;
-	}
+
+//		//clean up any temporary osfile
+//		if (osfile(temposfilename)) {
+//			if (not osremove(temposfilename)) {
+//				lasterror().errputl();
+//			}
+//		}
+
+	} // osfilename
 
 	//clean up any temporary osfile
-	if (osfile(temposfilename)) {
-		if (not osremove(temposfilename)) {
-			lasterror().errputl();
-		}
-	}
+	if (not workdir.osrmdir(true))
+		loglasterror();
 
 	return 0;
+}
+
+function getosfilename(in dir, in dbfilename, in fieldno, in id) {
+
+	var temposfilename = dbfilename ^ "~" ^ id;
+	let invalidfilechars = R"__(\"')__" "\u00A3 $%^&*(){}[]:;#<>?,./|";
+	temposfilename.lcaser();
+	// TODO use escaped chars to avoid two records converting to the same key
+	// e.g. currently both "aa,bb" and "aa.bb" will be converted to "aa-bb"
+	temposfilename.converter(invalidfilechars, str("-", len(invalidfilechars)));
+//	temposfilename ^= "-pid" ^ ospid();
+	if (dbfilename.starts("dict.") and fieldno)
+		temposfilename ^= ".sql";
+//	else
+//		temposfilename ^= ".dat";
+
+	if (dir.last() != "/")
+		temposfilename.prefixer("/");
+
+	temposfilename.prefixer(dir);
+
+	return temposfilename;
 }
 
 programexit()

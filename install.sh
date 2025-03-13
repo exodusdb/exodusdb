@@ -556,7 +556,7 @@ function build_and_install {
 :
 : Note: Using 'echo sudo dd' trick because 'sudo echo xxx > yyy' doesnt sudo the '> yyy' bit.
 :
-	echo 'export PATH="${PATH}:~/bin"' | sudo dd of=/etc/profile.d/exodus.sh status=none
+	printf 'export PATH="${PATH}:~/bin"\nexport LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:~/lib"\n' | sudo dd of=/etc/profile.d/exodus.sh status=none
 :
 } # end of stage B - Build and install
 

@@ -283,7 +283,8 @@ function main() {
 	// Compile list with optimisation. Its inner loops benefit from efficiency
 
 	if (USERNAME == "EXODUS") {
-		var(SENTENCE).oswrite("nlist") or lasterror().errputl("nlist:");
+		if (not var(SENTENCE).oswrite("nlist"))
+			lasterror().errputl("nlist:");
 		logputl();
 		logputl(SENTENCE);
 	}
@@ -376,8 +377,11 @@ function main() {
 		abort("");
 	}
 
-	if (LISTACTIVE) {
-		fromtimestamp = date().ostimestamp(SYSTEM.f(25));
+//	if (LISTACTIVE) {
+	// Include time before prior select if running as a service
+	let request_started = SYSTEM.f(25);
+	if (request_started) {
+		fromtimestamp = var().ostimestamp(request_started);
 	} else {
 		fromtimestamp = ostimestamp();
 	}
@@ -2495,7 +2499,8 @@ subroutine emailing() {
 
 		// Reset the output file to start another email
 		printptr = 0;
-		var("").oswrite(SYSTEM.f(2)) or lasterror().errputl("nlist:");
+		if (not var("").oswrite(SYSTEM.f(2)))
+			lasterror().errputl("nlist:");
 
 	}
 

@@ -10,6 +10,15 @@ function main() {
 	// EITHER 1. Call/perform nlist library if paging is not required
 	/////////////////////////////////////////////////////////////////
 
+	var listid = "";
+	if (not locate("lists", COMMAND)) {
+		listid = "default";
+		if (not getlist(listid))
+			listid = "";
+		else
+			logputl("Using select list ", listid);
+	}
+
 	if (not TERMINAL or OPTIONS.contains("N")) {
 
 		//call nlist();
@@ -17,6 +26,10 @@ function main() {
 		//TRACE(SENTENCE)
 		// Change list into nlist in order to call the nlist library
 		let result = perform("n" ^ SENTENCE);
+
+		if (listid)
+			deletelist("default");
+
 		return result;
 	}
 
@@ -68,8 +81,18 @@ function main() {
 	oscmd ^= " | pager --chop-long-lines --quit-if-one-screen";
 	//oscmd ^= "";
 
-	if (not osshell(oscmd))
-		abort(lasterror());
+	// TODO find some way to avoid having to clean up list
+	// deletelist in the beginning doesnt work.
+//	if (not osshell(oscmd))
+//		abort(lasterror());
+	var result = osshell(oscmd);
+	var lasterrorx = lasterror();
+
+	if (listid)
+		deletelist(listid);
+
+	if (not result)
+		abort(lasterrorx);
 
 	return 0;
 }

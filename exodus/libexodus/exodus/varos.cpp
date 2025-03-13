@@ -159,6 +159,10 @@ static bool checknotabsoluterootfolder(std::string dirpath) {
 	if ((!SLASH_IS_BACKSLASH && dirpath[0] == OSSLASH_ && var(dirpath).count(_OSSLASH) < 3) ||
 		(SLASH_IS_BACKSLASH && (dirpath[1] == ':') && (dirpath[2] == OSSLASH_))) {
 
+		// Exclude tmp dir
+		if (dirpath.starts_with(var().ostempdirpath().toString()))
+			return true;
+
 		// Only check existing dirs
 		if (not var(dirpath).osdir())
 			return true;
