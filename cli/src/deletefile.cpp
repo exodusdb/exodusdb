@@ -12,12 +12,12 @@ function main() {
 
 	for (let filename : filenames) {
 
-		if (not open(filename)) {
-			errputl(lasterror());
-			result = 1;
-			continue;
-		}
-
+//		if (not open(filename)) {
+//			errputl(lasterror());
+//			result = 1;
+//			continue;
+//		}
+//
 		if (not deletefile(filename)) {
 			errputl(lasterror());
 			result = 1;

@@ -285,8 +285,8 @@ function main() {
 	if (USERNAME == "EXODUS") {
 		if (not var(SENTENCE).oswrite("nlist"))
 			lasterror().errputl("nlist:");
-		logputl();
-		logputl(SENTENCE);
+		//logputl();
+		//logputl(SENTENCE);
 	}
 
 	//for printtx
@@ -1445,7 +1445,9 @@ x1exit:
 		head ^= _FM;
 	}
 
-	head.prefixer(FM);
+	// Why?
+	if (printptr)
+		head.prefixer(FM);
 
 	orighead = head;
 
@@ -1635,7 +1637,7 @@ nextrec:
 
 	if (not(silent) and not(printfilename.unassigned())) {
 		if (recn <= 2) {
-			logputl();
+			//logputl();
 		}
 		if (printfilename and not(mod(recn, 10))) {
 			//first recn will be 2

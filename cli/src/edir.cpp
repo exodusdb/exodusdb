@@ -80,7 +80,8 @@ function main() {
 
 	while (readnext(ID)) {
 
-		ID.unquoter();	 //spaces in keys have to be quoted
+		ID.unquoter(); // Spaces in keys have to be quoted
+		ID.unquoter(); // Handle overquoting
 
 		//get the record from the database (or filesystem if "dbfilename" is "DOS")
 		bool is_new_record = false;

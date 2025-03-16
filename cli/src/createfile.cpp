@@ -12,15 +12,15 @@ function main() {
 
 	for (let filename : filenames) {
 
-		if (open(filename)) {
-			errputl("Cannot create ", filename, " - it already exists");
-			result = 1;
-			continue;
-		}
-
+//		if (open(filename)) {
+//			errputl("Cannot create ", filename, " - it already exists");
+//			result = 1;
+//			continue;
+//		}
+//
 		if (not createfile(filename)) {
 			result = 1;
-			errputl("Cannot create ", filename);
+			errputl(lasterror());
 			continue;
 		}
 

@@ -6,6 +6,7 @@ programinit()
 	// instead of exodus's oo-style syntax "xxx.yyy().zzz()".
 	//
 	let filename = "xo_clients";
+	let use_perform = true;
 
 function main() {
 
@@ -145,33 +146,39 @@ function main() {
 
 	gosub sortselect(file, " by timestamp");
 
-	gosub sortselect(file, " with type \"'B'\" by balance");
+	if (use_perform)
+		 // perform("list ...") doesnt need overquoting
+		gosub sortselect(file, " with type 'B' by balance");
+	else
+		// osshell("list ...") needs overquoting
+		gosub sortselect(file, " with type \"'B'\" by balance");
 
 	var cmd = "list " ^ filename ^ " id-supp";
 	printl("\nList the file using ", quote(cmd));
-	//perform(cmd);
-	if (not osshell(cmd))
+	if (use_perform)
+		perform(cmd);
+	else if (not osshell(cmd))
 		loglasterror();
 
 	cmd = "list " ^ dictfilename;
 	printl("\nList the dict using ", quote(cmd));
-	//perform(cmd);
+//	if (use_perform)
+//		perform(cmd);
+//	else
 	if (not osshell(cmd))
 		loglasterror();
 
 	if (cleanup) {
 		printl("\nCleaning up. Delete the files");
-		//deletefile(file);
 		if (var().open(filename) and not deletefile(file)) {
 			abort(lasterror());
 		}
-		//deletefile(dictfile);
 		if (var().open(dictfilename) and not deletefile(dictfile)) {
 			abort(lasterror());
 		}
 	}
 
-	//committrans();
+	// committrans();
 	if (not committrans())
 		abort(lasterror());
 
@@ -212,8 +219,9 @@ subroutine sortselect(in file, in sortselectclause) {
 
 	let cmd = "list " ^ filename ^ " " ^ sortselectclause ^ " id-supp";
 	printl("\nList the file using ", quote(cmd));
-	//perform(cmd) or loglasterror("testsort:" ^ cmd);
-	if (not osshell(cmd))
+	if (use_perform)
+		perform(cmd);
+	else if (not osshell(cmd))
 		loglasterror();
 
 	//	rollbacktrans();
