@@ -4,6 +4,8 @@
 
 #include <req_common.h>
 
+// OBSOLETE? listen calls autorun3 directly
+
 libraryinit()
 
 #include <autorun3.h>

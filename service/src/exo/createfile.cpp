@@ -1,6 +1,8 @@
 #include <exodus/library.h>
 libraryinit()
 
+// OBSOLETE. No callers. replaced by var::createfile
+
 function main() {
 
 	// syntax is:

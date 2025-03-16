@@ -266,7 +266,7 @@ function main() {
 					if (SYSTEM.f(33)) {
 						gosub failsys();
 					}
-					perform("OFF");
+					logoff();
 					logoff();
 				}
 			}
@@ -533,7 +533,7 @@ nextreport:
 
 			// chr(7).output().str(3);
 			call note(msg);
-			perform("OFF");
+			logoff();
 			logoff();
 		}
 
@@ -547,7 +547,7 @@ nextreport:
 				//stop();
 				//std::unreachable();
 			}
-			perform("OFF");
+			logoff();
 			logoff();
 			//std::unreachable();
 		}
@@ -1727,7 +1727,7 @@ subroutine_noreturn failsys() {
 		loglasterror();
 
 	// and quit
-	perform("OFF");
+	logoff();
 	logoff();
 
 	//return;

@@ -1,6 +1,7 @@
 #include <exodus/library.h>
 #include <srv_common.h>
 
+// performed by generalproxy mode "ABOUT"
 libraryinit()
 
 #include <service_common.h>

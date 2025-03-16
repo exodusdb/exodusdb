@@ -1,6 +1,8 @@
 #include <exodus/library.h>
 #include <srv_common.h>
 
+// performed by srv/initgeneral2.cpp
+
 libraryinit()
 
 #include <log.h>

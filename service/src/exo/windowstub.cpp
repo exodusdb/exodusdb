@@ -1,6 +1,8 @@
 #include <exodus/library.h>
 libraryinit()
 
+// OBSOLETE. No callers
+
 #include <systemsubs.h>
 
 function main() {

@@ -2,6 +2,8 @@
 #include <srv_common.h>
 #include <req_common.h>
 
+// executed by listen to handle EXECUTE commands from web clients
+
 #include <req_common.h>
 
 libraryinit()

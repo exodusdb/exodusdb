@@ -1,6 +1,8 @@
 #include <exodus/library.h>
 libraryinit()
 
+// performed in many places as a prefix to actually commands to prepare and postprocess text output
+
 var docrep;
 var scrn;
 var temp;

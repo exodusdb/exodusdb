@@ -258,207 +258,207 @@ function main(in request1, in request2in, in request3in, in request4in, in reque
 		ANS = "";
 		return 0;
 
-	} else if (request1 == "PATCHANDRUNONCE") {
-
-		// never patch and run on development systems (therefore can only test elsewhere)
-		// OFF while developing this feature
-		isdevsys = isdevsys and date() > 19034;
-		// if system<61> or isdevsys then
-		// if (isdevsys or not(VOLUMES)) {
-		if (isdevsys) {
-			ANS = "";
-			return 0;
-		}
-
-		let live  = request2;
-		processes = request3;
-
-		// //////////////////////////////////////////////////////////////////////////
-		// Look for NEOPATCH.1 file in three locations
-		// //////////////////////////////////////////////////////////////////////////
-		// The file must have been created after the exodus version date
-		// and after the last patch date if any
-		// //////////////////////////////////////////////////////////////////////////
-		// 1. DATA\CLIENTX\NEOPATCH.1
-		//               - install in one EXODUS database
-		// 2. DATA\NEOPATCH.1
-		//               - install in all active EXODUS databases in one installation
-		// 3. D:\NEOPATCH.1 or D:\HOSTS\NEOPATCH.1
-		//               - install in all active EXODUS database and installations
-		let patchcode = "NEOPATCH";
-		var patchdirs = "../DATA/" ^ SYSTEM.f(17) ^ FM ^ "../DATA/" ^ FM ^ "../../";
-		patchdirs.converter("/", OSSLASH);
-
-		for (const var patchn : range(1, 3)) {
-
-			// skip if no patch file or not dated today
-			let patchfilename = patchdirs.f(patchn) ^ patchcode ^ ".1";
-			let patchfileinfo = patchfilename.osfile();
-			if (patchfileinfo.f(2) < date()) {
-				goto nextpatch;
-			}
-
-			// open patch file
-			if (not patchfile.osopen(patchfilename)) {
-				goto nextpatch;
-			}
-
-			// ensure patch file is complete
-			offset = patchfileinfo.f(1) - 18;
-			//call osbread(tt, patchfile, offset, 18);
-			if (not osbread(tt, patchfile, offset, 18))
-				abort(lasterror());
-			if (tt ne("!" ^ FM ^ "!END!OF!INSTALL!")) {
-				goto nextpatch;
-			}
-
-			// verify correct file heading and determine patchid from the file
-			offset_zero = 0;
-			//call osbread(firstblock, patchfile, offset_zero, 65000);
-			if (not osbread(firstblock, patchfile, offset_zero, 65000))
-				abort(lasterror());
-			patchid = firstblock.f(2).cut(5);
-//			if (firstblock.f(1) != "00000DEFINITIONS" or patchid.first(8) != "INSTALL*") {
-			if (firstblock.f(1) != "00000DEFINITIONS" or not patchid.starts("INSTALL*")) {
-				goto nextpatch;
-			}
-
-			// skip if patchid is older than 30 days
-			// if field(patchid,'*',3) < date()-30 then
-			// goto nextpatch
-			// end
-
-			// extract DEFINITIONS install key and rec from first block
-			// rec is "00000DEFINITIONS^00033INSTALL*X*19034*35287^...."
-			// remove 00000DEFINITIONS^
-			firstblock.remover(1);
-			// remove 5 byte length field and cut out key+rec
-			keyandrec = firstblock.b(6, firstblock.first(5));
-			// remove key
-			rec = keyandrec.remove(1, 0, 0);
-
-			// installation wide lock on it
-			if (not lockrecord("", processes, patchid)) {
-				goto nextpatch;
-			}
-
-			// skip if already installed in this database
-			if (var().read(DEFINITIONS, patchid)) {
-				call unlockrecord("", processes, patchid);
-				goto nextpatch;
-			}
-
-			// prevent from ever running this patch again on this database
-			rec.write(DEFINITIONS, patchid);
-
-			// get current EXODUS version timestamp
-			versiondatetime = "";
-			versionkey		= "general/version.dat";
-			versionkey.converter("/", OSSLASH);
-			if (tt.osread(versionkey)) {
-				tt.trimmer();
-				let vdate = tt.field(" ", 2, 3).iconv("D");
-				let vtime = tt.field(" ", 1).iconv("MT");
-				if (vdate and vtime) {
-					versiondatetime = vdate ^ "." ^ vtime.oconv("R(0)#5");
-				}
-			}
-
-			// get patch timestamp
-			patchdatetime = patchid.field("*", 3);
-
-			// skip patch if older than installation
-			skipreason = "";
-			skipemail  = "";
-			if (versiondatetime and patchdatetime < versiondatetime) {
-				skipreason = "Patch is older than installation version - " ^ oconv(versiondatetime, "[DATETIME,4*]");
-				skipemail  = 1;
-			}
-
-			// skip patch if older than last patch
-			if (not lastpatchid.read(DEFINITIONS, "INSTALL*LAST")) {
-				lastpatchid = "";
-			}
-			if (lastpatchid) {
-				let lastpatchdatetime = lastpatchid.field("*", 3);
-				if (patchdatetime < lastpatchdatetime) {
-					skipreason = "Patch is older than the last patch - " ^ oconv(lastpatchdatetime, "[DATETIME,4*]");
-				}
-			}
-
-			// ensure that we only ever runonce something just loaded from a patch
-			runoncekey = "$" ^ patchid.field("*", 2) ^ ".RUNONCE";
-			DEFINITIONS.deleterecord(runoncekey);
-
-			if (not skipemail) {
-
-				// list the files and records that were installed
-				let subject = rec.f(1) ^ " - " ^ patchid.field("*", 2) ^ " " ^ oconv(patchid.field("*", 3), "[DATETIME,4*]");
-				var body	= subject ^ " " ^ patchfilename ^ FM;
-				if (skipreason) {
-					body(-1) = FM ^ "NOT PATCHED - " ^ skipreason ^ FM ^ FM;
-				}
-				let nfiles = rec.f(3).fcount(_VM);
-				for (const var filen : range(1, nfiles)) {
-					body(-1) = rec.f(3, filen) ^ " " ^ rec.f(4, filen) ^ "  " ^ rec.f(5, filen);
-				}  // filen;
-
-				// message EXODUS only
-				call sysmsg(body, "NEOPATCH: " ^ subject, "EXODUS");
-			}
-
-			if (not skipreason) {
-
-				// perform the installation
-				let cmd = "INSTALL " ^ patchcode ^ " " ^ oscwd().first(2) ^ " (IO)";
-				printl(cmd);
-				perform(cmd);
-			}
-
-			// record success/failure before any autorun
-			(date() ^ "." ^ time().oconv("R(0)#5")).writef(DEFINITIONS, patchid, 6);
-
-			skipreason.writef(DEFINITIONS, patchid, 7);
-
-			if (skipreason) {
-				// release
-				call unlockrecord("", processes, patchid);
-				goto nextpatch;
-			}
-
-			// save the last patch info - used to prevent backward patching
-			patchid.write(DEFINITIONS, "INSTALL*LAST");
-
-			// post install runonce if installed
-			// if $PATCH.RUNONCE or $datasetcode.RUNONCE appears in definitions
-			// if the runonce record appears in the definitions then
-			// run it, save it and delete it
-			if (runonce.read(DEFINITIONS, runoncekey)) {
-				perform("RUN DEFINITIONS " ^ runoncekey.cut(1));
-				// leave it for inspection
-				// delete definitions,runoncekey
-			}
-
-			// trigger other processes to restart by updating SYSTEM.CFG
-			if (tt.osread("system.cfg")) {
-				//var(tt).oswrite("system.cfg");
-				if (not var(tt).oswrite("system.cfg"))
-					abort(lasterror());
-			}
-
-			// release
-			call unlockrecord("", processes, patchid);
-
-			// indicate patches applied and may need restart
-			ANS = 1;
-
-			// dont check any other patchdirs
-			return 0;
-
-nextpatch:;
-		}  // patchn;
-
-		ANS = "";
+//	} else if (request1 == "PATCHANDRUNONCE") {
+//
+//		// never patch and run on development systems (therefore can only test elsewhere)
+//		// OFF while developing this feature
+//		isdevsys = isdevsys and date() > 19034;
+//		// if system<61> or isdevsys then
+//		// if (isdevsys or not(VOLUMES)) {
+//		if (isdevsys) {
+//			ANS = "";
+//			return 0;
+//		}
+//
+//		let live  = request2;
+//		processes = request3;
+//
+//		// //////////////////////////////////////////////////////////////////////////
+//		// Look for NEOPATCH.1 file in three locations
+//		// //////////////////////////////////////////////////////////////////////////
+//		// The file must have been created after the exodus version date
+//		// and after the last patch date if any
+//		// //////////////////////////////////////////////////////////////////////////
+//		// 1. DATA\CLIENTX\NEOPATCH.1
+//		//               - install in one EXODUS database
+//		// 2. DATA\NEOPATCH.1
+//		//               - install in all active EXODUS databases in one installation
+//		// 3. D:\NEOPATCH.1 or D:\HOSTS\NEOPATCH.1
+//		//               - install in all active EXODUS database and installations
+//		let patchcode = "NEOPATCH";
+//		var patchdirs = "../DATA/" ^ SYSTEM.f(17) ^ FM ^ "../DATA/" ^ FM ^ "../../";
+//		patchdirs.converter("/", OSSLASH);
+//
+//		for (const var patchn : range(1, 3)) {
+//
+//			// skip if no patch file or not dated today
+//			let patchfilename = patchdirs.f(patchn) ^ patchcode ^ ".1";
+//			let patchfileinfo = patchfilename.osfile();
+//			if (patchfileinfo.f(2) < date()) {
+//				goto nextpatch;
+//			}
+//
+//			// open patch file
+//			if (not patchfile.osopen(patchfilename)) {
+//				goto nextpatch;
+//			}
+//
+//			// ensure patch file is complete
+//			offset = patchfileinfo.f(1) - 18;
+//			//call osbread(tt, patchfile, offset, 18);
+//			if (not osbread(tt, patchfile, offset, 18))
+//				abort(lasterror());
+//			if (tt ne("!" ^ FM ^ "!END!OF!INSTALL!")) {
+//				goto nextpatch;
+//			}
+//
+//			// verify correct file heading and determine patchid from the file
+//			offset_zero = 0;
+//			//call osbread(firstblock, patchfile, offset_zero, 65000);
+//			if (not osbread(firstblock, patchfile, offset_zero, 65000))
+//				abort(lasterror());
+//			patchid = firstblock.f(2).cut(5);
+////			if (firstblock.f(1) != "00000DEFINITIONS" or patchid.first(8) != "INSTALL*") {
+//			if (firstblock.f(1) != "00000DEFINITIONS" or not patchid.starts("INSTALL*")) {
+//				goto nextpatch;
+//			}
+//
+//			// skip if patchid is older than 30 days
+//			// if field(patchid,'*',3) < date()-30 then
+//			// goto nextpatch
+//			// end
+//
+//			// extract DEFINITIONS install key and rec from first block
+//			// rec is "00000DEFINITIONS^00033INSTALL*X*19034*35287^...."
+//			// remove 00000DEFINITIONS^
+//			firstblock.remover(1);
+//			// remove 5 byte length field and cut out key+rec
+//			keyandrec = firstblock.b(6, firstblock.first(5));
+//			// remove key
+//			rec = keyandrec.remove(1, 0, 0);
+//
+//			// installation wide lock on it
+//			if (not lockrecord("", processes, patchid)) {
+//				goto nextpatch;
+//			}
+//
+//			// skip if already installed in this database
+//			if (var().read(DEFINITIONS, patchid)) {
+//				call unlockrecord("", processes, patchid);
+//				goto nextpatch;
+//			}
+//
+//			// prevent from ever running this patch again on this database
+//			rec.write(DEFINITIONS, patchid);
+//
+//			// get current EXODUS version timestamp
+//			versiondatetime = "";
+//			versionkey		= "general/version.dat";
+//			versionkey.converter("/", OSSLASH);
+//			if (tt.osread(versionkey)) {
+//				tt.trimmer();
+//				let vdate = tt.field(" ", 2, 3).iconv("D");
+//				let vtime = tt.field(" ", 1).iconv("MT");
+//				if (vdate and vtime) {
+//					versiondatetime = vdate ^ "." ^ vtime.oconv("R(0)#5");
+//				}
+//			}
+//
+//			// get patch timestamp
+//			patchdatetime = patchid.field("*", 3);
+//
+//			// skip patch if older than installation
+//			skipreason = "";
+//			skipemail  = "";
+//			if (versiondatetime and patchdatetime < versiondatetime) {
+//				skipreason = "Patch is older than installation version - " ^ oconv(versiondatetime, "[DATETIME,4*]");
+//				skipemail  = 1;
+//			}
+//
+//			// skip patch if older than last patch
+//			if (not lastpatchid.read(DEFINITIONS, "INSTALL*LAST")) {
+//				lastpatchid = "";
+//			}
+//			if (lastpatchid) {
+//				let lastpatchdatetime = lastpatchid.field("*", 3);
+//				if (patchdatetime < lastpatchdatetime) {
+//					skipreason = "Patch is older than the last patch - " ^ oconv(lastpatchdatetime, "[DATETIME,4*]");
+//				}
+//			}
+//
+//			// ensure that we only ever runonce something just loaded from a patch
+//			runoncekey = "$" ^ patchid.field("*", 2) ^ ".RUNONCE";
+//			DEFINITIONS.deleterecord(runoncekey);
+//
+//			if (not skipemail) {
+//
+//				// list the files and records that were installed
+//				let subject = rec.f(1) ^ " - " ^ patchid.field("*", 2) ^ " " ^ oconv(patchid.field("*", 3), "[DATETIME,4*]");
+//				var body	= subject ^ " " ^ patchfilename ^ FM;
+//				if (skipreason) {
+//					body(-1) = FM ^ "NOT PATCHED - " ^ skipreason ^ FM ^ FM;
+//				}
+//				let nfiles = rec.f(3).fcount(_VM);
+//				for (const var filen : range(1, nfiles)) {
+//					body(-1) = rec.f(3, filen) ^ " " ^ rec.f(4, filen) ^ "  " ^ rec.f(5, filen);
+//				}  // filen;
+//
+//				// message EXODUS only
+//				call sysmsg(body, "NEOPATCH: " ^ subject, "EXODUS");
+//			}
+//
+//			if (not skipreason) {
+//
+//				// perform the installation
+//				let cmd = "INSTALL " ^ patchcode ^ " " ^ oscwd().first(2) ^ " (IO)";
+//				printl(cmd);
+//				perform(cmd);
+//			}
+//
+//			// record success/failure before any autorun
+//			(date() ^ "." ^ time().oconv("R(0)#5")).writef(DEFINITIONS, patchid, 6);
+//
+//			skipreason.writef(DEFINITIONS, patchid, 7);
+//
+//			if (skipreason) {
+//				// release
+//				call unlockrecord("", processes, patchid);
+//				goto nextpatch;
+//			}
+//
+//			// save the last patch info - used to prevent backward patching
+//			patchid.write(DEFINITIONS, "INSTALL*LAST");
+//
+//			// post install runonce if installed
+//			// if $PATCH.RUNONCE or $datasetcode.RUNONCE appears in definitions
+//			// if the runonce record appears in the definitions then
+//			// run it, save it and delete it
+//			if (runonce.read(DEFINITIONS, runoncekey)) {
+//				perform("RUN DEFINITIONS " ^ runoncekey.cut(1));
+//				// leave it for inspection
+//				// delete definitions,runoncekey
+//			}
+//
+//			// trigger other processes to restart by updating SYSTEM.CFG
+//			if (tt.osread("system.cfg")) {
+//				//var(tt).oswrite("system.cfg");
+//				if (not var(tt).oswrite("system.cfg"))
+//					abort(lasterror());
+//			}
+//
+//			// release
+//			call unlockrecord("", processes, patchid);
+//
+//			// indicate patches applied and may need restart
+//			ANS = 1;
+//
+//			// dont check any other patchdirs
+//			return 0;
+//
+//nextpatch:;
+//		}  // patchn;
+//
+//		ANS = "";
 
 	} else if (request1 == "CONVLOG") {
 

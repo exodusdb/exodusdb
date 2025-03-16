@@ -1,6 +1,8 @@
 #include <exodus/library.h>
 #include <srv_common.h>
 
+// chained to by initgeneral and executes LISTEN
+
 libraryinit()
 
 #include <getbackpars.h>
@@ -93,7 +95,7 @@ listen:
 
 	// stop if cant backup because another process is backing up or hung processes
 	if (msg_.contains("FILEMAN-SHUTDOWN")) {
-		perform("OFF");
+		logoff();
 		logoff();
 	}
 
@@ -275,7 +277,7 @@ listen:
 			call upgrade();
 
 			if (SYSTEM.f(125)) {
-				perform("OFF");
+				logoff();
 				logoff();
 			}
 		}
@@ -307,7 +309,7 @@ listen:
 	}
 
 	if (halt) {
-		perform("OFF");
+		logoff();
 		logoff();
 	}
 
@@ -315,7 +317,7 @@ listen:
 		// if NET LISTEN LISTEN LISTEN - then terminate if too many errors
 		if (cmd.len() > 100) {
 			printl(msg_);
-			perform("OFF");
+			logoff();
 		}
 		cmd.replacer(" INTRANET", "");
 		chain("NET " ^ cmd);

@@ -119,7 +119,7 @@ inpname:
 	if (xdata == "") {
 fail:
 		//  if @username='EXODUS' then stop
-		perform("OFF");
+		logoff();
 		logoff();
 	}
 

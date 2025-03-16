@@ -1,6 +1,8 @@
 #include <exodus/library.h>
 libraryinit()
 
+// TODO replace all occurrences in client code and obsolete this function
+
 function main(in type, in input0, in mode, io output) {
 
 	// just wraps the standard iconv oconv

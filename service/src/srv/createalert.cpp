@@ -1,6 +1,8 @@
 #include <exodus/library.h>
 #include <srv_common.h>
 
+// performed in initgeneral2 and client init code
+
 libraryinit()
 
 #include <authorised.h>

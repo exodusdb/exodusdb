@@ -1,6 +1,7 @@
 #include <exodus/library.h>
 libraryinit()
 
+// OBSOLETE - replaced by gosub htmllib2("GETCSS",
 function main(io css, in version = "") {
 
 	// NB quirk in ie mimiced by mozilla table dont inherit size

@@ -1,6 +1,8 @@
 #include <exodus/library.h>
 libraryinit()
 
+// OBSOLETE - replaced by htmllib2("GETSORTJS",
+
 var t2;
 
 function main(io tx) {

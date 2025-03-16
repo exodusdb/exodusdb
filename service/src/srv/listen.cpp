@@ -267,9 +267,9 @@ function main_init() {
 	// to allow pressing B for backup and quit without other processes starting up
 	lastmonitortime = time();
 	// dont do autoruns until 1 or 2 mins after starting (to let other processes start)
-	lastautorun = time() + var(60).rnd();
+	lastautorun = time() + rnd(60);
 	// do autorun immediately on dev system
-	if (var("exodus.id").osfile()) {
+	if ("exodus.id"_var.osfile()) {
 		lastautorun = time() - 60;
 	}
 
@@ -376,15 +376,11 @@ function main_init() {
 	// tracing=0
 	tracing = 1;
 
-	// ensure unique sorttempfile
-	// if sysvar('SET',192,102,'R':('0000':THREADNO)[-5,5]:'.SFX') else null
-	// call sysvar_192_102"SET", "R" ^ ("0000" ^ THREADNO).last(5) ^ ".SFX");
-
 	nrequests = SYSTEM.f(35) + 0;
 
-	printl(var("-").str(50));
+	printl(str("-", 50));
 	printl(THREADNO ^ ":", "EXODUS", datasetcode, oscwd());
-	printl(var("-").str(50));
+	printl(str("-", 50));
 
 	SYSTEM(33) = 1;
 
@@ -433,22 +429,17 @@ function main_init() {
 	tdir = "../logs/" ^ datasetcode;
 	tdir.converter("/", OSSLASH);
 	tdir.lcaser();
-//	if (not var().osopen(tdir.lcase())) {
 	if (not tdir.osdir()) {
 		if (STATUS != 2) {
-			//call osmkdir(tdir.lcase());
 			if (not osmkdir(tdir.lcase()))
 				abort(lasterror());
 		}
 	}
 
 	// check/make the annual log folder
-	// call shell('MD ':logpath)
-//	if (not var().osopen(logpath)) {
 	// osopen now only opens regular files
 	if (not logpath.osdir()) {
 		if (STATUS != 2) {
-			//call osmkdir(logpath);
 			if (not osmkdir(logpath))
 				abort(lasterror());
 		}
@@ -464,13 +455,9 @@ function main_init() {
 		logptr = logfilename.osfile().f(1);
 
 		// if the last bit closes the log, overwrite it to continue the log
-		// t2=logptr-6
-		// call osbread(tt,logfile,logfilename,t2,6)
-		// if tt='</Log>' then logptr=t2
 
 		// backup and read the last 6 characters of the log
 		logptr -= 6;
-		//call osbread(tt, logfile, logptr, 6);
 		if (not osbread(tt, logfile, logptr, 6))
 			abort(lasterror());
 		// maybe backup the log pointer to overwrite the closing tag
@@ -481,7 +468,6 @@ function main_init() {
 	} else {
 
 		// initialise xml log file header
-		//call oswrite("", logfilename);
 		if (not oswrite("", logfilename))
 			abort(lasterror());
 		if (logfile.osopen(logfilename)) {
@@ -556,7 +542,7 @@ function loop_init() {
 	// /////////
 
 	// clear any file handles
-	var().osflush();
+	osflush();
 
 	// on win95 this runs at same speed in full screen or windowed
 
@@ -576,7 +562,7 @@ nextsearch0:
 		return false;
 	}
 
-	var().cleardbcache();
+	clearcache();
 
 	// restore the program stack
 	// call programstackstack);
@@ -620,8 +606,7 @@ nextsearch0:
 		 " Listening"
 		 " " ^
 		 elapsedtimetext(lastrequestdate.ostimestamp(lastrequesttime), ostimestamp());
-	//var(tt).oswrite("process." ^ THREADNO);
-	if (not var(tt).oswrite("process." ^ THREADNO))
+	if (not tt.oswrite("process." ^ THREADNO))
 		loglasterror();
 
 	call unlockrecord("PROCESSES", processes, THREADNO);
@@ -652,12 +637,12 @@ nextsearch0:
 	gosub flagserveractive();
 
 	// run autorun, syncdata and clear old files once a minute
-	if ((time() - lastautorun > 60) or time() lt(lastautorun - 600)) {
+	if ((time() - lastautorun > 60) or time() < (lastautorun - 600)) {
 		lastautorun = time();
 
 		// call autorun instead of perform to allow output to remain on screen
 		// (BUT errors cause listen to crash and restart)
-		if (not var("autorun.end").osfile()) {
+		if (not osfile("autorun.end")) {
 			call autorun3();
 		}
 
@@ -693,7 +678,7 @@ subroutine wait() {
 	if (linkfilename1.osfile()) {
 		if (tracing) {
 			printl("CANNOT DELETE ", linkfilename1, " GENERATING ANOTHER");
-			linkfilename1 = var(99999999).rnd() ^ ".0";
+			linkfilename1 = rnd(99999999) ^ ".0";
 		}
 	}
 	linkfilename0 = linkfilename1.cut(inpath.len());
@@ -712,7 +697,7 @@ subroutine wait() {
 	perform(cmd);
 
 	// quit if connection no longer active. postgres restarted/stopped.
-	if (not var().sqlexec("SELECT NOW()"))
+	if (not sqlexec("SELECT NOW()"))
 		logoff();
 
 	// place a lock to indicate processing
@@ -760,11 +745,6 @@ function loop_exit() {
 		// leading space to avoid chars after ESC pressed being ANSI control sequences
 		tt.replacer(chr(27), "Esc");
 		call note("You have pressed the " ^ tt ^ " key to exit|press again to confirm|", "UB", buffer);
-		// loop
-		// input reply,-1:
-		// until reply
-		// call ossleep(1000*1)
-		// repeat
 		echo(0);
 		reply.inputn(1);
 		reply.lcaser();
@@ -897,23 +877,23 @@ function loop_exit() {
 	call getbackpars(bakpars);
 
 	// call monitor approx every minute +/- 10 seconds to avoid checking all the time
-	if ((time() - lastmonitortime).abs() > 60 + var(20).rnd() - 10) {
+	if ((time() - lastmonitortime).abs() > 60 + rnd(20) - 10) {
 		// if abs(time()-lastmonitortime)>(0+rnd(20)-10) then
 
 		// monitor updates nagios and optionally checks for upgrades
 		call monitor2();
 		lastmonitortime = time();
 
-		// install and run patches
-		call listen5("PATCHANDRUNONCE", live, processes);
-		patched = ANS;
-
-		if (patched) {
-			request1 = "RESTART PATCHED";
-
-			// gosub main_exit();
-			return false;
-		}
+//		// install and run patches
+//		call listen5("PATCHANDRUNONCE", live, processes);
+//		patched = ANS;
+//
+//		if (patched) {
+//			request1 = "RESTART PATCHED";
+//
+//			// gosub main_exit();
+//			return false;
+//		}
 
 		// monitor might have run so avoid processing another request without resetting
 		// goto nextsearch0;
@@ -929,7 +909,7 @@ function loop_exit() {
 	}
 
 	// backup
-	if (charx and var("Bb").contains(charx)) {
+	if (charx and "Bb"_var.contains(charx)) {
 		goto backup;
 	}
 	if (time() >= bakpars.f(3) and time() <= bakpars.f(4)) {
@@ -937,7 +917,7 @@ function loop_exit() {
 		// call log2('LISTEN: Backup time for ':datasetcode,logtime)
 
 		// delay 0 to 10 seconds closedown randomly to avoid conflict with identically configured processes
-		call ossleep(1000 * var(10).rnd());
+		ossleep(1000 * rnd(10));
 
 		dow = date().oconv("DW");
 
@@ -950,12 +930,12 @@ function loop_exit() {
 
 		} else if (bakpars.f(11)) {
 			call log2("backup is suppressed. Quitting.", logtime);
-			perform("OFF");
+			logoff();
 			logoff();
 
 		} else if (not bakpars.f(5).contains(dow)) {
 			call log2("Not right day of week " ^ bakpars.f(5) ^ " Logging off", logtime);
-			perform("OFF");
+			logoff();
 			logoff();
 
 		} else {
@@ -1001,7 +981,7 @@ subroutine main_exit() {
 
 	call listen5("UNLOCKLONGPROCESS");
 
-	var().unlockall();
+	unlockall();
 
 	// call restorescreenorigscrn, origattr);
 
@@ -1021,7 +1001,7 @@ subroutine main_exit() {
 
 	// esc does this
 	if ((origsysmode or request1 == "STOPDB") or halt) {
-		perform("OFF");
+		logoff();
 		logoff();
 	}
 
@@ -1063,12 +1043,12 @@ function got_link() {
 		}
 		// print 'lock locks,REQUEST*':linkfilename1
 
-		var().osflush();
+		osflush();
 openlink1:
 		if (not linkfile1.osopen(linkfilename1)) {
 			// remove from future candidate files?
 			// delay 100ms = 1/10th of second
-			call ossleep(100);
+			ossleep(100);
 			if (tracing) {
 				printl("CANNOT OPEN RW ", linkfilename1.quote());
 			}
@@ -1079,22 +1059,16 @@ openlink1:
 		timex = time();
 		// readlink1:
 		request_ = "";
-		// osbread request from linkfile1 at 0 length 256*256-4
 		tt = 0;
-		//call osbread(request_, linkfile1, tt, 256 * 256 - 4);
 		if (not osbread(request_, linkfile1, tt, 256 * 256 - 4))
 			abort(lasterror());
 
 		// if cannot read it then try again
 		if (request_ == "" and time() == timex) {
-			var().osflush();
+			osflush();
 			// delay 100ms = 1/10th of second
-			call ossleep(100);
+			ossleep(100);
 			linkfile1.osclose();
-			// 			if (not linkfile1.osopen(linkfilename1)) {
-			// 				{}
-			// 			}
-			// 			goto readlink1;
 			goto openlink1;
 		}
 
@@ -1105,14 +1079,11 @@ openlink1:
 		request_.replacer("\\r", _FM);
 		request_.trimmerlast(_FM);
 
-		// replyfilename=ucase(request<1>)
-		// eg D:\EXODUS\DATA\DEVDTEST\|3130570.1
 		// eg /var/www/html/exodus2/EXODUS//data/BASIC/~9979714.1
 		replyfilename = request_.f(1);
 		request_.remover(1);
 
 		// lock the replyfilename to prevent other listeners from processing it
-		// unlock locks,'REQUEST*':replyfilename
 		if (not lockrecord("", locks1, "REQUEST*" ^ replyfilename)) {
 			// if tracing then print 'CANNOT LOCK LOCKS,':quote('REQUEST*':replyfilename)
 			continue;
@@ -1128,9 +1099,9 @@ deleterequest:
 		if (osfile(linkfilename1) and not linkfilename1.osremove())
 			abort(lasterror());
 		if (linkfilename1.osfile()) {
-			var().osflush();
+			osflush();
 			// delay 100ms = 1/10th of second
-			call ossleep(100);
+			ossleep(100);
 			ntries += 1;
 			// if tracing then print 'COULD NOT DELETE ':linkfile1
 			if (ntries < 100) {
@@ -1140,11 +1111,6 @@ deleterequest:
 				printl("COULD NOT DELETE ", linkfile1);
 			}
 		}
-
-		// leave these in place for the duration of the process
-		// they should be cleared by unlock all somewhere at the end or beginning
-		// unlock locks,'REQUEST*':replyfilename
-		// unlock locks,'REQUEST*':linkfilename1
 
 		// found a good one so process it
 		// gosub onerequest();
@@ -1325,9 +1291,6 @@ function request_init() {
 			inptr = 0;
 			for (let blockn : range(1, nblocks)) {
 
-				// osbread datx[blockn] from linkfilename2 at ((blockn-1)*inblocksize) length inblocksize
-				// tt=(blockn-1)*inblocksize
-				//call osbread(datx[blockn], linkfile2, inptr, inblocksize);
 				if (not osbread(datx[blockn], linkfile2, inptr, inblocksize))
 					abort(lasterror());
 
@@ -1410,7 +1373,6 @@ cannotopenlinkfile2:
 
 			// read whole file upto limit
 			var	 offset_zero = 0;
-			//call osbread(data_, linkfile2, offset_zero, maxstrlen);
 			if (not osbread(data_, linkfile2, offset_zero, maxstrlen))
 				abort(lasterror());
 
@@ -1540,7 +1502,7 @@ subroutine process() {
 			abort(lasterror());
 		gosub process2();
 		if (not committrans())
-			response_ = "Error: Cannot commit " ^ var().lasterror() ^ FM ^ response_;
+			response_ = "Error: Cannot commit " ^ lasterror() ^ FM ^ response_;
 	}
 
 	// With try/catch so errors can be dealt with properly
@@ -1553,7 +1515,7 @@ subroutine process() {
 				abort(lasterror());
 			gosub process2();
 			if (not committrans())
-				response_ = "Error: Cannot commit " ^ var().lasterror() ^ FM ^ response_;
+				response_ = "Error: Cannot commit " ^ lasterror() ^ FM ^ response_;
 
 		} catch (VarError& e) {
 			//rollbacktrans();
@@ -2078,7 +2040,7 @@ noupdate:
 		// make sure that the record is already leaselocked to the user
 		lockkey = filename ^ "*" ^ ID;
 		if (not lockrec.read(leaselocks, lockkey)) {
-			lockrec = FM ^ FM ^ FM ^ FM ^ "NO LOCK RECORD";
+			lockrec = "^^^^NO LOCK RECORD"_var;
 		}
 		if (sessionid != lockrec.f(5)) {
 			// response='Somebody has updated this record.|Your update cannot be applied.':'|The session id does not agree ':quote(lockrec<5>)
@@ -2408,7 +2370,7 @@ badwrite:
 
 		// pass the output file in linkfilename2
 		// not good method, pass in system?
-		if (var("LIST,SELECTJOURNALS").locateusing(",", request_.f(1))) {
+		if ("LIST,SELECTJOURNALS"_var.locateusing(",", request_.f(1))) {
 			data_ = linkfilename2;
 		}
 		if (request_.f(1).starts("VAL.")) {
@@ -2527,7 +2489,7 @@ function request_exit() {
 	// 3. generally all processes are careful to unlock what they have locked
 	//   but crashed processes will not do this
 
-	var().unlockall();
+	unlockall();
 
 	// in case any select list left open
 	clearselect();
@@ -2541,11 +2503,7 @@ function request_exit() {
 	}
 
 	USERNAME = listenusername;
-	// call sysvar('SET',109,110,listenstation)
-	// call sysvar_109_110('SET',listenstation)
 	STATION = listenstation;
-
-	// if ucase(response[1,6])='ERROR:' then iodat=''
 
 	// have to call it here as well :(
 	responsetime = ostime();
@@ -2592,7 +2550,6 @@ function request_exit() {
 
 	} else {
 
-		//call oswrite("", linkfilename2);
 		if (not oswrite("", linkfilename2))
 			abort(lasterror());
 		if (linkfile2.osopen(linkfilename2)) {
@@ -2608,7 +2565,6 @@ function request_exit() {
 					break;
 
 				// in LISTEN and SELECT2 for direct output
-				//call osbwrite(blk, linkfile2, ptr);
 				if (not osbwrite(blk, linkfile2, ptr))
 					abort(lasterror());
 
@@ -2651,7 +2607,6 @@ function request_exit() {
 	// swap fm with char(13) in response
 
 	// write the response
-	//call oswrite(response_, linkfilename3);
 	if (not oswrite(response_, linkfilename3))
 		abort(lasterror());
 
@@ -2798,7 +2753,7 @@ subroutine leaselock() {
 	} else {
 		newsessionid = "";
 		for (let ii : range(1, 8)) {
-			newsessionid ^= var("01234567890ABDCEF").at(var(16).rnd() + 1);
+			newsessionid ^= "01234567890ABDCEF"_var.at(rnd(16) + 1);
 		}  // ii;
 	}
 
@@ -3087,7 +3042,6 @@ subroutine flagserveractive() {
 
 	// flag that this dataset is being served ("listened") (needed for old MAC)
 	// does not seem to cause any filesharing errors (stress tested at max speed)
-	//call oswrite("", inpath ^ serverflagfilename);
 	if (not oswrite("", inpath ^ serverflagfilename))
 		abort(lasterror());
 
@@ -3111,7 +3065,6 @@ subroutine writelogxclose() {
 }
 
 subroutine writelogx2() {
-	//call osbwrite(logx, logfile, logptr);
 	if (not osbwrite(logx, logfile, logptr))
 		abort(lasterror());
 	logx = "";

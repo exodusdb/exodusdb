@@ -1,6 +1,6 @@
 #include <exodus/library.h>
 libraryinit()
-
+// OBSOLETE replaced by .mv("*",
 function main(in args1, in args2, in sep) {
 
 	if (args1 == "" and args2 == "") {

@@ -1,6 +1,8 @@
 #include <exodus/library.h>
 #include <srv_common.h>
 
+// performed by various client programs
+
 libraryinit()
 
 #include <flushindex.h>
