@@ -156,7 +156,7 @@ function main() {
 	var cmd = "list " ^ filename ^ " id-supp";
 	printl("\nList the file using ", quote(cmd));
 	if (use_perform)
-		perform(cmd);
+		perform("n" ^ cmd);
 	else if (not osshell(cmd))
 		loglasterror();
 
@@ -220,7 +220,7 @@ subroutine sortselect(in file, in sortselectclause) {
 	let cmd = "list " ^ filename ^ " " ^ sortselectclause ^ " id-supp";
 	printl("\nList the file using ", quote(cmd));
 	if (use_perform)
-		perform(cmd);
+		perform("n" ^ cmd);
 	else if (not osshell(cmd))
 		loglasterror();
 
