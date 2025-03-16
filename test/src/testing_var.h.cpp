@@ -730,7 +730,7 @@ function main() {
 		let v2 = prefix("abc", "XYZ");
 	}
 
-	printl("append(const ARGS&... appendable) const&");
+	printl("append(const auto&... appendable) const&");
 	{
 		let v1 = "abc"_var.append(" is ", 10, " ok", '.');
 		assert(v1 == "abc is 10 ok.");
@@ -1544,11 +1544,11 @@ function main() {
 		if (deletec(file, key)) abort("deletec: " ^ lasterror());
 	}
 
-	printl("cleardbcache() const;");
+	printl("clearcache() const;");
 	{
-		conn.cleardbcache();
+		conn.clearcache();
 		// or
-		cleardbcache(conn);
+		clearcache(conn);
 	}
 
 	printl("xlate(in filename, in fieldno, const char* mode) const;");

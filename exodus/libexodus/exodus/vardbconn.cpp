@@ -110,7 +110,7 @@ bool DBConnector::delrecord(const int connid, const std::uint64_t hash64) {
 	return dbcache->erase(hash64);
 }
 
-void DBConnector::cleardbcache(const int connid) {
+void DBConnector::clearcache(const int connid) {
 	//TimeAcc t(107);
 	auto dbcache = get_dbcache(connid);
 
@@ -118,7 +118,7 @@ void DBConnector::cleardbcache(const int connid) {
 //		var(iter.first % 1'000'000'000).errputl("Clearing cache of ");
 
 	//if (dbcache->size())
-	//	var(dbcache->size()).errputl("cleardbcache: dbcache.size was ");
+	//	var(dbcache->size()).errputl("clearcache: dbcache.size was ");
 
 	dbcache->clear();
 	return;

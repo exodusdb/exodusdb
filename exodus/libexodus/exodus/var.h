@@ -24,10 +24,6 @@ THE SOFTWARE.
 
 // clang-format off
 
-// Purely #define so can done before any declarations
-// Always need to be run because modules dont export #define
-#include <exodus/vardefs.h>
-
 #if EXO_MODULE
 	import std;
 #else
@@ -40,8 +36,12 @@ THE SOFTWARE.
 
 #include <exodus/format.h>
 
+// Purely #define so can done before any declarations
+// Always need to be run because modules dont export #define
+#include <exodus/vardefs.h>
+
 // var_base provides the basic var-like functionality for var
-#include <exodus/vartyp.h>
+//#include <exodus/vartyp.h>
 #include <exodus/varb.h>
 
 namespace exo {
@@ -989,17 +989,20 @@ public:
 	//  let v2 = prefix("abc", "XYZ");`
 	ND var  prefix(SV insertstr) const&;
 
-	template <typename... ARGS>
+//	template <typename... ARGS>
+//	ND var  append(const ARGS&... appendable) const& {
+//		var nrvo = *this;
+//		(nrvo ^= ... ^= appendable);
+//		return nrvo;
+//	}
+
 	// Append anything at the end of a string
 	//
 	// `let v1 = "abc"_var.append(" is ", 10, " ok", '.'); // "abc is 10 ok."
 	//  // or
 	//  let v2 = append("abc", " is ", 10, " ok", '.');`
-	ND var  append(const ARGS&... appendable) const& {
-		var nrvo = *this;
-		(nrvo ^= ... ^= appendable);
-		return nrvo;
-	}
+    ND var  append(const auto&... appendable) const& {var nrvo = this->clone(); (nrvo ^= ... ^= appendable); return nrvo;}
+	// TODO perfect forwarding on argument 1 to create the initial string?
 
 	// Remove one trailing char.
 	// Equivalent to var[-1, 1] = "" in Pick OS
@@ -1276,16 +1279,34 @@ public:
 	ND var  last( const std::size_t length)     && {laster(length);          return std::move(*this);}
 	ND var  cut(  const int length)             && {cutter(length);          return std::move(*this);}
 	ND var  paste(const int pos1, const int length, SV replacestr)
-                                                && {paster(pos1, length, replacestr);   return std::move(*this);}
+                                                && {paster(pos1, length, replacestr);    return std::move(*this);}
 	ND var  paste(const int pos1, SV insertstr) && {paster(pos1, insertstr);             return std::move(*this);}
 	ND var  prefix(               SV prefixstr) && {prefixer(prefixstr);                 return std::move(*this);}
 	ND var  pop()                               && {popper();                            return std::move(*this);}
+
 //	ND var  append(SV appendstr)                && {appender(appendstr);                 return std::move(*this);}
-	template <typename... ARGS>
-	ND var  append(const ARGS&... appendable) && {
-				((*this) ^= ... ^= appendable);
-				return std::move(*this);
-			}
+//	template <typename... ARGS>
+//	ND var  append(const ARGS&... appendable) && {
+//				this->createString();
+//				(var_str += ... += appendable);
+	ND var  append(const auto&... appendable)   && {((*this) ^= ... ^= appendable);      return std::move(*this);}
+
+//    // Helper to append one argument, handling var differently
+//    template<typename T>
+//    void append_one(const T& value) {
+//        if constexpr (std::is_same_v<std::decay_t<T>, var>) {
+//            var_str += static_cast<const std::string&>(value);  // Explicit cast to string&
+//        } else {
+//            var_str += value;  // Other types (string, int, etc.)
+//        }
+//    }
+//	ND var  append(const auto&... appendable) && {
+////				((*this) ^= ... ^= appendable);
+//				this->createString();
+//				//(var_str += ... += appendable);
+//				(append_one(appendable), ...);  // Comma fold—calls append_one per arg
+//				return std::move(*this);
+//			}
 
 	ND var  fieldstore(SV delimiter, const int fieldno, const int nfields, in replacement)
                                                       && {fieldstorer(delimiter, fieldno, nfields, replacement);
@@ -1768,11 +1789,13 @@ public:
 	//  if (not connect("exodus")) ...`
 	ND bool connect(in conninfo = "");
 
-	// Attach (connect) specific files by name to specific connections.
-	// It is not necessary to attach files before opening them. Attach is meant to control the defaults.
-	// For the remainder of the session, opening the db file by name without specifying a connection will automatically use the specified connection applies during the attach command.
-	// If conn is not specified then filename will be attached to the default connection.
-	// Multiple file names must be separated by FM
+	// "attach" causes the given filenames to be associated with a specific connection for the remainder of the session.
+	// It is not necessary to attach files before opening them.
+	// Attachments can changed by calling attach() or open() on a different connection or they can be removed by calling detach().
+	// var: Defaults to the default connection.
+	// filenames: FM separated list.
+	// Returns: false if any filename does not exist and cannot be opened on the given connection. All filenames that can be opened on the conneciton are attached even if some cannot.
+	// Internally, attach merely opens each filename on the given connection causing them to be added to an internal cache.
 	//
 	// `let filenames = "xo_clients^dict.xo_clients"_var, conn = "exodus";
 	//  if (conn.attach(filenames)) ... ok
@@ -1780,7 +1803,9 @@ public:
 	//  if (attach(filenames)) ... ok`
 	ND bool attach(in filenames) const;
 
-	// Detach (disconnect) files that have been attached using attach().
+	// Removes files from the internal cache created by previous open() and attach() calls.
+	// var: Defaults to the default connection.
+	// filenames: FM separated list.
 	   void detach(in filenames);
 
 	// Begin a db transaction.
@@ -2073,8 +2098,11 @@ public:
 	   void write(in file, in key) const;
 
 	// Reads a record from a db file for a given key.
+	// file: A db filename or a var opened to a db file.
+	// key: The key of the record to be read.
 	// Returns: False if the key doesnt exist
 	// var: Contains the record if it exists or is unassigned if not.
+	// A special case of the key being "%RECORDS%" results in a fictitious "record" being returned as an FM separated list of all the keys in the db file up to a maximum size of 4Mib, sorted in natural order.
 	//
 	// `var record;
 	//  let file = "xo_clients", key = "GD001";
@@ -2153,7 +2181,7 @@ public:
 	// 1. Tries to read from a memory cache. Returns true if successful.
 	// 2a. Tries to read from the actual db file and returns false if unsuccessful.
 	// 2b. Writes the record and key to the memory cache and returns true.
-	// Cached db file data lives in exodus process memory and is lost when the process terminates or cleardbcache() is called.
+	// Cached db file data lives in exodus process memory and is lost when the process terminates or clearcache() is called.
 	//
     // `var record;
     //  let file = "xo_clients", key = "XD001";
@@ -2182,10 +2210,10 @@ public:
 	// Clears the memory cache of all records for the given connection
 	// All future cache readc() function calls will be forced to obtain records from the actual database and refresh the cache.
 	//
-	// `conn.cleardbcache();
+	// `conn.clearcache();
 	//  // or
-	// cleardbcache(conn);`
-	   void cleardbcache() const;
+	// clearcache(conn);`
+	   void clearcache() const;
 
 	// obj is strvar
 
@@ -3463,7 +3491,7 @@ class PUBLIC var_iter {
 	var_iter() = default;
 
 	// Construct from var
-	var_iter(in v);
+	explicit var_iter(in v);
 
 //	var_iter(var_iter&) = delete;
 //	var_iter(var_iter&&) = delete;
@@ -3624,7 +3652,7 @@ public:
     using difference_type   = std::ptrdiff_t;
 
     dim_iter() : ptr_() {}
-    dim_iter(std::vector<var>::iterator iter) : ptr_(iter) {}
+    explicit dim_iter(std::vector<var>::iterator iter) : ptr_(iter) {}
     dim_iter(const dim_iter& other) : ptr_(other.ptr_) {}
 
     var& operator*() { return *ptr_; }
@@ -3680,10 +3708,10 @@ public:
     using difference_type   = std::ptrdiff_t;
 
     dim_const_iter() : ptr_() {}
-    dim_const_iter(std::vector<var>::const_iterator iter) : ptr_(iter) {}
+    explicit dim_const_iter(std::vector<var>::const_iterator iter) : ptr_(iter) {}
     dim_const_iter(const dim_const_iter& other) : ptr_(other.ptr_) {}
     // Conversion from dim_iter to dim_const_iter, now works with friendship
-    dim_const_iter(const dim_iter& other) : ptr_(other.ptr_) {}
+    explicit dim_const_iter(const dim_iter& other) : ptr_(other.ptr_) {}
 
     const var& operator*() const { return *ptr_; }
     const var* operator->() const { return &(*ptr_); }
@@ -3979,11 +4007,6 @@ ND inline var_proxy3 var::operator()(int fieldno, int valueno, int subvalueno) {
 
 #endif // EXO_VAR_CPP
 
-/////////////////////////////////////
-// A global flag used in vardb:
-/////////////////////////////////////
-[[maybe_unused]] static inline int DBTRACE = var().osgetenv("EXO_DBTRACE");
-
 //
 /////////////////////
 // _var user literals
@@ -3994,6 +4017,7 @@ PUBLIC var  operator""_var(const char* cstr, std::size_t size);
 
 // 123456_var
 PUBLIC var  operator""_var(unsigned long long int i);
+//PUBLIC var  operator""_var(std::uint_t i);
 
 // 123.456_var
 PUBLIC var  operator""_var(long double d);

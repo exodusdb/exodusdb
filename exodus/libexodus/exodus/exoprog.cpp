@@ -734,6 +734,17 @@ var ExoProgram::perform(in command_line) {
 	// lowercase all library functions to aid in conversion from pickos
 	// TODO remove after conversion complete
 
+	// Hard coded to avoid needing a library. Currently only supporting upper case perform SELECT
+	// TODO replace all perform SELECT with simple select()
+	if (command_line.starts("SELECT ")) {
+		select(command_line);
+		return "";
+	}
+	if (command_line.starts("DELETEFILE ")) {
+		if (not var().deletefile(command_line.replace(" DATA ", " ").replace(" DICT ", "dict.").field(" ", 2))) {};
+		return "";
+	}
+
 	// Save some environment variables
 	//////////////////////////////////
 
@@ -1856,25 +1867,25 @@ var ExoProgram::elapsedtimetext(in timestamp1, in timestamp2) const {
 	secs -= minutes * 60;
 
 	if (weeks) {
-		text.updater(-1, weeks ^ " week");
+		text.appender(weeks ^ " week");
 		if (weeks ne 1) {
 			text ^= "s";
 		}
 	}
 	if (days) {
-		text.updater(-1, days ^ " day");
+		text.appender(FM_, days, " day");
 		if (days ne 1) {
 			text ^= "s";
 		}
 	}
 	if (hours) {
-		text.updater(-1, hours ^ " hour");
+		text.appender(FM_, hours, " hour");
 		if (hours ne 1) {
 			text ^= "s";
 		}
 	}
 	if (minutes) {
-		text.updater(-1, minutes ^ " min");
+		text.appender(FM_, minutes, " min");
 		if (minutes ne 1) {
 			text ^= "s";
 		}
@@ -1890,30 +1901,43 @@ var ExoProgram::elapsedtimetext(in timestamp1, in timestamp2) const {
 					secs.prefixer("0");
 				}
 			}
-			if (secs) {
-				text.updater(-1, secs ^ " sec");
+			if (secs >= 0.1) {
+				text.appender(FM_, secs, " sec");
 				if (secs ne 1) {
 					text ^= "s";
 				}
 			} else if (not minutes and not hours and not days and not weeks) {
 zero:
-				if (not text)
-					//text.updater(-1, "< 1 ms");
-					text = "< 1 ms";
+				if (not text) {
+					//text.appender(FM_, "< 1 ms");
+					var ms = secs * 1000;
+					if (ms < 0.1) {
+						var μs = ms * 1000;
+						if (timestamp1.toDouble() == timestamp2.toDouble()) {
+							text = "0 secs";
+						} else if (μs < 0.1) {
+								var ns = ms * 1'000'000;
+								text = ns.round(3) ^ " ns";
+						} else
+							text = μs.round(3) ^ " μs";
+					} else
+						text = ms.round(3) ^ " ms";
+				}
 			} else {
-				//text.updater(-1, "exactly");
+				//text.appender(FM_, "exactly");
 			}
 		} else {
 			if (not minutes and not hours and not days and not weeks) {
 				goto zero;
 			}
-			//text.updater(3, "exactly");
+			//text.appender(3, "exactly");
 		}
 	}
 
-	text.replacer(FM ^ FM ^ FM, FM);
-	text.replacer(FM ^ FM, FM);
-	text.replacer(FM, ", ");
+//	text.replacer(FM ^ FM ^ FM, FM);
+//	text.replacer(FM ^ FM, FM);
+	text.trimmer(_FM);
+	text.replacer(_FM, ", ");
 
 	return text;
 }

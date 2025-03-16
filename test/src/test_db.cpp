@@ -187,12 +187,20 @@ programinit()
 
 	{
 		printl("Create a temp file");
-		var tempfilename = "xo_test_db_deleterecord_temp";
+//		var tempfilename = "xo_test_db_deleterecord_temp";
+		var tempfilename = "xo_test_db_deleterecord";
 		var tempfile	 = tempfilename;
-		if (not deletefile(tempfile)) {}
+		if (not deletefile(tempfile)) {} // clean up first
 		assert(createfile(tempfile));
+
+		printl("Create its dictionary");
+		if (not deletefile("dict." ^ tempfilename)){}
+		if (not createfile("dict." ^ tempfilename))
+			loglasterror();
+		write("F^0^ID^^^^^^R^10"_var on "dict." ^ tempfilename, "ID");
+
 		assert(not read(RECORD from tempfile, "%RECORDS%"));
-		for (int i = 1; i le 10; ++i) {
+		for (int i : reverse_range(1, 10)) {
 			//assert(write(i on tempfile, i));
 //			assert(write(var(i) on tempfile, var(i)));
 			write(var(i) on tempfile, var(i));
@@ -201,13 +209,16 @@ programinit()
 		// Check reading magic key %RECORDS% returns all keys in natural order
 		assert(read(RECORD from tempfile, "%RECORDS%"));
 		TRACE(RECORD)
+//		assert(RECORD eq "1^2^3^4^5^6^7^8^9^10^11^12^13^14^15^16^17^18^19^20"_var);
 		assert(RECORD eq "1^2^3^4^5^6^7^8^9^10"_var);
 
 		printl("Check deleterecord works on a select list");
 		//		select(tempfile ^ " with ID ge 5");
 		select(tempfilename ^ " with ID ge '5'");
 		deleterecord(tempfile);
-		assert(tempfile.reccount() eq 5);
+		assert(read(RECORD from tempfile, "%RECORDS%"));
+		TRACE(RECORD)
+		assert(tempfile.reccount().errputl() eq 5);
 
 //		printl("Check deleterecord works command style list of keys");
 //		deleterecord(tempfilename ^ " '1' 2 \"3\"");

@@ -3115,15 +3115,19 @@ if (conn.attach(filenames)) ...
 .nf
  
 .fi
-Attach (connect) specific files by name to specific connections.
+"attach" causes the given filenames to be associated with a specific connection for the remainder of the session.
 
-It is not necessary to attach files before opening them. Attach is meant to control the defaults.
+It is not necessary to attach files before opening them.
 
-For the remainder of the session, opening the db file by name without specifying a connection will automatically use the specified connection applies during the attach command.
+Attachments can changed by calling attach() or open() on a different connection or they can be removed by calling detach().
 
-If conn is not specified then filename will be attached to the default connection.
+\fBvar:\fR Defaults to the default connection.
 
-Multiple file names must be separated by FM
+\fBfilenames:\fR FM separated list.
+
+\fBReturns:\fR false if any filename does not exist and cannot be opened on the given connection. All filenames that can be opened on the conneciton are attached even if some cannot.
+
+Internally, attach merely opens each filename on the given connection causing them to be added to an internal cache.
 
 \fBExample:\fR
 .RS
@@ -3141,7 +3145,11 @@ conn.detach(filenames)
 .nf
  
 .fi
-Detach (disconnect) files that have been attached using attach().
+Removes files from the internal cache created by previous open() and attach() calls.
+
+\fBvar:\fR Defaults to the default connection.
+
+\fBfilenames:\fR FM separated list.
 
 .SS
 if (conn.begintrans()) ...
@@ -3769,9 +3777,15 @@ if (record.read(file, key)) ...
 .fi
 Reads a record from a db file for a given key.
 
+\fBfile:\fR A db filename or a var opened to a db file.
+
+\fBkey:\fR The key of the record to be read.
+
 \fBReturns:\fR False if the key doesnt exist
 
 \fBvar:\fR Contains the record if it exists or is unassigned if not.
+
+A special case of the key being "%RECORDS%" results in a fictitious "record" being returned as an FM separated list of all the keys in the db file up to a maximum size of 4Mib, sorted in natural order.
 
 \fBExample:\fR
 .RS
@@ -3929,7 +3943,7 @@ if (record.readc(file, key)) ...
 
 2b. Writes the record and key to the memory cache and returns true.
 
-Cached db file data lives in exodus process memory and is lost when the process terminates or cleardbcache() is called.
+Cached db file data lives in exodus process memory and is lost when the process terminates or clearcache() is called.
 
 \fBExample:\fR
 .RS
@@ -3969,7 +3983,7 @@ if (deletec(file, key)) ...
 
 
 .SS
-conn.cleardbcache()
+conn.clearcache()
 .nf
  
 .fi
@@ -3980,9 +3994,9 @@ All future cache readc() function calls will be forced to obtain records from th
 \fBExample:\fR
 .RS
 .nf
-conn.cleardbcache();
+conn.clearcache();
 // or
-cleardbcache(conn);
+clearcache(conn);
 .fi
 .RE
 

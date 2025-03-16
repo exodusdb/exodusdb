@@ -25,7 +25,7 @@
 524 bool var::updaterecord(in file, in key) const
 525 bool var::insertrecord(in file, in key) const
 526 bool var::deleterecord(in key) const
-527 bool var::cleardbcache() const
+527 bool var::clearcache() const
 528 bool var::begintrans() const
 529 bool var::rollbacktrans() const
 530 bool var::committrans() const

@@ -155,7 +155,7 @@ class DBConnector final {
 	bool getrecord(const int dbconn_no, const std::uint64_t hash64, std::string& record) const;
 	void putrecord(const int dbconn_no, const std::uint64_t hash64, const std::string& record);
 	bool delrecord(const int dbconn_no, const std::uint64_t hash64);
-	void cleardbcache(const int dbconn_no);
+	void clearcache(const int dbconn_no);
 
    private:
 

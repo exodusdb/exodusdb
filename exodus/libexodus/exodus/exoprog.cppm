@@ -119,7 +119,7 @@ export namespace exo {
 	using exo::breakon;
 
 	using exo::chr;
-	using exo::cleardbcache;
+	using exo::clearcache;
 	using exo::clearfile;
 	using exo::clone;
 	using exo::close;

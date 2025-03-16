@@ -130,18 +130,33 @@ function main() {
 	{
 		if (connect()) {
 			TRACE(CURSOR)
-			if (not CURSOR.select("xo_clients by name_and_type"))
-				abort(lasterror());
 
-			TRACE(CURSOR)
-			var v1, v2, v3, v4;
-			pushselect(v2);
-			TRACE(CURSOR)
-			popselect(v2);
-			TRACE(CURSOR)
+			// VarDBException:read("dict.xo_clients^2", "name_and_type") File doesnt exist - Aborting.
+			// 4: vardb.cpp:2708: if (!dictrec.read(actualdictfile, fieldname)) UNLIKELY {
+			// 7: test_exoprog.cpp:133: if (not CURSOR.select("xo_clients by name_and_type"))
 
-			while(CURSOR.readnext(ID))
-				printl(ID);
+			// Unfortunately libdict_xo_clients.so is installed in /usr/local/lib not ~/lib so it is not detectable by libinfo
+			// and anyway it may not be usable if compiling a new binary incompatible version of exodus
+			//if (libinfo("dict_xo_clients")) {
+
+			try {
+				if (not CURSOR.select("xo_clients by name_and_type"))
+					abort(lasterror());
+
+				TRACE(CURSOR)
+				var v1, v2, v3, v4;
+				pushselect(v2);
+				TRACE(CURSOR)
+				popselect(v2);
+				TRACE(CURSOR)
+
+				while(CURSOR.readnext(ID))
+					printl(ID);
+			} catch (VarDBException e) {
+				loglasterror();
+			}
+			//}
+
 		}
 	}
 

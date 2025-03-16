@@ -151,7 +151,7 @@ auto get_timebank_acno(const std::string_view arg1) -> int {
 	else if (++acno && arg1 == "bool var::updaterecord(in file, in key) const") {}
 	else if (++acno && arg1 == "bool var::insertrecord(in file, in key) const") {}
 	else if (++acno && arg1 == "bool var::deleterecord(in key) const") {}
-	else if (++acno && arg1 == "bool var::cleardbcache() const") {}
+	else if (++acno && arg1 == "bool var::clearcache() const") {}
 	else if (++acno && arg1 == "bool var::begintrans() const") {}
 	else if (++acno && arg1 == "bool var::rollbacktrans() const") {}
 	else if (++acno && arg1 == "bool var::committrans() const") {}

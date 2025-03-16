@@ -536,13 +536,12 @@ ND bool begintrans(void);
 ND bool statustrans(void);
 ND bool rollbacktrans(void);
 ND bool committrans(void);
-   void cleardbcache(void);
 
 ND bool lock(in dbfile, in key);
    bool unlock(in dbfile, in key);
    bool unlockall(in conn = "" );
 
-   void cleardbcache(in conn = "" );
+   void clearcache(in conn = "" );
 
 ND bool open(in dbfilename, io dbfile);
 ND bool open(in dbfilename);

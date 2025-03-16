@@ -38,15 +38,15 @@ THE SOFTWARE.
 #	include <codecvt>
 #endif
 
+#include <fnmatch.h>  //for fnmatch() globbing
 #include <sys/stat.h>
-#include <unistd.h> //for close()
-#include <fnmatch.h> //for fnmatch() globbing
+#include <unistd.h>	 //for close()
 
-//used to convert to and from utf8 in osread and oswrite
-//#include <boost/detail/utf8_codecvt_facet.hpp>
+// used to convert to and from utf8 in osread and oswrite
+// #include <boost/detail/utf8_codecvt_facet.hpp>
 #include <boost/locale.hpp>
 
-//#include <boost/date_time/posix_time/posix_time.hpp>
+// #include <boost/date_time/posix_time/posix_time.hpp>
 
 #include <exodus/varimpl.h>
 #include <exodus/varoshandle.h>
@@ -59,17 +59,17 @@ static class SetGlobalLocale {
    public:
 	SetGlobalLocale() {
 
-//		// function to dump i/o stream locales for debugging
-//		auto dump = [](std::string is_was) {
-//			std::clog << "thrd locale " << is_was << " " << uselocale((locale_t) 0) << '\n';
-//			std::clog << "glob locale " << is_was << " " << std::locale("").name().c_str() << '\n';
-//			std::clog << "cout locale " << is_was << " " << std::cout.getloc().name() << '\n';
-//			std::clog << "cin  locale " << is_was << " " << std::cin.getloc().name() << '\n';
-//			std::clog << "cerr locale " << is_was << " " << std::cerr.getloc().name() << '\n';
-//		};
+		//		// function to dump i/o stream locales for debugging
+		//		auto dump = [](std::string is_was) {
+		//			std::clog << "thrd locale " << is_was << " " << uselocale((locale_t) 0) << '\n';
+		//			std::clog << "glob locale " << is_was << " " << std::locale("").name().c_str() << '\n';
+		//			std::clog << "cout locale " << is_was << " " << std::cout.getloc().name() << '\n';
+		//			std::clog << "cin  locale " << is_was << " " << std::cin.getloc().name() << '\n';
+		//			std::clog << "cerr locale " << is_was << " " << std::cerr.getloc().name() << '\n';
+		//		};
 
 		// Dump io stream locales before standardisation
-		//dump("was");
+		// dump("was");
 		/*
 			glob locale was C.UTF-8
 			cout locale was C
@@ -84,7 +84,7 @@ static class SetGlobalLocale {
 		}
 
 		// The calling thread's current locale is set to the global locale determined by setlocale(3).
-		//uselocale(LC_GLOBAL_LOCALE);
+		// uselocale(LC_GLOBAL_LOCALE);
 
 		// Imbue io streams with exodus standard locale
 		std::cout.imbue(std::locale(""));
@@ -93,14 +93,13 @@ static class SetGlobalLocale {
 		std::cerr.imbue(std::locale(""));
 
 		// Dump io stream locales after standardisation
-		//dump("is ");
+		// dump("is ");
 		/*
 			glob locale is C.UTF-8
 			cout locale is C.UTF-8
 			cin  locale is C.UTF-8
 			cerr locale is C.UTF-8
 		*/
-
 	}
 
 } setgloballocale;
@@ -124,11 +123,11 @@ static std::locale get_locale(const char* locale_name)	// throw (VarError)
 	if (not *locale_name || strcmp(locale_name, "utf8") == 0) {
 		std::locale old_locale;
 
-		//https://exceptionshub.com/read-unicode-utf-8-file-into-wstring.html
-		//wif.imbue(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t>));
+		// https://exceptionshub.com/read-unicode-utf-8-file-into-wstring.html
+		// wif.imbue(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t>));
 
-//		std::locale utf8_locale(old_locale,
-//								new std::codecvt_utf8<wchar_t>);
+		//		std::locale utf8_locale(old_locale,
+		//								new std::codecvt_utf8<wchar_t>);
 		std::locale utf8_locale(old_locale, new std::codecvt<wchar_t, char, std::mbstate_t>);
 
 		return utf8_locale;
@@ -153,7 +152,7 @@ static bool checknotabsoluterootfolder(std::string dirpath) {
 	// cwd to top level and delete relative
 	// top level folder has only one slash either at the beginning or, on windows, like x:\ .
 	// NB copy/same code in osrmdir and osrename
-	//if (!dirpath.ends_with(OSSLASH_))
+	// if (!dirpath.ends_with(OSSLASH_))
 	//	return true;
 
 	if ((!SLASH_IS_BACKSLASH && dirpath[0] == OSSLASH_ && var(dirpath).count(_OSSLASH) < 3) ||
@@ -183,21 +182,21 @@ static const std::string to_path_string(in str1) {
 
 static const std::string to_oscmd_string(in cmd) {
 
-//	// while converting from DOS convert all backslashes in first word to forward slashes on
-//	// linux or leave as if exodus on windows
-//
-//	// warning if any backslashes unless at least one of them is followed by $ which indicates
-//	// valid usage as an escape character aiming to recode all old windows-only code
-//	if (cmd.contains("\\") && !cmd.contains("\\$"))
-//		cmd.errputl("WARNING BACKSLASHES IN OS COMMAND:");
+	//	// while converting from DOS convert all backslashes in first word to forward slashes on
+	//	// linux or leave as if exodus on windows
+	//
+	//	// warning if any backslashes unless at least one of them is followed by $ which indicates
+	//	// valid usage as an escape character aiming to recode all old windows-only code
+	//	if (cmd.contains("\\") && !cmd.contains("\\$"))
+	//		cmd.errputl("WARNING BACKSLASHES IN OS COMMAND:");
 
 	return to_path_string(cmd.field(" ", 1)) + " " + cmd.field(" ", 2, 999999).toString();
 }
 
 // Returns with trailing OSSLASH
-var  var::ostempdirpath() const {
+var var::ostempdirpath() const {
 	std::error_code error_code;
-	//TODO handle error code specifically
+	// TODO handle error code specifically
 	std::string dirpath = std::string(std::filesystem::temp_directory_path(error_code));
 	if (dirpath.back() != OSSLASH_)
 		dirpath.push_back(OSSLASH_);
@@ -221,14 +220,14 @@ var  var::ostempdirpath() const {
 // and will automatically be fully deleted when the file handle is closed/process terminates.
 //
 
-//var  var::ostempfilename() const {
+// var  var::ostempfilename() const {
 //
 //	// Linux immediately unlinks the temporary file so it exists without a name.
 //	// the actual file is automatically deleted from the file system when the file handle is closed/process is closed.
 //	std::FILE* tempfile = std::tmpfile();
 //
 //	// Linux-specific method to acquire the tmpfile name
-//  // BUT FILE WILL NOT EXIST SINCE IT IS UNLINKED IMMEDIATELY AND FULLY DELETED ON FCLOSE BELOW
+//   // BUT FILE WILL NOT EXIST SINCE IT IS UNLINKED IMMEDIATELY AND FULLY DELETED ON FCLOSE BELOW
 //	let tempfilename;
 //	namespace fs = std::filesystem;
 //	tempfilename.var_str = fs::read_symlink(fs::path("/proc/self/fd") / std::to_string(fileno(tempfile)));
@@ -242,19 +241,19 @@ var  var::ostempdirpath() const {
 //
 //	return tempfilename;
 //
-//}
+// }
 
 // This function actually creates a file which must be cleaned up by the caller
 // The filenames are random names
 // TODO is this threadsafe?
-var  var::ostempfilename() const {
+var var::ostempfilename() const {
 
-	//https://cpp.hotexamples.com/examples/-/-/mkstemp/cpp-mkstemp-function-examples.html
+	// https://cpp.hotexamples.com/examples/-/-/mkstemp/cpp-mkstemp-function-examples.html
 
 	// Create a char* template of the temporary file name desired
 	// (2*26+10)^6 possible filenames = 56,800,235,584
 	// Note that 64 bit hash = 1.84467440737e+19 combinations
-	var rvo_tempfilename = this->ostempdirpath() ^ "~exoXXXXXX";
+	var				  rvo_tempfilename = this->ostempdirpath() ^ "~exoXXXXXX";
 	std::vector<char> buffer(rvo_tempfilename.var_str.begin(), rvo_tempfilename.var_str.end());
 	buffer.push_back('\0');
 
@@ -262,7 +261,7 @@ var  var::ostempfilename() const {
 	int fd_or_error;
 	if ((fd_or_error = mkstemp(&buffer[0])) == -1)
 		UNLIKELY
-		throw VarError(var(__PRETTY_FUNCTION__) ^ " - Cannot create tempfilename " ^ rvo_tempfilename.quote());
+	throw VarError(var(__PRETTY_FUNCTION__) ^ " - Cannot create tempfilename " ^ rvo_tempfilename.quote());
 
 	// Must close or we will leak file handles because this badly designed function returns a name not a handle
 	::close(fd_or_error);
@@ -286,9 +285,9 @@ bool var::osshell() const {
 	if (shellresult)
 		setlasterror("osshell failed: " ^ this->quote());
 
-	//TRACE(*this)
-	//TRACE(shellresult)
-	// breakon();
+	// TRACE(*this)
+	// TRACE(shellresult)
+	//  breakon();
 
 	return !shellresult;
 }
@@ -308,7 +307,7 @@ bool var::osshellread(in oscmd) {
 	// fflush?
 
 	//"r" means read
-	//std::FILE* pfile = popen(to_oscmd_string(oscmd).c_str(), "r");
+	// std::FILE* pfile = popen(to_oscmd_string(oscmd).c_str(), "r");
 	auto* pfile = popen(to_oscmd_string(oscmd).c_str(), "r");
 
 	// Detect program failure.
@@ -325,9 +324,9 @@ bool var::osshellread(in oscmd) {
 		// std::printf("%s\n", result);
 		// cannot trust that standard input is convertable from utf8
 		// output.var_str+=wstringfromUTF8((const UTF8*)result,strlen(result));
-		//std::string str1 = cstr1;
-		//output.var_str += std::string(str1.begin(), str1.end());
-		//readstr.var_str += std::string(cstr1);
+		// std::string str1 = cstr1;
+		// output.var_str += std::string(str1.begin(), str1.end());
+		// readstr.var_str += std::string(cstr1);
 		var_str += cstr1;
 	}
 
@@ -340,7 +339,6 @@ bool var::osshellread(in oscmd) {
 
 	// Return true if the exit status was 0
 	return !shellresult;
-
 }
 
 bool var::osshellwrite(in oscmd) const {
@@ -352,7 +350,7 @@ bool var::osshellwrite(in oscmd) const {
 	ISSTRING(oscmd)
 
 	//"w" means read
-	//std::FILE* pfile = popen(to_oscmd_string(oscmd).c_str(), "w");
+	// std::FILE* pfile = popen(to_oscmd_string(oscmd).c_str(), "w");
 	auto* pfile = popen(to_oscmd_string(oscmd).c_str(), "w");
 
 	// Detect program failure.
@@ -369,14 +367,13 @@ bool var::osshellwrite(in oscmd) const {
 	if (shellresult)
 		setlasterror("osshellwrite failed. " ^ oscmd.quote());
 
-	//return true if no error code
+	// return true if no error code
 	return !shellresult;
-
 }
 
 void var::osflush() const {
 	std::cout << std::flush;
-//	std::cerr << std::flush; // self flushing
+	//	std::cerr << std::flush; // self flushing
 	std::clog << std::flush;
 	return;
 }
@@ -427,18 +424,18 @@ std::fstream* var::osopenx(in osfilename, const bool utf8) const {
 		THISIS("bool var::osopenx(in osfilename, const bool utf8)")
 		ISSTRING(osfilename)
 
-	    // Check if the file exists and is a regular file
-	    if (!std::filesystem::is_regular_file(osfilename.c_str())) {
+		// Check if the file exists and is a regular file
+		if (!std::filesystem::is_regular_file(osfilename.c_str())) {
 			this->setlasterror("osopen failed. " ^ var(osfilename).quote() ^ " does not exist, or cannot be accessed, or is not a regular file.");
-	        return nullptr;
-	    }
+			return nullptr;
+		}
 
 		// TODO replace new/delete with some object
 		pfstreamfile1 = new std::fstream;
 
-//		// Apply the locale
-//		if (locale)
-//			pfstreamfile1->imbue(get_locale(locale));
+		//		// Apply the locale
+		//		if (locale)
+		//			pfstreamfile1->imbue(get_locale(locale));
 
 		// Open the file for i/o (fail if the file doesnt exist and do NOT delete any
 		// existing file) binary and in/out to allow reading and writing from same file
@@ -448,7 +445,7 @@ std::fstream* var::osopenx(in osfilename, const bool utf8) const {
 
 			// Cannot open for output. Try to open read-only
 			pfstreamfile1->open(to_path_string(osfilename).c_str(),
-						  std::ios::in | std::ios::binary);
+								std::ios::in | std::ios::binary);
 
 			// Fail if cannot open read-only
 			if (!(*pfstreamfile1)) {
@@ -463,7 +460,7 @@ std::fstream* var::osopenx(in osfilename, const bool utf8) const {
 		// 2. var_int <- the exodus os file cache handle no
 		// 3. var_dbl <- the utf8 flag
 		var_str = osfilename.var_str;
-		var_int =mv_handles_cache.add_handle(pfstreamfile1, del_fstream, osfilename.var_str);
+		var_int = mv_handles_cache.add_handle(pfstreamfile1, del_fstream, osfilename.var_str);
 		var_dbl = utf8;
 
 		// VARTYP_OSFILE
@@ -518,12 +515,12 @@ WINDOWS-1258
 //// no binary conversion is performed on input unless
 //// codepage is provided then exodus converts from the
 //// specified codepage (not locale) on input to utf-8 internally
-//bool var::osread(in osfilename, const char* codepage) {
+// bool var::osread(in osfilename, const char* codepage) {
 //
 //	THISIS("bool var::osread(in osfilename, const char* codepage")
 //	ISSTRING(osfilename)
 //	return osread(to_path_string(osfilename).c_str(), codepage);
-//}
+// }
 //
 bool var::osread(const char* osfilename, const char* codepage) {
 
@@ -537,12 +534,12 @@ bool var::osread(const char* osfilename, const char* codepage) {
 	// get a file structure
 	std::ifstream myfile;
 
-    // Check if the file exists and is a regular file
-    if (!std::filesystem::is_regular_file(osfilename)) {
-//        std::cout << "Error: File '" << osfilename << "' does not exist.\n";
+	// Check if the file exists and is a regular file
+	if (!std::filesystem::is_regular_file(osfilename)) {
+		//        std::cout << "Error: File '" << osfilename << "' does not exist.\n";
 		this->setlasterror("osread failed. " ^ var(osfilename).quote() ^ " does not exist, or cannot be accessed, or is not a regular file.");
-        return false;
-    }
+		return false;
+	}
 
 	// open in binary (and position "at end" to find the file size with tellg)
 	// TODO check myfile.close() on all exit paths or setup an object to do that
@@ -559,13 +556,13 @@ bool var::osread(const char* osfilename, const char* codepage) {
 	//	#pragma warning( disable: 4244 )
 	// warning C4244: '=' : conversion from 'std::streamoff' to 'unsigned int', possible loss of
 	// data
-	//myfile.seekg(0, std::ios::end);
+	// myfile.seekg(0, std::ios::end);
 	bytesize = static_cast<unsigned int>(myfile.tellg());
 
 	// if empty file then done ok
 	if (bytesize == 0) {
-//TRACE(var(osfilename) ^ " bytesize:" ^ var(bytesize) ^ " dir:" ^ var(osfilename).osfile())
-//TRACE(var("ls -l " ^ var(osfilename)).osshell())
+		// TRACE(var(osfilename) ^ " bytesize:" ^ var(bytesize) ^ " dir:" ^ var(osfilename).osfile())
+		// TRACE(var("ls -l " ^ var(osfilename)).osshell())
 		myfile.close();
 		return true;
 	}
@@ -574,21 +571,21 @@ bool var::osread(const char* osfilename, const char* codepage) {
 	try {
 		// emergency memory - will be deleted at } - useful if OOM
 		// cancelling this to avoid heap fragmentation and increase performance
-		//std::unique_ptr<char[]> emergencymemory(new char[16384]);
+		// std::unique_ptr<char[]> emergencymemory(new char[16384]);
 
 		// resize the string to receive the whole file
 		var_str.resize(bytesize);
 	} catch (std::bad_alloc& ex) {
 		myfile.close();
 		throw VarOutOfMemory("Could not obtain " ^ var(bytesize * sizeof(char)) ^
-							" bytes of memory to read " ^ var(osfilename) ^ " - " ^ ex.what());
+							 " bytes of memory to read " ^ var(osfilename) ^ " - " ^ ex.what());
 	}
 
 	// read the file into the reserved memory block
 	myfile.seekg(0, std::ios::beg);
 	// myfile.read (memblock.get(), (unsigned int) bytesize);
-	//myfile.read(&var_str[0], (unsigned int)bytesize);
-	//c++17 provides non-const access to data() :)
+	// myfile.read(&var_str[0], (unsigned int)bytesize);
+	// c++17 provides non-const access to data() :)
 	myfile.read(var_str.data(), static_cast<unsigned int>(bytesize));
 
 	bool failed = myfile.fail();
@@ -613,7 +610,7 @@ bool var::osread(const char* osfilename, const char* codepage) {
 	return true;
 }
 
-var  var::to_codepage(const char* codepage) const {
+var var::to_codepage(const char* codepage) const {
 
 	THISIS("bool var::to_codepage(const char* codepage) const")
 	assertString(function_sig);
@@ -624,22 +621,22 @@ var  var::to_codepage(const char* codepage) const {
 	// little endian means adding small byte of number comes first
 	// see iconv -l | grep utf32 -i
 
-	//from utf8 to codepage
-	//if (*codepage)
-		return boost::locale::conv::from_utf<char>(var_str, codepage);
-	//else
+	// from utf8 to codepage
+	// if (*codepage)
+	return boost::locale::conv::from_utf<char>(var_str, codepage);
+	// else
 	//	return var_str;
 }
 
-var  var::from_codepage(const char* codepage) const {
+var var::from_codepage(const char* codepage) const {
 
 	THISIS("bool var::from_codepage(const char* codepage) const")
 	assertString(function_sig);
 
-	//to utf8 from codepage
-	//if (codepage)
-		return boost::locale::conv::to_utf<char>(var_str, codepage);
-	//else
+	// to utf8 from codepage
+	// if (codepage)
+	return boost::locale::conv::to_utf<char>(var_str, codepage);
+	// else
 	//	return var_str;
 }
 
@@ -678,24 +675,23 @@ bool var::oswrite(in osfilename, const char* codepage) const {
 	return !failed;
 }
 
-//#ifdef VAR_OSBREADWRITE_CONST_OFFSET
-// a version that accepts a const offset ie ignores return value
-//bool var::osbwrite(in osfilevar, in offset, const bool adjust) const
-// offset -1 appends by starting writing one byte after the current end of the file
-// offset -2 updates the last byte of the file.
-// etc.
-//bool var::osbwrite(in osfilevar, in offset) const {
+// #ifdef VAR_OSBREADWRITE_CONST_OFFSET
+//  a version that accepts a const offset ie ignores return value
+// bool var::osbwrite(in osfilevar, in offset, const bool adjust) const
+//  offset -1 appends by starting writing one byte after the current end of the file
+//  offset -2 updates the last byte of the file.
+//  etc.
+// bool var::osbwrite(in osfilevar, in offset) const {
 //	return this->osbwrite(osfilevar, const_cast<io>(offset));
-//}
-//#endif
+// }
+// #endif
 
-//NOTE: unlike osread/oswrite which rely on iconv codepages to do any conversion
-//osbread and osbwrite rely on the locale being passed in on the osopen stage
+// NOTE: unlike osread/oswrite which rely on iconv codepages to do any conversion
+// osbread and osbwrite rely on the locale being passed in on the osopen stage
 
-//bool var::osbwrite(in osfilevar, io offset, const bool adjust) const
+// bool var::osbwrite(in osfilevar, io offset, const bool adjust) const
 bool var::osbwrite(in osfilevar, io offset) const {
 	// osfilehandle is just the filename but buffers the "file number" in the mvint too
-
 
 	THISIS("bool var::osbwrite(in osfilevar, io offset) const")
 	assertString(function_sig);
@@ -703,12 +699,13 @@ bool var::osbwrite(in osfilevar, io offset) const {
 
 	// get the buffered file handle/open on the fly
 	std::fstream* pfstreamfile1 = osfilevar.osopenx(osfilevar);
-	if (pfstreamfile1 == nullptr) UNLIKELY {
-		//throw VarError(this->setlasterror(osfilevar.quote() ^ " osbwrite open failed"));
-		this->setlasterror("osbwrite failed. " ^ this->lasterror());
-		return false;
-	}
-//	TRACE(pfstreamfile1->getloc().name())
+	if (pfstreamfile1 == nullptr)
+		UNLIKELY {
+			// throw VarError(this->setlasterror(osfilevar.quote() ^ " osbwrite open failed"));
+			this->setlasterror("osbwrite failed. " ^ this->lasterror());
+			return false;
+		}
+	//	TRACE(pfstreamfile1->getloc().name())
 
 	// NOTE 1/2 seekp goes by bytes regardless of the fact that it is a wide stream
 	// myfile.seekp (offset*sizeof(char));
@@ -725,11 +722,12 @@ bool var::osbwrite(in osfilevar, io offset) const {
 	// if you are trying to write an exodus string containing a GREEK CAPITAL GAMMA
 	// unicode \x0393 and current codepage is *NOT* CP1253 (Greek)
 	// then c++ wiofstream cannot convert \x0393 to a single byte (in CP1253)
-	if (pfstreamfile1->fail()) UNLIKELY {
-		// saved in cache, DO NOT CLOSE!
-		// myfile.close();
-		throw VarError(this->setlasterror(osfilevar.quote() ^ " osbwrite write failed"));
-	}
+	if (pfstreamfile1->fail())
+		UNLIKELY {
+			// saved in cache, DO NOT CLOSE!
+			// myfile.close();
+			throw VarError(this->setlasterror(osfilevar.quote() ^ " osbwrite write failed"));
+		}
 
 	// pass back the file pointer offset
 	offset = static_cast<int>(pfstreamfile1->tellp());
@@ -750,7 +748,7 @@ static unsigned count_invalid_trailing_UTF8_bytes(const std::string& str) {
 #pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
 	const char* cptr = &str.back();
 #pragma GCC diagnostic pop
-	int num = 1;
+	int num				   = 1;
 	int numBytesToTruncate = 0;
 
 	// UTF8 bytes sequences
@@ -809,9 +807,9 @@ static unsigned count_invalid_trailing_UTF8_bytes(const std::string& str) {
 	return numBytesToTruncate;
 }
 
-//NOTE if the locale is not C then any partial non-utf-8 bytes at the end (due to bytesize
-//not being an exact number of valid utf-8 code units) are trimmed off the return value
-//The new offset is changed to reflect the above and is simply increased by bytesize
+// NOTE if the locale is not C then any partial non-utf-8 bytes at the end (due to bytesize
+// not being an exact number of valid utf-8 code units) are trimmed off the return value
+// The new offset is changed to reflect the above and is simply increased by bytesize
 
 bool var::osbread(in osfilevar, io offset, const int bytesize) {
 
@@ -859,11 +857,12 @@ bool var::osbread(in osfilevar, io offset, const int bytesize) {
 
 	// get a memory block to read into
 	std::unique_ptr<char[]> memblock(new char[bytesize]);
-	//std::unique_ptr memblock(new char[bytesize]);
-	if (memblock == nullptr) UNLIKELY {
-		throw VarOutOfMemory("osbread could not obtain " ^ var(bytesize * sizeof(char)) ^
-							" bytes of memory to read " ^ osfilevar);
-	}
+	// std::unique_ptr memblock(new char[bytesize]);
+	if (memblock == nullptr)
+		UNLIKELY {
+			throw VarOutOfMemory("osbread could not obtain " ^ var(bytesize * sizeof(char)) ^
+								 " bytes of memory to read " ^ osfilevar);
+		}
 
 	// read the data (converting characters on the fly)
 	pfstreamfile1->read(memblock.get(), bytesize);
@@ -887,14 +886,14 @@ bool var::osbread(in osfilevar, io offset, const int bytesize) {
 	var_str.assign(memblock.get(), static_cast<unsigned int>(pfstreamfile1->gcount()));
 
 	// If the file is not ? locale, trim off any excess utf8 bytes
-//	TRACE(pfstreamfile1->getloc().name())
-//	if (pfstreamfile1->getloc().name() != "C") {
-//	if (pfstreamfile1->getloc().name() != "*") {
+	//	TRACE(pfstreamfile1->getloc().name())
+	//	if (pfstreamfile1->getloc().name() != "C") {
+	//	if (pfstreamfile1->getloc().name() != "*") {
 	// var_dbl stores the utf8 flag set in osopenx
-//	TRACE(osfilevar.var_dbl)
+	//	TRACE(osfilevar.var_dbl)
 	if (osfilevar.var_dbl) {
 		auto nextra_bytes = count_invalid_trailing_UTF8_bytes(var_str);
-//		TRACE(nextra_bytes)
+		//		TRACE(nextra_bytes)
 		if (nextra_bytes) {
 			// Reduce the offset
 			offset -= static_cast<int>(nextra_bytes);
@@ -925,7 +924,7 @@ bool var::osrename(in new_dirpath_or_filepath) const {
 	std::string path2 = to_path_string(new_dirpath_or_filepath);
 
 	// Prevent overwrite of existing file
-    // *** ACQUIRE ***
+	// *** ACQUIRE ***
 	std::ifstream myfile;
 	myfile.open(path2.c_str(), std::ios::binary);
 	if (myfile) {
@@ -946,25 +945,24 @@ bool var::osrename(in new_dirpath_or_filepath) const {
 		return false;
 	}
 
-//	if (!std::rename(path1.c_str(), path2.c_str())) {
-//	// TODO problem no informative error message
-//		this->setlasterror("osrename failed. " ^ this->quote() ^ " to " ^ new_dirpath_or_filepath.quote() ^ " unknown error.");
-//		return false;
-//	}
+	//	if (!std::rename(path1.c_str(), path2.c_str())) {
+	//	// TODO problem no informative error message
+	//		this->setlasterror("osrename failed. " ^ this->quote() ^ " to " ^ new_dirpath_or_filepath.quote() ^ " unknown error.");
+	//		return false;
+	//	}
 
-	//https://en.cppreference.com/w/cpp/filesystem/rename
+	// https://en.cppreference.com/w/cpp/filesystem/rename
 	std::error_code error_code;
 	std::filesystem::rename(
 		path1.c_str(),
 		path2.c_str(),
-		error_code
-	);
+		error_code);
 
-    // Handle error
-    if (error_code) {
+	// Handle error
+	if (error_code) {
 		this->setlasterror("osrename failed. " ^ this->quote() ^ " to " ^ new_dirpath_or_filepath.quote() ^ " Error: 0" ^ error_code.message());
 		return false;
-    }
+	}
 
 	return true;
 }
@@ -978,31 +976,27 @@ bool var::oscopy(in new_dirpath_or_filepath) const {
 	std::string path1 = to_path_string(*this);
 	std::string path2 = to_path_string(new_dirpath_or_filepath);
 
-    // copy recursively, overwriting
+	// copy recursively, overwriting
 	std::filesystem::path frompathx(path1.c_str());
 	std::filesystem::path topathx(path2.c_str());
-	//https://en.cppreference.com/w/cpp/filesystem/copy
+	// https://en.cppreference.com/w/cpp/filesystem/copy
 	std::error_code error_code;
 	std::filesystem::copy(
 		frompathx,
 		topathx,
-//		std::filesystem::copy_options::overwrite_existing
-//		| std::filesystem::copy_options::recursive
-//		| std::filesystem::copy_options::copy_symlinks,
+		//		std::filesystem::copy_options::overwrite_existing
+		//		| std::filesystem::copy_options::recursive
+		//		| std::filesystem::copy_options::copy_symlinks,
 		// Cludge to avoid compile error about missing binary operator when working under home brew module std
 		std::filesystem::copy_options(
-			  int(std::filesystem::copy_options::overwrite_existing)
-			| int(std::filesystem::copy_options::recursive)
-			| int(std::filesystem::copy_options::copy_symlinks)
-		),
-		error_code
-	);
+			int(std::filesystem::copy_options::overwrite_existing) | int(std::filesystem::copy_options::recursive) | int(std::filesystem::copy_options::copy_symlinks)),
+		error_code);
 
-    // Handle error
-    if (error_code) {
+	// Handle error
+	if (error_code) {
 		this->setlasterror("oscopy failed. " ^ this->quote() ^ " to " ^ new_dirpath_or_filepath.quote() ^ " Error: " ^ error_code.message());
 		return false;
-    }
+	}
 
 	return true;
 }
@@ -1030,11 +1024,11 @@ bool var::osmove(in new_dirpath_or_filepath) const {
 
 	// Safety
 	if (!checknotabsoluterootfolder(path1)) {
-	 	this->setlasterror(var(path1).quote() ^ " Cannot be moved or deleted because it is a top level dir");
+		this->setlasterror(var(path1).quote() ^ " Cannot be moved or deleted because it is a top level dir");
 		return false;
 	}
 	if (!checknotabsoluterootfolder(path2)) {
-	 	this->setlasterror(var(path2).quote() ^ " Cannot be overwritten because it is a top level dir");
+		this->setlasterror(var(path2).quote() ^ " Cannot be overwritten because it is a top level dir");
 		return false;
 	}
 
@@ -1053,7 +1047,7 @@ bool var::osmove(in new_dirpath_or_filepath) const {
 	// Delete original only after copy to target is successful
 	if (!this->osremove()) {
 
-	    // Too dangerous to remove target in case of failure to delete source
+		// Too dangerous to remove target in case of failure to delete source
 		// otherwise delete the target too
 		// new_dirpath_or_filepath.osremove();
 
@@ -1088,17 +1082,17 @@ bool var::osmkdir() const {
 
 	std::filesystem::path pathx(to_path_string(*this).c_str());
 
-//	if (std::filesystem::exists(pathx))	{
-//		this->setlasterror(this->quote() ^ " osmkdir failed. Target already exists.");
-//		return false;
-//	}
-//
+	//	if (std::filesystem::exists(pathx))	{
+	//		this->setlasterror(this->quote() ^ " osmkdir failed. Target already exists.");
+	//		return false;
+	//	}
+	//
 	std::error_code ec;
 
 	// Creates parent directories automatically
 	// https://en.cppreference.com/w/cpp/filesystem/create_directory
 	bool created = std::filesystem::create_directories(pathx, ec);
-	if (ec or ! created) {
+	if (ec or !created) {
 		this->setlasterror(this->quote() ^ " osmkdir failed. " ^ ec.message());
 		return false;
 	}
@@ -1152,21 +1146,21 @@ bool var::osrmdir(bool evenifnotempty) const {
 }
 
 // utility defined in mvdatetime.cpp
-//void ptime2mvdatetime(const boost::posix_time::ptime& ptimex, int& mvdate, int& mvtime);
-//WARNING ACTUALLY DEFINED WITH BOOST POSIX TIME BUT IT IS THE SAME
-//void ptime2mvdatetime(const std::filesystem::file_time_type& ptimex, int& mvdate, int& mvtime);
+// void ptime2mvdatetime(const boost::posix_time::ptime& ptimex, int& mvdate, int& mvtime);
+// WARNING ACTUALLY DEFINED WITH BOOST POSIX TIME BUT IT IS THE SAME
+// void ptime2mvdatetime(const std::filesystem::file_time_type& ptimex, int& mvdate, int& mvtime);
 void time_t_to_pick_date_time(time_t time, int* pick_date, int* pick_time);
 
-//convert some clock to time_t (for osfile() and osdir()
-//template <typename TP>
-//std::time_t to_time_t(TP tp) {
+// convert some clock to time_t (for osfile() and osdir()
+// template <typename TP>
+// std::time_t to_time_t(TP tp) {
 //	using namespace std::chrono;
 //	auto sctp = time_point_cast<system_clock::duration>(tp - TP::clock::now() + system_clock::now());
 //	return system_clock::to_time_t(sctp);
-//}
+// }
 
 // Return for a file or dir, a short string containing modified_date ^ FM ^ modified_time ^ FM ^size
-var  var::osinfo(const int mode /*=0*/) const {
+var var::osinfo(const int mode /*=0*/) const {
 
 	assertString(__PRETTY_FUNCTION__);
 
@@ -1180,7 +1174,7 @@ var  var::osinfo(const int mode /*=0*/) const {
 		// Using low level interface instead of std::filesystem to avoid multiple call to stat
 		// 7,430 ns/op instead of  18,500 ns/op
 
-		//https://stackoverflow.com/questions/21159047/get-the-creation-date-of-file-or-folder-in-c#21159305
+		// https://stackoverflow.com/questions/21159047/get-the-creation-date-of-file-or-folder-in-c#21159305
 
 		struct stat statinfo;
 
@@ -1203,26 +1197,26 @@ var  var::osinfo(const int mode /*=0*/) const {
 
 			case 1:
 				// Reject non-files. Links to files are ok.
-	 			if ((statinfo.st_mode & S_IFMT) != S_IFREG)
+				if ((statinfo.st_mode & S_IFMT) != S_IFREG)
 					return "";
 				size = static_cast<varint_t>(statinfo.st_size);
 				break;
 
 			default:
-	 			if ((statinfo.st_mode & S_IFMT) == S_IFREG)
+				if ((statinfo.st_mode & S_IFMT) == S_IFREG)
 					size = static_cast<varint_t>(statinfo.st_size);
 				else
 					size = "";
 				break;
-			}
+		}
 
 		// convert c style time_t to pickos integer date and time
 		int pick_date, pick_time;
-		//boost::posix_time::ptime ptimex = boost::posix_time::from_time_t(statinfo.st_mtime);
-		//ptime2mvdatetime(ptimex, pick_date, pick_time);
+		// boost::posix_time::ptime ptimex = boost::posix_time::from_time_t(statinfo.st_mtime);
+		// ptime2mvdatetime(ptimex, pick_date, pick_time);
 		time_t_to_pick_date_time(statinfo.st_mtime, &pick_date, &pick_time);
 
-		//file_size() is only available for files not directories
+		// file_size() is only available for files not directories
 		return size ^ FM ^ pick_date ^ FM ^ pick_time;
 
 	} catch (...) {
@@ -1230,34 +1224,34 @@ var  var::osinfo(const int mode /*=0*/) const {
 	}
 }
 
-var  var::osfile() const {
+var var::osfile() const {
 	return this->osinfo(1);
 }
 
-var  var::osdir() const {
+var var::osdir() const {
 	return this->osinfo(2);
 }
 
-var  var::oslistf(SV globpattern) const {
+var var::oslistf(SV globpattern) const {
 	return this->oslist(globpattern, 1);
 }
 
-var  var::oslistd(SV globpattern) const {
+var var::oslistd(SV globpattern) const {
 	return this->oslist(globpattern, 2);
 }
 
 /*
-*@param	path	A directory or blank for current working directory. If globpattern if empty then the last part (after any slashes) is used as globpattern.
-*@param	globpattern	Optional glob like "*",  "*.*", "*.???" etc. (CASE INSENSITIVE)
-*@param	mode	1=files only, 2=directories only, otherwise both.
-*@returns		List of directory and/or filenames depending on mode. fm separator
-*/
-var  var::oslist(SV globpattern0, const int mode) const {
+ *@param	path	A directory or blank for current working directory. If globpattern if empty then the last part (after any slashes) is used as globpattern.
+ *@param	globpattern	Optional glob like "*",  "*.*", "*.???" etc. (CASE INSENSITIVE)
+ *@param	mode	1=files only, 2=directories only, otherwise both.
+ *@returns		List of directory and/or filenames depending on mode. fm separator
+ */
+var var::oslist(SV globpattern0, const int mode) const {
 
 	THISIS("var  var::oslist(in globpattern, const int mode) const")
 	assertVar(function_sig);
-	//ISSTRING(path0)
-	//ISSTRING(globpattern0)
+	// ISSTRING(path0)
+	// ISSTRING(globpattern0)
 
 	// returns an FM separated list of files and/or folders
 
@@ -1283,7 +1277,7 @@ var  var::oslist(SV globpattern0, const int mode) const {
 			globpattern = "";
 	}
 
-	const bool getfiles = mode != 2;
+	const bool getfiles	  = mode != 2;
 	const bool getfolders = mode != 1;
 
 	// nrvo
@@ -1292,21 +1286,20 @@ var  var::oslist(SV globpattern0, const int mode) const {
 	// Work out the full absolute path
 	std::filesystem::path full_path(std::filesystem::current_path());
 	if (this_path.len()) {
-		//full_path = std::filesystem::absolute(std::filesystem::path(this_path.to_path_string().c_str()));
-		std::error_code error_code;
+		// full_path = std::filesystem::absolute(std::filesystem::path(this_path.to_path_string().c_str()));
+		std::error_code		  error_code;
 		std::filesystem::path pathx = std::filesystem::path(to_path_string(this_path).c_str());
-		full_path = std::filesystem::absolute(pathx, error_code);
+		full_path					= std::filesystem::absolute(pathx, error_code);
 		if (error_code) {
 			std::cerr << "'" << to_path_string(this_path) << "' path : " << error_code.message() << std::endl;
 			return filelist;
 		}
-
 	}
 
 	if (globpattern == "*")
 		globpattern = "";
 
-	//std::clog << "fullpath='" << full_path << "'" <<std::endl;
+	// std::clog << "fullpath='" << full_path << "'" <<std::endl;
 
 	// Quit if it isnt a folder
 	if (!std::filesystem::is_directory(full_path))
@@ -1317,8 +1310,8 @@ var  var::oslist(SV globpattern0, const int mode) const {
 		try {
 
 			// Skip unwanted items not matching the glob if provided
-			//TRACE(dir_itr->path().filename().string())
-			//TRACE(globpattern)
+			// TRACE(dir_itr->path().filename().string())
+			// TRACE(globpattern)
 			if (globpattern && fnmatch(globpattern.var_str.c_str(), dir_itr->path().filename().c_str(), 0) != 0)
 				continue;
 
@@ -1326,14 +1319,13 @@ var  var::oslist(SV globpattern0, const int mode) const {
 			if (std::filesystem::is_directory(*dir_itr)) {
 				if (getfolders) {
 append_it:
-//					filelist ^= dir_itr->path().filename().string() ^ FM;
+					//					filelist ^= dir_itr->path().filename().string() ^ FM;
 					filelist.var_str += dir_itr->path().filename().string();
 					filelist.var_str.push_back(FM_);
 				}
-			}
-			else {
+			} else {
 				if (getfiles) {
-//					filelist ^= dir_itr->path().filename().string() ^ FM;
+					//					filelist ^= dir_itr->path().filename().string() ^ FM;
 					goto append_it;
 				}
 			}
@@ -1344,7 +1336,7 @@ append_it:
 	}
 
 	// Delete last separator
-	if (! filelist.var_str.empty())
+	if (!filelist.var_str.empty())
 		filelist.var_str.pop_back();
 
 	return filelist;
@@ -1354,12 +1346,12 @@ bool var::oscwd(in newpath) const {
 
 	THISIS("var  var::oscwd(const char* newpath) const")
 	// doesnt use *this - should syntax be changed to setcwd? and getcwd()?
-	assertVar(function_sig);	 // not needed if *this not used
+	assertVar(function_sig);  // not needed if *this not used
 	ISSTRING(newpath)
 
 	try {
 		std::filesystem::current_path(to_path_string(newpath));
-		//std::filesystem::current_path(newpath);
+		// std::filesystem::current_path(newpath);
 	} catch (...) {
 		// filesystem error: cannot set current path: No such file or directory
 		// ignore all errors
@@ -1370,11 +1362,11 @@ bool var::oscwd(in newpath) const {
 	return true;
 }
 
-var  var::oscwd() const {
+var var::oscwd() const {
 
 	THISIS("var  var::oscwd() const")
 	// doesnt use *this - should syntax be changed to ossetcwd? and osgetcwd()?
-	assertVar(function_sig);	 // not needed if *this not used
+	assertVar(function_sig);  // not needed if *this not used
 
 	// TODO consider using complete() or system_complete()
 	//"[Note: When portable behavior is required, use complete(). When operating system

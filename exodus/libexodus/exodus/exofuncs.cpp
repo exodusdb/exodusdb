@@ -428,13 +428,12 @@ ND PUBLIC bool begintrans() {return var().begintrans();}
 ND PUBLIC bool statustrans() {return var().statustrans();}
 ND PUBLIC bool rollbacktrans() {return var().rollbacktrans();}
 ND PUBLIC bool committrans() {return var().committrans();}
-   PUBLIC void cleardbcache() {var().cleardbcache();}
 
 ND PUBLIC bool lock(in dbfile, in key) {return static_cast<bool>(dbfile.lock(key));}
    PUBLIC bool unlock(in dbfile, in key) {return dbfile.unlock(key);}
    PUBLIC bool unlockall(in conn) {return conn.unlockall();}
 
-   PUBLIC void cleardbcache(in conn) {return conn.cleardbcache();}
+   PUBLIC void clearcache(in conn) {return conn.clearcache();}
 
 ND PUBLIC bool open(in dbfilename, io dbfile) {return dbfile.open(dbfilename);}
 ND PUBLIC bool open(in dbfilename) {return var().open(dbfilename);}

@@ -364,14 +364,32 @@ function main() {
 			assert(elapsedtimetext(0, 7.0).logputl() eq "1 week");//??
 			assert(elapsedtimetext(0, 3.5).logputl() eq "3 days, 12 hours");//??
 			assert(elapsedtimetext(0, 1.0).logputl() eq "1 day");//??
-			assert(elapsedtimetext(0, onesec).logputl() eq "1 sec");
+
 			assert(elapsedtimetext(0, onesec * 10).logputl() eq "10 secs");
 			assert(elapsedtimetext(onesec * 10, onesec * 30).logputl() eq "20 secs");
-			assert(elapsedtimetext(0, onesec/1'000).logputl() eq "0.001 secs");
-			assert(elapsedtimetext(0, onesec/10'000).logputl() eq "0.0001 secs");
-			assert(elapsedtimetext(0, onesec/100'000).logputl() eq "< 1 ms");
-			//assert(elapsedtimetext(onesec/1'000'000).logputl() eq "0.000001 secs");
-			//assert(elapsedtimetext(onesec/10'000'000).logputl() eq "0.0000001 secs");
+
+			assert(elapsedtimetext(0, onesec                       ).logputl() eq "1 sec");
+			assert(elapsedtimetext(0,                             0).logputl() eq "0 secs");
+
+			assert(elapsedtimetext(0, onesec/                    10).logputl() eq "0.1 secs");
+			assert(elapsedtimetext(0, onesec/                   100).logputl() eq "10.000 ms");
+			assert(elapsedtimetext(0, onesec/                 1'000).logputl() eq "1.000 ms");
+			assert(elapsedtimetext(0, onesec/                10'000).logputl() eq "0.100 ms");
+
+			assert(elapsedtimetext(0, onesec/               100'000).logputl() eq "10.000 μs");
+			assert(elapsedtimetext(0, onesec/             1'000'000).logputl() eq "1.000 μs");
+			assert(elapsedtimetext(0, onesec/            10'000'000).logputl() eq "0.100 μs");
+
+			//error: use of overloaded operator '/' is ambiguous (with operand types 'var' and 'long')
+//			assert(elapsedtimetext(0, onesec/        10'000'000'000).logputl() eq "0.100 ns");
+
+			assert(elapsedtimetext(0, onesec/           100'000'000).logputl() eq "10.000 ns");
+			assert(elapsedtimetext(0, onesec/         1'000'000'000).logputl() eq "1.000 ns");
+			assert(elapsedtimetext(0, onesec/        10'000'000'000_var).logputl() eq "0.100 ns");
+			assert(elapsedtimetext(0, onesec/       100'000'000'000_var).logputl() eq "0.010 ns");
+			assert(elapsedtimetext(0, onesec/     1'000'000'000'000_var).logputl() eq "0.001 ns");
+			assert(elapsedtimetext(0, onesec/    10'000'000'000'000_var).logputl() eq "0.000 ns");
+
 		}
 
 		printl("----------------------------------------------");

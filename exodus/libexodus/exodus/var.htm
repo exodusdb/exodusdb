@@ -1757,7 +1757,7 @@ writec(record on file, key);</code></pre>
 1. Tries to read from a memory cache. Returns true if successful.</p>
 2a. Tries to read from the actual db file and returns false if unsuccessful.</p>
 2b. Writes the record and key to the memory cache and returns true.</p>
-Cached db file data lives in exodus process memory and is lost when the process terminates or cleardbcache() is called.
+Cached db file data lives in exodus process memory and is lost when the process terminates or clearcache() is called.
 
 <pre><code class='hljs-ncdecl language-javascript'>var record;
 let file = "xo_clients", key = "XD001";
@@ -1777,12 +1777,12 @@ if (file.deletec(key)) ... ok
 // or
 if (deletec(file, key)) ...</code></pre>
 </td></tr>
-<tr><td></td><td>conn.cleardbcache()</td><td>Clears the memory cache of all records for the given connection</p>
+<tr><td></td><td>conn.clearcache()</td><td>Clears the memory cache of all records for the given connection</p>
 All future cache readc() function calls will be forced to obtain records from the actual database and refresh the cache.
 
-<pre><code class='hljs-ncdecl language-javascript'>conn.cleardbcache();
+<pre><code class='hljs-ncdecl language-javascript'>conn.clearcache();
 // or
-cleardbcache(conn);</code></pre>
+clearcache(conn);</code></pre>
 </td></tr>
 <tr><td>var=</td><td>strvar.xlate(filename, fieldno, mode)</td><td>The xlate ("translate") function is similar to readf() but, when called as an exodus program member function, it can be used efficiently with exodus file dictionaries using column names and functions and multivalued data.</p>
 Arguments:</p>
