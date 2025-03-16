@@ -69,9 +69,10 @@ programinit()
 
 function main() {
 
-	// i - inline source code
-	if (OPTIONS.contains("i"))
-		return eeval_main();
+	// "i" - inline source code
+	// or 1st arg end with a ";" or contains a "("
+	if (OPTIONS.contains("i") or COMMAND.f(2).ends(";") or COMMAND.f(2).contains("("))
+		return gosub oneline_compile();
 
 	// Get more options from environment and possibly the second word of the command
 	var options = OPTIONS ^ osgetenv("EXO_COMPILE_OPTIONS");
@@ -2298,7 +2299,7 @@ function is_newer(in new_file_info, in old_file_info) {
 
 }
 
-function eeval_main() {
+function oneline_compile() {
 
 //	var source = SENTENCE.fieldstore(" ", 1, -1, "");
 	var source = COMMAND.remove(1).convert(FM, " ");
@@ -2339,7 +2340,7 @@ e.g.
 		abort(lasterror());
 
 	// Compile it
-	if (not osshell("compile " ^ tempfilesrc ^ " {SS}"))
+	if (not osshell("CXX_OPTIONS='-Wno-unused-result' compile " ^ tempfilesrc ^ " {SS}"))
 		abort(lasterror());
 
 	// Run it
