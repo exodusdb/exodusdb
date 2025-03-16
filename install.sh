@@ -556,7 +556,7 @@ function build_and_install {
 :
 : Note: Using 'echo sudo dd' trick because 'sudo echo xxx > yyy' doesnt sudo the '> yyy' bit.
 :
-	printf 'export PATH="${PATH}:~/bin"\nexport LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:~/lib"\n' | sudo dd of=/etc/profile.d/exodus.sh status=none
+	printf 'export PATH="${PATH}:~/bin"\nexport LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${HOME}/lib"\n' | sudo dd of=/etc/profile.d/exodus.sh status=none
 :
 } # end of stage B - Build and install
 
@@ -648,7 +648,8 @@ function install_database {
 	sudo -u postgres psql $PSQL_PORT_OPT template1 < $EXODUS_DIR/install_template1.sql
 :
 : Grant exodus login, createrole and createdatabase but not superuser
-: -------------------------------------------------------------------
+: Force exodus to create new files in public schema instead of exodus in all databases
+: ------------------------------------------------------------------------------------
 :
 	sudo -u postgres psql $PSQL_PORT_OPT <<-V0G0N
 		--
@@ -666,6 +667,11 @@ function install_database {
 	        CREATEDB
 	        CREATEROLE
 	    ;
+		--
+		-- Force exodus to create new files in public schema instead of exodus
+		-- in all databases.
+		--
+		ALTER ROLE exodus SET search_path TO public, exodus;
 V0G0N
 
 :
