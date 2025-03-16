@@ -57,11 +57,11 @@ function main() {
 	codefile << "\n";
 	codefile <<
 R"__(#include <cassert>
+
+#include <exodus/program.h>
 #ifndef EXO_FORMAT
 #	define println printl
 #endif
-
-#include <exodus/program.h>
 programinit()
 
 function main() {
@@ -477,7 +477,7 @@ function main() {
 					codematch ^= "\n\t}\n";
 
 					// Exclude format from tests in old version of Ubuntu
-					bool uses_format = srcline.match("(print|println|format)\\(");
+					bool uses_format = codematch.match("(print|println|format)\\(");
 					if (uses_format) {
 						codefile << "#ifdef EXO_FORMAT\n";
 					}

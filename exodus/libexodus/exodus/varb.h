@@ -1732,8 +1732,8 @@ template<> ND PUBLIC int         VARBASE1::toInt() const;
 template<> ND PUBLIC double      VARBASE1::toDouble() const;
 template<> ND PUBLIC std::string VARBASE1::toString() &&; // only from rvalues
 template<> ND PUBLIC RETVAR      VARBASE1::clone() const;
-template<> ND PUBLIC void        VARBASE1::createString() const;
-template<> ND PUBLIC void        VARBASE1::assertNumeric(const char* message, const char* varname/* = ""*/) const;
+template<>    PUBLIC void        VARBASE1::createString() const;
+template<>    PUBLIC void        VARBASE1::assertNumeric(const char* message, const char* varname/* = ""*/) const;
 
 } // namespace exo
 
