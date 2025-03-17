@@ -860,8 +860,21 @@ ENVIRONMENT
 
 		// Install/copy and header files found to inc directory
 		// .h files are not compiled. They are COPIED.
+		// except xxx_common.h files are used to GENERATE two line .cpp files
 		else if (inc_extensions.locateusing(" ", fileext)) {
 			var srctext = osread(srcfilename);
+
+			// Upgrade old commons from 2 arg macros to 1 arg
+			if (srcfilename.ends("_common.h")) {
+				let orig_srctext = srctext;
+				srctext.replacer(R"__(common(init|exit)\(([a-z]{2,3}),[a-z]{2,3}_common_no\))__"_rex, R"__(common\1\(\2\))__");
+				if (srctext ne orig_srctext) {
+					if (oswrite(srctext on srcfilename))
+						srcfilename.logputl("Updated commoninit():");
+					else
+						loglasterror();
+				}
+			}
 
 			var abs_srcfilename = srcfilename;
 			if (not abs_srcfilename.starts(OSSLASH))
