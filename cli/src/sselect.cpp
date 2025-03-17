@@ -15,7 +15,7 @@ function main() {
 		if (listid)
 			deletelist(listid);
 		if (not silent)
-			logputl("No items selected.");
+			logputl("0 items selected.");
 		abort();
 	}
 
@@ -23,7 +23,7 @@ function main() {
 		abort(lasterror());
 
 	if (not silent)
-		logputl("Items saved in ", listid, ".");
+		logputl(lasterror(), " items saved in ", listid, ".");
 
 	return 0;
 }

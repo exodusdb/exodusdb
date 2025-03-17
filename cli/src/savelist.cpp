@@ -17,13 +17,13 @@ function main() {
 
 	if (not hasnext())
 		if (not silent)
-			logputl("No items selected.");
+			logputl("0 items selected.");
 
 	if (not savelist(newlistid))
 		abort(lasterror());
 
 	if (not silent)
-			logputl("Items saved in ", newlistid, ".");
+			logputl(lasterror() ^ " items saved in ", newlistid, ".");
 
 	if (not deletelist(listid))
 		if (not silent)

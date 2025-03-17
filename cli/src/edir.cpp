@@ -24,7 +24,7 @@ function main() {
 	if (not COMMAND.f(3) and COMMAND.f(2) ne "DOS") {
 		listid = "default";
 		if (getlist(listid))
-			logputl("using list: ", listid);
+			logputl("Using list: ", listid);
 		else
 			listid = "";
 	}
@@ -98,7 +98,7 @@ function main() {
 			}
 		}
 
-		if (is_new_record)
+		if (is_new_record and keys)
 			printl("New record");
 
 		// fieldno 0/"" means whole record
@@ -152,6 +152,10 @@ function main() {
 		osfilenames ^= temposfilename.quote() ^ " ";
 
 	} // multiple IDs
+
+	// Consume the default list
+	if (listid)
+		deletelist(listid);
 
 	let isdict = not fieldno and ( dbfilename.starts("dict.") or (dbfilename == "DOS" and ID.contains("dat/dict.")));
 

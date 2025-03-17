@@ -54,7 +54,7 @@ function main() {
 
 	}
 
-	var cmd = "list " ^ filename;
+	var cmd = "nlist " ^ filename;
 
 	if (filename == "dict.all")
 		cmd ^= " ID-SUPP FILE_NAME FIELD_NAME @CRT BY FILE_NAME";
@@ -67,7 +67,8 @@ function main() {
 	if (OPTIONS.contains("V"))
 		logputl(cmd);
 
-	if (not osshell(cmd))
+//	if (not osshell(cmd))
+	if (not perform(cmd))
 		lasterror().errputl("listdict:");
 
 	return 0;
