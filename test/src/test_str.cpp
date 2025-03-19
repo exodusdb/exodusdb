@@ -9,7 +9,7 @@
 #include <exodus/program.h>
 programinit()
 
-function main() {
+func main() {
 
 	{
         // using using SNITCH in var.h

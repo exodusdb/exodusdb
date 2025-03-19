@@ -2,7 +2,7 @@
 libraryinit()
 
 // used as [FP] in dat/dict.currencies/EXCHANGE_RATE
-function main(in type, in inx, in /*mode*/, out outx) {
+func main(in type, in inx, in /*mode*/, out outx) {
 
 	let status = 0;
 	if (type == "OCONV") {

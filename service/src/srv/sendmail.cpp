@@ -55,7 +55,7 @@ var errors;
 var errorfile;
 var home = "";
 
-function main(in toaddress0, in ccaddress0, in subject0, in body0, in attachfilename0, in delete0, out errormsg, in replyto0 = var(), in params0 = var()) {
+func main(in toaddress0, in ccaddress0, in subject0, in body0, in attachfilename0, in delete0, out errormsg, in replyto0 = var(), in params0 = var()) {
 
 //	if (ccaddress0.unassigned()) {
 //		ccaddress = "";
@@ -679,7 +679,7 @@ TRACE(offset)
 	return 1;
 }
 
-subroutine addlinks2osfilename() {
+subr addlinks2osfilename() {
 	tt = osfilename;
 	// tt.converter("\\", "/");
 	// if (tt.starts("../")) {

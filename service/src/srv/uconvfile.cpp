@@ -15,7 +15,7 @@ var exe;
 var encoding;
 var errors;
 
-function main(in inputfilename, in encoding1i, in encoding2i, out result, out msg) {
+func main(in inputfilename, in encoding1i, in encoding2i, out result, out msg) {
 
 	// currently only used by convcsv
 

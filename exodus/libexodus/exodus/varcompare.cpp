@@ -38,7 +38,7 @@ namespace exo {
 
 inline bool almost_equal(double lhs_dbl, double rhs_dbl) {
 	//crude pickos method
-	return (std::abs(lhs_dbl - rhs_dbl) < SMALLEST_NUMBER);
+	return (std::abs(lhs_dbl - rhs_dbl) < EXO_SMALLEST_NUMBER);
 }
 
 /* more accurate way of comparing two decimals using EPSILON and ulp
@@ -64,7 +64,7 @@ inline bool almost_equal_not_zero(double x, double y, int ulp)
 inline bool almost_equal(double x, decltype(var_int) y, int ulp)
 {
 	if (y == 0)
-		return (std::abs(x) < SMALLEST_NUMBER);
+		return (std::abs(x) < EXO_SMALLEST_NUMBER);
 	else
 		return almost_equal_not_zero(x, static_cast<double>(y), ulp);
 }
@@ -72,9 +72,9 @@ inline bool almost_equal(double x, decltype(var_int) y, int ulp)
 inline bool almost_equal(double x, double y, int ulp)
 {
 	if (y == 0.0)
-		return (std::abs(x) < SMALLEST_NUMBER);
+		return (std::abs(x) < EXO_SMALLEST_NUMBER);
 	else if (x == 0.0)
-		return (std::abs(y) < SMALLEST_NUMBER);
+		return (std::abs(y) < EXO_SMALLEST_NUMBER);
 	else
 		return almost_equal_not_zero(x, y, ulp);
 }
@@ -166,18 +166,18 @@ bool var_eq_var(CBR lhs, CBR rhs) {
 
 				//return (lhs.var_intd == rhs.var_intd);
 
-				// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
-				//return (std::abs(lhs.var_dbl - rhs.var_dbl) < SMALLEST_NUMBER);
+				// (DOUBLES ONLY COMPARE TO ACCURACY EXO_SMALLEST_NUMBER was 0.0001)
+				//return (std::abs(lhs.var_dbl - rhs.var_dbl) < EXO_SMALLEST_NUMBER);
 				return almost_equal(lhs.var_dbl, rhs.var_dbl);
 			}
 
 			//DOUBLE V INT
 			else {
 				// different from var_lt_var (uses absolute)
-				// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
+				// (DOUBLES ONLY COMPARE TO ACCURACY EXO_SMALLEST_NUMBER was 0.0001)
 
 				//return (lhs.var_int == rhs.var_dbl);
-				//return (std::abs(lhs.var_dbl - static_cast<double>(rhs.var_int)) < SMALLEST_NUMBER);
+				//return (std::abs(lhs.var_dbl - static_cast<double>(rhs.var_int)) < EXO_SMALLEST_NUMBER);
 				// warning: conversion from ‘exo::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
 				return almost_equal(lhs.var_dbl, static_cast<double>(rhs.var_int));
 			}
@@ -188,10 +188,10 @@ bool var_eq_var(CBR lhs, CBR rhs) {
 		//if (rhs.var_typ & VARTYP_INTd)
 		if (rhs.var_typ & VARTYP_DBL) {
 			// different from var_lt_var (uses absolute)
-			// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
+			// (DOUBLES ONLY COMPARE TO ACCURACY EXO_SMALLEST_NUMBER was 0.0001)
 
 			//return (lhs.var_dbl == rhs.var_int);
-			//return (std::abs(static_cast<double>(lhs.var_int) - rhs.var_dbl) < SMALLEST_NUMBER);
+			//return (std::abs(static_cast<double>(lhs.var_int) - rhs.var_dbl) < EXO_SMALLEST_NUMBER);
 			//return almost_equal(lhs.var_int, rhs.var_dbl, 2);
 			//put lhs int 2nd argument to invoke the fastest implmentation
 			// warning: conversion from ‘exo::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
@@ -202,9 +202,9 @@ bool var_eq_var(CBR lhs, CBR rhs) {
 		else {
 			// different from var_lt_var (uses absolute)
 
-			// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
+			// (DOUBLES ONLY COMPARE TO ACCURACY EXO_SMALLEST_NUMBER was 0.0001)
 			//return (lhs.var_dbl == rhs.var_dbl);
-			//return (std::abs(lhs.var_dbl-rhs.var_dbl) < SMALLEST_NUMBER);
+			//return (std::abs(lhs.var_dbl-rhs.var_dbl) < EXO_SMALLEST_NUMBER);
 
 			return (lhs.var_int == rhs.var_int);
 		}
@@ -278,22 +278,22 @@ bool var_lt_var(CBR lhs, CBR rhs) {
 				return (lhs.var_int < rhs.var_int);
 			else
 				// different from var_eq_var
-				// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
+				// (DOUBLES ONLY COMPARE TO ACCURACY EXO_SMALLEST_NUMBER was 0.0001)
 				//return (static_cast<double>(lhs.var_int) < rhs.var_dbl);
-				return (rhs.var_dbl - static_cast<double>(lhs.var_int)) >= SMALLEST_NUMBER;
-			//return ((rhs.var_dbl - static_cast<double>(lhs.var_int) >= SMALLEST_NUMBER);
+				return (rhs.var_dbl - static_cast<double>(lhs.var_int)) >= EXO_SMALLEST_NUMBER;
+			//return ((rhs.var_dbl - static_cast<double>(lhs.var_int) >= EXO_SMALLEST_NUMBER);
 			// std::unreachable();
 		}
 		if (rhs.var_typ & VARTYP_INT)
 			// different from var_eq_var
-			// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
+			// (DOUBLES ONLY COMPARE TO ACCURACY EXO_SMALLEST_NUMBER was 0.0001)
 			//return (lhs.var_dbl < static_cast<double>(rhs.var_int));
-			return (static_cast<double>(rhs.var_int) - lhs.var_dbl) >= SMALLEST_NUMBER;
+			return (static_cast<double>(rhs.var_int) - lhs.var_dbl) >= EXO_SMALLEST_NUMBER;
 		else
 			// different from var_eq_var
-			// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
+			// (DOUBLES ONLY COMPARE TO ACCURACY EXO_SMALLEST_NUMBER was 0.0001)
 			//return (lhs.var_dbl < rhs.var_dbl);
-			return (rhs.var_dbl - lhs.var_dbl) >= SMALLEST_NUMBER;
+			return (rhs.var_dbl - lhs.var_dbl) >= EXO_SMALLEST_NUMBER;
 		// std::unreachable();
 	}
 
@@ -322,8 +322,8 @@ bool var_lt_int(CBR lhs, const int rhs_int) {
 
 		// Compare dbl by preference because int might be a conversion with loss of precision
 		if (lhs.var_typ & VARTYP_DBL)
-			// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
-			return (static_cast<double>(rhs_int) - lhs.var_dbl) >= SMALLEST_NUMBER;
+			// (DOUBLES ONLY COMPARE TO ACCURACY EXO_SMALLEST_NUMBER was 0.0001)
+			return (static_cast<double>(rhs_int) - lhs.var_dbl) >= EXO_SMALLEST_NUMBER;
 
 		//compare int if available
 		if (lhs.var_typ & VARTYP_INT)
@@ -352,8 +352,8 @@ bool int_lt_var(const int lhs_int, CBR rhs) {
 
 		// Compare dbl by preference because int might be a conversion with loss of precision
 		if (rhs.var_typ & VARTYP_DBL) {
-			// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
-			return (rhs.var_dbl - static_cast<double>(lhs_int)) >= SMALLEST_NUMBER;
+			// (DOUBLES ONLY COMPARE TO ACCURACY EXO_SMALLEST_NUMBER was 0.0001)
+			return (rhs.var_dbl - static_cast<double>(lhs_int)) >= EXO_SMALLEST_NUMBER;
 		}
 
 		//compare int if available
@@ -383,13 +383,13 @@ bool var_lt_dbl(CBR lhs, const double rhs_dbl) {
 
 		// LHS DBL
 		if (lhs.var_typ & VARTYP_DBL)
-			// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
-			return (rhs_dbl - lhs.var_dbl) >= SMALLEST_NUMBER;
+			// (DOUBLES ONLY COMPARE TO ACCURACY EXO_SMALLEST_NUMBER was 0.0001)
+			return (rhs_dbl - lhs.var_dbl) >= EXO_SMALLEST_NUMBER;
 
 		// LHS INT
 		if (lhs.var_typ & VARTYP_INT)
-			// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
-			return (rhs_dbl - static_cast<double>(lhs.var_int)) >= SMALLEST_NUMBER;
+			// (DOUBLES ONLY COMPARE TO ACCURACY EXO_SMALLEST_NUMBER was 0.0001)
+			return (rhs_dbl - static_cast<double>(lhs.var_int)) >= EXO_SMALLEST_NUMBER;
 
 		// Try to convert to number and try again
 		// Will check unassigned
@@ -415,13 +415,13 @@ bool dbl_lt_var(const double lhs_dbl, CBR rhs) {
 
 		// RHS double
 		if (rhs.var_typ & VARTYP_DBL)
-			// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
-			return (rhs.var_dbl - lhs_dbl) >= SMALLEST_NUMBER;
+			// (DOUBLES ONLY COMPARE TO ACCURACY EXO_SMALLEST_NUMBER was 0.0001)
+			return (rhs.var_dbl - lhs_dbl) >= EXO_SMALLEST_NUMBER;
 
 		// RHS int
 		if (rhs.var_typ & VARTYP_INT)
-			// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
-			return (static_cast<double>(rhs.var_int) - lhs_dbl) >= SMALLEST_NUMBER;
+			// (DOUBLES ONLY COMPARE TO ACCURACY EXO_SMALLEST_NUMBER was 0.0001)
+			return (static_cast<double>(rhs.var_int) - lhs_dbl) >= EXO_SMALLEST_NUMBER;
 
 		// Try to convert to number and try again
 		// Will check unassigned
@@ -451,8 +451,8 @@ bool var_eq_dbl(CBR lhs, const double rhs_dbl) {
 		// 2. LHS DBL
 		if (lhs.var_typ & VARTYP_DBL) {
 
-			// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
-			//return (std::abs(lhs.var_dbl - rhs.var_dbl) < SMALLEST_NUMBER);
+			// (DOUBLES ONLY COMPARE TO ACCURACY EXO_SMALLEST_NUMBER was 0.0001)
+			//return (std::abs(lhs.var_dbl - rhs.var_dbl) < EXO_SMALLEST_NUMBER);
 			//std::clog << "var_eq_dbl 2. lhs double " << lhs.var_dbl << " compare to double " << rhs_dbl << std::endl;
 			return almost_equal(lhs.var_dbl, rhs_dbl);
 
@@ -463,10 +463,10 @@ bool var_eq_dbl(CBR lhs, const double rhs_dbl) {
 
 			// LHS INT
 			// different from var_lt_var (uses absolute)
-			// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
+			// (DOUBLES ONLY COMPARE TO ACCURACY EXO_SMALLEST_NUMBER was 0.0001)
 
 			//return (lhs.var_dbl == rhs.var_int);
-			//return (std::abs(static_cast<double>(lhs.var_int) - rhs.var_dbl) < SMALLEST_NUMBER);
+			//return (std::abs(static_cast<double>(lhs.var_int) - rhs.var_dbl) < EXO_SMALLEST_NUMBER);
 			//return almost_equal(lhs.var_int, rhs.var_dbl, 2);
 			//put lhs int 2nd argument to invoke the fastest implmentation
 			//std::clog << "var_eq_dbl 3. lhs int " << lhs.var_int << " compare to double " << rhs_dbl << std::endl;
@@ -506,8 +506,8 @@ bool var_eq_bool(CBR lhs, const bool rhs_bool) {
 		//
 		if (lhs.var_typ & VARTYP_DBL) {
 
-			// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
-			//return (std::abs(lhs.var_dbl - rhs.var_dbl) < SMALLEST_NUMBER);
+			// (DOUBLES ONLY COMPARE TO ACCURACY EXO_SMALLEST_NUMBER was 0.0001)
+			//return (std::abs(lhs.var_dbl - rhs.var_dbl) < EXO_SMALLEST_NUMBER);
 			//std::clog << "var_eq_int 2. lhs double " << lhs.var_dbl << " compare to int " << int1 << std::endl;
 			return almost_equal(lhs.var_dbl, (rhs_bool ? 1 : 0));
 
@@ -551,8 +551,8 @@ bool var_eq_int(CBR lhs, const int rhs_int) {
 		// 2. LHS DBL
 		if (lhs.var_typ & VARTYP_DBL) {
 
-			// (DOUBLES ONLY COMPARE TO ACCURACY SMALLEST_NUMBER was 0.0001)
-			//return (std::abs(lhs.var_dbl - rhs.var_dbl) < SMALLEST_NUMBER);
+			// (DOUBLES ONLY COMPARE TO ACCURACY EXO_SMALLEST_NUMBER was 0.0001)
+			//return (std::abs(lhs.var_dbl - rhs.var_dbl) < EXO_SMALLEST_NUMBER);
 			//std::clog << "var_eq_int 2. lhs double " << lhs.var_dbl << " compare to int " << rhs_int << std::endl;
 			return almost_equal(lhs.var_dbl, rhs_int);
 

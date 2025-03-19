@@ -6,7 +6,7 @@ libraryinit()
 #include <service_common.h>
 
 
-function main(in alerttype0, in /*runasuser*/, out tasks, out title, out request, out datax) {
+func main(in alerttype0, in /*runasuser*/, out tasks, out title, out request, out datax) {
 
 	// 1) list of all active users
 	// at 7am on the 14th of each month (ie regularly but not everyday)

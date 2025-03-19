@@ -1,7 +1,7 @@
 #include <exodus/library.h>
 libraryinit()
 
-function main(in instr, in sepchars, in stoplist, in mode) {
+func main(in instr, in sepchars, in stoplist, in mode) {
 
 	// split into words by separators
 	var outstr = instr.convert(sepchars, str(VM, sepchars.len()));

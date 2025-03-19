@@ -15,7 +15,7 @@ SYNOPSIS
     demo_precision [PRECISION]
 
 DESCRIPTION
-    The precision_demo program illustrates how the Exodus library manages IEEE 754 8-byte std::double floating-point numbers for automatic string output and comparisons. This applies only to implicit conversions and does not cover explicit conversions via format(), oconv(), or round().
+    The demo_precision program illustrates how the Exodus library manages IEEE 754 8-byte std::double floating-point numbers for automatic string output and comparisons. This applies only to implicit conversions and does not cover explicit conversions via format(), oconv(), or round().
 
     For most general numerical applications (e.g., business or everyday calculations), Exodus' default settings are sufficient and manual adjustment of precision is not required. However, scientific or engineering applications may need finer control over very large or very small numbers.
 
@@ -25,9 +25,14 @@ DESCRIPTION
         - All numbers are output with a fixed precision of 12 significant digits using std::chars_format::general.
         - This ensures clean output (e.g., "0.3" instead of "0.30000000000000004").
         - Numbers exceeding 1e+12 or smaller than 1e-12 use scientific notation:
-            1234567890123         -> "1.23456789012e+12"
-            0.0000000000012345678 -> "1.23456789012e-12"
-
+            1234567890123.456             -> "1.23456789012e+12"
+            0.000000000001234567890123456 -> "1.23456789012e-12"
+        - Numbers numbers within the same limits do not use scientific notation:
+            123456789012.3456             -> "123456789012"
+            0.00000000001234567890123456  -> "0.0000000000123456789012"
+		- The 13th digit, if present, is used to round the 12 digit away from zero.
+            123456789012.3456             -> "123456789012"
+            123456789012.56               -> "123456789013"
     PRECISION SETTING
         - Exodus uses a "precision" value to define an epsilon (10^-precision) for:
           - Comparing floating-point numbers (e.g., two numbers are equal if their difference is less than epsilon).
@@ -44,9 +49,9 @@ OPTIONS
         - Higher precision suits scientific use but may affect handling of larger numbers.
 
 EXAMPLES
-    precision_demo
+    demo_precision
         Runs with default precision of 4 (epsilon = 0.0001).
-    precision_demo 12
+    demo_precision 12
         Runs with precision of 12 (epsilon = 0.000000000001).
 
 NOTES
@@ -168,12 +173,17 @@ SEE ALSO
 	test( "999999999999.49993896", "1e+12"			, "999999999999");
 	test( "999999999999.49993897", "1e+12"			, "1e+12");
 
-	TRACE(var(1) / var(3));
-	TRACE(var(2) / var(3));
-	TRACE(0.1_var + 0.2_var);
+	TRACE(var(1) / var(3))       // "0.333333333333"
+	TRACE(var(2) / var(3))       // "0.666666666667"
 
-	TRACE(setprecision(12));
-	TRACE(var(0.000000000012345678901234567890))
+	printl("Well known problem is avoided.");
+	TRACE(0.1_var + 0.2_var)     // "0.3"
+
+	printl("13th digit is used to round the 12th digit away from zero.");
+	TRACE((123456789012.56_var)) // "123456789013"
+
+	TRACE(setprecision(12)) // "12"
+	TRACE(var(0.000000000012345678901234567890))    // "0.0000000000123456789012"
 
 	return 0;
 }

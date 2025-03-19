@@ -13,7 +13,7 @@ libraryinit()
 var ndec;  // num
 var temp;
 
-function main(in nextcompanycode) {
+func main(in nextcompanycode) {
 
 	// use app specific version of initcompany2
 	if (APPLICATION != "EXODUS") {

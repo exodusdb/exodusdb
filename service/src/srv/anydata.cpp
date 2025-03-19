@@ -8,7 +8,7 @@ var filenamesx;
 var filename;
 var nrecs;	// num
 
-function main(in filenames0, out result) {
+func main(in filenames0, out result) {
 
 	// $insert bp,agency.common
 
@@ -40,7 +40,7 @@ exit:
 	return 0;
 }
 
-subroutine getnrecs() {
+subr getnrecs() {
 	nrecs = "";
 	var file;
 	if (not file.open(filename, "")) {

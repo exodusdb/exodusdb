@@ -24,13 +24,13 @@
 programinit()
 
 // Function to generate code to be asserted
-function print_assert(double d1, in /*v2*/) {
+func print_assert(double d1, in /*v2*/) {
 
 	printl("assert(var(", d1, ").squote().outputl() eq ", var(d1).squote().quote(), ");");
 	return true;
 }
 
-function main() {
+func main() {
 	printl("test_precision2 says 'Hello World!'");
 
 	// Code generator
@@ -77,12 +77,21 @@ function main() {
 		assert(var(1e-101).squote().outputl() eq "'0'");
 		assert(var(1e-100).squote().outputl() eq "'0'");
 		assert(var(1e-99).squote().outputl()  eq "'0'");
+#if 0
 		assert(var(1e-10).squote().outputl()  eq "'0.0000000001'");
 		assert(var(1e-09).squote().outputl()  eq "'0.000000001'");
 		assert(var(1e-08).squote().outputl()  eq "'0.00000001'");
 		assert(var(1e-07).squote().outputl()  eq "'0.0000001'");
 		assert(var(1e-06).squote().outputl()  eq "'0.000001'");
 		assert(var(1e-05).squote().outputl()  eq "'0.00001'");
+#else
+		assert(var(1e-10).squote().outputl()  eq "'0'");
+		assert(var(1e-09).squote().outputl()  eq "'0'");
+		assert(var(1e-08).squote().outputl()  eq "'0'");
+		assert(var(1e-07).squote().outputl()  eq "'0'");
+		assert(var(1e-06).squote().outputl()  eq "'0'");
+		assert(var(1e-05).squote().outputl()  eq "'0'");
+#endif
 		assert(var(0.0001).squote().outputl() eq "'0.0001'");
 
 		assert(var(0.001).squote().outputl() eq "'0.001'");

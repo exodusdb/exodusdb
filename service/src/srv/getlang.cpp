@@ -14,7 +14,7 @@ var languagecode;
 var langkey;
 var codepage;
 
-function main(in origprogname, in languagecode0, in origdatatype, io languagefile, io lang) {
+func main(in origprogname, in languagecode0, in origdatatype, io languagefile, io lang) {
 
 	lang = "";
 //	if (languagefile.unassigned()) {
@@ -167,7 +167,7 @@ getupperlower:
 	return 0;
 }
 
-subroutine getlang2(in origprogname, in datatype, in languagefile, io lang) {
+subr getlang2(in origprogname, in datatype, in languagefile, io lang) {
 
 	// try with language if present
 	if (languagecode) {
@@ -184,7 +184,7 @@ subroutine getlang2(in origprogname, in datatype, in languagefile, io lang) {
 	return;
 }
 
-subroutine getlang3(in origprogname, in datatype, in languagefile, io lang) {
+subr getlang3(in origprogname, in datatype, in languagefile, io lang) {
 
 	langkey = progname;
 	if (languagecode) {

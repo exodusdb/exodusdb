@@ -22,7 +22,7 @@ var logtime;
 //var vn;
 //var taskn2;
 
-function main(in mode) {
+func main(in mode) {
 	// jbase
 
 	if (mode == "GETCHANGEDTASKS") {

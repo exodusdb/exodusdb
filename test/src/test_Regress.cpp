@@ -6,7 +6,7 @@ programinit()
 
 var totndifferences = 0;
 
-function main() {
+func main() {
 
 	printl("test_regress says 'Hello World!'");
 
@@ -119,7 +119,7 @@ Lines: 190125 differences: 2 Max differences: 2
 #define LOCATE_VN	 ARG6  //col9
 #define LOCATE_SN	 ARG7  //col10
 
-function onefile(in filename, in maxndifferences) {
+func onefile(in filename, in maxndifferences) {
 
 	printl(filename);
 

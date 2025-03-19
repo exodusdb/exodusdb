@@ -451,7 +451,7 @@
 			library.h
 			dict.h
 			common.h
-			common2.h
+#			common2.h
 			exoprog.h
 			ioconv_custom.h
 			timebank.h

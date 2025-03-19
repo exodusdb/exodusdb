@@ -4,7 +4,7 @@
 #include <exodus/program.h>
 programinit()
 
-function main() {
+func main() {
 
 	{
 		TRACE(oconv(1234.56, "MD0"))

@@ -4,7 +4,7 @@
 #include <exodus/program.h>
 programinit()
 
-function test_ioconv(in ovar, in ivar) {
+func test_ioconv(in ovar, in ivar) {
 	logputl();
 	TRACE(ovar)
 	TRACE(ivar)
@@ -17,7 +17,7 @@ function test_ioconv(in ovar, in ivar) {
 	return true;
 }
 
-function main() {
+func main() {
 
 	assert(test_ioconv("111111111111111111111111111111111111111111111111111111111111111", "9223372036854775807"));
 	assert(test_ioconv("1111111111111111111111111111111111111111111111111111111111111111", "-1"));

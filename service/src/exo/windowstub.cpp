@@ -5,7 +5,7 @@ libraryinit()
 
 #include <systemsubs.h>
 
-function main() {
+func main() {
 	// printl("windowstub says 'Hello World!'");
 	// SENTENCE.outputl("SENTENCE=");
 	var progname = SENTENCE.field(" ", 2).lcase().convert(".", "");

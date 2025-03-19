@@ -16,7 +16,7 @@ var lockfile;
 
 #define lockitemsep_ "*"
 
-function main(in mode, in lockfilename, in lockkey, in lockdesc0, io locklist, in ntries0, out msg) {
+func main(in mode, in lockfilename, in lockkey, in lockdesc0, io locklist, in ntries0, out msg) {
 
 //	if (locklist.unassigned()) {
 //		locklist = "";
@@ -130,7 +130,7 @@ tryagain:
 	return 1;
 }
 
-subroutine getlockdesc(io lockdescx, in lockfilename, in lockkey) {
+subr getlockdesc(io lockdescx, in lockfilename, in lockkey) {
 
 	if (not lockdescx) {
 		lockdescx = lockfilename ^ " " ^ lockkey;
@@ -140,7 +140,7 @@ subroutine getlockdesc(io lockdescx, in lockfilename, in lockkey) {
 	return;
 }
 
-subroutine unlockit(in lockfilename, in lockkey, io locklist) {
+subr unlockit(in lockfilename, in lockkey, io locklist) {
 
 	if (lockfile.open(lockfilename, "")) {
 		unlockrecord("", lockfile, lockkey);
@@ -153,7 +153,7 @@ subroutine unlockit(in lockfilename, in lockkey, io locklist) {
 	return;
 }
 
-subroutine unlockall(io locklist, io msg) {
+subr unlockall(io locklist, io msg) {
 
 	var filename2 = "";
 	let file	  = "";

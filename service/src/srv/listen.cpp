@@ -209,7 +209,7 @@ var logid;
 var nextconnection;
 let interactive_prompt = "q to quit, x to execute commands";
 
-function main() {
+func main() {
 
 	if (main_init()) {
 
@@ -245,7 +245,7 @@ function main() {
 
 }
 
-function main_init() {
+func main_init() {
 
 	if (APPLICATION != "EXODUS") {
 
@@ -507,7 +507,7 @@ function main_init() {
 
 }  // main_init
 
-function loop_init() {
+func loop_init() {
 
 	// disconnect any connections added while processing requests
 	nextconnection.disconnectall();
@@ -662,7 +662,7 @@ nextsearch0:
 
 }  // loop_init
 
-subroutine wait() {
+subr wait() {
 
 	// if index(drive(),':',1) then exe='.exe' else exe=''
 	// cmd='WAITING.EXE'
@@ -718,7 +718,7 @@ subroutine wait() {
 
 }  // wait
 
-function loop_exit() {
+func loop_exit() {
 
 	// timeout if no activity
 	dostime = ostime();
@@ -970,7 +970,7 @@ backup:
 
 }  // loop_exit()
 
-subroutine main_exit() {
+subr main_exit() {
 
 	if (logfilename) {
 		logfile.osclose();
@@ -1012,7 +1012,7 @@ subroutine main_exit() {
 	return;
 }
 
-function got_link() {
+func got_link() {
 
 	if (not linkfilename1.osfile())
 		return false;
@@ -1122,7 +1122,7 @@ deleterequest:
 
 }  // got_link
 
-function request_init() {
+func request_init() {
 
 	nrequests += 1;
 
@@ -1433,7 +1433,7 @@ cannotopenlinkfile2:
 	return request_init_ok;
 }
 
-subroutine process() {
+subr process() {
 
 	// Call process2 wrapped inside a transaction
 
@@ -1529,7 +1529,7 @@ subroutine process() {
 
 }  // process
 
-subroutine process2() {
+subr process2() {
 
 	// process the input
 	// /////////////////
@@ -2471,7 +2471,7 @@ badwrite:
 
 }  // process2
 
-function request_exit() {
+func request_exit() {
 
 	// Handle the response
 	// ////////////////////
@@ -2640,7 +2640,7 @@ function request_exit() {
 
 }  // request_exit
 
-subroutine geterrorresponse() {
+subr geterrorresponse() {
 	// 	fileerrorx = FILEERROR;
 	// 	response_ = "Error: " ^ ("FS" ^ fileerrorx.f(1, 1)).xlate("SYS.MESSAGES", 11, "X");
 	// 	response_.replacer("%1%", handlefilename(fileerrorx.f(2, 1)));
@@ -2650,7 +2650,7 @@ subroutine geterrorresponse() {
 	return;
 }
 
-subroutine fmtresp() {
+subr fmtresp() {
 
 	// trim everything after <ESC> (why?)
 	tt = response_.index("<ESC>");
@@ -2669,7 +2669,7 @@ subroutine fmtresp() {
 	return;
 }
 
-subroutine gettimeouttime() {
+subr gettimeouttime() {
 	if (not timeoutsecs) {
 		timeouttime = "";
 		return;
@@ -2686,7 +2686,7 @@ subroutine gettimeouttime() {
 	return;
 }
 
-subroutine properlock() {
+subr properlock() {
 	// must lock it properly otherwise indexing will try to lock it and fail
 	// because it is only in the LOCKS file and not properly locked
 	req.valid = 1;
@@ -2714,7 +2714,7 @@ subroutine properlock() {
 	return;
 }
 
-subroutine properunlock() {
+subr properunlock() {
 	// NB i think that shadow.mfs is NOT programmed to remove the locks file entry
 
 	// must unlock it properly otherwise indexing will try to lock it and fail
@@ -2732,7 +2732,7 @@ subroutine properunlock() {
 	return;
 }
 
-subroutine leaselock() {
+subr leaselock() {
 	// called from LOCK/RELOCK/READU (and WRITE if prewrite changes the key)
 
 	// cannot do update security check here, have to do it AFTER
@@ -2898,7 +2898,7 @@ lockexit:
 	return;
 }
 
-subroutine rawlock() {
+subr rawlock() {
 	// attempt to lock the record
 	// bypass ordinary lock,file,key process otherwise
 	// the lock record will be checked - and in this case
@@ -2920,7 +2920,7 @@ subroutine rawlock() {
 	return;
 }
 
-subroutine rawunlock() {
+subr rawunlock() {
 	// unlock file,keyx
 	// code = 6;
 	// gosub rawlock2(code, nextbfs, handle, keyorfilename, fmc, state);
@@ -2937,13 +2937,13 @@ subroutine rawunlock() {
 //	return;
 //}
 
-subroutine badfile() {
+subr badfile() {
 	// response='Error: ':quote(filename):' file does not exist'
 	call listen4(24, response_, filename);
 	return;
 }
 
-function openleaselocks(in datafile) {
+func openleaselocks(in datafile) {
 
 	// Open the leaselocks on the same connection as the data file
 	if (not leaselocks.open("LOCKS", datafile)) {
@@ -2955,7 +2955,7 @@ function openleaselocks(in datafile) {
 	return true;
 }
 
-subroutine leaseunlock() {
+subr leaseunlock() {
 
 	// sessionid is used as a check that only the locker can unlock
 	if (not file.open(filename, "")) {
@@ -3030,7 +3030,7 @@ unlockexit:
 	return;
 }
 
-subroutine getdostime() {
+subr getdostime() {
 	dostime = ostime();
 	// convert to Windows based date/time (ndays since 1/1/1900)
 	// 31/12/67 in rev date() format equals 24837 in windows date format
@@ -3038,7 +3038,7 @@ subroutine getdostime() {
 	return;
 }
 
-subroutine flagserveractive() {
+subr flagserveractive() {
 
 	// flag that this dataset is being served ("listened") (needed for old MAC)
 	// does not seem to cause any filesharing errors (stress tested at max speed)
@@ -3048,7 +3048,7 @@ subroutine flagserveractive() {
 	return;
 }
 
-subroutine writelogx() {
+subr writelogx() {
 	t2 = "CONVLOG";
 	var dummy;
 	call  listen5(t2, logx, dummy, yy);
@@ -3056,7 +3056,7 @@ subroutine writelogx() {
 	return;
 }
 
-subroutine writelogxclose() {
+subr writelogxclose() {
 	logx = "</Log>";
 	gosub writelogx2();
 	// backup to overwrite if and when another transaction is received
@@ -3064,14 +3064,14 @@ subroutine writelogxclose() {
 	return;
 }
 
-subroutine writelogx2() {
+subr writelogx2() {
 	if (not osbwrite(logx, logfile, logptr))
 		abort(lasterror());
 	logx = "";
 	return;
 }
 
-function filesecurity() {
+func filesecurity() {
 
 	//ok = 1;
 	if (keyx.contains("*")) {
@@ -3093,7 +3093,7 @@ function filesecurity() {
 	return 1;
 }
 
-subroutine addlockholder() {
+subr addlockholder() {
 	if (tt.read(leaselocks, filename ^ "*" ^ keyx)) {
 		// if tt<6> then read tt from locks,field(tt<6>,'*',1,2) else null
 		response_ ^= ", LOCKHOLDER: " ^ (tt.f(4).quote());
@@ -3101,7 +3101,7 @@ subroutine addlockholder() {
 	return;
 }
 
-subroutine checkcompany() {
+subr checkcompany() {
 	badcomp = "";
 
 	// quit no COMPANY_CODE in dict (or cannot determine)
@@ -3134,7 +3134,7 @@ subroutine checkcompany() {
 	return;
 }
 
-subroutine updreqlog() {
+subr updreqlog() {
 	if (not reqlog) {
 		return;
 	}

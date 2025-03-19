@@ -1,7 +1,7 @@
 #include <exodus/library.h>
 libraryinit()
 
-function main() {
+func main() {
 	// TODO OBSOLETE/implement
 	return "definitions";
 }

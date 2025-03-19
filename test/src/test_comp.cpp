@@ -4,14 +4,16 @@
 #include <exodus/program.h>
 programinit()
 
-//exodus/c++ gt uses SMALLEST_NUMBER to compare equality
+//exodus/c++ gt uses exo_smallest_number to compare equality
 ////0.0001 for pick/arev compatibility
 
 	//#include <l2.h>
 
-	function main() {
+	let exo_smallest_number = pwr(10, -getprecision());
 
-	TRACE(SMALLEST_NUMBER)
+func main() {
+
+	TRACE(exo_smallest_number)
 
 	var bigs = "10000000000000";
 	var bigi = 100000000;
@@ -309,8 +311,8 @@ programinit()
 	assert((pwr(10.0, 2) gt 0));	  //100
 	assert((pwr(10.0, 3) gt 0));	  //1000
 
-	var smaller			 = SMALLEST_NUMBER - 0.000000000001;
-	var negative_smaller = -SMALLEST_NUMBER + 0.000000000001;
+	var smaller			 = exo_smallest_number - 0.000000000001;
+	var negative_smaller = -exo_smallest_number + 0.000000000001;
 
 	// var double
 
@@ -318,7 +320,7 @@ programinit()
 		printl("Test var double gt int 0");
 
 		printl("Smallest number is greater than 0");
-		assert(var(SMALLEST_NUMBER) gt 0);
+		assert(var(exo_smallest_number) gt 0);
 
 		printl("Slightly smaller number is *not* greater than 0");
 		assert(not(var(smaller) gt 0));
@@ -327,7 +329,7 @@ programinit()
 		printl("Test var double gt double");
 
 		printl("Smallest number is greater than 0");
-		assert(var(SMALLEST_NUMBER) gt 0.0);
+		assert(var(exo_smallest_number) gt 0.0);
 
 		printl("Slightly smaller number is *not* greater than 0");
 		assert(not(var(smaller) gt 0.0));
@@ -337,7 +339,7 @@ programinit()
 		printl("Test var double gt var int  0");
 
 		printl("Smallest number is greater than 0");
-		assert(var(SMALLEST_NUMBER) gt var(0));
+		assert(var(exo_smallest_number) gt var(0));
 
 		printl("Slightly smaller number is *not* greater than 0");
 		assert(not(var(smaller) gt var(0)));
@@ -346,7 +348,7 @@ programinit()
 		printl("Test var double gt var double 0");
 
 		printl("Smallest number is greater than 0");
-		assert(var(SMALLEST_NUMBER) gt var(0.0));
+		assert(var(exo_smallest_number) gt var(0.0));
 
 		printl("Slightly smaller number is *not* greater than 0");
 		assert(not(var(smaller) gt var(0.0)));
@@ -358,7 +360,7 @@ programinit()
 		printl("Test var double lt var int  0");
 
 		printl("Smallest neg number is lt than 0");
-		assert(var(-SMALLEST_NUMBER) lt 0);
+		assert(var(-exo_smallest_number) lt 0);
 
 		printl("Slightly smaller neg number is *not* lt than 0");
 		assert(not(var(negative_smaller) lt 0));
@@ -367,7 +369,7 @@ programinit()
 		printl("Test var double lt var double 0");
 
 		printl("Smallest number is lt than 0.0");
-		assert(var(-SMALLEST_NUMBER) lt var(0.0));
+		assert(var(-exo_smallest_number) lt var(0.0));
 
 		printl("Slightly smaller neg number is *not* greater than 0.0");
 		assert(not(var(negative_smaller) lt var(0.0)));

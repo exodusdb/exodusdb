@@ -30,7 +30,7 @@ programinit()
 //	return;
 //}
 
-function main() {
+func main() {
 
 	{
 		// testing oconv(x, "[NUMBER]")

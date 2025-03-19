@@ -49,8 +49,8 @@ ND PUBLIC var  osgetenv(SV envcode /*=""*/) {var envvalue = ""; if (not envvalue
 ND PUBLIC bool osgetenv(SV code, out value) {return value.osgetenv(code);}
    PUBLIC void ossetenv(SV code, in value) {return value.ossetenv(code);}
 
-ND PUBLIC var  ostempdirpath() {return var().ostempdirpath();}
-ND PUBLIC var  ostempfilename() {return var().ostempfilename();}
+ND PUBLIC var  ostempdir() {return var().ostempdir();}
+ND PUBLIC var  ostempfile() {return var().ostempfile();}
 
 ND PUBLIC bool assigned(in var1) {return var1.assigned();}
 ND PUBLIC bool unassigned(in var1) {return !var1.assigned();}
@@ -64,15 +64,18 @@ ND PUBLIC var  dump(in var1) {return var1.dump();}
 ND PUBLIC var  or_default(in var1, in defaultvar) {return var1.or_default(defaultvar);}
    PUBLIC void defaulter(io iovar1, in defaultvar) {iovar1.defaulter(defaultvar);}
 
+ND PUBLIC int  getprecision() {return var::getprecision();}
+   PUBLIC int  setprecision(int newprecision) {return var::setprecision(newprecision);}
+
 // OS
 
-ND PUBLIC var  date() {return var().date();}
-ND PUBLIC var  time() {return var().time();}
-ND PUBLIC var  ostime() {return var().ostime();}
-ND PUBLIC var  ostimestamp() {return var().ostimestamp();}
+ND PUBLIC var  date() {return var::date();}
+ND PUBLIC var  time() {return var::time();}
+ND PUBLIC var  ostime() {return var::ostime();}
+ND PUBLIC var  ostimestamp() {return var::ostimestamp();}
 ND PUBLIC var  ostimestamp(in date, in time) {return date.ostimestamp(time);}
 
-   PUBLIC void ossleep(const int milliseconds) {var().ossleep(milliseconds);}
+   PUBLIC void ossleep(const int milliseconds) {var::ossleep(milliseconds);}
 ND PUBLIC var  oswait(SV file_dir_list, const int milliseconds) {return var(file_dir_list).oswait(milliseconds);}
 
 // 4 argument version for statement format
@@ -121,8 +124,8 @@ ND PUBLIC var  oscwd() {return var().oscwd();}
 ND PUBLIC var  oscwd(in dirpath) {return dirpath.oscwd(dirpath);}
 
    PUBLIC void osflush() {return var().osflush();}
-ND PUBLIC var  ospid() {return var().ospid();}
-ND PUBLIC var  ostid() {return var().ostid();}
+ND PUBLIC var  ospid() {return var::ospid();}
+ND PUBLIC var  ostid() {return var::ostid();}
 
 ND PUBLIC bool osshell(in command) {return command.osshell();}
 ND PUBLIC bool osshellwrite(in writestr, in command) {return writestr.osshellwrite(command);}
@@ -290,8 +293,8 @@ ND PUBLIC var  last(in instring) {return instring.last();}
 ND PUBLIC var  first(in instring, const int nbytes) {return instring.first(nbytes);}
 ND PUBLIC var  last(in instring, const int nbytes) {return instring.last(nbytes);}
 
-ND PUBLIC var  chr(const int integer) {return var().chr(integer);}
-ND PUBLIC var  textchr(const int integer) {return var().textchr(integer);}
+ND PUBLIC var  chr(const int integer) {return var::chr(integer);}
+ND PUBLIC var  textchr(const int integer) {return var::textchr(integer);}
 
 // Match
 ND PUBLIC var  match(in instring, SV regex_str, SV regex_options /*=""*/) {return instring.match(regex_str, regex_options);}
@@ -448,6 +451,7 @@ ND PUBLIC bool readf(out field, in dbfile, in key, in fieldnumber) {return field
    PUBLIC void writec(in record, in dbfile, in key) {record.writec(dbfile, key);}
    PUBLIC void writef(in record, in dbfile, in key, const int fieldno) {record.writef(dbfile, key, fieldno);}
 ND PUBLIC bool updaterecord(in record, in dbfile, in key) {return record.updaterecord(dbfile, key);}
+ND PUBLIC bool updatekey(in dbfile, in key, in newkey) {return dbfile.updatekey(key, newkey);}
 ND PUBLIC bool insertrecord(in record, in dbfile, in key) {return record.insertrecord(dbfile, key);}
 //ND PUBLIC bool deleterecord(in dbfile, in key) {return dbfile.deleterecord(key);}
 ND PUBLIC bool deletec(in dbfile, in key) {return dbfile.deletec(key);}
@@ -463,7 +467,7 @@ ND PUBLIC var  xlate(in dbfilename, in key, in fieldno, in mode);
 ND PUBLIC var  lasterror() {return var().lasterror();}
    PUBLIC var  loglasterror(in source /*=""*/) {return var().loglasterror(source);}
 
-
+ND PUBLIC var  version() {return var::version();}
 
 ND PUBLIC bool createfile(in dbfilename) {
 	//exodus doesnt automatically create dict files

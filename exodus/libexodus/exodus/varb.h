@@ -194,15 +194,15 @@ namespace exo {
 	concept std_u32string_or_convertible = std::is_convertible_v<T, std::u32string_view>;
 #endif
 
-// floating point comparison
-//
-//#define SMALLEST_NUMBER 1e-13
-//sum(1287.89,-1226.54,-61.35,1226.54,-1226.54) -> 0.000'000'000'000'23
-//#define SMALLEST_NUMBER 1e-10
-//#define SMALLEST_NUMBER 2.91E-11 (2^-35) or 0.000'000'000'029'1
-//#define SMALLEST_NUMBER 1e-4d//0.0001 for pickos compatibility
-//PUBLIC CONSTINIT_OR_CONSTEXPR double SMALLEST_NUMBER = 0.0001;// for pickos compatibility
-inline const double SMALLEST_NUMBER = 0.0001;// for pickos compatibility
+// Maximum number of post decimal place digits to consider when comparing
+// floating point numbers or converting them to strings
+#ifndef EXO_VARB_CPP
+	extern thread_local int    EXO_PRECISION;
+	extern thread_local double EXO_SMALLEST_NUMBER;
+#else
+	thread_local int    EXO_PRECISION = 4;// for pickos compatibility
+	thread_local double EXO_SMALLEST_NUMBER = 0.0001;// for pickos compatibility
+#endif
 
 // Forward declarations
 
@@ -1577,6 +1577,9 @@ class PUBLIC var_base {
 	ND RETVAR mod(double divisor) const;
 	ND RETVAR mod(const int divisor) const;
 
+	ND static int  getprecision();
+	   static int  setprecision(int);
+
 	////////////////////
 	/// Stop documenting
 	/// :
@@ -1655,32 +1658,33 @@ protected:
 
 	// ::assertInteger
 
-	CONSTEXPR
-	void assertInteger(const char* message, const char* varname = "") const {
-		assertNumeric(message, varname);
-		if (!(var_typ & VARTYP_INT)) {
-
-			//var_int = std::floor(var_dbl);
-
-			// Truncate double to int
-			//var_int = std::trunc(var_dbl);
-			if (var_dbl >= 0) {
-				// 2.9 -> 2
-				// 2.9999 -> 2
-				// 2.99999 -> 3
-				var_int = static_cast<varint_t>(var_dbl + SMALLEST_NUMBER / 10);
-			} else {
-				// -2.9 -> -2
-				// -2.9999 -> -2.9
-				// -2.99999 -> -3
-				var_int = static_cast<varint_t>(var_dbl - SMALLEST_NUMBER / 10);
-			}
-
-			// Add int flag
-			var_typ |= VARTYP_INT;
-		}
-	}
-
+	//CONSTEXPR
+	void assertInteger(const char* message, const char* varname = "") const;
+// {
+//		assertNumeric(message, varname);
+//		if (!(var_typ & VARTYP_INT)) {
+//
+//			//var_int = std::floor(var_dbl);
+//
+//			// Truncate double to int
+//			//var_int = std::trunc(var_dbl);
+//			if (var_dbl >= 0) {
+//				// 2.9 -> 2
+//				// 2.9999 -> 2
+//				// 2.99999 -> 3
+//				var_int = static_cast<varint_t>(var_dbl + EXO_SMALLEST_NUMBER / 10);
+//			} else {
+//				// -2.9 -> -2
+//				// -2.9999 -> -2.9
+//				// -2.99999 -> -3
+//				var_int = static_cast<varint_t>(var_dbl - EXO_SMALLEST_NUMBER / 10);
+//			}
+//
+//			// Add int flag
+//			var_typ |= VARTYP_INT;
+//		}
+//	}
+//
 	// ::assertString
 
 	CONSTEXPR
@@ -1734,6 +1738,7 @@ template<> ND PUBLIC std::string VARBASE1::toString() &&; // only from rvalues
 template<> ND PUBLIC RETVAR      VARBASE1::clone() const;
 template<>    PUBLIC void        VARBASE1::createString() const;
 template<>    PUBLIC void        VARBASE1::assertNumeric(const char* message, const char* varname/* = ""*/) const;
+template<>    PUBLIC void        VARBASE1::assertInteger(const char* message, const char* varname/* = ""*/) const;
 
 } // namespace exo
 

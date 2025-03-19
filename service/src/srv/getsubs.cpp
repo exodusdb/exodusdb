@@ -22,7 +22,7 @@ var msg;
 //var wspos;
 //var wsmsg;
 
-function main(in mode) {
+func main(in mode) {
 
 	// declare function lockposting
 
@@ -218,7 +218,7 @@ nextdoc:
 	// in get.subs and generalproxy
 }
 
-function gettaskprefix(in task) {
+func gettaskprefix(in task) {
 	var taskprefix = "";
 	var task1	   = task.field(" ", 1);
 	if (task1 == "ANAL") {

@@ -278,8 +278,8 @@ export namespace exo {
 	using exo::osshellread;
 	using exo::osshellwrite;
 	using exo::ossleep;
-	using exo::ostempdirpath;
-	using exo::ostempfilename;
+	using exo::ostempdir;
+	using exo::ostempfile;
 	using exo::ostid;
 	using exo::ostime;
 	using exo::oswait;
@@ -338,6 +338,8 @@ export namespace exo {
 	using exo::seq;
 	using exo::setprompt;
 	using exo::setxlocale;
+	using exo::setprecision;
+	using exo::getprecision;
 
 	using exo::shuffle;
 	using exo::shuffler;
@@ -406,6 +408,9 @@ export namespace exo {
 	using exo::updater;
 
 	using exo::updaterecord;
+	using exo::updatekey;
+
+	using exo::version;
 
 	using exo::write;
 	using exo::writec;

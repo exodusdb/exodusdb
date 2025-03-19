@@ -12,7 +12,7 @@ libraryinit()
 var options;
 var nindexed;  // num
 
-function main() {
+func main() {
 	//
 
 	if (SENTENCE.contains("(")) {
@@ -171,7 +171,7 @@ exit:
 	return 0;
 }
 
-subroutine flush(in filename) {
+subr flush(in filename) {
 
 	call flushindex(filename);
 	nindexed = 0;

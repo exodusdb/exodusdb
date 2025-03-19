@@ -258,9 +258,9 @@ static const var defaultconninfo =
 static void PGconn_DELETER(PGconn* pgconn) {
 	auto pgconn2 = pgconn;
 
-    // At this point we have good new connection to database
-    if (DBTRACE>1) {
-        var("").logput("DBTR PQFinish");
+	// At this point we have good new connection to database
+	if (DBTRACE>1) {
+		var("").logput("DBTR PQFinish");
 		std::clog << pgconn << std::endl;
 	}
 
@@ -663,7 +663,7 @@ static DBConn* get_dbconn(in dbhandle) {
 // Returns 1 for success
 // Returns 0 for failure
 // dbresult is returned to caller to extract any data and call PQclear(dbresult) in destructor of DBresult
-static bool get_dbresult(in sql, DBresult& dbresult, PGconn* pgconn) {
+static DBresult get_dbresult(in sql, PGconn* pgconn, out ok) {
 	DEBUG_LOG_SQL
 
 	/* Dont use PQexec because is cannot be told to return binary results
@@ -672,6 +672,10 @@ static bool get_dbresult(in sql, DBresult& dbresult, PGconn* pgconn) {
 	dbresult = get_dbresult(pgconn, sql.var_str.c_str());
 	dbresult = dbresult;
 	*/
+
+	DBresult dbresult;
+
+	var errmsg;
 
 	// Parameter array with no parameters
 	const char* paramValues[1];
@@ -686,27 +690,36 @@ static bool get_dbresult(in sql, DBresult& dbresult, PGconn* pgconn) {
 
 	// Handle serious error. Why not throw?
 	if (not dbresult) UNLIKELY {
-		var("ERROR: vardb: PQexec command failed, no error code: ").errputl();
-		return false;
+		errmsg = "ERROR: vardb: PQexec command failed, no error code: ";
+		errmsg.errputl();
+		ok = false;
+		return dbresult;
 	}
 
 	switch (PQresultStatus(dbresult)) {
 
 		case PGRES_COMMAND_OK:
 			LIKELY
-			return true;
+			errmsg = "";
+			ok = true;
+			return dbresult;
 
 		case PGRES_TUPLES_OK:
-			return PQntuples(dbresult) > 0;
+			ok = PQntuples(dbresult) > 0;
+			if (ok)
+				errmsg = "";
+			else
+				errmsg = "PQntuples"_var ^ PQntuples(dbresult);
+			return dbresult;
 
 		case PGRES_NONFATAL_ERROR:
 
-			var("ERROR: vardb: SQL non-fatal error code " ^
+			errmsg = "ERROR: vardb: SQL non-fatal error code "_var ^
 				var(PQresStatus(PQresultStatus(dbresult))) ^ ", " ^
-				var(PQresultErrorMessage(dbresult)))
-				.errputl();
-
-			return true;
+				var(PQresultErrorMessage(dbresult));
+			errmsg.errputl();
+			ok = false;
+			return dbresult;
 
 		case PGRES_EMPTY_QUERY:
 		case PGRES_COPY_OUT:
@@ -725,13 +738,13 @@ static bool get_dbresult(in sql, DBresult& dbresult, PGconn* pgconn) {
 #pragma clang diagnostic ignored "-Wcovered-switch-default"
 		default:
 			UNLIKELY
-			var("ERROR: vardb: pqexec " ^ var(sql)).errputl();
-			var("ERROR: vardb: pqexec " ^
-				var(PQresStatus(PQresultStatus(dbresult))) ^ ": " ^
-				var(PQresultErrorMessage(dbresult)))
-				.errputl();
-
-			return false;
+			errmsg = "ERROR: vardb: pqexec " ^ sql ^
+					" ERROR: vardb: pqexec " ^
+					var(PQresStatus(PQresultStatus(dbresult))) ^ ": " ^
+					var(PQresultErrorMessage(dbresult));
+			errmsg.errputl();
+			ok = false;
+			return dbresult;
 #pragma clang diagnostic push
 	}
 
@@ -1536,7 +1549,7 @@ bool var::read(in file, in key) {
 
 	// TODO Lower case key if reading from dictionary
 
-	std::string key2 = key.normalize().var_str;
+	const std::string key2 = key.normalize().var_str;
 
 	// Asking to read DOS file! do osread using key as osfilename!
 	if (file == "") UNLIKELY {
@@ -1587,7 +1600,7 @@ bool var::read(in file, in key) {
 	int paramLengths[] = {static_cast<int>(key2.size())};
 	DEBUG_LOG_SQL1
 
-	DBresult dbresult = PQexecParams(pgconn,
+	const DBresult dbresult = PQexecParams(pgconn,
 											sql.var_str.c_str(), 1, /* one param */
 											nullptr,					/* let the backend deduce param type */
 											paramValues, paramLengths,
@@ -1709,7 +1722,7 @@ var  var::lock(in key) const {
 	}
 
 	// Call postgres
-	DBresult dbresult = PQexecParams(pgconn,
+	const DBresult dbresult = PQexecParams(pgconn,
 											// TODO: parameterise filename
 											sql, 1,                                      /* one param */
 											nullptr,                                     /* let the backend deduce param type */
@@ -1785,7 +1798,7 @@ bool var::unlock(in key) const {
 	}
 
 	// Call postgres
-	DBresult dbresult = PQexecParams(pgconn,
+	const DBresult dbresult = PQexecParams(pgconn,
 											sql, 1,										/* one param */
 											nullptr,									/* let the backend deduce param type */
 											paramValues, paramLengths, paramFormats, 1); /* ask for binary results */
@@ -1876,7 +1889,7 @@ bool var::sqlexec(in sqlcmd, io response) const {
 	// NB PQexec cannot be told to return binary results
 	// but it can execute multiple commands
 	// whereas PQexecParams is the opposite
-	DBresult dbresult = PQexec(pgconn, sqlcmd.var_str.c_str());
+	const DBresult dbresult = PQexec(pgconn, sqlcmd.var_str.c_str());
 
 	if (PQresultStatus(dbresult) != PGRES_COMMAND_OK and
 		PQresultStatus(dbresult) != PGRES_TUPLES_OK) UNLIKELY {
@@ -1965,10 +1978,8 @@ void var::write(in file, in key) const {
 	ISSTRING(file)
 	ISSTRING(key)
 
-	// std::string key2=key.var_str;
-	// std::string data2=var_str;
-	std::string key2 = key.normalize().var_str;
-	std::string data2 = this->normalize().var_str;
+	const std::string key2 = key.normalize().var_str;
+	const std::string data2 = this->normalize().var_str;
 
 	// file dos or DOS means osread/oswrite/osremove
 	if (file.var_str.size() == 3 and (file.var_str == "dos" or file.var_str == "DOS")) UNLIKELY {
@@ -2007,7 +2018,7 @@ void var::write(in file, in key) const {
 		throw VarDBException(errmsg);
 	}
 
-	DBresult dbresult = PQexecParams(pgconn,
+	const DBresult dbresult = PQexecParams(pgconn,
 											sql.var_str.c_str(),
 											2,       // two params (key and data)
 											nullptr, // let the backend deduce param type
@@ -2048,14 +2059,15 @@ bool var::updaterecord(in file, in key) const {
 	// to prevent any future readc getting known obsolete records
 	file.deletec(key);
 
-	std::string key2 = key.normalize().var_str;
-	std::string data2 = this->normalize().var_str;
+	const std::string key2 = key.normalize().var_str;
+	const std::string data2 = this->normalize().var_str;
 
 	let sql = "UPDATE "  ^ get_normal_filename(file) ^ " SET data = $2 WHERE key = $1";
 
 	// Parameter array
 	const char* paramValues[] = {key2.data(), data2.data()};
-	int paramLengths[] = {static_cast<int>(key2.size()), static_cast<int>(data2.size())};
+
+	const int paramLengths[] = {static_cast<int>(key2.size()), static_cast<int>(data2.size())};
 	DEBUG_LOG_SQL1
 
 	auto pgconn = get_pgconn(file);
@@ -2066,12 +2078,12 @@ bool var::updaterecord(in file, in key) const {
 		throw VarDBException(errmsg);
 	}
 
-	DBresult dbresult = PQexecParams(pgconn,
+	const DBresult dbresult = PQexecParams(pgconn,
 											sql.var_str.c_str(),
 											2,        // two params (key and data)
 											nullptr,  // let the backend deduce param type
 											paramValues, paramLengths,
-											nullptr,        // text arguments
+											nullptr,  // text arguments
 											0);       // text results
 
 	// Handle serious errors
@@ -2086,10 +2098,86 @@ bool var::updaterecord(in file, in key) const {
 
 	// If not updated 1 then fail
 	if (std::strcmp(PQcmdTuples(dbresult), "1") != 0) UNLIKELY {
-		var("ERROR: vardb: update(" ^ file.convert(_FM, "^") ^
-			", " ^ key ^ ") Failed: " ^ var(PQntuples(dbresult)) ^ " " ^
-			var(PQerrorMessage(pgconn)))
-			.errputl();
+		var(
+			"ERROR: vardb: updaterecord(" ^ file.convert(_FM, "^") ^ ", " ^ key ^ ") Failed: " ^
+			var(PQntuples(dbresult)) ^ " " ^
+			var(PQerrorMessage(pgconn))
+		).errputl();
+		return false;
+	}
+
+	return true;
+}
+
+//"updatekey" is non-standard for pick - but allows changing record keys without rewriting records.
+
+bool var::updatekey(in key, in newkey) const {
+
+	THISIS("bool var::updatekey(in key, in newkey) const")
+	assertString(function_sig);
+	ISSTRING(key)
+	ISSTRING(newkey)
+
+	// Clear any cache when updating actual records
+	// to prevent any future readc getting known obsolete records
+	this->deletec(key);
+	this->deletec(newkey);
+
+	const std::string key2    = key.normalize().var_str;
+	const std::string newkey2 = newkey.normalize().var_str;
+
+	let sql = "UPDATE "  ^ get_normal_filename(*this) ^ " SET key = $2 WHERE key = $1";
+
+	// Parameter array
+	const char* paramValues[]  = {key2.data(),
+	                              newkey2.data()};
+	const int   paramLengths[] = {static_cast<int>(key2.size()),
+	                              static_cast<int>(newkey2.size())};
+	DEBUG_LOG_SQL1
+
+	auto pgconn = get_pgconn(*this);
+	if (!pgconn) UNLIKELY {
+		let errmsg =
+			"ERROR: vardb: updatekey(" ^ this->convert(_FM, "^") ^ ", " ^ key ^ " -> " ^ newkey ^ ") "
+			"get_pgconn() failed. ";
+		this->setlasterror(errmsg);
+		throw VarDBException(errmsg);
+	}
+
+	const DBresult dbresult = PQexecParams(pgconn,
+											sql.var_str.c_str(),
+											2,        // two params (key and newkey)
+											nullptr,  // let the backend deduce param type
+											paramValues, paramLengths,
+											nullptr,  // text arguments
+											0);       // text results
+
+	// Handle serious errors
+	if (PQresultStatus(dbresult) != PGRES_COMMAND_OK) UNLIKELY {
+		let sqlstate = var(PQresultErrorField(dbresult, PG_DIAG_SQLSTATE));
+
+		let errmsg =
+			"ERROR: vardb: updatekey(" ^ this->convert(_FM, "^") ^ ", " ^ key ^ " -> " ^ newkey ^ ") "
+			"SQLERROR: " ^ sqlstate ^ " Failed: " ^ var(PQntuples(dbresult)) ^ " " ^
+			var(PQerrorMessage(pgconn));
+		this->setlasterror(errmsg);
+
+		// Duplicate key is a normal error. Do not throw
+		if (sqlstate == 23505) {
+			// SQLERROR: 23505 Failed: 0 ERROR:  duplicate key value violates unique constraint "xo_test_db_deleterecord_temp_pkey"
+			return false;
+		}
+
+		throw VarDBException(errmsg);
+	}
+
+	// if not updated 1 then fail
+	if (std::strcmp(PQcmdTuples(dbresult), "1") != 0) UNLIKELY {
+		var(
+			"ERROR: vardb: updatekey(" ^ this->convert(_FM, "^") ^ ", " ^ key ^ " -> " ^ newkey ^ ") " ^
+			var(PQntuples(dbresult)) ^ " " ^
+			var(PQerrorMessage(pgconn))
+		).errputl();
 		return false;
 	}
 
@@ -2111,8 +2199,8 @@ bool var::insertrecord(in file, in key) const {
 	// to prevent any future readc getting known obsolete records
 	file.deletec(key);
 
-	std::string key2 = key.normalize().var_str;
-	std::string data2 = this->normalize().var_str;
+	const std::string key2 = key.normalize().var_str;
+	const std::string data2 = this->normalize().var_str;
 
 	let sql =
 		"INSERT INTO " ^ get_normal_filename(file) ^ " (key,data) values( $1 , $2)";
@@ -2130,7 +2218,7 @@ bool var::insertrecord(in file, in key) const {
 		throw VarDBException(errmsg);
 	}
 
-	DBresult dbresult = PQexecParams(pgconn,
+	const DBresult dbresult = PQexecParams(pgconn,
 											sql.var_str.c_str(),
 											2,       // two params (key and data)
 											nullptr, // let the backend deduce param type
@@ -2176,7 +2264,7 @@ bool var::deleterecord(in key) const {
 	// to prevent and future readc getting known non-existent records
 	this->deletec(key);
 
-	std::string key2 = key.normalize().var_str;
+	const std::string key2 = key.normalize().var_str;
 
 	// File dos or DOS means osread/oswrite/osremove
 	if (var_str.size() == 3 and (var_str == "dos" or var_str == "DOS")) UNLIKELY {
@@ -2201,7 +2289,7 @@ bool var::deleterecord(in key) const {
 		throw VarDBException(errmsg);
 	}
 
-	DBresult dbresult = PQexecParams(pgconn, sql.var_str.c_str(), 1, /* two param */
+	const DBresult dbresult = PQexecParams(pgconn, sql.var_str.c_str(), 1, /* two param */
 											nullptr,							/* let the backend deduce param type */
 											paramValues, paramLengths,
 											nullptr,  // text arguments
@@ -2294,8 +2382,8 @@ bool var::rollbacktrans() const {
 	// Change status
 	dbconn->in_transaction_ = false;
 
-    // Clear the lock cache
-    dbconn->locks_.clear();
+// Clear the lock cache
+	dbconn->locks_.clear();
 
 	return true;
 }
@@ -2317,8 +2405,8 @@ bool var::committrans() const {
 	// Change status
 	dbconn->in_transaction_ = false;
 
-    // Clear the lock cache
-    dbconn->locks_.clear();
+	// Clear the lock cache
+	dbconn->locks_.clear();
 
 	return true;
 
@@ -4477,7 +4565,7 @@ bool var::selectx(in fieldnames, in sortselectclause) {
 	//	exo::logputl(sql);
 
 	// First close any existing cursor with the same name, otherwise cannot create  new cursor
-    // Avoid generating sql errors since they abort transactions
+	// Avoid generating sql errors since they abort transactions
 	if (this->cursorexists()) {
 		var sql2 = "";
 		sql2 ^= "CLOSE cursor1_";
@@ -4553,7 +4641,7 @@ void var::clearselect() {
 	//	exo::logputl("DBTRACE: ::clearselect() for " ^ listname);
 
 	// Dont close cursor unless it exists otherwise sql error aborts any transaction
-    // Avoid generating sql errors since they abort transactions
+	// Avoid generating sql errors since they abort transactions
 	// if (not this->cursorexists())
 	if (not this->cursorexists()) UNLIKELY
 		return;
@@ -4587,10 +4675,10 @@ void var::clearselect() {
 }
 
 // NB global not member function
-//	To make it var:: privat member -> pollute mv.h with PGresultptr :(
+//To make it var:: private member -> pollute mv.h with PGresultptr :(
 // bool readnextx(const std::string& cursor, PGresultptr& dbresult)
 // called by readnext (and perhaps hasnext/select to implement LISTACTIVE)
-static bool readnextx(in cursor, PGconn* pgconn, int  direction, PGresult*& pgresult, int* rown) {
+static bool readnextx(in cursor, PGconn* pgconn, int direction, PGresult*& pgresult, int* rown) {
 
 	let cursorcode = cursor.f(1).convert(".", "_");
 	let cursorid = cursor.f(2) ^ "_" ^ cursorcode;
@@ -4640,8 +4728,11 @@ static bool readnextx(in cursor, PGconn* pgconn, int  direction, PGresult*& pgre
 
 	// Execute the sql
 	// Cant use sqlexec() here because it returns data
-	DBresult dbresult2;
-	if (not get_dbresult(sql, dbresult2, pgconn)) {
+	var ok;
+//	const DBresult dbresult2 = get_dbresult(sql, pgconn, ok);
+	// Cant be const because we are going to return the pgresult inside dbresult2 to the caller
+	DBresult dbresult2 = get_dbresult(sql, pgconn, ok);
+	if (not ok) {
 		if (entry != thread_dbresults.end())
 			thread_dbresults.erase(entry);
 
@@ -4698,8 +4789,13 @@ static bool readnextx(in cursor, PGconn* pgconn, int  direction, PGresult*& pgre
 
 //TRACE(dbresult2.rown_)
 
-	// Return a pointer to the pgresult
-	pgresult = dbresult2;
+	// Take ownership of the pgresult currently owned by dbresult2
+//	pgresult = std::move(dbresult2);
+//	pgresult = std::move(dbresult2.pgresult_);
+	std::swap(pgresult, dbresult2.pgresult_);
+	// Relinquish ownership of pgresult to prevent its destructor here freeing it on close of this func
+	// done by std::move above.
+//	dbresult2.pgresult_ = nullptr;
 
 	// Transfer the probably multi-row result into the thread_dbresults cache
 	// for subsequent readnextx
@@ -4708,12 +4804,8 @@ static bool readnextx(in cursor, PGconn* pgconn, int  direction, PGresult*& pgre
 	else
 		thread_dbresults[cursorid] = pgresult;
 
-	// Relinquish ownership of pgresult
-	dbresult2.pgresult_ = nullptr;
-
-	//dump_pgresult(pgresult);
-
 	// Indicate success. true = found a new key/record
+	// out pgresult contains the meat
 	return true;
 }
 
@@ -4765,6 +4857,7 @@ bool var::savelist(SV listname) {
 
 	var listno = 1;
 	var listkey = listname;
+	int nkeys = 0;
 	const var listname2 = listname;
 	var list = "";
 	// Limit maximum number of keys in one block to 1Mb
@@ -4802,6 +4895,8 @@ bool var::savelist(SV listname) {
 	var mv;
 	while (this->readnext(key, mv)) {
 
+		nkeys++;
+
 		// Append the key to the list
 		list.var_str.append(key.var_str);
 
@@ -4825,6 +4920,8 @@ bool var::savelist(SV listname) {
 
 	// Write any pending list
 	write_list();
+
+	setlasterror(nkeys);
 
 	return listno > 1;
 }
@@ -4969,7 +5066,7 @@ bool var::hasnext() {
 	}
 
 	// TODO avoid this trip to the database somehow?
-    // Avoid generating sql errors since they abort transactions
+	// Avoid generating sql errors since they abort transactions
 	if (not this->cursorexists()) UNLIKELY
 		return false;
 
@@ -5054,7 +5151,7 @@ bool var::readnext(io record, io key, io valueno) {
 				if (not lists.open("LISTS")) UNLIKELY {
 					let errmsg = "readnext() LISTS file cannot be opened";
 			        this->setlasterror(errmsg);
-       				throw VarDBException(errmsg);
+					throw VarDBException(errmsg);
 				}
 
 				var listno = this->f(4);
@@ -5095,7 +5192,7 @@ bool var::readnext(io record, io key, io valueno) {
 	if (not this->cursorexists()) UNLIKELY
 		return false;
 
-	//DBresult dbresult;
+	//const DBresult dbresult;
 	PGresult* pgresult = nullptr;
 	int rown;
 	if (not readnextx(*this, pgconn, /*direction=*/1, pgresult, &rown)) UNLIKELY {
@@ -5106,9 +5203,6 @@ bool var::readnext(io record, io key, io valueno) {
 	//dump_pgresult(pgresult);
 
 	// Key is first column
-	// char* data = PQgetvalue(dbresult, 0, 0);
-	// int datalen = PQgetlength(dbresult, 0, 0);
-	// key=std::string(data,datalen);
 	key = getpgresultcell(pgresult, rown, 0);
 	// TODO return zero if no mv in select because no by mv column
 
@@ -5287,8 +5381,11 @@ var  var::listfiles() const {
 	if (not pgconn) UNLIKELY
 		return "";
 
-	DBresult dbresult;
-	if (not get_dbresult(sql, dbresult, pgconn)) UNLIKELY
+//	DBresult dbresult;
+//	if (not get_dbresult(sql, dbresult, pgconn)) UNLIKELY
+//		return "";
+	var ok; const DBresult dbresult = get_dbresult(sql, pgconn, ok);
+	if (not ok)
 		return "";
 
 	var filenames = "";
@@ -5326,15 +5423,18 @@ var  var::dblist() const {
 	if (not pgconn) UNLIKELY
 		return "";
 
-	DBresult dbresult;
-	if (not get_dbresult(sql, dbresult, pgconn)) UNLIKELY
+//	DBresult dbresult;
+//	if (not get_dbresult(sql, dbresult, pgconn)) UNLIKELY
+//		return "";
+	var ok; const DBresult dbresult = get_dbresult(sql, pgconn, ok);
+	if (not ok)
 		return "";
 
 	let dbnames = "";
 	auto ndbs = PQntuples(dbresult);
 	for (auto dbn = 0; dbn < ndbs; dbn++) {
 		if (not PQgetisnull(dbresult, dbn, 0)) {
-			std::string dbname = getpgresultcell(dbresult, dbn, 0);
+			const std::string dbname = getpgresultcell(dbresult, dbn, 0);
 			if (not dbname.starts_with("template") and not dbname.starts_with("postgres")) {
 				dbnames.var_str.append(dbname);
 				dbnames.var_str.push_back(FM_);
@@ -5351,7 +5451,7 @@ bool var::cursorexists() {
 	THISIS("bool var::cursorexists()")
 	assertVar(function_sig);
 
-    // We MUST avoid generating sql errors because any error aborts transactions
+	// We MUST avoid generating sql errors because any error aborts transactions
 
 	// Default cursor is ""
 	this->defaulter("");
@@ -5370,9 +5470,12 @@ bool var::cursorexists() {
 	// from http://www.alberton.info/postgresql_meta_info.html
 	let sql = "SELECT name from pg_cursors where name = 'cursor1_" ^ cursorcode ^ "'";
 
-	DBresult dbresult;
-	if (not get_dbresult(sql, dbresult, pgconn)) UNLIKELY
-		return false;
+//	DBresult dbresult;
+//	if (not get_dbresult(sql, dbresult, pgconn)) UNLIKELY
+//		return false;
+	var ok; const DBresult dbresult = get_dbresult(sql, pgconn, ok);
+	if (not ok)
+	return false;
 
 	return PQntuples(dbresult) > 0;
 }
@@ -5411,8 +5514,11 @@ var  var::listindex(in filename0, in fieldname0) const {
 		return "";
 
 	// Execute command or return empty string
-	DBresult dbresult;
-	if (not get_dbresult(sql, dbresult, pgconn)) UNLIKELY
+//	DBresult dbresult;
+//	if (not get_dbresult(sql, dbresult, pgconn)) UNLIKELY
+//		return "";
+	var ok; const DBresult dbresult = get_dbresult(sql, pgconn, ok);
+	if (not ok)
 		return "";
 
 	std::string indexnames = "";
@@ -5437,10 +5543,11 @@ var  var::listindex(in filename0, in fieldname0) const {
 
 	var result = "";
 	if (not indexnames.empty()) {
-		indexnames.pop_back();
-		result = std::move(indexnames);
+		result.var_str = std::move(indexnames);
+		result.var_str.pop_back();
 		result.sorter();
 	}
+
 	return result;
 }
 
@@ -5450,33 +5557,39 @@ var  var::reccount(in filename0) const {
 	assertVar(function_sig);
 	ISSTRING(filename0)
 
+	// Use var if filename not provided.
 	let filename = filename0 ?: (*this);
 
-	// Must vacuum first otherwise the count is unreliable
-	if (not this->statustrans())
-		this->flushindex(filename);
+	// Vacuum first otherwise the count is unreliable
+	// Sadly doesnt work in transactions
+	if (not this->flushindex(filename))
+		this->lasterror().logputl();
 
-	var sql = "SELECT reltuples::integer FROM pg_class WHERE relname = '";
-	sql ^= filename.f(1).lcase();
-	sql ^= "';";
+	let sql = "SELECT reltuples::integer FROM pg_class WHERE relname = '" ^ filename.f(1).lcase() ^ "';";
 
+	// Get a connection
 	auto pgconn = get_pgconn(filename);
 	if (not pgconn) UNLIKELY
 		return "";
 
 	// Execute command or return empty string
-	DBresult dbresult;
-	if (not get_dbresult(sql, dbresult, pgconn)) UNLIKELY
-		return "";
+//	DBresult dbresult;
+//	if (not get_dbresult(sql, dbresult, pgconn)) UNLIKELY
+//		return "";
+	var ok; const DBresult dbresult = get_dbresult(sql, pgconn, ok);
+	if (not ok)
+	return "";
 
-	var reccount = "";
+	var nrvo = "";
 	if (PQntuples(dbresult) and PQnfields(dbresult) > 0 and not PQgetisnull(dbresult, 0, 0)) {
-		// reccount=var((int)ntohl(*(uint32_t*)PQgetvalue(dbresult, 0, 0)));
-		reccount = getpgresultcell(dbresult, 0, 0);
-		reccount += 0;
+		// nrvo=var((int)ntohl(*(uint32_t*)PQgetvalue(dbresult, 0, 0)));
+		nrvo = getpgresultcell(dbresult, 0, 0);
+		// Ensure numeric
+		nrvo += 0;
 	}
 
-	return reccount;
+	// Might return -1 if unknown
+	return nrvo;
 }
 
 bool var::flushindex(in filename) const {
@@ -5485,23 +5598,37 @@ bool var::flushindex(in filename) const {
 	assertVar(function_sig);
 	ISSTRING(filename)
 
-	var sql = "VACUUM";
-	if (filename)
-		// attribute 1 in case passed a file instead of just filename
-		sql ^= " " ^ filename.f(1).lcase();
-	sql ^= ";";
+	// Skip if in a transaction
+	if (this->statustrans()) {
+		setlasterror("Error: var::flushindex cannot vacuum while transaction is active");
+		return false;
+	}
+
+	let sql = "VACUUM " ^ filename.f(1).lcase();
 
 	// TODO perhaps should get connection from file if passed a file
 	auto pgconn = get_pgconn(*this);
-	if (not pgconn) UNLIKELY
+	if (not pgconn) UNLIKELY {
+		setlasterror("Error: var::flushindex cannot get a connection " ^ filename);
 		return false;
+	}
 
 	// Execute command or return false
-	DBresult dbresult;
-	if (not get_dbresult(sql, dbresult, pgconn)) UNLIKELY
+//	DBresult dbresult;
+//	if (not get_dbresult(sql, dbresult, pgconn)) UNLIKELY {
+//		setlasterror("Error: var::flushindex failed to get a result.");
+//		return false;
+//	}
+	var ok; const DBresult dbresult = get_dbresult(sql, pgconn, ok);
+	if (not ok) {
+		setlasterror("Error: var::flushindex failed to get a result.");
 		return false;
+	}
 
-	if (PQntuples(dbresult)) {}
+	// What is this?
+	if (PQntuples(dbresult)) {
+		TRACE(PQntuples(dbresult))
+	}
 
 	return true;
 }

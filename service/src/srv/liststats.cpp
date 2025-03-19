@@ -60,7 +60,7 @@ var newoptions;
 var printtx_ii;	 // num
 var spaceoptionsize;
 
-function main() {
+func main() {
 
 	// for printtx
 

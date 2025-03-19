@@ -1,7 +1,7 @@
 #include <exodus/program.h>
 programinit()
 
-function main() {
+func main() {
 
 	printl("cpp2dat says 'Hello World!'");
 

@@ -159,7 +159,7 @@ static bool checknotabsoluterootfolder(std::string dirpath) {
 		(SLASH_IS_BACKSLASH && (dirpath[1] == ':') && (dirpath[2] == OSSLASH_))) {
 
 		// Exclude tmp dir
-		if (dirpath.starts_with(var().ostempdirpath().toString()))
+		if (dirpath.starts_with(var::ostempdir().toString()))
 			return true;
 
 		// Only check existing dirs
@@ -194,7 +194,7 @@ static const std::string to_oscmd_string(in cmd) {
 }
 
 // Returns with trailing OSSLASH
-var var::ostempdirpath() const {
+var var::ostempdir() {
 	std::error_code error_code;
 	// TODO handle error code specifically
 	std::string dirpath = std::string(std::filesystem::temp_directory_path(error_code));
@@ -220,7 +220,7 @@ var var::ostempdirpath() const {
 // and will automatically be fully deleted when the file handle is closed/process terminates.
 //
 
-// var  var::ostempfilename() const {
+// var  var::ostempfile() const {
 //
 //	// Linux immediately unlinks the temporary file so it exists without a name.
 //	// the actual file is automatically deleted from the file system when the file handle is closed/process is closed.
@@ -246,14 +246,14 @@ var var::ostempdirpath() const {
 // This function actually creates a file which must be cleaned up by the caller
 // The filenames are random names
 // TODO is this threadsafe?
-var var::ostempfilename() const {
+var var::ostempfile() {
 
 	// https://cpp.hotexamples.com/examples/-/-/mkstemp/cpp-mkstemp-function-examples.html
 
 	// Create a char* template of the temporary file name desired
 	// (2*26+10)^6 possible filenames = 56,800,235,584
 	// Note that 64 bit hash = 1.84467440737e+19 combinations
-	var				  rvo_tempfilename = this->ostempdirpath() ^ "~exoXXXXXX";
+	var				  rvo_tempfilename = var::ostempdir() ^ "~exoXXXXXX";
 	std::vector<char> buffer(rvo_tempfilename.var_str.begin(), rvo_tempfilename.var_str.end());
 	buffer.push_back('\0');
 

@@ -22,7 +22,7 @@ programinit()
 	return 0;
 }
 
-subroutine test_mod() {
+subr test_mod() {
 
 	//a	b	exodus	arev	remainder
 	var moddata = R"(
@@ -185,7 +185,7 @@ subroutine test_mod() {
 	return;
 }
 
-subroutine test_basic_ops() {
+subr test_basic_ops() {
 
 	//test all combinations of doubles and integers
 	test("102.5", "5.7");
@@ -195,7 +195,7 @@ subroutine test_basic_ops() {
 	return;
 }
 
-subroutine test(in as, in bs) {
+subr test(in as, in bs) {
 
 	//test all combinations of negatives
 	test2(as, bs);
@@ -206,7 +206,7 @@ subroutine test(in as, in bs) {
 	return;
 }
 
-subroutine test2(in as, in bs) {
+subr test2(in as, in bs) {
 
 	var z;
 	var ai = as;

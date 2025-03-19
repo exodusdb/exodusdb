@@ -1,7 +1,7 @@
 #include <exodus/library.h>
 libraryinit()
 
-function main(in type, in in0, in mode, out out0) {
+func main(in type, in in0, in mode, out out0) {
 
 	// used in timesheets which stores duration as decimal hours internally
 	// eg 1.5 internally shows as 1:30 externally ie one hour and 30 minutes

@@ -111,35 +111,56 @@ namespace exo {
 // Given the above then I choose to discard three digits of decimal accuracy
 // from double when converting to strings to avoid floating point inaccuracy compared to decimal digits.
 #define EXO_MAX_PRECISION std::numeric_limits<double>::digits10 // 15 for IEEE 8 byte double
-#define EXO_PRECISION EXO_MAX_PRECISION - 3 // 12 digits total e.g. 1.234'567'890'12
+//#define TO_STRING_NDECS EXO_MAX_PRECISION - 3 // 12 digits total e.g. 1.234'567'890'12
+thread_local int TO_STRING_NDECS = EXO_MAX_PRECISION - 3; // i.e. 12 assuming var using double
+
+// Set precision (decimal places) for floating point comparison. Useful in scientific or engineering applications.
+// var: New precision between -308 and 308 inclusive.
+// Returns: New precision if successful or old precision if not.
+// The default precision is 4 which corresponds to 0.0001.
+// By default, printing a raw var double smaller than 0.0001 without using oconv() or round() renders "0".
+template<> PUBLIC int VARBASE1::setprecision(int new_precision) /*const*/ {
+//	this->assertInteger(__PRETTY_FUNCTION__);
+	// For double: -307 to +308 (binary -1021/+1024 due to 20 bit exponent)
+	if (new_precision >= std::numeric_limits<double>::min_exponent10 and new_precision <= std::numeric_limits<double>::max_exponent10) {
+		EXO_PRECISION = new_precision;
+		EXO_SMALLEST_NUMBER = 1.0 / std::pow(10.0, EXO_PRECISION);
+	} else
+		std::cerr << "Error: Precision " << new_precision << " must be between " << std::numeric_limits<double>::min_exponent10 << " and " << std::numeric_limits<double>::max_exponent10 << std::endl;
+	return EXO_PRECISION;
+}
+
+template<> PUBLIC int VARBASE1::getprecision() /*const*/ {
+	return EXO_PRECISION;
+}
 
 // Used by:
-// 1. var::createString() (via double_to_string) using std::chars_format::general and given ndecs
-// 2. var::round()                               using std::chars_format::fixed and default precision (ndecs)
-static std::string double_to_chars_to_string(
-		double in_double,
-		std::chars_format in_format = std::chars_format::general,
-//		int decimals = std::numeric_limits<double>::digits10 + 1
-		int in_decimals = EXO_PRECISION
-	) {
-//	std::cerr << "in double  " << in_double << std::endl;
-//	std::cerr << "in decimals" << in_decimals << std::endl;
+// var::round() using std::chars_format::fixed and default precision (ndecs)
+static std::string double_to_chars_to_string(double in_double, int in_decimals) {
+
 	// Local stack working space for to_chars
-	constexpr auto MAX_CHARS = 24;
+	constexpr auto MAX_CHARS = 24; // 24
 	std::array<char, MAX_CHARS> out_chars;
 
 	// to_chars
 #pragma GCC diagnostic push
 #pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
-	auto [ptr, ec] = std::to_chars(out_chars.data(), out_chars.data() + out_chars.size(), in_double, in_format, in_decimals);
+	auto [ptr, ec] = std::to_chars(out_chars.data(), out_chars.data() + out_chars.size(), in_double, std::chars_format::fixed, in_decimals);
 #pragma GCC diagnostic pop
 
 	// Throw NON-NUMERIC if cannot convert
-	if (ec != std::errc())
-		throw VarNonNumeric("var::round: Cannot round " ^ var(in_double) ^ " ndecimals: " ^ in_decimals ^ " to " ^ MAX_CHARS ^ " characters");
+	if (ec != std::errc()) {
+		auto e = std::make_error_code(ec);
+		throw VarNonNumeric(
+			"var::round: Cannot round " ^ var(std::to_string(in_double)).trimlast("0") ^
+			" to " ^ in_decimals ^ " ndecimals" ^
+			" using only " ^ MAX_CHARS ^ " characters." ^
+            " Error: " ^ e.message() ^
+			" (" ^ e.value() ^ ")"
+		);
+	}
 
-	// Convert to a string.
-	// Hopefully using small string optimisation (SSO)
+	// Convert array to a std::string probably using SSO
 	return std::string(out_chars.data(), ptr - out_chars.data());
 }
 #endif
@@ -148,19 +169,33 @@ static std::string double_to_chars_to_string(
 // Utility to convert double to std string
 //////////////////////////////////////////
 
-static std::string double_to_string(double double1) {
+static std::string double_to_string(const double double1) {
 
-	// prevent "-0"
-	if (!double1)
-		return "0";
+	std::string resultstr;
 
-	int minus = double1 < 0 ? 1 : 0;
+	// Disregard floating point/decimal errors and -0
+//	if (std::abs(double1) < 1e-12) {
+//	if (std::abs(double1) < EXO_SMALLEST_PRECISION_NUMBER) {
+	if (std::abs(double1) < EXO_SMALLEST_NUMBER) {
+		resultstr = "0";
+		return resultstr;
+	}
 
-	//Precision on scientific output allows the full precision to obtained
-	//regardless of the size of the number (big or small)
+	// 1. Scientific precision is the total number of significant digits
 	//
-	//Precision on fixed output only controls the precision after the decimal point
-	//so the precision needs to be huge to cater for very small numbers eg < 10E-20
+	// e.g. 1233.5678     is 8 significant digits.
+	//      1.2345678e+03 is 8 significant digits.
+	//
+	// 2. C++ precision is the number of digits after the decimal point
+	//
+	// e.g. 1233.5678     is 4 digit precision in general format
+	//      1.2345678e+03 is 7 digit precision in scientific format
+	//
+	// c++ precision using scientific output allows the full precision to be obtained
+	// regardless of the size of the number (big or small)
+	//
+	// C++ Precision on fixed output only controls the precision after the decimal point
+	// so the precision needs to be huge to cater for very small numbers eg < 10E-20
 
 ///////////////////////////////////
 #ifdef EXO_USE_TO_CHARS // METHOD 1
@@ -171,37 +206,38 @@ static std::string double_to_string(double double1) {
 	// Use the new low level high performance double to chars converter
 	// https://en.cppreference.com/w/cpp/utility/to_chars
 
-//	// Use local data to avoid using heap
-//	// The result chars are very likely to fit in std::string SSO without using the heap
-//	// (15 bytes in gcc and 23 in clang)
-//	constexpr auto MAX_CHARS = 24;
-//	std::array<char, MAX_CHARS> chars;
-//
-//	//auto [ptr, ec] = std::to_chars(chars.data(), chars.data() + chars.size(), double1, std::chars_format::scientific);
-//#pragma GCC diagnostic push
-//#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
-//	auto [ptr, ec] = std::to_chars(chars.data(), chars.data() + chars.size(), double1, std::chars_format::general, std::numeric_limits<double>::digits10 + 1);
-//	//auto [ptr, ec] = std::to_chars(chars.data(), chars.data() + chars.size(), double1, std::chars_format::general, precision);
-//#pragma GCC diagnostic pop
-//
-//	// Throw if non-numeric
-//	if (ec != std::errc())
-//		UNLIKELY
-//		throw VarNonNumeric("double_to_string: Cannot convert double to " ^ var(MAX_CHARS) ^ " characters");
-//
-//	// Create a std string from the fixed array of char
-//	// Probably it will use small string optimisation (SSO)
-//	// - gcc 15 chars
-//	// - clang 23 chars
-//	std::string resultstr = std::string(chars.data(), ptr - chars.data());
+	// Local stack working space for to_chars
+	constexpr auto MAX_CHARS = 24; // 24
+	std::array<char, MAX_CHARS> out_chars;
 
-	std::string resultstr = double_to_chars_to_string(double1);
+	// to_chars
+#pragma GCC diagnostic push
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
+	auto [ptr, ec] = std::to_chars(out_chars.data(), out_chars.data() + out_chars.size(), double1, std::chars_format::general, TO_STRING_NDECS);
+#pragma GCC diagnostic pop
+
+	// Throw NON-NUMERIC if cannot convert
+	if (ec != std::errc()) {
+		auto e = std::make_error_code(ec);
+		throw VarNonNumeric(
+			"var::createString: Cannot convert:" ^ var(std::to_string(double1)).trimlast("0") ^
+			" to " ^ TO_STRING_NDECS ^ " ndecimals" ^
+			" using only " ^ MAX_CHARS ^ " characters." ^
+            " Error: " ^ e.message() ^
+			" (" ^ e.value() ^ ")"
+		);
+	}
+
+	// Convert to a string. Normally will use SSO and not the heap.
+	resultstr = std::string(out_chars.data(), ptr - out_chars.data());
 
 	// Find the exponent if any
 	const std::size_t epos = resultstr.find('e');
 	// We are done if there is no exponent
 	if (epos == std::string::npos)
 		return resultstr;
+
+	// 1e-10 -> "0.0000000001"
 
 //std::cout << "double1  =" << double1 << std::endl;
 //std::cout << "resultstr=" << resultstr << std::endl;
@@ -317,6 +353,11 @@ static std::string double_to_string(double double1) {
 // PROCESS THE SCIENTIFIC OUTPUT OF THE ABOVE 3 ALTERNATIVES
 ////////////////////////////////////////////////////////////
 
+	//                                             cout << dbl   cout << var
+	//              ".000012345678901234567890"    1.23457e-05   1.23456789012e-05
+	// "1234567890123.4567890"                     1.23457e+12   1.23456789012e+12
+	// return resultstr;
+
 	// Get trailing exponent as a signed int from -308 to 308
 	auto exponent = stoi(resultstr.substr(epos + 1));
 
@@ -354,7 +395,8 @@ static std::string double_to_string(double double1) {
 	//if (exponent < -6 or exponent > 12) {
 	//if (abs(exponent> > 15) {
 //	if (std::abs(exponent) > std::numeric_limits<double>::digits10) {
-	if (exponent > std::numeric_limits<double>::digits10) {
+//	if (exponent > std::numeric_limits<double>::digits10) {
+	if (std::abs(exponent) >= TO_STRING_NDECS) {
 
 		//remove trailing zeros
 		while (resultstr.back() == '0')
@@ -371,6 +413,8 @@ static std::string double_to_string(double double1) {
 
 	// "Small" exponents just move the decimal point and show without exponent
 	//////////////////////////////////////////////////////////////////////////
+
+	int minus = double1 < 0 ? 1 : 0;
 
 	//positive exponent
 	if (exponent > 0) {
@@ -404,10 +448,13 @@ static std::string double_to_string(double double1) {
 
 		// c 'std::cerr << var(0.1) + var(0.2) - var(0.3) << std::endl;' {i}
 		// 5.55111512313e-17
+//		if (-exponent > TO_STRING_NDECS) {
 		if (-exponent > EXO_PRECISION) {
 			resultstr = "0";
 			return resultstr;
 		}
+		//else if (exponent <= 16)
+		//	 return resultstr;
 
 		//remove decimal point
 		resultstr.erase(1 + minus, 1);
@@ -668,7 +715,7 @@ template<> PUBLIC bool VARBASE1::toBool() const {
 			//pickos print (0.00001 or 0)    ... prints 0 (bool)
 			//pickos print (0.00005=0.00006) ... prints 0 (==)
 			//pickos print (0.00005<0.00006) ... prints 1 (<)
-			return std::abs(var_dbl) >= SMALLEST_NUMBER;
+			return std::abs(var_dbl) >= EXO_SMALLEST_NUMBER;
 
 		if (!(var_typ)) {
 			this->assertAssigned(__PRETTY_FUNCTION__);
@@ -821,7 +868,7 @@ var  var::round(const int ndecimals) const {
 	double diff = (scaled_double + 0.5) - ceil2;
 	//if very close to 0.5 mark then round up/down using ceil/floor
 	double rounded_double;
-	//if (std::abs(diff) < SMALLEST_NUMBER) {
+	//if (std::abs(diff) < EXO_SMALLEST_NUMBER) {
 	//if (std::abs(diff) < 0.000'000'000'000'1) {
 	if (std::abs(diff) < 0.000'000'000'1) {
 		if (fromdouble >= 0)
@@ -848,24 +895,8 @@ var  var::round(const int ndecimals) const {
 	// Use the new low level high performance double to chars converter
 	// https://en.cppreference.com/w/cpp/utility/to_chars
 
-//	constexpr int maxchars {48};
-//
-//	// Local 
-//	std::array<char, maxchars> chars;
-//
-//	// Fixed decimal places
-//	// Specific number of decimal places
-//	auto [ptr, ec] = std::to_chars(chars.data(), chars.data() + chars.size(), rounded_double, std::chars_format::fixed, ndecimals >= 0 ? ndecimals : 0);
-//
-//	// Throw if non-numeric
-//	if (ec != std::errc())
-//		//throw VarNonNumeric("var::round: Cannot convert to 24 characters");
-//		throw VarNonNumeric("var::round: Cannot round " ^ var(fromdouble) ^ " ndecs: " ^ ndecimals ^ " to " ^ maxchars ^ " characters");
-//
-//	// Convert to a string. Hopefully using small string optimisation (SSO)
-//	result.var_str = std::string(chars.data(), ptr - chars.data());
-
-	result.var_str = double_to_chars_to_string(rounded_double, std::chars_format::fixed, ndecimals >= 0 ? ndecimals : 0);
+	// std::chars_format::fixed
+	result.var_str = double_to_chars_to_string(rounded_double, ndecimals >= 0 ? ndecimals : 0);
 
 #else
 	// We might use ryu here if installed but will not bother as to_chars(double) is built-in to g++v11 in Ubuntu 22.04
@@ -948,5 +979,183 @@ var  var::floor() const {
 
 	return var_int;
 }
+/*
+std::string var::oconv_MS(const char* conversion) const {
 
+	THISIS("str  var::oconv_MS(const char* conversion) const")
+
+	// http://www.d3ref.com/index.php?token=basic.masking.function
+
+	// 1. Analyse conversion
+
+	// Pointer arrives pointing to D or C after M
+	// get pointer to the third character (after the MD/MC bit)
+//	const char* pconversion = conversion0;
+	// First letter must be D or C
+//	pconversion++;
+
+	char thousandsep;
+	char decimalsep;
+	if (*conversion == 'D') LIKELY {
+		thousandsep = ',';
+		decimalsep = '.';
+	} else {
+		// TODO throw if not 'C'
+		thousandsep = '.';
+		decimalsep = ',';
+	}
+
+	// get the next character
+	conversion++;
+	char nextchar = *conversion;
+
+	// no conversion in the following cases
+	// 1. zero length string
+	// 2. non-numeric string
+	// 3. plain "MD" conversion without any trailing digits
+	//std::size_t convlen = strlen(conversion);
+	if (((var_typ & VARTYP_STR) && !var_str.size()) || !(this->isnum()) || !nextchar)
+		return *this;
+
+	// default conversion options
+	auto ndecimals = std::string::npos;
+	auto movedecs = std::string::npos;
+	bool dontmovepoint = false;
+	bool septhousands = false;
+	bool z_flag = false;
+	char trailer = '\0';
+	char prefixchar = '\0';
+
+	// following up to two digits are ndecimals, or ndecimals and movedecimals
+	// look for a digit
+	//TODO allow A-I to act like 10 to 19 digits
+	if (ASCII_isdigit(nextchar)) {
+
+		// first digit is either ndecimals or ndecimals and movedecimals
+		ndecimals = nextchar - '0';
+		movedecs = ndecimals;
+
+//		// are we done
+//		if (pos >= convlen)
+//			goto convert;
+
+		// look for a second digit
+		conversion++;
+		nextchar = *conversion;
+		if (ASCII_isdigit(nextchar)) {
+			// get movedecimals
+			movedecs = nextchar - '0';
+
+//			// are we done
+//			if (pos >= convlen)
+//				goto convert;
+
+			// move to the next character
+			conversion++;
+			nextchar = *conversion;
+		}
+	}
+
+	//1st digit = decimal places to display. Also decimal places to move if 2nd digit not present and no point in the data and no P flag present
+	//2nd digit = decimal places to move left
+
+	// P dont move point
+
+	//. or , mean separate thousands depending on MD or MC
+
+	// D C - < Negative handling
+
+	//Z Zero flag - output blank instead of zero
+
+	// X No conversion - return as is.
+
+	//If any trailer char
+	//1. > means wrap negative in <>
+	//2. - means suffix '-' if negative or ' ' if positive
+	//3. C means suffix CR if negative or DR if positive
+	//4. D means suffix DR if negative or CR if positive
+
+	while (nextchar) {
+
+		switch (nextchar) {
+			case 'P':
+				dontmovepoint = true;
+				break;
+
+			case '.':
+			case ',':
+				septhousands = true;
+				break;
+
+			case 'D':
+				trailer = 'D';
+				break;
+
+			case 'C':
+				trailer = 'C';
+				break;
+
+			case '-':
+				trailer = '-';
+				break;
+
+			case '<':
+				trailer = '<';
+				break;
+
+			case 'Z':
+				//Z means return empty string in the case of zero
+				z_flag = true;
+				// toBool is false for very small numbers that MD90 can still print as > 0
+//				if (!(this->toBool()))
+//					return "";
+				// Skip on absolute zero. Skip after rounding is also checked.
+				if ((var_typ & VARTYP_INT && ! var_int) || (var_typ & VARTYP_DBL && ! var_dbl))
+					return "";
+				break;
+
+			case 'X':
+				//do no conversion
+				return *this;
+				//std::unreachable();
+				break;
+			default:
+				if (prefixchar == '\0') {
+					//MD140P conversion ie 0 for prefix, is invalid conversion
+					if (nextchar == '0')
+						return *this;
+					prefixchar = nextchar;
+				}
+				break;
+		}
+		conversion++;
+		nextchar = *conversion;
+	}
+
+	// 2. Create output
+
+	// ndecimals is required for any conversion
+	if (ndecimals == std::string::npos)
+		return *this;
+
+	var newmv = (*this);
+
+	// move decimals
+	if (!dontmovepoint && movedecs != std::string::npos)
+		newmv = newmv / std::pow(10.0, movedecs);
+
+	// rounding
+	//if (ndecimals != std::string::npos) {
+	newmv = newmv.round(static_cast<int>(ndecimals));
+	if (!(newmv.var_typ & VARTYP_STR))
+		newmv.createString();
+	//}
+
+	// Option to suppress zeros - if no digits 1-9 (after rounding)
+//	if (z_flag and newmv.var_str.find_first_of("123456789") == std::string::npos) {
+	if (z_flag and not has_digit_1_to_9(newmv.var_str)) {
+		newmv.var_str.clear();
+		return newmv;
+	}
+*/
 } // namespace exo

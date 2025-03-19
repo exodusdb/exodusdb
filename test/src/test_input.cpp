@@ -4,7 +4,7 @@ programinit()
 let osfn1 = "t_bytes.bin";
 var tx;
 
-function main() {
+func main() {
 
 	// Self test
 	if (not COMMAND.contains("TEST")) {
@@ -77,7 +77,7 @@ function main() {
 	return 0;
 }
 
-function self_test(in mode) {
+func self_test(in mode) {
 
 	// Call self to read and generate the output file using mode
 	let osfn2 = osfn1 ^ "2";

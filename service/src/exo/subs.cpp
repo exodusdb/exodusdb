@@ -1,7 +1,7 @@
 #include <exodus/library.h>
 libraryinit()
 
-function main(in args1, in args2, in sep) {
+func main(in args1, in args2, in sep) {
 
 	if (args1 == "" and args2 == "") {
 		return args1;

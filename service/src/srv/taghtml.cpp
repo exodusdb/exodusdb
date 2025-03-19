@@ -3,7 +3,7 @@ libraryinit()
 
 // Called in many places oconv "[TAGHTML,
 
-function main(in /*type*/, in in0, in mode, out output) {
+func main(in /*type*/, in in0, in mode, out output) {
 
 	output = in0;
 	if (output == "") {

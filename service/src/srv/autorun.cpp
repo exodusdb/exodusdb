@@ -15,7 +15,7 @@ libraryinit()
 
 //var xx;
 
-function main() {
+func main() {
 	//
 
 	let options	  = SENTENCE.field("(", 2);

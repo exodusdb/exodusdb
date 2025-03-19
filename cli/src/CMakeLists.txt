@@ -78,6 +78,7 @@
 	add_executable(var2let var2let.cpp)
 	add_executable(redefine redefine.cpp)
 	add_executable(fire fire.cpp)
+	add_executable(sselect sselect.cpp)
 
 	# Rebuild and rerun if var.h changes to generate new man page
 	add_executable(gendoc gendoc.cpp ${CMAKE_CURRENT_SOURCE_DIR}/${LIBEXODUS_DIR}/var.h)
@@ -142,6 +143,7 @@
 	target_link_libraries(var2let exodus stdc++fs ${LIBS})
 	target_link_libraries(redefine exodus stdc++fs ${LIBS})
 	target_link_libraries(fire exodus stdc++fs ${LIBS})
+	target_link_libraries(sselect exodus stdc++fs ${LIBS})
 	target_link_libraries(gendoc exodus stdc++fs ${LIBS})
 
 	# REQUIRED only for c++ module discovery
@@ -191,6 +193,7 @@
 			var2let
 			redefine
 			fire
+			sselect
 			gendoc
 
 		DESTINATION

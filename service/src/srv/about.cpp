@@ -20,7 +20,7 @@ var dir;
 var versiondata;
 var ver;
 
-function main() {
+func main() {
 
 	interactive = false;  //not(SYSTEM.f(33));
 
@@ -78,7 +78,7 @@ function main() {
 	return 0;
 }
 
-subroutine getver() {
+subr getver() {
 	versiondata = "/version.dat";
 	versiondata.converter("/", OSSLASH);
 	// osread ver from dir:'\version.dat' else return;*ver='Not installed'
@@ -92,7 +92,7 @@ subroutine getver() {
 	return;
 }
 
-subroutine getnrecs() {
+subr getnrecs() {
 	nrecs = "";
 	if (not file.open(file, "")) {
 		return;

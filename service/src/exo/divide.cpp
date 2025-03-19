@@ -1,7 +1,7 @@
 #include <exodus/library.h>
 libraryinit()
 
-function main(in numerators, in denominator, in sep) {
+func main(in numerators, in denominator, in sep) {
 	// *reimplemented because /// not in c++/exodus
 	// linemark
 	if (numerators == "" or denominator == 1) {

@@ -31,10 +31,38 @@ THE SOFTWARE.
 //#endif
 //#include <exodus/varb.h>
 
+#define EXO_VARB_CPP // extern for EXO_SMALLEST_NUMBER
 #include <exodus/var.h>
 #include <exodus/exoimpl.h>
 
 namespace exo {
+
+//	template<> PUBLIC RETVAR VARBASE1::clone() const {
+//	CONSTEXPR
+	template<> void VARBASE1::assertInteger(const char* message, const char* varname /*= ""*/) const {
+		assertNumeric(message, varname);
+		if (!(var_typ & VARTYP_INT)) {
+
+			//var_int = std::floor(var_dbl);
+
+			// Truncate double to int
+			//var_int = std::trunc(var_dbl);
+			if (var_dbl >= 0) {
+				// 2.9 -> 2
+				// 2.9999 -> 2
+				// 2.99999 -> 3
+				var_int = static_cast<varint_t>(var_dbl + EXO_SMALLEST_NUMBER / 10);
+			} else {
+				// -2.9 -> -2
+				// -2.9999 -> -2.9
+				// -2.99999 -> -3
+				var_int = static_cast<varint_t>(var_dbl - EXO_SMALLEST_NUMBER / 10);
+			}
+
+			// Add int flag
+			var_typ |= VARTYP_INT;
+		}
+	}
 
 //// clone to var
 ////

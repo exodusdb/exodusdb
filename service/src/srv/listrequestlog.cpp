@@ -13,7 +13,7 @@ libraryinit()
 
 var msg;
 
-function main() {
+func main() {
 
 	if (not authorised("REQUESTLOG ACCESS", msg)) {
 		call note(msg);

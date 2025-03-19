@@ -1,7 +1,7 @@
 #include <exodus/library.h>
 libraryinit()
 
-function main(io v1, io v2, io v3, io v4, io v5, io v6) {
+func main(io v1, io v2, io v3, io v4, io v5, io v6) {
 	/* pushsession
         v1=var().getcursor();
         SENTENCE.move(v2);

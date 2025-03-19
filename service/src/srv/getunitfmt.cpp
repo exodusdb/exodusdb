@@ -4,7 +4,7 @@
 libraryinit()
 
 
-function main(in code, out fmtx) {
+func main(in code, out fmtx) {
 	// jbase
 
 	if (not code.len()) {

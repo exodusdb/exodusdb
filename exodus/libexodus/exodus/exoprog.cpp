@@ -734,6 +734,8 @@ var ExoProgram::perform(in command_line) {
 	// lowercase all library functions to aid in conversion from pickos
 	// TODO remove after conversion complete
 
+	// TODO connect many "command" to system calls using the VOC file to enable easy command line interfaces to exodus features.
+
 	// Hard coded to avoid needing a library. Currently only supporting upper case perform SELECT
 	// TODO replace all perform SELECT with simple select()
 	if (command_line.starts("SELECT ")) {
@@ -767,6 +769,8 @@ var ExoProgram::perform(in command_line) {
 	let saved_mv     = MV.move();
 	let saved_dict   = DICT.move();
 
+	const int saved_precision = var::getprecision();
+
 	// Increase the perform/execute "level"
 	LEVEL++;
 
@@ -790,6 +794,8 @@ var ExoProgram::perform(in command_line) {
 		saved_record.swap(RECORD);
 		saved_mv.swap(MV);
 		saved_dict.swap(DICT);
+
+		var::setprecision(saved_precision);
 
 		// Decrease the perform/execute "level"
 		LEVEL--;
@@ -1202,11 +1208,15 @@ baddict:
 		// return dict_callable_.calldict();
 		// return ANS;
 
+		const int saved_precision = var::getprecision();
+
 		ANS = dict_callable_->callsmf();
 
 		// restore the MV if necessary
 		//if (!ismv)
 		//	MV = savedMV;
+
+        var::setprecision(saved_precision);
 
 		return ANS;
 	}

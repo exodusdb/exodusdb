@@ -32,7 +32,7 @@ programinit()
 //
 //   test_main1 &> test_main1.out
 
-function main() {
+func main() {
 
 	{
 		printl("Check randomness of rnd(10)");
@@ -327,7 +327,7 @@ function main() {
 		}
 
 		//output time and date to stderr
-		errputl("Using Exodus library version:" ^ var().version());
+		errputl("Using Exodus library version:" ^ var::version());
 		date().oconv("D").errputl("Date is:");
 		time().oconv("MTS").errputl("Time is:");
 
@@ -595,22 +595,21 @@ function main() {
 	}
 
 	{
-		/* now using epsilon to judge small numbers and differences see MVeq()
-
-		//no longer applicable
-		//exodus comparisions and conversion to book ignores numbers less than 1e-13
-		//pick/arev bool and equality checks on doubles ignore less than 0.0001
-		//but comparison operators work exactly (to max binary precision?)
-		var smallestno = 1e-10;
-		var toosmallno = smallestno/10;
-		assert(smallestno);
-		assert(smallestno>0);
-		assert(smallestno!=0);
-		assert(!toosmallno);
-		assert(toosmallno==0);
-		assert(!(toosmallno>0));
-		assert(smallestno eq SMALLEST_NUMBER);
-		*/
+//		// now using epsilon to judge small numbers and differences see MVeq()
+//
+//		//no longer applicable
+//		//exodus comparisions and conversion to book ignores numbers less than 1e-13
+//		//pick/arev bool and equality checks on doubles ignore less than 0.0001
+//		//but comparison operators work exactly (to max binary precision?)
+//		var smallestno = 1e-10;
+//		var toosmallno = smallestno/10;
+//		assert(smallestno);
+//		assert(smallestno>0);
+//		assert(smallestno!=0);
+//		assert(!toosmallno);
+//		assert(toosmallno==0);
+//		assert(!(toosmallno>0));
+//		assert(smallestno eq EXO_SMALLEST_NUMBER);
 
 		var d1 = 1.2;
 		d1++;
@@ -1023,7 +1022,7 @@ bool test_amountunit(in inputx, in amount, in unitcode) {
 	return unitcode2 eq unitcode;
 }
 
-function test_ioconv_TX(in fmt, in rec, in txt) {
+func test_ioconv_TX(in fmt, in rec, in txt) {
 
 	TRACE(fmt)
 	TRACE(rec)

@@ -10,7 +10,7 @@ var starttime;	// num
 var endtime;	// num
 var testtime;	// num
 
-function main() {
+func main() {
 
 	// declare function esc.to.exit
 	let deletefilex = 1;

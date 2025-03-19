@@ -358,9 +358,102 @@
 	)
 
 #
-# Exit
-# ####
+# Collect lots of git info
+# ########################
 #
+
+# Check if in Git repo
+if(EXISTS "${CMAKE_SOURCE_DIR}/.git")
+    # Local branch
+    execute_process(
+        COMMAND git rev-parse --abbrev-ref HEAD
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        OUTPUT_VARIABLE GIT_BRANCH
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+        RESULT_VARIABLE GIT_RESULT
+    )
+
+    # Local commit timestamp
+    execute_process(
+        COMMAND git log -1 --format=%cd --date=iso
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        OUTPUT_VARIABLE GIT_LOCAL_COMMIT_TIMESTAMP
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+
+    # Local commit hash
+    execute_process(
+        COMMAND git rev-parse --short HEAD
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        OUTPUT_VARIABLE GIT_LOCAL_COMMIT_HASH
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+
+    # Repo URL from remote origin
+    execute_process(
+        COMMAND git config --get remote.origin.url
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        OUTPUT_VARIABLE GIT_REPO_URL_RAW
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+    string(REGEX REPLACE "^git@github.com:" "https://github.com/" GIT_REPO_URL "${GIT_REPO_URL_RAW}")
+    string(REGEX REPLACE "\\.git$" "" GIT_REPO_URL "${GIT_REPO_URL}")
+
+    # Remote commit hash (HEAD of origin/<branch>)
+    execute_process(
+        COMMAND git ls-remote origin HEAD
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        OUTPUT_VARIABLE GIT_REMOTE_HEAD
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+    string(REGEX REPLACE "^([0-9a-f]+)\tHEAD" "\\1" GIT_REMOTE_COMMIT_HASH "${GIT_REMOTE_HEAD}")
+    string(SUBSTRING "${GIT_REMOTE_COMMIT_HASH}" 0 9 GIT_REMOTE_COMMIT_HASH_SHORT)  # Shorten to 9 chars
+
+    # Remote commit timestamp
+    execute_process(
+        COMMAND git log -1 --format=%cd --date=iso origin/${GIT_BRANCH}
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        OUTPUT_VARIABLE GIT_REMOTE_COMMIT_TIMESTAMP
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+        RESULT_VARIABLE GIT_TS_RESULT
+    )
+
+    # Fallbacks if Git commands fail
+    if(NOT GIT_RESULT EQUAL 0 OR NOT GIT_BRANCH)
+        set(GIT_BRANCH "unknown")
+    endif()
+    if(NOT GIT_LOCAL_COMMIT_TIMESTAMP)
+        set(GIT_LOCAL_COMMIT_TIMESTAMP "unknown")
+    endif()
+    if(NOT GIT_LOCAL_COMMIT_HASH)
+        set(GIT_LOCAL_COMMIT_HASH "unknown")
+    endif()
+    if(NOT GIT_REPO_URL)
+        set(GIT_REPO_URL "unknown")
+    endif()
+    if(NOT GIT_TS_RESULT EQUAL 0 OR NOT GIT_REMOTE_COMMIT_TIMESTAMP)
+        set(GIT_REMOTE_COMMIT_TIMESTAMP "unknown")
+    endif()
+    if(NOT GIT_REMOTE_COMMIT_HASH_SHORT)
+        set(GIT_REMOTE_COMMIT_HASH_SHORT "unknown")
+    endif()
+else()
+    # Tarball build—no .git/
+    set(GIT_BRANCH "unknown")
+    set(GIT_LOCAL_COMMIT_TIMESTAMP "unknown")
+    set(GIT_LOCAL_COMMIT_HASH "unknown")
+    set(GIT_REPO_URL "unknown")
+    set(GIT_REMOTE_COMMIT_TIMESTAMP "unknown")
+    set(GIT_REMOTE_COMMIT_HASH_SHORT "unknown")
+endif()
+
+# Define macros
+add_definitions(-DGIT_BRANCH="${GIT_BRANCH}")
+add_definitions(-DGIT_LOCAL_COMMIT_TIMESTAMP="${GIT_LOCAL_COMMIT_TIMESTAMP}")
+add_definitions(-DGIT_LOCAL_COMMIT_HASH="${GIT_LOCAL_COMMIT_HASH}")
+add_definitions(-DGIT_REPO_URL="${GIT_REPO_URL}")
+add_definitions(-DGIT_REMOTE_COMMIT_TIMESTAMP="${GIT_REMOTE_COMMIT_TIMESTAMP}")
+add_definitions(-DGIT_REMOTE_COMMIT_HASH_SHORT="${GIT_REMOTE_COMMIT_HASH_SHORT}")
 
 #
 # Subdirs/submodules
@@ -386,6 +479,10 @@
 	add_subdirectory(test/src)
 	#target_compile_options(test_Regress PUBLIC "-O2")
 
+#
+# Exit
+# ####
+#
 	message("---------------------------")
 	message("-- CMAKE EXODUS FINISHED --")
 	message("---------------------------")

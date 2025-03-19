@@ -33,7 +33,7 @@ var msg;
 //var wspos;
 //var wsmsg;
 
-function main(in mode) {
+func main(in mode) {
 
 	// use agp<> instead of @record<> to assist source code searching for agp<?>
 
@@ -634,7 +634,7 @@ preventupdate:
 	return 0;
 }
 
-subroutine reorderdbs() {
+subr reorderdbs() {
 
 	// reorder dbs in ADAGENCY.VOL, ACCOUNTS.VOL etc
 	// according to dbs listed in configuration
@@ -692,7 +692,7 @@ subroutine reorderdbs() {
 	return;
 }
 
-subroutine postreadfix() {
+subr postreadfix() {
 	if (ID == "AGENCY.PARAMS") {
 
 		if (RECORD.f(55) == "") {

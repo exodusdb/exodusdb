@@ -5,7 +5,7 @@ var redcolour="\033[1;31m";
 var endcolour = "\033[0m";
 
 // View dict and data together
-function main() {
+func main() {
 
 	//F | T |DICT NAME              |SCHEDULES:J1061
 	//12| S |PERIOD                 |3/23

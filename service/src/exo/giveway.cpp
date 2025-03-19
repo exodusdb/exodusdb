@@ -4,7 +4,7 @@ libraryinit()
 var nowtime;		// num
 var longprocesslockno;	// num
 
-function main() {
+func main() {
 	if (USERNAME == "xEXODUS") {
 		return 0;
 	}

@@ -10,7 +10,7 @@ var direction;	// num
 //var xx;
 var daten;
 
-function main(in mode, io idate, in /*usercode*/, in userx, in /*marketcode*/, in market, in agp, out holidaytype, out workdate) {
+func main(in mode, io idate, in /*usercode*/, in userx, in /*marketcode*/, in market, in agp, out holidaytype, out workdate) {
 
 	// returns holidaytype given date,userx,market and global params
 
@@ -50,7 +50,7 @@ function main(in mode, io idate, in /*usercode*/, in userx, in /*marketcode*/, i
 	return 0;
 }
 
-subroutine getholidaytype(in idate, in userx, in agp, in market, io holidaytype) {
+subr getholidaytype(in idate, in userx, in agp, in market, io holidaytype) {
 
 	// type 4 is expired
 	// ////////////////

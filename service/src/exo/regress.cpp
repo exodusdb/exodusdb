@@ -4,7 +4,7 @@
 #include <exodus/program.h>
 programinit()
 
-function main() {
+func main() {
 	printl("regress says 'Hello World!'");
 	let osfilename = field(SENTENCE, " ", 2);
 	//var osfile;

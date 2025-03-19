@@ -3,7 +3,7 @@ libraryinit()
 
 var string1;
 
-function main(in string0) {
+func main(in string0) {
 //	if (string0.unassigned()) {
 //		// de bug
 //		string1 = "UNASSIGNED";

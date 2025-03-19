@@ -11,7 +11,7 @@
 #include <exodus/program.h>
 programinit()
 
-function main() {
+func main() {
 	var cmd;
 
 //    {

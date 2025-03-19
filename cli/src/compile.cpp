@@ -67,7 +67,7 @@ programinit()
 	//more complicated so for now use extern "C" and not .def files
 	//#define EXODUS_EXPORT_USING_DEF
 
-function main() {
+func main() {
 
 	// "i" - inline source code
 	// or 1st arg end with a ";" or contains a "("
@@ -864,13 +864,13 @@ ENVIRONMENT
 		else if (inc_extensions.locateusing(" ", fileext)) {
 			var srctext = osread(srcfilename);
 
-			// Upgrade old commons from 2 arg macros to 1 arg
+			// Hotfix old commons from 2 arg macros to 1 arg
 			if (srcfilename.ends("_common.h")) {
 				let orig_srctext = srctext;
 				srctext.replacer(R"__(common(init|exit)\(([a-z]{2,3}),[a-z]{2,3}_common_no\))__"_rex, R"__(common\1\(\2\))__");
 				if (srctext ne orig_srctext) {
 					if (oswrite(srctext on srcfilename))
-						srcfilename.logputl("Updated commoninit():");
+						srcfilename.logputl("Hotfix commoninit/exit:");
 					else
 						loglasterror();
 				}
@@ -1198,6 +1198,18 @@ ENVIRONMENT
 				return;
 			}
 
+//			{ // hotfixing src
+//				let orig_text = text;
+//				text.replacer(R"__(^function )__"_rex, "func ");
+//				text.replacer(R"__(^subroutine )__"_rex, "subr ");
+//				if (text ne orig_text) {
+//					if (oswrite(text on srcfilename, locale))
+//						srcfilename.logputl("Hotfix func/subr:");
+//					else
+//						loglasterror();
+//				}
+//			}
+
 			// Determine if program or subroutine/function
 			// and decide compile/link options
 			let isprogram =
@@ -1278,7 +1290,7 @@ ENVIRONMENT
 
 				if (
 					not(isprogram)
-					and (word1 eq "function" or word1 eq "subroutine")
+					and (word1 eq "function" or word1 eq "subroutine" or word1 eq "func" or word1 eq "subr")
 					and not filename_without_ext.starts("dict_")
 //					and not srcfilename.ends("_common.h")
 				) {
@@ -1299,8 +1311,8 @@ ENVIRONMENT
 						let libname = filepath_without_ext;
 						let returntype = word1 eq "subroutine" ? "void" : "var";
 						//var returnsvarorvoid = (word1 eq "function") ? "var" : "void";
-						let callorreturn = (word1 == "function") ? "return" : "call";
-						let funcreturnvoid = (word1 == "function") ? 0 : 1;
+						let callorreturn = (word1 == "function" or word1 == "func") ? "return" : "call";
+						let funcreturnvoid = (word1 == "function" or word1 == "func") ? 0 : 1;
 						var funcargsdecl = funcdecl.field("(", 2, 999999);
 
 						// Allow for unused arguments to be annotated or commented out to avoid warnings
@@ -1858,7 +1870,7 @@ ENVIRONMENT
 
 }  //main program
 
-function static compile(
+func static compile(
 
 	in verbose,
 	in objfileextension,
@@ -1905,7 +1917,7 @@ function static compile(
 
 }
 
-function static compile2(
+func static compile2(
 	in verbose,
 	in objfileextension,
 	in binfileextension,
@@ -2135,7 +2147,7 @@ compile_it:
 	return "";
 }
 
-function set_environment() {
+func set_environment() {
 
 	if (verbose)
 		printl("Searching standard directories");
@@ -2279,7 +2291,7 @@ function set_environment() {
 	return true;
 }
 
-function getparam(in result, in paramname, out paramvalue) {
+func getparam(in result, in paramname, out paramvalue) {
 	let posn = index(result.ucase(), "\n" ^ paramname.ucase() ^ "=");
 	if (not posn)
 		return false;
@@ -2287,7 +2299,7 @@ function getparam(in result, in paramname, out paramvalue) {
 	return true;
 }
 
-function make_include_dir(in incdir) {
+func make_include_dir(in incdir) {
 	if (not incdir.osdir()) {
 		if (not incdir.osmkdir()) {
 			errputl("Error: exodus compile could not create dir for header include files. Skipping creation of header file");
@@ -2297,7 +2309,7 @@ function make_include_dir(in incdir) {
 	return true;
 }
 
-function is_newer(in new_file_info, in old_file_info) {
+func is_newer(in new_file_info, in old_file_info) {
 
 	int new_file_date = new_file_info.f(2);
 	int old_file_date = old_file_info.f(2);
@@ -2312,7 +2324,7 @@ function is_newer(in new_file_info, in old_file_info) {
 
 }
 
-function oneline_compile() {
+func oneline_compile() {
 
 //	var source = SENTENCE.fieldstore(" ", 1, -1, "");
 	var source = COMMAND.remove(1).convert(FM, " ");
@@ -2338,7 +2350,7 @@ e.g.
 		"#include <exodus/program.h>\n"
 		"programinit()\n"
 		"\n"
-		"function main() {\n" ^
+		"func main() {\n" ^
 			source ^ "\n" ^
 			"\n"
 			"return 0;\n"
@@ -2346,8 +2358,8 @@ e.g.
 		"programexit()\n";
 
 	// Create a tmp cpp file
-	let tempfilebase = ostempfilename();
-//	let tempfilebase = ostempdirpath() ^ "~eeval";
+	let tempfilebase = ostempfile();
+//	let tempfilebase = ostempdir() ^ "~eeval";
 	let tempfilesrc	 = tempfilebase ^ ".cpp";
 	if (not oswrite(prog, tempfilesrc))
 		abort(lasterror());

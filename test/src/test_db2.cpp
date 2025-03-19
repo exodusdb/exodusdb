@@ -4,7 +4,7 @@
 #include <exodus/program.h>
 programinit()
 
-function main() {
+func main() {
 
 	// Quit if no default database connection
 	if (not connect()) {
@@ -182,45 +182,6 @@ dict(AGE_IN_YEARS) {
 
 	var filenames  = listfiles();
 	var indexnames = listindex("test_people");
-
-	/*
-	var().begin();
-	var testfile;
-	if (!testfile.open("TESTFILE"))
-		testfile.createfile("TESTFILE");
-	var record1=var("x").str(300);
-	var started=var().ostime();
-	int nn=10000;
-	if (0)
-	{
-		for (int ii=1;ii<nn;++ii)
-		{
-			if (!(ii%10000)) cout<<"Written "<<ii<<endl;
-			record1.insertrecord(testfile,ii);
-		}
-	}
-	var stopped=var().ostime();
-	wcout<<(stopped-started)/nn;
-
-	started=var().ostime();
-	for (int ii=1;ii<nn;++ii)
-	{
-		if (!(ii%10000)) cout<<"Read "<<ii<<endl;
-		record1.read(testfile,ii);
-	}
-
-	var().end();
-
-	stopped=var().ostime();
-	printl((stopped-started)/nn*1000000);
-
-	wcin>>nn;
-
-	//	testfile.deletefile();
-
-	*/
-
-	//	var().connectlocal("");
 
 	var filenames2 = "xo_clients";
 	filenames2 ^= FM ^ "xo_currencies";
@@ -631,7 +592,7 @@ dict(AGE_IN_YEARS) {
 	return 0;
 }
 
-subroutine generate_xo_clients_dict_data(in filename) {
+subr generate_xo_clients_dict_data(in filename) {
 
 	let dictfilename = "dict." ^ filename;
 

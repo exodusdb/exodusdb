@@ -19,7 +19,6 @@ export namespace exo {
 	using exo::VarError;
 	using exo::operator""_var;
 	using exo::operator""_rex;
-	using exo::SMALLEST_NUMBER;
 
 	using exo::var_proxy1;
 	using exo::var_proxy2;

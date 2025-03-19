@@ -22,7 +22,7 @@ libraryinit()
 
 	var errormsg;
 
-function main(in mode, in params, io result, io msg) {
+func main(in mode, in params, io result, io msg) {
 
 	// output:
 	// empty = ok

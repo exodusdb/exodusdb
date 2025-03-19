@@ -23,7 +23,7 @@ var result;
 var msg;
 var datasetcode;
 
-function main(in mode0, in dataset0) {
+func main(in mode0, in dataset0) {
 
 	interactive = false;  //not(SYSTEM.f(33));
 //	if (mode0.unassigned()) {

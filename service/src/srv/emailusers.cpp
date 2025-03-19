@@ -25,7 +25,7 @@ var ok;	 // num
 //var nn;
 var errormsg;
 
-function main(in /*mode0*/, in subject0, in body0, in groupids0, in /*jobids0*/, in userids0, in options, io emaillog) {
+func main(in /*mode0*/, in subject0, in body0, in groupids0, in /*jobids0*/, in userids0, in options, io emaillog) {
 
 	let interactive = false;  //not(SYSTEM.f(33));
 
@@ -292,7 +292,7 @@ function main(in /*mode0*/, in subject0, in body0, in groupids0, in /*jobids0*/,
 	return 0;
 }
 
-subroutine sendemails(io emaillog) {
+subr sendemails(io emaillog) {
 
 	if (not toemails) {
 		return;

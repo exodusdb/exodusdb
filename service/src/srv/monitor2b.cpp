@@ -17,7 +17,7 @@ var text;
 var errors;
 //var log;
 
-function main(in mode, in request, in tempfilename, out datax, out msg) {
+func main(in mode, in request, in tempfilename, out datax, out msg) {
 
 	// mode is WRITE or READ
 	// request is required sent to the server and
@@ -433,7 +433,7 @@ badresponse:
 	return 1;
 }
 
-subroutine getlog(in logfilename, in cleanup, out log) {
+subr getlog(in logfilename, in cleanup, out log) {
 
 	if (log.osread(logfilename)) {
 		if (cleanup) {
@@ -470,7 +470,7 @@ subroutine getlog(in logfilename, in cleanup, out log) {
 	// 3. reversed
 }
 
-subroutine hash(in salt, in max, out hashcode) {
+subr hash(in salt, in max, out hashcode) {
 
 	hashcode = salt;
 	for (const int ii : range(1, text.len())) {

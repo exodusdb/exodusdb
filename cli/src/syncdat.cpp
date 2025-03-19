@@ -11,7 +11,7 @@ programinit()
 
 	var errors = "";
 
-function main() {
+func main() {
 
 	if (index(OPTIONS, "H")) {
 		logputl(
@@ -456,7 +456,7 @@ function main() {
 
 }
 
-function is_newer(in fsinfo) {
+func is_newer(in fsinfo) {
 
     int fsinfo_date = fsinfo.f(2);
 

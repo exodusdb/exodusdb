@@ -12,7 +12,7 @@
 #include <exodus/program.h>
 programinit()
 
-function main() {
+func main() {
 
 	printl("z says 'Hello World!'");
 

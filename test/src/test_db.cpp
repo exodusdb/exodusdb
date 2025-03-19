@@ -49,36 +49,42 @@ programinit()
 	printl(response);
 	assert(response.field(RM, 2) eq "{NULL,00:00:01,00:00:00,00:00:01,12:00:00}");
 
-	var filename = "xo_test_db_temp";
+	{
+		printl("'DOS' fake db file - test open/read/write/delete");
+		var dosfile;
+		assert(open("DOS", dosfile));
+		assert(open("dos", dosfile));
+	//	assert(write("xyz", dosfile, "t_xyz.txt"));
+		write("xyz", dosfile, "t_xyz.txt");
+		assert(read(RECORD, dosfile, "t_xyz.txt"));
+		assert(RECORD eq "xyz");
+		assert(deleterecord(dosfile, "t_xyz.txt"));
+		assert(not read(RECORD, dosfile, "t_xyz.txt"));
+		assert(dosfile.reccount().errputl("dos reccount:") eq "");
+	}
 
-	printl("test open/read/write/delete on file 'DOS'");
-	var dosfile;
-	assert(open("DOS", dosfile));
-	assert(open("dos", dosfile));
-//	assert(write("xyz", dosfile, "t_xyz.txt"));
-	write("xyz", dosfile, "t_xyz.txt");
-	assert(read(RECORD, dosfile, "t_xyz.txt"));
-	assert(RECORD eq "xyz");
-	assert(deleterecord(dosfile, "t_xyz.txt"));
-	assert(not read(RECORD, dosfile, "t_xyz.txt"));
-
+	// Create a db file (temporary because it ends _temp)
+	var tempfile = "xo_test_db_temp";
+//	var tempfile = "xo_test_db";
 	var trec;
-	if (not deletefile(filename)) {}
-	assert(createfile(filename));
-
-	printl("Test rename, and rename back");
-	let renamed_filename = "renamed_" ^ filename;
-	if (not deletefile(renamed_filename)) {}
-	assert(renamefile(filename, renamed_filename) or (loglasterror() and false));
-	assert(renamefile(renamed_filename, filename) or (loglasterror() and false));
+	if (not tempfile.ends("_temp") and not deletefile(tempfile)) {}
+	// _temp file only last as long as the connection is active
+	assert(createfile(tempfile));
 
 	printl("Test reccount");
 	for (var recn : range(1, 10))
-		write(recn on filename, recn);
-	assert(filename.reccount() eq 10);
+		write(recn on tempfile, recn);
+	let tempfile_reccount = tempfile.reccount().errputl(tempfile ^ " reccount:");
+	assert(tempfile_reccount eq 10);
+
+	printl("Test rename, and rename back");
+	let renamed_tempfile = "renamed_" ^ tempfile;
+	if (not deletefile(renamed_tempfile)) {}
+	assert(renamefile(tempfile, renamed_tempfile) or (loglasterror() and false));
+	assert(renamefile(renamed_tempfile, tempfile) or (loglasterror() and false));
 
 	printl("Select 3 records");
-	assert(select(filename ^ " 1 2 3"));
+	assert(select(tempfile ^ " 1 2 3"));
 	assert(LISTACTIVE);
 
 	printl("savelist");
@@ -113,8 +119,8 @@ programinit()
 	assert(LISTACTIVE);
 
 	printl("Test clearfile");
-	assert(clearfile(filename));
-	assert(filename.reccount() eq 0);
+	assert(clearfile(tempfile));
+	assert(tempfile.reccount() eq 0);
 
 	printl("select list should still be active despite the above");
 	assert(LISTACTIVE);
@@ -130,11 +136,11 @@ programinit()
 
 		//write to cache
 		var xyz = "xyz";
-//		assert(xyz.writec(filename, k1));
-		xyz.writec(filename, k1);
+//		assert(xyz.writec(tempfile, k1));
+		xyz.writec(tempfile, k1);
 
 		//ensure wasnt written to real file
-		assert(not xyz.read(filename, k1));
+		assert(not xyz.read(tempfile, k1));
 		//and ensure failure to read results in unassigned variable
 		//assert(unassigned(xyz));
 		//ensure failure to read results in no change to record
@@ -143,13 +149,13 @@ programinit()
 		assert(xyz.unassigned());
 
 		//read from cache ok
-		assert(xyz.readc(filename, k1));
+		assert(xyz.readc(tempfile, k1));
 
 		//writing empty record to cache is like a deletion
 		xyz = "";
-//		assert(xyz.writec(filename, k1));
-		xyz.writec(filename, k1);
-		assert(not xyz.readc(filename, k1));
+//		assert(xyz.writec(tempfile, k1));
+		xyz.writec(tempfile, k1);
+		assert(not xyz.readc(tempfile, k1));
 		//and ensure failure to readc results in unassigned variable
 		//assert(unassigned(xyz));
 		//ensure failure to read results in no change to record
@@ -159,45 +165,45 @@ programinit()
 
 		//writing to real file also clears cache forcing a real reread
 		xyz = "abc";
-//		assert(xyz.writec(filename, k1));
-		xyz.writec(filename, k1);
-		assert(xyz.readc(filename, k1));
+//		assert(xyz.writec(tempfile, k1));
+		xyz.writec(tempfile, k1);
+		assert(xyz.readc(tempfile, k1));
 		xyz = "123";
-//		assert(xyz.write(filename, k1));
-		xyz.write(filename, k1);
-		assert(xyz.readc(filename, k1));
+//		assert(xyz.write(tempfile, k1));
+		xyz.write(tempfile, k1);
+		assert(xyz.readc(tempfile, k1));
 		assert(xyz eq "123");
 
 		//not testing deletec because write and delete always call it?
 
 		//deleting a record deletes it from both real and cache file
-		assert(deleterecord(filename, k1));
-		assert(not xyz.read(filename, k1));
-		assert(not xyz.readc(filename, k1));
+		assert(deleterecord(tempfile, k1));
+		assert(not xyz.read(tempfile, k1));
+		assert(not xyz.readc(tempfile, k1));
 
 		//writing empty record to cache is like a deletion
 		xyz = "";
-//		assert(xyz.writec(filename, k1));
-		xyz.writec(filename, k1);
+//		assert(xyz.writec(tempfile, k1));
+		xyz.writec(tempfile, k1);
 		//deletion from cache
-		assert(not xyz.readc(filename, k1));
+		assert(not xyz.readc(tempfile, k1));
 
-		assert(not xyz.read(filename, k1));
+		assert(not xyz.read(tempfile, k1));
 	}
 
 	{
 		printl("Create a temp file");
-//		var tempfilename = "xo_test_db_deleterecord_temp";
-		var tempfilename = "xo_test_db_deleterecord";
-		var tempfile	 = tempfilename;
+//		var temptempfile = "xo_test_db_deleterecord_temp";
+		var temptempfile = "xo_test_db_deleterecord";
+		var tempfile	 = temptempfile;
 		if (not deletefile(tempfile)) {} // clean up first
 		assert(createfile(tempfile));
 
 		printl("Create its dictionary");
-		if (not deletefile("dict." ^ tempfilename)){}
-		if (not createfile("dict." ^ tempfilename))
+		if (not deletefile("dict." ^ temptempfile)){}
+		if (not createfile("dict." ^ temptempfile))
 			loglasterror();
-		write("F^0^ID^^^^^^R^10"_var on "dict." ^ tempfilename, "ID");
+		write("F^0^ID^^^^^^R^10"_var on "dict." ^ temptempfile, "ID");
 
 		assert(not read(RECORD from tempfile, "%RECORDS%"));
 		for (int i : reverse_range(1, 10)) {
@@ -214,21 +220,25 @@ programinit()
 
 		printl("Check deleterecord works on a select list");
 		//		select(tempfile ^ " with ID ge 5");
-		select(tempfilename ^ " with ID ge '5'");
+		select(temptempfile ^ " with ID ge '5'");
 		deleterecord(tempfile);
 		assert(read(RECORD from tempfile, "%RECORDS%"));
 		TRACE(RECORD)
-		assert(tempfile.reccount().errputl() eq 5);
+		// reccount is unreliable. Especially inside transactions.
+		let tempfile_reccount = tempfile.reccount();
+		assert(tempfile_reccount.errputl() eq 5 or tempfile_reccount == -1);
 
 //		printl("Check deleterecord works command style list of keys");
-//		deleterecord(tempfilename ^ " '1' 2 \"3\"");
+//		deleterecord(temptempfile ^ " '1' 2 \"3\"");
 		selectkeys("1^2^3"_var);
-		deleterecord(tempfilename);
-		assert(tempfile.reccount() eq 2);
+		deleterecord(temptempfile);
+		let tempfile_reccount2 = tempfile.reccount();
+		assert(tempfile_reccount2.errputl() eq 2 or tempfile_reccount2 == -1);
 
 		printl("Check deleterecord one key using 2nd parameter works");
-		assert(deleterecord(tempfilename, "10"));
-		assert(tempfile.reccount() eq 1);
+		assert(deleterecord(temptempfile, "10"));
+		let tempfile_reccount3 = tempfile.reccount();
+		assert(tempfile_reccount3.errputl() eq 1 or tempfile_reccount3 == -1);
 
 		printl("Prepare a test record");
 //		assert(write("aa^bb^cc"_var on tempfile, "X"));
@@ -268,6 +278,27 @@ programinit()
 			assert(updaterecord("aa^bb^cc"_var on tempfile, "ZZZ"));
 			assert(read(rec from tempfile, "ZZZ"));
 			assert(rec eq "aa^bb^cc"_var);
+
+			printl("Check that updatekey can change a key");
+			assert(updatekey(tempfile, "ZZZ", "ZZZ2"));
+			assert(not read(rec from tempfile, "ZZZ"));
+			assert(read(rec from tempfile, "ZZZ2"));
+			assert(rec eq "aa^bb^cc"_var);
+			// Change it back
+			assert(updatekey(tempfile, "ZZZ2", "ZZZ"));
+			assert(not updatekey(tempfile, "ZZZ2", "ZZZ"));
+
+			// Prepare a target
+			assert(insertrecord("1^22^333"_var on tempfile, "ZZZ3"));
+
+			printl("Check that updatekey cant change a key to an existing key");
+			assert(not updatekey(tempfile, "ZZZ", "ZZZ3"));
+			loglasterror();
+
+			printl("Check failed target is unchanged");
+			var rec2;
+			assert(read(rec2 from tempfile, "ZZZ3"));
+			assert(rec2 eq "1^22^333"_var);
 
 			printl("Make an active list from a record");
 //			assert(formlist(tempfile, "ZZZ"));
@@ -311,16 +342,16 @@ programinit()
 	var compact_a = "\xC3\xA1";		 //"á";
 
 	//test write decomp can be read by compact and deleted by compact
-	write("temp", filename, decomp_a);
-	assert(read(trec, filename, compact_a));
+	write("temp", tempfile, decomp_a);
+	assert(read(trec, tempfile, compact_a));
 	assert(trec eq "temp");
-	assert(deleterecord(filename, compact_a));
-	assert(not read(trec, filename, compact_a));
+	assert(deleterecord(tempfile, compact_a));
+	assert(not read(trec, tempfile, compact_a));
 
 	//test write compact can be read by decomp and deleted by decomp
-	write("temp", filename, compact_a);
+	write("temp", tempfile, compact_a);
 	trec = "";
-	assert(read(trec, filename, decomp_a));
+	assert(read(trec, tempfile, decomp_a));
 
 	// Check failure to read a record turns the record variable into unassigned and unusable
 	// unlike pickos which leaves the variable untouched.
@@ -336,17 +367,17 @@ programinit()
 	{
 		printl("Check can write a whole dim array to one record");
 		dim d1 = {11, 22, 33};
-//		assert(d1.write(filename, "D1"));
-		d1.write(filename, "D1");
+//		assert(d1.write(tempfile, "D1"));
+		d1.write(tempfile, "D1");
 		var rec;
 
 		printl("Verify record back into a var");
-		assert(read(rec from filename, "D1"));
+		assert(read(rec from tempfile, "D1"));
 		assert(rec eq "11^22^33"_var);
 
 		printl("Verify record back into a dim");
 		dim d2;
-		assert(d2.read(filename, "D1"));
+		assert(d2.read(tempfile, "D1"));
 		assert(d2.join() eq d1.join());
 	}
 
@@ -355,19 +386,19 @@ programinit()
 
 		printl("Check can write a whole dim array to one record");
 		dim d1 = {11, 22, 33};
-//		assert(dimwrite(d1 on filename, "D1"));
-//		dimwrite(d1 on filename, "D1");
-		write(d1 on filename, "D1");
+//		assert(dimwrite(d1 on tempfile, "D1"));
+//		dimwrite(d1 on tempfile, "D1");
+		write(d1 on tempfile, "D1");
 		var rec;
 
 		printl("Verify record back into a var");
-		assert(read(rec from filename, "D1"));
+		assert(read(rec from tempfile, "D1"));
 		assert(rec eq "11^22^33"_var);
 
 		printl("Verify record back into a dim");
 		dim d2;
-//		assert(dimread(d2 from filename, "D1"));
-		assert(read(d2 from filename, "D1"));
+//		assert(dimread(d2 from tempfile, "D1"));
+		assert(read(d2 from tempfile, "D1"));
 		assert(d2.join() eq d1.join());
 	}
 

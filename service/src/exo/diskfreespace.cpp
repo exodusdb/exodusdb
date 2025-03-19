@@ -1,7 +1,7 @@
 #include <exodus/library.h>
 libraryinit()
 
-function main(in path0) {
+func main(in path0) {
 
 	var path = path0.or_default(".");
 //	if (path0.unassigned() or path0.contains(":") or not(path0))

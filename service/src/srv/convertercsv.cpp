@@ -1,7 +1,7 @@
 #include <exodus/library.h>
 libraryinit()
 
-function main(in mode, io /*line*/, in params, in filename) {
+func main(in mode, io /*line*/, in params, in filename) {
 
 	// mode=HEAD or LINE
 	// input line,params,filename

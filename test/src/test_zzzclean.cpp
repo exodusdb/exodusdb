@@ -4,7 +4,7 @@
 #include <exodus/program.h>
 programinit()
 
-function main() {
+func main() {
 
 	// Quit if no default database connection
 	if (not connect()) {

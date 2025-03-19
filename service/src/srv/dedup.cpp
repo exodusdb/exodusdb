@@ -3,7 +3,7 @@ libraryinit()
 
 //var list1n;
 
-function main(in /*mode*/, io list1, io list2, in seps) {
+func main(in /*mode*/, io list1, io list2, in seps) {
 
 	if (not(list1.len() and list2.len())) {
 		return 0;

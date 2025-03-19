@@ -3,7 +3,7 @@ libraryinit()
 
 // OBSOLETE - now hard coded in exoprog perform
 
-function main() {
+func main() {
 	select(SENTENCE);
 	return 0;
 }

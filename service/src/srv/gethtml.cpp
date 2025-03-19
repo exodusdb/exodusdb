@@ -16,7 +16,7 @@ var keyx;
 var tt;
 
 //function main(in mode0, out letterhead_out, in compcode0 = "", in qr_text = "") {
-function main(in mode0, out letterhead_out, in compcode0 = "", in qr_text0 = "") {
+func main(in mode0, out letterhead_out, in compcode0 = "", in qr_text0 = "") {
 
 	// gethtml may be "perform"ed, "execute"d  or "call"ed
 	//
@@ -269,7 +269,7 @@ function main(in mode0, out letterhead_out, in compcode0 = "", in qr_text0 = "")
 	return 0;
 }
 
-subroutine getcompanyconfig(out letterhead, io mode) {
+subr getcompanyconfig(out letterhead, io mode) {
 
 	letterhead = "";
 
@@ -448,7 +448,7 @@ subroutine getcompanyconfig(out letterhead, io mode) {
 	return;
 }
 
-subroutine getheadhtm(io letterhead) {
+subr getheadhtm(io letterhead) {
 
 nextmodex:
 	// ////////

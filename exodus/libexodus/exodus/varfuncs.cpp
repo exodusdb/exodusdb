@@ -307,8 +307,37 @@ template<> PUBLIC int VARBASE1::localeAwareCompare(const std::string& str1, cons
 	return result;
 }
 
-var  var::version() const {
-	return var(__DATE__).iconv("D").oconv("D") ^ " " ^ var(__TIME__);
+var  var::version() {
+//	return var(GIT_BRANCH) ^ " " ^ var(GIT_COMMIT_TIMESTAMP) ^ " " ^ var(GIT_COMMIT_HASH);
+//	return var(__DATE__).iconv("D").oconv("D") ^ " " ^ var(__TIME__);
+
+//	var v =
+//        // Full version with local and remote info
+//            std::string(GIT_BRANCH " " GIT_LOCAL_COMMIT_TIMESTAMP " " GIT_LOCAL_COMMIT_HASH " (remote: "
+//                              GIT_REMOTE_COMMIT_TIMESTAMP " " GIT_REMOTE_COMMIT_HASH ")");
+//
+//        // GitHub commit URL (local)
+//        v^= "\n" ^ std::string(GIT_REPO_URL) + "/commit/" + GIT_LOCAL_COMMIT_HASH;
+//
+//        // Download URL (remote HEAD)
+//        v ^= "\n" ^ std::string(GIT_REPO_URL) + "/archive/" + GIT_REMOTE_COMMIT_HASH + ".tar.gz";
+
+//    TRACE(exo::var::version());      // "doc 2025-03-17 15:03:00 +0000 212b0daf8 (remote: ...)"
+//    TRACE(exo::var::github_url());   // "https://github.com/exodusdb/exodusdb/commit/212b0daf8"
+//    TRACE(exo::var::download_url()); // "https://github.com/exodusdb/exodusdb/archive/<remote_hash>.tar.gz"
+
+
+            std::ostringstream oss;
+            oss << "Local:  " << GIT_BRANCH << " " << GIT_LOCAL_COMMIT_TIMESTAMP << " " << GIT_LOCAL_COMMIT_HASH << "\n"
+                << "Remote: " << GIT_BRANCH << " " << GIT_REMOTE_COMMIT_TIMESTAMP << " " << GIT_REMOTE_COMMIT_HASH_SHORT;
+	var v = oss.str();
+
+	v ^= "\n" ^ std::string(GIT_REPO_URL) + "/commit/" + GIT_LOCAL_COMMIT_HASH;
+
+    v^= "\n" ^ std::string(GIT_REPO_URL) + "/archive/" + GIT_REMOTE_COMMIT_HASH_SHORT + ".tar.gz";
+
+	return v;
+
 }
 
 bool var::eof() const {
@@ -1214,14 +1243,14 @@ var  var::textseq() const {
 
 // only returns BINARY bytes 0-255 (128-255) cannot be stored in the database unless with other
 // bytes making up UTF8
-var  var::chr(const int charno) const {
+var  var::chr(const int charno) {
 	return static_cast<char>(charno % 256);
 }
 
 // returns unicode 1-4 byte sequences (in utf8)
 // returns empty string for some invalid unicode points like 0xD800 to 0xDFFF which is reserved for
 // UTF16 0x110000 ... is invalid too
-var  var::textchr(const int utf_codepoint) const {
+var  var::textchr(const int utf_codepoint) {
 	// doesnt use *this at all (do we need a version that does?)
 
 	// return var((char) int1);

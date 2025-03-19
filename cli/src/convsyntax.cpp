@@ -64,7 +64,7 @@ OPTIONS
 	V - Verbose
 )";
 
-function main() {
+func main() {
 
 	if (not OPTIONS)
 		abort(syntax);
@@ -425,7 +425,7 @@ function main() {
 }
 
 // Restore the hidden commas|semicolons etc
-function restore_subsyntax(in line2, in hidden_char) {
+func restore_subsyntax(in line2, in hidden_char) {
 	//var line = line2.convert(FM_, hidden_char);
 	let line = line2.convert(_FM, hidden_char);
 	return line;
@@ -433,7 +433,7 @@ function restore_subsyntax(in line2, in hidden_char) {
 // Hide commas|semicolons inside brackets and quotes
 // so we can use the remaining 1, 2 or 3 commas to discover fn, vn, sn and replacement
 // or semicolons etc.
-function hide_subsyntax(in line, io pos, in hidden_char) {
+func hide_subsyntax(in line, io pos, in hidden_char) {
 
 	var line2 = line;
 	pos += 3; //skip over first paren

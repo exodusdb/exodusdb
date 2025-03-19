@@ -49,7 +49,7 @@ var requeststarttime;  // num
 var requeststoptime;   // num
 var printfile;
 
-function main(in docids0 = "", in options0 = "") {
+func main(in docids0 = "", in options0 = "") {
 
 	// LISTEN calls this every minute
 	// print 'autorun'
@@ -692,7 +692,7 @@ nextsign:
 	goto nextdoc;
 }
 
-subroutine exec() {
+subr exec() {
 
 	voccmd = request_.f(2);
 
@@ -725,7 +725,7 @@ subroutine exec() {
 	return;
 }
 
-subroutine exec2() {
+subr exec2() {
 	requeststarttime = ostime();
 	// system<25>=requeststarttime
 	// allow autorun processes to run for ever
@@ -869,14 +869,14 @@ sysmsgit:
 	return;
 }
 
-subroutine exit(in lockfilename, io lockfile, in lockkey) {
+subr exit(in lockfilename, io lockfile, in lockkey) {
 
 	call unlockrecord(lockfilename, lockfile, lockkey);
 
 	return;
 }
 
-subroutine fmtresp() {
+subr fmtresp() {
 
 	// trim everything after <ESC> (why?)
 	var tt = response_.index("<ESC>");
@@ -895,7 +895,7 @@ subroutine fmtresp() {
 	return;
 }
 
-subroutine getdaysago() {
+subr getdaysago() {
 	var weekend = "67";
 	marketcode	= srv.company.f(30, 1);
 	if (marketcode) {

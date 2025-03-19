@@ -1,7 +1,7 @@
 #include <exodus/library.h>
 libraryinit()
 
-function main() {
+func main() {
 	// TODO implement or obsolete
 	return 999;
 }

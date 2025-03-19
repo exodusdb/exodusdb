@@ -19,7 +19,7 @@ so we do this instead
 3. add pgexodus functions to template1 database (for all future database creations)
 */
 
-function main() {
+func main() {
 
 	printl("Exodus Copyright (c) 2009 steve.bush@neosys.com");
 	printl("Licence: http://www.opensource.org/licenses/mit-license.php");
@@ -109,7 +109,7 @@ function main() {
 }
 
 //get the first definition of each parameter
-subroutine getorigparam(in config, in name, out value) {
+subr getorigparam(in config, in name, out value) {
 	let pos = index(config, name);
 	if (!pos)
 		return;
@@ -117,7 +117,7 @@ subroutine getorigparam(in config, in name, out value) {
 	return;
 }
 
-subroutine getinput(in prompt, io data) {
+subr getinput(in prompt, io data) {
 	var text = prompt ^ " (" ^ data ^ ")";
 	if (len(text) < 30)
 		text = oconv(text, "L#30");
@@ -127,7 +127,7 @@ subroutine getinput(in prompt, io data) {
 		data = result;
 }
 
-function input_adminconfig(in origconfig, out serverconfig) {
+func input_adminconfig(in origconfig, out serverconfig) {
 
 	var host = "127.0.0.1";
 	var port = "5432";
@@ -174,7 +174,7 @@ function input_adminconfig(in origconfig, out serverconfig) {
 	return adminconfig;
 }
 
-function runsomesql(in sql) {
+func runsomesql(in sql) {
 
 	var errmsg;
 	if (not sql.sqlexec(sql, errmsg)) {
@@ -187,7 +187,7 @@ function runsomesql(in sql) {
 	return true;
 }
 
-function add_pgexodus_postgres_plugin() {
+func add_pgexodus_postgres_plugin() {
 
 //	let sql =
 //		"CREATE OR REPLACE FUNCTION exodus_call(bytea, bytea, bytea, bytea, bytea, int4, int4) RETURNS bytea AS 'pgexodus', 'exodus_call' LANGUAGE C IMMUTABLE;\n"
@@ -203,7 +203,7 @@ function add_pgexodus_postgres_plugin() {
 	return runsomesql(sql);
 }
 
-function create_dbuser(in dbusername, in dbuserpass) {
+func create_dbuser(in dbusername, in dbuserpass) {
 
 	var sql =
 		"CREATE ROLE $dbusername$ LOGIN"
@@ -218,7 +218,7 @@ function create_dbuser(in dbusername, in dbuserpass) {
 	return runsomesql(sql);
 }
 
-function create_db(in dbname, in dbusername) {
+func create_db(in dbname, in dbusername) {
 
 	var sql =
 		"CREATE DATABASE $dbname$"
@@ -232,7 +232,7 @@ function create_db(in dbname, in dbusername) {
 	return runsomesql(sql);
 }
 
-function configure_via_connection(in adminconfig, in dbname, in dbusername, in dbuserpass) {
+func configure_via_connection(in adminconfig, in dbname, in dbusername, in dbuserpass) {
 	printx(oconv("Creating new user " ^ dbusername ^ " ... ", "L#40"));
 	if (not create_dbuser(dbusername, dbuserpass))
 		//stop();

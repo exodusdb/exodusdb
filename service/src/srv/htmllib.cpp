@@ -11,7 +11,7 @@ var params2;
 var filler;
 var tagsep;
 
-function main(in mode, io datax, in params0 = "", in params20 = "") {
+func main(in mode, io datax, in params0 = "", in params20 = "") {
 
 	// BEING REPLACED BY LOWERCASE VERSION HTMLLIB2()
 	// GBP all HTMLLIB2
@@ -364,7 +364,7 @@ function main(in mode, io datax, in params0 = "", in params20 = "") {
 	return 0;
 }
 
-subroutine fill(io datax) {
+subr fill(io datax) {
 
 	let nn = datax.fcount(FM);
 

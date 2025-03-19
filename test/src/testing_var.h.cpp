@@ -8,7 +8,7 @@
 #endif
 programinit()
 
-function main() {
+func main() {
 
 	// Quit if no default database connection
 	if (not connect() or not reccount("xo_clients")) {
@@ -305,18 +305,18 @@ function main() {
 
 	}
 
-	printl("chr(const int num) const;");
+	printl("chr(const int num);");
 	{
-		let v1 = var().chr(0x61);
+		let v1 = var::chr(0x61);
 		assert(v1 == "a");
 
 		// or
 		let v2 = chr(0x61);
 	}
 
-	printl("textchr(const int num) const;");
+	printl("textchr(const int num);");
 	{
-		let v1 = var().textchr(171416);
+		let v1 = var::textchr(171416);
 		assert(v1 == "𩶘");
  // or "\xF0A9B698"
 		// or
@@ -1496,6 +1496,14 @@ function main() {
 		if (not updaterecord(record on file, key)) abort("updaterecord: " ^ lasterror());
 	}
 
+	printl("updatekey(in key, in newkey) const;");
+	{
+		let file = "xo_clients", key = "GD001", newkey = "GD002";
+		if (not file.updatekey(key, newkey)) abort("updatekey: " ^ lasterror());
+		// or
+		if (not updatekey(file, newkey, key)) abort("updatekey: " ^ lasterror()); // Reverse the above change.
+	}
+
 	printl("readf(in file, in key, const int fieldno);");
 	{
 		var field, file = "xo_clients", key = "GD001", fieldno = 2;
@@ -1662,30 +1670,30 @@ function main() {
 		if (deletelist("mylist")) abort("deletelist: " ^ lasterror());
 	}
 
-	printl("date() const;");
+	printl("date();");
 	{
-		let today1 = var().date();
+		let today1 = var::date();
 		// or
 		let today2 = date();
 	}
 
-	printl("time() const;");
+	printl("time();");
 	{
-		let now1 = var().time();
+		let now1 = var::time();
 		// or
 		let now2 = time();
 	}
 
-	printl("ostime() const;");
+	printl("ostime();");
 	{
-		let now1 = var().ostime();
+		let now1 = var::ostime();
 		// or
 		let now2 = ostime();
 	}
 
-	printl("ostimestamp() const;");
+	printl("ostimestamp();");
 	{
-		let now1 = var().ostimestamp();
+		let now1 = var::ostimestamp();
 		// or
 		let now2 = ostimestamp();
 	}
@@ -1700,9 +1708,9 @@ function main() {
 		let ts2 = ostimestamp(idate, itime);
 	}
 
-	printl("ossleep(const int milliseconds) const;");
+	printl("ossleep(const int milliseconds);");
 	{
-		var().ossleep(100); // sleep for 100ms
+		var::ossleep(100); // sleep for 100ms
 		// or
 		ossleep(100);
 	}
@@ -1720,7 +1728,7 @@ function main() {
 
 	printl("osopen(in osfilename, const bool utf8 = true) const;");
 	{
-		let osfilename = ostempdirpath() ^ "xo_gendoc_test.conf";
+		let osfilename = ostempdir() ^ "xo_gendoc_test.conf";
 		if (oswrite("" on osfilename)) {/*ok*/} else  abort("osopen: " ^ lasterror()); /// Create an empty os file
 		var ostempfile;
 		if (ostempfile.osopen(osfilename)) {/*ok*/} else  abort("osopen: " ^ lasterror());
@@ -1730,7 +1738,7 @@ function main() {
 
 	printl("osbwrite(in osfilevar, io offset) const;");
 	{
-		let osfilename = ostempdirpath() ^ "xo_gendoc_test.conf";
+		let osfilename = ostempdir() ^ "xo_gendoc_test.conf";
 		let text = "aaa=123\nbbb=456\n";
 		var offset = osfile(osfilename).f(1); /// Size of file therefore append
 		if (text.osbwrite(osfilename, offset)) {/*ok*/} else  abort("osbwrite: " ^ lasterror());
@@ -1742,7 +1750,7 @@ function main() {
 
 	printl("osbread(in osfilevar, io offset, const int length);");
 	{
-		let osfilename = ostempdirpath() ^ "xo_gendoc_test.conf";
+		let osfilename = ostempdir() ^ "xo_gendoc_test.conf";
 		var text, offset = 0;
 		if (text.osbread(osfilename, offset, 8)) {/*ok*/} else  abort("osbread: " ^ lasterror());
 		assert(text == "aaa=123\n" );
@@ -1765,7 +1773,7 @@ function main() {
 	printl("oswrite(in osfilename, const char* codepage = "") const;");
 	{
 		let text = "aaa = 123\nbbb = 456";
-		let osfilename = ostempdirpath() ^ "xo_gendoc_test.conf";
+		let osfilename = ostempdir() ^ "xo_gendoc_test.conf";
 		if (text.oswrite(osfilename)) {/*ok*/} else  abort("oswrite: " ^ lasterror());
 		// or
 		if (oswrite(text on osfilename)) {/*ok*/} else  abort("oswrite: " ^ lasterror());
@@ -1774,19 +1782,20 @@ function main() {
 	printl("osread(const char* osfilename, const char* codepage = "");");
 	{
 		var text;
-		let osfilename = ostempdirpath() ^ "xo_gendoc_test.conf";
+		let osfilename = ostempdir() ^ "xo_gendoc_test.conf";
 		if (text.osread(osfilename)) {/*ok*/} else  abort("osread: " ^ lasterror());
 		assert(text == "aaa = 123\nbbb = 456");
 
 		// or
 		if (osread(text from osfilename)) {/*ok*/} else  abort("osread: " ^ lasterror());
+		let text2 = osread(osfilename);
 	}
 
 	var osfile_or_dirname;
 
 	printl("osrename(in new_dirpath_or_filepath) const;");
 	{
-		let from_osfilename = ostempdirpath() ^ "xo_gendoc_test.conf";
+		let from_osfilename = ostempdir() ^ "xo_gendoc_test.conf";
 		let to_osfilename = from_osfilename ^ ".bak";
 
 		if (from_osfilename.osrename(to_osfilename)) {/*ok*/} else  abort("osrename: " ^ lasterror());
@@ -1796,7 +1805,7 @@ function main() {
 
 	printl("osmove(in to_osfilename) const;");
 	{
-		let from_osfilename = ostempdirpath() ^ "xo_gendoc_test.conf.bak";
+		let from_osfilename = ostempdir() ^ "xo_gendoc_test.conf.bak";
 		let to_osfilename = from_osfilename.cut(-4);
 
 		if (from_osfilename.osmove(to_osfilename)) {/*ok*/} else  abort("osmove: " ^ lasterror());
@@ -1806,7 +1815,7 @@ function main() {
 
 	printl("oscopy(in to_osfilename) const;");
 	{
-		let from_osfilename = ostempdirpath() ^ "xo_gendoc_test.conf";
+		let from_osfilename = ostempdir() ^ "xo_gendoc_test.conf";
 		let to_osfilename = from_osfilename ^ ".bak";
 		if (from_osfilename.oscopy(to_osfilename)) {/*ok*/} else  abort("oscopy: " ^ lasterror());;
 		// or
@@ -1817,7 +1826,7 @@ function main() {
 
 	printl("osremove() const;");
 	{
-		let osfilename = ostempdirpath() ^ "xo_gendoc_test.conf";
+		let osfilename = ostempdir() ^ "xo_gendoc_test.conf";
 		if (osfilename.osremove()) {/*ok*/} else  abort("osremove: " ^ lasterror());
 		// or
 		if (osremove(osfilename)) abort("osremove: " ^ lasterror());
@@ -1919,18 +1928,18 @@ function main() {
 		if (osshellwrite(outtext, "grep xyz")) {/*ok*/} else  abort("osshellwrite: " ^ lasterror());
 	}
 
-	printl("ostempdirpath() const;");
+	printl("ostempdir();");
 	{
-		let v1 = var().ostempdirpath();
+		let v1 = var::ostempdir();
 		// or
-		let v2 = ostempdirpath();
+		let v2 = ostempdir();
 	}
 
-	printl("ostempfilename() const;");
+	printl("ostempfile();");
 	{
-		var temposfilename1 = var().ostempfilename();
+		var temposfilename1 = var::ostempfile();
 		// or
-		var temposfilename2 = ostempfilename();
+		var temposfilename2 = ostempfile();
 	}
 
 	var envvalue;
@@ -1953,23 +1962,25 @@ function main() {
 
 	}
 
-	printl("ospid() const;");
+	printl("ospid();");
 	{
-		let pid1 = var().ospid(); /// e.g. 663237
+		let pid1 = var::ospid(); /// e.g. 663237
 		// or
 		let pid2 = ospid();
 	}
 
-	printl("ostid() const;");
+	printl("ostid();");
 	{
-		let tid1 = var().ostid(); /// e.g. 663237
+		let tid1 = var::ostid(); /// e.g. 663237
 		// or
 		let tid2 = ostid();
 	}
 
-	printl("version() const;");
+	printl("version();");
 	{
-		let v1 = var().version(); /// e.g. "29 JAN 2025 14:56:52"
+		let v1 = var::version();
+		// or
+		let v2 = version();
 	}
 
 	printl("setxlocale() const;");
@@ -2184,6 +2195,25 @@ function main() {
 
 	}
 
+	printl("setprecision(int newprecision);");
+	{
+		assert(0.000001_var == 0); /// NOTE WELL: Default precision 4.
+		let new_precision1 = var::setprecision(6);
+		assert(new_precision1 == 6);
+ // Increase the precision.
+		// or
+		let new_precision2 = setprecision(6);
+		assert(0.000001_var != 0);
+ /// NOTE: Precision 6.
+	}
+
+	printl("getprecision();");
+	{
+		let curr_precision1 = var::getprecision();
+		// or
+		let curr_precision2 = getprecision();
+	}
+
 	var vardate;
 
 	printl("oconv_D(const char* conversion) const;");
@@ -2218,7 +2248,7 @@ function main() {
 		assert(v2.oconv("D") == "18 OCT 2001^19 OCT 2001]20 OCT 2001"_var);
 
 		 // or
-		 assert( oconv(v1, "D"   ) == "18 OCT 2001"  );
+		 assert( oconv(v2, "D"   ) == "18 OCT 2001"  );
 	}
 
 	printl("iconv_D(const char* conversion) const;");
@@ -2373,16 +2403,29 @@ function main() {
 
 	printl("oconv_MX() const;");
 	{
-		assert( var("255").oconv("MX") == "FF");
+		let v1 = var("255").oconv("MX");
+		assert(v1 == "FF");
+
 		// or
-		assert( oconv(var("255"), "MX") == "FF");
+		let v2 = oconv(var("255"), "MX");
+	}
+
+	printl("iconv_MX() const;");
+	{
+		let v1 = "FFFF"_var.iconv("MX");
+		assert(v1 == 65'535);
+
+		// or
+		let v2 = iconv("FFFF"_var, "MX");
 	}
 
 	printl("oconv_MB() const;");
 	{
-		assert( var(255).oconv("MB") == 1111'1111);
+		let v1 = var(255).oconv("MB");
+		assert(v1 == 1111'1111);
+
 		// or
-		assert( oconv(var(255), "MB") == 1111'1111);
+		let v2 = oconv(var(255), "MB");
 	}
 
 	printl("oconv_TX(const char* conversion) const;");
@@ -2668,8 +2711,8 @@ subroutine cleanup() {
 		if (not dbdelete("xo_gendoc_testdb2")) {}; // Cleanup first
 		if (not deleteindex("xo_clients", "DATE_CREATED")) {}; // Cleanup first
 		//if (not "xo_clients"_var.deleterecord("GD001")) {}; // Cleanup first
-		if (not osremove(ostempdirpath() ^ "xo_gendoc_test.conf.bak")) {}; // Cleanup first
-		if (not osremove(ostempdirpath() ^ "xo_gendoc_test.conf")) {}; // Cleanup first
+		if (not osremove(ostempdir() ^ "xo_gendoc_test.conf.bak")) {}; // Cleanup first
+		if (not osremove(ostempdir() ^ "xo_gendoc_test.conf")) {}; // Cleanup first
 		if (osrmdir("xo_test/aaa")) {}; // Cleanup first
 		if (not deleterecord("xo_clients", "GD001")) {}; // Cleanup first
 		if (not osremove("xo_conf.txt")) {}; // Cleanup first

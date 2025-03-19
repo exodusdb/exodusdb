@@ -1,7 +1,7 @@
 #include <exodus/program.h>
 programinit()
 
-function main() {
+func main() {
 
 	let dbname1 = COMMAND.f(2);
 	let dbname2 = COMMAND.f(3);

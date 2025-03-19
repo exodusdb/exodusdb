@@ -12,7 +12,7 @@ libraryinit()
 //var outfile;
 var errors;
 
-function main(in module, in mode, in stationery) {
+func main(in module, in mode, in stationery) {
 
 	// checks there is some output and converts htm to pdf if necessary
 
@@ -71,7 +71,7 @@ function main(in module, in mode, in stationery) {
 	return 0;
 }
 
-subroutine check_exists_and_maybe_convert(in module, in mode, in stationery, io outfile) {
+subr check_exists_and_maybe_convert(in module, in mode, in stationery, io outfile) {
 
 	let diroutfile = outfile.osfile();
 	if (diroutfile.f(1) > 5) {

@@ -8,7 +8,7 @@ var testfilename;
 var dictfilename;
 var testfile;
 
-function main() {
+func main() {
 
 	// Quit if no default database connection
 	if (not connect()) {
@@ -74,7 +74,7 @@ function main() {
 	return 0;
 }
 
-function test() {
+func test() {
 
 	assert(select(testfilename ^ " with f1m 'E]' 'XX' (SR)"));
 	assert(readnext(RECORD, ID, MV));

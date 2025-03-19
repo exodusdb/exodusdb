@@ -758,8 +758,8 @@ function test_exodus_and_database {
 :
 	testsort
 :
-: 'Recommended: "export PATH=${PATH}:~/bin"'
-: 'or logout/login to get new path from /etc/profile.d/exodus.sh'
+: 'Recommended: "su -"'
+: 'or logout/login to get new path/libs from /etc/profile.d/exodus.sh'
 : 'which will enable running exodus programs created by edic/compile'
 : 'from the command line without prefixing ~/bin/'
 

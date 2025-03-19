@@ -1,7 +1,7 @@
 #include <exodus/library.h>
 libraryinit()
 
-function main(in /*x*/, in /*y*/, in /*x2*/, in /*y2*/, in /*readwrite*/, io /*buffer*/) {
+func main(in /*x*/, in /*y*/, in /*x2*/, in /*y2*/, in /*readwrite*/, io /*buffer*/) {
 
 	// TODO implement if screen handling required
 

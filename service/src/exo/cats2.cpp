@@ -1,7 +1,7 @@
 #include <exodus/library.h>
 libraryinit()
 
-function main(in list1, in infix, in list2) {
+func main(in list1, in infix, in list2) {
 
 	// joins multivalue lists in parallel with a separator
 

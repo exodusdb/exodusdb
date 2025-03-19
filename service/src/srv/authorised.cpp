@@ -8,7 +8,7 @@ libraryinit()
 #include <service_common.h>
 
 
-function main(in task0, out msg, in defaultlock = "", in username0 = "") {
+func main(in task0, out msg, in defaultlock = "", in username0 = "") {
 
 	// NB de bugging afer recompile requires restart since SECURITY is in PRELOAD
 	// call msg(task)
@@ -263,7 +263,7 @@ notallowed:
 	return 1;
 }
 
-subroutine readuserprivs() {
+subr readuserprivs() {
 	// in case called from FILEMAN due to no datasets
 	if (DEFINITIONS.open("DEFINITIONS", "")) {
 		if (not SECURITY.read(DEFINITIONS, "SECURITY")) {
@@ -275,7 +275,7 @@ subroutine readuserprivs() {
 	return;
 }
 
-subroutine writeuserprivs() {
+subr writeuserprivs() {
 	SECURITY(9) = "";
 	if (DEFINITIONS.open("DEFINITIONS", "")) {
 		SECURITY.write(DEFINITIONS, "SECURITY");

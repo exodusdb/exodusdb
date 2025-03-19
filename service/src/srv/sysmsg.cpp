@@ -23,7 +23,7 @@ var result;
 var errormsg;
 var exceededmsg;
 
-function main(in msg0, in subject0 = "", in username0 = "") {
+func main(in msg0, in subject0 = "", in username0 = "") {
 
 	// logs a message and sends it to all the technical support emails (backup)
 

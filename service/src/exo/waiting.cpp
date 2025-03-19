@@ -2,7 +2,7 @@
 libraryinit()
 
 // Performed by listen
-function main() {
+func main() {
 
 	breakoff();
 

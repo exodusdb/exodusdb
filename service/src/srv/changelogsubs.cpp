@@ -34,7 +34,7 @@ libraryinit()
 //var wspos;
 //var wsmsg;
 
-function main(in mode0) {
+func main(in mode0) {
 
 	var mode = mode0;
 
@@ -217,7 +217,7 @@ function main(in mode0) {
 	return 0;
 }
 
-subroutine select0(io mode) {
+subr select0(io mode) {
 
 	// get the one date prior (so list is "as at")
 
@@ -243,7 +243,7 @@ subroutine select0(io mode) {
 	return;
 }
 
-subroutine select(in mode) {
+subr select(in mode) {
 	data_ = mode.field(FM, 2, 9999);
 
 	// force all
@@ -271,7 +271,7 @@ subroutine select(in mode) {
 	return;
 }
 
-subroutine list(in mode) {
+subr list(in mode) {
 	// input
 	// data<1>=mv list of topics
 	// data<2>=date from which interested
@@ -311,7 +311,7 @@ subroutine list(in mode) {
 	return;
 }
 
-function getcurrentversiondatetime() {
+func getcurrentversiondatetime() {
 	// get currently installed version date
 	// temp=xlate('DOS','.\general\version.dat',1,'x')
 	var temp = "./general/version.dat";
@@ -330,7 +330,7 @@ function getcurrentversiondatetime() {
 	return currentversiondatetime;
 }
 
-subroutine getversiondates() {
+subr getversiondates() {
 	// extract installed version dates from upgrade.cfg
 	//call osread(versionlog, "upgrade.cfg");
 	var versionlog;

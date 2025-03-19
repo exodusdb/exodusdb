@@ -15,7 +15,7 @@ var targetusercodes;
 var title;
 //var usern;	// num
 
-function main(in mode0, in title0, in module, in request, in data0, in runasusercode0, in targetusercodes0, io document0, io docid, out msg) {
+func main(in mode0, in title0, in module, in request, in data0, in runasusercode0, in targetusercodes0, io document0, io docid, out msg) {
 
 	// creates an autorun record in documents
 	// GBP CREATEALERT mode WRITE

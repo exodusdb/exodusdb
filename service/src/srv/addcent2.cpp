@@ -3,7 +3,7 @@ libraryinit()
 
 #include <service_common.h>
 
-function main(in yymm) {
+func main(in yymm) {
 
 	// only used in accounting to convert YYMM->YYYYMM
 

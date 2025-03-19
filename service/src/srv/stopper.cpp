@@ -10,7 +10,7 @@ libraryinit()
 
 var mode;
 
-function main(in mode0, in time, in date, io /*buffer*/, out msg) {
+func main(in mode0, in time, in date, io /*buffer*/, out msg) {
 
 //	if (msg.unassigned()) {
 //		msg = "";

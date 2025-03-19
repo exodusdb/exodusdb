@@ -19,7 +19,7 @@
 #include <exodus/program.h>
 programinit()
 
-function main() {
+func main() {
 //#undef EXO_FORMAT
 #ifndef EXO_FORMAT
 	printl("EXO_FORMAT is not available so std::format a var is not possible.");

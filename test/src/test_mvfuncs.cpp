@@ -4,7 +4,7 @@
 #include <exodus/program.h>
 programinit()
 
-function main() {
+func main() {
 	printl("test_mvfuncs says 'Hello World!'");
 
 	/////////
@@ -116,6 +116,56 @@ function main() {
 
 	assert(oconv(3, "MX")   eq "3");
 	assert(oconv(3.5, "MX") eq "4");
+
+	{
+		// MX iconv
+
+		// Check iconv "MX" works
+		// a) on chars 0-9a-fA-F
+		// b) NOT on any other chars
+		// iconv handles multiple fields, values etc. so general field marks are not tested
+		for (var chn : range(1, 255)) {
+			var ch = chr(chn);
+			if (not var(_ALL_FMS).contains(ch)) {
+				errput(chn, ".\t", oconv(ch, "HEX"), "\t", iconv(ch, "MX").squote(), "\t");
+				if ("0123456789abcdefABCDEF"_var.contains(ch))
+					assert(not iconv(ch, "MX").empty());
+				else
+					assert(iconv(ch, "MX").empty());
+			}
+		}
+		printl();
+
+		printl("\nCheck round trip up to 64Kib + 1");
+		for (var chn : range(0, 65536)) {
+			if (chn < ST_ or chn >= RM_) {
+				var hex = oconv(chn, "MX");
+	//			logputl(chn, "\t", hex.squote(), "\t", hex.iconv("MX").squote());
+				assert(chn== iconv(oconv(chn, "MX"), "MX"));
+			}
+		}
+
+		assert(iconv("F", "MX") eq "15");
+		assert(iconv("FF", "MX") eq "255");
+		assert(iconv("FFF", "MX") eq "4095");
+		assert(iconv("FFFF", "MX") eq "65535");
+
+		assert(iconv("FFFFF", "MX") eq "1048575");
+		assert(iconv("FFFFFF", "MX") eq "16777215");
+		assert(iconv("FFFFFFF", "MX") eq "268435455");
+		assert(iconv("FFFFFFFF", "MX") eq "4294967295");
+
+		assert(iconv("FFFFFFFFF", "MX") eq "68719476735");
+		assert(iconv("FFFFFFFFFF", "MX") eq "1099511627775");
+		assert(iconv("FFFFFFFFFFF", "MX") eq "17592186044415");
+		assert(iconv("FFFFFFFFFFFF", "MX") eq "281474976710655");
+
+		assert(iconv("FFFFFFFFFFFFF", "MX") eq "4503599627370495");
+		assert(iconv("FFFFFFFFFFFFFF", "MX") eq "72057594037927935");
+		assert(iconv("FFFFFFFFFFFFFFF", "MX") eq "1152921504606846975");
+		assert(iconv("FFFFFFFFFFFFFFFF", "MX") eq "-1");
+
+	}
 
 	{
 		assert(var(' ').oconv("HEX").outputl()      eq "20");

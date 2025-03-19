@@ -503,19 +503,19 @@ public:
 	// Returns: A string containing a single char
 	// 0-127 -> ASCII, 128-255 -> invalid UTF-8 which cannot be written to the database or used in many exodus string operations
 	//
-	// `let v1 = var().chr(0x61); // "a"
+	// `let v1 = var::chr(0x61); // "a"
 	//  // or
 	//  let v2 = chr(0x61);`
-	ND var  chr(const int num) const;
+	ND static var  chr(const int num);
 
 	// Get a Unicode character given a Unicode Code Point (Number)
 	// Returns: A single Unicode character in UTF8 encoding.
 	// To get UTF code points > 2^63 you must provide negative ints because var doesnt provide an implicit constructor to unsigned int due to getting ambigious conversions because int and unsigned int are parallel priority in c++ implicit conversions.
 	//
-	// `let v1 = var().textchr(171416); // "𩶘" // or "\xF0A9B698"
+	// `let v1 = var::textchr(171416); // "𩶘" // or "\xF0A9B698"
 	//  // or
 	//  let v2 = textchr(171416);`
-	ND var  textchr(const int num) const;
+	ND static var  textchr(const int num);
 
 	// Get a string of repeated substrings.
 	// var: The substring to be repeated
@@ -1931,6 +1931,7 @@ public:
 	ND bool dbdelete(in dbname) const;
 
 	// Create a named db file.
+	// filenames ending with "_temp" only last until the connection is closed.
 	//
 	// `let filename = "xo_gendoc_temp", conn = "exodus";
 	//  if (conn.createfile(filename)) ... ok
@@ -1972,7 +1973,9 @@ public:
 
 	// obj is conn_or_file
 
-	// Returns: The approx. number of records in a db file
+	// Returns: The approx. number of records in a db file.
+	// Might return -1 if not known.
+	// Not very accurate inside transactions.
 	//
 	// `let conn = "exodus", filename = "xo_clients";
 	//  var nrecs1 = conn.reccount(filename);
@@ -1980,8 +1983,9 @@ public:
 	//  var nrecs2 = reccount(filename);`
 	ND var  reccount(in filename = "") const;
 
-	// Calls db maintenance function (vacuum)
+	// Calls db maintenance function for a file or all files.
 	// This doesnt actually flush any indexes but does make sure that reccount() function is reasonably accurate.
+	// Returns: True if successful otherwise false if not and with lasterror() set.
 	   bool flushindex(in filename = "") const;
 
 	///// DATABASE FILE I/O:
@@ -2115,6 +2119,7 @@ public:
 	// Returns: False if the key doesnt exist
 	// Any memory cached record is deleted.
 	// obj is file
+	// deleterecord(in file), a one argument free function, is available that deletes multiple records using the currently active select list.
 	//
 	// `let file = "xo_clients", key = "GD001";
 	//  if (file.deleterecord(key)) ... ok
@@ -2134,7 +2139,7 @@ public:
 	ND bool insertrecord(in file, in key) const;
 
 	// Updates an existing record in a db file.
-	// Returns: False if the key doesnt already exist
+	// Returns: False if no record with the given key exists.
 	// Any memory cached record is deleted.
 	//
 	// `let record = "Client GD^G^20855^30000^1001.00^20855.76539"_var;
@@ -2143,6 +2148,16 @@ public:
 	//  // or
 	//  if (not updaterecord(record on file, key)) ...`
 	ND bool updaterecord(in file, in key) const;
+
+	// Updates the key of an existing record in a db file.
+	// Returns: True if successful or false if no record with the given key exists, or a record with newkey already exists
+	// Any memory cached records of either key are deleted.
+	//
+	// `let file = "xo_clients", key = "GD001", newkey = "GD002";
+	//  if (not file.updatekey(key, newkey)) ...
+	//  // or
+	//  if (not updatekey(file, newkey, key)) ... // Reverse the above change.`
+	ND bool updatekey(in key, in newkey) const;
 
 	// obj is strvar
 
@@ -2418,37 +2433,37 @@ public:
 	// Number of whole days since pick epoch 1967-12-31 00:00:00 UTC. Negative for dates before.
 	// e.g. was 20821 from 2025-01-01 00:00:00 UTC for 24 hours
 	//
-	// `let today1 = var().date();
+	// `let today1 = var::date();
 	//  // or
 	//  let today2 = date();`
-	ND var  date() const;
+	ND static var  date();
 
 	// Number of whole seconds since last 00:00:00 (UTC).
 	// e.g. 43200 if time is 12:00
 	// Range 0 - 86399 since there are 24*60*60 (86400) seconds in a day.
 	//
-	// `let now1 = var().time();
+	// `let now1 = var::time();
 	//  // or
 	//  let now2 = time();`
-	ND var  time() const;
+	ND static var  time();
 
 	// Number of fractional seconds since last 00:00:00 (UTC).
 	// A floating point with approx. nanosecond resolution depending on hardware.
 	// e.g. 23343.704387955 approx. 06:29:03 UTC
 	//
-	// `let now1 = var().ostime();
+	// `let now1 = var::ostime();
 	//  // or
 	//  let now2 = ostime();`
-	ND var  ostime() const;
+	ND static var  ostime();
 
 	// Number of fractional days since pick epoch 1967-12-31 00:00:00 UTC. Negative for dates before.
 	// A floating point with approx. nanosecond resolution depending on hardware.
 	// e.g. Was 20821.99998842593 around 2025-01-01 23:59:59 UTC
 	//
-	// `let now1 = var().ostimestamp();
+	// `let now1 = var::ostimestamp();
 	//  // or
 	//  let now2 = ostimestamp();`
-	ND var  ostimestamp() const;
+	ND static var  ostimestamp();
 
 	// Construct a timestamp from a date and time
 	//
@@ -2461,10 +2476,10 @@ public:
 	// Sleep/pause/wait for a number of milliseconds
 	// Releases the processor if not needed for a period of time or a delay is required.
 	//
-	// `var().ossleep(100); // sleep for 100ms
+	// `var::ossleep(100); // sleep for 100ms
 	//  // or
 	//  ossleep(100);`
-	   void ossleep(const int milliseconds) const;
+	   static void ossleep(const int milliseconds);
 
 	// Sleep/pause/wait up to a given number of milliseconds or until any changes occur in an FM delimited list of directories and/or files.
 	// Any terminal input (e.g. a key press) will also terminate the wait.
@@ -2509,7 +2524,7 @@ public:
 	// Returns: True if successful or false if not possible for any reason. e.g. Target doesnt exist, permissions etc.
 	// The file will be opened for writing if possible otherwise for reading.
 	//
-	// `let osfilename = ostempdirpath() ^ "xo_gendoc_test.conf";
+	// `let osfilename = ostempdir() ^ "xo_gendoc_test.conf";
 	//  if (oswrite("" on osfilename)) ... ok /// Create an empty os file
 	//  var ostempfile;
 	//  if (ostempfile.osopen(osfilename)) ... ok
@@ -2520,7 +2535,7 @@ public:
 	// Writes data to an existing os file starting at a given byte offset (0 based).
 	// See osbread for more info.
 	//
-	// `let osfilename = ostempdirpath() ^ "xo_gendoc_test.conf";
+	// `let osfilename = ostempdir() ^ "xo_gendoc_test.conf";
 	//  let text = "aaa=123\nbbb=456\n";
 	//  var offset = osfile(osfilename).f(1); /// Size of file therefore append
 	//  if (text.osbwrite(osfilename, offset)) ... ok // offset -> 16
@@ -2533,7 +2548,7 @@ public:
 	// After reading, the offset is updated to point to the correct offset for a subsequent sequential read.
 	// If reading UTF8 data (the default) then the length of data actually returned may be a few bytes shorter than requested in order to be a complete number of UTF-8 code points.
 	//
-	// `let osfilename = ostempdirpath() ^ "xo_gendoc_test.conf";
+	// `let osfilename = ostempdir() ^ "xo_gendoc_test.conf";
 	//  var text, offset = 0;
 	//  if (text.osbread(osfilename, offset, 8)) ... ok // text -> "aaa=123\n" // offset -> 8
 	//  // or
@@ -2557,7 +2572,7 @@ public:
 	// If codepage is specified then output is converted from utf-8 to that codepage. Otherwise no conversion is done.
 	//
 	// `let text = "aaa = 123\nbbb = 456";
-	//  let osfilename = ostempdirpath() ^ "xo_gendoc_test.conf";
+	//  let osfilename = ostempdir() ^ "xo_gendoc_test.conf";
 	//  if (text.oswrite(osfilename)) ... ok
 	//  // or
 	//  if (oswrite(text on osfilename)) ... ok`
@@ -2565,14 +2580,15 @@ public:
 
 	// Read a complete os file into a var.
 	// If codepage is specified then input is converted from that codepage to utf-8 otherwise no conversion is done.
-	// Returns: True if successful or false if not possible for any reason.
-	// e.g. File doesnt exist, permissions etc.
+	// Returns: True if successful or false if not possible for any reason. e.g. File doesnt exist, insufficient permissions etc.
+	// var: [out] is currently set to "" in case of any failure but this is may be changed in a future release to either force var to be unassigned or to leave it untouched. To guarantee future behaviour either add a line 'xxxx.defaulter("")' or set var manually in case osread() returns false. Or use the one argument free function version of osread() which always returns "" in case of failure to read.
 	//
 	// `var text;
-	//  let osfilename = ostempdirpath() ^ "xo_gendoc_test.conf";
+	//  let osfilename = ostempdir() ^ "xo_gendoc_test.conf";
 	//  if (text.osread(osfilename)) ... ok // text -> "aaa = 123\nbbb = 456"
 	//  // or
-	//  if (osread(text from osfilename)) ... ok`
+	//  if (osread(text from osfilename)) ... ok
+	//  let text2 = osread(osfilename);`
 	ND bool osread(const char* osfilename, const char* codepage = "");
 
 	// TODO check if it calls osclose on itself in case removing a varfile
@@ -2586,9 +2602,9 @@ public:
 	// e.g. Target already exists, path is not writeable, permissions etc.
 	// Uses std::filesystem::rename internally.
 	//
-	// `let from_osfilename = ostempdirpath() ^ "xo_gendoc_test.conf";
+	// `let from_osfilename = ostempdir() ^ "xo_gendoc_test.conf";
 	//  let to_osfilename = from_osfilename ^ ".bak";
-	//  if (not osremove(ostempdirpath() ^ "xo_gendoc_test.conf.bak")) {}; // Cleanup first
+	//  if (not osremove(ostempdir() ^ "xo_gendoc_test.conf.bak")) {}; // Cleanup first
 	//
 	//  if (from_osfilename.osrename(to_osfilename)) ... ok
 	//  // or
@@ -2601,10 +2617,10 @@ public:
 	// e.g. Source doesnt exist or cannot be accessed, target already exists, source or target is not writeable, permissions etc.
 	// Attempts osrename first then oscopy followed by osremove original.
 	//
-	// `let from_osfilename = ostempdirpath() ^ "xo_gendoc_test.conf.bak";
+	// `let from_osfilename = ostempdir() ^ "xo_gendoc_test.conf.bak";
 	//  let to_osfilename = from_osfilename.cut(-4);
 	//
-	//  if (not osremove(ostempdirpath() ^ "xo_gendoc_test.conf")) {}; // Cleanup first
+	//  if (not osremove(ostempdir() ^ "xo_gendoc_test.conf")) {}; // Cleanup first
 	//  if (from_osfilename.osmove(to_osfilename)) ... ok
 	//  // or
 	//  if (osmove(from_osfilename, to_osfilename)) ...`
@@ -2614,7 +2630,7 @@ public:
 	// Will overwrite an existing os file or dir.
 	// Uses std::filesystem::copy internally with recursive and overwrite options
 	//
-	// `let from_osfilename = ostempdirpath() ^ "xo_gendoc_test.conf";
+	// `let from_osfilename = ostempdir() ^ "xo_gendoc_test.conf";
 	//  let to_osfilename = from_osfilename ^ ".bak";
 	//
 	//  if (from_osfilename.oscopy(to_osfilename)) ... ok;
@@ -2629,7 +2645,7 @@ public:
 	// Returns: True if successful or false if not possible for any reason.
 	// e.g. Target doesnt exist, path is not writeable, permissions etc.
 	//
-	// `let osfilename = ostempdirpath() ^ "xo_gendoc_test.conf";
+	// `let osfilename = ostempdir() ^ "xo_gendoc_test.conf";
 	//  if (osfilename.osremove()) ... ok
 	//  // or
 	//  if (osremove(osfilename)) ...`
@@ -2766,19 +2782,19 @@ public:
 	// e.g. "/tmp/"
 	// obj is var()
 	//
-	// `let v1 = var().ostempdirpath();
+	// `let v1 = var::ostempdir();
 	//  // or
-	//  let v2 = ostempdirpath();`
-	ND var  ostempdirpath() const;
+	//  let v2 = ostempdir();`
+	ND static var  ostempdir();
 
 	// Returns: The name of a new temporary file
 	// e.g. Something like "/tmp/~exoEcLj3C"
 	// obj is var()
 	//
-	// `var temposfilename1 = var().ostempfilename();
+	// `var temposfilename1 = var::ostempfile();
 	//  // or
-	//  var temposfilename2 = ostempfilename();`
-	ND var  ostempfilename() const;
+	//  var temposfilename2 = ostempfile();`
+	ND static var  ostempfile();
 
 	// obj is envvalue
 
@@ -2812,22 +2828,30 @@ public:
 
 	// Get the os process id
 	//
-	// `let pid1 = var().ospid(); /// e.g. 663237
+	// `let pid1 = var::ospid(); /// e.g. 663237
 	//  // or
 	//  let pid2 = ospid();`
-	ND var  ospid() const;
+	ND static var  ospid();
 
 	// Get the os thread process id
 	//
-	// `let tid1 = var().ostid(); /// e.g. 663237
+	// `let tid1 = var::ostid(); /// e.g. 663237
 	//  // or
 	//  let tid2 = ostid();`
-	ND var  ostid() const;
+	ND static var  ostid();
 
-	// Get the libexodus build date and time
+	// Get the local and remote git branch commit details
 	//
-	// `let v1 = var().version(); /// e.g. "29 JAN 2025 14:56:52"`
-	ND var  version() const;
+	// Local:  doc 2025-03-19 18:15:31 +0000 219cdad8a
+	// Remote: doc 2025-03-17 15:03:00 +0000 958f412f0
+	// https://github.com/exodusdb/exodusdb/commit/219cdad8a
+	// https://github.com/exodusdb/exodusdb/archive/958f412f0.tar.gz
+	//
+	// `let v1 = var::version();
+	//  // or
+	//  let v2 = version();`
+	//
+	ND static var  version();
 
 	// obj is var
 
@@ -3080,7 +3104,8 @@ public:
     //  var v4 = floor(-2.9);`
     ND var  floor() const;
 
-	/* Actually implemented in var_base but documented here
+	/* For doc only. Actually implemented in var_base but documented here
+
 	// Modulus function
 	// Identical to C++ % operator only for positive numbers and modulus
 	// Negative denominators are considered as periodic with positiive numbers
@@ -3099,7 +3124,38 @@ public:
 	// Not documenting the overloaded versions
 	//ND var  mod(double modulus) const;
 	//ND var  mod(const int modulus) const;
-    */
+
+	// Set the maximum floating point precision.
+	// This is the number of post-decimal point digits to consider for floating point comparison and implicit conversion to strings.
+	// The default precision is 4 which is 0.0001.
+	// NUMBERS AND DIFFERENCES SMALLER THAN 0.0001 ARE TREATED AS ZERO UNLESS PRECISION IS INCREASED.
+	// newprecision: New precision between -307 and 308 inclusive.
+	// Returns: The new precision if successful or the old precision if not.
+	// Not required if using common numbers or using the explicit rounding and formatting functions to convert numbers to strings.
+	// Increasing the precision allows comparing and outputting smaller numbers but creates errors handling large numbers.
+	// Setting precision inside a perform, execute or dictionary function lasts until termination of the function.
+	// See cli/demo_precision for more info.
+	// obj is var()
+	//
+	// `assert(0.000001_var == 0); /// NOTE WELL: Default precision 4.
+	//  let new_precision1 = var::setprecision(6); // 6 // Increase the precision.
+	//  // or
+	//  let new_precision2 = setprecision(6);
+	//  assert(0.000001_var != 0); /// NOTE: Precision 6.`
+	//
+       static int setprecision(int newprecision);
+
+	// Returns: The current precision setting.
+	// See setprecision() for more info.
+	// obj is var()
+	//
+	// `let curr_precision1 = var::getprecision();
+	//  // or
+	//  let curr_precision2 = getprecision();`
+	//
+       static int getprecision();
+
+    */  // For doc only.
 
 	// Close documentation
 	/// :
@@ -3174,7 +3230,7 @@ public:
 	//  assert(v2.oconv("D") == "18 OCT 2001^19 OCT 2001]20 OCT 2001"_var);
 	//
 	//   // or
-	//   assert( oconv(v1, "D"   ) == "18 OCT 2001"  );`
+	//   assert( oconv(v2, "D"   ) == "18 OCT 2001"  );`
 	ND std::string oconv_D(const char* conversion) const;
 
 	// Date input: Convert human readable date to internal date format.
@@ -3385,23 +3441,36 @@ public:
 
 /* fake code to generate documentation
 
-	// Number to hex format: Convert number to hexadecimal string
+	// Number to hex format: Convert numbers  to hexadecimal string.
 	// If the value is not numeric then no conversion is performed and the original value is returned.
+	// Floating point numbers are rounded to integers before conversion.
 	// obj is varnum
 	//
-	// `assert( var("255").oconv("MX") == "FF");
+	// `let v1 = var("255").oconv("MX"); // "FF"
 	//  // or
-	//  assert( oconv(var("255"), "MX") == "FF");`
-	ND std::string oconv_MX() const;
+	//  let v2 = oconv(var("255"), "MX");`
+	//
+	ND var oconv_MX() const;
+
+	// Hex format to number: Convert hexadecimal strings to numbers.
+	// Returns: An var integer or "" if there are any non-hex digits (0-9, a-f or A-F) in the input.
+	// obj is varstr
+	//
+	// `let v1 = "FFFF"_var.iconv("MX"); // 65'535
+	//  // or
+	//  let v2 = iconv("FFFF"_var, "MX");`
+	//
+	ND var iconv_MX() const;
 
 	// Number to binary format: Convert number to strings of 1s and 0s
 	// If the value is not numeric then no conversion is performed and the original value is returned.
 	// obj is varnum
 	//
-	// `assert( var(255).oconv("MB") == 1111'1111);
+	// `let v1 = var(255).oconv("MB"); // 1111'1111
 	//  // or
-	//  assert( oconv(var(255), "MB") == 1111'1111);`
-	ND std::string oconv_MB() const;
+	//  let v2 = oconv(var(255), "MB");`
+	//
+	ND var oconv_MB() const;
 */
 
 	// Convert dynamic arrays to standard text format.
@@ -4013,14 +4082,14 @@ ND inline var_proxy3 var::operator()(int fieldno, int valueno, int subvalueno) {
 /////////////////////
 
 // "abc^def"_var
-PUBLIC var  operator""_var(const char* cstr, std::size_t size);
+ND PUBLIC var  operator""_var(const char* cstr, std::size_t size);
 
 // 123456_var
-PUBLIC var  operator""_var(unsigned long long int i);
+ND PUBLIC var  operator""_var(unsigned long long int i);
 //PUBLIC var  operator""_var(std::uint_t i);
 
 // 123.456_var
-PUBLIC var  operator""_var(long double d);
+ND PUBLIC var  operator""_var(long double d);
 
 }  // namespace exo
 

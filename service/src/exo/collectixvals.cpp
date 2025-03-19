@@ -1,7 +1,7 @@
 #include <exodus/library.h>
 libraryinit()
 
-function main(in filename0, in dictid, in prefix = "", in orderby = "") {
+func main(in filename0, in dictid, in prefix = "", in orderby = "") {
 
 	let lenprefix = prefix.len();
 

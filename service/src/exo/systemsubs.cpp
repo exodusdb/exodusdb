@@ -10,7 +10,7 @@ libraryinit()
 
 var mode;
 
-function main(in mode0) {
+func main(in mode0) {
 
 	/*
 

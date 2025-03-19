@@ -1,7 +1,7 @@
 #include <exodus/library.h>
 libraryinit()
 
-function main(io filename, in mode, out filetitle, out triggers) {
+func main(io filename, in mode, out filetitle, out triggers) {
 
 	// purpose:
 	// 1. given a filename and mode (READ/READO/READU/WRITE/WRITEU/DELETE)

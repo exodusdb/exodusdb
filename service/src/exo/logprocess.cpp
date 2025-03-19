@@ -8,7 +8,7 @@ var processresult;
 var processcomments;
 var timex;
 
-function main(io processid, in processcategory0, in /*sparevar*/ = "", in processparameters0 = "", in processresult0 = "", in processcomments0 = "") {
+func main(io processid, in processcategory0, in /*sparevar*/ = "", in processparameters0 = "", in processresult0 = "", in processcomments0 = "") {
 
 	// obsolete since moved to processes from definitions
 
@@ -115,7 +115,7 @@ function main(io processid, in processcategory0, in /*sparevar*/ = "", in proces
 	return 0;
 }
 
-subroutine newprocessid(io processid) {
+subr newprocessid(io processid) {
 	// newprocessid(io processid)
 	timex = ostime();
 

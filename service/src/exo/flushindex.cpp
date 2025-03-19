@@ -1,7 +1,7 @@
 #include <exodus/library.h>
 libraryinit()
 
-function main(in /*filename*/ = "") {
+func main(in /*filename*/ = "") {
 //	if (filename)
 //		flushindex(filename);
 	return 0;

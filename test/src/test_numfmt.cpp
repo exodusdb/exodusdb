@@ -10,7 +10,7 @@ using namespace std;
 #include <exodus/program.h>
 programinit()
 
-function test(in str, in str2o = "") {
+func test(in str, in str2o = "") {
 
 	printx(str, "==", str.quote());
 	printl((str eq str) ? " is true" : " is false", "and ");
@@ -77,7 +77,7 @@ function test(in str, in str2o = "") {
 	return 0;
 }
 
-function main() {
+func main() {
 
 	test("0", "0");
 	test("00", "0");

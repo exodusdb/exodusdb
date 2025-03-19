@@ -17,7 +17,7 @@ libraryinit()
 	// both of which are not required, we can get away with hard coding for postgresql unless and until
 	// we wish to interactive with alternative database backends or have multiple file handlers called per file i/o
 
-function main(in code, in /*fs*/, io handle, in keyorfilename, in /*fmc*/, io record, io status) {
+func main(in code, in /*fs*/, io handle, in keyorfilename, in /*fmc*/, io record, io status) {
 
 	// clang-format off
 

@@ -4,7 +4,7 @@
 #include <exodus/program.h>
 programinit()
 
-function main() {
+func main() {
 
 	printl("test_funcs says 'Hello World!'");
 

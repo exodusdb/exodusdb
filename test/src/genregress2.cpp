@@ -1,7 +1,7 @@
 #include <exodus/program.h>
 programinit()
 
-function main() {
+func main() {
 
 	// This program can be used to generate files in OLDER versions of exodus
 	// These files can be used in test_regress in NEWER versions of exodus

@@ -18,7 +18,7 @@ var tt;	 // num
 var bakpars;
 var ver;
 
-function main() {
+func main() {
 
 	// if @username='EXODUS' then break on
 	// BREAK ON;

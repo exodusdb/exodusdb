@@ -1,7 +1,7 @@
 #include <exodus/program.h>
 programinit()
 
-function main() {
+func main() {
 
 	let filename = COMMAND.f(2);
 	let fieldname = COMMAND.f(3);

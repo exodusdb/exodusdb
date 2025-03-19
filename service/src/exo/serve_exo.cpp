@@ -13,7 +13,7 @@ programinit()
 
 //var xx;
 
-function main() {
+func main() {
 
 //	// NB numbers and names MUST match those in the matching common .h files
 //#pragma GCC diagnostic push

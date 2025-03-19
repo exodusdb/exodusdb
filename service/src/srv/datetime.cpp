@@ -1,7 +1,7 @@
 #include <exodus/library.h>
 libraryinit()
 
-function main(in type, in inx, in mode, out outx) {
+func main(in type, in inx, in mode, out outx) {
 
 	if (inx == "") {
 		outx = "";

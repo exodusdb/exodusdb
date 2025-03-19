@@ -7,7 +7,7 @@ var docrep;
 var scrn;
 var temp;
 
-function main() {
+func main() {
 	//
 
 	// a much simpler non-interactive version of GET

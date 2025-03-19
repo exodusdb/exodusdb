@@ -9,7 +9,7 @@ var dict_xo_test = "dict.xo_test";
 var default_conn;
 var xo_dict_conn;
 
-function main() {
+func main() {
 
     printl("\n   --- clear any existing EXO_DATA/DICT env ---\n");
     ossetenv("EXO_DATA", "");
@@ -142,7 +142,7 @@ function main() {
 	return 0;
 }
 
-subroutine cleanup() {
+subr cleanup() {
 
 	if (not dbdelete(xo_dict))
 		loglasterror();

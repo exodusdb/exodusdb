@@ -1,7 +1,7 @@
 #include <exodus/program.h>
 programinit()
 
-function main() {
+func main() {
 	var sql		  = "";
 	let filenames = listfiles();
 	// var nfiles=filenames.count(FM);

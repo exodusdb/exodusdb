@@ -24,7 +24,7 @@ var lastdate;
 var menutx;
 var oldmenu;
 
-function main(in mode, io logtime, in menu) {
+func main(in mode, io logtime, in menu) {
 
 	call log2("*init.general2 " ^ mode.f(1), logtime);
 

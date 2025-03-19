@@ -1,7 +1,7 @@
 #include <exodus/program.h>
 programinit()
 
-function main() {
+func main() {
 
 	var filename = COMMAND.f(2);//field(SENTENCE, " ", 2).lcase();
 	if (filename && not filename.starts("dict."))

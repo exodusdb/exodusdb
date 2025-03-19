@@ -5,7 +5,7 @@ libraryinit()
 
 var id;
 
-function main(in mode, io tx, in arg3, io arg4, in arg5) {
+func main(in mode, io tx, in arg3, io arg4, in arg5) {
 
 	if (mode == "INITMENUS") {
 

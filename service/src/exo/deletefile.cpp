@@ -1,7 +1,7 @@
 #include <exodus/library.h>
 libraryinit()
 
-function main() {
+func main() {
 	// printl("deletefile says 'Hello World!'");
 	//deletefile(field(COMMAND, _FM, 2, 999));
 	if (not deletefile(field(COMMAND, _FM, 2, 999))) {

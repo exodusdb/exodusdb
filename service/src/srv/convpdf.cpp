@@ -7,7 +7,7 @@ libraryinit()
 var printopts;
 var pdfcmd;
 
-function main(io osfilename, in printopts0, out errors) {
+func main(io osfilename, in printopts0, out errors) {
 
 	// osfilename in  ../data/xxxxxxxx.htm
 	// osfilename out ../data/xxxxxxxx.pdf (if successful)

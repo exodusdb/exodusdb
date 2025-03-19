@@ -1,7 +1,7 @@
 #include <exodus/program.h>
 programinit()
 
-function main() {
+func main() {
 
 //	TRACE(COMMAND)
 //	TRACE(OPTIONS)
@@ -79,7 +79,7 @@ function main() {
 			} else {
 
 				// Diff
-				let tmpfilename = ostempdirpath() ^ osfilename.convert(OSSLASH, "_");
+				let tmpfilename = ostempdir() ^ osfilename.convert(OSSLASH, "_");
 				if (not oswrite(RECORD on tmpfilename))
 					abort(lasterror());
 				// diff returns an error if there are differences

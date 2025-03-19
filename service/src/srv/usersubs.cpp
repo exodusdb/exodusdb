@@ -29,7 +29,7 @@ var deptn;
 //var wspos;
 //var wsmsg;
 
-function main(in mode) {
+func main(in mode) {
 
 	// $insert abp,common
 
@@ -397,12 +397,12 @@ function main(in mode) {
 	return 0;
 }
 
-subroutine unlocksec() {
+subr unlocksec() {
 	call unlockrecord("DEFINITIONS", DEFINITIONS, "SECURITY");
 	return;
 }
 
-function getusern() {
+func getusern() {
 	var usern;
 	// fail safe only allowed to update existing users
 	if (ID == "EXODUS") {
@@ -419,7 +419,7 @@ function getusern() {
 	// similar code in user.subs and security.subs
 }
 
-subroutine updatemirror() {
+subr updatemirror() {
 	// save the user keyed as username too
 	// because we save the user name and executive code in many places
 	// and we still need to get the executive email if they are a user
@@ -432,7 +432,7 @@ subroutine updatemirror() {
 	return;
 }
 
-subroutine getuserdept2(in mode) {
+subr getuserdept2(in mode) {
 
 	// locate the user in the table
 	usercode = mode.field(",", 2);
@@ -460,7 +460,7 @@ subroutine getuserdept2(in mode) {
 	return;
 }
 
-subroutine getdepts() {
+subr getdepts() {
 	depts		= "";
 	let nusers2 = SECURITY.f(1).fcount(VM);
 	for (let usern : range(2, nusers2 + 1)) {

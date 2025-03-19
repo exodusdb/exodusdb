@@ -2030,7 +2030,7 @@ Possible event type codes are as follows:</p>
 <em>Returns:</em> True if successful or false if not possible for any reason. e.g. Target doesnt exist, permissions etc.</p>
 The file will be opened for writing if possible otherwise for reading.
 
-<pre><code class='hljs-ncdecl language-javascript'>let osfilename = ostempdirpath() ^ "xo_gendoc_test.conf";
+<pre><code class='hljs-ncdecl language-javascript'>let osfilename = ostempdir() ^ "xo_gendoc_test.conf";
 if (oswrite("" on osfilename)) ... ok /// Create an empty os file
 var ostempfile;
 if (ostempfile.osopen(osfilename)) ... ok
@@ -2040,7 +2040,7 @@ if (osopen(osfilename to ostempfile)) ... ok</code></pre>
 <tr><td>if</td><td>osfilevar.osbwrite(osfilevar, io offset)</td><td>Writes data to an existing os file starting at a given byte offset (0 based).</p>
 See osbread for more info.
 
-<pre><code class='hljs-ncdecl language-javascript'>let osfilename = ostempdirpath() ^ "xo_gendoc_test.conf";
+<pre><code class='hljs-ncdecl language-javascript'>let osfilename = ostempdir() ^ "xo_gendoc_test.conf";
 let text = "aaa=123\nbbb=456\n";
 var offset = osfile(osfilename).f(1); /// Size of file therefore append
 if (text.osbwrite(osfilename, offset)) ... ok // offset -> 16
@@ -2052,7 +2052,7 @@ The osfilevar file handle may either be initialised by osopen or be just be a no
 After reading, the offset is updated to point to the correct offset for a subsequent sequential read.</p>
 If reading UTF8 data (the default) then the length of data actually returned may be a few bytes shorter than requested in order to be a complete number of UTF-8 code points.
 
-<pre><code class='hljs-ncdecl language-javascript'>let osfilename = ostempdirpath() ^ "xo_gendoc_test.conf";
+<pre><code class='hljs-ncdecl language-javascript'>let osfilename = ostempdir() ^ "xo_gendoc_test.conf";
 var text, offset = 0;
 if (text.osbread(osfilename, offset, 8)) ... ok // text -> "aaa=123\n" // offset -> 8
 // or
@@ -2072,7 +2072,7 @@ e.g. Path is not writeable, permissions etc.</p>
 If codepage is specified then output is converted from utf-8 to that codepage. Otherwise no conversion is done.
 
 <pre><code class='hljs-ncdecl language-javascript'>let text = "aaa = 123\nbbb = 456";
-let osfilename = ostempdirpath() ^ "xo_gendoc_test.conf";
+let osfilename = ostempdir() ^ "xo_gendoc_test.conf";
 if (text.oswrite(osfilename)) ... ok
 // or
 if (oswrite(text on osfilename)) ... ok</code></pre>
@@ -2083,7 +2083,7 @@ If codepage is specified then input is converted from that codepage to utf-8 oth
 e.g. File doesnt exist, permissions etc.
 
 <pre><code class='hljs-ncdecl language-javascript'>var text;
-let osfilename = ostempdirpath() ^ "xo_gendoc_test.conf";
+let osfilename = ostempdir() ^ "xo_gendoc_test.conf";
 if (text.osread(osfilename)) ... ok // text -> "aaa = 123\nbbb = 456"
 // or
 if (osread(text from osfilename)) ... ok</code></pre>
@@ -2095,9 +2095,9 @@ Source and target must exist in the same storage device.</p>
 e.g. Target already exists, path is not writeable, permissions etc.</p>
 Uses std::filesystem::rename internally.
 
-<pre><code class='hljs-ncdecl language-javascript'>let from_osfilename = ostempdirpath() ^ "xo_gendoc_test.conf";
+<pre><code class='hljs-ncdecl language-javascript'>let from_osfilename = ostempdir() ^ "xo_gendoc_test.conf";
 let to_osfilename = from_osfilename ^ ".bak";
-if (not osremove(ostempdirpath() ^ "xo_gendoc_test.conf.bak")) {}; // Cleanup first
+if (not osremove(ostempdir() ^ "xo_gendoc_test.conf.bak")) {}; // Cleanup first
 
 if (from_osfilename.osrename(to_osfilename)) ... ok
 // or
@@ -2109,10 +2109,10 @@ Will not overwrite an existing os file or dir.</p>
 e.g. Source doesnt exist or cannot be accessed, target already exists, source or target is not writeable, permissions etc.</p>
 Attempts osrename first then oscopy followed by osremove original.
 
-<pre><code class='hljs-ncdecl language-javascript'>let from_osfilename = ostempdirpath() ^ "xo_gendoc_test.conf.bak";
+<pre><code class='hljs-ncdecl language-javascript'>let from_osfilename = ostempdir() ^ "xo_gendoc_test.conf.bak";
 let to_osfilename = from_osfilename.cut(-4);
 
-if (not osremove(ostempdirpath() ^ "xo_gendoc_test.conf")) {}; // Cleanup first
+if (not osremove(ostempdir() ^ "xo_gendoc_test.conf")) {}; // Cleanup first
 if (from_osfilename.osmove(to_osfilename)) ... ok
 // or
 if (osmove(from_osfilename, to_osfilename)) ...</code></pre>
@@ -2121,7 +2121,7 @@ if (osmove(from_osfilename, to_osfilename)) ...</code></pre>
 Will overwrite an existing os file or dir.</p>
 Uses std::filesystem::copy internally with recursive and overwrite options
 
-<pre><code class='hljs-ncdecl language-javascript'>let from_osfilename = ostempdirpath() ^ "xo_gendoc_test.conf";
+<pre><code class='hljs-ncdecl language-javascript'>let from_osfilename = ostempdir() ^ "xo_gendoc_test.conf";
 let to_osfilename = from_osfilename ^ ".bak";
 
 if (from_osfilename.oscopy(to_osfilename)) ... ok;
@@ -2133,7 +2133,7 @@ Will not remove directories. Use osrmdir() to remove directories</p>
 <em>Returns:</em> True if successful or false if not possible for any reason.</p>
 e.g. Target doesnt exist, path is not writeable, permissions etc.
 
-<pre><code class='hljs-ncdecl language-javascript'>let osfilename = ostempdirpath() ^ "xo_gendoc_test.conf";
+<pre><code class='hljs-ncdecl language-javascript'>let osfilename = ostempdir() ^ "xo_gendoc_test.conf";
 if (osfilename.osremove()) ... ok
 // or
 if (osremove(osfilename)) ...</code></pre>
@@ -2245,12 +2245,12 @@ if (outtext.osshellwrite("grep xyz")) ... ok
 // or
 if (osshellwrite(outtext, "grep xyz")) ... ok</code></pre>
 </td></tr>
-<tr><td>var=</td><td>var().ostempdirpath()</td><td>Returns: The path of the tmp dir</p>
+<tr><td>var=</td><td>var().ostempdir()</td><td>Returns: The path of the tmp dir</p>
 e.g. "/tmp/"
 
-<pre><code class='hljs-ncdecl language-javascript'>let v1 = var().ostempdirpath();
+<pre><code class='hljs-ncdecl language-javascript'>let v1 = var().ostempdir();
 // or
-let v2 = ostempdirpath();</code></pre>
+let v2 = ostempdir();</code></pre>
 </td></tr>
 <tr><td>var=</td><td>var().ostempfilename()</td><td>Returns: The name of a new temporary file</p>
 e.g. Something like "/tmp/~exoEcLj3C"

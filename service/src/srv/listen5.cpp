@@ -66,7 +66,7 @@ var fileattributes;
 var filetime;
 var offset_zero;
 
-function main(in request1, in request2in, in request3in, in request4in, in request5in, in request6in) {
+func main(in request1, in request2in, in request3in, in request4in, in request5in, in request6in) {
 
 	// $insert abp,common
 	// $insert bp,agency.common
@@ -891,7 +891,7 @@ nextlock:
 	return 0;
 }
 
-subroutine getdostime() {
+subr getdostime() {
 	dostime = ostime();
 	// convert to Windows based date/time (ndays since 1/1/1900)
 	// 31/12/67 in rev date() format equals 24837 in windows date format
@@ -899,7 +899,7 @@ subroutine getdostime() {
 	return;
 }
 
-subroutine fileaccesscheck(in filename) {
+subr fileaccesscheck(in filename) {
 	response_ = "";
 
 	var securityfilename = filename;
@@ -932,7 +932,7 @@ subroutine fileaccesscheck(in filename) {
 	return;
 }
 
-subroutine deleteoldfiles() {
+subr deleteoldfiles() {
 
 	let deletetime = date() * 24 * 60 * 60 + time() - ageinsecs;
 

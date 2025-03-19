@@ -15,7 +15,7 @@ programinit()
 
 	let silent = OPTIONS.count("S") or TERMINAL;
 
-function main() {
+func main() {
 
 	// Quit if no default database connection
 	if (not connect()) {
@@ -117,7 +117,7 @@ function main() {
 	return 0;
 }
 
-function test(in option) {
+func test(in option) {
 
 	file.deleterecord(key);
 

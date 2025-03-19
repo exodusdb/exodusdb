@@ -13,7 +13,7 @@ var log;
 var bakpars;
 var ver;
 
-function main(in programname0, in text0) {
+func main(in programname0, in text0) {
 
 	let s33 = SYSTEM.f(33);
 

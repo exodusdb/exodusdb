@@ -41,10 +41,10 @@ extern char** environ;
 
 namespace exo {
 
-void var::ossleep(const int milliseconds) const {
+void var::ossleep(const int milliseconds) {
 
-	THISIS("void var::ossleep(const int milliseconds) const")
-	assertVar(function_sig);	 // not needed if *this not used
+	THISIS("void var::ossleep(const int milliseconds)")
+//	assertVar(function_sig);	 // not needed if *this not used
 
 	std::this_thread::sleep_for(std::chrono::milliseconds(milliseconds));
 
@@ -309,12 +309,12 @@ void var::ossetenv(SV envcode) const {
 	return;
 }
 
-var  var::ospid() const {
+var  var::ospid() {
 	//THISIS("var  var::ospid() const")
 	return getpid();
 }
 
-var  var::ostid() const {
+var  var::ostid() {
 	//THISIS("var  var::ospid() const")
 	return gettid();
 }

@@ -3,7 +3,7 @@ libraryinit()
 
 // OBSOLETE - no callers
 
-function main() {
+func main() {
 	// printl("reset - obsolete");
 	return 0;
 }

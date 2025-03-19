@@ -4,7 +4,13 @@
 #include <exodus/program.h>
 programinit()
 
-function main() {
+func main() {
+
+	{
+		// Questionnable partial lack of conversion in iconv generally
+		// How is one easily to tell if any conversion failed? STATUS? lasterror()?
+		assert("20 jan 2020^32 jan 2020^2 feb 2023"_var.iconv("D") == "19013^^20122"_var);
+	}
 
 	{
 		// oconv D failure returns the original

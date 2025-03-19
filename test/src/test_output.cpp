@@ -6,7 +6,7 @@
 #include <exodus/program.h>
 programinit()
 
-function main() {
+func main() {
 
 	// Easy way to skip testing since it it quite sensitive
 	if (osfile("test_output.freepass")) {
@@ -82,7 +82,7 @@ function main() {
 	stop();
 }
 
-subroutine generate() {
+subr generate() {
 
 	// Prepare some text with all the field marks
 	var fms = "RM= `;  FM= ^;  VM= ];  SM= };  TM= |;  ST= ~; "_var;

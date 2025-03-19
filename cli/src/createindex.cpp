@@ -1,7 +1,7 @@
 #include <exodus/program.h>
 programinit()
 
-function main() {
+func main() {
 
 	let force = OPTIONS.contains("F");
 	var indexnames = COMMAND.remove(1);

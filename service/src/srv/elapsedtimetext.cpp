@@ -1,7 +1,7 @@
 #include <exodus/library.h>
 libraryinit()
 // OBSOLETE - hard coded in exoprog
-function main(in fromdate, in fromtime, io uptodate, io uptotime) {
+func main(in fromdate, in fromtime, io uptodate, io uptotime) {
 
 	var text = "";
 

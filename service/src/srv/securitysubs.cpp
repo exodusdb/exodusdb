@@ -85,7 +85,7 @@ var msg;
 //var wspos;
 //var wsmsg;
 
-function main(in mode) {
+func main(in mode) {
 
 	let interactive = false;  //not(SYSTEM.f(33));
 
@@ -983,7 +983,7 @@ function main(in mode) {
 	return 0;
 }
 
-subroutine changepassx(in userx, in newpassword) {
+subr changepassx(in userx, in newpassword) {
 	let datax = RECORD.f(4, req.mvx);
 	var sysrec	  = datax.f(1, 1, 2);
 	sysrec.converter(TM ^ ST ^ chr(249), FM ^ VM ^ SM);
@@ -1010,7 +1010,7 @@ subroutine changepassx(in userx, in newpassword) {
 	return;
 }
 
-function generatepassword() {
+func generatepassword() {
 	var consonants = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 	let vowels	   = "AEIOUY";
 	consonants.converter(vowels ^ "QX", "");
@@ -1022,7 +1022,7 @@ function generatepassword() {
 	return newpassword;
 }
 
-subroutine newpass3(io sysrec, in userx, in newpassword) {
+subr newpass3(io sysrec, in userx, in newpassword) {
 
 	req.valid  = 0;
 //	let lastfn = 9;
@@ -1044,7 +1044,7 @@ subroutine newpass3(io sysrec, in userx, in newpassword) {
 	return;
 }
 
-subroutine makesysrec(io sysrec, in userx, in newpassword) {
+subr makesysrec(io sysrec, in userx, in newpassword) {
 
 	if (not sysrec.f(1)) {
 		sysrec(1) = "USER";
@@ -1080,7 +1080,7 @@ subroutine makesysrec(io sysrec, in userx, in newpassword) {
 	return;
 }
 
-subroutine gueststatus() {
+subr gueststatus() {
 	if (SYSTEM.f(21)) {
 		msg = "YOU ARE A TEMPORARY GUEST|YOU CANNOT ACCESS AUTHORISATION";
 		gosub invalid(msg);
@@ -1088,7 +1088,7 @@ subroutine gueststatus() {
 	return;
 }
 
-subroutine cleartemp() {
+subr cleartemp() {
 	// set in postread (setup) for exodus.net
 	// @record
 	// 20 start
@@ -1102,7 +1102,7 @@ subroutine cleartemp() {
 	return;
 }
 
-subroutine getemailtx(io emailtx, io newusers, in isnew, in userx, in userrec, in origuserrec, in userfields, in nuserfields) {
+subr getemailtx(io emailtx, io newusers, in isnew, in userx, in userrec, in origuserrec, in userfields, in nuserfields) {
 	// dont sysmsg/log new/amend/deleting users @neosys.com unless in testdata or dev
 	if (userrec.f(7).ucase().contains("@EXODUS.COM") and not SYSTEM.f(17, 1).ends("_test") and not var("exodus.id").osfile()) {
 		return;

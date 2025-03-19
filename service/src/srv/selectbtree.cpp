@@ -10,7 +10,7 @@ libraryinit()
 
 var foundkeys;
 
-function main(in filename, in indexid, in texts0, io msg) {
+func main(in filename, in indexid, in texts0, io msg) {
 
 	var texts  = texts0;
 	msg		   = "";

@@ -32,7 +32,7 @@ dim registerx{0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 //	registerx.redim(10);
 //}
 
-function main() {
+func main() {
 
 	//dim array
 
@@ -525,7 +525,7 @@ function main() {
 
 	{
 		// Check dim.oswrite preserves line endings
-		var tfilename = ostempfilename();
+		var tfilename = ostempfile();
 		var tx = "\n\nA\n\nB\n\n";
 		assert(tx.split("\n").oswrite(tfilename));
 		var info = osfile(tfilename);
@@ -574,7 +574,7 @@ function main() {
 		//assert((d1.join("\n") ^ "\n") eq txt);
 		assert(d1.join("\n") eq txt);
 
-//		var temposfilename = ostempfilename().outputl();
+//		var temposfilename = ostempfile().outputl();
 //		printl("Make a wintext file");
 //		var wintext1 =
 //			"aaa\r\n"
@@ -597,7 +597,7 @@ function main() {
 //		assert(d2.join("\r\n") eq wintext1);
 //
 //		printl("Check writing dim array to wintext file");
-//		var temposfilename2 = ostempfilename().outputl();
+//		var temposfilename2 = ostempfile().outputl();
 //		assert(d2.oswrite(temposfilename2));
 //
 //		printl("Check round trip");

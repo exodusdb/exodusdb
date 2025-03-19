@@ -4,7 +4,7 @@
 #include <exodus/program.h>
 programinit()
 
-function main() {
+func main() {
 
 	var filename = "t_hello.txt";
 	assert(oswrite("xyz", filename));

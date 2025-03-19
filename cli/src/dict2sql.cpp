@@ -52,7 +52,7 @@ var errors = "";
 
 var install_exodus_extensions = "";
 
-function main() {
+func main() {
 
 	//TODO update comment to reflect the move to schema "dict" and allow for $EXO_DICT and exodus_dict
 
@@ -345,7 +345,7 @@ COST 10;
 	return errors != "";
 }
 
-subroutine replace_FM_etc(io sql) {
+subr replace_FM_etc(io sql) {
 	sql.replacer(R"(\bRM\b)"_rex, R"(E'\\x1F')");
 	sql.replacer(R"(\bFM\b)"_rex, R"(E'\\x1E')");
 	sql.replacer(R"(\bVM\b)"_rex, R"(E'\\x1D')");
@@ -369,7 +369,7 @@ subroutine replace_FM_etc(io sql) {
 
 }
 
-subroutine create_function(in functionname_and_args, in return_sqltype, in sql, in sqltemplate0) {
+subr create_function(in functionname_and_args, in return_sqltype, in sql, in sqltemplate0) {
 
 //	printl(functionname_and_args, " -> ", return_sqltype);
 
@@ -551,7 +551,7 @@ subroutine create_function(in functionname_and_args, in return_sqltype, in sql, 
 	return;
 }
 
-subroutine onefile(in dictfilename, in dictids) {
+subr onefile(in dictfilename, in dictids) {
 
 	var dictfile;
 	if (!open(dictfilename, dictfile)) {
@@ -566,7 +566,7 @@ subroutine onefile(in dictfilename, in dictids) {
 	}
 }
 
-subroutine onefileonedict(in dictfile, in dictfilename, in reqdictid) {
+subr onefileonedict(in dictfile, in dictfilename, in reqdictid) {
 
 	if (reqdictid)
 		selectkeys(reqdictid);
@@ -581,7 +581,7 @@ subroutine onefileonedict(in dictfile, in dictfilename, in reqdictid) {
 	return;
 }
 
-subroutine onedictid(in dictfile, in dictfilename, io dictid, in reqdictid) {
+subr onedictid(in dictfile, in dictfilename, io dictid, in reqdictid) {
 
 	//get the dict source code
 	var dictrec;
@@ -1546,7 +1546,7 @@ BEGIN
 END;
 )V0G0N";
 
-subroutine rawsqlexec(in sql) {
+subr rawsqlexec(in sql) {
 	if (verbose)
 		printl(sql.field("RETURNS", 1));
 	var errormsg;
@@ -1556,7 +1556,7 @@ subroutine rawsqlexec(in sql) {
 	return;
 }
 
-subroutine rawsqlexec(in sql, out errormsg) {
+subr rawsqlexec(in sql, out errormsg) {
 	if (verbose)
 		printl(sql.field("RETURNS", 1));
 	//var().sqlexec(sql, errormsg);

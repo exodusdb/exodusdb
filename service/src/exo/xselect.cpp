@@ -1,7 +1,7 @@
 #include <exodus/library.h>
 libraryinit()
 
-function main(in cmd) {
+func main(in cmd) {
 	// if @username='EXODUS' then oswrite cmd on 'XSELECT.'
 	// oswrite cmd on 'XSELECT.'
 	let supersilent = index(cmd, "(SS");

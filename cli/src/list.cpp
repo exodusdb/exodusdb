@@ -4,7 +4,7 @@ programinit()
 //#include "nlist.h"
 //#include <exodus/nlist.h>
 
-function main() {
+func main() {
 
 	/////////////////////////////////////////////////////////////////
 	// EITHER 1. Call/perform nlist library if paging is not required

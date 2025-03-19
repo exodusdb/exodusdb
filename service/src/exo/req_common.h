@@ -1,7 +1,7 @@
 #ifndef SERVICE_SRC_EXO_REQ_COMMON_H_
 #define SERVICE_SRC_EXO_REQ_COMMON_H_
 
-#include <exodus/common2.h>
+#include <exodus/common.h>
 
 //#define req_common_no 1
 

@@ -3,7 +3,7 @@ libraryinit()
 
 // TODO replace all occurrences in client code and obsolete this function
 
-function main(in type, in input0, in mode, io output) {
+func main(in type, in input0, in mode, io output) {
 
 	// just wraps the standard iconv oconv
 	// so that we can find "[IOCONV,MT" etc in the source code instead of "MT"

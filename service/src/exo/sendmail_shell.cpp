@@ -5,7 +5,7 @@ programinit()
 
 	// command line shim to call exodus sendmail lib
 
-function main() {
+func main() {
 	call sendmail();
 	return 0;
 }

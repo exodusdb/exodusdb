@@ -11,7 +11,7 @@ Option U - Update
        W - Ignore warnings
 )-";
 
-function main() {
+func main() {
 
 	let osfilenames = COMMAND.remove(1);
 	let update = OPTIONS.contains("U");
@@ -48,7 +48,7 @@ function main() {
 			text.paster(pos, 5, "\tlet ");
 
 			// Write to /tmp
-			let tmpfilename = ostempdirpath() ^ "/" ^ osfilename.field("/", -1);
+			let tmpfilename = ostempdir() ^ "/" ^ osfilename.field("/", -1);
 			if (not oswrite(text on tmpfilename)) {
 				loglasterror();
 				continue;

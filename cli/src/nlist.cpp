@@ -274,7 +274,7 @@ var ptx_random;
 
 let ulchar = "-";
 
-function main() {
+func main() {
 
 	bool showborder = false;
 	bool headtabperpage = 1;
@@ -1940,13 +1940,13 @@ x2bexit:
 	return "";
 }
 
-subroutine getquotedword() {
+subr getquotedword() {
 	lastword = word;
 	gosub getquotedword2();
 	return;
 }
 
-subroutine getquotedword2() {
+subr getquotedword2() {
 	gosub getword();
 	if (((DQ ^ "'").contains(word.first())) and (word.starts(word.last()))) {
 		word.cutter(1);
@@ -1957,7 +1957,7 @@ subroutine getquotedword2() {
 	return;
 }
 
-subroutine getword() {
+subr getword() {
 
 getnextword:
 ////////////
@@ -1987,7 +1987,7 @@ getnextword:
 	return;
 }
 
-subroutine getword2() {
+subr getword2() {
 
 getword2b:
 //////////
@@ -2074,7 +2074,7 @@ getword2b:
 	return;
 }
 
-subroutine getwordexit() {
+subr getwordexit() {
 
 	wordexpanded = 0;
 
@@ -2153,7 +2153,7 @@ gotdictvoc:
 	return;
 }
 
-subroutine printbreaks() {
+subr printbreaks() {
 
 	if (not breakleveln) {
 		return;
@@ -2406,7 +2406,7 @@ subroutine printbreaks() {
 	return;
 }
 
-subroutine addstr() {
+subr addstr() {
 
 	str3 = str2;
 	if (str3.len() < str1.len()) {
@@ -2435,7 +2435,7 @@ subroutine addstr() {
 	return;
 }
 
-subroutine newheadreplacements() {
+subr newheadreplacements() {
 	for (int ii = 1; ii <= nreplacements; ++ii) {
 		dictid = replacements.f(ii);
 		tt = "{" ^ dictid ^ "}";
@@ -2446,7 +2446,7 @@ subroutine newheadreplacements() {
 	return;
 }
 
-subroutine emailing() {
+subr emailing() {
 	if (not emailtoid) {
 		return;
 	}

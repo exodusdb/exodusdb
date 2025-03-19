@@ -5,7 +5,7 @@ var fromquestion;
 var uptoquestion;
 var defaultperiod;
 
-function main(in fromquestion0, in uptoquestion0, io ifromdate, io iuptodate) {
+func main(in fromquestion0, in uptoquestion0, io ifromdate, io iuptodate) {
 
 //	if (fromquestion0.unassigned()) {
 //		fromquestion = "";

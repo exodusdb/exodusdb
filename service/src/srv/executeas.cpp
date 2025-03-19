@@ -9,7 +9,7 @@ libraryinit()
 //var xx;
 var origusername;
 
-function main(in cmd, in username) {
+func main(in cmd, in username) {
 
 	if (username) {
 		if (not SECURITY.f(1).locate(username)) {

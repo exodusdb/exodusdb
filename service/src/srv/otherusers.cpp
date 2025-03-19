@@ -11,7 +11,7 @@ var result;
 //var yy;
 //var zz;
 
-function main(in databasecode0 = "", in usercode0 = "") {
+func main(in databasecode0 = "", in usercode0 = "") {
 
 	// returns the number of other users of EXODUS
 

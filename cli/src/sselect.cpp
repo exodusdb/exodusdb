@@ -1,7 +1,7 @@
 #include <exodus/program.h>
 programinit()
 
-function main() {
+func main() {
 
 	bool silent = OPTIONS.count("S") - OPTIONS.count("s");
 

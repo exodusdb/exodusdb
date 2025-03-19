@@ -4,7 +4,7 @@
 #include <exodus/program.h>
 programinit()
 
-function main() {
+func main() {
 	{
 		assert(oconv(1234.4449, "MD20P").squote().outputl()             eq "'1234.44'");
 		assert(oconv(1234.4449999999999999, "MD20P").squote().outputl() eq "'1234.45'");

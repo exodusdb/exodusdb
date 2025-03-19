@@ -48,7 +48,7 @@ var loguptodate;
 var logkey;
 var logsearch;
 
-function main() {
+func main() {
 	// !subroutine general(request,data,response)
 
 	// use app specific version of generalsubs
@@ -897,12 +897,12 @@ exit:
 	return "";
 }
 
-subroutine postproc() {
+subr postproc() {
 	call proxysubs("GENERAL", mode, stationery);
 	return;
 }
 
-subroutine initlog() {
+subr initlog() {
 
 	logkey		   = request_.f(2);
 	logyear		   = request_.f(3);
@@ -955,7 +955,7 @@ subroutine initlog() {
 	// in get.subs and generalproxy
 }
 
-subroutine gettaskprefix() {
+subr gettaskprefix() {
 	taskprefix = "";
 	task	   = task.field(" ", 1);
 	if (task == "ANAL") {
@@ -970,7 +970,7 @@ subroutine gettaskprefix() {
 	return;
 }
 
-subroutine opendocuments() {
+subr opendocuments() {
 	if (not srv.documents.open("DOCUMENTS", "")) {
 		abort(lasterror());
 	}

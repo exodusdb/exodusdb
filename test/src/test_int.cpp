@@ -10,7 +10,7 @@
 #include <exodus/program.h>
 programinit()
 
-function main() {
+func main() {
 	printl("test_int says 'Hello World!'");
 
 	{

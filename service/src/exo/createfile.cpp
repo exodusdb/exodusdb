@@ -3,7 +3,7 @@ libraryinit()
 
 // OBSOLETE. No callers. replaced by var::createfile
 
-function main() {
+func main() {
 
 	// syntax is:
 	// createfile filename dictfilename
@@ -45,7 +45,7 @@ function main() {
 	return 0;
 }
 
-subroutine create(in filename) {
+subr create(in filename) {
 	var msg = filename;
 	if (createfile(filename))
 		msg ^= " created";

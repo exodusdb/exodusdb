@@ -1,7 +1,7 @@
 #include <exodus/program.h>
 programinit()
 
-function main() {
+func main() {
 
 	let dbname2 = COMMAND.f(2);
 	var filenames = COMMAND.field(FM, 3, 999999);

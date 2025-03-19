@@ -3,7 +3,7 @@ libraryinit()
 
 // OBSOLETE replaced by logoff(); everywhere
 
-function main() {
+func main() {
 	// printl("Goodbye");
 	// exit(0);
 	throw ExoLogoff("Logoff");

@@ -1,7 +1,7 @@
 #include <exodus/library.h>
 libraryinit()
 
-function main() {
+func main() {
 
 	// redirect to cli 'nlist' library
 	SENTENCE.prefixer("N");

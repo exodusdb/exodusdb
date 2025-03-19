@@ -5,7 +5,7 @@
 //#pragma clangx diagnostic ignored "-Wunsafe-buffer-usage"
 programinit()
 
-function main() {
+func main() {
 
 #if EXO_MODULE
 #else

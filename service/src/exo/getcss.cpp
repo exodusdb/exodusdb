@@ -2,7 +2,7 @@
 libraryinit()
 
 // OBSOLETE - replaced by gosub htmllib2("GETCSS",
-function main(io css, in version = "") {
+func main(io css, in version = "") {
 
 	// NB quirk in ie mimiced by mozilla table dont inherit size
 	// but work around is TABLE {FONT-SIZE:100%} in css
@@ -68,7 +68,7 @@ function main(io css, in version = "") {
 	return 0;
 }
 
-function getvogonpoetry(in version) {
+func getvogonpoetry(in version) {
 
 	if (version.assigned() and version == 2) {
 
@@ -137,7 +137,7 @@ table.hashtable td {padding:0px; margin:0px; text-align:left; vertical-align:top
 </style>
 <script type="text/javascript">
 var togglendisplayed=0
-function toggle(t,mode)
+func toggle(t,mode)
 {
  if (typeof t=='string')
  {
@@ -245,7 +245,7 @@ td.nx {border-top:none;border-bottom:none}
 
 <script type="text/javascript">
 var togglendisplayed=0
-function toggle(t,mode)
+func toggle(t,mode)
 {
  if (typeof t=='string')
  {

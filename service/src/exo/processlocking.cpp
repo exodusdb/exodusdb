@@ -1,7 +1,7 @@
 #include <exodus/library.h>
 libraryinit()
 
-function main(in /*mode*/, in /*processno*/, out result) {
+func main(in /*mode*/, in /*processno*/, out result) {
 
 	// returns 1 if processno is busy/cannot be locked, otherwise 0
 

@@ -18,7 +18,7 @@ programinit()
 	var nchanged;
 	var nnew;
 
-function main() {
+func main() {
 
 	if (not COMMAND.f(2) or not COMMAND.f(3)) {
 
@@ -316,7 +316,7 @@ function main() {
 }
 
 ///////////////////
-function getrec() {
+func getrec() {
 ///////////////////
 
 	// If source is database then simply readnext RECORD and ID
@@ -419,7 +419,7 @@ function getrec() {
 	return true;
 }
 
-subroutine unescape_sql(io arg1) {
+subr unescape_sql(io arg1) {
 
 	if (not arg1.contains("\\"))
 		return;

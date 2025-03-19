@@ -9,7 +9,7 @@ var year;	 // num
 var period;	 // num
 var idate;	 // num
 
-function main(in type, in input0, in mode, out output) {
+func main(in type, in input0, in mode, out output) {
 
 	// eg mode is WEEKLY2,7,1,4
 	// ie year starts on the first monday of july
@@ -91,7 +91,7 @@ function main(in type, in input0, in mode, out output) {
 	return 0;
 }
 
-subroutine getfirstdom() {
+subr getfirstdom() {
 
 	// find the first day of the period
 	idate = ("1/" ^ period ^ "/" ^ year).iconv("D2/E");

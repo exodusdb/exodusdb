@@ -149,7 +149,7 @@ void time_t_to_pick_date_time(const std::time_t time, int* pick_date, int* pick_
 }
 
 // -> number of days since the pick date epoch 31/12/1967
-var  var::date() const {
+var  var::date() {
 
 	// ASSUMPTION: td::chrono::system_clock() epoch is 1970/01/01 00:00:00
 
@@ -168,7 +168,7 @@ var  var::date() const {
 }
 
 // -> number of whole seconds since midnight UTC
-var  var::time() const {
+var  var::time() {
 
 //	Pure chrono solution (no mixing with C-style gmtime)
 //
@@ -198,7 +198,7 @@ var  var::time() const {
 }
 
 // -> decimal fractional seconds since midnight (up to micro or nano second accuracy)
-var  var::ostime() const {
+var  var::ostime() {
 
 	// ASSUMPTION: td::chrono::system_clock() epoch is midnight
 
@@ -218,17 +218,17 @@ var  var::ostime() const {
 }
 
 // Returns decimal fractional days since pick epoch 1967-12-31 00:00:00 (up to micro or nano second accuracy)
-var  var::ostimestamp() const {
+var  var::ostimestamp() {
 
-	let datenow = this->date();
-	var timenow = this->ostime();
+	let datenow = var::date();
+	var timenow = var::ostime();
 
 	// 1. If the date flipped while we got the time then get the time again
 	// If someone is messing with the system clock then we will
 	// fall for the bait only once.
 	// 2. Assuming that date() is returned as an int for speed
-	if (this->date().var_int != datenow.var_int)
-		timenow = this->ostime();
+	if (var::date().var_int != datenow.var_int)
+		timenow = var::ostime();
 
 	return datenow + timenow / 86'400;
 

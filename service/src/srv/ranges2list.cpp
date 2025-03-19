@@ -13,7 +13,7 @@ var listn;	// num
 var keys;
 var key;
 
-function main(io ranges0, in basekey0 = "", in listid0 = "") {
+func main(io ranges0, in basekey0 = "", in listid0 = "") {
 
 	// generate individual numbers given a list of ranges
 	// eg 1000,1100-1200,2000-2100,3000
@@ -198,7 +198,7 @@ exit:
 	return 0;
 }
 
-subroutine writelist() {
+subr writelist() {
 	if (not keys.len()) {
 		return;
 	}

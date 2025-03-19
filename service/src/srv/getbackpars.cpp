@@ -47,7 +47,7 @@ var tt;	 // num
 var dbn;
 //var xx;
 
-function main(out bakpars, in process0 = var()) {
+func main(out bakpars, in process0 = var()) {
 
 	// optonally get the backpars for a specific process if given
 //	if (process0.unassigned()) {

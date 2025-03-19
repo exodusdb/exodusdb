@@ -29,7 +29,7 @@ THE SOFTWARE.
 #endif
 
 // For debugging
-//#define TRACING
+#define TRACING 1
 
 #ifdef EXODUS_POSIX_SOURCE
 #	include <stdio.h>
@@ -42,7 +42,7 @@ THE SOFTWARE.
 #	include <memory> // for make_unique
 #endif
 
-#ifdef TRACING
+#if TRACING
 #	include <boost/stacktrace.hpp>
 #endif
 
@@ -56,37 +56,42 @@ using let = const var;
 
 static void addbacktraceline(in frameno, in sourcefilename, in lineno, io returnlines) {
 
-	//#ifdef TRACING
+	//#if TRACING
 	//	sourcefilename.errputl("SOURCEFILENAME=");
 	//	lineno.errputl("LINENO=");
 	//#endif
 
-	if (not lineno || not lineno.isnum())
+	bool raw = true;
+
+	if ((not lineno || not lineno.isnum()) and not raw)
 		return;
 
 	// Get the source file text
 	var filetext;
-	if (not filetext.osread(sourcefilename))
-		return;
+	if (not filetext.osread(sourcefilename)) {
+		if (not raw)
+			return;
+		filetext = "";
+	}
 
 	// Change DOS/WIN and MAC line ends to lf only
 	filetext.replacer("\x0D\x0A", "\x0A");
 	filetext.converter("\x0D", "\x0A");
 
 	// Extract the source line
-	let line = filetext.field("\x0A", lineno).trimfirst(" \t");
-	if (not line or line.match("^\\s*}"))
+	let line = lineno.isnum() ? filetext.field("\x0A", lineno).trimfirst(" \t") : "";
+	if ((not line or line.match("^\\s*}")) and not raw)
 		return;
 
 	// Suppress confusing and unhelpful exodus macros like programinit/exit, libraryinit/exit, classinit/exit
-	if (line.match("^(program|library|class)(init|exit)\\("))
+	if (/* not raw and */ line.match("^(program|library|class)(init|exit)\\("))
 		return;
 
 	// Skip "return nn"
-	if (line.match("^\\s*return\\s*\\d*"))
+	if (line.match("^\\s*return\\s*\\d*") and not raw)
 		return;
 
-#ifdef TRACING
+#if TRACING
 	line.errputl();
 #endif
 
@@ -113,13 +118,13 @@ static void addbacktraceline(in frameno, in sourcefilename, in lineno, io return
 // Capture the current stack addresses for later decoding
 void exo_savestack(void* stack_addresses[BACKTRACE_MAXADDRESSES], std::size_t* stack_size) {
 	*stack_size = ::backtrace(stack_addresses, BACKTRACE_MAXADDRESSES);
-#ifdef TRACING
+#if TRACING
 	std::cout << boost::stacktrace::stacktrace();
 #endif
 }
 
 ////////////////////////////////////////////////////////////////////
-// Convert the stack addresses to source file, line no and line text
+// Given stack addresses, get the source file, line no and line text
 ////////////////////////////////////////////////////////////////////
 // http://www.delorie.com/gnu/docs/glibc/libc_665.html
 var exo_backtrace(void* stack_addresses[BACKTRACE_MAXADDRESSES], std::size_t stack_size, std::size_t limit) {
@@ -131,27 +136,33 @@ var exo_backtrace(void* stack_addresses[BACKTRACE_MAXADDRESSES], std::size_t sta
 
 	let internaladdresses = "";
 
-//	let exo_debug;
-//	exo_debug.osgetenv("EXO_DEBUG");
-
-	/* example of TRACE from osx 64
-	Stack frames: 8
-	Backtrace 0: 0x10000c313
-	0   libexodus-11.5.0.dylib              0x000000010000c313 _ZN6exodus9backtraceEv + 99
-	Backtrace 1: 0x10001ec51
-	1   libexodus-11.5.0.dylib              0x000000010001ec51
-	_ZN6exodus11VarErrorC2ERKNS_3varE + 129 Backtrace 2: 0x10001f314 2 libexodus-11.5.0.dylib
-	0x000000010001f314 _ZN6exodus12VarUnassignedC2ERKNS_3varE + 52 Backtrace 3: 0x10000e193 3
-	libexodus-11.5.0.dylib              0x000000010000e193 _ZNK6exodus3var3putERSo + 243
-	Backtrace 4: 0x10000e322
-	4   libexodus-11.5.0.dylib              0x000000010000e322 _ZNK6exodus3var7outputlEv + 34
-	Backtrace 5: 0x10000143f
-	5   steve                               0x000000010000143f _ZN13ExodusProgram4mainEv + 77
-	Backtrace 6: 0x1000010e6
-	6   steve                               0x00000001000010e6 main + 99
-	Backtrace 7: 0x100000f64
-	7   steve                               0x0000000100000f64 start + 52
-	*/
+//Backtrace 0: 0x7624d8bac192 "/root/exodus/build/exodus/libexodus/exodus/libexodus.so.24.07(_ZN3exo13exo_savestackEPPvPm+0x12) [0x7624d8bac192]"
+//objdump --start-address=0000 --stop-address=0x12 --source --line-numbers /root/exodus/build/exodus/libexodus/exodus/libexodus.so.24.07
+//
+//Backtrace 1: 0x7624d8b9a8eb "/root/exodus/build/exodus/libexodus/exodus/libexodus.so.24.07(_ZN3exo8VarErrorC1ENSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE+0x9b) [0x7624d8b9a8eb]"
+//objdump --start-address=0000 --stop-address=0x9b --source --line-numbers /root/exodus/build/exodus/libexodus/exodus/libexodus.so.24.07
+//
+//Backtrace 2: 0x7624d8b9b23a "/root/exodus/build/exodus/libexodus/exodus/libexodus.so.24.07(_ZN3exo13VarUnassignedC1ENSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE+0x3a) [0x7624d8b9b23a]"
+//objdump --start-address=0000 --stop-address=0x3a --source --line-numbers /root/exodus/build/exodus/libexodus/exodus/libexodus.so.24.07
+//
+//Backtrace 3: 0x566f66d595cb "/root/exodus/build/cli/src/gendoc(+0x135cb) [0x566f66d595cb]"
+//objdump --start-address=0x13000 --stop-address=0x135cb --source --line-numbers /root/exodus/build/cli/src/gendoc
+//
+//Backtrace 4: 0x566f66d594e6 "/root/exodus/build/cli/src/gendoc(+0x134e6) [0x566f66d594e6]"
+//objdump --start-address=0x13000 --stop-address=0x134e6 --source --line-numbers /root/exodus/build/cli/src/gendoc
+//
+//Backtrace 5: 0x566f66d53c27 "/root/exodus/build/cli/src/gendoc(+0xdc27) [0x566f66d53c27]"
+//objdump --start-address=0xd000 --stop-address=0xdc27 --source --line-numbers /root/exodus/build/cli/src/gendoc
+//if (man) {
+//
+//Backtrace 6: 0x566f66d4baa1 "/root/exodus/build/cli/src/gendoc(+0x5aa1) [0x566f66d4baa1]"
+//objdump --start-address=0x5000 --stop-address=0x5aa1 --source --line-numbers /root/exodus/build/cli/src/gendoc
+//programexit()
+//
+//Backtrace 7: 0x7624d822a1ca "/lib/x86_64-linux-gnu/libc.so.6(+0x2a1ca) [0x7624d822a1ca]"
+//Backtrace 8: 0x7624d822a28b "/lib/x86_64-linux-gnu/libc.so.6(__libc_start_main+0x8b) [0x7624d822a28b]"
+//Backtrace 9: 0x566f66d4b8b5 "/root/exodus/build/cli/src/gendoc(+0x58b5) [0x566f66d4b8b5]"
+//objdump --start-address=0x5000 --stop-address=0x58b5 --source --line-numbers /root/exodus/build/cli/src/gendoc
 
 	// TODO autodetect if addr2line or dwalfdump/dSYM is available
 
@@ -161,7 +172,19 @@ var exo_backtrace(void* stack_addresses[BACKTRACE_MAXADDRESSES], std::size_t sta
 
 	for (std::size_t ii = 0; ii < stack_size; ii++) {
 
-#ifdef TRACING
+		var objfilename = var(strings[ii]).field("(", 1).field(" ", 1).field("[", 1);
+		var objaddress = var(strings[ii]).field("[", 2).field("]", 1);
+		if (objaddress.len() > 9)
+			objaddress = var(strings[ii]).field("(", 2).field(")", 1).field("+", 2);
+
+		// Skip libc
+#if TRACING < 2
+		if (objfilename.contains("libc.so")) {
+			continue;
+		}
+#endif
+
+#if TRACING
 		fprintf(stderr, "Backtrace %d: %p \"%s\"\n", int(ii), stack_addresses[ii], strings[ii]);
 		// Backtrace 0: 0x7f9d247cf9fd
 		// "/usr/local/lib/libexodus.so.19.01(_ZN6exodus9backtraceEv+0x62) [0x7f9d247cf9fd]"
@@ -170,28 +193,21 @@ var exo_backtrace(void* stack_addresses[BACKTRACE_MAXADDRESSES], std::size_t sta
 
 		// objdump --stop-address=0xa3f6 -l --disassemble ~/lib/libl1.so |grep cpp|tail -n1
 
-		var objfilename = var(strings[ii]).field("(", 1).field(" ", 1).field("[", 1);
-		var objaddress = var(strings[ii]).field("[", 2).field("]", 1);
-		if (objaddress.len() > 9)
-			objaddress = var(strings[ii]).field("(", 2).field(")", 1).field("+", 2);
-
-		// Skip libc
-		if (objfilename.contains("libc.so")) {
-			continue;
-		}
-
 		// Skip libexodus source code
 		//if (not exo_debug and objfilename.contains("libexodus.so"))
 		//if (objfilename.contains("libexodus.so"))
 		//	continue;
 
-//#ifdef TRACING
+//#if TRACING
 //		fprintf(stderr, " %s addr:%s\n", objfilename.c_str(), objaddress.c_str());
 ////		objfilename.errput("objfilename=");
 ////		objaddress.errputl(" objaddress=");
 //#endif
 
 		// if (objfilename == objfilename.convert("/\\:",""))
+//TRACE(objfilename)      // "/root/exodus/build/exodus/libexodus/exodus/libexodus.so.24.07"
+//TRACE(objfilename)      // "/root/exodus/build/cli/src/gendoc"
+
 		if (not objfilename.osfile()) {
 			// loadable program
 			var which_out;
@@ -206,18 +222,32 @@ var exo_backtrace(void* stack_addresses[BACKTRACE_MAXADDRESSES], std::size_t sta
 				continue;
 		}
 
+		// Skip if hex address is invalid
 		if ((not objaddress.starts("0")) || objaddress.at(2) != "x")
 			continue;
 
+		// Start at the beginning of a hex block
 		let startaddress = objaddress.paste(-3, 3, "000");
+//		let stopaddress = objaddress;
+//		let startaddress = objaddress;
+
+//		let startaddress = objaddress;
+		// Stop 1 after after the start address
+		let stopaddress = "0x" ^ (objaddress.cut(2).iconv("MX") + 1).oconv("MX");
 
 		////////////////////////
 		//objdump_out = objdump_out.osshellread();
 		var objdump_out;
-		let cmd = "objdump --start-address=" ^ startaddress ^ " --stop-address=" ^
-//						 objaddress ^ " --disassemble -l " ^ objfilename;
-						 objaddress ^ " --source --line-numbers " ^ objfilename;
-#ifdef TRACING
+		let cmd =
+			"objdump"
+			" --start-address=" ^ startaddress ^
+			" --stop-address=" ^ stopaddress ^
+//			" --disassemble -l " ^ objfilename ^
+			" --source"
+			" --line-numbers " ^
+			objfilename;
+
+#if TRACING
 		cmd.errputl();
 #endif
 		if (not objdump_out.osshellread(cmd))
@@ -242,7 +272,7 @@ var exo_backtrace(void* stack_addresses[BACKTRACE_MAXADDRESSES], std::size_t sta
 //						break;
 					line = objdump_out.f(ii2);
 //					linesource = nextline;
-//#ifdef TRACING
+//#if TRACING
 //					TRACE(line)
 //					TRACE(linesource)
 //#endif
@@ -251,7 +281,7 @@ var exo_backtrace(void* stack_addresses[BACKTRACE_MAXADDRESSES], std::size_t sta
 			}
 		}
 
-//#ifdef TRACING
+//#if TRACING
 //		if (line)
 //			line.errputl("line=");
 //#endif
@@ -266,7 +296,7 @@ var exo_backtrace(void* stack_addresses[BACKTRACE_MAXADDRESSES], std::size_t sta
 			//returnlines ^= var(ii + 1) ^ ": " ^ line.field2(_OSSLASH, -1) ^ " " ^ linesource ^ FM;
 		}
 
-#ifdef TRACING
+#if TRACING
 		var("").errputl();
 #endif
 		// Quit if reached limit of desired backtrace
@@ -286,13 +316,13 @@ var exo_backtrace(void* stack_addresses[BACKTRACE_MAXADDRESSES], std::size_t sta
 //service managers like systemd will send a polite SIGTERM signal
 //and wait for say 90 seconds before sending a kill signal
 static void SIGTERM_handler(int) {
-	fprintf(stderr, "=== SIGTERM received ===\n");
+	fprintf(stderr, "=== SIGTERM_handler: Set TERMINATE_req = true ===\n");
 	TERMINATE_req = true;
 }
 
 //restart
 static void SIGHUP_handler(int) {
-	fprintf(stderr, "=== SIGHUP received ===\n");
+	fprintf(stderr, "=== SIGHUP_handler: Set RELOAD_req = true ===\n");
 	RELOAD_req = true;
 }
 

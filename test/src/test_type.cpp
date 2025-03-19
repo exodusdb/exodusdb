@@ -46,7 +46,7 @@ void test_min_max(std::string typetitle, int max_min = 0)
 	}
 }
 
-function main() {
+func main() {
 
 	{
 		try {

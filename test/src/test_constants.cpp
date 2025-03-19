@@ -4,7 +4,7 @@
 #include <exodus/program.h>
 programinit()
 
-function main() {
+func main() {
 	printl("test_constants says 'Hello World!'");
 
 	printl("No actual tests at the moment");

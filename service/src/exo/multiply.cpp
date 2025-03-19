@@ -1,7 +1,7 @@
 #include <exodus/library.h>
 libraryinit()
 
-function main(in multipliers, in multiplicand, in sep) {
+func main(in multipliers, in multiplicand, in sep) {
 	// *reimplemented because *** operator not in c++/exodus
 	// linemark
 	if (multipliers == "" or multiplicand == 1) {

@@ -12,7 +12,7 @@ var startmode;
 var temp;
 var reply;	// num
 
-function main(in startmode0, out starttime, out startdate, out /*startbuffer*/) {
+func main(in startmode0, out starttime, out startdate, out /*startbuffer*/) {
 
 //	if (startmode0.unassigned()) {
 //		startmode = "";

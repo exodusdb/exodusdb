@@ -3,7 +3,7 @@ libraryinit()
 
 var previous;  // num
 
-function main(in mode, in previous0 = "") {
+func main(in mode, in previous0 = "") {
 	// jbase linemark
 //	if (previous0.unassigned()) {
 //		previous = 0;

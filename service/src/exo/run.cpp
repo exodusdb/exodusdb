@@ -3,7 +3,7 @@ libraryinit()
 
 // OBSOLETE. No callers.
 
-function main() {
+func main() {
 	printl(SENTENCE);
 	return 0;
 }

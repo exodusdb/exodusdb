@@ -1,7 +1,7 @@
 #include <exodus/library.h>
 libraryinit()
 
-function main() {
+func main() {
 	// printl("fileman says 'Hello World!'");
 	return 0;
 }

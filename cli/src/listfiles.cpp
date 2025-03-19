@@ -1,7 +1,7 @@
 #include <exodus/program.h>
 programinit()
 
-function main() {
+func main() {
 
 	let dbname = COMMAND.f(2);
 	var connection = "";

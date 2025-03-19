@@ -4,7 +4,7 @@
 #include <exodus/program.h>
 programinit()
 
-function main() {
+func main() {
 
 	// Quit if on github where unknown how to call another built test program
 	if (osgetenv("GITHUB_WORKSPACE")) {

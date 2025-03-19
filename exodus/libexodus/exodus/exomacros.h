@@ -72,11 +72,15 @@ THE SOFTWARE.
 //
 #undef function
 #undef subroutine
-#undef subroutine_noreturn
+#undef func
+#undef subr
+//#undef subroutine_noreturn
 
 #define function public: var
 #define subroutine public: void
-#define subroutine_noreturn public: [[noreturn]] void
+#define func public: var
+#define subr public: void
+//#define subroutine_noreturn public: [[noreturn]] void
 
 // "Call" and "Gosub"
 // ==================

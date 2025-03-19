@@ -8,7 +8,7 @@ programinit()
 	let filename = "xo_clients";
 	let use_perform = true;
 
-function main() {
+func main() {
 
 	// No real need for this especially because a) it does a default connection and b) we are not creating a connection for following db operations
 	// it is here just to remind that we can connect to specific servers and dataabases if desired
@@ -190,7 +190,7 @@ function main() {
 	return 0;
 }
 
-subroutine sortselect(in file, in sortselectclause) {
+subr sortselect(in file, in sortselectclause) {
 
 	printl("\nsselect the data - ", sortselectclause);
 

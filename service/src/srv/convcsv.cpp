@@ -43,7 +43,7 @@ var converterparams;
 var result;
 var errors;
 
-function main(in sentence0, in select0 = "", in filters0 = "") {
+func main(in sentence0, in select0 = "", in filters0 = "") {
 
 	// called from
 	// BP ANALTIME    call with filters
@@ -690,7 +690,7 @@ nextvn:
 	goto nextrec;
 }
 
-subroutine exit() {
+subr exit() {
 	outfile.osclose();
 	// will not do anything unless uconv is available
 	// call uconvfile(outfile,'CODEPAGE','UTF16',result,errors)
@@ -705,14 +705,14 @@ subroutine exit() {
 	return;
 }
 
-subroutine exit2() {
+subr exit2() {
 	// general result code
 	SYSTEM(34) = 0;
 	gosub exit3();
 	return;
 }
 
-subroutine exit3() {
+subr exit3() {
 	// TODO reimplement multiple mv group export
 	// if raw and exportable2 then
 	// mvgroupno+=1

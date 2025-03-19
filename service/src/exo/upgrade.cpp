@@ -1,7 +1,7 @@
 #include <exodus/library.h>
 libraryinit()
 
-function main([[maybe_unused]] in mode) {
+func main([[maybe_unused]] in mode) {
 	// TODO implement or obsolete
 	return 0;
 }

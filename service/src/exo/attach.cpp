@@ -3,7 +3,7 @@ libraryinit()
 
 // OBSOLETE - no callers. Replaced by var::attach
 
-function main() {
+func main() {
 	printl(SENTENCE);
 	return 0;
 }

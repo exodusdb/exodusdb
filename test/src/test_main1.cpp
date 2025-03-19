@@ -26,7 +26,7 @@ programinit()
 //
 //   test_main1 &> test_main1.out
 
-function main() {
+func main() {
 
 	//EXODUS syntax directions
 	//

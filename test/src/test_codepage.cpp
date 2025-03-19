@@ -4,7 +4,7 @@
 #include <exodus/program.h>
 programinit()
 
-function main() {
+func main() {
 
 
 	{
@@ -94,7 +94,7 @@ root@exodus:~/exodus/exodus/libexodus/exodus# hexdump t_utf8_allo4.txt -C
 	return 0;
 }
 
-function test_codepage(in codepage, in lang) {
+func test_codepage(in codepage, in lang) {
 	printl("---------- " ^ lang ^ " " ^ codepage ^ " ----------");
 
 	var v256 = "";

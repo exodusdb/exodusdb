@@ -1,7 +1,7 @@
 #include <exodus/library.h>
 libraryinit()
 
-function main(out hostsallow) {
+func main(out hostsallow) {
 
 	hostsallow = R"V0G0N(
 #dubai barsha office

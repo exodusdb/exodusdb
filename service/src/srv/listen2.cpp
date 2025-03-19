@@ -44,7 +44,7 @@ var locks;
 var styles2;
 var fields;
 
-function main(in request1, in request2, in request3, in request4, io request5, in request6 = "") {
+func main(in request1, in request2, in request3, in request4, io request5, in request6 = "") {
 
 	/* LISTEN COMMANDS;
 
@@ -1055,7 +1055,7 @@ validateexit2:
 	return 0;
 }
 
-subroutine becomeuserandconnection(in request2, in request4) {
+subr becomeuserandconnection(in request2, in request4) {
 
 	let username   = request2;
 	let connection = request4;
@@ -1150,7 +1150,7 @@ subroutine becomeuserandconnection(in request2, in request4) {
 	return;
 }
 
-subroutine addwhoistx() {
+subr addwhoistx() {
 	if (whoistx) {
 		body(-1) = _FM "\"whois\" ip number " ^ ipno ^ " information:";
 		body(-1) = _FM ^ whoistx;
@@ -1162,7 +1162,7 @@ subroutine addwhoistx() {
 	return;
 }
 
-subroutine switchcompany() {
+subr switchcompany() {
 	if (not ucomps.locate(srv.gcurrcompcode)) {
 		let tc = ucomps.f(1, 1);
 		var tt;

@@ -1,7 +1,7 @@
 #include <exodus/library.h>
 libraryinit()
 
-function main(in input0, in max) {
+func main(in input0, in max) {
 
 	var inputx;
 	var maxx;

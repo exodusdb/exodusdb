@@ -155,9 +155,18 @@ template<> PUBLIC VBR1 VARBASE1::operator^=(CBX rhs) & {
 	assertString(__PRETTY_FUNCTION__);
 	rhs.assertString(__PRETTY_FUNCTION__);
 
-	// tack it onto our string
-	var_str.append(rhs.var_str);
-	var_typ = VARTYP_STR;  // reset to one unique type
+	if (var_str.empty()) {
+//		(this*) = rhs.clone();
+		var_typ = rhs.var_typ;
+		var_int = rhs.var_int;
+		var_dbl = rhs.var_dbl;
+		// TODO if rhs is temporary then move its var_str
+		var_str = rhs.var_str;
+	} else {
+		// Append it onto our string
+		var_str.append(rhs.var_str);
+		var_typ = VARTYP_STR;  // reset to string only
+	}
 
 	return *this;
 }
@@ -168,9 +177,14 @@ template<> PUBLIC VBR1 VARBASE1::operator^=(const int int1) & {
 
 	assertString(__PRETTY_FUNCTION__);
 
-	// var_str+=var(int1).var_str;
-	var_str += std::to_string(int1);
-	var_typ = VARTYP_STR;  // reset to one unique type
+	if (var_str.empty()) {
+		var_str = std::to_string(int1);
+		var_int = int1;
+		var_typ = VARTYP_INTSTR;
+	} else {
+		var_str += std::to_string(int1);
+		var_typ = VARTYP_STR;  // reset to string only
+	}
 
 	return *this;
 }
@@ -184,9 +198,21 @@ template<> PUBLIC VBR1 VARBASE1::operator^=(const double double1) & {
 	// var_str+=var(int1).var_str;
 	//var_str += mvd2s(double1);
 	//var_typ = VARTYP_STR;  // reset to one unique type
-	let temp(double1);
+//	let temp(double1);
+//	temp.createString();
+//	var_str += temp.var_str;
+
+	var temp = double1;
 	temp.createString();
-	var_str += temp.var_str;
+	if (var_str.empty()) {
+//		var_str = std::to_string(double1);
+//		var_dbl = double1;
+//		var_typ = VARTYP_DBLSTR;
+		*this = temp;
+	} else {
+		var_str += temp.var_str;
+		var_typ = VARTYP_STR; // Reset to string only
+	}
 
 	return *this;
 }
@@ -199,7 +225,7 @@ template<> PUBLIC VBR1 VARBASE1::operator^=(const char char1) & {
 
 	// var_str+=var(int1).var_str;
 	var_str.push_back(char1);
-	var_typ = VARTYP_STR;  // reset to one unique type
+	var_typ = VARTYP_STR;  // reset to string only
 
 	return *this;
 }
@@ -216,7 +242,7 @@ template<> PUBLIC VBR1 VARBASE1::operator^=(const char* cstr) & {
 	// var_str+=var(int1).var_str;
 	// var_str+=std::string(char1);
 	var_str += cstr;
-	var_typ = VARTYP_STR;  // reset to one unique type
+	var_typ = VARTYP_STR;  // reset to string only
 
 	return *this;
 }
@@ -229,8 +255,13 @@ template<> PUBLIC VBR1 VARBASE1::operator^=(const std::string& string1) & {
 	assertString(__PRETTY_FUNCTION__);
 
 	// var_str+=var(int1).var_str;
-	var_str += string1;
-	var_typ = VARTYP_STR;  // reset to one unique type
+	if (var_str.empty()) {
+		// TODO move if temporary
+		var_str = string1;
+	} else {
+		var_str += string1;
+	}
+	var_typ = VARTYP_STR;  // reset to string only
 
 	return *this;
 }
@@ -244,7 +275,7 @@ template<> PUBLIC VBR1 VARBASE1::operator^=(SV sv1) & {
 
 	// var_str+=var(int1).var_str;
 	var_str += sv1;
-	var_typ = VARTYP_STR;  // reset to one unique type
+	var_typ = VARTYP_STR;  // reset to string only
 
 	return *this;
 }

@@ -507,7 +507,7 @@ bool Callable::openlib(const std::string newlibname) {
 	}
 
 #ifdef DLERROR
-	///root/lib/libdict_invoices.so: undefined symbol: _ZN6exodus14ostempfilenameEv
+	///root/lib/libdict_invoices.so: undefined symbol: _ZN6exodus14ostempfileEv
 	// /root/lib/libhtmllib2.so: cannot open shared object file: No such file or directory
 	const char* dlsym_error = dlerror();
 	if (dlsym_error)

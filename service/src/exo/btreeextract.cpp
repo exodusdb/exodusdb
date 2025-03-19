@@ -3,7 +3,7 @@ libraryinit()
 
 #include <service_common.h>
 
-function main(in cmd, in filename, in /*dictfile*/, out hits) {
+func main(in cmd, in filename, in /*dictfile*/, out hits) {
 
 	// replacement for simple btree.extract functions using SELECT command
 	// which is slower but perhaps more portable and works without btree indexes

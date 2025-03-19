@@ -33,7 +33,7 @@ programinit()
 //
 //   test_main2 &> test_main2.out
 
-function main() {
+func main() {
 
 	{
 		// range based for loop
@@ -961,7 +961,7 @@ TRACE("qqqa")
 }
 
 //be careful not to name any subroutines the same as any variables
-subroutine internal_subroutine_xyzz(in xyzz) {
+subr internal_subroutine_xyzz(in xyzz) {
 	printl("internal_subroutine_xyzz(in xyzz) ENTERED");
 	//var xx;
 	//printl(xx);

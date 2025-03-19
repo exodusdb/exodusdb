@@ -16,7 +16,7 @@ OPTIONS
 	let update = OPTIONS.contains("U");
 	let verbose = OPTIONS.count("V");
 
-function main() {
+func main() {
 //
 	let option_d = 2;//OPTIONS.count("d");
 //	let option_s = 1;//OPTIONS.count("s");
@@ -510,7 +510,7 @@ function main() {
 
 						// Output a diff
 //						printx(datfilename, datrec.trim("\n"));
-						let tmpdatfile = ostempdirpath() ^ datfilename.field("/", -1);
+						let tmpdatfile = ostempdir() ^ datfilename.field("/", -1);
 						if (not oswrite(datrec on tmpdatfile))
 							loglasterror();
 						else {
@@ -569,7 +569,7 @@ function main() {
 	return 0;
 }
 
-subroutine fix_include_common(in osfilenames) {
+subr fix_include_common(in osfilenames) {
 
 	if (verbose)
 		errputl("fixdeprecated: fix_include_common:", osfilenames);

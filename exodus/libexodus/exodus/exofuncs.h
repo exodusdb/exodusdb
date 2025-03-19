@@ -136,8 +136,8 @@ ND var  osgetenv(SV envcode = "" );
 ND bool osgetenv(SV code, out value);
    void ossetenv(SV code, in value);
 
-ND var ostempdirpath(void);
-ND var ostempfilename(void);
+ND var  ostempdir(void);
+ND var  ostempfile(void);
 
 ND bool assigned(in var1);
 ND bool unassigned(in var1);
@@ -150,6 +150,9 @@ ND var  clone(in fromvar);
 
    void swap(io var1, io var2);
 ND var  dump(in var1);
+
+ND int  getprecision();
+   int  setprecision(int newprecision);
 
 // OS
 
@@ -557,6 +560,7 @@ ND bool readf(out field, in dbfile, in key, in fieldnumber);
    void writef(in record, in dbfile, in key, const int fieldno);
 ND bool deletec(in dbfile, in key);
 ND bool updaterecord(in record, in dbfile, in key);
+ND bool updatekey(in dbfile, in key, in newkey);
 ND bool insertrecord(in record, in dbfile, in key);
 
 //ND bool dimread(dim& dimrecord, in dbfile, in key);
@@ -578,6 +582,8 @@ ND var xlate(in dbfilename, in key, in fieldno, in mode);
 
 ND var lasterror(void);
    var loglasterror(in source = " ");
+
+ND var version();
 
 ////////////////////////////////////////////
 //output(args), outputl(args), outputt(args)

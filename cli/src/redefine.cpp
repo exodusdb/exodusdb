@@ -9,7 +9,7 @@
 #include <exodus/program.h>
 programinit()
 
-function main() {
+func main() {
 
 	var defsrec;
 	if (not osread(defsrec from COMMAND(2)))

@@ -7,7 +7,7 @@ var rr;
 var id;
 var dict;
 
-function main(in selectx) {
+func main(in selectx) {
 
 	RECORD.move(rr);
 	ID.move(id);

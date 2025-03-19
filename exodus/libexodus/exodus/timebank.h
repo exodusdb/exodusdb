@@ -127,7 +127,7 @@ auto get_timebank_acno(const std::string_view arg1) -> int {
 	     if (++acno && arg1 == "xxxxxxxx unused") {}
 	else if (++acno && arg1 == "var  var::sort(SV delimiter)") {}
 	else if (++acno && arg1 == "var  var::reverse(SV delimiter)") {}
-	else if (++acno && arg1 == "var  var::ostimestamp(in ostime) const") {}
+	else if (++acno && arg1 == "var  var::ostimestamp(in ostime) static") {}
 	else if (++acno && arg1 == "bool var::connect(in conninfo") {}
 	else if (++acno && arg1 == "bool var::attach(in filenames") {}
 	else if (++acno && arg1 == "bool var::detach(in filenames") {}
@@ -149,6 +149,7 @@ auto get_timebank_acno(const std::string_view arg1) -> int {
 	else if (++acno && arg1 == "void var::writef(in file, in key, const int fieldno) const") {}
 	else if (++acno && arg1 == "void var::write(in file, in key) const") {}
 	else if (++acno && arg1 == "bool var::updaterecord(in file, in key) const") {}
+	else if (++acno && arg1 == "bool var::updatekey(in key, in newkey) const") {}
 	else if (++acno && arg1 == "bool var::insertrecord(in file, in key) const") {}
 	else if (++acno && arg1 == "bool var::deleterecord(in key) const") {}
 	else if (++acno && arg1 == "bool var::clearcache() const") {}
@@ -266,7 +267,7 @@ auto get_timebank_acno(const std::string_view arg1) -> int {
 	else if (++acno && arg1 == "var  var::oslist(in globpattern, const int mode) const") {}
 	else if (++acno && arg1 == "var  var::oscwd(const char* newpath) const") {}
 	else if (++acno && arg1 == "var  var::oscwd() const") {}
-	else if (++acno && arg1 == "void var::ossleep(const int milliseconds) const") {}
+	else if (++acno && arg1 == "void var::ossleep(const int milliseconds) static") {}
 	else if (++acno && arg1 == "var  var::rnd() const") {}
 	else if (++acno && arg1 == "void var::initrnd() const") {}
 	else if (++acno && arg1 == "bool var::osgetenv(SV envcode)") {}

@@ -6,7 +6,7 @@ libraryinit()
 var period;	 // num
 var year;		 // num
 
-function main(in type, in input0, in mode, out output) {
+func main(in type, in input0, in mode, out output) {
 
 	let firstmonth = mode.field(",", 1);
 	let maxperiod  = mode.field(",", 2);

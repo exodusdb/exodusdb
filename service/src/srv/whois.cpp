@@ -20,7 +20,7 @@ var cmd;
 var exe;
 var errors;
 
-function main(in /*mode*/, in ipno, out text) {
+func main(in /*mode*/, in ipno, out text) {
 
 	if (SENTENCE.field(" ", 1) == "WHOIS") {
 		SENTENCE.move(sentencex);

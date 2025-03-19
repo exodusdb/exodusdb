@@ -61,7 +61,7 @@ var upgradelog;
 var systemx;
 var yy;
 
-function main() {
+func main() {
 	//
 
 	// NB @VOLUMES blank on C++ and used to run slightly differently on C++
@@ -436,12 +436,12 @@ updateversion:
 		SYSTEM(44) = STATION.trim();
 	}
 
-	call log2("*detach merges", logtime);
-	// locate 'MERGES' in @files using fm setting xx then perform 'DETACH MERGES (S)'
-	// open 'MERGES' to xx then perform 'DETACH MERGES (S)'
-	if (var().open("MERGES", "")) {
-		perform("DELETEFILE MERGES (S)");
-	}
+//	call log2("*detach merges", logtime);
+//	// locate 'MERGES' in @files using fm setting xx then perform 'DETACH MERGES (S)'
+//	// open 'MERGES' to xx then perform 'DETACH MERGES (S)'
+//	if (var().open("MERGES", "")) {
+//		perform("DELETEFILE MERGES (S)");
+//	}
 
 	// 	call log2("*get user video table if any", logtime);
 	// 	let temp = ENVIRONKEYS.f(2);
@@ -1170,19 +1170,19 @@ nextreport:
 //		valid	  = 0;
 //		srv.units = "";
 //	}
-	if (var().open("UNITS", "")) {
-		perform("DELETEFILE UNITS (S)");
-	}
+//	if (var().open("UNITS", "")) {
+//		perform("DELETEFILE UNITS (S)");
+//	}
 	if (not openfile("ADDRESSES", srv.addresses, "DEFINITIONS")) {
 		valid = 0;
 	}
 	if (not openfile("DOCUMENTS", srv.documents, "DEFINITIONS")) {
 		valid = 0;
 	}
-	// IF OPENFILE2('SHADOW',shadow,'DEFINITIONS',1) ELSE valid=0
-	if (var().open("SHADOW", "")) {
-		perform("DELETEFILE SHADOW (S)");
-	}
+//	// IF OPENFILE2('SHADOW',shadow,'DEFINITIONS',1) ELSE valid=0
+//	if (var().open("SHADOW", "")) {
+//		perform("DELETEFILE SHADOW (S)");
+//	}
 
 	if (not valid) {
 		if (interactive) {
@@ -1675,7 +1675,7 @@ adddatasetcodename:
 	stop();
 }
 
-subroutine getsystem(in config_osfilename, in confign) {
+subr getsystem(in config_osfilename, in confign) {
 
 	call log2("*get " ^ config_osfilename ^ " parameters", logtime);
 	if (not systemx.osread(config_osfilename)) {
@@ -1705,7 +1705,7 @@ subroutine getsystem(in config_osfilename, in confign) {
 	return;
 }
 
-subroutine_noreturn failsys() {
+subr failsys() {
 	var msgx = msg_;
 
 	var msg2 = "*Authorisation Failure. " ^ msgx;

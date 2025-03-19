@@ -4,7 +4,7 @@
 #include <exodus/program.h>
 programinit()
 
-function main() {
+func main() {
 
 	{
 		// Unfortunately RM FM VM and SM are all considered as white space characters by regex rules

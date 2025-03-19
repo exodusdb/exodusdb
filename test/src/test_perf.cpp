@@ -12,7 +12,7 @@
 #include <exodus/program.h>
 programinit()
 
-function main() {
+func main() {
 
 //	// Quit if running under make since there are no tests
 //	if (osgetenv("MAKELEVEL")) {

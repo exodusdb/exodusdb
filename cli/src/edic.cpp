@@ -5,7 +5,7 @@ programinit()
 	let exo_HOME = osgetenv("EXO_HOME") ?: osgetenv("HOME");
 	let inc_dir = exo_HOME ^ OSSLASH ^ "inc" ^ OSSLASH;
 
-function main() {
+func main() {
 
 	// edic history dir/file
 	let edic_hist_dir = osgetenv("HOME") ^ "/.config/exodus/";
@@ -417,7 +417,7 @@ function main() {
 	return 0;
 }
 
-subroutine geteditor(out editor, out linenopattern) {
+subr geteditor(out editor, out linenopattern) {
 
 	editor = osgetenv("VISUAL");
 	linenopattern = "$LINENO ";

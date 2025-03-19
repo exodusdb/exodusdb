@@ -90,7 +90,7 @@ var newoptions;
 var printtx_ii;	 // num
 var spaceoptionsize;
 
-function main(in filename, in rowfields0, in colfield, in datafield, io output, io filterdictid, io filterin, io filterout, io allrowvals, io allcolvals, io prefixes, io prefixmvfn) {
+func main(in filename, in rowfields0, in colfield, in datafield, io output, io filterdictid, io filterin, io filterout, io allrowvals, io allcolvals, io prefixes, io prefixmvfn) {
 
 	// for printtx
 
@@ -422,7 +422,7 @@ exit:
 	return 0;
 }
 
-subroutine_noreturn abort_toobig(in filename) {
+subr abort_toobig(in filename) {
 
 	clearselect();
 	msg = "Crosstab too complex. Please simplify your request.";

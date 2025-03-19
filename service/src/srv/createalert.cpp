@@ -19,7 +19,7 @@ var title;
 var request;
 var datax;
 
-function main() {
+func main() {
 
 	var sentencex = SENTENCE.field("(", 1);
 	// cheap parser requires ~ for spaces

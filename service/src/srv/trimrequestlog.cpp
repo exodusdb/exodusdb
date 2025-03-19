@@ -13,7 +13,7 @@ libraryinit()
 var reqdate;
 var tt;
 
-function main() {
+func main() {
 
 	let update = 1;
 

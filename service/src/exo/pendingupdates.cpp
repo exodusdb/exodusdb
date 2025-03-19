@@ -3,7 +3,7 @@ libraryinit()
 
 // Remove from all client callers and OBSOLETE
 
-function main() {
+func main() {
 	// obsolete or reimplement
 	return 0;
 }

@@ -1,7 +1,7 @@
 #include <exodus/library.h>
 libraryinit()
 
-function main(in password) {
+func main(in password) {
 
 	var encryptkey = 1234567;
 

@@ -4,7 +4,7 @@
 #include <exodus/program.h>
 programinit()
 
-function main() {
+func main() {
 
 	/////////
 	//replace
@@ -662,7 +662,7 @@ function main() {
 }
 
 //function to conveniently test sum function
-function test_sum(in instr) {
+func test_sum(in instr) {
 	return sum(instr.convert("~^]}>|", _RM _FM _VM _SM _TM _ST)).convert(_RM _FM _VM _SM _TM _ST, "~^]}>|");
 }
 

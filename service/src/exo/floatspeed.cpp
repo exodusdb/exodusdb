@@ -9,7 +9,7 @@ var time1;	// num
 var time2;	// num
 var nn = 1000;
 
-function main() {
+func main() {
 	// call savescreenss1, ss2);
 	// printl(chr(12));
 	var ntries	 = 0;
@@ -65,7 +65,7 @@ function main() {
 	return 0;
 }
 
-subroutine getspeed(io retval) {
+subr getspeed(io retval) {
 	time1 = ostime();
 	// for (var dd = 1.1; dd < nn; ++dd) {
 	for (double dd = 1.1; dd < nn; ++dd) {

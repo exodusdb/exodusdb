@@ -1,7 +1,7 @@
 #include <exodus/library.h>
 libraryinit()
 
-function main(in pluralnoun) {
+func main(in pluralnoun) {
 	var temp  = pluralnoun;
 	var temp2 = pluralnoun;
 	temp2.ucaser();

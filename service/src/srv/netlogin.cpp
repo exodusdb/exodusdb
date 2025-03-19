@@ -28,7 +28,7 @@ var now2;  // num
 var encryptx;
 var allowablechars;
 
-function main(in mode0) {
+func main(in mode0) {
 
 //	if (mode0.unassigned()) {
 //		mode = "";
@@ -294,7 +294,7 @@ okfail:
 	return 0;
 }
 
-subroutine inputx() {
+subr inputx() {
 	call inputbox(msg, maxlen, show, allowablechars, xdata, escx);
 	return;
 	/*;
@@ -320,7 +320,7 @@ subroutine inputx() {
 	*/
 }
 
-subroutine getsec() {
+subr getsec() {
 	if (not SECURITY.read(DEFINITIONS, "SECURITY")) {
 		SECURITY = "";
 	}

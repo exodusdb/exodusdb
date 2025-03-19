@@ -4,7 +4,7 @@
 #include <exodus/program.h>
 programinit()
 
-function main() {
+func main() {
 
 	var tempdir		 = "t_exotemp746.dir";
 	var tempfilename = tempdir ^ _OSSLASH "temp1";
@@ -349,7 +349,7 @@ function main() {
 		assert(cwd1);
 
 		// Make a new dir
-		var cwd2 = ostempdirpath() ^ "t_cwd_" ^ rnd(99999999) ^ ".dir";
+		var cwd2 = ostempdir() ^ "t_cwd_" ^ rnd(99999999) ^ ".dir";
 		TRACE(cwd2)
 		assert(osmkdir(cwd2));
 
@@ -370,8 +370,8 @@ function main() {
 	}
 
 	{
-		var tempfilename = ostempfilename();
-		assert(tempfilename.starts(ostempdirpath()));
+		var tempfilename = ostempfile();
+		assert(tempfilename.starts(ostempdir()));
 		assert(oswrite("" on tempfilename));
 		TRACE(tempfilename)
 		assert(osremove(tempfilename));
@@ -379,7 +379,7 @@ function main() {
 
 	{
 		printl("Init");
-		var tempfilename = ostempfilename();
+		var tempfilename = ostempfile();
 		TRACE(tempfilename)
 		var testdata = "some test data";
 

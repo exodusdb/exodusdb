@@ -3,7 +3,7 @@ libraryinit()
 
 var params;
 
-function main(in msgno, io msg, in params0 = "") {
+func main(in msgno, io msg, in params0 = "") {
 //	if (params0.unassigned()) {
 //		params = "";
 //	} else {

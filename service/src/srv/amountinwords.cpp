@@ -32,7 +32,7 @@ var temp;
 var unitname;
 var subunitname;
 
-function main(in amountfmlanguage, in currcode0) {
+func main(in amountfmlanguage, in currcode0) {
 
 	comma = "";
 

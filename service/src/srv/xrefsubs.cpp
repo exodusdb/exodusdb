@@ -23,7 +23,7 @@ libraryinit()
 //var wsmsg;
 //var xx;
 
-function main(in mode, in subfn, in masterfilename, io masterfile, in masterfn, io locklist) {
+func main(in mode, in subfn, in masterfilename, io masterfile, in masterfn, io locklist) {
 
 	// also needs
 	// datafile,src.file
@@ -151,7 +151,7 @@ nextbuild:
 	return 0;
 }
 
-subroutine validateupdate(in deleting, in validating, in subfn, in masterfilename, in masterfile, in masterfn, io locklist) {
+subr validateupdate(in deleting, in validating, in subfn, in masterfilename, in masterfile, in masterfn, io locklist) {
 
 	let mastercode = deleting ? req.orec.f(subfn) : RECORD.f(subfn);
 	if (mastercode == "") {
@@ -193,7 +193,7 @@ subroutine validateupdate(in deleting, in validating, in subfn, in masterfilenam
 	return;
 }
 
-subroutine unlockall(io locklist) {
+subr unlockall(io locklist) {
 	call locking("UNLOCKALL", "", "", "", locklist, 0);
 	return;
 }

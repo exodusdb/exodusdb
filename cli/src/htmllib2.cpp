@@ -6,7 +6,7 @@ var params2;
 var tagsep;
 
 //Note that the argument names are not accurate for GETCSS, GETSORTJS, COLROWSPAN, CONVCSS, ADDUNITS, DOCMODS, GETMARK modes
-function main(in mode, io dataio, in params0 = "", in params20 = "", in glang = "") {
+func main(in mode, io dataio, in params0 = "", in params20 = "", in glang = "") {
 
 	// First for speed since called for every column and row
 	if (mode == "ADDUNITS") {
@@ -445,13 +445,13 @@ function main(in mode, io dataio, in params0 = "", in params20 = "", in glang = 
 	return 0;
 }
 
-function getvogonpoetry_sortjs() {
+func getvogonpoetry_sortjs() {
 
 	return
 R"V0G0N(
 <script type="text/javascript">
 gdateformat='d/M/yyyy'
-function sorttable(event)
+func sorttable(event)
 {
  if (document.body.getAttribute('contenteditable'))
   return true
@@ -540,7 +540,7 @@ function sorttable(event)
  QuickSort(rows,coln,fromrown,uptorown);
 }
 
-function QuickSort(rows,coln,min,max){
+func QuickSort(rows,coln,min,max){
 
  if (max<=min) return(true)
 
@@ -583,7 +583,7 @@ if (!document.swapNode) {
 
 }
 
-function getcss(io css, in version = "", in stationery = "") {
+func getcss(io css, in version = "", in stationery = "") {
 
 	//NB quirk in ie mimiced by mozilla table dont inherit size
 	//but work around is TABLE {FONT-SIZE:100%} in css
@@ -693,7 +693,7 @@ function getcss(io css, in version = "", in stationery = "") {
 
 }
 
-function getvogonpoetry_css(in version) {
+func getvogonpoetry_css(in version) {
 
 	if (version.assigned() and version == 2) {
 
@@ -774,7 +774,7 @@ table.hashtable td {padding:0px; margin:0px; text-align:left; vertical-align:top
 
 <script type="text/javascript">
 var togglendisplayed=0
-function toggle(t,mode)
+func toggle(t,mode)
 {
  if (typeof t=='string')
  {
@@ -886,7 +886,7 @@ td.nx {border-top:none;border-bottom:none}
 
 <script type="text/javascript">
 var togglendisplayed=0
-function toggle(t,mode)
+func toggle(t,mode)
 {
  if (typeof t=='string')
  {
@@ -934,7 +934,7 @@ function toggle(t,mode)
 	}
 }
 
-subroutine colrowspan(io colhdg, in thproperties, in nobase0, in basecurrcode) {
+subr colrowspan(io colhdg, in thproperties, in nobase0, in basecurrcode) {
 
 	//called from nlist, adxtab
 
@@ -1059,7 +1059,7 @@ subroutine colrowspan(io colhdg, in thproperties, in nobase0, in basecurrcode) {
 	return;
 }
 
-subroutine convcss(out outx, in tableid, in in0) {
+subr convcss(out outx, in tableid, in in0) {
 
 	//convert <COL ALIGN=RIGHT> to nth-child style
 
@@ -1103,7 +1103,7 @@ subroutine convcss(out outx, in tableid, in in0) {
 	return;
 }
 
-subroutine addunits(in a0, io bb, in sep) {
+subr addunits(in a0, io bb, in sep) {
 
 	//BP  ADXTAB  sm
 	//BP  ANALSCH vm
@@ -1186,7 +1186,7 @@ subroutine addunits(in a0, io bb, in sep) {
 	return;
 }
 
-subroutine docmods(io tx, in stationery) {
+subr docmods(io tx, in stationery) {
 
 	//html2pdf.exe messes up repeating headers on continuation pages
 	//so turn thead into additional tbody
@@ -1209,7 +1209,7 @@ subroutine docmods(io tx, in stationery) {
 	return;
 }
 
-function getmark(in mode, in html, io mark) {
+func getmark(in mode, in html, io mark) {
 	//eg
 	//call getmark('CLIENT',1,clientmark)
 	//call getmark('OWN',1,ownmark)
@@ -1275,7 +1275,7 @@ var link;
 }
 
 // In case refactoring c++ code mangles javascript code
-subroutine replace_literal_comparison_operators(io dataio) {
+subr replace_literal_comparison_operators(io dataio) {
 	dataio.replacer(" == ", " == ");
 	dataio.replacer(" != ", " != ");
 	dataio.replacer(" < ", " < ");

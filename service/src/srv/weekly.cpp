@@ -18,7 +18,7 @@ var diff;			   // num
 var firstdayofyear;	   // num
 var difference;		   // num
 
-function main(in type, in input0, in mode, out output) {
+func main(in type, in input0, in mode, out output) {
 
 	// eg mode is WEEKLY,1/7,1,4
 	// ie year starts on the first monday as near as possible to 1st July
@@ -122,7 +122,7 @@ tryyear:
 	return 0;
 }
 
-subroutine getfirstdateofyear() {
+subr getfirstdateofyear() {
 	firstdateofyear = (firstdate ^ "/" ^ year2).iconv("D2/E");
 
 	// move start of year to nearest start of week

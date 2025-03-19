@@ -33,7 +33,7 @@ void trig_function()
 #include <exodus/program.h>
 programinit()
 
-function main() {
+func main() {
 	trig_function<double>();
 	printl("e says 'Hello World!'");
 	return 0;

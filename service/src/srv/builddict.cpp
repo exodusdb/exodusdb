@@ -24,7 +24,7 @@ var doc;
 var splitline;
 var ln;
 
-function main() {
+func main() {
 
 	filename	 = SENTENCE.field(" ", 2);
 	dictfilename = SENTENCE.field(" ", 3);
@@ -85,7 +85,7 @@ function main() {
 
 }
 
-subroutine definemacro() {
+subr definemacro() {
 	nmacros += 1;
 	macros(1, nmacros) = blockid;
 	splitline		   = blockline.trim();
@@ -95,7 +95,7 @@ subroutine definemacro() {
 	return;
 }
 
-subroutine writedict() {
+subr writedict() {
 
 	block.lowerer();
 	block.trimmerlast(VM);
@@ -208,7 +208,7 @@ subroutine writedict() {
 	return;
 }
 
-subroutine getblock() {
+subr getblock() {
 	blocktype = "";
 	blockid	  = "";
 	blockline = "";

@@ -5,7 +5,7 @@ libraryinit()
 
 var t2;
 
-function main(io tx) {
+func main(io tx) {
 	// c xxx io
 	// TODO consider merging with readcss() perhaps with mode
 
@@ -27,12 +27,12 @@ function main(io tx) {
 	return 0;
 }
 
-function getvogonpoetry() {
+func getvogonpoetry() {
 
 	return R"V0G0N(
 <script type="text/javascript">
 gdateformat='d/M/yyyy'
-function sorttable(event)
+func sorttable(event)
 {
  if (document.body.getAttribute('contenteditable'))
   return true
@@ -121,7 +121,7 @@ function sorttable(event)
  QuickSort(rows,coln,fromrown,uptorown);
 }
 
-function QuickSort(rows,coln,min,max){
+func QuickSort(rows,coln,min,max){
 
  if (max<=min) return(true)
 

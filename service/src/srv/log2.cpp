@@ -8,7 +8,7 @@ var logfile;
 var datax;
 var time2;	// num
 
-function main(in msg0, io time0) {
+func main(in msg0, io time0) {
 
 	let interactive = false;  //not(SYSTEM.f(33));
 	if (interactive) {

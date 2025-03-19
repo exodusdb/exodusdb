@@ -3,7 +3,7 @@ libraryinit()
 
 #include <otherusers.h>
 
-function main(in /*mode*/, in datasetcode, out result) {
+func main(in /*mode*/, in datasetcode, out result) {
 
 	let shutdownfilename = datasetcode.lcase() ^ ".end";
 	if (shutdownfilename.osfile()) {

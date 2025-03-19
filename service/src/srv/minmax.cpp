@@ -4,7 +4,7 @@ libraryinit()
 var bit;
 var term;
 
-function main(in list0, out min, out max) {
+func main(in list0, out min, out max) {
 
 	// find the min and max in a list
 

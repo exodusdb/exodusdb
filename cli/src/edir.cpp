@@ -1,7 +1,7 @@
 #include <exodus/program.h>
 programinit()
 
-function main() {
+func main() {
 
 	//hard coded editor at the moment
 	//http://www.nano-editor.org/docs.php
@@ -66,7 +66,7 @@ function main() {
 	// 2,097,152
 
 	// Create and use a temporary work dir
-	let workdir = ostempdirpath() ^ "~e" ^ rnd(999'999);
+	let workdir = ostempdir() ^ "~e" ^ rnd(999'999);
 	if (not osmkdir(workdir))
 		abort(lasterror());
 
@@ -360,7 +360,7 @@ function main() {
 	return 0;
 }
 
-function getosfilename(in dir, in dbfilename, in fieldno, in id) {
+func getosfilename(in dir, in dbfilename, in fieldno, in id) {
 
 	var temposfilename = dbfilename ^ "~" ^ id;
 	let invalidfilechars = R"__(\"')__" "\u00A3 $%^&*(){}[]:;#<>?,./|";

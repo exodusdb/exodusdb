@@ -44,7 +44,7 @@ var allowduplicate;
 //var wspos;
 //var wsmsg;
 
-function main(in mode) {
+func main(in mode) {
 	// doesnt seem to be any limit on number of files per folder
 	// in ntfs filing system at least under win 2003 server
 	// test wrote 1,000,000 files containing the filenumber 1,2,3 etc in about 5 mins
@@ -670,7 +670,7 @@ nextline:
 	return 0;
 }
 
-subroutine cleanup() {
+subr cleanup() {
 
 	//osfile.osclose();
 	osfilex.osclose();
@@ -682,7 +682,7 @@ subroutine cleanup() {
 	return;
 }
 
-subroutine getline() {
+subr getline() {
 
 	if (buff.len() < lengthx) {
 
@@ -741,7 +741,7 @@ addbuff:
 	return;
 }
 
-subroutine lockfile(in filename) {
+subr lockfile(in filename) {
 	msg = "";
 	if (not file.open(filename, "")) {
 		msg = filename.quote() ^ " file cannot be opened";
@@ -764,12 +764,12 @@ subroutine lockfile(in filename) {
 	return;
 }
 
-subroutine unlockfile(in filename) {
+subr unlockfile(in filename) {
 	call unlockrecord(filename, file, key);
 	return;
 }
 
-subroutine parseline(io line) {
+subr parseline(io line) {
 
 	// preserve escaped quotes
 	line.replacer(_BS _DQ, "&quote;");

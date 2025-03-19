@@ -2,7 +2,7 @@
 
 libraryinit()
 
-function main(in cmd, out errors) {
+func main(in cmd, out errors) {
 
 	// var tempdir=std::experimental::filesystem::temp_directory_path().wstring();
 

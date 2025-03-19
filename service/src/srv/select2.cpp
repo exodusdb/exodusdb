@@ -44,7 +44,7 @@ var postreadmode;
 //var xx;
 var row;
 
-function main(in filenamex, in linkfilename2, in sortselect0, in dictids0, in options0, io datax, io response, in limitfields = "", in limitchecks = "", in limitvalues = "", in maxnrecs0 = 0) {
+func main(in filenamex, in linkfilename2, in sortselect0, in dictids0, in options0, io datax, io response, in limitfields = "", in limitchecks = "", in limitvalues = "", in maxnrecs0 = 0) {
 
 	// NB add %SELECTLIST% to sortselect to use active select list
 	// or provide an FM terminated list of keys
@@ -578,7 +578,7 @@ nextrec:
 	return 0;
 }
 
-subroutine exit() {
+subr exit() {
 	if (commonsaved) {
 		savesrcfile.move(req.srcfile);
 		savedatafile.move(req.datafile);

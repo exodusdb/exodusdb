@@ -5,7 +5,7 @@ libraryinit()
 
 var inx;  // num
 
-function main(in type, in in0, in /*mode*/, out outx) {
+func main(in type, in in0, in /*mode*/, out outx) {
 
 	// CALLED
 	// /////

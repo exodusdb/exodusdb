@@ -32,7 +32,7 @@ libraryinit()
 //var wspos;
 //var wsmsg;
 
-function main(in mode0) {
+func main(in mode0) {
 
 	// nb general.subs can only be called from programs with req_common.h
 	// because msg etc are common variables and must be defined in caller
@@ -164,7 +164,7 @@ next:
 	return 0;
 }
 
-function getdatasets() {
+func getdatasets() {
 
 	var dospath = oscwd().first(2) ^ "../data/";
 	dospath.converter("/", OSSLASH);
@@ -229,7 +229,7 @@ function getdatasets() {
 	return datasetcodes;
 }
 
-subroutine getuserdept2(in usercode) {
+subr getuserdept2(in usercode) {
 
 	// Locate the user in the table otherwise department is ""
 	var usern0;

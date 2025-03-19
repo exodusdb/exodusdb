@@ -1,7 +1,7 @@
 #ifndef SERVICE_SRC_SRV_SRV_COMMON_H_
 #define SERVICE_SRC_SRV_SRV_COMMON_H_
 
-#include <exodus/common2.h>
+#include <exodus/common.h>
 
 commoninit(srv)
 
