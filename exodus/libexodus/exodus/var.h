@@ -173,6 +173,8 @@ public:
 	//  // or
 	//  var v3 = or_default(v1, "abc");`
 	//
+	// Mutator: defaulter()
+	//
 	ND var or_default(in defaultvalue) const;
 
 	// If the var is unassigned then assign the default value to it, otherwise do nothing.
@@ -528,14 +530,14 @@ public:
 	ND var  str(const int num) const;
 
 	// Get a string containing a given number of spaces.
-	// var: The number of spaces required.
+	// nspaces: The number of spaces required.
 	// Returns: A string of space chars.
-	// obj is varnum
+	// obj is var()
 	//
-	// `let v1 = var(3).space(); // "␣␣␣"
+	// `let v1 = var::space(3); // "␣␣␣"
 	//  // or
 	//  let v2 = space(3);`
-	ND var  space() const;
+	ND static var  space(const int nspaces);
 
 	// Returns: A string representing a given number written in words instead of digits.
 	// locale: e.g. en_GB, ar_AE, el_CY, es_US, fr_FR etc or a language name e.g. "french".
@@ -3401,7 +3403,7 @@ public:
 	// ASCII only.
 	// obj is varstr
 	//
-	// `var v1 = "Have a nice day";
+	// `let v1 = "Have a nice day";
 	//  assert(  v1.oconv("T#10") == "Have a␣␣␣␣|nice day␣␣"_var);
 	//  // or
 	//  assert( oconv(v1, "T#10") == "Have a␣␣␣␣|nice day␣␣"_var );`
@@ -3448,7 +3450,7 @@ public:
 	//
 	// `let v1 = var("255").oconv("MX"); // "FF"
 	//  // or
-	//  let v2 = oconv(var("255"), "MX");`
+	//  let v2 = oconv(255, "MX");`
 	//
 	ND var oconv_MX() const;
 
@@ -3458,7 +3460,7 @@ public:
 	//
 	// `let v1 = "FFFF"_var.iconv("MX"); // 65'535
 	//  // or
-	//  let v2 = iconv("FFFF"_var, "MX");`
+	//  let v2 = iconv("FFFF", "MX");`
 	//
 	ND var iconv_MX() const;
 
@@ -3468,39 +3470,51 @@ public:
 	//
 	// `let v1 = var(255).oconv("MB"); // 1111'1111
 	//  // or
-	//  let v2 = oconv(var(255), "MB");`
+	//  let v2 = oconv(255, "MB");`
 	//
 	ND var oconv_MB() const;
 */
 
 	// Convert dynamic arrays to standard text format.
 	// Useful for using text editors on dynamic arrays.
-	// FMs -> NL after escaping any embedded NL
+	// FMs -> \n after escaping any embedded NL
+	// VMs -> literal "\" \n
+	// SMs -> literal "\\" \n
+	// etc.
 	// obj is varstr
 	//
-	// `  // backslash in text remains backslash
-	//    assert(var(_BS).oconv("TX") == _BS);
+	// `// 1. Backslash in text remains backslash
 	//
-	//    // 1. Double escape any _BS "n" -> _BS _BS "n"
-	//    assert(var(_BS "n").oconv("TX") == _BS _BS "n");
+	//  let v1 = var(_BS).oconv("TX");     // _BS
 	//
-	//    // 2. Single escape any _NL -> _BS "n"
-	//    assert(var(_NL).oconv("TX") == _BS "n");
+	//  // 2. Literal "\n" -> literal "\\n" (Double escape any escaped NL chars)
 	//
-	//    // 3. FMs -> _NL (⏎)
-	//    assert("🌍^🌍"_var.oconv("TX") == "🌍" _NL "🌍");
+	//  let v2 = var(_BS "n").oconv("TX"); // _BS _BS "n"
 	//
-	//    // 4. VMs -> _BS _NL (\⏎)
-	//    assert("🌍]🌍"_var.oconv("TX") == "🌍" _BS _NL "🌍");
+	//  // 3. \n becomes literal "\n" (Single escape any NL chars)
 	//
-	//    // 5. SMs -> _BS _BS _NL (\\⏎)
-	//    assert("🌍}🌍"_var.oconv("TX") == "🌍" _BS _BS _NL "🌍");
+	//  let v3 = var(_NL).oconv("TX");     // _BS "n"
 	//
-	//    // 6. TMs -> _BS _BS _BS _NL (\\\⏎)
-	//    assert("🌍|🌍"_var.oconv("TX") == "🌍" _BS _BS _BS _NL "🌍");
+	//  // 4. FM -> \n
 	//
-	//    // 7. STs -> _BS _BS _BS _BS _NL (\\\\⏎)
-	//    assert("🌍~🌍"_var.oconv("TX") == "🌍" _BS _BS _BS _BS _NL "🌍");`
+	//  let v4 = "f1^f2"_var.oconv("TX");  // "f1" _NL "f2"
+	//
+	//  // 5. VM -> "\" \n
+	//
+	//  let v5 = "v1]v2"_var.oconv("TX");  // "v1" _BS _NL "v2"
+	//
+	//  // 6. SM -> "\\" \n
+	//
+	//  let v6 = "s1}s1"_var.oconv("TX");  // "s2" _BS _BS _NL "s2"
+	//
+	//  // 7. TM -> "\\\" \n
+	//
+	//  let v7 = "t1|t2"_var.oconv("TX");  // "t1" _BS _BS _BS _NL "t2"
+	//
+	//  // 8. STs -> "\\\\" \n
+	//
+	//  let v8 = "st1~st2"_var.oconv("TX"); // "st1" _BS _BS _BS _BS _NL "st2"`
+	//
 	ND std::string oconv_TX(const char* conversion) const;
 
 	// Convert standard text format to dynamic array.

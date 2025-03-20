@@ -312,7 +312,7 @@ ND PUBLIC var  search(in instring, const rex& regex) {return instring.search(reg
 ND PUBLIC var  seq(in char1) {return char1.seq();}
 ND PUBLIC var  textseq(in char1) {return char1.textseq();}
 ND PUBLIC var  str(in instring, const int number) {return instring.str(number);}
-ND PUBLIC var  space(const int number) {return var(number).space();}
+ND PUBLIC var  space(const int nspaces) {return var::space(nspaces);}
 ND PUBLIC var  fcount(in instring, SV substr) {return instring.fcount(substr);}
 ND PUBLIC var  count(in instring, SV substr) {return instring.count(substr);}
 

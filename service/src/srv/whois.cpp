@@ -66,7 +66,7 @@ func main(in /*mode*/, in ipno, out text) {
 	allowedips.converter(_FM _VM
 						 ","
 						 "\r\n",
-						 var(100).space());
+						 space(100));
 	if (allowedips.locateusing(" ", ipno)) {
 returnzero:
 		text = "0";

@@ -19,7 +19,7 @@ func main(in filename, in indexid, in texts0, io msg) {
 	// analogous code whereever allpunctuation is used
 	// ED BP LISTSCHED AGENCY.SUBS SCHEDULES.DICT
 	let allpunctuation = SYSTEM.f(130);
-	texts.converter(allpunctuation, var(50).space());
+	texts.converter(allpunctuation, space(50));
 	var temp = texts.trim();
 
 	temp.replacer(" ", "&");

@@ -416,7 +416,7 @@ ND var  search(in instring, const rex& regex);
 ND var  seq(in char1);
 ND var  textseq(in char1);
 ND var  str(in instring, const int number);
-ND var  space(const int number);
+ND var  space(const int nspaces);
 ND var  fcount(in instring, SV substr);
 ND var  count(in instring, SV substr);
 

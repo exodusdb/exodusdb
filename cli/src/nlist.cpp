@@ -1382,7 +1382,7 @@ x1exit:
 	// Heading options
 
 	if (head == "" and not(rawtable)) {
-		head = filename ^ var(10).space() ^ " 'T'";
+		head = filename ^ space(10) ^ " 'T'";
 	}
 
 	if (html) {
@@ -2410,7 +2410,8 @@ subr addstr() {
 
 	str3 = str2;
 	if (str3.len() < str1.len()) {
-		str3 ^= (str1.len() - str2.len()).space();
+//		str3 ^= (str1.len() - str2.len()).space();
+		str3 ^= var::space(str1.len() - str2.len());
 	}
 	for (int ii = 1; ii <= str1.len(); ++ii) {
 		char1 = (str1.at(ii)).trim();

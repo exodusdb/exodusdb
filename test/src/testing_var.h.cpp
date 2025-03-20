@@ -332,9 +332,9 @@ func main() {
 		let v2 = str("ab", 3);
 	}
 
-	printl("space() const;");
+	printl("space(const int nspaces);");
 	{
-		let v1 = var(3).space();
+		let v1 = var::space(3);
 		assert(v1 == "   ");
 
 		// or
@@ -2367,7 +2367,7 @@ func main() {
 
 	printl("oconv_T(in format) const;");
 	{
-		var v1 = "Have a nice day";
+		let v1 = "Have a nice day";
 		assert(  v1.oconv("T#10") == "Have a    |nice day  "_var);
 
 		// or
@@ -2407,7 +2407,7 @@ func main() {
 		assert(v1 == "FF");
 
 		// or
-		let v2 = oconv(var("255"), "MX");
+		let v2 = oconv(255, "MX");
 	}
 
 	printl("iconv_MX() const;");
@@ -2416,7 +2416,7 @@ func main() {
 		assert(v1 == 65'535);
 
 		// or
-		let v2 = iconv("FFFF"_var, "MX");
+		let v2 = iconv("FFFF", "MX");
 	}
 
 	printl("oconv_MB() const;");
@@ -2425,27 +2425,37 @@ func main() {
 		assert(v1 == 1111'1111);
 
 		// or
-		let v2 = oconv(var(255), "MB");
+		let v2 = oconv(255, "MB");
 	}
 
 	printl("oconv_TX(const char* conversion) const;");
 	{
-		  // backslash in text remains backslash
-		  assert(var(_BS).oconv("TX") == _BS);
-		  // 1. Double escape any _BS "n" -> _BS _BS "n"
-		  assert(var(_BS "n").oconv("TX") == _BS _BS "n");
-		  // 2. Single escape any _NL -> _BS "n"
-		  assert(var(_NL).oconv("TX") == _BS "n");
-		  // 3. FMs -> _NL (⏎)
-		  assert("🌍^🌍"_var.oconv("TX") == "🌍" _NL "🌍");
-		  // 4. VMs -> _BS _NL (\⏎)
-		  assert("🌍]🌍"_var.oconv("TX") == "🌍" _BS _NL "🌍");
-		  // 5. SMs -> _BS _BS _NL (\\⏎)
-		  assert("🌍}🌍"_var.oconv("TX") == "🌍" _BS _BS _NL "🌍");
-		  // 6. TMs -> _BS _BS _BS _NL (\\\⏎)
-		  assert("🌍|🌍"_var.oconv("TX") == "🌍" _BS _BS _BS _NL "🌍");
-		  // 7. STs -> _BS _BS _BS _BS _NL (\\\\⏎)
-		  assert("🌍~🌍"_var.oconv("TX") == "🌍" _BS _BS _BS _BS _NL "🌍");
+		// 1. Backslash in text remains backslash
+		let v1 = var(_BS).oconv("TX");     // _BS
+		// 2. Literal "\n" -> literal "\\n" (Double escape any escaped NL chars)
+		let v2 = var(_BS "n").oconv("TX"); // _BS _BS "n"
+		// 3. \n becomes literal "\n" (Single escape any NL chars)
+		let v3 = var(_NL).oconv("TX");     // _BS "n"
+		// 4. FM -> \n
+		let v4 = "f1^f2"_var.oconv("TX");
+		assert(v4 == "f1" _NL "f2");
+
+		// 5. VM -> "\" \n
+		let v5 = "v1]v2"_var.oconv("TX");
+		assert(v5 == "v1" _BS _NL "v2");
+
+		// 6. SM -> "\\" \n
+		let v6 = "s1}s1"_var.oconv("TX");
+		assert(v6 == "s2" _BS _BS _NL "s2");
+
+		// 7. TM -> "\\\" \n
+		let v7 = "t1|t2"_var.oconv("TX");
+		assert(v7 == "t1" _BS _BS _BS _NL "t2");
+
+		// 8. STs -> "\\\\" \n
+		let v8 = "st1~st2"_var.oconv("TX");
+		assert(v8 == "st1" _BS _BS _BS _BS _NL "st2");
+
 	}
 
 ////////////////

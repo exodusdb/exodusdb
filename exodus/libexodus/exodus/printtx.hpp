@@ -374,7 +374,8 @@ subroutine convoptions(io ptx_temp) {
 					spaceoptionsize ^= optionchars.at(i_ + 1);
 					i_ += 1;
 				}
-				newoptions ^= spaceoptionsize.space();
+//				newoptions ^= spaceoptionsize.space();
+				newoptions ^= space(spaceoptionsize);
 			}
 		}	//i_;
 		//ptx_temp[optioncharn,-len(optionchars)-2]=newoptions

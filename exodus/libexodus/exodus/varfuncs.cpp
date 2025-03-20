@@ -1702,17 +1702,17 @@ var  var::str(const int num) const {
 	return newstr;
 }
 
-var  var::space() const {
+var  var::space(const int nspaces) {
 
-	THISIS("var  var::space() const")
-	assertNumeric(function_sig);
+	THISIS("var  var::space() static")
+//	assertNumeric(function_sig);
 
-	var newstr = "";
-	int nspaces = this->round().toInt();
+	var nrvo;
+	nrvo.var_typ = VARTYP_STR;
 	if (nspaces > 0)
-		newstr.var_str.resize(nspaces, ' ');
+		nrvo.var_str.resize(nspaces, ' ');
 
-	return newstr;
+	return nrvo;
 }
 
 
