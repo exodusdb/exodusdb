@@ -293,6 +293,9 @@ func main() {
 //			// response_.move(RECORD);
 //			srcline.replacer(R"__(([_\w.\[\]]+)\.move\(([_\w.\[\]]+)\);)__"_rex, "$2 = $1\\.move\\(\\);");
 
+			srcline.replacer(R"__(ostempdirpath()__", "ostempdir(");
+			srcline.replacer(R"__(ostempfilename()__", "ostempfile(");
+
 			srcline.replacer(R"__(makelist("", )__", "selectkeys(");
 			srcline.replacer(R"__(field2()__", "field(");
 

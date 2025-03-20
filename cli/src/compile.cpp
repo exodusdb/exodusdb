@@ -1204,19 +1204,19 @@ ENVIRONMENT
 				return;
 			}
 
-			{ // hotfixing src
-				let orig_text = text;
-//				text.replacer(R"__(^function )__"_rex, "func ");
-//				text.replacer(R"__(^subroutine )__"_rex, "subr ");
-				text.replacer("ostempfile", "ostempfile");
-				text.replacer("ostempdir", "ostempdir");
-				if (text ne orig_text) {
-					if (oswrite(text on srcfilename, locale))
-						srcfilename.logputl("Hotfix ostempfile/dir:");
-					else
-						loglasterror();
-				}
-			}
+//			{ // hotfixing src
+//				let orig_text = text;
+////				text.replacer(R"__(^function )__"_rex, "func ");
+////				text.replacer(R"__(^subroutine )__"_rex, "subr ");
+////				text.replacer("ostempfile", "ostempfile");
+////				text.replacer("ostempdir", "ostempdir");
+//				if (text ne orig_text) {
+//					if (oswrite(text on srcfilename, locale))
+//						srcfilename.logputl("Hotfix ostempfile/dir:");
+//					else
+//						loglasterror();
+//				}
+//			}
 
 			// Determine if program or subroutine/function
 			// and decide compile/link options
