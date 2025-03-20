@@ -70,9 +70,15 @@ programinit()
 func main() {
 
 	// "i" - inline source code
-	// or 1st arg end with a ";" or contains a "("
-	if (OPTIONS.contains("i") or COMMAND.f(2).ends(";") or COMMAND.f(2).contains("("))
+	// "`~!@#$%^&*()_+-=[]\{}|;':",./<>?"
+	//	var ascii = "!\"#$%&'()*+,-./:;<=>?@[\]^_`{|}~";
+
+	// Option "i" - inline/immediate compilation
+	// or if "filename" contains non-alphanumeric chars (except . / - _ ~)
+	if (OPTIONS.contains("i") or not COMMAND.f(2).replace("[[:alnum:]]"_rex, "").convert("./-_~", "").empty()) {
+//    if (OPTIONS.contains("i") or not COMMAND.f(2).match("[^[:alnum:]]").match("[^./-_~]").empty())
 		return gosub oneline_compile();
+	}
 
 	// Get more options from environment and possibly the second word of the command
 	var options = OPTIONS ^ osgetenv("EXO_COMPILE_OPTIONS");
@@ -1198,17 +1204,19 @@ ENVIRONMENT
 				return;
 			}
 
-//			{ // hotfixing src
-//				let orig_text = text;
+			{ // hotfixing src
+				let orig_text = text;
 //				text.replacer(R"__(^function )__"_rex, "func ");
 //				text.replacer(R"__(^subroutine )__"_rex, "subr ");
-//				if (text ne orig_text) {
-//					if (oswrite(text on srcfilename, locale))
-//						srcfilename.logputl("Hotfix func/subr:");
-//					else
-//						loglasterror();
-//				}
-//			}
+				text.replacer("ostempfile", "ostempfile");
+				text.replacer("ostempdir", "ostempdir");
+				if (text ne orig_text) {
+					if (oswrite(text on srcfilename, locale))
+						srcfilename.logputl("Hotfix ostempfile/dir:");
+					else
+						loglasterror();
+				}
+			}
 
 			// Determine if program or subroutine/function
 			// and decide compile/link options

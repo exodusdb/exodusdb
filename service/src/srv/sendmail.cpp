@@ -530,7 +530,7 @@ forcedemail:
 			// TRACE(headers)
 
 			// Output the headers
-			let tempfilename = var().ostempfilename();
+			let tempfilename = var::ostempfile();
 			//oswrite(headers, tempfilename);
 			if (not oswrite(headers, tempfilename)) {
 				abort(lasterror());
