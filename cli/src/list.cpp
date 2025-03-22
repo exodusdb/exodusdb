@@ -10,20 +10,19 @@ func main() {
 	// EITHER 1. Call/perform nlist library if paging is not required
 	/////////////////////////////////////////////////////////////////
 
-	var listid = "";
-	if (not locate("lists", COMMAND)) {
-		listid = "default";
-		if (not getlist(listid))
-			listid = "";
-		else
-			logputl("Using select list ", listid);
-	}
-
 	if (not TERMINAL or OPTIONS.contains("N")) {
 
-		//call nlist();
+		// TODO Consume the list immediately.
+		// and dont rely on calling deletelist in exit which will not be called in case of abort
+		var listid = "";
+		if (not locate("lists", COMMAND)) {
+			listid = "default";
+			if (not getlist(listid))
+				listid = "";
+			else
+				logputl("Using select list ", listid);
+		}
 
-		//TRACE(SENTENCE)
 		// Change list into nlist in order to call the nlist library
 		let result = perform("n" ^ SENTENCE);
 
@@ -37,8 +36,6 @@ func main() {
 	// OR 2. re-execute within an output pager
 	//////////////////////////////////////////
 
-	// Switch off TERMINAL
-	//var oscmd = "TERM=";
 	var oscmd = "";
 
 	// Prepare a bash command
@@ -74,22 +71,14 @@ func main() {
 	}
 
 	// Add any options and NOPAGE option
-	//if (OPTIONS)
-		oscmd ^= "{N"^ OPTIONS ^ "}";
+	oscmd ^= "{N"^ OPTIONS ^ "}";
 
 	// Pipe into pager
 	oscmd ^= " | pager --chop-long-lines --quit-if-one-screen";
-	//oscmd ^= "";
 
-	// TODO find some way to avoid having to clean up list
-	// deletelist in the beginning doesnt work.
-//	if (not osshell(oscmd))
-//		abort(lasterror());
+	// osshell
 	var result = osshell(oscmd);
 	var lasterrorx = lasterror();
-
-	if (listid)
-		deletelist(listid);
 
 	if (not result)
 		abort(lasterrorx);
