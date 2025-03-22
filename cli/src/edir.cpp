@@ -1,6 +1,25 @@
 #include <exodus/program.h>
 programinit()
 
+let syntax =
+"NAME"
+"\n	edir - Edit records"
+"\n"
+"\nSYNOPSIS"
+"\n	edir DBFILENAME [KEYS,...] [FIELDNO] {OPTIONS}"
+"\n	edir OSFILEPATH [LINENO] {OPTIONS}"
+"\n"
+"\nDESCRIPTION"
+"\n	Allows editing exodus database records using a standard text editor."
+"\n	Keys is optional for dict. files. All keys will be edited."
+"\n	Keys is optional if a default select list available."
+"\n	Multiple keys must be separated by commas, not spaces."
+"\n	Keys with spaces in them must be quoted."
+"\n"
+"\nOPTIONS"
+"\n	R	Show raw VM, SM etc."
+"\n	T	Print to standard output (terminal)";
+
 func main() {
 
 	//hard coded editor at the moment
@@ -19,43 +38,40 @@ func main() {
 	// (R)aw option only converts FM to NL and leaves VM SM TM ST untouched
 	let txtfmt = OPTIONS.contains("R") ? "TX1" : "TX";
 
-	// Try to activate a default select list if no keys provided
-	var listid = "";
-	if (not COMMAND.f(3) and COMMAND.f(2) ne "DOS") {
-		listid = "default";
-		if (getlist(listid))
-			logputl("Using list: ", listid);
-		else
-			listid = "";
-	}
-
-	//quit if arguments missing. IDs is optional if a select is available
-	if (not dbfilename or (not keys and listid.empty()))
-		abort(
-			"Syntax is:"
-			"\nedir DBFILENAME KEYS,... [FIELDNO]"
-			"\nor"
-			"\nedir OSFILEPATH [LINENO] [OPTIONS]"
-			"\n"
-			"\nMultiple keys must be separated by commas, not spaces."
-			"\nKeys with spaces in them must be quoted."
-			"\n"
-			"\nOPTION 'R' = Show raw tm/sm etc."
-			"\nOPTION 'T' = Print to standard output (terminal)"
-		);
+	if (not dbfilename)
+		abort(syntax);
 
 	if (not fieldno.isnum())
 		abort("fieldno must be numeric");
 
-	//connect to the database
-	//if (not connect())
-	//	stop("Please login");
-
-	//check the dbfile exists
+	// Check the dbfile exists
 	var dbfile;
-	if (not open(dbfilename, dbfile))
-//		abort("Cannot open db file " ^ dbfilename);
+	if (not open(dbfilename to dbfile))
 		abort(lasterror());
+
+	// Try to activate a default select list if no keys provided
+	var listid = "";
+	if (not keys) {
+		listid = "default";
+		if (getlist(listid))
+			logputl("Using list: ", listid);
+		else {
+			listid = "";
+
+			// Auto edit dict file
+			if (dbfilename.starts("dict.")) {
+				var cmd = dbfilename;
+				if (dbfilename == "dict.all")
+					cmd ^= " BY FILE_NAME";
+				cmd ^= " by TYPE by FMC by PART by MASTER_FLAG";
+				select(cmd);
+			}
+		}
+	}
+
+	// Quit if not keys, no select list and not a dict
+	if (not keys and not hasnext())
+		abort(syntax);
 
 	// If ID from command line
 	if (keys)
