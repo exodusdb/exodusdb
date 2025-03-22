@@ -454,8 +454,16 @@ func main() {
 					// IMPLICT ASSERTS
 					// e.g. '   let|var v1 = xxxxxxx ; // "X" // zzzz' where zzzz can be a literal number 9999, "xxx", true or false
 					//      '1112222222 3344444444444     55556666666'
-					static rex rex3 = rex(R"__(^(\s*)(let|var)\s+([a-z0-9A-Z_]+)([^\n]*?);[ \t]*//\s+(true|false|["0-9.-][^\n]*?)([ \t]//[^\n]*?)?$)__", "m");
-					codematch.replacer(rex3, "$1$2 $3$4; assert\\($3 == $5\\);$6");
+//					static rex rex3 = rex(R"__(^(\s*)(let|var)?\s+([a-z0-9A-Z_]+) = ([^\n]*?);[ \t]*//\s+(true|false|["0-9.-][^\n]*?)([ \t]//[^\n]*?)?$)__", "m");
+					static rex rex3 = rex(R"__(^(\s*)(let|var)\s+([a-z0-9A-Z_]+) = ([^\n]*?);[ \t]*//\s+(true|false|["0-9.-][^\n]*?)([ \t]//[^\n]*?)?$)__", "m");
+
+//					codematch.replacer(rex3, "\t$1$2 $3$4; assert\\($3 == $5\\);$6");
+					codematch.replacer(rex3, "\t\t$2 $3 = $4; assert\\($3 == $5\\);$6");
+
+					// e.g. '           v1 = xxxxxxx ; // "X" // zzzz' where zzzz can be a literal number 9999, "xxx", true or false
+					//      '1112222222 3344444444444     55556666666'
+					static rex rex3b = rex(R"__(^(\s*)()([a-z0-9A-Z_]+) = ([^\n]*?);[ \t]*//\s+(true|false|["0-9.-][^\n]*?)([ \t]//[^\n]*?)?$)__", "m");
+					codematch.replacer(rex3b, "\t\t$2$3 = $4; assert\\($3 == $5\\);$6");
 
 					// ARROW ASSERTS
 					//        if (not field.readf(file, key, fieldno)) abort("readf" ": " ^ lasterror()); // field -> "G"
@@ -504,7 +512,7 @@ func main() {
 					new_objs = "";
 
 					// Move rhs asserts onto separate lines
-					codematch.replacer(rex(R"__(;\s*assert([^\n;]*))__"), ";\n\t\tassert\\1\n");
+//					codematch.replacer(rex(R"__(;\s*assert([^\n;]*))__"), ";\n\t\tassert\\1\n\t");
 
 					// Tidy up
 					codematch.replacer(rex(R"__(\n;)__"), ";\n");
@@ -751,6 +759,7 @@ func main() {
 						func_decl = func_decl0;
 
 					if (is_static)
+						// var(). -> var::
 						func_decl.replacer("().", "::");
 				}
 
@@ -884,9 +893,10 @@ func main() {
 				doc_body.replacer("&bsol;", "\\");
 				doc_body.replacer("\\", "\\" "\\");
 
+				// Emphasise/highlight leading words xxxxxxx:
 	//			comments.replacer("Returns: ", "/fbReturns:/fr ");
 	//			doc_body.replacer("^([a-zA-Z0-9_.]+): "_rex, R"__(\\fI$1:\\fR )__");
-				doc_body.replacer(R"__(^([a-zA-Z0-9_.]+):(\s+))__"_rex, R"__(\\fB$1:\\fR$2)__");
+				doc_body.replacer(R"__(^([a-zA-Z0-9_."]+):(\s+))__"_rex, R"__(\\fB$1:\\fR$2)__");
 
 				// Man page codes
 				// .RS Right shift
