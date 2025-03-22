@@ -6,13 +6,13 @@ func main() {
 	var filename = COMMAND.f(2);//field(SENTENCE, " ", 2).lcase();
 	if (filename && not filename.starts("dict."))
 		filename = "dict." ^ filename;
-	//perform("list " ^ dictfilename ^ " by type \"F\" by FMC by PART");
 
-	//list the dictionary filenames if none provided
+	// List the dictionary filenames if none provided
 	if (not filename) {
 
-		//copy of rules in mvdbpostgres.cpp
+		// Copy of rules in mvdbpostgres.cpp
 		var dictdb = "";
+
 		//dictdb.osgetenv("EXO_DICT");
 		if (not dictdb.osgetenv("EXO_DICT")) {
 			//null
@@ -23,8 +23,7 @@ func main() {
 		}
 		var conn;
 		if (not conn.connect(dictdb)) {
-			//connect to default db
-			//conn.connect();
+			// Connect to default db
 			if (not conn.connect()) {
 				abort(lasterror());
 			}
@@ -39,8 +38,6 @@ func main() {
 //		if (not conn.connect(dictdb)) {
 //			abort();
 
-
-
 		var dictfilenames = "";
 		let filenames = conn.listfiles();
 		for (var filename : filenames) {
@@ -54,7 +51,7 @@ func main() {
 
 	}
 
-	var cmd = "nlist " ^ filename;
+	var cmd = "list " ^ filename;
 
 	if (filename == "dict.all")
 		cmd ^= " ID-SUPP FILE_NAME FIELD_NAME @CRT BY FILE_NAME";
@@ -67,8 +64,9 @@ func main() {
 	if (OPTIONS.contains("V"))
 		logputl(cmd);
 
-//	if (not osshell(cmd))
-	if (not perform(cmd))
+	// osshell "list" not perform "nlist"
+	// because list adds paging on terminals
+	if (not osshell(cmd))
 		lasterror().errputl("listdict:");
 
 	return 0;
