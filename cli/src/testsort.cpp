@@ -15,7 +15,7 @@ func main() {
 	if (not connect())
 		abort("Cannot connect to database. Please check configuration or run configexodus.");
 
-	//begintrans();
+	// Skip transactions so that any data remains for demo purposes even if there is any error
 //	if (not begintrans())
 //		abort(lasterror());
 
@@ -165,9 +165,14 @@ func main() {
 //	if (use_perform)
 //		perform(cmd);
 //	else
-	if (not osshell(cmd))
+	try {
+		if (not osshell(cmd))
+			loglasterror();
+	} catch (VarError e) {
+		// Hack to avoid
+		// /root/lib/libdict_voc.so does not exist or cannot be found, or libdict_voc.so cannot be linked/wrong version? - Aborting.
 		loglasterror();
-
+	}
 	if (cleanup) {
 		printl("\nCleaning up. Delete the files");
 		if (var().open(filename) and not deletefile(file)) {
@@ -221,6 +226,7 @@ subr sortselect(in file, in sortselectclause) {
 	printl("\nList the file using ", quote(cmd));
 	if (use_perform)
 		perform("n" ^ cmd);
+
 	else if (not osshell(cmd))
 		loglasterror();
 
