@@ -243,6 +243,13 @@ func main() {
 		let v2 = textchr(171416);
 	}
 
+	printl("textchrname(const int unicode_code_point);");
+	{
+				let v1 = var::textchrname(91); assert(v1 == "LEFT SQUARE BRACKET");
+		// or
+		let v2 = textchrname(91);
+	}
+
 	var varstr;
 
 	printl("str(const int num) const;");

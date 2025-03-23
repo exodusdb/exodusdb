@@ -546,13 +546,22 @@ public:
 
 	// Get a Unicode character given a Unicode Code Point (Number)
 	// Returns: A single Unicode character in UTF8 encoding.
-	// To get UTF code points > 2^63 you must provide negative ints because var doesnt provide an implicit constructor to unsigned int due to getting ambigious conversions because int and unsigned int are parallel priority in c++ implicit conversions.
 	//
 	// `let v1 = var::textchr(171416); // "𩶘" // or "\xF0A9B698"
 	//  // or
 	//  let v2 = textchr(171416);`
 	//
 	ND static var  textchr(const int num);
+
+	// Get a Unicode character name
+	// unicode_code_point: 0 - 0x10FFFF.
+	// Returns: Text of the name or "" if not a valid Unicode Code Point
+	//
+	// `let v1 = var::textchrname(91); // "LEFT SQUARE BRACKET"
+	//  // or
+	//  let v2 = textchrname(91);`
+	//
+	ND static var  textchrname(const int unicode_code_point);
 
 	// Get a string of repeated substrings.
 	// var: The substring to be repeated
@@ -610,6 +619,7 @@ public:
 	// Get the char number of a char
 	// Returns: A number between 0 and 255.
 	// If given a string, then only the first char is considered.
+	// Equivalent to ord() in php
 	//
 	// `let v1 = "abc"_var.seq(); // 0x61 // decimal 97, 'a'
 	//  // or
@@ -619,7 +629,8 @@ public:
 
 	// Get the Unicode Code Point of a Unicode character.
 	// var: A UTF-8 string. Only the first Unicode character is considered.
-	// Returns: A number.
+	// Returns: A number 0 to 0x10FFFF.
+	// Equivalent to ord() in python and ruby, mb_ord() php.
 	//
 	// `let v1 = "Γ"_var.textseq(); // 915 // U+0393: Greek Capital Letter Gamma (Unicode character)
 	//  // or
@@ -1590,7 +1601,7 @@ public:
 
 	// obj is strvar
 
-	// Converts from codepage encoded text to UTF-8 encoded text
+	// Converts from codepage encoded text to UTF-8 encoded exodus text
 	// e.g. Codepage "CP1124" (Ukrainian).
 	// Use Linux command "iconv -l" for complete list of code pages and encodings.
 	//
@@ -1601,7 +1612,7 @@ public:
 	//
 	ND var  from_codepage(const char* codepage) const;
 
-	// Converts to codepage encoded text from UTF-8 encoded text
+	// Converts to codepage encoded text from exodus UTF-8 encoded text
 	//
 	// `let v1 = "Є"_var.to_codepage("CP1124").oconv("HEX"); // "A4"
 	//  // or
@@ -2717,7 +2728,7 @@ public:
 
 	// Initialises an os file handle var that can be used for random read and write
 	// osfilename: The name of an existing os file name including path.
-	// utf8: Defaults to true which causes trimming of partial utf-8 Unicode byte sequences from the end of osbreads. For raw untrimmed osbreads pass tf8 = false;
+	// utf8: Defaults to true which causes trimming of partial UTF-8 Unicode byte sequences from the end of osbreads. For raw untrimmed osbreads pass tf8 = false;
 	// osfilevar: [out] To be used in subsequent calls to osbread() and osbwrite()
 	// Returns: True if successful or false if not possible for any reason. e.g. Target doesnt exist, permissions etc.
 	// The file will be opened for writing if possible otherwise for reading.
@@ -2770,7 +2781,7 @@ public:
 	// Create a complete os file from a var.
 	// strvar: The text or data to be used to create the file.
 	// osfilename: Absolute or relative path and filename to be written. Any existing os file is removed first.
-	// codepage: If specified then output is converted from utf-8 to that codepage before being written. Otherwise no conversion is done.
+	// codepage: If specified then output is converted from UTF-8 to that codepage before being written. Otherwise no conversion is done.
 	// Returns: True if successful or false if not possible for any reason. e.g. Path is not writeable, permissions etc.
 	//
 	// `let text = "aaa = 123\nbbb = 456";
@@ -2783,7 +2794,7 @@ public:
 
 	// Read a complete os file into a var.
 	// osfilename: Absolute or relative path and filename to be read.
-	// codepage: If specified then input is converted from that codepage to utf-8 after being read. Otherwise no conversion is done.
+	// codepage: If specified then input is converted from that codepage to UTF-8 after being read. Otherwise no conversion is done.
 	// strvar: [out] is currently set to "" in case of any failure but this is may be changed in a future release to either force var to be unassigned or to leave it untouched. To guarantee future behaviour either add a line 'xxxx.defaulter("")' or set var manually in case osread() returns false. Or use the one argument free function version of osread() which always returns "" in case of failure to read.
 	// Returns: True if successful or false if not possible for any reason. e.g. File doesnt exist, insufficient permissions etc.
 	//

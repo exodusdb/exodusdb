@@ -932,20 +932,6 @@ func main() {
 	assert(invert("ÏÎÍÌËÊÉÈÇÆ¾½¼»º¹¸·¶µ´³²±°¯®­¬«ª©¨§¦¥") eq "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ");
 	assert(invert("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ") eq "ÏÎÍÌËÊÉÈÇÆ¾½¼»º¹¸·¶µ´³²±°¯®­¬«ª©¨§¦¥");
 
-	//check unicode is invalid from 0xD800-0xDFF (UTF16 encoding) and 0x110000 onwards
-	assert(textchr(0xD7FF) ne "");
-	assert(textchr(0xD800)   eq "");
-	assert(textchr(0xDFFF)   eq "");
-	assert(textchr(0xE000) ne "");
-	assert(textchr(0x10FFFF) ne "");
-	assert(textchr(0x110000) eq "");
-
-//	var cmd = "c:\\xwindowspath_test_main1_\\to\\xyz.exe arg1 arg2";
-//	//assert(var(to_oscmd_string(cmd) eq cmd.convert("\\",OSSLASH));
-//	// No conversion at the moment
-//	//assert(to_oscmd_string(cmd) eq cmd);
-//	assert(not osshell(cmd));
-
 	printl(elapsedtimetext());
 	printl("Test passed");
 

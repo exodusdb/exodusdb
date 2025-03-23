@@ -92,6 +92,11 @@ Binary    Hex          Comments
 //#include <iostream> //cin and cout
 //#include <memory>   //for unique_ptr
 
+// for charname()
+#include <unicode/unistr.h>
+#include <unicode/uchar.h>
+#include <unicode/ustring.h>
+
 #include <boost/locale.hpp>
 //#include <boost/algorithm/string.hpp>
 #include <boost/algorithm/string/trim_all.hpp>
@@ -1234,8 +1239,8 @@ var  var::textseq() const {
 	if (var_str.empty())
 		return "";
 
-	// get four bytes from input string since in UTF8 a unicode code point may occupy up to 4
-	// bytes
+	// Get up to four bytes from input string since in UTF8 a unicode code point may occupy up to 4 bytes
+	// Sadly boost::locale::conv cannot accept a string_view
 	std::u32string str1 = boost::locale::conv::utf_to_utf<char32_t>(var_str.substr(0, 4));
 
 	return uint32_t(str1[0]);
@@ -1246,6 +1251,56 @@ var  var::textseq() const {
 var  var::chr(const int charno) {
 	return static_cast<char>(charno % 256);
 }
+
+// Convert a single Unicode character to its Unicode name
+std::string char_to_words(UChar32 c) {
+	char name[256];
+	UErrorCode status = U_ZERO_ERROR;
+	u_charName(c, U_UNICODE_CHAR_NAME, name, sizeof(name), &status);
+	if (U_SUCCESS(status)) {
+		return std::string(name);
+	}
+	UChar utf16[2];
+	int32_t utf16_len = 0;
+	u_strFromUTF32(utf16, 2, &utf16_len, &c, 1, &status);
+	if (U_SUCCESS(status)) {
+		char utf8[8];
+		int32_t len = 0;
+		u_strToUTF8(utf8, sizeof(utf8), &len, utf16, utf16_len, &status);
+		if (U_SUCCESS(status)) {
+			return std::string(utf8, len);
+		}
+	}
+	return "";
+}
+
+// Convert a Unicode name back to its single character number
+UChar32 words_to_char(const std::string& words) {
+	UErrorCode status = U_ZERO_ERROR;
+	UChar32 c = u_charFromName(U_UNICODE_CHAR_NAME, words.c_str(), &status);
+	if (U_SUCCESS(status) && c != U_SENTINEL) {
+		return c;
+	}
+	return U_SENTINEL; // -1 if no match
+}
+
+var  var::textchrname(const int utf_codepoint) {
+	// doesnt use *this at all (do we need a version that does?)
+
+	// return var((char) int1);
+
+//	if (!utf_codepoint)
+//		return std::string("\0", 1);
+
+//	std::wstring wstr1;
+//	wstr1.push_back(wchar_t(uint32_t(utf_codepoint)));
+//	return boost::locale::conv::utf_to_utf<char>(wstr1);
+	return char_to_words(utf_codepoint);
+}
+
+	// Maximum C++ int: 2147483647 (hex: 0x7fffffff)
+	// Maximum Unicode code point: 1114111 (hex: U+10ffff)
+	// Max int (2147483647) is greater than max Unicode code point (1114111) by 2146369536.
 
 // returns unicode 1-4 byte sequences (in utf8)
 // returns empty string for some invalid unicode points like 0xD800 to 0xDFFF which is reserved for
@@ -1262,7 +1317,6 @@ var  var::textchr(const int utf_codepoint) {
 	wstr1.push_back(wchar_t(uint32_t(utf_codepoint)));
 	return boost::locale::conv::utf_to_utf<char>(wstr1);
 }
-
 
 ////////
 // QUOTE - wrap with double quotes

@@ -397,8 +397,9 @@ ND var  last(in instring);
 ND var  first(in instring, const int nbytes);
 ND var  last(in instring, const int nbytes);
 
-ND var  chr(const int integer);
-ND var  textchr(const int integer);
+ND var  chr(const int char_no);
+ND var  textchr(const int unicode_char_no);
+ND var  textchrname(const int unicode_char_no);
 
 // Match
 ND var  match(in instring, SV regex_str, SV options = "" );

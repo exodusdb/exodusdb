@@ -674,14 +674,34 @@ Get a Unicode character given a Unicode Code Point (Number)
 
 \fBReturns:\fR A single Unicode character in UTF8 encoding.
 
-To get UTF code points > 2^63 you must provide negative ints because var doesnt provide an implicit constructor to unsigned int due to getting ambigious conversions because int and unsigned int are parallel priority in c++ implicit conversions.
-
 \fBExample:\fR
 .RS
 .nf
 let v1 = var::textchr(171416); // "𩶘" // or "\\xF0A9B698"
 // or
 let v2 = textchr(171416);
+.fi
+.RE
+
+
+
+.SS
+var v1 = var::textchrname(unicode_code_point);
+.nf
+ 
+.fi
+Get a Unicode character name
+
+\fBunicode_code_point:\fR 0 - 0x10FFFF.
+
+\fBReturns:\fR Text of the name or "" if not a valid Unicode Code Point
+
+\fBExample:\fR
+.RS
+.nf
+let v1 = var::textchrname(91); // "LEFT SQUARE BRACKET"
+// or
+let v2 = textchrname(91);
 .fi
 .RE
 
@@ -788,6 +808,8 @@ Get the char number of a char
 
 If given a string, then only the first char is considered.
 
+Equivalent to ord() in php
+
 \fBExample:\fR
 .RS
 .nf
@@ -808,7 +830,9 @@ Get the Unicode Code Point of a Unicode character.
 
 \fBvar:\fR A UTF-8 string. Only the first Unicode character is considered.
 
-\fBReturns:\fR A number.
+\fBReturns:\fR A number 0 to 0x10FFFF.
+
+Equivalent to ord() in python and ruby, mb_ord() php.
 
 \fBExample:\fR
 .RS
@@ -2670,7 +2694,7 @@ var v1 = strvar.from_codepage(codepage);
 .nf
  
 .fi
-Converts from codepage encoded text to UTF-8 encoded text
+Converts from codepage encoded text to UTF-8 encoded exodus text
 
 e.g. Codepage "CP1124" (Ukrainian).
 
@@ -2693,7 +2717,7 @@ var v1 = strvar.to_codepage(codepage);
 .nf
  
 .fi
-Converts to codepage encoded text from UTF-8 encoded text
+Converts to codepage encoded text from exodus UTF-8 encoded text
 
 \fBExample:\fR
 .RS
@@ -4731,7 +4755,7 @@ Initialises an os file handle var that can be used for random read and write
 
 \fBosfilename:\fR The name of an existing os file name including path.
 
-\fButf8:\fR Defaults to true which causes trimming of partial utf-8 Unicode byte sequences from the end of osbreads. For raw untrimmed osbreads pass tf8 = false;
+\fButf8:\fR Defaults to true which causes trimming of partial UTF-8 Unicode byte sequences from the end of osbreads. For raw untrimmed osbreads pass tf8 = false;
 
 \fBosfilevar:\fR [out] To be used in subsequent calls to osbread() and osbwrite()
 
@@ -4833,7 +4857,7 @@ Create a complete os file from a var.
 
 \fBosfilename:\fR Absolute or relative path and filename to be written. Any existing os file is removed first.
 
-\fBcodepage:\fR If specified then output is converted from utf-8 to that codepage before being written. Otherwise no conversion is done.
+\fBcodepage:\fR If specified then output is converted from UTF-8 to that codepage before being written. Otherwise no conversion is done.
 
 \fBReturns:\fR True if successful or false if not possible for any reason. e.g. Path is not writeable, permissions etc.
 
@@ -4859,7 +4883,7 @@ Read a complete os file into a var.
 
 \fBosfilename:\fR Absolute or relative path and filename to be read.
 
-\fBcodepage:\fR If specified then input is converted from that codepage to utf-8 after being read. Otherwise no conversion is done.
+\fBcodepage:\fR If specified then input is converted from that codepage to UTF-8 after being read. Otherwise no conversion is done.
 
 \fBstrvar:\fR [out] is currently set to "" in case of any failure but this is may be changed in a future release to either force var to be unassigned or to leave it untouched. To guarantee future behaviour either add a line 'xxxx.defaulter("")' or set var manually in case osread() returns false. Or use the one argument free function version of osread() which always returns "" in case of failure to read.
 

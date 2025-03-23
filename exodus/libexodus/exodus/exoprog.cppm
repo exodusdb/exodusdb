@@ -394,6 +394,7 @@ export namespace exo {
 	using exo::tcaser;
 
 	using exo::textchr;
+	using exo::textchrname;
 	using exo::textconvert;
 	using exo::textconverter;
 	using exo::textlen;

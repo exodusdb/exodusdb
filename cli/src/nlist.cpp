@@ -479,20 +479,23 @@ func main() {
 		}
 	}
 
+	// Avoid creating "S" type dictionary items.
+	// The required libdict_voc.so may not have been built or be an old version
 	if (not(tt.read(dictvoc, "@ID"))) {
 		"F^0^TABLE_NAME^S^1^^^^L^20^^VARCHAR"_var.write(dictvoc, "TABLE_NAME");
-		"F^0^COLUMN_NAME^S^2^^^^L^20"_var.write(dictvoc, "COLUMN_NAME");
+		"F^0^COLUMN_NAME^S^2^^^^L^20"_var.write(dictvoc,         "COLUMN_NAME");
 		"G^^TYPE FMC PART HEADING SM CONV JUST LEN MASTER_FLAG^^^^^^^^^^^^^^^^^^^^^^^^^0"_var.write(dictvoc, "@CRT");
-		"F^0^Ref.^S^0^^^^T^20"_var.write(dictvoc, "@ID");
-		"F^1^TYPE^S^0^^^^L^4"_var.write(dictvoc, "TYPE");
-		"F^2^FMC^S^0^^^^R^3"_var.write(dictvoc, "FMC");
-		"F^5^PART^S^0^^^^R^2"_var.write(dictvoc, "PART");
-		"F^3^HEADING^S^0^^^^T^20"_var.write(dictvoc, "HEADING");
-		"F^4^SM^S^0^^^^L^4"_var.write(dictvoc, "SM");
-		"F^7^CONV^S^0^^^^L^9"_var.write(dictvoc, "CONV");
-		"F^9^JST^S^0^^^^L^3"_var.write(dictvoc, "JUST");
-		"F^10^LEN^S^0^^^^R^3^^LENGTH"_var.write(dictvoc, "LEN");
-		"F^28^MST^S^^^BYes,^^L^4"_var.write(dictvoc, "MASTER_FLAG");
+		"F^0^Ref.^S^0^^^^T^20"_var.write(dictvoc,                "@ID");
+		"F^1^TYPE^S^0^^^^L^4"_var.write(dictvoc,                 "TYPE");
+		"F^2^FMC^S^0^^^^R^3"_var.write(dictvoc,                  "FMC");
+		"F^5^PART^S^0^^^^R^2"_var.write(dictvoc,                 "PART");
+		"F^3^HEADING^S^0^^^^T^20"_var.write(dictvoc,             "HEADING");
+		"F^4^SM^S^0^^^^L^4"_var.write(dictvoc,                   "SM");
+		"F^7^CONV^S^0^^^^L^9"_var.write(dictvoc,                 "CONV");
+		"F^9^JST^S^0^^^^L^3"_var.write(dictvoc,                  "JUST");
+		"F^10^LEN^S^0^^^^R^3^^LENGTH"_var.write(dictvoc,         "LEN");
+		// TODO make this 11/12/13?
+		"F^28^MST^S^^^BYes,^^L^4"_var.write(dictvoc,             "MASTER_FLAG");
 	}
 
 	colname.redim(maxncols);
@@ -1155,11 +1158,18 @@ x1exit:
 
 	// If no columns selected then try to use default @crt or @lptr group item
 	if (not(coln or crtx)) {
-		word = "@LPTR";
-		if (not(xx.readc(DICT, word))) {
-			word = "@CRT";
+		//TRACE(DICT)     // "dict.voc^2"
+		//TRACE(filename) // "XYZ"
+		if (DICT.f(1) eq "dict.voc" and not filename.lcase().starts("dict.")) {
+			// Dont use dict.voc columns for non-dict files
+			word = "";
+		} else {
+			word = "@LPTR";
 			if (not(xx.readc(DICT, word))) {
-				word = "";
+				word = "@CRT";
+				if (not(xx.readc(DICT, word))) {
+					word = "";
+				}
 			}
 		}
 		if (word) {

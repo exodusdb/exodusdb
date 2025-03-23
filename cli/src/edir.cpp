@@ -42,7 +42,7 @@ func main() {
 		abort(syntax);
 
 	if (not fieldno.isnum())
-		abort("fieldno must be numeric");
+		abort("fieldno must be numeric. Keys must be separated by commas, not spaces.");
 
 	// Check the dbfile exists
 	var dbfile;
@@ -148,8 +148,10 @@ func main() {
 //			abort(lasterror());
 
 		// Check osfile does not already exist in the new dir
-		if (osfile(temposfilename))
+		if (osfile(temposfilename)) {
+			osfile(temposfilename).errputl(temposfilename ^ " dirinfo:");
 			abort(ID.quote() ^ " should not already exist in " ^ workdir.quote());
+		}
 
 		// Write the osfile
 		if (not is_new_record and not oswrite(text, temposfilename))
@@ -379,12 +381,24 @@ func main() {
 func getosfilename(in dir, in dbfilename, in fieldno, in id) {
 
 	var temposfilename = dbfilename ^ "~" ^ id;
-	let invalidfilechars = R"__(\"')__" "\u00A3 $%^&*(){}[]:;#<>?,./|";
+//	let invalidfilechars = R"__(\"')__" "\u00A3 $%^&*(){}[]:;#<>?,./|";
+	let invalidfilechars = R"__(\"')__" "\u00A3 $%^&*(){}[]:;#<>?,/|";
 	temposfilename.lcaser();
-	// TODO use escaped chars to avoid two records converting to the same key
+
+	// Use escaped chars to avoid two records converting to the same key
 	// e.g. currently both "aa,bb" and "aa.bb" will be converted to "aa-bb"
-	temposfilename.converter(invalidfilechars, str("-", len(invalidfilechars)));
-//	temposfilename ^= "-pid" ^ ospid();
+//	temposfilename.converter(invalidfilechars, str("-", len(invalidfilechars)));
+	for (let i : range(1, len(invalidfilechars))) {
+		let c = invalidfilechars.at(i);
+		let cname = var::textchrname(textseq(c));
+//		let orig = temposfilename;
+		temposfilename.replacer(c, cname);
+//		if (temposfilename ne orig) {
+//			TRACE(c);
+//			TRACE(cname)
+//		}
+	}
+
 	if (dbfilename.starts("dict.") and fieldno)
 		temposfilename ^= ".sql";
 //	else
