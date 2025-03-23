@@ -213,6 +213,7 @@ var  var::iconv(const char* conversion) const {
 								// but it will accept them if cast correctly as signed int64
 								result ^= var(static_cast<varint_t>(total));
 							} else {
+								// var_str.size > 16 (sizeof var_int x 2)
 invalid_hex:
 								// TODO flag invalid
 								// var's int is int64_t (8 bytes) to max hex number is 16 f's
@@ -1217,13 +1218,69 @@ var  var::oconv(const char* conversion_in) const {
 											if (part.toInt()) {}
 										}
 
-										// Convert integer to hexadecimal
-										std::ostringstream ss;
-										ss << std::hex << std::uppercase
-										   //   << part.round().toInt();
-										   << part.var_int;
+//										// Convert integer to hexadecimal
+//										std::ostringstream ss;
+//										ss << std::hex << std::uppercase
+//										   //   << part.round().toInt();
+//										   << part.var_int;
+//
+//										part = ss.str();
 
-										part = ss.str();
+										// MX or MX0 to MXG
+										bool truncate = false;
+										pconversion++;
+										int width = *pconversion;
+										if (width >= '0' and width <= '9') {
+											// MX0 - MX9 -> width 0 - 9
+											width -= '0';
+											// MXnT = truncate
+											// Replicated for speed
+											pconversion++;
+											truncate = *pconversion == 'T';
+										}
+										else if (width >= 'A' and width <= 'G') {
+											// MXA - MXG -> width 10 - 16
+											width -= 'A' - 10;
+											// MXnT = truncate
+											// Replicated for speed
+											pconversion++;
+											truncate = *pconversion == 'T';
+										}
+
+										static constexpr char hex_table[] = "0123456789ABCDEF";
+										// TODO convert to inline function std::string int_to_hex(int64_t value) {
+										char buffer[16];
+										uint64_t uvalue = static_cast<uint64_t>(part.var_int);
+										int pos = 15;
+										do {
+											buffer[pos--] = hex_table[uvalue & 0xF];
+											uvalue >>= 4;
+										} while (uvalue != 0);
+										if (part.var_int < 0) {
+											while (pos >= 0) buffer[pos--] = 'F';
+											part.var_str = std::string_view(buffer, 16);
+										} else if (not width) {
+											int start = pos + 1;
+											part.var_str = std::string_view(buffer + start, 16 - start);
+
+										} else {
+											// For positives, calculate digits from pos and adjust width
+											int digits = 16 - pos - 1;  // Actual hex digits
+											int effective_width = digits;  // Default to actual digits
+											if (truncate) {
+												effective_width = (width <= 0 || width > 16) ? digits : std::max(1, width);
+											} else {
+												effective_width = (width <= 0 || width > 16) ? digits : std::max(digits, width);
+											}
+
+											// Fill remaining with '0' up to effective_width
+											while (pos >= 0) buffer[pos--] = '0';
+
+											int start = 16 - effective_width;
+											part.var_str = std::string_view(buffer + start, effective_width);
+
+										}
+										part.var_typ = VARTYP_STR;
 									}
 									break;
 
