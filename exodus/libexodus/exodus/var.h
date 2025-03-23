@@ -196,6 +196,7 @@ public:
 	//  v1.swap(v2); // v1 -> "" // v2.len() -> 65'536
 	//  // or
 	//  swap(v1, v2);`
+	//
 	void swap(io v2);
 
 	// Force the contents of a var to be moved instead of copied. The moved var becomes an empty string.
@@ -207,6 +208,7 @@ public:
 	//  var v2 = v1.move(); // v2.len() -> 65'536 // v1 -> ""
 	//  // or
 	//  var v3 = move(v2);`
+	//
 	ND var move();
 
     // Returns a copy of the var.
@@ -216,6 +218,7 @@ public:
 	//  var v2 = v1.clone(); // "abc"
 	//  // or
 	//  var v3 = clone(v2);`
+	//
 	ND var clone() const;
 
 	// Return a string describing internal data of a var.
@@ -231,6 +234,7 @@ public:
 	//  v1.dump().outputl(); /// e.g. var:0x7ffea7462cd0 typ:1 str:0x584d9e9f6e70 "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 	//  // or
 	//  outputl(dump(v1));`
+	//
 	ND var dump() const;
 
 	*/
@@ -270,28 +274,40 @@ public:
 	//
 	// `var v1 = 0.1;
 	//  var v2 = v1 + 0.2; // 0.3`
+	//
 	ND var operator+(var);
+
 	// Subtraction
 	ND var operator-(var);
+
 	// Multiplication
 	ND var operator*(var);
+
 	// Division
 	ND var operator/(var);
+
 	// Modulus
 	ND var operator%(var);
 
 	// Self addition
+	//
 	// `var v1 = 0.1;
 	//  v1 += 0.2; // 0.3`
+	//
 	ND var operator+=(var);
+
 	// Self subtraction
 	ND var operator-=(var);
+
 	// Self multiplication
 	ND var operator*=(var);
+
 	// Self division
 	ND var operator/=(var);
+
 	// Self modulus
 	ND var operator%=(var);
+
 	*/
 
 	// Prefix operators must be replicated in var
@@ -306,21 +322,31 @@ public:
 	// Must have postfix operators if prefix operators are defined
 
 	// Post increment
+	//
 	// `var v1 = 3;
 	//  var v2 = v1 ++; // v2 -> 3 // v1 -> 4`
+	//
 	   var  operator++(int) &;
+
 	// Post decrement
+	//
 	// `var v1 = 3;
 	//  var v2 = v1 --; // v2 -> 3 // v1 -> 2`
+	//
 	   var  operator--(int) &;
 
 	// Pre increment
+	//
 	// `var v1 = 3;
 	//  var v2 = ++ v1; // v2 -> 4 // v1 -> 4`
+	//
 	   io   operator++() &;
+
 	// Pre decrement
+	//
 	// `var v1 = 3;
 	//  var v2 = -- v1; // v2 -> 2 // v1 -> 2`
+	//
 	   io   operator--() &;
 
 	////////////////////////////////////////////////
@@ -336,12 +362,14 @@ public:
 	// ~ = ST, Subtext mark
 	//
 	// `var v1 = "f1^f2^v1]v2^f4"_var; // "f1" _FM "f2" _FM "v1" _VM "v2" _FM "f4"`
+	//
 	friend var  operator""_var(const char* cstr, std::size_t size);
 
 	template <class T>
     // Create a dynamic array var from a list. C++ constrains list elements to be all the same type: var, string, double, int, etc. but they all end up as fields of a dynamic array string.
 	//
 	// `var v1 = {11, 22, 33}; // "11^22^33"_var`
+	//
 	CONSTEXPR var(std::initializer_list<T> list)
 	// This constructor assumes FM delimiter so keep it out of var_base.
 	//Therefore it cannot use var_base initializers
@@ -362,7 +390,7 @@ public:
 
 	/* fake for gendoc
 
-	// Dynamic array - field update and append:
+	// Dynamic array - field extraction, update and append:
 	// See also inserter() and remover().
 	//
 	// `var v1 = "aa^bb"_var;
@@ -377,6 +405,7 @@ public:
 	// `var v1 = "aa^bb^cc"_var;
 	//  var v2 = v1.f(2); // "bb" /// .f() style access. Recommended.
 	//  var v3 =   v1(2); // "bb" ///   () style access. Not recommended.`
+	//
 	ND var  operator()(int fieldno) const;
 
 	// Dynamic array - value update and append
@@ -392,6 +421,7 @@ public:
 	// `var v1 = "aa^b1]b2^cc"_var;
 	//  var v2 = v1.f(2,2); // "b2" /// .f() style access. Recommended.
 	//  var v3 =   v1(2,2); // "b2" ///   () style access. Not recommended.`
+	//
 	ND var  operator()(int fieldno, valueno) const;
 
 	*/
@@ -430,6 +460,7 @@ public:
 	// `var v1 = "aa^b1]b2}s2^cc"_var;
 	//  var v2 = v1.f(2, 2, 2); // "s2" /// .f() style access. Recommended.
 	//  var v3 =   v1(2, 2, 2); // "s2" ///   () style access. Not recommended.`
+	//
 	ND const var  operator()(int fieldno, int valueno = 0, int subvalueno = 0) const {return this->f(fieldno, valueno, subvalueno);}
 //	ND var  operator()(int fieldno, int valueno = 0, int subvalueno = 0) &&      {return a(fieldno, valueno, subvalueno);}
 
@@ -462,10 +493,11 @@ public:
 
 	// String concatention operator ^
 	// At least one side must be a var.
-	// "aa" ^ "22" will not compile but "aa" "22".
+	// "aa" ^ "22" will not compile but "aa" "22" will.
 	// Floating point numbers are implicitly converted to strings with no more than 12 significant digits of precision. This practically eliminates all floatng point rounding errors.
 	// `var v2 = "aa";
 	//  var v1 = v2 ^ 22; // "aa22"`
+	//
 	ND var operator^(var);
 
 	// String self concatention ^= (append)
@@ -497,6 +529,7 @@ public:
 	// `let v1 = round(123456.789,  0); // "123457"
 	//  let v2 = round(123456.789, -1); // "123460"
 	//  let v3 = round(123456.789, -2); // "123500"`
+	//
     ND var  round(const int ndecimals = 0) const;
 
 	// obj is var()
@@ -508,6 +541,7 @@ public:
 	// `let v1 = var::chr(0x61); // "a"
 	//  // or
 	//  let v2 = chr(0x61);`
+	//
 	ND static var  chr(const int num);
 
 	// Get a Unicode character given a Unicode Code Point (Number)
@@ -517,16 +551,19 @@ public:
 	// `let v1 = var::textchr(171416); // "𩶘" // or "\xF0A9B698"
 	//  // or
 	//  let v2 = textchr(171416);`
+	//
 	ND static var  textchr(const int num);
 
 	// Get a string of repeated substrings.
 	// var: The substring to be repeated
 	// num: How many times to repeat the substring
 	// Returns: A string
+	// obj is varstr
 	//
 	// `let v1 = "ab"_var.str(3); // "ababab"
 	//  // or
 	//  let v2 = str("ab", 3);`
+	//
 	ND var  str(const int num) const;
 
 	// Get a string containing a given number of spaces.
@@ -537,6 +574,7 @@ public:
 	// `let v1 = var::space(3); // "␣␣␣"
 	//  // or
 	//  let v2 = space(3);`
+	//
 	ND static var  space(const int nspaces);
 
 	// Returns: A string representing a given number written in words instead of digits.
@@ -545,6 +583,7 @@ public:
 	//
 	// `let softhyphen = "\xc2\xad";
 	//  let v1 = var(123.45).numberinwords("de_DE").replace(softhyphen, " "); // "ein␣hundert␣drei␣und␣zwanzig␣Komma␣vier␣fünf"`
+	//
 	ND var  numberinwords(in locale = "");
 
 	////////////
@@ -575,6 +614,7 @@ public:
 	// `let v1 = "abc"_var.seq(); // 0x61 // decimal 97, 'a'
 	//  // or
 	//  let v2 = seq("abc");`
+	//
 	ND var  seq() const;
 
 	// Get the Unicode Code Point of a Unicode character.
@@ -584,6 +624,7 @@ public:
 	// `let v1 = "Γ"_var.textseq(); // 915 // U+0393: Greek Capital Letter Gamma (Unicode character)
 	//  // or
 	//  let v2 = textseq("Γ");`
+	//
 	ND var  textseq() const;
 
 	// Get the length of a source string in number of chars
@@ -592,6 +633,7 @@ public:
 	// `let v1 = "abc"_var.len(); // 3
 	//  // or
 	//  let v2 = len("abc");`
+	//
 	ND var  len() const;
 
 	// Checks if the var is an empty string.
@@ -603,6 +645,7 @@ public:
 	//  if (not v1.empty()) ... ok // true
 	//  // or
 	//  if (not empty(v1)) ... ok // true`
+	//
 	ND bool empty() const;
 
 	// Count the number of output columns required for a given source string.
@@ -614,6 +657,7 @@ public:
 	// `let v1 = "🤡x🤡"_var.textwidth(); // 5
 	//  // or
 	//  let v2 = textwidth("🤡x🤡");`
+	//
 	ND var  textwidth() const;
 
 	// Count the number of Unicode code points in a source string.
@@ -622,6 +666,7 @@ public:
 	// `let v1 = "Γιάννης"_var.textlen(); // 7
 	//  // or
 	//  let v2 = textlen("Γιάννης");`
+	//
 	ND var  textlen() const;
 
 	// Count the number of fields in a source string.
@@ -632,6 +677,7 @@ public:
 	// `let v1 = "aa**cc"_var.fcount("*"); // 3
 	//  // or
 	//  let v2 = fcount("aa**cc", "*");`
+	//
 	ND var  fcount(SV sepstr) const;
 
 	// Count the number of occurrences of a given substr in a source string.
@@ -642,6 +688,7 @@ public:
 	// `let v1 = "aa**cc"_var.count("*"); // 2
 	//  // or
 	//  let v2 = count("aa**cc", "*");`
+	//
 	ND var  count(SV sepstr) const;
 
 	// Exodus   Javascript   PHP             Python       Go          Rust          C++
@@ -657,6 +704,7 @@ public:
 	// `if ("abc"_var.starts("ab")) ... true
 	//  // or
 	//  if (starts("abc", "ab")) ... true`
+	//
 	ND bool starts(SV prefix) const;
 
 	// Checks if a source string ends with a given suffix (substr).
@@ -667,6 +715,7 @@ public:
 	// `if ("abc"_var.ends("bc")) ... true
 	//  // or
 	//  if (ends("abc", "bc")) ... true`
+	//
 	ND bool ends(SV suffix) const;
 
 	// Checks if a given substr exists in a source string.
@@ -680,6 +729,7 @@ public:
 	// `if ("abcd"_var.contains("bc")) ... true
 	//  // or
 	//  if (contains("abcd", "bc")) ... true`
+	//
 	ND bool contains(SV substr) const;
 
 	//https://en.wikipedia.org/wiki/Comparison_of_programming_languages_(string_functions)#Find
@@ -692,6 +742,7 @@ public:
 	// `let v1 = "abcd"_var.index("bc"); // 2
 	//  // or
 	//  let v2 = index("abcd", "bc");`
+	//
 	ND var  index(SV substr, const int startchar1 = 1) const;
 
 	// Find the nth occurrence of a substr in a source string.
@@ -701,6 +752,7 @@ public:
 	// `let v1 = "abcabc"_var.index("bc", 2); // 2
 	//  // or
 	//  let v2 = index("abcabc", "bc", 2);`
+	//
 	ND var  indexn(SV substr, const int occurrence) const;
 
 	// Find the position of substr working backwards from the end of the string towards the beginning.
@@ -711,6 +763,7 @@ public:
 	// `let v1 = "abcabc"_var.indexr("bc"); // 5
 	//  // or
 	//  let v2 = indexr("abcabc", "bc");`
+	//
 	ND var  indexr(SV substr, const int startchar1 = -1) const;
 
 	// Finds all matches of a given regular expression.
@@ -738,6 +791,7 @@ public:
 	// f - First only. Only for replace() (not match() or search())
     // w - Wildcard glob style (e.g. *.cfg) not regex style. Only for match() and search(). Not replace().
 	// </pre>
+	//
 	ND var  match(SV regex_str, SV regex_options = "") const;
 
 	// Ditto
@@ -754,6 +808,7 @@ public:
 	//  // or
 	//  startchar1 = 1;
 	//  let v2 = search("abc1abc2", "BC(\\d)", startchar1, "i");`
+	//
 	ND var  search(SV regex_str, io startchar1, SV regex_options = "") const;
 
 	// Ditto starting from first char
@@ -773,6 +828,7 @@ public:
 	// `let v1 = "abc"_var.hash(); assert(v1 == var(6'715'211'243'465'481'821));
 	//  // or
 	//  let v2 = hash("abc");`
+	//
 	ND var  hash(const std::uint64_t modulus = 0) const;
 
 	///// STRING CONVERSION - Non-mutating - Chainable:
@@ -785,6 +841,7 @@ public:
 	// `let v1 = "Γιάννης"_var.ucase(); // "ΓΙΆΝΝΗΣ"
 	//  // or
 	//  let v2 = ucase("Γιάννης");`
+	//
 	ND var  ucase() const& {var nrvo = this->clone(); nrvo.ucaser(); return nrvo;}
 
 	// Convert to lower case
@@ -792,6 +849,7 @@ public:
 	// `let v1 = "ΓΙΆΝΝΗΣ"_var.lcase(); // "γιάννης"
 	//  // or
 	//  let v2 = lcase("ΓΙΆΝΝΗΣ");`
+	//
 	ND var  lcase() const& {var nrvo = this->clone(); nrvo.lcaser(); return nrvo;}
 
 	// Convert to title case.
@@ -800,6 +858,7 @@ public:
 	// `let v1 = "γιάννης παππάς"_var.tcase(); // "Γιάννης Παππάς"
 	//  // or
 	//  let v2 = tcase("γιάννης παππάς");`
+	//
 	ND var  tcase() const& {var nrvo = this->clone(); nrvo.tcaser(); return nrvo;}
 
 	// Convert to folded case.
@@ -812,6 +871,7 @@ public:
 	// `let v1 = "Grüßen"_var.fcase(); // "grüssen"
 	//  // or
 	//  let v2 = tcase("Grüßen");`
+	//
 	ND var  fcase() const& {var nrvo = this->clone(); nrvo.fcaser(); return nrvo;}
 
 	// Replace Unicode character sequences with their standardised NFC form.
@@ -822,6 +882,7 @@ public:
 	// `let v1 = "cafe\u0301"_var.normalize(); // "caf\u00E9" // "café"
 	//  // or
 	//  let v2 = normalize("cafe\u0301");`
+	//
 	ND var  normalize() const& {var nrvo = this->clone(); nrvo.normalizer(); return nrvo;}
 
 	// Simple reversible disguising of string text.
@@ -835,6 +896,7 @@ public:
 	// `let v1 = "abc"_var.invert(); // "\xC2" "\x9E" "\xC2" "\x9D" "\xC2" "\x9C"
 	//  // or
 	//  let v2 = invert("abc");`
+	//
 	ND var  invert() const& {var nrvo = this->clone(); nrvo.inverter(); return nrvo;}
 
 	// Reduce all types of field mark chars by one level.
@@ -846,6 +908,7 @@ public:
 	// `let v1 = "a1^b2^c3"_var.lower(); // "a1]b2]c3"_var
 	//  // or
 	//  let v2 = lower("a1^b2^c3"_var);`
+	//
 	ND var  lower() const& {var nrvo = this->clone(); nrvo.lowerer(); return nrvo;}
 
 	// Increase all types of field mark chars by one level.
@@ -857,6 +920,7 @@ public:
 	// `let v1 = "a1]b2]c3"_var.raise(); // "a1^b2^c3"_var
 	//  // or
 	//  let v2 = "a1]b2]c3"_var;`
+	//
 	ND var  raise() const& {var nrvo = this->clone(); nrvo.raiser(); return nrvo;}
 
 	// Remove any redundant FM, VM etc. chars (Trailing FM; VM before FM etc.)
@@ -864,6 +928,7 @@ public:
 	// `let v1 = "a1^b2]]^c3^^"_var.crop(); // "a1^b2^c3"_var
 	//  // or
 	//  let v2 = crop("a1^b2]]^c3^^"_var);`
+	//
 	ND var  crop() const& {var nrvo = this->clone(); nrvo.cropper(); return nrvo;}
 
 	// Wrap in double quotes.
@@ -871,6 +936,7 @@ public:
 	// `let v1 = "abc"_var.quote(); // "\"abc\""
 	//  // or
 	//  let v2 = quote("abc");`
+	//
 	ND var  quote() const&;
 
 	// Wrap in single quotes.
@@ -878,6 +944,7 @@ public:
 	// `let v1 = "abc"_var.squote(); // "'abc'"
 	//  // or
 	//  let v2 = squote("abc");`
+	//
 	ND var  squote() const&;
 
 	// Remove one pair of surrounding double or single quotes.
@@ -885,6 +952,7 @@ public:
 	// `let v1 = "'abc'"_var.unquote(); // "abc"
 	//  // or
 	//  let v2 = unquote("'abc'");`
+	//
 	ND var  unquote() const&;
 
 	// Remove all leading, trailing and excessive inner bytes.
@@ -893,6 +961,7 @@ public:
 	// `let v1 = "␣␣a1␣␣b2␣c3␣␣"_var.trim(); // "a1␣b2␣c3"
 	//  // or
 	//  let v2 = trim("␣␣a1␣␣b2␣c3␣␣");`
+	//
 	ND var  trim(SV trimchars = " ") const&;
 
 	// Ditto but only leading.
@@ -900,6 +969,7 @@ public:
 	// `let v1 = "␣␣a1␣␣b2␣c3␣␣"_var.trimfirst(); // "a1␣␣b2␣c3␣␣"
 	//  // or
 	//  let v2 = trimfirst("␣␣a1␣␣b2␣c3␣␣");`
+	//
 	ND var  trimfirst(SV trimchars = " ") const&;
 
 	// Ditto but only trailing.
@@ -907,6 +977,7 @@ public:
 	// `let v1 = "␣␣a1␣␣b2␣c3␣␣"_var.trimlast(); // "␣␣a1␣␣b2␣c3"
 	//  // or
 	//  let v2 = trimlast("␣␣a1␣␣b2␣c3␣␣");`
+	//
 	ND var  trimlast(SV trimchars = " ") const&;
 
 	// Ditto but only leading and trailing, not inner.
@@ -914,6 +985,7 @@ public:
 	// `let v1 = "␣␣a1␣␣b2␣c3␣␣"_var.trimboth(); // "a1␣␣b2␣c3"
 	//  // or
 	//  let v2 = trimboth("␣␣a1␣␣b2␣c3␣␣");`
+	//
 	ND var  trimboth(SV trimchars = " ") const&;
 
 	// Get the first char of a string.
@@ -923,6 +995,7 @@ public:
 	// `let v1 = "abc"_var.first(); // "a"
 	//  // or
 	//  let v2 = first("abc");`
+	//
 	ND var  first() const&;
 
 	// Get the last char of a string.
@@ -932,6 +1005,7 @@ public:
 	// `let v1 = "abc"_var.last(); // "c"
 	//  // or
 	//  let v2 = last("abc");`
+	//
 	ND var  last() const&;
 
 	// Get the first n chars of a source string.
@@ -942,6 +1016,7 @@ public:
 	// `let v1 = "abc"_var.first(2); // "ab"
 	//  // or
 	//  let v2 = first("abc", 2);`
+	//
 	ND var  first(const std::size_t length) const&;
 
 	// Extract up to length trailing chars
@@ -950,6 +1025,7 @@ public:
 	// `let v1 = "abc"_var.last(2); // "bc"
 	//  // or
 	//  let v2 = last("abc", 2);`
+	//
 	ND var  last(const std::size_t length) const&;
 
 	// Remove n chars (bytes) from the source string.
@@ -960,6 +1036,7 @@ public:
 	// `let v1 = "abcd"_var.cut(2); // "cd"
 	//  // or
 	//  let v2 = cut("abcd", 2);`
+	//
 	ND var  cut(const int length) const&;
 
 	// Insert a substr at an given position after removing a given number of chars.
@@ -973,6 +1050,7 @@ public:
 	// `let v1 = "abcd"_var.paste(2, 2, "XYZ"); // "aXYZd"
 	//  // or
 	//  let v2 = paste("abcd", 2, 2, "XYZ");`
+	//
 	ND var  paste(const int pos1, const int length, SV replacestr) const& {var nrvo = this->clone(); nrvo.paster(pos1, length, replacestr); return nrvo;}
 
 	// Insert text at char position without overwriting any following chars
@@ -981,6 +1059,7 @@ public:
 	// `let v1 = "abcd"_var.paste(2, "XYZ"); // "aXYZbcd"
 	//  // or
 	//  let v2 = paste("abcd", 2, "XYZ");`
+	//
 	ND var  paste(const int pos1, SV insertstr) const& {var nrvo = this->clone(); nrvo.paster(pos1, insertstr); return nrvo;}
 
 	// Insert text at the beginning
@@ -989,6 +1068,7 @@ public:
 	// `let v1 = "abc"_var.prefix("XYZ"); // "XYZabc"
 	//  // or
 	//  let v2 = prefix("abc", "XYZ");`
+	//
 	ND var  prefix(SV insertstr) const&;
 
 //	template <typename... ARGS>
@@ -1004,6 +1084,7 @@ public:
 	//  // or
 	//  let v2 = append("abc", " is ", 10, " ok", '.');`
     ND var  append(const auto&... appendable) const& {var nrvo = this->clone(); (nrvo ^= ... ^= appendable); return nrvo;}
+	//
 	// TODO perfect forwarding on argument 1 to create the initial string?
 
 	// Remove one trailing char.
@@ -1012,6 +1093,7 @@ public:
 	// `let v1 = "abc"_var.pop(); // "ab"
 	//  // or
 	//  let v2 = pop("abc");`
+	//
 	ND var  pop() const& {var nrvo = this->clone(); nrvo.popper(); return nrvo;}
 
 	// Copies one or more consecutive fields from a string given a delimiter
@@ -1026,6 +1108,7 @@ public:
 	// `let v1 = "aa*bb*cc"_var.field("*", -1); // "cc"
 	//  // or
 	//  let v2 = field("aa*bb*cc", "*", -1);`
+	//
 	ND var  field(SV delimiter, const int fieldnx = 1, const int nfieldsx = 1) const;
 
 	// field2 is a version that treats fieldn -1 as the last field, -2 the penultimate field etc. -
@@ -1090,6 +1173,7 @@ public:
 	// `let v1 = "abcd"_var.substr(3, -2); // "cb"
 	//  // or
 	//  let v2 = substr("abcd", 3, -2); // "cb"`
+	//
 	ND var  substr(const int pos1, const int length) const& {var nrvo = this->clone(); nrvo.substrer(pos1, length); return nrvo;}
 
 	// Abbreviated alias of substr version 1.
@@ -1105,6 +1189,7 @@ public:
 	// `let v1 = "abcd"_var.substr(2); // "bcd"
 	//  // or
 	//  let v2 = substr("abcd", 2);`
+	//
 	ND var  substr(const int pos1) const& {var nrvo = this->clone(); nrvo.substrer(pos1); return nrvo;}
 
 	// Shorthand alias of substr version 2.
@@ -1127,6 +1212,7 @@ public:
 	//  let v1 = "12,45 78"_var.substr(pos1, ", ", COL2);  // v1 -> "45" // COL2 -> 6 // 6 is the position of the next delimiter char found.
 	//  // or
 	//  let v2 = substr("12,45 78", COL2 + 1, ", ", COL2); // v2 -> "78" // COL2 -> 9 // 9 is one after the end of the string meaning that none of the delimiter chars were found.`
+	//
 	   var  substr(const int pos1, SV delimiterchars, out pos2) const;
 
 	// Shorthand alias of substr version 3.
@@ -1156,6 +1242,7 @@ public:
 	//  let v1 = "12^45^78"_var.substr2(pos1, field_mark_no);  // "45" // pos1 -> 7 // field_mark_no -> 2 // field_mark_no 2 means that a FM was found.
 	//  // or
 	//  let v2 = substr2("12^45^78"_var, pos1, field_mark_no); // "78" // pos1 -> 9 // field_mark_no -> 0 // field_mark_no 0 means that none of the standard field marks were found.`
+	//
 	   var  substr2(io pos1, out delimiterno) const;
 
 	// Shorthand alias of substr version 4.
@@ -1169,6 +1256,7 @@ public:
 	// `let v1 = "abcde"_var.convert("aZd", "XY"); // "Xbce" // a is replaced and d is removed
 	//  // or
 	//  let v2 = convert("abcde", "aZd", "XY");`
+	//
 	ND var  convert(SV fromchars, SV tochars) const& {var nrvo = this->clone(); nrvo.converter(fromchars,tochars); return nrvo;}
 
 	// Ditto for Unicode code points.
@@ -1176,6 +1264,7 @@ public:
 	// `let v1 = "a🤡b😀c🌍d"_var.textconvert("🤡😀", "👋"); // "a👋bc🌍d"
 	//  // or
 	//  let v2 = textconvert("a🤡b😀c🌍d", "🤡😀", "👋");`
+	//
 	ND var  textconvert(SV fromchars, SV tochars) const& {var nrvo = this->clone(); nrvo.textconverter(fromchars,tochars); return nrvo;}
 
 	// Replace all occurrences of one substr with another.
@@ -1184,6 +1273,7 @@ public:
 	// `let v1 = "Abc.Abc"_var.replace("bc", "X"); // "AX.AX"
 	//  // or
 	//  let v2 = replace("Abc Abc", "bc", "X");`
+	//
 	ND var  replace(SV fromstr, SV tostr) const&;
 
 	// Replace substring(s) using a regular expression.
@@ -1192,6 +1282,7 @@ public:
 	// `let v1 = "A a B b"_var.replace("[A-Z]"_rex, "'$0'"); // "'A' a 'B' b"
 	//  // or
 	//  let v2 = replace("A a B b", "[A-Z]"_rex, "'$0'");`
+	//
 	ND var  replace(const rex& regex, SV tostr) const&;
 
 	// Remove duplicate fields in an FM or VM etc. separated list
@@ -1199,6 +1290,7 @@ public:
 	// `let v1 = "a1^b2^a1^c2"_var.unique(); // "a1^b2^c2"_var
 	//  // or
 	//  let v2 = unique("a1^b2^a1^c2"_var);`
+	//
 	ND var  unique() const&;
 
 	// Reorder fields in an FM or VM etc. separated list in ascending order
@@ -1210,6 +1302,7 @@ public:
 	//  `let v1 = "b1^a1^c20^c10^c2^c1^b2"_var.sort(); // "a1^b1^b2^c1^c10^c2^c20"_var
 	//  // or
 	//  let v2 = sort("b1^a1^c20^c10^c2^c1^b2"_var);`
+	//
 	ND var  sort(SV delimiter = _FM) const&;
 
 	// Reorder fields in an FM or VM etc. separated list in descending order
@@ -1217,6 +1310,7 @@ public:
 	// `let v1 = "20^10^2^1^1.1"_var.reverse(); // "1.1^1^2^10^20"_var
 	//  // or
 	//  let v2 = reverse("20^10^2^1^1.1"_var);`
+	//
 	ND var  reverse(SV delimiter = _FM) const&;
 
 	// Randomise the order of fields in an FM, VM separated list
@@ -1224,6 +1318,7 @@ public:
 	// `let v1 = "20^10^2^1^1.1"_var.shuffle(); /// e.g. "2^1^20^1.1^10" (random order depending on initrand())
 	//  // or
 	//  let v2 = shuffle("20^10^2^1^1.1"_var);`
+	//
 	ND var  shuffle(SV delimiter = _FM) const&;
 
 	// Split a delimited string with embedded quotes into a dynamic array.
@@ -1233,6 +1328,7 @@ public:
 	// `let v1 = "abc,\"def,\"123\" fgh\",12.34"_var.parse(','); // "abc^\"def,\"123\" fgh\"^12.34"_var
 	//  // or
 	//  let v2 = parse("abc,\"def,\"123\" fgh\",12.34", ',');`
+	//
 	ND var  parse(char sepchar = ' ') const& {var nrvo = this->clone(); nrvo.parser(sepchar); return nrvo;}
 
 	// Split a delimited string into a dim array.
@@ -1242,6 +1338,7 @@ public:
 	// `dim d1 = "a^b^c"_var.split(); // A dimensioned array with three elements (vars)
 	//  // or
 	//  dim d2 = split("a^b^c"_var);`
+	//
 	ND dim  split(SV delimiter = _FM) const;
 
 	// SAME ON TEMPORARIES - CALL MUTATORS FOR SPEED (not documenting since programmer interface is the same)
@@ -1291,6 +1388,7 @@ public:
 //	ND var  append(const ARGS&... appendable) && {
 //				this->createString();
 //				(var_str += ... += appendable);
+	//
 	ND var  append(const auto&... appendable)   && {((*this) ^= ... ^= appendable);      return std::move(*this);}
 
 //    // Helper to append one argument, handling var differently
@@ -1340,6 +1438,7 @@ public:
 	//  v1.ucaser(); // "ABC"
 	//  // or
 	//  ucaser(v1);`
+	//
 	   IO   ucaser() REF ;
 
 	   IO   lcaser() REF ;
@@ -1409,6 +1508,7 @@ public:
 	// `let v1 = var(30123).oconv("D/E"); // "21/06/2050"
 	//  // or
 	//  let v2 = oconv(30123, "D/E");`
+	//
 	ND var  oconv(const char* convstr) const;
 
 	// Converts external data to internal format according to a given conversion code or pattern
@@ -1419,6 +1519,7 @@ public:
 	// `let v1 = "21 JUN 2050"_var.iconv("D/E"); // 30123
 	//  // or
 	//  let v2 = iconv("21 JUN 2050", "D/E");`
+	//
 	ND var  iconv(const char* convstr) const;
 
 #ifdef EXO_FORMAT
@@ -1476,6 +1577,7 @@ public:
 	//  // or
 	//  var v3 = format("'{:_>8.2f}'", var(12.345)); // "'___12.35'"
 	//  var v4 = format("'{::MD20P|R(_)#8}'", var(12.345));`
+	//
 	ND var  format(in fmt_str, Args&&... args) const
 	{
 		THISIS("var  var::format(SV fmt_str, Args&&... args) const")
@@ -1496,6 +1598,7 @@ public:
 	//  // or
 	//  let v2 = from_codepage("\xa4", "CP1124");
 	//  // U+0404 Cyrillic Capital Letter Ukrainian Ie Unicode character`
+	//
 	ND var  from_codepage(const char* codepage) const;
 
 	// Converts to codepage encoded text from UTF-8 encoded text
@@ -1503,6 +1606,7 @@ public:
 	// `let v1 = "Є"_var.to_codepage("CP1124").oconv("HEX"); // "A4"
 	//  // or
 	//  let v2 = to_codepage("Є", "CP1124").oconv("HEX");`
+	//
 	ND var  to_codepage(const char* codepage) const;
 
 	///// DYNAMIC ARRAY FUNCTIONS:
@@ -1525,6 +1629,7 @@ public:
 	//
 	// `let v1 = "f1^f2v1]f2v2]f2v3^f2"_var;
 	//  let v2 = v1.f(2, 2); // "f2v2"`
+	//
 	ND var  f(const int fieldno, const int valueno = 0, const int subvalueno = 0)            const;
 
 	// Extract a specific field, value or subvalue from a dynamic array.
@@ -1534,6 +1639,7 @@ public:
 	//  //
 	//  // For brevity the function alias "f()" (standing for "field") is normally used instead of "extract()" as follows:
 	//  var v3 = v1.f(2, 2);`
+	//
 	ND var  extract(const int fieldno, const int valueno = 0, const int subvalueno = 0)      const {return this->f(fieldno, valueno, subvalueno);}
 
 	// UPDATE
@@ -1594,6 +1700,7 @@ public:
 	// `let v1 = "1]2]3^4]5]6"_var.sum(); // "6^15"_var
 	//  // or
 	//  let v2 = sum("1]2]3^4]5]6"_var);`
+	//
 	ND var  sum() const;
 
 	// Sum up all levels into a single figure
@@ -1601,6 +1708,7 @@ public:
 	// `let v1 = "1]2]3^4]5]6"_var.sumall(); // 21
 	//  // or
 	//  let v2 = sumall("1]2]3^4]5]6"_var);`
+	//
 	ND var  sumall() const;
 
 	// Ditto allowing commas etc.
@@ -1608,11 +1716,13 @@ public:
 	// `let v1 = "10,20,30"_var.sum(","); // 60
 	//  // or
 	//  let v2 = sum("10,20,30", ",");`
+	//
 	ND var  sum(SV delimiter) const;
 
 	// Binary ops (+, -, *, /) in parallel on multiple values
 	//
 	// `let v1 = "10]20]30"_var.mv("+","2]3]4"_var); // "12]23]34"_var`
+	//
 	ND var  mv(const char* opcode, in var2) const;
 
 	///// DYNAMIC ARRAY MUTATORS Standalone commands:
@@ -1639,6 +1749,7 @@ public:
 	//  v1(2) = "X"; /// Easiest.
 	//  // or
 	//  updater(v1, 2, "X");`
+	//
 	   IO   updater(const int fieldno, in replacement) REF {this->updater(fieldno, 0, 0, replacement); return THIS;}
 
 	// Replace a specific value of a specific field in a dynamic array.
@@ -1649,6 +1760,7 @@ public:
 	//  v1(2, 2) = "X"; /// Easiest.
 	//  // or
 	//  updater(v1, 2, 2, "X");`
+	//
 	   IO   updater(const int fieldno, const int valueno, in replacement) REF {this->updater(fieldno, valueno, 0, replacement); return THIS;}
 
 	// Replace a specific subvalue of a specific value of a specific field in a dynamic array.
@@ -1659,6 +1771,7 @@ public:
 	//  v1(2, 2, 2) = "X"; /// Easiest.
 	//  // or
 	//  updater(v1, 2, 2, 2, "X");`
+	//
 	   IO   updater(const int fieldno, const int valueno, const int subvalueno, in replacement) REF;
 
 	// Insert a specific field in a dynamic array, moving all other fields up.
@@ -1667,6 +1780,7 @@ public:
 	//  v1.inserter(2, "X"); // "f1^X^v1]v2}s2}s3^f3"_var
 	//  // or
 	//  inserter(v1, 2, "X");`
+	//
 	   IO   inserter(const int fieldno, in insertion) REF {this->inserter(fieldno, 0, 0, insertion); return THIS;}
 
 	// Ditto for a specific value in a specific field, moving all other values up.
@@ -1675,6 +1789,7 @@ public:
 	//  v1.inserter(2, 2, "X"); // "f1^v1]X]v2}s2}s3^f3"_var
 	//  // or
 	//  inserter(v1, 2, 2, "X");`
+	//
 	   IO   inserter(const int fieldno, const int valueno, in insertion) REF {this->inserter(fieldno, valueno, 0, insertion); return THIS;}
 
 	// Ditto for a specific subvalue in a dynamic array, moving all other subvalues up.
@@ -1683,6 +1798,7 @@ public:
 	//  v1.inserter(2, 2, 2, "X"); // "f1^v1]v2}X}s2}s3^f3"_var
 	//  // or
 	//  v1.inserter(2, 2, 2, "X");`
+	//
 	   IO   inserter(const int fieldno, const int valueno, const int subvalueno, in insertion) REF;
 
 	// Remove a specific field (or value, or subvalue) from a dynamic array, moving all other fields (or values, or subvalues)  down.
@@ -1691,6 +1807,7 @@ public:
 	//  v1.remover(2, 2); // "f1^v1^f3"_var
 	//  // or
 	//  remover(v1, 2, 2);`
+	//
 	   IO   remover(const int fieldno, const int valueno = 0, const int subvalueno = 0) REF;
 
 	//-er version could be extract and erase in one go
@@ -1710,6 +1827,7 @@ public:
 	// `if ("UK^US^UA"_var.locate("US")) ... ok // 2
 	//  // or
 	//  if (locate("US", "UK^US^UA"_var)) ... ok`
+	//
 	ND var locate(in target) const;
 
 	// locate() with only the target substr provided and setting returned searches unordered values separated by any type of field mark chars.
@@ -1720,6 +1838,7 @@ public:
 	//  if ("UK]US]UA"_var.locate("US", setting)) ... ok // setting -> 2
 	//  // or
 	//  if (locate("US", "UK]US]UA"_var, setting)) ... ok`
+	//
 	ND bool locate(in target, out valueno) const;
 
 	// locate() the target in unordered fields if fieldno is 0, or values if a fieldno is specified, or subvalues if the valueno argument is provided.
@@ -1728,6 +1847,7 @@ public:
 	//
 	// `var setting;
 	//  if ("f1^f2v1]f2v2]s1}s2}s3}s4^f3^f4"_var.locate("s4", setting, 2, 3)) ... ok // setting -> 4 // returns true`
+	//
 	ND bool locate(in target, out setting, const int fieldno, const int valueno = 0) const;
 
 	// LOCATE BY
@@ -1741,18 +1861,22 @@ public:
 	// In case the target is not exactly found then the correct value no for inserting the target is returned in setting.
 	//
 	// `var valueno; if ("aaa]bbb]ccc"_var.locateby("AL", "bb", valueno)) ... // valueno -> 2 // returns false and valueno = where it could be correctly inserted.`
+	//
 	ND bool locateby(const char* ordercode, in target, out valueno) const;
 
 	// locateby() ordered as above but in fields if fieldno is 0, or values in a specific fieldno, or subvalues in a specific valueno.
 	//
 	// `var setting;
 	//  if ("f1^f2^aaa]bbb]ccc^f4"_var.locateby("AL", "bb", setting, 3)) ... // setting -> 2 // return false and where it could be correctly inserted.`
+	//
 	ND bool locateby(const char* ordercode, in target, out setting, const int fieldno, const int valueno = 0) const;
 
 	// LOCATE USING
 
 	// locate() a target substr in the whole unordered string using a given delimiter char returning true if found.
+	//
 	// `if ("AB,EF,CD"_var.locateusing(",", "EF")) ... ok`
+	//
 	ND bool locateusing(const char* usingchar, in target) const;
 
 	// locate() the target in a specific field, value or subvalue using a specified delimiter and unordered data
@@ -1762,6 +1886,7 @@ public:
 	//
 	// `var setting;
 	//  if ("f1^f2^f3c1,f3c2,f3c3^f4"_var.locateusing(",", "f3c2", setting, 3)) ... ok // setting -> 2 // returns true`
+	//
 	ND bool locateusing(const char* usingchar, in target, out setting, const int fieldno = 0, const int valueno = 0, const int subvalueno = 0) const;
 
 	// LOCATE BY, USING
@@ -1789,6 +1914,7 @@ public:
 	//  if (not connect()) ...
 	//  // or
 	//  if (not connect("exodus")) ...`
+	//
 	ND bool connect(in conninfo = "");
 
 	// "attach" causes the given filenames to be associated with a specific connection for the remainder of the session.
@@ -1803,11 +1929,13 @@ public:
 	//  if (conn.attach(filenames)) ... ok
 	//  // or
 	//  if (attach(filenames)) ... ok`
+	//
 	ND bool attach(in filenames) const;
 
 	// Removes files from the internal cache created by previous open() and attach() calls.
 	// var: Defaults to the default connection.
 	// filenames: FM separated list.
+	//
 	   void detach(in filenames);
 
 	// Begin a db transaction.
@@ -1815,6 +1943,7 @@ public:
 	// `if (not conn.begintrans()) ...
 	//  // or
 	//  if (not begintrans()) ...`
+	//
 	ND bool begintrans() const;
 
 	// Check if a db transaction is in progress.
@@ -1822,6 +1951,7 @@ public:
 	// `if (conn.statustrans()) ... ok
 	//  // or
 	//  if (statustrans()) ... ok`
+	//
 	ND bool statustrans() const;
 
 	// Rollback a db transaction.
@@ -1829,6 +1959,7 @@ public:
 	// `if (conn.rollbacktrans()) ... ok
 	//  // or
 	//  if (rollbacktrans()) ... ok`
+	//
 	ND bool rollbacktrans() const;
 
 	// Commit a db transaction.
@@ -1837,6 +1968,7 @@ public:
 	// `if (conn.committrans()) ... ok
 	//  // or
 	//  if (committrans()) ... ok`
+	//
 	ND bool committrans() const;
 
 	// Execute an sql command.
@@ -1845,6 +1977,7 @@ public:
 	// `if (conn.sqlexec("select 1")) ... ok
 	//  // or
 	//  if (sqlexec("select 1")) ... ok`
+	//
 	ND bool sqlexec(in sqlcmd) const;
 
 	// Execute an SQL command and capture the response.
@@ -1857,6 +1990,7 @@ public:
 	//  if (conn.sqlexec(sqlcmd, response)) ... ok // response -> "col1^col2\x1fxxx^yyy"_var /// \x1f is the Record Mark (RM) char. The backtick char is used here by gendoc to deliminate source code.
 	//  // or
 	//  if (sqlexec(sqlcmd, response)) ... ok`
+	//
 	ND bool sqlexec(in sqlcmd, io response) const;
 
 	// Closes db connection and frees process resources both locally and in the database server.
@@ -1864,6 +1998,7 @@ public:
 	// `conn.disconnect();
 	//  // or
 	//  disconnect();`
+	//
 	   void disconnect();
 
 	// Closes all connections and frees process resources both locally and in the database server(s).
@@ -1872,22 +2007,28 @@ public:
 	// `conn.disconnectall();
 	//  // or
 	//  disconnectall();`
+	//
 	   void disconnectall();
 
 	// Returns: The last os or db error message.
-	// `var v1 = var().lasterror();
+	// obj is var()
+	//
+	// `var v1 = var::lasterror();
 	//  // or
 	//  var v2 = lasterror();`
-	ND var  lasterror() const;
+	//
+	ND static var  lasterror();
 
 	// Log the last os or db error message.
 	// Output: to stdlog
 	// Prefixes the output with source if provided.
+	// obj is var()
 	//
-	// `var().loglasterror("main:");
+	// `var::loglasterror("main:");
 	//  // or
 	//  loglasterror("main:");`
-	   var  loglasterror(in source = "") const;
+	//
+	   static void  loglasterror(in source = "");
 
 	///// DATABASE MANAGEMENT:
 	/////////////////////////
@@ -1903,6 +2044,7 @@ public:
 	//  if (conn.dbcreate("xo_gendoc_testdb")) ... ok
 	//  // or
 	//  if (dbcreate("xo_gendoc_testdb")) ...`
+	//
 	ND bool dbcreate(in new_dbname, in old_dbname = "") const;
 
 	// Create a named database as a copy of an existing database.
@@ -1914,6 +2056,7 @@ public:
 	//  if (conn.dbcopy("xo_gendoc_testdb", "xo_gendoc_testdb2")) ... ok
 	//  // or
 	//  if (dbcopy("xo_gendoc_testdb", "xo_gendoc_testdb2")) ...`
+	//
 	ND bool dbcopy(in from_dbname, in to_dbname) const;
 
 	// Returns: A list of available databases on a particular connection.
@@ -1921,6 +2064,7 @@ public:
 	// `let v1 = conn.dblist();
 	//  // or
 	//  let v2 = dblist();`
+	//
 	ND var  dblist() const;
 
 	// Delete (drop) a named database.
@@ -1930,6 +2074,7 @@ public:
 	//  if (conn.dbdelete("xo_gendoc_testdb2")) ... ok
 	//  // or
 	//  if (dbdelete("xo_gendoc_testdb2")) ...`
+	//
 	ND bool dbdelete(in dbname) const;
 
 	// Create a named db file.
@@ -1939,6 +2084,7 @@ public:
 	//  if (conn.createfile(filename)) ... ok
 	//  // or
 	//  if (createfile(filename)) ...`
+	//
 	ND bool createfile(in filename) const;
 
 	// Rename a db file.
@@ -1947,6 +2093,7 @@ public:
 	//  if (conn.renamefile(filename, new_filename)) ... ok
 	//  // or
 	//  if (renamefile(filename, new_filename)) ...`
+	//
 	ND bool renamefile(in filename, in newfilename) const;
 
 	// Returns: A list of all files in a database
@@ -1955,6 +2102,7 @@ public:
 	//  if (not conn.listfiles()) ...
 	//  // or
 	//  if (not listfiles()) ...`
+	//
 	ND var  listfiles() const;
 
 	// Delete all records in a db file
@@ -1963,6 +2111,7 @@ public:
 	//  if (not conn.clearfile(filename)) ...
 	//  // or
 	//  if (not clearfile(filename)) ...`
+	//
 	ND bool clearfile(in filename) const;
 
 	// Delete a db file
@@ -1971,6 +2120,7 @@ public:
 	//  if (conn.deletefile(filename)) ... ok
 	//  // or
 	//  if (deletefile(filename)) ...`
+	//
 	ND bool deletefile(in filename) const;
 
 	// obj is conn_or_file
@@ -1983,6 +2133,7 @@ public:
 	//  var nrecs1 = conn.reccount(filename);
 	//  // or
 	//  var nrecs2 = reccount(filename);`
+	//
 	ND var  reccount(in filename = "") const;
 
 	// Calls db maintenance function for a file or all files.
@@ -1995,12 +2146,15 @@ public:
 
 	// obj is file
 
-	// Opens a db file to a var which can be used in subsequent functions to work on the specified file and database connection.
+	// Opens a db file to a var which can be used in subsequent db function calls to access a specific file using a specific connection.
+	// connection: If not specified and the filename is present in an internal cache of filenames and connections created by previous calls to open() or attach() then open() returns true. If it is not present in the cache then the default connection will be checked.
+	// Returns: True if the filename was present in the cache OR if the db connection reports that the file is present.
 	//
 	// `var file, filename = "xo_clients";
 	//  if (not file.open(filename)) ...
 	//  // or
 	//  if (not open(filename to file)) ...`
+	//
 	ND bool open(in dbfilename, in connection = "");
 
 	// Closes db file var
@@ -2010,6 +2164,7 @@ public:
 	//  file.close();
 	//  // or
 	//  close(file);`
+	//
 	   void close() const;
 
 	// Creates a secondary index for a given db file and field name.
@@ -2026,6 +2181,7 @@ public:
 	//  if (filename.createindex(fieldname)) ... ok
 	//  // or
 	//  if (createindex(filename, fieldname)) ...`
+	//
 	ND bool createindex(in fieldname, in dictfile = "") const;
 
 	// Lists secondary indexes in a database or for a db file
@@ -2036,6 +2192,7 @@ public:
 	//  if (conn.listindex()) ... ok // includes "xo_clients__date_created"
 	//  // or
 	//  if (listindex()) ... ok`
+	//
 	ND var  listindex(in file_or_filename = "", in fieldname = "") const;
 
 	// Deletes a secondary index for a db file and field name.
@@ -2047,6 +2204,7 @@ public:
 	//  if (file.deleteindex(fieldname)) ... ok
 	//  // or
 	//  if (deleteindex(file, fieldname)) ...`
+	//
 	ND bool deleteindex(in fieldname) const;
 
 	// Places a metaphorical db lock on a particular record given a db file and key.
@@ -2066,6 +2224,7 @@ public:
 	//  if (file.lock(key)) ... ok
 	//  // or
 	//  if (lock(file, key)) ...`
+	//
 	ND var  lock(in key) const;
 
 	// Removes a db lock placed by the lock function.
@@ -2077,6 +2236,7 @@ public:
 	//  if (file.unlock(key)) ... ok
 	//  // or
 	//  if (unlock(file, key)) ...`
+	//
 	   bool unlock(in key) const;
 
 	// Removes all db locks placed by the lock function in the specified connection.
@@ -2086,13 +2246,15 @@ public:
 	//  if (not conn.unlockall()) ...
 	//  // or
 	//  if (not unlockall(conn)) ...`
+	//
 	   bool unlockall() const;
 
 	// obj is record
 
 	// Writes a record into a db file given a unique primary key.
 	// Either inserts a new record or updates an existing record.
-	// It always succeeds so no result code is returned.
+	// Returns: Nothing since writes always succeed.
+	// Throws: VarDBException if the file does not exist. Like most db functions.
 	// Any memory cached record is deleted.
 	//
 	// `let record = "Client GD^G^20855^30000^1001.00^20855.76539"_var;
@@ -2101,6 +2263,7 @@ public:
 	//  record.write(file, key);
 	//  // or
 	//  write(record on file, key);`
+	//
 	   void write(in file, in key) const;
 
 	// Reads a record from a db file for a given key.
@@ -2115,6 +2278,7 @@ public:
 	//  if (not record.read(file, key)) ... // record -> "Client GD^G^20855^30000^1001.00^20855.76539"_var
 	//  // or
 	//  if (not read(record from file, key)) ...`
+	//
 	ND bool read(in file, in key);
 
 	// Deletes a record from a db file given a key.
@@ -2127,6 +2291,7 @@ public:
 	//  if (file.deleterecord(key)) ... ok
 	//  // or
 	// //if (deleterecord(file, key)) ...`
+	//
 	   bool deleterecord(in key) const;
 
 	// Inserts a new record in a db file.
@@ -2138,6 +2303,7 @@ public:
 	//  if (record.insertrecord(file, key)) ... ok
 	//  // or
 	//  if (insertrecord(record on file, key)) ...`
+	//
 	ND bool insertrecord(in file, in key) const;
 
 	// Updates an existing record in a db file.
@@ -2149,6 +2315,7 @@ public:
 	//  if (not record.updaterecord(file, key)) ...
 	//  // or
 	//  if (not updaterecord(record on file, key)) ...`
+	//
 	ND bool updaterecord(in file, in key) const;
 
 	// Updates the key of an existing record in a db file.
@@ -2159,6 +2326,7 @@ public:
 	//  if (not file.updatekey(key, newkey)) ...
 	//  // or
 	//  if (not updatekey(file, newkey, key)) ... // Reverse the above change.`
+	//
 	ND bool updatekey(in key, in newkey) const;
 
 	// obj is strvar
@@ -2169,6 +2337,7 @@ public:
 	//  if (not field.readf(file, key, fieldno)) ... // field -> "G"
 	//  // or
 	//  if (not readf(field from file, key, fieldno)) ...`
+	//
 	ND bool readf(in file, in key, const int fieldno);
 
 	// "write field" Same as write() but only writes to a specific field number in the record
@@ -2177,6 +2346,7 @@ public:
 	//  field.writef(file, key, fieldno);
 	//  // or
 	//  writef(field on file, key, fieldno);`
+	//
 	   void writef(in file, in key, const int fieldno) const;
 
 	// obj is record
@@ -2192,6 +2362,7 @@ public:
 	//  record.writec(file, key);
 	//  // or
 	//  writec(record on file, key);`
+	//
 	   void writec(in file, in key) const;
 
 	// "Read cache" Same as "read() but first reads from a memory cache.
@@ -2208,6 +2379,7 @@ public:
 	//
 	//  // Verify not in actual database file by using read() not readc()
 	//  if (read(record from file, key)) abort("Error: " ^ key ^ " should not be in the actual database file"); // error`
+	//
 	ND bool readc(in file, in key);
 
 	// obj is dbfile
@@ -2220,6 +2392,7 @@ public:
 	//  if (file.deletec(key)) ... ok
 	//  // or
 	//  if (deletec(file, key)) ...`
+	//
 	   bool deletec(in key) const;
 
 	// obj is conn
@@ -2230,6 +2403,7 @@ public:
 	// `conn.clearcache();
 	//  // or
 	// clearcache(conn);`
+	//
 	   void clearcache() const;
 
 	// obj is strvar
@@ -2251,6 +2425,7 @@ public:
 	//  let client_name = key.xlate("xo_clients", 1, "X"); // "Client AAA"
 	//  // or
 	//  let name_and_type = xlate("xo_clients", key, "NAME_AND_TYPE", "X"); // "Client AAA (A)"`
+	//
 	ND var  xlate(in filename, in fieldno, const char* mode) const;
 
 	///// DATABASE SORT/SELECT:
@@ -2279,6 +2454,7 @@ public:
 	//  if (select("xo_clients with type 'B' and with balance ge 100 by type by name"))
 	//      while (readnext(ID))
 	//          println("Client code is {}", ID);`
+	//
 	ND bool select(in sort_select_command = "");
 
 	// Create an active select list from a string of keys.
@@ -2293,6 +2469,7 @@ public:
 	//  // or
 	//  if (selectkeys(keys)) ... ok
 	//  assert(readnext(ID) and ID == "A01");`
+	//
 	ND bool selectkeys(in keys);
 
 	// Checks if a select list is active.
@@ -2308,6 +2485,7 @@ public:
 	//  if (select("xo_clients")) {
 	//      assert(hasnext());
 	//  }`
+	//
 	ND bool hasnext();
 
 	// Acquires and consumes one key from an active select list of database record keys.
@@ -2317,10 +2495,12 @@ public:
 	// Each call to readnext consumes one key from the list.
 	// Once all the keys in an active select list have been consumed by calls to readnext, the list becomes inactive.
 	// See select() for example code.
+	//
 	ND bool readnext(out key);
 
 	// Similar to readnext(key) but multivalued.
 	// If the active list was ordered by multivalued database fields then pairs of key and multivalue number will be available to the readnext function.
+	//
 	ND bool readnext(out key, out valueno);
 
 	// Similar to readnext(key) but acquires the database record as well.
@@ -2337,6 +2517,7 @@ public:
 	//  if (select("xo_clients with type 'B' and with balance ge 100 by type by name (R)"))
 	//      while (readnext(RECORD, ID, MV))
 	//          println("Code is {}, Name is {}", calculate("CODE"), calculate("NAME"));`
+	//
 	ND bool readnext(out record, out key, out valueno);
 
 	// Deactivates an active select list.
@@ -2350,6 +2531,7 @@ public:
 	//  // or
 	//  clearselect();
 	//  if (not hasnext()) ... ok`
+	//
 	   void clearselect();
 
 	// Stores an active select list for later retrieval.
@@ -2371,6 +2553,7 @@ public:
 	//  if (select("xo_clients with type 'B' by name")) {
 	//      if (savelist("mylist")) ... ok
 	//  }`
+	//
 	   bool savelist(SV listname);
 
 	// Retrieve and reactivate a saved select list.
@@ -2390,6 +2573,7 @@ public:
 	//      while (readnext(ID))
 	//          println("Key is {}", ID);
 	//  }`
+	//
 	ND bool getlist(SV listname);
 
 	// Delete a saved select list.
@@ -2401,6 +2585,7 @@ public:
 	//  if (conn.deletelist("mylist")) ... ok
 	//  // or
 	//  if (deletelist("mylist")) ...`
+	//
 	   bool deletelist(SV listname) const;
 
 //	// Create a saved list from a string of keys.
@@ -2413,6 +2598,7 @@ public:
 //	//  if (conn.makelist("mylist", keys)) ... ok
 //	//  // or
 //	//  if (makelist("mylist", keys)) ... ok`
+//	//
 //	ND bool makelist(SV listname, in keys);
 //
 //	// Create an active select list from a database file record.
@@ -2425,6 +2611,7 @@ public:
 //	//  if (formlist("lists", "mylist")) ... ok
 //	//  while (readnext(ID))
 //	//      println("Key is {}, MV is {}", ID, MV);`
+//	//
 //	ND bool formlist(in keys, const int fieldno = 0);
 
 	///// OS TIME/DATE:
@@ -2438,6 +2625,7 @@ public:
 	// `let today1 = var::date();
 	//  // or
 	//  let today2 = date();`
+	//
 	ND static var  date();
 
 	// Number of whole seconds since last 00:00:00 (UTC).
@@ -2447,6 +2635,7 @@ public:
 	// `let now1 = var::time();
 	//  // or
 	//  let now2 = time();`
+	//
 	ND static var  time();
 
 	// Number of fractional seconds since last 00:00:00 (UTC).
@@ -2456,6 +2645,7 @@ public:
 	// `let now1 = var::ostime();
 	//  // or
 	//  let now2 = ostime();`
+	//
 	ND static var  ostime();
 
 	// Number of fractional days since pick epoch 1967-12-31 00:00:00 UTC. Negative for dates before.
@@ -2465,14 +2655,17 @@ public:
 	// `let now1 = var::ostimestamp();
 	//  // or
 	//  let now2 = ostimestamp();`
+	//
 	ND static var  ostimestamp();
 
 	// Construct a timestamp from a date and time
+	// obj is vardate
 	//
 	// `let idate = iconv("2025-01-01", "D"), itime = iconv("23:59:59", "MT");
 	//  let ts1 = idate.ostimestamp(itime); // 20821.99998842593
 	//  // or
 	//  let ts2 = ostimestamp(idate, itime);`
+	//
 	ND var  ostimestamp(in ostime) const;
 
 	// Sleep/pause/wait for a number of milliseconds
@@ -2481,6 +2674,7 @@ public:
 	// `var::ossleep(100); // sleep for 100ms
 	//  // or
 	//  ossleep(100);`
+	//
 	   static void ossleep(const int milliseconds);
 
 	// Sleep/pause/wait up to a given number of milliseconds or until any changes occur in an FM delimited list of directories and/or files.
@@ -2513,6 +2707,7 @@ public:
 	// * IN_DELETE_SELF⋅- Directory or file under observation was deleted
 	// * IN_MOVE_SELF⋅⋅⋅- Directory or file under observation was moved
 	// </pre>
+	//
 	   var  oswait(const int milliseconds) const;
 
 	///// OS FILE I/O:
@@ -2520,9 +2715,10 @@ public:
 
 	// obj is osfilevar
 
-	// Initialises an os file handle var that can be used in subsequent random access osbread and osbwrite functions.
+	// Initialises an os file handle var that can be used for random read and write
 	// osfilename: The name of an existing os file name including path.
 	// utf8: Defaults to true which causes trimming of partial utf-8 Unicode byte sequences from the end of osbreads. For raw untrimmed osbreads pass tf8 = false;
+	// osfilevar: [out] To be used in subsequent calls to osbread() and osbwrite()
 	// Returns: True if successful or false if not possible for any reason. e.g. Target doesnt exist, permissions etc.
 	// The file will be opened for writing if possible otherwise for reading.
 	//
@@ -2532,6 +2728,7 @@ public:
 	//  if (ostempfile.osopen(osfilename)) ... ok
 	//  // or
 	//  if (osopen(osfilename to ostempfile)) ... ok`
+	//
 	ND bool osopen(in osfilename, const bool utf8 = true) const;
 
 	// Writes data to an existing os file starting at a given byte offset (0 based).
@@ -2543,6 +2740,7 @@ public:
 	//  if (text.osbwrite(osfilename, offset)) ... ok // offset -> 16
 	//  // or
 	//  if (not osbwrite(text on osfilename, offset)) ...`
+	//
 	ND bool osbwrite(in osfilevar, io offset) const;
 
 	// Reads length bytes from an existing os file starting at a given byte offset (0 based).
@@ -2555,6 +2753,7 @@ public:
 	//  if (text.osbread(osfilename, offset, 8)) ... ok // text -> "aaa=123\n" // offset -> 8
 	//  // or
 	//  if (osbread(text from osfilename, offset, 8)) ... ok // text -> "bbb=456\n" // offset -> 16`
+	//
 	ND bool osbread(in osfilevar, io offset, const int length);
 
 	// Removes an osfilevar handle from the internal memory cache of os file handles. This frees up both exodus process memory and operating system resources.
@@ -2563,27 +2762,30 @@ public:
 	// `osfilevar.osclose();
 	//  // or
 	//  osclose(osfilevar);`
+	//
 	   void osclose() const;
 
 	// obj is strvar
 
 	// Create a complete os file from a var.
-	// Any existing os file is removed first.
-	// Returns: True if successful or false if not possible for any reason.
-	// e.g. Path is not writeable, permissions etc.
-	// If codepage is specified then output is converted from utf-8 to that codepage. Otherwise no conversion is done.
+	// strvar: The text or data to be used to create the file.
+	// osfilename: Absolute or relative path and filename to be written. Any existing os file is removed first.
+	// codepage: If specified then output is converted from utf-8 to that codepage before being written. Otherwise no conversion is done.
+	// Returns: True if successful or false if not possible for any reason. e.g. Path is not writeable, permissions etc.
 	//
 	// `let text = "aaa = 123\nbbb = 456";
 	//  let osfilename = ostempdir() ^ "xo_gendoc_test.conf";
 	//  if (text.oswrite(osfilename)) ... ok
 	//  // or
 	//  if (oswrite(text on osfilename)) ... ok`
+	//
 	ND bool oswrite(in osfilename, const char* codepage = "") const;
 
 	// Read a complete os file into a var.
-	// If codepage is specified then input is converted from that codepage to utf-8 otherwise no conversion is done.
+	// osfilename: Absolute or relative path and filename to be read.
+	// codepage: If specified then input is converted from that codepage to utf-8 after being read. Otherwise no conversion is done.
+	// strvar: [out] is currently set to "" in case of any failure but this is may be changed in a future release to either force var to be unassigned or to leave it untouched. To guarantee future behaviour either add a line 'xxxx.defaulter("")' or set var manually in case osread() returns false. Or use the one argument free function version of osread() which always returns "" in case of failure to read.
 	// Returns: True if successful or false if not possible for any reason. e.g. File doesnt exist, insufficient permissions etc.
-	// var: [out] is currently set to "" in case of any failure but this is may be changed in a future release to either force var to be unassigned or to leave it untouched. To guarantee future behaviour either add a line 'xxxx.defaulter("")' or set var manually in case osread() returns false. Or use the one argument free function version of osread() which always returns "" in case of failure to read.
 	//
 	// `var text;
 	//  let osfilename = ostempdir() ^ "xo_gendoc_test.conf";
@@ -2591,6 +2793,7 @@ public:
 	//  // or
 	//  if (osread(text from osfilename)) ... ok
 	//  let text2 = osread(osfilename);`
+	//
 	ND bool osread(const char* osfilename, const char* codepage = "");
 
 	// TODO check if it calls osclose on itself in case removing a varfile
@@ -2598,10 +2801,10 @@ public:
 	// obj is osfile_or_dirname
 
 	// Renames an os file or dir in the OS file system.
-	// Will not overwrite an existing os file or dir.
-	// Source and target must exist in the same storage device.
-	// Returns: True if successful or false if not possible for any reason.
-	// e.g. Target already exists, path is not writeable, permissions etc.
+	// The source and target must exist in the same storage device.
+	// osfile_or_dirname: Absolute or relative path and file or dir name to be renamed.
+	// new_dirpath_or_filepath: Will not overwrite an existing os file or dir.
+	// Returns: True if successful or false if not possible for any reason. e.g. Target already exists, path is not writeable, permissions etc.
 	// Uses std::filesystem::rename internally.
 	//
 	// `let from_osfilename = ostempdir() ^ "xo_gendoc_test.conf";
@@ -2611,13 +2814,14 @@ public:
 	//  if (from_osfilename.osrename(to_osfilename)) ... ok
 	//  // or
 	//  if (osrename(from_osfilename, to_osfilename)) ...`
+	//
 	ND bool osrename(in new_dirpath_or_filepath) const;
 
 	// "Moves" an os file or dir within the os file system.
-	// Will not overwrite an existing os file or dir.
-	// Returns: True if successful or false if not possible for any reason.
-	// e.g. Source doesnt exist or cannot be accessed, target already exists, source or target is not writeable, permissions etc.
-	// Attempts osrename first then oscopy followed by osremove original.
+	// Attempts osrename first, then oscopy followed by osremove original.
+	// osfile_or_dirname: Absolute or relative path and file or dir name to be moved.
+	// to_osfilename: Will not overwrite an existing os file or dir.
+	// Returns: True if successful or false if not possible for any reason. e.g. Source doesnt exist or cannot be accessed, target already exists, source or target is not writeable, permissions, storage space etc.
 	//
 	// `let from_osfilename = ostempdir() ^ "xo_gendoc_test.conf.bak";
 	//  let to_osfilename = from_osfilename.cut(-4);
@@ -2626,10 +2830,13 @@ public:
 	//  if (from_osfilename.osmove(to_osfilename)) ... ok
 	//  // or
 	//  if (osmove(from_osfilename, to_osfilename)) ...`
+	//
 	ND bool osmove(in to_osfilename) const;
 
 	// Copies an os file or directory recursively within the os file system.
-	// Will overwrite an existing os file or dir.
+	// osfile_or_dirname: Absolute or relative path and file or dir name to be copied.
+	// to_osfilename: Will overwrite an existing os file or merge into an existing dir.
+	// Returns: True if successful or false if not possible for any reason. e.g. Source doesnt exist or cannot be accessed, target is not writeable, permissions, storage space, etc.
 	// Uses std::filesystem::copy internally with recursive and overwrite options
 	//
 	// `let from_osfilename = ostempdir() ^ "xo_gendoc_test.conf";
@@ -2638,19 +2845,20 @@ public:
 	//  if (from_osfilename.oscopy(to_osfilename)) ... ok;
 	//  // or
 	//  if (oscopy(from_osfilename, to_osfilename)) ... ok`
+	//
 	ND bool oscopy(in to_osfilename) const;
 
-	// obj is osfilename
-
-	// Removes/deletes an os file from the OS file system given path and name.
+	// Removes/deletes an os file from the OS file system.
 	// Will not remove directories. Use osrmdir() to remove directories
-	// Returns: True if successful or false if not possible for any reason.
-	// e.g. Target doesnt exist, path is not writeable, permissions etc.
+	// osfilename: Absolute or relative path and file name to be removed.
+	// Returns: True if successful or false if not possible for any reason. e.g. Target doesnt exist, path is not writeable, permissions etc.
+	// obj is osfilename
 	//
 	// `let osfilename = ostempdir() ^ "xo_gendoc_test.conf";
 	//  if (osfilename.osremove()) ... ok
 	//  // or
 	//  if (osremove(osfilename)) ...`
+	//
 	ND bool osremove() const;
 
 	///// OS DIRECTORIES:
@@ -2660,8 +2868,11 @@ public:
 
 	// obj is dirpath
 
-	// Returns: A FM delimited string containing all matching dir entries given a dir path
-	// A glob pattern (e.g. *.conf) can be appended to the path or passed as argument.
+	// Get a list of os files and/or dirs.
+	// dirpath: Absolute or relative dir path.
+	// globpattern: e.g. *.conf to be appended to the dirpath or a complete path plus glob pattern e.g. /etc/ *.conf.
+	// mode: 0: default - Any regular files or dirs. 1 - Only regular os files. 2 - Only dirs.
+	// Returns: An FM delimited string containing all matching dir entries given a dir path
 	//
 	// `var entries1 = "/etc/"_var.oslist("*.cfg"); /// e.g. "adduser.conf^ca-certificates.con^... etc."
 	//  // or
@@ -2674,78 +2885,96 @@ public:
 	// Same as oslist for files only
 	ND var  oslistd(SV globpattern = "") const;
 
-	// Returns: Dir info for any dir entry or "" if it doesnt exist
-	// A short string containing size ^ FM ^ modified_time ^ FM ^ modified_time
-	// mode 0 default
-	// mode 1 returns "" if not an os file
-	// mode 2 returns "" if not an os dir
+	// Get dir info about an os file or dir.
+	// Returns: A short string containing size ^ FM ^ modified_time ^ FM ^ modified_time or "" if not a regular file or dir.
+	// mode: 0: default. 1: Must be a regular os file. 2: Must be an os dir.
 	// See also osfile() and osdir()
+	// obj is osfile_or_dirpath
 	//
 	// `var info1 = "/etc/hosts"_var.osinfo(); /// e.g. "221^20597^78309"_var
 	//  // or
 	//  var info2 = osinfo("/etc/hosts");`
-	// obj is osfile_or_dirpath
+	//
 	ND var  osinfo(const int mode = 0) const;
 
-	// Returns: Dir info for a os file
-	// A short string containing size ^ FM ^ modified_time ^ FM ^ modified_time
+	// Get dir info of an os file.
+	// osfilename: Absolute or relative path and file name.
+	// Returns: A short string containing size ^ FM ^ modified_time ^ FM ^ modified_time or "" if not a regular file.
 	// Alias for osinfo(1)
+	// obj is osfilename
 	//
 	// `var fileinfo1 = "/etc/hosts"_var.osfile(); /// e.g. "221^20597^78309"_var
 	//  // or
 	//  var fileinfo2 = osfile("/etc/hosts");`
-	// obj is osfilename
+	//
 	ND var  osfile() const;
 
-	// Returns: Dir info for a dir.
-	// A short string containing FM ^ modified_time ^ FM ^ modified_time
+	// Get dir info of an os dir.
+	// dirpath: Absolute or relative path and dir name.
+	// Returns: A short string containing FM ^ modified_time ^ FM ^ modified_time or "" if not a dir.
 	// Alias for osinfo(2)
+	// obj is dirpath
 	//
 	// `var dirinfo1 = "/etc/"_var.osdir(); /// e.g. "^20848^44464"_var
 	//  // or
 	//  var dirinfo2 = osfile("/etc/");`
+	//
 	ND var  osdir() const;
 
-	// Makes a new directory and returns true if successful.
-	// Including parent dirs if necessary.
+	// Create a new os file system directory.
+	// Parent dirs wil be created if necessary.
+	// dirpath: Absolute or relative path and dir name.
+	// Returns: True if successful.
+	// obj is dirpath
 	//
 	// `let osdirname = "xo_test/aaa";
 	//  if (osrmdir("xo_test/aaa")) {}; // Cleanup first
 	//  if (osdirname.osmkdir()) ... ok
 	//  // or
 	//  if (osmkdir(osdirname)) ...`
+	//
 	ND bool osmkdir() const;
 
-	// Changes the current working dir and returns true if successful.
+	// Changes the current working dir.
+	// newpath: An absolute or relative dir path and name.
+	// Returns: True if successful or false if not. e.g. Invalid dirpath, insufficient permission etc.
+	// obj is var()
 	//
 	// `let osdirname = "xo_test/aaa";
 	//  if (osdirname.oscwd()) ... ok
 	//  // or
 	//  if (oscwd(osdirname)) ... ok
 	//  if (oscwd("../..")) ... ok /// Change back to avoid errors in following code.`
-	ND bool oscwd(in newpath) const;
+	//
+	ND static bool oscwd(SV newpath);
 
-	// Returns: The current working directory
+	// Gets the current dir path and name.
+	// Returns: The current working dir path and name.
 	// e.g. "/root/exodus/cli/src/xo_test/aaa"
+	// obj is var()
 	//
 	// `var cwd1 = var().oscwd();
 	//  // or
 	//  var cwd2 = oscwd();`
-	ND var  oscwd() const;
+	//
+	ND static var  oscwd();
 
-	// Removes a os dir and returns true if successful.
-	// Optionally even if not empty. Including subdirs.
+	// Removes (deletes) an os dir,
+	// eventifnotempty: If true any subdirs will also be removed/deleted recursively, otherwise the function will fail and return false.
+	// Returns: Returns true if successful or false if not. e.g dir doesnt exist, insufficient permission, not empty etc.
 	//
 	// `let osdirname = "xo_test/aaa";
 	//  if (osdirname.osrmdir()) ... ok
 	//  // or
 	//  if (osrmdir(osdirname)) ...`
+	//
 	ND bool osrmdir(bool evenifnotempty = false) const;
 
 	///// OS SHELL/ENVIRONMENT:
 	//////////////////////////
 
 	// Execute a shell command.
+	// command: An executable command to be interpreted by the default os shell.
 	// Returns: True if the process terminates with error status 0 and false otherwise.
 	// Append "&>/dev/null" to the command to suppress terminal output.
 	// obj is command
@@ -2754,6 +2983,7 @@ public:
 	//  if (cmd.osshell()) ... ok
 	//  // or
 	//  if (osshell(cmd)) ... ok`
+	//
 	ND bool osshell() const;
 
 	// Same as osshell but captures and returns stdout
@@ -2767,6 +2997,7 @@ public:
 	//
 	//  // or capturing stdout but ignoring exit status
 	//  text = osshellread(cmd);`
+	//
 	ND bool osshellread(in oscmd);
 
 	// Same as osshell but provides stdin to the process
@@ -2778,78 +3009,91 @@ public:
 	//  if (outtext.osshellwrite("grep xyz")) ... ok
 	//  // or
 	//  if (osshellwrite(outtext, "grep xyz")) ... ok`
+	//
 	ND bool osshellwrite(in oscmd) const;
 
-	// Returns: The path of the tmp dir
-	// e.g. "/tmp/"
+	// Get the tmp dir path and name.
+	// Returns: A string e.g. "/tmp/"
 	// obj is var()
 	//
 	// `let v1 = var::ostempdir();
 	//  // or
 	//  let v2 = ostempdir();`
+	//
 	ND static var  ostempdir();
 
-	// Returns: The name of a new temporary file
-	// e.g. Something like "/tmp/~exoEcLj3C"
+	// Create a temporary file
+	// Returns: The name of new temporary file e.g. "/tmp/~exoEcLj3C"
 	// obj is var()
 	//
 	// `var temposfilename1 = var::ostempfile();
 	//  // or
 	//  var temposfilename2 = ostempfile();`
+	//
 	ND static var  ostempfile();
 
 	// obj is envvalue
 
-	// Set the value of an environment variable code
+	// Set the value of an environment variable
+	// envcode: The code of the env variable to set.
+	// envvalue: The new value to set the env code to.
 	// obj is envvalue
 	//
 	// `let envcode = "EXO_ABC", envvalue = "XYZ";
 	//  envvalue.ossetenv(envcode);
 	//  // or
 	//  ossetenv(envcode, envvalue);`
+	//
 	   void ossetenv(SV envcode) const;
 
 	// Get the value of an environment variable.
-	// envcode: The code of the desired environment variable or "" for all.
-	// Returns: True if set or false if not.
-	// var: If envcode exists: var is set to the value of the environment variable
-	// var: If envcode doesnt exist: var is set to ""
-	// var: If envcode is "": var is set to an dynamic array of all environment variables LIKE CODE1=VALUE1^CODE2=VALUE2...
-	// osgetenv and ossetenv work with a per thread copy of the process environment. This avoids multithreading issues but not actually changing the process environment.
+	// envcode: The code of the env variable to get or "" for all.
+	// envvalue: [out] Set to the value of the env variable if set otherwise "". If envcode is "" then envvalue is set to a dynamic array of all environment variables LIKE CODE1=VALUE1^CODE2=VALUE2...
+	// Returns: True if the envcode is set or false if not.
+	// osgetenv and ossetenv work with a per thread copy of the os process environment. This avoids multithreading issues but does not change the process environment. Child processes created by var::osshell() will not inherit any env variables set using ossetenv() so the oscommand will need to be prefixed to achieve the desired result.
 	// For the actual system environment, see "man environ". extern char **environ; // environ is a pointer to an array of pointers to char* env pairs like xxx=yyy and the last pointer in the array is nullptr.
+	// obj is envvalue
 	//
 	// `var envvalue1;
 	//  if (envvalue1.osgetenv("HOME")) ... ok // e.g. "/home/exodus"
 	//  // or
-	//  var envvalue2 = osgetenv("EXO_ABC"); // "XYZ"`
+	//  let envvalue2 = osgetenv("EXO_ABC"); // "XYZ"`
+	//
 	ND bool osgetenv(SV envcode);
-
-	// TODO check for threadsafe
 
 	// obj is var()
 
-	// Get the os process id
+	// Get the current os process id
+	// Returns: A number e.g. 663237.
+	// obj is var()
 	//
 	// `let pid1 = var::ospid(); /// e.g. 663237
 	//  // or
 	//  let pid2 = ospid();`
+	//
 	ND static var  ospid();
 
-	// Get the os thread process id
+	// Get the current os thread process id
+	// Returns: A number e.g. 663237.
+	// obj is var()
 	//
 	// `let tid1 = var::ostid(); /// e.g. 663237
 	//  // or
 	//  let tid2 = ostid();`
+	//
 	ND static var  ostid();
 
-	// Get the local and remote git branch commit details
+	// Get the exodus library version info.
+	// Returns: The git commit details as at the time the library was built.
+	// obj is var()
 	//
-	// Local:  doc 2025-03-19 18:15:31 +0000 219cdad8a
-	// Remote: doc 2025-03-17 15:03:00 +0000 958f412f0
-	// https://github.com/exodusdb/exodusdb/commit/219cdad8a
-	// https://github.com/exodusdb/exodusdb/archive/958f412f0.tar.gz
-	//
-	// `let v1 = var::version();
+	// `// e.g.
+	//  // Local:  doc 2025-03-19 18:15:31 +0000 219cdad8a
+	//  // Remote: doc 2025-03-17 15:03:00 +0000 958f412f0
+	//  // https://github.com/exodusdb/exodusdb/commit/219cdad8a
+	//  // https://github.com/exodusdb/exodusdb/archive/958f412f0.tar.gz
+	//  //
+	//  let v1 = var::version();
 	//  // or
 	//  let v2 = version();`
 	//
@@ -2857,21 +3101,25 @@ public:
 
 	// obj is var
 
-	// Sets the current thread's default locale codepage code
+	// Sets the current thread's default locale.
+	// strvar: The new locale codepage code.
 	// True if successful
 	// obj is strvar
 	//
-	// `if ("en_US.utf8"_var.setxlocale()) ... ok
+	// `if (var::setxlocale("en_US.utf8")) ... ok
 	//  // or
 	//  if (setxlocale("en_US.utf8")) ... ok`
-	   bool setxlocale() const;
-
-	// Returns: The current thread's default locale codepage code
 	//
-	// `let v1 = var().getxlocale(); // "en_US.utf8"
+	   static bool setxlocale(const char* newlocalecode);
+
+	// Gets the current thread's default locale.
+	// Returns: A locale codepage code string.
+	//
+	// `let v1 = var::getxlocale(); // "en_US.utf8"
 	//  // or
 	//  let v2 = getxlocale();`
-	ND var  getxlocale();
+	//
+	ND static var  getxlocale();
 
 	///// OUTPUT:
 	////////////
@@ -2886,6 +3134,7 @@ public:
 	// `"abc"_var.outputl("xyz = "); /// Sends "xyz = abc\n" to stdout and flushes.
 	//  // or
 	//  outputl("xyz = ", "abc"); /// Any number of arguments is allowed. All will be output.`
+	//
 	   CVR outputl(in prefix = "") const;
 	   CVR output(in prefix = "") const;  // Same as outputl() but doesnt append an NL char and is BUFFERED, not flushed.
 	   CVR outputt(in prefix = "") const; // Same as outputl() but appends a tab char instead of an NL char and is BUFFERED, not flushed.
@@ -2898,6 +3147,7 @@ public:
 	// `"abc"_var.logputl("xyz = "); /// Sends "xyz = abc\n" to stdlog buffer and is not flushed.
 	//  // or
 	//  logputl("xyz = ", "abc");; /// Any number of arguments is allowed. All will be output.`
+	//
 	   CVR logputl(in prefix = "") const;
 	   CVR logput(in prefix = "") const; // Same as logputl() but doesnt append an NL char.
 
@@ -2909,12 +3159,14 @@ public:
 	// `"abc"_var.errputl("xyz = "); /// Sends "xyz = abc\n" to stderr
 	//  // or
 	//  errputl("xyz = ", "abc"); /// Any number of arguments is allowed. All will be output.`
+	//
 	   CVR errputl(in prefix = "") const;
 	   CVR errput(in prefix = "") const; // Same as errputl() but doesnt append an NL char and is BUFFERED not flushed.
 
 	// Output to a given stream.
 	// Is BUFFERED not flushed.
 	// The raw string bytes are output. No character or byte conversion is performed.
+	//
 	   CVR put(std::ostream& ostream1) const;
 
 	// Flush any and all buffered output to stdout and stdlog.
@@ -2923,6 +3175,7 @@ public:
 	// `var().osflush();
 	//  // or
 	//  osflush();`
+	//
 	   void osflush() const;
 
 	///// INPUT:
@@ -2941,6 +3194,7 @@ public:
 	//  // if (v1.input("Prompt:")) ... ok
 	//  // or
 	//  // var v2 = input();`
+	//
 	ND bool input(in prompt = "");
 
     // Get raw bytes from standard input.
@@ -2952,6 +3206,7 @@ public:
 	// ⋅0 : Get all bytes presently available.
 	// ⋅1 : Same as keypressed(true). Deprecated.
 	// -1 : Same as keypressed(). Deprecated.
+	//
 	   out  inputn(const int nchars);
 
 	// Return the code of the current terminal key pressed.
@@ -2963,6 +3218,7 @@ public:
 	// `var v1; v1.keypressed();
 	//  // or
 	//  var v2 = keypressed();`
+	//
 	   out  keypressed(const bool wait = false);
 
 	// obj is var()
@@ -2975,21 +3231,25 @@ public:
 	// `var v1 = var().isterminal(); /// 1 or 0
 	//  // or
 	//  var v2 = isterminal();`
+	//
 	ND bool isterminal(const int arg = 1) const;
 
 	// Checks if stdin has any bytes available for input.
 	// If no bytes are immediately available, the process sleeps for up to the given number of milliseconds, returning true immediately any bytes become available or false if the period expires without any bytes becoming available.
 	// Returns: True if any bytes are available otherwise false.
 	// It only takes a few µsecs to return false if no bytes are available and no wait time has been requested.
+	//
 	ND bool hasinput(const int milliseconds = 0) const;
 
 	// True if stdin is at end of file
+	//
 	ND bool eof() const;
 
 	// Sets terminal echo on or off.
 	// "On" causes all stdin data to be reflected to stdout if stdin is a terminal.
 	// Turning terminal echo off can be used to prevent display of confidential information.
 	// Returns: True if successful.
+	//
 	   bool echo(const bool on_off = true) const;
 
 	// Install various interrupt handlers.
@@ -2997,10 +3257,12 @@ public:
 	// SIGINT - Ctrl+C -> "Interrupted. (C)ontinue (Q)uit (B)acktrace (D)ebug (A)bort ?"
 	// SIGHUP - Sets a static variable "RELOAD_req" which may be handled or ignored by the program.
 	// SIGTERM - Sets a static variable "TERMINATE_req" which may be handled or ignored by the program.
+	//
 	   void breakon() const;
 
 	// Disable keyboard interrupt.
 	// Ctrl+C becomes inactive in terminal.
+	//
 	   void breakoff() const;
 
 	///// MATH/BOOLEAN:
@@ -3013,12 +3275,14 @@ public:
 	//  let v2 = v1.abs(); // 12.34
     //  // or
     //  let v3 = abs(v1);`
+	//
     ND var  abs() const;
 
     // Power
     // `let v1 = var(2).pwr(8); // 256
     //  // or
     //  let v2 = pwr(2, 8);`
+	//
     ND var  pwr(in exponent) const;
 
     // Initialise the seed for rnd()
@@ -3028,6 +3292,7 @@ public:
     // `var(123).initrnd(); /// Set seed to 123
     //  // or
     //  initrnd(123);`
+	//
            void initrnd() const;
 
     // Pseudo random number generator
@@ -3037,42 +3302,49 @@ public:
     // `let v1 = var(100).rnd(); /// Random 0 to 99
     //  // or
     //  let v2 = rnd(100);`
+	//
     ND var  rnd()     const;
 
     // Power of e
     // `let v1 = var(1).exp(); // 2.718281828459045
     //  // or
     //  let v2 = exp(1);`
+	//
     ND var  exp()     const;
 
     // Square root
     // `let v1 = var(100).sqrt(); // 10
     //  // or
     //  let v2 = sqrt(100);`
+	//
     ND var  sqrt()    const;
 
     // Sine of degrees
     // `let v1 = var(30).sin(); // 0.5
     //  // or
     //  let v2 = sin(30);`
+	//
     ND var  sin()     const;
 
     // Cosine of degrees
     // `let v1 = var(60).cos(); // 0.5
     //  // or
     //  let v2 = cos(60);`
+	//
     ND var  cos()     const;
 
     // Tangent of degrees
     // `let v1 = var(45).tan(); // 1
     //  // or
     //  let v2 = tan(45);`
+	//
     ND var  tan()     const;
 
     // Arctangent of degrees
     // `let v1 = var(1).atan(); // 45
     //  // or
     //  let v2 = atan(1);`
+	//
     ND var  atan()    const;
 
     // Natural logarithm
@@ -3080,6 +3352,7 @@ public:
     // `let v1 = var(2.718281828459045).loge(); // 1
     //  // or
     //  let v2 = loge(2.718281828459045);`
+	//
     ND var  loge()    const;
 
     //  ND var  int() const;//reserved word
@@ -3093,6 +3366,7 @@ public:
     //  var v3 = var(-2.9).integer(); // -2
     //  // or
     //  var v4 = integer(-2.9);`
+	//
     ND var  integer() const;
 
     // Truncate decimal numbers towards negative
@@ -3104,6 +3378,7 @@ public:
     //  var v3 = var(-2.9).floor(); // -3
     //  // or
     //  var v4 = floor(-2.9);`
+	//
     ND var  floor() const;
 
 	/* For doc only. Actually implemented in var_base but documented here
@@ -3121,6 +3396,7 @@ public:
 	//  let v3 = mod(-11, 5); // 4
 	//  let v4 = mod(11, -5); // -4
 	//  let v5 = mod(-11, -5); // -1`
+	//
 	ND var  mod(in modulus) const;
 
 	// Not documenting the overloaded versions
@@ -3178,10 +3454,10 @@ public:
 
  private:
 
-	ND bool cursorexists(); //database, not terminal
+	ND bool dbcursorexists(); //database, not terminal
 	ND bool selectx(in fieldnames, in sortselectclause);
 
-	   var  setlasterror(in msg) const;
+	   static void  setlasterror(in msg);
 
 	// TODO check if can speed up by returning reference to converted self like MC
 
@@ -3192,80 +3468,82 @@ public:
 	// Date output: Convert internal date format to human readable date or calendar info in text format.
 	// Returns: Human readable date or calendar info, or the original value unconverted if non-numeric.
 	// Flags: See examples below.
-	// Any multifield/multivalue structure is preserved.
+	// Any Dynamic array structure is preserved.
 	// obj is vardate
 	//
 	// `let v1 = 19002;
+	//  var v2;
+	//  v2 =  v1.oconv( "D"   ) ; //  "09 JAN 2020"   // Default
 	//
-	//  assert( v1.oconv( "D"   ) == "09 JAN 2020"  ); // Default
+	//  v2 =  v1.oconv( "D/"  ) ; //  "01/09/2020"    // mm/dd/yyyy - American numeric
+	//  v2 =  v1.oconv( "D-"  ) ; //  "01-09-2020"    // mm-dd-yyyy - American numeric
 	//
-	//  assert( v1.oconv( "D/"  ) == "01/09/2020"   ); // mm/dd/yyyy - American numeric
-	//  assert( v1.oconv( "D-"  ) == "01-09-2020"   ); // mm-dd-yyyy - American numeric
+	//  v2 =  v1.oconv( "D/E" ) ; //  "09/01/2020"    // dd/mm/yyyy - International numeric
+	//  v2 =  v1.oconv( "D-E" ) ; //  "09-01-2020"    // dd-mm-yyyy - International numeric
 	//
-	//  assert( v1.oconv( "D/E" ) == "09/01/2020"   ); // dd/mm/yyyy - International numeric
-	//  assert( v1.oconv( "D-E" ) == "09-01-2020"   ); // dd-mm-yyyy - International numeric
+	//  v2 =  v1.oconv( "D2"  ) ; //  "09 JAN 20"     // 2 digit year
+	//  v2 =  v1.oconv( "D0"  ) ; //  "09 JAN"        // No year
 	//
-	//  assert( v1.oconv( "D2"  ) == "09 JAN 20"    ); // 2 digit year
-	//  assert( v1.oconv( "D0"  ) == "09 JAN"       ); // No year
+	//  v2 =  v1.oconv( "DS"  ) ; //  "2020 JAN 09"   // yyyy mmm dd - ISO year first, alpha month
+	//  v2 =  v1.oconv( "DS-" ) ; //  "2020-01-09"    // yyyy-mm-dd  - ISO year first, numeric month
 	//
-	//  assert( v1.oconv( "DS"  ) == "2020 JAN 09"  ); // yyyy mmm dd - ISO year first, alpha month
-	//  assert( v1.oconv( "DS-" ) == "2020-01-09"   ); // yyyy-mm-dd  - ISO year first, numeric month
+	//  v2 =  v1.oconv( "DZ"  ) ; //  " 9 JAN 2020"   // Leading 0 become spaces
+	//  v2 =  v1.oconv( "DZZ" ) ; //  "9 JAN 2020"    // Leading 0 are suppressed
+	//  v2 =  v1.oconv( "D!"  ) ; //  "09JAN2020"     // No separators
+	//  v2 =  v1.oconv( "DS-!") ; //  "20200109"      // yyyymmdd packed
 	//
-	//  assert( v1.oconv( "DZ"  ) == " 9 JAN 2020"  ); // Leading 0 become spaces
-	//  assert( v1.oconv( "DZZ" ) == "9 JAN 2020"   ); // Leading 0 are suppressed
-	//  assert( v1.oconv( "D!"  ) == "09JAN2020"    ); // No separators
-	//  assert( v1.oconv( "DS-!") == "20200109"     ); // yyyymmdd packed
+	//  v2 =  v1.oconv( "DM"  ) ; //  "1"             // Month number
+	//  v2 =  v1.oconv( "DMA" ) ; //  "JANUARY"       // Month name
+	//  v2 =  v1.oconv( "DY"  ) ; //  "2020"          // Year number
+	//  v2 =  v1.oconv( "DY2" ) ; //  "20"            // Year 2 digits
+	//  v2 =  v1.oconv( "DD"  ) ; //  "9"             // Day number in month (1-31)
+	//  v2 =  v1.oconv( "DW"  ) ; //  "4"             // Weekday number (1-7)
+	//  v2 =  v1.oconv( "DWA" ) ; //  "THURSDAY"      // Weekday name
+	//  v2 =  v1.oconv( "DQ"  ) ; //  "1"             // Quarter number
+	//  v2 =  v1.oconv( "DJ"  ) ; //  "9"             // Day number in year
+	//  v2 =  v1.oconv( "DL"  ) ; //  "31"            // Last day number of month (28-31)
 	//
-	//  assert( v1.oconv( "DM"  ) == "1"            ); // Month number
-	//  assert( v1.oconv( "DMA" ) == "JANUARY"      ); // Month name
-	//  assert( v1.oconv( "DY"  ) == "2020"         ); // Year number
-	//  assert( v1.oconv( "DY2" ) == "20"           ); // Year 2 digits
-	//  assert( v1.oconv( "DD"  ) == "9"            ); // Day number in month (1-31)
-	//  assert( v1.oconv( "DW"  ) == "4"            ); // Weekday number (1-7)
-	//  assert( v1.oconv( "DWA" ) == "THURSDAY"     ); // Weekday name
-	//  assert( v1.oconv( "DQ"  ) == "1"            ); // Quarter number
-	//  assert( v1.oconv( "DJ"  ) == "9"            ); // Day number in year
-	//  assert( v1.oconv( "DL"  ) == "31"           ); // Last day number of month (28-31)
-	//
-	//  // Multifield/multivalue
-	//  var v2 = "12345^12346]12347"_var;
-	//  assert(v2.oconv("D") == "18 OCT 2001^19 OCT 2001]20 OCT 2001"_var);
+	//  // Dynamic array
+	//  let v3 = "12345^12346]12347"_var;
+	//  v2 = v3.oconv("D") ; //  "18 OCT 2001^19 OCT 2001]20 OCT 2001"_var
 	//
 	//   // or
-	//   assert( oconv(v2, "D"   ) == "18 OCT 2001"  );`
+	//   v2 =  oconv(v3, "D"   ) ; //  "18 OCT 2001"  `
 	ND std::string oconv_D(const char* conversion) const;
 
 	// Date input: Convert human readable date to internal date format.
 	// Returns: Internal date or "" if the input is an invalid date.
 	// Internal date format is whole days since 1967-12-31 00:00:00 which is day 0.
-	// Any multifield/multivalue structure is preserved.
+	// Any Dynamic array structure is preserved.
 	// obj is varstr
 	//
 	// `// International order "DE"
-	//  assert(            oconv(19005, "DE") == "12 JAN 2020");
-	//  assert(   "12/1/2020"_var.iconv("DE") == 19005);
-	//  assert(   "12 1 2020"_var.iconv("DE") == 19005);
-	//  assert(   "12-1-2020"_var.iconv("DE") == 19005);
-	//  assert( "12 JAN 2020"_var.iconv("DE") == 19005);
-	//  assert( "jan 12 2020"_var.iconv("DE") == 19005);
+	//  var v2;
+	//  v2 =             oconv(19005, "DE") ; //  "12 JAN 2020"
+	//  v2 =    "12/1/2020"_var.iconv("DE") ; //  19005
+	//  v2 =    "12 1 2020"_var.iconv("DE") ; //  19005
+	//  v2 =    "12-1-2020"_var.iconv("DE") ; //  19005
+	//  v2 =  "12 JAN 2020"_var.iconv("DE") ; //  19005
+	//  v2 =  "jan 12 2020"_var.iconv("DE") ; //  19005
 	//
 	//  // American order "D"
-	//  assert(            oconv(19329, "D") == "01 DEC 2020");
-	//  assert(   "12/1/2020"_var.iconv("D") == 19329);
-	//  assert(  "DEC 1 2020"_var.iconv("D") == 19329);
-	//  assert(  "1 dec 2020"_var.iconv("D") == 19329);
+	//  v2 =             oconv(19329, "D") ; //  "01 DEC 2020"
+	//  v2 =    "12/1/2020"_var.iconv("D") ; //  19329
+	//  v2 =   "DEC 1 2020"_var.iconv("D") ; //  19329
+	//  v2 =   "1 dec 2020"_var.iconv("D") ; //  19329
 	//
 	//  // Reverse order
-	//  assert(  "2020/12/1"_var.iconv("DE") == 19329);
-	//  assert(   "2020-12-1"_var.iconv("D") == 19329);
-	//  assert(  "2020 1 dec"_var.iconv("D") == 19329);
+	//  v2 =   "2020/12/1"_var.iconv("DE") ; //  19329
+	//  v2 =    "2020-12-1"_var.iconv("D") ; //  19329
+	//  v2 =   "2020 1 dec"_var.iconv("D") ; //  19329
 	//
 	//  //Invalid date
-	//  assert(   "2/29/2021"_var.iconv("D") == "");
-	//  assert(  "29/2/2021"_var.iconv("DE") == "");
+	//  v2 =    "2/29/2021"_var.iconv("D") ; //  ""
+	//  v2 =   "29/2/2021"_var.iconv("DE") ; //  ""
 	//
 	//  // or
-	//  assert(iconv("12/1/2020"_var, "DE") == 19005);`
+	//  v2 = iconv("12/1/2020"_var, "DE") ; //  19005`
+	//
 	ND var  iconv_D(const char* conversion) const;
 
 	// Time output: Convert internal time format to human readable time e.g. "10:30:59".
@@ -3276,52 +3554,56 @@ public:
 	// "S" - Output seconds
 	// "2" = Ignored (used in iconv)
 	// ":" - Any other flag is used as the separator char instead of ":"
-	// Any multifield/multivalue structure is preserved.
+	// Any Dynamic array structure is preserved.
 	// obj is vartime
 	//
-	// `var v1 = 234800;
-	//  assert( v1.oconv( "MT"   ) == "17:13"      ); // Default
-	//  assert( v1.oconv( "MTH"  ) == "05:13PM"    ); // 'H' flag for AM/PM
-	//  assert( v1.oconv( "MTS"  ) == "17:13:20"   ); // 'S' flag for seconds
-	//  assert( v1.oconv( "MTHS" ) == "05:13:20PM" ); // Both flags
+	// `let v1  = 62000;
+	//  var v2;
+	//  v2 = v1.oconv("MT"  ); // "17:13"      // Default
+	//  v2 = v1.oconv("MTH" ); // "05:13PM"    // 'H' flag for AM/PM
+	//  v2 = v1.oconv("MTS" ); // "17:13:20"   // 'S' flag for seconds
+	//  v2 = v1.oconv("MTHS"); // "05:13:20PM" // Both flags
 	//
-	//  var v2 = 0;
-	//  assert( v2.oconv( "MT"   ) == "00:00"      );
-	//  assert( v2.oconv( "MTH"  ) == "12:00AM"    );
-	//  assert( v2.oconv( "MTS"  ) == "00:00:00"   );
-	//  assert( v2.oconv( "MTHS" ) == "12:00:00AM" );
+	//  let v3  = 0;
+	//  v2 = v3.oconv("MT"  ); // "00:00"
+	//  v2 = v3.oconv("MTH" ); // "12:00AM"
+	//  v2 = v3.oconv("MTS" ); // "00:00:00"
+	//  v2 = v3.oconv("MTHS"); // "12:00:00AM"
 	//
-	//  // Multifield/multivalue
-	//  var v3 = "234800^234860]234920"_var;
-	//  assert(v3.oconv("MT") == "17:13^17:14]17:15"_var);
+	//  // Dynamic array
+	//  let v4  = "61980^62040]62100"_var;
+	//  v2 = v4.oconv("MT");    // "17:13^17:14]17:15"_var
 	//
 	//  // or
-	//  assert( oconv(v1, "MT"   ) == "17:13"      );`
+	//  v2 = oconv(v1, "MT");    // "17:13"`
+	//
 	ND std::string oconv_MT(const char* conversion) const;
 
 	// Time input: Convert human readable time (e.g. "10:30:59") to internal time format.
 	// Returns: Internal time or "" if the input is an invalid time.
 	// Internal time format is whole seconds since midnight.
 	// Accepts: Two or three groups of digits surrounded and separated by any non-digits char(s).
-	// Any multifield/multivalue structure is preserved.
+	// Any Dynamic array structure is preserved.
 	// obj is varstr
 	//
-	// `assert(      "17:13"_var.iconv( "MT" ) == 61980);
-	//  assert(    "05:13PM"_var.iconv( "MT" ) == 61980);
-	//  assert(   "17:13:20"_var.iconv( "MT" ) == 62000);
-	//  assert( "05:13:20PM"_var.iconv( "MT" ) == 62000);
+	// `var v2;
+	//  v2 =       "17:13"_var.iconv( "MT" ) ; //  61980
+	//  v2 =     "05:13PM"_var.iconv( "MT" ) ; //  61980
+	//  v2 =    "17:13:20"_var.iconv( "MT" ) ; //  62000
+	//  v2 =  "05:13:20PM"_var.iconv( "MT" ) ; //  62000
 	//
-	//  assert(      "00:00"_var.iconv( "MT" ) == 0);
-	//  assert(    "12:00AM"_var.iconv( "MT" ) == 0);     // Midnight
-	//  assert(    "12:00PM"_var.iconv( "MT" ) == 43200); // Noon
-	//  assert(   "00:00:00"_var.iconv( "MT" ) == 0);
-	//  assert( "12:00:00AM"_var.iconv( "MT" ) == 0);
+	//  v2 =       "00:00"_var.iconv( "MT" ) ; //  0
+	//  v2 =     "12:00AM"_var.iconv( "MT" ) ; //  0     // Midnight
+	//  v2 =     "12:00PM"_var.iconv( "MT" ) ; //  43200 // Noon
+	//  v2 =    "00:00:00"_var.iconv( "MT" ) ; //  0
+	//  v2 =  "12:00:00AM"_var.iconv( "MT" ) ; //  0
 	//
-	//  // Multifield/multivalue
-	//  assert("17:13^05:13PM]17:13:20"_var.iconv("MT") == "61980^61980]62000"_var);
+	//  // Dynamic array
+	//  v2 = "17:13^05:13PM]17:13:20"_var.iconv("MT") ; //  "61980^61980]62000"_var
 	//
 	//  // or
-	//  assert(iconv("17:13", "MT") == 61980);`
+	//  v2 = iconv("17:13", "MT") ; //  61980`
+	//
 	ND var  iconv_MT(bool strict) const;
 
 	// Number output: Convert internal numbers to external text format after rounding and optional scaling.
@@ -3344,56 +3626,59 @@ public:
 	// "C" means suffix negatives with "CR" and positives or zero with "DB".
 	// "D" means suffix negatives with "DB" and positives or zero with "CR".
 	//
-	//  Any multifield/multivalue structure is preserved.
+	//  Any Dynamic array structure is preserved.
 	// obj is varnum
 	//
 	// `var v1 = -1234.567;
-	//  assert( v1.oconv( "MD20"   ) ==  "-1234.57"   );
-	//  assert( v1.oconv( "MD20,"  ) == "-1,234.57"   ); // , flag
-	//  assert( v1.oconv( "MC20,"  ) == "-1.234,57"   ); // MC code
-	//  assert( v1.oconv( "MD20,-" ) ==  "1,234.57-"  ); // - flag
-	//  assert( v1.oconv( "MD20,<" ) == "<1,234.57>"  ); // < flag
-	//  assert( v1.oconv( "MD20,C" ) ==  "1,234.57CR" ); // C flag
-	//  assert( v1.oconv( "MD20,D" ) ==  "1,234.57DB" ); // D flag
+	//  var v2;
+	//  v2 =  v1.oconv( "MD20"   ) ; //   "-1234.57"
+	//  v2 =  v1.oconv( "MD20,"  ) ; //  "-1,234.57"    // , flag
+	//  v2 =  v1.oconv( "MC20,"  ) ; //  "-1.234,57"    // MC code
+	//  v2 =  v1.oconv( "MD20,-" ) ; //   "1,234.57-"   // - flag
+	//  v2 =  v1.oconv( "MD20,<" ) ; //  "<1,234.57>"   // < flag
+	//  v2 =  v1.oconv( "MD20,C" ) ; //   "1,234.57CR"  // C flag
+	//  v2 =  v1.oconv( "MD20,D" ) ; //   "1,234.57DB"  // D flag
 	//
-	//  // Multifield/multivalue
-	//  var v2 = "1.1^2.1]2.2"_var;
-	//  assert( v2.oconv( "MD20"   ) == "1.10^2.10]2.20"_var);
+	//  // Dynamic array
+	//  var v3 = "1.1^2.1]2.2"_var;
+	//  v2 =  v3.oconv( "MD20"   ) ; //  "1.10^2.10]2.20"_var
 	//
 	//  // or
-	//  assert( oconv(v1, "MD20"   ) ==  "-1234.57"   );`
+	//  v2 =  oconv(v1, "MD20"   ) ; //   "-1234.57"   `
 	ND std::string oconv_MD(const char* conversion) const;
 
-	//  assert( v1.oconv( "MD2"   ) ==    "12.34" );
+	//  v2 =  v1.oconv( "MD2"   ) ; //     "12.34"
 
 	// Text justification: Left, right and center. Padding and truncating. See Procrustes.
 	// e.g. "L#10", "R#10", "C#10"
 	// Useful when outputting to terminal devices where spaces are used for alignment.
-	// Multifield/multivalue structure is preserved.
+	// Dynamic array structure is preserved.
 	// ASCII only.
 	// obj is var
 	//
-	// `assert(     "abcde"_var.oconv( "L#3" ) == "abc" ); // Truncating
-	//  assert(     "abcde"_var.oconv( "R#3" ) == "cde" );
-	//  assert(     "abcde"_var.oconv( "C#3" ) == "abc" );
+	// `var v2;
+	//  v2 =      "abcde"_var.oconv( "L#3" ) ; //  "abc"  // Truncating
+	//  v2 =      "abcde"_var.oconv( "R#3" ) ; //  "cde"
+	//  v2 =      "abcde"_var.oconv( "C#3" ) ; //  "abc"
 	//
-	//  assert(     "ab"_var.oconv( "L#6" ) == "ab␣␣␣␣" ); // Padding
-	//  assert(     "ab"_var.oconv( "R#6" ) == "␣␣␣␣ab" );
-	//  assert(     "ab"_var.oconv( "C#6" ) == "␣␣ab␣␣" );
+	//  v2 =      "ab"_var.oconv( "L#6" ) ; //  "ab␣␣␣␣"  // Padding
+	//  v2 =      "ab"_var.oconv( "R#6" ) ; //  "␣␣␣␣ab"
+	//  v2 =      "ab"_var.oconv( "C#6" ) ; //  "␣␣ab␣␣"
 	//
-	//  assert(      var(42).oconv( "L(0)#5" ) == "42000" ); // Padding char (x)
-	//  assert(      var(42).oconv( "R(0)#5" ) == "00042" );
-	//  assert(      var(42).oconv( "C(0)#5" ) == "04200" );
-	//  assert(      var(42).oconv( "C(0)#5" ) == "04200" );
+	//  v2 =       var(42).oconv( "L(0)#5" ) ; //  "42000"  // Padding char (x)
+	//  v2 =       var(42).oconv( "R(0)#5" ) ; //  "00042"
+	//  v2 =       var(42).oconv( "C(0)#5" ) ; //  "04200"
+	//  v2 =       var(42).oconv( "C(0)#5" ) ; //  "04200"
 	//
-	//  // Multifield/multivalue
-	//  assert(      "f1^v1]v2"_var.oconv("L(_)#5") == "f1___^v1___]v2___"_var);
+	//  // Dynamic array
+	//  v2 =       "f1^v1]v2"_var.oconv("L(_)#5") ; //  "f1___^v1___]v2___"_var
 	//
 	//  // Fail for non-ASCII (Should be 5)
-	//  assert(     "🐱"_var.oconv("L#5").textwidth() == 3);
+	//  v2 =      "🐱"_var.oconv("L#5").textwidth() ; //  3
 	//
 	//  // or
-	//  assert(     oconv("abcd", "L#3" ) == "abc" );`
+	//  v2 =      oconv("abcd", "L#3" ) ; //  "abc" `
+	//
 	ND std::string oconv_LRC(in format) const;
 
 	// Text folding and justification.
@@ -3404,68 +3689,103 @@ public:
 	// obj is varstr
 	//
 	// `let v1 = "Have a nice day";
-	//  assert(  v1.oconv("T#10") == "Have a␣␣␣␣|nice day␣␣"_var);
+	//  v2 =   v1.oconv("T#10") ; //  "Have a␣␣␣␣|nice day␣␣"_var
 	//  // or
-	//  assert( oconv(v1, "T#10") == "Have a␣␣␣␣|nice day␣␣"_var );`
+	//  v2 =  oconv(v1, "T#10") ; //  "Have a␣␣␣␣|nice day␣␣"_var `
+	//
 	ND std::string oconv_T(in format) const;
 
 	// Character replacement
 	// e.g. MRU
 	// `let v1 = "123/abC.";
-	//  assert(v1.oconv("MRL") == "123/abc."); // lcase
-	//  assert(v1.oconv("MRU") == "123/ABC."); // ucase
-	//  assert(v1.oconv("MRT") == "123/Abc."); // tcase
-	//  assert(v1.oconv("MRN") == "123");      // Return only digits
-	//  assert(v1.oconv("MRA") == "abC");      // Return only alphabetic
-	//  assert(v1.oconv("MRB") == "123abC");   // Return only alphanumeric
-	//  assert(v1.oconv("MR/N") == "/abC.");   // Remove digits
-	//  assert(v1.oconv("MR/A") == "123/.");   // Remove alphabetic
-	//  assert(v1.oconv("MR/B") == "/.");      // Remove alphanumeric`
+	//  var v2;
+	//  v2 = v1.oconv("MRL") ; //  "123/abc." // lcase
+	//  v2 = v1.oconv("MRU") ; //  "123/ABC." // ucase
+	//  v2 = v1.oconv("MRT") ; //  "123/Abc." // tcase
+	//  v2 = v1.oconv("MRN") ; //  "123"      // Return only digits
+	//  v2 = v1.oconv("MRA") ; //  "abC"      // Return only alphabetic
+	//  v2 = v1.oconv("MRB") ; //  "123abC"   // Return only alphanumeric
+	//  v2 = v1.oconv("MR/N") ; //  "/abC."   // Remove digits
+	//  v2 = v1.oconv("MR/A") ; //  "123/."   // Remove alphabetic
+	//  v2 = v1.oconv("MR/B") ; //  "/."      // Remove alphanumeric`
+	//
 	ND io   oconv_MR(const char* conversion);
 
-	// Convert a string of bytes to a string of hexadecimal digits. The size of the output is precisely double that of the input.
-	// Multifield/multivalue structure is not preserved. Field marks are converted to HEX as for all other bytes.
+	// Convert the chars of a string to a string of pairs of hexadecimal digits.
+	// varstr: A string. Numbers will be converted to strings for conversion. 1.2 -> "1.2" -> hex "312E32"
+	// Dynamic array structure is not preserved. Field marks are converted to HEX as for all other bytes.
+	// The size of the output is always precisely double that of the input.
+	// This function is the exact inverse of iconv("HEX").
 	// obj is varstr
 	//
-	// `assert(     "ab01"_var.oconv( "HEX" ) == "61" "62" "30" "31" );
-	//  assert( "\xff\x00"_var.oconv( "HEX" ) == "FF" "00"           ); // Any bytes are ok.
-	//  assert(        var(10).oconv( "HEX" ) == "31" "30"           ); // Uses ASCII string equivalent of 10 i.e. "10".
-	//  assert(   "\u0393"_var.oconv( "HEX" ) == "CE" "93"           ); // Greek capital Gamma in UTF8 bytes.
-	//  assert(     "a^]b"_var.oconv( "HEX" ) == "61" "1E" "1D" "62" ); // Field and value marks.
+	// `// var v2;
+	//  v2 =      "ab01"_var.oconv( "HEX" ) ; //  "61" "62" "30" "31" 
+	//  v2 =  "\xff\x00"_var.oconv( "HEX" ) ; //  "FF" "00"            // Any bytes are ok.
+	//  v2 =         var(10).oconv( "HEX" ) ; //  "31" "30"            // Uses ASCII string equivalent of 10 i.e. "10".
+	//  v2 =    "\u0393"_var.oconv( "HEX" ) ; //  "CE" "93"            // Greek capital Gamma in UTF8 bytes.
+	//  v2 =      "a^]b"_var.oconv( "HEX" ) ; //  "61" "1E" "1D" "62"  // Field and value marks.
 	//  // or
-	//  assert(      oconv("ab01"_var, "HEX") == "61" "62" "30" "31");`
+	//  v2 =       oconv("ab01"_var, "HEX") ; //  "61" "62" "30" "31"`
+	//
 	ND std::string oconv_HEX(const int ioratio) const;
 
-	// Convert a string of hexadecimal digits to a string of bytes. After prefixing a "0" to an odd sized input, the size of the output is precisely half that of the input.
-	// Reverse of oconv("HEX") above.
+	// Convert a string of pairs of hexadecimal digits to a string of chars.
+	// varstr: Must be a string of only hex digits 0-9, a-f or A-F.
+	// Returns: A string if all input was hex digits otherwise "".
+	// Dynamic array structure is not preserved. Any field marks prevent conversion.
+	// This function is the exact inverse of oconv("HEX").
+	// After prefixing a "0" to an odd sized input, the size of the output is always precisely half that of the input.
 	// obj is varstr
+	//
 	ND var  iconv_HEX(const int ioratio) const;
 
 /* fake code to generate documentation
 
-	// Number to hex format: Convert numbers  to hexadecimal string.
-	// If the value is not numeric then no conversion is performed and the original value is returned.
-	// Floating point numbers are rounded to integers before conversion.
+	// Convert number to hexadecimal string.
+	// "MX":   Convert and trim leading zeros                      e.g. oconv(1025, "MX")  -> "401"
+	// "MXn":  Pad with up to n leading zeros but do not truncate. e.g. oconv(1025, "MX8") -> "00000401"
+	// "MXnT": Pad and truncate to n characters.                   e.g. oconv(1025, "MX2") -> "01"
+	// "n":    Width. 0-9, A-G = 10 - 16.
+	// varnum: A number or dynamic array of numbers. Floating point numbers are rounded to integers before conversion.
+	// Returns: A string of hexadecimal digits or a dynamic array of the same. Elements that are not numeric are left untouched and unconverted.
+	// Dynamic array structure is preserved.
+	// Negative numbers are treated as unsigned 8 byte integers (uint64).
+	// 0  -> "00"
+	// 1  -> "01"
+	// 15 -> "0F"
+	// -1 -> "FFFF" "FFFF" "FFFF" "FFFF" (8 x "FF")
+	// This function is a near inverse of iconv("MX").
 	// obj is varnum
 	//
-	// `let v1 = var("255").oconv("MX"); // "FF"
+	// `let v1 = var("14.5]QQ]65535").oconv("MX"); // "F]QQ]FFFF"_var
 	//  // or
-	//  let v2 = oconv(255, "MX");`
+	//  let v2 = oconv("14.5]QQ]65535"_var, "MX");`
 	//
 	ND var oconv_MX() const;
 
-	// Hex format to number: Convert hexadecimal strings to numbers.
-	// Returns: An var integer or "" if there are any non-hex digits (0-9, a-f or A-F) in the input.
+	// Convert hexadecimal string to number.
+	// varstr: A string or dynamic array of up to 16 hex digits: 0-9, a-f, A-F.
+	// Returns: An integer or dynamic array of integers. Invalid elements are converted to "".
+	// Dynamic array structure is preserved.
+	// Hex strings are converted to unsigned 8 byte integers (uint64)
+	// Leading zeros are ignored.
+	// "0" -> 0
+	// "00" -> 0
+	// "1" -> 1
+	// Hex "FFFFFFFFFFFFFFFF" (8 x "FF") -> -1.
+	// Hex "7FFFFFFFFFFFFFFF" is the maximum positive integer: 9223372036854775805.
+	// Hex "8000000000000000" is the maximum negative integer: -9223372036854775808.
+	// This function is the exact inverse of oconv("MX").
 	// obj is varstr
 	//
-	// `let v1 = "FFFF"_var.iconv("MX"); // 65'535
+	// `let v1 = "F]QQ]FFFF"_var.iconv("MX"); // "15]]65535"_var
 	//  // or
-	//  let v2 = iconv("FFFF", "MX");`
+	//  let v2 = iconv("F]QQ]FFFF", "MX");`
 	//
 	ND var iconv_MX() const;
 
 	// Number to binary format: Convert number to strings of 1s and 0s
-	// If the value is not numeric then no conversion is performed and the original value is returned.
+	// varnum: If not numeric then no conversion is performed and the original value is returned.
 	// obj is varnum
 	//
 	// `let v1 = var(255).oconv("MB"); // 1111'1111
@@ -3484,35 +3804,27 @@ public:
 	// obj is varstr
 	//
 	// `// 1. Backslash in text remains backslash
-	//
 	//  let v1 = var(_BS).oconv("TX");     // _BS
 	//
 	//  // 2. Literal "\n" -> literal "\\n" (Double escape any escaped NL chars)
-	//
 	//  let v2 = var(_BS "n").oconv("TX"); // _BS _BS "n"
 	//
 	//  // 3. \n becomes literal "\n" (Single escape any NL chars)
-	//
 	//  let v3 = var(_NL).oconv("TX");     // _BS "n"
 	//
 	//  // 4. FM -> \n
-	//
 	//  let v4 = "f1^f2"_var.oconv("TX");  // "f1" _NL "f2"
 	//
 	//  // 5. VM -> "\" \n
-	//
 	//  let v5 = "v1]v2"_var.oconv("TX");  // "v1" _BS _NL "v2"
 	//
 	//  // 6. SM -> "\\" \n
-	//
 	//  let v6 = "s1}s1"_var.oconv("TX");  // "s2" _BS _BS _NL "s2"
 	//
 	//  // 7. TM -> "\\\" \n
-	//
 	//  let v7 = "t1|t2"_var.oconv("TX");  // "t1" _BS _BS _BS _NL "t2"
 	//
-	//  // 8. STs -> "\\\\" \n
-	//
+	//  // 8. ST -> "\\\\" \n
 	//  let v8 = "st1~st2"_var.oconv("TX"); // "st1" _BS _BS _BS _BS _NL "st2"`
 	//
 	ND std::string oconv_TX(const char* conversion) const;
@@ -3528,7 +3840,7 @@ public:
 	/////////////////////
 
 	// MD_ Decimal <- Decimal - Not implemented yet
-	//  Any multifield/multivalue structure is preserved.
+	//  Any Dynamic array structure is preserved.
 	ND var  iconv_MD(const char* conversion) const;
 
 	ND std::fstream* osopenx(in osfilename, const bool utf8 = true) const;
