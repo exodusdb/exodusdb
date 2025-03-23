@@ -54,8 +54,8 @@ func main() {
 	assert(not listfiles().lower().locate(xdictname));
 
 	printl("Create " ^ xdataname ^ " and " ^ xdictname);
-	assert(createfile(xdataname) or (loglasterror() and false));
-	assert(createfile(xdictname) or (loglasterror() and false));
+	assert(createfile(xdataname));
+	assert(createfile(xdictname));
 
 	printl("Open " ^ xdataname ^ " and " ^ xdictname);
 	assert(open(xdataname to FILE));

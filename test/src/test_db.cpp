@@ -80,8 +80,8 @@ programinit()
 	printl("Test rename, and rename back");
 	let renamed_tempfile = "renamed_" ^ tempfile;
 	if (not deletefile(renamed_tempfile)) {}
-	assert(renamefile(tempfile, renamed_tempfile) or (loglasterror() and false));
-	assert(renamefile(renamed_tempfile, tempfile) or (loglasterror() and false));
+	assert(renamefile(tempfile, renamed_tempfile));
+	assert(renamefile(renamed_tempfile, tempfile));
 
 	printl("Select 3 records");
 	assert(select(tempfile ^ " 1 2 3"));
