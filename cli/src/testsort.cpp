@@ -184,8 +184,8 @@ func main() {
 	}
 
 	// committrans();
-	if (not committrans())
-		abort(lasterror());
+	if (not committrans()) {}
+//		abort(lasterror());
 
 	printl("\nJust type 'list' to see the syntax of list");
 	printl("or list dict." ^ filename ^ " to see the dictionary");
