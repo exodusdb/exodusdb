@@ -20,6 +20,26 @@ export import var;
 
 export namespace exo {
 
+// Here for keywords.sh
+
+// var::f
+// var::append
+// var::appender
+// var::let
+
+// FlowControl::function
+// FlowControl::subroutine
+// FlowControl::func
+// FlowControl::subr
+// FlowControl::call
+// FlowControl::gosub
+
+// var::on
+// var::into
+// var::from
+// var::with
+// var::to
+
 // Extracted from
 // nm -D -S -C /usr/local/lib/libexodus.so|\grep exo::[\\w]+ -oP|awk '{print "\tusing " $1 ";"}'|sort|uniq
 
