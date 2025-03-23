@@ -642,7 +642,7 @@ static PGconn* get_pgconn(in dbhandle) {
 	}
 
 	// Return the relevent pg_connection structure
-	auto pgconn = thread_dbconnector.get_pgconn(dbconn_no);
+	const auto pgconn = thread_dbconnector.get_pgconn(dbconn_no);
 	// TODO error abort if zero
 	return pgconn;
 
@@ -678,8 +678,8 @@ static DBresult get_dbresult(in sql, PGconn* pgconn, out ok) {
 	var errmsg;
 
 	// Parameter array with no parameters
-	const char* paramValues[1];
-	int paramLengths[1];
+	const char* paramValues[1] = {nullptr};
+	const int paramLengths[1] = {0};
 
 	// Will contain any dbresult IF successful
 	dbresult = PQexecParams(pgconn, sql.toString().c_str(), 0, /* zero params */
@@ -1290,7 +1290,7 @@ bool var::open(in filename, in connection /*DEFAULTNULL*/) {
 			auto cached_file_handle = entry->second;
 
 			// Make sure the connection is still valid otherwise redo the open
-			auto pgconn = get_pgconn(cached_file_handle);
+			const auto pgconn = get_pgconn(cached_file_handle);
 			if (not pgconn) {
 				thread_file_handles.erase(normal_filename);
 			} else {
@@ -1345,16 +1345,6 @@ bool var::open(in filename, in connection /*DEFAULTNULL*/) {
 		and_schema_clause = " AND table_schema != 'dict'";
 	}
 
-//SELECT EXISTS (
-//    SELECT table_name
-//    FROM information_schema.tables
-//    WHERE table_name = 'qwe' AND table_schema != 'dict'
-//) AND EXISTS (
-//    SELECT matviewname AS table_name
-//    FROM pg_matviews
-//    WHERE schemaname = 'public' AND matviewname = 'qwe'
-//) AS result;
-
 	// 1. Look in information_schema.tables
 	// 2. Look in materialised views
 	var sql =
@@ -1377,10 +1367,9 @@ bool var::open(in filename, in connection /*DEFAULTNULL*/) {
 	if (not connection2.sqlexec(sql, result)) UNLIKELY
 		throw VarDBException(lasterror());
 
-	// Failure if not found
+	// Failure if not found. It is not an error.
 	if (not result.ends("t")) UNLIKELY {
-		let errmsg = "ERROR: vardb: 2 open(" ^ filename.quote() ^
-					") file does not exist.";
+		let errmsg = filename.quote() ^ " file does not exist.";
 		this->setlasterror(errmsg);
 		return false;
 	}
@@ -1586,7 +1575,7 @@ bool var::read(in file, in key) {
 	} // %RECORDS%
 
 	// Get file specific connection or fail
-	auto pgconn = get_pgconn(file);
+	const auto pgconn = get_pgconn(file);
 	if (not pgconn) UNLIKELY {
 		let errmsg = "var::read() get_pgconn() failed for " ^ file;
 		this->setlasterror(errmsg);
@@ -1596,8 +1585,8 @@ bool var::read(in file, in key) {
 	let sql = "SELECT data FROM " ^ get_normal_filename(file) ^ " WHERE key = $1";
 
 	// Parameter array
-	const char* paramValues[] = {key2.data()};
-	int paramLengths[] = {static_cast<int>(key2.size())};
+	const char* paramValues[]  = {key2.data()};
+	const int   paramLengths[] = {static_cast<int>(key2.size())};
 	DEBUG_LOG_SQL1
 
 	const DBresult dbresult = PQexecParams(pgconn,
@@ -1707,7 +1696,7 @@ var  var::lock(in key) const {
 
 	// Parameter array
 	const char* paramValues[] = {reinterpret_cast<char*>(&hash64)};
-	int paramLengths[] = {sizeof(std::uint64_t)};
+	const int paramLengths[] = {sizeof(std::uint64_t)};
 	int paramFormats[] = {1};  // binary
 
 	// Locks outside transactions remain for the duration of the connection and can be unlocked/relocked or unlockall'd
@@ -1760,7 +1749,7 @@ bool var::unlock(in key) const {
 
 	auto hash64 = vardb_hash_file_and_key(*this, key);
 
-	auto pgconn = get_pgconn(*this);
+	const auto pgconn = get_pgconn(*this);
 	if (not pgconn) UNLIKELY {
 		var errmsg = "var::unlock() get_pgconn() failed. ";
 		if (this->assigned())
@@ -1785,7 +1774,7 @@ bool var::unlock(in key) const {
 
 	// Parameter array
 	const char* paramValues[] = {reinterpret_cast<char*>(&hash64)};
-	int paramLengths[] = {sizeof(std::uint64_t)};
+	const int paramLengths[] = {sizeof(std::uint64_t)};
 	int paramFormats[] = {1};//binary
 
 	// $1=hashed filename and key
@@ -1823,7 +1812,7 @@ bool var::unlockall() const {
 	THISIS("void var::unlockall() const")
 	assertVar(function_sig);
 
-	auto pgconn = get_pgconn(*this);
+	const auto pgconn = get_pgconn(*this);
 	if (not pgconn) UNLIKELY {
 		var errmsg = "var::unlockall() get_pgconn() failed. ";
 		if (this->assigned())
@@ -1868,11 +1857,9 @@ bool var::sqlexec(in sqlcmd, io response) const {
 	THISIS("bool var::sqlexec(in sqlcmd, io response) const")
 	ISSTRING(sqlcmd)
 
-	auto pgconn = get_pgconn(*this);
+	const auto pgconn = get_pgconn(*this);
 	if (not pgconn) UNLIKELY {
-		var errmsg = "var::sqlexec() get_pgconn() failed. ";
-		if (this->assigned())
-			errmsg ^= *this;
+		let errmsg = "var::sqlexec() get_pgconn() failed. " ^ (this->assigned() ? *this : "");
 		this->setlasterror(errmsg);
 		throw VarDBException(errmsg);
 	}
@@ -2006,11 +1993,13 @@ void var::write(in file, in key) const {
 	sql ^= " DO UPDATE SET data = $2";
 
 	// Parameter array
-	const char* paramValues[] = {key2.data(), data2.data()};
-	int paramLengths[] = {static_cast<int>(key2.size()), static_cast<int>(data2.size())};
+	const char* paramValues[]  = {key2.data(),
+	                              data2.data()};
+	const int   paramLengths[] = {static_cast<int>(key2.size()),
+	                              static_cast<int>(data2.size())};
 	DEBUG_LOG_SQL1
 
-	auto pgconn = get_pgconn(file);
+	const auto pgconn = get_pgconn(file);
 	if (not pgconn) UNLIKELY {
 		var errmsg = "var::write() get_pgconn() failed. ";
 		errmsg ^= file ^ ", " ^ key;
@@ -2065,12 +2054,13 @@ bool var::updaterecord(in file, in key) const {
 	let sql = "UPDATE "  ^ get_normal_filename(file) ^ " SET data = $2 WHERE key = $1";
 
 	// Parameter array
-	const char* paramValues[] = {key2.data(), data2.data()};
-
-	const int paramLengths[] = {static_cast<int>(key2.size()), static_cast<int>(data2.size())};
+	const char* paramValues[]  = {key2.data(),
+	                              data2.data()};
+	const int   paramLengths[] = {static_cast<int>(key2.size()),
+	                              static_cast<int>(data2.size())};
 	DEBUG_LOG_SQL1
 
-	auto pgconn = get_pgconn(file);
+	const auto pgconn = get_pgconn(file);
 	if (not pgconn) UNLIKELY {
 		var errmsg = "var::updaterecord() get_pgconn() failed. ";
 		errmsg ^= file ^ ", " ^ key;
@@ -2135,7 +2125,7 @@ bool var::updatekey(in key, in newkey) const {
 	                              static_cast<int>(newkey2.size())};
 	DEBUG_LOG_SQL1
 
-	auto pgconn = get_pgconn(*this);
+	const auto pgconn = get_pgconn(*this);
 	if (!pgconn) UNLIKELY {
 		let errmsg =
 			"ERROR: vardb: updatekey(" ^ this->convert(_FM, "^") ^ ", " ^ key ^ " -> " ^ newkey ^ ") "
@@ -2206,11 +2196,13 @@ bool var::insertrecord(in file, in key) const {
 		"INSERT INTO " ^ get_normal_filename(file) ^ " (key,data) values( $1 , $2)";
 
 	// Parameter array
-	const char* paramValues[] = {key2.data(), data2.data()};
-	int paramLengths[] = {static_cast<int>(key2.size()), static_cast<int>(data2.size())};
+	const char* paramValues[]  = {key2.data(),
+	                              data2.data()};
+	const int   paramLengths[] = {static_cast<int>(key2.size()),
+	                              static_cast<int>(data2.size())};
 	DEBUG_LOG_SQL1
 
-	auto pgconn = get_pgconn(file);
+	const auto pgconn = get_pgconn(file);
 	if (not pgconn) UNLIKELY {
 		var errmsg = "var::insertrecord() get_pgconn() failed. ";
 		errmsg ^= file ^ ", " ^ key;
@@ -2275,11 +2267,11 @@ bool var::deleterecord(in key) const {
 	let sql = "DELETE FROM " ^ get_normal_filename(*this) ^ " WHERE KEY = $1";
 
 	// Parameter array
-	const char* paramValues[] = {key2.data()};
-	int paramLengths[] = {static_cast<int>(key2.size())};
+	const char* paramValues[]  = {key2.data()};
+	const int   paramLengths[] = {static_cast<int>(key2.size())};
 	DEBUG_LOG_SQL1
 
-	auto pgconn = get_pgconn(*this);
+	const auto pgconn = get_pgconn(*this);
 	if (not pgconn) UNLIKELY {
 		var errmsg = "var::deleterecord() get_pgconn() failed. ";
 		if (this->assigned())
@@ -4494,6 +4486,12 @@ bool var::selectx(in fieldnames, in sortselectclause) {
 		joins.inserter(1, 1, "\n RIGHT JOIN " ^ temptablename ^ " ON " ^ temptablename ^ ".key = " ^ actualfilename ^ ".key");
 	}
 
+	// Check file exists
+	var file;
+	if (not file.open(actualfilename)) {
+		throw VarDBException(lasterror());
+	}
+
 	//////////////////////////////////////////
 	// Assemble the full sql select statement:
 	//////////////////////////////////////////
@@ -4566,7 +4564,7 @@ bool var::selectx(in fieldnames, in sortselectclause) {
 
 	// First close any existing cursor with the same name, otherwise cannot create  new cursor
 	// Avoid generating sql errors since they abort transactions
-	if (this->cursorexists()) {
+	if (this->dbcursorexists()) {
 		var sql2 = "";
 		sql2 ^= "CLOSE cursor1_";
 
@@ -4642,8 +4640,8 @@ void var::clearselect() {
 
 	// Dont close cursor unless it exists otherwise sql error aborts any transaction
 	// Avoid generating sql errors since they abort transactions
-	// if (not this->cursorexists())
-	if (not this->cursorexists()) UNLIKELY
+	// if (not this->dbcursorexists())
+	if (not this->dbcursorexists()) UNLIKELY
 		return;
 
 	// Clear any select list
@@ -5067,10 +5065,10 @@ bool var::hasnext() {
 
 	// TODO avoid this trip to the database somehow?
 	// Avoid generating sql errors since they abort transactions
-	if (not this->cursorexists()) UNLIKELY
+	if (not this->dbcursorexists()) UNLIKELY
 		return false;
 
-	auto pgconn = get_pgconn(*this);
+	const auto pgconn = get_pgconn(*this);
 	if (not pgconn) UNLIKELY {
 		let errmsg = "var::hasnext() get_pgconn() failed for " ^ this->quote();
 		this->setlasterror(errmsg);
@@ -5184,12 +5182,12 @@ bool var::readnext(io record, io key, io valueno) {
 		}
 	}
 
-	auto pgconn = get_pgconn(*this);
+	const auto pgconn = get_pgconn(*this);
 	if (not pgconn) UNLIKELY
 		return false;
 
 	// Avoid generating sql errors since they abort transactions
-	if (not this->cursorexists()) UNLIKELY
+	if (not this->dbcursorexists()) UNLIKELY
 		return false;
 
 	//const DBresult dbresult;
@@ -5377,7 +5375,7 @@ var  var::listfiles() const {
 	sql ^= " UNION SELECT matviewname as table_name, schemaname as table_schema from pg_matviews";
 	sql ^= " WHERE schemaname " ^ schemafilter;
 
-	auto pgconn = get_pgconn(*this);
+	const auto pgconn = get_pgconn(*this);
 	if (not pgconn) UNLIKELY
 		return "";
 
@@ -5419,7 +5417,7 @@ var  var::dblist() const {
 
 	let sql = "SELECT datname FROM pg_database";
 
-	auto pgconn = get_pgconn(*this);
+	const auto pgconn = get_pgconn(*this);
 	if (not pgconn) UNLIKELY
 		return "";
 
@@ -5446,9 +5444,9 @@ var  var::dblist() const {
 	return dbnames.sort();
 }
 
-bool var::cursorexists() {
+bool var::dbcursorexists() {
 
-	THISIS("bool var::cursorexists()")
+	THISIS("bool var::dbcursorexists()")
 	assertVar(function_sig);
 
 	// We MUST avoid generating sql errors because any error aborts transactions
@@ -5463,7 +5461,7 @@ bool var::cursorexists() {
 	if (thread_dbresults.find(cursorid) != thread_dbresults.end()) LIKELY
 		return true;
 
-	auto pgconn = get_pgconn(*this);
+	const auto pgconn = get_pgconn(*this);
 	if (not pgconn) UNLIKELY
 		return false;
 
@@ -5509,7 +5507,7 @@ var  var::listindex(in filename0, in fieldname0) const {
 		" AND indisprimary != 't'"
 		");";
 
-	auto pgconn = get_pgconn(*this);
+	const auto pgconn = get_pgconn(*this);
 	if (not pgconn) UNLIKELY
 		return "";
 
@@ -5568,7 +5566,7 @@ var  var::reccount(in filename0) const {
 	let sql = "SELECT reltuples::integer FROM pg_class WHERE relname = '" ^ filename.f(1).lcase() ^ "';";
 
 	// Get a connection
-	auto pgconn = get_pgconn(filename);
+	const auto pgconn = get_pgconn(filename);
 	if (not pgconn) UNLIKELY
 		return "";
 
@@ -5607,7 +5605,7 @@ bool var::flushindex(in filename) const {
 	let sql = "VACUUM " ^ filename.f(1).lcase();
 
 	// TODO perhaps should get connection from file if passed a file
-	auto pgconn = get_pgconn(*this);
+	const auto pgconn = get_pgconn(*this);
 	if (not pgconn) UNLIKELY {
 		setlasterror("Error: var::flushindex cannot get a connection " ^ filename);
 		return false;
@@ -5633,7 +5631,7 @@ bool var::flushindex(in filename) const {
 	return true;
 }
 
-var  var::setlasterror(in msg) const {
+void  var::setlasterror(in msg) {
 	// No checking for speed
 	// THISIS("void var::lasterror(in msg")
 	// ISSTRING(msg)
@@ -5649,15 +5647,15 @@ var  var::setlasterror(in msg) const {
 	if (DBTRACE>1)
 		TRACE(thread_lasterror)
 
-	return lasterror();
+//	return lasterror();
 }
 
-var  var::lasterror() const {
+var  var::lasterror() {
 	return thread_lasterror;
 }
 
-var  var::loglasterror(in source) const {
-	return thread_lasterror.logputl(source ^ " ");
+void var::loglasterror(in source) {
+	thread_lasterror.logputl(source ^ " ");
 }
 
 }  // namespace exo
