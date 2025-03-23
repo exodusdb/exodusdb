@@ -52,7 +52,7 @@
 551 bool var::deleteindex(in fieldname) const
 552 var  var::listfiles() const
 553 var  var::dblist() const
-554 bool var::cursorexists()
+554 bool var::dbcursorexists()
 555 var  var::listindex(in filename, in fieldname) const
 556 var  var::reccount(in file_or_filename) const
 557 bool var::flushindex(in filename) const
@@ -139,8 +139,8 @@
 638 bool var::osmove(in new_dirpath_or_filepath) const
 639 bool var::osrmdir(bool evenifnotempty) const
 640 var  var::oslist(in globpattern, const int mode) const
-641 var  var::oscwd(const char* newpath) const
-642 var  var::oscwd() const
+641 bool var::oscwd(SV newpath) static
+642 var  var::oscwd() static
 643 void var::ossleep(const int milliseconds) static
 644 var  var::rnd() const
 645 void var::initrnd() const
@@ -180,7 +180,7 @@
 679 var  var::sumall() const
 680 var  var::sum() const
 681 var  var::sum(SV separator) const
-682 bool var::setxlocale() const
+682 bool var::setxlocale(const char* newlocalecode) static
 683 void var::quoter() &
 684 void var::squoter() &
 685 void var::unquoter() &
@@ -216,7 +216,7 @@
 715 auto fmt::formatter::format(var) const
 716 var  var::match(const rex& regex) const
 717 var  var::search(const rex& regex, int startchar1) const
-718 out  var::getxlocale()
+718 out  var::getxlocale() static
 719 CVR  var::output() const
 720 CVR  var::outputl() const
 721 CVR  var::outputt() const

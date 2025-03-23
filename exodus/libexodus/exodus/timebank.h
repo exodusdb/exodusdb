@@ -178,7 +178,7 @@ auto get_timebank_acno(const std::string_view arg1) -> int {
 	else if (++acno && arg1 == "bool var::deleteindex(in fieldname) const") {}
 	else if (++acno && arg1 == "var  var::listfiles() const") {}
 	else if (++acno && arg1 == "var  var::dblist() const") {}
-	else if (++acno && arg1 == "bool var::cursorexists()") {}
+	else if (++acno && arg1 == "bool var::dbcursorexists()") {}
 	else if (++acno && arg1 == "var  var::listindex(in filename, in fieldname) const") {}
 	else if (++acno && arg1 == "var  var::reccount(in file_or_filename) const") {}
 	else if (++acno && arg1 == "bool var::flushindex(in filename) const") {}
@@ -265,8 +265,8 @@ auto get_timebank_acno(const std::string_view arg1) -> int {
 	else if (++acno && arg1 == "bool var::osmove(in new_dirpath_or_filepath) const") {}
 	else if (++acno && arg1 == "bool var::osrmdir(bool evenifnotempty) const") {}
 	else if (++acno && arg1 == "var  var::oslist(in globpattern, const int mode) const") {}
-	else if (++acno && arg1 == "var  var::oscwd(const char* newpath) const") {}
-	else if (++acno && arg1 == "var  var::oscwd() const") {}
+	else if (++acno && arg1 == "bool var::oscwd(SV newpath) static") {}
+	else if (++acno && arg1 == "var  var::oscwd() static") {}
 	else if (++acno && arg1 == "void var::ossleep(const int milliseconds) static") {}
 	else if (++acno && arg1 == "var  var::rnd() const") {}
 	else if (++acno && arg1 == "void var::initrnd() const") {}
@@ -306,7 +306,7 @@ auto get_timebank_acno(const std::string_view arg1) -> int {
 	else if (++acno && arg1 == "var  var::sumall() const") {}
 	else if (++acno && arg1 == "var  var::sum() const") {}
 	else if (++acno && arg1 == "var  var::sum(SV separator) const") {}
-	else if (++acno && arg1 == "bool var::setxlocale() const") {}
+	else if (++acno && arg1 == "bool var::setxlocale(const char* newlocalecode) static") {}
 	else if (++acno && arg1 == "void var::quoter() &") {}
 	else if (++acno && arg1 == "void var::squoter() &") {}
 	else if (++acno && arg1 == "void var::unquoter() &") {}
@@ -347,7 +347,7 @@ auto get_timebank_acno(const std::string_view arg1) -> int {
 
 	else if (++acno && arg1 == "var  var::match(const rex& regex) const") {}
 	else if (++acno && arg1 == "var  var::search(const rex& regex, int startchar1) const") {}
-	else if (++acno && arg1 == "out  var::getxlocale()") {}
+	else if (++acno && arg1 == "out  var::getxlocale() static") {}
 
 	else if (++acno && arg1 == "CVR  var::output() const") {}
 	else if (++acno && arg1 == "CVR  var::outputl() const") {}
