@@ -50,7 +50,7 @@
 'sqrt', 'squote', 'squoter', 'starts', 'statustrans', 'str', 'substr', 
 'substr2', 'substr3', 'substrer', 'sum', 'sumall', 'swap', 'tan', 'tcase', 
 'tcaser', 'textchr', 'textchrname', 'textconvert', 'textconverter', 'textlen', 
-'textseq', 'textwidth', 'time', 'to', 'toBool', 'toChar', 'toDouble', 'toInt', 
+'textord', 'textwidth', 'time', 'to', 'toBool', 'toChar', 'toDouble', 'toInt', 
 'toInt64', 'toString', 'to_codepage', 'to_u32string', 'to_wstring', 'trim', 
 'trimboth', 'trimfirst', 'trimlast', 'trimmer', 'trimmerboth', 'trimmerfirst', 
 'trimmerlast', 'ucase', 'ucaser', 'unassigned', 'unique', 'uniquer', 'unlock', 

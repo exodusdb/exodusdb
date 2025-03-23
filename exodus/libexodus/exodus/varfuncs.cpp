@@ -1231,9 +1231,9 @@ var  var::seq() const {
 }
 
 // UTF8 - 1st UTF code point
-var  var::textseq() const {
+var  var::textord() const {
 
-	THISIS("var  var::textseq() const")
+	THISIS("var  var::textord() const")
 	assertString(function_sig);
 
 	if (var_str.empty())

@@ -39,13 +39,13 @@ func main() {
 		{
 			textchr(0x0001F600).dump().errputl();
 			assert("\U0001F600" == textchr(0x0001F600));
-			assert(0x0001F600 == textseq(textchr(0x0001F600)).toInt());
+			assert(0x0001F600 == textord(textchr(0x0001F600)).toInt());
 		}
 		{
 			TRACE(0x0001F600)
 			textchr(128512).dump().errputl();
 			assert("\U0001F600" == textchr(128512));
-			assert(128512 == textseq(textchr(128512)).toInt());
+			assert(128512 == textord(textchr(128512)).toInt());
 		}
 	}
 	{

@@ -25,7 +25,7 @@ func main() {
 	// First *byte* of a var may not be valid utf8
 	assert(var(greek5x4.toChar()).oconv("HEX").outputl() eq "CE");
 
-	assert(textseq("") eq "");
+	assert(textord("") eq "");
 
 	//fieldstorer
 	//in place - oo method

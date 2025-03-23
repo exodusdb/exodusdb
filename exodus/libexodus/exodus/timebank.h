@@ -212,7 +212,7 @@ auto get_timebank_acno(const std::string_view arg1) -> int {
 	else if (++acno && arg1 == "void var::normalizer() &") {}
 	else if (++acno && arg1 == "var  var::unique()") {}
 	else if (++acno && arg1 == "var  var::seq() const") {}
-	else if (++acno && arg1 == "var  var::textseq() const") {}
+	else if (++acno && arg1 == "var  var::textord() const") {}
 	else if (++acno && arg1 == "void var::paster(const int pos1, const int length, SV replacestr) &") {}
 	else if (++acno && arg1 == "void var::paster(const int pos1, SV insertstr) &") {}
 	else if (++acno && arg1 == "var  var::prefix(SV prefixstr)") {}

@@ -327,18 +327,18 @@ func main() {
 	var chinesechar = textchr(171416);
 	assert(chinesechar                   eq "𩶘");
 	printl(chinesechar);
-	assert(textseq(chinesechar ^ "abcd") eq 171416);
+	assert(textord(chinesechar ^ "abcd") eq 171416);
 	assert(oconv(chinesechar, "HEX")     eq "F0A9B698");
 
 	printl(textchr(915));
 	assert(textchr(915)               eq GreekCapitalGamma);
-	assert(textseq(GreekCapitalGamma) eq 915);
+	assert(textord(GreekCapitalGamma) eq 915);
 
 	//text three byte utf8
 	var euro = "€";
 	assert(euro                  eq textchr(8364));
-	assert(textseq(euro)         eq 8364);
-	assert(textseq(euro ^ "abc") eq 8364);
+	assert(textord(euro)         eq 8364);
+	assert(textord(euro ^ "abc") eq 8364);
 	assert(oconv(euro, "HEX")    eq "E282AC");
 
 	//multibyte locate using
@@ -903,9 +903,9 @@ func main() {
 		inverted.oconv("HEX")     .outputl("inverted hex  =");
 		invertedtwice.oconv("HEX").outputl("invertedx2 hex=");
 
-		cc.textseq()              .outputl("original seq  =");
-		inverted.textseq()        .outputl("inverted seq  =");
-		invertedtwice.textseq()   .outputl("invertedx2 seq=");
+		cc.textord()              .outputl("original seq  =");
+		inverted.textord()        .outputl("inverted seq  =");
+		invertedtwice.textord()   .outputl("invertedx2 seq=");
 
 		cc.len()                  .outputl("original len  =");
 		inverted.len()            .outputl("inverted len  =");

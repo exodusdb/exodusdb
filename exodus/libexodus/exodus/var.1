@@ -822,7 +822,7 @@ let v2 = seq("abc");
 
 
 .SS
-var v1 = strvar.textseq();
+var v1 = strvar.textord();
 .nf
  
 .fi
@@ -837,9 +837,9 @@ Equivalent to ord() in python and ruby, mb_ord() php.
 \fBExample:\fR
 .RS
 .nf
-let v1 = "Γ"_var.textseq(); // 915 // U+0393: Greek Capital Letter Gamma (Unicode character)
+let v1 = "Γ"_var.textord(); // 915 // U+0393: Greek Capital Letter Gamma (Unicode character)
 // or
-let v2 = textseq("Γ");
+let v2 = textord("Γ");
 .fi
 .RE
 

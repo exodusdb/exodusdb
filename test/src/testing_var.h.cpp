@@ -289,11 +289,11 @@ func main() {
 		let v2 = seq("abc");
 	}
 
-	printl("textseq() const;");
+	printl("textord() const;");
 	{
-				let v1 = "Γ"_var.textseq(); assert(v1 == 915); // U+0393: Greek Capital Letter Gamma (Unicode character)
+				let v1 = "Γ"_var.textord(); assert(v1 == 915); // U+0393: Greek Capital Letter Gamma (Unicode character)
 		// or
-		let v2 = textseq("Γ");
+		let v2 = textord("Γ");
 	}
 
 	printl("len() const;");

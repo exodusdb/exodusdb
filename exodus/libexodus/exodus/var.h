@@ -632,11 +632,11 @@ public:
 	// Returns: A number 0 to 0x10FFFF.
 	// Equivalent to ord() in python and ruby, mb_ord() php.
 	//
-	// `let v1 = "Γ"_var.textseq(); // 915 // U+0393: Greek Capital Letter Gamma (Unicode character)
+	// `let v1 = "Γ"_var.textord(); // 915 // U+0393: Greek Capital Letter Gamma (Unicode character)
 	//  // or
-	//  let v2 = textseq("Γ");`
+	//  let v2 = textord("Γ");`
 	//
-	ND var  textseq() const;
+	ND var  textord() const;
 
 	// Get the length of a source string in number of chars
 	// Returns: A number

@@ -390,7 +390,7 @@ func getosfilename(in dir, in dbfilename, in fieldno, in id) {
 //	temposfilename.converter(invalidfilechars, str("-", len(invalidfilechars)));
 	for (let i : range(1, len(invalidfilechars))) {
 		let c = invalidfilechars.at(i);
-		let cname = var::textchrname(textseq(c));
+		let cname = var::textchrname(textord(c));
 //		let orig = temposfilename;
 		temposfilename.replacer(c, cname);
 //		if (temposfilename ne orig) {

@@ -398,7 +398,7 @@ export namespace exo {
 	using exo::textconvert;
 	using exo::textconverter;
 	using exo::textlen;
-	using exo::textseq;
+	using exo::textord;
 	using exo::textwidth;
 
 	using exo::time;

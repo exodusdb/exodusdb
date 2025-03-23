@@ -86,7 +86,7 @@
 585 void var::normalizer() &
 586 var  var::unique()
 587 var  var::seq() const
-588 var  var::textseq() const
+588 var  var::textord() const
 589 void var::paster(const int pos1, const int length, SV replacestr) &
 590 void var::paster(const int pos1, SV insertstr) &
 591 var  var::prefix(SV prefixstr)
