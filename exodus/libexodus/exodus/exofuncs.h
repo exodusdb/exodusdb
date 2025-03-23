@@ -223,7 +223,7 @@ ND var  osshellread(in command);
 //void debug(in = "" );
 ND var  backtrace(void);
 
-   bool setxlocale(SV locale);
+   bool setxlocale(const char* newlocalecode);
 ND var  getxlocale(void);
 
 ND var  from_codepage(in instring, const char* codepage);
@@ -580,8 +580,8 @@ ND bool read(dim& dimrecord, in dbfile, in key);
 ND var xlate(in dbfilename, in key, in fieldno, const char* mode);
 ND var xlate(in dbfilename, in key, in fieldno, in mode);
 
-ND var lasterror(void);
-   var loglasterror(in source = " ");
+ND var  lasterror(void);
+   void loglasterror(in source = " ");
 
 ND var version();
 

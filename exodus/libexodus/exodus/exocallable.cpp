@@ -383,11 +383,26 @@ bool Callable::checkload(const std::string newlibname, const std::string newfunc
 	return true;
 }
 
-thread_local std::string libdir;
-
+// Constructs the fully configured path and file name for any given exodus library.
+//
+// e.g. /home/user/lib/libxxxxxxxx.so
+//
+// Also called by ExoProgram::libinfo
+//
+// Does not check if it exists
+// Does not default to system library
+//
+// EXO_LIBDIR
+// or
+// (EXO_HOME or HOME) + EXODUSLIBDIR (/lib)
+//
+// + LIBPREFIX (lib) + libname + EXODUSLIBEXT (.so)
+//
 std::string Callable::libfilepath(const std::string_view libname) const {
 
-	if (not libdir.size()) {
+	// Determine the libdir only once per thread
+	thread_local std::string libdir;
+	if (libdir.empty()) {
 		var temp;
 		if (temp.osgetenv("EXO_LIBDIR")) {
 			libdir = temp.toString();
@@ -398,6 +413,15 @@ std::string Callable::libfilepath(const std::string_view libname) const {
 				libdir += EXODUSLIBDIR; // /lib/
 			}
 		}
+		// Expand any ~
+		if (libdir[0] == '~') {
+			// env string is copied into string so following getenv usage is thread safe
+			var exo_HOME;
+			if (not exo_HOME.osgetenv("EXO_HOME") and not exo_HOME.osgetenv("HOME"))
+				exo_HOME = "";
+			//std::string replace
+			libdir.replace(0, 1, exo_HOME.toString());
+		}
 	}
 
 	//look for libXXXXXX.so in ~/lib
@@ -405,14 +429,6 @@ std::string Callable::libfilepath(const std::string_view libname) const {
 	libfilepath += EXODUSLIBPREFIX; // lib
 	libfilepath += libname;
 	libfilepath += EXODUSLIBEXT; // .so
-	if (libfilepath[0] == '~') {
-		// env string is copied into string so following getenv usage is safe
-		var exo_HOME;
-		if (not exo_HOME.osgetenv("EXO_HOME") and not exo_HOME.osgetenv("HOME"))
-			exo_HOME = "";
-		//std::string replace
-		libfilepath.replace(0, 1, exo_HOME.toString());
-	}
 
 	return libfilepath;
 }

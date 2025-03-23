@@ -120,8 +120,8 @@ ND PUBLIC var  osdir(in dirpath) {return dirpath.osdir();}
 ND PUBLIC bool osmkdir(in dirpath) {return dirpath.osmkdir();}
 ND PUBLIC bool osrmdir(in dirpath, const bool evenifnotempty /*=false*/) {return dirpath.osrmdir(evenifnotempty);}
 
-ND PUBLIC var  oscwd() {return var().oscwd();}
-ND PUBLIC var  oscwd(in dirpath) {return dirpath.oscwd(dirpath);}
+ND PUBLIC var  oscwd() {return var::oscwd();}
+ND PUBLIC var  oscwd(in dirpath) {return var::oscwd(dirpath);}
 
    PUBLIC void osflush() {return var().osflush();}
 ND PUBLIC var  ospid() {return var::ospid();}
@@ -134,8 +134,8 @@ ND PUBLIC var  osshellread(in command) {var result = ""; if (not result.osshellr
 
 ND PUBLIC var  backtrace();
 
-ND PUBLIC bool setxlocale(SV locale) {return var(locale).setxlocale();}
-ND PUBLIC var  getxlocale() {return var().getxlocale();}
+ND PUBLIC bool setxlocale(const char* newlocalecode) {return var::setxlocale(newlocalecode);}
+ND PUBLIC var  getxlocale() {return var::getxlocale();}
 
 ND PUBLIC var  from_codepage(in instring, const char* codepage) {return instring.from_codepage(codepage);}
 ND PUBLIC var  to_codepage(in instring, const char* codepage) {return instring.to_codepage(codepage);}
@@ -464,8 +464,8 @@ ND PUBLIC bool read(dim& dimrecord, in dbfile, in key) {return dimrecord.read(db
 ND PUBLIC var  xlate(in dbfilename, in key, in fieldno, const char* mode);
 ND PUBLIC var  xlate(in dbfilename, in key, in fieldno, in mode);
 
-ND PUBLIC var  lasterror() {return var().lasterror();}
-   PUBLIC var  loglasterror(in source /*=""*/) {return var().loglasterror(source);}
+ND PUBLIC var  lasterror() {return var::lasterror();}
+   PUBLIC void loglasterror(in source /*=""*/) {return var::loglasterror(source);}
 
 ND PUBLIC var  version() {return var::version();}
 

@@ -23,10 +23,10 @@
 
 namespace exo {
 
-bool var::setxlocale() const {
+bool var::setxlocale(const char* newlocalecode ) {
 
-	THISIS("bool var::setxlocale() const")
-	assertString(function_sig);
+	THISIS("bool var::setxlocale(const char* newlocalecode) static")
+//	assertString(function_sig);
 
 	// make a thread local locale if not done already
 	// TODO do this in thread creation
@@ -35,9 +35,9 @@ bool var::setxlocale() const {
 //	if (uselocale(nullptr) == uselocale(LC_GLOBAL_LOCALE))
 //		uselocale(duplocale(uselocale(LC_GLOBAL_LOCALE)));
 
-//	return std::setlocale(LC_ALL, (*this).toString().c_str()) != nullptr;
-	if (std::setlocale(LC_ALL, var_str.c_str()) == nullptr) {
-		this->setlasterror(var(function_sig) ^ "Error: " ^ this->quote() ^ " is invalid");
+	// TODO make thread safe
+	if (std::setlocale(LC_ALL, newlocalecode) == nullptr) {
+		var::setlasterror(var(function_sig) ^ "Error: '" ^ newlocalecode ^ "' is invalid");
 	}
 	return true;
 
@@ -66,7 +66,7 @@ bool var::setxlocale() const {
 
 var  var::getxlocale() {
 
-	THISIS("out  var::getxlocale()")
+	THISIS("out  var::getxlocale() static")
 
 #if defined(_MSC_VER) && defined(UNICODE)
 	return var(static_cast<int>GetThreadLocale());
