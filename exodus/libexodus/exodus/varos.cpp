@@ -314,7 +314,7 @@ bool var::osshellread(in oscmd) {
 	// Use status 0 to indicate that the program could not be started.
 	// Not that it returned exit status 0
 	if (pfile == nullptr) {
-		this->setlasterror("Status: 0 osshellread:. " ^ oscmd.quote());
+		var::setlasterror("Status: 0 osshellread:. " ^ oscmd.quote());
 		return false;
 	}
 
@@ -355,7 +355,7 @@ bool var::osshellwrite(in oscmd) const {
 
 	// Detect program failure.
 	if (pfile == nullptr) {
-		this->setlasterror("osshellwrite failed. " ^ oscmd.quote());
+		var::setlasterror("osshellwrite failed. " ^ oscmd.quote());
 		return false;
 	}
 
@@ -426,7 +426,7 @@ std::fstream* var::osopenx(in osfilename, const bool utf8) const {
 
 		// Check if the file exists and is a regular file
 		if (!std::filesystem::is_regular_file(osfilename.c_str())) {
-			this->setlasterror("osopen failed. " ^ var(osfilename).quote() ^ " does not exist, or cannot be accessed, or is not a regular file.");
+			var::setlasterror("osopen failed. " ^ var(osfilename).quote() ^ " does not exist, or cannot be accessed, or is not a regular file.");
 			return nullptr;
 		}
 
@@ -449,7 +449,7 @@ std::fstream* var::osopenx(in osfilename, const bool utf8) const {
 
 			// Fail if cannot open read-only
 			if (!(*pfstreamfile1)) {
-				this->setlasterror(osfilename.quote() ^ " cannot be opened.");
+				var::setlasterror(osfilename.quote() ^ " cannot be opened.");
 				delete pfstreamfile1;
 				return nullptr;
 			}
@@ -537,7 +537,7 @@ bool var::osread(const char* osfilename, const char* codepage) {
 	// Check if the file exists and is a regular file
 	if (!std::filesystem::is_regular_file(osfilename)) {
 		//        std::cout << "Error: File '" << osfilename << "' does not exist.\n";
-		this->setlasterror("osread failed. " ^ var(osfilename).quote() ^ " does not exist, or cannot be accessed, or is not a regular file.");
+		var::setlasterror("osread failed. " ^ var(osfilename).quote() ^ " does not exist, or cannot be accessed, or is not a regular file.");
 		return false;
 	}
 
@@ -545,7 +545,7 @@ bool var::osread(const char* osfilename, const char* codepage) {
 	// TODO check myfile.close() on all exit paths or setup an object to do that
 	myfile.open(osfilename, std::ios::binary | std::ios::in | std::ios::ate);
 	if (!myfile) {
-		this->setlasterror("osread failed. " ^ var(osfilename).quote() ^ " does not exist or cannot be accessed.");
+		var::setlasterror("osread failed. " ^ var(osfilename).quote() ^ " does not exist or cannot be accessed.");
 		return false;
 	}
 
@@ -599,7 +599,7 @@ bool var::osread(const char* osfilename, const char* codepage) {
 
 	// failure can indicate that we didnt get as many characters as requested
 	if (failed && !bytesize) {
-		this->setlasterror("osread failed. " ^ var(osfilename).quote() ^ " 0 bytes read.");
+		var::setlasterror("osread failed. " ^ var(osfilename).quote() ^ " 0 bytes read.");
 		return false;
 	}
 
@@ -657,7 +657,7 @@ bool var::oswrite(in osfilename, const char* codepage) const {
 	myfile.open(to_path_string(osfilename).c_str(),
 				std::ios::trunc | std::ios::out | std::ios::binary);
 	if (!myfile) {
-		this->setlasterror("oswrite failed. " ^ osfilename.quote() ^ " cannot be opened for output.");
+		var::setlasterror("oswrite failed. " ^ osfilename.quote() ^ " cannot be opened for output.");
 		return false;
 	}
 
@@ -671,7 +671,7 @@ bool var::oswrite(in osfilename, const char* codepage) const {
 	bool failed = myfile.fail();
 	myfile.close();
 	if (failed)
-		this->setlasterror("oswrite failed. " ^ osfilename.quote() ^ " Unknown reason.");
+		var::setlasterror("oswrite failed. " ^ osfilename.quote() ^ " Unknown reason.");
 	return !failed;
 }
 
@@ -701,8 +701,8 @@ bool var::osbwrite(in osfilevar, io offset) const {
 	std::fstream* pfstreamfile1 = osfilevar.osopenx(osfilevar);
 	if (pfstreamfile1 == nullptr)
 		UNLIKELY {
-			// throw VarError(this->setlasterror(osfilevar.quote() ^ " osbwrite open failed"));
-			this->setlasterror("osbwrite failed. " ^ this->lasterror());
+			// throw VarError(var::setlasterror(osfilevar.quote() ^ " osbwrite open failed"));
+			var::setlasterror("osbwrite failed. " ^ this->lasterror());
 			return false;
 		}
 	//	TRACE(pfstreamfile1->getloc().name())
@@ -726,7 +726,8 @@ bool var::osbwrite(in osfilevar, io offset) const {
 		UNLIKELY {
 			// saved in cache, DO NOT CLOSE!
 			// myfile.close();
-			throw VarError(this->setlasterror(osfilevar.quote() ^ " osbwrite write failed"));
+			var::setlasterror(osfilevar.quote() ^ " osbwrite write failed");
+			throw VarError(var::lasterror());
 		}
 
 	// pass back the file pointer offset
@@ -828,7 +829,7 @@ bool var::osbread(in osfilevar, io offset, const int bytesize) {
 	// get the buffered file handle/open on the fly
 	std::fstream* pfstreamfile1 = osfilevar.osopenx(osfilevar);
 	if (pfstreamfile1 == nullptr) {
-		this->setlasterror("osbread failed. " ^ this->lasterror());
+		var::setlasterror("osbread failed. " ^ this->lasterror());
 		return false;
 	}
 	/*
@@ -930,24 +931,24 @@ bool var::osrename(in new_dirpath_or_filepath) const {
 	if (myfile) {
 		// *** RELEASE ***
 		myfile.close();
-		this->setlasterror("osrename failed. " ^ new_dirpath_or_filepath.quote() ^ " already exists.");
+		var::setlasterror("osrename failed. " ^ new_dirpath_or_filepath.quote() ^ " already exists.");
 		return false;
 	}
 
 	// Safety
 	if (!checknotabsoluterootfolder(path1)) {
-		this->setlasterror("osrename failed. " ^ var(path1).quote() ^ " cannot be renamed because it is a top level dir");
+		var::setlasterror("osrename failed. " ^ var(path1).quote() ^ " cannot be renamed because it is a top level dir");
 		return false;
 	}
 
 	if (!checknotabsoluterootfolder(path2)) {
-		this->setlasterror("osrename failed. " ^ var(path2).quote() ^ " cannot be overwritten because it is a top level dir");
+		var::setlasterror("osrename failed. " ^ var(path2).quote() ^ " cannot be overwritten because it is a top level dir");
 		return false;
 	}
 
 	//	if (!std::rename(path1.c_str(), path2.c_str())) {
 	//	// TODO problem no informative error message
-	//		this->setlasterror("osrename failed. " ^ this->quote() ^ " to " ^ new_dirpath_or_filepath.quote() ^ " unknown error.");
+	//		var::setlasterror("osrename failed. " ^ this->quote() ^ " to " ^ new_dirpath_or_filepath.quote() ^ " unknown error.");
 	//		return false;
 	//	}
 
@@ -960,7 +961,7 @@ bool var::osrename(in new_dirpath_or_filepath) const {
 
 	// Handle error
 	if (error_code) {
-		this->setlasterror("osrename failed. " ^ this->quote() ^ " to " ^ new_dirpath_or_filepath.quote() ^ " Error: 0" ^ error_code.message());
+		var::setlasterror("osrename failed. " ^ this->quote() ^ " to " ^ new_dirpath_or_filepath.quote() ^ " Error: 0" ^ error_code.message());
 		return false;
 	}
 
@@ -994,7 +995,7 @@ bool var::oscopy(in new_dirpath_or_filepath) const {
 
 	// Handle error
 	if (error_code) {
-		this->setlasterror("oscopy failed. " ^ this->quote() ^ " to " ^ new_dirpath_or_filepath.quote() ^ " Error: " ^ error_code.message());
+		var::setlasterror("oscopy failed. " ^ this->quote() ^ " to " ^ new_dirpath_or_filepath.quote() ^ " Error: " ^ error_code.message());
 		return false;
 	}
 
@@ -1018,17 +1019,17 @@ bool var::osmove(in new_dirpath_or_filepath) const {
 	if (myfile) {
 		// RELEASE
 		myfile.close();
-		this->setlasterror("osmove " ^ this->quote() ^ " failed. " ^ new_dirpath_or_filepath.quote() ^ " already exists.");
+		var::setlasterror("osmove " ^ this->quote() ^ " failed. " ^ new_dirpath_or_filepath.quote() ^ " already exists.");
 		return false;
 	}
 
 	// Safety
 	if (!checknotabsoluterootfolder(path1)) {
-		this->setlasterror(var(path1).quote() ^ " Cannot be moved or deleted because it is a top level dir");
+		var::setlasterror(var(path1).quote() ^ " Cannot be moved or deleted because it is a top level dir");
 		return false;
 	}
 	if (!checknotabsoluterootfolder(path2)) {
-		this->setlasterror(var(path2).quote() ^ " Cannot be overwritten because it is a top level dir");
+		var::setlasterror(var(path2).quote() ^ " Cannot be overwritten because it is a top level dir");
 		return false;
 	}
 
@@ -1040,7 +1041,7 @@ bool var::osmove(in new_dirpath_or_filepath) const {
 	// To copy and delete instead of move
 	////////////////////////////////////////
 	if (!this->oscopy(new_dirpath_or_filepath)) {
-		this->setlasterror("osmove failed. " ^ this->lasterror());
+		var::setlasterror("osmove failed. " ^ this->lasterror());
 		return false;
 	}
 
@@ -1051,7 +1052,7 @@ bool var::osmove(in new_dirpath_or_filepath) const {
 		// otherwise delete the target too
 		// new_dirpath_or_filepath.osremove();
 
-		this->setlasterror(this->quote() ^ " osmove failed to remove source after copying to " ^ new_dirpath_or_filepath.quote());
+		var::setlasterror(this->quote() ^ " osmove failed to remove source after copying to " ^ new_dirpath_or_filepath.quote());
 		return false;
 	}
 
@@ -1065,12 +1066,12 @@ bool var::osremove() const {
 
 	// Prevent removal of dirs. Use osrmdir for that.
 	if (std::filesystem::is_directory(this->toString())) {
-		this->setlasterror(this->quote() ^ " osremove failed - is a directory.");
+		var::setlasterror(this->quote() ^ " osremove failed - is a directory.");
 		return false;
 	}
 
 	if (std::remove(to_path_string(*this).c_str())) {
-		this->setlasterror(this->quote() ^ " failed to osremove");
+		var::setlasterror(this->quote() ^ " failed to osremove");
 		return false;
 	}
 	return true;
@@ -1083,7 +1084,7 @@ bool var::osmkdir() const {
 	std::filesystem::path pathx(to_path_string(*this).c_str());
 
 	//	if (std::filesystem::exists(pathx))	{
-	//		this->setlasterror(this->quote() ^ " osmkdir failed. Target already exists.");
+	//		var::setlasterror(this->quote() ^ " osmkdir failed. Target already exists.");
 	//		return false;
 	//	}
 	//
@@ -1093,12 +1094,12 @@ bool var::osmkdir() const {
 	// https://en.cppreference.com/w/cpp/filesystem/create_directory
 	bool created = std::filesystem::create_directories(pathx, ec);
 	if (ec or !created) {
-		this->setlasterror(this->quote() ^ " osmkdir failed. " ^ ec.message());
+		var::setlasterror(this->quote() ^ " osmkdir failed. " ^ ec.message());
 		return false;
 	}
 
 	if (!std::filesystem::exists(pathx)) {
-		this->setlasterror(this->quote() ^ " osmkdir failed. Target could not be created.");
+		var::setlasterror(this->quote() ^ " osmkdir failed. Target could not be created.");
 		return false;
 	}
 
@@ -1116,12 +1117,12 @@ bool var::osrmdir(bool evenifnotempty) const {
 		std::filesystem::path pathx(to_path_string(*this).c_str());
 
 		if (!std::filesystem::exists(pathx)) {
-			this->setlasterror("osrmdir failed. " ^ this->quote() ^ " does not exist.");
+			var::setlasterror("osrmdir failed. " ^ this->quote() ^ " does not exist.");
 			return false;
 		}
 
 		if (!std::filesystem::is_directory(pathx)) {
-			this->setlasterror("osrmdir failed. " ^ this->quote() ^ " is not a directory.");
+			var::setlasterror("osrmdir failed. " ^ this->quote() ^ " is not a directory.");
 			return false;
 		}
 
@@ -1130,7 +1131,7 @@ bool var::osrmdir(bool evenifnotempty) const {
 			// safety .. simply REFUSE to rm top level folders if not empty
 			// find some other way e.g. shell command if you must
 			if (!checknotabsoluterootfolder(toString())) {
-				this->setlasterror("osrmdir failed " ^ this->quote() ^ " is a top level dir.");
+				var::setlasterror("osrmdir failed " ^ this->quote() ^ " is a top level dir.");
 				return false;
 			}
 
@@ -1138,7 +1139,7 @@ bool var::osrmdir(bool evenifnotempty) const {
 		} else
 			std::filesystem::remove(pathx);
 	} catch (...) {
-		this->setlasterror("osrmdir failed. " ^ this->quote() ^ " Unknown cause.");
+		var::setlasterror("osrmdir failed. " ^ this->quote() ^ " Unknown cause.");
 		return false;
 	}
 
@@ -1342,35 +1343,24 @@ append_it:
 	return filelist;
 }
 
-bool var::oscwd(in newpath) const {
+bool var::oscwd(SV newpath) {
 
-	THISIS("var  var::oscwd(const char* newpath) const")
-	// doesnt use *this - should syntax be changed to setcwd? and getcwd()?
-	assertVar(function_sig);  // not needed if *this not used
-	ISSTRING(newpath)
+	THISIS("bool var::oscwd(SV newpath) static")
 
 	try {
-		std::filesystem::current_path(to_path_string(newpath));
-		// std::filesystem::current_path(newpath);
+		std::filesystem::current_path(newpath);
 	} catch (...) {
-		// filesystem error: cannot set current path: No such file or directory
 		// ignore all errors
-		this->setlasterror(var(newpath).quote() ^ " oscwd failed - unknown cause.");
+		var::setlasterror(var(newpath).quote() ^ " oscwd failed - unknown cause.");
 		return false;
 	}
 
 	return true;
 }
 
-var var::oscwd() const {
+var var::oscwd() {
 
-	THISIS("var  var::oscwd() const")
-	// doesnt use *this - should syntax be changed to ossetcwd? and osgetcwd()?
-	assertVar(function_sig);  // not needed if *this not used
-
-	// TODO consider using complete() or system_complete()
-	//"[Note: When portable behavior is required, use complete(). When operating system
-	// dependent behavior is required, use system_complete()."
+	THISIS("var  var::oscwd() static")
 
 	std::string currentpath = std::filesystem::current_path().string();
 
