@@ -11,7 +11,16 @@ dim d1;
 .nf
  
 .fi
-Create an dimensioned array of vars pending actual dimensions.
+Create an undimensioned array of vars pending actual dimensions.
+
+\fBExample:\fR
+.RS
+.nf
+dim d1;
+.fi
+.RE
+
+
 
 .SS
 dim d1(nrows, ncols = 1);
@@ -20,12 +29,32 @@ dim d1(nrows, ncols = 1);
 .fi
 Create an array of vars with a fixed number of columns and rows. All vars are unassigned.
 
+\fBExample:\fR
+.RS
+.nf
+dim d1(10);
+dim d2(10, 3);
+.fi
+.RE
+
+
+
 .SS
 dim d1 = d2; // Copy
 .nf
  
 .fi
 Create a copy of an array.
+
+\fBExample:\fR
+.RS
+.nf
+ dim d1 = {2, 4, 6, 8};
+ dim d2 = d1;
+.fi
+.RE
+
+
 
 .SS
 dim d1 = dim(); // Move
@@ -34,12 +63,33 @@ dim d1 = dim(); // Move
 .fi
 Save an array created elsewhere.
 
+Uses C++ "move" semantics.
+
+\fBExample:\fR
+.RS
+.nf
+dim d1 = "f1^f2^f3"_var.split();
+.fi
+.RE
+
+
+
 .SS
 dim d1 = {"a", "b", "c" ...}; // Initializer list
 .nf
  
 .fi
-Create an array from a list. All elements must be the same type. var, string, double, int, etc..
+Create an array from a list. All elements must be the same type, var, string, double, int, etc.. but all end up as vars which are a flexible type.
+
+\fBExample:\fR
+.RS
+.nf
+dim d1 = {1, 2, 3, 4, 5};
+dim d2 = {"A", "B", "C"};
+.fi
+.RE
+
+
 
 .SS
 dim d1 = v1;
@@ -47,6 +97,16 @@ dim d1 = v1;
  
 .fi
 Initialise all elements of an array to some single value or constant. A var, "", 0 etc.
+
+\fBExample:\fR
+.RS
+.nf
+dim d1(10);
+d1 = "";
+.fi
+.RE
+
+
 
 .SS
 d1.redim(nrows, ncols = 1)
@@ -61,6 +121,16 @@ Resizing rows to 0 clears all data.
 
 Resizing cols to 0 clears all data and changes its status to "undimensioned".
 
+\fBExample:\fR
+.RS
+.nf
+dim d1;
+d1.redim(10, 3);
+.fi
+.RE
+
+
+
 .SS
 d1.swap(d2) 
 .nf
@@ -69,6 +139,17 @@ d1.swap(d2)
 Swap one array with another.
 
 Either or both may be undimensioned.
+
+\fBExample:\fR
+.RS
+.nf
+dim d1(5);
+dim d2(10);
+d1.swap(d2);
+.fi
+.RE
+
+
 
 .SH 3. ARRAY ACCESS
 .SH
@@ -80,12 +161,35 @@ var v1 = d1[rowno];       d1[rowno] = v1;
 .fi
 Access and update elements of a one dimensional array using [] brackets
 
+\fBExample:\fR
+.RS
+.nf
+dim d1 = {1, 2, 3, 4, 5};
+d1[3] = "X";
+let v1 = d1[3]; // "X"
+.fi
+.RE
+
+
+
 .SS
 var v1 = d1[rowno, colno];       d1[rowno, colno] = v1;
 .nf
  
 .fi
 Access and update elements of an two dimensional array using [] brackets
+
+\fBExample:\fR
+.RS
+.nf
+dim d1(10, 5);
+d1 = "";
+d1[3, 4] = "X";
+let v1 = d1[3, 4]; // "X"
+.fi
+.RE
+
+
 
 .SS
 var v1 = d1.rows();
@@ -96,6 +200,16 @@ Get the number of rows in the dimensioned array
 
 \fBReturns:\fR A count. Can be zero, indicating an empty array.
 
+\fBExample:\fR
+.RS
+.nf
+dim d1(5,3);
+let v1 = d1.rows(); // 5
+.fi
+.RE
+
+
+
 .SS
 var v1 = d1.cols();
 .nf
@@ -105,6 +219,16 @@ Get the number of columns in the dimensioned array
 
 \fBReturns:\fR A count.  0 if the array is undimensioned.
 
+\fBExample:\fR
+.RS
+.nf
+dim d1(5,3);
+let v1 = d1.cols(); // 3
+.fi
+.RE
+
+
+
 .SS
 var v1 = d1.join(delimiter = FM);
 .nf
@@ -112,7 +236,19 @@ var v1 = d1.join(delimiter = FM);
 .fi
 Joins all elements into a single delimited string
 
+\fBdelimiter:\fR Default is FM.
+
 \fBReturns:\fR A string var.
+
+\fBExample:\fR
+.RS
+.nf
+dim d1 = {"f1", "f2", "f3"};
+let v1 = d1.join(); // "f1^f2^f3"_var
+.fi
+.RE
+
+
 
 .SH 4. ARRAY MUTATION
 .SH
@@ -124,24 +260,25 @@ d1.splitter(str1, delimiter = FM)
 .fi
 Creates or updates the array from a given string.
 
-If the dim array has not been dimensioned (nrows and ncols are 0), it will be dimensioned with the number of elements that the string has fields.
+If the dim array is undimensioned it will be dimensioned with the number of elements that the string has fields.
 
-If the dim array has already been dimensioned, and has more elements than there are fields in the string, the excess array elements are initialised to "". If the record has more fields than there are elements in the array, the excess fields are all left unsplit in the final element of the array.
+If the dim array is dimensioned and has more elements than there are fields in the string, the excess array elements are initialised to "". If the record has more fields than there are elements in the array, the excess fields are all left unsplit in the final element of the array.
 
-Predimensioning arrays allows efficient reuse of arrays in loops.
+Predimensioning arrays allows the efficient reuse of arrays in loops and ensures that all elements are assigned values, useful when reading records from db files.
 
-In either case, all elements of the array are updated.
+Using undimensioned arrays allows the efficient handling of arrays with a very variable number of elements. e.g. os text files.
 
 \fBExample:\fR
 .RS
 .nf
 dim d1;
-d1.splitter("f1^f2^f3"_var); // d1.rows() -> 3
+d1.splitter("f1^f2^f3"_var); // d1.rows() -> 3  // Automatically dimensioned.
 //
 dim d2(10);
-d2.splitter("f1^f2^f3"_var); // d2.rows() -> 10
+d2.splitter("f1^f2^f3"_var); // d2.rows() -> 10 // Predimensioned. Excess elements become ""
 .fi
 .RE
+
 
 
 .SS
@@ -149,23 +286,56 @@ d1.sorter(reverse = false)
 .nf
  
 .fi
-Sort the elements of the array. In place.
+Sort the elements of the array in place.
 
 \fBreverse:\fR Defaults to false. If true, then the order is reversed.
+
+\fBExample:\fR
+.RS
+.nf
+dim d1 = "2,20,10,1"_var.split(",");
+d1.sorter();
+let v1 = d1.join(","); // "1,2,10,20"_var
+.fi
+.RE
+
+
 
 .SS
 d1.reverser()
 .nf
  
 .fi
-Reverse the elements of the array. In place.
+Reverse the elements of the array in place.
+
+\fBExample:\fR
+.RS
+.nf
+dim d1 = "2,20,10,1"_var.split(",");
+d1.reverser();
+let v1 = d1.join(","); // "1,10,20,2"_var
+.fi
+.RE
+
+
 
 .SS
 d1.shuffler()
 .nf
  
 .fi
-Randomly shuffle the order of the elements of the array. In place.
+Randomly shuffle the order of the elements of the array in place.
+
+\fBExample:\fR
+.RS
+.nf
+dim d1 = "2,20,10,1"_var.split(",");
+d1.shuffler();
+let v1 = d1.join(","); // random
+.fi
+.RE
+
+
 
 .SH 5. ARRAY CONVERSION
 .SH
@@ -216,6 +386,7 @@ write(d1 on file, key);
 .RE
 
 
+
 .SS
 if (d1.read(dbfile, key)) ...
 .nf
@@ -241,6 +412,7 @@ if (not d1.read(file, key)) ... // d1.join() -> "Client GD^G^20855^30000^1001.00
 if (not read(d1 from file, key)) ...
 .fi
 .RE
+
 
 
 .SH 7. ARRAY OS I/O
@@ -274,6 +446,7 @@ if (not oswrite(d1 on osfilename)) ...
 .RE
 
 
+
 .SS
 if (d1.osread(osfilename, codepage = "")) ...
 .nf
@@ -282,6 +455,8 @@ if (d1.osread(osfilename, codepage = "")) ...
 Read an entire os text file into an array.
 
 Each line in the os file, delimited by \\n or \\r\\n, becomes a separate element in the array.
+
+Existing data in the array is lost and the array is redimensioned to the number of lines in the input data.
 
 \fBcodepage:\fR Optional. Data will be converted from the specified codepage/encoding to UTF8 after being read. If the conversion cannot be performed then return false.
 
@@ -299,6 +474,7 @@ if (not d1.osread(osfilename)) ... // d1.join("\\n") -> "aaa=1\\nbbb=2\\nccc=3\\
 if (not osread(d1 from osfilename)) ...
 .fi
 .RE
+
 
 
 

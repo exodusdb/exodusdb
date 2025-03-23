@@ -147,6 +147,7 @@ swap(v1, v2);
 .RE
 
 
+
 .SS
 var v1 = v2.move();
 .nf
@@ -169,6 +170,7 @@ var v3 = move(v2);
 .RE
 
 
+
 .SS
 var v1 = v2.clone();
 .nf
@@ -187,6 +189,7 @@ var v2 = v1.clone(); // "abc"
 var v3 = clone(v2);
 .fi
 .RE
+
 
 
 .SS
@@ -219,6 +222,7 @@ v1.dump().outputl(); /// e.g. var:0x7ffea7462cd0 typ:1 str:0x584d9e9f6e70 "xxxxx
 outputl(dump(v1));
 .fi
 .RE
+
 
 
 .SH 3. ARITHMETICAL OPERATORS 
@@ -293,6 +297,7 @@ var v2 = v1 + 0.2; // 0.3
 .RE
 
 
+
 .SS
 var v1 = v2 - v3;
 .nf
@@ -335,6 +340,7 @@ var v1 = 0.1;
 v1 += 0.2; // 0.3
 .fi
 .RE
+
 
 
 .SS
@@ -381,6 +387,7 @@ var v2 = v1 ++; // v2 -> 3 // v1 -> 4
 .RE
 
 
+
 .SS
 v1 --
 .nf
@@ -395,6 +402,7 @@ var v1 = 3;
 var v2 = v1 --; // v2 -> 3 // v1 -> 2
 .fi
 .RE
+
 
 
 .SS
@@ -413,6 +421,7 @@ var v2 = ++ v1; // v2 -> 4 // v1 -> 4
 .RE
 
 
+
 .SS
 -- v1
 .nf
@@ -427,6 +436,7 @@ var v1 = 3;
 var v2 = -- v1; // v2 -> 2 // v1 -> 2
 .fi
 .RE
+
 
 
 .SH 4. DYNAMIC ARRAY CREATION, ACCESS AND UPDATE
@@ -459,6 +469,7 @@ var v1 = "f1^f2^v1]v2^f4"_var; // "f1" _FM "f2" _FM "v1" _VM "v2" _FM "f4"
 .RE
 
 
+
 .SS
 var v1 = {"a", "b", "c" ...}; // Initializer list
 .nf
@@ -474,12 +485,13 @@ var v1 = {11, 22, 33}; // "11^22^33"_var
 .RE
 
 
+
 .SS
 var v1 = v2(fieldno);       v1(fieldno) = v2;
 .nf
  
 .fi
-Dynamic array - field update and append:
+Dynamic array - field extraction, update and append:
 
 See also inserter() and remover().
 
@@ -507,6 +519,7 @@ var v2 = v1.f(2); // "bb" /// .f() style access. Recommended.
 var v3 =   v1(2); // "bb" ///   () style access. Not recommended.
 .fi
 .RE
+
 
 
 .SS
@@ -540,6 +553,7 @@ var v3 =   v1(2,2); // "b2" ///   () style access. Not recommended.
 .RE
 
 
+
 .SH 5. STRING CREATION 
 .SH
 
@@ -552,7 +566,7 @@ String concatention operator ^
 
 At least one side must be a var.
 
-"aa" ^ "22" will not compile but "aa" "22".
+"aa" ^ "22" will not compile but "aa" "22" will.
 
 Floating point numbers are implicitly converted to strings with no more than 12 significant digits of precision. This practically eliminates all floatng point rounding errors.
 
@@ -563,6 +577,7 @@ var v2 = "aa";
 var v1 = v2 ^ 22; // "aa22"
 .fi
 .RE
+
 
 
 .SS
@@ -627,6 +642,7 @@ let v3 = round(123456.789, -2); // "123500"
 .RE
 
 
+
 .SS
 var v1 = var::chr(num);
 .nf
@@ -646,6 +662,7 @@ let v1 = var::chr(0x61); // "a"
 let v2 = chr(0x61);
 .fi
 .RE
+
 
 
 .SS
@@ -669,8 +686,9 @@ let v2 = textchr(171416);
 .RE
 
 
+
 .SS
-var v1 = var().str(num);
+var v1 = varstr.str(num);
 .nf
  
 .fi
@@ -690,6 +708,7 @@ let v1 = "ab"_var.str(3); // "ababab"
 let v2 = str("ab", 3);
 .fi
 .RE
+
 
 
 .SS
@@ -713,6 +732,7 @@ let v2 = space(3);
 .RE
 
 
+
 .SS
 var v1 = varnum.numberinwords(locale = "");
 .nf
@@ -729,6 +749,7 @@ let softhyphen = "\\xc2\\xad";
 let v1 = var(123.45).numberinwords("de_DE").replace(softhyphen, " "); // "ein hundert drei und zwanzig Komma vier fünf"
 .fi
 .RE
+
 
 
 .SH 6. STRING SCANNING
@@ -777,6 +798,7 @@ let v2 = seq("abc");
 .RE
 
 
+
 .SS
 var v1 = strvar.textseq();
 .nf
@@ -798,6 +820,7 @@ let v2 = textseq("Γ");
 .RE
 
 
+
 .SS
 var v1 = strvar.len();
 .nf
@@ -815,6 +838,7 @@ let v1 = "abc"_var.len(); // 3
 let v2 = len("abc");
 .fi
 .RE
+
 
 
 .SS
@@ -839,6 +863,7 @@ if (not v1.empty()) ... ok // true
 if (not empty(v1)) ... ok // true
 .fi
 .RE
+
 
 
 .SS
@@ -866,6 +891,7 @@ let v2 = textwidth("🤡x🤡");
 .RE
 
 
+
 .SS
 var v1 = strvar.textlen();
 .nf
@@ -883,6 +909,7 @@ let v1 = "Γιάννης"_var.textlen(); // 7
 let v2 = textlen("Γιάννης");
 .fi
 .RE
+
 
 
 .SS
@@ -908,6 +935,7 @@ let v2 = fcount("aa**cc", "*");
 .RE
 
 
+
 .SS
 var v1 = strvar.count(sepstr);
 .nf
@@ -929,6 +957,7 @@ let v1 = "aa**cc"_var.count("*"); // 2
 let v2 = count("aa**cc", "*");
 .fi
 .RE
+
 
 
 .SS
@@ -954,6 +983,7 @@ if (starts("abc", "ab")) ... true
 .RE
 
 
+
 .SS
 if (strvar.ends(suffix)) ...
 .nf
@@ -975,6 +1005,7 @@ if ("abc"_var.ends("bc")) ... true
 if (ends("abc", "bc")) ... true
 .fi
 .RE
+
 
 
 .SS
@@ -1006,6 +1037,7 @@ if (contains("abcd", "bc")) ... true
 .RE
 
 
+
 .SS
 var v1 = strvar.index(substr, startchar1 = 1);
 .nf
@@ -1029,6 +1061,7 @@ let v2 = index("abcd", "bc");
 .RE
 
 
+
 .SS
 var v1 = strvar.indexn(substr, occurrence);
 .nf
@@ -1048,6 +1081,7 @@ let v1 = "abcabc"_var.index("bc", 2); // 2
 let v2 = index("abcabc", "bc", 2);
 .fi
 .RE
+
 
 
 .SS
@@ -1071,6 +1105,7 @@ let v1 = "abcabc"_var.indexr("bc"); // 5
 let v2 = indexr("abcabc", "bc");
 .fi
 .RE
+
 
 
 .SS
@@ -1127,6 +1162,8 @@ w - Wildcard glob style (e.g. *.cfg) not regex style. Only for match() and searc
 
 .fi
 
+
+
 .SS
 var v1 = strvar.match(regex);
 .nf
@@ -1159,6 +1196,7 @@ startchar1 = 1;
 let v2 = search("abc1abc2", "BC(\\\\d)", startchar1, "i");
 .fi
 .RE
+
 
 
 .SS
@@ -1205,6 +1243,7 @@ let v2 = hash("abc");
 .RE
 
 
+
 .SH 7. STRING CONVERSION - NON-MUTATING - CHAINABLE
 .SH
 
@@ -1225,6 +1264,7 @@ let v2 = ucase("Γιάννης");
 .RE
 
 
+
 .SS
 var v1 = strvar.lcase();
 .nf
@@ -1240,6 +1280,7 @@ let v1 = "ΓΙΆΝΝΗΣ"_var.lcase(); // "γιάννης"
 let v2 = lcase("ΓΙΆΝΝΗΣ");
 .fi
 .RE
+
 
 
 .SS
@@ -1259,6 +1300,7 @@ let v1 = "γιάννης παππάς"_var.tcase(); // "Γιάννης Παππ�
 let v2 = tcase("γιάννης παππάς");
 .fi
 .RE
+
 
 
 .SS
@@ -1288,6 +1330,7 @@ let v2 = tcase("Grüßen");
 .RE
 
 
+
 .SS
 var v1 = strvar.normalize();
 .nf
@@ -1309,6 +1352,7 @@ let v1 = "cafe\\u0301"_var.normalize(); // "caf\\u00E9" // "café"
 let v2 = normalize("cafe\\u0301");
 .fi
 .RE
+
 
 
 .SS
@@ -1340,6 +1384,7 @@ let v2 = invert("abc");
 .RE
 
 
+
 .SS
 var v1 = strvar.lower();
 .nf
@@ -1363,6 +1408,7 @@ let v1 = "a1^b2^c3"_var.lower(); // "a1]b2]c3"_var
 let v2 = lower("a1^b2^c3"_var);
 .fi
 .RE
+
 
 
 .SS
@@ -1390,6 +1436,7 @@ let v2 = "a1]b2]c3"_var;
 .RE
 
 
+
 .SS
 var v1 = strvar.crop();
 .nf
@@ -1405,6 +1452,7 @@ let v1 = "a1^b2]]^c3^^"_var.crop(); // "a1^b2^c3"_var
 let v2 = crop("a1^b2]]^c3^^"_var);
 .fi
 .RE
+
 
 
 .SS
@@ -1424,6 +1472,7 @@ let v2 = quote("abc");
 .RE
 
 
+
 .SS
 var v1 = strvar.squote();
 .nf
@@ -1441,6 +1490,7 @@ let v2 = squote("abc");
 .RE
 
 
+
 .SS
 var v1 = strvar.unquote();
 .nf
@@ -1456,6 +1506,7 @@ let v1 = "'abc'"_var.unquote(); // "abc"
 let v2 = unquote("'abc'");
 .fi
 .RE
+
 
 
 .SS
@@ -1477,6 +1528,7 @@ let v2 = trim("  a1  b2 c3  ");
 .RE
 
 
+
 .SS
 var v1 = strvar.trimfirst(trimchars = " ");
 .nf
@@ -1492,6 +1544,7 @@ let v1 = "  a1  b2 c3  "_var.trimfirst(); // "a1  b2 c3 �
 let v2 = trimfirst("  a1  b2 c3  ");
 .fi
 .RE
+
 
 
 .SS
@@ -1511,6 +1564,7 @@ let v2 = trimlast("  a1  b2 c3  ");
 .RE
 
 
+
 .SS
 var v1 = strvar.trimboth(trimchars = " ");
 .nf
@@ -1526,6 +1580,7 @@ let v1 = "  a1  b2 c3  "_var.trimboth(); // "a1  b2 c3"
 let v2 = trimboth("  a1  b2 c3  ");
 .fi
 .RE
+
 
 
 .SS
@@ -1549,6 +1604,7 @@ let v2 = first("abc");
 .RE
 
 
+
 .SS
 var v1 = strvar.last();
 .nf
@@ -1568,6 +1624,7 @@ let v1 = "abc"_var.last(); // "c"
 let v2 = last("abc");
 .fi
 .RE
+
 
 
 .SS
@@ -1593,6 +1650,7 @@ let v2 = first("abc", 2);
 .RE
 
 
+
 .SS
 var v1 = strvar.last(std::size_t length);
 .nf
@@ -1610,6 +1668,7 @@ let v1 = "abc"_var.last(2); // "bc"
 let v2 = last("abc", 2);
 .fi
 .RE
+
 
 
 .SS
@@ -1633,6 +1692,7 @@ let v1 = "abcd"_var.cut(2); // "cd"
 let v2 = cut("abcd", 2);
 .fi
 .RE
+
 
 
 .SS
@@ -1664,6 +1724,7 @@ let v2 = paste("abcd", 2, 2, "XYZ");
 .RE
 
 
+
 .SS
 var v1 = strvar.paste(pos1, insertstr);
 .nf
@@ -1683,6 +1744,7 @@ let v2 = paste("abcd", 2, "XYZ");
 .RE
 
 
+
 .SS
 var v1 = strvar.prefix(insertstr);
 .nf
@@ -1700,6 +1762,7 @@ let v1 = "abc"_var.prefix("XYZ"); // "XYZabc"
 let v2 = prefix("abc", "XYZ");
 .fi
 .RE
+
 
 
 .SS
@@ -1738,6 +1801,7 @@ let v2 = pop("abc");
 .RE
 
 
+
 .SS
 var v1 = strvar.field(delimiter, fieldnx = 1, nfieldsx = 1);
 .nf
@@ -1769,6 +1833,7 @@ let v1 = "aa*bb*cc"_var.field("*", -1); // "cc"
 let v2 = field("aa*bb*cc", "*", -1);
 .fi
 .RE
+
 
 
 .SS
@@ -1881,6 +1946,7 @@ let v2 = substr("abcd", 3, -2); // "cb"
 .RE
 
 
+
 .SS
 var v1 = strvar.b(pos1, length);
 .nf
@@ -1913,6 +1979,7 @@ let v1 = "abcd"_var.substr(2); // "bcd"
 let v2 = substr("abcd", 2);
 .fi
 .RE
+
 
 
 .SS
@@ -1960,6 +2027,7 @@ let v1 = "12,45 78"_var.substr(pos1, ", ", COL2);  // v1 -> "45" // COL2 -> 6 //
 let v2 = substr("12,45 78", COL2 + 1, ", ", COL2); // v2 -> "78" // COL2 -> 9 // 9 is one after the end of the string meaning that none of the delimiter chars were found.
 .fi
 .RE
+
 
 
 .SS
@@ -2013,6 +2081,7 @@ let v2 = substr2("12^45^78"_var, pos1, field_mark_no); // "78" // pos1 -> 9 // f
 .RE
 
 
+
 .SS
 var v1 = strvar.b2(io pos1, out field_mark_no);
 .nf
@@ -2043,6 +2112,7 @@ let v2 = convert("abcde", "aZd", "XY");
 .RE
 
 
+
 .SS
 var v1 = strvar.textconvert(fromchars, tochars);
 .nf
@@ -2058,6 +2128,7 @@ let v1 = "a🤡b😀c🌍d"_var.textconvert("🤡😀", "👋"); // "a👋bc🌍
 let v2 = textconvert("a🤡b😀c🌍d", "🤡😀", "👋");
 .fi
 .RE
+
 
 
 .SS
@@ -2079,6 +2150,7 @@ let v2 = replace("Abc Abc", "bc", "X");
 .RE
 
 
+
 .SS
 var v1 = strvar.replace(regex, tostr);
 .nf
@@ -2098,6 +2170,7 @@ let v2 = replace("A a B b", "[A-Z]"_rex, "'$0'");
 .RE
 
 
+
 .SS
 var v1 = strvar.unique();
 .nf
@@ -2113,6 +2186,7 @@ let v1 = "a1^b2^a1^c2"_var.unique(); // "a1^b2^c2"_var
 let v2 = unique("a1^b2^a1^c2"_var);
 .fi
 .RE
+
 
 
 .SS
@@ -2145,6 +2219,7 @@ let v2 = sort("b1^a1^c20^c10^c2^c1^b2"_var);
 .RE
 
 
+
 .SS
 var v1 = strvar.reverse(delimiter = FM);
 .nf
@@ -2162,6 +2237,7 @@ let v2 = reverse("20^10^2^1^1.1"_var);
 .RE
 
 
+
 .SS
 var v1 = strvar.shuffle(delimiter = FM);
 .nf
@@ -2177,6 +2253,7 @@ let v1 = "20^10^2^1^1.1"_var.shuffle(); /// e.g. "2^1^20^1.1^10" (random order d
 let v2 = shuffle("20^10^2^1^1.1"_var);
 .fi
 .RE
+
 
 
 .SS
@@ -2200,6 +2277,7 @@ let v2 = parse("abc,\\"def,\\"123\\" fgh\\",12.34", ',');
 .RE
 
 
+
 .SS
 dim d1 = strvar.split(delimiter = FM);
 .nf
@@ -2219,6 +2297,7 @@ dim d1 = "a^b^c"_var.split(); // A dimensioned array with three elements (vars)
 dim d2 = split("a^b^c"_var);
 .fi
 .RE
+
 
 
 .SS
@@ -2249,6 +2328,7 @@ v1.ucaser(); // "ABC"
 ucaser(v1);
 .fi
 .RE
+
 
 
 .SS
@@ -2536,6 +2616,7 @@ let v2 = oconv(30123, "D/E");
 .RE
 
 
+
 .SS
 var v1 = var.iconv(convstr);
 .nf
@@ -2557,6 +2638,7 @@ let v1 = "21 JUN 2050"_var.iconv("D/E"); // 30123
 let v2 = iconv("21 JUN 2050", "D/E");
 .fi
 .RE
+
 
 
 .SS
@@ -2582,6 +2664,7 @@ var v4 = format("'{::MD20P|R(_)#8}'", var(12.345));
 .RE
 
 
+
 .SS
 var v1 = strvar.from_codepage(codepage);
 .nf
@@ -2604,6 +2687,7 @@ let v2 = from_codepage("\\xa4", "CP1124");
 .RE
 
 
+
 .SS
 var v1 = strvar.to_codepage(codepage);
 .nf
@@ -2619,6 +2703,7 @@ let v1 = "Є"_var.to_codepage("CP1124").oconv("HEX"); // "A4"
 let v2 = to_codepage("Є", "CP1124").oconv("HEX");
 .fi
 .RE
+
 
 
 .SH 10. DYNAMIC ARRAY FUNCTIONS
@@ -2646,6 +2731,7 @@ let v2 = v1.f(2, 2); // "f2v2"
 .RE
 
 
+
 .SS
 var v1 = strvar.extract(fieldno, valueno = 0, subvalueno = 0);
 .nf
@@ -2663,6 +2749,7 @@ let v2 = v1.extract(2, 2); // "f2v2"
 var v3 = v1.f(2, 2);
 .fi
 .RE
+
 
 
 .SS
@@ -2738,6 +2825,7 @@ let v2 = sum("1]2]3^4]5]6"_var);
 .RE
 
 
+
 .SS
 var v1 = strvar.sumall();
 .nf
@@ -2753,6 +2841,7 @@ let v1 = "1]2]3^4]5]6"_var.sumall(); // 21
 let v2 = sumall("1]2]3^4]5]6"_var);
 .fi
 .RE
+
 
 
 .SS
@@ -2772,6 +2861,7 @@ let v2 = sum("10,20,30", ",");
 .RE
 
 
+
 .SS
 var v1 = strvar.mv(opcode, var2);
 .nf
@@ -2785,6 +2875,7 @@ Binary ops (+, -, *, /) in parallel on multiple values
 let v1 = "10]20]30"_var.mv("+","2]3]4"_var); // "12]23]34"_var
 .fi
 .RE
+
 
 
 .SH 12. DYNAMIC ARRAY MUTATORS STANDALONE COMMANDS
@@ -2810,6 +2901,7 @@ updater(v1, 2, "X");
 .RE
 
 
+
 .SS
 strvar.updater(fieldno, valueno, replacement)
 .nf
@@ -2828,6 +2920,7 @@ v1(2, 2) = "X"; /// Easiest.
 updater(v1, 2, 2, "X");
 .fi
 .RE
+
 
 
 .SS
@@ -2850,6 +2943,7 @@ updater(v1, 2, 2, 2, "X");
 .RE
 
 
+
 .SS
 strvar.inserter(fieldno, insertion)
 .nf
@@ -2866,6 +2960,7 @@ v1.inserter(2, "X"); // "f1^X^v1]v2}s2}s3^f3"_var
 inserter(v1, 2, "X");
 .fi
 .RE
+
 
 
 .SS
@@ -2886,6 +2981,7 @@ inserter(v1, 2, 2, "X");
 .RE
 
 
+
 .SS
 strvar.inserter(fieldno, valueno, subvalueno, insertion)
 .nf
@@ -2904,6 +3000,7 @@ v1.inserter(2, 2, 2, "X");
 .RE
 
 
+
 .SS
 strvar.remover(fieldno, valueno = 0, subvalueno = 0)
 .nf
@@ -2920,6 +3017,7 @@ v1.remover(2, 2); // "f1^v1^f3"_var
 remover(v1, 2, 2);
 .fi
 .RE
+
 
 
 .SH 13. DYNAMIC ARRAY SEARCH
@@ -2946,6 +3044,7 @@ if (locate("US", "UK^US^UA"_var)) ... ok
 .RE
 
 
+
 .SS
 if (strvar.locate(target, out valueno)) ...
 .nf
@@ -2968,6 +3067,7 @@ if (locate("US", "UK]US]UA"_var, setting)) ... ok
 .RE
 
 
+
 .SS
 if (strvar.locate(target, out setting, fieldno, valueno = 0)) ...
 .nf
@@ -2986,6 +3086,7 @@ var setting;
 if ("f1^f2v1]f2v2]s1}s2}s3}s4^f3^f4"_var.locate("s4", setting, 2, 3)) ... ok // setting -> 4 // returns true
 .fi
 .RE
+
 
 
 .SS
@@ -3015,6 +3116,7 @@ var valueno; if ("aaa]bbb]ccc"_var.locateby("AL", "bb", valueno)) ... // valueno
 .RE
 
 
+
 .SS
 if (strvar.locateby(ordercode, target, out setting, fieldno, valueno = 0)) ...
 .nf
@@ -3031,6 +3133,7 @@ if ("f1^f2^aaa]bbb]ccc^f4"_var.locateby("AL", "bb", setting, 3)) ... // setting 
 .RE
 
 
+
 .SS
 if (strvar.locateusing(usingchar, target)) ...
 .nf
@@ -3044,6 +3147,7 @@ locate() a target substr in the whole unordered string using a given delimiter c
 if ("AB,EF,CD"_var.locateusing(",", "EF")) ... ok
 .fi
 .RE
+
 
 
 .SS
@@ -3066,6 +3170,7 @@ var setting;
 if ("f1^f2^f3c1,f3c2,f3c3^f4"_var.locateusing(",", "f3c2", setting, 3)) ... ok // setting -> 2 // returns true
 .fi
 .RE
+
 
 
 .SS
@@ -3112,6 +3217,7 @@ if (not connect("exodus")) ...
 .RE
 
 
+
 .SS
 if (conn.attach(filenames)) ...
 .nf
@@ -3142,6 +3248,7 @@ if (attach(filenames)) ... ok
 .RE
 
 
+
 .SS
 conn.detach(filenames)
 .nf
@@ -3152,6 +3259,8 @@ Removes files from the internal cache created by previous open() and attach() ca
 \fBvar:\fR Defaults to the default connection.
 
 \fBfilenames:\fR FM separated list.
+
+
 
 .SS
 if (conn.begintrans()) ...
@@ -3168,6 +3277,7 @@ if (not conn.begintrans()) ...
 if (not begintrans()) ...
 .fi
 .RE
+
 
 
 .SS
@@ -3187,6 +3297,7 @@ if (statustrans()) ... ok
 .RE
 
 
+
 .SS
 if (conn.rollbacktrans()) ...
 .nf
@@ -3202,6 +3313,7 @@ if (conn.rollbacktrans()) ... ok
 if (rollbacktrans()) ... ok
 .fi
 .RE
+
 
 
 .SS
@@ -3223,6 +3335,7 @@ if (committrans()) ... ok
 .RE
 
 
+
 .SS
 if (conn.sqlexec(sqlcmd)) ...
 .nf
@@ -3240,6 +3353,7 @@ if (conn.sqlexec("select 1")) ... ok
 if (sqlexec("select 1")) ... ok
 .fi
 .RE
+
 
 
 .SS
@@ -3267,6 +3381,7 @@ if (sqlexec(sqlcmd, response)) ... ok
 .RE
 
 
+
 .SS
 conn.disconnect()
 .nf
@@ -3282,6 +3397,7 @@ conn.disconnect();
 disconnect();
 .fi
 .RE
+
 
 
 .SS
@@ -3303,8 +3419,9 @@ disconnectall();
 .RE
 
 
+
 .SS
-var v1 = conn.lasterror();
+var v1 = var::lasterror();
 .nf
  
 .fi
@@ -3313,15 +3430,16 @@ var v1 = conn.lasterror();
 \fBExample:\fR
 .RS
 .nf
-var v1 = var().lasterror();
+var v1 = var::lasterror();
 // or
 var v2 = lasterror();
 .fi
 .RE
 
 
+
 .SS
-var v1 = conn.loglasterror(source = "");
+var::loglasterror(source = "")
 .nf
  
 .fi
@@ -3334,11 +3452,12 @@ Prefixes the output with source if provided.
 \fBExample:\fR
 .RS
 .nf
-var().loglasterror("main:");
+var::loglasterror("main:");
 // or
 loglasterror("main:");
 .fi
 .RE
+
 
 
 .SH 15. DATABASE MANAGEMENT
@@ -3367,6 +3486,7 @@ if (dbcreate("xo_gendoc_testdb")) ...
 .RE
 
 
+
 .SS
 if (conn.dbcopy(from_dbname, to_dbname)) ...
 .nf
@@ -3390,6 +3510,7 @@ if (dbcopy("xo_gendoc_testdb", "xo_gendoc_testdb2")) ...
 .RE
 
 
+
 .SS
 var v1 = conn.dblist();
 .nf
@@ -3405,6 +3526,7 @@ let v1 = conn.dblist();
 let v2 = dblist();
 .fi
 .RE
+
 
 
 .SS
@@ -3427,6 +3549,7 @@ if (dbdelete("xo_gendoc_testdb2")) ...
 .RE
 
 
+
 .SS
 if (conn.createfile(filename)) ...
 .nf
@@ -3447,6 +3570,7 @@ if (createfile(filename)) ...
 .RE
 
 
+
 .SS
 if (conn.renamefile(filename, newfilename)) ...
 .nf
@@ -3463,6 +3587,7 @@ if (conn.renamefile(filename, new_filename)) ... ok
 if (renamefile(filename, new_filename)) ...
 .fi
 .RE
+
 
 
 .SS
@@ -3483,6 +3608,7 @@ if (not listfiles()) ...
 .RE
 
 
+
 .SS
 if (conn.clearfile(filename)) ...
 .nf
@@ -3501,6 +3627,7 @@ if (not clearfile(filename)) ...
 .RE
 
 
+
 .SS
 if (conn.deletefile(filename)) ...
 .nf
@@ -3517,6 +3644,7 @@ if (conn.deletefile(filename)) ... ok
 if (deletefile(filename)) ...
 .fi
 .RE
+
 
 
 .SS
@@ -3541,6 +3669,7 @@ var nrecs2 = reccount(filename);
 .RE
 
 
+
 .SS
 if (conn_or_file.flushindex(filename = "")) ...
 .nf
@@ -3560,7 +3689,11 @@ if (file.open(dbfilename, connection = "")) ...
 .nf
  
 .fi
-Opens a db file to a var which can be used in subsequent functions to work on the specified file and database connection.
+Opens a db file to a var which can be used in subsequent db function calls to access a specific file using a specific connection.
+
+\fBconnection:\fR If not specified and the filename is present in an internal cache of filenames and connections created by previous calls to open() or attach() then open() returns true. If it is not present in the cache then the default connection will be checked.
+
+\fBReturns:\fR True if the filename was present in the cache OR if the db connection reports that the file is present.
 
 \fBExample:\fR
 .RS
@@ -3571,6 +3704,7 @@ if (not file.open(filename)) ...
 if (not open(filename to file)) ...
 .fi
 .RE
+
 
 
 .SS
@@ -3591,6 +3725,7 @@ file.close();
 close(file);
 .fi
 .RE
+
 
 
 .SS
@@ -3626,6 +3761,7 @@ if (createindex(filename, fieldname)) ...
 .RE
 
 
+
 .SS
 var v1 = file|conn.listindex(file_or_filename = "", fieldname = "");
 .nf
@@ -3644,6 +3780,7 @@ if (conn.listindex()) ... ok // includes "xo_clients__date_created"
 if (listindex()) ... ok
 .fi
 .RE
+
 
 
 .SS
@@ -3668,6 +3805,7 @@ if (file.deleteindex(fieldname)) ... ok
 if (deleteindex(file, fieldname)) ...
 .fi
 .RE
+
 
 
 .SS
@@ -3710,6 +3848,7 @@ if (lock(file, key)) ...
 .RE
 
 
+
 .SS
 if (file.unlock(key)) ...
 .nf
@@ -3734,6 +3873,7 @@ if (unlock(file, key)) ...
 .RE
 
 
+
 .SS
 if (file.unlockall()) ...
 .nf
@@ -3754,6 +3894,7 @@ if (not unlockall(conn)) ...
 .RE
 
 
+
 .SS
 record.write(file, key)
 .nf
@@ -3763,7 +3904,9 @@ Writes a record into a db file given a unique primary key.
 
 Either inserts a new record or updates an existing record.
 
-It always succeeds so no result code is returned.
+\fBReturns:\fR Nothing since writes always succeed.
+
+\fBThrows:\fR VarDBException if the file does not exist. Like most db functions.
 
 Any memory cached record is deleted.
 
@@ -3778,6 +3921,7 @@ record.write(file, key);
 write(record on file, key);
 .fi
 .RE
+
 
 
 .SS
@@ -3809,6 +3953,7 @@ if (not read(record from file, key)) ...
 .RE
 
 
+
 .SS
 if (file.deleterecord(key)) ...
 .nf
@@ -3831,6 +3976,7 @@ if (file.deleterecord(key)) ... ok
 //if (deleterecord(file, key)) ...
 .fi
 .RE
+
 
 
 .SS
@@ -3856,6 +4002,7 @@ if (insertrecord(record on file, key)) ...
 .RE
 
 
+
 .SS
 if (record.updaterecord(file, key)) ...
 .nf
@@ -3877,6 +4024,7 @@ if (not record.updaterecord(file, key)) ...
 if (not updaterecord(record on file, key)) ...
 .fi
 .RE
+
 
 
 .SS
@@ -3901,6 +4049,7 @@ if (not updatekey(file, newkey, key)) ... // Reverse the above change.
 .RE
 
 
+
 .SS
 if (strvar.readf(file, key, fieldno)) ...
 .nf
@@ -3919,6 +4068,7 @@ if (not readf(field from file, key, fieldno)) ...
 .RE
 
 
+
 .SS
 strvar.writef(file, key, fieldno)
 .nf
@@ -3935,6 +4085,7 @@ field.writef(file, key, fieldno);
 writef(field on file, key, fieldno);
 .fi
 .RE
+
 
 
 .SS
@@ -3962,6 +4113,7 @@ record.writec(file, key);
 writec(record on file, key);
 .fi
 .RE
+
 
 
 .SS
@@ -3994,6 +4146,7 @@ if (read(record from file, key)) abort("Error: " ^ key ^ " should not be in the 
 .RE
 
 
+
 .SS
 if (dbfile.deletec(key)) ...
 .nf
@@ -4016,6 +4169,7 @@ if (deletec(file, key)) ...
 .RE
 
 
+
 .SS
 conn.clearcache()
 .nf
@@ -4033,6 +4187,7 @@ conn.clearcache();
 clearcache(conn);
 .fi
 .RE
+
 
 
 .SS
@@ -4073,6 +4228,7 @@ let client_name = key.xlate("xo_clients", 1, "X"); // "Client AAA"
 let name_and_type = xlate("xo_clients", key, "NAME_AND_TYPE", "X"); // "Client AAA (A)"
 .fi
 .RE
+
 
 
 .SH 17. DATABASE SORT/SELECT
@@ -4122,6 +4278,7 @@ if (select("xo_clients with type 'B' and with balance ge 100 by type by name"))
 .RE
 
 
+
 .SS
 if (dbfile.selectkeys(keys)) ...
 .nf
@@ -4147,6 +4304,7 @@ if (selectkeys(keys)) ... ok
 assert(readnext(ID) and ID == "A01");
 .fi
 .RE
+
 
 
 .SS
@@ -4177,6 +4335,7 @@ if (select("xo_clients")) {
 .RE
 
 
+
 .SS
 if (dbfile.readnext(out key)) ...
 .nf
@@ -4196,6 +4355,8 @@ Once all the keys in an active select list have been consumed by calls to readne
 
 See select() for example code.
 
+
+
 .SS
 if (dbfile.readnext(out key, out valueno)) ...
 .nf
@@ -4204,6 +4365,8 @@ if (dbfile.readnext(out key, out valueno)) ...
 Similar to readnext(key) but multivalued.
 
 If the active list was ordered by multivalued database fields then pairs of key and multivalue number will be available to the readnext function.
+
+
 
 .SS
 if (dbfile.readnext(out record, out key, out valueno)) ...
@@ -4234,6 +4397,7 @@ if (select("xo_clients with type 'B' and with balance ge 100 by type by name (R)
 .RE
 
 
+
 .SS
 dbfile.clearselect()
 .nf
@@ -4258,6 +4422,7 @@ clearselect();
 if (not hasnext()) ... ok
 .fi
 .RE
+
 
 
 .SS
@@ -4301,6 +4466,7 @@ if (select("xo_clients with type 'B' by name")) {
 .RE
 
 
+
 .SS
 if (dbfile.getlist(listname)) ...
 .nf
@@ -4335,6 +4501,7 @@ if (getlist("mylist")) {
 .RE
 
 
+
 .SS
 if (dbfile.deletelist(listname)) ...
 .nf
@@ -4359,6 +4526,7 @@ if (deletelist("mylist")) ...
 .RE
 
 
+
 .SH 18. OS TIME/DATE
 .SH
 
@@ -4379,6 +4547,7 @@ let today1 = var::date();
 let today2 = date();
 .fi
 .RE
+
 
 
 .SS
@@ -4402,6 +4571,7 @@ let now2 = time();
 .RE
 
 
+
 .SS
 var v1 = var::ostime();
 .nf
@@ -4421,6 +4591,7 @@ let now1 = var::ostime();
 let now2 = ostime();
 .fi
 .RE
+
 
 
 .SS
@@ -4444,8 +4615,9 @@ let now2 = ostimestamp();
 .RE
 
 
+
 .SS
-var v1 = var().ostimestamp(ostime);
+var v1 = vardate.ostimestamp(ostime);
 .nf
  
 .fi
@@ -4460,6 +4632,7 @@ let ts1 = idate.ostimestamp(itime); // 20821.99998842593
 let ts2 = ostimestamp(idate, itime);
 .fi
 .RE
+
 
 
 .SS
@@ -4479,6 +4652,7 @@ var::ossleep(100); // sleep for 100ms
 ossleep(100);
 .fi
 .RE
+
 
 
 .SS
@@ -4543,6 +4717,8 @@ Possible event type codes are as follows:
 
 .fi
 
+
+
 .SH 19. OS FILE I/O
 .SH
 
@@ -4551,11 +4727,13 @@ if (osfilevar.osopen(osfilename, utf8 = true)) ...
 .nf
  
 .fi
-Initialises an os file handle var that can be used in subsequent random access osbread and osbwrite functions.
+Initialises an os file handle var that can be used for random read and write
 
 \fBosfilename:\fR The name of an existing os file name including path.
 
 \fButf8:\fR Defaults to true which causes trimming of partial utf-8 Unicode byte sequences from the end of osbreads. For raw untrimmed osbreads pass tf8 = false;
+
+\fBosfilevar:\fR [out] To be used in subsequent calls to osbread() and osbwrite()
 
 \fBReturns:\fR True if successful or false if not possible for any reason. e.g. Target doesnt exist, permissions etc.
 
@@ -4572,6 +4750,7 @@ if (ostempfile.osopen(osfilename)) ... ok
 if (osopen(osfilename to ostempfile)) ... ok
 .fi
 .RE
+
 
 
 .SS
@@ -4594,6 +4773,7 @@ if (text.osbwrite(osfilename, offset)) ... ok // offset -> 16
 if (not osbwrite(text on osfilename, offset)) ...
 .fi
 .RE
+
 
 
 .SS
@@ -4621,6 +4801,7 @@ if (osbread(text from osfilename, offset, 8)) ... ok // text -> "bbb=456\\n" // 
 .RE
 
 
+
 .SS
 osfilevar.osclose()
 .nf
@@ -4640,6 +4821,7 @@ osclose(osfilevar);
 .RE
 
 
+
 .SS
 if (strvar.oswrite(osfilename, codepage = "")) ...
 .nf
@@ -4647,13 +4829,13 @@ if (strvar.oswrite(osfilename, codepage = "")) ...
 .fi
 Create a complete os file from a var.
 
-Any existing os file is removed first.
+\fBstrvar:\fR The text or data to be used to create the file.
 
-\fBReturns:\fR True if successful or false if not possible for any reason.
+\fBosfilename:\fR Absolute or relative path and filename to be written. Any existing os file is removed first.
 
-e.g. Path is not writeable, permissions etc.
+\fBcodepage:\fR If specified then output is converted from utf-8 to that codepage before being written. Otherwise no conversion is done.
 
-If codepage is specified then output is converted from utf-8 to that codepage. Otherwise no conversion is done.
+\fBReturns:\fR True if successful or false if not possible for any reason. e.g. Path is not writeable, permissions etc.
 
 \fBExample:\fR
 .RS
@@ -4667,6 +4849,7 @@ if (oswrite(text on osfilename)) ... ok
 .RE
 
 
+
 .SS
 if (strvar.osread(osfilename, codepage = "")) ...
 .nf
@@ -4674,11 +4857,13 @@ if (strvar.osread(osfilename, codepage = "")) ...
 .fi
 Read a complete os file into a var.
 
-If codepage is specified then input is converted from that codepage to utf-8 otherwise no conversion is done.
+\fBosfilename:\fR Absolute or relative path and filename to be read.
+
+\fBcodepage:\fR If specified then input is converted from that codepage to utf-8 after being read. Otherwise no conversion is done.
+
+\fBstrvar:\fR [out] is currently set to "" in case of any failure but this is may be changed in a future release to either force var to be unassigned or to leave it untouched. To guarantee future behaviour either add a line 'xxxx.defaulter("")' or set var manually in case osread() returns false. Or use the one argument free function version of osread() which always returns "" in case of failure to read.
 
 \fBReturns:\fR True if successful or false if not possible for any reason. e.g. File doesnt exist, insufficient permissions etc.
-
-\fBvar:\fR [out] is currently set to "" in case of any failure but this is may be changed in a future release to either force var to be unassigned or to leave it untouched. To guarantee future behaviour either add a line 'xxxx.defaulter("")' or set var manually in case osread() returns false. Or use the one argument free function version of osread() which always returns "" in case of failure to read.
 
 \fBExample:\fR
 .RS
@@ -4693,6 +4878,7 @@ let text2 = osread(osfilename);
 .RE
 
 
+
 .SS
 if (osfile_or_dirname.osrename(new_dirpath_or_filepath)) ...
 .nf
@@ -4700,13 +4886,13 @@ if (osfile_or_dirname.osrename(new_dirpath_or_filepath)) ...
 .fi
 Renames an os file or dir in the OS file system.
 
-Will not overwrite an existing os file or dir.
+The source and target must exist in the same storage device.
 
-Source and target must exist in the same storage device.
+\fBosfile_or_dirname:\fR Absolute or relative path and file or dir name to be renamed.
 
-\fBReturns:\fR True if successful or false if not possible for any reason.
+\fBnew_dirpath_or_filepath:\fR Will not overwrite an existing os file or dir.
 
-e.g. Target already exists, path is not writeable, permissions etc.
+\fBReturns:\fR True if successful or false if not possible for any reason. e.g. Target already exists, path is not writeable, permissions etc.
 
 Uses std::filesystem::rename internally.
 
@@ -4724,6 +4910,7 @@ if (osrename(from_osfilename, to_osfilename)) ...
 .RE
 
 
+
 .SS
 if (osfile_or_dirname.osmove(to_osfilename)) ...
 .nf
@@ -4731,13 +4918,13 @@ if (osfile_or_dirname.osmove(to_osfilename)) ...
 .fi
 "Moves" an os file or dir within the os file system.
 
-Will not overwrite an existing os file or dir.
+Attempts osrename first, then oscopy followed by osremove original.
 
-\fBReturns:\fR True if successful or false if not possible for any reason.
+\fBosfile_or_dirname:\fR Absolute or relative path and file or dir name to be moved.
 
-e.g. Source doesnt exist or cannot be accessed, target already exists, source or target is not writeable, permissions etc.
+\fBto_osfilename:\fR Will not overwrite an existing os file or dir.
 
-Attempts osrename first then oscopy followed by osremove original.
+\fBReturns:\fR True if successful or false if not possible for any reason. e.g. Source doesnt exist or cannot be accessed, target already exists, source or target is not writeable, permissions, storage space etc.
 
 \fBExample:\fR
 .RS
@@ -4753,6 +4940,7 @@ if (osmove(from_osfilename, to_osfilename)) ...
 .RE
 
 
+
 .SS
 if (osfile_or_dirname.oscopy(to_osfilename)) ...
 .nf
@@ -4760,7 +4948,11 @@ if (osfile_or_dirname.oscopy(to_osfilename)) ...
 .fi
 Copies an os file or directory recursively within the os file system.
 
-Will overwrite an existing os file or dir.
+\fBosfile_or_dirname:\fR Absolute or relative path and file or dir name to be copied.
+
+\fBto_osfilename:\fR Will overwrite an existing os file or merge into an existing dir.
+
+\fBReturns:\fR True if successful or false if not possible for any reason. e.g. Source doesnt exist or cannot be accessed, target is not writeable, permissions, storage space, etc.
 
 Uses std::filesystem::copy internally with recursive and overwrite options
 
@@ -4777,18 +4969,19 @@ if (oscopy(from_osfilename, to_osfilename)) ... ok
 .RE
 
 
+
 .SS
 if (osfilename.osremove()) ...
 .nf
  
 .fi
-Removes/deletes an os file from the OS file system given path and name.
+Removes/deletes an os file from the OS file system.
 
 Will not remove directories. Use osrmdir() to remove directories
 
-\fBReturns:\fR True if successful or false if not possible for any reason.
+\fBosfilename:\fR Absolute or relative path and file name to be removed.
 
-e.g. Target doesnt exist, path is not writeable, permissions etc.
+\fBReturns:\fR True if successful or false if not possible for any reason. e.g. Target doesnt exist, path is not writeable, permissions etc.
 
 \fBExample:\fR
 .RS
@@ -4801,6 +4994,7 @@ if (osremove(osfilename)) ...
 .RE
 
 
+
 .SH 20. OS DIRECTORIES
 .SH
 
@@ -4809,9 +5003,15 @@ var v1 = dirpath.oslist(globpattern = "", mode = 0);
 .nf
  
 .fi
-\fBReturns:\fR A FM delimited string containing all matching dir entries given a dir path
+Get a list of os files and/or dirs.
 
-A glob pattern (e.g. *.conf) can be appended to the path or passed as argument.
+\fBdirpath:\fR Absolute or relative dir path.
+
+\fBglobpattern:\fR e.g. *.conf to be appended to the dirpath or a complete path plus glob pattern e.g. /etc/ *.conf.
+
+\fBmode:\fR 0: default - Any regular files or dirs. 1 - Only regular os files. 2 - Only dirs.
+
+\fBReturns:\fR An FM delimited string containing all matching dir entries given a dir path
 
 \fBExample:\fR
 .RS
@@ -4842,15 +5042,11 @@ var v1 = osfile_or_dirpath.osinfo(mode = 0);
 .nf
  
 .fi
-\fBReturns:\fR Dir info for any dir entry or "" if it doesnt exist
+Get dir info about an os file or dir.
 
-A short string containing size ^ FM ^ modified_time ^ FM ^ modified_time
+\fBReturns:\fR A short string containing size ^ FM ^ modified_time ^ FM ^ modified_time or "" if not a regular file or dir.
 
-mode 0 default
-
-mode 1 returns "" if not an os file
-
-mode 2 returns "" if not an os dir
+\fBmode:\fR 0: default. 1: Must be a regular os file. 2: Must be an os dir.
 
 See also osfile() and osdir()
 
@@ -4864,14 +5060,17 @@ var info2 = osinfo("/etc/hosts");
 .RE
 
 
+
 .SS
 var v1 = osfilename.osfile();
 .nf
  
 .fi
-\fBReturns:\fR Dir info for a os file
+Get dir info of an os file.
 
-A short string containing size ^ FM ^ modified_time ^ FM ^ modified_time
+\fBosfilename:\fR Absolute or relative path and file name.
+
+\fBReturns:\fR A short string containing size ^ FM ^ modified_time ^ FM ^ modified_time or "" if not a regular file.
 
 Alias for osinfo(1)
 
@@ -4885,14 +5084,17 @@ var fileinfo2 = osfile("/etc/hosts");
 .RE
 
 
+
 .SS
 var v1 = dirpath.osdir();
 .nf
  
 .fi
-\fBReturns:\fR Dir info for a dir.
+Get dir info of an os dir.
 
-A short string containing FM ^ modified_time ^ FM ^ modified_time
+\fBdirpath:\fR Absolute or relative path and dir name.
+
+\fBReturns:\fR A short string containing FM ^ modified_time ^ FM ^ modified_time or "" if not a dir.
 
 Alias for osinfo(2)
 
@@ -4906,14 +5108,19 @@ var dirinfo2 = osfile("/etc/");
 .RE
 
 
+
 .SS
 if (dirpath.osmkdir()) ...
 .nf
  
 .fi
-Makes a new directory and returns true if successful.
+Create a new os file system directory.
 
-Including parent dirs if necessary.
+Parent dirs wil be created if necessary.
+
+\fBdirpath:\fR Absolute or relative path and dir name.
+
+\fBReturns:\fR True if successful.
 
 \fBExample:\fR
 .RS
@@ -4927,12 +5134,17 @@ if (osmkdir(osdirname)) ...
 .RE
 
 
+
 .SS
-if (dirpath.oscwd(newpath)) ...
+if (var::oscwd(newpath)) ...
 .nf
  
 .fi
-Changes the current working dir and returns true if successful.
+Changes the current working dir.
+
+\fBnewpath:\fR An absolute or relative dir path and name.
+
+\fBReturns:\fR True if successful or false if not. e.g. Invalid dirpath, insufficient permission etc.
 
 \fBExample:\fR
 .RS
@@ -4946,12 +5158,15 @@ if (oscwd("../..")) ... ok /// Change back to avoid errors in following code.
 .RE
 
 
+
 .SS
-var v1 = dirpath.oscwd();
+var v1 = var::oscwd();
 .nf
  
 .fi
-\fBReturns:\fR The current working directory
+Gets the current dir path and name.
+
+\fBReturns:\fR The current working dir path and name.
 
 e.g. "/root/exodus/cli/src/xo_test/aaa"
 
@@ -4965,14 +5180,17 @@ var cwd2 = oscwd();
 .RE
 
 
+
 .SS
 if (dirpath.osrmdir(evenifnotempty = false)) ...
 .nf
  
 .fi
-Removes a os dir and returns true if successful.
+Removes (deletes) an os dir,
 
-Optionally even if not empty. Including subdirs.
+\fBeventifnotempty:\fR If true any subdirs will also be removed/deleted recursively, otherwise the function will fail and return false.
+
+\fBReturns:\fR Returns true if successful or false if not. e.g dir doesnt exist, insufficient permission, not empty etc.
 
 \fBExample:\fR
 .RS
@@ -4985,6 +5203,7 @@ if (osrmdir(osdirname)) ...
 .RE
 
 
+
 .SH 21. OS SHELL/ENVIRONMENT
 .SH
 
@@ -4994,6 +5213,8 @@ if (command.osshell()) ...
  
 .fi
 Execute a shell command.
+
+\fBcommand:\fR An executable command to be interpreted by the default os shell.
 
 \fBReturns:\fR True if the process terminates with error status 0 and false otherwise.
 
@@ -5008,6 +5229,7 @@ if (cmd.osshell()) ... ok
 if (osshell(cmd)) ... ok
 .fi
 .RE
+
 
 
 .SS
@@ -5034,6 +5256,7 @@ text = osshellread(cmd);
 .RE
 
 
+
 .SS
 if (outstr.osshellwrite(oscmd)) ...
 .nf
@@ -5056,14 +5279,15 @@ if (osshellwrite(outtext, "grep xyz")) ... ok
 .RE
 
 
+
 .SS
 var v1 = var::ostempdir();
 .nf
  
 .fi
-\fBReturns:\fR The path of the tmp dir
+Get the tmp dir path and name.
 
-e.g. "/tmp/"
+\fBReturns:\fR A string e.g. "/tmp/"
 
 \fBExample:\fR
 .RS
@@ -5075,14 +5299,15 @@ let v2 = ostempdir();
 .RE
 
 
+
 .SS
 var v1 = var::ostempfile();
 .nf
  
 .fi
-\fBReturns:\fR The name of a new temporary file
+Create a temporary file
 
-e.g. Something like "/tmp/~exoEcLj3C"
+\fBReturns:\fR The name of new temporary file e.g. "/tmp/~exoEcLj3C"
 
 \fBExample:\fR
 .RS
@@ -5094,12 +5319,17 @@ var temposfilename2 = ostempfile();
 .RE
 
 
+
 .SS
 envvalue.ossetenv(envcode)
 .nf
  
 .fi
-Set the value of an environment variable code
+Set the value of an environment variable
+
+\fBenvcode:\fR The code of the env variable to set.
+
+\fBenvvalue:\fR The new value to set the env code to.
 
 \fBExample:\fR
 .RS
@@ -5112,6 +5342,7 @@ ossetenv(envcode, envvalue);
 .RE
 
 
+
 .SS
 if (envvalue.osgetenv(envcode)) ...
 .nf
@@ -5119,17 +5350,13 @@ if (envvalue.osgetenv(envcode)) ...
 .fi
 Get the value of an environment variable.
 
-\fBenvcode:\fR The code of the desired environment variable or "" for all.
+\fBenvcode:\fR The code of the env variable to get or "" for all.
 
-\fBReturns:\fR True if set or false if not.
+\fBenvvalue:\fR [out] Set to the value of the env variable if set otherwise "". If envcode is "" then envvalue is set to a dynamic array of all environment variables LIKE CODE1=VALUE1^CODE2=VALUE2...
 
-\fBvar:\fR If envcode exists: var is set to the value of the environment variable
+\fBReturns:\fR True if the envcode is set or false if not.
 
-\fBvar:\fR If envcode doesnt exist: var is set to ""
-
-\fBvar:\fR If envcode is "": var is set to an dynamic array of all environment variables LIKE CODE1=VALUE1^CODE2=VALUE2...
-
-osgetenv and ossetenv work with a per thread copy of the process environment. This avoids multithreading issues but not actually changing the process environment.
+osgetenv and ossetenv work with a per thread copy of the os process environment. This avoids multithreading issues but does not change the process environment. Child processes created by var::osshell() will not inherit any env variables set using ossetenv() so the oscommand will need to be prefixed to achieve the desired result.
 
 For the actual system environment, see "man environ". extern char **environ; // environ is a pointer to an array of pointers to char* env pairs like xxx=yyy and the last pointer in the array is nullptr.
 
@@ -5139,9 +5366,10 @@ For the actual system environment, see "man environ". extern char **environ; // 
 var envvalue1;
 if (envvalue1.osgetenv("HOME")) ... ok // e.g. "/home/exodus"
 // or
-var envvalue2 = osgetenv("EXO_ABC"); // "XYZ"
+let envvalue2 = osgetenv("EXO_ABC"); // "XYZ"
 .fi
 .RE
+
 
 
 .SS
@@ -5149,7 +5377,9 @@ var v1 = var::ospid();
 .nf
  
 .fi
-Get the os process id
+Get the current os process id
+
+\fBReturns:\fR A number e.g. 663237.
 
 \fBExample:\fR
 .RS
@@ -5161,12 +5391,15 @@ let pid2 = ospid();
 .RE
 
 
+
 .SS
 var v1 = var::ostid();
 .nf
  
 .fi
-Get the os thread process id
+Get the current os thread process id
+
+\fBReturns:\fR A number e.g. 663237.
 
 \fBExample:\fR
 .RS
@@ -5178,26 +5411,25 @@ let tid2 = ostid();
 .RE
 
 
+
 .SS
 var v1 = var::version();
 .nf
  
 .fi
-Get the local and remote git branch commit details
+Get the exodus library version info.
 
-
-
-\fBLocal:\fR  doc 2025-03-19 18:15:31 +0000 219cdad8a
-
-\fBRemote:\fR doc 2025-03-17 15:03:00 +0000 958f412f0
-
-https://github.com/exodusdb/exodusdb/commit/219cdad8a
-
-https://github.com/exodusdb/exodusdb/archive/958f412f0.tar.gz
+\fBReturns:\fR The git commit details as at the time the library was built.
 
 \fBExample:\fR
 .RS
 .nf
+// e.g.
+// Local:  doc 2025-03-19 18:15:31 +0000 219cdad8a
+// Remote: doc 2025-03-17 15:03:00 +0000 958f412f0
+// https://github.com/exodusdb/exodusdb/commit/219cdad8a
+// https://github.com/exodusdb/exodusdb/archive/958f412f0.tar.gz
+//
 let v1 = var::version();
 // or
 let v2 = version();
@@ -5207,22 +5439,25 @@ let v2 = version();
 
 
 .SS
-if (strvar.setxlocale()) ...
+if (strvar.setxlocale(newlocalecode)) ...
 .nf
  
 .fi
-Sets the current thread's default locale codepage code
+Sets the current thread's default locale.
+
+\fBstrvar:\fR The new locale codepage code.
 
 True if successful
 
 \fBExample:\fR
 .RS
 .nf
-if ("en_US.utf8"_var.setxlocale()) ... ok
+if (var::setxlocale("en_US.utf8")) ... ok
 // or
 if (setxlocale("en_US.utf8")) ... ok
 .fi
 .RE
+
 
 
 .SS
@@ -5230,16 +5465,19 @@ var v1 = var.getxlocale();
 .nf
  
 .fi
-\fBReturns:\fR The current thread's default locale codepage code
+Gets the current thread's default locale.
+
+\fBReturns:\fR A locale codepage code string.
 
 \fBExample:\fR
 .RS
 .nf
-let v1 = var().getxlocale(); // "en_US.utf8"
+let v1 = var::getxlocale(); // "en_US.utf8"
 // or
 let v2 = getxlocale();
 .fi
 .RE
+
 
 
 .SH 22. OUTPUT
@@ -5266,6 +5504,7 @@ The raw string bytes are output. No character or byte conversion is performed.
 outputl("xyz = ", "abc"); /// Any number of arguments is allowed. All will be output.
 .fi
 .RE
+
 
 
 .SS
@@ -5305,6 +5544,7 @@ logputl("xyz = ", "abc");; /// Any number of arguments is allowed. All will be o
 .RE
 
 
+
 .SS
 varstr.logput(prefix = "")
 .nf
@@ -5335,6 +5575,7 @@ errputl("xyz = ", "abc"); /// Any number of arguments is allowed. All will be ou
 .RE
 
 
+
 .SS
 varstr.errput(prefix = "")
 .nf
@@ -5353,6 +5594,8 @@ Is BUFFERED not flushed.
 
 The raw string bytes are output. No character or byte conversion is performed.
 
+
+
 .SS
 var().osflush()
 .nf
@@ -5368,6 +5611,7 @@ var().osflush();
 osflush();
 .fi
 .RE
+
 
 
 .SH 23. INPUT
@@ -5401,6 +5645,32 @@ Multibyte/UTF8 friendly.
 .RE
 
 
+
+.SS
+var.inputn(nchars)
+.nf
+ 
+.fi
+Get raw bytes from standard input.
+
+Any new line chars are treated like any other bytes.
+
+Care must be taken to handle incomplete UTF8 byte sequences at the end of one block and the beginning of the next block.
+
+\fBReturns:\fR The requested number of bytes or fewer if not available.
+
+\fBnchars:\fR
+
+99 : Get up to 99 bytes or fewer if not available. Caution required with UTF8.
+
+ 0 : Get all bytes presently available.
+
+ 1 : Same as keypressed(true). Deprecated.
+
+-1 : Same as keypressed(). Deprecated.
+
+
+
 .SS
 var.keypressed(wait = false)
 .nf
@@ -5428,6 +5698,7 @@ var v2 = keypressed();
 .RE
 
 
+
 .SS
 if (var().isterminal(arg = 1)) ...
 .nf
@@ -5453,6 +5724,7 @@ var v2 = isterminal();
 .RE
 
 
+
 .SS
 if (var().hasinput(milliseconds = 0)) ...
 .nf
@@ -5466,12 +5738,16 @@ If no bytes are immediately available, the process sleeps for up to the given nu
 
 It only takes a few µsecs to return false if no bytes are available and no wait time has been requested.
 
+
+
 .SS
 if (var().eof()) ...
 .nf
  
 .fi
 True if stdin is at end of file
+
+
 
 .SS
 if (var().echo(on_off = true)) ...
@@ -5485,6 +5761,8 @@ Sets terminal echo on or off.
 Turning terminal echo off can be used to prevent display of confidential information.
 
 \fBReturns:\fR True if successful.
+
+
 
 .SS
 var().breakon()
@@ -5501,6 +5779,8 @@ SIGHUP - Sets a variable "RELOAD_req" which may be handled or ignored by the pro
 
 SIGTERM - Sets a variable "TERMINATE_req" which may be handled or ignored by the program.
 
+
+
 .SS
 var().breakoff()
 .nf
@@ -5509,6 +5789,8 @@ var().breakoff()
 Disable keyboard interrupt.
 
 Ctrl+C becomes inactive in terminal.
+
+
 
 .SH 24. MATH/BOOLEAN
 .SH
@@ -5531,6 +5813,7 @@ let v3 = abs(v1);
 .RE
 
 
+
 .SS
 var v1 = varnum.pwr(exponent);
 .nf
@@ -5546,6 +5829,7 @@ let v1 = var(2).pwr(8); // 256
 let v2 = pwr(2, 8);
 .fi
 .RE
+
 
 
 .SS
@@ -5569,6 +5853,7 @@ initrnd(123);
 .RE
 
 
+
 .SS
 var v1 = varnum.rnd();
 .nf
@@ -5590,6 +5875,7 @@ let v2 = rnd(100);
 .RE
 
 
+
 .SS
 var v1 = varnum.exp();
 .nf
@@ -5605,6 +5891,7 @@ let v1 = var(1).exp(); // 2.718281828459045
 let v2 = exp(1);
 .fi
 .RE
+
 
 
 .SS
@@ -5624,6 +5911,7 @@ let v2 = sqrt(100);
 .RE
 
 
+
 .SS
 var v1 = varnum.sin();
 .nf
@@ -5639,6 +5927,7 @@ let v1 = var(30).sin(); // 0.5
 let v2 = sin(30);
 .fi
 .RE
+
 
 
 .SS
@@ -5658,6 +5947,7 @@ let v2 = cos(60);
 .RE
 
 
+
 .SS
 var v1 = varnum.tan();
 .nf
@@ -5673,6 +5963,7 @@ let v1 = var(45).tan(); // 1
 let v2 = tan(45);
 .fi
 .RE
+
 
 
 .SS
@@ -5692,6 +5983,7 @@ let v2 = atan(1);
 .RE
 
 
+
 .SS
 var v1 = varnum.loge();
 .nf
@@ -5709,6 +6001,7 @@ let v1 = var(2.718281828459045).loge(); // 1
 let v2 = loge(2.718281828459045);
 .fi
 .RE
+
 
 
 .SS
@@ -5734,6 +6027,7 @@ var v4 = integer(-2.9);
 .RE
 
 
+
 .SS
 var v1 = varnum.floor();
 .nf
@@ -5755,6 +6049,7 @@ var v3 = var(-2.9).floor(); // -3
 var v4 = floor(-2.9);
 .fi
 .RE
+
 
 
 .SS
@@ -5787,6 +6082,7 @@ let v4 = mod(11, -5); // -4
 let v5 = mod(-11, -5); // -1
 .fi
 .RE
+
 
 
 .SS
@@ -5861,49 +6157,49 @@ Date output: Convert internal date format to human readable date or calendar inf
 
 \fBFlags:\fR See examples below.
 
-Any multifield/multivalue structure is preserved.
+Any Dynamic array structure is preserved.
 
 \fBExample:\fR
 .RS
 .nf
 let v1 = 19002;
+var v2;
+v2 =  v1.oconv( "D"   ) ; //  "09 JAN 2020"   // Default
 
-assert( v1.oconv( "D"   ) == "09 JAN 2020"  ); // Default
+v2 =  v1.oconv( "D/"  ) ; //  "01/09/2020"    // mm/dd/yyyy - American numeric
+v2 =  v1.oconv( "D-"  ) ; //  "01-09-2020"    // mm-dd-yyyy - American numeric
 
-assert( v1.oconv( "D/"  ) == "01/09/2020"   ); // mm/dd/yyyy - American numeric
-assert( v1.oconv( "D-"  ) == "01-09-2020"   ); // mm-dd-yyyy - American numeric
+v2 =  v1.oconv( "D/E" ) ; //  "09/01/2020"    // dd/mm/yyyy - International numeric
+v2 =  v1.oconv( "D-E" ) ; //  "09-01-2020"    // dd-mm-yyyy - International numeric
 
-assert( v1.oconv( "D/E" ) == "09/01/2020"   ); // dd/mm/yyyy - International numeric
-assert( v1.oconv( "D-E" ) == "09-01-2020"   ); // dd-mm-yyyy - International numeric
+v2 =  v1.oconv( "D2"  ) ; //  "09 JAN 20"     // 2 digit year
+v2 =  v1.oconv( "D0"  ) ; //  "09 JAN"        // No year
 
-assert( v1.oconv( "D2"  ) == "09 JAN 20"    ); // 2 digit year
-assert( v1.oconv( "D0"  ) == "09 JAN"       ); // No year
+v2 =  v1.oconv( "DS"  ) ; //  "2020 JAN 09"   // yyyy mmm dd - ISO year first, alpha month
+v2 =  v1.oconv( "DS-" ) ; //  "2020-01-09"    // yyyy-mm-dd  - ISO year first, numeric month
 
-assert( v1.oconv( "DS"  ) == "2020 JAN 09"  ); // yyyy mmm dd - ISO year first, alpha month
-assert( v1.oconv( "DS-" ) == "2020-01-09"   ); // yyyy-mm-dd  - ISO year first, numeric month
+v2 =  v1.oconv( "DZ"  ) ; //  " 9 JAN 2020"   // Leading 0 become spaces
+v2 =  v1.oconv( "DZZ" ) ; //  "9 JAN 2020"    // Leading 0 are suppressed
+v2 =  v1.oconv( "D!"  ) ; //  "09JAN2020"     // No separators
+v2 =  v1.oconv( "DS-!") ; //  "20200109"      // yyyymmdd packed
 
-assert( v1.oconv( "DZ"  ) == " 9 JAN 2020"  ); // Leading 0 become spaces
-assert( v1.oconv( "DZZ" ) == "9 JAN 2020"   ); // Leading 0 are suppressed
-assert( v1.oconv( "D!"  ) == "09JAN2020"    ); // No separators
-assert( v1.oconv( "DS-!") == "20200109"     ); // yyyymmdd packed
+v2 =  v1.oconv( "DM"  ) ; //  "1"             // Month number
+v2 =  v1.oconv( "DMA" ) ; //  "JANUARY"       // Month name
+v2 =  v1.oconv( "DY"  ) ; //  "2020"          // Year number
+v2 =  v1.oconv( "DY2" ) ; //  "20"            // Year 2 digits
+v2 =  v1.oconv( "DD"  ) ; //  "9"             // Day number in month (1-31)
+v2 =  v1.oconv( "DW"  ) ; //  "4"             // Weekday number (1-7)
+v2 =  v1.oconv( "DWA" ) ; //  "THURSDAY"      // Weekday name
+v2 =  v1.oconv( "DQ"  ) ; //  "1"             // Quarter number
+v2 =  v1.oconv( "DJ"  ) ; //  "9"             // Day number in year
+v2 =  v1.oconv( "DL"  ) ; //  "31"            // Last day number of month (28-31)
 
-assert( v1.oconv( "DM"  ) == "1"            ); // Month number
-assert( v1.oconv( "DMA" ) == "JANUARY"      ); // Month name
-assert( v1.oconv( "DY"  ) == "2020"         ); // Year number
-assert( v1.oconv( "DY2" ) == "20"           ); // Year 2 digits
-assert( v1.oconv( "DD"  ) == "9"            ); // Day number in month (1-31)
-assert( v1.oconv( "DW"  ) == "4"            ); // Weekday number (1-7)
-assert( v1.oconv( "DWA" ) == "THURSDAY"     ); // Weekday name
-assert( v1.oconv( "DQ"  ) == "1"            ); // Quarter number
-assert( v1.oconv( "DJ"  ) == "9"            ); // Day number in year
-assert( v1.oconv( "DL"  ) == "31"           ); // Last day number of month (28-31)
-
-// Multifield/multivalue
-var v2 = "12345^12346]12347"_var;
-assert(v2.oconv("D") == "18 OCT 2001^19 OCT 2001]20 OCT 2001"_var);
+// Dynamic array
+let v3 = "12345^12346]12347"_var;
+v2 = v3.oconv("D") ; //  "18 OCT 2001^19 OCT 2001]20 OCT 2001"_var
 
  // or
- assert( oconv(v2, "D"   ) == "18 OCT 2001"  );
+ v2 =  oconv(v3, "D"   ) ; //  "18 OCT 2001"  
 .fi
 .RE
 
@@ -5919,38 +6215,40 @@ Date input: Convert human readable date to internal date format.
 
 Internal date format is whole days since 1967-12-31 00:00:00 which is day 0.
 
-Any multifield/multivalue structure is preserved.
+Any Dynamic array structure is preserved.
 
 \fBExample:\fR
 .RS
 .nf
 // International order "DE"
-assert(            oconv(19005, "DE") == "12 JAN 2020");
-assert(   "12/1/2020"_var.iconv("DE") == 19005);
-assert(   "12 1 2020"_var.iconv("DE") == 19005);
-assert(   "12-1-2020"_var.iconv("DE") == 19005);
-assert( "12 JAN 2020"_var.iconv("DE") == 19005);
-assert( "jan 12 2020"_var.iconv("DE") == 19005);
+var v2;
+v2 =             oconv(19005, "DE") ; //  "12 JAN 2020"
+v2 =    "12/1/2020"_var.iconv("DE") ; //  19005
+v2 =    "12 1 2020"_var.iconv("DE") ; //  19005
+v2 =    "12-1-2020"_var.iconv("DE") ; //  19005
+v2 =  "12 JAN 2020"_var.iconv("DE") ; //  19005
+v2 =  "jan 12 2020"_var.iconv("DE") ; //  19005
 
 // American order "D"
-assert(            oconv(19329, "D") == "01 DEC 2020");
-assert(   "12/1/2020"_var.iconv("D") == 19329);
-assert(  "DEC 1 2020"_var.iconv("D") == 19329);
-assert(  "1 dec 2020"_var.iconv("D") == 19329);
+v2 =             oconv(19329, "D") ; //  "01 DEC 2020"
+v2 =    "12/1/2020"_var.iconv("D") ; //  19329
+v2 =   "DEC 1 2020"_var.iconv("D") ; //  19329
+v2 =   "1 dec 2020"_var.iconv("D") ; //  19329
 
 // Reverse order
-assert(  "2020/12/1"_var.iconv("DE") == 19329);
-assert(   "2020-12-1"_var.iconv("D") == 19329);
-assert(  "2020 1 dec"_var.iconv("D") == 19329);
+v2 =   "2020/12/1"_var.iconv("DE") ; //  19329
+v2 =    "2020-12-1"_var.iconv("D") ; //  19329
+v2 =   "2020 1 dec"_var.iconv("D") ; //  19329
 
 //Invalid date
-assert(   "2/29/2021"_var.iconv("D") == "");
-assert(  "29/2/2021"_var.iconv("DE") == "");
+v2 =    "2/29/2021"_var.iconv("D") ; //  ""
+v2 =   "29/2/2021"_var.iconv("DE") ; //  ""
 
 // or
-assert(iconv("12/1/2020"_var, "DE") == 19005);
+v2 = iconv("12/1/2020"_var, "DE") ; //  19005
 .fi
 .RE
+
 
 
 .SS
@@ -5974,31 +6272,33 @@ Conversion code (e.g. "MTHS") is "MT" + flags ...
 
 ":" - Any other flag is used as the separator char instead of ":"
 
-Any multifield/multivalue structure is preserved.
+Any Dynamic array structure is preserved.
 
 \fBExample:\fR
 .RS
 .nf
-var v1 = 234800;
-assert( v1.oconv( "MT"   ) == "17:13"      ); // Default
-assert( v1.oconv( "MTH"  ) == "05:13PM"    ); // 'H' flag for AM/PM
-assert( v1.oconv( "MTS"  ) == "17:13:20"   ); // 'S' flag for seconds
-assert( v1.oconv( "MTHS" ) == "05:13:20PM" ); // Both flags
+let v1  = 62000;
+var v2;
+v2 = v1.oconv("MT"  ); // "17:13"      // Default
+v2 = v1.oconv("MTH" ); // "05:13PM"    // 'H' flag for AM/PM
+v2 = v1.oconv("MTS" ); // "17:13:20"   // 'S' flag for seconds
+v2 = v1.oconv("MTHS"); // "05:13:20PM" // Both flags
 
-var v2 = 0;
-assert( v2.oconv( "MT"   ) == "00:00"      );
-assert( v2.oconv( "MTH"  ) == "12:00AM"    );
-assert( v2.oconv( "MTS"  ) == "00:00:00"   );
-assert( v2.oconv( "MTHS" ) == "12:00:00AM" );
+let v3  = 0;
+v2 = v3.oconv("MT"  ); // "00:00"
+v2 = v3.oconv("MTH" ); // "12:00AM"
+v2 = v3.oconv("MTS" ); // "00:00:00"
+v2 = v3.oconv("MTHS"); // "12:00:00AM"
 
-// Multifield/multivalue
-var v3 = "234800^234860]234920"_var;
-assert(v3.oconv("MT") == "17:13^17:14]17:15"_var);
+// Dynamic array
+let v4  = "61980^62040]62100"_var;
+v2 = v4.oconv("MT");    // "17:13^17:14]17:15"_var
 
 // or
-assert( oconv(v1, "MT"   ) == "17:13"      );
+v2 = oconv(v1, "MT");    // "17:13"
 .fi
 .RE
+
 
 
 .SS
@@ -6014,29 +6314,31 @@ Internal time format is whole seconds since midnight.
 
 \fBAccepts:\fR Two or three groups of digits surrounded and separated by any non-digits char(s).
 
-Any multifield/multivalue structure is preserved.
+Any Dynamic array structure is preserved.
 
 \fBExample:\fR
 .RS
 .nf
-assert(      "17:13"_var.iconv( "MT" ) == 61980);
-assert(    "05:13PM"_var.iconv( "MT" ) == 61980);
-assert(   "17:13:20"_var.iconv( "MT" ) == 62000);
-assert( "05:13:20PM"_var.iconv( "MT" ) == 62000);
+var v2;
+v2 =       "17:13"_var.iconv( "MT" ) ; //  61980
+v2 =     "05:13PM"_var.iconv( "MT" ) ; //  61980
+v2 =    "17:13:20"_var.iconv( "MT" ) ; //  62000
+v2 =  "05:13:20PM"_var.iconv( "MT" ) ; //  62000
 
-assert(      "00:00"_var.iconv( "MT" ) == 0);
-assert(    "12:00AM"_var.iconv( "MT" ) == 0);     // Midnight
-assert(    "12:00PM"_var.iconv( "MT" ) == 43200); // Noon
-assert(   "00:00:00"_var.iconv( "MT" ) == 0);
-assert( "12:00:00AM"_var.iconv( "MT" ) == 0);
+v2 =       "00:00"_var.iconv( "MT" ) ; //  0
+v2 =     "12:00AM"_var.iconv( "MT" ) ; //  0     // Midnight
+v2 =     "12:00PM"_var.iconv( "MT" ) ; //  43200 // Noon
+v2 =    "00:00:00"_var.iconv( "MT" ) ; //  0
+v2 =  "12:00:00AM"_var.iconv( "MT" ) ; //  0
 
-// Multifield/multivalue
-assert("17:13^05:13PM]17:13:20"_var.iconv("MT") == "61980^61980]62000"_var);
+// Dynamic array
+v2 = "17:13^05:13PM]17:13:20"_var.iconv("MT") ; //  "61980^61980]62000"_var
 
 // or
-assert(iconv("17:13", "MT") == 61980);
+v2 = iconv("17:13", "MT") ; //  61980
 .fi
 .RE
+
 
 
 .SS
@@ -6084,26 +6386,27 @@ MC outputs like 123,45 (European)
 
 
 
- Any multifield/multivalue structure is preserved.
+ Any Dynamic array structure is preserved.
 
 \fBExample:\fR
 .RS
 .nf
 var v1 = -1234.567;
-assert( v1.oconv( "MD20"   ) ==  "-1234.57"   );
-assert( v1.oconv( "MD20,"  ) == "-1,234.57"   ); // , flag
-assert( v1.oconv( "MC20,"  ) == "-1.234,57"   ); // MC code
-assert( v1.oconv( "MD20,-" ) ==  "1,234.57-"  ); // - flag
-assert( v1.oconv( "MD20,<" ) == "<1,234.57>"  ); // < flag
-assert( v1.oconv( "MD20,C" ) ==  "1,234.57CR" ); // C flag
-assert( v1.oconv( "MD20,D" ) ==  "1,234.57DB" ); // D flag
+var v2;
+v2 =  v1.oconv( "MD20"   ) ; //   "-1234.57"
+v2 =  v1.oconv( "MD20,"  ) ; //  "-1,234.57"    // , flag
+v2 =  v1.oconv( "MC20,"  ) ; //  "-1.234,57"    // MC code
+v2 =  v1.oconv( "MD20,-" ) ; //   "1,234.57-"   // - flag
+v2 =  v1.oconv( "MD20,<" ) ; //  "<1,234.57>"   // < flag
+v2 =  v1.oconv( "MD20,C" ) ; //   "1,234.57CR"  // C flag
+v2 =  v1.oconv( "MD20,D" ) ; //   "1,234.57DB"  // D flag
 
-// Multifield/multivalue
-var v2 = "1.1^2.1]2.2"_var;
-assert( v2.oconv( "MD20"   ) == "1.10^2.10]2.20"_var);
+// Dynamic array
+var v3 = "1.1^2.1]2.2"_var;
+v2 =  v3.oconv( "MD20"   ) ; //  "1.10^2.10]2.20"_var
 
 // or
-assert( oconv(v1, "MD20"   ) ==  "-1234.57"   );
+v2 =  oconv(v1, "MD20"   ) ; //   "-1234.57"   
 .fi
 .RE
 
@@ -6119,36 +6422,38 @@ e.g. "L#10", "R#10", "C#10"
 
 Useful when outputting to terminal devices where spaces are used for alignment.
 
-Multifield/multivalue structure is preserved.
+Dynamic array structure is preserved.
 
 ASCII only.
 
 \fBExample:\fR
 .RS
 .nf
-assert(     "abcde"_var.oconv( "L#3" ) == "abc" ); // Truncating
-assert(     "abcde"_var.oconv( "R#3" ) == "cde" );
-assert(     "abcde"_var.oconv( "C#3" ) == "abc" );
+var v2;
+v2 =      "abcde"_var.oconv( "L#3" ) ; //  "abc"  // Truncating
+v2 =      "abcde"_var.oconv( "R#3" ) ; //  "cde"
+v2 =      "abcde"_var.oconv( "C#3" ) ; //  "abc"
 
-assert(     "ab"_var.oconv( "L#6" ) == "ab    " ); // Padding
-assert(     "ab"_var.oconv( "R#6" ) == "    ab" );
-assert(     "ab"_var.oconv( "C#6" ) == "  ab  " );
+v2 =      "ab"_var.oconv( "L#6" ) ; //  "ab    "  // Padding
+v2 =      "ab"_var.oconv( "R#6" ) ; //  "    ab"
+v2 =      "ab"_var.oconv( "C#6" ) ; //  "  ab  "
 
-assert(      var(42).oconv( "L(0)#5" ) == "42000" ); // Padding char (x)
-assert(      var(42).oconv( "R(0)#5" ) == "00042" );
-assert(      var(42).oconv( "C(0)#5" ) == "04200" );
-assert(      var(42).oconv( "C(0)#5" ) == "04200" );
+v2 =       var(42).oconv( "L(0)#5" ) ; //  "42000"  // Padding char (x)
+v2 =       var(42).oconv( "R(0)#5" ) ; //  "00042"
+v2 =       var(42).oconv( "C(0)#5" ) ; //  "04200"
+v2 =       var(42).oconv( "C(0)#5" ) ; //  "04200"
 
-// Multifield/multivalue
-assert(      "f1^v1]v2"_var.oconv("L(_)#5") == "f1___^v1___]v2___"_var);
+// Dynamic array
+v2 =       "f1^v1]v2"_var.oconv("L(_)#5") ; //  "f1___^v1___]v2___"_var
 
 // Fail for non-ASCII (Should be 5)
-assert(     "🐱"_var.oconv("L#5").textwidth() == 3);
+v2 =      "🐱"_var.oconv("L#5").textwidth() ; //  3
 
 // or
-assert(     oconv("abcd", "L#3" ) == "abc" );
+v2 =      oconv("abcd", "L#3" ) ; //  "abc" 
 .fi
 .RE
+
 
 
 .SS
@@ -6170,11 +6475,12 @@ ASCII only.
 .RS
 .nf
 let v1 = "Have a nice day";
-assert(  v1.oconv("T#10") == "Have a    |nice day  "_var);
+v2 =   v1.oconv("T#10") ; //  "Have a    |nice day  "_var
 // or
-assert( oconv(v1, "T#10") == "Have a    |nice day  "_var );
+v2 =  oconv(v1, "T#10") ; //  "Have a    |nice day  "_var 
 .fi
 .RE
+
 
 
 .SS
@@ -6190,17 +6496,19 @@ e.g. MRU
 .RS
 .nf
 let v1 = "123/abC.";
-assert(v1.oconv("MRL") == "123/abc."); // lcase
-assert(v1.oconv("MRU") == "123/ABC."); // ucase
-assert(v1.oconv("MRT") == "123/Abc."); // tcase
-assert(v1.oconv("MRN") == "123");      // Return only digits
-assert(v1.oconv("MRA") == "abC");      // Return only alphabetic
-assert(v1.oconv("MRB") == "123abC");   // Return only alphanumeric
-assert(v1.oconv("MR/N") == "/abC.");   // Remove digits
-assert(v1.oconv("MR/A") == "123/.");   // Remove alphabetic
-assert(v1.oconv("MR/B") == "/.");      // Remove alphanumeric
+var v2;
+v2 = v1.oconv("MRL") ; //  "123/abc." // lcase
+v2 = v1.oconv("MRU") ; //  "123/ABC." // ucase
+v2 = v1.oconv("MRT") ; //  "123/Abc." // tcase
+v2 = v1.oconv("MRN") ; //  "123"      // Return only digits
+v2 = v1.oconv("MRA") ; //  "abC"      // Return only alphabetic
+v2 = v1.oconv("MRB") ; //  "123abC"   // Return only alphanumeric
+v2 = v1.oconv("MR/N") ; //  "/abC."   // Remove digits
+v2 = v1.oconv("MR/A") ; //  "123/."   // Remove alphabetic
+v2 = v1.oconv("MR/B") ; //  "/."      // Remove alphanumeric
 .fi
 .RE
+
 
 
 .SS
@@ -6208,22 +6516,30 @@ var v1 = varstr.oconv("HEX");
 .nf
  
 .fi
-Convert a string of bytes to a string of hexadecimal digits. The size of the output is precisely double that of the input.
+Convert the chars of a string to a string of pairs of hexadecimal digits.
 
-Multifield/multivalue structure is not preserved. Field marks are converted to HEX as for all other bytes.
+\fBvarstr:\fR A string. Numbers will be converted to strings for conversion. 1.2 -> "1.2" -> hex "312E32"
+
+Dynamic array structure is not preserved. Field marks are converted to HEX as for all other bytes.
+
+The size of the output is always precisely double that of the input.
+
+This function is the exact inverse of iconv("HEX").
 
 \fBExample:\fR
 .RS
 .nf
-assert(     "ab01"_var.oconv( "HEX" ) == "61" "62" "30" "31" );
-assert( "\\xff\\x00"_var.oconv( "HEX" ) == "FF" "00"           ); // Any bytes are ok.
-assert(        var(10).oconv( "HEX" ) == "31" "30"           ); // Uses ASCII string equivalent of 10 i.e. "10".
-assert(   "\\u0393"_var.oconv( "HEX" ) == "CE" "93"           ); // Greek capital Gamma in UTF8 bytes.
-assert(     "a^]b"_var.oconv( "HEX" ) == "61" "1E" "1D" "62" ); // Field and value marks.
+// var v2;
+v2 =      "ab01"_var.oconv( "HEX" ) ; //  "61" "62" "30" "31"
+v2 =  "\\xff\\x00"_var.oconv( "HEX" ) ; //  "FF" "00"            // Any bytes are ok.
+v2 =         var(10).oconv( "HEX" ) ; //  "31" "30"            // Uses ASCII string equivalent of 10 i.e. "10".
+v2 =    "\\u0393"_var.oconv( "HEX" ) ; //  "CE" "93"            // Greek capital Gamma in UTF8 bytes.
+v2 =      "a^]b"_var.oconv( "HEX" ) ; //  "61" "1E" "1D" "62"  // Field and value marks.
 // or
-assert(      oconv("ab01"_var, "HEX") == "61" "62" "30" "31");
+v2 =       oconv("ab01"_var, "HEX") ; //  "61" "62" "30" "31"
 .fi
 .RE
+
 
 
 .SS
@@ -6231,27 +6547,59 @@ var v1 = varstr.iconv("HEX");
 .nf
  
 .fi
-Convert a string of hexadecimal digits to a string of bytes. After prefixing a "0" to an odd sized input, the size of the output is precisely half that of the input.
+Convert a string of pairs of hexadecimal digits to a string of chars.
 
-Reverse of oconv("HEX") above.
+\fBvarstr:\fR Must be a string of only hex digits 0-9, a-f or A-F.
+
+\fBReturns:\fR A string if all input was hex digits otherwise "".
+
+Dynamic array structure is not preserved. Any field marks prevent conversion.
+
+This function is the exact inverse of oconv("HEX").
+
+After prefixing a "0" to an odd sized input, the size of the output is always precisely half that of the input.
+
+
 
 .SS
 var v1 = varnum.oconv("MX");
 .nf
  
 .fi
-Number to hex format: Convert numbers  to hexadecimal string.
+Convert number to hexadecimal string.
 
-If the value is not numeric then no conversion is performed and the original value is returned.
+\fB"MX":\fR   Convert and trim leading zeros                      e.g. oconv(1025, "MX")  -> "401"
 
-Floating point numbers are rounded to integers before conversion.
+\fB"MXn":\fR  Pad with up to n leading zeros but do not truncate. e.g. oconv(1025, "MX8") -> "00000401"
+
+\fB"MXnT":\fR Pad and truncate to n characters.                   e.g. oconv(1025, "MX2") -> "01"
+
+\fB"n":\fR    Width. 0-9, A-G = 10 - 16.
+
+\fBvarnum:\fR A number or dynamic array of numbers. Floating point numbers are rounded to integers before conversion.
+
+\fBReturns:\fR A string of hexadecimal digits or a dynamic array of the same. Elements that are not numeric are left untouched and unconverted.
+
+Dynamic array structure is preserved.
+
+Negative numbers are treated as unsigned 8 byte integers (uint64).
+
+0  -> "00"
+
+1  -> "01"
+
+15 -> "0F"
+
+-1 -> "FFFF" "FFFF" "FFFF" "FFFF" (8 x "FF")
+
+This function is a near inverse of iconv("MX").
 
 \fBExample:\fR
 .RS
 .nf
-let v1 = var("255").oconv("MX"); // "FF"
+let v1 = var("14.5]QQ]65535").oconv("MX"); // "F]QQ]FFFF"_var
 // or
-let v2 = oconv(255, "MX");
+let v2 = oconv("14.5]QQ]65535"_var, "MX");
 .fi
 .RE
 
@@ -6262,16 +6610,38 @@ var v1 = varstr.iconv("MX");
 .nf
  
 .fi
-Hex format to number: Convert hexadecimal strings to numbers.
+Convert hexadecimal string to number.
 
-\fBReturns:\fR An var integer or "" if there are any non-hex digits (0-9, a-f or A-F) in the input.
+\fBvarstr:\fR A string or dynamic array of up to 16 hex digits: 0-9, a-f, A-F.
+
+\fBReturns:\fR An integer or dynamic array of integers. Invalid elements are converted to "".
+
+Dynamic array structure is preserved.
+
+Hex strings are converted to unsigned 8 byte integers (uint64)
+
+Leading zeros are ignored.
+
+"0" -> 0
+
+"00" -> 0
+
+"1" -> 1
+
+Hex "FFFFFFFFFFFFFFFF" (8 x "FF") -> -1.
+
+Hex "7FFFFFFFFFFFFFFF" is the maximum positive integer: 9223372036854775805.
+
+Hex "8000000000000000" is the maximum negative integer: -9223372036854775808.
+
+This function is the exact inverse of oconv("MX").
 
 \fBExample:\fR
 .RS
 .nf
-let v1 = "FFFF"_var.iconv("MX"); // 65'535
+let v1 = "F]QQ]FFFF"_var.iconv("MX"); // "15]]65535"_var
 // or
-let v2 = iconv("FFFF", "MX");
+let v2 = iconv("F]QQ]FFFF", "MX");
 .fi
 .RE
 
@@ -6284,7 +6654,7 @@ var v1 = varnum.oconv("MB");
 .fi
 Number to binary format: Convert number to strings of 1s and 0s
 
-If the value is not numeric then no conversion is performed and the original value is returned.
+\fBvarnum:\fR If not numeric then no conversion is performed and the original value is returned.
 
 \fBExample:\fR
 .RS
@@ -6318,35 +6688,27 @@ etc.
 .RS
 .nf
 // 1. Backslash in text remains backslash
-
 let v1 = var(_BS).oconv("TX");     // _BS
 
 // 2. Literal "\\n" -> literal "\\\\n" (Double escape any escaped NL chars)
-
 let v2 = var(_BS "n").oconv("TX"); // _BS _BS "n"
 
 // 3. \\n becomes literal "\\n" (Single escape any NL chars)
-
 let v3 = var(_NL).oconv("TX");     // _BS "n"
 
 // 4. FM -> \\n
-
 let v4 = "f1^f2"_var.oconv("TX");  // "f1" _NL "f2"
 
 // 5. VM -> "\\" \\n
-
 let v5 = "v1]v2"_var.oconv("TX");  // "v1" _BS _NL "v2"
 
 // 6. SM -> "\\\\" \\n
-
 let v6 = "s1}s1"_var.oconv("TX");  // "s2" _BS _BS _NL "s2"
 
 // 7. TM -> "\\\\\\" \\n
-
 let v7 = "t1|t2"_var.oconv("TX");  // "t1" _BS _BS _BS _NL "t2"
 
-// 8. STs -> "\\\\\\\\" \\n
-
+// 8. ST -> "\\\\\\\\" \\n
 let v8 = "st1~st2"_var.oconv("TX"); // "st1" _BS _BS _BS _BS _NL "st2"
 .fi
 .RE

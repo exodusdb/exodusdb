@@ -1,6 +1,9 @@
 .TH exoprog.h
 
-.SH 1. SELECT LISTS
+.SH 1. EXODUS PROGRAM
+.SH
+
+.SH 2. SELECT LISTS
 .SH
 
 .SS
@@ -290,7 +293,7 @@ if (not deletelist("my_list")) ...
 
 
 
-.SH 2. PERFORM/EXECUTE
+.SH 3. PERFORM/EXECUTE
 .SH
 
 .SS
@@ -345,13 +348,13 @@ Run an exodus program/library's main function after closing the current program.
 Identical to perform() except that the current program closes first.
 
 .SS
-var v1 = libinfo(command);
+var v1 = libinfo(libname);
 .nf
  
 .fi
-Check if a command's first word  is a performable/executable exodus program.
+Check if a lib exists to be performed/executed or called.
 
-.SH 3. PROGRAM TERMINATION 
+.SH 4. PROGRAM TERMINATION 
 .SH
 
 .SS
@@ -390,7 +393,7 @@ logoff(message = "")
 .fi
 
 
-.SH 4. DB FILE DICTIONARIES
+.SH 5. DB FILE DICTIONARIES
 .SH
 
 .SS
@@ -416,7 +419,7 @@ var v1 = xlate(filename, key, fieldno_or_name, mode);
 .fi
 
 
-.SH 5. I/O CONVERSION
+.SH 6. I/O CONVERSION
 .SH
 
 .SS
@@ -449,7 +452,7 @@ var v1 = iconv(input, conversion);
 .fi
 
 
-.SH 6. IOCONV DATE/TIME 
+.SH 7. IOCONV DATE/TIME 
 .SH
 
 .SS
@@ -615,7 +618,7 @@ var v1 = amountunit(input0);
 .fi
 
 
-.SH 7. TIME/DATE UTILITIES
+.SH 8. TIME/DATE UTILITIES
 .SH
 
 .SS
@@ -677,7 +680,7 @@ let v2 = elapsedtimetext(0, 0.001); // "1 min, 26 secs"
 
 
 
-.SH 8. TERMINAL I/O UTILITIES
+.SH 9. TERMINAL I/O UTILITIES
 .SH
 
 .SS
@@ -863,7 +866,7 @@ if (isterminal()) {
 .RE
 
 
-.SH 9. ARRAY UTILITIES
+.SH 10. ARRAY UTILITIES
 .SH
 
 .SS
@@ -916,7 +919,7 @@ sortarray(v1, "2]3"_var, "AR"); // v1 -> "f1^1]2]10]20^zz]yy]ww]xx^f3^f4"_var
 
 
 
-.SH 10. RECORD LOCKING
+.SH 11. RECORD LOCKING
 .SH
 
 .SS
