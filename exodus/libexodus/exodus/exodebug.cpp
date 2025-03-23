@@ -29,7 +29,7 @@ THE SOFTWARE.
 #endif
 
 // For debugging
-#define TRACING 1
+#define TRACING 0
 
 #ifdef EXODUS_POSIX_SOURCE
 #	include <stdio.h>

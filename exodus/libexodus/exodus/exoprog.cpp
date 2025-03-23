@@ -28,8 +28,9 @@ namespace exo {
 // 2. Destructor
 ExoProgram::~ExoProgram(){}
 
-var ExoProgram::libinfo(in command) {
-	return var(perform_callable_.libfilepath(command.toString())).osfile();
+var ExoProgram::libinfo(in libname) {
+	// Return dir size/date/time of /home/user/lib/libxxxxxxxx.so
+	return var(perform_callable_.libfilepath(libname)).osfile();
 }
 
 /////////////////////
@@ -68,33 +69,33 @@ bool ExoProgram::select(in sortselectclause_or_filehandle) {
 
 	var sortselectclause = sortselectclause_or_filehandle;
 
-	//stage 1
+	// Stage 1
 	/////////
 
-	//force default connection
+	// Force default connection
 	CURSOR.updater(2, "");
 
-	//indicate there are no calculated fields
+	// Indicate there are no calculated fields
 	CURSOR.updater(10, "");
 
 	//perform the select (stage 1 of possibly two stages)
 	//any fields requiring calculation that cannot be done by the database
 	//will be put skipped and put aside in CURSOR.updater(10) for stage 2
 
-	//select or fail
+	// Sselect or fail
 	if (!CURSOR.select(sortselectclause)) {
 		return false;
 		/////////////
 	}
 
-	//we are done if there are no calculated fields!
+	// We are done if there are no calculated fields!
 	var calc_fields = CURSOR.f(10);
 	if (!calc_fields) {
 		return true;
 		////////////
 	}
 
-	//stage 2 "2stage"
+	// Stage 2 "2stage"
 	//////////////////
 
 	if (not TERMINAL) {

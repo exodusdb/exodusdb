@@ -498,7 +498,9 @@ bool Callable::openlib(const std::string newlibname) {
 	/////////
 	plib_ = static_cast<void*>(dlopen(libfilepath_.c_str(), RTLD_NOW));
 
+	///////////////////////////////////////////////////////////////////////////////////////
 	// Also try without path in case the library is system installed e.g. in /usr/local/lib
+	///////////////////////////////////////////////////////////////////////////////////////
 	std::size_t fnpos0;
 	std::string purelibfilename;
 	if (plib_ == nullptr) {
