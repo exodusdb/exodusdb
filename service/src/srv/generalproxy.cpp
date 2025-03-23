@@ -493,8 +493,8 @@ func main() {
 //			convert @lower.case to @upper.case in y;
 //			convert @upper.case to @lower.case in x;
 //			for ii=1 to len(x);
-//				// if x[ii,1] != @lower.case[ii,1] then print 'x: ':ii:' ':seq(x[ii,1]) 'MX':' ':seq(@lower.case[ii,1]) 'MX'
-//				if y[ii,1] != @upper.case[ii,1] then print 'y: ':ii:' ':seq(y[ii,1]) 'MX':' ':seq(@upper.case[ii,1]) 'MX';
+//				// if x[ii,1] != @lower.case[ii,1] then print 'x: ':ii:' ':ord(x[ii,1]) 'MX':' ':ord(@lower.case[ii,1]) 'MX'
+//				if y[ii,1] != @upper.case[ii,1] then print 'y: ':ii:' ':ord(y[ii,1]) 'MX':' ':ord(@upper.case[ii,1]) 'MX';
 //				next ii;
 
 		} else {

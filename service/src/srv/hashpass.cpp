@@ -12,7 +12,7 @@ func main(in password) {
 		// /BREAK;
 		if (hashedpassword == "")
 			break;
-		encryptkey = (encryptkey.mod(390001)) * (hashedpassword.first()).seq() + 1;
+		encryptkey = (encryptkey.mod(390001)) * (hashedpassword.first()).ord() + 1;
 		hashedpassword.cutter(1);
 	}  // loop;
 

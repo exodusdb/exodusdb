@@ -439,19 +439,19 @@ func main() {
 	//assert(charin eq charout);
 	assert(osremove(testfilename));
 
-	assert(seq("")        eq "");
-	assert(seq(chr(-513)) eq 255);
-	assert(seq(chr(-512)) eq 0);
-	assert(seq(chr(-256)) eq 0);
-	assert(seq(chr(-1))   eq 255);
-	assert(seq(chr(0))    eq 0);
-	assert(seq(chr(1))    eq 1);
-	assert(seq(chr(127))  eq 127);
-	assert(seq(chr(128))  eq 128);
-	assert(seq(chr(255))  eq 255);
-	assert(seq(chr(256))  eq 0);
-	assert(seq(chr(512))  eq 0);
-	assert(seq(chr(513))  eq 1);
+	assert(ord("")        eq "");
+	assert(ord(chr(-513)) eq 255);
+	assert(ord(chr(-512)) eq 0);
+	assert(ord(chr(-256)) eq 0);
+	assert(ord(chr(-1))   eq 255);
+	assert(ord(chr(0))    eq 0);
+	assert(ord(chr(1))    eq 1);
+	assert(ord(chr(127))  eq 127);
+	assert(ord(chr(128))  eq 128);
+	assert(ord(chr(255))  eq 255);
+	assert(ord(chr(256))  eq 0);
+	assert(ord(chr(512))  eq 0);
+	assert(ord(chr(513))  eq 1);
 
 	//test all 8 bit bytes can be written and read
 	var tx = "";
@@ -528,8 +528,8 @@ func main() {
 		//greek lowercase gamma and uppercase sigma
 		var greek2 = "\u03B3\u03A3";				//unicode code points
 		assert(greek2.oconv("HEX") eq "CEB3CEA3");	//utf8 bytes
-		//assert(greek2[1].seq()==947);
-		//assert(greek2[2].seq()==931);
+		//assert(greek2[1].ord()==947);
+		//assert(greek2[2].ord()==931);
 
 		//output as utf8 to t_temp5.txt
 		var tempfilename5 = "t_temp5.txt";

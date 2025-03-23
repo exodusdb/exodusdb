@@ -1644,7 +1644,7 @@ var ExoProgram::oconv(in input0, in conversion) {
 					if (not delim)
 						break;
 
-					outx ^= var().chr(RM.seq() + 1 - delim);
+					outx ^= var().chr(RM.ord() + 1 - delim);
 				}
 			}
 			result = outx;
@@ -2361,7 +2361,7 @@ var ExoProgram::exoprog_number(in type, in input0, in ndecs0, out outx) {
 			break;
 
 		// Append whatever trailing delimiter was found when extracting the current amount
-		outx ^= var().chr(RM.seq() + 1 - delim);
+		outx ^= var().chr(RM.ord() + 1 - delim);
 
 	}  //loop next field, subvalue etc.
 

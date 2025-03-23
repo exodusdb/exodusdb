@@ -293,7 +293,7 @@ func onefile(in filename, in maxndifferences) {
 			if (subrec.f(1,1,1) ne subrec or what.f(1,1,1) ne what) {
 				converter(what,_RM _FM _VM _SM _TM _ST,"\xFF\xFE\xFD\xFC\xFB\xFA");
 				converter(subrec,_RM _FM _VM _SM _TM _ST,"\xFF\xFE\xFD\xFC\xFB\xFA");
-				//TRACE(lineno ^ ". subrec = " ^ subrec.convert("\xFF\xFE\xFD\xFC\xFB\xFA",_RM _FM _VM _SM _TM _ST) ^ " ... " ^ sep ^ " " ^ seq(sep));
+				//TRACE(lineno ^ ". subrec = " ^ subrec.convert("\xFF\xFE\xFD\xFC\xFB\xFA",_RM _FM _VM _SM _TM _ST) ^ " ... " ^ sep ^ " " ^ ord(sep));
 				if (sep eq "") {
 					if (LOCATE_SN)
 						sep = "";
@@ -305,13 +305,13 @@ func onefile(in filename, in maxndifferences) {
 						sep = FM;
 				}
 				if (sep and sep le RM) {
-					pick_sep = chr(seq(sep)+256-32);
+					pick_sep = chr(ord(sep)+256-32);
 					converter(what,pick_sep,sep);
 					converter(subrec,pick_sep,sep);
-					//TRACE(lineno ^ ". " ^ sep ^ " " ^ seq(sep) ^ " " ^ seq(pick_sep));
+					//TRACE(lineno ^ ". " ^ sep ^ " " ^ ord(sep) ^ " " ^ ord(pick_sep));
 				}
 				rec(LOCATE_FN, LOCATE_VN, LOCATE_SN) = subrec;
-				//TRACE(lineno ^ ". " ^ rec.convert("\xFF\xFE\xFD\xFC\xFB\xFA",_RM _FM _VM _SM _TM _ST) ^ " ... " ^ sep ^ " " ^ seq(sep));
+				//TRACE(lineno ^ ". " ^ rec.convert("\xFF\xFE\xFD\xFC\xFB\xFA",_RM _FM _VM _SM _TM _ST) ^ " ... " ^ sep ^ " " ^ ord(sep));
 			}
 			*/
 

@@ -282,11 +282,11 @@ func main() {
 		var v4 = v1.at(4); assert(v4 == "");
 	}
 
-	printl("seq() const;");
+	printl("ord() const;");
 	{
-				let v1 = "abc"_var.seq(); assert(v1 == 0x61); // decimal 97, 'a'
+				let v1 = "abc"_var.ord(); assert(v1 == 0x61); // decimal 97, 'a'
 		// or
-		let v2 = seq("abc");
+		let v2 = ord("abc");
 	}
 
 	printl("textord() const;");

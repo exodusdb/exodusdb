@@ -414,7 +414,7 @@ ND var  search(in instring, const rex& regex, io startchar1);
 // Ditto starting from first char.
 ND var  search(in instring, const rex& regex);
 
-ND var  seq(in char1);
+ND var  ord(in char1);
 ND var  textord(in char1);
 ND var  str(in instring, const int number);
 ND var  space(const int nspaces);

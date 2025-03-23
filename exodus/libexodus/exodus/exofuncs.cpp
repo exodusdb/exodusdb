@@ -310,7 +310,7 @@ ND PUBLIC var  search(in instring, const rex& regex, io startchar1) {return inst
 // Ditto starting from first char.
 ND PUBLIC var  search(in instring, const rex& regex) {return instring.search(regex);}
 
-ND PUBLIC var  seq(in char1) {return char1.seq();}
+ND PUBLIC var  ord(in char1) {return char1.ord();}
 ND PUBLIC var  textord(in char1) {return char1.textord();}
 ND PUBLIC var  str(in instring, const int number) {return instring.str(number);}
 ND PUBLIC var  space(const int nspaces) {return var::space(nspaces);}

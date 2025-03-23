@@ -355,7 +355,7 @@ export namespace exo {
 	using exo::rnd;
 	using exo::round;
 	using exo::search;
-	using exo::seq;
+	using exo::ord;
 	using exo::setprompt;
 	using exo::setxlocale;
 	using exo::setprecision;

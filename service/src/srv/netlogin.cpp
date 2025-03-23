@@ -306,7 +306,7 @@ subr inputx() {
 		// pass1
 		loop;
 			while encryptx # '';
-			encryptkey = mod(encryptkey, 390001) * seq(encryptx[1, 1]) + 1;
+			encryptkey = mod(encryptkey, 390001) * ord(encryptx[1, 1]) + 1;
 			encryptx[1, 1]='';
 			repeat;
 

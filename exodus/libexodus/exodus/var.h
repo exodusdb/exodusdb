@@ -621,11 +621,11 @@ public:
 	// If given a string, then only the first char is considered.
 	// Equivalent to ord() in php
 	//
-	// `let v1 = "abc"_var.seq(); // 0x61 // decimal 97, 'a'
+	// `let v1 = "abc"_var.ord(); // 0x61 // decimal 97, 'a'
 	//  // or
-	//  let v2 = seq("abc");`
+	//  let v2 = ord("abc");`
 	//
-	ND var  seq() const;
+	ND var  ord() const;
 
 	// Get the Unicode Code Point of a Unicode character.
 	// var: A UTF-8 string. Only the first Unicode character is considered.

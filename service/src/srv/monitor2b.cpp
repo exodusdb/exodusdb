@@ -474,7 +474,7 @@ subr hash(in salt, in max, out hashcode) {
 
 	hashcode = salt;
 	for (const int ii : range(1, text.len())) {
-		hashcode = (hashcode * (text.at(ii)).seq()).mod(max);
+		hashcode = (hashcode * (text.at(ii)).ord()).mod(max);
 	}  // ii;
 	return;
 }

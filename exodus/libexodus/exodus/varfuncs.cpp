@@ -1186,7 +1186,7 @@ var  var::unique() const& {
 	var bit;
 	var delimiter;
 	var sepchar = VM;
-	int RMseq_plus1 = RM.seq() + 1;
+	int RMseq_plus1 = RM.ord() + 1;
 	// bool founddelimiter = false;
 	while (true) {
 
@@ -1215,9 +1215,9 @@ var  var::unique() const& {
 }
 
 // BINARY - 1st byte
-var  var::seq() const {
+var  var::ord() const {
 
-	THISIS("var  var::seq() const")
+	THISIS("var  var::ord() const")
 	assertString(function_sig);
 
 	if (var_str.empty())

@@ -2013,8 +2013,8 @@ var  var::sum() const {
 	var nextsep;  //num
 	var accum;	  //num
 
-	let min_sep = ST.seq();  //26
-	let max_sep = RM.seq();	  //31
+	let min_sep = ST.ord();  //26
+	let max_sep = RM.ord();	  //31
 
 	var min_sep_present;
 	for (min_sep_present = min_sep; min_sep_present <= max_sep; ++min_sep_present) {

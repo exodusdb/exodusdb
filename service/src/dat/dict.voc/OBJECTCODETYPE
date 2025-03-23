@@ -5,7 +5,7 @@ S
 
 
 
-	return RECORD.f(1).seq();
+	return RECORD.f(1).ord();
 L
 10
 

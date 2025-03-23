@@ -79,7 +79,7 @@ func main() {
 
 	{
 		// var has no IMPLICIT char conversion so it converts via an int instead
-		var x = seq("a");  //what is the character number of "a"?
+		var x = ord("a");  //what is the character number of "a"?
 		TRACE(x)
 		char c = x;
 		assert(c eq 'a');

@@ -298,6 +298,8 @@ func main() {
 			srcline.replacer(R"__(\bvar\((\d+)\)\.space\(\))__"_rex, R"__(space\(\1\))__");
 			srcline.replacer(R"__(\b([a-zA-Z0-9_.]+)\.space\(\))__"_rex, R"__(space\(\1\))__");
 
+			srcline.replacer(R"__(\bseq\()__"_rex, R"__(ord\()__");
+
 			srcline.replacer(R"__(makelist("", )__", "selectkeys(");
 			srcline.replacer(R"__(field2()__", "field(");
 
