@@ -132,6 +132,10 @@ class PUBLIC ExoProgram {
 	// Is this required?
 	virtual ~ExoProgram();
 
+	////////////////////
+	//// Exodus Program:
+	////////////////////
+
 	///////////////////
 	///// Select lists:
 	///////////////////
@@ -305,8 +309,8 @@ ND	bool hasnext();
 	[[noreturn]]
 	void chain(in command_line);
 
-	// Check if a command's first word  is a performable/executable exodus program.
-	var  libinfo(in command);
+	// Check if a lib exists to be performed/executed or called.
+	var  libinfo(in libname);
 
 	///////////////////////////
 	///// Program termination :
