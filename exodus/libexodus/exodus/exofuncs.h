@@ -297,6 +297,9 @@ ND var  replace(in instring, SV fromstr, SV tostr);
 ND var  replace(in instring, const rex& regex, SV replacement);
    IO   replacer(io iostring, const rex& regex, SV replacement);
 
+ND var  replace(in instring, const rex& regex, SomeFunction(in match_str));
+   IO   replacer(io iostring, const rex& regex, SomeFunction(in match_str));
+
 ND var  ucase(in instring);
    IO   ucaser(io iostring);
 

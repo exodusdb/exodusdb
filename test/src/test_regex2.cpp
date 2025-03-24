@@ -181,10 +181,12 @@ func main() {
 	{
 		// User literal - _rex
 		// Caching in std:: map - 190 ns/op
+		errput("1'000'000 replacer ");
 		var t = "abc500";
 		for (auto i [[maybe_unused]]: range(0, 1'000'000)) {
 			t.replacer("def(abc)|ghf|[abc]+.*?def(abc)|ghf|[abc]+.*$"_rex, "");
 		}
+		errput();
 	}
 
 	// Default regex options is multiline in exodus (because boost::regex was)
@@ -220,6 +222,89 @@ func main() {
 		assert("abc\ndef\nhij"_var.match("^def$", "s") == "");
 		pos = 0;
 		assert("abc\ndef\nhij"_var.search("^def$", pos, "s") == "");
+	}
+
+	{
+	    // Original tests with c ^ c (doubling)
+	    std::cout << "Testing original doubling behavior:\n";
+	    assert("abc"_var.replace("b"_rex, [](auto c) { return c ^ c; }) == "abbc");
+	    assert("abcbd"_var.replace("b"_rex, [](auto c) { return c ^ c; }) == "abbcbbd");
+	    assert("abcb"_var.replace("b"_rex, [](auto c) { return c ^ c; }) == "abbcbb");
+	    assert("bcb"_var.replace("b"_rex, [](auto c) { return c ^ c; }) == "bbcbb");
+	    assert("bb"_var.replace("b"_rex, [](auto c) { return c ^ c; }) == "bbbb");
+	    assert("b"_var.replace("b"_rex, [](auto c) { return c ^ c; }) == "bb");
+	    assert(""_var.replace("b"_rex, [](auto c) { return c ^ c; }) == "");
+	    assert("ac"_var.replace("b"_rex, [](auto c) { return c ^ c; }) == "ac");
+	    std::cout << "All doubling tests passed.\n";
+
+	    // New tests with "" (empty string replacement)
+	    std::cout << "\nTesting empty string replacement:\n";
+//	    auto empty_replace = [](auto c) { return var(""); };  // Define once for reuse
+	    auto empty_replace = [](auto) { return var(""); };  // Define once for reuse
+
+	    var test1 = "abc"_var.replace("b"_rex, empty_replace);
+	    std::cout << test1 << "\n";  // "ac"
+	    assert(test1 == "ac");
+
+	    var test2 = "abcbd"_var.replace("b"_rex, empty_replace);
+	    std::cout << test2 << "\n";  // "acd"
+	    assert(test2 == "acd");
+
+	    var test3 = "abcb"_var.replace("b"_rex, empty_replace);
+	    std::cout << test3 << "\n";  // "ac"
+	    assert(test3 == "ac");
+
+	    var test4 = "bcb"_var.replace("b"_rex, empty_replace);
+	    std::cout << test4 << "\n";  // "c"
+	    assert(test4 == "c");
+
+	    var test5 = "bb"_var.replace("b"_rex, empty_replace);
+	    std::cout << test5 << "\n";  // ""
+	    assert(test5 == "");
+
+	    var test6 = "b"_var.replace("b"_rex, empty_replace);
+	    std::cout << test6 << "\n";  // ""
+	    assert(test6 == "");
+
+	    var test7 = ""_var.replace("b"_rex, empty_replace);
+	    std::cout << test7 << "\n";  // ""
+	    assert(test7 == "");
+
+	    var test8 = "ac"_var.replace("b"_rex, empty_replace);
+	    std::cout << test8 << "\n";  // "ac"
+	    assert(test8 == "ac");
+
+		// Additional edge cases
+		std::cout << "\nTesting edge cases with empty replacement:\n";
+		// 1. Overlapping potential (non-overlapping due to regex_search)
+		assert("aaa"_var.replace("aa"_rex, empty_replace) == "a");  // "aa" matches once, leaves "a"
+		// 2. Pattern at start
+		assert("abc"_var.replace("a"_rex, empty_replace) == "bc");
+		// 3. Pattern at end
+		assert("abc"_var.replace("c"_rex, empty_replace) == "ab");
+		// 4. Multi-character pattern
+		assert("abcde"_var.replace("cd"_rex, empty_replace) == "abe");
+		// 5. Special regex chars (assuming _rex doesn't escape)
+		assert("a.b"_var.replace("a.b"_rex, empty_replace) == "");  // Matches "a.b" literally
+		// 6. Empty pattern (might loop infinitely, but Boost handles it)
+		assert("abc"_var.replace(""_rex, empty_replace) == "abc");  // No match or safe exit
+		// 7. UTF-8 non-ASCII
+		assert("café"_var.replace("é"_rex, empty_replace) == "caf");  // Multi-byte char
+		// 8. Whitespace
+		assert("a b c"_var.replace(" "_rex, empty_replace) == "abc");
+		// 9. Case sensitivity
+		assert("aBc"_var.replace("b"_rex, empty_replace) == "aBc");  // "b" != "B"
+		// 10. Full string match
+		assert("abc"_var.replace("abc"_rex, empty_replace) == "");
+		std::cout << "All edge case tests passed.\n";
+
+	}
+
+	{
+		// Check that replace using function groups to work on
+		var words = "programinit libraryinit programexit libraryexit";
+		words.replacer("(program|library)(init|exit)"_rex, [](auto groups){TRACE(groups); return groups.f(1,2).first(3) ^ groups.f(1,3);});
+		assert(words == "proinit libinit proexit libexit");
 	}
 
 	printl(elapsedtimetext());

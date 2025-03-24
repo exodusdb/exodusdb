@@ -1256,6 +1256,7 @@ class PUBLIC var_base {
 	// It does return *this in order for chainable efficient multiple concatentation.
 
 	VARREF operator^=(CVR) &;
+	VARREF operator^=(TVR) &;
 	VARREF operator^=(const int) &;
 	VARREF operator^=(const double) &;
 	VARREF operator^=(const char) &;

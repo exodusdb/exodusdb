@@ -242,4 +242,12 @@
 #	define REF &
 #endif
 
+// Define a function pointer type for the replacement lambda
+// using ReplaceFunction = std::string (*)(in matchinfo);
+// using ReplaceFunction = var(*)(in matchinfo);
+//
+// Better to show the arguments to the function at point of use
+// "SomeFunction_that_returns_a_var"
+#define SomeFunction var(*sf)
+
 #endif //EXO_VARDEFS_H

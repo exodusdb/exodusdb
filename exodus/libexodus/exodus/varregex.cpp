@@ -625,6 +625,116 @@ var  var::search(const rex& regex, io startchar1) const {
 
 }
 
+// mutator
+IO   var::replacer(const rex& regex, SomeFunction(in match_str)) REF {
+    *this = this->replace(regex, sf);
+    return THIS;
+}
+
+// const
+var  var::replace(const rex& regex, SomeFunction(in match_str)) const {
+
+	THISIS("var  var::replace(const rex& regex, SomeFunction(in match_str)) const")
+	assertString(function_sig);
+
+	// Get the engine from the rex if present otherwise get one from the cache (or construct one in the cache)
+//	std::cout << &regex << std::endl;
+//	TRACE(regex.pimpl_ == nullptr)
+	REGEX& regex_engine = regex.pimpl_ ? *static_cast<boost::u32regex*>(regex.pimpl_) : varregex_get_regex_engine(regex.regex_str_, regex.options_);
+
+	// https://stackoverflow.com/questions/26320987/what-is-the-difference-between-regex-token-iterator-and-regex-iterator
+	// boost::u32regex_token_iterator<std::string::const_iterator>
+	//	iter {std_boost::make_u32regex_token_iterator(var_str,regex,{0,1,2,3,4,etc or -1})};
+	// token_iterator allow you to access none-matching parts of the string for parsing stuff
+	// but doesnt return an iterator with an array of groups
+
+	// Default return empty string
+	var nrvo = "";
+
+	// Get 1st iter (1st match)
+
+#ifdef EXO_BOOST_REGEX
+	boost::u32regex_iterator<const char*> iter;
+	try {
+//		iter = boost::make_u32regex_iterator(std::advance(var_str.begin(), startchar1), regex);
+		// Unfortunately boost::make_u32regex_iterator only supports std::string and const char*
+		// and we need start in the middle of std::string so we must use const char*
+		// so any \0 byte in var_str will terminate the match.
+		// TODO how to create an iterator over std::string but starting in the middle.
+		///root/exodus/exodus/libexodus/exodus/varregex.cpp:488:55: warning: unsafe pointer arithmetic [-Wunsafe-buffer-usage]
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
+		// Sadly u32regex will not take a std::string_view so we point into the middle of a std::string (unsafe)
+		iter = boost::make_u32regex_iterator(var_str.data(), regex_engine);
+#pragma clang diagnostic pop
+	} catch (boost::wrapexcept<std::out_of_range>& e) {
+		throw VarError("Error: (2b) Invalid match string " ^ var(regex.regex_str_).quote() ^ ". " ^ var(e.what()));
+	}
+#else
+	std::regex_iterator<std::string::const_iterator> iter(std::advance(var_str.begin(), startchar1 - 1), var_str.end(), regex_engine);
+#endif
+
+	// end_iter
+	decltype(iter) end_iter{};
+
+	// Maintain a last iterator to use for the ending.
+//	std::string::const_iterator last_iter = var_str.begin();
+	auto last_pos0 = 0;
+
+	for (;iter != end_iter; ++iter) {
+
+		// Get access to various match data
+		// https://en.cppreference.com/w/cpp/regex/regex_search
+		//auto& match_results = *iter;
+
+		// Get match data
+//		const boost::match_results<Iter>& match_date = *iter;
+		auto match_data = *iter;
+
+		// Group 0 is complete match of all groups
+		// Group 1+ are any subgroups
+		std::string matches = "";
+		for (std::size_t groupn = 0; groupn < match_data.size(); ++groupn) {
+
+			// Return the matching string
+			matches.append(match_data[groupn].str());
+
+			// Groups are separated by VM
+			matches.push_back(VM_);
+		}
+
+		// Remove trailing VM after all groups
+		if (not matches.empty())
+			matches.pop_back();
+
+		// Append the unmatched bit before the match
+		nrvo.var_str.append(match_data.prefix());
+
+		// Append the replacement
+//		nrvo.var_str.append(sf(matches));
+		nrvo ^= sf(matches);
+
+		// Point to after the match
+		// /usr/bin/../lib/gcc/x86_64-linux-gnu/99/../../../../include/c++/99/bits/stl_iterator.h:1047:11:
+		// note: candidate function (the implicit copy assignment operator) not viable:
+		// no known conversion from 'const char *const' to 'const __normal_iterator<char *, basic_string<char>>' for 1st argument
+		//last_iter = match_data[0].second;
+		last_pos0 = match_data[0].second - var_str.data();
+	}
+
+	// Append the unmatched tail (from last_pos0 to end)
+	if (last_pos0 < var_str.size()) {
+		nrvo.var_str.append(var_str.data() + last_pos0, var_str.size() - last_pos0);
+	}
+
+	return nrvo;
+
+}
+
+
+
+
+
 //////////
 // replace
 //////////

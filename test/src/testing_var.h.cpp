@@ -29,9 +29,10 @@ func main() {
 
 	printl("var() = default;");
 	{
-		let clients = "xo_clients", key = "SB001"; // const vars
-		var client;                                // Unassigned var
-		if (not read(client from clients, key)) abort("var: " ^ lasterror());
+		var client;                     // Unassigned var
+		let client_code = "SB001";      // Constant var
+		var clients     = "xo_clients"; // Variable var
+		if (not read(client from clients, client_code)) abort("var: " ^ lasterror());
 	}
 
 	printl("operator=(expression) &;");
@@ -692,6 +693,24 @@ func main() {
 				let v1 = "A a B b"_var.replace("[A-Z]"_rex, "'$0'"); assert(v1 == "'A' a 'B' b");
 		// or
 		let v2 = replace("A a B b", "[A-Z]"_rex, "'$0'");
+	}
+
+	printl("replace(const rex& regex, SomeFunction(in match_str)) const;");
+	{
+		// Decode hex escape codes.
+		var v1 = R"(--\0x3B--\0x2F--)";                                 // Hex escape codes.
+		v1.replacer(
+		    R"(\\0x[0-9a-fA-F]{2,2})"_rex,                              // Finds \0xFF.
+		    [](auto match_str) {return match_str.cut(3).iconv("HEX");}  // Decodes to a char.
+		);
+		assert(v1 == "--;--/--");
+		// Reformat dates using groups.
+		var v2 = "Date: 03-15-2025";
+		v2.replacer(
+		    R"((\d{2})-(\d{2})-(\d{4}))"_rex,
+		    [](auto match_str) {return match_str.f(1, 4) ^ "-" ^ match_str.f(1, 2) ^ "-" ^ match_str.f(1, 3);}
+		);
+		assert(v2 == "Date: 2025-03-15");
 	}
 
 	printl("unique() const&;");
@@ -1918,7 +1937,7 @@ func main() {
 		let v3 = "12345^12346]12347"_var;
 		v2 = v3.oconv("D") ; assert(v2 == "18 OCT 2001^19 OCT 2001]20 OCT 2001"_var);
 		 // or
-		v2 =  oconv(v3, "D"   ) ; assert(v2 == "18 OCT 2001"  );
+		 v2 =  oconv(v3, "D"   ) ;
 	}
 
 	printl("iconv_D(const char* conversion) const;");
@@ -2063,7 +2082,7 @@ func main() {
 
 	printl("oconv_MX() const;");
 	{
-				let v1 = var("14.5]QQ]65535").oconv("MX"); assert(v1 == "F]QQ]FFFF"_var);
+				let v1 = "14.5]QQ]65535"_var.oconv("MX"); assert(v1 == "F]QQ]FFFF"_var);
 		// or
 		let v2 = oconv("14.5]QQ]65535"_var, "MX");
 	}
@@ -2095,7 +2114,7 @@ func main() {
 		// 5. VM -> "\" \n
 		let v5 = "v1]v2"_var.oconv("TX"); assert(v5 == "v1" _BS _NL "v2");
 		// 6. SM -> "\\" \n
-		let v6 = "s1}s1"_var.oconv("TX"); assert(v6 == "s2" _BS _BS _NL "s2");
+		let v6 = "s1}s2"_var.oconv("TX"); assert(v6 == "s1" _BS _BS _NL "s2");
 		// 7. TM -> "\\\" \n
 		let v7 = "t1|t2"_var.oconv("TX"); assert(v7 == "t1" _BS _BS _BS _NL "t2");
 		// 8. ST -> "\\\\" \n
@@ -2191,10 +2210,10 @@ func main() {
 	printl("splitter(in str1, SV delimiter = _FM);");
 	{
 		dim d1;
-		d1.splitter("f1^f2^f3"_var);  assert(d1.rows() == 3  );;assert(d1 == Automatically dimensioned.);
+		d1.splitter("f1^f2^f3"_var);  assert(d1.rows() == 3  );//// Automatically dimensioned.
 		//
 		dim d2(10);
-		d2.splitter("f1^f2^f3"_var);  assert(d2.rows() == 10 );;assert(d2 == Predimensioned. Excess elements become "");
+		d2.splitter("f1^f2^f3"_var);  assert(d2.rows() == 10 );/// Predimensioned. Excess elements become ""
 	}
 
 	printl("sorter(bool reverse = false);");

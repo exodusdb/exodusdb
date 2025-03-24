@@ -381,25 +381,20 @@ func main() {
 func getosfilename(in dir, in dbfilename, in fieldno, in id) {
 
 	var temposfilename = dbfilename ^ "~" ^ id;
-//	let invalidfilechars = R"__(\"')__" "\u00A3 $%^&*(){}[]:;#<>?,./|";
-	let invalidfilechars = R"__(\"')__" "\u00A3 $%^&*(){}[]:;#<>?,/|";
 	temposfilename.lcaser();
 
-	// Use escaped chars to avoid two records converting to the same key
-	// e.g. currently both "aa,bb" and "aa.bb" will be converted to "aa-bb"
-//	temposfilename.converter(invalidfilechars, str("-", len(invalidfilechars)));
-	for (let i : range(1, len(invalidfilechars))) {
-		let c = invalidfilechars.at(i);
-		let cname = var::textchrname(textord(c));
-//		let orig = temposfilename;
-		temposfilename.replacer(c, cname);
-//		if (temposfilename ne orig) {
-//			TRACE(c);
-//			TRACE(cname)
-//		}
-	}
+	rex convertible_chars(R"__([\"')__"
+	                       "\u00A3 $%^&*(){}[\\]:;#=<>?,/|]");
+	temposfilename.replacer(
+		convertible_chars,
+		[](auto c) {
+			// Replace with unicode name e.g. "?" = "QUESTION MARK"
+			return var::textchrname(c.textord());
+		}
+	);
 
-	if (dbfilename.starts("dict.") and fieldno)
+	// syntax highlighting for psql. why not for exodus cpp?
+	if (dbfilename.starts("dict.") and fieldno == 8)
 		temposfilename ^= ".sql";
 //	else
 //		temposfilename ^= ".dat";

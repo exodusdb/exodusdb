@@ -122,14 +122,16 @@ public:
 	/* fake for gendoc
 
     // Create an unassigned var.
-	// Where-ever possible, variables should be assigned an initial value immediately at their point of definition, and marked as const if appropriate. However variables often have no real single initial value and are commonly defined in advance of being assigned a particular value. For example, a variable may be assigned differently on different branches of a conditional statement, or be provided as an outbound argument of a function call.
-	// Even when not assigned, "use before initialisation" bugs do not occur because a runtime error VarUnassigned is thrown if a var is used before it has been assigned a value.
+	// The var must be assigned before being used otherwise a runtime error VarUnassigned is thrown. Silent "use before assign" bugs cannot occur.
+	// Allowing unassigned variables allows them to be assigned conditionally in if/else statements and provided as outbound arguments of a function call.
 	//
 	// Use "let" instead of "var" as a shorthand way of writing "const var" whereever possible.
 	//
-	// `let clients = "xo_clients", key = "SB001"; // const vars
-	//  var client;                                // Unassigned var
-	//  if (not read(client from clients, key)) ...`
+	// `var client;                     // Unassigned var
+	//  let client_code = "SB001";      // Constant var
+	//  var clients     = "xo_clients"; // Variable var
+	//
+	//  if (not read(client from clients, client_code)) ...`
 	//
     var() = default;
 
@@ -1296,6 +1298,30 @@ public:
 	//
 	ND var  replace(const rex& regex, SV tostr) const&;
 
+	// Replace regex matches with a custom function’s output
+	// Allows very complex string conversions.
+	// SomeFunction: Must return a var. Can be an inline anonymous lambda function.
+	// e.g. [](auto match_str) {return match_str;} // Does nothing.
+	// match_str: Text of a single match. If regex groups are used, match_str.f(1, 1) is the whole match, match_str.f(1, 2) is the first group, etc.
+	//
+	// `// Decode hex escape codes.
+	//  var v1 = R"(--\0x3B--\0x2F--)";                                 // Hex escape codes.
+	//  v1.replacer(
+	//      R"(\\0x[0-9a-fA-F]{2,2})"_rex,                              // Finds \0xFF.
+	//      [](auto match_str) {return match_str.cut(3).iconv("HEX");}  // Decodes to a char.
+	//  );
+	//  assert(v1 == "--;--/--");
+	//
+	//  // Reformat dates using groups.
+	//  var v2 = "Date: 03-15-2025";
+	//  v2.replacer(
+	//      R"((\d{2})-(\d{2})-(\d{4}))"_rex,
+	//      [](auto match_str) {return match_str.f(1, 4) ^ "-" ^ match_str.f(1, 2) ^ "-" ^ match_str.f(1, 3);}
+	//  );
+	//  assert(v2 == "Date: 2025-03-15");`
+	//
+	var  replace(const rex& regex, SomeFunction(in match_str)) const;
+
 	// Remove duplicate fields in an FM or VM etc. separated list
 	//
 	// `let v1 = "a1^b2^a1^c2"_var.unique(); // "a1^b2^c2"_var
@@ -1430,6 +1456,8 @@ public:
 	ND var  textconvert(SV fromchars, SV tochars)     && {textconverter(fromchars, tochars);   return std::move(*this);}
 	ND var  replace(    SV fromstr,   SV tostr)       && {replacer(fromstr, tostr);            return std::move(*this);}
 	ND var  replace(const rex& regex, SV replacement) && {replacer(regex, replacement);        return std::move(*this);}
+	ND var  replace(const rex& regex, SomeFunction(in match_str))
+	                                                  && {replacer(regex, sf);                 return std::move(*this);}
 
 	ND var  unique()                                  && {uniquer();           return std::move(*this);}
 	ND var  sort(   SV delimiter = _FM)               && {sorter(delimiter);   return std::move(*this);}
@@ -1497,6 +1525,7 @@ public:
 	   IO   converter(SV from_chars, SV to_chars) REF;
 	   IO   textconverter(SV from_characters, SV to_characters) REF;
 	   IO   replacer(const rex& regex, SV tostr) REF;
+	   IO   replacer(const rex& regex, SomeFunction(in match_str)) REF;
 	   IO   replacer(SV fromstr, SV tostr) REF;
 //	   IO   regex_replacer(SV regex, SV replacement, SV regex_options = "") REF ;
 
@@ -3519,7 +3548,8 @@ public:
 	//  v2 = v3.oconv("D") ; //  "18 OCT 2001^19 OCT 2001]20 OCT 2001"_var
 	//
 	//   // or
-	//   v2 =  oconv(v3, "D"   ) ; //  "18 OCT 2001"  `
+	//   v2 =  oconv(v3, "D"   ) ;`
+	//
 	ND std::string oconv_D(const char* conversion) const;
 
 	// Date input: Convert human readable date to internal date format.
@@ -3768,7 +3798,7 @@ public:
 	// This function is a near inverse of iconv("MX").
 	// obj is varnum
 	//
-	// `let v1 = var("14.5]QQ]65535").oconv("MX"); // "F]QQ]FFFF"_var
+	// `let v1 = "14.5]QQ]65535"_var.oconv("MX"); // "F]QQ]FFFF"_var
 	//  // or
 	//  let v2 = oconv("14.5]QQ]65535"_var, "MX");`
 	//
@@ -3781,7 +3811,7 @@ public:
 	// Hex strings are converted to unsigned 8 byte integers (uint64)
 	// Leading zeros are ignored.
 	// "0" -> 0
-	// "00" -> 0
+	// "00"-> 0
 	// "1" -> 1
 	// Hex "FFFFFFFFFFFFFFFF" (8 x "FF") -> -1.
 	// Hex "7FFFFFFFFFFFFFFF" is the maximum positive integer: 9223372036854775805.
@@ -3830,7 +3860,7 @@ public:
 	//  let v5 = "v1]v2"_var.oconv("TX");  // "v1" _BS _NL "v2"
 	//
 	//  // 6. SM -> "\\" \n
-	//  let v6 = "s1}s1"_var.oconv("TX");  // "s2" _BS _BS _NL "s2"
+	//  let v6 = "s1}s2"_var.oconv("TX");  // "s1" _BS _BS _NL "s2"
 	//
 	//  // 7. TM -> "\\\" \n
 	//  let v7 = "t1|t2"_var.oconv("TX");  // "t1" _BS _BS _BS _NL "t2"

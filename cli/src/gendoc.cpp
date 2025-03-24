@@ -932,6 +932,16 @@ func main() {
 
 			else if (html) {
 
+				let page_title = "";
+				doc_text ^=
+					"<html>\n"
+					"<!DOCTYPE html>\n"
+					"<html>\n"
+					"<head>\n"
+//					"  <title>" ^ page_title ^ "</title>"
+					"</head>\n"
+					"<body>\n";
+
 				// c++ syntax highlighter - highlight.js
 				doc_text ^= highlight_js;
 				doc_text ^= "\n";
@@ -951,6 +961,7 @@ func main() {
 				doc_text ^= "</ol>\n";
 
 				doc_text ^= "</div>\n";
+
 			}
 
 			// 2. header
@@ -970,6 +981,13 @@ func main() {
 
 			doc_text ^= doc_body;
 			doc_text ^= "\n";
+
+			if (html) {
+				doc_text ^=
+					"</body>\n"
+					"</html>\n"
+					"</html>\n";
+			}
 
 			if (not output_to_orig_dir)
 				outputl(doc_text);

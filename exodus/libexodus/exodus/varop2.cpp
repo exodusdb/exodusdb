@@ -160,8 +160,27 @@ template<> PUBLIC VBR1 VARBASE1::operator^=(CBX rhs) & {
 		var_typ = rhs.var_typ;
 		var_int = rhs.var_int;
 		var_dbl = rhs.var_dbl;
-		// TODO if rhs is temporary then move its var_str
 		var_str = rhs.var_str;
+	} else {
+		// Append it onto our string
+		var_str.append(rhs.var_str);
+		var_typ = VARTYP_STR;  // reset to string only
+	}
+
+	return *this;
+}
+
+template<> PUBLIC VBR1 VARBASE1::operator^=(TBX rhs) & {
+
+	assertString(__PRETTY_FUNCTION__);
+	rhs.assertString(__PRETTY_FUNCTION__);
+
+	if (var_str.empty()) {
+//		(this*) = rhs.clone();
+		var_typ = rhs.var_typ;
+		var_int = rhs.var_int;
+		var_dbl = rhs.var_dbl;
+		var_str = std::move(rhs.var_str);
 	} else {
 		// Append it onto our string
 		var_str.append(rhs.var_str);

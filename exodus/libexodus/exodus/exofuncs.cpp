@@ -197,55 +197,58 @@ ND PUBLIC var  textwidth(in var1) {return var1.textwidth();}
 
 ND PUBLIC bool empty(in var1) {return var1.empty();}
 
-ND PUBLIC var  convert(in instring, SV fromchars, SV tochars) {return instring.convert(fromchars, tochars);}
+ND PUBLIC var  convert(  in instring, SV fromchars, SV tochars) {return instring.convert(fromchars, tochars);}
    PUBLIC IO   converter(io iostring, SV fromchars, SV tochars) {iostring.converter(fromchars, tochars); return IOSTRING;}
 
-ND PUBLIC var  textconvert(in instring, SV fromchars, SV tochars) {return instring.textconvert(fromchars, tochars);}
+ND PUBLIC var  textconvert(  in instring, SV fromchars, SV tochars) {return instring.textconvert(fromchars, tochars);}
    PUBLIC IO   textconverter(io iostring, SV fromchars, SV tochars) {iostring.textconverter(fromchars, tochars); return IOSTRING;}
 
-ND PUBLIC var  replace(in instring, SV fromstr, SV tostr) {return instring.replace(fromstr, tostr);}
+ND PUBLIC var  replace( in instring, SV fromstr, SV tostr) {return instring.replace(fromstr, tostr);}
    PUBLIC IO   replacer(io iostring, SV fromstr, SV tostr) {iostring.replacer(fromstr, tostr); return IOSTRING;}
 
-ND PUBLIC var  replace(in instring, const rex& regex, SV replacement) {return instring.replace(regex, replacement);}
+ND PUBLIC var  replace( in instring, const rex& regex, SV replacement) {return instring.replace(regex, replacement);}
    PUBLIC IO   replacer(io iostring, const rex& regex, SV replacement) {iostring.replacer(regex, replacement); return IOSTRING;}
 
-ND PUBLIC var  ucase(in instring) {return instring.ucase();}
+ND PUBLIC var  replace( in instring, const rex& regex, SomeFunction(in match_str)) {return instring.replace(regex, sf);}
+   PUBLIC IO   replacer(io iostring, const rex& regex, SomeFunction(in match_str)) {iostring.replacer(regex, sf); return IOSTRING;}
+
+ND PUBLIC var  ucase( in instring) {return instring.ucase();}
    PUBLIC IO   ucaser(io iostring) {iostring.ucaser(); return IOSTRING;}
 
-ND PUBLIC var  lcase(in instring) {return instring.lcase();}
+ND PUBLIC var  lcase( in instring) {return instring.lcase();}
    PUBLIC IO   lcaser(io iostring) {iostring.lcaser(); return IOSTRING;}
 
-ND PUBLIC var  tcase(in instring) {return instring.tcase();}
+ND PUBLIC var  tcase( in instring) {return instring.tcase();}
    PUBLIC IO   tcaser(io iostring) {iostring.tcaser(); return IOSTRING;}
 
-ND PUBLIC var  fcase(in instring) {return instring.fcase();}
+ND PUBLIC var  fcase( in instring) {return instring.fcase();}
    PUBLIC IO   fcaser(io iostring) {iostring.fcaser(); return IOSTRING;}
 
-ND PUBLIC var  normalize(in instring) {return instring.normalize();}
+ND PUBLIC var  normalize( in instring) {return instring.normalize();}
    PUBLIC IO   normalizer(io iostring) {iostring.normalizer(); return IOSTRING;}
 
+ND PUBLIC var  unique( in instring) {return instring.unique();}
    PUBLIC IO   uniquer(io iostring) {iostring.uniquer(); return IOSTRING;}
-ND PUBLIC var  unique(in instring) {return instring.unique();}
 
-ND PUBLIC var  invert(in instring) {return var(instring).invert();}
    PUBLIC IO   inverter(io iostring) {iostring.inverter(); return IOSTRING;}
-ND PUBLIC var  invert(var&& instring) {instring.inverter(); return instring;}
+ND PUBLIC var  invert(  in instring) {return var(instring).invert();}
+ND PUBLIC var  invert(  var&& instring) {instring.inverter(); return instring;}
 
-ND PUBLIC var  lower(in instring) {return instring.lower();}
+ND PUBLIC var  lower(  in instring) {return instring.lower();}
    PUBLIC IO   lowerer(io iostring) {iostring.lowerer(); return IOSTRING;}
 
-ND PUBLIC var  raise(in instring) {return instring.raise();}
+ND PUBLIC var  raise( in instring) {return instring.raise();}
    PUBLIC IO   raiser(io iostring) {iostring.raiser(); return IOSTRING;}
 
 // CUT
 
-ND PUBLIC var  cut(in instring, const int length) {return instring.cut(length);}
+ND PUBLIC var  cut(   in instring, const int length) {return instring.cut(length);}
           IO   cutter(io instring, const int length) {return instring.cutter(length);}
 
 // PASTER
 
 // 1. paste replace
-ND PUBLIC var  paste(in instring, const int pos1, const int length, in str) {return instring.paste(pos1, length, str);}
+ND PUBLIC var  paste( in instring, const int pos1, const int length, in str) {return instring.paste(pos1, length, str);}
    PUBLIC IO   paster(io iostring, const int pos1, const int length, in str) {iostring.paster(pos1, length, str); return IOSTRING;}
 
 //// 2. paste over to end
@@ -253,48 +256,48 @@ ND PUBLIC var  paste(in instring, const int pos1, const int length, in str) {ret
 //ND PUBLIC var  pasteall(in instring, const int pos1, in str);
 
 // 3. paste insert at pos1
-ND PUBLIC var  paste(in instring, const int pos1, in str) {return instring.paste(pos1, str);}
+ND PUBLIC var  paste( in instring, const int pos1, in str) {return instring.paste(pos1, str);}
    PUBLIC IO   paster(io iostring, const int pos1, in str) {iostring.paster(pos1, str); return IOSTRING;}
 
 // PREFIX
-ND PUBLIC var  prefix(in instring, in str) {return instring.prefix(str);}
+ND PUBLIC var  prefix(  in instring, in str) {return instring.prefix(str);}
    PUBLIC IO   prefixer(io iostring, in str) {iostring.prefixer(str); return IOSTRING;}
 
-ND PUBLIC var  pop(in instring) {return instring.pop();}
+ND PUBLIC var  pop(   in instring) {return instring.pop();}
    PUBLIC IO   popper(io iostring) {iostring.popper(); return IOSTRING;}
 
 
-ND PUBLIC var  quote(in instring) {return instring.quote();}
+ND PUBLIC var  quote( in instring) {return instring.quote();}
    PUBLIC IO   quoter(io iostring) {iostring.quoter(); return IOSTRING;}
 
-ND PUBLIC var  squote(in instring) {return instring.squote();}
+ND PUBLIC var  squote( in instring) {return instring.squote();}
    PUBLIC IO   squoter(io iostring) {iostring.squoter(); return IOSTRING;}
 
-ND PUBLIC var  unquote(in instring) {return instring.unquote();}
+ND PUBLIC var  unquote( in instring) {return instring.unquote();}
    PUBLIC IO   unquoter(io iostring) {iostring.unquoter(); return IOSTRING;}
 
 
-ND PUBLIC var  fieldstore(in instring, SV delimiter, const int fieldno, const int nfields, in replacement) {return instring.fieldstore(delimiter, fieldno, nfields, replacement);}
+ND PUBLIC var  fieldstore( in instring, SV delimiter, const int fieldno, const int nfields, in replacement) {return instring.fieldstore(delimiter, fieldno, nfields, replacement);}
    PUBLIC IO   fieldstorer(io iostring, SV delimiter, const int fieldno, const int nfields, in replacement) {iostring.fieldstorer(delimiter, fieldno, nfields, replacement); return IOSTRING;}
 
 
-ND PUBLIC var  trim(in instring, SV trimchars /*="*/) {return instring.trim(trimchars);}
+ND PUBLIC var  trim(     in instring, SV trimchars /*="*/) {return instring.trim(trimchars);}
 ND PUBLIC var  trimfirst(in instring, SV trimchars /*="*/) {return instring.trimfirst(trimchars);}
-ND PUBLIC var  trimlast(in instring, SV trimchars /*="*/) {return instring.trimlast(trimchars);}
-ND PUBLIC var  trimboth(in instring, SV trimchars /*="*/) {return instring.trimboth(trimchars);}
+ND PUBLIC var  trimlast( in instring, SV trimchars /*="*/) {return instring.trimlast(trimchars);}
+ND PUBLIC var  trimboth( in instring, SV trimchars /*="*/) {return instring.trimboth(trimchars);}
 
-   PUBLIC IO   trimmer(io iostring, SV trimchars /*="*/) {iostring.trimmer(trimchars); return IOSTRING;}
+   PUBLIC IO   trimmer(     io iostring, SV trimchars /*="*/) {iostring.trimmer(trimchars); return IOSTRING;}
    PUBLIC IO   trimmerfirst(io iostring, SV trimchars /*="*/) {iostring.trimmerfirst(trimchars); return IOSTRING;}
-   PUBLIC IO   trimmerlast(io iostring, SV trimchars /*="*/) {iostring.trimmerlast(trimchars); return IOSTRING;}
-   PUBLIC IO   trimmerboth(io iostring, SV trimchars /*="*/) {iostring.trimmerboth(trimchars); return IOSTRING;}
+   PUBLIC IO   trimmerlast( io iostring, SV trimchars /*="*/) {iostring.trimmerlast(trimchars); return IOSTRING;}
+   PUBLIC IO   trimmerboth( io iostring, SV trimchars /*="*/) {iostring.trimmerboth(trimchars); return IOSTRING;}
 
 ND PUBLIC var  first(in instring) {return instring.first();}
-ND PUBLIC var  last(in instring) {return instring.last();}
+ND PUBLIC var  last( in instring) {return instring.last();}
 ND PUBLIC var  first(in instring, const int nbytes) {return instring.first(nbytes);}
-ND PUBLIC var  last(in instring, const int nbytes) {return instring.last(nbytes);}
+ND PUBLIC var  last( in instring, const int nbytes) {return instring.last(nbytes);}
 
-ND PUBLIC var  chr(const int char_no) {return var::chr(char_no);}
-ND PUBLIC var  textchr(const int unicode_char_no) {return var::textchr(unicode_char_no);}
+ND PUBLIC var  chr(        const int char_no) {return var::chr(char_no);}
+ND PUBLIC var  textchr(    const int unicode_char_no) {return var::textchr(unicode_char_no);}
 ND PUBLIC var  textchrname(const int unicode_char_no) {return var::textchrname(unicode_char_no);}
 
 // Match
@@ -310,37 +313,37 @@ ND PUBLIC var  search(in instring, const rex& regex, io startchar1) {return inst
 // Ditto starting from first char.
 ND PUBLIC var  search(in instring, const rex& regex) {return instring.search(regex);}
 
-ND PUBLIC var  ord(in char1) {return char1.ord();}
+ND PUBLIC var  ord(    in char1) {return char1.ord();}
 ND PUBLIC var  textord(in char1) {return char1.textord();}
-ND PUBLIC var  str(in instring, const int number) {return instring.str(number);}
-ND PUBLIC var  space(const int nspaces) {return var::space(nspaces);}
-ND PUBLIC var  fcount(in instring, SV substr) {return instring.fcount(substr);}
-ND PUBLIC var  count(in instring, SV substr) {return instring.count(substr);}
+ND PUBLIC var  str(    in instring, const int number) {return instring.str(number);}
+ND PUBLIC var  space(  const int nspaces) {return var::space(nspaces);}
+ND PUBLIC var  fcount( in instring, SV substr) {return instring.fcount(substr);}
+ND PUBLIC var  count(  in instring, SV substr) {return instring.count(substr);}
 
-ND PUBLIC var  substr(in instring, const int startindex) {return instring.substr(startindex);}
-ND PUBLIC var  substr(in instring, const int startindex, const int length) {return instring.b(startindex, length);}
+ND PUBLIC var  substr(  in instring, const int startindex) {return instring.substr(startindex);}
+ND PUBLIC var  substr(  in instring, const int startindex, const int length) {return instring.b(startindex, length);}
    PUBLIC IO   substrer(io iostring, const int startindex) {iostring.substrer(startindex); return IOSTRING;}
    PUBLIC IO   substrer(io iostring, const int startindex, const int length) {iostring.substrer(startindex, length); return IOSTRING;}
 
 ND PUBLIC var  substr(in instring, const int startindex, SV delimiterchars, out pos2){return instring.substr(startindex, delimiterchars, pos2);}
 //   PUBLIC IO   substrer(io iostring, const int startindex, SV delimiterchars, out pos2) {iostring.substrer(startindex, delimiterchars, pos2) return IOSTRING;}
 
-ND PUBLIC bool starts(in instring, SV substr) {return instring.starts(substr);}
-ND PUBLIC bool ends(in instring, SV substr) {return instring.ends(substr);}
+ND PUBLIC bool starts  (in instring, SV substr) {return instring.starts(substr);}
+ND PUBLIC bool ends(    in instring, SV substr) {return instring.ends(substr);}
 ND PUBLIC bool contains(in instring, SV substr) {return instring.contains(substr);}
 
-ND PUBLIC var  index(in instring, SV substr, const int startindex /*=1*/) {return instring.index(substr, startindex);}
+ND PUBLIC var  index( in instring, SV substr, const int startindex /*=1*/) {return instring.index(substr, startindex);}
 ND PUBLIC var  indexn(in instring, SV substr, int occurrence) {return instring.indexn(substr, occurrence);}
 ND PUBLIC var  indexr(in instring, SV substr, const int startindex /*=-1*/) {return instring.indexr(substr, startindex);}
 
-ND PUBLIC var  field(in instring, SV substr, const int fieldno, const int nfields /*=1*/) {return instring.field(substr, fieldno, nfields);}
+ND PUBLIC var  field (in instring, SV substr, const int fieldno, const int nfields /*=1*/) {return instring.field(substr, fieldno, nfields);}
 ND PUBLIC var  field2(in instring, SV substr, const int fieldno, const int nfields /*=1*/) {return instring.field(substr, fieldno, nfields);}
 
 // STRINGS WITH FIELD MARKS
 
 ND PUBLIC var  substr2(in fromstr, io startindex, io delimiterno) {return fromstr.substr2(startindex, delimiterno);}
 
-ND PUBLIC dim split(in sourcevar, SV delimiter /*=_FM*/) {return sourcevar.split(delimiter);}
+ND PUBLIC dim split(   in sourcevar, SV delimiter /*=_FM*/) {return sourcevar.split(delimiter);}
 ND PUBLIC var  join(const dim& sourcedim, SV delimiter /*=_FM*/) {return sourcedim.join(delimiter);}
 
 ND PUBLIC var  update(in instring, const int fieldno, const int valueno, const int subvalueno, in replacement) {return instring.update(fieldno, valueno, subvalueno, replacement);}
@@ -349,11 +352,11 @@ ND PUBLIC var  update(in instring, const int fieldno, in replacement) {return in
 
 ND PUBLIC var  extract(in instring, const int fieldno /*=0*/, const int valueno /*=0*/, const int subvalueno /*=0*/) {return instring.f(fieldno, valueno, subvalueno);}
 
-ND PUBLIC var  insert(in instring, const int fieldno, const int valueno, const int subvalueno, in insertion) {return instring.insert(fieldno, valueno, subvalueno, insertion);}
-ND PUBLIC var  insert(in instring, const int fieldno, const int valueno, in insertion) {return instring.insert(fieldno, valueno, insertion);}
-ND PUBLIC var  insert(in instring, const int fieldno, in insertion) {return instring.insert(fieldno, insertion);}
+ND PUBLIC var  insert( in instring, const int fieldno, const int valueno, const int subvalueno, in insertion) {return instring.insert(fieldno, valueno, subvalueno, insertion);}
+ND PUBLIC var  insert( in instring, const int fieldno, const int valueno, in insertion) {return instring.insert(fieldno, valueno, insertion);}
+ND PUBLIC var  insert( in instring, const int fieldno, in insertion) {return instring.insert(fieldno, insertion);}
 
-ND PUBLIC var  remove(in instring, const int fieldno, const int valueno /*=0*/, const int subvalueno /*=0*/) {return instring.remove(fieldno, valueno, subvalueno);}
+ND PUBLIC var  remove( in instring, const int fieldno, const int valueno /*=0*/, const int subvalueno /*=0*/) {return instring.remove(fieldno, valueno, subvalueno);}
 
    PUBLIC IO   updater(io iostring, const int fieldno, const int valueno, const int subvalueno, in replacement) {iostring.updater(fieldno, valueno, subvalueno, replacement); return IOSTRING;}
    PUBLIC IO   updater(io iostring, const int fieldno, const int valueno, in replacement) {iostring.updater(fieldno, valueno, replacement); return IOSTRING;}
@@ -365,9 +368,9 @@ ND PUBLIC var  remove(in instring, const int fieldno, const int valueno /*=0*/, 
 
    PUBLIC IO   remover(io iostring, const int fieldno, const int valueno /*=0*/, const int subvalueno /*=0*/) {iostring.remover(fieldno, valueno, subvalueno); return IOSTRING;}
 
-ND PUBLIC var  locate(in target, in instring) {return instring.locate(target);}
-ND PUBLIC bool locate(in target, in instring, out setting) {return instring.locate(target, setting);}
-ND PUBLIC bool locate(in target, in instring, out setting, const int fieldno, const int valueno /*=0*/) {return instring.locate(target, setting, fieldno, valueno);}
+ND PUBLIC var  locate( in target, in instring) {return instring.locate(target);}
+ND PUBLIC bool locate( in target, in instring, out setting) {return instring.locate(target, setting);}
+ND PUBLIC bool locate( in target, in instring, out setting, const int fieldno, const int valueno /*=0*/) {return instring.locate(target, setting, fieldno, valueno);}
 
 ND PUBLIC bool locateby(const char* ordercode, in target, in instring, out setting) {return instring.locateby(ordercode, target, setting);}
 ND PUBLIC bool locateby(const char* ordercode, in target, in instring, out setting, const int fieldno, const int valueno /*=0*/) {return instring.locateby(ordercode, target, setting, fieldno, valueno);}
@@ -379,87 +382,87 @@ ND PUBLIC bool locateusing(in usingchar, in target, in instring) {return instrin
 ND PUBLIC bool locateusing(in usingchar, in target, in instring, out setting) {return instring.locateusing(usingchar, target, setting);}
 ND PUBLIC bool locateusing(in usingchar, in target, in instring, out setting, const int fieldno, const int valueno /*=0*/, const int subvalueno /*=0*/) {return instring.locateusing(usingchar, target, setting, fieldno, valueno, subvalueno);}
 
-ND PUBLIC var  sum(in instring, SV delimiter) {return instring.sum(delimiter);}
-ND PUBLIC var  sum(in instring) {return instring.sum();}
-ND PUBLIC var  sumall(in instring) {return instring.sumall();}
+ND PUBLIC var  sum(    in instring, SV delimiter) {return instring.sum(delimiter);}
+ND PUBLIC var  sum(    in instring) {return instring.sum();}
+ND PUBLIC var  sumall( in instring) {return instring.sumall();}
 
-ND PUBLIC var  hash(in instring, const std::uint64_t modulus) {return instring.hash(modulus);}
+ND PUBLIC var  hash(   in instring, const std::uint64_t modulus) {return instring.hash(modulus);}
 
-ND PUBLIC var  crop(in instring) {return instring.crop();}
+ND PUBLIC var  crop(   in instring) {return instring.crop();}
    PUBLIC IO   cropper(io iostring) {iostring.cropper(); return IOSTRING;}
 
-ND PUBLIC var  sort(in instring, SV delimiter /*=_FM*/) {return instring.sort(delimiter);}
-   PUBLIC IO   sorter(io iostring, SV delimiter /*=_FM*/) {iostring.sorter(delimiter); return IOSTRING;}
+ND PUBLIC var  sort(   in instring, SV delimiter /*=_FM*/) {return instring.sort(delimiter);}
+   PUBLIC IO   sorter( io iostring, SV delimiter /*=_FM*/) {iostring.sorter(delimiter); return IOSTRING;}
 
-ND PUBLIC var  reverse(in instring, SV delimiter /*=_FM*/) {return instring.reverse(delimiter);}
+ND PUBLIC var  reverse( in instring, SV delimiter /*=_FM*/) {return instring.reverse(delimiter);}
    PUBLIC IO   reverser(io iostring, SV delimiter /*=_FM*/) {iostring.reverser(delimiter); return IOSTRING;}
 
-ND PUBLIC var  shuffle(in instring, SV delimiter /*=_FM*/) {return instring.shuffle(delimiter);}
+ND PUBLIC var  shuffle( in instring, SV delimiter /*=_FM*/) {return instring.shuffle(delimiter);}
    PUBLIC IO   shuffler(io iostring, SV delimiter /*=_FM*/) {iostring.shuffler(delimiter); return IOSTRING;}
 
-ND PUBLIC var  parse(in instring, char sepchar /*=''*/) {return instring.parse(sepchar);}
-   PUBLIC IO   parser(io iostring, char sepchar /*=''*/) {iostring.parser(sepchar);}
+ND PUBLIC var  parse(   in instring, char sepchar /*=''*/) {return instring.parse(sepchar);}
+   PUBLIC IO   parser(  io iostring, char sepchar /*=''*/) {iostring.parser(sepchar);}
 
 // DATABASE
 
-ND PUBLIC bool connect(in connectioninfo /*=""*/) {var conn1; return conn1.connect(connectioninfo);}
+ND PUBLIC bool connect( in connectioninfo /*=""*/) {var conn1; return conn1.connect(connectioninfo);}
    PUBLIC void disconnect() {var().disconnect();}
    PUBLIC void disconnectall() {var().disconnectall();}
 
-ND PUBLIC bool sqlexec(in sqlcmd) {return var().sqlexec(sqlcmd);}
-ND PUBLIC bool sqlexec(in sqlcmd, out response) {return var().sqlexec(sqlcmd, response);}
+ND PUBLIC bool sqlexec( in sqlcmd) {return var().sqlexec(sqlcmd);}
+ND PUBLIC bool sqlexec( in sqlcmd, out response) {return var().sqlexec(sqlcmd, response);}
 
-ND PUBLIC bool attach(in filenames) {return var("").attach(filenames);}
+ND PUBLIC bool attach(  in filenames) {return var("").attach(filenames);}
 
 ND PUBLIC bool dbcreate(in dbname, in from_dbname) {return dbname.dbcreate(dbname, from_dbname);}
 ND PUBLIC var  dblist() {return var().dblist();}
-ND PUBLIC bool dbcopy(in from_dbname, in to_dbname) {return var().dbcopy(from_dbname, to_dbname);}
+ND PUBLIC bool dbcopy(  in from_dbname, in to_dbname) {return var().dbcopy(from_dbname, to_dbname);}
 ND PUBLIC bool dbdelete(in dbname) {return var().dbdelete(dbname);}
 
 ND PUBLIC bool createfile(in dbfilename);
 ND PUBLIC bool deletefile(in dbfilename_or_var);
-ND PUBLIC bool clearfile(in dbfilename_or_var);
+ND PUBLIC bool clearfile( in dbfilename_or_var);
 ND PUBLIC bool renamefile(in old_dbfilename, in new_dbfilename) {return old_dbfilename.renamefile(old_dbfilename.f(1), new_dbfilename);}
 ND PUBLIC var  listfiles() {return var().listfiles();}
 
-ND PUBLIC var  reccount(in dbfilename_or_var) {return dbfilename_or_var.reccount();}
+ND PUBLIC var  reccount(   in dbfilename_or_var) {return dbfilename_or_var.reccount();}
 
 ND PUBLIC bool createindex(in dbfilename_or_var, in fieldname /*=""*/, in dictfilename /*=""*/);
 ND PUBLIC bool deleteindex(in dbfilename_or_var, in fieldname /*=""*/);
-ND PUBLIC var  listindex(in dbfilename /*=""*/, in fieldname /*=""*/) {return var().listindex(dbfilename, fieldname);}
+ND PUBLIC var  listindex(  in dbfilename /*=""*/, in fieldname /*=""*/) {return var().listindex(dbfilename, fieldname);}
 
-ND PUBLIC bool begintrans() {return var().begintrans();}
-ND PUBLIC bool statustrans() {return var().statustrans();}
+ND PUBLIC bool begintrans()    {return var().begintrans();}
+ND PUBLIC bool statustrans()   {return var().statustrans();}
 ND PUBLIC bool rollbacktrans() {return var().rollbacktrans();}
-ND PUBLIC bool committrans() {return var().committrans();}
+ND PUBLIC bool committrans()   {return var().committrans();}
 
-ND PUBLIC bool lock(in dbfile, in key) {return static_cast<bool>(dbfile.lock(key));}
-   PUBLIC bool unlock(in dbfile, in key) {return dbfile.unlock(key);}
-   PUBLIC bool unlockall(in conn) {return conn.unlockall();}
+ND PUBLIC bool lock(      in dbfile, in key) {return static_cast<bool>(dbfile.lock(key));}
+   PUBLIC bool unlock(    in dbfile, in key) {return dbfile.unlock(key);}
+   PUBLIC bool unlockall( in conn) {return conn.unlockall();}
 
    PUBLIC void clearcache(in conn) {return conn.clearcache();}
 
-ND PUBLIC bool open(in dbfilename, io dbfile) {return dbfile.open(dbfilename);}
-ND PUBLIC bool open(in dbfilename) {return var().open(dbfilename);}
+ND PUBLIC bool open( in dbfilename, io dbfile) {return dbfile.open(dbfilename);}
+ND PUBLIC bool open( in dbfilename) {return var().open(dbfilename);}
 
    PUBLIC void close(in dbfile) {return dbfile.close();}
 
-ND PUBLIC bool read(out record, in dbfile, in key) {return record.read(dbfile, key);}
+ND PUBLIC bool read( out record, in dbfile, in key) {return record.read(dbfile, key);}
 ND PUBLIC bool readc(out record, in dbfile, in key) {return record.readc(dbfile, key);}
 ND PUBLIC bool readf(out field, in dbfile, in key, in fieldnumber) {return field.readf(dbfile, key, fieldnumber);}
 
-   PUBLIC void write(in record, in dbfile, in key) {record.write(dbfile, key);}
-   PUBLIC void writec(in record, in dbfile, in key) {record.writec(dbfile, key);}
-   PUBLIC void writef(in record, in dbfile, in key, const int fieldno) {record.writef(dbfile, key, fieldno);}
+   PUBLIC void write(       in record, in dbfile, in key) {record.write(dbfile, key);}
+   PUBLIC void writec(      in record, in dbfile, in key) {record.writec(dbfile, key);}
+   PUBLIC void writef(      in record, in dbfile, in key, const int fieldno) {record.writef(dbfile, key, fieldno);}
 ND PUBLIC bool updaterecord(in record, in dbfile, in key) {return record.updaterecord(dbfile, key);}
-ND PUBLIC bool updatekey(in dbfile, in key, in newkey) {return dbfile.updatekey(key, newkey);}
+ND PUBLIC bool updatekey(   in dbfile, in key, in newkey) {return dbfile.updatekey(key, newkey);}
 ND PUBLIC bool insertrecord(in record, in dbfile, in key) {return record.insertrecord(dbfile, key);}
 //ND PUBLIC bool deleterecord(in dbfile, in key) {return dbfile.deleterecord(key);}
-ND PUBLIC bool deletec(in dbfile, in key) {return dbfile.deletec(key);}
+ND PUBLIC bool deletec(     in dbfile, in key) {return dbfile.deletec(key);}
 
 //ND PUBLIC bool dimread(dim& dimrecord, in dbfile, in key) {return dimrecord.read(dbfile, key);
 //   PUBLIC void dimwrite(const dim& dimrecord, in dbfile, in key) {dimrecord.write(dbfile, key);}
-ND PUBLIC bool read(dim& dimrecord, in dbfile, in key) {return dimrecord.read(dbfile, key);}
+ND PUBLIC bool read(       dim& dimrecord, in dbfile, in key) {return dimrecord.read(dbfile, key);}
    PUBLIC void write(const dim& dimrecord, in dbfile, in key) {dimrecord.write(dbfile, key);}
 
 ND PUBLIC var  xlate(in dbfilename, in key, in fieldno, const char* mode);

@@ -276,6 +276,7 @@ auto get_timebank_acno(const std::string_view arg1) -> int {
 	else if (++acno && arg1 == "var  var::match(SV regex_str, SV regex_options) const") {}
 	else if (++acno && arg1 == "void var::replacer(SV what, SV with) &") {}
 	else if (++acno && arg1 == "var  var::replace(const rex& regex, SV replacement) const") {}
+	else if (++acno && arg1 == "var  var::replace(const rex& regex, SomeFunction(in match_str)) const") {}
 	else if (++acno && arg1 == "var  var::field(SV delimiter, const int fieldnx, const int nfieldsx) const") {}
 	else if (++acno && arg1 == "void var::fieldstorer(SV separator0, const int fieldnx, const int nfieldsx, in replacementx) &") {}
 	else if (++acno && arg1 == "bool var::locate(in target, out setting, const int fieldno, const int valueno) const") {}

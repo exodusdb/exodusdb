@@ -425,10 +425,10 @@ friend class dim_iter;
 	// Using undimensioned arrays allows the efficient handling of arrays with a very variable number of elements. e.g. os text files.
 	//
 	// `dim d1;
-	//  d1.splitter("f1^f2^f3"_var); // d1.rows() -> 3  // Automatically dimensioned.
+	//  d1.splitter("f1^f2^f3"_var); // d1.rows() -> 3  //// Automatically dimensioned.
 	//  //
 	//  dim d2(10);
-	//  d2.splitter("f1^f2^f3"_var); // d2.rows() -> 10 // Predimensioned. Excess elements become ""`
+	//  d2.splitter("f1^f2^f3"_var); // d2.rows() -> 10 /// Predimensioned. Excess elements become ""`
 	//
 	void splitter(in str1, SV delimiter = _FM);
 

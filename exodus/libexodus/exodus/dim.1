@@ -272,10 +272,10 @@ Using undimensioned arrays allows the efficient handling of arrays with a very v
 .RS
 .nf
 dim d1;
-d1.splitter("f1^f2^f3"_var); // d1.rows() -> 3  // Automatically dimensioned.
+d1.splitter("f1^f2^f3"_var); // d1.rows() -> 3  //// Automatically dimensioned.
 //
 dim d2(10);
-d2.splitter("f1^f2^f3"_var); // d2.rows() -> 10 // Predimensioned. Excess elements become ""
+d2.splitter("f1^f2^f3"_var); // d2.rows() -> 10 /// Predimensioned. Excess elements become ""
 .fi
 .RE
 
