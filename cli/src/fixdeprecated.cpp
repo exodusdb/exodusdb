@@ -1,8 +1,8 @@
 #include <exodus/program.h>
 programinit()
 
-let syntax = R"(
-SYNTAX
+let syntax =
+R"(SYNTAX
 	fixdeprecated [file|dir...] {OPTIONS}
 	Will read compiler output from standard input if available file|dir are not provided.
 OPTIONS
@@ -288,43 +288,42 @@ func main() {
 		auto source_fixer = [](io srcline) {
 
 			// NOT doing move until brackets are fixed first
-////			srcline.replacer(R"__(\bmove\()__"_rex, "move_to\\(");
+////			srcline.replacer(R"__(\bmove\()__"_rex, "move_to(");
 //			// pp.dtext[pp.dn, pnx].move(tq);
 //			// response_.move(RECORD);
-//			srcline.replacer(R"__(([_\w.\[\]]+)\.move\(([_\w.\[\]]+)\);)__"_rex, "$2 = $1\\.move\\(\\);");
+//			srcline.replacer(R"__(([_\w.\[\]]+)\.move\(([_\w.\[\]]+)\);)__"_rex, "$2 = $1\\.move();");
 
 			srcline.replacer(R"__(ostempdirpath()__", "ostempdir(");
 			srcline.replacer(R"__(ostempfilename()__", "ostempfile(");
-			srcline.replacer(R"__(\bvar\((\d+)\)\.space\(\))__"_rex, R"__(space\(\1\))__");
-			srcline.replacer(R"__(\b([a-zA-Z0-9_.]+)\.space\(\))__"_rex, R"__(space\(\1\))__");
+			srcline.replacer(R"__(\bvar\((\d+)\)\.space\(\))__"_rex, "space($1)");
+			srcline.replacer(R"__(\b([a-zA-Z0-9_.]+)\.space\(\))__"_rex, "space($1)");
 
-			srcline.replacer(R"__(\bseq\()__"_rex, R"__(ord\()__");
+			srcline.replacer(R"__(\bseq\()__"_rex, "ord(");
 
 			srcline.replacer(R"__(makelist("", )__", "selectkeys(");
 			srcline.replacer(R"__(field2()__", "field(");
 
 			// if (not lkfile.osopen(lkfilename, "C")) {
 			// if (not ovfile.osopen(osfile ^ ".OV", "C")) {
-//			srcline.replacer(R"__("C")__", R"__(false)__");
-			srcline.replacer(R"__((osopen\([^,]+,[^"]*)"C")__"_rex, R"__($1false)__");
+			srcline.replacer(R"__((osopen\([^,]+,[^"]*)"C")__"_rex, "$1false");
 
 			// reply.input();
 			// if (not reply.input()) {}
-			srcline.replacer(R"__(^(\s*)([a-zA-Z0-9_.]+\.input\([^)]*\));)__"_rex, R"__($1if \(not $2\) {})__");
+			srcline.replacer(R"__(^(\s*)([a-zA-Z0-9_.]+\.input\([^)]*\));)__"_rex, "$1if (not $2) {}");
 
 			//call pushselect(0, v69, v70, v71);
 			//call popselect(0, v69, v70, v71);
-			srcline.replacer(R"__(\b(push|pop)select\([^,]+,\s*([a-zA-Z0-9_]+).*)__"_rex, "$1select\\($2\\);");
+			srcline.replacer(R"__(\b(push|pop)select\([^,]+,\s*([a-zA-Z0-9_]+).*)__"_rex, "$1select($2);");
 
 			//MVLogoff -> ExoLogoff
 			srcline.replacer(R"__(\bMVLogoff\b)__"_rex, "ExoLogoff");
 
 			//tcase(mediacodes, "QUOTE");
 			//mediacode.replace(_VM, "\" \"").quote();
-			srcline.replacer(R"__(\bcapitalise\(([a-zA-Z0-9_]+), "QUOTE"\);)__"_rex, R"__($1.replace\(_VM, "\\" \\""\).quote\(\);)__");
+			srcline.replacer(R"__(\bcapitalise\(([a-zA-Z0-9_]+), "QUOTE"\);)__"_rex, R"__($1.replace(_VM, "\" \"").quote();)__");
 
 			//capitalise( -> tcase(
-			srcline.replacer(R"__(\bcapitalise\()__"_rex, "tcase\\(");
+			srcline.replacer(R"__(\bcapitalise\()__"_rex, "tcase(");
 
 			//mssg( -> note(
 			srcline.replacer("mssg(", "note(");
@@ -332,7 +331,7 @@ func main() {
 			// call note("WAITING TO GET NEXT VOUCHER NUMBER", "T");
 			// call note(msg, "T1");
 			if (srcline.contains("note("))
-				srcline.replacer(R"__(, "T1?"\);)__"_rex, R"__(\); ossleep\(1000\);)__");
+				srcline.replacer(R"__(, "T1?"\);)__"_rex, "); ossleep(1000);");
 
 			// call note("Starting at what date ?", "RC", fromdate, "");
 			// call note(question, "RC", reply, 1);
@@ -344,7 +343,7 @@ func main() {
 			}
 
 			//timestamp( -> ostimestamp(
-			srcline.replacer(R"__(\btimestamp\()__"_rex, "ostimestamp\\(");
+			srcline.replacer(R"__(\btimestamp\()__"_rex, "ostimestamp(");
 
 		};
 

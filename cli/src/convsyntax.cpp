@@ -131,7 +131,7 @@ func main() {
 					", ?"			// ,
 					"([^,]+)"		// (3) Everything else if no comma is the replacement
 					"\\);"_rex		// The trailing );
-				, R"(\1(\2) = \3;)");
+				, "$1($2) = $3;");
 
 				//x(fn, vn) = y;
 				line2.replacer(
@@ -143,7 +143,7 @@ func main() {
 					", ?"			// ,
 					"([^,]+)"		// (4) Everything else if no comma is the replacement
 					"\\);"_rex		// The trailing );
-				, R"(\1(\2, \3) = \4;)");
+				, "$1($2, $3) = $4;");
 
 				//x(fn, vm , sn) = y;
 				line2.replacer(
@@ -157,7 +157,7 @@ func main() {
 					", ?"			// ,
 					"([^,]+)"		// (5) Everything else if no comma is the replacement
 					"\\);"_rex		// The trailing );
-				, R"(\1(\2, \3, \4) = \5;)");
+				, "$1($2, $3, $4) = $5;");
 
 
 				if (line2.contains(".r(")) {
@@ -230,7 +230,7 @@ func main() {
 				} else if (forrange == 2) {
 					line2.replacer(
 						R"___(\tfor \(([a-z0-9_]+?) = (.+?); \1 (<=|le) (.+?); (\+\+\1|\1\+\+)\))___"_rex,
-						R"___(\tfor \(let \1 : range\(\2, \4\)\))___");
+						"\tfor (let $1 : range($2, $4))");
 						//R"___(\tfor \(([a-zA-Z_.0-9]+) =)___",
 						//R"___(QQQ : range\()___");
 	//				if (line.contains("QQQ"))
@@ -269,21 +269,21 @@ func main() {
 
 			// B - substr() to b()
 			if (substr2b) {
-				line2.replacer(R"__(\.substr\()__"_rex, R"__(.b\()__");
+				line2.replacer(R"__(\.substr\()__"_rex, ".b(");
 			}
 
 			// S - .b(1, ..) == -> .starts(..
-			//var newrec = RECORD.replace(R"(\.b\(1, \d+\) == (".*"))"_rex, R"(.starts(\1)");
+			//var newrec = RECORD.replace(R"(\.b\(1, \d+\) == (".*"))"_rex, R"(.starts($1)");
 			if (b1eq2starts) {
 				line2.replacer(
 					rex(R"__(\.b\(1, ?\d+\) ?(eq|==) ?(".*?"))__", "g"),
-					R"__(.starts\(\2\))__"
+					".starts($2)"
 				);
 
 				// first
 				line.replacer(
 					rex(R"__(\.b\(1, ?(\d+)\))__", "g"),
-					R"__(.first\(\1\))__"
+					".first($1)"
 				);
 			}
 
@@ -293,13 +293,13 @@ func main() {
 				// ends
 				line2.replacer(
 					rex(R"__(\.b\(-(\d+), ?\1\) ?(eq|==) ?(".*?"))__", "g"),
-					R"__(.ends\(\3\))__"
+					".ends($3)"
 				);
 
 				// last
 				line2.replacer(
 					rex(R"__(\.b\(-(\d+), ?\1\))__", "g"),
-					R"__(.last\(\1\))__"
+					".last($1)"
 				);
 			}
 
@@ -307,39 +307,39 @@ func main() {
 			if (cutting) {
 				line2.replacer(
 					R"__(\.b\(2\))__"_rex,
-					R"__(\.cut\(1\))__"
+					".cut(1)"
 				);
 				line2.replacer(
 					R"__(\.b\(3\))__"_rex,
-					R"__(\.cut\(2\))__"
+					".cut(2)"
 				);
 				line2.replacer(
 					R"__(\.b\(4\))__"_rex,
-					R"__(\.cut\(3\))__"
+					".cut(3)"
 				);
 				line2.replacer(
 					R"__(\.b\(5\))__"_rex,
-					R"__(\.cut\(4\))__"
+					".cut(4)"
 				);
 				line2.replacer(
 					R"__(\.b\(6\))__"_rex,
-					R"__(\.cut\(5\))__"
+					".cut(5)"
 				);
 				line2.replacer(
 					R"__(\.b\(7\))__"_rex,
-					R"__(\.cut\(6\))__"
+					".cut(6)"
 				);
 				line2.replacer(
 					R"__(\.b\(8\))__"_rex,
-					R"__(\.cut\(7\))__"
+					".cut(7)"
 				);
 				line2.replacer(
 					R"__(\.b\(9\))__"_rex,
-					R"__(\.cut\(8\))__"
+					".cut(8)"
 				);
 				line2.replacer(
 					R"__(\.b\(10\))__"_rex,
-					R"__(\.cut\(9\))__"
+					".cut(9)"
 				);
 			}
 
@@ -349,7 +349,7 @@ func main() {
 				line2.replacer(
 					//R"__(.paster\(1,\s*([A-Z0-9a-z_. + -]+),\s*""\))__"_rex,
 					R"__(.paster\(1,\s*([^,]+),\s*""\))__"_rex,
-					R"__(.cutter\(\1\))__"
+					".cutter($1)"
 				);
 
 			}
@@ -359,20 +359,20 @@ func main() {
 
 				line2.replacer(
 					R"__(\.oconv\("D2/E"\)\.first\(2\))__"_rex,
-					R"__(\.oconv\("DD"\))__"
+					".oconv(\"DD\")"
 				);
 
 				// .b(9, 99) -> .b(9)
 				line2.replacer(
 					R"__(\.b\(([a-zA-Z_0-9"]+), 99+\))__"_rex,
 					//R"__(\.b\((\d), 99+\))__",
-					R"__(.b\(\1\))__"
+					".b($1)"
 				);
 
 				// .b(1, -> .starts(
 				line2.replacer(
 					R"__(\.b\(1,\s*)__"_rex,
-					R"__(.first\()__"
+					".first("
 				);
 
 			}
@@ -382,7 +382,7 @@ func main() {
 				// var().date/time/chr( -> date/time/chr(
 				line2.replacer(
 					R"__(var\(\)\.(chr|date|time)\()__"_rex,
-					R"__(\1\()__"
+					"$1("
 				);
 
 			}
@@ -392,12 +392,12 @@ func main() {
 
 				line2.replacer(
 					R"__(\[1\]\s(eq|==)\s(".{1,2}"|[A-Z0-9a-z_.]+\b))__"_rex,
-					R"__(.starts\(\2\))__"
+					".starts($2)"
 				);
 
 				line2.replacer(
 					R"__(\[-1\]\s(eq|==)\s(".{1,2}"|[A-Z0-9a-z_.]+\b))__"_rex,
-					R"__(.ends\(\2\))__"
+					".ends($2)"
 				);
 
 			}

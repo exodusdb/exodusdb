@@ -69,12 +69,13 @@ func main() {
 		// https://en.cppreference.com/w/cpp/regex/syntax_option_type
 		var v1 = "zzxayyzz";
 		var rv = ".*(a|xayy)";
-		assert(v1.replace(rex(rv, ""  ), R"/(\(\1\))/").outputl() == "(a)yyzz" ); // ECMA           depth first
-		assert(v1.replace(rex(rv, "b" ), R"/(\(\1\))/").outputl() == v1        ); // BASIC POSIX    no change here
-		assert(v1.replace(rex(rv, "e" ), R"/(\(\1\))/").outputl() == "(xayy)zz"); // EXTENDED POSIX leftmost longest
-		assert(v1.replace(rex(rv, "a" ), R"/(\(\1\))/").outputl() == "(xayy)zz"); // AWK
-		assert(v1.replace(rex(rv, "g" ), R"/(\(\1\))/").outputl() == v1        ); // GREP = BASIC plus \n
-		assert(v1.replace(rex(rv, "eg"), R"/(\(\1\))/").outputl() == "(xayy)zz"); // EGREP
+		assert(v1.match(rv) == "zzxa]a"_var);                           // ECMA is exodus default
+		assert(v1.match(rex(rv, "")).errputl() == "zzxa]a"_var);        // ECMA           "depth first"
+		assert(v1.match(rex(rv, "b")).errputl() == ""_var);             // BASIC POSIX     -
+		assert(v1.match(rex(rv, "e")).errputl() == "zzxayy]xayy"_var);  // EXTENDED POSIX "leftmost longest"
+		assert(v1.match(rex(rv, "a")).errputl() == "zzxayy]xayy"_var);  // AWK             -
+		assert(v1.match(rex(rv, "g")).errputl() == ""_var);             // GREP            Same as BASIC plus \n
+		assert(v1.match(rex(rv, "eg")).errputl() == "zzxayy]xayy"_var); // EGREP           Same as EXTENDED POSIX?
 	}
         // single-line. ^ only matches beginning of string and not any embedded \n chars
         assert(replace("aaa\nbbb\nccc\n", rex("^b.*?$", "s"), "QQQ").outputl() eq "aaa\nbbb\nccc\n");
@@ -84,68 +85,68 @@ func main() {
 
         // DEFAULT multiline ^ matches beginning of string AND any embedded \n chars
         assert(replace("aaa\nbbb\nccc\n", rex("^b.*?$", "m"), "QQQ").outputl() eq "aaa\nQQQ\nccc\n");
-
+//
+//	{
+//		var v1 = "zzxa\nyyzz";
+//		var rv = ".*";
+//		assert(v1.replace(rex(rv, ""  ),"($1)").outputl() == "()()"); // ECMA           depth first
+//		assert(v1.replace(rex(rv, "b" ),"($1)").outputl() == "()()"); // BASIC POSIX    no change here
+//		assert(v1.replace(rex(rv, "e" ),"($1)").outputl() == "()()"); // EXTENDED POSIX leftmost longest
+//		assert(v1.replace(rex(rv, "a" ),"($1)").outputl() == "()()"); // AWK
+//		assert(v1.replace(rex(rv, "g" ),"($1)").outputl() == "()()"); // GREP
+//		assert(v1.replace(rex(rv, "eg"),"($1)").outputl() == "()()"); // EXTENDED GREP
+//
+//		// s - single line
+//		assert(v1.replace(rex(rv, "s"  ),"($1)").outputl() == "()()"); // ECMA           depth first
+//		assert(v1.replace(rex(rv, "sb" ),"($1)").outputl() == "()()"); // BASIC POSIX    no change here
+//		assert(v1.replace(rex(rv, "se" ),"($1)").outputl() == "()()"); // EXTENDED POSIX leftmost longest
+//		assert(v1.replace(rex(rv, "sa" ),"($1)").outputl() == "()()"); // AWK
+//		assert(v1.replace(rex(rv, "sg" ),"($1)").outputl() == "()()"); // GREP
+//		assert(v1.replace(rex(rv, "seg"),"($1)").outputl() == "()()"); // EXTENDED GREP
+//
+//		// m - multiline
+//		assert(v1.replace(rex(rv, "m"  ),"($1)").outputl() == "()()"); // ECMA           depth first
+//		assert(v1.replace(rex(rv, "mb" ),"($1)").outputl() == "()()"); // BASIC POSIX    no change here
+//		assert(v1.replace(rex(rv, "me" ),"($1)").outputl() == "()()"); // EXTENDED POSIX leftmost longest
+//		assert(v1.replace(rex(rv, "ma" ),"($1)").outputl() == "()()"); // AWK
+//		assert(v1.replace(rex(rv, "mg" ),"($1)").outputl() == "()()"); // GREP
+//		assert(v1.replace(rex(rv, "meg"),"($1)").outputl() == "()()"); // EXTENDED GREP
+//
+//	}
+//
+//	{
+//		var v1 = "zzxa\nyyzz";
+//		var rv = "^.*$";
+//		assert(v1.replace(rex(rv, ""  ),"($1)").outputl() == "()"); // ECMA           depth first
+//		assert(v1.replace(rex(rv, "b" ),"($1)").outputl() == "()"); // BASIC POSIX    no change here
+//		assert(v1.replace(rex(rv, "e" ),"($1)").outputl() == "()"); // EXTENDED POSIX leftmost longest
+//		assert(v1.replace(rex(rv, "a" ),"($1)").outputl() == "()"); // AWK
+//		assert(v1.replace(rex(rv, "g" ),"($1)").outputl() == "()"); // GREP
+//		assert(v1.replace(rex(rv, "eg"),"($1)").outputl() == "()"); // EXTENDED GREP
+//
+//		// s - single line
+//		assert(v1.replace(rex(rv, "s"  ),"($1)").outputl() == "()"); // ECMA           depth first
+//		assert(v1.replace(rex(rv, "sb" ),"($1)").outputl() == "()"); // BASIC POSIX    no change here
+//		assert(v1.replace(rex(rv, "se" ),"($1)").outputl() == "()"); // EXTENDED POSIX leftmost longest
+//		assert(v1.replace(rex(rv, "sa" ),"($1)").outputl() == "()"); // AWK
+//		assert(v1.replace(rex(rv, "sg" ),"($1)").outputl() == "()"); // GREP
+//		assert(v1.replace(rex(rv, "seg"),"($1)").outputl() == "()"); // EXTENDED GREP
+//
+//		// m - multiline
+//		assert(v1.replace(rex(rv, "m"  ),"($1)").outputl() == "()"); // ECMA           depth first
+//		assert(v1.replace(rex(rv, "mb" ),"($1)").outputl() == "()"); // BASIC POSIX    no change here
+//		assert(v1.replace(rex(rv, "me" ),"($1)").outputl() == "()"); // EXTENDED POSIX leftmost longest
+//		assert(v1.replace(rex(rv, "ma" ),"($1)").outputl() == "()"); // AWK
+//		assert(v1.replace(rex(rv, "mg" ),"($1)").outputl() == "()"); // GREP
+//		assert(v1.replace(rex(rv, "meg"),"($1)").outputl() == "()"); // EXTENDED GREP
+//
+//	}
 	{
-		var v1 = "zzxa\nyyzz";
-		var rv = ".*";
-		assert(v1.replace(rex(rv, ""  ), R"/(\(\1\))/").outputl() == "()()"); // ECMA           depth first
-		assert(v1.replace(rex(rv, "b" ), R"/(\(\1\))/").outputl() == "()()"); // BASIC POSIX    no change here
-		assert(v1.replace(rex(rv, "e" ), R"/(\(\1\))/").outputl() == "()()"); // EXTENDED POSIX leftmost longest
-		assert(v1.replace(rex(rv, "a" ), R"/(\(\1\))/").outputl() == "()()"); // AWK
-		assert(v1.replace(rex(rv, "g" ), R"/(\(\1\))/").outputl() == "()()"); // GREP
-		assert(v1.replace(rex(rv, "eg"), R"/(\(\1\))/").outputl() == "()()"); // EXTENDED GREP
-
-		// s - single line
-		assert(v1.replace(rex(rv, "s"  ), R"/(\(\1\))/").outputl() == "()()"); // ECMA           depth first
-		assert(v1.replace(rex(rv, "sb" ), R"/(\(\1\))/").outputl() == "()()"); // BASIC POSIX    no change here
-		assert(v1.replace(rex(rv, "se" ), R"/(\(\1\))/").outputl() == "()()"); // EXTENDED POSIX leftmost longest
-		assert(v1.replace(rex(rv, "sa" ), R"/(\(\1\))/").outputl() == "()()"); // AWK
-		assert(v1.replace(rex(rv, "sg" ), R"/(\(\1\))/").outputl() == "()()"); // GREP
-		assert(v1.replace(rex(rv, "seg"), R"/(\(\1\))/").outputl() == "()()"); // EXTENDED GREP
-
-		// m - multiline
-		assert(v1.replace(rex(rv, "m"  ), R"/(\(\1\))/").outputl() == "()()"); // ECMA           depth first
-		assert(v1.replace(rex(rv, "mb" ), R"/(\(\1\))/").outputl() == "()()"); // BASIC POSIX    no change here
-		assert(v1.replace(rex(rv, "me" ), R"/(\(\1\))/").outputl() == "()()"); // EXTENDED POSIX leftmost longest
-		assert(v1.replace(rex(rv, "ma" ), R"/(\(\1\))/").outputl() == "()()"); // AWK
-		assert(v1.replace(rex(rv, "mg" ), R"/(\(\1\))/").outputl() == "()()"); // GREP
-		assert(v1.replace(rex(rv, "meg"), R"/(\(\1\))/").outputl() == "()()"); // EXTENDED GREP
-
-	}
-
-	{
-		var v1 = "zzxa\nyyzz";
-		var rv = "^.*$";
-		assert(v1.replace(rex(rv, ""  ), R"/(\(\1\))/").outputl() == "()"); // ECMA           depth first
-		assert(v1.replace(rex(rv, "b" ), R"/(\(\1\))/").outputl() == "()"); // BASIC POSIX    no change here
-		assert(v1.replace(rex(rv, "e" ), R"/(\(\1\))/").outputl() == "()"); // EXTENDED POSIX leftmost longest
-		assert(v1.replace(rex(rv, "a" ), R"/(\(\1\))/").outputl() == "()"); // AWK
-		assert(v1.replace(rex(rv, "g" ), R"/(\(\1\))/").outputl() == "()"); // GREP
-		assert(v1.replace(rex(rv, "eg"), R"/(\(\1\))/").outputl() == "()"); // EXTENDED GREP
-
-		// s - single line
-		assert(v1.replace(rex(rv, "s"  ), R"/(\(\1\))/").outputl() == "()"); // ECMA           depth first
-		assert(v1.replace(rex(rv, "sb" ), R"/(\(\1\))/").outputl() == "()"); // BASIC POSIX    no change here
-		assert(v1.replace(rex(rv, "se" ), R"/(\(\1\))/").outputl() == "()"); // EXTENDED POSIX leftmost longest
-		assert(v1.replace(rex(rv, "sa" ), R"/(\(\1\))/").outputl() == "()"); // AWK
-		assert(v1.replace(rex(rv, "sg" ), R"/(\(\1\))/").outputl() == "()"); // GREP
-		assert(v1.replace(rex(rv, "seg"), R"/(\(\1\))/").outputl() == "()"); // EXTENDED GREP
-
-		// m - multiline
-		assert(v1.replace(rex(rv, "m"  ), R"/(\(\1\))/").outputl() == "()"); // ECMA           depth first
-		assert(v1.replace(rex(rv, "mb" ), R"/(\(\1\))/").outputl() == "()"); // BASIC POSIX    no change here
-		assert(v1.replace(rex(rv, "me" ), R"/(\(\1\))/").outputl() == "()"); // EXTENDED POSIX leftmost longest
-		assert(v1.replace(rex(rv, "ma" ), R"/(\(\1\))/").outputl() == "()"); // AWK
-		assert(v1.replace(rex(rv, "mg" ), R"/(\(\1\))/").outputl() == "()"); // GREP
-		assert(v1.replace(rex(rv, "meg"), R"/(\(\1\))/").outputl() == "()"); // EXTENDED GREP
-
-	}
-	{
-		var v1 = "zzxa\nayzz";
-		var rv = "^a.*";
-		assert(v1.replace(rex(rv, ""  ), R"/(\(\1\))/").outputl() == "zzxa\n()"); // ECMA           depth first
-		assert(v1.replace(rex(rv, "m" ), R"/(\(\1\))/").outputl() == "zzxa\n()"); // ECMA           depth first
-		assert(v1.replace(rex(rv, "s" ), R"/(\(\1\))/").outputl() == v1); // ECMA           depth first
+		var v1 = "zzxa\nayzz\nbcd";
+		var rv = "^a(.*?)$";  // You must use *? not to gobble up newlines as well.
+		assert(v1.replace(rex(rv, ""  ), "q(w$1e)r").outputl() == "zzxa\nq(wyzze)r\nbcd"); // Default is multiline
+		assert(v1.replace(rex(rv, "m" ), "q(w$1e)r").outputl() == "zzxa\nq(wyzze)r\nbcd"); // Multiline
+		assert(v1.replace(rex(rv, "s" ), "q($1)").outputl() == v1);                        // Single line doesnt match
 	}
 
 	{
@@ -153,9 +154,9 @@ func main() {
 		// Despite claim for "multiline" regex
 		var v1 = "zzxa\nayzz\n123";
 		var rv = "^a.*";
-		assert(v1.replace(rex(rv, ""  ), R"/(\(\1\))/").outputl() == "zzxa\n()"); // ECMA           depth first
-		assert(v1.replace(rex(rv, "m" ), R"/(\(\1\))/").outputl() == "zzxa\n()"); // ECMA           depth first
-		assert(v1.replace(rex(rv, "s" ), R"/(\(\1\))/").outputl() == v1); // ECMA           depth first
+		assert(v1.replace(rex(rv, ""  ), "($1)").outputl() == "zzxa\n()"); // ECMA           depth first
+		assert(v1.replace(rex(rv, "m" ), "($1)").outputl() == "zzxa\n()"); // ECMA           depth first
+		assert(v1.replace(rex(rv, "s" ), "($1)").outputl() == v1); // ECMA           depth first
 	}
 
 	{
@@ -163,9 +164,9 @@ func main() {
 		// e.g. .*?$
 		var v1 = "zzxa\nayzz\n123";
 		var rv = "^a.*?$";
-		assert(v1.replace(rex(rv, ""  ), R"/(\(\1\))/").outputl() == "zzxa\n()\n123"); // ECMA           depth first
-		assert(v1.replace(rex(rv, "m" ), R"/(\(\1\))/").outputl() == "zzxa\n()\n123"); // ECMA           depth first
-		assert(v1.replace(rex(rv, "s" ), R"/(\(\1\))/").outputl() == v1); // ECMA           depth first
+		assert(v1.replace(rex(rv, ""  ),"($1)").outputl() == "zzxa\n()\n123"); // ECMA           depth first
+		assert(v1.replace(rex(rv, "m" ),"($1)").outputl() == "zzxa\n()\n123"); // ECMA           depth first
+		assert(v1.replace(rex(rv, "s" ),"($1)").outputl() == v1); // ECMA           depth first
 	}
 
 	{
@@ -225,9 +226,9 @@ func main() {
 	}
 
 	{
-	    // Original tests with c ^ c (doubling)
+	    // Tests with c ^ c (doubling)
 	    std::cout << "Testing original doubling behavior:\n";
-	    assert("abc"_var.replace("b"_rex, [](auto c) { return c ^ c; }) == "abbc");
+	    assert("abc"_var.replace("b"_rex, [](auto c) { return c ^ c; }).outputl() == "abbc");
 	    assert("abcbd"_var.replace("b"_rex, [](auto c) { return c ^ c; }) == "abbcbbd");
 	    assert("abcb"_var.replace("b"_rex, [](auto c) { return c ^ c; }) == "abbcbb");
 	    assert("bcb"_var.replace("b"_rex, [](auto c) { return c ^ c; }) == "bbcbb");
@@ -235,7 +236,19 @@ func main() {
 	    assert("b"_var.replace("b"_rex, [](auto c) { return c ^ c; }) == "bb");
 	    assert(""_var.replace("b"_rex, [](auto c) { return c ^ c; }) == "");
 	    assert("ac"_var.replace("b"_rex, [](auto c) { return c ^ c; }) == "ac");
-	    std::cout << "All doubling tests passed.\n";
+	    std::cout << "All doubling all tests passed.\n";
+
+	    // Tests with c ^ c (doubling) First only.
+	    std::cout << "Testing original doubling behavior:\n";
+	    assert("abc"_var.replace(rex("b", "f"), [](auto c) { return c ^ c; }).outputl() == "abbc");
+	    assert("abcbd"_var.replace(rex("b", "f"), [](auto c) { return c ^ c; }) == "abbcbd");
+	    assert("abcb"_var.replace(rex("b", "f"), [](auto c) { return c ^ c; }) == "abbcb");
+	    assert("bcb"_var.replace(rex("b", "f"), [](auto c) { return c ^ c; }) == "bbcb");
+	    assert("bb"_var.replace(rex("b", "f"), [](auto c) { return c ^ c; }) == "bbb");
+	    assert("b"_var.replace(rex("b", "f"), [](auto c) { return c ^ c; }) == "bb");
+	    assert(""_var.replace(rex("b", "f"), [](auto c) { return c ^ c; }) == "");
+	    assert("ac"_var.replace(rex("b", "f"), [](auto c) { return c ^ c; }) == "ac");
+	    std::cout << "All doubling first tests passed.\n";
 
 	    // New tests with "" (empty string replacement)
 	    std::cout << "\nTesting empty string replacement:\n";
@@ -305,6 +318,18 @@ func main() {
 		var words = "programinit libraryinit programexit libraryexit";
 		words.replacer("(program|library)(init|exit)"_rex, [](auto groups){TRACE(groups); return groups.f(1,2).first(3) ^ groups.f(1,3);});
 		assert(words == "proinit libinit proexit libexit");
+	}
+
+	{
+		/* https://262.ecma-international.org/5.1/#sec-15.5.4.11
+			Otherwise, let newstring denote the result of converting replaceValue to a String. The result is a String value derived 
+			from the original input String by replacing each matched substring with a String derived from newstring by replacing characters 
+			in newstring by replacement text as specified in Table 22. These $ replacements are done left-to-right, and, once such a 
+			replacement is performed, the new replacement text is not subject to further replacements. For example, 
+			"$1,$2".replace(/(\$(\d))/g, "$$1-$1$2") returns "$1-$11,$1-$22". A $ in newstring that does not match any of the forms below 
+			is left as is.
+		*/
+		assert("$1,$2"_var.replace("(\\$(\\d))"_rex, "$$1-$1$2") eq "$1-$11,$1-$22");
 	}
 
 	printl(elapsedtimetext());

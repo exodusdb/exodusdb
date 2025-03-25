@@ -13,22 +13,15 @@ var v1;
 .fi
 Create an unassigned var.
 
-The var must be assigned before being used otherwise a runtime error VarUnassigned is thrown. Silent "use before assign" bugs cannot occur.
+Unassigned variables can be assigned conditionally in if/else statements or used as outbound arguments of function calls.
 
-Allowing unassigned variables allows them to be assigned conditionally in if/else statements and provided as outbound arguments of a function call.
-
-
-
-Use "let" instead of "var" as a shorthand way of writing "const var" whereever possible.
+A runtime error is thrown if a var is used before being assigned so silent "use before assign" bugs cannot occur.
 
 \fBExample:\fR
 .RS
 .nf
-var client;                     // Unassigned var
-let client_code = "SB001";      // Constant var
-var clients     = "xo_clients"; // Variable var
-
-if (not read(client from clients, client_code)) ...
+var client; // Unassigned var
+if (not read(client from "xo_clients", "SB001")) ...
 .fi
 .RE
 
@@ -39,7 +32,9 @@ var v1 = expression;
 .nf
  
 .fi
-Assign a var using a literal or an expression. Alternatively, use "let" instead of "var" as a shorthand way of writing "const var" where appropriate.
+Assign a var using a literal or an expression.
+
+Use "let" instead of "var" wherever possible as a shorthand way of writing "const var".
 
 \fBExample:\fR
 .RS
@@ -2178,13 +2173,29 @@ let v2 = replace("Abc Abc", "bc", "X");
 
 
 .SS
-var v1 = strvar.replace(regex, tostr);
+var v1 = strvar.replace(regex, replacement_str);
 .nf
  
 .fi
-Replace substring(s) using a regular expression.
+Replace substrings using a regular expression.
 
-Use $0, $1, $2 in tostr to refer to groups defined in the regex.
+\fBregex:\fR A regular expression created by rex() or _rex.
+
+\fBreplacement_str:\fR A literal to replace all matched substrings.
+
+The replacement string can include the following special replacement patterns:
+
+Pattern  Inserts
+
+$$       Inserts a "$".
+
+$&       Inserts the matched substring. Equivalent to $0.
+
+$`       Inserts the portion of the string that precedes the matched substring.
+
+$'       Inserts the portion of the string that follows the matched substring.
+
+$n       Inserts the nth (1-indexed) capturing group where n is a positive integer less than 100.
 
 \fBExample:\fR
 .RS
@@ -2202,7 +2213,7 @@ var v1 = strvar.replace(regex, SomeFunction(match_str));
 .nf
  
 .fi
-Replace regex matches with a custom function’s output
+Replace substrings using a regular expression and a custom function.
 
 Allows very complex string conversions.
 

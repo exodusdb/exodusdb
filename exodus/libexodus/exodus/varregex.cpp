@@ -114,22 +114,22 @@ namespace exo {
 
 	using syntax_flags_typ = int;
 
-    static const boost::u32regex digits_regex = boost::make_u32regex("\\d+");  //\d numeric
+	static const boost::u32regex digits_regex = boost::make_u32regex("\\d+");  //\d numeric
 
-    static const boost::u32regex alpha_regex =
-        boost::make_u32regex("[^\\W\\d]+");  // \a alphabetic
+	static const boost::u32regex alpha_regex =
+		boost::make_u32regex("[^\\W\\d]+");  // \a alphabetic
 
-    static const boost::u32regex alphanum_regex =
-        boost::make_u32regex("\\w+");  // \w alphanumeric
+	static const boost::u32regex alphanum_regex =
+		boost::make_u32regex("\\w+");  // \w alphanumeric
 
-    static const boost::u32regex non_digits_regex =
-        boost::make_u32regex("[^\\d]+");  // \D non-numeric
+	static const boost::u32regex non_digits_regex =
+		boost::make_u32regex("[^\\d]+");  // \D non-numeric
 
-    static const boost::u32regex non_alpha_regex =
-        boost::make_u32regex("[\\W\\d]+");  // \A non-alphabetic
+	static const boost::u32regex non_alpha_regex =
+		boost::make_u32regex("[\\W\\d]+");  // \A non-alphabetic
 
-    static const boost::u32regex non_alphanum_regex =
-        boost::make_u32regex("\\W+");  // \W non-alphanumeric
+	static const boost::u32regex non_alphanum_regex =
+		boost::make_u32regex("\\W+");  // \W non-alphanumeric
 
 #else // EXO_BOOST_REGEX not defined
 #	define REGEX std::regex
@@ -182,7 +182,7 @@ constexpr static syntax_flags_typ get_syntax_flags(SV regex_options) {
 	// s - Single line. Default in std::regex
 
 	// c - Use cache to store regex engine (for rex constructed objects)
-	//     ""_rex constructed objects always use the cache of regex engines. One entry per regex_str and options combination.
+	//	 ""_rex constructed objects always use the cache of regex engines. One entry per regex_str and options combination.
 
 	// default - collate - Character ranges of the form "[a-b]" will be locale sensitive.
 	// IF? the normal/ECMAScript/perl engine is selected.
@@ -427,8 +427,8 @@ var  var::match(const rex& regex) const {
 //	std::for_each(iter, end,
 //		[&result](auto match_results) {
 
-//	bool firstonly = regex.options_.find('f') != std::string::npos;
-	bool firstonly = regex.options_.contains("f");
+//	bool first_only = regex.options_.find('f') != std::string::npos;
+	bool first_only = regex.options_.contains("f");
 	while (iter != end) {
 
 		auto match_results = *iter;
@@ -453,7 +453,7 @@ var  var::match(const rex& regex) const {
 		// Multiple matches are separated by FM
 		result.var_str.push_back(FM_);
 
-		if (firstonly)
+		if (first_only)
 			break;
 
 		iter++;
@@ -528,7 +528,7 @@ var  var::search(SV regex_str, io startchar1, SV regex_options) const {
 		return this->search(regex3, startchar1);
 	}
 
-    return this->search(rex(regex_str, regex_options), startchar1);
+	return this->search(rex(regex_str, regex_options), startchar1);
 
 }
 
@@ -625,10 +625,39 @@ var  var::search(const rex& regex, io startchar1) const {
 
 }
 
+// TODO check our exodus syntax letters do not overlap between syntax_flags and replacement_flags
+
+// replacement_flags are only used in replacements
+auto get_replacement_flags(const std::string rex_options, bool& first_only) -> std_boost::match_flag_type {
+
+	// IMPORTANT
+	// Search and Replace Format String Syntax
+	// https://www.boost.org/doc/libs/1_87_0/libs/regex/doc/html/boost_regex/format.html
+	// There are three kind of format string: Sed, Perl and Boost-Extended.
+
+	// match_flags
+	// https://en.cppreference.com/w/cpp/regex/match_flag_type
+
+//	auto replacement_flags = std_boost::match_flag_type(boost::match_default);
+	auto replacement_flags = std_boost::match_flag_type(boost::match_perl);
+
+	// 'f' - first only, otherwise all
+	if (rex_options.find('f') != std::string::npos) {
+		replacement_flags |= boost::format_first_only;
+		first_only = true;
+	} else {
+		replacement_flags |= boost::format_all;
+		first_only = false;
+	}
+
+	return replacement_flags;
+
+}
+
 // mutator
 IO   var::replacer(const rex& regex, SomeFunction(in match_str)) REF {
-    *this = this->replace(regex, sf);
-    return THIS;
+	*this = this->replace(regex, sf);
+	return THIS;
 }
 
 // const
@@ -650,6 +679,9 @@ var  var::replace(const rex& regex, SomeFunction(in match_str)) const {
 
 	// Default return empty string
 	var nrvo = "";
+
+	bool first_only;
+	get_replacement_flags(regex.options_.var_str, first_only);
 
 	// Get 1st iter (1st match)
 
@@ -720,7 +752,12 @@ var  var::replace(const rex& regex, SomeFunction(in match_str)) const {
 		// no known conversion from 'const char *const' to 'const __normal_iterator<char *, basic_string<char>>' for 1st argument
 		//last_iter = match_data[0].second;
 		last_pos0 = match_data[0].second - var_str.data();
-	}
+
+		// rex can be created with an f - first only flag
+		if (first_only)
+			break;
+
+	} // next iter
 
 	// Append the unmatched tail (from last_pos0 to end)
 	if (last_pos0 < var_str.size()) {
@@ -764,6 +801,57 @@ IO   var::replacer(SV what, SV with) REF {
 
 }
 
+// Neutralize Boost Perl magic beyond ECMAScript/std::regex subset
+std::string restrict_to_ecmascript(const std::string_view replacement) {
+	std::string result;
+	result.reserve(replacement.size() * 2);
+
+	for (size_t i = 0; i < replacement.size(); ++i) {
+		char c = replacement[i];
+		if (c == '$') {
+			if (i + 1 < replacement.size()) {
+				char next = replacement[i + 1];
+				// Allow $&, $`, $', $$
+				if (next == '&' || next == '`' || next == '\'') {
+					result += "$" + std::string(1, next);
+					i++;
+//					TRACE("allowed $&|$`|$': " + result);
+					continue;
+				}
+				if (next == '$') {
+					result += "$$";
+					i++;
+//					TRACE("allowed $$: " + result);
+					continue;
+				}
+				// Allow $n (1-9) and $nn (01-99)
+				if (std::isdigit(next)) {
+					result += "$" + std::string(1, next);  // $n or start of $nn
+					i++;
+					if (i + 1 < replacement.size() && std::isdigit(replacement[i + 1])) {
+						result += replacement[i + 1];  // $nn
+						i++;
+					}
+//					TRACE("allowed $n|$nn: " + result);
+					continue;
+				}
+			}
+			result += "$$";  // Escape lone $ or invalid $n
+//			TRACE("escaped $: " + result);
+		} else if (c == '\\') {
+			result += "\\\\";
+//			TRACE("escaped \\: " + result);
+		} else if (c == '(' or c == ')') {
+			result += "\\";
+			result += c;
+		} else {
+			result += c;
+		}
+	}
+//	TRACE("final replacement: " + result);
+	return result;
+}
+
 // Regex based string replacement
 /////////////////////////////////
 
@@ -797,23 +885,28 @@ var  var::replace(const rex& regex, SV replacement) const& {
 	std::ostringstream oss1(std::ios::out | std::ios::binary);
 	std::ostream_iterator<char, char> oiter(oss1);
 
-	// match_flags
-	//////////////
+//	// replacement_flags IMPORTANT
+//	//////////////
+//
+//	// https://en.cppreference.com/w/cpp/regex/match_flag_type
+//
+//	// replacement_flags are only used in replacements
+//	auto replacement_flags = std_boost::match_flag_type(boost::match_default);
+//	// Option f = first only, otherwise all
+//	//c++23 if (regex_options.contains("f"))
+//
+//	// TODO check syntax letters do not overlap between syntax_flags and replacement_flags
+//
+//	// f - first only
+//	if (regex.options_.var_str.find('f') != std::string::npos)
+//		replacement_flags |= boost::format_first_only;
+//	else
+//		replacement_flags |= boost::format_all;
 
-	// https://en.cppreference.com/w/cpp/regex/match_flag_type
+	bool first_only;
+	auto replacement_flags = get_replacement_flags(regex.options_.var_str, first_only);
 
-	// match_flags are only used in replacements
-	auto match_flags = std_boost::match_flag_type(boost::match_default);
-	// Option f = first only, otherwise all
-	//c++23 if (regex_options.contains("f"))
-
-	// TODO check syntax letters do not overlap between syntax_flags and match_flags
-
-	// f - first only
-	if (regex.options_.var_str.find('f') != std::string::npos)
-		match_flags |= boost::format_first_only;
-	else
-		match_flags |= boost::format_all;
+	const auto replacement2 = restrict_to_ecmascript(replacement);
 
 	// Generate output
 	//////////////////
@@ -826,15 +919,17 @@ var  var::replace(const rex& regex, SV replacement) const& {
 			regex_engine,
 			// Sadly boost regex cannot handle string_view
 			//replacement,
-			std::string(replacement),
-			match_flags
+//			std::string(replacement),
+			replacement2,
+			replacement_flags
 		);
 	} catch (boost::wrapexcept<std::out_of_range>& e) {
 		let errmsg =
 			"Error: (3) Invalid data or replacement during regex replace of "
 			^ var(regex.regex_str_).quote()
 			^ " with "
-			^ var(replacement).quote()
+//			^ var(replacement).quote()
+			^ replacement2
 			^ ". "
 			^ var(e.what())
 		;

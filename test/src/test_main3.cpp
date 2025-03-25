@@ -205,13 +205,13 @@ func main() {
 		//TX
 
 		//FM
-		assert(test_ioconv_TX("TX", "X\\nY\nZ" _FM "ABC", "X\\\\nY\\nZ\nABC"));
+		assert(test_ioconv_TX("TX", "X\\nY\nZ^ABC"_var, "X\\\\nY\\nZ\nABC"));
 		//VM
-		assert(test_ioconv_TX("TX", "X\\nY\nZ" _VM "ABC", "X\\\\nY\\nZ\\\nABC"));
+		assert(test_ioconv_TX("TX", "X\\nY\nZ]ABC"_var, "X\\\\nY\\nZ\\\nABC"));
 		//SM
-		assert(test_ioconv_TX("TX", "X\\nY\nZ" _SM "ABC", "X\\\\nY\\nZ\\\\\nABC"));
+		assert(test_ioconv_TX("TX", "X\\nY\nZ}ABC"_var, "X\\\\nY\\nZ\\\\\nABC"));
 		//TM
-		assert(test_ioconv_TX("TX", "X\\nY\nZ" _TM "ABC", "X\\\\nY\\nZ\\\\\\\nABC"));
+		assert(test_ioconv_TX("TX", "X\\nY\nZ|ABC"_var, "X\\\\nY\\nZ\\\\\\\nABC"));
 		//ST
 		assert(test_ioconv_TX("TX",
 							  "X"
@@ -240,22 +240,23 @@ func main() {
 		assert(test_ioconv_TX("TX", "\n\\n\\\\n\\\\n", "\\n\\\\n\\\\\\n\\\\\\n"));
 
 		// trailing backslashes need escaping too
-		assert(test_ioconv_TX("TX", "ABC\\" _FM "DEF", "ABC{Back_Slash}\nDEF"));
+		// not "ABC\\^DEF" <-> ABC{Back_Slash}\nDEF
+		assert(test_ioconv_TX("TX", "ABC\\^DEF"_var, "ABC{Back_Slash}\nDEF"));
 
 		//TX1 (raw = FM only)
 
 		//FM
-		assert(test_ioconv_TX("TXR", "X\\nY\nZ" _FM "ABC", "X\\\\nY\\nZ\nABC"));
+		assert(test_ioconv_TX("TXR", "X\\nY\nZ^ABC"_var, "X\\\\nY\\nZ\nABC"_var));
 		//VM
-		assert(test_ioconv_TX("TXR", "X\\nY\nZ" _VM "ABC", "X\\\\nY\\nZ" _VM "ABC"));
+		assert(test_ioconv_TX("TXR", "X\\nY\nZ]ABC"_var, "X\\\\nY\\nZ]ABC"_var));
 		//SM
-		assert(test_ioconv_TX("TXR", "X\\nY\nZ" _SM "ABC", "X\\\\nY\\nZ" _SM "ABC"));
+		assert(test_ioconv_TX("TXR", "X\\nY\nZ}ABC"_var, "X\\\\nY\\nZ}ABC"_var));
 		//TM
-		assert(test_ioconv_TX("TXR", "X\\nY\nZ" _TM "ABC", "X\\\\nY\\nZ" _TM "ABC"));
+		assert(test_ioconv_TX("TXR", "X\\nY\nZ|ABC"_var, "X\\\\nY\\nZ|ABC"_var));
 		//ST
-		assert(test_ioconv_TX("TXR", "X\\nY\nZ" _ST "ABC", "X\\\\nY\\nZ" _ST "ABC"));
+		assert(test_ioconv_TX("TXR", "X\\nY\nZ~ABC"_var, "X\\\\nY\\nZ~ABC"_var));
 
-		assert(test_ioconv_TX("TXR", _RM _FM _VM _SM _TM _ST, _RM "\n" _VM _SM _TM _ST));
+		assert(test_ioconv_TX("TXR", "`^]}|~"_var, "`\n]}|~"_var));
 	}
 
 	{

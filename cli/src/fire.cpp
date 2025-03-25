@@ -58,12 +58,9 @@ func main() {
 
 		let origrec = RECORD;
 
-		//RECORD.replacer(R"___(\tcall fsmsg\(\);\n\t+stop\(\);)___"_rex, R"___(\tabort\(lasterror\);)___", "s");
-		//RECORD.replacer(R"___(\breado\b)___"_rex, R"___(readc)___", "s");
 		if (raw)
 			RECORD.replacer(find, repl);
 		else
-			//RECORD.replacer(find, repl, rxopts);
 			RECORD.replacer(rex(find,rxopts), repl);
 
 		if (RECORD != origrec) {

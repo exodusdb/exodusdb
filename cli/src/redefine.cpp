@@ -53,16 +53,6 @@ func main() {
 			if (not value or not name or value.isnum())
 				continue;
 
-//			let oldcode = "(orec|RECORD)\\(" ^ value ^ "\\b";
-//			let newcode = "\\1\\(" ^ name ^ "";
-//
-//			newcpp.replacer(rex(oldcode), newcode);
-//
-//			oldcode = "(orec|RECORD)\\.f\\(" ^ value ^ "\\b";
-//			newcode = "\\1.f\\(" ^ name ^ "";
-//
-//			newcpp.replacer(rex(oldcode), newcode);
-
 			if (name.ends("+")) {
 				name.popper();
 				name ^= value;

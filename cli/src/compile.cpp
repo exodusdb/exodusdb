@@ -873,7 +873,7 @@ ENVIRONMENT
 			// Hotfix old commons from 2 arg macros to 1 arg
 			if (srcfilename.ends("_common.h")) {
 				let orig_srctext = srctext;
-				srctext.replacer(R"__(common(init|exit)\(([a-z]{2,3}),[a-z]{2,3}_common_no\))__"_rex, R"__(common\1\(\2\))__");
+				srctext.replacer(R"__(common(init|exit)\(([a-z]{2,3}),[a-z]{2,3}_common_no\))__"_rex, "common$1($2)");
 				if (srctext ne orig_srctext) {
 					if (oswrite(srctext on srcfilename))
 						srcfilename.logputl("Hotfix commoninit/exit:");
@@ -1210,8 +1210,8 @@ ENVIRONMENT
 //				text.replacer(R"__(^subroutine )__"_rex, "subr ");
 //				text.replacer("ostempfile", "ostempfile");
 //				text.replacer("ostempdir", "ostempdir");
-//				text.replacer(R"__(space\(\1\))__", R"__(space\(\1\))__");
-				text.replacer(R"__(\bvar\((\d+)\).space\(\))__"_rex, R"__(space\(\1\))__");
+//				text.replacer(R"__(space\(\d\))__", "space($1)");
+				text.replacer(R"__(\bvar\((\d+)\).space\(\))__"_rex, "space($1)");
 
 				if (text ne orig_text) {
 					if (oswrite(text on srcfilename, locale))

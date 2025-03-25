@@ -29,10 +29,8 @@ func main() {
 
 	printl("var() = default;");
 	{
-		var client;                     // Unassigned var
-		let client_code = "SB001";      // Constant var
-		var clients     = "xo_clients"; // Variable var
-		if (not read(client from clients, client_code)) abort("var: " ^ lasterror());
+		var client; // Unassigned var
+		if (not read(client from "xo_clients", "SB001")) abort("var: " ^ lasterror());
 	}
 
 	printl("operator=(expression) &;");
@@ -688,7 +686,7 @@ func main() {
 		let v2 = replace("Abc Abc", "bc", "X");
 	}
 
-	printl("replace(const rex& regex, SV tostr) const&;");
+	printl("replace(const rex& regex, SV replacement_str) const&;");
 	{
 				let v1 = "A a B b"_var.replace("[A-Z]"_rex, "'$0'"); assert(v1 == "'A' a 'B' b");
 		// or

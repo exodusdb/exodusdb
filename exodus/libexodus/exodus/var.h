@@ -122,20 +122,16 @@ public:
 	/* fake for gendoc
 
     // Create an unassigned var.
-	// The var must be assigned before being used otherwise a runtime error VarUnassigned is thrown. Silent "use before assign" bugs cannot occur.
-	// Allowing unassigned variables allows them to be assigned conditionally in if/else statements and provided as outbound arguments of a function call.
+	// Unassigned variables can be assigned conditionally in if/else statements or used as outbound arguments of function calls.
+	// A runtime error is thrown if a var is used before being assigned so silent "use before assign" bugs cannot occur.
 	//
-	// Use "let" instead of "var" as a shorthand way of writing "const var" whereever possible.
-	//
-	// `var client;                     // Unassigned var
-	//  let client_code = "SB001";      // Constant var
-	//  var clients     = "xo_clients"; // Variable var
-	//
-	//  if (not read(client from clients, client_code)) ...`
+	// `var client; // Unassigned var
+	//  if (not read(client from "xo_clients", "SB001")) ...`
 	//
     var() = default;
 
-	// Assign a var using a literal or an expression. Alternatively, use "let" instead of "var" as a shorthand way of writing "const var" where appropriate.
+	// Assign a var using a literal or an expression.
+	// Use "let" instead of "var" wherever possible as a shorthand way of writing "const var".
 	//
 	// `var v1 = 42;                 // Integer
 	//  var v2 = 42.3;               // Double
@@ -1289,16 +1285,24 @@ public:
 	//
 	ND var  replace(SV fromstr, SV tostr) const&;
 
-	// Replace substring(s) using a regular expression.
-	// Use $0, $1, $2 in tostr to refer to groups defined in the regex.
+	// Replace substrings using a regular expression.
+	// regex: A regular expression created by rex() or _rex.
+	// replacement_str: A literal to replace all matched substrings.
+	// The replacement string can include the following special replacement patterns:
+	// Pattern  Inserts
+	// $$       Inserts a "$".
+	// $&       Inserts the matched substring. Equivalent to $0.
+	// ${backtick}       Inserts the portion of the string that precedes the matched substring.
+	// $'       Inserts the portion of the string that follows the matched substring.
+	// $n       Inserts the nth (1-indexed) capturing group where n is a positive integer less than 100.
 	//
 	// `let v1 = "A a B b"_var.replace("[A-Z]"_rex, "'$0'"); // "'A' a 'B' b"
 	//  // or
 	//  let v2 = replace("A a B b", "[A-Z]"_rex, "'$0'");`
 	//
-	ND var  replace(const rex& regex, SV tostr) const&;
+	ND var  replace(const rex& regex, SV replacement_str) const&;
 
-	// Replace regex matches with a custom function’s output
+	// Replace substrings using a regular expression and a custom function.
 	// Allows very complex string conversions.
 	// SomeFunction: Must return a var. Can be an inline anonymous lambda function.
 	// e.g. [](auto match_str) {return match_str;} // Does nothing.

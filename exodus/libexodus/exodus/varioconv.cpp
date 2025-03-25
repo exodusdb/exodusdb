@@ -1461,7 +1461,7 @@ std::string var::oconv_TX(const char* conversion) const {
 	// for usual case skip if no backslashes are present
 	if (result.var_str.find('\\') != std::string::npos)
 		//result.regex_replacer("\\\\([" _FM _VM _SM _TM _ST "])", "{Back_Slash}\\1");
-		result.replacer("\\\\([" _FM _VM _SM _TM _ST "])"_rex, "{Back_Slash}\\1");
+		result.replacer("\\\\([" _FM _VM _SM _TM _ST "])"_rex, "{Back_Slash}$1");
 
 	// "\n" -> "\\n"
 	result.replacer("\\n", "\\\\n");
@@ -1478,10 +1478,10 @@ std::string var::oconv_TX(const char* conversion) const {
 	// ST -> \\\\ + LF
 	const char raw = conversion[2];
 	if (not raw) {
-		result.replacer(_VM, "\\\n");
-		result.replacer(_SM, "\\\\\n");
-		result.replacer(_TM, "\\\\\\\n");
-		result.replacer(_ST, "\\\\\\\\\n");
+		result.replacer(_VM, "\\"                "\n");
+		result.replacer(_SM, "\\" "\\"           "\n");
+		result.replacer(_TM, "\\" "\\" "\\"      "\n");
+		result.replacer(_ST, "\\" "\\" "\\" "\\" "\n");
 	}
 
 	return result.var_str;
@@ -1498,27 +1498,27 @@ var  var::iconv_TX(const char* conversion) const {
 	// \\\ + LF -> ST
 	const char raw = conversion[2];
 	if (not raw) {
-		record.replacer("\\\\\\\\\n", _ST);
-		record.replacer("\\\\\\\n", _TM);
-		record.replacer("\\\\\n", _SM);
-		record.replacer("\\\n", _VM);
+		record.replacer("\\" "\\" "\\" "\\" "\n", _ST);
+		record.replacer("\\" "\\" "\\"      "\n", _TM);
+		record.replacer("\\" "\\"           "\n", _SM);
+		record.replacer("\\"                "\n", _VM);
 	}
 
 	// LF -> FM
 	record.converter("\n", _FM);
 
 	// "\n" -> LF
-	record.replacer("\\n", "\n");
+	record.replacer("\\" "n", "\n");
 
-	// "\\n" -> "\n"
-	record.replacer("\\\n", "\\n");
+	// "\" \n -> "\n"
+	record.replacer("\\" "\n", "\\" "n");
 
 	// unescape backslash before FM
 	// so we have to escape them somehow first
 	// for usual case skip if no { is present
 	if (record.var_str.find('{') != std::string::npos)
 		//record.regex_replacer("{Back_Slash}([" _FM _VM _SM _TM _ST "])", "\\\\" "\\1");
-		record.replacer("{Back_Slash}([" _FM _VM _SM _TM _ST "])"_rex, "\\\\" "\\1");
+		record.replacer("{Back_Slash}([" _FM _VM _SM _TM _ST "])"_rex, "\\" "$1");
 
 	return record;
 }
