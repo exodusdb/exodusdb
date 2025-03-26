@@ -54,21 +54,25 @@ set -euxo pipefail
 : STAGES
 :
 	ALL_STAGES=bBdDTW
+	SUB_STAGES=tI
 	DEFAULT_STAGES=bBdDT
 :
-:	STAGES must be one or more _consecutive_ letters from $ALL_STAGES, or A for all stages except W.
+:	STAGES must be one or more _consecutive_ letters from $ALL_STAGES or from $SUB_STAGES, or A for all stages except W, or AW for all stages.
 :
 :	A = All stages $DEFAULT_STAGES except W - Web service
+:	AW= All stages including W - Web service
 :
-:	b = Get dependencies for build and install
-:	B = Build and install
+:	b = Get dependencies for build and install.
+:	B = Build, test and install.
+:	i = Install exodus. Part of B.
 :
-:	d = Get dependencies for database
-:	D = Install database
+:	d = Get dependencies for database.
+:	D = Install database.
 :
-:	T = Test
+:	t = Test without database. Part of B.
+:	T = Test with database.
 :
-:	W = Install web service
+:	W = Install web service.
 :
 : COMPILER
 :
@@ -87,7 +91,7 @@ set -euxo pipefail
 : Parse command line
 : ------------------
 :
-	REQ_STAGES=${1:?STAGES is required and must be one or more *consecutive* letters from $ALL_STAGES, or A for all stages except W.}
+	REQ_STAGES=${1:?STAGES is required and must be one or more *consecutive* letters from $ALL_STAGES or from $SUB_STAGES, or A for all stages except W, or AW for all stages}
 	COMPILER=${2:-clang}
 	PG_VER=${3:-}
 
@@ -100,12 +104,17 @@ set -euxo pipefail
 : Validate
 : --------
 :
+	if [[ $REQ_STAGES == AW ]]; then
+		REQ_STAGES={$DEFAULT_STAGES}W
+	fi
 	if [[ $REQ_STAGES == A ]]; then
 		REQ_STAGES=$DEFAULT_STAGES
 	fi
 	if [[ ! $ALL_STAGES =~ $REQ_STAGES ]]; then
-		echo STAGES "'$REQ_STAGES'" must be one or more consecutive letters from $ALL_STAGES
-		exit 1
+		if [[ ! $SUB_STAGES =~ $REQ_STAGES ]]; then
+			echo STAGES "'$REQ_STAGES'" must be one or more consecutive letters from $ALL_STAGES or from $SUB_STAGES
+			exit 1
+		fi
 	fi
 
 	# duplicate code in install.sh and install_lxc.sh
@@ -456,7 +465,7 @@ function get_dependencies_for_build_and_install {
 
 } # end of stage b - Install dependencies
 
-function build_and_install {
+function build_only {
 :
 : -----
 : BUILD $*
@@ -511,7 +520,6 @@ function build_and_install {
 : Build exodus
 : ------------
 :
-:
 : Prep
 :
 	echo PGPATH=${PGPATH:-}
@@ -525,7 +533,10 @@ function build_and_install {
 	#ninja
 	#cmake --build $EXODUS_DIR/build -j$((`nproc`+1))
 	cmake --build $EXODUS_DIR/build
+:
+} # end of substage B
 
+function test_exodus_without_database {
 :
 : Run tests that do not require database
 : --------------------------------------
@@ -534,9 +545,12 @@ function build_and_install {
 : 2. EXO_NODATA=1 causes tests related to database to pass automatically
 :
 	cd $EXODUS_DIR/build/test/src && EXO_NODATA=1 CTEST_OUTPUT_ON_FAILURE=1 CTEST_PARALLEL_LEVEL=$((`nproc`+1)) ctest
-
 :
-: Install exodus
+} # end of test_exodus_without_database
+
+function install_exodus {
+:
+: Install exodus $*
 : --------------
 :
 : Also installs pgexodus.so to /usr/lib/postgresql but not actually required.
@@ -547,8 +561,8 @@ function build_and_install {
 	fi
 
 :
-: Add \~/bin to all users PATH
-: ----------------------------
+: Add \~/bin to PATH and \~/lib to LD_LIBRARY_PATH for all users
+: ------------------------------------------------------------
 :
 : Enable exodus programs created with edic/compile
 : to be run from command line without full path to \~/bin
@@ -558,7 +572,7 @@ function build_and_install {
 :
 	printf 'export PATH="${PATH}:~/bin"\nexport LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${HOME}/lib"\n' | sudo dd of=/etc/profile.d/exodus.sh status=none
 :
-} # end of stage B - Build and install
+} # end of install_exodus
 
 function get_dependencies_for_database {
 :
@@ -792,11 +806,17 @@ function install_www_service {
 :
 
 	if [[ $REQ_STAGES =~ b ]]; then get_dependencies_for_build_and_install; fi
-	if [[ $REQ_STAGES =~ B ]]; then build_and_install; fi
+	if [[ $REQ_STAGES =~ B ]]; then
+		build_only
+		test_exodus_without_database
+		install_exodus
+	fi
+	if [[ $REQ_STAGES =~ I ]]; then install_exodus; fi # Done as part of B
 
 	if [[ $REQ_STAGES =~ d ]]; then get_dependencies_for_database; fi
 	if [[ $REQ_STAGES =~ D ]]; then install_database; fi
 
+	if [[ $REQ_STAGES =~ t ]]; then test_exodus_without_database; fi # Done as part B
 	if [[ $REQ_STAGES =~ T ]]; then test_exodus_and_database; fi
 
 	if [[ $REQ_STAGES =~ W ]]; then install_www_service; fi

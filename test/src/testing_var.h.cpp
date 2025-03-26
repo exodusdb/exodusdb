@@ -10,14 +10,16 @@ programinit()
 
 func main() {
 
-	// Quit if no default database connection
-	if (not connect() or not reccount("xo_clients")) {
-		//Pass if allowed
-		if (osgetenv("EXO_NODATA") or true) {
-			printx("Test passed. Not really. ");
-		}
-		printl("No default db connection to perform db testing.");
-		return 0;
+	// Options to skip testing
+	{
+		let msg = "Test passed. Without commencing because ";
+
+		if (osgetenv("EXO_NODATA")) stop(msg ^ "EXO_NODATA was set.");
+
+		if (not connect())          stop(msg ^ "No default db connection.");
+
+		if (not open("xo_clients") or not reccount("xo_clients"))
+		                            stop(msg ^ "xo_clients file is missing or empty.");
 	}
 
 	// Clean up before starting
