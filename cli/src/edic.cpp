@@ -334,6 +334,7 @@ func main() {
 			compileoutputfilename ^= ".~";
 			//var compileoutputfilename=filename ^ ".2";
 			if (OSSLASH == "/") {
+				compilecmd.prefixer("EXO_POST_COMPILE=\"\" ");
 				compilecmd ^= " 2>&1";
 				compilecmd ^= " | tee " ^ compileoutputfilename.quote();
 				// --RAW-CONTROL-CHARS allows colors from compiler to be shown properly in compiler output
