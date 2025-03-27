@@ -430,6 +430,12 @@ func main() {
 		assert(offset                     eq 18);
 		assert(osread(filename).outputl() eq "1234567890abcqwXYZ");
 
+//		// test << operator on opened osfiles;
+//		//filex << "\nappendme1\n" << "appendme2\n";
+//		TRACE(filex.dump())
+//		filex << "\nappendme1\n" << "appendme2\n";
+//		assert(osread(filename).outputl(filex) eq "1234567890abcqwXYZ\nappendme1\nappendme2\n");
+
 		// files must be closed manually
 		// TODO add a way to autoclose all files/all files opened after a certain point
 		// rather like disconnect(nn)
@@ -438,6 +444,21 @@ func main() {
 		// Check can remove file
 		assert(osremove(filename));
 		assert(not osfile(filename));
+	}
+
+	{
+		// test << output to osfiles
+		let tfilename = "t_asd.txt";
+		assert(oswrite("" on tfilename));
+		tfilename << "line1\n" << "line2";
+
+		// No std::endl or std::flush so nothing visible to other users yet
+		assert(osread(tfilename).outputl() == "");
+
+		// We MUST flush or osclose before << info becomes available to other accessors of the file.
+		tfilename << std::endl;
+//		tfilename << std::flush;
+		assert(osread(tfilename).outputl() == "line1\nline2\n");
 	}
 
 	{
@@ -511,6 +532,18 @@ func main() {
 //		assert(oslistd() eq oslistd("."));
 //		assert(oslist() eq oslist("."));
 
+	}
+
+	// Test << output.
+	// TODO check manipulators like width precision work with non-var data. std::endl does.
+	// std::cout << var doesnt respect manipulators a the moment.
+	{
+		var file = ostempfile();
+
+		// Test using << to output to an osfile
+		file << "filename:" << file << ", a double:" << 123.456789 << ", an int:" << 123 << std::endl;
+
+		assert(osread(file).outputl() == "var:" ^ file ^ ", a double:123.457,  an int:123\n");
 	}
 
 	printl(elapsedtimetext());

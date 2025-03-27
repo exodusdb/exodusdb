@@ -97,7 +97,6 @@ allowing it to interface correctly with UTF-8, UTF-16, and UTF-32 data:
 #endif
 
 #include <exodus/varimpl.h>
-#include <exodus/varoshandle.h>
 
 #include <exodus/rex.h>
 

@@ -64,7 +64,7 @@ set -euxo pipefail
 :
 :	b = Get dependencies for build and install.
 :	B = Build, test and install.
-:	i = Install exodus. Part of B.
+:	I = Install exodus. Part of B.
 :
 :	d = Get dependencies for database.
 :	D = Install database.
@@ -619,7 +619,7 @@ function install_database {
 : ----------------------------------------
 	psql $PSQL_PORT_OPT --version || true
 	#pg_ctl start || true
-	sudo systemctl start postgresql || true # no systemctl on docker
+	sudo systemctl start postgresql || sudo systemctl start postgresql || true # no systemctl on docker
 	sudo systemctl status postgresql || true
 	sudo pgrep postgres -a || true
 	ls /var/run/postgresql || true
@@ -639,6 +639,9 @@ function install_database {
 : Test the pgexodus postgresql extension
 : --------------------------------------
 :
+: Restart postgresql in case regression database is stuck
+:
+	sudo systemctl start postgresql || true
 	cd $EXODUS_DIR/build/exodus/pgexodus && CTEST_OUTPUT_ON_FAILURE=1 ctest
 
 :

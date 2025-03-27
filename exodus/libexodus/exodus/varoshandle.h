@@ -36,9 +36,9 @@ class VarOSHandleEntry {
 	std::string extra;
 };
 
-class VarOSHandlesCache {
+class VarOSfstreamHandles {
    public:
-	VarOSHandlesCache();
+	VarOSfstreamHandles();
 	int add_handle(CACHED_HANDLE handle_to_opened_file, DELETER_AND_DESTROYER del, std::string name);
 	// VarOSHandleEntry & operator [] (int idx)
 	//{
@@ -46,7 +46,7 @@ class VarOSHandlesCache {
 	//}
 	CACHED_HANDLE get_handle(int index, std::string name);
 	void del_handle(int index);
-	virtual ~VarOSHandlesCache();
+	virtual ~VarOSfstreamHandles();
 
    private:
 	std::vector<VarOSHandleEntry> conntbl;
@@ -55,7 +55,7 @@ class VarOSHandlesCache {
 #ifndef INSIDE_VAR_OSHANDLE_CPP
 extern
 #endif								  // INSIDE_VAR_OSHANDLE_CPP
-	thread_local VarOSHandlesCache mv_handles_cache;  // global table (intended usage: mvos.cpp and vardb.cpp)
+	thread_local VarOSfstreamHandles thread_fstream_handles;  // global table (intended usage: mvos.cpp and vardb.cpp)
 
 }  // namespace exo
 

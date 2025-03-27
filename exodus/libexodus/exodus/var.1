@@ -705,7 +705,7 @@ let v2 = textchrname(91);
 
 
 .SS
-var v1 = varstr.str(num);
+var v1 = strvar.str(num);
 .nf
  
 .fi
@@ -4809,17 +4809,17 @@ if (osfilevar.osopen(osfilename, utf8 = true)) ...
 .nf
  
 .fi
-Initialises an os file handle var that can be used for random read and write
+Opens an OS file handle for random read and write operations.
 
-\fBosfilename:\fR The name of an existing os file name including path.
+\fBosfilevar:\fR [out] Handle for subsequent osbread() and osbwrite() calls.
 
-\fButf8:\fR Defaults to true which causes trimming of partial UTF-8 Unicode byte sequences from the end of osbreads. For raw untrimmed osbreads pass tf8 = false;
+\fBosfilename:\fR Path and name of an existing OS file.
 
-\fBosfilevar:\fR [out] To be used in subsequent calls to osbread() and osbwrite()
+\fButf8:\fR True (default) removes partial UTF-8 sequences from osbread() ends; false returns raw data.
 
-\fBReturns:\fR True if successful or false if not possible for any reason. e.g. Target doesnt exist, permissions etc.
+\fBReturns:\fR True if opened successfully, false if file doesn’t exist or isn’t accessible.
 
-The file will be opened for writing if possible otherwise for reading.
+Opens for writing if possible, otherwise read-only.
 
 \fBExample:\fR
 .RS
@@ -4836,20 +4836,26 @@ if (osopen(osfilename to ostempfile)) ... ok
 
 
 .SS
-if (osfilevar.osbwrite(osfilevar, io offset)) ...
+if (strvar.osbwrite(osfilevar, io offset)) ...
 .nf
  
 .fi
-Writes data to an existing os file starting at a given byte offset (0 based).
+Writes data to an OS file at a specified position.
 
-See osbread for more info.
+\fBstrvar:\fR Data to write.
+
+\fBosfilevar:\fR Handle from osopen() or a path/filename; creates file if offset is 0 and it’s new, fails if offset isn’t 0.
+
+\fBoffset:\fR [in/out] Start position (0-based); updated to end of written data; -1 appends.
+
+\fBReturns:\fR True if write succeeds, false if file isn’t accessible, updateable, or creatable.
 
 \fBExample:\fR
 .RS
 .nf
 let osfilename = ostempdir() ^ "xo_gendoc_test.conf";
 let text = "aaa=123\\nbbb=456\\n";
-var offset = osfile(osfilename).f(1); /// Size of file therefore append
+var offset = -1; /// -1 means append.
 if (text.osbwrite(osfilename, offset)) ... ok // offset -> 16
 // or
 if (not osbwrite(text on osfilename, offset)) ...
@@ -4859,17 +4865,21 @@ if (not osbwrite(text on osfilename, offset)) ...
 
 
 .SS
-if (osfilevar.osbread(osfilevar, io offset, length)) ...
+if (strvar.osbread(osfilevar, io offset, length)) ...
 .nf
  
 .fi
-Reads length bytes from an existing os file starting at a given byte offset (0 based).
+Reads data from an OS file at a specified position.
 
-The osfilevar file handle may either be initialised by osopen or be just be a normal string variable holding the path and name of the os file.
+\fBstrvar:\fR [out] Data read.
 
-After reading, the offset is updated to point to the correct offset for a subsequent sequential read.
+\fBosfilevar:\fR Handle from osopen() or a path/filename.
 
-If reading UTF8 data (the default) then the length of data actually returned may be a few bytes shorter than requested in order to be a complete number of UTF-8 code points.
+\fBoffset:\fR [in/out] Start position (0-based); updated to end of read data.
+
+\fBlength:\fR Chars to read; with utf8=true (default), may return less to ensure complete UTF-8 code points.
+
+\fBReturns:\fR True if read succeeds, false if file doesn’t exist or isn’t accessible or offset >= file size.
 
 \fBExample:\fR
 .RS
@@ -4885,7 +4895,28 @@ if (osbread(text from osfilename, offset, 8)) ... ok // text -> "bbb=456\\n" // 
 
 
 .SS
-osfilevar.osclose()
+osfile << anything << std::endl;
+.nf
+ 
+.fi
+Use convenient << syntax to output anything to an osfile.
+
+\fBosfilevar:\fR An os path and filename or an osfilevar opened by osopen(). The file will be created if it does not already exist.
+
+\fBExample:\fR
+.RS
+.nf
+let txtfile = "t_temp.txt";
+if (not osremove(txtfile)) {} // Remove any existing file.
+txtfile << txtfile << " " << 123.456789 << " " << 123 << std::endl;
+let v1 = osread(txtfile);   // "t_temp.txt 123.457 123\\n"
+.fi
+.RE
+
+
+
+.SS
+var().osclose()
 .nf
  
 .fi
@@ -4917,7 +4948,7 @@ Create a complete os file from a var.
 
 \fBcodepage:\fR If specified then output is converted from UTF-8 to that codepage before being written. Otherwise no conversion is done.
 
-\fBReturns:\fR True if successful or false if not possible for any reason. e.g. Path is not writeable, permissions etc.
+\fBReturns:\fR True if successful or false if not possible for any reason. e.g. Path is not writeable, permissions etc
 
 \fBExample:\fR
 .RS
@@ -5064,6 +5095,8 @@ Will not remove directories. Use osrmdir() to remove directories
 \fBosfilename:\fR Absolute or relative path and file name to be removed.
 
 \fBReturns:\fR True if successful or false if not possible for any reason. e.g. Target doesnt exist, path is not writeable, permissions etc.
+
+If osfilename is an osfilevar then it is automatically closed.
 
 \fBExample:\fR
 .RS
@@ -5566,7 +5599,7 @@ let v2 = getxlocale();
 .SH
 
 .SS
-varstr.outputl(prefix = "")
+strvar.outputl(prefix = "")
 .nf
  
 .fi
@@ -5590,21 +5623,21 @@ outputl("xyz = ", "abc"); /// Any number of arguments is allowed. All will be ou
 
 
 .SS
-varstr.output(prefix = "")
+strvar.output(prefix = "")
 .nf
  
 .fi
  Same as outputl() but doesnt append an NL char and is BUFFERED, not flushed.
 
 .SS
-varstr.outputt(prefix = "")
+strvar.outputt(prefix = "")
 .nf
  
 .fi
  Same as outputl() but appends a tab char instead of an NL char and is BUFFERED, not flushed.
 
 .SS
-varstr.logputl(prefix = "")
+strvar.logputl(prefix = "")
 .nf
  
 .fi
@@ -5628,14 +5661,14 @@ logputl("xyz = ", "abc");; /// Any number of arguments is allowed. All will be o
 
 
 .SS
-varstr.logput(prefix = "")
+strvar.logput(prefix = "")
 .nf
  
 .fi
  Same as logputl() but doesnt append an NL char.
 
 .SS
-varstr.errputl(prefix = "")
+strvar.errputl(prefix = "")
 .nf
  
 .fi
@@ -5659,14 +5692,14 @@ errputl("xyz = ", "abc"); /// Any number of arguments is allowed. All will be ou
 
 
 .SS
-varstr.errput(prefix = "")
+strvar.errput(prefix = "")
 .nf
  
 .fi
  Same as errputl() but doesnt append an NL char and is BUFFERED not flushed.
 
 .SS
-varstr.put(std::ostream& ostream1)
+strvar.put(std::ostream& ostream1)
 .nf
  
 .fi
@@ -6288,7 +6321,7 @@ v2 = v3.oconv("D") ; //  "18 OCT 2001^19 OCT 2001]20 OCT 2001"_var
 
 
 .SS
-var v1 = varstr.iconv("D");
+var v1 = strvar.iconv("D");
 .nf
  
 .fi
@@ -6385,7 +6418,7 @@ v2 = oconv(v1, "MT");    // "17:13"
 
 
 .SS
-var v1 = varstr.iconv("MT");
+var v1 = strvar.iconv("MT");
 .nf
  
 .fi
@@ -6540,7 +6573,7 @@ v2 =      oconv("abcd", "L#3" ) ; //  "abc"
 
 
 .SS
-var v1 = varstr.oconv("T");
+var v1 = strvar.oconv("T");
 .nf
  
 .fi
@@ -6595,13 +6628,13 @@ v2 = v1.oconv("MR/B") ; //  "/."      // Remove alphanumeric
 
 
 .SS
-var v1 = varstr.oconv("HEX");
+var v1 = strvar.oconv("HEX");
 .nf
  
 .fi
 Convert the chars of a string to a string of pairs of hexadecimal digits.
 
-\fBvarstr:\fR A string. Numbers will be converted to strings for conversion. 1.2 -> "1.2" -> hex "312E32"
+\fBstrvar:\fR A string. Numbers will be converted to strings for conversion. 1.2 -> "1.2" -> hex "312E32"
 
 Dynamic array structure is not preserved. Field marks are converted to HEX as for all other bytes.
 
@@ -6626,13 +6659,13 @@ v2 =       oconv("ab01"_var, "HEX") ; //  "61" "62" "30" "31"
 
 
 .SS
-var v1 = varstr.iconv("HEX");
+var v1 = strvar.iconv("HEX");
 .nf
  
 .fi
 Convert a string of pairs of hexadecimal digits to a string of chars.
 
-\fBvarstr:\fR Must be a string of only hex digits 0-9, a-f or A-F.
+\fBstrvar:\fR Must be a string of only hex digits 0-9, a-f or A-F.
 
 \fBReturns:\fR A string if all input was hex digits otherwise "".
 
@@ -6689,13 +6722,13 @@ let v2 = oconv("14.5]QQ]65535"_var, "MX");
 
 
 .SS
-var v1 = varstr.iconv("MX");
+var v1 = strvar.iconv("MX");
 .nf
  
 .fi
 Convert hexadecimal string to number.
 
-\fBvarstr:\fR A string or dynamic array of up to 16 hex digits: 0-9, a-f, A-F.
+\fBstrvar:\fR A string or dynamic array of up to 16 hex digits: 0-9, a-f, A-F.
 
 \fBReturns:\fR An integer or dynamic array of integers. Invalid elements are converted to "".
 
@@ -6751,7 +6784,7 @@ let v2 = oconv(255, "MB");
 
 
 .SS
-var v1 = varstr.oconv("TX");
+var v1 = strvar.oconv("TX");
 .nf
  
 .fi
@@ -6799,7 +6832,7 @@ let v8 = "st1~st2"_var.oconv("TX"); // "st1" _BS _BS _BS _BS _NL "st2"
 
 
 .SS
-var v1 = varstr.iconv("TX");
+var v1 = strvar.iconv("TX");
 .nf
  
 .fi

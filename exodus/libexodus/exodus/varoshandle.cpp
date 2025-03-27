@@ -22,10 +22,10 @@ VarOSHandleEntry::VarOSHandleEntry()
 	//: deleter((DELETER_AND_DESTROYER)0), handle(0) {}
 	: deleter(static_cast<DELETER_AND_DESTROYER>(nullptr)), handle(nullptr) {}
 
-VarOSHandlesCache::VarOSHandlesCache()
+VarOSfstreamHandles::VarOSfstreamHandles()
 	: conntbl(HANDLES_CACHE_SIZE) {}
 
-int VarOSHandlesCache::add_handle(CACHED_HANDLE handle_to_cache, DELETER_AND_DESTROYER del, std::string name) {
+int VarOSfstreamHandles::add_handle(CACHED_HANDLE handle_to_cache, DELETER_AND_DESTROYER del, std::string name) {
 
 	if (!del)
 		throw VarDBException(std::string(__PRETTY_FUNCTION__).append(" del is missing."));
@@ -47,14 +47,14 @@ int VarOSHandlesCache::add_handle(CACHED_HANDLE handle_to_cache, DELETER_AND_DES
 	return ix;
 }
 
-CACHED_HANDLE VarOSHandlesCache::get_handle(int index, std::string name) {
+CACHED_HANDLE VarOSfstreamHandles::get_handle(int index, std::string name) {
 	//std::lock_guard lock(mvhandles_mutex);
 	return (conntbl[index].deleter == nullptr) || (conntbl[index].extra != name)
 			   ? nullptr
 			   : conntbl[index].handle;
 }
 
-void VarOSHandlesCache::del_handle(int index) {
+void VarOSfstreamHandles::del_handle(int index) {
 	//std::lock_guard lock(mvhandles_mutex);
 	if (!conntbl[index].deleter)
 		throw VarDBException(std::string(__PRETTY_FUNCTION__).append(" deleter is missing."));
@@ -65,7 +65,7 @@ void VarOSHandlesCache::del_handle(int index) {
 	conntbl[index].deleter = nullptr;
 }
 
-VarOSHandlesCache::~VarOSHandlesCache() {
+VarOSfstreamHandles::~VarOSfstreamHandles() {
 
 	// crashes on linux and multithreaded destructor cant exist so  dont lock
 	// std::lock_guard lock(mvhandles_mutex);

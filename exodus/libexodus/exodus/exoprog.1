@@ -479,11 +479,12 @@ If you are calling iconv/oconv in code and DATEFMT is adequate for your needs th
 \fBExample:\fR
 .RS
 .nf
-let v1 = iconv("JAN 9 2020", "D");
-assert(oconv(v1, "[DATE]"   ) == " 9/ 1/2020");  // "D/EZ" or "[DATE,D]" equivalent assuming D/E in DATEFMT (replace leading zeros with spaces)
-assert(oconv(v1, "[DATE,4]" ) == " 9/ 1/2020");  // "D4Z"  equivalent assuming D/E in DATEFMT (replace leading zeros with spaces)
-assert(oconv(v1, "[DATE,*4]") == "9/1/2020");    // "D4ZZ" equivalent assuming D/E in DATEFMT (trim leading zeros and spaces)
-assert(oconv(v1, "[DATE,*]" ) == "9/1/20");      // "DZZ"  equivalent assuming D/E in DATEFMT (trim leading zeros and spaces)
+DATEFMT = "D/E";
+let v1 = iconv("JAN 9 2025", "D");
+assert(oconv(v1, "[DATE]"   ) == " 9/ 1/2025");  // "D/EZ" or "[DATE,D]" equivalent assuming D/E in DATEFMT (replace leading zeros with spaces)
+assert(oconv(v1, "[DATE,4]" ) == " 9/ 1/2025");  // "D4Z"  equivalent assuming D/E in DATEFMT (replace leading zeros with spaces)
+assert(oconv(v1, "[DATE,*4]") == "9/1/2025");    // "D4ZZ" equivalent assuming D/E in DATEFMT (trim leading zeros and spaces)
+assert(oconv(v1, "[DATE,*]" ) == "9/1/2025");    // "DZZ"  equivalent assuming D/E in DATEFMT (trim leading zeros and spaces)
 .fi
 .RE
 

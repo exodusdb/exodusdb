@@ -251,7 +251,7 @@ func main() {
 		let v2 = textchrname(91);
 	}
 
-	var varstr;
+	var strvar;
 
 	printl("str(const int num) const;");
 	{
@@ -272,8 +272,6 @@ func main() {
 		let softhyphen = "\xc2\xad";
 		let v1 = var(123.45).numberinwords("de_DE").replace(softhyphen, " "); assert(v1 == "ein hundert drei und zwanzig Komma vier fünf");
 	}
-
-	var strvar;
 
 	printl("at(const int pos1) const;");
 	{
@@ -1481,7 +1479,7 @@ func main() {
 	{
 		let osfilename = ostempdir() ^ "xo_gendoc_test.conf";
 		let text = "aaa=123\nbbb=456\n";
-		var offset = osfile(osfilename).f(1); /// Size of file therefore append
+		var offset = -1; /// -1 means append.
 		if (text.osbwrite(osfilename, offset)) {/*ok*/} else  abort("osbwrite: " ^ lasterror());  assert(offset == 16);
 		// or
 		if (not osbwrite(text on osfilename, offset)) abort("osbwrite: " ^ lasterror());
@@ -1494,6 +1492,14 @@ func main() {
 		if (text.osbread(osfilename, offset, 8)) {/*ok*/} else  abort("osbread: " ^ lasterror());  assert(text == "aaa=123\n" ); assert(offset == 8);
 		// or
 		if (osbread(text from osfilename, offset, 8)) {/*ok*/} else  abort("osbread: " ^ lasterror());  assert(text == "bbb=456\n" ); assert(offset == 16);
+	}
+
+	printl("operator<<(const auto& value) const");
+	{
+		let txtfile = "t_temp.txt";
+		if (not osremove(txtfile)) {} // Remove any existing file.
+		txtfile << txtfile << " " << 123.456789 << " " << 123 << std::endl;
+		let v1 = osread(txtfile); assert(v1 == "t_temp.txt 123.457 123\n");
 	}
 
 	printl("osclose() const;");
@@ -2366,11 +2372,12 @@ func main() {
 
 	printl("exoprog_date(in type, in input0, in ndecs0, out output);");
 	{
-		let v1 = iconv("JAN 9 2020", "D");
-		assert(oconv(v1, "[DATE]"   ) == " 9/ 1/2020");  // "D/EZ" or "[DATE,D]" equivalent assuming D/E in DATEFMT (replace leading zeros with spaces)
-		assert(oconv(v1, "[DATE,4]" ) == " 9/ 1/2020");  // "D4Z"  equivalent assuming D/E in DATEFMT (replace leading zeros with spaces)
-		assert(oconv(v1, "[DATE,*4]") == "9/1/2020");    // "D4ZZ" equivalent assuming D/E in DATEFMT (trim leading zeros and spaces)
-		assert(oconv(v1, "[DATE,*]" ) == "9/1/20");      // "DZZ"  equivalent assuming D/E in DATEFMT (trim leading zeros and spaces)
+		DATEFMT = "D/E";
+		let v1 = iconv("JAN 9 2025", "D");
+		assert(oconv(v1, "[DATE]"   ) == " 9/ 1/2025");  // "D/EZ" or "[DATE,D]" equivalent assuming D/E in DATEFMT (replace leading zeros with spaces)
+		assert(oconv(v1, "[DATE,4]" ) == " 9/ 1/2025");  // "D4Z"  equivalent assuming D/E in DATEFMT (replace leading zeros with spaces)
+		assert(oconv(v1, "[DATE,*4]") == "9/1/2025");    // "D4ZZ" equivalent assuming D/E in DATEFMT (trim leading zeros and spaces)
+		assert(oconv(v1, "[DATE,*]" ) == "9/1/2025");    // "DZZ"  equivalent assuming D/E in DATEFMT (trim leading zeros and spaces)
 	}
 
 	printl("exoprog_number(in type, in input0, in ndecs0, out output);");

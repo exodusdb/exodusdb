@@ -565,7 +565,7 @@ public:
 	// var: The substring to be repeated
 	// num: How many times to repeat the substring
 	// Returns: A string
-	// obj is varstr
+	// obj is strvar
 	//
 	// `let v1 = "ab"_var.str(3); // "ababab"
 	//  // or
@@ -2757,14 +2757,20 @@ public:
 	///// OS FILE I/O:
 	/////////////////
 
-	// obj is osfilevar
-
-	// Initialises an os file handle var that can be used for random read and write
-	// osfilename: The name of an existing os file name including path.
-	// utf8: Defaults to true which causes trimming of partial UTF-8 Unicode byte sequences from the end of osbreads. For raw untrimmed osbreads pass tf8 = false;
+	// Opens an os file handle var for random read and write operations.
 	// osfilevar: [out] To be used in subsequent calls to osbread() and osbwrite()
-	// Returns: True if successful or false if not possible for any reason. e.g. Target doesnt exist, permissions etc.
+	// osfilename: The path and name of an existing os file.
+	// utf8: If true, the default, then any partial UTF-8 Unicode byte sequences at the end of osbread data are removed. If false, then osbreads return unmodified data.
+	// Returns: true if the open operation is successful, or false if the file does not exist, or is not accessible.
 	// The file will be opened for writing if possible otherwise for reading.
+
+	// Opens an OS file handle for random read and write operations.
+	// osfilevar: [out] Handle for subsequent osbread() and osbwrite() calls.
+	// osfilename: Path and name of an existing OS file.
+	// utf8: True (default) removes partial UTF-8 sequences from osbread() ends; false returns raw data.
+	// Returns: True if opened successfully, false if file doesn’t exist or isn’t accessible.
+	// Opens for writing if possible, otherwise read-only.
+	// obj is osfilevar
 	//
 	// `let osfilename = ostempdir() ^ "xo_gendoc_test.conf";
 	//  if (oswrite("" on osfilename)) ... ok /// Create an empty os file
@@ -2775,22 +2781,42 @@ public:
 	//
 	ND bool osopen(in osfilename, const bool utf8 = true) const;
 
-	// Writes data to an existing os file starting at a given byte offset (0 based).
-	// See osbread for more info.
+	// Write data to an os file starting at a given position.
+	// strvar: The data to be written.
+	// osfilevar: An os path and filename or an osfilevar opened by osopen(). If not already opened by osopen(), and the file does not exist, it is automatically created if offset is 0 but if the offset is not zero then false is returned.
+	// offset: [io] The char number (0 based) in the file at which to start writing. After writing, the offset is updated to point to the correct offset for a potential subsequent sequential write.
+	// Returns: true if the write operation succeeds, or false if the file is not accessible, updateable, or creatable.
+
+	// Writes data to an OS file at a specified position.
+	// strvar: Data to write.
+	// osfilevar: Handle from osopen() or a path/filename; creates file if offset is 0 and it’s new, fails if offset isn’t 0.
+	// offset: [in/out] Start position (0-based); updated to end of written data; -1 appends.
+	// Returns: True if write succeeds, false if file isn’t accessible, updateable, or creatable.
+	// obj is strvar
 	//
 	// `let osfilename = ostempdir() ^ "xo_gendoc_test.conf";
 	//  let text = "aaa=123\nbbb=456\n";
-	//  var offset = osfile(osfilename).f(1); /// Size of file therefore append
+	//  var offset = -1; /// -1 means append.
 	//  if (text.osbwrite(osfilename, offset)) ... ok // offset -> 16
 	//  // or
 	//  if (not osbwrite(text on osfilename, offset)) ...`
 	//
 	ND bool osbwrite(in osfilevar, io offset) const;
 
-	// Reads length bytes from an existing os file starting at a given byte offset (0 based).
-	// The osfilevar file handle may either be initialised by osopen or be just be a normal string variable holding the path and name of the os file.
-	// After reading, the offset is updated to point to the correct offset for a subsequent sequential read.
-	// If reading UTF8 data (the default) then the length of data actually returned may be a few bytes shorter than requested in order to be a complete number of UTF-8 code points.
+	// Read data from an os file starting at a given position.
+	// strvar: [out] The data that is read.
+	// osfilevar: An os path and filename or an osfilevar opened by osopen().
+	// offset: [io] The char number (0 based) in the file at which to start reading. After reading, the offset is updated to point to the correct offset for a potential subsequent sequential read.
+	// length: The number of chars to read. If reading UTF8 data (the default) then the length of data actually returned may be a few bytes shorter than requested in order to be a complete number of UTF code points as encoded in UTF-8.
+	// Returns: true if the read operation is successful, or false if the file does not exist, or is not accessible.
+
+	// Reads data from an OS file at a specified position.
+	// strvar: [out] Data read.
+	// osfilevar: Handle from osopen() or a path/filename.
+	// offset: [in/out] Start position (0-based); updated to end of read data.
+	// length: Chars to read; with utf8=true (default), may return less to ensure complete UTF-8 code points.
+	// Returns: True if read succeeds, false if file doesn’t exist or isn’t accessible or offset >= file size.
+	// obj is strvar
 	//
 	// `let osfilename = ostempdir() ^ "xo_gendoc_test.conf";
 	//  var text, offset = 0;
@@ -2799,6 +2825,30 @@ public:
 	//  if (osbread(text from osfilename, offset, 8)) ... ok // text -> "bbb=456\n" // offset -> 16`
 	//
 	ND bool osbread(in osfilevar, io offset, const int length);
+
+	// Use convenient << syntax to output anything to an osfile.
+	// osfile: An os path and filename or an osfilevar opened by osopen(). The file will be appended, or created if it does not already exist.
+	// All standard c++ io manipulators may be used e.g. std::setw, setfill etc.
+	// obj is osfile
+	//
+	// `let txtfile = "t_temp.txt";
+	//  if (not osremove(txtfile)) {} // Remove any existing file.
+	//  txtfile << txtfile << " " << 123.456789 << " " << 123 << std::endl;
+	//  let v1 = osread(txtfile);   // "t_temp.txt 123.457 123\n"`
+	//
+	CVR operator<<(const auto& value) const {
+		std::fstream* fs = this->osopenx(*this, /*utf8*/ true, /*or_throw*/ true);
+		(*fs) << value; // Write to the stream
+		return *this;
+	}
+
+	// Handle all stream manipulators
+
+	CVR operator<<(std::ostream& (*manip)(std::ostream&)) const {
+		std::fstream* fs = this->osopenx(*this, /*utf8*/ true, /*or_throw*/ true);
+		manip(*fs); // Apply manipulator to the output side
+		return *this;
+	}
 
 	// Removes an osfilevar handle from the internal memory cache of os file handles. This frees up both exodus process memory and operating system resources.
 	// It is advisable to osclose any file handles after use, regardless of whether they were specifically opened using osopen or not, especially in long running programs. Exodus performs caching of internal os file handles per thread and os file. If not closed, then the operating system will probably not flush deleted files from storage until the process is terminated. This can potentially create an memory issue or file system resource issue especially if osopening/osreading/oswriting many perhaps temporary files in a long running process.
@@ -2815,7 +2865,7 @@ public:
 	// strvar: The text or data to be used to create the file.
 	// osfilename: Absolute or relative path and filename to be written. Any existing os file is removed first.
 	// codepage: If specified then output is converted from UTF-8 to that codepage before being written. Otherwise no conversion is done.
-	// Returns: True if successful or false if not possible for any reason. e.g. Path is not writeable, permissions etc.
+	// Returns: True if successful or false if not possible for any reason. e.g. Path is not writeable, permissions etc
 	//
 	// `let text = "aaa = 123\nbbb = 456";
 	//  let osfilename = ostempdir() ^ "xo_gendoc_test.conf";
@@ -2896,6 +2946,7 @@ public:
 	// Will not remove directories. Use osrmdir() to remove directories
 	// osfilename: Absolute or relative path and file name to be removed.
 	// Returns: True if successful or false if not possible for any reason. e.g. Target doesnt exist, path is not writeable, permissions etc.
+	// If osfilename is an osfilevar then it is automatically closed.
 	// obj is osfilename
 	//
 	// `let osfilename = ostempdir() ^ "xo_gendoc_test.conf";
@@ -3168,7 +3219,7 @@ public:
 	///// OUTPUT:
 	////////////
 
-	// obj is varstr
+	// obj is strvar
 
 	// Output to stdout with optional prefix.
 	// Appends an NL char.
@@ -3560,7 +3611,7 @@ public:
 	// Returns: Internal date or "" if the input is an invalid date.
 	// Internal date format is whole days since 1967-12-31 00:00:00 which is day 0.
 	// Any Dynamic array structure is preserved.
-	// obj is varstr
+	// obj is strvar
 	//
 	// `// International order "DE"
 	//  var v2;
@@ -3629,7 +3680,7 @@ public:
 	// Internal time format is whole seconds since midnight.
 	// Accepts: Two or three groups of digits surrounded and separated by any non-digits char(s).
 	// Any Dynamic array structure is preserved.
-	// obj is varstr
+	// obj is strvar
 	//
 	// `var v2;
 	//  v2 =       "17:13"_var.iconv( "MT" ) ; //  61980
@@ -3731,7 +3782,7 @@ public:
 	// Useful when outputting to terminal devices where spaces are used for alignment.
 	// Splits text into multiple fixed length lines by inserting spaces and TM chars.
 	// ASCII only.
-	// obj is varstr
+	// obj is strvar
 	//
 	// `let v1 = "Have a nice day";
 	//  v2 =   v1.oconv("T#10") ; //  "Have a␣␣␣␣|nice day␣␣"_var
@@ -3757,11 +3808,11 @@ public:
 	ND io   oconv_MR(const char* conversion);
 
 	// Convert the chars of a string to a string of pairs of hexadecimal digits.
-	// varstr: A string. Numbers will be converted to strings for conversion. 1.2 -> "1.2" -> hex "312E32"
+	// strvar: A string. Numbers will be converted to strings for conversion. 1.2 -> "1.2" -> hex "312E32"
 	// Dynamic array structure is not preserved. Field marks are converted to HEX as for all other bytes.
 	// The size of the output is always precisely double that of the input.
 	// This function is the exact inverse of iconv("HEX").
-	// obj is varstr
+	// obj is strvar
 	//
 	// `// var v2;
 	//  v2 =      "ab01"_var.oconv( "HEX" ) ; //  "61" "62" "30" "31" 
@@ -3775,12 +3826,12 @@ public:
 	ND std::string oconv_HEX(const int ioratio) const;
 
 	// Convert a string of pairs of hexadecimal digits to a string of chars.
-	// varstr: Must be a string of only hex digits 0-9, a-f or A-F.
+	// strvar: Must be a string of only hex digits 0-9, a-f or A-F.
 	// Returns: A string if all input was hex digits otherwise "".
 	// Dynamic array structure is not preserved. Any field marks prevent conversion.
 	// This function is the exact inverse of oconv("HEX").
 	// After prefixing a "0" to an odd sized input, the size of the output is always precisely half that of the input.
-	// obj is varstr
+	// obj is strvar
 	//
 	ND var  iconv_HEX(const int ioratio) const;
 
@@ -3809,7 +3860,7 @@ public:
 	ND var oconv_MX() const;
 
 	// Convert hexadecimal string to number.
-	// varstr: A string or dynamic array of up to 16 hex digits: 0-9, a-f, A-F.
+	// strvar: A string or dynamic array of up to 16 hex digits: 0-9, a-f, A-F.
 	// Returns: An integer or dynamic array of integers. Invalid elements are converted to "".
 	// Dynamic array structure is preserved.
 	// Hex strings are converted to unsigned 8 byte integers (uint64)
@@ -3821,7 +3872,7 @@ public:
 	// Hex "7FFFFFFFFFFFFFFF" is the maximum positive integer: 9223372036854775805.
 	// Hex "8000000000000000" is the maximum negative integer: -9223372036854775808.
 	// This function is the exact inverse of oconv("MX").
-	// obj is varstr
+	// obj is strvar
 	//
 	// `let v1 = "F]QQ]FFFF"_var.iconv("MX"); // "15]]65535"_var
 	//  // or
@@ -3846,7 +3897,7 @@ public:
 	// VMs -> literal "\" \n
 	// SMs -> literal "\\" \n
 	// etc.
-	// obj is varstr
+	// obj is strvar
 	//
 	// `// 1. Backslash in text remains backslash
 	//  let v1 = var(_BS).oconv("TX");     // _BS
@@ -3876,7 +3927,7 @@ public:
 
 	// Convert standard text format to dynamic array.
 	// Reverse of oconv("TX") above.
-	// obj is varstr
+	// obj is strvar
 	ND var  iconv_TX(const char* conversion) const;
 
 	/////////////////////
@@ -3888,7 +3939,7 @@ public:
 	//  Any Dynamic array structure is preserved.
 	ND var  iconv_MD(const char* conversion) const;
 
-	ND std::fstream* osopenx(in osfilename, const bool utf8 = true) const;
+	ND std::fstream* osopenx(in osfilename, const bool utf8 = true, const bool or_throw = false) const;
 
 	   bool THIS_IS_OSFILE() const { return ((var_typ & VARTYP_OSFILE) != VARTYP_UNA); }
 
