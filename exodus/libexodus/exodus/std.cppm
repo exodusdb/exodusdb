@@ -93,12 +93,39 @@ export namespace std {
 	using std::system_error;
 	using std::resetiosflags;
 	using std::setiosflags;
+
 	using std::setbase;
 	using std::setfill;
+	using std::dec;
+	using std::hex;
+	using std::oct;
 	using std::fixed;
-	using std::nextafter;
+	using std::scientific;
+	using std::hexfloat;
+	using std::defaultfloat;
 	using std::setprecision;
 	using std::setw;
+
+	using std::boolalpha;
+	using std::noboolalpha;
+	using std::showpoint;
+	using std::noshowpoint;
+	using std::showpos;
+	using std::noshowpos;
+	using std::showbase;
+	using std::noshowbase;
+	using std::uppercase;
+	using std::nouppercase;
+	using std::skipws;
+	using std::noskipws;
+	using std::unitbuf;
+	using std::nounitbuf;
+	using std::left;
+	using std::right;
+	using std::internal;
+	using std::noskipws;
+
+	using std::nextafter;
 	using std::get_money;
 	using std::put_money;
 	using std::get_time;

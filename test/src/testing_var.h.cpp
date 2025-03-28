@@ -52,10 +52,6 @@ func main() {
 		var x = 0.1, y = "0.2", z = x + y;  assert(z == 0.3);
 	}
 
-	var v2;
-
-	var v1;
-
 	printl("or_default(in defaultvalue) const;");
 	{
 		var v1; // Unassigned
@@ -208,8 +204,6 @@ func main() {
 		v1 ^= 22;  assert(v1 == "aa22");
 	}
 
-	var varnum;
-
 	printl("round(const int ndecimals = 0) const;");
 	{
 				let v1 = var(0.295).round(2); assert(v1 == "0.30");
@@ -250,8 +244,6 @@ func main() {
 		// or
 		let v2 = textchrname(91);
 	}
-
-	var strvar;
 
 	printl("str(const int num) const;");
 	{
@@ -954,12 +946,10 @@ func main() {
 		if ("f1^f2^f3c1,f3c2,f3c3^f4"_var.locateusing(",", "f3c2", setting, 3)) {/*ok*/} else  abort("locateusing: " ^ lasterror());  assert(setting == 2 );// returns true
 	}
 
-	var conn;
-
 	printl("connect(in conninfo = "");");
 	{
-		let conninfo = "dbname=exodus user=exodus password=somesillysecret";
-		if (not conn.connect(conninfo)) abort("connect: " ^ lasterror());;
+		var conn = "exodus";
+		if (not conn.connect("dbname=exodus user=exodus password=somesillysecret")) abort("connect: " ^ lasterror());;
 		// or
 		if (not connect()) abort("connect: " ^ lasterror());
 		// or
@@ -968,7 +958,8 @@ func main() {
 
 	printl("attach(in filenames) const;");
 	{
-		let filenames = "xo_clients^dict.xo_clients"_var, conn = "exodus";
+		var conn = "exodus";
+		let filenames = "xo_clients^dict.xo_clients"_var;
 		if (conn.attach(filenames)) {/*ok*/} else  abort("attach: " ^ lasterror());
 		// or
 		if (attach(filenames)) {/*ok*/} else  abort("attach: " ^ lasterror());
@@ -976,6 +967,7 @@ func main() {
 
 	printl("begintrans() const;");
 	{
+		var conn = "exodus";
 		if (not conn.begintrans()) abort("begintrans: " ^ lasterror());
 		// or
 		if (not begintrans()) abort("begintrans: " ^ lasterror());
@@ -983,6 +975,7 @@ func main() {
 
 	printl("statustrans() const;");
 	{
+		var conn = "exodus";
 		if (conn.statustrans()) {/*ok*/} else  abort("statustrans: " ^ lasterror());
 		// or
 		if (statustrans()) {/*ok*/} else  abort("statustrans: " ^ lasterror());
@@ -990,6 +983,7 @@ func main() {
 
 	printl("rollbacktrans() const;");
 	{
+		var conn = "exodus";
 		if (conn.rollbacktrans()) {/*ok*/} else  abort("rollbacktrans: " ^ lasterror());
 		// or
 		if (rollbacktrans()) {/*ok*/} else  abort("rollbacktrans: " ^ lasterror());
@@ -997,6 +991,7 @@ func main() {
 
 	printl("committrans() const;");
 	{
+		var conn = "exodus";
 		if (conn.committrans()) {/*ok*/} else  abort("committrans: " ^ lasterror());
 		// or
 		if (committrans()) {/*ok*/} else  abort("committrans: " ^ lasterror());
@@ -1004,6 +999,7 @@ func main() {
 
 	printl("sqlexec(in sqlcmd) const;");
 	{
+		var conn = "exodus";
 		if (conn.sqlexec("select 1")) {/*ok*/} else  abort("sqlexec: " ^ lasterror());
 		// or
 		if (sqlexec("select 1")) {/*ok*/} else  abort("sqlexec: " ^ lasterror());
@@ -1011,6 +1007,7 @@ func main() {
 
 	printl("sqlexec(in sqlcmd, io response) const;");
 	{
+		var conn = "exodus";
 		let sqlcmd = "select 'xxx' as col1, 'yyy' as col2";
 		var response;
 		if (conn.sqlexec(sqlcmd, response)) {/*ok*/} else  abort("sqlexec: " ^ lasterror());  assert(response == "col1^col2\x1fxxx^yyy"_var );/// \x1f is the Record Mark (RM) char. The backtick char is used here by gendoc to deliminate source code.
@@ -1020,6 +1017,7 @@ func main() {
 
 	printl("disconnect();");
 	{
+		var conn = "exodus";
 		conn.disconnect();
 		// or
 		disconnect();
@@ -1027,6 +1025,7 @@ func main() {
 
 	printl("disconnectall();");
 	{
+		var conn = "exodus";
 		conn.disconnectall();
 		// or
 		disconnectall();
@@ -1066,6 +1065,7 @@ func main() {
 
 	printl("dblist() const;");
 	{
+		var conn = "exodus";
 		let v1 = conn.dblist();
 		// or
 		let v2 = dblist();
@@ -1119,8 +1119,6 @@ func main() {
 		if (deletefile(filename)) abort("deletefile: " ^ lasterror());
 	}
 
-	var conn_or_file;
-
 	printl("reccount(in filename = "") const;");
 	{
 		let conn = "exodus", filename = "xo_clients";
@@ -1128,8 +1126,6 @@ func main() {
 		// or
 		var nrecs2 = reccount(filename);
 	}
-
-	var file;
 
 	printl("open(in dbfilename, in connection = "");");
 	{
@@ -1195,8 +1191,6 @@ func main() {
 		// or
 		if (not unlockall(conn)) abort("unlockall: " ^ lasterror());
 	}
-
-	var record;
 
 	printl("write(in file, in key) const;");
 	{
@@ -1287,8 +1281,6 @@ func main() {
 		if (read(record from file, key)) abort("Error: " ^ key ^ " should not be in the actual database file"); // error
 	}
 
-	var dbfile;
-
 	printl("deletec(in key) const;");
 	{
 		var file = "xo_clients", key = "XD001";
@@ -1299,6 +1291,7 @@ func main() {
 
 	printl("clearcache() const;");
 	{
+		let conn = "exodus";
 		conn.clearcache();
 		// or
 		clearcache(conn);
@@ -1437,8 +1430,6 @@ func main() {
 		let now2 = ostimestamp();
 	}
 
-	var vardate;
-
 	printl("ostimestamp(in ostime) const;");
 	{
 		let idate = iconv("2025-01-01", "D"), itime = iconv("23:59:59", "MT");
@@ -1454,16 +1445,12 @@ func main() {
 		ossleep(100);
 	}
 
-	var file_dir_list;
-
 	printl("oswait(const int milliseconds) const;");
 	{
 		let v1 = ".^/etc/hosts"_var.oswait(100); /// e.g. "IN_CLOSE_WRITE^/etc^hosts^f"_var
 		// or
 		let v2 = oswait(".^/etc/hosts"_var, 100);
 	}
-
-	var osfilevar;
 
 	printl("osopen(in osfilename, const bool utf8 = true) const;");
 	{
@@ -1502,8 +1489,50 @@ func main() {
 		let v1 = osread(txtfile); assert(v1 == "t_temp.txt 123.457 123\n");
 	}
 
+	printl("operator<<(const auto& value) const");
+	{
+		let vout = "std_iomanip_overview.txt";
+		if (not osremove(vout)) {}
+		using namespace std;
+		vout << boolalpha    << true          << "\ttrue"    << endl;
+		vout << noboolalpha  << true          << "\t1"       << endl;
+		vout << showpoint    << 42.0          << "\t42.0000" << endl;
+		vout << noshowpoint  << 42.0          << "\t42"      << endl;
+		vout << showpos      << 42            << "\t+42"     << endl;
+		vout << noshowpos    << 42            << "\t42"      << endl;
+		vout << skipws       << " " << 42     << "\t 42"     << endl;
+		vout << noskipws     << " " << 42     << "\t 42"     << endl;
+		vout << unitbuf      << "a"           << "\ta"       << endl;
+		vout << nounitbuf    << "b"           << "\tb"       << endl;
+		vout << setw(6)      << 42            << "\t    42"  << endl;
+		vout << left         << setw(6) << 42 << "\t42    "  << endl;
+		vout << right        << setw(6) << 42 << "\t    42"  << endl;
+		vout << internal     << setw(6) << 42 << "\t    42"  << endl;
+		vout << setfill('*') << setw(6) << 42 << "\t****42"  << endl;
+		vout << showbase     << hex << 255    << "\t0xff"    << endl;
+		vout << noshowbase   << 255           << "\tff"      << endl;
+		vout << uppercase    << 255           << "\tFF"      << endl;
+		vout << nouppercase  << 255           << "\tff"      << endl;
+		vout << oct          << 255           << "\t377"     << endl;
+		vout << hex          << 255           << "\tff"      << endl;
+		vout << dec          << 255           << "\t255"     << endl;
+		vout << fixed        << 42.1          << "\t42.100000"            << endl;
+		vout << scientific   << 42.1          << "\t4.210000e+01"         << endl;
+		vout << hexfloat     << 42.1          << "\t0x1.50ccccccccccdp+5" << endl;
+		vout << defaultfloat << 42.1          << "\t42.1"                 << endl;
+		vout << std::setprecision(3)      << 42.1567  << "\t42.2"  << endl;
+		vout << resetiosflags(ios::fixed) << 42.1567  << "\t42.2"  << endl;
+		vout << setiosflags(ios::showpos) << 42       << "\t+42"   << endl;
+		// Verify actual v. expected.
+		var act_v_exp = osread(vout);
+		act_v_exp.converter("\n\t", FM ^ VM); ;assert(act_v_exp == Text to dynamic array);
+		act_v_exp = invertarray(act_v_exp);   // Columns <-> Rows
+		assert(act_v_exp.f(1) eq act_v_exp.f(2));
+	}
+
 	printl("osclose() const;");
 	{
+		var osfilevar; if (osfilevar.osopen(ostempfile())) {/*ok*/} else  abort("osclose: " ^ lasterror());
 		osfilevar.osclose();
 		// or
 		osclose(osfilevar);
@@ -1527,8 +1556,6 @@ func main() {
 		if (osread(text from osfilename)) {/*ok*/} else  abort("osread: " ^ lasterror());
 		let text2 = osread(osfilename);
 	}
-
-	var osfile_or_dirname;
 
 	printl("osrename(in new_dirpath_or_filepath) const;");
 	{
@@ -1559,8 +1586,6 @@ func main() {
 		if (oscopy(from_osfilename, to_osfilename)) {/*ok*/} else  abort("oscopy: " ^ lasterror());
 	}
 
-	var osfilename;
-
 	printl("osremove() const;");
 	{
 		let osfilename = ostempdir() ^ "xo_gendoc_test.conf";
@@ -1569,16 +1594,12 @@ func main() {
 		if (osremove(osfilename)) abort("osremove: " ^ lasterror());
 	}
 
-	var dirpath;
-
 	printl("oslist(SV globpattern = "", const int mode = 0) const;");
 	{
 		var entries1 = "/etc/"_var.oslist("*.cfg"); /// e.g. "adduser.conf^ca-certificates.con^... etc."
 		// or
 		var entries2 = oslist("/etc/" "*.conf");
 	}
-
-	var osfile_or_dirpath;
 
 	printl("osinfo(const int mode = 0) const;");
 	{
@@ -1634,8 +1655,6 @@ func main() {
 		if (osrmdir(osdirname)) abort("osrmdir: " ^ lasterror());
 	}
 
-	var command;
-
 	printl("osshell() const;");
 	{
 		let cmd = "echo $HOME";
@@ -1643,8 +1662,6 @@ func main() {
 		// or
 		if (osshell(cmd)) {/*ok*/} else  abort("osshell: " ^ lasterror());
 	}
-
-	var instr;
 
 	printl("osshellread(in oscmd);");
 	{
@@ -1654,8 +1671,6 @@ func main() {
 		// or capturing stdout but ignoring exit status
 		text = osshellread(cmd);
 	}
-
-	var outstr;
 
 	printl("osshellwrite(in oscmd) const;");
 	{
@@ -1678,8 +1693,6 @@ func main() {
 		// or
 		var temposfilename2 = ostempfile();
 	}
-
-	var envvalue;
 
 	printl("ossetenv(SV envcode) const;");
 	{
@@ -1972,8 +1985,6 @@ func main() {
 		v2 = iconv("12/1/2020"_var, "DE") ; assert(v2 == 19005);
 	}
 
-	var vartime;
-
 	printl("oconv_MT(const char* conversion) const;");
 	{
 		let v1  = 62000;
@@ -2054,9 +2065,9 @@ func main() {
 	printl("oconv_T(in format) const;");
 	{
 		let v1 = "Have a nice day";
-		v2 =   v1.oconv("T#10") ; assert(v2 == "Have a    |nice day  "_var);
+		let v2 = v1.oconv("T#10") ; assert(v2 == "Have a    |nice day  "_var);
 		// or
-		v2 =  oconv(v1, "T#10") ; assert(v2 == "Have a    |nice day  "_var );
+		let v3  = oconv(v1, "T#10") ; //  "Have a    |nice day  "_var
 	}
 
 	printl("oconv_MR(const char* conversion);");
@@ -2076,7 +2087,7 @@ func main() {
 
 	printl("oconv_HEX(const int ioratio) const;");
 	{
-		// var v2;
+		var v2;
 		v2 =      "ab01"_var.oconv( "HEX" ) ; assert(v2 == "61" "62" "30" "31");
 		v2 =  "\xff\x00"_var.oconv( "HEX" ) ; assert(v2 == "FF" "00"           ); // Any bytes are ok.
 		v2 =         var(10).oconv( "HEX" ) ; assert(v2 == "31" "30"           ); // Uses ASCII string equivalent of 10 i.e. "10".
@@ -2164,8 +2175,6 @@ func main() {
 		dim d1(10);
 		d1 = "";
 	}
-
-	var d1;
 
 	printl("redim(const int nrows, const int ncols = 1);");
 	{

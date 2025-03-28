@@ -1952,8 +1952,8 @@ public:
 	// 4. The default conninfo is "host=127.0.0.1 port=5432 dbname=exodus user=exodus password=somesillysecret connect_timeout=10"
 	// Setting environment variable EXO_DBTRACE=1 will cause tracing of db interface including SQL commands.
 	//
-	// `let conninfo = "dbname=exodus user=exodus password=somesillysecret";
-	//  if (not conn.connect(conninfo)) ...;
+	// `var conn = "exodus";
+	//  if (not conn.connect("dbname=exodus user=exodus password=somesillysecret")) ...;
 	//  // or
 	//  if (not connect()) ...
 	//  // or
@@ -1969,7 +1969,8 @@ public:
 	// Returns: false if any filename does not exist and cannot be opened on the given connection. All filenames that can be opened on the conneciton are attached even if some cannot.
 	// Internally, attach merely opens each filename on the given connection causing them to be added to an internal cache.
 	//
-	// `let filenames = "xo_clients^dict.xo_clients"_var, conn = "exodus";
+	// `var conn = "exodus";
+	//  let filenames = "xo_clients^dict.xo_clients"_var;
 	//  if (conn.attach(filenames)) ... ok
 	//  // or
 	//  if (attach(filenames)) ... ok`
@@ -1984,7 +1985,8 @@ public:
 
 	// Begin a db transaction.
 	//
-	// `if (not conn.begintrans()) ...
+	// `var conn = "exodus";
+	//  if (not conn.begintrans()) ...
 	//  // or
 	//  if (not begintrans()) ...`
 	//
@@ -1992,7 +1994,8 @@ public:
 
 	// Check if a db transaction is in progress.
 	//
-	// `if (conn.statustrans()) ... ok
+	// `var conn = "exodus";
+	//  if (conn.statustrans()) ... ok
 	//  // or
 	//  if (statustrans()) ... ok`
 	//
@@ -2000,7 +2003,8 @@ public:
 
 	// Rollback a db transaction.
 	//
-	// `if (conn.rollbacktrans()) ... ok
+	// `var conn = "exodus";
+	//  if (conn.rollbacktrans()) ... ok
 	//  // or
 	//  if (rollbacktrans()) ... ok`
 	//
@@ -2009,7 +2013,8 @@ public:
 	// Commit a db transaction.
 	// Returns: True if successfully committed or if there was no transaction in progress, otherwise false.
 	//
-	// `if (conn.committrans()) ... ok
+	// `var conn = "exodus";
+	//  if (conn.committrans()) ... ok
 	//  // or
 	//  if (committrans()) ... ok`
 	//
@@ -2018,7 +2023,8 @@ public:
 	// Execute an sql command.
 	// Returns: True if there was no sql error otherwise lasterror() returns a detailed error message.
 	//
-	// `if (conn.sqlexec("select 1")) ... ok
+	// `var conn = "exodus";
+	//  if (conn.sqlexec("select 1")) ... ok
 	//  // or
 	//  if (sqlexec("select 1")) ... ok`
 	//
@@ -2029,7 +2035,8 @@ public:
 	// response: Any rows and columns returned are separated by RM and FM respectively. The first row is the column names.
 	// Recommended: Don't use sql directly unless you must to manage or configure a database.
 	//
-	// `let sqlcmd = "select 'xxx' as col1, 'yyy' as col2";
+	// `var conn = "exodus";
+	//  let sqlcmd = "select 'xxx' as col1, 'yyy' as col2";
 	//  var response;
 	//  if (conn.sqlexec(sqlcmd, response)) ... ok // response -> "col1^col2\x1fxxx^yyy"_var /// \x1f is the Record Mark (RM) char. The backtick char is used here by gendoc to deliminate source code.
 	//  // or
@@ -2039,7 +2046,8 @@ public:
 
 	// Closes db connection and frees process resources both locally and in the database server.
 	//
-	// `conn.disconnect();
+	// `var conn = "exodus";
+	//  conn.disconnect();
 	//  // or
 	//  disconnect();`
 	//
@@ -2048,7 +2056,8 @@ public:
 	// Closes all connections and frees process resources both locally and in the database server(s).
 	// All connections are closed automatically when a process terminates.
 	//
-	// `conn.disconnectall();
+	// `var conn = "exodus";
+	//  conn.disconnectall();
 	//  // or
 	//  disconnectall();`
 	//
@@ -2105,7 +2114,8 @@ public:
 
 	// Returns: A list of available databases on a particular connection.
 	//
-	// `let v1 = conn.dblist();
+	// `var conn = "exodus";
+	//  let v1 = conn.dblist();
 	//  // or
 	//  let v2 = dblist();`
 	//
@@ -2444,7 +2454,8 @@ public:
 	// Clears the memory cache of all records for the given connection
 	// All future cache readc() function calls will be forced to obtain records from the actual database and refresh the cache.
 	//
-	// `conn.clearcache();
+	// `let conn = "exodus";
+	//  conn.clearcache();
 	//  // or
 	// clearcache(conn);`
 	//
@@ -2836,6 +2847,57 @@ public:
 	//  txtfile << txtfile << " " << 123.456789 << " " << 123 << std::endl;
 	//  let v1 = osread(txtfile);   // "t_temp.txt 123.457 123\n"`
 	//
+	// `let vout = "std_iomanip_overview.txt";
+	//  if (not osremove(vout)) {}
+	//  using namespace std;
+	//
+	//  vout << boolalpha    << true          << "\ttrue"    << endl;
+	//  vout << noboolalpha  << true          << "\t1"       << endl;
+	//
+	//  vout << showpoint    << 42.0          << "\t42.0000" << endl;
+	//  vout << noshowpoint  << 42.0          << "\t42"      << endl;
+	//
+	//  vout << showpos      << 42            << "\t+42"     << endl;
+	//  vout << noshowpos    << 42            << "\t42"      << endl;
+	//
+	//  vout << skipws       << " " << 42     << "\t 42"     << endl;
+	//  vout << noskipws     << " " << 42     << "\t 42"     << endl;
+	//
+	//  vout << unitbuf      << "a"           << "\ta"       << endl;
+	//  vout << nounitbuf    << "b"           << "\tb"       << endl;
+	//
+	//  vout << setw(6)      << 42            << "\t    42"  << endl;
+	//
+	//  vout << left         << setw(6) << 42 << "\t42    "  << endl;
+	//  vout << right        << setw(6) << 42 << "\t    42"  << endl;
+	//  vout << internal     << setw(6) << 42 << "\t    42"  << endl;
+	//  vout << setfill('*') << setw(6) << 42 << "\t****42"  << endl;
+	//
+	//  vout << showbase     << hex << 255    << "\t0xff"    << endl;
+	//  vout << noshowbase   << 255           << "\tff"      << endl;
+	//
+	//  vout << uppercase    << 255           << "\tFF"      << endl;
+	//  vout << nouppercase  << 255           << "\tff"      << endl;
+	//
+	//  vout << oct          << 255           << "\t377"     << endl;
+	//  vout << hex          << 255           << "\tff"      << endl;
+	//  vout << dec          << 255           << "\t255"     << endl;
+	//
+	//  vout << fixed        << 42.1          << "\t42.100000"            << endl;
+	//  vout << scientific   << 42.1          << "\t4.210000e+01"         << endl;
+	//  vout << hexfloat     << 42.1          << "\t0x1.50ccccccccccdp+5" << endl;
+	//  vout << defaultfloat << 42.1          << "\t42.1"                 << endl;
+	//
+	//  vout << std::setprecision(3)      << 42.1567  << "\t42.2"  << endl;
+	//  vout << resetiosflags(ios::fixed) << 42.1567  << "\t42.2"  << endl;
+	//  vout << setiosflags(ios::showpos) << 42       << "\t+42"   << endl;
+	//
+	//  // Verify actual v. expected.
+	//  var act_v_exp = osread(vout);
+	//  act_v_exp.converter("\n\t", FM ^ VM); // Text to dynamic array
+	//  act_v_exp = invertarray(act_v_exp);   // Columns <-> Rows
+	//  assert(act_v_exp.f(1) eq act_v_exp.f(2));`
+	//
 	CVR operator<<(const auto& value) const {
 		std::fstream* fs = this->osopenx(*this, /*utf8*/ true, /*or_throw*/ true);
 		(*fs) << value; // Write to the stream
@@ -2853,7 +2915,8 @@ public:
 	// Removes an osfilevar handle from the internal memory cache of os file handles. This frees up both exodus process memory and operating system resources.
 	// It is advisable to osclose any file handles after use, regardless of whether they were specifically opened using osopen or not, especially in long running programs. Exodus performs caching of internal os file handles per thread and os file. If not closed, then the operating system will probably not flush deleted files from storage until the process is terminated. This can potentially create an memory issue or file system resource issue especially if osopening/osreading/oswriting many perhaps temporary files in a long running process.
 	//
-	// `osfilevar.osclose();
+	// `var osfilevar; if (osfilevar.osopen(ostempfile())) ... ok
+	//  osfilevar.osclose();
 	//  // or
 	//  osclose(osfilevar);`
 	//
@@ -3785,9 +3848,9 @@ public:
 	// obj is strvar
 	//
 	// `let v1 = "Have a nice day";
-	//  v2 =   v1.oconv("T#10") ; //  "Have a␣␣␣␣|nice day␣␣"_var
+	//  let v2 = v1.oconv("T#10") ; //  "Have a␣␣␣␣|nice day␣␣"_var
 	//  // or
-	//  v2 =  oconv(v1, "T#10") ; //  "Have a␣␣␣␣|nice day␣␣"_var `
+	//  let v3  = oconv(v1, "T#10") ; //  "Have a␣␣␣␣|nice day␣␣"_var `
 	//
 	ND std::string oconv_T(in format) const;
 
@@ -3814,7 +3877,7 @@ public:
 	// This function is the exact inverse of iconv("HEX").
 	// obj is strvar
 	//
-	// `// var v2;
+	// `var v2;
 	//  v2 =      "ab01"_var.oconv( "HEX" ) ; //  "61" "62" "30" "31" 
 	//  v2 =  "\xff\x00"_var.oconv( "HEX" ) ; //  "FF" "00"            // Any bytes are ok.
 	//  v2 =         var(10).oconv( "HEX" ) ; //  "31" "30"            // Uses ASCII string equivalent of 10 i.e. "10".

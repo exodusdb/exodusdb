@@ -506,8 +506,9 @@ func main() {
 						if (not objname or objname == "var")
 							continue;
 						if (not locate(objname, defined_objs)) {
-							codematch.prefixer("\n\tvar " ^ objname ^ ";\n");
 							defined_objs ^= objname ^ VM;
+							// Declare a var if "obj is"
+							//codematch.prefixer("\n\tvar " ^ objname ^ ";\n");
 						}
 					}
 					new_objs = "";
