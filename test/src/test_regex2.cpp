@@ -317,6 +317,7 @@ func main() {
 		// Check that replace using function groups to work on
 		var words = "programinit libraryinit programexit libraryexit";
 		words.replacer("(program|library)(init|exit)"_rex, [](auto groups){TRACE(groups); return groups.f(1,2).first(3) ^ groups.f(1,3);});
+		TRACE(words)
 		assert(words == "proinit libinit proexit libexit");
 	}
 
@@ -330,6 +331,37 @@ func main() {
 			is left as is.
 		*/
 		assert("$1,$2"_var.replace("(\\$(\\d))"_rex, "$$1-$1$2") eq "$1-$11,$1-$22");
+	}
+
+	// Test using capturing lambdas
+	{
+		// Create two lines with trailing comments
+		// We want to replace all keywords like var only BEFORE the //
+		RECORD = "var v1 = \"abc\";/" "/ var v1\n";
+		RECORD ^= "var v1 = \"abc\";\n";
+
+		// A non capturing function to wrap any word
+		auto wrapword = [](in word) {
+			//TRACE(word)
+			return "<span class=exo>" ^ word.f(1, 1) ^ "</span>";
+		};
+
+		rex rex1 = rex(R"__((var|let))__");
+
+		// A capturing lambda function to replace various words
+		auto wrapwords = [&](in words) -> var {
+			//TRACE(words.f(1,1))
+			return words.f(1,1).replace(rex1, wrapword);
+		};
+
+		// Replace various words only up to //
+		RECORD = RECORD.replace(R"__(^(.*?)(?=\/\/|$))__"_rex, wrapwords);
+
+		TRACE(RECORD)
+		assert(RECORD eq "<span class=exo>var</span> v1 = \"abc\";/" "/ var v1\n<span class=exo>var</span> v1 = \"abc\";\n");
+
+		assert(count(RECORD, "class") eq 2);
+
 	}
 
 	printl(elapsedtimetext());

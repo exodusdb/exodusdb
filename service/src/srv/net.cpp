@@ -95,8 +95,8 @@ listen:
 
 	// stop if cant backup because another process is backing up or hung processes
 	if (msg_.contains("FILEMAN-SHUTDOWN")) {
-		logoff();
-		logoff();
+		stop();
+		stop();
 	}
 
 	// check lists and indexing files are not corrupted and zero them if they are
@@ -277,8 +277,8 @@ listen:
 			call upgrade();
 
 			if (SYSTEM.f(125)) {
-				logoff();
-				logoff();
+				stop();
+				stop();
 			}
 		}
 	}
@@ -309,15 +309,15 @@ listen:
 	}
 
 	if (halt) {
-		logoff();
-		logoff();
+		stop();
+		stop();
 	}
 
 	if (cmd.field(" ", 1) == "LISTEN") {
 		// if NET LISTEN LISTEN LISTEN - then terminate if too many errors
 		if (cmd.len() > 100) {
 			printl(msg_);
-			logoff();
+			stop();
 		}
 		cmd.replacer(" INTRANET", "");
 		chain("NET " ^ cmd);

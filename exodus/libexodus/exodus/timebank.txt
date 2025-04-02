@@ -192,7 +192,7 @@
 691 var  var::last() const
 692 void var::firster() &
 693 void var::laster() &
-694 var  var::search(SV regex_str, int startchar1, SV regex_options) const
+694 var  var::search(SV regex_str, io startchar1, SV regex_options) const
 695 std::wstring var::to_wstring() const
 696 const char* var::c_str() const
 697 str  var::oconv_T(in format) const
@@ -216,7 +216,7 @@
 715 auto fmt::formatter::parse(...)
 716 auto fmt::formatter::format(var) const
 717 var  var::match(const rex& regex) const
-718 var  var::search(const rex& regex, int startchar1) const
+718 var  var::search(const rex& regex, io startchar1) const
 719 out  var::getxlocale() static
 720 CVR  var::output() const
 721 CVR  var::outputl() const

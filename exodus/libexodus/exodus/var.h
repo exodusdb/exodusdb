@@ -91,10 +91,6 @@ class var_proxy3;
 	using out    =       var&;
 	using io     =       var&;
 
-//////////
-//// var :
-//////////
-
 // class var
 // using CRTP to capture a customised base class that knows what a var is
 class PUBLIC var : public var_mid<var> {
@@ -127,6 +123,12 @@ public:
 	//
 	// `var client; // Unassigned var
 	//  if (not read(client from "xo_clients", "SB001")) ...`
+	//
+	// `//             Exodus keywords:     C++ declarations:
+	//  //             Non-Const   Const    Non-Const   Const
+	//  //             -----------------    ----------------------
+	//  // Variable:   var         let      var         const var
+	//  // Reference:  out         in       var&        const var&`
 	//
     var() = default;
 
@@ -352,12 +354,13 @@ public:
 	////////////////////////////////////////////////
 
 	// The literal suffix "_var" allows dynamic arrays to be seamlessly embedded in code using a predefined set of visible equivalents of unprintable field mark characters as follows:
-	// {backtick} = RM, Record mark
-	// ^ = FM, Field mark
-	// ] = VM, Value mark
-	// } = SM, Subvalue mark
-	// | = TM, Text mark
-	// ~ = ST, Subtext mark
+	//    Visible  Unprintable
+	// *     {backtick}     RM  Record mark
+	// *     ^     FM  Field mark
+	// *     ]     VM  Value mark
+	// *     }     SM  Subvalue mark
+	// *     |     TM  Text mark
+	// *     ~     ST  Subtext mark
 	//
 	// `var v1 = "f1^f2^v1]v2^f4"_var; // "f1" _FM "f2" _FM "v1" _VM "v2" _FM "f4"`
 	//
@@ -783,23 +786,22 @@ public:
 	//  let v2 = match("abc1abc2", "BC(\\d)", "i");`
 	//
 	// regex_options:
-	// <pre>
-    // l - Literal (any regex chars are treated as normal chars)
-    // i - Case insensitive
-    // p - ECMAScript/Perl (the default)
-    // b - Basic POSIX (same as sed)
-    // e - Extended POSIX
-    // a - awk
-    // g - grep
-    // eg - egrep or grep -E
+    // * l - Literal (any regex chars are treated as normal chars)
+    // * i - Case insensitive
+    // * p - ECMAScript/Perl (the default)
+    // * b - Basic POSIX (same as sed)
+    // * e - Extended POSIX
+    // * a - awk
+    // * g - grep
+    // * eg - egrep or grep -E
 	//
     // char ranges like a-z are locale sensitive if ECMAScript
 	//
-    // m - Multiline. Default in boost (and therefore exodus)
-    // s - Single line. Default in std::regex
-	// f - First only. Only for replace() (not match() or search())
-    // w - Wildcard glob style (e.g. *.cfg) not regex style. Only for match() and search(). Not replace().
-	// </pre>
+	// regex_options:
+    // * m - Multiline. Default in boost (and therefore exodus)
+    // * s - Single line. Default in std::regex
+	// * f - First only. Only for replace() (not match() or search())
+    // * w - Wildcard glob style (e.g. *.cfg) not regex style. Only for match() and search(). Not replace().
 	//
 	ND var  match(SV regex_str, SV regex_options = "") const;
 
@@ -808,7 +810,7 @@ public:
 
 	// Search for the first match of a regular expression.
 	// startchar1: [in] char position to start the search from
-	// startchar1: [out] char position to start the next search from
+	// startchar1: [out] char position to start the next search from or 0 if no more matches.
 	// Returns: The 1st match like match()
 	// regex_options as for match()
 	//
@@ -1290,11 +1292,11 @@ public:
 	// replacement_str: A literal to replace all matched substrings.
 	// The replacement string can include the following special replacement patterns:
 	// Pattern  Inserts
-	// $$       Inserts a "$".
-	// $&       Inserts the matched substring. Equivalent to $0.
-	// ${backtick}       Inserts the portion of the string that precedes the matched substring.
-	// $'       Inserts the portion of the string that follows the matched substring.
-	// $n       Inserts the nth (1-indexed) capturing group where n is a positive integer less than 100.
+	// * $$     Inserts a "$".
+	// * $&     Inserts the matched substring. Equivalent to $0.
+	// * ${backtick}     Inserts the portion of the string that precedes the matched substring.
+	// * $'     Inserts the portion of the string that follows the matched substring.
+	// * $n     Inserts the nth (1-indexed) capturing group where n is a positive integer less than 100.
 	//
 	// `let v1 = "A a B b"_var.replace("[A-Z]"_rex, "'$0'"); // "'A' a 'B' b"
 	//  // or
@@ -1302,9 +1304,19 @@ public:
 	//
 	ND var  replace(const rex& regex, SV replacement_str) const&;
 
+	// old non-templated version that handled functions and non-capturing lambdas without std::function
+	// Replaced by templated version that can accept capturing lambdas as well
+	//	var  replace(const rex& regex, SomeFunction(in match_str)) const;
+
+	// Implementation can handle any type of function including capturing lambdas.
+	// [[undocumented]]
+	var replace(const rex& rex1, var (*func)(const var&, void*), void* context) const;
+
+	// Template wrapper to accept any callable (including capturing lambdas)
+
 	// Replace substrings using a regular expression and a custom function.
-	// Allows very complex string conversions.
-	// SomeFunction: Must return a var. Can be an inline anonymous lambda function.
+	// Allows complex string conversions.
+	// repl_func: A function with arguments (in match_str) that returns a var to replace match_str. May be an inline anonymous lambda function (capturing or non-capturing).
 	// e.g. [](auto match_str) {return match_str;} // Does nothing.
 	// match_str: Text of a single match. If regex groups are used, match_str.f(1, 1) is the whole match, match_str.f(1, 2) is the first group, etc.
 	//
@@ -1314,9 +1326,9 @@ public:
 	//      R"(\\0x[0-9a-fA-F]{2,2})"_rex,                              // Finds \0xFF.
 	//      [](auto match_str) {return match_str.cut(3).iconv("HEX");}  // Decodes to a char.
 	//  );
-	//  assert(v1 == "--;--/--");
+	//  assert(v1 == "--;--/--");`
 	//
-	//  // Reformat dates using groups.
+	// `// Reformat dates using groups.
 	//  var v2 = "Date: 03-15-2025";
 	//  v2.replacer(
 	//      R"((\d{2})-(\d{2})-(\d{4}))"_rex,
@@ -1324,7 +1336,20 @@ public:
 	//  );
 	//  assert(v2 == "Date: 2025-03-15");`
 	//
-	var  replace(const rex& regex, SomeFunction(in match_str)) const;
+	var replace(const rex& regex, ReplacementFunction auto repl_func) const {
+
+		// Lambda to bridge the callable to a function pointer + context
+		struct Context {decltype(repl_func)* lambda;};
+		Context ctx{&repl_func};
+
+		// Non-capturing lambda to adapt the callable to the function pointer signature
+		auto bridge = [](const var& match_str, void* ctx) -> var {
+			auto* context = static_cast<Context*>(ctx);
+			return (*context->lambda)(match_str); // Invoke the original lambda
+		};
+
+		return replace(regex, bridge, &ctx);
+	}
 
 	// Remove duplicate fields in an FM or VM etc. separated list
 	//
@@ -1460,8 +1485,8 @@ public:
 	ND var  textconvert(SV fromchars, SV tochars)     && {textconverter(fromchars, tochars);   return std::move(*this);}
 	ND var  replace(    SV fromstr,   SV tostr)       && {replacer(fromstr, tostr);            return std::move(*this);}
 	ND var  replace(const rex& regex, SV replacement) && {replacer(regex, replacement);        return std::move(*this);}
-	ND var  replace(const rex& regex, SomeFunction(in match_str))
-	                                                  && {replacer(regex, sf);                 return std::move(*this);}
+//	ND var  replace(const rex& regex, ReplacementFunction auto repl_func)
+//	                                                  && {replacer(regex,repl_func);    return std::move(*this);}
 
 	ND var  unique()                                  && {uniquer();           return std::move(*this);}
 	ND var  sort(   SV delimiter = _FM)               && {sorter(delimiter);   return std::move(*this);}
@@ -1529,7 +1554,7 @@ public:
 	   IO   converter(SV from_chars, SV to_chars) REF;
 	   IO   textconverter(SV from_characters, SV to_characters) REF;
 	   IO   replacer(const rex& regex, SV tostr) REF;
-	   IO   replacer(const rex& regex, SomeFunction(in match_str)) REF;
+	   IO   replacer(const rex& regex, ReplacementFunction auto repl_func) REF {*this = replace(regex, repl_func);}
 	   IO   replacer(SV fromstr, SV tostr) REF;
 //	   IO   regex_replacer(SV regex, SV replacement, SV regex_options = "") REF ;
 
@@ -1944,13 +1969,13 @@ public:
 
 	// obj is conn
 
-	// For all db operations, the operative var can either be a db connection created with dbconnect() or be any var and a default connection will be established on the fly.
-	// The db connection string (conninfo) parameters are merged from the following places in descending priority.
+	// For all DB operations, the operative var can either be a DB connection created with dbconnect() or be any var and a default connection will be established on the fly.
+	// The DB connection string (conninfo) parameters are merged from the following places in descending priority.
 	// 1. Provided in connect()'s conninfo argument. See 4. for the complete list of parameters.
 	// 2. Any environment variables EXO_HOST EXO_PORT EXO_USER EXO_DATA EXO_PASS EXO_TIME
 	// 3. Any parameters found in a configuration file at ~/.config/exodus/exodus.cfg
 	// 4. The default conninfo is "host=127.0.0.1 port=5432 dbname=exodus user=exodus password=somesillysecret connect_timeout=10"
-	// Setting environment variable EXO_DBTRACE=1 will cause tracing of db interface including SQL commands.
+	// Setting environment variable EXO_DBTRACE=1 will cause tracing of DB interface including SQL commands.
 	//
 	// `var conn = "exodus";
 	//  if (not conn.connect("dbname=exodus user=exodus password=somesillysecret")) ...;
@@ -1983,7 +2008,7 @@ public:
 	//
 	   void detach(in filenames);
 
-	// Begin a db transaction.
+	// Begin a DB transaction.
 	//
 	// `var conn = "exodus";
 	//  if (not conn.begintrans()) ...
@@ -1992,7 +2017,7 @@ public:
 	//
 	ND bool begintrans() const;
 
-	// Check if a db transaction is in progress.
+	// Check if a DB transaction is in progress.
 	//
 	// `var conn = "exodus";
 	//  if (conn.statustrans()) ... ok
@@ -2001,7 +2026,7 @@ public:
 	//
 	ND bool statustrans() const;
 
-	// Rollback a db transaction.
+	// Rollback a DB transaction.
 	//
 	// `var conn = "exodus";
 	//  if (conn.rollbacktrans()) ... ok
@@ -2010,7 +2035,7 @@ public:
 	//
 	ND bool rollbacktrans() const;
 
-	// Commit a db transaction.
+	// Commit a DB transaction.
 	// Returns: True if successfully committed or if there was no transaction in progress, otherwise false.
 	//
 	// `var conn = "exodus";
@@ -2044,7 +2069,7 @@ public:
 	//
 	ND bool sqlexec(in sqlcmd, io response) const;
 
-	// Closes db connection and frees process resources both locally and in the database server.
+	// Closes DB connection and frees process resources both locally and in the database server.
 	//
 	// `var conn = "exodus";
 	//  conn.disconnect();
@@ -2063,7 +2088,7 @@ public:
 	//
 	   void disconnectall();
 
-	// Returns: The last os or db error message.
+	// Returns: The last OS or DB error message.
 	// obj is var()
 	//
 	// `var v1 = var::lasterror();
@@ -2072,7 +2097,10 @@ public:
 	//
 	ND static var  lasterror();
 
-	// Log the last os or db error message.
+	// Set the lasterror() message.
+	   static void  setlasterror(in msg);
+
+	// Log the last OS or DB error message.
 	// Output: to stdlog
 	// Prefixes the output with source if provided.
 	// obj is var()
@@ -2131,7 +2159,7 @@ public:
 	//
 	ND bool dbdelete(in dbname) const;
 
-	// Create a named db file.
+	// Create a named DB file.
 	// filenames ending with "_temp" only last until the connection is closed.
 	//
 	// `let filename = "xo_gendoc_temp", conn = "exodus";
@@ -2141,7 +2169,7 @@ public:
 	//
 	ND bool createfile(in filename) const;
 
-	// Rename a db file.
+	// Rename a DB file.
 	//
 	// `let conn = "exodus", filename = "xo_gendoc_temp", new_filename = "xo_gendoc_temp2";
 	//  if (conn.renamefile(filename, new_filename)) ... ok
@@ -2159,7 +2187,7 @@ public:
 	//
 	ND var  listfiles() const;
 
-	// Delete all records in a db file
+	// Delete all records in a DB file
 	//
 	// `let conn = "exodus", filename = "xo_gendoc_temp2";
 	//  if (not conn.clearfile(filename)) ...
@@ -2168,7 +2196,7 @@ public:
 	//
 	ND bool clearfile(in filename) const;
 
-	// Delete a db file
+	// Delete a DB file
 	//
 	// `let conn = "exodus", filename = "xo_gendoc_temp2";
 	//  if (conn.deletefile(filename)) ... ok
@@ -2179,7 +2207,7 @@ public:
 
 	// obj is conn_or_file
 
-	// Returns: The approx. number of records in a db file.
+	// Returns: The approx. number of records in a DB file.
 	// Might return -1 if not known.
 	// Not very accurate inside transactions.
 	//
@@ -2190,7 +2218,7 @@ public:
 	//
 	ND var  reccount(in filename = "") const;
 
-	// Calls db maintenance function for a file or all files.
+	// Calls DB maintenance function for a file or all files.
 	// This doesnt actually flush any indexes but does make sure that reccount() function is reasonably accurate.
 	// Returns: True if successful otherwise false if not and with lasterror() set.
 	   bool flushindex(in filename = "") const;
@@ -2200,9 +2228,9 @@ public:
 
 	// obj is file
 
-	// Opens a db file to a var which can be used in subsequent db function calls to access a specific file using a specific connection.
+	// Opens a DB file to a var which can be used in subsequent DB function calls to access a specific file using a specific connection.
 	// connection: If not specified and the filename is present in an internal cache of filenames and connections created by previous calls to open() or attach() then open() returns true. If it is not present in the cache then the default connection will be checked.
-	// Returns: True if the filename was present in the cache OR if the db connection reports that the file is present.
+	// Returns: True if the filename was present in the cache OR if the DB connection reports that the file is present.
 	//
 	// `var file, filename = "xo_clients";
 	//  if (not file.open(filename)) ...
@@ -2211,7 +2239,7 @@ public:
 	//
 	ND bool open(in dbfilename, in connection = "");
 
-	// Closes db file var
+	// Closes DB file var
 	// Does nothing currently since database file vars consume no resources
 	//
 	// `var file = "xo_clients";
@@ -2221,7 +2249,7 @@ public:
 	//
 	   void close() const;
 
-	// Creates a secondary index for a given db file and field name.
+	// Creates a secondary index for a given DB file and field name.
 	// The fieldname must exist in a dictionary file. The default dictionary is "dict." ^ filename.
 	// Returns: False if the index cannot be created for any reason.
 	// * Index already exists
@@ -2238,8 +2266,8 @@ public:
 	//
 	ND bool createindex(in fieldname, in dictfile = "") const;
 
-	// Lists secondary indexes in a database or for a db file
-	// Returns: False if the db file or fieldname are given and do not exist
+	// Lists secondary indexes in a database or for a DB file
+	// Returns: False if the DB file or fieldname are given and do not exist
 	// obj is file|conn
 	//
 	// `var conn = "exodus";
@@ -2249,7 +2277,7 @@ public:
 	//
 	ND var  listindex(in file_or_filename = "", in fieldname = "") const;
 
-	// Deletes a secondary index for a db file and field name.
+	// Deletes a secondary index for a DB file and field name.
 	// Returns: False if the index cannot be deleted for any reason
 	// * File does not exist
 	// * Index does not already exists
@@ -2281,7 +2309,7 @@ public:
 	//
 	ND var  lock(in key) const;
 
-	// Removes a db lock placed by the lock function.
+	// Removes a DB lock placed by the lock function.
 	// Only locks placed on the specified connection can be removed.
 	// Locks cannot be removed while a connection is in a transaction.
 	// Returns: False if the lock is not present in a connection.
@@ -2293,7 +2321,7 @@ public:
 	//
 	   bool unlock(in key) const;
 
-	// Removes all db locks placed by the lock function in the specified connection.
+	// Removes all DB locks placed by the lock function in the specified connection.
 	// Locks cannot be removed while in a transaction.
 	//
 	// `var conn = "exodus";
@@ -2305,10 +2333,10 @@ public:
 
 	// obj is record
 
-	// Writes a record into a db file given a unique primary key.
+	// Writes a record into a DB file given a unique primary key.
 	// Either inserts a new record or updates an existing record.
 	// Returns: Nothing since writes always succeed.
-	// Throws: VarDBException if the file does not exist. Like most db functions.
+	// Throws: VarDBException if the file does not exist. Like most DB functions.
 	// Any memory cached record is deleted.
 	//
 	// `let record = "Client GD^G^20855^30000^1001.00^20855.76539"_var;
@@ -2320,12 +2348,12 @@ public:
 	//
 	   void write(in file, in key) const;
 
-	// Reads a record from a db file for a given key.
-	// file: A db filename or a var opened to a db file.
+	// Reads a record from a DB file for a given key.
+	// file: A DB filename or a var opened to a DB file.
 	// key: The key of the record to be read.
 	// Returns: False if the key doesnt exist
 	// var: Contains the record if it exists or is unassigned if not.
-	// A special case of the key being "%RECORDS%" results in a fictitious "record" being returned as an FM separated list of all the keys in the db file up to a maximum size of 4Mib, sorted in natural order.
+	// A special case of the key being "%RECORDS%" results in a fictitious "record" being returned as an FM separated list of all the keys in the DB file up to a maximum size of 4Mib, sorted in natural order.
 	//
 	// `var record;
 	//  let file = "xo_clients", key = "GD001";
@@ -2335,7 +2363,7 @@ public:
 	//
 	ND bool read(in file, in key);
 
-	// Deletes a record from a db file given a key.
+	// Deletes a record from a DB file given a key.
 	// Returns: False if the key doesnt exist
 	// Any memory cached record is deleted.
 	// obj is file
@@ -2348,7 +2376,7 @@ public:
 	//
 	   bool deleterecord(in key) const;
 
-	// Inserts a new record in a db file.
+	// Inserts a new record in a DB file.
 	// Returns: False if the key already exists
 	// Any memory cached record is deleted.
 	//
@@ -2360,7 +2388,7 @@ public:
 	//
 	ND bool insertrecord(in file, in key) const;
 
-	// Updates an existing record in a db file.
+	// Updates an existing record in a DB file.
 	// Returns: False if no record with the given key exists.
 	// Any memory cached record is deleted.
 	//
@@ -2372,7 +2400,7 @@ public:
 	//
 	ND bool updaterecord(in file, in key) const;
 
-	// Updates the key of an existing record in a db file.
+	// Updates the key of an existing record in a DB file.
 	// Returns: True if successful or false if no record with the given key exists, or a record with newkey already exists
 	// Any memory cached records of either key are deleted.
 	//
@@ -2405,11 +2433,11 @@ public:
 
 	// obj is record
 
-	// "Write cache" Writes a record and key into a memory cached "db file".
+	// "Write cache" Writes a record and key into a memory cached "DB file".
 	// The actual database file is NOT updated.
 	// writec() either updates an existing cache record if the key already exists or otherwise inserts a new record into the cache.
 	// It always succeeds so no result code is returned.
-	// Neither the db file nor the record key need to actually exist in the actual db.
+	// Neither the DB file nor the record key need to actually exist in the actual DB.
 	//
     // `let record = "Client XD^X^20855^30000^1001.00^20855.76539"_var;
     //  let file = "xo_clients", key = "XD001";
@@ -2421,9 +2449,9 @@ public:
 
 	// "Read cache" Same as "read() but first reads from a memory cache.
 	// 1. Tries to read from a memory cache. Returns true if successful.
-	// 2a. Tries to read from the actual db file and returns false if unsuccessful.
+	// 2a. Tries to read from the actual DB file and returns false if unsuccessful.
 	// 2b. Writes the record and key to the memory cache and returns true.
-	// Cached db file data lives in exodus process memory and is lost when the process terminates or clearcache() is called.
+	// Cached DB file data lives in exodus process memory and is lost when the process terminates or clearcache() is called.
 	//
     // `var record;
     //  let file = "xo_clients", key = "XD001";
@@ -2466,7 +2494,7 @@ public:
 	// The xlate ("translate") function is similar to readf() but, when called as an exodus program member function, it can be used efficiently with exodus file dictionaries using column names and functions and multivalued data.
 	// Arguments:
 	// strvar: Used as the primary key to lookup a field in a given file and field no or field name.
-	// filename: The db file in which to look up data.
+	// filename: The DB file in which to look up data.
 	// If var key is multivalued then a multivalued field is returned.
 	// fieldno: Determines which field of the record is returned.
 	// * Integer returns that field number
@@ -2674,8 +2702,9 @@ public:
 
 	// obj is var()
 
-	// Number of whole days since pick epoch 1967-12-31 00:00:00 UTC. Negative for dates before.
-	// e.g. was 20821 from 2025-01-01 00:00:00 UTC for 24 hours
+	// A date in internal format.
+	// Internal format is the number of whole days since pick epoch 1967-12-31 00:00:00 UTC. Dates prior to that are numbered negatively.
+	// Returns: A number. e.g. 20821 represents 2025-01-01 00:00:00 UTC for 24 hours.
 	//
 	// `let today1 = var::date();
 	//  // or
@@ -2684,8 +2713,7 @@ public:
 	ND static var  date();
 
 	// Number of whole seconds since last 00:00:00 (UTC).
-	// e.g. 43200 if time is 12:00
-	// Range 0 - 86399 since there are 24*60*60 (86400) seconds in a day.
+	// Returns: A number in the range 0 - 86399 since there are 24*60*60 seconds in a day. e.g. 43200 if time is 12:00:00
 	//
 	// `let now1 = var::time();
 	//  // or
@@ -2694,7 +2722,7 @@ public:
 	ND static var  time();
 
 	// Number of fractional seconds since last 00:00:00 (UTC).
-	// A floating point with approx. nanosecond resolution depending on hardware.
+	// Returns: A floating point with approx. nanosecond resolution depending on hardware.
 	// e.g. 23343.704387955 approx. 06:29:03 UTC
 	//
 	// `let now1 = var::ostime();
@@ -2704,7 +2732,7 @@ public:
 	ND static var  ostime();
 
 	// Number of fractional days since pick epoch 1967-12-31 00:00:00 UTC. Negative for dates before.
-	// A floating point with approx. nanosecond resolution depending on hardware.
+	// Returns: A floating point with approx. nanosecond resolution depending on hardware.
 	// e.g. Was 20821.99998842593 around 2025-01-01 23:59:59 UTC
 	//
 	// `let now1 = var::ostimestamp();
@@ -2713,7 +2741,9 @@ public:
 	//
 	ND static var  ostimestamp();
 
-	// Construct a timestamp from a date and time
+	// Get a timestamp for a given date and time
+	// vardate: Internal date from date(), iconv("D") etc.
+	// ostime: Internal time from time(), ostime(), iconv("MT") etc.
 	// obj is vardate
 	//
 	// `let idate = iconv("2025-01-01", "D"), itime = iconv("23:59:59", "MT");
@@ -2723,7 +2753,8 @@ public:
 	//
 	ND var  ostimestamp(in ostime) const;
 
-	// Sleep/pause/wait for a number of milliseconds
+	// Sleep/pause/wait
+	// milliseconds: How to long to sleep.
 	// Releases the processor if not needed for a period of time or a delay is required.
 	//
 	// `var::ossleep(100); // sleep for 100ms
@@ -2732,23 +2763,24 @@ public:
 	//
 	   static void ossleep(const int milliseconds);
 
-	// Sleep/pause/wait up to a given number of milliseconds or until any changes occur in an FM delimited list of directories and/or files.
-	// Any terminal input (e.g. a key press) will also terminate the wait.
-	// An FM array of event information is returned. See below.
-	// Multiple events are returned in multivalues.
+	// Sleep/pause/wait up for a file system event
+	// file_dir_list: An FM delimited list of OS files and/or dirs to monitor.
+	// milliseconds: How long to wait. Any terminal input (e.g. a key press) will also terminate the wait.
+	// Returns: An FM array of event information is returned. See below.
+	// Multiple events may be captured and are returned in multivalues.
 	// obj is file_dir_list
 	//
 	// `let v1 = ".^/etc/hosts"_var.oswait(100); /// e.g. "IN_CLOSE_WRITE^/etc^hosts^f"_var
 	//  // or
 	//  let v2 = oswait(".^/etc/hosts"_var, 100);`
 	//
-	// Returned array fields
-	// 1. Event type codes
-	// 2. dirpaths
-	// 3. filenames
-	// 4. d=dir, f=file
-	// <pre>
-	// Possible event type codes are as follows:
+	// Returned dynamic array fields:
+	// # Event type codes
+	// # dirpaths
+	// # filenames
+	// # d=dir, f=file
+	//
+	// Possible event type codes:
 	// * IN_CLOSE_WRITE⋅- A file opened for writing was closed
 	// * IN_ACCESS⋅⋅⋅⋅⋅⋅- Data was read from file
 	// * IN_MODIFY⋅⋅⋅⋅⋅⋅- Data was written to file
@@ -2761,16 +2793,15 @@ public:
 	// * IN_DELETE⋅⋅⋅⋅⋅⋅- A file was deleted from the directory
 	// * IN_DELETE_SELF⋅- Directory or file under observation was deleted
 	// * IN_MOVE_SELF⋅⋅⋅- Directory or file under observation was moved
-	// </pre>
 	//
 	   var  oswait(const int milliseconds) const;
 
 	///// OS FILE I/O:
 	/////////////////
 
-	// Opens an os file handle var for random read and write operations.
+	// Opens an OS file handle var for random read and write operations.
 	// osfilevar: [out] To be used in subsequent calls to osbread() and osbwrite()
-	// osfilename: The path and name of an existing os file.
+	// osfilename: The path and name of an existing OS file.
 	// utf8: If true, the default, then any partial UTF-8 Unicode byte sequences at the end of osbread data are removed. If false, then osbreads return unmodified data.
 	// Returns: true if the open operation is successful, or false if the file does not exist, or is not accessible.
 	// The file will be opened for writing if possible otherwise for reading.
@@ -2784,7 +2815,7 @@ public:
 	// obj is osfilevar
 	//
 	// `let osfilename = ostempdir() ^ "xo_gendoc_test.conf";
-	//  if (oswrite("" on osfilename)) ... ok /// Create an empty os file
+	//  if (oswrite("" on osfilename)) ... ok /// Create an empty OS file
 	//  var ostempfile;
 	//  if (ostempfile.osopen(osfilename)) ... ok
 	//  // or
@@ -2792,9 +2823,9 @@ public:
 	//
 	ND bool osopen(in osfilename, const bool utf8 = true) const;
 
-	// Write data to an os file starting at a given position.
+	// Write data to an OS file starting at a given position.
 	// strvar: The data to be written.
-	// osfilevar: An os path and filename or an osfilevar opened by osopen(). If not already opened by osopen(), and the file does not exist, it is automatically created if offset is 0 but if the offset is not zero then false is returned.
+	// osfilevar: An OS path and filename or an osfilevar opened by osopen(). If not already opened by osopen(), and the file does not exist, it is automatically created if offset is 0 but if the offset is not zero then false is returned.
 	// offset: [io] The char number (0 based) in the file at which to start writing. After writing, the offset is updated to point to the correct offset for a potential subsequent sequential write.
 	// Returns: true if the write operation succeeds, or false if the file is not accessible, updateable, or creatable.
 
@@ -2814,9 +2845,9 @@ public:
 	//
 	ND bool osbwrite(in osfilevar, io offset) const;
 
-	// Read data from an os file starting at a given position.
+	// Read data from an OS file starting at a given position.
 	// strvar: [out] The data that is read.
-	// osfilevar: An os path and filename or an osfilevar opened by osopen().
+	// osfilevar: An OS path and filename or an osfilevar opened by osopen().
 	// offset: [io] The char number (0 based) in the file at which to start reading. After reading, the offset is updated to point to the correct offset for a potential subsequent sequential read.
 	// length: The number of chars to read. If reading UTF8 data (the default) then the length of data actually returned may be a few bytes shorter than requested in order to be a complete number of UTF code points as encoded in UTF-8.
 	// Returns: true if the read operation is successful, or false if the file does not exist, or is not accessible.
@@ -2838,14 +2869,15 @@ public:
 	ND bool osbread(in osfilevar, io offset, const int length);
 
 	// Use convenient << syntax to output anything to an osfile.
-	// osfile: An os path and filename or an osfilevar opened by osopen(). The file will be appended, or created if it does not already exist.
-	// All standard c++ io manipulators may be used e.g. std::setw, setfill etc.
+	// osfile: An OS path and filename or an osfilevar opened by osopen(). The file will be appended, or created if it does not already exist. osfile can be "stdout" or "stderr" to simulate cout/cerr/clog.
 	// obj is osfile
 	//
 	// `let txtfile = "t_temp.txt";
 	//  if (not osremove(txtfile)) {} // Remove any existing file.
 	//  txtfile << txtfile << " " << 123.456789 << " " << 123 << std::endl;
 	//  let v1 = osread(txtfile);   // "t_temp.txt 123.457 123\n"`
+	//
+	// All standard c++ io manipulators may be used e.g. std::setw, setfill etc.
 	//
 	// `let vout = "std_iomanip_overview.txt";
 	//  if (not osremove(vout)) {}
@@ -2912,8 +2944,8 @@ public:
 		return *this;
 	}
 
-	// Removes an osfilevar handle from the internal memory cache of os file handles. This frees up both exodus process memory and operating system resources.
-	// It is advisable to osclose any file handles after use, regardless of whether they were specifically opened using osopen or not, especially in long running programs. Exodus performs caching of internal os file handles per thread and os file. If not closed, then the operating system will probably not flush deleted files from storage until the process is terminated. This can potentially create an memory issue or file system resource issue especially if osopening/osreading/oswriting many perhaps temporary files in a long running process.
+	// Removes an osfilevar handle from the internal memory cache of OS file handles. This frees up both exodus process memory and operating system resources.
+	// It is advisable to osclose any file handles after use, regardless of whether they were specifically opened using osopen or not, especially in long running programs. Exodus performs caching of internal OS file handles per thread and OS file. If not closed, then the operating system will probably not flush deleted files from storage until the process is terminated. This can potentially create an memory issue or file system resource issue especially if osopening/osreading/oswriting many perhaps temporary files in a long running process.
 	//
 	// `var osfilevar; if (osfilevar.osopen(ostempfile())) ... ok
 	//  osfilevar.osclose();
@@ -2924,9 +2956,9 @@ public:
 
 	// obj is strvar
 
-	// Create a complete os file from a var.
+	// Create a complete OS file from a var.
 	// strvar: The text or data to be used to create the file.
-	// osfilename: Absolute or relative path and filename to be written. Any existing os file is removed first.
+	// osfilename: Absolute or relative path and filename to be written. Any existing OS file is removed first.
 	// codepage: If specified then output is converted from UTF-8 to that codepage before being written. Otherwise no conversion is done.
 	// Returns: True if successful or false if not possible for any reason. e.g. Path is not writeable, permissions etc
 	//
@@ -2938,7 +2970,7 @@ public:
 	//
 	ND bool oswrite(in osfilename, const char* codepage = "") const;
 
-	// Read a complete os file into a var.
+	// Read a complete OS file into a var.
 	// osfilename: Absolute or relative path and filename to be read.
 	// codepage: If specified then input is converted from that codepage to UTF-8 after being read. Otherwise no conversion is done.
 	// strvar: [out] is currently set to "" in case of any failure but this is may be changed in a future release to either force var to be unassigned or to leave it untouched. To guarantee future behaviour either add a line 'xxxx.defaulter("")' or set var manually in case osread() returns false. Or use the one argument free function version of osread() which always returns "" in case of failure to read.
@@ -2957,10 +2989,10 @@ public:
 
 	// obj is osfile_or_dirname
 
-	// Renames an os file or dir in the OS file system.
+	// Renames an OS file or dir in the OS file system.
 	// The source and target must exist in the same storage device.
 	// osfile_or_dirname: Absolute or relative path and file or dir name to be renamed.
-	// new_dirpath_or_filepath: Will not overwrite an existing os file or dir.
+	// new_dirpath_or_filepath: Will not overwrite an existing OS file or dir.
 	// Returns: True if successful or false if not possible for any reason. e.g. Target already exists, path is not writeable, permissions etc.
 	// Uses std::filesystem::rename internally.
 	//
@@ -2974,10 +3006,10 @@ public:
 	//
 	ND bool osrename(in new_dirpath_or_filepath) const;
 
-	// "Moves" an os file or dir within the os file system.
+	// "Moves" an OS file or dir within the OS file system.
 	// Attempts osrename first, then oscopy followed by osremove original.
 	// osfile_or_dirname: Absolute or relative path and file or dir name to be moved.
-	// to_osfilename: Will not overwrite an existing os file or dir.
+	// to_osfilename: Will not overwrite an existing OS file or dir.
 	// Returns: True if successful or false if not possible for any reason. e.g. Source doesnt exist or cannot be accessed, target already exists, source or target is not writeable, permissions, storage space etc.
 	//
 	// `let from_osfilename = ostempdir() ^ "xo_gendoc_test.conf.bak";
@@ -2990,9 +3022,9 @@ public:
 	//
 	ND bool osmove(in to_osfilename) const;
 
-	// Copies an os file or directory recursively within the os file system.
+	// Copies an OS file or directory recursively within the OS file system.
 	// osfile_or_dirname: Absolute or relative path and file or dir name to be copied.
-	// to_osfilename: Will overwrite an existing os file or merge into an existing dir.
+	// to_osfilename: Will overwrite an existing OS file or merge into an existing dir.
 	// Returns: True if successful or false if not possible for any reason. e.g. Source doesnt exist or cannot be accessed, target is not writeable, permissions, storage space, etc.
 	// Uses std::filesystem::copy internally with recursive and overwrite options
 	//
@@ -3005,7 +3037,7 @@ public:
 	//
 	ND bool oscopy(in to_osfilename) const;
 
-	// Removes/deletes an os file from the OS file system.
+	// Removes/deletes an OS file from the OS file system.
 	// Will not remove directories. Use osrmdir() to remove directories
 	// osfilename: Absolute or relative path and file name to be removed.
 	// Returns: True if successful or false if not possible for any reason. e.g. Target doesnt exist, path is not writeable, permissions etc.
@@ -3026,10 +3058,10 @@ public:
 
 	// obj is dirpath
 
-	// Get a list of os files and/or dirs.
+	// Get a list of OS files and/or dirs.
 	// dirpath: Absolute or relative dir path.
 	// globpattern: e.g. *.conf to be appended to the dirpath or a complete path plus glob pattern e.g. /etc/ *.conf.
-	// mode: 0: default - Any regular files or dirs. 1 - Only regular os files. 2 - Only dirs.
+	// mode: 0: default - Any regular files or dirs. 1 - Only regular OS files. 2 - Only dirs.
 	// Returns: An FM delimited string containing all matching dir entries given a dir path
 	//
 	// `var entries1 = "/etc/"_var.oslist("*.cfg"); /// e.g. "adduser.conf^ca-certificates.con^... etc."
@@ -3043,9 +3075,9 @@ public:
 	// Same as oslist for files only
 	ND var  oslistd(SV globpattern = "") const;
 
-	// Get dir info about an os file or dir.
+	// Get dir info about an OS file or dir.
 	// Returns: A short string containing size ^ FM ^ modified_time ^ FM ^ modified_time or "" if not a regular file or dir.
-	// mode: 0: default. 1: Must be a regular os file. 2: Must be an os dir.
+	// mode: 0: default. 1: Must be a regular OS file. 2: Must be an OS dir.
 	// See also osfile() and osdir()
 	// obj is osfile_or_dirpath
 	//
@@ -3055,7 +3087,7 @@ public:
 	//
 	ND var  osinfo(const int mode = 0) const;
 
-	// Get dir info of an os file.
+	// Get dir info of an OS file.
 	// osfilename: Absolute or relative path and file name.
 	// Returns: A short string containing size ^ FM ^ modified_time ^ FM ^ modified_time or "" if not a regular file.
 	// Alias for osinfo(1)
@@ -3067,7 +3099,7 @@ public:
 	//
 	ND var  osfile() const;
 
-	// Get dir info of an os dir.
+	// Get dir info of an OS dir.
 	// dirpath: Absolute or relative path and dir name.
 	// Returns: A short string containing FM ^ modified_time ^ FM ^ modified_time or "" if not a dir.
 	// Alias for osinfo(2)
@@ -3079,7 +3111,7 @@ public:
 	//
 	ND var  osdir() const;
 
-	// Create a new os file system directory.
+	// Create a new OS file system directory.
 	// Parent dirs wil be created if necessary.
 	// dirpath: Absolute or relative path and dir name.
 	// Returns: True if successful.
@@ -3117,7 +3149,7 @@ public:
 	//
 	ND static var  oscwd();
 
-	// Removes (deletes) an os dir,
+	// Removes (deletes) an OS dir,
 	// eventifnotempty: If true any subdirs will also be removed/deleted recursively, otherwise the function will fail and return false.
 	// Returns: Returns true if successful or false if not. e.g dir doesnt exist, insufficient permission, not empty etc.
 	//
@@ -3132,7 +3164,7 @@ public:
 	//////////////////////////
 
 	// Execute a shell command.
-	// command: An executable command to be interpreted by the default os shell.
+	// command: An executable command to be interpreted by the default OS shell.
 	// Returns: True if the process terminates with error status 0 and false otherwise.
 	// Append "&>/dev/null" to the command to suppress terminal output.
 	// obj is command
@@ -3236,7 +3268,7 @@ public:
 	// envcode: The code of the env variable to get or "" for all.
 	// envvalue: [out] Set to the value of the env variable if set otherwise "". If envcode is "" then envvalue is set to a dynamic array of all environment variables LIKE CODE1=VALUE1^CODE2=VALUE2...
 	// Returns: True if the envcode is set or false if not.
-	// osgetenv and ossetenv work with a per thread copy of the os process environment. This avoids multithreading issues but does not change the process environment. Child processes created by var::osshell() will not inherit any env variables set using ossetenv() so the oscommand will need to be prefixed to achieve the desired result.
+	// osgetenv and ossetenv work with a per thread copy of the OS process environment. This avoids multithreading issues but does not change the process environment. Child processes created by var::osshell() will not inherit any env variables set using ossetenv() so the oscommand will need to be prefixed to achieve the desired result.
 	// For the actual system environment, see "man environ". extern char **environ; // environ is a pointer to an array of pointers to char* env pairs like xxx=yyy and the last pointer in the array is nullptr.
 	// obj is envvalue
 	//
@@ -3249,7 +3281,7 @@ public:
 
 	// obj is var()
 
-	// Get the current os process id
+	// Get the current OS process id
 	// Returns: A number e.g. 663237.
 	// obj is var()
 	//
@@ -3259,7 +3291,7 @@ public:
 	//
 	ND static var  ospid();
 
-	// Get the current os thread process id
+	// Get the current OS thread process id
 	// Returns: A number e.g. 663237.
 	// obj is var()
 	//
@@ -3440,9 +3472,9 @@ public:
 
 	// Install various interrupt handlers.
 	// Automatically called in program/thread initialisation by exodus_main.
-	// SIGINT - Ctrl+C -> "Interrupted. (C)ontinue (Q)uit (B)acktrace (D)ebug (A)bort ?"
-	// SIGHUP - Sets a static variable "RELOAD_req" which may be handled or ignored by the program.
-	// SIGTERM - Sets a static variable "TERMINATE_req" which may be handled or ignored by the program.
+	// * SIGINT  - Ctrl+C -> "Interrupted. (C)ontinue (Q)uit (B)acktrace (D)ebug (A)bort ?"
+	// * SIGHUP  - Sets a static variable "RELOAD_req" which may be handled or ignored by the program.
+	// * SIGTERM - Sets a static variable "TERMINATE_req" which may be handled or ignored by the program.
 	//
 	   void breakon() const;
 
@@ -3643,8 +3675,6 @@ public:
 	ND bool dbcursorexists(); //database, not terminal
 	ND bool selectx(in fieldnames, in sortselectclause);
 
-	   static void  setlasterror(in msg);
-
 	// TODO check if can speed up by returning reference to converted self like MC
 
 	// Internal primitive oconvs
@@ -3653,7 +3683,7 @@ public:
 
 	// Date output: Convert internal date format to human readable date or calendar info in text format.
 	// Returns: Human readable date or calendar info, or the original value unconverted if non-numeric.
-	// Flags: See examples below.
+	// flags: See examples below.
 	// Any Dynamic array structure is preserved.
 	// obj is vardate
 	//
@@ -3736,11 +3766,11 @@ public:
 	// Time output: Convert internal time format to human readable time e.g. "10:30:59".
 	// Returns: Human readable time or the original value unconverted if non-numeric.
 	// Conversion code (e.g. "MTHS") is "MT" + flags ...
-	// Flags:
-	// "H" - Show AM/PM otherwise 24 hour clock is used.
-	// "S" - Output seconds
-	// "2" = Ignored (used in iconv)
-	// ":" - Any other flag is used as the separator char instead of ":"
+	// flags:
+	// * "H" - Show AM/PM otherwise 24 hour clock is used.
+	// * "S" - Output seconds
+	// * "2" = Ignored (used in iconv)
+	// * ":" - Any other flag is used as the separator char instead of ":"
 	// Any Dynamic array structure is preserved.
 	// obj is vartime
 	//
@@ -3795,23 +3825,21 @@ public:
 
 	// Number output: Convert internal numbers to external text format after rounding and optional scaling.
 	// Returns: A string or, if the value is not numeric, then no conversion is performed and the original value is returned.
-	// Conversion code (e.g. "MD20") is "MD" or "MC", 1st digit, 2nd digit, flags ...
+	// conversion_code: (e.g. "MD20Z") is "MD" or "MC", 1st digit, 2nd digit, flags ...
+	// * MD outputs like 123.45 (International)
+	// * MC outputs like 123,45 (European)
+	// * 1st digit = Decimal places to display. Also decimal places to move if 2nd digit not present and no P flag present.
+	// * 2nd digit = Optional decimal places to move left if P flag not present.
 	//
-	// MD outputs like 123.45 (International)
-	// MC outputs like 123,45 (European)
-	//
-	// 1st digit = Decimal places to display. Also decimal places to move if 2nd digit not present and no P flag present.
-	// 2nd digit = Optional decimal places to move left if P flag not present.
-	//
-	// Flags:
-	// "P" - Preserve decimal places. Same as 2nd digit = 0;
-	// "Z" - Zero flag - return "" if zero.
-	// "X" - No conversion - return as is.
-	// "." or "," - Separate thousands depending on MD or MC.
-	// "-" means suffix negatives with "-" and positives with " " (space).
-	// "<" means wrap negatives in "<" and ">" chars.
-	// "C" means suffix negatives with "CR" and positives or zero with "DB".
-	// "D" means suffix negatives with "DB" and positives or zero with "CR".
+	// flags:
+	// * "P" - Preserve decimal places. Same as 2nd digit = 0;
+	// * "Z" - Zero flag - return "" if zero.
+	// * "X" - No conversion - return as is.
+	// * "." or "," - Separate thousands depending on MD or MC.
+	// * "-" means suffix negatives with "-" and positives with " " (space).
+	// * "<" means wrap negatives in "<" and ">" chars.
+	// * "C" means suffix negatives with "CR" and positives or zero with "DB".
+	// * "D" means suffix negatives with "DB" and positives or zero with "CR".
 	//
 	//  Any Dynamic array structure is preserved.
 	// obj is varnum
@@ -3929,18 +3957,18 @@ public:
 /* fake code to generate documentation
 
 	// Convert number to hexadecimal string.
-	// "MX":   Convert and trim leading zeros                      e.g. oconv(1025, "MX")  -> "401"
-	// "MXn":  Pad with up to n leading zeros but do not truncate. e.g. oconv(1025, "MX8") -> "00000401"
-	// "MXnT": Pad and truncate to n characters.                   e.g. oconv(1025, "MX2") -> "01"
+	// * "MX":   Convert and trim leading zeros                      e.g. oconv(1025, "MX")  -> "401"
+	// * "MXn":  Pad with up to n leading zeros but do not truncate. e.g. oconv(1025, "MX8") -> "00000401"
+	// * "MXnT": Pad and truncate to n characters.                   e.g. oconv(1025, "MX2") -> "01"
 	// "n":    Width. 0-9, A-G = 10 - 16.
 	// varnum: A number or dynamic array of numbers. Floating point numbers are rounded to integers before conversion.
 	// Returns: A string of hexadecimal digits or a dynamic array of the same. Elements that are not numeric are left untouched and unconverted.
 	// Dynamic array structure is preserved.
 	// Negative numbers are treated as unsigned 8 byte integers (uint64).
-	// 0  -> "00"
-	// 1  -> "01"
-	// 15 -> "0F"
-	// -1 -> "FFFF" "FFFF" "FFFF" "FFFF" (8 x "FF")
+	// * 0  -> "00"
+	// * 1  -> "01"
+	// * 15 -> "0F"
+	// * -1 -> "FFFF" "FFFF" "FFFF" "FFFF" (8 x "FF")
 	// This function is a near inverse of iconv("MX").
 	// obj is varnum
 	//
@@ -3956,12 +3984,12 @@ public:
 	// Dynamic array structure is preserved.
 	// Hex strings are converted to unsigned 8 byte integers (uint64)
 	// Leading zeros are ignored.
-	// "0" -> 0
-	// "00"-> 0
-	// "1" -> 1
-	// Hex "FFFFFFFFFFFFFFFF" (8 x "FF") -> -1.
-	// Hex "7FFFFFFFFFFFFFFF" is the maximum positive integer: 9223372036854775805.
-	// Hex "8000000000000000" is the maximum negative integer: -9223372036854775808.
+	// * "0" -> 0
+	// * "00"-> 0
+	// * "1" -> 1
+	// * Hex "FFFFFFFFFFFFFFFF" (8 x "FF") -> -1.
+	// * Hex "7FFFFFFFFFFFFFFF" is the maximum positive integer: 9223372036854775805.
+	// * Hex "8000000000000000" is the maximum negative integer: -9223372036854775808.
 	// This function is the exact inverse of oconv("MX").
 	// obj is strvar
 	//

@@ -698,13 +698,13 @@ subr wait() {
 
 	// quit if connection no longer active. postgres restarted/stopped.
 	if (not sqlexec("SELECT NOW()"))
-		logoff();
+		stop();
 
 	// place a lock to indicate processing
 	// should really retry in case blocked by other processes checking it
 	// call rtp57(syslock, '', '', trim(@station):THREADNO, '', '', '')
 	if (not lockrecord("PROCESSES", processes, THREADNO, "", 999999))
-		logoff();
+		stop();
 
 	// pause forever while any quiet time process (eg hourly backup) is working
 	// maybe not necessary on test data
@@ -930,13 +930,13 @@ func loop_exit() {
 
 		} else if (bakpars.f(11)) {
 			call log2("backup is suppressed. Quitting.", logtime);
-			logoff();
-			logoff();
+			stop();
+			stop();
 
 		} else if (not bakpars.f(5).contains(dow)) {
 			call log2("Not right day of week " ^ bakpars.f(5) ^ " Logging off", logtime);
-			logoff();
-			logoff();
+			stop();
+			stop();
 
 		} else {
 			// call log2('Preventing further automatic backups today',logtime)
@@ -1001,8 +1001,8 @@ subr main_exit() {
 
 	// esc does this
 	if ((origsysmode or request1 == "STOPDB") or halt) {
-		logoff();
-		logoff();
+		stop();
+		stop();
 	}
 
 	// msg is @user4

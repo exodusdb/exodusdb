@@ -56,10 +56,6 @@ friend class dim_iter;
 	// SPECIAL MEMBER FUNCTIONS
 	///////////////////////////
 
-	//////////
-	//// dim :
-	//////////
-
 	//////////////////////////////////////
 	///// dimensioned array construction :
 	//////////////////////////////////////
@@ -378,9 +374,9 @@ friend class dim_iter;
 
 	// Transition alternative for () and [] syntax to be used in libexodus, cli, service and test.
 	// Should be removed in 2028 when Ubuntu 24.04 is the oldest to be supported by exodus
-	// DEPRECATED
+	// [[deprecated
 	ND VARREF at(int rowno, int colno) {return getelementref(rowno, colno);}
-	// DEPRECATED
+	// [[deprecated
 	ND CVR at(int rowno, int colno) const {return getelementref(rowno, colno);}
 
 	// obj is d1

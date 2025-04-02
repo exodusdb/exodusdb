@@ -318,7 +318,7 @@ auto get_timebank_acno(const std::string_view arg1) -> int {
 	else if (++acno && arg1 == "var  var::last() const") {}
 	else if (++acno && arg1 == "void var::firster() &") {}
 	else if (++acno && arg1 == "void var::laster() &") {}
-	else if (++acno && arg1 == "var  var::search(SV regex_str, int startchar1, SV regex_options) const") {}
+	else if (++acno && arg1 == "var  var::search(SV regex_str, io startchar1, SV regex_options) const") {}
 	else if (++acno && arg1 == "std::wstring var::to_wstring() const") {}
 	else if (++acno && arg1 == "const char* var::c_str() const") {}
 
@@ -347,7 +347,7 @@ auto get_timebank_acno(const std::string_view arg1) -> int {
 	else if (++acno && arg1 == "auto fmt::formatter::format(var) const") {}
 
 	else if (++acno && arg1 == "var  var::match(const rex& regex) const") {}
-	else if (++acno && arg1 == "var  var::search(const rex& regex, int startchar1) const") {}
+	else if (++acno && arg1 == "var  var::search(const rex& regex, io startchar1) const") {}
 	else if (++acno && arg1 == "out  var::getxlocale() static") {}
 
 	else if (++acno && arg1 == "CVR  var::output() const") {}

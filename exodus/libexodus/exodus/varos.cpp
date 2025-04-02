@@ -274,7 +274,7 @@ var var::ostempfile() {
 
 bool var::osshell() const {
 
-	THISIS("var  var::osshell() const")
+	THISIS("bool  var::osshell() const")
 	// will be checked again by toString()
 	// but put it here so any unassigned error shows in osshell
 	assertString(function_sig);
@@ -294,7 +294,7 @@ bool var::osshell() const {
 
 bool var::osshellread(in oscmd) {
 
-	THISIS("var  var::osshellread() const")
+	THISIS("bool  var::osshellread() const")
 	// will be checked again by toString()
 	// but put it here so any unassigned error shows in osshell
 	ISSTRING(oscmd)
@@ -343,7 +343,7 @@ bool var::osshellread(in oscmd) {
 
 bool var::osshellwrite(in oscmd) const {
 
-	THISIS("var  var::osshellwrite(in oscmd) const")
+	THISIS("bool  var::osshellwrite(in oscmd) const")
 	// will be checked again by toString()
 	// but put it here so any unassigned error shows in osshell
 	assertString(function_sig);
@@ -466,21 +466,20 @@ std::fstream* var::osopenx(in osfilename, const bool utf8, const bool autocreate
 	// Try to get the cached file handle. the usual case is that you osopen a file before doing
 	// osbwrite/osbread Using fstream instead of ofstream so that we can mix reads and writes on
 	// the same filehandle
-	std::fstream* fsx = nullptr;
+	std::fstream* fs_nrvo = nullptr;
 	if (THIS_IS_OSFILE()) {
-		fsx =
+		fs_nrvo =
 			static_cast<std::fstream*>(thread_fstream_handles.get_handle(static_cast<int>(var_int), var_str));
-		if (fsx == nullptr)  // nonvalid handle
+		if (fs_nrvo == nullptr)  // nonvalid handle
 		{
 			var_int = 0;
 			//			var_typ ^= VARTYP_OSFILE;	// clear bit
 			var_typ ^= VARTYP_OSFILE | VARTYP_INT | VARTYP_DBL;	// only STR bit should remains
 		}
 	}
-
 	// Return cached fs
-	if (fsx != nullptr)
-		return fsx;
+	if (fs_nrvo != nullptr)
+		return fs_nrvo;
 
 	// The file has NOT already been opened so open it now if possible.
 	// Also add it to the cache.
@@ -494,9 +493,23 @@ std::fstream* var::osopenx(in osfilename, const bool utf8, const bool autocreate
 
 	auto opening_options = std::fstream::out | std::fstream::in | std::fstream::binary;
 
-	if (std::filesystem::is_regular_file(osfilename.c_str())) {
+	if (osfilename.starts("std") and (osfilename == "stdout" or osfilename == "stderr")) {
 
-		// Try to open the existing regular file - binary r/w append
+		// Open /dev/stdout or /dev/stderr  - binary w
+		opening_options ^= std::fstream::in;
+		fs->open(osfilename.prefix("/dev/").c_str(), opening_options);
+		if (not fs->is_open()) {
+			const var errmsg = osfilename.quote() ^ " cannot be accessed";
+			if (autocreate_or_throw)
+				throw VarError(errmsg);
+			var::setlasterror(errmsg);
+			return nullptr;
+		}
+
+	}
+	else if (std::filesystem::is_regular_file(osfilename.c_str())) {
+
+		// Open the existing regular file - binary r/w append
 		opening_options |= std::fstream::ate;
 		fs->open(to_path_string(osfilename).c_str(), opening_options);
 		if (not fs->is_open()) {
@@ -538,7 +551,7 @@ std::fstream* var::osopenx(in osfilename, const bool utf8, const bool autocreate
 			throw(osfilename.quote() ^ " cannot be created.");
 	}
 
-	fsx = fs.release();
+	fs_nrvo = fs.release();
 
 	// Cache
 	// 1. var_str <- osfilename
@@ -546,7 +559,7 @@ std::fstream* var::osopenx(in osfilename, const bool utf8, const bool autocreate
 	// 3. var_dbl <- the utf8 flag
 	var_str = osfilename.var_str;
 	// Add the file into the cache of thread_fstream_handles
-	var_int = thread_fstream_handles.add_handle(fsx, del_fstream, osfilename.var_str);
+	var_int = thread_fstream_handles.add_handle(fs_nrvo, del_fstream, osfilename.var_str);
 	var_dbl = utf8;
 
 	// VARTYP_OSFILE
@@ -554,7 +567,7 @@ std::fstream* var::osopenx(in osfilename, const bool utf8, const bool autocreate
 	// in the possible case that the osfilename a number
 	var_typ = VARTYP_NANSTR_OSFILE;
 
-	return fsx;
+	return fs_nrvo;
 }
 
 // on unix or with iconv we could convert to or any character format

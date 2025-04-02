@@ -119,8 +119,8 @@ inpname:
 	if (xdata == "") {
 fail:
 		//  if @username='EXODUS' then stop
-		logoff();
-		logoff();
+		stop();
+		stop();
 	}
 
 	userx = xdata;
@@ -251,7 +251,7 @@ okfail:
 			}
 			// print char(12):char(7):msg
 			printl(msg);
-			logoff();
+			stop();
 		}
 
 		nfailures += 1;

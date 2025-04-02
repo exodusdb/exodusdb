@@ -569,13 +569,13 @@ func main() {
 		} catch (ExoAbortAll& e) {
 			printl("Caught ExoAbortAll", e.message);
 		}
-		try {
-			logoff();
-			throw VarError("Uncaught error ExoLogoff");
-			//std::unreachable();
-		} catch (ExoLogoff& e) {
-			printl("Caught MVlogoff", e.message);
-		}
+//		try {
+//			logoff();
+//			throw VarError("Uncaught error ExoLogoff");
+//			//std::unreachable();
+//		} catch (ExoLogoff& e) {
+//			printl("Caught MVlogoff", e.message);
+//		}
 #pragma GCC diagnostic pop
 
 //		if (uncaught) {

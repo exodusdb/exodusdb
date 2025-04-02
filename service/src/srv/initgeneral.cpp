@@ -266,8 +266,8 @@ func main() {
 					if (SYSTEM.f(33)) {
 						gosub failsys();
 					}
-					logoff();
-					logoff();
+					stop();
+					stop();
 				}
 			}
 		}
@@ -533,8 +533,8 @@ nextreport:
 
 			// chr(7).output().str(3);
 			call note(msg);
-			logoff();
-			logoff();
+			stop();
+			stop();
 		}
 
 		call log2("*check users", logtime);
@@ -547,8 +547,8 @@ nextreport:
 				//stop();
 				//std::unreachable();
 			}
-			logoff();
-			logoff();
+			stop();
+			stop();
 			//std::unreachable();
 		}
 	}
@@ -1727,8 +1727,8 @@ subr failsys() {
 		loglasterror();
 
 	// and quit
-	logoff();
-	logoff();
+	stop();
+	stop();
 
 	//return;
 	//std::unreachable();

@@ -42,7 +42,7 @@ _Pragma("GCC diagnostic pop")
 _Pragma("GCC diagnostic push")                                                                 \
 _Pragma("clang diagnostic ignored \"-Wshadow-field\"")                                         \
                                                                                                \
-    EXOPROGRAM_PREFIX##_ExoProgram(ExoEnv& mv) : ExoProgram(mv) {}                             \
+	EXOPROGRAM_PREFIX##_ExoProgram(ExoEnv& mv) : ExoProgram(mv) {}                             \
                                                                                                \
 _Pragma("GCC diagnostic pop")                                                                  \
 };                                                                                             \
@@ -51,72 +51,83 @@ _Pragma("GCC diagnostic push")                                                  
 _Pragma("clang diagnostic ignored \"-Wshadow-field\"")                                         \
 _Pragma("GCC diagnostic ignored \"-Winline\"")                                                 \
                                                                                                \
+/* main2 is a threadwise version main */                                                       \
 static int EXOPROGRAM_PREFIX##main2(int exodus_argc, const char* exodus_argv[], int threadno) {\
                                                                                                \
-    ExoEnv mv;                                                                                 \
-    exodus_main(exodus_argc, exodus_argv, mv, threadno);                                       \
+    /* Create a block of environment variables for the exodus program */                       \
+	ExoEnv mv;                                                                                 \
+	exodus_main(exodus_argc, exodus_argv, mv, threadno);                                       \
                                                                                                \
-    int result = 0;                                                                            \
-    EXOPROGRAM_PREFIX##_ExoProgram exoprogram1(mv);                                            \
-    if (osgetenv("EXO_DEBUG")) {                                                               \
-        errputl("Debug Init Thread:", THREADNO, " ", #EXOPROGRAM_PREFIX, " ", SENTENCE);       \
-        result = exoprogram1.main().toInt();                                                   \
-        errputl("Debug Exit Thread:", THREADNO, " ", #EXOPROGRAM_PREFIX, " ", SENTENCE);       \
-    } else {                                                                                   \
-        try {                                                                                  \
-            result = exoprogram1.main().toInt();                                               \
-        } catch (const ExoStop& exceptionx) {                                                  \
-            if (exceptionx.message.len())                                                      \
-                exceptionx.message.outputl();                                                  \
-            if (exceptionx.message.isnum())                                                    \
-                result = exceptionx.message.toInt();                                           \
-        } catch (const ExoAbort& exceptionx) {                                                 \
-            if (exceptionx.message.len())                                                      \
-                exceptionx.message.errputl();                                                  \
-            if (exceptionx.message.isnum() && exceptionx.message)                              \
-                result = exceptionx.message;                                                   \
-            else                                                                               \
-                result = 1;                                                                    \
-        } catch (const ExoAbortAll& exceptionx) {                                              \
-            if (exceptionx.message.len())                                                      \
-                exceptionx.message.errputl();                                                  \
-            if (exceptionx.message.isnum() && exceptionx.message)                              \
-                result = exceptionx.message.toInt();                                           \
-            else                                                                               \
-                result = 2;                                                                    \
-        } catch (const ExoLogoff& exceptionx) {                                                \
-            if (exceptionx.message.len())                                                      \
-                exceptionx.message.outputl();                                                  \
-            if (exceptionx.message.isnum())                                                    \
-                result = exceptionx.message.toInt();                                           \
-        } catch (const VarError& exceptionx) {                                                 \
-            errputl(exceptionx.message, " - Aborting.");                                       \
-            errputl(var(exceptionx.stack()).convert(FM, "\n"));                                \
-            result = OPTIONS.contains("I") ? 0 : 999;                                          \
-        }/* catch (const std::exception& exceptionx) {                                         \
-            errputl(exceptionx.what(), " - Aborting.");                                        \
-            result = 1;                                                                        \
-        } catch (...) {                                                                        \
+    /* Create an exodus program */                                                             \
+	EXOPROGRAM_PREFIX##_ExoProgram exoprogram1(mv);                                            \
+                                                                                               \
+	var result;                                                                                \
+	var caught = "";                                                                           \
+	int exit_status = 0;                                                                       \
+	if (osgetenv("EXO_DEBUG")) {                                                               \
+                                                                                               \
+	    /* Call main member function without catching stop, abort etc. and errors */           \
+		errputl("Debug Init Thread:", THREADNO, " ", #EXOPROGRAM_PREFIX, " ", SENTENCE);       \
+		result = exoprogram1.main();                                                           \
+		errputl("Debug Exit Thread:", THREADNO, " ", #EXOPROGRAM_PREFIX, " ", SENTENCE);       \
+	} else {                                                                                   \
+                                                                                               \
+        /* Call main member function catching stop, abort etc. and errors  */                  \
+		try {                                                                                  \
+			result = exoprogram1.main().or_default("");                                        \
+		} catch (const ExoStop& e) {                                                           \
+			result = e.message;                                                                \
+		}/*catch (const ExoLogoff& e) {                                                         \
+			result = e.message;                                                                \
+		}*/ catch (const ExoAbort& e) {                                                          \
+			caught = "ExoAbort: ";                                                             \
+			result = e.message;                                                                \
+			exit_status = 1;                                                                   \
+		} catch (const ExoAbortAll& e) {                                                       \
+			caught = "ExoAbortAll: ";                                                          \
+			result = e.message;                                                                \
+			exit_status = 2;                                                                   \
+		} catch (const VarError& e) {                                                          \
+			caught = "VarError: ";                                                             \
+			result = e.message;                                                                \
+			exit_status = 3;                                                                   \
+            /* stack dump */                                                                   \
+			errputl(var(e.stack()).convert(FM, "         \n"));                                \
+		}/* catch (const std::exception& e) {                                                  \
+			errputl(e.what(), " - Aborting.");                                                 \
+			result = 1;                                                                        \
+		} catch (...) {                                                                        \
 			var msg = "Error: Unknown exception in " ^ var(__PRETTY_FUNCTION__);               \
 			msg.errputl();                                                                     \
-			auto exceptionx = VarError(msg);                                                   \
-            errputl(var(exceptionx.stack()).convert(FM, "\n"));                                \
-            result = OPTIONS.contains("I") ? 0 : 999;                                          \
-        }*/                                                                                    \
-    }                                                                                          \
-    /*disconnect ALL connections of this thread*/                                              \
-    disconnectall();                                                                           \
-    disconnect();                                                                              \
-    if (OPTIONS.contains("I"))                                                                 \
-        result = 0;                                                                            \
-    return result;                                                                             \
-}                                                                                              \
+			auto e = VarError(msg);                                                            \
+			errputl(var(e.stack()).convert(FM, "         \n"));                                \
+			result = OPTIONS.contains("I") ? 0 : 999;                                          \
+		}*/                                                                                    \
+	}                                                                                          \
+	/*disconnect ALL db connections of this thread*/                                           \
+	disconnectall();                                                                           \
+	disconnect();                                                                              \
+/*	if (OPTIONS.contains("I")) */                                                              \
+/*		result = 0;            */                                                              \
+	if (not result.assigned())                                                                 \
+		result = 101;                                                                          \
+	if (not result.empty() and result.isnum())                                                 \
+		exit_status = result;                                                                  \
+	if (not result.isnum()) {                                                                  \
+		if (exit_status)                                                                       \
+			result.errputl(caught);                                                            \
+		else                                                                                   \
+			result.outputl(caught);                                                            \
+	}                                                                                          \
+	return exit_status;                                                                        \
+} /* of xxxxxxxx_main2 */                                                                      \
                                                                                                \
 _Pragma("GCC diagnostic pop")                                                                  \
                                                                                                \
-int EXOPROGRAM_PREFIX##main(int exodus_argc, const char* exodus_argv[]);                       \
+/* The standard main function */                                                               \
 int EXOPROGRAM_PREFIX##main(int exodus_argc, const char* exodus_argv[]) {                      \
-    return EXOPROGRAM_PREFIX##main2(exodus_argc, exodus_argv, 0);                              \
+	/* Call the threadwise main2 as thread 0 */                                                \
+	return EXOPROGRAM_PREFIX##main2(exodus_argc, exodus_argv, 0);                              \
 }
 
 #endif // EXODUS_LIBEXODUS_EXODUS_PROGRAM_H_

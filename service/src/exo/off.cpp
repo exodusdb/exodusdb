@@ -1,12 +1,13 @@
 #include <exodus/library.h>
 libraryinit()
 
-// OBSOLETE replaced by logoff(); everywhere
+// OBSOLETE replaced by stop(); everywhere
 
 func main() {
 	// printl("Goodbye");
 	// exit(0);
-	throw ExoLogoff("Logoff");
+//	throw ExoLogoff("Logoff");
+	stop();
 	//std::unreachable();
 }
 

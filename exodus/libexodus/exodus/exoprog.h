@@ -132,10 +132,6 @@ class PUBLIC ExoProgram {
 	// Is this required?
 	virtual ~ExoProgram();
 
-	////////////////////
-	//// Exodus Program:
-	////////////////////
-
 	///////////////////
 	///// Select lists:
 	///////////////////
@@ -284,19 +280,16 @@ ND	bool hasnext();
 	///// Perform/Execute:
 	//////////////////////
 
-	// Run an exodus program/library's main function using a command like syntax similar to that of executable programs.
-	// A "command line" is passed to the program/library in the usual COMMAND, SENTENCE and OPTIONS environment variables instead of function arguments.
+	// Run an exodus program/library's main function using a command like syntax similar to that of os executable programs.
+	// command_line: Used to initialise the COMMAND, SENTENCE and OPTIONS environment variables of the performed exodus program/library. Analogous to passing function arguments. The first word of command_line is used as the name of the program/library to be loaded and run.
 	// The program/library's main function should have zero arguments. Performing a program/library function with main arguments results in them being unassigned and in some case core dump may occur.
-	// The following environment variables are initialised on entry to the main function of the program/library. They are preserved untouched in the calling program.
-	// SENTENCE, COMMAND, OPTIONS: Initialised from the argument "command_line".
+	// Returns: Whatever var the program/library returns, or "" if it calls stop() or abort((). The return value can be ignored and discarded without any compiler warning.
+	// The following environment variables are initialised on entry to the main function of the program/library and are preserved untouched in the calling program.
 	// RECUR0, RECUR1, RECUR2, RECUR3, RECUR4 to "".
 	// ID, RECORD, MV, DICT initialised to "".
 	// LEVEL is incremented by one.
 	// All other environment variables are shared between the caller and callee. There is essentially only one environment in any one process or thread.
-	// Any active select list is passed to the performed program/library and can be consumed by it. Conversely any active select list created by the performed program/library will be returned to the calling program. In other words, both the performing and the performed programs/libraries share a single active select list environment. This is different from execute() which gets its own private active select list, initially inactive.
-	// command_line: The first word of this argument is used as the name of the program/library to be loaded and run. command_line is used to initialise the SENTENCE, COMMAND and OPTIONS environment variables.
-	// Returns: Whatever var the program/library returns, or "" if it calls stop() or abort(()".
-	// The return value can be ignored and discarded without any compiler warning.
+	// Any active select list in CURSOR is passed to the performed program/library and can be consumed by it. Conversely any active select list created by the performed program/library will be returned to the calling program. In other words, both the performing and the performed programs/libraries share a single active select list environment. This is different from execute() which gets its own private active select list, initially inactive.
 	// Exodus program/libraries may also be called directly using conventional function calling syntax. To call an exodus program/library called progname using either the syntax "call progname(args...);" or "var v1 = progname(args...);" you must "#include <progname.h>" after the "programinit()" or "libraryinit()" lines in your program/library.
 	var  perform(in command_line);
 
@@ -304,47 +297,62 @@ ND	bool hasnext();
 	// Identical to perform() but any currently active select list in the calling program/library is not accessible to the executed program/library and is preserved in the calling [program as is. Any select list created by the executed library is discarded when it terminates.
 	var  execute(in command_line);
 
-	// Run an exodus program/library's main function after closing the current program.
+	// Close the current program and perform another one.
 	// Identical to perform() except that the current program closes first.
 	[[noreturn]]
 	void chain(in command_line);
 
-	// Check if a lib exists to be performed/executed or called.
+	// Check if a lib exists to be performed/executed or called. Currently it does not check if it is actually loadable.
 	var  libinfo(in libname);
 
 	///////////////////////////
 	///// Program termination :
 	///////////////////////////
 
-	// Stop the current exodus program/library normally and return to the parent exodus program/library, or return to the operating system if none.
-	// Calling stop() in an exodus OS command line executable program, or in a function called from the same, will terminate the OS process with an error status of 0 which is generally considered to indicate success.
-	// Calling stop() in a performed or executed exodus program/library, or in a function called from the same, will terminate the program/library being executed and return to the exodus program that performed or executed it.
+	// Stop the current exodus program/library normally.
+	// Either return to the performing or executing parent exodus program/library, or exit to the OS if none.
+	// message: Optional. If exiting to the OS then it will be output to stdout or, if numeric, used as the exit status.
 	[[noreturn]]
 	void stop(in message = "") const;
 
-	// Abort the current exodus program/library abnormally and return to the parent exodus program/library, or return to the operating system if none.
-	// Similar to stop() but, if terminating the OS process, then return an error status of 1 which is generally considered to be an indication of failure.
+	// Abort the current exodus program/library.
+	// Similar to stop but if exiting to the OS then the default exit status is 1.
+	// message: Optional. If exiting to the OS then it will be output to stderr or, if numeric, used as the exit status.
 	[[noreturn]]
 	void abort(in message = "") const;
 
-	// Abort the current exodus program/library abnormally and return to the parent exodus program/library, or return to the operating system if none.
-	// Similar to abort() but, if terminating the OS process, then return an error status of 2 which is generally considered to be an indication of failure.
+	// Abort the current exodus program/library.
+	// Similar to abort but if exiting to the OS then the default exit status is 2.
 	[[noreturn]]
 	void abortall(in message = "") const;
 
-	// Quit to OS WITHOUT an error
-	//[[deprecated("Deprecated is a great way to highlight all uses of something!")]]
-	[[noreturn]]
-	void logoff(in message = "") const;
+//	// Stop the current exodus program/library normally.
+//	//[[deprecated("Deprecated is a great way to highlight all uses of something!")]]
+//	[[noreturn]]
+//	void logoff(in message = "") const;
 
 	///////////////////////////
 	///// db file dictionaries:
 	///////////////////////////
 
-	// given dictid reads dictrec from DICT file and extracts from RECORD/ID or calls library
-	// called dict+DICT function dictid not const so we can mess with the library?
+	// Given a dictid reads a dictrec from the current DICT file (using readc()) and then either extracts a specific field number from the current RECORD/ID/MV environment variables or calls a dict function library to calculate the result.
 ND	var  calculate(in dictid);
+
+	// Given dictid, dictfile, record, id and mv, reads a dictrec from dictfile (using readc()) and then either extracts a specific field number from the given record/id/mv or calls a dict function library to calculate the result.
 ND	var  calculate(in dictid, in dictfile, in id, in record, in mv = 0);
+
+	// Reads a record from the specified file and key (using readc()) and then either extracts a specific field number or calls calculate(dictid...) to obtain the result.
+	// filename: Which file to read.
+	// key: The key of the record to read.
+	// fieldno_or_name:
+	// * If numeric then a specific field number will be extracted.
+	// * If "0" then the key will be returned.
+	// * If "" then the whole record will be returned.
+	// * dictid: calculate(dictid) will be called.
+	// mode: Determines what to do if the record does not exist.
+	// * "X" Return ""
+	// * "C" Return the key.
+	// MV: Environment variable. Will be used to select a particular value or all if zero.
 ND	var  xlate(in filename, in key, in fieldno_or_name, const char* mode);
 
 	/////////////////////
@@ -471,6 +479,7 @@ ND	var  timedate2();
 ND	var  elapsedtimetext() const;
 
 	// Get text of elapsed time between two timestamps
+	// Caution. Use ostimestamp() which returns decimal days not ostime() which returns decimal seconds.
 	//
 	// `let v1 = elapsedtimetext(0, 0.55);  // "13 hours, 12 mins"
 	//  let v2 = elapsedtimetext(0, 0.001); // "1 min, 26 secs"`
@@ -604,7 +613,7 @@ ND	bool lockrecord(in filename, io file, in keyx) const;
 class PUBLIC ExoStop     {public:explicit ExoStop    (in var1 = ""); var message;};
 class PUBLIC ExoAbort    {public:explicit ExoAbort   (in var1 = ""); var message;};
 class PUBLIC ExoAbortAll {public:explicit ExoAbortAll(in var1 = ""); var message;};
-class PUBLIC ExoLogoff   {public:explicit ExoLogoff  (in var1 = ""); var message;};
+//class PUBLIC ExoLogoff   {public:explicit ExoLogoff  (in var1 = ""); var message;};
 
 // clang-format on
 

@@ -98,8 +98,8 @@ func main(in mode, in status0 = "") {
 	var parentdir = "../../";
 	parentdir.converter("/", OSSLASH);
 	if ((((SYSTEM.f(17).lcase() ^ ".end").osfile()) or var("global.end").osfile()) or ((parentdir ^ SYSTEM.f(123).lcase() ^ ".end").osfile())) {
-		logoff();
-		logoff();
+		stop();
+		stop();
 	}
 
 	return 0;

@@ -84,7 +84,7 @@ allowing it to interface correctly with UTF-8, UTF-16, and UTF-32 data:
 
 #define EXO_BOOST_REGEX
 #ifdef EXO_BOOST_REGEX
-#	define std_boost boost
+#	define std_or_boost boost
 #	include <boost/regex/icu.hpp>
 #	include <boost/regex.hpp>
 
@@ -93,7 +93,7 @@ allowing it to interface correctly with UTF-8, UTF-16, and UTF-32 data:
 #	else
 #		include <regex>
 #	endif
-#	define std_boost std
+#	define std_or_boost std
 #endif
 
 #include <exodus/varimpl.h>
@@ -185,11 +185,11 @@ constexpr static syntax_flags_typ get_syntax_flags(SV regex_options) {
 
 	// default - collate - Character ranges of the form "[a-b]" will be locale sensitive.
 	// IF? the normal/ECMAScript/perl engine is selected.
-	syntax_flags_typ regex_syntax_flags = std_boost::regex_constants::collate;
+	syntax_flags_typ regex_syntax_flags = std_or_boost::regex_constants::collate;
 
 	// i = icase - Character matching should be performed without regard to case.
 	if (regex_options.find('i') != std::string::npos) {
-		regex_syntax_flags |= std_boost::regex_constants::icase;
+		regex_syntax_flags |= std_or_boost::regex_constants::icase;
 	}
 
 	// m = multiline (The default in boost but not std::regex
@@ -197,7 +197,7 @@ constexpr static syntax_flags_typ get_syntax_flags(SV regex_options) {
 	// if the normal/perl/ECMAScript engine is selected.
 #ifndef EXO_BOOST_REGEX
 	if (regex_options.find('m') != std::string::npos) {
-		regex_syntax_flags|=std_boost::regex_constants::multiline;
+		regex_syntax_flags|=std_or_boost::regex_constants::multiline;
 	}
 #endif
 
@@ -205,7 +205,7 @@ constexpr static syntax_flags_typ get_syntax_flags(SV regex_options) {
 	// Specifies that ^ shall match the beginning of a line and $ shall match the end of a line,
 	// if the normal/perl/ECMAScript engine is selected.
 	if (regex_options.find('s') != std::string::npos) {
-		regex_syntax_flags|=std_boost::regex_constants::no_mod_m;
+		regex_syntax_flags|=std_or_boost::regex_constants::no_mod_m;
 	}
 
 	// l - literal TODO manually implement
@@ -214,7 +214,7 @@ constexpr static syntax_flags_typ get_syntax_flags(SV regex_options) {
 #ifdef EXO_BOOST_REGEX
 	//if (regex_options.contains("l"))
 	if (regex_options.find('l') != std::string::npos) {
-		regex_syntax_flags |= std_boost::regex_constants::literal;
+		regex_syntax_flags |= std_or_boost::regex_constants::literal;
 	}
 	else
 #endif
@@ -223,32 +223,32 @@ constexpr static syntax_flags_typ get_syntax_flags(SV regex_options) {
 	// eg = egrep (like grep -E) This is effectively the same as the basic option with the addition of newline '\n' as an alternation separator.
 	if (regex_options.find('g') != std::string::npos) {
 		if (regex_options.find('e') != std::string::npos)
-			regex_syntax_flags |= std_boost::regex_constants::egrep;
+			regex_syntax_flags |= std_or_boost::regex_constants::egrep;
 		else
-			regex_syntax_flags |= std_boost::regex_constants::grep;
+			regex_syntax_flags |= std_or_boost::regex_constants::grep;
 	}
 
 	// e = extended - Use the extended POSIX regular expression grammar
 	else if (regex_options.find('e') != std::string::npos) {
-			regex_syntax_flags |= std_boost::regex_constants::extended;
+			regex_syntax_flags |= std_or_boost::regex_constants::extended;
 	}
 
 	// b = basic - Use the basic POSIX regular expression grammar
 	else if (regex_options.find('b') != std::string::npos) {
-		regex_syntax_flags|=std_boost::regex_constants::basic;
+		regex_syntax_flags|=std_or_boost::regex_constants::basic;
 	}
 
 	// a = awk - Use the regular expression grammar used by the awk utility in POSIX
 	// Use the extended POSIX regular expression grammar
 	else if (regex_options.find('a') != std::string::npos) {
-		regex_syntax_flags |= std_boost::regex_constants::awk;
+		regex_syntax_flags |= std_or_boost::regex_constants::awk;
 	}
 
 	// n = nosubs - When performing matches, all marked sub-expressions (expr) are treated
 	// as non-marking sub-expressions (?:expr).
 	// No matches are stored in the supplied std::regex_match structure and mark_count() is zero.
 	if (regex_options.find('n') != std::string::npos) {
-		regex_syntax_flags |= std_boost::regex_constants::nosubs;
+		regex_syntax_flags |= std_or_boost::regex_constants::nosubs;
 	}
 
 	return regex_syntax_flags;
@@ -275,7 +275,7 @@ static REGEX varregex_make_regex_engine(SV regex_str, SV regex_options) {
 	catch (boost::wrapexcept<std::out_of_range>& e) {
 		throw VarError("Error: (1) Invalid data during match of " ^ var(regex_str).first(512).quote() ^ ". " ^ var(e.what()));
 	}
-	catch (std_boost::regex_error& e) {
+	catch (std_or_boost::regex_error& e) {
 		throw VarError("Error: Invalid regex string " ^ var(regex_str).first(128).first(512).quote() ^ ". " ^ var(e.what()).quote());
 	}
 	catch (...) {
@@ -358,10 +358,10 @@ var  var::match(SV regex_str, SV regex_options) const {
 		// 0. the following regexe special characters are not special so, if present in
 		// match expression, they must be escaped
 		// https://stackoverflow.com/questions/1252992/how-to-escape-a-string-for-use-in-boost-regex
-		// const std_boost::regex esc("[.^$|()\\[\\]{}*+?\\\\]");
+		// const std_or_boost::regex esc("[.^$|()\\[\\]{}*+?\\\\]");
 		// allow * and ? in glob expressions
 		// Special chars ". ^ $ | ( ) [ ] { } + \"
-		const std_boost::regex regex_special_chars{R"__([.^$|()\[\]{}+\\])__"};
+		const std_or_boost::regex regex_special_chars{R"__([.^$|()\[\]{}+\\])__"};
 
 #ifdef EXO_BOOST_REGEX
 		const std::string replacement_for_regex_special = R"__(\\$&)__";
@@ -369,8 +369,8 @@ var  var::match(SV regex_str, SV regex_options) const {
 		const std::string replacement_for_regex_special = R"__(\$&)__";
 #endif
 
-		//std::string regex2 = std_boost::regex_replace(regex.var_str, regex_special_chars,
-		std::string regex2 = std_boost::regex_replace(std::string(regex_str), regex_special_chars,
+		//std::string regex2 = std_or_boost::regex_replace(regex.var_str, regex_special_chars,
+		std::string regex2 = std_or_boost::regex_replace(std::string(regex_str), regex_special_chars,
 											  replacement_for_regex_special);
 
 		// 1. force to match whole string
@@ -498,10 +498,10 @@ var  var::search(SV regex_str, io startchar1, SV regex_options) const {
 		// 0. the following regexe special characters are not special so, if present in
 		// match expression, they must be escaped
 		// https://stackoverflow.com/questions/1252992/how-to-escape-a-string-for-use-in-boost-regex
-		// const std_boost::regex esc("[.^$|()\\[\\]{}*+?\\\\]");
+		// const std_or_boost::regex esc("[.^$|()\\[\\]{}*+?\\\\]");
 		// allow * and ? in glob expressions
 		// Special chars ". ^ $ | ( ) [ ] { } + \"
-		const std_boost::regex regex_special_chars{R"__([.^$|()\[\]{}+\\])__"};
+		const std_or_boost::regex regex_special_chars{R"__([.^$|()\[\]{}+\\])__"};
 
 #ifdef EXO_BOOST_REGEX
 		const std::string replacement_for_regex_special = R"__(\\$&)__";
@@ -509,8 +509,8 @@ var  var::search(SV regex_str, io startchar1, SV regex_options) const {
 		const std::string replacement_for_regex_special = R"__(\$&)__";
 #endif
 
-		//std::string regex2 = std_boost::regex_replace(regex.var_str, regex_special_chars,
-		std::string regex2 = std_boost::regex_replace(std::string(regex_str), regex_special_chars,
+		//std::string regex2 = std_or_boost::regex_replace(regex.var_str, regex_special_chars,
+		std::string regex2 = std_or_boost::regex_replace(std::string(regex_str), regex_special_chars,
 											  replacement_for_regex_special);
 
 		// 1. force to match whole string
@@ -534,7 +534,7 @@ var  var::search(SV regex_str, io startchar1, SV regex_options) const {
 // Version that accepts a rex object for speed
 var  var::search(const rex& regex, io startchar1) const {
 
-	THISIS("var  var::search(const rex& regex, int startchar1) const")
+	THISIS("var  var::search(const rex& regex, io startchar1) const")
 	assertString(function_sig);
 
 	// Get the engine from the rex if present otherwise get one from the cache (or construct one in the cache)
@@ -544,7 +544,7 @@ var  var::search(const rex& regex, io startchar1) const {
 
 	// https://stackoverflow.com/questions/26320987/what-is-the-difference-between-regex-token-iterator-and-regex-iterator
 	// boost::u32regex_token_iterator<std::string::const_iterator>
-	//	iter {std_boost::make_u32regex_token_iterator(var_str,regex,{0,1,2,3,4,etc or -1})};
+	//	iter {std_or_boost::make_u32regex_token_iterator(var_str,regex,{0,1,2,3,4,etc or -1})};
 	// token_iterator allow you to access none-matching parts of the string for parsing stuff
 	// but doesnt return an iterator with an array of groups
 
@@ -627,7 +627,7 @@ var  var::search(const rex& regex, io startchar1) const {
 // TODO check our exodus syntax letters do not overlap between syntax_flags and replacement_flags
 
 // replacement_flags are only used in replacements
-auto get_replacement_flags(const std::string rex_options, bool& first_only) -> std_boost::match_flag_type {
+auto get_replacement_flags(const std::string rex_options, bool& first_only) -> std_or_boost::match_flag_type {
 
 	// IMPORTANT
 	// Search and Replace Format String Syntax
@@ -637,8 +637,8 @@ auto get_replacement_flags(const std::string rex_options, bool& first_only) -> s
 	// match_flags
 	// https://en.cppreference.com/w/cpp/regex/match_flag_type
 
-//	auto replacement_flags = std_boost::match_flag_type(boost::match_default);
-	auto replacement_flags = std_boost::match_flag_type(boost::match_perl);
+//	auto replacement_flags = std_or_boost::match_flag_type(boost::match_default);
+	auto replacement_flags = std_or_boost::match_flag_type(boost::match_perl);
 
 	// 'f' - first only, otherwise all
 	if (rex_options.find('f') != std::string::npos) {
@@ -653,14 +653,16 @@ auto get_replacement_flags(const std::string rex_options, bool& first_only) -> s
 
 }
 
-// mutator
-IO   var::replacer(const rex& regex, SomeFunction(in match_str)) REF {
-	*this = this->replace(regex, sf);
-	return THIS;
-}
+//// mutator
+////IO   var::replacer(const rex& regex, SomeFunction(in match_str)) REF {
+//IO   var::replacer(const rex& regex, ReplacementFunction auto replacement_func) REF {
+//	*this = this->replace(regex, replacement_func);
+//	return THIS;
+//}
 
 // const
-var  var::replace(const rex& regex, SomeFunction(in match_str)) const {
+// Implementation can handle any type of function including capturing lambdas.
+var var::replace(const rex& regex, var (*sf)(const var&, void*), void* context) const {
 
 	THISIS("var  var::replace(const rex& regex, SomeFunction(in match_str)) const")
 	assertString(function_sig);
@@ -672,7 +674,7 @@ var  var::replace(const rex& regex, SomeFunction(in match_str)) const {
 
 	// https://stackoverflow.com/questions/26320987/what-is-the-difference-between-regex-token-iterator-and-regex-iterator
 	// boost::u32regex_token_iterator<std::string::const_iterator>
-	//	iter {std_boost::make_u32regex_token_iterator(var_str,regex,{0,1,2,3,4,etc or -1})};
+	//	iter {std_or_boost::make_u32regex_token_iterator(var_str,regex,{0,1,2,3,4,etc or -1})};
 	// token_iterator allow you to access none-matching parts of the string for parsing stuff
 	// but doesnt return an iterator with an array of groups
 
@@ -743,7 +745,7 @@ var  var::replace(const rex& regex, SomeFunction(in match_str)) const {
 
 		// Append the replacement
 //		nrvo.var_str.append(sf(matches));
-		nrvo ^= sf(matches);
+		nrvo ^= sf(matches, context);
 
 		// Point to after the match
 		// /usr/bin/../lib/gcc/x86_64-linux-gnu/99/../../../../include/c++/99/bits/stl_iterator.h:1047:11:
@@ -890,7 +892,7 @@ var  var::replace(const rex& regex, SV replacement) const& {
 //	// https://en.cppreference.com/w/cpp/regex/match_flag_type
 //
 //	// replacement_flags are only used in replacements
-//	auto replacement_flags = std_boost::match_flag_type(boost::match_default);
+//	auto replacement_flags = std_or_boost::match_flag_type(boost::match_default);
 //	// Option f = first only, otherwise all
 //	//c++23 if (regex_options.contains("f"))
 //
@@ -911,7 +913,7 @@ var  var::replace(const rex& regex, SV replacement) const& {
 	//////////////////
 
 	try {
-		std_boost::u32regex_replace(
+		std_or_boost::u32regex_replace(
 			oiter,
 			var_str.begin(),
 			var_str.end(),
@@ -1007,20 +1009,20 @@ io   var::oconv_MR(const char* conversion) {
 
 			// MR/N return everything except digits. Remove all digits 0123456789 (unicode digits?)
 			case 'N': {
-				//var_str=std_boost::regex_replace(toTstring((*this)),digits_regex, "");
+				//var_str=std_or_boost::regex_replace(toTstring((*this)),digits_regex, "");
 				var_str = REGEX_REPLACE(var_str, digits_regex, "");
 				break;
 			}
 
 			// MR/A return everything except "alphabetic". Remove all "alphabetic"
 			case 'A': {
-				//var_str=std_boost::regex_replace(toTstring((*this)),alpha_regex, "");
+				//var_str=std_or_boost::regex_replace(toTstring((*this)),alpha_regex, "");
 				var_str = REGEX_REPLACE(var_str, alpha_regex, "");
 				break;
 			}
 			// MR/B return everything except "alphanumeric". Remove all "alphanumeric"
 			case 'B': {
-				//var_str=std_boost::regex_replace(toTstring((*this)),alphanum_regex, "");
+				//var_str=std_or_boost::regex_replace(toTstring((*this)),alphanum_regex, "");
 				var_str = REGEX_REPLACE(var_str, alphanum_regex, "");
 				break;
 			}
@@ -1031,24 +1033,24 @@ io   var::oconv_MR(const char* conversion) {
 	}
 
 	// http://www.boost.org/doc/libs/1_37_0/libs/regex/doc/html/boost_regex/ref/regex_replace.html
-	// std_boost::regex_replace
+	// std_or_boost::regex_replace
 
 	switch (*conversion) {
 		// MRN return only digits i.e. remove all non-digits
 		case 'N': {
-			// var_str=std_boost::regex_replace(toTstring((*this)),non_digits_regex, "");
+			// var_str=std_or_boost::regex_replace(toTstring((*this)),non_digits_regex, "");
 			var_str = REGEX_REPLACE(var_str, non_digits_regex, "");
 			break;
 		}
 		// MRA return only "alphabetic" i.e. remove all "non-alphabetic"
 		case 'A': {
-			// var_str=std_boost::regex_replace(toTstring((*this)),non_alpha_regex, "");
+			// var_str=std_or_boost::regex_replace(toTstring((*this)),non_alpha_regex, "");
 			var_str = REGEX_REPLACE(var_str, non_alpha_regex, "");
 			break;
 		}
 		// MRB return only "alphanumeric" i.e. remove all "non-alphanumeric"
 		case 'B': {
-			// var_str=std_boost::regex_replace(toTstring((*this)),non_alphanum_regex, "");
+			// var_str=std_or_boost::regex_replace(toTstring((*this)),non_alphanum_regex, "");
 			var_str = REGEX_REPLACE(var_str, non_alphanum_regex, "");
 			break;
 		}

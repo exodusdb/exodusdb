@@ -887,11 +887,12 @@ var ExoProgram::perform(in command_line) {
 //			ANS = "";
 
 		// Stop
-		catch (const ExoStop&) {
+		catch (const ExoStop& e) {
 			// stop is normal way of stopping a perform
 			// functions can call it to terminate the whole "program"
 			// without needing to setup chains of returns
 			// to exit from nested functions
+			var::setlasterror(e.message);
 			ANS = "";
 		}
 
@@ -904,10 +905,11 @@ var ExoProgram::perform(in command_line) {
 		}
 
 		// AbortAll
-		catch (const ExoAbortAll&) {
+		catch (const ExoAbortAll& e) {
 			// similar to stop for the time being
 			// maybe it should set some error flag/messages
 			// and abort multiple levels of perform?
+			var::setlasterror(e.message);
 			ANS = "";
 		}
 
@@ -915,10 +917,12 @@ var ExoProgram::perform(in command_line) {
 		//that omits catch (VarError) if EXO_DEBUG is set
 		//so that gdb will catch the original error and allow backtracing there
 		//Until then, use gdb "catch throw" as mentioned below.
-		catch (const VarError&) {
+		catch (const VarError& e) {
 			//restore environment in case VarError is caught
 			//in caller and the program resumes processing
 			restore_environment();
+
+			var::setlasterror(e.message);
 
 			// Use gdb command "catch throw" to break at error line to get back traces there
 			UNLIKELY
@@ -2605,12 +2609,12 @@ var ExoProgram::amountunit(in input0, out unitx) {
 ExoStop     ::ExoStop(in errmsg)     : message(errmsg) {}
 ExoAbort    ::ExoAbort(in errmsg)    : message(errmsg) {}
 ExoAbortAll ::ExoAbortAll(in errmsg) : message(errmsg) {}
-ExoLogoff   ::ExoLogoff(in errmsg)   : message(errmsg) {}
+//ExoLogoff   ::ExoLogoff(in errmsg)   : message(errmsg) {}
 
 [[noreturn]] void ExoProgram::stop(in errmsg)     const {throw ExoStop(errmsg);}
 [[noreturn]] void ExoProgram::abort(in errmsg)    const {throw ExoAbort(errmsg);}
 [[noreturn]] void ExoProgram::abortall(in errmsg) const {throw ExoAbortAll(errmsg);}
-[[noreturn]] void ExoProgram::logoff(in errmsg)   const {throw ExoLogoff(errmsg);}
+//[[noreturn]] void ExoProgram::logoff(in errmsg)   const {throw ExoLogoff(errmsg);}
 
 // clang-format on
 
