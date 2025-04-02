@@ -49,7 +49,7 @@ func main() {
 	//////////////////////////////////////////////
 
 	var all_code_cleanups = "";
-	var first_osfilename0 = "";
+	var first_osfilenameonly = "";
 
 	let codefile = ostempfile();
 //	std::ofstream codefile(codefile.toString());
@@ -84,10 +84,20 @@ func main() {
 	gosub cleanup();
 )__";
 
-	// Process each input file in turn
-	//////////////////////////////////
+	var all_contents = "";
+
+///////////
+// nextfile
+///////////
+
+	let nfiles = COMMAND.fcount(FM) - 1;
+	dim file_texts(nfiles);
+	file_texts = "";
+	var filen = 0;
 
 	for (let osfilename : COMMAND.remove(1)) {
+
+		filen++;
 
 		// Skip and capture output dir for examples .cpp
 		if (osdir(osfilename)) {
@@ -101,30 +111,30 @@ func main() {
 			continue;
 		}
 //		src.converter("\n\r", _FM);
-		let osfilename0 = osfilename.field(OSSLASH, -1);
+		let osfilenameonly = osfilename.field(OSSLASH, -1);
 
 		// code is output using the name of the first file
-		if (not first_osfilename0)
-			first_osfilename0 = osfilename0;
+		if (not first_osfilenameonly)
+			first_osfilenameonly = osfilenameonly;
 
 		// Start the code examples for this osfile
-//		var file_header = osfilename0;
+//		var file_header = osfilenameonly;
 		////////////////
 		// Code examples - from var.h
 		////////////////
 		codefile << "\n////////////////";
-		codefile << "\n/" "/ Code examples " << osfilename0;
+		codefile << "\n/" "/ Code examples " << osfilenameonly;
 		codefile << "\n////////////////";
 		codefile << "\n";
 
-		var contents = "";
+		var file_contents = "";
 
 		var new_objs = "";
 		var defined_objs = "";
 		var all_func_sigs = "";
 		tableno = 0;
 
-		var class_name = osfilename0.field(".", 1);
+		var class_name = osfilenameonly.field(".", 1);
 
 		// Start a file for the documentation
 		/////////////////////////////////////
@@ -137,13 +147,18 @@ func main() {
 		auto skipping = true;
 		auto in_table = false;
 
-		var lastcomment = "";
+		var comments = "";
 
 		var default_objname = "var";
+
+///////////
+// nextline
+///////////
 
 		// Indexing instead of fieldwise so we can look back from any line
 		for (let lineno : range(1, src.rows())) {
 
+			// Alias srcline into the src dim array
 			var& srcline = src[lineno];
 
 			// tabs become spaces
@@ -153,13 +168,7 @@ func main() {
 			srcline.trimmerboth();
 
 			if (srcline.starts("[[noreturn") and srcline.ends("]]"))
-				continue;
-
-//			// "[[Deprecated" flags that the following function line should not be documented
-//			if (srcline.starts("[[deprecated")) {
-//				deprecated = true;
-//				continue;
-//			}
+				continue; // nextline
 
 			// class definitions
 			if (srcline.starts("class ")) {
@@ -172,7 +181,7 @@ func main() {
 					if (class_name == "ExoProgram")
 						default_objname = "";
 				}
-				continue;
+				continue; // nextline
 			}
 
 			////////////////////////////
@@ -200,7 +209,7 @@ func main() {
 				// Empty table title results in closing table and skipping following functions
 				// until another table title is found.
 				if (not trim(table_title.f(1, 3)))
-					continue;
+					continue; // nextline
 
 				in_table = true;
 
@@ -226,14 +235,15 @@ func main() {
 
 					var table_id = short_title.convert(" ", "_");
 
-					contents ^= "<li><a href=#" ^ table_id ^ ">" ^ short_title ^ "</a></li>\n";
+					let table_entry = "<li><a href=#" ^ table_id ^ ">" ^ short_title ^ "</a></li>\n";
+					file_contents ^= table_entry;
 
 					docfile << "<h" << level << " id=" << table_id << ">" << short_title << "</h" << level << ">" << std::endl;
 					docfile << "" << std::endl;
 					docfile << "<table class=wikitable>" << std::endl;
 					docfile << "<tr> <th>Use</th> <th>Function</th> <th>Description</th> </tr>" << std::endl;
 				}
-				continue;
+				continue; // nextline
 			}
 
 			// private declaration turns off documentation
@@ -242,7 +252,7 @@ func main() {
 			else if(srcline == "public:")
 				skipping = false;
 			if (skipping or not in_table)
-				continue;
+				continue; // nextline
 
 			///////////////////////////////////////
 			// Find a function declaration (tricky)
@@ -324,7 +334,7 @@ func main() {
 
 					// Collect possible function preamble comments
 					// Exactly // (two slashes, not more)
-					lastcomment ^= srcline.substr(4) ^ FM_;
+					comments ^= srcline.substr(4) ^ FM_;
 
 				} else {
 
@@ -337,7 +347,7 @@ func main() {
 					// From thrown away comments, get the default obj name for all following functions
 					// except where overridden in specific function comments.
 					// Only match "obj is xxx|yyy|zzz()" at the start of the first line of comment.
-					let new_default_objname = lastcomment.match(R"__(^\s*obj is ([a-zA-Z_][a-zA-Z0-9_()|]+))__").f(1, 2);
+					let new_default_objname = comments.match(R"__(^\s*obj is ([a-zA-Z_][a-zA-Z0-9_()|]+))__").f(1, 2);
 
 					if (new_default_objname) {
 						new_objs ^= new_default_objname ^ FM;
@@ -345,15 +355,15 @@ func main() {
 					}
 
 					// Throw away collected comments if not contiguous
-					lastcomment = "";
+					comments = "";
 				}
-				continue;
+				continue; // nextline
 			}
 
-			// Skip deprecated or UNDOCUMENTED functions
-			static rex undocumented("deprecate|undocumented", "i");
-			if (src[lineno - 1].ucase().match(undocumented))
-				continue;
+			// Skip [[deprecated]] and [[undocumented]] functions
+			static rex undocumented(R"__(\[\[(deprecated|undocumented))__");
+			if (comments.match(undocumented))
+				continue; // nextline
 
 			///////////////////////////////
 			// Found a function declaration
@@ -364,16 +374,15 @@ func main() {
 
 //			var comments = srcline.field("{", 1).field(";", 2, 9999).trimmerfirst("/ ");
 //			var comments = srcline.field("/" "/", 2, 99999).trimfirst();
-			var comments = srcline.field("/" "/", 2, 99999);
+			let trailing_comment = srcline.field("/" "/", 2, 99999);
 			srcline = srcline.field("/" "/", 1).field("{", 1).trimlast();
 			let funcname = srcline.field("(", 1);
 
-			// If no end of line comment use the lead in comments before the function declaration
-			if (not comments and lastcomment) {
-				lastcomment.popper();
-//				comments = std::move(lastcomment);
-				comments = lastcomment.move();
-			}
+			// Use trailing comment overerides leading comments
+			if (trailing_comment)
+				comments = trailing_comment;
+			else
+				comments.popper();
 
 			// Extract and remove any "obj is xxx|yyy|zzz()" lines in comments for specific functions
 			// comments is FM separated at this point (dont forget that \s matches FM chars)
@@ -426,6 +435,9 @@ func main() {
 				// Replace space formatting with single space
 				codematches.replacer("\u22c5+"_rex, " "); // "⋅" Unicode operator point operator -> space
 
+////////////////
+// nextcodematch
+////////////////
 				for (var codematch : codematches) {
 					codematch = codematch.f(1, 2);
 					// ... becomes proper code
@@ -504,7 +516,8 @@ func main() {
 					for (var objname : new_objs) {
 						objname.converter("()", "");
 						if (not objname or objname == "var")
-							continue;
+							continue; // nextcodematch
+
 						if (not locate(objname, defined_objs)) {
 							defined_objs ^= objname ^ VM;
 							// Declare a var if "obj is"
@@ -546,28 +559,51 @@ func main() {
 				else if (wiki)
 					comments.replacer(backquoted, "<syntaxhighlight lang=\"c++\">\n$1</syntaxhighlight>");
 				else
-					// Javascript instead of cpp because it gives better highlighting for exodus c++. See above too.
-					// (All function calls are highlighted)
-					comments.replacer(backquoted, "\n<pre><code class='hljs-ncdecl language-javascript'>$1</code></pre>\n");
+//					// Javascript instead of cpp because it gives better highlighting for exodus c++. See above too.
+//					// (All function calls are highlighted)
+//					comments.replacer(backquoted, "\n<pre><code class='hljs-ncdecl language-javascript'>$1</code></pre>\n");
+//					comments.replacer(backquoted, "\n<pre><code class='language-cpp'>$1</code></pre>\n");
+					comments.replacer(backquoted, "\n<textarea class=code-block>$1</textarea>\n");
 
 				// Ordinary spaces for aligning code in html and wiki
 				if (not man)
 					comments.replacer("\u22c5", " "); // "⋅" Unicode operator point operator -> " "
 			}
 
-			////////////////////////////////
-			// Output function documentation
-			////////////////////////////////
+/////////////////////////
+// probably function line
+/////////////////////////
+
+			// Can still bail out anywhere down to lineinit below
 
 			// After using backticks to delimit c++ code.
 			comments.replacer("{backtick}", "`");
 
 			if (man) {
+
+				// man page formatting function by function
+
 				// hide dot/space formatting
 				comments.replacer("\u22c5", "\u2005"); // "⋅" Unicode operator point operator -> " " FOUR-PER-EM SPACE
 				comments.replacer("␣", "\u2005");
 
+				// DOUBLE SPACE paragraphs to avoid man joining them up?
 				comments.replacer(_FM, "\n\n");
+
+				// Bullet points for lines starting * + space
+    			comments.replacer("\n\n* "_var, "\n.br\n<REAL_BS>(bu "_var);
+
+				// Auto numbered points
+				// # xxx
+				// # yyy
+				comments.replacer(R"__((^# .*?\n\n){2,999})__"_rex, [](in lines) {
+					dim response = lines.f(1, 1).trim(NL).split(NL);
+					let fmt = "R#" ^ response.rows().len(); // 1. R#1, 10. R#2
+					for (let ln : range(1, response.rows()))
+						response[ln] = ".br\n" ^ ln.oconv(fmt) ^ ". " ^ response[ln].cut(2);
+					return response.join(NL) ^ NL;
+				});
+
 			} else if (wiki) {
 				comments.replacer(_FM, "\n\n");
 			} else {
@@ -581,74 +617,80 @@ func main() {
 				comments.converter(_FM, _NL);
 			}
 
+			// Clean up function args
 			var line2 = srcline.field(";", 1);
+			{
 
-			if (verbose == 1) {
-				TRACE(line2)
-			}
+				if (verbose == 1) {
+					TRACE(line2)
+				}
 
-			// "ARGS&... appendable" -> "appendable, ..."
-			line2.replacer(R"__(\b[a-zA-Z][a-zA-Z0-9]*\s*&{1,2}\s*\.\.\.\s*\b([a-zA-Z][a-zA-Z0-9]*))__"_rex, "$1, ...");
+				// "ARGS&... appendable" -> "appendable, ..."
+				line2.replacer(R"__(\b[a-zA-Z][a-zA-Z0-9]*\s*&{1,2}\s*\.\.\.\s*\b([a-zA-Z][a-zA-Z0-9]*))__"_rex, "$1, ...");
 
-			line2.replacer("\\bstd::size_t\\b", "");
-			line2.replacer("\\bconst&&\\b", "");
-			line2.replacer("\\bconst&\\b", "");
-			line2.replacer("\\bconst\\b"_rex, "");
-			line2.replacer("\\bin\\b"_rex, "");
-			line2.replacer("\\bSV\\b"_rex, "");
-			line2.replacer("(int)", "(INT)"); // preserve operator++(int) for later analysis
-			line2.replacer("\\bint\\b"_rex, "");
-			line2.replacer("\\bint\\b"_rex, "");
-			line2.replacer("\\bchar\\*"_rex, "");
-			line2.replacer("\\bbool "_rex, "");
-			line2.replacer("\\brex& "_rex, "");
-//			line2.replacer("\\bdim& "_rex, ""); // needed to create this text below "dim d1 = d2; // Copy"
-			line2.replacer("\\bCVR "_rex, "");
-			line2.replacer("\\bCBR "_rex, "");
-			line2.replacer("\\bVARREF "_rex, "io");
-			line2.replacer("\\bCONSTEXPR "_rex, "");
-			line2.replacer("= _", "= ");
-			line2.trimmer();
-			line2.replacer("( ", "(");
-			line2.replacer(" )", ")");
+				line2.replacer("\\bstd::size_t\\b", "");
+				line2.replacer("\\bconst&&\\b", "");
+				line2.replacer("\\bconst&\\b", "");
+				line2.replacer("\\bconst\\b"_rex, "");
+				line2.replacer("\\bin\\b"_rex, "");
+				line2.replacer("\\bSV\\b"_rex, "");
+				line2.replacer("(int)", "(INT)"); // preserve operator++(int) for later analysis
+				line2.replacer("\\bint\\b"_rex, "");
+				line2.replacer("\\bint\\b"_rex, "");
+				line2.replacer("\\bchar\\*"_rex, "");
+				line2.replacer("\\bbool "_rex, "");
+				line2.replacer("\\bbool "_rex, "");
+				line2.replacer("\\bstd::size_t "_rex, "");
+				line2.replacer("\\brex& "_rex, "");
+	//			line2.replacer("\\bdim& "_rex, ""); // needed to create this text below "dim d1 = d2; // Copy"
+				line2.replacer("\\bCVR "_rex, "");
+				line2.replacer("\\bCBR "_rex, "");
+				line2.replacer("\\bVARREF "_rex, "io");
+				line2.replacer("\\bCONSTEXPR "_rex, "");
+				line2.replacer("= _", "= ");
+				line2.trimmer();
+				line2.replacer("( ", "(");
+				line2.replacer(" )", ")");
 
-//			line2.replacer("dim& ", "dim ");
-//			line2.replacer("dim& ", "");
-			line2.replacer("noexcept", "");
+	//			line2.replacer("dim& ", "dim ");
+	//			line2.replacer("dim& ", "");
+				line2.replacer("noexcept", "");
 
-			// SKIP temporaries and deleted functions
-			if (line2.ends("&&") || line2.ends("= delete"))
-				continue;
+				// SKIP temporaries and deleted functions
+				if (line2.ends("&&") || line2.ends("= delete"))
+					continue; // nextline
 
-			// Skip copy and move assignment
-			// void operator=(const dim& rhs) &;
-			// void operator=(dim&& rhs) & noexcept {
-//			if (line2.starts("operator=(const " ^ class_name ^ "&"))
-//				continue;
-//			if (line2.starts("operator=(" ^ class_name ^ "&&"))
-//				continue;
-			if (line2.match(R"__(\boperator\s*=\s*\(\s*(const)?\s*[a-zA-Z0-9_]+\s*&)__"))
-				continue;
+				// Skip copy and move assignment
+				// void operator=(const dim& rhs) &;
+				// void operator=(dim&& rhs) & noexcept {
+	//			if (line2.starts("operator=(const " ^ class_name ^ "&"))
+	//				continue;
+	//			if (line2.starts("operator=(" ^ class_name ^ "&&"))
+	//				continue;
+				if (line2.match(R"__(\boperator\s*=\s*\(\s*(const)?\s*[a-zA-Z0-9_]+\s*&)__"))
+					continue; // nextline
 
-//			// operator=(v1)
-//			// dim d1 = v1;
-//			if (line2.match(R"__(\boperator\s*=)__")) {
-//				line2.replacer(R"__(\boperator=\(([a-zA-Z0-9_]+)\))__"_rex, class_name ^ " " ^ class_name.first() ^ "1 = $1;");
-//			}
+	//			// operator=(v1)
+	//			// dim d1 = v1;
+	//			if (line2.match(R"__(\boperator\s*=)__")) {
+	//				line2.replacer(R"__(\boperator=\(([a-zA-Z0-9_]+)\))__"_rex, class_name ^ " " ^ class_name.first() ^ "1 = $1;");
+	//			}
 
-			if (line2.ends("&")) {
-				line2.popper();
-				line2.trimmerlast();
-			}
+				if (line2.ends("&")) {
+					line2.popper();
+					line2.trimmerlast();
+				}
 
-			if (line2.ends("REF")) {
-				line2.cutter(-3);
-				line2.trimmerlast();
-			}
+				if (line2.ends("REF")) {
+					line2.cutter(-3);
+					line2.trimmerlast();
+				}
+
+			} // end of clean up function arguments
 
 			// SKIP if no comments and already output
 			if (not comments and locate(line2, all_func_sigs))
-				continue;
+				continue; // nextline
 
 			all_func_sigs ^= line2 ^ VM;
 
@@ -683,7 +725,7 @@ func main() {
 					// operator<<(std::ostream& (*manip)(std::ostream&))
 					if (line2.contains("manip"))
 //						func_decl = "osfile << std::setw(n) << std::endl; etc.";
-						continue;
+						continue; // nextline
 					else
 						func_decl = "osfile << anything << std::endl;";
 					prefix = "";
@@ -842,6 +884,12 @@ func main() {
 			if (prefix == "cmd" or prefix == "cmd2")
 				prefix = "";
 
+///////////
+// lineinit
+///////////
+
+			// No going back from here because we start outputting to docfile
+
 			if (man) {
 
 				var func_decl2 = func_decl;
@@ -892,9 +940,9 @@ func main() {
 
 		} // srcline
 
-///////////
-// fileexit
-///////////
+/////////////
+// osfileexit
+/////////////
 
 		//////
 		// doc
@@ -907,10 +955,16 @@ func main() {
 			if (not osremove(docfilename))
 				loglasterror();
 
-			// Escape back slashes for man pages
 			if (man) {
+
+				// man page formatting at the end
+
+				// Escape back slashes for man pages comments
 				doc_body.replacer("&bsol;", _BS);
 				doc_body.replacer(_BS, _BS _BS);
+
+				// but man pages require some real BS in macros
+				doc_body.replacer("<REAL_BS>", _BS);
 
 				// Emphasise/highlight leading words xxxxxxx:
 				doc_body.replacer(R"__(^([a-zA-Z0-9_."]+):(\s+))__"_rex, R"__(\fB$1:\fR$2)__");
@@ -949,31 +1003,17 @@ func main() {
 
 			else if (html) {
 
-				let page_title = "";
-				doc_text ^=
-					"<html>\n"
-					"<!DOCTYPE html>\n"
-					"<html>\n"
-					"<head>\n"
-//					"  <title>" ^ page_title ^ "</title>"
-					"</head>\n"
-					"<body>\n";
-
-				// c++ syntax highlighter - highlight.js
-				doc_text ^= highlight_js;
-				doc_text ^= "\n";
-
-				// css and script
-				doc_text ^= css;
-				doc_text ^= "\n";
+				let osfile_id = osfilenameonly.field(".");
+				let osfile_title = osfilenameonly.field(".");
+				all_contents ^= "<li><a href=#" ^ osfile_id ^ ">" ^ osfile_title ^ "</a></li>\n";
 
 				// Contents
 				doc_text ^= "<div class=toc>\n";
 
-				doc_text ^= "<h4>Contents:</h4>\n";
+				doc_text ^= "<h4 id=" ^ osfile_id ^ ">Contents:</h4>\n";
 
 				doc_text ^= "<ol>\n";
-				doc_text ^= contents;
+				doc_text ^= file_contents;
 				doc_text ^= "\n";
 				doc_text ^= "</ol>\n";
 
@@ -984,7 +1024,7 @@ func main() {
 			// 2. header
 
 			if (man) {
-				doc_text ^= ".TH " ^ osfilename0;
+				doc_text ^= ".TH " ^ osfilenameonly;
 //				doc_text ^= "\n";
 //				doc_text ^= file_header;
 				doc_text ^= "\n\n";
@@ -999,15 +1039,14 @@ func main() {
 			doc_text ^= doc_body;
 			doc_text ^= "\n";
 
-			if (html) {
-				doc_text ^=
-					"</body>\n"
-					"</html>\n"
-					"</html>\n";
-			}
+			if (not output_to_orig_dir) {
 
-			if (not output_to_orig_dir)
-				outputl(doc_text);
+				if (man)
+					outputl(doc_text);
+				else
+					// Save it for output after all_contents in this program's exit
+					file_texts[filen] = doc_text.move();
+			}
 			else {
 				// Change .h to .1, .wiki. .htm etc.
 				var doc_osfilename = osfilename.fieldstore(".", -1, 1, doc_ext);
@@ -1031,6 +1070,70 @@ func main() {
 ///////
 // exit
 ///////
+
+	// Prefix multifile contents
+	if (html) {
+
+		var doc_text = "";
+		let page_title = "";
+		doc_text ^=
+			"<!DOCTYPE html>\n"
+			"<html>\n"
+			"<head>\n";
+	//					"  <title>" ^ page_title ^ "</title>"
+
+		// c++ syntax highlighter - highlight.js
+		doc_text ^= syntax_hljs_top;
+		doc_text ^= "\n";
+
+		// css and script
+		doc_text ^= css;
+		doc_text ^= "\n";
+
+		doc_text ^=
+			"</head>\n"
+			"<body>\n";
+
+		if (all_contents) {
+
+			doc_text ^= "<div class=toc>\n";
+
+			doc_text ^= "<h3>Sections:</h3>\n";
+
+			doc_text ^= "<ol>\n";
+			doc_text ^= all_contents;
+			doc_text ^= "\n";
+			doc_text ^= "</ol>\n";
+
+			doc_text ^= "</div>\n";
+		}
+
+		// Output the html header
+		printl(doc_text);
+
+		// Output each file's html
+//		for (let filen : rang(1, nfiles)) {
+		for (in file_text : file_texts) {
+			printl(file_text);
+		}
+
+		// Insert the latest version of exodus keywords
+		var exodus_keywords = osread(osgetenv("HOME") ^ "/exodus/exodus/libexodus/exodus/keywords.txt").field("\n",2,999999);
+		// Make unique FM array
+		exodus_keywords = exodus_keywords.convert(",'\n", "   ").trim().convert(" ", FM).sort().unique();
+		// Text fold at 80 and insert an escaped NL
+		exodus_keywords = exodus_keywords.convert(FM, " ").oconv("T#80").trimlast().replace(rex("\\s*" _TM), " \\\n");
+		syntax_hljs_bottom.replacer("EXODUS_KEYWORDS", exodus_keywords);
+
+		printx(syntax_hljs_bottom);
+
+		// Finalise the html
+		printl(
+			"</body>\n"
+			"</html>"
+		);
+
+	}
 
 	/////////////////////
 	// handle code output
@@ -1063,7 +1166,7 @@ func main() {
 			if (not osread(newcode from codefile))
 				abort(lasterror());
 
-			let code_filename = codefile_dir ^ "/" ^ "testing_'orig'.cpp"_var.replace("'orig'", first_osfilename0);
+			let code_filename = codefile_dir ^ "/" ^ "testing_'orig'.cpp"_var.replace("'orig'", first_osfilenameonly);
 			var oldcode = "";
 			if (not osread(oldcode from code_filename)) {
 				oldcode = "";
@@ -1089,52 +1192,135 @@ func main() {
 ////////////
 // syntax_js
 ////////////
-var highlight_js =R"__(
 
-	<!-- highlight.js for c++ syntax highlighting -->
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/cpp.min.js"></script>
-	<!-- done below <script>hljs.highlightAll();</script> -->
+	let syntax_hljs_top =
 
-<style>
+R"__(<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.17/codemirror.min.css">
+    <style>
+        .CodeMirror {
+            height: auto;
+            background: #ffffff;
+            color: #000000;
+            padding: 0.5em;
+            border: 1px solid #ddd;
+            margin-bottom: 1em;
+        }
+        .cm-keyword {
+            color: #008000;
+            font-weight: bold;
+        }
+        .cm-string {
+            color: #a31515;
+        }
+        .cm-number {
+            color: #0000ff;
+        }
+        .cm-comment {
+            color: #008080;
+        }
+        .cm-variable {
+            color: #000000;
+        }
+        .cm-type {
+            color: #2b91af;
+            font-weight: bold;
+        }
+        .cm-function {
+            color: #795e26;
+            font-weight: bold;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.17/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.17/mode/clike/clike.min.js"></script>
+)__";
 
-/* Change highlight.js comments from default grey to green */
-.hljs-comment,
-.hljs-quote {
-	color: #008000; /* This is green, you can adjust the shade as per your preference */
-	font-style: italic; /* Optional: You might want to keep comments italicized */
-}
+	var syntax_hljs_bottom =
 
-</style>
+R"__(<script>
+        // Define a custom CodeMirror mode for C++ with your extensions
+        CodeMirror.defineMode('customcpp', function(config, parserConfig) {
+            const cppMode = CodeMirror.getMode(config, 'text/x-c++src');
 
-<script>
-	//// Extend C++ language definition
-	//const cppLanguage = hljs.getLanguage('cpp');
-	//if (cppLanguage) {
-	//	// Adding custom keywords
-	//	cppLanguage.keywords = {
-	//		...cppLanguage.keywords,
-	//		keyword: cppLanguage.keywords.keyword + ' round chr textchr',
-	//		// You can also add to other categories like 'literal', 'built_in', etc.
-	//	};
-	//	// Register the modified language
-	//	hljs.registerLanguage('cpp', cppLanguage);
-	//}
+            return {
+                startState: function() {
+                    return {
+                        base: cppMode.startState(),
+                        inMemberFunction: false // Track if we're in a member function (e.g., conn.connect)
+                    };
+                },
+                token: function(stream, state) {
+                    // Handle member functions (e.g., conn.connect)
+                    if (!state.inMemberFunction && stream.match(/\b[a-zA-Z_][a-zA-Z0-9_]*\s*\.\s*(connect|disconnect)\b/)) {
+                        state.inMemberFunction = true;
+                        return 'function';
+                    }
+                    if (state.inMemberFunction) {
+                        if (stream.match(/\(/)) {
+                            state.inMemberFunction = false; // Reset after the function call starts
+                        }
+                        return null; // Skip tokens until we reset
+                    }
 
-	// Initialize highlight.js
-	document.addEventListener('DOMContentLoaded', (event) => {
-	    hljs.highlightAll();
-	});
-</script>
+                    // Match classes/types (e.g., var, let, dim)
+                    if (stream.match(/\b(var|let|dim)\b/)) {
+                        return 'type';
+                    }
 
+                    // Match free functions (e.g., note, call, func)
+                    if (stream.match(/\b(note|call|func)\b/)) {
+                        // Peek ahead to see if it's followed by a '('
+                        const next = stream.peek();
+                        if (next === '(') {
+                            return 'function';
+                        }
+                    }
+
+                    // Match standard C++ keywords (e.g., if, not)
+                    if (stream.match(/\b(if|not|else|for|while|do|switch|case|break|continue|return|goto|try|catch|throw|new|delete|sizeof|typeof|typeid|alignas|alignof|constexpr|decltype|noexcept|static_assert|thread_local)\b/)) {
+                        return 'keyword';
+                    }
+
+                    // Match 'read' and 'client' as functions and variables
+                    if (stream.match(/\b(read|client)\b/)) {
+                        const next = stream.peek();
+                        if (next === '(') {
+                            return 'function';
+                        }
+                        return 'variable';
+                    }
+
+                    // Delegate to the default C++ mode for other tokens
+                    return cppMode.token(stream, state.base);
+                },
+                copyState: function(state) {
+                    return {
+                        base: CodeMirror.copyState(cppMode, state.base),
+                        inMemberFunction: state.inMemberFunction
+                    };
+                }
+            };
+        });
+
+        // Initialize CodeMirror for all code blocks
+        document.addEventListener('DOMContentLoaded', function() {
+            const textareas = document.querySelectorAll('.code-block');
+            textareas.forEach(textarea => {
+                CodeMirror.fromTextArea(textarea, {
+                    mode: 'customcpp',
+                    lineNumbers: false, // Disable line numbers
+                    readOnly: true
+                });
+            });
+        });
+    </script>
 )__";
 
 //////
 // css
 //////
 
-var css =R"__(
+var css =
+R"__(
 	<!-- bootstrap css. Is this necessary? -->
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 
@@ -1193,106 +1379,105 @@ p {
 	border: 1px solid #a2a9b1;
 	border-collapse: collapse;
 }
-    img {
-        border: 0;
-        vertical-align: middle
-    }
+	img {
+		border: 0;
+		vertical-align: middle
+	}
 
-    hr {
-        height: 1px;
-        background-color: #a2a9b1;
-        border: 0;
-        margin: 0.2em 0
-    }
+	hr {
+		height: 1px;
+		background-color: #a2a9b1;
+		border: 0;
+		margin: 0.2em 0
+	}
 
-    h1,h2,h3,h4,h5,h6 {
-        color: #000;
-        margin: 0;
-        padding-top: 0.5em;
-        padding-bottom: 0.17em;
-        overflow: hidden
-    }
+	h1,h2,h3,h4,h5,h6 {
+		color: #000;
+		margin: 0;
+		padding-top: 0.5em;
+		padding-bottom: 0.17em;
+		overflow: hidden
+	}
 
-    h1,h2 {
-        margin-bottom: 0.6em;
-        border-bottom: 1px solid #a2a9b1
-    }
+	h1,h2 {
+		margin-bottom: 0.6em;
+		border-bottom: 1px solid #a2a9b1
+	}
 
-    h3,h4,h5 {
-        margin-bottom: 0.3em
-    }
+	h3,h4,h5 {
+		margin-bottom: 0.3em
+	}
 
-    h1 {
-        font-size: 188%;
-        font-weight: normal
-    }
+	h1 {
+		font-size: 188%;
+		font-weight: normal
+	}
 
-    h2 {
-        font-size: 150%;
-        font-weight: normal
-    }
+	h2 {
+		font-size: 150%;
+		font-weight: normal
+	}
 
-    h3 {
-        font-size: 128%
-    }
+	h3 {
+		font-size: 128%
+	}
 
-    h4 {
-        font-size: 116%
-    }
+	h4 {
+		font-size: 116%
+	}
 
-    h5 {
-        font-size: 108%
-    }
+	h5 {
+		font-size: 108%
+	}
 
-    h6 {
-        font-size: 100%
-    }
+	h6 {
+		font-size: 100%
+	}
 
-    p {
-        margin: 0.4em 0 0.5em 0
-    }
+	p {
+		margin: 0.4em 0 0.5em 0
+	}
 
-    p img {
-        margin: 0
-    }
+	p img {
+		margin: 0
+	}
 
-    ul {
-        margin: 0.3em 0 0 1.6em;
-        padding: 0
-    }
+	ul {
+		margin: 0.3em 0 0 1.6em;
+		padding: 0
+	}
 
-    ol {
-        margin: 0.3em 0 0 3.2em;
-        padding: 0;
-        list-style-image: none
-    }
+	ol {
+		margin: 0.3em 0 0 3.2em;
+		padding: 0;
+		list-style-image: none
+	}
 
-    li {
-        margin-bottom: 0.1em
-    }
+	li {
+		margin-bottom: 0.1em
+	}
 
-    dt {
-        font-weight: bold;
-        margin-bottom: 0.1em
-    }
+	dt {
+		font-weight: bold;
+		margin-bottom: 0.1em
+	}
 
-    dl {
-        margin-top: 0.2em;
-        margin-bottom: 0.5em
-    }
+	dl {
+		margin-top: 0.2em;
+		margin-bottom: 0.5em
+	}
 
-    dd {
-        margin-left: 1.6em;
-        margin-bottom: 0.1em
-    }
+	dd {
+		margin-left: 1.6em;
+		margin-bottom: 0.1em
+	}
 
 .gendoc_function {
-    color: #800;
-    font-weight: 700;
+	color: #800;
+	font-weight: 700;
 }
 
 </style>
-
 )__";
 
 programexit()
