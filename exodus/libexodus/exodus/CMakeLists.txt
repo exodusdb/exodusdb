@@ -262,6 +262,7 @@
 		varcompare.cpp
 		varop.cpp
 		varop2.cpp
+		varprocess.cpp
 		varchrono.cpp
 		varfuncs.cpp varioconv.cpp
 		exoenv.cpp exofuncs.cpp
