@@ -1,9 +1,6 @@
 .TH exoprog.h
 
-.SH 1. EXODUS PROGRAM
-.SH
-
-.SH 2. SELECT LISTS
+.SH 1. SELECT LISTS
 .SH
 
 .SS
@@ -293,7 +290,21 @@ if (not deletelist("my_list")) ...
 
 
 
-.SH 3. PERFORM/EXECUTE
+.SS
+if (formlist(filename_or_command, keys = "", fieldno = 0)) ...
+.nf
+ 
+.fi
+
+
+.SS
+if (makelist(listname, keys)) ...
+.nf
+ 
+.fi
+
+
+.SH 2. PERFORM/EXECUTE
 .SH
 
 .SS
@@ -301,15 +312,15 @@ var v1 = perform(command_line);
 .nf
  
 .fi
-Run an exodus program/library's main function using a command like syntax similar to that of executable programs.
+Run an exodus program/library's main function using a command like syntax similar to that of os executable programs.
 
-A "command line" is passed to the program/library in the usual COMMAND, SENTENCE and OPTIONS environment variables instead of function arguments.
+\fBcommand_line:\fR Used to initialise the COMMAND, SENTENCE and OPTIONS environment variables of the performed exodus program/library. Analogous to passing function arguments. The first word of command_line is used as the name of the program/library to be loaded and run.
 
 The program/library's main function should have zero arguments. Performing a program/library function with main arguments results in them being unassigned and in some case core dump may occur.
 
-The following environment variables are initialised on entry to the main function of the program/library. They are preserved untouched in the calling program.
+\fBReturns:\fR Whatever var the program/library returns, or "" if it calls stop() or abort((). The return value can be ignored and discarded without any compiler warning.
 
-SENTENCE, COMMAND, OPTIONS: Initialised from the argument "command_line".
+The following environment variables are initialised on entry to the main function of the program/library and are preserved untouched in the calling program.
 
 RECUR0, RECUR1, RECUR2, RECUR3, RECUR4 to "".
 
@@ -319,13 +330,7 @@ LEVEL is incremented by one.
 
 All other environment variables are shared between the caller and callee. There is essentially only one environment in any one process or thread.
 
-Any active select list is passed to the performed program/library and can be consumed by it. Conversely any active select list created by the performed program/library will be returned to the calling program. In other words, both the performing and the performed programs/libraries share a single active select list environment. This is different from execute() which gets its own private active select list, initially inactive.
-
-\fBcommand_line:\fR The first word of this argument is used as the name of the program/library to be loaded and run. command_line is used to initialise the SENTENCE, COMMAND and OPTIONS environment variables.
-
-\fBReturns:\fR Whatever var the program/library returns, or "" if it calls stop() or abort(()".
-
-The return value can be ignored and discarded without any compiler warning.
+Any active select list in CURSOR is passed to the performed program/library and can be consumed by it. Conversely any active select list created by the performed program/library will be returned to the calling program. In other words, both the performing and the performed programs/libraries share a single active select list environment. This is different from execute() which gets its own private active select list, initially inactive.
 
 Exodus program/libraries may also be called directly using conventional function calling syntax. To call an exodus program/library called progname using either the syntax "call progname(args...);" or "var v1 = progname(args...);" you must "#include <progname.h>" after the "programinit()" or "libraryinit()" lines in your program/library.
 
@@ -343,7 +348,7 @@ chain(command_line)
 .nf
  
 .fi
-Run an exodus program/library's main function after closing the current program.
+Close the current program and perform another one.
 
 Identical to perform() except that the current program closes first.
 
@@ -352,9 +357,9 @@ var v1 = libinfo(libname);
 .nf
  
 .fi
-Check if a lib exists to be performed/executed or called.
+Check if a lib exists to be performed/executed or called. Currently it does not check if it is actually loadable.
 
-.SH 4. PROGRAM TERMINATION 
+.SH 3. PROGRAM TERMINATION 
 .SH
 
 .SS
@@ -362,38 +367,33 @@ stop(message = "")
 .nf
  
 .fi
-Stop the current exodus program/library normally and return to the parent exodus program/library, or return to the operating system if none.
+Stop the current exodus program/library normally.
 
-Calling stop() in an exodus OS command line executable program, or in a function called from the same, will terminate the OS process with an error status of 0 which is generally considered to indicate success.
+Either return to the performing or executing parent exodus program/library, or exit to the OS if none.
 
-Calling stop() in a performed or executed exodus program/library, or in a function called from the same, will terminate the program/library being executed and return to the exodus program that performed or executed it.
+\fBmessage:\fR Optional. If exiting to the OS then it will be output to stdout or, if numeric, used as the exit status.
 
 .SS
 abort(message = "")
 .nf
  
 .fi
-Abort the current exodus program/library abnormally and return to the parent exodus program/library, or return to the operating system if none.
+Abort the current exodus program/library.
 
-Similar to stop() but, if terminating the OS process, then return an error status of 1 which is generally considered to be an indication of failure.
+Similar to stop but if exiting to the OS then the default exit status is 1.
+
+\fBmessage:\fR Optional. If exiting to the OS then it will be output to stderr or, if numeric, used as the exit status.
 
 .SS
 abortall(message = "")
 .nf
  
 .fi
-Abort the current exodus program/library abnormally and return to the parent exodus program/library, or return to the operating system if none.
+Abort the current exodus program/library.
 
-Similar to abort() but, if terminating the OS process, then return an error status of 2 which is generally considered to be an indication of failure.
+Similar to abort but if exiting to the OS then the default exit status is 2.
 
-.SS
-logoff(message = "")
-.nf
- 
-.fi
-
-
-.SH 5. DB FILE DICTIONARIES
+.SH 4. DB FILE DICTIONARIES
 .SH
 
 .SS
@@ -401,25 +401,45 @@ var v1 = calculate(dictid);
 .nf
  
 .fi
-given dictid reads dictrec from DICT file and extracts from RECORD/ID or calls library
-
-called dict+DICT function dictid not const so we can mess with the library?
+Given a dictid reads a dictrec from the current DICT file (using readc()) and then either extracts a specific field number from the current RECORD/ID/MV environment variables or calls a dict function library to calculate the result.
 
 .SS
 var v1 = calculate(dictid, dictfile, id, record, mv = 0);
 .nf
  
 .fi
-
+Given dictid, dictfile, record, id and mv, reads a dictrec from dictfile (using readc()) and then either extracts a specific field number from the given record/id/mv or calls a dict function library to calculate the result.
 
 .SS
 var v1 = xlate(filename, key, fieldno_or_name, mode);
 .nf
  
 .fi
+Reads a record from the specified file and key (using readc()) and then either extracts a specific field number or calls calculate(dictid...) to obtain the result.
 
+\fBfilename:\fR Which file to read.
 
-.SH 6. I/O CONVERSION
+\fBkey:\fR The key of the record to read.
+
+\fBfieldno_or_name:\fR
+.br
+\(bu If numeric then a specific field number will be extracted.
+.br
+\(bu If "0" then the key will be returned.
+.br
+\(bu If "" then the whole record will be returned.
+.br
+\(bu dictid: calculate(dictid) will be called.
+
+\fBmode:\fR Determines what to do if the record does not exist.
+.br
+\(bu "X" Return ""
+.br
+\(bu "C" Return the key.
+
+\fBMV:\fR Environment variable. Will be used to select a particular value or all if zero.
+
+.SH 5. I/O CONVERSION
 .SH
 
 .SS
@@ -450,9 +470,24 @@ var v1 = iconv(input, conversion);
 .nf
  
 .fi
+iconv/oconv with access to exoprogram's environment variables.
+
+exoprog's iconv/oconv have the ability to call custom functions like "[funname,args...]"
 
 
-.SH 7. IOCONV DATE/TIME 
+
+[NUMBER]  // built-in. See doc below.
+
+[DATE]    // built-in. See doc below.
+
+[DATEPERIOD]  e.g. [DATEPERIOD,1] [DATEPERIOD,1,12]
+
+[DATETIME]    e.g. [DATETIME,4*,DOS] [DATETIME,4*,MTS] [DATETIME,4*]
+
+[TIME2]       e.g. [TIME2,MT] [TIME2,MTS] [TIME2,MTS48]
+
+
+.SH 6. IOCONV DATE/TIME 
 .SH
 
 .SS
@@ -617,9 +652,15 @@ var v1 = amountunit(input0);
 .nf
  
 .fi
+Split amount+currency code/unit string into number and currency code/unit.
 
+\fBvar:\fR "123.45USD"
 
-.SH 8. TIME/DATE UTILITIES
+\fBReturns:\fR e.g. "123.45"
+
+\fBunitx:\fR [out] e.g. "USD
+
+.SH 7. TIME/DATE UTILITIES
 .SH
 
 .SS
@@ -671,6 +712,8 @@ var v1 = elapsedtimetext(timestamp1, timestamp2);
 .fi
 Get text of elapsed time between two timestamps
 
+Caution. Use ostimestamp() which returns decimal days not ostime() which returns decimal seconds.
+
 \fBExample:\fR
 .RS
 .nf
@@ -681,7 +724,7 @@ let v2 = elapsedtimetext(0, 0.001); // "1 min, 26 secs"
 
 
 
-.SH 9. TERMINAL I/O UTILITIES
+.SH 8. TERMINAL I/O UTILITIES
 .SH
 
 .SS
@@ -867,7 +910,7 @@ if (isterminal()) {
 .RE
 
 
-.SH 10. ARRAY UTILITIES
+.SH 9. ARRAY UTILITIES
 .SH
 
 .SS
@@ -920,7 +963,7 @@ sortarray(v1, "2]3"_var, "AR"); // v1 -> "f1^1]2]10]20^zz]yy]ww]xx^f3^f4"_var
 
 
 
-.SH 11. RECORD LOCKING
+.SH 10. RECORD LOCKING
 .SH
 
 .SS
@@ -935,20 +978,20 @@ if (lockrecord(filename, io file, keyx)) ...
 .nf
  
 .fi
-
+Does not actually return recor
 
 .SS
 if (unlockrecord(filename, io file, key)) ...
 .nf
  
 .fi
-
+Does not actually return reco
 
 .SS
 if (unlockrecord()) ...
 .nf
  
 .fi
-
+Does not actually return rec
 
 

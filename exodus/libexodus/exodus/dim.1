@@ -1,9 +1,6 @@
 .TH dim.h
 
-.SH 1. DIM 
-.SH
-
-.SH 2. DIMENSIONED ARRAY CONSTRUCTION 
+.SH 1. DIMENSIONED ARRAY CONSTRUCTION 
 .SH
 
 .SS
@@ -109,6 +106,20 @@ d1 = "";
 
 
 .SS
+dim d1 = sourceint;
+.nf
+ 
+.fi
+Undocumented
+
+.SS
+operator=(double sourcedbl)
+.nf
+ 
+.fi
+Undocumented
+
+.SS
 d1.redim(nrows, ncols = 1)
 .nf
  
@@ -151,7 +162,7 @@ d1.swap(d2);
 
 
 
-.SH 3. ARRAY ACCESS
+.SH 2. ARRAY ACCESS
 .SH
 
 .SS
@@ -189,6 +200,20 @@ let v1 = d1[3, 4]; // "X"
 .fi
 .RE
 
+
+
+.SS
+d2(rowno);       d1(rowno) = v2
+.nf
+ 
+.fi
+
+
+.SS
+d2(rowno, colno);       d1(rowno, colno) = v2
+.nf
+ 
+.fi
 
 
 .SS
@@ -250,7 +275,7 @@ let v1 = d1.join(); // "f1^f2^f3"_var
 
 
 
-.SH 4. ARRAY MUTATION
+.SH 3. ARRAY MUTATION
 .SH
 
 .SS
@@ -337,7 +362,7 @@ let v1 = d1.join(","); // random
 
 
 
-.SH 5. ARRAY CONVERSION
+.SH 4. ARRAY CONVERSION
 .SH
 
 .SS
@@ -361,7 +386,7 @@ dim d1 = d1.shuffle();
 .fi
 Same as shuffler() but returns a new array leaving the original untouched.
 
-.SH 6. ARRAY DB I/O
+.SH 5. ARRAY DB I/O
 .SH
 
 .SS
@@ -415,7 +440,7 @@ if (not read(d1 from file, key)) ...
 
 
 
-.SH 7. ARRAY OS I/O
+.SH 6. ARRAY OS I/O
 .SH
 
 .SS

@@ -35,6 +35,15 @@ func main() {
 		if (not read(client from "xo_clients", "SB001")) abort("var: " ^ lasterror());
 	}
 
+	printl("var() = default;");
+	{
+		//             Exodus keywords:     C++ declarations:
+		//             Non-Const   Const    Non-Const   Const
+		//             -----------------    ----------------------
+		// Variable:   var         let      var         const var
+		// Reference:  out         in       var&        const var&
+	}
+
 	printl("operator=(expression) &;");
 	{
 		var v1 = 42;                 // Integer
@@ -685,7 +694,7 @@ func main() {
 		let v2 = replace("A a B b", "[A-Z]"_rex, "'$0'");
 	}
 
-	printl("replace(const rex& regex, SomeFunction(in match_str)) const;");
+	printl("replace(const rex& regex, ReplacementFunction auto repl_func) const");
 	{
 		// Decode hex escape codes.
 		var v1 = R"(--\0x3B--\0x2F--)";                                 // Hex escape codes.
@@ -694,6 +703,10 @@ func main() {
 		    [](auto match_str) {return match_str.cut(3).iconv("HEX");}  // Decodes to a char.
 		);
 		assert(v1 == "--;--/--");
+	}
+
+	printl("replace(const rex& regex, ReplacementFunction auto repl_func) const");
+	{
 		// Reformat dates using groups.
 		var v2 = "Date: 03-15-2025";
 		v2.replacer(
@@ -1455,7 +1468,7 @@ func main() {
 	printl("osopen(in osfilename, const bool utf8 = true) const;");
 	{
 		let osfilename = ostempdir() ^ "xo_gendoc_test.conf";
-		if (oswrite("" on osfilename)) {/*ok*/} else  abort("osopen: " ^ lasterror()); /// Create an empty os file
+		if (oswrite("" on osfilename)) {/*ok*/} else  abort("osopen: " ^ lasterror()); /// Create an empty OS file
 		var ostempfile;
 		if (ostempfile.osopen(osfilename)) {/*ok*/} else  abort("osopen: " ^ lasterror());
 		// or
@@ -1678,6 +1691,14 @@ func main() {
 		if (outtext.osshellwrite("grep xyz")) {/*ok*/} else  abort("osshellwrite: " ^ lasterror());
 		// or
 		if (osshellwrite(outtext, "grep xyz")) {/*ok*/} else  abort("osshellwrite: " ^ lasterror());
+	}
+
+	printl("osprocess(in oscmd, in stdin_for_process, out stdout_from_process, out stderr_from_process, out exit_status, in timeout_secs = 0);");
+	{
+		var v_stdout, v_stderr, v_exit_status;
+		if (var::osprocess("grep xyz", "abc\nxyz 123\ndef", v_stdout, v_stderr, v_exit_status)) {/*ok*/} else  abort("osprocess: " ^ lasterror());  assert(v_stdout == "xyz 123" );// v_exit_status = 0
+		// or
+		if (osprocess("grep xyz", "abc\nxyz 123\ndef", v_stdout, v_stderr, v_exit_status)) {/*ok*/} else  abort("osprocess: " ^ lasterror());
 	}
 
 	printl("ostempdir();");

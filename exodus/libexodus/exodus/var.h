@@ -46,6 +46,12 @@ THE SOFTWARE.
 
 namespace exo {
 
+	// Concept to constrain replace()'s callback function
+	template <typename F>
+	concept ReplacementFunction  = requires(F f, const var& v) {
+		{ f(v) } -> std::same_as<var>; // Must take const var& and return var
+	};
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 //                                               VAR_MID
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2879,7 +2885,7 @@ public:
 	//
 	// All standard c++ io manipulators may be used e.g. std::setw, setfill etc.
 	//
-	// `let vout = "std_iomanip_overview.txt";
+	// `let vout = "t_std_iomanip_overview.txt";
 	//  if (not osremove(vout)) {}
 	//  using namespace std;
 	//

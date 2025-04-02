@@ -1,9 +1,6 @@
 .TH var.h
 
-.SH 1. VAR 
-.SH
-
-.SH 2. VAR CREATION 
+.SH 1. VAR CREATION 
 .SH
 
 .SS
@@ -22,6 +19,18 @@ A runtime error is thrown if a var is used before being assigned so silent "use 
 .nf
 var client; // Unassigned var
 if (not read(client from "xo_clients", "SB001")) ...
+.fi
+.RE
+
+
+\fBExample:\fR
+.RS
+.nf
+//             Exodus keywords:     C++ declarations:
+//             Non-Const   Const    Non-Const   Const
+//             -----------------    ----------------------
+// Variable:   var         let      var         const var
+// Reference:  out         in       var&        const var&
 .fi
 .RE
 
@@ -222,7 +231,7 @@ outputl(dump(v1));
 
 
 
-.SH 3. ARITHMETICAL OPERATORS 
+.SH 2. ARITHMETICAL OPERATORS 
 .SH
 
 .SS
@@ -436,7 +445,7 @@ var v2 = -- v1; // v2 -> 2 // v1 -> 2
 
 
 
-.SH 4. DYNAMIC ARRAY CREATION, ACCESS AND UPDATE
+.SH 3. DYNAMIC ARRAY CREATION, ACCESS AND UPDATE
 .SH
 
 .SS
@@ -446,17 +455,19 @@ var v1 = ""_var;
 .fi
 The literal suffix "_var" allows dynamic arrays to be seamlessly embedded in code using a predefined set of visible equivalents of unprintable field mark characters as follows:
 
-` = RM, Record mark
-
-^ = FM, Field mark
-
-] = VM, Value mark
-
-} = SM, Subvalue mark
-
-| = TM, Text mark
-
-~ = ST, Subtext mark
+   Visible  Unprintable
+.br
+\(bu     `     RM  Record mark
+.br
+\(bu     ^     FM  Field mark
+.br
+\(bu     ]     VM  Value mark
+.br
+\(bu     }     SM  Subvalue mark
+.br
+\(bu     |     TM  Text mark
+.br
+\(bu     ~     ST  Subtext mark
 
 \fBExample:\fR
 .RS
@@ -551,7 +562,7 @@ var v3 =   v1(2,2); // "b2" ///   () style access. Not recommended.
 
 
 
-.SH 5. STRING CREATION 
+.SH 4. STRING CREATION 
 .SH
 
 .SS
@@ -769,7 +780,7 @@ let v1 = var(123.45).numberinwords("de_DE").replace(softhyphen, " "); // "ein 
 
 
 
-.SH 6. STRING SCANNING
+.SH 5. STRING SCANNING
 .SH
 
 .SS
@@ -1148,24 +1159,22 @@ let v2 = match("abc1abc2", "BC(\\\\d)", "i");
 .RE
 
 \fBregex_options:\fR
-
-.nf
-
-l - Literal (any regex chars are treated as normal chars)
-
-i - Case insensitive
-
-p - ECMAScript/Perl (the default)
-
-b - Basic POSIX (same as sed)
-
-e - Extended POSIX
-
-a - awk
-
-g - grep
-
-eg - egrep or grep -E
+.br
+\(bu l - Literal (any regex chars are treated as normal chars)
+.br
+\(bu i - Case insensitive
+.br
+\(bu p - ECMAScript/Perl (the default)
+.br
+\(bu b - Basic POSIX (same as sed)
+.br
+\(bu e - Extended POSIX
+.br
+\(bu a - awk
+.br
+\(bu g - grep
+.br
+\(bu eg - egrep or grep -E
 
 
 
@@ -1173,15 +1182,15 @@ char ranges like a-z are locale sensitive if ECMAScript
 
 
 
-m - Multiline. Default in boost (and therefore exodus)
-
-s - Single line. Default in std::regex
-
-f - First only. Only for replace() (not match() or search())
-
-w - Wildcard glob style (e.g. *.cfg) not regex style. Only for match() and search(). Not replace().
-
-.fi
+\fBregex_options:\fR
+.br
+\(bu m - Multiline. Default in boost (and therefore exodus)
+.br
+\(bu s - Single line. Default in std::regex
+.br
+\(bu f - First only. Only for replace() (not match() or search())
+.br
+\(bu w - Wildcard glob style (e.g. *.cfg) not regex style. Only for match() and search(). Not replace().
 
 
 
@@ -1201,7 +1210,7 @@ Search for the first match of a regular expression.
 
 \fBstartchar1:\fR [in] char position to start the search from
 
-\fBstartchar1:\fR [out] char position to start the next search from
+\fBstartchar1:\fR [out] char position to start the next search from or 0 if no more matches.
 
 \fBReturns:\fR The 1st match like match()
 
@@ -1265,7 +1274,7 @@ let v2 = hash("abc");
 
 
 
-.SH 7. STRING CONVERSION - NON-MUTATING - CHAINABLE
+.SH 6. STRING CONVERSION - NON-MUTATING - CHAINABLE
 .SH
 
 .SS
@@ -1649,7 +1658,7 @@ let v2 = last("abc");
 
 
 .SS
-var v1 = strvar.first(std::size_t length);
+var v1 = strvar.first(length);
 .nf
  
 .fi
@@ -1673,7 +1682,7 @@ let v2 = first("abc", 2);
 
 
 .SS
-var v1 = strvar.last(std::size_t length);
+var v1 = strvar.last(length);
 .nf
  
 .fi
@@ -1855,6 +1864,13 @@ let v2 = field("aa*bb*cc", "*", -1);
 .fi
 .RE
 
+
+
+.SS
+var v1 = strvar.field2(separator, fieldno, nfields = 1);
+.nf
+ 
+.fi
 
 
 .SS
@@ -2186,16 +2202,16 @@ Replace substrings using a regular expression.
 The replacement string can include the following special replacement patterns:
 
 Pattern  Inserts
-
-$$       Inserts a "$".
-
-$&       Inserts the matched substring. Equivalent to $0.
-
-$`       Inserts the portion of the string that precedes the matched substring.
-
-$'       Inserts the portion of the string that follows the matched substring.
-
-$n       Inserts the nth (1-indexed) capturing group where n is a positive integer less than 100.
+.br
+\(bu $$     Inserts a "$".
+.br
+\(bu $&     Inserts the matched substring. Equivalent to $0.
+.br
+\(bu $`     Inserts the portion of the string that precedes the matched substring.
+.br
+\(bu $'     Inserts the portion of the string that follows the matched substring.
+.br
+\(bu $n     Inserts the nth (1-indexed) capturing group where n is a positive integer less than 100.
 
 \fBExample:\fR
 .RS
@@ -2209,15 +2225,15 @@ let v2 = replace("A a B b", "[A-Z]"_rex, "'$0'");
 
 
 .SS
-var v1 = strvar.replace(regex, SomeFunction(match_str));
+var v1 = strvar.replace(regex, ReplacementFunction auto repl_func);
 .nf
  
 .fi
 Replace substrings using a regular expression and a custom function.
 
-Allows very complex string conversions.
+Allows complex string conversions.
 
-\fBSomeFunction:\fR Must return a var. Can be an inline anonymous lambda function.
+\fBrepl_func:\fR A function with arguments (in match_str) that returns a var to replace match_str. May be an inline anonymous lambda function (capturing or non-capturing).
 
 e.g. [](auto match_str) {return match_str;} // Does nothing.
 
@@ -2233,7 +2249,13 @@ v1.replacer(
     [](auto match_str) {return match_str.cut(3).iconv("HEX");}  // Decodes to a char.
 );
 assert(v1 == "--;--/--");
+.fi
+.RE
 
+
+\fBExample:\fR
+.RS
+.nf
 // Reformat dates using groups.
 var v2 = "Date: 03-15-2025";
 v2.replacer(
@@ -2382,7 +2404,7 @@ var v1 = strvar.fieldstore(delimiter, fieldno, nfields, replacement);
 .fi
 
 
-.SH 8. STRING MUTATION - STANDALONE COMMANDS
+.SH 7. STRING MUTATION - STANDALONE COMMANDS
 .SH
 
 .SS
@@ -2526,14 +2548,14 @@ strvar.laster()
 
 
 .SS
-strvar.firster(std::size_t length)
+strvar.firster(length)
 .nf
  
 .fi
 
 
 .SS
-strvar.laster(std::size_t length)
+strvar.laster(length)
 .nf
  
 .fi
@@ -2624,7 +2646,7 @@ strvar.replacer(regex, tostr)
 
 
 .SS
-strvar.replacer(regex, SomeFunction(match_str))
+strvar.replacer(regex, ReplacementFunction auto repl_func)
 .nf
  
 .fi
@@ -2672,7 +2694,7 @@ strvar.parser(char sepchar = ' ')
 .fi
 
 
-.SH 9. I/O CONVERSION
+.SH 8. I/O CONVERSION
 .SH
 
 .SS
@@ -2788,7 +2810,7 @@ let v2 = to_codepage("Є", "CP1124").oconv("HEX");
 
 
 
-.SH 10. DYNAMIC ARRAY FUNCTIONS
+.SH 9. DYNAMIC ARRAY FUNCTIONS
 .SH
 
 .SS
@@ -2887,7 +2909,7 @@ Same as var.remover() function but returns a new string instead of updating a va
 
 "remove()" was called "delete()" in Pick OS/Basic.
 
-.SH 11. DYNAMIC ARRAY FILTERS
+.SH 10. DYNAMIC ARRAY FILTERS
 .SH
 
 .SS
@@ -2960,7 +2982,7 @@ let v1 = "10]20]30"_var.mv("+","2]3]4"_var); // "12]23]34"_var
 
 
 
-.SH 12. DYNAMIC ARRAY MUTATORS STANDALONE COMMANDS
+.SH 11. DYNAMIC ARRAY MUTATORS STANDALONE COMMANDS
 .SH
 
 .SS
@@ -3102,7 +3124,7 @@ remover(v1, 2, 2);
 
 
 
-.SH 13. DYNAMIC ARRAY SEARCH
+.SH 12. DYNAMIC ARRAY SEARCH
 .SH
 
 .SS
@@ -3264,7 +3286,7 @@ locatebyusing() supports all the above features in a single function.
 
 \fBReturns:\fR True if found.
 
-.SH 14. DATABASE ACCESS
+.SH 13. DATABASE ACCESS
 .SH
 
 .SS
@@ -3272,9 +3294,9 @@ if (conn.connect(conninfo = "")) ...
 .nf
  
 .fi
-For all db operations, the operative var can either be a db connection created with dbconnect() or be any var and a default connection will be established on the fly.
+For all DB operations, the operative var can either be a DB connection created with dbconnect() or be any var and a default connection will be established on the fly.
 
-The db connection string (conninfo) parameters are merged from the following places in descending priority.
+The DB connection string (conninfo) parameters are merged from the following places in descending priority.
 
 1. Provided in connect()'s conninfo argument. See 4. for the complete list of parameters.
 
@@ -3284,7 +3306,7 @@ The db connection string (conninfo) parameters are merged from the following pla
 
 4. The default conninfo is "host=127.0.0.1 port=5432 dbname=exodus user=exodus password=somesillysecret connect_timeout=10"
 
-Setting environment variable EXO_DBTRACE=1 will cause tracing of db interface including SQL commands.
+Setting environment variable EXO_DBTRACE=1 will cause tracing of DB interface including SQL commands.
 
 \fBExample:\fR
 .RS
@@ -3350,7 +3372,7 @@ if (conn.begintrans()) ...
 .nf
  
 .fi
-Begin a db transaction.
+Begin a DB transaction.
 
 \fBExample:\fR
 .RS
@@ -3369,7 +3391,7 @@ if (conn.statustrans()) ...
 .nf
  
 .fi
-Check if a db transaction is in progress.
+Check if a DB transaction is in progress.
 
 \fBExample:\fR
 .RS
@@ -3388,7 +3410,7 @@ if (conn.rollbacktrans()) ...
 .nf
  
 .fi
-Rollback a db transaction.
+Rollback a DB transaction.
 
 \fBExample:\fR
 .RS
@@ -3407,7 +3429,7 @@ if (conn.committrans()) ...
 .nf
  
 .fi
-Commit a db transaction.
+Commit a DB transaction.
 
 \fBReturns:\fR True if successfully committed or if there was no transaction in progress, otherwise false.
 
@@ -3476,7 +3498,7 @@ conn.disconnect()
 .nf
  
 .fi
-Closes db connection and frees process resources both locally and in the database server.
+Closes DB connection and frees process resources both locally and in the database server.
 
 \fBExample:\fR
 .RS
@@ -3516,7 +3538,7 @@ var v1 = var::lasterror();
 .nf
  
 .fi
-\fBReturns:\fR The last os or db error message.
+\fBReturns:\fR The last OS or DB error message.
 
 \fBExample:\fR
 .RS
@@ -3530,11 +3552,18 @@ var v2 = lasterror();
 
 
 .SS
+conn.setlasterror(msg)
+.nf
+ 
+.fi
+Set the lasterror() message.
+
+.SS
 var::loglasterror(source = "")
 .nf
  
 .fi
-Log the last os or db error message.
+Log the last OS or DB error message.
 
 \fBOutput:\fR to stdlog
 
@@ -3551,7 +3580,7 @@ loglasterror("main:");
 
 
 
-.SH 15. DATABASE MANAGEMENT
+.SH 14. DATABASE MANAGEMENT
 .SH
 
 .SS
@@ -3647,7 +3676,7 @@ if (conn.createfile(filename)) ...
 .nf
  
 .fi
-Create a named db file.
+Create a named DB file.
 
 filenames ending with "_temp" only last until the connection is closed.
 
@@ -3668,7 +3697,7 @@ if (conn.renamefile(filename, newfilename)) ...
 .nf
  
 .fi
-Rename a db file.
+Rename a DB file.
 
 \fBExample:\fR
 .RS
@@ -3706,7 +3735,7 @@ if (conn.clearfile(filename)) ...
 .nf
  
 .fi
-Delete all records in a db file
+Delete all records in a DB file
 
 \fBExample:\fR
 .RS
@@ -3725,7 +3754,7 @@ if (conn.deletefile(filename)) ...
 .nf
  
 .fi
-Delete a db file
+Delete a DB file
 
 \fBExample:\fR
 .RS
@@ -3744,7 +3773,7 @@ var v1 = conn_or_file.reccount(filename = "");
 .nf
  
 .fi
-\fBReturns:\fR The approx. number of records in a db file.
+\fBReturns:\fR The approx. number of records in a DB file.
 
 Might return -1 if not known.
 
@@ -3767,13 +3796,13 @@ if (conn_or_file.flushindex(filename = "")) ...
 .nf
  
 .fi
-Calls db maintenance function for a file or all files.
+Calls DB maintenance function for a file or all files.
 
 This doesnt actually flush any indexes but does make sure that reccount() function is reasonably accurate.
 
 \fBReturns:\fR True if successful otherwise false if not and with lasterror() set.
 
-.SH 16. DATABASE FILE I/O
+.SH 15. DATABASE FILE I/O
 .SH
 
 .SS
@@ -3781,11 +3810,11 @@ if (file.open(dbfilename, connection = "")) ...
 .nf
  
 .fi
-Opens a db file to a var which can be used in subsequent db function calls to access a specific file using a specific connection.
+Opens a DB file to a var which can be used in subsequent DB function calls to access a specific file using a specific connection.
 
 \fBconnection:\fR If not specified and the filename is present in an internal cache of filenames and connections created by previous calls to open() or attach() then open() returns true. If it is not present in the cache then the default connection will be checked.
 
-\fBReturns:\fR True if the filename was present in the cache OR if the db connection reports that the file is present.
+\fBReturns:\fR True if the filename was present in the cache OR if the DB connection reports that the file is present.
 
 \fBExample:\fR
 .RS
@@ -3804,7 +3833,7 @@ file.close()
 .nf
  
 .fi
-Closes db file var
+Closes DB file var
 
 Does nothing currently since database file vars consume no resources
 
@@ -3825,21 +3854,21 @@ if (file.createindex(fieldname, dictfile = "")) ...
 .nf
  
 .fi
-Creates a secondary index for a given db file and field name.
+Creates a secondary index for a given DB file and field name.
 
 The fieldname must exist in a dictionary file. The default dictionary is "dict." ^ filename.
 
 \fBReturns:\fR False if the index cannot be created for any reason.
-
-* Index already exists
-
-* File does not exist
-
-* The dictionary file does not have a record with a key of the given field name.
-
-* The dictionary file does not exist. Default is "dict." ^ filename.
-
-* The dictionary field defines a calculated field that uses an exodus function. Using a psql function is OK.
+.br
+\(bu Index already exists
+.br
+\(bu File does not exist
+.br
+\(bu The dictionary file does not have a record with a key of the given field name.
+.br
+\(bu The dictionary file does not exist. Default is "dict." ^ filename.
+.br
+\(bu The dictionary field defines a calculated field that uses an exodus function. Using a psql function is OK.
 
 \fBExample:\fR
 .RS
@@ -3859,9 +3888,9 @@ var v1 = file|conn.listindex(file_or_filename = "", fieldname = "");
 .nf
  
 .fi
-Lists secondary indexes in a database or for a db file
+Lists secondary indexes in a database or for a DB file
 
-\fBReturns:\fR False if the db file or fieldname are given and do not exist
+\fBReturns:\fR False if the DB file or fieldname are given and do not exist
 
 \fBExample:\fR
 .RS
@@ -3880,13 +3909,13 @@ if (file.deleteindex(fieldname)) ...
 .nf
  
 .fi
-Deletes a secondary index for a db file and field name.
+Deletes a secondary index for a DB file and field name.
 
 \fBReturns:\fR False if the index cannot be deleted for any reason
-
-* File does not exist
-
-* Index does not already exists
+.br
+\(bu File does not exist
+.br
+\(bu Index does not already exists
 
 \fBExample:\fR
 .RS
@@ -3905,11 +3934,11 @@ var v1 = file.lock(key);
 .nf
  
 .fi
-Places a metaphorical db lock on a particular record given a db file and key.
+Places a metaphorical DB lock on a particular record given a DB file and key.
 
 This is a advisory lock, not a physical lock, since it makes no restriction on the access or modification of data by other connections.
 
-Neither the db file nor the record key need to actually exist since a lock is just a hash of the db file name and key combined.
+Neither the DB file nor the record key need to actually exist since a lock is just a hash of the DB file name and key combined.
 
 If another connection attempts to place an identical lock on the same database it will be denied.
 
@@ -3919,15 +3948,15 @@ If the same process attempts to place an identical lock more than once it may be
 
 Locks can be used to avoid processing a transaction simultaneously with another connection only to have one of them fail due to mutually updating the same records.
 
-Returns::
-
-* 0: Failure: Another connection has already placed the same lock.
-
-* "" Failure: The lock has already been placed.
-
-* 1: Success: A new lock has been placed.
-
-* 2: Success: The lock has already been placed and the connection is in a transaction.
+\fBReturns:\fR
+.br
+\(bu 0: Failure: Another connection has already placed the same lock.
+.br
+\(bu "" Failure: The lock has already been placed.
+.br
+\(bu 1: Success: A new lock has been placed.
+.br
+\(bu 2: Success: The lock has already been placed and the connection is in a transaction.
 
 \fBExample:\fR
 .RS
@@ -3946,7 +3975,7 @@ if (file.unlock(key)) ...
 .nf
  
 .fi
-Removes a db lock placed by the lock function.
+Removes a DB lock placed by the lock function.
 
 Only locks placed on the specified connection can be removed.
 
@@ -3971,7 +4000,7 @@ if (file.unlockall()) ...
 .nf
  
 .fi
-Removes all db locks placed by the lock function in the specified connection.
+Removes all DB locks placed by the lock function in the specified connection.
 
 Locks cannot be removed while in a transaction.
 
@@ -3992,13 +4021,13 @@ record.write(file, key)
 .nf
  
 .fi
-Writes a record into a db file given a unique primary key.
+Writes a record into a DB file given a unique primary key.
 
 Either inserts a new record or updates an existing record.
 
 \fBReturns:\fR Nothing since writes always succeed.
 
-\fBThrows:\fR VarDBException if the file does not exist. Like most db functions.
+\fBThrows:\fR VarDBException if the file does not exist. Like most DB functions.
 
 Any memory cached record is deleted.
 
@@ -4021,9 +4050,9 @@ if (record.read(file, key)) ...
 .nf
  
 .fi
-Reads a record from a db file for a given key.
+Reads a record from a DB file for a given key.
 
-\fBfile:\fR A db filename or a var opened to a db file.
+\fBfile:\fR A DB filename or a var opened to a DB file.
 
 \fBkey:\fR The key of the record to be read.
 
@@ -4031,7 +4060,7 @@ Reads a record from a db file for a given key.
 
 \fBvar:\fR Contains the record if it exists or is unassigned if not.
 
-A special case of the key being "%RECORDS%" results in a fictitious "record" being returned as an FM separated list of all the keys in the db file up to a maximum size of 4Mib, sorted in natural order.
+A special case of the key being "%RECORDS%" results in a fictitious "record" being returned as an FM separated list of all the keys in the DB file up to a maximum size of 4Mib, sorted in natural order.
 
 \fBExample:\fR
 .RS
@@ -4051,7 +4080,7 @@ if (file.deleterecord(key)) ...
 .nf
  
 .fi
-Deletes a record from a db file given a key.
+Deletes a record from a DB file given a key.
 
 \fBReturns:\fR False if the key doesnt exist
 
@@ -4076,7 +4105,7 @@ if (record.insertrecord(file, key)) ...
 .nf
  
 .fi
-Inserts a new record in a db file.
+Inserts a new record in a DB file.
 
 \fBReturns:\fR False if the key already exists
 
@@ -4100,7 +4129,7 @@ if (record.updaterecord(file, key)) ...
 .nf
  
 .fi
-Updates an existing record in a db file.
+Updates an existing record in a DB file.
 
 \fBReturns:\fR False if no record with the given key exists.
 
@@ -4124,7 +4153,7 @@ if (record.updatekey(key, newkey)) ...
 .nf
  
 .fi
-Updates the key of an existing record in a db file.
+Updates the key of an existing record in a DB file.
 
 \fBReturns:\fR True if successful or false if no record with the given key exists, or a record with newkey already exists
 
@@ -4185,7 +4214,7 @@ record.writec(file, key)
 .nf
  
 .fi
-"Write cache" Writes a record and key into a memory cached "db file".
+"Write cache" Writes a record and key into a memory cached "DB file".
 
 The actual database file is NOT updated.
 
@@ -4193,7 +4222,7 @@ writec() either updates an existing cache record if the key already exists or ot
 
 It always succeeds so no result code is returned.
 
-Neither the db file nor the record key need to actually exist in the actual db.
+Neither the DB file nor the record key need to actually exist in the actual DB.
 
 \fBExample:\fR
 .RS
@@ -4217,11 +4246,11 @@ if (record.readc(file, key)) ...
 
 1. Tries to read from a memory cache. Returns true if successful.
 
-2a. Tries to read from the actual db file and returns false if unsuccessful.
+2a. Tries to read from the actual DB file and returns false if unsuccessful.
 
 2b. Writes the record and key to the memory cache and returns true.
 
-Cached db file data lives in exodus process memory and is lost when the process terminates or clearcache() is called.
+Cached DB file data lives in exodus process memory and is lost when the process terminates or clearcache() is called.
 
 \fBExample:\fR
 .RS
@@ -4294,23 +4323,23 @@ The xlate ("translate") function is similar to readf() but, when called as an ex
 
 \fBstrvar:\fR Used as the primary key to lookup a field in a given file and field no or field name.
 
-\fBfilename:\fR The db file in which to look up data.
+\fBfilename:\fR The DB file in which to look up data.
 
 If var key is multivalued then a multivalued field is returned.
 
 \fBfieldno:\fR Determines which field of the record is returned.
-
-* Integer returns that field number
-
-* 0 means return the key unchanged.
-
-* "" means return the whole record.
+.br
+\(bu Integer returns that field number
+.br
+\(bu 0 means return the key unchanged.
+.br
+\(bu "" means return the whole record.
 
 \fBmode:\fR Determines what is returned if the record does not exist for the given key and file.
-
-* "X" returns ""
-
-* "C" returns the key unconverted.
+.br
+\(bu "X" returns ""
+.br
+\(bu "C" returns the key unconverted.
 
 \fBExample:\fR
 .RS
@@ -4324,7 +4353,7 @@ let name_and_type = xlate("xo_clients", key, "NAME_AND_TYPE", "X"); // "Client A
 
 
 
-.SH 17. DATABASE SORT/SELECT
+.SH 16. DATABASE SORT/SELECT
 .SH
 
 .SS
@@ -4620,7 +4649,7 @@ if (deletelist("mylist")) ...
 
 
 
-.SH 18. OS TIME/DATE
+.SH 17. OS TIME/DATE
 .SH
 
 .SS
@@ -4628,9 +4657,11 @@ var v1 = var::date();
 .nf
  
 .fi
-Number of whole days since pick epoch 1967-12-31 00:00:00 UTC. Negative for dates before.
+A date in internal format.
 
-e.g. was 20821 from 2025-01-01 00:00:00 UTC for 24 hours
+Internal format is the number of whole days since pick epoch 1967-12-31 00:00:00 UTC. Dates prior to that are numbered negatively.
+
+\fBReturns:\fR A number. e.g. 20821 represents 2025-01-01 00:00:00 UTC for 24 hours.
 
 \fBExample:\fR
 .RS
@@ -4650,9 +4681,7 @@ var v1 = var::time();
 .fi
 Number of whole seconds since last 00:00:00 (UTC).
 
-e.g. 43200 if time is 12:00
-
-Range 0 - 86399 since there are 24*60*60 (86400) seconds in a day.
+\fBReturns:\fR A number in the range 0 - 86399 since there are 24*60*60 seconds in a day. e.g. 43200 if time is 12:00:00
 
 \fBExample:\fR
 .RS
@@ -4672,7 +4701,7 @@ var v1 = var::ostime();
 .fi
 Number of fractional seconds since last 00:00:00 (UTC).
 
-A floating point with approx. nanosecond resolution depending on hardware.
+\fBReturns:\fR A floating point with approx. nanosecond resolution depending on hardware.
 
 e.g. 23343.704387955 approx. 06:29:03 UTC
 
@@ -4694,7 +4723,7 @@ var v1 = var::ostimestamp();
 .fi
 Number of fractional days since pick epoch 1967-12-31 00:00:00 UTC. Negative for dates before.
 
-A floating point with approx. nanosecond resolution depending on hardware.
+\fBReturns:\fR A floating point with approx. nanosecond resolution depending on hardware.
 
 e.g. Was 20821.99998842593 around 2025-01-01 23:59:59 UTC
 
@@ -4714,7 +4743,11 @@ var v1 = vardate.ostimestamp(ostime);
 .nf
  
 .fi
-Construct a timestamp from a date and time
+Get a timestamp for a given date and time
+
+\fBvardate:\fR Internal date from date(), iconv("D") etc.
+
+\fBostime:\fR Internal time from time(), ostime(), iconv("MT") etc.
 
 \fBExample:\fR
 .RS
@@ -4733,7 +4766,9 @@ var::ossleep(milliseconds)
 .nf
  
 .fi
-Sleep/pause/wait for a number of milliseconds
+Sleep/pause/wait
+
+\fBmilliseconds:\fR How to long to sleep.
 
 Releases the processor if not needed for a period of time or a delay is required.
 
@@ -4753,13 +4788,15 @@ var v1 = file_dir_list.oswait(milliseconds);
 .nf
  
 .fi
-Sleep/pause/wait up to a given number of milliseconds or until any changes occur in an FM delimited list of directories and/or files.
+Sleep/pause/wait up for a file system event
 
-Any terminal input (e.g. a key press) will also terminate the wait.
+\fBfile_dir_list:\fR An FM delimited list of OS files and/or dirs to monitor.
 
-An FM array of event information is returned. See below.
+\fBmilliseconds:\fR How long to wait. Any terminal input (e.g. a key press) will also terminate the wait.
 
-Multiple events are returned in multivalues.
+\fBReturns:\fR An FM array of event information is returned. See below.
+
+Multiple events may be captured and are returned in multivalues.
 
 \fBExample:\fR
 .RS
@@ -4770,49 +4807,47 @@ let v2 = oswait(".^/etc/hosts"_var, 100);
 .fi
 .RE
 
-Returned array fields
+Returned dynamic array fields:
 
+.br
 1. Event type codes
-
+.br
 2. dirpaths
-
+.br
 3. filenames
-
+.br
 4. d=dir, f=file
 
-.nf
 
-Possible event type codes are as follows:
-
-* IN_CLOSE_WRITE - A file opened for writing was closed
-
-* IN_ACCESS      - Data was read from file
-
-* IN_MODIFY      - Data was written to file
-
-* IN_ATTRIB      - File attributes changed
-
-* IN_CLOSE       - File was closed (read or write)
-
-* IN_MOVED_FROM  - File was moved away from watched directory
-
-* IN_MOVED_TO    - File was moved into watched directory
-
-* IN_MOVE        - File was moved (in or out of directory)
-
-* IN_CREATE      - A file was created in the directory
-
-* IN_DELETE      - A file was deleted from the directory
-
-* IN_DELETE_SELF - Directory or file under observation was deleted
-
-* IN_MOVE_SELF   - Directory or file under observation was moved
-
-.fi
+Possible event type codes:
+.br
+\(bu IN_CLOSE_WRITE - A file opened for writing was closed
+.br
+\(bu IN_ACCESS      - Data was read from file
+.br
+\(bu IN_MODIFY      - Data was written to file
+.br
+\(bu IN_ATTRIB      - File attributes changed
+.br
+\(bu IN_CLOSE       - File was closed (read or write)
+.br
+\(bu IN_MOVED_FROM  - File was moved away from watched directory
+.br
+\(bu IN_MOVED_TO    - File was moved into watched directory
+.br
+\(bu IN_MOVE        - File was moved (in or out of directory)
+.br
+\(bu IN_CREATE      - A file was created in the directory
+.br
+\(bu IN_DELETE      - A file was deleted from the directory
+.br
+\(bu IN_DELETE_SELF - Directory or file under observation was deleted
+.br
+\(bu IN_MOVE_SELF   - Directory or file under observation was moved
 
 
 
-.SH 19. OS FILE I/O
+.SH 18. OS FILE I/O
 .SH
 
 .SS
@@ -4836,7 +4871,7 @@ Opens for writing if possible, otherwise read-only.
 .RS
 .nf
 let osfilename = ostempdir() ^ "xo_gendoc_test.conf";
-if (oswrite("" on osfilename)) ... ok /// Create an empty os file
+if (oswrite("" on osfilename)) ... ok /// Create an empty OS file
 var ostempfile;
 if (ostempfile.osopen(osfilename)) ... ok
 // or
@@ -4912,9 +4947,7 @@ osfile << anything << std::endl;
 .fi
 Use convenient << syntax to output anything to an osfile.
 
-\fBosfile:\fR An os path and filename or an osfilevar opened by osopen(). The file will be appended, or created if it does not already exist.
-
-All standard c++ io manipulators may be used e.g. std::setw, setfill etc.
+\fBosfile:\fR An OS path and filename or an osfilevar opened by osopen(). The file will be appended, or created if it does not already exist. osfile can be "stdout" or "stderr" to simulate cout/cerr/clog.
 
 \fBExample:\fR
 .RS
@@ -4926,6 +4959,7 @@ let v1 = osread(txtfile);   // "t_temp.txt 123.457 123\\n"
 .fi
 .RE
 
+All standard c++ io manipulators may be used e.g. std::setw, setfill etc.
 
 \fBExample:\fR
 .RS
@@ -4990,9 +5024,9 @@ var().osclose()
 .nf
  
 .fi
-Removes an osfilevar handle from the internal memory cache of os file handles. This frees up both exodus process memory and operating system resources.
+Removes an osfilevar handle from the internal memory cache of OS file handles. This frees up both exodus process memory and operating system resources.
 
-It is advisable to osclose any file handles after use, regardless of whether they were specifically opened using osopen or not, especially in long running programs. Exodus performs caching of internal os file handles per thread and os file. If not closed, then the operating system will probably not flush deleted files from storage until the process is terminated. This can potentially create an memory issue or file system resource issue especially if osopening/osreading/oswriting many perhaps temporary files in a long running process.
+It is advisable to osclose any file handles after use, regardless of whether they were specifically opened using osopen or not, especially in long running programs. Exodus performs caching of internal OS file handles per thread and OS file. If not closed, then the operating system will probably not flush deleted files from storage until the process is terminated. This can potentially create an memory issue or file system resource issue especially if osopening/osreading/oswriting many perhaps temporary files in a long running process.
 
 \fBExample:\fR
 .RS
@@ -5011,11 +5045,11 @@ if (strvar.oswrite(osfilename, codepage = "")) ...
 .nf
  
 .fi
-Create a complete os file from a var.
+Create a complete OS file from a var.
 
 \fBstrvar:\fR The text or data to be used to create the file.
 
-\fBosfilename:\fR Absolute or relative path and filename to be written. Any existing os file is removed first.
+\fBosfilename:\fR Absolute or relative path and filename to be written. Any existing OS file is removed first.
 
 \fBcodepage:\fR If specified then output is converted from UTF-8 to that codepage before being written. Otherwise no conversion is done.
 
@@ -5039,7 +5073,7 @@ if (strvar.osread(osfilename, codepage = "")) ...
 .nf
  
 .fi
-Read a complete os file into a var.
+Read a complete OS file into a var.
 
 \fBosfilename:\fR Absolute or relative path and filename to be read.
 
@@ -5068,13 +5102,13 @@ if (osfile_or_dirname.osrename(new_dirpath_or_filepath)) ...
 .nf
  
 .fi
-Renames an os file or dir in the OS file system.
+Renames an OS file or dir in the OS file system.
 
 The source and target must exist in the same storage device.
 
 \fBosfile_or_dirname:\fR Absolute or relative path and file or dir name to be renamed.
 
-\fBnew_dirpath_or_filepath:\fR Will not overwrite an existing os file or dir.
+\fBnew_dirpath_or_filepath:\fR Will not overwrite an existing OS file or dir.
 
 \fBReturns:\fR True if successful or false if not possible for any reason. e.g. Target already exists, path is not writeable, permissions etc.
 
@@ -5100,13 +5134,13 @@ if (osfile_or_dirname.osmove(to_osfilename)) ...
 .nf
  
 .fi
-"Moves" an os file or dir within the os file system.
+"Moves" an OS file or dir within the OS file system.
 
 Attempts osrename first, then oscopy followed by osremove original.
 
 \fBosfile_or_dirname:\fR Absolute or relative path and file or dir name to be moved.
 
-\fBto_osfilename:\fR Will not overwrite an existing os file or dir.
+\fBto_osfilename:\fR Will not overwrite an existing OS file or dir.
 
 \fBReturns:\fR True if successful or false if not possible for any reason. e.g. Source doesnt exist or cannot be accessed, target already exists, source or target is not writeable, permissions, storage space etc.
 
@@ -5130,11 +5164,11 @@ if (osfile_or_dirname.oscopy(to_osfilename)) ...
 .nf
  
 .fi
-Copies an os file or directory recursively within the os file system.
+Copies an OS file or directory recursively within the OS file system.
 
 \fBosfile_or_dirname:\fR Absolute or relative path and file or dir name to be copied.
 
-\fBto_osfilename:\fR Will overwrite an existing os file or merge into an existing dir.
+\fBto_osfilename:\fR Will overwrite an existing OS file or merge into an existing dir.
 
 \fBReturns:\fR True if successful or false if not possible for any reason. e.g. Source doesnt exist or cannot be accessed, target is not writeable, permissions, storage space, etc.
 
@@ -5159,7 +5193,7 @@ if (osfilename.osremove()) ...
 .nf
  
 .fi
-Removes/deletes an os file from the OS file system.
+Removes/deletes an OS file from the OS file system.
 
 Will not remove directories. Use osrmdir() to remove directories
 
@@ -5181,7 +5215,7 @@ if (osremove(osfilename)) ...
 
 
 
-.SH 20. OS DIRECTORIES
+.SH 19. OS DIRECTORIES
 .SH
 
 .SS
@@ -5189,13 +5223,13 @@ var v1 = dirpath.oslist(globpattern = "", mode = 0);
 .nf
  
 .fi
-Get a list of os files and/or dirs.
+Get a list of OS files and/or dirs.
 
 \fBdirpath:\fR Absolute or relative dir path.
 
 \fBglobpattern:\fR e.g. *.conf to be appended to the dirpath or a complete path plus glob pattern e.g. /etc/ *.conf.
 
-\fBmode:\fR 0: default - Any regular files or dirs. 1 - Only regular os files. 2 - Only dirs.
+\fBmode:\fR 0: default - Any regular files or dirs. 1 - Only regular OS files. 2 - Only dirs.
 
 \fBReturns:\fR An FM delimited string containing all matching dir entries given a dir path
 
@@ -5228,11 +5262,11 @@ var v1 = osfile_or_dirpath.osinfo(mode = 0);
 .nf
  
 .fi
-Get dir info about an os file or dir.
+Get dir info about an OS file or dir.
 
 \fBReturns:\fR A short string containing size ^ FM ^ modified_time ^ FM ^ modified_time or "" if not a regular file or dir.
 
-\fBmode:\fR 0: default. 1: Must be a regular os file. 2: Must be an os dir.
+\fBmode:\fR 0: default. 1: Must be a regular OS file. 2: Must be an OS dir.
 
 See also osfile() and osdir()
 
@@ -5252,7 +5286,7 @@ var v1 = osfilename.osfile();
 .nf
  
 .fi
-Get dir info of an os file.
+Get dir info of an OS file.
 
 \fBosfilename:\fR Absolute or relative path and file name.
 
@@ -5276,7 +5310,7 @@ var v1 = dirpath.osdir();
 .nf
  
 .fi
-Get dir info of an os dir.
+Get dir info of an OS dir.
 
 \fBdirpath:\fR Absolute or relative path and dir name.
 
@@ -5300,7 +5334,7 @@ if (dirpath.osmkdir()) ...
 .nf
  
 .fi
-Create a new os file system directory.
+Create a new OS file system directory.
 
 Parent dirs wil be created if necessary.
 
@@ -5372,7 +5406,7 @@ if (dirpath.osrmdir(evenifnotempty = false)) ...
 .nf
  
 .fi
-Removes (deletes) an os dir,
+Removes (deletes) an OS dir,
 
 \fBeventifnotempty:\fR If true any subdirs will also be removed/deleted recursively, otherwise the function will fail and return false.
 
@@ -5390,7 +5424,7 @@ if (osrmdir(osdirname)) ...
 
 
 
-.SH 21. OS SHELL/ENVIRONMENT
+.SH 20. OS SHELL/ENVIRONMENT
 .SH
 
 .SS
@@ -5400,7 +5434,7 @@ if (command.osshell()) ...
 .fi
 Execute a shell command.
 
-\fBcommand:\fR An executable command to be interpreted by the default os shell.
+\fBcommand:\fR An executable command to be interpreted by the default OS shell.
 
 \fBReturns:\fR True if the process terminates with error status 0 and false otherwise.
 
@@ -5461,6 +5495,61 @@ let outtext = "abc xyz";
 if (outtext.osshellwrite("grep xyz")) ... ok
 // or
 if (osshellwrite(outtext, "grep xyz")) ... ok
+.fi
+.RE
+
+
+
+.SS
+if (var::osprocess(oscmd, stdin_for_process, out stdout_from_process, out stderr_from_process, out exit_status, timeout_secs = 0)) ...
+.nf
+ 
+.fi
+Run an OS program synchronously.
+
+Executes an OS program passing input and capturing standard and error output, and exit status.
+
+Shell features (e.g., pipes, redirects) are not supported but can be invoked using an oscmd like "bash -c \\"abc|yyy $HOME\\""
+
+\fBoscmd:\fR The executable program and its arguments. Must exist in the OS PATH.
+
+\fBstdin_for_process:\fR Optional. Input data to send to the program's standard input.
+
+\fBstdout_from_process:\fR [out] Standard output produced by the program.
+
+\fBstderr_from_process:\fR [out] Error or log output from the program.
+
+\fBexit_status:\fR [out] Result of the program's execution:
+.br
+\(bu  0 Program terminated normally.
+.br
+\(bu -1 Timeout
+.br
+\(bu nn Program reported an exit status.
+
+\fBtimeout_in_secs:\fR Optional. Maximum runtime in seconds (default 0 = no timeout).
+
+\fBReturns:\fR Success or failure.
+.br
+\(bu true    Program ran and exited with status 0 (success).
+.br
+\(bu false   Program failed to start, timed out, or exited with non-zero status.
+
+\fBThrows:\fR Various system errors are possible.
+.br
+\(bu Pipe creation failed.
+.br
+\(bu Fork failed.
+.br
+\(bu Poll failure.
+
+\fBExample:\fR
+.RS
+.nf
+var v_stdout, v_stderr, v_exit_status;
+if (var::osprocess("grep xyz", "abc\\nxyz 123\\ndef", v_stdout, v_stderr, v_exit_status)) ... ok // v_stdout -> "xyz 123" // v_exit_status = 0
+// or
+if (osprocess("grep xyz", "abc\\nxyz 123\\ndef", v_stdout, v_stderr, v_exit_status)) ... ok
 .fi
 .RE
 
@@ -5542,7 +5631,7 @@ Get the value of an environment variable.
 
 \fBReturns:\fR True if the envcode is set or false if not.
 
-osgetenv and ossetenv work with a per thread copy of the os process environment. This avoids multithreading issues but does not change the process environment. Child processes created by var::osshell() will not inherit any env variables set using ossetenv() so the oscommand will need to be prefixed to achieve the desired result.
+osgetenv and ossetenv work with a per thread copy of the OS process environment. This avoids multithreading issues but does not change the process environment. Child processes created by var::osshell() will not inherit any env variables set using ossetenv() so the oscommand will need to be prefixed to achieve the desired result.
 
 For the actual system environment, see "man environ". extern char **environ; // environ is a pointer to an array of pointers to char* env pairs like xxx=yyy and the last pointer in the array is nullptr.
 
@@ -5563,7 +5652,7 @@ var v1 = var::ospid();
 .nf
  
 .fi
-Get the current os process id
+Get the current OS process id
 
 \fBReturns:\fR A number e.g. 663237.
 
@@ -5583,7 +5672,7 @@ var v1 = var::ostid();
 .nf
  
 .fi
-Get the current os thread process id
+Get the current OS thread process id
 
 \fBReturns:\fR A number e.g. 663237.
 
@@ -5666,7 +5755,7 @@ let v2 = getxlocale();
 
 
 
-.SH 22. OUTPUT
+.SH 21. OUTPUT
 .SH
 
 .SS
@@ -5800,7 +5889,7 @@ osflush();
 
 
 
-.SH 23. INPUT
+.SH 22. INPUT
 .SH
 
 .SS
@@ -5958,12 +6047,12 @@ var().breakon()
 Install various interrupt handlers.
 
 Automatically called in program/thread initialisation by exodus_main.
-
-SIGINT - Ctrl+C -> "Interrupted. (C)ontinue (Q)uit (B)acktrace (D)ebug (A)bort ?"
-
-SIGHUP - Sets a variable "RELOAD_req" which may be handled or ignored by the program.
-
-SIGTERM - Sets a variable "TERMINATE_req" which may be handled or ignored by the program.
+.br
+\(bu SIGINT  - Ctrl+C -> "Interrupted. (C)ontinue (Q)uit (B)acktrace (D)ebug (A)bort ?"
+.br
+\(bu SIGHUP  - Sets a variable "RELOAD_req" which may be handled or ignored by the program.
+.br
+\(bu SIGTERM - Sets a variable "TERMINATE_req" which may be handled or ignored by the program.
 
 
 
@@ -5978,7 +6067,7 @@ Ctrl+C becomes inactive in terminal.
 
 
 
-.SH 24. MATH/BOOLEAN
+.SH 23. MATH/BOOLEAN
 .SH
 
 .SS
@@ -6329,7 +6418,7 @@ let curr_precision2 = getprecision();
 
 
 
-.SH 25. I/O CONVERSION CODES 
+.SH 24. I/O CONVERSION CODES 
 .SH
 
 .SS
@@ -6341,7 +6430,7 @@ Date output: Convert internal date format to human readable date or calendar inf
 
 \fBReturns:\fR Human readable date or calendar info, or the original value unconverted if non-numeric.
 
-\fBFlags:\fR See examples below.
+\fBflags:\fR See examples below.
 
 Any Dynamic array structure is preserved.
 
@@ -6449,15 +6538,15 @@ Time output: Convert internal time format to human readable time e.g. "10:30:59"
 
 Conversion code (e.g. "MTHS") is "MT" + flags ...
 
-\fBFlags:\fR
-
-"H" - Show AM/PM otherwise 24 hour clock is used.
-
-"S" - Output seconds
-
-"2" = Ignored (used in iconv)
-
-":" - Any other flag is used as the separator char instead of ":"
+\fBflags:\fR
+.br
+\(bu "H" - Show AM/PM otherwise 24 hour clock is used.
+.br
+\(bu "S" - Output seconds
+.br
+\(bu "2" = Ignored (used in iconv)
+.br
+\(bu ":" - Any other flag is used as the separator char instead of ":"
 
 Any Dynamic array structure is preserved.
 
@@ -6537,39 +6626,35 @@ Number output: Convert internal numbers to external text format after rounding a
 
 \fBReturns:\fR A string or, if the value is not numeric, then no conversion is performed and the original value is returned.
 
-Conversion code (e.g. "MD20") is "MD" or "MC", 1st digit, 2nd digit, flags ...
+\fBconversion_code:\fR (e.g. "MD20Z") is "MD" or "MC", 1st digit, 2nd digit, flags ...
+.br
+\(bu MD outputs like 123.45 (International)
+.br
+\(bu MC outputs like 123,45 (European)
+.br
+\(bu 1st digit = Decimal places to display. Also decimal places to move if 2nd digit not present and no P flag present.
+.br
+\(bu 2nd digit = Optional decimal places to move left if P flag not present.
 
 
 
-MD outputs like 123.45 (International)
-
-MC outputs like 123,45 (European)
-
-
-
-1st digit = Decimal places to display. Also decimal places to move if 2nd digit not present and no P flag present.
-
-2nd digit = Optional decimal places to move left if P flag not present.
-
-
-
-\fBFlags:\fR
-
-"P" - Preserve decimal places. Same as 2nd digit = 0;
-
-"Z" - Zero flag - return "" if zero.
-
-"X" - No conversion - return as is.
-
-"." or "," - Separate thousands depending on MD or MC.
-
-"-" means suffix negatives with "-" and positives with " " (space).
-
-"<" means wrap negatives in "<" and ">" chars.
-
-"C" means suffix negatives with "CR" and positives or zero with "DB".
-
-"D" means suffix negatives with "DB" and positives or zero with "CR".
+\fBflags:\fR
+.br
+\(bu "P" - Preserve decimal places. Same as 2nd digit = 0;
+.br
+\(bu "Z" - Zero flag - return "" if zero.
+.br
+\(bu "X" - No conversion - return as is.
+.br
+\(bu "." or "," - Separate thousands depending on MD or MC.
+.br
+\(bu "-" means suffix negatives with "-" and positives with " " (space).
+.br
+\(bu "<" means wrap negatives in "<" and ">" chars.
+.br
+\(bu "C" means suffix negatives with "CR" and positives or zero with "DB".
+.br
+\(bu "D" means suffix negatives with "DB" and positives or zero with "CR".
 
 
 
@@ -6754,12 +6839,12 @@ var v1 = varnum.oconv("MX");
  
 .fi
 Convert number to hexadecimal string.
-
-\fB"MX":\fR   Convert and trim leading zeros                      e.g. oconv(1025, "MX")  -> "401"
-
-\fB"MXn":\fR  Pad with up to n leading zeros but do not truncate. e.g. oconv(1025, "MX8") -> "00000401"
-
-\fB"MXnT":\fR Pad and truncate to n characters.                   e.g. oconv(1025, "MX2") -> "01"
+.br
+\(bu "MX":   Convert and trim leading zeros                      e.g. oconv(1025, "MX")  -> "401"
+.br
+\(bu "MXn":  Pad with up to n leading zeros but do not truncate. e.g. oconv(1025, "MX8") -> "00000401"
+.br
+\(bu "MXnT": Pad and truncate to n characters.                   e.g. oconv(1025, "MX2") -> "01"
 
 \fB"n":\fR    Width. 0-9, A-G = 10 - 16.
 
@@ -6770,14 +6855,14 @@ Convert number to hexadecimal string.
 Dynamic array structure is preserved.
 
 Negative numbers are treated as unsigned 8 byte integers (uint64).
-
-0  -> "00"
-
-1  -> "01"
-
-15 -> "0F"
-
--1 -> "FFFF" "FFFF" "FFFF" "FFFF" (8 x "FF")
+.br
+\(bu 0  -> "00"
+.br
+\(bu 1  -> "01"
+.br
+\(bu 15 -> "0F"
+.br
+\(bu -1 -> "FFFF" "FFFF" "FFFF" "FFFF" (8 x "FF")
 
 This function is a near inverse of iconv("MX").
 
@@ -6808,18 +6893,18 @@ Dynamic array structure is preserved.
 Hex strings are converted to unsigned 8 byte integers (uint64)
 
 Leading zeros are ignored.
-
-"0" -> 0
-
-"00"-> 0
-
-"1" -> 1
-
-Hex "FFFFFFFFFFFFFFFF" (8 x "FF") -> -1.
-
-Hex "7FFFFFFFFFFFFFFF" is the maximum positive integer: 9223372036854775805.
-
-Hex "8000000000000000" is the maximum negative integer: -9223372036854775808.
+.br
+\(bu "0" -> 0
+.br
+\(bu "00"-> 0
+.br
+\(bu "1" -> 1
+.br
+\(bu Hex "FFFFFFFFFFFFFFFF" (8 x "FF") -> -1.
+.br
+\(bu Hex "7FFFFFFFFFFFFFFF" is the maximum positive integer: 9223372036854775805.
+.br
+\(bu Hex "8000000000000000" is the maximum negative integer: -9223372036854775808.
 
 This function is the exact inverse of oconv("MX").
 
