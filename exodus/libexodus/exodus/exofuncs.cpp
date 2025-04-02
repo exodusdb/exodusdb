@@ -131,6 +131,9 @@ ND PUBLIC bool osshell(in command) {return command.osshell();}
 ND PUBLIC bool osshellwrite(in writestr, in command) {return writestr.osshellwrite(command);}
 ND PUBLIC bool osshellread(out readstr, in command) {return readstr.osshellread(command);}
 ND PUBLIC var  osshellread(in command) {var result = ""; if (not result.osshellread(command)) {} return result;}
+ND PUBLIC bool osprocess(in oscmd, in stdin_to_process, out stdout_from_process, out stderr_from_process, out exit_status, in timeout_secs) {
+	return var::osprocess(oscmd, stdin_to_process, stdout_from_process, stderr_from_process, exit_status, timeout_secs);
+}
 
 ND PUBLIC var  backtrace();
 

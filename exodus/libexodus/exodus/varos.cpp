@@ -371,6 +371,71 @@ bool var::osshellwrite(in oscmd) const {
 	return !shellresult;
 }
 
+//bool run_piped_process_with_timeout(const std::string& input, std::string& stdout_output, 
+//std::string& stderr_output, int& exit_status, int timeout_seconds, const std::string& command)
+
+// Monster function defined in varos3.cpp
+bool run_piped_process_with_timeout(
+	const std::string& input,
+	std::string& stdout_output,
+	std::string& stderr_output,
+	int& process_exit_status,
+	int timeout_seconds,
+	const std::string& command);
+
+bool var::osprocess(in oscmd, in stdin_for_process, out stdout_from_process, out stderr_from_process, out exit_status, in timeout_secs) {
+
+	// Does not use bash or support sh-like functionality e.g. ; | || && > etc.
+
+	THISIS("bool var::osprocess(in oscmd, in stdin_for_process, out stdout_from_process, out stderr_from_process, out exit_status, in timeout_secs) static")
+	ISSTRING(oscmd)
+	ISSTRING(stdin_for_process)
+	ISNUMERIC(timeout_secs)
+
+	stdout_from_process = "";
+	stderr_from_process = "";
+	int process_exit_status = 0;
+
+	bool result = run_piped_process_with_timeout(
+		stdin_for_process.var_str,
+		stdout_from_process.var_str,
+		stderr_from_process.var_str,
+		process_exit_status,
+		int(timeout_secs),
+		oscmd.var_str
+	);
+/*
+	exit_status if false
+	not zero from client or
+	User createable:
+	127: No args—treated as "no program provided."
+	127: Program not found—child exits with 127.
+	-1: Timeout—internal error when we terminate the child.
+	Internal: Throwable
+	-2: Pipe fail.
+	-3: Fork fail.
+	-4: Rare internal failure (poll fail, abnormal termination).
+*/
+
+	exit_status = process_exit_status;
+
+	const var errmsg = (result and not process_exit_status) ? "" :
+		"var::osprocess failed. " ^ var(exit_status)
+		^ " " ^ oscmd.quote()
+		;
+	// False only when exit_status is >= 0
+	if (not result) {
+		if (std::abs(process_exit_status) <= -2 and std::abs(process_exit_status) >= -4)
+			// TODO test
+			throw VarError(errmsg ^ " piped_process: " ^ "Timeout^Pipe fail^Fork fail^Logic error"_var.f(std::abs(process_exit_status)));
+		var::setlasterror(errmsg);
+		return false;
+	}
+	var::setlasterror(errmsg);
+
+	return exit_status == 0;
+}
+
 void var::osflush() const {
 	std::cout << std::flush;
 	//	std::cerr << std::flush; // self flushing

@@ -2261,14 +2261,14 @@ public:
 	//
 	ND bool deleteindex(in fieldname) const;
 
-	// Places a metaphorical db lock on a particular record given a db file and key.
+	// Places a metaphorical DB lock on a particular record given a DB file and key.
 	// This is a advisory lock, not a physical lock, since it makes no restriction on the access or modification of data by other connections.
-	// Neither the db file nor the record key need to actually exist since a lock is just a hash of the db file name and key combined.
+	// Neither the DB file nor the record key need to actually exist since a lock is just a hash of the DB file name and key combined.
 	// If another connection attempts to place an identical lock on the same database it will be denied.
 	// Locks can be removed by unlock() or unlockall() or will be automatically removed at the end of a transaction or when the connection is closed.
 	// If the same process attempts to place an identical lock more than once it may be denied (if not in a transaction) or succeed but be ignored (if in a transaction).
 	// Locks can be used to avoid processing a transaction simultaneously with another connection only to have one of them fail due to mutually updating the same records.
-	// Returns::
+	// Returns:
 	// * 0: Failure: Another connection has already placed the same lock.
 	// * "" Failure: The lock has already been placed.
 	// * 1: Success: A new lock has been placed.
@@ -3169,6 +3169,34 @@ public:
 	//  if (osshellwrite(outtext, "grep xyz")) ... ok`
 	//
 	ND bool osshellwrite(in oscmd) const;
+
+	// Run an OS program synchronously.
+	// Executes an OS program passing input and capturing standard and error output, and exit status.
+    // Shell features (e.g., pipes, redirects) are not supported but can be invoked using an oscmd like "bash -c \"abc|yyy $HOME\""
+	// oscmd: The executable program and its arguments. Must exist in the OS PATH.
+	// stdin_for_process: Optional. Input data to send to the program's standard input.
+	// stdout_from_process: [out] Standard output produced by the program.
+	// stderr_from_process: [out] Error or log output from the program.
+	// exit_status: [out] Result of the program's execution:
+	// *  0 Program terminated normally.
+	// * -1 Timeout
+	// * nn Program reported an exit status.
+	// timeout_in_secs: Optional. Maximum runtime in seconds (default 0 = no timeout).
+	// Returns: Success or failure.
+	// * true    Program ran and exited with status 0 (success).
+	// * false   Program failed to start, timed out, or exited with non-zero status.
+	// Throws: Various system errors are possible.
+	// * Pipe creation failed.
+    // * Fork failed.
+	// * Poll failure.
+	// obj is var()
+	//
+	// `var v_stdout, v_stderr, v_exit_status;
+	//  if (var::osprocess("grep xyz", "abc\nxyz 123\ndef", v_stdout, v_stderr, v_exit_status)) ... ok // v_stdout -> "xyz 123" // v_exit_status = 0
+	//  // or
+	//  if (osprocess("grep xyz", "abc\nxyz 123\ndef", v_stdout, v_stderr, v_exit_status)) ... ok`
+	//
+	ND static bool osprocess(in oscmd, in stdin_for_process, out stdout_from_process, out stderr_from_process, out exit_status, in timeout_secs = 0);
 
 	// Get the tmp dir path and name.
 	// Returns: A string e.g. "/tmp/"

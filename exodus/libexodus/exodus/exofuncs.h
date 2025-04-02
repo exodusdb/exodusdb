@@ -217,6 +217,7 @@ ND bool osshell(in command);
 ND bool osshellwrite(in writestr, in command);
 ND bool osshellread(out readstr, in command);
 ND var  osshellread(in command);
+ND bool osprocess(in oscmd, in stdin_to_process, out stdout_from_process, out stderr_from_process, out exit_status, in timeout_secs = 0);
 
 //var execute(in command);
 

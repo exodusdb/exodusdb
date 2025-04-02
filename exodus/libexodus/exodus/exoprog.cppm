@@ -297,6 +297,7 @@ export namespace exo {
 	using exo::osshell;
 	using exo::osshellread;
 	using exo::osshellwrite;
+	using exo::osprocess;
 	using exo::ossleep;
 	using exo::ostempdir;
 	using exo::ostempfile;
