@@ -1,0 +1,198 @@
+<div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span><span class="c1"> // Preprocessor directive</span>
+
+<span class="c1">// Function to demonstrate various C++ keywords</span>
+<span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="c1">// &#39;int&#39; is a fundamental type, &#39;main&#39; is identifier</span>
+<span class="w">    </span><span class="c1">// Fundamental types</span>
+<span class="w">    </span><span class="kt">char</span><span class="w"> </span><span class="n">character</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="sc">&#39;a&#39;</span><span class="p">;</span><span class="w">        </span><span class="c1">// Character type</span>
+<span class="w">    </span><span class="kt">short</span><span class="w"> </span><span class="n">short_num</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span><span class="w">       </span><span class="c1">// Short integer type</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="nf">integer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">20</span><span class="p">;</span><span class="w">          </span><span class="c1">// Integer type</span>
+<span class="w">    </span><span class="kt">long</span><span class="w"> </span><span class="n">long_num</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">30L</span><span class="p">;</span><span class="w">      </span><span class="c1">// Long integer type</span>
+<span class="w">    </span><span class="kt">float</span><span class="w"> </span><span class="n">floating</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">3.14f</span><span class="p">;</span><span class="w">   </span><span class="c1">// Floating-point type</span>
+<span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">double_num</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">3.14159</span><span class="p">;</span><span class="w"> </span><span class="c1">// Double precision floating-point type</span>
+<span class="w">    </span><span class="kt">bool</span><span class="w"> </span><span class="n">boolean</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span><span class="w">      </span><span class="c1">// Boolean type</span>
+
+<span class="w">    </span><span class="c1">// Storage class specifiers</span>
+<span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">automatic</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w">       </span><span class="c1">// Automatic storage duration</span>
+<span class="w">    </span><span class="k">static</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">static_var</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span><span class="c1">// Static storage duration</span>
+<span class="w">    </span><span class="k">extern</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">external_var</span><span class="p">;</span><span class="w">  </span><span class="c1">// External linkage</span>
+<span class="w">    </span><span class="k">register</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">reg_var</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">3</span><span class="p">;</span><span class="w"> </span><span class="c1">// Register storage suggestion</span>
+
+<span class="w">    </span><span class="c1">// Control flow keywords</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">boolean</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">            </span><span class="c1">// Conditional statement</span>
+<span class="w">        </span><span class="k">goto</span><span class="w"> </span><span class="n">label</span><span class="p">;</span><span class="w">          </span><span class="c1">// Jump statement</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w"> </span>
+<span class="w">    </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="nf">integer</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">     </span><span class="c1">// Loop statement</span>
+<span class="w">        </span><span class="nf">integer</span><span class="o">--</span><span class="p">;</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nf">integer</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">10</span><span class="p">)</span>
+<span class="w">            </span><span class="k">break</span><span class="p">;</span><span class="w">           </span><span class="c1">// Loop control</span>
+<span class="w">        </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nf">integer</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">15</span><span class="p">)</span>
+<span class="w">            </span><span class="k">continue</span><span class="p">;</span><span class="w">       </span><span class="c1">// Loop control</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="k">do</span><span class="w"> </span><span class="p">{</span><span class="w">                     </span><span class="c1">// Loop statement</span>
+<span class="w">        </span><span class="nf">integer</span><span class="o">++</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="nf">integer</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">20</span><span class="p">);</span>
+
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">5</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="c1">// Loop statement</span>
+<span class="w">        </span><span class="k">switch</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">         </span><span class="c1">// Selection statement</span>
+<span class="w">            </span><span class="k">case</span><span class="w"> </span><span class="mi">0</span><span class="p">:</span><span class="w">         </span><span class="c1">// Case label</span>
+<span class="w">                </span><span class="k">break</span><span class="p">;</span>
+<span class="w">            </span><span class="k">default</span><span class="o">:</span><span class="w">        </span><span class="c1">// Default case</span>
+<span class="w">                </span><span class="k">break</span><span class="p">;</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1">// Type qualifiers</span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">constant</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">42</span><span class="p">;</span><span class="w">     </span><span class="c1">// Constant qualifier</span>
+<span class="w">    </span><span class="k">volatile</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">vol_var</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w">    </span><span class="c1">// Volatile qualifier</span>
+
+<span class="w">    </span><span class="c1">// Class-related keywords</span>
+<span class="w">    </span><span class="k">class</span><span class="w"> </span><span class="nc">MyClass</span><span class="w"> </span><span class="p">{</span><span class="w">             </span><span class="c1">// Class definition</span>
+<span class="w">    </span><span class="k">public</span><span class="o">:</span><span class="w">                    </span><span class="c1">// Access specifier</span>
+<span class="w">        </span><span class="k">virtual</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="kd">func</span><span class="p">()</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="c1">// Virtual function</span>
+<span class="w">    </span><span class="k">private</span><span class="o">:</span><span class="w">                  </span><span class="c1">// Access specifier</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="nf">data</span><span class="p">;</span>
+<span class="w">    </span><span class="k">protected</span><span class="o">:</span><span class="w">               </span><span class="c1">// Access specifier</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">more_data</span><span class="p">;</span>
+<span class="w">    </span><span class="p">};</span>
+
+<span class="w">    </span><span class="k">struct</span><span class="w"> </span><span class="nc">MyStruct</span><span class="w"> </span><span class="p">{</span><span class="w">         </span><span class="c1">// Structure definition</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">x</span><span class="p">;</span>
+<span class="w">    </span><span class="p">};</span>
+
+<span class="w">    </span><span class="k">union</span><span class="w"> </span><span class="nc">MyUnion</span><span class="w"> </span><span class="p">{</span><span class="w">          </span><span class="c1">// Union definition</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="p">;</span>
+<span class="w">        </span><span class="kt">float</span><span class="w"> </span><span class="nf">f</span><span class="p">;</span>
+<span class="w">    </span><span class="p">};</span>
+
+<span class="w">    </span><span class="c1">// Exception handling</span>
+<span class="w">    </span><span class="k">try</span><span class="w"> </span><span class="p">{</span><span class="w">                   </span><span class="c1">// Exception handling block</span>
+<span class="w">        </span><span class="k">throw</span><span class="w"> </span><span class="mi">42</span><span class="p">;</span><span class="w">          </span><span class="c1">// Throw expression</span>
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">      </span><span class="c1">// Exception handler</span>
+<span class="w">        </span><span class="c1">// Handle exception</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1">// Other keywords</span>
+<span class="w">    </span><span class="k">enum</span><span class="w"> </span><span class="nc">Color</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">RED</span><span class="p">,</span><span class="w"> </span><span class="n">GREEN</span><span class="w"> </span><span class="p">};</span><span class="w"> </span><span class="c1">// Enumeration</span>
+<span class="w">    </span><span class="k">typedef</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">Integer</span><span class="p">;</span><span class="w">      </span><span class="c1">// Type alias</span>
+<span class="w">    </span><span class="k">using</span><span class="w"> </span><span class="n">Number</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kt">float</span><span class="p">;</span><span class="w">     </span><span class="c1">// Type alias (modern)</span>
+<span class="w">    </span><span class="k">namespace</span><span class="w"> </span><span class="nn">MySpace</span><span class="w"> </span><span class="p">{</span><span class="w">      </span><span class="c1">// Namespace definition</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="kt">var</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="k">template</span><span class="w"> </span><span class="o">&lt;</span><span class="k">typename</span><span class="w"> </span><span class="nc">T</span><span class="o">&gt;</span><span class="w">    </span><span class="c1">// Template declaration</span>
+<span class="w">    </span><span class="n">T</span><span class="w"> </span><span class="n">add</span><span class="p">(</span><span class="n">T</span><span class="w"> </span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="n">T</span><span class="w"> </span><span class="n">b</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">b</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1">// Operator keywords</span>
+<span class="w">    </span><span class="kt">int</span><span class="o">*</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="kt">int</span><span class="p">;</span><span class="w">     </span><span class="c1">// Dynamic memory allocation</span>
+<span class="w">    </span><span class="k">delete</span><span class="w"> </span><span class="n">ptr</span><span class="p">;</span><span class="w">            </span><span class="c1">// Memory deallocation</span>
+<span class="w">    </span><span class="k">sizeof</span><span class="p">(</span><span class="kt">int</span><span class="p">);</span><span class="w">          </span><span class="c1">// Size operator</span>
+
+<span class="w">    </span><span class="c1">// Boolean literals</span>
+<span class="w">    </span><span class="nb">true</span><span class="p">;</span><span class="w">                </span><span class="c1">// Boolean literal</span>
+<span class="w">    </span><span class="nb">false</span><span class="p">;</span><span class="w">              </span><span class="c1">// Boolean literal</span>
+
+<span class="w">    </span><span class="c1">// Null pointer</span>
+<span class="w">    </span><span class="k">nullptr</span><span class="p">;</span><span class="w">            </span><span class="c1">// Null pointer literal</span>
+
+<span class="nl">label</span><span class="p">:</span><span class="w">                  </span><span class="c1">// Label for goto</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w">          </span><span class="c1">// Return statement</span>
+<span class="p">}</span>
+
+<span class="c1">// Note: Some keywords like &#39;inline&#39;, &#39;friend&#39;, &#39;explicit&#39;, &#39;mutable&#39;</span>
+<span class="c1">// could be added in more complex examples</span>
+
+<span class="c1">// test.cpp</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;iostream&gt;</span>
+
+<span class="kt">int</span><span class="w"> </span><span class="n">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nf">dim</span><span class="w"> </span><span class="n">x</span><span class="p">;</span><span class="w">           </span><span class="c1">// EXODUS_TYPES</span>
+<span class="w">    </span><span class="kt">var</span><span class="w"> </span><span class="n">y</span><span class="p">;</span><span class="w">           </span><span class="c1">// EXODUS_TYPES</span>
+<span class="w">    </span><span class="nf">print</span><span class="p">(</span><span class="s">&quot;Hello&quot;</span><span class="p">);</span><span class="w">  </span><span class="c1">// EXODUS_FUNCTIONS</span>
+<span class="w">    </span><span class="nf">input</span><span class="p">(</span><span class="n">x</span><span class="p">);</span><span class="w">        </span><span class="c1">// EXODUS_FUNCTIONS</span>
+<span class="w">    </span><span class="nf">read</span><span class="p">(</span><span class="n">y</span><span class="p">);</span><span class="w">         </span><span class="c1">// EXODUS_FUNCTIONS</span>
+<span class="w">    </span><span class="nf">write</span><span class="p">(</span><span class="n">x</span><span class="p">);</span><span class="w">        </span><span class="c1">// EXODUS_FUNCTIONS</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">true</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">      </span><span class="c1">// EXODUS_FLOWCONTROL, EXODUS_CONSTANTS</span>
+<span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">5</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">  </span><span class="c1">// EXODUS_FLOWCONTROL</span>
+<span class="w">            </span><span class="nf">print</span><span class="p">(</span><span class="s">&quot;Loop&quot;</span><span class="p">);</span><span class="w">  </span><span class="c1">// EXODUS_FUNCTIONS</span>
+<span class="w">            </span><span class="n">next</span><span class="p">;</span><span class="w">           </span><span class="c1">// EXODUS_FLOWCONTROL</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">        </span><span class="n">then</span><span class="w"> </span><span class="p">{</span><span class="w">          </span><span class="c1">// EXODUS_FLOWCONTROL</span>
+<span class="w">            </span><span class="kr">call</span><span class="w"> </span><span class="n">xyz</span><span class="p">(</span><span class="s">&quot;sub&quot;</span><span class="p">);</span><span class="w"> </span><span class="c1">// EXODUS_DECLARATIONS</span>
+<span class="w">        </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w">        </span><span class="c1">// EXODUS_FLOWCONTROL</span>
+<span class="w">            </span><span class="kr">gosub</span><span class="w"> </span><span class="n">xyz</span><span class="p">(</span><span class="s">&quot;alt&quot;</span><span class="p">);</span><span class="w"> </span><span class="c1">// EXODUS_DECLARATIONS</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="n">system</span><span class="p">(</span><span class="s">&quot;ls&quot;</span><span class="p">);</span><span class="w">    </span><span class="c1">// EXODUS_PSEUDO</span>
+<span class="w">    </span><span class="n">env</span><span class="p">(</span><span class="s">&quot;PATH&quot;</span><span class="p">);</span><span class="w">     </span><span class="c1">// EXODUS_PSEUDO</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">z</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">len</span><span class="p">(</span><span class="s">&quot;test&quot;</span><span class="p">);</span><span class="w">  </span><span class="c1">// EXODUS_BUILTINS</span>
+<span class="w">    </span><span class="nf">substr</span><span class="p">(</span><span class="n">z</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">);</span><span class="w">      </span><span class="c1">// EXODUS_BUILTINS</span>
+<span class="w">    </span><span class="kt">bool</span><span class="w"> </span><span class="n">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="n">y</span><span class="p">;</span><span class="w">     </span><span class="c1">// EXODUS_OPERATORS</span>
+<span class="w">    </span><span class="n">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="nb">false</span><span class="p">;</span><span class="w">       </span><span class="c1">// EXODUS_OPERATORS</span>
+<span class="w">	</span><span class="n">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="ow">eq</span><span class="w"> </span><span class="n">b</span><span class="w"> </span><span class="ow">ne</span><span class="w"> </span><span class="n">c</span><span class="w"> </span><span class="ow">lt</span><span class="w"> </span><span class="n">d</span><span class="w"> </span><span class="ow">gt</span><span class="w"> </span><span class="n">e</span><span class="w"> </span><span class="ow">le</span><span class="w"> </span><span class="nf">f</span><span class="w"> </span><span class="ow">ge</span><span class="w"> </span><span class="n">g</span><span class="p">;</span><span class="w"> </span><span class="c1">// EXODUS_OPERATORS</span>
+<span class="w">	</span><span class="nf">osread</span><span class="p">(</span><span class="n">xxx</span><span class="w"> </span><span class="ow">on</span><span class="w"> </span><span class="ow">from</span><span class="w"> </span><span class="ow">with</span><span class="w"> </span><span class="ow">to</span><span class="w"> </span><span class="n">yyy</span><span class="p">)</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+
+
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;exodus/library.h&gt;</span>
+<span class="kt">libraryinit</span><span class="p">()</span>
+
+<span class="kd">function</span><span class="w"> </span><span class="n">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">	</span><span class="nf">printl</span><span class="p">(</span><span class="s">&quot;f1 says &#39;Hello World!&#39;&quot;</span><span class="p">);</span>
+<span class="w">	</span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kt">libraryexit</span><span class="p">()</span>
+
+
+<span class="c1">// ???_common.h</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;exodus/common.h&gt;</span>
+<span class="kt">commoninit</span><span class="p">(</span><span class="n">abc</span><span class="p">)</span>
+
+<span class="kt">commonexit</span><span class="p">(</span><span class="n">abc</span><span class="p">)</span>
+
+
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;exodus/program.h&gt;</span>
+
+<span class="kt">programinit</span><span class="p">()</span>
+
+<span class="w">  </span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;externalfunc.h&gt;</span>
+
+<span class="kd">func</span><span class="w"> </span><span class="n">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">    </span><span class="nf">printl</span><span class="p">(</span><span class="s">&quot;program1 says&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;&#39;Hello World!&#39;&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">datetime</span><span class="p">());</span>
+
+<span class="w">    </span><span class="nf">let</span><span class="w"> </span><span class="n">c1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">c2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="k">auto</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="nf">range</span><span class="p">(</span><span class="n">c1</span><span class="p">,</span><span class="w"> </span><span class="n">c2</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nf">printt</span><span class="p">(</span><span class="n">i</span><span class="p">);</span>
+<span class="w">      </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="ow">not</span><span class="w"> </span><span class="nf">mod</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">))</span><span class="w"> </span><span class="nf">printx</span><span class="p">(</span><span class="s">&quot;Fizz&quot;</span><span class="p">);</span>
+<span class="w">      </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="ow">not</span><span class="w"> </span><span class="nf">mod</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">))</span><span class="w"> </span><span class="nf">printx</span><span class="p">(</span><span class="s">&quot;Buzz&quot;</span><span class="p">);</span>
+<span class="w">      </span><span class="nf">printl</span><span class="p">();</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="kr">call</span><span class="w"> </span><span class="n">func1</span><span class="p">(</span><span class="mf">1&#39;234.56</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;USD&quot;</span><span class="p">).</span><span class="nf">outputl</span><span class="p">();</span>
+
+<span class="w">    </span><span class="kr">gosub</span><span class="w"> </span><span class="n">subr1</span><span class="p">(</span><span class="mf">1&#39;234.56</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;USD&quot;</span><span class="p">);</span>
+<span class="w">    </span><span class="nf">printl</span><span class="p">(</span><span class="n">arg3</span><span class="p">);</span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="mi">123</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">  </span><span class="p">}</span>
+
+<span class="kd">func</span><span class="w"> </span><span class="n">func1</span><span class="p">(</span><span class="kt">in</span><span class="w"> </span><span class="n">arg1</span><span class="p">,</span><span class="w"> </span><span class="kt">in</span><span class="w"> </span><span class="n">arg2</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">	</span><span class="nf">stop</span><span class="p">();</span>
+<span class="w">	</span><span class="nf">abort</span><span class="p">();</span>
+<span class="w">	</span><span class="nf">abortall</span><span class="p">();</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">arg1</span><span class="w"> </span><span class="o">^</span><span class="w"> </span><span class="n">arg2</span><span class="p">;</span><span class="w"> </span><span class="c1">// Concatenate</span>
+<span class="w">  </span><span class="p">}</span>
+
+<span class="kd">subr</span><span class="w"> </span><span class="n">subr1</span><span class="p">(</span><span class="kt">in</span><span class="w"> </span><span class="n">arg1</span><span class="p">,</span><span class="w"> </span><span class="kt">in</span><span class="w"> </span><span class="n">arg2</span><span class="p">,</span><span class="w"> </span><span class="kt">out</span><span class="w"> </span><span class="n">arg3</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">arg3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">oconv</span><span class="p">(</span><span class="n">arg1</span><span class="p">,</span><span class="w"> </span><span class="n">arg2</span><span class="p">);</span>
+<span class="w">  </span><span class="p">}</span>
+
+<span class="n">programexit</span><span class="p">()</span>
+<span class="kt">programinit</span><span class="p">()</span>
+</pre></div>
