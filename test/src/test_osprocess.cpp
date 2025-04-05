@@ -44,6 +44,9 @@ function main() {
 	printl("Test cat 163MB returns the same");
 	test("cat", space(163'000'001), space(163'000'001), "", true, 0, "");
 
+	printl("Test bash cat 163MB to stderr and exit 42");
+	test("bash -c \"cat >&2 && exit 42\"", space(163'000'001), "", space(163'000'001), false, 42, "var::osprocess failed. 42 \"bash -c \"cat >&2 && exit 42\"\"");
+
 	printl("Test 100 x cat 3MB returns the same");
 	test("cat", space(3'000'001), space(3'000'001), "", true, 0, "", 0, 100);
 
@@ -74,9 +77,9 @@ function test(in cmd, in stdin, in stdout_exp, in stderr_exp, in result_exp, in 
 	if (stdout_act ne stdout_exp)
 		TRACE(stdout_exp.first(64))
 
-	TRACE(stderr_act)
+	TRACE(stderr_act.first(64))
 	if (stderr_act ne stderr_exp)
-		TRACE(stderr_exp)
+		TRACE(stderr_exp.first(64))
 
 	TRACE(result_act)
 	if (result_act ne result_exp)

@@ -100,7 +100,9 @@ class ExodusCppLexer(CppLexer):
         'dictinit', 'dictexit'
     }  # EXODUS_TYPES
 
-    EXTRA_FLOW_CONTROL = {'stop', 'abort', 'abortall', 'call', 'gosub'}  # EXODUS_FLOWCONTROL  .kr reserved
+    EXTRA_FLOW_CONTROL = {             # EXODUS_FLOWCONTROL  .kr reserved
+        'stop', 'abort', 'abortall',
+        'return', 'continue', 'break', 'throw', 'goto', 'co_return', 'co_yield', 'co_await'} #added c++ to get same color
 
     EXTRA_DECLARATIONS = {'func', 'subr', 'function', 'subroutine'}  # EXODUS_DECLARATIONS  .kd declaration
 
@@ -109,22 +111,26 @@ class ExodusCppLexer(CppLexer):
         'gt', 'le', 'ge', 'on', 'from', 'with', 'to'
     } # EXODUS_OPERATORS    normally a .k become purple .ow operator word
 
+    EXTRA_KEYWORDS = {'call', 'gosub'}  # EXODUS_KEYWORDS  .k ? style
+
+    EXTRA_CONSTANTS = {'RM', 'FM', 'VM', 'SM', 'TM', 'ST', 'BS', 'DQ', 'SQ', 'NL', 'EOL', 'PLATFORM',
+                       '_RM', '_FM', '_VM', '_SM', '_TM', '_ST', '_BS', '_DQ', '_SQ', '_NL', '_EOL',
+                       'RM_', 'FM_', 'VM_', 'SM_', 'TM_', 'ST_', 'BS_', 'DQ_', 'SQ_', 'NL_', 'EOL_'}  # EXODUS_CONSTANTS  .kc ? style
+
 #    EXTRA_CONSTANTS = {'true', 'false'}  # EXODUS_CONSTANTS
 #    EXTRA_PSEUDO = {'system', 'env'}  # EXODUS_PSEUDO
 #    EXTRA_BUILTINS = {'len', 'substr'}  # EXODUS_BUILTINS
-#    EXTRA_KEYWORDS = {'print', 'output', 'input', 'read', 'write'}  # EXODUS_FUNCTIONS
-
     _exodus_rules = [
         (re.compile(r'\b(' + '|'.join(EXTRA_OPERATORS) + r')\b'), Operator.Word),
         (re.compile(r'\b(' + '|'.join(EXTRA_FUNCTIONS) + r')\b'), Name.Function),
         (re.compile(r'\b(' + '|'.join(EXTRA_DECLARATIONS) + r')\b'), Keyword.Declaration),
         (re.compile(r'\b(' + '|'.join(EXTRA_FLOW_CONTROL) + r')\b'), Keyword.Reserved),
         (re.compile(r'\b(' + '|'.join(EXTRA_TYPES) + r')\b'), Keyword.Type),
+        (re.compile(r'\b(' + '|'.join(EXTRA_KEYWORDS) + r')\b'), Keyword),
+        (re.compile(r'\b(' + '|'.join(EXTRA_CONSTANTS) + r')\b'), Keyword.Constant),
 
-#        (re.compile(r'\b(' + '|'.join(EXTRA_CONSTANTS) + r')\b'), Keyword.Constant),
 #        (re.compile(r'\b(' + '|'.join(EXTRA_PSEUDO) + r')\b'), Keyword.Pseudo),
 #        (re.compile(r'\b(' + '|'.join(EXTRA_BUILTINS) + r')\b'), Name.Builtin),
-#        (re.compile(r'\b(' + '|'.join(EXTRA_KEYWORDS) + r')\b'), Keyword),
     ]
 
     def get_tokens_unprocessed(self, text, stack=('root',)):

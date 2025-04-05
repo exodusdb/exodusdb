@@ -35,7 +35,6 @@ export namespace exo {
 // FlowControl::gosub
 
 // var::on
-// var::into
 // var::from
 // var::with
 // var::to

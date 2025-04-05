@@ -103,8 +103,8 @@ friend class dim_iter;
 
 	// Create a copy of an array.
 	//
-	// ` dim d1 = {2, 4, 6, 8};
-	//   dim d2 = d1;`
+	// `dim d1 = {2, 4, 6, 8};
+	//  dim d2 = d1;`
 	//
 	dim(const dim& rhs);
 

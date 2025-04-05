@@ -1532,41 +1532,8 @@ IO   var::paster(const int pos1, const int length, SV replacestr) REF {
 	return THIS;
 }
 //
-//// 2. paste over to end
-//
-//// Constant
-//var  var::pasteall(const int pos1, SV insertstr) const& {
-//	// TODO avoid copy
-//	return var(*this).pasterall(pos1, insertstr);
-//}
-//
-//// Mutate
-//io   var::pasterall(const int pos1, SV insertstr) {
-//
-//	THISIS("io   var::pasterall(const int pos1, SV insertstr)")
-//	assertStringMutator(function_sig);
-//	//ISSTRING(insertstr)
-//
-//	// TODO make sure start and length work like pickos and HANDLE NEGATIVE LENGTH!
-//	int pos1b;
-//	if (pos1 > 0)
-//		pos1b = pos1;
-//	else if (pos1 < 0) {
-//		pos1b = static_cast<int>(var_str.size()) + pos1 + 1;
-//		if (pos1b < 1)
-//			pos1b = 1;
-//	} else
-//		pos1b = 1;
-//
-//	if (static_cast<unsigned int>(pos1b) > var_str.size())
-//		var_str += insertstr;
-//	else
-//		var_str.replace(pos1b - 1, var_str.size(), insertstr);
-//
-//	return *this;
-//}
 
-// 3. paste insert at
+// 2. paste insert at
 
 // Mutate
 IO   var::paster(const int pos1, SV insertstr) REF {

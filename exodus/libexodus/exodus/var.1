@@ -1108,9 +1108,9 @@ Find the nth occurrence of a substr in a source string.
 \fBExample:\fR
 .RS
 .nf
-let v1 = "abcabc"_var.index("bc", 2); // 2
+let v1 = "abcabc"_var.indexn("bc", 2); // 5
 // or
-let v2 = index("abcabc", "bc", 2);
+let v2 = indexn("abcabc", "bc", 2);
 .fi
 .RE
 
@@ -4964,7 +4964,7 @@ All standard c++ io manipulators may be used e.g. std::setw, setfill etc.
 \fBExample:\fR
 .RS
 .nf
-let vout = "std_iomanip_overview.txt";
+let vout = "t_std_iomanip_overview.txt";
 if (not osremove(vout)) {}
 using namespace std;
 
@@ -6995,5 +6995,7 @@ var v1 = strvar.iconv("TX");
 Convert standard text format to dynamic array.
 
 Reverse of oconv("TX") above.
+
+
 
 

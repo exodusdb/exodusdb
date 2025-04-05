@@ -479,7 +479,7 @@ ND	var  timedate2();
 ND	var  elapsedtimetext() const;
 
 	// Get text of elapsed time between two timestamps
-	// Caution. Use ostimestamp() which returns decimal days not ostime() which returns decimal seconds.
+	// Caution. Use ostimestamps not ostimes. One is in days and the other is in seconds.
 	//
 	// `let v1 = elapsedtimetext(0, 0.55);  // "13 hours, 12 mins"
 	//  let v2 = elapsedtimetext(0, 0.001); // "1 min, 26 secs"`
@@ -613,7 +613,6 @@ ND	bool lockrecord(in filename, io file, in keyx) const;
 class PUBLIC ExoStop     {public:explicit ExoStop    (in var1 = ""); var message;};
 class PUBLIC ExoAbort    {public:explicit ExoAbort   (in var1 = ""); var message;};
 class PUBLIC ExoAbortAll {public:explicit ExoAbortAll(in var1 = ""); var message;};
-//class PUBLIC ExoLogoff   {public:explicit ExoLogoff  (in var1 = ""); var message;};
 
 // clang-format on
 

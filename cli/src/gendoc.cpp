@@ -37,11 +37,96 @@ var tableno = 0;
 // Default to current dir for example code output dir
 var codefile_dir = "";
 
+var all_code_matches = "";
+var all_code_matches_ptr = 1;
+let code_match_delim1 = "\n//``````\n";
+let code_match_delim2 = "``````";
+// For style switcher
+let style_switcher_class = "light";
+
 func main() {
 
 	if (not COMMAND.count(FM)) {
 		abort(syntax);
 	}
+
+	if (html) {
+
+		// Pass 1 to collect and syntax highlight c++ code examples
+		main2(true);
+
+		// pygmentize cpp syntax highlighting
+		{
+
+			// Lambda converter will be used twice
+			auto converter = [this](in cpp_in, out html_out) -> bool {
+
+				// TODO enforce stdin stdout and stderr to be independent vars.
+				var errors, exit_status;
+
+				// Requires cd ~/exodus/pygment && ./install.sh
+				let lexer = "exoduscpp";
+				// pygmentize -l exoduscpp -f html -O full,style=colorful -o test.html test.cpp -v"
+
+				// osprocess
+				if (not var::osprocess(
+					"pygmentize -l " ^ lexer ^ " -f html",
+					/*in*/ cpp_in,
+					/*out*/ html_out, errors, exit_status)
+				)
+					abort(lasterror() ^ " " ^ errors);
+
+				// Remove the first two tags
+				// <div class="highlight"><pre>
+				html_out.cutter(html_out.indexn(">", 2));
+
+				// Also this
+				if (html_out.starts("<span></span>"))
+					html_out.cutter(13);
+
+				// Remove the last two tags
+				// </pre></div>
+				html_out.fieldstorer("<", -2, -2, "");
+				html_out.popper();
+
+				return true;
+			};
+
+			// 1. Convert all the code matches to html
+			var converted_code_matches;
+			converter(all_code_matches, converted_code_matches);
+
+			// 2. Work out how it converted the code match separator so we can undo it
+			var converted_code_match_delim1;
+			converter(code_match_delim1, converted_code_match_delim1);
+
+			// All code matches becomes the html converted version
+			all_code_matches = converted_code_matches.replace(converted_code_match_delim1, code_match_delim2);
+
+		}
+
+		{
+			// Optionally get pygmentize css
+			// We have out own style embedded.
+			if (false) {
+				var errors, exit_status;
+				if (not var::osprocess("pygmentize -S default -f html", "", css_cpp_style, errors, exit_status))
+					abort(lasterror());
+				css_cpp_style.prefixer("<style>\n");
+				css_cpp_style.appender("</style>\n");
+			}
+
+		}
+
+	}
+
+	// Pass 2
+	main2(false);
+
+	stop();
+}
+
+func main2(in pass1) {
 
 	var docfilename = ostempfile();
 
@@ -428,9 +513,9 @@ func main() {
 				}
 
 				// regex between pairs of backticks
-				static rex backquoted {R"__(`([^`]*)`)__"};
+				static rex backquoted_rex {R"__(`([^`]*)`)__"};
 
-				var codematches = comments.match(backquoted);
+				var codematches = comments.match(backquoted_rex);
 
 				// Replace space formatting with single space
 				codematches.replacer("\u22c5+"_rex, " "); // "⋅" Unicode operator point operator -> space
@@ -440,6 +525,16 @@ func main() {
 ////////////////
 				for (var codematch : codematches) {
 					codematch = codematch.f(1, 2);
+
+					// Just accumulate code matches in pass1
+					if (pass1) {
+						// First line indented 1 char by the the back tick
+						if (not codematch.starts(" "))
+							codematch.replacer("\n ", "\n");
+						all_code_matches ^= codematch ^ code_match_delim1;
+						continue;
+					}
+
 					// ... becomes proper code
 					let aborting = " abort(\"" ^ funcname ^ ": \" ^ lasterror());";
 					codematch.replacer(") ... ok", ") {/" "*ok*" "/} else " ^ aborting);
@@ -535,11 +630,27 @@ func main() {
 					codematch.replacer(rex(R"__([\t ]*\n)__"), "\n");
 
 					codefile << codematch;
+//					var codematch2, errors, exit_status;
+//TRACE("PYGMENTIZE")
+//TIMESTAMP=ostimestamp();
+//					if (not var::osprocess("pygmentize -f html", codematch, codematch2, errors, exit_status)) {
+//						loglasterror();
+//						codematch2 = codematch;
+//					}
+//TRACE(elapsedtimetext())
+//TRACE(codematch2)
+//static var codematches = "xyz";
+//codematches << codematch;
+//					codefile << codematch2;
 
 					if (uses_format) {
 						codefile << "#endif\n";
 					}
-				}
+				} // next codematch
+
+				// We only need to collect code matches in pass1
+				if (pass1)
+					continue; // nextline
 
 				// Remove one leading space (should only be from code)
 				comments.replacer("\n ", "\n");
@@ -554,17 +665,38 @@ func main() {
 					// .RE REturn (left shift)
 					// .fi formatting
 					// Prefix by a section title "Example:"
-					comments.replacer(backquoted, "\nExample:\n.RS\n.nf\n$1\n.fi\n.RE\n");
+					comments.replacer(backquoted_rex, "\nExample:\n.RS\n.nf\n$1\n.fi\n.RE\n");
 				}
 				else if (wiki)
-					comments.replacer(backquoted, "<syntaxhighlight lang=\"c++\">\n$1</syntaxhighlight>");
-				else
+					comments.replacer(backquoted_rex, "<syntaxhighlight lang=\"c++\">\n$1</syntaxhighlight>");
+				else {
+
 //					// Javascript instead of cpp because it gives better highlighting for exodus c++. See above too.
 //					// (All function calls are highlighted)
-//					comments.replacer(backquoted, "\n<pre><code class='hljs-ncdecl language-javascript'>$1</code></pre>\n");
-//					comments.replacer(backquoted, "\n<pre><code class='language-cpp'>$1</code></pre>\n");
-					comments.replacer(backquoted, "\n<textarea class=code-block>$1</textarea>\n");
+//					comments.replacer(backquoted_rex, "\n<pre><code class='hljs-ncdecl language-javascript'>$1</code></pre>\n");
+//					comments.replacer(backquoted_rex, "\n<pre><code class='language-cpp'>$1</code></pre>\n");
+//					comments.replacer(backquoted_rex, "\n<textarea class=code-block>$1</textarea>\n");
 
+					// Use a lambda that consumes all_code_matches sequentially using a pointer into all_code_matches
+					comments.replacer(
+						backquoted_rex,
+						[this](in /*codeblock*/) {
+//TRACE(all_code_matches_ptr)
+							let end_charn = all_code_matches.index(code_match_delim2, all_code_matches_ptr);
+							let code_match_len = end_charn ? end_charn - all_code_matches_ptr : all_code_matches.len();
+							let code_match = all_code_matches.substr(all_code_matches_ptr, code_match_len);
+							all_code_matches_ptr += code_match_len + code_match_delim2.len();
+//TRACE(codeblock)
+//TRACE(all_code_matches_ptr)
+//TRACE(end_charn)
+//TRACE(code_match_len)
+//TRACE(code_match)
+//input();
+							return "<div class=\"highlight " ^ style_switcher_class ^ "\"><pre>" ^ code_match ^ "</pre></div>";
+						}
+					);
+
+				}
 				// Ordinary spaces for aligning code in html and wiki
 				if (not man)
 					comments.replacer("\u22c5", " "); // "⋅" Unicode operator point operator -> " "
@@ -1071,6 +1203,9 @@ func main() {
 // exit
 ///////
 
+	if (pass1)
+		return 0;
+
 	// Prefix multifile contents
 	if (html) {
 
@@ -1082,17 +1217,20 @@ func main() {
 			"<head>\n";
 	//					"  <title>" ^ page_title ^ "</title>"
 
-		// c++ syntax highlighter - highlight.js
-		doc_text ^= syntax_hljs_top;
-		doc_text ^= "\n";
-
 		// css and script
 		doc_text ^= css;
 		doc_text ^= "\n";
 
+		// css for cpp syntax
+		doc_text ^= css_cpp_style;
+
+//		doc_text ^= style_switcher_head;
+
 		doc_text ^=
 			"</head>\n"
-			"<body>\n";
+			"<body class=\"" ^ style_switcher_class ^ "\">\n";
+
+//		doc_text ^= style_switcher_dropdown;
 
 		if (all_contents) {
 
@@ -1126,6 +1264,8 @@ func main() {
 		syntax_hljs_bottom.replacer("EXODUS_KEYWORDS", exodus_keywords);
 
 		printx(syntax_hljs_bottom);
+
+//		printx(style_switcher_foot);
 
 		// Finalise the html
 		printl(
@@ -1187,7 +1327,7 @@ func main() {
 
 	return 0;
 
-} // main
+} // main2
 
 ////////////
 // syntax_js
@@ -1195,124 +1335,12 @@ func main() {
 
 	let syntax_hljs_top =
 
-R"__(<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.17/codemirror.min.css">
-    <style>
-        .CodeMirror {
-            height: auto;
-            background: #ffffff;
-            color: #000000;
-            padding: 0.5em;
-            border: 1px solid #ddd;
-            margin-bottom: 1em;
-        }
-        .cm-keyword {
-            color: #008000;
-            font-weight: bold;
-        }
-        .cm-string {
-            color: #a31515;
-        }
-        .cm-number {
-            color: #0000ff;
-        }
-        .cm-comment {
-            color: #008080;
-        }
-        .cm-variable {
-            color: #000000;
-        }
-        .cm-type {
-            color: #2b91af;
-            font-weight: bold;
-        }
-        .cm-function {
-            color: #795e26;
-            font-weight: bold;
-        }
-    </style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.17/codemirror.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.17/mode/clike/clike.min.js"></script>
+R"__(
 )__";
 
 	var syntax_hljs_bottom =
 
-R"__(<script>
-        // Define a custom CodeMirror mode for C++ with your extensions
-        CodeMirror.defineMode('customcpp', function(config, parserConfig) {
-            const cppMode = CodeMirror.getMode(config, 'text/x-c++src');
-
-            return {
-                startState: function() {
-                    return {
-                        base: cppMode.startState(),
-                        inMemberFunction: false // Track if we're in a member function (e.g., conn.connect)
-                    };
-                },
-                token: function(stream, state) {
-                    // Handle member functions (e.g., conn.connect)
-                    if (!state.inMemberFunction && stream.match(/\b[a-zA-Z_][a-zA-Z0-9_]*\s*\.\s*(connect|disconnect)\b/)) {
-                        state.inMemberFunction = true;
-                        return 'function';
-                    }
-                    if (state.inMemberFunction) {
-                        if (stream.match(/\(/)) {
-                            state.inMemberFunction = false; // Reset after the function call starts
-                        }
-                        return null; // Skip tokens until we reset
-                    }
-
-                    // Match classes/types (e.g., var, let, dim)
-                    if (stream.match(/\b(var|let|dim)\b/)) {
-                        return 'type';
-                    }
-
-                    // Match free functions (e.g., note, call, func)
-                    if (stream.match(/\b(note|call|func)\b/)) {
-                        // Peek ahead to see if it's followed by a '('
-                        const next = stream.peek();
-                        if (next === '(') {
-                            return 'function';
-                        }
-                    }
-
-                    // Match standard C++ keywords (e.g., if, not)
-                    if (stream.match(/\b(if|not|else|for|while|do|switch|case|break|continue|return|goto|try|catch|throw|new|delete|sizeof|typeof|typeid|alignas|alignof|constexpr|decltype|noexcept|static_assert|thread_local)\b/)) {
-                        return 'keyword';
-                    }
-
-                    // Match 'read' and 'client' as functions and variables
-                    if (stream.match(/\b(read|client)\b/)) {
-                        const next = stream.peek();
-                        if (next === '(') {
-                            return 'function';
-                        }
-                        return 'variable';
-                    }
-
-                    // Delegate to the default C++ mode for other tokens
-                    return cppMode.token(stream, state.base);
-                },
-                copyState: function(state) {
-                    return {
-                        base: CodeMirror.copyState(cppMode, state.base),
-                        inMemberFunction: state.inMemberFunction
-                    };
-                }
-            };
-        });
-
-        // Initialize CodeMirror for all code blocks
-        document.addEventListener('DOMContentLoaded', function() {
-            const textareas = document.querySelectorAll('.code-block');
-            textareas.forEach(textarea => {
-                CodeMirror.fromTextArea(textarea, {
-                    mode: 'customcpp',
-                    lineNumbers: false, // Disable line numbers
-                    readOnly: true
-                });
-            });
-        });
-    </script>
+R"__(
 )__";
 
 //////
@@ -1479,5 +1507,313 @@ p {
 
 </style>
 )__";
+
+var css_cpp_style =
+
+R"__(<style>
+pre { line-height: 125%; }
+td.linenos .normal { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+span.linenos { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
+td.linenos .special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
+
+
+
+
+
+
+/* Highlight and Error */
+:root {
+  --highlight-bg-color: #ffffcc;
+  --error-border-color: #FF0000;
+  --highlight-font-weight: normal;
+  --highlight-font-style: normal;
+  --master-bold: bold; /*var(--master-bold)*/
+  --master-italic: normal; /*var(--master-italic)*/
+}
+.hll { background-color: var(--highlight-bg-color); font-weight: var(--highlight-font-weight); font-style: var(--highlight-font-style); }
+.err { border: 1px solid var(--error-border-color); font-weight: var(--highlight-font-weight); font-style: var(--highlight-font-style); } /* Error */
+
+/* Comments */
+:root {
+  --comment-main-color: #3D7B7B;
+  --comment-preproc-color: #9C6500;
+  --comment-font-weight: var(--master-bold);
+  --comment-font-style: var(--master-italic);
+}
+.c   { color: var(--comment-main-color); font-weight: var(--comment-font-weight); font-style: var(--comment-font-style); } /* Comment */
+.ch  { color: var(--comment-main-color); font-weight: var(--comment-font-weight); font-style: var(--comment-font-style); } /* Comment.Hashbang */
+.cm  { color: var(--comment-main-color); font-weight: var(--comment-font-weight); font-style: var(--comment-font-style); } /* Comment.Multiline */
+.cp  { color: var(--comment-preproc-color); font-weight: var(--comment-font-weight); font-style: var(--comment-font-style); } /* Comment.Preproc */
+.cpf { color: var(--comment-main-color); font-weight: var(--comment-font-weight); font-style: var(--comment-font-style); } /* Comment.PreprocFile */
+.c1  { color: var(--comment-main-color); font-weight: var(--comment-font-weight); font-style: var(--comment-font-style); } /* Comment.Single */
+.cs  { color: var(--comment-main-color); font-weight: var(--comment-font-weight); font-style: var(--comment-font-style); } /* Comment.Special */
+
+/* Keywords */
+:root {
+  --keyword-main-color: #008000; /*green*/
+  --keyword-type-color: #B00040; /*reddish*/
+  --keyword-flow-color: #FF5722; /*orange*/
+  --keyword-cnst-color: #FF0000; /*red*/
+  --keyword-font-weight: var(--master-bold);
+  --keyword-font-style: normal;
+}
+.k   { color: var(--keyword-main-color); font-weight: var(--keyword-font-weight); font-style: var(--keyword-font-style); } /* Keyword */
+.kc  { color: var(--keyword-cnst-color); font-weight: var(--keyword-font-weight); font-style: var(--keyword-font-style); } /* Keyword.Constant */
+
+/* used in exodus_cpp.py EXTRA_DECLARATIONS 'func', 'subr', 'function', 'subroutine' */
+.kd  { color: var(--keyword-main-color); font-weight: var(--keyword-font-weight); font-style: var(--keyword-font-style); } /*Keyword.Declaration*/
+
+.kn  { color: var(--keyword-main-color); font-weight: var(--keyword-font-weight); font-style: var(--keyword-font-style); } /* Keyword.Namespace */
+.kp  { color: var(--keyword-main-color); font-weight: var(--keyword-font-weight); font-style: var(--keyword-font-style); } /* Keyword.Pseudo */
+
+/* used in exodus_cpp.py EXTRA_FLOW_CONTROL 'stop', 'abort', 'abortall', 'call', 'gosub' */
+.kr  { color: var(--keyword-flow-color); font-weight: var(--keyword-font-weight); font-style: var(--keyword-font-style); } /* Keyword.Reserved */
+
+/* used in exodus_cpp.py EXTRA_TYPES 'dim', 'var', '_var', 'rex', '_rex', 'let', 'in', 'out', 'io', 'qqqqqqq'
+								        'programexit', 'programinit',
+								        'libraryinit', 'libraryexit',
+								         'commoninit', 'commonexit',
+								        'dictinit', 'dictexit'*/
+.kt  { color: var(--keyword-type-color); font-weight: var(--keyword-font-weight); font-style: var(--keyword-font-style); } /* Keyword.Type */
+
+/* Operators */
+:root {
+  --operator-main-color: #666666;
+  --operator-word-color: #AA22FF;
+  --operator-font-weight: var(--master-bold);
+  --operator-font-style: normal;
+}
+.o   { color: var(--operator-main-color); font-weight: var(--operator-font-weight); font-style: var(--operator-font-style); } /* Operator */
+.ow  { color: var(--operator-word-color); font-weight: var(--operator-font-weight); font-style: var(--operator-font-style); } /* Operator.Word */
+
+/* Literals */
+:root {
+  --literal-color: #0000FF;                     /* Unified color (using original string main color as default) */
+  --literal-font-weight: var(--master-bold);    /* Unified weight (defaulting to normal) */
+  --literal-font-style: var(--master-italic);   /* Unified style (defaulting to normal) */
+}
+.m   { color: var(--literal-color); font-weight: var(--literal-font-weight); font-style: var(--literal-font-style); } /* Literal.Number */
+.mb  { color: var(--literal-color); font-weight: var(--literal-font-weight); font-style: var(--literal-font-style); } /* Literal.Number.Bin */
+.mf  { color: var(--literal-color); font-weight: var(--literal-font-weight); font-style: var(--literal-font-style); } /* Literal.Number.Float */
+.mh  { color: var(--literal-color); font-weight: var(--literal-font-weight); font-style: var(--literal-font-style); } /* Literal.Number.Hex */
+.mi  { color: var(--literal-color); font-weight: var(--literal-font-weight); font-style: var(--literal-font-style); } /* Literal.Number.Integer */
+.mo  { color: var(--literal-color); font-weight: var(--literal-font-weight); font-style: var(--literal-font-style); } /* Literal.Number.Oct */
+.il  { color: var(--literal-color); font-weight: var(--literal-font-weight); font-style: var(--literal-font-style); } /* Literal.Number.Integer.Long */
+.nb  { color: var(--literal-color); font-weight: var(--literal-font-weight); font-style: var(--literal-font-style); } /* Name.Builtin (Really Literal.Number.Boolean?) */
+.s   { color: var(--literal-color); font-weight: var(--literal-font-weight); font-style: var(--literal-font-style); } /* Literal.String */
+.sa  { color: var(--literal-color); font-weight: var(--literal-font-weight); font-style: var(--literal-font-style); } /* Literal.String.Affix */
+.sb  { color: var(--literal-color); font-weight: var(--literal-font-weight); font-style: var(--literal-font-style); } /* Literal.String.Backtick */
+.sc  { color: var(--literal-color); font-weight: var(--literal-font-weight); font-style: var(--literal-font-style); } /* Literal.String.Char */
+.dl  { color: var(--literal-color); font-weight: var(--literal-font-weight); font-style: var(--literal-font-style); } /* Literal.String.Delimiter */
+.sd  { color: var(--literal-color); font-weight: var(--literal-font-weight); font-style: var(--literal-font-style); } /* Literal.String.Doc */
+.s2  { color: var(--literal-color); font-weight: var(--literal-font-weight); font-style: var(--literal-font-style); } /* Literal.String.Double */
+.se  { color: var(--literal-color); font-weight: var(--literal-font-weight); font-style: var(--literal-font-style); } /* Literal.String.Escape */
+.sh  { color: var(--literal-color); font-weight: var(--literal-font-weight); font-style: var(--literal-font-style); } /* Literal.String.Heredoc */
+.si  { color: var(--literal-color); font-weight: var(--literal-font-weight); font-style: var(--literal-font-style); } /* Literal.String.Interpol */
+.sx  { color: var(--literal-color); font-weight: var(--literal-font-weight); font-style: var(--literal-font-style); } /* Literal.String.Other */
+.sr  { color: var(--literal-color); font-weight: var(--literal-font-weight); font-style: var(--literal-font-style); } /* Literal.String.Regex */
+.s1  { color: var(--literal-color); font-weight: var(--literal-font-weight); font-style: var(--literal-font-style); } /* Literal.String.Single */
+.ss  { color: var(--literal-color); font-weight: var(--literal-font-weight); font-style: var(--literal-font-style); } /* Literal.String.Symbol */
+
+/* Unidentified Names - Perhaps the most important part of a program strangely unhighlighted by pygmentize default style.*/
+:root {
+  --unidentified-color: #000000;
+  --unidentified-font-weight: var(--master-bold);
+  --unidentified-font-style: normal;
+}
+.n   { color: var(--unidentified-color); font-weight: var(--unidentified-font-weight); font-style: var(--unidentified-font-style); } /* Unidentified */
+
+/* Names */
+:root {
+  --name-attribute-color: #687822;
+  --name-builtin-color: #008000;
+  --name-class-color: #B00040; /* same as .kt keyword type color to be like types*/
+  --name-constant-color: #880000;
+  --name-decorator-color: #AA22FF;
+  --name-entity-color: #717171;
+  --name-exception-color: #CB3F38;
+  --name-label-color: #767600;
+  --name-tag-color: #008000;
+  --name-variable-color: #19177C;
+  --name-font-weight: var(--master-bold);
+  --name-font-style: normal;
+}
+.na  { color: var(--name-attribute-color); font-weight: var(--name-font-weight); font-style: var(--name-font-style); } /* Name.Attribute */
+.nc  { color: var(--name-class-color); font-weight: var(--name-font-weight); font-style: var(--name-font-style); } /* Name.Class */
+.no  { color: var(--name-constant-color); font-weight: var(--name-font-weight); font-style: var(--name-font-style); } /* Name.Constant */
+.nd  { color: var(--name-decorator-color); font-weight: var(--name-font-weight); font-style: var(--name-font-style); } /* Name.Decorator */
+.ni  { color: var(--name-entity-color); font-weight: var(--name-font-weight); font-style: var(--name-font-style); } /* Name.Entity */
+.ne  { color: var(--name-exception-color); font-weight: var(--name-font-weight); font-style: var(--name-font-style); } /* Name.Exception */
+
+/* used in exodus_cpp.py EXTRAC_FUNCTIONS massive list*/
+.nf  { color: var(--name-class-color); font-weight: var(--name-font-weight); font-style: var(--name-font-style); } /* Name.Function */
+
+.nl  { color: var(--name-label-color); font-weight: var(--name-font-weight); font-style: var(--name-font-style); } /* Name.Label */
+.nn  { color: var(--name-class-color); font-weight: var(--name-font-weight); font-style: var(--name-font-style); } /* Name.Namespace */
+.nt  { color: var(--name-tag-color); font-weight: var(--name-font-weight); font-style: var(--name-font-style); } /* Name.Tag */
+.nv  { color: var(--name-variable-color); font-weight: var(--name-font-weight); font-style: var(--name-font-style); } /* Name.Variable */
+.bp  { color: var(--name-builtin-color); font-weight: var(--name-font-weight); font-style: var(--name-font-style); } /* Name.Builtin.Pseudo */
+.fm  { color: var(--name-class-color); font-weight: var(--name-font-weight); font-style: var(--name-font-style); } /* Name.Function.Magic */
+.vc  { color: var(--name-variable-color); font-weight: var(--name-font-weight); font-style: var(--name-font-style); } /* Name.Variable.Class */
+.vg  { color: var(--name-variable-color); font-weight: var(--name-font-weight); font-style: var(--name-font-style); } /* Name.Variable.Global */
+.vi  { color: var(--name-variable-color); font-weight: var(--name-font-weight); font-style: var(--name-font-style); } /* Name.Variable.Instance */
+.vm  { color: var(--name-variable-color); font-weight: var(--name-font-weight); font-style: var(--name-font-style); } /* Name.Variable.Magic */
+
+/* Generic */
+:root {
+  --generic-deleted-color: #A00000;
+  --generic-error-color: #E40000;
+  --generic-heading-color: #000080;
+  --generic-inserted-color: #008400;
+  --generic-output-color: #717171;
+  --generic-subheading-color: #800080;
+  --generic-traceback-color: #0044DD;
+  --generic-font-weight: var(--master-bold);
+  --generic-font-style: italic;
+}
+.gd  { color: var(--generic-deleted-color); font-weight: var(--generic-font-weight); font-style: var(--generic-font-style); } /* Generic.Deleted */
+.ge  { font-weight: var(--generic-font-weight); font-style: var(--generic-font-style); } /* Generic.Emph */
+.ges { font-weight: var(--generic-font-weight); font-style: var(--generic-font-style); } /* Generic.EmphStrong */
+.gr  { color: var(--generic-error-color); font-weight: var(--generic-font-weight); font-style: var(--generic-font-style); } /* Generic.Error */
+.gh  { color: var(--generic-heading-color); font-weight: var(--generic-font-weight); font-style: var(--generic-font-style); } /* Generic.Heading */
+.gi  { color: var(--generic-inserted-color); font-weight: var(--generic-font-weight); font-style: var(--generic-font-style); } /* Generic.Inserted */
+.go  { color: var(--generic-output-color); font-weight: var(--generic-font-weight); font-style: var(--generic-font-style); } /* Generic.Output */
+.gp  { color: var(--generic-heading-color); font-weight: var(--generic-font-weight); font-style: var(--generic-font-style); } /* Generic.Prompt */
+.gs  { font-weight: var(--generic-font-weight); font-style: var(--generic-font-style); } /* Generic.Strong */
+.gu  { color: var(--generic-subheading-color); font-weight: var(--generic-font-weight); font-style: var(--generic-font-style); } /* Generic.Subheading */
+.gt  { color: var(--generic-traceback-color); font-weight: var(--generic-font-weight); font-style: var(--generic-font-style); } /* Generic.Traceback */
+
+/* Whitespace */
+:root {
+  --whitespace-color: #bbbbbb;
+  --text-font-weight: normal;
+  --text-font-style: normal;
+}
+.w   { color: var(--whitespace-color); font-weight: var(--text-font-weight); font-style: var(--text-font-style); } /* Text.Whitespace */
+
+
+
+
+
+
+
+
+
+
+</style>
+)__";
+
+let style_switcher_head = R"__(
+    <style>
+		#style-select {
+            position: fixed; /* Keeps it in place while scrolling */
+            top: 10px;      /* Distance from the top */
+            right: 10px;    /* Distance from the right */
+            z-index: 1000;  /* Ensures it stays on top of other content */
+		}
+
+        .highlight { 
+            padding: 15px; 
+            border: 1px solid #ddd; 
+            border-radius: 4px; 
+        }
+        .highlight pre {
+            margin: 0;
+        }
+        body.light {
+            background: #f8f8f8;
+            color: #333;
+        }
+        body.dark {
+            background: #1e1e1e;
+            color: #ddd;
+        }
+        /* Default light and dark fallbacks */
+        .highlight.light {
+            background: #ffffff;
+            border-color: #ccc;
+        }
+        .highlight.dark {
+            background: #2d2d2d;
+            border-color: #555;
+        }
+    </style>
+    <link id="pygments-style" rel="stylesheet" href="">
+)__";
+
+let style_switcher_dropdown = R"__(
+	<select id="style-select">
+        <option value="default" data-theme="light">default</option>
+        <option value="autumn" data-theme="light">autumn</option>
+        <option value="borland" data-theme="light">borland</option>
+        <option value="bw" data-theme="light">bw</option>
+        <option value="colorful" data-theme="light">colorful</option>
+        <option value="emacs" data-theme="light">emacs</option>
+        <option value="friendly" data-theme="light">friendly</option>
+        <option value="manni" data-theme="light">manni</option>
+        <option value="murphy" data-theme="light">murphy</option>
+        <option value="pastie" data-theme="light">pastie</option>
+        <option value="perldoc" data-theme="light">perldoc</option>
+        <option value="solarized-light" data-theme="light">solarized-light</option>
+        <option value="tango" data-theme="light">tango</option>
+        <option value="vs" data-theme="light">vs</option>
+
+        <option value="fruity" data-theme="dark">fruity</option>
+        <option value="monokai" data-theme="dark">monokai</option>
+        <option value="native" data-theme="dark">native</option>
+        <option value="solarized-dark" data-theme="dark">solarized-dark</option>
+        <option value="vim" data-theme="dark">vim</option>
+    </select>
+)__";
+
+let style_switcher_foot = R"__(
+	<script>
+        function setCookie(name, value, days) {
+            const date = new Date();
+            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+            const expires = "expires=" + date.toUTCString();
+            document.cookie = name + "=" + value + ";" + expires + ";path=/";
+        }
+
+        function getCookie(name) {
+            const nameEQ = name + "=";
+            const ca = document.cookie.split(';');
+            for(let i = 0; i < ca.length; i++) {
+                let c = ca[i];
+                while (c.charAt(0) == ' ') c = c.substring(1);
+                if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length);
+            }
+            return null;
+        }
+
+        function loadStyle(styleName, theme) {
+            const styleLink = document.getElementById('pygments-style');
+            styleLink.href = `https://cdn.jsdelivr.net/gh/richleland/pygments-css@master/${styleName}.css`;
+            document.body.className = theme;
+            document.querySelector('.highlight').className = `highlight ${theme} ${styleName}`;
+            setCookie('selectedStyle', styleName, 365);
+            setCookie('selectedTheme', theme, 365);
+        }
+
+        const select = document.getElementById('style-select');
+        const savedStyle = getCookie('selectedStyle');
+        const savedTheme = getCookie('selectedTheme');
+
+        if (savedStyle && savedTheme) {
+            select.value = savedStyle;
+            loadStyle(savedStyle, savedTheme);
+        } else {
+            loadStyle('default', 'light');
+        }
+
+        select.addEventListener('change', function(e) {
+            const selectedOption = e.target.selectedOptions[0];
+            const theme = selectedOption.getAttribute('data-theme');
+            loadStyle(e.target.value, theme);
+        });
+    </script>
+)__";
+
 
 programexit()

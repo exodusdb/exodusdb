@@ -254,11 +254,7 @@ ND PUBLIC var  cut(   in instring, const int length) {return instring.cut(length
 ND PUBLIC var  paste( in instring, const int pos1, const int length, in str) {return instring.paste(pos1, length, str);}
    PUBLIC IO   paster(io iostring, const int pos1, const int length, in str) {iostring.paster(pos1, length, str); return IOSTRING;}
 
-//// 2. paste over to end
-//PUBLIC io   pasterall(io iostring, const int pos1, in str);
-//ND PUBLIC var  pasteall(in instring, const int pos1, in str);
-
-// 3. paste insert at pos1
+// 2. paste insert at pos1
 ND PUBLIC var  paste( in instring, const int pos1, in str) {return instring.paste(pos1, str);}
    PUBLIC IO   paster(io iostring, const int pos1, in str) {iostring.paster(pos1, str); return IOSTRING;}
 

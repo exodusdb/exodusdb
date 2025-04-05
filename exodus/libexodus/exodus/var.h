@@ -767,9 +767,9 @@ public:
 	// substr: The string to search for.
 	// Returns: char position (1 based) or 0 if not present.
 	//
-	// `let v1 = "abcabc"_var.index("bc", 2); // 2
+	// `let v1 = "abcabc"_var.indexn("bc", 2); // 5
 	//  // or
-	//  let v2 = index("abcabc", "bc", 2);`
+	//  let v2 = indexn("abcabc", "bc", 2);`
 	//
 	ND var  indexn(SV substr, const int occurrence) const;
 
@@ -4053,6 +4053,7 @@ public:
 	// Convert standard text format to dynamic array.
 	// Reverse of oconv("TX") above.
 	// obj is strvar
+	//
 	ND var  iconv_TX(const char* conversion) const;
 
 	/////////////////////

@@ -369,9 +369,9 @@ func main() {
 
 	printl("indexn(SV substr, const int occurrence) const;");
 	{
-				let v1 = "abcabc"_var.index("bc", 2); assert(v1 == 2);
+				let v1 = "abcabc"_var.indexn("bc", 2); assert(v1 == 5);
 		// or
-		let v2 = index("abcabc", "bc", 2);
+		let v2 = indexn("abcabc", "bc", 2);
 	}
 
 	printl("indexr(SV substr, const int startchar1 = -1) const;");
@@ -1504,7 +1504,7 @@ func main() {
 
 	printl("operator<<(const auto& value) const");
 	{
-		let vout = "std_iomanip_overview.txt";
+		let vout = "t_std_iomanip_overview.txt";
 		if (not osremove(vout)) {}
 		using namespace std;
 		vout << boolalpha    << true          << "\ttrue"    << endl;
@@ -2176,8 +2176,8 @@ func main() {
 
 	printl("dim(const dim& rhs);");
 	{
-		 dim d1 = {2, 4, 6, 8};
-		 dim d2 = d1;
+		dim d1 = {2, 4, 6, 8};
+		dim d2 = d1;
 	}
 
 	printl("dim(dim&& rhs) noexcept : base(std::move(rhs)), ncols_(rhs.ncols_)");

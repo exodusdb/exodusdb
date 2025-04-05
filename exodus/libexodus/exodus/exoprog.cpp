@@ -2609,12 +2609,10 @@ var ExoProgram::amountunit(in input0, out unitx) {
 ExoStop     ::ExoStop(in errmsg)     : message(errmsg) {}
 ExoAbort    ::ExoAbort(in errmsg)    : message(errmsg) {}
 ExoAbortAll ::ExoAbortAll(in errmsg) : message(errmsg) {}
-//ExoLogoff   ::ExoLogoff(in errmsg)   : message(errmsg) {}
 
 [[noreturn]] void ExoProgram::stop(in errmsg)     const {throw ExoStop(errmsg);}
 [[noreturn]] void ExoProgram::abort(in errmsg)    const {throw ExoAbort(errmsg);}
 [[noreturn]] void ExoProgram::abortall(in errmsg) const {throw ExoAbortAll(errmsg);}
-//[[noreturn]] void ExoProgram::logoff(in errmsg)   const {throw ExoLogoff(errmsg);}
 
 // clang-format on
 

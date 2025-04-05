@@ -344,11 +344,7 @@ ND var  cut(in instring, const int length);
 ND var  paste(in instring, const int pos1, const int length, in str);
    IO   paster(io iostring, const int pos1, const int length, in str);
 
-//// 2. paste over to end
-//IO pasterall(io iostring, const int pos1, in str);
-//ND var pasteall(in instring, const int pos1, in str);
-
-// 3. paste insert at pos1
+// 2. paste insert at pos1
 ND var  paste(in instring, const int pos1, in str);
    IO   paster(io iostring, const int pos1, in str);
 
