@@ -158,9 +158,12 @@ OPTIONS
 	P	= C++ preprocessor output only, PP = cleanup, PPP reformat (and reindent if 'indent' is installed).
 	X	= Skip compilation
 	L	= Clean (remove) object and header files that compile installed.
-	i	= Inline code
-			compile 'oconv("date()", "D")' {i}                        // Simple expression. NO semicolon."
-			compile 'write("f1^f2"_var on "definitions", "abc");' {i} // Raw source code.   MANDATORY semicolon(s).
+	i	= Inline code                                               // If it looks like code, i is optional.
+			compile 'oconv(date(), "D")'                            // Simple expression. NO semicolon.
+			compile 'var v1 = date();oswrite(v1 on "t_test.txt");'  // Full code with mandatory semicolon(s).
+	b	= Benchmark code. b for 10 test iterations, bb for 100 etc. // As for option i.
+	B   = Benchmark code. B for 10 repeats, BB for 100 etc.
+			compile 'oconv(date(), "D")' {bbbB}                     // 1000 ops x 10 reps ->  1. 1,000 ops in 1.034 ms. 1.034 μs/op '09 APR 2025'
 ENVIRONMENT
 	EXO_COMPILE_OPTIONS As above
 	CXX_OPTIONS         Depends on c++ compiler used
@@ -2337,6 +2340,9 @@ func is_newer(in new_file_info, in old_file_info) {
 
 func oneline_compile() {
 
+	let benchmark = OPTIONS.count("b");
+	let nrepeats = OPTIONS.count("B");
+
 //	var source = SENTENCE.fieldstore(" ", 1, -1, "");
 	var source = COMMAND.remove(1).convert(FM, " ");
 
@@ -2353,7 +2359,27 @@ e.g.
 	// source ending with a ; is assumed to be one or more commands which dont return a value
 	// and is compiled as is, otherwise wrap in TRACE() to display the output
 	let source_is_expression = not source.ends(";");
-	if (source_is_expression)
+	if (true or benchmark or nrepeats) {
+		if (source_is_expression)
+			source = "ANS = " ^ source ^ ";";
+		source =
+R"__(
+		var nreps = pwr(10, <nrepeats>);
+		for (var repn : range(1, nreps)) {
+			var started = ostimestamp();
+			int nops = pwr(10, <benchmark>);
+			for (auto i = 1; i <= nops; ++i) {
+				)__" ^ source ^ R"__(
+			};
+		var stopped = ostimestamp();
+		errputl(repn, ". ", oconv(nops, "MD00,"), " ops in ", elapsedtimetext(started, stopped), ". ", elapsedtimetext(0, (stopped - started) / nops), "/op", " ", ANS.squote() );
+	}
+)__";
+		source.replacer("<nrepeats>", nrepeats);
+		source.replacer("<benchmark>", benchmark);
+	}
+
+	else if (source_is_expression)
 		source = "TRACE(" ^ source ^ ")";
 
 	// Generate exodus program source code
@@ -2364,7 +2390,7 @@ e.g.
 		"func main() {\n" ^
 			source ^ "\n" ^
 			"\n"
-			"return 0;\n"
+			"\treturn 0;\n"
 		"}\n"
 		"programexit()\n";
 
