@@ -386,6 +386,7 @@ export namespace exo {
 
 	using exo::sum;
 	using exo::sumall;
+	using exo::stddev;
 
 	using exo::swap;
 	using exo::tan;

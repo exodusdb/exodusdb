@@ -1786,6 +1786,14 @@ public:
 	//
 	ND var  sumall() const;
 
+	// Calculate n, tot, min, max, tot, mean and stddev
+	//
+	// `let v1 = "-11.2^0^11.5^12^13.9^14"_var.stddev(); // "6^40.2^-11.2^14^6.7^9.32344714506"_var
+	//  // or
+	//  let v2 = stddev("-11.2^0^11.5^12^13.9^14"_var);`
+	//
+	ND var  stddev() const;
+
 	// Ditto allowing commas etc.
 	//
 	// `let v1 = "10,20,30"_var.sum(","); // 60

@@ -2949,6 +2949,24 @@ let v2 = sumall("1]2]3^4]5]6"_var);
 
 
 .SS
+var v1 = strvar.stddev();
+.nf
+ 
+.fi
+Calculate n, tot, min, max, tot, mean and stddev
+
+\fBExample:\fR
+.RS
+.nf
+let v1 = "-11.2^0^11.5^12^13.9^14"_var.stddev(); // "6^40.2^-11.2^14^6.7^9.32344714506"_var
+// or
+let v2 = stddev("-11.2^0^11.5^12^13.9^14"_var);
+.fi
+.RE
+
+
+
+.SS
 var v1 = strvar.sum(delimiter);
 .nf
  

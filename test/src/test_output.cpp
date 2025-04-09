@@ -1,7 +1,7 @@
 //#include <boost/date_time/posix_time/posix_time.hpp>
 
-#include <iostream> // for stdout/stderr
-#include <cstdio>
+//#include <iostream> // for stdout/stderr
+//#include <cstdio>
 
 #include <exodus/program.h>
 programinit()

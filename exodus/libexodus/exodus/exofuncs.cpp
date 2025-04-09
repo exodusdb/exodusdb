@@ -384,6 +384,7 @@ ND PUBLIC bool locateusing(in usingchar, in target, in instring, out setting, co
 ND PUBLIC var  sum(    in instring, SV delimiter) {return instring.sum(delimiter);}
 ND PUBLIC var  sum(    in instring) {return instring.sum();}
 ND PUBLIC var  sumall( in instring) {return instring.sumall();}
+ND PUBLIC var  stddev( in instring) {return instring.stddev();}
 
 ND PUBLIC var  hash(   in instring, const std::uint64_t modulus) {return instring.hash(modulus);}
 

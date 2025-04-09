@@ -492,6 +492,7 @@ ND bool locateusing(in usingchar, in target, in instring, out setting, const int
 ND var  sum(in instring, SV delimiter);
 ND var  sum(in instring);
 ND var  sumall(in instring);
+ND var  stddev(in instring);
 
 ND var  crop(in instring);
    IO   cropper(io iostring);

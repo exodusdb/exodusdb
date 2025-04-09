@@ -76,7 +76,7 @@ func main() {
 	println(v1, "yyy");
 	println(s1, "yyy");
 
-	printl(fmt::format("abc {} ghi", "def"));
+//	printl(fmt::format("abc {} ghi", "def"));
 
 	{
 //		C++ format code "f" rounding has a DIFFERENT rounding rule compared to exodus format code "MD"
@@ -424,7 +424,7 @@ func main() {
 
 		//format("{::0{}}",var(7),4).squote().outputl(":0{} 7 = ");  //      7
 
-		std::cout << fmt::format("{:03}",7) << " :03 7 = " << std::endl;
+//		std::cout << fmt::format("{:03}",7) << " :03 7 = " << std::endl;
 
 //		// OK - Check double width emoji
 //		assert("🐱"_var.oconv("L(.)#5").outputl() == "🐱...");

@@ -5,33 +5,18 @@ module;
 
 #include "allstd.hpp"
 
-//#include <concepts>
-//#include <string>
-//#include <vector>
-//#include <array>
-//#include <algorithm>
-//#include <mutex>
-//#include <memory>
-//#include <list>
-//#include <codecvt>
-//#include <chrono>
-//#include <thread>
-//
-//#include <map>
-//
-//#include <fstream>
-//#include <istream>
-//#include <ostream>
-//
-//#include <random>
-//
-//#include <bitset>
-//
-//#include <filesystem>
-
 export module std;
 
+// Export POSIX functions into the global namespace
+export using ::size_t;
+export using ::getpid;
+export using ::isatty;
+
 export namespace std {
+
+	using std::getline;
+	using std::stack;
+	using std::all_of;
 
 //	using std::concepts;
 

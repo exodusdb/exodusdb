@@ -2142,4 +2142,41 @@ var  var::sum(SV separator) const {
 	return nrvo;	//NRVO hopefully since single named return
 }
 
+var  var::stddev() const {
+
+	THISIS("var  var::stddev() const")
+	assertString(function_sig);
+
+	// Handle any field delimiters
+	var strvar = this->convert(_VM _SM _TM _ST _RM, _FM _FM _FM _FM _FM);
+
+	// n, tot, mean
+	int n = strvar.fcount(_FM);
+	if (not n)
+		return "";
+	double tot;
+	for (var v1 : strvar)
+		tot += v1.toDouble();
+	double mean = tot / n;
+
+	// sumsqdiff, min, max
+	double sumsqdiff = 0.0;
+	var min = 1.0e308;
+	var max = -1.0e307;
+	for (var v1 : strvar) {
+		double diff = v1 - mean;
+		sumsqdiff += diff * diff;
+		if (v1 < min)
+			min = v1;
+		if (v1 > max)
+			max = v1;
+	}
+
+	var stddev = var(sumsqdiff / n).sqrt();
+
+	var nrvo = n ^ FM ^ tot ^ FM ^ min ^ FM ^ max ^ FM ^ mean ^ FM ^ stddev;
+
+	return nrvo;
+}
+
 }  // namespace exo

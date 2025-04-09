@@ -842,6 +842,13 @@ func main() {
 		let v2 = sumall("1]2]3^4]5]6"_var);
 	}
 
+	printl("stddev() const;");
+	{
+				let v1 = "-11.2^0^11.5^12^13.9^14"_var.stddev(); assert(v1 == "6^40.2^-11.2^14^6.7^9.32344714506"_var);
+		// or
+		let v2 = stddev("-11.2^0^11.5^12^13.9^14"_var);
+	}
+
 	printl("sum(SV delimiter) const;");
 	{
 				let v1 = "10,20,30"_var.sum(","); assert(v1 == 60);
