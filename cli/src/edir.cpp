@@ -383,7 +383,7 @@ func getosfilename(in dir, in dbfilename, in fieldno, in id) {
 	var temposfilename = dbfilename ^ "~" ^ id;
 	temposfilename.lcaser();
 
-	rex convertible_chars(R"__([\"')__"
+	static rex convertible_chars(R"__([\"')__"
 	                       "\u00A3 $%^&*(){}[\\]:;#=<>?,/|]");
 	temposfilename.replacer(
 		convertible_chars,

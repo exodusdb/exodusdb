@@ -227,7 +227,7 @@ func main() {
 		std::ofstream docfile(docfilename.toString());
 
 		// Lines like "///... some text:"
-		rex doc_rex(R"__(^(/{3,})\s+(.*):$)__");
+		const static rex doc_rex(R"__(^(/{3,})\s+(.*):$)__");
 
 		auto skipping = true;
 		auto in_table = false;

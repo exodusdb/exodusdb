@@ -27,6 +27,7 @@ static std::atomic<int> atomic_ncompilation_failures;
 
 #include <exodus/program.h>
 var verbose;
+var force;
 var cleaning;
 var exo_post_compile = "";
 
@@ -69,24 +70,13 @@ programinit()
 
 func main() {
 
-	// "i" - inline source code
-	// "`~!@#$%^&*()_+-=[]\{}|;':",./<>?"
-	//	var ascii = "!\"#$%&'()*+,-./:;<=>?@[\]^_`{|}~";
-
-	// Option "i" - inline/immediate compilation
-	// or if "filename" contains non-alphanumeric chars (except . / - _ ~)
-	if (OPTIONS.contains("i") or not COMMAND.f(2).replace("[[:alnum:]]"_rex, "").convert("./-_~", "").empty()) {
-//    if (OPTIONS.contains("i") or not COMMAND.f(2).match("[^[:alnum:]]").match("[^./-_~]").empty())
-		return gosub oneline_compile();
-	}
-
 	// Get more options from environment and possibly the second word of the command
 	var options = OPTIONS ^ osgetenv("EXO_COMPILE_OPTIONS");
-	let secondword = COMMAND.f(2);
-	if (var("{(").contains(secondword.first()) && var("})").contains(secondword.last())) {
-		COMMAND.remover(2);
-		options ^= secondword;
-	}
+//	let secondword = COMMAND.f(2);
+//	if (var("{(").contains(secondword.first()) && var("})").contains(secondword.last())) {
+//		COMMAND.remover(2);
+//		options ^= secondword;
+//	}
 
 #if EXO_MODULE
 	let exo_module = EXO_MODULE;
@@ -95,8 +85,9 @@ func main() {
 #endif
 
 	// Global options
-	verbose = options.contains("V");
+	verbose = options.count("V");
 	cleaning = options.contains("L");
+	force = options.contains("F") or options.contains("P");
 
 	// Options
 	let cleaning = options.contains("L");
@@ -107,11 +98,21 @@ func main() {
 	// Also compile will recognise "export CXX_options--O0" in shell
 	let optimise = 1 + options.count("O") - options.count("o") + (!!exo_module);
 	let generateheadersonly = options.contains("h");
-	let force = options.contains("F") or options.contains("P");
 	let color_option = options.count("C") - options.count("c");
 	let warnings = options.count("W") - options.count("w");
 	let warnings_are_errors = options.count("E") - options.count("e");
 	let preprocess_only = options.count("P");
+
+	// "i" - inline source code
+	// "`~!@#$%^&*()_+-=[]\{}|;':",./<>?"
+	//	var ascii = "!\"#$%&'()*+,-./:;<=>?@[\]^_`{|}~";
+
+	// Option "i" - inline/immediate compilation
+	// or if "filename" contains non-alphanumeric chars (except . / - _ ~)
+	if (OPTIONS.contains("i") or not COMMAND.f(2).replace("[[:alnum:]]"_rex, "").convert("./-_~", "").empty()) {
+//    if (OPTIONS.contains("i") or not COMMAND.f(2).match("[^[:alnum:]]").match("[^./-_~]").empty())
+		return gosub oneline_compile();
+	}
 
 	// Skip compile for option X - allows disabling compilations unless generating headers
 	if (options.contains("X") and not options.contains("h"))
@@ -1699,6 +1700,10 @@ ENVIRONMENT
 					}
 				}
 
+				else if (filename_without_ext.starts("~")) {
+					if (verbose)
+						logputl("temp skipped.");
+				}
 				else if (oldheadertext ne newheadertext) {
 
 //					TRACE(headerfilename)
@@ -2340,10 +2345,15 @@ func is_newer(in new_file_info, in old_file_info) {
 
 func oneline_compile() {
 
-	let benchmark = OPTIONS.count("b");
-	let nrepeats = OPTIONS.count("B");
+	// log means how many zeros after 1
+	// So 0, 1, 2, 3 -> 1, 10, 100, 1000
+	let log_nreps = OPTIONS.count("B");
+	let log_nops  = OPTIONS.count("b");
 
-//	var source = SENTENCE.fieldstore(" ", 1, -1, "");
+	// Work out the actual nreps/nops
+	let act_nreps = pwr(10, log_nreps);
+	let act_nops  = pwr(10, log_nops);
+
 	var source = COMMAND.remove(1).convert(FM, " ");
 
 	if (not source)
@@ -2359,54 +2369,123 @@ e.g.
 	// source ending with a ; is assumed to be one or more commands which dont return a value
 	// and is compiled as is, otherwise wrap in TRACE() to display the output
 	let source_is_expression = not source.ends(";");
-	if (true or benchmark or nrepeats) {
-		if (source_is_expression)
-			source = "ANS = " ^ source ^ ";";
-		source =
+	if (source_is_expression)
+		source = "ANS = " ^ source ^ ";";
+	source =
+//////////////////////////////////////////////////////////////////////////
 R"__(
-		var nreps = pwr(10, <nrepeats>);
-		for (var repn : range(1, nreps)) {
-			var started = ostimestamp();
-			int nops = pwr(10, <benchmark>);
-			for (auto i = 1; i <= nops; ++i) {
-				)__" ^ source ^ R"__(
-			};
-		var stopped = ostimestamp();
-		errputl(repn, ". ", oconv(nops, "MD00,"), " ops in ", elapsedtimetext(started, stopped), ". ", elapsedtimetext(0, (stopped - started) / nops), "/op", " ", ANS.squote() );
-	}
+	var nreps = COMMAND.f(2);
+	var rep_optimes = "";
+	var opunit = "";
+	int nops = COMMAND.f(3);
+	let col0 = TERMINAL ? AT(-40) : "";
+	for (var repn : range(1, nreps)) {
+		if (esctoexit())
+			break;
+		var i; // Using var to avoid optimisation away of int
+		var framework_secs = 0;
+		{
+			if (<source_is_expression>) {
+				var started = ostime();
+				for (i = 1; i <= nops; ++i) {
+					ANS = "";
+				}
+				framework_secs = i;
+				var stopped = ostime();
+				framework_secs = stopped - started;
+				//TRACE(ANS)
+				//TRACE(started)
+				//TRACE(stopped)
+				//TRACE(framework_secs)
+			} else {
+				var started = framework_secs + ostime();
+				for (i = 1; i <= nops; ++i) {
+					// optimiser will respect this loop if i is a var)
+				}
+				framework_secs = i;
+				var stopped = ostime();
+				framework_secs = stopped - started;
+				//TRACE(framework_secs)
+			}
+		}
+		{
+			var started = ostime();
+			for (i = 1; i <= nops; ++i) {
+				)__"
+//////////////////////////////////////////////////////////////////////////
+                 ^ source ^
+//////////////////////////////////////////////////////////////////////////
+R"__(
+			}
+			var stopped = ostime();
+			var elapsed_secs = stopped - started;
+			//TRACE(elapsed_secs)
+			if (framework_secs < elapsed_secs)
+				elapsed_secs -= framework_secs;
+			//TRACE(elapsed_secs)
+			var elapsed_days = elapsed_secs / 86400;
+			var optime_text = elapsedtimetext(0, elapsed_days / nops);
+			output(col0);
+//			errput(repn, "/", nreps, ". ", oconv(nops, "MD00,"), " ops in ", elapsedtimetext(0, elapsed_days), ". ",
+//				optime_text, "/op", " ", ANS.squote() );
+
+			// Accumulate optimes for stats
+			var rep_opunit = field(optime_text, " ", 2);
+			if (opunit eq "")
+				// First opunit
+				opunit = rep_opunit;
+			if (rep_opunit eq opunit) {
+				// Only add optimes if they match the first opunit
+				rep_optimes ^= field(optime_text, " ", 1) ^ _FM;
+			}
+			var stats = rep_optimes.pop().stddev().oconv("MD30");
+//			logputl();
+			if (nreps > 1)
+				errput("Rep:" , repn, "/", oconv(nreps, "MD0,"), ". ", oconv(nops, "MD0,"), " ops/rep  min:", stats.f(3), "  max:", stats.f(4), "  avg:", stats.f(5), " ± ", stats.f(6), " ", opunit, "/op");
+			else if (nops > 1)
+				errput(oconv(nops, "MD0,"), " ops. ", stats.f(5), " ", opunit, "/op");
+			else
+				errput(stats.f(5), " ", opunit);
+			errput("  ", ANS.squote());
+			osflush();
+		}
+	} // repn
+
+	logputl();
 )__";
-		source.replacer("<nrepeats>", nrepeats);
-		source.replacer("<benchmark>", benchmark);
-	}
+//////////////////////////////////////////////////////////////////////////
 
-	else if (source_is_expression)
-		source = "TRACE(" ^ source ^ ")";
+	source.replacer("<act_nreps>", act_nreps);
+	source.replacer("<act_nops>", act_nops);
+	source.replacer("<source_is_expression>", source_is_expression);
 
-	// Generate exodus program source code
+	// Generate full exodus program source code
 	let prog =
 		"#include <exodus/program.h>\n"
 		"programinit()\n"
 		"\n"
-		"func main() {\n" ^
+		"func main() {" ^
 			source ^ "\n" ^
-			"\n"
 			"\treturn 0;\n"
 		"}\n"
 		"programexit()\n";
 
 	// Create a tmp cpp file
-	let tempfilebase = ostempfile();
+//	let tempfilebase = ostempfile();
+	let tempfilebase = ostempdir() ^ "~exo" ^ prog.hash(0xFF'FFFF).oconv("MX");
+
 //	let tempfilebase = ostempdir() ^ "~eeval";
 	let tempfilesrc	 = tempfilebase ^ ".cpp";
-	if (not oswrite(prog, tempfilesrc))
+	if (prog ne osread(tempfilesrc) and not oswrite(prog on tempfilesrc))
 		abort(lasterror());
 
 	// Compile it
-	if (not osshell("CXX_OPTIONS='-Wno-unused-result' compile " ^ tempfilesrc ^ " {SS}"))
+	let options = " {SS" ^ str("V", verbose)  ^ str("F", force) ^ "}";
+	if (not osshell("CXX_OPTIONS='-Wno-unused-result' compile " ^ tempfilesrc ^ options))
 		abort(lasterror());
 
 	// Run it
-	if (not osshell(tempfilebase.field("/", -1)))
+	if (not osshell(tempfilebase.field("/", -1) ^ " " ^ act_nreps ^ " " ^ act_nops))
 		loglasterror();
 
 	// Start a new line in case output left the cursor hanging mid line.
@@ -2414,8 +2493,8 @@ R"__(
 		printl();
 
 	// Cleanup {L} removes ~/bin and ~/inc files
-	if (not osshell("compile " ^ tempfilesrc ^ " {LSS}"))
-		loglasterror();
+	//if (not osshell("compile " ^ tempfilesrc ^ " {LSS}"))
+	//	loglasterror();
 
 	return 0;
 }
