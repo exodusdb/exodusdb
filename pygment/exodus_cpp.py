@@ -113,13 +113,59 @@ class ExodusCppLexer(CppLexer):
 
     EXTRA_KEYWORDS = {'call', 'gosub'}  # EXODUS_KEYWORDS  .k ? style
 
-    EXTRA_CONSTANTS = {'RM', 'FM', 'VM', 'SM', 'TM', 'ST', 'BS', 'DQ', 'SQ', 'NL', 'EOL', 'PLATFORM',
-                       '_RM', '_FM', '_VM', '_SM', '_TM', '_ST', '_BS', '_DQ', '_SQ', '_NL', '_EOL',
-                       'RM_', 'FM_', 'VM_', 'SM_', 'TM_', 'ST_', 'BS_', 'DQ_', 'SQ_', 'NL_', 'EOL_'}  # EXODUS_CONSTANTS  .kc ? style
+    EXTRA_LITERALS = {
+# Some literal abbreviations.          Fixed in ASCII/Unicode.
+'NL', 'BS', 'DQ', 'SQ',
+'_NL', '_BS', '_DQ', '_SQ',
+'NL_', 'BS_', 'DQ_', 'SQ_',
+
+# Exodus literal abbreviations.        Fixed in Exodus.
+'RM', 'FM', 'VM', 'SM', 'TM', 'ST',
+'_RM', '_FM', '_VM', '_SM', '_TM', '_ST',
+'RM_', 'FM_', 'VM_', 'SM_', 'TM_', 'ST_',
+'_ALL_FMS',
+'_VISIBLE_RM', '_VISIBLE_FM', '_VISIBLE_VM', '_VISIBLE_SM', '_VISIBLE_TM', '_VISIBLE_ST',
+'VISIBLE_RM_', 'VISIBLE_FM_', 'VISIBLE_VM_', 'VISIBLE_SM_', 'VISIBLE_TM_', 'VISIBLE_ST_',
+'_VISIBLE_FMS',
+
+# CPU, OS, compiler and c++ info.      Fixed in Exodus build/release.
+
+# Fixed in compiler and Exodus build options.
+# e.g. "clang" "19" "24"
+'_COMPILER', '_COMPILER_VERSION', '_CPP_STANDARD',
+
+# Fixed in OS.
+# e.g. "Ubuntu" "24.04"
+'_OS_NAME', '_OS_VERSION',
+
+# Fixed in CPU type: "x86" "x64".
+'PLATFORM', '_PLATFORM',
+
+# Fixed in OS type.
+# Posix: "/"   Windows: "\"
+'OSSLASH', '_OSSLASH', 'OSSLASH_',
+# Posix: "\n"  Windows: "\r\n",
+'EOL', '_EOL',
+    }
+
+    EXTRA_CONSTANTS = {
+#unorganised atm
+'DATEFMT', 'BASEFMT', 'TZ',
+'EW', 'PW', 'VW', 'XW', 'MW', 'HW', 'AW',
+'FILE', 'ID', 'RECORD', 'DICT', 'MV', 'ANS', 'PSEUDO', 'DATA', 'CURSOR',
+'DEFINITIONS', 'SECURITY', 'SYSTEM', 'SESSION', 'TIMESTAMP',
+'USERNAME', 'STATUS', 'LISTACTIVE',
+'SENTENCE', 'EXECPATH', 'COMMAND', 'OPTIONS',
+'USER0', 'USER1', 'USER2', 'USER3', 'USER4',
+'RECUR0', 'RECUR1', 'RECUR2', 'RECUR3', 'RECUR4',
+'APPLICATION',
+'TERMINAL', 'LEVEL', 'THREADNO',
+'CRTHIGH', 'CRTWIDE', 'LPTRHIGH', 'LPTRWIDE',
+'STATION', 'PRIVILEGE', 'FILES', 'TCLSTACK', 'INTCONST', 'STATUS', 'COL1', 'COL2', 'PRIORITYINT', 'FILEERRORMODE', 'FILEERROR', 'RECCOUNT',
+}  # EXODUS_CONSTANTS
 
 #    EXTRA_CONSTANTS = {'true', 'false'}  # EXODUS_CONSTANTS
 #    EXTRA_PSEUDO = {'system', 'env'}  # EXODUS_PSEUDO
-#    EXTRA_BUILTINS = {'len', 'substr'}  # EXODUS_BUILTINS
     _exodus_rules = [
         (re.compile(r'\b(' + '|'.join(EXTRA_OPERATORS) + r')\b'), Operator.Word),
         (re.compile(r'\b(' + '|'.join(EXTRA_FUNCTIONS) + r')\b'), Name.Function),
@@ -127,10 +173,10 @@ class ExodusCppLexer(CppLexer):
         (re.compile(r'\b(' + '|'.join(EXTRA_FLOW_CONTROL) + r')\b'), Keyword.Reserved),
         (re.compile(r'\b(' + '|'.join(EXTRA_TYPES) + r')\b'), Keyword.Type),
         (re.compile(r'\b(' + '|'.join(EXTRA_KEYWORDS) + r')\b'), Keyword),
+        (re.compile(r'\b(' + '|'.join(EXTRA_LITERALS) + r')\b'), Name.Builtin), #.nb is like true/false i.e literals
         (re.compile(r'\b(' + '|'.join(EXTRA_CONSTANTS) + r')\b'), Keyword.Constant),
 
 #        (re.compile(r'\b(' + '|'.join(EXTRA_PSEUDO) + r')\b'), Keyword.Pseudo),
-#        (re.compile(r'\b(' + '|'.join(EXTRA_BUILTINS) + r')\b'), Name.Builtin),
     ]
 
     def get_tokens_unprocessed(self, text, stack=('root',)):

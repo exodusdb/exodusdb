@@ -24,8 +24,12 @@
 // SIMILAR CODE IN
 // program.h library.h
 
-// A program is just a class with an following
-// int main() function that creates and calls it
+// A Exodus program is just a class inheriting from ExoProgram
+// that has a member function called var main().
+
+//////////////////////////////////////////////////////////////
+// programinit simply opens a class inheriting from ExoProgram
+//////////////////////////////////////////////////////////////
 
 #define programinit(EXOPROGRAM_PREFIX)                     \
 _Pragma("GCC diagnostic push")                             \
@@ -36,6 +40,13 @@ _Pragma("GCC diagnostic pop")
 
 //OPTION I=Ignore. Causes error exit to be suppressed
 //OPTION D=Debug. Suppress try/catch exception handling so debuggers can catch errors
+
+//////////////////////////////////////////////////////////////////////
+// programexit simply closes the program class and provides int main()
+// 1. Create an instance of the ExoProgram class.
+// 2. Call its main() member function.
+// 3. Handle its normal and abnormal exits and exceptions.
+//////////////////////////////////////////////////////////////////////
 
 #define programexit(EXOPROGRAM_PREFIX)                                                         \
  public:                                                                                       \

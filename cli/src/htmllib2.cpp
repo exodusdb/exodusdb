@@ -1,9 +1,12 @@
+#include <cassert>
+
 #include <exodus/library.h>
 libraryinit()
 
 var params;
 var params2;
 var tagsep;
+var quiet = true;
 
 //Note that the argument names are not accurate for GETCSS, GETSORTJS, COLROWSPAN, CONVCSS, ADDUNITS, DOCMODS, GETMARK modes
 func main(in mode, io dataio, in params0 = "", in params20 = "", in glang = "") {
@@ -434,6 +437,17 @@ func main(in mode, io dataio, in params0 = "", in params20 = "", in glang = "") 
 		let& html = params20;
 
 		gosub getmark(getmarkmode, html, mark);
+
+	} else if (mode =="T2H") {
+		// Convert Exodus comment text (pseudo markdown) to html
+        let& text_in = params0;
+		return t2h_main(text_in);
+
+	} else if (mode =="H2M") {
+		// Convert html to man page format
+        let& text_in = params0;
+        var& exit_status = dataio;
+		return h2m_main(text_in, exit_status);
 
 	} else {
 		call note(mode.quote() ^ " unknown mode in HTMLLIB2");
@@ -1284,4 +1298,729 @@ subr replace_literal_comparison_operators(io dataio) {
 	dataio.replacer(" >= ", " >= ");
 }
 
-libraryexit()
+// Convert exodus comment text (pseudo markdown) to html
+function t2h_main(in inp) {
+
+	bool in_code = false;
+	var outp = "";
+
+	// lines of text become "fields" separated by \x1e chars
+	// We are still going to refer to them "lines"
+	// even while we use "f"/"field" functions to access them
+	var lines = inp.convert("\n", FM);
+	var lastindent = 1;
+	var linetypes = "";
+
+	// lambda to return the correct tag
+	///////////////////////////////////
+
+	auto linetypetag = [] (in linetype, bool opening) -> var {
+		if (linetype eq "*" or linetype eq "#")
+			return "li";
+		if (not opening and linetype eq "dt")
+			return "dd";
+		return linetype;
+	};
+
+	// lambda to close old tags and open new ones
+	/////////////////////////////////////////////
+
+	auto close_andor_open = [&](in newindent, in newlinetype) {
+
+// 2 1 * * on exit from one indent
+//printl(lastindent, newindent, newlinetype, linetypes.convert(FM, "^"));
+
+		// Close old indents if decreasing indent
+		while (lastindent > newindent) {
+			let lastlinetype = linetypes.f(lastindent);
+			if (lastlinetype) {
+				outp.appender("</", linetypetag(lastlinetype, false), ">\n");
+				// Close old list?
+				if (lastlinetype eq "*")
+					outp.appender("</ul>\n");
+				else if (lastlinetype eq "#")
+					outp.appender("</ol>\n");
+				else if (lastlinetype eq "dt" or lastlinetype eq "dd")
+					outp.appender("</dl>\n");
+			}
+			lastindent--;
+		}
+
+		// Note that if we are going to a deeper indent then lastlinetype will of course be ""
+		// but the reverse is not true if we are staying on the same indent or rising up to a shallower indent
+		lastindent = newindent;
+		let lastlinetype = linetypes.f(lastindent);
+
+		if (lastlinetype)
+			outp.appender("</", linetypetag(lastlinetype, false), ">\n");
+
+		// Changing line type at new current level?
+		// If going deeper then this is always true because last line type is ""
+		if (lastlinetype ne newlinetype) {
+
+			// Close old list?
+			if (lastlinetype eq "*")
+				outp.appender("</ul>\n");
+			else if (lastlinetype eq "#")
+				outp.appender("</ol>\n");
+			else if (lastlinetype eq "dt" or lastlinetype eq "dd")
+				outp.appender("</dl>\n");
+
+			// Start new list?
+			if (newlinetype eq "*")
+				outp.appender("<ul>\n");
+			else if (newlinetype eq "#")
+				outp.appender("<ol>\n");
+			else if (newlinetype eq "dt" or lastlinetype eq "dd")
+				outp.appender("<dl>\n");
+		}
+
+		linetypes(newindent) = newlinetype;
+
+		// Cut off any deeper indents since we have handled and close them all
+		linetypes = linetypes.field(FM, 1, newindent);
+	};
+
+	// Process all text lines
+	/////////////////////////
+
+	for (let rawline : lines) {
+
+		var line = rawline.trimfirst();
+
+		// Determine new indent (1 based)
+		let newindent = len(rawline) - len(line) + 1;
+
+		// Skip over, into or out of code block
+		///////////////////////////////////////
+
+		if (in_code) {
+			if (line.last() eq "`") {
+				// Switch out of code
+				in_code = false;
+			}
+			outp.appender(space(newindent - 1), line, NL_);
+			continue;
+		}
+		else if (line.first() eq "`") {
+			in_code = true;
+			outp ^= NL_;
+			outp.appender(space(newindent - 1), line, NL_);
+			continue;
+		}
+
+		// Inbound line conversions
+		// Convert (not code block) since we may add html tags ourselves
+		// This preserves any < & > in the text but disallows any html pass through
+		line.replacer("&", "&amp;");
+		line.replacer("<", "&lt;");
+		line.replacer(">", "&gt;");
+
+		// Determine linetype and line
+		var linetype;
+		{
+			let match1 = line.match(R"__(^\* (.*?) \* (.*)$)__");
+			if (match1) {
+				// * aaaaaaaa * bbbbbbbb
+				linetype = "dt";
+				line = match1.f(1, 2).trimboth() ^ "</dt><dd>" ^ match1.f(1, 3).trimboth("* ");
+
+			} else if (line.match(R"__(^[*#] *)__")) {
+				// #xxxxxxxx
+				// *xxxxxxxx
+				linetype = line.first();
+				line.cutter(1);
+				line.trimmerfirst();
+
+			} else if (line.match("^\\d+\\.")) {
+				// 99.xxxxxxxx
+				linetype = "#";
+				line = line.field(".", 2, 999).trimfirst();
+
+			} else {
+				// xxxxxxxx
+				linetype = "p";
+			}
+		}
+
+		// Close any previous tags and open any group tags
+		close_andor_open(newindent, linetype);
+		linetypes(newindent) = linetype;
+
+		// Outbound line conversions
+		{
+			// Emphasise first words ending in :
+			line.replacer(R"__(^([\w_]+): ?)__"_rex, "<em>$1:</em> ");
+		}
+
+		// Open a tag and output the line
+		outp.appender(space(newindent - 1) ^ "<", linetypetag(linetype, true), ">", line);
+
+	}
+
+	// Close any outstanding tags.
+	close_andor_open(1, "");
+
+	return outp.trim("\n") ^ "\n";
+
+}
+
+var inp =
+        "# Function Overview\n"
+        "* Feature 1\n"
+        "  * Subfeature 1\n"
+        "  * Subfeature 2\n"
+        "* Feature 2\n"
+        "Some text here.\n"
+        "# Steps\n"
+        "  # Step 1\n"
+        "  # Step 2\n";
+
+function t2h_selftest() {
+
+//	TRACE(main(""))
+//	TRACE(main("abc"))
+//	TRACE(main("abc\ndef"))
+//	TRACE(main("*abc"))
+//
+//	TRACE(main("*abc\ndef"))
+//	TRACE(main("*abc\n*def"))
+//	TRACE(main("abc\n*def"))
+//
+//	TRACE(main("#abc\n*def"))
+//	TRACE(main("*abc\n#def"))
+//
+//	TRACE(main("abc\n def"))
+//
+//	TRACE(main("*abc\n #def"))
+
+	assert(t2h_main("")            eq "");
+	assert(t2h_main("abc")         eq "<p>abc</p>\n");
+	assert(t2h_main("abc\ndef")    eq "<p>abc</p>\n<p>def</p>\n");
+	assert(t2h_main("*abc")        eq "<ul>\n<li>abc</li>\n</ul>\n");
+	assert(t2h_main("*abc\ndef")   eq "<ul>\n<li>abc</li>\n</ul>\n<p>def</p>\n");
+	assert(t2h_main("*abc\n*def")  eq "<ul>\n<li>abc</li>\n<li>def</li>\n</ul>\n");
+	assert(t2h_main("abc\n*def")   eq "<p>abc</p>\n<ul>\n<li>def</li>\n</ul>\n");
+	assert(t2h_main("#abc\n*def")  eq "<ol>\n<li>abc</li>\n</ol>\n<ul>\n<li>def</li>\n</ul>\n");
+	assert(t2h_main("*abc\n#def")  eq "<ul>\n<li>abc</li>\n</ul>\n<ol>\n<li>def</li>\n</ol>\n");
+	assert(t2h_main("abc\n def")   eq "<p>abc <p>def</p>\n</p>\n");
+	assert(t2h_main("*abc\n #def") eq "<ul>\n<li>abc<ol>\n <li>def</li>\n</ol>\n</li>\n</ul>\n");
+	assert(t2h_main("*abc\n *def") eq "<ul>\n<li>abc<ul>\n <li>def</li>\n</ul>\n</li>\n</ul>\n");
+
+//	assert(t2h_main("Returns: value").errputl() eq "<p><em>Returns:</em> value</p>\n");
+//	assert(t2h_main("// Header").errputl() eq "<h2>Header</h2>\n");
+	assert(t2h_main("1. Item 1\n2. Item 2") eq "<ol>\n<li>Item 1</li>\n<li>Item 2</li>\n</ol>\n");
+//	assert(t2h_main("<!--CODEBLOCK-->").errputl() eq "<!--CODEBLOCK-->\n");
+
+	assert(t2h_main("<>") eq "<p>&lt;&gt;</p>");
+
+//	TRACE(t2h_main(inp))
+
+	if (not quiet)
+		logputl("Self Test passed.");
+
+	return 1;
+}
+
+function h2m_main(in all_input, out exit_status) {
+
+//	if (not quiet)
+//		logputl("h2m input");
+
+	// 0 success
+	// 1 parser error
+	// 2 converter error
+//	int exit_status = 0;
+	exit_status = 0;
+
+//	selftest_validator();
+
+	// Read lines of input and parse line by line. Probably should read all then parse all.
+	// Parse HTML into tokens
+	// Tokens:
+	// 1. Pure tags stripped of any attributes
+	// 2. Anything between the tags
+//	std::string all_input = reader();
+	std::vector<std::string> tokens = h2m_parser(all_input, exit_status);
+	if (exit_status) {
+		// Soldier on
+	}
+
+	// Call a general html tag validator
+	// This checks that all tags are closed and must be checked at the end
+    HTMLTagValidator h2m_validator;
+    if (!h2m_validator.process(all_input)) {
+        std::cerr << "Invalid HTML detected in line: " << std::endl;
+        exit_status = 2;
+		// Soldier on
+    }
+
+	// Convert tokens to man page format and output
+	// Runs even if parser fails
+	return var(h2m_convert_to_man(tokens, exit_status)).trim("\n") ^ "\n";
+
+}
+
+// Structure to track state of ordered lists (e.g., <ol>) for numbering
+struct ListState {
+    bool is_ordered = false;  // True if list is ordered (<ol>), false for unordered (<ul>)
+    int ol_counter = 1;       // Counter for ordered list items (starts at 1)
+	bool is_indented = false; // We must indent if any sub tags (excluding inline macros for bold etc.) are found (and undent on </li>
+	bool in_li = false;       // Dont indent after ul/ol until we are inside an li
+};
+
+// Converter: Processes token array into man page format using a lookup table
+// - Maps known tags to man page commands via tag_map
+// - Handles special cases (<li>, <a href>) dynamically
+// - Continues processing past unrecognized tags, logging errors to stderr
+// - Sets exit_status to 2 if conversion errors occur
+std::string h2m_convert_to_man(const std::vector<std::string>& tokens, out exit_status) {
+
+	std::stringstream ss_out;
+
+    // Output man page header with newline before dot command
+//    ss_out << "\n.TH HTML2MAN 1 \"April 06, 2025\" \"html2man\" \"Generated by html2man v4.2\"\n";
+//	ss_out << ".nr IN 4n\n";
+
+    std::stack<ListState> list_stack;  // Stack to track nested lists and their states
+    std::vector<std::string> footnotes;  // Array to store footnote URLs from <a href>
+    bool in_code = false;              // Flag for code block state (<code>, <pre>)
+
+    // Tag-to-man conversion table based on our mapping
+    // - Left: HTML tag, Right: Man page command or macro
+    // - Newlines moved before dot commands where appropriate (Fix 3)
+    // - No structural validation; purely a lookup for output
+    std::map<std::string, std::string> tag_map = {
+        {"<h1>",            "\n.SH "},         // Section heading
+        {"</h1>",           "\n"},             // End section heading
+        {"<h2>",            "\n.SS "},         // Subsection heading
+        {"</h2>",           "\n"},             // End subsection heading
+        {"<h3>",            "\n.SS "},         // Same as h2
+        {"</h3>",           "\n"},             // Same as /h2
+        {"<h4>",            "\n.SS "},         // "
+        {"</h4>",           "\n"},             // "
+
+//        {"<p>",             "\n.br\n.in +0.5n\n"},        // Paragraph break with newline
+//        {"</p>",            "\n.in -0.5n\n"},             // End paragraph
+        {"<p>",             "\n.PP \\\"<p>\n"},        // Paragraph break with newline
+        {"</p>",            "\n.sp 1 \\\"</p>\n"},             // End paragraph
+
+
+        {"<br>",            "\n.br\n"},        // Line break with newline
+
+        {"</li>",           ""},               // End list item (handled by <li>, no extra newline)
+        {"</a>",            "\\fR"},           // End link text
+
+        {"<ul>",            ""},          // Start unordered list (indent)
+        {"</ul>",           ""},          // End unordered list (unindent)
+
+        {"<ol>",            ""},          // Start ordered list (indent)
+        {"</ol>",           ""},          // End ordered list (unindent)
+
+        {"<b>",             "\\fB"},           // Start bold text
+        {"</b>",            "\\fR"},           // End bold text
+
+        {"<em>",             "\\fB"},           // Start bold text
+        {"</em>",            "\\fR"},           // End bold text
+
+        {"<strong>",        "\\fB"},           // Start bold text (semantic alias for <b>)
+        {"</strong>",       "\\fR"},           // End bold text
+
+        {"<i>",             "\\fI"},           // Start italic text
+        {"</i>",            "\\fR"},           // End italic text
+
+        {"<u>",             "\\fI"},           // Start italic text (underline approximated)
+        {"</u>",            "\\fR"},           // End italic text
+
+        {"<code>",          "\n.nf \\\"<code>\n"},        // Start code block (no fill/no format)
+        {"</code>",         "\n.fi \\\"</code>\n"},        // End code block (restore fill/format)
+
+        {"<pre>",           "\n.nf \\\"<pre>\n"},        // Start preformatted text (no fill/no format)
+        {"</pre>",          "\n.fi \\\"</pre>\n"},        // End preformatted text (restore fill/format)
+
+        {"<dl>",            "\n.PD 0 \\\"<dl>\n"},             // Start descriptive list
+        {"</dl>",           "\n.PD \\\"</dl>\n"},        // End descriptive list
+
+//        {"<dt>",            "\n.IP \""},     // Start descriptive term
+//        {"</dt>",           "\"\n"},         // End descriptive term
+        {"<dt>",            "\n.TP \\\"<dt>\n\\fB"},    // Start descriptive term
+        {"</dt>",           "\\fR \\\"</dt>\n"},         // End descriptive term
+
+        {"<dd>",            ""},               // Start descriptive details
+        {"</dd>",           "\n.\\\"</dd>\n"},        // End descriptive details
+
+        {"<blockquote>",    "\n.RS\n"},        // Start blockquote (indent)
+        {"</blockquote>",   "\n.RE\n"},        // End blockquote (unindent)
+
+        {"<hr>",            "\n.br\n"},        // Horizontal rule (line break)
+
+        {"<sup>",           "\\u"},            // Superscript
+        {"</sup>",          "\\fR"},           // End superscript
+
+        {"<sub>",           "\\d"},            // Subscript
+        {"</sub>",          "\\fR"},           // End subscript
+
+        {"<table>",         "\n.TS\ntab(:);\nl l.\n"},  // Start simple table (left-aligned columns)
+        {"</table>",        "\n.TE\n"}          // End table
+    };
+
+    for (size_t i = 0; i < tokens.size(); ++i) {  // Process each token
+        std::string token = tokens[i];
+
+        if (token[0] == '<') {
+
+            // Handle tags
+
+            // <a href="..."
+            if (token.substr(0, 8) == "<a href=") {
+
+                // Special case: <a href="...">
+#if 0
+                std::regex href_regex("href=\"([^\"]+)\"");  // Extract URL from href attribute
+                std::smatch match;
+                if (std::regex_search(token, match, href_regex)) {
+                    footnotes.push_back(match[1]);  // Store URL for footnote
+#else
+                rex href_regex("href=\"([^\"]+)\"");  // Extract URL from href attribute
+                let match1 = match(token, href_regex);
+				if (match1) {
+                    footnotes.push_back(match1.f(1, 2));  // Store URL for footnote
+#endif
+                    ss_out << "\\fB";            // Bold link text
+                }
+
+            }
+
+            // <li>
+            else if (token == "<li>" && !list_stack.empty()) {
+//                // Special case: <li> in list (Custom formatting for lists)
+//                ss_out << "\n.br\n";  // Break line before list item
+//                if (list_stack.top().is_ordered) {
+//                    // Ordered list item
+//                    ss_out << std::to_string(list_stack.top().ol_counter++) << ". ";
+//                } else {
+//                    // Unordered list item
+//                    ss_out << "\\(bu ";
+//                }
+                // Special case: <li> in list (Custom formatting for lists)
+                ss_out << "\n.br\n";  // Break line before list item
+                if (list_stack.top().is_ordered) {
+                    // Ordered list item
+                    ss_out << std::to_string(list_stack.top().ol_counter++) << ". ";
+                } else {
+                    // Unordered list item
+                    ss_out << "\\(bu ";
+                }
+//				ss_out << ".RS\n";
+//				ss_out << "\n";
+            }
+            else if (tag_map.count(token)) {
+
+				// Trigger an indent
+				if (!list_stack.empty()) {
+	                if (token == "</li>") {
+						// undent if necessary
+						if (list_stack.top().is_indented) {
+		                    ss_out << "\n.RE\n";
+							list_stack.top().is_indented = false;
+							list_stack.top().in_li = false;
+						}
+	                } else if (!list_stack.top().is_indented) {
+						if (token == "<li>")
+							// flag that we are inside and li
+							list_stack.top().in_li = true;
+						else if (token[1] != '/' /* and token is not inline type)*/) {
+							// Indent on most opening tags inside li item
+//		                    ss_out << "\n.RS\n";
+		                    ss_out << "\n.RS";
+							list_stack.top().is_indented = true;
+						}
+					}
+				}
+
+                // Known tag in table
+                ss_out << tag_map[token];  // Output mapped command
+
+                // Update state based on tag
+                if (token == "<code>" || token == "<pre>") in_code = true;
+                else if (token == "</code>" || token == "</pre>") in_code = false;
+                else if (token == "<ul>" || token == "<ol>") list_stack.push({token == "<ol>", 1});
+                else if (token == "</ul>" || token == "</ol>") { if (!list_stack.empty()) list_stack.pop(); }
+            }
+            else {
+                // Unrecognized tag
+                std::cerr << "h2ml::convert_to_man ERROR: Unrecognized tag: " << token << "\n";
+                exit_status = 1;
+                // Soldier on: skip this tag, continue processing
+            }
+        } else {
+            // Handle plain text
+
+			// Unescape the critical html codes
+
+		    // Step 1: Replace < with <
+		    size_t pos = 0;
+		    while ((pos = token.find("&lt;", pos)) != std::string::npos) {
+		        token.replace(pos, 4, "<");
+		        pos += 1; // Move past <
+		    }
+
+		    // Step 2: Replace > with >
+		    pos = 0;
+		    while ((pos = token.find("&gt;", pos)) != std::string::npos) {
+		        token.replace(pos, 4, ">");
+		        pos += 1; // Move past >
+		    }
+
+		    // Step 3: Replace & with &
+		    pos = 0;
+		    while ((pos = token.find("&amp;", pos)) != std::string::npos) {
+		        token.replace(pos, 5, "&");
+		        pos += 1; // Move past &
+		    }
+
+            // Skip whitespace-only tokens (Fix 2)
+            size_t j0 = token.find_first_not_of(" \t\n");
+            if (j0 == std::string::npos)
+                continue;
+
+			// Allow one leading space
+			if (j0 > 0) {
+				j0 --;
+				token[j0] = ' ';
+			}
+
+            // Process text with troff escaping
+            std::string escaped;
+            if (!in_code) {  // Escape troff special chars outside code blocks
+                for (size_t j = j0; j < token.length(); ++j) {  // Index-based loop for compatibility
+                    char c = token[j];
+                    if (c == '.' && escaped.empty()) escaped += "\\&.";  // Escape leading dot
+                    else if (c == '\\') escaped += "\\\\";              // Escape backslash
+                    else escaped += c;                                  // Normal char
+                }
+            } else {
+                // No escaping in code blocks
+                escaped = token;
+            }
+            // Output text with \& to prevent command interpretation (e.g., after periods)
+//            if (!in_code && !escaped.empty() && escaped.back() == '.') escaped += "\\&";
+            ss_out << escaped;
+        }
+    }
+
+    // Output footnotes for <a href> links
+    for (size_t i = 0; i < footnotes.size(); ++i) {
+        ss_out << "\n.br\n\\(dg " << i + 1 << ". " << footnotes[i] << "\n";
+    }
+
+	return ss_out.str();
+
+}
+
+class HTMLTagValidator {
+private:
+    std::stack<std::string> tags;
+    static inline const std::string selfClosingTags =
+        "|br|img|input|hr|meta|link|area|base|col|embed|source|track|wbr|";
+
+    static bool isAlpha(char c) {
+        return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
+    }
+
+    static char toLower(char c) {
+        if (c >= 'A' && c <= 'Z') return c + ('a' - 'A');
+        return c;
+    }
+
+    bool isSelfClosing(const std::string& tag) const {
+        std::string lowerTag = tag;
+//        for (char& c : lowerTag) c = toLower(c);
+		for (char* c = lowerTag.data(); *c; ++c) *c = toLower(*c);
+        std::string delimitedTag = "|" + lowerTag + "|";
+        return selfClosingTags.find(delimitedTag) != std::string::npos;
+    }
+
+    bool isCommentOrSpecial(const std::string& tagContent) const {
+        return tagContent.substr(0, 3) == "!--" ||
+               tagContent.substr(0, 8) == "![CDATA[" ||
+               tagContent.substr(0, 8) == "!DOCTYPE";
+    }
+
+    bool isValidTagName(const std::string& tag) const {
+        std::string lowerTag = tag;
+//        for (char& c : lowerTag) c = toLower(c);
+		for (char* c = lowerTag.data(); *c; ++c) *c = toLower(*c);
+        if (lowerTag.empty() || !isAlpha(lowerTag[0])) return false;
+//        for (char c : lowerTag) {
+		for (char* c = lowerTag.data(); *c; ++c) {
+            if (!((*c >= 'a' && *c <= 'z') || (*c >= '0' && *c <= '9') || *c == '-')) return false;
+        }
+        return true;
+    }
+
+public:
+    HTMLTagValidator() {}
+
+    bool process(const std::string& html) {
+        size_t pos = 0;
+        while (pos < html.length()) {
+            if (html[pos] == '<') {
+                size_t end = html.find('>', pos);
+                if (end == std::string::npos) return false;
+
+                std::string tagContent = html.substr(pos + 1, end - pos - 1);
+                if (tagContent.empty()) return false;
+
+                if (isCommentOrSpecial(tagContent)) {
+                    if (tagContent.substr(0, 3) == "!--") {
+                        size_t commentEnd = html.find("-->", pos);
+                        if (commentEnd == std::string::npos) return false;
+                        pos = commentEnd + 3;
+                    } else {
+                        pos = end + 1;
+                    }
+                    continue;
+                }
+
+                if (tagContent[0] != '/' && !isAlpha(tagContent[0]) && tagContent[0] != '!') {
+                    pos = end + 1;
+                    continue;
+                }
+
+                if (tagContent[0] == '/') {
+                    std::string tagName = tagContent.substr(1);
+//                    for (char& c : tagName) c = toLower(c);
+                    for (char* c = tagName.data(); *c; ++c) *c = toLower(*c);
+                    if (tags.empty() || tags.top() != tagName) return false;
+                    tags.pop();
+                } else {
+                    size_t spacePos = tagContent.find(' ');
+                    std::string tagName = (spacePos == std::string::npos) ? tagContent : tagContent.substr(0, spacePos);
+                    bool hasSlash = tagContent.back() == '/' && (spacePos == std::string::npos || spacePos == tagContent.length() - 1);
+                    if (hasSlash && spacePos == std::string::npos) tagName = tagName.substr(0, tagName.length() - 1);
+//                    for (char& c : tagName) c = toLower(c);
+                    for (char* c = tagName.data(); *c; ++c) *c = toLower(*c);
+                    if (!isValidTagName(tagName)) return false;
+                    if (!isSelfClosing(tagName)) tags.push(tagName);
+                }
+                pos = end + 1;
+            } else {
+                pos++;
+            }
+        }
+        return tags.empty();
+    }
+};
+
+int h2m_selftest_validator() {
+    std::vector<std::pair<std::string, int>> test_cases = {
+        {"<div><p><span>Hello</span></p></div>", 0},
+        {"<div><br/>Text<img src='x'/></div>", 0},
+        {"<div><p>Hello", 1},
+        {"<div><p></div>", 1},
+        {"<>", 1},
+        {"<div class='x'><p id='y'>Text</p></div>", 0},
+        {"<div><p>Hello<", 1},
+        {"<div><!-- Comment --></div>", 0},
+        {"<div><![CDATA[<p>]]></div>", 0},
+        {"<!DOCTYPE html><div></div>", 0},
+        {"<DIV><p></P></div>", 0},
+        {"<p>a < b > c</p>", 0},
+        {"<div><!-- > --></div>", 0},
+        {"<div><!-- Comment", 1},
+        {"<p>Text <span>a > b</span> more</p>", 0},
+        {"<br/><img/><hr/>", 0},
+        {"This is <not> a tag</not>", 0}
+    };
+
+    int passed = 0;
+    for (size_t i = 0; i < test_cases.size(); ++i) {
+
+//        const auto& [html, expected_status] = test_cases[i];
+		auto case1 = test_cases[i];
+		auto& html = case1.first;
+		auto& expected_status = case1.second;
+
+        HTMLTagValidator validator;
+        bool is_valid = validator.process(html);
+
+        if ((is_valid && expected_status == 0) || (!is_valid && expected_status == 1)) {
+//            std::cout << "  ✅ Passed\n";
+            ++passed;
+        } else {
+            std::cerr << "Test " << i + 1 << ": \"" << html << "\"\n";
+            std::cerr << "  Expected: " << (expected_status == 0 ? "Valid" : "Invalid")
+                  << ", Got: " << (is_valid ? "Valid" : "Invalid") << "\n";
+            std::cerr << "  ❌ Failed\n";
+            std::cerr << "\n";
+        }
+    }
+
+    std::clog << "Test passed. " << passed << " out of " << test_cases.size() << " tests.\n";
+
+    return (static_cast<size_t>(passed) == test_cases.size()) ? 0 : 1;
+}
+
+
+//// Reads HTML from stdin, returning all input as a string with lines separated and terminated by \n
+//std::string h2m_reader() {
+//	std::string all_input;
+//	std::string line;
+//	while (std::getline(std::cin, line)) {
+//		line.push_back('\n');  // Preserve line endings
+//		all_input += line;
+//	}
+//	return all_input;
+//}
+
+// Parses HTML input into a vector of tokens (tags and text)
+// - Checks for unterminated tags (e.g., <tag without >) within each line
+// - Does not validate HTML structure (e.g., matching <tag> with </tag>)
+// - Sets exit_status to 1 if parsing errors occur
+std::vector<std::string> h2m_parser(const std::string& all_input, out exit_status) {
+    std::vector<std::string> tokens;
+    std::string line;
+    size_t input_pos = 0;
+
+    // Process input line-by-line
+    while (input_pos < all_input.length()) {
+        // Extract one line (up to and including \n)
+        size_t line_end = all_input.find('\n', input_pos);
+        if (line_end == std::string::npos) {
+            line = all_input.substr(input_pos);
+            input_pos = all_input.length();
+        } else {
+            line = all_input.substr(input_pos, line_end - input_pos + 1);
+            input_pos = line_end + 1;
+        }
+
+        size_t pos = 0;
+        while (pos < line.length()) {
+            if (line[pos] == '<') {  // Start of a tag
+                size_t end = line.find('>', pos);
+                if (end == std::string::npos) {
+                    std::cerr << "h2ml::parser ERROR: Unterminated tag (no '>') in line: " << line << "\n";
+                    exit_status = 1;
+                    break;  // Skip rest of line on error
+                }
+                // Extract full tag including < and > (e.g., <h1>, </p>)
+                std::string tag = "<" + line.substr(pos + 1, end - pos - 1) + ">";
+                tokens.push_back(tag);
+                pos = end + 1;
+            } else {  // Plain text between tags
+                size_t next_tag = line.find('<', pos);
+                if (next_tag == std::string::npos) next_tag = line.length();
+                std::string text = line.substr(pos, next_tag - pos);
+                if (!text.empty()) {
+                    tokens.push_back(text);
+                }
+                pos = next_tag;
+            }
+        }
+    }
+
+    return tokens;
+}
+
+libraryexit()  // Closes the Exodus library class and provides a factory function for use in dynamic loading and linking

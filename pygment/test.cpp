@@ -2,6 +2,9 @@
 
 // Function to demonstrate various C++ keywords
 int main() { // 'int' is a fundamental type, 'main' is identifier
+
+	std::cout << something << std::endl;
+
     // Fundamental types
     char character = 'a';        // Character type
     short short_num = 10;       // Short integer type

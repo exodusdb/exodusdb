@@ -1,27 +1,105 @@
 # Overwrite nano config somewhere like /usr/share/nano/c.nanorc
 
-## Syntax highlighting for C and C++ files. Extended to include exodus program/var keywords
+## Syntax highlighting for C and C++ files. Extended to include Exodus program/var keywords
 
 syntax c "\.([ch](pp|ppm|ppm|xx)?|C|cc|c\+\+|cu|H|hh|ii?)$"
 header "-\*-.*\<C(\+\+)?((;|[[:blank:]]).*)?-\*-"
 magic "^(C|C\+\+) (source|program)"
 comment "//"
 
-# Constants.
-color brightred "\<[A-Z_][0-9A-Z_]*\>"
-# Labels.
-color brightmagenta "^[[:blank:]]*[A-Z_a-z][0-9A-Z_a-z]*:[[:blank:]]*$"
-color bold,normal ":[[:blank:]]*$"
+# nano basic colors and bright variants.
+# red green blue yellow magenta cyan white black
+# brightred brightgreen brightblue brightyellow brightmagenta brightcyan brightwhite
+# bold,red (Sensitive to terminal setting: Show bold text in bright colors)
+# bold,brightred (not allowed)
+#
+# nano extended colors (no bright allowed)
+# pink purple mauve lagoon mint lime peach orange latte rosy beet plum sea sky slate teal sage brown ocher sand tawny brick crimson
+# bold,pink etc. (Not sensitive to terminal setting: Show bold text in bright colors)
+# #fff (3 hex digit colors)
+# bold,#fff
+
+# Basic color Category
+# ----------- --------
+# 1. red      ALL_CAPS
+# 2. green    C++ and Exodus generally
+# 3. blue     Exodus thread vars and soon all exoprog env vars
+# 4. yellow   Literals
+# 5. magenta  Operators
+# 6. cyan     Comments
+# 7. white    User var/funcs. (Anything unmatched)
+# 8. black    Unusable in dark mode
+
+#    Category         Color
+#    --------         -----
+# 0. Uncategorised    Various
+# 1. ALL_CAPS         red
+# 2. C++ general      green
+# 3. Exodus general   green
+# 4. Exits            pink (extended color)
+# 5. Operators        magenta
+# 6. Literals         yellow
+# 7. Comments         cyan
+# 8. User vars/funcs  white (Anything unmatched)
+
+########################
+# PENDING CLASSIFICATION
+########################
+
+# CAPITAL_WORDS
+color bold,crimson "\<[A-Z_][0-9A-Z_]*\>"
+
+color orange "\<(EW|PW|VW|XW|MW|HW|AW)\>"
+color orange "\<(FILE|ID|RECORD|DICT|MV|ANS|PSEUDO|DATA|CURSOR)\>"
+color orange "\<(DEFINITIONS|SECURITY|SYSTEM|SESSION|TIMESTAMP)\>"
+color orange "\<(USERNAME|STATUS|LISTACTIVE)\>"
+color orange "\<(SENTENCE|EXECPATH|COMMAND|OPTIONS)\>"
+color orange "\<(USER0|USER1|USER2|USER3|USER4)\>"
+color orange "\<(RECUR0|RECUR1|RECUR2|RECUR3|RECUR4)\>"
+color orange "\<(APPLICATION)\>"
+color orange "\<(TERMINAL|LEVEL|THREADNO)\>"
+color orange "\<(CRTHIGH|CRTWIDE|LPTRHIGH|LPTRWIDE)\>"
+color orange "\<(STATION|PRIVILEGE|FILES|TCLSTACK|INTCONST|STATUS|COL1|COL2|PRIORITYINT|FILEERRORMODE|FILEERROR|RECCOUNT)\>"
+
+# Reminders.
+color brightwhite,yellow "\<(FIXME|TODO|XXX)\>"
+
+# Import/export
+color brightyellow "^[[:blank:]]*(import|export)[[:blank:]]*[a-zA-Z0-9_]+"
+
+# Preprocessor directives.
+color brightcyan start="^[[:blank:]]*#[[:blank:]]*(if(n?def)?|elif|warning|error|pragma)\>" end="(\`|[^\])$"
+color brightcyan "^[[:blank:]]*#[[:blank:]]*((define|else|endif|include(_next)?|line|undef)\>|$)"
+
+# Exodus thread globals
+#######################
+color bold,white "\<(BASEFMT|DATEFMT|TZ)\>"
+
+###############
+# C/C++ General - bold,green
+###############
+
+# GCC builtins.
+color bold,green "__attribute__[[:blank:]]*\(\([^)]*\)\)|__(aligned|asm|builtin|hidden|inline|packed|restrict|section|typeof|weak)__"
+
+# c/c++
+color bold,green "\<(if|else|for|while|do|switch|case|default)\>"
+color bold,green "\<(try|catch|operator|new|delete)\>"
 
 # Types and related keywords.
-color bold,green "\<(auto|bool|char|const|double|enum|extern|float|inline|int|long|restrict|short|signed|sizeof|static|struct|typedef|union|unsigned|void)\>"
+color bold,green "\<(auto|bool|char|const|constexpr|constinit|consteval|double|enum|extern|float|inline|int|long|restrict|short|signed|sizeof|static|struct|typedef|union|unsigned|void)\>"
 color bold,green "\<([[:lower:]][[:lower:]_]*|(u_?)?int(8|16|32|64))_t\>"
 color bold,green "\<(_(Alignas|Alignof|Atomic|Bool|Complex|Generic|Imaginary|Noreturn|Static_assert|Thread_local))\>"
 color bold,green "\<(class|explicit|friend|mutable|namespace|override|private|protected|public|register|template|this|typename|using|virtual|volatile)\>"
+color bold,green "\<(export|import|module)\>"
 
-#EXODUS C++ standard stuff
-color bold,green "\<std::[A-Z_a-z][0-9A-Z_a-z]*\>"
-color bold,green "\<chrono::[A-Z_a-z][0-9A-Z_a-z:]*\>"
+# Namespaces
+color bold,green "\<[A-Z_a-z][A-Z_a-z0-9]*(::[A-Z_a-z][0-9A-Z_a-z]*)+\>"
+
+# Attributes [[deprecated ..., [[likely ... [[nodiscard ...
+color bold,green  "\[\[.*?\]\]"
+
+#Various common C++ library stuff
 color bold,green "\<(now|time_since_epoch)\>"
 color bold,green "::(npos|digits10|fixed|general|scientific)\>"
 color bold,green "\<(thread_local|static_cast)\>"
@@ -29,30 +107,32 @@ color bold,green "\<(width|fill|precision|to_ullong|to_string|what|get)\>"
 color bold,green "\<(begin|rbegin|end|rend|size|toString|c_str|data|push_back|find|rfind|front|back|pop_back|starts_with|ends_with|resize|erase|length|clear|find_first|find_first_of|reserve)\>"
 color bold,green "\<(termios|fcntl|tcgetattr|tcsetattr)\>"
 color bold,green "\<(first|second)\>"
-color bold,green "\<(export|import|module)\>"
 
-color brightyellow "^[[:blank:]]*import[[:blank:]]*[a-zA-Z0-9_]+"
+################
+# Exodus General - bold,green
+################
 
-#EXODUS types
-color bold,green "\<(let|var|_var|dim|redim|rex|_rex)\>"
+#Exodus types
+color bold,green "\<(let|var|_var|dim|redim|rex|_rex|SV)\>"
 color bold,green "\<(in|out|io|exo|range|reverse_range)\>"
 
 #VAR_BASE internals
 color bold,green "\<(var_str|var_int|var_dbl|var_typ)\>"
 
-# EXODUS related keywords.
-color bold,green "\<(ExoAbort|ExoAbortAll|ExoLogoff|ExoStop|Callable|ExoProgram|ExoCommon|RELOAD_req|TERMINATE_req|DimIndexOutOfBounds|DimUndimensioned|VarDBException|VarDebug|VarDivideByZero|VarError|VarInvalidPointer|VarNonNumeric|VarNonPositive|VarNotImplemented|VarNumOverflow|VarNumUnderflow|VarOutOfMemory|VarUnassigned|VarUnconstructed|exo_backtrace|exo_savestack|exodus_main)\>"
+# Exodus related internal keywords.
+color bold,green "\<(ExoAbort|ExoAbortAll|ExoStop|Callable|ExoProgram|ExoCommon|RELOAD_req|TERMINATE_req|DimIndexOutOfBounds|DimUndimensioned|VarDBException|VarDebug|VarDivideByZero|VarError|VarInvalidPointer|VarNonNumeric|VarNonPositive|VarNotImplemented|VarNumOverflow|VarNumUnderflow|VarOutOfMemory|VarUnassigned|VarUnconstructed|exo_backtrace|exo_savestack|exodus_main)\>"
 
-# EXODUS free and var functions
+# Exodus free and var functions
 color bold,green "\<(f|at|b|b2|mv)\>"
 color bold,green "\<(numberinwords)\>"
 color bold,green "\<(rows|cols)\>"
 color bold,green "\<append|appender|firster|laster|locatebyusing|detach|flushindex|var_iter|var_proxy1|var_proxy2|var_proxy3|var_mid|var_base)\>"
 color bold,green "\<(dbcursorexists|selectx|setlasterror|iconv_MD|osopenx)\>"
-color bold,green "\<(abs|append|appender|assigned|unassigned|atan|attach|backtrace|begintrans|committrans|rollbacktrans|statustrans|breakoff|breakon|chr|textchrname|clearcache|clearfile|clone|close|connect|contains|convert|converter|cos|count|createfile|createindex|crop|cropper|cut|cutter|date|dbcopy|dbcreate|dbdelete|dblist|debug|defaulter|deletec|deletefile|deleteindex|deleterecord|disconnect|disconnectall|dump|echo|empty|ends|eof|errput|errputl|exp|extract|fcase|fcaser|fcount|field2|field|fieldstore|fieldstorer|first|floor|format|from_codepage|to_codepage|getexecpath|gethostname|getprocessn|getprompt|getxlocale|hash|hasinput|index|indexn|indexr|initrnd|input|inputn|insert|inserter|insertrecord|integer|invert|inverter|isnum|isterminal|join|keypressed|last|lasterror|lcase|lcaser|len|listfiles|listindex|locate|locateby|locateusing|lock|loge|loglasterror|logput|logputl|lower|lowerer|match|mod|move|normalize|normalizer|num|open|or_default|osbread|osbwrite|osclose|oscopy|oscwd|osdir|osfile|osflush|osgetenv|osinfo|oslist|oslistd|oslistf|osmkdir|osmove|osopen|ospid|osprocess|osread|osremove|osrename|osrmdir|ossetenv|osshell|osshellread|osshellwrite|ossleep|ostempdir|ostempfile|ostid|ostime|oswait|oswrite|output|outputl|outputt|parse|parser|paste|paster|pop|popper|prefix|prefixer|print|printl|println|printt|printx|pwr|quote|quoter|raise|raiser|read|readc|readf|reccount|remove|remover|renamefile|replace|replacer|reverse|reverser|rnd|round|search|ord|setprompt|setxlocale|shuffle|shuffler|sin|sort|sorter|space|split|splitter|sqlexec|sqrt|squote|squoter|starts|str|substr2|substr|substrer|sum|sumall|swap|tan|tcase|tcaser|textchr|textconvert|textconverter|textlen|textord|textwidth|time|ostimestamp|trim|trimboth|trimfirst|trimlast|trimmer|trimmerboth|trimmerfirst|trimmerlast|ucase|ucaser|unique|uniquer|unlock|unlockall|unquote|unquoter|update|updater|updaterecord|updatekey|version|write|writec|writef|xlate|setprecision|getprecision)\>"
+color bold,green "\<(abs|append|appender|assigned|unassigned|atan|attach|backtrace|begintrans|committrans|rollbacktrans|statustrans|breakoff|breakon|chr|textchrname|clearcache|clearfile|clone|close|connect|contains|convert|converter|cos|count|createfile|createindex|crop|cropper|cut|cutter|date|dbcopy|dbcreate|dbdelete|dblist|debug|defaulter|deletec|deletefile|deleteindex|deleterecord|disconnect|disconnectall|dump|echo|empty|ends|eof|errput|errputl|exp|extract|fcase|fcaser|fcount|field2|field|fieldstore|fieldstorer|first|floor|format|from_codepage|to_codepage|getexecpath|gethostname|getprocessn|getprompt|getxlocale|hash|hasinput|index|indexn|indexr|initrnd|input|inputn|insert|inserter|insertrecord|integer|invert|inverter|isnum|isterminal|join|keypressed|last|lasterror|lcase|lcaser|len|listfiles|listindex|locate|locateby|locateusing|lock|loge|loglasterror|logput|logputl|lower|lowerer|match|mod|move|normalize|normalizer|num|open|or_default|osbread|osbwrite|osclose|oscopy|oscwd|osdir|osfile|osflush|osgetenv|osinfo|oslist|oslistd|oslistf|osmkdir|osmove|osopen|ospid|osprocess|osread|osremove|osrename|osrmdir|ossetenv|osshell|osshellread|osshellwrite|ossleep|ostempdir|ostempfile|ostid|ostime|oswait|oswrite|output|outputl|outputt|parse|parser|paste|paster|pop|popper|prefix|prefixer|print|printl|println|printt|printx|pwr|quote|quoter|raise|raiser|read|readc|readf|reccount|remove|remover|renamefile|replace|replacer|reverse|reverser|rnd|round|search|ord|setprompt|setxlocale|shuffle|shuffler|sin|sort|sorter|space|split|splitter|sqlexec|sqrt|squote|squoter|starts|str|substr2|substr|substrer|sum|sumall|stddev|swap|tan|tcase|tcaser|textchr|textconvert|textconverter|textlen|textord|textwidth|time|ostimestamp|trim|trimboth|trimfirst|trimlast|trimmer|trimmerboth|trimmerfirst|trimmerlast|ucase|ucaser|unique|uniquer|unlock|unlockall|unquote|unquoter|update|updater|updaterecord|updatekey|version|write|writec|writef|xlate|setprecision|getprecision)\>"
 
-#EXODUS var functions
+#Exodus var functions
 color bold,green "\<(toBool|toString|toDouble|toInt|c_str)\>"
+
 #private
 color bold,green "\<(createString|iconv_D|oconv_D|iconv_TX|oconv_TX|iconv_HEX|oconv_HEX|iconv_MT|oconv_MT|oconv_T|oconv_MD|oconv_LRC|oconv_MR)\>"
 color bold,green "\<(assertAssigned|assertDecimal|assertInteger|assertNumeric|assertString|assertStringMutator|assertVar)\>"
@@ -61,43 +141,102 @@ color bold,green "\<(PQ|PG)[a-z]+\>"
 # EXOPROGRAM functions
 color bold,green "\<(select|selectkeys|hasnext|readnext|pushselect|popselect|clearselect|deleterecord|savelist|getlist|deletelist||calculate|xlate|oconv|iconv||amountunit||timedate2|getdatetime|elapsedtimetext||note|decide|esctoexit|AT|getcursor|setcursor|invertarray|sortarray||lockrecord|unlockrecord)\>"
 
-# Flow control.
-color brightyellow "\<(if|else|for|while|do|switch|case|default)\>"
-color brightyellow "\<(try|throw|catch|operator|new|delete)\>"
-color brightyellow "\<(break|continue|goto|return)\>"
+# Exodus constants - kind of literals
+#################
+color bold,green "\<(EXO_OS_NAME|EXO_OS_VERSION)|PLATFORM\>"
 
-# EXODUS Flow control
-color brightyellow "\<(stop|abort|abortall|logoff)\>"
-color bold,magenta "\<(call|gosub|function|func|subroutine|subr|not|and|or)\>"
+#######
+# EXITS - bold,yellow
+#######
+
+# C++ Exits
+color bold,pink "\<(throw|break|continue|goto|return)\>"
+
+# Labels.
+color bold,pink "^[[:blank:]]*[A-Z_a-z][0-9A-Z_a-z]*:[[:blank:]]*$"
+color bold,pink ":[[:blank:]]*$"
+
+# Exodus Exits
+color bold,pink "\<(stop|abort|abortall|logoff)\>"
+
+# EXOPROGRAM Not really exits but currently considered important to highlight
+color bold,pink "\<(perform|execute|chain|libinfo)\>"
+
+###########
+# OPERATORS - bold magenta
+###########
+
+# Exodus flow control
+color bold,magenta "\<(call|gosub|function|func|subroutine|subr)\>"
 color bold,magenta "^(programinit|programexit|libraryinit|libraryexit|commoninit|commonexit)\("
-# EXODUS commas
+
+# Exodus commas
 color bold,magenta "\<(on|from|with|to)\>"
 
-# EXODUS operators
-color bold,magenta "\<(eq|ne|lt|gt|le|ge)\>"
+# Exodus operators
+color bold,magenta "\<(not|and|or|eq|EQ|ne|lt|gt|le|ge)\>"
 
-#EXOPROGRAM Flow control
-color brightyellow "\<(perform|execute|chain|libinfo)\>"
+##########
+# LITERALS - bold yellow
+##########
 
-# Single-quoted stuff (characters, backslash escapes, hex and octal byte codes).
-color brightmagenta "'([^'\]|\\(["'\abfnrtv]|x[[:xdigit:]]{1,2}|[0-3]?[0-7]{1,2}))'"
+# Strings and names of included files. Fixed/changeable in source code.
+color bold,yellow ""([^"]|\\")*"|#[[:blank:]]*include[[:blank:]]*<[^>]+>"
 
-# GCC builtins.
-color bold,cyan "__attribute__[[:blank:]]*\(\([^)]*\)\)|__(aligned|asm|builtin|hidden|inline|packed|restrict|section|typeof|weak)__"
+# Single-quoted.                       Fixed/changeable in source code.
+# characters, backslash escapes, hex and octal byte codes).
+color bold,yellow "'([^'\]|\\(["'\abfnrtv]|x[[:xdigit:]]{1,2}|[0-3]?[0-7]{1,2}))'"
 
-# Strings and names of included files.
-color brightyellow ""([^"]|\\")*"|#[[:blank:]]*include[[:blank:]]*<[^>]+>"
+# Numbers.                             Fixed/changeable in source code
+# decimal, hexadecimal and octal
+color bold,yellow "\<([0-9]+|0x[[:xdigit:]]+)\>"
 
-# Preprocessor directives.
-color brightcyan start="^[[:blank:]]*#[[:blank:]]*(if(n?def)?|elif|warning|error|pragma)\>" end="(\`|[^\])$"
-color brightcyan "^[[:blank:]]*#[[:blank:]]*((define|else|endif|include(_next)?|line|undef)\>|$)"
+# Special values.                      Fixed in C++.
+color bold,yellow "\<(true|false|null|nullptr)\>"
 
-# Comments.
+# Some literal abbreviations.          Fixed in ASCII/Unicode.
+color bold,yellow "\<(NL|BS|DQ|SQ)\>"
+color bold,yellow "\<(_NL|_BS|_DQ|_SQ)\>"
+color bold,yellow "\<(NL_|BS_|DQ_|SQ_)\>"
+
+# Exodus literal abbreviations.        Fixed in Exodus.
+color bold,yellow "\<(RM|FM|VM|SM|TM|ST)\>"
+color bold,yellow "\<(_RM|_FM|_VM|_SM|_TM|_ST)\>"
+color bold,yellow "\<(RM_|FM_|VM_|SM_|TM_|ST_)\>"
+color bold,yellow "\<(_ALL_FMS)\>"
+color bold,yellow "\<(_VISIBLE_RM|_VISIBLE_FM|_VISIBLE_VM|_VISIBLE_SM|_VISIBLE_TM|_VISIBLE_ST)\>"
+color bold,yellow "\<(VISIBLE_RM_|VISIBLE_FM_|VISIBLE_VM_|VISIBLE_SM_|VISIBLE_TM_|VISIBLE_ST_)\>"
+color bold,yellow "\<(_VISIBLE_FMS)\>"
+
+# CPU, OS, compiler and c++ info.      Fixed in Exodus build/release.
+
+# Fixed in compiler and Exodus build options.
+# e.g. "clang" "19" "24"
+color bold,yellow "\<(_COMPILER|_COMPILER_VERSION|_CPP_STANDARD)\>"
+
+# Fixed in OS.
+# e.g. "Ubuntu" "24.04"
+color bold,yellow "\<(_OS_NAME|_OS_VERSION)\>"
+
+# Fixed in CPU type: "x86" "x64".
+color bold,yellow "\<(_PLATFORM)\>"
+
+# Fixed in OS type.
+# Posix: "/"   Windows: "\"
+color bold,yellow "\<(OSSLASH|_OSSLASH|OSSLASH_)\>"
+# Posix: "\n"  Windows: "\r\n"
+color bold,yellow "\<(EOL|_EOL)\>"
+
+##########
+# Comments - bold cyan
+##########
+
 color bold,cyan "//.*"
 color bold,cyan start="/\*" end="\*/"
 
-# Reminders.
-color brightwhite,yellow "\<(FIXME|TODO|XXX)\>"
+#########
+# SPECIAL
+#########
 
 # Trailing whitespace.
 color ,green "[[:space:]]+$"

@@ -1217,6 +1217,8 @@ ENVIRONMENT
 //				text.replacer(R"__(space\(\d\))__", "space($1)");
 				text.replacer(R"__(\bvar\((\d+)\).space\(\))__"_rex, "space($1)");
 
+				text.replacer("MVLogoff", "ExoLogoff");
+
 				if (text ne orig_text) {
 					if (oswrite(text on srcfilename, locale))
 						srcfilename.logputl("Hotfix various:");
@@ -1442,10 +1444,20 @@ ENVIRONMENT
 								if (argn < maxargn) {
 									inbound_args ^= ", " ^ argtype ^ " " ^ argname;
 									if (argdefault ne "") {
+
 										//build a new non-constant dummy variable name to be used as unassigned argument to the real function
-										argname2 = argname ^ "_" ^ argtype;
-										//declare it
-										func_body ^= " var " ^ argname2;
+										// duplicate code above and below
+										if (argtype == "in" || argtype == "out" || argtype == "io") {
+											argname2 = argname ^ "_" ^ argtype;
+											//declare it
+											func_body ^= " var " ^ argname2;
+										} else {
+											// use unknown arg type as is/without ref
+											argname2 = argname;
+											//declare it
+											func_body ^= " " ^ argtype.convert("&", "") ^ " " ^ argname2;
+										}
+
 										//default it. DOS doesnt have a "default" for missing args other than "var()" ie unassigned
 										if (argdefault ne "" and argdefault ne "var()")
 											func_body ^= " = " ^ argdefault;
@@ -1453,9 +1465,17 @@ ENVIRONMENT
 									}
 								} else {
 									//build a new non-constant dummy variable name to be used as unassigned argument to the real function
-									argname2 = argname ^ "_" ^ argtype;
-									//declare it
-									func_body ^= " var " ^ argname2;
+									// duplicate code above and below
+									if (argtype == "in" || argtype == "out" || argtype == "io") {
+										argname2 = argname ^ "_" ^ argtype;
+										//declare it
+										func_body ^= " var " ^ argname2;
+									} else {
+										// use unknown arg type as is/without ref
+										argname2 = argname;
+										//declare it
+										func_body ^= " " ^ argtype.convert("&", "") ^ " " ^ argname2;
+									}
 									//default it. DOS doesnt have a "default" for missing args other than "var()" ie unassigned
 									if (argdefault ne "" and argdefault ne "var()")
 										func_body ^= " = " ^ argdefault;
@@ -2441,12 +2461,13 @@ R"__(
 			var stats = rep_optimes.pop().stddev().oconv("MD30");
 //			logputl();
 			if (nreps > 1)
-				errput("Rep:" , repn, "/", oconv(nreps, "MD0,"), ". ", oconv(nops, "MD0,"), " ops/rep  min:", stats.f(3), "  max:", stats.f(4), "  avg:", stats.f(5), " ± ", stats.f(6), " ", opunit, "/op");
+				errput("Rep:" , repn.oconv("MD0,"), "/", oconv(nreps, "MD0,"), ". ", oconv(nops, "MD0,"), " ops/rep  min:", stats.f(3), "  max:", stats.f(4), "  avg:", stats.f(5), " ± ", stats.f(6), " ", opunit, "/op");
 			else if (nops > 1)
 				errput(oconv(nops, "MD0,"), " ops. ", stats.f(5), " ", opunit, "/op");
 			else
 				errput(stats.f(5), " ", opunit);
-			errput("  ", ANS.squote());
+			if (repn == nreps or ANS.len() <= 32)
+				errput("  ", ANS.squote());
 			osflush();
 		}
 	} // repn

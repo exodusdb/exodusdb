@@ -209,25 +209,6 @@ func main(in mode, io logtime, in menu) {
 
 	} else if (mode == "COMPRESSLOGS") {
 
-		// use WINDOWS COMPACT to save disk space
-//		if (VOLUMES) {
-//
-//			call log2("*once off call to windows COMPACT command on ..LOGS", logtime);
-//
-//			if (not conf.osread("..\\LOGS\\exodus.ini")) {
-//				conf = "";
-//			}
-//			if (not conf.contains("NOTREQ")) {
-//
-//				let cmd = "compact /C /S /F ..\\LOGS ..\\LOGS\\*.*";
-//				var(cmd ^ " DONE,NOTREQ").oswrite("..\\LOGS\\exodus.ini");
-//
-//				printl(cmd);
-//				printl(shell2(cmd, errors));
-//				printl(errors);
-//			}
-//		}
-
 		call log2("*compress logs with gzip", logtime);
 		var	 dbcode	  = SYSTEM.f(17);
 		var	 curryear = date().oconv("DY");
@@ -237,7 +218,7 @@ func main(in mode, io logtime, in menu) {
 
 			// dir='..\logs\':dbcode:'\':year
 			// filenames='..\logs\':dbcode:'\':year:'\*.xml'
-			var filenamesx = "../logs/" ^ dbcode ^ "/" ^ year ^ "/*.xml";
+			var filenamesx = "../logs/" ^ dbcode ^ "/" ^ year ^ "/" "*.xml";
 			filenamesx.converter("/", OSSLASH);
 
 			if (not oslistf(filenamesx))
@@ -357,15 +338,6 @@ nextuser:
 		}
 
 	} else if (mode == "OSCLEANUP") {
-		// initdir '..\VDM*.TMP'
-		// temps=dirlist()
-//		if (VOLUMES) {
-//			let temps  = oslistf("..\\vdm*.tmp");
-//			let ntemps = temps.fcount(FM);
-//			for (const var tempn : range(1, ntemps)) {
-//				("..\\" ^ temps.f(tempn)).osremove();
-//			}  // tempn;
-//		}
 
 	} else if (mode == "MAKEMENU") {
 
@@ -388,12 +360,6 @@ nextuser:
 		href = "../exodus/systemconfiguration.htm";
 		call menusubs("ADDITEM", menutx, item, href);
 
-//		if (VOLUMES) {
-//			item = "_Backup";
-//			href = "../exodus/backup.htm";
-//			call menusubs("ADDITEM", menutx, item, href);
-//		}
-
 		item = "L_og";
 		href = "../exodus/log.htm";
 		call menusubs("ADDITEM", menutx, item, href);
@@ -415,25 +381,11 @@ nextuser:
 
 		call menusubs("ADDSEP", menutx);
 
-//		if (VOLUMES) {
-//			item		= "List of Database _Processes";
-//			let onclick = "javascript:openwindow_sync('EXECUTE|rGENERAL|rLISTPROCESSES');return false";
-//			// backslash
-//			onclick.converter("|", chr(92));
-//			call menusubs("ADDITEM", menutx, item, href, onclick);
-//		}
-
 		item		= "_List of Documents in Use";
 		var onclick = "javascript:openwindow_sync('EXECUTE|rGENERAL|rLISTLOCKS');return false";
 		// backslash
 		onclick.converter("|", chr(92));
 		call menusubs("ADDITEM", menutx, item, href, onclick);
-
-//		if (VOLUMES) {
-//			item = "_Stop/Restart EXODUS Service";
-//			href = "../exodus/stopservice.htm";
-//			call menusubs("ADDITEM", menutx, item, href);
-//		}
 
 		call menusubs("ENDMENU", menutx);
 

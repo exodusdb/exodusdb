@@ -344,15 +344,18 @@ ND	var  calculate(in dictid, in dictfile, in id, in record, in mv = 0);
 	// Reads a record from the specified file and key (using readc()) and then either extracts a specific field number or calls calculate(dictid...) to obtain the result.
 	// filename: Which file to read.
 	// key: The key of the record to read.
-	// fieldno_or_name:
-	// * If numeric then a specific field number will be extracted.
-	// * If "0" then the key will be returned.
-	// * If "" then the whole record will be returned.
-	// * dictid: calculate(dictid) will be called.
-	// mode: Determines what to do if the record does not exist.
-	// * "X" Return ""
-	// * "C" Return the key.
-	// MV: Environment variable. Will be used to select a particular value or all if zero.
+	//
+	// fieldno_or_name: The field  to return.
+	// * nn * Field number nn.
+	// * 0  * The record key (ID).
+	// * "" * The whole record (RECORD)
+	// * dictid * The function calculate(dictid) will be called.
+	//
+	// mode: If the record does not exist.
+	// * "X" * Return ""
+	// * "C" * Return the key.
+	//
+	// MV: Environment variable. Will be used to select a particular value if not zero, or all values if zero.
 ND	var  xlate(in filename, in key, in fieldno_or_name, const char* mode);
 
 	/////////////////////
@@ -521,13 +524,13 @@ ND	bool esctoexit() const;
 	// Returns: A string to be output to the terminal in order to accomplish the desired operation.
 	// The terminal protocol is xterminal.
 	// code:
-	// n   Position the cursor at column number n
-	// 0   Position the cursor at column number 0
-	// -1  Clear the screen and home the cursor
-	// -2  Position the cursor at the top left home (x,y = 0,0)
-	// -3  Clear from the cursor at the end of screen
-	// -4  Clear from cursor to end of line
-	// -40 Position the cursor at columnno 0 and clear to end of line
+	// * n   * Position the cursor at column number n
+	// * 0   * Position the cursor at column number 0
+	// * -1  * Clear the screen and home the cursor
+	// * -2  * Position the cursor at the top left home (x,y = 0,0)
+	// * -3  * Clear from the cursor at the end of screen
+	// * -4  * Clear from cursor to end of line
+	// * -40 * Position the cursor at columnno 0 and clear to end of line
 ND	var  AT(const int code) const;
 
 	// Get a terminal cursor positioning string.
@@ -543,11 +546,11 @@ ND	var  AT(const int x, const int y) const;
 	// delayms: Default 3000ms. The maximum time to wait for terminal response.
 	// max_errors: Default is 0. If not zero, reset the number of times to error before automatically disabling getcursor(). max_errors is initialised to 3. If negative then max_errors has the the effect of disabling all future calls to getcursor().
 	// In case the terminal fails to respond correctly within the required timeout, or is currently disabled due to too many failures, or has been specifically disabled then the returned "cursor" var contains a 4th field:
-	// TIMEOUT - The terminal failed to respond within the timeout.
-	// READ_ERROR - Failed to read terminal response.
-	// INVALID_RESPONSE - Terminal response invalid.
-	// SETUP_ERROR - Terminal setup failed.
-	// DISABLED - Terminal is disabled due to more errors than the maximum currently set.
+	// * TIMEOUT          * The terminal failed to respond within the timeout.
+	// * READ_ERROR       * Failed to read terminal response.
+	// * INVALID_RESPONSE * Terminal response invalid.
+	// * SETUP_ERROR      * Terminal setup failed.
+	// * DISABLED         * Terminal is disabled due to more errors than the maximum currently set.
 	//
 	// `var cursor;
 	//  if (isterminal() and not getcursor(cursor)) ... // cursor becomes something like "0^20^0.012345"_var`
@@ -587,10 +590,11 @@ ND	var  invertarray(in input, bool pad = false);
 	// Sorts fields of multivalues of dynamic arrays in parallel
 	// fns: VM separated list of field numbers to sort in parallel based on the first field number
 	// order:
-	// AL Ascending  - Left Justified  - Alphabetic
-	// DL Descending - Left Justfiied  - Alphabetic
-	// AR Ascending  - Right Justified - Numeric
-	// DR Descending - Right Justified - Numeric
+	// * AL * Ascending  - Left Justified (Alphabetic)
+	// * DL * Descending - Left Justified (Alphabetic)
+	// * AR * Ascending  - Right Justified (Numeric/Natural)
+	// * DR * Descending - Right Justified (Numeric/Natural)
+	//
 	// `var v1 = "f1^10]20]2]1^ww]xx]yy]zz^f3^f4"_var;  // fields 2 and 3 are parallel multivalues and currently unordered.
 	//  sortarray(v1, "2]3"_var, "AR"); // v1 -> "f1^1]2]10]20^zz]yy]ww]xx^f3^f4"_var`
 	//

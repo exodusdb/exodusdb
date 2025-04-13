@@ -2154,7 +2154,7 @@ var  var::stddev() const {
 	int n = strvar.fcount(_FM);
 	if (not n)
 		return "";
-	double tot;
+	double tot = 0;
 	for (var v1 : strvar)
 		tot += v1.toDouble();
 	double mean = tot / n;

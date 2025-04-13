@@ -7,159 +7,176 @@
 dim d1;
 .nf
  
-.fi
+.fi.PP \"<p>
 Create an undimensioned array of vars pending actual dimensions.
-
+.sp 1 \"</p>
+.PP \"<p>
+.PP \"<p>
 \fBExample:\fR
-.RS
-.nf
+.nf \"<code>
 dim d1;
-.fi
-.RE
-
+.fi \"</code>
+.sp 1 \"</p>
+.sp 1 \"</p>
 
 
 .SS
 dim d1(nrows, ncols = 1);
 .nf
  
-.fi
+.fi.PP \"<p>
 Create an array of vars with a fixed number of columns and rows. All vars are unassigned.
-
+.sp 1 \"</p>
+.PP \"<p>
+.PP \"<p>
 \fBExample:\fR
-.RS
-.nf
+.nf \"<code>
 dim d1(10);
 dim d2(10, 3);
-.fi
-.RE
-
+.fi \"</code>
+.sp 1 \"</p>
+.sp 1 \"</p>
 
 
 .SS
 dim d1 = d2; // Copy
 .nf
  
-.fi
+.fi.PP \"<p>
 Create a copy of an array.
-
+.sp 1 \"</p>
+.PP \"<p>
+.PP \"<p>
 \fBExample:\fR
-.RS
-.nf
+.nf \"<code>
 dim d1 = {2, 4, 6, 8};
 dim d2 = d1;
-.fi
-.RE
-
+.fi \"</code>
+.sp 1 \"</p>
+.sp 1 \"</p>
 
 
 .SS
 dim d1 = dim(); // Move
 .nf
  
-.fi
+.fi.PP \"<p>
 Save an array created elsewhere.
-
+.sp 1 \"</p>
+.PP \"<p>
 Uses C++ "move" semantics.
-
+.sp 1 \"</p>
+.PP \"<p>
+.PP \"<p>
 \fBExample:\fR
-.RS
-.nf
+.nf \"<code>
 dim d1 = "f1^f2^f3"_var.split();
-.fi
-.RE
-
+.fi \"</code>
+.sp 1 \"</p>
+.sp 1 \"</p>
 
 
 .SS
 dim d1 = {"a", "b", "c" ...}; // Initializer list
 .nf
  
-.fi
+.fi.PP \"<p>
 Create an array from a list. All elements must be the same type, var, string, double, int, etc.. but all end up as vars which are a flexible type.
-
+.sp 1 \"</p>
+.PP \"<p>
+.PP \"<p>
 \fBExample:\fR
-.RS
-.nf
+.nf \"<code>
 dim d1 = {1, 2, 3, 4, 5};
 dim d2 = {"A", "B", "C"};
-.fi
-.RE
-
+.fi \"</code>
+.sp 1 \"</p>
+.sp 1 \"</p>
 
 
 .SS
 dim d1 = v1;
 .nf
  
-.fi
+.fi.PP \"<p>
 Initialise all elements of an array to some single value or constant. A var, "", 0 etc.
-
+.sp 1 \"</p>
+.PP \"<p>
+.PP \"<p>
 \fBExample:\fR
-.RS
-.nf
+.nf \"<code>
 dim d1(10);
 d1 = "";
-.fi
-.RE
-
+.fi \"</code>
+.sp 1 \"</p>
+.sp 1 \"</p>
 
 
 .SS
 dim d1 = sourceint;
 .nf
  
-.fi
+.fi.PP \"<p>
 Undocumented
+.sp 1 \"</p>
+
 
 .SS
 operator=(double sourcedbl)
 .nf
  
-.fi
+.fi.PP \"<p>
 Undocumented
+.sp 1 \"</p>
+
 
 .SS
 d1.redim(nrows, ncols = 1)
 .nf
  
-.fi
+.fi.PP \"<p>
 Resize an array to a different number of rows and columns.
-
+.sp 1 \"</p>
+.PP \"<p>
 Existing data will be retained as far as possible. Any additional elements are unassigned.
-
+.sp 1 \"</p>
+.PP \"<p>
 Resizing rows to 0 clears all data.
-
+.sp 1 \"</p>
+.PP \"<p>
 Resizing cols to 0 clears all data and changes its status to "undimensioned".
-
+.sp 1 \"</p>
+.PP \"<p>
+.PP \"<p>
 \fBExample:\fR
-.RS
-.nf
+.nf \"<code>
 dim d1;
 d1.redim(10, 3);
-.fi
-.RE
-
+.fi \"</code>
+.sp 1 \"</p>
+.sp 1 \"</p>
 
 
 .SS
 d1.swap(d2) 
 .nf
  
-.fi
+.fi.PP \"<p>
 Swap one array with another.
-
+.sp 1 \"</p>
+.PP \"<p>
 Either or both may be undimensioned.
-
+.sp 1 \"</p>
+.PP \"<p>
+.PP \"<p>
 \fBExample:\fR
-.RS
-.nf
+.nf \"<code>
 dim d1(5);
 dim d2(10);
 d1.swap(d2);
-.fi
-.RE
-
+.fi \"</code>
+.sp 1 \"</p>
+.sp 1 \"</p>
 
 
 .SH 2. ARRAY ACCESS
@@ -169,18 +186,46 @@ d1.swap(d2);
 var v1 = d1[rowno];       d1[rowno] = v1;
 .nf
  
-.fi
+.fi.PP \"<p>
 Access and update elements of a one dimensional array using [] brackets
-
+.sp 1 \"</p>
+.PP \"<p>
+.PP \"<p>
 \fBExample:\fR
-.RS
-.nf
+.nf \"<code>
 dim d1 = {1, 2, 3, 4, 5};
 d1[3] = "X";
 let v1 = d1[3]; // "X"
-.fi
-.RE
+.fi \"</code>
+.sp 1 \"</p>
+.sp 1 \"</p>
 
+
+.SS
+var v1 = d1[rowno];       d1[rowno] = v1;
+.nf
+ 
+.fi
+
+
+.SS
+var v1 = d1[rowno, colno];       d1[rowno, colno] = v1;
+.nf
+ 
+.fi.PP \"<p>
+Access and update elements of an two dimensional array using [] brackets
+.sp 1 \"</p>
+.PP \"<p>
+.PP \"<p>
+\fBExample:\fR
+.nf \"<code>
+dim d1(10, 5);
+d1 = "";
+d1[3, 4] = "X";
+let v1 = d1[3, 4]; // "X"
+.fi \"</code>
+.sp 1 \"</p>
+.sp 1 \"</p>
 
 
 .SS
@@ -188,18 +233,13 @@ var v1 = d1[rowno, colno];       d1[rowno, colno] = v1;
 .nf
  
 .fi
-Access and update elements of an two dimensional array using [] brackets
 
-\fBExample:\fR
-.RS
+
+.SS
+d2(rowno);       d1(rowno) = v2
 .nf
-dim d1(10, 5);
-d1 = "";
-d1[3, 4] = "X";
-let v1 = d1[3, 4]; // "X"
+ 
 .fi
-.RE
-
 
 
 .SS
@@ -217,62 +257,76 @@ d2(rowno, colno);       d1(rowno, colno) = v2
 
 
 .SS
-var v1 = d1.rows();
+d2(rowno, colno);       d1(rowno, colno) = v2
 .nf
  
 .fi
-Get the number of rows in the dimensioned array
 
-\fBReturns:\fR A count. Can be zero, indicating an empty array.
 
-\fBExample:\fR
-.RS
+.SS
+var v1 = d1.rows();
 .nf
+ 
+.fi.PP \"<p>
+Get the number of rows in the dimensioned array
+.sp 1 \"</p>
+.PP \"<p>
+\fBReturns:\fR A count. Can be zero, indicating an empty array.
+.sp 1 \"</p>
+.PP \"<p>
+.PP \"<p>
+\fBExample:\fR
+.nf \"<code>
 dim d1(5,3);
 let v1 = d1.rows(); // 5
-.fi
-.RE
-
+.fi \"</code>
+.sp 1 \"</p>
+.sp 1 \"</p>
 
 
 .SS
 var v1 = d1.cols();
 .nf
  
-.fi
+.fi.PP \"<p>
 Get the number of columns in the dimensioned array
-
+.sp 1 \"</p>
+.PP \"<p>
 \fBReturns:\fR A count.  0 if the array is undimensioned.
-
+.sp 1 \"</p>
+.PP \"<p>
+.PP \"<p>
 \fBExample:\fR
-.RS
-.nf
+.nf \"<code>
 dim d1(5,3);
 let v1 = d1.cols(); // 3
-.fi
-.RE
-
+.fi \"</code>
+.sp 1 \"</p>
+.sp 1 \"</p>
 
 
 .SS
 var v1 = d1.join(delimiter = FM);
 .nf
  
-.fi
+.fi.PP \"<p>
 Joins all elements into a single delimited string
-
+.sp 1 \"</p>
+.PP \"<p>
 \fBdelimiter:\fR Default is FM.
-
+.sp 1 \"</p>
+.PP \"<p>
 \fBReturns:\fR A string var.
-
+.sp 1 \"</p>
+.PP \"<p>
+.PP \"<p>
 \fBExample:\fR
-.RS
-.nf
+.nf \"<code>
 dim d1 = {"f1", "f2", "f3"};
 let v1 = d1.join(); // "f1^f2^f3"_var
-.fi
-.RE
-
+.fi \"</code>
+.sp 1 \"</p>
+.sp 1 \"</p>
 
 
 .SH 3. ARRAY MUTATION
@@ -282,84 +336,93 @@ let v1 = d1.join(); // "f1^f2^f3"_var
 d1.splitter(str1, delimiter = FM)
 .nf
  
-.fi
+.fi.PP \"<p>
 Creates or updates the array from a given string.
-
+.sp 1 \"</p>
+.PP \"<p>
 If the dim array is undimensioned it will be dimensioned with the number of elements that the string has fields.
-
+.sp 1 \"</p>
+.PP \"<p>
 If the dim array is dimensioned and has more elements than there are fields in the string, the excess array elements are initialised to "". If the record has more fields than there are elements in the array, the excess fields are all left unsplit in the final element of the array.
-
+.sp 1 \"</p>
+.PP \"<p>
 Predimensioning arrays allows the efficient reuse of arrays in loops and ensures that all elements are assigned values, useful when reading records from db files.
-
+.sp 1 \"</p>
+.PP \"<p>
 Using undimensioned arrays allows the efficient handling of arrays with a very variable number of elements. e.g. os text files.
-
+.sp 1 \"</p>
+.PP \"<p>
+.PP \"<p>
 \fBExample:\fR
-.RS
-.nf
+.nf \"<code>
 dim d1;
 d1.splitter("f1^f2^f3"_var); // d1.rows() -> 3  //// Automatically dimensioned.
 //
 dim d2(10);
 d2.splitter("f1^f2^f3"_var); // d2.rows() -> 10 /// Predimensioned. Excess elements become ""
-.fi
-.RE
-
+.fi \"</code>
+.sp 1 \"</p>
+.sp 1 \"</p>
 
 
 .SS
 d1.sorter(reverse = false)
 .nf
  
-.fi
+.fi.PP \"<p>
 Sort the elements of the array in place.
-
+.sp 1 \"</p>
+.PP \"<p>
 \fBreverse:\fR Defaults to false. If true, then the order is reversed.
-
+.sp 1 \"</p>
+.PP \"<p>
+.PP \"<p>
 \fBExample:\fR
-.RS
-.nf
+.nf \"<code>
 dim d1 = "2,20,10,1"_var.split(",");
 d1.sorter();
 let v1 = d1.join(","); // "1,2,10,20"_var
-.fi
-.RE
-
+.fi \"</code>
+.sp 1 \"</p>
+.sp 1 \"</p>
 
 
 .SS
 d1.reverser()
 .nf
  
-.fi
+.fi.PP \"<p>
 Reverse the elements of the array in place.
-
+.sp 1 \"</p>
+.PP \"<p>
+.PP \"<p>
 \fBExample:\fR
-.RS
-.nf
+.nf \"<code>
 dim d1 = "2,20,10,1"_var.split(",");
 d1.reverser();
 let v1 = d1.join(","); // "1,10,20,2"_var
-.fi
-.RE
-
+.fi \"</code>
+.sp 1 \"</p>
+.sp 1 \"</p>
 
 
 .SS
 d1.shuffler()
 .nf
  
-.fi
+.fi.PP \"<p>
 Randomly shuffle the order of the elements of the array in place.
-
+.sp 1 \"</p>
+.PP \"<p>
+.PP \"<p>
 \fBExample:\fR
-.RS
-.nf
+.nf \"<code>
 dim d1 = "2,20,10,1"_var.split(",");
 d1.shuffler();
 let v1 = d1.join(","); // random
-.fi
-.RE
-
+.fi \"</code>
+.sp 1 \"</p>
+.sp 1 \"</p>
 
 
 .SH 4. ARRAY CONVERSION
@@ -369,22 +432,28 @@ let v1 = d1.join(","); // random
 dim d1 = d1.sort(reverse = false);
 .nf
  
-.fi
+.fi.PP \"<p>
 Same as sorter() but returns a new array leaving the original untouched.
+.sp 1 \"</p>
+
 
 .SS
 dim d1 = d1.reverse();
 .nf
  
-.fi
+.fi.PP \"<p>
 Same as reverser() but returns a new array leaving the original untouched.
+.sp 1 \"</p>
+
 
 .SS
 dim d1 = d1.shuffle();
 .nf
  
-.fi
+.fi.PP \"<p>
 Same as shuffler() but returns a new array leaving the original untouched.
+.sp 1 \"</p>
+
 
 .SH 5. ARRAY DB I/O
 .SH
@@ -393,51 +462,58 @@ Same as shuffler() but returns a new array leaving the original untouched.
 d1.write(dbfile, key)
 .nf
  
-.fi
+.fi.PP \"<p>
 Writes a db file record created from an array.
-
+.sp 1 \"</p>
+.PP \"<p>
 Each element in the array becomes a separate field in the db record. Any redundant trailing FMs are suppressed.
-
+.sp 1 \"</p>
+.PP \"<p>
+.PP \"<p>
 \fBExample:\fR
-.RS
-.nf
+.nf \"<code>
 dim d1 = "Client GD^G^20855^30000^1001.00^20855.76539"_var.split();
 let file = "xo_clients", key = "GD001";
 if (not deleterecord("xo_clients", "GD001")) {}; // Cleanup first
 d1.write(file, key);
 // or
 write(d1 on file, key);
-.fi
-.RE
-
+.fi \"</code>
+.sp 1 \"</p>
+.sp 1 \"</p>
 
 
 .SS
 if (d1.read(dbfile, key)) ...
 .nf
  
-.fi
+.fi.PP \"<p>
 Read a db file record into an array.
-
+.sp 1 \"</p>
+.PP \"<p>
 Each field in the database record becomes a single element in the array.
-
+.sp 1 \"</p>
+.PP \"<p>
 \fBReturns:\fR True if the record exists or false if not,
-
+.sp 1 \"</p>
+.PP \"<p>
 If the array is predimensioned then any excess array elements are initialised to "" and any excess record fields are left unsplit in the final array element. See dim splitter for more info.
-
+.sp 1 \"</p>
+.PP \"<p>
 If the array is not predimensioned (rows and cols = 0) then it will be dimensioned to have exactly the same number of rows as there are fields in the record being read.
-
+.sp 1 \"</p>
+.PP \"<p>
+.PP \"<p>
 \fBExample:\fR
-.RS
-.nf
+.nf \"<code>
 dim d1(10);
 let file = "xo_clients", key = "GD001";
 if (not d1.read(file, key)) ... // d1.join() -> "Client GD^G^20855^30000^1001.00^20855.76539^^^^"_var
 // or
 if (not read(d1 from file, key)) ...
-.fi
-.RE
-
+.fi \"</code>
+.sp 1 \"</p>
+.sp 1 \"</p>
 
 
 .SH 6. ARRAY OS I/O
@@ -447,59 +523,70 @@ if (not read(d1 from file, key)) ...
 if (d1.oswrite(osfilename, codepage = "")) ...
 .nf
  
-.fi
+.fi.PP \"<p>
 Creates an entire os text file from an array
-
+.sp 1 \"</p>
+.PP \"<p>
 Each element of the array becomes one line in the os file delimited by \\n
-
+.sp 1 \"</p>
+.PP \"<p>
 Any existing os file is overwritten and replaced.
-
+.sp 1 \"</p>
+.PP \"<p>
 \fBcodepage:\fR Optional: Data is converted from UTF8 to the required codepage/encoding before output. If the conversion cannot be performed then return false.
-
+.sp 1 \"</p>
+.PP \"<p>
 \fBReturns:\fR True if successful or false if not.
-
+.sp 1 \"</p>
+.PP \"<p>
+.PP \"<p>
 \fBExample:\fR
-.RS
-.nf
-dim d1 = "aaa=1\\nbbb=2\\nccc=3\\n"_var.split("\\n");
+.nf \"<code>
+dim d1 = "aaa=1\nbbb=2\nccc=3\n"_var.split("\n");
 if (not osremove("xo_conf.txt")) {}; // Cleanup first
 let osfilename = "xo_conf.txt";
 if (not d1.oswrite(osfilename)) ...
 // or
 if (not oswrite(d1 on osfilename)) ...
-.fi
-.RE
-
+.fi \"</code>
+.sp 1 \"</p>
+.sp 1 \"</p>
 
 
 .SS
 if (d1.osread(osfilename, codepage = "")) ...
 .nf
  
-.fi
+.fi.PP \"<p>
 Read an entire os text file into an array.
-
+.sp 1 \"</p>
+.PP \"<p>
 Each line in the os file, delimited by \\n or \\r\\n, becomes a separate element in the array.
-
+.sp 1 \"</p>
+.PP \"<p>
 Existing data in the array is lost and the array is redimensioned to the number of lines in the input data.
-
+.sp 1 \"</p>
+.PP \"<p>
 \fBcodepage:\fR Optional. Data will be converted from the specified codepage/encoding to UTF8 after being read. If the conversion cannot be performed then return false.
-
+.sp 1 \"</p>
+.PP \"<p>
 \fBReturns:\fR True if successful or false if not.
-
+.sp 1 \"</p>
+.PP \"<p>
 If the first \\n in the file is \\r\\n then the whole file will be split using \\r\\n as delimiter.
-
+.sp 1 \"</p>
+.PP \"<p>
+.PP \"<p>
 \fBExample:\fR
-.RS
-.nf
+.nf \"<code>
 dim d1;
 let osfilename = "xo_conf.txt";
-if (not d1.osread(osfilename)) ... // d1.join("\\n") -> "aaa=1\\nbbb=2\\nccc=3\\n"_var0
+if (not d1.osread(osfilename)) ... // d1.join("\n") -> "aaa=1\nbbb=2\nccc=3\n"_var0
 // or
 if (not osread(d1 from osfilename)) ...
-.fi
-.RE
-
+.fi \"</code>
+.sp 1 \"</p>
+.sp 1 \"</p>
 
 
 

@@ -7,6 +7,22 @@ programinit()
 // Source code comments contain "\u22c5+"; "⋅" Unicode operator point operator and "␣" space indicater
 // man_page_white_space_code_point = "\u2005"; // " " FOUR-PER-EM SPACE
 
+//#include "t2hl.h" // comment text 2 html converter
+//#include "h2ml.h" // html 2 man page text converter
+//#include <htmllib2.h>
+#include "htmllib2.h"
+
+// various   func/var comments exodus/c++ literals exovars jumps  allcaps
+// purple    white    cyan     green      yellow   brown   pink   red
+func demo_colors() {
+    // A comment
+    var dummy;
+    if (not open("DEFINITIONS" to DEFINITIONS))
+        abort(lasterror());
+    TRACE(R"__(\\)__")
+	return 0;
+}
+
 let syntax =
 
 R"__(gendoc osfilename ... [codefile_dir] [{OPTIONS}]
@@ -58,47 +74,48 @@ func main() {
 		// pygmentize cpp syntax highlighting
 		{
 
-			// Lambda converter will be used twice
-			auto converter = [this](in cpp_in, out html_out) -> bool {
+			// A named lambda since it needs to be called twice
+			auto converter = [this](in cpp_in) -> var {
 
-				// TODO enforce stdin stdout and stderr to be independent vars.
-				var errors, exit_status;
+				var html_out;
 
-				// Requires cd ~/exodus/pygment && ./install.sh
-				let lexer = "exoduscpp";
+				// requires plugin install. cd ~/exodus/pygment && ./install.sh
+				let plugin_lexer = "exoduscpp";
+
+				// We dont want html header nor css style sheet.
+				// For full output in a complete html file including css
 				// pygmentize -l exoduscpp -f html -O full,style=colorful -o test.html test.cpp -v"
+				let oscmd = "pygmentize -l " ^ plugin_lexer ^ " -f html";
 
 				// osprocess
+				var errors, exit_status;
 				if (not var::osprocess(
-					"pygmentize -l " ^ lexer ^ " -f html",
+					oscmd,
 					/*in*/ cpp_in,
 					/*out*/ html_out, errors, exit_status)
 				)
-					abort(lasterror() ^ " " ^ errors);
+					abort(lasterror() ^ " " ^ exit_status ^ " " ^ errors);
 
-				// Remove the first two tags
-				// <div class="highlight"><pre>
+				// Remove the first two tags. <div class="highlight"><pre>
 				html_out.cutter(html_out.indexn(">", 2));
 
-				// Also this
+				// Remove a redundent span
 				if (html_out.starts("<span></span>"))
 					html_out.cutter(13);
 
-				// Remove the last two tags
-				// </pre></div>
+				// Remove the last two tags. </pre></div>
 				html_out.fieldstorer("<", -2, -2, "");
 				html_out.popper();
 
-				return true;
+				return html_out;
 			};
 
 			// 1. Convert all the code matches to html
-			var converted_code_matches;
-			converter(all_code_matches, converted_code_matches);
+			let converted_code_matches = converter(all_code_matches);
 
-			// 2. Work out how it converted the code match separator so we can undo it
-			var converted_code_match_delim1;
-			converter(code_match_delim1, converted_code_match_delim1);
+			// 2. Work out how pygmentize converts our code match separator
+			//    so we can restore our original unconverted code match separator
+			let converted_code_match_delim1 = converter(code_match_delim1);
 
 			// All code matches becomes the html converted version
 			all_code_matches = converted_code_matches.replace(converted_code_match_delim1, code_match_delim2);
@@ -106,9 +123,10 @@ func main() {
 		}
 
 		{
-			// Optionally get pygmentize css
-			// We have out own style embedded.
+			// Get css_cpp_style. Not required.
+			// We already hard coded our heavily customised pygmentize style.
 			if (false) {
+				// How to get a fresh copy of pygmentize default html style
 				var errors, exit_status;
 				if (not var::osprocess("pygmentize -S default -f html", "", css_cpp_style, errors, exit_status))
 					abort(lasterror());
@@ -224,7 +242,8 @@ func main() {
 		// Start a file for the documentation
 		/////////////////////////////////////
 
-		std::ofstream docfile(docfilename.toString());
+//		std::ofstream docfile(docfilename.toString());
+		var docfile = docfilename;
 
 		// Lines like "///... some text:"
 		const static rex doc_rex(R"__(^(/{3,})\s+(.*):$)__");
@@ -232,7 +251,7 @@ func main() {
 		auto skipping = true;
 		auto in_table = false;
 
-		var comments = "";
+		var contiguous_comments = "";
 
 		var default_objname = "var";
 
@@ -252,11 +271,23 @@ func main() {
 //			srcline.trimmer();
 			srcline.trimmerboth();
 
+			if (srcline == "private:") {
+				// Ignore all comments in private
+				// (unless turned on by a table title below)
+				skipping = true;
+				continue; // nextline
+			}
+
+			if(srcline == "public:")
+				// Inspect everything in public
+				skipping = false;
+
 			if (srcline.starts("[[noreturn") and srcline.ends("]]"))
+				// Skip noreturn
 				continue; // nextline
 
-			// class definitions
 			if (srcline.starts("class ")) {
+				// Always capture class info
 				srcline.replacer("PUBLIC ", "");
 				// Find class xxx : or { or final
 				let class_match = srcline.match(R"__(class\s+([a-zA-Z0-9_]+)\s*[:{f])__");
@@ -272,11 +303,9 @@ func main() {
 			////////////////////////////
 			// Start a section and table
 			////////////////////////////
-
-			// Match lines starting // and ending ":"
+			// Lines starting // and ending ":"
 			var table_title = srcline.match(doc_rex);
 			if (table_title) {
-
 
 				skipping = false;
 
@@ -329,132 +358,132 @@ func main() {
 					docfile << "<tr> <th>Use</th> <th>Function</th> <th>Description</th> </tr>" << std::endl;
 				}
 				continue; // nextline
-			}
 
-			// private declaration turns off documentation
-			if (srcline == "private:")
-				skipping = true;
-			else if(srcline == "public:")
-				skipping = false;
+			} // table title
+
 			if (skipping or not in_table)
+				// Skipping by default.
+				// private: turns skip off.
+				// public: and table titles turn skip off
 				continue; // nextline
 
-			///////////////////////////////////////
-			// Find a function declaration (tricky)
-			///////////////////////////////////////
+			//////////////////////////////////////
+			// function detector/rejector (tricky)
+			//////////////////////////////////////
 
-			//	static int getprecision() const;
-			let origsrcline = srcline;
-			// TODO replacer to return a bool that it did something?
-			// but a returned bool could easily be accidentally used as a var.
-			// Use a thread_local global variable flag?
-			srcline.replacer(R"__(\bstatic\s+)__"_rex, "");
-			bool is_static = srcline ne origsrcline;
+			// continues to next line on rejection
+			var funcx_prefix;
+			struct Funcx {var is_static; var no_discard; var is_ctor; var prefix = "";} funcx_mut;
+			{
+				//	static int getprecision() const;
+				let origsrcline = srcline;
+				// TODO replacer to return a bool that it did something?
+				// but a returned bool could easily be accidentally used as a var.
+				// Use a thread_local global variable flag?
+				srcline.replacer(R"__(\bstatic\s+)__"_rex, "");
+				funcx_mut.is_static = srcline ne origsrcline;
 
-			// Not documenting ND or not since mostly ND
-			auto no_discard = srcline.starts("ND ");
-			if (no_discard)
-				srcline.cutter(3);
-//
-//			// Only interested in certain function declarations and comments starting exactly //
-//			var prefix = srcline.field(" ", 1);
-//
-//			if (prefix == "friend" || prefix.starts("CONST")) {
-////				TRACE(prefix)
-//				srcline = srcline.field(" ", 2, 999999).trimfirst();
-//				prefix = srcline.field(" ", 1);
-//			}
+				// Not documenting ND or not since mostly ND
+				funcx_mut.no_discard = srcline.starts("ND ");
+				if (funcx_mut.no_discard)
+					srcline.cutter(3);
 
-            srcline.replacer(R"__(^((friend)|(CONST[^\s]*))\s)__"_rex, "");
-			srcline.trimmerfirst();
-            var prefix = srcline.field(" ", 1);
+				srcline.replacer(R"__(^((friend)|(CONST[^\s]*))\s)__"_rex, "");
+				srcline.trimmerfirst();
+				funcx_prefix = srcline.field(" ", 1);
 
-			// Suppress lines that are not comments or function declarations
-			if (not prefix.starts("/") and not srcline.match(R"__(^[\sa-zA-Z0-9_:&]+\()__")) {
-				var remainder = srcline.field(" ", 2, 99999).trimfirst();
-				if (not remainder.starts("operator"))
-					prefix = "";
-			}
-
-			bool is_constructor = false;
-
-			// Include lines starting var
-			// Warning: lines like "var xxx = 123;" are NOT function declarations
-			if (prefix == "var" or prefix == "int")
-				prefix ^= "=";
-
-			else if (prefix.starts("dim(") or prefix.starts("var(")) {
-				is_constructor = true;
-			}
-
-			else if (prefix == "std::string") prefix = "var="; // i/oconv private
-
-			else if (prefix == "RETVAR") prefix = "="; // from var_base
-
-			// const var&
-			else if (prefix == "CVR")  prefix = "expr";// only for output/logput/errput etc.
-			else if (prefix == "CBR") prefix = "expr"; // from var_base
-
-			// var& (various types)
-			else if (prefix == "io")   prefix = "expr";// none should return this
-			else if (prefix == "IO")   prefix = "cmd"; // ditto. (now IO=void for mutator -er)
-			else if (prefix == "VARREF") prefix = "VARREF"; // exo::var& from var_base
-			else if (prefix == "out")  prefix = "expr";// only input and getlocale
-
-			// bool
-			else if (prefix == "bool") prefix = "if";  // many return true/false
-
-			// void
-			else if (prefix == "void") prefix = "cmd"; // many return nothing
-
-			// dim
-			else if (prefix == "dim") prefix = "dim=";
-
-			// int (rare)
-			else if (prefix == "int") {prefix = "int";} // setprecision/getprecision
-
-			else {
-
-				if (prefix == "/" "/") {
-
-					// Collect possible function preamble comments
-					// Exactly // (two slashes, not more)
-					comments ^= srcline.substr(4) ^ FM_;
-
-				} else {
-
-					if (verbose == 2)
-						TRACE(srcline)
-
-					// Throw away non-function preamble comments
-					////////////////////////////////////////////
-
-					// From thrown away comments, get the default obj name for all following functions
-					// except where overridden in specific function comments.
-					// Only match "obj is xxx|yyy|zzz()" at the start of the first line of comment.
-					let new_default_objname = comments.match(R"__(^\s*obj is ([a-zA-Z_][a-zA-Z0-9_()|]+))__").f(1, 2);
-
-					if (new_default_objname) {
-						new_objs ^= new_default_objname ^ FM;
-						default_objname = new_default_objname;
-					}
-
-					// Throw away collected comments if not contiguous
-					comments = "";
+				// Suppress lines that are not comments or function declarations
+				if (not funcx_prefix.starts("/") and not srcline.match(R"__(^[\sa-zA-Z0-9_:&]+\()__")) {
+					var remainder = srcline.field(" ", 2, 99999).trimfirst();
+					if (not remainder.starts("operator"))
+						funcx_prefix = "";
 				}
-				continue; // nextline
-			}
 
-			// Skip [[deprecated]] and [[undocumented]] functions
-			static rex undocumented(R"__(\[\[(deprecated|undocumented))__");
-			if (comments.match(undocumented))
-				continue; // nextline
+				funcx_mut.is_ctor = funcx_prefix.starts("dim(") or funcx_prefix.starts("var(");
+				if (funcx_mut.is_ctor) {
+				}
+
+				else if (funcx_prefix == "var" or funcx_prefix == "int")
+					// Include lines starting var
+					// Warning: lines like "var xxx = 123;" are NOT function declarations
+					funcx_prefix ^= "=";
+
+				else if (funcx_prefix == "std::string") funcx_prefix = "var="; // i/oconv private
+
+				else if (funcx_prefix == "RETVAR") funcx_prefix = "="; // from var_base
+
+				// const var&
+				else if (funcx_prefix == "CVR")  funcx_prefix = "expr";// only for output/logput/errput etc.
+				else if (funcx_prefix == "CBR") funcx_prefix = "expr"; // from var_base
+
+				// var& (various types)
+				else if (funcx_prefix == "io")   funcx_prefix = "expr";// none should return this
+				else if (funcx_prefix == "IO")   funcx_prefix = "cmd"; // ditto. (now IO=void for mutator -er)
+				else if (funcx_prefix == "VARREF") funcx_prefix = "VARREF"; // exo::var& from var_base
+				else if (funcx_prefix == "out")  funcx_prefix = "expr";// only input and getlocale
+
+				// bool
+				else if (funcx_prefix == "bool") funcx_prefix = "if";  // many return true/false
+
+				// void
+				else if (funcx_prefix == "void") funcx_prefix = "cmd"; // many return nothing
+
+				// dim
+				else if (funcx_prefix == "dim") funcx_prefix = "dim=";
+
+				// int (rare)
+				else if (funcx_prefix == "int") {funcx_prefix = "int";} // setprecision/getprecision
+
+				else {
+
+					if (funcx_prefix == "/" "/") {
+
+						// Collect possible function preamble comments
+						// Exactly // (two slashes, not more)
+						contiguous_comments ^= srcline.substr(4) ^ FM_;
+
+					} else {
+
+						if (verbose == 2)
+							TRACE(srcline)
+
+						// Throw away non-function preamble comments
+						////////////////////////////////////////////
+
+						// From thrown away comments, get the default obj name for all following functions
+						// except where overridden in specific function comments.
+						// Only match "obj is xxx|yyy|zzz()" at the start of the first line of comment.
+						let new_default_objname = contiguous_comments.match(R"__(^\s*obj is ([a-zA-Z_][a-zA-Z0-9_()|]+))__").f(1, 2);
+
+						if (new_default_objname) {
+							new_objs ^= new_default_objname ^ FM;
+							default_objname = new_default_objname;
+						}
+
+						// Throw away collected comments if not contiguous
+						contiguous_comments = "";
+					}
+					continue; // nextline
+				}
+
+				// Skip [[deprecated]] and [[undocumented]] functions
+				const static rex undocumented(R"__(\[\[(deprecated|undocumented))__");
+				if (contiguous_comments.match(undocumented))
+					continue; // nextline
+
+			} // function detector/rejector
+			// Get a constant copy of the originals.
+			// No way to mark something const after declaration in c++.
+			const Funcx funcx_const = funcx_mut;
 
 			///////////////////////////////
 			// Found a function declaration
 			///////////////////////////////
 
-			if (not is_constructor)
+			// Consume the comments
+			var comments = move(contiguous_comments);
+
+			if (not funcx_const.is_ctor)
 				srcline = srcline.field(" ", 2, 9999).trimfirst();
 
 //			var comments = srcline.field("{", 1).field(";", 2, 9999).trimmerfirst("/ ");
@@ -478,42 +507,31 @@ func main() {
 			}
 			let objname = objmatch.f(1,2);
 
-			/////////////////////
-			// Handle code blocks
-			/////////////////////
+			// Add a backtick if an odd numbers is present indicating forgot to close c++ code
+			if (comments.count("`") % 2) {
+				if (comments.count("`") > 1 ) {
+					abort("Error: Odd number of backticks in " ^ funcname.quote());
+				}
+				logputl("Warning: Missing closing backtick in " ^ funcname.quote());
+				comments ^= "`";
+			}
+
+			comments.converter(_FM, _NL);
+
+			// Convert Exodus comment text (pseudo markdown) to html first
+			if (not pass1)
+//				comments = t2hl(comments.convert(_FM, _NL));
+				comments = htmllib2("T2H", STATUS, comments.convert(_FM, _NL));
+
+			//////////////////////
+			// Code blocks handler
+			//////////////////////
 
 			// Format backticked source code fragments
 			if (comments.contains("`")) {
-				// FMs inside backticks (c++ code) become simple "\n"
-				bool backtick = false;
-				for (int charn : range(1, comments.len())) {
-					char charx = comments.substr(charn, 1).toChar();
-					if (charx == '`') {
-						backtick = not backtick;
-						continue;
-					}
-					if (backtick && charx == FM_) {
-						comments.paster(charn, 1, "\n");
-					}
-				}
-
-				// Prevent extra </p> before or after `
-				static rex rex1 {R"__(`\s*)__" _FM};
-				static rex rex2 {_FM R"__(\s*`)__"};
-				comments.replacer(rex1, "`\n");
-				comments.replacer(rex2, "\n`");
-
-				// Add a backtick if an odd numbers is present indicating forgot to close c++ code
-				if (comments.count("`") % 2) {
-					if (comments.count("`") > 1 ) {
-						abort("Error: Odd number of backticks in " ^ funcname.quote());
-					}
-					logputl("Warning: Missing closing backtick in " ^ funcname.quote());
-					comments ^= "`";
-				}
 
 				// regex between pairs of backticks
-				static rex backquoted_rex {R"__(`([^`]*)`)__"};
+				const static rex backquoted_rex {R"__(`([^`]*)`)__"};
 
 				var codematches = comments.match(backquoted_rex);
 
@@ -546,7 +564,7 @@ func main() {
 					codematch.replacer("\t ", "\t");
 
 					// Remove "// Cleanup" lines to be put in heading of
-					static rex cleanup_pattern {R"__(^[^\n]*// Cleanup[^\n]*)__"};
+					const static rex cleanup_pattern {R"__(^[^\n]*// Cleanup[^\n]*)__"};
 					var cleanups = codematch.match(cleanup_pattern);
 					if (cleanups) {
 						for (let cleanup : cleanups) {
@@ -562,22 +580,22 @@ func main() {
 					// IMPLICT ASSERTS
 					// e.g. '   let|var v1 = xxxxxxx ; // "X" // zzzz' where zzzz can be a literal number 9999, "xxx", true or false
 					//      '1112222222 3344444444444     55556666666'
-//					static rex rex3 = rex(R"__(^(\s*)(let|var)?\s+([a-z0-9A-Z_]+) = ([^\n]*?);[ \t]*//\s+(true|false|["0-9.-][^\n]*?)([ \t]//[^\n]*?)?$)__", "m");
-					static rex rex3 = rex(R"__(^(\s*)(let|var)\s+([a-z0-9A-Z_]+) = ([^\n]*?);[ \t]*//\s+(true|false|["0-9.-][^\n]*?)([ \t]//[^\n]*?)?$)__", "m");
+//					const static rex rex3 = rex(R"__(^(\s*)(let|var)?\s+([a-z0-9A-Z_]+) = ([^\n]*?);[ \t]*//\s+(true|false|["0-9.-][^\n]*?)([ \t]//[^\n]*?)?$)__", "m");
+					const static rex rex3 = rex(R"__(^(\s*)(let|var)\s+([a-z0-9A-Z_]+) = ([^\n]*?);[ \t]*//\s+(true|false|["0-9.-][^\n]*?)([ \t]//[^\n]*?)?$)__", "m");
 
 //					codematch.replacer(rex3, "\t$1$2 $3$4; assert($3 == $5);$6");
 					codematch.replacer(rex3, "\t\t$2 $3 = $4; assert($3 == $5);$6");
 
 					// e.g. '           v1 = xxxxxxx ; // "X" // zzzz' where zzzz can be a literal number 9999, "xxx", true or false
 					//      '1112222222 3344444444444     55556666666'
-					static rex rex3b = rex(R"__(^(\s*)()([a-z0-9A-Z_]+) = ([^\n]*?);[ \t]*//\s+(true|false|["0-9.-][^\n]*?)([ \t]//[^\n]*?)?$)__", "m");
+					const static rex rex3b = rex(R"__(^(\s*)()([a-z0-9A-Z_]+) = ([^\n]*?);[ \t]*//\s+(true|false|["0-9.-][^\n]*?)([ \t]//[^\n]*?)?$)__", "m");
 					codematch.replacer(rex3b, "\t\t$2$3 = $4; assert($3 == $5);$6");
 
 					// ARROW ASSERTS
 					//        if (not field.readf(file, key, fieldno)) abort("readf" ": " ^ lasterror()); // field -> "G"
 					// e.g. '  // v1 -> "f1^X^f3"_var // v2 -> "a b c"'
 					//        1   22    33333333333333
-					static rex rex5 = rex(R"__(([^/])//\s*([a-zA-Z0-9_.()]+)\s*->\s*([^/\n]*))__");
+					const static rex rex5 = rex(R"__(([^/])//\s*([a-zA-Z0-9_.()]+)\s*->\s*([^/\n]*))__");
 					codematch.replacer(rex5, "$1 assert($2 == $3);");
 					// Why does it need multiple replaces? (possibly because group 3 overlaps with group 1)
 					codematch.replacer(rex5, "$1 assert($2 == $3); ");
@@ -588,7 +606,7 @@ func main() {
 //					// MUTATOR ASSERTS
 //					// e.g. 'v1.xxx xxx xxx // zzzz // xxxxxx'
 //					// e.g. 'v1.ucaser(); // "ABC"'
-					static rex rex4 = rex(R"__(^(\s*)([a-z0-9A-Z_]+)\.([^/\n]*)//\s+([^/\n]*)([^\n]*))__");
+					const static rex rex4 = rex(R"__(^(\s*)([a-z0-9A-Z_]+)\.([^/\n]*)//\s+([^/\n]*)([^\n]*))__");
 					codematch.replacer(rex4, "$1$2.$3;assert($2 == $4);$5");
 
 					// Replace hacked spaces ␣ with real spaces " "
@@ -652,6 +670,10 @@ func main() {
 				if (pass1)
 					continue; // nextline
 
+				//////////////////
+				// FORMAT COMMENTS
+				//////////////////
+
 				// Remove one leading space (should only be from code)
 				comments.replacer("\n ", "\n");
 				//oswrite(comments on "x");
@@ -665,17 +687,41 @@ func main() {
 					// .RE REturn (left shift)
 					// .fi formatting
 					// Prefix by a section title "Example:"
-					comments.replacer(backquoted_rex, "\nExample:\n.RS\n.nf\n$1\n.fi\n.RE\n");
+//					comments.replacer(backquoted_rex, "\nExample:\n.RS\n.nf\n$1\n.fi\n.RE\n");
+					// Let h2ml do the job
+//					comments.replacer(backquoted_rex, "\n<b>Example:</b><code>\n$1\n</code>\n");
+					// html2 cant do the job unless html chars are escaped and for man output pygmenter has not been called to do the job
+					// therefore do the html escaping here
+					comments.replacer(
+						backquoted_rex,
+						[](in code_match) {
+							let group1 =
+								code_match(1, 2)
+								// html escapes
+								.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+								// man page escapes (handled by h2m in final stage)
+								//.replace(_BS, _BS _BS).replace(".", _BS "&.")
+							;
+							return "\n<p><b>Example:</b><code>\n" ^ group1 ^ "\n</code></p>\n";
+						}
+					);
 				}
 				else if (wiki)
+
+					// wiki
 					comments.replacer(backquoted_rex, "<syntaxhighlight lang=\"c++\">\n$1</syntaxhighlight>");
+
 				else {
+
+					// html
 
 //					// Javascript instead of cpp because it gives better highlighting for exodus c++. See above too.
 //					// (All function calls are highlighted)
 //					comments.replacer(backquoted_rex, "\n<pre><code class='hljs-ncdecl language-javascript'>$1</code></pre>\n");
 //					comments.replacer(backquoted_rex, "\n<pre><code class='language-cpp'>$1</code></pre>\n");
 //					comments.replacer(backquoted_rex, "\n<textarea class=code-block>$1</textarea>\n");
+
+					// REPLACE CODE WITH PASS1 CONVERTED_CODE
 
 					// Use a lambda that consumes all_code_matches sequentially using a pointer into all_code_matches
 					comments.replacer(
@@ -694,13 +740,15 @@ func main() {
 //input();
 							return "<div class=\"highlight " ^ style_switcher_class ^ "\"><pre>" ^ code_match ^ "</pre></div>";
 						}
-					);
+
+					); // replace code with syntax hightlighted html code
 
 				}
 				// Ordinary spaces for aligning code in html and wiki
 				if (not man)
 					comments.replacer("\u22c5", " "); // "⋅" Unicode operator point operator -> " "
-			}
+
+			} // code blocks handler
 
 /////////////////////////
 // probably function line
@@ -719,37 +767,34 @@ func main() {
 				comments.replacer("\u22c5", "\u2005"); // "⋅" Unicode operator point operator -> " " FOUR-PER-EM SPACE
 				comments.replacer("␣", "\u2005");
 
-				// DOUBLE SPACE paragraphs to avoid man joining them up?
-				comments.replacer(_FM, "\n\n");
-
-				// Bullet points for lines starting * + space
-    			comments.replacer("\n\n* "_var, "\n.br\n<REAL_BS>(bu "_var);
-
-				// Auto numbered points
-				// # xxx
-				// # yyy
-				comments.replacer(R"__((^# .*?\n\n){2,999})__"_rex, [](in lines) {
-					dim response = lines.f(1, 1).trim(NL).split(NL);
-					let fmt = "R#" ^ response.rows().len(); // 1. R#1, 10. R#2
-					for (let ln : range(1, response.rows()))
-						response[ln] = ".br\n" ^ ln.oconv(fmt) ^ ". " ^ response[ln].cut(2);
-					return response.join(NL) ^ NL;
-				});
+//				comments = h2ml(comments);
+				comments = htmllib2("H2M", STATUS, comments);
 
 			} else if (wiki) {
+
+				// wiki
 				comments.replacer(_FM, "\n\n");
+
 			} else {
-				// html
-				thread_local rex field_rex {R"__([^\x1e]+\x1e)__"};
-//oswrite(comments on "x");
-//stop();
-				comments.replacer(R"__((^|\x1e)([a-zA-Z0-9_.]+):(\s*))__"_rex, "\x1e<em>$2:</em>$3");
-				// Replace all xxxxxxxx^ with <p>xxxxxxx</p>\n
-				comments.replacer(field_rex, "<p>$&</p>\n");
-				comments.converter(_FM, _NL);
+
+				// convert text to html
+				// Already converted early on
+				if (false) {
+					// html emphasise first word
+					const static rex first_word_if_colon_rex = R"__((^|\x1e)([a-zA-Z0-9_.]+):(\s*))__"_rex;
+					comments.replacer(first_word_if_colon_rex, "\x1e<em>$2:</em>$3");
+
+					// Replace all [not FM]+ FM with <p>[not FM]+</p>\n
+					const static rex field_rex {R"__([^\x1e]+\x1e)__"};
+					comments.replacer(field_rex, "<p>$&</p>\n");
+
+					// dynamic array -> text format
+					comments.converter(_FM, _NL);
+				}
 			}
 
 			// Clean up function args
+			// Can reject the function and continue to next line
 			var line2 = srcline.field(";", 1);
 			{
 
@@ -840,8 +885,9 @@ func main() {
 			func_decl0 = func_decl0.replace(R"__(exoprog_number\(.*)__"_rex, "iconv|oconv(var, \"[NUMBER]\")");
 
 			// Prefix the object name
+			// Can reject the function and skip to nextline
 			var func_decl;
-			if (not is_constructor) {
+			if (not funcx_const.is_ctor) {
 
 				func_decl0.replacer("dim& ", "");
 
@@ -860,7 +906,7 @@ func main() {
 						continue; // nextline
 					else
 						func_decl = "osfile << anything << std::endl;";
-					prefix = "";
+					funcx_prefix = "";
 				}
 				else if (line2.match(R"__(\boperator\s*\[\]\s*\()__")) {
 
@@ -875,7 +921,7 @@ func main() {
 					if (html or wiki)
 						func_decl.replacer("       ", "</br>");
 					// Use on left and right hand side
-					prefix = "";
+					funcx_prefix = "";
 					}
 
 				else if (line2.contains("operator\"\"_")) {
@@ -915,7 +961,7 @@ func main() {
 					);
 
 					// Prevent prefixing with "var v1 = "
-					prefix = "";
+					funcx_prefix = "";
 				}
 
 				else if (line2.match(R"__(\boperator\s*[\+\-]{2,2}\s*\(INT\))__")) {
@@ -927,7 +973,7 @@ func main() {
 					);
 
 					// Prevent prefixing with "var v1 = "
-					prefix = "";
+					funcx_prefix = "";
 				}
 
 				else if (line2.match(R"__(\boperator\s*[\+\-]{2,2}\s*\(\))__")) {
@@ -939,10 +985,10 @@ func main() {
 					);
 
 					// Prevent prefixing with "var v1 = "
-					prefix = "";
+					funcx_prefix = "";
 				}
 
-//				else if (prefix == "int=") {
+//				else if (funcx_prefix == "int=") {
 //					func_decl = func_decl0;
 //				}
 
@@ -953,7 +999,7 @@ func main() {
 					} else
 						func_decl = func_decl0;
 
-					if (is_static)
+					if (funcx_const.is_static)
 						// var(). -> var::
 						func_decl.replacer("().", "::");
 				}
@@ -971,34 +1017,34 @@ func main() {
 				var arg1 = args.field(" ", 1);
 				let class_letter = func_decl0.first(1);
 
-				// Default constructor
+				// Default ctor
 				if (arg1 == "") {
 					// dim() -> dim d1;
 					func_decl = class_name ^ " " ^ func_decl0.first(1) ^ "1;";
-					prefix = "";
+					funcx_prefix = "";
 				}
-				// Copy constructor
+				// Copy ctor
 				else if (arg1 == (class_name ^ "&")) {
 					// dim(dim&) -> dim d1 = d2;
-					prefix = "";
+					funcx_prefix = "";
 					func_decl = class_name ^ " " ^ class_letter ^ "1 = " ^ class_letter ^ "2; /" "/ Copy";
 				}
-				// Move constructor
+				// Move ctor
 				else if (arg1 == (class_name ^ "&&")) {
 					// dim(dim&&) -> dim d1 = dim();
-					prefix = "";
+					funcx_prefix = "";
 					func_decl = class_name ^ " " ^ class_letter ^ "1 = " ^ class_name ^ "(); /" "/ Move";
 				}
 				else if (arg1.starts("std::initializer_list")) {
 					// -> dim d1 = {"a", "b", "c", "d" ...};
-					prefix = "";
+					funcx_prefix = "";
 					func_decl = class_name ^ " " ^ class_letter ^ R"__(1 = {"a", "b", "c" ...};)__" " /" "/ Initializer list";
 				}
-				// Other constructors
+				// Other ctors
 				else {
 					// dim(nrows, ncols = 1) -> "dim d1(nrows, ncols = 1);
 					func_decl = class_name ^ " " ^ class_letter ^ "1(" ^ args ^ ");";
-					prefix = "";
+					funcx_prefix = "";
 				}
 
 			}
@@ -1013,22 +1059,21 @@ func main() {
 //				line2.paster(line2.index("("), "</span>");
 //			}
 
-			if (prefix == "cmd" or prefix == "cmd2")
-				prefix = "";
+			if (funcx_prefix == "cmd" or funcx_prefix == "cmd2")
+				funcx_prefix = "";
 
 ///////////
 // lineinit
 ///////////
 
 			// No going back from here because we start outputting to docfile
-
 			if (man) {
 
 				var func_decl2 = func_decl;
 
-				let match1 = prefix.match("([a-zA-Z_0-9]+)=").f(1, 2);
+				let match1 = funcx_prefix.match("([a-zA-Z_0-9]+)=").f(1, 2);
 
-				if (prefix == "if")
+				if (funcx_prefix == "if")
 					func_decl2 = "if (" ^ func_decl ^ ") ...";
 
 				else if (match1) {
@@ -1037,7 +1082,7 @@ func main() {
 //					func_decl2 = "int i1 = " ^ func_decl ^ ";";
 					func_decl2 = match1 ^ " " ^ match1.first() ^ "1 = " ^ func_decl ^ ";";
 				}
-//				else if (prefix == "var=")
+//				else if (funcx_prefix == "var=")
 //					func_decl2 = "var v1 = " ^ func_decl ^ ";";
 
 				// Subsection header
@@ -1053,22 +1098,24 @@ func main() {
 //				docfile << "\u000A" << std::endl; // ignored
 //				docfile << "\u2003" << std::endl; //U+2003 EM SPACE
 				docfile << "\u2005" << std::endl; //U+2005 Four-Per-Em Space
-				docfile << ".fi" << std::endl;
-
+//				docfile << ".fi" << std::endl;
+				docfile << ".fi";
+//TRACE(comments)
+//input();
 				docfile << comments << std::endl;
 				docfile << "" << std::endl;
 			}
 			else if (wiki) {
 				docfile << "|-" << std::endl;
-				docfile << "|" << prefix << "||" << func_decl << "||" << comments << std::endl;
+				docfile << "|" << funcx_prefix << "||" << func_decl << "||" << comments << std::endl;
 			} else {
 				// Using javascript see below too
-				docfile << "<tr><td>" << prefix << "</td><td>" << func_decl <<  "</td><td>" << comments << "</td></tr>" << std::endl;
+				docfile << "<tr><td>" << funcx_prefix << "</td><td>" << func_decl <<  "</td><td>" << comments << "</td></tr>" << std::endl;
 			}
 
 // format() slows compilation a lot for one off compilations (2.8/0.73 secs i.e x4)
 // so maybe wait for a modules version of fmt library
-//			println("|" "{}" "||" "<em>" "{}" "</em>" "." "{}" "||" "{}", prefix, objname, line2, comments);
+//			println("|" "{}" "||" "<em>" "{}" "</em>" "." "{}" "||" "{}", funcx_prefix, objname, line2, comments);
 
 		} // srcline
 
@@ -1089,25 +1136,27 @@ func main() {
 
 			if (man) {
 
-				// man page formatting at the end
+				// All done in h2ml
 
-				// Escape back slashes for man pages comments
-				doc_body.replacer("&bsol;", _BS);
-				doc_body.replacer(_BS, _BS _BS);
-
-				// but man pages require some real BS in macros
-				doc_body.replacer("<REAL_BS>", _BS);
-
-				// Emphasise/highlight leading words xxxxxxx:
-				doc_body.replacer(R"__(^([a-zA-Z0-9_."]+):(\s+))__"_rex, R"__(\fB$1:\fR$2)__");
-
-				// Man page codes
-				// .RS Right shift
-				// .nf No format
-				// .RE REturn (left shift)
-				// .fi formatting
-				doc_body.replacer(R"__(^<pre>)__"_rex, ".nf");
-				doc_body.replacer(R"__(^</pre>)__"_rex, ".fi");
+//				// man page formatting at the end
+//
+//				// Escape back slashes for man pages comments
+//				doc_body.replacer("&bsol;", _BS);
+//				doc_body.replacer(_BS, _BS _BS);
+//
+//				// but man pages require some real BS in macros
+//				doc_body.replacer("<REAL_BS>", _BS);
+//
+//				// Emphasise/highlight leading words xxxxxxx:
+//				doc_body.replacer(R"__(^([a-zA-Z0-9_."]+):(\s+))__"_rex, R"__(\fB$1:\fR$2)__");
+//
+//				// Man page codes
+//				// .RS Right Fhift
+//				// .nf No Format
+//				// .RE REturn (left shift)
+//				// .fi Formatting
+//				doc_body.replacer(R"__(^<pre>)__"_rex, ".nf");
+//				doc_body.replacer(R"__(^</pre>)__"_rex, ".fi");
 
 			} else {
 				// Done above. Too late here since <p> added already
@@ -1160,6 +1209,9 @@ func main() {
 //				doc_text ^= "\n";
 //				doc_text ^= file_header;
 				doc_text ^= "\n\n";
+//				doc_text ^= ".PD 0 \\\" Turn off blank lines in .TP\n";
+
+
 			}
 			else {
 //				doc_text ^= file_header;
@@ -1476,8 +1528,8 @@ p {
 	}
 
 	ol {
-		margin: 0.3em 0 0 3.2em;
-		padding: 0;
+		/*margin: 0.3em 0 0 3.2em;
+		padding: 0;*/
 		list-style-image: none
 	}
 
@@ -1519,8 +1571,15 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 
 
 
-
-
+/*	0. .hll/.err
+	1. Comments
+	2. Keywords
+	3. Operator
+	4. Literals
+	5. Name
+	6. Generic
+	7. Text.
+*/
 
 /* Highlight and Error */
 :root {
@@ -1571,10 +1630,10 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 .kr  { color: var(--keyword-flow-color); font-weight: var(--keyword-font-weight); font-style: var(--keyword-font-style); } /* Keyword.Reserved */
 
 /* used in exodus_cpp.py EXTRA_TYPES 'dim', 'var', '_var', 'rex', '_rex', 'let', 'in', 'out', 'io', 'qqqqqqq'
-								        'programexit', 'programinit',
-								        'libraryinit', 'libraryexit',
-								         'commoninit', 'commonexit',
-								        'dictinit', 'dictexit'*/
+									    'programexit', 'programinit',
+									    'libraryinit', 'libraryexit',
+									     'commoninit', 'commonexit',
+									    'dictinit', 'dictexit'*/
 .kt  { color: var(--keyword-type-color); font-weight: var(--keyword-font-weight); font-style: var(--keyword-font-style); } /* Keyword.Type */
 
 /* Operators */

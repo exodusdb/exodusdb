@@ -697,23 +697,23 @@ func main() {
 	printl("replace(const rex& regex, ReplacementFunction auto repl_func) const");
 	{
 		// Decode hex escape codes.
-		var v1 = R"(--\0x3B--\0x2F--)";                                 // Hex escape codes.
-		v1.replacer(
+		let v1 = R"(--\0x3B--\0x2F--)";                                 // Hex escape codes.
+		let v2 = v1.replace(
 		    R"(\\0x[0-9a-fA-F]{2,2})"_rex,                              // Finds \0xFF.
 		    [](auto match_str) {return match_str.cut(3).iconv("HEX");}  // Decodes to a char.
 		);
-		assert(v1 == "--;--/--");
+		assert(v2 == "--;--/--");
 	}
 
 	printl("replace(const rex& regex, ReplacementFunction auto repl_func) const");
 	{
 		// Reformat dates using groups.
-		var v2 = "Date: 03-15-2025";
-		v2.replacer(
+		let v3 = "Date: 03-15-2025";
+		let v4 = v3.replace(
 		    R"((\d{2})-(\d{2})-(\d{4}))"_rex,
 		    [](auto match_str) {return match_str.f(1, 4) ^ "-" ^ match_str.f(1, 2) ^ "-" ^ match_str.f(1, 3);}
 		);
-		assert(v2 == "Date: 2025-03-15");
+		assert(v4 == "Date: 2025-03-15");
 	}
 
 	printl("unique() const&;");
@@ -1545,8 +1545,8 @@ func main() {
 		vout << setiosflags(ios::showpos) << 42       << "\t+42"   << endl;
 		// Verify actual v. expected.
 		var act_v_exp = osread(vout);
-		act_v_exp.converter("\n\t", FM ^ VM); ;assert(act_v_exp == Text to dynamic array);
-		act_v_exp = invertarray(act_v_exp);   // Columns <-> Rows
+		act_v_exp.converter("\n\t", FM ^ VM); /// Text to dynamic array
+		act_v_exp = invertarray(act_v_exp);   /// Columns <-> Rows
 		assert(act_v_exp.f(1) eq act_v_exp.f(2));
 	}
 
@@ -1822,7 +1822,7 @@ func main() {
 		var v2 = keypressed();
 	}
 
-	printl("isterminal(const int arg = 1) const;");
+	printl("isterminal(const int in_out_err = 1) const;");
 	{
 		var v1 = var().isterminal(); /// 1 or 0
 		// or

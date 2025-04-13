@@ -34,9 +34,13 @@
 // SIMILAR CODE IN
 // program.h library.h
 
-// a library section is just a class plus a global exported function that allows the class
-// to be instantiated and its main(...) called from another program via so/dll delay loading
-// AND share the mv environment variables of the calling program!
+// a library section is just a class plus a global exported factory function that allows the
+// class to be instantiated and its main(...) function called from another program
+// via so/dll delay loading AND share the mv environment variables of the calling program.
+
+/////////////////////////////////////////////////////////////////
+// libraryinit simply opens a class that inherits from ExoProgram
+// //////////////////////////////////////////////////////////////
 
 #define libraryinit(EXOPROGRAM_PREFIX)                     \
 _Pragma("GCC diagnostic push")                             \
@@ -44,6 +48,10 @@ _Pragma("clang diagnostic ignored \"-Wweak-vtables\"")     \
 _Pragma("GCC diagnostic ignored \"-Winline\"")             \
 class EXOPROGRAM_PREFIX##_ExoProgram : public ExoProgram { \
 _Pragma("GCC diagnostic pop")
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+// libraryexit simply closes the class and provides a factory function to create an instance of the class
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #define libraryexit(EXOPROGRAM_PREFIX)                                                  \
  public:                                                                                \

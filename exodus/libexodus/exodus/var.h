@@ -230,11 +230,11 @@ public:
 	// Return a string describing internal data of a var.
 	// If the str is located on the heap then its address is given.
 	// typ:
-    // 0x01 str is available.
-    // 0x02 int is available.
-    // 0x04 dbl is available.
-    // 0x08 nan: str is not a number.
-    // 0x16 osfile: str, int and dbl have special meaning.
+    // * 0x01 * str is available.
+    // * 0x02 * int is available.
+    // * 0x04 * dbl is available.
+    // * 0x08 * nan: str is not a number.
+    // * 0x16 * osfile: str, int and dbl have special meaning.
 	//
 	// `var v1 = str("x", 32);
 	//  v1.dump().outputl(); /// e.g. var:0x7ffea7462cd0 typ:1 str:0x584d9e9f6e70 "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
@@ -264,8 +264,8 @@ public:
 	bool isnum() const;
 
     // Returns a copy of the var if it is numeric or 0 otherwise.
-	// Returns: A guaranteed numeric var
 	// Allows working numerically with data that may be non-numeric.
+	// Returns: A guaranteed numeric var
 	//
 	// `var v1 = "123.45"_var.num();    // 123.45
 	//  var v2 = "abc"_var.num() + 100; // 100`
@@ -360,13 +360,13 @@ public:
 	////////////////////////////////////////////////
 
 	// The literal suffix "_var" allows dynamic arrays to be seamlessly embedded in code using a predefined set of visible equivalents of unprintable field mark characters as follows:
-	//    Visible  Unprintable
-	// *     {backtick}     RM  Record mark
-	// *     ^     FM  Field mark
-	// *     ]     VM  Value mark
-	// *     }     SM  Subvalue mark
-	// *     |     TM  Text mark
-	// *     ~     ST  Subtext mark
+	// Visible equivalents
+	// * {backtick} * RM  Record mark
+	// *  ^     * FM  Field mark
+	// *  ]     * VM  Value mark
+	// *  }     * SM  Subvalue mark
+	// *  |     * TM  Text mark
+	// *  ~     * ST  Subtext mark
 	//
 	// `var v1 = "f1^f2^v1]v2^f4"_var; // "f1" _FM "f2" _FM "v1" _VM "v2" _FM "f4"`
 	//
@@ -792,22 +792,22 @@ public:
 	//  let v2 = match("abc1abc2", "BC(\\d)", "i");`
 	//
 	// regex_options:
-    // * l - Literal (any regex chars are treated as normal chars)
-    // * i - Case insensitive
-    // * p - ECMAScript/Perl (the default)
-    // * b - Basic POSIX (same as sed)
-    // * e - Extended POSIX
-    // * a - awk
-    // * g - grep
-    // * eg - egrep or grep -E
+    // * l  * Literal (any regex chars are treated as normal chars)
+    // * i  * Case insensitive
+    // * p  * ECMAScript/Perl (the default)
+    // * b  * Basic POSIX (same as sed)
+    // * e  * Extended POSIX
+    // * a  * awk
+    // * g  * grep
+    // * eg * egrep or grep -E
 	//
     // char ranges like a-z are locale sensitive if ECMAScript
 	//
 	// regex_options:
-    // * m - Multiline. Default in boost (and therefore exodus)
-    // * s - Single line. Default in std::regex
-	// * f - First only. Only for replace() (not match() or search())
-    // * w - Wildcard glob style (e.g. *.cfg) not regex style. Only for match() and search(). Not replace().
+    // * m * Multiline. Default in boost (and therefore exodus)
+    // * s * Single line. Default in std::regex
+	// * f * First only. Only for replace() (not match() or search())
+    // * w * Wildcard glob style (e.g. *.cfg) not regex style. Only for match() and search(). Not replace().
 	//
 	ND var  match(SV regex_str, SV regex_options = "") const;
 
@@ -1297,12 +1297,12 @@ public:
 	// regex: A regular expression created by rex() or _rex.
 	// replacement_str: A literal to replace all matched substrings.
 	// The replacement string can include the following special replacement patterns:
-	// Pattern  Inserts
-	// * $$     Inserts a "$".
-	// * $&     Inserts the matched substring. Equivalent to $0.
-	// * ${backtick}     Inserts the portion of the string that precedes the matched substring.
-	// * $'     Inserts the portion of the string that follows the matched substring.
-	// * $n     Inserts the nth (1-indexed) capturing group where n is a positive integer less than 100.
+	// Pattern
+	// * $$ *    Inserts a "$".
+	// * $& *    Inserts the matched substring. Equivalent to $0.
+	// * ${backtick} *    Inserts the portion of the string that precedes the matched substring.
+	// * $' *    Inserts the portion of the string that follows the matched substring.
+	// * $n *    Inserts the nth (1-indexed) capturing group where n is a positive integer less than 100.
 	//
 	// `let v1 = "A a B b"_var.replace("[A-Z]"_rex, "'$0'"); // "'A' a 'B' b"
 	//  // or
@@ -1327,20 +1327,20 @@ public:
 	// match_str: Text of a single match. If regex groups are used, match_str.f(1, 1) is the whole match, match_str.f(1, 2) is the first group, etc.
 	//
 	// `// Decode hex escape codes.
-	//  var v1 = R"(--\0x3B--\0x2F--)";                                 // Hex escape codes.
-	//  v1.replacer(
+	//  let v1 = R"(--\0x3B--\0x2F--)";                                 // Hex escape codes.
+	//  let v2 = v1.replace(
 	//      R"(\\0x[0-9a-fA-F]{2,2})"_rex,                              // Finds \0xFF.
 	//      [](auto match_str) {return match_str.cut(3).iconv("HEX");}  // Decodes to a char.
 	//  );
-	//  assert(v1 == "--;--/--");`
+	//  assert(v2 == "--;--/--");`
 	//
 	// `// Reformat dates using groups.
-	//  var v2 = "Date: 03-15-2025";
-	//  v2.replacer(
+	//  let v3 = "Date: 03-15-2025";
+	//  let v4 = v3.replace(
 	//      R"((\d{2})-(\d{2})-(\d{4}))"_rex,
 	//      [](auto match_str) {return match_str.f(1, 4) ^ "-" ^ match_str.f(1, 2) ^ "-" ^ match_str.f(1, 3);}
 	//  );
-	//  assert(v2 == "Date: 2025-03-15");`
+	//  assert(v4 == "Date: 2025-03-15");`
 	//
 	var replace(const rex& regex, ReplacementFunction auto repl_func) const {
 
@@ -1395,7 +1395,7 @@ public:
 
 	// Split a delimited string with embedded quotes into a dynamic array.
 	// Can be used to process CSV data.
-	// Replaces separator chars with FM chars except inside double or single quotes and ignoring escaped quotes &bsol;" &bsol;'
+	// Replaces separator chars with FM chars except inside double or single quotes and ignoring escaped quotes \" \'
 	//
 	// `let v1 = "abc,\"def,\"123\" fgh\",12.34"_var.parse(','); // "abc^\"def,\"123\" fgh\"^12.34"_var
 	//  // or
@@ -1506,7 +1506,7 @@ public:
 	// obj is strvar
 
 	// Upper case
-	// All string mutators follow the same pattern as ucaser.<br>See the non-mutating functions for details.
+	// All string mutators follow the same pattern as ucaser. See the non-mutating functions for details.
 	//
 	// `var v1 = "abc";
 	//  v1.ucaser(); // "ABC"
@@ -1725,7 +1725,7 @@ public:
 	// is .updater()
 	// Replaces a specific subvalue in a dynamic array. Normally one uses the updater() function to replace in place.
 
-	// Same as var.updater() function but returns a new string instead of updating a variable in place.<br>Rarely used.
+	// Same as var.updater() function but returns a new string instead of updating a variable in place. Rarely used.
 	// "update()" was called "replace()" in Pick OS/Basic.
 	ND var  update(const int fieldno, const int valueno, const int subvalueno, in replacement) const& {var nrvo = this->clone(); nrvo.updater(fieldno, valueno, subvalueno, replacement); return nrvo;}
 
@@ -1985,7 +1985,7 @@ public:
 
 	// For all DB operations, the operative var can either be a DB connection created with dbconnect() or be any var and a default connection will be established on the fly.
 	// The DB connection string (conninfo) parameters are merged from the following places in descending priority.
-	// 1. Provided in connect()'s conninfo argument. See 4. for the complete list of parameters.
+	// 1. Provided in connect()'s conninfo argument. See the last option. for the complete list of parameters.
 	// 2. Any environment variables EXO_HOST EXO_PORT EXO_USER EXO_DATA EXO_PASS EXO_TIME
 	// 3. Any parameters found in a configuration file at ~/.config/exodus/exodus.cfg
 	// 4. The default conninfo is "host=127.0.0.1 port=5432 dbname=exodus user=exodus password=somesillysecret connect_timeout=10"
@@ -2311,10 +2311,10 @@ public:
 	// If the same process attempts to place an identical lock more than once it may be denied (if not in a transaction) or succeed but be ignored (if in a transaction).
 	// Locks can be used to avoid processing a transaction simultaneously with another connection only to have one of them fail due to mutually updating the same records.
 	// Returns:
-	// * 0: Failure: Another connection has already placed the same lock.
-	// * "" Failure: The lock has already been placed.
-	// * 1: Success: A new lock has been placed.
-	// * 2: Success: The lock has already been placed and the connection is in a transaction.
+	// * 0  * Failure: Another connection has already placed the same lock.
+	// * "" * Failure: The lock has already been placed.
+	// * 1  * Success: A new lock has been placed.
+	// * 2  * Success: The lock has already been placed and the connection is in a transaction.
 	//
 	// `var file = "xo_clients", key = "1000";
 	//  if (file.lock(key)) ... ok
@@ -2507,16 +2507,16 @@ public:
 
 	// The xlate ("translate") function is similar to readf() but, when called as an exodus program member function, it can be used efficiently with exodus file dictionaries using column names and functions and multivalued data.
 	// Arguments:
-	// strvar: Used as the primary key to lookup a field in a given file and field no or field name.
+	// strvar: The primary key to lookup a field in a given file and field no or field name.
 	// filename: The DB file in which to look up data.
 	// If var key is multivalued then a multivalued field is returned.
-	// fieldno: Determines which field of the record is returned.
-	// * Integer returns that field number
-	// * 0 means return the key unchanged.
-	// * "" means return the whole record.
-	// mode: Determines what is returned if the record does not exist for the given key and file.
-	// * "X" returns ""
-	// * "C" returns the key unconverted.
+	// fieldno: Which field of the record to return.
+	// * nn * Field number nn
+	// * 0  * The key.
+	// * "" * The whole record.
+	// mode: If the record does not exist.
+	// * "X" * Returns ""
+	// * "C" * Returns the key unconverted.
 	//
 	// `let key = "SB001";
 	//  let client_name = key.xlate("xo_clients", 1, "X"); // "Client AAA"
@@ -2789,24 +2789,24 @@ public:
 	//  let v2 = oswait(".^/etc/hosts"_var, 100);`
 	//
 	// Returned dynamic array fields:
-	// # Event type codes
-	// # dirpaths
-	// # filenames
-	// # d=dir, f=file
+	// 1. Event type codes
+	// 2. dirpaths
+	// 3. filenames
+	// 4. d=dir, f=file
 	//
 	// Possible event type codes:
-	// * IN_CLOSE_WRITE⋅- A file opened for writing was closed
-	// * IN_ACCESS⋅⋅⋅⋅⋅⋅- Data was read from file
-	// * IN_MODIFY⋅⋅⋅⋅⋅⋅- Data was written to file
-	// * IN_ATTRIB⋅⋅⋅⋅⋅⋅- File attributes changed
-	// * IN_CLOSE⋅⋅⋅⋅⋅⋅⋅- File was closed (read or write)
-	// * IN_MOVED_FROM⋅⋅- File was moved away from watched directory
-	// * IN_MOVED_TO⋅⋅⋅⋅- File was moved into watched directory
-	// * IN_MOVE⋅⋅⋅⋅⋅⋅⋅⋅- File was moved (in or out of directory)
-	// * IN_CREATE⋅⋅⋅⋅⋅⋅- A file was created in the directory
-	// * IN_DELETE⋅⋅⋅⋅⋅⋅- A file was deleted from the directory
-	// * IN_DELETE_SELF⋅- Directory or file under observation was deleted
-	// * IN_MOVE_SELF⋅⋅⋅- Directory or file under observation was moved
+	// * IN_CLOSE_WRITE * A file opened for writing was closed
+	// * IN_ACCESS      * Data was read from file
+	// * IN_MODIFY      * Data was written to file
+	// * IN_ATTRIB      * File attributes changed
+	// * IN_CLOSE       * File was closed (read or write)
+	// * IN_MOVED_FROM  * File was moved away from watched directory
+	// * IN_MOVED_TO    * File was moved into watched directory
+	// * IN_MOVE        * File was moved (in or out of directory)
+	// * IN_CREATE      * A file was created in the directory
+	// * IN_DELETE      * A file was deleted from the directory
+	// * IN_DELETE_SELF * Directory or file under observation was deleted
+	// * IN_MOVE_SELF   * Directory or file under observation was moved
 	//
 	   var  oswait(const int milliseconds) const;
 
@@ -2940,8 +2940,8 @@ public:
 	//
 	//  // Verify actual v. expected.
 	//  var act_v_exp = osread(vout);
-	//  act_v_exp.converter("\n\t", FM ^ VM); // Text to dynamic array
-	//  act_v_exp = invertarray(act_v_exp);   // Columns <-> Rows
+	//  act_v_exp.converter("\n\t", FM ^ VM); /// Text to dynamic array
+	//  act_v_exp = invertarray(act_v_exp);   /// Columns <-> Rows
 	//  assert(act_v_exp.f(1) eq act_v_exp.f(2));`
 	//
 	CVR operator<<(const auto& value) const {
@@ -3224,13 +3224,13 @@ public:
 	// stdout_from_process: [out] Standard output produced by the program.
 	// stderr_from_process: [out] Error or log output from the program.
 	// exit_status: [out] Result of the program's execution:
-	// *  0 Program terminated normally.
-	// * -1 Timeout
-	// * nn Program reported an exit status.
+	// *  0 * Program terminated normally.
+	// * -1 * Timeout
+	// * nn * Program reported an exit status.
 	// timeout_in_secs: Optional. Maximum runtime in seconds (default 0 = no timeout).
 	// Returns: Success or failure.
-	// * true    Program ran and exited with status 0 (success).
-	// * false   Program failed to start, timed out, or exited with non-zero status.
+	// * True  * Program ran and exited with status 0 (success).
+	// * False * Program failed to start, timed out, or exited with non-zero status.
 	// Throws: Various system errors are possible.
 	// * Pipe creation failed.
     // * Fork failed.
@@ -3434,10 +3434,10 @@ public:
 	// Care must be taken to handle incomplete UTF8 byte sequences at the end of one block and the beginning of the next block.
 	// Returns: The requested number of bytes or fewer if not available.
 	// nchars:
-	// 99 : Get up to 99 bytes or fewer if not available. Caution required with UTF8.
-	// ⋅0 : Get all bytes presently available.
-	// ⋅1 : Same as keypressed(true). Deprecated.
-	// -1 : Same as keypressed(). Deprecated.
+	// * nn * Get up to nn bytes or fewer if not available. Caution required with UTF8.
+	// *  0 * Get all bytes presently available.
+	// *  1 * Same as keypressed(true). Deprecated.
+	// * -1 * Same as keypressed(). Deprecated.
 	//
 	   out  inputn(const int nchars);
 
@@ -3456,15 +3456,19 @@ public:
 	// obj is var()
 
 	// Checks if one of stdin, stdout, stderr is a terminal or a file/pipe.
-	// arg: 0 - stdin, 1 - stdout (Default), 2 - stderr.
+	// in_out_err:
+	// * 0 * stdin
+	// * 1 * stdout (Default)
+	// * 2 * stderr.
 	// Returns: True if it is a terminal or false if it is a file or pipe.
 	// Note that if the process is at the start or end of a pipeline, then only stdin or stdout will be a terminal.
 	// The type of stdout terminal can be obtained from the TERM environment variable.
+	//
 	// `var v1 = var().isterminal(); /// 1 or 0
 	//  // or
 	//  var v2 = isterminal();`
 	//
-	ND bool isterminal(const int arg = 1) const;
+	ND bool isterminal(const int in_out_err = 1) const;
 
 	// Checks if stdin has any bytes available for input.
 	// If no bytes are immediately available, the process sleeps for up to the given number of milliseconds, returning true immediately any bytes become available or false if the period expires without any bytes becoming available.
@@ -3486,9 +3490,9 @@ public:
 
 	// Install various interrupt handlers.
 	// Automatically called in program/thread initialisation by exodus_main.
-	// * SIGINT  - Ctrl+C -> "Interrupted. (C)ontinue (Q)uit (B)acktrace (D)ebug (A)bort ?"
-	// * SIGHUP  - Sets a static variable "RELOAD_req" which may be handled or ignored by the program.
-	// * SIGTERM - Sets a static variable "TERMINATE_req" which may be handled or ignored by the program.
+	// * SIGINT  * Ctrl+C -> "Interrupted. (C)ontinue (Q)uit (B)acktrace (D)ebug (A)bort ?"
+	// * SIGHUP  * Sets a static variable "RELOAD_req" which may be handled or ignored by the program.
+	// * SIGTERM * Sets a static variable "TERMINATE_req" which may be handled or ignored by the program.
 	//
 	   void breakon() const;
 
@@ -3779,12 +3783,12 @@ public:
 
 	// Time output: Convert internal time format to human readable time e.g. "10:30:59".
 	// Returns: Human readable time or the original value unconverted if non-numeric.
-	// Conversion code (e.g. "MTHS") is "MT" + flags ...
+	// Conversion code (e.g. "MTHS") is "MT" ^ flags ...
 	// flags:
-	// * "H" - Show AM/PM otherwise 24 hour clock is used.
-	// * "S" - Output seconds
-	// * "2" = Ignored (used in iconv)
-	// * ":" - Any other flag is used as the separator char instead of ":"
+	// * H * Show AM/PM otherwise 24 hour clock is used.
+	// * S * Output seconds
+	// * 2 * Ignored (used in iconv)
+	// * : * Any other flag is used as the separator char instead of ":"
 	// Any Dynamic array structure is preserved.
 	// obj is vartime
 	//
@@ -3840,20 +3844,21 @@ public:
 	// Number output: Convert internal numbers to external text format after rounding and optional scaling.
 	// Returns: A string or, if the value is not numeric, then no conversion is performed and the original value is returned.
 	// conversion_code: (e.g. "MD20Z") is "MD" or "MC", 1st digit, 2nd digit, flags ...
-	// * MD outputs like 123.45 (International)
-	// * MC outputs like 123,45 (European)
-	// * 1st digit = Decimal places to display. Also decimal places to move if 2nd digit not present and no P flag present.
-	// * 2nd digit = Optional decimal places to move left if P flag not present.
+	// * "MD" * Outputs like 123.45 (International)
+	// * "MC" * Outputs like 123,45 (European)
+	// 1st digit * Decimal places to display. Also decimal places to move if 2nd digit not present and no P flag present.
+	// 2nd digit * Optional decimal places to move left if P flag not present.
 	//
 	// flags:
-	// * "P" - Preserve decimal places. Same as 2nd digit = 0;
-	// * "Z" - Zero flag - return "" if zero.
-	// * "X" - No conversion - return as is.
-	// * "." or "," - Separate thousands depending on MD or MC.
-	// * "-" means suffix negatives with "-" and positives with " " (space).
-	// * "<" means wrap negatives in "<" and ">" chars.
-	// * "C" means suffix negatives with "CR" and positives or zero with "DB".
-	// * "D" means suffix negatives with "DB" and positives or zero with "CR".
+	// * P * Preserve decimal places. Same as 2nd digit = 0;
+	// * Z * Zero flag - return "" if zero.
+	// * X * No conversion - return as is.
+	// * . * Separate thousands depending on MD or MC.
+	// * , * Ditto
+	// * - * Suffix negatives with "-" and positives with " " (space).
+	// * < * Wrap negatives in "<" and ">" chars.
+	// * C * Suffix negatives with "CR" and positives or zero with "DB".
+	// * D * Suffix negatives with "DB" and positives or zero with "CR".
 	//
 	//  Any Dynamic array structure is preserved.
 	// obj is varnum
@@ -3971,18 +3976,19 @@ public:
 /* fake code to generate documentation
 
 	// Convert number to hexadecimal string.
-	// * "MX":   Convert and trim leading zeros                      e.g. oconv(1025, "MX")  -> "401"
-	// * "MXn":  Pad with up to n leading zeros but do not truncate. e.g. oconv(1025, "MX8") -> "00000401"
-	// * "MXnT": Pad and truncate to n characters.                   e.g. oconv(1025, "MX2") -> "01"
+	// * "MX"   * Convert and trim leading zeros                      e.g. oconv(1025, "MX")  -> "401"
+	// * "MXn"  * Pad with up to n leading zeros but do not truncate. e.g. oconv(1025, "MX8") -> "00000401"
+	// * "MXnT" * Pad and truncate to n characters.                   e.g. oconv(1025, "MX2") -> "01"
 	// "n":    Width. 0-9, A-G = 10 - 16.
 	// varnum: A number or dynamic array of numbers. Floating point numbers are rounded to integers before conversion.
 	// Returns: A string of hexadecimal digits or a dynamic array of the same. Elements that are not numeric are left untouched and unconverted.
 	// Dynamic array structure is preserved.
 	// Negative numbers are treated as unsigned 8 byte integers (uint64).
-	// * 0  -> "00"
-	// * 1  -> "01"
-	// * 15 -> "0F"
-	// * -1 -> "FFFF" "FFFF" "FFFF" "FFFF" (8 x "FF")
+	// Input Output
+	// * 0  * "00"
+	// * 1  * "01"
+	// * 15 * "0F"
+	// * -1 * "FFFF" "FFFF" "FFFF" "FFFF" (8 x "FF")
 	// This function is a near inverse of iconv("MX").
 	// obj is varnum
 	//
@@ -3998,12 +4004,13 @@ public:
 	// Dynamic array structure is preserved.
 	// Hex strings are converted to unsigned 8 byte integers (uint64)
 	// Leading zeros are ignored.
-	// * "0" -> 0
-	// * "00"-> 0
-	// * "1" -> 1
-	// * Hex "FFFFFFFFFFFFFFFF" (8 x "FF") -> -1.
-	// * Hex "7FFFFFFFFFFFFFFF" is the maximum positive integer: 9223372036854775805.
-	// * Hex "8000000000000000" is the maximum negative integer: -9223372036854775808.
+	// * "0"  * ->   0
+	// * "00" * ->   0
+	// * "1"  * ->   1
+	//
+	// Hex "FFFF" "FFFF" "FFFF" "FFFF" (8 x "FF") -> -1.
+	// Hex "7FFF" "FFFF" "FFFF" "FFFF" -> The maximum positive integer: 9223372036854775805.
+	// Hex "8000" "0000" "0000" "0000" -> The maximum negative integer: -9223372036854775808.
 	// This function is the exact inverse of oconv("MX").
 	// obj is strvar
 	//
@@ -4026,9 +4033,9 @@ public:
 
 	// Convert dynamic arrays to standard text format.
 	// Useful for using text editors on dynamic arrays.
-	// FMs -> \n after escaping any embedded NL
-	// VMs -> literal "\" \n
-	// SMs -> literal "\\" \n
+	// * FMs * ->   \n after escaping any embedded NL
+	// * VMs * ->   literal "\" \n
+	// * SMs * ->   literal "\\" \n
 	// etc.
 	// obj is strvar
 	//
