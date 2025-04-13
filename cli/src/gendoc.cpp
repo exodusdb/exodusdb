@@ -66,6 +66,9 @@ func main() {
 		abort(syntax);
 	}
 
+	if (not libinfo("htmllib2"))
+		abort("gendoc: htmllib2 not installed yet.");
+
 	if (html) {
 
 		// Pass 1 to collect and syntax highlight c++ code examples
