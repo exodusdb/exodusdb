@@ -315,7 +315,9 @@ function main() {
 			//clear the screen (should be cls on win)
 			if (OSSLASH == "/")
 				//osshell("clear");
-				if (not osshell("clear")) {
+				//if (not osshell("clear")) {
+				// -x preserve scrollback buffer
+				if (not osshell("clear -x")) {
 					abort(lasterror());
 				}
 			//else
