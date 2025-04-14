@@ -981,8 +981,13 @@ nextfiles:
 				if (((filename.last(4)).contains(".")) and filetime <= deletetime) {
 deleteit:
 					//filename.osremove();
-					if (osfile(filename) and not filename.osremove())
-						abort(lasterror());
+					if (osfile(filename) and not filename.osremove()) {
+						//abort(lasterror());
+						// Mitigate race condition between threads
+						ossleep(var(100).rnd());
+						if (osfile(filename) and not filename.osremove())
+							loglasterror();
+					}
 				} else {
 				}
 			}
