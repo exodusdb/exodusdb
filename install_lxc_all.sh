@@ -11,7 +11,7 @@ set -euxo pipefail
 :
 : 'BASE CONTAINERS - e.g. u2404,u2204,u2004'
 :
-: 'COMPILERS - default is both clang and g++'
+: 'COMPILERS - default is clang'
 :
 : 'clang or g++ for latest version available. Optionally followed by a version e.g.'
 : 'clang-18, clang-min, clang-latest, clang-default, g++-14, g++-min, g++-latest, g++-default'
@@ -23,7 +23,7 @@ set -euxo pipefail
 :
 : $0 u2404,u2204 B g++
 :
-: All stages for both g++ and clang
+: All stages except W for clang
 :
 : $0 u2404 A
 :
@@ -34,7 +34,7 @@ set -euxo pipefail
 :
 	BASE_CONTAINERS=${1:?BASE_CONTAINERS is required. e.g u2404 or using commas: u2404,u2202. Must exist and will be copied.}
 	STAGES=${2:?Stages is required e.g. A for all or any consecutive chars of 'bBdDTW'}
-	COMPILERS=${3:-clang g++}
+	COMPILERS=${3:-clang}
 
 :
 : Main
