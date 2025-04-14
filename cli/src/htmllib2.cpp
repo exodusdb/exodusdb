@@ -1,3 +1,8 @@
+#ifndef EXO_MODULE
+#	include <stack>
+#	include <vector> // Actually already comes with dim.h
+#	include <map>    // Actually already comes with ?
+#endif
 #include <cassert>
 
 #include <exodus/library.h>
