@@ -49,7 +49,9 @@ func main() {
 	if (current_stdout ne expected_stdout) {
 		outputl(filename1 ^ " has changed. See ", filename1 ^ ".expected");
 		if (not oswrite(expected_stdout on filename1 ^ ".expected")) {};
-		if (osshell("diff " ^ filename1 ^ " " ^ filename1 ^ ".expected 2>&1")) {};
+		var oscmd = "diff " ^ filename1 ^ ".expected " ^ filename1 ^ " 2>&1";
+		printl(oscmd);
+		if (osshell(oscmd)) {};
 		abort();
 	}
 
@@ -73,7 +75,9 @@ func main() {
 	if (current_stderr ne expected_stderr) {
 		outputl(filename2 ^ " has changed. See ", filename2 ^ ".expected");
 		if (not oswrite(expected_stderr on filename2 ^ ".expected")) {};
-		if (osshell("diff " ^ filename2 ^ " " ^ filename2 ^ ".expected 2>&1")) {};
+		let oscmd = "diff " ^ filename2 ^ ".expected " ^ filename2 ^ " 2>&1";
+		printl(oscmd);
+		if (osshell(oscmd)) {};
 		abort();
 	}
 
