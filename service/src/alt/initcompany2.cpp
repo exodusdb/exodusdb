@@ -8,4 +8,4 @@ func main(in /*oldcompany*/) {
 	return 0;
 }
 
-libraryexit()
+}; // libraryexit()

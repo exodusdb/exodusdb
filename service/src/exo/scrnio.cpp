@@ -14,4 +14,4 @@ func main(in /*coln*/, in /*rown*/, in /*data*/, in /*attribute*/) {
 	return 0;
 }
 
-libraryexit()
+}; // libraryexit()

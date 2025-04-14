@@ -159,4 +159,4 @@ func main(io osfilename, in printopts0, out errors) {
 	return 0;
 }
 
-libraryexit()
+}; // libraryexit()

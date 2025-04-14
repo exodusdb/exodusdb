@@ -12,4 +12,4 @@ function main(in type, in input, in mode, out output) {
 	return true;
 }
 
-libraryexit()
+}; // libraryexit()

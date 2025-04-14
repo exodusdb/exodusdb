@@ -614,9 +614,11 @@ ND	bool lockrecord(in filename, io file, in keyx) const;
 
 // clang-format off
 
-class PUBLIC ExoStop     {public:explicit ExoStop    (in var1 = ""); var message;};
-class PUBLIC ExoAbort    {public:explicit ExoAbort   (in var1 = ""); var message;};
-class PUBLIC ExoAbortAll {public:explicit ExoAbortAll(in var1 = ""); var message;};
+class PUBLIC ExoExit                      {public:explicit ExoExit    (in var1 = ""); var message;};
+//class PUBLIC ExoStop     : public ExoExit {using ExoExit::ExoExit}; //linker errors in application code
+class PUBLIC ExoStop     : public ExoExit {public:explicit ExoStop    (in var1 = ""); var message;};
+class PUBLIC ExoAbort    : public ExoExit {public:explicit ExoAbort   (in var1 = ""); var message;};
+class PUBLIC ExoAbortAll : public ExoExit {public:explicit ExoAbortAll(in var1 = ""); var message;};
 
 // clang-format on
 

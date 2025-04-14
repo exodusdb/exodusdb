@@ -844,7 +844,7 @@ var ExoProgram::perform(in command_line) {
 											true  // forcenew each perform/execute
 											)) {
 			USER4 ^= "perform() Cannot find shared library \"" + libname +
-					 "\", or \"libraryexit()\" is not present in it.";
+					 "\", or \"libraryinit()\" is not present in it.";
 			// UNLIKELY throw VarError(USER4);
 			// return "";
 			break;
@@ -2606,6 +2606,7 @@ var ExoProgram::amountunit(in input0, out unitx) {
 
 // clang-format off
 
+ExoExit     ::ExoExit(in errmsg)     : message(errmsg) {}
 ExoStop     ::ExoStop(in errmsg)     : message(errmsg) {}
 ExoAbort    ::ExoAbort(in errmsg)    : message(errmsg) {}
 ExoAbortAll ::ExoAbortAll(in errmsg) : message(errmsg) {}

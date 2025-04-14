@@ -107,4 +107,4 @@ subr getfirstdom() {
 	return;
 }
 
-libraryexit()
+}; // libraryexit()

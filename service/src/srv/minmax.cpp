@@ -37,4 +37,4 @@ func main(in list0, out min, out max) {
 	return result;
 }
 
-libraryexit()
+}; // libraryexit()

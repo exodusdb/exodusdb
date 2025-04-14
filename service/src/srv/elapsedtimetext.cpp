@@ -103,4 +103,4 @@ zero:
 	return text;
 }
 
-libraryexit()
+}; // libraryexit()

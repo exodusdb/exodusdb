@@ -133,4 +133,4 @@ func main(io filename, in mode, out filetitle, out triggers) {
 	return 0;
 }
 
-libraryexit()
+}; // libraryexit()

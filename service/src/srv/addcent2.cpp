@@ -21,4 +21,4 @@ func main(in yymm) {
 	return "19" ^ yymm;
 }
 
-libraryexit()
+}; // libraryexit()

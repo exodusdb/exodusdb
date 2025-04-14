@@ -219,4 +219,4 @@ func main(in mode0, in title0, in module, in request, in data0, in runasusercode
 	return 1;
 }
 
-libraryexit()
+}; // libraryexit()

@@ -8,4 +8,4 @@ func main(in escstring) {
 	return attribute;
 }
 
-libraryexit()
+}; // libraryexit()

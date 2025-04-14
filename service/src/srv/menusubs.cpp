@@ -118,4 +118,4 @@ func main(in mode, io tx, in arg3, io arg4, in arg5) {
 	return 0;
 }
 
-libraryexit()
+}; // libraryexit()

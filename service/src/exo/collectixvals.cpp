@@ -67,4 +67,4 @@ func main(in filename0, in dictid, in prefix = "", in orderby = "") {
 	return 0;
 }
 
-libraryexit()
+}; // libraryexit()

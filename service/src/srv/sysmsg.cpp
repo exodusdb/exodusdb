@@ -296,4 +296,4 @@ func main(in msg0, in subject0 = "", in username0 = "") {
 	return 0;
 }
 
-libraryexit()
+}; // libraryexit()

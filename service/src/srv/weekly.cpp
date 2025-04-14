@@ -142,4 +142,4 @@ subr getfirstdateofyear() {
 	return;
 }
 
-libraryexit()
+}; // libraryexit()

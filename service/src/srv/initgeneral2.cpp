@@ -461,4 +461,4 @@ nextuser:
 	return 0;
 }
 
-libraryexit()
+}; // libraryexit()

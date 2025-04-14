@@ -54,4 +54,4 @@ subr create(in filename) {
 	if (not index(OPTIONS, "S"))
 		printl(msg);
 }
-libraryexit()
+}; // libraryexit()

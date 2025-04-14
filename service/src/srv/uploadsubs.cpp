@@ -793,4 +793,4 @@ subr parseline(io line) {
 	return;
 }
 
-libraryexit()
+}; // libraryexit()

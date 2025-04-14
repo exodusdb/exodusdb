@@ -62,4 +62,4 @@ func main(in filename, in indexid, in texts0, io msg) {
 	return 0;
 }
 
-libraryexit()
+}; // libraryexit()

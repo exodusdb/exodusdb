@@ -125,4 +125,4 @@ subr getholidaytype(in idate, in userx, in agp, in market, io holidaytype) {
 	return;
 }
 
-libraryexit()
+}; // libraryexit()

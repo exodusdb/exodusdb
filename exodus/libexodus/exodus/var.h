@@ -362,11 +362,11 @@ public:
 	// The literal suffix "_var" allows dynamic arrays to be seamlessly embedded in code using a predefined set of visible equivalents of unprintable field mark characters as follows:
 	// Visible equivalents
 	// * {backtick} * RM  Record mark
-	// *  ^     * FM  Field mark
-	// *  ]     * VM  Value mark
-	// *  }     * SM  Subvalue mark
-	// *  |     * TM  Text mark
-	// *  ~     * ST  Subtext mark
+	// * ^     * FM  Field mark
+	// * ]     * VM  Value mark
+	// * }     * SM  Subvalue mark
+	// * |     * TM  Text mark
+	// * ~     * ST  Subtext mark
 	//
 	// `var v1 = "f1^f2^v1]v2^f4"_var; // "f1" _FM "f2" _FM "v1" _VM "v2" _FM "f4"`
 	//
@@ -1058,10 +1058,11 @@ public:
 
 	// Insert a substr at an given position after removing a given number of chars.
 	//
-	// pos1: 0 or 1 : Remove length chars from the beginning and insert at the beginning.
-	// pos1: > than the length of the source string. Insert after the last char.
-	// pos1: -1 : Remove up to length chars before inserting.Insert on or before the last char.
-	// pos1: -2 : Insert on or before the penultimate char.
+	// pos1:
+	// * 0 or 1   * Remove length chars from the beginning and insert at the beginning.
+	// *   -1     * Insert on or before the last char after removing up to length chars starting with the last char.
+	// *   -2     * Ditto on or before the penultimate char.
+	// * > strlen * If pos1 > length of the source string, insert after the last char.
 	// Equivalent to var[pos1, length] = substr in Pick OS
 	//
 	// `let v1 = "abcd"_var.paste(2, 2, "XYZ"); // "aXYZd"
@@ -1250,7 +1251,6 @@ public:
 	// pos1 [out] is correctly positioned to copy the next substr.
 	// Works with any encoding including UTF8. Was called "remove" in Pick OS.
 	// The equivalent in Pick OS was the statement "Remove variable From string At column Setting flag"
-	// ...
 	// This function is valuable for high performance processing of dynamic arrays.
 	// It is notably used in "list" to print parallel columns of mixed combinations of multivalues/subvalues and text marks correctly lined up mv to mv, sv to sv, tm to tm even when particular values, subvalues and text fragments are missing from particular columns.
 	// It is similar to version 3 of substr - substr(pos1, delimiterchars, pos2) except that in this version the delimiter chars are hard coded as the standard field mark chars (RM, FM, VM, SM, TM, ST) and it returns the first char position of the next substr, not the char position of the next field mark char.
@@ -3237,6 +3237,18 @@ public:
 	// * Poll failure.
 	// obj is var()
 	//
+
+	// Run an OS program synchronously.
+	// Executes an OS command, capturing its standard output, error, and exit status. Shell features (e.g., pipes, redirects) are unsupported but can be invoked via an oscmd like "bash -c 'abc|yy $HOME'".
+	// oscmd: Executable and arguments; must exist in OS PATH.
+	// stdin_for_process: Optional; input data for the program’s standard input.
+	// stdout_from_process: [out] Standard output from the program.
+	// stderr_from_process: [out] Error/log output from the program.
+	// exit_status: [out] Program’s exit status: 0 (normal), -1 (timeout), else (error).
+	// timeout_secs: Optional; max runtime in seconds (default 0 = no timeout).
+	// Returns: True if program ran and exited with status 0 (success) or false if program failed to start, timed out, or exited with non-zero status.
+	// Throws: Pipe creation failed, fork failed, poll failed.
+	//
 	// `var v_stdout, v_stderr, v_exit_status;
 	//  if (var::osprocess("grep xyz", "abc\nxyz 123\ndef", v_stdout, v_stderr, v_exit_status)) ... ok // v_stdout -> "xyz 123" // v_exit_status = 0
 	//  // or
@@ -3984,11 +3996,10 @@ public:
 	// Returns: A string of hexadecimal digits or a dynamic array of the same. Elements that are not numeric are left untouched and unconverted.
 	// Dynamic array structure is preserved.
 	// Negative numbers are treated as unsigned 8 byte integers (uint64).
-	// Input Output
-	// * 0  * "00"
-	// * 1  * "01"
-	// * 15 * "0F"
-	// * -1 * "FFFF" "FFFF" "FFFF" "FFFF" (8 x "FF")
+	// * 0  -> * "00"
+	// * 1  -> * "01"
+	// * 15 -> * "0F"
+	// * -1 -> * "FFFF" "FFFF" "FFFF" "FFFF" (8 x "FF")
 	// This function is a near inverse of iconv("MX").
 	// obj is varnum
 	//
@@ -4004,9 +4015,9 @@ public:
 	// Dynamic array structure is preserved.
 	// Hex strings are converted to unsigned 8 byte integers (uint64)
 	// Leading zeros are ignored.
-	// * "0"  * ->   0
-	// * "00" * ->   0
-	// * "1"  * ->   1
+	// * "0"  -> * 0
+	// * "00" -> * 0
+	// * "1"  -> * 1
 	//
 	// Hex "FFFF" "FFFF" "FFFF" "FFFF" (8 x "FF") -> -1.
 	// Hex "7FFF" "FFFF" "FFFF" "FFFF" -> The maximum positive integer: 9223372036854775805.
@@ -4033,9 +4044,9 @@ public:
 
 	// Convert dynamic arrays to standard text format.
 	// Useful for using text editors on dynamic arrays.
-	// * FMs * ->   \n after escaping any embedded NL
-	// * VMs * ->   literal "\" \n
-	// * SMs * ->   literal "\\" \n
+	// * FMs -> *   \n after escaping any embedded NL
+	// * VMs -> *   literal "\" \n
+	// * SMs -> *   literal "\\" \n
 	// etc.
 	// obj is strvar
 	//

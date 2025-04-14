@@ -26,4 +26,4 @@ func main(in alerttype0, in /*runasuser*/, out tasks, out title, out request, ou
 	return 0;
 }
 
-libraryexit()
+}; // libraryexit()

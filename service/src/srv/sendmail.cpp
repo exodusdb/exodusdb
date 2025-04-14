@@ -714,4 +714,4 @@ subr addlinks2osfilename() {
 	return;
 }
 
-libraryexit()
+}; // libraryexit()

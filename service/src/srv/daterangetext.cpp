@@ -111,4 +111,4 @@ func main(in d1, in d2, out result, io lang) {
 	*/
 }
 
-libraryexit()
+}; // libraryexit()

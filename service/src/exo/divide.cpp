@@ -20,4 +20,4 @@ func main(in numerators, in denominator, in sep) {
 	return output.join(sep);
 }
 
-libraryexit()
+}; // libraryexit()

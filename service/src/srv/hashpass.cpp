@@ -28,4 +28,4 @@ func main(in password) {
 	return hashedpassword;
 }
 
-libraryexit()
+}; // libraryexit()

@@ -24,4 +24,4 @@ func main(in string0) {
 	return string1.quote();
 }
 
-libraryexit()
+}; // libraryexit()

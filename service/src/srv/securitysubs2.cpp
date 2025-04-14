@@ -283,4 +283,4 @@ deletetask:
 	return 0;
 }
 
-libraryexit()
+}; // libraryexit()

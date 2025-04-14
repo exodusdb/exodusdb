@@ -162,4 +162,4 @@ func main(in databasecode0 = "", in usercode0 = "") {
 	return returndata;
 }
 
-libraryexit()
+}; // libraryexit()

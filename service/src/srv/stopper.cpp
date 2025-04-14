@@ -54,4 +54,4 @@ func main(in mode0, in time, in date, io /*buffer*/, out msg) {
 	return result;
 }
 
-libraryexit()
+}; // libraryexit()

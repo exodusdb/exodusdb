@@ -600,4 +600,4 @@ subr exit() {
 	return;
 }
 
-libraryexit()
+}; // libraryexit()

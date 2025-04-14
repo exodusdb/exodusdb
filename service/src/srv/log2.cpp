@@ -82,4 +82,4 @@ func main(in msg0, io time0) {
 	return 0;
 }
 
-libraryexit()
+}; // libraryexit()

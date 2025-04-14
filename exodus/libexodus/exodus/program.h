@@ -21,7 +21,7 @@
 // argument. Additional matching pairs of statements can delineate additional subprograms as long
 // as each pair has a unique argument since their argument names are used as part of the class name.
 
-// SIMILAR CODE IN
+// COMPARABLE CODE IN
 // program.h library.h
 
 // A Exodus program is just a class inheriting from ExoProgram

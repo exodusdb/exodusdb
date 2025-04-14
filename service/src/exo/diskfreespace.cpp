@@ -23,4 +23,4 @@ func main(in path0) {
 	return available;
 }
 
-libraryexit()
+}; // libraryexit()

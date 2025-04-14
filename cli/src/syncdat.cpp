@@ -238,8 +238,9 @@ func main() {
 
 				// dict intro
 				let line1 = "\nlibraryinit(" ^ ID.lcase() ^ ")";
+//				let line1 = "\ndictinit(" ^ ID.lcase() ^ ")";
 				new_cpp_text ^= line1 ^ "\n";
-				new_cpp_text ^= "/" "/" ^ str("-", len(line1) - 3) ^ "\n";
+//				new_cpp_text ^= "/" "/" ^ str("-", len(line1) - 3) ^ "\n";
 
 				var dictsrc = RECORD(8);
 				dictsrc.converter(VM, "\n");
@@ -277,7 +278,9 @@ func main() {
 				}
 
 				// dict outro
-				new_cpp_text ^= "libraryexit(" ^ ID.lcase() ^ ")\n\n";
+				//new_cpp_text ^= "libraryexit(" ^ ID.lcase() ^ ")\n\n";
+				new_cpp_text.popper();
+				new_cpp_text ^= "};\n";
 
 			} // generate and isdict and S item
 

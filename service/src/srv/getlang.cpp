@@ -219,4 +219,4 @@ subr getlang3(in origprogname, in datatype, in languagefile, io lang) {
 	return;
 }
 
-libraryexit()
+}; // libraryexit()

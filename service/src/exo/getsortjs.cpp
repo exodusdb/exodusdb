@@ -163,4 +163,4 @@ if (!document.swapNode) {
 )V0G0N";
 }
 
-libraryexit()
+}; // libraryexit()

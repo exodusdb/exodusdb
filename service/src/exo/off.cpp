@@ -6,9 +6,9 @@ libraryinit()
 func main() {
 	// printl("Goodbye");
 	// exit(0);
-//	throw ExoLogoff("Logoff");
+//	throw ExoStop("Logoff");
 	stop();
 	//std::unreachable();
 }
 
-libraryexit()
+}; // libraryexit()

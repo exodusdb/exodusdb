@@ -5,9 +5,7 @@
 
 .SS
 var v1;
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Create an unassigned var.
 .sp 1 \"</p>
 .PP \"<p>
@@ -19,31 +17,29 @@ A runtime error is thrown if a var is used before being assigned so silent "use 
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var client; // Unassigned var
 if (not read(client from "xo_clients", "SB001")) ...
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 //             Exodus keywords:     C++ declarations:
 //             Non-Const   Const    Non-Const   Const
 //             -----------------    ----------------------
 // Variable:   var         let      var         const var
 // Reference:  out         in       var&        const var&
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = expression;
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Assign a var using a literal or an expression.
 .sp 1 \"</p>
 .PP \"<p>
@@ -52,7 +48,7 @@ Use "let" instead of "var" wherever possible as a shorthand way of writing "cons
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var v1 = 42;                 // Integer
 var v2 = 42.3;               // Double
 var v3 = "abc";              // String
@@ -66,34 +62,28 @@ var v10 = 12'345_var;        // A literal var integer
 var v11 = 123.45_var;        // A literal var double
 var v12 = "f1^v1]v2^f3"_var; // A literal var string
 var x = 0.1, y = "0.2", z = x + y; // z -> 0.3
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 if (v1.assigned()) ...
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 \fBReturns:\fR True if the var is assigned, otherwise false
 .sp 1 \"</p>
 
 
 .SS
 if (v1.unassigned()) ...
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 \fBReturns:\fR True if the var is unassigned, otherwise false
 .sp 1 \"</p>
 
 
 .SS
 var v1 = v2.or_default(defaultvalue);
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 \fBReturns:\fR A copy of the var if it is assigned or the default value if it is not.
 .sp 1 \"</p>
 .PP \"<p>
@@ -105,12 +95,12 @@ Can be used to handle optional arguments in functions.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var v1; // Unassigned
 var v2 = v1.or_default("abc"); // v2 -> "abc"
 // or
 var v3 = or_default(v1, "abc");
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 .PP \"<p>
@@ -122,9 +112,7 @@ var v3 = or_default(v1, "abc");
 
 .SS
 v1.defaulter(defaultvalue)
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 If the var is unassigned then assign the default value to it, otherwise do nothing.
 .sp 1 \"</p>
 .PP \"<p>
@@ -133,21 +121,19 @@ If the var is unassigned then assign the default value to it, otherwise do nothi
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var v1; // Unassigned
 v1.defaulter("abc"); // v1 -> "abc"
 // or
 defaulter(v1, "abc");
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 v1.swap(io v2)
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Swap the contents of one var with another.
 .sp 1 \"</p>
 .PP \"<p>
@@ -159,22 +145,20 @@ Eiher or both variables may be unassigned.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var v1 = space(65'536);
 var v2 = "";
 v1.swap(v2); // v1 -> "" // v2.len() -> 65'536
 // or
 swap(v1, v2);
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = v2.move();
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Force the contents of a var to be moved instead of copied. The moved var becomes an empty string.
 .sp 1 \"</p>
 .PP \"<p>
@@ -186,42 +170,38 @@ The moved var must be assigned otherwise a VarUnassigned error is thrown.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var v1 = space(65'536);
 var v2 = v1.move(); // v2.len() -> 65'536 // v1 -> ""
 // or
 var v3 = move(v2);
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = v2.clone();
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Returns a copy of the var.
 .sp 1 \"</p>
 .PP \"<p>
 The cloned var may be unassigned, in which case the copy will be unassigned too.
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var v1 = "abc";
 var v2 = v1.clone(); // "abc"
 // or
 var v3 = clone(v2);
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = v1.dump();
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Return a string describing internal data of a var.
 .sp 1 \"</p>
 .PP \"<p>
@@ -231,23 +211,23 @@ If the str is located on the heap then its address is given.
 \fBtyp:\fR
 .sp 1 \"</p>
 .PD 0 \"<dl>
-.TP \"<dt>
+.TP 10\"<dt>
 \fB0x01\fR \"</dt>
 str is available.
 .\"</dd>
-.TP \"<dt>
+.TP 10\"<dt>
 \fB0x02\fR \"</dt>
 int is available.
 .\"</dd>
-.TP \"<dt>
+.TP 10\"<dt>
 \fB0x04\fR \"</dt>
 dbl is available.
 .\"</dd>
-.TP \"<dt>
+.TP 10\"<dt>
 \fB0x08\fR \"</dt>
 nan: str is not a number.
 .\"</dd>
-.TP \"<dt>
+.TP 10\"<dt>
 \fB0x16\fR \"</dt>
 osfile: str, int and dbl have special meaning.
 .\"</dd>
@@ -255,12 +235,12 @@ osfile: str, int and dbl have special meaning.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var v1 = str("x", 32);
 v1.dump().outputl(); /// e.g. var:0x7ffea7462cd0 typ:1 str:0x584d9e9f6e70 "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 // or
 outputl(dump(v1));
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
@@ -270,9 +250,7 @@ outputl(dump(v1));
 
 .SS
 if (v1.isnum()) ...
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Checks if a var is numeric.
 .sp 1 \"</p>
 .PP \"<p>
@@ -284,22 +262,20 @@ A string is defined as numeric only if it consists of one or more digits 0-9, wi
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 if ("+123.45"_var.isnum()) ... ok
 if (       ""_var.isnum()) ... ok
 if (not   "."_var.isnum()) ... ok
 // or
 if (isnum("123.")) ... ok
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = v1.num();
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Returns a copy of the var if it is numeric or 0 otherwise.
 .sp 1 \"</p>
 .PP \"<p>
@@ -311,19 +287,17 @@ Allows working numerically with data that may be non-numeric.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var v1 = "123.45"_var.num();    // 123.45
 var v2 = "abc"_var.num() + 100; // 100
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = v2 + v3;
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Addition
 .sp 1 \"</p>
 .PP \"<p>
@@ -341,172 +315,146 @@ Internally, 0.1 + 0.2 looks like this using doubles.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var v1 = 0.1;
 var v2 = v1 + 0.2; // 0.3
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = v2 - v3;
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Subtraction
 .sp 1 \"</p>
 
 
 .SS
 var v1 = v2 * v3;
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Multiplication
 .sp 1 \"</p>
 
 
 .SS
 var v1 = v2 / v3;
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Division
 .sp 1 \"</p>
 
 
 .SS
 var v1 = v2 % v3;
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Modulus
 .sp 1 \"</p>
 
 
 .SS
 v1 += v2
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Self addition
 .sp 1 \"</p>
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var v1 = 0.1;
 v1 += 0.2; // 0.3
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 v1 -= v2
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Self subtraction
 .sp 1 \"</p>
 
 
 .SS
 v1 *= v2
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Self multiplication
 .sp 1 \"</p>
 
 
 .SS
 v1 /= v2
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Self division
 .sp 1 \"</p>
 
 
 .SS
 v1 %= v2
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Self modulus
 .sp 1 \"</p>
 
 
 .SS
 v1 ++
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Post increment
 .sp 1 \"</p>
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var v1 = 3;
 var v2 = v1 ++; // v2 -> 3 // v1 -> 4
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 v1 --
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Post decrement
 .sp 1 \"</p>
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var v1 = 3;
 var v2 = v1 --; // v2 -> 3 // v1 -> 2
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 ++ v1
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Pre increment
 .sp 1 \"</p>
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var v1 = 3;
 var v2 = ++ v1; // v2 -> 4 // v1 -> 4
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 -- v1
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Pre decrement
 .sp 1 \"</p>
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var v1 = 3;
 var v2 = -- v1; // v2 -> 2 // v1 -> 2
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
@@ -516,36 +464,34 @@ var v2 = -- v1; // v2 -> 2 // v1 -> 2
 
 .SS
 var v1 = ""_var;
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 The literal suffix "_var" allows dynamic arrays to be seamlessly embedded in code using a predefined set of visible equivalents of unprintable field mark characters as follows:
 .sp 1 \"</p>
 .PP \"<p>
 Visible equivalents
 .sp 1 \"</p>
 .PD 0 \"<dl>
-.TP \"<dt>
+.TP 10\"<dt>
 \fB`\fR \"</dt>
 RM  Record mark
 .\"</dd>
-.TP \"<dt>
+.TP 10\"<dt>
 \fB^\fR \"</dt>
 FM  Field mark
 .\"</dd>
-.TP \"<dt>
+.TP 10\"<dt>
 \fB]\fR \"</dt>
 VM  Value mark
 .\"</dd>
-.TP \"<dt>
+.TP 10\"<dt>
 \fB}\fR \"</dt>
 SM  Subvalue mark
 .\"</dd>
-.TP \"<dt>
+.TP 10\"<dt>
 \fB|\fR \"</dt>
 TM  Text mark
 .\"</dd>
-.TP \"<dt>
+.TP 10\"<dt>
 \fB~\fR \"</dt>
 ST  Subtext mark
 .\"</dd>
@@ -553,35 +499,31 @@ ST  Subtext mark
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var v1 = "f1^f2^v1]v2^f4"_var; // "f1" _FM "f2" _FM "v1" _VM "v2" _FM "f4"
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = {"a", "b", "c" ...}; // Initializer list
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Create a dynamic array var from a list. C++ constrains list elements to be all the same type: var, string, double, int, etc. but they all end up as fields of a dynamic array string.
 .sp 1 \"</p>
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var v1 = {11, 22, 33}; // "11^22^33"_var
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = v2(fieldno);       v1(fieldno) = v2;
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Dynamic array - field extraction, update and append:
 .sp 1 \"</p>
 .PP \"<p>
@@ -590,12 +532,12 @@ See also inserter() and remover().
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var v1 = "aa^bb"_var;
 v1(4) = 44; // v1 -> "aa^bb^^44"_var
 // Field number -1 causes appending a field when updating.
 v1(-1) = "55"; // v1 -> "aa^bb^^44^55"_var
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 .PP \"<p>
@@ -612,20 +554,18 @@ Furthermore using plain round brackets without the leading .f can be confused wi
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var v1 = "aa^bb^cc"_var;
 var v2 = v1.f(2); // "bb" /// .f() style access. Recommended.
 var v3 =   v1(2); // "bb" ///   () style access. Not recommended.
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = v2(fieldno, valueno);       v1(fieldno, valueno) = v2;
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Dynamic array - value update and append
 .sp 1 \"</p>
 .PP \"<p>
@@ -634,12 +574,12 @@ See also inserter() and remover().
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var v1 = "aa^b1]b2^cc"_var;
 v1(2, 4) = "44"; // v1 -> "aa^b1]b2]]44^cc"_var
 // value number -1 causes appending a value when updating.
 v1(2, -1) = 55; // v1 -> "aa^b1]b2]]44]55^cc"_var
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 .PP \"<p>
@@ -650,11 +590,11 @@ Value access:
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var v1 = "aa^b1]b2^cc"_var;
 var v2 = v1.f(2,2); // "b2" /// .f() style access. Recommended.
 var v3 =   v1(2,2); // "b2" ///   () style access. Not recommended.
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
@@ -664,9 +604,7 @@ var v3 =   v1(2,2); // "b2" ///   () style access. Not recommended.
 
 .SS
 var v1 = v2 ^ v3;
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 String concatention operator ^
 .sp 1 \"</p>
 .PP \"<p>
@@ -679,35 +617,31 @@ At least one side must be a var.
 Floating point numbers are implicitly converted to strings with no more than 12 significant digits of precision. This practically eliminates all floatng point rounding errors.
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var v2 = "aa";
 var v1 = v2 ^ 22; // "aa22"
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 v1 ^= v2
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 String self concatention ^= (append)
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var v1 = "aa";
 v1 ^= 22; // v1 -> "aa22"
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = varnum.round(ndecimals = 0);
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Convert a number into a string after rounding it to a given number of decimal places.
 .sp 1 \"</p>
 .PP \"<p>
@@ -728,7 +662,7 @@ Trailing zeros are not omitted. A leading "0." is shown where appropriate.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = var(0.295).round(2);  //  "0.30"
 // or
 let v2 = round(1.295, 2);      //  "1.30"
@@ -738,27 +672,25 @@ var v4 = round(-1.295, 2);     // "-1.30"
 var v5 = round(0, 1);           // "0.0"
 var v6 = round(0, 0);           // "0"
 var v7 = round(0, -1);          // "0"
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 .PP \"<p>
 Negative number of decimals rounds to the left of the decimal point
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = round(123456.789,  0); // "123457"
 let v2 = round(123456.789, -1); // "123460"
 let v3 = round(123456.789, -2); // "123500"
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = var::chr(num);
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Get a char given an integer 0-255.
 .sp 1 \"</p>
 .PP \"<p>
@@ -770,20 +702,18 @@ Get a char given an integer 0-255.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = var::chr(0x61); // "a"
 // or
 let v2 = chr(0x61);
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = var::textchr(num);
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Get a Unicode character given a Unicode Code Point (Number)
 .sp 1 \"</p>
 .PP \"<p>
@@ -792,20 +722,18 @@ Get a Unicode character given a Unicode Code Point (Number)
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = var::textchr(171416); // "𩶘" // or "\xF0A9B698"
 // or
 let v2 = textchr(171416);
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = var::textchrname(unicode_code_point);
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Get a Unicode character name
 .sp 1 \"</p>
 .PP \"<p>
@@ -817,20 +745,18 @@ Get a Unicode character name
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = var::textchrname(91); // "LEFT SQUARE BRACKET"
 // or
 let v2 = textchrname(91);
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = strvar.str(num);
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Get a string of repeated substrings.
 .sp 1 \"</p>
 .PP \"<p>
@@ -845,20 +771,18 @@ Get a string of repeated substrings.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = "ab"_var.str(3); // "ababab"
 // or
 let v2 = str("ab", 3);
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = var::space(nspaces);
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Get a string containing a given number of spaces.
 .sp 1 \"</p>
 .PP \"<p>
@@ -870,20 +794,18 @@ Get a string containing a given number of spaces.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = var::space(3); // "   "
 // or
 let v2 = space(3);
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = varnum.numberinwords(locale = "");
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 \fBReturns:\fR A string representing a given number written in words instead of digits.
 .sp 1 \"</p>
 .PP \"<p>
@@ -892,10 +814,10 @@ var v1 = varnum.numberinwords(locale = "");
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let softhyphen = "\xc2\xad";
 let v1 = var(123.45).numberinwords("de_DE").replace(softhyphen, " "); // "ein hundert drei und zwanzig Komma vier fünf"
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
@@ -905,9 +827,7 @@ let v1 = var(123.45).numberinwords("de_DE").replace(softhyphen, " "); // "ein 
 
 .SS
 var v1 = strvar.at(pos1);
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Get a single char from a string.
 .sp 1 \"</p>
 .PP \"<p>
@@ -917,21 +837,19 @@ Get a single char from a string.
 \fBReturns:\fR A single char if pos1 +/- the length of the string, or "" if greater. Returns the first char if pos1 is 0 or (-pos1) > length.
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var v1 = "abc";
 var v2 = v1.at(2);  // "b"
 var v3 = v1.at(-3); // "a"
 var v4 = v1.at(4);  // ""
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = strvar.ord();
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Get the char number of a char
 .sp 1 \"</p>
 .PP \"<p>
@@ -946,20 +864,18 @@ Equivalent to ord() in php
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = "abc"_var.ord(); // 0x61 // decimal 97, 'a'
 // or
 let v2 = ord("abc");
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = strvar.textord();
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Get the Unicode Code Point of a Unicode character.
 .sp 1 \"</p>
 .PP \"<p>
@@ -974,20 +890,18 @@ Equivalent to ord() in python and ruby, mb_ord() php.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = "Γ"_var.textord(); // 915 // U+0393: Greek Capital Letter Gamma (Unicode character)
 // or
 let v2 = textord("Γ");
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = strvar.len();
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Get the length of a source string in number of chars
 .sp 1 \"</p>
 .PP \"<p>
@@ -996,20 +910,18 @@ Get the length of a source string in number of chars
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = "abc"_var.len(); // 3
 // or
 let v2 = len("abc");
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 if (strvar.empty()) ...
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Checks if the var is an empty string.
 .sp 1 \"</p>
 .PP \"<p>
@@ -1024,21 +936,19 @@ Note that 'if (var.empty())' is not exactly the same as 'if (not var)' because '
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = "0";
 if (not v1.empty()) ... ok // true
 // or
 if (not empty(v1)) ... ok // true
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = strvar.textwidth();
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Count the number of output columns required for a given source string.
 .sp 1 \"</p>
 .PP \"<p>
@@ -1056,20 +966,18 @@ Does not properly calculate all possible combining sequences of graphemes e.g. f
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = "🤡x🤡"_var.textwidth(); // 5
 // or
 let v2 = textwidth("🤡x🤡");
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = strvar.textlen();
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Count the number of Unicode code points in a source string.
 .sp 1 \"</p>
 .PP \"<p>
@@ -1078,20 +986,18 @@ Count the number of Unicode code points in a source string.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = "Γιάννης"_var.textlen(); // 7
 // or
 let v2 = textlen("Γιάννης");
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = strvar.fcount(sepstr);
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Count the number of fields in a source string.
 .sp 1 \"</p>
 .PP \"<p>
@@ -1106,20 +1012,18 @@ This is similar to "var.count(sepstr) + 1" but it returns 0 for an empty source 
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = "aa**cc"_var.fcount("*"); // 3
 // or
 let v2 = fcount("aa**cc", "*");
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = strvar.count(sepstr);
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Count the number of occurrences of a given substr in a source string.
 .sp 1 \"</p>
 .PP \"<p>
@@ -1134,20 +1038,18 @@ Overlapping substrings are not counted.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = "aa**cc"_var.count("*"); // 2
 // or
 let v2 = count("aa**cc", "*");
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 if (strvar.starts(prefix)) ...
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Checks if a source string starts with a given prefix (substr).
 .sp 1 \"</p>
 .PP \"<p>
@@ -1162,20 +1064,18 @@ Checks if a source string starts with a given prefix (substr).
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 if ("abc"_var.starts("ab")) ... true
 // or
 if (starts("abc", "ab")) ... true
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 if (strvar.ends(suffix)) ...
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Checks if a source string ends with a given suffix (substr).
 .sp 1 \"</p>
 .PP \"<p>
@@ -1190,20 +1090,18 @@ Checks if a source string ends with a given suffix (substr).
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 if ("abc"_var.ends("bc")) ... true
 // or
 if (ends("abc", "bc")) ... true
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 if (strvar.contains(substr)) ...
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Checks if a given substr exists in a source string.
 .sp 1 \"</p>
 .PP \"<p>
@@ -1227,20 +1125,18 @@ Programmer logic: Compare as many characters as are in the search string for pre
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 if ("abcd"_var.contains("bc")) ... true
 // or
 if (contains("abcd", "bc")) ... true
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = strvar.index(substr, startchar1 = 1);
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Find a substr in a source string.
 .sp 1 \"</p>
 .PP \"<p>
@@ -1255,20 +1151,18 @@ Find a substr in a source string.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = "abcd"_var.index("bc"); // 2
 // or
 let v2 = index("abcd", "bc");
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = strvar.indexn(substr, occurrence);
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Find the nth occurrence of a substr in a source string.
 .sp 1 \"</p>
 .PP \"<p>
@@ -1280,20 +1174,18 @@ Find the nth occurrence of a substr in a source string.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = "abcabc"_var.indexn("bc", 2); // 5
 // or
 let v2 = indexn("abcabc", "bc", 2);
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = strvar.indexr(substr, startchar1 = -1);
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Find the position of substr working backwards from the end of the string towards the beginning.
 .sp 1 \"</p>
 .PP \"<p>
@@ -1308,20 +1200,18 @@ Find the position of substr working backwards from the end of the string towards
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = "abcabc"_var.indexr("bc"); // 5
 // or
 let v2 = indexr("abcabc", "bc");
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = strvar.match(regex_str, regex_options = "");
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Finds all matches of a given regular expression.
 .sp 1 \"</p>
 .PP \"<p>
@@ -1330,11 +1220,11 @@ Finds all matches of a given regular expression.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = "abc1abc2"_var.match("BC(\\d)", "i"); // "bc1]1^bc2]2"_var
 // or
 let v2 = match("abc1abc2", "BC(\\d)", "i");
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 .PP \"<p>
@@ -1343,35 +1233,35 @@ let v2 = match("abc1abc2", "BC(\\d)", "i");
 \fBregex_options:\fR
 .sp 1 \"</p>
 .PD 0 \"<dl>
-.TP \"<dt>
+.TP 10\"<dt>
 \fBl\fR \"</dt>
 Literal (any regex chars are treated as normal chars)
 .\"</dd>
-.TP \"<dt>
+.TP 10\"<dt>
 \fBi\fR \"</dt>
 Case insensitive
 .\"</dd>
-.TP \"<dt>
+.TP 10\"<dt>
 \fBp\fR \"</dt>
 ECMAScript/Perl (the default)
 .\"</dd>
-.TP \"<dt>
+.TP 10\"<dt>
 \fBb\fR \"</dt>
 Basic POSIX (same as sed)
 .\"</dd>
-.TP \"<dt>
+.TP 10\"<dt>
 \fBe\fR \"</dt>
 Extended POSIX
 .\"</dd>
-.TP \"<dt>
+.TP 10\"<dt>
 \fBa\fR \"</dt>
 awk
 .\"</dd>
-.TP \"<dt>
+.TP 10\"<dt>
 \fBg\fR \"</dt>
 grep
 .\"</dd>
-.TP \"<dt>
+.TP 10\"<dt>
 \fBeg\fR \"</dt>
 egrep or grep -E
 .\"</dd>
@@ -1387,19 +1277,19 @@ char ranges like a-z are locale sensitive if ECMAScript
 \fBregex_options:\fR
 .sp 1 \"</p>
 .PD 0 \"<dl>
-.TP \"<dt>
+.TP 10\"<dt>
 \fBm\fR \"</dt>
 Multiline. Default in boost (and therefore exodus)
 .\"</dd>
-.TP \"<dt>
+.TP 10\"<dt>
 \fBs\fR \"</dt>
 Single line. Default in std::regex
 .\"</dd>
-.TP \"<dt>
+.TP 10\"<dt>
 \fBf\fR \"</dt>
 First only. Only for replace() (not match() or search())
 .\"</dd>
-.TP \"<dt>
+.TP 10\"<dt>
 \fBw\fR \"</dt>
 Wildcard glob style (e.g. *.cfg) not regex style. Only for match() and search(). Not replace().
 .\"</dd>
@@ -1408,18 +1298,14 @@ Wildcard glob style (e.g. *.cfg) not regex style. Only for match() and search().
 
 .SS
 var v1 = strvar.match(regex);
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Ditto
 .sp 1 \"</p>
 
 
 .SS
 var v1 = strvar.search(regex_str, io startchar1, regex_options = "");
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Search for the first match of a regular expression.
 .sp 1 \"</p>
 .PP \"<p>
@@ -1437,49 +1323,41 @@ regex_options as for match()
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var startchar1 = 1;
 let v1 = "abc1abc2"_var.search("BC(\\d)", startchar1, "i"); // "bc1]1"_var // startchar1 -> 5 /// Ready for the next search
 // or
 startchar1 = 1;
 let v2 = search("abc1abc2", "BC(\\d)", startchar1, "i");
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = strvar.search(regex_str);
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Ditto starting from first char
 .sp 1 \"</p>
 
 
 .SS
 var v1 = strvar.search(regex, io startchar1);
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Ditto given a rex
 .sp 1 \"</p>
 
 
 .SS
 var v1 = strvar.search(regex);
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Ditto starting from first char.
 .sp 1 \"</p>
 
 
 .SS
 var v1 = strvar.hash(std::uint64_t modulus = 0);
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Get a hash of a source string.
 .sp 1 \"</p>
 .PP \"<p>
@@ -1494,11 +1372,11 @@ MurmurHash3 is used.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = "abc"_var.hash(); assert(v1 == var(6'715'211'243'465'481'821));
 // or
 let v2 = hash("abc");
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
@@ -1508,47 +1386,41 @@ let v2 = hash("abc");
 
 .SS
 var v1 = strvar.ucase();
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Convert to upper case
 .sp 1 \"</p>
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = "Γιάννης"_var.ucase(); // "ΓΙΆΝΝΗΣ"
 // or
 let v2 = ucase("Γιάννης");
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = strvar.lcase();
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Convert to lower case
 .sp 1 \"</p>
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = "ΓΙΆΝΝΗΣ"_var.lcase(); // "γιάννης"
 // or
 let v2 = lcase("ΓΙΆΝΝΗΣ");
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = strvar.tcase();
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Convert to title case.
 .sp 1 \"</p>
 .PP \"<p>
@@ -1557,20 +1429,18 @@ Convert to title case.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = "γιάννης παππάς"_var.tcase(); // "Γιάννης Παππάς"
 // or
 let v2 = tcase("γιάννης παππάς");
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = strvar.fcase();
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Convert to folded case.
 .sp 1 \"</p>
 .PP \"<p>
@@ -1591,20 +1461,18 @@ Case folding is not locale-dependent.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = "Grüßen"_var.fcase(); // "grüssen"
 // or
 let v2 = tcase("Grüßen");
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = strvar.normalize();
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Replace Unicode character sequences with their standardised NFC form.
 .sp 1 \"</p>
 .PP \"<p>
@@ -1619,20 +1487,18 @@ Normalization is not locale-dependent.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = "cafe\u0301"_var.normalize(); // "caf\u00E9" // "café"
 // or
 let v2 = normalize("cafe\u0301");
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = strvar.invert();
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Simple reversible disguising of string text.
 .sp 1 \"</p>
 .PP \"<p>
@@ -1656,20 +1522,18 @@ Non-existant Unicode Code Points may be created but UTF8 encoding remains valid.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = "abc"_var.invert(); // "\xC2" "\x9E" "\xC2" "\x9D" "\xC2" "\x9C"
 // or
 let v2 = invert("abc");
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = strvar.lower();
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Reduce all types of field mark chars by one level.
 .sp 1 \"</p>
 .PP \"<p>
@@ -1687,20 +1551,18 @@ String size remains identical.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = "a1^b2^c3"_var.lower(); // "a1]b2]c3"_var
 // or
 let v2 = lower("a1^b2^c3"_var);
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = strvar.raise();
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Increase all types of field mark chars by one level.
 .sp 1 \"</p>
 .PP \"<p>
@@ -1718,96 +1580,86 @@ String size remains identical.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = "a1]b2]c3"_var.raise(); // "a1^b2^c3"_var
 // or
 let v2 = "a1]b2]c3"_var;
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = strvar.crop();
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Remove any redundant FM, VM etc. chars (Trailing FM; VM before FM etc.)
 .sp 1 \"</p>
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = "a1^b2]]^c3^^"_var.crop(); // "a1^b2^c3"_var
 // or
 let v2 = crop("a1^b2]]^c3^^"_var);
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = strvar.quote();
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Wrap in double quotes.
 .sp 1 \"</p>
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = "abc"_var.quote(); // "\"abc\""
 // or
 let v2 = quote("abc");
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = strvar.squote();
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Wrap in single quotes.
 .sp 1 \"</p>
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = "abc"_var.squote(); // "'abc'"
 // or
 let v2 = squote("abc");
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = strvar.unquote();
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Remove one pair of surrounding double or single quotes.
 .sp 1 \"</p>
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = "'abc'"_var.unquote(); // "abc"
 // or
 let v2 = unquote("'abc'");
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = strvar.trim(trimchars = " ");
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Remove all leading, trailing and excessive inner bytes.
 .sp 1 \"</p>
 .PP \"<p>
@@ -1816,77 +1668,69 @@ Remove all leading, trailing and excessive inner bytes.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = "  a1  b2 c3  "_var.trim(); // "a1 b2 c3"
 // or
 let v2 = trim("  a1  b2 c3  ");
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = strvar.trimfirst(trimchars = " ");
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Ditto but only leading.
 .sp 1 \"</p>
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = "  a1  b2 c3  "_var.trimfirst(); // "a1  b2 c3  "
 // or
 let v2 = trimfirst("  a1  b2 c3  ");
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = strvar.trimlast(trimchars = " ");
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Ditto but only trailing.
 .sp 1 \"</p>
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = "  a1  b2 c3  "_var.trimlast(); // "  a1  b2 c3"
 // or
 let v2 = trimlast("  a1  b2 c3  ");
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = strvar.trimboth(trimchars = " ");
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Ditto but only leading and trailing, not inner.
 .sp 1 \"</p>
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = "  a1  b2 c3  "_var.trimboth(); // "a1  b2 c3"
 // or
 let v2 = trimboth("  a1  b2 c3  ");
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = strvar.first();
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Get the first char of a string.
 .sp 1 \"</p>
 .PP \"<p>
@@ -1898,20 +1742,18 @@ Equivalent to var.substr(1,length) or var[1, length] in Pick OS
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = "abc"_var.first(); // "a"
 // or
 let v2 = first("abc");
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = strvar.last();
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Get the last char of a string.
 .sp 1 \"</p>
 .PP \"<p>
@@ -1923,20 +1765,18 @@ Equivalent to var.substr(-1, 1) or var[-1, 1] in Pick OS
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = "abc"_var.last(); // "c"
 // or
 let v2 = last("abc");
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = strvar.first(length);
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Get the first n chars of a source string.
 .sp 1 \"</p>
 .PP \"<p>
@@ -1951,20 +1791,18 @@ Equivalent to var.substr(1, length) or var[1, length] in Pick OS
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = "abc"_var.first(2); // "ab"
 // or
 let v2 = first("abc", 2);
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = strvar.last(length);
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Extract up to length trailing chars
 .sp 1 \"</p>
 .PP \"<p>
@@ -1973,20 +1811,18 @@ Equivalent to var.substr(-length, length) or var[-length, length] in Pick OS
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = "abc"_var.last(2); // "bc"
 // or
 let v2 = last("abc", 2);
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = strvar.cut(length);
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Remove n chars (bytes) from the source string.
 .sp 1 \"</p>
 .PP \"<p>
@@ -2001,56 +1837,61 @@ Equivalent to var.substr(length) or var[1, length] = "" in Pick OS
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = "abcd"_var.cut(2); // "cd"
 // or
 let v2 = cut("abcd", 2);
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = strvar.paste(pos1, length, replacestr);
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Insert a substr at an given position after removing a given number of chars.
 .sp 1 \"</p>
 .PP \"<p>
 .sp 1 \"</p>
 .PP \"<p>
-\fBpos1:\fR 0 or 1 : Remove length chars from the beginning and insert at the beginning.
+\fBpos1:\fR
 .sp 1 \"</p>
-.PP \"<p>
-\fBpos1:\fR > than the length of the source string. Insert after the last char.
-.sp 1 \"</p>
-.PP \"<p>
-\fBpos1:\fR -1 : Remove up to length chars before inserting.Insert on or before the last char.
-.sp 1 \"</p>
-.PP \"<p>
-\fBpos1:\fR -2 : Insert on or before the penultimate char.
-.sp 1 \"</p>
+.PD 0 \"<dl>
+.TP 10\"<dt>
+\fB0 or 1\fR \"</dt>
+Remove length chars from the beginning and insert at the beginning.
+.\"</dd>
+.TP 10\"<dt>
+\fB -1\fR \"</dt>
+Insert on or before the last char after removing up to length chars starting with the last char.
+.\"</dd>
+.TP 10\"<dt>
+\fB -2\fR \"</dt>
+Ditto on or before the penultimate char.
+.\"</dd>
+.TP 10\"<dt>
+\fB> strlen\fR \"</dt>
+If pos1 > length of the source string, insert after the last char.
+.\"</dd>
+.PD \"</dl>
 .PP \"<p>
 Equivalent to var[pos1, length] = substr in Pick OS
 .sp 1 \"</p>
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = "abcd"_var.paste(2, 2, "XYZ"); // "aXYZd"
 // or
 let v2 = paste("abcd", 2, 2, "XYZ");
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = strvar.paste(pos1, insertstr);
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Insert text at char position without overwriting any following chars
 .sp 1 \"</p>
 .PP \"<p>
@@ -2059,20 +1900,18 @@ Equivalent to var[pos1, 0] = substr in Pick OS
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = "abcd"_var.paste(2, "XYZ"); // "aXYZbcd"
 // or
 let v2 = paste("abcd", 2, "XYZ");
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = strvar.prefix(insertstr);
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Insert text at the beginning
 .sp 1 \"</p>
 .PP \"<p>
@@ -2081,39 +1920,35 @@ Equivalent to var[0, 0] = substr in Pick OS
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = "abc"_var.prefix("XYZ"); // "XYZabc"
 // or
 let v2 = prefix("abc", "XYZ");
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = strvar.append(appendable, ...);
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Append anything at the end of a string
 .sp 1 \"</p>
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = "abc"_var.append(" is ", 10, " ok", '.'); // "abc is 10 ok."
 // or
 let v2 = append("abc", " is ", 10, " ok", '.');
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = strvar.pop();
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Remove one trailing char.
 .sp 1 \"</p>
 .PP \"<p>
@@ -2122,20 +1957,18 @@ Equivalent to var[-1, 1] = "" in Pick OS
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = "abc"_var.pop(); // "ab"
 // or
 let v2 = pop("abc");
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = strvar.field(delimiter, fieldnx = 1, nfieldsx = 1);
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Copies one or more consecutive fields from a string given a delimiter
 .sp 1 \"</p>
 .PP \"<p>
@@ -2150,37 +1983,33 @@ Copies one or more consecutive fields from a string given a delimiter
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = "aa*bb*cc"_var.field("*", 2); // "bb"
 // or
 let v2 = field("aa*bb*cc", "*", 2);
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = "aa*bb*cc"_var.field("*", -1); // "cc"
 // or
 let v2 = field("aa*bb*cc", "*", -1);
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = strvar.field2(separator, fieldno, nfields = 1);
-.nf
- 
-.fi
+
 
 
 .SS
 var v1 = strvar.fieldstore(separator, fieldno, nfields, replacement);
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 fieldstore() replaces, inserts or deletes subfields in a string.
 .sp 1 \"</p>
 .PP \"<p>
@@ -2206,11 +2035,11 @@ The replacement can contain multiple fields itself. If replacing n fields and th
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = "aa,bb,cc,dd,ee"_var.fieldstore(",", 2, 3, "11,22"); // "aa,11,22,,ee"
 // or
 let v2 = fieldstore("aa,bb,cc,dd,ee", ",", 2, 3, "11,22");
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 .PP \"<p>
@@ -2221,16 +2050,16 @@ If nfields is 0 then insert the replacement field(s) before fieldno
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = "aa,bb,cc,dd,ee"_var.fieldstore(",", 2, 0, "11,22"); // "aa,11,22,bb,cc,dd,ee"
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 If nfields is negative then delete abs(n) fields before inserting whatever fields the replacement has.
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = "aa,bb,cc,dd,ee"_var.fieldstore(",", 2, -2, "11"); // "aa,11,dd,ee"
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 .PP \"<p>
@@ -2241,18 +2070,16 @@ If nfields exceeds the number of fields in the input then additional empty field
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = "aa,bb,cc"_var.fieldstore(",", 6, 2, "11"); // "aa,bb,cc,,,11,"
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = strvar.substr(pos1, length);
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 substr version 1.
 .sp 1 \"</p>
 .PP \"<p>
@@ -2276,11 +2103,11 @@ Not Unicode friendly.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = "abcd"_var.substr(2, 2); // "bc"
 // or
 let v2 = substr("abcd", 2, 2);
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 .PP \"<p>
@@ -2291,11 +2118,11 @@ If pos1 is negative then start counting backwards from the last char
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = "abcd"_var.substr(-3, 2); // "bc"
 // or
 let v2 = substr("abcd", -3, 2);
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 .PP \"<p>
@@ -2306,29 +2133,25 @@ If length is negative then work backwards and return chars reversed
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = "abcd"_var.substr(3, -2); // "cb"
 // or
 let v2 = substr("abcd", 3, -2); // "cb"
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = strvar.b(pos1, length);
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Abbreviated alias of substr version 1.
 .sp 1 \"</p>
 
 
 .SS
 var v1 = strvar.substr(pos1);
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 substr version 2.
 .sp 1 \"</p>
 .PP \"<p>
@@ -2349,29 +2172,25 @@ Partially Unicode friendly but pos1 is in chars.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = "abcd"_var.substr(2); // "bcd"
 // or
 let v2 = substr("abcd", 2);
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = strvar.b(pos1);
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Shorthand alias of substr version 2.
 .sp 1 \"</p>
 
 
 .SS
 var v1 = strvar.substr(pos1, delimiterchars, out pos2);
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 substr version 3.
 .sp 1 \"</p>
 .PP \"<p>
@@ -2410,30 +2229,26 @@ This function is similar to std::string::find_first_of but that function only re
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var pos1 = 4;
 let v1 = "12,45 78"_var.substr(pos1, ", ", COL2);  // v1 -> "45" // COL2 -> 6 // 6 is the position of the next delimiter char found.
 // or
 let v2 = substr("12,45 78", COL2 + 1, ", ", COL2); // v2 -> "78" // COL2 -> 9 // 9 is one after the end of the string meaning that none of the delimiter chars were found.
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = strvar.b(pos1, delimiterchars, out pos2);
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Shorthand alias of substr version 3.
 .sp 1 \"</p>
 
 
 .SS
 var v1 = strvar.substr2(io pos1, out delimiterno);
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 substr version 4.
 .sp 1 \"</p>
 .PP \"<p>
@@ -2464,9 +2279,6 @@ Works with any encoding including UTF8. Was called "remove" in Pick OS.
 The equivalent in Pick OS was the statement "Remove variable From string At column Setting flag"
 .sp 1 \"</p>
 .PP \"<p>
-\&...
-.sp 1 \"</p>
-.PP \"<p>
 This function is valuable for high performance processing of dynamic arrays.
 .sp 1 \"</p>
 .PP \"<p>
@@ -2478,30 +2290,26 @@ It is similar to version 3 of substr - substr(pos1, delimiterchars, pos2) except
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var pos1 = 4, field_mark_no;
 let v1 = "12^45^78"_var.substr2(pos1, field_mark_no);  // "45" // pos1 -> 7 // field_mark_no -> 2 // field_mark_no 2 means that a FM was found.
 // or
 let v2 = substr2("12^45^78"_var, pos1, field_mark_no); // "78" // pos1 -> 9 // field_mark_no -> 0 // field_mark_no 0 means that none of the standard field marks were found.
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = strvar.b2(io pos1, out field_mark_no);
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Shorthand alias of substr version 4.
 .sp 1 \"</p>
 
 
 .SS
 var v1 = strvar.convert(fromchars, tochars);
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Convert or delete chars one for one to other chars
 .sp 1 \"</p>
 .PP \"<p>
@@ -2516,39 +2324,35 @@ Not UTF8 compatible.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = "abcde"_var.convert("aZd", "XY"); // "Xbce" // a is replaced and d is removed
 // or
 let v2 = convert("abcde", "aZd", "XY");
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = strvar.textconvert(fromchars, tochars);
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Ditto for Unicode code points.
 .sp 1 \"</p>
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = "a🤡b😀c🌍d"_var.textconvert("🤡😀", "👋"); // "a👋bc🌍d"
 // or
 let v2 = textconvert("a🤡b😀c🌍d", "🤡😀", "👋");
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = strvar.replace(fromstr, tostr);
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Replace all occurrences of one substr with another.
 .sp 1 \"</p>
 .PP \"<p>
@@ -2557,20 +2361,18 @@ Case sensitive.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = "Abc.Abc"_var.replace("bc", "X"); // "AX.AX"
 // or
 let v2 = replace("Abc Abc", "bc", "X");
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = strvar.replace(regex, replacement_str);
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Replace substrings using a regular expression.
 .sp 1 \"</p>
 .PP \"<p>
@@ -2586,23 +2388,23 @@ The replacement string can include the following special replacement patterns:
 Pattern
 .sp 1 \"</p>
 .PD 0 \"<dl>
-.TP \"<dt>
+.TP 10\"<dt>
 \fB$$\fR \"</dt>
 Inserts a "$".
 .\"</dd>
-.TP \"<dt>
+.TP 10\"<dt>
 \fB$&\fR \"</dt>
 Inserts the matched substring. Equivalent to $0.
 .\"</dd>
-.TP \"<dt>
+.TP 10\"<dt>
 \fB$`\fR \"</dt>
 Inserts the portion of the string that precedes the matched substring.
 .\"</dd>
-.TP \"<dt>
+.TP 10\"<dt>
 \fB$'\fR \"</dt>
 Inserts the portion of the string that follows the matched substring.
 .\"</dd>
-.TP \"<dt>
+.TP 10\"<dt>
 \fB$n\fR \"</dt>
 Inserts the nth (1-indexed) capturing group where n is a positive integer less than 100.
 .\"</dd>
@@ -2610,20 +2412,18 @@ Inserts the nth (1-indexed) capturing group where n is a positive integer less t
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = "A a B b"_var.replace("[A-Z]"_rex, "'$0'"); // "'A' a 'B' b"
 // or
 let v2 = replace("A a B b", "[A-Z]"_rex, "'$0'");
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = strvar.replace(regex, ReplacementFunction auto repl_func);
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Replace substrings using a regular expression and a custom function.
 .sp 1 \"</p>
 .PP \"<p>
@@ -2641,7 +2441,7 @@ e.g. [](auto match_str) {return match_str;} // Does nothing.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 // Decode hex escape codes.
 let v1 = R"(--\0x3B--\0x2F--)";                                 // Hex escape codes.
 let v2 = v1.replace(
@@ -2649,13 +2449,13 @@ let v2 = v1.replace(
     [](auto match_str) {return match_str.cut(3).iconv("HEX");}  // Decodes to a char.
 );
 assert(v2 == "--;--/--");
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 // Reformat dates using groups.
 let v3 = "Date: 03-15-2025";
 let v4 = v3.replace(
@@ -2663,104 +2463,94 @@ let v4 = v3.replace(
     [](auto match_str) {return match_str.f(1, 4) ^ "-" ^ match_str.f(1, 2) ^ "-" ^ match_str.f(1, 3);}
 );
 assert(v4 == "Date: 2025-03-15");
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = strvar.unique();
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Remove duplicate fields in an FM or VM etc. separated list
 .sp 1 \"</p>
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = "a1^b2^a1^c2"_var.unique(); // "a1^b2^c2"_var
 // or
 let v2 = unique("a1^b2^a1^c2"_var);
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = strvar.sort(delimiter = FM);
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Reorder fields in an FM or VM etc. separated list in ascending order
 .sp 1 \"</p>
 .PP \"<p>
 Numeric data:
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = "20^10^2^1^1.1"_var.sort(); // "1^1.1^2^10^20"_var
 // or
 let v2 = sort("20^10^2^1^1.1"_var);
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 .PP \"<p>
 Alphabetic data:
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = "b1^a1^c20^c10^c2^c1^b2"_var.sort(); // "a1^b1^b2^c1^c10^c2^c20"_var
 // or
 let v2 = sort("b1^a1^c20^c10^c2^c1^b2"_var);
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = strvar.reverse(delimiter = FM);
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Reorder fields in an FM or VM etc. separated list in descending order
 .sp 1 \"</p>
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = "20^10^2^1^1.1"_var.reverse(); // "1.1^1^2^10^20"_var
 // or
 let v2 = reverse("20^10^2^1^1.1"_var);
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = strvar.shuffle(delimiter = FM);
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Randomise the order of fields in an FM, VM separated list
 .sp 1 \"</p>
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = "20^10^2^1^1.1"_var.shuffle(); /// e.g. "2^1^20^1.1^10" (random order depending on initrand())
 // or
 let v2 = shuffle("20^10^2^1^1.1"_var);
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = strvar.parse(char sepchar = ' ');
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Split a delimited string with embedded quotes into a dynamic array.
 .sp 1 \"</p>
 .PP \"<p>
@@ -2772,20 +2562,18 @@ Replaces separator chars with FM chars except inside double or single quotes and
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = "abc,\"def,\"123\" fgh\",12.34"_var.parse(','); // "abc^\"def,\"123\" fgh\"^12.34"_var
 // or
 let v2 = parse("abc,\"def,\"123\" fgh\",12.34", ',');
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 dim d1 = strvar.split(delimiter = FM);
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Split a delimited string into a dim array.
 .sp 1 \"</p>
 .PP \"<p>
@@ -2797,27 +2585,23 @@ The delimiter can be multibyte Unicode.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 dim d1 = "a^b^c"_var.split(); // A dimensioned array with three elements (vars)
 // or
 dim d2 = split("a^b^c"_var);
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = strvar.paste(pos1, length, replacestr);
-.nf
- 
-.fi
+
 
 
 .SS
 var v1 = strvar.fieldstore(delimiter, fieldno, nfields, replacement);
-.nf
- 
-.fi
+
 
 
 .SH 7. STRING MUTATION - STANDALONE COMMANDS
@@ -2825,9 +2609,7 @@ var v1 = strvar.fieldstore(delimiter, fieldno, nfields, replacement);
 
 .SS
 strvar.ucaser()
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Upper case
 .sp 1 \"</p>
 .PP \"<p>
@@ -2836,280 +2618,204 @@ All string mutators follow the same pattern as ucaser. See the non-mutating func
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var v1 = "abc";
 v1.ucaser(); // "ABC"
 // or
 ucaser(v1);
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 strvar.lcaser()
-.nf
- 
-.fi
+
 
 
 .SS
 strvar.tcaser()
-.nf
- 
-.fi
+
 
 
 .SS
 strvar.fcaser()
-.nf
- 
-.fi
+
 
 
 .SS
 strvar.normalizer()
-.nf
- 
-.fi
+
 
 
 .SS
 strvar.inverter()
-.nf
- 
-.fi
+
 
 
 .SS
 strvar.quoter()
-.nf
- 
-.fi
+
 
 
 .SS
 strvar.squoter()
-.nf
- 
-.fi
+
 
 
 .SS
 strvar.unquoter()
-.nf
- 
-.fi
+
 
 
 .SS
 strvar.lowerer()
-.nf
- 
-.fi
+
 
 
 .SS
 strvar.raiser()
-.nf
- 
-.fi
+
 
 
 .SS
 strvar.cropper()
-.nf
- 
-.fi
+
 
 
 .SS
 strvar.trimmer(trimchars = " ")
-.nf
- 
-.fi
+
 
 
 .SS
 strvar.trimmerfirst(trimchars = " ")
-.nf
- 
-.fi
+
 
 
 .SS
 strvar.trimmerlast(trimchars = " ")
-.nf
- 
-.fi
+
 
 
 .SS
 strvar.trimmerboth(trimchars = " ")
-.nf
- 
-.fi
+
 
 
 .SS
 strvar.firster()
-.nf
- 
-.fi
+
 
 
 .SS
 strvar.laster()
-.nf
- 
-.fi
+
 
 
 .SS
 strvar.firster(length)
-.nf
- 
-.fi
+
 
 
 .SS
 strvar.laster(length)
-.nf
- 
-.fi
+
 
 
 .SS
 strvar.cutter(length)
-.nf
- 
-.fi
+
 
 
 .SS
 strvar.paster(pos1, length, insertstr)
-.nf
- 
-.fi
+
 
 
 .SS
 strvar.paster(pos1, insertstr)
-.nf
- 
-.fi
+
 
 
 .SS
 strvar.prefixer(insertstr)
-.nf
- 
-.fi
+
 
 
 .SS
 strvar.appender(appendable, ...)
-.nf
- 
-.fi
+
 
 
 .SS
 strvar.popper()
-.nf
- 
-.fi
+
 
 
 .SS
 strvar.fieldstorer(delimiter, fieldno, nfields, replacement)
-.nf
- 
-.fi
+
 
 
 .SS
 strvar.substrer(pos1, length)
-.nf
- 
-.fi
+
 
 
 .SS
 strvar.substrer(pos1)
-.nf
- 
-.fi
+
 
 
 .SS
 strvar.converter(from_chars, to_chars)
-.nf
- 
-.fi
+
 
 
 .SS
 strvar.textconverter(from_characters, to_characters)
-.nf
- 
-.fi
+
 
 
 .SS
 strvar.replacer(regex, tostr)
-.nf
- 
-.fi
+
 
 
 .SS
 strvar.replacer(regex, ReplacementFunction auto repl_func)
-.nf
- 
-.fi
+
 
 
 .SS
 strvar.replacer(fromstr, tostr)
-.nf
- 
-.fi
+
 
 
 .SS
 strvar.uniquer()
-.nf
- 
-.fi
+
 
 
 .SS
 strvar.sorter(delimiter = FM)
-.nf
- 
-.fi
+
 
 
 .SS
 strvar.reverser(delimiter = FM)
-.nf
- 
-.fi
+
 
 
 .SS
 strvar.shuffler(delimiter = FM)
-.nf
- 
-.fi
+
 
 
 .SS
 strvar.parser(char sepchar = ' ')
-.nf
- 
-.fi
+
 
 
 .SH 8. I/O CONVERSION
@@ -3117,9 +2823,7 @@ strvar.parser(char sepchar = ' ')
 
 .SS
 var v1 = var.oconv(convstr);
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Converts internal data to output external display format according to a given conversion code or pattern
 .sp 1 \"</p>
 .PP \"<p>
@@ -3134,20 +2838,18 @@ See [[#ICONV/OCONV PATTERNS]]
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = var(30123).oconv("D/E"); // "21/06/2050"
 // or
 let v2 = oconv(30123, "D/E");
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = var.iconv(convstr);
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Converts external data to internal format according to a given conversion code or pattern
 .sp 1 \"</p>
 .PP \"<p>
@@ -3162,20 +2864,18 @@ See [[#ICONV/OCONV PATTERNS]]
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = "21 JUN 2050"_var.iconv("D/E"); // 30123
 // or
 let v2 = iconv("21 JUN 2050", "D/E");
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = var.format(fmt_str, args, ...);
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Classic format function in printf style
 .sp 1 \"</p>
 .PP \"<p>
@@ -3187,22 +2887,20 @@ or with exodus oconv codes e.g. {::MD20P|R(_)#8} as in the below example.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = var(12.345).format("'{:_>8.2f}'"); // "'___12.35'"
 let v2 = var(12.345).format("'{::MD20P|R(_)#8}'");
 // or
 var v3 = format("'{:_>8.2f}'", var(12.345)); // "'___12.35'"
 var v4 = format("'{::MD20P|R(_)#8}'", var(12.345));
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = strvar.from_codepage(codepage);
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Converts from codepage encoded text to UTF-8 encoded exodus text
 .sp 1 \"</p>
 .PP \"<p>
@@ -3214,31 +2912,29 @@ Use Linux command "iconv -l" for complete list of code pages and encodings.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = "\xa4"_var.from_codepage("CP1124"); // "Є"
 // or
 let v2 = from_codepage("\xa4", "CP1124");
 // U+0404 Cyrillic Capital Letter Ukrainian Ie Unicode character
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = strvar.to_codepage(codepage);
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Converts to codepage encoded text from exodus UTF-8 encoded text
 .sp 1 \"</p>
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = "Є"_var.to_codepage("CP1124").oconv("HEX"); // "A4"
 // or
 let v2 = to_codepage("Є", "CP1124").oconv("HEX");
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
@@ -3248,9 +2944,7 @@ let v2 = to_codepage("Є", "CP1124").oconv("HEX");
 
 .SS
 var v1 = strvar.f(fieldno, valueno = 0, subvalueno = 0);
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 f() is a highly abbreviated alias for the Pick OS field/value/subvalue extract() function.
 .sp 1 \"</p>
 .PP \"<p>
@@ -3265,40 +2959,36 @@ The abbreviated exodus field extraction function (e.g. xxx.f(20)) is provided in
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = "f1^f2v1]f2v2]f2v3^f2"_var;
 let v2 = v1.f(2, 2); // "f2v2"
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = strvar.extract(fieldno, valueno = 0, subvalueno = 0);
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Extract a specific field, value or subvalue from a dynamic array.
 .sp 1 \"</p>
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = "f1^f2v1]f2v2]f2v3^f2"_var;
 let v2 = v1.extract(2, 2); // "f2v2"
 //
 // For brevity the function alias "f()" (standing for "field") is normally used instead of "extract()" as follows:
 var v3 = v1.f(2, 2);
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = strvar.update(fieldno, valueno, subvalueno, replacement);
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Same as var.updater() function but returns a new string instead of updating a variable in place. Rarely used.
 .sp 1 \"</p>
 .PP \"<p>
@@ -3308,54 +2998,42 @@ Same as var.updater() function but returns a new string instead of updating a va
 
 .SS
 var v1 = strvar.update(fieldno, valueno, replacement);
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Ditto for a specific multivalue
 .sp 1 \"</p>
 
 
 .SS
 var v1 = strvar.update(fieldno, replacement);
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Ditto for a specific field
 .sp 1 \"</p>
 
 
 .SS
 var v1 = strvar.insert(fieldno, valueno, subvalueno, insertion);
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Same as var.inserter() function but returns a new string instead of updating a variable in place.
 .sp 1 \"</p>
 
 
 .SS
 var v1 = strvar.insert(fieldno, valueno, insertion);
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Ditto for a specific multivalue
 .sp 1 \"</p>
 
 
 .SS
 var v1 = strvar.insert(fieldno, insertion);
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Ditto for a specific field
 .sp 1 \"</p>
 
 
 .SS
 var v1 = strvar.remove(fieldno, valueno = 0, subvalueno = 0);
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Same as var.remover() function but returns a new string instead of updating a variable in place.
 .sp 1 \"</p>
 .PP \"<p>
@@ -3368,93 +3046,83 @@ Same as var.remover() function but returns a new string instead of updating a va
 
 .SS
 var v1 = strvar.sum();
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Sum up multiple values into one higher level
 .sp 1 \"</p>
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = "1]2]3^4]5]6"_var.sum(); // "6^15"_var
 // or
 let v2 = sum("1]2]3^4]5]6"_var);
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = strvar.sumall();
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Sum up all levels into a single figure
 .sp 1 \"</p>
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = "1]2]3^4]5]6"_var.sumall(); // 21
 // or
 let v2 = sumall("1]2]3^4]5]6"_var);
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = strvar.stddev();
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Calculate n, tot, min, max, tot, mean and stddev
 .sp 1 \"</p>
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = "-11.2^0^11.5^12^13.9^14"_var.stddev(); // "6^40.2^-11.2^14^6.7^9.32344714506"_var
 // or
 let v2 = stddev("-11.2^0^11.5^12^13.9^14"_var);
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = strvar.sum(delimiter);
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Ditto allowing commas etc.
 .sp 1 \"</p>
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = "10,20,30"_var.sum(","); // 60
 // or
 let v2 = sum("10,20,30", ",");
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = strvar.mv(opcode, var2);
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Binary ops (+, -, *, /) in parallel on multiple values
 .sp 1 \"</p>
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = "10]20]30"_var.mv("+","2]3]4"_var); // "12]23]34"_var
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
@@ -3464,146 +3132,132 @@ let v1 = "10]20]30"_var.mv("+","2]3]4"_var); // "12]23]34"_var
 
 .SS
 strvar.updater(fieldno, replacement)
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Replace a specific field in a dynamic array
 .sp 1 \"</p>
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var v1 = "f1^v1]v2}s2}s3^f3"_var;
 v1.updater(2, "X"); // "f1^X^f3"_var
 // or
 v1(2) = "X"; /// Easiest.
 // or
 updater(v1, 2, "X");
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 strvar.updater(fieldno, valueno, replacement)
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Replace a specific value of a specific field in a dynamic array.
 .sp 1 \"</p>
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var v1 = "f1^v1]v2}s2}s3^f3"_var;
 v1.updater(2, 2, "X"); // "f1^v1]X^f3"_var
 // or
 v1(2, 2) = "X"; /// Easiest.
 // or
 updater(v1, 2, 2, "X");
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 strvar.updater(fieldno, valueno, subvalueno, replacement)
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Replace a specific subvalue of a specific value of a specific field in a dynamic array.
 .sp 1 \"</p>
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var v1 = "f1^v1]v2}s2}s3^f3"_var;
 v1.updater(2, 2, 2, "X"); // "f1^v1]v2}X}s3^f3"_var
 // or
 v1(2, 2, 2) = "X"; /// Easiest.
 // or
 updater(v1, 2, 2, 2, "X");
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 strvar.inserter(fieldno, insertion)
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Insert a specific field in a dynamic array, moving all other fields up.
 .sp 1 \"</p>
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var v1 = "f1^v1]v2}s2}s3^f3"_var;
 v1.inserter(2, "X"); // "f1^X^v1]v2}s2}s3^f3"_var
 // or
 inserter(v1, 2, "X");
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 strvar.inserter(fieldno, valueno, insertion)
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Ditto for a specific value in a specific field, moving all other values up.
 .sp 1 \"</p>
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var v1 = "f1^v1]v2}s2}s3^f3"_var;
 v1.inserter(2, 2, "X"); // "f1^v1]X]v2}s2}s3^f3"_var
 // or
 inserter(v1, 2, 2, "X");
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 strvar.inserter(fieldno, valueno, subvalueno, insertion)
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Ditto for a specific subvalue in a dynamic array, moving all other subvalues up.
 .sp 1 \"</p>
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var v1 = "f1^v1]v2}s2}s3^f3"_var;
 v1.inserter(2, 2, 2, "X"); // "f1^v1]v2}X}s2}s3^f3"_var
 // or
 v1.inserter(2, 2, 2, "X");
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 strvar.remover(fieldno, valueno = 0, subvalueno = 0)
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Remove a specific field (or value, or subvalue) from a dynamic array, moving all other fields (or values, or subvalues)  down.
 .sp 1 \"</p>
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var v1 = "f1^v1]v2}s2}s3^f3"_var;
 v1.remover(2, 2); // "f1^v1^f3"_var
 // or
 remover(v1, 2, 2);
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
@@ -3613,9 +3267,7 @@ remover(v1, 2, 2);
 
 .SS
 var v1 = strvar.locate(target);
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 locate() with only the target substr argument provided searches unordered values separated by any of the field mark chars.
 .sp 1 \"</p>
 .PP \"<p>
@@ -3627,20 +3279,18 @@ Searching for empty fields, values etc. (i.e. "") will work. Locating "" in "]yy
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 if ("UK^US^UA"_var.locate("US")) ... ok // 2
 // or
 if (locate("US", "UK^US^UA"_var)) ... ok
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 if (strvar.locate(target, out valueno)) ...
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 locate() with only the target substr provided and setting returned searches unordered values separated by any type of field mark chars.
 .sp 1 \"</p>
 .PP \"<p>
@@ -3652,21 +3302,19 @@ locate() with only the target substr provided and setting returned searches unor
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var setting;
 if ("UK]US]UA"_var.locate("US", setting)) ... ok // setting -> 2
 // or
 if (locate("US", "UK]US]UA"_var, setting)) ... ok
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 if (strvar.locate(target, out setting, fieldno, valueno = 0)) ...
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 locate() the target in unordered fields if fieldno is 0, or values if a fieldno is specified, or subvalues if the valueno argument is provided.
 .sp 1 \"</p>
 .PP \"<p>
@@ -3678,19 +3326,17 @@ locate() the target in unordered fields if fieldno is 0, or values if a fieldno 
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var setting;
 if ("f1^f2v1]f2v2]s1}s2}s3}s4^f3^f4"_var.locate("s4", setting, 2, 3)) ... ok // setting -> 4 // returns true
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 if (strvar.locateby(ordercode, target, out valueno)) ...
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 locateby() without fieldno or valueno arguments searches ordered values separated by VM chars.
 .sp 1 \"</p>
 .PP \"<p>
@@ -3714,53 +3360,47 @@ In case the target is not exactly found then the correct value no for inserting 
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var valueno; if ("aaa]bbb]ccc"_var.locateby("AL", "bb", valueno)) ... // valueno -> 2 // returns false and valueno = where it could be correctly inserted.
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 if (strvar.locateby(ordercode, target, out setting, fieldno, valueno = 0)) ...
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 locateby() ordered as above but in fields if fieldno is 0, or values in a specific fieldno, or subvalues in a specific valueno.
 .sp 1 \"</p>
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var setting;
 if ("f1^f2^aaa]bbb]ccc^f4"_var.locateby("AL", "bb", setting, 3)) ... // setting -> 2 // return false and where it could be correctly inserted.
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 if (strvar.locateusing(usingchar, target)) ...
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 locate() a target substr in the whole unordered string using a given delimiter char returning true if found.
 .sp 1 \"</p>
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 if ("AB,EF,CD"_var.locateusing(",", "EF")) ... ok
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 if (strvar.locateusing(usingchar, target, out setting, fieldno = 0, valueno = 0, subvalueno = 0)) ...
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 locate() the target in a specific field, value or subvalue using a specified delimiter and unordered data
 .sp 1 \"</p>
 .PP \"<p>
@@ -3775,19 +3415,17 @@ This is similar to the main locate command but the delimiter char can be specifi
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var setting;
 if ("f1^f2^f3c1,f3c2,f3c3^f4"_var.locateusing(",", "f3c2", setting, 3)) ... ok // setting -> 2 // returns true
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 if (strvar.locatebyusing(ordercode, usingchar, target, out setting, fieldno = 0, valueno = 0, subvalueno = 0)) ...
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 locatebyusing() supports all the above features in a single function.
 .sp 1 \"</p>
 .PP \"<p>
@@ -3800,9 +3438,7 @@ locatebyusing() supports all the above features in a single function.
 
 .SS
 if (conn.connect(conninfo = "")) ...
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 For all DB operations, the operative var can either be a DB connection created with dbconnect() or be any var and a default connection will be established on the fly.
 .sp 1 \"</p>
 .PP \"<p>
@@ -3822,23 +3458,21 @@ Setting environment variable EXO_DBTRACE=1 will cause tracing of DB interface in
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var conn = "exodus";
 if (not conn.connect("dbname=exodus user=exodus password=somesillysecret")) ...;
 // or
 if (not connect()) ...
 // or
 if (not connect("exodus")) ...
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 if (conn.attach(filenames)) ...
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 "attach" causes the given filenames to be associated with a specific connection for the remainder of the session.
 .sp 1 \"</p>
 .PP \"<p>
@@ -3862,22 +3496,20 @@ Internally, attach merely opens each filename on the given connection causing th
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var conn = "exodus";
 let filenames = "xo_clients^dict.xo_clients"_var;
 if (conn.attach(filenames)) ... ok
 // or
 if (attach(filenames)) ... ok
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 conn.detach(filenames)
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Removes files from the internal cache created by previous open() and attach() calls.
 .sp 1 \"</p>
 .PP \"<p>
@@ -3890,69 +3522,61 @@ Removes files from the internal cache created by previous open() and attach() ca
 
 .SS
 if (conn.begintrans()) ...
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Begin a DB transaction.
 .sp 1 \"</p>
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var conn = "exodus";
 if (not conn.begintrans()) ...
 // or
 if (not begintrans()) ...
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 if (conn.statustrans()) ...
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Check if a DB transaction is in progress.
 .sp 1 \"</p>
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var conn = "exodus";
 if (conn.statustrans()) ... ok
 // or
 if (statustrans()) ... ok
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 if (conn.rollbacktrans()) ...
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Rollback a DB transaction.
 .sp 1 \"</p>
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var conn = "exodus";
 if (conn.rollbacktrans()) ... ok
 // or
 if (rollbacktrans()) ... ok
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 if (conn.committrans()) ...
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Commit a DB transaction.
 .sp 1 \"</p>
 .PP \"<p>
@@ -3961,21 +3585,19 @@ Commit a DB transaction.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var conn = "exodus";
 if (conn.committrans()) ... ok
 // or
 if (committrans()) ... ok
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 if (conn.sqlexec(sqlcmd)) ...
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Execute an sql command.
 .sp 1 \"</p>
 .PP \"<p>
@@ -3984,21 +3606,19 @@ Execute an sql command.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var conn = "exodus";
 if (conn.sqlexec("select 1")) ... ok
 // or
 if (sqlexec("select 1")) ... ok
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 if (conn.sqlexec(sqlcmd, io response)) ...
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Execute an SQL command and capture the response.
 .sp 1 \"</p>
 .PP \"<p>
@@ -4013,43 +3633,39 @@ Execute an SQL command and capture the response.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var conn = "exodus";
 let sqlcmd = "select 'xxx' as col1, 'yyy' as col2";
 var response;
 if (conn.sqlexec(sqlcmd, response)) ... ok // response -> "col1^col2\x1fxxx^yyy"_var /// \x1f is the Record Mark (RM) char. The backtick char is used here by gendoc to deliminate source code.
 // or
 if (sqlexec(sqlcmd, response)) ... ok
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 conn.disconnect()
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Closes DB connection and frees process resources both locally and in the database server.
 .sp 1 \"</p>
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var conn = "exodus";
 conn.disconnect();
 // or
 disconnect();
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 conn.disconnectall()
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Closes all connections and frees process resources both locally and in the database server(s).
 .sp 1 \"</p>
 .PP \"<p>
@@ -4058,49 +3674,43 @@ All connections are closed automatically when a process terminates.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var conn = "exodus";
 conn.disconnectall();
 // or
 disconnectall();
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = var::lasterror();
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 \fBReturns:\fR The last OS or DB error message.
 .sp 1 \"</p>
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var v1 = var::lasterror();
 // or
 var v2 = lasterror();
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 conn.setlasterror(msg)
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Set the lasterror() message.
 .sp 1 \"</p>
 
 
 .SS
 var::loglasterror(source = "")
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Log the last OS or DB error message.
 .sp 1 \"</p>
 .PP \"<p>
@@ -4112,11 +3722,11 @@ Prefixes the output with source if provided.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var::loglasterror("main:");
 // or
 loglasterror("main:");
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
@@ -4126,9 +3736,7 @@ loglasterror("main:");
 
 .SS
 if (conn.dbcreate(new_dbname, old_dbname = "")) ...
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Create a named database on a particular connection.
 .sp 1 \"</p>
 .PP \"<p>
@@ -4140,22 +3748,20 @@ Optionally copies an existing database from the same connection and which cannot
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var conn = "exodus";
 if (not dbdelete("xo_gendoc_testdb")) {}; // Cleanup first
 if (conn.dbcreate("xo_gendoc_testdb")) ... ok
 // or
 if (dbcreate("xo_gendoc_testdb")) ...
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 if (conn.dbcopy(from_dbname, to_dbname)) ...
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Create a named database as a copy of an existing database.
 .sp 1 \"</p>
 .PP \"<p>
@@ -4167,42 +3773,38 @@ The source database must exist on the same connection and cannot have any curren
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var conn = "exodus";
 if (not dbdelete("xo_gendoc_testdb2")) {}; // Cleanup first
 if (conn.dbcopy("xo_gendoc_testdb", "xo_gendoc_testdb2")) ... ok
 // or
 if (dbcopy("xo_gendoc_testdb", "xo_gendoc_testdb2")) ...
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = conn.dblist();
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 \fBReturns:\fR A list of available databases on a particular connection.
 .sp 1 \"</p>
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var conn = "exodus";
 let v1 = conn.dblist();
 // or
 let v2 = dblist();
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 if (conn.dbdelete(dbname)) ...
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Delete (drop) a named database.
 .sp 1 \"</p>
 .PP \"<p>
@@ -4211,21 +3813,19 @@ The target database must exist and cannot have any current connections.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var conn = "exodus";
 if (conn.dbdelete("xo_gendoc_testdb2")) ... ok
 // or
 if (dbdelete("xo_gendoc_testdb2")) ...
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 if (conn.createfile(filename)) ...
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Create a named DB file.
 .sp 1 \"</p>
 .PP \"<p>
@@ -4234,101 +3834,91 @@ filenames ending with "_temp" only last until the connection is closed.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let filename = "xo_gendoc_temp", conn = "exodus";
 if (conn.createfile(filename)) ... ok
 // or
 if (createfile(filename)) ...
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 if (conn.renamefile(filename, newfilename)) ...
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Rename a DB file.
 .sp 1 \"</p>
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let conn = "exodus", filename = "xo_gendoc_temp", new_filename = "xo_gendoc_temp2";
 if (conn.renamefile(filename, new_filename)) ... ok
 // or
 if (renamefile(filename, new_filename)) ...
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = conn.listfiles();
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 \fBReturns:\fR A list of all files in a database
 .sp 1 \"</p>
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var conn = "exodus";
 if (not conn.listfiles()) ...
 // or
 if (not listfiles()) ...
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 if (conn.clearfile(filename)) ...
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Delete all records in a DB file
 .sp 1 \"</p>
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let conn = "exodus", filename = "xo_gendoc_temp2";
 if (not conn.clearfile(filename)) ...
 // or
 if (not clearfile(filename)) ...
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 if (conn.deletefile(filename)) ...
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Delete a DB file
 .sp 1 \"</p>
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let conn = "exodus", filename = "xo_gendoc_temp2";
 if (conn.deletefile(filename)) ... ok
 // or
 if (deletefile(filename)) ...
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = conn_or_file.reccount(filename = "");
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 \fBReturns:\fR The approx. number of records in a DB file.
 .sp 1 \"</p>
 .PP \"<p>
@@ -4340,21 +3930,19 @@ Not very accurate inside transactions.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let conn = "exodus", filename = "xo_clients";
 var nrecs1 = conn.reccount(filename);
 // or
 var nrecs2 = reccount(filename);
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 if (conn_or_file.flushindex(filename = "")) ...
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Calls DB maintenance function for a file or all files.
 .sp 1 \"</p>
 .PP \"<p>
@@ -4370,9 +3958,7 @@ This doesnt actually flush any indexes but does make sure that reccount() functi
 
 .SS
 if (file.open(dbfilename, connection = "")) ...
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Opens a DB file to a var which can be used in subsequent DB function calls to access a specific file using a specific connection.
 .sp 1 \"</p>
 .PP \"<p>
@@ -4384,21 +3970,19 @@ Opens a DB file to a var which can be used in subsequent DB function calls to ac
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var file, filename = "xo_clients";
 if (not file.open(filename)) ...
 // or
 if (not open(filename to file)) ...
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 file.close()
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Closes DB file var
 .sp 1 \"</p>
 .PP \"<p>
@@ -4407,21 +3991,19 @@ Does nothing currently since database file vars consume no resources
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var file = "xo_clients";
 file.close();
 // or
 close(file);
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 if (file.createindex(fieldname, dictfile = "")) ...
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Creates a secondary index for a given DB file and field name.
 .sp 1 \"</p>
 .PP \"<p>
@@ -4443,22 +4025,20 @@ The fieldname must exist in a dictionary file. The default dictionary is "dict."
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var filename = "xo_clients", fieldname = "DATE_CREATED";
 if (not deleteindex("xo_clients", "DATE_CREATED")) {}; // Cleanup first
 if (filename.createindex(fieldname)) ... ok
 // or
 if (createindex(filename, fieldname)) ...
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = file|conn.listindex(file_or_filename = "", fieldname = "");
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Lists secondary indexes in a database or for a DB file
 .sp 1 \"</p>
 .PP \"<p>
@@ -4467,21 +4047,19 @@ Lists secondary indexes in a database or for a DB file
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var conn = "exodus";
 if (conn.listindex()) ... ok // includes "xo_clients__date_created"
 // or
 if (listindex()) ... ok
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 if (file.deleteindex(fieldname)) ...
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Deletes a secondary index for a DB file and field name.
 .sp 1 \"</p>
 .PP \"<p>
@@ -4494,21 +4072,19 @@ Deletes a secondary index for a DB file and field name.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var file = "xo_clients", fieldname = "DATE_CREATED";
 if (file.deleteindex(fieldname)) ... ok
 // or
 if (deleteindex(file, fieldname)) ...
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = file.lock(key);
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Places a metaphorical DB lock on a particular record given a DB file and key.
 .sp 1 \"</p>
 .PP \"<p>
@@ -4533,19 +4109,19 @@ Locks can be used to avoid processing a transaction simultaneously with another 
 \fBReturns:\fR
 .sp 1 \"</p>
 .PD 0 \"<dl>
-.TP \"<dt>
+.TP 10\"<dt>
 \fB0\fR \"</dt>
 Failure: Another connection has already placed the same lock.
 .\"</dd>
-.TP \"<dt>
+.TP 10\"<dt>
 \fB""\fR \"</dt>
 Failure: The lock has already been placed.
 .\"</dd>
-.TP \"<dt>
+.TP 10\"<dt>
 \fB1\fR \"</dt>
 Success: A new lock has been placed.
 .\"</dd>
-.TP \"<dt>
+.TP 10\"<dt>
 \fB2\fR \"</dt>
 Success: The lock has already been placed and the connection is in a transaction.
 .\"</dd>
@@ -4553,21 +4129,19 @@ Success: The lock has already been placed and the connection is in a transaction
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var file = "xo_clients", key = "1000";
 if (file.lock(key)) ... ok
 // or
 if (lock(file, key)) ...
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 if (file.unlock(key)) ...
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Removes a DB lock placed by the lock function.
 .sp 1 \"</p>
 .PP \"<p>
@@ -4582,21 +4156,19 @@ Locks cannot be removed while a connection is in a transaction.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var file = "xo_clients", key = "1000";
 if (file.unlock(key)) ... ok
 // or
 if (unlock(file, key)) ...
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 if (file.unlockall()) ...
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Removes all DB locks placed by the lock function in the specified connection.
 .sp 1 \"</p>
 .PP \"<p>
@@ -4605,21 +4177,19 @@ Locks cannot be removed while in a transaction.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var conn = "exodus";
 if (not conn.unlockall()) ...
 // or
 if (not unlockall(conn)) ...
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 record.write(file, key)
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Writes a record into a DB file given a unique primary key.
 .sp 1 \"</p>
 .PP \"<p>
@@ -4637,23 +4207,21 @@ Any memory cached record is deleted.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let record = "Client GD^G^20855^30000^1001.00^20855.76539"_var;
 let file = "xo_clients", key = "GD001";
 //if (not "xo_clients"_var.deleterecord("GD001")) {}; // Cleanup first
 record.write(file, key);
 // or
 write(record on file, key);
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 if (record.read(file, key)) ...
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Reads a record from a DB file for a given key.
 .sp 1 \"</p>
 .PP \"<p>
@@ -4674,22 +4242,20 @@ A special case of the key being "%RECORDS%" results in a fictitious "record" bei
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var record;
 let file = "xo_clients", key = "GD001";
 if (not record.read(file, key)) ... // record -> "Client GD^G^20855^30000^1001.00^20855.76539"_var
 // or
 if (not read(record from file, key)) ...
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 if (file.deleterecord(key)) ...
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Deletes a record from a DB file given a key.
 .sp 1 \"</p>
 .PP \"<p>
@@ -4704,21 +4270,19 @@ deleterecord(in file), a one argument free function, is available that deletes m
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let file = "xo_clients", key = "GD001";
 if (file.deleterecord(key)) ... ok
 // or
 //if (deleterecord(file, key)) ...
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 if (record.insertrecord(file, key)) ...
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Inserts a new record in a DB file.
 .sp 1 \"</p>
 .PP \"<p>
@@ -4730,22 +4294,20 @@ Any memory cached record is deleted.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let record = "Client GD^G^20855^30000^1001.00^20855.76539"_var;
 let file = "xo_clients", key = "GD001";
 if (record.insertrecord(file, key)) ... ok
 // or
 if (insertrecord(record on file, key)) ...
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 if (record.updaterecord(file, key)) ...
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Updates an existing record in a DB file.
 .sp 1 \"</p>
 .PP \"<p>
@@ -4757,22 +4319,20 @@ Any memory cached record is deleted.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let record = "Client GD^G^20855^30000^1001.00^20855.76539"_var;
 let file = "xo_clients", key = "GD001";
 if (not record.updaterecord(file, key)) ...
 // or
 if (not updaterecord(record on file, key)) ...
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 if (record.updatekey(key, newkey)) ...
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Updates the key of an existing record in a DB file.
 .sp 1 \"</p>
 .PP \"<p>
@@ -4784,61 +4344,55 @@ Any memory cached records of either key are deleted.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let file = "xo_clients", key = "GD001", newkey = "GD002";
 if (not file.updatekey(key, newkey)) ...
 // or
 if (not updatekey(file, newkey, key)) ... // Reverse the above change.
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 if (strvar.readf(file, key, fieldno)) ...
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 "Read field" Same as read() but only returns a specific field number from the record.
 .sp 1 \"</p>
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var field, file = "xo_clients", key = "GD001", fieldno = 2;
 if (not field.readf(file, key, fieldno)) ... // field -> "G"
 // or
 if (not readf(field from file, key, fieldno)) ...
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 strvar.writef(file, key, fieldno)
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 "write field" Same as write() but only writes to a specific field number in the record
 .sp 1 \"</p>
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var field = "f3", file = "xo_clients", key = "1000", fieldno = 3;
 field.writef(file, key, fieldno);
 // or
 writef(field on file, key, fieldno);
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 record.writec(file, key)
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 "Write cache" Writes a record and key into a memory cached "DB file".
 .sp 1 \"</p>
 .PP \"<p>
@@ -4856,22 +4410,20 @@ Neither the DB file nor the record key need to actually exist in the actual DB.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let record = "Client XD^X^20855^30000^1001.00^20855.76539"_var;
 let file = "xo_clients", key = "XD001";
 record.writec(file, key);
 // or
 writec(record on file, key);
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 if (record.readc(file, key)) ...
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 "Read cache" Same as "read() but first reads from a memory cache.
 .sp 1 \"</p>
 .br
@@ -4888,7 +4440,7 @@ Cached DB file data lives in exodus process memory and is lost when the process 
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var record;
 let file = "xo_clients", key = "XD001";
 if (record.readc(file, key)) ... ok
@@ -4896,16 +4448,14 @@ if (record.readc(file, key)) ... ok
 if (readc(record from file, key)) ... ok
 // Verify not in actual database file by using read() not readc()
 if (read(record from file, key)) abort("Error: " ^ key ^ " should not be in the actual database file"); // error
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 if (dbfile.deletec(key)) ...
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Deletes a record and key from a memory cached "file".
 .sp 1 \"</p>
 .PP \"<p>
@@ -4917,21 +4467,19 @@ The actual database file is NOT updated.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var file = "xo_clients", key = "XD001";
 if (file.deletec(key)) ... ok
 // or
 if (deletec(file, key)) ...
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 conn.clearcache()
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Clears the memory cache of all records for the given connection
 .sp 1 \"</p>
 .PP \"<p>
@@ -4940,21 +4488,19 @@ All future cache readc() function calls will be forced to obtain records from th
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let conn = "exodus";
 conn.clearcache();
 // or
 clearcache(conn);
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = strvar.xlate(filename, fieldno, mode);
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 The xlate ("translate") function is similar to readf() but, when called as an exodus program member function, it can be used efficiently with exodus file dictionaries using column names and functions and multivalued data.
 .sp 1 \"</p>
 .PP \"<p>
@@ -4973,15 +4519,15 @@ If var key is multivalued then a multivalued field is returned.
 \fBfieldno:\fR Which field of the record to return.
 .sp 1 \"</p>
 .PD 0 \"<dl>
-.TP \"<dt>
+.TP 10\"<dt>
 \fBnn\fR \"</dt>
 Field number nn
 .\"</dd>
-.TP \"<dt>
+.TP 10\"<dt>
 \fB0\fR \"</dt>
 The key.
 .\"</dd>
-.TP \"<dt>
+.TP 10\"<dt>
 \fB""\fR \"</dt>
 The whole record.
 .\"</dd>
@@ -4990,11 +4536,11 @@ The whole record.
 \fBmode:\fR If the record does not exist.
 .sp 1 \"</p>
 .PD 0 \"<dl>
-.TP \"<dt>
+.TP 10\"<dt>
 \fB"X"\fR \"</dt>
 Returns ""
 .\"</dd>
-.TP \"<dt>
+.TP 10\"<dt>
 \fB"C"\fR \"</dt>
 Returns the key unconverted.
 .\"</dd>
@@ -5002,12 +4548,12 @@ Returns the key unconverted.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let key = "SB001";
 let client_name = key.xlate("xo_clients", 1, "X"); // "Client AAA"
 // or
 let name_and_type = xlate("xo_clients", key, "NAME_AND_TYPE", "X"); // "Client AAA (A)"
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
@@ -5017,9 +4563,7 @@ let name_and_type = xlate("xo_clients", key, "NAME_AND_TYPE", "X"); // "Client A
 
 .SS
 if (dbfile.select(sort_select_command = "")) ...
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Create an active select list of keys of a database file.
 .sp 1 \"</p>
 .PP \"<p>
@@ -5058,7 +4602,7 @@ Active select lists created using var.select()'s member function syntax cannot b
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var clients = "xo_clients";
 if (clients.select("with type 'B' and with balance ge 100 by type by name"))
     while (clients.readnext(ID))
@@ -5067,16 +4611,14 @@ if (clients.select("with type 'B' and with balance ge 100 by type by name"))
 if (select("xo_clients with type 'B' and with balance ge 100 by type by name"))
     while (readnext(ID))
         println("Client code is {}", ID);
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 if (dbfile.selectkeys(keys)) ...
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Create an active select list from a string of keys.
 .sp 1 \"</p>
 .PP \"<p>
@@ -5091,7 +4633,7 @@ Similar to select() but creates the list directly from a var.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var dbfile = "";
 let keys = "A01^B02^C03"_var;
 if (dbfile.selectkeys(keys)) ... ok
@@ -5099,16 +4641,14 @@ assert(dbfile.readnext(ID) and ID == "A01");
 // or
 if (selectkeys(keys)) ... ok
 assert(readnext(ID) and ID == "A01");
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 if (dbfile.hasnext()) ...
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Checks if a select list is active.
 .sp 1 \"</p>
 .PP \"<p>
@@ -5123,7 +4663,7 @@ If it returns true then a call to readnext() will return a database record key, 
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var clients = "xo_clients", key;
 if (clients.select()) {
     assert(clients.hasnext());
@@ -5132,16 +4672,14 @@ if (clients.select()) {
 if (select("xo_clients")) {
     assert(hasnext());
 }
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 if (dbfile.readnext(out key)) ...
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Acquires and consumes one key from an active select list of database record keys.
 .sp 1 \"</p>
 .PP \"<p>
@@ -5166,9 +4704,7 @@ See select() for example code.
 
 .SS
 if (dbfile.readnext(out key, out valueno)) ...
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Similar to readnext(key) but multivalued.
 .sp 1 \"</p>
 .PP \"<p>
@@ -5178,9 +4714,7 @@ If the active list was ordered by multivalued database fields then pairs of key 
 
 .SS
 if (dbfile.readnext(out record, out key, out valueno)) ...
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Similar to readnext(key) but acquires the database record as well.
 .sp 1 \"</p>
 .PP \"<p>
@@ -5195,7 +4729,7 @@ Similar to readnext(key) but acquires the database record as well.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var clients = "xo_clients";
 if (clients.select("with type 'B' and with balance ge 100 by type by name (R)"))
     while (clients.readnext(RECORD, ID, MV))
@@ -5205,16 +4739,14 @@ DICT = "dict.xo_clients";
 if (select("xo_clients with type 'B' and with balance ge 100 by type by name (R)"))
     while (readnext(RECORD, ID, MV))
         println("Code is {}, Name is {}", calculate("CODE"), calculate("NAME"));
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 dbfile.clearselect()
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Deactivates an active select list.
 .sp 1 \"</p>
 .PP \"<p>
@@ -5229,23 +4761,21 @@ Has no effect if no select list is active for dbfile.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var clients = "xo_clients";
 clients.clearselect();
 if (not clients.hasnext()) ... ok
 // or
 clearselect();
 if (not hasnext()) ... ok
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 if (dbfile.savelist(listname)) ...
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Stores an active select list for later retrieval.
 .sp 1 \"</p>
 .PP \"<p>
@@ -5281,7 +4811,7 @@ Select lists saved in the lists database file may be created, deleted and listed
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var clients = "xo_clients";
 if (clients.select("with type 'B' by name")) {
 }
@@ -5289,16 +4819,14 @@ if (clients.select("with type 'B' by name")) {
 if (select("xo_clients with type 'B' by name")) {
     if (savelist("mylist")) ... ok
 }
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 if (dbfile.getlist(listname)) ...
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Retrieve and reactivate a saved select list.
 .sp 1 \"</p>
 .PP \"<p>
@@ -5319,7 +4847,7 @@ Retrieving a list does not delete it and a list can be retrieved more than once 
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var file = "";
 if (file.getlist("mylist")) {
     while (file.readnext(ID))
@@ -5330,16 +4858,14 @@ if (getlist("mylist")) {
     while (readnext(ID))
         println("Key is {}", ID);
 }
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 if (dbfile.deletelist(listname)) ...
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Delete a saved select list.
 .sp 1 \"</p>
 .PP \"<p>
@@ -5354,12 +4880,12 @@ Delete a saved select list.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var conn = "";
 if (conn.deletelist("mylist")) ... ok
 // or
 if (deletelist("mylist")) ...
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
@@ -5369,9 +4895,7 @@ if (deletelist("mylist")) ...
 
 .SS
 var v1 = var::date();
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 A date in internal format.
 .sp 1 \"</p>
 .PP \"<p>
@@ -5383,20 +4907,18 @@ Internal format is the number of whole days since pick epoch 1967-12-31 00:00:00
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let today1 = var::date();
 // or
 let today2 = date();
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = var::time();
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Number of whole seconds since last 00:00:00 (UTC).
 .sp 1 \"</p>
 .PP \"<p>
@@ -5405,20 +4927,18 @@ Number of whole seconds since last 00:00:00 (UTC).
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let now1 = var::time();
 // or
 let now2 = time();
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = var::ostime();
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Number of fractional seconds since last 00:00:00 (UTC).
 .sp 1 \"</p>
 .PP \"<p>
@@ -5430,20 +4950,18 @@ e.g. 23343.704387955 approx. 06:29:03 UTC
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let now1 = var::ostime();
 // or
 let now2 = ostime();
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = var::ostimestamp();
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Number of fractional days since pick epoch 1967-12-31 00:00:00 UTC. Negative for dates before.
 .sp 1 \"</p>
 .PP \"<p>
@@ -5455,20 +4973,18 @@ e.g. Was 20821.99998842593 around 2025-01-01 23:59:59 UTC
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let now1 = var::ostimestamp();
 // or
 let now2 = ostimestamp();
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = vardate.ostimestamp(ostime);
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Get a timestamp for a given date and time
 .sp 1 \"</p>
 .PP \"<p>
@@ -5480,21 +4996,19 @@ Get a timestamp for a given date and time
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let idate = iconv("2025-01-01", "D"), itime = iconv("23:59:59", "MT");
 let ts1 = idate.ostimestamp(itime); // 20821.99998842593
 // or
 let ts2 = ostimestamp(idate, itime);
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var::ossleep(milliseconds)
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Sleep/pause/wait
 .sp 1 \"</p>
 .PP \"<p>
@@ -5506,20 +5020,18 @@ Releases the processor if not needed for a period of time or a delay is required
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var::ossleep(100); // sleep for 100ms
 // or
 ossleep(100);
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = file_dir_list.oswait(milliseconds);
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Sleep/pause/wait up for a file system event
 .sp 1 \"</p>
 .PP \"<p>
@@ -5537,11 +5049,11 @@ Multiple events may be captured and are returned in multivalues.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = ".^/etc/hosts"_var.oswait(100); /// e.g. "IN_CLOSE_WRITE^/etc^hosts^f"_var
 // or
 let v2 = oswait(".^/etc/hosts"_var, 100);
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 .PP \"<p>
@@ -5563,51 +5075,51 @@ Returned dynamic array fields:
 Possible event type codes:
 .sp 1 \"</p>
 .PD 0 \"<dl>
-.TP \"<dt>
+.TP 10\"<dt>
 \fBIN_CLOSE_WRITE\fR \"</dt>
 A file opened for writing was closed
 .\"</dd>
-.TP \"<dt>
+.TP 10\"<dt>
 \fBIN_ACCESS\fR \"</dt>
 Data was read from file
 .\"</dd>
-.TP \"<dt>
+.TP 10\"<dt>
 \fBIN_MODIFY\fR \"</dt>
 Data was written to file
 .\"</dd>
-.TP \"<dt>
+.TP 10\"<dt>
 \fBIN_ATTRIB\fR \"</dt>
 File attributes changed
 .\"</dd>
-.TP \"<dt>
+.TP 10\"<dt>
 \fBIN_CLOSE\fR \"</dt>
 File was closed (read or write)
 .\"</dd>
-.TP \"<dt>
+.TP 10\"<dt>
 \fBIN_MOVED_FROM\fR \"</dt>
 File was moved away from watched directory
 .\"</dd>
-.TP \"<dt>
+.TP 10\"<dt>
 \fBIN_MOVED_TO\fR \"</dt>
 File was moved into watched directory
 .\"</dd>
-.TP \"<dt>
+.TP 10\"<dt>
 \fBIN_MOVE\fR \"</dt>
 File was moved (in or out of directory)
 .\"</dd>
-.TP \"<dt>
+.TP 10\"<dt>
 \fBIN_CREATE\fR \"</dt>
 A file was created in the directory
 .\"</dd>
-.TP \"<dt>
+.TP 10\"<dt>
 \fBIN_DELETE\fR \"</dt>
 A file was deleted from the directory
 .\"</dd>
-.TP \"<dt>
+.TP 10\"<dt>
 \fBIN_DELETE_SELF\fR \"</dt>
 Directory or file under observation was deleted
 .\"</dd>
-.TP \"<dt>
+.TP 10\"<dt>
 \fBIN_MOVE_SELF\fR \"</dt>
 Directory or file under observation was moved
 .\"</dd>
@@ -5619,9 +5131,7 @@ Directory or file under observation was moved
 
 .SS
 if (osfilevar.osopen(osfilename, utf8 = true)) ...
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Opens an OS file handle for random read and write operations.
 .sp 1 \"</p>
 .PP \"<p>
@@ -5642,23 +5152,21 @@ Opens for writing if possible, otherwise read-only.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let osfilename = ostempdir() ^ "xo_gendoc_test.conf";
 if (oswrite("" on osfilename)) ... ok /// Create an empty OS file
 var ostempfile;
 if (ostempfile.osopen(osfilename)) ... ok
 // or
 if (osopen(osfilename to ostempfile)) ... ok
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 if (strvar.osbwrite(osfilevar, io offset)) ...
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Writes data to an OS file at a specified position.
 .sp 1 \"</p>
 .PP \"<p>
@@ -5676,23 +5184,21 @@ Writes data to an OS file at a specified position.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let osfilename = ostempdir() ^ "xo_gendoc_test.conf";
 let text = "aaa=123\nbbb=456\n";
 var offset = -1; /// -1 means append.
 if (text.osbwrite(osfilename, offset)) ... ok // offset -> 16
 // or
 if (not osbwrite(text on osfilename, offset)) ...
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 if (strvar.osbread(osfilevar, io offset, length)) ...
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Reads data from an OS file at a specified position.
 .sp 1 \"</p>
 .PP \"<p>
@@ -5713,22 +5219,20 @@ Reads data from an OS file at a specified position.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let osfilename = ostempdir() ^ "xo_gendoc_test.conf";
 var text, offset = 0;
 if (text.osbread(osfilename, offset, 8)) ... ok // text -> "aaa=123\n" // offset -> 8
 // or
 if (osbread(text from osfilename, offset, 8)) ... ok // text -> "bbb=456\n" // offset -> 16
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 osfile << anything << std::endl;
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Use convenient << syntax to output anything to an osfile.
 .sp 1 \"</p>
 .PP \"<p>
@@ -5737,12 +5241,12 @@ Use convenient << syntax to output anything to an osfile.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let txtfile = "t_temp.txt";
 if (not osremove(txtfile)) {} // Remove any existing file.
 txtfile << txtfile << " " << 123.456789 << " " << 123 << std::endl;
 let v1 = osread(txtfile);   // "t_temp.txt 123.457 123\n"
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 .PP \"<p>
@@ -5753,7 +5257,7 @@ All standard c++ io manipulators may be used e.g. std::setw, setfill etc.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let vout = "t_std_iomanip_overview.txt";
 if (not osremove(vout)) {}
 using namespace std;
@@ -5791,16 +5295,14 @@ var act_v_exp = osread(vout);
 act_v_exp.converter("\n\t", FM ^ VM); /// Text to dynamic array
 act_v_exp = invertarray(act_v_exp);   /// Columns <-> Rows
 assert(act_v_exp.f(1) eq act_v_exp.f(2));
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var().osclose()
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Removes an osfilevar handle from the internal memory cache of OS file handles. This frees up both exodus process memory and operating system resources.
 .sp 1 \"</p>
 .PP \"<p>
@@ -5809,21 +5311,19 @@ It is advisable to osclose any file handles after use, regardless of whether the
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var osfilevar; if (osfilevar.osopen(ostempfile())) ... ok
 osfilevar.osclose();
 // or
 osclose(osfilevar);
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 if (strvar.oswrite(osfilename, codepage = "")) ...
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Create a complete OS file from a var.
 .sp 1 \"</p>
 .PP \"<p>
@@ -5841,22 +5341,20 @@ Create a complete OS file from a var.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let text = "aaa = 123\nbbb = 456";
 let osfilename = ostempdir() ^ "xo_gendoc_test.conf";
 if (text.oswrite(osfilename)) ... ok
 // or
 if (oswrite(text on osfilename)) ... ok
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 if (strvar.osread(osfilename, codepage = "")) ...
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Read a complete OS file into a var.
 .sp 1 \"</p>
 .PP \"<p>
@@ -5874,23 +5372,21 @@ Read a complete OS file into a var.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var text;
 let osfilename = ostempdir() ^ "xo_gendoc_test.conf";
 if (text.osread(osfilename)) ... ok // text -> "aaa = 123\nbbb = 456"
 // or
 if (osread(text from osfilename)) ... ok
 let text2 = osread(osfilename);
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 if (osfile_or_dirname.osrename(new_dirpath_or_filepath)) ...
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Renames an OS file or dir in the OS file system.
 .sp 1 \"</p>
 .PP \"<p>
@@ -5911,23 +5407,21 @@ Uses std::filesystem::rename internally.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let from_osfilename = ostempdir() ^ "xo_gendoc_test.conf";
 let to_osfilename = from_osfilename ^ ".bak";
 if (not osremove(ostempdir() ^ "xo_gendoc_test.conf.bak")) {}; // Cleanup first
 if (from_osfilename.osrename(to_osfilename)) ... ok
 // or
 if (osrename(from_osfilename, to_osfilename)) ...
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 if (osfile_or_dirname.osmove(to_osfilename)) ...
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 "Moves" an OS file or dir within the OS file system.
 .sp 1 \"</p>
 .PP \"<p>
@@ -5945,23 +5439,21 @@ Attempts osrename first, then oscopy followed by osremove original.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let from_osfilename = ostempdir() ^ "xo_gendoc_test.conf.bak";
 let to_osfilename = from_osfilename.cut(-4);
 if (not osremove(ostempdir() ^ "xo_gendoc_test.conf")) {}; // Cleanup first
 if (from_osfilename.osmove(to_osfilename)) ... ok
 // or
 if (osmove(from_osfilename, to_osfilename)) ...
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 if (osfile_or_dirname.oscopy(to_osfilename)) ...
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Copies an OS file or directory recursively within the OS file system.
 .sp 1 \"</p>
 .PP \"<p>
@@ -5979,22 +5471,20 @@ Uses std::filesystem::copy internally with recursive and overwrite options
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let from_osfilename = ostempdir() ^ "xo_gendoc_test.conf";
 let to_osfilename = from_osfilename ^ ".bak";
 if (from_osfilename.oscopy(to_osfilename)) ... ok;
 // or
 if (oscopy(from_osfilename, to_osfilename)) ... ok
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 if (osfilename.osremove()) ...
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Removes/deletes an OS file from the OS file system.
 .sp 1 \"</p>
 .PP \"<p>
@@ -6012,12 +5502,12 @@ If osfilename is an osfilevar then it is automatically closed.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let osfilename = ostempdir() ^ "xo_gendoc_test.conf";
 if (osfilename.osremove()) ... ok
 // or
 if (osremove(osfilename)) ...
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
@@ -6027,9 +5517,7 @@ if (osremove(osfilename)) ...
 
 .SS
 var v1 = dirpath.oslist(globpattern = "", mode = 0);
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Get a list of OS files and/or dirs.
 .sp 1 \"</p>
 .PP \"<p>
@@ -6047,38 +5535,32 @@ Get a list of OS files and/or dirs.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var entries1 = "/etc/"_var.oslist("*.cfg"); /// e.g. "adduser.conf^ca-certificates.con^... etc."
 // or
 var entries2 = oslist("/etc/" "*.conf");
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = dirpath.oslistf(globpattern = "");
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Same as oslist for files only
 .sp 1 \"</p>
 
 
 .SS
 var v1 = dirpath.oslistd(globpattern = "");
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Same as oslist for files only
 .sp 1 \"</p>
 
 
 .SS
 var v1 = osfile_or_dirpath.osinfo(mode = 0);
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Get dir info about an OS file or dir.
 .sp 1 \"</p>
 .PP \"<p>
@@ -6093,20 +5575,18 @@ See also osfile() and osdir()
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var info1 = "/etc/hosts"_var.osinfo(); /// e.g. "221^20597^78309"_var
 // or
 var info2 = osinfo("/etc/hosts");
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = osfilename.osfile();
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Get dir info of an OS file.
 .sp 1 \"</p>
 .PP \"<p>
@@ -6121,20 +5601,18 @@ Alias for osinfo(1)
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var fileinfo1 = "/etc/hosts"_var.osfile(); /// e.g. "221^20597^78309"_var
 // or
 var fileinfo2 = osfile("/etc/hosts");
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = dirpath.osdir();
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Get dir info of an OS dir.
 .sp 1 \"</p>
 .PP \"<p>
@@ -6149,20 +5627,18 @@ Alias for osinfo(2)
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var dirinfo1 = "/etc/"_var.osdir(); /// e.g. "^20848^44464"_var
 // or
 var dirinfo2 = osfile("/etc/");
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 if (dirpath.osmkdir()) ...
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Create a new OS file system directory.
 .sp 1 \"</p>
 .PP \"<p>
@@ -6177,22 +5653,20 @@ Parent dirs wil be created if necessary.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let osdirname = "xo_test/aaa";
 if (osrmdir("xo_test/aaa")) {}; // Cleanup first
 if (osdirname.osmkdir()) ... ok
 // or
 if (osmkdir(osdirname)) ...
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 if (var::oscwd(newpath)) ...
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Changes the current working dir.
 .sp 1 \"</p>
 .PP \"<p>
@@ -6204,22 +5678,20 @@ Changes the current working dir.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let osdirname = "xo_test/aaa";
 if (osdirname.oscwd()) ... ok
 // or
 if (oscwd(osdirname)) ... ok
 if (oscwd("../..")) ... ok /// Change back to avoid errors in following code.
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = var::oscwd();
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Gets the current dir path and name.
 .sp 1 \"</p>
 .PP \"<p>
@@ -6231,20 +5703,18 @@ e.g. "/root/exodus/cli/src/xo_test/aaa"
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var cwd1 = var().oscwd();
 // or
 var cwd2 = oscwd();
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 if (dirpath.osrmdir(evenifnotempty = false)) ...
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Removes (deletes) an OS dir,
 .sp 1 \"</p>
 .PP \"<p>
@@ -6256,12 +5726,12 @@ Removes (deletes) an OS dir,
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let osdirname = "xo_test/aaa";
 if (osdirname.osrmdir()) ... ok
 // or
 if (osrmdir(osdirname)) ...
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
@@ -6271,9 +5741,7 @@ if (osrmdir(osdirname)) ...
 
 .SS
 if (command.osshell()) ...
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Execute a shell command.
 .sp 1 \"</p>
 .PP \"<p>
@@ -6288,21 +5756,19 @@ Append "&>/dev/null" to the command to suppress terminal output.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let cmd = "echo $HOME";
 if (cmd.osshell()) ... ok
 // or
 if (osshell(cmd)) ... ok
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 if (instr.osshellread(oscmd)) ...
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Same as osshell but captures and returns stdout
 .sp 1 \"</p>
 .PP \"<p>
@@ -6314,22 +5780,20 @@ Append "2>&1" to the command to capture stderr/stdlog output as well.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let cmd = "echo $HOME";
 var text;
 if (text.osshellread(cmd)) ... ok
 // or capturing stdout but ignoring exit status
 text = osshellread(cmd);
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 if (outstr.osshellwrite(oscmd)) ...
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Same as osshell but provides stdin to the process
 .sp 1 \"</p>
 .PP \"<p>
@@ -6341,101 +5805,64 @@ Append "&> somefile" to the command to suppress and/or capture output.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let outtext = "abc xyz";
 if (outtext.osshellwrite("grep xyz")) ... ok
 // or
 if (osshellwrite(outtext, "grep xyz")) ... ok
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
-if (var::osprocess(oscmd, stdin_for_process, out stdout_from_process, out stderr_from_process, out exit_status, timeout_secs = 0)) ...
-.nf
- 
-.fi.PP \"<p>
+if (dirpath.osprocess(oscmd, stdin_for_process, out stdout_from_process, out stderr_from_process, out exit_status, timeout_secs = 0)) ...
+.PP \"<p>
 Run an OS program synchronously.
 .sp 1 \"</p>
 .PP \"<p>
-Executes an OS program passing input and capturing standard and error output, and exit status.
+Executes an OS command, capturing its standard output, error, and exit status. Shell features (e.g., pipes, redirects) are unsupported but can be invoked via an oscmd like "bash -c 'abc|yy $HOME'".
 .sp 1 \"</p>
 .PP \"<p>
-Shell features (e.g., pipes, redirects) are not supported but can be invoked using an oscmd like "bash -c \\"abc|yyy $HOME\\""
+\fBoscmd:\fR Executable and arguments; must exist in OS PATH.
 .sp 1 \"</p>
 .PP \"<p>
-\fBoscmd:\fR The executable program and its arguments. Must exist in the OS PATH.
+\fBstdin_for_process:\fR Optional; input data for the program’s standard input.
 .sp 1 \"</p>
 .PP \"<p>
-\fBstdin_for_process:\fR Optional. Input data to send to the program's standard input.
+\fBstdout_from_process:\fR [out] Standard output from the program.
 .sp 1 \"</p>
 .PP \"<p>
-\fBstdout_from_process:\fR [out] Standard output produced by the program.
+\fBstderr_from_process:\fR [out] Error/log output from the program.
 .sp 1 \"</p>
 .PP \"<p>
-\fBstderr_from_process:\fR [out] Error or log output from the program.
+\fBexit_status:\fR [out] Program’s exit status: 0 (normal), -1 (timeout), else (error).
 .sp 1 \"</p>
 .PP \"<p>
-\fBexit_status:\fR [out] Result of the program's execution:
-.sp 1 \"</p>
-.PD 0 \"<dl>
-.TP \"<dt>
-\fB0\fR \"</dt>
-Program terminated normally.
-.\"</dd>
-.TP \"<dt>
-\fB-1\fR \"</dt>
-Timeout
-.\"</dd>
-.TP \"<dt>
-\fBnn\fR \"</dt>
-Program reported an exit status.
-.\"</dd>
-.PD \"</dl>
-.PP \"<p>
-\fBtimeout_in_secs:\fR Optional. Maximum runtime in seconds (default 0 = no timeout).
+\fBtimeout_secs:\fR Optional; max runtime in seconds (default 0 = no timeout).
 .sp 1 \"</p>
 .PP \"<p>
-\fBReturns:\fR Success or failure.
+\fBReturns:\fR True if program ran and exited with status 0 (success) or false if program failed to start, timed out, or exited with non-zero status.
 .sp 1 \"</p>
-.PD 0 \"<dl>
-.TP \"<dt>
-\fBTrue\fR \"</dt>
-Program ran and exited with status 0 (success).
-.\"</dd>
-.TP \"<dt>
-\fBFalse\fR \"</dt>
-Program failed to start, timed out, or exited with non-zero status.
-.\"</dd>
-.PD \"</dl>
 .PP \"<p>
-\fBThrows:\fR Various system errors are possible.
+\fBThrows:\fR Pipe creation failed, fork failed, poll failed.
 .sp 1 \"</p>
-.br
-\(bu Pipe creation failed.
-.br
-\(bu Fork failed.
-.br
-\(bu Poll failure.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var v_stdout, v_stderr, v_exit_status;
 if (var::osprocess("grep xyz", "abc\nxyz 123\ndef", v_stdout, v_stderr, v_exit_status)) ... ok // v_stdout -> "xyz 123" // v_exit_status = 0
 // or
 if (osprocess("grep xyz", "abc\nxyz 123\ndef", v_stdout, v_stderr, v_exit_status)) ... ok
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = var::ostempdir();
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Get the tmp dir path and name.
 .sp 1 \"</p>
 .PP \"<p>
@@ -6444,20 +5871,18 @@ Get the tmp dir path and name.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = var::ostempdir();
 // or
 let v2 = ostempdir();
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = var::ostempfile();
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Create a temporary file
 .sp 1 \"</p>
 .PP \"<p>
@@ -6466,20 +5891,18 @@ Create a temporary file
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var temposfilename1 = var::ostempfile();
 // or
 var temposfilename2 = ostempfile();
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 envvalue.ossetenv(envcode)
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Set the value of an environment variable
 .sp 1 \"</p>
 .PP \"<p>
@@ -6491,21 +5914,19 @@ Set the value of an environment variable
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let envcode = "EXO_ABC", envvalue = "XYZ";
 envvalue.ossetenv(envcode);
 // or
 ossetenv(envcode, envvalue);
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 if (envvalue.osgetenv(envcode)) ...
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Get the value of an environment variable.
 .sp 1 \"</p>
 .PP \"<p>
@@ -6526,21 +5947,19 @@ For the actual system environment, see "man environ". extern char **environ; // 
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var envvalue1;
 if (envvalue1.osgetenv("HOME")) ... ok // e.g. "/home/exodus"
 // or
 let envvalue2 = osgetenv("EXO_ABC"); // "XYZ"
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = var::ospid();
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Get the current OS process id
 .sp 1 \"</p>
 .PP \"<p>
@@ -6549,20 +5968,18 @@ Get the current OS process id
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let pid1 = var::ospid(); /// e.g. 663237
 // or
 let pid2 = ospid();
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = var::ostid();
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Get the current OS thread process id
 .sp 1 \"</p>
 .PP \"<p>
@@ -6571,20 +5988,18 @@ Get the current OS thread process id
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let tid1 = var::ostid(); /// e.g. 663237
 // or
 let tid2 = ostid();
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = var::version();
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Get the exodus library version info.
 .sp 1 \"</p>
 .PP \"<p>
@@ -6593,7 +6008,7 @@ Get the exodus library version info.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 // e.g.
 // Local:  doc 2025-03-19 18:15:31 +0000 219cdad8a
 // Remote: doc 2025-03-17 15:03:00 +0000 958f412f0
@@ -6603,16 +6018,14 @@ Get the exodus library version info.
 let v1 = var::version();
 // or
 let v2 = version();
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 if (strvar.setxlocale(newlocalecode)) ...
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Sets the current thread's default locale.
 .sp 1 \"</p>
 .PP \"<p>
@@ -6624,20 +6037,18 @@ True if successful
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 if (var::setxlocale("en_US.utf8")) ... ok
 // or
 if (setxlocale("en_US.utf8")) ... ok
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = var.getxlocale();
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Gets the current thread's default locale.
 .sp 1 \"</p>
 .PP \"<p>
@@ -6646,11 +6057,11 @@ Gets the current thread's default locale.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = var::getxlocale(); // "en_US.utf8"
 // or
 let v2 = getxlocale();
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
@@ -6660,9 +6071,7 @@ let v2 = getxlocale();
 
 .SS
 strvar.outputl(prefix = "")
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Output to stdout with optional prefix.
 .sp 1 \"</p>
 .PP \"<p>
@@ -6677,38 +6086,32 @@ The raw string bytes are output. No character or byte conversion is performed.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 "abc"_var.outputl("xyz = "); /// Sends "xyz = abc\n" to stdout and flushes.
 // or
 outputl("xyz = ", "abc"); /// Any number of arguments is allowed. All will be output.
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 strvar.output(prefix = "")
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Same as outputl() but doesnt append an NL char and is BUFFERED, not flushed.
 .sp 1 \"</p>
 
 
 .SS
 strvar.outputt(prefix = "")
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Same as outputl() but appends a tab char instead of an NL char and is BUFFERED, not flushed.
 .sp 1 \"</p>
 
 
 .SS
 strvar.logputl(prefix = "")
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Output to stdlog with optional prefix.
 .sp 1 \"</p>
 .PP \"<p>
@@ -6723,29 +6126,25 @@ Any of the six types of field mark chars present are converted to their visible 
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 "abc"_var.logputl("xyz = "); /// Sends "xyz = abc\n" to stdlog buffer and is not flushed.
 // or
 logputl("xyz = ", "abc");; /// Any number of arguments is allowed. All will be output.
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 strvar.logput(prefix = "")
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Same as logputl() but doesnt append an NL char.
 .sp 1 \"</p>
 
 
 .SS
 strvar.errputl(prefix = "")
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Output to stderr with optional prefix.
 .sp 1 \"</p>
 .PP \"<p>
@@ -6760,29 +6159,25 @@ Any of the six types of field mark chars present are converted to their visible 
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 "abc"_var.errputl("xyz = "); /// Sends "xyz = abc\n" to stderr
 // or
 errputl("xyz = ", "abc"); /// Any number of arguments is allowed. All will be output.
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 strvar.errput(prefix = "")
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Same as errputl() but doesnt append an NL char and is BUFFERED not flushed.
 .sp 1 \"</p>
 
 
 .SS
 strvar.put(std::ostream& ostream1)
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Output to a given stream.
 .sp 1 \"</p>
 .PP \"<p>
@@ -6795,19 +6190,17 @@ The raw string bytes are output. No character or byte conversion is performed.
 
 .SS
 var().osflush()
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Flush any and all buffered output to stdout and stdlog.
 .sp 1 \"</p>
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var().osflush();
 // or
 osflush();
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
@@ -6817,9 +6210,7 @@ osflush();
 
 .SS
 if (var.input(prompt = "")) ...
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Returns one line of input from stdin.
 .sp 1 \"</p>
 .PP \"<p>
@@ -6840,21 +6231,19 @@ Multibyte/UTF8 friendly.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 // var v1 = "defaultvalue";
 // if (v1.input("Prompt:")) ... ok
 // or
 // var v2 = input();
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var.inputn(nchars)
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Get raw bytes from standard input.
 .sp 1 \"</p>
 .PP \"<p>
@@ -6870,19 +6259,19 @@ Care must be taken to handle incomplete UTF8 byte sequences at the end of one bl
 \fBnchars:\fR
 .sp 1 \"</p>
 .PD 0 \"<dl>
-.TP \"<dt>
+.TP 10\"<dt>
 \fBnn\fR \"</dt>
 Get up to nn bytes or fewer if not available. Caution required with UTF8.
 .\"</dd>
-.TP \"<dt>
-\fB0\fR \"</dt>
+.TP 10\"<dt>
+\fB 0\fR \"</dt>
 Get all bytes presently available.
 .\"</dd>
-.TP \"<dt>
-\fB1\fR \"</dt>
+.TP 10\"<dt>
+\fB 1\fR \"</dt>
 Same as keypressed(true). Deprecated.
 .\"</dd>
-.TP \"<dt>
+.TP 10\"<dt>
 \fB-1\fR \"</dt>
 Same as keypressed(). Deprecated.
 .\"</dd>
@@ -6891,9 +6280,7 @@ Same as keypressed(). Deprecated.
 
 .SS
 var.keypressed(wait = false)
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Return the code of the current terminal key pressed.
 .sp 1 \"</p>
 .PP \"<p>
@@ -6912,35 +6299,33 @@ e.g. The PgDn key if pressed might return an escape sequence like "\\x1b[6~"
 It only takes a few µsecs to return false if no key is pressed.
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var v1; v1.keypressed();
 // or
 var v2 = keypressed();
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 if (var().isterminal(in_out_err = 1)) ...
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Checks if one of stdin, stdout, stderr is a terminal or a file/pipe.
 .sp 1 \"</p>
 .PP \"<p>
 \fBin_out_err:\fR
 .sp 1 \"</p>
 .PD 0 \"<dl>
-.TP \"<dt>
+.TP 10\"<dt>
 \fB0\fR \"</dt>
 stdin
 .\"</dd>
-.TP \"<dt>
+.TP 10\"<dt>
 \fB1\fR \"</dt>
 stdout (Default)
 .\"</dd>
-.TP \"<dt>
+.TP 10\"<dt>
 \fB2\fR \"</dt>
 stderr.
 .\"</dd>
@@ -6957,20 +6342,18 @@ The type of stdout terminal can be obtained from the TERM environment variable.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var v1 = var().isterminal(); /// 1 or 0
 // or
 var v2 = isterminal();
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 if (var().hasinput(milliseconds = 0)) ...
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Checks if stdin has any bytes available for input.
 .sp 1 \"</p>
 .PP \"<p>
@@ -6986,18 +6369,14 @@ It only takes a few µsecs to return false if no bytes are available and no wait
 
 .SS
 if (var().eof()) ...
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 True if stdin is at end of file
 .sp 1 \"</p>
 
 
 .SS
 if (var().echo(on_off = true)) ...
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Sets terminal echo on or off.
 .sp 1 \"</p>
 .PP \"<p>
@@ -7013,24 +6392,22 @@ Turning terminal echo off can be used to prevent display of confidential informa
 
 .SS
 var().breakon()
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Install various interrupt handlers.
 .sp 1 \"</p>
 .PP \"<p>
 Automatically called in program/thread initialisation by exodus_main.
 .sp 1 \"</p>
 .PD 0 \"<dl>
-.TP \"<dt>
+.TP 10\"<dt>
 \fBSIGINT\fR \"</dt>
 Ctrl+C -> "Interrupted. (C)ontinue (Q)uit (B)acktrace (D)ebug (A)bort ?"
 .\"</dd>
-.TP \"<dt>
+.TP 10\"<dt>
 \fBSIGHUP\fR \"</dt>
 Sets a variable "RELOAD_req" which may be handled or ignored by the program.
 .\"</dd>
-.TP \"<dt>
+.TP 10\"<dt>
 \fBSIGTERM\fR \"</dt>
 Sets a variable "TERMINATE_req" which may be handled or ignored by the program.
 .\"</dd>
@@ -7039,9 +6416,7 @@ Sets a variable "TERMINATE_req" which may be handled or ignored by the program.
 
 .SS
 var().breakoff()
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Disable keyboard interrupt.
 .sp 1 \"</p>
 .PP \"<p>
@@ -7054,44 +6429,38 @@ Ctrl+C becomes inactive in terminal.
 
 .SS
 var v1 = varnum.abs();
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Absolute value
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = -12.34;
 let v2 = v1.abs(); // 12.34
 // or
 let v3 = abs(v1);
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = varnum.pwr(exponent);
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Power
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = var(2).pwr(8); // 256
 // or
 let v2 = pwr(2, 8);
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 varnum.initrnd()
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Initialise the seed for rnd()
 .sp 1 \"</p>
 .PP \"<p>
@@ -7103,20 +6472,18 @@ Seeded from std::chrono::high_resolution_clock::now() if the argument is 0;
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var(123).initrnd(); /// Set seed to 123
 // or
 initrnd(123);
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = varnum.rnd();
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Pseudo random number generator
 .sp 1 \"</p>
 .PP \"<p>
@@ -7128,188 +6495,168 @@ Uses std::mt19937 and std::uniform_int_distribution<int>
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = var(100).rnd(); /// Random 0 to 99
 // or
 let v2 = rnd(100);
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = varnum.exp();
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Power of e
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = var(1).exp(); // 2.718281828459045
 // or
 let v2 = exp(1);
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = varnum.sqrt();
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Square root
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = var(100).sqrt(); // 10
 // or
 let v2 = sqrt(100);
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = varnum.sin();
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Sine of degrees
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = var(30).sin(); // 0.5
 // or
 let v2 = sin(30);
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = varnum.cos();
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Cosine of degrees
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = var(60).cos(); // 0.5
 // or
 let v2 = cos(60);
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = varnum.tan();
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Tangent of degrees
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = var(45).tan(); // 1
 // or
 let v2 = tan(45);
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = varnum.atan();
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Arctangent of degrees
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = var(1).atan(); // 45
 // or
 let v2 = atan(1);
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = varnum.loge();
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Natural logarithm
 .sp 1 \"</p>
 .PP \"<p>
 \fBReturns:\fR Floating point ver (double)
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = var(2.718281828459045).loge(); // 1
 // or
 let v2 = loge(2.718281828459045);
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = varnum.integer();
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Truncate decimal numbers towards zero
 .sp 1 \"</p>
 .PP \"<p>
 \fBReturns:\fR An integer var
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = var(2.9).integer(); // 2
 // or
 let v2 = integer(2.9);
 var v3 = var(-2.9).integer(); // -2
 // or
 var v4 = integer(-2.9);
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = varnum.floor();
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Truncate decimal numbers towards negative
 .sp 1 \"</p>
 .PP \"<p>
 \fBReturns:\fR An integer var
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = var(2.9).floor(); // 2
 // or
 let v2 = floor(2.9);
 var v3 = var(-2.9).floor(); // -3
 // or
 var v4 = floor(-2.9);
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = varnum.mod(modulus);
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Modulus function
 .sp 1 \"</p>
 .PP \"<p>
@@ -7331,23 +6678,21 @@ Result is between (modulus, 0] if modulus is negative (symmetric)
 Floating point works.
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = var(11).mod(5); // 1
 // or
 let v2 = mod(11, 5); // 1
 let v3 = mod(-11, 5); // 4
 let v4 = mod(11, -5); // -4
 let v5 = mod(-11, -5); // -1
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 int i1 = var::setprecision(newprecision);
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Set the maximum floating point precision.
 .sp 1 \"</p>
 .PP \"<p>
@@ -7380,22 +6725,20 @@ See cli/demo_precision for more info.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 assert(0.000001_var == 0); /// NOTE WELL: Default precision 4.
 let new_precision1 = var::setprecision(6); // 6 // Increase the precision.
 // or
 let new_precision2 = setprecision(6);
 assert(0.000001_var != 0); /// NOTE: Precision 6.
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 int i1 = var::getprecision();
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 \fBReturns:\fR The current precision setting.
 .sp 1 \"</p>
 .PP \"<p>
@@ -7404,11 +6747,11 @@ See setprecision() for more info.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let curr_precision1 = var::getprecision();
 // or
 let curr_precision2 = getprecision();
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
@@ -7418,9 +6761,7 @@ let curr_precision2 = getprecision();
 
 .SS
 var v1 = vardate.oconv("D");
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Date output: Convert internal date format to human readable date or calendar info in text format.
 .sp 1 \"</p>
 .PP \"<p>
@@ -7435,7 +6776,7 @@ Any Dynamic array structure is preserved.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = 19002;
 var v2;
 v2 =  v1.oconv( "D"   ) ; //  "09 JAN 2020"   // Default
@@ -7466,16 +6807,14 @@ let v3 = "12345^12346]12347"_var;
 v2 = v3.oconv("D") ; //  "18 OCT 2001^19 OCT 2001]20 OCT 2001"_var
  // or
  v2 =  oconv(v3, "D"   ) ;
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = strvar.iconv("D");
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Date input: Convert human readable date to internal date format.
 .sp 1 \"</p>
 .PP \"<p>
@@ -7490,7 +6829,7 @@ Any Dynamic array structure is preserved.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 // International order "DE"
 var v2;
 v2 =             oconv(19005, "DE") ; //  "12 JAN 2020"
@@ -7513,16 +6852,14 @@ v2 =    "2/29/2021"_var.iconv("D") ; //  ""
 v2 =   "29/2/2021"_var.iconv("DE") ; //  ""
 // or
 v2 = iconv("12/1/2020"_var, "DE") ; //  19005
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = vartime.oconv("MT");
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Time output: Convert internal time format to human readable time e.g. "10:30:59".
 .sp 1 \"</p>
 .PP \"<p>
@@ -7535,19 +6872,19 @@ Conversion code (e.g. "MTHS") is "MT" ^ flags ...
 \fBflags:\fR
 .sp 1 \"</p>
 .PD 0 \"<dl>
-.TP \"<dt>
+.TP 10\"<dt>
 \fBH\fR \"</dt>
 Show AM/PM otherwise 24 hour clock is used.
 .\"</dd>
-.TP \"<dt>
+.TP 10\"<dt>
 \fBS\fR \"</dt>
 Output seconds
 .\"</dd>
-.TP \"<dt>
+.TP 10\"<dt>
 \fB2\fR \"</dt>
 Ignored (used in iconv)
 .\"</dd>
-.TP \"<dt>
+.TP 10\"<dt>
 \fB:\fR \"</dt>
 Any other flag is used as the separator char instead of ":"
 .\"</dd>
@@ -7558,7 +6895,7 @@ Any Dynamic array structure is preserved.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1  = 62000;
 var v2;
 v2 = v1.oconv("MT"  ); // "17:13"      // Default
@@ -7575,16 +6912,14 @@ let v4  = "61980^62040]62100"_var;
 v2 = v4.oconv("MT");    // "17:13^17:14]17:15"_var
 // or
 v2 = oconv(v1, "MT");    // "17:13"
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = strvar.iconv("MT");
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Time input: Convert human readable time (e.g. "10:30:59") to internal time format.
 .sp 1 \"</p>
 .PP \"<p>
@@ -7602,7 +6937,7 @@ Any Dynamic array structure is preserved.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var v2;
 v2 =       "17:13"_var.iconv( "MT" ) ; //  61980
 v2 =     "05:13PM"_var.iconv( "MT" ) ; //  61980
@@ -7617,16 +6952,14 @@ v2 =  "12:00:00AM"_var.iconv( "MT" ) ; //  0
 v2 = "17:13^05:13PM]17:13:20"_var.iconv("MT") ; //  "61980^61980]62000"_var
 // or
 v2 = iconv("17:13", "MT") ; //  61980
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = varnum.oconv("MD");
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Number output: Convert internal numbers to external text format after rounding and optional scaling.
 .sp 1 \"</p>
 .PP \"<p>
@@ -7636,11 +6969,11 @@ Number output: Convert internal numbers to external text format after rounding a
 \fBconversion_code:\fR (e.g. "MD20Z") is "MD" or "MC", 1st digit, 2nd digit, flags ...
 .sp 1 \"</p>
 .PD 0 \"<dl>
-.TP \"<dt>
+.TP 10\"<dt>
 \fB"MD"\fR \"</dt>
 Outputs like 123.45 (International)
 .\"</dd>
-.TP \"<dt>
+.TP 10\"<dt>
 \fB"MC"\fR \"</dt>
 Outputs like 123,45 (European)
 .\"</dd>
@@ -7657,39 +6990,39 @@ Outputs like 123,45 (European)
 \fBflags:\fR
 .sp 1 \"</p>
 .PD 0 \"<dl>
-.TP \"<dt>
+.TP 10\"<dt>
 \fBP\fR \"</dt>
 Preserve decimal places. Same as 2nd digit = 0;
 .\"</dd>
-.TP \"<dt>
+.TP 10\"<dt>
 \fBZ\fR \"</dt>
 Zero flag - return "" if zero.
 .\"</dd>
-.TP \"<dt>
+.TP 10\"<dt>
 \fBX\fR \"</dt>
 No conversion - return as is.
 .\"</dd>
-.TP \"<dt>
+.TP 10\"<dt>
 \fB\&.\fR \"</dt>
 Separate thousands depending on MD or MC.
 .\"</dd>
-.TP \"<dt>
+.TP 10\"<dt>
 \fB,\fR \"</dt>
 Ditto
 .\"</dd>
-.TP \"<dt>
+.TP 10\"<dt>
 \fB-\fR \"</dt>
 Suffix negatives with "-" and positives with " " (space).
 .\"</dd>
-.TP \"<dt>
+.TP 10\"<dt>
 \fB<\fR \"</dt>
 Wrap negatives in "<" and ">" chars.
 .\"</dd>
-.TP \"<dt>
+.TP 10\"<dt>
 \fBC\fR \"</dt>
 Suffix negatives with "CR" and positives or zero with "DB".
 .\"</dd>
-.TP \"<dt>
+.TP 10\"<dt>
 \fBD\fR \"</dt>
 Suffix negatives with "DB" and positives or zero with "CR".
 .\"</dd>
@@ -7702,7 +7035,7 @@ Any Dynamic array structure is preserved.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var v1 = -1234.567;
 var v2;
 v2 =  v1.oconv( "MD20"   ) ; //   "-1234.57"
@@ -7717,16 +7050,14 @@ var v3 = "1.1^2.1]2.2"_var;
 v2 =  v3.oconv( "MD20"   ) ; //  "1.10^2.10]2.20"_var
 // or
 v2 =  oconv(v1, "MD20"   ) ; //   "-1234.57"   
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = var.oconv("LRC");
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Text justification: Left, right and center. Padding and truncating. See Procrustes.
 .sp 1 \"</p>
 .PP \"<p>
@@ -7744,7 +7075,7 @@ ASCII only.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var v2;
 v2 =      "abcde"_var.oconv( "L#3" ) ; //  "abc"  // Truncating
 v2 =      "abcde"_var.oconv( "R#3" ) ; //  "cde"
@@ -7762,16 +7093,14 @@ v2 =       "f1^v1]v2"_var.oconv("L(_)#5") ; //  "f1___^v1___]v2___"_var
 v2 =      "🐱"_var.oconv("L#5").textwidth() ; //  3
 // or
 v2 =      oconv("abcd", "L#3" ) ; //  "abc" 
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = strvar.oconv("T");
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Text folding and justification.
 .sp 1 \"</p>
 .PP \"<p>
@@ -7789,28 +7118,26 @@ ASCII only.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = "Have a nice day";
 let v2 = v1.oconv("T#10") ; //  "Have a    |nice day  "_var
 // or
 let v3  = oconv(v1, "T#10") ; //  "Have a    |nice day  "_var 
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 varnum.oconv("MR")
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Character replacement
 .sp 1 \"</p>
 .PP \"<p>
 e.g. MRU
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = "123/abC.";
 var v2;
 v2 = v1.oconv("MRL") ; //  "123/abc." // lcase
@@ -7822,16 +7149,14 @@ v2 = v1.oconv("MRB") ; //  "123abC"   // Return only alphanumeric
 v2 = v1.oconv("MR/N") ; //  "/abC."   // Remove digits
 v2 = v1.oconv("MR/A") ; //  "123/."   // Remove alphabetic
 v2 = v1.oconv("MR/B") ; //  "/."      // Remove alphanumeric
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = strvar.oconv("HEX");
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Convert the chars of a string to a string of pairs of hexadecimal digits.
 .sp 1 \"</p>
 .PP \"<p>
@@ -7849,7 +7174,7 @@ This function is the exact inverse of iconv("HEX").
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var v2;
 v2 =      "ab01"_var.oconv( "HEX" ) ; //  "61" "62" "30" "31"
 v2 =  "\xff\x00"_var.oconv( "HEX" ) ; //  "FF" "00"            // Any bytes are ok.
@@ -7858,16 +7183,14 @@ v2 =    "\u0393"_var.oconv( "HEX" ) ; //  "CE" "93"            // Greek capital 
 v2 =      "a^]b"_var.oconv( "HEX" ) ; //  "61" "1E" "1D" "62"  // Field and value marks.
 // or
 v2 =       oconv("ab01"_var, "HEX") ; //  "61" "62" "30" "31"
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = strvar.iconv("HEX");
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Convert a string of pairs of hexadecimal digits to a string of chars.
 .sp 1 \"</p>
 .PP \"<p>
@@ -7889,21 +7212,19 @@ After prefixing a "0" to an odd sized input, the size of the output is always pr
 
 .SS
 var v1 = varnum.oconv("MX");
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Convert number to hexadecimal string.
 .sp 1 \"</p>
 .PD 0 \"<dl>
-.TP \"<dt>
+.TP 10\"<dt>
 \fB"MX"\fR \"</dt>
 Convert and trim leading zeros                      e.g. oconv(1025, "MX")  -> "401"
 .\"</dd>
-.TP \"<dt>
+.TP 10\"<dt>
 \fB"MXn"\fR \"</dt>
 Pad with up to n leading zeros but do not truncate. e.g. oconv(1025, "MX8") -> "00000401"
 .\"</dd>
-.TP \"<dt>
+.TP 10\"<dt>
 \fB"MXnT"\fR \"</dt>
 Pad and truncate to n characters.                   e.g. oconv(1025, "MX2") -> "01"
 .\"</dd>
@@ -7923,24 +7244,21 @@ Dynamic array structure is preserved.
 .PP \"<p>
 Negative numbers are treated as unsigned 8 byte integers (uint64).
 .sp 1 \"</p>
-.PP \"<p>
-Input Output
-.sp 1 \"</p>
 .PD 0 \"<dl>
-.TP \"<dt>
-\fB0\fR \"</dt>
+.TP 10\"<dt>
+\fB0  ->\fR \"</dt>
 "00"
 .\"</dd>
-.TP \"<dt>
-\fB1\fR \"</dt>
+.TP 10\"<dt>
+\fB1  ->\fR \"</dt>
 "01"
 .\"</dd>
-.TP \"<dt>
-\fB15\fR \"</dt>
+.TP 10\"<dt>
+\fB15 ->\fR \"</dt>
 "0F"
 .\"</dd>
-.TP \"<dt>
-\fB-1\fR \"</dt>
+.TP 10\"<dt>
+\fB-1 ->\fR \"</dt>
 "FFFF" "FFFF" "FFFF" "FFFF" (8 x "FF")
 .\"</dd>
 .PD \"</dl>
@@ -7950,20 +7268,18 @@ This function is a near inverse of iconv("MX").
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = "14.5]QQ]65535"_var.oconv("MX"); // "F]QQ]FFFF"_var
 // or
 let v2 = oconv("14.5]QQ]65535"_var, "MX");
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = strvar.iconv("MX");
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Convert hexadecimal string to number.
 .sp 1 \"</p>
 .PP \"<p>
@@ -7982,17 +7298,17 @@ Hex strings are converted to unsigned 8 byte integers (uint64)
 Leading zeros are ignored.
 .sp 1 \"</p>
 .PD 0 \"<dl>
-.TP \"<dt>
-\fB"0"\fR \"</dt>
-->   0
+.TP 10\"<dt>
+\fB"0"  ->\fR \"</dt>
+0
 .\"</dd>
-.TP \"<dt>
-\fB"00"\fR \"</dt>
-->   0
+.TP 10\"<dt>
+\fB"00" ->\fR \"</dt>
+0
 .\"</dd>
-.TP \"<dt>
-\fB"1"\fR \"</dt>
-->   1
+.TP 10\"<dt>
+\fB"1"  ->\fR \"</dt>
+1
 .\"</dd>
 .PD \"</dl>
 .PP \"<p>
@@ -8012,20 +7328,18 @@ This function is the exact inverse of oconv("MX").
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = "F]QQ]FFFF"_var.iconv("MX"); // "15]]65535"_var
 // or
 let v2 = iconv("F]QQ]FFFF", "MX");
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = varnum.oconv("MB");
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Number to binary format: Convert number to strings of 1s and 0s
 .sp 1 \"</p>
 .PP \"<p>
@@ -8034,37 +7348,35 @@ Number to binary format: Convert number to strings of 1s and 0s
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = var(255).oconv("MB"); // 1111'1111
 // or
 let v2 = oconv(255, "MB");
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = strvar.oconv("TX");
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Convert dynamic arrays to standard text format.
 .sp 1 \"</p>
 .PP \"<p>
 Useful for using text editors on dynamic arrays.
 .sp 1 \"</p>
 .PD 0 \"<dl>
-.TP \"<dt>
-\fBFMs\fR \"</dt>
-->   \\n after escaping any embedded NL
+.TP 10\"<dt>
+\fBFMs ->\fR \"</dt>
+\\n after escaping any embedded NL
 .\"</dd>
-.TP \"<dt>
-\fBVMs\fR \"</dt>
-->   literal "\\" \\n
+.TP 10\"<dt>
+\fBVMs ->\fR \"</dt>
+literal "\\" \\n
 .\"</dd>
-.TP \"<dt>
-\fBSMs\fR \"</dt>
-->   literal "\\\\" \\n
+.TP 10\"<dt>
+\fBSMs ->\fR \"</dt>
+literal "\\\\" \\n
 .\"</dd>
 .PD \"</dl>
 .PP \"<p>
@@ -8073,7 +7385,7 @@ etc.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 // 1. Backslash in text remains backslash
 let v1 = var(_BS).oconv("TX");     // _BS
 // 2. Literal "\n" -> literal "\\n" (Double escape any escaped NL chars)
@@ -8090,16 +7402,14 @@ let v6 = "s1}s2"_var.oconv("TX");  // "s1" _BS _BS _NL "s2"
 let v7 = "t1|t2"_var.oconv("TX");  // "t1" _BS _BS _BS _NL "t2"
 // 8. ST -> "\\\\" \n
 let v8 = "st1~st2"_var.oconv("TX"); // "st1" _BS _BS _BS _BS _NL "st2"
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = strvar.iconv("TX");
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Convert standard text format to dynamic array.
 .sp 1 \"</p>
 .PP \"<p>

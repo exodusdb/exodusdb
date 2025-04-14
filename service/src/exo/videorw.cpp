@@ -20,4 +20,4 @@ func main(in /*x*/, in /*y*/, in /*x2*/, in /*y2*/, in /*readwrite*/, io /*buffe
 	return 0;
 }
 
-libraryexit()
+}; // libraryexit()

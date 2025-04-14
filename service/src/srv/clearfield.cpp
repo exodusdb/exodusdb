@@ -178,4 +178,4 @@ subr flush(in filename) {
 	return;
 }
 
-libraryexit()
+}; // libraryexit()

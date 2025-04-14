@@ -120,4 +120,4 @@ getlogkey:
 	return 0;
 }
 
-libraryexit()
+}; // libraryexit()

@@ -5,9 +5,7 @@
 
 .SS
 if (select(sortselectclause_or_filehandle = "")) ...
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Create an active select list using a natural language sort/select command.
 .sp 1 \"</p>
 .PP \"<p>
@@ -25,54 +23,48 @@ In the following examples, various environment variables like RECORD, ID and MV 
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 select("xo_clients by name by type with type 'A' 'B' and with balance between 0 and 2000");
 if (readnext(ID)) ... ok
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 if (selectkeys(keys)) ...
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Create an active select list from some given keys.
 .sp 1 \"</p>
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 selectkeys("SB001^JB001^JB002"_var);
 if (readnext(ID)) ... ok // ID -> "SB001"
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 if (hasnext()) ...
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Check if a select list is active.
 .sp 1 \"</p>
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 if (hasnext()) ... ok
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 if (readnext(out key)) ...
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Get the next key from an active select list.
 .sp 1 \"</p>
 .PP \"<p>
@@ -84,19 +76,17 @@ Get the next key from an active select list.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 selectkeys("SB001^JB001^JB002"_var);
 if (readnext(ID)) ... ok // ID -> "SB001"
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 if (readnext(out key, out valueno)) ...
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Get the next key and value number pair from an active select list.
 .sp 1 \"</p>
 .PP \"<p>
@@ -111,19 +101,17 @@ Get the next key and value number pair from an active select list.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 selectkeys("SB001]2^SB001]1^JB001]2"_var);
 if (readnext(ID, MV)) ... ok // ID -> "SB001" // MV -> 2
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 if (readnext(out record, out key, out valueno)) ...
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Get the next record, key and value no from an active select list.
 .sp 1 \"</p>
 .PP \"<p>
@@ -141,20 +129,18 @@ Get the next record, key and value no from an active select list.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 select("xo_clients by name (R)");
 if (readnext(RECORD, ID, MV)) ... ok;
 assert(not RECORD.empty());
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 pushselect(out cursor)
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Saves a pointer to the currently active select list.
 .sp 1 \"</p>
 .PP \"<p>
@@ -166,7 +152,7 @@ This allows another select list to be activated and used temporarily before the 
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 select("xo_clients by name");
 var saved_xo_clients_cursor;
 pushselect(saved_xo_clients_cursor);
@@ -174,16 +160,14 @@ pushselect(saved_xo_clients_cursor);
 // ... work with another select list ...
 //
 popselect(saved_xo_clients_cursor); // Reactivate the original select list.
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 popselect(cursor)
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Re-establish an active select list saved by pushselect().
 .sp 1 \"</p>
 .PP \"<p>
@@ -196,9 +180,7 @@ See pushselect() for more info.
 
 .SS
 clearselect()
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Deactivate an active select list.
 .sp 1 \"</p>
 .PP \"<p>
@@ -207,18 +189,16 @@ If no select list is active then nothing is done.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 clearselect();
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 if (deleterecord(filename)) ...
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Use an active select list to delete db records.
 .sp 1 \"</p>
 .PP \"<p>
@@ -230,42 +210,38 @@ Contrast this function with the two argument "deleterecord(file, key)" function 
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 if (select("xo_clients with type 'Q' and with balance between 0 and 100")) {
   if (deleterecord("xo_clients")) ...
 }
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 if (deleterecord(dbfile, key)) ...
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Delete a single database file record.
 .sp 1 \"</p>
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let file = "xo_clients", key = "QQ001";
 write("" on file, key);
 if (not deleterecord(file, key)) ...
 // or
 write("" on file, key);
 if (not file.deleterecord(key)) ...
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 if (savelist(listname)) ...
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Save a currently active select list under a given name.
 .sp 1 \"</p>
 .PP \"<p>
@@ -280,19 +256,17 @@ Lists are saved as a record in the "lists" file.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 selectkeys("SB001^SB002"_var);
 if (not savelist("my_list")) ...
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 if (getlist(listname)) ...
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Reactivate a saved select list of a given name.
 .sp 1 \"</p>
 .PP \"<p>
@@ -304,18 +278,16 @@ A saved list is obtained from the "lists" file and activated.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 if (not getlist("my_list")) ...
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 if (deletelist(listname)) ...
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Remove a saved select list by name.
 .sp 1 \"</p>
 .PP \"<p>
@@ -324,25 +296,21 @@ A saved list is deleted from the "lists" file.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 if (not deletelist("my_list")) ...
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 if (formlist(filename_or_command, keys = "", fieldno = 0)) ...
-.nf
- 
-.fi
+
 
 
 .SS
 if (makelist(listname, keys)) ...
-.nf
- 
-.fi
+
 
 
 .SH 2. PERFORM/EXECUTE
@@ -350,9 +318,7 @@ if (makelist(listname, keys)) ...
 
 .SS
 var v1 = perform(command_line);
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Run an exodus program/library's main function using a command like syntax similar to that of os executable programs.
 .sp 1 \"</p>
 .PP \"<p>
@@ -389,9 +355,7 @@ Exodus program/libraries may also be called directly using conventional function
 
 .SS
 var v1 = execute(command_line);
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Run an exodus program/library's main function.
 .sp 1 \"</p>
 .PP \"<p>
@@ -401,9 +365,7 @@ Identical to perform() but any currently active select list in the calling progr
 
 .SS
 chain(command_line)
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Close the current program and perform another one.
 .sp 1 \"</p>
 .PP \"<p>
@@ -413,9 +375,7 @@ Identical to perform() except that the current program closes first.
 
 .SS
 var v1 = libinfo(libname);
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Check if a lib exists to be performed/executed or called. Currently it does not check if it is actually loadable.
 .sp 1 \"</p>
 
@@ -425,9 +385,7 @@ Check if a lib exists to be performed/executed or called. Currently it does not 
 
 .SS
 stop(message = "")
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Stop the current exodus program/library normally.
 .sp 1 \"</p>
 .PP \"<p>
@@ -440,9 +398,7 @@ Either return to the performing or executing parent exodus program/library, or e
 
 .SS
 abort(message = "")
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Abort the current exodus program/library.
 .sp 1 \"</p>
 .PP \"<p>
@@ -455,9 +411,7 @@ Similar to stop but if exiting to the OS then the default exit status is 1.
 
 .SS
 abortall(message = "")
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Abort the current exodus program/library.
 .sp 1 \"</p>
 .PP \"<p>
@@ -470,27 +424,21 @@ Similar to abort but if exiting to the OS then the default exit status is 2.
 
 .SS
 var v1 = calculate(dictid);
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Given a dictid reads a dictrec from the current DICT file (using readc()) and then either extracts a specific field number from the current RECORD/ID/MV environment variables or calls a dict function library to calculate the result.
 .sp 1 \"</p>
 
 
 .SS
 var v1 = calculate(dictid, dictfile, id, record, mv = 0);
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Given dictid, dictfile, record, id and mv, reads a dictrec from dictfile (using readc()) and then either extracts a specific field number from the given record/id/mv or calls a dict function library to calculate the result.
 .sp 1 \"</p>
 
 
 .SS
 var v1 = xlate(filename, key, fieldno_or_name, mode);
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Reads a record from the specified file and key (using readc()) and then either extracts a specific field number or calls calculate(dictid...) to obtain the result.
 .sp 1 \"</p>
 .PP \"<p>
@@ -505,19 +453,19 @@ Reads a record from the specified file and key (using readc()) and then either e
 \fBfieldno_or_name:\fR The field  to return.
 .sp 1 \"</p>
 .PD 0 \"<dl>
-.TP \"<dt>
+.TP 10\"<dt>
 \fBnn\fR \"</dt>
 Field number nn.
 .\"</dd>
-.TP \"<dt>
+.TP 10\"<dt>
 \fB0\fR \"</dt>
 The record key (ID).
 .\"</dd>
-.TP \"<dt>
+.TP 10\"<dt>
 \fB""\fR \"</dt>
 The whole record (RECORD)
 .\"</dd>
-.TP \"<dt>
+.TP 10\"<dt>
 \fBdictid\fR \"</dt>
 The function calculate(dictid) will be called.
 .\"</dd>
@@ -528,11 +476,11 @@ The function calculate(dictid) will be called.
 \fBmode:\fR If the record does not exist.
 .sp 1 \"</p>
 .PD 0 \"<dl>
-.TP \"<dt>
+.TP 10\"<dt>
 \fB"X"\fR \"</dt>
 Return ""
 .\"</dd>
-.TP \"<dt>
+.TP 10\"<dt>
 \fB"C"\fR \"</dt>
 Return the key.
 .\"</dd>
@@ -549,9 +497,7 @@ Return the key.
 
 .SS
 var v1 = oconv(input, conversion);
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 iconv/oconv with access to exoprogram's environment variables.
 .sp 1 \"</p>
 .PP \"<p>
@@ -578,9 +524,7 @@ exoprog's iconv/oconv have the ability to call custom functions like "[funname,a
 
 .SS
 var v1 = iconv(input, conversion);
-.nf
- 
-.fi
+
 
 
 .SH 6. IOCONV DATE/TIME 
@@ -588,9 +532,7 @@ var v1 = iconv(input, conversion);
 
 .SS
 var v1 = iconv|oconv(var, "[DATE]");
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Use iconv/oconv code "[DATE,args]" when you want date conversion to depend on the environment variable DATEFMT, particularly its American/International setting. Otherwise use ordinary "D" conversion codes directly for slightly greater performance.
 .sp 1 \"</p>
 .PP \"<p>
@@ -616,23 +558,21 @@ If you are calling iconv/oconv in code and DATEFMT is adequate for your needs th
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 DATEFMT = "D/E";
 let v1 = iconv("JAN 9 2025", "D");
 assert(oconv(v1, "[DATE]"   ) == " 9/ 1/2025");  // "D/EZ" or "[DATE,D]" equivalent assuming D/E in DATEFMT (replace leading zeros with spaces)
 assert(oconv(v1, "[DATE,4]" ) == " 9/ 1/2025");  // "D4Z"  equivalent assuming D/E in DATEFMT (replace leading zeros with spaces)
 assert(oconv(v1, "[DATE,*4]") == "9/1/2025");    // "D4ZZ" equivalent assuming D/E in DATEFMT (trim leading zeros and spaces)
 assert(oconv(v1, "[DATE,*]" ) == "9/1/2025");    // "DZZ"  equivalent assuming D/E in DATEFMT (trim leading zeros and spaces)
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = iconv|oconv(var, "[NUMBER]");
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Use iconv/oconv "[NUMBER,args]" either when your numbers have currency or unit code suffixes or when you want number conversion to depend on the environment variable BASEFMT to determine thousands separator and decimal point. Otherwise use ordinary "MD" conversion codes directly for slightly greater performance.
 .sp 1 \"</p>
 .PP \"<p>
@@ -728,9 +668,9 @@ Special format "[NUMBER,ndecs,move_ndecs]": move_ndecs causes decimal point to b
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var v1 = oconv("1234.5USD", "[NUMBER,2]"); // "1,234.50USD" // Comma added and decimal places corrected.
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 iconv:
 Remove all thousands separator chars and optionally standardise the number of decimal places.
@@ -739,18 +679,16 @@ iconv only handles a single field/value.
 Optional prefix of "1/" or "/" causes the reciprocal of the number to be used. e.g. "1/100" or "/100" -> "0.01".
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var v1 = iconv("1,234.5678USD", "[NUMBER]"); // "1234.57USD" // Comma removed
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = amountunit(input0, out unitx);
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Split amount+currency code/unit string into number and currency code/unit.
 .sp 1 \"</p>
 .PP \"<p>
@@ -766,9 +704,7 @@ Split amount+currency code/unit string into number and currency code/unit.
 
 .SS
 var v1 = amountunit(input0);
-.nf
- 
-.fi
+
 
 
 .SH 7. TIME/DATE UTILITIES
@@ -776,9 +712,7 @@ var v1 = amountunit(input0);
 
 .SS
 var v1 = timedate2();
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 \fBReturns:\fR Text of date and time in users time zone
 .sp 1 \"</p>
 .PP \"<p>
@@ -791,9 +725,7 @@ Offset from UTC by TZ seconds.
 
 .SS
 getdatetime(out user_date, out user_time, out system_date, out system_time, out UTC_date, out UTC_time)
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 \fBReturns:\fR User, server and UTC date and time
 .sp 1 \"</p>
 .PP \"<p>
@@ -806,9 +738,7 @@ User date and time is determined by adding the environment variable TZ.f(1)'s TZ
 
 .SS
 var v1 = elapsedtimetext();
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Get text of elapsed time since environment variable TIMESTAMP was initialised with ostimestamp() at program/thread startup.
 .sp 1 \"</p>
 .PP \"<p>
@@ -817,18 +747,16 @@ TIMESTAMP can be updated using ostimestamp() as and when desired.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var v1 = elapsedtimetext(); // e.g. "< 1ms"
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = elapsedtimetext(timestamp1, timestamp2);
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Get text of elapsed time between two timestamps
 .sp 1 \"</p>
 .PP \"<p>
@@ -837,10 +765,10 @@ Caution. Use ostimestamps not ostimes. One is in days and the other is in second
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = elapsedtimetext(0, 0.55);  // "13 hours, 12 mins"
 let v2 = elapsedtimetext(0, 0.001); // "1 min, 26 secs"
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
@@ -850,9 +778,7 @@ let v2 = elapsedtimetext(0, 0.001); // "1 min, 26 secs"
 
 .SS
 note(msg, options, io response)
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 If stdin is a terminal, output a message to stdout and optionally pause processing and request a response from the user, otherwise set the response to "" and continue.
 .sp 1 \"</p>
 .PP \"<p>
@@ -861,36 +787,32 @@ If stdin is a terminal, output a message to stdout and optionally pause processi
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var response;
 // call note("Enter something", "RC", response);
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 note(msg)
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Output a message to stdin and continue.
 .sp 1 \"</p>
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 call note("Hello world.");
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = decide(question, options = "");
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 If stdin is a terminal, pause processing, list some given options to stdout and request the user to make a choice, otherwise set the response to "" and continue.
 .sp 1 \"</p>
 .PP \"<p>
@@ -900,9 +822,7 @@ If stdin is a terminal, pause processing, list some given options to stdout and 
 
 .SS
 var v1 = decide(question, options, out reply, defaultreply = 1);
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Same as decide() above but extended.
 .sp 1 \"</p>
 .PP \"<p>
@@ -915,9 +835,7 @@ Same as decide() above but extended.
 
 .SS
 if (esctoexit()) ...
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 If stdin is a terminal, check if a key has been pressed and, if so, pause execution and ask the user to confirm if they want to escape/cancel or resume processing.
 .sp 1 \"</p>
 .PP \"<p>
@@ -927,9 +845,7 @@ If stdin is a terminal, check if a key has been pressed and, if so, pause execut
 
 .SS
 var v1 = AT(code);
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Get a string to control terminal operation.
 .sp 1 \"</p>
 .PP \"<p>
@@ -942,31 +858,31 @@ The terminal protocol is xterminal.
 \fBcode:\fR
 .sp 1 \"</p>
 .PD 0 \"<dl>
-.TP \"<dt>
+.TP 10\"<dt>
 \fBn\fR \"</dt>
 Position the cursor at column number n
 .\"</dd>
-.TP \"<dt>
+.TP 10\"<dt>
 \fB0\fR \"</dt>
 Position the cursor at column number 0
 .\"</dd>
-.TP \"<dt>
+.TP 10\"<dt>
 \fB-1\fR \"</dt>
 Clear the screen and home the cursor
 .\"</dd>
-.TP \"<dt>
+.TP 10\"<dt>
 \fB-2\fR \"</dt>
 Position the cursor at the top left home (x,y = 0,0)
 .\"</dd>
-.TP \"<dt>
+.TP 10\"<dt>
 \fB-3\fR \"</dt>
 Clear from the cursor at the end of screen
 .\"</dd>
-.TP \"<dt>
+.TP 10\"<dt>
 \fB-4\fR \"</dt>
 Clear from cursor to end of line
 .\"</dd>
-.TP \"<dt>
+.TP 10\"<dt>
 \fB-40\fR \"</dt>
 Position the cursor at columnno 0 and clear to end of line
 .\"</dd>
@@ -975,9 +891,7 @@ Position the cursor at columnno 0 and clear to end of line
 
 .SS
 var v1 = AT(x, y);
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Get a terminal cursor positioning string.
 .sp 1 \"</p>
 .PP \"<p>
@@ -990,9 +904,7 @@ The terminal protocol is xterminal.
 
 .SS
 if (getcursor(out cursor, delayms = 3000, max_errors = 0)) ...
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Get the position of the terminal cursor.
 .sp 1 \"</p>
 .PP \"<p>
@@ -1017,23 +929,23 @@ The FM delimited string returned can be later passed to setcursor() to repositio
 In case the terminal fails to respond correctly within the required timeout, or is currently disabled due to too many failures, or has been specifically disabled then the returned "cursor" var contains a 4th field:
 .sp 1 \"</p>
 .PD 0 \"<dl>
-.TP \"<dt>
+.TP 10\"<dt>
 \fBTIMEOUT\fR \"</dt>
 The terminal failed to respond within the timeout.
 .\"</dd>
-.TP \"<dt>
+.TP 10\"<dt>
 \fBREAD_ERROR\fR \"</dt>
 Failed to read terminal response.
 .\"</dd>
-.TP \"<dt>
+.TP 10\"<dt>
 \fBINVALID_RESPONSE\fR \"</dt>
 Terminal response invalid.
 .\"</dd>
-.TP \"<dt>
+.TP 10\"<dt>
 \fBSETUP_ERROR\fR \"</dt>
 Terminal setup failed.
 .\"</dd>
-.TP \"<dt>
+.TP 10\"<dt>
 \fBDISABLED\fR \"</dt>
 Terminal is disabled due to more errors than the maximum currently set.
 .\"</dd>
@@ -1041,19 +953,17 @@ Terminal is disabled due to more errors than the maximum currently set.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var cursor;
 if (isterminal() and not getcursor(cursor)) ... // cursor becomes something like "0^20^0.012345"_var
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 var v1 = getcursor();
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Get the position of the terminal cursor.
 .sp 1 \"</p>
 .PP \"<p>
@@ -1062,32 +972,30 @@ For more info see the main getcursor() function above.
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let cursor = getcursor(); // If isterminal() then cursor becomes something like "0^20^0.012345"_var
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 setcursor(cursor_coordinates)
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 If stdin is a terminal, position the cursor at x and y as per the given coordinates.
 .sp 1 \"</p>
 .PP \"<p>
 \fBcursor_coordinates:\fR An FM delimited string containing the x and y coordinates of the terminal cursor as can be obtained by getcursor().
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 if (isterminal()) {
     let cursor = getcursor(); // Save the current cursor position.
     TRACE(cursor)             // Show the saved cursor position.
     print(AT(0,0));           // Position the cursor at 0,0.
     setcursor(cursor);        // Restore its position
 }
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
@@ -1097,9 +1005,7 @@ if (isterminal()) {
 
 .SS
 var v1 = invertarray(input, pad = false);
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Dynamic array fields become values and vice versa
 .sp 1 \"</p>
 .PP \"<p>
@@ -1111,19 +1017,17 @@ Dynamic array fields become values and vice versa
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 let v1 = "a]b]c^1]2]3"_var;
 let v2 = invertarray(v1); // "a]1^b]2^c]3"_var
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
 
 .SS
 sortarray(io array, fns = "", order = "")
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Sorts fields of multivalues of dynamic arrays in parallel
 .sp 1 \"</p>
 .PP \"<p>
@@ -1133,19 +1037,19 @@ Sorts fields of multivalues of dynamic arrays in parallel
 \fBorder:\fR
 .sp 1 \"</p>
 .PD 0 \"<dl>
-.TP \"<dt>
+.TP 10\"<dt>
 \fBAL\fR \"</dt>
 Ascending  - Left Justified (Alphabetic)
 .\"</dd>
-.TP \"<dt>
+.TP 10\"<dt>
 \fBDL\fR \"</dt>
 Descending - Left Justified (Alphabetic)
 .\"</dd>
-.TP \"<dt>
+.TP 10\"<dt>
 \fBAR\fR \"</dt>
 Ascending  - Right Justified (Numeric/Natural)
 .\"</dd>
-.TP \"<dt>
+.TP 10\"<dt>
 \fBDR\fR \"</dt>
 Descending - Right Justified (Numeric/Natural)
 .\"</dd>
@@ -1153,10 +1057,10 @@ Descending - Right Justified (Numeric/Natural)
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
-.nf \"<code>
+.EX \"<code>
 var v1 = "f1^10]20]2]1^ww]xx]yy]zz^f3^f4"_var;  // fields 2 and 3 are parallel multivalues and currently unordered.
 sortarray(v1, "2]3"_var, "AR"); // v1 -> "f1^1]2]10]20^zz]yy]ww]xx^f3^f4"_var
-.fi \"</code>
+.EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
 
@@ -1166,32 +1070,24 @@ sortarray(v1, "2]3"_var, "AR"); // v1 -> "f1^1]2]10]20^zz]yy]ww]xx^f3^f4"_var
 
 .SS
 if (lockrecord(filename, io file, keyx, recordx, waitsecs = 0, allowduplicate = false)) ...
-.nf
- 
-.fi.PP \"<p>
+.PP \"<p>
 Does not actually return record
 .sp 1 \"</p>
 
 
 .SS
 if (lockrecord(filename, io file, keyx)) ...
-.nf
- 
-.fi
+
 
 
 .SS
 if (unlockrecord(filename, io file, key)) ...
-.nf
- 
-.fi
+
 
 
 .SS
 if (unlockrecord()) ...
-.nf
- 
-.fi
+
 
 
 

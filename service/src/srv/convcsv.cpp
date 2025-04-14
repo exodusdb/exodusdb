@@ -728,4 +728,4 @@ subr exit3() {
 	return;
 }
 
-libraryexit()
+}; // libraryexit()

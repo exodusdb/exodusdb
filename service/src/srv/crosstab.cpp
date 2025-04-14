@@ -431,4 +431,4 @@ subr abort_toobig(in filename) {
 	}
 	abort(msg);
 }
-libraryexit()
+}; // libraryexit()

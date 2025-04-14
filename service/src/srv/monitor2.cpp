@@ -812,4 +812,4 @@ nextdbasen:;
 	return 0;
 }
 
-libraryexit()
+}; // libraryexit()

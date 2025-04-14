@@ -318,4 +318,4 @@ subr sendemails(io emaillog) {
 	return;
 }
 
-libraryexit()
+}; // libraryexit()

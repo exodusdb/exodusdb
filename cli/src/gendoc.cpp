@@ -67,11 +67,12 @@ func main() {
 	}
 
 	// Skip if htmllib2 not installed or loadable yet
-	if (not libinfo("htmllib2"))
-		stop("gendoc: htmllib2 not installed yet.");
+//	if (not libinfo("htmllib2"))
+//		stop("gendoc: htmllib2 not installed yet.");
 	try {
 		call htmllib2("T2H", STATUS, "");
 	} catch (...) {
+		loglasterror();
 		stop("gendoc: htmllib2 not installed yet.");
 	}
 
@@ -1099,18 +1100,18 @@ func main() {
 				// Put on a separate line to avoid suppression of double quote chars
 				docfile << func_decl2 << std::endl;
 
-//				docfile << ".sp" << std::endl; // ignored
-				// Hack to defeat man's stubborn insistence on suppressing blank lines between section title and section text
-				docfile << ".nf" << std::endl;
-//				docfile << " " << std::endl; // ignored
-//				docfile << ".sp" << std::endl; // ignored
-//				docfile << "\u000A" << std::endl; // ignored
-//				docfile << "\u2003" << std::endl; //U+2003 EM SPACE
-				docfile << "\u2005" << std::endl; //U+2005 Four-Per-Em Space
-//				docfile << ".fi" << std::endl;
-				docfile << ".fi";
-//TRACE(comments)
-//input();
+////				docfile << ".sp" << std::endl; // ignored
+//				// Hack to defeat man's stubborn insistence on suppressing blank lines between section title and section text
+//				docfile << ".nf" << std::endl;
+////				docfile << " " << std::endl; // ignored
+////				docfile << ".sp" << std::endl; // ignored
+////				docfile << "\u000A" << std::endl; // ignored
+////				docfile << "\u2003" << std::endl; //U+2003 EM SPACE
+//				docfile << "\u2005" << std::endl; //U+2005 Four-Per-Em Space
+////				docfile << ".fi" << std::endl;
+//				docfile << ".fi";
+////TRACE(comments)
+////input();
 				docfile << comments << std::endl;
 				docfile << "" << std::endl;
 			}

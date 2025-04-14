@@ -168,4 +168,4 @@ success:
 	return 1;
 }
 
-libraryexit()
+}; // libraryexit()

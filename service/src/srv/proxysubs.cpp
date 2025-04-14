@@ -116,4 +116,4 @@ fileok:
 	return;
 }
 
-libraryexit()
+}; // libraryexit()

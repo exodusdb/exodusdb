@@ -162,4 +162,4 @@ func main(out bakpars, in process0 = var()) {
 	return 0;
 }
 
-libraryexit()
+}; // libraryexit()

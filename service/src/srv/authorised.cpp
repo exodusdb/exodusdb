@@ -283,4 +283,4 @@ subr writeuserprivs() {
 	return;
 }
 
-libraryexit()
+}; // libraryexit()

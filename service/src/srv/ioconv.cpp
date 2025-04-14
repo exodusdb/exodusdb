@@ -23,4 +23,4 @@ func main(in type, in input0, in mode, io output) {
 	return 0;
 }
 
-libraryexit()
+}; // libraryexit()

@@ -198,4 +198,4 @@ subr unlockall(io locklist) {
 	return;
 }
 
-libraryexit()
+}; // libraryexit()

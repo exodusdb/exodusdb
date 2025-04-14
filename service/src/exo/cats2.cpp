@@ -22,4 +22,4 @@ func main(in list1, in infix, in list2) {
 	return output;
 }
 
-libraryexit()
+}; // libraryexit()

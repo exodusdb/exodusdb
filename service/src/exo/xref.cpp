@@ -19,4 +19,4 @@ func main(in instr, in sepchars, in stoplist, in mode) {
 	return 0;
 }
 
-libraryexit()
+}; // libraryexit()

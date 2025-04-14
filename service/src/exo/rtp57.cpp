@@ -152,5 +152,4 @@ INSTALL      | 22 | Passed         | Unused         | Unused         | Unused   
 	return 0;
 }
 
-libraryexit()
-
+}; // libraryexit()

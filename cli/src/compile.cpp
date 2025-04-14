@@ -1217,7 +1217,10 @@ ENVIRONMENT
 //				text.replacer(R"__(space\(\d\))__", "space($1)");
 				text.replacer(R"__(\bvar\((\d+)\).space\(\))__"_rex, "space($1)");
 
-				text.replacer("MVLogoff", "ExoLogoff");
+				text.replacer("Exo" "Logoff", "ExoStop");
+
+				if (text.ends("\nlibraryexit()\n"))
+					text.paster(-14, 0, "}; /" "/ ");
 
 				if (text ne orig_text) {
 					if (oswrite(text on srcfilename, locale))

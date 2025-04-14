@@ -1734,4 +1734,4 @@ subr failsys() {
 	//std::unreachable();
 }
 
-libraryexit()
+}; // libraryexit()

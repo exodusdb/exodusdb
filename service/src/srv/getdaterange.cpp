@@ -100,4 +100,4 @@ inpuptodate:
 	return 0;
 }
 
-libraryexit()
+}; // libraryexit()

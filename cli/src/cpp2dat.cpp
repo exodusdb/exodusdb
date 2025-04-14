@@ -16,6 +16,8 @@ func main() {
 	//    */
 	//    return ANS;
 	//}
+	//};
+
 	//libraryexit(brand_and_date)
 
 	let update = OPTIONS.contains("U");
@@ -58,7 +60,7 @@ func main() {
 		var in_pgsql_block;
 		for (in line : oldcpptext) {
 
-			// We are interested in dict source between libraryinit and libraryexit statements
+			// We are interested in dict source between libraryinit and \n};\n (libraryexit) statements
 			if (line.starts("libraryinit")) {
 				dictid = line.field("(",2).field(")",1).ucase();
 
@@ -75,7 +77,7 @@ func main() {
 			}
 
 			// If at libraryexit then process the dict item source code that we have accumulated
-			else if (line.starts("libraryexit")) {
+			else if (line eq "}};" or line eq "*/};" or line.starts("libraryexit")) {
 
 				// Remove "function main() {" and closing "}"
 				// iif there are no #include statements
@@ -220,7 +222,7 @@ func main() {
 				// Skip any pgsql function found in the .cpp file
 				// since all updates have been done in dat/dict files
 				if (not in_pgsql_block)
-					in_pgsql_block = line.convert("\t ;", "") == "/*pgsql";
+					in_pgsql_block = line.convert("\t ;", "") == "/" "*pgsql";
 
 				if (not in_pgsql_block)
 					newdictsrc ^= line ^ VM;

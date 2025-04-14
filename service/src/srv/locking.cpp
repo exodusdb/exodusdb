@@ -181,4 +181,4 @@ subr unlockall(io locklist, io msg) {
 	return;
 }
 
-libraryexit()
+}; // libraryexit()

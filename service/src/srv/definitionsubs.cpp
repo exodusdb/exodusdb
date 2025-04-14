@@ -757,4 +757,4 @@ subr postreadfix() {
 	return;
 }
 
-libraryexit()
+}; // libraryexit()

@@ -19,4 +19,4 @@ func main(in cmd, out errors) {
 	return output;
 }
 
-libraryexit()
+}; // libraryexit()

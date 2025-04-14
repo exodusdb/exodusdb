@@ -48,4 +48,4 @@ func main(io listitems) {
 	return 0;
 }
 
-libraryexit()
+}; // libraryexit()

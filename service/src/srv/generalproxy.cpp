@@ -977,4 +977,4 @@ subr opendocuments() {
 	return;
 }
 
-libraryexit()
+}; // libraryexit()

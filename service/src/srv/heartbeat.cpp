@@ -105,4 +105,4 @@ func main(in mode, in status0 = "") {
 	return 0;
 }
 
-libraryexit()
+}; // libraryexit()

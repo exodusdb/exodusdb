@@ -25,4 +25,4 @@ func main(io v1, io v2, io v3, io v4, io v5, io v6) {
 	return 0;
 }
 
-libraryexit()
+}; // libraryexit()

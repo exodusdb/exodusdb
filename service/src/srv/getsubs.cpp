@@ -233,4 +233,4 @@ func gettaskprefix(in task) {
 	return taskprefix;
 }
 
-libraryexit()
+}; // libraryexit()

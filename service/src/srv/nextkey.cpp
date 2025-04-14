@@ -137,4 +137,4 @@ checkrec:
 	return keyx;
 }
 
-libraryexit()
+}; // libraryexit()

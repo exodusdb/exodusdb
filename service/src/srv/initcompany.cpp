@@ -198,4 +198,4 @@ func main(in nextcompanycode) {
 	return 1;
 }
 
-libraryexit()
+}; // libraryexit()

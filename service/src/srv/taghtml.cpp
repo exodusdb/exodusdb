@@ -56,4 +56,4 @@ func main(in /*type*/, in in0, in mode, out output) {
 //	assert(oconv(text2,"[TAGHTML,XYZ]").convert(VM,"]").outputl() == "<XYZ>&amp;&amp;___&amp;___&lt;___&amp;gt&amp;gt___&amp;&amp;</XYZ>");
 //}
 
-libraryexit()
+}; // libraryexit()

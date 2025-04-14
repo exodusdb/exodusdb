@@ -25,7 +25,7 @@ libraryinit()
 function main(in var1) {
 	printl("lib1 says " ^ var1);
 }
-libraryexit()
+}; // libraryexit()
 
 ==== lib1.h ====
 

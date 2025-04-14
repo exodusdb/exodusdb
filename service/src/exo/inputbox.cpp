@@ -13,4 +13,4 @@ func main(in msg, in /*maxlen*/, in /*show*/, in /*allowablechars*/, io data, in
 	return 0;
 }
 
-libraryexit()
+}; // libraryexit()

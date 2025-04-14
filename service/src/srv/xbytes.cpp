@@ -52,4 +52,4 @@ func main(in type, in input0, in mode, out output) {
 	return 0;
 }
 
-libraryexit()
+}; // libraryexit()

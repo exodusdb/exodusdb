@@ -1007,4 +1007,4 @@ deleteit:
 	return;
 }
 
-libraryexit()
+}; // libraryexit()

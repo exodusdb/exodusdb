@@ -167,4 +167,4 @@ stage2:
 	return 0;
 }
 
-libraryexit()
+}; // libraryexit()

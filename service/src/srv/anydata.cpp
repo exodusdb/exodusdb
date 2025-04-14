@@ -57,4 +57,4 @@ subr getnrecs() {
 	return;
 }
 
-libraryexit()
+}; // libraryexit()

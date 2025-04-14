@@ -326,4 +326,4 @@ listen:
 	return 0;
 }
 
-libraryexit()
+}; // libraryexit()

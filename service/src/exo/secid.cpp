@@ -46,4 +46,4 @@ func main(in input0, in max) {
 	return rnd(maxx);
 }
 
-libraryexit()
+}; // libraryexit()

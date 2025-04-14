@@ -48,4 +48,4 @@ func main(in args1, in args2, in sep) {
 	return output.join(sep);
 }
 
-libraryexit()
+}; // libraryexit()

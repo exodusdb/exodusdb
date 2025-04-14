@@ -6,4 +6,4 @@ func main([[maybe_unused]] in mode) {
 	return 0;
 }
 
-libraryexit()
+}; // libraryexit()

@@ -143,4 +143,4 @@ func main(in mode, in params, io result, io msg) {
 	return 0;
 }
 
-libraryexit()
+}; // libraryexit()

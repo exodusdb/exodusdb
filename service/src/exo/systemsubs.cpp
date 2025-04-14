@@ -58,4 +58,4 @@ func main(in mode0) {
 	return 0;
 }
 
-libraryexit()
+}; // libraryexit()

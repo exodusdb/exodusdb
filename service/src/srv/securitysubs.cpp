@@ -1170,4 +1170,4 @@ subr getemailtx(io emailtx, io newusers, in isnew, in userx, in userrec, in orig
 	return;
 }
 
-libraryexit()
+}; // libraryexit()

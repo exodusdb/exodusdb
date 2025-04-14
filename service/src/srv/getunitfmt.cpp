@@ -50,4 +50,4 @@ func main(in code, out fmtx) {
 	return 0;
 }
 
-libraryexit()
+}; // libraryexit()

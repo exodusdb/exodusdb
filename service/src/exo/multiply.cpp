@@ -21,4 +21,4 @@ func main(in multipliers, in multiplicand, in sep) {
 	return output.join(sep);
 }
 
-libraryexit()
+}; // libraryexit()

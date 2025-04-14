@@ -266,4 +266,4 @@ func main() {
 	stop();
 }
 
-libraryexit()
+}; // libraryexit()

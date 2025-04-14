@@ -3153,4 +3153,4 @@ subr updreqlog() {
 	return;
 }
 
-libraryexit()
+}; // libraryexit()

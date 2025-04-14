@@ -31,4 +31,4 @@ func main(in filename, io file, in similarfilename = "", in /*autocreate*/ = "")
 	return true;
 }
 
-libraryexit()
+}; // libraryexit()

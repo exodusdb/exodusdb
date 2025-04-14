@@ -7,4 +7,4 @@ func main() {
 	return SYSTEM.f(140);
 }
 
-libraryexit()
+}; // libraryexit()

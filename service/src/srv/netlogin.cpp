@@ -327,4 +327,4 @@ subr getsec() {
 	return;
 }
 
-libraryexit()
+}; // libraryexit()

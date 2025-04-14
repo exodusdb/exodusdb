@@ -6,4 +6,4 @@ func main() {
 	return 999;
 }
 
-libraryexit()
+}; // libraryexit()

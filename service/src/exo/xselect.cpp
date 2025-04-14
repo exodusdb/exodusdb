@@ -17,4 +17,4 @@ func main(in cmd) {
 	return 0;
 }
 
-libraryexit()
+}; // libraryexit()

@@ -6,4 +6,4 @@ func main(in /*mode*/, io /*text*/) {
 	return 0;
 }
 
-libraryexit()
+}; // libraryexit()

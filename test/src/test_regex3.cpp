@@ -83,7 +83,7 @@ function highlight_cpp_syntax(in text, io allwords_pat) {
 		//
 		//'var', '_var', 'BASEFMT', 'BS', 'CVR', 'Callable', 'DATEFMT', 'DQ',
 		//'DimIndexOutOfBounds', 'DimUndimensioned', 'EOL', 'ExoAbort', 'ExoAbortAll',
-		//'ExoCommon', 'ExoEnv', 'ExoLogoff', 'ExoProgram', 'ExoStop', 'FM', 'NL',
+		//'ExoCommon', 'ExoEnv', 'ExoStop', 'ExoProgram', 'ExoStop', 'FM', 'NL',
 		var allwords = get_exodus_keywords();
 		if (not allwords)
 			loglasterror();

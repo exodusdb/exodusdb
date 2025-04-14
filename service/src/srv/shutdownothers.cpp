@@ -50,4 +50,4 @@ func main(in /*mode*/, in datasetcode, out result) {
 	return 0;
 }
 
-libraryexit()
+}; // libraryexit()

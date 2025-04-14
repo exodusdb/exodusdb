@@ -920,4 +920,4 @@ subr getdaysago() {
 	return;
 }
 
-libraryexit()
+}; // libraryexit()

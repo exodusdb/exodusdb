@@ -480,4 +480,4 @@ subr getdepts() {
 	return;
 }
 
-libraryexit()
+}; // libraryexit()

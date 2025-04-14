@@ -261,4 +261,4 @@ subr getuserdept2(in usercode) {
 	return;
 }
 
-libraryexit()
+}; // libraryexit()

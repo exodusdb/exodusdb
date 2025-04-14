@@ -315,8 +315,8 @@ func main() {
 			//call popselect(0, v69, v70, v71);
 			srcline.replacer(R"__(\b(push|pop)select\([^,]+,\s*([a-zA-Z0-9_]+).*)__"_rex, "$1select($2);");
 
-			//MVLogoff -> ExoLogoff
-			srcline.replacer(R"__(\bMVLogoff\b)__"_rex, "ExoLogoff");
+			//MVLogoff -> ExoStop
+			srcline.replacer(R"__(\bMVLogoff\b)__"_rex, "ExoStop");
 
 			//tcase(mediacodes, "QUOTE");
 			//mediacode.replace(_VM, "\" \"").quote();

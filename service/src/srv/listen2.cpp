@@ -1173,4 +1173,4 @@ subr switchcompany() {
 	return;
 }
 
-libraryexit()
+}; // libraryexit()

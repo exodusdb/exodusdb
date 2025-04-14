@@ -477,4 +477,4 @@ nextprefix:
 	return;
 }
 
-libraryexit()
+}; // libraryexit()

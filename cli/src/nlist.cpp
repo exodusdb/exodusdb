@@ -2524,4 +2524,4 @@ subr emailing() {
 	return;
 }
 
-libraryexit()
+}; // libraryexit()

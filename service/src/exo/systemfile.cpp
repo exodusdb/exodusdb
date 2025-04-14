@@ -6,4 +6,4 @@ func main() {
 	return "definitions";
 }
 
-libraryexit()
+}; // libraryexit()

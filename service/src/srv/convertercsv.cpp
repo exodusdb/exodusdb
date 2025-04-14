@@ -35,4 +35,4 @@ func main(in mode, io /*line*/, in params, in filename) {
 	return 0;
 }
 
-libraryexit()
+}; // libraryexit()

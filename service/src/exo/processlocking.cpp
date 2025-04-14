@@ -13,4 +13,4 @@ func main(in /*mode*/, in /*processno*/, out result) {
 	return result;
 }
 
-libraryexit()
+}; // libraryexit()

@@ -199,7 +199,7 @@ func main() {
 				if (progtype == "mainlib")
 					blankfile.replacer("program()", "function " ^ basefilename ^ "()");
 			} else if (progtype == "class" or progtype == "classlib") {
-				startatlineno = "6,9";
+				startatlineno = "6,5";
 				blankfile ^= "#include <exodus/program.h>\n";
 				//programinit() as 2nd line to avoid ppl in external functions before programinit
 				//blankfile^="\n";
@@ -216,8 +216,11 @@ func main() {
 				blankfile ^= "\nprogramexit()";
 				blankfile ^= "\n";
 
-				if (progtype == "classlib")
+				if (progtype == "classlib") {
 					blankfile.replacer("program", "library");
+					blankfile.replacer("libraryexit()", "}; /" "/ libraryexit");
+//					blankfile.replacer("libraryexit()", "};");
+				}
 			} else if (progtype == "dict") {
 				startatlineno = "6,9";
 				blankfile ^= "#include <exodus/dict.h>\n\n";

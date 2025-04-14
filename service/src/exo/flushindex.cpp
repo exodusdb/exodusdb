@@ -7,4 +7,4 @@ func main(in /*filename*/ = "") {
 	return 0;
 }
 
-libraryexit()
+}; // libraryexit()

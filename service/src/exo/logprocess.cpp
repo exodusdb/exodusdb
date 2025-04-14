@@ -134,4 +134,4 @@ subr newprocessid(io processid) {
 	return;
 }
 
-libraryexit()
+}; // libraryexit()

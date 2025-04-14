@@ -131,4 +131,4 @@ func main(in msgno, io msg, in params0 = "") {
 	//return 0;
 }
 
-libraryexit()
+}; // libraryexit()

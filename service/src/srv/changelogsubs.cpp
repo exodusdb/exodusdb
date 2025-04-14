@@ -356,4 +356,4 @@ subr getversiondates() {
 	return;
 }
 
-libraryexit()
+}; // libraryexit()

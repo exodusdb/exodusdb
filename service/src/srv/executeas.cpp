@@ -32,4 +32,4 @@ func main(in cmd, in username) {
 	return 0;
 }
 
-libraryexit()
+}; // libraryexit()

@@ -389,4 +389,4 @@ subr fill(io datax) {
 	return;
 }
 
-libraryexit()
+}; // libraryexit()

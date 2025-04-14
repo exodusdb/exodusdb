@@ -23,4 +23,4 @@ func main(in selectx) {
 	return 0;
 }
 
-libraryexit()
+}; // libraryexit()

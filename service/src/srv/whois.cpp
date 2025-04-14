@@ -108,4 +108,4 @@ returnzero:
 	return 0;
 }
 
-libraryexit()
+}; // libraryexit()

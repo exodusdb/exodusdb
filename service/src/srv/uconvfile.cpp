@@ -137,4 +137,4 @@ func main(in inputfilename, in encoding1i, in encoding2i, out result, out msg) {
 	return 0;
 }
 
-libraryexit()
+}; // libraryexit()

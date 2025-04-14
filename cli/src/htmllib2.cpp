@@ -1426,19 +1426,33 @@ function t2h_main(in inp) {
 		{
 			let match1 = line.match(R"__(^\* (.*?) \* (.*)$)__");
 			if (match1) {
-				// * aaaaaaaa * bbbbbbbb
-				linetype = "dt";
-				line = match1.f(1, 2).trimboth() ^ "</dt><dd>" ^ match1.f(1, 3).trimboth("* ");
 
-			} else if (line.match(R"__(^[*#] *)__")) {
-				// #xxxxxxxx
-				// *xxxxxxxx
+				//////////////////
+				// Definition list -> <dl>
+				//////////////////
+				// * aaaa * bbbbbb
+				//////////////////
+				linetype = "dt";
+				line = match1.f(1, 2).trimlast() ^ "</dt><dd>" ^ match1.f(1, 3).trimboth("* ");
+
+			} else if (line.match(R"__(^\* *)__")) {
+
+				////////////////
+				// Bulleted list -> <ul> Unordered list
+				////////////////
+				// * xxxxxxxxxxx
+				////////////////
 				linetype = line.first();
 				line.cutter(1);
 				line.trimmerfirst();
 
-			} else if (line.match("^\\d+\\.")) {
-				// 99.xxxxxxxx
+			} else if (line.match("^\\d+\\. ")) {
+
+				////////////////
+				// Numbered list -> <ol> Ordered list
+				////////////////
+				// 99. xxxxxxxxx
+				////////////////
 				linetype = "#";
 				line = line.field(".", 2, 999).trimfirst();
 
@@ -1637,22 +1651,28 @@ std::string h2m_convert_to_man(const std::vector<std::string>& tokens, out exit_
         {"<u>",             "\\fI"},           // Start italic text (underline approximated)
         {"</u>",            "\\fR"},           // End italic text
 
-        {"<code>",          "\n.nf \\\"<code>\n"},        // Start code block (no fill/no format)
-        {"</code>",         "\n.fi \\\"</code>\n"},        // End code block (restore fill/format)
+//        {"<code>",          "\n.nf \\\"<code>\n"},        // Start code block (no fill/no format)
+//        {"</code>",         "\n.fi \\\"</code>\n"},        // End code block (restore fill/format)
+        {"<code>",          "\n.EX \\\"<code>\n"},     // Start code block (no fill/no format)
+        {"</code>",         "\n.EE \\\"</code>\n"},    // End code block (restore fill/format)
 
-        {"<pre>",           "\n.nf \\\"<pre>\n"},        // Start preformatted text (no fill/no format)
-        {"</pre>",          "\n.fi \\\"</pre>\n"},        // End preformatted text (restore fill/format)
+        {"<pre>",           "\n.nf \\\"<pre>\n"},      // Start preformatted text (no fill/no format)
+        {"</pre>",          "\n.fi \\\"</pre>\n"},     // End preformatted text (restore fill/format)
 
-        {"<dl>",            "\n.PD 0 \\\"<dl>\n"},             // Start descriptive list
-        {"</dl>",           "\n.PD \\\"</dl>\n"},        // End descriptive list
+        {"<dl>",            "\n.PD 0 \\\"<dl>\n"},     // Start descriptive list
+        {"</dl>",           "\n.PD \\\"</dl>\n"},      // End descriptive list
 
-//        {"<dt>",            "\n.IP \""},     // Start descriptive term
-//        {"</dt>",           "\"\n"},         // End descriptive term
-        {"<dt>",            "\n.TP \\\"<dt>\n\\fB"},    // Start descriptive term
-        {"</dt>",           "\\fR \\\"</dt>\n"},         // End descriptive term
+		///////////////////////////////////
+		// apt-get install groff groff-base
+		// man groff_man
+		// man tbl
+		///////////////////////////////////
 
-        {"<dd>",            ""},               // Start descriptive details
-        {"</dd>",           "\n.\\\"</dd>\n"},        // End descriptive details
+        {"<dt>",            "\n.TP 10\\\"<dt>\n\\fB"}, // Start descriptive term
+        {"</dt>",           "\\fR \\\"</dt>\n"},       // End descriptive term
+
+        {"<dd>",            ""},                       // Start descriptive details
+        {"</dd>",           "\n.\\\"</dd>\n"},         // End descriptive details
 
         {"<blockquote>",    "\n.RS\n"},        // Start blockquote (indent)
         {"</blockquote>",   "\n.RE\n"},        // End blockquote (unindent)

@@ -82,6 +82,7 @@ export namespace exo {
 //	using exo::TM;
 //	using exo::ST;
 
+	using exo::ExoExit;
 	using exo::ExoAbort;
 	using exo::ExoAbortAll;
 //	using exo:: ExoLogoff;

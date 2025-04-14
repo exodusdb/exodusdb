@@ -292,4 +292,4 @@ func toggle(t,mode)
 	}
 }
 
-libraryexit()
+}; // libraryexit()

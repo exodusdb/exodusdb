@@ -39,4 +39,4 @@ func main(in /*mode*/, io list1, io list2, in seps) {
 	return 0;
 }
 
-libraryexit()
+}; // libraryexit()

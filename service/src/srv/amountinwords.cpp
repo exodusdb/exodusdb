@@ -449,4 +449,4 @@ french:
 	return words.trim();
 }
 
-libraryexit()
+}; // libraryexit()

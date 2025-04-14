@@ -38,4 +38,4 @@ func main(in pluralnoun) {
 	return temp;
 }
 
-libraryexit()
+}; // libraryexit()

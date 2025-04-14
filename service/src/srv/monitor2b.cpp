@@ -479,4 +479,4 @@ subr hash(in salt, in max, out hashcode) {
 	return;
 }
 
-libraryexit()
+}; // libraryexit()
