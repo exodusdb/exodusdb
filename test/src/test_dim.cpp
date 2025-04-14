@@ -775,9 +775,9 @@ func main() {
 		TRACE(d[1])
 		assert(d[1] == "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
 		var s = {str("a",30), str("b",30), str("c",30)};
-		TRACE()
+		logputl();
 		TRACE(d.join())
-		TRACE()
+		logputl();
 		TRACE(s)
 		assert(d.join() eq
 							"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa^"

@@ -109,9 +109,13 @@
 // Useful TRACE() function for debugging
 #define TRACE(EXPRESSION) \
 	try{ \
-		var(EXPRESSION).quote().errputl("TRACE(" #EXPRESSION ")\t/" "/ "); \
+		std::cerr << "TRACE(" #EXPRESSION ")\t/" "/ "; \
+		var TRACE_expressionx {EXPRESSION}; \
+		TRACE_expressionx ^= ""; \
+		std::cerr << _DQ << TRACE_expressionx << _DQ << std::endl; \
 	} catch (VarError e) { \
-		var(e.stack()).errputl(e.message); \
+		/*var(e.stack()).errputl(e.message);*/ \
+		std::cerr << var(e.message).field(":", 1) << ": " << var(e.stack()) << std::endl; \
 	};
 
 #define TRACE2(EXPRESSION) \
