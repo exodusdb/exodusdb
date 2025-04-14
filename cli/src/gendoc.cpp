@@ -66,8 +66,14 @@ func main() {
 		abort(syntax);
 	}
 
+	// Skip if htmllib2 not installed or loadable yet
 	if (not libinfo("htmllib2"))
-		abort("gendoc: htmllib2 not installed yet.");
+		stop("gendoc: htmllib2 not installed yet.");
+	try {
+		call htmllib2("T2H", STATUS, "");
+	} catch (...) {
+		stop("gendoc: htmllib2 not installed yet.");
+	}
 
 	if (html) {
 
