@@ -217,6 +217,7 @@ var  var::iconv(const char* conversion) const {
 invalid_hex:
 								// TODO flag invalid
 								// var's int is int64_t (8 bytes) to max hex number is 16 f's
+								{} // older compilers dont like label at the end
 							}
 							break;
 						}
