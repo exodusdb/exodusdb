@@ -246,10 +246,6 @@ ENVIRONMENT
 				printl("Using EXO_CXX environment variable for compiler " ^ compiler.quote());
 		} else {
 			compiler = "c++";
-#ifdef __APPLE__
-			if (PLATFORM eq "x86")
-				compiler = "g++-4.0";
-#endif
 			if (verbose)
 				printl("no EXO_CXX or CXX environment variable. Assuming " ^ compiler.quote());
 		}

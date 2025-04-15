@@ -1492,59 +1492,50 @@ bool ExoProgram::unlockrecord(in /*filename*/, io file0, in key) const {
 	return 1;
 }
 
-// WARNING/ pickos column and row numbering is 0 based but
-// in exodus we move to 1 based numbering to be consistent with
-// c/c++/linux/terminal standards. hopefully not too inconvenient
-
 var ExoProgram::AT(const int columnno, const int rowno) const {
-	// THISIS("var ExoProgram::at(const int columnno, const int rowno) const")
 
-	std::string tempstr = "\x1B[";
-	tempstr += std::to_string(rowno);
-	tempstr.push_back(';');
-	tempstr += std::to_string(columnno);
-	tempstr.push_back('H');
-	return tempstr;
+	// Hard coded for xterm at the moment
+	// http://www.xfree86.org/current/ctlseqs.html
+
+	// WARNING: Pick OS column and row numbering is 0 based
+	// BUT in exodus we move to 1 based numbering to be consistent with
+	// General terminal standards.
+
+	// Columns and rows are 1 based.
+
+	return "\x1B[" ^ var(rowno) ^ ';' ^ var(columnno) ^ 'H';
 }
 
 var ExoProgram::AT(const int columnno) const {
-	// THISIS("var ExoProgram::at(const int columnno) const")
 
-	// hard coded for xterm at the moment
-	// http://www.xfree86.org/current/ctlseqs.html
+	// Columns are 1 based.
 
-	// move to columnno 0
+	// Move to column n - ESC[nG
+	if (columnno > 0)
+		return "\x1B[" ^ var(columnno) ^ 'G';
+
+	// Move to the first column "\r"
 	if (columnno == 0)
 		// return "\x1b[G";
 		return "\r";  // works on more terminals
 
-	//return "";
-
-	// move to columnno
-	if (columnno > 0) {
-		std::string tempstr = "\x1B[";
-		tempstr += std::to_string(columnno);
-		tempstr.push_back('G');
-		return tempstr;
-	}
-	// clear the screen and home the cursor
+	// Clear the screen and home the cursor - ESC[H ESC[J
 	if (columnno == -1)
-		return "\x1B[2J\x1B[H";
-	// return "\x0c";//works on more terminals
+		return "\x1B[H\x1B[J";
 
-	// move the cursor to top left home
+	// Move the cursor to top left home - ESC[H
 	if (columnno == -2)
 		return "\x1B[H";
 
-	// clear from cursor to end of screen
+	// Clear from cursor to end of screen - ESC[J
 	if (columnno == -3)
 		return "\x1B[J";
 
-	// clear from cursor to end of line
+	// Clear from cursor to end of line - ESC[K
 	if (columnno == -4)
-		return "\x1B[0K";
+		return "\x1B[K";
 
-	// move cursor to columnno 0 and clear to end of line
+	// Move cursor to the first column and clear to end of line
 	if (columnno == -40)
 		return "\r\x1B[K";
 
