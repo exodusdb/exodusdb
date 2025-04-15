@@ -457,13 +457,19 @@ function get_dependencies_for_build_and_install {
 	ls -l /usr/lib/postgresql/ || true
 
 :
+: Install pygments syntax highlighter for cli gendoc
+: --------------------------------------------------
+:
+	APT_GET sudo apt-get install -y python3-pygments || FAILED to install pygments
+
+:
 : Install exodus lexer plugin for pygment syntax highlighter
 : ----------------------------------------------------------
 :
 	cd $EXODUS_DIR/pygment
 	./install.sh && ./test.sh && echo ok || echo FAILED to install pygment plugin
 	cd ..
-:
+
 :
 : Show installed compilers and standard library versions
 : ------------------------------------------------------
