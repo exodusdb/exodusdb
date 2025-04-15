@@ -462,4 +462,4 @@ func hide_subsyntax(in line, io pos, in hidden_char) {
 	}
 	return line2;
 }
-programexit()
+}; // programexit()

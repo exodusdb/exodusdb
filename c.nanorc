@@ -168,7 +168,7 @@ color bold,pink "\<(perform|execute|chain|libinfo)\>"
 
 # Exodus flow control
 color bold,magenta "\<(call|gosub|function|func|subroutine|subr)\>"
-color bold,magenta "^(programinit|programexit|libraryinit|libraryexit|commoninit|commonexit)\("
+color bold,magenta "^(programinit|programexit|libraryinit|libraryexit|commoninit|commonexit|dictinit|dictexit)\("
 
 # Exodus commas
 color bold,magenta "\<(on|from|with|to)\>"

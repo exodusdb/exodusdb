@@ -14,7 +14,7 @@ func main() {
 
 		dim text;
 		if (not text.osread(osfilename))
-			abort(fsmsg());
+			abort(lasterror());
 
 		var maxprintcoln = 0;
 		var block_startln = 0;
@@ -66,7 +66,7 @@ func main() {
 			if (updated) {
 				osfilename.outputl("Updated ");
 				if (not text.oswrite(osfilename))
-					abort(fsmsg());
+					abort(lasterror());
 			}
 		} else {
 			for (in line : text)
@@ -78,4 +78,4 @@ func main() {
 	return 0;
 }
 
-programexit()
+}; // programexit()

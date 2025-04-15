@@ -362,4 +362,4 @@ func configure_via_connection(in adminconfig, in dbname, in dbusername, in dbuse
 //	return true;
 //}
 
-programexit()
+}; // programexit()

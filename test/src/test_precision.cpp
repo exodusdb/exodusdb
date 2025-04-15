@@ -377,7 +377,7 @@ func main() {
     return 0;
 }
 
-programexit()
+}; // programexit()
 */
 
 #ifdef EXO_USE_RYU
@@ -1043,4 +1043,4 @@ func test2(const std::string str1, const std::string str2 = std::string()) {
 	return true;
 }
 
-programexit()
+}; // programexit()

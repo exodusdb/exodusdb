@@ -135,4 +135,4 @@ func test_codepage(in codepage, in lang) {
 	return 0;
 }
 
-programexit()
+}; // programexit()

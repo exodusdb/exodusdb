@@ -71,7 +71,7 @@ set -euxo pipefail
 : Start base container $OS
 : --------------------
 :
-			lxc start $OS || true
+			lxc restart $OS || true
 :
 : Upgrade all in base container - $OS
 : -----------------------------

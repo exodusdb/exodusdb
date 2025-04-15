@@ -32,4 +32,4 @@ func main() {
 	return result;
 }
 
-programexit()
+}; // programexit()

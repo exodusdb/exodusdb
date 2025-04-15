@@ -179,4 +179,4 @@ exit:
 	return 0;
 }
 
-programexit()
+}; // programexit()

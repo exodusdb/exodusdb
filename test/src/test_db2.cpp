@@ -718,4 +718,4 @@ subr generate_xo_clients_dict_data(in filename) {
 	return;
 }
 
-programexit()
+}; // programexit()

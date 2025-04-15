@@ -393,4 +393,4 @@ func onefile(in filename, in maxndifferences) {
 	return ndifferences;
 }
 
-programexit()
+}; // programexit()

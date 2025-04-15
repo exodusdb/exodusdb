@@ -161,4 +161,4 @@ func test() {
 	return 0;
 }
 
-programexit()
+}; // programexit()

@@ -233,4 +233,4 @@ subr sortselect(in file, in sortselectclause) {
 	//	rollbacktrans();
 }
 
-programexit()
+}; // programexit()

@@ -407,4 +407,4 @@ func getosfilename(in dir, in dbfilename, in fieldno, in id) {
 	return temposfilename;
 }
 
-programexit()
+}; // programexit()

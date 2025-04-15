@@ -1,5 +1,5 @@
-#ifndef EXODUS_LIBEXODUS_EXODUS_PROGRAM_H_
-#define EXODUS_LIBEXODUS_EXODUS_PROGRAM_H_
+#ifndef EXODUS_LIBEXODUS_EXODUS_LIBRARY_H_
+#define EXODUS_LIBEXODUS_EXODUS_LIBRARY_H_
 
 #include <exodus/exodus.h>
 
@@ -83,25 +83,26 @@ extern "C" PUBLIC void exoprogram_createdelete_##EXOPROGRAM_PREFIX(             
         pexoprogram, mv, pmemberfunc);                                             \
 }                                                                                  \
 _Pragma("clang diagnostic pop")                                                    \
-_Pragma("GCC diagnostic push")                                                     \
-_Pragma("clang diagnostic ignored \"-Wweak-vtables\"")                             \
-_Pragma("GCC diagnostic ignored \"-Winline\"")                                     \
                                                                                    \
 /*                                                                                 \
  * 3. Open the ExoProgram derived class definition                                 \
  */                                                                                \
+_Pragma("GCC diagnostic push")                                                     \
+_Pragma("clang diagnostic ignored \"-Wweak-vtables\"")                             \
+_Pragma("GCC diagnostic ignored \"-Winline\"")                                     \
+                                                                                   \
 class EXOPROGRAM_PREFIX##_ExoProgram : public exo::ExoProgram {                    \
 _Pragma("GCC diagnostic pop")                                                      \
                                                                                    \
+/*                                                                                 \
+ * 4. Inherit ExoProgram's constructor using an ExoEnv                             \
+ */                                                                                \
 public:                                                                            \
     _Pragma("clang diagnostic push")                                               \
     _Pragma("clang diagnostic ignored \"-Wshadow-field\"")                         \
                                                                                    \
-/*                                                                                 \
- * 4. Inherit a constructor from an ExoEnv                                         \
- */                                                                                \
     using ExoProgram::ExoProgram;                                                  \
     /*EXOPROGRAM_PREFIX##_ExoProgram(exo::ExoEnv& mv) : exo::ExoProgram(mv) {}*/   \
     _Pragma("clang diagnostic pop")
 
-#endif // EXODUS_LIBEXODUS_EXODUS_PROGRAM_H_
+#endif // EXODUS_LIBEXODUS_EXODUS_LIBRARY_H_

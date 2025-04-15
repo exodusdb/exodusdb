@@ -971,4 +971,4 @@ subr internal_subroutine_xyzz(in xyzz) {
 	return;
 }
 
-programexit()
+}; // programexit()

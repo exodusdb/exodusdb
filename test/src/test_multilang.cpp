@@ -505,4 +505,4 @@ zu-ZA
 	return 0;
 }
 
-programexit()
+}; // programexit()

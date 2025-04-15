@@ -213,7 +213,7 @@ func main() {
 				blankfile ^= "\tprintl(\"" ^ basefilename ^ " says 'Hello World!'\");\n";
 				blankfile ^= "\treturn 0;\n";
 				blankfile ^= "}\n";
-				blankfile ^= "\nprogramexit()";
+				blankfile ^= "\n}; // programexit()";
 				blankfile ^= "\n";
 
 				if (progtype == "classlib") {
@@ -553,4 +553,4 @@ subr geteditor(out editor, out linenopattern) {
 
 	return;
 }
-programexit()
+}; // programexit()

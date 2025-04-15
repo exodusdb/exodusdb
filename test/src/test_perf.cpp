@@ -782,4 +782,4 @@ void extract(char * instring, int inlength, int fieldno, int valueno, int subval
 }
 #pragma GCC diagnostic pop
 
-programexit()
+}; // programexit()

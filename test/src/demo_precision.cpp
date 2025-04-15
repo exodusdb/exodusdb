@@ -188,4 +188,4 @@ SEE ALSO
 	return 0;
 }
 
-programexit()
+}; // programexit()

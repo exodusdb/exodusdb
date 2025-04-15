@@ -436,4 +436,4 @@ subr unescape_sql(io arg1) {
 
 }
 
-programexit()
+}; // programexit()

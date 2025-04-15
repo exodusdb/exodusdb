@@ -1043,4 +1043,4 @@ func test_ioconv_TX(in fmt, in rec, in txt) {
 	return true;
 }
 
-programexit()
+}; // programexit()

@@ -1566,4 +1566,4 @@ subr rawsqlexec(in sql, out errormsg) {
 	return;
 }
 
-programexit()
+}; // programexit()

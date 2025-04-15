@@ -512,4 +512,4 @@ programinit()
 	return 0;
 }
 
-programexit()
+}; // programexit()

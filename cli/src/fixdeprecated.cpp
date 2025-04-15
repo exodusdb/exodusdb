@@ -492,12 +492,12 @@ func main() {
 			var datfiledir = filename.replace("dic/", "dat/").replace("/dict_", "/dict.").cut(-4);
 
 			// find dict id backwards
-			// libraryinit(date_created)
+			// dictinit(date_created) OR libraryinit(date_created)
 			var lineno2 = lineno - 1;
 			var datfilename = "";
 			while (lineno2) {
 				var srcline2 = src.field(EOL, lineno2);
-				if (srcline2.match("libraryinit")) {
+				if (srcline2.match("dictinit") or srcline2.match("libraryinit")) {
 					datfilename = datfiledir ^ "/" ^ srcline2.field("(", 2).field(")", 1).ucase();
 					break;
 				}
@@ -668,4 +668,4 @@ subr fix_include_common(in osfilenames) {
 	}
 }
 
-programexit()
+}; // programexit()

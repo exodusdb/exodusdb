@@ -67,4 +67,4 @@ func main() {
 	return 0;
 }
 
-programexit()
+}; // programexit()

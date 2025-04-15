@@ -151,4 +151,4 @@ subr cleanup() {
 	if (not default_conn.deletefile(dict_xo_test))
 		loglasterror();
 }
-programexit()
+}; // programexit()

@@ -1215,7 +1215,8 @@ ENVIRONMENT
 
 				text.replacer("Exo" "Logoff", "ExoStop");
 
-				if (text.ends("\nlibraryexit()\n"))
+				// Change obsolete programinit and libraryinit if exactly at end of file
+				if (text.ends("\nprogramexit()\n") or text.ends("\nlibraryexit()\n"))
 					text.paster(-14, 0, "}; /" "/ ");
 
 				if (text ne orig_text) {
@@ -2488,7 +2489,7 @@ R"__(
 			source ^ "\n" ^
 			"\treturn 0;\n"
 		"}\n"
-		"programexit()\n";
+		"}; /" "/ programexit()\n";
 
 	// Create a tmp cpp file
 //	let tempfilebase = ostempfile();
@@ -2519,4 +2520,4 @@ R"__(
 	return 0;
 }
 
-programexit()
+}; // programexit()

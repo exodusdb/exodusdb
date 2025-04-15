@@ -634,4 +634,4 @@ Nórdicg: Ljœr ye caudran créneþ ý jor cẃran.
 	return 0;
 }
 
-programexit()
+}; // programexit()

@@ -675,4 +675,4 @@ subr test2(in as, in bs) {
 	return;
 }
 
-programexit()
+}; // programexit()

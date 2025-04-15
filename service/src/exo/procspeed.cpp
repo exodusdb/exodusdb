@@ -87,4 +87,4 @@ subr getspeed(io retval) {
 	return;
 }
 
-programexit()
+}; // programexit()

@@ -21,5 +21,4 @@ func main() {
 	return errorno;
 }
 
-programexit()
-
+}; // programexit()

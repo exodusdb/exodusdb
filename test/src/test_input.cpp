@@ -112,4 +112,4 @@ func self_test(in mode) {
 
 }
 
-programexit()
+}; // programexit()

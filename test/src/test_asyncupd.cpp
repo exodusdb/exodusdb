@@ -156,4 +156,4 @@ func test(in option) {
 	return true;
 }
 
-programexit()
+}; // programexit()

@@ -374,4 +374,4 @@ auto _var = u8<span class=exo2>R"delim(e R )delim"</span>;
 <span class=exo7>/)V0G0N" R"V0G0N(* unclosed ml comment invalid c++ should not be converted e R
 </span>)V0G0N";
 
-programexit()
+}; // programexit()

@@ -189,7 +189,7 @@ func main() {
 
 		}
 
-		var new_cpp_text = "#include <exodus/library.h>\n\n";
+		var new_cpp_text = "#include <exodus/dict.h>\n\n";
 		var dict2sql_ids = "";
 
 		var common_lines = "";
@@ -236,14 +236,16 @@ func main() {
 			// Add it to new_cpp_text
 			if (generate and isdict and RECORD.f(1) == "S") {
 
+				var dictsrc = RECORD(8);
+				dictsrc.converter(VM, "\n");
+
+				let hasfuncmain = dictsrc.contains("function main()");
+
 				// dict intro
-				let line1 = "\nlibraryinit(" ^ ID.lcase() ^ ")";
+				var line1 = (hasfuncmain ? "\nlibraryinit(" : "\ndictinit(") ^ ID.lcase() ^ ")";
 //				let line1 = "\ndictinit(" ^ ID.lcase() ^ ")";
 				new_cpp_text ^= line1 ^ "\n";
 //				new_cpp_text ^= "/" "/" ^ str("-", len(line1) - 3) ^ "\n";
-
-				var dictsrc = RECORD(8);
-				dictsrc.converter(VM, "\n");
 
                 // Remove #include <xxx_common.h> lines
 				var lines = dictsrc.match(R"__(#include\s*[<"][a-z]{2,3}_common.h[>"]\s*\n)__").sort().unique();
@@ -252,34 +254,13 @@ func main() {
 					common_lines ^= lines.convert("\n", "") ^ FM;
 				}
 
-				// Add dict function intro
-				var addfunctionmain = not dictsrc.contains("function main()");
-				if (addfunctionmain) {
-					new_cpp_text ^= "function main() {\n";
-
-					// Add closing brace before pgsql , if present
-					let t = dictsrc.index("\n/" "*pgsql");
-					if (t) {
-						dictsrc.paster(t, 1, "\n}\n");
-						dictsrc.replacer("\n\n}", "\n}");
-						addfunctionmain = false;
-					}
-				}
-//TRACE(ID)
-//TRACE(dictsrc)
-//stop();
 				new_cpp_text ^= dictsrc ^ "\n";
 
-				// Close function main if not already done
-				if (addfunctionmain) {
-					if (not new_cpp_text.ends("\n"))
-						new_cpp_text ^= '\n';
-					new_cpp_text ^= "}\n";
-				}
+				// Close function main opened in dictinit
+				if (not hasfuncmain)
+					new_cpp_text ^= '}';
 
 				// dict outro
-				//new_cpp_text ^= "libraryexit(" ^ ID.lcase() ^ ")\n\n";
-				new_cpp_text.popper();
 				new_cpp_text ^= "};\n";
 
 			} // generate and isdict and S item
@@ -418,6 +399,11 @@ func main() {
 				new_cpp_text.fieldstorer("\n", 3, -1, common_lines);
 			}
 
+			// Limit blank lines to one.
+			new_cpp_text.replacer("\n\n\n+"_rex, "\n\n");
+			new_cpp_text.trimmerboth("\n");
+			new_cpp_text ^= '\n';
+
 			// Update
 			if (new_cpp_text == old_cpp_text) {
 				if (verbose)
@@ -473,4 +459,4 @@ func is_newer(in fsinfo) {
 
 }
 
-programexit()
+}; // programexit()

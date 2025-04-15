@@ -2509,4 +2509,4 @@ subroutine cleanup() {
 		if (not osremove("xo_conf.txt")) {}; // Cleanup first
 };
 
-programexit()
+}; // programexit()

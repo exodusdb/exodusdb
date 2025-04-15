@@ -104,4 +104,4 @@ function test(in cmd, in stdin, in stdout_exp, in stderr_exp, in result_exp, in 
 	return true;
 }
 
-programexit()
+}; // programexit()
