@@ -313,15 +313,16 @@ function main() {
 			}
 
 			//clear the screen (should be cls on win)
-			if (OSSLASH == "/")
-				//osshell("clear");
-				//if (not osshell("clear")) {
-				// -x preserve scrollback buffer
-				if (not osshell("clear -x")) {
-					abort(lasterror());
-				}
+			//if (OSSLASH == "/")
+			//	//osshell("clear");
+			//	//if (not osshell("clear")) {
+			//	// -x preserve scrollback buffer
+			//	if (not osshell("clear -x")) {
+			//		abort(lasterror());
+			//	}
 			//else
 			//	osshell("cls");
+			output(AT(-1));
 
 			//build the compiler command
 			let compiler = "compile";
