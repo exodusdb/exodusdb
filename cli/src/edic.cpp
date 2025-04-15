@@ -322,7 +322,7 @@ function main() {
 			//	}
 			//else
 			//	osshell("cls");
-			output(AT(-1));
+			//output(AT(-1));
 
 			//build the compiler command
 			let compiler = "compile";
