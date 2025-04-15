@@ -1547,20 +1547,32 @@ p {
 		margin-bottom: 0.1em
 	}
 
-	dt {
-		font-weight: bold;
-		margin-bottom: 0.1em
-	}
+dl {
+  display: grid;
+  grid-template-columns: minmax(auto, max-content) 1fr; /* Left: expands to fit content, Right: remaining space */
+  /*gap: 10px;*/ /* Space between rows and columns */
+  /*max-width: 600px;*/ /* Matches your image */
+  /*font-family: monospace;*/ /* Matches your image */
+  overflow: hidden; /* Clears floats for the dl container */
+}
+dt, dd {
+  /*padding: 5px;*/
+  margin: 0;
+  box-sizing: border-box;
+  border-bottom: 1px dashed grey; /* Matches your image */
+}
 
-	dl {
-		margin-top: 0.2em;
-		margin-bottom: 0.5em
-	}
+dt {
+  grid-column: 1; /* Left column */
+  font-weight: bold; /* Matches your image */
+  padding-right: 5px;
+  font-family: monospace; /* Matches your image */
+}
 
-	dd {
-		margin-left: 1.6em;
-		margin-bottom: 0.1em
-	}
+dd {
+  grid-column: 2; /* Right column */
+  margin-left:1em;
+}
 
 .gendoc_function {
 	color: #800;
