@@ -7,35 +7,53 @@
 #   define EXO_LIBRARY
 #endif
 
-// Exodus programs can be built as shared libraries and may then be called 
-// Exodus libraries, although they are functionally identical internally.
+// PROGRAM, LIBRARY or FUNCTION?
 //
-// Both programs and libraries allow a set of functions to work on a private 
-// set of data. Library functions, however, have a callable interface via 
-// their main() function. The main() function of libraries can have any 
-// Exodus or C++ arguments, including references and constants, but it always 
-// returns a var.
+// An Exodus program is technically any C++ class derived from the 
+// ExoProgram base class and that has a main() function. Exodus 
+// programs can be built either as standalone programs or as shared 
+// libraries. As standalone programs they may be called Exodus 
+// standalone programs, Exodus programs or just programs. As shared 
+// libraries they may be called Exodus libraries or just libraries. 
+// Regardless of what they are called, under the hood they are 
+// fully programs in the sense of allowing a set of related functions 
+// to operate on a private set of data. They are two different ways of 
+// packaging the same program structure
 //
-// Exodus libraries are often called "library functions" because their only 
-// interface is their main() function, and they typically retain no state 
-// between calls. They are however full blown objects. It is just that all 
-// their member functions and data have no public interface.
+// Exodus libraries have a callable interface via their main() 
+// function. It can have any Exodus or C++ arguments, including 
+// references and constants. It always returns a var.
 //
-// The inclusion of library.h instead of program.h causes Exodus programs to be built as shared libraries (.so files) instead of command line executables.
+// Exodus libraries are often called "library functions" because their 
+// only interface is their main() function, hidden 
+// behind a callable object with the same name as the library. They 
+// also commonly retain little or no state between calls. They are, 
+// however, full-blown objects. Their member functions and data, 
+// except main(), have no public interface.
 //
-// Exodus libraries are dynamically loaded and called as ordinary functions by other Exodus programs and libraries.
+// Exodus libraries are implemented as function objects in the caller. 
+// They retain state between calls by creating an instance of the 
+// library class on first call to their function object. Subsequent 
+// calls use this instance.
 //
-// You can switch which library is loaded at runtime, even after using it, 
-// offering rare flexibility to configure and reconfigure applications while 
-// running. So if you have three libraries l1, l2, and l3 all with the same 
-// interface (main arguments are identical), and you include l1.h, you can set 
-// l1 = "l2" and calling l1() will use l2 instead, and afterwards you can set 
-// l1 = "l3" and calling l1() will actually call l3.
+// Calling a library function with fewer than its defined number of 
+// arguments is supported by providing default constructed objects for 
+// any or all missing arguments starting from the rightmost.
+
+// CREATING LIBRARIES
+//
+// To create an Exodus program as a shared library (.so file) instead 
+// of a command line executable, include library.h instead of 
+// program.h.
 //
 // The libraryinit() macro creates a factory function to create an 
-// instance of the program in the shared library (.so file) at runtime. 
-// It also starts but leaves open a class definition inheriting from 
-// exo::ExoProgram that is to be completed by the Exodus programmer.
+// instance of the program in the shared library (.so file) at 
+// runtime. It also starts, but leaves open, a class definition 
+// inheriting from exo::ExoProgram.
+//
+// It is the Exodus programmer's task to complete the class by 
+// providing a function main(), any other functions or data members, 
+// then close it with a }; as follows:
 //
 // Example library (func1.cpp):
 //   #include <exodus/library.h>
@@ -44,11 +62,20 @@
 //       /*code*/
 //       return "";
 //   }
-//   /*sibling funcs and data*/
+//   /*optional sibling funcs and data*/
 //   };
+
+// USING LIBRARIES
 //
-// To use a library function, include its .h file and call it like a regular function. libraries .h files are generated automatically by exodus/cli/compile.
-// The .h file must be included after the programinit() line since it needs access to its parent's environment (ExoEnv).
+// To use a library function in any other Exodus program or library, 
+// include its .h file and call it like a regular function. 
+//
+// exodus/cli/compile automatically generates the necessary header file 
+// for every library.
+//
+// Note that the .h file must be included *after* the programinit() 
+// line because it must share the program’s environment with the 
+// library.
 //
 // Example program (prog1.cpp):
 //   #include <exodus/program.h>
@@ -60,103 +87,108 @@
 //   }
 //   /*sibling funcs and data*/
 //   };
-//
-// Each library function is a class, so its main() function can access other
-// member functions and data in the same class, just like a C++ object.
-// Multiple library functions can be defined in one file using libraryinit(xxx)
-// with a unique xxx for each, creating separate classes callable as functions.
-//
-// COMPARABLE CODE IN
-// program.h library.h
-// Both create C++ classes inherited from exo::ExoProgram, with a var main()
-// function, closed by };. Programs run as executables; libraries load dynamically.
 
-// Inline template to create and delete an ExoProgram class for dynamic loading.
+// RUNTIME
+//
+// Exodus libraries are dynamically loaded at runtime on first call to 
+// the function object.
+//
+// You can change which library a function loads at runtime, even 
+// after calling it. For example, if libraries l1, l2, and l3 have the 
+// same main() arguments, include l1.h, set l1 = "l2", and call l1() 
+// to load l2. Later, set l1 = "l3", and calling l1() will switch to 
+// l3, all without restarting. This enables you to reconfigure 
+// high-performance C++ applications on the fly.
+
+// See Also
+//
+// program.h library.h
+//
+// Both create C++ classes inherited from exo::ExoProgram, with a var 
+// main() function, closed by };. Programs run as executables; 
+// libraries load dynamically.
+
+// FACTORY FUNCTION
+///////////////////
+//
+// An inline template to create and delete an ExoProgram class for dynamic loading.
 //
 // PROBLEM: The factory function (exoprogram_createdelete_xxx) must 
 // create an ExoProgram object and get a member function pointer to its 
 // main() function. It cannot do so directly because the class is 
-// defined after the factory, so its type is unknown.
+// defined after the factory, so its type is incomplete.
 //
 // SOLUTION: We provide the following exoprogram_createdelete_impl() 
 // factory function. This function has known arguments so that 
-// exoprogram_createdelete_xxx may call it. This 
-// _impl() function is templated on a forward-declared ExoProgram type. 
-// That means that the compiler can defer instantiating it (fully 
+// exoprogram_createdelete_xxx may call it. This _impl() function is 
+// templated on a forward-declared ExoProgram type. That means that 
+// the compiler can defer instantiating the template (finally 
 // compiling it) until after the ExoProgram is fully defined.
 // TODO: Consider moving to exocallable.h for reuse.
 namespace exodus_detail {
-    template<typename T>
-    inline void exoprogram_createdelete_impl(exo::pExoProgram& pexoprogram, exo::ExoEnv& mv, exo::pExoProgram_MemberFunc& pmemberfunc) {
-        if (pexoprogram) {
-            delete pexoprogram;
-            pexoprogram = nullptr;
-            pmemberfunc = nullptr;
-        } else {
-            pexoprogram = new T(mv);
-            pmemberfunc = reinterpret_cast<exo::pExoProgram_MemberFunc>(&T::main);
-        }
-    }
+	template<typename T>
+	inline void exoprogram_createdelete_impl(
+		exo::pExoProgram& pexoprogram,
+		exo::ExoEnv& mv,
+		exo::pExoProgram_MemberFunc& pmemberfunc
+	) {
+		if (pexoprogram) {
+			delete pexoprogram;
+			pexoprogram = nullptr;
+			pmemberfunc = nullptr;
+		} else {
+			pexoprogram = new T(mv);
+			pmemberfunc = reinterpret_cast<exo::pExoProgram_MemberFunc>(&T::main);
+		}
+	}
 }
 
-//[[deprecated("Use }; instead of libraryexit()")]]
+// libraryexit() MACRO
+//////////////////////
+//
+// Deprecated: Use }; instead of libraryexit()
 #define libraryexit(UNUSED) };
 
+// libraryinit() MACRO
 //////////////////////
-// libraryinit() macro
-//////////////////////
-/*
- * 1. Define a factory function for an ExoProgram.
- * 2. Open *and leave open* the definition of the class.
- * Sections 3, 4 and 5 are identical in program.h nd library.h
- */
+//
+// 1. Define a factory function for an ExoProgram.
+// 2. Open *and leave open* the definition of the class.
+// Sections 3, 4, and 5 are identical in program.h and library.h
+//
 #define libraryinit(EXOPROGRAM_PREFIX)                                             \
-/*                                                                                 \
- * 1. Forward declare the ExoProgram-derived class being created                  \
- */                                                                                \
+                                                                                   \
+/* 1. Forward declare the ExoProgram-derived class being created */                \
 class EXOPROGRAM_PREFIX##_ExoProgram;                                              \
-/*                                                                                 \
- * 2. Define a factory function for dynamic loading                               \
- */                                                                                \
-/*ma("clang diagnostic push")*/                                                   \
-/*ma("clang diagnostic ignored \"-Wmissing-prototypes\"")*/                       \
+                                                                                   \
+/* 2. Define a factory function for dynamic loading              */                \
 extern "C" PUBLIC void exoprogram_createdelete_##EXOPROGRAM_PREFIX(                \
     exo::pExoProgram& pexoprogram, exo::ExoEnv& mv,                                \
     exo::pExoProgram_MemberFunc& pmemberfunc) {                                    \
     exodus_detail::exoprogram_createdelete_impl<EXOPROGRAM_PREFIX##_ExoProgram>(   \
         pexoprogram, mv, pmemberfunc);                                             \
 }                                                                                  \
-/*ma("clang diagnostic pop")*/                                                    \
-/*                                                                                 \
- * 3. Open the ExoProgram-derived class definition                                \
- */                                                                                \
-/*_Pragma("GCC diagnostic push")*/                                                     \
-/*_Pragma("clang diagnostic ignored \"-Wweak-vtables\"")*/                             \
-/*_Pragma("GCC diagnostic ignored \"-Winline\"")*/                                     \
+                                                                                   \
+/* 3. Open the ExoProgram-derived class definition               */                \
 class EXOPROGRAM_PREFIX##_ExoProgram : public exo::ExoProgram {                    \
-/*_Pragma("GCC diagnostic pop")                */                                      \
-/*                                                                                 \
- * 4. Inherit ExoProgram's constructor using an ExoEnv                            \
- */                                                                                \
+                                                                                   \
+/* 4. Inherit ExoProgram's constructor using an ExoEnv           */                \
 public:                                                                            \
-    /*_Pragma("clang diagnostic push")*/                                               \
-    /*_Pragma("clang diagnostic ignored \"-Wshadow-field\"")*/                         \
-    using ExoProgram::ExoProgram;                                                  \
-    /*_Pragma("clang diagnostic pop")*/                                                \
-/*                                                                                 \
- * User code follows, ending with }; to close the class                            \
- */                                                                                \
-/*                                                                                 \
- * 5. The class scope is left open - observe that there is no closin '};' closing. \
- */
-// 1. User code (including function main(){...}) MUST follow the above macro.
-// 2. MUST BE TERMINATED BY }; to close the above class scope. e.g.
+    using ExoProgram::ExoProgram;
+
+// User code follows, ending with }; to close the class
+
+// 5. The class scope is left open - observe that there is no closing '};' in the macro.
+//
+// a. User code (including function main(){...}) MUST follow the above macro.
+// b. MUST BE TERMINATED BY }; to close the above class scope. e.g.
 //
 // function main() {
 //     println("Hello World");
 //     return 0;
 // }
 //
-// }; // MANDATORY
+// }; // <- MANDATORY
 
 #endif // EXODUS_LIBEXODUS_EXODUS_LIBRARY_H_
+
