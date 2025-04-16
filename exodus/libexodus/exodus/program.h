@@ -60,8 +60,16 @@ namespace exodus_detail {
 	}
 }
 
+//[[deprecated("Use }; instead of programexit()")]]
+#define programexit(UNUSED) };
+
+//////////////////////
+// programinit() macro
+//////////////////////
 /*
- * A macro to instantiate and run an ExoProgram derived class on execution.
+ * 1. Instantiate and run an ExoProgram derived class on execution.
+ * 2. Open *and leave open* the definition of the class.
+ * Sections 3, 4 and 5 are identical in program.h nd library.h
  */
 #define programinit(EXOPROGRAM_PREFIX)                                             \
 /*                                                                                 \
@@ -71,9 +79,9 @@ class EXOPROGRAM_PREFIX##_ExoProgram;                                           
 /*                                                                                 \
  * 1. Define a threadsafe main2() function                                         \
  */                                                                                \
-_Pragma("GCC diagnostic push")                                                     \
-_Pragma("clang diagnostic ignored \"-Wshadow-field\"")                             \
-_Pragma("GCC diagnostic ignored \"-Winline\"")                                     \
+/*_Pragma("GCC diagnostic push")*/                                                     \
+/*_Pragma("clang diagnostic ignored \"-Wshadow-field\"")*/                             \
+/*_Pragma("GCC diagnostic ignored \"-Winline\"")*/                                     \
 static int EXOPROGRAM_PREFIX##main2(int exodus_argc, const char* exodus_argv[], int threadno) { \
     /* Create a block of environment variables for the exodus program */           \
     ExoEnv mv;                                                                     \
@@ -133,7 +141,7 @@ static int EXOPROGRAM_PREFIX##main2(int exodus_argc, const char* exodus_argv[], 
     }                                                                              \
     return exit_status;                                                            \
 } /* of xxxxxxxx_main2 */                                                          \
-_Pragma("GCC diagnostic pop")                                                      \
+/*_Pragma("GCC diagnostic pop")*/                                                      \
 /*                                                                                 \
  * 2. Define the standard int main() global namespace/free function entry point    \
  */                                                                                \
@@ -144,34 +152,33 @@ int EXOPROGRAM_PREFIX##main(int exodus_argc, const char* exodus_argv[]) {       
 /*                                                                                 \
  * 3. Open the ExoProgram derived class definition                                 \
  */                                                                                \
-_Pragma("GCC diagnostic push")                                                     \
-_Pragma("clang diagnostic ignored \"-Wweak-vtables\"")                             \
-_Pragma("GCC diagnostic ignored \"-Winline\"")                                     \
+/*_Pragma("GCC diagnostic push")*/                                                     \
+/*_Pragma("clang diagnostic ignored \"-Wweak-vtables\"")*/                             \
+/*_Pragma("GCC diagnostic ignored \"-Winline\"")*/                                     \
 class EXOPROGRAM_PREFIX##_ExoProgram : public exo::ExoProgram {                    \
-_Pragma("GCC diagnostic pop")                                                      \
+/*_Pragma("GCC diagnostic pop")*/                                                      \
 /*                                                                                 \
  * 4. Inherit ExoProgram's constructor using an ExoEnv                             \
  */                                                                                \
 public:                                                                            \
-    _Pragma("clang diagnostic push")                                               \
-    _Pragma("clang diagnostic ignored \"-Wshadow-field\"")                         \
+    /*_Pragma("clang diagnostic push")*/                                               \
+    /*_Pragma("clang diagnostic ignored \"-Wshadow-field\"")*/                         \
     using ExoProgram::ExoProgram;                                                  \
-    /*EXOPROGRAM_PREFIX##_ExoProgram(exo::ExoEnv& mv) : exo::ExoProgram(mv) {}*/   \
-    _Pragma("clang diagnostic pop")                                                \
+    /*_Pragma("clang diagnostic pop")*/                                                \
+/*                                                                                 \
+ * User code follows, ending with }; to close the class                            \
+ */                                                                                \
 /*                                                                                 \
  * 5. The class scope is left open - observe that there is no closin '};' closing. \
  */
-
-// User code follows programinit(). Must be terminated by };
-// to close the above class scope. e.g.
+// 1. User code (including function main(){...}) MUST follow the above macro.
+// 2. MUST BE TERMINATED BY }; to close the above class scope. e.g.
 //
 // function main() {
 //     println("Hello World");
 //     return 0;
 // }
 //
-// }; // programexit()
-
-#define programexit(UNUSED) };
+// }; // MANDATORY
 
 #endif // EXODUS_LIBEXODUS_EXODUS_PROGRAM_H_
