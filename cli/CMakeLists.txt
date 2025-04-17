@@ -20,7 +20,7 @@
 # ###############################
 #
 	cmake_policy(SET CMP0015 NEW)
-	include_directories(${EXODUS_DIR}/.. ${FMT_INCLUDE} ../fmt/include)
+	include_directories(${SRC_EXODUS_DIR}/.. ${FMT_INCLUDE} ../fmt/include)
 	link_directories(${EXODUS_DIR})
 
 #

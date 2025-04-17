@@ -614,7 +614,7 @@ function install_database {
 	# Already installed in b stage along main exodus
 	# but here only the postgresl extension is installed
 	#sudo cmake --install $EXODUS_DIR/build
-	sudo cmake --install $EXODUS_DIR/build/exodus/pgexodus/
+	sudo cmake --install $EXODUS_DIR/build/pgexodus/
 #
 #-- Install configuration: "RELEASE"
 #-- Up-to-date: /usr/lib/postgresql/16/lib/pgexodus.so
