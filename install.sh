@@ -653,9 +653,10 @@ function install_database {
 : Test the pgexodus postgresql extension
 : --------------------------------------
 :
-: Restart postgresql in case regression database is stuck
+#: Restart postgresql in case regression database is stuck
+#: Now done in cmake pgexodus_test
+#	sudo systemctl restart postgresql
 :
-	sudo systemctl start postgresql || true
 	cd $EXODUS_DIR/build/exodus/pgexodus && CTEST_OUTPUT_ON_FAILURE=1 ctest
 
 :

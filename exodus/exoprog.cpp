@@ -929,8 +929,8 @@ var ExoProgram::perform(in command_line) {
 			throw;
 		}
 
-		// Dont catch ExoLogoff in perform/execute. leave it for exoprog top level exit
-		//catch (const ExoLogoff& e)
+		// Dont catch Exo Logoff in perform/execute. leave it for exoprog top level exit
+		//catch (const Exo Logoff& e)
 		//{
 		//	// similar to stop for the time being
 		//	// maybe it should set some error flag/messages

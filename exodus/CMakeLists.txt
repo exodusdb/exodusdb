@@ -104,7 +104,7 @@
 # fast_float
 ############
 #
-	include_directories(. .. ../../../fast_float/include)
+	include_directories(. .. ../fast_float/include)
 
 ##
 ## fmt

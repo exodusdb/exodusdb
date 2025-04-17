@@ -459,25 +459,30 @@ add_definitions(-DGIT_REMOTE_COMMIT_HASH_SHORT="${GIT_REMOTE_COMMIT_HASH_SHORT}"
 # Subdirs/submodules
 # ##################
 
-    set(LIBEXODUS_DIR ../../exodus/libexodus/exodus)
-    set(EXODUS_CLI_DIR ../../cli/src)
-    set(EXODUS_TEST_DIR ../../test/src)
-    set(FASTFLOAT_DIR ../../fast_float)
+	# header only
+    set(FASTFLOAT_DIR fast_float)
 
 	message("")
-	add_subdirectory(exodus/libexodus/exodus)
+    set(EXODUS_DIR exodus)
+    set(SRC_EXODUS_DIR ${CMAKE_SOURCE_DIR}/${EXODUS_DIR})
+    message("SRC_EXODUS_DIR ${CMAKE_SOURCE_DIR}/${EXODUS_DIR}")
 	#target_compile_options(exodus PUBLIC -Wall)
+	add_subdirectory(exodus)
 
 	message("")
-	add_subdirectory(exodus/pgexodus)
 	#target_compile_options(pgexodus PUBLIC -Wall)
+	add_subdirectory(pgexodus)
 
 	message("")
-	add_subdirectory(cli/src)
+    set(CLI_DIR cli)
+    set(BIN_EXODUS_CLI_DIR ${CMAKE_BINARY_DIR}/${CLI_DIR})
 	#target_compile_options(nlist PUBLIC "-O2")
+	add_subdirectory(cli)
 
-	add_subdirectory(test/src)
+	message("")
+    set(TEST_DIR test)
 	#target_compile_options(test_Regress PUBLIC "-O2")
+	add_subdirectory(test)
 
 #
 # Exit

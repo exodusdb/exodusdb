@@ -1,5 +1,5 @@
 [submodule "exodus/pgexodus"]
-	path = exodus/pgexodus
+	path = pgexodus
 	url = https://github.com/exodusdb/pgexodus
 #	branch = master
 [submodule "fmt"]

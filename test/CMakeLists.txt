@@ -47,8 +47,8 @@
 # ###############################
 #
 	cmake_policy(SET CMP0015 NEW)
-	include_directories(${LIBEXODUS_DIR}/.. ${FAST_FLOAT_DIR}/include)
-	link_directories(${LIBEXODUS_DIR})
+	include_directories(${EXODUS_DIR}/.. ${FAST_FLOAT_DIR}/include)
+	link_directories(${EXODUS_DIR})
 
 #
 # Turn off optimisation since compile time of test_main currently becomes 60 seconds
@@ -61,7 +61,7 @@
 # Build test programs not like test_*.cpp
 # #######################################
 #
-	add_executable(testcommandline testcommandline.cpp ${LIBEXODUS_DIR}/var.h)
+	add_executable(testcommandline testcommandline.cpp ${SRC_EXODUS_DIR}/var.h)
 	target_link_libraries(testcommandline exodus ${PROJECT_LIBS})
 
     # lib #
@@ -73,7 +73,7 @@
 # Generate testing_var.h.cpp
 # ##########################
 #
-	add_executable(testing_var_h testing_var.h.cpp ${LIBEXODUS_DIR}/var.h ${LIBEXODUS_DIR}/dim.h ${LIBEXODUS_DIR}/exoprog.h)
+	add_executable(testing_var_h testing_var.h.cpp ${SRC_EXODUS_DIR}/var.h ${SRC_EXODUS_DIR}/dim.h ${SRC_EXODUS_DIR}/exoprog.h)
 	target_link_libraries(testing_var_h exodus ${PROJECT_LIBS})
 	if (EXO_MODULE)
 		target_link_libraries(testing_var_h
@@ -83,8 +83,8 @@
 
 	# Generate test/src/testing_var.h.cpp from var.h
 	add_custom_target(PreBuild_testing_var_h
-    	COMMAND test -x ${CMAKE_CURRENT_BINARY_DIR}/${EXODUS_CLI_DIR}/gendoc && ${CMAKE_CURRENT_BINARY_DIR}/${EXODUS_CLI_DIR}/gendoc ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/${LIBEXODUS_DIR}/var.h ${CMAKE_CURRENT_SOURCE_DIR}/${LIBEXODUS_DIR}/dim.h ${CMAKE_CURRENT_SOURCE_DIR}/${LIBEXODUS_DIR}/exoprog.h > /dev/null || echo Skipped first build because gendoc not built yet
-    	COMMENT "Running pre-build command gendoc to create or update test/src/testing_var.h.cpp"
+    	COMMAND test -x ${BIN_CLI_DIR}/gendoc && ${BIN_CLI_DIR}/gendoc ${CMAKE_SOURCE_DIR} ${SRC_EXODUS_DIR}/var.h ${SRC_EXODUS_DIR}/dim.h ${SRC_EXODUS_DIR}/exoprog.h > /dev/null || echo Skipped first build because gendoc not built yet
+    	COMMENT "Running pre-build command gendoc to create or update test/testing_var.h.cpp"
 	)
 
 	# Force regeneration of testing_var.h.cpp from var.h
@@ -98,7 +98,7 @@
 	set_tests_properties(
 		testing_var_h
 		PROPERTIES
-		ENVIRONMENT "EXO_LIBDIR=${CMAKE_CURRENT_BINARY_DIR}/${EXODUS_CLI_DIR}"
+		ENVIRONMENT "EXO_LIBDIR=${BIN_CLI_DIR}"
 		PASS_REGULAR_EXPRESSION "Test passed"
 		TIMEOUT 30
 	)
