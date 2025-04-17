@@ -178,7 +178,7 @@ function download_submodules {
 : -----------------------
 :
 	test -f $EXODUS_DIR/fmt/CMakeLists.txt
-	test -f $EXODUS_DIR/exodus/pgexodus/CMakeLists.txt
+	test -f $EXODUS_DIR/pgexodus/CMakeLists.txt
 }
 
 :
