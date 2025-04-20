@@ -1,0 +1,15 @@
+All the main directories are now directly under ~/dbexodus.
+exodusdb
+├── cli
+├── data        Belongs to test
+├── exodus      Was in libexodus
+├── fast_float 
+├── fmt
+├── pgexodus
+│   └── src
+├── pygment
+├── ryu         Used in u22.04 not u24.04+
+├── service
+│   ├── src
+│   └── www
+└── test
