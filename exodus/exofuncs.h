@@ -503,8 +503,8 @@ ND var  sort(in instring, SV delimiter = _FM );
 ND var  reverse(in instring, SV delimiter = _FM );
    IO   reverser(io iostring, SV delimiter = _FM );
 
-ND var  shuffle(in instring, SV delimiter = _FM );
-   IO   shuffler(io iostring, SV delimiter = _FM );
+ND var  randomize(in instring, SV delimiter = _FM );
+   IO   randomizer(io iostring, SV delimiter = _FM );
 
 ND var  parse(in instring, char sepchar = ' ');
    IO   parser(io instring, char sepchar = ' ');

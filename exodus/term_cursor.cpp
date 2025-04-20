@@ -104,8 +104,8 @@ bool getCursorPos(
     }
 
     // Success
-    x = col - 1;
-    y = row - 1;
+    x = col;
+    y = row;
     thread_error_count = 0;
     tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
     clock_gettime(CLOCK_MONOTONIC, &end);

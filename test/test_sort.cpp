@@ -150,15 +150,15 @@ func main() {
 		dim cardsx = cards1;
 
 		initrnd(123);
-		dim cards2 = cards1.shuffle();
+		dim cards2 = cards1.randomize();
 
 		initrnd(123);
-//		dim cardsy = cardsx.shuffler();
-		cardsx.shuffler();
+//		dim cardsy = cardsx.randomizer();
+		cardsx.randomizer();
 		dim cardsy = cardsx;
 
 		initrnd(1234);
-		dim cards3 = dim(cards1).shuffle();
+		dim cards3 = dim(cards1).randomize();
 
 		logputl();
 		TRACE(cards1.join())
@@ -181,14 +181,14 @@ func main() {
 		var cardsx = cards1;
 
 		initrnd(123);
-		var cards2 = cards1.shuffle(VM);
+		var cards2 = cards1.randomize(VM);
 
 		initrnd(123);
-		cardsx.shuffler(VM);
+		cardsx.randomizer(VM);
 		var cardsy = cardsx;
 
 		initrnd(1234);
-		var cards3 = cards1.shuffle(VM);
+		var cards3 = cards1.randomize(VM);
 
 		logputl();
 		TRACE(cards1)
@@ -211,14 +211,14 @@ func main() {
 		var cardsx = cards1;
 
 		initrnd(123);
-		var cards2 = shuffle(cards1, VM);
+		var cards2 = randomize(cards1, VM);
 
 		initrnd(123);
-		shuffler(cardsx, VM);
+		randomizer(cardsx, VM);
 		var cardsy = cardsx;
 
 		initrnd(1234);
-		var cards3 = shuffle(cards1, VM);
+		var cards3 = randomize(cards1, VM);
 
 		logputl();
 		TRACE(cards1)

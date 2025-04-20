@@ -362,8 +362,8 @@ export namespace exo {
 	using exo::setprecision;
 	using exo::getprecision;
 
-	using exo::shuffle;
-	using exo::shuffler;
+	using exo::randomize;
+	using exo::randomizer;
 
 	using exo::sin;
 

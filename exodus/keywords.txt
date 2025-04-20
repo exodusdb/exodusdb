@@ -45,7 +45,7 @@
 'replacer', 'reverse', 'reverse_range', 'reverser', 'rex', 'rnd', 
 'rollbacktrans', 'round', 'savelist', 'search', 'select', 'selectkeys', 
 'selectx', 'setlasterror', 'setprecision', 'setprompt', 'setxlocale', 
-'shuffle', 'shuffler', 'sin', 'sort', 'sorter', 'space', 'split', 'sqlexec', 
+'randomize', 'randomizer', 'sin', 'sort', 'sorter', 'space', 'split', 'sqlexec', 
 'sqrt', 'squote', 'squoter', 'starts', 'statustrans', 'str', 'substr', 
 'substr2', 'substr3', 'substrer', 'sum', 'sumall', 'swap', 'tan', 'tcase', 
 'tcaser', 'textchr', 'textchrname', 'textconvert', 'textconverter', 'textlen', 
@@ -59,7 +59,7 @@
 'writef', 'xlate', 
 
 'dim', '_dim', 'cols', 'dim', 'getelementref', 'init', 'join', 'operator', 
-'osread', 'oswrite', 'read', 'redim', 'reverser', 'rows', 'shuffler', 'sort', 
+'osread', 'oswrite', 'read', 'redim', 'reverser', 'rows', 'randomizer', 'sort', 
 'sorter', 'split', 'splitter', 'write', 
 
 'ExoProgram', '_ExoProgram', 'AT', 'ExoProgram', 'abort', 'abortall', 

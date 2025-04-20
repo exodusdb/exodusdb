@@ -382,9 +382,9 @@ void dim::reverser() {
 	return;
 }
 
-void dim::shuffler() {
+void dim::randomizer() {
 
-	THISIS("dim& dim::shuffler()")
+	THISIS("dim& dim::randomizer()")
 	if (!ncols_) UNLIKELY
 		throw DimUndimensioned(function_sig);
 
@@ -607,21 +607,21 @@ var  var::reverse(SV delimiter) const& {
 }
 
 ///////////////
-// var shuffler
+// var randomizer
 ///////////////
 
 // No speed or memory advantage since not shuffling in place
-// but provided for syntactical convenience avoiding need to assign output of shuffle()
-IO   var::shuffler(SV delimiter) REF {
-	*this = this->split(delimiter).shuffle().join(delimiter);
+// but provided for syntactical convenience avoiding need to assign output of randomize()
+IO   var::randomizer(SV delimiter) REF {
+	*this = this->split(delimiter).randomize().join(delimiter);
 	return THIS;
 }
 
 // No speed or memory advantage since not shuffling in place
-// but provided for syntactical convenience avoiding need to assign output of shuffle()
-var  var::shuffle(SV delimiter) const& {
+// but provided for syntactical convenience avoiding need to assign output of randomize()
+var  var::randomize(SV delimiter) const& {
 	auto _ = this->split(delimiter);
-	_.shuffler();
+	_.randomizer();
 	return _.join(delimiter);
 }
 

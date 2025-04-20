@@ -247,5 +247,5 @@
 746 dim& dim::splitter(in str1, SV delimiter)
 747 dim& dim::sorter(bool reverseorder)
 748 dim& dim::reverser()
-749 dim& dim::shuffler()
+749 dim& dim::randomizer()
     

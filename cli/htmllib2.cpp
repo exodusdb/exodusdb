@@ -1469,7 +1469,8 @@ function t2h_main(in inp) {
 		// Outbound line conversions
 		{
 			// Emphasise first words ending in :
-			line.replacer(R"__(^([\w_]+): ?)__"_rex, "<em>$1:</em> ");
+			// Accept \w _ . [ ]
+			line.replacer(R"__(^([\w_.\[\]]+): ?)__"_rex, "<em>$1:</em> ");
 		}
 
 		// Open a tag and output the line

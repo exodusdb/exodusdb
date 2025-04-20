@@ -477,7 +477,7 @@ func main() {
 				}
 
 				// Skip [[deprecated]] and [[undocumented]] functions
-				const static rex undocumented(R"__(\[\[(deprecated|undocumented))__");
+				const static rex undocumented(R"__((deprecated|undocumented))__", "i");
 				if (contiguous_comments.match(undocumented))
 					continue; // nextline
 
@@ -787,20 +787,21 @@ func main() {
 
 			} else {
 
-				// convert text to html
-				// Already converted early on
-				if (false) {
-					// html emphasise first word
-					const static rex first_word_if_colon_rex = R"__((^|\x1e)([a-zA-Z0-9_.]+):(\s*))__"_rex;
-					comments.replacer(first_word_if_colon_rex, "\x1e<em>$2:</em>$3");
-
-					// Replace all [not FM]+ FM with <p>[not FM]+</p>\n
-					const static rex field_rex {R"__([^\x1e]+\x1e)__"};
-					comments.replacer(field_rex, "<p>$&</p>\n");
-
-					// dynamic array -> text format
-					comments.converter(_FM, _NL);
-				}
+//				// convert text to html
+//				// Already converted early on
+//				if (false) {
+//					// html emphasise first word. Allow aaaAAA09_.[out]:
+//					const static rex first_word_if_colon_rex = R"__((^|\x1e)([a-zA-Z0-9_.\[\]]+):(\s*))__"_rex;
+//					comments.replacer(first_word_if_colon_rex, "\x1e<em>$2:</em>$3");
+//
+//					// Wrap lines in <p></p>
+//					// Replace all [not FM]+ FM with <p>[not FM]+</p>\n
+//					const static rex field_rex {R"__([^\x1e]+\x1e)__"};
+//					comments.replacer(field_rex, "<p>$&</p>\n");
+//
+//					// dynamic array -> text format
+//					comments.converter(_FM, _NL);
+//				}
 			}
 
 			// Clean up function args
@@ -1059,16 +1060,6 @@ func main() {
 
 			}
 
-//			// bold the function name
-//			if (man) {}
-//			else if (wiki) {
-//				line2.prefixer("<em>");
-//				line2.paster(line2.index("("), "</em>");
-//			} else {
-//				line2.prefixer("<span class='gendoc_function'>");
-//				line2.paster(line2.index("("), "</span>");
-//			}
-
 			if (funcx_prefix == "cmd" or funcx_prefix == "cmd2")
 				funcx_prefix = "";
 
@@ -1119,13 +1110,15 @@ func main() {
 				docfile << "|-" << std::endl;
 				docfile << "|" << funcx_prefix << "||" << func_decl << "||" << comments << std::endl;
 			} else {
-				// Using javascript see below too
-				docfile << "<tr><td>" << funcx_prefix << "</td><td>" << func_decl <<  "</td><td>" << comments << "</td></tr>" << std::endl;
-			}
 
-// format() slows compilation a lot for one off compilations (2.8/0.73 secs i.e x4)
-// so maybe wait for a modules version of fmt library
-//			println("|" "{}" "||" "<em>" "{}" "</em>" "." "{}" "||" "{}", funcx_prefix, objname, line2, comments);
+				// Finally its a three column row
+				docfile
+					<< "<tr>"
+					<< "<td><p><code>" << funcx_prefix << "</code></p></td>"
+					<< "<td><p><code>" << func_decl    << "</code></p></td>"
+					<< "<td>"          << comments     << "</td>"
+					<< "</tr>" << std::endl;
+			}
 
 		} // srcline
 
@@ -1143,35 +1136,6 @@ func main() {
 
 			if (not osremove(docfilename))
 				loglasterror();
-
-			if (man) {
-
-				// All done in h2ml
-
-//				// man page formatting at the end
-//
-//				// Escape back slashes for man pages comments
-//				doc_body.replacer("&bsol;", _BS);
-//				doc_body.replacer(_BS, _BS _BS);
-//
-//				// but man pages require some real BS in macros
-//				doc_body.replacer("<REAL_BS>", _BS);
-//
-//				// Emphasise/highlight leading words xxxxxxx:
-//				doc_body.replacer(R"__(^([a-zA-Z0-9_."]+):(\s+))__"_rex, R"__(\fB$1:\fR$2)__");
-//
-//				// Man page codes
-//				// .RS Right Fhift
-//				// .nf No Format
-//				// .RE REturn (left shift)
-//				// .fi Formatting
-//				doc_body.replacer(R"__(^<pre>)__"_rex, ".nf");
-//				doc_body.replacer(R"__(^</pre>)__"_rex, ".fi");
-
-			} else {
-				// Done above. Too late here since <p> added already
-//				doc_body.replacer(R"__(^([a-zA-Z0-9_.]+):(\s*))__"_rex, "<em>$1:</em>$2");
-			}
 
 			// Close prior table
 			if (in_table) {
@@ -1416,59 +1380,95 @@ R"__(
 
 <style>
 
-body {
-	margin: 10px;
+:root {
+    --bs-font-monospace: SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
 }
+	body {
+		margin: 10px;
+	    font-size: 1rem;
+	    font-weight: 400;
+		font-family: system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue","Noto Sans","Liberation Sans",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
+		line-height: 1.5;
+	}
 
-pre {
-	margin: 0px;
-	white-space: pre-wrap;
-	word-wrap: break-word;
-	white-space: -moz-pre-wrap;
-	white-space: -pre-wrap;
-	white-space: -o-pre-wrap;
-	overflow-wrap: break-word;
-	overflow-x: auto;
-}
+	pre {
+		margin: 0px;
+		white-space: pre;
+		overflow-x: auto;
+		max-width: none;
+		width: auto;
+	}
 
-table, th, td {
-	border: 1px solid #a2a9b1;
-}
+	table, th, td {
+		border: 1px solid #a2a9b1;
+	}
 
-th {
-	background-color: #eaecf0;
-	font-weight: bold;
-	text-align: left;
-	padding: 8px;
-}
+	th {
+		background-color: #eaecf0;
+		font-weight: bold;
+		text-align: left;
+		padding: 8px;
+	}
 
-td {
-	padding: 0.2em 0.4em;
-	vertical-align: top;
-}
+	td {
+		padding: 0 0.5em 0 0.7em;
+		vertical-align: top;
+	}
 
-p {
-  margin: 0.4em 0 0.5em 0;
-}
+	.toc, .toccolours {
+		border: 1px solid #a2a9b1;
+		background-color: #f8f9fa;
+		padding: 5px;
+		font-size: 95%;
+	}
 
-.toc, .toccolours {
-	border: 1px solid #a2a9b1;
-	background-color: #f8f9fa;
-	padding: 5px;
-	font-size: 95%;
-}
-.toc {
-	display: table;
-	padding: 7px;
-}
+	.toc {
+		display: table;
+		padding: 7px;
+	}
 
-.wikitable {
-	background-color: #f8f9fa;
-	color: #202122;
-	margin: 1em 0;
-	border: 1px solid #a2a9b1;
-	border-collapse: collapse;
-}
+	.wikitable {
+		background-color: #f8f9fa;
+		color: #202122;
+		margin: 1em 0;
+		border: 1px solid #a2a9b1;
+		border-collapse: collapse;
+	}
+
+	p {
+		max-width: 50ch;
+		margin: 0.4em 0 0.5em 0;
+	}
+
+	/* paras starting em/em get indented*/
+	p:has(> em:first-child) {
+		padding-left: 68px;
+		border-top: 1px dashed grey;
+		/*border-bottom: 1px dashed grey;*/
+	}
+
+	/* first line of description is the title.*/
+	/* Exclude p with anything in it like em/em */
+	td:nth-child(3) p:first-child:not(:has(*)) {
+		font-weight: 500;
+	}
+
+	/* We only use em/em for leading words (arguments) */
+	em {
+	    display: inline-block;
+	    min-width: 64px; /* Fill the undone indent approximately */
+	    margin-left: -68px; /* Undo indent for the box */
+	}
+
+	/* Style em like code*/
+	code, em {
+		color:inherit; /* ignore styling from mediawiki/bootstrap etc.*/
+		font-family: var(--bs-font-monospace);
+		font-style: normal;
+		/*font-size: smaller;*/
+		font-weight: normal;
+	}
+
 	img {
 		border: 0;
 		vertical-align: middle
@@ -1481,7 +1481,7 @@ p {
 		margin: 0.2em 0
 	}
 
-	h1,h2,h3,h4,h5,h6 {
+	h1, h2, h3, h4, h5, h6 {
 		color: #000;
 		margin: 0;
 		padding-top: 0.5em;
@@ -1489,12 +1489,12 @@ p {
 		overflow: hidden
 	}
 
-	h1,h2 {
+	h1, h2 {
 		margin-bottom: 0.6em;
 		border-bottom: 1px solid #a2a9b1
 	}
 
-	h3,h4,h5 {
+	h3, h4, h5 {
 		margin-bottom: 0.3em
 	}
 
@@ -1538,8 +1538,6 @@ p {
 	}
 
 	ol {
-		/*margin: 0.3em 0 0 3.2em;
-		padding: 0;*/
 		list-style-image: none
 	}
 
@@ -1547,37 +1545,45 @@ p {
 		margin-bottom: 0.1em
 	}
 
-dl {
-  display: grid;
-  grid-template-columns: minmax(auto, max-content) 1fr; /* Left: expands to fit content, Right: remaining space */
-  /*gap: 10px;*/ /* Space between rows and columns */
-  /*max-width: 600px;*/ /* Matches your image */
-  /*font-family: monospace;*/ /* Matches your image */
-  overflow: hidden; /* Clears floats for the dl container */
-}
-dt, dd {
-  /*padding: 5px;*/
-  margin: 0;
-  box-sizing: border-box;
-  border-bottom: 1px dashed grey; /* Matches your image */
-}
+	dl {
+		display: grid;
+		grid-template-columns: minmax(auto, max-content) 1fr; /* Left: expands to fit content, Right: remaining space */
+		/*gap: 10px;*/ /* Space between rows and columns */
+		overflow: hidden; /* Clears floats for the dl container */
+		/*align-items: baseline;*/ /* Align grid items by baseline */
+    	align-items: stretch; /* Change from baseline to stretch to ensure equal heights */
+        max-width: 50ch;
+	}
 
-dt {
-  grid-column: 1; /* Left column */
-  font-weight: bold; /* Matches your image */
-  padding-right: 5px;
-  font-family: monospace; /* Matches your image */
-}
+	dt, dd {
+		margin: 0;
+		box-sizing: border-box;
+		border-bottom: 1px dashed grey;
+		line-height: 1.5; /* Consistent line height */
+		vertical-align: baseline; /* Ensure text aligns on baseline */
+	}
 
-dd {
-  grid-column: 2; /* Right column */
-  margin-left:1em;
-}
+	dt {
+		grid-column: 1; /* Left column */
+		padding-right: 5px;
+//		text-align: center;
+		font-weight: bold;
+		font-family: var(--bs-font-monospace);
+		white-space: pre-wrap;
+	/*	font-size: 95%;*
+	/*	padding-top: 0.15em;*/ /* Nudge dt text baseline down to match dd */
+	}
 
-.gendoc_function {
-	color: #800;
-	font-weight: 700;
-}
+	dd {
+		grid-column: 2; /* Right column */
+		margin-left:1em;
+	}
+
+
+	.gendoc_function {
+		color: #800;
+		font-weight: 700;
+	}
 
 </style>
 )__";

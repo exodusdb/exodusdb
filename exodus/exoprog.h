@@ -62,7 +62,7 @@ class PUBLIC ExoProgram {
 	// A cache of Callables dict functions
 	std::map<std::string, Callable*> cached_dict_functions;
 
-	// A callable used in ExoProgram::perform to call libraries WITH NO ARGUMENTS
+	// A callable used in ExoProgram::perform and ExoProgram::execute to call libraries WITH NO ARGUMENTS
 	mutable Callable perform_callable_;
 
  public:
@@ -141,7 +141,7 @@ class PUBLIC ExoProgram {
 	// Create an active select list using a natural language sort/select command.
 	// This and all the following exoprog member functions work on an environment variable CURSOR.
 	// Identical functions are available directly on plain var objects but vars have less functionality regarding dictionaries and environment variables which are built-in to exoprog.
-	// Returns: True if an active select list was created, false otherwise.
+	// return: True if an active select list was created, false otherwise.
 	// In the following examples, various environment variables like RECORD, ID and MV are used instead of declaring and using named vars. In actual code, either may be freely used.
 	//
 	// `select("xo_clients by name by type with type 'A' 'B' and with balance between 0 and 2000");
@@ -150,7 +150,7 @@ class PUBLIC ExoProgram {
 	bool select(in sortselectclause_or_filehandle = "");
 	// TODO make ND?
 
-	// Create an active select list from some given keys.
+	// Create an active select list from a dynamic array of keys.
 	//
 	// `selectkeys("SB001^JB001^JB002"_var);
 	//  if (readnext(ID)) ... ok // ID -> "SB001"`
@@ -164,8 +164,8 @@ class PUBLIC ExoProgram {
 ND	bool hasnext();
 
 	// Get the next key from an active select list.
-	// key: [out] A string. Typically the key of a db file record.
-	// Returns: True if an active select list was available and the next key in the list was obtained.
+	// key[out]: A string. Typically the key of a db file record.
+	// return: True if an active select list was available and the next key in the list was obtained.
 	//
 	// `selectkeys("SB001^JB001^JB002"_var);
 	//  if (readnext(ID)) ... ok // ID -> "SB001"`
@@ -173,9 +173,9 @@ ND	bool hasnext();
 	bool readnext(out key);
 
 	// Get the next key and value number pair from an active select list.
-	// key: [out] A string. Typically the key of a db file record.
-	// valueno: [out] Is only available in select lists that have been created by sort/select commands that refer to multi-valued db dictionary fields where db records have multiple values for a specific field. In this case, a record key will appear multiple times in the select list since each multivalue is exploded for the purpose of sorting and selecting. This can be viewed as a process of "normalising" multivalues so they appear as multiple records instead of being held in a single record.
-	// Returns: True if an active select list was available and the next key in the list was obtained.
+	// key[out]: A string. Typically the key of a db file record.
+	// valueno[out]: Is only available in select lists that have been created by sort/select commands that refer to multi-valued db dictionary fields where db records have multiple values for a specific field. In this case, a record key will appear multiple times in the select list since each multivalue is exploded for the purpose of sorting and selecting. This can be viewed as a process of "normalising" multivalues so they appear as multiple records instead of being held in a single record.
+	// return: True if an active select list was available and the next key in the list was obtained.
 	//
 	// `selectkeys("SB001]2^SB001]1^JB001]2"_var);
 	//  if (readnext(ID, MV)) ... ok // ID -> "SB001" // MV -> 2`
@@ -183,10 +183,10 @@ ND	bool hasnext();
 	bool readnext(out key, out valueno);
 
 	// Get the next record, key and value no from an active select list.
-	// record: [out] Is only available in select lists that have been created with the final (R) option. Otherwise the record will be returned as an empty string and must be obtained using a db read() function.
-	// key: [out] A string. Typically the key of a db file record.
-	// valueno: [out] Is only available in select lists that have been created by sort/select commands that refer to multi-valued db dictionary fields where db records have multiple values for a specific field.
-	// Returns: True if an active select list was available and the next key in the list was obtained.
+	// record[out]: Is only available in select lists that have been created with the final (R) option. Otherwise the record will be returned as an empty string and must be obtained using a db read() function.
+	// key[out]: A string. Typically the key of a db file record.
+	// valueno[out]: Is only available in select lists that have been created by sort/select commands that refer to multi-valued db dictionary fields where db records have multiple values for a specific field.
+	// return: True if an active select list was available and the next key in the list was obtained.
 	//
 	// `select("xo_clients by name (R)");
 	//  if (readnext(RECORD, ID, MV)) ... ok;
@@ -194,9 +194,10 @@ ND	bool hasnext();
 	//
 	bool readnext(out record, out key, out valueno);
 
-	// Saves a pointer to the currently active select list.
-	// This allows another select list to be activated and used temporarily before the original select list is reactivated.
-	// cursor: [out] A var that can be passed later on to the popselect() function to reactivate the saved list.
+	// Get a reference to the currently active select list and suspend it.
+	// Allow another select list to be activated and used temporarily before the original select list is reactivated.
+	// Multiple levels of pushselect/popselect can be used.
+	// cursor[out]: A var that can be passed later on to the popselect() function to reactivate the saved list.
 	//
 	// `select("xo_clients by name");
 	//  var saved_xo_clients_cursor;
@@ -209,7 +210,7 @@ ND	bool hasnext();
 	void pushselect(out cursor);
 	// TODO what happens if no list is active?
 
-	// Re-establish an active select list saved by pushselect().
+	// Re-activate a select list using a reference provided by pushselect().
 	// cursor: A var created by the pushselect() function.
 	// See pushselect() for more info.
 	void popselect(in cursor);
@@ -222,8 +223,8 @@ ND	bool hasnext();
 	//
 	void clearselect();
 
-	// Use an active select list to delete db records.
-	// Returns: False if any records could not be deleted.
+	// Delete multiple DB records using an active select list.
+	// return: False if any records could not be deleted.
 	// Contrast this function with the two argument "deleterecord(file, key)" function that deletes a single record.
 	//
 	// `if (select("xo_clients with type 'Q' and with balance between 0 and 100")) {
@@ -232,7 +233,7 @@ ND	bool hasnext();
 	//
 	bool deleterecord(in filename);
 
-	// Delete a single database file record.
+	// Delete a single DB record.
 	//
 	// `let file = "xo_clients", key = "QQ001";
 	//  write("" on file, key);
@@ -243,10 +244,10 @@ ND	bool hasnext();
 	//
 	ND bool deleterecord(in dbfile, in key);
 
-	// Save a currently active select list under a given name.
+	// Save the current active select list under a given name.
+	// Select lists are saved in the DB file "lists". They are accessible to any Exodus process and remain until specifically deleted.
 	// After saving, the list is no longer active and hasnext() will return false.
-	// Returns: True if an active select list was saved, false if there was no active select list.
-	// Lists are saved as a record in the "lists" file.
+	// return: True if an active select list was saved, false if there was no active select list.
 	//
 	// `selectkeys("SB001^SB002"_var);
 	//  if (not savelist("my_list")) ...`
@@ -254,9 +255,9 @@ ND	bool hasnext();
 	bool savelist(SV listname);
 	// TODO make it ND? void?
 
-	// Reactivate a saved select list of a given name.
-	// A saved list is obtained from the "lists" file and activated.
-	// Returns: True if an active select list was successfully reactivated, otherwise false.
+	// Create an active select list using a saved select list of a given name.
+	// A saved list is obtained from the "lists" file and activated. The list remains in the lists file for multiple use.
+	// return: True if an active select list was successfully reactivated, otherwise false.
 	//
 	// `if (not getlist("my_list")) ...`
 	//
@@ -280,29 +281,36 @@ ND	bool hasnext();
 	///// Perform/Execute:
 	//////////////////////
 
-	// Run an exodus program/library's main function using a command like syntax similar to that of os executable programs.
+	// Run an Exodus program/library.
+	// Creates a new instance of an Exodus program library function object and calls its main() function using a command-like syntax, similar to that of running an OS executable program, and passes its arguments through the COMMAND and OPTIONS variables.
+	// A performed program/library's main function should have no arguments otherwise they appear unassigned and a segfault or core dump may occur.
+	// The Exodus program class member variables of a performed or executed program/library are all, as might be expected, initially unassigned unless specifically initialised inline. Note that this is not the same as calling a program library function (using function call syntax and round brackets funcx()), where the program/library/function's member variables are initially unassigned but retain their state between calls.
 	// command_line: Used to initialise the COMMAND, SENTENCE and OPTIONS environment variables of the performed exodus program/library. Analogous to passing function arguments. The first word of command_line is used as the name of the program/library to be loaded and run.
-	// The program/library's main function should have zero arguments. Performing a program/library function with main arguments results in them being unassigned and in some case core dump may occur.
-	// Returns: Whatever var the program/library returns, or "" if it calls stop() or abort((). The return value can be ignored and discarded without any compiler warning.
-	// The following environment variables are initialised on entry to the main function of the program/library and are preserved untouched in the calling program.
-	// RECUR0, RECUR1, RECUR2, RECUR3, RECUR4 to "".
-	// ID, RECORD, MV, DICT initialised to "".
-	// LEVEL is incremented by one.
-	// All other environment variables are shared between the caller and callee. There is essentially only one environment in any one process or thread.
-	// Any active select list in CURSOR is passed to the performed program/library and can be consumed by it. Conversely any active select list created by the performed program/library will be returned to the calling program. In other words, both the performing and the performed programs/libraries share a single active select list environment. This is different from execute() which gets its own private active select list, initially inactive.
-	// Exodus program/libraries may also be called directly using conventional function calling syntax. To call an exodus program/library called progname using either the syntax "call progname(args...);" or "var v1 = progname(args...);" you must "#include <progname.h>" after the "programinit()" or "libraryinit()" lines in your program/library.
+	// return: Whatever the program returns from main() or passes as an argument to stop(). If the program terminates abnormally then it will return "" and lasterror() will contain some error message. The return value may be ignored so there is no need so wrap perform statements in if clauses to avoid compiler warnings.
+	// throw: All the various runtime errors based on VarError e.g. VarUnassigned.
+	// environment: The following environment variables are initialised on entry to the main function of the program/library and are preserved untouched (actually restored) in the calling program.
+	// * COMMAND, OPTIONS, SENTENCE.
+	// * RECUR0, RECUR1, RECUR2, RECUR3, RECUR4 to "".
+	// * ID, RECORD, MV, DICT initialised to "".
+	// * LEVEL is incremented by one.
+	// * All other environment variables are shared between the caller and callee. There is essentially only one environment in any one process or thread.
+	// * CURSOR Any active select list in CURSOR is passed to the performed program/library and can be consumed by it. Conversely any active select list created by the performed program/library will be returned to the calling program. In other words, both the performing and the performed programs/libraries share a single active select list environment. This is different from execute() where the executed program/library gets its own private active select list, initially inactive.
+	// Exodus program/library/functions may also be called directly using conventional function calling syntax. To call an exodus program/library called progname using either the syntax "call progname(args...);" or "var v1 = progname(args...);" you must "#include <progname.h>" after the "programinit()" or "libraryinit()" lines in your program/library. See library.h for more info.
 	var  perform(in command_line);
 
-	// Run an exodus program/library's main function.
+	// Run an exodus program/library.
 	// Identical to perform() but any currently active select list in the calling program/library is not accessible to the executed program/library and is preserved in the calling [program as is. Any select list created by the executed library is discarded when it terminates.
 	var  execute(in command_line);
 
 	// Close the current program and perform another one.
-	// Identical to perform() except that the current program closes first.
+	// Similar to perform() except that the current program closes first and all environment variables carry forward unchanged.
 	[[noreturn]]
 	void chain(in command_line);
 
-	// Check if a lib exists to be performed/executed or called. Currently it does not check if it is actually loadable.
+	// Check if a lib exists.
+	// Can be checked before perform/execute to avoid errors.
+	// Currently it does not check if the library is actually loadable.
+	// return: osfile info.
 	var  libinfo(in libname);
 
 	///////////////////////////
@@ -311,9 +319,9 @@ ND	bool hasnext();
 
 	// Stop the current exodus program/library normally.
 	// Either return to the performing or executing parent exodus program/library, or exit to the OS if none.
-	// message: Optional. If exiting to the OS then it will be output to stdout or, if numeric, used as the exit status.
+	// result: Optional. It will be used as the return value of a parent program's perform() or execute() function, or if none, and therefore returning to the OS, it will be output to stdout if non-numeric or, if numeric, used as the exit status.
 	[[noreturn]]
-	void stop(in message = "") const;
+	void stop(in result = "") const;
 
 	// Abort the current exodus program/library.
 	// Similar to stop but if exiting to the OS then the default exit status is 1.
@@ -335,14 +343,22 @@ ND	bool hasnext();
 	///// db file dictionaries:
 	///////////////////////////
 
-	// Given a dictid reads a dictrec from the current DICT file (using readc()) and then either extracts a specific field number from the current RECORD/ID/MV environment variables or calls a dict function library to calculate the result.
+	// Get DB record field values given field name only.
+	// Use a dictionary file that contains info sufficient to either extract or calculate the required value.
+	// 1. Read fieldinfo from the current DICT file using readc() for caching.
+	// 2. Use the fieldinfo to:
+	//   * Either extract a specific field number from the current RECORD/ID/MV environment variables.
+	//   * Or call a dictionary function library to calculate the result.
 ND	var  calculate(in dictid);
 
-	// Given dictid, dictfile, record, id and mv, reads a dictrec from dictfile (using readc()) and then either extracts a specific field number from the given record/id/mv or calls a dict function library to calculate the result.
+	// Get DB record field values given name and data.
+	// Same as the one argument version of calculate() but RECORD/ID/MV are provided as arguments instead of being hard coded.
 ND	var  calculate(in dictid, in dictfile, in id, in record, in mv = 0);
 
-	// Reads a record from the specified file and key (using readc()) and then either extracts a specific field number or calls calculate(dictid...) to obtain the result.
-	// filename: Which file to read.
+	// Read DB field using field number or name.
+	// 1. Read a record from a given file and key using readc() for caching.
+	// 2. Extracts the given field number or calls calculate(dictid...) if non-numeric.
+	// filename: The file to read.
 	// key: The key of the record to read.
 	//
 	// fieldno_or_name: The field  to return.
@@ -362,8 +378,8 @@ ND	var  xlate(in filename, in key, in fieldno_or_name, const char* mode);
 	///// i/o conversion:
 	/////////////////////
 
-	// iconv/oconv with access to exoprogram's environment variables.
-	// exoprog's iconv/oconv have the ability to call custom functions like "[funname,args...]"
+	// iconv/oconv "[...]"
+	// ExoProgram's iconv/oconv functions have access to ExoProgram's environment variables like BASEFMT, DATEFMT and TZ and have the ability to call custom functions like "[funname,args...]"
 	//
 	// [NUMBER]  // built-in. See doc below.
 	// [DATE]    // built-in. See doc below.
@@ -380,12 +396,13 @@ ND	var  iconv(in input, in conversion);
 	///// ioconv date/time :
 	////////////////////////
 
+	// iconv/oconv "[DATE]"
 	// Use iconv/oconv code "[DATE,args]" when you want date conversion to depend on the environment variable DATEFMT, particularly its American/International setting. Otherwise use ordinary "D" conversion codes directly for slightly greater performance.
 	//
 	// var: [oconv] An internal date (a number).
-	// Returns: [oconv] A readable date in text format depending on "[DATE,args]" e.g. "31 DEC 2020" "31/12/2020" "12/31/2020"
+	// return: [oconv] A readable date in text format depending on "[DATE,args]" e.g. "31 DEC 2020" "31/12/2020" "12/31/2020"
 	// var: [iconv] A date in text format as above.
-	// Returns: [iconv] An internal date (a number) or "" if the input could not be understood as a valid date.
+	// return: [iconv] An internal date (a number) or "" if the input could not be understood as a valid date.
 	// args: If args is empty then DATEFMT is used as the conversion code. If args starts with "D" then args is used as the conversion codes but any E option in DATEFMT is appended. If args does not start with "D" then args are appended to DATEFMT, a "Z" option is appended, and the result used as the conversion code. A "*" option is equivalent to a second "Z" option.
 	// If you are calling iconv/oconv in code and DATEFMT is adequate for your needs then pass it directly as a function argument e.g. 'var v1 = iconv|oconv(v2, DATEFORMAT);' instead of indirectly like 'var v1 = iconv|oconv(v2, "[DATE]");'.
 	//
@@ -398,11 +415,12 @@ ND	var  iconv(in input, in conversion);
 	//
 	var  exoprog_date(in type, in input0, in ndecs0, out output);
 
+	// iconv/oconv "[NUMBER]"
 	// Use iconv/oconv "[NUMBER,args]" either when your numbers have currency or unit code suffixes or when you want number conversion to depend on the environment variable BASEFMT to determine thousands separator and decimal point. Otherwise use ordinary "MD" conversion codes directly for slightly greater performance.
 	// Formatting for numbers with optional currency code/unit suffix and is sensitive to the International or European setting in BASEFMT regarding use of commas or dots for thousands separators and decimal points.
 	// Primarily used for oconv() but can be used in reverse for iconv.
 	// var: A number with an optional currency code or unit suffix. e.g. "12345.67USD"
-	// Returns: A formatted number with thousands separated conventionally e.g. "12.345.67USD".
+	// return: A formatted number with thousands separated conventionally e.g. "12.345.67USD".
 	// iconv/oconv("[NUMBER]")      oconv leaves ndecimals untouched as in the input. iconv see below.
 	// iconv/oconv("[NUMBER,2]")    Specified number of decimal places
 	// iconv/oconv("[NUMBER,BASE]") Decimal places as per BASEFMT
@@ -452,10 +470,11 @@ ND	var  iconv(in input, in conversion);
 
 public:
 
+	// Parse amount+currency code string.
 	// Split amount+currency code/unit string into number and currency code/unit.
 	// var: "123.45USD"
-	// Returns: e.g. "123.45"
-	// unitx: [out] e.g. "USD"
+	// return: e.g. "123.45"
+	// unitx[out]: e.g. "USD"
 	var  amountunit(in input0, out unitx);
 ND	var  amountunit(in input0);
 
@@ -463,26 +482,30 @@ ND	var  amountunit(in input0);
 	///// Time/date utilities:
 	//////////////////////////
 
-	// Returns: Text of date and time in users time zone
+	// Get text of date and time.
+	// In users time zone
 	// e.g. "2MAR2025 11:52AM"
 	// Offset from UTC by TZ seconds.
 ND	var  timedate2();
 
-	// Returns: User, server and UTC date and time
+	// Get current user, server and UTC dates and times.
 	// User date and time is determined by adding the environment variable TZ.f(1)'s TZ offset (in seconds) to UTC date/time obtained from the operating system.
 	// "system" date and time is normally the same as UTC date/time and is determined by adding the environment variable TZ.f(2)'s TZ offset (in seconds) to UTC date/time obtained from the operating system.
 	//
 	void  getdatetime(out user_date, out user_time, out system_date, out system_time, out UTC_date, out UTC_time);
 
-	// Get text of elapsed time since environment variable TIMESTAMP was initialised with ostimestamp() at program/thread startup.
+	// Get text of elapsed time.
+	// Since environment variable TIMESTAMP.
+	// TIMESTAMP is initialised with ostimestamp() at program/thread startup.
 	// TIMESTAMP can be updated using ostimestamp() as and when desired.
 	//
 	// `var v1 = elapsedtimetext(); // e.g. "< 1ms"`
 	//
 ND	var  elapsedtimetext() const;
 
-	// Get text of elapsed time between two timestamps
-	// Caution. Use ostimestamps not ostimes. One is in days and the other is in seconds.
+	// Get text of elapsed time.
+	// Between two given timestamps
+	// Warning: Use ostimestamp() not ostime(). The first is in days and the second is in seconds.
 	//
 	// `let v1 = elapsedtimetext(0, 0.55);  // "13 hours, 12 mins"
 	//  let v2 = elapsedtimetext(0, 0.001); // "1 min, 26 secs"`
@@ -493,7 +516,8 @@ ND	var  elapsedtimetext(in timestamp1, in timestamp2) const;
 	///// Terminal i/o utilities:
 	/////////////////////////////
 
-	// If stdin is a terminal, output a message to stdout and optionally pause processing and request a response from the user, otherwise set the response to "" and continue.
+	// Output a message to stdout and optionally request input.
+	// If input is requested but stdin is not a terminal then set the response to "" and continue.
 	// options: R = Response requested. C upper case response.
 	//
 	// `var response;
@@ -501,45 +525,52 @@ ND	var  elapsedtimetext(in timestamp1, in timestamp2) const;
 	//
 	void note(in msg, in options, io response) const;
 
-	// Output a message to stdin and continue.
+	// Output a message to stdout.
 	//
 	// `call note("Hello world.");`
 	//
 	void note(in msg) const;
 
-	// If stdin is a terminal, pause processing, list some given options to stdout and request the user to make a choice, otherwise set the response to "" and continue.
-	// Returns: The chosen option (value not number) or "" if the user cancelled.
+	// Input user selection from a list of options.
+	// If stdin is not a terminal, set the response to "" and continue.
+	// return: The chosen option (value not number) or "" if the user cancelled.
 ND	var  decide(in question, in options = "") const;
 
-	// Same as decide() above but extended.
+	// Input user selection from a list of options.
+	// If stdin is not a terminal set the response to the default value, or "" if none, and continue.
 	// defaultreply: A default option if the user presses Enter.
-	// reply: [out] The option number that the user chose or "" if they cancelled.
+	// reply[out]: The option number that the user chose or "" if they cancelled.
+	// return: The chosen option (value not number) or "" if the user cancelled.
 	var  decide(in question, in options, out reply, const int defaultreply = 1) const;
 
+	// Check for user pause or cancel.
 	// If stdin is a terminal, check if a key has been pressed and, if so, pause execution and ask the user to confirm if they want to escape/cancel or resume processing.
-	// Returns: True if a key has been pressed and the user confirms to escape/cancel. False if no key has been pressed or the user chooses to resume and not escape/cancel.
+	// return:
+	// * True  * A key has been pressed and the user chose not to resume.
+	// * False * stdif is not a terminal, no key has been pressed, or the user chose to resume.
 ND	bool esctoexit() const;
 
 	// Get a string to control terminal operation.
-	// Returns: A string to be output to the terminal in order to accomplish the desired operation.
+	// return: A string to be output to the terminal in order to accomplish the desired operation.
 	// The terminal protocol is xterminal.
 	// code:
-	// * n   * Position the cursor at column number n
-	// * 0   * Position the cursor at column number 0
-	// * -1  * Clear the screen and home the cursor
-	// * -2  * Position the cursor at the top left home (x,y = 0,0)
-	// * -3  * Clear from the cursor at the end of screen
-	// * -4  * Clear from cursor to end of line
-	// * -40 * Position the cursor at columnno 0 and clear to end of line
+	// *   n * Position the cursor at column number n (1 based).
+	// *   0 * Position the cursor at the first column (1).
+	// *  -1 * Clear the screen and home the cursor.
+	// *  -2 * Position the cursor at the top left home (x, y = 1, 1).
+	// *  -3 * Clear from the cursor at the end of screen.
+	// *  -4 * Clear from cursor to end of line.
+	// * -40 * Position the cursor at columnno 0 and clear to end of line.
 ND	var  AT(const int code) const;
 
 	// Get a terminal cursor positioning string.
-	// Returns: A string to be output to the terminal to position the cursor at the desired screen x and y position.
+	// return: A string to be output to the terminal to position the cursor at the desired screen x and y position.
 	// The terminal protocol is xterminal.
 ND	var  AT(const int x, const int y) const;
 
 	// Get the position of the terminal cursor.
-	// cursor: [out] If stdin is a terminal, an FM delimited string containing the x and y coordinates of the current terminal cursor.
+	// cursor[out]: If stdin is a terminal, an FM delimited string containing the x and y coordinates of the current terminal cursor.
+	// x and y are 1 based, not 0 based.
 	// If stdin is not a terminatl then an empty string "" is returned.
 	// The cursor additionally contains a third field which contains the delay in ms from the terminal.
 	// The FM delimited string returned can be later passed to setcursor() to reposition the cursor back to its original position or it can be parsed and used accordingly.
@@ -553,7 +584,7 @@ ND	var  AT(const int x, const int y) const;
 	// * DISABLED         * Terminal is disabled due to more errors than the maximum currently set.
 	//
 	// `var cursor;
-	//  if (isterminal() and not getcursor(cursor)) ... // cursor becomes something like "0^20^0.012345"_var`
+	//  if (isterminal() and not getcursor(cursor)) ... // cursor becomes something like "1^20^0.012345"_var`
 	//
 ND	bool getcursor(out cursor, int delayms = 3000, int max_errors = 0) const;
 
@@ -579,7 +610,7 @@ ND	var  getcursor() const;
 	//////////////////////
 
 	// Dynamic array fields become values and vice versa
-	// Returns: The inverted dynamic array.
+	// return: The inverted dynamic array.
 	// pad: If true then on return, all fields will have the same number of values with superfluous trailing VMs where necessary.
 	//
 	// `let v1 = "a]b]c^1]2]3"_var;
@@ -587,7 +618,7 @@ ND	var  getcursor() const;
 	//
 ND	var  invertarray(in input, bool pad = false);
 
-	// Sorts fields of multivalues of dynamic arrays in parallel
+	// Sort parallel fields of multivalues of dynamic arrays
 	// fns: VM separated list of field numbers to sort in parallel based on the first field number
 	// order:
 	// * AL * Ascending  - Left Justified (Alphabetic)
@@ -604,8 +635,7 @@ ND	var  invertarray(in input, bool pad = false);
 	///// Record locking:
 	/////////////////////
 
-	// Does not actually return record
-ND	bool lockrecord(in filename, io file, in keyx, in recordx, const int waitsecs = 0, const bool allowduplicate = false) const;
+ND	bool lockrecord(in filename, io file, in keyx, in unused, const int waitsecs = 0, const bool allowduplicate = false) const;
 ND	bool lockrecord(in filename, io file, in keyx) const;
 	bool unlockrecord(in filename, io file, in key) const;
 	bool unlockrecord() const;

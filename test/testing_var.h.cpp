@@ -744,11 +744,11 @@ func main() {
 		let v2 = reverse("20^10^2^1^1.1"_var);
 	}
 
-	printl("shuffle(SV delimiter = _FM) const&;");
+	printl("randomize(SV delimiter = _FM) const&;");
 	{
-		let v1 = "20^10^2^1^1.1"_var.shuffle(); /// e.g. "2^1^20^1.1^10" (random order depending on initrand())
+		let v1 = "20^10^2^1^1.1"_var.randomize(); /// e.g. "2^1^20^1.1^10" (random order depending on initrand())
 		// or
-		let v2 = shuffle("20^10^2^1^1.1"_var);
+		let v2 = randomize("20^10^2^1^1.1"_var);
 	}
 
 	printl("parse(char sepchar = ' ') const&");
@@ -2273,10 +2273,10 @@ func main() {
 		let v1 = d1.join(","); assert(v1 == "1,10,20,2"_var);
 	}
 
-	printl("shuffler();");
+	printl("randomizer();");
 	{
 		dim d1 = "2,20,10,1"_var.split(",");
-		d1.shuffler();
+		d1.randomizer();
 		let v1 = d1.join(","); // random
 	}
 

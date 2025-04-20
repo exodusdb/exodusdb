@@ -380,7 +380,7 @@ auto get_timebank_acno(const std::string_view arg1) -> int {
 	else if (++acno && arg1 == "dim& dim::splitter(in str1, SV delimiter)") {}
 	else if (++acno && arg1 == "dim& dim::sorter(bool reverseorder)") {}
 	else if (++acno && arg1 == "dim& dim::reverser()") {}
-	else if (++acno && arg1 == "dim& dim::shuffler()") {}
+	else if (++acno && arg1 == "dim& dim::randomizer()") {}
 
 	// MUST REGENERATE timebank.txt after amending this list
 	//////////////////

@@ -54,7 +54,7 @@ class ExodusCppLexer(CppLexer):
         'reccount', 'remove', 'remover', 'renamefile', 'replace', 'replacer',
         'reverse', 'reverse_range', 'reverser', 'rex', 'rnd', 'rollbacktrans', 'round',
         'savelist', 'search', 'select', 'selectkeys', 'selectx', 'setlasterror',
-        'setprecision', 'setprompt', 'setxlocale', 'shuffle', 'shuffler', 'sin',
+        'setprecision', 'setprompt', 'setxlocale', 'randomize', 'randomizer', 'sin',
         'sort', 'sorter', 'space', 'split', 'sqlexec', 'sqrt', 'squote', 'squoter',
         'starts', 'statustrans', 'str', 'substr', 'substr2', 'substr3', 'substrer',
         'sum', 'sumall', 'swap', 'tan', 'tcase', 'tcaser', 'textchr', 'textchrname',
@@ -77,7 +77,7 @@ class ExodusCppLexer(CppLexer):
         # 'dim', 'getelementref', 'init',
         'join',
         # 'operator',
-        'osread', 'oswrite', 'read', 'redim', 'reverser', 'rows', 'shuffler', 'sort',
+        'osread', 'oswrite', 'read', 'redim', 'reverser', 'rows', 'randomizer', 'sort',
         'sorter', 'split', 'splitter', 'write',
 
         'AT',

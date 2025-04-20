@@ -397,8 +397,8 @@ ND PUBLIC var  sort(   in instring, SV delimiter /*=_FM*/) {return instring.sort
 ND PUBLIC var  reverse( in instring, SV delimiter /*=_FM*/) {return instring.reverse(delimiter);}
    PUBLIC IO   reverser(io iostring, SV delimiter /*=_FM*/) {iostring.reverser(delimiter); return IOSTRING;}
 
-ND PUBLIC var  shuffle( in instring, SV delimiter /*=_FM*/) {return instring.shuffle(delimiter);}
-   PUBLIC IO   shuffler(io iostring, SV delimiter /*=_FM*/) {iostring.shuffler(delimiter); return IOSTRING;}
+ND PUBLIC var  randomize( in instring, SV delimiter /*=_FM*/) {return instring.randomize(delimiter);}
+   PUBLIC IO   randomizer(io iostring, SV delimiter /*=_FM*/) {iostring.randomizer(delimiter); return IOSTRING;}
 
 ND PUBLIC var  parse(   in instring, char sepchar /*=''*/) {return instring.parse(sepchar);}
    PUBLIC IO   parser(  io iostring, char sepchar /*=''*/) {iostring.parser(sepchar);}

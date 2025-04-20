@@ -73,7 +73,7 @@ set -euxo pipefail
 	rsync $DRYRUN -av --whole-file --delete ~/{bin,lib,dat,inc} ~/live
 
 :
-: Finished $DRYRUN copying EXOXUS programs to live in $(($SECONDS / 60)) minutes and $(($SECONDS % 60)) seconds.
+: Finished $DRYRUN copying EXODUS programs to live in $(($SECONDS / 60)) minutes and $(($SECONDS % 60)) seconds.
 : =========================================================================
 :
 : Warn DRYRUN if not CONFIRMed, or Restart required if CONFIRMed

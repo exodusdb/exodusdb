@@ -15,7 +15,7 @@ This and all the following exoprog member functions work on an environment varia
 Identical functions are available directly on plain var objects but vars have less functionality regarding dictionaries and environment variables which are built-in to exoprog.
 .sp 1 \"</p>
 .PP \"<p>
-\fBReturns:\fR True if an active select list was created, false otherwise.
+\fBreturn:\fR True if an active select list was created, false otherwise.
 .sp 1 \"</p>
 .PP \"<p>
 In the following examples, various environment variables like RECORD, ID and MV are used instead of declaring and using named vars. In actual code, either may be freely used.
@@ -34,7 +34,7 @@ if (readnext(ID)) ... ok
 .SS
 if (selectkeys(keys)) ...
 .PP \"<p>
-Create an active select list from some given keys.
+Create an active select list from a dynamic array of keys.
 .sp 1 \"</p>
 .PP \"<p>
 .PP \"<p>
@@ -68,10 +68,10 @@ if (readnext(out key)) ...
 Get the next key from an active select list.
 .sp 1 \"</p>
 .PP \"<p>
-\fBkey:\fR [out] A string. Typically the key of a db file record.
+\fBkey[out]:\fR A string. Typically the key of a db file record.
 .sp 1 \"</p>
 .PP \"<p>
-\fBReturns:\fR True if an active select list was available and the next key in the list was obtained.
+\fBreturn:\fR True if an active select list was available and the next key in the list was obtained.
 .sp 1 \"</p>
 .PP \"<p>
 .PP \"<p>
@@ -90,13 +90,13 @@ if (readnext(out key, out valueno)) ...
 Get the next key and value number pair from an active select list.
 .sp 1 \"</p>
 .PP \"<p>
-\fBkey:\fR [out] A string. Typically the key of a db file record.
+\fBkey[out]:\fR A string. Typically the key of a db file record.
 .sp 1 \"</p>
 .PP \"<p>
-\fBvalueno:\fR [out] Is only available in select lists that have been created by sort/select commands that refer to multi-valued db dictionary fields where db records have multiple values for a specific field. In this case, a record key will appear multiple times in the select list since each multivalue is exploded for the purpose of sorting and selecting. This can be viewed as a process of "normalising" multivalues so they appear as multiple records instead of being held in a single record.
+\fBvalueno[out]:\fR Is only available in select lists that have been created by sort/select commands that refer to multi-valued db dictionary fields where db records have multiple values for a specific field. In this case, a record key will appear multiple times in the select list since each multivalue is exploded for the purpose of sorting and selecting. This can be viewed as a process of "normalising" multivalues so they appear as multiple records instead of being held in a single record.
 .sp 1 \"</p>
 .PP \"<p>
-\fBReturns:\fR True if an active select list was available and the next key in the list was obtained.
+\fBreturn:\fR True if an active select list was available and the next key in the list was obtained.
 .sp 1 \"</p>
 .PP \"<p>
 .PP \"<p>
@@ -115,16 +115,16 @@ if (readnext(out record, out key, out valueno)) ...
 Get the next record, key and value no from an active select list.
 .sp 1 \"</p>
 .PP \"<p>
-\fBrecord:\fR [out] Is only available in select lists that have been created with the final (R) option. Otherwise the record will be returned as an empty string and must be obtained using a db read() function.
+\fBrecord[out]:\fR Is only available in select lists that have been created with the final (R) option. Otherwise the record will be returned as an empty string and must be obtained using a db read() function.
 .sp 1 \"</p>
 .PP \"<p>
-\fBkey:\fR [out] A string. Typically the key of a db file record.
+\fBkey[out]:\fR A string. Typically the key of a db file record.
 .sp 1 \"</p>
 .PP \"<p>
-\fBvalueno:\fR [out] Is only available in select lists that have been created by sort/select commands that refer to multi-valued db dictionary fields where db records have multiple values for a specific field.
+\fBvalueno[out]:\fR Is only available in select lists that have been created by sort/select commands that refer to multi-valued db dictionary fields where db records have multiple values for a specific field.
 .sp 1 \"</p>
 .PP \"<p>
-\fBReturns:\fR True if an active select list was available and the next key in the list was obtained.
+\fBreturn:\fR True if an active select list was available and the next key in the list was obtained.
 .sp 1 \"</p>
 .PP \"<p>
 .PP \"<p>
@@ -141,13 +141,16 @@ assert(not RECORD.empty());
 .SS
 pushselect(out cursor)
 .PP \"<p>
-Saves a pointer to the currently active select list.
+Get a reference to the currently active select list and suspend it.
 .sp 1 \"</p>
 .PP \"<p>
-This allows another select list to be activated and used temporarily before the original select list is reactivated.
+Allow another select list to be activated and used temporarily before the original select list is reactivated.
 .sp 1 \"</p>
 .PP \"<p>
-\fBcursor:\fR [out] A var that can be passed later on to the popselect() function to reactivate the saved list.
+Multiple levels of pushselect/popselect can be used.
+.sp 1 \"</p>
+.PP \"<p>
+\fBcursor[out]:\fR A var that can be passed later on to the popselect() function to reactivate the saved list.
 .sp 1 \"</p>
 .PP \"<p>
 .PP \"<p>
@@ -168,7 +171,7 @@ popselect(saved_xo_clients_cursor); // Reactivate the original select list.
 .SS
 popselect(cursor)
 .PP \"<p>
-Re-establish an active select list saved by pushselect().
+Re-activate a select list using a reference provided by pushselect().
 .sp 1 \"</p>
 .PP \"<p>
 \fBcursor:\fR A var created by the pushselect() function.
@@ -199,10 +202,10 @@ clearselect();
 .SS
 if (deleterecord(filename)) ...
 .PP \"<p>
-Use an active select list to delete db records.
+Delete multiple DB records using an active select list.
 .sp 1 \"</p>
 .PP \"<p>
-\fBReturns:\fR False if any records could not be deleted.
+\fBreturn:\fR False if any records could not be deleted.
 .sp 1 \"</p>
 .PP \"<p>
 Contrast this function with the two argument "deleterecord(file, key)" function that deletes a single record.
@@ -222,7 +225,7 @@ if (select("xo_clients with type 'Q' and with balance between 0 and 100")) {
 .SS
 if (deleterecord(dbfile, key)) ...
 .PP \"<p>
-Delete a single database file record.
+Delete a single DB record.
 .sp 1 \"</p>
 .PP \"<p>
 .PP \"<p>
@@ -242,16 +245,16 @@ if (not file.deleterecord(key)) ...
 .SS
 if (savelist(listname)) ...
 .PP \"<p>
-Save a currently active select list under a given name.
+Save the current active select list under a given name.
+.sp 1 \"</p>
+.PP \"<p>
+Select lists are saved in the DB file "lists". They are accessible to any Exodus process and remain until specifically deleted.
 .sp 1 \"</p>
 .PP \"<p>
 After saving, the list is no longer active and hasnext() will return false.
 .sp 1 \"</p>
 .PP \"<p>
-\fBReturns:\fR True if an active select list was saved, false if there was no active select list.
-.sp 1 \"</p>
-.PP \"<p>
-Lists are saved as a record in the "lists" file.
+\fBreturn:\fR True if an active select list was saved, false if there was no active select list.
 .sp 1 \"</p>
 .PP \"<p>
 .PP \"<p>
@@ -267,13 +270,13 @@ if (not savelist("my_list")) ...
 .SS
 if (getlist(listname)) ...
 .PP \"<p>
-Reactivate a saved select list of a given name.
+Create an active select list using a saved select list of a given name.
 .sp 1 \"</p>
 .PP \"<p>
-A saved list is obtained from the "lists" file and activated.
+A saved list is obtained from the "lists" file and activated. The list remains in the lists file for multiple use.
 .sp 1 \"</p>
 .PP \"<p>
-\fBReturns:\fR True if an active select list was successfully reactivated, otherwise false.
+\fBreturn:\fR True if an active select list was successfully reactivated, otherwise false.
 .sp 1 \"</p>
 .PP \"<p>
 .PP \"<p>
@@ -319,44 +322,50 @@ if (makelist(listname, keys)) ...
 .SS
 var v1 = perform(command_line);
 .PP \"<p>
-Run an exodus program/library's main function using a command like syntax similar to that of os executable programs.
+Run an Exodus program/library.
+.sp 1 \"</p>
+.PP \"<p>
+Creates a new instance of an Exodus program library function object and calls its main() function using a command-like syntax, similar to that of running an OS executable program, and passes its arguments through the COMMAND and OPTIONS variables.
+.sp 1 \"</p>
+.PP \"<p>
+A performed program/library's main function should have no arguments otherwise they appear unassigned and a segfault or core dump may occur.
+.sp 1 \"</p>
+.PP \"<p>
+The Exodus program class member variables of a performed or executed program/library are all, as might be expected, initially unassigned unless specifically initialised inline. Note that this is not the same as calling a program library function (using function call syntax and round brackets funcx()), where the program/library/function's member variables are initially unassigned but retain their state between calls.
 .sp 1 \"</p>
 .PP \"<p>
 \fBcommand_line:\fR Used to initialise the COMMAND, SENTENCE and OPTIONS environment variables of the performed exodus program/library. Analogous to passing function arguments. The first word of command_line is used as the name of the program/library to be loaded and run.
 .sp 1 \"</p>
 .PP \"<p>
-The program/library's main function should have zero arguments. Performing a program/library function with main arguments results in them being unassigned and in some case core dump may occur.
+\fBreturn:\fR Whatever the program returns from main() or passes as an argument to stop(). If the program terminates abnormally then it will return "" and lasterror() will contain some error message. The return value may be ignored so there is no need so wrap perform statements in if clauses to avoid compiler warnings.
 .sp 1 \"</p>
 .PP \"<p>
-\fBReturns:\fR Whatever var the program/library returns, or "" if it calls stop() or abort((). The return value can be ignored and discarded without any compiler warning.
+\fBthrow:\fR All the various runtime errors based on VarError e.g. VarUnassigned.
 .sp 1 \"</p>
 .PP \"<p>
-The following environment variables are initialised on entry to the main function of the program/library and are preserved untouched in the calling program.
+\fBenvironment:\fR The following environment variables are initialised on entry to the main function of the program/library and are preserved untouched (actually restored) in the calling program.
 .sp 1 \"</p>
+.br
+\(bu COMMAND, OPTIONS, SENTENCE.
+.br
+\(bu RECUR0, RECUR1, RECUR2, RECUR3, RECUR4 to "".
+.br
+\(bu ID, RECORD, MV, DICT initialised to "".
+.br
+\(bu LEVEL is incremented by one.
+.br
+\(bu All other environment variables are shared between the caller and callee. There is essentially only one environment in any one process or thread.
+.br
+\(bu CURSOR Any active select list in CURSOR is passed to the performed program/library and can be consumed by it. Conversely any active select list created by the performed program/library will be returned to the calling program. In other words, both the performing and the performed programs/libraries share a single active select list environment. This is different from execute() where the executed program/library gets its own private active select list, initially inactive.
 .PP \"<p>
-RECUR0, RECUR1, RECUR2, RECUR3, RECUR4 to "".
-.sp 1 \"</p>
-.PP \"<p>
-ID, RECORD, MV, DICT initialised to "".
-.sp 1 \"</p>
-.PP \"<p>
-LEVEL is incremented by one.
-.sp 1 \"</p>
-.PP \"<p>
-All other environment variables are shared between the caller and callee. There is essentially only one environment in any one process or thread.
-.sp 1 \"</p>
-.PP \"<p>
-Any active select list in CURSOR is passed to the performed program/library and can be consumed by it. Conversely any active select list created by the performed program/library will be returned to the calling program. In other words, both the performing and the performed programs/libraries share a single active select list environment. This is different from execute() which gets its own private active select list, initially inactive.
-.sp 1 \"</p>
-.PP \"<p>
-Exodus program/libraries may also be called directly using conventional function calling syntax. To call an exodus program/library called progname using either the syntax "call progname(args...);" or "var v1 = progname(args...);" you must "#include <progname.h>" after the "programinit()" or "libraryinit()" lines in your program/library.
+Exodus program/library/functions may also be called directly using conventional function calling syntax. To call an exodus program/library called progname using either the syntax "call progname(args...);" or "var v1 = progname(args...);" you must "#include <progname.h>" after the "programinit()" or "libraryinit()" lines in your program/library. See library.h for more info.
 .sp 1 \"</p>
 
 
 .SS
 var v1 = execute(command_line);
 .PP \"<p>
-Run an exodus program/library's main function.
+Run an exodus program/library.
 .sp 1 \"</p>
 .PP \"<p>
 Identical to perform() but any currently active select list in the calling program/library is not accessible to the executed program/library and is preserved in the calling [program as is. Any select list created by the executed library is discarded when it terminates.
@@ -369,14 +378,23 @@ chain(command_line)
 Close the current program and perform another one.
 .sp 1 \"</p>
 .PP \"<p>
-Identical to perform() except that the current program closes first.
+Similar to perform() except that the current program closes first and all environment variables carry forward unchanged.
 .sp 1 \"</p>
 
 
 .SS
 var v1 = libinfo(libname);
 .PP \"<p>
-Check if a lib exists to be performed/executed or called. Currently it does not check if it is actually loadable.
+Check if a lib exists.
+.sp 1 \"</p>
+.PP \"<p>
+Can be checked before perform/execute to avoid errors.
+.sp 1 \"</p>
+.PP \"<p>
+Currently it does not check if the library is actually loadable.
+.sp 1 \"</p>
+.PP \"<p>
+\fBreturn:\fR osfile info.
 .sp 1 \"</p>
 
 
@@ -384,7 +402,7 @@ Check if a lib exists to be performed/executed or called. Currently it does not 
 .SH
 
 .SS
-stop(message = "")
+stop(result = "")
 .PP \"<p>
 Stop the current exodus program/library normally.
 .sp 1 \"</p>
@@ -392,7 +410,7 @@ Stop the current exodus program/library normally.
 Either return to the performing or executing parent exodus program/library, or exit to the OS if none.
 .sp 1 \"</p>
 .PP \"<p>
-\fBmessage:\fR Optional. If exiting to the OS then it will be output to stdout or, if numeric, used as the exit status.
+\fBresult:\fR Optional. It will be used as the return value of a parent program's perform() or execute() function, or if none, and therefore returning to the OS, it will be output to stdout if non-numeric or, if numeric, used as the exit status.
 .sp 1 \"</p>
 
 
@@ -425,24 +443,44 @@ Similar to abort but if exiting to the OS then the default exit status is 2.
 .SS
 var v1 = calculate(dictid);
 .PP \"<p>
-Given a dictid reads a dictrec from the current DICT file (using readc()) and then either extracts a specific field number from the current RECORD/ID/MV environment variables or calls a dict function library to calculate the result.
+Get DB record field values given field name only.
 .sp 1 \"</p>
+.PP \"<p>
+Use a dictionary file that contains info sufficient to either extract or calculate the required value.
+.sp 1 \"</p>
+.br
+1. Read fieldinfo from the current DICT file using readc() for caching.
+.br
+2. Use the fieldinfo to:
+.RS
+.br
+\(bu Either extract a specific field number from the current RECORD/ID/MV environment variables.
+.br
+\(bu Or call a dictionary function library to calculate the result.
+.RE
 
 
 .SS
 var v1 = calculate(dictid, dictfile, id, record, mv = 0);
 .PP \"<p>
-Given dictid, dictfile, record, id and mv, reads a dictrec from dictfile (using readc()) and then either extracts a specific field number from the given record/id/mv or calls a dict function library to calculate the result.
+Get DB record field values given name and data.
+.sp 1 \"</p>
+.PP \"<p>
+Same as the one argument version of calculate() but RECORD/ID/MV are provided as arguments instead of being hard coded.
 .sp 1 \"</p>
 
 
 .SS
 var v1 = xlate(filename, key, fieldno_or_name, mode);
 .PP \"<p>
-Reads a record from the specified file and key (using readc()) and then either extracts a specific field number or calls calculate(dictid...) to obtain the result.
+Read DB field using field number or name.
 .sp 1 \"</p>
+.br
+1. Read a record from a given file and key using readc() for caching.
+.br
+2. Extracts the given field number or calls calculate(dictid...) if non-numeric.
 .PP \"<p>
-\fBfilename:\fR Which file to read.
+\fBfilename:\fR The file to read.
 .sp 1 \"</p>
 .PP \"<p>
 \fBkey:\fR The key of the record to read.
@@ -498,10 +536,10 @@ Return the key.
 .SS
 var v1 = oconv(input, conversion);
 .PP \"<p>
-iconv/oconv with access to exoprogram's environment variables.
+iconv/oconv "[...]"
 .sp 1 \"</p>
 .PP \"<p>
-exoprog's iconv/oconv have the ability to call custom functions like "[funname,args...]"
+ExoProgram's iconv/oconv functions have access to ExoProgram's environment variables like BASEFMT, DATEFMT and TZ and have the ability to call custom functions like "[funname,args...]"
 .sp 1 \"</p>
 .PP \"<p>
 .sp 1 \"</p>
@@ -533,6 +571,9 @@ var v1 = iconv(input, conversion);
 .SS
 var v1 = iconv|oconv(var, "[DATE]");
 .PP \"<p>
+iconv/oconv "[DATE]"
+.sp 1 \"</p>
+.PP \"<p>
 Use iconv/oconv code "[DATE,args]" when you want date conversion to depend on the environment variable DATEFMT, particularly its American/International setting. Otherwise use ordinary "D" conversion codes directly for slightly greater performance.
 .sp 1 \"</p>
 .PP \"<p>
@@ -541,13 +582,13 @@ Use iconv/oconv code "[DATE,args]" when you want date conversion to depend on th
 \fBvar:\fR [oconv] An internal date (a number).
 .sp 1 \"</p>
 .PP \"<p>
-\fBReturns:\fR [oconv] A readable date in text format depending on "[DATE,args]" e.g. "31 DEC 2020" "31/12/2020" "12/31/2020"
+\fBreturn:\fR [oconv] A readable date in text format depending on "[DATE,args]" e.g. "31 DEC 2020" "31/12/2020" "12/31/2020"
 .sp 1 \"</p>
 .PP \"<p>
 \fBvar:\fR [iconv] A date in text format as above.
 .sp 1 \"</p>
 .PP \"<p>
-\fBReturns:\fR [iconv] An internal date (a number) or "" if the input could not be understood as a valid date.
+\fBreturn:\fR [iconv] An internal date (a number) or "" if the input could not be understood as a valid date.
 .sp 1 \"</p>
 .PP \"<p>
 \fBargs:\fR If args is empty then DATEFMT is used as the conversion code. If args starts with "D" then args is used as the conversion codes but any E option in DATEFMT is appended. If args does not start with "D" then args are appended to DATEFMT, a "Z" option is appended, and the result used as the conversion code. A "*" option is equivalent to a second "Z" option.
@@ -573,6 +614,9 @@ assert(oconv(v1, "[DATE,*]" ) == "9/1/2025");    // "DZZ"  equivalent assuming D
 .SS
 var v1 = iconv|oconv(var, "[NUMBER]");
 .PP \"<p>
+iconv/oconv "[NUMBER]"
+.sp 1 \"</p>
+.PP \"<p>
 Use iconv/oconv "[NUMBER,args]" either when your numbers have currency or unit code suffixes or when you want number conversion to depend on the environment variable BASEFMT to determine thousands separator and decimal point. Otherwise use ordinary "MD" conversion codes directly for slightly greater performance.
 .sp 1 \"</p>
 .PP \"<p>
@@ -585,7 +629,7 @@ Primarily used for oconv() but can be used in reverse for iconv.
 \fBvar:\fR A number with an optional currency code or unit suffix. e.g. "12345.67USD"
 .sp 1 \"</p>
 .PP \"<p>
-\fBReturns:\fR A formatted number with thousands separated conventionally e.g. "12.345.67USD".
+\fBreturn:\fR A formatted number with thousands separated conventionally e.g. "12.345.67USD".
 .sp 1 \"</p>
 .PP \"<p>
 iconv/oconv("[NUMBER]")      oconv leaves ndecimals untouched as in the input. iconv see below.
@@ -689,16 +733,19 @@ var v1 = iconv("1,234.5678USD", "[NUMBER]"); // "1234.57USD" // Comma removed
 .SS
 var v1 = amountunit(input0, out unitx);
 .PP \"<p>
+Parse amount+currency code string.
+.sp 1 \"</p>
+.PP \"<p>
 Split amount+currency code/unit string into number and currency code/unit.
 .sp 1 \"</p>
 .PP \"<p>
 \fBvar:\fR "123.45USD"
 .sp 1 \"</p>
 .PP \"<p>
-\fBReturns:\fR e.g. "123.45"
+\fBreturn:\fR e.g. "123.45"
 .sp 1 \"</p>
 .PP \"<p>
-\fBunitx:\fR [out] e.g. "USD"
+\fBunitx[out]:\fR e.g. "USD"
 .sp 1 \"</p>
 
 
@@ -713,7 +760,10 @@ var v1 = amountunit(input0);
 .SS
 var v1 = timedate2();
 .PP \"<p>
-\fBReturns:\fR Text of date and time in users time zone
+Get text of date and time.
+.sp 1 \"</p>
+.PP \"<p>
+In users time zone
 .sp 1 \"</p>
 .PP \"<p>
 e.g. "2MAR2025 11:52AM"
@@ -726,7 +776,7 @@ Offset from UTC by TZ seconds.
 .SS
 getdatetime(out user_date, out user_time, out system_date, out system_time, out UTC_date, out UTC_time)
 .PP \"<p>
-\fBReturns:\fR User, server and UTC date and time
+Get current user, server and UTC dates and times.
 .sp 1 \"</p>
 .PP \"<p>
 User date and time is determined by adding the environment variable TZ.f(1)'s TZ offset (in seconds) to UTC date/time obtained from the operating system.
@@ -739,7 +789,13 @@ User date and time is determined by adding the environment variable TZ.f(1)'s TZ
 .SS
 var v1 = elapsedtimetext();
 .PP \"<p>
-Get text of elapsed time since environment variable TIMESTAMP was initialised with ostimestamp() at program/thread startup.
+Get text of elapsed time.
+.sp 1 \"</p>
+.PP \"<p>
+Since environment variable TIMESTAMP.
+.sp 1 \"</p>
+.PP \"<p>
+TIMESTAMP is initialised with ostimestamp() at program/thread startup.
 .sp 1 \"</p>
 .PP \"<p>
 TIMESTAMP can be updated using ostimestamp() as and when desired.
@@ -757,10 +813,13 @@ var v1 = elapsedtimetext(); // e.g. "< 1ms"
 .SS
 var v1 = elapsedtimetext(timestamp1, timestamp2);
 .PP \"<p>
-Get text of elapsed time between two timestamps
+Get text of elapsed time.
 .sp 1 \"</p>
 .PP \"<p>
-Caution. Use ostimestamps not ostimes. One is in days and the other is in seconds.
+Between two given timestamps
+.sp 1 \"</p>
+.PP \"<p>
+\fBWarning:\fR Use ostimestamp() not ostime(). The first is in days and the second is in seconds.
 .sp 1 \"</p>
 .PP \"<p>
 .PP \"<p>
@@ -779,7 +838,10 @@ let v2 = elapsedtimetext(0, 0.001); // "1 min, 26 secs"
 .SS
 note(msg, options, io response)
 .PP \"<p>
-If stdin is a terminal, output a message to stdout and optionally pause processing and request a response from the user, otherwise set the response to "" and continue.
+Output a message to stdout and optionally request input.
+.sp 1 \"</p>
+.PP \"<p>
+If input is requested but stdin is not a terminal then set the response to "" and continue.
 .sp 1 \"</p>
 .PP \"<p>
 \fBoptions:\fR R = Response requested. C upper case response.
@@ -798,7 +860,7 @@ var response;
 .SS
 note(msg)
 .PP \"<p>
-Output a message to stdin and continue.
+Output a message to stdout.
 .sp 1 \"</p>
 .PP \"<p>
 .PP \"<p>
@@ -813,34 +875,56 @@ call note("Hello world.");
 .SS
 var v1 = decide(question, options = "");
 .PP \"<p>
-If stdin is a terminal, pause processing, list some given options to stdout and request the user to make a choice, otherwise set the response to "" and continue.
+Input user selection from a list of options.
 .sp 1 \"</p>
 .PP \"<p>
-\fBReturns:\fR The chosen option (value not number) or "" if the user cancelled.
+If stdin is not a terminal, set the response to "" and continue.
+.sp 1 \"</p>
+.PP \"<p>
+\fBreturn:\fR The chosen option (value not number) or "" if the user cancelled.
 .sp 1 \"</p>
 
 
 .SS
 var v1 = decide(question, options, out reply, defaultreply = 1);
 .PP \"<p>
-Same as decide() above but extended.
+Input user selection from a list of options.
+.sp 1 \"</p>
+.PP \"<p>
+If stdin is not a terminal set the response to the default value, or "" if none, and continue.
 .sp 1 \"</p>
 .PP \"<p>
 \fBdefaultreply:\fR A default option if the user presses Enter.
 .sp 1 \"</p>
 .PP \"<p>
-\fBreply:\fR [out] The option number that the user chose or "" if they cancelled.
+\fBreply[out]:\fR The option number that the user chose or "" if they cancelled.
+.sp 1 \"</p>
+.PP \"<p>
+\fBreturn:\fR The chosen option (value not number) or "" if the user cancelled.
 .sp 1 \"</p>
 
 
 .SS
 if (esctoexit()) ...
 .PP \"<p>
+Check for user pause or cancel.
+.sp 1 \"</p>
+.PP \"<p>
 If stdin is a terminal, check if a key has been pressed and, if so, pause execution and ask the user to confirm if they want to escape/cancel or resume processing.
 .sp 1 \"</p>
 .PP \"<p>
-\fBReturns:\fR True if a key has been pressed and the user confirms to escape/cancel. False if no key has been pressed or the user chooses to resume and not escape/cancel.
+\fBreturn:\fR
 .sp 1 \"</p>
+.PD 0 \"<dl>
+.TP 10\"<dt>
+\fBTrue\fR \"</dt>
+A key has been pressed and the user chose not to resume.
+.\"</dd>
+.TP 10\"<dt>
+\fBFalse\fR \"</dt>
+stdif is not a terminal, no key has been pressed, or the user chose to resume.
+.\"</dd>
+.PD \"</dl>
 
 
 .SS
@@ -849,7 +933,7 @@ var v1 = AT(code);
 Get a string to control terminal operation.
 .sp 1 \"</p>
 .PP \"<p>
-\fBReturns:\fR A string to be output to the terminal in order to accomplish the desired operation.
+\fBreturn:\fR A string to be output to the terminal in order to accomplish the desired operation.
 .sp 1 \"</p>
 .PP \"<p>
 The terminal protocol is xterminal.
@@ -860,31 +944,31 @@ The terminal protocol is xterminal.
 .PD 0 \"<dl>
 .TP 10\"<dt>
 \fBn\fR \"</dt>
-Position the cursor at column number n
+Position the cursor at column number n (1 based).
 .\"</dd>
 .TP 10\"<dt>
 \fB0\fR \"</dt>
-Position the cursor at column number 0
+Position the cursor at the first column (1).
 .\"</dd>
 .TP 10\"<dt>
 \fB-1\fR \"</dt>
-Clear the screen and home the cursor
+Clear the screen and home the cursor.
 .\"</dd>
 .TP 10\"<dt>
 \fB-2\fR \"</dt>
-Position the cursor at the top left home (x,y = 0,0)
+Position the cursor at the top left home (x, y = 1, 1).
 .\"</dd>
 .TP 10\"<dt>
 \fB-3\fR \"</dt>
-Clear from the cursor at the end of screen
+Clear from the cursor at the end of screen.
 .\"</dd>
 .TP 10\"<dt>
 \fB-4\fR \"</dt>
-Clear from cursor to end of line
+Clear from cursor to end of line.
 .\"</dd>
 .TP 10\"<dt>
 \fB-40\fR \"</dt>
-Position the cursor at columnno 0 and clear to end of line
+Position the cursor at columnno 0 and clear to end of line.
 .\"</dd>
 .PD \"</dl>
 
@@ -895,7 +979,7 @@ var v1 = AT(x, y);
 Get a terminal cursor positioning string.
 .sp 1 \"</p>
 .PP \"<p>
-\fBReturns:\fR A string to be output to the terminal to position the cursor at the desired screen x and y position.
+\fBreturn:\fR A string to be output to the terminal to position the cursor at the desired screen x and y position.
 .sp 1 \"</p>
 .PP \"<p>
 The terminal protocol is xterminal.
@@ -908,7 +992,10 @@ if (getcursor(out cursor, delayms = 3000, max_errors = 0)) ...
 Get the position of the terminal cursor.
 .sp 1 \"</p>
 .PP \"<p>
-\fBcursor:\fR [out] If stdin is a terminal, an FM delimited string containing the x and y coordinates of the current terminal cursor.
+\fBcursor[out]:\fR If stdin is a terminal, an FM delimited string containing the x and y coordinates of the current terminal cursor.
+.sp 1 \"</p>
+.PP \"<p>
+x and y are 1 based, not 0 based.
 .sp 1 \"</p>
 .PP \"<p>
 If stdin is not a terminatl then an empty string "" is returned.
@@ -955,7 +1042,7 @@ Terminal is disabled due to more errors than the maximum currently set.
 \fBExample:\fR
 .EX \"<code>
 var cursor;
-if (isterminal() and not getcursor(cursor)) ... // cursor becomes something like "0^20^0.012345"_var
+if (isterminal() and not getcursor(cursor)) ... // cursor becomes something like "1^20^0.012345"_var
 .EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
@@ -1009,7 +1096,7 @@ var v1 = invertarray(input, pad = false);
 Dynamic array fields become values and vice versa
 .sp 1 \"</p>
 .PP \"<p>
-\fBReturns:\fR The inverted dynamic array.
+\fBreturn:\fR The inverted dynamic array.
 .sp 1 \"</p>
 .PP \"<p>
 \fBpad:\fR If true then on return, all fields will have the same number of values with superfluous trailing VMs where necessary.
@@ -1028,7 +1115,7 @@ let v2 = invertarray(v1); // "a]1^b]2^c]3"_var
 .SS
 sortarray(io array, fns = "", order = "")
 .PP \"<p>
-Sorts fields of multivalues of dynamic arrays in parallel
+Sort parallel fields of multivalues of dynamic arrays
 .sp 1 \"</p>
 .PP \"<p>
 \fBfns:\fR VM separated list of field numbers to sort in parallel based on the first field number
@@ -1069,10 +1156,8 @@ sortarray(v1, "2]3"_var, "AR"); // v1 -> "f1^1]2]10]20^zz]yy]ww]xx^f3^f4"_var
 .SH
 
 .SS
-if (lockrecord(filename, io file, keyx, recordx, waitsecs = 0, allowduplicate = false)) ...
-.PP \"<p>
-Does not actually return record
-.sp 1 \"</p>
+if (lockrecord(filename, io file, keyx, unused, waitsecs = 0, allowduplicate = false)) ...
+
 
 
 .SS

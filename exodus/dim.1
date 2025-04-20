@@ -6,7 +6,10 @@
 .SS
 dim d1;
 .PP \"<p>
-Create an undimensioned array of vars pending actual dimensions.
+Create an undimensioned array of vars.
+.sp 1 \"</p>
+.PP \"<p>
+Pending actual dimensions by redim, read, osread or split.
 .sp 1 \"</p>
 .PP \"<p>
 .PP \"<p>
@@ -21,7 +24,10 @@ dim d1;
 .SS
 dim d1(nrows, ncols = 1);
 .PP \"<p>
-Create an array of vars with a fixed number of columns and rows. All vars are unassigned.
+Create a dimensioned array of vars.
+.sp 1 \"</p>
+.PP \"<p>
+Specify a fixed number of columns and rows. All vars are unassigned.
 .sp 1 \"</p>
 .PP \"<p>
 .PP \"<p>
@@ -37,7 +43,10 @@ dim d2(10, 3);
 .SS
 dim d1 = d2; // Copy
 .PP \"<p>
-Create a copy of an array.
+Copy a dimensioned array.
+.sp 1 \"</p>
+.PP \"<p>
+Unassigned elements are copied as is.
 .sp 1 \"</p>
 .PP \"<p>
 .PP \"<p>
@@ -53,10 +62,10 @@ dim d2 = d1;
 .SS
 dim d1 = dim(); // Move
 .PP \"<p>
-Save an array created elsewhere.
+Save a dimensioned array created elsewhere.
 .sp 1 \"</p>
 .PP \"<p>
-Uses C++ "move" semantics.
+Use C++ "move" semantics.
 .sp 1 \"</p>
 .PP \"<p>
 .PP \"<p>
@@ -71,7 +80,10 @@ dim d1 = "f1^f2^f3"_var.split();
 .SS
 dim d1 = {"a", "b", "c" ...}; // Initializer list
 .PP \"<p>
-Create an array from a list. All elements must be the same type, var, string, double, int, etc.. but all end up as vars which are a flexible type.
+Create a dimensioned array from a literal list.
+.sp 1 \"</p>
+.PP \"<p>
+All elements must be the same type, var, string, double, int, etc. All end up as vars which are flexible.
 .sp 1 \"</p>
 .PP \"<p>
 .PP \"<p>
@@ -87,7 +99,10 @@ dim d2 = {"A", "B", "C"};
 .SS
 dim d1 = v1;
 .PP \"<p>
-Initialise all elements of an array to some single value or constant. A var, "", 0 etc.
+Initialise all elements of an dimensioned array.
+.sp 1 \"</p>
+.PP \"<p>
+To some single value. e.g. a var,  "", 0 etc.
 .sp 1 \"</p>
 .PP \"<p>
 .PP \"<p>
@@ -101,26 +116,15 @@ d1 = "";
 
 
 .SS
-dim d1 = sourceint;
-.PP \"<p>
-Undocumented
-.sp 1 \"</p>
-
-
-.SS
-operator=(double sourcedbl)
-.PP \"<p>
-Undocumented
-.sp 1 \"</p>
-
-
-.SS
 d1.redim(nrows, ncols = 1)
 .PP \"<p>
-Resize an array to a different number of rows and columns.
+Resize a dimensioned array.
 .sp 1 \"</p>
 .PP \"<p>
-Existing data will be retained as far as possible. Any additional elements are unassigned.
+To a different number of rows and columns.
+.sp 1 \"</p>
+.PP \"<p>
+Existing data will be retained. Any additional elements are unassigned.
 .sp 1 \"</p>
 .PP \"<p>
 Resizing rows to 0 clears all data.
@@ -142,7 +146,7 @@ d1.redim(10, 3);
 .SS
 d1.swap(d2) 
 .PP \"<p>
-Swap one array with another.
+Swap two arrays.
 .sp 1 \"</p>
 .PP \"<p>
 Either or both may be undimensioned.
@@ -165,7 +169,10 @@ d1.swap(d2);
 .SS
 var v1 = d1[rowno];       d1[rowno] = v1;
 .PP \"<p>
-Access and update elements of a one dimensional array using [] brackets
+[row] Access and update dimensioned array elements.
+.sp 1 \"</p>
+.PP \"<p>
+Two dimensioned arrays can be traversed, columnwise then rowwise, using one dimension array access.
 .sp 1 \"</p>
 .PP \"<p>
 .PP \"<p>
@@ -180,14 +187,9 @@ let v1 = d1[3]; // "X"
 
 
 .SS
-var v1 = d1[rowno];       d1[rowno] = v1;
-
-
-
-.SS
 var v1 = d1[rowno, colno];       d1[rowno, colno] = v1;
 .PP \"<p>
-Access and update elements of an two dimensional array using [] brackets
+[row, col] Access and update dimensioned array elements.
 .sp 1 \"</p>
 .PP \"<p>
 .PP \"<p>
@@ -203,37 +205,12 @@ let v1 = d1[3, 4]; // "X"
 
 
 .SS
-var v1 = d1[rowno, colno];       d1[rowno, colno] = v1;
-
-
-
-.SS
-d2(rowno);       d1(rowno) = v2
-
-
-
-.SS
-d2(rowno);       d1(rowno) = v2
-
-
-
-.SS
-d2(rowno, colno);       d1(rowno, colno) = v2
-
-
-
-.SS
-d2(rowno, colno);       d1(rowno, colno) = v2
-
-
-
-.SS
 var v1 = d1.rows();
 .PP \"<p>
 Get the number of rows in the dimensioned array
 .sp 1 \"</p>
 .PP \"<p>
-\fBReturns:\fR A count. Can be zero, indicating an empty array.
+\fBreturn:\fR A count. Can be zero, indicating an empty or undimensioned array.
 .sp 1 \"</p>
 .PP \"<p>
 .PP \"<p>
@@ -252,7 +229,7 @@ var v1 = d1.cols();
 Get the number of columns in the dimensioned array
 .sp 1 \"</p>
 .PP \"<p>
-\fBReturns:\fR A count.  0 if the array is undimensioned.
+\fBreturn:\fR A count.  0 if the array is undimensioned.
 .sp 1 \"</p>
 .PP \"<p>
 .PP \"<p>
@@ -268,13 +245,16 @@ let v1 = d1.cols(); // 3
 .SS
 var v1 = d1.join(delimiter = FM);
 .PP \"<p>
-Joins all elements into a single delimited string
+Get a delimited string concatenating all elements of a dimensioned array.
+.sp 1 \"</p>
+.PP \"<p>
+Unassigned elements on the end are omitted.
 .sp 1 \"</p>
 .PP \"<p>
 \fBdelimiter:\fR Default is FM.
 .sp 1 \"</p>
 .PP \"<p>
-\fBReturns:\fR A string var.
+\fBreturn:\fR A string var.
 .sp 1 \"</p>
 .PP \"<p>
 .PP \"<p>
@@ -293,7 +273,7 @@ let v1 = d1.join(); // "f1^f2^f3"_var
 .SS
 d1.splitter(str1, delimiter = FM)
 .PP \"<p>
-Creates or updates the array from a given string.
+Create or update a dimensioned array using a string with delimiters.
 .sp 1 \"</p>
 .PP \"<p>
 If the dim array is undimensioned it will be dimensioned with the number of elements that the string has fields.
@@ -302,10 +282,10 @@ If the dim array is undimensioned it will be dimensioned with the number of elem
 If the dim array is dimensioned and has more elements than there are fields in the string, the excess array elements are initialised to "". If the record has more fields than there are elements in the array, the excess fields are all left unsplit in the final element of the array.
 .sp 1 \"</p>
 .PP \"<p>
-Predimensioning arrays allows the efficient reuse of arrays in loops and ensures that all elements are assigned values, useful when reading records from db files.
+Predimensioning arrays allows the efficient reuse of arrays in loops and ensures that all elements are assigned values, useful when reading records from DB files.
 .sp 1 \"</p>
 .PP \"<p>
-Using undimensioned arrays allows the efficient handling of arrays with a very variable number of elements. e.g. os text files.
+Using undimensioned arrays allows the efficient handling of arrays with a very variable number of elements. e.g. OS text files.
 .sp 1 \"</p>
 .PP \"<p>
 .PP \"<p>
@@ -324,10 +304,13 @@ d2.splitter("f1^f2^f3"_var); // d2.rows() -> 10 /// Predimensioned. Excess eleme
 .SS
 d1.sorter(reverse = false)
 .PP \"<p>
-Sort the elements of the array in place.
+Sort a dimensioned array.
 .sp 1 \"</p>
 .PP \"<p>
-\fBreverse:\fR Defaults to false. If true, then the order is reversed.
+The order of the elements is adjusted so that each element is <= the next.
+.sp 1 \"</p>
+.PP \"<p>
+\fBreverse:\fR If true, then the order is reversed. The default is false.
 .sp 1 \"</p>
 .PP \"<p>
 .PP \"<p>
@@ -344,7 +327,10 @@ let v1 = d1.join(","); // "1,2,10,20"_var
 .SS
 d1.reverser()
 .PP \"<p>
-Reverse the elements of the array in place.
+Reverse a dimensioned array.
+.sp 1 \"</p>
+.PP \"<p>
+The order of the elements is reversed.
 .sp 1 \"</p>
 .PP \"<p>
 .PP \"<p>
@@ -359,16 +345,19 @@ let v1 = d1.join(","); // "1,10,20,2"_var
 
 
 .SS
-d1.shuffler()
+d1.randomizer()
 .PP \"<p>
-Randomly shuffle the order of the elements of the array in place.
+Randomise a dimensioned array.
+.sp 1 \"</p>
+.PP \"<p>
+The order of the elements is randomised.
 .sp 1 \"</p>
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
 .EX \"<code>
 dim d1 = "2,20,10,1"_var.split(",");
-d1.shuffler();
+d1.randomizer();
 let v1 = d1.join(","); // random
 .EE \"</code>
 .sp 1 \"</p>
@@ -381,21 +370,21 @@ let v1 = d1.join(","); // random
 .SS
 dim d1 = d1.sort(reverse = false);
 .PP \"<p>
-Same as sorter() but returns a new array leaving the original untouched.
+Get a sorted copy of a dimensioned array.
 .sp 1 \"</p>
 
 
 .SS
 dim d1 = d1.reverse();
 .PP \"<p>
-Same as reverser() but returns a new array leaving the original untouched.
+Get a reversed copy of a dimensioned array;
 .sp 1 \"</p>
 
 
 .SS
-dim d1 = d1.shuffle();
+dim d1 = d1.randomize();
 .PP \"<p>
-Same as shuffler() but returns a new array leaving the original untouched.
+Get a randomised copy of a dimensioned array.
 .sp 1 \"</p>
 
 
@@ -405,10 +394,13 @@ Same as shuffler() but returns a new array leaving the original untouched.
 .SS
 d1.write(dbfile, key)
 .PP \"<p>
-Writes a db file record created from an array.
+Write a DB file record created from a dimensioned array.
 .sp 1 \"</p>
 .PP \"<p>
-Each element in the array becomes a separate field in the db record. Any redundant trailing FMs are suppressed.
+Each element in the array becomes a separate field in the DB record.
+.sp 1 \"</p>
+.PP \"<p>
+Redundant trailing FMs are omitted.
 .sp 1 \"</p>
 .PP \"<p>
 .PP \"<p>
@@ -428,13 +420,13 @@ write(d1 on file, key);
 .SS
 if (d1.read(dbfile, key)) ...
 .PP \"<p>
-Read a db file record into an array.
+Read a DB file record into a dimensioned array.
 .sp 1 \"</p>
 .PP \"<p>
 Each field in the database record becomes a single element in the array.
 .sp 1 \"</p>
 .PP \"<p>
-\fBReturns:\fR True if the record exists or false if not,
+\fBreturn:\fR True if the record exists or false if not,
 .sp 1 \"</p>
 .PP \"<p>
 If the array is predimensioned then any excess array elements are initialised to "" and any excess record fields are left unsplit in the final array element. See dim splitter for more info.
@@ -462,19 +454,19 @@ if (not read(d1 from file, key)) ...
 .SS
 if (d1.oswrite(osfilename, codepage = "")) ...
 .PP \"<p>
-Creates an entire os text file from an array
+Create an entire OS text file from a dimensioned array
 .sp 1 \"</p>
 .PP \"<p>
-Each element of the array becomes one line in the os file delimited by \\n
+Each element of the array becomes one line in the OS file delimited by \\n
 .sp 1 \"</p>
 .PP \"<p>
-Any existing os file is overwritten and replaced.
+Any existing OS file is overwritten and replaced.
 .sp 1 \"</p>
 .PP \"<p>
 \fBcodepage:\fR Optional: Data is converted from UTF8 to the required codepage/encoding before output. If the conversion cannot be performed then return false.
 .sp 1 \"</p>
 .PP \"<p>
-\fBReturns:\fR True if successful or false if not.
+\fBreturn:\fR True if successful or false if not.
 .sp 1 \"</p>
 .PP \"<p>
 .PP \"<p>
@@ -494,10 +486,10 @@ if (not oswrite(d1 on osfilename)) ...
 .SS
 if (d1.osread(osfilename, codepage = "")) ...
 .PP \"<p>
-Read an entire os text file into an array.
+Read an entire OS text file into a dimensioned array.
 .sp 1 \"</p>
 .PP \"<p>
-Each line in the os file, delimited by \\n or \\r\\n, becomes a separate element in the array.
+Each line in the OS file, delimited by \\n or \\r\\n, becomes a separate element in the array.
 .sp 1 \"</p>
 .PP \"<p>
 Existing data in the array is lost and the array is redimensioned to the number of lines in the input data.
@@ -506,7 +498,7 @@ Existing data in the array is lost and the array is redimensioned to the number 
 \fBcodepage:\fR Optional. Data will be converted from the specified codepage/encoding to UTF8 after being read. If the conversion cannot be performed then return false.
 .sp 1 \"</p>
 .PP \"<p>
-\fBReturns:\fR True if successful or false if not.
+\fBreturn:\fR True if successful or false if not.
 .sp 1 \"</p>
 .PP \"<p>
 If the first \\n in the file is \\r\\n then the whole file will be split using \\r\\n as delimiter.

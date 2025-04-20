@@ -64,7 +64,8 @@ friend class dim_iter;
 	// 1. Default constructor
 	/////////////////////////
 
-	// Create an undimensioned array of vars pending actual dimensions.
+	// Create an undimensioned array of vars.
+	// Pending actual dimensions by redim, read, osread or split.
 	//
 	// `dim d1;`
 	//
@@ -75,7 +76,8 @@ friend class dim_iter;
 
 	// FIXED CONSTRUCTOR
 
-	// Create an array of vars with a fixed number of columns and rows. All vars are unassigned.
+	// Create a dimensioned array of vars.
+	// Specify a fixed number of columns and rows. All vars are unassigned.
 	//
 	// `dim d1(10);
 	//  dim d2(10, 3);`
@@ -101,7 +103,8 @@ friend class dim_iter;
 //		*this = sourcedim;
 //	}
 
-	// Create a copy of an array.
+	// Copy a dimensioned array.
+	// Unassigned elements are copied as is.
 	//
 	// `dim d1 = {2, 4, 6, 8};
 	//  dim d2 = d1;`
@@ -117,8 +120,8 @@ friend class dim_iter;
 //		*this = std::move(sourcedim);
 //	}
 
-	// Save an array created elsewhere.
-	// Uses C++ "move" semantics.
+	// Save a dimensioned array created elsewhere.
+	// Use C++ "move" semantics.
 	//
 	// `dim d1 = "f1^f2^f3"_var.split();`
 	//
@@ -202,7 +205,8 @@ friend class dim_iter;
 	/////////////////////////////////////////////////////////////////
 	template<class T>
 
-	// Create an array from a list. All elements must be the same type, var, string, double, int, etc.. but all end up as vars which are a flexible type.
+	// Create a dimensioned array from a literal list.
+	// All elements must be the same type, var, string, double, int, etc. All end up as vars which are flexible.
 	//
 	// `dim d1 = {1, 2, 3, 4, 5};
 	//  dim d2 = {"A", "B", "C"};`
@@ -245,7 +249,8 @@ friend class dim_iter;
 	// parameters unfortunately causes problem of passing var by value and thereby unnecessary
 	// contruction see also ^= etc
 
-	// Initialise all elements of an array to some single value or constant. A var, "", 0 etc.
+	// Initialise all elements of an dimensioned array.
+	// To some single value. e.g. a var,  "", 0 etc.
 	//
 	// `dim d1(10);
 	//  d1 = "";`
@@ -258,8 +263,9 @@ friend class dim_iter;
 	// Undocumented
 	void operator=(const double sourcedbl);
 
-	// Resize an array to a different number of rows and columns.
-	// Existing data will be retained as far as possible. Any additional elements are unassigned.
+	// Resize a dimensioned array.
+	// To a different number of rows and columns.
+	// Existing data will be retained. Any additional elements are unassigned.
 	// Resizing rows to 0 clears all data.
 	// Resizing cols to 0 clears all data and changes its status to "undimensioned".
 	// obj is d1
@@ -271,7 +277,7 @@ friend class dim_iter;
 
 	// Swap member (handles both base and ncols_)
 
-	// Swap one array with another.
+	// Swap two arrays.
 	// Either or both may be undimensioned.
 	// obj is d1
 	//
@@ -323,7 +329,8 @@ friend class dim_iter;
 	// and so allows lhs assignment like d1(1,2) = "x";
 	// or if on the rhs then use as a normal expression
 
-	// Access and update elements of a one dimensional array using [] brackets
+	// [row] Access and update dimensioned array elements.
+	// Two dimensioned arrays can be traversed, columnwise then rowwise, using one dimension array access.
 	//
 	// `dim d1 = {1, 2, 3, 4, 5};
 	//  d1[3] = "X";
@@ -332,6 +339,7 @@ friend class dim_iter;
 	ND VARREF operator[](int rowno) {return getelementref(rowno, 1);}
 
 	//following const version is called if we do () on a dim which was defined as const xx
+	// Undocumented
 	ND CVR operator[](int rowno) const {return getelementref(rowno, 1);}
 
 	// Provide 2d version of bracket operator if c++23+
@@ -342,7 +350,7 @@ friend class dim_iter;
 //#	define DEPRECATED_PARENS2
 #	define DEPRECATED_PARENS2 [[deprecated("EXODUS: Replace multiple dimensioned array accessors like (x,y) with [x,y] e.g. dimarray(x,y) -> dimarray[x,y]")]]
 
-	// Access and update elements of an two dimensional array using [] brackets
+	// [row, col] Access and update dimensioned array elements.
 	//
 	// `dim d1(10, 5);
 	//  d1 = "";
@@ -351,6 +359,7 @@ friend class dim_iter;
 	//
 	ND VARREF operator[](int rowno, int colno) {return getelementref(rowno, colno);}
 
+	// Undocumented
 	ND CVR operator[](int rowno, int colno) const {return getelementref(rowno, colno);}
 #else
 #	define DEPRECATED_PARENS [[deprecated("EXODUS: Replace single dimensioned array accessors like () with [] e.g. dimarray(n) -> dimarray[n]")]]
@@ -358,8 +367,10 @@ friend class dim_iter;
 #endif
 
 	DEPRECATED_PARENS
+	// Undocumented
 	ND VARREF operator()(int rowno) {return getelementref(rowno, 1);}
 	DEPRECATED_PARENS
+	// Undocumented
 	ND CVR operator()(int rowno) const {return getelementref(rowno, 1);}
 
 	// parenthesis operators often come in pairs
@@ -368,8 +379,10 @@ friend class dim_iter;
 	// or if on the rhs then use as a normal expression
 	//following const version is called if we do () on a dim which was defined as const xx
 	DEPRECATED_PARENS2
+	// Undocumented
 	ND VARREF operator()(int rowno, int colno) {return getelementref(rowno, colno);}
 	DEPRECATED_PARENS2
+	// Undocumented
 	ND CVR operator()(int rowno, int colno) const {return getelementref(rowno, colno);}
 
 	// Transition alternative for () and [] syntax to be used in libexodus, cli, service and test.
@@ -382,7 +395,7 @@ friend class dim_iter;
 	// obj is d1
 
 	// Get the number of rows in the dimensioned array
-	// Returns: A count. Can be zero, indicating an empty array.
+	// return: A count. Can be zero, indicating an empty or undimensioned array.
 	//
 	// `dim d1(5,3);
 	// let v1 = d1.rows(); // 5`
@@ -390,7 +403,7 @@ friend class dim_iter;
 	ND var rows() const;
 
 	// Get the number of columns in the dimensioned array
-	// Returns: A count.  0 if the array is undimensioned.
+	// return: A count.  0 if the array is undimensioned.
 	//
 	// `dim d1(5,3);
 	// let v1 = d1.cols(); // 3`
@@ -398,12 +411,13 @@ friend class dim_iter;
 	ND var cols() const;
 
 	// Q: why is this commented out?
-	// A: we dont want to COPY vars out of an array when using it in rhs expression
+	// A: we dont want to COPY vars out of a dimensioned array when using it in rhs expression
 	// var operator() (int row, int col=1) const;
 
-	// Joins all elements into a single delimited string
+	// Get a delimited string concatenating all elements of a dimensioned array.
+	// Unassigned elements on the end are omitted.
 	// delimiter: Default is FM.
-	// Returns: A string var.
+	// return: A string var.
 	//
 	// `dim d1 = {"f1", "f2", "f3"};
 	//  let v1 = d1.join(); // "f1^f2^f3"_var`
@@ -414,11 +428,11 @@ friend class dim_iter;
 	///// array mutation:
 	/////////////////////
 
-	// Creates or updates the array from a given string.
+	// Create or update a dimensioned array using a string with delimiters.
 	// If the dim array is undimensioned it will be dimensioned with the number of elements that the string has fields.
 	// If the dim array is dimensioned and has more elements than there are fields in the string, the excess array elements are initialised to "". If the record has more fields than there are elements in the array, the excess fields are all left unsplit in the final element of the array.
-    // Predimensioning arrays allows the efficient reuse of arrays in loops and ensures that all elements are assigned values, useful when reading records from db files.
-	// Using undimensioned arrays allows the efficient handling of arrays with a very variable number of elements. e.g. os text files.
+    // Predimensioning arrays allows the efficient reuse of arrays in loops and ensures that all elements are assigned values, useful when reading records from DB files.
+	// Using undimensioned arrays allows the efficient handling of arrays with a very variable number of elements. e.g. OS text files.
 	//
 	// `dim d1;
 	//  d1.splitter("f1^f2^f3"_var); // d1.rows() -> 3  //// Automatically dimensioned.
@@ -428,8 +442,9 @@ friend class dim_iter;
 	//
 	void splitter(in str1, SV delimiter = _FM);
 
-	// Sort the elements of the array in place.
-	// reverse: Defaults to false. If true, then the order is reversed.
+	// Sort a dimensioned array.
+	// The order of the elements is adjusted so that each element is <= the next.
+	// reverse: If true, then the order is reversed. The default is false.
 	//
 	// `dim d1 = "2,20,10,1"_var.split(",");
 	//  d1.sorter();
@@ -437,7 +452,8 @@ friend class dim_iter;
 	//
 	void sorter(bool reverse = false);
 
-	// Reverse the elements of the array in place.
+	// Reverse a dimensioned array.
+	// The order of the elements is reversed.
 	//
 	// `dim d1 = "2,20,10,1"_var.split(",");
 	//  d1.reverser();
@@ -445,41 +461,45 @@ friend class dim_iter;
 	//
 	void reverser();
 
-	// Randomly shuffle the order of the elements of the array in place.
+	// Randomise a dimensioned array.
+	// The order of the elements is randomised.
 	//
 	// `dim d1 = "2,20,10,1"_var.split(",");
-	//  d1.shuffler();
+	//  d1.randomizer();
 	//  let v1 = d1.join(","); // random`
 	//
-	void shuffler();
+	void randomizer();
 
 //	dim& eraser(std::vector<var>::iterator iter1, std::vector<var>::iterator iter2) {base::erase(iter1, iter2); return *this;}
 //	dim& eraser(dim_iter dim_iter1, dim_iter dim_iter2) {base::erase(&*dim_iter1, &*dim_iter2); return *this;}
+
+	PUBLIC void push_back(var&& var1) {base::push_back(std::move(var1));}
 
 	///////////////////////
 	///// array conversion:
 	///////////////////////
 
-	// Same as sorter() but returns a new array leaving the original untouched.
+	// Get a sorted copy of a dimensioned array.
 	ND dim sort(bool reverse = false) const& {dim d1(*this); d1.sorter(reverse); return d1;}
 
-	// Same as reverser() but returns a new array leaving the original untouched.
+	// Get a reversed copy of a dimensioned array;
 	ND dim reverse()                  const& {dim d1(*this); d1.reverser();      return d1;}
 
-	// Same as shuffler() but returns a new array leaving the original untouched.
-	ND dim shuffle()                  const& {dim d1(*this); d1.shuffler();      return d1;}
+	// Get a randomised copy of a dimensioned array.
+	ND dim randomize()                const& {dim d1(*this); d1.randomizer();    return d1;}
 
 	// On temporaries the mutator functions are called.
-	ND dim sort(bool reverseorder = false) && {sorter(reverseorder); return std::move(*this);}
-	ND dim reverse()                       && {reverser();           return std::move(*this);}
-	ND dim shuffle()                       && {shuffler();           return std::move(*this);}
+	ND dim sort(bool reverse = false) &&     {               sorter(reverse);    return std::move(*this);}
+	ND dim reverse()                  &&     {               reverser();         return std::move(*this);}
+	ND dim randomize()                &&     {               randomizer();       return std::move(*this);}
 
 	///////////////////
 	///// array DB I/O:
 	///////////////////
 
-	// Writes a db file record created from an array.
-	// Each element in the array becomes a separate field in the db record. Any redundant trailing FMs are suppressed.
+	// Write a DB file record created from a dimensioned array.
+	// Each element in the array becomes a separate field in the DB record.
+	// Redundant trailing FMs are omitted.
 	//
     // `dim d1 = "Client GD^G^20855^30000^1001.00^20855.76539"_var.split();
     //  let file = "xo_clients", key = "GD001";
@@ -490,9 +510,9 @@ friend class dim_iter;
 	//
 	void write(in dbfile, in key) const;
 
-	// Read a db file record into an array.
+	// Read a DB file record into a dimensioned array.
 	// Each field in the database record becomes a single element in the array.
-	// Returns: True if the record exists or false if not,
+	// return: True if the record exists or false if not,
 	// If the array is predimensioned then any excess array elements are initialised to "" and any excess record fields are left unsplit in the final array element. See dim splitter for more info.
 	// If the array is not predimensioned (rows and cols = 0) then it will be dimensioned to have exactly the same number of rows as there are fields in the record being read.
 	//
@@ -508,11 +528,11 @@ friend class dim_iter;
 	///// array OS I/O:
 	///////////////////
 
-	// Creates an entire os text file from an array
-	// Each element of the array becomes one line in the os file delimited by \n
-	// Any existing os file is overwritten and replaced.
+	// Create an entire OS text file from a dimensioned array
+	// Each element of the array becomes one line in the OS file delimited by \n
+	// Any existing OS file is overwritten and replaced.
 	// codepage: Optional: Data is converted from UTF8 to the required codepage/encoding before output. If the conversion cannot be performed then return false.
-	// Returns: True if successful or false if not.
+	// return: True if successful or false if not.
 	//
 	// `dim d1 = "aaa=1\nbbb=2\nccc=3\n"_var.split("\n");
     //  if (not osremove("xo_conf.txt")) {}; // Cleanup first
@@ -523,11 +543,11 @@ friend class dim_iter;
 	//
 	ND bool oswrite(in osfilename, const char* codepage = "") const;
 
-	// Read an entire os text file into an array.
-	// Each line in the os file, delimited by \n or \r\n, becomes a separate element in the array.
+	// Read an entire OS text file into a dimensioned array.
+	// Each line in the OS file, delimited by \n or \r\n, becomes a separate element in the array.
 	// Existing data in the array is lost and the array is redimensioned to the number of lines in the input data.
 	// codepage: Optional. Data will be converted from the specified codepage/encoding to UTF8 after being read. If the conversion cannot be performed then return false.
-	// Returns: True if successful or false if not.
+	// return: True if successful or false if not.
 	// If the first \n in the file is \r\n then the whole file will be split using \r\n as delimiter.
 	//
 	// `dim d1;
@@ -548,20 +568,6 @@ friend class dim_iter;
 	// and have no knowledge of the underlying container or collection. Therefore they only move "removed" elements
 	// to the end of the container. They return an iter to the first "removed" element so vector::erase can actually do the removal.
 	//
-	// begin() needs to skip the first vector element 0,0
-	// because dim uses 1 based indexing
-	// but we still allow use of vestigial dim(0)/dim(0, 0)
-	//
-//	PUBLIC auto begin() {return ++base::begin();}
-//	PUBLIC auto end()   {return base::end();}
-//	PUBLIC std::iterator<var*, std::vector<var>> begin() {return ++base::begin();}
-//	PUBLIC __gnu_cxx::__normal_iterator<exo::var *, std::vector<exo::var>> begin() {return ++base::begin();}
-//	PUBLIC __gnu_cxx::__normal_iterator<exo::var *, std::vector<exo::var>> end()   {return base::end();}
-//	typedef typename std::vector<var>::iterator iter;
-//	PUBLIC dim_iter begin() {return ++base::begin();}
-//	PUBLIC dim_iter end()   {return base::end();}
-
-	PUBLIC void push_back(var&& var1) {base::push_back(std::move(var1));}
 
  private:
 

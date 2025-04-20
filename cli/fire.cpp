@@ -37,6 +37,9 @@ func main() {
 	// Remove all non-regex options
 	let rxopts = OPTIONS.convert("rUV", "");
 
+	// TODO Enable fire to replace only outside/only inside quotes/literals/comments.
+	rex find_rex = rex(find,rxopts);
+
 	for (in osfilename : COMMAND) {
 
 		if (verbose)
@@ -61,7 +64,7 @@ func main() {
 		if (raw)
 			RECORD.replacer(find, repl);
 		else
-			RECORD.replacer(rex(find,rxopts), repl);
+			RECORD.replacer(find_rex, repl);
 
 		if (RECORD != origrec) {
 

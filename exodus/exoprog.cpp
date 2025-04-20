@@ -712,11 +712,11 @@ var ExoProgram::execute(in command_line) {
 	var saved_cursor;
 	pushselect(saved_cursor);
 
-	let result = perform(command_line);
+	let nrvo = perform(command_line);
 
 	popselect(saved_cursor);
 
-	return result;
+	return nrvo;
 }
 
 // chain
@@ -737,15 +737,19 @@ var ExoProgram::perform(in command_line) {
 
 	// TODO connect many "command" to system calls using the VOC file to enable easy command line interfaces to exodus features.
 
+	var nrvo = "";
+
 	// Hard coded to avoid needing a library. Currently only supporting upper case perform SELECT
 	// TODO replace all perform SELECT with simple select()
 	if (command_line.starts("SELECT ")) {
 		select(command_line);
-		return "";
+		nrvo = "";
+		return nrvo;
 	}
 	if (command_line.starts("DELETEFILE ")) {
 		if (not var().deletefile(command_line.replace(" DATA ", " ").replace(" DICT ", "dict.").field(" ", 2))) {};
-		return "";
+		nrvo = "";
+		return nrvo;
 	}
 
 	// Save some environment variables
@@ -835,13 +839,16 @@ var ExoProgram::perform(in command_line) {
 		}
 
 		// Load the shared library file (always lowercase) TODO allow mixed case
+		// creating a new object so that its member variables all start out unassigned.
 		let libid = SENTENCE.field(" ", 1).lcase();
 		std::string libname = libid.toString();
 		if (!perform_callable_.initsmf(
 											mv,
 											libname.c_str(),
+											/* Use the non-adorned factory function for library() not library(xxx)*/
 											"exoprogram_createdelete_",
-											true  // forcenew each perform/execute
+											// Force new each perform/execute
+											true
 											)) {
 			USER4 ^= "perform() Cannot find shared library \"" + libname +
 					 "\", or \"libraryinit()\" is not present in it.";
@@ -872,13 +879,14 @@ var ExoProgram::perform(in command_line) {
 			}
 
 			// Since the returned var appears OK, use it.
-			ANS = *retval;
+			nrvo = std::move(*retval);
 
 			// Since the returned var appears OK, delete it.
 			// If retval was not actually returned by callsmf then we may get a segfault: free(): invalid pointer
 			// from the fake var's std::string destructor
 			delete retval;
 
+			var::setlasterror("");
 		}
 
 		// TODO reimplement this
@@ -892,25 +900,22 @@ var ExoProgram::perform(in command_line) {
 			// functions can call it to terminate the whole "program"
 			// without needing to setup chains of returns
 			// to exit from nested functions
-			var::setlasterror(e.message);
-			ANS = "";
+			var::setlasterror("");
+			nrvo = e.message;
 		}
 
 		// Abort
 		catch (const ExoAbort& e) {
-			// similar to stop for the time being
-			// maybe it should set some error flag/messages
-			note(e.message);
-			ANS = "";
+			var::setlasterror("ExoAbort:" ^ e.message);
+			nrvo = "";
 		}
 
 		// AbortAll
 		catch (const ExoAbortAll& e) {
-			// similar to stop for the time being
-			// maybe it should set some error flag/messages
-			// and abort multiple levels of perform?
-			var::setlasterror(e.message);
-			ANS = "";
+			// similar to abort for the time being
+			// maybe it should abort multiple levels of perform/execute?
+			var::setlasterror("ExoAbortAll:" ^ e.message);
+			nrvo = "";
 		}
 
 		//TODO Create a second version of this whole try/catch block
@@ -929,43 +934,17 @@ var ExoProgram::perform(in command_line) {
 			throw;
 		}
 
-		// Dont catch Exo Logoff in perform/execute. leave it for exoprog top level exit
-		//catch (const Exo Logoff& e)
-		//{
-		//	// similar to stop for the time being
-		//	// maybe it should set some error flag/messages
-		//	// and abort multiple levels of perform?
-		//	ANS = "";
-		//}
-
 		// CHAIN is a kind of optional follow-on controlled by the library function
 		// to perform another function after the first
 		// Go round again if anything in CHAIN
 		SENTENCE = CHAIN.move();
 
-	} // 
+	} //
 
 	// restore various environment variables
 	restore_environment();
 
-//	// Futile attempt to recover from performing a subroutine which returns void instead of var
-//	// This is atrocious undefined behaviour in C++
-//	// TODO check that we only callsmf on libraries that provide FUNCTION main
-//	// OR call libraries with SUBROUTINE main with new function maybe callsubroutine
-//	//if (ANS.undefined() or ANS.unassigned()) {
-//	// unassigned also checks undefined i.e. illegal bits in ANS.vartyp
-//	TRACE("QWE1")
-//	if (ANS.unassigned()) {
-//		TRACE("QWE2")
-//		ANS = "";
-//	}
-//	let bad;
-//	ANS.swap(bad);
-//	TRACE("QWE3")
-//	ANS = "";
-//	TRACE("QWE4")
-
-	return ANS;
+	return nrvo;
 }
 
 // xlate
@@ -1180,14 +1159,16 @@ baddict:
 //					dict_callable_->mv_ = (&mv);
 
 				// Wire it up with the necessary ExoEnv mv
-				// and locate the correct function object in the library
-				std::string str_funcname =
-					("exoprogram_createdelete_" ^ dictid.lcase()).toString();
+				// and locate the correct function object factory function in the library
+				std::string factory_funcname = "exoprogram_createdelete_" + dictid.lcase().toString();
 				if (!dict_callable_->initsmf(
-														mv,
-														libname.c_str(),
-														str_funcname.c_str())
-													)
+												mv,
+												libname.c_str(),
+												factory_funcname.c_str(),
+												// dont force new each call
+												false
+											)
+				)
 					UNLIKELY
 					throw VarError("ExoProgram::calculate() Cannot find Library " +
 								  libname + ", or function " +

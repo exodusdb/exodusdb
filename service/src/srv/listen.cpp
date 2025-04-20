@@ -848,13 +848,6 @@ func loop_exit() {
 		return true;
 	}
 
-	// 	// f10 or ? on linux
-	// 	if (charx == INTCONST.f(7)) {
-	// 		// execute("RUNMENU " ^ ENVIRONSET.f(37));
-	// 		execute("RUNMENU");
-	// 		return true;
-	// 	}
-
 	if (charx != "") {
 
 		// "U" = unlock all locks
@@ -883,17 +876,6 @@ func loop_exit() {
 		// monitor updates nagios and optionally checks for upgrades
 		call monitor2();
 		lastmonitortime = time();
-
-//		// install and run patches
-//		call listen5("PATCHANDRUNONCE", live, processes);
-//		patched = ANS;
-//
-//		if (patched) {
-//			request1 = "RESTART PATCHED";
-//
-//			// gosub main_exit();
-//			return false;
-//		}
 
 		// monitor might have run so avoid processing another request without resetting
 		// goto nextsearch0;
