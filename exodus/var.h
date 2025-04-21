@@ -123,9 +123,9 @@ public:
 
 	/* fake for gendoc
 
-    // Create an unassigned var.
-	// Unassigned variables can be assigned conditionally in if/else statements or used as outbound arguments of function calls.
-	// A runtime error is thrown if a var is used before being assigned so silent "use before assign" bugs cannot occur.
+	// Create an unassigned var.
+	// Unassigned vars can be conditionally assigned in if/else statements or used as outbound arguments in function calls.
+	// A runtime error is thrown if a var is used before being assigned, preventing silent "use before assign" bugs.
 	//
 	// `var client; // Unassigned var
 	//  if (not read(client from "xo_clients", "SB001")) ...`
@@ -199,7 +199,7 @@ public:
 
 	// Swap the contents of one var with another.
     // Useful for stashing large strings quickly. They are moved using pointers without making copies or allocating memory.
-	// Eiher or both variables may be unassigned.
+	// Either or both variables may be unassigned.
 	//
 	// `var v1 = space(65'536);
 	//  var v2 = "";
@@ -210,9 +210,9 @@ public:
 	void swap(io v2);
 
 	// Move a var into another.
-	// Shallow copy of var data and take ownership of the moved var's string if any. The moved var becomes an empty string.
-	// This allows large strings to be handled efficiently. They are moved using pointers without making copies or allocating memory.
-    // The moved var must be assigned otherwise a VarUnassigned error is thrown.
+	// Performs a shallow copy of the var's data and transfers ownership of its string, if any. The moved var is set to an empty string.
+	// Enables efficient handling of large strings by moving pointers without copying or allocating memory.
+	// throw: VarUnassigned if the moved var is unassigned before the move.
 	// obj is v2
 	//
 	// `var v1 = space(65'536);
@@ -233,8 +233,8 @@ public:
 	ND var clone() const;
 
 	// Return a string describing internal data of a var.
-	// If the str is located on the heap then its address is given.
-	// typ:
+	// If the var holds an internal std::string using heap storage then its its heap storage address is given.
+	// typ: Multiple typs may exist simultaneously.
     // * 0x01 * str is available.
     // * 0x02 * int is available.
     // * 0x04 * dbl is available.
@@ -257,12 +257,16 @@ public:
 	/* fake for gendoc Defined for var_base in varb.h
 
 	// Check if a var is numeric.
-	// return: True if a var holds a double, an integer, or a string that is defined as numeric.
-	// A string is defined as numeric only if it consists of one or more digits 0-9, with an optional decimal point "." placed anywhere, with an optional + or - sign prefix, or it is the empty string "", which is defined to be zero.
+	// return: True if a var holds a double, integer, or a string representing a numeric value.
+	// A string is considered numeric if it is:
+	// * Empty (treated as zero), or
+	// * Composed of one or more digits (0-9), an optional leading '+' or '-' sign, and an optional single decimal point ('.') placed before, within, or after the digits.
+	// * Optionally includes an exponential suffix ('e' or 'E', optionally followed by '+' or '-', and 1-3 digits).
 	//
-	// `if ("+123.45"_var.isnum()) ... ok
-	//  if (       ""_var.isnum()) ... ok
-	//  if (not   "."_var.isnum()) ... ok
+	// `if (   "+123.45"_var.isnum()) ... ok
+	//  if ("+1.2345e+2"_var.isnum()) ... ok
+	//  if (          ""_var.isnum()) ... ok
+	//  if (not      "."_var.isnum()) ... ok
 	//  // or
 	//  if (isnum("123.")) ... ok`
 	//

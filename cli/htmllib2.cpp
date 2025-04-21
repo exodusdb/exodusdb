@@ -2113,7 +2113,7 @@ Formats HTML-like input, including snippets without <body>, by indenting tags wi
 //#include <string_view>
 //#include <cstdlib> // For EXIT_SUCCESS, EXIT_FAILURE
 
-bool is_void_tag(const char* ptr) {
+bool is_void_pre_tag(const char* ptr, std::string& tag_name) {
     // List of tags to ignore for indentation (lowercase)
     static const char* ignored_tags[] = {
         "br", "img", "hr", "meta", "link", "input", // Void tags
@@ -2126,7 +2126,8 @@ bool is_void_tag(const char* ptr) {
     ptr += is_closing ? 2 : 1; // Skip '</' or '<'
 
     // Collect tag name until space, '>', or '/'
-    std::string tag_name;
+//    std::string tag_name;
+    tag_name = "";
     if (is_closing) {
         tag_name += '/'; // Prefix closing tags with '/'
     }
@@ -2206,6 +2207,9 @@ int html_tidy_main2(const std::string& input, std::string& output, std::stringst
     const char* ptr = input_cstr + body_pos;
     char prev_char = body_pos > 0 ? *(ptr - 1) : '\0'; // Track previous character
 
+	std::string tag_name;
+	int inside_pre = 0;
+
     // Process characters with pointer, building output string
     while (*ptr != '\0') {
         char c = *ptr;
@@ -2218,21 +2222,25 @@ int html_tidy_main2(const std::string& input, std::string& output, std::stringst
             if (is_valid_tag) {
                 bool is_closing_tag = (next == '/');
                 // Check if it's a void tag or </body>, </html
-                bool is_ignored = is_void_tag(ptr);
+                bool is_ignored = is_void_pre_tag(ptr, tag_name);
                 if (!is_ignored) {
                     if (!is_closing_tag) {
-                        // Non-void opening tag: remove existing indent (if any), append newline and indent
-                        while (!output.empty() && (output.back() == ' ' || output.back() == '\t')) {
-                            output.pop_back();
-                        }
-                        if (!output.empty() && output.back() != '\n') {
-                            output.push_back('\n');
-                        }
-                        for (int j = 0; j < indent_level; ++j) {
-                            output.push_back(indent_unit);
-                        }
+						if (!inside_pre) {
+	                        // Non-void opening tag: remove existing indent (if any), append newline and indent
+	                        while (!output.empty() && (output.back() == ' ' || output.back() == '\t')) {
+	                            output.pop_back();
+	                        }
+	                        if (!output.empty() && output.back() != '\n') {
+	                            output.push_back('\n');
+	                        }
+	                        for (int j = 0; j < indent_level; ++j) {
+	                            output.push_back(indent_unit);
+	                        }
+						}
                         // Increase indent level
                         ++indent_level;
+						if (tag_name == "pre")
+							inside_pre++;
                     } else {
                         // Other closing tags: decrease indent level if not already 0
                         if (indent_level > 0) {
@@ -2241,12 +2249,16 @@ int html_tidy_main2(const std::string& input, std::string& output, std::stringst
                             ++excessive_undent;
                             messages << "htmllib2:html_tidy: Error: Excessive undent attempt on line " << line_number << '\n';
                         }
-                        // Indent if on a new line
-                        if (prev_char == '\n') {
-                            for (int j = 0; j < indent_level; ++j) {
-                                output.push_back(indent_unit);
-                            }
-                        }
+						if (!inside_pre) {
+	                        // Indent if on a new line
+	                        if (prev_char == '\n') {
+	                            for (int j = 0; j < indent_level; ++j) {
+	                                output.push_back(indent_unit);
+	                            }
+	                        }
+						}
+						if (tag_name == "/pre")
+							inside_pre--;
                     }
                 } else {
                     // Void tags or </body>, </html>: just append without indent or level change

@@ -1260,7 +1260,7 @@ func main() {
 
 		if (all_contents) {
 
-			doc_text ^= "<div class=\"toc>\">\n";
+			doc_text ^= "<div class=\"toc\">\n";
 
 			doc_text ^= "<h3>Sections:</h3>\n";
 
@@ -1298,6 +1298,7 @@ func main() {
 ////oswrite(doc_text on "y");
 //		}
 //
+
 		// Properly indent the html (body only)
 		let errcode = htmllib2("HTMLTIDY", DATA, doc_text);
 		if (not errcode or len(DATA) > len(doc_text))
@@ -1555,7 +1556,7 @@ R"__(
 
 	dt {
 		grid-column: 1; /* Left column */
-		padding-right: 5px;
+		padding: 0 5px 0 5px;
 //		text-align: center;
 		font-weight: bold;
 		font-family: var(--bs-font-monospace);
