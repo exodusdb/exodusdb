@@ -804,22 +804,22 @@ public:
 	//  let v2 = match("abc1abc2", "BC(\\d)", "i");`
 	//
 	// regex_options:
-    // * l  * Literal (any regex chars are treated as normal chars)
-    // * i  * Case insensitive
-    // * p  * ECMAScript/Perl (the default)
-    // * b  * Basic POSIX (same as sed)
-    // * e  * Extended POSIX
-    // * a  * awk
-    // * g  * grep
-    // * eg * egrep or grep -E
+    // *  l  * Literal (any regex chars are treated as normal chars)
+    // *  i  * Case insensitive
+    // *  p  * ECMAScript/Perl (the default)
+    // *  b  * Basic POSIX (same as sed)
+    // *  e  * Extended POSIX
+    // *  a  * awk
+    // *  g  * grep
+    // *  eg * egrep or grep -E
 	//
     // char ranges like a-z are locale sensitive if ECMAScript
 	//
 	// regex_options:
-    // * m * Multiline. Default in boost (and therefore exodus)
-    // * s * Single line. Default in std::regex
-	// * f * First only. Only for replace() (not match() or search())
-    // * w * Wildcard glob style (e.g. *.cfg) not regex style. Only for match() and search(). Not replace().
+    // *  m * Multiline. Default in boost (and therefore exodus)
+    // *  s * Single line. Default in std::regex
+	// *  f * First only. Only for replace() (not match() or search())
+    // *  w * Wildcard glob style (e.g. *.cfg) not regex style. Only for match() and search(). Not replace().
 	//
 	ND var  match(SV regex_str, SV regex_options = "") const;
 

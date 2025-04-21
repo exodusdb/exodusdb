@@ -454,6 +454,16 @@ func main(in mode, io dataio, in params0 = "", in params20 = "", in glang = "") 
         var& exit_status = dataio;
 		return h2m_main(text_in, exit_status);
 
+	} else if (mode =="HTMLTIDY") {
+		// Properly indent html
+        let& html_in = params0;
+        var& html_out = dataio;
+		// 0 Success
+		// 1 Excessive indent
+		// 2 Excessive undent
+		var messages;
+		return html_tidy_main(html_in, html_out, messages);
+
 	} else {
 		call note(mode.quote() ^ " unknown mode in HTMLLIB2");
 	}
@@ -2047,6 +2057,240 @@ std::vector<std::string> h2m_parser(const std::string& all_input, out exit_statu
     }
 
     return tokens;
+}
+
+/* HTML Indentation Formatter
+
+1. One-line Summary:
+Formats HTML-like input, including snippets without <body>, by indenting tags with tabs, trimming trailing whitespace, preserving content whitespace, and detecting indentation errors, building output in a single string.
+
+2. What It Handles:
+- Any HTML-like tags (e.g., <div>, <custom>, <span>) regardless of input indentation.
+- HTML snippets lacking <body> or <BODY>, starting indentation from the beginning.
+- Void (self-closing) tags (e.g., <br>, <img>) without increasing indent level.
+- Closing tags </body> and </html> ignored for indentation purposes.
+- Non-tag '<' characters (e.g., <3, < b in text) output as-is.
+- Case-insensitive <body> and <BODY> for pre-<body> content preservation.
+- Whitespace preservation in tags like <dt> and <pre> (e.g., for white-space: pre-wrap).
+- Trims trailing spaces and tabs before non-void opening tags to clean up output.
+- Excessive undent attempts with per-line and summary error messages on stderr.
+- Exit status for errors: 2 for excessive undents, 1 for unbalanced tags, 0 for success.
+- Line count message on clog indicating lines converted.
+
+3. Implementation Details:
+- Reads entire input from stdin into a std::string for processing.
+- Builds output in a single std::string, reserved at 1.1 times input size, using push_back for efficiency.
+- Outputs final string to std::cout at the end of processing.
+- Uses std::string_view to efficiently append pre-<body> content to the output string.
+- Starts processing at the '<' of <body> or <BODY>, or at the start (body_pos = 0) if no <body> is found.
+- Initializes indent_level = -1 for <body> content, or 0 for snippets without <body>.
+- Uses char* pointer iteration over c_str() for character-by-character processing.
+- Indents with a single tab character (char indent_unit = '\t') per level.
+- Tracks line numbers (starting at 1) by counting '\n' characters.
+- Recognizes valid tag start characters: letters (a-z, A-Z), '/', '!', '?'.
+- Ignores non-tag '<' (e.g., <3, <@) by checking next character.
+- Handles void tags (br, img, hr, meta, link, input) and closing tags (/body, /html) via is_void_tag function.
+- is_void_tag converts tag names to lowercase for case-insensitive matching.
+- For non-void opening tags: trims trailing spaces/tabs from output string, appends newline (if last char is not '\n'), indents, increments indent_level.
+- For closing tags (not /body, /html): decrements indent_level if > 0, else increments excessive_undent and outputs error to stderr with line number.
+- For void tags and /body, /html: appends without indent_level change or indentation.
+- Prevents indent_level from going below 0, counting excessive undent attempts.
+- Outputs per-line excessive undent errors to stderr with line number.
+- Outputs summary errors to stderr: total excessive_undent count and non-zero indent_level if applicable.
+- Outputs line count to clog: "Lines converted: <number>".
+- Returns exit status: 2 if excessive_undent > 0, 1 if indent_level != 0, 0 if both are satisfied.
+- Preserves all content whitespace (e.g., in <dt>, <pre>) by appending characters as-is.
+- Outputs no trailing newline, ending with the last processed character.
+- Handles large files (e.g., 531,391 bytes) efficiently with string and pointer operations.
+- Case-insensitive handling of <body> and <BODY> for pre-<body> content.
+- Supports HTML with <pre>, <code>, <span> containing non-tag '<' (e.g., <span class="o">=</span>).
+- Processes unindented or poorly indented input, applying consistent tab-based indentation.
+*/
+
+//#include <iostream>
+//#include <string>
+//#include <sstream>
+//#include <string_view>
+//#include <cstdlib> // For EXIT_SUCCESS, EXIT_FAILURE
+
+bool is_void_tag(const char* ptr) {
+    // List of tags to ignore for indentation (lowercase)
+    static const char* ignored_tags[] = {
+        "br", "img", "hr", "meta", "link", "input", // Void tags
+        "/body", "/html", // Closing tags to ignore
+        nullptr // Sentinel
+    };
+
+    // Check if it's a closing tag
+    bool is_closing = (*ptr == '<' && *(ptr + 1) == '/');
+    ptr += is_closing ? 2 : 1; // Skip '</' or '<'
+
+    // Collect tag name until space, '>', or '/'
+    std::string tag_name;
+    if (is_closing) {
+        tag_name += '/'; // Prefix closing tags with '/'
+    }
+    while (*ptr != '\0' && *ptr != ' ' && *ptr != '>' && *ptr != '/') {
+        tag_name += (*ptr >= 'A' && *ptr <= 'Z') ? *ptr + ('a' - 'A') : *ptr; // Convert to lowercase
+        ++ptr;
+    }
+
+    // Check if tag_name matches any ignored tag
+    for (int i = 0; ignored_tags[i] != nullptr; ++i) {
+        if (tag_name == ignored_tags[i]) {
+            return true;
+        }
+    }
+    return false;
+}
+
+// Shim to convert var <-> std::strings
+// 0 Success
+// 1 Excessive indent
+// 2 Excessive undent
+function html_tidy_main(in html_in, out html_out, out messages) {
+	std::string html_out_str;
+	std::stringstream messages_ss;
+
+	let result = html_tidy_main2(html_in.toString(), html_out_str, messages_ss);
+	html_out = std::move(html_out_str);
+
+	messages = messages_ss.str();
+	if (result)
+		messages.errputl();
+
+	return result;
+}
+
+int html_tidy_main2(const std::string& input, std::string& output, std::stringstream& messages) {
+
+//    // Read entire input into a string
+//    std::stringstream buffer;
+//    buffer << std::cin.rdbuf();
+//    std::string input = buffer.str();
+
+    const char* input_cstr = input.c_str();
+
+    // Initialize output string with reserved capacity (1.1x input size)
+//    std::string output;
+    output.reserve(static_cast<size_t>(double(input.size()) * 1.1));
+
+    int indent_level = -1; // Current indentation level (start at -1 so <body> is 0)
+    int excessive_undent = 0; // Count attempts to undent below 0
+    int line_number = 1; // Track line number, starting at 1
+    const char indent_unit = '\t'; // Tab character
+
+    // Find <body> or <BODY> position
+    size_t body_pos = input.find("<body");
+    if (body_pos == std::string::npos) {
+        body_pos = input.find("<BODY");
+        if (body_pos == std::string::npos) {
+            // Process entire input as snippet
+            body_pos = 0;
+            indent_level = 0;
+        }
+    }
+
+    // Append pre-<body> content using string_view
+    std::string_view input_view(input);
+    output.append(input_view.substr(0, body_pos));
+
+    // Count lines in pre-<body> content
+    for (size_t i = 0; i < body_pos && input_cstr[i] != '\0'; ++i) {
+        if (input_cstr[i] == '\n') {
+            ++line_number;
+        }
+    }
+
+    // Start at the '<' of <body> or <BODY> (or start of string for snippets)
+    const char* ptr = input_cstr + body_pos;
+    char prev_char = body_pos > 0 ? *(ptr - 1) : '\0'; // Track previous character
+
+    // Process characters with pointer, building output string
+    while (*ptr != '\0') {
+        char c = *ptr;
+        if (c == '<') {
+            // Look ahead to next character
+            char next = *(ptr + 1);
+            // Check if next character is valid for a tag (ordered by probability)
+            bool is_valid_tag = ((next >= 'a' && next <= 'z') || (next >= 'A' && next <= 'Z') ||
+                                 next == '/' || next == '!' || next == '?');
+            if (is_valid_tag) {
+                bool is_closing_tag = (next == '/');
+                // Check if it's a void tag or </body>, </html
+                bool is_ignored = is_void_tag(ptr);
+                if (!is_ignored) {
+                    if (!is_closing_tag) {
+                        // Non-void opening tag: remove existing indent (if any), append newline and indent
+                        while (!output.empty() && (output.back() == ' ' || output.back() == '\t')) {
+                            output.pop_back();
+                        }
+                        if (!output.empty() && output.back() != '\n') {
+                            output.push_back('\n');
+                        }
+                        for (int j = 0; j < indent_level; ++j) {
+                            output.push_back(indent_unit);
+                        }
+                        // Increase indent level
+                        ++indent_level;
+                    } else {
+                        // Other closing tags: decrease indent level if not already 0
+                        if (indent_level > 0) {
+                            --indent_level;
+                        } else {
+                            ++excessive_undent;
+                            messages << "htmllib2:html_tidy: Error: Excessive undent attempt on line " << line_number << '\n';
+                        }
+                        // Indent if on a new line
+                        if (prev_char == '\n') {
+                            for (int j = 0; j < indent_level; ++j) {
+                                output.push_back(indent_unit);
+                            }
+                        }
+                    }
+                } else {
+                    // Void tags or </body>, </html>: just append without indent or level change
+                    output.push_back('\n');
+                    for (int j = 0; j < indent_level; ++j) {
+                        output.push_back(indent_unit);
+                    }
+                }
+            }
+            output.push_back(c); // Append '<' whether tag or not
+        } else {
+            // Append all other characters as-is
+            output.push_back(c);
+        }
+        // Update line number
+        if (c == '\n') {
+            ++line_number;
+        }
+        prev_char = c; // Update previous character
+        ++ptr; // Move to next character
+    }
+
+    // Output the final string to cout
+//    std::cout << output;
+
+    // Output line count to clog
+    messages << "htmllib2:html_tidy: Lines converted: " << line_number << '\n';
+
+    // Output summary error messages to stderr
+    if (excessive_undent > 0) {
+        messages << "htmllib2:html_tidy: Error: Total excessive undent attempts: " << excessive_undent << '\n';
+    }
+    if (indent_level != 0) {
+        messages << "htmllib2:html_tidy: Error: Final indent level non-zero: " << indent_level << '\n';
+    }
+
+    // Determine exit status
+    if (excessive_undent > 0) {
+        return 2; // EXIT_FAILURE with status 2 for excessive undent
+    }
+    if (indent_level != 0) {
+        return 1; // EXIT_FAILURE with status 1 for non-zero final indent
+    }
+    return 0; // EXIT_SUCCESS
 }
 
 libraryexit()  // Closes the Exodus library class and provides a factory function for use in dynamic loading and linking

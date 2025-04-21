@@ -374,9 +374,9 @@ ND	var  calculate(in dictid, in dictfile, in id, in record, in mv = 0);
 	// MV: Environment variable. Will be used to select a particular value if not zero, or all values if zero.
 ND	var  xlate(in filename, in key, in fieldno_or_name, const char* mode);
 
-	/////////////////////
-	///// i/o conversion:
-	/////////////////////
+	////////////////////
+	///// io conversion:
+	////////////////////
 
 	// iconv/oconv "[...]"
 	// ExoProgram's iconv/oconv functions have access to ExoProgram's environment variables like BASEFMT, DATEFMT and TZ and have the ability to call custom functions like "[funname,args...]"

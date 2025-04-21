@@ -357,14 +357,14 @@ func main() {
 
 				} else {
 
-					var table_id = short_title.convert(" ", "_");
+					var table_id = short_title.convert(" /", "__");
 
-					let table_entry = "<li><a href=#" ^ table_id ^ ">" ^ short_title ^ "</a></li>\n";
+					let table_entry = "<li><a href=\"#" ^ table_id ^ "\">" ^ short_title ^ "</a></li>\n";
 					file_contents ^= table_entry;
 
-					docfile << "<h" << level << " id=" << table_id << ">" << short_title << "</h" << level << ">" << std::endl;
+					docfile << "<h" << level << " id=\"" << table_id << "\">" << short_title << "</h" << level << ">" << std::endl;
 					docfile << "" << std::endl;
-					docfile << "<table class=wikitable>" << std::endl;
+					docfile << "<table class=\"wikitable\">" << std::endl;
 					docfile << "<tr> <th>Use</th> <th>Function</th> <th>Description</th> </tr>" << std::endl;
 				}
 				continue; // nextline
@@ -658,18 +658,6 @@ func main() {
 					codematch.replacer(rex(R"__([\t ]*\n)__"), "\n");
 
 					codefile << codematch;
-//					var codematch2, errors, exit_status;
-//TRACE("PYGMENTIZE")
-//TIMESTAMP=ostimestamp();
-//					if (not var::osprocess("pygmentize -f html", codematch, codematch2, errors, exit_status)) {
-//						loglasterror();
-//						codematch2 = codematch;
-//					}
-//TRACE(elapsedtimetext())
-//TRACE(codematch2)
-//static var codematches = "xyz";
-//codematches << codematch;
-//					codefile << codematch2;
 
 					if (uses_format) {
 						codefile << "#endif\n";
@@ -930,7 +918,7 @@ func main() {
 						 "var v1 = " ^ class_name.first() ^ "1[$1];       " ^ class_name.first() ^ "1[$1] = v1;"
 					);
 					if (html or wiki)
-						func_decl.replacer("       ", "</br>");
+						func_decl.replacer("       ", "<br>");
 					// Use on left and right hand side
 					funcx_prefix = "";
 					}
@@ -1111,12 +1099,17 @@ func main() {
 				docfile << "|" << funcx_prefix << "||" << func_decl << "||" << comments << std::endl;
 			} else {
 
+				let funcx_prefix_wrapped = funcx_prefix ? ("<p><code>" ^ funcx_prefix ^ "</code></p>") : "";
+//				func_decl.replacer("&", "&amp;");
+//				func_decl.replacer("<", "&lt;");
+//				func_decl.replacer(">", "&gt;");
+
 				// Finally its a three column row
 				docfile
 					<< "<tr>"
-					<< "<td><p><code>" << funcx_prefix << "</code></p></td>"
-					<< "<td><p><code>" << func_decl    << "</code></p></td>"
-					<< "<td>"          << comments     << "</td>"
+					<< "<td>"          << funcx_prefix_wrapped << "</td>"
+					<< "<td><p><code>" << func_decl            << "</code></p></td>"
+					<< "<td>"          << comments             << "</td>"
 					<< "</tr>" << std::endl;
 			}
 
@@ -1160,12 +1153,12 @@ func main() {
 
 				let osfile_id = osfilenameonly.field(".");
 				let osfile_title = osfilenameonly.field(".");
-				all_contents ^= "<li><a href=#" ^ osfile_id ^ ">" ^ osfile_title ^ "</a></li>\n";
+				all_contents ^= "<li><a href=\"#" ^ osfile_id ^ "\">" ^ osfile_title ^ "</a></li>\n";
 
 				// Contents
-				doc_text ^= "<div class=toc>\n";
+				doc_text ^= "<div class=\"toc\">\n";
 
-				doc_text ^= "<h4 id=" ^ osfile_id ^ ">Contents:</h4>\n";
+				doc_text ^= "<h4 id=\"" ^ osfile_id ^ "\">Contents:</h4>\n";
 
 				doc_text ^= "<ol>\n";
 				doc_text ^= file_contents;
@@ -1190,6 +1183,11 @@ func main() {
 			else {
 //				doc_text ^= file_header;
 				doc_text ^= "\n\n";
+
+//				// Remove all p before and after div
+//				doc_body.replacer("<p>\n<div", "<div");
+//				doc_body.replacer("</div>\n</p>", "</div>");
+//				doc_body.replacer("<p></p>", "");
 			}
 
 			// 3. body
@@ -1240,8 +1238,9 @@ func main() {
 		doc_text ^=
 			"<!DOCTYPE html>\n"
 			"<html>\n"
-			"<head>\n";
-	//					"  <title>" ^ page_title ^ "</title>"
+			"<head>\n"
+			"<title>" ^ page_title ^ "</title>"
+		;
 
 		// css and script
 		doc_text ^= css;
@@ -1254,13 +1253,14 @@ func main() {
 
 		doc_text ^=
 			"</head>\n"
-			"<body class=\"" ^ style_switcher_class ^ "\">\n";
+			"<body class=\"" ^ style_switcher_class ^ "\">\n"
+		;
 
 //		doc_text ^= style_switcher_dropdown;
 
 		if (all_contents) {
 
-			doc_text ^= "<div class=toc>\n";
+			doc_text ^= "<div class=\"toc>\">\n";
 
 			doc_text ^= "<h3>Sections:</h3>\n";
 
@@ -1272,34 +1272,41 @@ func main() {
 			doc_text ^= "</div>\n";
 		}
 
-		// Output the html header
-		printl(doc_text);
+		// Append each file's html
+		for (in file_text : file_texts)
+			doc_text ^= file_text;
 
-		// Output each file's html
-//		for (let filen : rang(1, nfiles)) {
-		for (in file_text : file_texts) {
-			printl(file_text);
-		}
-
-		// Insert the latest version of exodus keywords
-		var exodus_keywords = osread(osgetenv("HOME") ^ "/exodus/exodus/libexodus/exodus/keywords.txt").field("\n",2,999999);
-		// Make unique FM array
-		exodus_keywords = exodus_keywords.convert(",'\n", "   ").trim().convert(" ", FM).sort().unique();
-		// Text fold at 80 and insert an escaped NL
-		exodus_keywords = exodus_keywords.convert(FM, " ").oconv("T#80").trimlast().replace(rex("\\s*" _TM), " \\\n");
-		syntax_hljs_bottom.replacer("EXODUS_KEYWORDS", exodus_keywords);
-
-		printx(syntax_hljs_bottom);
-
-//		printx(style_switcher_foot);
-
-		// Finalise the html
-		printl(
+		// Close everything
+		doc_text ^=
 			"</body>\n"
 			"</html>"
-		);
+		;
 
-	}
+//		// Tidy the text if possible
+//		if (osshell("which tidy 1> /dev/null")) {
+//			var doc_out;
+//			var err_out;
+//			var exit_status;
+////			var cmd = "tidy -i -w 0";
+//			var cmd = xmllint --format --html input.html > output.html
+//			// Ignore warnings (status 1), and errors (status 2) as long as output > input
+////oswrite(doc_text on "x");
+//			if (not osprocess(cmd, doc_text, doc_out, err_out, exit_status) and exit_status > 1 and len(doc_out) < len(doc_text))
+//				logputl(err_out);
+//			else
+//				doc_text = move(doc_out);
+////oswrite(doc_text on "y");
+//		}
+//
+		// Properly indent the html (body only)
+		let errcode = htmllib2("HTMLTIDY", DATA, doc_text);
+		if (not errcode or len(DATA) > len(doc_text))
+			doc_text = move(DATA);
+
+		// Output the html header and multi-file section contents
+		printl(doc_text);
+
+	} // html
 
 	/////////////////////
 	// handle code output
@@ -1355,29 +1362,12 @@ func main() {
 
 } // main2
 
-////////////
-// syntax_js
-////////////
-
-	let syntax_hljs_top =
-
-R"__(
-)__";
-
-	var syntax_hljs_bottom =
-
-R"__(
-)__";
-
 //////
 // css
 //////
 
 var css =
 R"__(
-	<!-- bootstrap css. Is this necessary? -->
-	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-
 <style>
 
 :root {
