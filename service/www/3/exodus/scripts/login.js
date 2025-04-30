@@ -212,18 +212,26 @@ function* login_onclick() {
     if (datasetx.substr(-5) != '_test')
        exodussetcookie('EXODUS','dataset',datasetx,'',true)
 
+    // Ensure login fields are not empty
     if (!gusername_element.value) {
         //  alert('Please enter your username first')
         gusername_element.focus()
         return
     }
-
-    //ensure username is in uppercase and no trailing spaces
-    gusername_element.value = gusername_element.value.toUpperCase().replace(/ *$/, '')
     if (!gpassword_element.value) {
         //  alert('Please enter your password first')
         gpassword_element.focus()
         return
+    }
+
+    // Ensure username is in uppercase and no trailing spaces
+    gusername_element.value = gusername_element.value.toUpperCase().replace(/ *$/, '')
+
+    // Ensure username has no spaces
+    if (gusername_element.value.includes(' ')) {
+        gusername_element.focus();
+        gusername_element.select();
+        return yield* exodusinvalid("<b>Wrong username or password</b> \r → Check details and try again.");
     }
 
     var authno = ''
