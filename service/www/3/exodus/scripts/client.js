@@ -5186,20 +5186,24 @@ function* exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negativebut
     }
     if (imagesrc) {
         if (imagesrc == 'critical') {
-            imagesrc = 'xpcritical.gif'
+            //imagesrc = 'xpcritical.gif'
+            imagesrc = 'xpcritical.webp'
             div.style.backgroundColor = '#ffdddd'//reddish
         }
         if (imagesrc == 'warning') {
-            imagesrc = 'xpwarning.gif'
+            //imagesrc = 'xpwarning.gif'
+            imagesrc = 'xpwarning.webp'
             div.style.backgroundColor = '#ffff99'//yellowish
             //darker than usual messages to distinguish from the usual buff document background color
         }
         if (imagesrc == 'info') {
-            imagesrc = 'xpinfo.gif'
+            //imagesrc = 'xpinfo.gif'
+            imagesrc = 'xpinfo.webp'
             div.style.backgroundColor = '#ddffdd'//greenish
         }
         if (imagesrc == 'question1') {
-            imagesrc = 'xpquestion.gif'
+            //imagesrc = 'xpquestion.gif'
+            imagesrc = 'xpquestion.webp'
             div.style.backgroundColor = '#ddddff'//blueish
         }
         if (!(imagesrc.indexOf('/') + 1 + imagesrc.indexOf('\\') + 1)) {
