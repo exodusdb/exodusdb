@@ -3,7 +3,9 @@
 var gimageextensions=['gif','jpg','jpeg','png','tif','tiff','bmp']
 var gvideoextensions=['mpg','mpeg','avi','mov','mp4','3gp']
 var gaudioextensions=['mp3','wav','mid','midi']
-var gdocumentextensions=['doc','xls','pdf','ppt','txt','zip','psjpg', 'docx', 'xlsx', 'pptx', 'htm', 'html', 'mht', 'eml', 'msg']
+//var gdocumentextensions=['doc','xls','pdf','ppt','txt','zip','psjpg', 'docx', 'xlsx', 'pptx', 'htm', 'html', 'mht', 'eml', 'msg']
+//removed psjpg (unrecognised format) and html,htm (risky formats as they can contain scripts)
+var gdocumentextensions=['doc','xls','pdf','ppt','txt','zip','docx','xlsx','pptx','mht','eml','msg']
 var gaudiovisualextensions=[gimageextensions,gvideoextensions,gaudioextensions,gdocumentextensions].join(',').split(',')
 var gexistingextensions=[]
 var gexistingbasefilenames=[]
@@ -14,30 +16,95 @@ addeventlistener(document,'keydown','form_onkeydown')
 
 function previewimage_sync(fileInput) {
 
-    var img=document.getElementById("thumbnail");     
+    var img=document.getElementById("thumbnail");
     img.src=''
     var img_size=document.getElementById("thumbnail_size_span");
     img_size.innerText=''
-           
-    var files = fileInput.files;
+
+    var files = fileInput.files
     if (!files)
-        return false
-    for (var i = 0; i < files.length; i++) {           
+         return false
+
+    file = files[0]
+    filename = file.name
+    extension = filename.split('.').pop().toLowerCase()
+
+    dropbox = document.getElementById("dropbox")
+    //check if incompatible file type before upload
+    if (!gaudiovisualextensions.includes(extension)) {
+        dropbox.classList.remove("valid")
+        dropbox.classList.add("invalid")
+        show_dropbox_msg(filename + ' file format is not supported', '&#10008;', 'red')
+        return
+    }
+
+    //preview image if type is image
+    for (var i = 0; i < files.length; i++) {
         var file = files[i];
-        var imageType = /image.*/;     
+        var imageType = /image.*/;
         if (!file.type.match(imageType)) {
             continue;
         }
         img.file = file;
         var reader = new FileReader();
-        reader.onload = (function(aImg) { 
-            return function(e) { 
-                aImg.src = e.target.result; 
-            }; 
+        reader.onload = (function(aImg) {
+            return function(e) {
+                aImg.src = e.target.result;
+            };
         })(img);
         reader.readAsDataURL(file);
     }
-    window.setTimeout(function(){img_size.innerText=img.width+'x'+img.height},100) 
+    window.setTimeout(function(){img_size.innerText='('+img.width+'x'+img.height+')'},100)
+
+    //file accepted
+    dropbox.classList.remove("invalid")
+    dropbox.classList.add("valid")
+    show_dropbox_msg('Ready to upload ' + filename, '&#10004;', 'green')
+}
+
+function highlight_dropbox(event) {
+	//necessary to allow dropping
+	event.preventDefault()
+	event.dataTransfer.dropEffect = 'copy'
+	document.getElementById("dropbox").classList.add("dragover")
+}
+
+function unhighlight_dropbox() {
+	document.getElementById("dropbox").classList.remove("dragover")
+}
+
+function show_dropbox_msg(msg, symbol, color) {
+	dropbox.innerHTML =
+		'<span>' +
+			'<span style="color: #999; font-family: monospace; font-size: 12px; font-style: italic;">Click to browse for a file<br>Or drag & drop it here</span>' +
+			'<br><br><br>' +
+			'<span style="color: #666; font-family: monospace; font-size: 12px; font-style: italic;">' + msg + '</span>' +
+			'<span style="font-size:14px; font-style:italic; color:' + color + ';"> ' + symbol + ' </span>' +
+		'</span>'
+}
+
+function upload_ondrop(event) {
+	//purpose to capture single file if multiple have been dropped
+
+	//prevent default browser behavior of opening file in the tab
+	event.preventDefault()
+
+	inputfile = document.getElementById("filedata")
+	dropbox.classList.remove("dragover")
+
+	//get list of files dropped
+	files = event.dataTransfer.files
+
+	// exit early if no files dropped
+	if (!files.length)
+		return
+
+	//select first dropped file - ignore rest
+	dt = new DataTransfer()
+	dt.items.add(files[0])
+
+	inputfile.files = dt.files
+	previewimage_sync(inputfile)
 }
     
 function* form_onkeydown(event) {
@@ -314,7 +381,10 @@ function* loadimages() {
  //eg \devdtest\upload\programs\
  gparameters.originalkeyversionno=uploadtarget
  
- $form1.button_submit.value='Upload '+gparameters.originalkeyversionno
+ //$form1.button_submit.value='Upload '+gparameters.originalkeyversionno
+ $form1.button_submit.value='Upload'
+ //removed path as it is not relevant to user
+ //document.getElementById("uploadpathtext").textContent = gparameters.originalkeyversionno;
  
  //return yield* openwindow('EXECUTE\rGENERAL\rOPENUPLOAD',key+'.'+versionno)
  
