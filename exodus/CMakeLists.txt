@@ -288,6 +288,7 @@
 		# Little ones last for quick parallel finishing
 		term_getkey.cpp term_haskey.cpp term_echo.cpp term_cursor.cpp
 		readline.cpp
+		reset_range.cpp
 	)
 
 ##
