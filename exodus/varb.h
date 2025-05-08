@@ -156,34 +156,6 @@ namespace exo {
 //
 #include <exodus/vartyp.h>
 
-//#pragma clang diagnostic push
-//#pragma clang diagnostic ignored "-Wreserved-id-macro"
-//
-//#ifdef EXO_TIMEBANK
-//#	define THISIS(FUNC_DESC) [[maybe_unused]] static const char* function_sig = FUNC_DESC;Timer thisistimer(get_timebank_acno(FUNC_DESC));
-//#else
-//#	define THISIS(FUNC_DESC) [[maybe_unused]] static const char* function_sig = FUNC_DESC;
-//#endif
-//
-//#define ISVAR(VARNAME) (VARNAME).assertVar(function_sig, #VARNAME);
-//#define ISASSIGNED(VARNAME) (VARNAME).assertAssigned(function_sig, #VARNAME);
-//#define ISSTRING(VARNAME) (VARNAME).assertString(function_sig, #VARNAME);
-//#define ISNUMERIC(VARNAME) (VARNAME).assertNumeric(function_sig, #VARNAME);
-//
-//#pragma clang diagnostic pop
-//
-//// tracing ctor/dtor/assign/conversions
-//// Use cmake -DEXO_SNITCH=1 to enable
-////
-//#ifdef EXO_SNITCH
-//#	undef EXO_SNITCH
-////#include <iomanip>
-//#	define EXO_SNITCH(FUNC) std::clog << this << " " << FUNC << " " << var_typ << " " << std::setw(10) << var_int << " " << std::setw(10) << var_dbl << " '" << var_str << "' " << std::endl;
-//#	define EXO_SNITCHING
-//#else
-//#	define EXO_SNITCH(FUNC)
-//#endif
-
 namespace exo {
 
 #ifdef EXO_CONCEPTS

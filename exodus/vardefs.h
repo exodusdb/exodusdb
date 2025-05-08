@@ -3,6 +3,18 @@
 
 //#include <version> // for __cpp_consteval
 
+// Tracing ctor/dtor/assign/conversions
+// Use cmake -DEXO_SNITCH=1 to enable or enable it here
+//
+//#define EXO_SNITCH
+#ifdef EXO_SNITCH
+#	undef EXO_SNITCH
+#	define EXO_SNITCH(FUNC) std::clog << this << " " << FUNC << " " << var_typ << " " << std::setw(10) << var_int << " " << std::setw(10) << var_dbl << " '" << var_str << "' " << std::endl;
+#	define EXO_SNITCHING
+#else
+#	define EXO_SNITCH(FUNC)
+#endif
+
 #define BACKTRACE_MAXADDRESSES 100
 
 #define DUMPDEFINE(x) DUMPDEFINE0(x)
@@ -181,7 +193,7 @@
 
 // Make var constinit/constexpr if std::string is constexpr (c++20 but g++-12 has some limitation)
 //
-#if __cpp_lib_constexpr_string >= 201907L
+#if __cpp_lib_constexpr_string >= 201907L && !defined(EXO_SNITCH)
 #	define CONSTEXPR constexpr
 #	define CONSTINIT_OR_CONSTEXPR constinit const // const because constexpr implies const
 
@@ -219,17 +231,6 @@
 #define ISNUMERIC(VARNAME) (VARNAME).assertNumeric(function_sig, #VARNAME);
 
 #pragma clang diagnostic pop
-
-// Tracing ctor/dtor/assign/conversions
-// Use cmake -DEXO_SNITCH=1 to enable
-//
-#ifdef EXO_SNITCH
-#	undef EXO_SNITCH
-#	define EXO_SNITCH(FUNC) std::clog << this << " " << FUNC << " " << var_typ << " " << std::setw(10) << var_int << " " << std::setw(10) << var_dbl << " '" << var_str << "' " << std::endl;
-#	define EXO_SNITCHING
-#else
-#	define EXO_SNITCH(FUNC)
-#endif
 
 // Allow x.cutter().x.popper() ?
 //#define EXO_ALLOW_CHAINING
