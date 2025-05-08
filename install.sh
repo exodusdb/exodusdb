@@ -159,20 +159,31 @@ function APT_GET {
 :
 function download_submodules {
 :
-: Note that main git repo contains just a hash/pointer to the commit to be checked out,
-: not a tag to master, and the initial state will be "HEAD detached".
-:
-	# Does having branch = master in .submodules have any effect?
+#: Note that main git repo contains just a hash/pointer to the commit to be checked out,
+#: not a tag to master, and the initial state will be "HEAD detached".
+#:
+#	# Does having branch = master in .submodules have any effect?
+#	git submodule init
+##	git submodule update --remote
+#	git submodule update
+#:
+#: Reconnect submodule to HEAD in case development/push desired
+#:
+##	git submodule foreach git pull origin master
+#	git submodule foreach git checkout master
+#	git submodule foreach git pull
+##	git submodule foreach git reset --hard
 	git submodule init
-#	git submodule update --remote
-	git submodule update
-:
-: Reconnect submodule to HEAD in case development/push desired
-:
-#	git submodule foreach git pull origin master
-	git submodule foreach git checkout master
-	git submodule foreach git pull
-#	git submodule foreach git reset --hard
+	git submodule update --recursive --init
+	git submodule sync --recursive
+	git submodule status --recursive
+#	git submodule foreach 'git switch master || git checkout -b master; git reset --soft HEAD'
+	git submodule foreach 'git switch master || git checkout -b master; git reset --soft HEAD; git branch --set-upstream-to=origin/master master 2>/dev/null || true'
+
+:	"Verifying submodules..."
+	git submodule foreach 'git fetch origin && echo "Submodule: $name" && git branch -r | grep -q "origin/master" && echo "  - Has origin/master: Yes" || echo "  - Has origin/master: No"; git branch -r --contains $(git rev-parse HEAD) | grep -q "origin/master" && echo "  - HEAD $(git rev-parse --short HEAD) is on origin/master: Yes" || echo "  - HEAD $(git rev-parse --short HEAD) is on origin/master: No"'
+:	"Verification complete."
+
 :
 : Verify submodules exist
 : -----------------------
