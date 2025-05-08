@@ -88,6 +88,7 @@
 	set_target_properties(exodus-cli PROPERTIES OUTPUT_NAME exodus)
 
 	# lib #
+	add_library(compile2 SHARED compile2.cpp)
 	add_library(htmllib2 SHARED htmllib2.cpp)
 #	add_library(htmllib2 SHARED)
 #	target_sources(htmllib2 PUBLIC FILE_SET cxx_modules TYPE CXX_MODULES FILES htmllib2.cpp)
@@ -147,6 +148,7 @@
 	target_link_libraries(gendoc exodus stdc++fs ${LIBS})
 
 	# REQUIRED only for c++ module discovery
+	target_link_libraries(compile2 exodus ${LIBS})
 	target_link_libraries(htmllib2 exodus ${LIBS})
 	target_link_libraries(nlist exodus ${LIBS})
 	target_link_libraries(dict_xo_clients exodus ${LIBS})
@@ -211,6 +213,7 @@
 	install(
 		TARGETS
 			dict_xo_clients
+			compile2
 			htmllib2
 			nlist
 		DESTINATION
@@ -230,11 +233,11 @@
 				RESULT_VARIABLE
 					RESVAR
 			)
-	        message(
+			message(
 				ldconfig <\${OUTVAR}>\n
-	            <\${ERRVAR}>\n
-	            <\${RESVAR}>\n
-	        )
+				<\${ERRVAR}>\n
+				<\${RESVAR}>\n
+			)
 		"
 	)
 
@@ -258,8 +261,8 @@
 ## 6. Install man pages
 #######################
 #install(FILES var.1
-#        DESTINATION ${CMAKE_INSTALL_PREFIX}/share/man/man1
-#        COMPONENT man)
+#		DESTINATION ${CMAKE_INSTALL_PREFIX}/share/man/man1
+#		COMPONENT man)
 
 # 7. CLEAN OUT ANY EDIC/COMPILE libs in ~/lib THAT WILL SHADOW THE REAL FILE IN /usr/local/lib
 #############################################
@@ -268,10 +271,10 @@
 			execute_process(
 				COMMAND
 					rm -f $ENV{HOME}/lib/libdict_xo_clients.so $ENV{HOME}/lib/libhtmllib2.so $ENV{HOME}/lib/libnlist.so
-					      $ENV{HOME}/inc/htmllib2.h $ENV{HOME}/inc/nlist.h
+						  $ENV{HOME}/inc/htmllib2.h $ENV{HOME}/inc/nlist.h
 			)
 		"
-    )
+	)
 
 
 #
