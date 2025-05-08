@@ -1,9 +1,15 @@
 #if EXO_MODULE
+	import std;
 #else
+#	include <atomic>
+#	include <future>
+#	include <promise>
+#	include <memory>
 #	include <exodus/dim.h>
 #	include <exodus/rex.h>
 #endif
 
+#define EXO_EXOPROG_CPP
 #include <exodus/exoprog.h>
 #include <exodus/exocallable.h>
 
@@ -30,7 +36,7 @@ ExoProgram::~ExoProgram(){}
 
 var ExoProgram::libinfo(in libname) {
 	// Return dir size/date/time of /home/user/lib/libxxxxxxxx.so
-	return var(perform_callable_.libfilepath(libname)).osfile();
+	return var(Callable::libfilepath(libname)).osfile();
 }
 
 /////////////////////
@@ -43,7 +49,6 @@ var ExoProgram::libinfo(in libname) {
 // and cannot be changed thereafter.
 ExoProgram::ExoProgram(ExoEnv& inmv)
 	:
-	perform_callable_(inmv),
 	mv(inmv)
 {
 	cached_dictid_ = "";
@@ -248,7 +253,7 @@ bool ExoProgram::select(in sortselectclause_or_filehandle) {
 		//}
 		if (ioconv.starts("[DATE")) {
 			sqltype = "DATE";
-            ioconvs[fieldn] = "D";
+			ioconvs[fieldn] = "D";
 		}
 		else if (ioconv.starts("[TIME")) {
 			sqltype = "TIME";//TODO check if works
@@ -410,8 +415,8 @@ bool ExoProgram::select(in sortselectclause_or_filehandle) {
 							ok = reqivalues[fieldn].contains(ivalue);
 							break;
 						default:
-						    // TODO should this be a special system error since it cannot be caused by application programmer?
-						    throw VarError("EXODUS: Error in " ^ var(__PRETTY_FUNCTION__) ^ " Invalid opmo " ^ opnos[fieldn]);
+							// TODO should this be a special system error since it cannot be caused by application programmer?
+							throw VarError("EXODUS: Error in " ^ var(__PRETTY_FUNCTION__) ^ " Invalid opmo " ^ opnos[fieldn]);
 					}//switch
 
 					//quit searching data values if found or no more
@@ -706,6 +711,181 @@ void ExoProgram::note(in msg, in options, io response) const {
 	}
 }
 
+var exoprog_callsmf(const Callable& callable) {
+
+	var nrvo;
+
+	// Call the shared library exodus object's main function
+	try {
+
+		//ANS = perform_callable.callsmf();
+		var* retval = new var;
+		*retval = callable.callsmf();
+
+		// Detect corrupt return if we are lucky
+		// If we are unlucky the corrupt data will look good
+		// OK: var_typ will have only bottom 5 bits set
+		// KO: var_typ will have other bits set
+		// By throwing without deleting the new head var, we will avoid
+		// segfault: free(): invalid pointer" when the var's std:string is "destructed"
+		// but the memory will leak.
+		if (retval->unassigned()) {
+			retval->dump().errputl();
+//					 restore_environment();
+			UNLIKELY
+			throw VarError("exoprog::perform corrupt result. perform only functions, not subroutines.");
+		}
+
+		// Since the returned var appears OK, use it.
+		nrvo = std::move(*retval);
+
+		// Since the returned var appears OK, delete it.
+		// If retval was not actually returned by callsmf then we may get a segfault: free(): invalid pointer
+		// from the fake var's std::string destructor
+		delete retval;
+
+		var::setlasterror("");
+	}
+
+	// TODO reimplement this
+//		} catch (const VarUnconstructed&) {
+//			// if return "" is missing then default ANS to ""
+//			ANS = "";
+
+	// Stop
+	catch (const ExoStop& e) {
+		// stop is normal way of stopping a perform
+		// functions can call it to terminate the whole "program"
+		// without needing to setup chains of returns
+		// to exit from nested functions
+		var::setlasterror("");
+		nrvo = e.message;
+	}
+
+	// Abort
+	catch (const ExoAbort& e) {
+		var::setlasterror("ExoAbort:" ^ e.message);
+		nrvo = "";
+	}
+
+	// AbortAll
+	catch (const ExoAbortAll& e) {
+		// similar to abort for the time being
+		// maybe it should abort multiple levels of perform/execute?
+		var::setlasterror("ExoAbortAll:" ^ e.message);
+		nrvo = "";
+	}
+
+	//TODO Create a second version of this whole try/catch block
+	//that omits catch (VarError) if EXO_DEBUG is set
+	//so that gdb will catch the original error and allow backtracing there
+	//Until then, use gdb "catch throw" as mentioned below.
+	catch (const VarError& e) {
+		//restore environment in case VarError is caught
+		//in caller and the program resumes processing
+//				restore_environment();
+
+		var::setlasterror(e.message);
+
+		// Use gdb command "catch throw" to break at error line to get back traces there
+		UNLIKELY
+		throw;
+	}
+
+	return nrvo;
+}
+
+auto ExoProgram::setmaxthreads(std::size_t max_threads) -> void {
+	threadpool1.set_max_threads(max_threads?:threadpool1.get_num_cores());
+}
+
+auto ExoProgram::getmaxthreads() -> var {
+	return threadpool1.get_max_threads();
+}
+
+auto ExoProgram::getnumcores() -> var {
+	return threadpool1.get_num_cores();
+}
+
+auto ExoProgram::run_count() -> var {
+	return threadpool1.get_total_tasks_enqueued();
+}
+
+auto ExoProgram::shutdown_run() -> void {
+	threadpool1.shutdown();
+}
+
+void ExoProgram::reset_run(size_t num_threads) {
+	ThreadPool::reset(&threadpool1, num_threads);
+}
+
+// Asynchronous run:
+// return: Job containing a future<ExoEnv> and max_thread_no, input_queue, output_queue
+// Creates new ExoEnv
+Job ExoProgram::run(in command) {
+	return Job(command, nullptr, nullptr, result_queue_);
+}
+
+////    std::cerr << "Run: Processing command: " << command << "\n";
+//    auto promise = std::make_shared<std::promise<ExoEnv>>();
+//    ExoEnv new_env;
+//    new_env.init(global_thread_counter.fetch_add(1) + 1);
+//    new_env.parse(command);
+//
+//    // Create and assign queues
+//    new_env.input_queue = std::make_shared<ThreadSafeQueue<var>>();
+//    new_env.output_queue = std::make_shared<ThreadSafeQueue<var>>();
+////    std::cerr << "Run: Input queue use count after creation: " << new_env.input_queue.use_count() << "\n";
+//
+//    // Create Job with copies of new_env's queues before moving
+//    Job job(promise->get_future(), new_env.input_queue, new_env.output_queue);
+////    if (!job.input_queue) {
+////        std::cerr << "Error: job.input_queue is null after construction\n";
+////        return job; // Early return
+////    }
+////    std::cerr << "Run: job.input_queue use count after construction: " << job.input_queue.use_count() << "\n";
+//
+//    // Move new_env into shared_ptr
+//    auto shared_env = std::make_shared<ExoEnv>(std::move(new_env));
+////    std::cerr << "Run: new_env.input_queue after move: " << (new_env.input_queue ? "valid" : "null") << "\n";
+//
+//    // Ensure shared_env has valid queues
+////    if (!shared_env->input_queue) {
+////        shared_env->input_queue = job.input_queue;
+////        shared_env->output_queue = job.output_queue;
+////        std::cerr << "Run: Restored shared_env->input_queue\n";
+////    }
+////    std::cerr << "Run: shared_env->input_queue use count after move: " << shared_env->input_queue.use_count() << "\n";
+//
+//    auto task = [this, promise, shared_env, command]() mutable {
+//        try {
+////            std::cerr << "Thread: Input queue use count: " << shared_env->input_queue.use_count() << "\n";
+//            Callable callable{*shared_env};
+//            var libname = command.field(" ", 1);
+//            var funcname = "exoprogram_createdelete_";
+//            if (libname.contains(".")) {
+//                funcname ^= libname.field(".", 2);
+//                libname = libname.field(".", 1);
+//            }
+//            if (!callable.initsmf(*shared_env, libname.c_str(), funcname.c_str(), true))
+//                throw std::runtime_error("Failed to initialize shared member function");
+//            shared_env->ANS = std::move(exoprog_callsmf(callable));
+////            std::cerr << "Thread: Input queue use count after work: " << shared_env->input_queue.use_count() << "\n";
+//            promise->set_value(std::move(*shared_env));
+//        } catch (...) {
+//            promise->set_exception(std::current_exception());
+//        }
+//    };
+//
+//    try {
+//        threadpool1.enqueue(std::move(task));
+//    } catch (const std::exception& e) {
+//        promise->set_exception(std::current_exception());
+//    }
+//
+//    return job;
+//}
+
 // execute
 var ExoProgram::execute(in command_line) {
 
@@ -812,42 +992,20 @@ var ExoProgram::perform(in command_line) {
 	// CHAIN may be set by the performed library to execute a follow on SENTENCE/command_line
 	CHAIN = "";
 
+	Callable perform_callable;
+
 	SENTENCE = command_line;
 	while (SENTENCE) {
 
-		// Parse words using spaces into an FM delimited string leaving quoted phrases intact.
-		// Spaces are used to parse fields.
-		// Spaces and single quotes are preserved inside double quotes.
-		// Spaces are double quotes preserved inside single quotes.
-		// Backslashes and any character following a backslash (particularly spaces, double and single quotes and backslashes) are treated as non-special characters.
-		COMMAND = SENTENCE.parse(' ');
-
-		// Cut off OPTIONS from end of COMMAND if present
-		// *** SIMILAR code in
-		// 1. exofuncs.cpp exodus_main()
-		// 2. exoprog.cpp  perform()
-		// OPTIONS are in either (AbC) or {AbC} WITHOUT SPACES in the last field of COMMAND
-		OPTIONS = COMMAND.field(FM, -1);
-		if ((OPTIONS.starts("{") and OPTIONS.ends("}")) or (OPTIONS.starts("(") and OPTIONS.ends(")"))) {
-			// Remove last field of COMMAND. TODO fpopper command or remover(-1)?
-			COMMAND.cutter(-OPTIONS.len() - 1);
-			// Remove first { or ( and last ) } chars of OPTIONS
-			OPTIONS.cutter(1);
-			OPTIONS.popper();
-		} else {
-			OPTIONS = "";
-		}
-
-		// Load the shared library file (always lowercase) TODO allow mixed case
-		// creating a new object so that its member variables all start out unassigned.
-		let libid = SENTENCE.field(" ", 1).lcase();
-		std::string libname = libid.toString();
-		if (!perform_callable_.initsmf(
+		let libname = mv.parse(SENTENCE);
+		// Reuse a single Callable object
+		// TODO Create new every time?
+		if (!perform_callable.initsmf(
 											mv,
 											libname.c_str(),
 											/* Use the non-adorned factory function for library() not library(xxx)*/
 											"exoprogram_createdelete_",
-											// Force new each perform/execute
+											// Force new each perform/execute to avoid reuse of member data.
 											true
 											)) {
 			USER4 ^= "perform() Cannot find shared library \"" + libname +
@@ -857,80 +1015,12 @@ var ExoProgram::perform(in command_line) {
 			break;
 		}
 
-		// Call the shared library exodus object's main function
+		// Returns a var or throws VarError (catches stop/abort)
 		try {
-
-			//ANS = perform_callable_.callsmf();
-			var* retval = new var;
-			*retval = perform_callable_.callsmf();
-
-			// Detect corrupt return if we are lucky
-			// If we are unlucky the corrupt data will look good
-			// OK: var_typ will have only bottom 5 bits set
-			// KO: var_typ will have other bits set
-			// By throwing without deleting the new head var, we will avoid
-			// segfault: free(): invalid pointer" when the var's std:string is "destructed"
-			// but the memory will leak.
-			if (retval->unassigned()) {
-				retval->dump().errputl();
-				restore_environment();
-				UNLIKELY
-				throw VarError("exoprog::perform corrupt result. perform only functions, not subroutines.");
-			}
-
-			// Since the returned var appears OK, use it.
-			nrvo = std::move(*retval);
-
-			// Since the returned var appears OK, delete it.
-			// If retval was not actually returned by callsmf then we may get a segfault: free(): invalid pointer
-			// from the fake var's std::string destructor
-			delete retval;
-
-			var::setlasterror("");
+			nrvo = exoprog_callsmf(perform_callable);
 		}
-
-		// TODO reimplement this
-//		} catch (const VarUnconstructed&) {
-//			// if return "" is missing then default ANS to ""
-//			ANS = "";
-
-		// Stop
-		catch (const ExoStop& e) {
-			// stop is normal way of stopping a perform
-			// functions can call it to terminate the whole "program"
-			// without needing to setup chains of returns
-			// to exit from nested functions
-			var::setlasterror("");
-			nrvo = e.message;
-		}
-
-		// Abort
-		catch (const ExoAbort& e) {
-			var::setlasterror("ExoAbort:" ^ e.message);
-			nrvo = "";
-		}
-
-		// AbortAll
-		catch (const ExoAbortAll& e) {
-			// similar to abort for the time being
-			// maybe it should abort multiple levels of perform/execute?
-			var::setlasterror("ExoAbortAll:" ^ e.message);
-			nrvo = "";
-		}
-
-		//TODO Create a second version of this whole try/catch block
-		//that omits catch (VarError) if EXO_DEBUG is set
-		//so that gdb will catch the original error and allow backtracing there
-		//Until then, use gdb "catch throw" as mentioned below.
-		catch (const VarError& e) {
-			//restore environment in case VarError is caught
-			//in caller and the program resumes processing
+		catch (...) {
 			restore_environment();
-
-			var::setlasterror(e.message);
-
-			// Use gdb command "catch throw" to break at error line to get back traces there
-			UNLIKELY
 			throw;
 		}
 
@@ -1194,41 +1284,31 @@ baddict:
 		// return dict_callable_.calldict();
 		// return ANS;
 
+		// Don't allow dict functions to permanently change precision
 		const int saved_precision = var::getprecision();
+		auto restore_environment = [&]() {
+			var::setprecision(saved_precision);
+		};
 
-		ANS = dict_callable_->callsmf();
+		try {
+			// Handles stop and abort but throws VarError
+			ANS = exoprog_callsmf(*dict_callable_);
+		}
+		catch (...) {
+			restore_environment();
+			throw;
+		}
 
-		// restore the MV if necessary
-		//if (!ismv)
-		//	MV = savedMV;
-
-        var::setprecision(saved_precision);
+		restore_environment();
 
 		return ANS;
-	}
+
+	} // "S" function type dict items
 
 	UNLIKELY
 	throw VarError("ExoProgram::calculate(" ^ dictid ^ ") " ^ DICT ^ " Invalid dictionary type " ^
 				  dicttype.quote());
 }
-
-//// debug
-//void ExoProgram::debug() const {
-//
-//	let reply;
-//	std::clog << "debug():";
-//	if (OSSLASH == "/")
-//		asm("int $3");	//use gdb n commands to resume
-//	else
-//		var().debug();
-//	return;
-//}
-
-// fsmg
-//bool ExoProgram::fsmsg(in msg) const {
-//	note(msg ^ var().lasterror());
-//	return false;
-//}
 
 // decide 2
 var ExoProgram::decide(in question, in options) const {
@@ -1423,7 +1503,7 @@ lock:
 		if (waitsecs) {
 
 			if ((waitsecs0 - waitsecs) >  30)
-	            var("").errputl("Locking file : " ^ file.f(1).quote() ^ " key : " ^ keyx.quote() ^ " secs : " ^ waitsecs ^ "/" ^ waitsecs0);
+				var("").errputl("Locking file : " ^ file.f(1).quote() ^ " key : " ^ keyx.quote() ^ " secs : " ^ waitsecs ^ "/" ^ waitsecs0);
 
 			var().ossleep(1000);
 			waitsecs -= 1;
@@ -1668,19 +1748,19 @@ var ExoProgram::iconv(in input, in conversion) {
 			var outx;
 
 			//custom function "[NUMBER]" actually has a built in function
-            if (functionname == "number") {
-                gosub exoprog_number("ICONV", result, mode, outx);
+			if (functionname == "number") {
+				gosub exoprog_number("ICONV", result, mode, outx);
 			}
 			//custom function "[DATE]" actually has a built in function
-            else if (functionname == "date") {
-                gosub exoprog_date("ICONV", result, mode, outx);
+			else if (functionname == "date") {
+				gosub exoprog_date("ICONV", result, mode, outx);
 			}
 			//custom function "[CAPITALISE]" DEPRECATE and replace with 
-            else if (functionname == "capitalise") {
-                //gosub capitalise(result, mode, outx);
+			else if (functionname == "capitalise") {
+				//gosub capitalise(result, mode, outx);
 				//result = result;
 				outx = result;
-            } else {
+			} else {
 
 				// set the function name
 				ioconv_custom = functionname;
@@ -2485,8 +2565,8 @@ var ExoProgram::amountunit(in input0, out unitx) {
 
 	std::string_view sv = input0;
 
-    for (auto it = sv.rbegin(); it != sv.rend(); ++it) {
-        if (*it <= '9' and *it >= '0') {
+	for (auto it = sv.rbegin(); it != sv.rend(); ++it) {
+		if (*it <= '9' and *it >= '0') {
 
 			// it - s.rbegin()
 			// 123456 -> 0
@@ -2495,8 +2575,8 @@ var ExoProgram::amountunit(in input0, out unitx) {
 			auto pos = sv.size() - std::size_t(it - sv.rbegin());
 			unitx = sv.substr(pos);
 			return sv.substr(0, pos);
-        }
-    }
+		}
+	}
 
 	// All unit no digits
 	unitx = sv;
@@ -2514,66 +2594,66 @@ var ExoProgram::amountunit(in input0, out unitx) {
 //using SV = std::string_view;
 //
 //inline SV split_simd(SV s, SV& unit) {
-//    constexpr size_t SSE_SIZE = 16;
+//	constexpr size_t SSE_SIZE = 16;
 //
-//    if (s.empty()) {
-//        unit = s;
-//        return "";
-//    }
+//	if (s.empty()) {
+//		unit = s;
+//		return "";
+//	}
 //
-//    if (s.size() <= SSE_SIZE) {
-//        alignas(16) char buffer[SSE_SIZE] = {0};
-//        std::memcpy(buffer, s.data(), s.size());
-//        __m128i chars = _mm_load_si128(reinterpret_cast<const __m128i*>(buffer));
+//	if (s.size() <= SSE_SIZE) {
+//		alignas(16) char buffer[SSE_SIZE] = {0};
+//		std::memcpy(buffer, s.data(), s.size());
+//		__m128i chars = _mm_load_si128(reinterpret_cast<const __m128i*>(buffer));
 //
-//        __m128i min_digit = _mm_set1_epi8('0');
-//        __m128i max_digit = _mm_set1_epi8('9');
-//        __m128i lt_0 = _mm_cmplt_epi8(chars, min_digit);
-//        __m128i gt_9 = _mm_cmpgt_epi8(chars, max_digit);
-//        __m128i not_digit = _mm_or_si128(lt_0, gt_9);
-//        __m128i is_digit = _mm_andnot_si128(not_digit, _mm_set1_epi8(-1));
+//		__m128i min_digit = _mm_set1_epi8('0');
+//		__m128i max_digit = _mm_set1_epi8('9');
+//		__m128i lt_0 = _mm_cmplt_epi8(chars, min_digit);
+//		__m128i gt_9 = _mm_cmpgt_epi8(chars, max_digit);
+//		__m128i not_digit = _mm_or_si128(lt_0, gt_9);
+//		__m128i is_digit = _mm_andnot_si128(not_digit, _mm_set1_epi8(-1));
 //
-//        uint16_t mask = _mm_movemask_epi8(is_digit);
+//		uint16_t mask = _mm_movemask_epi8(is_digit);
 //
-//        if (mask == 0) {
-//            unit = s;
-//            return "";
-//        }
+//		if (mask == 0) {
+//			unit = s;
+//			return "";
+//		}
 //
-//        size_t pos = 31 - __builtin_clz(static_cast<uint32_t>(mask));
-//        if (pos >= s.size()) {
-//            unit = s;
-//            return "";
-//        }
+//		size_t pos = 31 - __builtin_clz(static_cast<uint32_t>(mask));
+//		if (pos >= s.size()) {
+//			unit = s;
+//			return "";
+//		}
 //
-//        unit = s.substr(pos + 1);
-//        return s.substr(0, pos + 1);
-//    }
+//		unit = s.substr(pos + 1);
+//		return s.substr(0, pos + 1);
+//	}
 //
-//    for (auto it = s.rbegin(); it != s.rend(); ++it) {
-//        if (*it <= '9' && *it >= '0') {
-//            auto pos = s.size() - std::size_t(it - s.rbegin());
-//            unit = s.substr(pos);
-//            return s.substr(0, pos);
-//        }
-//    }
-//    unit = s;
-//    return "";
+//	for (auto it = s.rbegin(); it != s.rend(); ++it) {
+//		if (*it <= '9' && *it >= '0') {
+//			auto pos = s.size() - std::size_t(it - s.rbegin());
+//			unit = s.substr(pos);
+//			return s.substr(0, pos);
+//		}
+//	}
+//	unit = s;
+//	return "";
 //}
 //
 //int main() {
-//    auto test = [](SV s) {
-//        SV unit;
-//        SV amount = split_simd(s, unit);
-//        std::cout << "Input: \"" << s << "\" -> Amount: \"" << amount << "\", Unit: \"" << unit << "\"\n";
-//    };
+//	auto test = [](SV s) {
+//		SV unit;
+//		SV amount = split_simd(s, unit);
+//		std::cout << "Input: \"" << s << "\" -> Amount: \"" << amount << "\", Unit: \"" << unit << "\"\n";
+//	};
 //
-//    test("123abc");
-//    test("abc");
-//    test("12345");
-//    test("");
-//    test("12abc34de");
-//    return 0;
+//	test("123abc");
+//	test("abc");
+//	test("12345");
+//	test("");
+//	test("12abc34de");
+//	return 0;
 //}
 
 // clang-format off

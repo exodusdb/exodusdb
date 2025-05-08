@@ -6,9 +6,7 @@ module;
 #include <exodus/vardefs.h>
 
 #include <exodus/exoimpl.h>
-#include <exodus/exocallable.h>
 #include <exodus/exoprog.h>
-
 #include <exodus/format.h>
 #include <exodus/exofuncs.h>
 
@@ -87,10 +85,19 @@ export namespace exo {
 	using exo::ExoAbortAll;
 //	using exo:: ExoLogoff;
 	using exo::ExoStop;
+	using exo::function;
+	using exo::subroutine;
+	using exo::func;
+	using exo::subr;
 
+	using exo::reset_range;
 	using exo::Callable;
 	using exo::ExoProgram;
-	using exo::ExoCommon;
+	using exo::Job;
+	using exo::Jobs;
+	using exo::ThreadPool;
+	using exo::ThreadSafeQueue;
+//	using exo::ExoCommon;
 
 	using exo::RELOAD_req;
 	using exo::TERMINATE_req;
@@ -371,6 +378,7 @@ export namespace exo {
 	using exo::sorter;
 
 	using exo::space;
+	using exo::unpack;
 	using exo::split;
 	using exo::sqlexec;
 	using exo::sqrt;

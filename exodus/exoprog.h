@@ -14,6 +14,14 @@
 //#include <exodus/exocallable.h>
 //#include "timeaccount.h"
 
+// Forward declarations
+namespace std {
+	class mutex;
+	class condition_variable;
+	class thread;
+	template<typename T> class atomic;
+}
+
 #	include <exodus/var.h>
 #endif
 
@@ -21,31 +29,24 @@
 #include <exodus/exoimpl.h>
 #include <exodus/exoenv.h>
 #include <exodus/exocallable.h>
+//#include <exodus/thread_pool.h>
+//#include <exodus/threadsafequeue.h>
+#include <exodus/job.h>
 
 namespace exo {
 
-// mv.xyz is going to be used a lot by exodus programmers for exodus "global variables"
-// eg mv.RECORD mv.DICT
-//
-// threadsafe! it is member data so it is global to the class/object and not global to the
-// program
-//
-// it is a reference/pointer so that an external "subroutine" can be created which has
-// identical exodus global variables to the "main program" as far as the exodus application
-// programmer thinks
-//
-// being a reference ensures that exodus programs cannot exist without an mv
-// however this restriction might be relaxed
-//
-// mv was initially a reference so that exodus application programmers could writew
-// things like mv.ID (instead of the harder to understand, for an application programmer,
-// mv->ID style) however now that a macro is used to generate mv.ID from just ID we could
-// make mv to be a pointer and assign it as and when desired we would just need to change
-//#define ID mv.ID
-// to
-//#define ID mv->ID
-// so that ID RECORD etc. continue to appear to the application programmer to be "threadsafe
-// global" variables
+// Template to reset a range of objects to their default-constructed state
+template<typename T>
+void reset_range(T& first, T& last);
+
+using function = var;
+using subroutine = void;
+using func = var;
+using subr = void;
+
+using Jobs = std::vector<Job>;
+using Queue = ThreadSafeQueue<var>;
+using ResultQueue = ThreadSafeQueue<ExoEnv>;
 
 //class ExoProgram
 class PUBLIC ExoProgram {
@@ -62,10 +63,13 @@ class PUBLIC ExoProgram {
 	// A cache of Callables dict functions
 	std::map<std::string, Callable*> cached_dict_functions;
 
-	// A callable used in ExoProgram::perform and ExoProgram::execute to call libraries WITH NO ARGUMENTS
-	mutable Callable perform_callable_;
+    // Shared state
+//    std::shared_ptr<ThreadSafeQueue<var>> input_queue;
+//    std::shared_ptr<ThreadSafeQueue<var>> output_queue;
 
  public:
+
+	std::shared_ptr<ResultQueue> result_queue_ = std::make_shared<ResultQueue>();
 
 	// mv.XXXXXX is going to be used a lot by exodus programmers for exodus "global variables"
 	// e.g. mv.RECORD mv.DICT etc.
@@ -277,9 +281,9 @@ ND	bool hasnext();
 	[[deprecated ("exoprog::makelist() Refactor makelist(\"\", keys) as selectkeys(keys) or use fixdeprecated")]]
 	bool makelist(SV listname, in keys);
 
-	//////////////////////
-	///// Perform/Execute:
-	//////////////////////
+	//////////////////////////
+	///// Run/Perform/Execute:
+	//////////////////////////
 
 	// Run an Exodus program/library.
 	// Creates a new instance of an Exodus program library function object and calls its main() function using a command-like syntax, similar to that of running an OS executable program, and passes its arguments through the COMMAND and OPTIONS variables.
@@ -301,6 +305,38 @@ ND	bool hasnext();
 	// Run an exodus program/library.
 	// Identical to perform() but any currently active select list in the calling program/library is not accessible to the executed program/library and is preserved in the calling [program as is. Any select list created by the executed library is discarded when it terminates.
 	var  execute(in command_line);
+
+	// Run another program in parallel.
+	// Unlike perform and execute run() does not block and wait for the program to finish. The new program runs in parallel. There is no way direct way of communicating with the running program at the moment but it is planned to be able to send and receive messages using a read and write queue.
+	// return: A "job" object that you can use to manage the running job.
+	// * Check if it has finished.
+	// * Pause and wait for it to finish with optional timeout.
+	// * When it has finished, access all its environment variables.
+	// command: See perform.
+	// return: std::future<ExoEnv>, creates new ExoEnv
+	// If the parent program exits while there are any programs still running they will be terminated automatically.
+	//
+	// // run(command);
+	//
+		Job run(in command);
+
+	// 0 = getnumcores()
+	auto setmaxthreads(std::size_t max_threads = 0) -> void;
+	auto getmaxthreads() -> var;
+	auto getnumcores() -> var;
+
+    std::generator<ExoEnv&> run_results() {
+        for (int i = 0; i < run_count(); ++i) {
+            ExoEnv env;
+            result_queue_->wait_and_pop(env);
+            co_yield env;
+        }
+    }
+
+	auto run_count() -> var;
+	// Required to stop hanging due to dlopen causing reset of max_worker_id to construction setting and preventing workers from seeing the need to close.
+	static auto shutdown_run() -> void;
+	static auto reset_run(size_t num_threads) -> void;
 
 	// Close the current program and perform another one.
 	// Similar to perform() except that the current program closes first and all environment variables carry forward unchanged.
@@ -639,6 +675,83 @@ ND	bool lockrecord(in filename, io file, in keyx, in unused, const int waitsecs 
 ND	bool lockrecord(in filename, io file, in keyx) const;
 	bool unlockrecord(in filename, io file, in key) const;
 	bool unlockrecord() const;
+
+	var& ID        {mv.ID};
+	var& RECORD    {mv.RECORD};
+	var& FILE      {mv.FILE};
+	var& DICT      {mv.DICT};
+	var& ANS       {mv.ANS};
+	var& MV        {mv.MV};
+	var& PSEUDO    {mv.PSEUDO};
+	var& DATA      {mv.DATA};
+//	var& LISTACTIVE {mv.LISTACTIVE};
+
+	var& USERNAME  {mv.USERNAME};
+	var& APPLICATION {mv.APPLICATION};
+	var& SENTENCE  {mv.SENTENCE};
+	var& CHAIN     {mv.CHAIN};
+
+	var& USER0     {mv.USER0};
+	var& USER1     {mv.USER1};
+	var& USER2     {mv.USER2};
+	var& USER3     {mv.USER3};
+	var& USER4     {mv.USER4};
+
+	var& RECUR0    {mv.RECUR0};
+	var& RECUR1    {mv.RECUR1};
+	var& RECUR2    {mv.RECUR2};
+	var& RECUR3    {mv.RECUR3};
+	var& RECUR4    {mv.RECUR4};
+
+	const var& EXECPATH  {mv.EXECPATH};
+	var& COMMAND   {mv.COMMAND};
+	var& OPTIONS   {mv.OPTIONS};
+
+	var& DEFINITIONS   {mv.DEFINITIONS};
+	var& SECURITY  {mv.SECURITY};
+	var& SYSTEM    {mv.SYSTEM};
+	var& SESSION   {mv.SESSION};
+	var& THREADNO  {mv.THREADNO};
+
+	var& STATION   {mv.STATION};
+	//var& DATEFM  {mv.DATEFMT};
+	//var& BASEFMT {mv.BASEFMT};
+	var& PRIVILEGE {mv.PRIVILEGE};
+	var& FILES     {mv.FILES};
+	var& TCLSTACK  {mv.TCLSTACK};
+	var& INTCONST  {mv.INTCONST};
+	var& STATUS    {mv.STATUS};
+	int& COL1      {mv.COL1};
+	var& COL2      {mv.COL2};
+	var& PRIORITYINT   {mv.PRIORITYINT};
+
+	var& FILEERRORMODE {mv.FILEERRORMODE};
+	var& FILEERROR     {mv.FILEERROR};
+
+	var& RECCOUNT      {mv.RECCOUNT};
+
+	var& AW            {mv.AW};
+	var& EW            {mv.EW};
+	var& HW            {mv.HW};
+	var& MW            {mv.MW};
+	var& PW            {mv.PW};
+	//var& SW          {mv.SW};
+	var& VW            {mv.VW};
+	var& XW            {mv.XW};
+
+	var& CRTHIGH       {mv.CRTHIGH};
+	var& CRTWIDE       {mv.CRTWIDE};
+	var& LPTRHIGH      {mv.LPTRHIGH};
+	var& LPTRWIDE      {mv.LPTRWIDE};
+
+	const var& TERMINAL      {mv.TERMINAL};
+	var& LEVEL         {mv.LEVEL};
+
+//	var& THREADNO      {mv.THREADNO};
+	var& CURSOR        {mv.CURSOR};
+	var& TIMESTAMP     {mv.TIMESTAMP};
+
+	var& VOLUMES       {mv.VOLUMES};
 
 };
 
