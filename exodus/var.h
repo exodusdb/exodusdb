@@ -27,10 +27,10 @@ THE SOFTWARE.
 #if EXO_MODULE
 	import std;
 #else
-#	include <iostream>
+#	include <fstream>
 #	include <string>
 #	include <string_view>
-#	include <array> // used in operator<<
+//#	include <array> // used in operator<<
 #	include <vector>
 #endif
 
