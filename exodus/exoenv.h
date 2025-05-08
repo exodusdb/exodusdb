@@ -198,11 +198,15 @@ class PUBLIC ExoEnv final {
 
 	// A cache of handles to dynamically loaded shared libraries
 	std::map<std::string, void*> dlopen_cache;
-//	std::map<std::string, void*, std::less<std::string<char>>> dlopen_cache;
-//	std::map<std::string, void*, std::less<char>> dlopen_cache;
 
 #pragma clang diagnostic pop
 
+//    std::shared_ptr<std::atomic<int>> max_thread_no;
+
+	// New queue members for run
+	std::shared_ptr<ThreadSafeQueue<var>> input_queue;
+	std::shared_ptr<ThreadSafeQueue<var>> output_queue;
+	std::shared_ptr<ThreadSafeQueue<var>> error_queue;
  private:
 
 var osgetenv(SV envcode) {
@@ -214,6 +218,11 @@ var osgetenv(SV envcode) {
 
 }; // class ExoEnv
 
-}  // namespace exo
+PUBLIC extern ThreadPool threadpool1;
+#ifdef EXO_EXOPROG_CPP
+PUBLIC ThreadPool threadpool1(4);
+#endif
+
+} // namespace exo
 
 #endif //EXOENV_H
