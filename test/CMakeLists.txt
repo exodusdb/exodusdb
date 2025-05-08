@@ -65,9 +65,9 @@
 	target_link_libraries(testcommandline exodus ${PROJECT_LIBS})
 
     # lib #
-    add_library(testcommandlib SHARED testcommandlib.cpp)
+    add_library(testecho SHARED testecho.cpp)
 	# REQUIRED only for c++ module discovery
-	target_link_libraries(testcommandlib exodus ${PROJECT_LIBS})
+	target_link_libraries(testecho exodus ${PROJECT_LIBS})
 
 #
 # Generate testing_var.h.cpp
