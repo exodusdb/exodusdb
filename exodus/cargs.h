@@ -25,13 +25,16 @@ class Cargs {
 	std::vector<char*> argv_;
 
    public:
-	//constructor from var
-	Cargs(in command) {
+	//constructor from var delimited by FM e.g. COMMAND and optional OPTIONS
+	Cargs(in command, in options = "") {
 		//printl(command);
 		for (var word : command) {
 			//printl(word);
 			argv_.push_back(strings.emplace_back(std::string(word ^ "\x00")).data());
 		}
+		if (not options.empty())
+			argv_.push_back(strings.emplace_back(std::string("{" ^ options ^ "}\x00")).data());
+
 		//last arg must be nullptr
 		argv_.push_back(nullptr);
 	}
