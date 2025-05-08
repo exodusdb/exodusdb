@@ -1699,7 +1699,6 @@ public:
 //		return fmt::vformat(fmt_str, fmt::make_format_args(*this, args...) );
 //	}
 
-	template<class... Args>
 	// Classic format function in printf style
 	// vars can be formatted either with C++ format codes e.g. {:_>8.2f}
 	// or with exodus oconv codes e.g. {::MD20P|R(_)#8} as in the below example.
@@ -1710,6 +1709,7 @@ public:
 	//  var v3 = format("'{:_>8.2f}'", var(12.345)); // "'___12.35'"
 	//  var v4 = format("'{::MD20P|R(_)#8}'", var(12.345));`
 	//
+	template<class... Args>
 	ND var  format(in fmt_str, Args&&... args) const
 	{
 		THISIS("var  var::format(SV fmt_str, Args&&... args) const")
@@ -2680,7 +2680,7 @@ public:
 	// * "C" * Returns the key unconverted.
 	//
 	// `let key = "SB001";
-	//  let client_name = key.xlate("xo_clients", 1, "X"); // "Client AAA"
+	//  let client_name = key.xlate("xo_clients", 1, "X").squote(); // "'Client AAA'"
 	//  // or
 	//  let name_and_type = xlate("xo_clients", key, "NAME_AND_TYPE", "X"); // "Client AAA (A)"`
 	//
@@ -3388,7 +3388,7 @@ public:
 	// throw: Pipe creation failed, fork failed, poll failed.
 	//
 	// `var v_stdout, v_stderr, v_exit_status;
-	//  if (var::osprocess("grep xyz", "abc\nxyz 123\ndef", v_stdout, v_stderr, v_exit_status)) ... ok // v_stdout -> "xyz 123" // v_exit_status = 0
+	//  if (var::osprocess("grep xyz", "abc\nxyz 123\ndef", v_stdout, v_stderr, v_exit_status)) ... ok // v_stdout -> "xyz 123\n" // v_exit_status = 0
 	//  // or
 	//  if (osprocess("grep xyz", "abc\nxyz 123\ndef", v_stdout, v_stderr, v_exit_status)) ... ok`
 	//
@@ -3839,26 +3839,6 @@ public:
 
 	ND var_iter begin() const;
 	ND var_iter end() const;
-
-    // New Unpack function to allow "auto [a,b,c] = d1.unpack<3>();"
-	// Create a tuple<var,N>
-    template <size_t N>
-    auto unpack() const {
-        THISIS("auto var::unpack<N>() const")
-        assertString(function_sig);
-
-		// Utility somewhere in the forest
-		std::vector<var> basic_split(const std::string_view str, char separator);
-		auto vv1 = basic_split(var_str, FM_);
-
-        auto fill_tuple = [vv1]<size_t... Is>(std::index_sequence<Is...>) {
-            return std::make_tuple(
-				// Move
-                (Is < vv1.size() ? std::move(vv1[Is]) : var(""))...
-            );
-        };
-        return fill_tuple(std::make_index_sequence<N>{});
-    }
 
 	///////////////////////////
 	// PRIVATE MEMBER FUNCTIONS
@@ -4662,7 +4642,7 @@ class PUBLIC var_proxy1 {
 	// instead of wasting time constructing a temporary var only to extract a single char from it
 	ND RETVAR at(const int pos1) const;
 
-};
+}; // var proxy1
 
 // class var_proxy2 - replace or extract fn, vn, sv
 ///////////////////////////////////////////////////
@@ -4705,7 +4685,7 @@ class PUBLIC var_proxy2 {
 
 	ND var  at(const int pos1) const;
 
-}; // class var
+}; // class var_proxy2
 
 // class var_proxy3 - replace or extract fn, vn, sn
 ///////////////////////////////////////////////////
@@ -4749,7 +4729,7 @@ class PUBLIC var_proxy3 {
 
 	ND var  at(const int pos1) const;
 
-};
+}; // class var_proxy3
 
 ND inline var_proxy1 var::operator()(int fieldno) {return var_proxy1(*this, fieldno);}
 ND inline var_proxy2 var::operator()(int fieldno, int valueno) {return var_proxy2(*this, fieldno, valueno);}
