@@ -6,9 +6,7 @@
 #	include <exodus/var.h>
 #endif
 
-// We could bring the whole of exo namespace
-//using namespace exo;
-//or just the var with all its many member functions 
+//using exo;
 using exo::var;
 
 int main() {
@@ -19,11 +17,10 @@ int main() {
 	// and, if database functionality is required, postgresql client
 	// and libexodus.so installed in system lib
 
-	// Compile simply using at least c++17
+	// Compile simply using at least c++20
 	//
-	//  g++ test_var.cpp -std=c++17 -lexodus
 	//  g++ test_var.cpp -std=c++20 -lexodus
-
+	//
 	// If exodus was built with clang modules on Ubuntu 24.04
 	//	c++ test_var.cpp  -std=c++2c  -DEXO_MODULE=1 -fmodule-file=var=/usr/local/lib/var.pcm -fmodule-file=std=/usr/local/lib/std.pcm -lexodus
 

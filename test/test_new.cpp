@@ -7,6 +7,70 @@ programinit()
 func main() {
 	printl("test says 'Hello World!'");
 
+	{	// Easy wrapping/unwrapping of vars in FM (i.e. '\0x1f') or other delimiters including (multibyte and multichar)
+		// Easy to cut and paste list of variable but can easily get silently out of sync.
+		var package;
+		{
+			var a = "a";
+			var b = "b";
+			var c = "c";
+			// Super easy FM Only method to package at the moment
+			package = {a, b, c};
+		}
+		{
+			// Can unpack using any delimiter even multichar delimiters e.g. ||
+			// NO way to pass unassigned atm.
+			auto [a, b, c, d] = package.unpack<4>(FM);
+			assert(a eq "a" and b eq "b" and c eq "c" and d.unassigned());
+		}
+	}
+	{
+		printl("Test auto [a, b, c] = varx.unpack<N>()");
+
+		{	// Any delimiter
+			auto [aa, bb, cc, dd] = unpack<4>("aa]bb]cc"_var, VM);
+			assert(aa eq "aa" and bb eq "bb" and cc eq "cc" and dd.unassigned());
+		}
+
+		{ 	// Including Unicode
+			auto [aa, bb, cc, dd] = unpack<4>("aa⭕bb⭕cc", "⭕");
+			assert(aa eq "aa" and bb eq "bb" and cc eq "cc" and dd.unassigned());
+		}
+
+		{ 	// Including multichar
+			auto [aa, bb, cc, dd] = unpack<4>("aa||bb||cc", "||");
+			assert(aa eq "aa" and bb eq "bb" and cc eq "cc" and dd.unassigned());
+		}
+
+		var v1 = {1,2,3};
+		logputl(v1);
+		assert(v1 = "1^2^3"_var);
+		{
+			printl("Unpack 1");
+			auto [a] = unpack<1>(v1);
+			assert(a eq 1);
+		}
+		{
+			printl("Unpack 2");
+			auto [a,b] = unpack<2>(v1);
+			assert(a eq 1 and b eq 2);
+		}
+		{
+			printl("Unpack 3");
+			auto [a, b, c] = unpack<3>(v1);
+			assert(a eq 1 and b eq 2 and c eq 3);
+		}
+		{
+			printl("Unpack 4");
+			auto [a, b, c, d] = unpack<4>(v1);
+			assert(a eq 1 and b eq 2 and c eq 3 and d.unassigned());
+		}
+		{
+			printl("Unpack 5");
+			auto [a, b, c, d, e] = unpack<5>(v1);
+			assert(a eq 1 and b eq 2 and c eq 3 and d.unassigned() and e.unassigned());
+		}
+	}
 	{
 		printl("Test auto [a, b, c] = dimx.unpack<N>()");
 
@@ -14,61 +78,59 @@ func main() {
 		logputl(d1.join());
 		{
 			printl("Unpack 1");
-			auto [a] = d1.unpack<1>();
-			assert(a == 1);
+			auto [a] = unpack<1>(d1);
+			assert(a eq 1);
 		}
 		{
 			printl("Unpack 2");
-			auto [a,b] = d1.unpack<2>();
-			assert(a == 1 && b == 2);
+			auto [a,b] = unpack<2>(d1);
+			assert(a eq 1 and b eq 2);
 		}
 		{
 			printl("Unpack 3");
-			auto [a, b, c] = d1.unpack<3>();
-			assert(a == 1 && b == 2 && c == 3);
+			auto [a, b, c] = unpack<3>(d1);
+			TRACE(a)
+			TRACE(b)
+			TRACE(c)
+			assert(a eq 1 and b eq 2 and c eq 3);//err
+			a = "x";
+			TRACE(d1[1])
+			TRACE(d1[2])
+			TRACE(d1[3])
 		}
 		{
 			printl("Unpack 4");
-			auto [a, b, c, d] = d1.unpack<4>();
-			assert(a == 1 && b == 2 && c == 3 && d == "");
+			auto [a, b, c, d] = unpack<4>(d1);
+			assert(a eq 1 and b eq 2 and c eq 3 and d.unassigned());
 		}
 		{
 			printl("Unpack 5");
-			auto [a, b, c, d, e] = d1.unpack<5>();
-			assert(a == 1 && b == 2 && c == 3 && d == "" && e == "");
+			auto [a, b, c, d, e] = unpack<5>(d1);
+			assert(a eq 1 and b eq 2 and c eq 3 and d.unassigned() and e.unassigned());
 		}
 	}
-	{
-		printl("Test auto [a, b, c] = varx.unpack<N>()");
 
-		var v1 = {1,2,3};
-		logputl(v1);
-		assert(v1 = "1^2^3"_var);
-		{
-			printl("Unpack 1");
-			auto [a] = v1.unpack<1>();
-			assert(a == 1);
+	{
+		// Use a function that returns three args. Using delimiter "| |" here.
+		auto [x, y, z] = func_returning_three_vars("a| |b| |c", "| |");
+		assert(x eq "a" and y eq "b" and z eq "c");
+
+	}
+
+	{
+		logputl("Test async Job and queuing");
+		Job j1("testecho");
+		j1.input_queue->push("123");
+		// It should timeout if echo is running and waiting
+		if (j1.wait_for(100)) {
+			j1.get(); // Trigger any exception.
+			// Should not get here.
+			assert(false);
 		}
-		{
-			printl("Unpack 2");
-			auto [a,b] = v1.unpack<2>();
-			assert(a == 1 && b == 2);
-		}
-		{
-			printl("Unpack 3");
-			auto [a, b, c] = v1.unpack<3>();
-			assert(a == 1 && b == 2 && c == 3);
-		}
-		{
-			printl("Unpack 4");
-			auto [a, b, c, d] = v1.unpack<4>();
-			assert(a == 1 && b == 2 && c == 3 && d == "");
-		}
-		{
-			printl("Unpack 5");
-			auto [a, b, c, d, e] = v1.unpack<5>();
-			assert(a == 1 && b == 2 && c == 3 && d == "" && e == "");
-		}
+		j1.output_queue->wait_and_pop(DATA);
+		assert(DATA = 123);
+		// Close echo
+		j1.input_queue->push("");
 	}
 
 	printl(elapsedtimetext());
@@ -76,4 +138,10 @@ func main() {
 
 	return 0;
 }
+
+//std::array<var,3> func_returning_three_vars(in v1, in delim) {
+std::array<var,3> func_returning_three_vars(in v1, in delim) {
+	return v1.unpack<3>(delim);
+}
+
 }; // programexit()
