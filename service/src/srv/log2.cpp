@@ -64,7 +64,7 @@ func main(in msg0, io time0) {
 	entry ^= " " ^ msg0;
 
 	if (TERMINAL) {
-		printl(entry);
+		logputl(entry);
 	}
 
 	entry ^= "\r\n";

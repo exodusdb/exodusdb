@@ -394,39 +394,8 @@ updateversion:
 	// NB EXODUS memory is tested in LOGON.OLD
 	// http://www.columbia.edu/~em36/wpdos/emsxp.html
 
-	// startup options
-	// http://www.revelation.com/knowledge.nsf/461ff2bd5a8ddeed852566f50065057d/3c57c588ce21daf9852563920051f70b?OpenDocument
-	// AREV adagency,exodus /X /M4096
-	// /X tells the system to use EMS memory for variable storage.
-	// /M tells the system to use EMS memory for running and executing programs.
-	// /M can also be followed by an option memory allocation amount in kilobytes.
-	// You should never allocate more than 4096K of EMS memory otherwise unstable
-	// /O tells the system to not use any EMS memory at all.
-	// /E tells the system to not use the on-board math chip and use a math chip emulator instead.
-	// /, prompts for a user name
-
 	call log2("*force replication system to reinitialise", logtime);
 	call shadowmfs("EXODUSINIT", "");
-
-	// 	call log2("*reattach data", logtime);
-	// 	let volumesx = VOLUMES;
-	// 	let nvolumes = VOLUMES.fcount(FM);
-	// 	for (const var volumen : range(1, nvolumes)) {
-	// 		let volume = volumesx.f(volumen);
-	// 		let tpath = "../" "DATA" "/";
-	// 		tpath.converter("/", OSSLASH);
-	// 		if (volume.first(8) == tpath) {
-	// 			execute("ATTACH " ^ volume ^ " (S)");
-	// 		}
-	// 	} // volumen;
-	//
-	// 	if (VOLUMES) {
-	// 		call log2("*perform RUN GBP LOGON.OLD UPGRADEVOC", logtime);
-	// 		perform("RUN GBP LOGON.OLD UPGRADEVOC");
-	// 	}
-
-	// call log2('*set workstation time to server time',logtime)
-	// call settime('')
 
 	call log2("*save the original username and station", logtime);
 	if (not SYSTEM.f(43)) {
@@ -435,37 +404,6 @@ updateversion:
 	if (not SYSTEM.f(44)) {
 		SYSTEM(44) = STATION.trim();
 	}
-
-//	call log2("*detach merges", logtime);
-//	// locate 'MERGES' in @files using fm setting xx then perform 'DETACH MERGES (S)'
-//	// open 'MERGES' to xx then perform 'DETACH MERGES (S)'
-//	if (var().open("MERGES", "")) {
-//		perform("DELETEFILE MERGES (S)");
-//	}
-
-	// 	call log2("*get user video table if any", logtime);
-	// 	let temp = ENVIRONKEYS.f(2);
-	// 	temp.converter(".", "");
-	// 	if (colors.osread(temp ^ ".vid")) {
-	// 		let color2;
-	// 		if (not color2.read(systemfile(), ENVIRONKEYS ^ ".VIDEO")) {
-	// 			color2 = "";
-	// 		}
-	// 		if (colors != color2) {
-	// 			colors.write(systemfile(), ENVIRONKEYS ^ ".VIDEO");
-	// 			// call colortoescold);
-	// 		}
-	// 	}
-	//
-	// 	call log2("*setup escape sequence for standard color and background", logtime);
-	// 	temp = HW.f(3)[4] ^ HW.f(8)[4];
-	// 	if (temp == "00") {
-	// 		temp = "70";
-	// 	}
-	// 	tt = "\x1B";
-	// 	tt ^= "C";
-	// 	tt ^= temp;
-	// 	AW(30) = tt;
 
 	call log2("*convert reports file", logtime);
 	if (SYSTEM.f(17) != "DEVDTEST") {
@@ -1564,11 +1502,6 @@ adddatasetcodename:
 		}
 	}
 
-	// in INIT.GENERAL and DEFINITION.SUBS
-	// if dir('ddns.cmd') then
-	// perform 'STARTDDNS'
-	// end
-
 	// FOLLOWING MUST ALL BE DONE LAST OF ALL
 
 	call log2("*save upgrade history and email notification", logtime);
@@ -1721,17 +1654,13 @@ subr failsys() {
 	// respond to user
 	msgx.replacer(FM ^ FM, FM);
 	msgx.converter(FM, "|");
-	// call oswrite(msg,system<33,10>:'.$2')
-	//var(msg).oswrite(SYSTEM.f(33, 10) ^ ".$2");
 	if (not msgx.oswrite(SYSTEM.f(33, 10) ^ ".$2"))
 		loglasterror();
 
 	// and quit
 	stop();
-	stop();
 
-	//return;
-	//std::unreachable();
+	return;
 }
 
 }; // libraryexit()
