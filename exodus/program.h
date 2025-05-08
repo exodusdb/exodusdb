@@ -96,9 +96,9 @@ static int EXOPROGRAM_PREFIX##main2(int exodus_argc, const char* exodus_argv[], 
     if (osgetenv("EXO_DEBUG")) {                                                   \
                                                                                    \
         /* Call main member function without catching stop, abort etc. and errors */     \
-        errputl("Debug Init Thread:", THREADNO, " ", #EXOPROGRAM_PREFIX, " ", SENTENCE); \
+        errputl("Debug Init Thread:", mv.THREADNO, " ", #EXOPROGRAM_PREFIX, " ", mv.SENTENCE); \
         result = exodus_detail::exoprogram_run<EXOPROGRAM_PREFIX##_ExoProgram>(mv);      \
-        errputl("Debug Exit Thread:", THREADNO, " ", #EXOPROGRAM_PREFIX, " ", SENTENCE); \
+        errputl("Debug Exit Thread:", mv.THREADNO, " ", #EXOPROGRAM_PREFIX, " ", mv.SENTENCE); \
     } else {                                                                       \
                                                                                    \
         /* Call main member function catching stop, abort etc. and errors  */      \
@@ -175,6 +175,6 @@ public:                                                                         
 //     return 0;
 // }
 //
-// }; // pogranexit()
+// }; // programexit()
 
 #endif // EXODUS_LIBEXODUS_EXODUS_PROGRAM_H_
