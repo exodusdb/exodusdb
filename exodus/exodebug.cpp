@@ -355,14 +355,10 @@ static void SIGINT_handler(int sig [[maybe_unused]]) {
 
 	while (true) {
 
-		// printf ("\nInterrupted. (C)ontinue (E)nd (B)acktrace\n");
-
-		// errput("? ");
 		var cmd = "A";
 
 		if (var().isterminal()) {
-			// if (!cmd.input("Interrupted. (C)ontinue (E)xit (B)acktrace (A)bort ?"))
-			fprintf(stderr, "Interrupted. (C)ontinue (Q)uit (B)acktrace (D)ebug (A)bort ? ");
+			fprintf(stderr, "Interrupted. (C)ontinue (Q)uit (A)bort (B)acktrace (D)ebug ? ");
 			fflush(stderr);
 			if (!cmd.inputn(1))
 				continue;
