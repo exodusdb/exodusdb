@@ -82,8 +82,11 @@ class PUBLIC ExoEnv final {
 	var THREADNO  = "";
 	var TIMESTAMP = var().ostimestamp();
 	// Note that osgetenv is member function not a exofuncs free function
-	let TERMINAL  = var().isterminal() ? osgetenv("TERM") : "";
-	let EXECPATH  = getexecpath();
+//	let TERMINAL  = var().isterminal() ? osgetenv("TERM") : "";
+//	let TERMINAL  = (var().isterminal(0) or var().isterminal()) ? osgetenv("TERM") : "";
+//	let EXECPATH  = getexecpath();
+	var TERMINAL  = (var().isterminal(0) or var().isterminal()) ? osgetenv("TERM") : "";
+	var EXECPATH  = getexecpath();
 	// Updated to requestor's ip address in service listen
 	var STATION   = var(gethostname()).field(".", 1);
 
@@ -115,8 +118,8 @@ class PUBLIC ExoEnv final {
 // Moved to thread_local in var.h
 //	// i18n/l10n - basic internationalisation/localisation
 ////	var DATEFMT = "D/E";	 // 31/12/2020 International date format
-//	var DATEFMT = "DE";	     // 31 DEC 2020 alpha month output, International date format input
-////	var DATEFMT = "D";	     // 31 DEC 2020 alpha month output, American date format input
+//	var DATEFMT = "DE";		 // 31 DEC 2020 alpha month output, International date format input
+////	var DATEFMT = "D";		 // 31 DEC 2020 alpha month output, American date format input
 //	//var BASEFMT = "MD20P,";	 // base currency format
 //	var BASEFMT = "MD20,";	 // base currency format
 //	var SW = "";             // User TZ offset from UTC in seconds
@@ -160,7 +163,7 @@ class PUBLIC ExoEnv final {
 	var ID = "";
 	var RECORD = "";
 	var MV = "";
-	var LISTACTIVE = "";
+//	var LISTACTIVE = "";
 	var SESSION = "";
 	var STATUS = "";
 	var FILEERROR = "";
@@ -177,9 +180,6 @@ class PUBLIC ExoEnv final {
 	// Per string access
 	int COL1 = 0;
 	var COL2 = 0;
-
-	// define a type of object that holds many ExoCommons
-	ExoCommon* namedcommon[99] = {nullptr};
 
 	// Evade a warning from clang 18 when building with modules
 	// about some unused "less" function in the std::map<std::string, void*> that we use
