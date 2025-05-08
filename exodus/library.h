@@ -52,13 +52,13 @@
 // inheriting from exo::ExoProgram.
 //
 // It is the Exodus programmer's task to complete the class by 
-// providing a function main(), any other functions or data members, 
+// providing a func main(), any other functions or data members, 
 // then close it with a }; as follows:
 //
 // Example library (func1.cpp):
 //   #include <exodus/library.h>
 //   libraryinit()
-//   function main(/*args*/) {
+//   func main(/*args*/) {
 //       /*code*/
 //       return "";
 //   }
@@ -81,7 +81,7 @@
 //   #include <exodus/program.h>
 //   programinit()
 //   #include <func1.h>
-//   function main() {
+//   func main() {
 //       /*code*/ func1(/*args*/);
 //       return 0;
 //   }
@@ -180,10 +180,10 @@ public:                                                                         
 
 // 5. The class scope is left open - observe that there is no closing '};' in the macro.
 //
-// a. User code (including function main(){...}) MUST follow the above macro.
+// a. User code (including func main(){...}) MUST follow the above macro.
 // b. MUST BE TERMINATED BY }; to close the above class scope. e.g.
 //
-// function main() {
+// func main() {
 //     println("Hello World");
 //     return 0;
 // }
