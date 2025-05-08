@@ -81,6 +81,40 @@ bool ExoEnv::init(const int threadno) {
 	return true;
 }
 
+var ExoEnv::parse(in sentence) {
+
+	// Parse words using spaces into an FM delimited string leaving quoted phrases intact.
+	// Spaces are used to parse fields.
+	// Spaces and single quotes are preserved inside double quotes.
+	// Spaces are double quotes preserved inside single quotes.
+	// Backslashes and any character following a backslash (particularly spaces, double and single quotes and backslashes) are treated as non-special characters.
+	SENTENCE = sentence;
+
+	COMMAND = SENTENCE.parse(' ');
+
+	// Cut off OPTIONS from end of COMMAND if present
+	// *** SIMILAR code in
+	// 1. exofuncs.cpp exodus_main()
+	// 2. exoprog.cpp  perform()
+	// OPTIONS are in either (AbC) or {AbC} WITHOUT SPACES in the last field of COMMAND
+	OPTIONS = COMMAND.field(FM, -1);
+	if ((OPTIONS.starts("{") and OPTIONS.ends("}")) or (OPTIONS.starts("(") and OPTIONS.ends(")"))) {
+		// Remove last field of COMMAND. TODO fpopper command or remover(-1)?
+		COMMAND.cutter(-OPTIONS.len() - 1);
+		// Remove first { or ( and last ) } chars of OPTIONS
+		OPTIONS.cutter(1);
+		OPTIONS.popper();
+	} else {
+		OPTIONS = "";
+	}
+
+	// Load the shared library file (always lowercase) TODO allow mixed case
+	// creating a new object so that its member variables all start out unassigned.
+	let libname = SENTENCE.field(" ", 1).lcase();
+
+	return libname;
+}
+
 //bool ExoEnv::processno_islocked(int processno)
 //{
 //	return processno_islocked2(processno, &processnolockfd);
