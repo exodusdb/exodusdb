@@ -1431,6 +1431,45 @@ public:
 	//
 	ND dim  split(SV delimiter = _FM) const;
 
+	// Unpack a delimited string into N new vars.
+	// Useful when marshalling multiple vars as a single string across interfaces.
+	// Note the unusual syntax requiring literal angle brackets.
+	// [a,b,c...]: New vars to be constructed.
+	// N: Must agree with the number of vars being created or returned.
+	// delim: Defaults to FM but can be multichar/unicode string. e.g. ",", VM, "| |", or "⭕".
+	// return: A C++ object enabling inline creation of vars.
+	// Prefix with const to make all the new vars const; partial const declaration is not supported.
+	//
+	// `let a = "aa", b = "bb";
+	//  let pack1 = {a, b}; // "aa^bb"_var
+	//  auto [a2, b2, c2] = pack1.unpack<3>(); // a2 -> "aa" // b2 -> "bb" // c2 -> unassigned
+	//  // or
+	//  auto [a3, b3, c3] = unpack<3>(pack1);
+	//
+	//  // Similar to:
+	//  auto funcx = []() -> std::array<var, 2> {
+	//      let a = "aa", b = "bb";
+	//      return std::array{a, b};
+	//  //  return unpack("aa^bb"_var);
+	//  };
+	//  auto [a4, b4] = funcx();`
+	//
+	template <size_t N>
+	std::array<var, N> unpack/*<N>*/(SV delim = _FM) const {
+        THISIS("auto var::unpack<N>(SV delim = _FM) const")
+        assertString(function_sig);
+
+		// std::vector<var> vv1 = this->split(delim);
+		// Utility somewhere in the forest
+		std::vector<var> basic_split(in v1, SV delim);
+		auto vv1 = basic_split(var_str, delim);
+		return [&vv1]<size_t... Is>(std::index_sequence<Is...>) {
+    		return std::array<var, N>{
+        		(Is < vv1.size() ? std::move(vv1[Is]) : std::move(var()))...
+    		};
+		}(std::make_index_sequence<N>{});
+	}
+
 	// SAME ON TEMPORARIES - CALL MUTATORS FOR SPEED (not documenting since programmer interface is the same)
 	/////////////////////////////////////////
 
