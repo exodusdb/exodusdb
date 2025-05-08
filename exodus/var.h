@@ -3801,6 +3801,26 @@ public:
 	ND var_iter begin() const;
 	ND var_iter end() const;
 
+    // New Unpack function to allow "auto [a,b,c] = d1.unpack<3>();"
+	// Create a tuple<var,N>
+    template <size_t N>
+    auto unpack() const {
+        THISIS("auto var::unpack<N>() const")
+        assertString(function_sig);
+
+		// Utility somewhere in the forest
+		std::vector<var> basic_split(const std::string_view str, char separator);
+		auto vv1 = basic_split(var_str, FM_);
+
+        auto fill_tuple = [vv1]<size_t... Is>(std::index_sequence<Is...>) {
+            return std::make_tuple(
+				// Move
+                (Is < vv1.size() ? std::move(vv1[Is]) : var(""))...
+            );
+        };
+        return fill_tuple(std::make_index_sequence<N>{});
+    }
+
 	///////////////////////////
 	// PRIVATE MEMBER FUNCTIONS
 	///////////////////////////

@@ -47,7 +47,30 @@ friend class dim_iter;
 
  public:
 
-	// inherit contructors
+    // New Unpack function to allow "auto [a,b,c] = d1.unpack<3>();"
+    // Lvalue version: Copy strings (const MyVec&)
+    template <size_t N>
+    auto unpack() const& {
+        auto fill_tuple = [this]<size_t... Is>(std::index_sequence<Is...>) {
+            return std::make_tuple(
+                (Is < base::size() ? base::operator[](Is) : var(""))... // Copy
+            );
+        };
+        return fill_tuple(std::make_index_sequence<N>{});
+    }
+    // Rvalue version: Move strings (MyVec&&)
+    template <size_t N>
+    auto unpack() && {
+        auto fill_tuple = [this]<size_t... Is>(std::index_sequence<Is...>) {
+            return std::make_tuple(
+                (Is < base::size() ? std::move(base::operator[](Is)) : var(""))... // Move
+            );
+        };
+        return fill_tuple(std::make_index_sequence<N>{});
+    }
+
+
+	// inherit constructors
 //	using base::vector;
 
 	// TODO define in class for inline/optimisation?
@@ -247,7 +270,7 @@ friend class dim_iter;
 	// The assignment operator should always return a reference to *this.
 	// cant be (in var1) because seems to cause a problem with var1=var2 in function
 	// parameters unfortunately causes problem of passing var by value and thereby unnecessary
-	// contruction see also ^= etc
+	// construction see also ^= etc
 
 	// Initialise all elements of an dimensioned array.
 	// To some single value. e.g. a var,  "", 0 etc.

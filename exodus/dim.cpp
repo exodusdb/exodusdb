@@ -178,12 +178,12 @@ CVR  dim::getelementref(int rowno1, int colno1) const {
 	if (rowno < 0)
 		rowno += nrows + 1;
 	if (rowno < 1 || rowno > nrows)
-		throw DimIndexOutOfBounds("row:" ^ var(rowno1) ^ " can be -" ^ var(nrows) ^ " to +" ^ nrows);
+		throw DimIndexOutOfBounds("row:" ^ var(rowno1) ^ " can be -" ^ var(nrows) ^ " to +" ^ nrows ^ " not zero.");
 
 	if (colno < 0)
 		colno += ncols_ + 1;
 	if (colno < 1 || colno > ncols_)
-		throw DimIndexOutOfBounds("col:" ^ var(colno1) ^ " can be -" ^ var(ncols_) ^  " to +" ^ ncols_);
+		throw DimIndexOutOfBounds("col:" ^ var(colno1) ^ " can be -" ^ var(ncols_) ^  " to +" ^ ncols_ ^ " not zero.");
 
 	// Calculate index and throw error if out of range
 	// row 1 col1 -> index 0
@@ -625,4 +625,24 @@ var  var::randomize(SV delimiter) const& {
 	return _.join(delimiter);
 }
 
+// Utility
+PUBLIC std::vector<var> basic_split(const std::string_view str, char separator) {
+    std::vector<var> result;
+    // Estimate capacity to avoid reallocations
+    result.reserve(std::count(str.begin(), str.end(), separator) + 1);
+
+    std::string_view sv(str);
+    size_t start = 0;
+    while (start < sv.size()) {
+        size_t end = sv.find(separator, start);
+        if (end == std::string_view::npos) {
+            result.emplace_back(sv.substr(start));
+            break;
+        }
+        result.emplace_back(sv.substr(start, end - start));
+        start = end + 1;
+    }
+
+    return result;
+}
 }  // namespace exo
