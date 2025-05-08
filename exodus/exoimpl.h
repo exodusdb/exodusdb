@@ -50,7 +50,8 @@ THE SOFTWARE.
 //#include <exodus/rex.h>
 #endif
 
-//#include <exodus/vardefs.h>
+#include <exodus/vardefs.h> // for PUBLIC
+
     using VAR    =       exo::var;
     using VARREF =       exo::var&;
     using CVR    = const exo::var&;

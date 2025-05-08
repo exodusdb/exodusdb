@@ -70,16 +70,22 @@ THE SOFTWARE.
 // ===========================
 // Allow simplified syntax eg "function xyz(in arg1, out arg2) { ..."
 //
-#undef function
-#undef subroutine
-#undef func
-#undef subr
+//#undef function
+//#undef subroutine
+//#undef func
+//#undef subr
 //#undef subroutine_noreturn
 
-#define function public: var
-#define subroutine public: void
-#define func public: var
-#define subr public: void
+//// TODO move to exoprog
+//using function = var;
+//using subroutine = void;
+//using func = var;
+//using subr = void;
+// Replaced by "using" in exoprog
+//#define function public: var
+//#define subroutine public: void
+//#define func public: var
+//#define subr public: void
 //#define subroutine_noreturn public: [[noreturn]] void
 
 // "Call" and "Gosub"
@@ -161,6 +167,8 @@ namespace exo {
 #define with ,
 #define to ,
 
+#define LISTACTIVE hasnext()
+
 // Environment variables
 // =====================
 // The following short cuts are provided because they are used continually.
@@ -171,82 +179,82 @@ namespace exo {
 
 // Keep in sync in exoenv.h and exomacros.h
 
-#define ID     mv.ID
-#define RECORD mv.RECORD
-#define FILE   mv.FILE
-#define DICT   mv.DICT
-#define ANS    mv.ANS
-#define MV     mv.MV
-#define PSEUDO mv.PSEUDO
-#define DATA   mv.DATA
-#define LISTACTIVE hasnext()
-
-#define USERNAME    mv.USERNAME
-#define APPLICATION mv.APPLICATION
-#define SENTENCE    mv.SENTENCE
-#define CHAIN       mv.CHAIN
-
-#define USER0 mv.USER0
-#define USER1 mv.USER1
-#define USER2 mv.USER2
-#define USER3 mv.USER3
-#define USER4 mv.USER4
-
-#define RECUR0 mv.RECUR0
-#define RECUR1 mv.RECUR1
-#define RECUR2 mv.RECUR2
-#define RECUR3 mv.RECUR3
-#define RECUR4 mv.RECUR4
-
-#define EXECPATH mv.EXECPATH
-#define COMMAND  mv.COMMAND
-#define OPTIONS  mv.OPTIONS
-
-#define DEFINITIONS mv.DEFINITIONS
-#define SECURITY    mv.SECURITY
-#define SYSTEM      mv.SYSTEM
-#define SESSION     mv.SESSION
-#define THREADNO    mv.THREADNO
-
-#define STATION     mv.STATION
-//#define DATEFMT     mv.DATEFMT
-//#define BASEFMT     mv.BASEFMT
-#define PRIVILEGE   mv.PRIVILEGE
-#define FILES       mv.FILES
-#define TCLSTACK    mv.TCLSTACK
-#define INTCONST    mv.INTCONST
-#define STATUS      mv.STATUS
-#define COL1        mv.COL1
-#define COL2        mv.COL2
-#define PRIORITYINT mv.PRIORITYINT
-// To be replace by try/catch
-#define FILEERRORMODE mv.FILEERRORMODE
-#define FILEERROR     mv.FILEERROR
-
-#define RECCOUNT mv.RECCOUNT
-
-#define AW mv.AW
-#define EW mv.EW
-#define HW mv.HW
-#define MW mv.MW
-#define PW mv.PW
-//#define SW mv.SW
-#define VW mv.VW
-#define XW mv.XW
-
-#define CRTHIGH  mv.CRTHIGH
-#define CRTWIDE  mv.CRTWIDE
-#define LPTRHIGH mv.LPTRHIGH
-#define LPTRWIDE mv.LPTRWIDE
-
-#define TERMINAL mv.TERMINAL
-#define LEVEL    mv.LEVEL
-
-#define THREADNO  mv.THREADNO
-#define CURSOR    mv.CURSOR
-#define TIMESTAMP mv.TIMESTAMP
-
-//to be deleted as soon as it is removed from service
-#define VOLUMES mv.VOLUMES
+//#define ID     mv.ID
+//#define RECORD mv.RECORD
+//#define FILE   mv.FILE
+//#define DICT   mv.DICT
+//#define ANS    mv.ANS
+//#define MV     mv.MV
+//#define PSEUDO mv.PSEUDO
+//#define DATA   mv.DATA
+//#define LISTACTIVE hasnext()
+//
+//#define USERNAME    mv.USERNAME
+//#define APPLICATION mv.APPLICATION
+//#define SENTENCE    mv.SENTENCE
+//#define CHAIN       mv.CHAIN
+//
+//#define USER0 mv.USER0
+//#define USER1 mv.USER1
+//#define USER2 mv.USER2
+//#define USER3 mv.USER3
+//#define USER4 mv.USER4
+//
+//#define RECUR0 mv.RECUR0
+//#define RECUR1 mv.RECUR1
+//#define RECUR2 mv.RECUR2
+//#define RECUR3 mv.RECUR3
+//#define RECUR4 mv.RECUR4
+//
+//#define EXECPATH mv.EXECPATH
+//#define COMMAND  mv.COMMAND
+//#define OPTIONS  mv.OPTIONS
+//
+//#define DEFINITIONS mv.DEFINITIONS
+//#define SECURITY    mv.SECURITY
+//#define SYSTEM      mv.SYSTEM
+//#define SESSION     mv.SESSION
+//#define THREADNO    mv.THREADNO
+//
+//#define STATION     mv.STATION
+////#define DATEFMT     mv.DATEFMT
+////#define BASEFMT     mv.BASEFMT
+//#define PRIVILEGE   mv.PRIVILEGE
+//#define FILES       mv.FILES
+//#define TCLSTACK    mv.TCLSTACK
+//#define INTCONST    mv.INTCONST
+//#define STATUS      mv.STATUS
+//#define COL1        mv.COL1
+//#define COL2        mv.COL2
+//#define PRIORITYINT mv.PRIORITYINT
+//// To be replace by try/catch
+//#define FILEERRORMODE mv.FILEERRORMODE
+//#define FILEERROR     mv.FILEERROR
+//
+//#define RECCOUNT mv.RECCOUNT
+//
+//#define AW mv.AW
+//#define EW mv.EW
+//#define HW mv.HW
+//#define MW mv.MW
+//#define PW mv.PW
+////#define SW mv.SW
+//#define VW mv.VW
+//#define XW mv.XW
+//
+//#define CRTHIGH  mv.CRTHIGH
+//#define CRTWIDE  mv.CRTWIDE
+//#define LPTRHIGH mv.LPTRHIGH
+//#define LPTRWIDE mv.LPTRWIDE
+//
+//#define TERMINAL mv.TERMINAL
+//#define LEVEL    mv.LEVEL
+//
+//#define THREADNO  mv.THREADNO
+//#define CURSOR    mv.CURSOR
+//#define TIMESTAMP mv.TIMESTAMP
+//
+////to be deleted as soon as it is removed from service
+//#define VOLUMES mv.VOLUMES
 
 #endif  // EXODUS_LIBEXODUS_EXODUS_EXOMACROS_H_
