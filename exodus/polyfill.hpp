@@ -67,6 +67,6 @@ void println(std::format_string<T...> fmt, T&&... args) {
 } // namespace std
 #endif
 
-//#ifndef __cpp_lib_generator
-//#include "generator.hpp"
-//#endif
+#ifndef __cpp_lib_generator
+#include "generator.hpp"
+#endif
