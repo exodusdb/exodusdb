@@ -40,9 +40,9 @@ binary is automatically loaded the first time that the function is called.
 programinit()
 #include <lib1.h>
 function main (){
- call lib1("xyz");
+ call lib1("xyz");  // "call" is an empty macro
 }
-programexit()
+}; // programexit()
 
 ==== sample session ====
 
@@ -53,9 +53,9 @@ lib1 says xyz
 
 === Exodus Library Concept ===
 
-exodus allows multiple functions and subroutines in a particular file using the following syntax
+exodus allows multiple function objects in a particular file using the following syntax
 
-This is currently only used to provide c++ dictionary functions at the moment
+This is currently only used to provide c++ "dictionary" functions at the moment
 but the machinery would be similar for multi-function libraries.
 
 e.g. in a file dict1.cpp
@@ -63,11 +63,11 @@ e.g. in a file dict1.cpp
 #include <exodus/dict.h>
 dictinit(aaa)
 ...
-dictexit(aaa)
+};
 
 dictinit(bbb)
 ...
-dictexit(bbb)
+};
 */
 
 #ifndef EXODUS_LIBEXODUS_EXODUS_EXOCALLABLE_H_
@@ -76,7 +76,11 @@ dictexit(bbb)
 #if EXO_MODULE
 	import var;
 #else
-#	include <mutex>
+//#	include <mutex>
+//#include <future>
+//#include <map>
+//#include <mutex>
+//#include <string>
 #	include <exodus/var.h>
 #endif
 
@@ -109,7 +113,7 @@ class PUBLIC Callable {
 
     mutable ExoEnv* mv_;
 
- private:
+// private:
 
 	// Records the library opened so we can close and reopen new libraries automatically
 	std::string libname_;
@@ -218,13 +222,13 @@ class PUBLIC Callable {
 	bool initsmf(ExoEnv& mv, const char* libname, const char* funcname, const bool forcenew = false);
 
 	// Call a shared member function
-	var callsmf();
+	var callsmf() const;
 
 	// Call a shared global function
 	//var callsgf();
 
 	// Build a path to the shared library file
-	std::string libfilepath(const std::string_view libname) const;
+	static std::string libfilepath(const std::string_view libname);
 
  protected:
 

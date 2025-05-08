@@ -241,10 +241,10 @@ bool Callable::attach(const char* newlibname) {
 //	return true;
 //}
 
-// initsmf is called by dict/perform/execute ... can be called repeatably since buffers lib and func
-// perform/execute call with forcenew=true to ensure global variables are unassigned initially
+// initsmf is called by exoprog::calculate/perform and job::start
+// It can be called repeatably since it buffers lib
 //
-// "forcenew" is used in PERFORM/EXECUTE to ensure that the ExodusProgram globals
+// "forcenew" is used in perform/job::start to ensure that the ExodusProgram globals
 // are initialised i.e. performing the same command twice
 // starts from scratch each time.
 //
@@ -255,7 +255,7 @@ bool Callable::attach(const char* newlibname) {
 bool Callable::initsmf(ExoEnv& mv, const char* newlibname, const char* newfuncname, const bool forcenew) {
 
 	if (TRACING >= 4) {
-		std::cout << "exocallable:initsmf: === in === " << newlibname << std::endl;
+		std::cout << "exocallable:initsmf: === in === newlibname: '" << newlibname << "' newfuncname: '" << newfuncname << "'" << std::endl;
 	}
 
 	// Get our environment in place first
@@ -263,7 +263,7 @@ bool Callable::initsmf(ExoEnv& mv, const char* newlibname, const char* newfuncna
 	mv_ = &mv;
 
 	// Open the library or fail
-	if (newlibname != libname_ && !openlib(newlibname)) {
+	if ((newlibname != libname_ || ! plibobject_) && !openlib(newlibname)) {
 		return false;
 	}
 
@@ -304,7 +304,7 @@ bool Callable::initsmf(ExoEnv& mv, const char* newlibname, const char* newfuncna
 	}
 
 	if (TRACING >= 3) {
-		std::cout << "exocallable:initsmf()       " << libname_ << ", " << funcname_ << " " << plibobject_ << "," << pmemberfunc_ << std::endl;
+		std::cout << "exocallable:initsmf() libname_: '" << libname_ << "', funcname_: '" << funcname_ << "', plibobject_:  " << plibobject_ << ", pmemberfunc: " << pmemberfunc_ << std::endl;
 	}
 
 	return true;
@@ -398,7 +398,7 @@ bool Callable::checkload(const std::string newlibname, const std::string newfunc
 //
 // + LIBPREFIX (lib) + libname + EXODUSLIBEXT (.so)
 //
-std::string Callable::libfilepath(const std::string_view libname) const {
+std::string Callable::libfilepath(const std::string_view libname) {
 
 	// Determine the libdir only once per thread
 	thread_local std::string libdir;
@@ -505,22 +505,24 @@ bool Callable::openlib(const std::string newlibname) {
 	std::string purelibfilename;
 	if (plib_ == nullptr) {
 
+		//TRACE(libfilepath_)     // "/root/lib/libtestecho.so"
 		fnpos0 = libfilepath_.rfind(OSSLASH_);
 		if (fnpos0 != std::string::npos && fnpos0 != libfilepath_.size() - 1) {
 
 			// In two places
 			purelibfilename = libfilepath_.substr(fnpos0 + 1);
-
-			//TRACE(purelibraryfilename)
+			//TRACE(purelibfilename)  // "libtestecho.so"
 
 			/////////
 			// dlopen
 			/////////
 			plib_ = static_cast<void*>(dlopen(purelibfilename.c_str(), RTLD_NOW));
 
-//			// Try on the same path as the executable
-//			if (plib_ == nullptr) {
-//			}
+			if (plib_ == nullptr) {
+				// Try on the same path as the executable
+				//TRACE(var::oscwd())     // "/root/exodus/test"
+				//plib_ = static_cast<void*>(dlopen(("./" +purelibfilename).c_str(), RTLD_NOW));
+			}
 		}
 	}
 
@@ -636,7 +638,7 @@ bool Callable::openfunc(const std::string newfuncname) {
 // that can call the shared library object member function
 // with the right arguments and returning a var
 //using pExoProgram_MemberFunc = var (ExoProgram::*)();
-var Callable::callsmf() {
+PUBLIC var Callable::callsmf() const {
 
 	if (TRACING >= 3) {
 		std::cout << "exocallable:callsmf()       " << libname_ << ", " << funcname_ << " " << plibobject_ << "," << pmemberfunc_ << std::endl;
@@ -686,7 +688,7 @@ void Callable::delete_shared_object() {
 	// Skip if there is no plibobject_
 	if (plibobject_ == nullptr) {
 		if (TRACING >= 5) {
-			std::cout << "exocallable::delete_shared_object: Not required for function in library : " << libname_ << std::endl;
+			std::cout << "exocallable::delete_shared_object: Already nullptr. library : " << libname_ << std::endl;
 		}
 		return;
 	}
