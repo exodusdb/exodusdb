@@ -14,6 +14,34 @@ export using ::isatty;
 
 export namespace std {
 
+	using std::generator;
+	using std::coroutine_handle;
+	using std::coroutine_traits;
+//	using std::make_shared;
+	using std::current_exception;
+
+	using std::is_destructible;
+	using std::ptrdiff_t;
+//	using std::make_shared;
+	using std::atomic;
+	using std::get;
+	using std::index_sequence;
+	using std::make_index_sequence;
+#undef function
+	using std::function;
+	using std::construct_at;
+	using std::shared_ptr;
+	using std::weak_ptr;
+	using std::promise;
+	using std::future;
+	using std::future_status;
+	using std::stop_token;
+	using std::make_exception_ptr;
+	using std::conditional;
+	using std::condition_variable;
+	using std::queue;
+	using std::unique_lock;
+
 	using std::getline;
 	using std::stack;
 	using std::all_of;
@@ -256,6 +284,8 @@ export namespace std {
 	using std::hash;
 
 	namespace chrono {
+		using std::chrono::_V2::system_clock;
+		using std::chrono::steady_clock;
 		using std::chrono::clock_time_conversion;
 		using std::chrono::sys_time;
 		using std::chrono::high_resolution_clock;
@@ -291,10 +321,12 @@ export namespace std {
 
 	namespace this_thread {
 		using std::this_thread::sleep_for;
+		using std::this_thread::get_id;
 	}
 
 	// from <cstdint>
 	using ::uint;
+	using ::uintptr_t;
 	using std::size_t;
 	using std::int8_t;
 	using std::int16_t;
@@ -557,6 +589,7 @@ using std::is_constructible;
 using std::is_convertible;
 using std::is_copy_assignable;
 using std::is_copy_constructible;
+using std::is_copy_constructible_v;
 using std::is_default_constructible;
 using std::is_destructible;
 using std::is_empty;
