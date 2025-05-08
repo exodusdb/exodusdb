@@ -645,4 +645,10 @@ PUBLIC std::vector<var> basic_split(const std::string_view str, char separator) 
 
     return result;
 }
+
+// Utility var -> vector
+PUBLIC std::vector<var> basic_split(in v1, SV delim) {
+	return v1.split(delim);
+}
+
 }  // namespace exo

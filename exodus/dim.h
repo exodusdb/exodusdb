@@ -47,29 +47,6 @@ friend class dim_iter;
 
  public:
 
-    // New Unpack function to allow "auto [a,b,c] = d1.unpack<3>();"
-    // Lvalue version: Copy strings (const MyVec&)
-    template <size_t N>
-    auto unpack() const& {
-        auto fill_tuple = [this]<size_t... Is>(std::index_sequence<Is...>) {
-            return std::make_tuple(
-                (Is < base::size() ? base::operator[](Is) : var(""))... // Copy
-            );
-        };
-        return fill_tuple(std::make_index_sequence<N>{});
-    }
-    // Rvalue version: Move strings (MyVec&&)
-    template <size_t N>
-    auto unpack() && {
-        auto fill_tuple = [this]<size_t... Is>(std::index_sequence<Is...>) {
-            return std::make_tuple(
-                (Is < base::size() ? std::move(base::operator[](Is)) : var(""))... // Move
-            );
-        };
-        return fill_tuple(std::make_index_sequence<N>{});
-    }
-
-
 	// inherit constructors
 //	using base::vector;
 
@@ -446,6 +423,47 @@ friend class dim_iter;
 	//  let v1 = d1.join(); // "f1^f2^f3"_var`
 	//
 	ND var join(SV delimiter = _FM) const;
+
+    // unpack lvalue version: Copy strings (const MyVec&)
+
+	// New Unpack function to allow "auto [a,b,c] = d1.unpack<3>();"
+	template <size_t N>
+	std::array<var, N> unpack() const& {
+
+//    std::clog << "base size:" << base::size() << std::endl;
+//    for (size_t i = 0; i < base::size(); ++i) {
+//        std::clog << "result[" << i << "]:" << base::operator[](i) << std::endl;
+//    }
+
+	// MUST use base:operator[](index) NOT (*this)[index] because dim is 1 based
+	// Unless you use 1 based indexing and dont care about being validate by dim::operator[] all the time.
+
+    auto result = [this]<size_t... Is>(std::index_sequence<Is...>) {
+        return std::array<var, N>{
+            (Is < base::size() ? base::operator[](Is) : var())...
+        };
+    }(std::make_index_sequence<N>{});
+
+//    std::clog << "unpack result:" << std::endl;
+//    for (size_t i = 0; i < N; ++i) {
+//        std::clog << "result[" << i << "]:" << result[i].dump() << std::endl;
+//    }
+
+    return result;
+
+	}
+
+    // unpack rvalue version: Move strings (MyVec&&)
+
+	template <size_t N>
+	std::array<var, N> unpack() && {
+		auto fill_array = [this]<size_t... Is>(std::index_sequence<Is...>) {
+			return std::array<var, N>{
+				(Is < base::size() ? std::move(base::operator[](Is)) : std::move(var()))...
+			};
+		};
+		return fill_array(std::make_index_sequence<N>{});
+	}
 
 	/////////////////////
 	///// array mutation:
