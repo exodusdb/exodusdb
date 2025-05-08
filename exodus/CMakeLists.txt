@@ -258,7 +258,8 @@
 		exoprog.cpp
 		vardb.cpp varregex.cpp varos.cpp varos2.cpp varstr.cpp
 		varb.cpp
-		var.cpp dim.cpp varnum.cpp varmath.cpp exodebug.cpp
+		var.cpp dim.cpp
+		varnum.cpp varmath.cpp exodebug.cpp
 		varcompare.cpp
 		varop.cpp
 		varop2.cpp
@@ -266,6 +267,11 @@
 		varchrono.cpp
 		varfuncs.cpp varioconv.cpp
 		exoenv.cpp exofuncs.cpp
+
+		job.cpp
+		threadsafequeue.cpp
+		threadpool.cpp
+
 		varwait.cpp varunicode.cpp varposix.cpp exocallable.cpp
 		#murmurhash2_64.cpp
 		murmurhash3.cpp
@@ -418,6 +424,7 @@
 				varerr.h
 				varb_friends.h
 				dim.h
+				job.h
 				rex.h
 			DESTINATION include/exodus
 		)
@@ -444,16 +451,18 @@
 			exoimpl.h
 			exomacros.h
 			exoenv.h
+			threadsafequeue.h
 			exofuncs.h
 			format.h
 			#mvimpl.h mvipc.h mvconfig.h mvlink.h
-			exocallable.h
 			program.h
 			library.h
 			dict.h
 			common.h
-#			common2.h
 			exoprog.h
+			exocallable.h
+			job.h
+			threadpool.h
 			ioconv_custom.h
 			timebank.h
 			printtx.hpp
