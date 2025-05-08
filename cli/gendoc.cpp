@@ -120,6 +120,16 @@ func main() {
 				return html_out;
 			};
 
+			// 0. How pygmentize wraps a \n char
+			//15:15:41 root@de1:~/exodus/pygment# pygmentize -l exodus_cpp -f html
+			//<div class="highlight"><pre><span></span>
+			//</pre></div>
+			//15:15:49 root@de1:~/exodus/pygment# pygmentize -l exodus_cpp -f html | xxd
+			//00000000: 3c64 6976 2063 6c61 7373 3d22 6869 6768  <div class="high
+			//00000010: 6c69 6768 7422 3e3c 7072 653e 3c73 7061  light"><pre><spa
+			//00000020: 6e3e 3c2f 7370 616e 3e0a 3c2f 7072 653e  n></span>.</pre>
+			//00000030: 3c2f 6469 763e 0a                        </div>.
+
 			// 1. Convert all the code matches to html
 			let converted_code_matches = converter(all_code_matches);
 
@@ -212,7 +222,7 @@ func main() {
 
 		filen++;
 
-		// Skip and capture output dir for examples .cpp
+		// output dir for examples .cpp
 		if (osdir(osfilename)) {
 			codefile_dir = osfilename;
 			continue;
@@ -310,6 +320,9 @@ func main() {
 				continue; // nextline
 			}
 
+			if (srcline.starts("template "))
+				continue; // nextline
+
 			////////////////////////////
 			// Start a section and table
 			////////////////////////////
@@ -398,6 +411,7 @@ func main() {
 				if (funcx_mut.no_discard)
 					srcline.cutter(3);
 
+				// funcx_prefix starts life as the first word
 				srcline.replacer(R"__(^((friend)|(CONST[^\s]*))\s)__"_rex, "");
 				srcline.trimmerfirst();
 				funcx_prefix = srcline.field(" ", 1);
@@ -411,6 +425,11 @@ func main() {
 
 				funcx_mut.is_ctor = funcx_prefix.starts("dim(") or funcx_prefix.starts("var(");
 				if (funcx_mut.is_ctor) {
+				}
+
+				// std::array<var, N> unpack(SV delim = _FM) const {
+				else if (srcline.starts("std::") and srcline.ends("{")) {
+					funcx_prefix = "auto [a, b, ...] =";
 				}
 
 				else if (funcx_prefix == "var" or funcx_prefix == "int")
@@ -490,11 +509,14 @@ func main() {
 			// Found a function declaration
 			///////////////////////////////
 
-			// Consume the comments
+			// Consume the comments in case we skip the function
 			var comments = move(contiguous_comments);
 
-			if (not funcx_const.is_ctor)
-				srcline = srcline.field(" ", 2, 9999).trimfirst();
+			if (not funcx_const.is_ctor) {
+				//std::array<var, N> unpack(SV delim = _FM) const {
+				let sep = srcline.starts("std::array<") ? ">" : " ";
+				srcline = srcline.field(sep, 2, 9999).trimfirst();
+			}
 
 //			var comments = srcline.field("{", 1).field(";", 2, 9999).trimmerfirst("/ ");
 //			var comments = srcline.field("/" "/", 2, 99999).trimfirst();
@@ -519,11 +541,11 @@ func main() {
 
 			// Add a backtick if an odd numbers is present indicating forgot to close c++ code
 			if (comments.count("`") % 2) {
-				if (comments.count("`") > 1 ) {
+//				if (comments.count("`") > 1 ) {
 					abort("Error: Odd number of backticks in " ^ funcname.quote());
-				}
-				logputl("Warning: Missing closing backtick in " ^ funcname.quote());
-				comments ^= "`";
+//				}
+//				logputl("Warning: Missing closing backtick in " ^ funcname.quote());
+//				comments ^= "`";
 			}
 
 			comments.converter(_FM, _NL);
@@ -594,24 +616,28 @@ func main() {
 					const static rex rex3 = rex(R"__(^(\s*)(let|var)\s+([a-z0-9A-Z_]+) = ([^\n]*?);[ \t]*//\s+(true|false|["0-9.-][^\n]*?)([ \t]//[^\n]*?)?$)__", "m");
 
 //					codematch.replacer(rex3, "\t$1$2 $3$4; assert($3 == $5);$6");
-					codematch.replacer(rex3, "\t\t$2 $3 = $4; assert($3 == $5);$6");
+					codematch.replacer(rex3, "\t\t$2 $3 = $4; assert($3.errputl() == $5);$6");
 
 					// e.g. '           v1 = xxxxxxx ; // "X" // zzzz' where zzzz can be a literal number 9999, "xxx", true or false
 					//      '1112222222 3344444444444     55556666666'
 					const static rex rex3b = rex(R"__(^(\s*)()([a-z0-9A-Z_]+) = ([^\n]*?);[ \t]*//\s+(true|false|["0-9.-][^\n]*?)([ \t]//[^\n]*?)?$)__", "m");
-					codematch.replacer(rex3b, "\t\t$2$3 = $4; assert($3 == $5);$6");
+					codematch.replacer(rex3b, "\t\t$2$3 = $4; assert($3.errputl() == $5);$6");
 
 					// ARROW ASSERTS
 					//        if (not field.readf(file, key, fieldno)) abort("readf" ": " ^ lasterror()); // field -> "G"
 					// e.g. '  // v1 -> "f1^X^f3"_var // v2 -> "a b c"'
 					//        1   22    33333333333333
-					const static rex rex5 = rex(R"__(([^/])//\s*([a-zA-Z0-9_.()]+)\s*->\s*([^/\n]*))__");
-					codematch.replacer(rex5, "$1 assert($2 == $3);");
+					// First only because it messes up if not repeated separately.
 					// Why does it need multiple replaces? (possibly because group 3 overlaps with group 1)
-					codematch.replacer(rex5, "$1 assert($2 == $3); ");
-					codematch.replacer(rex5, "$1 assert($2 == $3); ");
-					codematch.replacer(rex5, "$1 assert($2 == $3); ");
-					codematch.replacer(rex5, "$1 assert($2 == $3); ");
+					const static rex rex5 = rex(R"__(([^/])//\s*([a-zA-Z0-9_.()]+)\s*->\s*([^/\n]*))__", "f");
+					codematch.replacer(rex5, "$1 assert($2.errputl() == $3);");
+					codematch.replacer(rex5, "$1 assert($2.errputl() == $3);");
+					codematch.replacer(rex5, "$1 assert($2.errputl() == $3);");
+					codematch.replacer(rex5, "$1 assert($2.errputl() == $3);");
+					codematch.replacer(rex5, "$1 assert($2.errputl() == $3);");
+
+					// Fix " -> unassigned"
+					codematch.replacer(".errputl() == unassigned", ".unassigned()");
 
 //					// MUTATOR ASSERTS
 //					// e.g. 'v1.xxx xxx xxx // zzzz // xxxxxx'
@@ -736,7 +762,8 @@ func main() {
 //TRACE(code_match_len)
 //TRACE(code_match)
 //input();
-							return "<div class=\"highlight " ^ style_switcher_class ^ "\"><pre>" ^ code_match ^ "</pre></div>";
+//							return "<div class=\"highlight " ^ style_switcher_class ^ "\"><pre>" ^ code_match ^ "</pre></div>";
+							return "<pre>" ^ code_match ^ "</pre>";
 						}
 
 					); // replace code with syntax hightlighted html code
@@ -772,24 +799,6 @@ func main() {
 
 				// wiki
 				comments.replacer(_FM, "\n\n");
-
-			} else {
-
-//				// convert text to html
-//				// Already converted early on
-//				if (false) {
-//					// html emphasise first word. Allow aaaAAA09_.[out]:
-//					const static rex first_word_if_colon_rex = R"__((^|\x1e)([a-zA-Z0-9_.\[\]]+):(\s*))__"_rex;
-//					comments.replacer(first_word_if_colon_rex, "\x1e<em>$2:</em>$3");
-//
-//					// Wrap lines in <p></p>
-//					// Replace all [not FM]+ FM with <p>[not FM]+</p>\n
-//					const static rex field_rex {R"__([^\x1e]+\x1e)__"};
-//					comments.replacer(field_rex, "<p>$&</p>\n");
-//
-//					// dynamic array -> text format
-//					comments.converter(_FM, _NL);
-//				}
 			}
 
 			// Clean up function args
@@ -874,6 +883,12 @@ func main() {
 				TRACE(line2)
 			}
 
+			// Remove inline multi-line quotes.
+			// We defined them as inline documentation in the function definition.
+			// std::array<var, N> unpack/*<N>*/(SV delim /*= _FM*/) const {
+			line2.replacer("/" "*", "");
+			line2.replacer("*" "/", "");
+
 			// i/oconv_MD(const char* conversion) -> i/oconv("MD")
 			var func_decl0 = line2.replace(R"__(([io])conv_([A-Z]+)\([a-zA-Z0-0_*]*\))__"_rex, "$1conv(\"$2\")");
 
@@ -883,177 +898,190 @@ func main() {
 			//    var  exoprog_number(in type, in input0, in ndecs0, out output);
 			func_decl0 = func_decl0.replace(R"__(exoprog_number\(.*)__"_rex, "iconv|oconv(var, \"[NUMBER]\")");
 
-			// Prefix the object name
-			// Can reject the function and skip to nextline
+			// Work out func_decl and adjust funcx_prefix
+			// iomanip - reject the function and skip to nextline
 			var func_decl;
-			if (not funcx_const.is_ctor) {
+			{
+				if (not funcx_const.is_ctor) {
 
-				func_decl0.replacer("dim& ", "");
+					func_decl0.replacer("dim& ", "");
 
-				if (line2.match(R"__(\boperator\s*=)__")) {
+					if (line2.match(R"__(\boperator\s*=)__")) {
 
-					// "operator=(v1)" -> "dim d1 = v1;"
-					func_decl = func_decl0.replace(R"__(\boperator\s*=\s*\(\s*([a-zA-Z0-9_]+)\s*\))__"_rex, class_name ^ " " ^ class_name.first() ^ "1 = $1;");
-				}
-
-				else if (line2.match(R"__(\boperator\s*<<\s*\()__")) {
-
-					// operator<<(auto& value)
-					// operator<<(std::ostream& (*manip)(std::ostream&))
-					if (line2.contains("manip"))
-//						func_decl = "osfile << std::setw(n) << std::endl; etc.";
-						continue; // nextline
-					else
-						func_decl = "osfile << anything << std::endl;";
-					funcx_prefix = "";
-				}
-				else if (line2.match(R"__(\boperator\s*\[\]\s*\()__")) {
-
-					// "operator[](rowno)"
-					// "operator[](rowno, colno)"
-					// -> "var v1 = d1[rown];   d1[rown] = v1;"
-					// -> "var v1 = d1[rown, coln];   d1[rown, coln] = v1;"
-					func_decl = func_decl0.replace(
-						R"__(\boperator\s*\[\]\s*\(\s*([^\)]+)\))__"_rex,
-						 "var v1 = " ^ class_name.first() ^ "1[$1];       " ^ class_name.first() ^ "1[$1] = v1;"
-					);
-					if (html or wiki)
-						func_decl.replacer("       ", "<br>");
-					// Use on left and right hand side
-					funcx_prefix = "";
+						// "operator=(v1)" -> "dim d1 = v1;"
+						func_decl = func_decl0.replace(R"__(\boperator\s*=\s*\(\s*([a-zA-Z0-9_]+)\s*\))__"_rex, class_name ^ " " ^ class_name.first() ^ "1 = $1;");
 					}
 
-				else if (line2.contains("operator\"\"_")) {
-					// operator""_var(cstr, std::size_t size);
-					// ->
-					// var v1 = ""_var
-					func_decl = func_decl0.replace(
-						R"__(\boperator""_([a-zA-Z0-9_])([a-zA-Z0-9_]+).*)__"_rex,
-//						"$1$2 ${1}1 = \"\"_$1$2"
-						"\"\"_$1$2"
-					);
+					else if (line2.match(R"__(\boperator\s*<<\s*\()__")) {
 
-				}
-				else if (line2.match(R"__(\boperator\s*\(\)\s*\()__")) {
-					//operator()(fieldno, valueno = 0, subvalueno = 0);
-					func_decl = func_decl0.replace(" = 0", "").replace(
-						R"__(\boperator\s*\(\)\s*\(\s*([^\)]+)\))__"_rex,
-						class_name.first() ^ "2($1);       " ^ class_name.first() ^ "1($1) = v2"
-					);
-				}
+						// operator<<(auto& value)
+						// operator<<(std::ostream& (*manip)(std::ostream&))
+						if (line2.contains("manip"))
+	//						func_decl = "osfile << std::setw(n) << std::endl; etc.";
+							continue; // nextline
+						else
+							func_decl = "osfile << anything << std::endl;";
+						funcx_prefix = "";
+					}
+					else if (line2.match(R"__(\boperator\s*\[\]\s*\()__")) {
 
-				else if (line2.match(R"__(\boperator\s*[\+\-\*\/\%\^]\s*\(.*)__")) {
-					//operator+(var)
-					// v2 + v3
-					func_decl = func_decl0.replace(
-						R"__(\boperator\s*([\+\-\*\/\%\^])\s*\(.*)__"_rex,
-						class_name.first() ^ "2 $1 " ^ class_name.first() ^ "3"
-					);
-				}
+						// "operator[](rowno)"
+						// "operator[](rowno, colno)"
+						// -> "var v1 = d1[rown];   d1[rown] = v1;"
+						// -> "var v1 = d1[rown, coln];   d1[rown, coln] = v1;"
+						func_decl = func_decl0.replace(
+							R"__(\boperator\s*\[\]\s*\(\s*([^\)]+)\))__"_rex,
+							 "var v1 = " ^ class_name.first() ^ "1[$1];       " ^ class_name.first() ^ "1[$1] = v1;"
+						);
+						if (html or wiki)
+							func_decl.replacer("       ", "<br>");
+						// Use on left and right hand side
+						funcx_prefix = "";
+						}
 
-				else if (line2.match(R"__(\boperator\s*[\+\-\*\/\%\^]=\s*\(.*)__")) {
-					//operator+=(var)
-					// v1 += v2
-					func_decl = func_decl0.replace(
-						R"__(\boperator\s*([\+\-\*\/\%\^]=)\s*\(.*)__"_rex,
-						class_name.first() ^ "1 $1 " ^ class_name.first() ^ "2"
-					);
+					else if (line2.contains("operator\"\"_")) {
+						// operator""_var(cstr, std::size_t size);
+						// ->
+						// var v1 = ""_var
+						func_decl = func_decl0.replace(
+							R"__(\boperator""_([a-zA-Z0-9_])([a-zA-Z0-9_]+).*)__"_rex,
+	//						"$1$2 ${1}1 = \"\"_$1$2"
+							"\"\"_$1$2"
+						);
 
-					// Prevent prefixing with "var v1 = "
-					funcx_prefix = "";
-				}
+					}
+					else if (line2.match(R"__(\boperator\s*\(\)\s*\()__")) {
+						//operator()(fieldno, valueno = 0, subvalueno = 0);
+						func_decl = func_decl0.replace(" = 0", "").replace(
+							R"__(\boperator\s*\(\)\s*\(\s*([^\)]+)\))__"_rex,
+							class_name.first() ^ "2($1);       " ^ class_name.first() ^ "1($1) = v2"
+						);
+					}
 
-				else if (line2.match(R"__(\boperator\s*[\+\-]{2,2}\s*\(INT\))__")) {
-					//operator++(int);
-					// v1 ++
-					func_decl = func_decl0.replace(
-						R"__(\boperator\s*([\+\-]{2,2})\s*\(.*)__"_rex,
-						class_name.first() ^ "1 $1"
-					);
+					else if (line2.match(R"__(\boperator\s*[\+\-\*\/\%\^]\s*\(.*)__")) {
+						//operator+(var)
+						// v2 + v3
+						func_decl = func_decl0.replace(
+							R"__(\boperator\s*([\+\-\*\/\%\^])\s*\(.*)__"_rex,
+							class_name.first() ^ "2 $1 " ^ class_name.first() ^ "3"
+						);
+					}
 
-					// Prevent prefixing with "var v1 = "
-					funcx_prefix = "";
-				}
+					else if (line2.match(R"__(\boperator\s*[\+\-\*\/\%\^]=\s*\(.*)__")) {
+						//operator+=(var)
+						// v1 += v2
+						func_decl = func_decl0.replace(
+							R"__(\boperator\s*([\+\-\*\/\%\^]=)\s*\(.*)__"_rex,
+							class_name.first() ^ "1 $1 " ^ class_name.first() ^ "2"
+						);
 
-				else if (line2.match(R"__(\boperator\s*[\+\-]{2,2}\s*\(\))__")) {
-					//operator++();
-					// ++ v1
-					func_decl = func_decl0.replace(
-						R"__(\boperator\s*([\+\-]{2,2})\s*\(.*)__"_rex,
-						"$1 " ^ class_name.first() ^ "1"
-					);
+						// Prevent prefixing with "var v1 = "
+						funcx_prefix = "";
+					}
 
-					// Prevent prefixing with "var v1 = "
-					funcx_prefix = "";
-				}
+					else if (line2.match(R"__(\boperator\s*[\+\-]{2,2}\s*\(INT\))__")) {
+						//operator++(int);
+						// v1 ++
+						func_decl = func_decl0.replace(
+							R"__(\boperator\s*([\+\-]{2,2})\s*\(.*)__"_rex,
+							class_name.first() ^ "1 $1"
+						);
 
-//				else if (funcx_prefix == "int=") {
-//					func_decl = func_decl0;
-//				}
+						// Prevent prefixing with "var v1 = "
+						funcx_prefix = "";
+					}
 
+					else if (line2.match(R"__(\boperator\s*[\+\-]{2,2}\s*\(\))__")) {
+						//operator++();
+						// ++ v1
+						func_decl = func_decl0.replace(
+							R"__(\boperator\s*([\+\-]{2,2})\s*\(.*)__"_rex,
+							"$1 " ^ class_name.first() ^ "1"
+						);
+
+						// Prevent prefixing with "var v1 = "
+						funcx_prefix = "";
+					}
+
+	//				else if (funcx_prefix == "int=") {
+	//					func_decl = func_decl0;
+	//				}
+					else if (funcx_prefix.starts("auto")) {
+						// std::array<var N> unpack etc.
+						func_decl = funcx_prefix ^ " " ^ func_decl0;
+	//					TRACE(funcx_prefix)     // "auto [a, b, ...] ="
+	//					TRACE(srcline)  // "unpack(SV delim = _FM) const"
+	//					TRACE(func_decl)        // "auto [a, b, ...] = unpack(delim = FM)"
+					}
+
+					else {
+						// xxxxxxxxx -> var.xxxxxxxxx
+						if (default_objname) {
+							func_decl = (objname ?: default_objname) ^ "." ^ func_decl0;
+						} else
+							func_decl = func_decl0;
+
+						if (funcx_const.is_static)
+							// var(). -> var::
+							func_decl.replacer("().", "::");
+					}
+
+				} // not is_ctor
 				else {
-					// xxxxxxxxx -> var.xxxxxxxxx
-					if (default_objname) {
-						func_decl = (objname ?: default_objname) ^ "." ^ func_decl0;
-					} else
-						func_decl = func_decl0;
 
-					if (funcx_const.is_static)
-						// var(). -> var::
-						func_decl.replacer("().", "::");
-				}
+					// ctor
+	//TRACE(func_decl0)
+	//TRACE: func_decl0 = "dim() = default"
+	//TRACE: func_decl0 = "dim(dim& sourcedim)"
+	//TRACE: func_decl0 = "dim(dim&& sourcedim)"
+	//TRACE: func_decl0 = "dim(nrows, ncols = 1)"
+	//TRACE: func_decl0 = "dim(std::initializer_list<T> list)"
+					// dim(xxx) -> dim d(xxx);
+					// dim() -> dim d;
+					var args = func_decl0.field("(", 2, 999999).field(")", 1);
+					var arg1 = args.field(" ", 1);
+					let class_letter = func_decl0.first(1);
 
-			} else {
-//TRACE(func_decl0)
-//TRACE: func_decl0 = "dim() = default"
-//TRACE: func_decl0 = "dim(dim& sourcedim)"
-//TRACE: func_decl0 = "dim(dim&& sourcedim)"
-//TRACE: func_decl0 = "dim(nrows, ncols = 1)"
-//TRACE: func_decl0 = "dim(std::initializer_list<T> list)"
-				// dim(xxx) -> dim d(xxx);
-				// dim() -> dim d;
-				var args = func_decl0.field("(", 2, 999999).field(")", 1);
-				var arg1 = args.field(" ", 1);
-				let class_letter = func_decl0.first(1);
+					// Default ctor
+					if (arg1 == "") {
+						// dim() -> dim d1;
+						func_decl = class_name ^ " " ^ func_decl0.first(1) ^ "1;";
+						funcx_prefix = "";
+					}
+					// Copy ctor
+					else if (arg1 == (class_name ^ "&")) {
+						// dim(dim&) -> dim d1 = d2;
+						funcx_prefix = "";
+						func_decl = class_name ^ " " ^ class_letter ^ "1 = " ^ class_letter ^ "2; /" "/ Copy";
+					}
+					// Move ctor
+					else if (arg1 == (class_name ^ "&&")) {
+						// dim(dim&&) -> dim d1 = dim();
+						funcx_prefix = "";
+						func_decl = class_name ^ " " ^ class_letter ^ "1 = " ^ class_name ^ "(); /" "/ Move";
+					}
+					else if (arg1.starts("std::initializer_list")) {
+						// -> dim d1 = {"a", "b", "c", "d" ...};
+						funcx_prefix = "";
+						func_decl = class_name ^ " " ^ class_letter ^ R"__(1 = {"a", "b", "c" ...};)__" " /" "/ Initializer list";
+					}
+					// Other ctors
+					else {
+						// dim(nrows, ncols = 1) -> "dim d1(nrows, ncols = 1);
+						func_decl = class_name ^ " " ^ class_letter ^ "1(" ^ args ^ ");";
+						funcx_prefix = "";
+					}
 
-				// Default ctor
-				if (arg1 == "") {
-					// dim() -> dim d1;
-					func_decl = class_name ^ " " ^ func_decl0.first(1) ^ "1;";
+				} // ctor
+
+				if (funcx_prefix == "cmd" or funcx_prefix == "cmd2")
 					funcx_prefix = "";
-				}
-				// Copy ctor
-				else if (arg1 == (class_name ^ "&")) {
-					// dim(dim&) -> dim d1 = d2;
-					funcx_prefix = "";
-					func_decl = class_name ^ " " ^ class_letter ^ "1 = " ^ class_letter ^ "2; /" "/ Copy";
-				}
-				// Move ctor
-				else if (arg1 == (class_name ^ "&&")) {
-					// dim(dim&&) -> dim d1 = dim();
-					funcx_prefix = "";
-					func_decl = class_name ^ " " ^ class_letter ^ "1 = " ^ class_name ^ "(); /" "/ Move";
-				}
-				else if (arg1.starts("std::initializer_list")) {
-					// -> dim d1 = {"a", "b", "c", "d" ...};
-					funcx_prefix = "";
-					func_decl = class_name ^ " " ^ class_letter ^ R"__(1 = {"a", "b", "c" ...};)__" " /" "/ Initializer list";
-				}
-				// Other ctors
-				else {
-					// dim(nrows, ncols = 1) -> "dim d1(nrows, ncols = 1);
-					func_decl = class_name ^ " " ^ class_letter ^ "1(" ^ args ^ ");";
-					funcx_prefix = "";
-				}
 
-			}
+			} // func_decl and adjust funcx_prefix
 
-			if (funcx_prefix == "cmd" or funcx_prefix == "cmd2")
-				funcx_prefix = "";
-
-///////////
-// lineinit
-///////////
+//////////////
+// outlineinit
+//////////////
 
 			// No going back from here because we start outputting to docfile
 			if (man) {
@@ -1073,6 +1101,17 @@ func main() {
 				}
 //				else if (funcx_prefix == "var=")
 //					func_decl2 = "var v1 = " ^ func_decl ^ ";";
+
+//if (srcline.contains("unpack")) {
+//TRACE(srcline)
+//TRACE(funcx_prefix)
+//TRACE(func_decl)
+//TRACE(func_decl2)
+//}
+//TRACE(srcline)  // "unpack(SV delim = _FM) const"
+//TRACE(funcx_prefix)     // "auto [a, b, ...] ="
+//TRACE(func_decl)        // "strvar.unpack(delim = FM)"
+//TRACE(func_decl2)       // "strvar.unpack(delim = FM)"
 
 				// Subsection header
 				docfile << ".SS" << std::endl;

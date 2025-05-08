@@ -239,7 +239,8 @@ func main() {
 				var dictsrc = RECORD(8);
 				dictsrc.converter(VM, "\n");
 
-				let hasfuncmain = dictsrc.contains("function main()");
+				dictsrc.replacer("function main(", "func main(");
+				let hasfuncmain = dictsrc.contains("func main(");
 
 				// dict intro
 				var line1 = (hasfuncmain ? "\nlibraryinit(" : "\ndictinit(") ^ ID.lcase() ^ ")";
@@ -256,7 +257,7 @@ func main() {
 
 				new_cpp_text ^= dictsrc ^ "\n";
 
-				// Close function main opened in dictinit
+				// Close func main opened in dictinit
 				if (not hasfuncmain)
 					new_cpp_text ^= '}';
 
