@@ -25,18 +25,22 @@ THE SOFTWARE.
 
 #if EXO_MODULE
 	import std;
+	import var;
 #else
 #	include <string>
 #	include <map>
+#	include <memory> // For shared_ptr
 #endif
 
 #if EXO_MODULE
 	import var;
 #else
 #	include <exodus/exoimpl.h>
-#	include <exodus/exocallable.h>
 #endif
 #include <exodus/vardefs.h>
+#include <exodus/exocallable.h>
+#include <exodus/threadpool.h>
+#include <exodus/threadsafequeue.h>
 
 namespace exo {
 
@@ -50,43 +54,26 @@ ND PUBLIC var  getprocessn();
 ND PUBLIC var  getexecpath();
 ND PUBLIC std::string gethostname();
 
-// to avoid gcc 4 "warning: type attributes are honored only at type definition"
-// dont declare PUBLIC on forward declarations
-// class PUBLIC ExoEnv;
 class ExoEnv;
-
-/*
-const static int NTHREADS = 1;
-
-#ifdef EXOENV_CPP
-// plus 1 to allow for main thread to have its own
-PUBLIC
-std::vector<ExoEnv*> global_environments(NTHREADS + 1);
-#else
-extern PUBLIC std::vector<ExoEnv*> global_environments;
-#endif
-*/
-
-// Tip about os shell environment variables
-// OS shell  environment variables are not available to child processes until exported
-// "set -p" to find out exported variables instead of all
-// "env" - run a program in a modified environment
-// See man bash for more info
-
-// Abstract base class
-class ExoCommon {
- public:
-	// Virtual because derived class's members should be destructed
-	virtual ~ExoCommon(){}
-};
 
 class PUBLIC ExoEnv final {
  public:
-	virtual ~ExoEnv();
+	ExoEnv() = default;
+	~ExoEnv();
+
+    // Ensure move semantics
+    ExoEnv(ExoEnv&& other) noexcept = default;
+    ExoEnv& operator=(ExoEnv&& other) noexcept = default;
+
+    // Delete copy to maintain move-only semantics
+    ExoEnv(const ExoEnv&) = delete;
+    ExoEnv& operator=(const ExoEnv&) = delete;
 
 	bool init(const int threadno);
 
 	bool processno_islocked(int processno);
+
+	var parse(in sentence);
 
 	// Keep in sync in exoenv.h and exomacros.h
 
