@@ -2645,6 +2645,53 @@ dim d2 = split("a^b^c"_var);
 
 
 .SS
+auto [a, b, ...] = unpack<N>(delim = FM)
+.PP \"<p>
+Unpack a delimited string into N new vars.
+.sp 1 \"</p>
+.PP \"<p>
+Useful when marshalling multiple vars as a single string across interfaces.
+.sp 1 \"</p>
+.PP \"<p>
+Note the unusual syntax requiring literal angle brackets.
+.sp 1 \"</p>
+.PP \"<p>
+[a,b,c...]: New vars to be constructed.
+.sp 1 \"</p>
+.PP \"<p>
+\fBN:\fR Must agree with the number of vars being created or returned.
+.sp 1 \"</p>
+.PP \"<p>
+\fBdelim:\fR Defaults to FM but can be multichar/unicode string. e.g. ",", VM, "| |", or "⭕".
+.sp 1 \"</p>
+.PP \"<p>
+\fBreturn:\fR A C++ object enabling inline creation of vars.
+.sp 1 \"</p>
+.PP \"<p>
+Prefix with const to make all the new vars const; partial const declaration is not supported.
+.sp 1 \"</p>
+.PP \"<p>
+.PP \"<p>
+\fBExample:\fR
+.EX \"<code>
+let a = "aa", b = "bb";
+let pack1 = {a, b}; // "aa^bb"_var
+auto [a2, b2, c2] = pack1.unpack<3>(); // a2 -> "aa" // b2 -> "bb" // c2 -> unassigned
+// or
+auto [a3, b3, c3] = unpack<3>(pack1);
+// Similar to:
+auto funcx = []() -> std::array<var, 2> {
+    let a = "aa", b = "bb";
+    return std::array{a, b};
+//  return unpack("aa^bb"_var);
+};
+auto [a4, b4] = funcx();
+.EE \"</code>
+.sp 1 \"</p>
+.sp 1 \"</p>
+
+
+.SS
 var v1 = strvar.paste(pos1, length, replacestr);
 
 
@@ -2925,27 +2972,7 @@ let v2 = iconv("21 JUN 2050", "D/E");
 
 .SS
 var v1 = var.format(fmt_str, args, ...);
-.PP \"<p>
-Classic format function in printf style
-.sp 1 \"</p>
-.PP \"<p>
-vars can be formatted either with C++ format codes e.g. {:_>8.2f}
-.sp 1 \"</p>
-.PP \"<p>
-or with exodus oconv codes e.g. {::MD20P|R(_)#8} as in the below example.
-.sp 1 \"</p>
-.PP \"<p>
-.PP \"<p>
-\fBExample:\fR
-.EX \"<code>
-let v1 = var(12.345).format("'{:_>8.2f}'"); // "'___12.35'"
-let v2 = var(12.345).format("'{::MD20P|R(_)#8}'");
-// or
-var v3 = format("'{:_>8.2f}'", var(12.345)); // "'___12.35'"
-var v4 = format("'{::MD20P|R(_)#8}'", var(12.345));
-.EE \"</code>
-.sp 1 \"</p>
-.sp 1 \"</p>
+
 
 
 .SS
@@ -4907,7 +4934,7 @@ Returns the key unconverted.
 \fBExample:\fR
 .EX \"<code>
 let key = "SB001";
-let client_name = key.xlate("xo_clients", 1, "X"); // "Client AAA"
+let client_name = key.xlate("xo_clients", 1, "X").squote(); // "'Client AAA'"
 // or
 let name_and_type = xlate("xo_clients", key, "NAME_AND_TYPE", "X"); // "Client AAA (A)"
 .EE \"</code>
@@ -6271,7 +6298,7 @@ Shell features (e.g., pipes, redirects) are unsupported but can be invoked via a
 \fBExample:\fR
 .EX \"<code>
 var v_stdout, v_stderr, v_exit_status;
-if (var::osprocess("grep xyz", "abc\nxyz 123\ndef", v_stdout, v_stderr, v_exit_status)) ... ok // v_stdout -> "xyz 123" // v_exit_status = 0
+if (var::osprocess("grep xyz", "abc\nxyz 123\ndef", v_stdout, v_stderr, v_exit_status)) ... ok // v_stdout -> "xyz 123\n" // v_exit_status = 0
 // or
 if (osprocess("grep xyz", "abc\nxyz 123\ndef", v_stdout, v_stderr, v_exit_status)) ... ok
 .EE \"</code>
@@ -8112,6 +8139,13 @@ let v1 = d1.join(); // "f1^f2^f3"_var
 .sp 1 \"</p>
 
 
+.SS
+auto [a, b, ...] = unpack()
+.PP \"<p>
+New Unpack function to allow "auto [a,b,c] = d1.unpack<3>();"
+.sp 1 \"</p>
+
+
 .SH 3. ARRAY MUTATION
 .SH
 
@@ -8682,7 +8716,7 @@ if (makelist(listname, keys)) ...
 
 
 
-.SH 2. PERFORM/EXECUTE
+.SH 2. RUN/PERFORM/EXECUTE
 .SH
 
 .SS
@@ -8736,6 +8770,11 @@ Run an exodus program/library.
 .PP \"<p>
 Identical to perform() but any currently active select list in the calling program/library is not accessible to the executed program/library and is preserved in the calling [program as is. Any select list created by the executed library is discarded when it terminates.
 .sp 1 \"</p>
+
+
+.SS
+auto [a, b, ...] = run_results()
+
 
 
 .SS
