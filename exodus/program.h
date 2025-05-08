@@ -132,6 +132,9 @@ static int EXOPROGRAM_PREFIX##main2(int exodus_argc, const char* exodus_argv[], 
         }*/                                                                        \
     }                                                                              \
                                                                                    \
+    /*shutdown the threadpool*/                                                    \
+    ExoProgram::shutdown_run();                                                    \
+                                                                                   \
     /*disconnect ALL db connections of this thread*/                               \
     disconnectall();                                                               \
     disconnect();                                                                  \
