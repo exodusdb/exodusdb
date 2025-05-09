@@ -423,7 +423,7 @@ func main() {
 						funcx_prefix = "";
 				}
 
-				funcx_mut.is_ctor = funcx_prefix.starts("dim(") or funcx_prefix.starts("var(");
+				funcx_mut.is_ctor = funcx_prefix.starts("dim(", "var(");
 				if (funcx_mut.is_ctor) {
 				}
 

@@ -182,7 +182,8 @@ class var;
 template<typename var> class var_mid; // forward declaration of a class template
 
 // grep -P "VBR|CBR|TBR|RETVAR" -rl
-#define VARBASE1   var_base<var_mid<exo::var>>
+#define VARBASE1  var_base<var_mid<exo::var>>
+#define VBV       var_base<var_mid<exo::var>>
 
 #define VBR1      var_base<var_mid<var>>&
 #define CBR const var_base<var_mid<exo::var>>&
