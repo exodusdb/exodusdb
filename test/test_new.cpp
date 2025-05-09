@@ -133,14 +133,17 @@ func main() {
 		j1.input_queue->push("");
 	}
 
+	{
+		// multi-argument starts, ends, contains
+	}
+
 	printl(elapsedtimetext());
 	printl("Test passed");
 
 	return 0;
 }
 
-//std::array<var,3> func_returning_three_vars(in v1, in delim) {
-std::array<var,3> func_returning_three_vars(in v1, in delim) {
+auto func_returning_three_vars(in v1, in delim) -> std::array<var,3> {
 	return v1.unpack<3>(delim);
 }
 

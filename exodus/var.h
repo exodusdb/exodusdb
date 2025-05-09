@@ -740,6 +740,14 @@ public:
 	//
 	ND bool starts(SV prefix) const;
 
+	template<typename... T>
+	bool starts(SV prefix, T&&... prefix_n) const {
+		if (starts(prefix)) return true;
+//		static_assert((std::is_convertible_v<T, std::string_view> && ...),
+//			"All prefix_n arguments must be convertible to std::string_view");
+		return (... || no_check_starts(static_cast<SV>(std::forward<T>(prefix_n))));
+	}
+
 	// Check if a source string ends with a given suffix (substr).
 	// suffix: The substr to check for.
 	// return: True if the source string ends with given suffix.
@@ -750,6 +758,14 @@ public:
 	//  if (ends("abc", "bc")) ... true`
 	//
 	ND bool ends(SV suffix) const;
+
+	template<typename... T>
+	bool ends(SV suffix, T&&... suffix_n) const {
+		if (ends(suffix)) return true;
+//		static_assert((std::is_convertible_v<T, std::string_view> && ...),
+//			"All suffix_n arguments must be convertible to std::string_view");
+		return (... || no_check_ends(static_cast<SV>(std::forward<T>(suffix_n))));
+	}
 
 	// Check if a given substr exists in a source string.
 	// substr: The substr to check for.
@@ -764,6 +780,14 @@ public:
 	//  if (contains("abcd", "bc")) ... true`
 	//
 	ND bool contains(SV substr) const;
+
+	template<typename... T>
+	bool contains(SV substr, T&&... substr_n) const {
+		if (contains(substr)) return true;
+//		static_assert((std::is_convertible_v<T, std::string_view> && ...),
+//			"All substr_n arguments must be convertible to std::string_view");
+		return (... || no_check_contains(static_cast<SV>(std::forward<T>(substr_n))));
+	}
 
 	//https://en.wikipedia.org/wiki/Comparison_of_programming_languages_(string_functions)#Find
 
@@ -1363,7 +1387,7 @@ public:
 		struct Context {decltype(repl_func)* lambda;};
 		Context ctx{&repl_func};
 
-		// Non-capturing lambda to adapt the callable to the function pointer signature
+		// Non-capturing lambda to adapt the callable to the function pointer signature. [[Undocumented]]
 		auto bridge = [](const var& match_str, void* ctx) -> var {
 			auto* context = static_cast<Context*>(ctx);
 			return (*context->lambda)(match_str); // Invoke the original lambda
@@ -1455,13 +1479,13 @@ public:
 	//  auto [a4, b4] = funcx();`
 	//
 	template <size_t N>
-	std::array<var, N> unpack/*<N>*/(SV delim = _FM) const {
+	auto unpack/*<N>*/(SV delim = _FM) const -> std::array<var, N> {
         THISIS("auto var::unpack<N>(SV delim = _FM) const")
         assertString(function_sig);
 
 		// std::vector<var> vv1 = this->split(delim);
 		// Utility somewhere in the forest
-		std::vector<var> basic_split(in v1, SV delim);
+		auto basic_split(in v1, SV delim) -> std::vector<var>;
 		auto vv1 = basic_split(var_str, delim);
 		return [&vv1]<size_t... Is>(std::index_sequence<Is...>) {
     		return std::array<var, N>{
@@ -3845,6 +3869,10 @@ public:
 	///////////////////////////
 
  private:
+
+	ND bool no_check_starts(SV substr) const;
+	ND bool no_check_ends(SV substr) const;
+	ND bool no_check_contains(SV substr) const;
 
 	ND bool dbcursorexists(); //database, not terminal
 	ND bool selectx(in fieldnames, in sortselectclause);

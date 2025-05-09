@@ -308,7 +308,7 @@ ND	bool hasnext();
 	var  execute(in command_line);
 
 	// Run another program in parallel.
-	// Unlike perform and execute run() does not block and wait for the program to finish. The new program runs in parallel. There is no way direct way of communicating with the running program at the moment but it is planned to be able to send and receive messages using a read and write queue.
+	// Unlike perform and execute run() does not block and wait for the program to finish. It runs in parallel. There is no way direct way of communicating with the running program at the moment but it is planned to be able to send and receive messages using a read and write queue.
 	// return: A "job" object that you can use to manage the running job.
 	// * Check if it has finished.
 	// * Pause and wait for it to finish with optional timeout.
@@ -319,14 +319,18 @@ ND	bool hasnext();
 	//
 	// // run(command);
 	//
-		Job run(in command);
+	Job  run(in command);
 
 	// 0 = getnumcores()
 	auto setmaxthreads(std::size_t max_threads = 0) -> void;
 	auto getmaxthreads() -> var;
 	auto getnumcores() -> var;
 
-    std::generator<ExoEnv&> run_results() {
+	// Process all run results asynchronously.
+	// for (auto& env : run_results()) {
+	//     ...
+	// }
+	auto run_results() -> std::generator<ExoEnv&> {
         for (int i = 0; i < run_count(); ++i) {
             ExoEnv env;
             result_queue_->wait_and_pop(env);

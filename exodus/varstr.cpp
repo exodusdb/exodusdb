@@ -1091,13 +1091,12 @@ bool var::starts(SV prefix) const {
 	assertString(function_sig);
 
 	// Differ from c++, javascript, python3 - see comment on var::contains
-	if (prefix.empty()) {
-		var(function_sig).errputl();
-//		VarError e(__PRETTY_FUNCTION__);
-//		e.message.errput();
-//		e.stack(1).f(1).errputl();
+	return no_check_starts(prefix);
+}
+
+bool var::no_check_starts(SV prefix) const {
+	if (prefix.empty())
 		return false;
-	}
 
 	return var_str.starts_with(prefix);
 }
@@ -1108,13 +1107,13 @@ bool var::ends(SV suffix) const {
 	assertString(function_sig);
 
 	// DIFFERS from c++, javascript, python3 - see comment on var:contains
-	if (suffix.empty()) {
-		var(function_sig).errputl();
-//		VarError e(__PRETTY_FUNCTION__);
-//		e.message.errput();
-//		e.stack(1).f(1).errputl();
+	return no_check_ends(suffix);
+}
+
+bool var::no_check_ends(SV suffix) const {
+
+	if (suffix.empty())
 		return false;
-	}
 
 	return var_str.ends_with(suffix);
 }
@@ -1132,17 +1131,19 @@ bool var::contains(SV substr) const {
 	//
 	// Programmer logic: Compare as many characters as are in the search string for presence in the list of characters and return success if there are no failures.
 	//
-	if (substr.empty()) {
-		return false;
-	}
+	return no_check_contains(substr);
+}
+
+bool var::no_check_contains(SV substr) const {
+    if (substr.empty())
+        return false;
 
 #ifdef __cpp_lib_string_contains
-	//C++23
-	return var_str.contains(substr);
+    // C++23
+    return var_str.contains(substr);
 #else
-	return var_str.find(substr) != std::string::npos;
+    return var_str.find(substr) != std::string::npos;
 #endif
-
 }
 
 ////////

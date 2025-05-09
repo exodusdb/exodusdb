@@ -428,7 +428,7 @@ friend class dim_iter;
 
 	// New Unpack function to allow "auto [a,b,c] = d1.unpack<3>();"
 	template <size_t N>
-	std::array<var, N> unpack() const& {
+	auto unpack() const& -> std::array<var, N> {
 
 //    std::clog << "base size:" << base::size() << std::endl;
 //    for (size_t i = 0; i < base::size(); ++i) {
@@ -456,7 +456,7 @@ friend class dim_iter;
     // unpack rvalue version: Move strings (MyVec&&)
 
 	template <size_t N>
-	std::array<var, N> unpack() && {
+	auto unpack() && -> std::array<var, N> {
 		auto fill_array = [this]<size_t... Is>(std::index_sequence<Is...>) {
 			return std::array<var, N>{
 				(Is < base::size() ? std::move(base::operator[](Is)) : std::move(var()))...

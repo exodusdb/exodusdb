@@ -740,28 +740,25 @@ class PUBLIC var_base {
 //                                  NAMED CONVERSION FUNCTIONS (CONVERT TO)
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
-	bool toBool() const;
+	auto toBool()       const   -> bool;
 
-	char toChar() const;
+	auto toChar()       const   -> char;
 
-	// standard c/c++ int() truncate towards zero i.e. take the number to the left of the point.
-	// (whereas pickos is floor i.e. -1.9 -> 2)
-	//int64_t toInt() const;
-	int toInt() const;
+	// Standard c/c++ int() truncate towards zero.
+	// i.e. take the number to the left of the point.
+	// Whereas pickos is floor i.e. -1.9 -> 2.
+	auto toInt()        const   -> int;
 
-	std::int64_t toInt64() const;
+	auto toInt64()      const   -> std::int64_t;
 
-	double toDouble() const;
+	auto toDouble()     const   -> double;
 
-	// Be careful not to retain the pointer or reference beyond the scope of the var
-	const char* c_str() const&;
-	const std::string& toString() const&;
+	auto c_str()        const&  -> const char*;       // DONT retain beyond scope of the var
+	auto toString()     const&  -> const std::string&;
+	auto toString()          && -> std::string;       // Temporaries can move their inner string
 
-	// Temporaries can move their inner std::string
-	std::string toString() &&;
-
-	std::wstring to_wstring() const;
-	std::u32string to_u32string() const;
+	auto to_wstring()   const   -> std::wstring;
+	auto to_u32string() const   -> std::u32string;
 
 	//void from_u32string(std::u32string) const;
 
@@ -966,7 +963,6 @@ class PUBLIC var_base {
 		EXO_SNITCH("var_base >u32")
 		return this->to_u32string();
 	}
-
 
 	// In case using a pointer to a var
 	//

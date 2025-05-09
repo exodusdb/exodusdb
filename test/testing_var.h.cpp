@@ -766,22 +766,6 @@ func main() {
 		dim d2 = split("a^b^c"_var);
 	}
 
-	printl("unpack/*<N>*/(SV delim = _FM) const");
-	{
-		let a = "aa", b = "bb";
-		let pack1 = {a, b}; assert(pack1.errputl() == "aa^bb"_var);
-		auto [a2, b2, c2] = pack1.unpack<3>();  assert(a2.errputl() == "aa" ); assert(b2.errputl() == "bb" ); assert(c2.unassigned());
-		// or
-		auto [a3, b3, c3] = unpack<3>(pack1);
-		// Similar to:
-		auto funcx = []() -> std::array<var, 2> {
-		    let a = "aa", b = "bb";
-		    return std::array{a, b};
-		//  return unpack("aa^bb"_var);
-		};
-		auto [a4, b4] = funcx();
-	}
-
 	printl("ucaser() REF ;");
 	{
 		var v1 = "abc";

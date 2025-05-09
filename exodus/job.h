@@ -59,17 +59,17 @@ public:
 
 	// wait_for() overloads for common durations
 	bool wait_for(int duration) const; // Default: milliseconds
-	std::future_status wait_for(int duration, TimeUnit unit) const;
+	auto wait_for(int duration, TimeUnit unit) const ->	std::future_status;
 
 	// wait_until with opaque TimePoint
-//	std::future_status wait_until(const TimePoint& abs_time) const;
+//	auto wait_until(const TimePoint& abs_time) const -> std::future_status;
 
 //	// Wait with internal condition variable, using a predicate
 //	template<typename Predicate>
-//	std::future_status wait_with_condition(Predicate pred) const;
+//	auto wait_with_condition(Predicate pred) const -> std::future_status;
 //
 	// Access condition variable for lambda to notify
-	std::condition_variable& get_condition_variable() const;
+	auto get_condition_variable() const -> std::condition_variable&;
 
 private:
 //	mutable std::mutex mutex; // Mutable for const wait_with_condition
