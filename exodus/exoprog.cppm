@@ -254,6 +254,7 @@ export namespace exo {
 	using exo::listfiles;
 	using exo::listindex;
 
+	using exo::listed;
 	using exo::locate;
 	using exo::locateby;
 	using exo::locateusing;

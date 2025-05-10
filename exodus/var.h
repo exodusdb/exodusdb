@@ -824,6 +824,26 @@ public:
 	//
 	ND var  indexr(SV substr, const int startchar1 = -1) const;
 
+	// Check if something is in a list.
+	// The list must be comma separated without spaces.
+	//
+	// `let v1 = "def";
+	//  if (v1.listed("abc,def")) ... ok
+	//  // or
+	//  if (listed(v1, "abc,def")) ... ok`
+	//
+	ND bool listed(SV list) const;
+
+	// Check if something is in a list and return its position.
+	//
+	// `let v1 = "def";
+	//  var posn;
+	//  if (v1.listed("abc,def", posn)) ... ok // posn -> 2
+	//  // or
+	//  if (listed(v1, "abc,def", posn)) ... ok`
+	//
+	ND bool listed(SV list, out position) const;
+
 	// Find all matches of a given regular expression.
 	// return: Zero or more matching substrings separated by FMs. Any groups are in VMs.
 	//

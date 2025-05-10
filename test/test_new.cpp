@@ -137,6 +137,17 @@ func main() {
 		// multi-argument starts, ends, contains
 	}
 
+	{
+		// x.listed(list) and listed(x, list)
+        let v1 = "def";
+
+        assert(v1.listed("abc,def"));
+        assert(listed(v1, "abc,def"));
+
+        assert(v1.listed("abc,def", MV) && MV.errputl() eq 2);
+        assert(listed(v1, "abc,def", MV) && MV.errputl() eq 2);
+	}
+
 	printl(elapsedtimetext());
 	printl("Test passed");
 

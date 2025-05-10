@@ -382,6 +382,23 @@ func main() {
 		let v2 = indexr("abcabc", "bc");
 	}
 
+	printl("listed(SV list) const;");
+	{
+		let v1 = "def";
+		if (v1.listed("abc,def")) {/*ok*/} else  abort("listed: " ^ lasterror());
+		// or
+		if (listed(v1, "abc,def")) {/*ok*/} else  abort("listed: " ^ lasterror());
+	}
+
+	printl("listed(SV list, out position) const;");
+	{
+		let v1 = "def";
+		var posn;
+		if (v1.listed("abc,def", posn)) {/*ok*/} else  abort("listed: " ^ lasterror());  assert(posn.errputl() == 2);
+		// or
+		if (listed(v1, "abc,def", posn)) {/*ok*/} else  abort("listed: " ^ lasterror());
+	}
+
 	printl("match(SV regex_str, SV regex_options = "") const;");
 	{
 				let v1 = "abc1abc2"_var.match("BC(\\d)", "i"); assert(v1.errputl() == "bc1]1^bc2]2"_var);

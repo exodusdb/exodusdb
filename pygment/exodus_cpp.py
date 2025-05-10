@@ -35,7 +35,7 @@ class ExodusCppLexer(CppLexer):
         'indexr', 'initrnd', 'input', 'inputn', 'insert', 'inserter', 'insertrecord',
         'integer', 'into', 'invert', 'inverter', 'isnum', 'isterminal', 'join',
         'keypressed', 'last', 'laster', 'lasterror', 'lcase', 'lcaser', 'len', 'let',
-        'listfiles', 'listindex', 'load', 'localeAwareCompare', 'locate', 'locateby',
+        'listfiles', 'listindex', 'load', 'localeAwareCompare', 'listed', 'locate', 'locateby',
         'locatebyusing', 'locateusing', 'lock', 'loge', 'loglasterror', 'logput',
         'logputl', 'lower', 'lowerer', 'match', 'mod', 'move', 'multivalued', 'mv',
         'normalize', 'normalizer', 'num', 'numberinwords', 'oconv', 'oconv_D',

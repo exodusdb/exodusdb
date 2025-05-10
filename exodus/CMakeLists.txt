@@ -272,6 +272,8 @@
 		threadsafequeue.cpp
 		threadpool.cpp
 
+		varlisted.cpp
+
 		varwait.cpp varunicode.cpp varposix.cpp exocallable.cpp
 		#murmurhash2_64.cpp
 		murmurhash3.cpp

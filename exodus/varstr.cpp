@@ -255,6 +255,25 @@ IO   var::fieldstorer(SV separator, const int fieldnx, const int nfieldsx, in re
 }
 
 /////////
+// LISTED
+/////////
+
+// Defined in varlisted.cpp
+auto findSubstringInCommaSeparated(SV s1, SV s2, bool indexed = true) -> size_t;
+
+bool var::listed(SV list) const {
+	THISIS("bool var::listed(SV list) const")
+	return findSubstringInCommaSeparated(var_str, list, false);
+}
+
+bool var::listed(SV list, out position) const {
+	// TODO position = max count + 1 if not found
+	THISIS("bool var::listed(SV list, out position) const")
+	position = findSubstringInCommaSeparated(var_str, list, false);
+	return position;
+}
+
+/////////
 // LOCATE
 /////////
 
