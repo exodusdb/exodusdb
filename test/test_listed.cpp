@@ -1,8 +1,8 @@
-#include <iostream>
-#include <string>
-#include <vector>
-#include <random>
-#include <sstream>
+//#include <iostream>
+//#include <string>
+//#include <vector>
+//#include <random>
+//#include <sstream>
 #include <chrono>
 #include <cassert>
 
@@ -16,92 +16,11 @@ func main() {
 		ntests = 1'000'000;
 
     // Run repeatable fuzz tests
-    fuzzTest(ntests, 12345);
+//    fuzzTest(ntests, 12345, true);
+    fuzzTest(ntests, 12345, false);
 
     return 0;
 }
-
-//#define NDEBUG
-//#define RAWCPP
-#ifdef RAWCPP
-auto findSubstringInCommaSeparated(const std::string_view s1, const std::string_view s2, bool indexed) -> size_t {
-
-    if (s1.empty() || s2.empty() || s1.size() > s2.size()) return false;
-
-    const char* p1 = s1.data();
-    const char* p2 = s2.data();
-
-    const char* s1_end = s1.data() + s1.size();
-    const char* s2_end = s2.data() + s2.size();
-    const char* s2_max = s2_end - s1.size() + 1;
-
-#ifndef NDEBUG
-    assert(p1 == s1.data() && p1 < s1_end && "p1 out of s1 bounds");
-    assert(p2 == s2.data() && p2 < s2_end && "p2 out of s2 bounds");
-#endif
-
-    while (p2 < s2_max) {
-#ifndef NDEBUG
-        assert(p2 < s2_end && "p2 exceeds s2 upper bound");
-#endif
-        if (*p2 == *p1) {
-            if (p2 == s2.data() || *(p2 - 1) == ',') {
-#ifndef NDEBUG
-                assert(p2 > s2.data() || p2 == s2.data() && "p2 underflow on prev char access");
-#endif
-                const char* temp1 = p1;
-
-#ifndef NDEBUG
-                assert(temp1 < s1_end && "temp1 exceeds s1 upper bound");
-                assert(p2 < s2_end && "p2 exceeds s2 upper bound");
-#endif
-
-                while (temp1 < s1_end) {
-#ifndef NDEBUG
-                    assert(temp1 < s1_end && "temp1 exceeds s1 upper bound in loop");
-                    assert(p2 < s2_end && "p2 exceeds s2 upper bound in loop");
-#endif
-                    if (*temp1 != *p2) {
-                        goto mismatch;
-                    }
-                    temp1++;
-                    p2++;
-                    if (p2 == s2_end) {
-                        if (! (temp1 < s1_end)) {
-							goto matched;
-						}
-                    }
-                }
-
-#ifndef NDEBUG
-                assert(temp1 <= s1_end && "temp1 exceeds s1 end after loop");
-                assert(p2 < s2_end && "p2 exceeds s2 upper bound after loop");
-#endif
-
-                if (*p2 == ',') {
-matched:
-					if (indexed)
-						return size_t(p2 - s2.data()) - s1.size() + 1;
-					// Count commas and add 1
-					size_t count = 1;
-					p2 -= s1.size();
-					while (p2-- >= s2.data()) {
-						count += *p2 == ',';
-					}
-					return count;
-                }
-mismatch:;
-            }
-        }
-        p2++;
-    }
-
-#ifndef NDEBUG
-    assert(p2 <= s2_end && "p2 exceeds s2 end after loop");
-#endif
-    return 0;
-}
-#endif
 
 // Simpler, slower algorithm: Split s2 by commas and check each token
 auto simpleFindSubstring(const std::string& s1, const std::string& s2, bool indexed) -> size_t {
@@ -142,7 +61,7 @@ std::string generateRandomString(std::mt19937& rng, int minLen, int maxLen, bool
 }
 
 // Fuzz testing function
-void fuzzTest(size_t numTests, unsigned int seed) {
+void fuzzTest(size_t numTests, unsigned int seed, bool indexed) {
     std::mt19937 rng(seed);
     int failures = 0;
     int foundCases = 0; // Counter for found cases
@@ -164,7 +83,6 @@ void fuzzTest(size_t numTests, unsigned int seed) {
         {"b", ",b,,b,"}     // Multiple matches with commas
     };
 
-	bool indexed = false;
 	std::cout << (indexed ? "Indexed" : "Counted") << std::endl;
 
     std::cout << "Testing " << edgeCases.size() << " edge cases...\n";
@@ -223,7 +141,7 @@ void fuzzTest(size_t numTests, unsigned int seed) {
 
         // Progress indicator
         if ((i + 1) % (numTests / 10) == 0) {
-            std::cout << (i + 1) << " tests completed...\n";
+            std::cout << "\r" << (i + 1) << std::flush;
         }
     }
 
@@ -231,6 +149,7 @@ void fuzzTest(size_t numTests, unsigned int seed) {
     std::chrono::duration<double> duration = end - start;
 
     std::cout << "\nFuzz testing complete!\n";
+	std::cout << (indexed ? "Indexed" : "Counted") << std::endl;
     std::cout << "Total tests: " << size_t(numTests) + edgeCases.size() << " (including " << edgeCases.size() << std::endl;
     std::cout << "Found cases: " << foundCases << "\n";
     std::cout << "Failures: " << failures << "\n";
