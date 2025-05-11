@@ -55,16 +55,24 @@ ThreadPool::ThreadPool(size_t max_threads)
 // Destroy the thread pool, stopping all workers and joining their threads
 ThreadPool::~ThreadPool() {
 	{
+		LOG << "~Threadpool: Acquiring mutex." << std::endl;
 		std::unique_lock<std::mutex> lock(*mutex);
-		(*max_worker_id_).store(0); // Signal all workers to exit
-		condition->notify_all(); // Wake all workers to check exit condition
+
+		while (!pending_tasks->queue.empty()) {
+			LOG << "~Threadpool: Popping pending task." << std::endl;
+			pending_tasks->queue.pop();
+		}
+		LOG << "~Threadpool: Signal shutdown." << std::endl;
+		(*max_worker_id_).store(0);
+		LOG << "~Threadpool: Wake all workers to check exit condition" << std::endl;
+		condition->notify_all();
 	}
 	// Join all worker threads
 	for (auto& worker : workers) {
 		if (worker.joinable()) {
-			LOG << "~Threadpool: Joining worker." << std::endl;
+			LOG << "~Threadpool: Detaching worker." << std::endl;
 			worker.join();
-			LOG << "~Threadpool: Joined  worker." << std::endl;
+			LOG << "~Threadpool: Detached  worker." << std::endl;
 		}
 	}
 }
