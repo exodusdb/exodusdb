@@ -130,11 +130,14 @@ class PUBLIC ExoProgram {
 	//ExoProgram() = default;
 	ExoProgram() = delete;
 
-	// doing virtual isnt much use because external functions (which are based on
+	// Virtual main() isnt much use because .so external functions (which are based on
 	// ExoProgram) need to have complete freedom of arguments to main(...) virtual var
 	// main();
 
-	// Is this required?
+	// We MIGHT be able to get away with no virtual destructor IIF
+	// we ONLY use the factory function to create and delete derived xxx_ExoProgram objects.
+	// Without virtual, xxx_ExoProgram dtor is not present in .so files
+	// which could be a problem if not using factory function to create .so. objects.
 	virtual ~ExoProgram();
 
 	///////////////////
