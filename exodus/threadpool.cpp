@@ -17,10 +17,10 @@
 // Logging macro with relative timestamp from program start
 //#define ENABLE_LOGGING
 #ifdef ENABLE_LOGGING
-//#include <iostream>
-//#include <iomanip>
-//#include <chrono>
-//#include <thread>
+#include <iostream>
+#include <iomanip>
+#include <chrono>
+#include <thread>
 //	// Static variable to capture initial time (initialized once at program start)
 static const auto start_time = std::chrono::system_clock::now();
 #define LOG std::cerr << "[" << std::fixed << std::setprecision(3) \

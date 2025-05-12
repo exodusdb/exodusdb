@@ -3,8 +3,8 @@
 #else
 #	include <atomic>
 #	include <future>
-#	include <promise>
 #	include <memory>
+#	include <generator>
 #	include <exodus/dim.h>
 #	include <exodus/rex.h>
 #endif
@@ -818,6 +818,14 @@ auto ExoProgram::shutdown_run() -> void {
 
 void ExoProgram::reset_run(size_t num_threads) {
 	ThreadPool::reset(&threadpool1, num_threads);
+}
+
+auto ExoProgram::run_results() -> std::generator<ExoEnv&> {
+	for (int i = 0; i < run_count(); ++i) {
+		ExoEnv env;
+		result_queue_->wait_and_pop(env);
+		co_yield env;
+	}
 }
 
 // Asynchronous run:

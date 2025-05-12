@@ -5,6 +5,8 @@
 	import std;
 #else
 #	include <string>
+#	include <future>
+#	include <generator>
 #	include <coroutine>
 
 // Using map for dict function cache instead of unordered_map since it is faster
@@ -340,13 +342,7 @@ ND	bool hasnext();
 	// for (auto& env : run_results()) {
 	//     ...
 	// }
-	auto run_results() -> std::generator<ExoEnv&> {
-        for (int i = 0; i < run_count(); ++i) {
-            ExoEnv env;
-            result_queue_->wait_and_pop(env);
-            co_yield env;
-        }
-    }
+	auto run_results() -> std::generator<ExoEnv&>;
 
 	auto run_count() -> var;
 	// Required to stop hanging due to dlopen causing reset of max_worker_id to construction setting and preventing workers from seeing the need to close.

@@ -4,6 +4,7 @@
 #pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
 #include <exodus/format.h>
 #pragma GCC diagnostic pop
+#include <generator>
 
 #include <exodus/program.h>
 

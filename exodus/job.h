@@ -5,7 +5,7 @@
 #ifdef EXO_MODULE
 	import std;
 #else
-//	#include <future>
+	#include <future>
 	#include <memory>
 namespace std {
 	template<typename> class future; // Forward declaration of std::future

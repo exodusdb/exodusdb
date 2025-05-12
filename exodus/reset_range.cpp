@@ -8,6 +8,7 @@
 #	include <stdexcept>
 #	include <utility>
 #	include <exodus/var.h>
+#	include <exodus/dim.h>
 #endif
 
 #define PUBLIC __attribute__((visibility("default")))
