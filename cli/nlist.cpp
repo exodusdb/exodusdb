@@ -622,15 +622,15 @@ func main() {
 	// NEOSYS custom code TODO remove to SYSTEM
 	if (html) {
 
-		if (var("PLANS,SCHEDULES,ADS,BOOKING_ORDERS,VEHICLES,RATECARDS").locateusing(",", filename, xx)) {
+		if (filename.listed("PLANS,SCHEDULES,ADS,BOOKING_ORDERS,VEHICLES,RATECARDS")) {
 			printtxmark = "Media Management";
 		}
 
-		if (var("JOBS,JOB_ORDERS,JOB_INVOICES").locateusing(",", filename, xx)) {
+		if (filename.listed("JOBS,JOB_ORDERS,JOB_INVOICES")) {
 			printtxmark = "Job Management";
 		}
 
-		if (var("CHARTS,RECURRING").locateusing(",", filename, xx)) {
+		if (filename.listed("CHARTS,RECURRING")) {
 			printtxmark = "Financial";
 		}
 
@@ -725,14 +725,14 @@ phraseinit:
 		}
 
 		// Negate next comparision
-		if (var("NOT,NE,<>").locateusing(",", nextword, xx)) {
+		if (nextword.listed("NOT,NE,<>")) {
 			nextword = "NOT";
 			gosub getword();
 			sortselect ^= " " ^ word;
 		}
 
 		// Comparision
-		if (var("MATCH,EQ,,NE,GT,LT,GE,LE,<,>,<=,>=,=,[],[,]").locateusing(",", nextword, xx)) {
+		if (nextword.listed("MATCH,EQ,,NE,GT,LT,GE,LE,<,>,<=,>=,=,[],[,]")) {
 			//only EQ works at the moment
 			gosub getword();
 			sortselect ^= " " ^ word;
@@ -1006,7 +1006,7 @@ phraseinit:
 
 			// Suppress untotalled columns if doing detsupp2
 			if (detsupp == 2 and (not(totalflag or breakonflag))) {
-				if (var("JL,JUSTLEN,CH,COLHEAD,OC,OCONV").locateusing(",", nextword, xx)) {
+				if (nextword.listed("JL,JUSTLEN,CH,COLHEAD,OC,OCONV")) {
 					gosub getword();
 					gosub getword();
 				}

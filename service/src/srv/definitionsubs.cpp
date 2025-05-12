@@ -544,7 +544,7 @@ preventupdate:
 		// Processes restart if system.cfg date/time changes
 		// TODO make it only per database
 		if (USERNAME != "EXODUS") {
-			if (var("AGENCY.PARAMS,ALL,SECURITY,TAXES,TIMESHEET.PARAMS").locateusing(",", ID)) {
+			if (ID.listed("AGENCY.PARAMS,ALL,SECURITY,TAXES,TIMESHEET.PARAMS")) {
 //				// TODO prevent a write from system configuration file
 //				//call osread(tt, "system.cfg");
 //				if (not osread(tt, "system.cfg"))

@@ -778,7 +778,7 @@ nextreport:
 			}
 			var pos;
 			var codepage2;
-			if (var("UTF-8,720,737").locateusing(",", codepage, pos)) {
+			if (codepage.listed("UTF-8,720,737", pos)) {
 				codepage2 = var("UTF-8,windows-1256,windows-1253").field(",", pos);
 			} else {
 				codepage2 = "windows-1252";

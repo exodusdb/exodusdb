@@ -320,7 +320,7 @@ nocommon:
 		// if @list.active or index(' ':sortselect,' BY ',1) or index(sortselect,'WITH AUTHORISED',1) else
 		if (not(LISTACTIVE or ((" " ^ sortselect).contains(" BY ")))) {
 			// only look in selected files otherwise c++ takes too long on some files
-			if (var("COMPANIES,CURRENCIES,UNITS,LEDGERS,JOB_TYPES").locateusing(",", filenamex)) {
+			if (filenamex.listed("COMPANIES,CURRENCIES,UNITS,LEDGERS,JOB_TYPES")) {
 				if (records.read(file, "%RECORDS%")) {
 					if (records.len() < 200) {
 						records.replacer(FM, "\" \"");

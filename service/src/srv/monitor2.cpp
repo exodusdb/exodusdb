@@ -278,7 +278,7 @@ nextprocess:
 		}
 		dbasesystems(1, dbasen) = RECORD.f(51);
 		status					= calculate("STATUS");
-		if (not var("OK,Hung,Maintenance,Closed,Crashed").locateusing(",", status.field(" ", 1), statusn)) {
+		if (not status.field(" ", 1).listed("OK,Hung,Maintenance,Closed,Crashed", statusn)) {
 			// statusn will be 6
 			processcount(20, dbasen) = status;
 		}

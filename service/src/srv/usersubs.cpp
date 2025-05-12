@@ -134,7 +134,7 @@ func main(in mode) {
 					var word = sysemails.field(" ", ii);
 					word	 = field(word, "@", -1);
 					// remove smtp. mailout. etc from smtp host domain
-					if (var("smtp,mail,mailout").locateusing(",", word.field(".", 1))) {
+					if (word.field(".", 1).listed("smtp,mail,mailout")) {
 						word = word.field(".", 2, 999);
 					}
 					sysemails = sysemails.fieldstore(" ", ii, 1, word);

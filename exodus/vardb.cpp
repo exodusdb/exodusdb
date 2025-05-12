@@ -3478,7 +3478,8 @@ bool var::selectx(in fieldnames, in sortselectclause) {
 
 	// The next word can be the filename if not one of the select clause words
 	// override any filename in the cursor variable
-	if (firstucword and not var("BY BY-DSND WITH WITHOUT ( { USING DISTINCT").locateusing(" ", firstucword)) {
+	//if (firstucword and not var("BY BY-DSND WITH WITHOUT ( { USING DISTINCT").locateusing(" ", firstucword)) {
+	if (firstucword and not firstucword.listed("BY,BY-DSND,WITH,WITHOUT,(,{,USING,DISTINCT")) {
 		actualfilename = firstucword;
 		dictfilename = actualfilename;
 		// remove it
@@ -3838,13 +3839,15 @@ bool var::selectx(in fieldnames, in sortselectclause) {
 			// Convert PICK/AREV relational operators to standard SQL relational operators
 			// IS/ISNT/NOT -> EQ/NE/NE
 			var aliasno;
-			if (var("IS EQ NE NOT ISNT GT LT GE LE").locateusing(" ", ucword, aliasno)) {
+//			if (var("IS EQ NE NOT ISNT GT LT GE LE").locateusing(" ", ucword, aliasno)) {
+			if (ucword.listed("IS,EQ,NE,NOT,ISNT,GT,LT,GE,LE", aliasno)) {
 				word1 = var("= = <> <> <> > < >= <=").field(" ", aliasno);
 				ucword = word1;
 			}
 
 			// Capture operator is any
-			if (var("= <> > < >= <= ~ ~* !~ !~*").locateusing(" ", ucword)) {
+//			if (var("= <> > < >= <= ~ ~* !~ !~*").locateusing(" ", ucword)) {
+			if (ucword.listed("=,<>,>,<,>=,<=,~,~*,!~,!~*")) {
 				// Is an operator
 				op = ucword;
 				// Get another word (or words)
@@ -3996,8 +3999,9 @@ bool var::selectx(in fieldnames, in sortselectclause) {
 					op = "=";
 
 				// Invert comparison if "WITHOUT" or "NOT" for calculated fields
-				if (negative and
-					var("= <> > < >= <= ~ ~* !~ !~* !! ! ]").locateusing(" ", op, aliasno)) {
+				//if (negative and
+				//	var("= <> > < >= <= ~ ~* !~ !~* !! ! ]").locateusing(" ", op, aliasno)) {
+				if (negative and op.listed("=,<>,>,<,>=,<=,~,~*,!~,!~*,!!,!,]", aliasno)) {
 					// op.logputl("op entered:");
 					negative = false;
 					op = var("<> = <= >= < > !~ !~* ~ ~* ! !! !]").field(" ", aliasno);
@@ -4364,7 +4368,8 @@ bool var::selectx(in fieldnames, in sortselectclause) {
 			// Default to OR between with clauses
 			if (whereclause) {
 				let lastpart = whereclause.field(" ", -1);
-				if (not var("OR AND (").locateusing(" ", lastpart))
+				//if (not var("OR AND (").locateusing(" ", lastpart))
+				if (not lastpart.listed("OR,AND,("))
 					whereclause ^= " or ";
 				if (DBTRACE_SELECT)
 					TRACE(whereclause)

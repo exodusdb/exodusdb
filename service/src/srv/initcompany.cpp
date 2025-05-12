@@ -185,7 +185,7 @@ func main(in nextcompanycode) {
 	let financialyear = srv.company.f(6);
 	var firstmonth	  = financialyear.field(",", 1);
 	if (firstmonth.isnum()) {
-		if (not var("1,2,3,4,5,6,7,8,9,10,11,12").locateusing(",", firstmonth, temp)) {
+		if (not firstmonth.listed("1,2,3,4,5,6,7,8,9,10,11,12", temp)) {
 			firstmonth = 1;
 		}
 		var maxperiod = financialyear.field(",", 2);

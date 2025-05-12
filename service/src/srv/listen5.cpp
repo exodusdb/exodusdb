@@ -274,7 +274,7 @@ func main(in request1, in request2in, in request3in, in request4in, in request5i
 			sortby = "AL";
 		}
 		if (sortby) {
-			if (not var("AL,AR,DL,DR").locateusing(",", sortby)) {
+			if (not sortby.listed("AL,AR,DL,DR")) {
 				response_ = "Invalid sortby " ^ (sortby.quote()) ^ " in LISTEN,GETINDEXVALUES";
 				return 0;
 			}
@@ -678,7 +678,7 @@ subr fileaccesscheck(in filename) {
 	// security check
 	// dont check markets and companies because really must have access to some
 	// and eliminates need for clumsy task COMPANY ACCESS PARTIAL task
-	if (not var("MENUS,ADMENUS").locateusing(",", filename)) {
+	if (not filename.listed("MENUS,ADMENUS")) {
 		var temp = securityfilename;
 		temp.converter(".", " ");
 		temp = singular(temp);
@@ -730,7 +730,7 @@ nextfiles:
 		// replaced by databasecode.SVR
 		// if filename0='GLOBAL.SVR' then goto deleteit
 
-		if (not var(".jpg,.png,.gif,.svr,.cfg").locateusing(",", (filename.last(4)).lcase())) {
+		if (not filename.last(4).lcase().listed(".jpg,.png,.gif,.svr,.cfg")) {
 
 			// a file ending .4 is a request to delete the .2 and .3 files
 			if (filename.ends(".4")) {
@@ -754,7 +754,7 @@ nextfiles:
 				// and has a file extension (ie leave PARAMS and PARAMS2)
 				fileattributes = filename.osfile();
 				filetime	   = fileattributes.f(2) * 24 * 60 * 60 + fileattributes.f(3);
-				if (((filename.last(4)).contains(".")) and filetime <= deletetime) {
+				if (filename.last(4).contains(".") and filetime <= deletetime) {
 deleteit:
 					//filename.osremove();
 					if (osfile(filename) and not filename.osremove()) {

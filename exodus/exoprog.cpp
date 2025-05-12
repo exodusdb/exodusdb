@@ -212,7 +212,8 @@ bool ExoProgram::select(in sortselectclause_or_filehandle) {
 		var opno;
 		if (!op)
 			opno = 0;
-		else if (not var("= <> > < >= <= ~ ~* !~ !~* >< >!< in not_in !! ! ] [ []").locateusing(" ", op.convert(" ", "_"), opno))
+//		else if (not var("= <> > < >= <= ~ ~* !~ !~* >< >!< in not_in !! ! ] [ []").locateusing(" ", op.convert(" ", "_"), opno))
+		else if (not op.convert(" ", "_").listed("=,<>,>,<,>=,<=,~,~*,!~,!~*,><,>!<,in,not_in,!!,!,],[,[]", opno))
 			UNLIKELY
 			throw VarError(op.quote() ^ " unknown op in sql select");
 		opnos[fieldn] = opno;

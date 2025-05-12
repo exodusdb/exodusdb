@@ -774,7 +774,7 @@ subr exec2() {
 
 	// pass the output file in linkfilename2
 	// not good method, pass in system?
-	if (var("LIST,SELECTJOURNALS").locateusing(",", request_.f(1))) {
+	if (request_.f(1).listed("LIST,SELECTJOURNALS")) {
 		data_ = linkfilename2;
 	}
 
