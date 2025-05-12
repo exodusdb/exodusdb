@@ -460,6 +460,9 @@ func main() {
 				// dim
 				else if (funcx_prefix == "dim") funcx_prefix = "dim=";
 
+				// Job
+				else if (funcx_prefix == "Job") funcx_prefix = "(Job)";
+
 				// int (rare)
 				else if (funcx_prefix == "int") {funcx_prefix = "int";} // setprecision/getprecision
 

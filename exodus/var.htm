@@ -5852,6 +5852,25 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
+		<td></td>
+		<td>
+			<p>
+				<code>envvalue.ossetenv(envcode)</code></p></td>
+		<td>
+			<p>Set the value of an environment variable.</p>
+			<p>
+				<em>envcode:</em> The code of the env variable to set.</p>
+			<p>
+				<em>envvalue:</em> The new value to set the env code to.</p>
+			<p>
+				<pre><span class="nf">let</span><span class="w"> </span><span class="n">envcode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;EXO_ABC&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">envvalue</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;XYZ&quot;</span><span class="p">;</span>
+<span class="n">envvalue</span><span class="p">.</span><span class="nf">ossetenv</span><span class="p">(</span><span class="n">envcode</span><span class="p">);</span>
+<span class="c1">// or</span>
+<span class="nf">ossetenv</span><span class="p">(</span><span class="n">envcode</span><span class="p">,</span><span class="w"> </span><span class="n">envvalue</span><span class="p">);</span>
+</pre>
+			</p>
+		</td></tr>
+	<tr>
 		<td>
 			<p>
 				<code>if</code></p></td>
@@ -5873,25 +5892,6 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 <span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">envvalue1</span><span class="p">.</span><span class="nf">osgetenv</span><span class="p">(</span><span class="s">&quot;HOME&quot;</span><span class="p">))</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="n">ok</span><span class="w"> </span><span class="c1">// e.g. &quot;/home/exodus&quot;</span>
 <span class="c1">// or</span>
 <span class="nf">let</span><span class="w"> </span><span class="n">envvalue2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">osgetenv</span><span class="p">(</span><span class="s">&quot;EXO_ABC&quot;</span><span class="p">);</span><span class="w"> </span><span class="c1">// &quot;XYZ&quot;</span>
-</pre>
-			</p>
-		</td></tr>
-	<tr>
-		<td></td>
-		<td>
-			<p>
-				<code>envvalue.ossetenv(envcode)</code></p></td>
-		<td>
-			<p>Set the value of an environment variable.</p>
-			<p>
-				<em>envcode:</em> The code of the env variable to set.</p>
-			<p>
-				<em>envvalue:</em> The new value to set the env code to.</p>
-			<p>
-				<pre><span class="nf">let</span><span class="w"> </span><span class="n">envcode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;EXO_ABC&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">envvalue</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;XYZ&quot;</span><span class="p">;</span>
-<span class="n">envvalue</span><span class="p">.</span><span class="nf">ossetenv</span><span class="p">(</span><span class="n">envcode</span><span class="p">);</span>
-<span class="c1">// or</span>
-<span class="nf">ossetenv</span><span class="p">(</span><span class="n">envcode</span><span class="p">,</span><span class="w"> </span><span class="n">envvalue</span><span class="p">);</span>
 </pre>
 			</p>
 		</td></tr>
@@ -7587,7 +7587,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 		<li>
 			<a href="#Select_Lists">Select Lists</a></li>
 		<li>
-			<a href="#Run_Perform_Execute">Run/Perform/Execute</a></li>
+			<a href="#Perform_Execute_Run">Perform/Execute/Run</a></li>
 		<li>
 			<a href="#Program_Termination_">Program Termination </a></li>
 		<li>
@@ -7883,7 +7883,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 		<td>
 		</td></tr>
 </table>
-<h5 id="Run_Perform_Execute">Run/Perform/Execute</h5>
+<h5 id="Perform_Execute_Run">Perform/Execute/Run</h5>
 
 <table class="wikitable">
 	<tr>
@@ -7930,6 +7930,43 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 		<td>
 			<p>Run an exodus program/library.</p>
 			<p>Identical to perform() but any currently active select list in the calling program/library is not accessible to the executed program/library and is preserved in the calling [program as is. Any select list created by the executed library is discarded when it terminates.</p>
+		</td></tr>
+	<tr>
+		<td>
+			<p>
+				<code>(Job)</code></p></td>
+		<td>
+			<p>
+				<code>run(command)</code></p></td>
+		<td>
+			<p>Run another program in parallel.</p>
+			<p>Unlike perform and execute, run() does not block until it completes. It runs in parallel.</p>
+			<p>
+				<em>command:</em> See perform.</p>
+			<p>
+				<em>return:</em> A "job" object that you can use to manage the running job.</p>
+			<ul>
+				<li>Check if it has finished.</li>
+				<li>Pause and wait for it to finish with optional timeout.</li>
+				<li>When it has finished, access all its environment variables.</li>
+			</ul>
+			<p>See also:</p>
+			<dl>
+				<dt>run_results()</dt>
+				<dd>For use in a range based for-loops to simplify the asynchronous collection of output from all commands as they complete. Programs inner environments are retained for post processing so any suitable environment variable e.g. DATA, ANS or RECORD can be used to return data.</dd>
+				<dt>shutdown_run()</dt>
+				<dd>Wait for all jobs to finish before continuing, otherwise, if the parent program exits, they will be aborted.</dd>
+			</dl>
+			<p>
+				<pre><span class="n">run</span><span class="p">(</span><span class="s">&quot;testlib aa&quot;</span><span class="p">);</span>
+<span class="n">run</span><span class="p">(</span><span class="s">&quot;testlib bb&quot;</span><span class="p">);</span>
+<span class="n">run</span><span class="p">(</span><span class="s">&quot;testlib cc&quot;</span><span class="p">);</span>
+<span class="kt">var</span><span class="w"> </span><span class="n">results</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="p">;</span>
+<span class="c1">// Process results asynchronously.</span>
+<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="k">auto</span><span class="o">&amp;</span><span class="w"> </span><span class="n">env</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">run_results</span><span class="p">())</span>
+<span class="w">    </span><span class="n">results</span><span class="w"> </span><span class="o">^=</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="kc">DATA</span><span class="p">.</span><span class="nf">f</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="o">^</span><span class="w"> </span><span class="nb">FM</span><span class="p">;</span>
+</pre>
+			</p>
 		</td></tr>
 	<tr>
 		<td></td>

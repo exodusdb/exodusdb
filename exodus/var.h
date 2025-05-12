@@ -3460,6 +3460,18 @@ public:
 
 	// obj is envvalue
 
+	// Set the value of an environment variable.
+	// envcode: The code of the env variable to set.
+	// envvalue: The new value to set the env code to.
+	// obj is envvalue
+	//
+	// `let envcode = "EXO_ABC", envvalue = "XYZ";
+	//  envvalue.ossetenv(envcode);
+	//  // or
+	//  ossetenv(envcode, envvalue);`
+	//
+	   void ossetenv(SV envcode) const;
+
 	// Get the value of an environment variable.
 	// envcode: The code of the env variable to get or "" for all.
 	// envvalue[out]: Set to the value of the env variable if set otherwise "". If envcode is "" then envvalue is set to a dynamic array of all environment variables LIKE CODE1=VALUE1^CODE2=VALUE2...
@@ -3474,18 +3486,6 @@ public:
 	//  let envvalue2 = osgetenv("EXO_ABC"); // "XYZ"`
 	//
 	ND bool osgetenv(SV envcode);
-
-	// Set the value of an environment variable.
-	// envcode: The code of the env variable to set.
-	// envvalue: The new value to set the env code to.
-	// obj is envvalue
-	//
-	// `let envcode = "EXO_ABC", envvalue = "XYZ";
-	//  envvalue.ossetenv(envcode);
-	//  // or
-	//  ossetenv(envcode, envvalue);`
-	//
-	   void ossetenv(SV envcode) const;
 
 	// obj is var()
 

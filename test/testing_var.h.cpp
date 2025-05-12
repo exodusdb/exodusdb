@@ -1729,20 +1729,20 @@ func main() {
 		var temposfilename2 = ostempfile();
 	}
 
-	printl("osgetenv(SV envcode);");
-	{
-		var envvalue1;
-		if (envvalue1.osgetenv("HOME")) {/*ok*/} else  abort("osgetenv: " ^ lasterror()); // e.g. "/home/exodus"
-		// or
-		let envvalue2 = osgetenv("EXO_ABC"); assert(envvalue2.errputl() == "XYZ");
-	}
-
 	printl("ossetenv(SV envcode) const;");
 	{
 		let envcode = "EXO_ABC", envvalue = "XYZ";
 		envvalue.ossetenv(envcode);
 		// or
 		ossetenv(envcode, envvalue);
+	}
+
+	printl("osgetenv(SV envcode);");
+	{
+		var envvalue1;
+		if (envvalue1.osgetenv("HOME")) {/*ok*/} else  abort("osgetenv: " ^ lasterror()); // e.g. "/home/exodus"
+		// or
+		let envvalue2 = osgetenv("EXO_ABC"); assert(envvalue2.errputl() == "XYZ");
 	}
 
 	printl("ospid();");
@@ -2412,6 +2412,17 @@ func main() {
 	printl("deletelist(SV listname);");
 	{
 		if (not deletelist("my_list")) abort("deletelist: " ^ lasterror());
+	}
+
+	printl("run(in command);");
+	{
+		run("testlib aa");
+		run("testlib bb");
+		run("testlib cc");
+		var results = "";
+		// Process results asynchronously.
+		for (auto& env : run_results())
+		    results ^= env.DATA.f(2) ^ FM;
 	}
 
 	printl("exoprog_date(in type, in input0, in ndecs0, out output);");

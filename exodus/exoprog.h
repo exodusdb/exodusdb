@@ -283,7 +283,7 @@ ND	bool hasnext();
 	bool makelist(SV listname, in keys);
 
 	//////////////////////////
-	///// Run/Perform/Execute:
+	///// Perform/Execute/Run:
 	//////////////////////////
 
 	// Run an Exodus program/library.
@@ -308,16 +308,23 @@ ND	bool hasnext();
 	var  execute(in command_line);
 
 	// Run another program in parallel.
-	// Unlike perform and execute run() does not block and wait for the program to finish. It runs in parallel. There is no way direct way of communicating with the running program at the moment but it is planned to be able to send and receive messages using a read and write queue.
+	// Unlike perform and execute, run() does not block until it completes. It runs in parallel.
+	// command: See perform.
 	// return: A "job" object that you can use to manage the running job.
 	// * Check if it has finished.
 	// * Pause and wait for it to finish with optional timeout.
 	// * When it has finished, access all its environment variables.
-	// command: See perform.
-	// return: std::future<ExoEnv>, creates new ExoEnv
-	// If the parent program exits while there are any programs still running they will be terminated automatically.
+	// See also:
+	// * run_results() * For use in a range based for-loops to simplify the asynchronous collection of output from all commands as they complete. Programs inner environments are retained for post processing so any suitable environment variable e.g. DATA, ANS or RECORD can be used to return data.
+	// * shutdown_run() * Wait for all jobs to finish before continuing, otherwise, if the parent program exits, they will be aborted.
 	//
-	// // run(command);
+	// `run("testlib aa");
+	//  run("testlib bb");
+	//  run("testlib cc");
+	//  var results = "";
+	//  // Process results asynchronously.
+	//  for (auto& env : run_results())
+	//      results ^= env.DATA.f(2) ^ FM;`
 	//
 	Job  run(in command);
 
