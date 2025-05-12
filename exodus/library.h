@@ -149,6 +149,9 @@ namespace exodus_detail {
 // Deprecated: Use }; instead of libraryexit()
 #define libraryexit(UNUSED) };
 
+#define PUBLIC __attribute__((visibility("default")))
+
+
 // libraryinit() MACRO
 //////////////////////
 //
@@ -170,11 +173,11 @@ extern "C" PUBLIC void exoprogram_createdelete_##EXOPROGRAM_PREFIX(             
 }                                                                                  \
                                                                                    \
 /* 3. Open the ExoProgram-derived class definition               */                \
-class EXOPROGRAM_PREFIX##_ExoProgram : public exo::ExoProgram {                    \
+class PUBLIC EXOPROGRAM_PREFIX##_ExoProgram : public exo::ExoProgram {             \
                                                                                    \
 /* 4. Inherit ExoProgram's constructor using an ExoEnv           */                \
 public:                                                                            \
-    using ExoProgram::ExoProgram;
+    using ExoProgram::ExoProgram;                                                  \
 
 // User code follows, ending with }; to close the class
 
