@@ -1,6 +1,6 @@
 module;
 
-#include <unistd.h>
+//#include <unistd.h>
 #include "std-gmf.hpp"
 
 #include "allstd.hpp"
@@ -11,6 +11,88 @@ export module std;
 export using ::size_t;
 export using ::getpid;
 export using ::isatty;
+
+export namespace __gnu_cxx {
+    using __gnu_cxx::__normal_iterator;
+
+    // Export the comparison operators
+    template<typename _Iterator, typename _Container>
+    bool operator==(const __normal_iterator<_Iterator, _Container>& __lhs,
+                    const __normal_iterator<_Iterator, _Container>& __rhs) noexcept {
+        return __lhs.base() == __rhs.base();
+    }
+
+    template<typename _Iterator, typename _Container>
+    bool operator!=(const __normal_iterator<_Iterator, _Container>& __lhs,
+                    const __normal_iterator<_Iterator, _Container>& __rhs) noexcept {
+        return __lhs.base() != __rhs.base();
+    }
+}
+
+export namespace std {
+
+
+    // Core iterator functions
+    using std::begin;
+    using std::end;
+    using std::rbegin;
+    using std::rend;
+    using std::cbegin;
+    using std::cend;
+    using std::crbegin;
+    using std::crend;
+
+    // Iterator traits and tags
+    using std::iterator_traits;
+    using std::input_iterator_tag;
+    using std::output_iterator_tag;
+    using std::forward_iterator_tag;
+    using std::bidirectional_iterator_tag;
+    using std::random_access_iterator_tag;
+
+    // Iterator operations
+    using std::advance;
+    using std::distance;
+    using std::next;
+    using std::prev;
+
+    // Iterator types
+    using std::reverse_iterator;
+    using std::move_iterator;
+    using std::insert_iterator;
+    using std::front_insert_iterator;
+    using std::back_insert_iterator;
+
+    // Iterator adaptors
+    using std::make_reverse_iterator;
+    using std::make_move_iterator;
+    using std::front_inserter;
+    using std::back_inserter;
+    using std::inserter;
+
+    // Stream iterators
+    using std::istream_iterator;
+    using std::ostream_iterator;
+    using std::istreambuf_iterator;
+    using std::ostreambuf_iterator;
+
+    // Iterator concepts (C++20 and later)
+    using std::incrementable_traits;
+    using std::indirectly_readable_traits;
+    using std::iter_value_t;
+    using std::iter_difference_t;
+    using std::iter_reference_t;
+    using std::iter_rvalue_reference_t;
+    using std::iter_common_reference_t;
+
+    // Iterator utilities (C++20 and later)
+    using std::ranges::iterator_t;
+    using std::ranges::range_value_t;
+    using std::ranges::range_difference_t;
+    using std::ranges::range_size_t;
+    using std::ranges::range_reference_t;
+    using std::ranges::range_rvalue_reference_t;
+}
 
 export namespace std {
 
@@ -27,7 +109,7 @@ export namespace std {
 	using std::get;
 	using std::index_sequence;
 	using std::make_index_sequence;
-#undef function
+
 	using std::function;
 	using std::construct_at;
 	using std::shared_ptr;
@@ -154,11 +236,6 @@ export namespace std {
 	using std::from_chars;
 	using std::chars_format;
 
-	// really? since we are providing fmt::format
-	// Causes "error: call to 'format' is ambiguous"
-	// Should not cause problems since we are using in the std namespace ... but it does.
-	//using std::format;
-
 	using std::pair;
 	using std::initializer_list;
 
@@ -255,74 +332,11 @@ export namespace std {
 	using std::endl;
 	using std::flush;
 
-//	using std::filesystem;
-// Lots more - see https://en.cppreference.com/w/cpp/filesystem
-	namespace filesystem {
-		using std::filesystem::temp_directory_path;
-		using std::filesystem::is_directory;
-		using std::filesystem::path;
-		using std::filesystem::current_path;
-		using std::filesystem::absolute;
-		using std::filesystem::create_directories;
-		using std::filesystem::directory_iterator;
-		using std::filesystem::exists;
-		using std::filesystem::rename;
-		using std::filesystem::copy;
-		using std::filesystem::copy_options;
-		using std::filesystem::copy_options::overwrite_existing;
-		using std::filesystem::copy_options::recursive;
-		using std::filesystem::copy_options::copy_symlinks;
-		using std::filesystem::remove_all;
-		using std::filesystem::remove;
-		using std::filesystem::read_symlink;
-		using std::filesystem::is_regular_file;
-	} // namespace filesystem
 
 	using std::ratio;
 	using std::ratio_multiply;
 	using std::common_type;
 	using std::hash;
-
-	namespace chrono {
-		using std::chrono::_V2::system_clock;
-		using std::chrono::steady_clock;
-		using std::chrono::clock_time_conversion;
-		using std::chrono::sys_time;
-		using std::chrono::high_resolution_clock;
-		using std::chrono::system_clock;
-		using std::chrono::time_point;
-		using std::chrono::time_point_cast;
-		using std::chrono::clock_cast;
-		using std::chrono::duration;
-		using std::chrono::treat_as_floating_point;
-		using std::chrono::duration_values;
-		using std::chrono::duration_cast;
-//		using std::chrono::years;
-//		using std::chrono::months;
-//		using std::chrono::weeks;
-//		using std::chrono::days;
-		using std::chrono::hours;
-		using std::chrono::minutes;
-		using std::chrono::seconds;
-		using std::chrono::milliseconds;
-		using std::chrono::microseconds;
-		using std::chrono::nanoseconds;
-
-		using std::chrono::operator""h;   // hours
-		using std::chrono::operator""min; // minutes
-		using std::chrono::operator""s;   // sec
-		using std::chrono::operator""ms;  // millisecs
-		using std::chrono::operator""us;  // microsecs
-		using std::chrono::operator""ns;  // nanosecs
-		using std::chrono::operator""d;   // day of month
-		using std::chrono::operator""y;   // year
-
-	} // namespace chrono
-
-	namespace this_thread {
-		using std::this_thread::sleep_for;
-		using std::this_thread::get_id;
-	}
 
 	// from <cstdint>
 	using ::uint;
@@ -369,14 +383,6 @@ export namespace std {
 	// <ctime>
 	using std::time_t;
 
-	// <cctype>
-// Should not be using these since they are not fully threadsafe even for narrow chars
-// Replaced by ASCII_isdigit ASCII_isalpha ASCII_toupper in exodus/ASCIIutil.h
-//	using std::isdigit;
-//	using std::isalpha;
-//	using std::toupper;
-//	using std::tolower;
-
 	// <stdexcept>
 	using std::invalid_argument;
 
@@ -388,23 +394,6 @@ export namespace std {
 
 //	using std::binary_function;
 //	using std::_Select1st;
-	
-	// Allow three way access to string_literals
-	// https://en.cppreference.com/w/cpp/string/basic_string/operator%22%22s
-	inline namespace literals {
-		using literals::operator""s;
-		inline namespace string_literals {
-			using string_literals::operator""s;
-		}
-	}
-	inline namespace string_literals {
-		using string_literals::operator""s;
-	}
-
-//using std::ExoEnv;
-//using std::ExodusProgram;
-//using std::ExoProgram;
-//using std::Init;
 using std::align_val_t;
 using std::allocator;
 using std::back_insert_iterator;
@@ -708,4 +697,95 @@ using std::uses_allocator;
 
 } // namespace std
 
+export namespace std {
+	// really? since we are providing fmt::format
+	// Causes "error: call to 'format' is ambiguous"
+	// Should not cause problems since we are using in the std namespace ... but it does.
+	//using std::format;
 
+	// <cctype>
+	// Should not be using these since they are not fully threadsafe even for narrow chars
+	// Replaced by ASCII_isdigit ASCII_isalpha ASCII_toupper in exodus/ASCIIutil.h
+	//	using std::isdigit;
+	//	using std::isalpha;
+	//	using std::toupper;
+	//	using std::tolower;
+}
+
+export namespace std {
+//	using std::filesystem;
+// Lots more - see https://en.cppreference.com/w/cpp/filesystem
+	namespace filesystem {
+		using std::filesystem::temp_directory_path;
+		using std::filesystem::is_directory;
+		using std::filesystem::path;
+		using std::filesystem::current_path;
+		using std::filesystem::absolute;
+		using std::filesystem::create_directories;
+		using std::filesystem::directory_iterator;
+		using std::filesystem::exists;
+		using std::filesystem::rename;
+		using std::filesystem::copy;
+		using std::filesystem::copy_options;
+		using std::filesystem::copy_options::overwrite_existing;
+		using std::filesystem::copy_options::recursive;
+		using std::filesystem::copy_options::copy_symlinks;
+		using std::filesystem::remove_all;
+		using std::filesystem::remove;
+		using std::filesystem::read_symlink;
+		using std::filesystem::is_regular_file;
+	} // namespace filesystem
+
+	namespace chrono {
+		using std::chrono::_V2::system_clock;
+		using std::chrono::steady_clock;
+		using std::chrono::clock_time_conversion;
+		using std::chrono::sys_time;
+		using std::chrono::high_resolution_clock;
+		using std::chrono::system_clock;
+		using std::chrono::time_point;
+		using std::chrono::time_point_cast;
+		using std::chrono::clock_cast;
+		using std::chrono::duration;
+		using std::chrono::treat_as_floating_point;
+		using std::chrono::duration_values;
+		using std::chrono::duration_cast;
+//		using std::chrono::years;
+//		using std::chrono::months;
+//		using std::chrono::weeks;
+//		using std::chrono::days;
+		using std::chrono::hours;
+		using std::chrono::minutes;
+		using std::chrono::seconds;
+		using std::chrono::milliseconds;
+		using std::chrono::microseconds;
+		using std::chrono::nanoseconds;
+
+		using std::chrono::operator""h;   // hours
+		using std::chrono::operator""min; // minutes
+		using std::chrono::operator""s;   // sec
+		using std::chrono::operator""ms;  // millisecs
+		using std::chrono::operator""us;  // microsecs
+		using std::chrono::operator""ns;  // nanosecs
+		using std::chrono::operator""d;   // day of month
+		using std::chrono::operator""y;   // year
+
+	} // namespace chrono
+
+	namespace this_thread {
+		using std::this_thread::sleep_for;
+		using std::this_thread::get_id;
+	}
+	// Allow three way access to string_literals
+	// https://en.cppreference.com/w/cpp/string/basic_string/operator%22%22s
+	inline namespace literals {
+		using literals::operator""s;
+		inline namespace string_literals {
+			using string_literals::operator""s;
+		}
+	}
+	inline namespace string_literals {
+		using string_literals::operator""s;
+	}
+
+}

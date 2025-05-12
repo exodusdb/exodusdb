@@ -4475,10 +4475,6 @@ class PUBLIC var_iter {
 //};
 
 
-//
-////#include <vector>
-////#include <iterator>
-//
 class dim_const_iter; // Forward declaration for friendship
 
 class dim_iter {
@@ -4536,9 +4532,6 @@ inline dim_iter operator+(std::ptrdiff_t n, const dim_iter& it) {
 }
 
 
-
-//#include <vector>
-//#include <iterator>
 
 class dim_const_iter {
 private:

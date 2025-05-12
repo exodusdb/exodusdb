@@ -35,9 +35,6 @@ THE SOFTWARE.
 //#include <unordered_map>
 //module #include <map>
 
-//#include <vector>
-//#define eq ==
-
 #include <version> // Only for __cpp_lib_constexpr_string >= 201907L TODO remove
 
 #if EXO_MODULE

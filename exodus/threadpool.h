@@ -12,7 +12,6 @@
 //  216 |	   operator==(const allocator&, const allocator&) _GLIBCXX_NOTHROW
 //	  |	   ^		  ~~~~~~~~~~~~~~~~
 // <plus of similar note:s
-#	include <vector>
 
 #ifdef EXO_MODULE
 	import std;
