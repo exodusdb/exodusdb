@@ -1,13 +1,10 @@
-
 // EXO_FORMAT required to append -lfmt to compile and link command
 #pragma GCC diagnostic push
 #pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
-#include <exodus/format.h>
+//#include <exodus/format.h>
 #pragma GCC diagnostic pop
-#include <generator>
 
 #include <exodus/program.h>
-
 programinit()
 
 	// CONSTANTS
