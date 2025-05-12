@@ -94,6 +94,7 @@
 #	target_sources(htmllib2 PUBLIC FILE_SET cxx_modules TYPE CXX_MODULES FILES htmllib2.cpp)
 	add_library(nlist SHARED nlist.cpp)
 	add_library(dict_xo_clients SHARED dict_xo_clients.cpp)
+	add_library(testlib SHARED testlib.cpp)
 
 
 	# SPECIAL for nlist
@@ -152,6 +153,7 @@
 	target_link_libraries(htmllib2 exodus ${LIBS})
 	target_link_libraries(nlist exodus ${LIBS})
 	target_link_libraries(dict_xo_clients exodus ${LIBS})
+	target_link_libraries(testlib exodus ${LIBS})
 
 #
 # 3. INSTALL BINs
@@ -216,6 +218,7 @@
 			compile2
 			htmllib2
 			nlist
+			testlib
 		DESTINATION
 			lib
 	)
