@@ -6355,6 +6355,30 @@ var temposfilename2 = ostempfile();
 
 
 .SS
+envvalue.ossetenv(envcode)
+.PP \"<p>
+Set the value of an environment variable.
+.sp 1 \"</p>
+.PP \"<p>
+\fBenvcode:\fR The code of the env variable to set.
+.sp 1 \"</p>
+.PP \"<p>
+\fBenvvalue:\fR The new value to set the env code to.
+.sp 1 \"</p>
+.PP \"<p>
+.PP \"<p>
+\fBExample:\fR
+.EX \"<code>
+let envcode = "EXO_ABC", envvalue = "XYZ";
+envvalue.ossetenv(envcode);
+// or
+ossetenv(envcode, envvalue);
+.EE \"</code>
+.sp 1 \"</p>
+.sp 1 \"</p>
+
+
+.SS
 if (envvalue.osgetenv(envcode)) ...
 .PP \"<p>
 Get the value of an environment variable.
@@ -6382,30 +6406,6 @@ var envvalue1;
 if (envvalue1.osgetenv("HOME")) ... ok // e.g. "/home/exodus"
 // or
 let envvalue2 = osgetenv("EXO_ABC"); // "XYZ"
-.EE \"</code>
-.sp 1 \"</p>
-.sp 1 \"</p>
-
-
-.SS
-envvalue.ossetenv(envcode)
-.PP \"<p>
-Set the value of an environment variable.
-.sp 1 \"</p>
-.PP \"<p>
-\fBenvcode:\fR The code of the env variable to set.
-.sp 1 \"</p>
-.PP \"<p>
-\fBenvvalue:\fR The new value to set the env code to.
-.sp 1 \"</p>
-.PP \"<p>
-.PP \"<p>
-\fBExample:\fR
-.EX \"<code>
-let envcode = "EXO_ABC", envvalue = "XYZ";
-envvalue.ossetenv(envcode);
-// or
-ossetenv(envcode, envvalue);
 .EE \"</code>
 .sp 1 \"</p>
 .sp 1 \"</p>
@@ -8717,7 +8717,7 @@ if (makelist(listname, keys)) ...
 
 
 
-.SH 2. RUN/PERFORM/EXECUTE
+.SH 2. PERFORM/EXECUTE/RUN
 .SH
 
 .SS
@@ -8770,6 +8770,55 @@ Run an exodus program/library.
 .sp 1 \"</p>
 .PP \"<p>
 Identical to perform() but any currently active select list in the calling program/library is not accessible to the executed program/library and is preserved in the calling [program as is. Any select list created by the executed library is discarded when it terminates.
+.sp 1 \"</p>
+
+
+.SS
+run(command)
+.PP \"<p>
+Run another program in parallel.
+.sp 1 \"</p>
+.PP \"<p>
+Unlike perform and execute, run() does not block until it completes. It runs in parallel.
+.sp 1 \"</p>
+.PP \"<p>
+\fBcommand:\fR See perform.
+.sp 1 \"</p>
+.PP \"<p>
+\fBreturn:\fR A "job" object that you can use to manage the running job.
+.sp 1 \"</p>
+.br
+\(bu Check if it has finished.
+.br
+\(bu Pause and wait for it to finish with optional timeout.
+.br
+\(bu When it has finished, access all its environment variables.
+.PP \"<p>
+See also:
+.sp 1 \"</p>
+.PD 0 \"<dl>
+.TP 10\"<dt>
+\fBrun_results()\fR \"</dt>
+For use in a range based for-loops to simplify the asynchronous collection of output from all commands as they complete. Programs inner environments are retained for post processing so any suitable environment variable e.g. DATA, ANS or RECORD can be used to return data.
+.\"</dd>
+.TP 10\"<dt>
+\fBshutdown_run()\fR \"</dt>
+Wait for all jobs to finish before continuing, otherwise, if the parent program exits, they will be aborted.
+.\"</dd>
+.PD \"</dl>
+.PP \"<p>
+.PP \"<p>
+\fBExample:\fR
+.EX \"<code>
+run("testlib aa");
+run("testlib bb");
+run("testlib cc");
+var results = "";
+// Process results asynchronously.
+for (auto& env : run_results())
+    results ^= env.DATA.f(2) ^ FM;
+.EE \"</code>
+.sp 1 \"</p>
 .sp 1 \"</p>
 
 
