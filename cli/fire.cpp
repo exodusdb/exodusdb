@@ -68,8 +68,12 @@ func main() {
 			try {
 				RECORD.replacer(find_rex, repl);
 			} catch (VarError e) {
-				nerrors++;
-				errputl(osfilename, ": ", e.message);
+				if (e.message.contains("UTF-8"))
+					outputl(osfilename, ": Not UTF-8");
+				else {
+					nerrors++;
+					errputl(osfilename, ": ", e.message);
+				}
 			}
 		}
 		if (RECORD != origrec) {
