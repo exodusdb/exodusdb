@@ -1,9 +1,7 @@
-//#include <iostream>
-//#include <string>
-//#include <vector>
-//#include <random>
-//#include <sstream>
-#include <chrono>
+#ifndef EXO_MODULE
+#	include <random>
+#	include <chrono>
+#endif
 #include <cassert>
 
 #include <exodus/program.h>

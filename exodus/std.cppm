@@ -736,41 +736,42 @@ export namespace std {
 		using std::filesystem::is_regular_file;
 	} // namespace filesystem
 
-	namespace chrono {
-		using std::chrono::_V2::system_clock;
-		using std::chrono::steady_clock;
-		using std::chrono::clock_time_conversion;
-		using std::chrono::sys_time;
-		using std::chrono::high_resolution_clock;
-		using std::chrono::system_clock;
-		using std::chrono::time_point;
-		using std::chrono::time_point_cast;
-		using std::chrono::clock_cast;
-		using std::chrono::duration;
-		using std::chrono::treat_as_floating_point;
-		using std::chrono::duration_values;
-		using std::chrono::duration_cast;
-//		using std::chrono::years;
-//		using std::chrono::months;
-//		using std::chrono::weeks;
-//		using std::chrono::days;
-		using std::chrono::hours;
-		using std::chrono::minutes;
-		using std::chrono::seconds;
-		using std::chrono::milliseconds;
-		using std::chrono::microseconds;
-		using std::chrono::nanoseconds;
-
-		using std::chrono::operator""h;   // hours
-		using std::chrono::operator""min; // minutes
-		using std::chrono::operator""s;   // sec
-		using std::chrono::operator""ms;  // millisecs
-		using std::chrono::operator""us;  // microsecs
-		using std::chrono::operator""ns;  // nanosecs
-		using std::chrono::operator""d;   // day of month
-		using std::chrono::operator""y;   // year
-
-	} // namespace chrono
+//	namespace chrono {
+//		using std::chrono::operator-;
+//		using std::chrono::_V2::system_clock;
+//		using std::chrono::steady_clock;
+//		using std::chrono::clock_time_conversion;
+//		using std::chrono::sys_time;
+//		using std::chrono::high_resolution_clock;
+//		using std::chrono::system_clock;
+//		using std::chrono::time_point;
+//		using std::chrono::time_point_cast;
+//		using std::chrono::clock_cast;
+//		using std::chrono::duration;
+//		using std::chrono::treat_as_floating_point;
+//		using std::chrono::duration_values;
+//		using std::chrono::duration_cast;
+////		using std::chrono::years;
+////		using std::chrono::months;
+////		using std::chrono::weeks;
+////		using std::chrono::days;
+//		using std::chrono::hours;
+//		using std::chrono::minutes;
+//		using std::chrono::seconds;
+//		using std::chrono::milliseconds;
+//		using std::chrono::microseconds;
+//		using std::chrono::nanoseconds;
+//
+//		using std::chrono::operator""h;   // hours
+//		using std::chrono::operator""min; // minutes
+//		using std::chrono::operator""s;   // sec
+//		using std::chrono::operator""ms;  // millisecs
+//		using std::chrono::operator""us;  // microsecs
+//		using std::chrono::operator""ns;  // nanosecs
+//		using std::chrono::operator""d;   // day of month
+//		using std::chrono::operator""y;   // year
+//
+//	} // namespace chrono
 
 	namespace this_thread {
 		using std::this_thread::sleep_for;
@@ -786,6 +787,136 @@ export namespace std {
 	}
 	inline namespace string_literals {
 		using string_literals::operator""s;
+	}
+
+  namespace chrono {
+    // Core Types
+    using std::chrono::duration;
+    using std::chrono::time_point;
+    using std::chrono::day;
+    using std::chrono::month;
+    using std::chrono::year;
+    using std::chrono::weekday;
+    using std::chrono::weekday_indexed;
+    using std::chrono::weekday_last;
+    using std::chrono::month_day;
+    using std::chrono::month_day_last;
+    using std::chrono::month_weekday;
+    using std::chrono::month_weekday_last;
+    using std::chrono::year_month;
+    using std::chrono::year_month_day;
+    using std::chrono::year_month_day_last;
+    using std::chrono::year_month_weekday;
+    using std::chrono::year_month_weekday_last;
+    using std::chrono::hh_mm_ss;
+    using std::chrono::sys_time;
+    using std::chrono::utc_time;
+    using std::chrono::tai_time;
+    using std::chrono::gps_time;
+    using std::chrono::file_time;
+    using std::chrono::local_time;
+
+    // Clock Types
+    using std::chrono::system_clock;
+    using std::chrono::steady_clock;
+    using std::chrono::high_resolution_clock;
+    using std::chrono::utc_clock;
+    using std::chrono::tai_clock;
+    using std::chrono::gps_clock;
+    using std::chrono::file_clock;
+    using std::chrono::local_t;
+
+    // Duration Aliases
+    using std::chrono::nanoseconds;
+    using std::chrono::microseconds;
+    using std::chrono::milliseconds;
+    using std::chrono::seconds;
+    using std::chrono::minutes;
+    using std::chrono::hours;
+    using std::chrono::days;
+    using std::chrono::weeks;
+    using std::chrono::months;
+    using std::chrono::years;
+
+    // Free Functions
+    using std::chrono::duration_cast;
+    using std::chrono::time_point_cast;
+    using std::chrono::floor;
+    using std::chrono::ceil;
+    using std::chrono::round;
+    using std::chrono::abs;
+    using std::chrono::clock_cast;
+
+    // Operator Overloads
+    using std::chrono::operator+;   // Covers duration+duration, time_point+duration, duration+time_point
+    using std::chrono::operator-;   // Covers duration-duration, time_point-time_point, time_point-duration
+    using std::chrono::operator*;   // Covers duration*scalar, scalar*duration
+    using std::chrono::operator/;   // Covers duration/scalar, duration/duration
+    using std::chrono::operator%;   // Covers duration%scalar, duration%duration
+    using std::chrono::operator==;  // Covers duration==duration, time_point==time_point
+    using std::chrono::operator<;   // Covers duration<duration, time_point<time_point
+    using std::chrono::operator>;   // Covers duration>duration, time_point>time_point
+    using std::chrono::operator<=;  // Covers duration<=duration, time_point<=time_point
+    using std::chrono::operator>=;  // Covers duration>=duration, time_point>=time_point
+    using std::chrono::operator<=>; // Covers duration<=>duration, time_point<=>time_point (C++20)
+
+    // Constants
+    using std::chrono::last;
+    using std::chrono::Sunday;
+    using std::chrono::Monday;
+    using std::chrono::Tuesday;
+    using std::chrono::Wednesday;
+    using std::chrono::Thursday;
+    using std::chrono::Friday;
+    using std::chrono::Saturday;
+    using std::chrono::January;
+    using std::chrono::February;
+    using std::chrono::March;
+    using std::chrono::April;
+    using std::chrono::May;
+    using std::chrono::June;
+    using std::chrono::July;
+    using std::chrono::August;
+    using std::chrono::September;
+    using std::chrono::October;
+    using std::chrono::November;
+    using std::chrono::December;
+
+    // Calendar and Time Zone Types/Functions
+    using std::chrono::sys_info;
+    using std::chrono::local_info;
+    using std::chrono::zoned_time;
+    using std::chrono::time_zone;
+    using std::chrono::time_zone_link;
+    using std::chrono::nonexistent_local_time;
+    using std::chrono::ambiguous_local_time;
+    using std::chrono::choose;
+    using std::chrono::get_tzdb;
+    using std::chrono::reload_tzdb;
+    using std::chrono::get_tzdb_list;
+    using std::chrono::remote_version;
+    using std::chrono::current_zone;
+    using std::chrono::locate_zone;
+    using std::chrono::tzdb;
+    using std::chrono::tzdb_list;
+
+    // Literal Operators (in std::chrono::literals)
+//    namespace literals {
+      using std::chrono::operator""h;
+      using std::chrono::operator""min;
+      using std::chrono::operator""s;
+      using std::chrono::operator""ms;
+      using std::chrono::operator""us;
+      using std::chrono::operator""ns;
+      using std::chrono::operator""d;
+      using std::chrono::operator""y;
+//    }
+  }
+
+	namespace chrono {
+	    using std::chrono::clock_time_conversion;
+	    using std::chrono::treat_as_floating_point;
+	    using std::chrono::duration_values;
 	}
 
 }
