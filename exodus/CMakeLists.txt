@@ -132,59 +132,6 @@
 #
 	include_directories(exodus)
 
-# cmake MODULE options?
-# #####################
-#
-# strings `which cmake`|grep _MODULE
-#
-# strings `which cmake`|grep CXX_MODULE
-#
-#CXX_MODULES
-#INTERFACE_CXX_MODULE_SETS
-#CXX_MODULE_DIRS
-#CXX_MODULE_SET
-#CXX_MODULE_DIRS_
-#CXX_MODULE_SET_
-#IMPORTED_CXX_MODULES_
-#CXX_MODULES_DIRECTORY
-#CXX_MODULES_BMI
-#CXX_MODULE_HEADERS
-#CXX_MODULE
-#IMPORTED_CXX_MODULES_INCLUDE_DIRECTORIES
-#IMPORTED_CXX_MODULES_COMPILE_DEFINITIONS
-#IMPORTED_CXX_MODULES_COMPILE_FEATURES
-#IMPORTED_CXX_MODULES_COMPILE_OPTIONS
-#IMPORTED_CXX_MODULES_LINK_LIBRARIES
-#CMAKE_CXX_MODULE_BMI_ONLY_FLAG
-
-#add_library(Constants)
-#target_sources(Constants
-#  PUBLIC
-#    FILE_SET cxx_modules TYPE CXX_MODULES FILES
-#    Constants.ixx
-#)
-
-#add_library(vartyp)
-#target_sources(vartyp
-#  PUBLIC
-#    FILE_SET cxx_modules TYPE CXX_MODULES FILES
-#	vartyp.cpp
-#)
-
-##
-## module allstd
-## #############
-##
-#	add_library(allstd)
-#	target_sources(allstd
-#		PUBLIC
-#		FILE_SET modules_public
-#		TYPE CXX_MODULES
-#		FILES
-#			allstd.cppm
-#	)
-#	target_compile_options(allstd PRIVATE -Wno-include-angled-in-module-purview -Wno-reserved-module-identifier)
-
 #
 # module std
 # ##########
