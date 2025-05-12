@@ -40,6 +40,7 @@ func main() {
 	// TODO Enable fire to replace only outside/only inside quotes/literals/comments.
 	rex find_rex = rex(find,rxopts);
 
+	var nerrors = 0;
 	for (in osfilename : COMMAND) {
 
 		if (verbose)
@@ -63,9 +64,14 @@ func main() {
 
 		if (raw)
 			RECORD.replacer(find, repl);
-		else
-			RECORD.replacer(find_rex, repl);
-
+		else {
+			try {
+				RECORD.replacer(find_rex, repl);
+			} catch (VarError e) {
+				nerrors++;
+				errputl(osfilename, ": ", e.message);
+			}
+		}
 		if (RECORD != origrec) {
 
 			printl(osfilename);
@@ -106,7 +112,7 @@ func main() {
 			}
 		}
 	}
-	return 0;
+	return nerrors;
 }
 
 }; // programexit()
