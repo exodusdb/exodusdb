@@ -228,7 +228,7 @@ listen:
 				// if servername then body:=fm:'ServerName=':servername
 
 				body ^= FM ^ FM ^ msg_;
-				body.converter(FM ^ VM ^ SM ^ TM ^ ST ^ "|",
+				body.converter(FM ^ VM ^ SM ^ TM ^ STM ^ "|",
 							   "\r"
 							   "\r"
 							   "\r"

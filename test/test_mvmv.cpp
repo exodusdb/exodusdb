@@ -691,7 +691,7 @@ func main() {
 
 //function to conveniently test sum function
 func test_sum(in instr) {
-	return sum(instr.convert("~^]}>|", _RM _FM _VM _SM _TM _ST)).convert(_RM _FM _VM _SM _TM _ST, "~^]}>|");
+	return sum(instr.convert("~^]}>|", _RM _FM _VM _SM _TM _STM)).convert(_RM _FM _VM _SM _TM _STM, "~^]}>|");
 }
 
 }; // programexit()

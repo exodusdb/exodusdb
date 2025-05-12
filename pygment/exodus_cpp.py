@@ -120,12 +120,12 @@ class ExodusCppLexer(CppLexer):
 'NL_', 'BS_', 'DQ_', 'SQ_',
 
 # Exodus literal abbreviations.        Fixed in Exodus.
-'RM', 'FM', 'VM', 'SM', 'TM', 'ST',
-'_RM', '_FM', '_VM', '_SM', '_TM', '_ST',
-'RM_', 'FM_', 'VM_', 'SM_', 'TM_', 'ST_',
+'RM', 'FM', 'VM', 'SM', 'TM', 'STM',
+'_RM', '_FM', '_VM', '_SM', '_TM', '_STM',
+'RM_', 'FM_', 'VM_', 'SM_', 'TM_', 'STM_',
 '_ALL_FMS',
-'_VISIBLE_RM', '_VISIBLE_FM', '_VISIBLE_VM', '_VISIBLE_SM', '_VISIBLE_TM', '_VISIBLE_ST',
-'VISIBLE_RM_', 'VISIBLE_FM_', 'VISIBLE_VM_', 'VISIBLE_SM_', 'VISIBLE_TM_', 'VISIBLE_ST_',
+'_VISIBLE_RM', '_VISIBLE_FM', '_VISIBLE_VM', '_VISIBLE_SM', '_VISIBLE_TM', '_VISIBLE_STM',
+'VISIBLE_RM_', 'VISIBLE_FM_', 'VISIBLE_VM_', 'VISIBLE_SM_', 'VISIBLE_TM_', 'VISIBLE_STM_',
 '_VISIBLE_FMS',
 
 # CPU, OS, compiler and c++ info.      Fixed in Exodus build/release.

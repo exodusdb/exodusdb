@@ -138,7 +138,7 @@ func main() {
 
 		printl("\nCheck round trip up to 64Kib + 1");
 		for (var chn : range(0, 65536)) {
-			if (chn < ST_ or chn >= RM_) {
+			if (chn < STM_ or chn >= RM_) {
 				var hex = oconv(chn, "MX");
 	//			logputl(chn, "\t", hex.squote(), "\t", hex.iconv("MX").squote());
 				assert(chn== iconv(oconv(chn, "MX"), "MX"));

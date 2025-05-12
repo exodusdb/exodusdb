@@ -2169,7 +2169,7 @@ func main() {
 		let v6 = "s1}s2"_var.oconv("TX"); assert(v6.errputl() == "s1" _BS _BS _NL "s2");
 		// 7. TM -> "\\\" \n
 		let v7 = "t1|t2"_var.oconv("TX"); assert(v7.errputl() == "t1" _BS _BS _BS _NL "t2");
-		// 8. ST -> "\\\\" \n
+		// 8. STM -> "\\\\" \n
 		let v8 = "st1~st2"_var.oconv("TX"); assert(v8.errputl() == "st1" _BS _BS _BS _BS _NL "st2");
 	}
 

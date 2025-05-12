@@ -1461,8 +1461,8 @@ std::string var::oconv_TX(const char* conversion) const {
 	// so we have to escape them somehow first
 	// for usual case skip if no backslashes are present
 	if (result.var_str.find('\\') != std::string::npos)
-		//result.regex_replacer("\\\\([" _FM _VM _SM _TM _ST "])", "{Back_Slash}\\1");
-		result.replacer("\\\\([" _FM _VM _SM _TM _ST "])"_rex, "{Back_Slash}$1");
+		//result.regex_replacer("\\\\([" _FM _VM _SM _TM _STM "])", "{Back_Slash}\\1");
+		result.replacer("\\\\([" _FM _VM _SM _TM _STM "])"_rex, "{Back_Slash}$1");
 
 	// "\n" -> "\\n"
 	result.replacer("\\n", "\\\\n");
@@ -1476,13 +1476,13 @@ std::string var::oconv_TX(const char* conversion) const {
 	// VM -> \ + LF
 	// SM -> \\ + LF
 	// TM -> \\\ + LF
-	// ST -> \\\\ + LF
+	// STM -> \\\\ + LF
 	const char raw = conversion[2];
 	if (not raw) {
 		result.replacer(_VM, "\\"                "\n");
 		result.replacer(_SM, "\\" "\\"           "\n");
 		result.replacer(_TM, "\\" "\\" "\\"      "\n");
-		result.replacer(_ST, "\\" "\\" "\\" "\\" "\n");
+		result.replacer(_STM, "\\" "\\" "\\" "\\" "\n");
 	}
 
 	return result.var_str;
@@ -1496,10 +1496,10 @@ var  var::iconv_TX(const char* conversion) const {
 	// \ + LF -> VM
 	// \\ + LF -> SM
 	// \\ + LF -> TM
-	// \\\ + LF -> ST
+	// \\\ + LF -> STM
 	const char raw = conversion[2];
 	if (not raw) {
-		record.replacer("\\" "\\" "\\" "\\" "\n", _ST);
+		record.replacer("\\" "\\" "\\" "\\" "\n", _STM);
 		record.replacer("\\" "\\" "\\"      "\n", _TM);
 		record.replacer("\\" "\\"           "\n", _SM);
 		record.replacer("\\"                "\n", _VM);
@@ -1518,8 +1518,8 @@ var  var::iconv_TX(const char* conversion) const {
 	// so we have to escape them somehow first
 	// for usual case skip if no { is present
 	if (record.var_str.find('{') != std::string::npos)
-		//record.regex_replacer("{Back_Slash}([" _FM _VM _SM _TM _ST "])", "\\\\" "\\1");
-		record.replacer("{Back_Slash}([" _FM _VM _SM _TM _ST "])"_rex, "\\" "$1");
+		//record.regex_replacer("{Back_Slash}([" _FM _VM _SM _TM _STM "])", "\\\\" "\\1");
+		record.replacer("{Back_Slash}([" _FM _VM _SM _TM _STM "])"_rex, "\\" "$1");
 
 	return record;
 }

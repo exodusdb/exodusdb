@@ -14,7 +14,7 @@ func main() {
 		assert(match(_VM, "\\s") == _VM);
 		assert(match(_SM, "\\s") == _SM);
 		assert(match(_TM, "\\s") == "");
-		assert(match(_ST, "\\s") == "");
+		assert(match(_STM, "\\s") == "");
 
 		// Demo simplicity of exodus regex
 		//
@@ -205,8 +205,8 @@ func main() {
 
 	var r1 = _FM "0.123";
 	assert(r1.replace("([\x1A-\x1F]-?)0."_rex, "$1.") eq _FM ".123");
-	var r2 = _ST "-0.123";
-	assert(r2.replace("([\x1A-\x1F]-?)0."_rex, "$1.") eq _ST "-.123");
+	var r2 = _STM "-0.123";
+	assert(r2.replace("([\x1A-\x1F]-?)0."_rex, "$1.") eq _STM "-.123");
 
 	//replacing unicode style numbers characters using javascript style regex
 	//assert(var("Ⅻ").replace(R"(\p{Number})"_rex,"yes")=="yes");

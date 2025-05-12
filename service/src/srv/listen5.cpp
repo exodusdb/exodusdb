@@ -248,7 +248,7 @@ func main(in request1, in request2in, in request3in, in request4in, in request5i
 		// swap tm with "[" in logx
 		logx.converter(_FM _VM _SM _TM, "^]\\[");
 		// logx.converter(_ALL_FMS, _VISIBLE_FMS);
-		logx.replacer(ST, "%FA");
+		logx.replacer(STM, "%FA");
 
 		logx.replacer("%20", " ");
 		// does not seem to format in XML

@@ -78,7 +78,7 @@ export namespace exo {
 //	using exo::VM;
 //	using exo::SM;
 //	using exo::TM;
-//	using exo::ST;
+//	using exo::STM;
 
 	using exo::ExoExit;
 	using exo::ExoAbort;

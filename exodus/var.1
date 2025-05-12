@@ -518,7 +518,7 @@ TM  Text mark
 .\"</dd>
 .TP 10\"<dt>
 \fB~\fR \"</dt>
-ST  Subtext mark
+STM  Subtext mark
 .\"</dd>
 .PD \"</dl>
 .PP \"<p>
@@ -1641,7 +1641,7 @@ Convert all FM to VM, VM to SM etc.
 \fBreturn:\fR The converted string.
 .sp 1 \"</p>
 .PP \"<p>
-Note that subtext ST chars are not converted because they are already the lowest level.
+Note that subtext STM chars are not converted because they are already the lowest level.
 .sp 1 \"</p>
 .PP \"<p>
 String size remains identical.
@@ -2348,7 +2348,7 @@ var v1 = strvar.substr2(io pos1, out delimiterno);
 substr version 4.
 .sp 1 \"</p>
 .PP \"<p>
-Copy a substr from a given char position up to (but excluding) the next field mark char (RM, FM, VM, SM, TM, ST).
+Copy a substr from a given char position up to (but excluding) the next field mark char (RM, FM, VM, SM, TM, STM).
 .sp 1 \"</p>
 .PP \"<p>
 \fBreturn:\fR A substr or "".
@@ -2381,7 +2381,7 @@ This function is valuable for high performance processing of dynamic arrays.
 It is notably used in "list" to print parallel columns of mixed combinations of multivalues/subvalues and text marks correctly lined up mv to mv, sv to sv, tm to tm even when particular values, subvalues and text fragments are missing from particular columns.
 .sp 1 \"</p>
 .PP \"<p>
-It is similar to version 3 of substr - substr(pos1, delimiterchars, pos2) except that in this version the delimiter chars are hard coded as the standard field mark chars (RM, FM, VM, SM, TM, ST) and it returns the first char position of the next substr, not the char position of the next field mark char.
+It is similar to version 3 of substr - substr(pos1, delimiterchars, pos2) except that in this version the delimiter chars are hard coded as the standard field mark chars (RM, FM, VM, SM, TM, STM) and it returns the first char position of the next substr, not the char position of the next field mark char.
 .sp 1 \"</p>
 .PP \"<p>
 .PP \"<p>
@@ -7856,7 +7856,7 @@ let v5 = "v1]v2"_var.oconv("TX");  // "v1" _BS _NL "v2"
 let v6 = "s1}s2"_var.oconv("TX");  // "s1" _BS _BS _NL "s2"
 // 7. TM -> "\\\" \n
 let v7 = "t1|t2"_var.oconv("TX");  // "t1" _BS _BS _BS _NL "t2"
-// 8. ST -> "\\\\" \n
+// 8. STM -> "\\\\" \n
 let v8 = "st1~st2"_var.oconv("TX"); // "st1" _BS _BS _BS _BS _NL "st2"
 .EE \"</code>
 .sp 1 \"</p>

@@ -230,7 +230,7 @@ func main(in msg0, in subject0 = "", in username0 = "") {
 
 		if (request_) {
 			temp = request_;
-			temp.converter(RM ^ FM ^ VM ^ SM ^ TM ^ ST, "`^]}\\~");
+			temp.converter(RM ^ FM ^ VM ^ SM ^ TM ^ STM, "`^]}\\~");
 			body(-1) = oconv("Request:", l9) ^ temp;
 		}
 
@@ -249,7 +249,7 @@ func main(in msg0, in subject0 = "", in username0 = "") {
 			temp.replacer("}", "%7D");
 			temp.replacer("\\", "%5C");
 			temp.replacer("~", "%7E");
-			temp.converter(RM ^ FM ^ VM ^ SM ^ TM ^ ST, "`^]}\\~");
+			temp.converter(RM ^ FM ^ VM ^ SM ^ TM ^ STM, "`^]}\\~");
 			body(-1) = oconv("Data:", l9) ^ temp;
 		}
 
@@ -258,7 +258,7 @@ func main(in msg0, in subject0 = "", in username0 = "") {
 			body(-1) = oconv("Duration:", l9) ^ elapsedtimetext(date().ostimestamp(requeststarttime), ostimestamp());
 		}
 
-		body.converter(FM ^ VM ^ SM ^ TM ^ ST ^ "|",
+		body.converter(FM ^ VM ^ SM ^ TM ^ STM ^ "|",
 					   "\r"
 					   "\r"
 					   "\r"

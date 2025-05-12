@@ -3,7 +3,7 @@
 'var', '_var', 'BASEFMT', 'BS', 'CVR', 'Callable', 'DATEFMT', 'DQ', 
 'DimIndexOutOfBounds', 'DimUndimensioned', 'EOL', 'ExoAbort', 'ExoAbortAll', 
 'ExoCommon', 'ExoEnv', 'ExoProgram', 'ExoStop', 'FM', 'NL', 'OSSLASH', 
-'OSSLASH_IS_BACKSLASH', 'PLATFORM', 'RELOAD_req', 'RM', 'SM', 'SQ', 'ST', 'SV', 
+'OSSLASH_IS_BACKSLASH', 'PLATFORM', 'RELOAD_req', 'RM', 'SM', 'SQ', 'STM', 'SV', 
 'TERMINATE_req', 'TM', 'TZ', 'VARREF', 'VM', 'VarDBException', 'VarDebug', 
 'VarDivideByZero', 'VarError', 'VarInvalidPointer', 'VarNonNumeric', 
 'VarNonPositive', 'VarNotImplemented', 'VarNumOverflow', 'VarNumUnderflow', 

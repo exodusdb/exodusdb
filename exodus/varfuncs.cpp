@@ -1756,7 +1756,7 @@ IO   var::cropper() REF {
 		char charx = *cur_iter++;
 
 		// Simply append ordinary characters
-		if (!char_is_ASCII(charx) || charx > RM_ || charx < ST_) {
+		if (!char_is_ASCII(charx) || charx > RM_ || charx < STM_) {
 			*out_iter++ = charx;
 			continue;
 		}
@@ -1768,7 +1768,7 @@ IO   var::cropper() REF {
 		// e.g. aaa]]]^bbb -> aaa^bbb
 		while (out_iter != beg_iter) {
 			char lastchar = *(out_iter-1);
-			if (char_is_ASCII(lastchar) && lastchar >= ST_ && lastchar < charx)
+			if (char_is_ASCII(lastchar) && lastchar >= STM_ && lastchar < charx)
 				out_iter--;
 			else
 				break;
@@ -1784,7 +1784,7 @@ IO   var::cropper() REF {
 
 	// Remove all trailing fms.
 	// The above algorithm only trims superfluous fms within the string.
-	auto last_not_fm = var_str.find_last_not_of(_RM _FM _VM _SM _TM _ST);
+	auto last_not_fm = var_str.find_last_not_of(_RM _FM _VM _SM _TM _STM);
 	if (last_not_fm == std::string::npos)
 		var_str.clear();
 	else
@@ -1804,12 +1804,12 @@ IO   var::lowerer() REF {
 	//assertString(function_sig);
 
 	// note: rotate lowest sep to highest
-	//this->converter(_RM _FM _VM _SM _TM _ST, _FM _VM _SM _TM _ST _RM);
+	//this->converter(_RM _FM _VM _SM _TM _STM, _FM _VM _SM _TM _STM _RM);
 
-	//bottom marks get crushed together but ST is infrequently used
-	// reversible by raiser only if no ST chars are present - which are not common
-//	this->converter(_RM _FM _VM _SM _TM, _FM _VM _SM _TM _ST);
-//	string_converter(var_str, _RM _FM _VM _SM _TM, _FM _VM _SM _TM _ST);
+	//bottom marks get crushed together but STM is infrequently used
+	// reversible by raiser only if no STM chars are present - which are not common
+//	this->converter(_RM _FM _VM _SM _TM, _FM _VM _SM _TM _STM);
+//	string_converter(var_str, _RM _FM _VM _SM _TM, _FM _VM _SM _TM _STM);
 
 	for (char& c : var_str) {
 
@@ -1825,8 +1825,8 @@ IO   var::lowerer() REF {
 		if (c > RM_) LIKELY
 			continue;
 
-		// Bump DOWN all field marks except the bottom one (ST_)
-		if (c > ST_)
+		// Bump DOWN all field marks except the bottom one (STM_)
+		if (c > STM_)
 			c -=1;
 	}
 
@@ -1844,12 +1844,12 @@ IO   var::raiser() REF {
 
 	// note: rotate highest sep to lowest
 	// advantage is it is reversible by lowerer but the problem is that the smallest delimiter becomes the largest
-	//this->converter(_FM _VM _SM _TM _ST _RM, _RM _FM _VM _SM _TM _ST);
+	//this->converter(_FM _VM _SM _TM _STM _RM, _RM _FM _VM _SM _TM _STM);
 
 	// top two marks get crushed together but RM is rarely used
 	// reversible by lowerer only if no RM are present - which are rare
-//	this->converter(_FM _VM _SM _TM _ST, _RM _FM _VM _SM _TM);
-//	string_converter(var_str, _FM _VM _SM _TM _ST, _RM _FM _VM _SM _TM);
+//	this->converter(_FM _VM _SM _TM _STM, _RM _FM _VM _SM _TM);
+//	string_converter(var_str, _FM _VM _SM _TM _STM, _RM _FM _VM _SM _TM);
 
 	for (char& c : var_str) {
 
@@ -1866,7 +1866,7 @@ IO   var::raiser() REF {
 			continue;
 
 		// Bump UP all field marks except the top one (RT_)
-		if (c >= ST_)
+		if (c >= STM_)
 			c +=1;
 	}
 

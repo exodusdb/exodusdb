@@ -284,7 +284,7 @@ func main() {
 		assert(unique("x]y]x]z"_var) eq convert("x]y]z", "]", VM));
 		assert(unique("x}y}x}z"_var) eq convert("x}y}z", "}", SM));
 		assert(unique("x|y|x|z"_var) eq convert("x|y|z", "|", TM));
-		assert(unique("x~y~x~z"_var) eq convert("x~y~z", "~", ST));
+		assert(unique("x~y~x~z"_var) eq convert("x~y~z", "~", STM));
 	}
 
 	{
@@ -306,7 +306,7 @@ func main() {
 		assert(x eq convert("x|y|z", "|", TM));
 		x = "x~y~x~z"_var;
 		uniquer(x);
-		assert(x eq convert("x~y~z", "~", ST));
+		assert(x eq convert("x~y~z", "~", STM));
 	}
 
 	{

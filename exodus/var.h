@@ -376,7 +376,7 @@ public:
 	// * ]     * VM  Value mark
 	// * }     * SM  Subvalue mark
 	// * |     * TM  Text mark
-	// * ~     * ST  Subtext mark
+	// * ~     * STM  Subtext mark
 	//
 	// `var v1 = "f1^f2^v1]v2^f4"_var; // "f1" _FM "f2" _FM "v1" _VM "v2" _FM "f4"`
 	//
@@ -979,7 +979,7 @@ public:
 	// Reduce all types of field mark chars by one level.
 	// Convert all FM to VM, VM to SM etc.
 	// return: The converted string.
-	// Note that subtext ST chars are not converted because they are already the lowest level.
+	// Note that subtext STM chars are not converted because they are already the lowest level.
 	// String size remains identical.
 	//
 	// `let v1 = "a1^b2^c3"_var.lower(); // "a1]b2]c3"_var
@@ -1301,7 +1301,7 @@ public:
 	// delimiterno) const;
 
 	// substr version 4.
-	// Copy a substr from a given char position up to (but excluding) the next field mark char (RM, FM, VM, SM, TM, ST).
+	// Copy a substr from a given char position up to (but excluding) the next field mark char (RM, FM, VM, SM, TM, STM).
 	// return: A substr or "".
 	// pos1: [in] The position of the first char to copy. Negative positions count backwards from the last char of the string.
 	// pos1[out]: The position of the first char of the next substr after whatever field mark char is found, or one char position after the end of the source string if no subsequent field mark char is found.
@@ -1312,7 +1312,7 @@ public:
 	// The equivalent in Pick OS was the statement "Remove variable From string At column Setting flag"
 	// This function is valuable for high performance processing of dynamic arrays.
 	// It is notably used in "list" to print parallel columns of mixed combinations of multivalues/subvalues and text marks correctly lined up mv to mv, sv to sv, tm to tm even when particular values, subvalues and text fragments are missing from particular columns.
-	// It is similar to version 3 of substr - substr(pos1, delimiterchars, pos2) except that in this version the delimiter chars are hard coded as the standard field mark chars (RM, FM, VM, SM, TM, ST) and it returns the first char position of the next substr, not the char position of the next field mark char.
+	// It is similar to version 3 of substr - substr(pos1, delimiterchars, pos2) except that in this version the delimiter chars are hard coded as the standard field mark chars (RM, FM, VM, SM, TM, STM) and it returns the first char position of the next substr, not the char position of the next field mark char.
 	//
 	// `var pos1 = 4, field_mark_no;
 	//  let v1 = "12^45^78"_var.substr2(pos1, field_mark_no);  // "45" // pos1 -> 7 // field_mark_no -> 2 // field_mark_no 2 means that a FM was found.
@@ -4271,7 +4271,7 @@ public:
 	//  // 7. TM -> "\\\" \n
 	//  let v7 = "t1|t2"_var.oconv("TX");  // "t1" _BS _BS _BS _NL "t2"
 	//
-	//  // 8. ST -> "\\\\" \n
+	//  // 8. STM -> "\\\\" \n
 	//  let v8 = "st1~st2"_var.oconv("TX"); // "st1" _BS _BS _BS _BS _NL "st2"`
 	//
 	ND std::string oconv_TX(const char* conversion) const;
@@ -4802,7 +4802,7 @@ ND inline var_proxy3 var::operator()(int fieldno, int valueno, int subvalueno) {
 	PUBLIC extern const var VM;
 	PUBLIC extern const var SM;
 	PUBLIC extern const var TM;
-	PUBLIC extern const var ST;
+	PUBLIC extern const var STM;
 
 	PUBLIC extern const var BS;
 	PUBLIC extern const var DQ;
@@ -4822,7 +4822,7 @@ ND inline var_proxy3 var::operator()(int fieldno, int valueno, int subvalueno) {
 	CONSTINIT_VAR const var VM = VM_;
 	CONSTINIT_VAR const var SM = SM_;
 	CONSTINIT_VAR const var TM = TM_;
-	CONSTINIT_VAR const var ST = ST_;
+	CONSTINIT_VAR const var STM = STM_;
 
 	CONSTINIT_VAR const var BS = BS_;
 	CONSTINIT_VAR const var DQ = DQ_;

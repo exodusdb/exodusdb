@@ -692,7 +692,7 @@ static inline std::size_t count_all_field_marks(SV sv1) {
 	std::size_t result = 0;
 
 	while (iter != end2) {
-		if ((*iter) <= RM_ && (*iter) >= ST_) {
+		if ((*iter) <= RM_ && (*iter) >= STM_) {
 			result++;
 		}
 		iter++;
@@ -731,7 +731,7 @@ inline std::size_t find_first_fm(const std::string& s1, std::size_t pos) {
 	auto iter = s1.c_str() + pos;
 	for (;;) {
 		if (*iter <= RM_) {
-			if (*iter >= ST_)
+			if (*iter >= STM_)
 				return iter - s1.c_str();
 			if (*iter == 0)
 				return std::string::npos;
@@ -784,7 +784,7 @@ var var::locate(in target) const {
 		// Skip if target_pos > 0 and prior char is not any one of the field marks
 		if (target_pos > 0) {
 			c = var_str[target_pos - 1];
-			if (c > RM_ || c < ST_) {
+			if (c > RM_ || c < STM_) {
 				goto next_search;
 			}
 		}
@@ -801,7 +801,7 @@ found:
 
 		// Success if the following char is any one of the field marks
 		c = var_str[target_end];
-		if (c <= RM_ && c >= ST_)
+		if (c <= RM_ && c >= STM_)
 			goto found;
 
 next_search:
@@ -826,7 +826,7 @@ next_search:
 		if (var_str.size() == 0)
 			return 1;
 		char last_char = var_str.back();
-		if (last_char <= RM_ && last_char >= ST_)
+		if (last_char <= RM_ && last_char >= STM_)
 			return count_all_field_marks(SV(var_str)) + 1;
 	}
 	return 0;
@@ -1682,7 +1682,7 @@ var  var::mv(const char* opcode, in var2) const {
 		// find the end of a value in var1 (this)
 		if (separator1 <= separator2) {
 getnextp1:
-//			p1b = var_str.find_first_of(_RM _FM _VM _SM _TM _ST, p1a);
+//			p1b = var_str.find_first_of(_RM _FM _VM _SM _TM _STM, p1a);
 			p1b = find_first_fm(var_str, p1a);
 			if (p1b == std::string::npos) {
 				separator1 = RM_ + 1;
@@ -1696,7 +1696,7 @@ getnextp1:
 		// find the end of a value in var1 (this)
 		if (separator2 <= separator1_prior) {
 getnextp2:
-//			p2b = var2.var_str.find_first_of(_RM _FM _VM _SM _TM _ST, p2a);
+//			p2b = var2.var_str.find_first_of(_RM _FM _VM _SM _TM _STM, p2a);
 			p2b = find_first_fm(var2.var_str, p2a);
 			if (p2b == std::string::npos) {
 				separator2 = RM_ + 1;
@@ -1831,7 +1831,7 @@ var  var::substr(const int pos1, SV delimiterchars, out pos2) const {
 ////////
 
 // returns the characters up to the next delimiter
-// delimiter returned as numbers RM=1F=1 FM=1E=2, VM=1D=3 SM=1C=4 TM=1B=5 to ST=1A=6 or 0 if not found
+// delimiter returned as numbers RM=1F=1 FM=1E=2, VM=1D=3 SM=1C=4 TM=1B=5 to STM=1A=6 or 0 if not found
 // NOTE pos1 is 1 based not 0. anything less than 1 is treated as 1
 var  var::substr2(io pos1, out delimiterno) const {
 
@@ -1864,7 +1864,7 @@ var  var::substr2(io pos1, out delimiterno) const {
 
 	// find the end of the field (or string)
 	std::size_t end_pos;
-//	end_pos = var_str.find_first_of(_RM _FM _VM _SM _TM _ST, pos);
+//	end_pos = var_str.find_first_of(_RM _FM _VM _SM _TM _STM, pos);
 	end_pos = find_first_fm(var_str, pos);
 
 	// past of of string?
@@ -1878,7 +1878,7 @@ var  var::substr2(io pos1, out delimiterno) const {
 		//return returnable;
 	}
 
-	// delimiters returned as numbers RM=1F=1 FM=1E=2, VM=1D=3 SM=1C=4 TM=1B=5 to ST=1A=6
+	// delimiters returned as numbers RM=1F=1 FM=1E=2, VM=1D=3 SM=1C=4 TM=1B=5 to STM=1A=6
 	// delimiterno=int(LASTDELIMITERCHARNOPLUS1-var_str[end_pos]);
 	delimiterno = static_cast<int>(*_RM) - static_cast<int>(var_str[end_pos]) + 1;
 
@@ -1996,7 +1996,7 @@ var  var::sumall() const {
 	var subfield, term;
 	std::size_t maxdecimals = 0;
 	while (true) {
-		//this extracts a substring up to any separator charactor ST-RM
+		//this extracts a substring up to any separator charactor STM-RM
 		subfield = (*this).substr2(start, term);
 
 		std::size_t subfieldsize = subfield.var_str.size();
@@ -2033,7 +2033,7 @@ var  var::sum() const {
 	var nextsep;  //num
 	var accum;	  //num
 
-	let min_sep = ST.ord();  //26
+	let min_sep = STM.ord();  //26
 	let max_sep = RM.ord();	  //31
 
 	var min_sep_present;
@@ -2145,7 +2145,7 @@ var  var::sum(SV separator) const {
 	var nrvo = 0;
 	int nn = this->fcount(separator);
 
-	// static var allseparators=_ST _TM _SM _VM _FM _RM;
+	// static var allseparators=_STM _TM _SM _VM _FM _RM;
 	// var separatorn=allseparators.contains(separator);
 	// if (!separatorn) return var1*var2;
 
@@ -2168,7 +2168,7 @@ var  var::stddev() const {
 	assertString(function_sig);
 
 	// Handle any field delimiters
-	var strvar = this->convert(_VM _SM _TM _ST _RM, _FM _FM _FM _FM _FM);
+	var strvar = this->convert(_VM _SM _TM _STM _RM, _FM _FM _FM _FM _FM);
 
 	// n, tot, mean
 	int n = strvar.fcount(_FM);

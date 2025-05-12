@@ -641,7 +641,7 @@ subr onedictid(in dictfile, in dictfilename, io dictid, in reqdictid) {
 		chars.replacer("FA", "");
 		chars = "\\x1D\\x1E" ^ iconv(chars, "HEX");
 		chars.replacer("'", "''");
-		chars ^= "\\x1A";  //ST
+		chars ^= "\\x1A";  //STM
 		chars ^= "\\x1B";  //TM
 		chars ^= "\\x1C";  //SM
 		chars ^= "\\x1F";  //RM

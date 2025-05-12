@@ -360,14 +360,14 @@ func main() {
 
 	{
 		// all 6 DONT round trip lower+raise
-		var seps = _RM _FM _VM _SM _TM _ST;
+		var seps = _RM _FM _VM _SM _TM _STM;
 		TRACE(seps)
 		TRACE(lower(seps))
-		assert(lower(seps)         eq _FM _VM _SM _TM _ST _ST);
+		assert(lower(seps)         eq _FM _VM _SM _TM _STM _STM);
 		assert(lower(seps).raise() != seps); // no round trip
 
 		// all 6 DONT round trip raise+lower
-		seps = _RM _FM _VM _SM _TM _ST;
+		seps = _RM _FM _VM _SM _TM _STM;
 		assert(raise(seps)         eq _RM _RM _FM _VM _SM _TM);
 		assert(raise(seps).lower() != seps); // no round trip
 	}
@@ -375,11 +375,11 @@ func main() {
 	{
 		// top 5 DO round trip lower + lower OK
 		var seps = _RM _FM _VM _SM _TM;
-		assert(lower(seps)         eq _FM _VM _SM _TM _ST);
+		assert(lower(seps)         eq _FM _VM _SM _TM _STM);
 		assert(lower(seps).raise() eq seps);
 
 		// bottom 5 DO round trip raise+lower OK
-		seps = _FM _VM _SM _TM _ST;
+		seps = _FM _VM _SM _TM _STM;
 		assert(raise(seps)         eq _RM _FM _VM _SM _TM);
 		assert(raise(seps).lower() eq seps);
 	}
@@ -389,15 +389,15 @@ func main() {
 
 	{
 		// all 6 DONT round trip lowerer+raiser OK
-		var seps    =  _RM _FM _VM _SM _TM _ST;
+		var seps    =  _RM _FM _VM _SM _TM _STM;
 		var	x       =  seps;
 		lowerer(x);
-		assert(x    eq _FM _VM _SM _TM _ST _ST);
+		assert(x    eq _FM _VM _SM _TM _STM _STM);
 		raiser(x);
 		assert(x != seps);//no round trip
 
 		// all 6 DONT round trip raiser+lower OK
-		seps     =  _RM _FM _VM _SM _TM _ST;
+		seps     =  _RM _FM _VM _SM _TM _STM;
 		x        =  seps;
 		//raiser.dump().outputl();
 		raiser(x);
@@ -411,12 +411,12 @@ func main() {
 		var seps         =  _RM _FM _VM _SM _TM;
 		var x            =  seps;
 		lowerer(x);
-		assert(x         eq _FM _VM _SM _TM _ST);
+		assert(x         eq _FM _VM _SM _TM _STM);
 		raiser(x);
 		assert(x eq seps);
 
 		// bottom 5 round trip raiser+lower OK
-		seps     =  _FM _VM _SM _TM _ST;
+		seps     =  _FM _VM _SM _TM _STM;
 		x	     =  seps;
 		raiser(x);
 		assert(x eq _RM _FM _VM _SM _TM);

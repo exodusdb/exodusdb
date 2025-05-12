@@ -71,7 +71,7 @@
 #define _VM "\x1D"  // Value Mark
 #define _SM "\x1C"  // Subvalue Mark
 #define _TM "\x1B"  // Text Mark
-#define _ST "\x1A"  // Subtext Mark
+#define _STM "\x1A"  // Subtext Mark
 
 #define _NL "\n"
 #define _BS "\\"
@@ -86,7 +86,7 @@
 #define VM_ '\x1D'     // Value Mark
 #define SM_ '\x1C'     // Subvalue Mark
 #define TM_ '\x1B'     // Text Mark
-#define ST_ '\x1A'     // Subtext Mark
+#define STM_ '\x1A'     // Subtext Mark
 
 #define NL_ '\n'
 #define BS_ '\\'
@@ -107,16 +107,16 @@
 #define VISIBLE_VM_ ']'
 #define VISIBLE_SM_ '}'
 #define VISIBLE_TM_ '|'
-#define VISIBLE_ST_ '~'
+#define VISIBLE_STM_ '~'
 
 #define _VISIBLE_RM "`"
 #define _VISIBLE_FM "^"
 #define _VISIBLE_VM "]"
 #define _VISIBLE_SM "}"
 #define _VISIBLE_TM "|"
-#define _VISIBLE_ST "~"
+#define _VISIBLE_STM "~"
 
-#define _ALL_FMS _RM _FM _VM _SM _TM _ST
+#define _ALL_FMS _RM _FM _VM _SM _TM _STM
 
 // Useful TRACE() function for debugging
 #define TRACE(EXPRESSION) \

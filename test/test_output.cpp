@@ -89,7 +89,7 @@ func main() {
 subr generate() {
 
 	// Prepare some text with all the field marks
-	var fms = "RM= `;  FM= ^;  VM= ];  SM= };  TM= |;  ST= ~; "_var;
+	var fms = "RM= `;  FM= ^;  VM= ];  SM= };  TM= |;  STM= ~; "_var;
 
 	// All varieties of var.output call var.put() to output
 
@@ -244,81 +244,81 @@ subr generate() {
 let expected_stdout = R"V0G0N(
 
 === free output() ===
-RM= ;  FM= ;  VM= ;  SM= ;  TM= ;  ST= ; 
+RM= ;  FM= ;  VM= ;  SM= ;  TM= ;  STM= ; 
 
 === free outputt() ===
-		RM= ;  FM= ;  VM= ;  SM= ;  TM= ;  ST= ; 
+		RM= ;  FM= ;  VM= ;  SM= ;  TM= ;  STM= ; 
 
 === free outputl() ===
-RM= ;  FM= ;  VM= ;  SM= ;  TM= ;  ST= ; 
+RM= ;  FM= ;  VM= ;  SM= ;  TM= ;  STM= ; 
 
 
 === var::output ===
-RM= ;  FM= ;  VM= ;  SM= ;  TM= ;  ST= ; 
+RM= ;  FM= ;  VM= ;  SM= ;  TM= ;  STM= ; 
 
 === var::outputt ===
-		RM= ;  FM= ;  VM= ;  SM= ;  TM= ;  ST= ; 
+		RM= ;  FM= ;  VM= ;  SM= ;  TM= ;  STM= ; 
 
 === var::outputl ===
-RM= ;  FM= ;  VM= ;  SM= ;  TM= ;  ST= ; 
+RM= ;  FM= ;  VM= ;  SM= ;  TM= ;  STM= ; 
 
 
 === free print() ===
-RM= ;  FM= ;  VM= ;  SM= ;  TM= ;  ST= ; 
+RM= ;  FM= ;  VM= ;  SM= ;  TM= ;  STM= ; 
 
 === free printt() ===
-RM= ;  FM= ;  VM= ;  SM= ;  TM= ;  ST= ; 	
+RM= ;  FM= ;  VM= ;  SM= ;  TM= ;  STM= ; 	
 
 === free printl() ===
-RM= ;  FM= ;  VM= ;  SM= ;  TM= ;  ST= ; 
+RM= ;  FM= ;  VM= ;  SM= ;  TM= ;  STM= ; 
 
 
 === cout << var ===
-RM= ;  FM= ;  VM= ;  SM= ;  TM= ;  ST= ; 
+RM= ;  FM= ;  VM= ;  SM= ;  TM= ;  STM= ; 
 
 
 === var::put(cout) ===
-RM= ;  FM= ;  VM= ;  SM= ;  TM= ;  ST= ; 
+RM= ;  FM= ;  VM= ;  SM= ;  TM= ;  STM= ; 
 )V0G0N";
 
 let expected_stderr = R"V0G0N(
 
 === free logput() ===
-RM= `;  FM= ^;  VM= ];  SM= };  TM= |;  ST= ~; 
+RM= `;  FM= ^;  VM= ];  SM= };  TM= |;  STM= ~; 
 
 === free logputl() ===
-RM= `;  FM= ^;  VM= ];  SM= };  TM= |;  ST= ~; 
+RM= `;  FM= ^;  VM= ];  SM= };  TM= |;  STM= ~; 
 
 
 === var::logput ===
-RM= `;  FM= ^;  VM= ];  SM= };  TM= |;  ST= ~; 
+RM= `;  FM= ^;  VM= ];  SM= };  TM= |;  STM= ~; 
 
 === var::logputl ===
-RM= `;  FM= ^;  VM= ];  SM= };  TM= |;  ST= ~; 
+RM= `;  FM= ^;  VM= ];  SM= };  TM= |;  STM= ~; 
 
 
 === free errput() ===
-RM= `;  FM= ^;  VM= ];  SM= };  TM= |;  ST= ~; 
+RM= `;  FM= ^;  VM= ];  SM= };  TM= |;  STM= ~; 
 
 === free errputl() ===
-RM= `;  FM= ^;  VM= ];  SM= };  TM= |;  ST= ~; 
+RM= `;  FM= ^;  VM= ];  SM= };  TM= |;  STM= ~; 
 
 
 === var::errput ===
-RM= `;  FM= ^;  VM= ];  SM= };  TM= |;  ST= ~; 
+RM= `;  FM= ^;  VM= ];  SM= };  TM= |;  STM= ~; 
 
 === var::errputl ===
-RM= `;  FM= ^;  VM= ];  SM= };  TM= |;  ST= ~; 
+RM= `;  FM= ^;  VM= ];  SM= };  TM= |;  STM= ~; 
 
 
 === cerr << var ===
-RM= ;  FM= ;  VM= ;  SM= ;  TM= ;  ST= ; 
+RM= ;  FM= ;  VM= ;  SM= ;  TM= ;  STM= ; 
 
 === clog << var ===
-RM= ;  FM= ;  VM= ;  SM= ;  TM= ;  ST= ; 
+RM= ;  FM= ;  VM= ;  SM= ;  TM= ;  STM= ; 
 
 === TRACE ===
-TRACE(fms)	// "RM= `;  FM= ^;  VM= ];  SM= };  TM= |;  ST= ~; "
+TRACE(fms)	// "RM= `;  FM= ^;  VM= ];  SM= };  TM= |;  STM= ~; "
 )V0G0N";
 
 }; // programexit()

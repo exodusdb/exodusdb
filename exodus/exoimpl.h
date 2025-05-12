@@ -137,7 +137,7 @@ namespace exo {
 	PUBLIC extern const var VM;
 	PUBLIC extern const var SM;
 	PUBLIC extern const var TM;
-	PUBLIC extern const var ST;
+	PUBLIC extern const var STM;
 
 	PUBLIC extern const var BS;
 	PUBLIC extern const var DQ;

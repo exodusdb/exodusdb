@@ -37,7 +37,7 @@ func main() {
 	assert(var("60" _VM "120").oconv("MT") eq "00:01" _VM "00:02");
 	assert(var("60" _SM "120").oconv("MT") eq "00:01" _SM "00:02");
 	assert(var("60" _TM "120").oconv("MT") eq "00:01" _TM "00:02");
-	assert(var("60" _ST "120").oconv("MT") eq "00:01" _ST "00:02");
+	assert(var("60" _STM "120").oconv("MT") eq "00:01" _STM "00:02");
 
 	//test that some random times iconv/oconv roundtrip ok
 	initrnd(1000);

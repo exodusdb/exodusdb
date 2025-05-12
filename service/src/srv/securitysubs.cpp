@@ -326,7 +326,7 @@ func main(in mode) {
 			var sysrec2;
 			if (sysrec2.read(systemfile(), userx)) {
 				// convert \FE\:\FD\:\FC\ TO \FB\:\FA\:\F9\ in SYSREC2
-				sysrec2.converter(FM ^ VM ^ SM, TM ^ ST ^ chr(249));
+				sysrec2.converter(FM ^ VM ^ SM, TM ^ STM ^ chr(249));
 				if (sysrec2 != sysrec) {
 					RECORD(4, usern) = "<hidden>" ^ SM ^ sysrec2;
 				}
@@ -986,7 +986,7 @@ func main(in mode) {
 subr changepassx(in userx, in newpassword) {
 	let datax = RECORD.f(4, req.mvx);
 	var sysrec	  = datax.f(1, 1, 2);
-	sysrec.converter(TM ^ ST ^ chr(249), FM ^ VM ^ SM);
+	sysrec.converter(TM ^ STM ^ chr(249), FM ^ VM ^ SM);
 	if (not sysrec) {
 		if (not sysrec.read(systemfile(), userx)) {
 			sysrec	  = "USER";
@@ -1003,7 +1003,7 @@ subr changepassx(in userx, in newpassword) {
 
 		// store the new password and system record
 		var temp = sysrec;
-		temp.converter(FM ^ VM ^ SM, TM ^ ST ^ chr(249));
+		temp.converter(FM ^ VM ^ SM, TM ^ STM ^ chr(249));
 		req.is(1, 1, 2)	   = temp;
 		RECORD(4, req.mvx) = req.is;
 	}

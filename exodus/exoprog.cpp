@@ -1694,7 +1694,7 @@ var ExoProgram::oconv(in input0, in conversion) {
 				// and call it
 				//call ioconv_custom("OCONV", result, mode, output);
 
-				//call it once per field (any field mark RM-ST are preserved)
+				//call it once per field (any field mark RM-STM are preserved)
 				var posn = 1;
 				var ifield, ofield, delim;
 				outx = "";

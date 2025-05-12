@@ -74,7 +74,7 @@ ND var operator""_var(const char* cstr, std::size_t size) {
 			case VISIBLE_VM_: c = VM_; break;
 			case VISIBLE_SM_: c = SM_; break;
 			case VISIBLE_TM_: c = TM_; break;
-			case VISIBLE_ST_: c = ST_; break;
+			case VISIBLE_STM_: c = STM_; break;
 			case VISIBLE_RM_: c = RM_; break;
 			// All other chars left unconverted
 			default:;

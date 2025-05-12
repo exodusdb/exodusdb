@@ -35,7 +35,7 @@ func main() {
 	let keys       = COMMAND.f(3).convert(",", FM);
 	let fieldno    = COMMAND.f(4);
 
-	// (R)aw option only converts FM to NL and leaves VM SM TM ST untouched
+	// (R)aw option only converts FM to NL and leaves VM SM TM STM untouched
 	let txtfmt = OPTIONS.contains("R") ? "TX1" : "TX";
 
 	if (not dbfilename)

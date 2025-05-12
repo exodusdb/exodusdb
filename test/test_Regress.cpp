@@ -150,7 +150,7 @@ func onefile(in filename, in maxndifferences) {
 
 		//printl(line);
 
-		converter(line, "\xFF\xFE\xFD\xFC\xFB\xFA", _RM _FM _VM _SM _TM _ST);
+		converter(line, "\xFF\xFE\xFD\xFC\xFB\xFA", _RM _FM _VM _SM _TM _STM);
 
 		dim line2	 = line.split("\t");
 		var funcname = line2[2];
@@ -291,9 +291,9 @@ func onefile(in filename, in maxndifferences) {
 			//if ordering and target/string contains field/value/marks then change to PICK seps to ensure compatible ordering
 			//except the sep field mark that is being used
 			if (subrec.f(1,1,1) ne subrec or what.f(1,1,1) ne what) {
-				converter(what,_RM _FM _VM _SM _TM _ST,"\xFF\xFE\xFD\xFC\xFB\xFA");
-				converter(subrec,_RM _FM _VM _SM _TM _ST,"\xFF\xFE\xFD\xFC\xFB\xFA");
-				//TRACE(lineno ^ ". subrec = " ^ subrec.convert("\xFF\xFE\xFD\xFC\xFB\xFA",_RM _FM _VM _SM _TM _ST) ^ " ... " ^ sep ^ " " ^ ord(sep));
+				converter(what,_RM _FM _VM _SM _TM _STM,"\xFF\xFE\xFD\xFC\xFB\xFA");
+				converter(subrec,_RM _FM _VM _SM _TM _STM,"\xFF\xFE\xFD\xFC\xFB\xFA");
+				//TRACE(lineno ^ ". subrec = " ^ subrec.convert("\xFF\xFE\xFD\xFC\xFB\xFA",_RM _FM _VM _SM _TM _STM) ^ " ... " ^ sep ^ " " ^ ord(sep));
 				if (sep eq "") {
 					if (LOCATE_SN)
 						sep = "";
@@ -311,7 +311,7 @@ func onefile(in filename, in maxndifferences) {
 					//TRACE(lineno ^ ". " ^ sep ^ " " ^ ord(sep) ^ " " ^ ord(pick_sep));
 				}
 				rec(LOCATE_FN, LOCATE_VN, LOCATE_SN) = subrec;
-				//TRACE(lineno ^ ". " ^ rec.convert("\xFF\xFE\xFD\xFC\xFB\xFA",_RM _FM _VM _SM _TM _ST) ^ " ... " ^ sep ^ " " ^ ord(sep));
+				//TRACE(lineno ^ ". " ^ rec.convert("\xFF\xFE\xFD\xFC\xFB\xFA",_RM _FM _VM _SM _TM _STM) ^ " ... " ^ sep ^ " " ^ ord(sep));
 			}
 			*/
 

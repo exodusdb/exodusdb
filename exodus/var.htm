@@ -933,7 +933,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 				<dt>|</dt>
 				<dd>TM  Text mark</dd>
 				<dt>~</dt>
-				<dd>ST  Subtext mark</dd>
+				<dd>STM  Subtext mark</dd>
 			</dl>
 			<p>
 				<pre><span class="kt">var</span><span class="w"> </span><span class="n">v1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;f1^f2^v1]v2^f4&quot;</span><span class="kt">_var</span><span class="p">;</span><span class="w"> </span><span class="c1">// &quot;f1&quot; _FM &quot;f2&quot; _FM &quot;v1&quot; _VM &quot;v2&quot; _FM &quot;f4&quot;</span>
@@ -1863,7 +1863,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			<p>Convert all FM to VM, VM to SM etc.</p>
 			<p>
 				<em>return:</em> The converted string.</p>
-			<p>Note that subtext ST chars are not converted because they are already the lowest level.</p>
+			<p>Note that subtext STM chars are not converted because they are already the lowest level.</p>
 			<p>String size remains identical.</p>
 			<p>
 				<pre><span class="nf">let</span><span class="w"> </span><span class="n">v1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;a1^b2^c3&quot;</span><span class="kt">_var</span><span class="p">.</span><span class="nf">lower</span><span class="p">();</span><span class="w"> </span><span class="c1">// &quot;a1]b2]c3&quot;_var</span>
@@ -2429,7 +2429,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 				<code>strvar.substr2(io pos1, out delimiterno)</code></p></td>
 		<td>
 			<p>substr version 4.</p>
-			<p>Copy a substr from a given char position up to (but excluding) the next field mark char (RM, FM, VM, SM, TM, ST).</p>
+			<p>Copy a substr from a given char position up to (but excluding) the next field mark char (RM, FM, VM, SM, TM, STM).</p>
 			<p>
 				<em>return:</em> A substr or "".</p>
 			<p>
@@ -2444,7 +2444,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			<p>The equivalent in Pick OS was the statement "Remove variable From string At column Setting flag"</p>
 			<p>This function is valuable for high performance processing of dynamic arrays.</p>
 			<p>It is notably used in "list" to print parallel columns of mixed combinations of multivalues/subvalues and text marks correctly lined up mv to mv, sv to sv, tm to tm even when particular values, subvalues and text fragments are missing from particular columns.</p>
-			<p>It is similar to version 3 of substr - substr(pos1, delimiterchars, pos2) except that in this version the delimiter chars are hard coded as the standard field mark chars (RM, FM, VM, SM, TM, ST) and it returns the first char position of the next substr, not the char position of the next field mark char.</p>
+			<p>It is similar to version 3 of substr - substr(pos1, delimiterchars, pos2) except that in this version the delimiter chars are hard coded as the standard field mark chars (RM, FM, VM, SM, TM, STM) and it returns the first char position of the next substr, not the char position of the next field mark char.</p>
 			<p>
 				<pre><span class="kt">var</span><span class="w"> </span><span class="n">pos1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="n">field_mark_no</span><span class="p">;</span>
 <span class="nf">let</span><span class="w"> </span><span class="n">v1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;12^45^78&quot;</span><span class="kt">_var</span><span class="p">.</span><span class="nf">substr2</span><span class="p">(</span><span class="n">pos1</span><span class="p">,</span><span class="w"> </span><span class="n">field_mark_no</span><span class="p">);</span><span class="w">  </span><span class="c1">// &quot;45&quot; // pos1 -&gt; 7 // field_mark_no -&gt; 2 // field_mark_no 2 means that a FM was found.</span>
@@ -7104,7 +7104,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 <span class="c1">// 7. TM -&gt; &quot;\\\&quot; \n</span>
 <span class="nf">let</span><span class="w"> </span><span class="n">v7</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;t1|t2&quot;</span><span class="kt">_var</span><span class="p">.</span><span class="nf">oconv</span><span class="p">(</span><span class="s">&quot;TX&quot;</span><span class="p">);</span><span class="w">  </span><span class="c1">// &quot;t1&quot; _BS _BS _BS _NL &quot;t2&quot;</span>
 
-<span class="c1">// 8. ST -&gt; &quot;\\\\&quot; \n</span>
+<span class="c1">// 8. STM -&gt; &quot;\\\\&quot; \n</span>
 <span class="nf">let</span><span class="w"> </span><span class="n">v8</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;st1~st2&quot;</span><span class="kt">_var</span><span class="p">.</span><span class="nf">oconv</span><span class="p">(</span><span class="s">&quot;TX&quot;</span><span class="p">);</span><span class="w"> </span><span class="c1">// &quot;st1&quot; _BS _BS _BS _BS _NL &quot;st2&quot;</span>
 </pre>
 			</p>

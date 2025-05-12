@@ -31,7 +31,7 @@ func main() {
 		for (var line : data) {
 			if (not line)
 				continue;
-			line.converter("\xFF\xFE\xFD\xFC\xFB\xFA", _RM _FM _VM _SM _TM _ST);
+			line.converter("\xFF\xFE\xFD\xFC\xFB\xFA", _RM _FM _VM _SM _TM _STM);
 			dim line2    = line.split("\t");
 			if (line2[2] == "EXTRACT") {
 
