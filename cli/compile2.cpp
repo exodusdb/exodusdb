@@ -403,9 +403,9 @@ function main() {
 				if (add_funcs)
 					add_funcs ^= _EOL;
 
-				//new method using member functions to call external functions with mv environment
+				//new method using member functions to call external functions with ev environment
 				//using a callable class that allows library name changing
-				//public inheritance only so we can directly access mv in mvprogram.cpp for oconv/iconv. should perhaps be private inheritance and mv set using .init(mv)
+				//public inheritance only so we can directly access ev in exoprogram.cpp for oconv/iconv. should perhaps be private inheritance and ev set using .init(ev)
 				var inclusion =
 					_EOL
 					_EOL "/" "/ A 'callable' class and object that allows function call syntax to actually open shared libraries/create Exodus Program objects on the fly."
@@ -420,8 +420,8 @@ function main() {
 					_EOL "/" "/ A constructor providing:"
 					_EOL "/" "/ 1. The name of the shared library to open,"
 					_EOL "/" "/ 2. The name of the function within the shared library that will create an exodus program object,"
-					_EOL "/" "/ 3. The current program's mv environment to share with it."
-					_EOL "Callable_funcx(ExoEnv& mv) : Callable(mv) {}"
+					_EOL "/" "/ 3. The current program's ev environment to share with it."
+					_EOL "Callable_funcx(ExoEnv& ev) : Callable(ev) {}"
 					_EOL
 					_EOL "/" "/ Allow assignment of library name to override the default constructed"
 					_EOL "using Callable::operator=;"
@@ -433,7 +433,7 @@ function main() {
 					_EOL "{"
 					_EOL
 					_EOL " /" "/ The first call will link to the shared lib and create/cache an object from it."
-					_EOL " /" "/ passing current standard variables in mv"
+					_EOL " /" "/ passing current standard variables in ev"
 					_EOL " if (this->pmemberfunc_== nullptr)"
 //							_EOL "  this->init();"
 					_EOL "  this->attach(\"funcx\");"
@@ -461,8 +461,8 @@ function main() {
 					_EOL "#pragma GCC diagnostic pop"
 					_EOL
 					_EOL "/" "/ A callable object of the above type that allows function call syntax to access"
-					_EOL "/" "/ an Exodus program/function initialized with the current mv environment."
-					_EOL "Callable_funcx funcx{mv};";
+					_EOL "/" "/ an Exodus program/function initialized with the current ev environment."
+					_EOL "Callable_funcx funcx{ev};";
 
 				replacer(inclusion, "funcx", field(libname, OSSLASH, -1));
 				//replacer(example,"exoprogram_createdelete_",funcname);

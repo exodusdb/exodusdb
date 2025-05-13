@@ -16,10 +16,10 @@
 #include <exodus/exoimpl.h>
 
 // Allows and *requires* coding style like exodus application programming
-// e.g. must use USERNAME not mv.USERNAME
+// e.g. must use USERNAME not ev.USERNAME
 #include <exodus/exomacros.h>
 
-// Putting various member functions into all exodus programs allows access to the mv environment
+// Putting various member functions into all exodus programs allows access to the ev environment
 // variable which is also available in all exodus programs.
 
 namespace exo {
@@ -44,12 +44,12 @@ var ExoProgram::libinfo(in libname) {
 /////////////////////
 
 // Constructor from an ExoEnv
-// mv is a reference to allow mv.xxxxxx syntax instead of mv->xxxxxx
+// ev is a reference to allow ev.xxxxxx syntax instead of ev->xxxxxx
 // However, being a reference, it must be provided at ExodusProgram construction time
 // and cannot be changed thereafter.
 ExoProgram::ExoProgram(ExoEnv& inmv)
 	:
-	mv(inmv)
+	ev(inmv)
 {
 	cached_dictid_ = "";
 	dict_callable_ = nullptr;
@@ -473,7 +473,7 @@ bool ExoProgram::select(in sortselectclause_or_filehandle) {
 		//insertsql.logputl();
 
 		if (not CURSOR.sqlexec(insertsql)) {
-			//tolerate failure to write in case multiple records returned (due to mv selection?)
+			//tolerate failure to write in case multiple records returned (due to ev selection?)
 			if (not CURSOR.lasterror().contains("duplicate key"))
 				CURSOR.lasterror().errputl("Error inserting pass2 record:");
 		}
@@ -946,11 +946,11 @@ var ExoProgram::perform(in command_line) {
 	SENTENCE = command_line;
 	while (SENTENCE) {
 
-		let libname = mv.parse(SENTENCE);
+		let libname = ev.parse(SENTENCE);
 		// Reuse a single Callable object
 		// TODO Create new every time?
 		if (!perform_callable.initsmf(
-											mv,
+											ev,
 											libname.c_str(),
 											/* Use the non-adorned factory function for library() not library(xxx)*/
 											"exoprogram_createdelete_",
@@ -1116,7 +1116,7 @@ var ExoProgram::calculate(in dictid) {
 			if (not cached_dictrec_.readc(DICT, othercase_dictid)) {
 
 				// try dict.voc
-				var dictvoc;  // TODO implement mv.DICTVOC to avoid opening
+				var dictvoc;  // TODO implement ev.DICTVOC to avoid opening
 				if (not dictvoc.open("dict.voc")) {
 baddict:
 					UNLIKELY
@@ -1195,13 +1195,13 @@ baddict:
 
 //				// Patch in the current exoenv
 //				if (!dict_callable_->mv_)
-//					dict_callable_->mv_ = (&mv);
+//					dict_callable_->mv_ = (&ev);
 
-				// Wire it up with the necessary ExoEnv mv
+				// Wire it up with the necessary ExoEnv ev
 				// and locate the correct function object factory function in the library
 				std::string factory_funcname = "exoprogram_createdelete_" + dictid.lcase().toString();
 				if (!dict_callable_->initsmf(
-												mv,
+												ev,
 												libname.c_str(),
 												factory_funcname.c_str(),
 												// dont force new each call
@@ -1629,7 +1629,7 @@ var ExoProgram::oconv(in input0, in conversion) {
 				ioconv_custom = functionname;
 
 				// wire in the current environment
-				//ioconv_custom.mv_ = &mv;
+				//ioconv_custom.ev_ = &ev;
 
 				// and call it
 				//call ioconv_custom("OCONV", result, mode, output);
@@ -1715,7 +1715,7 @@ var ExoProgram::iconv(in input, in conversion) {
 				ioconv_custom = functionname;
 
 				// wire up the current environment
-				//ioconv_custom.mv_ = (&mv);
+				//ioconv_custom.ev_ = (&ev);
 
 				// and call it
 				call ioconv_custom("ICONV", result, mode, outx);
@@ -2382,7 +2382,7 @@ void ExoProgram::sortarray(io array, in fns, in orderby0) {
 	//sorts one or more parallel mved fields in a record
 
 	//array is the record which the field(s) to be sorted are present
-	//fns is a mv array of parallel field numbers to be sorted
+	//fns is a ev array of parallel field numbers to be sorted
 	//order is D or A (can be repeated to sort for multiple sorts per fn)
 	//eg AA would sort the first two fns ascending
 	//justification is L or R for left (text) or right (numberic)
@@ -2620,10 +2620,10 @@ int ExoProgram::run_main(var (ExoProgram::*main_func)(), int argc, const char* a
 
 	// Check EXO_DEBUG using ExoEnv
 	if (var().osgetenv("EXO_DEBUG")) {
-		var("Debug Init Thread:" ^ mv.THREADNO ^ " " ^ mv.SENTENCE).errputl();
+		var("Debug Init Thread:" ^ ev.THREADNO ^ " " ^ ev.SENTENCE).errputl();
 		// Debug mode: no exception catching
 		result = (this->*main_func)();
-		var("Debug Exit Thread:" ^ mv.THREADNO ^ " " ^ mv.SENTENCE).errputl();
+		var("Debug Exit Thread:" ^ ev.THREADNO ^ " " ^ ev.SENTENCE).errputl();
 	} else {
 		try {
 			// Normal mode: catch exceptions
@@ -2651,7 +2651,7 @@ int ExoProgram::run_main(var (ExoProgram::*main_func)(), int argc, const char* a
 			msg.errputl();
 			auto e = VarError(msg);
 			var(e.stack()).convert(FM, "         \n").errputl();
-			result = mv.OPTIONS.contains("I") ? 0 : 999;
+			result = ev.OPTIONS.contains("I") ? 0 : 999;
 		}
 	}
 

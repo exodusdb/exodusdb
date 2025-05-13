@@ -579,7 +579,7 @@ ND bool insertrecord(in record, in dbfile, in key);
 ND bool read(dim& dimrecord, in dbfile, in key);
    void write(const dim& dimrecord, in dbfile, in key);
 
-// moved to exoprog so they have access to default cursor in mv.CURSOR
+// moved to exoprog so they have access to default cursor in ev.CURSOR
 // bool select(in sortselectclause = "" );
 // void clearselect(void);
 // bool readnext(out key);

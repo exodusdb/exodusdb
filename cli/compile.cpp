@@ -513,7 +513,7 @@ ENVIRONMENT
 			basicoptions ^= "  -Wno-c++98-compat";
 			basicoptions ^= " -Wno-c++98-compat-pedantic";
 
-			// Never warn about macro expansion since it is essential for mv.RECORD etc.
+			// Never warn about macro expansion since it is essential for ev.RECORD etc.
 			basicoptions ^= " -Wno-disabled-macro-expansion";
 		}
 
@@ -721,7 +721,7 @@ ENVIRONMENT
 		//exodus library
 		if (debugging) {
 			//Creates a debug multithreaded DLL using MSVCRTD.lib.
-			//using MDd causes weird inability to access mv.DICT and other variables in main() despite them being initialised in exodus_main()
+			//using MDd causes weird inability to access ev.DICT and other variables in main() despite them being initialised in exodus_main()
 			basicoptions ^= " /MDd";
 			//basicoptions^=" /MD";
 

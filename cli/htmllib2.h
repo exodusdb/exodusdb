@@ -14,8 +14,8 @@ public:
 // A constructor providing:
 // 1. The name of the shared library to open,
 // 2. The name of the function within the shared library that will create an exodus program object,
-// 3. The current program's mv environment to share with it.
-Callable_htmllib2(ExoEnv& mv) : Callable(mv) {}
+// 3. The current program's ev environment to share with it.
+Callable_htmllib2(ExoEnv& ev) : Callable(ev) {}
 
 // Allow assignment of library name to override the default constructed
 using Callable::operator=;
@@ -27,7 +27,7 @@ var operator() (in mode, io dataio, in params0 = "", in params20 = "", in glang 
 {
 
  // The first call will link to the shared lib and create/cache an object from it.
- // passing current standard variables in mv
+ // passing current standard variables in ev
  if (this->pmemberfunc_== nullptr)
   this->attach("htmllib2");
 
@@ -70,6 +70,6 @@ var operator() (in mode) {
 #pragma GCC diagnostic pop
 
 // A callable object of the above type that allows function call syntax to access
-// an Exodus program/function initialized with the current mv environment.
-Callable_htmllib2 htmllib2{mv};
+// an Exodus program/function initialized with the current ev environment.
+Callable_htmllib2 htmllib2{ev};
 //#endif

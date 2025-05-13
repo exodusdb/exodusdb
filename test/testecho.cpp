@@ -6,11 +6,11 @@ function main() {
 	// Loop echoing input and close if receive empty string.
 	for (;;) {
 		var v1;
-		mv.input_queue->wait_and_pop(v1);
+		ev.input_queue->wait_and_pop(v1);
 		if (v1.empty())
 			break;
-		mv.output_queue->push(123.34);
-//		mv.output_queue->push(std::move(v1));
+		ev.output_queue->push(123.34);
+//		ev.output_queue->push(std::move(v1));
 	}
 //	printl(THREADNO ^ ": echo says 'Goodbye World!'");
 	return 0;

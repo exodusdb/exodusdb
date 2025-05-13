@@ -2,14 +2,14 @@
 WARNING this documentation is from BEFORE adding enabling call of objects in external libraries
 using programinit/exit and libraryinit/exit.
 
-Traditionally, mv functions and subroutines are implemented as separately compilable units
+Traditionally, ev functions and subroutines are implemented as separately compilable units
 and there is only one function or subroutine per compilation unit (file/record).
 
 the only difference between functions and subroutines is that functions return a value whereas
 subroutines do not. Both functions and subroutines can be called with any number of arguments
 including none.
 
-exodus implements mv external functions and subroutines as C++ callables in shared libraries loaded
+exodus implements ev external functions and subroutines as C++ callables in shared libraries loaded
 on demand/just in time.
 
 === example ===
@@ -194,13 +194,13 @@ class PUBLIC Callable {
 	//////////////////////
 
 	// Constructor to provide everything immediately
-	Callable(const std::string_view libname, const std::string_view funcname, ExoEnv& mv);
+	Callable(const std::string_view libname, const std::string_view funcname, ExoEnv& ev);
 
 	// Constructor to provide library and function names immediately
 	Callable(const std::string_view libname, const std::string_view funcname);
 
 	// Constructor to provide environment immediately
-	Callable(ExoEnv& mv);
+	Callable(ExoEnv& ev);
 
 
 	/////////////
@@ -219,7 +219,7 @@ class PUBLIC Callable {
 	// For dict/perform/execute (external shared member functions)
 	// forcenew used by perform/execute to delete and create new object each time
 	// so that global variables start out unassigned each time performed/executed
-	bool initsmf(ExoEnv& mv, const char* libname, const char* funcname, const bool forcenew = false);
+	bool initsmf(ExoEnv& ev, const char* libname, const char* funcname, const bool forcenew = false);
 
 	// Call a shared member function
 	var callsmf() const;
@@ -232,10 +232,10 @@ class PUBLIC Callable {
 
  protected:
 
-	// Assumes name and mv setup on initialisation then opens library on first call
+	// Assumes name and ev setup on initialisation then opens library on first call
 	//bool init();
 
-	//bool attach(const char* libname, const char* funcname, ExoEnv& mv);
+	//bool attach(const char* libname, const char* funcname, ExoEnv& ev);
 	bool attach(const char* libname);
 
 	// External shared global functions (not member functions)

@@ -74,8 +74,8 @@ class PUBLIC ExoProgram {
 
 	std::shared_ptr<ResultQueue> result_queue_ = std::make_shared<ResultQueue>();
 
-	// mv.XXXXXX is going to be used a lot by exodus programmers for exodus "global variables"
-	// e.g. mv.RECORD mv.DICT etc.
+	// ev.XXXXXX is going to be used a lot by exodus programmers for exodus "global variables"
+	// e.g. ev.RECORD ev.DICT etc.
 	//
 	// Threadsafe. Environment vars are member data so they are "global" to the
 	// ExoProgram class/object and not global to the program.
@@ -88,15 +88,15 @@ class PUBLIC ExoProgram {
 	// identical exodus global variables to the "main program" as far as the exodus application
 	// programmer can tell.
 	//
-	// mv being a reference ensures that exodus programs cannot exist without an mv
+	// ev being a reference ensures that exodus programs cannot exist without an ev
 	//
-	// Using a reference instead of a pointer allows debugging via mv.ID instead of mv->ID
+	// Using a reference instead of a pointer allows debugging via ev.ID instead of ev->ID
 	//
 	// Macros are provided for all env vars like
-	// #define ID mv.ID
-	// to allow code to be written without the mv. prefix for readability
-	// #define ID mv->ID //This form is not required because mv is reference.
-	ExoEnv& mv;
+	// #define ID ev.ID
+	// to allow code to be written without the ev. prefix for readability
+	// #define ID ev->ID //This form is not required because ev is reference.
+	ExoEnv& ev;
 
  public:
 
@@ -124,11 +124,11 @@ class PUBLIC ExoProgram {
 #include <exodus/ioconv_custom.h>
 
 	explicit ExoProgram(ExoEnv& inmv);
-	//ExoProgram(ExoEnv& mv);
+	//ExoProgram(ExoEnv& ev);
 	//explicit ExoProgram(ExoEnv&& inmv) = delete;
 
 	// No default constructor
-	// data member mv is a reference and we only provide constructors for preexisting ExoEnv.
+	// data member ev is a reference and we only provide constructors for preexisting ExoEnv.
 	//ExoProgram() = default;
 	ExoProgram() = delete;
 
@@ -406,7 +406,7 @@ ND	var  calculate(in dictid);
 
 	// Get DB record field values given name and data.
 	// Same as the one argument version of calculate() but RECORD/ID/MV are provided as arguments instead of being hard coded.
-ND	var  calculate(in dictid, in dictfile, in id, in record, in mv = 0);
+ND	var  calculate(in dictid, in dictfile, in id, in record, in ev = 0);
 
 	// Read DB field using field number or name.
 	// 1. Read a record from a given file and key using readc() for caching.
@@ -693,82 +693,82 @@ ND	bool lockrecord(in filename, io file, in keyx) const;
 	bool unlockrecord(in filename, io file, in key) const;
 	bool unlockrecord() const;
 
-	var& ID        {mv.ID};
-	var& RECORD    {mv.RECORD};
-	var& FILE      {mv.FILE};
-	var& DICT      {mv.DICT};
-	var& ANS       {mv.ANS};
-	var& MV        {mv.MV};
-	var& PSEUDO    {mv.PSEUDO};
-	var& DATA      {mv.DATA};
-//	var& LISTACTIVE {mv.LISTACTIVE};
+	var& ID        {ev.ID};
+	var& RECORD    {ev.RECORD};
+	var& FILE      {ev.FILE};
+	var& DICT      {ev.DICT};
+	var& ANS       {ev.ANS};
+	var& MV        {ev.MV};
+	var& PSEUDO    {ev.PSEUDO};
+	var& DATA      {ev.DATA};
+//	var& LISTACTIVE {ev.LISTACTIVE};
 
-	var& USERNAME  {mv.USERNAME};
-	var& APPLICATION {mv.APPLICATION};
-	var& SENTENCE  {mv.SENTENCE};
-	var& CHAIN     {mv.CHAIN};
+	var& USERNAME  {ev.USERNAME};
+	var& APPLICATION {ev.APPLICATION};
+	var& SENTENCE  {ev.SENTENCE};
+	var& CHAIN     {ev.CHAIN};
 
-	var& USER0     {mv.USER0};
-	var& USER1     {mv.USER1};
-	var& USER2     {mv.USER2};
-	var& USER3     {mv.USER3};
-	var& USER4     {mv.USER4};
+	var& USER0     {ev.USER0};
+	var& USER1     {ev.USER1};
+	var& USER2     {ev.USER2};
+	var& USER3     {ev.USER3};
+	var& USER4     {ev.USER4};
 
-	var& RECUR0    {mv.RECUR0};
-	var& RECUR1    {mv.RECUR1};
-	var& RECUR2    {mv.RECUR2};
-	var& RECUR3    {mv.RECUR3};
-	var& RECUR4    {mv.RECUR4};
+	var& RECUR0    {ev.RECUR0};
+	var& RECUR1    {ev.RECUR1};
+	var& RECUR2    {ev.RECUR2};
+	var& RECUR3    {ev.RECUR3};
+	var& RECUR4    {ev.RECUR4};
 
-	const var& EXECPATH  {mv.EXECPATH};
-	var& COMMAND   {mv.COMMAND};
-	var& OPTIONS   {mv.OPTIONS};
+	const var& EXECPATH  {ev.EXECPATH};
+	var& COMMAND   {ev.COMMAND};
+	var& OPTIONS   {ev.OPTIONS};
 
-	var& DEFINITIONS   {mv.DEFINITIONS};
-	var& SECURITY  {mv.SECURITY};
-	var& SYSTEM    {mv.SYSTEM};
-	var& SESSION   {mv.SESSION};
-	var& THREADNO  {mv.THREADNO};
+	var& DEFINITIONS   {ev.DEFINITIONS};
+	var& SECURITY  {ev.SECURITY};
+	var& SYSTEM    {ev.SYSTEM};
+	var& SESSION   {ev.SESSION};
+	var& THREADNO  {ev.THREADNO};
 
-	var& STATION   {mv.STATION};
-	//var& DATEFM  {mv.DATEFMT};
-	//var& BASEFMT {mv.BASEFMT};
-	var& PRIVILEGE {mv.PRIVILEGE};
-	var& FILES     {mv.FILES};
-	var& TCLSTACK  {mv.TCLSTACK};
-	var& INTCONST  {mv.INTCONST};
-	var& STATUS    {mv.STATUS};
-	int& COL1      {mv.COL1};
-	var& COL2      {mv.COL2};
-	var& PRIORITYINT   {mv.PRIORITYINT};
+	var& STATION   {ev.STATION};
+	//var& DATEFM  {ev.DATEFMT};
+	//var& BASEFMT {ev.BASEFMT};
+	var& PRIVILEGE {ev.PRIVILEGE};
+	var& FILES     {ev.FILES};
+	var& TCLSTACK  {ev.TCLSTACK};
+	var& INTCONST  {ev.INTCONST};
+	var& STATUS    {ev.STATUS};
+	int& COL1      {ev.COL1};
+	var& COL2      {ev.COL2};
+	var& PRIORITYINT   {ev.PRIORITYINT};
 
-	var& FILEERRORMODE {mv.FILEERRORMODE};
-	var& FILEERROR     {mv.FILEERROR};
+	var& FILEERRORMODE {ev.FILEERRORMODE};
+	var& FILEERROR     {ev.FILEERROR};
 
-	var& RECCOUNT      {mv.RECCOUNT};
+	var& RECCOUNT      {ev.RECCOUNT};
 
-	var& AW            {mv.AW};
-	var& EW            {mv.EW};
-	var& HW            {mv.HW};
-	var& MW            {mv.MW};
-	var& PW            {mv.PW};
-	//var& SW          {mv.SW};
-	var& VW            {mv.VW};
-	var& XW            {mv.XW};
+	var& AW            {ev.AW};
+	var& EW            {ev.EW};
+	var& HW            {ev.HW};
+	var& MW            {ev.MW};
+	var& PW            {ev.PW};
+	//var& SW          {ev.SW};
+	var& VW            {ev.VW};
+	var& XW            {ev.XW};
 
-	var& CRTHIGH       {mv.CRTHIGH};
-	var& CRTWIDE       {mv.CRTWIDE};
-	var& LPTRHIGH      {mv.LPTRHIGH};
-	var& LPTRWIDE      {mv.LPTRWIDE};
+	var& CRTHIGH       {ev.CRTHIGH};
+	var& CRTWIDE       {ev.CRTWIDE};
+	var& LPTRHIGH      {ev.LPTRHIGH};
+	var& LPTRWIDE      {ev.LPTRWIDE};
 
-	const var& TERMINAL      {mv.TERMINAL};
-	var& LEVEL         {mv.LEVEL};
+	const var& TERMINAL      {ev.TERMINAL};
+	var& LEVEL         {ev.LEVEL};
 
-//	var& THREADNO      {mv.THREADNO};
-	var& CURSOR        {mv.CURSOR};
-	var& TIMESTAMP     {mv.TIMESTAMP};
+//	var& THREADNO      {ev.THREADNO};
+	var& CURSOR        {ev.CURSOR};
+	var& TIMESTAMP     {ev.TIMESTAMP};
 
-	var& VOLUMES       {mv.VOLUMES};
+	var& VOLUMES       {ev.VOLUMES};
 
 };
 

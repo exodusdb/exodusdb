@@ -35,7 +35,7 @@ THE SOFTWARE.
 // 4. call the main function on that object to execute the code
 
 // NOTE that the code can also stop at step 2 to call global functions directly BUT
-// although calling global functions gives them mv (via argument) they cant call
+// although calling global functions gives them ev (via argument) they cant call
 // external subroutines since external subroutines are implemented in exodus
 // as member functions which require special coding to be called from global functions
 
@@ -113,7 +113,7 @@ namespace exo {
 
 // using namespace exo;
 
-// Default constructor.  probably followed by .init(libname,funcname,mv)
+// Default constructor.  probably followed by .init(libname,funcname,ev)
 Callable::Callable()
 	// TODO optimise by only initialise one and detect usage on that only
 	: mv_(nullptr), libname_(""), funcname_(""), plib_(nullptr), pfunc_(nullptr), plibobject_(nullptr), pmemberfunc_(nullptr) {
@@ -121,8 +121,8 @@ Callable::Callable()
 }
 
 // Constructor to provide everything immediately
-Callable::Callable(const std::string_view libname, const std::string_view funcname, ExoEnv& mv)
-	: mv_(&mv), libname_(libname), funcname_(funcname), plib_(nullptr), pfunc_(nullptr), plibobject_(nullptr), pmemberfunc_(nullptr) {
+Callable::Callable(const std::string_view libname, const std::string_view funcname, ExoEnv& ev)
+	: mv_(&ev), libname_(libname), funcname_(funcname), plib_(nullptr), pfunc_(nullptr), plibobject_(nullptr), pmemberfunc_(nullptr) {
 	plibobject_ = nullptr;
 }
 
@@ -133,8 +133,8 @@ Callable::Callable(const std::string_view libname, const std::string_view funcna
 }
 
 // Constructor to provide environment immediately. probably followed by .init(libname,funcname)
-Callable::Callable(ExoEnv& mv)
-	: mv_(&mv), libname_(""), funcname_(""), plib_(nullptr), pfunc_(nullptr), plibobject_(nullptr), pmemberfunc_(nullptr) {
+Callable::Callable(ExoEnv& ev)
+	: mv_(&ev), libname_(""), funcname_(""), plib_(nullptr), pfunc_(nullptr), plibobject_(nullptr), pmemberfunc_(nullptr) {
 	plibobject_ = nullptr;
 }
 
@@ -145,14 +145,14 @@ Callable::~Callable() {
 }
 
 //// Designed to be called once only the first time an callable object is called
-//bool Callable::attach_shared_object(const char* newlibname, const char* newfuncname, ExoEnv& mv) {
+//bool Callable::attach_shared_object(const char* newlibname, const char* newfuncname, ExoEnv& ev) {
 //
 //	if (TRACING >= 4) {
-//		std::cout << "exocallable:init(libname,funcname,mv)  " << libname_ << ", " << funcname_ << std::endl;
+//		std::cout << "exocallable:init(libname,funcname,ev)  " << libname_ << ", " << funcname_ << std::endl;
 //	}
 //
 //	// Acquire the program environment that will be passed to all libobjects during creation
-//	mv_ = &mv;
+//	mv_ = &ev;
 //
 //	// Load the library and get access to the function that will create/delete a libobject
 //	checkload(newlibname, newfuncname);
@@ -162,7 +162,7 @@ Callable::~Callable() {
 //	// so that the same memory management routine is called to create and delete it.
 //	//
 //	// pfunc_ either
-//	// 1. returns a plibobject_ if plibobject_ is passed in nullptr (using mv as an init argument)
+//	// 1. returns a plibobject_ if plibobject_ is passed in nullptr (using ev as an init argument)
 //	// 2. deletes a plibobject_ if not
 //
 //	// Create a libobject by calling the given function
@@ -171,7 +171,7 @@ Callable::~Callable() {
 //		return false;
 //
 //	if (TRACING >= 3) {
-//		std::cout << "exocallable:init(libname,funcname,mv) OK" << libname_ << ", " << funcname_ << " " << plibobject_ << "," << pmemberfunc_ << std::endl;
+//		std::cout << "exocallable:init(libname,funcname,ev) OK" << libname_ << ", " << funcname_ << " " << plibobject_ << "," << pmemberfunc_ << std::endl;
 //	}
 //
 //	return true;
@@ -185,7 +185,7 @@ bool Callable::attach(const char* newlibname) {
 	}
 
 	// Acquire the program environment that will be passed to all libobjects during creation
-	//mv_ = &mv;
+	//mv_ = &ev;
 
 	// Load the library and acquire pfunc_ that will create/delete a libobject
 	checkload(newlibname, "exoprogram_createdelete_");
@@ -195,7 +195,7 @@ bool Callable::attach(const char* newlibname) {
 	// so that the same memory management routine is called to create and delete it.
 	//
 	// pfunc_ either
-	// 1. returns a plibobject_ if plibobject_ is passed in nullptr (using mv as an init argument)
+	// 1. returns a plibobject_ if plibobject_ is passed in nullptr (using ev as an init argument)
 	// 2. deletes a plibobject_ if not
 
 	// Create a libobject by calling the given function
@@ -212,7 +212,7 @@ bool Callable::attach(const char* newlibname) {
 
 //// Called from every library .h file if _pmemberfunc is nullptr
 //// atm designed to be called once only the first time an external function is called
-//// assuming library and function names and mv are already set
+//// assuming library and function names and ev are already set
 //bool Callable::init() {
 //	if (TRACING >= 4) {
 //		std::cout << "exocallable:init()          " << libname_ << ", " << funcname_ << std::endl;
@@ -222,7 +222,7 @@ bool Callable::attach(const char* newlibname) {
 //	// Call a function in the library to create one of its "exodus program" objects
 //	// nb we MUST call the same library to delete it
 //	// so that the same memory management routine is called to create and delete it.
-//	// pfunc_ return a plibobject_ if plibobject_ is passed in nullptr (using mv as an init argument)
+//	// pfunc_ return a plibobject_ if plibobject_ is passed in nullptr (using ev as an init argument)
 //	// or deletes a plibobject_ if not
 //
 //	// generate an error here to debug
@@ -252,7 +252,7 @@ bool Callable::attach(const char* newlibname) {
 // They use Callable::init() and then directly call the member function.
 // They do *NOT* clear ExodusProgram globals so can reuse state and behave like a lambda function or co-routine.
 //
-bool Callable::initsmf(ExoEnv& mv, const char* newlibname, const char* newfuncname, const bool forcenew) {
+bool Callable::initsmf(ExoEnv& ev, const char* newlibname, const char* newfuncname, const bool forcenew) {
 
 	if (TRACING >= 4) {
 		std::cout << "exocallable:initsmf: === in === newlibname: '" << newlibname << "' newfuncname: '" << newfuncname << "'" << std::endl;
@@ -260,7 +260,7 @@ bool Callable::initsmf(ExoEnv& mv, const char* newlibname, const char* newfuncna
 
 	// Get our environment in place first
 	// because the library/function cache used by openlib is within it
-	mv_ = &mv;
+	mv_ = &ev;
 
 	// Open the library or fail
 	if ((newlibname != libname_ || ! plibobject_) && !openlib(newlibname)) {
@@ -280,7 +280,7 @@ bool Callable::initsmf(ExoEnv& mv, const char* newlibname, const char* newfuncna
 		// Call a function in the library to create one of its "exodus program" objects
 		// nb we MUST call the same library to delete it
 		// so that the same memory management routine is called to create and delete it.
-		// pfunc_ return a plibobject_ if plibobject_ is passed in nullptr (using mv as an init
+		// pfunc_ return a plibobject_ if plibobject_ is passed in nullptr (using ev as an init
 		// argument)
 		// or deletes a plibobject_ if not
 
@@ -451,7 +451,7 @@ bool Callable::openlib(const std::string newlibname) {
 #endif
 
 	{
-		// No need for this if dlcache is per mv and is therefore effectively threadlocal?
+		// No need for this if dlcache is per ev and is therefore effectively threadlocal?
 		LOCKDLCACHE
 
 	// Evade a warning from clang 18 when building with modules
@@ -616,9 +616,9 @@ bool Callable::openfunc(const std::string newfuncname) {
 //var Callable::callsgf() {
 //	// dictionaries are libraries of subroutines (ie return void) that
 //	// have one argument "ExoEnv". They set their response in ANS.
-//	// they are global functions and receive mv environment reference as their one and only
+//	// they are global functions and receive ev environment reference as their one and only
 //	// argument.
-//	using ExodusDynamic = var (*)(ExoEnv & mv);
+//	using ExodusDynamic = var (*)(ExoEnv & ev);
 //
 //		if (TRACING >= 3) {
 //			std::cout << "exocallable:CALLING SGF " << libname_ << ", " << funcname_ << std::endl;

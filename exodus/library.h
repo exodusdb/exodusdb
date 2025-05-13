@@ -129,7 +129,7 @@ namespace exodus_detail {
 	template<typename T>
 	inline void exoprogram_createdelete_impl(
 		exo::pExoProgram& pexoprogram,
-		exo::ExoEnv& mv,
+		exo::ExoEnv& ev,
 		exo::pExoProgram_MemberFunc& pmemberfunc
 	) {
 		if (pexoprogram) {
@@ -137,7 +137,7 @@ namespace exodus_detail {
 			pexoprogram = nullptr;
 			pmemberfunc = nullptr;
 		} else {
-			pexoprogram = new T(mv);
+			pexoprogram = new T(ev);
 			pmemberfunc = reinterpret_cast<exo::pExoProgram_MemberFunc>(&T::main);
 		}
 	}
@@ -166,10 +166,10 @@ class EXOPROGRAM_PREFIX##_ExoProgram;                                           
                                                                                    \
 /* 2. Define a factory function for dynamic loading              */                \
 extern "C" PUBLIC void exoprogram_createdelete_##EXOPROGRAM_PREFIX(                \
-    exo::pExoProgram& pexoprogram, exo::ExoEnv& mv,                                \
+    exo::pExoProgram& pexoprogram, exo::ExoEnv& ev,                                \
     exo::pExoProgram_MemberFunc& pmemberfunc) {                                    \
     exodus_detail::exoprogram_createdelete_impl<EXOPROGRAM_PREFIX##_ExoProgram>(   \
-        pexoprogram, mv, pmemberfunc);                                             \
+        pexoprogram, ev, pmemberfunc);                                             \
 }                                                                                  \
                                                                                    \
 /* 3. Open the ExoProgram-derived class definition               */                \

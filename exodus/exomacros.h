@@ -38,7 +38,7 @@ THE SOFTWARE.
 
 #include <exodus/exocallable.h>
 
-// Flag to force exodus/format.h to be included BEFORE other exodus headers and their intrusive macros (e.g. mv)
+// Flag to force exodus/format.h to be included BEFORE other exodus headers and their intrusive macros (e.g. ev)
 #define EXODUS_MACROS
 
 // Order of C++ standard includes
@@ -172,89 +172,89 @@ namespace exo {
 // Environment variables
 // =====================
 // The following short cuts are provided because they are used continually.
-// but the common environment mv has to be shared by shared libraries.
+// but the common environment ev has to be shared by shared libraries.
 // They could all be referenced individually but that would slow creation
 // of exodus callable "programs".
-// When debugging you will have to remember to inspect mv.ID instead of ID.
+// When debugging you will have to remember to inspect ev.ID instead of ID.
 
 // Keep in sync in exoenv.h and exomacros.h
 
-//#define ID     mv.ID
-//#define RECORD mv.RECORD
-//#define FILE   mv.FILE
-//#define DICT   mv.DICT
-//#define ANS    mv.ANS
-//#define MV     mv.MV
-//#define PSEUDO mv.PSEUDO
-//#define DATA   mv.DATA
+//#define ID     ev.ID
+//#define RECORD ev.RECORD
+//#define FILE   ev.FILE
+//#define DICT   ev.DICT
+//#define ANS    ev.ANS
+//#define MV     ev.MV
+//#define PSEUDO ev.PSEUDO
+//#define DATA   ev.DATA
 //#define LISTACTIVE hasnext()
 //
-//#define USERNAME    mv.USERNAME
-//#define APPLICATION mv.APPLICATION
-//#define SENTENCE    mv.SENTENCE
-//#define CHAIN       mv.CHAIN
+//#define USERNAME    ev.USERNAME
+//#define APPLICATION ev.APPLICATION
+//#define SENTENCE    ev.SENTENCE
+//#define CHAIN       ev.CHAIN
 //
-//#define USER0 mv.USER0
-//#define USER1 mv.USER1
-//#define USER2 mv.USER2
-//#define USER3 mv.USER3
-//#define USER4 mv.USER4
+//#define USER0 ev.USER0
+//#define USER1 ev.USER1
+//#define USER2 ev.USER2
+//#define USER3 ev.USER3
+//#define USER4 ev.USER4
 //
-//#define RECUR0 mv.RECUR0
-//#define RECUR1 mv.RECUR1
-//#define RECUR2 mv.RECUR2
-//#define RECUR3 mv.RECUR3
-//#define RECUR4 mv.RECUR4
+//#define RECUR0 ev.RECUR0
+//#define RECUR1 ev.RECUR1
+//#define RECUR2 ev.RECUR2
+//#define RECUR3 ev.RECUR3
+//#define RECUR4 ev.RECUR4
 //
-//#define EXECPATH mv.EXECPATH
-//#define COMMAND  mv.COMMAND
-//#define OPTIONS  mv.OPTIONS
+//#define EXECPATH ev.EXECPATH
+//#define COMMAND  ev.COMMAND
+//#define OPTIONS  ev.OPTIONS
 //
-//#define DEFINITIONS mv.DEFINITIONS
-//#define SECURITY    mv.SECURITY
-//#define SYSTEM      mv.SYSTEM
-//#define SESSION     mv.SESSION
-//#define THREADNO    mv.THREADNO
+//#define DEFINITIONS ev.DEFINITIONS
+//#define SECURITY    ev.SECURITY
+//#define SYSTEM      ev.SYSTEM
+//#define SESSION     ev.SESSION
+//#define THREADNO    ev.THREADNO
 //
-//#define STATION     mv.STATION
-////#define DATEFMT     mv.DATEFMT
-////#define BASEFMT     mv.BASEFMT
-//#define PRIVILEGE   mv.PRIVILEGE
-//#define FILES       mv.FILES
-//#define TCLSTACK    mv.TCLSTACK
-//#define INTCONST    mv.INTCONST
-//#define STATUS      mv.STATUS
-//#define COL1        mv.COL1
-//#define COL2        mv.COL2
-//#define PRIORITYINT mv.PRIORITYINT
+//#define STATION     ev.STATION
+////#define DATEFMT     ev.DATEFMT
+////#define BASEFMT     ev.BASEFMT
+//#define PRIVILEGE   ev.PRIVILEGE
+//#define FILES       ev.FILES
+//#define TCLSTACK    ev.TCLSTACK
+//#define INTCONST    ev.INTCONST
+//#define STATUS      ev.STATUS
+//#define COL1        ev.COL1
+//#define COL2        ev.COL2
+//#define PRIORITYINT ev.PRIORITYINT
 //// To be replace by try/catch
-//#define FILEERRORMODE mv.FILEERRORMODE
-//#define FILEERROR     mv.FILEERROR
+//#define FILEERRORMODE ev.FILEERRORMODE
+//#define FILEERROR     ev.FILEERROR
 //
-//#define RECCOUNT mv.RECCOUNT
+//#define RECCOUNT ev.RECCOUNT
 //
-//#define AW mv.AW
-//#define EW mv.EW
-//#define HW mv.HW
-//#define MW mv.MW
-//#define PW mv.PW
-////#define SW mv.SW
-//#define VW mv.VW
-//#define XW mv.XW
+//#define AW ev.AW
+//#define EW ev.EW
+//#define HW ev.HW
+//#define MW ev.MW
+//#define PW ev.PW
+////#define SW ev.SW
+//#define VW ev.VW
+//#define XW ev.XW
 //
-//#define CRTHIGH  mv.CRTHIGH
-//#define CRTWIDE  mv.CRTWIDE
-//#define LPTRHIGH mv.LPTRHIGH
-//#define LPTRWIDE mv.LPTRWIDE
+//#define CRTHIGH  ev.CRTHIGH
+//#define CRTWIDE  ev.CRTWIDE
+//#define LPTRHIGH ev.LPTRHIGH
+//#define LPTRWIDE ev.LPTRWIDE
 //
-//#define TERMINAL mv.TERMINAL
-//#define LEVEL    mv.LEVEL
+//#define TERMINAL ev.TERMINAL
+//#define LEVEL    ev.LEVEL
 //
-//#define THREADNO  mv.THREADNO
-//#define CURSOR    mv.CURSOR
-//#define TIMESTAMP mv.TIMESTAMP
+//#define THREADNO  ev.THREADNO
+//#define CURSOR    ev.CURSOR
+//#define TIMESTAMP ev.TIMESTAMP
 //
 ////to be deleted as soon as it is removed from service
-//#define VOLUMES mv.VOLUMES
+//#define VOLUMES ev.VOLUMES
 
 #endif  // EXODUS_LIBEXODUS_EXODUS_EXOMACROS_H_

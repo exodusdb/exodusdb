@@ -61,7 +61,7 @@ ExoEnv::ExoEnv(int exodus_argc, const char* exodus_argv[], int threadno) : THREA
 	//int environmentn = 0;
 //	init(threadno);
 	// DICT.outputl("DICT=");
-	//	global_environments[environmentn] = &mv;
+	//	global_environments[environmentn] = &ev;
 
 	// Done in exoenv contructors now
 	// EXECPATH = getexecpath();
