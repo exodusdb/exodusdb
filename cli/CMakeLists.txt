@@ -293,31 +293,21 @@
 
 set(SET_MY_ENV ${CMAKE_COMMAND} -E env EXO_LIBDIR=${CMAKE_CURRENT_BINARY_DIR})
 
-# Define a custom command that will run after the target is built
-# Generate man page var.1 next to libexodus/exodus/var.h
+## Define a custom command that will run after the target is built
+## Generate man page var.1 and var.h next to libexodus/exodus/var.h, dim.h and
+## NB Only one postbuild allowed per target probably.
 add_custom_command(
 	TARGET gendoc
 	POST_BUILD
-#	{mo} man page output to original dir as .1
-	COMMAND ${SET_MY_ENV} ${CMAKE_CURRENT_BINARY_DIR}/gendoc ${SRC_EXODUS_DIR}/var.h ${SRC_EXODUS_DIR}/dim.h ${SRC_EXODUS_DIR}/exoprog.h {m} > ${SRC_EXODUS_DIR}/var.1
+	COMMAND ${SET_MY_ENV} bash -c "${CMAKE_CURRENT_SOURCE_DIR}/gendoc.sh ${CMAKE_CURRENT_BINARY_DIR}/ ${SRC_EXODUS_DIR}"
 	COMMENT "Executing cli post-build command for gendoc to generate var.1"
-)
-
-# Define a custom command that will run after the target is built
-# Generate man page var.1 next to libexodus/exodus/var.h
-add_custom_command(
-	TARGET gendoc
-	POST_BUILD
-#	{mo} man page output to original dir as .1
-	COMMAND ${SET_MY_ENV} ${CMAKE_CURRENT_BINARY_DIR}/gendoc ${SRC_EXODUS_DIR}/var.h ${SRC_EXODUS_DIR}/dim.h ${SRC_EXODUS_DIR}/exoprog.h {h} > ${SRC_EXODUS_DIR}/var.htm
-	COMMENT "Executing cli post-build command for gendoc to generate var.htm"
+	VERBATIM
 )
 
 # Install the generated man page var.1
 install(FILES
-		${SRC_EXODUS_DIR}/var.1
-#		${SRC_EXODUS_DIR}/dim.1
-#		${SRC_EXODUS_DIR}/exoprog.1
-
-		DESTINATION ${CMAKE_INSTALL_PREFIX}/share/man/man1
+	${SRC_EXODUS_DIR}/var.1
+#	${SRC_EXODUS_DIR}/dim.1
+#	${SRC_EXODUS_DIR}/exoprog.1
+	DESTINATION ${CMAKE_INSTALL_PREFIX}/share/man/man1
 )
