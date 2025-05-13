@@ -835,66 +835,6 @@ Job ExoProgram::run(in command) {
 	return Job(command, nullptr, nullptr, result_queue_);
 }
 
-////	std::cerr << "Run: Processing command: " << command << "\n";
-//	auto promise = std::make_shared<std::promise<ExoEnv>>();
-//	ExoEnv new_env;
-//	new_env.init(global_thread_counter.fetch_add(1) + 1);
-//	new_env.parse(command);
-//
-//	// Create and assign queues
-//	new_env.input_queue = std::make_shared<ThreadSafeQueue<var>>();
-//	new_env.output_queue = std::make_shared<ThreadSafeQueue<var>>();
-////	std::cerr << "Run: Input queue use count after creation: " << new_env.input_queue.use_count() << "\n";
-//
-//	// Create Job with copies of new_env's queues before moving
-//	Job job(promise->get_future(), new_env.input_queue, new_env.output_queue);
-////	if (!job.input_queue) {
-////		std::cerr << "Error: job.input_queue is null after construction\n";
-////		return job; // Early return
-////	}
-////	std::cerr << "Run: job.input_queue use count after construction: " << job.input_queue.use_count() << "\n";
-//
-//	// Move new_env into shared_ptr
-//	auto shared_env = std::make_shared<ExoEnv>(std::move(new_env));
-////	std::cerr << "Run: new_env.input_queue after move: " << (new_env.input_queue ? "valid" : "null") << "\n";
-//
-//	// Ensure shared_env has valid queues
-////	if (!shared_env->input_queue) {
-////		shared_env->input_queue = job.input_queue;
-////		shared_env->output_queue = job.output_queue;
-////		std::cerr << "Run: Restored shared_env->input_queue\n";
-////	}
-////	std::cerr << "Run: shared_env->input_queue use count after move: " << shared_env->input_queue.use_count() << "\n";
-//
-//	auto task = [this, promise, shared_env, command]() mutable {
-//		try {
-////			std::cerr << "Thread: Input queue use count: " << shared_env->input_queue.use_count() << "\n";
-//			Callable callable{*shared_env};
-//			var libname = command.field(" ", 1);
-//			var funcname = "exoprogram_createdelete_";
-//			if (libname.contains(".")) {
-//				funcname ^= libname.field(".", 2);
-//				libname = libname.field(".", 1);
-//			}
-//			if (!callable.initsmf(*shared_env, libname.c_str(), funcname.c_str(), true))
-//				throw std::runtime_error("Failed to initialize shared member function");
-//			shared_env->ANS = std::move(exoprog_callsmf(callable));
-////			std::cerr << "Thread: Input queue use count after work: " << shared_env->input_queue.use_count() << "\n";
-//			promise->set_value(std::move(*shared_env));
-//		} catch (...) {
-//			promise->set_exception(std::current_exception());
-//		}
-//	};
-//
-//	try {
-//		threadpool1.enqueue(std::move(task));
-//	} catch (const std::exception& e) {
-//		promise->set_exception(std::current_exception());
-//	}
-//
-//	return job;
-//}
-
 // execute
 var ExoProgram::execute(in command_line) {
 

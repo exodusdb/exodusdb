@@ -32,8 +32,7 @@
 namespace exo {
 	template<typename T>
 	int run_exoprogram(int argc, const char* argv[]) {
-		ExoEnv mv;
-		mv.exodus_main(argc, argv);
+		ExoEnv mv(argc, argv);
 		T exoprogram(mv);
 		return exoprogram.run_main(
 			static_cast<exo::var (ExoProgram::*)()>(&T::main),

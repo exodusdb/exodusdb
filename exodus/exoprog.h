@@ -346,9 +346,13 @@ ND	bool hasnext();
 	// }
 	auto run_results() -> std::generator<ExoEnv&>;
 
+	// Required to terminate run_results.
 	auto run_count() -> var;
+
 	// Required to stop hanging due to dlopen causing reset of max_worker_id to construction setting and preventing workers from seeing the need to close.
 	static auto shutdown_run() -> void;
+
+	// Calls shutdown, dtor, ctor. Useful to start a new batch of jobs followed by async collection of all run_results.
 	static auto reset_run(size_t num_threads) -> void;
 
 	// Close the current program and perform another one.

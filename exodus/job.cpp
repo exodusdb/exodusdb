@@ -105,12 +105,10 @@ Job::Job (
 	auto promise = std::make_shared<std::promise<ExoEnv>>();
 	future = promise->get_future();
 
-	// global Job no
+	// global Job no starts at 0
 	static std::atomic<unsigned int> global_job_counter{0};
 
-	ExoEnv new_env;
-	new_env.init(global_job_counter.fetch_add(1) + 1);
-	new_env.parse(command);
+	ExoEnv new_env(command, global_job_counter.fetch_add(1) + 1);
 
 	// Assign queues to new_env
 	new_env.input_queue = input_queue;

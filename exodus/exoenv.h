@@ -69,12 +69,15 @@ class PUBLIC ExoEnv final {
     ExoEnv(const ExoEnv&) = delete;
     ExoEnv& operator=(const ExoEnv&) = delete;
 
-	void exodus_main(int exodus_argc, const char* exodus_argv[], int threadno = 0);
+	// ctor from argc argv
+	ExoEnv(int exodus_argc, const char* exodus_argv[], int threadno = 0);
 
-	bool init(const int threadno);
+	// ctor from command;
+	ExoEnv(in command, int threadno = 0);
 
 	bool processno_islocked(int processno);
 
+	// Update COMMAND, OPTIONS etc. for a performed program
 	var parse(in sentence);
 
 	// Keep in sync in exoenv.h and exomacros.h
@@ -220,6 +223,7 @@ var osgetenv(SV envcode) {
 
 }; // class ExoEnv
 
+// Why is this defined along with ExoEnv?
 PUBLIC extern ThreadPool threadpool1;
 #ifdef EXO_EXOPROG_CPP
 PUBLIC ThreadPool threadpool1(4);

@@ -38,86 +38,17 @@ std::string mvgethostname();
 
 // NB do not define default copy constructor and assignment in order to force
 // derived classes to implement them since they are defined in the class header
+// No derived classes to date.
 
-// destructor
-ExoEnv::~ExoEnv() {
-
-	// std::wcout<<"ExoEnv: Closing Definitions ... "<<std::flush;
-	if (DEFINITIONS.assigned() && DEFINITIONS) {
-		DEFINITIONS.close();
-	}
-	// std::wcout<<"OK"<<std::endl;
-
-	// std::wcout<<"ExoEnv: Disconnecting DB ... "<<std::flush;
-	if (SESSION.assigned() && SESSION) {
-		SESSION.close();
-	}
-	// std::wcout<<"OK"<<std::endl;
-
-	// a file handle to make unique locks
-	//if (processnolockfd != 0)
-	//	releaseprocess(&processnolockfd);
+// ctor from command
+ExoEnv::ExoEnv(in command, int threadno) : THREADNO(threadno) {
+	parse(command);
 }
 
-// keep in sync both 1) declaration in class and 2) contruction initialisation
-bool ExoEnv::init(const int threadno) {
-
-	// std::wcout<<"ExoEnv::init("<<threadno<<")"<<std::endl;
-
-	THREADNO = threadno;
-
-	// pretty obsolete nowadays
-	// environment variables may not be available until exported
-	// do set -p to find out exported variables instead of all
-	if (not CRTWIDE.osgetenv("COLUMNS") or not CRTWIDE)
-		CRTWIDE = 80;
-	if (not CRTHIGH.osgetenv("LINES") or not CRTHIGH)
-		CRTHIGH = 25;
-
-	//	THREADNO.outputl("PROCESS NO ===================================================== ");
-
-	//STATION = var(mvgethostname()).field(".", 1);
-
-	return true;
-}
-
-var ExoEnv::parse(in sentence) {
-
-	// Parse words using spaces into an FM delimited string leaving quoted phrases intact.
-	// Spaces are used to parse fields.
-	// Spaces and single quotes are preserved inside double quotes.
-	// Spaces are double quotes preserved inside single quotes.
-	// Backslashes and any character following a backslash (particularly spaces, double and single quotes and backslashes) are treated as non-special characters.
-	SENTENCE = sentence;
-
-	COMMAND = SENTENCE.parse(' ');
-
-	// Cut off OPTIONS from end of COMMAND if present
-	// *** SIMILAR code in
-	// 1. exofuncs.cpp exodus_main()
-	// 2. exoprog.cpp  perform()
-	// OPTIONS are in either (AbC) or {AbC} WITHOUT SPACES in the last field of COMMAND
-	OPTIONS = COMMAND.field(FM, -1);
-	if ((OPTIONS.starts("{") and OPTIONS.ends("}")) or (OPTIONS.starts("(") and OPTIONS.ends(")"))) {
-		// Remove last field of COMMAND. TODO fpopper command or remover(-1)?
-		COMMAND.cutter(-OPTIONS.len() - 1);
-		// Remove first { or ( and last ) } chars of OPTIONS
-		OPTIONS.cutter(1);
-		OPTIONS.popper();
-	} else {
-		OPTIONS = "";
-	}
-
-	// Load the shared library file (always lowercase) TODO allow mixed case
-	// creating a new object so that its member variables all start out unassigned.
-	let libname = SENTENCE.field(" ", 1).lcase();
-
-	return libname;
-}
-
+// ctor from argc argv
 #pragma GCC diagnostic push
 #pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
-void ExoEnv::exodus_main(int exodus_argc, const char* exodus_argv[], int threadno) {
+ExoEnv::ExoEnv(int exodus_argc, const char* exodus_argv[], int threadno) : THREADNO(threadno) {
 #pragma GCC diagnostic pop
 
 	// signal/interrupt handlers
@@ -128,7 +59,7 @@ void ExoEnv::exodus_main(int exodus_argc, const char* exodus_argv[], int threadn
 	//	tss_environmentns.reset(new int(0));
 	//	global_environments.resize(6);
 	//int environmentn = 0;
-	init(threadno);
+//	init(threadno);
 	// DICT.outputl("DICT=");
 	//	global_environments[environmentn] = &mv;
 
@@ -187,7 +118,7 @@ void ExoEnv::exodus_main(int exodus_argc, const char* exodus_argv[], int threadn
 		OPTIONS = "";
 	}
 
-	let temp;
+//	let temp;
 	// DBTRACE=osgetenv("EXO_DBTRACE",temp)?1:-1;
 
 	// would have to passed in as a function pointer
@@ -195,6 +126,82 @@ void ExoEnv::exodus_main(int exodus_argc, const char* exodus_argv[], int threadn
 
 	//atexit(exodus_atexit);
 
+}
+
+// destructor
+ExoEnv::~ExoEnv() {
+
+	// std::wcout<<"ExoEnv: Closing Definitions ... "<<std::flush;
+	if (DEFINITIONS.assigned() && DEFINITIONS) {
+		DEFINITIONS.close();
+	}
+	// std::wcout<<"OK"<<std::endl;
+
+	// std::wcout<<"ExoEnv: Disconnecting DB ... "<<std::flush;
+	if (SESSION.assigned() && SESSION) {
+		SESSION.close();
+	}
+	// std::wcout<<"OK"<<std::endl;
+
+	// a file handle to make unique locks
+	//if (processnolockfd != 0)
+	//	releaseprocess(&processnolockfd);
+}
+
+//// keep in sync both 1) declaration in class and 2) ctor initialisation
+//bool ExoEnv::init(const int threadno) {
+//
+//	// std::wcout<<"ExoEnv::init("<<threadno<<")"<<std::endl;
+//
+//	THREADNO = threadno;
+//
+//	// pretty obsolete nowadays
+//	// environment variables may not be available until exported
+//	// do set -p to find out exported variables instead of all
+//	if (not CRTWIDE.osgetenv("COLUMNS") or not CRTWIDE)
+//		CRTWIDE = 80;
+//	if (not CRTHIGH.osgetenv("LINES") or not CRTHIGH)
+//		CRTHIGH = 25;
+//
+//	//	THREADNO.outputl("PROCESS NO ===================================================== ");
+//
+//	//STATION = var(mvgethostname()).field(".", 1);
+//
+//	return true;
+//}
+
+var ExoEnv::parse(in sentence) {
+
+	// Parse words using spaces into an FM delimited string leaving quoted phrases intact.
+	// Spaces are used to parse fields.
+	// Spaces and single quotes are preserved inside double quotes.
+	// Spaces are double quotes preserved inside single quotes.
+	// Backslashes and any character following a backslash (particularly spaces, double and single quotes and backslashes) are treated as non-special characters.
+	SENTENCE = sentence;
+
+	COMMAND = SENTENCE.parse(' ');
+
+	// Cut off OPTIONS from end of COMMAND if present
+	// *** SIMILAR code in
+	// 1. exofuncs.cpp exodus_main()
+	// 2. exoprog.cpp  perform()
+	// OPTIONS are in either (AbC) or {AbC} WITHOUT SPACES in the last field of COMMAND
+	OPTIONS = COMMAND.field(FM, -1);
+	if ((OPTIONS.starts("{") and OPTIONS.ends("}")) or (OPTIONS.starts("(") and OPTIONS.ends(")"))) {
+		// Remove last field of COMMAND. TODO fpopper command or remover(-1)?
+		COMMAND.cutter(-OPTIONS.len() - 1);
+		// Remove first { or ( and last ) } chars of OPTIONS
+		OPTIONS.cutter(1);
+		OPTIONS.popper();
+	} else {
+		OPTIONS = "";
+	}
+
+	// Load the shared library file (always lowercase) TODO allow mixed case
+	// creating a new object so that its member variables all start out unassigned.
+	let libname = SENTENCE.field(" ", 1).lcase();
+
+	return libname;
 }
 
 //bool ExoEnv::processno_islocked(int processno)
