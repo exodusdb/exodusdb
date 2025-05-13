@@ -128,8 +128,6 @@ std::mutex global_mutex_threadstream;
 //      = output/outputl/outputt, logput/logputl
 //#define LOCKIOSTREAM_NO
 
-int exodus_main(int exodus_argc, const char* exodus_argv[], ExoEnv& mv, int threadno);
-
 ND var  hash(in instring, const std::uint64_t modulus = 0);
 
 ND var  osgetenv(SV envcode = "" );

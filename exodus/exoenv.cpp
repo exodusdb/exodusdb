@@ -43,14 +43,14 @@ std::string mvgethostname();
 ExoEnv::~ExoEnv() {
 
 	// std::wcout<<"ExoEnv: Closing Definitions ... "<<std::flush;
-	if (this->DEFINITIONS.assigned() && this->DEFINITIONS) {
-		this->DEFINITIONS.close();
+	if (DEFINITIONS.assigned() && DEFINITIONS) {
+		DEFINITIONS.close();
 	}
 	// std::wcout<<"OK"<<std::endl;
 
 	// std::wcout<<"ExoEnv: Disconnecting DB ... "<<std::flush;
-	if (this->SESSION.assigned() && this->SESSION) {
-		this->SESSION.close();
+	if (SESSION.assigned() && SESSION) {
+		SESSION.close();
 	}
 	// std::wcout<<"OK"<<std::endl;
 
@@ -64,19 +64,19 @@ bool ExoEnv::init(const int threadno) {
 
 	// std::wcout<<"ExoEnv::init("<<threadno<<")"<<std::endl;
 
-	this->THREADNO = threadno;
+	THREADNO = threadno;
 
 	// pretty obsolete nowadays
 	// environment variables may not be available until exported
 	// do set -p to find out exported variables instead of all
-	if (not this->CRTWIDE.osgetenv("COLUMNS") or not this->CRTWIDE)
-		this->CRTWIDE = 80;
-	if (not this->CRTHIGH.osgetenv("LINES") or not this->CRTHIGH)
-		this->CRTHIGH = 25;
+	if (not CRTWIDE.osgetenv("COLUMNS") or not CRTWIDE)
+		CRTWIDE = 80;
+	if (not CRTHIGH.osgetenv("LINES") or not CRTHIGH)
+		CRTHIGH = 25;
 
-	//	this->THREADNO.outputl("PROCESS NO ===================================================== ");
+	//	THREADNO.outputl("PROCESS NO ===================================================== ");
 
-	//this->STATION = var(mvgethostname()).field(".", 1);
+	//STATION = var(mvgethostname()).field(".", 1);
 
 	return true;
 }
@@ -113,6 +113,88 @@ var ExoEnv::parse(in sentence) {
 	let libname = SENTENCE.field(" ", 1).lcase();
 
 	return libname;
+}
+
+#pragma GCC diagnostic push
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
+void ExoEnv::exodus_main(int exodus_argc, const char* exodus_argv[], int threadno) {
+#pragma GCC diagnostic pop
+
+	// signal/interrupt handlers
+	// install_signals();
+	//var().breakon();
+//	breakon();
+
+	//	tss_environmentns.reset(new int(0));
+	//	global_environments.resize(6);
+	//int environmentn = 0;
+	init(threadno);
+	// DICT.outputl("DICT=");
+	//	global_environments[environmentn] = &mv;
+
+	// Done in exoenv contructors now
+	// EXECPATH = getexecpath();
+
+	// No longer done here; to allow EXECPATH to be const
+	//if (not EXECPATH) {
+	//	if (exodus_argc)
+	//		EXECPATH = var(exodus_argv[0]);
+	//	if (not EXECPATH.contains(OSSLASH))
+	//		EXECPATH.prefixer(oscwd() ^ OSSLASH);
+	//}
+
+	SENTENCE = "";  // ALN:TODO: hm, again, char->var-> op=(var)
+	COMMAND = "";
+	OPTIONS = "";
+
+	// reconstructs complete original sentence unfortunately quote marks will have been lost
+	// unless escaped needs to go after various exodus definitions how the MSVCRT tokenizes
+	// arguments http://msdn.microsoft.com/en-us/library/a1y7w461.aspx
+	// http://stackoverflow.com/questions/4094699/how-does-the-windows-command-interpreter-cmd-exe-parse-scripts
+	for (int ii = 0; ii < exodus_argc; ++ii) {
+		var word = var(exodus_argv[ii]);
+		if (ii == 0) {
+			word = word.field(OSSLASH, -1);
+			// remove trailing ".exe"
+			if (word.lcase().ends(".exe"))
+				word.cutter(-4);
+		} else
+			SENTENCE ^= " ";
+
+		//dont do this because easier to understand bash expansion without it
+		// put back quotes if any spaces
+		//if (word.contains(" "))
+		//	word.quoter();
+
+		SENTENCE ^= word;
+		COMMAND ^= word ^ FM_;
+	}
+	COMMAND.popper();
+
+	// Cut off OPTIONS from end of COMMAND if present
+	// *** SIMILAR code in
+	// 1. exofuncs.cpp exodus_main()
+	// 2. exoprog.cpp  perform()
+	// OPTIONS are in either (AbC) or {AbC} in the last field of COMMAND
+	OPTIONS = COMMAND.field(_FM, -1);
+	if ((OPTIONS.starts("{") and OPTIONS.ends("}")) or (OPTIONS.starts("(") and OPTIONS.ends(")"))) {
+		// Remove last field of COMMAND TODO fpopper command?
+		COMMAND.cutter(-OPTIONS.len() - 1);
+		// Remove first { or ( and last ) } chars of OPTIONS
+		OPTIONS.cutter(1);
+		OPTIONS.popper();
+	} else {
+		OPTIONS = "";
+	}
+
+	let temp;
+	// DBTRACE=osgetenv("EXO_DBTRACE",temp)?1:-1;
+
+	// would have to passed in as a function pointer
+	// main2(exodus_argc, exodus_argv);
+
+	//atexit(exodus_atexit);
+
 }
 
 //bool ExoEnv::processno_islocked(int processno)

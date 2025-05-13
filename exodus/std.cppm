@@ -102,6 +102,8 @@ export namespace std {
 //	using std::make_shared;
 	using std::current_exception;
 
+	using std::is_base_of_v;
+	using std::is_same_v;
 	using std::is_destructible;
 	using std::ptrdiff_t;
 //	using std::make_shared;

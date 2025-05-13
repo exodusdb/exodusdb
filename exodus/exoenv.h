@@ -69,6 +69,8 @@ class PUBLIC ExoEnv final {
     ExoEnv(const ExoEnv&) = delete;
     ExoEnv& operator=(const ExoEnv&) = delete;
 
+	void exodus_main(int exodus_argc, const char* exodus_argv[], int threadno = 0);
+
 	bool init(const int threadno);
 
 	bool processno_islocked(int processno);

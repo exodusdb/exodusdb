@@ -835,64 +835,64 @@ Job ExoProgram::run(in command) {
 	return Job(command, nullptr, nullptr, result_queue_);
 }
 
-////    std::cerr << "Run: Processing command: " << command << "\n";
-//    auto promise = std::make_shared<std::promise<ExoEnv>>();
-//    ExoEnv new_env;
-//    new_env.init(global_thread_counter.fetch_add(1) + 1);
-//    new_env.parse(command);
+////	std::cerr << "Run: Processing command: " << command << "\n";
+//	auto promise = std::make_shared<std::promise<ExoEnv>>();
+//	ExoEnv new_env;
+//	new_env.init(global_thread_counter.fetch_add(1) + 1);
+//	new_env.parse(command);
 //
-//    // Create and assign queues
-//    new_env.input_queue = std::make_shared<ThreadSafeQueue<var>>();
-//    new_env.output_queue = std::make_shared<ThreadSafeQueue<var>>();
-////    std::cerr << "Run: Input queue use count after creation: " << new_env.input_queue.use_count() << "\n";
+//	// Create and assign queues
+//	new_env.input_queue = std::make_shared<ThreadSafeQueue<var>>();
+//	new_env.output_queue = std::make_shared<ThreadSafeQueue<var>>();
+////	std::cerr << "Run: Input queue use count after creation: " << new_env.input_queue.use_count() << "\n";
 //
-//    // Create Job with copies of new_env's queues before moving
-//    Job job(promise->get_future(), new_env.input_queue, new_env.output_queue);
-////    if (!job.input_queue) {
-////        std::cerr << "Error: job.input_queue is null after construction\n";
-////        return job; // Early return
-////    }
-////    std::cerr << "Run: job.input_queue use count after construction: " << job.input_queue.use_count() << "\n";
+//	// Create Job with copies of new_env's queues before moving
+//	Job job(promise->get_future(), new_env.input_queue, new_env.output_queue);
+////	if (!job.input_queue) {
+////		std::cerr << "Error: job.input_queue is null after construction\n";
+////		return job; // Early return
+////	}
+////	std::cerr << "Run: job.input_queue use count after construction: " << job.input_queue.use_count() << "\n";
 //
-//    // Move new_env into shared_ptr
-//    auto shared_env = std::make_shared<ExoEnv>(std::move(new_env));
-////    std::cerr << "Run: new_env.input_queue after move: " << (new_env.input_queue ? "valid" : "null") << "\n";
+//	// Move new_env into shared_ptr
+//	auto shared_env = std::make_shared<ExoEnv>(std::move(new_env));
+////	std::cerr << "Run: new_env.input_queue after move: " << (new_env.input_queue ? "valid" : "null") << "\n";
 //
-//    // Ensure shared_env has valid queues
-////    if (!shared_env->input_queue) {
-////        shared_env->input_queue = job.input_queue;
-////        shared_env->output_queue = job.output_queue;
-////        std::cerr << "Run: Restored shared_env->input_queue\n";
-////    }
-////    std::cerr << "Run: shared_env->input_queue use count after move: " << shared_env->input_queue.use_count() << "\n";
+//	// Ensure shared_env has valid queues
+////	if (!shared_env->input_queue) {
+////		shared_env->input_queue = job.input_queue;
+////		shared_env->output_queue = job.output_queue;
+////		std::cerr << "Run: Restored shared_env->input_queue\n";
+////	}
+////	std::cerr << "Run: shared_env->input_queue use count after move: " << shared_env->input_queue.use_count() << "\n";
 //
-//    auto task = [this, promise, shared_env, command]() mutable {
-//        try {
-////            std::cerr << "Thread: Input queue use count: " << shared_env->input_queue.use_count() << "\n";
-//            Callable callable{*shared_env};
-//            var libname = command.field(" ", 1);
-//            var funcname = "exoprogram_createdelete_";
-//            if (libname.contains(".")) {
-//                funcname ^= libname.field(".", 2);
-//                libname = libname.field(".", 1);
-//            }
-//            if (!callable.initsmf(*shared_env, libname.c_str(), funcname.c_str(), true))
-//                throw std::runtime_error("Failed to initialize shared member function");
-//            shared_env->ANS = std::move(exoprog_callsmf(callable));
-////            std::cerr << "Thread: Input queue use count after work: " << shared_env->input_queue.use_count() << "\n";
-//            promise->set_value(std::move(*shared_env));
-//        } catch (...) {
-//            promise->set_exception(std::current_exception());
-//        }
-//    };
+//	auto task = [this, promise, shared_env, command]() mutable {
+//		try {
+////			std::cerr << "Thread: Input queue use count: " << shared_env->input_queue.use_count() << "\n";
+//			Callable callable{*shared_env};
+//			var libname = command.field(" ", 1);
+//			var funcname = "exoprogram_createdelete_";
+//			if (libname.contains(".")) {
+//				funcname ^= libname.field(".", 2);
+//				libname = libname.field(".", 1);
+//			}
+//			if (!callable.initsmf(*shared_env, libname.c_str(), funcname.c_str(), true))
+//				throw std::runtime_error("Failed to initialize shared member function");
+//			shared_env->ANS = std::move(exoprog_callsmf(callable));
+////			std::cerr << "Thread: Input queue use count after work: " << shared_env->input_queue.use_count() << "\n";
+//			promise->set_value(std::move(*shared_env));
+//		} catch (...) {
+//			promise->set_exception(std::current_exception());
+//		}
+//	};
 //
-//    try {
-//        threadpool1.enqueue(std::move(task));
-//    } catch (const std::exception& e) {
-//        promise->set_exception(std::current_exception());
-//    }
+//	try {
+//		threadpool1.enqueue(std::move(task));
+//	} catch (const std::exception& e) {
+//		promise->set_exception(std::current_exception());
+//	}
 //
-//    return job;
+//	return job;
 //}
 
 // execute
@@ -1107,7 +1107,7 @@ var ExoProgram::xlate(in filename, in key, in fieldno_or_name, const char* mode)
 	if (nkeys > 1)
 		results.converter(_FM, _VM);
 	//else
-	//    sep = _RM;
+	//	sep = _RM;
 
 	return results;
 }
@@ -2665,6 +2665,75 @@ var ExoProgram::amountunit(in input0, out unitx) {
 //	return 0;
 //}
 
+// In exofuncs.h and exodebug.cpp
+void breakon();
+
+int ExoProgram::run_main(var (ExoProgram::*main_func)(), int argc, const char* argv[], int threadno) {
+
+    // signal/interrupt handlers
+    // install_signals();
+	breakon();
+
+	var result;
+	var caught = "";
+	int exit_status = 0;
+
+	// Check EXO_DEBUG using ExoEnv
+	if (var().osgetenv("EXO_DEBUG")) {
+		var("Debug Init Thread:" ^ mv.THREADNO ^ " " ^ mv.SENTENCE).errputl();
+		// Debug mode: no exception catching
+		result = (this->*main_func)();
+		var("Debug Exit Thread:" ^ mv.THREADNO ^ " " ^ mv.SENTENCE).errputl();
+	} else {
+		try {
+			// Normal mode: catch exceptions
+			result = (this->*main_func)().or_default("");
+		} catch (const ExoStop& e) {
+			result = e.message;
+		} catch (const ExoAbort& e) {
+			caught = "ExoAbort: ";
+			result = e.message;
+			exit_status = 1;
+		} catch (const ExoAbortAll& e) {
+			caught = "ExoAbortAll: ";
+			result = e.message;
+			exit_status = 2;
+		} catch (const VarError& e) {
+			caught = "VarError: ";
+			result = e.message;
+			exit_status = 3;
+			var(e.stack()).convert(FM, "         \n").errputl();
+		} catch (const std::exception& e) {
+			(var(e.what()) ^ " - Aborting.").errputl();
+			result = 1;
+		} catch (...) {
+			let msg = "Error: Unknown exception caught in " ^ var(__PRETTY_FUNCTION__);
+			msg.errputl();
+			auto e = VarError(msg);
+			var(e.stack()).convert(FM, "         \n").errputl();
+			result = mv.OPTIONS.contains("I") ? 0 : 999;
+		}
+	}
+
+	// Cleanup
+	var().disconnectall();
+	var().disconnect();
+
+	// Handle result and exit status
+	if (!result.assigned())
+		result = 101;
+	if (!result.empty() && result.isnum())
+		exit_status = result;
+	if (!result.isnum()) {
+		if (exit_status)
+			result.errputl(caught);
+		else
+			result.outputl(caught);
+	}
+
+	return exit_status;
+}
+
 // clang-format off
 
 ExoExit     ::ExoExit(in errmsg)     : message(errmsg) {}
@@ -2678,4 +2747,4 @@ ExoAbortAll ::ExoAbortAll(in errmsg) : message(errmsg) {}
 
 // clang-format on
 
-}  // namespace exo
+} // namespace exo

@@ -476,6 +476,7 @@ add_definitions(-DGIT_REMOTE_COMMIT_HASH_SHORT="${GIT_REMOTE_COMMIT_HASH_SHORT}"
 	message("")
     set(CLI_DIR cli)
     set(BIN_CLI_DIR ${CMAKE_BINARY_DIR}/${CLI_DIR})
+    set(SRC_CLI_DIR ${CMAKE_SOURCE_DIR}/${CLI_DIR})
 	#target_compile_options(nlist PUBLIC "-O2")
 	add_subdirectory(cli)
 

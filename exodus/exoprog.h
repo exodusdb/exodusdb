@@ -142,6 +142,8 @@ class PUBLIC ExoProgram {
 	// which could be a problem if not using factory function to create .so. objects.
 	virtual ~ExoProgram();
 
+    int run_main(var (ExoProgram::*main_func)(), int argc, const char* argv[], int threadno = 0);
+
 	///////////////////
 	///// Select lists:
 	///////////////////

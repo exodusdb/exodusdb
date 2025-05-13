@@ -121,7 +121,6 @@ export namespace exo {
 
 //	using exo::exo_backtrace;
 //	using exo::exo_savestack;
-	using exo::exodus_main;
 
 	// This is mostly exporting the free functions defined in exofuncs.h
 
