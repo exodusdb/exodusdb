@@ -67,13 +67,24 @@ set -euxo pipefail
 	fi
 
 :
-: Check the server program and work directory are actually available
-: ==================================================================
+: Check serve_any is available
+: ============================
 :
-	SERVICE_BIN=$EXO_HOME/bin/serve_$APP_CODE
+	SERVICE_BIN=$EXO_HOME/bin/serve_any
 	if ! test -x $SERVICE_BIN; then
 		set +x
 		echo "$SERVICE_BIN program not available or not executable. Cannot create service."
+		exit 1
+	fi
+
+:
+: Check the server program and work directory are actually available
+: ==================================================================
+:
+	SERVICE_CMD=serve_$APP_CODE
+	if ! test -x $EXO_HOME/bin/$SERVICE_CMD; then
+		set +x
+		echo "$SERVICE_CMD program not available or not executable. Cannot create service."
 		exit 1
 	fi
 
@@ -112,7 +123,7 @@ set -euxo pipefail
 		Environment="LD_LIBRARY_PATH=$EXO_HOME/lib"
 		Environment="EXO_STARTED_BY_SYSTEMD=true"
 		Environment="EXO_SERVICE_CODE=$SERVICE_CODE@%i"
-		ExecStart=$SERVICE_BIN $IDB_CODES
+		ExecStart=$SERVICE_BIN $SERVICE_CMD $IDB_CODES
 		ExecReload=/bin/kill -s HUP \$MAINPID
 		#StandardOutput=append:/var/log/neo/${IDB_CODE}.log
 		#StandardError=append:/var/log/neo/${IDB_CODE}_error.log
