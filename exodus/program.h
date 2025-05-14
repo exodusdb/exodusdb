@@ -31,8 +31,8 @@
 // A templated function to instantiate the class and run main().
 namespace exo {
 	template<typename T>
-	int run_exoprogram(int argc, const char* argv[]) {
-		ExoEnv ev(argc, argv);
+	int run_exoprogram(int argc, const char* argv[], int threadno = 0) {
+		ExoEnv ev(argc, argv, threadno);
 		T exoprogram(ev);
 		return exoprogram.run_main(
 			static_cast<exo::var (ExoProgram::*)()>(&T::main),
@@ -46,6 +46,10 @@ namespace exo {
 /* 1. Forward declare the ExoProgram-derived class */               \
 class PREFIX##_ExoProgram;                                          \
                                                                     \
+/* for backward compatibility during transition only*/              \
+int PREFIX##main2(int argc, const char* argv[], int threadno) {     \
+	return exo::run_exoprogram<PREFIX##_ExoProgram>(argc, argv, threadno);\
+}                                                                   \
 /* 2. Define int main() to instantiate and run the program */       \
 int PREFIX##main(int argc, const char* argv[]) {                    \
 	return exo::run_exoprogram<PREFIX##_ExoProgram>(argc, argv);    \

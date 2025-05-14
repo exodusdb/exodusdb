@@ -114,6 +114,9 @@ function main() {
 
 		text.replacer("Exo" "Logoff", "ExoStop");
 
+		// ST, _ST and ST_ become STM, _STM and STM_
+		text.replacer(R"__(\b(_?)ST(_?)\b)__"_rex, "$1STM$2");
+
 		// Change obsolete programinit and libraryinit if exactly at end of file
 		if (text.ends("\nprogramexit()\n") or text.ends("\nlibraryexit()\n"))
 			text.paster(-14, 0, "}; /" "/ ");
