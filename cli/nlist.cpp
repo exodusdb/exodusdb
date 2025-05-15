@@ -381,7 +381,7 @@ func main() {
 	// Include time before prior select if running as a service
 	let request_started = SYSTEM.f(25);
 	if (request_started) {
-		fromtimestamp = var().ostimestamp(request_started);
+		fromtimestamp = date().ostimestamp(request_started);
 	} else {
 		fromtimestamp = ostimestamp();
 	}
