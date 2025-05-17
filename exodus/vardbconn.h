@@ -27,7 +27,7 @@
 
 //Requirement 10. Attempt to use 'invalidated' connection raises exception 
 
-//Requirement 11. ConnectionLockss (which accompany DB table locks), are added to connection table and
+//Requirement 11. DBlockss (which accompany DB table locks), are added to connection table and
 //					stored/deleted within connection record
 
 #if EXO_MODULE
@@ -55,27 +55,37 @@
 
 namespace exo {
 
-using ConnectionLocks = std::map<std::uint64_t, int>;
-using DBCache = std::map<std::uint64_t, std::string>;
+//using DBlocks = std::map<std::uint64_t, int>;
+using DBlocks = std::set<std::uint64_t>;
+using DBcache = std::map<std::uint64_t, std::string>;
 using PGCONN_DELETER = void (*)(PGconn*);
 
-class DBConn;
-using DBConns = std::map<int, DBConn>;
+class DBconn;
+using DBconns = std::map<int, DBconn>;
+
+// Implicitly converts to which ever ptr is needed in function calls
+// DBconn contains a PGconn* so it is PGconn* plus.
+class DBconn_ptr {
+public:
+	DBconn* dbconn = nullptr;
+	operator DBconn*() const;
+	operator PGconn*() const;
+};
 
 // Holds a pointer to a PGconn, caches for records, and a lock table
-class DBConn	 // used as 'second' in pair, stored in connection map
+class DBconn	 // used as 'second' in pair, stored in dbconns map
 {
    public:
 
 	// ctors
 
-//	DBConn() : pgconn_(nullptr) {}
-	explicit DBConn() = default;
+//	DBconn() : pgconn_(nullptr) {}
+	explicit DBconn() = default;
 
-	//DBConn(PGconn* pgconn, std::string conninfo)
+	//DBconn(PGconn* pgconn, std::string conninfo)
 	//	: pgconn_(pgconn), conninfo_(conninfo) {
 	//}
-	DBConn(PGconn* pgconn, std::string conninfo);
+	DBconn(PGconn* pgconn, std::string conninfo);
 
 	// members
 	//////////
@@ -89,13 +99,13 @@ class DBConn	 // used as 'second' in pair, stored in connection map
 
 	// postgres locks per dbconn
 	// used to fail lock (per mv standard_ instead of stack locks (per postgres standard)
-	//ConnectionLocks* locks_;
-	ConnectionLocks locks_;
+	//DBlocks* locks_;
+	DBlocks locks_;
 
 	//?
 	int extra_ = 0;
 
-	DBCache dbcache_;
+	DBcache dbcache_;
 
 	std::string conninfo_;
 
@@ -103,12 +113,12 @@ class DBConn	 // used as 'second' in pair, stored in connection map
 
 };
 
-//PUBLIC DBConn::DBConn(PGconn* pgconn, std::string conninfo)
+//PUBLIC DBconn::DBconn(PGconn* pgconn, std::string conninfo)
 //		: pgconn_(pgconn), conninfo_(conninfo) {
 //	}
 
 // "final" to avoid declaring the destructor as virtual as a precaution
-class DBConnector final {
+class DBpool final {
 
 	// data members
 	///////////////
@@ -120,18 +130,18 @@ class DBConnector final {
 	int dbconn_no_;
 
 	// container
-	mutable DBConns dbconns_;
+	mutable DBconns dbconns_;
 
    public:
 
 	// ctors/dtors
 	//////////////
 
-	explicit DBConnector(PGCONN_DELETER del_);
+	explicit DBpool(PGCONN_DELETER del_);
 
 	//class marked as final so no need for virtual
-	//virtual ~DBConnector();
-	~DBConnector();
+	//virtual ~DBpool();
+	~DBpool();
 
 	// manipulators
 	///////////////
@@ -148,9 +158,12 @@ class DBConnector final {
 	////////////
 
 	int max_dbconn_no();
-	PGconn* get_pgconn(const int dbconn_no) const;
-	DBConn* get_dbconn(const int dbconn_no) const;
-	DBCache* get_dbcache(const int dbconn_no) const;
+
+	// We are actually passing something that can be implicit converted to a PGconn
+	auto get_pgconn(const int dbconn_no) const -> DBconn_ptr;
+
+	auto get_dbconn(const int dbconn_no) const -> DBconn*;
+	auto get_dbcache(const int dbconn_no) const -> DBcache*;
 
 	bool getrecord(const int dbconn_no, const std::uint64_t hash64, std::string& record) const;
 	void putrecord(const int dbconn_no, const std::uint64_t hash64, const std::string& record);

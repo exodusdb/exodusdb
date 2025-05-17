@@ -12,33 +12,44 @@ constexpr int TRACING = 0;
 
 namespace exo {
 
-DBConn::DBConn(PGconn* pgconn, std::string conninfo)
+// Implicitly converts to which ever ptr is needed in function calls
+// DBconn contains a PGconn* so it is PGconn* plus.
+DBconn_ptr::operator DBconn*() const {
+	return dbconn;
+}
+DBconn_ptr::operator PGconn*() const {
+	return dbconn->pgconn_;
+}
+
+DBconn::DBconn(PGconn* pgconn, std::string conninfo)
 	: pgconn_(pgconn), conninfo_(conninfo) {
 }
 
-DBConnector::DBConnector(PGCONN_DELETER del)
+DBpool::DBpool(PGCONN_DELETER del)
 	// see important NOTE_OSX in header
 	: del_(del), dbconn_no_(0), dbconns_() {
 }
 
-int DBConnector::add_dbconn(PGconn* conn_to_cache, const std::string conninfo) {
+int DBpool::add_dbconn(PGconn* conn_to_cache, const std::string conninfo) {
 	// no longer need locking since dbconns_ is thread_local
 	//std::lock_guard lock(dbconns_mutex);
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Winline"
 	++dbconn_no_;
-	dbconns_[dbconn_no_] = DBConn(conn_to_cache, conninfo);
+	dbconns_[dbconn_no_] = DBconn(conn_to_cache, conninfo);
 #pragma GCC diagnostic pop
 
 	if (TRACING >= 3) {
-		var(conninfo).replace(R"(password\s*=\s*\w*)"_rex, "").errputl("DBConnector::add_dbconn: " ^ var(dbconn_no_) ^ " conninfo: ");
+		var(conninfo).replace(R"(password\s*=\s*\w*)"_rex, "").errputl("DBpool::add_dbconn: " ^ var(dbconn_no_) ^ " conninfo: ");
 	}
 
 	return dbconn_no_;
 }
 
-PGconn* DBConnector::get_pgconn(const int index) const {
+// We are actully passing something that can be implicit converted to a PGconn
+//PGconn* DBpool::get_pgconn(const int index) const {
+DBconn_ptr DBpool::get_pgconn(const int index) const {
 	//TimeAcc t(100);
 	//std::lock_guard lock(dbconns_mutex);
 
@@ -48,35 +59,37 @@ PGconn* DBConnector::get_pgconn(const int index) const {
 
 	//std::lock_guard lock(dbconns_mutex);
 	auto iter = dbconns_.find(index);
-	//return (PGconn*)(iter == dbconns_.end() ? nullptr : iter->second.pgconn_);
-	//return reinterpret_cast<PGconn*>(iter == dbconns_.end() ? nullptr : iter->second.pgconn_);
-	return static_cast<PGconn*>(iter == dbconns_.end() ? nullptr : iter->second.pgconn_);
+	//	return static_cast<PGconn*>(iter == dbconns_.end() ? nullptr : iter->second.pgconn_);
+	DBconn_ptr dbconn_ptr;
+	if (iter == dbconns_.end())
+		dbconn_ptr.dbconn = &iter->second;
+	return dbconn_ptr;
 }
 
-DBConn* DBConnector::get_dbconn(const int index) const {
+DBconn* DBpool::get_dbconn(const int index) const {
 	//TimeAcc t(103);
 	//std::lock_guard lock(dbconns_mutex);
 	auto iter = dbconns_.find(index);
-	return static_cast<DBConn*>(iter == dbconns_.end() ? nullptr : &iter->second);
-	//return reinterpret_cast<DBConn*>(iter == dbconns_.end() ? nullptr : &iter->second);
+	return static_cast<DBconn*>(iter == dbconns_.end() ? nullptr : &iter->second);
+	//return reinterpret_cast<DBconn*>(iter == dbconns_.end() ? nullptr : &iter->second);
 }
 
-//ConnectionLocks* DBConnector::get_lock_table(int index) const {
+//DBlocks* DBpool::get_lock_table(int index) const {
 //	//std::lock_guard lock(dbconns_mutex);
 //	const auto iter = dbconns_.find(index);
-//	return (ConnectionLocks*)(iter == dbconns_.end() ? nullptr : iter->second.locks__);
+//	return (DBlocks*)(iter == dbconns_.end() ? nullptr : iter->second.locks__);
 //}
 
-DBCache* DBConnector::get_dbcache(const int index) const{
+DBcache* DBpool::get_dbcache(const int index) const{
 	//TimeAcc t(104);
 	//std::lock_guard lock(dbconns_mutex);
 	auto iter = dbconns_.find(index);
-	return static_cast<DBCache*>(iter == dbconns_.end() ? nullptr : &iter->second.dbcache_);
-	//return reinterpret_cast<DBCache*>(iter == dbconns_.end() ? nullptr : &iter->second.dbcache_);
+	return static_cast<DBcache*>(iter == dbconns_.end() ? nullptr : &iter->second.dbcache_);
+	//return reinterpret_cast<DBcache*>(iter == dbconns_.end() ? nullptr : &iter->second.dbcache_);
 }
 
 // pass filename and key by value relying on short string optimisation for performance
-bool DBConnector::getrecord(const int connid, const std::uint64_t hash64, std::string& record) const {
+bool DBpool::getrecord(const int connid, const std::uint64_t hash64, std::string& record) const {
 	//TimeAcc t(105);
 	auto dbcache = get_dbcache(connid);
 	auto cacheentry = dbcache->find(hash64);
@@ -91,7 +104,7 @@ bool DBConnector::getrecord(const int connid, const std::uint64_t hash64, std::s
 }
 
 // pass filename and key by value relying on short string optimisation for performance
-void DBConnector::putrecord(const int connid, const std::uint64_t hash64, const std::string& record) {
+void DBpool::putrecord(const int connid, const std::uint64_t hash64, const std::string& record) {
 	//TimeAcc t(106);
 	auto dbcache = get_dbcache(connid);
 	dbcache->insert_or_assign(hash64, record);
@@ -101,7 +114,7 @@ void DBConnector::putrecord(const int connid, const std::uint64_t hash64, const 
 
 // delrecord is currently setting record to "" to counter c++ unordered map reputed performance issues
 // pass filename and key by value relying on short string optimisation for performance
-bool DBConnector::delrecord(const int connid, const std::uint64_t hash64) {
+bool DBpool::delrecord(const int connid, const std::uint64_t hash64) {
 	//TimeAcc t(106);
 	auto dbcache = get_dbcache(connid);
 	//Must remove since empty entries indicate no present and could be writing a record
@@ -110,7 +123,7 @@ bool DBConnector::delrecord(const int connid, const std::uint64_t hash64) {
 	return dbcache->erase(hash64);
 }
 
-void DBConnector::clearcache(const int connid) {
+void DBpool::clearcache(const int connid) {
 	//TimeAcc t(107);
 	auto dbcache = get_dbcache(connid);
 
@@ -124,7 +137,7 @@ void DBConnector::clearcache(const int connid) {
 	return;
 }
 
-void DBConnector::del_dbconn(const int index) {
+void DBpool::del_dbconn(const int index) {
 	//std::lock_guard lock(dbconns_mutex);
 	//TimeAcc t(108);
 	auto iter = dbconns_.find(index);
@@ -141,7 +154,7 @@ void DBConnector::del_dbconn(const int index) {
 	}
 }
 
-void DBConnector::del_dbconns(const int from_index) {
+void DBpool::del_dbconns(const int from_index) {
 	//std::lock_guard lock(dbconns_mutex);
 	//TimeAcc t(109);
 	auto ix = dbconns_.begin();
@@ -165,18 +178,18 @@ void DBConnector::del_dbconns(const int from_index) {
 	dbconn_no_ = from_index - 1;
 }
 
-DBConnector::~DBConnector() {
+DBpool::~DBpool() {
 	// std::lock_guard lock(dbconns_mutex);
 	//TimeAcc t(110);
 
 	//if (dbconns_.size())
-	//	var(dbconns_.size()).errputl("~DBConnector: dbconns_.size was ");
+	//	var(dbconns_.size()).errputl("~DBpool: dbconns_.size was ");
 
 	auto ix = dbconns_.begin();
 	for (;ix != dbconns_.end(); ix++) {
 
 		//if (ix->second.dbcache_.size())
-		//	var(ix->second.dbcache_.size()).errputl("~DBConnector: []dbcache_.size was ");
+		//	var(ix->second.dbcache_.size()).errputl("~DBpool: []dbcache_.size was ");
 
 		del_(reinterpret_cast<PGconn*>(ix->second.pgconn_));
 		//delete ix->second.locks__;
@@ -188,7 +201,7 @@ DBConnector::~DBConnector() {
 	// lock.unlock();
 }
 
-int DBConnector::max_dbconn_no() {
+int DBpool::max_dbconn_no() {
 	return dbconn_no_;
 }
 
