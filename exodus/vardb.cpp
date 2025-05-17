@@ -252,7 +252,7 @@ static const var defaultconninfo =
 	"password=somesillysecret connect_timeout=10";
 
 // Deleter function to close connection and connection cache object
-// this is also called in the destructor of DBConnectorCache
+// this is also called in the destructor of DBpoolCache
 // MAKE POSTGRES CONNECTIONS ARE CLOSED PROPERLY OTHERWISE MIGHT RUN OUT OF CONNECTIONS!!!
 // TODO so make sure that we dont use exit(n) anywhere in the programs!
 static void PGconn_DELETER(PGconn* pgconn) {
@@ -290,7 +290,7 @@ static thread_local int thread_default_data_dbconn_no = 0;
 static thread_local int thread_default_dict_dbconn_no = 0;
 //thread_local var thread_connparams = "";
 static thread_local var thread_lasterror = "";
-static thread_local DBConnector thread_dbconnector(PGconn_DELETER);
+static thread_local DBpool dbpool(PGconn_DELETER);
 static thread_local std::map<std::string, std::string> thread_file_handles;
 
 // Few entries so map will be much faster than unordered_map
@@ -637,25 +637,25 @@ static PGconn* get_pgconn(in dbhandle) {
 
 	if (DBTRACE>1) UNLIKELY {
 		std::clog << std::endl;
-		PGconn* pgconn=thread_dbconnector.get_pgconn(dbconn_no);
+		PGconn* pgconn=dbpool.get_pgconn(dbconn_no);
 		std::clog << "CONN " << dbconn_no << " " << pgconn << std::endl;
 	}
 
 	// Return the relevent pg_connection structure
-	const auto pgconn = thread_dbconnector.get_pgconn(dbconn_no);
+	const auto pgconn = dbpool.get_dbconn(dbconn_no)->pgconn_;
 	// TODO error abort if zero
 	return pgconn;
 
 }
 
 // Gets lock_table, associated with connection, associated with this object
-static DBConn* get_dbconn(in dbhandle) {
+static DBconn* get_dbconn(in dbhandle) {
 	int dbconn_no = get_dbconn_no_or_default(dbhandle);
 	if (not dbconn_no) UNLIKELY {
 		let errmsg = "get_dbconn() attempted when not connected";
 		throw VarDBException(errmsg);
 	}
-	return thread_dbconnector.get_dbconn(dbconn_no);
+	return dbpool.get_dbconn(dbconn_no);
 }
 
 //static bool get_dbresult(in sql, DBresult& dbresult, PGconn* pgconn);
@@ -690,7 +690,7 @@ static DBresult get_dbresult(in sql, PGconn* pgconn, out ok) {
 
 	// Handle serious error. Why not throw?
 	if (not dbresult) UNLIKELY {
-		errmsg = "ERROR: vardb: PQexec command failed, no error code: ";
+		errmsg = "ERROR: vardb: PQexecParams command failed, no error code: ";
 		errmsg.errputl();
 		ok = false;
 		return dbresult;
@@ -738,8 +738,8 @@ static DBresult get_dbresult(in sql, PGconn* pgconn, out ok) {
 #pragma clang diagnostic ignored "-Wcovered-switch-default"
 		default:
 			UNLIKELY
-			errmsg = "ERROR: vardb: pqexec " ^ sql ^
-					" ERROR: vardb: pqexec " ^
+			errmsg = "ERROR: vardb: pqexecparams " ^ sql ^
+					" ERROR: vardb: pqexecparams " ^
 					var(PQresStatus(PQresultStatus(dbresult))) ^ ": " ^
 					var(PQresultErrorMessage(dbresult));
 			errmsg.errputl();
@@ -754,54 +754,54 @@ static DBresult get_dbresult(in sql, PGconn* pgconn, out ok) {
 
 }
 
-#if defined _MSC_VER  //|| defined __CYGWIN__ || defined __MINGW32__
-LONG WINAPI DelayLoadDllExceptionFilter(PEXCEPTION_POINTERS pExcPointers) {
-	LONG lDisposition = EXCEPTION_EXECUTE_HANDLER;
-
-	PDelayLoadInfo pDelayLoadInfo =
-		PDelayLoadInfo(pExcPointers->ExceptionRecord->ExceptionInformation[0]);
-
-	switch (pExcPointers->ExceptionRecord->ExceptionCode) {
-		case VcppException(ERROR_SEVERITY_ERROR, ERROR_MOD_NOT_FOUND):
-			printf("vardb:: %s was not found\n", pDelayLoadInfo->szDll);
-			break;
-			/*
-			case VcppException(ERROR_SEVERITY_ERROR, ERROR_PROC_NOT_FOUND):
-			if (pdli->dlp.fImportByName) {
-				printf("Function %s was not found in %sn",
-				pDelayLoadInfo->dlp.szProcName, pDelayLoadInfo->szDll);
-			} else {
-			printf("Function ordinal %d was not found in %sn",
-				pDelayLoadInfo->dlp.dwOrdinal, pDelayLoadInfo->szDll);
-			}
-			break;
-		*/
-		default:
-			// Exception is not related to delay loading
-			printf("Unknown problem %s\n", pDelayLoadInfo->szDll);
-			lDisposition = EXCEPTION_CONTINUE_SEARCH;
-			break;
-	}
-
-	return (lDisposition);
-}
-
-// msvc uses a special mode to catch failure to load a delay loaded dll that is incompatible with
-// the normal try/catch and needs to be put in simple global function with no complex objects (that
-// require standard c++ try/catch stack unwinding?) maybe it would be easier to manually load it
-// using dlopen/dlsym implemented in var as var::load and var::call
-// http://msdn.microsoft.com/en-us/library/5skw957f(vs.80).aspx
-static bool msvc_PQconnectdb(PGconn** pgconn, const std::string& conninfo) {
-	// connect or fail
-	__try {
-		*pgconn = PQconnectdb(conninfo.c_str());
-	} __except (DelayLoadDllExceptionFilter(GetExceptionInformation())) {
-		return false;
-	}
-	return true;
-}
-
-#endif
+//#if defined _MSC_VER  //|| defined __CYGWIN__ || defined __MINGW32__
+//LONG WINAPI DelayLoadDllExceptionFilter(PEXCEPTION_POINTERS pExcPointers) {
+//	LONG lDisposition = EXCEPTION_EXECUTE_HANDLER;
+//
+//	PDelayLoadInfo pDelayLoadInfo =
+//		PDelayLoadInfo(pExcPointers->ExceptionRecord->ExceptionInformation[0]);
+//
+//	switch (pExcPointers->ExceptionRecord->ExceptionCode) {
+//		case VcppException(ERROR_SEVERITY_ERROR, ERROR_MOD_NOT_FOUND):
+//			printf("vardb:: %s was not found\n", pDelayLoadInfo->szDll);
+//			break;
+//			/*
+//			case VcppException(ERROR_SEVERITY_ERROR, ERROR_PROC_NOT_FOUND):
+//			if (pdli->dlp.fImportByName) {
+//				printf("Function %s was not found in %sn",
+//				pDelayLoadInfo->dlp.szProcName, pDelayLoadInfo->szDll);
+//			} else {
+//			printf("Function ordinal %d was not found in %sn",
+//				pDelayLoadInfo->dlp.dwOrdinal, pDelayLoadInfo->szDll);
+//			}
+//			break;
+//		*/
+//		default:
+//			// Exception is not related to delay loading
+//			printf("Unknown problem %s\n", pDelayLoadInfo->szDll);
+//			lDisposition = EXCEPTION_CONTINUE_SEARCH;
+//			break;
+//	}
+//
+//	return (lDisposition);
+//}
+//
+//// msvc uses a special mode to catch failure to load a delay loaded dll that is incompatible with
+//// the normal try/catch and needs to be put in simple global function with no complex objects (that
+//// require standard c++ try/catch stack unwinding?) maybe it would be easier to manually load it
+//// using dlopen/dlsym implemented in var as var::load and var::call
+//// http://msdn.microsoft.com/en-us/library/5skw957f(vs.80).aspx
+//static bool msvc_PQconnectdb(PGconn** pgconn, const std::string& conninfo) {
+//	// connect or fail
+//	__try {
+//		*pgconn = PQconnectdb(conninfo.c_str());
+//	} __except (DelayLoadDllExceptionFilter(GetExceptionInformation())) {
+//		return false;
+//	}
+//	return true;
+//}
+//
+//#endif
 
 static var build_conn_info(in conninfo) {
 	// Priority is
@@ -1038,7 +1038,7 @@ bool var::connect(in conninfo) {
 	// At this point we have good new connection to database
 
 	// Cache the new connection handle and get the cache index no (starting 1)
-	int dbconn_no = thread_dbconnector.add_dbconn(pgconn, fullconninfo.var_str);
+	int dbconn_no = dbpool.add_dbconn(pgconn, fullconninfo.var_str);
 	if (DBTRACE_CONN) {
 		TRACE(thread_default_data_dbconn_no)
 		TRACE(thread_default_dict_dbconn_no)
@@ -1166,7 +1166,7 @@ void var::disconnect() {
 
 	// Disconnect
 	// Note singular form of dbconn
-	thread_dbconnector.del_dbconn(dbconn_no);
+	dbpool.del_dbconn(dbconn_no);
 	var_typ = VARTYP_UNA;
 
 	// If we happen to be disconnecting the same connection as the default connection
@@ -1221,7 +1221,7 @@ void var::disconnectall() {
 		dbconn_no.logputl("DBTR var::disconnectall() >= ");
 
 //	// Note the plural for dbconn"S" to delete all starting from
-//	thread_dbconnector.del_dbconns(dbconn_no);
+//	dbpool.del_dbconns(dbconn_no);
 //
 //	if (thread_default_data_dbconn_no >= dbconn_no) {
 //		thread_default_data_dbconn_no = 0;
@@ -1238,7 +1238,7 @@ void var::disconnectall() {
 //	}
 
 	// Disconnect all connections >= dbconn_no
-	auto max_dbconn_no = thread_dbconnector.max_dbconn_no();
+	auto max_dbconn_no = dbpool.max_dbconn_no();
 	for (auto dbconn_no2 = dbconn_no; dbconn_no2 <= max_dbconn_no; ++dbconn_no2) {
 		var connection2 = FM ^ dbconn_no2;
 		connection2.disconnect();
@@ -1247,7 +1247,7 @@ void var::disconnectall() {
 	// Make sure the max dbconn_no is reduced
 	// although the connections will have already been disconnected
 	// Note the PLURAL form of dbconn"S" to delete all starting from
-	thread_dbconnector.del_dbconns(dbconn_no);
+	dbpool.del_dbconns(dbconn_no);
 
 	return;
 }
@@ -1442,7 +1442,7 @@ bool var::readc(in file, in key) {
 	// Attempt to get record from the cache
 	auto hash64 = vardb_hash_file_and_key(file, key);
 	std::string cachedrecord;
-	if (thread_dbconnector.getrecord(dbconn_no, hash64, cachedrecord)) {
+	if (dbpool.getrecord(dbconn_no, hash64, cachedrecord)) {
 		// Cache hit.
 		if (cachedrecord.empty()) LIKELY {
 			// Actual record doesnt exist.
@@ -1466,11 +1466,11 @@ bool var::readc(in file, in key) {
 
 	if (result) {
 		// Cache a successful ordinary read
-		thread_dbconnector.putrecord(dbconn_no, hash64, var_str);
+		dbpool.putrecord(dbconn_no, hash64, var_str);
 	} else {
 		// Cache "" to falsify future reads without actual reads.
 		var("").writec(file, key);
-		thread_dbconnector.putrecord(dbconn_no, hash64, "");
+		dbpool.putrecord(dbconn_no, hash64, "");
 	}
 
 	return result;
@@ -1491,7 +1491,7 @@ void var::writec(in file, in key) const {
 		throw VarDBException("get_dbconn_no() failed");
 
 	auto hash64 = vardb_hash_file_and_key(file, key);
-	thread_dbconnector.putrecord(dbconn_no, hash64, var_str);
+	dbpool.putrecord(dbconn_no, hash64, var_str);
 
 	return;
 }
@@ -1510,8 +1510,9 @@ bool var::deletec(in key) const {
 		throw VarDBException("get_dbconn_no() failed");
 
 	auto hash64 = vardb_hash_file_and_key(*this, key);
-	return thread_dbconnector.delrecord(dbconn_no, hash64);
+	return dbpool.delrecord(dbconn_no, hash64);
 }
+
 
 bool var::read(in file, in key) {
 
@@ -1730,8 +1731,9 @@ var  var::lock(in key) const {
 
 	// Add to lock cache if successful
 	if (*PQgetvalue(dbresult, 0, 0) != 0) {
-		std::pair<const std::uint64_t, int> lock(hash64, 0);
-		dbconn->locks_.insert(lock);
+//		std::pair<const std::uint64_t, int> lock(hash64, 0);
+//		dbconn->locks_.insert(lock);
+		dbconn->locks_.insert(hash64);
 		return 1;
 	}
 
@@ -2320,7 +2322,7 @@ void var::clearcache() const {
 //		throw VarDBException("get_dbconn_no() failed in clearcache");
 		return;
 
-	thread_dbconnector.clearcache(dbconn_no);
+	dbpool.clearcache(dbconn_no);
 
 	// Warning if any cursors have not been closed/cleaned up.
 	for (auto& entry : thread_dbresults)
