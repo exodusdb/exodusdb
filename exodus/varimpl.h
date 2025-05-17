@@ -1,5 +1,5 @@
-#ifndef EXODUS_LIBEXODUS_EXODUS_VARIMPL_H_
-#define EXODUS_LIBEXODUS_EXODUS_VARIMPL_H_
+#ifndef LIBEXODUS_VARIMPL_H_
+#define LIBEXODUS_VARIMPL_H_
 
 #include <exodus/var.h>
 #include <exodus/varerr.h>
@@ -26,4 +26,4 @@ namespace exo {
 
 } // namespace exo
 
-#endif // EXODUS_LIBEXODUS_EXODUS_VARIMPL_H_
+#endif // LIBEXODUS_VARIMPL_H_

@@ -1,5 +1,5 @@
-#ifndef EXODUS_LIBEXODUS_EXODUS_VARERR_H_
-#define EXODUS_LIBEXODUS_EXODUS_VARERR_H_
+#ifndef LIBEXODUS_VARERR_H_
+#define LIBEXODUS_VARERR_H_
 
 //#include <stddef> // std::size_t
 
@@ -61,5 +61,5 @@ class PUBLIC DimIndexOutOfBounds: public VarError {public: explicit DimIndexOutO
 
 } //namespace exo
 
-#endif //EXODUS_LIBEXODUS_EXODUS_VARERR_H_
+#endif //LIBEXODUS_VARERR_H_
 

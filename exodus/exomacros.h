@@ -20,8 +20,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#ifndef EXODUS_LIBEXODUS_EXODUS_EXOMACROS_H_
-#define EXODUS_LIBEXODUS_EXODUS_EXOMACROS_H_
+#ifndef LIBEXODUS_EXOMACROS_H_
+#define LIBEXODUS_EXOMACROS_H_
 
 // This file provides various macros to make exodus application programming
 // look simpler. Sadly, C++ macros cannot be declared within namespaces
@@ -257,4 +257,4 @@ namespace exo {
 ////to be deleted as soon as it is removed from service
 //#define VOLUMES ev.VOLUMES
 
-#endif  // EXODUS_LIBEXODUS_EXODUS_EXOMACROS_H_
+#endif  // LIBEXODUS_EXOMACROS_H_

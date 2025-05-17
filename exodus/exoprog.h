@@ -1,5 +1,5 @@
-#ifndef EXODUS_LIBEXODUS_EXODUS_EXOPROG_H_
-#define EXODUS_LIBEXODUS_EXODUS_EXOPROG_H_
+#ifndef LIBEXODUS_EXOPROG_H_
+#define LIBEXODUS_EXOPROG_H_
 
 #if EXO_MODULE
 	import std;
@@ -783,4 +783,4 @@ class PUBLIC ExoAbortAll : public ExoExit {public:explicit ExoAbortAll(in var1 =
 // clang-format on
 
 }  // namespace exo
-#endif	// EXODUS_LIBEXODUS_EXODUS_EXOPROG_H_
+#endif	// LIBEXODUS_EXOPROG_H_

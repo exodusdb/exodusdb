@@ -1,5 +1,5 @@
-#ifndef EXODUS_LIBEXODUS_EXODUS_LIBRARY_H_
-#define EXODUS_LIBEXODUS_EXODUS_LIBRARY_H_
+#ifndef LIBEXODUS_LIBRARY_H_
+#define LIBEXODUS_LIBRARY_H_
 
 #include <exodus/exodus.h>
 
@@ -193,5 +193,5 @@ public:                                                                         
 //
 // }; // <- MANDATORY
 
-#endif // EXODUS_LIBEXODUS_EXODUS_LIBRARY_H_
+#endif // LIBEXODUS_LIBRARY_H_
 

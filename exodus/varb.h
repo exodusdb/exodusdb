@@ -1,5 +1,5 @@
-#ifndef EXODUS_LIBEXODUS_EXODUS_VARB_H_
-#define EXODUS_LIBEXODUS_EXODUS_VARB_H_
+#ifndef LIBEXODUS_VARB_H_
+#define LIBEXODUS_VARB_H_
 
 /*
 Copyright (c) 2009 steve.bush@neosys.com
@@ -1712,4 +1712,4 @@ template<>    PUBLIC void        VARBASE1::assertInteger(const char* message, co
 
 } // namespace exo
 
-#endif // EXODUS_LIBEXODUS_EXODUS_VARB_H_
+#endif // LIBEXODUS_VARB_H_

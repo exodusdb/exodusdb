@@ -20,8 +20,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#ifndef EXODUS_LIBEXODUS_EXODUS_EXODUS_H_
-#define EXODUS_LIBEXODUS_EXODUS_EXODUS_H_ 1
+#ifndef LIBEXODUS_EXODUS_H_
+#define LIBEXODUS_EXODUS_H_ 1
 
 /////////////////////////////////////////////////////////////
 // NOTE exodus.h MUST be included AFTER std headers
@@ -67,4 +67,4 @@ THE SOFTWARE.
 using namespace exo;
 #pragma clang diagnostic pop
 
-#endif	// EXODUS_LIBEXODUS_EXODUS_EXODUS_H_
+#endif	// LIBEXODUS_EXODUS_H_

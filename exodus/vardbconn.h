@@ -1,5 +1,5 @@
-#ifndef EXODUS_LIBEXODUS_EXODUS_VARDBCONN_H_
-#define EXODUS_LIBEXODUS_EXODUS_VARDBCONN_H_
+#ifndef LIBEXODUS_VARDBCONN_H_
+#define LIBEXODUS_VARDBCONN_H_
 
 //
 // Exodus -
@@ -162,4 +162,4 @@ class DBConnector final {
 };
 
 }  // namespace exo
-#endif	//EXODUS_LIBEXODUS_EXODUS_VARDBCONN_H_
+#endif	//LIBEXODUS_VARDBCONN_H_

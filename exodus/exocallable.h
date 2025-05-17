@@ -70,8 +70,8 @@ dictinit(bbb)
 };
 */
 
-#ifndef EXODUS_LIBEXODUS_EXODUS_EXOCALLABLE_H_
-#define EXODUS_LIBEXODUS_EXODUS_EXOCALLABLE_H_
+#ifndef LIBEXODUS_EXOCALLABLE_H_
+#define LIBEXODUS_EXOCALLABLE_H_
 
 #if EXO_MODULE
 	import var;
@@ -255,4 +255,4 @@ private:
 
 }  // namespace exo
 
-#endif // EXODUS_LIBEXODUS_EXODUS_EXOCALLABLE_H_
+#endif // LIBEXODUS_EXOCALLABLE_H_

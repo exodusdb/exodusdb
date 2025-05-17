@@ -1,5 +1,5 @@
-#ifndef EXODUS_LIBEXODUS_EXODUS_VAR_H_
-#define EXODUS_LIBEXODUS_EXODUS_VAR_H_
+#ifndef LIBEXODUS_VAR_H_
+#define LIBEXODUS_VAR_H_
 /*
 Copyright (c) 2009 steve.bush@neosys.com
 
@@ -4863,4 +4863,4 @@ ND PUBLIC var  operator""_var(long double d);
 
 // clang-format on
 
-#endif //EXODUS_LIBEXODUS_EXODUS_VAR_H_
+#endif //LIBEXODUS_VAR_H_

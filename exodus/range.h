@@ -1,5 +1,5 @@
-#ifndef EXODUS_LIBEXODUS_EXODUS_RANGE_H_
-#define EXODUS_LIBEXODUS_EXODUS_RANGE_H_
+#ifndef LIBEXODUS_RANGE_H_
+#define LIBEXODUS_RANGE_H_
 
 #include <exodus/exoimpl.h>
 
@@ -133,4 +133,4 @@ class PUBLIC reverse_range {
 
 } // namespace exo
 
-#endif // EXODUS_LIBEXODUS_EXODUS_RANGE_H_
+#endif // LIBEXODUS_RANGE_H_

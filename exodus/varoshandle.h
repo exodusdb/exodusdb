@@ -9,8 +9,8 @@
 // but the non-numeric bit will also be set to prevent the int being used
 // for ordinary numerical functions
 
-#ifndef EXODUS_LIBEXODUS_EXODUS_VAROSHANDLE_H_
-#define EXODUS_LIBEXODUS_EXODUS_VAROSHANDLE_H_
+#ifndef LIBEXODUS_VAROSHANDLE_H_
+#define LIBEXODUS_VAROSHANDLE_H_
 
 #if EXO_MODULE
 	import std;
@@ -59,4 +59,4 @@ extern
 
 }  // namespace exo
 
-#endif  // EXODUS_LIBEXODUS_EXODUS_VAROSHANDLE_H_
+#endif  // LIBEXODUS_VAROSHANDLE_H_
