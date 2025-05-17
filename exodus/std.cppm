@@ -469,6 +469,7 @@ using std::mem_fun1_t;
 using std::mem_fun_ref_t;
 using std::mem_fun_t;
 //using std::memory_resource;
+using std::memory_order;
 using std::messages;
 using std::messages_byname;
 using std::money_base;

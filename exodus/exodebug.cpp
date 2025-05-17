@@ -172,24 +172,42 @@ var exo_backtrace(void* stack_addresses[BACKTRACE_MAXADDRESSES], std::size_t sta
 
 	for (std::size_t ii = 0; ii < stack_size; ii++) {
 
+		// To find source lines using objdump we need to know the file name and absolute address in the file
+
 		var objfilename = var(strings[ii]).field("(", 1).field(" ", 1).field("[", 1);
 		var objaddress = var(strings[ii]).field("[", 2).field("]", 1);
-		if (objaddress.len() > 9)
-			objaddress = var(strings[ii]).field("(", 2).field(")", 1).field("+", 2);
 
 		// Skip libc
-#if TRACING < 2
-		if (objfilename.contains("libc.so")) {
+//#if TRACING < 2
+		if (objfilename.contains("libc.so"))
 			continue;
-		}
-#endif
+//#endif
 
-#if TRACING
+//#if TRACING
 		fprintf(stderr, "Backtrace %d: %p \"%s\"\n", int(ii), stack_addresses[ii], strings[ii]);
 		// Backtrace 0: 0x7f9d247cf9fd
 		// "/usr/local/lib/libexodus.so.19.01(_ZN6exodus9backtraceEv+0x62) [0x7f9d247cf9fd]"
 		// Backtrace 5: 0x7f638280e3f6 "/root/lib/libl1.so(+0xa3f6) [0x7f638280e3f6]"
-#endif
+//#endif
+
+		// Handle high addresses that are random loaded .so and therefore useless.
+		if (objaddress.len() > 9) {
+			objaddress = var(strings[ii]).field("(", 2).field(")", 1);
+			if (objaddress.starts("+")) {
+				// "/root/lib/liblistsched.so(+0x8067) [0x7fe49722a067]"
+				objaddress.cutter(1);
+			}
+			else {
+				// Handle FUNCNAME+RELATIVE address by not adding source line for now.
+				// TODO
+				// Anything before the + means a relative address and we havent bothered to code for it.
+				// /usr/local/lib/libexodus.so.24.07(_ZN3exo10ExoProgram7performERKNS_3varE+0x5d0) [0x7fe49b202710]
+				if (not objfilename.contains("libexodus.so")) {
+					addbacktraceline(ii, objfilename.field("/", -1), "", returnlines);
+					continue;
+				}
+			}
+		}
 
 		// objdump --stop-address=0xa3f6 -l --disassemble ~/lib/libl1.so |grep cpp|tail -n1
 
@@ -223,7 +241,7 @@ var exo_backtrace(void* stack_addresses[BACKTRACE_MAXADDRESSES], std::size_t sta
 		}
 
 		// Skip if hex address is invalid
-		if ((not objaddress.starts("0")) || objaddress.at(2) != "x")
+		if (not objaddress.starts("0") || objaddress.at(2) != "x")
 			continue;
 
 		// Start at the beginning of a hex block
@@ -256,7 +274,7 @@ var exo_backtrace(void* stack_addresses[BACKTRACE_MAXADDRESSES], std::size_t sta
 
 		objdump_out.converter("\r\n", _FM _FM);
 
-		// find the last line containing .cpp
+		// Find the last line containing .cpp
 		/// root/exodus/exodus/libexodus/exodus/l1.cpp:7 (discriminator 3)
 		const var nn2 = objdump_out.fcount(FM);
 		var line = "";
@@ -286,6 +304,10 @@ var exo_backtrace(void* stack_addresses[BACKTRACE_MAXADDRESSES], std::size_t sta
 //			line.errputl("line=");
 //#endif
 
+		// Skip library internals
+		if (objfilename.contains("libexodus.so"))
+			continue;
+
 		// append the source line text and number to the output
 		if (line) {
 			let sourcefilename = line.field(":", 1);
@@ -294,6 +316,8 @@ var exo_backtrace(void* stack_addresses[BACKTRACE_MAXADDRESSES], std::size_t sta
 			//7: p1.cpp:13: return 1;
 			//returnlines ^= var(ii + 1) ^ ": " ^ sourcefilename ^ ":" ^ lineno ^ ": " ^ linesource ^ FM;
 			//returnlines ^= var(ii + 1) ^ ": " ^ line.field2(_OSSLASH, -1) ^ " " ^ linesource ^ FM;
+		} else if (not objfilename.contains("libexodus.so")) {
+			addbacktraceline(ii, objfilename.field("/", -1), "", returnlines);
 		}
 
 #if TRACING

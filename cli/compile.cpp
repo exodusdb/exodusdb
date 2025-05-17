@@ -399,8 +399,9 @@ ENVIRONMENT
 		}
 		//}
 
+//		basicoptions ^= " -fno-omit-frame-pointer ";
 		// Minor space savings
-		basicoptions ^= " -ffunction-sections -fdata-sections ";
+//		basicoptions ^= " -ffunction-sections -fdata-sections ";
 
 		// Help fixdeprecated get all errors and deprecations
 		if (clang)
@@ -410,7 +411,11 @@ ENVIRONMENT
 
 		// Use c++ (g++/clang) -fvisibility=hidden to make all hidden except those marked DLL_PUBLIC ie "default"
 #if __GNUC__ >= 4
-		liboptions ^= " -fvisibility=hidden -fvisibility-inlines-hidden ";
+		basicoptions ^= " -fvisibility=hidden ";
+
+		// Required to allow exodebug to get absolute addresses instead of function name + offset
+		// bad: "/root/lib/libnlist.so(_ZN11_ExoProgram4mainEv+0x403) [0x7aa6aa9c3ec3]"
+		basicoptions ^= " -fvisibility-inlines-hidden ";
 #endif
 
 #ifdef EXO_FORMAT
