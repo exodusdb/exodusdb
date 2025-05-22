@@ -87,9 +87,11 @@ class ExodusCppLexer(CppLexer):
         'exoprog_date', 'exoprog_number', 'formlist', 'fsmsg', 'getcursor',
         'getdatetime', 'getlist', 'hasnext', 'iconv', 'invertarray', 'libinfo',
         'lockrecord', 'logoff', 'makelist', 'note', 'oconv', 'otherdatasetusers',
-        'otherdatausers', 'otherusers', 'perform', 'popselect', 'pushselect',
+        'otherdatausers', 'otherusers', 'perform', 'run', 'popselect', 'pushselect',
         'readnext', 'savelist', 'select', 'selectkeys', 'setcursor', 'sortarray',
-        'stop', 'timedate2', 'unlockrecord', 'xlate'
+        'stop', 'timedate2', 'unlockrecord', 'xlate',
+		'setmaxthreads', 'getmaxthreads', 'getnumcores', 'run_count', 'run_results', 'shutdown_run', 'reset_run'
+
     } # EXODUS_FUNCTIONS  .nf
 
     EXTRA_TYPES = {
