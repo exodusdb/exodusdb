@@ -47,7 +47,7 @@ comment "//"
 ########################
 
 # CAPITAL_WORDS
-color bold,crimson "\<[A-Z_][0-9A-Z_]*\>"
+color bold,red "\<[A-Z_][0-9A-Z_]*\>"
 
 color orange "\<(EW|PW|VW|XW|MW|HW|AW)\>"
 color orange "\<(FILE|ID|RECORD|DICT|MV|ANS|PSEUDO|DATA|CURSOR)\>"
