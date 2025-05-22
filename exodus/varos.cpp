@@ -274,7 +274,7 @@ var var::ostempfile() {
 
 bool var::osshell() const {
 
-	THISIS("bool  var::osshell() const")
+	THISIS("bool var::osshell() const")
 	// will be checked again by toString()
 	// but put it here so any unassigned error shows in osshell
 	assertString(function_sig);
@@ -294,7 +294,7 @@ bool var::osshell() const {
 
 bool var::osshellread(in oscmd) {
 
-	THISIS("bool  var::osshellread() const")
+	THISIS("bool var::osshellread(in oscmd)")
 	// will be checked again by toString()
 	// but put it here so any unassigned error shows in osshell
 	ISSTRING(oscmd)
@@ -343,7 +343,7 @@ bool var::osshellread(in oscmd) {
 
 bool var::osshellwrite(in oscmd) const {
 
-	THISIS("bool  var::osshellwrite(in oscmd) const")
+	THISIS("bool var::osshellwrite(in oscmd) const")
 	// will be checked again by toString()
 	// but put it here so any unassigned error shows in osshell
 	assertString(function_sig);

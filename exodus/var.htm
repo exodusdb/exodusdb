@@ -7958,12 +7958,12 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 				<dd>Wait for all jobs to finish before continuing, otherwise, if the parent program exits, they will be aborted.</dd>
 			</dl>
 			<p>
-				<pre><span class="n">run</span><span class="p">(</span><span class="s">&quot;testlib aa&quot;</span><span class="p">);</span>
-<span class="n">run</span><span class="p">(</span><span class="s">&quot;testlib bb&quot;</span><span class="p">);</span>
-<span class="n">run</span><span class="p">(</span><span class="s">&quot;testlib cc&quot;</span><span class="p">);</span>
+				<pre><span class="nf">run</span><span class="p">(</span><span class="s">&quot;testlib aa&quot;</span><span class="p">);</span>
+<span class="nf">run</span><span class="p">(</span><span class="s">&quot;testlib bb&quot;</span><span class="p">);</span>
+<span class="nf">run</span><span class="p">(</span><span class="s">&quot;testlib cc&quot;</span><span class="p">);</span>
 <span class="kt">var</span><span class="w"> </span><span class="n">results</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="p">;</span>
 <span class="c1">// Process results asynchronously.</span>
-<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="k">auto</span><span class="o">&amp;</span><span class="w"> </span><span class="n">env</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">run_results</span><span class="p">())</span>
+<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="k">auto</span><span class="o">&amp;</span><span class="w"> </span><span class="n">env</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="nf">run_results</span><span class="p">())</span>
 <span class="w">    </span><span class="n">results</span><span class="w"> </span><span class="o">^=</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="kc">DATA</span><span class="p">.</span><span class="nf">f</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="o">^</span><span class="w"> </span><span class="nb">FM</span><span class="p">;</span>
 </pre>
 			</p>

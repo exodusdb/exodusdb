@@ -183,12 +183,12 @@ var exo_backtrace(void* stack_addresses[BACKTRACE_MAXADDRESSES], std::size_t sta
 			continue;
 //#endif
 
-//#if TRACING
+#if TRACING
 		fprintf(stderr, "Backtrace %d: %p \"%s\"\n", int(ii), stack_addresses[ii], strings[ii]);
 		// Backtrace 0: 0x7f9d247cf9fd
 		// "/usr/local/lib/libexodus.so.19.01(_ZN6exodus9backtraceEv+0x62) [0x7f9d247cf9fd]"
 		// Backtrace 5: 0x7f638280e3f6 "/root/lib/libl1.so(+0xa3f6) [0x7f638280e3f6]"
-//#endif
+#endif
 
 		// Handle high addresses that are random loaded .so and therefore useless.
 		if (objaddress.len() > 9) {
@@ -337,6 +337,20 @@ var exo_backtrace(void* stack_addresses[BACKTRACE_MAXADDRESSES], std::size_t sta
 
 }
 
+/* Possible plan to extend exodus signal handling
+	SIGHUP
+	Reload config. Same as issuing the command RELOAD on the console.
+	SIGTERM
+	Super safe shutdown. Wait for all existing clients to disconnect, but don’t accept new connections. This is the same as issuing SHUTDOWN WAIT_FOR_CLIENTS on the console. If this signal is received while there is already a shutdown in progress, then an “immediate shutdown” is triggered instead of a “super safe shutdown”. In PgBouncer versions earlier than 1.23.0, this signal would cause an “immediate shutdown”.
+	SIGINT
+	Safe shutdown. Same as issuing SHUTDOWN WAIT_FOR_SERVERS on the console. If this signal is received while there is already a shutdown in progress, then an “immediate shutdown” is triggered instead of a “safe shutdown”.
+	SIGQUIT
+	Immediate shutdown. Same as issuing SHUTDOWN on the console.
+	SIGUSR1
+	Same as issuing PAUSE on the console.
+	SIGUSR2
+	Same as issuing RESUME on the console.
+*/
 //service managers like systemd will send a polite SIGTERM signal
 //and wait for say 90 seconds before sending a kill signal
 static void SIGTERM_handler(int) {

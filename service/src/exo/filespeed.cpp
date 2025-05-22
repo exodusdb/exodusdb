@@ -20,7 +20,7 @@ func main() {
 	if (deletefilex) {
 		tempfilename = "BENCHMARK" ^ SYSTEM.f(24);
 	} else {
-		tempfilename = "BENCHMARK.FILESPEED";
+		tempfilename = "BENCHMARK_FILESPEED";
 	}
 
 	// locate tempfilename in @files using @fm setting x then

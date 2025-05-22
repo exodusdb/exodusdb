@@ -14,25 +14,27 @@
 
 #include "threadpool.h"
 
-//// Logging macro with relative timestamp from program start
-////#define ENABLE_LOGGING
-//#ifdef ENABLE_LOGGING
-//#	include <iostream>
-//#	include <iomanip>
-//#	include <chrono>
-//#	include <thread>
-////	// Static variable to capture initial time (initialized once at program start)
-//static const auto start_time = std::chrono::system_clock::now();
-//#	define LOG std::cerr << "[" << std::fixed << std::setprecision(3) \
-//					  << (std::chrono::duration_cast<std::chrono::microseconds>( \
-//						  std::chrono::system_clock::now().time_since_epoch()).count() - \
-//						  std::chrono::duration_cast<std::chrono::microseconds>( \
-//						  start_time.time_since_epoch()).count()) / 1000.0 \
-//					  << "ms, T" << std::this_thread::get_id() << "] P "
-////					  << "ms, T" << std::hash<std::thread::id>{}(std::this_thread::get_id()) % 1000000 << "] "
-//#else
-//#	define LOG if (0) std::cerr // No-op, optimized out
-//#endif
+// Logging macro with relative timestamp from program start
+//#define ENABLE_LOGGING
+#ifdef ENABLE_LOGGING
+#ifndef EXO_MODULE
+#	include <iostream>
+#	include <iomanip>
+#	include <chrono>
+#	include <thread>
+#endif
+//	// Static variable to capture initial time (initialized once at program start)
+static const auto start_time = std::chrono::system_clock::now();
+#	define LOG std::cerr << "[" << std::fixed << std::setprecision(3) \
+					  << double(std::chrono::duration_cast<std::chrono::microseconds>( \
+						  std::chrono::system_clock::now().time_since_epoch()).count() - \
+						  std::chrono::duration_cast<std::chrono::microseconds>( \
+						  start_time.time_since_epoch()).count()) / 1000.0 \
+					  << "ms, T" << std::this_thread::get_id() << "] P "
+//					  << "ms, T" << std::hash<std::thread::id>{}(std::this_thread::get_id()) % 1000000 << "] "
+#else
+#	define LOG if (0) std::cerr // No-op, optimized out
+#endif
 
 namespace exo {
 
@@ -44,9 +46,9 @@ struct TaskQueue {
 // Initialize the thread pool with a maximum number of workers
 ThreadPool::ThreadPool(size_t max_threads)
 	:
+	total_tasks_enqueued(std::make_unique<std::atomic<size_t>>(0)),
 	max_worker_id_(std::make_unique<std::atomic<size_t>>(max_threads)),
 	live_worker_count(std::make_unique<std::atomic<size_t>>(0)),
-	total_tasks_enqueued(std::make_unique<std::atomic<size_t>>(0)),
 	running_task_count(std::make_unique<std::atomic<size_t>>(0)),
 	pending_tasks(std::make_unique<TaskQueue>()),
 	mutex(std::make_unique<std::mutex>()),
@@ -55,24 +57,24 @@ ThreadPool::ThreadPool(size_t max_threads)
 // Destroy the thread pool, stopping all workers and joining their threads
 ThreadPool::~ThreadPool() {
 	{
-		//LOG << "~Threadpool: Acquiring mutex." << std::endl;
+		LOG << "~Threadpool: Acquiring mutex." << std::endl;
 		std::unique_lock<std::mutex> lock(*mutex);
 
 		while (!pending_tasks->queue.empty()) {
-			//LOG << "~Threadpool: Popping pending task." << std::endl;
+			LOG << "~Threadpool: Popping pending task." << std::endl;
 			pending_tasks->queue.pop();
 		}
-		//LOG << "~Threadpool: Signal shutdown." << std::endl;
+		LOG << "~Threadpool: Signal shutdown." << std::endl;
 		(*max_worker_id_).store(0);
-		//LOG << "~Threadpool: Wake all workers to check exit condition" << std::endl;
+		LOG << "~Threadpool: Wake all workers to check exit condition" << std::endl;
 		condition->notify_all();
 	}
 	// Join all worker threads
 	for (auto& worker : workers) {
 		if (worker.joinable()) {
-			//LOG << "~Threadpool: Detaching worker." << std::endl;
+			LOG << "~Threadpool: Detaching worker." << std::endl;
 			worker.join();
-			//LOG << "~Threadpool: Detached  worker." << std::endl;
+			LOG << "~Threadpool: Detached  worker." << std::endl;
 		}
 	}
 }
@@ -97,36 +99,36 @@ void ThreadPool::enqueue(std::function<void()> task) {
 				while (true) {
 					std::function<void()> task;
 					{
-						//LOG << "Worker " << worker_id << ": Acquiring mutex." << std::endl;
+						LOG << "Worker " << worker_id << ": Acquiring mutex." << std::endl;
 						std::unique_lock<std::mutex> lock(*mutex);
-						//LOG << "Worker " << worker_id << ": Entering wait." << std::endl;
+						LOG << "Worker " << worker_id << ": Entering wait." << std::endl;
 						condition->wait(lock, [this, worker_id] {
-							//LOG << "Worker " << worker_id << ": Evaluating predicate (queue_empty=" 
-							//		  << pending_tasks->queue.empty() << ", max_worker_id=" 
-							//		  << (*max_worker_id_).load() << ", worker_id=" << worker_id << ")." << std::endl;
+							LOG << "Worker " << worker_id << ": Evaluating predicate (queue_empty=" \
+									  << pending_tasks->queue.empty() << ", max_worker_id=" \
+									  << (*max_worker_id_).load() << ", worker_id=" << worker_id << ")." << std::endl;
 							return !pending_tasks->queue.empty() || (*max_worker_id_).load() == 0 || worker_id >= (*max_worker_id_).load();
 						});
-						//LOG << "Worker " << worker_id << ": Woke from wait." << std::endl;
-						//LOG << "Worker " << worker_id << ": Checking exit condition (queue_empty=" 
-						//		  << pending_tasks->queue.empty() << ", max_worker_id=" 
-						//		  << (*max_worker_id_).load() << ", worker_id=" << worker_id << ")." << std::endl;
+						LOG << "Worker " << worker_id << ": Woke from wait." << std::endl;
+						LOG << "Worker " << worker_id << ": Checking exit condition (queue_empty=" \
+								  << pending_tasks->queue.empty() << ", max_worker_id=" \
+								  << (*max_worker_id_).load() << ", worker_id=" << worker_id << ")." << std::endl;
 						if (pending_tasks->queue.empty() && ((*max_worker_id_).load() == 0 || worker_id >= (*max_worker_id_).load())) {
-							//LOG << "Worker " << worker_id << ": Exiting." << std::endl;
+							LOG << "Worker " << worker_id << ": Exiting." << std::endl;
 							(*live_worker_count).fetch_sub(1);
 							return;
 						}
-						//LOG << "Worker " << worker_id << ": Accessing queue front." << std::endl;
+						LOG << "Worker " << worker_id << ": Accessing queue front." << std::endl;
 						task = std::move(pending_tasks->queue.front());
-						//LOG << "Worker " << worker_id << ": Popping queue." << std::endl;
+						LOG << "Worker " << worker_id << ": Popping queue." << std::endl;
 						pending_tasks->queue.pop();
-						//LOG << "Worker " << worker_id << ": Task acquired." << std::endl;
+						LOG << "Worker " << worker_id << ": Task acquired." << std::endl;
 					}
-					//LOG << "Worker " << worker_id << ": Incrementing running_task_count." << std::endl;
+					LOG << "Worker " << worker_id << ": Incrementing running_task_count." << std::endl;
 					(*running_task_count).fetch_add(1);
-					//LOG << "Worker " << worker_id << ": Executing task." << std::endl;
+					LOG << "Worker " << worker_id << ": Executing task." << std::endl;
 					task();
-					//LOG << "Worker " << worker_id << ": Task completed." << std::endl;
-					//LOG << "Worker " << worker_id << ": Decrementing running_task_count." << std::endl;
+					LOG << "Worker " << worker_id << ": Task completed." << std::endl;
+					LOG << "Worker " << worker_id << ": Decrementing running_task_count." << std::endl;
 					(*running_task_count).fetch_sub(1);
 				}
 			});
@@ -171,14 +173,14 @@ void ThreadPool::shutdown() {
 	{
 		std::unique_lock<std::mutex> lock(*mutex);
 		(*max_worker_id_).store(0);
-		//LOG << "ThreadPool shutdown: Setting max_worker_id=0." << std::endl;
+		LOG << "ThreadPool shutdown: Setting max_worker_id=0." << std::endl;
 		condition->notify_all();
 	}
 	for (auto& worker : workers) {
 		if (worker.joinable()) {
-			//LOG << "ThreadPool shutdown: Joining worker." << std::endl;
+			LOG << "ThreadPool shutdown: Joining worker." << std::endl;
 			worker.join();
-			//LOG << "ThreadPool shutdown: Joined worker." << std::endl;
+			LOG << "ThreadPool shutdown: Joined worker." << std::endl;
 		}
 	}
 }
@@ -189,7 +191,7 @@ void ThreadPool::reset(ThreadPool* ptr, size_t num_threads) {
 		return;
 	}
 
-	//LOG << "ThreadPool resetting.\n";
+	LOG << "ThreadPool resetting.\n";
 	// Ensure the thread pool is shut down cleanly
 	ptr->shutdown();
 
@@ -198,7 +200,7 @@ void ThreadPool::reset(ThreadPool* ptr, size_t num_threads) {
 	// Reconstruct in place with placement new
 	new (ptr) ThreadPool(num_threads); // Initialize new thread pool
 
-	//LOG << "ThreadPool reset complete\n";
+	LOG << "ThreadPool reset complete\n";
 }
 
 } // namespace exo

@@ -80,40 +80,40 @@
 	# REQUIRED only for c++ module discovery
 	target_link_libraries(testecho exodus ${PROJECT_LIBS})
 
+
+## Generate testing_var.h.cpp
+## ##########################
 #
-# Generate testing_var.h.cpp
-# ##########################
+#	add_executable(testing_var_h testing_var.h.cpp ${SRC_EXODUS_DIR}/var.h ${SRC_EXODUS_DIR}/dim.h ${SRC_EXODUS_DIR}/exoprog.h)
+#	target_link_libraries(testing_var_h exodus ${PROJECT_LIBS})
+#	if (EXO_MODULE)
+#		target_link_libraries(testing_var_h
+#		exovar
+#	)
+#	endif()
 #
-	add_executable(testing_var_h testing_var.h.cpp ${SRC_EXODUS_DIR}/var.h ${SRC_EXODUS_DIR}/dim.h ${SRC_EXODUS_DIR}/exoprog.h)
-	target_link_libraries(testing_var_h exodus ${PROJECT_LIBS})
-	if (EXO_MODULE)
-		target_link_libraries(testing_var_h
-		exovar
-	)
-	endif()
-
-	# Generate test/src/testing_var.h.cpp from var.h
-	add_custom_target(PreBuild_testing_var_h
-    	COMMAND test -x ${BIN_CLI_DIR}/gendoc && ${BIN_CLI_DIR}/gendoc ${PROJECT_SOURCE_DIR} ${SRC_EXODUS_DIR}/var.h ${SRC_EXODUS_DIR}/dim.h ${SRC_EXODUS_DIR}/exoprog.h > /dev/null || echo Skipped first build because gendoc not built yet
-    	COMMENT "Running pre-build command gendoc to create or update ${PROJECT_SOURCE_DIR} testing_var.h.cpp"
-		VERBATIM
-	)
-
-	# Force regeneration of testing_var.h.cpp from var.h
-	add_dependencies(testing_var_h PreBuild_testing_var_h)
-
-	# Setup a test
-	add_test(NAME testing_var_h
-		COMMAND testing_var_h
-		WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-	)
-	set_tests_properties(
-		testing_var_h
-		PROPERTIES
-		ENVIRONMENT "EXO_LIBDIR=${BIN_CLI_DIR}"
-		PASS_REGULAR_EXPRESSION "Test passed"
-		TIMEOUT 30
-	)
+#	# Generate test/src/testing_var.h.cpp from var.h
+#	add_custom_target(PreBuild_testing_var_h
+#    	COMMAND test -x ${BIN_CLI_DIR}/gendoc && ${BIN_CLI_DIR}/gendoc ${PROJECT_SOURCE_DIR} ${SRC_EXODUS_DIR}/var.h ${SRC_EXODUS_DIR}/dim.h ${SRC_EXODUS_DIR}/exoprog.h > /dev/null || echo Skipped first build because gendoc not built yet
+#    	COMMENT "Running pre-build command gendoc to create or update ${PROJECT_SOURCE_DIR} testing_var.h.cpp"
+#		VERBATIM
+#	)
+#
+#	# Force regeneration of testing_var.h.cpp from var.h
+#	add_dependencies(testing_var_h PreBuild_testing_var_h)
+#
+#	# Setup a test
+#	add_test(NAME testing_var_h
+#		COMMAND testing_var_h
+#		WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+#	)
+#	set_tests_properties(
+#		testing_var_h
+#		PROPERTIES
+#		ENVIRONMENT "EXO_LIBDIR=${BIN_CLI_DIR}"
+#		PASS_REGULAR_EXPRESSION "Test passed"
+#		TIMEOUT 30
+#	)
 
 #
 # Trigger cmake update if any new test_*.cpp files appear

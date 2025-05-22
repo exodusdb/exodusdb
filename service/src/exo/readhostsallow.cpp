@@ -40,6 +40,9 @@ sshd: 127.
 
 #nl13
 sshd: 5.79.74.40
+
+#bahia2
+sshd: 94.202.10.178
 )V0G0N";
 
 	// fm instead of crlf

@@ -45,12 +45,19 @@
 # Warning. Using sudo which is strange inside cmake.
 # Warning. Only doing c++ 14 here. TODO patch all.
 #
-	execute_process(
-		COMMAND
-			sudo test -f  /usr/include/c++/14/ostream && sed -i "s|# include <format>|# ifndef EXO_FORMAT\\n#  include <format>\\n# endif|" /usr/include/c++/14/ostream
-		COMMAND
-			sudo test -f  /usr/include/c++/14/ostream && sed -i "s|#if __cpp_lib_print|#if !defined(EXO_FORMAT) \\&\\& __cpp_lib_print|" /usr/include/c++/14/ostream
-	)
+#	execute_process(
+#		COMMAND
+#			sudo test -f  /usr/include/c++/14/ostream && sed -i "s|# include <format>|# ifndef EXO_FORMAT\\n#  include <format>\\n# endif|" /usr/include/c++/14/ostream
+#		COMMAND
+#			sudo test -f  /usr/include/c++/14/ostream && sed -i "s|#if __cpp_lib_print|#if !defined(EXO_FORMAT) \\&\\& __cpp_lib_print|" /usr/include/c++/14/ostream
+#		VERBATIM
+#	)
+execute_process(
+    COMMAND
+        sh -c "sudo test -f /usr/include/c++/14/ostream && sudo sed -i 's|# include <format>|# ifndef EXO_FORMAT\\n#  include <format>\\n# endif|' /usr/include/c++/14/ostream"
+    COMMAND
+        sh -c "sudo test -f /usr/include/c++/14/ostream && sudo sed -i 's|#if __cpp_lib_print|#if !defined(EXO_FORMAT) \\&\\& __cpp_lib_print|' /usr/include/c++/14/ostream"
+)
 
 #
 # Coverage testing
@@ -98,7 +105,12 @@
 	set(Boost_USE_STATIC_RUNTIME      OFF)
 	set(Boost_Boost_USE_DEBUG_RUNTIME OFF)
 
-	find_package(Boost REQUIRED COMPONENTS date_time system regex thread locale)
+#	find_package(Boost REQUIRED COMPONENTS date_time system regex thread locale)
+    if (EXO_BOOST_FIBER)
+		find_package(Boost REQUIRED COMPONENTS date_time system regex thread locale fiber context)
+	else()
+		find_package(Boost REQUIRED COMPONENTS date_time system regex thread locale)
+	endif()
 
 	#message(" Boost_LIBRARY_DIRS=${Boost_LIBRARY_DIRS}")
 	message(" Boost_LIBRARIES=${Boost_LIBRARIES}")
@@ -107,6 +119,13 @@
 
 	include_directories(${BOOST_INCLUDE_DIR})
 
+#	find_library(LIBUV_LIBRARY NAMES uv libuv uv1 libuv1)
+#	link_libraries(uv)
+
+#	find_package(PkgConfig REQUIRED)
+#	pkg_check_modules(LIBUV REQUIRED libuv)
+# find_library(LIBUV_LIBRARY NAMES uv libuv)
+# find_path(LIBUV_INCLUDE_DIR NAMES uv.h)
 #
 # fast_float
 ############
@@ -222,6 +241,12 @@
 		varfuncs.cpp varioconv.cpp
 		exoenv.cpp exofuncs.cpp
 
+		vardb_async.cpp
+		fiber_scheduler.cpp
+		DBresult.cpp
+		DBconn.cpp
+		DBpool.cpp
+
 		job.cpp
 		threadsafequeue.cpp
 		threadpool.cpp
@@ -233,7 +258,7 @@
 		murmurhash3.cpp
 		#naturalorder.cpp
 		gettimeofday.cpp
-		varoshandle.cpp vardbconn.cpp
+		varoshandle.cpp
 		variter.cpp
 #		dimiter.cpp
 		varput.cpp

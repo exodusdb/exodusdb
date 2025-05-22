@@ -451,7 +451,7 @@ function get_dependencies_for_build_and_install {
 : Download and install dev packages for postgresql client lib and boost
 : ---------------------------------------------------------------------
 :
-	APT_GET sudo apt-get install -y libpq-dev libboost-regex-dev libboost-locale-dev
+	APT_GET sudo apt-get install -y libpq-dev libboost-regex-dev libboost-locale-dev libboost-fiber-dev libcontext-dev
 	#APT_GET sudo apt-get install -y g++ libboost-date-time-dev libboost-system-dev libboost-thread-dev
 
 :

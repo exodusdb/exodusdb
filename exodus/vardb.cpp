@@ -171,23 +171,35 @@ Within transactions, lock requests for locks that have already been obtained alw
 #	include <utility> //for pair
 #endif
 
-#if defined _MSC_VER  // || defined __CYGWIN__ || defined __MINGW32__
-#define WIN32_LEAN_AND_MEAN
-#include <DelayImp.h>
-#include <windows.h>
+//#define sigint_received false // in exoimpl.h (TERMINATE_req || RELOAD_req)
+// Thread-safe mutex for pgconn (remove if get_pgconn ensures exclusivity)
+//static std::mutex conn_mutex;
+
+//#undef EXO_BOOST_FIBER
+#define EXO_BOOST_FIBER
+#ifdef EXO_BOOST_FIBER
+#	include "vardb_async.h"
+#	define XPQexecParams async_PQexec<1>
+#	define XPQexec async_PQexec<2>
 #else
+#	define XPQexecParams PQexecParams
+#	define XPQexec PQexec
 #endif
+
+// Global SIGINT flag
+//static std::atomic<bool> sigint_received{false};
+// TODO convert RELOAD|TERMINATE_req to atomic
 
 // To see Postgres PQlib calls
 //////////////////////////////
 //
 // All calls
 //
-//  grep -P '\bPQ[\w]+' vardb.cpp --color=always|less
+//  grep -P '\bX?PQ[\w]+' vardb.cpp --color=always|less
 //
 // or without transaction related calls
 //
-//  grep -P '\bPQ[\w]+' *.cpp --color=always|grep -vP 'errorMessage|resultStatus|ntuples|getisnull|cmdTuples|PQexec|getvalue|getlength|nfields|PQfname|resultError'
+//  grep -P '\bX?PQ[\w]+' *.cpp --color=always|grep -vP 'errorMessage|resultStatus|ntuples|getisnull|cmdTuples|PQexec|getvalue|getlength|nfields|PQfname|resultError'
 //
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wreserved-identifier"
@@ -211,7 +223,7 @@ Within transactions, lock requests for locks that have already been obtained alw
 	static const uint32_t murmurhash_seed = 0xf00dba11;
 
 #elif defined(USE_MURMURHASH2)
-#	include "murmurhash2_64.h" // it has included in vardbconn.h (std::uint64_t defined)
+#	include "murmurhash2_64.h" // it has included in DBpool.h (std::uint64_t defined)
 
 #else
 	// c++ std Hash functions are only required to produce the same result for the same input within a single execution of a program;
@@ -221,9 +233,7 @@ Within transactions, lock requests for locks that have already been obtained alw
 #endif
 
 #include <exodus/varimpl.h>
-#include <exodus/vardbconn.h>  // placed as last include, causes boost header compiler errors
-//#include <exodus/exoenv.h>
-//#include <exodus/mvutf.h>
+#include "DBpool.h"         // placed as last include, causes boost header compiler errors
 #include <exodus/dim.h>
 #include <exodus/rex.h>
 
@@ -239,35 +249,19 @@ Within transactions, lock requests for locks that have already been obtained alw
 
 #define DEBUG_LOG_SQL1 if (DBTRACE) sql.replace("$1", var(paramValues[0]).first(50).squote()).convert("\n\t", "  ").trim().logputl("SQL2 ");
 
+#include "DBresult.h"
+
 namespace exo {
 
 // Obtained from env EXO_DBTRACE in get_dbconn_no_or_default on first connection
 static inline int DBTRACE = -1;
-
+//#define EXO_DBTRACE
 using let = const var;
 
 // The idea is for exodus to have access to one standard database without secret password
 static const var defaultconninfo =
 	"host=127.0.0.1 port=5432 dbname=exodus user=exodus "
 	"password=somesillysecret connect_timeout=10";
-
-// Deleter function to close connection and connection cache object
-// this is also called in the destructor of DBpoolCache
-// MAKE POSTGRES CONNECTIONS ARE CLOSED PROPERLY OTHERWISE MIGHT RUN OUT OF CONNECTIONS!!!
-// TODO so make sure that we dont use exit(n) anywhere in the programs!
-static void PGconn_DELETER(PGconn* pgconn) {
-	auto pgconn2 = pgconn;
-
-	// At this point we have good new connection to database
-	if (DBTRACE>1) {
-		var("").logput("DBTR PQFinish");
-		std::clog << pgconn << std::endl;
-	}
-
-	//var("========================== deleting connection ==============================").errputl();
-	PQfinish(pgconn2);	// AFAIK, it destroys the object by pointer
-					//	delete pgp;
-}
 
 // this front end C interface is based on postgres
 // http://www.postgresql.org/docs/8.2/static/libpq-exec.html
@@ -286,17 +280,14 @@ static void PGconn_DELETER(PGconn* pgconn) {
 // explain analyse select * from testview where field1  > 'aaaaaaaaa';e
 
 // THREAD_LOCAL data - shared by all dynamically loaded shared libraries
-static thread_local int thread_default_data_dbconn_no = 0;
-static thread_local int thread_default_dict_dbconn_no = 0;
-//thread_local var thread_connparams = "";
-static thread_local var thread_lasterror = "";
-static thread_local DBpool dbpool(PGconn_DELETER);
+static thread_local int                                thread_default_data_dbconn_no = 0;
+static thread_local int                                thread_default_dict_dbconn_no = 0;
+static thread_local var                                thread_lasterror = "";
+static thread_local DBpool                             thread_dbpool;
 static thread_local std::map<std::string, std::string> thread_file_handles;
 
 // Few entries so map will be much faster than unordered_map
-// thread_local std::unordered_map<std::string, DBresult> thread_dbresults;
-class DBresult;
-static thread_local std::map<std::string, DBresult> thread_dbresults;
+static thread_local std::map<std::string, DBresult>    thread_dbresults;
 
 static var getpgresultcell(PGresult* pgresult, int rown, int coln) {
 	return var(PQgetvalue(pgresult, rown, coln), PQgetlength(pgresult, rown, coln));
@@ -395,102 +386,6 @@ static std::uint64_t vardb_hash_file_and_key(in file, in key) {
 	return vardb_hash_stdstr(fileandkey);
 
 }
-
-// DBresult is a RAII/SBRM container of a PGresult pointer and calls PQclear on destruction
-// Safe and automatic clearing of heap data generated by the postgresql C language PQlib api
-class DBresult {
-
-   public:
-
-	// Owns the PGresult object on the stack. Initially none.
-	PGresult* pgresult_ = nullptr;
-
-	// Pointer into pgresult if there are many rows
-	// e.g. in readnextx after FETCH nn
-	int rown_ = 0;
-
-	// Default constructor results in a nullptr
-	DBresult() = default;
-
-	// Allow construction from a PGresult*
-	//DBresult(PGresult* pgresult)
-	//explicit DBresult(PGresult* pgresult)
-	DBresult(PGresult* pgresult)
-	:
-	pgresult_(pgresult) {
-
-		if (DBTRACE>1) {
-			var("DBresult (c) own ").logput();
-			std::clog << pgresult_ << std::endl;
-		}
-	}
-
-	// Prevent copy
-	DBresult(const DBresult&) = delete;
-
-	// Move constructor transfers ownership of the PGresult
-	DBresult(DBresult&& dbresult)
-	:
-	rown_(dbresult.rown_) {
-
-		// If already assigned to a different PGresult then clear the old one first
-		if (pgresult_ and pgresult_ != dbresult.pgresult_) {
-			if (DBTRACE>1) {
-				var("DBresult (m) PQC ").logput();
-				std::clog << pgresult_ << std::endl;
-			}
-			PQclear(pgresult_);
-			pgresult_ = nullptr;
-		}
-
-		pgresult_=dbresult.pgresult_;
-		dbresult.pgresult_ = nullptr;
-
-		if (DBTRACE>1) {
-			var("DBresult (m) own ").logput();
-			std::clog << pgresult_ << std::endl;
-		}
-	}
-
-	// Allow assignment from a PGresult*
-	void operator=(PGresult* pgresult) {
-
-		rown_ = 0;
-
-		// If already assigned to a different PGresult then clear the old one first
-		if (pgresult_ and pgresult_ != pgresult) {
-			if (DBTRACE>1) {
-				var("DBresult (=) PQC ").logput();
-				std::clog << pgresult_ << std::endl;
-			}
-			PQclear(pgresult_);
-		}
-
-		pgresult_ = pgresult;
-		if (DBTRACE>1) {
-			var("DBresult (=) own ").logput();
-			std::clog << pgresult_ << std::endl;
-		}
-	}
-
-	// Allow implicit conversion to a PGresult*
-	// No tiresome .get() required as in unique_ptr
-	operator PGresult*() const {
-		return pgresult_;
-	}
-
-	// Destructor automatically calls PQClear when a DBresult goes out of scope
-	// This the whole point of having DBresult.
-	~DBresult() {
-		if (pgresult_) {
-			if (DBTRACE>1) {
-				var("DBresult (~) PQC ").logput();
-				std::clog << pgresult_ << std::endl;
-			}
-			PQclear(pgresult_);
-		}
-	}
-};
 
 static int get_dbconn_no(in dbhandle) {
 
@@ -623,26 +518,27 @@ static int get_dbconn_no_or_default(in dbhandle) {
 // NB in case 2 and 3 the connection id is recorded in the var
 // use void pointer to avoid need for including postgres headers in mv.h or any fancy class
 // hierarchy (assumes accurate programming by system programmers in exodus mvdb routines)
-static PGconn* get_pgconn(in dbhandle) {
+static DBconn_ptr get_pgconn(in dbhandle) {
 
 	// var("--- connection ---").logputl();
 	// Get the connection associated with *this
 	int dbconn_no = get_dbconn_no_or_default(dbhandle);
 	// var(dbconn_no).logputl("dbconn_no1=");
 
-	// Otherwise fail
-	if (not dbconn_no) UNLIKELY
-//		throw VarDBException("pgconnection() requested when not connected.");
-		return nullptr;
+//	// Otherwise fail
+//	if (not dbconn_no) UNLIKELY
+////		throw VarDBException("pgconnection() requested when not connected.");
+//		return nullptr;
 
+	auto pgconn=thread_dbpool.get_pgconn(dbconn_no);
 	if (DBTRACE>1) UNLIKELY {
 		std::clog << std::endl;
-		PGconn* pgconn=dbpool.get_pgconn(dbconn_no);
-		std::clog << "CONN " << dbconn_no << " " << pgconn << std::endl;
+//		std::clog << "CONN " << dbconn_no << " " << pgconn << std::endl;
+		std::clog << "CONN " << dbconn_no << std::endl;
 	}
 
 	// Return the relevent pg_connection structure
-	const auto pgconn = dbpool.get_dbconn(dbconn_no)->pgconn_;
+//	const auto pgconn = thread_dbpool.get_dbconn(dbconn_no)->pgconn_;
 	// TODO error abort if zero
 	return pgconn;
 
@@ -655,34 +551,29 @@ static DBconn* get_dbconn(in dbhandle) {
 		let errmsg = "get_dbconn() attempted when not connected";
 		throw VarDBException(errmsg);
 	}
-	return dbpool.get_dbconn(dbconn_no);
+	return thread_dbpool.get_dbconn(dbconn_no);
 }
 
-//static bool get_dbresult(in sql, DBresult& dbresult, PGconn* pgconn);
 // Used for sql commands that require no parameters
 // Returns 1 for success
 // Returns 0 for failure
 // dbresult is returned to caller to extract any data and call PQclear(dbresult) in destructor of DBresult
-static DBresult get_dbresult(in sql, PGconn* pgconn, out ok) {
+static DBresult get_dbresult(in sql, DBconn_ptr dbconn_ptr, out ok) {
 	DEBUG_LOG_SQL
 
 	/* Dont use PQexec because is cannot be told to return binary results
 	and use PQexecParams with zero parameters instead
 	//execute the command
-	dbresult = get_dbresult(pgconn, sql.var_str.c_str());
+	dbresult = get_dbresult(dbconn_ptr, sql.var_str.c_str());
 	dbresult = dbresult;
 	*/
-
-	DBresult dbresult;
-
-	var errmsg;
 
 	// Parameter array with no parameters
 	const char* paramValues[1] = {nullptr};
 	const int paramLengths[1] = {0};
 
 	// Will contain any dbresult IF successful
-	dbresult = PQexecParams(pgconn, sql.toString().c_str(), 0, /* zero params */
+	DBresult dbresult = XPQexecParams(dbconn_ptr, sql.toString().c_str(), 0, /* zero params */
 							nullptr,								/* let the backend deduce param type */
 							paramValues, paramLengths,
 							nullptr,  // text arguments
@@ -690,8 +581,8 @@ static DBresult get_dbresult(in sql, PGconn* pgconn, out ok) {
 
 	// Handle serious error. Why not throw?
 	if (not dbresult) UNLIKELY {
-		errmsg = "ERROR: vardb: PQexecParams command failed, no error code: ";
-		errmsg.errputl();
+		dbresult.pqerrmsg = "ERROR: vardb: PQexecParams command failed, no error code: ";
+		var(dbresult.pqerrmsg).errputl();
 		ok = false;
 		return dbresult;
 	}
@@ -700,24 +591,26 @@ static DBresult get_dbresult(in sql, PGconn* pgconn, out ok) {
 
 		case PGRES_COMMAND_OK:
 			LIKELY
-			errmsg = "";
+			dbresult.pqerrmsg = "";
 			ok = true;
+			if (DBTRACE > 0)
+				TRACE(sql ^ " OK");
 			return dbresult;
 
 		case PGRES_TUPLES_OK:
 			ok = PQntuples(dbresult) > 0;
 			if (ok)
-				errmsg = "";
+				dbresult.pqerrmsg = "";
 			else
-				errmsg = "PQntuples"_var ^ PQntuples(dbresult);
+				dbresult.pqerrmsg = "PQntuples" + std::to_string(PQntuples(dbresult));
 			return dbresult;
 
 		case PGRES_NONFATAL_ERROR:
 
-			errmsg = "ERROR: vardb: SQL non-fatal error code "_var ^
-				var(PQresStatus(PQresultStatus(dbresult))) ^ ", " ^
-				var(PQresultErrorMessage(dbresult));
-			errmsg.errputl();
+			dbresult.pqerrmsg = std::string("ERROR: vardb: SQL non-fatal error code ") +
+				PQresStatus(PQresultStatus(dbresult)) + ", " +
+				PQresultErrorMessage(dbresult);
+			var(dbresult.pqerrmsg).errputl();
 			ok = false;
 			return dbresult;
 
@@ -738,11 +631,11 @@ static DBresult get_dbresult(in sql, PGconn* pgconn, out ok) {
 #pragma clang diagnostic ignored "-Wcovered-switch-default"
 		default:
 			UNLIKELY
-			errmsg = "ERROR: vardb: pqexecparams " ^ sql ^
-					" ERROR: vardb: pqexecparams " ^
-					var(PQresStatus(PQresultStatus(dbresult))) ^ ": " ^
-					var(PQresultErrorMessage(dbresult));
-			errmsg.errputl();
+			dbresult.pqerrmsg = "ERROR: vardb: pqexecparams " + sql.toString() +
+					" ERROR: vardb: pqexecparams " +
+					PQresStatus(PQresultStatus(dbresult)) + ": " +
+					PQresultErrorMessage(dbresult);
+			var(dbresult.pqerrmsg).errputl();
 			ok = false;
 			return dbresult;
 #pragma clang diagnostic push
@@ -750,58 +643,11 @@ static DBresult get_dbresult(in sql, PGconn* pgconn, out ok) {
 
 	// Should never get here
 	// std::unreachable
-	// return false;
+	ok = false;
+	dbresult.pqerrmsg = "Unknown error in " + sql.toString();
+	return dbresult;
 
 }
-
-//#if defined _MSC_VER  //|| defined __CYGWIN__ || defined __MINGW32__
-//LONG WINAPI DelayLoadDllExceptionFilter(PEXCEPTION_POINTERS pExcPointers) {
-//	LONG lDisposition = EXCEPTION_EXECUTE_HANDLER;
-//
-//	PDelayLoadInfo pDelayLoadInfo =
-//		PDelayLoadInfo(pExcPointers->ExceptionRecord->ExceptionInformation[0]);
-//
-//	switch (pExcPointers->ExceptionRecord->ExceptionCode) {
-//		case VcppException(ERROR_SEVERITY_ERROR, ERROR_MOD_NOT_FOUND):
-//			printf("vardb:: %s was not found\n", pDelayLoadInfo->szDll);
-//			break;
-//			/*
-//			case VcppException(ERROR_SEVERITY_ERROR, ERROR_PROC_NOT_FOUND):
-//			if (pdli->dlp.fImportByName) {
-//				printf("Function %s was not found in %sn",
-//				pDelayLoadInfo->dlp.szProcName, pDelayLoadInfo->szDll);
-//			} else {
-//			printf("Function ordinal %d was not found in %sn",
-//				pDelayLoadInfo->dlp.dwOrdinal, pDelayLoadInfo->szDll);
-//			}
-//			break;
-//		*/
-//		default:
-//			// Exception is not related to delay loading
-//			printf("Unknown problem %s\n", pDelayLoadInfo->szDll);
-//			lDisposition = EXCEPTION_CONTINUE_SEARCH;
-//			break;
-//	}
-//
-//	return (lDisposition);
-//}
-//
-//// msvc uses a special mode to catch failure to load a delay loaded dll that is incompatible with
-//// the normal try/catch and needs to be put in simple global function with no complex objects (that
-//// require standard c++ try/catch stack unwinding?) maybe it would be easier to manually load it
-//// using dlopen/dlsym implemented in var as var::load and var::call
-//// http://msdn.microsoft.com/en-us/library/5skw957f(vs.80).aspx
-//static bool msvc_PQconnectdb(PGconn** pgconn, const std::string& conninfo) {
-//	// connect or fail
-//	__try {
-//		*pgconn = PQconnectdb(conninfo.c_str());
-//	} __except (DelayLoadDllExceptionFilter(GetExceptionInformation())) {
-//		return false;
-//	}
-//	return true;
-//}
-//
-//#endif
 
 static var build_conn_info(in conninfo) {
 	// Priority is
@@ -985,20 +831,8 @@ bool var::connect(in conninfo) {
 	PGconn* pgconn;
 	for (;;) {
 
-//#if defined _MSC_VER  //|| defined __CYGWIN__ || defined __MINGW32__
-//		if (not msvc_PQconnectdb(&pgconn, fullconninfo.var_str)) UNLIKELY {
-//			let libname = "libpq.dl";
-//			// var libname="libpq.so";
-//			let errmsg="ERROR: vardb: connect() Cannot load shared library " ^ libname ^
-//				". Verify configuration PATH contains postgres's \\bin.";
-//			this->setlasterror(errmsg);
-//			return false;
-//		}
-//#else
-
 		// Attempt connection
 		pgconn = PQconnectdb(fullconninfo.var_str.c_str());
-//#endif
 
 		// Connected OK
 		if (PQstatus(pgconn) == CONNECTION_OK or fullconninfo)
@@ -1038,7 +872,7 @@ bool var::connect(in conninfo) {
 	// At this point we have good new connection to database
 
 	// Cache the new connection handle and get the cache index no (starting 1)
-	int dbconn_no = dbpool.add_dbconn(pgconn, fullconninfo.var_str);
+	int dbconn_no = thread_dbpool.add_dbconn(pgconn, fullconninfo.var_str);
 	if (DBTRACE_CONN) {
 		TRACE(thread_default_data_dbconn_no)
 		TRACE(thread_default_dict_dbconn_no)
@@ -1166,7 +1000,7 @@ void var::disconnect() {
 
 	// Disconnect
 	// Note singular form of dbconn
-	dbpool.del_dbconn(dbconn_no);
+	thread_dbpool.del_dbconn(dbconn_no);
 	var_typ = VARTYP_UNA;
 
 	// If we happen to be disconnecting the same connection as the default connection
@@ -1208,11 +1042,13 @@ void var::disconnect() {
 	return;
 }
 
+// Disconnect the current connection no (or start at 2) and all above
 void var::disconnectall() {
 
 	THISIS("bool var::disconnectall()")
 	assertVar(function_sig);
 
+	// Start at the current dbconn_no (default to 2)
 	var dbconn_no = get_dbconn_no(*this);
 	if (not dbconn_no)
 		dbconn_no = 2;
@@ -1220,25 +1056,8 @@ void var::disconnectall() {
 	if (DBTRACE>1)
 		dbconn_no.logputl("DBTR var::disconnectall() >= ");
 
-//	// Note the plural for dbconn"S" to delete all starting from
-//	dbpool.del_dbconns(dbconn_no);
-//
-//	if (thread_default_data_dbconn_no >= dbconn_no) {
-//		thread_default_data_dbconn_no = 0;
-//		if (DBTRACE>1) {
-//			var(dbconn_no).logputl("DBTR var::disconnectall() DEFAULT CONN FOR DATA ");
-//		}
-//	}
-//
-//	if (thread_default_dict_dbconn_no >= dbconn_no) {
-//		thread_default_dict_dbconn_no = 0;
-//		if (DBTRACE>1) {
-//			var(dbconn_no).logputl("DBTR var::disconnectall() DEFAULT CONN FOR DICT ");
-//		}
-//	}
-
 	// Disconnect all connections >= dbconn_no
-	auto max_dbconn_no = dbpool.max_dbconn_no();
+	auto max_dbconn_no = thread_dbpool.max_dbconn_no();
 	for (auto dbconn_no2 = dbconn_no; dbconn_no2 <= max_dbconn_no; ++dbconn_no2) {
 		var connection2 = FM ^ dbconn_no2;
 		connection2.disconnect();
@@ -1247,12 +1066,12 @@ void var::disconnectall() {
 	// Make sure the max dbconn_no is reduced
 	// although the connections will have already been disconnected
 	// Note the PLURAL form of dbconn"S" to delete all starting from
-	dbpool.del_dbconns(dbconn_no);
+	thread_dbpool.del_dbconns(dbconn_no);
 
 	return;
 }
 
-// Open a file given a filename on current thread-default connection
+// Open a given filename on given connection or current thread-default connection to file var
 // We are using strict filename/file syntax (even though we could use one variable for both!)
 // We store the filename in the file since that is what we need to generate read/write sql
 // later usage example:
@@ -1442,7 +1261,7 @@ bool var::readc(in file, in key) {
 	// Attempt to get record from the cache
 	auto hash64 = vardb_hash_file_and_key(file, key);
 	std::string cachedrecord;
-	if (dbpool.getrecord(dbconn_no, hash64, cachedrecord)) {
+	if (thread_dbpool.getrecord(dbconn_no, hash64, cachedrecord)) {
 		// Cache hit.
 		if (cachedrecord.empty()) LIKELY {
 			// Actual record doesnt exist.
@@ -1466,11 +1285,11 @@ bool var::readc(in file, in key) {
 
 	if (result) {
 		// Cache a successful ordinary read
-		dbpool.putrecord(dbconn_no, hash64, var_str);
+		thread_dbpool.putrecord(dbconn_no, hash64, var_str);
 	} else {
 		// Cache "" to falsify future reads without actual reads.
 		var("").writec(file, key);
-		dbpool.putrecord(dbconn_no, hash64, "");
+		thread_dbpool.putrecord(dbconn_no, hash64, "");
 	}
 
 	return result;
@@ -1491,7 +1310,7 @@ void var::writec(in file, in key) const {
 		throw VarDBException("get_dbconn_no() failed");
 
 	auto hash64 = vardb_hash_file_and_key(file, key);
-	dbpool.putrecord(dbconn_no, hash64, var_str);
+	thread_dbpool.putrecord(dbconn_no, hash64, var_str);
 
 	return;
 }
@@ -1510,7 +1329,7 @@ bool var::deletec(in key) const {
 		throw VarDBException("get_dbconn_no() failed");
 
 	auto hash64 = vardb_hash_file_and_key(*this, key);
-	return dbpool.delrecord(dbconn_no, hash64);
+	return thread_dbpool.delrecord(dbconn_no, hash64);
 }
 
 
@@ -1575,6 +1394,8 @@ bool var::read(in file, in key) {
 
 	} // %RECORDS%
 
+	std::string normalised_filename = get_normal_filename(file);
+
 	// Get file specific connection or fail
 	const auto pgconn = get_pgconn(file);
 	if (not pgconn) UNLIKELY {
@@ -1583,19 +1404,41 @@ bool var::read(in file, in key) {
 		throw VarDBException(errmsg);
 	}
 
+// TODO keep a cache of PREPARED files and look up if already prepared before PREPARING one.
+////	// PREPARE instead of direct SELECT which questionably doesnt cache repetitive simple sql statements
+//	std::string prepared_code = "vardb_read_" + normalised_filename;
+//	let sql0 = "PREPARE " + prepared_code + " (text) AS SELECT data FROM " + normalised_filename + " WHERE key = $1";
+//	var response;
+//	if (not sqlexec(sql0, response))
+//		response.errputl();
+////		throw VarError(response);
+
 	let sql = "SELECT data FROM " ^ get_normal_filename(file) ^ " WHERE key = $1";
+//	let sql = "EXECUTE " + prepared_code + " ($1)";
+//	let sql = prepared_code;
 
 	// Parameter array
 	const char* paramValues[]  = {key2.data()};
 	const int   paramLengths[] = {static_cast<int>(key2.size())};
+	const int   paramFormats[] = {0}; // Text format
 	DEBUG_LOG_SQL1
 
-	const DBresult dbresult = PQexecParams(pgconn,
-											sql.var_str.c_str(), 1, /* one param */
-											nullptr,					/* let the backend deduce param type */
-											paramValues, paramLengths,
-											nullptr,	// text arguments
-											0);	// text results
+	const DBresult dbresult = PQexecParams(
+		pgconn,
+		sql.var_str.c_str(),          // Query
+		1,                            // One param
+		static_cast<const Oid[]>(25), // Text
+		paramValues, paramLengths,
+		paramFormats,	              // Text arguments
+		0                             // Text results
+	);
+//	const DBresult dbresult = PQexecPrepared(
+//		pgconn,
+//		sql.var_str.c_str(), 1,    // One param
+//		paramValues, paramLengths,
+//		nullptr,	               // Text arguments
+//		0                          // Text results
+//	);
 
 	// Handle serious errors
 	if (PQresultStatus(dbresult) != PGRES_TUPLES_OK) UNLIKELY {
@@ -1605,7 +1448,7 @@ bool var::read(in file, in key) {
 		if (sqlstate == "42P01")
 			errmsg ^= " File doesnt exist";
 		else
-			errmsg ^= var(PQerrorMessage(pgconn)) ^ " SQLERROR:" ^ sqlstate;
+			errmsg ^= (var(dbresult.pqerrmsg) ?: var(PQerrorMessage(pgconn))) ^ " SQLERROR:" ^ sqlstate;
 
 		this->setlasterror(errmsg);
 		throw VarDBException(errmsg);
@@ -1666,7 +1509,7 @@ var  var::lock(in key) const {
 	assertVar(function_sig);
 	ISSTRING(key)
 
-	PGconn* pgconn = get_pgconn(*this);
+	auto pgconn = get_pgconn(*this);
 	if (not pgconn) UNLIKELY {
 		var errmsg = "var::lock() get_pgconn() failed. ";
 		if (this->assigned())
@@ -1712,7 +1555,7 @@ var  var::lock(in key) const {
 	}
 
 	// Call postgres
-	const DBresult dbresult = PQexecParams(pgconn,
+	const DBresult dbresult = XPQexecParams(pgconn,
 											// TODO: parameterise filename
 											sql, 1,                                      /* one param */
 											nullptr,                                     /* let the backend deduce param type */
@@ -1722,7 +1565,7 @@ var  var::lock(in key) const {
 	if (PQresultStatus(dbresult) != PGRES_TUPLES_OK or PQntuples(dbresult) != 1) UNLIKELY {
 		let sqlstate = var(PQresultErrorField(dbresult, PG_DIAG_SQLSTATE));
 		let errmsg = "lock(" ^ *this ^ ", " ^ key ^ ")\n" ^
-			var(PQerrorMessage(pgconn)) ^ "\nSQLERROR:" ^ sqlstate ^ " PQresultStatus=" ^
+			(var(dbresult.pqerrmsg) ?: var(PQerrorMessage(pgconn))) ^ "\nSQLERROR:" ^ sqlstate ^ " PQresultStatus=" ^
 			var(PQresStatus(PQresultStatus(dbresult))) ^ ", PQntuples=" ^
 			var(PQntuples(dbresult));
 		this->setlasterror(errmsg);
@@ -1789,7 +1632,7 @@ bool var::unlock(in key) const {
 	}
 
 	// Call postgres
-	const DBresult dbresult = PQexecParams(pgconn,
+	const DBresult dbresult = XPQexecParams(pgconn,
 											sql, 1,										/* one param */
 											nullptr,									/* let the backend deduce param type */
 											paramValues, paramLengths, paramFormats, 1); /* ask for binary results */
@@ -1798,7 +1641,7 @@ bool var::unlock(in key) const {
 	if (PQresultStatus(dbresult) != PGRES_TUPLES_OK) UNLIKELY {
 		let sqlstate = var(PQresultErrorField(dbresult, PG_DIAG_SQLSTATE));
 		let errmsg = "unlock(" ^ this->convert(_FM, "^") ^ ", " ^ key ^ ")\n" ^
-				var(PQerrorMessage(pgconn)) ^ "\nSQLERROR:" ^ sqlstate ^ " PQresultStatus=" ^
+				(var(dbresult.pqerrmsg) ?: var(PQerrorMessage(pgconn))) ^ "\nSQLERROR:" ^ sqlstate ^ " PQresultStatus=" ^
 				var(PQresStatus(PQresultStatus(dbresult))) ^ ", PQntuples=" ^
 				var(PQntuples(dbresult));
 		this->setlasterror(errmsg);
@@ -1877,14 +1720,18 @@ bool var::sqlexec(in sqlcmd, io response) const {
 
 	// NB PQexec cannot be told to return binary results
 	// but it can execute multiple commands
-	// whereas PQexecParams is the opposite
-	const DBresult dbresult = PQexec(pgconn, sqlcmd.var_str.c_str());
+	// whereas XPQexecParams is the opposite
+	DBresult dbresult = XPQexec(pgconn, sqlcmd.var_str.c_str());
 
 	if (PQresultStatus(dbresult) != PGRES_COMMAND_OK and
 		PQresultStatus(dbresult) != PGRES_TUPLES_OK) UNLIKELY {
+//		if (!dbresult) {
+//			response = dbresult.pqerrmsg;
+//			return false;
+//		}
 		let sqlstate = var(PQresultErrorField(dbresult, PG_DIAG_SQLSTATE));
 		// sql state 42P03 = duplicate_cursor
-		response = var(PQerrorMessage(pgconn)) ^ " sqlstate:" ^ sqlstate ^ " " ^ sqlcmd;
+		response = "var::sqlexec: " ^ (var(dbresult.pqerrmsg) ?: var(PQerrorMessage(pgconn))) ^ " sqlstate:" ^ sqlstate ^ " " ^ sqlcmd;
 		return false;
 	}
 
@@ -2009,7 +1856,7 @@ void var::write(in file, in key) const {
 		throw VarDBException(errmsg);
 	}
 
-	const DBresult dbresult = PQexecParams(pgconn,
+	const DBresult dbresult = XPQexecParams(pgconn,
 											sql.var_str.c_str(),
 											2,       // two params (key and data)
 											nullptr, // let the backend deduce param type
@@ -2023,7 +1870,7 @@ void var::write(in file, in key) const {
 		let errmsg = "ERROR: vardb: write(" ^ file.convert(_FM, "^") ^
 					", " ^ key ^ ") failed: SQLERROR:" ^ sqlstate ^ " PQresultStatus=" ^
 					var(PQresStatus(PQresultStatus(dbresult))) ^ " " ^
-					var(PQerrorMessage(pgconn));
+					(var(dbresult.pqerrmsg) ?: var(PQerrorMessage(pgconn)));
 		// ERROR: vardb: write(definitions^1, LAST_SYNCDATE_TIME*DAT) failed: SQLERROR:25P02
 		// PQresultStatus=PGRES_FATAL_ERROR ERROR:  current transaction is aborted, commands ignored until end of transaction block
 
@@ -2070,7 +1917,7 @@ bool var::updaterecord(in file, in key) const {
 		throw VarDBException(errmsg);
 	}
 
-	const DBresult dbresult = PQexecParams(pgconn,
+	const DBresult dbresult = XPQexecParams(pgconn,
 											sql.var_str.c_str(),
 											2,        // two params (key and data)
 											nullptr,  // let the backend deduce param type
@@ -2083,7 +1930,7 @@ bool var::updaterecord(in file, in key) const {
 		let sqlstate = var(PQresultErrorField(dbresult, PG_DIAG_SQLSTATE));
 		let errmsg = "ERROR: vardb: update(" ^ file.convert(_FM, "^") ^
 				", " ^ key ^ ") SQLERROR: " ^ sqlstate ^ " Failed: " ^ var(PQntuples(dbresult)) ^ " " ^
-				var(PQerrorMessage(pgconn));
+				(var(dbresult.pqerrmsg) ?: var(PQerrorMessage(pgconn)));
 		this->setlasterror(errmsg);
 		throw VarDBException(errmsg);
 	}
@@ -2093,7 +1940,7 @@ bool var::updaterecord(in file, in key) const {
 		var(
 			"ERROR: vardb: updaterecord(" ^ file.convert(_FM, "^") ^ ", " ^ key ^ ") Failed: " ^
 			var(PQntuples(dbresult)) ^ " " ^
-			var(PQerrorMessage(pgconn))
+			(var(dbresult.pqerrmsg) ?: var(PQerrorMessage(pgconn)))
 		).errputl();
 		return false;
 	}
@@ -2136,7 +1983,7 @@ bool var::updatekey(in key, in newkey) const {
 		throw VarDBException(errmsg);
 	}
 
-	const DBresult dbresult = PQexecParams(pgconn,
+	const DBresult dbresult = XPQexecParams(pgconn,
 											sql.var_str.c_str(),
 											2,        // two params (key and newkey)
 											nullptr,  // let the backend deduce param type
@@ -2151,7 +1998,7 @@ bool var::updatekey(in key, in newkey) const {
 		let errmsg =
 			"ERROR: vardb: updatekey(" ^ this->convert(_FM, "^") ^ ", " ^ key ^ " -> " ^ newkey ^ ") "
 			"SQLERROR: " ^ sqlstate ^ " Failed: " ^ var(PQntuples(dbresult)) ^ " " ^
-			var(PQerrorMessage(pgconn));
+			(var(dbresult.pqerrmsg) ?: var(PQerrorMessage(pgconn)));
 		this->setlasterror(errmsg);
 
 		// Duplicate key is a normal error. Do not throw
@@ -2168,7 +2015,7 @@ bool var::updatekey(in key, in newkey) const {
 		var(
 			"ERROR: vardb: updatekey(" ^ this->convert(_FM, "^") ^ ", " ^ key ^ " -> " ^ newkey ^ ") " ^
 			var(PQntuples(dbresult)) ^ " " ^
-			var(PQerrorMessage(pgconn))
+			(var(dbresult.pqerrmsg) ?: var(PQerrorMessage(pgconn)))
 		).errputl();
 		return false;
 	}
@@ -2212,7 +2059,7 @@ bool var::insertrecord(in file, in key) const {
 		throw VarDBException(errmsg);
 	}
 
-	const DBresult dbresult = PQexecParams(pgconn,
+	const DBresult dbresult = XPQexecParams(pgconn,
 											sql.var_str.c_str(),
 											2,       // two params (key and data)
 											nullptr, // let the backend deduce param type
@@ -2231,7 +2078,7 @@ bool var::insertrecord(in file, in key) const {
 		let errmsg = "ERROR: vardb: insertrecord(" ^
 				file.convert(_FM, "^") ^ ", " ^ key ^ ") Failed: " ^
 				var(PQntuples(dbresult)) ^ " SQLERROR:" ^ sqlstate ^ " " ^
-				var(PQerrorMessage(pgconn));
+				(var(dbresult.pqerrmsg) ?: var(PQerrorMessage(pgconn)));
 		this->setlasterror(errmsg);
 		throw VarDBException(errmsg);
 	}
@@ -2240,7 +2087,7 @@ bool var::insertrecord(in file, in key) const {
 	if (std::strcmp(PQcmdTuples(dbresult), "1") != 0) UNLIKELY {
 		var("ERROR: vardb: insertrecord(" ^ file.convert(_FM, "^") ^
 			", " ^ key ^ ") Failed: " ^ var(PQntuples(dbresult)) ^ " " ^
-			var(PQerrorMessage(pgconn)))
+			(var(dbresult.pqerrmsg) ?: var(PQerrorMessage(pgconn))))
 			.errputl();
 		return false;
 	}
@@ -2283,7 +2130,7 @@ bool var::deleterecord(in key) const {
 		throw VarDBException(errmsg);
 	}
 
-	const DBresult dbresult = PQexecParams(pgconn, sql.var_str.c_str(), 1, /* two param */
+	const DBresult dbresult = XPQexecParams(pgconn, sql.var_str.c_str(), 1, /* two param */
 											nullptr,							/* let the backend deduce param type */
 											paramValues, paramLengths,
 											nullptr,  // text arguments
@@ -2294,7 +2141,7 @@ bool var::deleterecord(in key) const {
 		let sqlstate = var(PQresultErrorField(dbresult, PG_DIAG_SQLSTATE));
 		let errmsg = "ERROR: vardb: deleterecord(" ^ this->convert(_FM, "^") ^
 				", " ^ key ^ ") SQLERROR: " ^ sqlstate ^ " Failed: " ^ var(PQntuples(dbresult)) ^ " " ^
-				var(PQerrorMessage(pgconn));
+				(var(dbresult.pqerrmsg) ?: var(PQerrorMessage(pgconn)));
 		this->setlasterror(errmsg);
 		throw VarDBException(errmsg);
 	}
@@ -2322,7 +2169,7 @@ void var::clearcache() const {
 //		throw VarDBException("get_dbconn_no() failed in clearcache");
 		return;
 
-	dbpool.clearcache(dbconn_no);
+	thread_dbpool.clearcache(dbconn_no);
 
 	// Warning if any cursors have not been closed/cleaned up.
 	for (auto& entry : thread_dbresults)
@@ -4683,7 +4530,7 @@ void var::clearselect() {
 //To make it var:: private member -> pollute mv.h with PGresultptr :(
 // bool readnextx(const std::string& cursor, PGresultptr& dbresult)
 // called by readnext (and perhaps hasnext/select to implement LISTACTIVE)
-static bool readnextx(in cursor, PGconn* pgconn, int direction, PGresult*& pgresult, int* rown) {
+static bool readnextx(in cursor, DBconn_ptr pgconn, int direction, PGresult*& pgresult, int* rown) {
 
 	let cursorcode = cursor.f(1).convert(".", "_");
 	let cursorid = cursor.f(2) ^ "_" ^ cursorcode;
@@ -5480,7 +5327,7 @@ bool var::dbcursorexists() {
 //		return false;
 	var ok; const DBresult dbresult = get_dbresult(sql, pgconn, ok);
 	if (not ok)
-	return false;
+		return false;
 
 	return PQntuples(dbresult) > 0;
 }
@@ -5583,7 +5430,7 @@ var  var::reccount(in filename0) const {
 //		return "";
 	var ok; const DBresult dbresult = get_dbresult(sql, pgconn, ok);
 	if (not ok)
-	return "";
+		return "";
 
 	var nrvo = "";
 	if (PQntuples(dbresult) and PQnfields(dbresult) > 0 and not PQgetisnull(dbresult, 0, 0)) {

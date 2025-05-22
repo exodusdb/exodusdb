@@ -107,6 +107,15 @@
 #	set(CMAKE_CXX_MODULE_EXTENSIONS ".ixx" ".h")
 
 #
+# BOOST FIBER OPTION -DEXO_MODULE=ON/OFF or enabled by default
+# ##################
+#
+# Requires: apt install libboost-fiber-dev libboost-context-dev
+#
+	option(EXO_BOOST_FIBER "Build with Boost fiber async" ON)
+	message("-- EXO_BOOST_FIBER is ${EXO_BOOST_FIBER}")
+
+#
 # Build type
 # ##########
 #

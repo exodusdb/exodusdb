@@ -43,7 +43,7 @@ namespace exo {
 
 void var::ossleep(const int milliseconds) {
 
-	THISIS("void var::ossleep(const int milliseconds)")
+	THISIS("void var::ossleep(const int milliseconds) static")
 //	assertVar(function_sig);	 // not needed if *this not used
 
 	std::this_thread::sleep_for(std::chrono::milliseconds(milliseconds));

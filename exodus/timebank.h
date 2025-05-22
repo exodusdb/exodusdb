@@ -127,7 +127,7 @@ auto get_timebank_acno(const std::string_view arg1) -> int {
 	     if (++acno && arg1 == "xxxxxxxx unused") {}
 	else if (++acno && arg1 == "var  var::sort(SV delimiter)") {}
 	else if (++acno && arg1 == "var  var::reverse(SV delimiter)") {}
-	else if (++acno && arg1 == "var  var::ostimestamp(in ostime) static") {}
+	else if (++acno && arg1 == "var  var::ostimestamp(in ostime) const") {}
 	else if (++acno && arg1 == "bool var::connect(in conninfo") {}
 	else if (++acno && arg1 == "bool var::attach(in filenames") {}
 	else if (++acno && arg1 == "bool var::detach(in filenames") {}
@@ -221,7 +221,7 @@ auto get_timebank_acno(const std::string_view arg1) -> int {
 	else if (++acno && arg1 == "void var::move(io tovar)") {}
 	else if (++acno && arg1 == "var  var::move()") {}
 	else if (++acno && arg1 == "var  var::str(const int num) const") {}
-	else if (++acno && arg1 == "var  var::space() const") {}
+	else if (++acno && arg1 == "var  var::space() static") {}
 	else if (++acno && arg1 == "void var::cropper() &") {}
 	else if (++acno && arg1 == "void var::lowerer() &") {}
 	else if (++acno && arg1 == "void var::raiser() &") {}
@@ -249,11 +249,12 @@ auto get_timebank_acno(const std::string_view arg1) -> int {
 	else if (++acno && arg1 == "var  var::sqrt() const") {}
 	else if (++acno && arg1 == "var  var::pwr(in exponent) const") {}
 	else if (++acno && arg1 == "var  var::exp() const") {}
-	else if (++acno && arg1 == "var  var::osshell() const") {}
-	else if (++acno && arg1 == "var  var::osshellread() const") {}
-	else if (++acno && arg1 == "var  var::osshellwrite(in oscmd) const") {}
+	else if (++acno && arg1 == "bool var::osshell() const") {}
+	else if (++acno && arg1 == "bool var::osshellwrite(in oscmd) const") {}
+	else if (++acno && arg1 == "bool var::osshellread(in oscmd)") {}
+	else if (++acno && arg1 == "bool var::osprocess(in oscmd, in stdin_for_process, out stdout_from_process, out stderr_from_process, out exit_status, in timeout_secs) static") {}
 	else if (++acno && arg1 == "bool var::osopen(in osfilename, const bool utf8)") {}
-	else if (++acno && arg1 == "bool var::osopenx(in osfilename, const bool utf8)") {}
+	else if (++acno && arg1 == "bool var::osopenx(in osfilename, const bool utf8, const bool autocreate_or_throw)") {}
 	else if (++acno && arg1 == "bool var::osread(const char* osfilename, const char* codepage") {}
 	else if (++acno && arg1 == "bool var::to_codepage(const char* codepage) const") {}
 	else if (++acno && arg1 == "bool var::from_codepage(const char* codepage) const") {}
@@ -365,6 +366,10 @@ auto get_timebank_acno(const std::string_view arg1) -> int {
 	else if (++acno && arg1 == "CVR  var::logput(in prefix) const") {}
 	else if (++acno && arg1 == "CVR  var::logputl(in prefix) const") {}
 	else if (++acno && arg1 == "var  var::oswait(const int milliseconds) const") {}
+	else if (++acno && arg1 == "auto var::unpack<N>(SV delim = _FM) const") {}
+	else if (++acno && arg1 == "bool var::listed(SV list) const") {}
+	else if (++acno && arg1 == "bool var::listed(SV list, out position) const") {}
+	else if (++acno && arg1 == "var  var::stddev() const") {}
 
 	else if (++acno && arg1 == "bool dim::read(in filevar, in key)") {}
 	else if (++acno && arg1 == "void dim::write(in filevar, in key) const") {}

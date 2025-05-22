@@ -32,6 +32,11 @@ export namespace __gnu_cxx {
 export namespace std {
 
 
+	using std::printf;
+	using std::fprintf;
+	using std::sprintf;
+	using std::snprintf;
+
     // Core iterator functions
     using std::begin;
     using std::end;
@@ -260,6 +265,7 @@ export namespace std {
 	using std::data;
 
 	using std::swap;
+	using std::exchange;
 	using std::move;
 	using std::forward;
 	using std::remove_reference;
