@@ -3,13 +3,14 @@
 #if EXO_MODULE
 	import std;
 #else
-#   include <functional>
-#   include <queue>
-#   include <mutex>
-#   include <condition_variable>
-#   include <thread>
-#   include <atomic>
-#   include <memory>
+#	include <functional>
+#	include <queue>
+#	include <mutex>
+#	include <condition_variable>
+#	include <thread>
+#	include <atomic>
+#	include <memory>
+#	include <iostream> // unlike clang, g++ wants this to compile std::cerr in logging despite if (0)
 #endif
 
 #include "threadpool.h"
