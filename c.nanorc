@@ -140,6 +140,7 @@ color bold,green "\<(PQ|PG)[a-z]+\>"
 
 # EXOPROGRAM functions
 color bold,green "\<(select|selectkeys|hasnext|readnext|pushselect|popselect|clearselect|deleterecord|savelist|getlist|deletelist||calculate|xlate|oconv|iconv||amountunit||timedate2|getdatetime|elapsedtimetext||note|decide|esctoexit|AT|getcursor|setcursor|invertarray|sortarray||lockrecord|unlockrecord)\>"
+color bold,green "\<(setmaxthreads|getmaxthreads|getnumcores|run_count|run_results|shutdown_run|reset_run|)\>"
 
 # Exodus constants - kind of literals
 #################
@@ -160,7 +161,7 @@ color bold,pink ":[[:blank:]]*$"
 color bold,pink "\<(stop|abort|abortall|logoff)\>"
 
 # EXOPROGRAM Not really exits but currently considered important to highlight
-color bold,pink "\<(perform|execute|chain|libinfo)\>"
+color bold,pink "\<(perform|execute|chain|libinfo|run)\>"
 
 ###########
 # OPERATORS - bold magenta
