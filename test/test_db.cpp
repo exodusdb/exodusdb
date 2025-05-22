@@ -37,8 +37,7 @@ programinit()
 //	if (read(RECORD from "DEFINITIONS", "EXODUS"))
 //		TRACE(RECORD);
 
-	if (not sqlexec("test bad sql command"))
-		loglasterror();
+	assert(not sqlexec("test bad sql command"));
 
 //	stop("Test passed");
 //	//Skip if fast testing required
