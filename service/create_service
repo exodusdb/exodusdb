@@ -82,9 +82,10 @@ set -euxo pipefail
 : ==================================================================
 :
 	SERVICE_CMD=serve_$APP_CODE
-	if ! test -x $EXO_HOME/bin/$SERVICE_CMD; then
+	SERVICE_LIB=$EXO_HOME/lib/libserve_$APP_CODE.so
+	if ! test -x $SERVICE_LIB; then
 		set +x
-		echo "$SERVICE_CMD program not available or not executable. Cannot create service."
+		echo "$SERVICE_LIB library not available or not executable. Cannot create service."
 		exit 1
 	fi
 

@@ -182,9 +182,11 @@ set -euxo pipefail
 :
 : Verify chromium pdf converter works
 :
+: Ignore a lot of chromium error messages and check output chromium2pdf.pdf if in doubt.
+!
 	printf "<html><body>Nothing Special</body></html>\n" > chromium2pdf.html
 	chromium --no-sandbox --headless --disable-gpu --print-to-pdf=chromium2pdf.pdf chromium2pdf.html
-	rm chromium2pdf.html chromium2pdf.pdf
+#	rm chromium2pdf.html chromium2pdf.pdf
 
 :
 : Determine local ip number for info
