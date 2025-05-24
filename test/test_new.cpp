@@ -148,6 +148,57 @@ func main() {
         assert(listed(v1, "abc,def", MV) && MV.errputl() eq 2);
 	}
 
+	{
+		let randomfilename1 = "xo_test_new1_temp";
+		assert(createfile(randomfilename1));
+
+		let randomfilename2 = "xo_test_new2_temp";
+		assert(createfile(randomfilename2));
+		assert(open(randomfilename2));
+
+		ID = "ABC";
+
+		// Test read from an unopened file.
+
+		// Recovers and succeeds if outside transactions.
+		write("123", randomfilename1, ID);
+		assert(read(RECORD, randomfilename1, ID));
+		assert(deleterecord(randomfilename1, ID));
+		assert(not read(RECORD, randomfilename1, ID));
+
+		// Throws if in transaction because using PREPARED postgresql statements.
+		// which are only done on opening and any errors terminate transactions.
+
+		assert(begintrans());
+
+		try {
+			// Opened file should be OK
+			write("123", randomfilename2, ID);
+
+			// Unopened file
+			write("123", randomfilename1, ID);
+			assert(read(RECORD, randomfilename1, ID));
+			assert(deleterecord(randomfilename1, ID));
+
+			assert(false && "Read/write/delete on unopened file should THROW inside transaction.");
+
+		} catch (VarError e) {
+			// Verify throwm
+			TRACE(e.message);
+		}
+
+		// In trans (but errored)
+		assert(statustrans());
+
+		// Commit trans with errors should rollback and return false.
+		assert(not committrans());
+
+		// Rollback should have occurred
+		assert(not statustrans());
+		assert(not read(RECORD, randomfilename2, ID));
+		assert(not read(RECORD, randomfilename1, ID));
+	}
+
 	printl(elapsedtimetext());
 	printl("Test passed");
 

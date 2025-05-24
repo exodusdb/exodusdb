@@ -243,6 +243,8 @@ execute_process(
 
 		vardb_async.cpp
 		fiber_scheduler.cpp
+		fiber_mutex.cpp
+
 		DBresult.cpp
 		DBconn.cpp
 		DBpool.cpp

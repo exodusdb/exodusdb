@@ -175,15 +175,19 @@ Within transactions, lock requests for locks that have already been obtained alw
 // Thread-safe mutex for pgconn (remove if get_pgconn ensures exclusivity)
 //static std::mutex conn_mutex;
 
+#define EXO_PREPARED true
+
 //#undef EXO_BOOST_FIBER
-#define EXO_BOOST_FIBER
+//#define EXO_BOOST_FIBER
 #ifdef EXO_BOOST_FIBER
 #	include "vardb_async.h"
-#	define XPQexecParams async_PQexec<1>
-#	define XPQexec async_PQexec<2>
+#	define XPQexecParams   async_PQexec<1>
+#	define XPQexec         async_PQexec<2>
+#	define XPQexecPrepared async_PQexec<3>
 #else
-#	define XPQexecParams PQexecParams
-#	define XPQexec PQexec
+#	define XPQexecParams   PQexecParams
+#	define XPQexec         PQexec
+#	define XPQexecPrepared PQexecPrepared_shim
 #endif
 
 // Global SIGINT flag
@@ -293,6 +297,21 @@ static var getpgresultcell(PGresult* pgresult, int rown, int coln) {
 	return var(PQgetvalue(pgresult, rown, coln), PQgetlength(pgresult, rown, coln));
 }
 
+// shim to synchonise function sig.
+auto PQexecPrepared_shim(
+	PGconn *conn,
+	const char *stmtName,
+	int nParams,
+	void*,
+	const char *const *paramValues,
+	const int *paramLengths,
+	const int *paramFormats,
+	int resultFormat
+) -> PGresult* {
+	return PQexecPrepared(conn, stmtName, nParams, paramValues, paramLengths, paramFormats, resultFormat);
+}
+
+
 //void dump_pgresult(PGresult* pgresult) {
 //
 //	/* first, print out the attribute names */
@@ -318,7 +337,7 @@ static var getpgresultcell(PGresult* pgresult, int rown, int coln) {
 
 // Given a file name or handle, extract filename, standardize utf8, lowercase and change . to _
 // Normalise all alternative utf8 encodings of the same unicode points so they are identical
-static var get_normal_filename(in filename_or_handle) {
+static var get_normalized_filename(in filename_or_handle) {
 
 	// No longer convert . in filenames to _
 	return filename_or_handle.f(1).normalize().lcase();
@@ -372,7 +391,7 @@ static std::uint64_t vardb_hash_stdstr(std::string str1) {
 static std::uint64_t vardb_hash_file_and_key(in file, in key) {
 
 	// Use the pure filename and disregard any connection number
-	std::string fileandkey = get_normal_filename(file);
+	std::string fileandkey = get_normalized_filename(file);
 
 	// Separate the filename from the key to avoid alternative interpretations
 	// eg "FILENAMEKEY" could be FILE, NAMEKEY or FILENAME, KEY
@@ -765,7 +784,7 @@ static var get_fileexpression(in /*mainfilename*/, in filename, in keyordata) {
 	//	return keyordata;
 	// else
 	//return filename.convert(".", "_") ^ "." ^ keyordata;
-	return get_normal_filename(filename) ^ "." ^ keyordata;
+	return get_normalized_filename(filename) ^ "." ^ keyordata;
 
 	// If you dont use STRICT in the postgres function declaration/definitions then nullptr
 	// parameters do not abort functions
@@ -911,8 +930,8 @@ bool var::connect(in conninfo) {
 	// but this does
 	// this turns off the notice when creating tables with a primary key
 	// DEBUG5, DEBUG4, DEBUG3, DEBUG2, DEBUG1, LOG, NOTICE, WARNING, ERROR, FATAL, and PANIC
-	if (not this->sqlexec(var("SET client_min_messages = ") ^ (DBTRACE ? "LOG" : "WARNING"))) UNLIKELY
-		this->loglasterror();
+//	if (not this->sqlexec(var("SET client_min_messages = ") ^ (DBTRACE ? "LOG" : "WARNING"))) UNLIKELY
+//		this->loglasterror();
 
 	return true;
 }
@@ -942,16 +961,16 @@ bool var::attach(in filenames) const {
 	// Cache file handles in thread_file_handles
 	var notattached_filenames = "";
 	for (var filename : filenames2) {
-		const var normal_filename = get_normal_filename(filename);
+		const var normalized_filename = get_normalized_filename(filename);
 		var file;
-		if (file.open(normal_filename, *this)) {
+		if (file.open(normalized_filename, *this)) {
 			// Similar code in dbattach and open
-			thread_file_handles[normal_filename] = file.var_str;
+			thread_file_handles[normalized_filename] = file.var_str;
 			if (DBTRACE>1)
 				file.logputl("DBTR var::attach() ");
 		}
 		else {
-			notattached_filenames ^= normal_filename ^ " ";
+			notattached_filenames ^= normalized_filename ^ " ";
 		}
 	}
 
@@ -973,7 +992,7 @@ void var::detach(in filenames) {
 
 	for (var filename : filenames) {
 		// Similar code in detach and deletefile
-		thread_file_handles.erase(get_normal_filename(filename));
+		thread_file_handles.erase(get_normalized_filename(filename));
 	}
 	return;
 }
@@ -1086,10 +1105,10 @@ bool var::open(in filename, in connection /*DEFAULTNULL*/) {
 	assertVar(function_sig);
 	ISSTRING(filename)
 
-	const var normal_filename = get_normal_filename(filename);
+	const var normalized_filename = get_normalized_filename(filename);
 
 	// If filename == dos or DOS  means osread/oswrite/osremove
-	if (normal_filename.var_str.size() == 3 and normal_filename.var_str == "dos") UNLIKELY {
+	if (normalized_filename.var_str.size() == 3 and normalized_filename.var_str == "dos") UNLIKELY {
 		var_str = "dos";
 		var_typ = VARTYP_NANSTR;
 		return true;
@@ -1103,7 +1122,7 @@ bool var::open(in filename, in connection /*DEFAULTNULL*/) {
 	else {
 
 		// Or use any preopened or preattached file handle if available
-		auto entry = thread_file_handles.find(normal_filename);
+		auto entry = thread_file_handles.find(normalized_filename);
 		if (entry != thread_file_handles.end()) {
 
 			auto cached_file_handle = entry->second;
@@ -1111,7 +1130,7 @@ bool var::open(in filename, in connection /*DEFAULTNULL*/) {
 			// Make sure the connection is still valid otherwise redo the open
 			const auto pgconn = get_pgconn(cached_file_handle);
 			if (not pgconn) {
-				thread_file_handles.erase(normal_filename);
+				thread_file_handles.erase(normalized_filename);
 			} else {
 				var_str = cached_file_handle;
 				var_typ = VARTYP_NANSTR;
@@ -1123,7 +1142,7 @@ bool var::open(in filename, in connection /*DEFAULTNULL*/) {
 
 		// Or determine connection from filename in case filename is a handle
 		// Use default data or dict connection
-		connection2 = normal_filename;
+		connection2 = normalized_filename;
 
 	}
 
@@ -1139,10 +1158,10 @@ bool var::open(in filename, in connection /*DEFAULTNULL*/) {
 	var tablename;
 	var schema;
 	var and_schema_clause;
-	if (normal_filename.contains(".")) {
+	if (normalized_filename.contains(".")) {
 		// e.g. filenames starting dict.
-		schema = normal_filename.field(".",1);
-		tablename = normal_filename.field(".",2,999);
+		schema = normalized_filename.field(".",1);
+		tablename = normalized_filename.field(".",2,999);
 		and_schema_clause = " AND table_schema = " ^ schema.squote();
 	} else {
 
@@ -1158,7 +1177,7 @@ bool var::open(in filename, in connection /*DEFAULTNULL*/) {
 		// FIXME limit to schemas on the search path otherwise will not be able to access the file without explicit schema
 		schema = "public";
 
-		tablename = normal_filename;
+		tablename = normalized_filename;
 		//no schema filter allows opening temporary files with exist in various pg_temp_xxxx schemata
 		//and_schema_clause = "";
 		and_schema_clause = " AND table_schema != 'dict'";
@@ -1193,17 +1212,34 @@ bool var::open(in filename, in connection /*DEFAULTNULL*/) {
 		return false;
 	}
 
+	// Opening a file triggers prepare.
+	if (EXO_PREPARED) {
+		let code = normalized_filename.convert(".", "_");
+		let sql =
+			"DO $$"
+			"BEGIN"
+			"    IF NOT EXISTS (SELECT 1 FROM pg_prepared_statements WHERE name = 'vardb_read_" ^ code ^ "') THEN"
+			"        EXECUTE 'PREPARE vardb_read_" ^ code ^ " (text) AS SELECT data FROM " ^ normalized_filename ^ " WHERE key = $1';"
+			"        EXECUTE 'PREPARE vardb_delete_" ^ code ^ " (text) AS DELETE FROM " ^ normalized_filename ^ " WHERE key = $1';"
+			"        EXECUTE 'PREPARE vardb_write_" ^ code ^ " (text, text) AS INSERT INTO " ^ normalized_filename ^ " (key, data) VALUES ($1, $2) ON CONFLICT (key) DO UPDATE SET data = $2';"
+			"    END IF;"
+			"END $$;";
+		if (not connection2.sqlexec(sql)) {
+			throw VarDBException(lasterror());
+		}
+	}
+
 	//this->setlasterror();
 
 	// var becomes a file containing the filename and connection no
-	var_str = normal_filename.var_str;
+	var_str = normalized_filename.var_str;
 	var_str.push_back(FM_);
 	var_str.append(std::to_string(get_dbconn_no_or_default(connection2)));
 	var_typ = VARTYP_NANSTR;
 
 	// Cache the file so future opens return the same without reference to the database
 	// Similar code in dbattach and open
-	thread_file_handles[normal_filename] = var_str;
+	thread_file_handles[normalized_filename] = var_str;
 
 	if (DBTRACE>1) UNLIKELY
 		this->logputl("DBTR var::open-3 ");
@@ -1373,7 +1409,7 @@ bool var::read(in file, in key) {
 		var_typ = VARTYP_STR;
 
 		let sql =
-			"SELECT key from " ^ get_normal_filename(file) ^
+			"SELECT key from " ^ get_normalized_filename(file) ^
 			" WHERE NOT (key LIKE '%$%' AND key LIKE '%')"
 			" ORDER BY key"
 			" COLLATE exodus_natural"
@@ -1394,8 +1430,6 @@ bool var::read(in file, in key) {
 
 	} // %RECORDS%
 
-	std::string normalised_filename = get_normal_filename(file);
-
 	// Get file specific connection or fail
 	const auto pgconn = get_pgconn(file);
 	if (not pgconn) UNLIKELY {
@@ -1404,54 +1438,63 @@ bool var::read(in file, in key) {
 		throw VarDBException(errmsg);
 	}
 
-// TODO keep a cache of PREPARED files and look up if already prepared before PREPARING one.
-////	// PREPARE instead of direct SELECT which questionably doesnt cache repetitive simple sql statements
-//	std::string prepared_code = "vardb_read_" + normalised_filename;
-//	let sql0 = "PREPARE " + prepared_code + " (text) AS SELECT data FROM " + normalised_filename + " WHERE key = $1";
-//	var response;
-//	if (not sqlexec(sql0, response))
-//		response.errputl();
-////		throw VarError(response);
-
-	let sql = "SELECT data FROM " ^ get_normal_filename(file) ^ " WHERE key = $1";
-//	let sql = "EXECUTE " + prepared_code + " ($1)";
-//	let sql = prepared_code;
-
 	// Parameter array
 	const char* paramValues[]  = {key2.data()};
 	const int   paramLengths[] = {static_cast<int>(key2.size())};
 	const int   paramFormats[] = {0}; // Text format
-	DEBUG_LOG_SQL1
 
-	const DBresult dbresult = PQexecParams(
-		pgconn,
-		sql.var_str.c_str(),          // Query
-		1,                            // One param
-		static_cast<const Oid[]>(25), // Text
-		paramValues, paramLengths,
-		paramFormats,	              // Text arguments
-		0                             // Text results
-	);
-//	const DBresult dbresult = PQexecPrepared(
-//		pgconn,
-//		sql.var_str.c_str(), 1,    // One param
-//		paramValues, paramLengths,
-//		nullptr,	               // Text arguments
-//		0                          // Text results
-//	);
+	DBresult dbresult;
+	for (bool maybe_prepared = EXO_PREPARED;;) {
 
-	// Handle serious errors
-	if (PQresultStatus(dbresult) != PGRES_TUPLES_OK) UNLIKELY {
-		let sqlstate = var(PQresultErrorField(dbresult, PG_DIAG_SQLSTATE));
-		var errmsg =
-			"read(" ^ file.convert("." _FM, "_^").replace("dict_","dict.").quote() ^ ", " ^ key.quote() ^ ")";
-		if (sqlstate == "42P01")
-			errmsg ^= " File doesnt exist";
-		else
-			errmsg ^= (var(dbresult.pqerrmsg) ?: var(PQerrorMessage(pgconn))) ^ " SQLERROR:" ^ sqlstate;
+		let sql = maybe_prepared ?
+			"vardb_read_" ^ get_normalized_filename(file).convert(".", "_")
+		:
+			"SELECT data FROM " ^ get_normalized_filename(file) ^ " WHERE key = $1";
+		;
+		// let sql = "EXECUTE " + prepared_code + " ($1)";
+		DEBUG_LOG_SQL1
 
-		this->setlasterror(errmsg);
-		throw VarDBException(errmsg);
+		dbresult = maybe_prepared ?
+			XPQexecPrepared(
+				pgconn,
+				sql.var_str.c_str(), 1,       // One param (key)
+				nullptr,                      // Dummy
+				paramValues, paramLengths,
+				nullptr,	                  // Text arguments
+				0                             // Text results
+			)
+		:
+			XPQexecParams(
+				pgconn,
+				sql.var_str.c_str(),
+				1,                            // One param (key)
+				static_cast<const Oid[]>(25), // Text
+				paramValues, paramLengths,
+				paramFormats,	              // Text arguments
+				0                             // Text results
+			)
+		;
+
+		// Handle serious errors
+		if (PQresultStatus(dbresult) != PGRES_TUPLES_OK) UNLIKELY {
+			let sqlstate = var(PQresultErrorField(dbresult, PG_DIAG_SQLSTATE));
+			var errmsg =
+				"read(" ^ file.convert("." _FM, "_^").replace("dict_","dict.").quote() ^ ", " ^ key.quote() ^ ")";
+			if (sqlstate == "42P01")
+				errmsg ^= " File doesnt exist.";
+			else if (sqlstate == "26000") {
+				if (not pgconn.dbconn->in_transaction_) {
+					maybe_prepared = false;
+					continue;
+				}
+				errmsg ^= " file has not been opened/prepared and transaction is active.";
+			} else
+				errmsg ^= " " ^ (var(dbresult.pqerrmsg) ?: var(PQerrorMessage(pgconn))) ^ " SQLERROR:" ^ sqlstate;
+
+			this->setlasterror(errmsg);
+			throw VarDBException(errmsg);
+		}
+		break;
 	}
 
 	if (PQntuples(dbresult) < 1) UNLIKELY {
@@ -1555,11 +1598,13 @@ var  var::lock(in key) const {
 	}
 
 	// Call postgres
-	const DBresult dbresult = XPQexecParams(pgconn,
-											// TODO: parameterise filename
-											sql, 1,                                      /* one param */
-											nullptr,                                     /* let the backend deduce param type */
-											paramValues, paramLengths, paramFormats, 1); /* ask for binary dbresults */
+	const DBresult dbresult = XPQexecParams(
+		pgconn,
+		// TODO: parameterise filename
+		sql, 1,                                     /* one param */
+		nullptr,                                    /* let the backend deduce param type */
+		paramValues, paramLengths, paramFormats, 1) /* ask for binary dbresults */
+	;
 
 	// Handle serious errors
 	if (PQresultStatus(dbresult) != PGRES_TUPLES_OK or PQntuples(dbresult) != 1) UNLIKELY {
@@ -1831,23 +1876,6 @@ void var::write(in file, in key) const {
 	// to prevent any future readc() getting known obsolete records
 	file.deletec(key2);
 
-	var sql;
-
-	// Note cannot use postgres PREPARE/EXECUTE with parameterised filename
-	// but performance gain is probably not great since the sql we use to read and write is
-	// quite simple (could PREPARE once per file/table)
-
-	sql = "INSERT INTO " ^ get_normal_filename(file) ^ " (key,data) values( $1 , $2)";
-	sql ^= " ON CONFLICT (key)";
-	sql ^= " DO UPDATE SET data = $2";
-
-	// Parameter array
-	const char* paramValues[]  = {key2.data(),
-	                              data2.data()};
-	const int   paramLengths[] = {static_cast<int>(key2.size()),
-	                              static_cast<int>(data2.size())};
-	DEBUG_LOG_SQL1
-
 	const auto pgconn = get_pgconn(file);
 	if (not pgconn) UNLIKELY {
 		var errmsg = "var::write() get_pgconn() failed. ";
@@ -1856,26 +1884,68 @@ void var::write(in file, in key) const {
 		throw VarDBException(errmsg);
 	}
 
-	const DBresult dbresult = XPQexecParams(pgconn,
-											sql.var_str.c_str(),
-											2,       // two params (key and data)
-											nullptr, // let the backend deduce param type
-											paramValues, paramLengths,
-											nullptr,       // text arguments
-											0);      // text results
+	// Parameter array
+	const char* paramValues[]  = {key2.data(),
+	                              data2.data()};
+	const int   paramLengths[] = {static_cast<int>(key2.size()),
+	                              static_cast<int>(data2.size())};
 
-	// Handle serious errors
-	if (PQresultStatus(dbresult) != PGRES_COMMAND_OK) UNLIKELY {
-		let sqlstate = var(PQresultErrorField(dbresult, PG_DIAG_SQLSTATE));
-		let errmsg = "ERROR: vardb: write(" ^ file.convert(_FM, "^") ^
-					", " ^ key ^ ") failed: SQLERROR:" ^ sqlstate ^ " PQresultStatus=" ^
-					var(PQresStatus(PQresultStatus(dbresult))) ^ " " ^
-					(var(dbresult.pqerrmsg) ?: var(PQerrorMessage(pgconn)));
-		// ERROR: vardb: write(definitions^1, LAST_SYNCDATE_TIME*DAT) failed: SQLERROR:25P02
-		// PQresultStatus=PGRES_FATAL_ERROR ERROR:  current transaction is aborted, commands ignored until end of transaction block
+	for (bool maybe_prepared = EXO_PREPARED;;) {
 
-		this->setlasterror(errmsg);
-		throw VarDBException(errmsg);
+		let sql = maybe_prepared ?
+			"vardb_write_" ^ get_normalized_filename(file).convert(".", "_")
+		:
+			"INSERT INTO " ^ get_normalized_filename(file) ^ " (key,data) values( $1 , $2)"
+			" ON CONFLICT (key)"
+			" DO UPDATE SET data = $2"
+		;
+		// let sql = "EXECUTE " + prepared_code + " ($1)";
+		DEBUG_LOG_SQL1
+
+		const DBresult dbresult = maybe_prepared ?
+			XPQexecPrepared(
+				pgconn,
+				sql.var_str.c_str(),
+				2,                         // Two params (key and data)
+				nullptr,                   // Dummy
+				paramValues, paramLengths,
+				nullptr,	               // Text arguments
+				0                          // Text results
+			)
+		:
+			XPQexecParams(
+				pgconn,
+				sql.var_str.c_str(),
+				2,                          // two params (key and data)
+				nullptr,                    // let the backend deduce param type
+				paramValues, paramLengths,
+				nullptr,                    // text arguments
+				0                           // text results
+			)
+		;
+
+		// Handle serious errors
+		if (PQresultStatus(dbresult) != PGRES_COMMAND_OK) UNLIKELY {
+			let sqlstate = var(PQresultErrorField(dbresult, PG_DIAG_SQLSTATE));
+			var errmsg = "ERROR: vardb: write(" ^ file.convert(_FM, "^") ^
+						", " ^ key ^ ")";
+			if (sqlstate == "26000") {
+				if (not pgconn.dbconn->in_transaction_) {
+					maybe_prepared = false;
+					continue;
+				}
+				errmsg ^= " file has not been opened/prepared and transaction is active.";
+			} else {
+				errmsg ^= " failed: SQLERROR:" ^ sqlstate ^ " PQresultStatus=" ^
+						var(PQresStatus(PQresultStatus(dbresult))) ^ " " ^
+						(var(dbresult.pqerrmsg) ?: var(PQerrorMessage(pgconn)));
+			}
+			// ERROR: vardb: write(definitions^1, LAST_SYNCDATE_TIME*DAT) failed: SQLERROR:25P02
+			// PQresultStatus=PGRES_FATAL_ERROR ERROR:  current transaction is aborted, commands ignored until end of transaction block
+
+			throw VarDBException(errmsg);
+		}
+		break;
 	}
 
 	// success if inserted or updated 1 record
@@ -1900,15 +1970,6 @@ bool var::updaterecord(in file, in key) const {
 	const std::string key2 = key.normalize().var_str;
 	const std::string data2 = this->normalize().var_str;
 
-	let sql = "UPDATE "  ^ get_normal_filename(file) ^ " SET data = $2 WHERE key = $1";
-
-	// Parameter array
-	const char* paramValues[]  = {key2.data(),
-	                              data2.data()};
-	const int   paramLengths[] = {static_cast<int>(key2.size()),
-	                              static_cast<int>(data2.size())};
-	DEBUG_LOG_SQL1
-
 	const auto pgconn = get_pgconn(file);
 	if (not pgconn) UNLIKELY {
 		var errmsg = "var::updaterecord() get_pgconn() failed. ";
@@ -1917,13 +1978,25 @@ bool var::updaterecord(in file, in key) const {
 		throw VarDBException(errmsg);
 	}
 
-	const DBresult dbresult = XPQexecParams(pgconn,
-											sql.var_str.c_str(),
-											2,        // two params (key and data)
-											nullptr,  // let the backend deduce param type
-											paramValues, paramLengths,
-											nullptr,  // text arguments
-											0);       // text results
+	// Parameter array
+	const char* paramValues[]  = {key2.data(),
+	                              data2.data()};
+	const int   paramLengths[] = {static_cast<int>(key2.size()),
+	                              static_cast<int>(data2.size())};
+
+	// not EXO_PREPARED
+	let sql = "UPDATE "  ^ get_normalized_filename(file) ^ " SET data = $2 WHERE key = $1";
+	DEBUG_LOG_SQL1
+
+	const DBresult dbresult = XPQexecParams(
+		pgconn,
+		sql.var_str.c_str(),
+		2,        // two params (key and data)
+		nullptr,  // let the backend deduce param type
+		paramValues, paramLengths,
+		nullptr,  // text arguments
+		0         // text results
+	);
 
 	// Handle serious errors
 	if (PQresultStatus(dbresult) != PGRES_COMMAND_OK) UNLIKELY {
@@ -1965,15 +2038,6 @@ bool var::updatekey(in key, in newkey) const {
 	const std::string key2    = key.normalize().var_str;
 	const std::string newkey2 = newkey.normalize().var_str;
 
-	let sql = "UPDATE "  ^ get_normal_filename(*this) ^ " SET key = $2 WHERE key = $1";
-
-	// Parameter array
-	const char* paramValues[]  = {key2.data(),
-	                              newkey2.data()};
-	const int   paramLengths[] = {static_cast<int>(key2.size()),
-	                              static_cast<int>(newkey2.size())};
-	DEBUG_LOG_SQL1
-
 	const auto pgconn = get_pgconn(*this);
 	if (!pgconn) UNLIKELY {
 		let errmsg =
@@ -1983,13 +2047,25 @@ bool var::updatekey(in key, in newkey) const {
 		throw VarDBException(errmsg);
 	}
 
-	const DBresult dbresult = XPQexecParams(pgconn,
-											sql.var_str.c_str(),
-											2,        // two params (key and newkey)
-											nullptr,  // let the backend deduce param type
-											paramValues, paramLengths,
-											nullptr,  // text arguments
-											0);       // text results
+	// Parameter array
+	const char* paramValues[]  = {key2.data(),
+	                              newkey2.data()};
+	const int   paramLengths[] = {static_cast<int>(key2.size()),
+	                              static_cast<int>(newkey2.size())};
+
+	// not EXO_PREPARED
+	let sql = "UPDATE "  ^ get_normalized_filename(*this) ^ " SET key = $2 WHERE key = $1";
+	DEBUG_LOG_SQL1
+
+	const DBresult dbresult = XPQexecParams(
+		pgconn,
+		sql.var_str.c_str(),
+		2,        // two params (key and newkey)
+		nullptr,  // let the backend deduce param type
+		paramValues, paramLengths,
+		nullptr,  // text arguments
+		0         // text results
+	);
 
 	// Handle serious errors
 	if (PQresultStatus(dbresult) != PGRES_COMMAND_OK) UNLIKELY {
@@ -2041,16 +2117,6 @@ bool var::insertrecord(in file, in key) const {
 	const std::string key2 = key.normalize().var_str;
 	const std::string data2 = this->normalize().var_str;
 
-	let sql =
-		"INSERT INTO " ^ get_normal_filename(file) ^ " (key,data) values( $1 , $2)";
-
-	// Parameter array
-	const char* paramValues[]  = {key2.data(),
-	                              data2.data()};
-	const int   paramLengths[] = {static_cast<int>(key2.size()),
-	                              static_cast<int>(data2.size())};
-	DEBUG_LOG_SQL1
-
 	const auto pgconn = get_pgconn(file);
 	if (not pgconn) UNLIKELY {
 		var errmsg = "var::insertrecord() get_pgconn() failed. ";
@@ -2059,13 +2125,26 @@ bool var::insertrecord(in file, in key) const {
 		throw VarDBException(errmsg);
 	}
 
-	const DBresult dbresult = XPQexecParams(pgconn,
-											sql.var_str.c_str(),
-											2,       // two params (key and data)
-											nullptr, // let the backend deduce param type
-											paramValues, paramLengths,
-											nullptr,       // text arguments
-											0);      // text results
+	// Parameter array
+	const char* paramValues[]  = {key2.data(),
+	                              data2.data()};
+	const int   paramLengths[] = {static_cast<int>(key2.size()),
+	                              static_cast<int>(data2.size())};
+
+	// no EXO_PREPARED
+	let sql =
+		"INSERT INTO " ^ get_normalized_filename(file) ^ " (key,data) values( $1 , $2)";
+	DEBUG_LOG_SQL1
+
+	const DBresult dbresult = XPQexecParams(
+		pgconn,
+		sql.var_str.c_str(),
+		2,       // two params (key and data)
+		nullptr, // let the backend deduce param type
+		paramValues, paramLengths,
+		nullptr, // text arguments
+		0        // text results
+	);
 
 	// Handle serious errors or ordinary duplicate key failure (which will mess us transactionsa)
 	if (PQresultStatus(dbresult) != PGRES_COMMAND_OK) UNLIKELY {
@@ -2113,13 +2192,6 @@ bool var::deleterecord(in key) const {
 		return (key.osfile() and key.osremove());
 	}
 
-	let sql = "DELETE FROM " ^ get_normal_filename(*this) ^ " WHERE KEY = $1";
-
-	// Parameter array
-	const char* paramValues[]  = {key2.data()};
-	const int   paramLengths[] = {static_cast<int>(key2.size())};
-	DEBUG_LOG_SQL1
-
 	const auto pgconn = get_pgconn(*this);
 	if (not pgconn) UNLIKELY {
 		var errmsg = "var::deleterecord() get_pgconn() failed. ";
@@ -2130,20 +2202,60 @@ bool var::deleterecord(in key) const {
 		throw VarDBException(errmsg);
 	}
 
-	const DBresult dbresult = XPQexecParams(pgconn, sql.var_str.c_str(), 1, /* two param */
-											nullptr,							/* let the backend deduce param type */
-											paramValues, paramLengths,
-											nullptr,  // text arguments
-											0); // text results
+	// Parameter array
+	const char* paramValues[]  = {key2.data()};
+	const int   paramLengths[] = {static_cast<int>(key2.size())};
+	const int   paramFormats[] = {0}; // Text format
 
-	// Handle serious errors
-	if (PQresultStatus(dbresult) != PGRES_COMMAND_OK) UNLIKELY {
-		let sqlstate = var(PQresultErrorField(dbresult, PG_DIAG_SQLSTATE));
-		let errmsg = "ERROR: vardb: deleterecord(" ^ this->convert(_FM, "^") ^
-				", " ^ key ^ ") SQLERROR: " ^ sqlstate ^ " Failed: " ^ var(PQntuples(dbresult)) ^ " " ^
-				(var(dbresult.pqerrmsg) ?: var(PQerrorMessage(pgconn)));
-		this->setlasterror(errmsg);
-		throw VarDBException(errmsg);
+	DBresult dbresult;
+	for (bool maybe_prepared = EXO_PREPARED;;) {
+
+		let sql = maybe_prepared ?
+			"vardb_delete_" ^ get_normalized_filename(*this).convert(".", "_")
+		:
+			"DELETE FROM " ^ get_normalized_filename(*this) ^ " WHERE KEY = $1"
+		;
+		// let sql = "EXECUTE " + prepared_code + " ($1)";
+		DEBUG_LOG_SQL1
+
+		dbresult = maybe_prepared ?
+			XPQexecPrepared(
+				pgconn,
+				sql.var_str.c_str(), 1,       // One param (key)
+				nullptr,                      // Dummy
+				paramValues, paramLengths,
+				nullptr,	                  // Text arguments
+				0                             // Text results
+			)
+		:
+			XPQexecParams(
+				pgconn,
+				sql.var_str.c_str(),
+				1,                            // One param (key)
+				static_cast<const Oid[]>(25), // Text
+				paramValues, paramLengths,
+				paramFormats,	              // Text arguments
+				0                             // Text results
+			)
+		;
+
+		// Handle serious errors
+		if (PQresultStatus(dbresult) != PGRES_COMMAND_OK) UNLIKELY {
+			let sqlstate = var(PQresultErrorField(dbresult, PG_DIAG_SQLSTATE));
+			var errmsg = "ERROR: vardb: deleterecord(" ^ this->convert(_FM, "^") ^ ", " ^ key ^ ")";
+			if (sqlstate == "26000") {
+				if (not pgconn.dbconn->in_transaction_) {
+					maybe_prepared = false;
+					continue;
+				}
+				errmsg ^= " file has not been opened/prepared and transaction is active.";
+			} else {
+				errmsg ^= " SQLERROR: " ^ sqlstate ^ " Failed: " ^ var(PQntuples(dbresult)) ^ " " ^
+					(var(dbresult.pqerrmsg) ?: var(PQerrorMessage(pgconn)));
+			}
+			throw VarDBException(errmsg);
+		}
+		break;
 	}
 
 	// If not updated 1 then fail
@@ -2181,6 +2293,18 @@ void var::clearcache() const {
 	return;
 }
 
+// Function to get transaction status as a string
+var getTransactionStatus(PGconn* conn) {
+    switch (PQtransactionStatus(conn)) {
+        case PQTRANS_IDLE: return "IDLE";
+        case PQTRANS_ACTIVE: return "ACTIVE";
+        case PQTRANS_INTRANS: return "INTRANS";
+        case PQTRANS_INERROR: return "INERROR";
+        case PQTRANS_UNKNOWN: return "UNKNOWN";
+        default: return "INVALID";
+    }
+}
+
 bool var::begintrans() const {
 
 	THISIS("bool var::begintrans() const")
@@ -2196,6 +2320,14 @@ bool var::begintrans() const {
 		return false;
 
 	auto dbconn = get_dbconn(*this);
+
+	let status = getTransactionStatus(dbconn->pgconn_);
+	// Only active while an (async?) SQL command is in progress.
+//	if (status != "INTRANS" && status != "ACTIVE") {
+	if (status != "INTRANS") {
+		setlasterror("Failed to begin transaction. Status: " ^ status);
+		return false;
+	}
 
 	// Change status
 	// ESSENTIAL Used to change locking type to PER TRANSACTION
@@ -2223,7 +2355,7 @@ bool var::rollbacktrans() const {
 	// Change status
 	dbconn->in_transaction_ = false;
 
-// Clear the lock cache
+	// Clear the lock cache
 	dbconn->locks_.clear();
 
 	return true;
@@ -2237,11 +2369,30 @@ bool var::committrans() const {
 	// Clear the record cache
 	this->clearcache();
 
-	// End (commit) a transaction
-	if (not this->sqlexec("END")) UNLIKELY
-		return false;
-
 	auto dbconn = get_dbconn(*this);
+
+	bool result = true;
+
+	let status = getTransactionStatus(dbconn->pgconn_);
+
+	// Rollback if in error and indicate failure
+	if (status == "INERROR") {
+		if (this->rollbacktrans())
+			lasterror().errputl();
+		setlasterror("COMMITTRANS: Failed and rolledback due to status:" ^ status);
+		return false;
+	}
+
+	// Indicate failure if status incorrect.
+	if (status != "INTRANS" && status != "ACTIVE") {
+		result = false;
+		setlasterror("COMMITTRANS: Failed. ROLLBACK due to transaction status: " ^ status);
+	}
+
+	// End (commit) a transaction.
+	// Will rollback if in error.
+	if (not this->sqlexec("END")) UNLIKELY
+		result = false;
 
 	// Change status
 	dbconn->in_transaction_ = false;
@@ -2249,7 +2400,7 @@ bool var::committrans() const {
 	// Clear the lock cache
 	dbconn->locks_.clear();
 
-	return true;
+	return result;
 
 }
 
@@ -2368,7 +2519,7 @@ bool var::createfile(in filename) const {
 	var sql = "CREATE";
 	if (filename.ends("_temp") and not filename.starts("dict."))
 		sql ^= " TEMPORARY ";
-	sql ^= " TABLE " ^ get_normal_filename(filename);
+	sql ^= " TABLE " ^ get_normalized_filename(filename);
 	sql ^= " (key text primary key, data text)";
 
 	if (this->assigned()) LIKELY
@@ -2429,7 +2580,7 @@ bool var::deletefile(in filename) const {
 	// Remove from file cache regardless of success or failure to deletefile
 	// Delete from cache AFTER the above open which will place it in the cache
 	// Similar code in detach and deletefile
-	if (thread_file_handles.erase(get_normal_filename(filename))) {
+	if (thread_file_handles.erase(get_normalized_filename(filename))) {
 		//filename.errputl("::deletefile ==== Connection cache DELETED = ");
 	} else {
 		//filename.errputl("::deletefile ==== Connection cache NONE    = ");
@@ -2724,7 +2875,7 @@ TRACE: "QQQ"="QQQ"
 		else if (pgsql_pos) {
 			//TRACE("has pgsql_pos")
 			// plsql function name assumed to be like "dictfilename_FIELDNAME()"
-			sqlexpression = get_normal_filename(actualdictfile).replace("dict.", "dict_") ^ "_" ^ fieldname ^ "(";
+			sqlexpression = get_normalized_filename(actualdictfile).replace("dict.", "dict_") ^ "_" ^ fieldname ^ "(";
 
 			// function arguments are (key,data) by default
 
@@ -3250,7 +3401,7 @@ bool var::selectx(in fieldnames, in sortselectclause) {
 	if (DBTRACE>1)
 		TRACE(sortselectclause)
 
-	var actualfilename = get_normal_filename(*this);
+	var actualfilename = get_normalized_filename(*this);
 	var dictfilename = actualfilename;
 	var actualfieldnames = fieldnames;
 	var dictfile = "";
@@ -5093,7 +5244,7 @@ bool var::createindex(in fieldname0, in dictfile) const {
 	ISSTRING(fieldname0)
 	ISSTRING(dictfile)
 
-	let filename = get_normal_filename(*this);
+	let filename = get_normalized_filename(*this);
 	let fieldname = fieldname0.convert(".", "_");
 
 	// Actual dictfile to use is either given or defaults to that of the filename
@@ -5190,7 +5341,7 @@ bool var::deleteindex(in fieldname0) const {
 	assertString(function_sig);
 	ISSTRING(fieldname0)
 
-	let filename = get_normal_filename(*this);
+	let filename = get_normalized_filename(*this);
 	let fieldname = fieldname0.convert(".", "_");
 
 	// Delete the index field (actually only present on calculated field indexes so ignore

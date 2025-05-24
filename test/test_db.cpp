@@ -34,8 +34,10 @@ programinit()
 		return 0;
 	}
 
-//	if (read(RECORD from "DEFINITIONS", "EXODUS"))
-//		TRACE(RECORD);
+	if (open("definitions" to DEFINITIONS)) {
+		if (read(RECORD from DEFINITIONS, "EXODUS"))
+			TRACE(RECORD);
+	}
 
 	assert(not sqlexec("test bad sql command"));
 
@@ -76,6 +78,8 @@ programinit()
 	if (not tempfile.ends("_temp") and not deletefile(tempfile)) {}
 	// _temp file only last as long as the connection is active
 	assert(createfile(tempfile));
+	assert(open(tempfile));
+//	assert(tempfile.open(tempfile));
 
 	printl("Test reccount");
 	for (var recn : range(1, 10))
@@ -209,6 +213,7 @@ programinit()
 		if (not deletefile("dict." ^ temptempfile)){}
 		if (not createfile("dict." ^ temptempfile))
 			loglasterror();
+		assert(open("dict." ^ temptempfile));
 		write("F^0^ID^^^^^^R^10"_var on "dict." ^ temptempfile, "ID");
 
 		assert(not read(RECORD from tempfile, "%RECORDS%"));
@@ -362,6 +367,7 @@ programinit()
 	// Check failure to read a record turns the record variable into unassigned and unusable
 	// unlike pickos which leaves the variable untouched.
 	var rec = "abc";
+	assert(open("dict.voc"));
 	assert(not rec.read("dict.voc", "LJLKJLKJLKJLKJLKJw"));
 	try {
 		printl(rec.quote());

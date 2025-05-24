@@ -12,6 +12,9 @@
 
 #include <libpq-fe.h> // for PGconn
 
+#include "fiber_mutex.h"
+#include "stream_ptr.h"
+
 namespace exo {
 
 // Using map generally instead of unordered_map since it is faster
@@ -44,12 +47,16 @@ public:
 
 	// Members
 	PGconn* pgconn_ = nullptr;
+    StreamPtr stream_ptr_; // Owns the socket and its cleanup. socket added in async_PQexec
 	// postgres locks per dbconn
 	// Used to fail repetitive lock (per mv standard_ instead of stack locks (per postgres standard)
 	DBlocks locks_;
 	DBcache dbcache_;
 	std::string conninfo_;
 	bool in_transaction_ = false;
+
+	FiberMutex mutex_;
+
 };
 
 // Non-owning ptr to DBconn

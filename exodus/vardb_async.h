@@ -35,7 +35,7 @@ auto async_PQexec(
 	const int* paramFormats = nullptr,
 	int resultFormat = 0
 ) -> DBresult {
-	static_assert(N == 1 || N == 2, "N must be 1 (PQexecParams) or 2 (PQexec)");
+	static_assert(N == 1 || N == 2 || N == 3, "N must be 1 (PQexecParams), 2 (PQexec), or 3 (PQexecPrepared)");
 	return async_PQexec_impl<N>(
 		conn,
 		query,

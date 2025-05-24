@@ -2,8 +2,9 @@
 #include <iostream>
 
 // Motivation:
-// 1. Allow a thread to act as its own io event loop.
+// 1. Allow a thread to act as its own io event loop whether it has fibers or not.
 // 2. Allow multiple fibers within a thread to use async io independently without blocking all fibers in the thread as would be the case if they rely on ordinary threadwise async io like poll/select.
+// 3. If no fibers are enabled (all are waiting for i/o) then the whole thread should be in suspense until any i/o occurs.
 
 #include "fiber_scheduler.h"
 
@@ -17,7 +18,7 @@ fiber_scheduler::fiber_scheduler(boost::asio::io_context& ioc) : io_context_(ioc
 }
 
 void fiber_scheduler::awakened(boost::fibers::context* ctx) noexcept {
-	LOG << "Awakened fiber: " << ctx << std::endl;
+	LOG << "Awakened (enabled) fiber: " << ctx << std::endl;
 	boost::fibers::algo::round_robin::awakened(ctx);
 }
 
@@ -25,6 +26,8 @@ boost::fibers::context* fiber_scheduler::pick_next() noexcept {
 	auto ctx = boost::fibers::algo::round_robin::pick_next();
 	if (!ctx && !io_context_.stopped()) {
 		LOG << "No ready fibers, polling io_context" << std::endl;
+		// Only one event at time to keep things smooth.
+		// Assuming that there is little point in enabling many fibers together.
 		size_t events = io_context_.poll_one();
 		if (events) {
 			LOG << "Polled " << events << " io_context event(s)" << std::endl;
