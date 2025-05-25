@@ -1,6 +1,6 @@
 #!/bin/bash
+sleep 0.5 # to allow viewing of last test result time
 set -euxo pipefail
-
 :
 : Extract function headers from timebank.h
 : ----------------------------------------

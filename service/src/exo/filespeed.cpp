@@ -1,8 +1,6 @@
 #include <exodus/program.h>
 programinit()
 
-#include <openfile.h>
-
 var tempfilename;
 var rec;
 var tempfile;
@@ -12,7 +10,6 @@ var testtime;	// num
 
 func main() {
 
-	// declare function esc.to.exit
 	let deletefilex = 1;
 
 	let usetransaction = true;
@@ -23,17 +20,14 @@ func main() {
 		tempfilename = "BENCHMARK_FILESPEED";
 	}
 
-	// locate tempfilename in @files using @fm setting x then
 	if (deletefilex) {
-		//deletefile(tempfilename ^ " (S)");
 		if (var().open(tempfilename) and not deletefile(tempfilename ^ " (S)")) {
 			abort(lasterror());
 		}
 	}
 	clearselect();
-	// end
 
-	// syntax is FILESPEED nreps(1000) recsize(1000) ntests(10)
+	printl("Syntax is FILESPEED nreps recsize ntests");
 	var nreps = SENTENCE.field(" ", 2);
 	if (not nreps) {
 		nreps = 1000;
@@ -62,7 +56,7 @@ func main() {
 
 /////////
 nexttest:
-	// ///////
+/////////
 	if (testn >= ntests) {
 		goto exit;
 	}
@@ -75,12 +69,9 @@ nexttest:
 		stop();
 	}
 
-	// PERFORM 'MAKEFILE ':TEMPFILENAME:' ':recsize:' ':N:' (S)'
-	//createfile(tempfilename ^ " (S)");
 	if (not createfile(tempfilename ^ " (S)")) {
 		abort(lasterror());
 	}
-	// perform 'SELECT ':tempfilename
 
 	if (esctoexit()) {
 		goto exit;
@@ -94,32 +85,26 @@ nexttest:
 	starttime = ostime();
 
 	if (usetransaction)
-		//begintrans();
 		if (not begintrans())
 			abort(lasterror());
 
-	// print
-	// print 'Writing 1Kb records'
+	// Write
 	for (const var ii : range(1, nreps)) {
-		// 		if (esctoexit()) {
-		// 			goto exit;
-		// 		}
-		// 		printx(AT(0), "W", ii);
 		rec.write(tempfile, ii);
-	}  // ii;
+	}
 
-	// print
-	// print 'Deleting 1Kb records'
+	// Read
 	for (const var ii : range(1, nreps)) {
-		// 		if (esctoexit()) {
-		// 			goto exit;
-		// 		}
-		// 		printx(AT(0), "D", ii);
+		if (not rec.read(tempfile, ii))
+			abort(lasterror());
+	}
+
+	// Delete
+	for (const var ii : range(1, nreps)) {
 		tempfile.deleterecord(ii);
-	}  // ii;
+	}
 
 	if (usetransaction)
-		//committrans();
 		if (not committrans())
 			loglasterror();
 
@@ -135,16 +120,12 @@ nexttest:
 	}
 	avgtime = (tottime / testn).oconv("MD20P");
 
-	// print ' ':testn:'. ',testtime 'MD20P',mintime,avgtime,maxtime
 	minspeed = (1 / maxtime).oconv("MD20P");
 	avgspeed = (1 / avgtime).oconv("MD20P");
 	maxspeed = (1 / mintime).oconv("MD20P");
-	//printl(" ", testn, ". ", "\t", testtime.oconv("MD20P"), "\t", minspeed, "\t", avgspeed, "\t", maxspeed);
 	printl(testn ^ ".", "\t", testtime.oconv("MD20P"), "\t", minspeed, "\t", avgspeed, "\t", maxspeed);
 
-	// call note(endtime-starttime:' Seconds')
 	if (deletefilex) {
-		//deletefile(tempfilename ^ " (S)");
         if (var().open(tempfilename) and not deletefile(tempfilename ^ " (S)")) {
             abort(lasterror());
         }
@@ -154,21 +135,12 @@ nexttest:
 
 /////
 exit:
-	// ///
+/////
 	if (deletefilex) {
-		//deletefile(tempfilename ^ " (S)");
         if (var().open(tempfilename) and not deletefile(tempfilename ^ " (S)")) {
             abort(lasterror());
         }
 	}
-
-	// msg=''
-	// msg<-1>='FILESPEED: Write then Delete'
-	// msg<-1>='Recs: ':n:' '
-	// msg<-1>='Size: ':recsize:' bytes'
-	// msg<-1>='Tests: ':testn:' '
-	// msg<-1>='|RESULTS:'
-	// msg<-1>='Min/Avg/Max:':mintime:'/':avgtime:'/':maxtime:' secs'
 
 	var msg = "";
 	msg(-1) = "FILESPEED Min/Avg/Max = " ^ minspeed ^ " / " ^ avgspeed ^ " / " ^ maxspeed;

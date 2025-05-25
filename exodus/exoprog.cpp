@@ -2642,7 +2642,7 @@ int ExoProgram::run_main(var (ExoProgram::*main_func)(), int argc, const char* a
 			caught = "VarError: ";
 			result = e.message;
 			exit_status = 3;
-			var(e.stack()).convert(FM, "         \n").errputl();
+			var(e.stack()).convert(FM, "\n").errputl();
 		} catch (const std::exception& e) {
 			(var(e.what()) ^ " - Aborting.").errputl();
 			result = 1;
@@ -2650,7 +2650,7 @@ int ExoProgram::run_main(var (ExoProgram::*main_func)(), int argc, const char* a
 			let msg = "Error: Unknown exception caught in " ^ var(__PRETTY_FUNCTION__);
 			msg.errputl();
 			auto e = VarError(msg);
-			var(e.stack()).convert(FM, "         \n").errputl();
+			var(e.stack()).convert(FM, "\n").errputl();
 			result = ev.OPTIONS.contains("I") ? 0 : 999;
 		}
 	}
