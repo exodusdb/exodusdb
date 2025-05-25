@@ -94,7 +94,7 @@ color bold,green "\<(class|explicit|friend|mutable|namespace|override|private|pr
 color bold,green "\<(export|import|module)\>"
 
 # Namespaces
-color bold,green "\<[A-Z_a-z][A-Z_a-z0-9]*(::[A-Z_a-z][0-9A-Z_a-z]*)+\>"
+color bold,green "\<[A-Z_a-z][A-Z_a-z0-9]*(::[~A-Z_a-z][0-9A-Z_a-z]*)+\>"
 
 # Attributes [[deprecated ..., [[likely ... [[nodiscard ...
 color bold,green  "\[\[.*?\]\]"
