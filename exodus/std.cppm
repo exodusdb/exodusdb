@@ -13,6 +13,7 @@ export using ::getpid;
 export using ::isatty;
 
 export namespace __gnu_cxx {
+
     using __gnu_cxx::__normal_iterator;
 
     // Export the comparison operators
@@ -31,6 +32,13 @@ export namespace __gnu_cxx {
 
 export namespace std {
 
+	using std::__invoke;
+	using std::apply;
+	using std::invoke;
+	using std::apply;
+	using std::make_tuple;
+	using std::ref;
+	using std::bind;
 
 	using std::printf;
 	using std::fprintf;
@@ -548,6 +556,7 @@ using std::contiguous_iterator_tag;
 using std::ctype_base;
 //using std::dangling;
 using std::decay;
+using std::decay_t;
 using std::default_sentinel_t;
 using std::destroying_delete_t;
 using std::disjunction;

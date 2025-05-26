@@ -314,7 +314,5 @@ add_custom_command(
 # Install the generated man page var.1
 install(FILES
 	${SRC_EXODUS_DIR}/var.1
-#	${SRC_EXODUS_DIR}/dim.1
-#	${SRC_EXODUS_DIR}/exoprog.1
 	DESTINATION ${CMAKE_INSTALL_PREFIX}/share/man/man1
 )

@@ -796,44 +796,44 @@ var exoprog_callsmf(const Callable& callable) {
 	return nrvo;
 }
 
-auto ExoProgram::setmaxthreads(std::size_t max_threads) -> void {
-	threadpool1.set_max_threads(max_threads?:threadpool1.get_num_cores());
-}
-
-auto ExoProgram::getmaxthreads() -> var {
-	return threadpool1.get_max_threads();
-}
-
-auto ExoProgram::getnumcores() -> var {
-	return threadpool1.get_num_cores();
-}
-
-auto ExoProgram::run_count() -> var {
-	return threadpool1.get_total_tasks_enqueued();
-}
-
-auto ExoProgram::shutdown_run() -> void {
-	threadpool1.shutdown();
-}
-
-void ExoProgram::reset_run(size_t num_threads) {
-	ThreadPool::reset(&threadpool1, num_threads);
-}
-
-auto ExoProgram::run_results() -> std::generator<ExoEnv&> {
-	for (int i = 0; i < run_count(); ++i) {
-		ExoEnv env;
-		result_queue_->wait_and_pop(env);
-		co_yield env;
-	}
-}
-
-// Asynchronous run:
-// return: Job containing a future<ExoEnv> and max_thread_no, input_queue, output_queue
-// Creates new ExoEnv
-Job ExoProgram::run(in command) {
-	return Job(command, nullptr, nullptr, result_queue_);
-}
+//auto ExoProgram::setmaxthreads(std::size_t max_threads) -> void {
+//	threadpool1.set_max_threads(max_threads?:threadpool1.get_num_cores());
+//}
+//
+//auto ExoProgram::getmaxthreads() -> var {
+//	return threadpool1.get_max_threads();
+//}
+//
+//auto ExoProgram::getnumcores() -> var {
+//	return threadpool1.get_num_cores();
+//}
+//
+//auto ExoProgram::run_count() -> var {
+//	return threadpool1.get_total_tasks_enqueued();
+//}
+//
+//auto ExoProgram::shutdown_run() -> void {
+//	threadpool1.shutdown();
+//}
+//
+//void ExoProgram::reset_run(size_t num_threads) {
+//	ThreadPool::reset(&threadpool1, num_threads);
+//}
+//
+//auto ExoProgram::run_results() -> std::generator<ExoEnv&> {
+//	for (int i = 0; i < run_count(); ++i) {
+//		ExoEnv env;
+//		result_queue_->wait_and_pop(env);
+//		co_yield env;
+//	}
+//}
+//
+//// Asynchronous run:
+//// return: Job containing a future<ExoEnv> and max_thread_no, input_queue, output_queue
+//// Creates new ExoEnv
+//Job ExoProgram::run(in command) {
+//	return Job(command, nullptr, nullptr, result_queue_);
+//}
 
 // execute
 var ExoProgram::execute(in command_line) {

@@ -2196,7 +2196,7 @@ public:
 	// Commit a DB transaction.
 	// return:
 	// * True  * Successfully committed or there was no transaction in progress.
-	// * False * DB refused. See lasterror() for info.
+	// * False * Transaction was in error or DB refused. See lasterror() for info.
 	//
 	// `var dbconn = "exodus";
 	//  if (dbconn.committrans()) ... ok

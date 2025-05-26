@@ -184,10 +184,16 @@ func main2(in pass1) {
 R"__(#include <cassert>
 
 #include <exodus/program.h>
-#ifndef EXO_FORMAT
+//#ifndef EXO_FORMAT
 #	define println printl
-#endif
+#	define print printx
+//#endif
 programinit()
+
+func add(in a, in b) {
+	set_run_result(a + b);
+	return "";
+}
 
 func main() {
 
@@ -314,7 +320,8 @@ func main() {
 				if (class_match) {
 					class_name = class_match.f(1, 2);
 					default_objname = class_name;
-					if (class_name == "ExoProgram")
+//					if (class_name == "ExoProgram")
+					if (class_name.listed("ExoProgram,JobManager,FiberManager"))
 						default_objname = "";
 				}
 				continue; // nextline
@@ -436,6 +443,11 @@ func main() {
 					// Include lines starting var
 					// Warning: lines like "var xxx = 123;" are NOT function declarations
 					funcx_prefix ^= "=";
+
+				else if (funcx_prefix == "auto" and srcline.contains("->")) {
+					funcx_prefix = srcline.field("->", 2).field("{", 1).field(";", 1);
+					srcline = srcline.field("->", 1).trimlast();
+				}
 
 				else if (funcx_prefix == "std::string") funcx_prefix = "var="; // i/oconv private
 
@@ -1166,8 +1178,9 @@ func main() {
 		//////
 		{
 			var doc_body;
-			if (not osread(doc_body from docfilename))
-				abort(lasterror());
+			if (not osread(doc_body from docfilename)) {
+				abort(osfilenameonly ^ " missing doc section header? " ^ lasterror());
+			}
 
 			if (not osremove(docfilename))
 				loglasterror();

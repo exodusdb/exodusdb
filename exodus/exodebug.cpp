@@ -97,7 +97,7 @@ static void addbacktraceline(in frameno, in sourcefilename, in lineno, io return
 
 	// Example output line:
 	// "8: p2.cpp:15: printl(v2);"
-	let linetext = (frameno) ^ ": " ^ sourcefilename.field(_OSSLASH, -1) ^ ":" ^ lineno ^ ": " ^ line;
+	let linetext = (frameno) ^ ": " ^ sourcefilename.field(_OSSLASH, -1) ^ ":" ^ lineno ^ ":\t" ^ line;
 	//var linetext = std::format("{:0}: {:1}:{:2}: {:3}" , frameno, sourcefilename.field2(_OSSLASH, -1), lineno, line);
 
 	returnlines ^= linetext ^ FM;
@@ -192,7 +192,7 @@ var exo_backtrace(void* stack_addresses[BACKTRACE_MAXADDRESSES], std::size_t sta
 #endif
 
 		// Use gdb by preference because it finds source file, line numbers AND source line all in one
-		static bool gdb = var("which gdb").osshell();
+		static bool gdb = var("which gdb > /dev/null").osshell();
 		if (gdb) {
 			var objaddress = var(strings[frameno]).field("(", 2).field(")", 1);
 			//gdb --batch -ex "file /root/exodus/build/exodus/libexodus.so.24.07" -ex "list *(_ZN3exo13exo_savestackEPPvPm+0x12)"
@@ -218,7 +218,8 @@ var exo_backtrace(void* stack_addresses[BACKTRACE_MAXADDRESSES], std::size_t sta
 				let lineno = source_file_line.field(":", 2);
 				var col2;
 				let sourceline = stdout.substr(stdout.index(_NL ^ lineno ^ "\t") + 1, _NL, col2).cut(lineno.len()).trimfirst(" \t");
-				addbacktraceline(frameno, source_file_line, sourceline, returnlines);
+//				addbacktraceline(frameno, source_file_line, sourceline, returnlines);
+				returnlines ^= var(frameno) ^ ": " ^ source_file_line ^ ":\t" ^ sourceline ^ FM;
 				continue;
 			}
 		}

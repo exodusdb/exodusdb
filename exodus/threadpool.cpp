@@ -74,7 +74,8 @@ ThreadPool::~ThreadPool() {
 	for (auto& worker : workers) {
 		if (worker.joinable()) {
 			LOG << "~Threadpool: Detaching worker." << std::endl;
-			worker.join();
+			worker.detach();
+//			worker.join();
 			LOG << "~Threadpool: Detached  worker." << std::endl;
 		}
 	}
@@ -142,6 +143,19 @@ void ThreadPool::enqueue(std::function<void()> task) {
 // New method to get the total number of tasks enqueued
 size_t ThreadPool::get_total_tasks_enqueued() const {
 	return (*total_tasks_enqueued).load();
+}
+
+// Decrement e.g. when consuming result queue.
+size_t ThreadPool::decrement_total_tasks_enqueued() const {
+size_t current = total_tasks_enqueued->load();
+while (current > 0) {
+    if (total_tasks_enqueued->compare_exchange_strong(current, current - 1)) {
+        break; // Successfully decremented
+    }
+    // Optional: Add a pause or yield to reduce contention
+//    std::this_thread::yield(); // Helps in high-contention scenarios
+}
+	return current;
 }
 
 // Set the desired number of live workers

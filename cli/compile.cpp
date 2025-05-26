@@ -1,9 +1,8 @@
-// EXO_FORMAT required to append -lfmt to compile and link command
-#pragma GCC diagnostic push
-#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
-//#include <exodus/format.h>
-#pragma GCC diagnostic pop
-
+//// EXO_FORMAT required to append -lfmt to compile and link command
+//#pragma GCC diagnostic push
+//#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
+////#include <exodus/format.h>
+//#pragma GCC diagnostic pop
 #include <exodus/program.h>
 programinit()
 
@@ -1287,7 +1286,7 @@ R"__(
 
 	// Run it
 	if (not osshell(tempfilebase.field("/", -1) ^ " " ^ act_nreps ^ " " ^ act_nops))
-		loglasterror();
+		{} // loglasterror();
 
 	// Start a new line in case output left the cursor hanging mid line.
 	if (not source_is_expression)

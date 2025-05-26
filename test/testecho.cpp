@@ -9,8 +9,8 @@ function main() {
 		ev.input_queue->wait_and_pop(v1);
 		if (v1.empty())
 			break;
-		ev.output_queue->push(123.34);
-//		ev.output_queue->push(std::move(v1));
+//		ev.output_queue->push(123.34);
+		ev.output_queue->push(std::move(v1));
 	}
 //	printl(THREADNO ^ ": echo says 'Goodbye World!'");
 	return 0;

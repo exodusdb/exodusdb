@@ -119,17 +119,27 @@ func main() {
 
 	{
 		logputl("Test async Job and queuing");
+
+		// Start a job using libtestecho.so
 		Job j1("testecho");
+
+		// Message the job
 		j1.input_queue->push("123");
-		// It should timeout if echo is running and waiting
+
+		// Check that the job is not closed.
+		// It should timeout and return false
+		// since echo should still be running and waiting
 		if (j1.wait_for(100)) {
 			j1.get(); // Trigger any exception.
 			// Should not get here.
 			assert(false);
 		}
+
+		// Verify that job replies correctly.
 		j1.output_queue->wait_and_pop(DATA);
 		assert(DATA = 123);
-		// Close echo
+
+		// Request echo to close with a "" input.
 		j1.input_queue->push("");
 	}
 
@@ -146,9 +156,19 @@ func main() {
 
         assert(v1.listed("abc,def", MV) && MV.errputl() eq 2);
         assert(listed(v1, "abc,def", MV) && MV.errputl() eq 2);
+
+        assert(not v1.listed("abc,deff", MV) && MV.errputl() eq 0);
+        assert(not listed(v1, "abc,deff", MV) && MV.errputl() eq 0);
 	}
 
 	{
+		// Check that we can read/write/delete files
+		// without opening them after new logic in vardb::read/write/delete
+		// to always use sql PREPARED statements and fall back to normal sql on error.
+
+		// Fallback on error doesnt work in transactions
+		// because ANY error causes transaction failure.
+
 		let randomfilename1 = "xo_test_new1_temp";
 		assert(createfile(randomfilename1));
 

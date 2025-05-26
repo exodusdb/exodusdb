@@ -97,6 +97,7 @@ export namespace exo {
 	using exo::Jobs;
 	using exo::ThreadPool;
 	using exo::ThreadSafeQueue;
+	using exo::FiberManager;
 //	using exo::ExoCommon;
 
 	using exo::RELOAD_req;

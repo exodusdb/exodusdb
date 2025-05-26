@@ -58,6 +58,7 @@ public:
 	void enqueue(std::function<void()> task);
 
 	size_t get_total_tasks_enqueued() const;
+	size_t decrement_total_tasks_enqueued() const;
 
 	// Sets the desired number of live workers, increasing or decreasing the pool.
 	// Workers with IDs >= max_worker_id exit when idle to reduce the pool size.

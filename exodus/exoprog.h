@@ -8,22 +8,11 @@
 #	include <future>
 #	include <generator>
 #	include <coroutine>
-
 // Using map for dict function cache instead of unordered_map since it is faster
 // up to about 400 elements according to https://youtu.be/M2fKMP47slQ?t=258
 // and perhaps even more since it doesnt require hashing time.
 // https://youtu.be/M2fKMP47slQ?t=476
 #	include <map>
-//#include <exodus/exocallable.h>
-//#include "timeaccount.h"
-
-// Forward declarations
-namespace std {
-	class mutex;
-	class condition_variable;
-	class thread;
-	template<typename T> class atomic;
-}
 
 #	include <exodus/var.h>
 #endif
@@ -34,7 +23,9 @@ namespace std {
 #include <exodus/exocallable.h>
 //#include <exodus/thread_pool.h>
 //#include <exodus/threadsafequeue.h>
-#include <exodus/job.h>
+//#include <exodus/job.h>
+#include <exodus/job_manager.h>
+#include <exodus/fiber_manager.h>
 
 namespace exo {
 
@@ -47,12 +38,12 @@ using subroutine = void;
 using func = var;
 using subr = void;
 
-using Jobs = std::vector<Job>;
-using Queue = ThreadSafeQueue<var>;
-using ResultQueue = ThreadSafeQueue<ExoEnv>;
+//using Jobs = std::vector<Job>;
+//using Queue = ThreadSafeQueue<var>;
+//using ResultQueue = ThreadSafeQueue<ExoEnv>;
 
 //class ExoProgram
-class PUBLIC ExoProgram {
+class PUBLIC ExoProgram : public FiberManager, public JobManager {
 
  private:
 
@@ -72,7 +63,7 @@ class PUBLIC ExoProgram {
 
  public:
 
-	std::shared_ptr<ResultQueue> result_queue_ = std::make_shared<ResultQueue>();
+//	std::shared_ptr<ResultQueue> result_queue_ = std::make_shared<ResultQueue>();
 
 	// ev.XXXXXX is going to be used a lot by exodus programmers for exodus "global variables"
 	// e.g. ev.RECORD ev.DICT etc.
@@ -313,47 +304,6 @@ ND	bool hasnext();
 	// Run an exodus program/library.
 	// Identical to perform() but any currently active select list in the calling program/library is not accessible to the executed program/library and is preserved in the calling [program as is. Any select list created by the executed library is discarded when it terminates.
 	var  execute(in command_line);
-
-	// Run another program in parallel.
-	// Unlike perform and execute, run() does not block until it completes. It runs in parallel.
-	// command: See perform.
-	// return: A "job" object that you can use to manage the running job.
-	// * Check if it has finished.
-	// * Pause and wait for it to finish with optional timeout.
-	// * When it has finished, access all its environment variables.
-	// See also:
-	// * run_results() * For use in a range based for-loops to simplify the asynchronous collection of output from all commands as they complete. Programs inner environments are retained for post processing so any suitable environment variable e.g. DATA, ANS or RECORD can be used to return data.
-	// * shutdown_run() * Wait for all jobs to finish before continuing, otherwise, if the parent program exits, they will be aborted.
-	//
-	// `run("testlib aa");
-	//  run("testlib bb");
-	//  run("testlib cc");
-	//  var results = "";
-	//  // Process results asynchronously.
-	//  for (auto& env : run_results())
-	//      results ^= env.DATA.f(2) ^ FM;`
-	//
-	Job  run(in command);
-
-	// 0 = getnumcores()
-	auto setmaxthreads(std::size_t max_threads = 0) -> void;
-	auto getmaxthreads() -> var;
-	auto getnumcores() -> var;
-
-	// Process all run results asynchronously.
-	// for (auto& env : run_results()) {
-	//     ...
-	// }
-	auto run_results() -> std::generator<ExoEnv&>;
-
-	// Required to terminate run_results.
-	auto run_count() -> var;
-
-	// Required to stop hanging due to dlopen causing reset of max_worker_id to construction setting and preventing workers from seeing the need to close.
-	static auto shutdown_run() -> void;
-
-	// Calls shutdown, dtor, ctor. Useful to start a new batch of jobs followed by async collection of all run_results.
-	static auto reset_run(size_t num_threads) -> void;
 
 	// Close the current program and perform another one.
 	// Similar to perform() except that the current program closes first and all environment variables carry forward unchanged.
@@ -653,7 +603,7 @@ ND	var  getcursor() const;
 	// `if (isterminal()) {
 	//      let cursor = getcursor(); // Save the current cursor position.
 	//      TRACE(cursor)             // Show the saved cursor position.
-	//      print(AT(0,0));           // Position the cursor at 0,0.
+	//      printx(AT(0,0));          // Position the cursor at 0,0.
 	//      setcursor(cursor);        // Restore its position
 	//  }`
 	void setcursor(in cursor_coordinates) const;

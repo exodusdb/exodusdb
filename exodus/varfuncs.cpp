@@ -2160,16 +2160,17 @@ var  var::xlate(in filename, in fieldno, const char* mode) const {
 	// access to dictionaries
 	ISNUMERIC(fieldno)
 
-	// open the file (skip this for now since sql doesnt need "open"
-	var file;
-	// if (!file.open(filename))
-	//{
-	//	_STATUS=filename^" does not exist";
-	//	record="";
-	//	return record;
-	//}
-	//file MUST be lower case in order to detect "dict."
-	file = filename.lcase();
+	// Use filename in case it is a file handle
+	// and can give us a non-default connection
+	var file = filename;
+
+	// We must open the file (probably cached)
+	// to ensure that sql PREPARED statements are available.
+	// Actually only needed during transactions
+	// but checking that will increase work during transactions
+	// while perhaps being only a little faster otherwise.
+	if (!file.open(filename.lcase()))
+		throw VarDBException("xlate: " ^ lasterror());
 
 	char sep = fieldno.len() ? VM_ : RM_;
 

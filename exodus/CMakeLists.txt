@@ -244,12 +244,14 @@ execute_process(
 		vardb_async.cpp
 		fiber_scheduler.cpp
 		fiber_mutex.cpp
+		fiber_manager.cpp
 
 		DBresult.cpp
 		DBconn.cpp
 		DBpool.cpp
 
 		job.cpp
+		job_manager.cpp
 		threadsafequeue.cpp
 		threadpool.cpp
 
@@ -409,6 +411,8 @@ execute_process(
 				varb_friends.h
 				dim.h
 				job.h
+				job_manager.h
+				fiber_manager.h
 				rex.h
 			DESTINATION include/exodus
 		)
@@ -446,6 +450,8 @@ execute_process(
 			exoprog.h
 			exocallable.h
 			job.h
+			job_manager.h
+			fiber_manager.h
 			threadpool.h
 			ioconv_custom.h
 			timebank.h

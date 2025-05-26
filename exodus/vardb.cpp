@@ -2379,12 +2379,12 @@ bool var::committrans() const {
 	if (status == "INERROR") {
 		if (this->rollbacktrans())
 			lasterror().errputl();
-		setlasterror("COMMITTRANS: Failed and rolledback due to status:" ^ status);
+		setlasterror("COMMITTRANS: Failed and rolled back due to status:" ^ status);
 		return false;
 	}
 
 	// Indicate failure if status incorrect.
-	if (status != "INTRANS" && status != "ACTIVE") {
+	if (status != "INTRANS" && status != "ACTIVE" && status != "IDLE") {
 		result = false;
 		setlasterror("COMMITTRANS: Failed. ROLLBACK due to transaction status: " ^ status);
 	}

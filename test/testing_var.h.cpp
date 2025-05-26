@@ -3,10 +3,16 @@
 #include <cassert>
 
 #include <exodus/program.h>
-#ifndef EXO_FORMAT
+//#ifndef EXO_FORMAT
 #	define println printl
-#endif
+#	define print printx
+//#endif
 programinit()
+
+func add(in a, in b) {
+	set_run_result(a + b);
+	return "";
+}
 
 func main() {
 
@@ -2414,17 +2420,6 @@ func main() {
 		if (not deletelist("my_list")) abort("deletelist: " ^ lasterror());
 	}
 
-	printl("run(in command);");
-	{
-		run("testlib aa");
-		run("testlib bb");
-		run("testlib cc");
-		var results = "";
-		// Process results asynchronously.
-		for (auto& env : run_results())
-		    results ^= env.DATA.f(2) ^ FM;
-	}
-
 	printl("exoprog_date(in type, in input0, in ndecs0, out output);");
 	{
 		DATEFMT = "D/E";
@@ -2477,18 +2472,16 @@ func main() {
 	{
 		let cursor = getcursor(); // If isterminal() then cursor becomes something like "0^20^0.012345"_var
 	}
-#ifdef EXO_FORMAT
 
 	printl("setcursor(in cursor_coordinates) const;");
 	{
 		if (isterminal()) {
 		    let cursor = getcursor(); // Save the current cursor position.
 		    TRACE(cursor)             // Show the saved cursor position.
-		    print(AT(0,0));           // Position the cursor at 0,0.
+		    printx(AT(0,0));          // Position the cursor at 0,0.
 		    setcursor(cursor);        // Restore its position
 		}
 	}
-#endif
 
 	printl("invertarray(in input, bool pad = false);");
 	{
@@ -2500,6 +2493,41 @@ func main() {
 	{
 		var v1 = "f1^10]20]2]1^ww]xx]yy]zz^f3^f4"_var;  // fields 2 and 3 are parallel multivalues and currently unordered.
 		sortarray(v1, "2]3"_var, "AR");  assert(v1.errputl() == "f1^1]2]10]20^zz]yy]ww]xx^f3^f4"_var);
+	}
+
+////////////////
+// Code examples job_manager.h
+////////////////
+
+	printl("run(in command);");
+	{
+		run("testlib aa");
+		run("testlib bb");
+		run("testlib cc");
+		var results = "";
+		// Process results asynchronously.
+		for (auto& env : run_results())
+		    results ^= env.DATA.f(2) ^ FM;
+	}
+
+////////////////
+// Code examples fiber_manager.h
+////////////////
+
+	printl("co_run(F&& f, Args&&... args)");
+	{
+		//func add(in a, in b) {
+		//    set_run_result(a + b);
+		  //    return "";
+		//}
+		for (var i : range(1, 100)) {
+		    co_run(&_ExoProgram::add, this, i, 2);
+		}
+		yield();
+		var total = 0;
+		for (auto result : co_run_results())
+		    total += result.data;
+		assert(total eq 5250);
 	}
 
 ////////
