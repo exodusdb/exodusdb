@@ -550,7 +550,7 @@ var v1 = {11, 22, 33}; // "11^22^33"_var
 
 
 .SS
-var v1 = v2(fieldno);       v1(fieldno) = v2;
+var v1 = v2(fieldno);   v1(fieldno) = v2;
 .PP \"<p>
 Dynamic array field extraction, update and append:
 .sp 1 \"</p>
@@ -592,7 +592,7 @@ var v3 =   v1(2); // "bb" ///   () style access. Not recommended.
 
 
 .SS
-var v1 = v2(fieldno, valueno);       v1(fieldno, valueno) = v2;
+var v1 = v2(fieldno, valueno);   v1(fieldno, valueno) = v2;
 .PP \"<p>
 Dynamic array value update and append
 .sp 1 \"</p>
@@ -2696,16 +2696,6 @@ dim d1 = "a^b^c"_var.split(); // A dimensioned array with three elements (vars)
 dim d2 = split("a^b^c"_var);
 .EE \"</code>
 .sp 1 \"</p>
-.sp 1 \"</p>
-
-
-.SS
-strvar.basic_split(v1, delim)
-.PP \"<p>
-\fBstd:\fR :vector<var> vv1 = this->split(delim);
-.sp 1 \"</p>
-.PP \"<p>
-Utility somewhere in the forest
 .sp 1 \"</p>
 
 
@@ -8057,7 +8047,7 @@ d1.swap(d2);
 .SH
 
 .SS
-var v1 = d1[rowno];       d1[rowno] = v1;
+var v1 = d1[rowno];   d1[rowno] = v1;
 .PP \"<p>
 [row] Access and update dimensioned array elements.
 .sp 1 \"</p>
@@ -8077,7 +8067,7 @@ let v1 = d1[3]; // "X"
 
 
 .SS
-var v1 = d1[rowno, colno];       d1[rowno, colno] = v1;
+var v1 = d1[rowno, colno];   d1[rowno, colno] = v1;
 .PP \"<p>
 [row, col] Access and update dimensioned array elements.
 .sp 1 \"</p>
@@ -8154,13 +8144,6 @@ dim d1 = {"f1", "f2", "f3"};
 let v1 = d1.join(); // "f1^f2^f3"_var
 .EE \"</code>
 .sp 1 \"</p>
-.sp 1 \"</p>
-
-
-.SS
-d1.unpack()
-.PP \"<p>
-New Unpack function to allow "auto [a,b,c] = d1.unpack<3>();"
 .sp 1 \"</p>
 
 
@@ -9663,44 +9646,28 @@ Initial configuration is 4.
 
 
 .SS
-getmaxthreads()
+var v1 = getmaxthreads();
 .PP \"<p>
 Get the current threadpool size.
 .sp 1 \"</p>
 
 
 .SS
-getnumcores()
+var v1 = getnumcores();
 .PP \"<p>
 Get the number of processor cores available.
 .sp 1 \"</p>
 
 
 .SS
-run_results()
-.PP \"<p>
-Process all run results asynchronously.
-.sp 1 \"</p>
-.PP \"<p>
-for (auto& env : run_results()) {    
-.PP \"<p>
-\&...
-.sp 1 \"</p>
-.sp 1 \"</p>
-.PP \"<p>
-}
-.sp 1 \"</p>
-
-
-.SS
-run_count()
+var v1 = run_count();
 .PP \"<p>
 Get the number of jobs run and pending results.
 .sp 1 \"</p>
 
 
 .SS
-decrement_run_count()
+var v1 = decrement_run_count();
 .PP \"<p>
 Decrease the number of jobs pending results.
 .sp 1 \"</p>
@@ -9742,13 +9709,13 @@ co_run(F&& f, args, ...)
 Call any function asynchronously.
 .sp 1 \"</p>
 .PP \"<p>
-Exodus' asynchronous functions run to completion, or they request database i/o, or they call yield(), and their execution is interleaved with other async functions. Since they are not threaded, they are implicitly thread-safe and do not need to use locking when reading or updating shared data.
+Exodus' asynchronous functions run sequentially not simultaneously. Their execution will be interleaved with other async functions while database i/o is pending or when they call yield(). They are implicitly thread-safe. Global state may be changed by other async functions but not simultaneously.
 .sp 1 \"</p>
 .PP \"<p>
-Exodus' asynchronous functions are fibers akin to threads but without parallel processing. They are extremely fast to setup and switch with complete stack and state.
+Exodus' asynchronous functions are fibers akin to threads but without parallel processing or OS management. They are extremely fast to setup and and switch between and have a normal stack. They might be called "coprocesses" by comparion with "coroutines" which do not have stacks.
 .sp 1 \"</p>
 .PP \"<p>
-The initial state of asynchronous functions is "ready, not running". Once the main program calls yield() then one is selected by a round robin scheduler and they begin running and yielding to each other.
+The initial state of an asynchronous function is "ready, not running". Once the main program calls yield() then one of the "ready, not running" async functions is selected by a round robin scheduler and it runs until complete, requests database i/o or yields, and so on.
 .sp 1 \"</p>
 .PP \"<p>
 .PP \"<p>
@@ -9756,7 +9723,7 @@ The initial state of asynchronous functions is "ready, not running". Once the ma
 .EX \"<code>
 //func add(in a, in b) {
 //    set_run_result(a + b);
-  //    return "";
+// return "";
 //}
 for (var i : range(1, 100)) {
     co_run(&_ExoProgram::add, this, i, 2);
@@ -9790,14 +9757,7 @@ set_run_result(var data, var message = "")
 Set a co_run result.
 .sp 1 \"</p>
 .PP \"<p>
-See co_run for an example.
-.sp 1 \"</p>
-
-
-.SS
-co_run_results()
-.PP \"<p>
-A range that can be used in range-based for loops to pick up all co_run results.
+Callable in an async function to provide output collectible by co_run_results().
 .sp 1 \"</p>
 .PP \"<p>
 See co_run for an example.
@@ -9805,9 +9765,15 @@ See co_run for an example.
 
 
 .SS
-co_run_count()
+var v1 = co_run_count();
 .PP \"<p>
-Get the number of co_runs started.
+Get the number of co_runs pending.
+.sp 1 \"</p>
+.PP \"<p>
+Not required if you use co_run_results to collect results.
+.sp 1 \"</p>
+.PP \"<p>
+Calling co_run increases the number and co_run_results reduces the number.
 .sp 1 \"</p>
 
 
