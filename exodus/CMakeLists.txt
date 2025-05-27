@@ -10,6 +10,30 @@
 	message("---------------------")
 
 #
+# BOOST FIBER OPTION -DEXO_MODULE=ON/OFF or enabled by default
+# ##################
+#
+# Requires: apt install libboost-fiber-dev libboost-context-dev
+#
+	option(EXO_BOOST_FIBER "Build with Boost fiber async" ON)
+	message("-- EXO_BOOST_FIBER is ${EXO_BOOST_FIBER}")
+
+	if (EXO_BOOST_FIBER)
+		add_compile_definitions(EXO_BOOST_FIBER=1)
+	endif()
+
+#
+# -DEXO_PREPARED=ON/OFF
+# #####################
+#
+	option(EXO_PREPARED "DB read/write/delete use SQL PREPARED statements" ON)
+	message("-- EXO_PREPARED is ${EXO_PREPARED}")
+
+	if (EXO_PREPARED)
+		add_compile_definitions(EXO_PREPARED=1)
+	endif()
+
+#
 # Compiler flags
 # ##############
 #

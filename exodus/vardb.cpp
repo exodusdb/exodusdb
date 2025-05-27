@@ -175,7 +175,10 @@ Within transactions, lock requests for locks that have already been obtained alw
 // Thread-safe mutex for pgconn (remove if get_pgconn ensures exclusivity)
 //static std::mutex conn_mutex;
 
-#define EXO_PREPARED true
+#ifdef EXO_PREPARED
+#else
+#define EXO_PREPARED false
+#endif
 
 //#undef EXO_BOOST_FIBER
 //#define EXO_BOOST_FIBER
