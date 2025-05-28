@@ -114,6 +114,7 @@ function main(in mode0, out letterhead_out, in compcode0 = "", in qr_text0 = "")
 	// otherwise get from definitions
 	// /////////////////////////////
 
+	keyx = "";
 	if (not letterhead) {
 		gosub getheadhtm(letterhead);
 		if (letterhead) {
@@ -178,26 +179,36 @@ function main(in mode0, out letterhead_out, in compcode0 = "", in qr_text0 = "")
 
 			let qr_body = qr_text.f(1);
 			let qr_tip	= qr_text.f(2) ^ qr_body;
-			let cmd		= "qrencode --size=2 --type=SVG " ^ qr_body.squote();
+			//let cmd		= "qrencode --size=2 --type=SVG " ^ qr_body.squote();
+			// --inline option removes the junk <?xml version="1.0 ..
+			let cmd         = "qrencode --size=2 --type=SVG --inline " ^ qr_body.squote();
 			svg			= osshellread(cmd);
 
-			// remove everything like xml and comments before the opening <svg tag
+			// remove qrencode comment before the opening <svg tag
 			svg.cutter(svg.index("<svg") - 1);
+
+			/// resize QR svg
+			/// orig: <svg width="2.61cm" height="2.61cm" viewBox="0 0 37 37" preserveAspectRatio="none" version="1.1" xmln
+			/// xMidYMid meet - resize with focal point in center and not top left
+			svg.fieldstorer("\n", 1, 1, "<svg width=\"60%\" height=\"60%\" viewBox=\"0 0 100 100\" preserveAspectRatio=\"xMidYMid meet\" version=\"1.1\">");
 
 			// 			#tooltip1 { position: relative; }
 			// 			#tooltip1 a span { display: none; color: #FFFFFF; }
 			// 			#tooltip1 a:hover span { display: block; position: absolute; width: 200px; background: #aaa url(images/horses200x50.jpg); height: 50px; left: 100px; top: -10px; color: #FFFFFF; padding: 0 5px; }
 			// 			The html markup is:-
 			// 			<p id="tooltip1"><a href="introduction.php">Introduction<span>Introduction to HTML and CSS: tooltip with extra text</span></a></p>
+			//svg =
+			//	"<style>\n"
+			//	"#tooltip1 { position: relative; }\n"
+			//	"#tooltip1 a span { display: none; color: #FFFFFF; }\n"
+			//	"#tooltip1 a:hover span { display: block; position: absolute; white-space: nowrap; background-color: #222; left: 20px; top: 20px; color: #FFFFFF; padding: 0 5px; font-size:170%}\n"
+			//	"</style>\n"
+			//	"<p id='tooltip1'><a>" ^
+			//	svg ^ "<span> " ^ qr_tip.replace("\n", "<br />") ^ "</span></a></p>";
 
-			svg =
-				"<style>\n"
-				"#tooltip1 { position: relative; }\n"
-				"#tooltip1 a span { display: none; color: #FFFFFF; }\n"
-				"#tooltip1 a:hover span { display: block; position: absolute; white-space: nowrap; background-color: #222; left: 20px; top: 20px; color: #FFFFFF; padding: 0 5px; font-size:170%}\n"
-				"</style>\n"
-				"<p id='tooltip1'><a>" ^
-				svg ^ "<span> " ^ qr_tip.replace("\n", "<br />") ^ "</span></a></p>";
+			// simplify tooltip with (better looking) alternative title= and align svg after resize
+			svg = "<div title=\"" ^ qr_tip ^ "\" align=\"center\">" ^ svg ^ "</div>";
+
 		}
 
 		letterhead.replacer("%QR%", svg);
@@ -209,20 +220,27 @@ function main(in mode0, out letterhead_out, in compcode0 = "", in qr_text0 = "")
 
 		// check simple HTML
 		if (letterhead.count("<") != letterhead.count(">")) {
-			call mssg(keyx.quote() ^ " page header is not valid HTML");
+			//call mssg(keyx.quote() ^ " page header is not valid HTML");
+			keyx = keyx ? "DEFINITIONS " ^ keyx.quote() : "Company File " ^ compcode.quote();
+			keyx ^= " letterhead is not valid HTML";
+			call mssg(keyx ^ " letterhead is not valid HTML");
 			letterhead = "";
 		}
 
 		// check various tags exist in equal numbers
 		// this doesnt check if they are in a correct sequence or hierarchy etc
-		let tags		= "div,span,table,thead,tbody,tr,td,a,b,i,u,big,small,centre,abbr";
-		let ntags		= tags.fcount(",");
+		//let tags		= "div,span,table,thead,tbody,tr,td,a,b,i,u,big,small,centre,abbr";
+		//let ntags		= tags.fcount(",");
 		let letterhead2 = letterhead.lcase();
-		for (const var tagn : range(1, ntags)) {
-			let tag = tags.field(",", tagn);
+		//for (const var tagn : range(1, ntags)) {
+		//	let tag = tags.field(",", tagn);
+		let tags = "div,span,table,thead,tbody,tr,td,a,b,i,u,big,small,centre,abbr"_var.convert(",", FM);
+		for (const var tag : tags) {
 			if (letterhead2.count("<" ^ tag ^ ">") + letterhead2.count("<" ^ tag ^ " ") != letterhead2.count("</" ^ tag ^ ">")) {
-				letterhead = keyx.quote() ^ " has mismatched &lt;" ^ tag ^ "&gt; tags";
-				// tagn = ntags;
+				//letterhead = keyx.quote() ^ " has mismatched &lt;" ^ tag ^ "&gt; tags";
+				//// tagn = ntags;
+				letterhead ^= "Mismatched &lt;" ^ tag ^ "&gt; tags in Letterhead for";
+				letterhead ^= keyx ? "DEFINITIONS " ^ keyx.quote() : "Company File " ^ compcode.quote();
 				break;
 			}
 		}  // tagn;
