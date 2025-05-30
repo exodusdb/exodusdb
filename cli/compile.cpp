@@ -180,9 +180,18 @@ ENVIRONMENT
 
 	// TODO Dont hard code for typical Ubuntu
 	var latest_exo_info = "";
-	var osfiledirs = oslist("/usr/local/lib/libexo*") ^ FM ^ "/usr/local/include/exodus";
-	for (var filedir : osfiledirs) {
-		var info = osinfo(filedir);
+//	for (auto dirpattern : "/usr/local/lib]libexo*^/usr/local/include]exodus"_var) {
+//		let dir = dirpattern.f(1, 1);
+//		let pat = dirpattern.f(1, 2);
+//		let osfiles = oslist(dir, pat);
+//		for (var file : osfiles) {
+//			let info = osinfo(dir ^ "/" ^ file);
+//			if (is_newer(info, latest_exo_info))
+//				latest_exo_info = info;
+//		}
+//	}
+	for (auto dir : "/usr/local/lib^usr/local/bin^/usr/local/include/exodus"_var) {
+		let info = osinfo(dir);
 		if (is_newer(info, latest_exo_info))
 			latest_exo_info = info;
 	}

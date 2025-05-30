@@ -73,7 +73,7 @@ func main() {
 		call htmllib2("T2H", STATUS, "");
 	} catch (...) {
 		loglasterror();
-		stop("gendoc: htmllib2 not installed yet.");
+		stop("gendoc: htmllib2 not installed yet. " ^ lasterror());
 	}
 
 	if (html) {
