@@ -10,7 +10,7 @@ programinit()
 
 // For co_run example
 func add(in a, in b) {
-	set_run_result(a + b);
+	set_async_result(a + b);
 	return "";
 }
 
@@ -2514,18 +2514,18 @@ func main() {
 // Code examples fiber_manager.h
 ////////////////
 
-	printl("co_run(F&& f, Args&&... args)");
+	printl("async(F&& funcname, Args&&... args)");
 	{
 		//func add(in a, in b) {
-		//    set_run_result(a + b);
+		//    set_async_result(a + b);
 		// return "";
 		//}
 		for (var i : range(1, 100)) {
-		    co_run(&_ExoProgram::add, this, i, 2);
+		    async(&_ExoProgram::add, this, i, 2);
 		}
 		yield();
 		var total = 0;
-		for (auto result : co_run_results())
+		for (auto result : async_results())
 		    total += result.data;
 		assert(total eq 5250);
 	}

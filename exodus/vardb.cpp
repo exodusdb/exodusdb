@@ -252,9 +252,19 @@ Within transactions, lock requests for locks that have already been obtained alw
 
 #define DBTRACE_CONN 0
 
-#define DEBUG_LOG_SQL if (DBTRACE) sql.convert("\n\t", "  ").trim().logputl("SQL1 ");
+#define DEBUG_LOG_SQL0 if (DBTRACE) {\
+	std::clog << dbconn_ptr.dbconn->dbconn_no_ << ": SQL0 " << \
+	sql.convert("\n\t", "  ").trim() << "\n";\
+}
 
-#define DEBUG_LOG_SQL1 if (DBTRACE) sql.replace("$1", var(paramValues[0]).first(50).squote()).convert("\n\t", "  ").trim().logputl("SQL2 ");
+#define DEBUG_LOG_SQL1 if (DBTRACE) {\
+	std::clog << pgconn.dbconn->dbconn_no_ << ": SQL1 " << \
+	(sql.contains("$1")\
+	?\
+	sql.replace("$1", var(paramValues[0]).first(50).squote())\
+	:\
+	(sql ^ " " ^ var(paramValues[0]).first(50).squote())).convert("\n\t", "  ").trim() << "\n";\
+}
 
 #include "DBresult.h"
 
@@ -581,7 +591,7 @@ static DBconn* get_dbconn(in dbhandle) {
 // Returns 0 for failure
 // dbresult is returned to caller to extract any data and call PQclear(dbresult) in destructor of DBresult
 static DBresult get_dbresult(in sql, DBconn_ptr dbconn_ptr, out ok) {
-	DEBUG_LOG_SQL
+	DEBUG_LOG_SQL0
 
 	/* Dont use PQexec because is cannot be told to return binary results
 	and use PQexecParams with zero parameters instead
@@ -1761,7 +1771,8 @@ bool var::sqlexec(in sqlcmd, io response) const {
 	if (DBTRACE) {
 		if (DBTRACE>1)
 			(this->assigned() ? *this : "").trim("\n").logputl("SQLE ");
-		sqlcmd.convert("\t\n", "  ").trim().logputl("SQLE ");
+//		sqlcmd.convert("\t\n", "  ").trim().logputl("SQLE ");
+	    std::clog << pgconn.dbconn->dbconn_no_ << ": SQLE " << sqlcmd.convert("\n\t", "  ").trim() << "\n";
 	}
 
 	// will contain any dbresult IF successful
@@ -4566,7 +4577,7 @@ bool var::selectx(in fieldnames, in sortselectclause) {
 
 	//sql.logputl("sql=");
 
-	// DEBUG_LOG_SQL
+	// DEBUG_LOG_SQL0
 	// if (DBTRACE>1)
 	//	exo::logputl(sql);
 

@@ -253,7 +253,9 @@ VarError::VarError(std::string message_)
 
 	// Capture the stack at point of creation i.e. when thrown
 	// TODO capture in caller using default argument to VarError?
-	exo_savestack(stack_addresses_, &stack_size_);
+	if (not exo_savestack(stack_addresses_, &stack_size_))
+		// gdb exists but could not attach to the process so it must already be attached.
+		throw;
 
 	// Flush any stdout error messages out
 	std::cout << std::flush;

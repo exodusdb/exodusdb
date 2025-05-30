@@ -14,9 +14,9 @@ namespace exo {
 // Default constructor
 DBconn::DBconn() = default;
 
-// Constructor with PGconn* and conninfo
-DBconn::DBconn(PGconn* pgconn, std::string conninfo)
-	: pgconn_(pgconn), conninfo_(std::move(conninfo)) {}
+// Constructor with info
+DBconn::DBconn(PGconn* pgconn, std::string conninfo, int dbconn_no)
+	: pgconn_(pgconn), conninfo_(std::move(conninfo)), dbconn_no_(dbconn_no) {}
 
 // Destructor for RAII cleanup
 DBconn::~DBconn() {
@@ -31,7 +31,8 @@ DBconn::DBconn(DBconn&& other) noexcept
 	  locks_(std::move(other.locks_)),
 	  dbcache_(std::move(other.dbcache_)),
 	  conninfo_(std::move(other.conninfo_)),
-	  in_transaction_(other.in_transaction_) {
+	  in_transaction_(other.in_transaction_),
+	  dbconn_no_(other.dbconn_no_) {
 	other.pgconn_ = nullptr; // Prevent double-free
 }
 
@@ -43,11 +44,12 @@ DBconn& DBconn::operator=(DBconn&& other) noexcept {
 			PQfinish(pgconn_);
 		}
 		// Move members
-		pgconn_ = other.pgconn_;
-		locks_ = std::move(other.locks_);
-		dbcache_ = std::move(other.dbcache_);
-		conninfo_ = std::move(other.conninfo_);
+		pgconn_         = other.pgconn_;
+		locks_          = std::move(other.locks_);
+		dbcache_        = std::move(other.dbcache_);
+		conninfo_       = std::move(other.conninfo_);
 		in_transaction_ = other.in_transaction_;
+		dbconn_no_      = other.dbconn_no_;
 		// Nullify other's pgconn to prevent double-free
 		other.pgconn_ = nullptr;
 	}

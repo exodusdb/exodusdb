@@ -20,7 +20,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#include <unistd.h> //for getpid
+#include <unistd.h> //for getpid/gettid
 #if EXO_MODULE
 	import std;
 #else
@@ -316,6 +316,7 @@ var  var::ospid() {
 
 var  var::ostid() {
 	//THISIS("var  var::ospid() const")
+//	return syscall(SYS_gettid);
 	return gettid();
 }
 

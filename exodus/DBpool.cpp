@@ -24,7 +24,7 @@ int DBpool::add_dbconn(PGconn* pgconn, const std::string conninfo) {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Winline"
 	++dbconn_no_;
-	dbconns_[dbconn_no_] = DBconn(pgconn, conninfo);
+	dbconns_[dbconn_no_] = DBconn(pgconn, conninfo, dbconn_no_);
 #pragma GCC diagnostic pop
 
 	if (TRACING >= 3) {

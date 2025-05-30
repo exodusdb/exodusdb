@@ -99,26 +99,31 @@ Job::Job (
 	: input_queue(input_queuex   ?: std::make_shared<ThreadSafeQueue<var>>()),
 	  output_queue(output_queuex ?: std::make_shared<ThreadSafeQueue<var>>())
 	{
-//	input_queue  = std::make_shared<ThreadSafeQueue<var>>();
-//	output_queue = std::make_shared<ThreadSafeQueue<var>>();
 
+	// A future to allow async commands on jobs.
+	// Finished jobs also post into a result queue
+	// which is an alternative way to wait for completion.
 	auto promise = std::make_shared<std::promise<ExoEnv>>();
 	future = promise->get_future();
 
-	// global Job no starts at 0
+	// A global Job no starts at 0
 	static std::atomic<unsigned int> global_job_counter{0};
 
+	// Create a new environment with a counter for it's THREADNO.
 	ExoEnv new_env(command, global_job_counter.fetch_add(1) + 1);
 
-	// Assign queues to new_env
+	// Assign queues to new_env.
 	new_env.input_queue = input_queue;
 	new_env.output_queue = output_queue;
 
-	// Move new_env into shared_ptr
+	// Move new_env into shared_ptr.
 	auto shared_env = std::make_shared<ExoEnv>(std::move(new_env));
 
+	// Create a lambda to be queued on the threadpool's task queue.
 	auto task = [promise, shared_env, command, cv = &cv, result_queuex]() mutable {
 		try {
+
+			// Prepare to load and use a shared library
 			Callable callable{*shared_env};
 			var libname = command.field(" ", 1);
 			var funcname = "exoprogram_createdelete_";
@@ -126,18 +131,38 @@ Job::Job (
 				funcname ^= libname.field(".", 2);
 				libname = libname.field(".", 1);
 			}
+
+			// Load a shared library and instantiate one of its objects.
 			if (!callable.initsmf(*shared_env, libname.c_str(), funcname.c_str(), true))
 				throw std::runtime_error("Failed to initialize shared member function");
+
+			// Call a shared library objects member function.
+			// It will handle only its ExoExit exceptions (Stop/Abort)
+			// not VarError or anything else.
 			shared_env->ANS = std::move(callable.callsmf());
+
 			// Push normal result
 			if (result_queuex)
-				// EITHER
+				// EITHER if given a queue
 				result_queuex->push(std::move(*shared_env));
 			else
-				// OR
+				// OR (Why not both since it is a shared_ptr)
 				promise->set_value(std::move(*shared_env));
-			cv->notify_one(); // Notify Job
+
+			// Notify Job
+			cv->notify_one();
+
+		} catch (VarError& e) {
+			std::cerr << command << std::endl;
+			std::cerr << e.stack() << std::endl;
+			// Push abnormal result
+			if (result_queuex) {
+				result_queuex->push(std::move(*shared_env));
+			}
+			promise->set_exception(std::current_exception());
+			cv->notify_one(); // Notify on exception
 		} catch (...) {
+			std::cerr << "Error: Job: Unknown error in " << command << std::endl;
 			// Push abnormal result
 			if (result_queuex) {
 				result_queuex->push(std::move(*shared_env));
@@ -146,8 +171,10 @@ Job::Job (
 			cv->notify_one(); // Notify on exception
 		}
 //		std::clog << "Job:task lambda finished" << std::endl;
-	};
 
+	}; // task lambda
+
+	// Add the new job's lambda to the threadpool's task queue
 	try {
 		threadpool1.enqueue(std::move(task));
 	} catch (const std::exception& e) {

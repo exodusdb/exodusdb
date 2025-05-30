@@ -193,7 +193,7 @@ programinit()
 
 // For co_run example
 func add(in a, in b) {
-	set_run_result(a + b);
+	set_async_result(a + b);
 	return "";
 }
 
@@ -836,6 +836,7 @@ func main() {
 				// "ARGS&... appendable" -> "appendable, ..."
 				line2.replacer(R"__(\b[a-zA-Z][a-zA-Z0-9]*\s*&{1,2}\s*\.\.\.\s*\b([a-zA-Z][a-zA-Z0-9]*))__"_rex, "$1, ...");
 
+				line2.replacer("F&& ","");// async
 				line2.replacer("\\bstd::size_t\\b", "");
 				line2.replacer("\\bconst&&\\b", "");
 				line2.replacer("\\bconst&\\b", "");

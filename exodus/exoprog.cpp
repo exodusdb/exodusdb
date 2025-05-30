@@ -777,10 +777,8 @@ var exoprog_callsmf(const Callable& callable) {
 		nrvo = "";
 	}
 
-	//TODO Create a second version of this whole try/catch block
-	//that omits catch (VarError) if EXO_DEBUG is set
-	//so that gdb will catch the original error and allow backtracing there
-	//Until then, use gdb "catch throw" as mentioned below.
+	// We break into gdb at point of VarError exception construction
+	// if gdb available and EXO_DEBUG=1 or if running under gdb already
 	catch (const VarError& e) {
 		//restore environment in case VarError is caught
 		//in caller and the program resumes processing
@@ -2618,8 +2616,14 @@ int ExoProgram::run_main(var (ExoProgram::*main_func)(), int argc, const char* a
 	var caught = "";
 	int exit_status = 0;
 
+// We break into gdb at point of VarError exception construction
+// if gdb available and EXO_DEBUG=1 or if running under gdb already
+// Use gdb catch throw (somehow skip catching ExoExit (Stop/Abort) exceptions)
+// to catch any std::exception or unknown exceptions.
+//
 	// Check EXO_DEBUG using ExoEnv
-	if (var().osgetenv("EXO_DEBUG")) {
+	var exo_debug;
+	if (exo_debug.osgetenv("EXO_DEBUG") and exo_debug) {
 		var("Debug Init Thread:" ^ ev.THREADNO ^ " " ^ ev.SENTENCE).errputl();
 		// Debug mode: no exception catching
 		result = (this->*main_func)();

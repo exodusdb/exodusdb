@@ -47,10 +47,10 @@ public:
 //	size_t co_run_count() const { return co_run_count_; }
 //
 //	// Generator for completed co_run results
-//	std::generator<CoRunResult&> co_run_results();
+//	std::generator<AsyncResult&> co_run_results();
 //
 //	// function to queue a result
-//	void set_run_result(var data, var message);
+//	void set_async_result(var data, var message);
 //
 //	// function to yield
 //	void yield();

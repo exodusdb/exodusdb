@@ -9704,33 +9704,178 @@ Calls shutdown_run() first.
 .SH
 
 .SS
-co_run(F&& f, args, ...)
+async(funcname, args, ...)
 .PP \"<p>
 Call any function asynchronously.
 .sp 1 \"</p>
 .PP \"<p>
-Exodus' asynchronous functions run sequentially not simultaneously. Their execution will be interleaved with other async functions while database i/o is pending or when they call yield(). They are implicitly thread-safe. Global state may be changed by other async functions but not simultaneously.
+\fBfuncname:\fR To call an Exodus program function the function name must be prefixed by "&_ExoProgram::" and followed by ", this" as follows:
 .sp 1 \"</p>
 .PP \"<p>
-Exodus' asynchronous functions are fibers akin to threads but without parallel processing or OS management. They are extremely fast to setup and and switch between and have a normal stack. They might be called "coprocesses" by comparion with "coroutines" which do not have stacks.
+e.g. async(&_ExoProgram::xxxxxx, this, arg1, arg2, etc)
+.sp 1 \"</p>
+.PP \"<p>
+Exodus' asynchronous functions run sequentially not simultaneously. Their execution will be interleaved with other async functions in the same thread of execution while database i/o is pending or when they call yield(). They are implicitly thread-safe but global state may be changed by other async functions.
+.sp 1 \"</p>
+.PP \"<p>
+Exodus' asynchronous functions are implemented as fibers which are akin to threads but without parallel processing or OS management. They are extremely fast to setup and and switch between and have a normal stack. They might be called "coprocesses" by comparion with "coroutines" which do not have stacks.
 .sp 1 \"</p>
 .PP \"<p>
 The initial state of an asynchronous function is "ready, not running". Once the main program calls yield() then one of the "ready, not running" async functions is selected by a round robin scheduler and it runs until complete, requests database i/o or yields, and so on.
+.sp 1 \"</p>
+.PP \"<p>
+.sp 1 \"</p>
+.PP \"<p>
+\fBhttps:\fR //x.com/i/grok/share/N4zbWT3V2hb4qK71G0qT0togh
+.sp 1 \"</p>
+.PP \"<p>
+.sp 1 \"</p>
+.PD 0 \"<dl>
+.TP 10\"<dt>
+\fBConcept\fR \"</dt>
+Aligns with the computer science concept of *cooperative multitasking*, where isolated execution contexts yield to a scheduler for interleaved execution.
+.\"</dd>
+.PD \"</dl>
+.PP \"<p>
+.sp 1 \"</p>
+.PD 0 \"<dl>
+.TP 10\"<dt>
+\fBConcurrency\fR \"</dt>
+Interleaved execution of multiple tasks (with full stacks) within a *single thread*, not parallelism (simultaneous multi-CPU execution).
+.\"</dd>
+.PD \"</dl>
+.PP \"<p>
+.sp 1 \"</p>
+.PD 0 \"<dl>
+.TP 10\"<dt>
+\fBFull Stacks\fR \"</dt>
+Independent, full execution context sharing global state but with separate call stacks, resembling process-like entities but not OS processes. Not lightweight coroutines (e.g., Python’s 'async def' or generators) due to their lack of isolation or stacks.
+.\"</dd>
+.PD \"</dl>
+.PP \"<p>
+.sp 1 \"</p>
+.PD 0 \"<dl>
+.TP 10\"<dt>
+\fBYield\fR \"</dt>
+Each full stack can yield control explicitly to a scheduler, suspending its own execution and allowing another stack to run.
+.\"</dd>
+.PD \"</dl>
+.PP \"<p>
+.sp 1 \"</p>
+.PP \"<p>
+\fBScheduler:\fR
+.sp 1 \"</p>
+.PP \"<p>
+.br
+\(bu A *minimal, non-interrupt-driven* mechanism that uses a *loop* to scan full stacks and decide which to run next.
+.br
+\(bu Its sole role is to *pass control* (or "hand the baton") to the next stack, not to manage events (e.g., I/O, timers, or signals).
+.br
+\(bu May optionally link to events if chosen, but this is not its primary function.
+.sp 1 \"</p>
+.PP \"<p>
+.sp 1 \"</p>
+.PD 0 \"<dl>
+.TP 10\"<dt>
+\fBNo OS\fR \"</dt>
+No OS-level process creation (e.g., no 'fork', 'spawn', or equivalents like Python’s 'multiprocessing').
+.\"</dd>
+.PD \"</dl>
+.PP \"<p>
+.sp 1 \"</p>
+.PD 0 \"<dl>
+.TP 10\"<dt>
+\fBNo Threads\fR \"</dt>
+Multiple async functions share a *single thread*. Threads can have multiple async routines but not vice versa.
+.\"</dd>
+.PD \"</dl>
+.PP \"<p>
+.sp 1 \"</p>
+.PD 0 \"<dl>
+.TP 10\"<dt>
+\fBNo Stackless Coroutines\fR \"</dt>
+Lightweight cooperative tasks (e.g., Python’s 'asyncio' coroutines or generators) are not considered full stacks
+.\"</dd>
+.PD \"</dl>
+.PP \"<p>
+.sp 1 \"</p>
+.PD 0 \"<dl>
+.TP 10\"<dt>
+\fBNo Event Loop\fR \"</dt>
+The scheduler is not driven by interrupts or events (e.g., I/O polling, timers, or signals, as in 'asyncio's event loop).
+.\"</dd>
+.PD \"</dl>
+.PP \"<p>
+.sp 1 \"</p>
+.PP \"<p>
+\fBComparable:\fR
+.sp 1 \"</p>
+.PP \"<p>
+.PD 0 \"<dl>
+.TP 10\"<dt>
+\fBBoost\fR \"</dt>
+Boost Fibers are used to implement async in Exodus.
+.\"</dd>
+.TP 10\"<dt>
+\fBGo\fR \"</dt>
+Goroutines have with a runtime scheduler loop (GOMAXPROCS=1), balancing scalability and ease.
+.\"</dd>
+.TP 10\"<dt>
+\fBJava\fR \"</dt>
+Project Loom: Continuations provide stackful coroutines, but require a custom single-threaded, non-interrupt-driven scheduler.
+.\"</dd>
+.TP 10\"<dt>
+\fBPython\fR \"</dt>
+Stackless, a non-standard Python variant, has tasklets with a scheduler loop.
+.\"</dd>
+.TP 10\"<dt>
+\fBLua\fR \"</dt>
+Stackful coroutines with a user-defined scheduler loop, offering simplicity and control.
+.\"</dd>
+.TP 10\"<dt>
+\fBRuby\fR \"</dt>
+Native Fibers provide stackful coroutines with a user-defined, non-interrupt-driven scheduler loop.
+.\"</dd>
+.TP 10\"<dt>
+\fBErlang\fR \"</dt>
+Lightweight VM processes with BEAM’s scheduler loop, providing strong isolation.
+.\"</dd>
+.PD \"</dl>
+.sp 1 \"</p>
+.PP \"<p>
+.sp 1 \"</p>
+.PP \"<p>
++---------.-------------.--------------------------.-------------------------+
+.sp 1 \"</p>
+.PP \"<p>
+| Command | Mechanism   | Execution                | Use Case                |
+.sp 1 \"</p>
+.PP \"<p>
+|---------|-------------|--------------------------|-------------------------|
+.sp 1 \"</p>
+.PP \"<p>
+| async   | Fiber       | Cooperative, yield-based | Lightweight async tasks |
+.sp 1 \"</p>
+.PP \"<p>
+| run     | Thread pool | Parallel, preemptive     | Heavy parallel tasks    |
+.sp 1 \"</p>
+.PP \"<p>
++---------.-------------.--------------------------.-------------------------+
 .sp 1 \"</p>
 .PP \"<p>
 .PP \"<p>
 \fBExample:\fR
 .EX \"<code>
 //func add(in a, in b) {
-//    set_run_result(a + b);
+//    set_async_result(a + b);
 // return "";
 //}
 for (var i : range(1, 100)) {
-    co_run(&_ExoProgram::add, this, i, 2);
+    async(&_ExoProgram::add, this, i, 2);
 }
 yield();
 var total = 0;
-for (auto result : co_run_results())
+for (auto result : async_results())
     total += result.data;
 assert(total eq 5250);
 .EE \"</code>
@@ -9752,28 +9897,28 @@ A round robin scheduler resumes fibers in turn or sleeps if all are waiting for 
 
 
 .SS
-set_run_result(var data, var message = "")
+set_async_result(var data, var message = "")
 .PP \"<p>
-Set a co_run result.
+Set a async result.
 .sp 1 \"</p>
 .PP \"<p>
-Callable in an async function to provide output collectible by co_run_results().
+Callable in an async function to provide output collectible by async_results().
 .sp 1 \"</p>
 .PP \"<p>
-See co_run for an example.
+See async for an example.
 .sp 1 \"</p>
 
 
 .SS
-var v1 = co_run_count();
+var v1 = async_count();
 .PP \"<p>
-Get the number of co_runs pending.
+Get the number of asyncs pending.
 .sp 1 \"</p>
 .PP \"<p>
-Not required if you use co_run_results to collect results.
+Not required if you use async_results to collect results.
 .sp 1 \"</p>
 .PP \"<p>
-Calling co_run increases the number and co_run_results reduces the number.
+Calling async increases the number and async_results reduces the number.
 .sp 1 \"</p>
 
 

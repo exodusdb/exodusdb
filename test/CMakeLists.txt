@@ -87,9 +87,10 @@
 	add_executable(testing_var_h testing_var.h.cpp ${SRC_EXODUS_DIR}/var.h ${SRC_EXODUS_DIR}/dim.h ${SRC_EXODUS_DIR}/exoprog.h ${SRC_EXODUS_DIR}/job_manager.h ${SRC_EXODUS_DIR}/fiber_manager.h)
 	target_link_libraries(testing_var_h exodus ${PROJECT_LIBS})
 	if (EXO_MODULE)
-		target_link_libraries(testing_var_h
-		exovar
-	)
+		target_link_libraries(
+			testing_var_h
+			exovar
+		)
 	endif()
 
 	# Generate test/src/testing_var.h.cpp from var.h
@@ -100,7 +101,7 @@
 	)
 
 	# Force regeneration of testing_var.h.cpp from var.h
-	add_dependencies(testing_var_h PreBuild_testing_var_h)
+	add_dependencies(testing_var_h PreBuild_testing_var_h gendoc)
 
 	# Setup a test
 	add_test(NAME testing_var_h
@@ -110,7 +111,7 @@
 	set_tests_properties(
 		testing_var_h
 		PROPERTIES
-		ENVIRONMENT "EXO_LIBDIR=${BIN_CLI_DIR}"
+		ENVIRONMENT "EXO_LIBDIR=${BIN_CLI_DIR};EXO_DEBUG=0"
 		PASS_REGULAR_EXPRESSION "Test passed"
 		TIMEOUT 30
 	)
@@ -151,7 +152,7 @@
 			PROPERTIES
 			PASS_REGULAR_EXPRESSION "Test passed"
 #			FAIL_REGULAR_EXPRESSION "(Test failed)"
-			ENVIRONMENT "EXO_LIBDIR=${CMAKE_CURRENT_BINARY_DIR}"
+			ENVIRONMENT "EXO_LIBDIR=${CMAKE_CURRENT_BINARY_DIR};EXO_DEBUG=0"
 			TIMEOUT 30
 		)
 

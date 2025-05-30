@@ -1,10 +1,14 @@
 #ifndef FIBER_SCHEDULER_H
 #define FIBER_SCHEDULER_H
 
-#include <chrono>
-#include <iostream>
-#include <mutex>
-#include <condition_variable>
+#ifdef EXO_MODULE
+	import std;
+#else
+#	include <chrono>
+#	include <iostream>
+#	include <mutex>
+#	include <condition_variable>
+#endif
 
 #include <boost/asio.hpp>
 #include <boost/fiber/all.hpp>

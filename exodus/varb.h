@@ -1427,7 +1427,8 @@ class PUBLIC var_base {
 
 	// Note replicated for var but that one converts FM, VM etc. to visible chars before output
 	friend std::ostream& operator<<(std::ostream& ostream1, CBR outvar) {
-		outvar.assertString(__PRETTY_FUNCTION__);
+		THISIS("ostream << var")
+		outvar.assertString(function_sig);
 		ostream1 << outvar.var_str;
 		return ostream1;
 	}
@@ -1437,7 +1438,8 @@ class PUBLIC var_base {
 
 	friend std::istream& operator>>(std::istream& istream1, VARREF invar) {
 
-		invar.assertVar(__PRETTY_FUNCTION__);
+		THISIS("istream >> var")
+		invar.assertVar(function_sig);
 
 		invar.var_str.clear();
 		invar.var_typ = VARTYP_STR;

@@ -485,6 +485,9 @@ add_definitions(-DGIT_REMOTE_COMMIT_HASH_SHORT="${GIT_REMOTE_COMMIT_HASH_SHORT}"
 	#target_compile_options(test_Regress PUBLIC "-O2")
 	add_subdirectory(test)
 
+#	message("")
+#	add_subdirectory(backward-cpp)
+
 #
 # Exit
 # ####

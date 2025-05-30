@@ -8751,23 +8751,107 @@ Optional prefix of "1/" or "/" causes the reciprocal of the number to be used. e
 		<td></td>
 		<td>
 			<p>
-				<code>co_run(F&& f, args, ...)</code></p></td>
+				<code>async(funcname, args, ...)</code></p></td>
 		<td>
 			<p>Call any function asynchronously.</p>
-			<p>Exodus' asynchronous functions run sequentially not simultaneously. Their execution will be interleaved with other async functions while database i/o is pending or when they call yield(). They are implicitly thread-safe. Global state may be changed by other async functions but not simultaneously.</p>
-			<p>Exodus' asynchronous functions are fibers akin to threads but without parallel processing or OS management. They are extremely fast to setup and and switch between and have a normal stack. They might be called "coprocesses" by comparion with "coroutines" which do not have stacks.</p>
+			<p>
+				<em>funcname:</em> To call an Exodus program function the function name must be prefixed by "&amp;_ExoProgram::" and followed by ", this" as follows:</p>
+			<p>e.g. async(&amp;_ExoProgram::xxxxxx, this, arg1, arg2, etc)</p>
+			<p>Exodus' asynchronous functions run sequentially not simultaneously. Their execution will be interleaved with other async functions in the same thread of execution while database i/o is pending or when they call yield(). They are implicitly thread-safe but global state may be changed by other async functions.</p>
+			<p>Exodus' asynchronous functions are implemented as fibers which are akin to threads but without parallel processing or OS management. They are extremely fast to setup and and switch between and have a normal stack. They might be called "coprocesses" by comparion with "coroutines" which do not have stacks.</p>
 			<p>The initial state of an asynchronous function is "ready, not running". Once the main program calls yield() then one of the "ready, not running" async functions is selected by a round robin scheduler and it runs until complete, requests database i/o or yields, and so on.</p>
+			<p></p>
+			<p>
+				<em>https:</em> //x.com/i/grok/share/N4zbWT3V2hb4qK71G0qT0togh</p>
+			<p></p>
+			<dl>
+				<dt>Concept</dt>
+				<dd>Aligns with the computer science concept of *cooperative multitasking*, where isolated execution contexts yield to a scheduler for interleaved execution.</dd>
+			</dl>
+			<p></p>
+			<dl>
+				<dt>Concurrency</dt>
+				<dd>Interleaved execution of multiple tasks (with full stacks) within a *single thread*, not parallelism (simultaneous multi-CPU execution).</dd>
+			</dl>
+			<p></p>
+			<dl>
+				<dt>Full Stacks</dt>
+				<dd>Independent, full execution context sharing global state but with separate call stacks, resembling process-like entities but not OS processes. Not lightweight coroutines (e.g., Python’s 'async def' or generators) due to their lack of isolation or stacks.</dd>
+			</dl>
+			<p></p>
+			<dl>
+				<dt>Yield</dt>
+				<dd>Each full stack can yield control explicitly to a scheduler, suspending its own execution and allowing another stack to run.</dd>
+			</dl>
+			<p></p>
+			<p>
+				<em>Scheduler:</em> </p>
+			<p>
+				<ul>
+					<li>A *minimal, non-interrupt-driven* mechanism that uses a *loop* to scan full stacks and decide which to run next.</li>
+					<li>Its sole role is to *pass control* (or "hand the baton") to the next stack, not to manage events (e.g., I/O, timers, or signals).</li>
+					<li>May optionally link to events if chosen, but this is not its primary function.</li>
+				</ul>
+			</p>
+			<p></p>
+			<dl>
+				<dt>No OS</dt>
+				<dd>No OS-level process creation (e.g., no 'fork', 'spawn', or equivalents like Python’s 'multiprocessing').</dd>
+			</dl>
+			<p></p>
+			<dl>
+				<dt>No Threads</dt>
+				<dd>Multiple async functions share a *single thread*. Threads can have multiple async routines but not vice versa.</dd>
+			</dl>
+			<p></p>
+			<dl>
+				<dt>No Stackless Coroutines</dt>
+				<dd>Lightweight cooperative tasks (e.g., Python’s 'asyncio' coroutines or generators) are not considered full stacks</dd>
+			</dl>
+			<p></p>
+			<dl>
+				<dt>No Event Loop</dt>
+				<dd>The scheduler is not driven by interrupts or events (e.g., I/O polling, timers, or signals, as in 'asyncio's event loop).</dd>
+			</dl>
+			<p></p>
+			<p>
+				<em>Comparable:</em> </p>
+			<p>
+				<dl>
+					<dt>Boost</dt>
+					<dd>Boost Fibers are used to implement async in Exodus.</dd>
+					<dt>Go</dt>
+					<dd>Goroutines have with a runtime scheduler loop (GOMAXPROCS=1), balancing scalability and ease.</dd>
+					<dt>Java</dt>
+					<dd>Project Loom: Continuations provide stackful coroutines, but require a custom single-threaded, non-interrupt-driven scheduler.</dd>
+					<dt>Python</dt>
+					<dd>Stackless, a non-standard Python variant, has tasklets with a scheduler loop.</dd>
+					<dt>Lua</dt>
+					<dd>Stackful coroutines with a user-defined scheduler loop, offering simplicity and control.</dd>
+					<dt>Ruby</dt>
+					<dd>Native Fibers provide stackful coroutines with a user-defined, non-interrupt-driven scheduler loop.</dd>
+					<dt>Erlang</dt>
+					<dd>Lightweight VM processes with BEAM’s scheduler loop, providing strong isolation.</dd>
+				</dl>
+			</p>
+			<p></p>
+			<p>+---------.-------------.--------------------------.-------------------------+</p>
+			<p>| Command | Mechanism   | Execution                | Use Case                |</p>
+			<p>|---------|-------------|--------------------------|-------------------------|</p>
+			<p>| async   | Fiber       | Cooperative, yield-based | Lightweight async tasks |</p>
+			<p>| run     | Thread pool | Parallel, preemptive     | Heavy parallel tasks    |</p>
+			<p>+---------.-------------.--------------------------.-------------------------+</p>
 			<p>
 				<pre><span class="c1">//func add(in a, in b) {</span>
-<span class="c1">//    set_run_result(a + b);</span>
+<span class="c1">//    set_async_result(a + b);</span>
 <span class="c1">// return &quot;&quot;;</span>
 <span class="c1">//}</span>
 <span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">var</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="nf">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">100</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="n">co_run</span><span class="p">(</span><span class="o">&amp;</span><span class="n">_ExoProgram</span><span class="o">::</span><span class="n">add</span><span class="p">,</span><span class="w"> </span><span class="k">this</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">);</span>
+<span class="w">    </span><span class="n">async</span><span class="p">(</span><span class="o">&amp;</span><span class="n">_ExoProgram</span><span class="o">::</span><span class="n">add</span><span class="p">,</span><span class="w"> </span><span class="k">this</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">);</span>
 <span class="p">}</span>
 <span class="n">yield</span><span class="p">();</span>
 <span class="kt">var</span><span class="w"> </span><span class="n">total</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
-<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="k">auto</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">co_run_results</span><span class="p">())</span>
+<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="k">auto</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">async_results</span><span class="p">())</span>
 <span class="w">    </span><span class="n">total</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">result</span><span class="p">.</span><span class="nf">data</span><span class="p">;</span>
 <span class="n">assert</span><span class="p">(</span><span class="n">total</span><span class="w"> </span><span class="ow">eq</span><span class="w"> </span><span class="mi">5250</span><span class="p">);</span>
 </pre>
@@ -8787,11 +8871,11 @@ Optional prefix of "1/" or "/" causes the reciprocal of the number to be used. e
 		<td></td>
 		<td>
 			<p>
-				<code>set_run_result(var data, var message = "")</code></p></td>
+				<code>set_async_result(var data, var message = "")</code></p></td>
 		<td>
-			<p>Set a co_run result.</p>
-			<p>Callable in an async function to provide output collectible by co_run_results().</p>
-			<p>See co_run for an example.</p>
+			<p>Set a async result.</p>
+			<p>Callable in an async function to provide output collectible by async_results().</p>
+			<p>See async for an example.</p>
 		</td></tr>
 	<tr>
 		<td>
@@ -8799,11 +8883,11 @@ Optional prefix of "1/" or "/" causes the reciprocal of the number to be used. e
 				<code>var=</code></p></td>
 		<td>
 			<p>
-				<code>co_run_count()</code></p></td>
+				<code>async_count()</code></p></td>
 		<td>
-			<p>Get the number of co_runs pending.</p>
-			<p>Not required if you use co_run_results to collect results.</p>
-			<p>Calling co_run increases the number and co_run_results reduces the number.</p>
+			<p>Get the number of asyncs pending.</p>
+			<p>Not required if you use async_results to collect results.</p>
+			<p>Calling async increases the number and async_results reduces the number.</p>
 		</td></tr>
 </table>
 

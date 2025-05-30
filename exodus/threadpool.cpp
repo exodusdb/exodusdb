@@ -74,8 +74,12 @@ ThreadPool::~ThreadPool() {
 	for (auto& worker : workers) {
 		if (worker.joinable()) {
 			LOG << "~Threadpool: Detaching worker." << std::endl;
-			worker.detach();
-//			worker.join();
+			// compile with many threads usually errors out with 
+			//malloc_consolidate(): unaligned fastbin chunk detected
+			//./compall: line 52: 1107964 Segmentation fault      (core dumped) compile alt exo srv dic {S${COMPILER_OPTIONS}}
+			//make: *** [Makefile:2: comp] Error 139
+//			worker.detach();
+			worker.join();
 			LOG << "~Threadpool: Detached  worker." << std::endl;
 		}
 	}

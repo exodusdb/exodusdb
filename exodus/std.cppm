@@ -32,6 +32,9 @@ export namespace __gnu_cxx {
 
 export namespace std {
 
+	using std::raise;
+	using std::rethrow_exception;
+
 	using std::__invoke;
 	using std::apply;
 	using std::invoke;

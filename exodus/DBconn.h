@@ -32,7 +32,7 @@ class DBconn {
 public:
 	// Constructors
 	explicit DBconn();
-	DBconn(PGconn* pgconn, std::string conninfo);
+	DBconn(PGconn* pgconn, std::string conninfo, int dbconn_no);
 
 	// Destructor
 	~DBconn();
@@ -56,6 +56,7 @@ public:
 	bool in_transaction_ = false;
 
 	FiberMutex mutex_;
+	int dbconn_no_ = 0;
 
 };
 

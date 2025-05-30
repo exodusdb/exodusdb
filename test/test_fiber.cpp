@@ -4,12 +4,12 @@
 programinit()
 
 func echo(const var& value) {
-	set_run_result(value, "echo");
+	set_async_result(value, "echo");
 	return 0;
 }
 
 func add(const var& value1, const var& value2) {
-	set_run_result(value1 + value2, "add");
+	set_async_result(value1 + value2, "add");
 	return 0;
 }
 
@@ -22,9 +22,9 @@ function main() {
 	var t1 = ostimestamp();
 	for (var i : range(1, N1)) {
 
-		co_run(&_ExoProgram::echo, this, i);
+		async(&_ExoProgram::echo, this, i);
 
-		co_run(&_ExoProgram::add , this, i, i);
+		async(&_ExoProgram::add , this, i, i);
 
 	}
 
@@ -36,10 +36,10 @@ function main() {
 	// 2. Iterate over completed fiber results
 	//////////////////////////////////////////
 	var t3 = ostimestamp();
-	var n_co_run = 0;
+	var n_async = 0;
 	var total1 = 0;
 	var total2 = 0;
-	for (auto& result [[maybe_unused]] : co_run_results()) {
+	for (auto& result [[maybe_unused]] : async_results()) {
 		if (result.message.starts("e"))
 			total1 += result.data;
 		else if (result.message.starts("a"))
@@ -48,22 +48,22 @@ function main() {
 			result.message.errputl("result.message=");
 			assert(false && "message should be echo or add");
 		}
-		n_co_run ++;
+		n_async ++;
 	}
 
-	var t4 = (ostimestamp() - t3) / n_co_run;
+	var t4 = (ostimestamp() - t3) / n_async;
 	printl(elapsedtimetext(0, t4));
 
-	assert(n_co_run.errputl("n_co_run=") eq 20000);
+	assert(n_async.errputl("n_async=") eq 20000);
 	assert(total1.errputl("total1=") eq 50005000);
 	assert(total2.errputl("total2=") eq 100010000);
 
 	{
 		for (var i : range(1, 100))
-			co_run(&_ExoProgram::add2, this, i, 2);
+			async(&_ExoProgram::add2, this, i, 2);
 		yield();
 		var total = 0;
-		for (auto result : co_run_results())
+		for (auto result : async_results())
 		total += result.data;
 		assert(total eq 5250);
 	}
@@ -76,7 +76,7 @@ function main() {
 }
 
 func add2(in a, in b) {
-	set_run_result(a + b, "add2");
+	set_async_result(a + b, "add2");
 	return "";
 }
 
