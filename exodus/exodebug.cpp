@@ -45,6 +45,7 @@ THE SOFTWARE.
 #if TRACING
 #	include <boost/stacktrace.hpp>
 #endif
+//#include <backward.hpp>
 
 #include <exodus/var.h>
 #include <exodus/exoimpl.h>
@@ -105,6 +106,55 @@ static void addbacktraceline(in frameno, in sourcefilename, in lineno, io return
 	return;
 }
 
+var summarise_gdb_bt(in osfilename) {
+
+	var result = "";
+	var currthreadno = "";
+	var currthreadtitle = "";
+	var txt;
+	if (not txt.osread(osfilename))
+		return "";
+	txt.converter(NL, FM);
+	for (var line : txt) {
+//			TRACE(line);
+		if (line.starts("Thread ")) {
+			let threadno = line.field(" ", 2);
+			if (threadno > 1 or currthreadno)
+				currthreadtitle = line.field(" ", 1, 2);
+			currthreadno = threadno;
+		}
+		if (line.starts("#")) {
+
+			// #12 _ExoProgram::main3 (this=this@entry=0x7ffc342fdb00,
+			//  call_id=..., N=..., mode=...) at /root/exodus/exodus/t1.cpp:75
+			if (not line.trim().field(" ", 2).contains("_ExoProgram"))
+				continue;
+
+			var srcfileline = line.field(" ", -1);
+			var srcfileline2 = srcfileline.field("/", -2, 2);
+//				if (srcfileline2.starts("exodus/"))
+//					continue;
+//				TRACE(srcfileline)
+			if (srcfileline.field("/", -1).count(":") == 1) {
+				var src;
+				if (not src.osread(srcfileline.field(":",1)))
+					continue;
+				src = src.field(NL, srcfileline.field(":",2));
+				line = line.field(" ", 1) ^ " " ^ srcfileline2 ^ "\t" ^ src.trimboth(" \t");
+				if (currthreadtitle) {
+					// Thread 1 is usually last.
+					// and we dont output it unless other threads already output.
+					currthreadtitle.logputl();
+					currthreadtitle = "";
+				}
+				result.appender(line, _NL);
+			}
+		}
+	}
+	result.popper();
+	return result;
+}
+
 ////////////////////////////////////////////////////////////////////
 //// Reserve space for snapshot of stack taken on every mv exception
 ////////////////////////////////////////////////////////////////////
@@ -115,13 +165,136 @@ static void addbacktraceline(in frameno, in sourcefilename, in lineno, io return
 //	thread_local std::size_t thread_stack_size = 0;
 //}
 
-// Capture the current stack addresses for later decoding
-void exo_savestack(void* stack_addresses[BACKTRACE_MAXADDRESSES], std::size_t* stack_size) {
+//// Capture the current stack addresses for later decoding
+//void exo_savestack(void* stack_addresses[BACKTRACE_MAXADDRESSES], std::size_t* stack_size) {
+//	*stack_size = ::backtrace(stack_addresses, BACKTRACE_MAXADDRESSES);
+//#if TRACING
+//	std::cout << boost::stacktrace::stacktrace();
+//#endif
+//}
+
+// Capture the current stack addresses for later decoding.
+// false indicates that gdb is available but already attached and caller can throw to get into gdb.
+// We always get the basic stack and gdb is to get accurate backtrace in backtrace.$pid.log
+bool exo_savestack(void* stack_addresses[BACKTRACE_MAXADDRESSES], std::size_t* stack_size) {
+
+	// Always get the basic stack because it is quick
+	// but is it not very accurate inside threads and fibers
 	*stack_size = ::backtrace(stack_addresses, BACKTRACE_MAXADDRESSES);
+
+	// EXO_DEBUG=0 to suppress using gdb for backtracing.
+	// Speeds up testing various VarError conditions which use try/catch and dont need backtracing.
+	var exo_debug;
+	if (exo_debug.osgetenv("EXO_DEBUG") and not exo_debug)
+		return true;
+
+#if TRACING
+	std::cerr << "Attaching GDB to PID: " << getpid() << "\n";
+#endif
+	std::string pid = std::to_string(getpid());
+
+//	std::string gdb_cmd = "gdb -batch -p " + pid + " -ex 'thread apply all bt full' -ex 'detach' -ex 'quit' > backtrace." + pid + ".log 2>/dev/null";
+
+	// Get all thread info because there is no gdb command to switch to thread (LWP) by LWP id.
+	var gdb_cmds = " -ex 'thread apply all bt' -ex 'detach' -ex 'quit'";
+	var gdb_cmd = "gdb -batch -p " ^ pid ^ gdb_cmds ^ " > backtrace." ^ pid ^ ".log 2>/dev/null < /dev/null";
+
+	if (system(gdb_cmd.c_str()) != 0) {
+		// gdb not installed. Rely on ::backtrace above which isnt very accurate in threads or fibers.
+		return true;
+	}
+//	if (not gdb_cmd.osshell()) {
+//		var::lasterror().logputl();
+//		return true;
+//	}
+
+	var txt;
+	let logfilename = "backtrace." ^ var::ospid() ^ ".log";
+	if (not txt.osread(logfilename)) {
+		// gdb not installed. Rely on ::backtrace above which isnt very accurate in threads or fibers.
+//		std::cerr << "Could not attach gdb" << std::endl;
+		return true;
+	}
+
+	// If running under gdb or gdb already attached then we cannot attach again.
+	if (not txt.contains("#0")) {
+		std::clog << "gdb is already attached to pid " << var::ospid() << ". Search backtrace starting ExoProgram." << std::endl;
+		// Could not attach to process.  If your uid matches the uid of the target
+		// process, check the setting of /proc/sys/kernel/yama/ptrace_scope, or try
+		// again as the root user.  For more details, see /etc/sysctl.d/10-ptrace.conf
+		return false;
+	}
+
+	std::cerr << "----- gdb " << logfilename << " -----" << std::endl;
+
+	// EXO_DEBUG=1 signifies desire to break into gdb.
+	// instead being caught by program or perform/execute/run exception handlers
+	// EXO_DEBUG=1 used to signify running under gdb
+	// but now we can detect that automatically by an inability to attach dynamically.
+	// TODO Move to VarError handler?
+	if (not exo_debug.empty()) {
+		// EXO_DEBUG=0 to suppress using it for backtracing. Speeds up testing various VarError conditions.
+		if (exo_debug) {
+
+			// Display filtered backtrace
+			summarise_gdb_bt(logfilename).logputl();
+
+			std::cerr << var("-").str(logfilename.len() + 16) << std::endl;
+
+			// Patch .gdbinit to suppress long list of system file symbol loading
+			var gdbinit;
+			bool gdbinit_update = false;
+			if (gdbinit.osread("~/.gdbinit")) {
+				if (not gdbinit.contains("symbol-loading")) {
+					gdbinit ^=
+						"\n"
+						"# Suppress long list when auto-attaching to gdb in new version of Exodus.\n"
+						"set print symbol-loading off\n"
+					;
+					gdbinit_update = true;
+				}
+				if (not gdbinit.contains("debuginfod")) {
+					gdbinit ^=
+						"\n"
+						"# Suppress long list when auto-attaching to gdb in new version of Exodus.\n"
+						"set debuginfod enabled off\n"
+					;
+					gdbinit_update = true;
+				}
+				if (gdbinit_update and gdbinit.oswrite("~/.gdbinit"))
+					var("~/.gdbinit updated.").logputl();
+			}
+
+			// Search backtrace for lines starting _ExoProgram
+			var("Search backtrace for lines starting _ExoProgram.").logputl();
+			let cmd1 = "gdb -q -p " ^ var::ospid() ^ " -ex 'bt' -ex 'detach' -ex 'quit' 2> /dev/null | grep -P '^#[0-9]+\\s+_ExoProgram'";
+			system(cmd1);
+
+			// Attach gdb interactively
+			let cmd = "gdb -q -p " ^ var::ospid();
+			cmd.logputl();
+			if (system(cmd) == 0) {
+				// gdb use completed.
+			} else {
+				// gdb not installed or already attached?
+			}
+
+		} else {
+			// No gdb but use ::backtrace stack addresses captured above
+			return true;
+		}
+	}
+
+//	else
+//		std::cerr << "Backtrace saved to backtrace.log\n";
+
 #if TRACING
 	std::cout << boost::stacktrace::stacktrace();
 #endif
+	return true;
 }
+
+//}
 
 ////////////////////////////////////////////////////////////////////
 // Given stack addresses, get the source file, line no and line text
@@ -129,11 +302,13 @@ void exo_savestack(void* stack_addresses[BACKTRACE_MAXADDRESSES], std::size_t* s
 // http://www.delorie.com/gnu/docs/glibc/libc_665.html
 var exo_backtrace(void* stack_addresses[BACKTRACE_MAXADDRESSES], std::size_t stack_size, std::size_t limit) {
 
-	var returnlines = "";
+	// Utilise gdb backtrace.$pid.log if available
+	var returnlines = summarise_gdb_bt("backtrace." ^ var::ospid() ^ ".log");
+	if (returnlines)
+		return returnlines;
+
 	std::size_t nlines = 0;
 	var mangled_addresses = "";
-
-	//var("backtrace()").errputl();
 
 	let internaladdresses = "";
 
