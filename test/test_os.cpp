@@ -546,6 +546,58 @@ func main() {
 		assert(osread(file).outputl() == "var:" ^ file ^ ", a double:123.457,  an int:123\n");
 	}
 
+	{
+		// Test ability to convert leading ~/ to $HOME/
+
+		let osfilename1 = "~/xx";
+		let osfilename2 = osgetenv("HOME") ^ "/xx";
+		DATA = "x";
+
+		// Check oswrite
+		assert(oswrite(DATA on osfilename1));
+
+		// Check osinfo
+		assert(osinfo(osfilename2).f(1) eq 1);
+		assert(osinfo(osfilename1).f(1) eq 1);
+
+		// Check oslist
+		assert(oslist(osfilename1 ^ "*") eq "xx");
+		assert(oslist(osfilename2 ^ "*") eq "xx");
+
+		// Check osread
+		assert(osread(DATA from osfilename1) and DATA eq "x");
+
+		// Check osopen
+		var osfile1;
+		assert (osopen(osfilename1 to osfile1));
+
+		// Check osbwrite
+		var offset = 0;
+		assert(osbwrite("abc" from osfile1, offset));
+		offset = 1;
+		assert(osbread(DATA from osfile1, offset, 1));
+		assert(DATA eq "b");
+
+		// Check osremove
+		assert(osremove(osfilename1));
+		assert(not osinfo(osfilename1));
+		assert(not osinfo(osfilename2));
+
+		// mkdir
+		var temp_subdir = "~/" ^ rnd(9999999);
+		assert(osmkdir(temp_subdir));
+
+		// Check cwd
+		var cwd = oscwd();
+		assert(oscwd(temp_subdir));
+		assert(oscwd(cwd));
+
+		// Check rmdir
+		assert(osrmdir(temp_subdir));
+	//	assert(osshell("rmdir " ^ temp_subdir));
+
+	}
+
 	printl(elapsedtimetext());
 	printl("Test passed");
 

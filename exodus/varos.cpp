@@ -176,8 +176,23 @@ static bool checknotabsoluterootfolder(std::string dirpath) {
 	return true;
 }
 
-static const std::string to_path_string(in str1) {
-	return str1.toString();
+// Only substitutes initial ~/ with $HOME/
+static const std::string to_path_string(in path) {
+	//	return str1.toString();
+	if (path.empty() or not path.starts("~/"))
+		return path;
+
+	// static;
+	var temp;
+	static thread_local std::string home = temp.osgetenv("HOME") ? temp.normalize() : "";
+
+	// For security home dir must be simple and absolute
+	if (home.empty() or not home.starts_with("/") or home.contains("..")) {
+		("varos: " ^ var(home).squote() ^ " HOME dir must be simple and absolute.").logputl();
+		return path;
+	}
+
+	return home ^ path.c_str() + 1;
 }
 
 static const std::string to_oscmd_string(in cmd) {
@@ -454,13 +469,16 @@ bool var::osopen(in osfilename, const bool utf8 /*=true*/) const {
 	if (THIS_IS_OSFILE())
 		this->osclose();
 
-	return this->osopenx(osfilename, utf8, /*autocreate_or_throw*/ false) != nullptr;
+	const var osfilename2 = to_path_string(osfilename);
+
+	return this->osopenx(osfilename2, utf8, /*autocreate_or_throw*/ false) != nullptr;
 }
 
 static void del_fstream(void* handle) {
 	delete static_cast<std::fstream*>(handle);
 }
 
+// osfilename must be clean.
 std::fstream* var::osopenx(in osfilename, const bool utf8, const bool autocreate_or_throw) const {
 
 	// Try to get the cached file handle. the usual case is that you osopen a file before doing
@@ -554,7 +572,7 @@ std::fstream* var::osopenx(in osfilename, const bool utf8, const bool autocreate
 	fs_nrvo = fs.release();
 
 	// Cache
-	// 1. var_str <- osfilename
+	// 1. var_str <- osfilename2
 	// 2. var_int <- the exodus os file cache handle no
 	// 3. var_dbl <- the utf8 flag
 	var_str = osfilename.var_str;
@@ -564,7 +582,7 @@ std::fstream* var::osopenx(in osfilename, const bool utf8, const bool autocreate
 
 	// VARTYP_OSFILE
 	// VARTYP_NAN is set to prevent isnum trashing var_int or var_dbl
-	// in the possible case that the osfilename a number
+	// in the possible case that the osfilename2 a number
 	var_typ = VARTYP_NANSTR_OSFILE;
 
 	return fs_nrvo;
@@ -620,6 +638,7 @@ WINDOWS-1258
 //	return osread(to_path_string(osfilename).c_str(), codepage);
 // }
 //
+
 bool var::osread(const char* osfilename, const char* codepage) {
 
 	THISIS("bool var::osread(const char* osfilename, const char* codepage")
@@ -629,21 +648,23 @@ bool var::osread(const char* osfilename, const char* codepage) {
 	var_str.clear();
 	var_typ = VARTYP_STR;
 
+	const var osfilename2 = to_path_string(osfilename);
+
 	// get a file structure
 	std::ifstream myfile;
 
 	// Check if the file exists and is a regular file
-	if (!std::filesystem::is_regular_file(osfilename)) {
-		//        std::cout << "Error: File '" << osfilename << "' does not exist.\n";
-		var::setlasterror("osread failed. " ^ var(osfilename).quote() ^ " does not exist, or cannot be accessed, or is not a regular file.");
+	if (!std::filesystem::is_regular_file(osfilename2.c_str())) {
+		//        std::cout << "Error: File '" << osfilename2 << "' does not exist.\n";
+		var::setlasterror("osread failed. " ^ var(osfilename2).quote() ^ " does not exist, or cannot be accessed, or is not a regular file.");
 		return false;
 	}
 
 	// open in binary (and position "at end" to find the file size with tellg)
 	// TODO check myfile.close() on all exit paths or setup an object to do that
-	myfile.open(osfilename, std::ios::binary | std::ios::in | std::ios::ate);
+	myfile.open(osfilename2.c_str(), std::ios::binary | std::ios::in | std::ios::ate);
 	if (!myfile) {
-		var::setlasterror("osread failed. " ^ var(osfilename).quote() ^ " does not exist or cannot be accessed.");
+		var::setlasterror("osread failed. " ^ var(osfilename2).quote() ^ " does not exist or cannot be accessed.");
 		return false;
 	}
 
@@ -659,8 +680,8 @@ bool var::osread(const char* osfilename, const char* codepage) {
 
 	// if empty file then done ok
 	if (bytesize == 0) {
-		// TRACE(var(osfilename) ^ " bytesize:" ^ var(bytesize) ^ " dir:" ^ var(osfilename).osfile())
-		// TRACE(var("ls -l " ^ var(osfilename)).osshell())
+		// TRACE(var(osfilename2) ^ " bytesize:" ^ var(bytesize) ^ " dir:" ^ var(osfilename2).osfile())
+		// TRACE(var("ls -l " ^ var(osfilename2)).osshell())
 		myfile.close();
 		return true;
 	}
@@ -676,7 +697,7 @@ bool var::osread(const char* osfilename, const char* codepage) {
 	} catch (std::bad_alloc& ex) {
 		myfile.close();
 		throw VarOutOfMemory("Could not obtain " ^ var(bytesize * sizeof(char)) ^
-							 " bytes of memory to read " ^ var(osfilename) ^ " - " ^ ex.what());
+							 " bytes of memory to read " ^ var(osfilename2) ^ " - " ^ ex.what());
 	}
 
 	// read the file into the reserved memory block
@@ -697,7 +718,7 @@ bool var::osread(const char* osfilename, const char* codepage) {
 
 	// failure can indicate that we didnt get as many characters as requested
 	if (failed && !bytesize) {
-		var::setlasterror("osread failed. " ^ var(osfilename).quote() ^ " 0 bytes read.");
+		var::setlasterror("osread failed. " ^ var(osfilename2).quote() ^ " 0 bytes read.");
 		return false;
 	}
 
@@ -814,15 +835,17 @@ bool var::oswrite(in osfilename, const char* codepage) const {
 	assertString(function_sig);
 	ISSTRING(osfilename)
 
+	const var osfilename2 = to_path_string(osfilename);
+
 	// A file structure
 	std::ofstream myfile;
 
 	// Truncate any previous file,
 	// TODO check myfile.close() on all exit paths or setup an object to do that
-	myfile.open(to_path_string(osfilename).c_str(),
+	myfile.open(to_path_string(osfilename2).c_str(),
 				std::ios::trunc | std::ios::out | std::ios::binary);
 	if (!myfile) {
-		var::setlasterror("oswrite failed. " ^ osfilename.quote() ^ " cannot be opened for output.");
+		var::setlasterror("oswrite failed. " ^ osfilename2.quote() ^ " cannot be opened for output.");
 		return false;
 	}
 
@@ -839,7 +862,7 @@ bool var::oswrite(in osfilename, const char* codepage) const {
 	bool failed = myfile.fail();
 
 	if (failed)
-		var::setlasterror("oswrite failed. " ^ osfilename.quote() ^ " Unknown reason.");
+		var::setlasterror("oswrite failed. " ^ osfilename2.quote() ^ " Unknown reason.");
 
 	return !failed;
 }
@@ -1193,17 +1216,22 @@ bool var::osmove(in new_dirpath_or_filepath) const {
 
 bool var::osremove() const {
 
-	assertVar(__PRETTY_FUNCTION__);
-	this->osclose();  // in case this is cached opened file handle
+	THISIS("bool var::osremove() const")
+	assertVar(function_sig);
+
+	// In case this is cached opened file handle
+	this->osclose();
+
+	const std::string filename2 = to_path_string(*this);
 
 	// Prevent removal of dirs. Use osrmdir for that.
-	if (std::filesystem::is_directory(this->toString())) {
-		var::setlasterror(this->quote() ^ " osremove failed - is a directory.");
+	if (std::filesystem::is_directory(filename2)) {
+		var::setlasterror(var(filename2).quote() ^ " osremove failed - is a directory.");
 		return false;
 	}
 
-	if (std::remove(to_path_string(*this).c_str())) {
-		var::setlasterror(this->quote() ^ " failed to osremove");
+	if (std::remove(filename2.c_str())) {
+		var::setlasterror(var(filename2).quote() ^ " failed to osremove");
 		return false;
 	}
 	return true;
@@ -1479,11 +1507,18 @@ bool var::oscwd(SV newpath) {
 
 	THISIS("bool var::oscwd(SV newpath) static")
 
+    const std::string newpath2 = to_path_string(newpath);
+
 	try {
-		std::filesystem::current_path(newpath);
+		std::filesystem::current_path(newpath2);
+
+	} catch (std::exception e) {
+		var(e.what()).errputl();
+		var::setlasterror(var(newpath2).quote() ^ " oscwd failed. " ^ e.what());
+		return false;
 	} catch (...) {
 		// ignore all errors
-		var::setlasterror(var(newpath).quote() ^ " oscwd failed - unknown cause.");
+		var::setlasterror(var(newpath2).quote() ^ " oscwd failed - unknown cause.");
 		return false;
 	}
 
