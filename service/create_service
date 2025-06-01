@@ -120,8 +120,8 @@ set -euxo pipefail
 		Environment="EXO_HOME=$EXO_HOME"
 		Environment="EXO_DATA=$IDB_CODE"
 		Environment="EXO_DICT=$DICTDB"
-		Environment="PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:$EXO_HOME/bin"
-		Environment="LD_LIBRARY_PATH=$EXO_HOME/lib"
+		Environment="PATH=/usr/local/live/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:$EXO_HOME/bin"
+		Environment="LD_LIBRARY_PATH=/usr/local/live/lib:$EXO_HOME/lib"
 		Environment="EXO_STARTED_BY_SYSTEMD=true"
 		Environment="EXO_SERVICE_CODE=$SERVICE_CODE@%i"
 		ExecStart=$SERVICE_BIN $SERVICE_CMD $IDB_CODES
@@ -195,5 +195,7 @@ V0G0N
 : serve_agy
 :
 : tail /var/log/syslog -f
+:
+: Manual systemctl daemon-reload may be required if not automatic.
 :
 : service $FULL_SERVICE_CODE status || true

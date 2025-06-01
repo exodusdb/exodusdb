@@ -1,10 +1,10 @@
 #!/bin/bash
 set -euxo pipefail
 
-: =================================================
+: ============================================================
 #: Copy all EXODUS dictionaries and programs to live
-: Copy all EXODUS programs to live
-: =================================================
+: Copy all EXODUS programs to live. User and system installed.
+: ============================================================
 :
 : 'Syntax is ./copyall [CONFIRM]'
 :
@@ -16,8 +16,8 @@ set -euxo pipefail
 : EXODUS installed in
 : ===================
 
-	EXODUS=~/exodus
-
+	EXO_HOME=${EXO_HOME:-$HOME}
+	EXO_INSTALL_DIR=/usr/local
 :
 : Dry run or not
 : ==============
@@ -57,20 +57,28 @@ set -euxo pipefail
 : =============================================
 :
 : May be used for EXODUS environment variable "EXO_HOME"
+: and system environment variables $PATH and $LD_LIBRARY_PATH
 :
-	mkdir -p $HOME/live
+	mkdir -p $EXO_HOME/live
+	mkdir -p $EXO_INSTALL_DIR/live
 
 :
-: Copy all bin, lib and dat files to live
-: =======================================
+: Copy all $EXO_HOME bin, lib, dat and inc files to ~/live
+: ========================================================
 :
 :	MUST use 'whole file' option to ensure that the OS dlopen understands everything has changed
 :	otherwise new code may not become active and/or undefined behaviour i.e. crashes etc.
 :
-	#rsync -av ~/bin ~/lib ~/inc ~/live
-	#rsync -a ~/{bin,lib,inc} ~/live
-	#rsync -av --delete ~/{bin,lib} ~/live
-	rsync $DRYRUN -av --whole-file --delete ~/{bin,lib,dat,inc} ~/live
+	rsync $DRYRUN -av --whole-file --delete $HOME/{bin,lib,dat,inc} ~/live
+
+:
+: Copy $EXO_INSTALL_DIR bin, lib and inc files to /usr/local/live
+: ===============================================================
+:
+:	Note that ldconfig will not see or use /usr/local/live.
+:	We are relying on PATH and LD_LIBRARY_PATH configuration in the live service to use it.
+:
+	sudo rsync $DRYRUN -av --delete $EXO_INSTALL_DIR/{bin,lib,share,include} $EXO_INSTALL_DIR/live
 
 :
 : Finished $DRYRUN copying EXODUS programs to live in $(($SECONDS / 60)) minutes and $(($SECONDS % 60)) seconds.
@@ -82,9 +90,9 @@ set -euxo pipefail
 	if [[ -n "$DRYRUN" ]]; then
 		tput setaf 1
 :
-: =============================================================================
+: ==============================
 : DRYRUN - - no CONFIRM provided
-: =============================================================================
+: ==============================
 		tput sgr0
 	else
 :
@@ -95,5 +103,13 @@ set -euxo pipefail
 #	Only needed if sync_dat failed and need to force all
 #	touch ~/live/{bin,lib,dat,dat/*,dat/*/*}
 	touch ~/live/{bin,lib,dat}
+
+:
+: ==================================
+: Listing unconverted live services. If any then recreate any ONE service to fix all
+: ==================================
+:
+	grep PATH /etc/systemd/system/*_live@* | grep -v /usr/local/live || : None. All live services converted.
+
 	fi
 :
