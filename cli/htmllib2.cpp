@@ -1587,7 +1587,7 @@ function h2m_main(in all_input, out exit_status) {
 
 	// Convert tokens to man page format and output
 	// Runs even if parser fails
-	return var(h2m_convert_to_man(tokens, exit_status)).trim("\n") ^ "\n";
+	return h2m_convert_to_man(tokens, exit_status);
 
 }
 
@@ -1604,7 +1604,7 @@ struct ListState {
 // - Handles special cases (<li>, <a href>) dynamically
 // - Continues processing past unrecognized tags, logging errors to stderr
 // - Sets exit_status to 2 if conversion errors occur
-std::string h2m_convert_to_man(const std::vector<std::string>& tokens, out exit_status) {
+var h2m_convert_to_man(const std::vector<std::string>& tokens, out exit_status) {
 
 	std::stringstream ss_out;
 
@@ -1632,8 +1632,10 @@ std::string h2m_convert_to_man(const std::vector<std::string>& tokens, out exit_
 
 //        {"<p>",             "\n.br\n.in +0.5n\n"},        // Paragraph break with newline
 //        {"</p>",            "\n.in -0.5n\n"},             // End paragraph
-        {"<p>",             "\n.PP \\\"<p>\n"},        // Paragraph break with newline
-        {"</p>",            "\n.sp 1 \\\"</p>\n"},             // End paragraph
+//        {"<p>",             "\n.PP \\\"<p>\n"},        // Paragraph break with newline
+//        {"</p>",            "\n.sp 1 \\\"</p>\n"},             // End paragraph
+        {"<p>",             "\n.PP\n"},        // Paragraph break with newline
+        {"</p>",            "\n.sp 0\n"},             // End paragraph
 
 
         {"<br>",            "\n.br\n"},        // Line break with newline
@@ -1828,17 +1830,18 @@ std::string h2m_convert_to_man(const std::vector<std::string>& tokens, out exit_
 
             // Process text with troff escaping
             std::string escaped;
-            if (!in_code) {  // Escape troff special chars outside code blocks
+			// Allow "\xff\x00" in code
+//            if (!in_code) {  // Escape troff special chars outside code blocks
                 for (size_t j = j0; j < token.length(); ++j) {  // Index-based loop for compatibility
                     char c = token[j];
                     if (c == '.' && escaped.empty()) escaped += "\\&.";  // Escape leading dot
                     else if (c == '\\') escaped += "\\\\";              // Escape backslash
                     else escaped += c;                                  // Normal char
                 }
-            } else {
-                // No escaping in code blocks
-                escaped = token;
-            }
+//            } else {
+//                // No escaping in code blocks. Why?
+//                escaped = token;
+//            }
             // Output text with \& to prevent command interpretation (e.g., after periods)
 //            if (!in_code && !escaped.empty() && escaped.back() == '.') escaped += "\\&";
             ss_out << escaped;
@@ -1850,7 +1853,34 @@ std::string h2m_convert_to_man(const std::vector<std::string>& tokens, out exit_
         ss_out << "\n.br\n\\(dg " << i + 1 << ". " << footnotes[i] << "\n";
     }
 
-	return ss_out.str();
+	var vout = ss_out.str();
+
+	// Remove ".PP" before box chars.
+	vout.replacer("\\.PP\n([┌│├└])"_rex, "$1");
+
+	// Make sure .sp 1 -> .sp 0 after box chars.
+	vout.replacer("([┐│┤])\n\\.sp \\d"_rex,"$1\n.sp 0");
+
+	//.PP
+	//┌─────────┬─────────────┬──────────────────────────┬─────────────────────────┐
+	//.sp 0
+	//.PP
+	//│ Command │ Mechanism   │ Execution                │ Use Case                │
+	//.sp 0
+	//.PP
+	//├─────────┼─────────────┼──────────────────────────┼─────────────────────────┤
+	//.sp 0
+	//.PP
+	//│ async   │ Fiber       │ Cooperative, yield-based │ Lightweight async tasks │
+	//.sp 0
+	//.PP
+	//│ run     │ Thread pool │ Parallel, preemptive     │ Heavy parallel tasks    │
+	//.sp 0
+	//.PP
+	//└─────────┴─────────────┴──────────────────────────┴─────────────────────────┘
+	//.sp 0
+
+	return vout.trim("\n") ^ "\n";
 
 }
 
