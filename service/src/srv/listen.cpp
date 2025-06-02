@@ -207,7 +207,7 @@ var compcode;
 var logid;
 
 var nextconnection;
-let interactive_prompt = "(q)uit, e(x)ecute or (d)ebug:";
+let interactive_prompt = "(q)uit, e(x)ecute or (d)ebug:\nListening ...\r";
 
 func main() {
 
@@ -500,8 +500,10 @@ func main_init() {
 
 	// In init_main and loop_exit with commands
 	// q to quit, x to execute commands
-	if (isterminal(0))
-		outputl(interactive_prompt);
+	if (isterminal(0)) {
+ 		output(interactive_prompt);
+		osflush();
+	}
 
 	return true;
 
@@ -769,7 +771,8 @@ func loop_exit() {
 			outputl(" ignored.");
 
 			// In main and various places
-			outputl(interactive_prompt);
+			output(interactive_prompt);
+			osflush();
 
 			return true;
 		}
@@ -787,7 +790,7 @@ func loop_exit() {
 
 		// Command loop
 		for (;;) {
-
+			print(AT(-4));
 			if (not cmd.input("Command? ") || not cmd)
 				break;
 
@@ -850,9 +853,9 @@ func loop_exit() {
 		} // command loop
 
 		// In main and various places
-		outputl(interactive_prompt);
-
+		output(interactive_prompt);
 		osflush();
+
 		return true;
 	}
 
@@ -861,7 +864,8 @@ func loop_exit() {
 		debug();
 
 		// In main and various places
-		outputl(interactive_prompt);
+		output(interactive_prompt);
+		osflush();
 
 		return true;
 	}
