@@ -33,8 +33,8 @@
 
 #include "DBresult.h"
 #include "DBconn.h"
-#include "fiber_scheduler.h"
-#include "fiber_mutex.h"
+#include "task_scheduler.h"
+#include "task_mutex.h"
 #include "stream_ptr.h"
 
 // Logging macro with relative timestamp from program start
@@ -98,14 +98,14 @@ auto async_PQexec_impl(
 	thread_local bool scheduler_set = false;
 	if (!scheduler_set) {
 		LOG << "[Main] Setting scheduler on ioc: " << &io_context << std::endl;
-		boost::fibers::use_scheduling_algorithm<fiber_scheduler>(io_context);
+		boost::fibers::use_scheduling_algorithm<task_scheduler>(io_context);
 		scheduler_set = true;
 	}
 
 	// Lock the connection at least until we have obtained our PGresult.
 	// Stop other fibers from using the same PGconn simultaneously.
-	// FiberMutex is boost::fibers::mutex
-	std::lock_guard<FiberMutex> lock(conn.dbconn->mutex_);
+	// TaskMutex is boost::fibers::mutex
+	std::lock_guard<TaskMutex> lock(conn.dbconn->mutex_);
 
 	DBresult dbresult;
 
@@ -207,7 +207,7 @@ auto async_PQexec_impl(
 		//	remains valid until the async_wait callback runs.
 		// 2. TCP/IP errors are handled by PQflush (-1) or async_wait's error_code,
 		//	preventing premature loop exits.
-		// 3. Fiber scheduler does not destroy the fiber before future.get().
+		// 3. Task scheduler does not destroy the fiber before future.get().
 		// 4. No timeouts or early loop exits (e.g., break, return) are introduced.
 		// Review if: Loop cancellation (e.g., timeouts via stream->cancel()) or early
 		// exits are added, as shared_ptr may be needed to ensure promise lifetime.

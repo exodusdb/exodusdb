@@ -266,9 +266,9 @@ execute_process(
 		exoenv.cpp exofuncs.cpp
 
 		vardb_async.cpp
-		fiber_scheduler.cpp
-		fiber_mutex.cpp
-		fiber_manager.cpp
+		task_scheduler.cpp
+		task_mutex.cpp
+		task_manager.cpp
 
 		DBresult.cpp
 		DBconn.cpp
@@ -436,7 +436,7 @@ execute_process(
 				dim.h
 				job.h
 				job_manager.h
-				fiber_manager.h
+				task_manager.h
 				rex.h
 			DESTINATION include/exodus
 		)
@@ -475,7 +475,7 @@ execute_process(
 			exocallable.h
 			job.h
 			job_manager.h
-			fiber_manager.h
+			task_manager.h
 			threadpool.h
 			ioconv_custom.h
 			timebank.h

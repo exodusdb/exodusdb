@@ -25,7 +25,7 @@
 //#include <exodus/threadsafequeue.h>
 //#include <exodus/job.h>
 #include <exodus/job_manager.h>
-#include <exodus/fiber_manager.h>
+#include <exodus/task_manager.h>
 
 namespace exo {
 
@@ -43,7 +43,7 @@ using subr = void;
 //using ResultQueue = ThreadSafeQueue<ExoEnv>;
 
 //class ExoProgram
-class PUBLIC ExoProgram : public FiberManager, public JobManager {
+class PUBLIC ExoProgram : public TaskManager, public JobManager {
 
  private:
 

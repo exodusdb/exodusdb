@@ -326,7 +326,7 @@ func main() {
 					class_name = class_match.f(1, 2);
 					default_objname = class_name;
 //					if (class_name == "ExoProgram")
-					if (class_name.listed("ExoProgram,JobManager,FiberManager"))
+					if (class_name.listed("ExoProgram,JobManager,TaskManager"))
 						default_objname = "";
 				}
 				continue; // nextline

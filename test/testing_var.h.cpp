@@ -2511,7 +2511,7 @@ func main() {
 	}
 
 ////////////////
-// Code examples fiber_manager.h
+// Code examples task_manager.h
 ////////////////
 
 	printl("async(F&& funcname, Args&&... args)");

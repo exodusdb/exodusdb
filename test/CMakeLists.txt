@@ -84,7 +84,7 @@
 # Generate testing_var.h.cpp
 # ##########################
 
-	add_executable(testing_var_h testing_var.h.cpp ${SRC_EXODUS_DIR}/var.h ${SRC_EXODUS_DIR}/dim.h ${SRC_EXODUS_DIR}/exoprog.h ${SRC_EXODUS_DIR}/job_manager.h ${SRC_EXODUS_DIR}/fiber_manager.h)
+	add_executable(testing_var_h testing_var.h.cpp ${SRC_EXODUS_DIR}/var.h ${SRC_EXODUS_DIR}/dim.h ${SRC_EXODUS_DIR}/exoprog.h ${SRC_EXODUS_DIR}/job_manager.h ${SRC_EXODUS_DIR}/task_manager.h)
 	target_link_libraries(testing_var_h exodus ${PROJECT_LIBS})
 	if (EXO_MODULE)
 		target_link_libraries(
@@ -95,7 +95,7 @@
 
 	# Generate test/src/testing_var.h.cpp from var.h
 	add_custom_target(PreBuild_testing_var_h
-    	COMMAND test -x ${BIN_CLI_DIR}/gendoc && ${BIN_CLI_DIR}/gendoc ${PROJECT_SOURCE_DIR} ${SRC_EXODUS_DIR}/var.h ${SRC_EXODUS_DIR}/dim.h ${SRC_EXODUS_DIR}/exoprog.h ${SRC_EXODUS_DIR}/job_manager.h ${SRC_EXODUS_DIR}/fiber_manager.h > /dev/null || echo Skipped first build because gendoc not built yet
+    	COMMAND test -x ${BIN_CLI_DIR}/gendoc && ${BIN_CLI_DIR}/gendoc ${PROJECT_SOURCE_DIR} ${SRC_EXODUS_DIR}/var.h ${SRC_EXODUS_DIR}/dim.h ${SRC_EXODUS_DIR}/exoprog.h ${SRC_EXODUS_DIR}/job_manager.h ${SRC_EXODUS_DIR}/task_manager.h > /dev/null || echo Skipped first build because gendoc not built yet
     	COMMENT "Running pre-build command gendoc to create or update ${PROJECT_SOURCE_DIR} testing_var.h.cpp"
 		VERBATIM
 	)

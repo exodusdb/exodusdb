@@ -12,7 +12,7 @@
 
 #include <libpq-fe.h> // for PGconn
 
-#include "fiber_mutex.h"
+#include "task_mutex.h"
 #include "stream_ptr.h"
 
 namespace exo {
@@ -55,7 +55,7 @@ public:
 	std::string conninfo_;
 	bool in_transaction_ = false;
 
-	FiberMutex mutex_;
+	TaskMutex mutex_;
 	int dbconn_no_ = 0;
 
 };
