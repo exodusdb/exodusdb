@@ -1,25 +1,25 @@
-#ifndef FIBER_MUTEX_HPP
-#define FIBER_MUTEX_HPP
+#ifndef TASK_MUTEX_HPP
+#define TASK_MUTEX_HPP
 
 #include <memory> // For std::unique_ptr
 
 namespace exo {
 
 // No Boost headers included here to avoid slow compilation times.
-class FiberMutex {
+class TaskMutex {
 public:
-	FiberMutex();
-	~FiberMutex();
+	TaskMutex();
+	~TaskMutex();
 
 	// Mutexes are non-copyable.
 	// Delete copy and assign ctors.
-	FiberMutex(const FiberMutex&) = delete;
-	FiberMutex& operator=(const FiberMutex&) = delete;
+	TaskMutex(const TaskMutex&) = delete;
+	TaskMutex& operator=(const TaskMutex&) = delete;
 
 	// Move operations are allowed since we are only a ptr
 	// Unique_ptr provides the machinery.
-	FiberMutex(FiberMutex&&) noexcept = default;
-	FiberMutex& operator=(FiberMutex&&) noexcept = default;
+	TaskMutex(TaskMutex&&) noexcept = default;
+	TaskMutex& operator=(TaskMutex&&) noexcept = default;
 
 	// Allow usage like an actual mutex.
 	void lock();
@@ -33,4 +33,4 @@ private:
 
 } // namespace exo
 
-#endif // FIBER_MUTEX_HPP
+#endif // TASK_MUTEX_HPP

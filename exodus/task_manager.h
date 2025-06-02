@@ -1,5 +1,5 @@
-#ifndef FIBER_MANAGER_HPP
-#define FIBER_MANAGER_HPP
+#ifndef TASK_MANAGER_HPP
+#define TASK_MANAGER_HPP
 
 #ifdef EXO_MODULE
 	import std;
@@ -25,7 +25,7 @@ public:
 	var message;
 };
 
-class PUBLIC FiberManager {
+class PUBLIC TaskManager {
 
 	struct Impl;
 	std::unique_ptr<Impl> impl_;
@@ -35,45 +35,47 @@ class PUBLIC FiberManager {
 	void async_impl(std::function<void()> fn);
 
 public:
-	FiberManager();
-	~FiberManager();
+	TaskManager();
+	~TaskManager();
 
 	// Prevent copying
-	FiberManager(const FiberManager&) = delete;
-	FiberManager& operator=(const FiberManager&) = delete;
+	TaskManager(const TaskManager&) = delete;
+	TaskManager& operator=(const TaskManager&) = delete;
 
-	/////////////////////
-	/// Async functions :
-	/////////////////////
+	/////////////////
+	/// Async tasks :
+	/////////////////
 
 	// Templated constructor to accept any callable and its arguments.
 
-	// Call any function asynchronously.
-	// funcname: To call an Exodus program function the function name must be prefixed by "&_ExoProgram::" and followed by ", this" as follows:
+	// Create an independent asynchronous task by calling a function.
+	// funcname: Any callable function name. To call an Exodus program member function, it must be prefixed by "&_ExoProgram::" and followed by ", this" as follows:
 	// e.g. async(&_ExoProgram::xxxxxx, this, arg1, arg2, etc)
-	// Exodus' asynchronous functions run sequentially not simultaneously. Their execution will be interleaved with other async functions in the same thread of execution while database i/o is pending or when they call yield(). They are implicitly thread-safe but global state may be changed by other async functions.
-	// Exodus' asynchronous functions are implemented as fibers which are akin to threads but without parallel processing or OS management. They are extremely fast to setup and and switch between and have a normal stack. They might be called "coprocesses" by comparion with "coroutines" which do not have stacks.
-	// The initial state of an asynchronous function is "ready, not running". Once the main program calls yield() then one of the "ready, not running" async functions is selected by a round robin scheduler and it runs until complete, requests database i/o or yields, and so on.
+	// Exodus' asynchronous tasks run sequentially, not simultaneously. Their execution will be interleaved with other async tasks in the same thread of execution either whenever they ask for database i/o or when they call yield(). They are implicitly thread-safe but thread state (e.g RECORD/ID etc.) may be changed by other async tasks while yielded.
+	// Exodus' asynchronous tasks are implemented using Boost fibers. These are similar to threads but without parallel processing or OS management. They are extremely fast to setup and and switch between and have a normal stack. They might be called "coprocesses" by comparion with "coroutines" which do not have stacks.
+	// The initial state of an asynchronous task is "ready, not running". Once the main program calls yield() then one of the "ready, not running" async tasks is selected by a round robin scheduler and it runs until complete, requests database i/o, or yields, and so on.
+	// Asynchronous tasks may return results in a result queue by calling set_async_result(...) one or more times.
+	// Asynchronous tasks may share the default thread database connection but not concurrently so are better off with their own connection. Multiple asynchronous tasks with multiple concurrent database connections is ideally suited to async tasks.
 	//
 	// https://x.com/i/grok/share/N4zbWT3V2hb4qK71G0qT0togh
 	//
-	// * Concept * Aligns with the computer science concept of *cooperative multitasking*, where isolated execution contexts yield to a scheduler for interleaved execution.
+	// * Concept * "async" aligns with the computer science concept of *cooperative multitasking*, where isolated execution contexts yield to a scheduler for *interleaved*, not simultaneous, execution.
 	//
 	// * Concurrency * Interleaved execution of multiple tasks (with full stacks) within a *single thread*, not parallelism (simultaneous multi-CPU execution).
 	//
-	// * Full Stacks * Independent, full execution context sharing global state but with separate call stacks, resembling process-like entities but not OS processes. Not lightweight coroutines (e.g., Python’s 'async def' or generators) due to their lack of isolation or stacks.
+	// * Full Stacks * Independent, full execution context sharing global state but with separate call stacks, resembling process-like entities but not OS processes. Not lightweight coroutines (e.g., Python’s 'async def' or generators) due to their lack of isolation and stacks.
 	//
-	// * Yield * Each full stack can yield control explicitly to a scheduler, suspending its own execution and allowing another stack to run.
+	// * Yield * Each async task can yield control explicitly to a scheduler, suspending its own execution and allowing another stack to run.
 	//
 	// Scheduler:
 	//
-	//  * A *minimal, non-interrupt-driven* mechanism that uses a *loop* to scan full stacks and decide which to run next.
-	//  * Its sole role is to *pass control* (or "hand the baton") to the next stack, not to manage events (e.g., I/O, timers, or signals).
+	//  * A *minimal, non-interrupt-driven* mechanism that scans async full stacks and decide which to run next.
+	//  * Its sole role is to *pass control* (or "hand the baton") to the next task, not to manage events (e.g., I/O, timers, or signals).
 	//  * May optionally link to events if chosen, but this is not its primary function.
 	//
 	// * No OS * No OS-level process creation (e.g., no 'fork', 'spawn', or equivalents like Python’s 'multiprocessing').
 	//
-	// * No Threads * Multiple async functions share a *single thread*. Threads can have multiple async routines but not vice versa.
+	// * No Threads * Multiple async tasks share a *single thread*. Threads can have multiple async routines but not vice versa.
 	//
 	// * No Stackless Coroutines * Lightweight cooperative tasks (e.g., Python’s 'asyncio' coroutines or generators) are not considered full stacks
 	//
@@ -121,9 +123,9 @@ public:
 		async_impl(callable);
 	}
 
-	// Hand over execution to other fibers.
+	// Hand over execution to other async tasks.
 	// Execution can be suspended with full retention of stack and state.
-	// A round robin scheduler resumes fibers in turn or sleeps if all are waiting for database i/o.
+	// A round robin scheduler resumes async tasks in turn or sleeps if all are waiting for database i/o.
 	//
 	void yield() const;
 
@@ -138,7 +140,7 @@ public:
 
 	// Get the number of asyncs pending.
 	// Not required if you use async_results to collect results.
-	// Calling async increases the number and async_results reduces the number.
+	// Calling async() increases the number and calling async_results() reduces the number.
 	auto async_count() const -> var {return async_count_;}
 
 //    // Calls shutdown, dtor, ctor. Useful to start a new batch of jobs followed by async collection of all async_results.
@@ -148,4 +150,4 @@ public:
 
 } // namespace exo
 
-#endif
+#endif // TASK_MANAGER_H

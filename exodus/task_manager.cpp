@@ -8,8 +8,8 @@
 #	include <exodus/var.h>
 #endif
 
-#include "fiber_scheduler.h"
-#include "fiber_manager.h"
+#include "task_scheduler.h"
+#include "task_manager.h"
 
 #include <boost/fiber/all.hpp>
 
@@ -18,7 +18,7 @@
 
 namespace exo {
 
-struct FiberManager::Impl {
+struct TaskManager::Impl {
 	std::vector<boost::fibers::fiber> fibers;
 	boost::fibers::buffered_channel<std::shared_ptr<AsyncResult>> result_channel;
 	std::mutex mutex;
@@ -30,9 +30,9 @@ struct FiberManager::Impl {
 	}
 };
 
-FiberManager::FiberManager() : impl_(std::make_unique<Impl>()) {}
+TaskManager::TaskManager() : impl_(std::make_unique<Impl>()) {}
 
-FiberManager::~FiberManager() {
+TaskManager::~TaskManager() {
 	impl_->result_channel.close();
 	for (auto& fiber : impl_->fibers) {
 		if (fiber.joinable()) {
@@ -41,13 +41,13 @@ FiberManager::~FiberManager() {
 	}
 }
 
-void FiberManager::async_impl(std::function<void()> fn) {
+void TaskManager::async_impl(std::function<void()> fn) {
 	std::lock_guard<std::mutex> lock(impl_->mutex);
 	impl_->fibers.emplace_back([fn = std::move(fn), this]() {
 		LOG << "Running fiber." << std::endl;
 		try {
 			fn();
-			LOG << "Fiber completed." << std::endl;
+			LOG << "Task completed." << std::endl;
 
 			// Require fibers to push their own results
 			// impl_->result_channel.push(result_ptr);
@@ -59,7 +59,7 @@ void FiberManager::async_impl(std::function<void()> fn) {
 
 			// Queue a result
 			auto result_ptr = std::make_shared<AsyncResult>();
-			result_ptr->message = "Error: Fiber: " + e.message;
+			result_ptr->message = "Error: Task: " + e.message;
 			LOG << result_ptr->message << std::endl;
 			impl_->result_channel.push(result_ptr);
 
@@ -73,7 +73,7 @@ void FiberManager::async_impl(std::function<void()> fn) {
 
 			// Queue a result
 			auto result_ptr = std::make_shared<AsyncResult>();
-			result_ptr->message = "Error: Fiber: " + std::string(e.what());
+			result_ptr->message = "Error: Task: " + std::string(e.what());
 			std::cerr << result_ptr->message << std::endl;
 			impl_->result_channel.push(result_ptr);
 
@@ -84,24 +84,24 @@ void FiberManager::async_impl(std::function<void()> fn) {
 
 			// Queue a result
 			auto result_ptr = std::make_shared<AsyncResult>();
-			result_ptr->message = "Error: Fiber: Unknown.";
+			result_ptr->message = "Error: Task: Unknown.";
 			std::cerr << result_ptr->message << std::endl;
 			impl_->result_channel.push(result_ptr);
 
 			// Access the scheduler
 //			auto& sched = boost::fibers::context::active()->get_scheduler()->algorithm();
-//			auto* custom_sched = dynamic_cast<fiber_scheduler*>(&*sched);
+//			auto* custom_sched = dynamic_cast<task_scheduler*>(&*sched);
 		}
 
 		boost::this_fiber::yield();
 	});
 }
 
-void FiberManager::yield() const {
+void TaskManager::yield() const {
 	boost::this_fiber::yield();
 }
 
-void FiberManager::set_async_result(var data, var message) const {
+void TaskManager::set_async_result(var data, var message) const {
 	LOG << "set_async_result: " << std::endl;
 	auto result_ptr = std::make_shared<AsyncResult>();
 	result_ptr->data = std::move(data);
@@ -109,7 +109,7 @@ void FiberManager::set_async_result(var data, var message) const {
 	impl_->result_channel.push(result_ptr);
 }
 
-auto FiberManager::async_results() -> std::generator<AsyncResult&> {
+auto TaskManager::async_results() -> std::generator<AsyncResult&> {
 	LOG << "Expecting " << async_count_ << " results" << std::endl;
 	while (async_count_) {
 		async_count_--;
