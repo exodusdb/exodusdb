@@ -83,20 +83,20 @@ public:
 	//
 	// Comparable:
 	//
-	//  * Boost *  Boost Fibers are used to implement async in Exodus.
+	//  * Boost *  Boost Tasks are used to implement async tasks in Exodus.
 	//  * Go *     Goroutines have with a runtime scheduler loop (GOMAXPROCS=1), balancing scalability and ease.
 	//  * Java *   Project Loom: Continuations provide stackful coroutines, but require a custom single-threaded, non-interrupt-driven scheduler.
 	//  * Python * Stackless, a non-standard Python variant, has tasklets with a scheduler loop.
 	//  * Lua *    Stackful coroutines with a user-defined scheduler loop, offering simplicity and control.
-	//  * Ruby *   Native Fibers provide stackful coroutines with a user-defined, non-interrupt-driven scheduler loop.
+	//  * Ruby *   Native Tasks provide stackful coroutines with a user-defined, non-interrupt-driven scheduler loop.
 	//  * Erlang * Lightweight VM processes with BEAM’s scheduler loop, providing strong isolation.
 	//
-	// +---------.-------------.--------------------------.-------------------------+
-	// | Command | Mechanism   | Execution                | Use Case                |
-	// |---------|-------------|--------------------------|-------------------------|
-	// | async   | Fiber       | Cooperative, yield-based | Lightweight async tasks |
-	// | run     | Thread pool | Parallel, preemptive     | Heavy parallel tasks    |
-	// +---------.-------------.--------------------------.-------------------------+
+	// ┌─────────┬─────────────┬───────────────────────────┬─────────────────────────┬───────────────────────────┐
+	// │ Command │ Mechanism   │ Execution                 │ Use Case                │ Environment               │
+	// ├─────────┼─────────────┼───────────────────────────┼─────────────────────────┼───────────────────────────┤
+	// │ async   │ Fiber       │ Cooperative, i/o or yield │ Lightweight async tasks │ Shares parent environment │
+	// │ run     │ Thread pool │ Parallel, preemptive      │ Heavy parallel jobs     │ Private RECORD/ID etc.    │
+	// └─────────┴─────────────┴───────────────────────────┴─────────────────────────┴───────────────────────────┘
 	//
 	// `//func add(in a, in b) {
 	//  //    set_async_result(a + b);
