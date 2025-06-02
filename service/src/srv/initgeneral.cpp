@@ -1600,7 +1600,7 @@ adddatasetcodename:
 					loglasterror();
 			}
 
-			call log2("*chain to NET AUTO (" ^ SYSTEM.f(17) ^ ") INIT.GENERAL Quitting.", logtime);
+			call log2("*INITGENERAL chain to NET AUTO (" ^ SYSTEM.f(17) ^ ")", logtime);
 			chain("NET AUTO");
 		}
 	}
