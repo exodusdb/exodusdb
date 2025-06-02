@@ -250,7 +250,7 @@ Within transactions, lock requests for locks that have already been obtained alw
 
 #define DBTRACE_SELECT DBTRACE>1
 
-#define DBTRACE_CONN 0
+#define DBTRACE_CONN DBTRACE
 
 #define DEBUG_LOG_SQL0 if (DBTRACE) {\
 	std::clog << dbconn_ptr.dbconn->dbconn_no_ << ": SQL0 " << \
@@ -839,7 +839,7 @@ bool var::connect(in conninfo) {
 		if (this->assigned())
 			fullconninfo = *this;
 		isdefault = not fullconninfo;
-		if (DBTRACE_CONN) {
+		if (DBTRACE_CONN > 1) {
 			TRACE(isdefault)
 			TRACE(thread_default_data_dbconn_no)
 		}
@@ -856,8 +856,9 @@ bool var::connect(in conninfo) {
 	fullconninfo = build_conn_info(fullconninfo);
 
 	// Log the conninfo without password
-	if (DBTRACE_CONN) {
-		fullconninfo.replace(R"(password\s*=\s*\w*)"_rex, "password=**********").logputl("\nvar::connect( ) ");
+	if (DBTRACE_CONN > 1) {
+//		fullconninfo.replace(R"(password\s*=\s*\w*)"_rex, "password=**********").logputl("\nvar::connect( ) ");
+		fullconninfo.replace(R"(password\s*=\s*\w*)"_rex, "").logputl("\nvar::connect( ) ");
 	}
 
 	PGconn* pgconn;
@@ -905,7 +906,7 @@ bool var::connect(in conninfo) {
 
 	// Cache the new connection handle and get the cache index no (starting 1)
 	int dbconn_no = thread_dbpool.add_dbconn(pgconn, fullconninfo.var_str);
-	if (DBTRACE_CONN) {
+	if (DBTRACE_CONN > 1) {
 		TRACE(thread_default_data_dbconn_no)
 		TRACE(thread_default_dict_dbconn_no)
 	}
@@ -914,22 +915,22 @@ bool var::connect(in conninfo) {
 	if (not this->assigned())
 		(*this) = "";
 
-	this->updater(1,fullconninfo.field("dbname=", -1).field(" ", 1));
+	this->updater(1,fullconninfo.field("dbname=", 2).field(" ", 1));
 
 	this->updater(2, dbconn_no);
 	this->updater(3, dbconn_no);
 
-	if (DBTRACE_CONN) {
-		fullconninfo.replace(R"(password\s*=\s*\w*)"_rex, "password=**********").logputl("var::connect() OK ");
-		this->logput("var::connect() OK ");
-		std::clog << " " << pgconn << std::endl;
+	if (DBTRACE_CONN > 0) {
+//		fullconninfo.replace(R"(password\s*=\s*\w*)"_rex, "password=**********").logputl("var::connect() OK ");
+		this->f(1).logputl(this->f(2) ^ ": DBTR var::connect() OK ");
+//		std::clog << " " << pgconn << std::endl;
 	}
 
 	// Set default connection - ONLY IF THERE ISNT ONE ALREADY
 	if (isdefault and not thread_default_data_dbconn_no) {
 		thread_default_data_dbconn_no = dbconn_no;
-		if (DBTRACE_CONN) {
-			this->logputl("NEW DEFAULT DATA CONN " ^ var(dbconn_no) ^ " on ");
+		if (DBTRACE_CONN > 0) {
+			this->f(1).logputl(this->f(2) ^ ": DBTR NEW DEFAULT DATA CONN " ^ var(dbconn_no) ^ " on ");
 		}
 
 	}
@@ -1018,7 +1019,7 @@ void var::disconnect() {
 	assertVar(function_sig);
 //	assertString(function_sig);
 
-	if (DBTRACE>1 or DBTRACE_CONN)
+	if (DBTRACE>1 or DBTRACE_CONN > 0)
 		(this->assigned() ? *this : var("")).logputl("DBTR var::disconnect() ");
 
 	// Disconnect the specified connection or default data connection
@@ -1040,7 +1041,7 @@ void var::disconnect() {
 	// connect this is rather too smart but will probably do what people expect
 	if (dbconn_no == thread_default_data_dbconn_no) {
 		thread_default_data_dbconn_no = 0;
-		if (DBTRACE>1 or DBTRACE_CONN) {
+		if (DBTRACE>1 or DBTRACE_CONN > 0) {
 			var(dbconn_no).logputl("DBTR var::disconnect() DEFAULT CONN FOR DATA ");
 		}
 	}
@@ -1050,7 +1051,7 @@ void var::disconnect() {
 	// connect this is rather too smart but will probably do what people expect
 	if (dbconn_no == thread_default_dict_dbconn_no) {
 		thread_default_dict_dbconn_no = 0;
-		if (DBTRACE>1 or DBTRACE_CONN) {
+		if (DBTRACE>1 or DBTRACE_CONN > 0) {
 			var(dbconn_no).logputl("DBTR var::disconnect() DEFAULT CONN FOR DICT ");
 		}
 	}
