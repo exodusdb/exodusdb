@@ -674,7 +674,7 @@ static void SIGINT_handler(int sig [[maybe_unused]]) {
 //	VarError err("backtrace()");
 
 	// interact on a new line
-	fprintf(stderr, "SIGINT_handler\n");
+//	fprintf(stderr, "SIGINT_handler\n");
 
 	// Break straight into debugger via stack capture
 	var exo_debug;
@@ -691,7 +691,7 @@ static void SIGINT_handler(int sig [[maybe_unused]]) {
 
 	while (not exo_debug) {
 
-		fprintf(stderr, "SIGINT_handler loop\n");
+//		fprintf(stderr, "SIGINT_handler loop\n");
 		var cmd = "A";
 
 		if (var().isterminal()) {
