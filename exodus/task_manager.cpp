@@ -1,11 +1,14 @@
 #ifdef EXO_MODULE
 	import std;
 	import var;
+	import exoprog; // for ExoExit
 #	include <memory> // work around bug in std module that disallows "using std::make_shared;"
 #else
 #	include <vector>
 #	include <mutex>
+
 #	include <exodus/var.h>
+#	include <exodus/exoprog.h>
 #endif
 
 #include "task_scheduler.h"
@@ -51,6 +54,35 @@ void TaskManager::async_impl(std::function<void()> fn) {
 
 			// Require fibers to push their own results
 			// impl_->result_channel.push(result_ptr);
+
+		} catch (const ExoStop& e) {
+
+//			// Save exception for rethrowing in main fiber
+//			err_ptr = std::current_exception();
+//
+			// Queue a result
+			auto result_ptr = std::make_shared<AsyncResult>();
+			result_ptr->message = "Error: Task: " ^ e.message;
+			LOG << result_ptr->message << std::endl;
+			impl_->result_channel.push(result_ptr);
+
+//			std::rethrow_exception(err_ptr);
+//			var(e.stack()).convert(FM, "\n").errputl();
+
+//		} catch (const ExoAbort& e) {
+		} catch (const ExoExit& e) {
+
+			// Save exception for rethrowing in main fiber
+			err_ptr = std::current_exception();
+
+			// Queue a result
+			auto result_ptr = std::make_shared<AsyncResult>();
+			result_ptr->message = "ExoAbort: Task: " ^ e.message;
+			LOG << result_ptr->message << std::endl;
+			impl_->result_channel.push(result_ptr);
+
+//			std::rethrow_exception(err_ptr);
+//			var(e.stack()).convert(FM, "\n").errputl();
 
 		} catch (const VarError& e) {
 
