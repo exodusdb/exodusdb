@@ -22,7 +22,7 @@
 //   /*global vars, local functions*/
 //   };
 
-// Setting EXO_DEBUG=1 disables exception handling for easier debugging:
+// Setting EXO_DEBUG=1 causes automatic attachment of debugger in case of VarError
 //   env EXO_DEBUG=1 ./program
 //
 // SEE ALSO

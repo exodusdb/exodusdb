@@ -207,7 +207,7 @@ var compcode;
 var logid;
 
 var nextconnection;
-let interactive_prompt = "q to quit, x to execute commands";
+let interactive_prompt = "(q)uit, e(x)ecute or (d)ebug:";
 
 func main() {
 
@@ -744,12 +744,16 @@ func loop_exit() {
 	if (charx.contains(tt)) {
 		// leading space to avoid chars after ESC pressed being ANSI control sequences
 		tt.replacer(chr(27), "Esc");
-		call note("You have pressed the " ^ tt ^ " key to exit|press again to confirm|", "UB", buffer);
-		echo(0);
+//		call note("Press " ^ tt ^ " again to confirm|", "UB", buffer);
+//		echo(0);
+//		reply.inputn(1);
+//		reply.lcaser();
+//		echo(1);
+//		call note("", "DB", buffer);
+		output("Press " ^ tt ^ " again to confirm: ");
+		osflush();
 		reply.inputn(1);
-		reply.lcaser();
-		echo(1);
-		call note("", "DB", buffer);
+
 		if (reply == INTCONST.f(1)) {
 			// space to defeat ANSI control chars after pressing Esc
 			printx(" ");
@@ -757,8 +761,17 @@ func loop_exit() {
 			return false;
 		}
 		// "x"
-		if (reply == INTCONST.f(7)) {
+		if (reply == INTCONST.f(7) or reply.listed("x,d")) {
+			if (reply == "x")
+				outputl();
 			charx = reply;
+		} else {
+			outputl(" ignored.");
+
+			// In main and various places
+			outputl(interactive_prompt);
+
+			return true;
 		}
 	}
 
@@ -782,7 +795,7 @@ func loop_exit() {
 
 			// Check if something like ~/lib/libxxxxxxxx.so exists where xxxxxxxx is the first word of the command
 			if (not libinfo(cmd.field(" "))) {
-				errputl(cmd.field(" "), " does not exist. Only executable and performable lib commands are allowed.");
+				errputl(cmd.field(" "), " does not exist. Only perform'able lib commands are allowed.");
 
 			} else {
 				try {
@@ -836,10 +849,20 @@ func loop_exit() {
 
 		} // command loop
 
-		// In main and commands exit
+		// In main and various places
 		outputl(interactive_prompt);
 
 		osflush();
+		return true;
+	}
+
+	if (charx == "d") {
+		print("c to continue. ");
+		debug();
+
+		// In main and various places
+		outputl(interactive_prompt);
+
 		return true;
 	}
 

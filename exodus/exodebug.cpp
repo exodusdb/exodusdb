@@ -42,6 +42,8 @@ THE SOFTWARE.
 #	include <memory> // for make_unique
 #endif
 
+#include <termios.h>
+
 #if TRACING
 #	include <boost/stacktrace.hpp>
 #endif
@@ -284,10 +286,10 @@ bool exo_savestack(void* stack_addresses[BACKTRACE_MAXADDRESSES], std::size_t* s
 					var("~/.gdbinit updated.").logputl();
 			}
 
-			// Search backtrace for lines starting _ExoProgram
-			var("Search backtrace for lines starting _ExoProgram.").logputl();
-			let cmd1 = "gdb -q -p " ^ var::ospid() ^ " -ex 'bt' -ex 'detach' -ex 'quit' 2> /dev/null | grep -P '^#[0-9]+\\s+_ExoProgram'";
-			system(cmd1);
+//			// Search backtrace for lines starting _ExoProgram
+//			var("Search backtrace for lines starting _ExoProgram.").logputl();
+//			let cmd1 = "gdb -q -p " ^ var::ospid() ^ " -ex 'bt' -ex 'detach' -ex 'quit' 2> /dev/null | grep -P '^#[0-9]+\\s+_ExoProgram'";
+//			system(cmd1);
 
 			// Attach gdb interactively
 			let cmd = "gdb -q -p " ^ var::ospid();
@@ -307,9 +309,9 @@ bool exo_savestack(void* stack_addresses[BACKTRACE_MAXADDRESSES], std::size_t* s
 //	else
 //		std::cerr << "Backtrace saved to backtrace.log\n";
 
-#if TRACING
-	std::cout << boost::stacktrace::stacktrace();
-#endif
+//#if TRACING
+//	std::cout << boost::stacktrace::stacktrace();
+//#endif
 	return true;
 }
 
@@ -391,16 +393,16 @@ var exo_backtrace(void* stack_addresses[BACKTRACE_MAXADDRESSES], std::size_t sta
 			var objaddress = var(strings[frameno]).field("(", 2).field(")", 1);
 			//gdb --batch -ex "file /root/exodus/build/exodus/libexodus.so.24.07" -ex "list *(_ZN3exo13exo_savestackEPPvPm+0x12)"
 			//0x124992 is in exo::exo_savestack(void**, unsigned long*) (/root/exodus/exodus/exodebug.cpp:120).
-			//115     //      thread_local std::size_t thread_stack_size = 0;
-			//116     //}
+			//115	 //	  thread_local std::size_t thread_stack_size = 0;
+			//116	 //}
 			//117
-			//118     // Capture the current stack addresses for later decoding
-			//119     void exo_savestack(void* stack_addresses[BACKTRACE_MAXADDRESSES], std::size_t* stack_size) {
-			//120             *stack_size = ::backtrace(stack_addresses, BACKTRACE_MAXADDRESSES);
-			//121     #if TRACING
-			//122             std::cout << boost::stacktrace::stacktrace();
-			//123     #endif
-			//124     }
+			//118	 // Capture the current stack addresses for later decoding
+			//119	 void exo_savestack(void* stack_addresses[BACKTRACE_MAXADDRESSES], std::size_t* stack_size) {
+			//120			 *stack_size = ::backtrace(stack_addresses, BACKTRACE_MAXADDRESSES);
+			//121	 #if TRACING
+			//122			 std::cout << boost::stacktrace::stacktrace();
+			//123	 #endif
+			//124	 }
 			//07:52:45 root@de1:~/exodus/exodus#
 			var stdout;
 			var stderr;
@@ -451,8 +453,8 @@ var exo_backtrace(void* stack_addresses[BACKTRACE_MAXADDRESSES], std::size_t sta
 //#endif
 
 		// if (objfilename == objfilename.convert("/\\:",""))
-//TRACE(objfilename)      // "/root/exodus/build/exodus/libexodus/exodus/libexodus.so.24.07"
-//TRACE(objfilename)      // "/root/exodus/build/cli/src/gendoc"
+//TRACE(objfilename)	  // "/root/exodus/build/exodus/libexodus/exodus/libexodus.so.24.07"
+//TRACE(objfilename)	  // "/root/exodus/build/cli/src/gendoc"
 
 		if (not objfilename.osfile()) {
 			// loadable program
@@ -516,7 +518,7 @@ var exo_backtrace(void* stack_addresses[BACKTRACE_MAXADDRESSES], std::size_t sta
 			if (objdump_out.f(frameno2).contains(".cpp:")) {
 //				let nextline = objdump_out.f(frameno2);
 //				// Skip disassembly lines
-//				if (not nextline.match("    [0-9a-f]: ")) {
+//				if (not nextline.match("	[0-9a-f]: ")) {
 //					// Skip lines like "return 1;" since they seem to be spurious
 //					if (nextline.match("^\\s*return\\s*\\d+;"))
 //						break;
@@ -620,10 +622,47 @@ PUBLIC void breakon();
 //void SIGINT_handler(int sig) {
 static void SIGINT_handler(int sig [[maybe_unused]]) {
 
+	// Save stdin terminal attributes
+	// Probably not available if running as a service
+	struct termios oldtio, curtio;
+	bool has_oldtio = false;
+	if (tcgetattr(STDIN_FILENO, &oldtio) < 0) {
+		//EBADF - The filedes argument is not a valid file descriptor.
+		//ENOTTY - The filedes is not associated with a terminal.
+		//	  var("no std input").outputl();
+		//	  return false;
+	} else {
+		has_oldtio = true;
+//		nfds = 2;
+
+		//Make sure we exit cleanly
+		// memset(&sa, 0, sizeof(struct sigaction));
+		// sa.sa_handler = sighandler;
+		// sigaction(SIGINT, &sa, nullptr);
+		// sigaction(SIGQUIT, &sa, nullptr);
+		// sigaction(SIGTERM, &sa, nullptr);
+
+		//This is needed to be able to tcsetattr() after a hangup (Ctrl-C)
+		//see tcsetattr() on POSIX
+
+		// memset(&sa, 0, sizeof(struct sigaction));
+		// sa.sa_handler = SIG_IGN;
+		// sigaction(SIGTTOU, &sa, nullptr);
+
+		// Set stdin mode
+		// a) non-canonical (i.e. characterwise not linewise input)
+		// b) no-echo
+		// https://man7.org/linux/man-pages/man3/termios.3.html
+		//
+		tcgetattr(STDIN_FILENO, &curtio);
+		curtio.c_lflag |= (ICANON | ECHO);
+		tcsetattr(STDIN_FILENO, TCSANOW, &curtio);
+	}
+
 	// Ignore more of this signal - restore on exit
-	breakoff();
+//	breakoff();
 	// Faster/safer?
-	//signal(sig, SIG_IGN);
+	signal(sig, SIG_IGN);
 
 	// Hide input characters
 	//var().echo(true);
@@ -631,13 +670,28 @@ static void SIGINT_handler(int sig [[maybe_unused]]) {
 	// duplicated in init and B
 	// backtrace().convert(FM,"\n").errputl();
 
-	VarError err("backtrace()");
+	// Capture the current stack and trigger debugger
+//	VarError err("backtrace()");
 
 	// interact on a new line
-	fprintf(stderr, "\n");
+	fprintf(stderr, "SIGINT_handler\n");
 
-	while (true) {
+	// Break straight into debugger via stack capture
+	var exo_debug;
+	if (exo_debug.osgetenv("EXO_DEBUG") and exo_debug) {
+            // Attach gdb interactively
+            let cmd = "gdb -q -p " ^ var::ospid();
+            cmd.logputl();
+            if (system(cmd) == 0) {
+                // gdb use completed.
+            } else {
+                // gdb not installed or already attached?
+            }
+	}
 
+	while (not exo_debug) {
+
+		fprintf(stderr, "SIGINT_handler loop\n");
 		var cmd = "A";
 
 		if (var().isterminal()) {
@@ -675,6 +729,7 @@ static void SIGINT_handler(int sig [[maybe_unused]]) {
 			fflush(stderr);			// duplicated in init and B
 
 			// Backtrace
+			VarError err("SIGINT_handler");
 			var(err.stack()).convert(FM, "\n").errputl();
 
 		} else if (cmd1 == "D") {
@@ -682,6 +737,8 @@ static void SIGINT_handler(int sig [[maybe_unused]]) {
 			fprintf(stderr, "ebugging ... ");
 			fflush(stderr);			// duplicated in init and B
 
+			breakon();
+			var().echo(1);
 			// Debugging
 			// duplicated in init and B
 			let pid = getpid();
@@ -708,13 +765,19 @@ static void SIGINT_handler(int sig [[maybe_unused]]) {
 
 	}
 
+	// restore terminal attributes (probably linewise input and echo)
+//	if (nfds == 2) {
+	if (has_oldtio)
+		tcsetattr(STDIN_FILENO, TCSANOW, &oldtio);
+//	}
 	// Show input characters
 	//var().echo(true);
 
 	// Stop ignoring this signal
-	breakon();
+//	breakon();
 	// faster/safer?
-	//signal(SIGINT, SIGINT_handler);
+	fprintf(stderr, "restablish SIGINT_handler\n");
+	signal(SIGINT, SIGINT_handler);
 
 }
 
@@ -742,7 +805,8 @@ ND PUBLIC var backtrace() {
 
 PUBLIC void debug(in var1) {
 
-	std::clog << "debug(" << var1 << ")" << std::endl;
+	if (!var1.empty())
+		std::clog << "debug(" << var1 << ")" << std::endl;
 	std::cout << std::flush;
 
 	//use gdb "n" command(s) to single step

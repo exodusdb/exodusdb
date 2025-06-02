@@ -14,7 +14,7 @@
 #include <exodus/cargs.h>
 #include <exodus/var.h>
 
-//similar code in haskey.cpp and mvwait.cpp
+//similar code in haskey.cpp and varwait.cpp
 
 #pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
 
@@ -54,7 +54,7 @@ static var handle_events(int inotify_fd, int* wd, const int argc, const char* ar
 		// Read some events
 		len = read(inotify_fd, buf, sizeof buf);
 		if (len == -1 && errno != EAGAIN) {
-			std::perror("mvwait: read");
+			std::perror("varwait: read");
 			std::exit(EXIT_FAILURE);
 		}
 
@@ -168,7 +168,7 @@ static var wait_main(const int argc, const char* argv[], const int wait_time_ms)
 	// or crash
 	inotify_fd = inotify_init1(IN_NONBLOCK);
 	if (inotify_fd == -1) {
-		std::perror("mvwait: inotify_init1");
+		std::perror("varwait: inotify_init1");
 		std::exit(EXIT_FAILURE);
 	}
 
@@ -176,7 +176,7 @@ static var wait_main(const int argc, const char* argv[], const int wait_time_ms)
 	// or crash
 	wd = reinterpret_cast<int*>(calloc(argc, sizeof(int)));
 	if (wd == nullptr) {
-		std::perror("mvwait: calloc");
+		std::perror("varwait: calloc");
 		std::exit(EXIT_FAILURE);
 	}
 
@@ -192,7 +192,7 @@ static var wait_main(const int argc, const char* argv[], const int wait_time_ms)
 		// or crash
 		if (wd[i] == -1) {
 			fprintf(stderr, "Cannot watch '%s'\n", argv[i]);
-			std::perror("mvwait: inotify_add_watch");
+			std::perror("varwait: inotify_add_watch");
 			std::exit(EXIT_FAILURE);
 		}
 	}
@@ -258,9 +258,13 @@ static var wait_main(const int argc, const char* argv[], const int wait_time_ms)
 		//poll events and input until timeout or crash
 		poll_num = poll(fds, nfds, wait_time_ms);
 		if (poll_num == -1) {
-			if (errno == EINTR)
+			if (errno == EINTR) {
+//				fprintf(stderr, "EINTR\n");
+//				events = "C";
+//				break;
 				continue;
-			std::perror("mvwait: poll");
+			}
+			std::perror("varwait: poll");
 			std::exit(EXIT_FAILURE);
 		}
 
@@ -299,7 +303,7 @@ static var wait_main(const int argc, const char* argv[], const int wait_time_ms)
 	//remove watches or crash (is this necessary since we close the fd next)
 	for (i = 1; i < argc; i++) {
 		if (inotify_rm_watch(inotify_fd, wd[i]) < 0) {
-			std::perror("mvwait: inotify_rm_watch");
+			std::perror("varwait: inotify_rm_watch");
 			std::exit(EXIT_FAILURE);
 		}
 	}
@@ -316,7 +320,7 @@ static var wait_main(const int argc, const char* argv[], const int wait_time_ms)
 
 	//exit(EXIT_SUCCESS);
 	//events.outputl("oswait events=");
-
+//TRACE(events);
 	return events;
 }
 

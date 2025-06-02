@@ -253,9 +253,13 @@ VarError::VarError(std::string message_)
 
 	// Capture the stack at point of creation i.e. when thrown
 	// TODO capture in caller using default argument to VarError?
-	if (not exo_savestack(stack_addresses_, &stack_size_))
+	if (not exo_savestack(stack_addresses_, &stack_size_)) {
 		// gdb exists but could not attach to the process so it must already be attached.
-		throw;
+		// Flush any stdout error messages out
+		std::cout << std::flush;
+		std::cerr << "\n" << message_ << std::endl;
+		debug();
+	}
 
 	// Flush any stdout error messages out
 	std::cout << std::flush;
@@ -277,12 +281,13 @@ VarError::VarError(std::string message_)
 
 	// Break into debugger if EXO_DEBUG is set to 1
 	// otherwise allow catch at a higher level or terminate
-	var exo_debug;
-	if (exo_debug.osgetenv("EXO_DEBUG") and exo_debug == 1) {
-		var(message).errputl("\n");
-		var(stack()).convert(FM, "\n").errputl();
-		debug();
-	}
+	// Probably already broken into debugger in the exo_savestack call above.
+//	var exo_debug;
+//	if (exo_debug.osgetenv("EXO_DEBUG") and exo_debug == 1) {
+//		var(message).errputl("\n");
+//		var(stack()).convert(FM, "\n").errputl();
+//		debug();
+//	}
 }
 
 // stack - source line acquisition

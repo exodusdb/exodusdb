@@ -4,7 +4,8 @@ libraryinit()
 // Performed by listen
 func main() {
 
-	breakoff();
+	// Why exactly is this done?
+//	breakoff();
 
 	// SENTENCE
 	// waiting filepattern seconds milliseconds globalend newfilename newfilepath portno?
@@ -106,7 +107,7 @@ func main() {
 
 	} while (true);
 
-	breakon();
+//	breakon();
 
 	return 0;
 }
