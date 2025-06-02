@@ -4164,7 +4164,7 @@ public:
 	// obj is strvar
 	//
 	// `var v2;
-	//  v2 =      "ab01"_var.oconv( "HEX" ) ; //  "61" "62" "30" "31" 
+	//  v2 =      "ab01"_var.oconv( "HEX" ) ; //  "61" "62" "30" "31"
 	//  v2 =  "\xff\x00"_var.oconv( "HEX" ) ; //  "FF" "00"            // Any bytes are ok.
 	//  v2 =         var(10).oconv( "HEX" ) ; //  "31" "30"            // Uses ASCII string equivalent of 10 i.e. "10".
 	//  v2 =    "\u0393"_var.oconv( "HEX" ) ; //  "CE" "93"            // Greek capital Gamma in UTF8 bytes.
