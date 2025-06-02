@@ -11,15 +11,46 @@ set -euxo pipefail
 :
 : 'Example:  ./run centauro_test'
 :
+: 'OPTIONs are passed to serve_any'
+:
+: This script runs BOTH _test and non-_test database using non-/live/
+: bin and lib dirs UNLESS EXO_LIVE is set.
+:
+: "_test" is about which database to use.
+: "/live/" is about which programs to use.
+:
+: 1. NON-LIVE PROGRAMS - bin, lib etc.
+:
+: - Service: HOME/bin, lib etc.        From service/compall
+: - System : /user/local/bin, lib etc. From Exodus install.sh
+:
+: 2. LIVE PROGRAMS - bin, lib etc. - Use /live/ dir.
+:
+: - Service: HOME/live/lib, bin etc.        From service/copyall
+: - System : /user/local/live/lib, bin etc. From service/copyall
 
+:
+: Validate
+: ========
+:
 	DB_CODE=${1:?DBNAME argument is required.}
 	OPTIONS=${2:-}
 
 :
-: Caller sets APP_CODE or it defaults to exo
-: ==========================================
+: Config
+: ======
 :
-	APP_CODE=${APP_CODE:-exo}
+: Caller sets APP_CODE or it defaults to exo
+:
+	export APP_CODE=${APP_CODE:-exo}
+:
+: Default EXO_LIVE is empty
+:
+	EXO_LIVE=${EXO_LIVE:-}
+:
+: Break into debugger on all errors
+:
+	export EXO_DEBUG=${EXO_DEBUG:-1}
 
 :
 : Remove any _test suffix from DB_CODE to get the working host dir
@@ -30,50 +61,74 @@ set -euxo pipefail
 	fi
 
 :
-: Check Syntax
-: ============
-:
-	if [ -z "$DB_CODE" ]; then
-:		'Syntax error. Cannot continue.'
-		exit 1
-	fi
-
-:
-: Flag to break into debugger on all errors iif _test database
-: ============================================================
-:
-	if [ "${DB_CODE: -5}" = "_test" ]; then
-		#export EXO_HOME=~
-		export EXO_DEBUG=1
-	else
-		#export EXO_HOME=~/live
-		export EXO_DEBUG=
-	fi
-
-:
 : Always use the test programs in ~/ when running manually
 : ========================================================
 :
 	export EXO_HOME=~
-	#export EXO_HOME=~/live
-	#if [ "${DB_CODE: -5}" = "_test" ]; then
-	#	export EXO_HOME=~
-	#	export EXO_DEBUG=1
-	#else
-	#	export EXO_HOME=~/live
-	#	export EXO_DEBUG=
-	#fi
 
 :
-: Ensure the correct bin is found first in the path
-: =================================================
+: Ensure the right EXODUS SYSTEM bin and lib are used.
+: ====================================================
 :
-: Unfortunately cannot put first since that would mask system programs
-: especially old cli compilations might exist in ~/bin and ~/live/bin
-: For now just append to the end since always ~/bin
+#	Example environment from live systemd service.
+#	Note prefix /usr/local/live/bin on PATH and /usr/local/live/lib on LD_LIBRARY_PATH
+#
+#	export EXO_HOME=/root/live"
+#	export EXO_DATA=%i"
+#	export EXO_DICT=exodus_live"
+#	export PATH=/usr/local/live/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/root/live/bin
+#	export LD_LIBRARY_PATH=/usr/local/live/lib:/root/live/lib"
+
+	if [ -n "$EXO_LIVE" ]; then
 :
-#	export PATH="$EXO_HOME/bin:$PATH"
-	export PATH="$PATH:$EXO_HOME/bin"
+: live/ service programs.
+:
+		export EXO_HOME=~/live/
+:
+: live/bin first in PATH ahead of /usr/local/bin
+:
+		export PATH="/usr/local/live/bin:$PATH"
+:
+: live/lib first in LD_LIBRARY_PATH to beat ldconfig /usr/local/bin
+:
+		export LD_LIBRARY_PATH="/usr/local/live/lib:$LD_LIBRARY_PATH"
+:
+: exodus_live dictionary db.
+:
+		export EXO_DICT=exodus_live
+:
+	else
+:
+: Standard service programs.
+:
+		export EXO_HOME=~
+:
+: Standard system bin.
+:
+:		PATH already includes /usr/local/bin
+:
+: Standard system lib.
+:
+:		ldconfig already includes /usr/local/lib
+:
+: Standard exodus dictionary db.
+:
+		export EXO_DICT=exodus
+	fi
+
+:
+: Ensure SERVICE bin and lib files can be found
+: =============================================
+:
+:	Make sure it comes before any already configured path.
+:	Will not override any manually configured LD_LIBRARY_PATH
+:
+	export PATH=$(echo "$PATH" | sed "s|:/bin:|:/bin:$EXO_HOME/bin:|")
+:
+:	Exodus dynamic lib loads are hard coded to use '$EXO_HOME' already so this may be superfluous.
+:	Will not override any manually configured LD_LIBRARY_PATH
+:
+	export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$EXO_HOME/lib"
 
 :
 : Service code is APP_live@xxxxxxxx or APP_test@xxxxxxxx
@@ -90,7 +145,6 @@ set -euxo pipefail
 :
 	FULL_SERVICE_CODE=${APP_CODE}_${SERVICE_SUFFIX}@${DB_CODE%_test}
 
-:
 :
 : Change to the working directory
 : ===============================
@@ -114,14 +168,6 @@ set -euxo pipefail
 	export EXO_DATA=$DB_CODE
 
 :
-: Indicate the database to use for dictionaries
-: =============================================
-:
-: Always the test dictionaries even while running a live database
-:
-	export EXO_DICT=exodus
-
-:
 : Install gdb if necessary
 : ========================
 :
@@ -131,7 +177,11 @@ set -euxo pipefail
 : Start the server process under gdb
 : ==================================
 :
-	gdb -ex "set print inferior-events off" -ex run --args serve_${APP_CODE} $DB_CODE $OPTIONS
+#	Running under gdb for convenience
+	gdb -ex "set print inferior-events off" -ex run --args serve_any serve_${APP_CODE} $DB_CODE $OPTIONS
+#	No longer need to run under GDB since EXO_DEBUG=1 requests attach on error.
+#	and can break into gdb using Ctrl+C and option (D)ebug.
+#	gdb -ex "set print inferior-events off" -ex run --args serve_any serve_${APP_CODE} $DB_CODE $OPTIONS
 
 :
 : Check if background service should be restarted
