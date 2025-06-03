@@ -1410,8 +1410,14 @@ function* formfunctions_onload() {
     // Right side login details, disappears if zoomed in to avoid menu extending vertically
     //loginhtml += '<span style="float:right; margin: 5px 10px; vertical-align:middle">'
     // Adjust margin to center element vertically. Not exact middle due to settings in client.js
-    loginhtml += '<span style="float:right; margin: 7px 10px; vertical-align:middle">'
-    loginhtml += gdatasetname + ' - ' + gdataset + ' - ' + gusername + '</span>'
+    //loginhtml += '<span style="float:right; margin: 7px 10px; vertical-align:middle">'
+    //loginhtml += gdatasetname + ' - ' + gdataset + ' - ' + gusername + '</span>'
+    loginhtml += '<span style="float:right; margin: 7px 10px; vertical-align:middle;'
+    // Highlight if logged into test database
+    if (gdataset.split('_')[1] == 'test')
+        loginhtml += 'color: red;'
+    // Reduce clutter by displaying database name and username only
+    loginhtml += '">' + gdatasetname + ' - ' + gusername + '</span>'
     if (gKeyNodes)
         buttonhtml += loginhtml
 
