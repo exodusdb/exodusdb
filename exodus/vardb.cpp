@@ -1230,14 +1230,30 @@ bool var::open(in filename, in connection /*DEFAULTNULL*/) {
 	if (EXO_PREPARED) {
 		let code = normalized_filename.convert(".", "_");
 		let sql =
+//			"DO $$"
+//			"BEGIN"
+//			"    IF NOT EXISTS (SELECT 1 FROM pg_prepared_statements WHERE name = 'vardb_read_" ^ code ^ "') THEN"
+//			"        EXECUTE 'PREPARE vardb_read_" ^ code ^ " (text) AS SELECT data FROM " ^ normalized_filename ^ " WHERE key = $1';"
+//			"        EXECUTE 'PREPARE vardb_delete_" ^ code ^ " (text) AS DELETE FROM " ^ normalized_filename ^ " WHERE key = $1';"
+//			"        EXECUTE 'PREPARE vardb_write_" ^ code ^ " (text, text) AS INSERT INTO " ^ normalized_filename ^ " (key, data) VALUES ($1, $2) ON CONFLICT (key) DO UPDATE SET data = $2';"
+//			"    END IF;"
+//			"END $$;";
+//
 			"DO $$"
 			"BEGIN"
-			"    IF NOT EXISTS (SELECT 1 FROM pg_prepared_statements WHERE name = 'vardb_read_" ^ code ^ "') THEN"
-			"        EXECUTE 'PREPARE vardb_read_" ^ code ^ " (text) AS SELECT data FROM " ^ normalized_filename ^ " WHERE key = $1';"
-			"        EXECUTE 'PREPARE vardb_delete_" ^ code ^ " (text) AS DELETE FROM " ^ normalized_filename ^ " WHERE key = $1';"
-			"        EXECUTE 'PREPARE vardb_write_" ^ code ^ " (text, text) AS INSERT INTO " ^ normalized_filename ^ " (key, data) VALUES ($1, $2) ON CONFLICT (key) DO UPDATE SET data = $2';"
+			// Delete any existing prepared statements first
+			// In case they relate to a dropped and recreated table with the same name (but different oid)
+			"    IF EXISTS (SELECT 1 FROM pg_prepared_statements WHERE name = 'vardb_read_" ^ code ^ "') THEN"
+			"        EXECUTE 'DEALLOCATE vardb_read_" ^ code ^ "';"
+			"        EXECUTE 'DEALLOCATE vardb_delete_" ^ code ^ "';"
+			"        EXECUTE 'DEALLOCATE vardb_write_" ^ code ^ "';"
 			"    END IF;"
-			"END $$;";
+			"    EXECUTE 'PREPARE vardb_read_" ^ code ^ " (text) AS SELECT data FROM " ^ normalized_filename ^ " WHERE key = $1';"
+			"    EXECUTE 'PREPARE vardb_delete_" ^ code ^ " (text) AS DELETE FROM " ^ normalized_filename ^ " WHERE key = $1';"
+			"    EXECUTE 'PREPARE vardb_write_" ^ code ^ " (text, text) AS INSERT INTO " ^ normalized_filename ^ " (key, data) VALUES ($1, $2) ON CONFLICT (key) DO UPDATE SET data = $2';"
+			"END $$;"
+		;
+
 		if (not connection2.sqlexec(sql)) {
 			throw VarDBException(lasterror());
 		}
@@ -2531,16 +2547,25 @@ bool var::createfile(in filename) const {
 		return false;
 	}
 
+	// sql
 	var sql = "CREATE";
 	if (filename.ends("_temp") and not filename.starts("dict."))
 		sql ^= " TEMPORARY ";
 	sql ^= " TABLE " ^ get_normalized_filename(filename);
 	sql ^= " (key text primary key, data text)";
 
-	if (this->assigned()) LIKELY
-		return this->sqlexec(sql);
+	// Create it
+	//     if (not (this->assigned() ? *this : filename).sqlexec(sql))
+	if (not this->sqlexec(sql))
+		return false;
 
-	return filename.sqlexec(sql);
+	// Open it as well to get prepared statements implemented by open
+	if (not this->clone().open(filename, *this)) UNLIKELY {
+		setlasterror(filename.quote() ^ " created but cannot be opened.");
+		return false;
+	}
+
+	return true;
 }
 
 bool var::renamefile(in filename, in newfilename) const {
