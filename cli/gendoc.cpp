@@ -1167,6 +1167,12 @@ func main() {
 //				func_decl.replacer("<", "&lt;");
 //				func_decl.replacer(">", "&gt;");
 
+//				<p>┌─────────┬─────────────┬───────────────────────────┬─────────────────────────┬───────────────────────────┐</p>
+//				<p>│ Command │ Mechanism   │ Execution                 │ Use Case                │ Environment               │</p>
+//				<p>├─────────┼─────────────┼───────────────────────────┼─────────────────────────┼───────────────────────────┤</p>
+				if (comments.contains("┌─"))
+					call htmllib2("BOX2TABLE", comments);
+
 				// Finally its a three column row
 				docfile
 					<< "<tr>"
@@ -1458,6 +1464,7 @@ R"__(
 
 	table, th, td {
 		border: 1px solid #a2a9b1;
+		border-collapse: collapse;
 	}
 
 	th {

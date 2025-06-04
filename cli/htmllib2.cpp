@@ -443,26 +443,30 @@ func main(in mode, io dataio, in params0 = "", in params20 = "", in glang = "") 
 
 		gosub getmark(getmarkmode, html, mark);
 
-	} else if (mode =="T2H") {
+	} else if (mode == "T2H") {
 		// Convert Exodus comment text (pseudo markdown) to html
         let& text_in = params0;
 		return t2h_main(text_in);
 
-	} else if (mode =="H2M") {
+	} else if (mode == "H2M") {
 		// Convert html to man page format
         let& text_in = params0;
         var& exit_status = dataio;
 		return h2m_main(text_in, exit_status);
 
-	} else if (mode =="HTMLTIDY") {
+	} else if (mode == "HTMLTIDY") {
 		// Properly indent html
-        let& html_in = params0;
-        var& html_out = dataio;
 		// 0 Success
 		// 1 Excessive indent
 		// 2 Excessive undent
+		let& html_in = params0;
+		var& html_out = dataio;
 		var messages;
 		return html_tidy_main(html_in, html_out, messages);
+
+	} else if (mode == "BOX2TABLE") {
+		dataio = boxdrawing_to_html(dataio);
+		return 0;
 
 	} else {
 		call note(mode.quote() ^ " unknown mode in HTMLLIB2");
@@ -2277,7 +2281,8 @@ int html_tidy_main2(const std::string& input, std::string& output, std::stringst
                             --indent_level;
                         } else {
                             ++excessive_undent;
-                            messages << "htmllib2:html_tidy: Error: Excessive undent attempt on line " << line_number << '\n';
+                            messages << "htmllib2:html_tidy: Error: Excessive undent attempt on line " << line_number << ". See htmllib2.input.txt\n";
+							if (not oswrite(input on "htmllib2.input.txt")) {}
                         }
 						if (!inside_pre) {
 	                        // Indent if on a new line
@@ -2333,6 +2338,56 @@ int html_tidy_main2(const std::string& input, std::string& output, std::stringst
         return 1; // EXIT_FAILURE with status 1 for non-zero final indent
     }
     return 0; // EXIT_SUCCESS
+}
+
+func boxdrawing_to_html(in html) {
+
+//			<p>┌─────────┬─────────────┬───────────────────────────┬─────────────────────────┬───────────────────────────┐</p>
+//			<p>│ Command │ Mechanism   │ Execution                 │ Use Case                │ Environment               │</p>
+//			<p>├─────────┼─────────────┼───────────────────────────┼─────────────────────────┼───────────────────────────┤</p>
+//			<p>│ async   │ Fiber       │ Cooperative, i/o or yield │ Lightweight async tasks │ Shares parent environment │</p>
+//			<p>├─────────┼─────────────┼───────────────────────────┼─────────────────────────┼───────────────────────────┤</p>
+//			<p>│ run     │ Thread pool │ Parallel, preemptive      │ Heavy parallel jobs     │ Private RECORD/ID etc.    │</p>
+//			<p>└─────────┴─────────────┴───────────────────────────┴─────────────────────────┴───────────────────────────┘</p>
+
+	var spacer;
+	var pure = false;
+	var act = html;
+	if (pure) {
+		act.replacer("<p>┌", "<table class=\"box_drawing\"><thead>");
+		act.replacer("<p>├", "</thead><tbody>");
+		act.replacer("<p>└", "</tbody></table>");
+		act.replacer("[─┌─┬─┐├─┼─┤└─┴─┘]+"_rex, "");
+	} else {
+		act.replacer("<p>┌", "<table>\n<tr><td>");
+		act.replacer("<p>├", "<tr><td>");
+		act.replacer("<p>└", "<tr><td>");
+
+		act.replacer("┬", "</td><td>");
+		act.replacer("┼", "</td><td>");
+		act.replacer("┴", "</td><td>");
+
+		act.replacer("┐</p>", "</td></tr>");
+		act.replacer("┤</p>", "</td></tr>");
+		act.replacer("┘</p>", "</td></tr>\n</table>");
+
+		act.replacer("[─┌─┬─┐├─┼─┤└─┴─┘]"_rex, " ");
+	}
+
+	act.replacer("<p>│"_rex, "<tr><td>");
+	act.replacer("│</p>"_rex, "</td></tr>");
+
+	act.replacer("│", "</td><td>");
+
+//┌─┬─┐
+//
+//│ │ │
+//
+//├─┼─┤
+//
+//└─┴─┘
+
+	return act;
 }
 
 libraryexit()  // Closes the Exodus library class and provides a factory function for use in dynamic loading and linking
