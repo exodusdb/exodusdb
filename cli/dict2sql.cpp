@@ -340,7 +340,7 @@ COST 10;
 		errors(-1) = lasterror();
 
 	if (errors)
-		errors.errputl("\ndict2sql Errors: ");
+		errors.errputl("\ndict2sql: errors: ");
 
 	return errors != "";
 }
@@ -352,6 +352,7 @@ subr replace_FM_etc(io sql) {
 	sql.replacer(R"(\bSM\b)"_rex, R"__(E'\x1C')__");
 	sql.replacer(R"(\bTM\b)"_rex, R"__(E'\x1B')__");
 	sql.replacer(R"(\bST\b)"_rex, R"__(E'\x1A')__");
+	sql.replacer(R"(\bSTM\b)"_rex, R"__(E'\x1A')__");
 
 	// In case refactoring c++ code mangles pgsql code
 	//
@@ -421,8 +422,7 @@ subr create_function(in functionname_and_args, in return_sqltype, in sql, in sql
 //			" FROM   pg_catalog.pg_proc"
 //			" WHERE  proname = "         ^ squote(functionname) ^
 //			" AND  oid::regprocedure = " ^ squote("exodus." ^ functionname ^ "(" ^ argtypes ^ ")") ^ "::regprocedure"
-//			//" AND    proargnames = "     ^ squote("{" ^ argnames ^ "}")
-//	;
+//			//" AND    proargnames = "     ^ squote("{" ^ argnames ^ "}")}//	;
 	// Get any existing routine source code
 	let sql_get_existing_declaration =
 		"SELECT     prosrc"
@@ -430,13 +430,36 @@ subr create_function(in functionname_and_args, in return_sqltype, in sql, in sql
 		" LEFT JOIN pg_catalog.pg_namespace n ON n.oid = pronamespace"
 		" WHERE     proname   = " ^ squote(functionname) ^
 		" AND       proargnames " ^ (argnames ? (" = '{" ^ argnames ^ "}'") : " is null") ^
-		" AND       n.nspname = 'exodus'"
+//		" AND       n.nspname = 'exodus'"
+		" AND       n.nspname != 'pg_catalog'"
 	;
 	if (not var().sqlexec(sql_get_existing_declaration, oldfunction)) {
-		var().lasterror().logput("DICT2SQL ERROR:" ^ oldfunction);
+		var().lasterror().logput("dict2sql: error:" ^ oldfunction);
 		//null
 	}
+
+	// Get rid of old superfluous public schema function if more than one function
+	if (oldfunction.count(RM) > 1) {
+		reindex_if_indexed = true;
+		//DROP FUNCTION IF EXISTS public.dict_addresses_person_xref(key text, data text);
+		logputl("dict2sql: deleting old public version of " ^ functionname_and_args);
+		if (not var().sqlexec("DROP FUNCTION IF EXISTS public." ^ functionname_and_args.replace("exodus.", "")))
+			var().lasterror().logput("dict2sql: error: ");
+
+		// Get hopefully only one function now.
+		if (not var().sqlexec(sql_get_existing_declaration, oldfunction)) {
+			var().lasterror().logput("dict2sql: error:" ^ oldfunction);
+			//null
+		}
+
+	}
+
 	oldfunction.substrer(oldfunction.index("\n") + 1);
+//	TRACE(functionname)
+//	if (functionname eq "dict_jobs_text") {
+//		oswrite(oldfunction on "of");
+//		oswrite(functionsql on "fs");
+//	}
 
 	// Skip if no change in name, arg types and body
 	if (not force && oldfunction && functionsql.contains(oldfunction) ) {
