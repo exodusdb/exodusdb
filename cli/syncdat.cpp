@@ -1,7 +1,7 @@
 #include <exodus/program.h>
 programinit()
 
-	let force = index(OPTIONS, "F");
+	var force = index(OPTIONS, "F");
 	let generate = index(OPTIONS, "G");
 	let ignore_nodb = index(OPTIONS, "I");
 	let verbose = index(OPTIONS, "V");
@@ -90,7 +90,7 @@ func main() {
 
 	let txtfmt = "TX";
 
-	let prefix = THREADNO ^ ": syncdat:";
+	let prefix = THREADNO ^ ": syncdat: " ^ osgetenv("EXO_DATA") ^ " " ^ osgetenv("EXO_DICT") ^ " ";
 
 	// Warn if no definitions file
 	var definitions;
@@ -109,15 +109,25 @@ func main() {
 	last_sync_date = last_sync.f(1);
 	last_sync_time = last_sync.f(2);
 
+	let dependencies = "dict2sql^syncdat"_var;
+	for (let dependent : dependencies) {
+		// Force everything if dependent has changed.
+		let dependent_dirinfo = osfile(osshellread("which " ^ dependent));
+		if (not force and (dependent_dirinfo.empty() or is_newer_than_last_sync(dependent_dirinfo))) {
+			printl("syncdat: (F)orce because newer " ^ dependent ^ " (or cant be found) since last sync time ", last_sync_date.oconv("D-Y"), last_sync_time.oconv("MTS"));
+			force = true;
+		}
+	}
+
 	// Skip if nothing new
 	let datinfo = osdir(datpath);
 	if (not datinfo) {
 		abort(prefix ^ " Error: " ^ datpath.quote() ^ " dat dir missing");
 	}
 	printl(prefix, "Scanning", datpath, datinfo.f(2).oconv("D-Y"), datinfo.f(3).oconv("MTS"));
-	if (not force and not is_newer(datinfo)) {
+	if (not force and not is_newer_than_last_sync(datinfo)) {
 		if (verbose)
-			printl("No change since", last_sync_date.oconv("D-Y"), last_sync_time.oconv("MTS"));
+			printl("No change since last sync time ", last_sync_date.oconv("D-Y"), last_sync_time.oconv("MTS"));
 		return 0;
 	}
 
@@ -143,7 +153,7 @@ func main() {
 //		// Skip dirs which are not newer i.e. have no newer records
 //		if (not force and not generate) {
 //			let dirinfo = osdir(dirpath);
-//			if (not is_newer(dirinfo)) {
+//			if (not is_newer_than_last_sync(dirinfo)) {
 //				//if (verbose)
 //					printl("Nothing new in", dirpath, dirinfo.f(2).oconv("D-Y"), dirinfo.f(3).oconv("MTS"));
 //				continue;
@@ -273,7 +283,7 @@ func main() {
 				// Skip files/records which are not newer
 				// because reloading pg functions in slow
 				// to force updates, perhaps touch dat dat/* and dat/*/*
-				if (not force and not is_newer(osfile(filepath))) {
+				if (not force and not is_newer_than_last_sync(osfile(filepath))) {
 					if (verbose)
 						printl("Not newer", dbfilename, ID);
 					continue;
@@ -331,8 +341,7 @@ func main() {
 
 		// Load and changed functions into database
 		if (dict2sql_ids) {
-			let cmd = "dict2sql " ^ dbfilename ^ " " ^ dict2sql_ids;
-			//cmd ^= " {V}";
+			let cmd = "dict2sql " ^ dbfilename ^ " " ^ dict2sql_ids;// ^ " {V}";
 			if (verbose)
 				cmd.logputl();
 			if (not osshell(cmd)) {
@@ -446,7 +455,7 @@ func main() {
 
 }
 
-func is_newer(in fsinfo) {
+func is_newer_than_last_sync(in fsinfo) {
 
     int fsinfo_date = fsinfo.f(2);
 
