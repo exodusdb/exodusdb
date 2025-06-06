@@ -263,12 +263,14 @@ auto findSubstringInCommaSeparated(SV s1, SV s2, bool indexed = true) -> size_t;
 
 bool var::listed(SV list) const {
 	THISIS("bool var::listed(SV list) const")
+	assertString(function_sig);
 	return findSubstringInCommaSeparated(var_str, list, false);
 }
 
 bool var::listed(SV list, out position) const {
 	// TODO position = max count + 1 if not found
 	THISIS("bool var::listed(SV list, out position) const")
+	assertString(function_sig);
 	position = findSubstringInCommaSeparated(var_str, list, false);
 	return position;
 }
