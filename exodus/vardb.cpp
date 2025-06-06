@@ -824,7 +824,8 @@ bool var::connect(in conninfo) {
 	assertVar(function_sig);
 	ISSTRING(conninfo)
 
-//	// NB DONT log/trace or otherwise output the full connection info without HIDING the
+//	// NB DONT
+//  // log/trace or otherwise output the full connection info without HIDING the
 //	// password
 //	if (DBTRACE>1 or DBTRACE_CONN) {
 //		TRACE(__PRETTY_FUNCTION__)
@@ -1519,7 +1520,7 @@ bool var::read(in file, in key) {
 				}
 				errmsg ^= " file has not been opened/prepared and transaction is active.";
 			} else
-				errmsg ^= " " ^ (var(dbresult.pqerrmsg) ?: var(PQerrorMessage(pgconn))) ^ " SQLERROR:" ^ sqlstate;
+				errmsg ^= " " ^ (var(dbresult.pqerrmsg) ?: var(PQerrorMessage(pgconn))).trimlast("\n") ^ ". sqlstate:" ^ sqlstate;
 
 			this->setlasterror(errmsg);
 			throw VarDBException(errmsg);
@@ -1531,7 +1532,7 @@ bool var::read(in file, in key) {
 
 		// Leave unassigned if not read
 
-		this->setlasterror("ERROR: vardb: read() record does not exist " ^
+		this->setlasterror("ERROR: vardb: read(" ^ file.convert("." _FM, "_^").replace("dict_","dict.").quote() ^ ") record does not exist " ^
 					key.quote());
 		return false;
 	}
@@ -1640,7 +1641,7 @@ var  var::lock(in key) const {
 	if (PQresultStatus(dbresult) != PGRES_TUPLES_OK or PQntuples(dbresult) != 1) UNLIKELY {
 		let sqlstate = var(PQresultErrorField(dbresult, PG_DIAG_SQLSTATE));
 		let errmsg = "lock(" ^ *this ^ ", " ^ key ^ ")\n" ^
-			(var(dbresult.pqerrmsg) ?: var(PQerrorMessage(pgconn))) ^ "\nSQLERROR:" ^ sqlstate ^ " PQresultStatus=" ^
+			(var(dbresult.pqerrmsg) ?: var(PQerrorMessage(pgconn))).trimlast("\n") ^ ". sqlstate" ^ sqlstate ^ " PQresultStatus=" ^
 			var(PQresStatus(PQresultStatus(dbresult))) ^ ", PQntuples=" ^
 			var(PQntuples(dbresult));
 		this->setlasterror(errmsg);
@@ -1716,7 +1717,7 @@ bool var::unlock(in key) const {
 	if (PQresultStatus(dbresult) != PGRES_TUPLES_OK) UNLIKELY {
 		let sqlstate = var(PQresultErrorField(dbresult, PG_DIAG_SQLSTATE));
 		let errmsg = "unlock(" ^ this->convert(_FM, "^") ^ ", " ^ key ^ ")\n" ^
-				(var(dbresult.pqerrmsg) ?: var(PQerrorMessage(pgconn))) ^ "\nSQLERROR:" ^ sqlstate ^ " PQresultStatus=" ^
+				(var(dbresult.pqerrmsg) ?: var(PQerrorMessage(pgconn))).trimlast("\n") ^ "\nsqlstate" ^ sqlstate ^ " PQresultStatus=" ^
 				var(PQresStatus(PQresultStatus(dbresult))) ^ ", PQntuples=" ^
 				var(PQntuples(dbresult));
 		this->setlasterror(errmsg);
@@ -1807,7 +1808,7 @@ bool var::sqlexec(in sqlcmd, io response) const {
 //		}
 		let sqlstate = var(PQresultErrorField(dbresult, PG_DIAG_SQLSTATE));
 		// sql state 42P03 = duplicate_cursor
-		response = "var::sqlexec: " ^ (var(dbresult.pqerrmsg) ?: var(PQerrorMessage(pgconn))) ^ " sqlstate:" ^ sqlstate ^ " " ^ sqlcmd;
+		response = "var::sqlexec: " ^ (var(dbresult.pqerrmsg) ?: var(PQerrorMessage(pgconn))).trimlast("\n") ^ ". sqlstate:" ^ sqlstate ^ " " ^ sqlcmd;
 		return false;
 	}
 
@@ -1967,11 +1968,11 @@ void var::write(in file, in key) const {
 				}
 				errmsg ^= " file has not been opened/prepared and transaction is active.";
 			} else {
-				errmsg ^= " failed: SQLERROR:" ^ sqlstate ^ " PQresultStatus=" ^
+				errmsg ^= " failed: sqlstate" ^ sqlstate ^ " PQresultStatus=" ^
 						var(PQresStatus(PQresultStatus(dbresult))) ^ " " ^
-						(var(dbresult.pqerrmsg) ?: var(PQerrorMessage(pgconn)));
+						(var(dbresult.pqerrmsg) ?: var(PQerrorMessage(pgconn))).trimlast("\n");
 			}
-			// ERROR: vardb: write(definitions^1, LAST_SYNCDATE_TIME*DAT) failed: SQLERROR:25P02
+			// ERROR: vardb: write(definitions^1, LAST_SYNCDATE_TIME*DAT) failed: sqlstate25P02
 			// PQresultStatus=PGRES_FATAL_ERROR ERROR:  current transaction is aborted, commands ignored until end of transaction block
 
 			throw VarDBException(errmsg);
@@ -2033,8 +2034,8 @@ bool var::updaterecord(in file, in key) const {
 	if (PQresultStatus(dbresult) != PGRES_COMMAND_OK) UNLIKELY {
 		let sqlstate = var(PQresultErrorField(dbresult, PG_DIAG_SQLSTATE));
 		let errmsg = "ERROR: vardb: update(" ^ file.convert(_FM, "^") ^
-				", " ^ key ^ ") SQLERROR: " ^ sqlstate ^ " Failed: " ^ var(PQntuples(dbresult)) ^ " " ^
-				(var(dbresult.pqerrmsg) ?: var(PQerrorMessage(pgconn)));
+				", " ^ key ^ ") sqlstate " ^ sqlstate ^ " Failed: " ^ var(PQntuples(dbresult)) ^ " " ^
+				(var(dbresult.pqerrmsg) ?: var(PQerrorMessage(pgconn))).trimlast("\n");
 		this->setlasterror(errmsg);
 		throw VarDBException(errmsg);
 	}
@@ -2044,7 +2045,7 @@ bool var::updaterecord(in file, in key) const {
 		var(
 			"ERROR: vardb: updaterecord(" ^ file.convert(_FM, "^") ^ ", " ^ key ^ ") Failed: " ^
 			var(PQntuples(dbresult)) ^ " " ^
-			(var(dbresult.pqerrmsg) ?: var(PQerrorMessage(pgconn)))
+			(var(dbresult.pqerrmsg) ?: var(PQerrorMessage(pgconn))).trimlast("\n")
 		).errputl();
 		return false;
 	}
@@ -2104,13 +2105,13 @@ bool var::updatekey(in key, in newkey) const {
 
 		let errmsg =
 			"ERROR: vardb: updatekey(" ^ this->convert(_FM, "^") ^ ", " ^ key ^ " -> " ^ newkey ^ ") "
-			"SQLERROR: " ^ sqlstate ^ " Failed: " ^ var(PQntuples(dbresult)) ^ " " ^
-			(var(dbresult.pqerrmsg) ?: var(PQerrorMessage(pgconn)));
+			"sqlstate " ^ sqlstate ^ " Failed: " ^ var(PQntuples(dbresult)) ^ " " ^
+			(var(dbresult.pqerrmsg) ?: var(PQerrorMessage(pgconn))).trimlast("\n");
 		this->setlasterror(errmsg);
 
 		// Duplicate key is a normal error. Do not throw
 		if (sqlstate == 23505) {
-			// SQLERROR: 23505 Failed: 0 ERROR:  duplicate key value violates unique constraint "xo_test_db_deleterecord_temp_pkey"
+			// sqlstate 23505 Failed: 0 ERROR:  duplicate key value violates unique constraint "xo_test_db_deleterecord_temp_pkey"
 			return false;
 		}
 
@@ -2122,7 +2123,7 @@ bool var::updatekey(in key, in newkey) const {
 		var(
 			"ERROR: vardb: updatekey(" ^ this->convert(_FM, "^") ^ ", " ^ key ^ " -> " ^ newkey ^ ") " ^
 			var(PQntuples(dbresult)) ^ " " ^
-			(var(dbresult.pqerrmsg) ?: var(PQerrorMessage(pgconn)))
+			(var(dbresult.pqerrmsg) ?: var(PQerrorMessage(pgconn))).trimlast("\n")
 		).errputl();
 		return false;
 	}
@@ -2187,8 +2188,8 @@ bool var::insertrecord(in file, in key) const {
 
 		let errmsg = "ERROR: vardb: insertrecord(" ^
 				file.convert(_FM, "^") ^ ", " ^ key ^ ") Failed: " ^
-				var(PQntuples(dbresult)) ^ " SQLERROR:" ^ sqlstate ^ " " ^
-				(var(dbresult.pqerrmsg) ?: var(PQerrorMessage(pgconn)));
+				var(PQntuples(dbresult)) ^ " sqlstate" ^ sqlstate ^ " " ^
+				(var(dbresult.pqerrmsg) ?: var(PQerrorMessage(pgconn))).trimlast("\n");
 		this->setlasterror(errmsg);
 		throw VarDBException(errmsg);
 	}
@@ -2197,7 +2198,7 @@ bool var::insertrecord(in file, in key) const {
 	if (std::strcmp(PQcmdTuples(dbresult), "1") != 0) UNLIKELY {
 		var("ERROR: vardb: insertrecord(" ^ file.convert(_FM, "^") ^
 			", " ^ key ^ ") Failed: " ^ var(PQntuples(dbresult)) ^ " " ^
-			(var(dbresult.pqerrmsg) ?: var(PQerrorMessage(pgconn))))
+			(var(dbresult.pqerrmsg) ?: var(PQerrorMessage(pgconn))).trimlast("\n"))
 			.errputl();
 		return false;
 	}
@@ -2281,8 +2282,8 @@ bool var::deleterecord(in key) const {
 				}
 				errmsg ^= " file has not been opened/prepared and transaction is active.";
 			} else {
-				errmsg ^= " SQLERROR: " ^ sqlstate ^ " Failed: " ^ var(PQntuples(dbresult)) ^ " " ^
-					(var(dbresult.pqerrmsg) ?: var(PQerrorMessage(pgconn)));
+				errmsg ^= " sqlstate " ^ sqlstate ^ " Failed: " ^ var(PQntuples(dbresult)) ^ " " ^
+					(var(dbresult.pqerrmsg) ?: var(PQerrorMessage(pgconn))).trimlast("\n");
 			}
 			throw VarDBException(errmsg);
 		}
