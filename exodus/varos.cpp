@@ -177,22 +177,37 @@ static bool checknotabsoluterootfolder(std::string dirpath) {
 }
 
 // Only substitutes initial ~/ with $HOME/
+// and removes all trailing \n
 static const std::string to_path_string(in path) {
-	//	return str1.toString();
-	if (path.empty() or not path.starts("~/"))
-		return path;
 
-	// static;
+	std::string result = path;
+
+	// Unlikely empty case
+	if (result.empty()) UNLIKELY
+		return result;
+
+	// Remove any trailing \n
+	while (result.back() == '\n') UNLIKELY
+		result.pop_back();
+
+	// Usually no leading ~/
+	if (not result.starts_with("~/")) LIKELY
+		return result;
+
+	// Static copy of HOME environment variable for speed;
 	var temp;
 	static thread_local std::string home = temp.osgetenv("HOME") ? temp.normalize() : "";
 
-	// For security home dir must be simple and absolute
-	if (home.empty() or not home.starts_with("/") or home.contains("..")) {
-		("varos: " ^ var(home).squote() ^ " HOME dir must be simple and absolute.").logputl();
-		return path;
+	// For security, the HOME dir cannot contain "..".
+	if (home.contains("..")) {
+		("varos: " ^ var(home).squote() ^ " For security, the HOME dir cannot contain '..'").logputl();
+		return result;
 	}
 
-	return home ^ path.c_str() + 1;
+	// Replace the leading ~ with the contents of HOME
+	result.replace(0, 1, home);
+
+	return result;
 }
 
 static const std::string to_oscmd_string(in cmd) {
