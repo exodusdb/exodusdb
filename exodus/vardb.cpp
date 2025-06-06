@@ -811,11 +811,11 @@ static var get_fileexpression(in /*mainfilename*/, in filename, in keyordata) {
 
 // Used in var::selectx
 static void to_extract_text(io dictexpression) {
-				dictexpression.replacer("^exodus.extract_number\\("_rex, "exodus.extract_text\\(");
-				dictexpression.replacer("^exodus.extract_sort\\("_rex, "exodus.extract_text\\(");
-				dictexpression.replacer("^exodus.extract_date\\("_rex, "exodus.extract_text\\(");
-				dictexpression.replacer("^exodus.extract_time\\("_rex, "exodus.extract_text\\(");
-				dictexpression.replacer("^exodus.extract_datetime\\("_rex, "exodus.extract_text\\(");
+				dictexpression.replacer("^exodus.extract_number\\("_rex, "exodus.extract_text(");
+				dictexpression.replacer("^exodus.extract_sort\\("_rex, "exodus.extract_text(");
+				dictexpression.replacer("^exodus.extract_date\\("_rex, "exodus.extract_text(");
+				dictexpression.replacer("^exodus.extract_time\\("_rex, "exodus.extract_text(");
+				dictexpression.replacer("^exodus.extract_datetime\\("_rex, "exodus.extract_text(");
 }
 
 bool var::connect(in conninfo) {
@@ -3224,7 +3224,7 @@ exodus_call:
 		if (sqlexpression.starts("exodus.extract_date(") or sqlexpression.starts("exodus.extract_time("))
 			sqlexpression.paster(20, "_array");
 		else {
-			sqlexpression.replacer("exodus.extract_sort\\("_rex, "exodus.extract_text\\(");
+			sqlexpression.replacer("exodus.extract_sort\\("_rex, "exodus.extract_text(");
 			sqlexpression = "string_to_array(" ^ sqlexpression ^ ", chr(29),'')";
 
 			// Note 3rd argument '' means convert empty multivalues to nullptr in the array
@@ -4175,7 +4175,7 @@ bool var::selectx(in fieldnames, in sortselectclause) {
 					+RECORDS+ | +RECORDS+
 					*/
 
-					dictexpression.replacer("^exodus.extract_number\\("_rex, "exodus.extract_text\\(");
+					dictexpression.replacer("^exodus.extract_number\\("_rex, "exodus.extract_text(");
 					if (not subvalue.starts("'"))
 						subvalue.squoter();
 
@@ -4599,7 +4599,7 @@ bool var::selectx(in fieldnames, in sortselectclause) {
 		sql ^= " \nLIMIT\n " ^ maxnrecs;
 
 	// Final catch of obsolete function that was replaced by COLLATE keyword
-	sql.replacer("exodus.extract_sort\\("_rex, "exodus.extract_text\\(");
+	sql.replacer("exodus.extract_sort\\("_rex, "exodus.extract_text(");
 
 	//sql.logputl("sql=");
 
