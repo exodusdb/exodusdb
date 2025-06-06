@@ -2582,25 +2582,29 @@ bool var::renamefile(in filename, in newfilename) const {
 	// Fail neatly if the old file does not exist.
 	// SQL errors during a transaction cause the whole transaction to fail.
 	// Make sure we use the right connection
-	var file;
-	if (not file.open(filename, *this)) UNLIKELY {
+//	var file;
+//	if (not file.open(filename, *this)) UNLIKELY {
+	if (not this->clone().open(filename, *this)) UNLIKELY {
 		setlasterror(filename.quote() ^ " cannot be renamed because it does not exist.");
 		return false;
 	}
 
 	// Fail neatly if the new file exists
 	// SQL errors during a transaction cause the whole transaction to fail.
-	if (file.open(newfilename, *this)) UNLIKELY {
+//	if (file.open(newfilename, *this)) UNLIKELY {
+	if (this->clone().open(newfilename, *this)) UNLIKELY {
 		setlasterror(filename.quote() ^ " cannot be renamed because " ^ newfilename.quote() ^ " already exists.");
 		return false;
 	}
 
 	// Remove from the cache of file handles
-	file.detach(filename);
+//	file.detach(filename);
+	this->clone().detach(filename);
 
 	let sql = "ALTER TABLE " ^ filename ^ " RENAME TO " ^ newfilename;
 
-	if (not file.sqlexec(sql)) UNLIKELY
+//	if (not file.sqlexec(sql)) UNLIKELY
+	if (not this->sqlexec(sql)) UNLIKELY
 		throw VarDBException(this->lasterror());
 
 	return true;
@@ -2615,8 +2619,9 @@ bool var::deletefile(in filename) const {
 	// Fail neatly if the file does not exist
 	// SQL errors during a transaction cause the whole transaction to fail.
 	// Delete the file on whatever connection it exists;
-	var file;
-	if (not file.open(filename, *this)) UNLIKELY {
+//	var file;
+//	if (not file.open(filename, *this)) UNLIKELY {
+	if (not this->clone().open(filename, *this)) UNLIKELY {
 		setlasterror(filename.quote() ^ " cannot be deleted because it does not exist.");
 		return false;
 	}
@@ -2632,7 +2637,7 @@ bool var::deletefile(in filename) const {
 
 	let sql = "DROP TABLE " ^ filename.f(1) ^ " CASCADE";
 
-	if (not file.sqlexec(sql)) UNLIKELY
+	if (not this->clone().sqlexec(sql)) UNLIKELY
 		throw VarDBException(this->lasterror());
 
 	return true;
@@ -2646,14 +2651,16 @@ bool var::clearfile(in filename) const {
 
 	// Fail neatly if the file does not exist
 	// SQL errors during a transaction cause the whole transaction to fail.
-	var file;
-	if (not file.open(filename, *this)) UNLIKELY {
+//	var file;
+//	if (not file.open(filename, *this)) UNLIKELY {
+	if (not this->clone().open(filename, *this)) UNLIKELY {
 		setlasterror(filename.quote() ^ " cannot be cleared because it does not exist.");
 		return false;
 	}
 
 	let sql = "DELETE FROM " ^ filename.f(1);
-	if (not file.sqlexec(sql)) UNLIKELY
+//	if (not file.sqlexec(sql)) UNLIKELY
+	if (not this->sqlexec(sql)) UNLIKELY
 		throw VarDBException(this->lasterror());
 
 	return true;
@@ -2679,9 +2686,11 @@ static var get_dictexpression(in cursor, in mainfilename, in filename, in dictfi
 			dictfilename = "dict." ^ mainfilename;
 
 		// If dict .mainfile is not available, use dict.voc
-		if (not actualdictfile.open(dictfilename)) {
+//		if (not actualdictfile.open(dictfilename)) {
+		if (not actualdictfile.open(dictfilename, dictfile)) {
 			dictfilename = "dict.voc";
-			if (not actualdictfile.open(dictfilename)) UNLIKELY {
+//			if (not actualdictfile.open(dictfilename)) UNLIKELY {
+			if (not actualdictfile.open(dictfilename, dictfile)) UNLIKELY {
 				let errmsg = "get_dictexpression() cannot open " ^ dictfilename.quote();
 				throw VarDBException(errmsg);
 			}
@@ -3055,7 +3064,8 @@ TRACE: "QQQ"="QQQ"
 				// ismv;
 				let xlatetargetdictfilename = "dict." ^ xlatetargetfilename;
 				var xlatetargetdictfile;
-				if (not xlatetargetdictfile.open(xlatetargetdictfilename)) UNLIKELY {
+//				if (not xlatetargetdictfile.open(xlatetargetdictfilename)) UNLIKELY {
+				if (not xlatetargetdictfile.open(xlatetargetdictfilename, dictfile)) UNLIKELY {
 					let errmsg = xlatetargetdictfilename ^ " cannot be opened for " ^ function_src;
 					throw VarDBException(errmsg);
 				}
@@ -3572,6 +3582,7 @@ bool var::selectx(in fieldnames, in sortselectclause) {
 		// USING filename
 		else if (ucword == "USING" and remaining) {
 			dictfilename = getword(remaining, xx);
+//			if (not dictfile.open("dict." ^ dictfilename)) UNLIKELY {
 			if (not dictfile.open("dict." ^ dictfilename)) UNLIKELY {
 				let errmsg = "select() dict_" ^ dictfilename ^ " file cannot be opened";
 				throw VarDBException(errmsg);
@@ -4501,7 +4512,7 @@ bool var::selectx(in fieldnames, in sortselectclause) {
 	//TRACE(actualfilename)
 	if (not this->f(2) or actualfilename.lcase().starts("dict.")) {
 		var actualfile;
-		if (actualfile.open(actualfilename))
+		if (actualfile.open(actualfilename, *this))
 			this->updater(2, actualfile.f(2));
 		//TRACE(actualfile)
 	}
@@ -4535,9 +4546,9 @@ bool var::selectx(in fieldnames, in sortselectclause) {
 		joins.inserter(1, 1, "\n RIGHT JOIN " ^ temptablename ^ " ON " ^ temptablename ^ ".key = " ^ actualfilename ^ ".key");
 	}
 
-	// Check file exists
+	// Check file exists on the same connection
 	var file;
-	if (not file.open(actualfilename)) {
+	if (not file.open(actualfilename, *this)) {
 		throw VarDBException(lasterror());
 	}
 
@@ -4799,7 +4810,7 @@ static bool readnextx(in cursor, DBconn_ptr pgconn, int direction, PGresult*& pg
 			/**
 			// If the standard select list file is available then select it, i.e. create
 			a CURSOR, so FETCH has something to work on var listfilename="savelist_" ^
-			cursor ^ "_" ^ ospid() ^ "_tempx"; if (not var().open(listfilename))
+			cursor ^ "_" ^ ospid() ^ "_tempx"; if (not var().open(listfilename, *this))
 				return false;
 			// TODO should add BY LISTITEMNO
 			if (not cursor.select("select " ^ listfilename))
@@ -4865,8 +4876,8 @@ bool var::deletelist(SV listname) const {
 		this->logputl("DBTR var::deletelist(" ^ var(listname) ^ ") ");
 
 	// Open the lists file on the same connection
-	var lists = *this;
-	if (not lists.open("LISTS")) UNLIKELY
+	var lists;
+	if (not lists.open("LISTS", *this)) UNLIKELY
 		// Skip this error for now because maybe no LISTS on some databases
 		return false;
 		//throw VarDBException("deletelist() LISTS file cannot be opened");
@@ -4895,8 +4906,8 @@ bool var::savelist(SV listname) {
 		this->logputl("DBTR var::savelist(" ^ var(listname) ^ ") ");
 
 	// Open the lists file on the same connection
-	var lists = *this;
-	if (not lists.open("LISTS")) UNLIKELY {
+	var lists;
+	if (not lists.open("LISTS", *this)) UNLIKELY {
 		let errmsg = "savelist() LISTS file cannot be opened";
 		this->setlasterror(errmsg);
 		throw VarDBException(errmsg);
@@ -4988,8 +4999,8 @@ bool var::getlist(SV listname) {
 	listfilename.converter("-.*/", "____");
 
 	// Open the lists file on the same connection
-	var lists = *this;
-	if (not lists.open("LISTS")) UNLIKELY {
+	var lists;
+	if (not lists.open("LISTS", *this)) UNLIKELY {
 		let errmsg = "getlist() LISTS file cannot be opened";
 		this->setlasterror(errmsg);
 		throw VarDBException(errmsg);
@@ -5082,8 +5093,8 @@ bool var::hasnext() {
 			this->logputl("DBTR var::hasnext(" ^ listid ^ ") ");
 
 		// Otherwise try and get another block
-		var lists = *this;
-		if (not lists.open("LISTS")) UNLIKELY {
+		var lists;
+		if (not lists.open("LISTS", *this)) UNLIKELY {
 			let errmsg = "var::hasnext(): LISTS file cannot be opened";
 			this->setlasterror(errmsg);
 			throw VarDBException(errmsg);
@@ -5194,8 +5205,8 @@ bool var::readnext(io record, io key, io valueno) {
 					return false;
 				}
 
-				var lists = *this;
-				if (not lists.open("LISTS")) UNLIKELY {
+				var lists;
+				if (not lists.open("LISTS", *this)) UNLIKELY {
 					let errmsg = "readnext() LISTS file cannot be opened";
 			        this->setlasterror(errmsg);
 					throw VarDBException(errmsg);
