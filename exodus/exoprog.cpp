@@ -944,6 +944,8 @@ var ExoProgram::perform(in command_line) {
 	SENTENCE = command_line;
 	while (SENTENCE) {
 
+		// TODO implement chain as just this block and call stack for debugging
+
 		let libname = ev.parse(SENTENCE);
 		// Reuse a single Callable object
 		// TODO Create new every time?

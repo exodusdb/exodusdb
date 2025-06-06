@@ -25,6 +25,7 @@
 
 	table, th, td {
 		border: 1px solid #a2a9b1;
+		border-collapse: collapse;
 	}
 
 	th {
@@ -8821,7 +8822,7 @@ Optional prefix of "1/" or "/" causes the reciprocal of the number to be used. e
 			<p>
 				<dl>
 					<dt>Boost</dt>
-					<dd>Boost Tasks are used to implement async tasks in Exodus.</dd>
+					<dd>Boost Fibers are used to implement async tasks in Exodus.</dd>
 					<dt>Go</dt>
 					<dd>Goroutines have with a runtime scheduler loop (GOMAXPROCS=1), balancing scalability and ease.</dd>
 					<dt>Java</dt>
@@ -8837,12 +8838,111 @@ Optional prefix of "1/" or "/" causes the reciprocal of the number to be used. e
 				</dl>
 			</p>
 			<p></p>
-			<p>┌─────────┬─────────────┬───────────────────────────┬─────────────────────────┬───────────────────────────┐</p>
-			<p>│ Command │ Mechanism   │ Execution                 │ Use Case                │ Environment               │</p>
-			<p>├─────────┼─────────────┼───────────────────────────┼─────────────────────────┼───────────────────────────┤</p>
-			<p>│ async   │ Fiber       │ Cooperative, i/o or yield │ Lightweight async tasks │ Shares parent environment │</p>
-			<p>│ run     │ Thread pool │ Parallel, preemptive      │ Heavy parallel jobs     │ Private RECORD/ID etc.    │</p>
-			<p>└─────────┴─────────────┴───────────────────────────┴─────────────────────────┴───────────────────────────┘</p>
+			<table>
+				<tr>
+					<td>         </td>
+					<td>             </td>
+					<td>                           </td>
+					<td>                         </td>
+					<td>                           </td></tr>
+				<tr>
+					<td> Command </td>
+					<td> Mechanism   </td>
+					<td> Execution                 </td>
+					<td> Use Case                </td>
+					<td> Environment               </td></tr>
+				<tr>
+					<td>         </td>
+					<td>             </td>
+					<td>                           </td>
+					<td>                         </td>
+					<td>                           </td></tr>
+				<tr>
+					<td> async   </td>
+					<td> Fiber       </td>
+					<td> Cooperative, i/o or yield </td>
+					<td> Lightweight async tasks </td>
+					<td> Shares parent environment </td></tr>
+				<tr>
+					<td> run     </td>
+					<td> Thread pool </td>
+					<td> Parallel, preemptive      </td>
+					<td> Heavy parallel jobs     </td>
+					<td> Private RECORD/ID etc.    </td></tr>
+				<tr>
+					<td>         </td>
+					<td>             </td>
+					<td>                           </td>
+					<td>                         </td>
+					<td>                           </td></tr>
+			</table>
+			<p></p>
+			<p>Exodus uses a specific definition of asynchronous.</p>
+			<table>
+				<tr>
+					<td>                  </td>
+					<td>                          </td>
+					<td>                         </td></tr>
+				<tr>
+					<td> Terminology:     </td>
+					<td> Asynchronous             </td>
+					<td> Parallel                </td></tr>
+				<tr>
+					<td> Definition:      </td>
+					<td> Not at the same time     </td>
+					<td> Simultaneous execution  </td></tr>
+				<tr>
+					<td>                  </td>
+					<td>                          </td>
+					<td>                         </td></tr>
+				<tr>
+					<td> Execution:       </td>
+					<td> Interleaved              </td>
+					<td> Parallel                </td></tr>
+				<tr>
+					<td> CPUs:            </td>
+					<td> Single CPU               </td>
+					<td> Multi-CPU               </td></tr>
+				<tr>
+					<td>                  </td>
+					<td>                          </td>
+					<td>                         </td></tr>
+				<tr>
+					<td> Implementation:  </td>
+					<td> In-program switching     </td>
+					<td> OS switching            </td></tr>
+				<tr>
+					<td> Model:           </td>
+					<td> Cooperative multitasking </td>
+					<td> Preemptive multitasking </td></tr>
+				<tr>
+					<td> Common terms:    </td>
+					<td> Non-blocking             </td>
+					<td> Concurrent (loosely)    </td></tr>
+				<tr>
+					<td> Model:           </td>
+					<td> Fibers, Coroutines       </td>
+					<td> Processes, threads      </td></tr>
+				<tr>
+					<td>                  </td>
+					<td>                          </td>
+					<td>                         </td></tr>
+				<tr>
+					<td> Exodus function: </td>
+					<td> async()                  </td>
+					<td> run()                   </td></tr>
+				<tr>
+					<td> Exodus classes:  </td>
+					<td> Task/Tasks               </td>
+					<td> Job/Jobs                </td></tr>
+				<tr>
+					<td>                  </td>
+					<td>                          </td>
+					<td>                         </td></tr>
+			</table>
+			<p></p>
+			<p>Exodus’ async() is like multitasking—juggling Tasks in one thread, like switching between email and cooking. Whereas run() launches Jobs in parallel, like multiple teams working simultaneously. Forget “concurrent”—it’s async or parallel, oil and water.</p>
+			<p>"Async Misleading: Just like std::async hides a threading model, C++ coroutines hide a stackless function model, while Boost.Fiber delivers the task-based async people intuitively expect. The “async” label gets slapped on all three, despite wildly different mechanics—classic salesman/academic hair-splitting."</p>
 			<p>
 				<pre><span class="c1">//func add(in a, in b) {</span>
 <span class="c1">//    set_async_result(a + b);</span>

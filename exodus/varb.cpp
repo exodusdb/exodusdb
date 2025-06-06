@@ -258,6 +258,7 @@ VarError::VarError(std::string message_)
 		// Flush any stdout error messages out
 		std::cout << std::flush;
 		std::cerr << "\n" << message_ << std::endl;
+		// break out into gdb
 		debug();
 	}
 

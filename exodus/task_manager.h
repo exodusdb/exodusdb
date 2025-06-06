@@ -83,7 +83,7 @@ public:
 	//
 	// Comparable:
 	//
-	//  * Boost *  Boost Tasks are used to implement async tasks in Exodus.
+	//  * Boost *  Boost Fibers are used to implement async tasks in Exodus.
 	//  * Go *     Goroutines have with a runtime scheduler loop (GOMAXPROCS=1), balancing scalability and ease.
 	//  * Java *   Project Loom: Continuations provide stackful coroutines, but require a custom single-threaded, non-interrupt-driven scheduler.
 	//  * Python * Stackless, a non-standard Python variant, has tasklets with a scheduler loop.
@@ -97,6 +97,26 @@ public:
 	// │ async   │ Fiber       │ Cooperative, i/o or yield │ Lightweight async tasks │ Shares parent environment │
 	// │ run     │ Thread pool │ Parallel, preemptive      │ Heavy parallel jobs     │ Private RECORD/ID etc.    │
 	// └─────────┴─────────────┴───────────────────────────┴─────────────────────────┴───────────────────────────┘
+	//
+	// Exodus uses a specific definition of asynchronous.
+	// ┌──────────────────┬──────────────────────────┬─────────────────────────┐
+	// │ Terminology:     │ Asynchronous             │ Parallel                │
+	// │ Definition:      │ Not at the same time     │ Simultaneous execution  │
+	// ├──────────────────┼──────────────────────────┼─────────────────────────┤
+	// │ Execution:       │ Interleaved              │ Parallel                │
+	// │ CPUs:            │ Single CPU               │ Multi-CPU               │
+	// ├──────────────────┼──────────────────────────┼─────────────────────────┤
+	// │ Implementation:  │ In-program switching     │ OS switching            │
+	// │ Model:           │ Cooperative multitasking │ Preemptive multitasking │
+	// │ Common terms:    │ Non-blocking             │ Concurrent (loosely)    │
+	// │ Model:           │ Fibers, Coroutines       │ Processes, threads      │
+	// ├──────────────────┼──────────────────────────┼─────────────────────────┤
+	// │ Exodus function: │ async()                  │ run()                   │
+	// │ Exodus classes:  │ Task/Tasks               │ Job/Jobs                │
+	// └──────────────────┴──────────────────────────┴─────────────────────────┘
+	//
+	// Exodus’ async() is like multitasking—juggling Tasks in one thread, like switching between email and cooking. Whereas run() launches Jobs in parallel, like multiple teams working simultaneously. Forget “concurrent”—it’s async or parallel, oil and water.
+	// "Async Misleading: Just like std::async hides a threading model, C++ coroutines hide a stackless function model, while Boost.Fiber delivers the task-based async people intuitively expect. The “async” label gets slapped on all three, despite wildly different mechanics—classic salesman/academic hair-splitting."
 	//
 	// `//func add(in a, in b) {
 	//  //    set_async_result(a + b);

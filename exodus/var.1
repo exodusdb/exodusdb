@@ -9820,7 +9820,7 @@ The scheduler is not driven by interrupts or events (e.g., I/O polling, timers, 
 .PD 0 \"<dl>
 .TP 10\"<dt>
 \fBBoost\fR \"</dt>
-Boost Tasks are used to implement async tasks in Exodus.
+Boost Fibers are used to implement async tasks in Exodus.
 .\"</dd>
 .TP 10\"<dt>
 \fBGo\fR \"</dt>
@@ -9861,6 +9861,49 @@ Lightweight VM processes with BEAM’s scheduler loop, providing strong isolatio
 │ run     │ Thread pool │ Parallel, preemptive      │ Heavy parallel jobs     │ Private RECORD/ID etc.    │
 .sp 0
 └─────────┴─────────────┴───────────────────────────┴─────────────────────────┴───────────────────────────┘
+.sp 0
+.PP
+.sp 0
+.PP
+Exodus uses a specific definition of asynchronous.
+.sp 0
+┌──────────────────┬──────────────────────────┬─────────────────────────┐
+.sp 0
+│ Terminology:     │ Asynchronous             │ Parallel                │
+.sp 0
+│ Definition:      │ Not at the same time     │ Simultaneous execution  │
+.sp 0
+├──────────────────┼──────────────────────────┼─────────────────────────┤
+.sp 0
+│ Execution:       │ Interleaved              │ Parallel                │
+.sp 0
+│ CPUs:            │ Single CPU               │ Multi-CPU               │
+.sp 0
+├──────────────────┼──────────────────────────┼─────────────────────────┤
+.sp 0
+│ Implementation:  │ In-program switching     │ OS switching            │
+.sp 0
+│ Model:           │ Cooperative multitasking │ Preemptive multitasking │
+.sp 0
+│ Common terms:    │ Non-blocking             │ Concurrent (loosely)    │
+.sp 0
+│ Model:           │ Fibers, Coroutines       │ Processes, threads      │
+.sp 0
+├──────────────────┼──────────────────────────┼─────────────────────────┤
+.sp 0
+│ Exodus function: │ async()                  │ run()                   │
+.sp 0
+│ Exodus classes:  │ Task/Tasks               │ Job/Jobs                │
+.sp 0
+└──────────────────┴──────────────────────────┴─────────────────────────┘
+.sp 0
+.PP
+.sp 0
+.PP
+Exodus’ async() is like multitasking—juggling Tasks in one thread, like switching between email and cooking. Whereas run() launches Jobs in parallel, like multiple teams working simultaneously. Forget “concurrent”—it’s async or parallel, oil and water.
+.sp 0
+.PP
+"Async Misleading: Just like std::async hides a threading model, C++ coroutines hide a stackless function model, while Boost.Fiber delivers the task-based async people intuitively expect. The “async” label gets slapped on all three, despite wildly different mechanics—classic salesman/academic hair-splitting."
 .sp 0
 .PP
 .PP
