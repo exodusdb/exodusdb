@@ -2405,13 +2405,21 @@ bool var::committrans() const {
 
 	bool result = true;
 
+	// Change status regardless
+	dbconn->in_transaction_ = false;
+
+	// Clear the lock cache regardless of status
+	dbconn->locks_.clear();
+
 	let status = getTransactionStatus(dbconn->pgconn_);
 
 	// Rollback if in error and indicate failure
 	if (status == "INERROR") {
 		if (this->rollbacktrans())
+			setlasterror("");
+		else
 			lasterror().errputl();
-		setlasterror("COMMITTRANS: Failed and rolled back due to status:" ^ status);
+		setlasterror("COMMITTRANS: Failed and rolled back due to status:" ^ status ^ " " ^ lasterror());
 		return false;
 	}
 
@@ -2422,15 +2430,10 @@ bool var::committrans() const {
 	}
 
 	// End (commit) a transaction.
-	// Will rollback if in error.
+	// If transaction status is INERROR then Postgresql would rollback and return OK (rather unexpected).
+	// BUT we filtered out INERROR above and return false to make testing committrans() for success easy.
 	if (not this->sqlexec("END")) UNLIKELY
 		result = false;
-
-	// Change status
-	dbconn->in_transaction_ = false;
-
-	// Clear the lock cache
-	dbconn->locks_.clear();
 
 	return result;
 
