@@ -548,21 +548,39 @@ func main() {
 
 	{
 		// Test ability to convert leading ~/ to $HOME/
+		// also test ability to remove any trailing \n
 
-		let osfilename1 = "~/xx";
-		let osfilename2 = osgetenv("HOME") ^ "/xx";
-		DATA = "x";
+		// Two ways to name a file
+#define OSFILENAMEX "t_exodus_test_os.txt"
+		let osfilename1 = "~/" OSFILENAMEX "\n\n";
+		let osfilename2 = osgetenv("HOME") ^ "/" OSFILENAMEX "\n\n";
+
+		// Try to delete all possible incarnations of the test file
+		if (
+			   osremove(osfilename1)
+			or osremove(osfilename2)
+			or osremove(osfilename1.trimlast("\n"))
+			or osremove(osfilename2.trimlast("\n"))
+		) {}
 
 		// Check oswrite
+		DATA = "x";
 		assert(oswrite(DATA on osfilename1));
+		// Assume oswrite works without ~
+		// assert(oswrite(DATA on osfilename2));
 
 		// Check osinfo
-		assert(osinfo(osfilename2).f(1) eq 1);
+		assert(osinfo(osfilename2.errputl("osfilename2=")).errputl("osinfo=").f(1) eq 1);
 		assert(osinfo(osfilename1).f(1) eq 1);
 
+		// Check created without trailing in name (is this even possible)
+		// on linux only / is an illegal file char.
+		assert(osinfo(osfilename2.trimlast("\n")).f(1) eq 1);
+		assert(osinfo(osfilename1.trimlast("\n")).f(1) eq 1);
+
 		// Check oslist
-		assert(oslist(osfilename1 ^ "*") eq "xx");
-		assert(oslist(osfilename2 ^ "*") eq "xx");
+		assert(oslist(osfilename1.trimlast("\n") ^ "*") eq OSFILENAMEX);
+		assert(oslist(osfilename2.trimlast("\n") ^ "*") eq OSFILENAMEX);
 
 		// Check osread
 		assert(osread(DATA from osfilename1) and DATA eq "x");
@@ -583,8 +601,10 @@ func main() {
 		assert(not osinfo(osfilename1));
 		assert(not osinfo(osfilename2));
 
+		// Check ~ works on directories too
+
 		// mkdir
-		var temp_subdir = "~/" ^ rnd(9999999);
+		var temp_subdir = "~/t_exodus_test_os_" ^ rnd(9999999);
 		assert(osmkdir(temp_subdir));
 
 		// Check cwd
