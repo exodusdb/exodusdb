@@ -112,10 +112,15 @@ function main() {
 //				text.replacer(R"__(space\(\d\))__", "space($1)");
 		text.replacer(R"__(\bvar\((\d+)\).space\(\))__"_rex, "space($1)");
 
-		text.replacer("Exo" "Logoff", "ExoStop");
 
-		// ST, _ST and ST_ become STM, _STM and STM_
-		text.replacer(R"__(\b(_?)ST(_?)\b)__"_rex, "$1STM$2");
+		if (srcfilename ne "compile2.cpp") {
+
+			text.replacer("Exo" "Logoff", "ExoStop");
+
+			// TODO: Leave it to fixdeprecated which will fix the source dat files too.
+			// ST, _ST and ST_ become STM, _STM and STM_
+			text.replacer(R"__(\b(_?)ST(_?)\b)__"_rex, "$1STM$2");
+		}
 
 		// Change obsolete programinit and libraryinit if exactly at end of file
 		if (text.ends("\nprogramexit()\n") or text.ends("\nlibraryexit()\n"))

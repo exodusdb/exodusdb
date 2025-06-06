@@ -216,6 +216,12 @@ bool exo_savestack(void* stack_addresses[BACKTRACE_MAXADDRESSES], std::size_t* s
 
 //	std::string gdb_cmd = "gdb -batch -p " + pid + " -ex 'thread apply all bt full' -ex 'detach' -ex 'quit' > backtrace." + pid + ".log 2>/dev/null";
 
+	if (not "which gdb")
+		return true;
+
+	let logfilename = "backtrace." ^ var::ospid() ^ ".log";
+	std::cerr << "----- gdb " << logfilename << " -----" << std::endl;
+
 	// Get all thread info because there is no gdb command to switch to thread (LWP) by LWP id.
 	var gdb_cmds = " -ex 'thread apply all bt' -ex 'detach' -ex 'quit'";
 	var gdb_cmd = "gdb -batch -p " ^ pid ^ gdb_cmds ^ " > backtrace." ^ pid ^ ".log 2>/dev/null < /dev/null";
@@ -230,7 +236,6 @@ bool exo_savestack(void* stack_addresses[BACKTRACE_MAXADDRESSES], std::size_t* s
 //	}
 
 	var txt;
-	let logfilename = "backtrace." ^ var::ospid() ^ ".log";
 	if (not txt.osread(logfilename)) {
 		// gdb not installed. Rely on ::backtrace above which isnt very accurate in threads or fibers.
 //		std::cerr << "Could not attach gdb" << std::endl;
@@ -246,7 +251,7 @@ bool exo_savestack(void* stack_addresses[BACKTRACE_MAXADDRESSES], std::size_t* s
 		return false;
 	}
 
-	std::cerr << "----- gdb " << logfilename << " -----" << std::endl;
+//	std::cerr << "----- gdb " << logfilename << " -----" << std::endl;
 
 	// EXO_DEBUG=1 signifies desire to break into gdb.
 	// instead being caught by program or perform/execute/run exception handlers
