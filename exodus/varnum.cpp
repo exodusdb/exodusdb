@@ -733,7 +733,7 @@ template<> PUBLIC bool VARBASE1::toBool() const {
 
 template<> PUBLIC int VARBASE1::toInt() const {
 	this->assertInteger(__PRETTY_FUNCTION__);
-	return static_cast<int>(*this);
+	return static_cast<int>(var_int);
 }
 
 ///////////////
@@ -742,7 +742,16 @@ template<> PUBLIC int VARBASE1::toInt() const {
 
 template<> PUBLIC std::int64_t VARBASE1::toInt64() const {
 	this->assertInteger(__PRETTY_FUNCTION__);
-	return static_cast<std::int64_t>(*this);
+	return static_cast<std::int64_t>(var_int);
+}
+
+//////////////
+// var::toSize
+//////////////
+
+template<> PUBLIC std::size_t VARBASE1::toSize() const {
+	this->assertInteger(__PRETTY_FUNCTION__);
+	return static_cast<std::size_t>(var_int);
 }
 
 ////////////////
