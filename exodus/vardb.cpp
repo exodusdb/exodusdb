@@ -1499,7 +1499,9 @@ bool var::read(in file, in key) {
 				pgconn,
 				sql.var_str.c_str(),
 				1,                            // One param (key)
-				static_cast<const Oid[]>(25), // Text
+//				static_cast<const Oid[]>(25), // Text (Doesnt compile pre 24.04)
+//				(const Oid[]){25},            // Text (Warning)
+				nullptr,                      // Let the backend deduce param type
 				paramValues, paramLengths,
 				paramFormats,	              // Text arguments
 				0                             // Text results
@@ -2264,7 +2266,9 @@ bool var::deleterecord(in key) const {
 				pgconn,
 				sql.var_str.c_str(),
 				1,                            // One param (key)
-				static_cast<const Oid[]>(25), // Text
+//				static_cast<const Oid[]>(25), // Text (Doesnt compile pre 24.04)
+//				(const Oid[]){25},            // Text (Warning)
+				nullptr,                      // Let the backend deduce param type
 				paramValues, paramLengths,
 				paramFormats,	              // Text arguments
 				0                             // Text results

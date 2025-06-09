@@ -181,8 +181,21 @@ class ExodusCppLexer(CppLexer):
 #        (re.compile(r'\b(' + '|'.join(EXTRA_PSEUDO) + r')\b'), Keyword.Pseudo),
     ]
 
+# Works on Ubuntu 24.40
+#    def get_tokens_unprocessed(self, text, stack=('root',)):
+#        for index, token, value in super().get_tokens_unprocessed(text, stack):
+#            matched = False
+#            for pattern, token_type in self._exodus_rules:
+#                if pattern.fullmatch(value):
+#                    yield index, token_type, value
+#                    matched = True
+#                    break
+#            if not matched:
+#                yield index, token, value
+
+	# Works on Ubuntu 22.04
     def get_tokens_unprocessed(self, text, stack=('root',)):
-        for index, token, value in super().get_tokens_unprocessed(text, stack):
+        for index, token, value in super().get_tokens_unprocessed(text):
             matched = False
             for pattern, token_type in self._exodus_rules:
                 if pattern.fullmatch(value):
