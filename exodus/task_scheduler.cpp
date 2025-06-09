@@ -1,5 +1,10 @@
-#include <chrono>
-#include <iostream>
+#if EXO_MODULE
+	import std;
+#else
+#	include <chrono>
+#	include <iostream>
+#	include <utility>
+#endif
 
 // Motivation:
 // 1. Allow a thread to act as its own io event loop whether it has fibers or not.

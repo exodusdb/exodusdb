@@ -115,8 +115,8 @@ ResultRange<TaskManager, AsyncResult>::Iterator::operator++() {
 }
 
 // Explicit instantiations
-template class PUBLIC ResultRange<JobManager, ExoEnv>;
-template class PUBLIC ResultRange<TaskManager, AsyncResult>;
+template class ResultRange<JobManager, ExoEnv>;
+template class ResultRange<TaskManager, AsyncResult>;
 
 // Declare TaskManager specialization (defined in task_manager.cpp)
 template<>
