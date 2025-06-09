@@ -186,7 +186,8 @@ auto async_PQexec_impl(
 		LOG << "PQsendQueryPrepared:" << static_cast<PGconn*>(conn) << "\n";
 		exit_status = PQsendQueryPrepared(conn, query, nParams, /*paramTypes,*/ paramValues, paramLengths, paramFormats, resultFormat);
 	} else {
-		static_assert(false, "N must be 1, 2 or 3");
+		// Doesnt compile pre-24.04
+//		static_assert(false, "N must be 1, 2 or 3");
 	}
 	if (exit_status != 1) {
 		std::string pqerr = PQerrorMessage(conn);
