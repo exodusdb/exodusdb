@@ -278,6 +278,7 @@ execute_process(
 		job_manager.cpp
 		threadsafequeue.cpp
 		threadpool.cpp
+		result_range.cpp
 
 		varlisted.cpp
 
@@ -436,6 +437,7 @@ execute_process(
 				dim.h
 				job.h
 				job_manager.h
+				result_range.h
 				task_manager.h
 				rex.h
 			DESTINATION include/exodus

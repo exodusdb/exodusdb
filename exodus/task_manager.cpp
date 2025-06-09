@@ -13,6 +13,7 @@
 
 #include "task_scheduler.h"
 #include "task_manager.h"
+#include "task_manager_impl.h"
 
 #include <boost/fiber/all.hpp>
 
@@ -21,19 +22,8 @@
 
 namespace exo {
 
-struct TaskManager::Impl {
-	std::vector<boost::fibers::fiber> fibers;
-	boost::fibers::buffered_channel<std::shared_ptr<AsyncResult>> result_channel;
-	std::mutex mutex;
-
-	Impl() : result_channel(128) {
-		// Set round-robin scheduler for cooperative execution
-		// DO NOT override the custom fiber scheduler set in vardb_async.
-//		boost::fibers::use_scheduling_algorithm<boost::fibers::algo::round_robin>();
-	}
-};
-
-TaskManager::TaskManager() : impl_(std::make_unique<Impl>()) {}
+//TaskManager_Impl() : result_channel(128) {}
+TaskManager::TaskManager() : impl_(std::make_unique<TaskManager_Impl>()) {}
 
 TaskManager::~TaskManager() {
 	impl_->result_channel.close();
@@ -141,6 +131,7 @@ void TaskManager::set_async_result(var data, var message) const {
 	impl_->result_channel.push(result_ptr);
 }
 
+#ifdef EXO_GENERATOR
 auto TaskManager::async_results() -> std::generator<AsyncResult&> {
 	LOG << "Expecting " << async_count_ << " results" << std::endl;
 	while (async_count_) {
@@ -157,5 +148,10 @@ auto TaskManager::async_results() -> std::generator<AsyncResult&> {
 		}
 	}
 }
+#else
+auto TaskManager::async_results() -> ResultRange<TaskManager, AsyncResult> {
+	return ResultRange<TaskManager, AsyncResult>(this);
+}
+#endif
 
 } // namespace exo

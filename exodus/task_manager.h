@@ -4,6 +4,8 @@
 #ifdef EXO_MODULE
 	import std;
 	import var;
+#	define EXO_GENERATOR
+//#	include <exodus/result_range.h>
 #else
 #	include <utility>
 #   include <functional>
@@ -11,6 +13,13 @@
 #   include <generator>
 #   include <tuple>
 #	include <exception>
+#	include <version>
+#	ifdef __cpp_lib_generator 202207L
+#		define EXO_GENERATOR
+#   	include <generator>
+#	else
+#		include <exodus/result_range.h>
+#	endif
 
 #	include <exodus/var.h>
 #endif
@@ -19,20 +28,25 @@
 
 namespace exo {
 
-class AsyncResult {
+class PUBLIC AsyncResult {
 public:
 	var data;
 	var message;
 };
 
+struct TaskManager_Impl;
+
 class PUBLIC TaskManager {
 
-	struct Impl;
-	std::unique_ptr<Impl> impl_;
+	std::unique_ptr<TaskManager_Impl> impl_;
 	size_t async_count_ = 0;
 	std::exception_ptr err_ptr;
 
 	void async_impl(std::function<void()> fn);
+
+#ifndef EXO_GENERATOR
+    friend class ResultRange<TaskManager, AsyncResult>; // Allow access to impl_, err_ptr, async_count_
+#endif
 
 public:
 	TaskManager();
@@ -154,9 +168,15 @@ public:
 	// See async for an example.
 	void set_async_result(var data, var message = "") const;
 
+#ifdef EXO_GENERATOR
+
 	// A range-based for loop to pick up all async results.
 	// See async for an example.
 	auto async_results() -> std::generator<AsyncResult&>;
+
+#else
+	auto async_results() -> ResultRange<TaskManager, AsyncResult>;
+#endif
 
 	// Get the number of asyncs pending.
 	// Not required if you use async_results to collect results.

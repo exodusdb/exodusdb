@@ -7363,390 +7363,401 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 </pre>
 			</p>
 		</td></tr>
-</table>
-<h5 id="Array_Mutation">Array Mutation</h5>
+	<tr>
+		<td>
+			<p>
+				<code>std::array
+					<var, N></code></p></td>
+			<td>
+				<p>
+					<code>d1.unpack()</code></p></td>
+			<td>
+				<p>New Unpack function to allow "auto [a,b,c] = d1.unpack&lt;3&gt;();"</p>
+			</td></tr>
+	</table>
+	<h5 id="Array_Mutation">Array Mutation</h5>
 
-<table class="wikitable">
-	<tr>
-		<th>Use</th>
-		<th>Function</th>
-		<th>Description</th> </tr>
-	<tr>
-		<td></td>
-		<td>
-			<p>
-				<code>d1.splitter(str1, delimiter = FM)</code></p></td>
-		<td>
-			<p>Create or update a dimensioned array using a string with delimiters.</p>
-			<p>If the dim array is undimensioned it will be dimensioned with the number of elements that the string has fields.</p>
-			<p>If the dim array is dimensioned and has more elements than there are fields in the string, the excess array elements are initialised to "". If the record has more fields than there are elements in the array, the excess fields are all left unsplit in the final element of the array.</p>
-			<p>Predimensioning arrays allows the efficient reuse of arrays in loops and ensures that all elements are assigned values, useful when reading records from DB files.</p>
-			<p>Using undimensioned arrays allows the efficient handling of arrays with a very variable number of elements. e.g. OS text files.</p>
-			<p>
-				<pre><span class="nf">dim</span><span class="w"> </span><span class="n">d1</span><span class="p">;</span>
+	<table class="wikitable">
+		<tr>
+			<th>Use</th>
+			<th>Function</th>
+			<th>Description</th> </tr>
+		<tr>
+			<td></td>
+			<td>
+				<p>
+					<code>d1.splitter(str1, delimiter = FM)</code></p></td>
+			<td>
+				<p>Create or update a dimensioned array using a string with delimiters.</p>
+				<p>If the dim array is undimensioned it will be dimensioned with the number of elements that the string has fields.</p>
+				<p>If the dim array is dimensioned and has more elements than there are fields in the string, the excess array elements are initialised to "". If the record has more fields than there are elements in the array, the excess fields are all left unsplit in the final element of the array.</p>
+				<p>Predimensioning arrays allows the efficient reuse of arrays in loops and ensures that all elements are assigned values, useful when reading records from DB files.</p>
+				<p>Using undimensioned arrays allows the efficient handling of arrays with a very variable number of elements. e.g. OS text files.</p>
+				<p>
+					<pre><span class="nf">dim</span><span class="w"> </span><span class="n">d1</span><span class="p">;</span>
 <span class="n">d1</span><span class="p">.</span><span class="nf">splitter</span><span class="p">(</span><span class="s">&quot;f1^f2^f3&quot;</span><span class="kt">_var</span><span class="p">);</span><span class="w"> </span><span class="c1">// d1.rows() -&gt; 3  //// Automatically dimensioned.</span>
 <span class="c1">//</span>
 <span class="nf">dim</span><span class="w"> </span><span class="nf">d2</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span>
 <span class="n">d2</span><span class="p">.</span><span class="nf">splitter</span><span class="p">(</span><span class="s">&quot;f1^f2^f3&quot;</span><span class="kt">_var</span><span class="p">);</span><span class="w"> </span><span class="c1">// d2.rows() -&gt; 10 /// Predimensioned. Excess elements become &quot;&quot;</span>
 </pre>
-			</p>
-		</td></tr>
-	<tr>
-		<td></td>
-		<td>
-			<p>
-				<code>d1.sorter(reverse = false)</code></p></td>
-		<td>
-			<p>Sort a dimensioned array.</p>
-			<p>The order of the elements is adjusted so that each element is &lt;= the next.</p>
-			<p>
-				<em>reverse:</em> If true, then the order is reversed. The default is false.</p>
-			<p>
-				<pre><span class="nf">dim</span><span class="w"> </span><span class="n">d1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;2,20,10,1&quot;</span><span class="kt">_var</span><span class="p">.</span><span class="nf">split</span><span class="p">(</span><span class="s">&quot;,&quot;</span><span class="p">);</span>
+				</p>
+			</td></tr>
+		<tr>
+			<td></td>
+			<td>
+				<p>
+					<code>d1.sorter(reverse = false)</code></p></td>
+			<td>
+				<p>Sort a dimensioned array.</p>
+				<p>The order of the elements is adjusted so that each element is &lt;= the next.</p>
+				<p>
+					<em>reverse:</em> If true, then the order is reversed. The default is false.</p>
+				<p>
+					<pre><span class="nf">dim</span><span class="w"> </span><span class="n">d1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;2,20,10,1&quot;</span><span class="kt">_var</span><span class="p">.</span><span class="nf">split</span><span class="p">(</span><span class="s">&quot;,&quot;</span><span class="p">);</span>
 <span class="n">d1</span><span class="p">.</span><span class="nf">sorter</span><span class="p">();</span>
 <span class="nf">let</span><span class="w"> </span><span class="n">v1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">d1</span><span class="p">.</span><span class="nf">join</span><span class="p">(</span><span class="s">&quot;,&quot;</span><span class="p">);</span><span class="w"> </span><span class="c1">// &quot;1,2,10,20&quot;_var</span>
 </pre>
-			</p>
-		</td></tr>
-	<tr>
-		<td></td>
-		<td>
-			<p>
-				<code>d1.reverser()</code></p></td>
-		<td>
-			<p>Reverse a dimensioned array.</p>
-			<p>The order of the elements is reversed.</p>
-			<p>
-				<pre><span class="nf">dim</span><span class="w"> </span><span class="n">d1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;2,20,10,1&quot;</span><span class="kt">_var</span><span class="p">.</span><span class="nf">split</span><span class="p">(</span><span class="s">&quot;,&quot;</span><span class="p">);</span>
+				</p>
+			</td></tr>
+		<tr>
+			<td></td>
+			<td>
+				<p>
+					<code>d1.reverser()</code></p></td>
+			<td>
+				<p>Reverse a dimensioned array.</p>
+				<p>The order of the elements is reversed.</p>
+				<p>
+					<pre><span class="nf">dim</span><span class="w"> </span><span class="n">d1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;2,20,10,1&quot;</span><span class="kt">_var</span><span class="p">.</span><span class="nf">split</span><span class="p">(</span><span class="s">&quot;,&quot;</span><span class="p">);</span>
 <span class="n">d1</span><span class="p">.</span><span class="nf">reverser</span><span class="p">();</span>
 <span class="nf">let</span><span class="w"> </span><span class="n">v1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">d1</span><span class="p">.</span><span class="nf">join</span><span class="p">(</span><span class="s">&quot;,&quot;</span><span class="p">);</span><span class="w"> </span><span class="c1">// &quot;1,10,20,2&quot;_var</span>
 </pre>
-			</p>
-		</td></tr>
-	<tr>
-		<td></td>
-		<td>
-			<p>
-				<code>d1.randomizer()</code></p></td>
-		<td>
-			<p>Randomise a dimensioned array.</p>
-			<p>The order of the elements is randomised.</p>
-			<p>
-				<pre><span class="nf">dim</span><span class="w"> </span><span class="n">d1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;2,20,10,1&quot;</span><span class="kt">_var</span><span class="p">.</span><span class="nf">split</span><span class="p">(</span><span class="s">&quot;,&quot;</span><span class="p">);</span>
+				</p>
+			</td></tr>
+		<tr>
+			<td></td>
+			<td>
+				<p>
+					<code>d1.randomizer()</code></p></td>
+			<td>
+				<p>Randomise a dimensioned array.</p>
+				<p>The order of the elements is randomised.</p>
+				<p>
+					<pre><span class="nf">dim</span><span class="w"> </span><span class="n">d1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;2,20,10,1&quot;</span><span class="kt">_var</span><span class="p">.</span><span class="nf">split</span><span class="p">(</span><span class="s">&quot;,&quot;</span><span class="p">);</span>
 <span class="n">d1</span><span class="p">.</span><span class="nf">randomizer</span><span class="p">();</span>
 <span class="nf">let</span><span class="w"> </span><span class="n">v1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">d1</span><span class="p">.</span><span class="nf">join</span><span class="p">(</span><span class="s">&quot;,&quot;</span><span class="p">);</span><span class="w"> </span><span class="c1">// random</span>
 </pre>
-			</p>
-		</td></tr>
-</table>
-<h5 id="Array_Conversion">Array Conversion</h5>
+				</p>
+			</td></tr>
+	</table>
+	<h5 id="Array_Conversion">Array Conversion</h5>
 
-<table class="wikitable">
-	<tr>
-		<th>Use</th>
-		<th>Function</th>
-		<th>Description</th> </tr>
-	<tr>
-		<td>
-			<p>
-				<code>dim=</code></p></td>
-		<td>
-			<p>
-				<code>d1.sort(reverse = false)</code></p></td>
-		<td>
-			<p>Get a sorted copy of a dimensioned array.</p>
-		</td></tr>
-	<tr>
-		<td>
-			<p>
-				<code>dim=</code></p></td>
-		<td>
-			<p>
-				<code>d1.reverse()</code></p></td>
-		<td>
-			<p>Get a reversed copy of a dimensioned array;</p>
-		</td></tr>
-	<tr>
-		<td>
-			<p>
-				<code>dim=</code></p></td>
-		<td>
-			<p>
-				<code>d1.randomize()</code></p></td>
-		<td>
-			<p>Get a randomised copy of a dimensioned array.</p>
-		</td></tr>
-</table>
-<h5 id="Array_DB_I_O">Array DB I/O</h5>
+	<table class="wikitable">
+		<tr>
+			<th>Use</th>
+			<th>Function</th>
+			<th>Description</th> </tr>
+		<tr>
+			<td>
+				<p>
+					<code>dim=</code></p></td>
+			<td>
+				<p>
+					<code>d1.sort(reverse = false)</code></p></td>
+			<td>
+				<p>Get a sorted copy of a dimensioned array.</p>
+			</td></tr>
+		<tr>
+			<td>
+				<p>
+					<code>dim=</code></p></td>
+			<td>
+				<p>
+					<code>d1.reverse()</code></p></td>
+			<td>
+				<p>Get a reversed copy of a dimensioned array;</p>
+			</td></tr>
+		<tr>
+			<td>
+				<p>
+					<code>dim=</code></p></td>
+			<td>
+				<p>
+					<code>d1.randomize()</code></p></td>
+			<td>
+				<p>Get a randomised copy of a dimensioned array.</p>
+			</td></tr>
+	</table>
+	<h5 id="Array_DB_I_O">Array DB I/O</h5>
 
-<table class="wikitable">
-	<tr>
-		<th>Use</th>
-		<th>Function</th>
-		<th>Description</th> </tr>
-	<tr>
-		<td></td>
-		<td>
-			<p>
-				<code>d1.write(dbfile, key)</code></p></td>
-		<td>
-			<p>Write a DB file record created from a dimensioned array.</p>
-			<p>Each element in the array becomes a separate field in the DB record.</p>
-			<p>Redundant trailing FMs are omitted.</p>
-			<p>
-				<pre><span class="nf">dim</span><span class="w"> </span><span class="n">d1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;Client GD^G^20855^30000^1001.00^20855.76539&quot;</span><span class="kt">_var</span><span class="p">.</span><span class="nf">split</span><span class="p">();</span>
+	<table class="wikitable">
+		<tr>
+			<th>Use</th>
+			<th>Function</th>
+			<th>Description</th> </tr>
+		<tr>
+			<td></td>
+			<td>
+				<p>
+					<code>d1.write(dbfile, key)</code></p></td>
+			<td>
+				<p>Write a DB file record created from a dimensioned array.</p>
+				<p>Each element in the array becomes a separate field in the DB record.</p>
+				<p>Redundant trailing FMs are omitted.</p>
+				<p>
+					<pre><span class="nf">dim</span><span class="w"> </span><span class="n">d1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;Client GD^G^20855^30000^1001.00^20855.76539&quot;</span><span class="kt">_var</span><span class="p">.</span><span class="nf">split</span><span class="p">();</span>
 <span class="nf">let</span><span class="w"> </span><span class="n">file</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;xo_clients&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;GD001&quot;</span><span class="p">;</span>
 <span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="ow">not</span><span class="w"> </span><span class="nf">deleterecord</span><span class="p">(</span><span class="s">&quot;xo_clients&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;GD001&quot;</span><span class="p">))</span><span class="w"> </span><span class="p">{};</span><span class="w"> </span><span class="c1">// Cleanup first</span>
 <span class="n">d1</span><span class="p">.</span><span class="nf">write</span><span class="p">(</span><span class="n">file</span><span class="p">,</span><span class="w"> </span><span class="n">key</span><span class="p">);</span>
 <span class="c1">// or</span>
 <span class="nf">write</span><span class="p">(</span><span class="n">d1</span><span class="w"> </span><span class="ow">on</span><span class="w"> </span><span class="n">file</span><span class="p">,</span><span class="w"> </span><span class="n">key</span><span class="p">);</span>
 </pre>
-			</p>
-		</td></tr>
-	<tr>
-		<td>
-			<p>
-				<code>if</code></p></td>
-		<td>
-			<p>
-				<code>d1.read(dbfile, key)</code></p></td>
-		<td>
-			<p>Read a DB file record into a dimensioned array.</p>
-			<p>Each field in the database record becomes a single element in the array.</p>
-			<p>
-				<em>return:</em> True if the record exists or false if not,</p>
-			<p>If the array is predimensioned then any excess array elements are initialised to "" and any excess record fields are left unsplit in the final array element. See dim splitter for more info.</p>
-			<p>If the array is not predimensioned (rows and cols = 0) then it will be dimensioned to have exactly the same number of rows as there are fields in the record being read.</p>
-			<p>
-				<pre><span class="nf">dim</span><span class="w"> </span><span class="nf">d1</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span>
+				</p>
+			</td></tr>
+		<tr>
+			<td>
+				<p>
+					<code>if</code></p></td>
+			<td>
+				<p>
+					<code>d1.read(dbfile, key)</code></p></td>
+			<td>
+				<p>Read a DB file record into a dimensioned array.</p>
+				<p>Each field in the database record becomes a single element in the array.</p>
+				<p>
+					<em>return:</em> True if the record exists or false if not,</p>
+				<p>If the array is predimensioned then any excess array elements are initialised to "" and any excess record fields are left unsplit in the final array element. See dim splitter for more info.</p>
+				<p>If the array is not predimensioned (rows and cols = 0) then it will be dimensioned to have exactly the same number of rows as there are fields in the record being read.</p>
+				<p>
+					<pre><span class="nf">dim</span><span class="w"> </span><span class="nf">d1</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span>
 <span class="nf">let</span><span class="w"> </span><span class="n">file</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;xo_clients&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;GD001&quot;</span><span class="p">;</span>
 <span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="ow">not</span><span class="w"> </span><span class="n">d1</span><span class="p">.</span><span class="nf">read</span><span class="p">(</span><span class="n">file</span><span class="p">,</span><span class="w"> </span><span class="n">key</span><span class="p">))</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="c1">// d1.join() -&gt; &quot;Client GD^G^20855^30000^1001.00^20855.76539^^^^&quot;_var</span>
 <span class="c1">// or</span>
 <span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="ow">not</span><span class="w"> </span><span class="nf">read</span><span class="p">(</span><span class="n">d1</span><span class="w"> </span><span class="ow">from</span><span class="w"> </span><span class="n">file</span><span class="p">,</span><span class="w"> </span><span class="n">key</span><span class="p">))</span><span class="w"> </span><span class="p">...</span>
 </pre>
-			</p>
-		</td></tr>
-</table>
-<h5 id="Array_OS_I_O">Array OS I/O</h5>
+				</p>
+			</td></tr>
+	</table>
+	<h5 id="Array_OS_I_O">Array OS I/O</h5>
 
-<table class="wikitable">
-	<tr>
-		<th>Use</th>
-		<th>Function</th>
-		<th>Description</th> </tr>
-	<tr>
-		<td>
-			<p>
-				<code>if</code></p></td>
-		<td>
-			<p>
-				<code>d1.oswrite(osfilename, codepage = "")</code></p></td>
-		<td>
-			<p>Create an entire OS text file from a dimensioned array</p>
-			<p>Each element of the array becomes one line in the OS file delimited by \n</p>
-			<p>Any existing OS file is overwritten and replaced.</p>
-			<p>
-				<em>codepage:</em> Optional: Data is converted from UTF8 to the required codepage/encoding before output. If the conversion cannot be performed then return false.</p>
-			<p>
-				<em>return:</em> True if successful or false if not.</p>
-			<p>
-				<pre><span class="nf">dim</span><span class="w"> </span><span class="n">d1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;aaa=1</span><span class="se">\n</span><span class="s">bbb=2</span><span class="se">\n</span><span class="s">ccc=3</span><span class="se">\n</span><span class="s">&quot;</span><span class="kt">_var</span><span class="p">.</span><span class="nf">split</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+	<table class="wikitable">
+		<tr>
+			<th>Use</th>
+			<th>Function</th>
+			<th>Description</th> </tr>
+		<tr>
+			<td>
+				<p>
+					<code>if</code></p></td>
+			<td>
+				<p>
+					<code>d1.oswrite(osfilename, codepage = "")</code></p></td>
+			<td>
+				<p>Create an entire OS text file from a dimensioned array</p>
+				<p>Each element of the array becomes one line in the OS file delimited by \n</p>
+				<p>Any existing OS file is overwritten and replaced.</p>
+				<p>
+					<em>codepage:</em> Optional: Data is converted from UTF8 to the required codepage/encoding before output. If the conversion cannot be performed then return false.</p>
+				<p>
+					<em>return:</em> True if successful or false if not.</p>
+				<p>
+					<pre><span class="nf">dim</span><span class="w"> </span><span class="n">d1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;aaa=1</span><span class="se">\n</span><span class="s">bbb=2</span><span class="se">\n</span><span class="s">ccc=3</span><span class="se">\n</span><span class="s">&quot;</span><span class="kt">_var</span><span class="p">.</span><span class="nf">split</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
 <span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="ow">not</span><span class="w"> </span><span class="nf">osremove</span><span class="p">(</span><span class="s">&quot;xo_conf.txt&quot;</span><span class="p">))</span><span class="w"> </span><span class="p">{};</span><span class="w"> </span><span class="c1">// Cleanup first</span>
 <span class="nf">let</span><span class="w"> </span><span class="n">osfilename</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;xo_conf.txt&quot;</span><span class="p">;</span>
 <span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="ow">not</span><span class="w"> </span><span class="n">d1</span><span class="p">.</span><span class="nf">oswrite</span><span class="p">(</span><span class="n">osfilename</span><span class="p">))</span><span class="w"> </span><span class="p">...</span>
 <span class="c1">// or</span>
 <span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="ow">not</span><span class="w"> </span><span class="nf">oswrite</span><span class="p">(</span><span class="n">d1</span><span class="w"> </span><span class="ow">on</span><span class="w"> </span><span class="n">osfilename</span><span class="p">))</span><span class="w"> </span><span class="p">...</span>
 </pre>
-			</p>
-		</td></tr>
-	<tr>
-		<td>
-			<p>
-				<code>if</code></p></td>
-		<td>
-			<p>
-				<code>d1.osread(osfilename, codepage = "")</code></p></td>
-		<td>
-			<p>Read an entire OS text file into a dimensioned array.</p>
-			<p>Each line in the OS file, delimited by \n or \r\n, becomes a separate element in the array.</p>
-			<p>Existing data in the array is lost and the array is redimensioned to the number of lines in the input data.</p>
-			<p>
-				<em>codepage:</em> Optional. Data will be converted from the specified codepage/encoding to UTF8 after being read. If the conversion cannot be performed then return false.</p>
-			<p>
-				<em>return:</em> True if successful or false if not.</p>
-			<p>If the first \n in the file is \r\n then the whole file will be split using \r\n as delimiter.</p>
-			<p>
-				<pre><span class="nf">dim</span><span class="w"> </span><span class="n">d1</span><span class="p">;</span>
+				</p>
+			</td></tr>
+		<tr>
+			<td>
+				<p>
+					<code>if</code></p></td>
+			<td>
+				<p>
+					<code>d1.osread(osfilename, codepage = "")</code></p></td>
+			<td>
+				<p>Read an entire OS text file into a dimensioned array.</p>
+				<p>Each line in the OS file, delimited by \n or \r\n, becomes a separate element in the array.</p>
+				<p>Existing data in the array is lost and the array is redimensioned to the number of lines in the input data.</p>
+				<p>
+					<em>codepage:</em> Optional. Data will be converted from the specified codepage/encoding to UTF8 after being read. If the conversion cannot be performed then return false.</p>
+				<p>
+					<em>return:</em> True if successful or false if not.</p>
+				<p>If the first \n in the file is \r\n then the whole file will be split using \r\n as delimiter.</p>
+				<p>
+					<pre><span class="nf">dim</span><span class="w"> </span><span class="n">d1</span><span class="p">;</span>
 <span class="nf">let</span><span class="w"> </span><span class="n">osfilename</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;xo_conf.txt&quot;</span><span class="p">;</span>
 <span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="ow">not</span><span class="w"> </span><span class="n">d1</span><span class="p">.</span><span class="nf">osread</span><span class="p">(</span><span class="n">osfilename</span><span class="p">))</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="c1">// d1.join(&quot;\n&quot;) -&gt; &quot;aaa=1\nbbb=2\nccc=3\n&quot;_var0</span>
 <span class="c1">// or</span>
 <span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="ow">not</span><span class="w"> </span><span class="nf">osread</span><span class="p">(</span><span class="n">d1</span><span class="w"> </span><span class="ow">from</span><span class="w"> </span><span class="n">osfilename</span><span class="p">))</span><span class="w"> </span><span class="p">...</span>
 </pre>
-			</p>
-		</td></tr>
-</table>
+				</p>
+			</td></tr>
+	</table>
 
-<div class="toc">
-	<h4 id="exoprog">Contents:</h4>
-	<ol>
-		<li>
-			<a href="#Select_Lists">Select Lists</a></li>
-		<li>
-			<a href="#Perform_Execute_Run">Perform/Execute/Run</a></li>
-		<li>
-			<a href="#Program_Termination_">Program Termination </a></li>
-		<li>
-			<a href="#DB_File_Dictionaries">DB File Dictionaries</a></li>
-		<li>
-			<a href="#Io_Conversion">Io Conversion</a></li>
-		<li>
-			<a href="#Ioconv_Date_Time_">Ioconv Date/Time </a></li>
-		<li>
-			<a href="#Time_Date_Utilities">Time/Date Utilities</a></li>
-		<li>
-			<a href="#Terminal_I_O_Utilities">Terminal I/O Utilities</a></li>
-		<li>
-			<a href="#Array_Utilities">Array Utilities</a></li>
-		<li>
-			<a href="#Record_Locking">Record Locking</a></li>
+	<div class="toc">
+		<h4 id="exoprog">Contents:</h4>
+		<ol>
+			<li>
+				<a href="#Select_Lists">Select Lists</a></li>
+			<li>
+				<a href="#Perform_Execute_Run">Perform/Execute/Run</a></li>
+			<li>
+				<a href="#Program_Termination_">Program Termination </a></li>
+			<li>
+				<a href="#DB_File_Dictionaries">DB File Dictionaries</a></li>
+			<li>
+				<a href="#Io_Conversion">Io Conversion</a></li>
+			<li>
+				<a href="#Ioconv_Date_Time_">Ioconv Date/Time </a></li>
+			<li>
+				<a href="#Time_Date_Utilities">Time/Date Utilities</a></li>
+			<li>
+				<a href="#Terminal_I_O_Utilities">Terminal I/O Utilities</a></li>
+			<li>
+				<a href="#Array_Utilities">Array Utilities</a></li>
+			<li>
+				<a href="#Record_Locking">Record Locking</a></li>
 
-	</ol>
-</div>
+		</ol>
+	</div>
 
 
-<h5 id="Select_Lists">Select Lists</h5>
+	<h5 id="Select_Lists">Select Lists</h5>
 
-<table class="wikitable">
-	<tr>
-		<th>Use</th>
-		<th>Function</th>
-		<th>Description</th> </tr>
-	<tr>
-		<td>
-			<p>
-				<code>if</code></p></td>
-		<td>
-			<p>
-				<code>select(sortselectclause_or_filehandle = "")</code></p></td>
-		<td>
-			<p>Create an active select list using a natural language sort/select command.</p>
-			<p>This and all the following exoprog member functions work on an environment variable CURSOR.</p>
-			<p>Identical functions are available directly on plain var objects but vars have less functionality regarding dictionaries and environment variables which are built-in to exoprog.</p>
-			<p>
-				<em>return:</em> True if an active select list was created, false otherwise.</p>
-			<p>In the following examples, various environment variables like RECORD, ID and MV are used instead of declaring and using named vars. In actual code, either may be freely used.</p>
-			<p>
-				<pre><span class="nf">select</span><span class="p">(</span><span class="s">&quot;xo_clients by name by type with type &#39;A&#39; &#39;B&#39; and with balance between 0 and 2000&quot;</span><span class="p">);</span>
+	<table class="wikitable">
+		<tr>
+			<th>Use</th>
+			<th>Function</th>
+			<th>Description</th> </tr>
+		<tr>
+			<td>
+				<p>
+					<code>if</code></p></td>
+			<td>
+				<p>
+					<code>select(sortselectclause_or_filehandle = "")</code></p></td>
+			<td>
+				<p>Create an active select list using a natural language sort/select command.</p>
+				<p>This and all the following exoprog member functions work on an environment variable CURSOR.</p>
+				<p>Identical functions are available directly on plain var objects but vars have less functionality regarding dictionaries and environment variables which are built-in to exoprog.</p>
+				<p>
+					<em>return:</em> True if an active select list was created, false otherwise.</p>
+				<p>In the following examples, various environment variables like RECORD, ID and MV are used instead of declaring and using named vars. In actual code, either may be freely used.</p>
+				<p>
+					<pre><span class="nf">select</span><span class="p">(</span><span class="s">&quot;xo_clients by name by type with type &#39;A&#39; &#39;B&#39; and with balance between 0 and 2000&quot;</span><span class="p">);</span>
 <span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nf">readnext</span><span class="p">(</span><span class="kc">ID</span><span class="p">))</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="n">ok</span>
 </pre>
-			</p>
-		</td></tr>
-	<tr>
-		<td>
-			<p>
-				<code>if</code></p></td>
-		<td>
-			<p>
-				<code>selectkeys(keys)</code></p></td>
-		<td>
-			<p>Create an active select list from a dynamic array of keys.</p>
-			<p>
-				<pre><span class="nf">selectkeys</span><span class="p">(</span><span class="s">&quot;SB001^JB001^JB002&quot;</span><span class="kt">_var</span><span class="p">);</span>
+				</p>
+			</td></tr>
+		<tr>
+			<td>
+				<p>
+					<code>if</code></p></td>
+			<td>
+				<p>
+					<code>selectkeys(keys)</code></p></td>
+			<td>
+				<p>Create an active select list from a dynamic array of keys.</p>
+				<p>
+					<pre><span class="nf">selectkeys</span><span class="p">(</span><span class="s">&quot;SB001^JB001^JB002&quot;</span><span class="kt">_var</span><span class="p">);</span>
 <span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nf">readnext</span><span class="p">(</span><span class="kc">ID</span><span class="p">))</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="n">ok</span><span class="w"> </span><span class="c1">// ID -&gt; &quot;SB001&quot;</span>
 </pre>
-			</p>
-		</td></tr>
-	<tr>
-		<td>
-			<p>
-				<code>if</code></p></td>
-		<td>
-			<p>
-				<code>hasnext()</code></p></td>
-		<td>
-			<p>Check if a select list is active.</p>
-			<p>
-				<pre><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nf">hasnext</span><span class="p">())</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="n">ok</span>
+				</p>
+			</td></tr>
+		<tr>
+			<td>
+				<p>
+					<code>if</code></p></td>
+			<td>
+				<p>
+					<code>hasnext()</code></p></td>
+			<td>
+				<p>Check if a select list is active.</p>
+				<p>
+					<pre><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nf">hasnext</span><span class="p">())</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="n">ok</span>
 </pre>
-			</p>
-		</td></tr>
-	<tr>
-		<td>
-			<p>
-				<code>if</code></p></td>
-		<td>
-			<p>
-				<code>readnext(out key)</code></p></td>
-		<td>
-			<p>Get the next key from an active select list.</p>
-			<p>
-				<em>key[out]:</em> A string. Typically the key of a db file record.</p>
-			<p>
-				<em>return:</em> True if an active select list was available and the next key in the list was obtained.</p>
-			<p>
-				<pre><span class="nf">selectkeys</span><span class="p">(</span><span class="s">&quot;SB001^JB001^JB002&quot;</span><span class="kt">_var</span><span class="p">);</span>
+				</p>
+			</td></tr>
+		<tr>
+			<td>
+				<p>
+					<code>if</code></p></td>
+			<td>
+				<p>
+					<code>readnext(out key)</code></p></td>
+			<td>
+				<p>Get the next key from an active select list.</p>
+				<p>
+					<em>key[out]:</em> A string. Typically the key of a db file record.</p>
+				<p>
+					<em>return:</em> True if an active select list was available and the next key in the list was obtained.</p>
+				<p>
+					<pre><span class="nf">selectkeys</span><span class="p">(</span><span class="s">&quot;SB001^JB001^JB002&quot;</span><span class="kt">_var</span><span class="p">);</span>
 <span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nf">readnext</span><span class="p">(</span><span class="kc">ID</span><span class="p">))</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="n">ok</span><span class="w"> </span><span class="c1">// ID -&gt; &quot;SB001&quot;</span>
 </pre>
-			</p>
-		</td></tr>
-	<tr>
-		<td>
-			<p>
-				<code>if</code></p></td>
-		<td>
-			<p>
-				<code>readnext(out key, out valueno)</code></p></td>
-		<td>
-			<p>Get the next key and value number pair from an active select list.</p>
-			<p>
-				<em>key[out]:</em> A string. Typically the key of a db file record.</p>
-			<p>
-				<em>valueno[out]:</em> Is only available in select lists that have been created by sort/select commands that refer to multi-valued db dictionary fields where db records have multiple values for a specific field. In this case, a record key will appear multiple times in the select list since each multivalue is exploded for the purpose of sorting and selecting. This can be viewed as a process of "normalising" multivalues so they appear as multiple records instead of being held in a single record.</p>
-			<p>
-				<em>return:</em> True if an active select list was available and the next key in the list was obtained.</p>
-			<p>
-				<pre><span class="nf">selectkeys</span><span class="p">(</span><span class="s">&quot;SB001]2^SB001]1^JB001]2&quot;</span><span class="kt">_var</span><span class="p">);</span>
+				</p>
+			</td></tr>
+		<tr>
+			<td>
+				<p>
+					<code>if</code></p></td>
+			<td>
+				<p>
+					<code>readnext(out key, out valueno)</code></p></td>
+			<td>
+				<p>Get the next key and value number pair from an active select list.</p>
+				<p>
+					<em>key[out]:</em> A string. Typically the key of a db file record.</p>
+				<p>
+					<em>valueno[out]:</em> Is only available in select lists that have been created by sort/select commands that refer to multi-valued db dictionary fields where db records have multiple values for a specific field. In this case, a record key will appear multiple times in the select list since each multivalue is exploded for the purpose of sorting and selecting. This can be viewed as a process of "normalising" multivalues so they appear as multiple records instead of being held in a single record.</p>
+				<p>
+					<em>return:</em> True if an active select list was available and the next key in the list was obtained.</p>
+				<p>
+					<pre><span class="nf">selectkeys</span><span class="p">(</span><span class="s">&quot;SB001]2^SB001]1^JB001]2&quot;</span><span class="kt">_var</span><span class="p">);</span>
 <span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nf">readnext</span><span class="p">(</span><span class="kc">ID</span><span class="p">,</span><span class="w"> </span><span class="kc">MV</span><span class="p">))</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="n">ok</span><span class="w"> </span><span class="c1">// ID -&gt; &quot;SB001&quot; // MV -&gt; 2</span>
 </pre>
-			</p>
-		</td></tr>
-	<tr>
-		<td>
-			<p>
-				<code>if</code></p></td>
-		<td>
-			<p>
-				<code>readnext(out record, out key, out valueno)</code></p></td>
-		<td>
-			<p>Get the next record, key and value no from an active select list.</p>
-			<p>
-				<em>record[out]:</em> Is only available in select lists that have been created with the final (R) option. Otherwise the record will be returned as an empty string and must be obtained using a db read() function.</p>
-			<p>
-				<em>key[out]:</em> A string. Typically the key of a db file record.</p>
-			<p>
-				<em>valueno[out]:</em> Is only available in select lists that have been created by sort/select commands that refer to multi-valued db dictionary fields where db records have multiple values for a specific field.</p>
-			<p>
-				<em>return:</em> True if an active select list was available and the next key in the list was obtained.</p>
-			<p>
-				<pre><span class="nf">select</span><span class="p">(</span><span class="s">&quot;xo_clients by name (R)&quot;</span><span class="p">);</span>
+				</p>
+			</td></tr>
+		<tr>
+			<td>
+				<p>
+					<code>if</code></p></td>
+			<td>
+				<p>
+					<code>readnext(out record, out key, out valueno)</code></p></td>
+			<td>
+				<p>Get the next record, key and value no from an active select list.</p>
+				<p>
+					<em>record[out]:</em> Is only available in select lists that have been created with the final (R) option. Otherwise the record will be returned as an empty string and must be obtained using a db read() function.</p>
+				<p>
+					<em>key[out]:</em> A string. Typically the key of a db file record.</p>
+				<p>
+					<em>valueno[out]:</em> Is only available in select lists that have been created by sort/select commands that refer to multi-valued db dictionary fields where db records have multiple values for a specific field.</p>
+				<p>
+					<em>return:</em> True if an active select list was available and the next key in the list was obtained.</p>
+				<p>
+					<pre><span class="nf">select</span><span class="p">(</span><span class="s">&quot;xo_clients by name (R)&quot;</span><span class="p">);</span>
 <span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nf">readnext</span><span class="p">(</span><span class="kc">RECORD</span><span class="p">,</span><span class="w"> </span><span class="kc">ID</span><span class="p">,</span><span class="w"> </span><span class="kc">MV</span><span class="p">))</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="n">ok</span><span class="p">;</span>
 <span class="n">assert</span><span class="p">(</span><span class="ow">not</span><span class="w"> </span><span class="kc">RECORD</span><span class="p">.</span><span class="nf">empty</span><span class="p">());</span>
 </pre>
-			</p>
-		</td></tr>
-	<tr>
-		<td></td>
-		<td>
-			<p>
-				<code>pushselect(out cursor)</code></p></td>
-		<td>
-			<p>Get a reference to the currently active select list and suspend it.</p>
-			<p>Allow another select list to be activated and used temporarily before the original select list is reactivated.</p>
-			<p>Multiple levels of pushselect/popselect can be used.</p>
-			<p>
-				<em>cursor[out]:</em> A var that can be passed later on to the popselect() function to reactivate the saved list.</p>
-			<p>
-				<pre><span class="nf">select</span><span class="p">(</span><span class="s">&quot;xo_clients by name&quot;</span><span class="p">);</span>
+				</p>
+			</td></tr>
+		<tr>
+			<td></td>
+			<td>
+				<p>
+					<code>pushselect(out cursor)</code></p></td>
+			<td>
+				<p>Get a reference to the currently active select list and suspend it.</p>
+				<p>Allow another select list to be activated and used temporarily before the original select list is reactivated.</p>
+				<p>Multiple levels of pushselect/popselect can be used.</p>
+				<p>
+					<em>cursor[out]:</em> A var that can be passed later on to the popselect() function to reactivate the saved list.</p>
+				<p>
+					<pre><span class="nf">select</span><span class="p">(</span><span class="s">&quot;xo_clients by name&quot;</span><span class="p">);</span>
 <span class="kt">var</span><span class="w"> </span><span class="n">saved_xo_clients_cursor</span><span class="p">;</span>
 <span class="nf">pushselect</span><span class="p">(</span><span class="n">saved_xo_clients_cursor</span><span class="p">);</span>
 <span class="c1">//</span>
@@ -7754,902 +7765,902 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 <span class="c1">//</span>
 <span class="nf">popselect</span><span class="p">(</span><span class="n">saved_xo_clients_cursor</span><span class="p">);</span><span class="w"> </span><span class="c1">// Reactivate the original select list.</span>
 </pre>
-			</p>
-		</td></tr>
-	<tr>
-		<td></td>
-		<td>
-			<p>
-				<code>popselect(cursor)</code></p></td>
-		<td>
-			<p>Re-activate a select list using a reference provided by pushselect().</p>
-			<p>
-				<em>cursor:</em> A var created by the pushselect() function.</p>
-			<p>See pushselect() for more info.</p>
-		</td></tr>
-	<tr>
-		<td></td>
-		<td>
-			<p>
-				<code>clearselect()</code></p></td>
-		<td>
-			<p>Deactivate an active select list.</p>
-			<p>If no select list is active then nothing is done.</p>
-			<p>
-				<pre><span class="nf">clearselect</span><span class="p">();</span>
+				</p>
+			</td></tr>
+		<tr>
+			<td></td>
+			<td>
+				<p>
+					<code>popselect(cursor)</code></p></td>
+			<td>
+				<p>Re-activate a select list using a reference provided by pushselect().</p>
+				<p>
+					<em>cursor:</em> A var created by the pushselect() function.</p>
+				<p>See pushselect() for more info.</p>
+			</td></tr>
+		<tr>
+			<td></td>
+			<td>
+				<p>
+					<code>clearselect()</code></p></td>
+			<td>
+				<p>Deactivate an active select list.</p>
+				<p>If no select list is active then nothing is done.</p>
+				<p>
+					<pre><span class="nf">clearselect</span><span class="p">();</span>
 </pre>
-			</p>
-		</td></tr>
-	<tr>
-		<td>
-			<p>
-				<code>if</code></p></td>
-		<td>
-			<p>
-				<code>deleterecord(filename)</code></p></td>
-		<td>
-			<p>Delete multiple DB records using an active select list.</p>
-			<p>
-				<em>return:</em> False if any records could not be deleted.</p>
-			<p>Contrast this function with the two argument "deleterecord(file, key)" function that deletes a single record.</p>
-			<p>
-				<pre><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nf">select</span><span class="p">(</span><span class="s">&quot;xo_clients with type &#39;Q&#39; and with balance between 0 and 100&quot;</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+				</p>
+			</td></tr>
+		<tr>
+			<td>
+				<p>
+					<code>if</code></p></td>
+			<td>
+				<p>
+					<code>deleterecord(filename)</code></p></td>
+			<td>
+				<p>Delete multiple DB records using an active select list.</p>
+				<p>
+					<em>return:</em> False if any records could not be deleted.</p>
+				<p>Contrast this function with the two argument "deleterecord(file, key)" function that deletes a single record.</p>
+				<p>
+					<pre><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nf">select</span><span class="p">(</span><span class="s">&quot;xo_clients with type &#39;Q&#39; and with balance between 0 and 100&quot;</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
 <span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nf">deleterecord</span><span class="p">(</span><span class="s">&quot;xo_clients&quot;</span><span class="p">))</span><span class="w"> </span><span class="p">...</span>
 <span class="p">}</span>
 </pre>
-			</p>
-		</td></tr>
-	<tr>
-		<td>
-			<p>
-				<code>if</code></p></td>
-		<td>
-			<p>
-				<code>deleterecord(dbfile, key)</code></p></td>
-		<td>
-			<p>Delete a single DB record.</p>
-			<p>
-				<pre><span class="nf">let</span><span class="w"> </span><span class="n">file</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;xo_clients&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;QQ001&quot;</span><span class="p">;</span>
+				</p>
+			</td></tr>
+		<tr>
+			<td>
+				<p>
+					<code>if</code></p></td>
+			<td>
+				<p>
+					<code>deleterecord(dbfile, key)</code></p></td>
+			<td>
+				<p>Delete a single DB record.</p>
+				<p>
+					<pre><span class="nf">let</span><span class="w"> </span><span class="n">file</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;xo_clients&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;QQ001&quot;</span><span class="p">;</span>
 <span class="nf">write</span><span class="p">(</span><span class="s">&quot;&quot;</span><span class="w"> </span><span class="ow">on</span><span class="w"> </span><span class="n">file</span><span class="p">,</span><span class="w"> </span><span class="n">key</span><span class="p">);</span>
 <span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="ow">not</span><span class="w"> </span><span class="nf">deleterecord</span><span class="p">(</span><span class="n">file</span><span class="p">,</span><span class="w"> </span><span class="n">key</span><span class="p">))</span><span class="w"> </span><span class="p">...</span>
 <span class="c1">// or</span>
 <span class="nf">write</span><span class="p">(</span><span class="s">&quot;&quot;</span><span class="w"> </span><span class="ow">on</span><span class="w"> </span><span class="n">file</span><span class="p">,</span><span class="w"> </span><span class="n">key</span><span class="p">);</span>
 <span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="ow">not</span><span class="w"> </span><span class="n">file</span><span class="p">.</span><span class="nf">deleterecord</span><span class="p">(</span><span class="n">key</span><span class="p">))</span><span class="w"> </span><span class="p">...</span>
 </pre>
-			</p>
-		</td></tr>
-	<tr>
-		<td>
-			<p>
-				<code>if</code></p></td>
-		<td>
-			<p>
-				<code>savelist(listname)</code></p></td>
-		<td>
-			<p>Save the current active select list under a given name.</p>
-			<p>Select lists are saved in the DB file "lists". They are accessible to any Exodus process and remain until specifically deleted.</p>
-			<p>After saving, the list is no longer active and hasnext() will return false.</p>
-			<p>
-				<em>return:</em> True if an active select list was saved, false if there was no active select list.</p>
-			<p>
-				<pre><span class="nf">selectkeys</span><span class="p">(</span><span class="s">&quot;SB001^SB002&quot;</span><span class="kt">_var</span><span class="p">);</span>
+				</p>
+			</td></tr>
+		<tr>
+			<td>
+				<p>
+					<code>if</code></p></td>
+			<td>
+				<p>
+					<code>savelist(listname)</code></p></td>
+			<td>
+				<p>Save the current active select list under a given name.</p>
+				<p>Select lists are saved in the DB file "lists". They are accessible to any Exodus process and remain until specifically deleted.</p>
+				<p>After saving, the list is no longer active and hasnext() will return false.</p>
+				<p>
+					<em>return:</em> True if an active select list was saved, false if there was no active select list.</p>
+				<p>
+					<pre><span class="nf">selectkeys</span><span class="p">(</span><span class="s">&quot;SB001^SB002&quot;</span><span class="kt">_var</span><span class="p">);</span>
 <span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="ow">not</span><span class="w"> </span><span class="nf">savelist</span><span class="p">(</span><span class="s">&quot;my_list&quot;</span><span class="p">))</span><span class="w"> </span><span class="p">...</span>
 </pre>
-			</p>
-		</td></tr>
-	<tr>
-		<td>
-			<p>
-				<code>if</code></p></td>
-		<td>
-			<p>
-				<code>getlist(listname)</code></p></td>
-		<td>
-			<p>Create an active select list using a saved select list of a given name.</p>
-			<p>A saved list is obtained from the "lists" file and activated. The list remains in the lists file for multiple use.</p>
-			<p>
-				<em>return:</em> True if an active select list was successfully reactivated, otherwise false.</p>
-			<p>
-				<pre><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="ow">not</span><span class="w"> </span><span class="nf">getlist</span><span class="p">(</span><span class="s">&quot;my_list&quot;</span><span class="p">))</span><span class="w"> </span><span class="p">...</span>
+				</p>
+			</td></tr>
+		<tr>
+			<td>
+				<p>
+					<code>if</code></p></td>
+			<td>
+				<p>
+					<code>getlist(listname)</code></p></td>
+			<td>
+				<p>Create an active select list using a saved select list of a given name.</p>
+				<p>A saved list is obtained from the "lists" file and activated. The list remains in the lists file for multiple use.</p>
+				<p>
+					<em>return:</em> True if an active select list was successfully reactivated, otherwise false.</p>
+				<p>
+					<pre><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="ow">not</span><span class="w"> </span><span class="nf">getlist</span><span class="p">(</span><span class="s">&quot;my_list&quot;</span><span class="p">))</span><span class="w"> </span><span class="p">...</span>
 </pre>
-			</p>
-		</td></tr>
-	<tr>
-		<td>
-			<p>
-				<code>if</code></p></td>
-		<td>
-			<p>
-				<code>deletelist(listname)</code></p></td>
-		<td>
-			<p>Remove a saved select list by name.</p>
-			<p>A saved list is deleted from the "lists" file.</p>
-			<p>
-				<pre><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="ow">not</span><span class="w"> </span><span class="nf">deletelist</span><span class="p">(</span><span class="s">&quot;my_list&quot;</span><span class="p">))</span><span class="w"> </span><span class="p">...</span>
+				</p>
+			</td></tr>
+		<tr>
+			<td>
+				<p>
+					<code>if</code></p></td>
+			<td>
+				<p>
+					<code>deletelist(listname)</code></p></td>
+			<td>
+				<p>Remove a saved select list by name.</p>
+				<p>A saved list is deleted from the "lists" file.</p>
+				<p>
+					<pre><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="ow">not</span><span class="w"> </span><span class="nf">deletelist</span><span class="p">(</span><span class="s">&quot;my_list&quot;</span><span class="p">))</span><span class="w"> </span><span class="p">...</span>
 </pre>
-			</p>
-		</td></tr>
-	<tr>
-		<td>
-			<p>
-				<code>if</code></p></td>
-		<td>
-			<p>
-				<code>formlist(filename_or_command, keys = "", fieldno = 0)</code></p></td>
-		<td>
-		</td></tr>
-	<tr>
-		<td>
-			<p>
-				<code>if</code></p></td>
-		<td>
-			<p>
-				<code>makelist(listname, keys)</code></p></td>
-		<td>
-		</td></tr>
-</table>
-<h5 id="Perform_Execute_Run">Perform/Execute/Run</h5>
+				</p>
+			</td></tr>
+		<tr>
+			<td>
+				<p>
+					<code>if</code></p></td>
+			<td>
+				<p>
+					<code>formlist(filename_or_command, keys = "", fieldno = 0)</code></p></td>
+			<td>
+			</td></tr>
+		<tr>
+			<td>
+				<p>
+					<code>if</code></p></td>
+			<td>
+				<p>
+					<code>makelist(listname, keys)</code></p></td>
+			<td>
+			</td></tr>
+	</table>
+	<h5 id="Perform_Execute_Run">Perform/Execute/Run</h5>
 
-<table class="wikitable">
-	<tr>
-		<th>Use</th>
-		<th>Function</th>
-		<th>Description</th> </tr>
-	<tr>
-		<td>
-			<p>
-				<code>var=</code></p></td>
-		<td>
-			<p>
-				<code>perform(command_line)</code></p></td>
-		<td>
-			<p>Run an Exodus program/library.</p>
-			<p>Creates a new instance of an Exodus program library function object and calls its main() function using a command-like syntax, similar to that of running an OS executable program, and passes its arguments through the COMMAND and OPTIONS variables.</p>
-			<p>A performed program/library's main function should have no arguments otherwise they appear unassigned and a segfault or core dump may occur.</p>
-			<p>The Exodus program class member variables of a performed or executed program/library are all, as might be expected, initially unassigned unless specifically initialised inline. Note that this is not the same as calling a program library function (using function call syntax and round brackets funcx()), where the program/library/function's member variables are initially unassigned but retain their state between calls.</p>
-			<p>
-				<em>command_line:</em> Used to initialise the COMMAND, SENTENCE and OPTIONS environment variables of the performed exodus program/library. Analogous to passing function arguments. The first word of command_line is used as the name of the program/library to be loaded and run.</p>
-			<p>
-				<em>return:</em> Whatever the program returns from main() or passes as an argument to stop(). If the program terminates abnormally then it will return "" and lasterror() will contain some error message. The return value may be ignored so there is no need so wrap perform statements in if clauses to avoid compiler warnings.</p>
-			<p>
-				<em>throw:</em> All the various runtime errors based on VarError e.g. VarUnassigned.</p>
-			<p>
-				<em>environment:</em> The following environment variables are initialised on entry to the main function of the program/library and are preserved untouched (actually restored) in the calling program.</p>
-			<ul>
-				<li>COMMAND, OPTIONS, SENTENCE.</li>
-				<li>RECUR0, RECUR1, RECUR2, RECUR3, RECUR4 to "".</li>
-				<li>ID, RECORD, MV, DICT initialised to "".</li>
-				<li>LEVEL is incremented by one.</li>
-				<li>All other environment variables are shared between the caller and callee. There is essentially only one environment in any one process or thread.</li>
-				<li>CURSOR Any active select list in CURSOR is passed to the performed program/library and can be consumed by it. Conversely any active select list created by the performed program/library will be returned to the calling program. In other words, both the performing and the performed programs/libraries share a single active select list environment. This is different from execute() where the executed program/library gets its own private active select list, initially inactive.</li>
-			</ul>
-			<p>Exodus program/library/functions may also be called directly using conventional function calling syntax. To call an exodus program/library called progname using either the syntax "call progname(args...);" or "var v1 = progname(args...);" you must "#include &lt;progname.h&gt;" after the "programinit()" or "libraryinit()" lines in your program/library. See library.h for more info.</p>
-		</td></tr>
-	<tr>
-		<td>
-			<p>
-				<code>var=</code></p></td>
-		<td>
-			<p>
-				<code>execute(command_line)</code></p></td>
-		<td>
-			<p>Run an exodus program/library.</p>
-			<p>Identical to perform() but any currently active select list in the calling program/library is not accessible to the executed program/library and is preserved in the calling [program as is. Any select list created by the executed library is discarded when it terminates.</p>
-		</td></tr>
-	<tr>
-		<td></td>
-		<td>
-			<p>
-				<code>chain(command_line)</code></p></td>
-		<td>
-			<p>Close the current program and perform another one.</p>
-			<p>Similar to perform() except that the current program closes first and all environment variables carry forward unchanged.</p>
-		</td></tr>
-	<tr>
-		<td>
-			<p>
-				<code>var=</code></p></td>
-		<td>
-			<p>
-				<code>libinfo(libname)</code></p></td>
-		<td>
-			<p>Check if a lib exists.</p>
-			<p>Can be checked before perform/execute to avoid errors.</p>
-			<p>Currently it does not check if the library is actually loadable.</p>
-			<p>
-				<em>return:</em> osfile info.</p>
-		</td></tr>
-</table>
-<h5 id="Program_Termination_">Program Termination </h5>
+	<table class="wikitable">
+		<tr>
+			<th>Use</th>
+			<th>Function</th>
+			<th>Description</th> </tr>
+		<tr>
+			<td>
+				<p>
+					<code>var=</code></p></td>
+			<td>
+				<p>
+					<code>perform(command_line)</code></p></td>
+			<td>
+				<p>Run an Exodus program/library.</p>
+				<p>Creates a new instance of an Exodus program library function object and calls its main() function using a command-like syntax, similar to that of running an OS executable program, and passes its arguments through the COMMAND and OPTIONS variables.</p>
+				<p>A performed program/library's main function should have no arguments otherwise they appear unassigned and a segfault or core dump may occur.</p>
+				<p>The Exodus program class member variables of a performed or executed program/library are all, as might be expected, initially unassigned unless specifically initialised inline. Note that this is not the same as calling a program library function (using function call syntax and round brackets funcx()), where the program/library/function's member variables are initially unassigned but retain their state between calls.</p>
+				<p>
+					<em>command_line:</em> Used to initialise the COMMAND, SENTENCE and OPTIONS environment variables of the performed exodus program/library. Analogous to passing function arguments. The first word of command_line is used as the name of the program/library to be loaded and run.</p>
+				<p>
+					<em>return:</em> Whatever the program returns from main() or passes as an argument to stop(). If the program terminates abnormally then it will return "" and lasterror() will contain some error message. The return value may be ignored so there is no need so wrap perform statements in if clauses to avoid compiler warnings.</p>
+				<p>
+					<em>throw:</em> All the various runtime errors based on VarError e.g. VarUnassigned.</p>
+				<p>
+					<em>environment:</em> The following environment variables are initialised on entry to the main function of the program/library and are preserved untouched (actually restored) in the calling program.</p>
+				<ul>
+					<li>COMMAND, OPTIONS, SENTENCE.</li>
+					<li>RECUR0, RECUR1, RECUR2, RECUR3, RECUR4 to "".</li>
+					<li>ID, RECORD, MV, DICT initialised to "".</li>
+					<li>LEVEL is incremented by one.</li>
+					<li>All other environment variables are shared between the caller and callee. There is essentially only one environment in any one process or thread.</li>
+					<li>CURSOR Any active select list in CURSOR is passed to the performed program/library and can be consumed by it. Conversely any active select list created by the performed program/library will be returned to the calling program. In other words, both the performing and the performed programs/libraries share a single active select list environment. This is different from execute() where the executed program/library gets its own private active select list, initially inactive.</li>
+				</ul>
+				<p>Exodus program/library/functions may also be called directly using conventional function calling syntax. To call an exodus program/library called progname using either the syntax "call progname(args...);" or "var v1 = progname(args...);" you must "#include &lt;progname.h&gt;" after the "programinit()" or "libraryinit()" lines in your program/library. See library.h for more info.</p>
+			</td></tr>
+		<tr>
+			<td>
+				<p>
+					<code>var=</code></p></td>
+			<td>
+				<p>
+					<code>execute(command_line)</code></p></td>
+			<td>
+				<p>Run an exodus program/library.</p>
+				<p>Identical to perform() but any currently active select list in the calling program/library is not accessible to the executed program/library and is preserved in the calling [program as is. Any select list created by the executed library is discarded when it terminates.</p>
+			</td></tr>
+		<tr>
+			<td></td>
+			<td>
+				<p>
+					<code>chain(command_line)</code></p></td>
+			<td>
+				<p>Close the current program and perform another one.</p>
+				<p>Similar to perform() except that the current program closes first and all environment variables carry forward unchanged.</p>
+			</td></tr>
+		<tr>
+			<td>
+				<p>
+					<code>var=</code></p></td>
+			<td>
+				<p>
+					<code>libinfo(libname)</code></p></td>
+			<td>
+				<p>Check if a lib exists.</p>
+				<p>Can be checked before perform/execute to avoid errors.</p>
+				<p>Currently it does not check if the library is actually loadable.</p>
+				<p>
+					<em>return:</em> osfile info.</p>
+			</td></tr>
+	</table>
+	<h5 id="Program_Termination_">Program Termination </h5>
 
-<table class="wikitable">
-	<tr>
-		<th>Use</th>
-		<th>Function</th>
-		<th>Description</th> </tr>
-	<tr>
-		<td></td>
-		<td>
-			<p>
-				<code>stop(result = "")</code></p></td>
-		<td>
-			<p>Stop the current exodus program/library normally.</p>
-			<p>Either return to the performing or executing parent exodus program/library, or exit to the OS if none.</p>
-			<p>
-				<em>result:</em> Optional. It will be used as the return value of a parent program's perform() or execute() function, or if none, and therefore returning to the OS, it will be output to stdout if non-numeric or, if numeric, used as the exit status.</p>
-		</td></tr>
-	<tr>
-		<td></td>
-		<td>
-			<p>
-				<code>abort(message = "")</code></p></td>
-		<td>
-			<p>Abort the current exodus program/library.</p>
-			<p>Similar to stop but if exiting to the OS then the default exit status is 1.</p>
-			<p>
-				<em>message:</em> Optional. If exiting to the OS then it will be output to stderr or, if numeric, used as the exit status.</p>
-		</td></tr>
-	<tr>
-		<td></td>
-		<td>
-			<p>
-				<code>abortall(message = "")</code></p></td>
-		<td>
-			<p>Abort the current exodus program/library.</p>
-			<p>Similar to abort but if exiting to the OS then the default exit status is 2.</p>
-		</td></tr>
-</table>
-<h5 id="DB_File_Dictionaries">DB File Dictionaries</h5>
+	<table class="wikitable">
+		<tr>
+			<th>Use</th>
+			<th>Function</th>
+			<th>Description</th> </tr>
+		<tr>
+			<td></td>
+			<td>
+				<p>
+					<code>stop(result = "")</code></p></td>
+			<td>
+				<p>Stop the current exodus program/library normally.</p>
+				<p>Either return to the performing or executing parent exodus program/library, or exit to the OS if none.</p>
+				<p>
+					<em>result:</em> Optional. It will be used as the return value of a parent program's perform() or execute() function, or if none, and therefore returning to the OS, it will be output to stdout if non-numeric or, if numeric, used as the exit status.</p>
+			</td></tr>
+		<tr>
+			<td></td>
+			<td>
+				<p>
+					<code>abort(message = "")</code></p></td>
+			<td>
+				<p>Abort the current exodus program/library.</p>
+				<p>Similar to stop but if exiting to the OS then the default exit status is 1.</p>
+				<p>
+					<em>message:</em> Optional. If exiting to the OS then it will be output to stderr or, if numeric, used as the exit status.</p>
+			</td></tr>
+		<tr>
+			<td></td>
+			<td>
+				<p>
+					<code>abortall(message = "")</code></p></td>
+			<td>
+				<p>Abort the current exodus program/library.</p>
+				<p>Similar to abort but if exiting to the OS then the default exit status is 2.</p>
+			</td></tr>
+	</table>
+	<h5 id="DB_File_Dictionaries">DB File Dictionaries</h5>
 
-<table class="wikitable">
-	<tr>
-		<th>Use</th>
-		<th>Function</th>
-		<th>Description</th> </tr>
-	<tr>
-		<td>
-			<p>
-				<code>var=</code></p></td>
-		<td>
-			<p>
-				<code>calculate(dictid)</code></p></td>
-		<td>
-			<p>Get DB record field values given field name only.</p>
-			<p>Use a dictionary file that contains info sufficient to either extract or calculate the required value.</p>
-			<ol>
-				<li>Read fieldinfo from the current DICT file using readc() for caching.</li>
-				<li>Use the fieldinfo to:
-					<ul>
-						<li>Either extract a specific field number from the current RECORD/ID/MV environment variables.</li>
-						<li>Or call a dictionary function library to calculate the result.</li>
-					</ul>
-				</li>
-			</ol>
-		</td></tr>
-	<tr>
-		<td>
-			<p>
-				<code>var=</code></p></td>
-		<td>
-			<p>
-				<code>calculate(dictid, dictfile, id, record, ev = 0)</code></p></td>
-		<td>
-			<p>Get DB record field values given name and data.</p>
-			<p>Same as the one argument version of calculate() but RECORD/ID/MV are provided as arguments instead of being hard coded.</p>
-		</td></tr>
-	<tr>
-		<td>
-			<p>
-				<code>var=</code></p></td>
-		<td>
-			<p>
-				<code>xlate(filename, key, fieldno_or_name, mode)</code></p></td>
-		<td>
-			<p>Read DB field using field number or name.</p>
-			<ol>
-				<li>Read a record from a given file and key using readc() for caching.</li>
-				<li>Extracts the given field number or calls calculate(dictid...) if non-numeric.</li>
-			</ol>
-			<p>
-				<em>filename:</em> The file to read.</p>
-			<p>
-				<em>key:</em> The key of the record to read.</p>
-			<p></p>
-			<p>
-				<em>fieldno_or_name:</em> The field  to return.</p>
-			<dl>
-				<dt>nn</dt>
-				<dd>Field number nn.</dd>
-				<dt>0</dt>
-				<dd>The record key (ID).</dd>
-				<dt>""</dt>
-				<dd>The whole record (RECORD)</dd>
-				<dt>dictid</dt>
-				<dd>The function calculate(dictid) will be called.</dd>
-			</dl>
-			<p></p>
-			<p>
-				<em>mode:</em> If the record does not exist.</p>
-			<dl>
-				<dt>"X"</dt>
-				<dd>Return ""</dd>
-				<dt>"C"</dt>
-				<dd>Return the key.</dd>
-			</dl>
-			<p></p>
-			<p>
-				<em>MV:</em> Environment variable. Will be used to select a particular value if not zero, or all values if zero.</p>
-		</td></tr>
-</table>
-<h5 id="Io_Conversion">Io Conversion</h5>
+	<table class="wikitable">
+		<tr>
+			<th>Use</th>
+			<th>Function</th>
+			<th>Description</th> </tr>
+		<tr>
+			<td>
+				<p>
+					<code>var=</code></p></td>
+			<td>
+				<p>
+					<code>calculate(dictid)</code></p></td>
+			<td>
+				<p>Get DB record field values given field name only.</p>
+				<p>Use a dictionary file that contains info sufficient to either extract or calculate the required value.</p>
+				<ol>
+					<li>Read fieldinfo from the current DICT file using readc() for caching.</li>
+					<li>Use the fieldinfo to:
+						<ul>
+							<li>Either extract a specific field number from the current RECORD/ID/MV environment variables.</li>
+							<li>Or call a dictionary function library to calculate the result.</li>
+						</ul>
+					</li>
+				</ol>
+			</td></tr>
+		<tr>
+			<td>
+				<p>
+					<code>var=</code></p></td>
+			<td>
+				<p>
+					<code>calculate(dictid, dictfile, id, record, ev = 0)</code></p></td>
+			<td>
+				<p>Get DB record field values given name and data.</p>
+				<p>Same as the one argument version of calculate() but RECORD/ID/MV are provided as arguments instead of being hard coded.</p>
+			</td></tr>
+		<tr>
+			<td>
+				<p>
+					<code>var=</code></p></td>
+			<td>
+				<p>
+					<code>xlate(filename, key, fieldno_or_name, mode)</code></p></td>
+			<td>
+				<p>Read DB field using field number or name.</p>
+				<ol>
+					<li>Read a record from a given file and key using readc() for caching.</li>
+					<li>Extracts the given field number or calls calculate(dictid...) if non-numeric.</li>
+				</ol>
+				<p>
+					<em>filename:</em> The file to read.</p>
+				<p>
+					<em>key:</em> The key of the record to read.</p>
+				<p></p>
+				<p>
+					<em>fieldno_or_name:</em> The field  to return.</p>
+				<dl>
+					<dt>nn</dt>
+					<dd>Field number nn.</dd>
+					<dt>0</dt>
+					<dd>The record key (ID).</dd>
+					<dt>""</dt>
+					<dd>The whole record (RECORD)</dd>
+					<dt>dictid</dt>
+					<dd>The function calculate(dictid) will be called.</dd>
+				</dl>
+				<p></p>
+				<p>
+					<em>mode:</em> If the record does not exist.</p>
+				<dl>
+					<dt>"X"</dt>
+					<dd>Return ""</dd>
+					<dt>"C"</dt>
+					<dd>Return the key.</dd>
+				</dl>
+				<p></p>
+				<p>
+					<em>MV:</em> Environment variable. Will be used to select a particular value if not zero, or all values if zero.</p>
+			</td></tr>
+	</table>
+	<h5 id="Io_Conversion">Io Conversion</h5>
 
-<table class="wikitable">
-	<tr>
-		<th>Use</th>
-		<th>Function</th>
-		<th>Description</th> </tr>
-	<tr>
-		<td>
-			<p>
-				<code>var=</code></p></td>
-		<td>
-			<p>
-				<code>oconv(input, conversion)</code></p></td>
-		<td>
-			<p>iconv/oconv "[...]"</p>
-			<p>ExoProgram's iconv/oconv functions have access to ExoProgram's environment variables like BASEFMT, DATEFMT and TZ and have the ability to call custom functions like "[funname,args...]"</p>
-			<p></p>
-			<p>[NUMBER]  // built-in. See doc below.</p>
-			<p>[DATE]    // built-in. See doc below.</p>
-			<p>[DATEPERIOD]  e.g. [DATEPERIOD,1] [DATEPERIOD,1,12]</p>
-			<p>[DATETIME]    e.g. [DATETIME,4*,DOS] [DATETIME,4*,MTS] [DATETIME,4*]</p>
-			<p>[TIME2]       e.g. [TIME2,MT] [TIME2,MTS] [TIME2,MTS48]</p>
-		</td></tr>
-	<tr>
-		<td>
-			<p>
-				<code>var=</code></p></td>
-		<td>
-			<p>
-				<code>iconv(input, conversion)</code></p></td>
-		<td>
-		</td></tr>
-</table>
-<h5 id="Ioconv_Date_Time_">Ioconv Date/Time </h5>
+	<table class="wikitable">
+		<tr>
+			<th>Use</th>
+			<th>Function</th>
+			<th>Description</th> </tr>
+		<tr>
+			<td>
+				<p>
+					<code>var=</code></p></td>
+			<td>
+				<p>
+					<code>oconv(input, conversion)</code></p></td>
+			<td>
+				<p>iconv/oconv "[...]"</p>
+				<p>ExoProgram's iconv/oconv functions have access to ExoProgram's environment variables like BASEFMT, DATEFMT and TZ and have the ability to call custom functions like "[funname,args...]"</p>
+				<p></p>
+				<p>[NUMBER]  // built-in. See doc below.</p>
+				<p>[DATE]    // built-in. See doc below.</p>
+				<p>[DATEPERIOD]  e.g. [DATEPERIOD,1] [DATEPERIOD,1,12]</p>
+				<p>[DATETIME]    e.g. [DATETIME,4*,DOS] [DATETIME,4*,MTS] [DATETIME,4*]</p>
+				<p>[TIME2]       e.g. [TIME2,MT] [TIME2,MTS] [TIME2,MTS48]</p>
+			</td></tr>
+		<tr>
+			<td>
+				<p>
+					<code>var=</code></p></td>
+			<td>
+				<p>
+					<code>iconv(input, conversion)</code></p></td>
+			<td>
+			</td></tr>
+	</table>
+	<h5 id="Ioconv_Date_Time_">Ioconv Date/Time </h5>
 
-<table class="wikitable">
-	<tr>
-		<th>Use</th>
-		<th>Function</th>
-		<th>Description</th> </tr>
-	<tr>
-		<td>
-			<p>
-				<code>var=</code></p></td>
-		<td>
-			<p>
-				<code>iconv|oconv(var, "[DATE]")</code></p></td>
-		<td>
-			<p>iconv/oconv "[DATE]"</p>
-			<p>Use iconv/oconv code "[DATE,args]" when you want date conversion to depend on the environment variable DATEFMT, particularly its American/International setting. Otherwise use ordinary "D" conversion codes directly for slightly greater performance.</p>
-			<p></p>
-			<p>
-				<em>var:</em> [oconv] An internal date (a number).</p>
-			<p>
-				<em>return:</em> [oconv] A readable date in text format depending on "[DATE,args]" e.g. "31 DEC 2020" "31/12/2020" "12/31/2020"</p>
-			<p>
-				<em>var:</em> [iconv] A date in text format as above.</p>
-			<p>
-				<em>return:</em> [iconv] An internal date (a number) or "" if the input could not be understood as a valid date.</p>
-			<p>
-				<em>args:</em> If args is empty then DATEFMT is used as the conversion code. If args starts with "D" then args is used as the conversion codes but any E option in DATEFMT is appended. If args does not start with "D" then args are appended to DATEFMT, a "Z" option is appended, and the result used as the conversion code. A "*" option is equivalent to a second "Z" option.</p>
-			<p>If you are calling iconv/oconv in code and DATEFMT is adequate for your needs then pass it directly as a function argument e.g. 'var v1 = iconv|oconv(v2, DATEFORMAT);' instead of indirectly like 'var v1 = iconv|oconv(v2, "[DATE]");'.</p>
-			<p>
-				<pre><span class="kc">DATEFMT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;D/E&quot;</span><span class="p">;</span>
+	<table class="wikitable">
+		<tr>
+			<th>Use</th>
+			<th>Function</th>
+			<th>Description</th> </tr>
+		<tr>
+			<td>
+				<p>
+					<code>var=</code></p></td>
+			<td>
+				<p>
+					<code>iconv|oconv(var, "[DATE]")</code></p></td>
+			<td>
+				<p>iconv/oconv "[DATE]"</p>
+				<p>Use iconv/oconv code "[DATE,args]" when you want date conversion to depend on the environment variable DATEFMT, particularly its American/International setting. Otherwise use ordinary "D" conversion codes directly for slightly greater performance.</p>
+				<p></p>
+				<p>
+					<em>var:</em> [oconv] An internal date (a number).</p>
+				<p>
+					<em>return:</em> [oconv] A readable date in text format depending on "[DATE,args]" e.g. "31 DEC 2020" "31/12/2020" "12/31/2020"</p>
+				<p>
+					<em>var:</em> [iconv] A date in text format as above.</p>
+				<p>
+					<em>return:</em> [iconv] An internal date (a number) or "" if the input could not be understood as a valid date.</p>
+				<p>
+					<em>args:</em> If args is empty then DATEFMT is used as the conversion code. If args starts with "D" then args is used as the conversion codes but any E option in DATEFMT is appended. If args does not start with "D" then args are appended to DATEFMT, a "Z" option is appended, and the result used as the conversion code. A "*" option is equivalent to a second "Z" option.</p>
+				<p>If you are calling iconv/oconv in code and DATEFMT is adequate for your needs then pass it directly as a function argument e.g. 'var v1 = iconv|oconv(v2, DATEFORMAT);' instead of indirectly like 'var v1 = iconv|oconv(v2, "[DATE]");'.</p>
+				<p>
+					<pre><span class="kc">DATEFMT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;D/E&quot;</span><span class="p">;</span>
 <span class="nf">let</span><span class="w"> </span><span class="n">v1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">iconv</span><span class="p">(</span><span class="s">&quot;JAN 9 2025&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;D&quot;</span><span class="p">);</span>
 <span class="n">assert</span><span class="p">(</span><span class="nf">oconv</span><span class="p">(</span><span class="n">v1</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;[DATE]&quot;</span><span class="w">   </span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s">&quot; 9/ 1/2025&quot;</span><span class="p">);</span><span class="w">  </span><span class="c1">// &quot;D/EZ&quot; or &quot;[DATE,D]&quot; equivalent assuming D/E in DATEFMT (replace leading zeros with spaces)</span>
 <span class="n">assert</span><span class="p">(</span><span class="nf">oconv</span><span class="p">(</span><span class="n">v1</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;[DATE,4]&quot;</span><span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s">&quot; 9/ 1/2025&quot;</span><span class="p">);</span><span class="w">  </span><span class="c1">// &quot;D4Z&quot;  equivalent assuming D/E in DATEFMT (replace leading zeros with spaces)</span>
 <span class="n">assert</span><span class="p">(</span><span class="nf">oconv</span><span class="p">(</span><span class="n">v1</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;[DATE,*4]&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s">&quot;9/1/2025&quot;</span><span class="p">);</span><span class="w">    </span><span class="c1">// &quot;D4ZZ&quot; equivalent assuming D/E in DATEFMT (trim leading zeros and spaces)</span>
 <span class="n">assert</span><span class="p">(</span><span class="nf">oconv</span><span class="p">(</span><span class="n">v1</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;[DATE,*]&quot;</span><span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s">&quot;9/1/2025&quot;</span><span class="p">);</span><span class="w">    </span><span class="c1">// &quot;DZZ&quot;  equivalent assuming D/E in DATEFMT (trim leading zeros and spaces)</span>
 </pre>
-			</p>
-		</td></tr>
-	<tr>
-		<td>
-			<p>
-				<code>var=</code></p></td>
-		<td>
-			<p>
-				<code>iconv|oconv(var, "[NUMBER]")</code></p></td>
-		<td>
-			<p>iconv/oconv "[NUMBER]"</p>
-			<p>Use iconv/oconv "[NUMBER,args]" either when your numbers have currency or unit code suffixes or when you want number conversion to depend on the environment variable BASEFMT to determine thousands separator and decimal point. Otherwise use ordinary "MD" conversion codes directly for slightly greater performance.</p>
-			<p>Formatting for numbers with optional currency code/unit suffix and is sensitive to the International or European setting in BASEFMT regarding use of commas or dots for thousands separators and decimal points.</p>
-			<p>Primarily used for oconv() but can be used in reverse for iconv.</p>
-			<p>
-				<em>var:</em> A number with an optional currency code or unit suffix. e.g. "12345.67USD"</p>
-			<p>
-				<em>return:</em> A formatted number with thousands separated conventionally e.g. "12.345.67USD".</p>
-			<p>iconv/oconv("[NUMBER]")      oconv leaves ndecimals untouched as in the input. iconv see below.</p>
-			<p>iconv/oconv("[NUMBER,2]")    Specified number of decimal places</p>
-			<p>iconv/oconv("[NUMBER,BASE]") Decimal places as per BASEFMT</p>
-			<p>iconv/oconv("[NUMBER,*]")    Leave decimal places untouched as in the input</p>
-			<p>iconv/oconv("[NUMBER,X]")    Leave decimal places untouched as in the input</p>
-			<p>iconv/oconv("[NUMBER,2Z]")   Z (suppress zero) combined with any other code for oconv results in empty output "" instead of "0.00" in case of zero input.</p>
-			<p></p>
-			<p>Empty input "" gives empty output "".</p>
-			<p></p>
-			<p>All leading, trailing and internal spaces are removed from the input.</p>
-			<p></p>
-			<p>A trailing currency or unit code is ignored and returned on output.</p>
-			<p></p>
-			<p>An exodus number is an optional leading + or - followed by one or more decimal digits 0-9 with a single optional decimal point placed anywhere.</p>
-			<p></p>
-			<p>If the input is non-numeric then "" is returned and STATUS set to 2. In the case of oconv with multiple fields or values each field or value is processed separately but STATUS is set to 2 if any are non-numeric.</p>
-			<p></p>
-			<p>iconv removes and oconv adds thousand separator chars. The thousands separator is  "," if BASEFMT starts with "MD" or "." if it starts with "MC".</p>
-			<p></p>
-			<p>
-				<em>oconv:</em> </p>
-			<p></p>
-			<p>Add thousands separator chars and optionally standardise the number of decimal places.</p>
-			<p></p>
-			<p>Multiple numbers in fields, values, subvalues etc. can be processed in one string.</p>
-			<p></p>
-			<p>Any leading + character is preserved on output.</p>
-			<p></p>
-			<p>Z suppresses zeros and returns empty string "" instead.</p>
-			<p></p>
-			<p>Special format "[NUMBER,ndecs,move_ndecs]": move_ndecs causes decimal point to be shifted left if positive or right if negative.</p>
-			<p>
-				<pre><span class="kt">var</span><span class="w"> </span><span class="n">v1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">oconv</span><span class="p">(</span><span class="s">&quot;1234.5USD&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;[NUMBER,2]&quot;</span><span class="p">);</span><span class="w"> </span><span class="c1">// &quot;1,234.50USD&quot; // Comma added and decimal places corrected.</span>
+				</p>
+			</td></tr>
+		<tr>
+			<td>
+				<p>
+					<code>var=</code></p></td>
+			<td>
+				<p>
+					<code>iconv|oconv(var, "[NUMBER]")</code></p></td>
+			<td>
+				<p>iconv/oconv "[NUMBER]"</p>
+				<p>Use iconv/oconv "[NUMBER,args]" either when your numbers have currency or unit code suffixes or when you want number conversion to depend on the environment variable BASEFMT to determine thousands separator and decimal point. Otherwise use ordinary "MD" conversion codes directly for slightly greater performance.</p>
+				<p>Formatting for numbers with optional currency code/unit suffix and is sensitive to the International or European setting in BASEFMT regarding use of commas or dots for thousands separators and decimal points.</p>
+				<p>Primarily used for oconv() but can be used in reverse for iconv.</p>
+				<p>
+					<em>var:</em> A number with an optional currency code or unit suffix. e.g. "12345.67USD"</p>
+				<p>
+					<em>return:</em> A formatted number with thousands separated conventionally e.g. "12.345.67USD".</p>
+				<p>iconv/oconv("[NUMBER]")      oconv leaves ndecimals untouched as in the input. iconv see below.</p>
+				<p>iconv/oconv("[NUMBER,2]")    Specified number of decimal places</p>
+				<p>iconv/oconv("[NUMBER,BASE]") Decimal places as per BASEFMT</p>
+				<p>iconv/oconv("[NUMBER,*]")    Leave decimal places untouched as in the input</p>
+				<p>iconv/oconv("[NUMBER,X]")    Leave decimal places untouched as in the input</p>
+				<p>iconv/oconv("[NUMBER,2Z]")   Z (suppress zero) combined with any other code for oconv results in empty output "" instead of "0.00" in case of zero input.</p>
+				<p></p>
+				<p>Empty input "" gives empty output "".</p>
+				<p></p>
+				<p>All leading, trailing and internal spaces are removed from the input.</p>
+				<p></p>
+				<p>A trailing currency or unit code is ignored and returned on output.</p>
+				<p></p>
+				<p>An exodus number is an optional leading + or - followed by one or more decimal digits 0-9 with a single optional decimal point placed anywhere.</p>
+				<p></p>
+				<p>If the input is non-numeric then "" is returned and STATUS set to 2. In the case of oconv with multiple fields or values each field or value is processed separately but STATUS is set to 2 if any are non-numeric.</p>
+				<p></p>
+				<p>iconv removes and oconv adds thousand separator chars. The thousands separator is  "," if BASEFMT starts with "MD" or "." if it starts with "MC".</p>
+				<p></p>
+				<p>
+					<em>oconv:</em> </p>
+				<p></p>
+				<p>Add thousands separator chars and optionally standardise the number of decimal places.</p>
+				<p></p>
+				<p>Multiple numbers in fields, values, subvalues etc. can be processed in one string.</p>
+				<p></p>
+				<p>Any leading + character is preserved on output.</p>
+				<p></p>
+				<p>Z suppresses zeros and returns empty string "" instead.</p>
+				<p></p>
+				<p>Special format "[NUMBER,ndecs,move_ndecs]": move_ndecs causes decimal point to be shifted left if positive or right if negative.</p>
+				<p>
+					<pre><span class="kt">var</span><span class="w"> </span><span class="n">v1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">oconv</span><span class="p">(</span><span class="s">&quot;1234.5USD&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;[NUMBER,2]&quot;</span><span class="p">);</span><span class="w"> </span><span class="c1">// &quot;1,234.50USD&quot; // Comma added and decimal places corrected.</span>
 </pre>
 iconv:
 Remove all thousands separator chars and optionally standardise the number of decimal places.
 If ndecs is not specified in the "[NUMBER]" pattern then ndecs is taken from the current RECORD using dictionary code NDECS if DICT is available otherwise it uses ndecs from BASEFMT.
 iconv only handles a single field/value.
 Optional prefix of "1/" or "/" causes the reciprocal of the number to be used. e.g. "1/100" or "/100" -> "0.01".
-				<pre><span class="kt">var</span><span class="w"> </span><span class="n">v1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">iconv</span><span class="p">(</span><span class="s">&quot;1,234.5678USD&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;[NUMBER]&quot;</span><span class="p">);</span><span class="w"> </span><span class="c1">// &quot;1234.57USD&quot; // Comma removed</span>
+					<pre><span class="kt">var</span><span class="w"> </span><span class="n">v1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">iconv</span><span class="p">(</span><span class="s">&quot;1,234.5678USD&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;[NUMBER]&quot;</span><span class="p">);</span><span class="w"> </span><span class="c1">// &quot;1234.57USD&quot; // Comma removed</span>
 </pre>
-			</p>
-		</td></tr>
-	<tr>
-		<td>
-			<p>
-				<code>var=</code></p></td>
-		<td>
-			<p>
-				<code>amountunit(input0, out unitx)</code></p></td>
-		<td>
-			<p>Parse amount+currency code string.</p>
-			<p>Split amount+currency code/unit string into number and currency code/unit.</p>
-			<p>
-				<em>var:</em> "123.45USD"</p>
-			<p>
-				<em>return:</em> e.g. "123.45"</p>
-			<p>
-				<em>unitx[out]:</em> e.g. "USD"</p>
-		</td></tr>
-	<tr>
-		<td>
-			<p>
-				<code>var=</code></p></td>
-		<td>
-			<p>
-				<code>amountunit(input0)</code></p></td>
-		<td>
-		</td></tr>
-</table>
-<h5 id="Time_Date_Utilities">Time/Date Utilities</h5>
+				</p>
+			</td></tr>
+		<tr>
+			<td>
+				<p>
+					<code>var=</code></p></td>
+			<td>
+				<p>
+					<code>amountunit(input0, out unitx)</code></p></td>
+			<td>
+				<p>Parse amount+currency code string.</p>
+				<p>Split amount+currency code/unit string into number and currency code/unit.</p>
+				<p>
+					<em>var:</em> "123.45USD"</p>
+				<p>
+					<em>return:</em> e.g. "123.45"</p>
+				<p>
+					<em>unitx[out]:</em> e.g. "USD"</p>
+			</td></tr>
+		<tr>
+			<td>
+				<p>
+					<code>var=</code></p></td>
+			<td>
+				<p>
+					<code>amountunit(input0)</code></p></td>
+			<td>
+			</td></tr>
+	</table>
+	<h5 id="Time_Date_Utilities">Time/Date Utilities</h5>
 
-<table class="wikitable">
-	<tr>
-		<th>Use</th>
-		<th>Function</th>
-		<th>Description</th> </tr>
-	<tr>
-		<td>
-			<p>
-				<code>var=</code></p></td>
-		<td>
-			<p>
-				<code>timedate2()</code></p></td>
-		<td>
-			<p>Get text of date and time.</p>
-			<p>In users time zone</p>
-			<p>e.g. "2MAR2025 11:52AM"</p>
-			<p>Offset from UTC by TZ seconds.</p>
-		</td></tr>
-	<tr>
-		<td></td>
-		<td>
-			<p>
-				<code>getdatetime(out user_date, out user_time, out system_date, out system_time, out UTC_date, out UTC_time)</code></p></td>
-		<td>
-			<p>Get current user, server and UTC dates and times.</p>
-			<p>User date and time is determined by adding the environment variable TZ.f(1)'s TZ offset (in seconds) to UTC date/time obtained from the operating system.</p>
-			<p>"system" date and time is normally the same as UTC date/time and is determined by adding the environment variable TZ.f(2)'s TZ offset (in seconds) to UTC date/time obtained from the operating system.</p>
-		</td></tr>
-	<tr>
-		<td>
-			<p>
-				<code>var=</code></p></td>
-		<td>
-			<p>
-				<code>elapsedtimetext()</code></p></td>
-		<td>
-			<p>Get text of elapsed time.</p>
-			<p>Since environment variable TIMESTAMP.</p>
-			<p>TIMESTAMP is initialised with ostimestamp() at program/thread startup.</p>
-			<p>TIMESTAMP can be updated using ostimestamp() as and when desired.</p>
-			<p>
-				<pre><span class="kt">var</span><span class="w"> </span><span class="n">v1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">elapsedtimetext</span><span class="p">();</span><span class="w"> </span><span class="c1">// e.g. &quot;&lt; 1ms&quot;</span>
+	<table class="wikitable">
+		<tr>
+			<th>Use</th>
+			<th>Function</th>
+			<th>Description</th> </tr>
+		<tr>
+			<td>
+				<p>
+					<code>var=</code></p></td>
+			<td>
+				<p>
+					<code>timedate2()</code></p></td>
+			<td>
+				<p>Get text of date and time.</p>
+				<p>In users time zone</p>
+				<p>e.g. "2MAR2025 11:52AM"</p>
+				<p>Offset from UTC by TZ seconds.</p>
+			</td></tr>
+		<tr>
+			<td></td>
+			<td>
+				<p>
+					<code>getdatetime(out user_date, out user_time, out system_date, out system_time, out UTC_date, out UTC_time)</code></p></td>
+			<td>
+				<p>Get current user, server and UTC dates and times.</p>
+				<p>User date and time is determined by adding the environment variable TZ.f(1)'s TZ offset (in seconds) to UTC date/time obtained from the operating system.</p>
+				<p>"system" date and time is normally the same as UTC date/time and is determined by adding the environment variable TZ.f(2)'s TZ offset (in seconds) to UTC date/time obtained from the operating system.</p>
+			</td></tr>
+		<tr>
+			<td>
+				<p>
+					<code>var=</code></p></td>
+			<td>
+				<p>
+					<code>elapsedtimetext()</code></p></td>
+			<td>
+				<p>Get text of elapsed time.</p>
+				<p>Since environment variable TIMESTAMP.</p>
+				<p>TIMESTAMP is initialised with ostimestamp() at program/thread startup.</p>
+				<p>TIMESTAMP can be updated using ostimestamp() as and when desired.</p>
+				<p>
+					<pre><span class="kt">var</span><span class="w"> </span><span class="n">v1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">elapsedtimetext</span><span class="p">();</span><span class="w"> </span><span class="c1">// e.g. &quot;&lt; 1ms&quot;</span>
 </pre>
-			</p>
-		</td></tr>
-	<tr>
-		<td>
-			<p>
-				<code>var=</code></p></td>
-		<td>
-			<p>
-				<code>elapsedtimetext(timestamp1, timestamp2)</code></p></td>
-		<td>
-			<p>Get text of elapsed time.</p>
-			<p>Between two given timestamps</p>
-			<p>
-				<em>Warning:</em> Use ostimestamp() not ostime(). The first is in days and the second is in seconds.</p>
-			<p>
-				<pre><span class="nf">let</span><span class="w"> </span><span class="n">v1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">elapsedtimetext</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.55</span><span class="p">);</span><span class="w">  </span><span class="c1">// &quot;13 hours, 12 mins&quot;</span>
+				</p>
+			</td></tr>
+		<tr>
+			<td>
+				<p>
+					<code>var=</code></p></td>
+			<td>
+				<p>
+					<code>elapsedtimetext(timestamp1, timestamp2)</code></p></td>
+			<td>
+				<p>Get text of elapsed time.</p>
+				<p>Between two given timestamps</p>
+				<p>
+					<em>Warning:</em> Use ostimestamp() not ostime(). The first is in days and the second is in seconds.</p>
+				<p>
+					<pre><span class="nf">let</span><span class="w"> </span><span class="n">v1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">elapsedtimetext</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.55</span><span class="p">);</span><span class="w">  </span><span class="c1">// &quot;13 hours, 12 mins&quot;</span>
 <span class="nf">let</span><span class="w"> </span><span class="n">v2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">elapsedtimetext</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.001</span><span class="p">);</span><span class="w"> </span><span class="c1">// &quot;1 min, 26 secs&quot;</span>
 </pre>
-			</p>
-		</td></tr>
-</table>
-<h5 id="Terminal_I_O_Utilities">Terminal I/O Utilities</h5>
+				</p>
+			</td></tr>
+	</table>
+	<h5 id="Terminal_I_O_Utilities">Terminal I/O Utilities</h5>
 
-<table class="wikitable">
-	<tr>
-		<th>Use</th>
-		<th>Function</th>
-		<th>Description</th> </tr>
-	<tr>
-		<td></td>
-		<td>
-			<p>
-				<code>note(msg, options, io response)</code></p></td>
-		<td>
-			<p>Output a message to stdout and optionally request input.</p>
-			<p>If input is requested but stdin is not a terminal then set the response to "" and continue.</p>
-			<p>
-				<em>options:</em> R = Response requested. C upper case response.</p>
-			<p>
-				<pre><span class="kt">var</span><span class="w"> </span><span class="n">response</span><span class="p">;</span>
+	<table class="wikitable">
+		<tr>
+			<th>Use</th>
+			<th>Function</th>
+			<th>Description</th> </tr>
+		<tr>
+			<td></td>
+			<td>
+				<p>
+					<code>note(msg, options, io response)</code></p></td>
+			<td>
+				<p>Output a message to stdout and optionally request input.</p>
+				<p>If input is requested but stdin is not a terminal then set the response to "" and continue.</p>
+				<p>
+					<em>options:</em> R = Response requested. C upper case response.</p>
+				<p>
+					<pre><span class="kt">var</span><span class="w"> </span><span class="n">response</span><span class="p">;</span>
 <span class="c1">// call note(&quot;Enter something&quot;, &quot;RC&quot;, response);</span>
 </pre>
-			</p>
-		</td></tr>
-	<tr>
-		<td></td>
-		<td>
-			<p>
-				<code>note(msg)</code></p></td>
-		<td>
-			<p>Output a message to stdout.</p>
-			<p>
-				<pre><span class="k">call</span><span class="w"> </span><span class="nf">note</span><span class="p">(</span><span class="s">&quot;Hello world.&quot;</span><span class="p">);</span>
+				</p>
+			</td></tr>
+		<tr>
+			<td></td>
+			<td>
+				<p>
+					<code>note(msg)</code></p></td>
+			<td>
+				<p>Output a message to stdout.</p>
+				<p>
+					<pre><span class="k">call</span><span class="w"> </span><span class="nf">note</span><span class="p">(</span><span class="s">&quot;Hello world.&quot;</span><span class="p">);</span>
 </pre>
-			</p>
-		</td></tr>
-	<tr>
-		<td>
-			<p>
-				<code>var=</code></p></td>
-		<td>
-			<p>
-				<code>decide(question, options = "")</code></p></td>
-		<td>
-			<p>Input user selection from a list of options.</p>
-			<p>If stdin is not a terminal, set the response to "" and continue.</p>
-			<p>
-				<em>return:</em> The chosen option (value not number) or "" if the user cancelled.</p>
-		</td></tr>
-	<tr>
-		<td>
-			<p>
-				<code>var=</code></p></td>
-		<td>
-			<p>
-				<code>decide(question, options, out reply, defaultreply = 1)</code></p></td>
-		<td>
-			<p>Input user selection from a list of options.</p>
-			<p>If stdin is not a terminal set the response to the default value, or "" if none, and continue.</p>
-			<p>
-				<em>defaultreply:</em> A default option if the user presses Enter.</p>
-			<p>
-				<em>reply[out]:</em> The option number that the user chose or "" if they cancelled.</p>
-			<p>
-				<em>return:</em> The chosen option (value not number) or "" if the user cancelled.</p>
-		</td></tr>
-	<tr>
-		<td>
-			<p>
-				<code>if</code></p></td>
-		<td>
-			<p>
-				<code>esctoexit()</code></p></td>
-		<td>
-			<p>Check for user pause or cancel.</p>
-			<p>If stdin is a terminal, check if a key has been pressed and, if so, pause execution and ask the user to confirm if they want to escape/cancel or resume processing.</p>
-			<p>
-				<em>return:</em> </p>
-			<dl>
-				<dt>True</dt>
-				<dd>A key has been pressed and the user chose not to resume.</dd>
-				<dt>False</dt>
-				<dd>stdif is not a terminal, no key has been pressed, or the user chose to resume.</dd>
-			</dl>
-		</td></tr>
-	<tr>
-		<td>
-			<p>
-				<code>var=</code></p></td>
-		<td>
-			<p>
-				<code>AT(code)</code></p></td>
-		<td>
-			<p>Get a string to control terminal operation.</p>
-			<p>
-				<em>return:</em> A string to be output to the terminal in order to accomplish the desired operation.</p>
-			<p>The terminal protocol is xterminal.</p>
-			<p>
-				<em>code:</em> </p>
-			<dl>
-				<dt>  n</dt>
-				<dd>Position the cursor at column number n (1 based).</dd>
-				<dt>  0</dt>
-				<dd>Position the cursor at the first column (1).</dd>
-				<dt> -1</dt>
-				<dd>Clear the screen and home the cursor.</dd>
-				<dt> -2</dt>
-				<dd>Position the cursor at the top left home (x, y = 1, 1).</dd>
-				<dt> -3</dt>
-				<dd>Clear from the cursor at the end of screen.</dd>
-				<dt> -4</dt>
-				<dd>Clear from cursor to end of line.</dd>
-				<dt>-40</dt>
-				<dd>Position the cursor at columnno 0 and clear to end of line.</dd>
-			</dl>
-		</td></tr>
-	<tr>
-		<td>
-			<p>
-				<code>var=</code></p></td>
-		<td>
-			<p>
-				<code>AT(x, y)</code></p></td>
-		<td>
-			<p>Get a terminal cursor positioning string.</p>
-			<p>
-				<em>return:</em> A string to be output to the terminal to position the cursor at the desired screen x and y position.</p>
-			<p>The terminal protocol is xterminal.</p>
-		</td></tr>
-	<tr>
-		<td>
-			<p>
-				<code>if</code></p></td>
-		<td>
-			<p>
-				<code>getcursor(out cursor, delayms = 3000, max_errors = 0)</code></p></td>
-		<td>
-			<p>Get the position of the terminal cursor.</p>
-			<p>
-				<em>cursor[out]:</em> If stdin is a terminal, an FM delimited string containing the x and y coordinates of the current terminal cursor.</p>
-			<p>x and y are 1 based, not 0 based.</p>
-			<p>If stdin is not a terminatl then an empty string "" is returned.</p>
-			<p>The cursor additionally contains a third field which contains the delay in ms from the terminal.</p>
-			<p>The FM delimited string returned can be later passed to setcursor() to reposition the cursor back to its original position or it can be parsed and used accordingly.</p>
-			<p>
-				<em>delayms:</em> Default 3000ms. The maximum time to wait for terminal response.</p>
-			<p>
-				<em>max_errors:</em> Default is 0. If not zero, reset the number of times to error before automatically disabling getcursor(). max_errors is initialised to 3. If negative then max_errors has the the effect of disabling all future calls to getcursor().</p>
-			<p>In case the terminal fails to respond correctly within the required timeout, or is currently disabled due to too many failures, or has been specifically disabled then the returned "cursor" var contains a 4th field:</p>
-			<dl>
-				<dt>TIMEOUT</dt>
-				<dd>The terminal failed to respond within the timeout.</dd>
-				<dt>READ_ERROR</dt>
-				<dd>Failed to read terminal response.</dd>
-				<dt>INVALID_RESPONSE</dt>
-				<dd>Terminal response invalid.</dd>
-				<dt>SETUP_ERROR</dt>
-				<dd>Terminal setup failed.</dd>
-				<dt>DISABLED</dt>
-				<dd>Terminal is disabled due to more errors than the maximum currently set.</dd>
-			</dl>
-			<p>
-				<pre><span class="kt">var</span><span class="w"> </span><span class="n">cursor</span><span class="p">;</span>
+				</p>
+			</td></tr>
+		<tr>
+			<td>
+				<p>
+					<code>var=</code></p></td>
+			<td>
+				<p>
+					<code>decide(question, options = "")</code></p></td>
+			<td>
+				<p>Input user selection from a list of options.</p>
+				<p>If stdin is not a terminal, set the response to "" and continue.</p>
+				<p>
+					<em>return:</em> The chosen option (value not number) or "" if the user cancelled.</p>
+			</td></tr>
+		<tr>
+			<td>
+				<p>
+					<code>var=</code></p></td>
+			<td>
+				<p>
+					<code>decide(question, options, out reply, defaultreply = 1)</code></p></td>
+			<td>
+				<p>Input user selection from a list of options.</p>
+				<p>If stdin is not a terminal set the response to the default value, or "" if none, and continue.</p>
+				<p>
+					<em>defaultreply:</em> A default option if the user presses Enter.</p>
+				<p>
+					<em>reply[out]:</em> The option number that the user chose or "" if they cancelled.</p>
+				<p>
+					<em>return:</em> The chosen option (value not number) or "" if the user cancelled.</p>
+			</td></tr>
+		<tr>
+			<td>
+				<p>
+					<code>if</code></p></td>
+			<td>
+				<p>
+					<code>esctoexit()</code></p></td>
+			<td>
+				<p>Check for user pause or cancel.</p>
+				<p>If stdin is a terminal, check if a key has been pressed and, if so, pause execution and ask the user to confirm if they want to escape/cancel or resume processing.</p>
+				<p>
+					<em>return:</em> </p>
+				<dl>
+					<dt>True</dt>
+					<dd>A key has been pressed and the user chose not to resume.</dd>
+					<dt>False</dt>
+					<dd>stdif is not a terminal, no key has been pressed, or the user chose to resume.</dd>
+				</dl>
+			</td></tr>
+		<tr>
+			<td>
+				<p>
+					<code>var=</code></p></td>
+			<td>
+				<p>
+					<code>AT(code)</code></p></td>
+			<td>
+				<p>Get a string to control terminal operation.</p>
+				<p>
+					<em>return:</em> A string to be output to the terminal in order to accomplish the desired operation.</p>
+				<p>The terminal protocol is xterminal.</p>
+				<p>
+					<em>code:</em> </p>
+				<dl>
+					<dt>  n</dt>
+					<dd>Position the cursor at column number n (1 based).</dd>
+					<dt>  0</dt>
+					<dd>Position the cursor at the first column (1).</dd>
+					<dt> -1</dt>
+					<dd>Clear the screen and home the cursor.</dd>
+					<dt> -2</dt>
+					<dd>Position the cursor at the top left home (x, y = 1, 1).</dd>
+					<dt> -3</dt>
+					<dd>Clear from the cursor at the end of screen.</dd>
+					<dt> -4</dt>
+					<dd>Clear from cursor to end of line.</dd>
+					<dt>-40</dt>
+					<dd>Position the cursor at columnno 0 and clear to end of line.</dd>
+				</dl>
+			</td></tr>
+		<tr>
+			<td>
+				<p>
+					<code>var=</code></p></td>
+			<td>
+				<p>
+					<code>AT(x, y)</code></p></td>
+			<td>
+				<p>Get a terminal cursor positioning string.</p>
+				<p>
+					<em>return:</em> A string to be output to the terminal to position the cursor at the desired screen x and y position.</p>
+				<p>The terminal protocol is xterminal.</p>
+			</td></tr>
+		<tr>
+			<td>
+				<p>
+					<code>if</code></p></td>
+			<td>
+				<p>
+					<code>getcursor(out cursor, delayms = 3000, max_errors = 0)</code></p></td>
+			<td>
+				<p>Get the position of the terminal cursor.</p>
+				<p>
+					<em>cursor[out]:</em> If stdin is a terminal, an FM delimited string containing the x and y coordinates of the current terminal cursor.</p>
+				<p>x and y are 1 based, not 0 based.</p>
+				<p>If stdin is not a terminatl then an empty string "" is returned.</p>
+				<p>The cursor additionally contains a third field which contains the delay in ms from the terminal.</p>
+				<p>The FM delimited string returned can be later passed to setcursor() to reposition the cursor back to its original position or it can be parsed and used accordingly.</p>
+				<p>
+					<em>delayms:</em> Default 3000ms. The maximum time to wait for terminal response.</p>
+				<p>
+					<em>max_errors:</em> Default is 0. If not zero, reset the number of times to error before automatically disabling getcursor(). max_errors is initialised to 3. If negative then max_errors has the the effect of disabling all future calls to getcursor().</p>
+				<p>In case the terminal fails to respond correctly within the required timeout, or is currently disabled due to too many failures, or has been specifically disabled then the returned "cursor" var contains a 4th field:</p>
+				<dl>
+					<dt>TIMEOUT</dt>
+					<dd>The terminal failed to respond within the timeout.</dd>
+					<dt>READ_ERROR</dt>
+					<dd>Failed to read terminal response.</dd>
+					<dt>INVALID_RESPONSE</dt>
+					<dd>Terminal response invalid.</dd>
+					<dt>SETUP_ERROR</dt>
+					<dd>Terminal setup failed.</dd>
+					<dt>DISABLED</dt>
+					<dd>Terminal is disabled due to more errors than the maximum currently set.</dd>
+				</dl>
+				<p>
+					<pre><span class="kt">var</span><span class="w"> </span><span class="n">cursor</span><span class="p">;</span>
 <span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nf">isterminal</span><span class="p">()</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="ow">not</span><span class="w"> </span><span class="nf">getcursor</span><span class="p">(</span><span class="n">cursor</span><span class="p">))</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="c1">// cursor becomes something like &quot;1^20^0.012345&quot;_var</span>
 </pre>
-			</p>
-		</td></tr>
-	<tr>
-		<td>
-			<p>
-				<code>var=</code></p></td>
-		<td>
-			<p>
-				<code>getcursor()</code></p></td>
-		<td>
-			<p>Get the position of the terminal cursor.</p>
-			<p>For more info see the main getcursor() function above.</p>
-			<p>
-				<pre><span class="nf">let</span><span class="w"> </span><span class="n">cursor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">getcursor</span><span class="p">();</span><span class="w"> </span><span class="c1">// If isterminal() then cursor becomes something like &quot;0^20^0.012345&quot;_var</span>
+				</p>
+			</td></tr>
+		<tr>
+			<td>
+				<p>
+					<code>var=</code></p></td>
+			<td>
+				<p>
+					<code>getcursor()</code></p></td>
+			<td>
+				<p>Get the position of the terminal cursor.</p>
+				<p>For more info see the main getcursor() function above.</p>
+				<p>
+					<pre><span class="nf">let</span><span class="w"> </span><span class="n">cursor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">getcursor</span><span class="p">();</span><span class="w"> </span><span class="c1">// If isterminal() then cursor becomes something like &quot;0^20^0.012345&quot;_var</span>
 </pre>
-			</p>
-		</td></tr>
-	<tr>
-		<td></td>
-		<td>
-			<p>
-				<code>setcursor(cursor_coordinates)</code></p></td>
-		<td>
-			<p>If stdin is a terminal, position the cursor at x and y as per the given coordinates.</p>
-			<p>
-				<em>cursor_coordinates:</em> An FM delimited string containing the x and y coordinates of the terminal cursor as can be obtained by getcursor().
-				<pre><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nf">isterminal</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+				</p>
+			</td></tr>
+		<tr>
+			<td></td>
+			<td>
+				<p>
+					<code>setcursor(cursor_coordinates)</code></p></td>
+			<td>
+				<p>If stdin is a terminal, position the cursor at x and y as per the given coordinates.</p>
+				<p>
+					<em>cursor_coordinates:</em> An FM delimited string containing the x and y coordinates of the terminal cursor as can be obtained by getcursor().
+					<pre><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nf">isterminal</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="nf">let</span><span class="w"> </span><span class="n">cursor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">getcursor</span><span class="p">();</span><span class="w"> </span><span class="c1">// Save the current cursor position.</span>
 <span class="w">    </span><span class="n">TRACE</span><span class="p">(</span><span class="n">cursor</span><span class="p">)</span><span class="w">             </span><span class="c1">// Show the saved cursor position.</span>
 <span class="w">    </span><span class="nf">printx</span><span class="p">(</span><span class="nf">AT</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">));</span><span class="w">          </span><span class="c1">// Position the cursor at 0,0.</span>
 <span class="w">    </span><span class="nf">setcursor</span><span class="p">(</span><span class="n">cursor</span><span class="p">);</span><span class="w">        </span><span class="c1">// Restore its position</span>
 <span class="p">}</span>
 </pre>
-			</p>
-		</td></tr>
-</table>
-<h5 id="Array_Utilities">Array Utilities</h5>
+				</p>
+			</td></tr>
+	</table>
+	<h5 id="Array_Utilities">Array Utilities</h5>
 
-<table class="wikitable">
-	<tr>
-		<th>Use</th>
-		<th>Function</th>
-		<th>Description</th> </tr>
-	<tr>
-		<td>
-			<p>
-				<code>var=</code></p></td>
-		<td>
-			<p>
-				<code>invertarray(input, pad = false)</code></p></td>
-		<td>
-			<p>Dynamic array fields become values and vice versa</p>
-			<p>
-				<em>return:</em> The inverted dynamic array.</p>
-			<p>
-				<em>pad:</em> If true then on return, all fields will have the same number of values with superfluous trailing VMs where necessary.</p>
-			<p>
-				<pre><span class="nf">let</span><span class="w"> </span><span class="n">v1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;a]b]c^1]2]3&quot;</span><span class="kt">_var</span><span class="p">;</span>
+	<table class="wikitable">
+		<tr>
+			<th>Use</th>
+			<th>Function</th>
+			<th>Description</th> </tr>
+		<tr>
+			<td>
+				<p>
+					<code>var=</code></p></td>
+			<td>
+				<p>
+					<code>invertarray(input, pad = false)</code></p></td>
+			<td>
+				<p>Dynamic array fields become values and vice versa</p>
+				<p>
+					<em>return:</em> The inverted dynamic array.</p>
+				<p>
+					<em>pad:</em> If true then on return, all fields will have the same number of values with superfluous trailing VMs where necessary.</p>
+				<p>
+					<pre><span class="nf">let</span><span class="w"> </span><span class="n">v1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;a]b]c^1]2]3&quot;</span><span class="kt">_var</span><span class="p">;</span>
 <span class="nf">let</span><span class="w"> </span><span class="n">v2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">invertarray</span><span class="p">(</span><span class="n">v1</span><span class="p">);</span><span class="w"> </span><span class="c1">// &quot;a]1^b]2^c]3&quot;_var</span>
 </pre>
-			</p>
-		</td></tr>
-	<tr>
-		<td></td>
-		<td>
-			<p>
-				<code>sortarray(io array, fns = "", order = "")</code></p></td>
-		<td>
-			<p>Sort parallel fields of multivalues of dynamic arrays</p>
-			<p>
-				<em>fns:</em> VM separated list of field numbers to sort in parallel based on the first field number</p>
-			<p>
-				<em>order:</em> </p>
-			<dl>
-				<dt>AL</dt>
-				<dd>Ascending  - Left Justified (Alphabetic)</dd>
-				<dt>DL</dt>
-				<dd>Descending - Left Justified (Alphabetic)</dd>
-				<dt>AR</dt>
-				<dd>Ascending  - Right Justified (Numeric/Natural)</dd>
-				<dt>DR</dt>
-				<dd>Descending - Right Justified (Numeric/Natural)</dd>
-			</dl>
-			<p>
-				<pre><span class="kt">var</span><span class="w"> </span><span class="n">v1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;f1^10]20]2]1^ww]xx]yy]zz^f3^f4&quot;</span><span class="kt">_var</span><span class="p">;</span><span class="w">  </span><span class="c1">// fields 2 and 3 are parallel multivalues and currently unordered.</span>
+				</p>
+			</td></tr>
+		<tr>
+			<td></td>
+			<td>
+				<p>
+					<code>sortarray(io array, fns = "", order = "")</code></p></td>
+			<td>
+				<p>Sort parallel fields of multivalues of dynamic arrays</p>
+				<p>
+					<em>fns:</em> VM separated list of field numbers to sort in parallel based on the first field number</p>
+				<p>
+					<em>order:</em> </p>
+				<dl>
+					<dt>AL</dt>
+					<dd>Ascending  - Left Justified (Alphabetic)</dd>
+					<dt>DL</dt>
+					<dd>Descending - Left Justified (Alphabetic)</dd>
+					<dt>AR</dt>
+					<dd>Ascending  - Right Justified (Numeric/Natural)</dd>
+					<dt>DR</dt>
+					<dd>Descending - Right Justified (Numeric/Natural)</dd>
+				</dl>
+				<p>
+					<pre><span class="kt">var</span><span class="w"> </span><span class="n">v1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;f1^10]20]2]1^ww]xx]yy]zz^f3^f4&quot;</span><span class="kt">_var</span><span class="p">;</span><span class="w">  </span><span class="c1">// fields 2 and 3 are parallel multivalues and currently unordered.</span>
 <span class="nf">sortarray</span><span class="p">(</span><span class="n">v1</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;2]3&quot;</span><span class="kt">_var</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;AR&quot;</span><span class="p">);</span><span class="w"> </span><span class="c1">// v1 -&gt; &quot;f1^1]2]10]20^zz]yy]ww]xx^f3^f4&quot;_var</span>
 </pre>
-			</p>
-		</td></tr>
-</table>
-<h5 id="Record_Locking">Record Locking</h5>
+				</p>
+			</td></tr>
+	</table>
+	<h5 id="Record_Locking">Record Locking</h5>
 
-<table class="wikitable">
-	<tr>
-		<th>Use</th>
-		<th>Function</th>
-		<th>Description</th> </tr>
-	<tr>
-		<td>
-			<p>
-				<code>if</code></p></td>
-		<td>
-			<p>
-				<code>lockrecord(filename, io file, keyx, unused, waitsecs = 0, allowduplicate = false)</code></p></td>
-		<td>
-		</td></tr>
-	<tr>
-		<td>
-			<p>
-				<code>if</code></p></td>
-		<td>
-			<p>
-				<code>lockrecord(filename, io file, keyx)</code></p></td>
-		<td>
-		</td></tr>
-	<tr>
-		<td>
-			<p>
-				<code>if</code></p></td>
-		<td>
-			<p>
-				<code>unlockrecord(filename, io file, key)</code></p></td>
-		<td>
-		</td></tr>
-	<tr>
-		<td>
-			<p>
-				<code>if</code></p></td>
-		<td>
-			<p>
-				<code>unlockrecord()</code></p></td>
-		<td>
-		</td></tr>
-</table>
+	<table class="wikitable">
+		<tr>
+			<th>Use</th>
+			<th>Function</th>
+			<th>Description</th> </tr>
+		<tr>
+			<td>
+				<p>
+					<code>if</code></p></td>
+			<td>
+				<p>
+					<code>lockrecord(filename, io file, keyx, unused, waitsecs = 0, allowduplicate = false)</code></p></td>
+			<td>
+			</td></tr>
+		<tr>
+			<td>
+				<p>
+					<code>if</code></p></td>
+			<td>
+				<p>
+					<code>lockrecord(filename, io file, keyx)</code></p></td>
+			<td>
+			</td></tr>
+		<tr>
+			<td>
+				<p>
+					<code>if</code></p></td>
+			<td>
+				<p>
+					<code>unlockrecord(filename, io file, key)</code></p></td>
+			<td>
+			</td></tr>
+		<tr>
+			<td>
+				<p>
+					<code>if</code></p></td>
+			<td>
+				<p>
+					<code>unlockrecord()</code></p></td>
+			<td>
+			</td></tr>
+	</table>
 
-<div class="toc">
-	<h4 id="job_manager">Contents:</h4>
-	<ol>
-		<li>
-			<a href="#Run_Thread_">Run Thread </a></li>
+	<div class="toc">
+		<h4 id="job_manager">Contents:</h4>
+		<ol>
+			<li>
+				<a href="#Run_Thread_">Run Thread </a></li>
 
-	</ol>
-</div>
+		</ol>
+	</div>
 
 
-<h3 id="Run_Thread_">Run Thread </h3>
+	<h3 id="Run_Thread_">Run Thread </h3>
 
-<table class="wikitable">
-	<tr>
-		<th>Use</th>
-		<th>Function</th>
-		<th>Description</th> </tr>
-	<tr>
-		<td>
-			<p>
-				<code>(Job)</code></p></td>
-		<td>
-			<p>
-				<code>run(command)</code></p></td>
-		<td>
-			<p>Run another program in parallel.</p>
-			<p>Unlike perform and execute, run() does not block until it completes. It runs in parallel.</p>
-			<p>
-				<em>command:</em> See perform.</p>
-			<p>
-				<em>return:</em> A "job" object that you can use to manage the running job.</p>
-			<ul>
-				<li>Check if it has finished.</li>
-				<li>Pause and wait for it to finish with optional timeout.</li>
-				<li>When it has finished, access all its environment variables.</li>
-			</ul>
-			<p>See also:</p>
-			<dl>
-				<dt>run_results()</dt>
-				<dd>For use in a range based for-loops to simplify the asynchronous collection of output from all commands as they complete. Programs inner environments are retained for post processing so any suitable environment variable e.g. DATA, ANS or RECORD can be used to return data.</dd>
-				<dt>shutdown_run()</dt>
-				<dd>Wait for all jobs to finish before continuing, otherwise, if the parent program exits, they will be aborted.</dd>
-			</dl>
-			<p>
-				<pre><span class="nf">run</span><span class="p">(</span><span class="s">&quot;testlib aa&quot;</span><span class="p">);</span>
+	<table class="wikitable">
+		<tr>
+			<th>Use</th>
+			<th>Function</th>
+			<th>Description</th> </tr>
+		<tr>
+			<td>
+				<p>
+					<code>(Job)</code></p></td>
+			<td>
+				<p>
+					<code>run(command)</code></p></td>
+			<td>
+				<p>Run another program in parallel.</p>
+				<p>Unlike perform and execute, run() does not block until it completes. It runs in parallel.</p>
+				<p>
+					<em>command:</em> See perform.</p>
+				<p>
+					<em>return:</em> A "job" object that you can use to manage the running job.</p>
+				<ul>
+					<li>Check if it has finished.</li>
+					<li>Pause and wait for it to finish with optional timeout.</li>
+					<li>When it has finished, access all its environment variables.</li>
+				</ul>
+				<p>See also:</p>
+				<dl>
+					<dt>run_results()</dt>
+					<dd>For use in a range based for-loops to simplify the asynchronous collection of output from all commands as they complete. Programs inner environments are retained for post processing so any suitable environment variable e.g. DATA, ANS or RECORD can be used to return data.</dd>
+					<dt>shutdown_run()</dt>
+					<dd>Wait for all jobs to finish before continuing, otherwise, if the parent program exits, they will be aborted.</dd>
+				</dl>
+				<p>
+					<pre><span class="nf">run</span><span class="p">(</span><span class="s">&quot;testlib aa&quot;</span><span class="p">);</span>
 <span class="nf">run</span><span class="p">(</span><span class="s">&quot;testlib bb&quot;</span><span class="p">);</span>
 <span class="nf">run</span><span class="p">(</span><span class="s">&quot;testlib cc&quot;</span><span class="p">);</span>
 <span class="kt">var</span><span class="w"> </span><span class="n">results</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="p">;</span>
@@ -8657,294 +8668,306 @@ Optional prefix of "1/" or "/" causes the reciprocal of the number to be used. e
 <span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="k">auto</span><span class="o">&amp;</span><span class="w"> </span><span class="n">env</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="nf">run_results</span><span class="p">())</span>
 <span class="w">    </span><span class="n">results</span><span class="w"> </span><span class="o">^=</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="kc">DATA</span><span class="p">.</span><span class="nf">f</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="o">^</span><span class="w"> </span><span class="nb">FM</span><span class="p">;</span>
 </pre>
-			</p>
-		</td></tr>
-	<tr>
-		<td></td>
-		<td>
-			<p>
-				<code>setmaxthreads(max_threads = 0)</code></p></td>
-		<td>
-			<p>Set the threadpool size</p>
-			<p>Initial configuration is 4.</p>
-			<p>
-				<em>max_threads:</em> The default is 0 which sets the threadpool size to the number of processors in the system.</p>
-		</td></tr>
-	<tr>
-		<td>
-			<p>
-				<code>var=</code></p></td>
-		<td>
-			<p>
-				<code>getmaxthreads()</code></p></td>
-		<td>
-			<p>Get the current threadpool size.</p>
-		</td></tr>
-	<tr>
-		<td>
-			<p>
-				<code>var=</code></p></td>
-		<td>
-			<p>
-				<code>getnumcores()</code></p></td>
-		<td>
-			<p>Get the number of processor cores available.</p>
-		</td></tr>
-	<tr>
-		<td>
-			<p>
-				<code>var=</code></p></td>
-		<td>
-			<p>
-				<code>run_count()</code></p></td>
-		<td>
-			<p>Get the number of jobs run and pending results.</p>
-		</td></tr>
-	<tr>
-		<td>
-			<p>
-				<code>var=</code></p></td>
-		<td>
-			<p>
-				<code>decrement_run_count()</code></p></td>
-		<td>
-			<p>Decrease the number of jobs pending results.</p>
-		</td></tr>
-	<tr>
-		<td></td>
-		<td>
-			<p>
-				<code>shutdown_run()</code></p></td>
-		<td>
-			<p>Wait for all jobs to finish.</p>
-			<p>Both pending and running jobs will be completed.</p>
-			<p>On program termination all jobs will be aborted.</p>
-		</td></tr>
-	<tr>
-		<td></td>
-		<td>
-			<p>
-				<code>reset_run(size_t num_threads)</code></p></td>
-		<td>
-			<p>Start a new batch of jobs.</p>
-			<p>Calls shutdown_run() first.</p>
-		</td></tr>
-</table>
+				</p>
+			</td></tr>
+		<tr>
+			<td></td>
+			<td>
+				<p>
+					<code>setmaxthreads(max_threads = 0)</code></p></td>
+			<td>
+				<p>Set the threadpool size</p>
+				<p>Initial configuration is 4.</p>
+				<p>
+					<em>max_threads:</em> The default is 0 which sets the threadpool size to the number of processors in the system.</p>
+			</td></tr>
+		<tr>
+			<td>
+				<p>
+					<code>var=</code></p></td>
+			<td>
+				<p>
+					<code>getmaxthreads()</code></p></td>
+			<td>
+				<p>Get the current threadpool size.</p>
+			</td></tr>
+		<tr>
+			<td>
+				<p>
+					<code>var=</code></p></td>
+			<td>
+				<p>
+					<code>getnumcores()</code></p></td>
+			<td>
+				<p>Get the number of processor cores available.</p>
+			</td></tr>
+		<tr>
+			<td>
+				<p>
+					<code>std::generator
+						<ExoEnv&></code></p></td>
+				<td>
+					<p>
+						<code>run_results()</code></p></td>
+				<td>
+					<p>Process all run results in parallel as they come in.</p>
+					<p>See run() for an example.</p>
+				</td></tr>
+			<tr>
+				<td>
+					<p>
+						<code>var=</code></p></td>
+				<td>
+					<p>
+						<code>run_count()</code></p></td>
+				<td>
+					<p>Get the number of jobs run and pending results.</p>
+				</td></tr>
+			<tr>
+				<td>
+					<p>
+						<code>var=</code></p></td>
+				<td>
+					<p>
+						<code>decrement_run_count()</code></p></td>
+				<td>
+					<p>Decrease the number of jobs pending results.</p>
+				</td></tr>
+			<tr>
+				<td></td>
+				<td>
+					<p>
+						<code>shutdown_run()</code></p></td>
+				<td>
+					<p>Wait for all jobs to finish.</p>
+					<p>Both pending and running jobs will be completed.</p>
+					<p>On program termination all jobs will be aborted.</p>
+				</td></tr>
+			<tr>
+				<td></td>
+				<td>
+					<p>
+						<code>reset_run(size_t num_threads)</code></p></td>
+				<td>
+					<p>Start a new batch of jobs.</p>
+					<p>Calls shutdown_run() first.</p>
+				</td></tr>
+		</table>
 
-<div class="toc">
-	<h4 id="task_manager">Contents:</h4>
-	<ol>
-		<li>
-			<a href="#Async_Tasks_">Async Tasks </a></li>
+		<div class="toc">
+			<h4 id="task_manager">Contents:</h4>
+			<ol>
+				<li>
+					<a href="#Async_Tasks_">Async Tasks </a></li>
 
-	</ol>
-</div>
+			</ol>
+		</div>
 
 
-<h3 id="Async_Tasks_">Async Tasks </h3>
+		<h3 id="Async_Tasks_">Async Tasks </h3>
 
-<table class="wikitable">
-	<tr>
-		<th>Use</th>
-		<th>Function</th>
-		<th>Description</th> </tr>
-	<tr>
-		<td></td>
-		<td>
-			<p>
-				<code>async(funcname, args, ...)</code></p></td>
-		<td>
-			<p>Create an independent asynchronous task by calling a function.</p>
-			<p>
-				<em>funcname:</em> Any callable function name. To call an Exodus program member function, it must be prefixed by "&amp;_ExoProgram::" and followed by ", this" as follows:</p>
-			<p>e.g. async(&amp;_ExoProgram::xxxxxx, this, arg1, arg2, etc)</p>
-			<p>Exodus' asynchronous tasks run sequentially, not simultaneously. Their execution will be interleaved with other async tasks in the same thread of execution either whenever they ask for database i/o or when they call yield(). They are implicitly thread-safe but thread state (e.g RECORD/ID etc.) may be changed by other async tasks while yielded.</p>
-			<p>Exodus' asynchronous tasks are implemented using Boost fibers. These are similar to threads but without parallel processing or OS management. They are extremely fast to setup and and switch between and have a normal stack. They might be called "coprocesses" by comparion with "coroutines" which do not have stacks.</p>
-			<p>The initial state of an asynchronous task is "ready, not running". Once the main program calls yield() then one of the "ready, not running" async tasks is selected by a round robin scheduler and it runs until complete, requests database i/o, or yields, and so on.</p>
-			<p>Asynchronous tasks may return results in a result queue by calling set_async_result(...) one or more times.</p>
-			<p>Asynchronous tasks may share the default thread database connection but not concurrently so are better off with their own connection. Multiple asynchronous tasks with multiple concurrent database connections is ideally suited to async tasks.</p>
-			<p></p>
-			<p>
-				<em>https:</em> //x.com/i/grok/share/N4zbWT3V2hb4qK71G0qT0togh</p>
-			<p></p>
-			<dl>
-				<dt>Concept</dt>
-				<dd>"async" aligns with the computer science concept of *cooperative multitasking*, where isolated execution contexts yield to a scheduler for *interleaved*, not simultaneous, execution.</dd>
-			</dl>
-			<p></p>
-			<dl>
-				<dt>Concurrency</dt>
-				<dd>Interleaved execution of multiple tasks (with full stacks) within a *single thread*, not parallelism (simultaneous multi-CPU execution).</dd>
-			</dl>
-			<p></p>
-			<dl>
-				<dt>Full Stacks</dt>
-				<dd>Independent, full execution context sharing global state but with separate call stacks, resembling process-like entities but not OS processes. Not lightweight coroutines (e.g., Python’s 'async def' or generators) due to their lack of isolation and stacks.</dd>
-			</dl>
-			<p></p>
-			<dl>
-				<dt>Yield</dt>
-				<dd>Each async task can yield control explicitly to a scheduler, suspending its own execution and allowing another stack to run.</dd>
-			</dl>
-			<p></p>
-			<p>
-				<em>Scheduler:</em> </p>
-			<p>
-				<ul>
-					<li>A *minimal, non-interrupt-driven* mechanism that scans async full stacks and decide which to run next.</li>
-					<li>Its sole role is to *pass control* (or "hand the baton") to the next task, not to manage events (e.g., I/O, timers, or signals).</li>
-					<li>May optionally link to events if chosen, but this is not its primary function.</li>
-				</ul>
-			</p>
-			<p></p>
-			<dl>
-				<dt>No OS</dt>
-				<dd>No OS-level process creation (e.g., no 'fork', 'spawn', or equivalents like Python’s 'multiprocessing').</dd>
-			</dl>
-			<p></p>
-			<dl>
-				<dt>No Threads</dt>
-				<dd>Multiple async tasks share a *single thread*. Threads can have multiple async routines but not vice versa.</dd>
-			</dl>
-			<p></p>
-			<dl>
-				<dt>No Stackless Coroutines</dt>
-				<dd>Lightweight cooperative tasks (e.g., Python’s 'asyncio' coroutines or generators) are not considered full stacks</dd>
-			</dl>
-			<p></p>
-			<dl>
-				<dt>No Event Loop</dt>
-				<dd>The scheduler is not driven by interrupts or events (e.g., I/O polling, timers, or signals, as in 'asyncio's event loop).</dd>
-			</dl>
-			<p></p>
-			<p>
-				<em>Comparable:</em> </p>
-			<p>
-				<dl>
-					<dt>Boost</dt>
-					<dd>Boost Fibers are used to implement async tasks in Exodus.</dd>
-					<dt>Go</dt>
-					<dd>Goroutines have with a runtime scheduler loop (GOMAXPROCS=1), balancing scalability and ease.</dd>
-					<dt>Java</dt>
-					<dd>Project Loom: Continuations provide stackful coroutines, but require a custom single-threaded, non-interrupt-driven scheduler.</dd>
-					<dt>Python</dt>
-					<dd>Stackless, a non-standard Python variant, has tasklets with a scheduler loop.</dd>
-					<dt>Lua</dt>
-					<dd>Stackful coroutines with a user-defined scheduler loop, offering simplicity and control.</dd>
-					<dt>Ruby</dt>
-					<dd>Native Tasks provide stackful coroutines with a user-defined, non-interrupt-driven scheduler loop.</dd>
-					<dt>Erlang</dt>
-					<dd>Lightweight VM processes with BEAM’s scheduler loop, providing strong isolation.</dd>
-				</dl>
-			</p>
-			<p></p>
-			<table>
-				<tr>
-					<td>         </td>
-					<td>             </td>
-					<td>                           </td>
-					<td>                         </td>
-					<td>                           </td></tr>
-				<tr>
-					<td> Command </td>
-					<td> Mechanism   </td>
-					<td> Execution                 </td>
-					<td> Use Case                </td>
-					<td> Environment               </td></tr>
-				<tr>
-					<td>         </td>
-					<td>             </td>
-					<td>                           </td>
-					<td>                         </td>
-					<td>                           </td></tr>
-				<tr>
-					<td> async   </td>
-					<td> Fiber       </td>
-					<td> Cooperative, i/o or yield </td>
-					<td> Lightweight async tasks </td>
-					<td> Shares parent environment </td></tr>
-				<tr>
-					<td> run     </td>
-					<td> Thread pool </td>
-					<td> Parallel, preemptive      </td>
-					<td> Heavy parallel jobs     </td>
-					<td> Private RECORD/ID etc.    </td></tr>
-				<tr>
-					<td>         </td>
-					<td>             </td>
-					<td>                           </td>
-					<td>                         </td>
-					<td>                           </td></tr>
-			</table>
-			<p></p>
-			<p>Exodus uses a specific definition of asynchronous.</p>
-			<table>
-				<tr>
-					<td>                  </td>
-					<td>                          </td>
-					<td>                         </td></tr>
-				<tr>
-					<td> Terminology:     </td>
-					<td> Asynchronous             </td>
-					<td> Parallel                </td></tr>
-				<tr>
-					<td> Definition:      </td>
-					<td> Not at the same time     </td>
-					<td> Simultaneous execution  </td></tr>
-				<tr>
-					<td>                  </td>
-					<td>                          </td>
-					<td>                         </td></tr>
-				<tr>
-					<td> Execution:       </td>
-					<td> Interleaved              </td>
-					<td> Parallel                </td></tr>
-				<tr>
-					<td> CPUs:            </td>
-					<td> Single CPU               </td>
-					<td> Multi-CPU               </td></tr>
-				<tr>
-					<td>                  </td>
-					<td>                          </td>
-					<td>                         </td></tr>
-				<tr>
-					<td> Implementation:  </td>
-					<td> In-program switching     </td>
-					<td> OS switching            </td></tr>
-				<tr>
-					<td> Model:           </td>
-					<td> Cooperative multitasking </td>
-					<td> Preemptive multitasking </td></tr>
-				<tr>
-					<td> Common terms:    </td>
-					<td> Non-blocking             </td>
-					<td> Concurrent (loosely)    </td></tr>
-				<tr>
-					<td> Model:           </td>
-					<td> Fibers, Coroutines       </td>
-					<td> Processes, threads      </td></tr>
-				<tr>
-					<td>                  </td>
-					<td>                          </td>
-					<td>                         </td></tr>
-				<tr>
-					<td> Exodus function: </td>
-					<td> async()                  </td>
-					<td> run()                   </td></tr>
-				<tr>
-					<td> Exodus classes:  </td>
-					<td> Task/Tasks               </td>
-					<td> Job/Jobs                </td></tr>
-				<tr>
-					<td>                  </td>
-					<td>                          </td>
-					<td>                         </td></tr>
-			</table>
-			<p></p>
-			<p>Exodus’ async() is like multitasking—juggling Tasks in one thread, like switching between email and cooking. Whereas run() launches Jobs in parallel, like multiple teams working simultaneously. Forget “concurrent”—it’s async or parallel, oil and water.</p>
-			<p>"Async Misleading: Just like std::async hides a threading model, C++ coroutines hide a stackless function model, while Boost.Fiber delivers the task-based async people intuitively expect. The “async” label gets slapped on all three, despite wildly different mechanics—classic salesman/academic hair-splitting."</p>
-			<p>
-				<pre><span class="c1">//func add(in a, in b) {</span>
+		<table class="wikitable">
+			<tr>
+				<th>Use</th>
+				<th>Function</th>
+				<th>Description</th> </tr>
+			<tr>
+				<td></td>
+				<td>
+					<p>
+						<code>async(funcname, args, ...)</code></p></td>
+				<td>
+					<p>Create an independent asynchronous task by calling a function.</p>
+					<p>
+						<em>funcname:</em> Any callable function name. To call an Exodus program member function, it must be prefixed by "&amp;_ExoProgram::" and followed by ", this" as follows:</p>
+					<p>e.g. async(&amp;_ExoProgram::xxxxxx, this, arg1, arg2, etc)</p>
+					<p>Exodus' asynchronous tasks run sequentially, not simultaneously. Their execution will be interleaved with other async tasks in the same thread of execution either whenever they ask for database i/o or when they call yield(). They are implicitly thread-safe but thread state (e.g RECORD/ID etc.) may be changed by other async tasks while yielded.</p>
+					<p>Exodus' asynchronous tasks are implemented using Boost fibers. These are similar to threads but without parallel processing or OS management. They are extremely fast to setup and and switch between and have a normal stack. They might be called "coprocesses" by comparion with "coroutines" which do not have stacks.</p>
+					<p>The initial state of an asynchronous task is "ready, not running". Once the main program calls yield() then one of the "ready, not running" async tasks is selected by a round robin scheduler and it runs until complete, requests database i/o, or yields, and so on.</p>
+					<p>Asynchronous tasks may return results in a result queue by calling set_async_result(...) one or more times.</p>
+					<p>Asynchronous tasks may share the default thread database connection but not concurrently so are better off with their own connection. Multiple asynchronous tasks with multiple concurrent database connections is ideally suited to async tasks.</p>
+					<p></p>
+					<p>
+						<em>https:</em> //x.com/i/grok/share/N4zbWT3V2hb4qK71G0qT0togh</p>
+					<p></p>
+					<dl>
+						<dt>Concept</dt>
+						<dd>"async" aligns with the computer science concept of *cooperative multitasking*, where isolated execution contexts yield to a scheduler for *interleaved*, not simultaneous, execution.</dd>
+					</dl>
+					<p></p>
+					<dl>
+						<dt>Concurrency</dt>
+						<dd>Interleaved execution of multiple tasks (with full stacks) within a *single thread*, not parallelism (simultaneous multi-CPU execution).</dd>
+					</dl>
+					<p></p>
+					<dl>
+						<dt>Full Stacks</dt>
+						<dd>Independent, full execution context sharing global state but with separate call stacks, resembling process-like entities but not OS processes. Not lightweight coroutines (e.g., Python’s 'async def' or generators) due to their lack of isolation and stacks.</dd>
+					</dl>
+					<p></p>
+					<dl>
+						<dt>Yield</dt>
+						<dd>Each async task can yield control explicitly to a scheduler, suspending its own execution and allowing another stack to run.</dd>
+					</dl>
+					<p></p>
+					<p>
+						<em>Scheduler:</em> </p>
+					<p>
+						<ul>
+							<li>A *minimal, non-interrupt-driven* mechanism that scans async full stacks and decide which to run next.</li>
+							<li>Its sole role is to *pass control* (or "hand the baton") to the next task, not to manage events (e.g., I/O, timers, or signals).</li>
+							<li>May optionally link to events if chosen, but this is not its primary function.</li>
+						</ul>
+					</p>
+					<p></p>
+					<dl>
+						<dt>No OS</dt>
+						<dd>No OS-level process creation (e.g., no 'fork', 'spawn', or equivalents like Python’s 'multiprocessing').</dd>
+					</dl>
+					<p></p>
+					<dl>
+						<dt>No Threads</dt>
+						<dd>Multiple async tasks share a *single thread*. Threads can have multiple async routines but not vice versa.</dd>
+					</dl>
+					<p></p>
+					<dl>
+						<dt>No Stackless Coroutines</dt>
+						<dd>Lightweight cooperative tasks (e.g., Python’s 'asyncio' coroutines or generators) are not considered full stacks</dd>
+					</dl>
+					<p></p>
+					<dl>
+						<dt>No Event Loop</dt>
+						<dd>The scheduler is not driven by interrupts or events (e.g., I/O polling, timers, or signals, as in 'asyncio's event loop).</dd>
+					</dl>
+					<p></p>
+					<p>
+						<em>Comparable:</em> </p>
+					<p>
+						<dl>
+							<dt>Boost</dt>
+							<dd>Boost Fibers are used to implement async tasks in Exodus.</dd>
+							<dt>Go</dt>
+							<dd>Goroutines have with a runtime scheduler loop (GOMAXPROCS=1), balancing scalability and ease.</dd>
+							<dt>Java</dt>
+							<dd>Project Loom: Continuations provide stackful coroutines, but require a custom single-threaded, non-interrupt-driven scheduler.</dd>
+							<dt>Python</dt>
+							<dd>Stackless, a non-standard Python variant, has tasklets with a scheduler loop.</dd>
+							<dt>Lua</dt>
+							<dd>Stackful coroutines with a user-defined scheduler loop, offering simplicity and control.</dd>
+							<dt>Ruby</dt>
+							<dd>Native Tasks provide stackful coroutines with a user-defined, non-interrupt-driven scheduler loop.</dd>
+							<dt>Erlang</dt>
+							<dd>Lightweight VM processes with BEAM’s scheduler loop, providing strong isolation.</dd>
+						</dl>
+					</p>
+					<p></p>
+					<table>
+						<tr>
+							<td>         </td>
+							<td>             </td>
+							<td>                           </td>
+							<td>                         </td>
+							<td>                           </td></tr>
+						<tr>
+							<td> Command </td>
+							<td> Mechanism   </td>
+							<td> Execution                 </td>
+							<td> Use Case                </td>
+							<td> Environment               </td></tr>
+						<tr>
+							<td>         </td>
+							<td>             </td>
+							<td>                           </td>
+							<td>                         </td>
+							<td>                           </td></tr>
+						<tr>
+							<td> async   </td>
+							<td> Fiber       </td>
+							<td> Cooperative, i/o or yield </td>
+							<td> Lightweight async tasks </td>
+							<td> Shares parent environment </td></tr>
+						<tr>
+							<td> run     </td>
+							<td> Thread pool </td>
+							<td> Parallel, preemptive      </td>
+							<td> Heavy parallel jobs     </td>
+							<td> Private RECORD/ID etc.    </td></tr>
+						<tr>
+							<td>         </td>
+							<td>             </td>
+							<td>                           </td>
+							<td>                         </td>
+							<td>                           </td></tr>
+					</table>
+					<p></p>
+					<p>Exodus uses a specific definition of asynchronous.</p>
+					<table>
+						<tr>
+							<td>                  </td>
+							<td>                          </td>
+							<td>                         </td></tr>
+						<tr>
+							<td> Terminology:     </td>
+							<td> Asynchronous             </td>
+							<td> Parallel                </td></tr>
+						<tr>
+							<td> Definition:      </td>
+							<td> Not at the same time     </td>
+							<td> Simultaneous execution  </td></tr>
+						<tr>
+							<td>                  </td>
+							<td>                          </td>
+							<td>                         </td></tr>
+						<tr>
+							<td> Execution:       </td>
+							<td> Interleaved              </td>
+							<td> Parallel                </td></tr>
+						<tr>
+							<td> CPUs:            </td>
+							<td> Single CPU               </td>
+							<td> Multi-CPU               </td></tr>
+						<tr>
+							<td>                  </td>
+							<td>                          </td>
+							<td>                         </td></tr>
+						<tr>
+							<td> Implementation:  </td>
+							<td> In-program switching     </td>
+							<td> OS switching            </td></tr>
+						<tr>
+							<td> Model:           </td>
+							<td> Cooperative multitasking </td>
+							<td> Preemptive multitasking </td></tr>
+						<tr>
+							<td> Common terms:    </td>
+							<td> Non-blocking             </td>
+							<td> Concurrent (loosely)    </td></tr>
+						<tr>
+							<td> Model:           </td>
+							<td> Fibers, Coroutines       </td>
+							<td> Processes, threads      </td></tr>
+						<tr>
+							<td>                  </td>
+							<td>                          </td>
+							<td>                         </td></tr>
+						<tr>
+							<td> Exodus function: </td>
+							<td> async()                  </td>
+							<td> run()                   </td></tr>
+						<tr>
+							<td> Exodus classes:  </td>
+							<td> Task/Tasks               </td>
+							<td> Job/Jobs                </td></tr>
+						<tr>
+							<td>                  </td>
+							<td>                          </td>
+							<td>                         </td></tr>
+					</table>
+					<p></p>
+					<p>Exodus’ async() is like multitasking—juggling Tasks in one thread, like switching between email and cooking. Whereas run() launches Jobs in parallel, like multiple teams working simultaneously. Forget “concurrent”—it’s async or parallel, oil and water.</p>
+					<p>"Async Misleading: Just like std::async hides a threading model, C++ coroutines hide a stackless function model, while Boost.Fiber delivers the task-based async people intuitively expect. The “async” label gets slapped on all three, despite wildly different mechanics—classic salesman/academic hair-splitting."</p>
+					<p>
+						<pre><span class="c1">//func add(in a, in b) {</span>
 <span class="c1">//    set_async_result(a + b);</span>
 <span class="c1">// return &quot;&quot;;</span>
 <span class="c1">//}</span>
@@ -8957,43 +8980,65 @@ Optional prefix of "1/" or "/" causes the reciprocal of the number to be used. e
 <span class="w">    </span><span class="n">total</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">result</span><span class="p">.</span><span class="nf">data</span><span class="p">;</span>
 <span class="n">assert</span><span class="p">(</span><span class="n">total</span><span class="w"> </span><span class="ow">eq</span><span class="w"> </span><span class="mi">5250</span><span class="p">);</span>
 </pre>
-			</p>
-		</td></tr>
-	<tr>
-		<td></td>
-		<td>
-			<p>
-				<code>yield()</code></p></td>
-		<td>
-			<p>Hand over execution to other async tasks.</p>
-			<p>Execution can be suspended with full retention of stack and state.</p>
-			<p>A round robin scheduler resumes async tasks in turn or sleeps if all are waiting for database i/o.</p>
-		</td></tr>
-	<tr>
-		<td></td>
-		<td>
-			<p>
-				<code>set_async_result(var data, var message = "")</code></p></td>
-		<td>
-			<p>Set a async result.</p>
-			<p>Callable in an async function to provide output collectible by async_results().</p>
-			<p>See async for an example.</p>
-		</td></tr>
-	<tr>
-		<td>
-			<p>
-				<code>var=</code></p></td>
-		<td>
-			<p>
-				<code>async_count()</code></p></td>
-		<td>
-			<p>Get the number of asyncs pending.</p>
-			<p>Not required if you use async_results to collect results.</p>
-			<p>Calling async() increases the number and calling async_results() reduces the number.</p>
-		</td></tr>
-</table>
+					</p>
+				</td></tr>
+			<tr>
+				<td></td>
+				<td>
+					<p>
+						<code>yield()</code></p></td>
+				<td>
+					<p>Hand over execution to other async tasks.</p>
+					<p>Execution can be suspended with full retention of stack and state.</p>
+					<p>A round robin scheduler resumes async tasks in turn or sleeps if all are waiting for database i/o.</p>
+				</td></tr>
+			<tr>
+				<td></td>
+				<td>
+					<p>
+						<code>set_async_result(var data, var message = "")</code></p></td>
+				<td>
+					<p>Set a async result.</p>
+					<p>Callable in an async function to provide output collectible by async_results().</p>
+					<p>See async for an example.</p>
+				</td></tr>
+			<tr>
+				<td>
+					<p>
+						<code>std::generator
+							<AsyncResult&></code></p></td>
+					<td>
+						<p>
+							<code>async_results()</code></p></td>
+					<td>
+						<p>A range-based for loop to pick up all async results.</p>
+						<p>See async for an example.</p>
+					</td></tr>
+				<tr>
+					<td>
+						<p>
+							<code>ResultRange
+								<TaskManager, AsyncResult></code></p></td>
+						<td>
+							<p>
+								<code>async_results()</code></p></td>
+						<td>
+						</td></tr>
+					<tr>
+						<td>
+							<p>
+								<code>var=</code></p></td>
+						<td>
+							<p>
+								<code>async_count()</code></p></td>
+						<td>
+							<p>Get the number of asyncs pending.</p>
+							<p>Not required if you use async_results to collect results.</p>
+							<p>Calling async() increases the number and calling async_results() reduces the number.</p>
+						</td></tr>
+				</table>
 
 
-</body>
+				</body>
 
-</html>
+				</html>

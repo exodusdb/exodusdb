@@ -8147,6 +8147,13 @@ let v1 = d1.join(); // "f1^f2^f3"_var
 .sp 0
 
 
+.SS
+d1.unpack()
+.PP
+New Unpack function to allow "auto [a,b,c] = d1.unpack<3>();"
+.sp 0
+
+
 .SH 3. ARRAY MUTATION
 .SH
 
@@ -9660,6 +9667,16 @@ Get the number of processor cores available.
 
 
 .SS
+run_results()
+.PP
+Process all run results in parallel as they come in.
+.sp 0
+.PP
+See run() for an example.
+.sp 0
+
+
+.SS
 var v1 = run_count();
 .PP
 Get the number of jobs run and pending results.
@@ -9950,6 +9967,21 @@ Callable in an async function to provide output collectible by async_results().
 .PP
 See async for an example.
 .sp 0
+
+
+.SS
+async_results()
+.PP
+A range-based for loop to pick up all async results.
+.sp 0
+.PP
+See async for an example.
+.sp 0
+
+
+.SS
+async_results()
+
 
 
 .SS

@@ -4,12 +4,21 @@
 #ifdef EXO_MODULE
 	import std;
 	import var;
+#	define EXO_GENERATOR
+//#		include <exodus/result_range.h>
 #else
 #	include <utility>
 #   include <functional>
 #   include <memory>
-#   include <generator>
 #   include <tuple>
+#	include <version>
+#	ifdef __cpp_lib_generator 202207L
+#		define EXO_GENERATOR
+#   	include <generator>
+#	else
+#		include <exodus/result_range.h>
+#	endif
+#
 #	include <exodus/var.h>
 #endif
 
@@ -24,9 +33,19 @@ using Queue = ThreadSafeQueue<var>;
 using ResultQueue = ThreadSafeQueue<ExoEnv>;
 
 class PUBLIC JobManager {
+	std::shared_ptr<ResultQueue> result_queue_ = std::make_shared<ResultQueue>();
+
 public:
 	JobManager() = default;
 	~JobManager() = default;
+
+	// Prevent copying
+	JobManager(const JobManager&) = delete;
+	JobManager& operator=(const JobManager&) = delete;
+
+#ifndef EXO_GENERATOR
+	friend ResultRange<JobManager, ExoEnv>;
+#endif
 
 //	std::shared_ptr<ResultQueue> result_queue_ = std::make_shared<ResultQueue>();
 
@@ -42,22 +61,6 @@ public:
 //		++co_run_count_;
 //		do_run(callable);
 //	}
-//
-//	// Get the number of fibers started
-//	size_t co_run_count() const { return co_run_count_; }
-//
-//	// Generator for completed co_run results
-//	std::generator<AsyncResult&> co_run_results();
-//
-//	// function to queue a result
-//	void set_async_result(var data, var message);
-//
-//	// function to yield
-//	void yield();
-
-	// Prevent copying
-	JobManager(const JobManager&) = delete;
-	JobManager& operator=(const JobManager&) = delete;
 
 	////////////////
 	/// RUN THREAD :
@@ -95,11 +98,15 @@ public:
 	// Get the number of processor cores available.
 	auto getnumcores() -> var;
 
-	// Process all run results asynchronously.
-	// for (auto& env : run_results()) {
-	//     ...
-	// }
+#ifdef EXO_GENERATOR
+
+	// Process all run results in parallel as they come in.
+	// See run() for an example.
 	auto run_results() -> std::generator<ExoEnv&>;
+
+#else
+/*nodoc*/	auto run_results() -> ResultRange<JobManager, ExoEnv>;
+#endif
 
 	// Get the number of jobs run and pending results.
 	auto run_count() -> var;
@@ -116,13 +123,7 @@ public:
 	// Calls shutdown_run() first.
 	static auto reset_run(size_t num_threads) -> void;
 
-private:
-//	void do_run(std::function<void()> fn);
-//
-//	struct Impl;
-//	std::unique_ptr<Impl> impl_;
-//	size_t co_run_count_ = 0;
-	std::shared_ptr<ResultQueue> result_queue_ = std::make_shared<ResultQueue>();
+/*nodoc*/	auto result_queue() -> std::shared_ptr<ResultQueue>;
 
 };
 

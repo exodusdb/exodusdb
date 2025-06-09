@@ -57,13 +57,13 @@ set -euxo pipefail
 : =============================================
 :
 : May be used for EXODUS environment variable "EXO_HOME"
-: and system environment variables $PATH and $LD_LIBRARY_PATH
+: and system environment variables '$PATH' and '$LD_LIBRARY_PATH'
 :
 	mkdir -p $EXO_HOME/live
 	mkdir -p $EXO_INSTALL_DIR/live
 
 :
-: Copy all $EXO_HOME bin, lib, dat and inc files to ~/live
+: Copy all '$EXO_HOME' bin, lib, dat and inc files to ~/live
 : ========================================================
 :
 :	MUST use 'whole file' option to ensure that the OS dlopen understands everything has changed
@@ -72,7 +72,7 @@ set -euxo pipefail
 	rsync $DRYRUN -av --whole-file --delete $HOME/{bin,lib,dat,inc} ~/live
 
 :
-: Copy $EXO_INSTALL_DIR bin, lib and inc files to /usr/local/live
+: Copy '$EXO_INSTALL_DIR' bin, lib and inc files to /usr/local/live
 : ===============================================================
 :
 :	Note that ldconfig will not see or use /usr/local/live.

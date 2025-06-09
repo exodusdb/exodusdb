@@ -1505,8 +1505,8 @@ public:
 
 		// std::vector<var> vv1 = this->split(delim);
 		// Utility somewhere in the forest
-		auto basic_split(in v1, SV delim) -> std::vector<var>;
-		auto vv1 = basic_split(var_str, delim);
+		/*nondoc*/ auto basic_split(in v1, SV delim) -> std::vector<var>;
+		/*nondoc*/ auto vv1 = basic_split(var_str, delim);
 		return [&vv1]<size_t... Is>(std::index_sequence<Is...>) {
     		return std::array<var, N>{
         		(Is < vv1.size() ? std::move(vv1[Is]) : std::move(var()))...

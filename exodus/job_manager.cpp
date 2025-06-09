@@ -35,6 +35,8 @@ auto JobManager::decrement_run_count() -> var {
 	return threadpool1.decrement_total_tasks_enqueued();
 }
 
+std::shared_ptr<ResultQueue> JobManager::result_queue() { return result_queue_; }
+
 auto JobManager::shutdown_run() -> void {
 	threadpool1.shutdown();
 }
@@ -43,6 +45,7 @@ void JobManager::reset_run(size_t num_threads) {
 	ThreadPool::reset(&threadpool1, num_threads);
 }
 
+#ifdef EXO_GENERATOR
 auto JobManager::run_results() -> std::generator<ExoEnv&> {
 	int rc = run_count();
 	for (int i = 0; i < rc; ++i) {
@@ -52,8 +55,13 @@ auto JobManager::run_results() -> std::generator<ExoEnv&> {
 		co_yield env;
 	}
 }
+#else
+auto JobManager::run_results() -> ResultRange<JobManager, ExoEnv> {
+	return ResultRange<JobManager, ExoEnv>(this);
+}
+#endif
 
-// Asynchronous run:
+// Parallel run:
 // return: Job containing a future<ExoEnv> and max_thread_no, input_queue, output_queue
 // Creates new ExoEnv
 Job JobManager::run(in command) {
