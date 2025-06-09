@@ -163,6 +163,9 @@ func main() {
 
 func main2(in pass1) {
 
+	if (verbose eq 1)
+		logputl("\n---------- Pass ", pass1 ? 1 : 2, " ----------");
+
 	var docfilename = ostempfile();
 
 	// Start a temporary file for the example code
@@ -302,6 +305,10 @@ func main() {
 			srcline.replacer("\t", " ");
 			srcline.trimmerboth();
 
+			// Skip all preprocessor lines
+			if (srcline.starts("#"))
+				continue; // nextline
+
 			if (srcline == "private:") {
 				// Ignore all comments in private
 				// (unless turned on by a table title below)
@@ -435,10 +442,15 @@ func main() {
 						funcx_prefix = "";
 				}
 
+				var definitely_func = false;
 				if (funcx_prefix == "auto" and srcline.contains("->")) {
 					funcx_prefix = srcline.field("->", 2).field("{", 1).field(";", 1).trim();
 					srcline = srcline.field("->", 1).trimlast();
+					definitely_func = true;
 				}
+
+				if (verbose eq 2)
+					TRACE("000 " ^ funcx_prefix ^ " ... " ^ srcline)
 
 				funcx_mut.is_ctor = funcx_prefix.starts("dim(", "var(");
 				if (funcx_mut.is_ctor) {
@@ -483,6 +495,8 @@ func main() {
 				// int (rare)
 				else if (funcx_prefix == "int") {funcx_prefix = "int";} // setprecision/getprecision
 
+				else if (definitely_func) {
+				}
 				else {
 
 					if (funcx_prefix == "/" "/") {
@@ -528,6 +542,9 @@ func main() {
 			///////////////////////////////
 			// Found a function declaration
 			///////////////////////////////
+
+			if (verbose eq 1)
+				TRACE("111 " ^ srcline)
 
 			// Consume the comments in case we skip the function
 			var comments = move(contiguous_comments);
@@ -830,7 +847,7 @@ func main() {
 			{
 
 				if (verbose == 1) {
-					TRACE(line2)
+					TRACE("aaa " ^ line2)
 				}
 
 				// "ARGS&... appendable" -> "appendable, ..."
@@ -904,7 +921,7 @@ func main() {
 			all_func_sigs ^= line2 ^ VM;
 
 			if (verbose == 1) {
-				TRACE(line2)
+				TRACE("bbb " ^ line2)
 			}
 
 			// Remove inline multi-line quotes.
