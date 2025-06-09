@@ -15,8 +15,6 @@
 //#define LOG std::cerr
 #define LOG if (0) std::cerr // No-op, optimized out
 
-#define PUBLIC __attribute__((visibility("default")))
-
 namespace exo {
 
 // Generic implementation
@@ -44,6 +42,8 @@ typename ResultRange<U, T>::Iterator ResultRange<U, T>::end() const {
 }
 
 // Specialization for JobManager, ExoEnv
+////////////////////////////////////////
+
 template<>
 ResultRange<JobManager, ExoEnv>::Iterator
 ResultRange<JobManager, ExoEnv>::begin() {
@@ -68,6 +68,8 @@ ResultRange<JobManager, ExoEnv>::Iterator::operator++() {
 }
 
 // Specialization for TaskManager, AsyncResult
+//////////////////////////////////////////////
+
 template<>
 ResultRange<TaskManager, AsyncResult>::Iterator
 ResultRange<TaskManager, AsyncResult>::begin() {
@@ -117,12 +119,6 @@ ResultRange<TaskManager, AsyncResult>::Iterator::operator++() {
 // Explicit instantiations
 template class ResultRange<JobManager, ExoEnv>;
 template class ResultRange<TaskManager, AsyncResult>;
-
-// Declare TaskManager specialization (defined in task_manager.cpp)
-template<>
-PUBLIC ResultRange<exo::TaskManager, exo::AsyncResult>::Iterator ResultRange<exo::TaskManager, exo::AsyncResult>::begin();
-template<>
-PUBLIC ResultRange<exo::TaskManager, exo::AsyncResult>::Iterator& ResultRange<exo::TaskManager, exo::AsyncResult>::Iterator::operator++();
 
 } // namespace exo
 
