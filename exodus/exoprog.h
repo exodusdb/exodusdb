@@ -6,7 +6,7 @@
 #else
 #	include <string>
 #	include <future>
-#	include <generator>
+//#	include <generator>
 #	include <coroutine>
 // Using map for dict function cache instead of unordered_map since it is faster
 // up to about 400 elements according to https://youtu.be/M2fKMP47slQ?t=258

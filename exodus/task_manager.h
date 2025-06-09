@@ -13,8 +13,9 @@
 #   include <generator>
 #   include <tuple>
 #	include <exception>
-#	include <version>
-#	ifdef __cpp_lib_generator 202207L
+//#	include <version>
+//#	ifdef __cpp_lib_generator // 202207L
+#	if __has_include(<generator>)
 #		define EXO_GENERATOR
 #   	include <generator>
 #	else

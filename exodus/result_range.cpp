@@ -1,7 +1,8 @@
 #ifndef EXO_MODULE // exclude the whole thing since we have generator in our std module
 
-#include <version>
-#ifndef __cpp_lib_generator //202207L
+//#include <version>
+//#ifndef __cpp_lib_generator // 202207L
+#if ! __has_include(<generator>)
 
 #	include <memory> // std::shared_ptr
 #	include <stdexcept>
@@ -125,5 +126,5 @@ PUBLIC ResultRange<exo::TaskManager, exo::AsyncResult>::Iterator& ResultRange<ex
 
 } // namespace exo
 
-#endif // doesnt have __cpp_lib_generator
+#endif // doesnt have <generator>
 #endif // doesnt have EXO_MODULE
