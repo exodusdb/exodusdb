@@ -39,12 +39,11 @@ THE SOFTWARE.
 
 #if EXO_MODULE
 	import std;
-
 	import var;
 #else
 #	include <exodus/var.h>
-//#include <exodus/dim.h>
-//#include <exodus/rex.h>
+//#	include <exodus/dim.h>
+//#	include <exodus/rex.h>
 #endif
 
 #include <exodus/vardefs.h> // for PUBLIC

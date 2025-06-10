@@ -182,7 +182,7 @@ class var;
 template<typename var> class var_mid; // forward declaration of a class template
 
 #define VARBASE1  var_base<var_mid<exo::var>>
-#define VBV       var_base<var_mid<exo::var>>
+//#define VBV       var_base<var_mid<exo::var>>
 
 #define VBR1      var_base<var_mid<var>>&
 //#define CBR const var_base<var_mid<exo::var>>&
@@ -255,7 +255,8 @@ class PUBLIC var_base {
  protected:
 
 //	using VAR    =       var_base;
-	using VARREF =       var_base&;
+//	using VARREF =       var_base&;
+	using BASEREF =       var_base&;
 //	using CBR    = const var_base&;
 //	using TBR    =       var_base&&;
 
@@ -1173,69 +1174,69 @@ class PUBLIC var_base {
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
 #ifdef SELF_OP_ARE_CHAINABLE
-#	define VARREF1 VARREF
-#	define VARREF1_RETURN *this
+#	define BASEREF_OR_VOID BASEREF
+#	define THIS_OR_NOTHING *this
 #else
-#	define VARREF1 void
-#	define VARREF1_RETURN
+#	define BASEREF_OR_VOID void
+#	define THIS_OR_NOTHING
 #endif
-	VARREF1 operator+=(CBR) &;
-	VARREF1 operator*=(CBR) &;
-	VARREF1 operator-=(CBR) &;
-	VARREF1 operator/=(CBR) &;
-	VARREF1 operator%=(CBR) &;
+	BASEREF_OR_VOID operator+=(CBR) &;
+	BASEREF_OR_VOID operator*=(CBR) &;
+	BASEREF_OR_VOID operator-=(CBR) &;
+	BASEREF_OR_VOID operator/=(CBR) &;
+	BASEREF_OR_VOID operator%=(CBR) &;
 
 	// Specialisations for speed to avoid a) unnecessary converting to a var and then b) having to decide what type of var we have
 
 	// Addvar_base(
-	VARREF1 operator+=(const int) &;
-	VARREF1 operator+=(const double) &;
-	VARREF1 operator+=(const char  char1) & {(*this) += var_base(char1); return VARREF1_RETURN;}
-	VARREF1 operator+=(const char* chars) & {(*this) += var_base(chars); return VARREF1_RETURN;}
-	VARREF1 operator+=(const bool) &;
+	BASEREF_OR_VOID operator+=(const int) &;
+	BASEREF_OR_VOID operator+=(const double) &;
+	BASEREF_OR_VOID operator+=(const char  char1) & {(*this) += var_base(char1); return THIS_OR_NOTHING;}
+	BASEREF_OR_VOID operator+=(const char* chars) & {(*this) += var_base(chars); return THIS_OR_NOTHING;}
+	BASEREF_OR_VOID operator+=(const bool) &;
 
 	// Multiply
-	VARREF1 operator*=(const int) &;
-	VARREF1 operator*=(const double) &;
-	VARREF1 operator*=(const char  char1) & {(*this) *= var_base(char1); return VARREF1_RETURN;}
-	VARREF1 operator*=(const char* chars) & {(*this) *= var_base(chars); return VARREF1_RETURN;}
-	VARREF1 operator*=(const bool) &;
+	BASEREF_OR_VOID operator*=(const int) &;
+	BASEREF_OR_VOID operator*=(const double) &;
+	BASEREF_OR_VOID operator*=(const char  char1) & {(*this) *= var_base(char1); return THIS_OR_NOTHING;}
+	BASEREF_OR_VOID operator*=(const char* chars) & {(*this) *= var_base(chars); return THIS_OR_NOTHING;}
+	BASEREF_OR_VOID operator*=(const bool) &;
 
 	// Subtract
-	VARREF1 operator-=(const int) &;
-	VARREF1 operator-=(const double) &;
-	VARREF1 operator-=(const char  char1) & {(*this) -= var_base(char1); return VARREF1_RETURN;}
-	VARREF1 operator-=(const char* chars) & {(*this) -= var_base(chars); return VARREF1_RETURN;}
-	VARREF1 operator-=(const bool) &;
+	BASEREF_OR_VOID operator-=(const int) &;
+	BASEREF_OR_VOID operator-=(const double) &;
+	BASEREF_OR_VOID operator-=(const char  char1) & {(*this) -= var_base(char1); return THIS_OR_NOTHING;}
+	BASEREF_OR_VOID operator-=(const char* chars) & {(*this) -= var_base(chars); return THIS_OR_NOTHING;}
+	BASEREF_OR_VOID operator-=(const bool) &;
 
 	// Divide
-	VARREF1 operator/=(const int) &;
-	VARREF1 operator/=(const double) &;
-	VARREF1 operator/=(const char  char1) & {(*this) /= var_base(char1); return VARREF1_RETURN;}
-	VARREF1 operator/=(const char* chars) & {(*this) /= var_base(chars); return VARREF1_RETURN;}
-	VARREF1 operator/=(const bool) &;
+	BASEREF_OR_VOID operator/=(const int) &;
+	BASEREF_OR_VOID operator/=(const double) &;
+	BASEREF_OR_VOID operator/=(const char  char1) & {(*this) /= var_base(char1); return THIS_OR_NOTHING;}
+	BASEREF_OR_VOID operator/=(const char* chars) & {(*this) /= var_base(chars); return THIS_OR_NOTHING;}
+	BASEREF_OR_VOID operator/=(const bool) &;
 
 	// Modulo
-	VARREF1 operator%=(const int) &;
-	VARREF1 operator%=(const double dbl1) &;
-	VARREF1 operator%=(const char  char1) & {(*this) %= var_base(char1); return VARREF1_RETURN;}
-	VARREF1 operator%=(const char* chars) & {(*this) %= var_base(chars); return VARREF1_RETURN;}
-	VARREF1 operator%=(const bool  bool1) & {(*this) %= var_base(bool1); return VARREF1_RETURN;}
+	BASEREF_OR_VOID operator%=(const int) &;
+	BASEREF_OR_VOID operator%=(const double dbl1) &;
+	BASEREF_OR_VOID operator%=(const char  char1) & {(*this) %= var_base(char1); return THIS_OR_NOTHING;}
+	BASEREF_OR_VOID operator%=(const char* chars) & {(*this) %= var_base(chars); return THIS_OR_NOTHING;}
+	BASEREF_OR_VOID operator%=(const bool  bool1) & {(*this) %= var_base(bool1); return THIS_OR_NOTHING;}
 
 	// Concat self assign is different.
 	// It does return *this in order for chainable efficient multiple concatentation.
 
-	VARREF operator^=(CBR) &;
-	VARREF operator^=(TBR) &;
-	VARREF operator^=(const int) &;
-	VARREF operator^=(const double) &;
-	VARREF operator^=(const char) &;
+	BASEREF operator^=(CBR) &;
+	BASEREF operator^=(TBR) &;
+	BASEREF operator^=(const int) &;
+	BASEREF operator^=(const double) &;
+	BASEREF operator^=(const char) &;
 
 #define NOT_TEMPLATED_APPEND
 #ifdef NOT_TEMPLATED_APPEND
-	VARREF operator^=(const char*) &;
-	VARREF operator^=(const std::string&) &;
-	VARREF operator^=(SV) &;
+	BASEREF operator^=(const char*) &;
+	BASEREF operator^=(const std::string&) &;
+	BASEREF operator^=(SV) &;
 #else
 	// var = string-like
 	template <typename Appendable, std::enable_if_t<
@@ -1252,10 +1253,10 @@ class PUBLIC var_base {
 		std::string,
 		std::string_view,
 	*/
-	VARREF operator^=(Appendable str2) & {
+	BASEREF operator^=(Appendable str2) & {
 		assertString(__PRETTY_FUNCTION__);
 		var_str += str2;
-		var_typ = VARTYP_STR;  // must reset to one unique type
+		var_typ = VARTYP_STR;  // Must reset to one unique type
 		return *this;
 	}
 #endif
@@ -1268,57 +1269,57 @@ class PUBLIC var_base {
 /*
 	#define DEPRECATE [[deprecated("Using self assign operators on temporaries is pointless. Use the operator by itself, without the = sign, to achieve the same.")]]
 
-	DEPRECATE VARREF operator+=(CBR rhs) && {(*this) += rhs; return *this;}// = delete;
-	DEPRECATE VARREF operator*=(CBR rhs) && {(*this) *= rhs; return *this;}// = delete;
-	DEPRECATE VARREF operator-=(CBR rhs) && {(*this) -= rhs; return *this;}// = delete;
-	DEPRECATE VARREF operator/=(CBR rhs) && {(*this) /= rhs; return *this;}// = delete;
-	DEPRECATE VARREF operator%=(CBR rhs) && {(*this) %= rhs; return *this;}// = delete;
-	DEPRECATE VARREF operator^=(CBR rhs) && {(*this) ^= rhs; return *this;}// = delete;
+	DEPRECATE BASEREF operator+=(CBR rhs) && {(*this) += rhs; return *this;}// = delete;
+	DEPRECATE BASEREF operator*=(CBR rhs) && {(*this) *= rhs; return *this;}// = delete;
+	DEPRECATE BASEREF operator-=(CBR rhs) && {(*this) -= rhs; return *this;}// = delete;
+	DEPRECATE BASEREF operator/=(CBR rhs) && {(*this) /= rhs; return *this;}// = delete;
+	DEPRECATE BASEREF operator%=(CBR rhs) && {(*this) %= rhs; return *this;}// = delete;
+	DEPRECATE BASEREF operator^=(CBR rhs) && {(*this) ^= rhs; return *this;}// = delete;
 
 	// Specialisations are deprecated too
 
 	// Add
-	DEPRECATE VARREF operator+=(const int    rhs) && {(*this) += rhs; return *this;}// = delete;
-	DEPRECATE VARREF operator+=(const double rhs) && {(*this) += rhs; return *this;}// = delete;
-	DEPRECATE VARREF operator+=(const char   rhs) && {(*this) += rhs; return *this;}// = delete;
-	DEPRECATE VARREF operator+=(const char*  rhs) && {(*this) += rhs; return *this;}// = delete;
-	DEPRECATE VARREF operator+=(const bool   rhs) && {(*this) += rhs; return *this;}// = delete;
+	DEPRECATE BASEREF operator+=(const int    rhs) && {(*this) += rhs; return *this;}// = delete;
+	DEPRECATE BASEREF operator+=(const double rhs) && {(*this) += rhs; return *this;}// = delete;
+	DEPRECATE BASEREF operator+=(const char   rhs) && {(*this) += rhs; return *this;}// = delete;
+	DEPRECATE BASEREF operator+=(const char*  rhs) && {(*this) += rhs; return *this;}// = delete;
+	DEPRECATE BASEREF operator+=(const bool   rhs) && {(*this) += rhs; return *this;}// = delete;
 
 	// Multiply
-	DEPRECATE VARREF operator*=(const int    rhs) && {(*this) *= rhs; return *this;}// = delete;
-	DEPRECATE VARREF operator*=(const double rhs) && {(*this) *= rhs; return *this;}// = delete;
-	DEPRECATE VARREF operator*=(const char   rhs) && {(*this) *= rhs; return *this;}// = delete;
-	DEPRECATE VARREF operator*=(const char*  rhs) && {(*this) *= rhs; return *this;}// = delete;
-	DEPRECATE VARREF operator*=(const bool   rhs) && {(*this) *= rhs; return *this;}// = delete;
+	DEPRECATE BASEREF operator*=(const int    rhs) && {(*this) *= rhs; return *this;}// = delete;
+	DEPRECATE BASEREF operator*=(const double rhs) && {(*this) *= rhs; return *this;}// = delete;
+	DEPRECATE BASEREF operator*=(const char   rhs) && {(*this) *= rhs; return *this;}// = delete;
+	DEPRECATE BASEREF operator*=(const char*  rhs) && {(*this) *= rhs; return *this;}// = delete;
+	DEPRECATE BASEREF operator*=(const bool   rhs) && {(*this) *= rhs; return *this;}// = delete;
 
 	// Subtract
-	DEPRECATE VARREF operator-=(const int    rhs) && {(*this) -= rhs; return *this;}// = delete;
-	DEPRECATE VARREF operator-=(const double rhs) && {(*this) -= rhs; return *this;}// = delete;
-	DEPRECATE VARREF operator-=(const char   rhs) && {(*this) -= rhs; return *this;}// = delete;
-	DEPRECATE VARREF operator-=(const char*  rhs) && {(*this) -= rhs; return *this;}// = delete;
-	DEPRECATE VARREF operator-=(const bool   rhs) && {(*this) -= rhs; return *this;}// = delete;
+	DEPRECATE BASEREF operator-=(const int    rhs) && {(*this) -= rhs; return *this;}// = delete;
+	DEPRECATE BASEREF operator-=(const double rhs) && {(*this) -= rhs; return *this;}// = delete;
+	DEPRECATE BASEREF operator-=(const char   rhs) && {(*this) -= rhs; return *this;}// = delete;
+	DEPRECATE BASEREF operator-=(const char*  rhs) && {(*this) -= rhs; return *this;}// = delete;
+	DEPRECATE BASEREF operator-=(const bool   rhs) && {(*this) -= rhs; return *this;}// = delete;
 
 	// Divide
-	DEPRECATE VARREF operator/=(const int    rhs) && {(*this) /= rhs; return *this;}// = delete;
-	DEPRECATE VARREF operator/=(const double rhs) && {(*this) /= rhs; return *this;}// = delete;
-	DEPRECATE VARREF operator/=(const char   rhs) && {(*this) /= rhs; return *this;}// = delete;
-	DEPRECATE VARREF operator/=(const char*  rhs) && {(*this) /= rhs; return *this;}// = delete;
-	DEPRECATE VARREF operator/=(const bool   rhs) && {(*this) /= rhs; return *this;}// = delete;
+	DEPRECATE BASEREF operator/=(const int    rhs) && {(*this) /= rhs; return *this;}// = delete;
+	DEPRECATE BASEREF operator/=(const double rhs) && {(*this) /= rhs; return *this;}// = delete;
+	DEPRECATE BASEREF operator/=(const char   rhs) && {(*this) /= rhs; return *this;}// = delete;
+	DEPRECATE BASEREF operator/=(const char*  rhs) && {(*this) /= rhs; return *this;}// = delete;
+	DEPRECATE BASEREF operator/=(const bool   rhs) && {(*this) /= rhs; return *this;}// = delete;
 
 	// Modulo
-	DEPRECATE VARREF operator%=(const int    rhs) && {(*this) %= rhs; return *this;}// = delete;
-	DEPRECATE VARREF operator%=(const double rhs) && {(*this) %= rhs; return *this;}// = delete;
-	DEPRECATE VARREF operator%=(const char   rhs) && {(*this) %= rhs; return *this;}// = delete;
-	DEPRECATE VARREF operator%=(const char*  rhs) && {(*this) %= rhs; return *this;}// = delete;
-	DEPRECATE VARREF operator%=(const bool   rhs) && {(*this) %= rhs; return *this;}// = delete;
+	DEPRECATE BASEREF operator%=(const int    rhs) && {(*this) %= rhs; return *this;}// = delete;
+	DEPRECATE BASEREF operator%=(const double rhs) && {(*this) %= rhs; return *this;}// = delete;
+	DEPRECATE BASEREF operator%=(const char   rhs) && {(*this) %= rhs; return *this;}// = delete;
+	DEPRECATE BASEREF operator%=(const char*  rhs) && {(*this) %= rhs; return *this;}// = delete;
+	DEPRECATE BASEREF operator%=(const bool   rhs) && {(*this) %= rhs; return *this;}// = delete;
 
 	// Concat
-	DEPRECATE VARREF operator^=(const int          rhs) && {(*this) ^= rhs; return *this;}// = delete;
-	DEPRECATE VARREF operator^=(const double       rhs) && {(*this) ^= rhs; return *this;}// = delete;
-	DEPRECATE VARREF operator^=(const char         rhs) && {(*this) ^= rhs; return *this;}// = delete;
-	DEPRECATE VARREF operator^=(const char*        rhs) && {(*this) ^= rhs; return *this;}// = delete;
-	DEPRECATE VARREF operator^=(const std::string& rhs) && {(*this) ^= rhs; return *this;}// = delete;
-	DEPRECATE VARREF operator^=(const std::string_view rhs) && {(*this) ^= rhs; return *this;}// = delete;
+	DEPRECATE BASEREF operator^=(const int          rhs) && {(*this) ^= rhs; return *this;}// = delete;
+	DEPRECATE BASEREF operator^=(const double       rhs) && {(*this) ^= rhs; return *this;}// = delete;
+	DEPRECATE BASEREF operator^=(const char         rhs) && {(*this) ^= rhs; return *this;}// = delete;
+	DEPRECATE BASEREF operator^=(const char*        rhs) && {(*this) ^= rhs; return *this;}// = delete;
+	DEPRECATE BASEREF operator^=(const std::string& rhs) && {(*this) ^= rhs; return *this;}// = delete;
+	DEPRECATE BASEREF operator^=(const std::string_view rhs) && {(*this) ^= rhs; return *this;}// = delete;
 
 	#undef DEPRECATE
 */
@@ -1337,8 +1338,8 @@ class PUBLIC var_base {
 	RETVAR operator--(int) &;
 
 	// Prefix increment/decrement
-	VARREF operator++() &;
-	VARREF operator--() &;
+	BASEREF operator++() &;
+	BASEREF operator--() &;
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wnon-template-friend"
@@ -1409,17 +1410,13 @@ class PUBLIC var_base {
 	// ENSURE all changes in varb_friends.h and varb_friends_impl.h are replicated using sed commands listed in the files
 	// Implementations are in varb_friends_impl.h included in var.cpp
 
+// Also included without friend definition after class var_base definition below.
 #define VAR_FRIEND friend
-//#undef TBR1
-//#define TBR1 var_base&&
 #include "varb_friends.h"
-//#undef TBR1
-//#define TBR1 var_base<var_mid<var>>&&
-
-// in varb.cpp
+// Implementation in varb.cpp
 //#include "varb_friends_impl.h"
 
-#pragma GCC diagnostic pop
+#pragma GCC diagnostic pop // "-Wnon-template-friend"
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 //                                         IOSTREAM FRIENDS
@@ -1441,7 +1438,7 @@ class PUBLIC var_base {
 	// ISTREAM
 	//////////
 
-	friend std::istream& operator>>(std::istream& istream1, VARREF invar) {
+	friend std::istream& operator>>(std::istream& istream1, BASEREF invar) {
 
 //		THISIS("istream >> var")
 //		invar.assertVar(function_sig);
@@ -1522,13 +1519,13 @@ class PUBLIC var_base {
 	// The ownership of a heap allocated string can be transferred from one var to another if it is no longer required in the original var.
 	// Transferring ownership of strings only requires copying a pointer instead of performing heap allocation and deallocation and also, in the case of very large strings, copying of large areas of memory.
 	// If the source var is unassigned then then a VarUnassigned error is thrown.
-	void move(VARREF destinationvar);
+	void move(BASEREF destinationvar);
 
 	// Swaps the contents of two variables.
 	// Useful for stashing large strings quicky.
 	// Works on unassigned variables without triggering an error
 	// If the source is unassigned then the target is unassigned too.
-	void swap(VARREF var2);
+	void swap(BASEREF var2);
 
 	// Swaps the contents of two variables.
 	// This version works on const vars

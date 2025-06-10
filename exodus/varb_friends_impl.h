@@ -1,4 +1,6 @@
 //
+// This file has the definitions commented out. varb_friends_impl.h has the definitions uncommented.
+//
 // MUST keep this file virtually identical between "varb_friends.h" and "varb_friends_impl.h"
 // except for commenting in/out the implementation section on the right hand side
 //
@@ -170,36 +172,10 @@
 	PUBLIC VAR_FRIEND RETVAR operator^(TBR1 lhs,CBR1 rhs) /*IMPL*/ {lhs ^= rhs; return std::move(lhs.var_str);}
 //	PUBLIC VAR_FRIEND RETVAR operator^(CBR1 lhs,TBR1 rhs) /*IMPL*/ {???}
 
-//	//template<typename T> PUBLIC VAR_FRIEND RETVAR operator^(const T&   lhs,       CBR1 rhs) /*IMPL*/ {var_base<var> nrvo = lhs; return var_cat_var(nrvo, rhs ); }
-//	template<typename T> PUBLIC VAR_FRIEND RETVAR operator^(const T&   lhs,       CBR1 rhs) /*IMPL*/ {return var_cat_var(VARBASE(lhs), rhs ); }
-//
-////	template<typename T> PUBLIC VAR_FRIEND RETVAR operator^(      T&&  lhs,       CBR1 rhs) /*IMPL*/ {return static_cast<RETVAR>(T(lhs) ^= rhs) ; } //var_base -> va
-//
-//	template<typename T> PUBLIC VAR_FRIEND RETVAR operator^(      T&&  lhs,       CBR1 rhs) /*IMPL*/ {return static_cast<RETVAR>(VARBASE(lhs) ^= rhs) ; } //var_base -> va
-
-//	template<typename T> PUBLIC VAR_FRIEND RETVAR operator^(      CBR1  lhs, const T&  rhs) /*IMPL*/ {return var_cat_var(lhs, rhs ); }
-//	template<typename T> PUBLIC VAR_FRIEND RETVAR operator^(      T&&  lhs, const T&  rhs) /*IMPL*/ {return static_cast<RETVAR>(T(lhs) ^= rhs) ; } //var_base -> va
-
-	//PUBLIC VAR_FRIEND RETVAR operator^(const std::string &  lhs, CBR1 rhs) /*IMPL*/ {return static_cast<RETVAR>(RETVAR(lhs) ^= rhs); }
-//	PUBLIC VAR_FRIEND RETVAR operator^(std::string &&  lhs, CBR1 rhs) /*IMPL*/ {return static_cast<RETVAR>(RETVAR(lhs) ^= rhs); }
-
 	// ARITHMETIC friends v. main types
 
 	// PLUS  friends v. main types
 
-#if 00 // Templates before var became the template var_base<var>
-	template<class T> PUBLIC VAR_FRIEND RETVAR operator+(CBR1 lhs, const T rhs) /*IMPL*/ {RETVAR nrvo = lhs.clone(); nrvo += rhs; return nrvo;}
-	template<class T> PUBLIC VAR_FRIEND RETVAR operator-(CBR1 lhs, const T rhs) /*IMPL*/ {RETVAR nrvo = lhs.clone(); nrvo -= rhs; return nrvo;}
-	template<class T> PUBLIC VAR_FRIEND RETVAR operator*(CBR1 lhs, const T rhs) /*IMPL*/ {RETVAR nrvo = lhs.clone(); nrvo *= rhs; return nrvo;}
-	template<class T> PUBLIC VAR_FRIEND RETVAR operator/(CBR1 lhs, const T rhs) /*IMPL*/ {RETVAR nrvo = lhs.clone(); nrvo /= rhs; return nrvo;}
-	template<class T> PUBLIC VAR_FRIEND RETVAR operator%(CBR1 lhs, const T rhs) /*IMPL*/ {RETVAR nrvo = lhs.clone(); nrvo %= rhs; return nrvo;}
-
-//	template<class T> PUBLIC VAR_FRIEND RETVAR operator+(const T lhs, CBR1 rhs) /*IMPL*/ {RETVAR nrvo = rhs.clone(); nrvo += lhs; return nrvo;}
-//	template<class T> PUBLIC VAR_FRIEND RETVAR operator*(const T lhs, CBR1 rhs) /*IMPL*/ {RETVAR nrvo = rhs.clone(); nrvo *= lhs; return nrvo;}
-	template<class T> PUBLIC VAR_FRIEND RETVAR operator-(const T lhs, CBR1 rhs) /*IMPL*/ {RETVAR nrvo = -rhs;        nrvo += lhs; return nrvo;}
-	template<class T> PUBLIC VAR_FRIEND RETVAR operator/(const T lhs, CBR1 rhs) /*IMPL*/ {RETVAR nrvo =  lhs;        nrvo /= rhs; return nrvo;}
-	template<class T> PUBLIC VAR_FRIEND RETVAR operator%(const T lhs, CBR1 rhs) /*IMPL*/ {RETVAR nrvo =  lhs;        nrvo %= rhs; return nrvo;}
-#else
 	PUBLIC VAR_FRIEND RETVAR operator+(CBR1            lhs,   const char*  cstr2 ) /*IMPL*/ {RETVAR nrvo = lhs.clone(); nrvo    += cstr2; return nrvo;}
 	PUBLIC VAR_FRIEND RETVAR operator+(CBR1            lhs,   const char   char2 ) /*IMPL*/ {RETVAR nrvo = lhs.clone(); nrvo    += char2; return nrvo;}
 	PUBLIC VAR_FRIEND RETVAR operator+(CBR1            lhs,   const int    int2  ) /*IMPL*/ {RETVAR nrvo = lhs.clone(); nrvo    += int2;  return nrvo;}
@@ -291,8 +267,6 @@
 	PUBLIC VAR_FRIEND RETVAR operator%(const int      int1,  CBR1          rhs   ) /*IMPL*/ {RETVAR nrvo = int1;  nrvo  %= rhs;   return nrvo;}
 	PUBLIC VAR_FRIEND RETVAR operator%(const double   dbl1,  CBR1          rhs   ) /*IMPL*/ {RETVAR nrvo = dbl1;  nrvo  %= rhs;   return nrvo;}
 //	PUBLIC VAR_FRIEND RETVAR operator%(const bool   bool1, CBR1          rhs   ) /*IMPL*/ {RETVAR nrvo = bool1 ;nrvo  %= rhs;   return nrvo;} // Almost meaningless
-
-#endif
 
 	// STRING CONCATENATE  friends v. main types
 
