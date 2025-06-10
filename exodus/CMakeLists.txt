@@ -465,6 +465,7 @@ execute_process(
 			exodus.h
 			range.h
 			exoimpl.h
+			exodebug.h
 			exomacros.h
 			exoenv.h
 			threadsafequeue.h

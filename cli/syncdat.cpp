@@ -114,7 +114,7 @@ func main() {
 		// Force everything if dependent has changed.
 		let dependent_dirinfo = osfile(osshellread("which " ^ dependent));
 		if (not force and (dependent_dirinfo.empty() or is_newer_than_last_sync(dependent_dirinfo))) {
-			printl("syncdat: (F)orce because newer " ^ dependent ^ " (or cant be found) since last sync time ", last_sync_date.oconv("D-Y"), last_sync_time.oconv("MTS"));
+			printl(THREADNO ^ ":", "syncdat: (F)orce because newer " ^ dependent ^ " (or cant be found) since last sync time ", last_sync_date.oconv("D-Y"), last_sync_time.oconv("MTS"));
 			force = true;
 		}
 	}

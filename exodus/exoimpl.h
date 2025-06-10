@@ -45,6 +45,7 @@ THE SOFTWARE.
 //#	include <exodus/dim.h>
 //#	include <exodus/rex.h>
 #endif
+#include "exodebug.h"
 
 #include <exodus/vardefs.h> // for PUBLIC
 
@@ -146,9 +147,9 @@ namespace exo {
 	PUBLIC extern const char* const _OS_NAME;
 	PUBLIC extern const char* const _OS_VERSION;
 
-	PUBLIC void debug(in = "");
-	PUBLIC auto exo_savestack(void* stack_addresses[BACKTRACE_MAXADDRESSES], std::size_t* stack_size) -> bool;
- ND PUBLIC auto exo_backtrace( void* stack_addresses[BACKTRACE_MAXADDRESSES], std::size_t stack_size, std::size_t limit = 0) -> std::string;
+//	PUBLIC void debug(in = "");
+//	PUBLIC auto exo_savestack(void* stack_addresses[BACKTRACE_MAXADDRESSES], std::size_t* stack_size) -> bool;
+// ND PUBLIC auto exo_backtrace( void* stack_addresses[BACKTRACE_MAXADDRESSES], std::size_t stack_size, std::size_t limit = 0) -> std::string;
 
 	// Set by signals for threads to poll
 	PUBLIC inline bool TERMINATE_req = false;
