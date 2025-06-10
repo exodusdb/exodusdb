@@ -104,8 +104,9 @@ jobs:
     #runs-on: ubuntu-${{ matrix.UBUNTU_VER }}
     runs-on: ubuntu-${{ matrix.UBUNTU_VER && matrix.UBUNTU_VER || 'latest' }}
     #if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
-#    if: ${{ github.event_name == 'pull_request' || github.ref == 'refs/heads/modules' }}
-    if: ${{ github.event_name == 'pull_request' || github.ref == 'refs/heads/async' }}
+    if: ${{ github.event_name == 'pull_request' || github.ref == 'refs/heads/modules' }}
+    # error in gendoc related to "pygmentize -l exoduscpp -f html" because pygmentize couldnt install.
+#    if: ${{ github.event_name == 'pull_request' || github.ref == 'refs/heads/async' }}
     steps:
     - uses: actions/checkout@v4
       with:
