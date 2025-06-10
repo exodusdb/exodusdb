@@ -130,11 +130,14 @@ public:
 	// `var client; // Unassigned var
 	//  if (not read(client from "xo_clients", "SB001")) ...`
 	//
-	// `//             Exodus keywords:     C++ declarations:
-	//  //             Non-Const   Const    Non-Const   Const
-	//  //             -----------------    ----------------------
-	//  // Variable:   var         let      var         const var
-	//  // Reference:  out         in       var&        const var&`
+	// Pseudonyms:
+	// ┌──────────────────────┬───────────────┬──────────────────┐
+	// │ Usage                │ Non-Constant  │ Constant         │
+	// ├──────────────────────┼───────────────┼──────────────────┤
+	// │ Variables:           │    var → var  │ let → const var  │
+	// ├──────────────────────┼───────────────┼──────────────────┤
+	// │ Function parameters: │ out/io → var& │ in  → const var& │
+	// └──────────────────────┴───────────────┴──────────────────┘
 	//
     var() = default;
 

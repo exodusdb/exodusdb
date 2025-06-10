@@ -69,13 +69,13 @@ public:
 	// Exodus' asynchronous tasks are implemented using Boost fibers. These are similar to threads but without parallel processing or OS management. They are extremely fast to setup and and switch between and have a normal stack. They might be called "coprocesses" by comparion with "coroutines" which do not have stacks.
 	// The initial state of an asynchronous task is "ready, not running". Once the main program calls yield() then one of the "ready, not running" async tasks is selected by a round robin scheduler and it runs until complete, requests database i/o, or yields, and so on.
 	// Asynchronous tasks may return results in a result queue by calling set_async_result(...) one or more times.
-	// Asynchronous tasks may share the default thread database connection but not concurrently so are better off with their own connection. Multiple asynchronous tasks with multiple concurrent database connections is ideally suited to async tasks.
+	// Asynchronous tasks may use the default database connection, which is per thread, but not at the same time so they should create their own connection. Multiple asynchronous tasks using multiple asynchronous database connections is the prime use case for async tasks since while some tasks are waiting for db i/o another task can progress.
 	//
 	// https://x.com/i/grok/share/N4zbWT3V2hb4qK71G0qT0togh
 	//
 	// * Concept * "async" aligns with the computer science concept of *cooperative multitasking*, where isolated execution contexts yield to a scheduler for *interleaved*, not simultaneous, execution.
 	//
-	// * Concurrency * Interleaved execution of multiple tasks (with full stacks) within a *single thread*, not parallelism (simultaneous multi-CPU execution).
+	// * Asynchronous * Interleaved execution of multiple tasks (with full stacks) within a *single thread*, not parallelism (simultaneous multi-CPU execution).
 	//
 	// * Full Stacks * Independent, full execution context sharing global state but with separate call stacks, resembling process-like entities but not OS processes. Not lightweight coroutines (e.g., Python’s 'async def' or generators) due to their lack of isolation and stacks.
 	//
@@ -112,7 +112,7 @@ public:
 	// │ run     │ Thread pool │ Parallel, preemptive      │ Heavy parallel jobs     │ Private RECORD/ID etc.    │
 	// └─────────┴─────────────┴───────────────────────────┴─────────────────────────┴───────────────────────────┘
 	//
-	// Exodus uses a specific definition of asynchronous.
+	// Exodus uses specific definitions of asynchronous and parallel and avoids the word concurrent which covers both terms.
 	// ┌──────────────────┬──────────────────────────┬─────────────────────────┐
 	// │ Terminology:     │ Asynchronous             │ Parallel                │
 	// │ Definition:      │ Not at the same time     │ Simultaneous execution  │
@@ -122,8 +122,8 @@ public:
 	// ├──────────────────┼──────────────────────────┼─────────────────────────┤
 	// │ Implementation:  │ In-program switching     │ OS switching            │
 	// │ Model:           │ Cooperative multitasking │ Preemptive multitasking │
-	// │ Common terms:    │ Non-blocking             │ Concurrent (loosely)    │
-	// │ Model:           │ Fibers, Coroutines       │ Processes, threads      │
+	// │ Common terms:    │ Non-blocking             │                         │
+	// │ Examples:        │ Fibers, Coroutines       │ Processes, threads      │
 	// ├──────────────────┼──────────────────────────┼─────────────────────────┤
 	// │ Exodus function: │ async()                  │ run()                   │
 	// │ Exodus classes:  │ Task/Tasks               │ Job/Jobs                │

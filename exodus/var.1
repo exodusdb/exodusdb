@@ -24,16 +24,23 @@ if (not read(client from "xo_clients", "SB001")) ...
 .sp 0
 .sp 0
 .PP
-.PP
-\fBExample:\fR
-.EX \"<code>
-//             Exodus keywords:     C++ declarations:
-//             Non-Const   Const    Non-Const   Const
-//             -----------------    ----------------------
-// Variable:   var         let      var         const var
-// Reference:  out         in       var&        const var&
-.EE \"</code>
 .sp 0
+.PP
+\fBPseudonyms:\fR
+.sp 0
+┌──────────────────────┬───────────────┬──────────────────┐
+.sp 0
+│ Usage                │ Non-Constant  │ Constant         │
+.sp 0
+├──────────────────────┼───────────────┼──────────────────┤
+.sp 0
+│ Variables:           │    var → var  │ let → const var  │
+.sp 0
+├──────────────────────┼───────────────┼──────────────────┤
+.sp 0
+│ Function parameters: │ out/io → var& │ in  → const var& │
+.sp 0
+└──────────────────────┴───────────────┴──────────────────┘
 .sp 0
 
 
@@ -9744,7 +9751,7 @@ The initial state of an asynchronous task is "ready, not running". Once the main
 Asynchronous tasks may return results in a result queue by calling set_async_result(...) one or more times.
 .sp 0
 .PP
-Asynchronous tasks may share the default thread database connection but not concurrently so are better off with their own connection. Multiple asynchronous tasks with multiple concurrent database connections is ideally suited to async tasks.
+Asynchronous tasks may use the default database connection, which is per thread, but not at the same time so they should create their own connection. Multiple asynchronous tasks using multiple asynchronous database connections is the prime use case for async tasks since while some tasks are waiting for db i/o another task can progress.
 .sp 0
 .PP
 .sp 0
@@ -9763,7 +9770,7 @@ Asynchronous tasks may share the default thread database connection but not conc
 .sp 0
 .PD 0 \"<dl>
 .TP 10\"<dt>
-\fBConcurrency\fR \"</dt>
+\fBAsynchronous\fR \"</dt>
 Interleaved execution of multiple tasks (with full stacks) within a *single thread*, not parallelism (simultaneous multi-CPU execution).
 .\"</dd>
 .PD \"</dl>
@@ -9882,7 +9889,7 @@ Lightweight VM processes with BEAM’s scheduler loop, providing strong isolatio
 .PP
 .sp 0
 .PP
-Exodus uses a specific definition of asynchronous.
+Exodus uses specific definitions of asynchronous and parallel and avoids the word concurrent which covers both terms.
 .sp 0
 ┌──────────────────┬──────────────────────────┬─────────────────────────┐
 .sp 0
@@ -9902,9 +9909,9 @@ Exodus uses a specific definition of asynchronous.
 .sp 0
 │ Model:           │ Cooperative multitasking │ Preemptive multitasking │
 .sp 0
-│ Common terms:    │ Non-blocking             │ Concurrent (loosely)    │
+│ Common terms:    │ Non-blocking             │                         │
 .sp 0
-│ Model:           │ Fibers, Coroutines       │ Processes, threads      │
+│ Examples:        │ Fibers, Coroutines       │ Processes, threads      │
 .sp 0
 ├──────────────────┼──────────────────────────┼─────────────────────────┤
 .sp 0

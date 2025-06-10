@@ -41,15 +41,6 @@ func main() {
 		if (not read(client from "xo_clients", "SB001")) abort("var: " ^ lasterror());
 	}
 
-	printl("var() = default;");
-	{
-		//             Exodus keywords:     C++ declarations:
-		//             Non-Const   Const    Non-Const   Const
-		//             -----------------    ----------------------
-		// Variable:   var         let      var         const var
-		// Reference:  out         in       var&        const var&
-	}
-
 	printl("operator=(expression) &;");
 	{
 		var v1 = 42;                 // Integer

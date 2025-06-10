@@ -505,14 +505,39 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="ow">not</span><span class="w"> </span><span class="nf">read</span><span class="p">(</span><span class="n">client</span><span class="w"> </span><span class="ow">from</span><span class="w"> </span><span class="s">&quot;xo_clients&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;SB001&quot;</span><span class="p">))</span><span class="w"> </span><span class="p">...</span>
 </pre>
 			</p>
+			<p></p>
 			<p>
-				<pre><span class="c1">//             Exodus keywords:     C++ declarations:</span>
-<span class="c1">//             Non-Const   Const    Non-Const   Const</span>
-<span class="c1">//             -----------------    ----------------------</span>
-<span class="c1">// Variable:   var         let      var         const var</span>
-<span class="c1">// Reference:  out         in       var&amp;        const var&amp;</span>
-</pre>
-			</p>
+				<em>Pseudonyms:</em> </p>
+			<table>
+				<tr>
+					<td>                      </td>
+					<td>               </td>
+					<td>                  </td></tr>
+				<tr>
+					<td> Usage                </td>
+					<td> Non-Constant  </td>
+					<td> Constant         </td></tr>
+				<tr>
+					<td>                      </td>
+					<td>               </td>
+					<td>                  </td></tr>
+				<tr>
+					<td> Variables:           </td>
+					<td>    var → var  </td>
+					<td> let → const var  </td></tr>
+				<tr>
+					<td>                      </td>
+					<td>               </td>
+					<td>                  </td></tr>
+				<tr>
+					<td> Function parameters: </td>
+					<td> out/io → var&amp; </td>
+					<td> in  → const var&amp; </td></tr>
+				<tr>
+					<td>                      </td>
+					<td>               </td>
+					<td>                  </td></tr>
+			</table>
 		</td></tr>
 	<tr>
 		<td></td>
@@ -8785,7 +8810,7 @@ Optional prefix of "1/" or "/" causes the reciprocal of the number to be used. e
 					<p>Exodus' asynchronous tasks are implemented using Boost fibers. These are similar to threads but without parallel processing or OS management. They are extremely fast to setup and and switch between and have a normal stack. They might be called "coprocesses" by comparion with "coroutines" which do not have stacks.</p>
 					<p>The initial state of an asynchronous task is "ready, not running". Once the main program calls yield() then one of the "ready, not running" async tasks is selected by a round robin scheduler and it runs until complete, requests database i/o, or yields, and so on.</p>
 					<p>Asynchronous tasks may return results in a result queue by calling set_async_result(...) one or more times.</p>
-					<p>Asynchronous tasks may share the default thread database connection but not concurrently so are better off with their own connection. Multiple asynchronous tasks with multiple concurrent database connections is ideally suited to async tasks.</p>
+					<p>Asynchronous tasks may use the default database connection, which is per thread, but not at the same time so they should create their own connection. Multiple asynchronous tasks using multiple asynchronous database connections is the prime use case for async tasks since while some tasks are waiting for db i/o another task can progress.</p>
 					<p></p>
 					<p>
 						<em>https:</em> //x.com/i/grok/share/N4zbWT3V2hb4qK71G0qT0togh</p>
@@ -8796,7 +8821,7 @@ Optional prefix of "1/" or "/" causes the reciprocal of the number to be used. e
 					</dl>
 					<p></p>
 					<dl>
-						<dt>Concurrency</dt>
+						<dt>Asynchronous</dt>
 						<dd>Interleaved execution of multiple tasks (with full stacks) within a *single thread*, not parallelism (simultaneous multi-CPU execution).</dd>
 					</dl>
 					<p></p>
@@ -8900,7 +8925,7 @@ Optional prefix of "1/" or "/" causes the reciprocal of the number to be used. e
 							<td>                           </td></tr>
 					</table>
 					<p></p>
-					<p>Exodus uses a specific definition of asynchronous.</p>
+					<p>Exodus uses specific definitions of asynchronous and parallel and avoids the word concurrent which covers both terms.</p>
 					<table>
 						<tr>
 							<td>                  </td>
@@ -8941,9 +8966,9 @@ Optional prefix of "1/" or "/" causes the reciprocal of the number to be used. e
 						<tr>
 							<td> Common terms:    </td>
 							<td> Non-blocking             </td>
-							<td> Concurrent (loosely)    </td></tr>
+							<td>                         </td></tr>
 						<tr>
-							<td> Model:           </td>
+							<td> Examples:        </td>
 							<td> Fibers, Coroutines       </td>
 							<td> Processes, threads      </td></tr>
 						<tr>
