@@ -28,6 +28,7 @@ THE SOFTWARE.
 	import std;
 #else
 #	include <string>
+#	include <iostream>
 #endif
 
 #include "vardefs.h"
