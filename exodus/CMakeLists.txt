@@ -258,8 +258,9 @@ execute_process(
 		var.cpp dim.cpp
 		varnum.cpp varmath.cpp exodebug.cpp
 		varcompare.cpp
+		varbop.cpp
+		varbop2.cpp
 		varop.cpp
-		varop2.cpp
 		varprocess.cpp
 		varchrono.cpp
 		varfuncs.cpp varioconv.cpp

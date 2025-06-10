@@ -34,10 +34,8 @@ THE SOFTWARE.
 ////#include <vector>
 #endif
 
+#include <exodus/varb.h>
 #include <exodus/var.h>
-#include <exodus/varerr.h>
-#include <exodus/varimpl.h>
-#include <exodus/exoimpl.h>
 
 namespace exo {
 
@@ -53,14 +51,6 @@ namespace exo {
 // which is effectively about makeing objects behave like ordinary variable syntactically
 // implementing smartpointers
 
-#ifdef SELF_OP_ARE_CHAINABLE
-#	define VBR_THIS (*this)
-#else
-#	undef VBR1
-#	define VBR1 void
-#	define VBR_THIS
-#endif
-
 //////////////////
 // SELF ASSIGN VAR
 //////////////////
@@ -68,7 +58,7 @@ namespace exo {
 // VAR += VAR
 /////////////
 
-template<> PUBLIC VBR1 VARBASE1::operator+=(CBR rhs) & {
+template<> PUBLIC VBR1_OR_VOID VB1::operator+=(CBR rhs) & {
 
 	rhs.assertNumeric(__PRETTY_FUNCTION__);
 
@@ -79,9 +69,9 @@ tryagain:
 		// use rhs double if available otherwise use its int
 		// warning: conversion from ‘exo::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
 		var_dbl += (rhs.var_typ & VARTYP_DBL) ? rhs.var_dbl : static_cast<double>(rhs.var_int);
-		// reset lhs to one unique type
+		// Reset lhs to one unique type
 		var_typ = VARTYP_DBL;
-		return VBR_THIS;
+		return THIS_OR_NOTHING;
 	}
 
 	// lhs int
@@ -91,19 +81,19 @@ tryagain:
 		if (rhs.var_typ & VARTYP_DBL) {
 			// warning: conversion from ‘exo::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
 			var_dbl = static_cast<double>(var_int) + rhs.var_dbl;
-			// reset lhs to one unique type
+			// Reset lhs to one unique type
 			var_typ = VARTYP_DBL;
-			return VBR_THIS;
+			return THIS_OR_NOTHING;
 		}
 
-		// both are ints
+		// Both are ints
 		var_int += rhs.var_int;
-		// reset lhs to one unique type
+		// Reset lhs to one unique type
 		var_typ = VARTYP_INT;
-		return VBR_THIS;
+		return THIS_OR_NOTHING;
 	}
 
-	// try to convert to numeric
+	// Try to convert to numeric
 	if (isnum())
 		LIKELY
 		goto tryagain;
@@ -117,7 +107,7 @@ tryagain:
 // VAR -= VAR
 /////////////
 
-template<> PUBLIC VBR1 VARBASE1::operator-=(CBR rhs) & {
+template<> PUBLIC VBR1_OR_VOID VB1::operator-=(CBR rhs) & {
 
 	rhs.assertNumeric(__PRETTY_FUNCTION__);
 
@@ -128,9 +118,9 @@ tryagain:
 		// use rhs double if available otherwise use its int
 		// warning: conversion from ‘exo::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
 		var_dbl -= (rhs.var_typ & VARTYP_DBL) ? rhs.var_dbl : static_cast<double>(rhs.var_int);
-		// reset lhs to one unique type
+		// Reset lhs to one unique type
 		var_typ = VARTYP_DBL;
-		return VBR_THIS;
+		return THIS_OR_NOTHING;
 	}
 
 	// lhs int
@@ -140,19 +130,19 @@ tryagain:
 		if (rhs.var_typ & VARTYP_DBL) {
 			// warning: conversion from ‘exo::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
 			var_dbl = static_cast<double>(var_int) - rhs.var_dbl;
-			// reset lhs to one unique type
+			// Reset lhs to one unique type
 			var_typ = VARTYP_DBL;
-			return VBR_THIS;
+			return THIS_OR_NOTHING;
 		}
 
-		// both are ints
+		// Both are ints
 		var_int -= rhs.var_int;
-		// reset lhs to one unique type
+		// Reset lhs to one unique type
 		var_typ = VARTYP_INT;
-		return VBR_THIS;
+		return THIS_OR_NOTHING;
 	}
 
-	// try to convert to numeric
+	// Try to convert to numeric
 	if (isnum())
 		LIKELY
 		goto tryagain;
@@ -166,7 +156,7 @@ tryagain:
 // VAR *= VAR
 /////////////
 
-template<> PUBLIC VBR1 VARBASE1::operator*=(CBR rhs) & {
+template<> PUBLIC VBR1_OR_VOID VB1::operator*=(CBR rhs) & {
 
 	rhs.assertNumeric(__PRETTY_FUNCTION__);
 
@@ -177,9 +167,9 @@ tryagain:
 		// use rhs double if available otherwise use its int
 		// warning: conversion from ‘exo::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
 		var_dbl *= (rhs.var_typ & VARTYP_DBL) ? rhs.var_dbl : static_cast<double>(rhs.var_int);
-		// reset lhs to one unique type
+		// Reset lhs to one unique type
 		var_typ = VARTYP_DBL;
-		return VBR_THIS;
+		return THIS_OR_NOTHING;
 	}
 
 	// lhs int
@@ -189,19 +179,19 @@ tryagain:
 		if (rhs.var_typ & VARTYP_DBL) {
 			//warning: conversion from ‘exo::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
 			var_dbl = static_cast<double>(var_int) * rhs.var_dbl;
-			// reset lhs to one unique type
+			// Reset lhs to one unique type
 			var_typ = VARTYP_DBL;
-			return VBR_THIS;
+			return THIS_OR_NOTHING;
 		}
 
-		// both are ints
+		// Both are ints
 		var_int *= rhs.var_int;
-		// reset lhs to one unique type
+		// Reset lhs to one unique type
 		var_typ = VARTYP_INT;
-		return VBR_THIS;
+		return THIS_OR_NOTHING;
 	}
 
-	// try to convert to numeric
+	// Try to convert to numeric
 	if (isnum())
 		LIKELY
 		goto tryagain;
@@ -215,7 +205,7 @@ tryagain:
 // VAR /= VAR
 /////////////
 
-template<> PUBLIC VBR1 VARBASE1::operator/=(CBR rhs) & {
+template<> PUBLIC VBR1_OR_VOID VB1::operator/=(CBR rhs) & {
 
 	// Always returns a double because
 	// 10/3 must be 3.3333333
@@ -261,7 +251,7 @@ tryagain:
 			var_dbl = static_cast<double>(this->var_int) / rhs.var_dbl;
 		}
 
-		// both are ints - must return a double
+		// Both are ints - must return a double
 		else {
 			if (!rhs.var_int)
 				UNLIKELY
@@ -273,25 +263,25 @@ tryagain:
 
 	}
 
-	// try to convert to numeric
+	// Try to convert to numeric
 	else if (isnum())
 		goto tryagain;
 
 	else
 		assertNumeric(__PRETTY_FUNCTION__);
 
-	// reset lhs to one unique type
+	// Reset lhs to one unique type
 	var_typ = VARTYP_DBL;
 
-	return VBR_THIS;
+	return THIS_OR_NOTHING;
 }
 
 // VAR %= VAR
 /////////////
 
-template<> PUBLIC VBR1 VARBASE1::operator%=(CBR rhs) & {
+template<> PUBLIC VBR1_OR_VOID VB1::operator%=(CBR rhs) & {
 	*this = this->mod(rhs);
-	return VBR_THIS;
+	return THIS_OR_NOTHING;
 }
 
 /////////////////////
@@ -301,12 +291,12 @@ template<> PUBLIC VBR1 VARBASE1::operator%=(CBR rhs) & {
 // VAR += double
 ////////////////
 
-template<> PUBLIC VBR1 VARBASE1::operator+=(const double dbl1) & {
+template<> PUBLIC VBR1_OR_VOID VB1::operator+=(const double dbl1) & {
 
 tryagain:
 
 	// lhs double
-	if (var_typ & VARTYP_DBL)
+	if (var_typ & VARTYP_DBL) LIKELY
 		var_dbl += dbl1;
 
 	// lhs int
@@ -314,7 +304,7 @@ tryagain:
 		// warning: conversion from ‘exo::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
 		var_dbl = static_cast<double>(var_int) + dbl1;
 
-	// try to convert to numeric
+	// Try to convert to numeric
 	else if (isnum())
 		goto tryagain;
 
@@ -324,21 +314,21 @@ tryagain:
 		throw VarNonNumeric(this->first_(128) ^ "+= ");
 	}
 
-	// reset to one unique type
+	// Reset to one unique type
 	var_typ = VARTYP_DBL;
 
-	return VBR_THIS;
+	return THIS_OR_NOTHING;
 }
 
 // VAR -= DOUBLE
 ////////////////
 
-template<> PUBLIC VBR1 VARBASE1::operator-=(const double dbl1) & {
+template<> PUBLIC VBR1_OR_VOID VB1::operator-=(const double dbl1) & {
 
 tryagain:
 
 	// lhs double
-	if (var_typ & VARTYP_DBL)
+	if (var_typ & VARTYP_DBL) LIKELY
 		var_dbl -= dbl1;
 
 	// lhs int
@@ -346,28 +336,28 @@ tryagain:
 		// warning: conversion from ‘exo::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
 		var_dbl = static_cast<double>(var_int) - dbl1;
 
-	// try to convert to numeric
+	// Try to convert to numeric
 	else if (isnum())
 		goto tryagain;
 
 	else
 		assertNumeric(__PRETTY_FUNCTION__);
 
-	// reset to one unique type
+	// Reset to one unique type
 	var_typ = VARTYP_DBL;
 
-	return VBR_THIS;
+	return THIS_OR_NOTHING;
 }
 
 // VAR *= DOUBLE
 ////////////////
 
-template<> PUBLIC VBR1 VARBASE1::operator*=(const double dbl1) & {
+template<> PUBLIC VBR1_OR_VOID VB1::operator*=(const double dbl1) & {
 
 tryagain:
 
 	// lhs double
-	if (var_typ & VARTYP_DBL)
+	if (var_typ & VARTYP_DBL) LIKELY
 		var_dbl *= dbl1;
 
 	// lhs int
@@ -375,23 +365,23 @@ tryagain:
 		// warning: conversion from ‘exo::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
 		var_dbl = static_cast<double>(var_int) * dbl1;
 
-	// try to convert to numeric
+	// Try to convert to numeric
 	else if (isnum())
 		goto tryagain;
 
 	else
 		assertNumeric(__PRETTY_FUNCTION__);
 
-	// reset to one unique type
+	// Reset to one unique type
 	var_typ = VARTYP_DBL;
 
-	return VBR_THIS;
+	return THIS_OR_NOTHING;
 }
 
 // VAR /= double
 ////////////////
 
-template<> PUBLIC VBR1 VARBASE1::operator/=(const double dbl1) & {
+template<> PUBLIC VBR1_OR_VOID VB1::operator/=(const double dbl1) & {
 
 	if (!dbl1)
 		UNLIKELY
@@ -401,7 +391,7 @@ template<> PUBLIC VBR1 VARBASE1::operator/=(const double dbl1) & {
 tryagain:
 
 	// lhs double
-	if (var_typ & VARTYP_DBL)
+	if (var_typ & VARTYP_DBL) LIKELY
 		var_dbl /= dbl1;
 
 	// lhs int
@@ -409,25 +399,25 @@ tryagain:
 		// warning: conversion from ‘exo::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
 		var_dbl = static_cast<double>(var_int) / dbl1;
 
-	// try to convert to numeric
+	// Try to convert to numeric
 	else if (isnum())
 		goto tryagain;
 
 	else
 		assertNumeric(__PRETTY_FUNCTION__);
 
-	// reset to one unique type
+	// Reset to one unique type
 	var_typ = VARTYP_DBL;
 
-	return VBR_THIS;
+	return THIS_OR_NOTHING;
 }
 
 // VAR %= double
 ////////////////
 
-template<> PUBLIC VBR1 VARBASE1::operator%=(const double rhs) & {
+template<> PUBLIC VBR1_OR_VOID VB1::operator%=(const double rhs) & {
 	*this = this->mod(rhs);
-	return VBR_THIS;
+	return THIS_OR_NOTHING;
 }
 
 //////////////////
@@ -437,7 +427,7 @@ template<> PUBLIC VBR1 VARBASE1::operator%=(const double rhs) & {
 // VAR += int
 /////////////
 
-template<> PUBLIC VBR1 VARBASE1::operator+=(const int int1) & {
+template<> PUBLIC VBR1_OR_VOID VB1::operator+=(const int int1) & {
 
 tryagain:
 
@@ -445,20 +435,20 @@ tryagain:
 	if (var_typ & VARTYP_DBL) {
 		// warning: conversion from ‘exo::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
 		var_dbl += static_cast<double>(int1);
-		// reset to one unique type
+		// Reset to one unique type
 		var_typ = VARTYP_DBL;
-		return VBR_THIS;
+		return THIS_OR_NOTHING;
 	}
 
-	// both int
+	// Both int
 	else if (var_typ & VARTYP_INT) {
 		var_int += int1;
-		// reset to one unique type
+		// Reset to one unique type
 		var_typ = VARTYP_INT;
-		return VBR_THIS;
+		return THIS_OR_NOTHING;
 	}
 
-	// try to convert to numeric
+	// Try to convert to numeric
 	if (isnum())
 		LIKELY
 		goto tryagain;
@@ -472,7 +462,7 @@ tryagain:
 // VAR -= int
 /////////////
 
-template<> PUBLIC VBR1 VARBASE1::operator-=(const int int1) & {
+template<> PUBLIC VBR1_OR_VOID VB1::operator-=(const int int1) & {
 
 tryagain:
 
@@ -480,20 +470,20 @@ tryagain:
 	if (var_typ & VARTYP_DBL) {
 		// warning: conversion from ‘exo::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
 		var_dbl -= static_cast<double>(int1);
-		// reset to one unique type
+		// Reset to one unique type
 		var_typ = VARTYP_DBL;
-		return VBR_THIS;
+		return THIS_OR_NOTHING;
 	}
 
-	// both int
+	// Both int
 	else if (var_typ & VARTYP_INT) {
 		var_int -= int1;
-		// reset to one unique type
+		// Reset to one unique type
 		var_typ = VARTYP_INT;
-		return VBR_THIS;
+		return THIS_OR_NOTHING;
 	}
 
-	// try to convert to numeric
+	// Try to convert to numeric
 	if (isnum())
 		LIKELY
 		goto tryagain;
@@ -508,7 +498,7 @@ tryagain:
 // VAR *= int
 /////////////
 
-template<> PUBLIC VBR1 VARBASE1::operator*=(const int int1) & {
+template<> PUBLIC VBR1_OR_VOID VB1::operator*=(const int int1) & {
 
 tryagain:
 
@@ -516,20 +506,20 @@ tryagain:
 	if (var_typ & VARTYP_DBL) {
 		// warning: conversion from ‘exo::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
 		var_dbl *= static_cast<double>(int1);
-		// reset to one unique type
+		// Reset to one unique type
 		var_typ = VARTYP_DBL;
-		return VBR_THIS;
+		return THIS_OR_NOTHING;
 	}
 
-	// both int
+	// Both int
 	else if (var_typ & VARTYP_INT) {
 		var_int *= int1;
-		// reset to one unique type
+		// Reset to one unique type
 		var_typ = VARTYP_INT;
-		return VBR_THIS;
+		return THIS_OR_NOTHING;
 	}
 
-	// try to convert to numeric
+	// Try to convert to numeric
 	if (isnum())
 		LIKELY
 		goto tryagain;
@@ -543,7 +533,7 @@ tryagain:
 // VAR /= int
 /////////////
 
-template<> PUBLIC VBR1 VARBASE1::operator/=(const int int1) & {
+template<> PUBLIC VBR1_OR_VOID VB1::operator/=(const int int1) & {
 
 	// Always return double
 
@@ -559,30 +549,30 @@ tryagain:
 		// warning: conversion from ‘exo::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
 		var_dbl /= static_cast<double>(int1);
 
-	// both int
+	// Both int
 	else if (var_typ & VARTYP_INT)
 		// warning: conversion from ‘exo::varint_t’ {aka ‘long int’} to ‘double’ may change value [-Wconversion]
 		var_dbl = static_cast<double>(var_int) / static_cast<double>(int1);
 
-	// try to convert to numeric
+	// Try to convert to numeric
 	else if (isnum())
 		goto tryagain;
 
 	else
 		assertNumeric(__PRETTY_FUNCTION__);
 
-	// reset to one unique type
+	// Reset to one unique type
 	var_typ = VARTYP_DBL;
-	return VBR_THIS;
+	return THIS_OR_NOTHING;
 }
 
 
 // VAR %= int
 /////////////
 
-template<> PUBLIC VBR1 VARBASE1::operator%=(const int rhs) & {
+template<> PUBLIC VBR1_OR_VOID VB1::operator%=(const int rhs) & {
 	*this = this->mod(rhs);
-	return VBR_THIS;
+	return THIS_OR_NOTHING;
 }
 
 ///////////////////
@@ -591,33 +581,33 @@ template<> PUBLIC VBR1 VARBASE1::operator%=(const int rhs) & {
 
 // VAR += bool
 
-template<> PUBLIC VBR1 VARBASE1::operator+=(const bool bool1) & {
+template<> PUBLIC VBR1_OR_VOID VB1::operator+=(const bool bool1) & {
 	if (bool1)
 		(*this)++;
 	else
 		assertNumeric(__PRETTY_FUNCTION__);
-	return VBR_THIS;
+	return THIS_OR_NOTHING;
 }
 
 // VAR -= bool
 
-template<> PUBLIC VBR1 VARBASE1::operator-=(const bool bool1) & {
+template<> PUBLIC VBR1_OR_VOID VB1::operator-=(const bool bool1) & {
 	if (bool1)
 		(*this)--;
 	else
 		assertNumeric(__PRETTY_FUNCTION__);
-	return VBR_THIS;
+	return THIS_OR_NOTHING;
 }
 
 // VAR *= bool
 
-template<> PUBLIC VBR1 VARBASE1::operator*=(const bool bool1) & {
+template<> PUBLIC VBR1_OR_VOID VB1::operator*=(const bool bool1) & {
 	assertNumeric(__PRETTY_FUNCTION__);
 	if (!bool1) {
 		var_int = 0;
 		var_typ = VARTYP_INT;
 	}
-	return VBR_THIS;
+	return THIS_OR_NOTHING;
 }
 
 // VAR /= bool

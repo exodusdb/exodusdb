@@ -1599,7 +1599,7 @@ IO   var::substrer(const int pos1, const int length) REF {
 //////
 //    ND var at(const int pos1) const;
 
-template<> PUBLIC RETVAR VARBASE1::at(const int charno) const {
+template<> PUBLIC RETVAR VB1::at(const int charno) const {
 
 	THISIS("var  var::at(const int charno) const")
 	assertString(function_sig);
@@ -1644,7 +1644,7 @@ template<> PUBLIC RETVAR VARBASE1::at(const int charno) const {
 	return var_str[0];
 }
 
-template<> PUBLIC RETVAR VARBASE1::operator[](const int pos1) const {
+template<> PUBLIC RETVAR VB1::operator[](const int pos1) const {
 	return this->at(pos1);
 }
 

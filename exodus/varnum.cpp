@@ -119,7 +119,7 @@ thread_local int TO_STRING_NDECS = EXO_MAX_PRECISION - 3; // i.e. 12 assuming va
 // Returns: New precision if successful or old precision if not.
 // The default precision is 4 which corresponds to 0.0001.
 // By default, printing a raw var double smaller than 0.0001 without using oconv() or round() renders "0".
-template<> PUBLIC int VARBASE1::setprecision(int new_precision) /*const*/ {
+template<> PUBLIC int VB1::setprecision(int new_precision) /*const*/ {
 //	this->assertInteger(__PRETTY_FUNCTION__);
 	// For double: -307 to +308 (binary -1021/+1024 due to 20 bit exponent)
 	if (new_precision >= std::numeric_limits<double>::min_exponent10 and new_precision <= std::numeric_limits<double>::max_exponent10) {
@@ -130,7 +130,7 @@ template<> PUBLIC int VARBASE1::setprecision(int new_precision) /*const*/ {
 	return EXO_PRECISION;
 }
 
-template<> PUBLIC int VARBASE1::getprecision() /*const*/ {
+template<> PUBLIC int VB1::getprecision() /*const*/ {
 	return EXO_PRECISION;
 }
 
@@ -486,7 +486,7 @@ removetrailing:
 ////////////////////
 
 // mainly called in ISSTRING when not already a string
-template<> PUBLIC void VARBASE1::createString() const {
+template<> PUBLIC void VB1::createString() const {
 
 	// TODO ensure ISVAR is called everywhere in advance
 	// to avoid wasting time doing multiple calls to ISVAR
@@ -546,7 +546,7 @@ template<> PUBLIC void VARBASE1::createString() const {
 // Explicit instantiation
 //template             PUBLIC bool var_base<var_mid<var>>::isnum(void) const;
 
-template<> PUBLIC bool VARBASE1::isnum(void) const {
+template<> PUBLIC bool VB1::isnum(void) const {
 
 	// TODO make isnum private and ensure ISVAR is checked before all calls to isnum
 	// to save the probably double check here
@@ -664,7 +664,7 @@ template<> PUBLIC bool VARBASE1::isnum(void) const {
 	return true;
 }
 
-template<> PUBLIC RETVAR VARBASE1::num(void) const {
+template<> PUBLIC RETVAR VB1::num(void) const {
 	RETVAR result;
 	if (this->isnum())
 		result = this->clone();
@@ -673,7 +673,7 @@ template<> PUBLIC RETVAR VARBASE1::num(void) const {
 	return result;
 }
 
-template<> PUBLIC void VARBASE1::assertNumeric(const char* message, const char* varname/* = ""*/) const {
+template<> PUBLIC void VB1::assertNumeric(const char* message, const char* varname/* = ""*/) const {
 	if (!this->isnum()) {
 		UNLIKELY
 		//throw VarNonNumeric(var_base(varname) ^ " in " ^ var_base(message) ^ " data: " ^ var_str.substr(0,127));
@@ -685,7 +685,7 @@ template<> PUBLIC void VARBASE1::assertNumeric(const char* message, const char* 
 // var::toBool
 //////////////
 
-template<> PUBLIC bool VARBASE1::toBool() const {
+template<> PUBLIC bool VB1::toBool() const {
 
 	// could be skipped for speed assuming that people will not write unusual "var x=f(x)" type
 	// syntax as follows: var xx=xx?11:22;
@@ -731,7 +731,7 @@ template<> PUBLIC bool VARBASE1::toBool() const {
 // var::toInt
 /////////////
 
-template<> PUBLIC int VARBASE1::toInt() const {
+template<> PUBLIC int VB1::toInt() const {
 	this->assertInteger(__PRETTY_FUNCTION__);
 	return static_cast<int>(var_int);
 }
@@ -740,7 +740,7 @@ template<> PUBLIC int VARBASE1::toInt() const {
 // var::toInt64
 ///////////////
 
-template<> PUBLIC std::int64_t VARBASE1::toInt64() const {
+template<> PUBLIC std::int64_t VB1::toInt64() const {
 	this->assertInteger(__PRETTY_FUNCTION__);
 	return static_cast<std::int64_t>(var_int);
 }
@@ -749,7 +749,7 @@ template<> PUBLIC std::int64_t VARBASE1::toInt64() const {
 // var::toSize
 //////////////
 
-template<> PUBLIC std::size_t VARBASE1::toSize() const {
+template<> PUBLIC std::size_t VB1::toSize() const {
 	this->assertInteger(__PRETTY_FUNCTION__);
 	return static_cast<std::size_t>(var_int);
 }
@@ -758,7 +758,7 @@ template<> PUBLIC std::size_t VARBASE1::toSize() const {
 // var::toDouble
 ////////////////
 
-template<> PUBLIC double VARBASE1::toDouble() const {
+template<> PUBLIC double VB1::toDouble() const {
 	this->assertDecimal(__PRETTY_FUNCTION__);
 	return var_dbl;
 }

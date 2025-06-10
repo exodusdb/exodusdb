@@ -59,81 +59,7 @@ namespace exo {
 	using SV = std::string_view;
 }
 
-//#if __cpp_lib_concepts >= 201907L && ( __GNUC__ > 10 || __clang_major__ > 1 )
-//#	define EXO_CONCEPTS
-//#endif
-//
-//#pragma GCC diagnostic ignored "-Winline"
-//
-//// Visibility
-////
-//// If using g++ -fvisibility=hidden to make all hidden except those marked PUBLIC ie "default"
-//// "Weak" template functions seem to get excluded if visiblity is hidden, despite being marked as PUBLIC
-//// so we explictly instantiate them as non-template functions with "template<> ..." syntax.
-//// nm -C *so |&grep -F "exo::var_base<exo::var_mid<exo::var> >::"
-//// nm -D libexodus.so --demangle |grep T -w
-//#define PUBLIC __attribute__((visibility("default")))
-//
-//// [[likely]] [[unlikely]]
-////
-//#if __has_cpp_attribute(likely)
-//#	define LIKELY [[likely]]
-//#	define UNLIKELY [[unlikely]]
-//#else
-//#	define LIKELY
-//#	define UNLIKELY
-//#endif
-//
-//// [[nodiscard]]
-////
-//#define ND [[nodiscard]]
-//
-//// constinit/consteval where possible otherwise constexpt
-////
-//// constinit https://en.cppreference.com/w/cpp/language/constinit
-////
-//// constinit - asserts that a variable has static initialization,
-//// i.e. zero initialization and constant initialization, otherwise the program is ill-formed.
-////
-//// The constinit specifier declares a variable with static or thread storage duration.
-//// If a variable is declared with constinit, its initializing declaration must be applied with constinit.
-//// If a variable declared with constinit has dynamic initialization
-//// (even if it is performed as static initialization), the program is ill-formed.
-//// If no constinit declaration is reachable at the point of the initializing declaration,
-//// the program is ill-formed, no diagnostic required.
-////
-//// constinit cannot be used together with constexpr.
-//// When the declared variable is a reference, constinit is equivalent to constexpr.
-//// When the declared variable is an object, constexpr mandates that the object must
-//// have static initialization and constant destruction and makes the object const-qualified,
-//// however, constinit does not mandate constant destruction and const-qualification.
-//// As a result, an object of a type which has constexpr constructors and no constexpr destructor
-//// (e.g. std::shared_ptr<T>) might be declared with constinit but not constexpr.
-//
-//// Make var constinit/constexpr if std::string is constexpr (c++20 but g++-12 has some limitation)
-////
-//#if __cpp_lib_constexpr_string >= 201907L
-//#	define CONSTEXPR constexpr
-//#	define CONSTINIT_OR_CONSTEXPR constinit const // const because constexpr implies const
-//
-//#if ( __GNUC__  >= 13 ) || ( __clang_major__ > 1)
-//#		define CONSTINIT_VAR constinit
-//#	else
-//		// Ubuntu 22.04 g++12 doesnt support constinit var
-//#		define CONSTINIT_VAR
-//#	endif
-//
-//#else
-//#	define CONSTEXPR
-//#	define CONSTINIT_OR_CONSTEXPR constexpr
-//#	define CONSTINIT_VAR
-//#endif
-//
-//#if __cpp_consteval >= 201811L
-//#	define CONSTEVAL_OR_CONSTEXPR consteval
-//#else
-//#	define CONSTEVAL_OR_CONSTEXPR constexpr
-//#endif
+#include "vardefs.h"
 
 // timebank profiling
 //
@@ -177,20 +103,20 @@ namespace exo {
 class var;
 template<typename var> class var_mid; // forward declaration of a class template
 
-#define VARBASE1  var_base<var_mid<exo::var>>
+#define VB1         var_base<var_mid<exo::var>>
 //#define VBV       var_base<var_mid<exo::var>>
-
-#define VBR1      var_base<var_mid<var>>&
+#define VBR1        var_base<var_mid<var>>&
 //#define CBR const var_base<var_mid<exo::var>>&
-#define CBR1 const var_base<var_mid<exo::var>>&
-#define TBR1       var_base<var_mid<exo::var>>&&
+#define CBR1  const var_base<var_mid<exo::var>>&
+#define TBR1        var_base<var_mid<exo::var>>&&
 
-#define VBR       var_base&
-#define CBR const var_base&
-#define TBR       var_base&&
+#define VBR         var_base&
+#define VARBASEREF  var_base&
+#define CBR   const var_base&
+#define TBR         var_base&&
 
-#define RETVAR    exo::var
-#define RETVARREF exo::var&
+#define RETVAR      exo::var
+#define RETVARREF   exo::var&
 
 // original help from Thinking in C++ Volume 1 Chapter 12
 // http://www.camtp.uni-mb.si/books/Thinking-in-C++/TIC2Vone-distribution/html/Chapter12.html
@@ -252,7 +178,7 @@ class PUBLIC var_base {
 
 //	using VAR    =       var_base;
 //	using VARREF =       var_base&;
-	using BASEREF =       var_base&;
+//	using VBR    =       var_base&;
 //	using CBR    = const var_base&;
 //	using TBR    =       var_base&&;
 
@@ -434,7 +360,7 @@ class PUBLIC var_base {
 	// 6. move assignment - from rvalue/temporary
 	/////////////////////
 
-	// var_base = temp var_base
+	// var_base = var_base&&
 
 	// Prevent assigning to temporaries
 	// xyz.f(2) = "abc"; // Must not compile
@@ -765,10 +691,10 @@ class PUBLIC var_base {
 //                               IMPLICIT CONVERSION OPERATORS (CONVERT TO)
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
-	// someone recommends not to create more than one automatic converter
+	// Someone recommends not to create more than one automatic converter
 	// to avoid the compiler error "ambiguous conversion"
 
-	// explicit keyword only works on conversion TO var not conversion FROM var
+	// explicit keyword only works on conversion TO var_base not conversion FROM var_base
 
 	// NB const possibly determines priority of choice between automatic conversion
 	// and C++ uses bool and int conversion in certain cases to convert to int and bool
@@ -791,8 +717,8 @@ class PUBLIC var_base {
 //		return static_cast<exo::var*>(this);
 //	}
 
-	// integer <- var
-	/////////////////
+	// integer <- var_base
+	//////////////////////
 
 	// necessary to allow conversion to int in many functions like extract(x,y,z)
 
@@ -840,8 +766,8 @@ class PUBLIC var_base {
 		return static_cast<Integer>(var_int);
 	}
 
-	// floating point <- var
-	////////////////////////
+	// floating point <- var_base
+	/////////////////////////////
 
 #ifdef EXO_CONCEPTS
 	template <std::floating_point FloatingPoint>
@@ -860,8 +786,8 @@ class PUBLIC var_base {
 		return static_cast<FloatingPoint>(var_dbl);
 	}
 
-	// void* <- var
-	///////////////
+	// void* <- var_base
+	////////////////////
 
 	// Recommended to provide automatic conversion to VOID POINTER instead of direct to bool
 	// since void* is auto converted to bool nicely for natural "if (xyz)" syntax
@@ -882,8 +808,8 @@ class PUBLIC var_base {
 		return reinterpret_cast<void*>(this->toBool());
 	}
 
-	// bool <- var
-	//////////////
+	// bool <- var_base
+	///////////////////
 
 	ND CONSTEXPR
 	operator bool() const {
@@ -894,7 +820,7 @@ class PUBLIC var_base {
 	// Implemented in varnum after ::toBool to avoid
 	// varnum.cpp:646:34: error: explicit specialization of 'toBool' after instantiation
 
-	// NB && and || operators are NOT overloaded because var is set to convert to boolean
+	// NB && and || operators are NOT overloaded because var_base is set to convert to boolean
 	// automatically this is fortunate because "shortcircuiting" of && and || doesnt happen when
 	// overloaded
 
@@ -902,10 +828,10 @@ class PUBLIC var_base {
 	// utf8 and cannot hold char(0) perhaps and force people to use something like .utf8() or
 	// .toString().c_char() This was added to allow the arguments of osread type functions which
 	// need cstrings to be cstrings so that calls with fixed filenames etc dont require a
-	// conversion to var and back again The other solution would be to declare a parallel set of
-	// function with var arguments operator const char*() const;
+	// conversion to var_base and back again The other solution would be to declare a parallel set of
+	// function with var_base arguments operator const char*() const;
 
-	// convert to c_str may or may not be necessary in order to do wcout<<var
+	// convert to c_str may or may not be necessary in order to do wcout<<var_base
 	// NB not needed because we overide the << operator itself
 	// and causes a problem with unwanted conversions to strings
 	// maybe should throw an error is 0x00 present in the string
@@ -919,8 +845,8 @@ class PUBLIC var_base {
 	// for now prevent this to ensure efficient programming
 	//explicit
 
-	// string-like <- var
-	/////////////////////
+	// string-like <- var_base
+	//////////////////////////
 
 //	template <typename StringLike, std::enable_if_t<std::is_convertible<StringLike, std::string_view>::value, bool> = true>
 //	//enable_if can be replaced by a concept when available in g++ compiler (gcc v11?)
@@ -963,7 +889,7 @@ class PUBLIC var_base {
 		return this->to_u32string();
 	}
 
-	// In case using a pointer to a var
+	// In case using a pointer to a var_base
 	//
 	// e.g. when passing io or out vars to functions as pointers instead of const ref
 	//
@@ -989,7 +915,7 @@ class PUBLIC var_base {
 	//
 	auto operator*() = delete;
 
-	// allow conversion to char (takes first char or char 0 if zero length string)
+	// Allow conversion to char (takes first char or char 0 if zero length string)
 	// would allow the usage of any char function but may result
 	// in a lot of compilation failures due to "ambiguous overload"
 	// unfortunately there is no "explicit" keyword as for constructors - coming in C++0X
@@ -1004,8 +930,8 @@ class PUBLIC var_base {
 
 	// The assignment operators return void to prevent accidental misuse where == was intended.
 
-	// var = Integral
-	/////////////////
+	// var_base = Integral
+	//////////////////////
 
 #ifdef EXO_CONCEPTS
 	template <std::integral Integer>
@@ -1059,8 +985,8 @@ class PUBLIC var_base {
 //		var_typ = VARTYP_INT;
 //	}
 
-	// var = Floating Point
-	///////////////////////
+	// var_base = Floating Point
+	////////////////////////////
 
 #ifdef EXO_CONCEPTS
 	template <std::floating_point FloatingPoint>
@@ -1079,8 +1005,8 @@ class PUBLIC var_base {
 		EXO_SNITCH("var_base =Fp ")
 	}
 
-	// var = char
-	/////////////
+	// var_base = char
+	//////////////////
 	CONSTEXPR
 	void operator=(const char char2) & {
 
@@ -1102,8 +1028,8 @@ class PUBLIC var_base {
 		return;
 	}
 
-	// var = char*
-	//////////////
+	// var_base = char*
+	///////////////////
 
 	// The assignment operator should always return a reference to *this.
 	CONSTEXPR
@@ -1124,8 +1050,8 @@ class PUBLIC var_base {
 		return;
 	}
 
-//	// var = std::string& - lvalue
-//	//////////////////////////////
+//	// var_base = std::string& - lvalue
+//	///////////////////////////////////
 //
 //	void operator=(const std::string& string2) & {
 //
@@ -1141,8 +1067,8 @@ class PUBLIC var_base {
 //		return;
 //	}
 
-	// var = std::string&& - lvalue/rvalue perfect forwarding
-	/////////////////////////////////////////////////////////
+	// var_base = std::string&& - lvalue/rvalue perfect forwarding
+	//////////////////////////////////////////////////////////////
 
 	// The assignment operator should always return a reference to *this.
 	// but we do not in order to prevent misuse when == intended
@@ -1170,71 +1096,73 @@ class PUBLIC var_base {
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
 #ifdef SELF_OP_ARE_CHAINABLE
-#	define BASEREF_OR_VOID BASEREF
+#	define VBR_OR_VOID VBR
+#	define VBR1_OR_VOID VBR1
 #	define THIS_OR_NOTHING *this
 #else
-#	define BASEREF_OR_VOID void
+#	define VBR_OR_VOID void
+#	define VBR1_OR_VOID void
 #	define THIS_OR_NOTHING
 #endif
-	BASEREF_OR_VOID operator+=(CBR) &;
-	BASEREF_OR_VOID operator*=(CBR) &;
-	BASEREF_OR_VOID operator-=(CBR) &;
-	BASEREF_OR_VOID operator/=(CBR) &;
-	BASEREF_OR_VOID operator%=(CBR) &;
+	VBR_OR_VOID operator+=(CBR) &;
+	VBR_OR_VOID operator*=(CBR) &;
+	VBR_OR_VOID operator-=(CBR) &;
+	VBR_OR_VOID operator/=(CBR) &;
+	VBR_OR_VOID operator%=(CBR) &;
 
 	// Specialisations for speed to avoid a) unnecessary converting to a var and then b) having to decide what type of var we have
 
 	// Addvar_base(
-	BASEREF_OR_VOID operator+=(const int) &;
-	BASEREF_OR_VOID operator+=(const double) &;
-	BASEREF_OR_VOID operator+=(const char  char1) & {(*this) += var_base(char1); return THIS_OR_NOTHING;}
-	BASEREF_OR_VOID operator+=(const char* chars) & {(*this) += var_base(chars); return THIS_OR_NOTHING;}
-	BASEREF_OR_VOID operator+=(const bool) &;
+	VBR_OR_VOID operator+=(const int) &;
+	VBR_OR_VOID operator+=(const double) &;
+	VBR_OR_VOID operator+=(const char  char1) & {(*this) += var_base(char1); return THIS_OR_NOTHING;}
+	VBR_OR_VOID operator+=(const char* chars) & {(*this) += var_base(chars); return THIS_OR_NOTHING;}
+	VBR_OR_VOID operator+=(const bool) &;
 
 	// Multiply
-	BASEREF_OR_VOID operator*=(const int) &;
-	BASEREF_OR_VOID operator*=(const double) &;
-	BASEREF_OR_VOID operator*=(const char  char1) & {(*this) *= var_base(char1); return THIS_OR_NOTHING;}
-	BASEREF_OR_VOID operator*=(const char* chars) & {(*this) *= var_base(chars); return THIS_OR_NOTHING;}
-	BASEREF_OR_VOID operator*=(const bool) &;
+	VBR_OR_VOID operator*=(const int) &;
+	VBR_OR_VOID operator*=(const double) &;
+	VBR_OR_VOID operator*=(const char  char1) & {(*this) *= var_base(char1); return THIS_OR_NOTHING;}
+	VBR_OR_VOID operator*=(const char* chars) & {(*this) *= var_base(chars); return THIS_OR_NOTHING;}
+	VBR_OR_VOID operator*=(const bool) &;
 
 	// Subtract
-	BASEREF_OR_VOID operator-=(const int) &;
-	BASEREF_OR_VOID operator-=(const double) &;
-	BASEREF_OR_VOID operator-=(const char  char1) & {(*this) -= var_base(char1); return THIS_OR_NOTHING;}
-	BASEREF_OR_VOID operator-=(const char* chars) & {(*this) -= var_base(chars); return THIS_OR_NOTHING;}
-	BASEREF_OR_VOID operator-=(const bool) &;
+	VBR_OR_VOID operator-=(const int) &;
+	VBR_OR_VOID operator-=(const double) &;
+	VBR_OR_VOID operator-=(const char  char1) & {(*this) -= var_base(char1); return THIS_OR_NOTHING;}
+	VBR_OR_VOID operator-=(const char* chars) & {(*this) -= var_base(chars); return THIS_OR_NOTHING;}
+	VBR_OR_VOID operator-=(const bool) &;
 
 	// Divide
-	BASEREF_OR_VOID operator/=(const int) &;
-	BASEREF_OR_VOID operator/=(const double) &;
-	BASEREF_OR_VOID operator/=(const char  char1) & {(*this) /= var_base(char1); return THIS_OR_NOTHING;}
-	BASEREF_OR_VOID operator/=(const char* chars) & {(*this) /= var_base(chars); return THIS_OR_NOTHING;}
-	BASEREF_OR_VOID operator/=(const bool) &;
+	VBR_OR_VOID operator/=(const int) &;
+	VBR_OR_VOID operator/=(const double) &;
+	VBR_OR_VOID operator/=(const char  char1) & {(*this) /= var_base(char1); return THIS_OR_NOTHING;}
+	VBR_OR_VOID operator/=(const char* chars) & {(*this) /= var_base(chars); return THIS_OR_NOTHING;}
+	VBR_OR_VOID operator/=(const bool) &;
 
 	// Modulo
-	BASEREF_OR_VOID operator%=(const int) &;
-	BASEREF_OR_VOID operator%=(const double dbl1) &;
-	BASEREF_OR_VOID operator%=(const char  char1) & {(*this) %= var_base(char1); return THIS_OR_NOTHING;}
-	BASEREF_OR_VOID operator%=(const char* chars) & {(*this) %= var_base(chars); return THIS_OR_NOTHING;}
-	BASEREF_OR_VOID operator%=(const bool  bool1) & {(*this) %= var_base(bool1); return THIS_OR_NOTHING;}
+	VBR_OR_VOID operator%=(const int) &;
+	VBR_OR_VOID operator%=(const double dbl1) &;
+	VBR_OR_VOID operator%=(const char  char1) & {(*this) %= var_base(char1); return THIS_OR_NOTHING;}
+	VBR_OR_VOID operator%=(const char* chars) & {(*this) %= var_base(chars); return THIS_OR_NOTHING;}
+	VBR_OR_VOID operator%=(const bool  bool1) & {(*this) %= var_base(bool1); return THIS_OR_NOTHING;}
 
 	// Concat self assign is different.
 	// It does return *this in order for chainable efficient multiple concatentation.
 
-	BASEREF operator^=(CBR) &;
-	BASEREF operator^=(TBR) &;
-	BASEREF operator^=(const int) &;
-	BASEREF operator^=(const double) &;
-	BASEREF operator^=(const char) &;
+	VBR operator^=(CBR) &;
+	VBR operator^=(TBR) &;
+	VBR operator^=(const int) &;
+	VBR operator^=(const double) &;
+	VBR operator^=(const char) &;
 
 #define NOT_TEMPLATED_APPEND
 #ifdef NOT_TEMPLATED_APPEND
-	BASEREF operator^=(const char*) &;
-	BASEREF operator^=(const std::string&) &;
-	BASEREF operator^=(SV) &;
+	VBR operator^=(const char*) &;
+	VBR operator^=(const std::string&) &;
+	VBR operator^=(SV) &;
 #else
-	// var = string-like
+	// var_base = string-like
 	template <typename Appendable, std::enable_if_t<
 		std::is_same<Appendable, const char*>::value
 		||
@@ -1249,7 +1177,7 @@ class PUBLIC var_base {
 		std::string,
 		std::string_view,
 	*/
-	BASEREF operator^=(Appendable str2) & {
+	VBR operator^=(Appendable str2) & {
 		assertString(__PRETTY_FUNCTION__);
 		var_str += str2;
 		var_typ = VARTYP_STR;  // Must reset to one unique type
@@ -1265,57 +1193,57 @@ class PUBLIC var_base {
 /*
 	#define DEPRECATE [[deprecated("Using self assign operators on temporaries is pointless. Use the operator by itself, without the = sign, to achieve the same.")]]
 
-	DEPRECATE BASEREF operator+=(CBR rhs) && {(*this) += rhs; return *this;}// = delete;
-	DEPRECATE BASEREF operator*=(CBR rhs) && {(*this) *= rhs; return *this;}// = delete;
-	DEPRECATE BASEREF operator-=(CBR rhs) && {(*this) -= rhs; return *this;}// = delete;
-	DEPRECATE BASEREF operator/=(CBR rhs) && {(*this) /= rhs; return *this;}// = delete;
-	DEPRECATE BASEREF operator%=(CBR rhs) && {(*this) %= rhs; return *this;}// = delete;
-	DEPRECATE BASEREF operator^=(CBR rhs) && {(*this) ^= rhs; return *this;}// = delete;
+	DEPRECATE VBR operator+=(CBR rhs) && {(*this) += rhs; return *this;}// = delete;
+	DEPRECATE VBR operator*=(CBR rhs) && {(*this) *= rhs; return *this;}// = delete;
+	DEPRECATE VBR operator-=(CBR rhs) && {(*this) -= rhs; return *this;}// = delete;
+	DEPRECATE VBR operator/=(CBR rhs) && {(*this) /= rhs; return *this;}// = delete;
+	DEPRECATE VBR operator%=(CBR rhs) && {(*this) %= rhs; return *this;}// = delete;
+	DEPRECATE VBR operator^=(CBR rhs) && {(*this) ^= rhs; return *this;}// = delete;
 
 	// Specialisations are deprecated too
 
 	// Add
-	DEPRECATE BASEREF operator+=(const int    rhs) && {(*this) += rhs; return *this;}// = delete;
-	DEPRECATE BASEREF operator+=(const double rhs) && {(*this) += rhs; return *this;}// = delete;
-	DEPRECATE BASEREF operator+=(const char   rhs) && {(*this) += rhs; return *this;}// = delete;
-	DEPRECATE BASEREF operator+=(const char*  rhs) && {(*this) += rhs; return *this;}// = delete;
-	DEPRECATE BASEREF operator+=(const bool   rhs) && {(*this) += rhs; return *this;}// = delete;
+	DEPRECATE VBR operator+=(const int    rhs) && {(*this) += rhs; return *this;}// = delete;
+	DEPRECATE VBR operator+=(const double rhs) && {(*this) += rhs; return *this;}// = delete;
+	DEPRECATE VBR operator+=(const char   rhs) && {(*this) += rhs; return *this;}// = delete;
+	DEPRECATE VBR operator+=(const char*  rhs) && {(*this) += rhs; return *this;}// = delete;
+	DEPRECATE VBR operator+=(const bool   rhs) && {(*this) += rhs; return *this;}// = delete;
 
 	// Multiply
-	DEPRECATE BASEREF operator*=(const int    rhs) && {(*this) *= rhs; return *this;}// = delete;
-	DEPRECATE BASEREF operator*=(const double rhs) && {(*this) *= rhs; return *this;}// = delete;
-	DEPRECATE BASEREF operator*=(const char   rhs) && {(*this) *= rhs; return *this;}// = delete;
-	DEPRECATE BASEREF operator*=(const char*  rhs) && {(*this) *= rhs; return *this;}// = delete;
-	DEPRECATE BASEREF operator*=(const bool   rhs) && {(*this) *= rhs; return *this;}// = delete;
+	DEPRECATE VBR operator*=(const int    rhs) && {(*this) *= rhs; return *this;}// = delete;
+	DEPRECATE VBR operator*=(const double rhs) && {(*this) *= rhs; return *this;}// = delete;
+	DEPRECATE VBR operator*=(const char   rhs) && {(*this) *= rhs; return *this;}// = delete;
+	DEPRECATE VBR operator*=(const char*  rhs) && {(*this) *= rhs; return *this;}// = delete;
+	DEPRECATE VBR operator*=(const bool   rhs) && {(*this) *= rhs; return *this;}// = delete;
 
 	// Subtract
-	DEPRECATE BASEREF operator-=(const int    rhs) && {(*this) -= rhs; return *this;}// = delete;
-	DEPRECATE BASEREF operator-=(const double rhs) && {(*this) -= rhs; return *this;}// = delete;
-	DEPRECATE BASEREF operator-=(const char   rhs) && {(*this) -= rhs; return *this;}// = delete;
-	DEPRECATE BASEREF operator-=(const char*  rhs) && {(*this) -= rhs; return *this;}// = delete;
-	DEPRECATE BASEREF operator-=(const bool   rhs) && {(*this) -= rhs; return *this;}// = delete;
+	DEPRECATE VBR operator-=(const int    rhs) && {(*this) -= rhs; return *this;}// = delete;
+	DEPRECATE VBR operator-=(const double rhs) && {(*this) -= rhs; return *this;}// = delete;
+	DEPRECATE VBR operator-=(const char   rhs) && {(*this) -= rhs; return *this;}// = delete;
+	DEPRECATE VBR operator-=(const char*  rhs) && {(*this) -= rhs; return *this;}// = delete;
+	DEPRECATE VBR operator-=(const bool   rhs) && {(*this) -= rhs; return *this;}// = delete;
 
 	// Divide
-	DEPRECATE BASEREF operator/=(const int    rhs) && {(*this) /= rhs; return *this;}// = delete;
-	DEPRECATE BASEREF operator/=(const double rhs) && {(*this) /= rhs; return *this;}// = delete;
-	DEPRECATE BASEREF operator/=(const char   rhs) && {(*this) /= rhs; return *this;}// = delete;
-	DEPRECATE BASEREF operator/=(const char*  rhs) && {(*this) /= rhs; return *this;}// = delete;
-	DEPRECATE BASEREF operator/=(const bool   rhs) && {(*this) /= rhs; return *this;}// = delete;
+	DEPRECATE VBR operator/=(const int    rhs) && {(*this) /= rhs; return *this;}// = delete;
+	DEPRECATE VBR operator/=(const double rhs) && {(*this) /= rhs; return *this;}// = delete;
+	DEPRECATE VBR operator/=(const char   rhs) && {(*this) /= rhs; return *this;}// = delete;
+	DEPRECATE VBR operator/=(const char*  rhs) && {(*this) /= rhs; return *this;}// = delete;
+	DEPRECATE VBR operator/=(const bool   rhs) && {(*this) /= rhs; return *this;}// = delete;
 
 	// Modulo
-	DEPRECATE BASEREF operator%=(const int    rhs) && {(*this) %= rhs; return *this;}// = delete;
-	DEPRECATE BASEREF operator%=(const double rhs) && {(*this) %= rhs; return *this;}// = delete;
-	DEPRECATE BASEREF operator%=(const char   rhs) && {(*this) %= rhs; return *this;}// = delete;
-	DEPRECATE BASEREF operator%=(const char*  rhs) && {(*this) %= rhs; return *this;}// = delete;
-	DEPRECATE BASEREF operator%=(const bool   rhs) && {(*this) %= rhs; return *this;}// = delete;
+	DEPRECATE VBR operator%=(const int    rhs) && {(*this) %= rhs; return *this;}// = delete;
+	DEPRECATE VBR operator%=(const double rhs) && {(*this) %= rhs; return *this;}// = delete;
+	DEPRECATE VBR operator%=(const char   rhs) && {(*this) %= rhs; return *this;}// = delete;
+	DEPRECATE VBR operator%=(const char*  rhs) && {(*this) %= rhs; return *this;}// = delete;
+	DEPRECATE VBR operator%=(const bool   rhs) && {(*this) %= rhs; return *this;}// = delete;
 
 	// Concat
-	DEPRECATE BASEREF operator^=(const int          rhs) && {(*this) ^= rhs; return *this;}// = delete;
-	DEPRECATE BASEREF operator^=(const double       rhs) && {(*this) ^= rhs; return *this;}// = delete;
-	DEPRECATE BASEREF operator^=(const char         rhs) && {(*this) ^= rhs; return *this;}// = delete;
-	DEPRECATE BASEREF operator^=(const char*        rhs) && {(*this) ^= rhs; return *this;}// = delete;
-	DEPRECATE BASEREF operator^=(const std::string& rhs) && {(*this) ^= rhs; return *this;}// = delete;
-	DEPRECATE BASEREF operator^=(const std::string_view rhs) && {(*this) ^= rhs; return *this;}// = delete;
+	DEPRECATE VBR operator^=(const int          rhs) && {(*this) ^= rhs; return *this;}// = delete;
+	DEPRECATE VBR operator^=(const double       rhs) && {(*this) ^= rhs; return *this;}// = delete;
+	DEPRECATE VBR operator^=(const char         rhs) && {(*this) ^= rhs; return *this;}// = delete;
+	DEPRECATE VBR operator^=(const char*        rhs) && {(*this) ^= rhs; return *this;}// = delete;
+	DEPRECATE VBR operator^=(const std::string& rhs) && {(*this) ^= rhs; return *this;}// = delete;
+	DEPRECATE VBR operator^=(const std::string_view rhs) && {(*this) ^= rhs; return *this;}// = delete;
 
 	#undef DEPRECATE
 */
@@ -1334,8 +1262,8 @@ class PUBLIC var_base {
 	RETVAR operator--(int) &;
 
 	// Prefix increment/decrement
-	BASEREF operator++() &;
-	BASEREF operator--() &;
+	VBR operator++() &;
+	VBR operator--() &;
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wnon-template-friend"
@@ -1406,7 +1334,7 @@ class PUBLIC var_base {
 	// ENSURE all changes in varb_friends.h and varb_friends_impl.h are replicated using sed commands listed in the files
 	// Implementations are in varb_friends_impl.h included in var.cpp
 
-// Also included without friend definition after class var_base definition below.
+// Also included *without* friend definition after class var_base definition below.
 #define VAR_FRIEND friend
 #include "varb_friends.h"
 // Implementation in varb.cpp
@@ -1434,7 +1362,7 @@ class PUBLIC var_base {
 	// ISTREAM
 	//////////
 
-	friend std::istream& operator>>(std::istream& istream1, BASEREF invar) {
+	friend std::istream& operator>>(std::istream& istream1, VBR invar) {
 
 //		THISIS("istream >> var")
 //		invar.assertVar(function_sig);
@@ -1515,13 +1443,13 @@ class PUBLIC var_base {
 	// The ownership of a heap allocated string can be transferred from one var to another if it is no longer required in the original var.
 	// Transferring ownership of strings only requires copying a pointer instead of performing heap allocation and deallocation and also, in the case of very large strings, copying of large areas of memory.
 	// If the source var is unassigned then then a VarUnassigned error is thrown.
-	void move(BASEREF destinationvar);
+	void move(VBR destinationvar);
 
 	// Swaps the contents of two variables.
 	// Useful for stashing large strings quicky.
 	// Works on unassigned variables without triggering an error
 	// If the source is unassigned then the target is unassigned too.
-	void swap(BASEREF var2);
+	void swap(VBR var2);
 
 	// Swaps the contents of two variables.
 	// This version works on const vars
@@ -1701,17 +1629,17 @@ protected:
 // Forward declaration of some member functions to avoid errors like
 // error: explicit specialization of 'toBool' after instantiation
 
-template<> ND PUBLIC bool         VARBASE1::toBool() const;
-template<> ND PUBLIC int          VARBASE1::toInt() const;
-template<> ND PUBLIC std::int64_t VARBASE1::toInt64() const;
-template<> ND PUBLIC std::size_t  VARBASE1::toSize() const;
-template<> ND PUBLIC double       VARBASE1::toDouble() const;
-template<> ND PUBLIC std::string  VARBASE1::toString() &&; // only from rvalues
+template<> ND PUBLIC bool         VB1::toBool() const;
+template<> ND PUBLIC int          VB1::toInt() const;
+template<> ND PUBLIC std::int64_t VB1::toInt64() const;
+template<> ND PUBLIC std::size_t  VB1::toSize() const;
+template<> ND PUBLIC double       VB1::toDouble() const;
+template<> ND PUBLIC std::string  VB1::toString() &&; // only from rvalues
 
-template<> ND PUBLIC RETVAR VARBASE1::clone() const;
-template<>    PUBLIC void   VARBASE1::createString() const;
-template<>    PUBLIC void   VARBASE1::assertNumeric(const char* message, const char* varname/* = ""*/) const;
-template<>    PUBLIC void   VARBASE1::assertInteger(const char* message, const char* varname/* = ""*/) const;
+template<> ND PUBLIC RETVAR VB1::clone() const;
+template<>    PUBLIC void   VB1::createString() const;
+template<>    PUBLIC void   VB1::assertNumeric(const char* message, const char* varname/* = ""*/) const;
+template<>    PUBLIC void   VB1::assertInteger(const char* message, const char* varname/* = ""*/) const;
 
 } // namespace exo
 

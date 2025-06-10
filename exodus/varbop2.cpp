@@ -23,82 +23,14 @@ THE SOFTWARE.
 #if EXO_MODULE
 	import std;
 #else
-#	include <iostream>
 #	include <string>
-//#	include <utility> // for std::move
-//#	include <array>
-//
-//#include <cassert>
 #	include <limits>
-////#include <sstream>
-////#include <vector>
 #endif
 
+#include <exodus/varb.h>
 #include <exodus/var.h>
-#include <exodus/varerr.h>
-#include <exodus/varimpl.h>
-#include <exodus/exoimpl.h>
 
 namespace exo {
-
-using let = const var;
-
-// Originally most help from Thinking in C++ Volume 1 Chapter 12
-// http://www.camtp.uni-mb.si/books/Thinking-in-C++/TIC2Vone-distribution/html/Chapter12.html
-
-// Also - very clearly written
-// Addison Wesley Longman, Inc.
-// C++ Primer, Third Edition 1998 Stanley B Lippman
-// Chapter 15 Overloaded operators and User-Defined Conversions
-
-// Could also use http://www.informit.com/articles/article.asp?p=25264&seqNum=1
-// which is effectively about makeing objects behave like ordinary variable syntactically
-// implementing smartpointers
-
-
-////////////////////
-// USER LITERAL _var
-////////////////////
-
-// "abc^def"_var
-
-ND var operator""_var(const char* cstr, std::size_t size) {
-
-	let rvo = var(cstr, size);
-
-	// Convert _VISIBLE_FMS to _ALL_FMS
-	for (char& c : rvo.var_str) {
-		switch (c) {
-			// Most common first to perhaps aid optimisation
-			case VISIBLE_FM_: c = FM_; break;
-			case VISIBLE_VM_: c = VM_; break;
-			case VISIBLE_SM_: c = SM_; break;
-			case VISIBLE_TM_: c = TM_; break;
-			case VISIBLE_STM_: c = STM_; break;
-			case VISIBLE_RM_: c = RM_; break;
-			// All other chars left unconverted
-			default:;
-		}
-	}
-
-	return rvo;
-
-}
-
-// 123456_var
-/////////////
-
-ND var operator""_var(unsigned long long int i) {
-    return var(i);
-}
-
-// 123.456_var
-//////////////
-
-ND var operator""_var(long double d) {
-    return var(d);
-}
-
 
 ///////////////////
 // UNARY PLUS/MINUS
@@ -106,7 +38,7 @@ ND var operator""_var(long double d) {
 
 // +var
 
-template<> PUBLIC RETVAR VARBASE1::operator+() const {
+template<> PUBLIC RETVAR VB1::operator+() const {
 
 	assertVar(__PRETTY_FUNCTION__);
 	assertNumeric(__PRETTY_FUNCTION__);
@@ -117,7 +49,7 @@ template<> PUBLIC RETVAR VARBASE1::operator+() const {
 
 // -var
 
-template<> PUBLIC RETVAR VARBASE1::operator-() const {
+template<> PUBLIC RETVAR VB1::operator-() const {
 
 	assertVar(__PRETTY_FUNCTION__);
 
@@ -149,8 +81,7 @@ template<> PUBLIC RETVAR VARBASE1::operator-() const {
 
 // ^= var
 
-// The assignment operator must always return a reference to *this. Why?
-template<> PUBLIC VBR1 VARBASE1::operator^=(CBR rhs) & {
+template<> PUBLIC VBR1 VB1::operator^=(CBR rhs) & {
 
 	assertString(__PRETTY_FUNCTION__);
 	rhs.assertString(__PRETTY_FUNCTION__);
@@ -164,19 +95,18 @@ template<> PUBLIC VBR1 VARBASE1::operator^=(CBR rhs) & {
 	} else {
 		// Append it onto our string
 		var_str.append(rhs.var_str);
-		var_typ = VARTYP_STR;  // reset to string only
+		var_typ = VARTYP_STR;  // Reset to string only
 	}
 
 	return *this;
 }
 
-template<> PUBLIC VBR1 VARBASE1::operator^=(TBR rhs) & {
+template<> PUBLIC VBR1 VB1::operator^=(TBR rhs) & {
 
 	assertString(__PRETTY_FUNCTION__);
 	rhs.assertString(__PRETTY_FUNCTION__);
 
 	if (var_str.empty()) {
-//		(this*) = rhs.clone();
 		var_typ = rhs.var_typ;
 		var_int = rhs.var_int;
 		var_dbl = rhs.var_dbl;
@@ -184,7 +114,7 @@ template<> PUBLIC VBR1 VARBASE1::operator^=(TBR rhs) & {
 	} else {
 		// Append it onto our string
 		var_str.append(rhs.var_str);
-		var_typ = VARTYP_STR;  // reset to string only
+		var_typ = VARTYP_STR;  // Reset to string only
 	}
 
 	return *this;
@@ -192,7 +122,7 @@ template<> PUBLIC VBR1 VARBASE1::operator^=(TBR rhs) & {
 
 // ^= int
 
-template<> PUBLIC VBR1 VARBASE1::operator^=(const int int1) & {
+template<> PUBLIC VBR1 VB1::operator^=(const int int1) & {
 
 	assertString(__PRETTY_FUNCTION__);
 
@@ -202,7 +132,7 @@ template<> PUBLIC VBR1 VARBASE1::operator^=(const int int1) & {
 		var_typ = VARTYP_INTSTR;
 	} else {
 		var_str += std::to_string(int1);
-		var_typ = VARTYP_STR;  // reset to string only
+		var_typ = VARTYP_STR;  // Reset to string only
 	}
 
 	return *this;
@@ -210,23 +140,13 @@ template<> PUBLIC VBR1 VARBASE1::operator^=(const int int1) & {
 
 // ^= double
 
-template<> PUBLIC VBR1 VARBASE1::operator^=(const double double1) & {
+template<> PUBLIC VBR1 VB1::operator^=(const double double1) & {
 
 	assertString(__PRETTY_FUNCTION__);
-
-	// var_str+=var(int1).var_str;
-	//var_str += mvd2s(double1);
-	//var_typ = VARTYP_STR;  // reset to one unique type
-//	let temp(double1);
-//	temp.createString();
-//	var_str += temp.var_str;
 
 	var temp = double1;
 	temp.createString();
 	if (var_str.empty()) {
-//		var_str = std::to_string(double1);
-//		var_dbl = double1;
-//		var_typ = VARTYP_DBLSTR;
 		*this = temp;
 	} else {
 		var_str += temp.var_str;
@@ -238,13 +158,13 @@ template<> PUBLIC VBR1 VARBASE1::operator^=(const double double1) & {
 
 // ^= char
 
-template<> PUBLIC VBR1 VARBASE1::operator^=(const char char1) & {
+template<> PUBLIC VBR1 VB1::operator^=(const char char1) & {
 
 	assertString(__PRETTY_FUNCTION__);
 
 	// var_str+=var(int1).var_str;
 	var_str.push_back(char1);
-	var_typ = VARTYP_STR;  // reset to string only
+	var_typ = VARTYP_STR;  // Reset to string only
 
 	return *this;
 }
@@ -253,48 +173,41 @@ template<> PUBLIC VBR1 VARBASE1::operator^=(const char char1) & {
 
 // ^= char*
 
-// The assignment operator must always return a reference to *this.
-template<> PUBLIC VBR1 VARBASE1::operator^=(const char* cstr) & {
+template<> PUBLIC VBR1 VB1::operator^=(const char* cstr) & {
 
 	assertString(__PRETTY_FUNCTION__);
 
-	// var_str+=var(int1).var_str;
-	// var_str+=std::string(char1);
 	var_str += cstr;
-	var_typ = VARTYP_STR;  // reset to string only
+	var_typ = VARTYP_STR;  // Reset to string only
 
 	return *this;
 }
 
 // ^= std::string
 
-// The assignment operator must always return a reference to *this.
-template<> PUBLIC VBR1 VARBASE1::operator^=(const std::string& string1) & {
+template<> PUBLIC VBR1 VB1::operator^=(const std::string& string1) & {
 
 	assertString(__PRETTY_FUNCTION__);
 
-	// var_str+=var(int1).var_str;
 	if (var_str.empty()) {
 		// TODO move if temporary
 		var_str = string1;
 	} else {
 		var_str += string1;
 	}
-	var_typ = VARTYP_STR;  // reset to string only
+	var_typ = VARTYP_STR;  // Reset to string only
 
 	return *this;
 }
 
 // ^= std::string_view
 
-// The assignment operator must always return a reference to *this.
-template<> PUBLIC VBR1 VARBASE1::operator^=(SV sv1) & {
+template<> PUBLIC VBR1 VB1::operator^=(SV sv1) & {
 
 	assertString(__PRETTY_FUNCTION__);
 
-	// var_str+=var(int1).var_str;
 	var_str += sv1;
-	var_typ = VARTYP_STR;  // reset to string only
+	var_typ = VARTYP_STR;  // Reset to string only
 
 	return *this;
 }
@@ -313,38 +226,38 @@ template<> PUBLIC VBR1 VARBASE1::operator^=(SV sv1) & {
 // *** YOU HAVE BEEN WARNED ***
 // Not returning void so is usable in expressions
 // The int argument indicates that this is POSTFIX override v++
-template<> PUBLIC RETVAR VARBASE1::operator++(int) & {
+template<> PUBLIC RETVAR VB1::operator++(int) & {
 
-	// full check done below to avoid double checking number type
+	// Full check done below to avoid double checking number type
 	assertVar(__PRETTY_FUNCTION__);
 
 	var priorvalue;
 
 tryagain:
-	// prefer int since ++ nearly always on integers
+	// Prefer int since ++ nearly always on integers
 	if (var_typ & VARTYP_INT) {
 		if (var_int == std::numeric_limits<decltype(var_int)>::max())
 			UNLIKELY
 			throw VarNumOverflow("operator++");
 		priorvalue = var(var_int);
 		var_int++;
-		var_typ = VARTYP_INT;  // reset to one unique type
+		var_typ = VARTYP_INT;  // Reset to one unique type
 
 	} else if (var_typ & VARTYP_DBL) {
 		priorvalue = var_dbl;
 		var_dbl++;
-		var_typ = VARTYP_DBL;  // reset to one unique type
+		var_typ = VARTYP_DBL;  // Reset to one unique type
 
 	} else if (var_typ & VARTYP_STR) {
-		// try to convert to numeric
+		// Try to convert to numeric
 		if (isnum())
 			goto tryagain;
 
-		//trigger VarNonNumeric
+		// Trigger VarNonNumeric
 		assertNumeric(__PRETTY_FUNCTION__);
 
 	} else {
-		//trigger VarUnassigned
+		// Trigger VarUnassigned
 		assertNumeric(__PRETTY_FUNCTION__);
 	}
 
@@ -356,38 +269,38 @@ tryagain:
 
 // Not returning void so is usable in expressions
 // The int argument indicates that this is POSTFIX override v--
-template<> PUBLIC RETVAR VARBASE1::operator--(int) & {
+template<> PUBLIC RETVAR VB1::operator--(int) & {
 
-	// full check done below to avoid double checking number type
+	// Full check done below to avoid double checking number type
 	assertVar(__PRETTY_FUNCTION__);
 
 	var priorvalue;
 
 tryagain:
-	// prefer int since -- nearly always on integers
+	// Prefer int since -- nearly always on integers
 	if (var_typ & VARTYP_INT) {
 		if (var_int == std::numeric_limits<decltype(var_int)>::min())
 			UNLIKELY
 			throw VarNumUnderflow("operator--");
 		priorvalue = var(var_int);
 		var_int--;
-		var_typ = VARTYP_INT;  // reset to one unique type
+		var_typ = VARTYP_INT;  // Reset to one unique type
 
 	} else if (var_typ & VARTYP_DBL) {
 		priorvalue = var_dbl;
 		var_dbl--;
-		var_typ = VARTYP_DBL;  // reset to one unique type
+		var_typ = VARTYP_DBL;  // Reset to one unique type
 
 	} else if (var_typ & VARTYP_STR) {
-		// try to convert to numeric
+		// Try to convert to numeric
 		if (isnum())
 			goto tryagain;
 
-		//trigger VarNonNumeric
+		// Trigger VarNonNumeric
 		assertNumeric(__PRETTY_FUNCTION__);
 
 	} else {
-		//trigger VarUnassigned
+		// Trigger VarUnassigned
 		assertNumeric(__PRETTY_FUNCTION__);
 	}
 
@@ -402,32 +315,32 @@ tryagain:
 
 // Not returning void so is usable in expressions
 // No argument indicates that this is prefix override ++var
-template<> PUBLIC VBR1 VARBASE1::operator++() & {
+template<> PUBLIC VBR1 VB1::operator++() & {
 
-	// full check done below to avoid double checking number type
+	// Full check done below to avoid double checking number type
 	assertVar(__PRETTY_FUNCTION__);
 
 tryagain:
-	// prefer int since -- nearly always on integers
+	// Prefer int since -- nearly always on integers
 	if (var_typ & VARTYP_INT) {
 		if (var_int == std::numeric_limits<decltype(var_int)>::max())
 			UNLIKELY
 			throw VarNumOverflow("operator++");
 		var_int++;
-		var_typ = VARTYP_INT;  // reset to one unique type
+		var_typ = VARTYP_INT;  // Reset to one unique type
 	} else if (var_typ & VARTYP_DBL) {
 		var_dbl++;
-		var_typ = VARTYP_DBL;  // reset to one unique type
+		var_typ = VARTYP_DBL;  // Reset to one unique type
 	} else if (var_typ & VARTYP_STR) {
-		// try to convert to numeric
+		// Try to convert to numeric
 		if (isnum())
 			goto tryagain;
 
-		//trigger VarNonNumeric
+		// Trigger VarNonNumeric
 		assertNumeric(__PRETTY_FUNCTION__);
 
 	} else {
-		//trigger VarUnassigned
+		// Trigger VarUnassigned
 		assertNumeric(__PRETTY_FUNCTION__);
 	}
 
@@ -439,75 +352,38 @@ tryagain:
 
 // Not returning void so is usable in expressions
 // No argument indicates that this is prefix override --var
-template<> PUBLIC VBR1 VARBASE1::operator--() & {
+template<> PUBLIC VBR1 VB1::operator--() & {
 
-	// full check done below to avoid double checking number type
+	// Full check done below to avoid double checking number type
 	assertVar(__PRETTY_FUNCTION__);
 
 tryagain:
-	// prefer int since -- nearly always on integers
+	// Prefer int since -- nearly always on integers
 	if (var_typ & VARTYP_INT) {
 		if (var_int == std::numeric_limits<decltype(var_int)>::min())
 			UNLIKELY
 			throw VarNumUnderflow("operator--");
 		var_int--;
-		var_typ = VARTYP_INT;  // reset to one unique type
+		var_typ = VARTYP_INT;  // Reset to one unique type
 
 	} else if (var_typ & VARTYP_DBL) {
 		var_dbl--;
-		var_typ = VARTYP_DBL;  // reset to one unique type
+		var_typ = VARTYP_DBL;  // Reset to one unique type
 
 	} else if (var_typ & VARTYP_STR) {
-		// try to convert to numeric
+		// Try to convert to numeric
 		if (isnum())
 			goto tryagain;
 
-		//trigger VarNonNumeric
+		// Trigger VarNonNumeric
 		assertNumeric(__PRETTY_FUNCTION__);
 
 	} else {
-		//trigger VarUnassigned
+		// Trigger VarUnassigned
 		assertNumeric(__PRETTY_FUNCTION__);
 	}
 
 	// OK to return *this in prefix --
-	return *this;
-}
-
-
-////////////////////////////////////////
-// SELF INCREMENT/DECREMENT var versions
-////////////////////////////////////////
-
-// All forwarded to var_base
-
-// var ++
-
-var  var::operator++(int) & {
-	let orig = this->clone();
-	var_base::operator++();
-	return orig;
-}
-
-// var --
-
-var  var::operator--(int) & {
-	let orig = this->clone();
-	var_base::operator--(0);
-	return orig;
-}
-
-// ++ var
-
-var& var::operator++() & {
-	var_base::operator++(0);
-	return *this;
-}
-
-// -- var
-
-var& var::operator--() & {
-	var_base::operator--();
 	return *this;
 }
 

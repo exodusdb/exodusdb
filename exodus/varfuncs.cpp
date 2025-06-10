@@ -206,7 +206,7 @@ static void string_converter(T1& var_str, const T2 fromchars, const T3 tochars) 
 	return;
 }
 
-template<> PUBLIC bool VARBASE1::assigned() const {
+template<> PUBLIC bool VB1::assigned() const {
 	// THISIS("bool var::assigned() const")
 
 	// treat undefined as unassigned
@@ -220,7 +220,7 @@ template<> PUBLIC bool VARBASE1::assigned() const {
 	return var_typ != VARTYP_UNA;
 }
 
-template<> PUBLIC bool VARBASE1::unassigned() const {
+template<> PUBLIC bool VB1::unassigned() const {
 	// see explanation above in assigned
 	// THISIS("bool var::unassigned() const")
 	// assertVar(function_sig);
@@ -231,7 +231,7 @@ template<> PUBLIC bool VARBASE1::unassigned() const {
 	return !var_typ;
 }
 
-template<> PUBLIC std::u32string VARBASE1::to_u32string() const {
+template<> PUBLIC std::u32string VB1::to_u32string() const {
 
 	 THISIS("std::u32string var::to_u32string() const")
 	 assertString(function_sig);
@@ -244,7 +244,7 @@ template<> PUBLIC std::u32string VARBASE1::to_u32string() const {
 	return boost::locale::conv::utf_to_utf<char32_t>(var_str);
 }
 
-template<> PUBLIC std::wstring VARBASE1::to_wstring() const {
+template<> PUBLIC std::wstring VB1::to_wstring() const {
 
 	 THISIS("std::wstring var::to_wstring() const")
 	 assertString(function_sig);
@@ -257,7 +257,7 @@ template<> PUBLIC std::wstring VARBASE1::to_wstring() const {
 	return boost::locale::conv::utf_to_utf<wchar_t>(var_str);
 }
 
-template<> PUBLIC void VARBASE1::from_u32string(std::u32string u32str) const {
+template<> PUBLIC void VB1::from_u32string(std::u32string u32str) const {
 	// for speed, dont validate
 	// THISIS("void var::from_u32tring() const")
 	// assertVar(function_sig);
@@ -267,15 +267,15 @@ template<> PUBLIC void VARBASE1::from_u32string(std::u32string u32str) const {
 }
 
 // CONSTRUCTOR from const std::u32string converts to utf-8
-template<> PUBLIC VARBASE1::var_base(const std::wstring& wstr1) {
+template<> PUBLIC VB1::var_base(const std::wstring& wstr1) {
 	var_typ = VARTYP_STR;
 	var_str = boost::locale::conv::utf_to_utf<char>(wstr1);
 }
 
 //int var::localeAwareCompare(const std::string& str1, const std::string& str2) {
-//template<> PUBLIC int VARBASE1::localeAwareCompare(const std::string& str1, const std::string& str2) {
-template<> PUBLIC int VARBASE1::localeAwareCompare(const std::string& str1, const std::string& str2) {
-///template<> PUBLIC int VARBASE1::localeAwareCompare(const std::string_view str1, const std::string_view str2) {
+//template<> PUBLIC int VB1::localeAwareCompare(const std::string& str1, const std::string& str2) {
+template<> PUBLIC int VB1::localeAwareCompare(const std::string& str1, const std::string& str2) {
+///template<> PUBLIC int VB1::localeAwareCompare(const std::string_view str1, const std::string_view str2) {
 
 	// https://www.boost.org/doc/libs/1_70_0/libs/locale/doc/html/collation.html
 	// eg ensure lower case sorts before uppercase (despite "A" \x41 is less than "a" \x61)
@@ -576,7 +576,7 @@ out  var::keypressed(const bool wait /*=false*/) {
 }
 
 
-template<> PUBLIC void VARBASE1::defaulter(CBR defaultvalue) {
+template<> PUBLIC void VB1::defaulter(CBR defaultvalue) {
 
 	// see explanation above in assigned
 	// assertVar(function_sig);
@@ -593,7 +593,7 @@ template<> PUBLIC void VARBASE1::defaulter(CBR defaultvalue) {
 	return;// *this;
 }
 
-template<> PUBLIC RETVAR VARBASE1::or_default(CBR defaultvalue) const {
+template<> PUBLIC RETVAR VB1::or_default(CBR defaultvalue) const {
 
 	THISIS("var  var::or_default(in defaultvalue) const")
 	ISASSIGNED(defaultvalue)
@@ -605,7 +605,7 @@ template<> PUBLIC RETVAR VARBASE1::or_default(CBR defaultvalue) const {
 	}
 }
 
-template<> PUBLIC const char* VARBASE1::c_str() const& {
+template<> PUBLIC const char* VB1::c_str() const& {
 
 	THISIS("const char* var::c_str() const")
 	assertString(function_sig);
@@ -613,7 +613,7 @@ template<> PUBLIC const char* VARBASE1::c_str() const& {
 	return var_str.c_str();
 }
 
-template<> PUBLIC char VARBASE1::toChar() const {
+template<> PUBLIC char VB1::toChar() const {
 
 	THISIS("char var::toChar() const")
 	assertString(function_sig);
@@ -625,7 +625,7 @@ template<> PUBLIC char VARBASE1::toChar() const {
 }
 
 // temporary var can return move its string into the output
-template<> PUBLIC std::string VARBASE1::toString() && {
+template<> PUBLIC std::string VB1::toString() && {
 
 	THISIS("str  var::toString() &&")
 	assertString(function_sig);
@@ -634,7 +634,7 @@ template<> PUBLIC std::string VARBASE1::toString() && {
 }
 
 // non-temporary var can return a const ref to its string
-template<> PUBLIC const std::string& VARBASE1::toString() const& {
+template<> PUBLIC const std::string& VB1::toString() const& {
 
 	THISIS("str  var::toString() const&")
 	assertString(function_sig);
@@ -1617,7 +1617,7 @@ IO   var::popper() REF {
 }
 
 
-template<> PUBLIC void VARBASE1::move(VBR tovar) {
+template<> PUBLIC void VB1::move(VARBASEREF tovar) {
 
 	THISIS("void var::move(io tovar)")
 	assertAssigned(function_sig);
@@ -1640,7 +1640,7 @@ template<> PUBLIC void VARBASE1::move(VBR tovar) {
 
 // Const version needed in calculatex
 // Identical code except signature is not const
-template<> PUBLIC void VARBASE1::swap(CBR var2) const {
+template<> PUBLIC void VB1::swap(CBR var2) const {
 
 	THISIS("CVR  var::swap(in var2) const")
 
@@ -1670,8 +1670,8 @@ template<> PUBLIC void VARBASE1::swap(CBR var2) const {
 }
 
 // non-const version
-//template<> PUBLIC VBR1 VARBASE1::swap(VBR var2) {
-template<> PUBLIC void VARBASE1::swap(VBR var2) {
+//template<> PUBLIC VBR1 VB1::swap(VARBASEREF var2) {
+template<> PUBLIC void VB1::swap(VARBASEREF var2) {
 
 	THISIS("io   var::swap(io var2)")
 

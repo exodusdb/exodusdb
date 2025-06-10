@@ -37,9 +37,9 @@ THE SOFTWARE.
 
 namespace exo {
 
-//	template<> PUBLIC RETVAR VARBASE1::clone() const {
+//	template<> PUBLIC RETVAR VB1::clone() const {
 //	CONSTEXPR
-	template<> void VARBASE1::assertInteger(const char* message, const char* varname /*= ""*/) const {
+	template<> void VB1::assertInteger(const char* message, const char* varname /*= ""*/) const {
 		assertNumeric(message, varname);
 		if (!(var_typ & VARTYP_INT)) {
 
@@ -67,7 +67,7 @@ namespace exo {
 //// clone to var
 ////
 //CONSTEXPR
-//operator VARBASE1::var() &{
+//operator VB1::var() &{
 //	EXO_SNITCH("var_base cp>v")
 //	return this->clone();
 //}
@@ -75,14 +75,14 @@ namespace exo {
 //// move to var
 ////
 //CONSTEXPR
-//operator VARBASE1::var() && {
+//operator VB1::var() && {
 //	EXO_SNITCH("var_base mv>v")
 //	return this->move();
 //}
 
 // ::clone to var
 //
-template<> PUBLIC RETVAR VARBASE1::clone() const {
+template<> PUBLIC RETVAR VB1::clone() const {
 
 	RETVAR rvo;
 	rvo.var_typ = var_typ;
@@ -111,7 +111,7 @@ template<> PUBLIC RETVAR VARBASE1::clone() const {
 
 // ::move to var
 //
-template<> PUBLIC RETVAR VARBASE1::move() {
+template<> PUBLIC RETVAR VB1::move() {
 
     THISIS("var  var::move()")
     assertAssigned(function_sig);
@@ -156,7 +156,7 @@ template<> PUBLIC RETVAR VARBASE1::move() {
 // utility string function on var_base for throwing errors
 // TODO refactor out
 //
-template<> PUBLIC RETVAR VARBASE1::first_(int nchars) const {
+template<> PUBLIC RETVAR VB1::first_(int nchars) const {
 	assertString(__PRETTY_FUNCTION__);
 	if (nchars < static_cast<int>(var_str.size()))
 		return var_str.substr(0, nchars);
@@ -165,7 +165,7 @@ template<> PUBLIC RETVAR VARBASE1::first_(int nchars) const {
 
 // ::dump
 //
-template<> PUBLIC RETVAR VARBASE1::dump() const {
+template<> PUBLIC RETVAR VB1::dump() const {
 	var nrvo = "var:";
 
 	// Append the var's address
