@@ -135,7 +135,7 @@ ND PUBLIC bool osprocess(in oscmd, in stdin_to_process, out stdout_from_process,
 	return var::osprocess(oscmd, stdin_to_process, stdout_from_process, stderr_from_process, exit_status, timeout_secs);
 }
 
-ND PUBLIC var  backtrace();
+//ND PUBLIC auto backtrace() -> std::string;
 
 ND PUBLIC bool setxlocale(const char* newlocalecode) {return var::setxlocale(newlocalecode);}
 ND PUBLIC var  getxlocale() {return var::getxlocale();}

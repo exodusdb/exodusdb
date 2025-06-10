@@ -32,12 +32,8 @@ THE SOFTWARE.
 
 #if EXO_MODULE
 	import std;
-//#	include <iomanip> // Here only to solve some inability to manually create a std module
 #else
 #	include <cstdint> // for std::int64_t etc.
-//#	include <cmath>   // for std::fmod etc.
-//#	include <cstring> // for std::strstr etc.
-
 #	include <iostream>
 #	include <fstream>
 #	include <string>

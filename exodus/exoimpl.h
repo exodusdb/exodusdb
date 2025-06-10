@@ -147,8 +147,8 @@ namespace exo {
 	PUBLIC extern const char* const _OS_VERSION;
 
 	PUBLIC void debug(in = "");
-	PUBLIC bool exo_savestack(void* stack_addresses[BACKTRACE_MAXADDRESSES], std::size_t* stack_size);
-	ND PUBLIC var exo_backtrace( void* stack_addresses[BACKTRACE_MAXADDRESSES], std::size_t stack_size, std::size_t limit = 0);
+	PUBLIC auto exo_savestack(void* stack_addresses[BACKTRACE_MAXADDRESSES], std::size_t* stack_size) -> bool;
+ ND PUBLIC auto exo_backtrace( void* stack_addresses[BACKTRACE_MAXADDRESSES], std::size_t stack_size, std::size_t limit = 0) -> std::string;
 
 	// Set by signals for threads to poll
 	PUBLIC inline bool TERMINATE_req = false;

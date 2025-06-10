@@ -3,6 +3,12 @@
 
 //#include <stddef> // std::size_t
 
+#if EXO_MDOULE
+	import std;
+#else
+#	include <string>
+#endif
+
 namespace exo {
 
 //#pragma GCC diagnostic push

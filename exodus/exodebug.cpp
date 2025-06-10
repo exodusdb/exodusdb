@@ -31,18 +31,21 @@ THE SOFTWARE.
 // For debugging
 #define TRACING 0
 
-#ifdef EXODUS_POSIX_SOURCE
+#if EXO_MODULE
+	import std;
+#else
 #	include <stdio.h>
 #	include <cstdlib>
 #	include <iostream>
 #	include <string>
-#	include <execinfo.h> // for backtrace
 #	include <unistd.h> // for getpid
-#	include <signal.h>
+//#	include <signal.h>
 #	include <memory> // for make_unique
 #endif
 
 #include <termios.h>
+#include <execinfo.h> // for backtrace
+#include <csignal>
 
 #if TRACING
 #	include <boost/stacktrace.hpp>
@@ -52,6 +55,7 @@ THE SOFTWARE.
 #include <exodus/var.h>
 #include <exodus/exoimpl.h>
 #include <exodus/range.h>
+#include "exodebug.h"
 
 namespace exo {
 
@@ -197,7 +201,7 @@ var summarise_gdb_bt(in osfilename) {
 // Capture the current stack addresses for later decoding.
 // false indicates that gdb is available but already attached and caller can throw to get into gdb.
 // We always get the basic stack and gdb is to get accurate backtrace in backtrace.$pid.log
-bool exo_savestack(void* stack_addresses[BACKTRACE_MAXADDRESSES], std::size_t* stack_size) {
+auto exo_savestack(void* stack_addresses[BACKTRACE_MAXADDRESSES], std::size_t* stack_size) -> bool{
 
 	// Always get the basic stack because it is quick
 	// but is it not very accurate inside threads and fibers
@@ -326,7 +330,7 @@ bool exo_savestack(void* stack_addresses[BACKTRACE_MAXADDRESSES], std::size_t* s
 // Given stack addresses, get the source file, line no and line text
 ////////////////////////////////////////////////////////////////////
 // http://www.delorie.com/gnu/docs/glibc/libc_665.html
-var exo_backtrace(void* stack_addresses[BACKTRACE_MAXADDRESSES], std::size_t stack_size, std::size_t limit) {
+auto exo_backtrace(void* stack_addresses[BACKTRACE_MAXADDRESSES], std::size_t stack_size, std::size_t limit) -> std::string {
 
 	// Utilise gdb backtrace.$pid.log if available
 	var returnlines = summarise_gdb_bt("backtrace." ^ var::ospid() ^ ".log");
@@ -803,12 +807,12 @@ PUBLIC void breakon()  {
 }
 
 // Get a stack list on demand
-ND PUBLIC var backtrace() {
+ND PUBLIC auto backtrace() -> std::string {
 	VarError e("backtrace()");
 	return e.stack();
 }
 
-PUBLIC void debug(in var1) {
+PUBLIC void debug(SV var1) {
 
 	if (!var1.empty())
 		std::clog << "debug(" << var1 << ")" << std::endl;

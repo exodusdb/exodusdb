@@ -208,27 +208,6 @@ template<> PUBLIC RETVAR VARBASE1::dump() const {
 	return nrvo;
 }
 
-// Exception constructors
-//
-// clang-format off
-VarUnconstructed   ::VarUnconstructed   (std::string errmsg) : VarError("VarUnconstructed:"    + errmsg) {}
-VarUnassigned      ::VarUnassigned      (std::string errmsg) : VarError("VarUnassigned:"       + errmsg) {}
-VarDivideByZero    ::VarDivideByZero    (std::string errmsg) : VarError("VarDivideByZero:"     + errmsg) {}
-VarNonNumeric      ::VarNonNumeric      (std::string errmsg) : VarError("VarNonNumeric:"       + errmsg) {}
-VarNonPositive     ::VarNonPositive     (std::string errmsg) : VarError("VarNonPositive:"      + errmsg) {}
-VarNumOverflow     ::VarNumOverflow     (std::string errmsg) : VarError("VarNumOverflow:"      + errmsg) {}
-VarNumUnderflow    ::VarNumUnderflow    (std::string errmsg) : VarError("VarNumUnderflow:"     + errmsg) {}
-VarOutOfMemory     ::VarOutOfMemory     (std::string errmsg) : VarError("VarOutOfMemory:"      + errmsg) {}
-VarInvalidPointer  ::VarInvalidPointer  (std::string errmsg) : VarError("VarInvalidPointer:"   + errmsg) {}
-VarDBException     ::VarDBException     (std::string errmsg) : VarError("VarDBException:"      + errmsg) {}
-VarNotImplemented  ::VarNotImplemented  (std::string errmsg) : VarError("VarNotImplemented:"   + errmsg) {}
-VarDebug           ::VarDebug           (std::string errmsg) : VarError("VarDebug"             + errmsg) {}
-
-DimUndimensioned   ::DimUndimensioned   (std::string errmsg) : VarError("DimUndimensioned"     + errmsg) {}
-DimIndexOutOfBounds::DimIndexOutOfBounds(std::string errmsg) : VarError("DimIndexOutOfBounds:" + errmsg) {}
-
-// clang-format on
-
 // std::string utility
 inline void varb_replace_string (std::string& subject, const std::string& search, const std::string& replace) {
 	std::size_t pos = 0;
@@ -238,67 +217,6 @@ inline void varb_replace_string (std::string& subject, const std::string& search
 //		pos += replace.length();
 		}
 	}
-
-// VarError constructor
-//
-VarError::VarError(std::string message_)
-	: message(message_) {
-	// *** WARNING ***
-	// any errors in this constructor
-	// will cause recursion and hang/segfault
-
-//	if (message.assigned())
-//		message.put(std::cerr);
-//	var("\n").put(std::cerr);
-
-	// Capture the stack at point of creation i.e. when thrown
-	// TODO capture in caller using default argument to VarError?
-	if (not exo_savestack(stack_addresses_, &stack_size_)) {
-		// gdb exists but could not attach to the process so it must already be attached.
-		// Flush any stdout error messages out
-		std::cout << std::flush;
-		std::cerr << "\n" << message_ << std::endl;
-		// break out into gdb
-		debug();
-	}
-
-	// Flush any stdout error messages out
-	std::cout << std::flush;
-
-//	this->stack = exo_backtrace();
-//	((message.assigned() ? message : "") ^ "\n" ^ stack.convert(FM, "\n") ^ "\n").put(std::cerr);
-//	this->stack = "";
-
-//	stack.convert(FM, "\n").put(std::cerr);
-//	var("\n").put(std::cerr);
-
-	// Hide complexity
-//	if (message.contains("var_")) {
-	if (message.find("var_") != std::string::npos) {
-	    varb_replace_string(message, "exo::var_base<exo::var_mid<exo::var>>", "var");
-    	varb_replace_string(message, " [var = exo::var_mid<exo::var>]", "");
-    	varb_replace_string(message, " [var = exo::var_mid<exo::var>, ", "[");
-	}
-
-	// Break into debugger if EXO_DEBUG is set to 1
-	// otherwise allow catch at a higher level or terminate
-	// Probably already broken into debugger in the exo_savestack call above.
-//	var exo_debug;
-//	if (exo_debug.osgetenv("EXO_DEBUG") and exo_debug == 1) {
-//		var(message).errputl("\n");
-//		var(stack()).convert(FM, "\n").errputl();
-//		debug();
-//	}
-}
-
-// stack - source line acquisition
-//
-std::string VarError::stack(const std::size_t limit) const {
-
-	// Convert the stack addresses into source code lines
-	return exo_backtrace(stack_addresses_, stack_size_, limit);
-
-}
 
 // var friend binary ops implementations
 //

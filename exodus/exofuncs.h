@@ -220,7 +220,7 @@ ND bool osprocess(in oscmd, in stdin_to_process, out stdout_from_process, out st
 //var execute(in command);
 
 //void debug(in = "" );
-ND var  backtrace(void);
+ND auto backtrace(void) -> std::string;
 
    bool setxlocale(const char* newlocalecode);
 ND var  getxlocale(void);
