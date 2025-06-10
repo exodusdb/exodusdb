@@ -566,10 +566,12 @@ function test_exodus_without_database {
 : Run tests that do not require database
 : --------------------------------------
 :
-: 1. Test in build/test/src to avoid testing pgexodus lib since postgres is not installed yet
+#: 1. Test in build/test/src to avoid testing pgexodus lib since postgres is not installed yet
+: 1. Test in build/test to avoid testing pgexodus lib since postgres is not installed yet
 : 2. EXO_NODATA=1 causes tests related to database to pass automatically
 :
-	cd $EXODUS_DIR/build/test/src && EXO_NODATA=1 CTEST_OUTPUT_ON_FAILURE=1 CTEST_PARALLEL_LEVEL=$((`nproc`+1)) ctest
+	#cd $EXODUS_DIR/build/test/src && EXO_NODATA=1 CTEST_OUTPUT_ON_FAILURE=1 CTEST_PARALLEL_LEVEL=$((`nproc`+1)) ctest
+	cd $EXODUS_DIR/build/test && EXO_NODATA=1 CTEST_OUTPUT_ON_FAILURE=1 CTEST_PARALLEL_LEVEL=$((`nproc`+1)) ctest
 :
 } # end of test_exodus_without_database
 
@@ -789,7 +791,8 @@ function test_exodus_and_database {
 : Many tests using ctest - In parallel. Output only on error
 : ----------------------
 :
-: Note that all the exodus/build/test/src test to that do not require database were already run
+#: Note that all the exodus/build/test/src test to that do not require database were already run
+: Note that all the exodus/build/test test to that do not require database were already run
 : in the build stage using EXO_NODATA=1 and pgexodus test is omitted
 : This test is run in the exodus/build
 :
