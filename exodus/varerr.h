@@ -14,8 +14,6 @@ namespace exo {
 class PUBLIC VarError {
  public:
 
-	//VarError(CBR message) = delete;
-	//explicit
 	VarError(std::string message);
 
 	// Note: "message" is not const so that an exception handler (catch block)

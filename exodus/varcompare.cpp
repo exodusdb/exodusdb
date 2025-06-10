@@ -104,7 +104,7 @@ bool bool_lt_bool(const bool lhs, const bool rhs) {
 
 // almost identical code in var_eq_var and var_lt_var except where noted
 // NOTE doubles compare only to 0.0001 accuracy)
-bool var_eq_var(CBR lhs, CBR rhs) {
+bool var_eq_var(CBR1 lhs, CBR1 rhs) {
 
 	lhs.assertVar(__PRETTY_FUNCTION__);
 	rhs.assertVar(__PRETTY_FUNCTION__);
@@ -223,7 +223,7 @@ bool var_eq_var(CBR lhs, CBR rhs) {
 
 // almost identical between var_eq_var and var_lt_var except where noted
 // NOTE doubles compare only to 0.0001 accuracy)
-bool var_lt_var(CBR lhs, CBR rhs) {
+bool var_lt_var(CBR1 lhs, CBR1 rhs) {
 
 	lhs.assertVar(__PRETTY_FUNCTION__);
 	rhs.assertVar(__PRETTY_FUNCTION__);
@@ -309,7 +309,7 @@ bool var_lt_var(CBR lhs, CBR rhs) {
 
 // similar to var_eq_var and var_lt_var - this is the var<int version for speed
 // NOTE doubles compare only to 0.0001 accuracy)
-bool var_lt_int(CBR lhs, const int rhs_int) {
+bool var_lt_int(CBR1 lhs, const int rhs_int) {
 
 	lhs.assertVar(__PRETTY_FUNCTION__);
 
@@ -339,7 +339,7 @@ bool var_lt_int(CBR lhs, const int rhs_int) {
 }
 
 // NOTE doubles compare only to 0.0001 accuracy)
-bool int_lt_var(const int lhs_int, CBR rhs) {
+bool int_lt_var(const int lhs_int, CBR1 rhs) {
 
 	rhs.assertVar(__PRETTY_FUNCTION__);
 
@@ -370,7 +370,7 @@ bool int_lt_var(const int lhs_int, CBR rhs) {
 }
 
 // NOTE doubles compare only to 0.0001 accuracy)
-bool var_lt_dbl(CBR lhs, const double rhs_dbl) {
+bool var_lt_dbl(CBR1 lhs, const double rhs_dbl) {
 
 	lhs.assertVar(__PRETTY_FUNCTION__);
 
@@ -402,7 +402,7 @@ bool var_lt_dbl(CBR lhs, const double rhs_dbl) {
 }
 
 // NOTE doubles compare only to 0.0001 accuracy)
-bool dbl_lt_var(const double lhs_dbl, CBR rhs) {
+bool dbl_lt_var(const double lhs_dbl, CBR1 rhs) {
 
 	rhs.assertVar(__PRETTY_FUNCTION__);
 
@@ -434,7 +434,7 @@ bool dbl_lt_var(const double lhs_dbl, CBR rhs) {
 }
 
 // NOTE doubles compare only to 0.0001 accuracy)
-bool var_eq_dbl(CBR lhs, const double rhs_dbl) {
+bool var_eq_dbl(CBR1 lhs, const double rhs_dbl) {
 
 	lhs.assertVar(__PRETTY_FUNCTION__);
 
@@ -487,7 +487,7 @@ bool var_eq_dbl(CBR lhs, const double rhs_dbl) {
 }
 
 // NOTE doubles compare only to 0.0001 accuracy)
-bool var_eq_bool(CBR lhs, const bool rhs_bool) {
+bool var_eq_bool(CBR1 lhs, const bool rhs_bool) {
 
 	lhs.assertVar(__PRETTY_FUNCTION__);
 
@@ -536,7 +536,7 @@ bool var_eq_bool(CBR lhs, const bool rhs_bool) {
 
 }
 // NOTE doubles compare only to 0.0001 accuracy)
-bool var_eq_int(CBR lhs, const int rhs_int) {
+bool var_eq_int(CBR1 lhs, const int rhs_int) {
 
 	lhs.assertVar(__PRETTY_FUNCTION__);
 
@@ -581,16 +581,16 @@ bool var_eq_int(CBR lhs, const int rhs_int) {
 /////////////////
 
 // clang-format off
-bool var_eq_var (CBR          lhs, CBR          rhs );
-bool var_eq_int (CBR          lhs, const int    rhs );
-bool var_eq_dbl (CBR          lhs, const double rhs );
-bool var_eq_bool(CBR          lhs, const bool   rhs );
+bool var_eq_var (CBR1          lhs, CBR1          rhs );
+bool var_eq_int (CBR1          lhs, const int    rhs );
+bool var_eq_dbl (CBR1          lhs, const double rhs );
+bool var_eq_bool(CBR1          lhs, const bool   rhs );
 
-bool var_lt_var (CBR          lhs, CBR          rhs );
-bool var_lt_int (CBR          lhs, const int    rhs );
-bool var_lt_dbl (CBR          lhs, const double rhs );
-bool int_lt_var (const int    lhs, CBR          rhs );
-bool dbl_lt_var (const double lhs, CBR          rhs );
+bool var_lt_var (CBR1          lhs, CBR1          rhs );
+bool var_lt_int (CBR1          lhs, const int    rhs );
+bool var_lt_dbl (CBR1          lhs, const double rhs );
+bool int_lt_var (const int    lhs, CBR1          rhs );
+bool dbl_lt_var (const double lhs, CBR1          rhs );
 //clang-format on
 
 } // namespace exo

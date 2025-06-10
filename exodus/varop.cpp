@@ -68,7 +68,7 @@ namespace exo {
 // VAR += VAR
 /////////////
 
-template<> PUBLIC VBR1 VARBASE1::operator+=(CBX rhs) & {
+template<> PUBLIC VBR1 VARBASE1::operator+=(CBR rhs) & {
 
 	rhs.assertNumeric(__PRETTY_FUNCTION__);
 
@@ -117,7 +117,7 @@ tryagain:
 // VAR -= VAR
 /////////////
 
-template<> PUBLIC VBR1 VARBASE1::operator-=(CBX rhs) & {
+template<> PUBLIC VBR1 VARBASE1::operator-=(CBR rhs) & {
 
 	rhs.assertNumeric(__PRETTY_FUNCTION__);
 
@@ -166,7 +166,7 @@ tryagain:
 // VAR *= VAR
 /////////////
 
-template<> PUBLIC VBR1 VARBASE1::operator*=(CBX rhs) & {
+template<> PUBLIC VBR1 VARBASE1::operator*=(CBR rhs) & {
 
 	rhs.assertNumeric(__PRETTY_FUNCTION__);
 
@@ -215,7 +215,7 @@ tryagain:
 // VAR /= VAR
 /////////////
 
-template<> PUBLIC VBR1 VARBASE1::operator/=(CBX rhs) & {
+template<> PUBLIC VBR1 VARBASE1::operator/=(CBR rhs) & {
 
 	// Always returns a double because
 	// 10/3 must be 3.3333333
@@ -289,7 +289,7 @@ tryagain:
 // VAR %= VAR
 /////////////
 
-template<> PUBLIC VBR1 VARBASE1::operator%=(CBX rhs) & {
+template<> PUBLIC VBR1 VARBASE1::operator%=(CBR rhs) & {
 	*this = this->mod(rhs);
 	return VBR_THIS;
 }

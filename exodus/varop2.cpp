@@ -150,7 +150,7 @@ template<> PUBLIC RETVAR VARBASE1::operator-() const {
 // ^= var
 
 // The assignment operator must always return a reference to *this. Why?
-template<> PUBLIC VBR1 VARBASE1::operator^=(CBX rhs) & {
+template<> PUBLIC VBR1 VARBASE1::operator^=(CBR rhs) & {
 
 	assertString(__PRETTY_FUNCTION__);
 	rhs.assertString(__PRETTY_FUNCTION__);
@@ -170,7 +170,7 @@ template<> PUBLIC VBR1 VARBASE1::operator^=(CBX rhs) & {
 	return *this;
 }
 
-template<> PUBLIC VBR1 VARBASE1::operator^=(TBX rhs) & {
+template<> PUBLIC VBR1 VARBASE1::operator^=(TBR rhs) & {
 
 	assertString(__PRETTY_FUNCTION__);
 	rhs.assertString(__PRETTY_FUNCTION__);

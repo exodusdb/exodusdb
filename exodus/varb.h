@@ -181,17 +181,17 @@ namespace exo {
 class var;
 template<typename var> class var_mid; // forward declaration of a class template
 
-// grep -P "VBR|CBR|TBR|RETVAR" -rl
 #define VARBASE1  var_base<var_mid<exo::var>>
 #define VBV       var_base<var_mid<exo::var>>
 
 #define VBR1      var_base<var_mid<var>>&
-#define CBR const var_base<var_mid<exo::var>>&
-#define TBR       var_base<var_mid<exo::var>>&&
+//#define CBR const var_base<var_mid<exo::var>>&
+#define CBR1 const var_base<var_mid<exo::var>>&
+#define TBR1       var_base<var_mid<exo::var>>&&
 
-#define VBX       var_base&
-#define CBX const var_base&
-#define TBX       var_base&&
+#define VBR       var_base&
+#define CBR const var_base&
+#define TBR       var_base&&
 
 #define RETVAR    exo::var
 #define RETVARREF exo::var&
@@ -254,10 +254,10 @@ class PUBLIC var_base {
 
  protected:
 
-	using VAR    =       var_base;
+//	using VAR    =       var_base;
 	using VARREF =       var_base&;
-	using CVR    = const var_base&;
-	using TVR    =       var_base&&;
+//	using CBR    = const var_base&;
+//	using TBR    =       var_base&&;
 
 //	using in     = const var_base&;
 //	using out    =       var_base&;
@@ -352,7 +352,7 @@ class PUBLIC var_base {
 	//////////////////////
 	//
 	CONSTEXPR // but new std::string?
-	var_base(CVR rhs)
+	var_base(CBR rhs)
 		:
 		var_str(rhs.var_str),
 		var_int(rhs.var_int),
@@ -374,11 +374,11 @@ class PUBLIC var_base {
 
 #ifndef SNITCHING
 	CONSTEXPR
-	var_base(TVR fromvar) noexcept = default;
+	var_base(TBR fromvar) noexcept = default;
 
 #else
 	CONSTEXPR
-	var_base(TVR rhs) noexcept
+	var_base(TBR rhs) noexcept
 		:
 		var_str(std::move(rhs.var_str)),
 		var_int(rhs.var_int),
@@ -406,15 +406,15 @@ class PUBLIC var_base {
 	// e.g. printl(date() = 12345);
 	//[[deprecated("Deprecated is a great way to highlight all uses of something which can otherwise be hard or slow to find!")]
 	CONSTEXPR
-	void operator=(CVR rhs) && = delete;
+	void operator=(CBR rhs) && = delete;
 
-	// var_base& operator=(CVR rhs) & = default;
+	// var_base& operator=(CBR rhs) & = default;
 	// Cannot use default copy assignment because
 	// a) it returns a value allowing accidental use of "=" instead of == in if statements
 	// b) doesnt check if rhs is assigned
 
 	CONSTEXPR // but new std::string?
-	void operator=(CVR rhs) & {
+	void operator=(CBR rhs) & {
 
 		//assertVar(__PRETTY_FUNCTION__);  //could be skipped for speed?
 		rhs.assertAssigned(__PRETTY_FUNCTION__);
@@ -443,16 +443,16 @@ class PUBLIC var_base {
 	// xyz.f(2) = "abc"; // Must not compile
 
 	CONSTEXPR
-	void operator=(TVR rhs) && noexcept = delete;
+	void operator=(TBR rhs) && noexcept = delete;
 
 	// Cannot use the default move assignment because
 	// a) It returns a value allowing accidental use of "=" in if statements instead of ==
 	// b) It doesnt check if rhs is assigned although this is
 	//    is less important for temporaries which are rarely unassigned.
-	//var_base& operator=(TVR rhs) & noexcept = default;
+	//var_base& operator=(TBR rhs) & noexcept = default;
 
 	CONSTEXPR
-	void operator=(TVR rhs) & noexcept {
+	void operator=(TBR rhs) & noexcept {
 
 		// Skipped for speed
 		//assertVar(__PRETTY_FUNCTION__);
@@ -1179,11 +1179,11 @@ class PUBLIC var_base {
 #	define VARREF1 void
 #	define VARREF1_RETURN
 #endif
-	VARREF1 operator+=(CVR) &;
-	VARREF1 operator*=(CVR) &;
-	VARREF1 operator-=(CVR) &;
-	VARREF1 operator/=(CVR) &;
-	VARREF1 operator%=(CVR) &;
+	VARREF1 operator+=(CBR) &;
+	VARREF1 operator*=(CBR) &;
+	VARREF1 operator-=(CBR) &;
+	VARREF1 operator/=(CBR) &;
+	VARREF1 operator%=(CBR) &;
 
 	// Specialisations for speed to avoid a) unnecessary converting to a var and then b) having to decide what type of var we have
 
@@ -1225,8 +1225,8 @@ class PUBLIC var_base {
 	// Concat self assign is different.
 	// It does return *this in order for chainable efficient multiple concatentation.
 
-	VARREF operator^=(CVR) &;
-	VARREF operator^=(TVR) &;
+	VARREF operator^=(CBR) &;
+	VARREF operator^=(TBR) &;
 	VARREF operator^=(const int) &;
 	VARREF operator^=(const double) &;
 	VARREF operator^=(const char) &;
@@ -1268,12 +1268,12 @@ class PUBLIC var_base {
 /*
 	#define DEPRECATE [[deprecated("Using self assign operators on temporaries is pointless. Use the operator by itself, without the = sign, to achieve the same.")]]
 
-	DEPRECATE VARREF operator+=(CVR rhs) && {(*this) += rhs; return *this;}// = delete;
-	DEPRECATE VARREF operator*=(CVR rhs) && {(*this) *= rhs; return *this;}// = delete;
-	DEPRECATE VARREF operator-=(CVR rhs) && {(*this) -= rhs; return *this;}// = delete;
-	DEPRECATE VARREF operator/=(CVR rhs) && {(*this) /= rhs; return *this;}// = delete;
-	DEPRECATE VARREF operator%=(CVR rhs) && {(*this) %= rhs; return *this;}// = delete;
-	DEPRECATE VARREF operator^=(CVR rhs) && {(*this) ^= rhs; return *this;}// = delete;
+	DEPRECATE VARREF operator+=(CBR rhs) && {(*this) += rhs; return *this;}// = delete;
+	DEPRECATE VARREF operator*=(CBR rhs) && {(*this) *= rhs; return *this;}// = delete;
+	DEPRECATE VARREF operator-=(CBR rhs) && {(*this) -= rhs; return *this;}// = delete;
+	DEPRECATE VARREF operator/=(CBR rhs) && {(*this) /= rhs; return *this;}// = delete;
+	DEPRECATE VARREF operator%=(CBR rhs) && {(*this) %= rhs; return *this;}// = delete;
+	DEPRECATE VARREF operator^=(CBR rhs) && {(*this) ^= rhs; return *this;}// = delete;
 
 	// Specialisations are deprecated too
 
@@ -1382,23 +1382,23 @@ class PUBLIC var_base {
 
 	// Logical
 
-	friend bool var_eq_var (      CBR     lhs,         CBR     rhs);
-	friend bool var_lt_var (      CBR     lhs,         CBR     rhs);
+	friend bool var_eq_var (      CBR1   lhs,       CBR1   rhs  );
+	friend bool var_lt_var (      CBR1   lhs,       CBR1   rhs  );
 
 	// Specialisations for speed
 
-	friend bool var_eq_dbl (      CBR     lhs,   const double dbl1 );
-	friend bool var_eq_int (      CBR     lhs,   const int    int1 );
-	friend bool var_eq_bool(      CBR     lhs,   const bool   bool1);
+	friend bool var_eq_dbl (      CBR1   lhs, const double dbl1 );
+	friend bool var_eq_int (      CBR1   lhs, const int    int1 );
+	friend bool var_eq_bool(      CBR1   lhs, const bool   bool1);
 
-	friend bool var_lt_int (      CBR     lhs,   const int    int1 );
-	friend bool int_lt_var (const int    int1,        CBR     rhs  );
+	friend bool var_lt_int (      CBR1   lhs, const int    int1 );
+	friend bool int_lt_var (const int    int1,      CBR1   rhs  );
 
-	friend bool var_lt_dbl (      CBR     lhs,   const double dbl1 );
-	friend bool dbl_lt_var (const double dbl1,        CBR     rhs  );
+	friend bool var_lt_dbl (      CBR1   lhs, const double dbl1 );
+	friend bool dbl_lt_var (const double dbl1,      CBR1   rhs  );
 
-//	friend bool var_lt_bool (      CBR    lhs,   const bool   bool1) = delete;
-//	friend bool bool_lt_var (const bool  bool1,       CBR     rhs  ) = delete;
+//	friend bool var_lt_bool (      CBR1  lhs, const bool   bool1) = delete;
+//	friend bool bool_lt_var (const bool  bool1,     CBR1   rhs  ) = delete;
 //	friend var operator""_var(const char* cstr, std::size_t size);
 
 	//////////////////////////////////////
@@ -1410,11 +1410,13 @@ class PUBLIC var_base {
 	// Implementations are in varb_friends_impl.h included in var.cpp
 
 #define VAR_FRIEND friend
-#undef TBR
-#define TBR var_base&&
+//#undef TBR1
+//#define TBR1 var_base&&
 #include "varb_friends.h"
-#undef TBR
-#define TBR var_base<var_mid<var>>&&
+//#undef TBR1
+//#define TBR1 var_base<var_mid<var>>&&
+
+// in varb.cpp
 //#include "varb_friends_impl.h"
 
 #pragma GCC diagnostic pop
@@ -1427,7 +1429,7 @@ class PUBLIC var_base {
 	//////////
 
 //	// Note replicated for var but that one converts FM, VM etc. to visible chars before output
-	friend std::ostream& operator<<(std::ostream& ostream1, CBR outvar)
+	friend std::ostream& operator<<(std::ostream& ostream1, CBR1 outvar)
 	{
 //		THISIS("ostream << var")
 //		outvar.assertString(function_sig);
@@ -1509,11 +1511,11 @@ class PUBLIC var_base {
 
 	// If the var is unassigned, assigns the default value to it, otherwise does nothing.
 	// Mutator.
-	void defaulter(CVR defaultvalue);
+	void defaulter(CBR defaultvalue);
 
 	// Returns: A copy of the var if it is assigned otherwise it returns a copy of the default var
 	// If ''defaultvalue'' is unassigned then then a VarUnassigned error is thrown.
-	ND RETVAR or_default(CVR defaultvalue) const;
+	ND RETVAR or_default(CBR defaultvalue) const;
 
 	// "moves" the var to the destination var leaving the source var unassigned.
 	// This is useful for performance with vars which own strings larger than can be fitted inside a std::string object, which is 15 bytes on linux.
@@ -1535,7 +1537,7 @@ class PUBLIC var_base {
 	// temporarily require member variables to be something else but switch back before exiting
 	// If such functions throw an error without catching then it would leave the member variables in a changed state.
 	// Either or both vars may be unassigned without triggering a VarUnnassigned error.
-	void swap(CVR var2) const;
+	void swap(CBR var2) const;
 
 	// Returns a copy of the var but works on unassigned vars without triggering an error
 	// If the source is unassigned then the copy is unassigned too.
@@ -1549,7 +1551,7 @@ class PUBLIC var_base {
 	ND RETVAR dump() const;
 
 	// Needed in operator%
-	ND RETVAR mod(CVR divisor) const;
+	ND RETVAR mod(CBR divisor) const;
 	ND RETVAR mod(double divisor) const;
 	ND RETVAR mod(const int divisor) const;
 
@@ -1688,8 +1690,6 @@ protected:
 	}
 
 }; // class var_base
-
-//    ND PUBLIC exo::var operator+(CBR  lhs, CBR rhs);
 
 // varb_friends again to add [[nodicard]] attribute
 #undef VAR_FRIEND

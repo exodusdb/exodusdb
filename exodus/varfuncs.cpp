@@ -576,7 +576,7 @@ out  var::keypressed(const bool wait /*=false*/) {
 }
 
 
-template<> PUBLIC void VARBASE1::defaulter(CBX defaultvalue) {
+template<> PUBLIC void VARBASE1::defaulter(CBR defaultvalue) {
 
 	// see explanation above in assigned
 	// assertVar(function_sig);
@@ -593,7 +593,7 @@ template<> PUBLIC void VARBASE1::defaulter(CBX defaultvalue) {
 	return;// *this;
 }
 
-template<> PUBLIC RETVAR VARBASE1::or_default(CBX defaultvalue) const {
+template<> PUBLIC RETVAR VARBASE1::or_default(CBR defaultvalue) const {
 
 	THISIS("var  var::or_default(in defaultvalue) const")
 	ISASSIGNED(defaultvalue)
@@ -1617,7 +1617,7 @@ IO   var::popper() REF {
 }
 
 
-template<> PUBLIC void VARBASE1::move(VBX tovar) {
+template<> PUBLIC void VARBASE1::move(VBR tovar) {
 
 	THISIS("void var::move(io tovar)")
 	assertAssigned(function_sig);
@@ -1640,8 +1640,7 @@ template<> PUBLIC void VARBASE1::move(VBX tovar) {
 
 // Const version needed in calculatex
 // Identical code except signature is not const
-//template<> PUBLIC CBR VARBASE1::swap(CBX var2) const {
-template<> PUBLIC void VARBASE1::swap(CBX var2) const {
+template<> PUBLIC void VARBASE1::swap(CBR var2) const {
 
 	THISIS("CVR  var::swap(in var2) const")
 
@@ -1671,8 +1670,8 @@ template<> PUBLIC void VARBASE1::swap(CBX var2) const {
 }
 
 // non-const version
-//template<> PUBLIC VBR1 VARBASE1::swap(VBX var2) {
-template<> PUBLIC void VARBASE1::swap(VBX var2) {
+//template<> PUBLIC VBR1 VARBASE1::swap(VBR var2) {
+template<> PUBLIC void VARBASE1::swap(VBR var2) {
 
 	THISIS("io   var::swap(io var2)")
 
