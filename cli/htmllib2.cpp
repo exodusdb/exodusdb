@@ -484,7 +484,7 @@ func getvogonpoetry_sortjs() {
 R"V0G0N(
 <script type="text/javascript">
 gdateformat='d/M/yyyy'
-func sorttable(event)
+function sorttable(event)
 {
  if (document.body.getAttribute('contenteditable'))
   return true
@@ -573,7 +573,7 @@ func sorttable(event)
  QuickSort(rows,coln,fromrown,uptorown);
 }
 
-func QuickSort(rows,coln,min,max){
+function QuickSort(rows,coln,min,max){
 
  if (max<=min) return(true)
 
@@ -807,48 +807,49 @@ table.hashtable td {padding:0px; margin:0px; text-align:left; vertical-align:top
 
 <script type="text/javascript">
 var togglendisplayed=0
-func toggle(t,mode)
-{
- if (typeof t=='string')
- {
-  if (document.getElementsByClassName)
-   t=document.getElementsByClassName(t)
-  else
-   t=document.getElementsByName(t)
- }
- if (t.tagName) t=[t]
- if (!t.length) return
- var display="none"
- for (var i = t.length-1; i>=0; i--) {
-  if (t[i].style.display == "") {
-   t[i].style.display = "none";
-  } else {
-   t[i].style.display = "";
-   display=""
-   }
-  }
+function toggle(t, mode) {
 
- if (!mode)
- {
-  var toggleheading=false
-  if (display=='')
-  {
-   togglendisplayed++
-   if (togglendisplayed==1) toggleheading=true
-  }
-  else
-  {
-   togglendisplayed--
-   if (togglendisplayed==0) toggleheading=true
-  }
-  if (toggleheading) {
-   //toggle(document.getElementsByName('BHEAD'),true)
-   var rules=document.styleSheets[0].cssRules||document.styleSheets[0].rules
-   var bheads=[rules[0],rules[1]]
-   toggle(bheads,true)
-  }
- }
+	if (typeof t == 'string') {
+		if (document.getElementsByClassName)
+			t = document.getElementsByClassName(t)
+		else
+			t = document.getElementsByName(t)
+	}
+
+	if (t.tagName) t=[t]
+	if (!t.length) return
+
+	var display = "none"
+	for (var ii = t.length - 1; ii>=0; ii--) {
+		if (t[ii].style.display == "") {
+			t[ii].style.display = "none"
+		} else {
+			t[ii].style.display = ""
+			display = ""
+		}
+	}
+
+	if (!mode)  {
+		var toggleheading=false
+		if (display == '') {
+			togglendisplayed++
+			if (togglendisplayed == 1)
+				toggleheading = true
+
+		} else {
+			togglendisplayed--
+			if (togglendisplayed == 0)
+				toggleheading = true
+		}
+		if (toggleheading) {
+			//toggle(document.getElementsByName('BHEAD'),true)
+			var rules=document.styleSheets[0].cssRules||document.styleSheets[0].rules
+			var bheads=[rules[0],rules[1]]
+			toggle(bheads,true)
+		}
+	}
 }
+
 window.onload=function (){
  if (!window.opener)
   return
@@ -919,49 +920,48 @@ td.nx {border-top:none;border-bottom:none}
 
 <script type="text/javascript">
 var togglendisplayed=0
-func toggle(t,mode)
-{
- if (typeof t=='string')
- {
-  if (document.getElementsByClassName)
-   t=document.getElementsByClassName(t)
-  else
-   t=document.getElementsByName(t)
- }
- if (t.tagName) t=[t]
- if (!t.length) return
- var display="none"
- for (var i = t.length-1; i>=0; i--) {
-  if (t[i].style.display == "") {
-   t[i].style.display = "none";
-  } else {
-   t[i].style.display = "";
-   display=""
-   }
-  }
+function toggle(t, mode) {
 
- if (!mode)
- {
-  var toggleheading=false
-  if (display=='')
-  {
-   togglendisplayed++
-   if (togglendisplayed==1) toggleheading=true
-  }
-  else
-  {
-   togglendisplayed--
-   if (togglendisplayed==0) toggleheading=true
-  }
-  if (toggleheading) {
-   //toggle(document.getElementsByName('BHEAD'),true)
-   var rules=document.styleSheets[0].cssRules||document.styleSheets[0].rules
-   var bheads=[rules[0],rules[1]]
-   toggle(bheads,true)
-  }
- }
+    if (typeof t == 'string') {
+        if (document.getElementsByClassName)
+            t = document.getElementsByClassName(t)
+        else
+            t = document.getElementsByName(t)
+    }
+
+    if (t.tagName) t=[t]
+    if (!t.length) return
+
+    var display = "none"
+    for (var ii = t.length - 1; ii>=0; ii--) {
+        if (t[ii].style.display == "") {
+            t[ii].style.display = "none"
+        } else {
+            t[ii].style.display = ""
+            display = ""
+        }
+    }
+
+    if (!mode)  {
+        var toggleheading=false
+        if (display == '') {
+            togglendisplayed++
+            if (togglendisplayed == 1)
+                toggleheading = true
+
+        } else {
+            togglendisplayed--
+            if (togglendisplayed == 0)
+                toggleheading = true
+        }
+        if (toggleheading) {
+            //toggle(document.getElementsByName('BHEAD'),true)
+            var rules=document.styleSheets[0].cssRules||document.styleSheets[0].rules
+            var bheads=[rules[0],rules[1]]
+            toggle(bheads,true)
+        }
+    }
 }
-</script>
 )V0G0N";
 
 	}
