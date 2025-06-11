@@ -29,8 +29,8 @@ set -euxo pipefail
 	fi
 
 :
-: For live databases, EXO_HOME is $HOME/live and EXO_DICT=exodus
-: For test databases, EXO_HOME is $HOME      and EXO_DICT=exodus_live
+: For live databases, EXO_HOME is $HOME/live and EXO_DICT=exodus_live
+: For test databases, EXO_HOME is $HOME      and EXO_DICT=exodus
 : =========================================
 :
 	if [ $LIVE_OR_TEST = test ]; then
