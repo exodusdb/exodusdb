@@ -1179,7 +1179,8 @@ func main() {
 				docfile << "|" << funcx_prefix << "||" << func_decl << "||" << comments << std::endl;
 			} else {
 
-				let funcx_prefix_wrapped = funcx_prefix ? ("<p><code>" ^ funcx_prefix ^ "</code></p>") : "";
+				let encoded_funcx_prefix = funcx_prefix.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
+				let funcx_prefix_wrapped = funcx_prefix ? ("<p><code>" ^ encoded_funcx_prefix ^ "</code></p>") : "";
 //				func_decl.replacer("&", "&amp;");
 //				func_decl.replacer("<", "&lt;");
 //				func_decl.replacer(">", "&gt;");
