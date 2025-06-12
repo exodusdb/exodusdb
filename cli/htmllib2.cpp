@@ -962,6 +962,7 @@ function toggle(t, mode) {
         }
     }
 }
+</script>
 )V0G0N";
 
 	}
