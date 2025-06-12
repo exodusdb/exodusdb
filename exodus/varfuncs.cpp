@@ -29,99 +29,24 @@ Binary    Hex          Comments
 11110xxx  0xF0..0xF4   First byte of a 4-byte character encoding
 */
 
-//#include <math.h>    //for abs(double) and stod
-//#include <cstdlib>  //for exit
-
-//#include <utility> //for move
-//#include <mutex> //for lock_guard
-//module #include <string>
-
-#if __has_include(<signal.h>)
-//#include <signal.h>	 //for raise(SIGTRAP)
-#endif
-
-/* using fastfloat instead of ryu because it is > 3 time faster
-	but it doesnt prevent excessively long decimal ASCII input
-	and unconfirmed if it does supports round trip ascii->double->ascii
-	//from test_perf.cpp
-    var v("1234.5678");  //23ns
-    //v.isnum();         //+ 56ns ( 79ns using fastfloat)
-    //v.isnum();         //+184ns (207ns using ryu)
-    //v.isnum();         //+194ns (217ns using std::stod)
-    //v.isnum();         //+???ns (???ns using <charconv> from_chars)
-*/
-
-//fastfloat  "1234.5678" -> 1234.5678  56ns (but does it round trip?)
-//ryu        "1234.5678" -> 1234.5678 184ns
-//std::stod  "1234.5678" -> 1234.5678 192ns (but does it round trip?)
-//from_chars "1234.5678" -> 1234.5678 ???ns (but does it round trip?)
-
-//Eisel-Lemire algorithm seems to be fastest "parse chars to double" according to Lavavej at Microsoft
-//Feb 2021 https://reviews.llvm.org/D70631 "There have been a couple of algorithmic developments very recently
-// - for parsing (from_chars), the Eisel-Lemire algorithm is much faster than the technique used here.
-// I would have used it if it were available back then!"
-//
-//double only available in gcc 11 onwards. msvc has it from 2017 or 19
-//https://github.com/fastfloat/fast_float
-#if __has_include(<fast_float/fast_float.h>)
-#define HAS_FASTFLOAT
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
-#pragma clang diagnostic ignored "-Wold-style-cast"
-#pragma clang diagnostic ignored "-Wextra-semi-stmt"
-#pragma clang diagnostic ignored "-Wreserved-identifier"
-#include <fast_float/fast_float.h>
-#pragma clang diagnostic pop
-#define STD_OR_FASTFLOAT fast_float
-
-#elif __GNUC__ >= 11 || __clang_major__ >= 14
-#define USE_CHARCONV
-#define STD_OR_FASTFLOAT std
-
-//#elif __has_include(<ryu/ryu.h>)
-//#define HAS_RYU
-//#include <ryu/ryu.h>
-#endif
-
-//gcc 10 doesnt include conv from and to floating point
-//#include <charconv>	 // for from_chars and to_chars
-
-//#include <sstream>
-//#include <iomanip>    //for setprecision
-
-//#include <iostream> //cin and cout
-//#include <memory>   //for unique_ptr
-
-// for charname()
-#include <unicode/unistr.h>
+// ICU
+//#include <unicode/unistr.h>
 #include <unicode/uchar.h>
 #include <unicode/ustring.h>
-
+//
 #include <boost/locale.hpp>
-//#include <boost/algorithm/string.hpp>
+////#include <boost/algorithm/string.hpp>
 #include <boost/algorithm/string/trim_all.hpp>
 
 #include <exodus/varimpl.h>
-//#include <exodus/mvutf.h>
-//#include <exodus/varlocale.h>
-
-// std::ios::sync_with_stdio(false);
-//static bool desynced_with_stdio = false;
-
-// TODO check that all string increase operations dont crash the system
 
 namespace exo {
 
-// output/errput/logput not threadsafe but probably not a problem
-//inline std::mutex global_mutex_threadstream;
-//#define LOCKIOSTREAM_OR_NOT std::lock_guard guard(global_mutex_threadstream);
-//#define LOCKIOSTREAM_OR_NOT
-
-// exodus uses one locale per thread
+// exodus uses one locale per thread defined in varbfuncs.cpp
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wexit-time-destructors"
 #pragma clang diagnostic ignored "-Wglobal-constructors"
-static thread_local std::locale thread_boost_locale1;
+extern thread_local std::locale thread_boost_locale1;
 #pragma clang diagnostic pop
 
 static void init_boost_locale1() {
@@ -132,14 +57,14 @@ static void init_boost_locale1() {
 }
 
 // Utility to check char ASCII (0-127)
-
+//
 // On x86, comparing a char for equality with an int is generally quicker than comparing it with another char.
-
+//
 // This is because on x86, int is the native word size, so operations on ints are usually faster than operations
 // on smaller types like char. When comparing a char with an int, the char is usually sign-extended to an int
 // (if it's a signed char) or zero-extended to an int (if it's an unsigned char),
 // and then the comparison is performed as an int comparison. This can be done with a single instruction.
-
+//
 static inline bool char_is_ASCII(char c1) {
 	// c++ char type signedness is implementation defined. typically unsigned on x86 and signed on arm except IOS
 	// Therefore must NOT do comparisons < unless we know the chars are ASCII 0-127, nor do arithmetic outside 0-127.
@@ -147,8 +72,8 @@ static inline bool char_is_ASCII(char c1) {
 	return (c1 & 0b1000'0000) == 0;
 }
 
-// Utility to check std::string for ASCII (0-127)
-
+// Utility to check SV for ASCII (0-127)
+//
 static inline bool sv_is_ASCII(std::string_view str1) {
 	// Optimise for ASCII
 	// try ASCII uppercase to start with for speed
@@ -163,7 +88,7 @@ static inline bool sv_is_ASCII(std::string_view str1) {
 }
 
 // Generic helper to handle char and u32_char wise conversion (mapping)
-
+//
 template<typename T1, typename T2, typename T3>
 static void string_converter(T1& var_str, const T2 fromchars, const T3 tochars) {
 	typename T1::size_type pos = T1::npos;
@@ -206,140 +131,15 @@ static void string_converter(T1& var_str, const T2 fromchars, const T3 tochars) 
 	return;
 }
 
-template<> PUBLIC bool VB1::assigned() const {
-	// THISIS("bool var::assigned() const")
-
-	// treat undefined as unassigned
-	// undefined is a state where we are USING the variable before its contructor has been
-	// called! which is possible (in syntax like var xx.osread()?) and also when passing default
-	// variables to functions in the callables on ISVAR(gcc)
-
-	if (var_typ & VARTYP_MASK)
-		return false;
-
-	return var_typ != VARTYP_UNA;
-}
-
-template<> PUBLIC bool VB1::unassigned() const {
-	// see explanation above in assigned
-	// THISIS("bool var::unassigned() const")
-	// assertVar(function_sig);
-
-	if (var_typ & VARTYP_MASK)
-		return true;
-
-	return !var_typ;
-}
-
-template<> PUBLIC std::u32string VB1::to_u32string() const {
-
-	 THISIS("std::u32string var::to_u32string() const")
-	 assertString(function_sig);
-
-	// 1.4 secs per 10,000,000 var=var copies of 3 byte ASCII strings
-	// simple var=var copy of the following data
-
-	// 14.9 secs round trips u8->u32->u8 per 10,000,000 on vm7
-	// SKIPS/TRIMS OUT any bad utf8
-	return boost::locale::conv::utf_to_utf<char32_t>(var_str);
-}
-
-template<> PUBLIC std::wstring VB1::to_wstring() const {
-
-	 THISIS("std::wstring var::to_wstring() const")
-	 assertString(function_sig);
-
-	// 1.4 secs per 10,000,000 var=var copies of 3 byte ASCII strings
-	// simple var=var copy of the following data
-
-	// 14.9 secs round trips u8->w->u8 per 10,000,000 on vm7
-	// SKIPS/TRIMS OUT any bad utf8
-	return boost::locale::conv::utf_to_utf<wchar_t>(var_str);
-}
-
-template<> PUBLIC void VB1::from_u32string(std::u32string u32str) const {
-	// for speed, dont validate
-	// THISIS("void var::from_u32tring() const")
-	// assertVar(function_sig);
-	var_typ = VARTYP_STR;
-
-	var_str = boost::locale::conv::utf_to_utf<char>(u32str);
-}
-
-// CONSTRUCTOR from const std::u32string converts to utf-8
-template<> PUBLIC VB1::var_base(const std::wstring& wstr1) {
-	var_typ = VARTYP_STR;
-	var_str = boost::locale::conv::utf_to_utf<char>(wstr1);
-}
-
-//int var::localeAwareCompare(const std::string& str1, const std::string& str2) {
-//template<> PUBLIC int VB1::localeAwareCompare(const std::string& str1, const std::string& str2) {
-template<> PUBLIC int VB1::localeAwareCompare(const std::string& str1, const std::string& str2) {
-///template<> PUBLIC int VB1::localeAwareCompare(const std::string_view str1, const std::string_view str2) {
-
-	// https://www.boost.org/doc/libs/1_70_0/libs/locale/doc/html/collation.html
-	// eg ensure lower case sorts before uppercase (despite "A" \x41 is less than "a" \x61)
-	init_boost_locale1();
-
-	// Level
-	// 0 = primary – ignore accents and character case, comparing base letters only. For example "facade"
-	// and "Façade" are the same.
-	// 1 = secondary – ignore character case but consider accents. "facade" and
-	// "façade" are different but "Façade" and "façade" are the same.
-	// 3 = tertiary – consider both case and
-	// accents: "Façade" and "façade" are different. Ignore punctuation.
-	// 4 = quaternary – consider all case,
-	// accents, and punctuation. The words must be identical in terms of Unicode representation.
-	// 5 = identical – as quaternary, but compare code points as well.
-	//#define COMP_LEVEL identical
-
-#define COMP_LEVEL identical
-
-//	boost::string_view str1b(str1.data(), str1.size());
-//	boost::string_view str2b(str2.data(), str2.size());
-
-	int result = std::use_facet<boost::locale::collator<char>>(thread_boost_locale1)
-#if BOOST_VERSION < 108300
-					.compare(boost::locale::collator_base::COMP_LEVEL, str1, str2);
-#else
-					.compare(boost::locale::collate_level::COMP_LEVEL, str1, str2);
-#endif
-
-	//var(str1).outputl("str1=");
-	//var(str2).outputl("str2=");
-	//var(result).outputl("comp=");
-
-	return result;
-}
-
 var  var::version() {
-//	return var(GIT_BRANCH) ^ " " ^ var(GIT_COMMIT_TIMESTAMP) ^ " " ^ var(GIT_COMMIT_HASH);
-//	return var(__DATE__).iconv("D").oconv("D") ^ " " ^ var(__TIME__);
-
-//	var v =
-//        // Full version with local and remote info
-//            std::string(GIT_BRANCH " " GIT_LOCAL_COMMIT_TIMESTAMP " " GIT_LOCAL_COMMIT_HASH " (remote: "
-//                              GIT_REMOTE_COMMIT_TIMESTAMP " " GIT_REMOTE_COMMIT_HASH ")");
-//
-//        // GitHub commit URL (local)
-//        v^= "\n" ^ std::string(GIT_REPO_URL) + "/commit/" + GIT_LOCAL_COMMIT_HASH;
-//
-//        // Download URL (remote HEAD)
-//        v ^= "\n" ^ std::string(GIT_REPO_URL) + "/archive/" + GIT_REMOTE_COMMIT_HASH + ".tar.gz";
-
-//    TRACE(exo::var::version());      // "doc 2025-03-17 15:03:00 +0000 212b0daf8 (remote: ...)"
-//    TRACE(exo::var::github_url());   // "https://github.com/exodusdb/exodusdb/commit/212b0daf8"
-//    TRACE(exo::var::download_url()); // "https://github.com/exodusdb/exodusdb/archive/<remote_hash>.tar.gz"
-
-
-            std::ostringstream oss;
-            oss << "Local:  " << GIT_BRANCH << " " << GIT_LOCAL_COMMIT_TIMESTAMP << " " << GIT_LOCAL_COMMIT_HASH << "\n"
-                << "Remote: " << GIT_BRANCH << " " << GIT_REMOTE_COMMIT_TIMESTAMP << " " << GIT_REMOTE_COMMIT_HASH_SHORT;
+	std::ostringstream oss;
+	oss << "Local:  " << GIT_BRANCH << " " << GIT_LOCAL_COMMIT_TIMESTAMP << " " << GIT_LOCAL_COMMIT_HASH << "\n"
+	    << "Remote: " << GIT_BRANCH << " " << GIT_REMOTE_COMMIT_TIMESTAMP << " " << GIT_REMOTE_COMMIT_HASH_SHORT;
 	var v = oss.str();
 
 	v ^= "\n" ^ std::string(GIT_REPO_URL) + "/commit/" + GIT_LOCAL_COMMIT_HASH;
 
-    v^= "\n" ^ std::string(GIT_REPO_URL) + "/archive/" + GIT_REMOTE_COMMIT_HASH_SHORT + ".tar.gz";
+	v^= "\n" ^ std::string(GIT_REPO_URL) + "/archive/" + GIT_REMOTE_COMMIT_HASH_SHORT + ".tar.gz";
 
 	return v;
 
@@ -355,7 +155,7 @@ bool var::eof() const {
 // 3 usecs
 bool var::hasinput(const int milliseconds) const {
 
-	//declare in haskey.cpp
+	// Defined in haskey.cpp
 	bool haskey(int milliseconds);
 
 	return haskey(milliseconds);
@@ -372,7 +172,7 @@ bool var::input(in prompt /*=""*/) {
 	var_str.clear();
 	var_typ = VARTYP_STR;
 
-	// if stdin is not a terminal
+	// If stdin is not a terminal
 	if (not this->isterminal(0)) {
 		if (!std::cin.eof())
 			std::getline(std::cin, var_str);
@@ -408,8 +208,8 @@ bool var::input(in prompt /*=""*/) {
 	return !exit_key;
 }
 
-// for nchars, use int instead of var to trigger error at point of calling not here
-// not binary safe if nchars = 0 because we allow line editing assuming terminal console
+// For nchars, use int instead of var to trigger error at point of calling not here
+// Not binary safe if nchars = 0 because we allow line editing assuming terminal console
 out  var::inputn(const int nchars) {
 
 	THISIS("out  var::inputn(const int nchars")
@@ -575,78 +375,11 @@ out  var::keypressed(const bool wait /*=false*/) {
 	return *this;
 }
 
-
-template<> PUBLIC void VB1::defaulter(CBR defaultvalue) {
-
-	// see explanation above in assigned
-	// assertVar(function_sig);
-
-	THISIS("void var::defaulter(in defaultvalue)")
-	ISASSIGNED(defaultvalue)
-
-	//?allow undefined usage like var xyz=xyz.readnext();
-	// if (var_typ & VARTYP_MASK)
-
-	if (this->unassigned()) UNLIKELY{
-		*this = defaultvalue;
-	}
-	return;// *this;
-}
-
-template<> PUBLIC RETVAR VB1::or_default(CBR defaultvalue) const {
-
-	THISIS("var  var::or_default(in defaultvalue) const")
-	ISASSIGNED(defaultvalue)
-
-	if (this->unassigned()) {
-		return *static_cast<const exo::var*>(&defaultvalue);
-	} else {
-		return *static_cast<const exo::var*>(this);
-	}
-}
-
-template<> PUBLIC const char* VB1::c_str() const& {
-
-	THISIS("const char* var::c_str() const")
-	assertString(function_sig);
-
-	return var_str.c_str();
-}
-
-template<> PUBLIC char VB1::toChar() const {
-
-	THISIS("char var::toChar() const")
-	assertString(function_sig);
-
-	if (var_str.empty())
-		return '\0';
-
-	return var_str[0];
-}
-
-// temporary var can return move its string into the output
-template<> PUBLIC std::string VB1::toString() && {
-
-	THISIS("str  var::toString() &&")
-	assertString(function_sig);
-
-	return std::move(var_str);
-}
-
-// non-temporary var can return a const ref to its string
-template<> PUBLIC const std::string& VB1::toString() const& {
-
-	THISIS("str  var::toString() const&")
-	assertString(function_sig);
-
-	return var_str;
-}
-
 //////
 // LEN
 //////
 
-// synonym for length for compatibility with pick's len() which is bytes
+// Synonym for length for compatibility with pick's len() which is bytes
 var  var::len() const {
 
 	THISIS("var  var::len() const")
@@ -659,13 +392,17 @@ var  var::len() const {
 // EMPTY
 ////////
 
-bool  var::empty() const {
+bool var::empty() const {
 
 	THISIS("bool var::empty() const")
 	assertString(function_sig);
 
 	return var_str.empty();
 }
+
+/////////////
+// TEXT WIDTH
+/////////////
 
 // Implementation of os wcswidth for terminal output of wide characters
 // https://mitchellh.com/writing/grapheme-clusters-in-terminals
@@ -688,7 +425,7 @@ var  var::textwidth() const {
 	}
 	return size;
 
-    //int wcswidth(const wchar_t *s, std::size_t n);
+//int wcswidth(const wchar_t *s, std::size_t n);
 unicode:
 	auto wstr1 = this->to_wstring();
 	auto width = wcswidth(wstr1.data(),std::string::npos);
@@ -722,13 +459,9 @@ unicode:
 	return width;
 }
 
-//const char* var::data() const {
-//
-//	THISIS("const char* var::data() const")
-//	assertString(function_sig);
-//
-//	return var_str.data();
-//}
+//////////
+// TEXTLEN utf-8 code points
+//////////
 
 var  var::textlen() const {
 
@@ -745,7 +478,7 @@ var  var::textlen() const {
 }
 
 ///////////////////////////////////////////////////////////////////////
-// trim - remove leading, trailing and excess internal spaces/character
+// TRIM - remove leading, trailing and excess internal spaces/character
 ///////////////////////////////////////////////////////////////////////
 
 // trim
@@ -872,7 +605,9 @@ IO   var::inverter() REF {
 	return THIS;
 }
 
-// ucase() - upper case
+////////
+// UCASE - Upper case
+////////
 
 //// Const
 //var  var::ucase() const& {
@@ -1039,7 +774,9 @@ IO   var::ucaser() REF {
 	return THIS;
 }
 
-// lcase() - lower case
+////////
+// LCASE - Lower case
+////////
 
 // Mutate
 IO   var::lcaser() REF {
@@ -1077,7 +814,9 @@ IO   var::lcaser() REF {
 }
 
 
-// tcase() - title case
+////////
+// TCASE - Title Case
+////////
 
 // Mutate
 IO   var::tcaser() REF {
@@ -1101,8 +840,10 @@ IO   var::tcaser() REF {
 	return THIS;
 }
 
+////////
+// FCASE - Fold case
+////////
 
-// fcase()
 // fold case - standardise text for indexing/searching
 // https://www.w3.org/International/wiki/Case_folding
 // Note that accents are sometimes significant and sometime not. e.g. in French
@@ -1127,6 +868,10 @@ IO   var::fcaser() REF {
 
 	return THIS;
 }
+
+////////////
+// NORMALISE - Standardise chars
+////////////
 
 // *** USED TO NORMALISE ALL KEYS BEFORE READING OR WRITING ***
 // *** otherwise can have two record with similar keys á and á
@@ -1165,6 +910,10 @@ IO   var::normalizer() REF {
 	return THIS;
 }
 
+
+/////////
+// UNIQUE
+/////////
 
 // There is no memory or performance advantage for mutable call, only a consistent syntax for user
 
@@ -1214,6 +963,10 @@ var  var::unique() const& {
 	return result;
 }
 
+//////
+// ORD - Ordinal of 1st byte (0-255)
+//////
+
 // BINARY - 1st byte
 var  var::ord() const {
 
@@ -1230,7 +983,10 @@ var  var::ord() const {
 		return byteno + 256;
 }
 
-// UTF8 - 1st UTF code point
+//////////
+// TEXTORD - Ordinal of first UTF8 code point
+//////////
+
 var  var::textord() const {
 
 	THISIS("var  var::textord() const")
@@ -1246,13 +1002,20 @@ var  var::textord() const {
 	return uint32_t(str1[0]);
 }
 
+//////
+// CHR - One char/byte from ordinal (0-255)
+//////
+
 // only returns BINARY bytes 0-255 (128-255) cannot be stored in the database unless with other
 // bytes making up UTF8
 var  var::chr(const int charno) {
 	return static_cast<char>(charno % 256);
 }
 
-// Convert a single Unicode character to its Unicode name
+////////////////
+// CHAR_TO_WORDS - Official name of first UTF8 code point
+////////////////
+
 std::string char_to_words(UChar32 c) {
 	char name[256];
 	UErrorCode status = U_ZERO_ERROR;
@@ -1274,7 +1037,7 @@ std::string char_to_words(UChar32 c) {
 	return "";
 }
 
-// Convert a Unicode name back to its single character number
+// Utility to convert a Unicode name back to its single character number
 UChar32 words_to_char(const std::string& words) {
 	UErrorCode status = U_ZERO_ERROR;
 	UChar32 c = u_charFromName(U_UNICODE_CHAR_NAME, words.c_str(), &status);
@@ -1283,6 +1046,10 @@ UChar32 words_to_char(const std::string& words) {
 	}
 	return U_SENTINEL; // -1 if no match
 }
+
+//////////////
+// TEXTCHRNAME - Official name of Unicode code point number.
+//////////////
 
 var  var::textchrname(const int utf_codepoint) {
 	// doesnt use *this at all (do we need a version that does?)
@@ -1302,6 +1069,10 @@ var  var::textchrname(const int utf_codepoint) {
 	// Maximum Unicode code point: 1114111 (hex: U+10ffff)
 	// Max int (2147483647) is greater than max Unicode code point (1114111) by 2146369536.
 
+//////////
+// TEXTCHR - UTF8 char (1-4 bytes) from Unicode code point number.
+//////////
+
 // returns unicode 1-4 byte sequences (in utf8)
 // returns empty string for some invalid unicode points like 0xD800 to 0xDFFF which is reserved for
 // UTF16 0x110000 ... is invalid too
@@ -1319,11 +1090,11 @@ var  var::textchr(const int utf_codepoint) {
 }
 
 ////////
-// QUOTE - wrap with double quotes
+// QUOTE - Wrap in double quotes
 ////////
 
 // Const
-var var::quote() const& {
+var  var::quote() const& {
 
 	THISIS("var  var::quote() const&")
 	assertString(function_sig);
@@ -1350,7 +1121,7 @@ IO   var::quoter() REF {
 
 
 /////////
-// SQUOTE - wrap with single quotes
+// SQUOTE - Wrap in single quotes
 /////////
 
 // Const
@@ -1381,11 +1152,11 @@ IO   var::squoter() REF {
 
 
 //////////
-// UNQUOTE - remove outer double or single quotes
+// UNQUOTE - Remove outer pait of double OR single quotes
 //////////
 
 // Const
-var   var::unquote() const& {
+var  var::unquote() const& {
 
 	THISIS("var  var::unquote() const&")
 	assertString(function_sig);
@@ -1460,9 +1231,9 @@ IO   var::unquoter() REF {
 }
 
 
-////////
-// PASTE
-////////
+/////////
+// PASTER - Insert a substr after deleting 0-N chars.
+/////////
 
 // 1. paste replace
 
@@ -1531,7 +1302,10 @@ IO   var::paster(const int pos1, const int length, SV replacestr) REF {
 
 	return THIS;
 }
-//
+
+/////////
+// PASTER - Insert a substr at char position.
+/////////
 
 // 2. paste insert at
 
@@ -1572,7 +1346,7 @@ IO   var::paster(const int pos1, SV insertstr) REF {
 }
 
 /////////
-// PREFIX - insert at beginning
+// PREFIX - Insert a substr at beginning.
 /////////
 
 // Constant
@@ -1601,7 +1375,7 @@ IO   var::prefixer(SV prefixstr) REF {
 
 
 //////
-// POP -remove last byte of string
+// POP - Remove last the char/byte of string.
 //////
 
 // Mutate
@@ -1616,89 +1390,9 @@ IO   var::popper() REF {
 	return THIS;
 }
 
-
-template<> PUBLIC void VB1::move(VARBASEREF tovar) {
-
-	THISIS("void var::move(io tovar)")
-	assertAssigned(function_sig);
-	ISVAR(tovar)
-
-	// move the string
-	tovar.var_str = std::move(var_str);
-
-	// set source var to empty string
-	var_str.clear();
-	var_typ = VARTYP_STR;
-
-	// copy the rest over
-	tovar.var_typ = var_typ;
-	tovar.var_int = var_int;
-	tovar.var_dbl = var_dbl;
-
-//	return tovar;
-}
-
-// Const version needed in calculatex
-// Identical code except signature is not const
-template<> PUBLIC void VB1::swap(CBR var2) const {
-
-	THISIS("CVR  var::swap(in var2) const")
-
-	// Works on unassigned vars
-	assertVar(function_sig);
-	ISVAR(var2)
-
-	// copy var2 to temp
-	auto mvtypex = var2.var_typ;
-	auto mvintx = var2.var_int;
-	auto mvdblx = var2.var_dbl;
-
-	// swap strings
-	var_str.swap(var2.var_str);
-
-	// copy var1 to var2
-	var2.var_typ = var_typ;
-	var2.var_int = var_int;
-	var2.var_dbl = var_dbl;
-
-	// copy temp to var1
-	var_typ = mvtypex;
-	var_int = mvintx;
-	var_dbl = mvdblx;
-
-//	return *this;
-}
-
-// non-const version
-//template<> PUBLIC VBR1 VB1::swap(VARBASEREF var2) {
-template<> PUBLIC void VB1::swap(VARBASEREF var2) {
-
-	THISIS("io   var::swap(io var2)")
-
-	// Works on unassigned vars
-	assertVar(function_sig);
-	ISVAR(var2)
-
-	// copy var2 to temp
-	auto mvtypex = var2.var_typ;
-	auto mvintx = var2.var_int;
-	auto mvdblx = var2.var_dbl;
-
-	// swap strings
-	var_str.swap(var2.var_str);
-
-	// copy var1 to var2
-	var2.var_typ = var_typ;
-	var2.var_int = var_int;
-	var2.var_dbl = var_dbl;
-
-	// copy temp to var1
-	var_typ = mvtypex;
-	var_int = mvintx;
-	var_dbl = mvdblx;
-
-//	return *this;
-}
+//////
+// STR - Generate a repeated substr.
+//////
 
 var  var::str(const int num) const {
 
@@ -1722,6 +1416,10 @@ var  var::str(const int num) const {
 	return newstr;
 }
 
+////////
+// SPACE - Generate a string of N spaces.
+////////
+
 var  var::space(const int nspaces) {
 
 	THISIS("var  var::space() static")
@@ -1735,8 +1433,9 @@ var  var::space(const int nspaces) {
 	return nrvo;
 }
 
-
-//crop() - Remove superfluous FM, VM. e.g. VM before FM etc.
+//////
+//crop - Remove superfluous FM, VM. e.g. VM before FM etc.
+//////
 
 // Mutate
 IO   var::cropper() REF {
@@ -1792,8 +1491,9 @@ IO   var::cropper() REF {
 	return THIS;
 }
 
-
-// lower() drops FM to VM, VM to SM etc.
+////////
+// Lower - Changes FM to VM, VM to SM etc. STM is left unchanged.
+////////
 
 // Mutate
 IO   var::lowerer() REF {
@@ -1832,7 +1532,9 @@ IO   var::lowerer() REF {
 	return THIS;
 }
 
-// raise() lifts VM to FM, SM to VM etc.
+///////
+// RAISE - Change VM to FM, SM to VM etc. RM is left unchanged.
+////////
 
 // Mutate
 IO   var::raiser() REF {
@@ -1872,9 +1574,12 @@ IO   var::raiser() REF {
 	return THIS;
 }
 
+//////////
+// CONVERT - Replaces chars/bytes with other chars/bytes or deleted them.
+//////////
 
 // convert() - replaces one by one in string, a list of characters with another list of characters
-// if the target list is shorter than the source list of characters then characters are deleted
+// If the target list is shorter than the source list of characters then characters are deleted
 //var  var::convert(in fromchars, in tochars) const& {
 
 // Mutate
@@ -1924,7 +1629,9 @@ IO   var::textconverter(SV fromchars, SV tochars) REF {
 	return THIS;
 }
 
-// parse() - replaces seps with FMs except inside double and single quotes. Backslash escapes.
+////////
+// PARSE - Replaces seps with FMs except inside double and single quotes. Backslash escapes.
+////////
 
 // Mutate
 IO   var::parser(char sepchar) REF {
@@ -1985,9 +1692,10 @@ IO   var::parser(char sepchar) REF {
 	return THIS;
 }
 
-////////
-// FCOUNT
-////////
+/////////
+// FCOUNT - Field count. Empty string is zero.
+/////////
+
 // TODO make a char and char version for speed
 var  var::fcount(SV sepstr) const {
 
@@ -2004,7 +1712,7 @@ var  var::fcount(SV sepstr) const {
 	return this->count(sepstr) + 1;
 }
 ////////
-// COUNT
+// COUNT - Counts occurrences of a given char/byte/substr.
 ////////
 
 var  var::count(SV sepstr) const {
@@ -2032,15 +1740,9 @@ var  var::count(SV sepstr) const {
 }
 
 ////////
-// INDEX
+// INDEX - Returns the char/byte no (1 base position) of the first occurrence of a given substr starting from a given position. 0 If not found.
 ////////
 
-//// 1 based starting byte no of an occurrence or 0 if not present
-//var  var::index(SV substr) const {
-//	return this->index2(substr, 1);
-//}
-
-// 1 based starting byte no of first occurrence starting from byte no, or 0 if not present
 var  var::index(SV substr, const int startindex) const {
 
 	THISIS("var  var::index(SV substr, const int startindex) const")
@@ -2060,8 +1762,11 @@ var  var::index(SV substr, const int startindex) const {
 	return var(static_cast<int>(start_pos) + 1);
 }
 
+/////////
+// INDEXR - Like index() but starting from the last char/byte working backwards.
+/////////
+
 // reverse search
-// 1 based starting byte no of first occurrence starting from byte no, or 0 if not present
 var  var::indexr(SV substr, const int startindex) const {
 
 	THISIS("var  var::indexr(SV substr, const int startindex) const")
@@ -2101,7 +1806,10 @@ var  var::indexr(SV substr, const int startindex) const {
 	return var(static_cast<int>(start_pos) + 1);
 }
 
-// 1 based starting byte no of an occurrence or 0 if not present
+/////////
+// INDEXN // 1 based starting byte no of the Nth occurrence of a given char/byte/subst. 0 if not present.
+/////////
+
 var  var::indexn(SV substr, const int occurrenceno) const {
 
 	//THISIS("var  var::index(SV substr, const int occurrenceno) const")
@@ -2145,6 +1853,10 @@ var  var::indexn(SV substr, const int occurrenceno) const {
 	//return 0;
 }
 
+////////
+// XLATE - Lookup a db field given file name, key and field number.
+////////
+
 // fieldno can be "" to return the whole record (0 returns the key)
 // TODO provide a version with int fieldno to handle the most frequent case
 // although may also support dictid (of target file) instead of fieldno
@@ -2186,7 +1898,7 @@ var  var::xlate(in filename, in fieldno, const char* mode) const {
 		var key = this->f(1, vn);
 		var record;
 		if (!record.readc(file, key)) {
-			// if record doesnt exist then "", or original key if mode is "C"
+			// If record doesnt exist then "", or original key if mode is "C"
 
 			// no record and mode C returns the key
 			// gcc warning: comparison with string literal results in unspecified
@@ -2224,6 +1936,10 @@ var  var::xlate(in filename, in fieldno, const char* mode) const {
 	//response.convert(FM^VM,"^]").outputl("RESPONSE=");
 	return response;
 }
+
+////////////////
+// NUMBERINWORDS - Convert a number to it's long form in words.
+////////////////
 
 var  var::numberinwords(in langname_or_locale_id) {
 

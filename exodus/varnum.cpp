@@ -24,11 +24,11 @@ THE SOFTWARE.
 	but it doesnt prevent excessively long decimal ASCII input
 	and unconfirmed if it does supports round trip ascii->double->ascii
 	//from test_perf.cpp
-    var v("1234.5678");  //23ns
-    //v.isnum();         //+ 56ns ( 79ns using fastfloat)
-    //v.isnum();         //+184ns (207ns using ryu)
-    //v.isnum();         //+194ns (217ns using std::stod)
-    //v.isnum();         //+???ns (???ns using <charconv> from_chars)
+	var v("1234.5678");  //23ns
+	//v.isnum();         //+ 56ns ( 79ns using fastfloat)
+	//v.isnum();         //+184ns (207ns using ryu)
+	//v.isnum();         //+194ns (217ns using std::stod)
+	//v.isnum();         //+???ns (???ns using <charconv> from_chars)
 */
 
 #if EXO_MODULE
@@ -119,7 +119,7 @@ thread_local int TO_STRING_NDECS = EXO_MAX_PRECISION - 3; // i.e. 12 assuming va
 // Returns: New precision if successful or old precision if not.
 // The default precision is 4 which corresponds to 0.0001.
 // By default, printing a raw var double smaller than 0.0001 without using oconv() or round() renders "0".
-template<> PUBLIC int VB1::setprecision(int new_precision) /*const*/ {
+PUBLIC int VB1::setprecision(int new_precision) /*const*/ {
 //	this->assertInteger(__PRETTY_FUNCTION__);
 	// For double: -307 to +308 (binary -1021/+1024 due to 20 bit exponent)
 	if (new_precision >= std::numeric_limits<double>::min_exponent10 and new_precision <= std::numeric_limits<double>::max_exponent10) {
@@ -130,12 +130,12 @@ template<> PUBLIC int VB1::setprecision(int new_precision) /*const*/ {
 	return EXO_PRECISION;
 }
 
-template<> PUBLIC int VB1::getprecision() /*const*/ {
+PUBLIC int VB1::getprecision() /*const*/ {
 	return EXO_PRECISION;
 }
 
 // Used by:
-// var::round() using std::chars_format::fixed and default precision (ndecs)
+// VB1::round() using std::chars_format::fixed and default precision (ndecs)
 static std::string double_to_chars_to_string(double in_double, int in_decimals) {
 
 	// Local stack working space for to_chars
@@ -155,7 +155,7 @@ static std::string double_to_chars_to_string(double in_double, int in_decimals) 
 			"var::round: Cannot round " ^ var(std::to_string(in_double)).trimlast("0") ^
 			" to " ^ in_decimals ^ " ndecimals" ^
 			" using only " ^ MAX_CHARS ^ " characters." ^
-            " Error: " ^ e.message() ^
+			" Error: " ^ e.message() ^
 			" (" ^ e.value() ^ ")"
 		);
 	}
@@ -223,7 +223,7 @@ static std::string double_to_string(const double double1) {
 			"var::createString: Cannot convert:" ^ var(std::to_string(double1)).trimlast("0") ^
 			" to " ^ TO_STRING_NDECS ^ " ndecimals" ^
 			" using only " ^ MAX_CHARS ^ " characters." ^
-            " Error: " ^ e.message() ^
+			" Error: " ^ e.message() ^
 			" (" ^ e.value() ^ ")"
 		);
 	}
@@ -324,8 +324,8 @@ static std::string double_to_string(const double double1) {
 #ifdef ALWAYS_VIA_SCIENTIFIC
 	//use digits10 if using scientific because we automatically get one additional on the left
 	//ss.precision(15);
-    ss.precision(std::numeric_limits<double>::digits10);
-    //ss.precision(16);
+	ss.precision(std::numeric_limits<double>::digits10);
+	//ss.precision(16);
 	ss << std::scientific;
 #else
 	//use digits10 +1 if not using auto formatting (scientific for large/small numbers)
@@ -481,12 +481,12 @@ removetrailing:
 	return resultstr;
 }
 
-////////////////////
-// var::createstring
-////////////////////
+/////////////////////////
+// var_base::createstring
+/////////////////////////
 
 // mainly called in ISSTRING when not already a string
-template<> PUBLIC void VB1::createString() const {
+PUBLIC void VB1::createString() const {
 
 	// TODO ensure ISVAR is called everywhere in advance
 	// to avoid wasting time doing multiple calls to ISVAR
@@ -516,9 +516,9 @@ template<> PUBLIC void VB1::createString() const {
 	throw VarUnassigned("createString()");
 }
 
-/////////////
-// var::isnum
-/////////////
+//////////////////
+// var_base::isnum
+//////////////////
 
 // RULES need updating since we are now allowing E/e scientific notation
 //
@@ -540,13 +540,7 @@ template<> PUBLIC void VB1::createString() const {
 // 3. digits (0-9) must occur 1 or more times (but see rule 0.)
 // 4. all characters mean non-numeric
 
-// Explicit specialisation
-//template<>           PUBLIC bool var_base<var_mid<var>>::isnum(void) const;
-
-// Explicit instantiation
-//template             PUBLIC bool var_base<var_mid<var>>::isnum(void) const;
-
-template<> PUBLIC bool VB1::isnum(void) const {
+PUBLIC bool VB1::isnum(void) const {
 
 	// TODO make isnum private and ensure ISVAR is checked before all calls to isnum
 	// to save the probably double check here
@@ -664,7 +658,7 @@ template<> PUBLIC bool VB1::isnum(void) const {
 	return true;
 }
 
-template<> PUBLIC RETVAR VB1::num(void) const {
+PUBLIC RETVAR VB1::num(void) const {
 	RETVAR result;
 	if (this->isnum())
 		result = this->clone();
@@ -673,7 +667,7 @@ template<> PUBLIC RETVAR VB1::num(void) const {
 	return result;
 }
 
-template<> PUBLIC void VB1::assertNumeric(const char* message, const char* varname/* = ""*/) const {
+PUBLIC void VB1::assertNumeric(const char* message, const char* varname/* = ""*/) const {
 	if (!this->isnum()) {
 		UNLIKELY
 		//throw VarNonNumeric(var_base(varname) ^ " in " ^ var_base(message) ^ " data: " ^ var_str.substr(0,127));
@@ -681,11 +675,11 @@ template<> PUBLIC void VB1::assertNumeric(const char* message, const char* varna
 	}
 }
 
-//////////////
-// var::toBool
-//////////////
+///////////////////
+// var_base::toBool
+///////////////////
 
-template<> PUBLIC bool VB1::toBool() const {
+PUBLIC bool VB1::toBool() const {
 
 	// could be skipped for speed assuming that people will not write unusual "var x=f(x)" type
 	// syntax as follows: var xx=xx?11:22;
@@ -727,47 +721,47 @@ template<> PUBLIC bool VB1::toBool() const {
 	}
 }
 
-/////////////
-// var::toInt
-/////////////
+//////////////////
+// var_base::toInt
+//////////////////
 
-template<> PUBLIC int VB1::toInt() const {
+PUBLIC int VB1::toInt() const {
 	this->assertInteger(__PRETTY_FUNCTION__);
 	return static_cast<int>(var_int);
 }
 
-///////////////
-// var::toInt64
-///////////////
+////////////////////
+// var_base::toInt64
+////////////////////
 
-template<> PUBLIC std::int64_t VB1::toInt64() const {
+PUBLIC std::int64_t VB1::toInt64() const {
 	this->assertInteger(__PRETTY_FUNCTION__);
 	return static_cast<std::int64_t>(var_int);
 }
 
-//////////////
-// var::toSize
-//////////////
+///////////////////
+// var_base::toSize
+///////////////////
 
-template<> PUBLIC std::size_t VB1::toSize() const {
+PUBLIC std::size_t VB1::toSize() const {
 	this->assertInteger(__PRETTY_FUNCTION__);
 	return static_cast<std::size_t>(var_int);
 }
 
-////////////////
-// var::toDouble
-////////////////
+/////////////////////
+// var_base::toDouble
+/////////////////////
 
-template<> PUBLIC double VB1::toDouble() const {
+PUBLIC double VB1::toDouble() const {
 	this->assertDecimal(__PRETTY_FUNCTION__);
 	return var_dbl;
 }
 
-/////////////
-// var::round
-/////////////
+//////////////////
+// var_base::round
+//////////////////
 
-var  var::round(const int ndecimals) const {
+RETVAR VB1::round(const int ndecimals) const {
 
 /*
 	"Round half away from zero" or "Commercial rounding"
@@ -822,7 +816,6 @@ var  var::round(const int ndecimals) const {
 	// if n=0 could save the integer conversion here but would require mentality to save BOTH
 	// int and double currently its possible since space is reserved for both but this may
 	// change
-
 
 	this->assertNumeric(__PRETTY_FUNCTION__);
 
@@ -922,249 +915,4 @@ var  var::round(const int ndecimals) const {
 	return result;
 }
 
-///////////////
-// var::integer
-///////////////
-
-// function name is "integer" instead of "int" because int is a reserved word in c/c++ for int datatype
-// using the system int() function on a var e.g. int(varx) returns an int whereas this function returns a var
-var  var::integer() const {
-
-    //-1.0 = -1
-
-    //-0.9 = 0
-    //-0.5 = 0
-    //-0.1 = 0
-
-    // 0   = 0
-
-    // 0.1 = 0
-    // 0.5 = 0
-    // 0.9 = 0
-
-    // 1.0 = 1
-
-	this->assertInteger(__PRETTY_FUNCTION__);
-	return var_int;
-}
-
-/////////////
-// var::floor
-/////////////
-
-var  var::floor() const {
-
-	// Goes to the closest integer towards negative infinity
-
-	//-1.9 - -2
-	//-1.5 = -2
-    //-1.0 = -1
-
-    //-0.9 = -1
-    //-0.5 = -1
-    //-0.1 = -1
-
-    // 0   = 0
-
-    // 0.1 = 0
-    // 0.5 = 0
-    // 0.9 = 0
-
-    // 1.0 = 1
-	// 1.5 = 1
-	// 1.9 = 1
-
-	this->assertNumeric(__PRETTY_FUNCTION__);
-
-	if (!(var_typ & VARTYP_INT)) {
-
-		//warning: conversion from ‘double’ to ‘long int’ may change value [-Wfloat-conversion]
-		var_int = static_cast<varint_t>(std::floor(var_dbl));
-		//var_int = std::floor<varint_t>(var_dbl);
-
-		// Add int flag
-		var_typ |= VARTYP_INT;
-	}
-
-	return var_int;
-}
-/*
-std::string var::oconv_MS(const char* conversion) const {
-
-	THISIS("str  var::oconv_MS(const char* conversion) const")
-
-	// http://www.d3ref.com/index.php?token=basic.masking.function
-
-	// 1. Analyse conversion
-
-	// Pointer arrives pointing to D or C after M
-	// get pointer to the third character (after the MD/MC bit)
-//	const char* pconversion = conversion0;
-	// First letter must be D or C
-//	pconversion++;
-
-	char thousandsep;
-	char decimalsep;
-	if (*conversion == 'D') LIKELY {
-		thousandsep = ',';
-		decimalsep = '.';
-	} else {
-		// TODO throw if not 'C'
-		thousandsep = '.';
-		decimalsep = ',';
-	}
-
-	// get the next character
-	conversion++;
-	char nextchar = *conversion;
-
-	// no conversion in the following cases
-	// 1. zero length string
-	// 2. non-numeric string
-	// 3. plain "MD" conversion without any trailing digits
-	//std::size_t convlen = strlen(conversion);
-	if (((var_typ & VARTYP_STR) && !var_str.size()) || !(this->isnum()) || !nextchar)
-		return *this;
-
-	// default conversion options
-	auto ndecimals = std::string::npos;
-	auto movedecs = std::string::npos;
-	bool dontmovepoint = false;
-	bool septhousands = false;
-	bool z_flag = false;
-	char trailer = '\0';
-	char prefixchar = '\0';
-
-	// following up to two digits are ndecimals, or ndecimals and movedecimals
-	// look for a digit
-	//TODO allow A-I to act like 10 to 19 digits
-	if (ASCII_isdigit(nextchar)) {
-
-		// first digit is either ndecimals or ndecimals and movedecimals
-		ndecimals = nextchar - '0';
-		movedecs = ndecimals;
-
-//		// are we done
-//		if (pos >= convlen)
-//			goto convert;
-
-		// look for a second digit
-		conversion++;
-		nextchar = *conversion;
-		if (ASCII_isdigit(nextchar)) {
-			// get movedecimals
-			movedecs = nextchar - '0';
-
-//			// are we done
-//			if (pos >= convlen)
-//				goto convert;
-
-			// move to the next character
-			conversion++;
-			nextchar = *conversion;
-		}
-	}
-
-	//1st digit = decimal places to display. Also decimal places to move if 2nd digit not present and no point in the data and no P flag present
-	//2nd digit = decimal places to move left
-
-	// P dont move point
-
-	//. or , mean separate thousands depending on MD or MC
-
-	// D C - < Negative handling
-
-	//Z Zero flag - output blank instead of zero
-
-	// X No conversion - return as is.
-
-	//If any trailer char
-	//1. > means wrap negative in <>
-	//2. - means suffix '-' if negative or ' ' if positive
-	//3. C means suffix CR if negative or DR if positive
-	//4. D means suffix DR if negative or CR if positive
-
-	while (nextchar) {
-
-		switch (nextchar) {
-			case 'P':
-				dontmovepoint = true;
-				break;
-
-			case '.':
-			case ',':
-				septhousands = true;
-				break;
-
-			case 'D':
-				trailer = 'D';
-				break;
-
-			case 'C':
-				trailer = 'C';
-				break;
-
-			case '-':
-				trailer = '-';
-				break;
-
-			case '<':
-				trailer = '<';
-				break;
-
-			case 'Z':
-				//Z means return empty string in the case of zero
-				z_flag = true;
-				// toBool is false for very small numbers that MD90 can still print as > 0
-//				if (!(this->toBool()))
-//					return "";
-				// Skip on absolute zero. Skip after rounding is also checked.
-				if ((var_typ & VARTYP_INT && ! var_int) || (var_typ & VARTYP_DBL && ! var_dbl))
-					return "";
-				break;
-
-			case 'X':
-				//do no conversion
-				return *this;
-				//std::unreachable();
-				break;
-			default:
-				if (prefixchar == '\0') {
-					//MD140P conversion ie 0 for prefix, is invalid conversion
-					if (nextchar == '0')
-						return *this;
-					prefixchar = nextchar;
-				}
-				break;
-		}
-		conversion++;
-		nextchar = *conversion;
-	}
-
-	// 2. Create output
-
-	// ndecimals is required for any conversion
-	if (ndecimals == std::string::npos)
-		return *this;
-
-	var newmv = (*this);
-
-	// move decimals
-	if (!dontmovepoint && movedecs != std::string::npos)
-		newmv = newmv / std::pow(10.0, movedecs);
-
-	// rounding
-	//if (ndecimals != std::string::npos) {
-	newmv = newmv.round(static_cast<int>(ndecimals));
-	if (!(newmv.var_typ & VARTYP_STR))
-		newmv.createString();
-	//}
-
-	// Option to suppress zeros - if no digits 1-9 (after rounding)
-//	if (z_flag and newmv.var_str.find_first_of("123456789") == std::string::npos) {
-	if (z_flag and not has_digit_1_to_9(newmv.var_str)) {
-		newmv.var_str.clear();
-		return newmv;
-	}
-*/
 } // namespace exo

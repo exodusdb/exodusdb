@@ -452,6 +452,7 @@ export namespace exo {
 
 }
 export namespace fmt {
+	using fmt::formatter;
 	using fmt::format;
 	using fmt::print;
 //	using fmt::println;

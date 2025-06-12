@@ -101,14 +101,12 @@ namespace exo {
 // Forward declarations
 
 class var;
-template<typename var> class var_mid; // forward declaration of a class template
+class var_mid; // forward declaration of a class template
 
-#define VB1         var_base<var_mid<exo::var>>
-//#define VBV       var_base<var_mid<exo::var>>
-#define VBR1        var_base<var_mid<var>>&
-//#define CBR const var_base<var_mid<exo::var>>&
-#define CBR1  const var_base<var_mid<exo::var>>&
-#define TBR1        var_base<var_mid<exo::var>>&&
+#define VB1         var_base
+#define VBR1        var_base&
+#define CBR1  const var_base&
+#define TBR1        var_base&&
 
 #define VBR         var_base&
 #define VARBASEREF  var_base&
@@ -167,7 +165,6 @@ inline const long double VAR_LOW_DOUBLE = static_cast<long double>(-1.7976931348
 // var_base function arguments are always var_base  where possible since var IS A var_base so readily convertible
 // but always return a var where possible so that var member functionality is readily available to function results
 
-template<typename var>
 class PUBLIC var_base {
 
 	/////////////////////////
@@ -203,8 +200,8 @@ class PUBLIC var_base {
 
  public:
 
-	//friend class var; // Does this actually do anything useful? var already inherits access to all var_base protected members
-	friend class var_mid<var>; // Does this actually do anything useful? var already inherits access to all var_base protected members
+	// Define all ctor/assign/conversions inline to ensure optimisation can remove redundant assembler.
+	// This is important for value types like var_base.
 
 	/////////////////////////
 	// 1. Default constructor
@@ -1067,6 +1064,18 @@ class PUBLIC var_base {
 //		return;
 //	}
 
+	CONSTEXPR void operator=(const std::string& rhs) & {
+		var_str = rhs;
+		var_typ = VARTYP_STR;
+		EXO_SNITCH("var_base =st&")
+	}
+
+	CONSTEXPR void operator=(std::string_view rhs) & {
+		var_str = std::string(rhs);
+		var_typ = VARTYP_STR;
+		EXO_SNITCH("var_base =sv ")
+	}
+
 	// var_base = std::string&& - lvalue/rvalue perfect forwarding
 	//////////////////////////////////////////////////////////////
 
@@ -1087,7 +1096,7 @@ class PUBLIC var_base {
 		// reset to one unique type
 		var_typ = VARTYP_STR;
 
-		EXO_SNITCH("var_base =str")
+		EXO_SNITCH("var_base =s&&")
 		return;
 	}
 
@@ -1479,6 +1488,8 @@ class PUBLIC var_base {
 	ND static int  getprecision();
 	   static int  setprecision(int);
 
+    ND RETVAR round(const int ndecimals = 0) const;
+
 	////////////////////
 	/// Stop documenting
 	/// :
@@ -1535,7 +1546,7 @@ protected:
 		assertVar(message, varname);
 		if (!var_typ)
 			[[unlikely]]
-			throw VarUnassigned(var_base(varname) ^ " in " ^ message);
+			throw VarUnassigned(std::string(varname) + " in " + message);
 	}
 
 	// assertNumeric
@@ -1592,7 +1603,7 @@ protected:
 		if (!(var_typ & VARTYP_STR)) {
 			if (!var_typ)
 				[[unlikely]]
-				throw VarUnassigned(var_base(varname) ^ " in " ^ message);
+				throw VarUnassigned(std::string(varname) + " in " + message);
 			this->createString();
 		}
 	}
@@ -1621,25 +1632,6 @@ protected:
 #undef PUBLIC
 #define PUBLIC __attribute__((visibility("default")))
 ////#include "varb_friends_impl.h"
-
-////////////////////////////////
-// var_base forward declarations
-////////////////////////////////
-
-// Forward declaration of some member functions to avoid errors like
-// error: explicit specialization of 'toBool' after instantiation
-
-template<> ND PUBLIC bool         VB1::toBool() const;
-template<> ND PUBLIC int          VB1::toInt() const;
-template<> ND PUBLIC std::int64_t VB1::toInt64() const;
-template<> ND PUBLIC std::size_t  VB1::toSize() const;
-template<> ND PUBLIC double       VB1::toDouble() const;
-template<> ND PUBLIC std::string  VB1::toString() &&; // only from rvalues
-
-template<> ND PUBLIC RETVAR VB1::clone() const;
-template<>    PUBLIC void   VB1::createString() const;
-template<>    PUBLIC void   VB1::assertNumeric(const char* message, const char* varname/* = ""*/) const;
-template<>    PUBLIC void   VB1::assertInteger(const char* message, const char* varname/* = ""*/) const;
 
 } // namespace exo
 

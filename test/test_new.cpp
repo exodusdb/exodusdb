@@ -16,6 +16,7 @@ func main() {
 			var c = "c";
 			// Super easy FM Only method to package at the moment
 			package = {a, b, c};
+			assert(package eq "a^b^c"_var);
 		}
 		{
 			// Can unpack using any delimiter even multichar delimiters e.g. ||
@@ -44,7 +45,7 @@ func main() {
 
 		var v1 = {1,2,3};
 		logputl(v1);
-		assert(v1 = "1^2^3"_var);
+		assert(v1 == "1^2^3"_var);
 		{
 			printl("Unpack 1");
 			auto [a] = unpack<1>(v1);
@@ -155,7 +156,7 @@ func main() {
 
 		// Verify that job replies correctly.
 		j1.output_queue->wait_and_pop(DATA);
-		assert(DATA = 123);
+		assert(DATA == 123);
 
 		// Request echo to close with a "" input.
 		j1.input_queue->push("");

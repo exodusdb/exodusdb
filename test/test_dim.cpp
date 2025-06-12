@@ -116,9 +116,9 @@ func main() {
 		try{d4 = "x";assert(false);} catch (DimUndimensioned e) {};
 
 		assert(join(d1) == "");
-		try{join(d2) = "x";assert(false);} catch (DimUndimensioned e) {};
-		try{join(d3) = "x";assert(false);} catch (DimUndimensioned e) {};
-		try{join(d4) = "x";assert(false);} catch (DimUndimensioned e) {};
+		try{join(d2).outputl();assert(false);} catch (DimUndimensioned e) {};
+		try{join(d3).outputl();assert(false);} catch (DimUndimensioned e) {};
+		try{join(d4).outputl();assert(false);} catch (DimUndimensioned e) {};
 	}
 	{
 		//dim_iter
@@ -350,24 +350,30 @@ func main() {
 		assert(d1.join() eq v2);
 
 		// remove_if
+		// DOESNT actually remove. Moves to the end
 		d1 = "10^2^1^20"_var.split();
-		[[maybe_unused]] auto dummy1 = std::remove_if(d1.begin(), d1.end(), [](var x){return x eq "2";});
-		// TODO add erase to exo::dim?
-//		d1.erase(std::remove_if(d1.begin(), d1.end(), [](var x){return x eq "2";}), d1.end());
+		auto first_removed1 = std::remove_if(d1.begin(), d1.end(), [](var x){return x eq "2";});
 		TRACE(d1.join("^"))
+//		assert(*first_removed1 eq 20);
+//		assert(d1.join() eq "10^1^20^20"_var);
+		assert(*first_removed1 eq "");
 		assert(d1.join() eq "10^1^20^"_var);
+//		std::vector(d1).erase(first_removed1, d1.end());
+//		assert(d1.join() eq "10^1^20"_var);
 
-		// remove_if
+		// erase_if
 		d1 = v1.split();
-		[[maybe_unused]] auto dummy2 = std::remove_if(d1.begin(), d1.end(), [](var x){return x eq "2";});
-		// TODO add erase to exo::dim?
-//		d1.erase(std::remove_if(d1.begin(), d1.end(), [](var x){return x eq "2";}), d1.end());
-		assert(d1.join() eq "10^1^20^"_var);
+		[[maybe_unused]] auto dummy2 = std::erase_if(d1, [](var x){return x eq "2";});
+		assert(d1.join() eq "10^1^20"_var);
 
-		// unique?
-		d1 = "b^a^a^b^c"_var.split();
-		[[maybe_unused]] auto dummy3 = std::unique(d1.begin(), d1.end());
-		assert(d1.join().outputl() eq "b^a^b^c^"_var);
+		// unique
+		// DOESNT actually remove. Shuffles towards the first.
+		d1 = "b^a^a^b^d"_var.split();
+		auto first_removable = std::unique(d1.begin(), d1.end());
+//		assert(*first_removable eq "d");
+//		assert(d1.join().outputl() eq "b^a^b^d^d"_var);
+		assert(*first_removable eq "");
+		assert(d1.join().errputl() eq "b^a^b^d^"_var);
 
 		// std::find
 		d1 = "b^a^a^b^c"_var.split();

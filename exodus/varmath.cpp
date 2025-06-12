@@ -43,127 +43,6 @@ namespace exo {
 
 // Some template instatiations are at the end of this file
 
-//C/C++                Int  Float	Definition
-//
-//%, div               Yes  No   Truncated[c]
-//
-//fmod (C)
-//std::fmod (C++)      No   Yes  Truncated[11]
-//
-//remainder (C)
-//std::remainder (C++) No   Yes  Rounded
-
-//PICKOS modulo limits the value instead of doing a kind of remainder as per c++ % operator
-// [0 , limit) if limit is positive
-// (limit, 0] if limit is negative
-// unlike c++ which is acts more like a divisor/remainder function
-// Note that PICKOS definition is symmetrical about 0 the limit of 0
-//i.e. mod(x,y) == -(mod(-x,-y))
-static double exodusmodulo_dbl(const double dividend, const double limit) {
-
-	if (!limit)
-		UNLIKELY
-		throw VarDivideByZero("mod('" ^ var(dividend) ^ "', '" ^ var(limit) ^ ")");
-
-	double result;
-	if (limit > 0) {
-		LIKELY
-		result = std::fmod(dividend, limit);
-		if (result < 0)
-			UNLIKELY
-			result += limit;
-	} else {
-		result = -std::fmod(-dividend, -limit);
-		if (result > 0)
-			result += limit;
-	}
-	return result;
-}
-
-static varint_t exodusmodulo_int(const varint_t dividend, const varint_t limit) {
-
-	if (!limit)
-		UNLIKELY
-		throw VarDivideByZero("mod('" ^ var(dividend) ^ "', '" ^ var(limit) ^ ")");
-
-	varint_t result;
-	if (limit > 0) {
-		LIKELY
-		result = dividend % limit;
-		if (result < 0)
-			UNLIKELY
-			result += limit;
-	} else {
-		result = -(-dividend % -limit);
-		if (result > 0)
-			result += limit;
-	}
-	return result;
-}
-
-template<> PUBLIC RETVAR VB1::mod(CBR limit) const {
-
-	THISIS("var  var::mod(in limit) const")
-	assertNumeric(function_sig);
-	ISNUMERIC(limit)
-
-	// prefer double dividend
-	if (this->var_typ & VARTYP_DBL) {
-
-		// use limit's double if available otherwise create it from limit's int/long
-		if (!(limit.var_typ & VARTYP_DBL)) {
-			limit.var_dbl = static_cast<double>(limit.var_int);
-			// Dont register that the limit has a double
-			//limit.var_typ = limit.var_typ & VARTYP_DBL;
-		}
-
-mod_doubles:
-		return exodusmodulo_dbl(var_dbl, limit.var_dbl);
-	}
-
-	// if limit has a double then prefer it and convert this to double
-	if (limit.var_typ & VARTYP_DBL) {
-		var_dbl = static_cast<double>(this->var_int);
-		// Dont register that this has a double
-		//var_typ = var_typ & VARTYP_DBL;
-		goto mod_doubles;
-	}
-
-	//otherwise both ints/longs
-	return exodusmodulo_int(this->var_int, limit.var_int);
-}
-
-
-template<> PUBLIC RETVAR VB1::mod(double limit) const {
-
-	THISIS("var  var::mod(double limit) const")
-	assertNumeric(function_sig);
-
-	// ensure double dividend
-	if (not (this->var_typ & VARTYP_DBL)) {
-		this->var_dbl = static_cast<double>(this->var_int);
-		// Dont register that this has a double
-		//this->var_typ = this->var_typ & VARTYP_DBL;
-	}
-
-	return exodusmodulo_dbl(this->var_dbl, limit);
-}
-
-
-template<> PUBLIC RETVAR VB1::mod(const int limit) const {
-
-	THISIS("var  var::mod(const int limit) const")
-	assertNumeric(function_sig);
-
-	// prefer double dividend
-	if (this->var_typ & VARTYP_DBL) {
-		return exodusmodulo_dbl(this->var_dbl, static_cast<double>(limit));
-	}
-
-	// otherwise both ints
-	return exodusmodulo_int(var_int, limit);
-}
-
 /*
 	let sqrt() const;
 	let loge() const;
@@ -289,6 +168,73 @@ var  var::exp() const {
 		return std::exp(var_dbl);
 	else
 		return std::exp(static_cast<double>(var_int));
+}
+
+///////////////
+// var::integer
+///////////////
+
+// function name is "integer" instead of "int" because int is a reserved word in c/c++ for int datatype
+// using the system int() function on a var e.g. int(varx) returns an int whereas this function returns a var
+var  var::integer() const {
+
+	//-1.0 = -1
+
+	//-0.9 = 0
+	//-0.5 = 0
+	//-0.1 = 0
+
+	// 0   = 0
+
+	// 0.1 = 0
+	// 0.5 = 0
+	// 0.9 = 0
+
+	// 1.0 = 1
+
+	this->assertInteger(__PRETTY_FUNCTION__);
+	return var_int;
+}
+
+//////////////////
+// var_base::floor
+//////////////////
+
+var var::floor() const {
+
+	// Goes to the closest integer towards negative infinity
+
+	//-1.9 - -2
+	//-1.5 = -2
+	//-1.0 = -1
+
+	//-0.9 = -1
+	//-0.5 = -1
+	//-0.1 = -1
+
+	// 0   = 0
+
+	// 0.1 = 0
+	// 0.5 = 0
+	// 0.9 = 0
+
+	// 1.0 = 1
+	// 1.5 = 1
+	// 1.9 = 1
+
+	this->assertNumeric(__PRETTY_FUNCTION__);
+
+	if (!(var_typ & VARTYP_INT)) {
+
+		//warning: conversion from ‘double’ to ‘long int’ may change value [-Wfloat-conversion]
+		var_int = static_cast<varint_t>(std::floor(var_dbl));
+		//var_int = std::floor<varint_t>(var_dbl);
+
+		// Add int flag
+		var_typ |= VARTYP_INT;
+	}
+
+	return var_int;
 }
 
 } // namespace exo

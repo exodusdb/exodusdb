@@ -34,6 +34,8 @@ THE SOFTWARE.
 //#include <stdexcept> // for std::invalid_argument
 #endif
 
+using uint64_t = std::uint64_t;
+
 #include "ASCIIutil.h" // for ASCII_isdigit ASCII_isalpha ASCII_toupper
 
 #include <exodus/var.h>

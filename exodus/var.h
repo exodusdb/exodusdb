@@ -56,37 +56,15 @@ namespace exo {
 //                                               VAR_MID
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-template <typename var>
-class var_mid : public var_base<var_mid<var>> {
-
-public:
-
-	//friend class var;// Does this achieve anything?
-
-	// Inherit constructors
-	using var_base<var_mid<var>>::var_base;
-
-	// var_base::clone and move, like most var_base functions return a var
-	// since a var is usable as a var_base but not vice versa.
-
-}; // class var_mid
-
 // Forward declarations
 //
-class var;
-class rex;
-class dim;
-class var_iter;
-class var_proxy1;
-class var_proxy2;
-class var_proxy3;
-
-// Note:
-// Inside class var_base
-// using VAR    =       var_base;
-// using VARREF =       var_base&;
-// using CVR    = const var_base&;
-// using TVR    =       var_base&&;
+	class var;
+	class rex;
+	class dim;
+	class var_iter;
+	class var_proxy1;
+	class var_proxy2;
+	class var_proxy3;
 
 	using VAR    =       var;
 	using VARREF =       var&;
@@ -97,9 +75,43 @@ class var_proxy3;
 	using out    =       var&;
 	using io     =       var&;
 
+class var_mid : public var_base {
+
+public:
+
+	// Inherit constructors
+	using var_base::var_base;
+
+	// Copy ctor
+    var_mid(const var_mid& other) = default;
+
+	// Move ctor
+    var_mid(var_mid&& other) noexcept = default;
+
+	// ASSIGNMENT
+
+	// Inherit assignment operators
+	using var_base::operator=;
+
+	// Return void to prevent accidental use in conditionals (e.g., if (v = "x"))
+	// and to discourage assignment chaining, enhancing code clarity.
+
+	// Copy assignment
+	void /*var_mid&*/ operator=(const var_mid& other) {  // Suppress implicit operators
+		var_base::operator=(other);  // Delegate to base
+		return /* *this*/;
+	}
+
+	// Move assignment
+    void /*var_mid&*/ operator=(var_mid&& other) & noexcept { var_base::operator=(std::move(other)); }
+
+	// var_base::clone and move, like most var_base functions return a var
+	// since a var is usable as a var_base but not vice versa.
+
+}; // class var_mid
+
 // class var
-// using CRTP to capture a customised base class that knows what a var is
-class PUBLIC var : public var_mid<var> {
+class PUBLIC var : public var_mid {
 
 	// Apparently the "using CVR - const var&;" declared in exo namespace scope
 	// isnt isnt exactly the same inside the actual var class definition
@@ -111,9 +123,40 @@ class PUBLIC var : public var_mid<var> {
 
 public:
 
-	// Inherit all constructors from var_base
-//	using var_base::var_base;
-	using var_mid<var>::var_mid;
+	// Define all ctor/assign/conversions inline to ensure optimisation can remove redundant assembler.
+	// This is important for value types like var.
+
+	// Inherit all constructors from var_base via var_mid
+	using var_mid::var_mid;
+
+	// Copy ctor
+	var(const var& other) = default;
+
+	// Move ctor
+	var(var&& other) noexcept = default;
+
+	// ASSIGNMENT
+
+	// Inherit all assignment operators to convert all types DIRECTLY
+	// otherwise we get nonsense like using our implicit copy/move ctors from var AFTER using var_base ctors from various types
+    using var_mid::operator=;
+
+	// Return void to prevent accidental use in conditionals (e.g., if (v = "x"))
+	// and to discourage assignment chaining, enhancing code clarity.
+
+	// Copy assignment
+	void /*var&*/ operator=(const var& other) {  // Suppress implicit operators
+		var_mid::operator=(other);  // Delegate to base
+		return /**this*/;
+	}
+
+	// Move assignment
+	void /*var&*/ operator=(var&& other) & noexcept { var_mid::operator=(std::move(other)); }
+
+	// Initializer list
+	void /*var&*/ operator=(std::initializer_list<var> list) & {
+		var_mid::operator=(var(list));  // Reuse constructor, assign via var_mid
+	}
 
 	// Tabular documentation is generated for comments starting /// or more and ending with a colon
 
@@ -402,7 +445,7 @@ public:
 
 		for (auto item : list) {
 			//(*this) ^= item;
-			var_str += std::string_view(var_base(item));
+			var_str += std::string_view(var(item));
 			var_str.push_back(FM_);
 		}
 		if (!var_str.empty())
@@ -525,7 +568,6 @@ public:
 	// `var v1 = "aa";
 	//  v1 ^= 22; // v1 -> "aa22"`
 	ND var operator^=(var);
-	*/
 
 	// Round a number.
 	// Convert a number into a string after rounding it to a given number of decimal places.
@@ -553,6 +595,7 @@ public:
 	//  let v3 = round(123456.789, -2); // "123500"`
 	//
     ND var  round(const int ndecimals = 0) const;
+	*/
 
 	// obj is var()
 
@@ -3837,8 +3880,8 @@ public:
 	ND var  mod(in modulus) const;
 
 	// Not documenting the overloaded versions
-	//ND var  mod(double modulus) const;
-	//ND var  mod(const int modulus) const;
+	// ND var  mod(double modulus) const;
+	// ND var  mod(const int modulus) const;
 
 	// Set floating point precision.
 	// This is the number of post-decimal point digits to consider for floating point comparison and implicit conversion to strings.

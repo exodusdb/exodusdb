@@ -294,6 +294,7 @@ execute_process(
 		varprocess.cpp
 		varchrono.cpp
 		varfuncs.cpp varioconv.cpp
+		varbfuncs.cpp
 		exoenv.cpp exofuncs.cpp
 
 		vardb_async.cpp

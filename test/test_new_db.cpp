@@ -136,32 +136,6 @@ func main() {
 
 	}
 
-	{
-		logputl("Test async Job and queuing");
-
-		// Start a job using libtestecho.so
-		Job j1("testecho");
-
-		// Message the job
-		j1.input_queue->push("123");
-
-		// Check that the job is not closed.
-		// It should timeout and return false
-		// since echo should still be running and waiting
-		if (j1.wait_for(100)) {
-			j1.get(); // Trigger any exception.
-			// Should not get here.
-			assert(false);
-		}
-
-		// Verify that job replies correctly.
-		j1.output_queue->wait_and_pop(DATA);
-		assert(DATA = 123);
-
-		// Request echo to close with a "" input.
-		j1.input_queue->push("");
-	}
-
 	printl(elapsedtimetext());
 	printl("Test passed.");
 

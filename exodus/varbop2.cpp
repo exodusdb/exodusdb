@@ -32,13 +32,67 @@ THE SOFTWARE.
 
 namespace exo {
 
+/////////////
+/// AT and []
+/////////////
+
+RETVAR VB1::at(const int charno) const {
+
+	THISIS("var  var::at(const int charno) const")
+	assertString(function_sig);
+
+	int nchars = static_cast<int>(var_str.size());
+
+	// beyond end of string return ""
+	// get this test out of the way first since it only has to be done later on anyway
+	if (charno > nchars)
+		return "";
+
+	// within string return the character
+	// handle positive indexing first for speed on the assumption
+	// that it is commoner than negative indexing
+	if (charno > 0)
+		return var_str[charno - 1];
+
+	// character 0 return the first character or "" if none
+	// have to get this special case out of the way first
+	// despite it being unusual
+	// since it only has to be done later anyway
+	if (charno == 0) {
+		if (nchars)
+			return var_str[0];
+		else
+			return "";
+	}
+
+	// have to check this later so check it now
+	if (!nchars)
+		return "";
+
+	// convert negative index to positive index
+	int charno2 = nchars + charno;
+
+	// if index is now 0 or positive then return the character
+	if (charno2 >= 0)
+		return var_str[charno2];	// no need for -1 here
+
+	// otherwise so negative as to point before beginning of string
+	// and rule is to return the first character in that case
+	return var_str[0];
+}
+
+// Deprecated
+RETVAR VB1::operator[](const int pos1) const {
+	return this->at(pos1);
+}
+
 ///////////////////
 // UNARY PLUS/MINUS
 ///////////////////
 
 // +var
 
-template<> PUBLIC RETVAR VB1::operator+() const {
+RETVAR VB1::operator+() const {
 
 	assertVar(__PRETTY_FUNCTION__);
 	assertNumeric(__PRETTY_FUNCTION__);
@@ -49,7 +103,7 @@ template<> PUBLIC RETVAR VB1::operator+() const {
 
 // -var
 
-template<> PUBLIC RETVAR VB1::operator-() const {
+RETVAR VB1::operator-() const {
 
 	assertVar(__PRETTY_FUNCTION__);
 
@@ -81,7 +135,7 @@ template<> PUBLIC RETVAR VB1::operator-() const {
 
 // ^= var
 
-template<> PUBLIC VBR1 VB1::operator^=(CBR rhs) & {
+VBR1 VB1::operator^=(CBR rhs) & {
 
 	assertString(__PRETTY_FUNCTION__);
 	rhs.assertString(__PRETTY_FUNCTION__);
@@ -101,7 +155,7 @@ template<> PUBLIC VBR1 VB1::operator^=(CBR rhs) & {
 	return *this;
 }
 
-template<> PUBLIC VBR1 VB1::operator^=(TBR rhs) & {
+VBR1 VB1::operator^=(TBR rhs) & {
 
 	assertString(__PRETTY_FUNCTION__);
 	rhs.assertString(__PRETTY_FUNCTION__);
@@ -122,7 +176,7 @@ template<> PUBLIC VBR1 VB1::operator^=(TBR rhs) & {
 
 // ^= int
 
-template<> PUBLIC VBR1 VB1::operator^=(const int int1) & {
+VBR1 VB1::operator^=(const int int1) & {
 
 	assertString(__PRETTY_FUNCTION__);
 
@@ -140,7 +194,7 @@ template<> PUBLIC VBR1 VB1::operator^=(const int int1) & {
 
 // ^= double
 
-template<> PUBLIC VBR1 VB1::operator^=(const double double1) & {
+VBR1 VB1::operator^=(const double double1) & {
 
 	assertString(__PRETTY_FUNCTION__);
 
@@ -158,7 +212,7 @@ template<> PUBLIC VBR1 VB1::operator^=(const double double1) & {
 
 // ^= char
 
-template<> PUBLIC VBR1 VB1::operator^=(const char char1) & {
+VBR1 VB1::operator^=(const char char1) & {
 
 	assertString(__PRETTY_FUNCTION__);
 
@@ -173,7 +227,7 @@ template<> PUBLIC VBR1 VB1::operator^=(const char char1) & {
 
 // ^= char*
 
-template<> PUBLIC VBR1 VB1::operator^=(const char* cstr) & {
+VBR1 VB1::operator^=(const char* cstr) & {
 
 	assertString(__PRETTY_FUNCTION__);
 
@@ -185,7 +239,7 @@ template<> PUBLIC VBR1 VB1::operator^=(const char* cstr) & {
 
 // ^= std::string
 
-template<> PUBLIC VBR1 VB1::operator^=(const std::string& string1) & {
+VBR1 VB1::operator^=(const std::string& string1) & {
 
 	assertString(__PRETTY_FUNCTION__);
 
@@ -202,7 +256,7 @@ template<> PUBLIC VBR1 VB1::operator^=(const std::string& string1) & {
 
 // ^= std::string_view
 
-template<> PUBLIC VBR1 VB1::operator^=(SV sv1) & {
+VBR1 VB1::operator^=(SV sv1) & {
 
 	assertString(__PRETTY_FUNCTION__);
 
@@ -226,7 +280,7 @@ template<> PUBLIC VBR1 VB1::operator^=(SV sv1) & {
 // *** YOU HAVE BEEN WARNED ***
 // Not returning void so is usable in expressions
 // The int argument indicates that this is POSTFIX override v++
-template<> PUBLIC RETVAR VB1::operator++(int) & {
+RETVAR VB1::operator++(int) & {
 
 	// Full check done below to avoid double checking number type
 	assertVar(__PRETTY_FUNCTION__);
@@ -269,7 +323,7 @@ tryagain:
 
 // Not returning void so is usable in expressions
 // The int argument indicates that this is POSTFIX override v--
-template<> PUBLIC RETVAR VB1::operator--(int) & {
+RETVAR VB1::operator--(int) & {
 
 	// Full check done below to avoid double checking number type
 	assertVar(__PRETTY_FUNCTION__);
@@ -315,7 +369,7 @@ tryagain:
 
 // Not returning void so is usable in expressions
 // No argument indicates that this is prefix override ++var
-template<> PUBLIC VBR1 VB1::operator++() & {
+VBR1 VB1::operator++() & {
 
 	// Full check done below to avoid double checking number type
 	assertVar(__PRETTY_FUNCTION__);
@@ -352,7 +406,7 @@ tryagain:
 
 // Not returning void so is usable in expressions
 // No argument indicates that this is prefix override --var
-template<> PUBLIC VBR1 VB1::operator--() & {
+VBR1 VB1::operator--() & {
 
 	// Full check done below to avoid double checking number type
 	assertVar(__PRETTY_FUNCTION__);
@@ -385,6 +439,126 @@ tryagain:
 
 	// OK to return *this in prefix --
 	return *this;
+}
+
+//C/C++                Int  Float	Definition
+//
+//%, div               Yes  No   Truncated[c]
+//
+//fmod (C)
+//std::fmod (C++)      No   Yes  Truncated[11]
+//
+//remainder (C)
+//std::remainder (C++) No   Yes  Rounded
+
+//PICKOS modulo limits the value instead of doing a kind of remainder as per c++ % operator
+// [0 , limit) if limit is positive
+// (limit, 0] if limit is negative
+// unlike c++ which is acts more like a divisor/remainder function
+// Note that PICKOS definition is symmetrical about 0 the limit of 0
+//i.e. mod(x,y) == -(mod(-x,-y))
+static double exodusmodulo_dbl(const double dividend, const double limit) {
+
+	if (!limit)
+		UNLIKELY
+		throw VarDivideByZero("mod('" ^ var(dividend) ^ "', '" ^ var(limit) ^ ")");
+
+	double result;
+	if (limit > 0) {
+		LIKELY
+		result = std::fmod(dividend, limit);
+		if (result < 0)
+			UNLIKELY
+			result += limit;
+	} else {
+		result = -std::fmod(-dividend, -limit);
+		if (result > 0)
+			result += limit;
+	}
+	return result;
+}
+
+static varint_t exodusmodulo_int(const varint_t dividend, const varint_t limit) {
+
+	if (!limit)
+		UNLIKELY
+		throw VarDivideByZero("mod('" ^ var(dividend) ^ "', '" ^ var(limit) ^ ")");
+
+	varint_t result;
+	if (limit > 0) {
+		LIKELY
+		result = dividend % limit;
+		if (result < 0)
+			UNLIKELY
+			result += limit;
+	} else {
+		result = -(-dividend % -limit);
+		if (result > 0)
+			result += limit;
+	}
+	return result;
+}
+
+RETVAR VB1::mod(CBR limit) const {
+
+	THISIS("var  var::mod(in limit) const")
+	assertNumeric(function_sig);
+	ISNUMERIC(limit)
+
+	// prefer double dividend
+	if (this->var_typ & VARTYP_DBL) {
+
+		// use limit's double if available otherwise create it from limit's int/long
+		if (!(limit.var_typ & VARTYP_DBL)) {
+			limit.var_dbl = static_cast<double>(limit.var_int);
+			// Dont register that the limit has a double
+			//limit.var_typ = limit.var_typ & VARTYP_DBL;
+		}
+
+mod_doubles:
+		return exodusmodulo_dbl(var_dbl, limit.var_dbl);
+	}
+
+	// if limit has a double then prefer it and convert this to double
+	if (limit.var_typ & VARTYP_DBL) {
+		var_dbl = static_cast<double>(this->var_int);
+		// Dont register that this has a double
+		//var_typ = var_typ & VARTYP_DBL;
+		goto mod_doubles;
+	}
+
+	//otherwise both ints/longs
+	return exodusmodulo_int(this->var_int, limit.var_int);
+}
+
+
+RETVAR VB1::mod(double limit) const {
+
+	THISIS("var  var::mod(double limit) const")
+	assertNumeric(function_sig);
+
+	// ensure double dividend
+	if (not (this->var_typ & VARTYP_DBL)) {
+		this->var_dbl = static_cast<double>(this->var_int);
+		// Dont register that this has a double
+		//this->var_typ = this->var_typ & VARTYP_DBL;
+	}
+
+	return exodusmodulo_dbl(this->var_dbl, limit);
+}
+
+RETVAR VB1::mod(const int limit) const {
+
+	THISIS("var  var::mod(const int limit) const")
+	assertNumeric(function_sig);
+
+	// prefer double dividend
+	if (this->var_typ & VARTYP_DBL) {
+		return exodusmodulo_dbl(this->var_dbl, static_cast<double>(limit));
+	}
+
+	// otherwise both ints
+	return exodusmodulo_int(var_int, limit);
 }
 
 } // namespace exo

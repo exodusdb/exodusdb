@@ -32,6 +32,8 @@ export namespace __gnu_cxx {
 
 export namespace std {
 
+	using std::count;
+
 	using std::raise;
 	using std::rethrow_exception;
 
@@ -360,6 +362,7 @@ export namespace std {
 	// from <cstdint>
 	using ::uint;
 	using ::uintptr_t;
+	using ::uint64_t;
 	using std::size_t;
 	using std::int8_t;
 	using std::int16_t;

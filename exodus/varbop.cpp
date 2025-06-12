@@ -58,7 +58,7 @@ namespace exo {
 // VAR += VAR
 /////////////
 
-template<> PUBLIC VBR1_OR_VOID VB1::operator+=(CBR rhs) & {
+VBR1_OR_VOID VB1::operator+=(CBR rhs) & {
 
 	rhs.assertNumeric(__PRETTY_FUNCTION__);
 
@@ -107,7 +107,7 @@ tryagain:
 // VAR -= VAR
 /////////////
 
-template<> PUBLIC VBR1_OR_VOID VB1::operator-=(CBR rhs) & {
+VBR1_OR_VOID VB1::operator-=(CBR rhs) & {
 
 	rhs.assertNumeric(__PRETTY_FUNCTION__);
 
@@ -156,7 +156,7 @@ tryagain:
 // VAR *= VAR
 /////////////
 
-template<> PUBLIC VBR1_OR_VOID VB1::operator*=(CBR rhs) & {
+VBR1_OR_VOID VB1::operator*=(CBR rhs) & {
 
 	rhs.assertNumeric(__PRETTY_FUNCTION__);
 
@@ -205,7 +205,7 @@ tryagain:
 // VAR /= VAR
 /////////////
 
-template<> PUBLIC VBR1_OR_VOID VB1::operator/=(CBR rhs) & {
+VBR1_OR_VOID VB1::operator/=(CBR rhs) & {
 
 	// Always returns a double because
 	// 10/3 must be 3.3333333
@@ -279,7 +279,7 @@ tryagain:
 // VAR %= VAR
 /////////////
 
-template<> PUBLIC VBR1_OR_VOID VB1::operator%=(CBR rhs) & {
+VBR1_OR_VOID VB1::operator%=(CBR rhs) & {
 	*this = this->mod(rhs);
 	return THIS_OR_NOTHING;
 }
@@ -291,7 +291,7 @@ template<> PUBLIC VBR1_OR_VOID VB1::operator%=(CBR rhs) & {
 // VAR += double
 ////////////////
 
-template<> PUBLIC VBR1_OR_VOID VB1::operator+=(const double dbl1) & {
+VBR1_OR_VOID VB1::operator+=(const double dbl1) & {
 
 tryagain:
 
@@ -323,7 +323,7 @@ tryagain:
 // VAR -= DOUBLE
 ////////////////
 
-template<> PUBLIC VBR1_OR_VOID VB1::operator-=(const double dbl1) & {
+VBR1_OR_VOID VB1::operator-=(const double dbl1) & {
 
 tryagain:
 
@@ -352,7 +352,7 @@ tryagain:
 // VAR *= DOUBLE
 ////////////////
 
-template<> PUBLIC VBR1_OR_VOID VB1::operator*=(const double dbl1) & {
+VBR1_OR_VOID VB1::operator*=(const double dbl1) & {
 
 tryagain:
 
@@ -381,7 +381,7 @@ tryagain:
 // VAR /= double
 ////////////////
 
-template<> PUBLIC VBR1_OR_VOID VB1::operator/=(const double dbl1) & {
+VBR1_OR_VOID VB1::operator/=(const double dbl1) & {
 
 	if (!dbl1)
 		UNLIKELY
@@ -415,7 +415,7 @@ tryagain:
 // VAR %= double
 ////////////////
 
-template<> PUBLIC VBR1_OR_VOID VB1::operator%=(const double rhs) & {
+VBR1_OR_VOID VB1::operator%=(const double rhs) & {
 	*this = this->mod(rhs);
 	return THIS_OR_NOTHING;
 }
@@ -427,7 +427,7 @@ template<> PUBLIC VBR1_OR_VOID VB1::operator%=(const double rhs) & {
 // VAR += int
 /////////////
 
-template<> PUBLIC VBR1_OR_VOID VB1::operator+=(const int int1) & {
+VBR1_OR_VOID VB1::operator+=(const int int1) & {
 
 tryagain:
 
@@ -462,7 +462,7 @@ tryagain:
 // VAR -= int
 /////////////
 
-template<> PUBLIC VBR1_OR_VOID VB1::operator-=(const int int1) & {
+VBR1_OR_VOID VB1::operator-=(const int int1) & {
 
 tryagain:
 
@@ -498,7 +498,7 @@ tryagain:
 // VAR *= int
 /////////////
 
-template<> PUBLIC VBR1_OR_VOID VB1::operator*=(const int int1) & {
+VBR1_OR_VOID VB1::operator*=(const int int1) & {
 
 tryagain:
 
@@ -533,7 +533,7 @@ tryagain:
 // VAR /= int
 /////////////
 
-template<> PUBLIC VBR1_OR_VOID VB1::operator/=(const int int1) & {
+VBR1_OR_VOID VB1::operator/=(const int int1) & {
 
 	// Always return double
 
@@ -570,7 +570,7 @@ tryagain:
 // VAR %= int
 /////////////
 
-template<> PUBLIC VBR1_OR_VOID VB1::operator%=(const int rhs) & {
+VBR1_OR_VOID VB1::operator%=(const int rhs) & {
 	*this = this->mod(rhs);
 	return THIS_OR_NOTHING;
 }
@@ -581,7 +581,7 @@ template<> PUBLIC VBR1_OR_VOID VB1::operator%=(const int rhs) & {
 
 // VAR += bool
 
-template<> PUBLIC VBR1_OR_VOID VB1::operator+=(const bool bool1) & {
+VBR1_OR_VOID VB1::operator+=(const bool bool1) & {
 	if (bool1)
 		(*this)++;
 	else
@@ -591,7 +591,7 @@ template<> PUBLIC VBR1_OR_VOID VB1::operator+=(const bool bool1) & {
 
 // VAR -= bool
 
-template<> PUBLIC VBR1_OR_VOID VB1::operator-=(const bool bool1) & {
+VBR1_OR_VOID VB1::operator-=(const bool bool1) & {
 	if (bool1)
 		(*this)--;
 	else
@@ -601,7 +601,7 @@ template<> PUBLIC VBR1_OR_VOID VB1::operator-=(const bool bool1) & {
 
 // VAR *= bool
 
-template<> PUBLIC VBR1_OR_VOID VB1::operator*=(const bool bool1) & {
+VBR1_OR_VOID VB1::operator*=(const bool bool1) & {
 	assertNumeric(__PRETTY_FUNCTION__);
 	if (!bool1) {
 		var_int = 0;

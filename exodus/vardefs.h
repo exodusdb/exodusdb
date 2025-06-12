@@ -27,10 +27,9 @@
 
 
 // 1. TO_CHARS from Ubuntu 22.04
-// Duplicated in varnum.cpp, testnum.cpp and test_precision.cpp. Keep in sync.
+// Used varnum.cpp, test_main3.cpp, test_precision2.cpp.
 #if __GNUC__ >= 11 || __clang_major__ >=  14
 #	define EXO_USE_TO_CHARS
-//#include <array>
 // 2. RYU
 #elif __has_include(<ryu/ryu.h>)
 #	define EXO_USE_RYU
