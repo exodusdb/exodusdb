@@ -450,6 +450,7 @@ ENVIRONMENT
 		basicoptions ^= " -fmodule-file=var=/usr/local/lib/var.pcm";
 		basicoptions ^= " -fmodule-file=std=/usr/local/lib/std.pcm";
 		basicoptions ^= " -fmodule-file=exoprog=/usr/local/lib/exoprog.pcm";
+//		basicoptions ^= " -fmodule-file=fmt=/usr/local/lib/fmt.pcm";
 #endif
 		if (color_option) {
 			basicoptions ^= " -fdiagnostics-color=";

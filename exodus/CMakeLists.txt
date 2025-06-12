@@ -23,6 +23,17 @@
 	endif()
 
 #
+# SNITCH OPTION -DEXO_SNITCH=ON/OFF or disabled by default
+# #############
+#
+	option(EXO_SNITCH "Build with SNITCH - var ctor tracing - VERY SLOW" OFF)
+	message("-- EXO_SNITCH is ${EXO_SNITCH}")
+
+	if (EXO_SNITCH)
+		add_compile_definitions(EXO_SNITCH=1)
+	endif()
+
+#
 # -DEXO_PREPARED=ON/OFF
 # #####################
 #
@@ -199,6 +210,23 @@ execute_process(
 	#	target_link_libraries(std allstd)
 	endif()
 
+##
+## module fmt
+## ##########
+##
+#	if (EXO_MODULE)
+#		add_library(fmt)
+#		target_sources(fmt
+#			PUBLIC
+#			FILE_SET modules_public
+#			TYPE CXX_MODULES
+#			FILES
+#				fmt.cppm
+#		)
+#		target_compile_options(std PRIVATE -Wno-include-angled-in-module-purview -Wno-reserved-module-identifier)
+#	#	target_link_libraries(std allstd)
+#	endif()
+
 #
 # module?
 # #######
@@ -219,6 +247,7 @@ execute_process(
 	#			dim.cppm
 		)
 		target_link_libraries(exovar std)
+#		target_link_libraries(exovar fmt)
 #		target_link_libraries(exovar ${FMT_LIBRARIES})
 		target_link_libraries(exovar fmt::fmt)
 	endif()
@@ -240,8 +269,9 @@ execute_process(
 				exoprog.cppm
 		)
 		target_link_libraries(exoprog std)
+#		target_link_libraries(exoprog fmt)
 		target_link_libraries(exoprog exovar)
-#		target_link_libraries(exovar fmt::fmt)
+		target_link_libraries(exovar fmt::fmt)
 	endif()
 #
 # libexodus source
@@ -355,7 +385,7 @@ execute_process(
 #	#
 #	# This is probably not needed here. Maybe required by cli compile.cpp linkoptions?
 #	target_link_libraries(exodus ${FMT_LIBRARIES})
-	target_link_libraries(exodus fmt::fmt)
+#	target_link_libraries(exodus fmt::fmt)
 
 
 #
@@ -410,7 +440,7 @@ execute_process(
 
 	if (EXO_MODULE)
 		install(
-			TARGETS std exovar exoprog
+			TARGETS std exovar exoprog # fmt
 			DESTINATION lib
 		)
 	endif()
