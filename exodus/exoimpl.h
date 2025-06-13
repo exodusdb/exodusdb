@@ -45,6 +45,7 @@ THE SOFTWARE.
 //#	include <exodus/dim.h>
 //#	include <exodus/rex.h>
 #endif
+
 #include "exodebug.h"
 
 #include <exodus/vardefs.h> // for PUBLIC
@@ -164,6 +165,8 @@ namespace exo {
 
 #if defined _MSC_VER || defined __CYGWIN__ || defined __MINGW32__
 
+	// Windows
+
 #	define                     _EOL        "\r\n"
 	PUBLIC inline const var     EOL      = _EOL;
 
@@ -175,6 +178,8 @@ namespace exo {
 #	define               OSSLASH_IS_BACKSLASH true
 
 #else
+
+	// Posix
 
 #	define              _EOL        "\n"
 	PUBLIC inline const var     EOL      = _EOL;

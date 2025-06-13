@@ -62,37 +62,40 @@ export namespace exo {
 //	using exo::var_proxy2;
 //	using exo::var_proxy3;
 
-//	using exo::BS;
-//	using exo::DQ;
-//	using exo::SQ;
-//	using exo::NL;
-//	using exo::EOL;
+	using exo::BS;
+	using exo::DQ;
+	using exo::SQ;
+	using exo::NL;
+	using exo::EOL;
 
-//	using exo::OSSLASH;
-//	using exo::PLATFORM;
-//	using exo::_OS_NAME;
-//	using exo::_OS_VERSION;
+	using exo::OSSLASH;
+	using exo::PLATFORM;
+	using exo::_OS_NAME;
+	using exo::_OS_VERSION;
+	using exo::_COMPILER;
 
-//	using exo::RM;
-//	using exo::FM;
-//	using exo::VM;
-//	using exo::SM;
-//	using exo::TM;
-//	using exo::STM;
+	using exo::RM;
+	using exo::FM;
+	using exo::VM;
+	using exo::SM;
+	using exo::TM;
+	using exo::STM;
+
+	using exo::Callable;
+	using exo::ExoProgram;
+	using exo::pExoProgram;
+	using exo::pExoProgram_MemberFunc;
 
 	using exo::ExoExit;
 	using exo::ExoAbort;
 	using exo::ExoAbortAll;
-//	using exo:: ExoLogoff;
 	using exo::ExoStop;
+
 	using exo::function;
 	using exo::subroutine;
 	using exo::func;
 	using exo::subr;
 
-	using exo::reset_range;
-	using exo::Callable;
-	using exo::ExoProgram;
 	using exo::Job;
 	using exo::Jobs;
 	using exo::ThreadPool;
@@ -124,6 +127,8 @@ export namespace exo {
 //	using exo::exo_savestack;
 
 	// This is mostly exporting the free functions defined in exofuncs.h
+
+	using exo::reset_range;
 
 	using exo::abs;
 

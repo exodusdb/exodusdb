@@ -55,6 +55,7 @@ THE SOFTWARE.
 //#include <exodus/program.h>
 //#include <exodus/library.h>
 //#include <exodus/common.h>
+#include <exodus/exoimpl.h>
 #include <exodus/exomacros.h>
 
 // It usually poor practice to "pollute" the global space of the header user

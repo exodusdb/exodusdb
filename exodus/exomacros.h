@@ -34,9 +34,8 @@ THE SOFTWARE.
 	import var;
 #else
 #	include <exodus/var.h>
+#	include <exodus/exocallable.h>
 #endif
-
-#include <exodus/exocallable.h>
 
 // Flag to force exodus/format.h to be included BEFORE other exodus headers and their intrusive macros (e.g. ev)
 #define EXODUS_MACROS
@@ -167,7 +166,10 @@ namespace exo {
 #define with ,
 #define to ,
 
+// Various
+// =======
 #define LISTACTIVE hasnext()
+#define CALLMEMBERFUNCTION(object, ptrToMember) ((object).*(ptrToMember))
 
 // Environment variables
 // =====================
