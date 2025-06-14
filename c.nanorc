@@ -158,7 +158,7 @@ color bold,pink "^[[:blank:]]*[A-Z_a-z][0-9A-Z_a-z]*:[[:blank:]]*$"
 color bold,pink ":[[:blank:]]*$"
 
 # Exodus Exits
-color bold,pink "\<(stop|abort|abortall|logoff)\>"
+color bold,pink "\<(stop|abort|abortall)\>"
 
 # EXOPROGRAM Not really exits but currently considered important to highlight
 color bold,pink "\<(perform|execute|chain|libinfo|run)\>"

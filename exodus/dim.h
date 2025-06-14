@@ -38,8 +38,8 @@ class PUBLIC dim final : public std::vector<var> {
 
 	// Inherit constructors.
 	// What exactly does this do since we also manually define various constructors.
-//	using base::vector;
-//	using base::operator=; // Overidden by many operator= below.
+	using base::vector;
+	using base::operator=; // Overidden by many operator= below.
 
 	///////////////////////////
 	// SPECIAL MEMBER FUNCTIONS
@@ -207,6 +207,8 @@ class PUBLIC dim final : public std::vector<var> {
 	// Other constructors
 	/////////////////////
 
+/* doc only. Actually using std::vectors version.
+
     // Constructor from initializer_list for (int, double, cstr etc.)
 	/////////////////////////////////////////////////////////////////
 	template<class T>
@@ -240,7 +242,7 @@ class PUBLIC dim final : public std::vector<var> {
 		}
 
 	}
-
+*/
 	///////////////////
 	// OTHER ASSIGNMENT
 	///////////////////
@@ -308,11 +310,11 @@ class PUBLIC dim final : public std::vector<var> {
 	//  d1[3] = "X";
 	//  let v1 = d1[3]; // "X"`
 	//
-	ND VARREF operator[](int rowno) {return getelementref(rowno, 1);}
+	ND VARREF operator[](int rowno) {return getelementref(rowno, 0);}
 
 	// Following const version is called if we do () on a dim which was defined as const xx
 	// Undocumented
-	ND CVR operator[](int rowno) const {return getelementref(rowno, 1);}
+	ND CVR operator[](int rowno) const {return getelementref(rowno, 0);}
 
 	// Provide 2d version of bracket operator if c++23+
 	// and deprecate the parenthesis operator
@@ -329,7 +331,11 @@ class PUBLIC dim final : public std::vector<var> {
 	//  d1[3, 4] = "X";
 	//  let v1 = d1[3, 4]; // "X"`
 	//
-	ND VARREF operator[](int rowno, int colno) {return getelementref(rowno, colno);}
+	ND VARREF operator[](int rowno, int colno) {
+		if (!colno)
+	        throw DimIndexOutOfBounds("colno:" ^ var(colno));
+		return getelementref(rowno, colno);
+	}
 
 	// Undocumented
 	ND CVR operator[](int rowno, int colno) const {return getelementref(rowno, colno);}
@@ -340,10 +346,10 @@ class PUBLIC dim final : public std::vector<var> {
 
 	DEPRECATED_PARENS
 	// Undocumented
-	ND VARREF operator()(int rowno) {return getelementref(rowno, 1);}
+	ND VARREF operator()(int rowno) {return getelementref(rowno, 0);}
 	DEPRECATED_PARENS
 	// Undocumented
-	ND CVR operator()(int rowno) const {return getelementref(rowno, 1);}
+	ND CVR operator()(int rowno) const {return getelementref(rowno, 0);}
 
 	// Parenthesis operators often come in pairs
 	// Returns a reference to one var of the array
@@ -559,6 +565,51 @@ class PUBLIC dim final : public std::vector<var> {
 	//  if (not osread(d1 from osfilename)) ...`
 	//
 	ND bool osread(in osfilename, const char* codepage = "");
+
+	/* doc only
+
+	///////////////////////
+	///// dim array OTHER :
+	///////////////////////
+
+	// All C++ vector functions and algorithms work on dim arrays.
+	// See https://en.cppreference.com/w/cpp/container/vector.html
+	//
+	// `dim d1;
+	//  d1.reserve(5);
+	//  d1.resize(3);
+	//  let v2 = d1.capacity(); //   5
+	//  let v3 = d1.size();     //   3
+	//  let v4 = d1.empty();    //   0
+	//  d1.shrink_to_fit();
+	//  let v5 = d1.capacity(); //   3
+	//
+	//  d1 = "x";
+	//  let v6 = d1.join();     //   "x^x^x"_var
+	//  d1.clear();
+	//
+	//  d1 = {1, 2, 3, 4};
+	//  let v7 = d1.join();     //   "1^2^3^4"_var
+	//  let v8 = d1.front();    //   1
+	//  let v9 = d1.back();     //   4
+	//
+	//  d1.push_back(5);
+	//  let v10 = d1[5];        //   5
+	//  d1.pop_back();
+	//
+	//  d1.insert(d1.begin() + 2, "a");
+	//  let v11 = d1.join();              //   "1^2^a^3^4"_var
+	//
+	//  d1.erase(d1.begin() + 2);
+	//  let v12 = d1.join();              //   "1^2^3^4"_var
+	//
+	//  std::erase_if(d1, [](var& v) {
+	//     return v % 2;
+	//  });
+	//  let v13 = d1.join();              // "2^4"_var`
+	//
+	void push_back(anything);
+	*/
 
  private:
 

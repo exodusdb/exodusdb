@@ -533,7 +533,7 @@ func main() {
 		}
 		try {
 			dim x;
-			var y	 = x.rows();
+			var y	 = x.join();
 			throw VarError("Uncaught error DimUndimensioned 5");
 		} catch (DimUndimensioned& e) {
 			printl(e.message);
