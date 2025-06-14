@@ -2322,6 +2322,36 @@ func main() {
 		if (not osread(d1 from osfilename)) abort("osread: " ^ lasterror());
 	}
 
+	printl("push_back(anything);");
+	{
+		dim d1;
+		d1.reserve(5);
+		d1.resize(3);
+		let v2 = d1.capacity(); assert(v2.errputl() == 5);
+		let v3 = d1.size(); assert(v3.errputl() == 3);
+		let v4 = d1.empty(); assert(v4.errputl() == 0);
+		d1.shrink_to_fit();
+		let v5 = d1.capacity(); assert(v5.errputl() == 3);
+		d1 = "x";
+		let v6 = d1.join(); assert(v6.errputl() == "x^x^x"_var);
+		d1.clear();
+		d1 = {1, 2, 3, 4};
+		let v7 = d1.join(); assert(v7.errputl() == "1^2^3^4"_var);
+		let v8 = d1.front(); assert(v8.errputl() == 1);
+		let v9 = d1.back(); assert(v9.errputl() == 4);
+		d1.push_back(5);
+		let v10 = d1[5]; assert(v10.errputl() == 5);
+		d1.pop_back();
+		d1.insert(d1.begin() + 2, "a");
+		let v11 = d1.join(); assert(v11.errputl() == "1^2^a^3^4"_var);
+		d1.erase(d1.begin() + 2);
+		let v12 = d1.join(); assert(v12.errputl() == "1^2^3^4"_var);
+		std::erase_if(d1, [](var& v) {
+		   return v % 2;
+		});
+		let v13 = d1.join(); assert(v13.errputl() == "2^4"_var);
+	}
+
 ////////////////
 // Code examples exoprog.h
 ////////////////

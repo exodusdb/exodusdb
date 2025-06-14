@@ -45,7 +45,8 @@ namespace exo {
 // Copy an array (cloning)
 dim::dim(const dim& rhs) : base(), ncols_(rhs.ncols_) {
 
-	if (!rhs.ncols_)
+//	if (!rhs.ncols_)
+	if (!rhs.size())
 		throw DimUndimensioned(__PRETTY_FUNCTION__);
 
 	reserve(rhs.size());
@@ -62,7 +63,8 @@ void dim::operator=(const dim& rhs) & {
 	if (this == &rhs)
 		return;
 
-	if (!rhs.ncols_)
+//	if (!rhs.ncols_)
+	if (!rhs.size())
 		throw DimUndimensioned(__PRETTY_FUNCTION__);
 
 	clear(); // Clear existing elements
@@ -107,10 +109,10 @@ var  dim::rows() const {
 
 	THISIS("var  dim::rows() const")
 
-	if (!this->ncols_) UNLIKELY
-		throw DimUndimensioned(function_sig);
+	var nrows = base::size();
 
-	let nrows = base::size() / ncols_;
+	if (ncols_)
+		nrows /= ncols_;
 
 	return nrows;
 }
@@ -119,9 +121,6 @@ var  dim::rows() const {
 var  dim::cols() const {
 
 	THISIS("var  dim::cols() const")
-
-//	if (!this->ncols_) UNLIKELY
-//		throw DimUndimensioned(function_sig);
 
 	return ncols_;
 }
@@ -158,57 +157,148 @@ VARREF dim::getelementref(int rowno, int colno) {
 	return const_cast<var&>(const_cast<const dim*>(this)->getelementref(rowno, colno));
 }
 
-// dim[] operator utility (const)
-CVR  dim::getelementref(int rowno1, int colno1) const {
 
-	THISIS("CVR  dim::getelementref(int rowno1, int colno1) const")
+CVR dim::getelementref(int rowno1, int colno1) const {
+	THISIS("CVR dim::getelementref(int rowno1, int colno1) const")
 
-	if (!ncols_) UNLIKELY
-		throw DimUndimensioned(function_sig);
+	// rowno1 and colno1 is 1 based index into our inherited base (std::vector)
+	// Allow 1d access to 2d data but not vice versa.
+	// coln1  = 0 Indicates 1d access
+	// ncols_ = 0 Indicates 1d data
 
-    int nrows = base::size() / ncols_;
-
-	int rowno = rowno1;
-	int colno = colno1;
-
-	// Throw error if rowno/coln not +/- nrows/ncols
-	// Negative -1 -> last rown/coln
-	// Convert negative into positive to access std::vector
-
-	if (rowno < 0)
-		rowno += nrows + 1;
-	if (rowno < 1 || rowno > nrows)
-		throw DimIndexOutOfBounds("row:" ^ var(rowno1) ^ " can be -" ^ var(nrows) ^ " to +" ^ nrows ^ " not zero.");
-
-	if (colno < 0)
-		colno += ncols_ + 1;
-	if (colno < 1 || colno > ncols_)
-		throw DimIndexOutOfBounds("col:" ^ var(colno1) ^ " can be -" ^ var(ncols_) ^  " to +" ^ ncols_ ^ " not zero.");
-
-	// Calculate index and throw error if out of range
-	// row 1 col1 -> index 0
-	int cell_index0 = ncols_ * (rowno - 1) + colno - 1;
-
-	// Check bounds and throw DimIndexOutOfBounds
-	int ncells = static_cast<int>(base::size());
-	if (cell_index0 >= ncells) { UNLIKELY
-		throw DimIndexOutOfBounds("row:" ^ var(rowno) ^ " col:" ^ var(colno) ^ " not within bounds (" ^ var(nrows) ^ ", " ^ var(ncols_) ^ ")");
+	// Calculate nrows.
+	size_t ncells = base::size();
+	size_t nrows = ncells;
+	if (colno1) {
+		// 2d access requires 2nd dimension (ncols_) to have a positive size.
+		if (!ncols_) {
+			throw DimUndimensioned("colno: " ^ var(colno1) ^ " cannot be requested on a 1 dimensioned array");
+		}
+		// Ceiling division to include partial last row
+		nrows = (ncells + ncols_ - 1) / ncols_;
+	}
+	if (ncells == 0) {
+		throw DimIndexOutOfBounds("Cannot access empty dimensioned array");
 	}
 
-	return (base::operator[](cell_index0));
+	// Convert negative into positive to access std::vector.
+	// Negative -1 -> last rown
+	// Throw error if rowno not +/- nrows
+	size_t rowno = static_cast<size_t>(rowno1);
+	if (rowno1 < 0) {
+		if (rowno1 < -static_cast<int>(nrows)) {
+			goto throw_bounds_error_row;
+		}
+		rowno = static_cast<size_t>(rowno1 + static_cast<int>(nrows) + 1);
+	}
+	if (rowno < 1 || rowno > nrows) {
+throw_bounds_error_row:
+		throw DimIndexOutOfBounds("rowno:" ^ var(rowno1) ^ " can be -" ^ var(nrows) ^ " to +" ^ var(nrows) ^ " but not zero.");
+	}
+
+	// Ditto for colno.
+	size_t colno = static_cast<size_t>(colno1);
+	if (colno1) {
+		if (colno1 < 0) {
+			if (colno1 < -static_cast<int>(ncols_)) {
+				goto throw_bounds_error_col;
+			}
+			colno = static_cast<size_t>(colno1 + static_cast<int>(ncols_) + 1);
+		}
+		if (colno < 1 || colno > ncols_) {
+throw_bounds_error_col:
+			throw DimIndexOutOfBounds("colno:" ^ var(colno1) ^ " can be -" ^ var(ncols_) ^ " to +" ^ var(ncols_) ^ " but not zero.");
+		}
+	}
+
+	// Calculate combined 0 based index.
+	size_t cell_index0 = colno ? (rowno - 1) * ncols_ + (colno - 1) : (rowno - 1);
+
+	// Check bounds and throw DimIndexOutOfBounds.
+	if (cell_index0 >= ncells) { UNLIKELY
+		// For 2D, check if the row/col combination is valid
+		if (colno && rowno == nrows) {
+			size_t max_cols = ncells % ncols_;
+			if (max_cols == 0) max_cols = ncols_;
+			if (colno > max_cols) {
+				throw DimIndexOutOfBounds("colno:" ^ var(colno1) ^ " exceeds partial row columns (" ^ var(max_cols) ^ ") at row:" ^ var(rowno));
+			}
+		}
+		throw DimIndexOutOfBounds(
+			colno ?
+			"row:" ^ var(rowno) ^ " col:" ^ var(colno) ^ " not within bounds (" ^ var(nrows) ^ ", " ^ var(ncols_) ^ ")" :
+			"row:" ^ var(rowno) ^ " not within bounds (" ^ var(nrows) ^ ")"
+		);
+	}
+
+	return base::operator[](cell_index0);
 }
 
-// Set all elements to a given var
+//// dim[] operator utility (const)
+//CVR  dim::getelementref(int rowno1, int colno1) const {
+//
+//	THISIS("CVR  dim::getelementref(int rowno1, int colno1) const")
+//
+//	// rowno1 and colno1 is 1 based index into our inherited base (std::vector)
+//
+//	// Allow 1d access to 2d data but not vice versa.
+//	// coln1  = 0 Indicates 1d access
+//	// ncols_ = 0 Indicates 1d data
+//
+//	// Calculate nrows.
+//	int ncells = static_cast<int>(base::size());
+//	int nrows = ncells;
+//	if (colno1) {
+//		// 2d access requires 2nd dimension (ncols_) to have a positive size.
+//		if (!ncols_)
+//			throw DimUndimensioned(function_sig);
+//		nrows /= ncols_;
+//	}
+//
+//	// Convert negative into positive to access std::vector.
+//	// Negative -1 -> last rown
+//	// Throw error if rowno not +/- nrows
+//	int rowno = rowno1;
+//	if (rowno < 0)
+//		rowno += nrows + 1;
+//	if (rowno < 1 || rowno > nrows)
+//		throw DimIndexOutOfBounds("rowno:" ^ var(rowno1) ^ " can be -" ^ var(nrows) ^ " to +" ^ nrows ^ " but not zero.");
+//
+//	// Ditto for colno.
+//	int colno = colno1;
+//	if (colno1) {
+//		if (colno < 0)
+//			colno += ncols_ + 1;
+//		if (colno < 1 || colno > ncols_)
+//			throw DimIndexOutOfBounds("colno:" ^ var(colno1) ^ " can be -" ^ var(ncols_) ^  " to +" ^ ncols_ ^ " but not zero.");
+//	}
+//
+//	// Calculate combined 0 based index.
+//	int cell_index0;
+//	if (colno)
+//		cell_index0 = ncols_ * (rowno - 1) + colno - 1;
+//	else
+//		cell_index0 = rowno - 1;
+//
+//	// Check bounds and throw DimIndexOutOfBounds.
+//	if (cell_index0 >= ncells) { UNLIKELY
+//		throw DimIndexOutOfBounds("row:" ^ var(rowno) ^ " col:" ^ var(colno) ^ " not within bounds (" ^ var(nrows) ^ ", " ^ var(ncols_) ^ ")");
+//	}
+//
+//	return (base::operator[](cell_index0));
+//}
+
+// Set ALL elements to a given var
 dim& dim::init(in sourcevar) {
 
 	THISIS("dim& dim::init(in sourcevar)")
 
-	if (!ncols_) UNLIKELY
+//	if (!ncols_) UNLIKELY
+	if (!base::size()) UNLIKELY
 		throw DimUndimensioned(function_sig);
 
-	for (var& v : *this) {
+	for (var& v : *this)
 		v = sourcevar;
-	}
 
 	return *this;
 }
@@ -218,7 +308,8 @@ var  dim::join(SV delimiter) const {
 
 	THISIS("var  dim::join(SV delimiter) const");
 
-	if (!ncols_) UNLIKELY
+//	if (!ncols_) UNLIKELY
+	if (!base::size()) UNLIKELY
 		throw DimUndimensioned(function_sig);
 
 	auto delimiter_size = delimiter.size();
@@ -304,9 +395,10 @@ void dim::splitter(in str1, SV delimiter) {
 	// Do not always redimension always since often we are dim reading db records
 	// and we may get VNA accessing array elements if too few.
 	// Always return at least 1 element even if input is ""
-	if (!this->ncols_) {
+//	if (!ncols_) {
+	if (!base::size()) {
 		this->redim(str1.count(delimiter) + 1);
-		ncols_ = 1;
+//		ncols_ = 1;
 	}
 
 	// Empty string just fills array with empty string
@@ -320,7 +412,9 @@ void dim::splitter(in str1, SV delimiter) {
 	std::size_t next_pos = 0;
 	std::size_t sepsize = delimiter.size();
 	int fieldno;
-	int nrows = static_cast<int>(base::size()) / ncols_;
+	int nrows = static_cast<int>(base::size());
+	if (ncols_)
+		nrows /= ncols_;
 	for (fieldno = 0; fieldno < nrows; fieldno++) {
 
 		// Find the next delimiter delimiter
@@ -360,7 +454,8 @@ void dim::splitter(in str1, SV delimiter) {
 void dim::sorter(bool reverseorder) {
 
 	THISIS("dim& dim::sorter(bool reverseorder)")
-	if (!ncols_) UNLIKELY
+//	if (!ncols_) UNLIKELY
+	if (!base::size()) UNLIKELY
 		throw DimUndimensioned(function_sig);
 
 	if (!reverseorder)
@@ -374,7 +469,8 @@ void dim::sorter(bool reverseorder) {
 void dim::reverser() {
 
 	THISIS("dim& dim::reverser()")
-	if (!ncols_) UNLIKELY
+//	if (!ncols_) UNLIKELY
+	if (!base::size()) UNLIKELY
 		throw DimUndimensioned(function_sig);
 
 	std::reverse(base::begin(), base::end());
@@ -385,7 +481,8 @@ void dim::reverser() {
 void dim::randomizer() {
 
 	THISIS("dim& dim::randomizer()")
-	if (!ncols_) UNLIKELY
+//	if (!ncols_) UNLIKELY
+	if (!base::size()) UNLIKELY
 		throw DimUndimensioned(function_sig);
 
 	// Create or reuse a base generator per thread on the heap.
@@ -458,7 +555,8 @@ bool dim::osread(in osfilename, const char* codepage) {
 	base::clear();
 
 	// Force automatic redimensioning
-	ncols_ = 0;
+//	ncols_ = 0;
+	base::clear();
 
 	this->splitter(txt.var_str, linesep);
 
@@ -606,9 +704,9 @@ var  var::reverse(SV delimiter) const& {
 
 }
 
-///////////////
+/////////////////
 // var randomizer
-///////////////
+/////////////////
 
 // No speed or memory advantage since not shuffling in place
 // but provided for syntactical convenience avoiding need to assign output of randomize()

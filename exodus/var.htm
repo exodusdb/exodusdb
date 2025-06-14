@@ -7168,6 +7168,8 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			<a href="#Dim_Array_DB_I_O">Dim Array DB I/O</a></li>
 		<li>
 			<a href="#Dim_Array_OS_I_O">Dim Array OS I/O</a></li>
+		<li>
+			<a href="#Dim_Array_Other_">Dim Array Other </a></li>
 
 	</ol>
 </div>
@@ -7616,6 +7618,58 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 <span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="ow">not</span><span class="w"> </span><span class="n">d1</span><span class="p">.</span><span class="nf">osread</span><span class="p">(</span><span class="n">osfilename</span><span class="p">))</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="c1">// d1.join(&quot;\n&quot;) -&gt; &quot;aaa=1\nbbb=2\nccc=3\n&quot;_var0</span>
 <span class="c1">// or</span>
 <span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="ow">not</span><span class="w"> </span><span class="nf">osread</span><span class="p">(</span><span class="n">d1</span><span class="w"> </span><span class="ow">from</span><span class="w"> </span><span class="n">osfilename</span><span class="p">))</span><span class="w"> </span><span class="p">...</span>
+</pre>
+			</p>
+		</td></tr>
+</table>
+<h5 id="Dim_Array_Other_">Dim Array Other </h5>
+
+<table class="wikitable">
+	<tr>
+		<th>Use</th>
+		<th>Function</th>
+		<th>Description</th> </tr>
+	<tr>
+		<td></td>
+		<td>
+			<p>
+				<code>d1.push_back(anything)</code></p></td>
+		<td>
+			<p>All C++ vector functions and algorithms work on dim arrays.</p>
+			<p>See https://en.cppreference.com/w/cpp/container/vector.html</p>
+			<p>
+				<pre><span class="nf">dim</span><span class="w"> </span><span class="n">d1</span><span class="p">;</span>
+<span class="n">d1</span><span class="p">.</span><span class="n">reserve</span><span class="p">(</span><span class="mi">5</span><span class="p">);</span>
+<span class="n">d1</span><span class="p">.</span><span class="n">resize</span><span class="p">(</span><span class="mi">3</span><span class="p">);</span>
+<span class="nf">let</span><span class="w"> </span><span class="n">v2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">d1</span><span class="p">.</span><span class="n">capacity</span><span class="p">();</span><span class="w"> </span><span class="c1">//   5</span>
+<span class="nf">let</span><span class="w"> </span><span class="n">v3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">d1</span><span class="p">.</span><span class="n">size</span><span class="p">();</span><span class="w">     </span><span class="c1">//   3</span>
+<span class="nf">let</span><span class="w"> </span><span class="n">v4</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">d1</span><span class="p">.</span><span class="nf">empty</span><span class="p">();</span><span class="w">    </span><span class="c1">//   0</span>
+<span class="n">d1</span><span class="p">.</span><span class="n">shrink_to_fit</span><span class="p">();</span>
+<span class="nf">let</span><span class="w"> </span><span class="n">v5</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">d1</span><span class="p">.</span><span class="n">capacity</span><span class="p">();</span><span class="w"> </span><span class="c1">//   3</span>
+
+<span class="n">d1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;x&quot;</span><span class="p">;</span>
+<span class="nf">let</span><span class="w"> </span><span class="n">v6</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">d1</span><span class="p">.</span><span class="nf">join</span><span class="p">();</span><span class="w">     </span><span class="c1">//   &quot;x^x^x&quot;_var</span>
+<span class="n">d1</span><span class="p">.</span><span class="n">clear</span><span class="p">();</span>
+
+<span class="n">d1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">};</span>
+<span class="nf">let</span><span class="w"> </span><span class="n">v7</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">d1</span><span class="p">.</span><span class="nf">join</span><span class="p">();</span><span class="w">     </span><span class="c1">//   &quot;1^2^3^4&quot;_var</span>
+<span class="nf">let</span><span class="w"> </span><span class="n">v8</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">d1</span><span class="p">.</span><span class="n">front</span><span class="p">();</span><span class="w">    </span><span class="c1">//   1</span>
+<span class="nf">let</span><span class="w"> </span><span class="n">v9</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">d1</span><span class="p">.</span><span class="n">back</span><span class="p">();</span><span class="w">     </span><span class="c1">//   4</span>
+
+<span class="n">d1</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="mi">5</span><span class="p">);</span>
+<span class="nf">let</span><span class="w"> </span><span class="n">v10</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">d1</span><span class="p">[</span><span class="mi">5</span><span class="p">];</span><span class="w">        </span><span class="c1">//   5</span>
+<span class="n">d1</span><span class="p">.</span><span class="n">pop_back</span><span class="p">();</span>
+
+<span class="n">d1</span><span class="p">.</span><span class="nf">insert</span><span class="p">(</span><span class="n">d1</span><span class="p">.</span><span class="nf">begin</span><span class="p">()</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;a&quot;</span><span class="p">);</span>
+<span class="nf">let</span><span class="w"> </span><span class="n">v11</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">d1</span><span class="p">.</span><span class="nf">join</span><span class="p">();</span><span class="w">              </span><span class="c1">//   &quot;1^2^a^3^4&quot;_var</span>
+
+<span class="n">d1</span><span class="p">.</span><span class="n">erase</span><span class="p">(</span><span class="n">d1</span><span class="p">.</span><span class="nf">begin</span><span class="p">()</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">2</span><span class="p">);</span>
+<span class="nf">let</span><span class="w"> </span><span class="n">v12</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">d1</span><span class="p">.</span><span class="nf">join</span><span class="p">();</span><span class="w">              </span><span class="c1">//   &quot;1^2^3^4&quot;_var</span>
+
+<span class="n">std</span><span class="o">::</span><span class="n">erase_if</span><span class="p">(</span><span class="n">d1</span><span class="p">,</span><span class="w"> </span><span class="p">[](</span><span class="kt">var</span><span class="o">&amp;</span><span class="w"> </span><span class="n">v</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="kr">return</span><span class="w"> </span><span class="n">v</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span>
+<span class="p">});</span>
+<span class="nf">let</span><span class="w"> </span><span class="n">v13</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">d1</span><span class="p">.</span><span class="nf">join</span><span class="p">();</span><span class="w">              </span><span class="c1">// &quot;2^4&quot;_var</span>
 </pre>
 			</p>
 		</td></tr>

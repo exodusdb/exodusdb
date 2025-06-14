@@ -34,25 +34,42 @@ dim registerx{0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 func main() {
 
+	{
+		// Multilevel creates FM delimited strings
+		dim d={{"a1", "a2"}, {"b1", "b2"}};
+		assert(d.join(RM) eq "a1^a2`b1^b2"_var);
+	}
+
 	//dim array
 
 	{
-		// Empty array with no rows is allowed. (Defaults to one column)
+		// Working with empty array with no rows is not allowed.
 		dim d0(0);
-		assert(d0.join() eq "");
+		try {
+			assert(d0.join() eq "");
+			assert(false && "Empty array");
+		} catch (DimUndimensioned e) {
+			// OK
+		}
 	}
 
 	{
 		// Empty array is allowed with zero rows but must have cols
 		dim d0(0, 1);
-		assert(d0.join() eq "");
+//		assert(d0.join() eq "");
+		try {
+			assert(d0.join() eq "");
+			assert(false && "Empty array");
+		} catch (DimUndimensioned e) {
+			// OK
+		}
 		d0.redim(2, 2);
 		d0 = "3";
-		d0[1,1] = "q";
+		d0[1, 1] = "q";
 //		TRACE(d0.join())
-//		try {assert(d0.join() == "");assert(false);} catch(VarUnassigned e) {};
+//		try {assert(d0.join() == ""); assert(false);} catch(VarUnassigned e) {};
 		d0 = "x";
-		assert(d0.join().outputl() eq "x^x^x^x"_var);
+		assert(d0.join().errputl() eq "x^x^x^x"_var);
 
 		// Redim to empty array is allowed
 		d0.redim(0, 0);
@@ -92,33 +109,18 @@ func main() {
 
 	{
 		dim d1(0);
-		dim d2(0, 0);
-		dim d3(0, 1);
-		dim d4(0, 2);
-		d1 = "x";
-		//d2 = "x";
-		d3 = "x";
-		d4 = "x";
-		assert(join(d1)          eq "");
-//		assert(join(d2)          eq "");
-		assert(join(d3)          eq "");
-		assert(join(d4)          eq "");
-	}
-	{
-		dim d1(0);
-		dim d2(0, 0);
-		dim d3(1, 0);
-		dim d4(2, 0);
+		dim d2(0, 0); // no rows
+		dim d3(1, 0); // 1 row 1d
 
-		d1 = "x";
-		try{d2 = "x";assert(false);} catch (DimUndimensioned e) {};
-		try{d3 = "x";assert(false);} catch (DimUndimensioned e) {};
-		try{d4 = "x";assert(false);} catch (DimUndimensioned e) {};
+		// operator =
+		try {d1 = "x"; assert(false && "Empty array");} catch (DimUndimensioned e) {/*OK*/}
+		try {d2 = "x"; assert(false && "Empty array");} catch (DimUndimensioned e) {/*OK*/}
+		try {d3 = "x"; assert(false && "Empty array");} catch (DimUndimensioned e) {/*OK*/}
 
-		assert(join(d1) == "");
-		try{join(d2).outputl();assert(false);} catch (DimUndimensioned e) {};
-		try{join(d3).outputl();assert(false);} catch (DimUndimensioned e) {};
-		try{join(d4).outputl();assert(false);} catch (DimUndimensioned e) {};
+		// join
+		try {if(join(d1)){}; assert(false && "Empty array");} catch (DimUndimensioned e) {/*OK*/}
+		try {if(join(d1)){}; assert(false && "Empty array");} catch (DimUndimensioned e) {/*OK*/}
+		try {if(join(d1)){}; assert(false && "Empty array");} catch (DimUndimensioned e) {/*OK*/}
 	}
 	{
 		//dim_iter
@@ -160,29 +162,26 @@ func main() {
 		assert(d1.at(3, 2) eq "x");
 
 		const dim d2 = {1, 2, 3, 4, 5, 6};
-		assert(d2.at(6, 1) eq 6);
-
+		TRACE(d2.join())
+		//TRACE(d2.at(1))
+		//TRACE(d2.at(6))
+		TRACE(d2.at(1, 0))
+		TRACE(d2.at(6, 0))
+		try{assert(d2.at(1, 1) eq 1); assert(false && "Cant use coln on 1d array");} catch (DimUndimensioned e) {};
+		assert(d2.at(6, 0) eq 6);
 		const dim d3 = {1, 2, 3, 4, 5, 6};
-		assert(d3.at(1, 1) eq d3[1]);
-		assert(d3.at(2, 1) eq d3[2]);
-		assert(d3.at(3, 1) eq d3[3]);
-		assert(d3.at(4, 1) eq d3[4]);
-		assert(d3.at(5, 1) eq d3[5]);
-		assert(d3.at(6, 1) eq d3[6]);
+		assert(d3.at(1, 0) eq d3[1]);
+		assert(d3.at(6, 0) eq d3[6]);
 
-		assert(d2.at(1, 1) eq 1);
-		assert(d2.at(2, 1) eq 2);
-		assert(d2.at(3, 1) eq 3);
-		assert(d2.at(4, 1) eq 4);
-		assert(d2.at(5, 1) eq 5);
-		assert(d2.at(6, 1) eq 6);
+		assert(d2.at(1, 0) eq 1);
+		assert(d2.at(6, 0) eq 6);
 
 		// Disallowed0
-		try{d1.at(0, 0) = "qwe";assert(false);} catch (DimIndexOutOfBounds e) {};
-		try{assert(d1.at(0, 0) == "qwe");assert(false);} catch (DimIndexOutOfBounds e) {};
+		try{d1.at(0, 0) = "qwe"; assert(false);} catch (DimIndexOutOfBounds e) {};
+		try{assert(d1.at(0, 0) == "qwe"); assert(false);} catch (DimIndexOutOfBounds e) {};
 //		assert(d1.at(0, 0) eq "qwe");
 
-		//const dim d4 = {{1,2},{3,4},{5,6}};
+		//const dim d4 = {{1, 2}, {3, 4}, {5, 6}};
 		//assert(d2.at(6,1) eq 6);
 	}
 	{
@@ -191,13 +190,13 @@ func main() {
 
 		// But can redim(0) to clear all rows (but ncols remains)
 		d1.redim(0);
-		assert(d1.join()         eq "");
+		try{assert(d1.join() eq ""); assert(false);} catch (DimUndimensioned e) {};
 
 		// But can redim(0, 0) to clear all data
 		d1.redim(0, 0);
 
 		// but no longer use it
-		try{assert(d1.join()         eq ""); assert(false);} catch(DimUndimensioned e) {};
+		try{assert(d1.join() eq ""); assert(false);} catch (DimUndimensioned e) {};
 	}
 	{
 		dim d1;
@@ -301,20 +300,20 @@ func main() {
 //	assert(a11(10) eq "");
 
 	{
-		dim d = {1,2,3};
-		d.redim(0);
-		assert(d.join() eq "");
+		dim d1 = {1, 2, 3};
+		d1.redim(0);
+		try{assert(d1.join() eq ""); assert(false);} catch(DimUndimensioned e) {};
 	}
 	{
 		// Reverse - odd
-		dim d1 = {1,2,3,4,5};
+		dim d1 = {1, 2, 3, 4, 5};
 		d1.reverser();
 		assert(d1.join(",") eq "5,4,3,2,1");
 		d1.reverser();
 		assert(d1.reverse().join(",") eq "5,4,3,2,1");
 
 		// Reverse - even
-		dim d2 = {1,2,3,4};
+		dim d2 = {1, 2, 3, 4};
 		d2.reverser();
 		assert(d2.join(",") eq "4,3,2,1");
 		d2.reverser();
@@ -432,8 +431,8 @@ func main() {
 	printl();
 
 	a7 = split("xx" ^ FM ^ "bb");
-	assert(a7[1]                      eq "xx");
-	assert(a7[2]                      eq "bb");
+	assert(a7[1]     eq "xx");
+	assert(a7[2]     eq "bb");
 	assert(a7.join() eq("xx" ^ FM ^ "bb"));
 
 	dim arrx(2, 2), arry;
@@ -459,10 +458,10 @@ func main() {
 				arr2.at(ii, jj) = ii * 3 + jj;
 			}
 		}
-		assert(arr1[0]        eq "0");
-		assert(arr1.at(0, 0)     eq "0");
+		assert(arr1[0]       eq "0");
+		assert(arr1.at(0, 0) eq "0");
 		for (int ii = 1; ii le 3; ++ii) {
-			assert(arr1[ii]      eq ii);
+			assert(arr1[ii]  eq ii);
 			for (int jj = 1; jj le 3; ++jj) {
 				assert(arr2.at(ii, jj) eq ii * 3 + jj);
 			}
@@ -660,7 +659,7 @@ func main() {
 		x = "x";
 		assert(x.join() eq "x"_var);
 		assert(x.rows() eq 1);
-		assert(x.cols() eq 1);
+		assert(x.cols() eq 0);
 	}
 
 	// 2
@@ -673,7 +672,7 @@ func main() {
 		x = "x";
 		assert(x.join() eq "x^x"_var);
 		assert(x.rows() eq 2);
-		assert(x.cols() eq 1);
+		assert(x.cols() eq 0);
 	}
 
 	// 3
@@ -686,7 +685,7 @@ func main() {
 		x = "x";
 		assert(x.join() eq "x^x^x"_var);
 		assert(x.rows() eq 3);
-		assert(x.cols() eq 1);
+		assert(x.cols() eq 0);
 	}
 
 	// CONSTRUCT PLAIN {}
@@ -701,7 +700,7 @@ func main() {
 		x = "x";
 		assert(x.join() eq "x");
 		assert(x.rows() eq 1);
-		assert(x.cols() eq 1);
+		assert(x.cols() eq 0);
 	}
 
 	// 2
@@ -714,7 +713,7 @@ func main() {
 		x = "x";
 		assert(x.join() eq "x^x"_var);
 		assert(x.rows() eq 2);
-		assert(x.cols() eq 1);
+		assert(x.cols() eq 0);
 	}
 
 	// 3
@@ -728,7 +727,7 @@ func main() {
 		x = "x";
 		assert(x.join() eq "x^x^x"_var);
 		assert(x.rows() eq 3);
-		assert(x.cols() eq 1);
+		assert(x.cols() eq 0);
 	}
 
 	{
@@ -756,12 +755,12 @@ func main() {
 	}
 
 	{
-		dim d = {str("a",30), str("b",30), str("c",30)};
+		dim d = {str("a", 30), str("b", 30), str("c", 30)};
 		TRACE(d.rows())
 		TRACE(d.cols())
 		TRACE(d[1])
 		assert(d[1] == "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
-		var s = {str("a",30), str("b",30), str("c",30)};
+		var s = {str("a", 30), str("b", 30), str("c", 30)};
 		logputl();
 		TRACE(d.join())
 		logputl();
@@ -794,13 +793,13 @@ func main() {
 	{
 		// Testing two dimensional esp. negative row and col
 
-		dim d(3,2);
-		d[1,1]=11;
-		d[1,2]="aa";
-		d[2,1]=22;
-		d[2,2]="bb";
-		d[3,1]=33;
-		d[3,2]="cc";
+		dim d(3, 2);
+		d[1, 1]=11;
+		d[1, 2]="aa";
+		d[2, 1]=22;
+		d[2, 2]="bb";
+		d[3, 1]=33;
+		d[3, 2]="cc";
 
 		//TODO could be ] and ^
 		assert(d.join().outputl() == "11^aa^22^bb^33^cc"_var);
@@ -811,22 +810,22 @@ func main() {
 		{
 			// coln = 1
 
-			assert((d[-3,1].outputl() == "11"));
-			assert((d[-2,1].outputl() == "22"));
-			assert((d[-1,1].outputl() == "33"));
+			assert((d[-3, 1].outputl() == "11"));
+			assert((d[-2, 1].outputl() == "22"));
+			assert((d[-1, 1].outputl() == "33"));
 
-			assert((d[1,1].outputl() == "11"));
-			assert((d[2,1].outputl() == "22"));
-			assert((d[3,1].outputl() == "33"));
+			assert((d[1, 1].outputl() == "11"));
+			assert((d[2, 1].outputl() == "22"));
+			assert((d[3, 1].outputl() == "33"));
 
 			//DimIndexOutOfBounds:row:-4 can be -3 to +3 - Aborting.
 			try {
-				assert((d[-4,1] == ""));
+				assert((d[-4, 1] == ""));
 				assert(false);
 			}
 			catch (DimIndexOutOfBounds e) {};
 			try {
-				assert((d[4,1] == ""));
+				assert((d[4, 1] == ""));
 				assert(false);
 			}
 			catch (DimIndexOutOfBounds e) {};
@@ -849,7 +848,7 @@ func main() {
 		{
 			// coln 2 == -1
 
-			assert((d[-3, 2].outputl() == d[-3, -1]));
+			assert((d[-3, 2].outputl() == d[-3,  -1]));
 			assert((d[-2, 2].outputl() == d[-2, -1]));
 			assert((d[-1, 2].outputl() == d[-1, -1]));
 
@@ -882,7 +881,7 @@ func main() {
 			}
 			catch (DimIndexOutOfBounds e) {};
 			try {
-				assert((d[1,3] == ""));
+				assert((d[1, 3] == ""));
 				assert(false);
 			}
 			catch (DimIndexOutOfBounds e) {};
@@ -892,21 +891,21 @@ func main() {
 		{
 			// Row 0?
 			try {
-				assert((d[0,1] == ""));
+				assert((d[0, 1] == ""));
 				assert(false);
 			}
 			catch (DimIndexOutOfBounds e) {};
 
 			// Col 0?
 			try {
-				assert((d[1,0] == ""));
+				assert((d[1, 0] == ""));
 				assert(false);
 			}
 			catch (DimIndexOutOfBounds e) {};
 
 			// both 0?
 			try {
-				assert((d[0,0] == ""));
+				assert((d[0, 0] == ""));
 				assert(false);
 			}
 			catch (DimIndexOutOfBounds e) {};
@@ -918,7 +917,7 @@ func main() {
 	{
 		// Single dim negative row and col
 
-		dim d {11,22,33};
+		dim d {11, 22, 33};
 
 		assert(d[-3] == "11");
 		assert(d[-2] == "22");
@@ -950,18 +949,30 @@ func main() {
 	}
 
 	{
-        // Allow use of dim as a std::vector<var>
+		// Allow use of dim as a std::vector<var>
 
-        dim d = {2,1,3,4};
+		dim d = {2, 1, 3, 4};
 
-        std::erase_if(d, [](var& v) {return v >= 3;});
-        assert(d.join() == "2^1"_var);
+		std::erase_if(d, [](var& v) {return v >= 3;});
+		assert(d.join() == "2^1"_var);
 
-        std::sort(d.begin(), d.end());
-        assert(d.join() == "1^2"_var);
+		std::sort(d.begin(), d.end());
+		assert(d.join() == "1^2"_var);
 
 //        std::ranges::sort(d);
-    }
+	}
+
+	{
+		// Check move temporary dim actually moves the vector
+
+		dim d1 = {1, 2, 3};
+		auto d11 = &d1[1];
+		std::cerr << d11 << std::endl;
+
+		dim d2 = std::move(d1);
+		std::cerr << &d2[1] << std::endl;
+		assert(&d2[1] eq d11);
+	}
 
 	printl(elapsedtimetext());
 	printl("Test passed");
