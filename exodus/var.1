@@ -8050,7 +8050,7 @@ d1.swap(d2);
 .sp 0
 
 
-.SH 2. ARRAY ACCESS
+.SH 2. DIM ARRAY ACCESS
 .SH
 
 .SS
@@ -8059,7 +8059,7 @@ var v1 = d1[rowno];   d1[rowno] = v1;
 [row] Access and update dimensioned array elements.
 .sp 0
 .PP
-Two dimensioned arrays can be traversed, columnwise then rowwise, using one dimension array access.
+Two dimensioned arrays can be traversed, columnwise then rowwise, using one dimension array access and vice versa.
 .sp 0
 .PP
 .PP
@@ -8157,11 +8157,11 @@ let v1 = d1.join(); // "f1^f2^f3"_var
 .SS
 d1.unpack()
 .PP
-New Unpack function to allow "auto [a,b,c] = d1.unpack<3>();"
+New unpack() function to allow "auto [a,b,c] = d1.unpack<3>();"
 .sp 0
 
 
-.SH 3. ARRAY MUTATION
+.SH 3. DIM ARRAY MUTATION
 .SH
 
 .SS
@@ -8258,7 +8258,7 @@ let v1 = d1.join(","); // random
 .sp 0
 
 
-.SH 4. ARRAY CONVERSION
+.SH 4. DIM ARRAY CONVERSION
 .SH
 
 .SS
@@ -8282,7 +8282,7 @@ Get a randomised copy of a dimensioned array.
 .sp 0
 
 
-.SH 5. ARRAY DB I/O
+.SH 5. DIM ARRAY DB I/O
 .SH
 
 .SS
@@ -8342,7 +8342,7 @@ if (not read(d1 from file, key)) ...
 .sp 0
 
 
-.SH 6. ARRAY OS I/O
+.SH 6. DIM ARRAY OS I/O
 .SH
 
 .SS

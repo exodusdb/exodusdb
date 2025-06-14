@@ -7159,15 +7159,15 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 		<li>
 			<a href="#Dimensioned_Array_Construction_">Dimensioned Array Construction </a></li>
 		<li>
-			<a href="#Array_Access">Array Access</a></li>
+			<a href="#Dim_Array_Access">Dim Array Access</a></li>
 		<li>
-			<a href="#Array_Mutation">Array Mutation</a></li>
+			<a href="#Dim_Array_Mutation">Dim Array Mutation</a></li>
 		<li>
-			<a href="#Array_Conversion">Array Conversion</a></li>
+			<a href="#Dim_Array_Conversion">Dim Array Conversion</a></li>
 		<li>
-			<a href="#Array_DB_I_O">Array DB I/O</a></li>
+			<a href="#Dim_Array_DB_I_O">Dim Array DB I/O</a></li>
 		<li>
-			<a href="#Array_OS_I_O">Array OS I/O</a></li>
+			<a href="#Dim_Array_OS_I_O">Dim Array OS I/O</a></li>
 
 	</ol>
 </div>
@@ -7295,7 +7295,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 </table>
-<h5 id="Array_Access">Array Access</h5>
+<h5 id="Dim_Array_Access">Dim Array Access</h5>
 
 <table class="wikitable">
 	<tr>
@@ -7310,7 +7310,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 					<br>d1[rowno] = v1;</code></p></td>
 		<td>
 			<p>[row] Access and update dimensioned array elements.</p>
-			<p>Two dimensioned arrays can be traversed, columnwise then rowwise, using one dimension array access.</p>
+			<p>Two dimensioned arrays can be traversed, columnwise then rowwise, using one dimension array access and vice versa.</p>
 			<p>
 				<pre><span class="nf">dim</span><span class="w"> </span><span class="n">d1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">};</span>
 <span class="n">d1</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;X&quot;</span><span class="p">;</span>
@@ -7396,10 +7396,10 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			<p>
 				<code>d1.unpack()</code></p></td>
 		<td>
-			<p>New Unpack function to allow "auto [a,b,c] = d1.unpack&lt;3&gt;();"</p>
+			<p>New unpack() function to allow "auto [a,b,c] = d1.unpack&lt;3&gt;();"</p>
 		</td></tr>
 </table>
-<h5 id="Array_Mutation">Array Mutation</h5>
+<h5 id="Dim_Array_Mutation">Dim Array Mutation</h5>
 
 <table class="wikitable">
 	<tr>
@@ -7474,7 +7474,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 </table>
-<h5 id="Array_Conversion">Array Conversion</h5>
+<h5 id="Dim_Array_Conversion">Dim Array Conversion</h5>
 
 <table class="wikitable">
 	<tr>
@@ -7512,7 +7512,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			<p>Get a randomised copy of a dimensioned array.</p>
 		</td></tr>
 </table>
-<h5 id="Array_DB_I_O">Array DB I/O</h5>
+<h5 id="Dim_Array_DB_I_O">Dim Array DB I/O</h5>
 
 <table class="wikitable">
 	<tr>
@@ -7562,7 +7562,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 </table>
-<h5 id="Array_OS_I_O">Array OS I/O</h5>
+<h5 id="Dim_Array_OS_I_O">Dim Array OS I/O</h5>
 
 <table class="wikitable">
 	<tr>

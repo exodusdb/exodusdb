@@ -14,7 +14,6 @@ export namespace exo {
 	using exo::var_iter;
 
 	using exo::dim;
-	using exo::dim_iter;
 	using exo::rex;
 	using exo::VarError;
 	using exo::operator""_var;
