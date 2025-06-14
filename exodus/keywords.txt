@@ -16,7 +16,7 @@
 'cropper', 'cut', 'cutter', 'data', 'date', 'dbcopy', 'dbcreate', 
 'dbcursorexists', 'dbdelete', 'dblist', 'debug', 'defaulter', 'deletec', 
 'deletefile', 'deleteindex', 'deletelist', 'deleterecord', 'detach', 'dim', 
-'dim_iter', 'disconnect', 'disconnectall', 'dump', 'echo', 'empty', 'end', 
+'disconnect', 'disconnectall', 'dump', 'echo', 'empty', 'end', 
 'ends', 'eof', 'errput', 'errputl', 'exo_backtrace', 'exo_savestack', 
 'exodus_main', 'exp', 'extract', 'f', 'fcase', 'fcaser', 'fcount', 'field', 
 'field2', 'fieldstore', 'fieldstorer', 'first', 'firster', 'floor', 

@@ -349,17 +349,16 @@ func main() {
 		std::reverse(d1.begin(), d1.end());
 		assert(d1.join() eq v2);
 
-		// remove_if
+		// remove_if + erase
 		// DOESNT actually remove. Moves to the end
 		d1 = "10^2^1^20"_var.split();
 		auto first_removed1 = std::remove_if(d1.begin(), d1.end(), [](var x){return x eq "2";});
 		TRACE(d1.join("^"))
-//		assert(*first_removed1 eq 20);
-//		assert(d1.join() eq "10^1^20^20"_var);
 		assert(*first_removed1 eq "");
 		assert(d1.join() eq "10^1^20^"_var);
-//		std::vector(d1).erase(first_removed1, d1.end());
-//		assert(d1.join() eq "10^1^20"_var);
+		// erase
+		d1.erase(first_removed1, d1.end());
+		assert(d1.join() eq "10^1^20"_var);
 
 		// erase_if
 		d1 = v1.split();
@@ -381,24 +380,6 @@ func main() {
 		const auto pos = std::distance(d1.begin(), x);
 		assert(pos eq 4);
 		//assert(d1.join().outputl() eq "b^a^b^c"_var);
-
-		// erase_if?
-		printl("erase_if doesnt compile despite dim having an erase function");
-		printl("but remove_if combined with dim::erase will achieve the same result");
-		d1 = "1^2^4^5^3"_var.split();
-		TRACE(d1.join())
-		//std::erase_if(d.begin(), d.end(), [](auto i){return i lt 3;});
-// Removed dim::eraser(dim_iter, dim_iter) due to difficulty of converting a dim_iter to a vector::iterator
-//		d1.eraser(
-//			std::remove_if(
-//				d1.begin(),
-//				d1.end(),
-//				[](auto i){return i lt 3;}
-//			),
-//			d1.end()
-//		);
-//		TRACE(d1.join())
-//		assert(d1.join() eq "4^5^3"_var);
 
 	}
 

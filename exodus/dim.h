@@ -1,5 +1,5 @@
-#ifndef VARDIM_H
-#define VARDIM_H
+#ifndef VAR_DIM_H
+#define VAR_DIM_H
 
 #if EXO_MODULE
 	import std;
@@ -26,31 +26,20 @@ namespace exo {
 
 //class dim final
 class PUBLIC dim final : public std::vector<var> {
-//class PUBLIC dim final : public std::vector<var_base<var_mid<exo::var>>> {
-
-friend class dim_iter;
 
  private:
 
 	mutable int ncols_ = 0;
-//	std::vector<var> data_;
-
-//    private:
-//        std::vector<var>::iterator it_;
-
-//	typename std::vector<var>::iterator it_;
-//	using iterator = dim_iter;
 
 	// Alias for the base class
 	using base = std::vector<var>;
-//	using base = std::vector<var_base<var_mid<exo::var>>>;
 
  public:
 
-	// inherit constructors
+	// Inherit constructors.
+	// What exactly does this do since we also manually define various constructors.
 //	using base::vector;
-
-	// TODO define in class for inline/optimisation?
+//	using base::operator=; // Overidden by many operator= below.
 
 	///////////////////////////
 	// SPECIAL MEMBER FUNCTIONS
@@ -177,25 +166,42 @@ friend class dim_iter;
 		if (this != &rhs) {
 			swap(rhs); // Swap all members
 		}
-//		return *this;
 		return;
 	}
 
-//	// Iterator overrides
-//	// TODO all throw errors if used on undimensioned arrays
-	// Needed for range based for to compile: "for (var& v1 : d1) {"
-//	auto begin() { return base::begin();}
-//	auto end() { return base::end();}
-//	auto begin() const { return base::begin();}
-//	auto end() const { return base::end();}
-//	auto cbegin() const { return base::cbegin();}
-//	auto cend() const { return base::cend();}
-	dim_iter begin() { return dim_iter(base::begin()); }
-	dim_iter end() { return dim_iter(base::end()); }
-	dim_const_iter begin() const { return dim_const_iter(base::begin()); }
-	dim_const_iter end() const { return dim_const_iter(base::end()); }
-	dim_const_iter cbegin() const { return dim_const_iter(base::cbegin()); }
-	dim_const_iter cend() const { return dim_const_iter(base::cend()); }
+//	All std::vector's member functions are automatically available
+
+//	using base::begin;
+//	using base::end;
+//	using base::cbegin;
+//	using base::cend;
+//	using base::rbegin;
+//	using base::rend;
+//	using base::crbegin;
+//	using base::crend;
+//
+//	using base::size;
+//	using base::max_size;
+//	using base::resize;
+//	using base::capacity;
+//	using base::empty;
+//	using base::reserve;
+//	using base::shrink_to_fit;
+////	using base::operator[]; // Note: Custom operator[] below overides this and is 1 based indexing
+////	using base::at;             // std vector at() is zero based therefore DO NOT USE. The two dimensions at(x,y) suppresses it without "using"
+//	using base::front;
+//	using base::back;
+//	using base::data;
+//	using base::assign;
+//	using base::push_back;
+//	using base::pop_back;
+//	using base::insert;
+//	using base::erase;
+////	using base::swap; // Note: Custom swap below overrides this
+//	using base::clear;
+//	using base::emplace;
+//	using base::emplace_back;
+//	using base::get_allocator;
 
 	/////////////////////
 	// Other constructors
@@ -234,10 +240,6 @@ friend class dim_iter;
 		}
 
 	}
-//	template<class T>
-//        // Constructor with initializer list
-//        dim(std::initializer_list<T> init) : base(init), ncols_(1) {}
-
 
 	///////////////////
 	// OTHER ASSIGNMENT
@@ -290,47 +292,17 @@ friend class dim_iter;
 		std::swap(ncols_, d2.ncols_);
 	}
 
-	///////////////////
-	///// array access:
-	///////////////////
+	///////////////////////
+	///// dim array access:
+	///////////////////////
 
-////	ND dim_iter begin();
-////	ND dim_iter end();
-//	// Custom iterators for range-based for
-//	dim_iter begin() { return dim_iter(base::begin()); }
-//	dim_iter end() { return dim_iter(base::end()); }
-//	dim_const_iter begin() const { return dim_const_iter(base::begin()); }
-//	dim_const_iter end() const { return dim_const_iter(base::end()); }
-//	dim_const_iter cbegin() const { return dim_const_iter(base::cbegin()); }
-//	dim_const_iter cend() const { return dim_const_iter(base::cend()); }
-
-//	// Implicit conversion to std::vector<var>&
-//	operator std::vector<var>&() { return data_; }
-//	operator const std::vector<var>&() const { return data_; }
-
-//
-//	ND const dim_iter begin() const;
-//	ND const dim_iter end() const;
-
-//    // Mutable iterators
-//    dim_iter begin() { return dim_iter(base::begin()); }
-//    dim_iter end() { return dim_iter(base::end()); }
-//
-//    // Const iterators
-//    dim_const_iter begin() const { return dim_const_iter(base::begin()); }
-//    dim_const_iter end() const { return dim_const_iter(base::end()); }
-//
-//    // Explicit const iterators (cbegin/cend)
-//    dim_const_iter cbegin() const { return dim_const_iter(base::begin()); }
-//    dim_const_iter cend() const { return dim_const_iter(base::end()); }
-
-	// brackets operators often come in pairs
-	// returns a reference to one var of the array
+	// Brackets operators often come in pairs.
+	// Returns a reference to one var of the array
 	// and so allows lhs assignment like d1(1,2) = "x";
-	// or if on the rhs then use as a normal expression
+	// or if on the rhs then use as a normal expression.
 
 	// [row] Access and update dimensioned array elements.
-	// Two dimensioned arrays can be traversed, columnwise then rowwise, using one dimension array access.
+	// Two dimensioned arrays can be traversed, columnwise then rowwise, using one dimension array access and vice versa.
 	//
 	// `dim d1 = {1, 2, 3, 4, 5};
 	//  d1[3] = "X";
@@ -338,7 +310,7 @@ friend class dim_iter;
 	//
 	ND VARREF operator[](int rowno) {return getelementref(rowno, 1);}
 
-	//following const version is called if we do () on a dim which was defined as const xx
+	// Following const version is called if we do () on a dim which was defined as const xx
 	// Undocumented
 	ND CVR operator[](int rowno) const {return getelementref(rowno, 1);}
 
@@ -373,11 +345,11 @@ friend class dim_iter;
 	// Undocumented
 	ND CVR operator()(int rowno) const {return getelementref(rowno, 1);}
 
-	// parenthesis operators often come in pairs
-	// returns a reference to one var of the array
+	// Parenthesis operators often come in pairs
+	// Returns a reference to one var of the array
 	// and so allows lhs assignment like d1(1,2) = "x";
 	// or if on the rhs then use as a normal expression
-	//following const version is called if we do () on a dim which was defined as const xx
+	// The following const version is called if we do () on a dim which was defined as const xx
 	DEPRECATED_PARENS2
 	// Undocumented
 	ND VARREF operator()(int rowno, int colno) {return getelementref(rowno, colno);}
@@ -424,50 +396,39 @@ friend class dim_iter;
 	//
 	ND var join(SV delimiter = _FM) const;
 
-    // unpack lvalue version: Copy strings (const MyVec&)
+    // unpack() lvalue version: Copy strings (const MyVec&)
 
-	// New Unpack function to allow "auto [a,b,c] = d1.unpack<3>();"
+	// New unpack() function to allow "auto [a,b,c] = d1.unpack<3>();"
 	template <size_t N>
 	auto unpack() const& -> std::array<var, N> {
 
-//    std::clog << "base size:" << base::size() << std::endl;
-//    for (size_t i = 0; i < base::size(); ++i) {
-//        std::clog << "result[" << i << "]:" << base::operator[](i) << std::endl;
-//    }
-
-	// MUST use base:operator[](index) NOT (*this)[index] because dim is 1 based
-	// Unless you use 1 based indexing and dont care about being validate by dim::operator[] all the time.
-
-    auto result = [this]<size_t... Is>(std::index_sequence<Is...>) {
-        return std::array<var, N>{
-            (Is < base::size() ? base::operator[](Is) : var())...
-        };
-    }(std::make_index_sequence<N>{});
-
-//    std::clog << "unpack result:" << std::endl;
-//    for (size_t i = 0; i < N; ++i) {
-//        std::clog << "result[" << i << "]:" << result[i].dump() << std::endl;
-//    }
-
-    return result;
-
+		// MUST use BASE::operator[](index) NOT (*this)[index] because dim::operator[] is 1 based
+		// Unless you use 1 based indexing and dont care about being validate by dim::operator[] all the time.
+		auto result = [this]<size_t... Is>(std::index_sequence<Is...>) {
+			return std::array<var, N> {
+				// If N > size of dim then create unassigned vars
+				(Is < base::size() ? base::operator[](Is) : var())...
+			};
+		}(std::make_index_sequence<N>{});
+		return result;
 	}
 
-    // unpack rvalue version: Move strings (MyVec&&)
+    // Unpack rvalue version: Move strings (MyVec&&)
 
 	template <size_t N>
 	auto unpack() && -> std::array<var, N> {
 		auto fill_array = [this]<size_t... Is>(std::index_sequence<Is...>) {
 			return std::array<var, N>{
+				// If N > size of dim then create unassigned vars
 				(Is < base::size() ? std::move(base::operator[](Is)) : std::move(var()))...
 			};
 		};
 		return fill_array(std::make_index_sequence<N>{});
 	}
 
-	/////////////////////
-	///// array mutation:
-	/////////////////////
+	/////////////////////////
+	///// dim array mutation:
+	/////////////////////////
 
 	// Create or update a dimensioned array using a string with delimiters.
 	// If the dim array is undimensioned it will be dimensioned with the number of elements that the string has fields.
@@ -514,11 +475,11 @@ friend class dim_iter;
 //	dim& eraser(std::vector<var>::iterator iter1, std::vector<var>::iterator iter2) {base::erase(iter1, iter2); return *this;}
 //	dim& eraser(dim_iter dim_iter1, dim_iter dim_iter2) {base::erase(&*dim_iter1, &*dim_iter2); return *this;}
 
-	PUBLIC void push_back(var&& var1) {base::push_back(std::move(var1));}
+//	PUBLIC void push_back(var&& var1) {base::push_back(std::move(var1));}
 
-	///////////////////////
-	///// array conversion:
-	///////////////////////
+	///////////////////////////
+	///// dim array conversion:
+	///////////////////////////
 
 	// Get a sorted copy of a dimensioned array.
 	ND dim sort(bool reverse = false) const& {dim d1(*this); d1.sorter(reverse); return d1;}
@@ -534,9 +495,9 @@ friend class dim_iter;
 	ND dim reverse()                  &&     {               reverser();         return std::move(*this);}
 	ND dim randomize()                &&     {               randomizer();       return std::move(*this);}
 
-	///////////////////
-	///// array DB I/O:
-	///////////////////
+	///////////////////////
+	///// dim array DB I/O:
+	///////////////////////
 
 	// Write a DB file record created from a dimensioned array.
 	// Each element in the array becomes a separate field in the DB record.
@@ -565,9 +526,9 @@ friend class dim_iter;
 	//
 	ND bool read(in dbfile, in key);
 
-	///////////////////
-	///// array OS I/O:
-	///////////////////
+	///////////////////////
+	///// dim array OS I/O:
+	///////////////////////
 
 	// Create an entire OS text file from a dimensioned array
 	// Each element of the array becomes one line in the OS file delimited by \n
@@ -599,17 +560,6 @@ friend class dim_iter;
 	//
 	ND bool osread(in osfilename, const char* codepage = "");
 
-	////////////
-	// ITERATORS
-	////////////
-
-	// Allow use of std algorithms
-	//
-	// Note that remove, remove_if, unique and other algorithms operate on a range of elements denoted by two forward iterators,
-	// and have no knowledge of the underlying container or collection. Therefore they only move "removed" elements
-	// to the end of the container. They return an iter to the first "removed" element so vector::erase can actually do the removal.
-	//
-
  private:
 
 	dim& init(in var1);
@@ -626,5 +576,4 @@ inline void swap(dim& a, dim& b) noexcept {
 
 } // namespace exo
 
-#endif //VARDIM_H
-
+#endif // VAR_DIM_H
