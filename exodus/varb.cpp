@@ -151,6 +151,23 @@ RETVAR VB1::move() {
 	return rvo;
 }
 
+// Synonym for length for compatibility with pick's len() which is bytes
+var  VB1::len() const {
+
+	THISIS("var  var::len() const")
+	assertString(function_sig);
+
+	return var_str.size();
+}
+
+bool VB1::empty() const {
+
+	THISIS("var  var::empty() const")
+	assertString(function_sig);
+
+	return var_str.empty();
+}
+
 // ::first_
 //
 // utility string function on var_base for throwing errors

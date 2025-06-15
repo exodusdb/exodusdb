@@ -15,6 +15,8 @@ namespace exo {
 class PUBLIC rex final {
 
 friend class var;
+friend class var_mid;
+friend class var_base;
 
  private:
 	mutable var   regex_str_ = "";

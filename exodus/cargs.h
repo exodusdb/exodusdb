@@ -28,7 +28,7 @@ class Cargs {
 	//constructor from var delimited by FM e.g. COMMAND and optional OPTIONS
 	Cargs(in command, in options = "") {
 		//printl(command);
-		for (var word : command) {
+		for (var word : static_cast<const var&>(command)) {
 			//printl(word);
 			argv_.push_back(strings.emplace_back(std::string(word ^ "\x00")).data());
 		}

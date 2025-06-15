@@ -194,6 +194,11 @@ class PUBLIC var_base {
 	mutable VARTYP      var_typ;     // Default initialised to VARTYP_UNA.
 	                                 // Implemented as an unsigned int 1.e. 4 bytes
 
+	friend class var;
+//	friend class var_mid;
+	friend class dim;
+//	friend class rex;
+
 /////////////////////////////////////////////////////////////////////////////////////////////////
 //                                SPECIAL MEMBER FUNCTIONS (SMF)
 /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -700,10 +705,12 @@ class PUBLIC var_base {
 
 	// Implicitly convert var_base to var
 
-//	// clone, like most var_base functions returns a var since var's are var_base's but not vice versa
-//	CONSTEXPR
-//	operator var() &;
-//
+	// Type conversion since reference will be optimised away by -O2
+	// Note that most var_base function directly return a var since var's have full functionality
+	// and can be implicitly used as var_base but not vice versa.
+	CONSTEXPR
+	operator var&() &;
+
 //	CONSTEXPR
 //	// move, like most var_base functions returns a var since var's are var_base's but not vice versa
 //	operator var() &&;
@@ -1398,6 +1405,9 @@ class PUBLIC var_base {
 
 	// Returns a copy of the var or 0 if non-numeric
 	ND RETVAR num() const;
+
+	ND RETVAR len() const;
+	ND bool empty() const;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 //                                   [] or at

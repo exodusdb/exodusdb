@@ -35,6 +35,7 @@ namespace exo {
 //CONSTRUCTOR from a var (ie begin())
 var_iter::var_iter(in var1)
 	: pvar_(&var1){
+//	: pvar_(static_cast<const var*>(&var1)){
 	if (!var1.len())
 		startpos_ = std::string::npos;
 }

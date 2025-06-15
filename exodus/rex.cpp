@@ -38,7 +38,7 @@ rex::rex(SV expression) :expression_(expression) {
 rex::rex(SV expression, SV options) :expression_(expression), options_(options) {
 }
 
-var  var::replace(rex const& regex, SV replacement) const& {
+var  var_mid::replace(rex const& regex, SV replacement) const& {
 	return this->regex_replace(regex.expression_, replacement, regex.options_);
 }
 

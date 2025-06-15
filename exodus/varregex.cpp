@@ -340,9 +340,9 @@ static REGEX& varregex_get_regex_engine(SV regex_str, SV regex_options) {
 ////////
 
 // should be in mvfuncs.cpp - here really because boost regex is included here for file matching
-var  var::match(SV regex_str, SV regex_options) const {
+var  var_mid::match(SV regex_str, SV regex_options) const {
 
-	THISIS("var  var::match(SV regex_str, SV regex_options) const")
+	THISIS("var  var_mid::match(SV regex_str, SV regex_options) const")
 	assertString(function_sig);
 	//ISSTRING(regex_str)
 
@@ -391,12 +391,12 @@ var  var::match(SV regex_str, SV regex_options) const {
 }
 
 // should be in mvfuncs.cpp - here really because boost regex is included here for file matching
-var  var::match(const rex& regex) const {
+var  var_mid::match(const rex& regex) const {
 
 	// VISUALISE REGULAR EXPRESSIONS GRAPHICALLY
 	// https:www.debuggex.com
 
-	THISIS("var  var::match(const rex& regex) const")
+	THISIS("var  var_mid::match(const rex& regex) const")
 	assertString(function_sig);
 
 	// Get the engine from the rex if present otherwise get one from the cache (or construct one in the cache)
@@ -471,9 +471,9 @@ var  var::match(const rex& regex) const {
 /////////
 
 // should be in mvfuncs.cpp - here really because boost regex is included here for file matching
-var  var::search(SV regex_str, io startchar1, SV regex_options) const {
+var  var_mid::search(SV regex_str, io startchar1, SV regex_options) const {
 
-	THISIS("var  var::search(SV regex_str, io startchar1, SV regex_options) const")
+	THISIS("var  var_mid::search(SV regex_str, io startchar1, SV regex_options) const")
 	assertString(function_sig);
 
 	// Note that option f - first only is deliberately not implemented in search
@@ -532,9 +532,9 @@ var  var::search(SV regex_str, io startchar1, SV regex_options) const {
 }
 
 // Version that accepts a rex object for speed
-var  var::search(const rex& regex, io startchar1) const {
+var  var_mid::search(const rex& regex, io startchar1) const {
 
-	THISIS("var  var::search(const rex& regex, io startchar1) const")
+	THISIS("var  var_mid::search(const rex& regex, io startchar1) const")
 	assertString(function_sig);
 
 	// Get the engine from the rex if present otherwise get one from the cache (or construct one in the cache)
@@ -654,17 +654,17 @@ auto get_replacement_flags(const std::string rex_options, bool& first_only) -> s
 }
 
 //// mutator
-////IO   var::replacer(const rex& regex, SomeFunction(in match_str)) REF {
-//IO   var::replacer(const rex& regex, ReplacementFunction auto replacement_func) REF {
+////IO   var_mid::replacer(const rex& regex, SomeFunction(in match_str)) REF {
+//IO   var_mid::replacer(const rex& regex, ReplacementFunction auto replacement_func) REF {
 //	*this = this->replace(regex, replacement_func);
 //	return THIS;
 //}
 
 // const
 // Implementation can handle any type of function including capturing lambdas.
-var var::replace(const rex& regex, var (*sf)(const var&, void*), void* context) const {
+var var_mid::replace(const rex& regex, var (*sf)(const var&, void*), void* context) const {
 
-	THISIS("var  var::replace(const rex& regex, SomeFunction(in match_str)) const")
+	THISIS("var  var_mid::replace(const rex& regex, SomeFunction(in match_str)) const")
 	assertString(function_sig);
 
 	// Get the engine from the rex if present otherwise get one from the cache (or construct one in the cache)
@@ -780,16 +780,16 @@ var var::replace(const rex& regex, var (*sf)(const var&, void*), void* context) 
 // Simple non-regex case sensitive substr replacement
 
 // constant
-var  var::replace(SV what, SV with) const& {
+var  var_mid::replace(SV what, SV with) const& {
 
 	//return this->clone().replacer(what, with);}
 	return boost::algorithm::replace_all_copy(var_str, what, with);
 }
 
 // mutator
-IO   var::replacer(SV what, SV with) REF {
+IO   var_mid::replacer(SV what, SV with) REF {
 
-	THISIS("void var::replacer(SV what, SV with) &")
+	THISIS("void var_mid::replacer(SV what, SV with) &")
 	assertStringMutator(function_sig);
 
 	// nothing to do if oldstr is ""
@@ -859,17 +859,17 @@ std::string restrict_to_ecmascript(const std::string_view replacement) {
 // only here really because boost regex is included here for file matching
 
 // mutator
-IO   var::replacer(const rex& regex, SV replacement) REF {
+IO   var_mid::replacer(const rex& regex, SV replacement) REF {
 	*this = this->replace(regex, replacement);
 	return THIS;
 }
 
 // const
-var  var::replace(const rex& regex, SV replacement) const& {
+var  var_mid::replace(const rex& regex, SV replacement) const& {
 
 //	std::cout << "\n" << &regex << " " << __PRETTY_FUNCTION__ << std::endl;
 
-	THISIS("var  var::replace(const rex& regex, SV replacement) const")
+	THISIS("var  var_mid::replace(const rex& regex, SV replacement) const")
 	assertString(function_sig);
 
 	// http://www.boost.org/doc/libs/1_38_0/libs/regex/doc/html/boost_regex/syntax/basic_syntax.html

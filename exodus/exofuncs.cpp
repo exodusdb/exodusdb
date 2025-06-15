@@ -195,10 +195,9 @@ ND PUBLIC bool eof() {return var().eof();}
 // SIMPLE STRINGS
 
 ND PUBLIC var  len(in var1) {return var1.len();}
+ND PUBLIC bool empty(in var1) {return var1.empty();}
 ND PUBLIC var  textlen(in var1) {return var1.textlen();}
 ND PUBLIC var  textwidth(in var1) {return var1.textwidth();}
-
-ND PUBLIC bool empty(in var1) {return var1.empty();}
 
 ND PUBLIC var  convert(  in instring, SV fromchars, SV tochars) {return instring.convert(fromchars, tochars);}
    PUBLIC IO   converter(io iostring, SV fromchars, SV tochars) {iostring.converter(fromchars, tochars); return IOSTRING;}
@@ -295,9 +294,9 @@ ND PUBLIC var  last( in instring) {return instring.last();}
 ND PUBLIC var  first(in instring, const int nbytes) {return instring.first(nbytes);}
 ND PUBLIC var  last( in instring, const int nbytes) {return instring.last(nbytes);}
 
-ND PUBLIC var  chr(        const int char_no) {return var::chr(char_no);}
-ND PUBLIC var  textchr(    const int unicode_char_no) {return var::textchr(unicode_char_no);}
-ND PUBLIC var  textchrname(const int unicode_char_no) {return var::textchrname(unicode_char_no);}
+ND PUBLIC var  chr(        const int char_no) {return var_mid::chr(char_no);}
+ND PUBLIC var  textchr(    const int unicode_char_no) {return var_mid::textchr(unicode_char_no);}
+ND PUBLIC var  textchrname(const int unicode_char_no) {return var_mid::textchrname(unicode_char_no);}
 
 // Match
 ND PUBLIC var  match(in instring, SV regex_str, SV regex_options /*=""*/) {return instring.match(regex_str, regex_options);}

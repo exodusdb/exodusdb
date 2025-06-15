@@ -463,6 +463,7 @@ execute_process(
 		install(
 			FILES
 				varb.h
+				vars.h
 				var.h
 				vartyp.h
 				varerr.h

@@ -373,9 +373,9 @@ var  dim::join(SV delimiter) const {
 	return nrvo;
 }
 
-// var::split()
+// var_mid::split()
 // d1 = v1.split()
-dim  var::split(SV delimiter) const {
+dim  var_mid::split(SV delimiter) const {
 
 	// Will be dimensioned to hold the exact number of fields present
 	dim nrvo;
@@ -384,7 +384,7 @@ dim  var::split(SV delimiter) const {
 }
 
 // d.splitter(v, sep)
-void dim::splitter(in str1, SV delimiter) {
+void dim::splitter(/*in*/ const var_mid& str1, SV delimiter) {
 
 	//TODO If delimiter is "" split every utf8 chararacter?
 
@@ -398,6 +398,7 @@ void dim::splitter(in str1, SV delimiter) {
 //	if (!ncols_) {
 	if (!base::size()) {
 		this->redim(str1.count(delimiter) + 1);
+//		this->redim(static_cast<const var&>(str1).count(delimiter) + 1);
 //		ncols_ = 1;
 	}
 
@@ -581,15 +582,15 @@ bool dim::oswrite(in osfilename, const char* codepage) const {
 
 // no speed or memory advantage since not sorting in place
 // but provided for syntactical convenience avoiding need to assign output of sort()
-IO   var::sorter(SV delimiter) REF {
+IO   var_mid::sorter(SV delimiter) REF {
 	(*this) = this->split(delimiter).sort().join(delimiter);
 	return THIS;
 }
 
 //sorting var - using temporary dim
-var  var::sort(SV delimiter) const& {
+var  var_mid::sort(SV delimiter) const& {
 
-	THISIS("var  var::sort(SV delimiter)")
+	THISIS("var  var_mid::sort(SV delimiter)")
 	assertString(function_sig);
 
 	//perhaps is slower but sorts testing var < var linguistically but not natural numbers like 10a 2b
@@ -607,15 +608,15 @@ var  var::sort(SV delimiter) const& {
 
 // no speed or memory advantage since not sorting in place
 // but provided for syntactical convenience avoiding need to assign output of reverse()
-IO   var::reverser(SV delimiter) REF {
+IO   var_mid::reverser(SV delimiter) REF {
 	(*this) = this->split(delimiter).reverse().join(delimiter);
 	return THIS;
 }
 
 //reversing var - not using dim
-var  var::reverse(SV delimiter) const& {
+var  var_mid::reverse(SV delimiter) const& {
 
-	THISIS("var  var::reverse(SV delimiter)")
+	THISIS("var  var_mid::reverse(SV delimiter)")
 	assertString(function_sig);
 
 	const auto delimitersize = delimiter.size();
@@ -710,21 +711,21 @@ var  var::reverse(SV delimiter) const& {
 
 // No speed or memory advantage since not shuffling in place
 // but provided for syntactical convenience avoiding need to assign output of randomize()
-IO   var::randomizer(SV delimiter) REF {
+IO   var_mid::randomizer(SV delimiter) REF {
 	*this = this->split(delimiter).randomize().join(delimiter);
 	return THIS;
 }
 
 // No speed or memory advantage since not shuffling in place
 // but provided for syntactical convenience avoiding need to assign output of randomize()
-var  var::randomize(SV delimiter) const& {
+var  var_mid::randomize(SV delimiter) const& {
 	auto _ = this->split(delimiter);
 	_.randomizer();
 	return _.join(delimiter);
 }
 
 // Utility
-PUBLIC std::vector<var> basic_split(const std::string_view str, char separator) {
+PUBLIC auto basic_split(const std::string_view str, char separator) -> std::vector<var> {
     std::vector<var> result;
     // Estimate capacity to avoid reallocations
     result.reserve(std::count(str.begin(), str.end(), separator) + 1);
@@ -745,7 +746,7 @@ PUBLIC std::vector<var> basic_split(const std::string_view str, char separator) 
 }
 
 // Utility var -> vector
-PUBLIC std::vector<var> basic_split(in v1, SV delim) {
+PUBLIC auto basic_split(in v1, SV delim) -> std::vector<var> {
 	return v1.split(delim);
 }
 

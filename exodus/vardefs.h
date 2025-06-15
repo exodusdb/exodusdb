@@ -227,10 +227,15 @@ exo::Timer thisistimer(exo::get_timebank_acno(FUNC_DESC));
 #	define THISIS(FUNC_DESC) [[maybe_unused]] constexpr char function_sig[] = FUNC_DESC;
 #endif
 
-#define ISVAR(VARNAME) (VARNAME).assertVar(function_sig, #VARNAME);
+#define ISVAR(VARNAME)      (VARNAME).assertVar(function_sig, #VARNAME);
 #define ISASSIGNED(VARNAME) (VARNAME).assertAssigned(function_sig, #VARNAME);
-#define ISSTRING(VARNAME) (VARNAME).assertString(function_sig, #VARNAME);
-#define ISNUMERIC(VARNAME) (VARNAME).assertNumeric(function_sig, #VARNAME);
+#define ISSTRING(VARNAME)   (VARNAME).assertString(function_sig, #VARNAME);
+#define ISNUMERIC(VARNAME)  (VARNAME).assertNumeric(function_sig, #VARNAME);
+
+//#define ISVAR(VARNAME)      (static_cast<const var_base&>(VARNAME)).assertVar(function_sig, #VARNAME);
+//#define ISASSIGNED(VARNAME) (static_cast<const var_base&>(VARNAME)).assertAssigned(function_sig, #VARNAME);
+//#define ISSTRING(VARNAME)   (static_cast<const var_base&>(VARNAME)).assertString(function_sig, #VARNAME);
+//#define ISNUMERIC(VARNAME)  (static_cast<const var_base&>(VARNAME)).assertNumeric(function_sig, #VARNAME);
 
 #pragma clang diagnostic pop
 
