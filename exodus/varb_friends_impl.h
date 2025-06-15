@@ -285,7 +285,7 @@
 
 	//temporaries (rvalues) - mutate the temporary var to save a copy
 //#undef TBR1
-//#define TBR1 var_base<var_mid<exo::var>>&&
+//#define TBR1 var_base<var_stg<exo::var>>&&
 	PUBLIC VAR_FRIEND RETVAR operator^(TBR1    lhs, const char*  rhs) /*IMPL*/ {lhs ^= rhs; return std::move(lhs.var_str);}
 	PUBLIC VAR_FRIEND RETVAR operator^(TBR1    lhs, const char   rhs) /*IMPL*/ {lhs ^= rhs; return std::move(lhs.var_str);}
 	PUBLIC VAR_FRIEND RETVAR operator^(TBR1    lhs, const int    rhs) /*IMPL*/ {lhs ^= rhs; return std::move(lhs.var_str);}

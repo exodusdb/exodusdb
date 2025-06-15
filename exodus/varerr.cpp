@@ -104,9 +104,9 @@ VarError::VarError(std::string message_)
 	// Hide complexity
 //	if (message.contains("var_")) {
 	if (message.find("var_") != std::string::npos) {
-	    varb_replace_string(message, "exo::var_base<exo::var_mid<exo::var>>", "var");
-    	varb_replace_string(message, " [var = exo::var_mid<exo::var>]", "");
-    	varb_replace_string(message, " [var = exo::var_mid<exo::var>, ", "[");
+	    varb_replace_string(message, "exo::var_base<exo::var_stg<exo::var>>", "var");
+    	varb_replace_string(message, " [var = exo::var_stg<exo::var>]", "");
+    	varb_replace_string(message, " [var = exo::var_stg<exo::var>, ", "[");
 	}
 
 	// Break into debugger if EXO_DEBUG is set to 1

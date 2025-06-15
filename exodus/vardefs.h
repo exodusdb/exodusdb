@@ -150,7 +150,7 @@
 // If using g++ -fvisibility=hidden to make all hidden except those marked PUBLIC ie "default"
 // "Weak" template functions seem to get excluded if visiblity is hidden, despite being marked as PUBLIC
 // so we explictly instantiate them as non-template functions with "template<> ..." syntax.
-// nm -C *so |&grep -F "exo::var_base<exo::var_mid<exo::var> >::"
+// nm -C *so |&grep -F "exo::var_base<exo::var_stg<exo::var> >::"
 // nm -D libexodus.so --demangle |grep T -w
 #define PUBLIC __attribute__((visibility("default")))
 

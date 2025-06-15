@@ -448,7 +448,7 @@ class PUBLIC dim final : public std::vector<var> {
 	//  dim d2(10);
 	//  d2.splitter("f1^f2^f3"_var); // d2.rows() -> 10 /// Predimensioned. Excess elements become ""`
 	//
-	void splitter(/*in*/ const var_mid& str1, SV delimiter = _FM);
+	void splitter(/*in*/ const var_stg& str1, SV delimiter = _FM);
 
 	// Sort a dimensioned array.
 	// The order of the elements is adjusted so that each element is <= the next.

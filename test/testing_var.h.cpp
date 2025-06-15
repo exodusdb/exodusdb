@@ -1512,7 +1512,7 @@ func main() {
 		let v1 = d1.join(); assert(v1.errputl() == "f1^f2^f3"_var);
 	}
 
-	printl("splitter(/*in*/ const var_mid& str1, SV delimiter = _FM);");
+	printl("splitter(/*in*/ const var_stg& str1, SV delimiter = _FM);");
 	{
 		dim d1;
 		d1.splitter("f1^f2^f3"_var);  assert(d1.rows().errputl() == 3  );//// Automatically dimensioned.

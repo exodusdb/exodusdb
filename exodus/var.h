@@ -65,7 +65,7 @@ namespace exo {
 	using io     =       var&;
 
 // class var
-class PUBLIC var : public var_mid {
+class PUBLIC var : public var_stg {
 
 	// Using applies to all member functions everywhere
 	using CVR    = const var&;
@@ -82,8 +82,8 @@ public:
 	// Define all ctor/assign/conversions inline to ensure optimisation can remove redundant assembler.
 	// This is important for value types like var.
 
-	// Inherit all constructors from var_base via var_mid
-	using var_mid::var_mid;
+	// Inherit all constructors from var_base via var_stg
+	using var_stg::var_stg;
 
 	// Copy ctor
 	var(const var& other) = default;
@@ -95,23 +95,23 @@ public:
 
 	// Inherit all assignment operators to convert all types DIRECTLY
 	// otherwise we get nonsense like using our implicit copy/move ctors from var AFTER using var_base ctors from various types
-    using var_mid::operator=;
+    using var_stg::operator=;
 
 	// Return void to prevent accidental use in conditionals (e.g., if (v = "x"))
 	// and to discourage assignment chaining, enhancing code clarity.
 
 	// Copy assignment
 	void /*var&*/ operator=(const var& other) {  // Suppress implicit operators
-		var_mid::operator=(other);  // Delegate to base
+		var_stg::operator=(other);  // Delegate to base
 		return /**this*/;
 	}
 
 	// Move assignment
-	void /*var&*/ operator=(var&& other) & noexcept { var_mid::operator=(std::move(other)); }
+	void /*var&*/ operator=(var&& other) & noexcept { var_stg::operator=(std::move(other)); }
 
 	// Initializer list
 	void /*var&*/ operator=(std::initializer_list<var> list) & {
-		var_mid::operator=(var(list));  // Reuse constructor, assign via var_mid
+		var_stg::operator=(var(list));  // Reuse constructor, assign via var_stg
 	}
 
 	// Tabular documentation is generated for comments starting /// or more and ending with a colon
@@ -3148,17 +3148,17 @@ ND PUBLIC var  operator""_var(long double d);
 
 
 ///////////////////////////////
-// var_mid template definitions
+// var_stg template definitions
 ///////////////////////////////
 
 // Replace
 
-ND var  var_mid::replace(const rex& regex, ReplacementFunction auto repl_func)
+ND var  var_stg::replace(const rex& regex, ReplacementFunction auto repl_func)
                                                            && {replacer(regex,repl_func);    return move();}
 
-   IO   var_mid::replacer(const rex& regex, ReplacementFunction auto repl_func) REF {*this = replace(regex, repl_func);}
+   IO   var_stg::replacer(const rex& regex, ReplacementFunction auto repl_func) REF {*this = replace(regex, repl_func);}
 
-ND var  var_mid::replace(const rex& regex, ReplacementFunction auto repl_func) const {
+ND var  var_stg::replace(const rex& regex, ReplacementFunction auto repl_func) const {
 
 	// Lambda to bridge the callable to a function pointer + context
 	struct Context {decltype(repl_func)* lambda;};
@@ -3176,7 +3176,7 @@ ND var  var_mid::replace(const rex& regex, ReplacementFunction auto repl_func) c
 // Unpack
 
 template <size_t N>
-auto var_mid::unpack/*<N>*/(SV delim /*= _FM*/) const -> std::array<var, N> {
+auto var_stg::unpack/*<N>*/(SV delim /*= _FM*/) const -> std::array<var, N> {
     THISIS("auto var::unpack<N>(SV delim /*= _FM*/) const")
     assertString(function_sig);
 
@@ -3193,8 +3193,8 @@ auto var_mid::unpack/*<N>*/(SV delim /*= _FM*/) const -> std::array<var, N> {
 
 // Append
 
-ND var  var_mid::append(const auto&... appendable) const& {var nrvo = this->clone(); (nrvo ^= ... ^= appendable); return nrvo;}
-ND var  var_mid::append(const auto&... appendable)   && {((*this) ^= ... ^= appendable);      return move();}
+ND var  var_stg::append(const auto&... appendable) const& {var nrvo = this->clone(); (nrvo ^= ... ^= appendable); return nrvo;}
+ND var  var_stg::append(const auto&... appendable)   && {((*this) ^= ... ^= appendable);      return move();}
 
 }  // namespace exo
 

@@ -13,7 +13,7 @@ namespace exo {
 		{ f(v) } -> std::same_as<var>; // Must take const var& and return var
 	};
 
-class PUBLIC var_mid : public var_base {
+class PUBLIC var_stg : public var_base {
 
 public:
 
@@ -28,11 +28,11 @@ public:
 //	using CVR    = const var&;
 //	using TVR    =       var&&;
 
-	using in     = const var_mid&;
-	using out    =       var_mid&;
-	using io     =       var_mid&;
+	using in     = const var_stg&;
+	using out    =       var_stg&;
+	using io     =       var_stg&;
 
-	// Implicitly convert var_mid to var
+	// Implicitly convert var_stg to var
 
 	// Type conversion since reference will be optimised away by -O2
 	// Note that most var_base function directly return a var since var's have full functionality
@@ -430,13 +430,13 @@ public:
 	ND var  search(SV regex_str, io startchar1, SV regex_options = "") const;
 
 	// Ditto starting from first char
-	ND var  search(SV regex_str) const; //IMPL{var_mid startchar1 = 1; return this->search(regex_str, startchar1);}
+	ND var  search(SV regex_str) const; //IMPL{var_stg startchar1 = 1; return this->search(regex_str, startchar1);}
 
 	// Ditto given a rex
 	ND var  search(const rex& regex, io startchar1) const;
 
 	// Ditto starting from first char.
-	ND var  search(const rex& regex) const; //IMPL{var_mid startchar1 = 1; return this->search(regex, startchar1);}
+	ND var  search(const rex& regex) const; //IMPL{var_stg startchar1 = 1; return this->search(regex, startchar1);}
 
 	// Get a hash of a source string.
 	// modulus: The result is limited to [0, modulus)
@@ -460,7 +460,7 @@ public:
 	//  // or
 	//  let v2 = ucase("Γιάννης");`
 	//
-	ND var  ucase() const&; //IMPL{var_mid nrvo = this->clone(); nrvo.ucaser(); return nrvo;}
+	ND var  ucase() const&; //IMPL{var_stg nrvo = this->clone(); nrvo.ucaser(); return nrvo;}
 
 	// Convert to lower case
 	//
@@ -468,7 +468,7 @@ public:
 	//  // or
 	//  let v2 = lcase("ΓΙΆΝΝΗΣ");`
 	//
-	ND var  lcase() const&; //IMPL{var_mid nrvo = this->clone(); nrvo.lcaser(); return nrvo;}
+	ND var  lcase() const&; //IMPL{var_stg nrvo = this->clone(); nrvo.lcaser(); return nrvo;}
 
 	// Convert to title case.
 	// return: Original source string with the first letter of each word is capitalised.
@@ -477,7 +477,7 @@ public:
 	//  // or
 	//  let v2 = tcase("γιάννης παππάς");`
 	//
-	ND var  tcase() const&; //IMPL{var_mid nrvo = this->clone(); nrvo.tcaser(); return nrvo;}
+	ND var  tcase() const&; //IMPL{var_stg nrvo = this->clone(); nrvo.tcaser(); return nrvo;}
 
 	// Convert to folded case.
 	// Case folding is the process of converting text to a case independent representation.
@@ -490,7 +490,7 @@ public:
 	//  // or
 	//  let v2 = tcase("Grüßen");`
 	//
-	ND var  fcase() const&; //IMPL{var_mid nrvo = this->clone(); nrvo.fcaser(); return nrvo;}
+	ND var  fcase() const&; //IMPL{var_stg nrvo = this->clone(); nrvo.fcaser(); return nrvo;}
 
 	// Replace Unicode character sequences with their standardised NFC form.
 	// Unicode normalization is the process of converting Unicode strings to a standard form, making them binary comparable and suitable for text processing and comparison. It is an important part of Unicode text processing.
@@ -501,7 +501,7 @@ public:
 	//  // or
 	//  let v2 = normalize("cafe\u0301");`
 	//
-	ND var  normalize() const&; //IMPL{var_mid nrvo = this->clone(); nrvo.normalizer(); return nrvo;}
+	ND var  normalize() const&; //IMPL{var_stg nrvo = this->clone(); nrvo.normalizer(); return nrvo;}
 
 	// Simple reversible disguising of string text.
 	// It works by treating the string as UTF8 encoded Unicode code points and inverting the first 8 bits of their Unicode Code Points.
@@ -515,7 +515,7 @@ public:
 	//  // or
 	//  let v2 = invert("abc");`
 	//
-	ND var  invert() const&; //IMPL{var_mid nrvo = this->clone(); nrvo.inverter(); return nrvo;}
+	ND var  invert() const&; //IMPL{var_stg nrvo = this->clone(); nrvo.inverter(); return nrvo;}
 
 	// Reduce all types of field mark chars by one level.
 	// Convert all FM to VM, VM to SM etc.
@@ -527,7 +527,7 @@ public:
 	//  // or
 	//  let v2 = lower("a1^b2^c3"_var);`
 	//
-	ND var  lower() const&; //IMPL{var_mid nrvo = this->clone(); nrvo.lowerer(); return nrvo;}
+	ND var  lower() const&; //IMPL{var_stg nrvo = this->clone(); nrvo.lowerer(); return nrvo;}
 
 	// Increase all types of field mark chars by one level.
 	// Convert all VM to FM, SM to VM etc.
@@ -539,7 +539,7 @@ public:
 	//  // or
 	//  let v2 = "a1]b2]c3"_var;`
 	//
-	ND var  raise() const&; //IMPL{var_mid nrvo = this->clone(); nrvo.raiser(); return nrvo;}
+	ND var  raise() const&; //IMPL{var_stg nrvo = this->clone(); nrvo.raiser(); return nrvo;}
 
 	// Remove any redundant FM, VM etc. chars (Trailing FM; VM before FM etc.)
 	//
@@ -547,7 +547,7 @@ public:
 	//  // or
 	//  let v2 = crop("a1^b2]]^c3^^"_var);`
 	//
-	ND var  crop() const&; //IMPL{var_mid nrvo = this->clone(); nrvo.cropper(); return nrvo;}
+	ND var  crop() const&; //IMPL{var_stg nrvo = this->clone(); nrvo.cropper(); return nrvo;}
 
 	// Wrap in double quotes.
 	//
@@ -669,7 +669,7 @@ public:
 	//  // or
 	//  let v2 = paste("abcd", 2, 2, "XYZ");`
 	//
-	ND var  paste(const int pos1, const int length, SV replacestr) const&; //IMPL{var_mid nrvo = this->clone(); nrvo.paster(pos1, length, replacestr); return nrvo;}
+	ND var  paste(const int pos1, const int length, SV replacestr) const&; //IMPL{var_stg nrvo = this->clone(); nrvo.paster(pos1, length, replacestr); return nrvo;}
 
 	// Insert text at char position without overwriting any following chars
 	// Equivalent to var[pos1, 0] = substr in Pick OS
@@ -678,7 +678,7 @@ public:
 	//  // or
 	//  let v2 = paste("abcd", 2, "XYZ");`
 	//
-	ND var  paste(const int pos1, SV insertstr) const&; //IMPL{var_mid nrvo = this->clone(); nrvo.paster(pos1, insertstr); return nrvo;}
+	ND var  paste(const int pos1, SV insertstr) const&; //IMPL{var_stg nrvo = this->clone(); nrvo.paster(pos1, insertstr); return nrvo;}
 
 	// Insert text at the beginning
 	// Equivalent to var[0, 0] = substr in Pick OS
@@ -701,7 +701,7 @@ public:
 	// `let v1 = "abc"_var.append(" is ", 10, " ok", '.'); // "abc is 10 ok."
 	//  // or
 	//  let v2 = append("abc", " is ", 10, " ok", '.');`
-    ND var  append(const auto&... appendable) const&; //IMPL{var_mid nrvo = this->clone(); (nrvo ^= ... ^= appendable); return nrvo;}
+    ND var  append(const auto&... appendable) const&; //IMPL{var_stg nrvo = this->clone(); (nrvo ^= ... ^= appendable); return nrvo;}
 	//
 	// TODO perfect forwarding on argument 1 to create the initial string?
 
@@ -712,7 +712,7 @@ public:
 	//  // or
 	//  let v2 = pop("abc");`
 	//
-	ND var  pop() const&; //IMPL{var_mid nrvo = this->clone(); nrvo.popper(); return nrvo;}
+	ND var  pop() const&; //IMPL{var_stg nrvo = this->clone(); nrvo.popper(); return nrvo;}
 
 	// Copy one or more consecutive fields from a string.
 	// delimiter: A Unicode character.
@@ -766,7 +766,7 @@ public:
 	//
 	// `let v1 = "aa,bb,cc"_var.fieldstore(",", 6, 2, "11"); // "aa,bb,cc,,,11,"`
 	//
-	ND var  fieldstore(SV separator, const int fieldno, const int nfields, in replacement) const&; //IMPL{var_mid nrvo = this->clone(); nrvo.fieldstorer(separator, fieldno, nfields, replacement); return nrvo;}
+	ND var  fieldstore(SV separator, const int fieldno, const int nfields, in replacement) const&; //IMPL{var_stg nrvo = this->clone(); nrvo.fieldstorer(separator, fieldno, nfields, replacement); return nrvo;}
 
 	// substr version 1.
 	// Copy a substr of length chars from a given a starting char position.
@@ -792,7 +792,7 @@ public:
 	//  // or
 	//  let v2 = substr("abcd", 3, -2); // "cb"`
 	//
-	ND var  substr(const int pos1, const int length) const&; //IMPL{var_mid nrvo = this->clone(); nrvo.substrer(pos1, length); return nrvo;}
+	ND var  substr(const int pos1, const int length) const&; //IMPL{var_stg nrvo = this->clone(); nrvo.substrer(pos1, length); return nrvo;}
 
 	// Abbreviated alias of substr version 1.
 	ND var  b(const int pos1, const int length) const&; //IMPL{return this->substr(pos1, length);}
@@ -808,7 +808,7 @@ public:
 	//  // or
 	//  let v2 = substr("abcd", 2);`
 	//
-	ND var  substr(const int pos1) const&; //IMPL{var_mid nrvo = this->clone(); nrvo.substrer(pos1); return nrvo;}
+	ND var  substr(const int pos1) const&; //IMPL{var_stg nrvo = this->clone(); nrvo.substrer(pos1); return nrvo;}
 
 	// Shorthand alias of substr version 2.
 	ND var  b(const int pos1) const&; //IMPL{return this->substr(pos1);}
@@ -874,7 +874,7 @@ public:
 	//  // or
 	//  let v2 = convert("abcde", "aZd", "XY");`
 	//
-	ND var  convert(SV fromchars, SV tochars) const&; //IMPL{var_mid nrvo = this->clone(); nrvo.converter(fromchars,tochars); return nrvo;}
+	ND var  convert(SV fromchars, SV tochars) const&; //IMPL{var_stg nrvo = this->clone(); nrvo.converter(fromchars,tochars); return nrvo;}
 
 	// Ditto for Unicode code points.
 	//
@@ -882,7 +882,7 @@ public:
 	//  // or
 	//  let v2 = textconvert("a🤡b😀c🌍d", "🤡😀", "👋");`
 	//
-	ND var  textconvert(SV fromchars, SV tochars) const&; //IMPL{var_mid nrvo = this->clone(); nrvo.textconverter(fromchars,tochars); return nrvo;}
+	ND var  textconvert(SV fromchars, SV tochars) const&; //IMPL{var_stg nrvo = this->clone(); nrvo.textconverter(fromchars,tochars); return nrvo;}
 
 	// Replace all occurrences of one substr with another.
 	// Case sensitive.
@@ -1004,7 +1004,7 @@ public:
 	//  // or
 	//  let v2 = parse("abc,\"def,\"123\" fgh\",12.34", ',');`
 	//
-	ND var  parse(char sepchar = ' ') const&; //IMPL{var_mid nrvo = this->clone(); nrvo.parser(sepchar); return nrvo;}
+	ND var  parse(char sepchar = ' ') const&; //IMPL{var_stg nrvo = this->clone(); nrvo.parser(sepchar); return nrvo;}
 
 	// Split a delimited string into a dim array.
 	// Delimiter: Can be multibyte Unicode.
@@ -1258,32 +1258,32 @@ public:
 	// Update (replace or insert) a specific subvalue  in a dynamic array.
 	// Same as var.updater() function but returns a new string instead of updating a variable in place. Rarely used.
 	// "update()" was called "replace()" in Pick OS/Basic.
-	ND var  update(const int fieldno, const int valueno, const int subvalueno, in replacement) const&; //IMPL{var_mid nrvo = this->clone(); nrvo.updater(fieldno, valueno, subvalueno, replacement); return nrvo;}
+	ND var  update(const int fieldno, const int valueno, const int subvalueno, in replacement) const&; //IMPL{var_stg nrvo = this->clone(); nrvo.updater(fieldno, valueno, subvalueno, replacement); return nrvo;}
 
 	// Update (replace or insert) a specific value in a dynamic array.
-	ND var  update(const int fieldno, const int valueno, in replacement)                    const&; //IMPL{var_mid nrvo = this->clone(); nrvo.updater(fieldno, valueno, 0, replacement); return nrvo;}
+	ND var  update(const int fieldno, const int valueno, in replacement)                    const&; //IMPL{var_stg nrvo = this->clone(); nrvo.updater(fieldno, valueno, 0, replacement); return nrvo;}
 
 	// Update (replace or insert) a specific field a dynamic array.
-	ND var  update(const int fieldno, in replacement)                                       const&; //IMPL{var_mid nrvo = this->clone(); nrvo.updater(fieldno, 0, 0, replacement); return nrvo;}
+	ND var  update(const int fieldno, in replacement)                                       const&; //IMPL{var_stg nrvo = this->clone(); nrvo.updater(fieldno, 0, 0, replacement); return nrvo;}
 
 	// INSERT
 
 	// Insert a subvalue in a dynamic array.
 	// Same as var.inserter() function but returns a new string instead of updating a variable in place.
-	ND var  insert(const int fieldno, const int valueno, const int subvalueno, in insertion) const&; //IMPL{var_mid nrvo = this->clone(); nrvo.inserter(fieldno, valueno, subvalueno, insertion); return nrvo;}
+	ND var  insert(const int fieldno, const int valueno, const int subvalueno, in insertion) const&; //IMPL{var_stg nrvo = this->clone(); nrvo.inserter(fieldno, valueno, subvalueno, insertion); return nrvo;}
 
 	// Insert a value in a dynamic array.
-	ND var  insert(const int fieldno, const int valueno, in insertion)                      const&; //IMPL{var_mid nrvo = this->clone(); nrvo.inserter(fieldno, valueno, 0, insertion); return nrvo;}
+	ND var  insert(const int fieldno, const int valueno, in insertion)                      const&; //IMPL{var_stg nrvo = this->clone(); nrvo.inserter(fieldno, valueno, 0, insertion); return nrvo;}
 
 	// Insert a field in a dynamic array.
-	ND var  insert(const int fieldno, in insertion)                                         const&; //IMPL{var_mid nrvo = this->clone(); nrvo.inserter(fieldno, 0, 0, insertion); return nrvo;}
+	ND var  insert(const int fieldno, in insertion)                                         const&; //IMPL{var_stg nrvo = this->clone(); nrvo.inserter(fieldno, 0, 0, insertion); return nrvo;}
 
 	// REMOVE
 
 	// Remove a field, value or subvalue from a dynamic array.
 	// Same as var.remover() function but returns a new string instead of updating a variable in place.
 	// "remove()" was called "delete()" in Pick OS/Basic.
-	ND var  remove(const int fieldno, const int valueno = 0, const int subvalueno = 0)      const&; //IMPL{var_mid nrvo = this->clone(); nrvo.remover(fieldno, valueno, subvalueno); return nrvo;}
+	ND var  remove(const int fieldno, const int valueno = 0, const int subvalueno = 0)      const&; //IMPL{var_stg nrvo = this->clone(); nrvo.remover(fieldno, valueno, subvalueno); return nrvo;}
 
 	// SAME AS ABOVE ON TEMPORARIES TO USE MUTATING (not documented because used difference in implementation is irrelevant to exodus users)
 	///////////////////////////////////////////////

@@ -57,7 +57,7 @@ export namespace exo {
 //	using exo::var;
 //	using exo::var_base;
 //	using exo::var_iter;
-//	using exo::var_mid;
+//	using exo::var_stg;
 //	using exo::var_proxy1;
 //	using exo::var_proxy2;
 //	using exo::var_proxy3;

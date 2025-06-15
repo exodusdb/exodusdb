@@ -3,9 +3,9 @@
 // nano varreplacer.cpp varinserter.cpp varremover.cpp
 // alt+, and alt+. to switch file in nano
 
-IO   var_mid::updater(int fieldno, int valueno, int subvalueno, in replacement) REF {
+IO   var_stg::updater(int fieldno, int valueno, int subvalueno, in replacement) REF {
 
-	THISIS("void var_mid::updater(int fieldno, int valueno, int subvalueno, in replacement) &")
+	THISIS("void var_stg::updater(int fieldno, int valueno, int subvalueno, in replacement) &")
 	assertStringMutator(function_sig);
 	ISSTRING(replacement)
 

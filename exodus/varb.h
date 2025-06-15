@@ -101,7 +101,7 @@ namespace exo {
 // Forward declarations
 
 class var;
-class var_mid; // forward declaration of a class template
+class var_stg; // forward declaration of a class template
 
 #define VB1         var_base
 #define VBR1        var_base&
@@ -195,7 +195,7 @@ class PUBLIC var_base {
 	                                 // Implemented as an unsigned int 1.e. 4 bytes
 
 	friend class var;
-//	friend class var_mid;
+//	friend class var_stg;
 	friend class dim;
 //	friend class rex;
 

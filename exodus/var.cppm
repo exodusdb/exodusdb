@@ -9,7 +9,7 @@ export module var;
 export namespace exo {
 
 	using exo::var_base;
-	using exo::var_mid;
+	using exo::var_stg;
 	using exo::var;
 	using exo::var_iter;
 
