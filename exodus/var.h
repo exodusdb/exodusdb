@@ -82,33 +82,10 @@ public:
 	// Inherit constructors
 	using var_base::var_base;
 
-	// Copy ctor
-    var_mid(const var_mid& other) = default;
-
-	// Move ctor
-    var_mid(var_mid&& other) noexcept = default;
-
-	// ASSIGNMENT
-
 	// Inherit assignment operators
 	using var_base::operator=;
 
-	// Return void to prevent accidental use in conditionals (e.g., if (v = "x"))
-	// and to discourage assignment chaining, enhancing code clarity.
-
-	// Copy assignment
-	void /*var_mid&*/ operator=(const var_mid& other) {  // Suppress implicit operators
-		var_base::operator=(other);  // Delegate to base
-		return /* *this*/;
-	}
-
-	// Move assignment
-    void /*var_mid&*/ operator=(var_mid&& other) & noexcept { var_base::operator=(std::move(other)); }
-
-	// var_base::clone and move, like most var_base functions return a var
-	// since a var is usable as a var_base but not vice versa.
-
-}; // class var_mid
+};
 
 // class var
 class PUBLIC var : public var_mid {
