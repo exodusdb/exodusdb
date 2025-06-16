@@ -956,7 +956,7 @@ io   var::oconv_MR(const char* conversion) {
 
 	// abort if no 3rd char
 	if (*conversion == '\0')
-		return (*this);
+		return *this;
 
 	// in case changes to/from numeric
 	var_typ = VARTYP_STR;

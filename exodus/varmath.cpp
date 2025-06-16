@@ -55,7 +55,7 @@ namespace exo {
  * \return True if the object was created, false if not
  *         (i.e., we're out of memory)
  */
-var  var::abs() const {
+var  var_base::abs() const {
 
 	THISIS("var  var::abs() const")
 	assertNumeric(function_sig);
@@ -64,7 +64,7 @@ var  var::abs() const {
 	if (this->var_typ & VARTYP_DBL) {
 		if (var_dbl < 0)
 			return -var_dbl;
-		return (*this);
+		return this->clone();
 	} else {
 		if (var_int < 0)
 			return -var_int;
@@ -72,7 +72,7 @@ var  var::abs() const {
 	}
 }
 
-var  var::sin() const {
+var  var_base::sin() const {
 
 	THISIS("var  var::sin() const")
 	assertNumeric(function_sig);
@@ -84,7 +84,7 @@ var  var::sin() const {
 		return std::sin(static_cast<double>(var_int) * M_PI / 180);
 }
 
-var  var::cos() const {
+var  var_base::cos() const {
 
 	THISIS("var  var::cos() const")
 	assertNumeric(function_sig);
@@ -96,7 +96,7 @@ var  var::cos() const {
 		return std::cos(static_cast<double>(var_int) * M_PI / 180);
 }
 
-var  var::tan() const {
+var  var_base::tan() const {
 
 	THISIS("var  var::tan() const")
 	assertNumeric(function_sig);
@@ -108,7 +108,7 @@ var  var::tan() const {
 		return std::tan(static_cast<double>(var_int) * M_PI / 180);
 }
 
-var  var::atan() const {
+var  var_base::atan() const {
 
 	THISIS("var  var::atan() const")
 	assertNumeric(function_sig);
@@ -120,7 +120,7 @@ var  var::atan() const {
 		return std::atan(static_cast<double>(var_int)) / M_PI * 180;
 }
 
-var  var::loge() const {
+var  var_base::loge() const {
 
 	THISIS("var  var::loge() const")
 	assertNumeric(function_sig);
@@ -132,7 +132,7 @@ var  var::loge() const {
 		return std::log(static_cast<double>(var_int));
 }
 
-var  var::sqrt() const {
+var  var_base::sqrt() const {
 
 	THISIS("var  var::sqrt() const")
 	assertNumeric(function_sig);
@@ -145,7 +145,7 @@ var  var::sqrt() const {
 	return std::sqrt(static_cast<double>(var_int));
 }
 
-var  var::pwr(in exponent) const {
+var  var_base::pwr(in exponent) const {
 
 	THISIS("var  var::pwr(in exponent) const")
 	assertNumeric(function_sig);
@@ -158,7 +158,7 @@ var  var::pwr(in exponent) const {
 		return std::pow(static_cast<double>(var_int), exponent.toDouble());
 }
 
-var  var::exp() const {
+var  var_base::exp() const {
 
 	THISIS("var  var::exp() const")
 	assertNumeric(function_sig);
@@ -171,12 +171,12 @@ var  var::exp() const {
 }
 
 ///////////////
-// var::integer
+// var_base::integer
 ///////////////
 
 // function name is "integer" instead of "int" because int is a reserved word in c/c++ for int datatype
 // using the system int() function on a var e.g. int(varx) returns an int whereas this function returns a var
-var  var::integer() const {
+var  var_base::integer() const {
 
 	//-1.0 = -1
 
@@ -192,7 +192,9 @@ var  var::integer() const {
 
 	// 1.0 = 1
 
-	this->assertInteger(__PRETTY_FUNCTION__);
+	THISIS("var  var::integer() const")
+	this->assertInteger(function_sig);
+
 	return var_int;
 }
 
@@ -200,7 +202,7 @@ var  var::integer() const {
 // var_base::floor
 //////////////////
 
-var var::floor() const {
+var var_base::floor() const {
 
 	// Goes to the closest integer towards negative infinity
 
@@ -222,7 +224,8 @@ var var::floor() const {
 	// 1.5 = 1
 	// 1.9 = 1
 
-	this->assertNumeric(__PRETTY_FUNCTION__);
+	THISIS("var  var::floor() const")
+	this->assertNumeric(function_sig);
 
 	if (!(var_typ & VARTYP_INT)) {
 

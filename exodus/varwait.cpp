@@ -325,7 +325,7 @@ static var wait_main(const int argc, const char* argv[], const int wait_time_ms)
 	return events;
 }
 
-var  var::oswait(const int milliseconds) const {
+var  var_os::oswait(const int milliseconds) const {
 
 	THISIS("var  var::oswait(const int milliseconds) const")
 	assertString(function_sig);

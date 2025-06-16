@@ -299,7 +299,6 @@ static const var defaultconninfo =
 // THREAD_LOCAL data - shared by all dynamically loaded shared libraries
 static thread_local int                                thread_default_data_dbconn_no = 0;
 static thread_local int                                thread_default_dict_dbconn_no = 0;
-static thread_local var                                thread_lasterror = "";
 static thread_local DBpool                             thread_dbpool;
 static thread_local std::map<std::string, std::string> thread_file_handles;
 
@@ -5693,33 +5692,6 @@ bool var::flushindex(in filename) const {
 	}
 
 	return true;
-}
-
-void  var::setlasterror(in msg) {
-	// No checking for speed
-	// THISIS("void var::lasterror(in msg")
-	// ISSTRING(msg)
-
-	// tcache_get (tc_idx=12) at malloc.c:2943
-	// 2943    malloc.c: No such file or directory.
-	// You have heap corruption somewhere -- someone is running off the end of an array or
-	// dereferencing an invalid pointer or using some object after it has been freed. EVADE
-	// error for now by commenting next line
-
-	thread_lasterror = msg;
-
-	if (DBTRACE>1)
-		TRACE(thread_lasterror)
-
-//	return lasterror();
-}
-
-var  var::lasterror() {
-	return thread_lasterror;
-}
-
-void var::loglasterror(in source) {
-	thread_lasterror.logputl(source ^ " ");
 }
 
 }  // namespace exo

@@ -149,7 +149,7 @@ void time_t_to_pick_date_time(const std::time_t time, int* pick_date, int* pick_
 }
 
 // -> number of days since the pick date epoch 31/12/1967
-var  var::date() {
+var  var_os::date() {
 
 	// ASSUMPTION: td::chrono::system_clock() epoch is 1970/01/01 00:00:00
 
@@ -168,7 +168,7 @@ var  var::date() {
 }
 
 // -> number of whole seconds since midnight UTC
-var  var::time() {
+var  var_os::time() {
 
 //	Pure chrono solution (no mixing with C-style gmtime)
 //
@@ -198,7 +198,7 @@ var  var::time() {
 }
 
 // -> decimal fractional seconds since midnight (up to micro or nano second accuracy)
-var  var::ostime() {
+var  var_os::ostime() {
 
 	// ASSUMPTION: td::chrono::system_clock() epoch is midnight
 
@@ -218,7 +218,7 @@ var  var::ostime() {
 }
 
 // Returns decimal fractional days since pick epoch 1967-12-31 00:00:00 (up to micro or nano second accuracy)
-var  var::ostimestamp() {
+var  var_os::ostimestamp() {
 
 	let datenow = var::date();
 	var timenow = var::ostime();
@@ -235,7 +235,7 @@ var  var::ostimestamp() {
 }
 
 // -> decimal fractional days since pick epoch 1967-12-31 00:00:00 (up to micro or nano second accuracy)
-var  var::ostimestamp(in ostime) const {
+var  var_os::ostimestamp(in ostime) const {
 
 	THISIS("var  var::ostimestamp(in ostime) const")
 	assertNumeric(function_sig);

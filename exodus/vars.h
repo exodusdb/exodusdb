@@ -23,6 +23,9 @@ public:
 	// Inherit assignment operators
 	using var_base::operator=;
 
+	// Inherit conversion to var;
+	using var_base::operator var;
+
 //	using VAR    =       var;
 //	using VARREF =       var&;
 //	using CVR    = const var&;
@@ -34,11 +37,11 @@ public:
 
 	// Implicitly convert var_stg to var
 
-	// Type conversion since reference will be optimised away by -O2
-	// Note that most var_base function directly return a var since var's have full functionality
-	// and can be implicitly used as var_base but not vice versa.
-	CONSTEXPR
-	operator var&() &;
+//	// Type conversion since reference will be optimised away by -O2
+//	// Note that most var_base function directly return a var since var's have full functionality
+//	// and can be implicitly used as var_base but not vice versa.
+//	CONSTEXPR
+//	operator var&() &;
 
 	///////////////////////
 	///// String creation :

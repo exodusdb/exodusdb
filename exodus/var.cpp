@@ -49,4 +49,33 @@ ND var var_proxy3::at(const int pos1) const {
 	return v1.at(pos1);
 }
 
+static thread_local var thread_lasterror = "";
+
+void  var::setlasterror(in msg) {
+	// No checking for speed
+	// THISIS("void var::lasterror(in msg")
+	// ISSTRING(msg)
+
+	// tcache_get (tc_idx=12) at malloc.c:2943
+	// 2943    malloc.c: No such file or directory.
+	// You have heap corruption somewhere -- someone is running off the end of an array or
+	// dereferencing an invalid pointer or using some object after it has been freed. EVADE
+	// error for now by commenting next line
+
+	thread_lasterror = msg;
+
+//	if (DBTRACE>1)
+//		TRACE(thread_lasterror)
+
+//	return lasterror();
+}
+
+var  var::lasterror() {
+	return thread_lasterror;
+}
+
+void var::loglasterror(in source) {
+	thread_lasterror.logputl(source ^ " ");
+}
+
 }  // namespace exo

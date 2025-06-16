@@ -215,9 +215,13 @@ RETVAR VB1::dump() const {
 		nrvo ^= " str:";
 
 		// Append the string's address if not within the var e.g. it on the heap. not SSO
-		const var cstr_addr = int64_t(static_cast<const void*>(var_str.c_str()));
-		if (abs(cstr_addr - var_addr) > 64)
-			nrvo ^= "0x" ^ cstr_addr.oconv("MX").lcase();
+		const char* str_start = var_str.c_str();
+		const char* obj_start = reinterpret_cast<const char*>(&var_str);
+		ptrdiff_t diff = str_start - obj_start;
+		if (std::abs(diff) > 32) {
+			const var str_addr = int64_t(static_cast<const void*>(var_str.c_str()));
+			nrvo ^= "0x" ^ str_addr.oconv("MX").lcase();
+		}
 
 		nrvo ^= " " _DQ ^ var_base(var_str).first_(1024).convert(_ALL_FMS, _VISIBLE_FMS) ^ _DQ;
 	}

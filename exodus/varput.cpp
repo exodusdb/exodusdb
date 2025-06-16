@@ -43,7 +43,7 @@ using let = const var;
 /////////
 
 //NOT THREADSAFE? warning put() is not threadsafe whereas output(), errput() and logput() are threadsafe
-CVR  var::put(std::ostream& ostream1) const {
+CVR  var_os::put(std::ostream& ostream1) const {
 
 	THISIS("CVR  var::put(std::ostream& ostream1) const")
 	assertString(function_sig);
@@ -67,14 +67,14 @@ CVR  var::put(std::ostream& ostream1) const {
 ///////////////////////////////////////////////////
 
 // output()
-CVR  var::output(in prefix) const {
+CVR  var_os::output(in prefix) const {
 	THISIS("CVR  var::output(in prefix) const")
 	prefix.put(std::cout);
 	return this->put(std::cout);
 }
 
 // outputl()
-CVR  var::outputl(in prefix) const {
+CVR  var_os::outputl(in prefix) const {
 	// FLUSHED not buffered
 	THISIS("CVR  var::outputl(in prefix) const")
 	prefix.put(std::cout);
@@ -84,7 +84,7 @@ CVR  var::outputl(in prefix) const {
 }
 
 // outputt()
-CVR  var::outputt(in prefix) const {
+CVR  var_os::outputt(in prefix) const {
 	// BUFFERED not flushed
 	THISIS("CVR  var::outputt(in prefix) const")
 	std::cout << "\t";
@@ -98,7 +98,7 @@ CVR  var::outputt(in prefix) const {
 ////////////////////////////////////////////////////
 
 // errput
-CVR  var::errput(in prefix) const {
+CVR  var_os::errput(in prefix) const {
 	// BUFFERED? not flushed
 	THISIS("CVR  var::errput(in prefix) const")
 	//prefix.put(std::cerr);
@@ -109,7 +109,7 @@ CVR  var::errput(in prefix) const {
 }
 
 // errputl
-CVR  var::errputl(in prefix) const {
+CVR  var_os::errputl(in prefix) const {
 	// FLUSHED not buffered
 	THISIS("CVR  var::errputl(in prefix) const")
 	//prefix.put(std::cerr);
@@ -124,7 +124,7 @@ CVR  var::errputl(in prefix) const {
 ///////////////////////////////////////////////////////////////////////////
 
 // logput
-CVR  var::logput(in prefix) const {
+CVR  var_os::logput(in prefix) const {
 	// BUFFERED not flushed
 	THISIS("CVR  var::logput(in prefix) const")
 	//prefix.put(std::clog);
@@ -134,7 +134,7 @@ CVR  var::logput(in prefix) const {
 }
 
 // logputl
-CVR  var::logputl(in prefix) const {
+CVR  var_os::logputl(in prefix) const {
 	// BUFFERED not flushed
 	THISIS("CVR  var::logputl(in prefix) const")
 	//prefix.put(std::clog);

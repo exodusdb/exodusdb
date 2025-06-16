@@ -23,7 +23,7 @@
 
 namespace exo {
 
-bool var::setxlocale(const char* newlocalecode ) {
+bool var_os::setxlocale(const char* newlocalecode ) {
 
 	THISIS("bool var::setxlocale(const char* newlocalecode) static")
 //	assertString(function_sig);
@@ -64,7 +64,7 @@ bool var::setxlocale(const char* newlocalecode ) {
 //#endif
 }
 
-var  var::getxlocale() {
+var  var_os::getxlocale() {
 
 	THISIS("out  var::getxlocale() static")
 

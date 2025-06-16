@@ -224,7 +224,7 @@ static const std::string to_oscmd_string(in cmd) {
 }
 
 // Returns with trailing OSSLASH
-var var::ostempdir() {
+var var_os::ostempdir() {
 	std::error_code error_code;
 	// TODO handle error code specifically
 	std::string dirpath = std::string(std::filesystem::temp_directory_path(error_code));
@@ -250,7 +250,7 @@ var var::ostempdir() {
 // and will automatically be fully deleted when the file handle is closed/process terminates.
 //
 
-// var  var::ostempfile() const {
+// var  var_os::ostempfile() const {
 //
 //	// Linux immediately unlinks the temporary file so it exists without a name.
 //	// the actual file is automatically deleted from the file system when the file handle is closed/process is closed.
@@ -276,14 +276,14 @@ var var::ostempdir() {
 // This function actually creates a file which must be cleaned up by the caller
 // The filenames are random names
 // TODO is this threadsafe?
-var var::ostempfile() {
+var var_os::ostempfile() {
 
 	// https://cpp.hotexamples.com/examples/-/-/mkstemp/cpp-mkstemp-function-examples.html
 
 	// Create a char* template of the temporary file name desired
 	// (2*26+10)^6 possible filenames = 56,800,235,584
 	// Note that 64 bit hash = 1.84467440737e+19 combinations
-	var				  rvo_tempfilename = var::ostempdir() ^ "~exoXXXXXX";
+	var				  rvo_tempfilename = var_os::ostempdir() ^ "~exoXXXXXX";
 	std::vector<char> buffer(rvo_tempfilename.var_str.begin(), rvo_tempfilename.var_str.end());
 	buffer.push_back('\0');
 
@@ -302,9 +302,9 @@ var var::ostempfile() {
 	return rvo_tempfilename;
 }
 
-bool var::osshell() const {
+bool var_os::osshell() const {
 
-	THISIS("bool var::osshell() const")
+	THISIS("bool var_os::osshell() const")
 	// will be checked again by toString()
 	// but put it here so any unassigned error shows in osshell
 	assertString(function_sig);
@@ -313,7 +313,7 @@ bool var::osshell() const {
 	int shellresult = system(to_oscmd_string(*this).c_str());
 
 	if (shellresult)
-		setlasterror("osshell failed: " ^ this->quote());
+		var::setlasterror("osshell failed: " ^ this->quote());
 
 	// TRACE(*this)
 	// TRACE(shellresult)
@@ -322,7 +322,7 @@ bool var::osshell() const {
 	return !shellresult;
 }
 
-bool var::osshellread(in oscmd) {
+bool var_os::osshellread(in oscmd) {
 
 	THISIS("bool var::osshellread(in oscmd)")
 	// will be checked again by toString()
@@ -365,13 +365,13 @@ bool var::osshellread(in oscmd) {
 
 	// Return the exit status in last error if not 0
 	if (shellresult)
-		setlasterror("Status: " ^ var(shellresult) ^ " osshellread: " ^ oscmd.quote());
+		var::setlasterror("Status: " ^ var(shellresult) ^ " osshellread: " ^ oscmd.quote());
 
 	// Return true if the exit status was 0
 	return !shellresult;
 }
 
-bool var::osshellwrite(in oscmd) const {
+bool var_os::osshellwrite(in oscmd) const {
 
 	THISIS("bool var::osshellwrite(in oscmd) const")
 	// will be checked again by toString()
@@ -395,7 +395,7 @@ bool var::osshellwrite(in oscmd) const {
 	int shellresult = pclose(pfile);
 
 	if (shellresult)
-		setlasterror("osshellwrite failed. " ^ oscmd.quote());
+		var::setlasterror("osshellwrite failed. " ^ oscmd.quote());
 
 	// return true if no error code
 	return !shellresult;
@@ -413,7 +413,7 @@ bool run_piped_process_with_timeout(
 	int timeout_seconds,
 	const std::string& command);
 
-bool var::osprocess(in oscmd, in stdin_for_process, out stdout_from_process, out stderr_from_process, out exit_status, in timeout_secs) {
+bool var_os::osprocess(in oscmd, in stdin_for_process, out stdout_from_process, out stderr_from_process, out exit_status, in timeout_secs) {
 
 	// Does not use bash or support sh-like functionality e.g. ; | || && > etc.
 
@@ -466,15 +466,8 @@ bool var::osprocess(in oscmd, in stdin_for_process, out stdout_from_process, out
 	return exit_status == 0;
 }
 
-void var::osflush() const {
-	std::cout << std::flush;
-	//	std::cerr << std::flush; // self flushing
-	std::clog << std::flush;
-	return;
-}
-
 // optional locale (not the same as codepage)
-bool var::osopen(in osfilename, const bool utf8 /*=true*/) const {
+bool var_os::osopen(in osfilename, const bool utf8 /*=true*/) const {
 
 	THISIS("bool var::osopen(in osfilename, const bool utf8)")
 	assertVar(function_sig);
@@ -494,7 +487,7 @@ static void del_fstream(void* handle) {
 }
 
 // osfilename must be clean.
-std::fstream* var::osopenx(in osfilename, const bool utf8, const bool autocreate_or_throw) const {
+std::fstream* var_os::osopenx(in osfilename, const bool utf8, const bool autocreate_or_throw) const {
 
 	// Try to get the cached file handle. the usual case is that you osopen a file before doing
 	// osbwrite/osbread Using fstream instead of ofstream so that we can mix reads and writes on
@@ -646,7 +639,7 @@ WINDOWS-1258
 //// no binary conversion is performed on input unless
 //// codepage is provided then exodus converts from the
 //// specified codepage (not locale) on input to utf-8 internally
-// bool var::osread(in osfilename, const char* codepage) {
+// bool var_os::osread(in osfilename, const char* codepage) {
 //
 //	THISIS("bool var::osread(in osfilename, const char* codepage")
 //	ISSTRING(osfilename)
@@ -654,7 +647,7 @@ WINDOWS-1258
 // }
 //
 
-bool var::osread(const char* osfilename, const char* codepage) {
+bool var_os::osread(const char* osfilename, const char* codepage) {
 
 	THISIS("bool var::osread(const char* osfilename, const char* codepage")
 	assertVar(function_sig);
@@ -744,7 +737,7 @@ bool var::osread(const char* osfilename, const char* codepage) {
 	return true;
 }
 
-var var::to_codepage(const char* codepage) const {
+var var_os::to_codepage(const char* codepage) const {
 
 	THISIS("bool var::to_codepage(const char* codepage) const")
 	assertString(function_sig);
@@ -762,7 +755,7 @@ var var::to_codepage(const char* codepage) const {
 	//	return var_str;
 }
 
-var var::from_codepage(const char* codepage) const {
+var var_os::from_codepage(const char* codepage) const {
 
 	THISIS("bool var::from_codepage(const char* codepage) const")
 	assertString(function_sig);
@@ -844,7 +837,7 @@ static unsigned count_invalid_trailing_UTF8_bytes(const std::string& str) {
 // no binary conversion is performed on output unless
 // codepage is provided (not locale) then exodus assumes internally
 // utf-8 and converts all output to the specified codepage
-bool var::oswrite(in osfilename, const char* codepage) const {
+bool var_os::oswrite(in osfilename, const char* codepage) const {
 
 	THISIS("bool var::oswrite(in osfilename, const char* codepage) const")
 	assertString(function_sig);
@@ -884,11 +877,11 @@ bool var::oswrite(in osfilename, const char* codepage) const {
 
 // #ifdef VAR_OSBREADWRITE_CONST_OFFSET
 //  a version that accepts a const offset ie ignores return value
-// bool var::osbwrite(in osfilevar, in offset, const bool adjust) const
+// bool var_os::osbwrite(in osfilevar, in offset, const bool adjust) const
 //  offset -1 appends by starting writing one byte after the current end of the file
 //  offset -2 updates the last byte of the file.
 //  etc.
-// bool var::osbwrite(in osfilevar, in offset) const {
+// bool var_os::osbwrite(in osfilevar, in offset) const {
 //	return this->osbwrite(osfilevar, const_cast<io>(offset));
 // }
 // #endif
@@ -896,8 +889,8 @@ bool var::oswrite(in osfilename, const char* codepage) const {
 // NOTE: unlike osread/oswrite which rely on iconv codepages to do any conversion
 // osbread and osbwrite rely on the locale being passed in on the osopen stage
 
-// bool var::osbwrite(in osfilevar, io offset, const bool adjust) const
-bool var::osbwrite(in osfilevar, io offset) const {
+// bool var_os::osbwrite(in osfilevar, io offset, const bool adjust) const
+bool var_os::osbwrite(in osfilevar, io offset) const {
 
 	// osfilehandle is just the filename but has a special var_typ
 	// and buffers the "file number" in the var_int
@@ -945,7 +938,7 @@ bool var::osbwrite(in osfilevar, io offset) const {
 // NOTE if the locale is not C then any partial non-utf-8 bytes at the end (due to bytesize
 // not being an exact number of valid utf-8 code units) are trimmed off the return value
 // The new offset is changed to reflect the above and is simply increased by bytesize
-bool var::osbread(in osfilevar, io offset, const int bytesize) {
+bool var_os::osbread(in osfilevar, io offset, const int bytesize) {
 
 	THISIS("bool var::osbread(in osfilevar, io offset, const int bytesize")
 	assertVar(function_sig);
@@ -963,7 +956,7 @@ bool var::osbread(in osfilevar, io offset, const int bytesize) {
 	// likely indicating that the file was not preopened and does not exist
 	std::fstream* fs = osfilevar.osopenx(osfilevar /*utf8 = true*/ /*autocreate_or_throw = false*/);
 	if (fs == nullptr) {
-		var::setlasterror("osbread failed. " ^ this->lasterror());
+		var::setlasterror("osbread failed. " ^ var::lasterror());
 		return false;
 	}
 
@@ -1075,7 +1068,7 @@ bool var::osbread(in osfilevar, io offset, const int bytesize) {
 	return !hard_fail && !var_str.empty();
 }
 
-void var::osclose() const {
+void var_os::osclose() const {
 	if (THIS_IS_OSFILE()) {
 		thread_fstream_handles.del_handle(static_cast<int>(var_int));
 //		var_typ ^= (VARTYP_OSFILE | VARTYP_INT | VARTYP_NAN | VARTYP_DBL);	// only STR bit should remains
@@ -1084,7 +1077,7 @@ void var::osclose() const {
 	// in all other cases, the files should be closed.
 }
 
-bool var::osrename(in new_dirpath_or_filepath) const {
+bool var_os::osrename(in new_dirpath_or_filepath) const {
 
 	THISIS("bool var::osrename(in new_dirpath_or_filepath) const")
 	assertString(function_sig);
@@ -1138,7 +1131,7 @@ bool var::osrename(in new_dirpath_or_filepath) const {
 	return true;
 }
 
-bool var::oscopy(in new_dirpath_or_filepath) const {
+bool var_os::oscopy(in new_dirpath_or_filepath) const {
 
 	THISIS("bool var::oscopy(in new_dirpath_or_filepath) const")
 	assertString(function_sig);
@@ -1172,7 +1165,7 @@ bool var::oscopy(in new_dirpath_or_filepath) const {
 	return true;
 }
 
-bool var::osmove(in new_dirpath_or_filepath) const {
+bool var_os::osmove(in new_dirpath_or_filepath) const {
 
 	THISIS("bool var::osmove(in new_dirpath_or_filepath) const")
 	assertString(function_sig);
@@ -1211,7 +1204,7 @@ bool var::osmove(in new_dirpath_or_filepath) const {
 	// To copy and delete instead of move
 	////////////////////////////////////////
 	if (!this->oscopy(new_dirpath_or_filepath)) {
-		var::setlasterror("osmove failed. " ^ this->lasterror());
+		var::setlasterror("osmove failed. " ^ var::lasterror());
 		return false;
 	}
 
@@ -1229,7 +1222,7 @@ bool var::osmove(in new_dirpath_or_filepath) const {
 	return true;
 }
 
-bool var::osremove() const {
+bool var_os::osremove() const {
 
 	THISIS("bool var::osremove() const")
 	assertVar(function_sig);
@@ -1252,7 +1245,7 @@ bool var::osremove() const {
 	return true;
 }
 
-bool var::osmkdir() const {
+bool var_os::osmkdir() const {
 
 	assertString(__PRETTY_FUNCTION__);
 
@@ -1281,7 +1274,7 @@ bool var::osmkdir() const {
 	return true;
 }
 
-bool var::osrmdir(bool evenifnotempty) const {
+bool var_os::osrmdir(bool evenifnotempty) const {
 
 	THISIS("bool var::osrmdir(bool evenifnotempty) const")
 	assertString(function_sig);
@@ -1336,7 +1329,7 @@ void time_t_to_pick_date_time(time_t time, int* pick_date, int* pick_time);
 // }
 
 // Return for a file or dir, a short string containing modified_date ^ FM ^ modified_time ^ FM ^size
-var var::osinfo(const int mode /*=0*/) const {
+var var_os::osinfo(const int mode /*=0*/) const {
 
 	assertString(__PRETTY_FUNCTION__);
 
@@ -1400,19 +1393,19 @@ var var::osinfo(const int mode /*=0*/) const {
 	}
 }
 
-var var::osfile() const {
+var var_os::osfile() const {
 	return this->osinfo(1);
 }
 
-var var::osdir() const {
+var var_os::osdir() const {
 	return this->osinfo(2);
 }
 
-var var::oslistf(SV globpattern) const {
+var var_os::oslistf(SV globpattern) const {
 	return this->oslist(globpattern, 1);
 }
 
-var var::oslistd(SV globpattern) const {
+var var_os::oslistd(SV globpattern) const {
 	return this->oslist(globpattern, 2);
 }
 
@@ -1422,7 +1415,7 @@ var var::oslistd(SV globpattern) const {
  *@param	mode	1=files only, 2=directories only, otherwise both.
  *@returns		List of directory and/or filenames depending on mode. fm separator
  */
-var var::oslist(SV globpattern0, const int mode) const {
+var var_os::oslist(SV globpattern0, const int mode) const {
 
 	THISIS("var  var::oslist(in globpattern, const int mode) const")
 	assertVar(function_sig);
@@ -1518,7 +1511,7 @@ append_it:
 	return filelist;
 }
 
-bool var::oscwd(SV newpath) {
+bool var_os::oscwd(SV newpath) {
 
 	THISIS("bool var::oscwd(SV newpath) static")
 
@@ -1540,13 +1533,20 @@ bool var::oscwd(SV newpath) {
 	return true;
 }
 
-var var::oscwd() {
+var var_os::oscwd() {
 
 	THISIS("var  var::oscwd() static")
 
 	std::string currentpath = std::filesystem::current_path().string();
 
 	return var(currentpath).convert("/", _OSSLASH);
+}
+
+void var_os::osflush() const {
+	std::cout << std::flush;
+	//	std::cerr << std::flush; // self flushing
+	std::clog << std::flush;
+	return;
 }
 
 }  // namespace exo

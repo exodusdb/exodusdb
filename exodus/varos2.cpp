@@ -41,15 +41,6 @@ extern char** environ;
 
 namespace exo {
 
-void var::ossleep(const int milliseconds) {
-
-	THISIS("void var::ossleep(const int milliseconds) static")
-//	assertVar(function_sig);	 // not needed if *this not used
-
-	std::this_thread::sleep_for(std::chrono::milliseconds(milliseconds));
-
-}
-
 // BOOST RANDOM
 // http://www.boost.org/doc/libs/1_38_0/libs/random/random_demo.cpp
 
@@ -88,7 +79,7 @@ thread_local std::unique_ptr<RNG_typ> thread_RNG;
 
 // PickOS returns pseudo random integers in the range of 0-4 for rnd(5)
 // Exodus is symmetrical for negative numbers
-var  var::rnd() const {
+var  var_base::rnd() const {
 
 	THISIS("var  var::rnd() const")
 	assertNumeric(function_sig);
@@ -122,7 +113,7 @@ var  var::rnd() const {
 
 }
 
-void var::initrnd() const {
+void var_base::initrnd() const {
 
 	THISIS("void var::initrnd() const")
 	assertAssigned(__PRETTY_FUNCTION__);
@@ -163,9 +154,18 @@ void var::initrnd() const {
 	thread_RNG = std::make_unique<RNG_typ>(seed);
 }
 
+void var_os::ossleep(const int milliseconds) {
+
+	THISIS("void var::ossleep(const int milliseconds) static")
+//	assertVar(function_sig);	 // not needed if *this not used
+
+	std::this_thread::sleep_for(std::chrono::milliseconds(milliseconds));
+
+}
+
 static thread_local std::string thread_environ;
 
-bool var::osgetenv(SV envcode) {
+bool var_os::osgetenv(SV envcode) {
 
 	// TIP if you cant seem to set osgetenv vars in bash/sh
 	// then ensure you set them with "export"
@@ -272,7 +272,7 @@ bool var::osgetenv(SV envcode) {
 
 }
 
-void var::ossetenv(SV envcode) const {
+void var_os::ossetenv(SV envcode) const {
 
 	THISIS("bool var::ossetenv(SV envcode) const")
 	assertString(function_sig);
@@ -309,12 +309,12 @@ void var::ossetenv(SV envcode) const {
 	return;
 }
 
-var  var::ospid() {
+var  var_os::ospid() {
 	//THISIS("var  var::ospid() const")
 	return getpid();
 }
 
-var  var::ostid() {
+var  var_os::ostid() {
 	//THISIS("var  var::ospid() const")
 //	return syscall(SYS_gettid);
 	return gettid();

@@ -350,7 +350,7 @@ invalid_hex:
 
 		// empty conversion string - no conversion
 		case '\0':
-			return (*this);
+			return *this;
 
 		// invalid conversion
 		default:;
@@ -1420,7 +1420,7 @@ var  var::oconv(const char* conversion_in) const {
 
 				// Empty conversion string - no conversion
 				case '\0':
-					return (*this);
+					return *this;
 					//break;
 
 				default:
