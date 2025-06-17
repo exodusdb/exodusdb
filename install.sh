@@ -1,4 +1,5 @@
 #!/bin/bash
+[ $SHLVL -le 3 ] && exec > >(tee -a "$(basename `echo ${0/.sh/}.$*.log | sed 's/ /\./g'`)") 2>&1
 set -euxo pipefail
 :
 : $0 $*
