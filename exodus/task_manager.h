@@ -157,7 +157,7 @@ public:
 		async_impl(callable);
 	}
 
-	// Hand over execution to other async tasks.
+	// Hand over execution to other async tasks. Automatically called on every database i/o.
 	// Execution can be suspended with full retention of stack and state.
 	// A round robin scheduler resumes async tasks in turn or sleeps if all are waiting for database i/o.
 	//
@@ -175,6 +175,7 @@ public:
 	auto async_results() -> std::generator<AsyncResult&>;
 
 #else
+	// undocumented
 	auto async_results() -> ResultRange<TaskManager, AsyncResult>;
 #endif
 

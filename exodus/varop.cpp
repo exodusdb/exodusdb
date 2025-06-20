@@ -75,40 +75,41 @@ ND var operator""_var(long double d) {
     return var(d);
 }
 
-////////////////////////////////////////
-// SELF INCREMENT/DECREMENT var versions
-////////////////////////////////////////
-
-// All forwarded to var_base
-
-// var ++
-
-var  var::operator++(int) & {
-	const var orig = this->clone();
-	var_base::operator++();
-	return orig;
-}
-
-// var --
-
-var  var::operator--(int) & {
-	const var orig = this->clone();
-	var_base::operator--(0);
-	return orig;
-}
-
-// ++ var
-
-var& var::operator++() & {
-	var_base::operator++(0);
-	return *this;
-}
-
-// -- var
-
-var& var::operator--() & {
-	var_base::operator--();
-	return *this;
-}
+// Inheriting from var_base now
+//////////////////////////////////////////
+//// SELF INCREMENT/DECREMENT var versions
+//////////////////////////////////////////
+//
+//// All forwarded to var_base
+//
+//// var ++
+//
+//var  var::operator++(int) & {
+//	const var orig = this->clone();
+//	var_base::operator++();
+//	return orig;
+//}
+//
+//// var --
+//
+//var  var::operator--(int) & {
+//	const var orig = this->clone();
+//	var_base::operator--(0);
+//	return orig;
+//}
+//
+//// ++ var
+//
+//var& var::operator++() & {
+//	var_base::operator++(0);
+//	return *this;
+//}
+//
+//// -- var
+//
+//var& var::operator--() & {
+//	var_base::operator--();
+//	return *this;
+//}
 
 } // namespace exo

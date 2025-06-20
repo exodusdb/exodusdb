@@ -227,14 +227,11 @@ var var_base::floor() const {
 	THISIS("var  var::floor() const")
 	this->assertNumeric(function_sig);
 
-	if (!(var_typ & VARTYP_INT)) {
-
+	// Always use double if available.
+	// Because the int may have been created from the double - not using floor.
+	if (var_typ & VARTYP_DBL) {
 		//warning: conversion from ‘double’ to ‘long int’ may change value [-Wfloat-conversion]
-		var_int = static_cast<varint_t>(std::floor(var_dbl));
-		//var_int = std::floor<varint_t>(var_dbl);
-
-		// Add int flag
-		var_typ |= VARTYP_INT;
+		return static_cast<varint_t>(std::floor(var_dbl));
 	}
 
 	return var_int;

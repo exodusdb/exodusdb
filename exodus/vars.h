@@ -1,6 +1,8 @@
 #ifndef VAR_STR_H
 #define VAR_STR_H
 
+// gendoc: var - String functions
+
 namespace exo {
 
 	class rex;
@@ -94,7 +96,7 @@ public:
 	// obj is var()
 
 	// Get a char.
-	// num: An integer 0-255.
+	// chrnum: An integer 0-255.
 	// return: A string containing a single char
 	// 0-127 -> ASCII, 128-255 -> invalid UTF-8 which cannot be written to the database or used in many exodus string operations
 	//
@@ -102,17 +104,17 @@ public:
 	//  // or
 	//  let v2 = chr(0x61);`
 	//
-	ND static var  chr(const int num);
+	ND static var  chr(const int chrnum);
 
 	// Get a Unicode character.
-	// num: A Unicode Code Point (Number)
+	// codepoint: A Unicode Code Point (Number)
 	// return: A single Unicode character in UTF8 encoding.
 	//
 	// `let v1 = var::textchr(171416); // "𩶘" // or "\xF0A9B698"
 	//  // or
 	//  let v2 = textchr(171416);`
 	//
-	ND static var  textchr(const int num);
+	ND static var  textchr(const int codepoint);
 
 	// Get a Unicode character name
 	// unicode_code_point: 0 - 0x10FFFF.
@@ -126,7 +128,7 @@ public:
 
 	// Get a string of repeated substrings.
 	// var: The substring to be repeated
-	// num: How many times to repeat the substring
+	// nreps: How many times to repeat the substring
 	// return: A string
 	// obj is strvar
 	//
@@ -134,7 +136,7 @@ public:
 	//  // or
 	//  let v2 = str("ab", 3);`
 	//
-	ND var  str(const int num) const;
+	ND var  str(const int nreps) const;
 
 	// Get a string as a given number of spaces.
 	// nspaces: The number of spaces required.
@@ -1455,41 +1457,48 @@ public:
 
 	// LOCATE
 
-	// locate substr in dynamic array
-	// Search unordered fields, values and/or subvalues.
-	// With only the substr argument provided, locate searches regardless of the field mark delimiters present.
-	// return: The field, value or subvalue number if found or 0 if not. Fields are counted regardless of delimiter.
-	// Searching for empty fields, values etc. (i.e. "") will work. Locating "" in "]yy" will return 1, in "xx]]zz" 2, and in "xx]yy]" 3, however, locating "" in "xx" will return 0 because there is conceptually no empty value in "xx". Locate "" in "" will return 1.
+	// locate the position of a substr in dynamic array.
+	// Find a substr in an unordered dynamic array regardless of delimiter.
+	// return: The field, value or subvalue number or 0 if not found.
+	// Searching for empty fields, values etc. (i.e. "") will work. Locating "" returns:
+	//  * "]yy" *    1
+	//  * "xx]]zz" * 2
+	//  * "xx]yy]" * 3
+	//  * "xx" *     0
+	//  * "" *       1
 	//
-	// `if ("UK^US^UA"_var.locate("US")) ... ok // 2
+	// `let pos1 = "UK]US^UA"_var.locate("US"); // 2
+	//  let pos2 = "UK]US^UA"_var.locate("GB"); // 0
 	//  // or
-	//  if (locate("US", "UK^US^UA"_var)) ... ok`
+	//  let pos3 = locate("US", "UK]US^UA"_var);`
 	//
 	ND var locate(in substr) const;
 
-	// locate substr in values.
-	// Search unordered VM delimited string.
-	// valueno[out]: Value number if found or the max value number + 1 if not. If not found then valueno [out] is suitable for creating a new value.
+	// locate substr in dynamic array returning bool and position.
+	// Searches an unordered dynamic array regardless of delimiter.
 	// return: True if found or False if not.
+	// position[out]: The field, value or subvalue number if found or the max such number + 1 if not. If not found then position [out] is suitable for creating a new value.
 	//
-	// `var valueno;
-	//  if ("UK]US]UA"_var.locate("US", valueno)) ... ok // valueno -> 2
+	// `var pos;
+	//  if (    "UK]US^UA"_var.locate("US", pos)) ... ok // position -> 2
+	//  if (not "UK]US^UA"_var.locate("GB", pos)) ... ok // position -> 4
 	//  // or
-	//  if (locate("US", "UK]US]UA"_var,valueno)) ... ok`
+	//  if (locate("US", "UK]US^UA"_var, pos)) ... ok`
 	//
-	ND bool locate(in substr, out valueno) const;
+	ND bool locate(in substr, out position) const;
 
-	// locate substr in dynamic array.
-	// Search in an unordered dynamic array.
-	// fieldno: If fieldno is non-zero then search the specified field number otherwise, if fieldno is 0, search using FM as delimiter.
+	// locate substr in a dynamic array or field or value.
+	// Check if substr is present in an unordered dynamic array.
+	// fieldno: If fieldno is non-zero then search the specified field number otherwise, if fieldno is 0, search the whole value using FM as delimiter.
 	// valueno: If provided, search the specified value number for a subvalue.
-	// num[out]: If found, the field, value or subvalue number where it was found. If not found, the max field, value or subvalue number + 1. If not found then num [out] is suitable for creating a new field, value or subvalue.
+	// position[out]: If found, the field, value or subvalue number where it was found. If not found, the max field, value or subvalue number + 1.
+	// If not found then position[out] is suitable for appending a new field, value or subvalue.
 	// return: True if found or False if not.
 	//
-	// `var num;
-	//  if ("f1^f2v1]f2v2]s1}s2}s3}s4^f3^f4"_var.locate("s4", num, 2, 3)) ... ok // num -> 4 // Return true`
+	// `var pos;
+	//  if ("f1^f2v1]f2v2]s1}s2}s3}s4^f3^f4"_var.locate("s4", pos, 2, 3)) ... ok // pos -> 4 // Return true`
 	//
-	ND bool locate(in substr, out num, const int fieldno, const int valueno = 0) const;
+	ND bool locate(in substr, out position, const int fieldno, const int valueno = 0) const;
 
 	// LOCATE BY
 
@@ -1504,7 +1513,7 @@ public:
 	// return: True if found, otherwise false.
 	// valueno[out]: Either the value no found or the correct value no for inserting the substr
 	//
-	// `var valueno; if ("aaa]bbb]ccc"_var.locateby("AL", "bb", valueno)) ... // valueno -> 2 // Return false and valueno = where it could be correctly inserted.`
+	// `var valueno; if (not "aaa]bbb]ccc"_var.locateby("AL", "bb", valueno)) ... ok // valueno -> 2 // Return false and valueno = where it could be correctly inserted.`
 	//
 	ND bool locateby(const char* ordercode, in substr, out valueno) const;
 
@@ -1512,10 +1521,10 @@ public:
 	// locateby() with fieldno and/or valueno arguments, searches fields if fieldno is 0, or values in a specific fieldno, or subvalues in a specific valueno.
 	// For more info, see locateby() without fieldno or valueno arguments.
 	//
-	// `var num;
-	//  if ("f1^f2^aaa]bbb]ccc^f4"_var.locateby("AL", "bb", num, 3)) ... // num -> 2 // return false and where it could be correctly inserted.`
+	// `var pos;
+	//  if (not "f1^f2^aaa]bbb]ccc^f4"_var.locateby("AL", "bb", pos, 3)) ... ok // pos -> 2 // return false and where it could be correctly inserted.`
 	//
-	ND bool locateby(const char* ordercode, in substr, out num, const int fieldno, const int valueno = 0) const;
+	ND bool locateby(const char* ordercode, in substr, out pos, const int fieldno, const int valueno = 0) const;
 
 	// LOCATE USING
 
@@ -1527,19 +1536,19 @@ public:
 
 	// locate substr in dynamic array using any delimiter
 	// Search in a specific field, value or subvalue.
-	// num[out]:  If found, the number where found, otherwise the maximum number of delimited fields + 1.
+	// pos[out]:  If found, the number where found, otherwise the maximum number of delimited fields + 1.
 	// return: True if found and False if not.
 	// This is similar to the main locate command but the delimiter char can be specified e.g. a comma or TM etc.
 	//
-	// `var num;
-	//  if ("f1^f2^f3c1,f3c2,f3c3^f4"_var.locateusing(",", "f3c2", num, 3)) ... ok // num -> 2 // Return true`
+	// `var pos;
+	//  if ("f1^f2^f3c1,f3c2,f3c3^f4"_var.locateusing(",", "f3c2", pos, 3)) ... ok // pos -> 2 // Return true`
 	//
-	ND bool locateusing(const char* usingchar, in substr, out num, const int fieldno = 0, const int valueno = 0, const int subvalueno = 0) const;
+	ND bool locateusing(const char* usingchar, in substr, out pos, const int fieldno = 0, const int valueno = 0, const int subvalueno = 0) const;
 
 	// LOCATE BY, USING
 
 	// locatebyusing() supports all the locate features in a single function.
-	ND bool locatebyusing(const char* ordercode, const char* usingchar, in substr, out num, const int fieldno = 0, const int valueno = 0, const int subvalueno = 0) const;
+	ND bool locatebyusing(const char* ordercode, const char* usingchar, in substr, out pos, const int fieldno = 0, const int valueno = 0, const int subvalueno = 0) const;
 
 private:
 	ND bool no_check_starts(SV substr) const;

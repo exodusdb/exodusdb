@@ -58,107 +58,6 @@ func main() {
 		var x = 0.1, y = "0.2", z = x + y;  assert(z.errputl() == 0.3);
 	}
 
-	printl("or_default(in defaultvalue) const;");
-	{
-		var v1; // Unassigned
-		var v2 = v1.or_default("abc");  assert(v2.errputl() == "abc");
-		// or
-		var v3 = or_default(v1, "abc");
-	}
-
-	printl("defaulter(CVR defaultvalue);");
-	{
-		var v1; // Unassigned
-		v1.defaulter("abc");  assert(v1.errputl() == "abc");
-		// or
-		defaulter(v1, "abc");
-	}
-
-	printl("swap(io v2);");
-	{
-		var v1 = space(65'536);
-		var v2 = "";
-		v1.swap(v2);  assert(v1.errputl() == "" ); assert(v2.len().errputl() == 65'536);
-		// or
-		swap(v1, v2);
-	}
-
-	printl("move();");
-	{
-		var v1 = space(65'536);
-		var v2 = v1.move();  assert(v2.len().errputl() == 65'536 ); assert(v1.errputl() == "");
-		// or
-		var v3 = move(v2);
-	}
-
-	printl("clone() const;");
-	{
-		var v1 = "abc";
-		var v2 = v1.clone(); assert(v2.errputl() == "abc");
-		// or
-		var v3 = clone(v2);
-	}
-
-	printl("dump() const;");
-	{
-		var v1 = str("x", 32);
-		v1.dump().outputl(); /// e.g. var:0x7ffea7462cd0 typ:1 str:0x584d9e9f6e70 "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-		// or
-		outputl(dump(v1));
-	}
-
-	printl("isnum() const;");
-	{
-		if (   "+123.45"_var.isnum()) {/*ok*/} else  abort("isnum: " ^ lasterror());
-		if ("+1.2345e+2"_var.isnum()) {/*ok*/} else  abort("isnum: " ^ lasterror());
-		if (          ""_var.isnum()) {/*ok*/} else  abort("isnum: " ^ lasterror());
-		if (not      "."_var.isnum()) {/*ok*/} else  abort("isnum: " ^ lasterror());
-		// or
-		if (isnum("123.")) {/*ok*/} else  abort("isnum: " ^ lasterror());
-	}
-
-	printl("num() const;");
-	{
-				var v1 = "123.45"_var.num(); assert(v1.errputl() == 123.45);
-		var v2 = "abc"_var.num() + 100; assert(v2.errputl() == 100);
-	}
-
-	printl("operator+(var);");
-	{
-		var v1 = 0.1;
-		var v2 = v1 + 0.2; assert(v2.errputl() == 0.3);
-	}
-
-	printl("operator+=(var);");
-	{
-		var v1 = 0.1;
-		v1 += 0.2; // 0.3
-	}
-
-	printl("operator++(int) &;");
-	{
-		var v1 = 3;
-		var v2 = v1 ++;  assert(v2.errputl() == 3 ); assert(v1.errputl() == 4);
-	}
-
-	printl("operator--(int) &;");
-	{
-		var v1 = 3;
-		var v2 = v1 --;  assert(v2.errputl() == 3 ); assert(v1.errputl() == 2);
-	}
-
-	printl("operator++() &;");
-	{
-		var v1 = 3;
-		var v2 = ++ v1;  assert(v2.errputl() == 4 ); assert(v1.errputl() == 4);
-	}
-
-	printl("operator--() &;");
-	{
-		var v1 = 3;
-		var v2 = -- v1;  assert(v2.errputl() == 2 ); assert(v1.errputl() == 2);
-	}
-
 	printl("operator""_var(const char* cstr, std::size_t size);");
 	{
 				var v1 = "f1^f2^v1]v2^f4"_var; assert(v1.errputl() == "f1" _FM "f2" _FM "v1" _VM "v2" _FM "f4");
@@ -197,6 +96,21 @@ func main() {
 		var v1 = "aa^b1]b2^cc"_var;
 		var v2 = v1.f(2,2); assert(v2.errputl() == "b2"); /// .f() style access. Recommended.
 		var v3 =   v1(2,2); assert(v3.errputl() == "b2"); ///   () style access. Not recommended.
+	}
+
+	printl("operator()(int fieldno, int valueno = 0, int subvalueno = 0) const");
+	{
+		var v1 = "aa^bb^cc"_var;
+		v1(2, 2, 2) = "22";  assert(v1.errputl() == "aa^bb]}22^cc"_var);
+		// subvalue number -1 causes appending a subvalue when updating.
+		v1(2, 2, -1) = 33;  assert(v1.errputl() == "aa^bb]}22}33^cc"_var);
+	}
+
+	printl("operator()(int fieldno, int valueno = 0, int subvalueno = 0) const");
+	{
+		var v1 = "aa^b1]b2}s2^cc"_var;
+		var v2 = v1.f(2, 2, 2); assert(v2.errputl() == "s2"); /// .f() style access. Recommended.
+		var v3 =   v1(2, 2, 2); assert(v3.errputl() == "s2"); ///   () style access. Not recommended.
 	}
 
 	printl("oconv(const char* convstr) const;");
@@ -669,130 +583,6 @@ func main() {
 		if (deletelist("mylist")) abort("deletelist: " ^ lasterror());
 	}
 
-	printl("abs() const;");
-	{
-		let v1 = -12.34;
-		let v2 = v1.abs(); assert(v2.errputl() == 12.34);
-		// or
-		let v3 = abs(v1);
-	}
-
-	printl("pwr(in exponent) const;");
-	{
-				let v1 = var(2).pwr(8); assert(v1.errputl() == 256);
-		// or
-		let v2 = pwr(2, 8);
-	}
-
-	printl("initrnd() const;");
-	{
-		var(123).initrnd(); /// Set seed to 123
-		// or
-		initrnd(123);
-	}
-
-	printl("rnd()     const;");
-	{
-		let v1 = var(100).rnd(); /// Random 0 to 99
-		// or
-		let v2 = rnd(100);
-	}
-
-	printl("exp()     const;");
-	{
-				let v1 = var(1).exp(); assert(v1.errputl() == 2.718281828459045);
-		// or
-		let v2 = exp(1);
-	}
-
-	printl("sqrt()    const;");
-	{
-				let v1 = var(100).sqrt(); assert(v1.errputl() == 10);
-		// or
-		let v2 = sqrt(100);
-	}
-
-	printl("sin()     const;");
-	{
-				let v1 = var(30).sin(); assert(v1.errputl() == 0.5);
-		// or
-		let v2 = sin(30);
-	}
-
-	printl("cos()     const;");
-	{
-				let v1 = var(60).cos(); assert(v1.errputl() == 0.5);
-		// or
-		let v2 = cos(60);
-	}
-
-	printl("tan()     const;");
-	{
-				let v1 = var(45).tan(); assert(v1.errputl() == 1);
-		// or
-		let v2 = tan(45);
-	}
-
-	printl("atan()    const;");
-	{
-				let v1 = var(1).atan(); assert(v1.errputl() == 45);
-		// or
-		let v2 = atan(1);
-	}
-
-	printl("loge()    const;");
-	{
-				let v1 = var(2.718281828459045).loge(); assert(v1.errputl() == 1);
-		// or
-		let v2 = loge(2.718281828459045);
-	}
-
-	printl("integer() const;");
-	{
-				let v1 = var(2.9).integer(); assert(v1.errputl() == 2);
-		// or
-		let v2 = integer(2.9);
-		var v3 = var(-2.9).integer(); assert(v3.errputl() == -2);
-		// or
-		var v4 = integer(-2.9);
-	}
-
-	printl("floor() const;");
-	{
-				let v1 = var(2.9).floor(); assert(v1.errputl() == 2);
-		// or
-		let v2 = floor(2.9);
-		var v3 = var(-2.9).floor(); assert(v3.errputl() == -3);
-		// or
-		var v4 = floor(-2.9);
-	}
-
-	printl("mod(in modulus) const;");
-	{
-				let v1 = var(11).mod(5); assert(v1.errputl() == 1);
-		// or
-		let v2 = mod(11, 5); assert(v2.errputl() == 1);
-		let v3 = mod(-11, 5); assert(v3.errputl() == 4);
-		let v4 = mod(11, -5); assert(v4.errputl() == -4);
-		let v5 = mod(-11, -5); assert(v5.errputl() == -1);
-	}
-
-	printl("setprecision(int newprecision);");
-	{
-		assert(0.000001_var == 0); /// NOTE WELL: Default precision 4.
-		let new_precision1 = var::setprecision(6); assert(new_precision1.errputl() == 6); // Increase the precision.
-		// or
-		let new_precision2 = setprecision(6);
-		assert(0.000001_var != 0); /// NOTE: Precision 6.
-	}
-
-	printl("getprecision();");
-	{
-		let curr_precision1 = var::getprecision();
-		// or
-		let curr_precision2 = getprecision();
-	}
-
 	printl("oconv_D(const char* conversion) const;");
 	{
 		let v1 = 19002;
@@ -1004,6 +794,1270 @@ func main() {
 		let v7 = "t1|t2"_var.oconv("TX"); assert(v7.errputl() == "t1" _BS _BS _BS _NL "t2");
 		// 8. STM -> "\\\\" \n
 		let v8 = "st1~st2"_var.oconv("TX"); assert(v8.errputl() == "st1" _BS _BS _BS _BS _NL "st2");
+	}
+
+////////////////
+// Code examples varb.h
+////////////////
+
+	printl("defaulter(CBR defaultvalue);");
+	{
+		var v1; // Unassigned
+		v1.defaulter("abc");  assert(v1.errputl() == "abc");
+		// or
+		defaulter(v1, "abc");
+	}
+
+	printl("or_default(CBR defaultvalue) const;");
+	{
+		var v1; // Unassigned
+		var v2 = v1.or_default("abc");  assert(v2.errputl() == "abc");
+		// or
+		var v3 = or_default(v1, "abc");
+	}
+
+	printl("move(VBR destinationvar);");
+	{
+		var v1 = space(65'535);
+		var v2;
+		v1.move(v2);  assert(v2.len().errputl() == 65'536 ); assert(v1.errputl() == "");
+	}
+
+	printl("move();");
+	{
+		var v1 = space(65'535);
+		var v2 = v1.move();  assert(v2.len().errputl() == 65'536 ); assert(v1.errputl() == "");
+		// or
+		let v3 = move(v2);
+	}
+
+	printl("swap(VBR var2);");
+	{
+		var v1 = space(65'536);
+		var v2 = "";
+		v1.swap(v2);  assert(v1.errputl() == "" ); assert(v2.len().errputl() == 65'536);
+		// or
+		swap(v1, v2);
+	}
+
+	printl("clone() const;");
+	{
+		var v1 = "abc";
+		var v2 = v1.clone(); assert(v2.errputl() == "abc");
+		// or
+		var v3 = clone(v2);
+	}
+
+	printl("dump() const;");
+	{
+		var v1 = str("x", 32);
+		v1.dump().outputl(); /// e.g. var:0x7ffea7462cd0 typ:1 str:0x584d9e9f6e70 "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+		// or
+		outputl(dump(v1));
+	}
+
+	printl("operator+() const;");
+	{
+		let v1 = 3;
+		let v2 = +v1; assert(v2.errputl() == 3);
+	}
+
+	printl("operator-() const;");
+	{
+		let v1 = 3;
+		let v2 = -v1; assert(v2.errputl() == -3);
+		let v3 = -v2; assert(v3.errputl() == 3);
+	}
+
+	printl("operator!() const");
+	{
+		if (!var("") eq true) {/*ok*/} else  abort("operator!: " ^ lasterror());
+		if (!var("x") eq false) {/*ok*/} else  abort("operator!: " ^ lasterror());
+		if (!var("0") eq true) {/*ok*/} else  abort("operator!: " ^ lasterror());
+		if (!var("123") eq false) {/*ok*/} else  abort("operator!: " ^ lasterror());
+		// or
+		if (not var("") eq true) {/*ok*/} else  abort("operator!: " ^ lasterror());
+	}
+
+	printl("operator++(int) &;");
+	{
+		var v1 = 3;
+		let v2 = v1++;  assert(v2.errputl() == 3 ); assert(v1.errputl() == 4);
+	}
+
+	printl("operator--(int) &;");
+	{
+		var v1 = 3;
+		let v2 = v1--;  assert(v2.errputl() == 3 ); assert(v1.errputl() == 2);
+	}
+
+	printl("operator++() &;");
+	{
+		var v1 = 3;
+		let v2 = ++v1;  assert(v2.errputl() == 4 ); assert(v1.errputl() == 4);
+	}
+
+	printl("operator--() &;");
+	{
+		var v1 = 3;
+		let v2 = --v1;  assert(v2.errputl() == 2 ); assert(v1.errputl() == 2);
+	}
+
+	printl("isnum() const;");
+	{
+		if (   "+123.45"_var.isnum()) {/*ok*/} else  abort("isnum: " ^ lasterror());
+		if ("+1.2345e+2"_var.isnum()) {/*ok*/} else  abort("isnum: " ^ lasterror());
+		if (          ""_var.isnum()) {/*ok*/} else  abort("isnum: " ^ lasterror());
+		if (not      "."_var.isnum()) {/*ok*/} else  abort("isnum: " ^ lasterror());
+		// or
+		if (isnum("123.")) {/*ok*/} else  abort("isnum: " ^ lasterror());
+	}
+
+	printl("num() const;");
+	{
+				var v1 = "123.45"_var.num(); assert(v1.errputl() == 123.45);
+		var v2 = "abc"_var.num() + 100; assert(v2.errputl() == 100);
+	}
+
+	printl("operator+(var);");
+	{
+		var v1 = 0.1;
+		var v2 = v1 + 0.2; assert(v2.errputl() == 0.3);
+	}
+
+	printl("operator+=(var);");
+	{
+		var v1 = 0.1;
+		v1 += 0.2; // 0.3
+	}
+
+	printl("abs() const;");
+	{
+		let v1 = -12.34;
+		let v2 = v1.abs(); assert(v2.errputl() == 12.34);
+		// or
+		let v3 = abs(v1);
+	}
+
+	printl("pwr(in exponent) const;");
+	{
+				let v1 = var(2).pwr(8); assert(v1.errputl() == 256);
+		// or
+		let v2 = pwr(2, 8);
+	}
+
+	printl("initrnd() const;");
+	{
+		var(123).initrnd(); /// Set seed to 123
+		// or
+		initrnd(123);
+	}
+
+	printl("rnd() const;");
+	{
+		let v1 = var(100).rnd(); /// Random 0 to 99
+		// or
+		let v2 = rnd(100);
+	}
+
+	printl("exp() const;");
+	{
+				let v1 = var(1).exp(); assert(v1.errputl() == 2.718281828459045);
+		// or
+		let v2 = exp(1);
+	}
+
+	printl("sqrt() const;");
+	{
+				let v1 = var(100).sqrt(); assert(v1.errputl() == 10);
+		// or
+		let v2 = sqrt(100);
+	}
+
+	printl("sin() const;");
+	{
+				let v1 = var(30).sin(); assert(v1.errputl() == 0.5);
+		// or
+		let v2 = sin(30);
+	}
+
+	printl("cos() const;");
+	{
+				let v1 = var(60).cos(); assert(v1.errputl() == 0.5);
+		// or
+		let v2 = cos(60);
+	}
+
+	printl("tan() const;");
+	{
+				let v1 = var(45).tan(); assert(v1.errputl() == 1);
+		// or
+		let v2 = tan(45);
+	}
+
+	printl("atan() const;");
+	{
+				let v1 = var(1).atan(); assert(v1.errputl() == 45);
+		// or
+		let v2 = atan(1);
+	}
+
+	printl("loge() const;");
+	{
+				let v1 = var(2.718281828459045).loge(); assert(v1.errputl() == 1);
+		// or
+		let v2 = loge(2.718281828459045);
+	}
+
+	printl("integer() const;");
+	{
+				let v1 = var(2.9).integer(); assert(v1.errputl() == 2);
+		// or
+		let v2 = integer(2.9);
+		var v3 = var(-2.9).integer(); assert(v3.errputl() == -2);
+		// or
+		var v4 = integer(-2.9);
+	}
+
+	printl("floor() const;");
+	{
+				let v1 = var(2.9).floor(); assert(v1.errputl() == 2);
+		// or
+		let v2 = floor(2.9);
+		var v3 = var(-2.9).floor(); assert(v3.errputl() == -3);
+		// or
+		var v4 = floor(-2.9);
+	}
+
+	printl("mod(CBR limit) const;");
+	{
+				let v01 = var(3.0).mod(3.0); assert(v01.errputl() == 0);
+		let v02 = var(2.0).mod(3.0); assert(v02.errputl() == 2);
+		let v03 = var(0.0).mod(3.0); assert(v03.errputl() == 0);
+		let v04 = var(-2.0).mod(3.0); assert(v04.errputl() == 1);
+		let v05 = var(-3.0).mod(3.0); assert(v05.errputl() == 0);
+		let v06 = var(3.0).mod(-3.0); assert(v06.errputl() == 0);
+		let v07 = var(2.0).mod(-3.0); assert(v07.errputl() == -1);
+		let v08 = var(0.0).mod(-3.0); assert(v08.errputl() == 0);
+		let v09 = var(-2.0).mod(-3.0); assert(v09.errputl() == -2);
+		let v10 = var(-3.0).mod(-3.0); assert(v10.errputl() == 0);
+		// or
+		let v11 = mod(4, 3); assert(v11.errputl() == 1);
+		// or
+		let v12 = var(4) % 3; assert(v12.errputl() == 1);
+	}
+
+	printl("getprecision();");
+	{
+				let v1 = var(0.00001) eq 0; assert(v1.errputl() == true);
+		var::setprecision(6);
+		let v2 = var(0.00001) eq 0; // false;
+		// or
+		setprecision(4);
+	}
+
+	printl("round(const int ndecimals = 0) const;");
+	{
+				let v1 = var(123.4).round(2); assert(v1.errputl() == "123.40");
+		let v2 = var(123456).round(-3); assert(v2.errputl() == "123000");
+		// or
+		let v3 = round(123.4, 2);
+	}
+
+////////////////
+// Code examples vars.h
+////////////////
+
+	printl("operator^(var);");
+	{
+		var v2 = "aa";
+		var v1 = v2 ^ 22; assert(v1.errputl() == "aa22");
+	}
+
+	printl("operator^=(var);");
+	{
+		var v1 = "aa";
+		v1 ^= 22;  assert(v1.errputl() == "aa22");
+	}
+
+	printl("round(const int ndecimals = 0) const;");
+	{
+				let v1 = var(0.295).round(2); assert(v1.errputl() == "0.30");
+		// or
+		let v2 = round(1.295, 2); assert(v2.errputl() == "1.30");
+		var v3 = var(-0.295).round(2); assert(v3.errputl() == "-0.30");
+		// or
+		var v4 = round(-1.295, 2); assert(v4.errputl() == "-1.30");
+		var v5 = round(0, 1); assert(v5.errputl() == "0.0");
+		var v6 = round(0, 0); assert(v6.errputl() == "0");
+		var v7 = round(0, -1); assert(v7.errputl() == "0");
+	}
+
+	printl("round(const int ndecimals = 0) const;");
+	{
+				let v1 = round(123456.789,  0); assert(v1.errputl() == "123457");
+		let v2 = round(123456.789, -1); assert(v2.errputl() == "123460");
+		let v3 = round(123456.789, -2); assert(v3.errputl() == "123500");
+	}
+
+	printl("chr(const int chrnum);");
+	{
+				let v1 = var::chr(0x61); assert(v1.errputl() == "a");
+		// or
+		let v2 = chr(0x61);
+	}
+
+	printl("textchr(const int codepoint);");
+	{
+				let v1 = var::textchr(171416); assert(v1.errputl() == "𩶘"); // or "\xF0A9B698"
+		// or
+		let v2 = textchr(171416);
+	}
+
+	printl("textchrname(const int unicode_code_point);");
+	{
+				let v1 = var::textchrname(91); assert(v1.errputl() == "LEFT SQUARE BRACKET");
+		// or
+		let v2 = textchrname(91);
+	}
+
+	printl("str(const int nreps) const;");
+	{
+				let v1 = "ab"_var.str(3); assert(v1.errputl() == "ababab");
+		// or
+		let v2 = str("ab", 3);
+	}
+
+	printl("space(const int nspaces);");
+	{
+				let v1 = var::space(3); assert(v1.errputl() == "   ");
+		// or
+		let v2 = space(3);
+	}
+
+	printl("numberinwords(in locale = "");");
+	{
+		let softhyphen = "\xc2\xad";
+		let v1 = var(123.45).numberinwords("de_DE").replace(softhyphen, " "); assert(v1.errputl() == "ein hundert drei und zwanzig Komma vier fünf");
+	}
+
+	printl("at(const int pos1) const;");
+	{
+		var v1 = "abc";
+		var v2 = v1.at(2); assert(v2.errputl() == "b");
+		var v3 = v1.at(-3); assert(v3.errputl() == "a");
+		var v4 = v1.at(4); assert(v4.errputl() == "");
+	}
+
+	printl("ord() const;");
+	{
+				let v1 = "abc"_var.ord(); assert(v1.errputl() == 0x61); // decimal 97, 'a'
+		// or
+		let v2 = ord("abc");
+	}
+
+	printl("textord() const;");
+	{
+				let v1 = "Γ"_var.textord(); assert(v1.errputl() == 915); // U+0393: Greek Capital Letter Gamma (Unicode character)
+		// or
+		let v2 = textord("Γ");
+	}
+
+	printl("len() const;");
+	{
+				let v1 = "abc"_var.len(); assert(v1.errputl() == 3);
+		// or
+		let v2 = len("abc");
+	}
+
+	printl("empty() const;");
+	{
+		let v1 = "0";
+		if (not v1.empty()) {/*ok*/} else  abort("empty: " ^ lasterror()); // true
+		// or
+		if (not empty(v1)) {/*ok*/} else  abort("empty: " ^ lasterror()); // true
+	}
+
+	printl("textwidth() const;");
+	{
+				let v1 = "🤡x🤡"_var.textwidth(); assert(v1.errputl() == 5);
+		// or
+		let v2 = textwidth("🤡x🤡");
+	}
+
+	printl("textlen() const;");
+	{
+				let v1 = "Γιάννης"_var.textlen(); assert(v1.errputl() == 7);
+		// or
+		let v2 = textlen("Γιάννης");
+	}
+
+	printl("fcount(SV sepstr) const;");
+	{
+				let v1 = "aa**cc"_var.fcount("*"); assert(v1.errputl() == 3);
+		// or
+		let v2 = fcount("aa**cc", "*");
+	}
+
+	printl("count(SV sepstr) const;");
+	{
+				let v1 = "aa**cc"_var.count("*"); assert(v1.errputl() == 2);
+		// or
+		let v2 = count("aa**cc", "*");
+	}
+
+	printl("starts(SV prefix) const;");
+	{
+		if ("abc"_var.starts("ab")) {/*true*/} else  abort("starts: " ^ lasterror());
+		// or
+		if (starts("abc", "ab")) {/*true*/} else  abort("starts: " ^ lasterror());
+	}
+
+	printl("ends(SV suffix) const;");
+	{
+		if ("abc"_var.ends("bc")) {/*true*/} else  abort("ends: " ^ lasterror());
+		// or
+		if (ends("abc", "bc")) {/*true*/} else  abort("ends: " ^ lasterror());
+	}
+
+	printl("contains(SV substr) const;");
+	{
+		if ("abcd"_var.contains("bc")) {/*true*/} else  abort("contains: " ^ lasterror());
+		// or
+		if (contains("abcd", "bc")) {/*true*/} else  abort("contains: " ^ lasterror());
+	}
+
+	printl("index(SV substr, const int startchar1 = 1) const;");
+	{
+				let v1 = "abcd"_var.index("bc"); assert(v1.errputl() == 2);
+		// or
+		let v2 = index("abcd", "bc");
+	}
+
+	printl("indexn(SV substr, const int occurrence) const;");
+	{
+				let v1 = "abcabc"_var.indexn("bc", 2); assert(v1.errputl() == 5);
+		// or
+		let v2 = indexn("abcabc", "bc", 2);
+	}
+
+	printl("indexr(SV substr, const int startchar1 = -1) const;");
+	{
+				let v1 = "abcabc"_var.indexr("bc"); assert(v1.errputl() == 5);
+		// or
+		let v2 = indexr("abcabc", "bc");
+	}
+
+	printl("listed(SV list) const;");
+	{
+		let v1 = "def";
+		if (v1.listed("abc,def")) {/*ok*/} else  abort("listed: " ^ lasterror());
+		// or
+		if (listed(v1, "abc,def")) {/*ok*/} else  abort("listed: " ^ lasterror());
+	}
+
+	printl("listed(SV list, out position) const;");
+	{
+		let v1 = "def";
+		var posn;
+		if (v1.listed("abc,def", posn)) {/*ok*/} else  abort("listed: " ^ lasterror());  assert(posn.errputl() == 2);
+		// or
+		if (listed(v1, "abc,def", posn)) {/*ok*/} else  abort("listed: " ^ lasterror());
+	}
+
+	printl("match(SV regex_str, SV regex_options = "") const;");
+	{
+				let v1 = "abc1abc2"_var.match("BC(\\d)", "i"); assert(v1.errputl() == "bc1]1^bc2]2"_var);
+		// or
+		let v2 = match("abc1abc2", "BC(\\d)", "i");
+	}
+
+	printl("search(SV regex_str, io startchar1, SV regex_options = "") const;");
+	{
+		var startchar1 = 1;
+		let v1 = "abc1abc2"_var.search("BC(\\d)", startchar1, "i"); assert(v1.errputl() == "bc1]1"_var);  assert(startchar1.errputl() == 5 );/// Ready for the next search
+		// or
+		startchar1 = 1;
+		let v2 = search("abc1abc2", "BC(\\d)", startchar1, "i");
+	}
+
+	printl("hash(const std::uint64_t modulus = 0) const;");
+	{
+		let v1 = "abc"_var.hash(); assert(v1 == var(6'715'211'243'465'481'821));
+		// or
+		let v2 = hash("abc");
+	}
+
+	printl("quote() const&;");
+	{
+				let v1 = "abc"_var.quote(); assert(v1.errputl() == "\"abc\"");
+		// or
+		let v2 = quote("abc");
+	}
+
+	printl("squote() const&;");
+	{
+				let v1 = "abc"_var.squote(); assert(v1.errputl() == "'abc'");
+		// or
+		let v2 = squote("abc");
+	}
+
+	printl("unquote() const&;");
+	{
+				let v1 = "'abc'"_var.unquote(); assert(v1.errputl() == "abc");
+		// or
+		let v2 = unquote("'abc'");
+	}
+
+	printl("trim(SV trimchars = " ") const&;");
+	{
+				let v1 = "  a1  b2 c3  "_var.trim(); assert(v1.errputl() == "a1 b2 c3");
+		// or
+		let v2 = trim("  a1  b2 c3  ");
+	}
+
+	printl("trimfirst(SV trimchars = " ") const&;");
+	{
+				let v1 = "  a1  b2 c3  "_var.trimfirst(); assert(v1.errputl() == "a1  b2 c3  ");
+		// or
+		let v2 = trimfirst("  a1  b2 c3  ");
+	}
+
+	printl("trimlast(SV trimchars = " ") const&;");
+	{
+				let v1 = "  a1  b2 c3  "_var.trimlast(); assert(v1.errputl() == "  a1  b2 c3");
+		// or
+		let v2 = trimlast("  a1  b2 c3  ");
+	}
+
+	printl("trimboth(SV trimchars = " ") const&;");
+	{
+				let v1 = "  a1  b2 c3  "_var.trimboth(); assert(v1.errputl() == "a1  b2 c3");
+		// or
+		let v2 = trimboth("  a1  b2 c3  ");
+	}
+
+	printl("first() const&;");
+	{
+				let v1 = "abc"_var.first(); assert(v1.errputl() == "a");
+		// or
+		let v2 = first("abc");
+	}
+
+	printl("last() const&;");
+	{
+				let v1 = "abc"_var.last(); assert(v1.errputl() == "c");
+		// or
+		let v2 = last("abc");
+	}
+
+	printl("first(const std::size_t length) const&;");
+	{
+				let v1 = "abc"_var.first(2); assert(v1.errputl() == "ab");
+		// or
+		let v2 = first("abc", 2);
+	}
+
+	printl("last(const std::size_t length) const&;");
+	{
+				let v1 = "abc"_var.last(2); assert(v1.errputl() == "bc");
+		// or
+		let v2 = last("abc", 2);
+	}
+
+	printl("cut(const int length) const&;");
+	{
+				let v1 = "abcd"_var.cut(2); assert(v1.errputl() == "cd");
+		// or
+		let v2 = cut("abcd", 2);
+	}
+
+	printl("prefix(SV insertstr) const&;");
+	{
+				let v1 = "abc"_var.prefix("XYZ"); assert(v1.errputl() == "XYZabc");
+		// or
+		let v2 = prefix("abc", "XYZ");
+	}
+
+	printl("field(SV delimiter, const int fieldnx = 1, const int nfieldsx = 1) const;");
+	{
+				let v1 = "aa*bb*cc"_var.field("*", 2); assert(v1.errputl() == "bb");
+		// or
+		let v2 = field("aa*bb*cc", "*", 2);
+	}
+
+	printl("field(SV delimiter, const int fieldnx = 1, const int nfieldsx = 1) const;");
+	{
+				let v1 = "aa*bb*cc"_var.field("*", -1); assert(v1.errputl() == "cc");
+		// or
+		let v2 = field("aa*bb*cc", "*", -1);
+	}
+
+	printl("substr(const int pos1, SV delimiterchars, out pos2) const;");
+	{
+		var pos1 = 4;
+		let v1 = "12,45 78"_var.substr(pos1, ", ", COL2);   assert(v1.errputl() == "45" ); assert(COL2.errputl() == 6 );// 6 is the position of the next delimiter char found.
+		// or
+		let v2 = substr("12,45 78", COL2 + 1, ", ", COL2);  assert(v2.errputl() == "78" ); assert(COL2.errputl() == 9 );// 9 is one after the end of the string meaning that none of the delimiter chars were found.
+	}
+
+	printl("substr2(io pos1, out delimiterno) const;");
+	{
+		var pos1 = 4, field_mark_no;
+		let v1 = "12^45^78"_var.substr2(pos1, field_mark_no); assert(v1.errputl() == "45");  assert(pos1.errputl() == 7 ); assert(field_mark_no.errputl() == 2 );// field_mark_no 2 means that a FM was found.
+		// or
+		let v2 = substr2("12^45^78"_var, pos1, field_mark_no); assert(v2.errputl() == "78");  assert(pos1.errputl() == 9 ); assert(field_mark_no.errputl() == 0 );// field_mark_no 0 means that none of the standard field marks were found.
+	}
+
+	printl("replace(SV fromstr, SV tostr) const&;");
+	{
+				let v1 = "Abc.Abc"_var.replace("bc", "X"); assert(v1.errputl() == "AX.AX");
+		// or
+		let v2 = replace("Abc Abc", "bc", "X");
+	}
+
+	printl("replace(const rex& regex, SV replacement_str) const&;");
+	{
+				let v1 = "A a B b"_var.replace("[A-Z]"_rex, "'$0'"); assert(v1.errputl() == "'A' a 'B' b");
+		// or
+		let v2 = replace("A a B b", "[A-Z]"_rex, "'$0'");
+	}
+
+	printl("replace(const rex& regex, ReplacementFunction auto repl_func) const; /*IMPL");
+	{
+		// Decode hex escape codes.
+		let v1 = R"(--\0x3B--\0x2F--)";                                 // Hex escape codes.
+		let v2 = v1.replace(
+		    R"(\\0x[0-9a-fA-F]{2,2})"_rex,                              // Find \0xFF.
+		    [](auto match_str) {return match_str.cut(3).iconv("HEX");}  // Decode to a char.
+		);
+		assert(v2 == "--;--/--");
+	}
+
+	printl("replace(const rex& regex, ReplacementFunction auto repl_func) const; /*IMPL");
+	{
+		// Reformat dates using groups.
+		let v3 = "Date: 03-15-2025";
+		let v4 = v3.replace(
+		    R"((\d{2})-(\d{2})-(\d{4}))"_rex,
+		    [](auto match_str) {return match_str.f(1, 4) ^ "-" ^ match_str.f(1, 2) ^ "-" ^ match_str.f(1, 3);}
+		);
+		assert(v4 == "Date: 2025-03-15");
+	}
+
+	printl("unique() const&;");
+	{
+				let v1 = "a1^b2^a1^c2"_var.unique(); assert(v1.errputl() == "a1^b2^c2"_var);
+		// or
+		let v2 = unique("a1^b2^a1^c2"_var);
+	}
+
+	printl("sort(SV delimiter = _FM) const&;");
+	{
+				let v1 = "20^10^2^1^1.1"_var.sort(); assert(v1.errputl() == "1^1.1^2^10^20"_var);
+		// or
+		let v2 = sort("20^10^2^1^1.1"_var);
+	}
+
+	printl("sort(SV delimiter = _FM) const&;");
+	{
+				let v1 = "b1^a1^c20^c10^c2^c1^b2"_var.sort(); assert(v1.errputl() == "a1^b1^b2^c1^c10^c2^c20"_var);
+		// or
+		let v2 = sort("b1^a1^c20^c10^c2^c1^b2"_var);
+	}
+
+	printl("reverse(SV delimiter = _FM) const&;");
+	{
+				let v1 = "20^10^2^1^1.1"_var.reverse(); assert(v1.errputl() == "1.1^1^2^10^20"_var);
+		// or
+		let v2 = reverse("20^10^2^1^1.1"_var);
+	}
+
+	printl("randomize(SV delimiter = _FM) const&;");
+	{
+		let v1 = "20^10^2^1^1.1"_var.randomize(); /// e.g. "2^1^20^1.1^10" (random order depending on initrand())
+		// or
+		let v2 = randomize("20^10^2^1^1.1"_var);
+	}
+
+	printl("split(SV delimiter = _FM) const;");
+	{
+		dim d1 = "a^b^c"_var.split(); // A dimensioned array with three elements (vars)
+		// or
+		dim d2 = split("a^b^c"_var);
+	}
+
+	printl("ucaser() REF ;");
+	{
+		var v1 = "abc";
+		v1.ucaser(); ;assert(v1 == "ABC");
+		// or
+		ucaser(v1);
+	}
+
+	printl("f(const int fieldno, const int valueno = 0, const int subvalueno = 0)            const;");
+	{
+		let v1 = "f1^f2v1]f2v2]f2v3^f2"_var;
+		let v2 = v1.f(2, 2); assert(v2.errputl() == "f2v2");
+	}
+
+	printl("sum() const;");
+	{
+				let v1 = "1]2]3^4]5]6"_var.sum(); assert(v1.errputl() == "6^15"_var);
+		// or
+		let v2 = sum("1]2]3^4]5]6"_var);
+	}
+
+	printl("sumall() const;");
+	{
+				let v1 = "1]2]3^4]5]6"_var.sumall(); assert(v1.errputl() == 21);
+		// or
+		let v2 = sumall("1]2]3^4]5]6"_var);
+	}
+
+	printl("sum(SV delimiter) const;");
+	{
+				let v1 = "10,20,30"_var.sum(","); assert(v1.errputl() == 60);
+		// or
+		let v2 = sum("10,20,30", ",");
+	}
+
+	printl("stddev() const;");
+	{
+				let v1 = "-11.2^0^11.5^12^13.9^14"_var.stddev(); assert(v1.errputl() == "6^40.2^-11.2^14^6.7^9.32344714506"_var);
+		// or
+		let v2 = stddev("-11.2^0^11.5^12^13.9^14"_var);
+	}
+
+	printl("mv(const char* opcode, in var2) const;");
+	{
+				let v1 = "10]20]30"_var.mv("+","2]3]4"_var); assert(v1.errputl() == "12]23]34"_var);
+	}
+
+	printl("updater(const int fieldno, in replacement) REF");
+	{
+		var v1 = "f1^v1]v2}s2}s3^f3"_var;
+		v1.updater(2, "X"); ;assert(v1 == "f1^X^f3"_var);
+		// or
+		v1(2) = "X"; /// Easiest.
+		// or
+		updater(v1, 2, "X");
+	}
+
+	printl("updater(const int fieldno, const int valueno, in replacement) REF");
+	{
+		var v1 = "f1^v1]v2}s2}s3^f3"_var;
+		v1.updater(2, 2, "X"); ;assert(v1 == "f1^v1]X^f3"_var);
+		// or
+		v1(2, 2) = "X"; /// Easiest.
+		// or
+		updater(v1, 2, 2, "X");
+	}
+
+	printl("updater(const int fieldno, const int valueno, const int subvalueno, in replacement) REF;");
+	{
+		var v1 = "f1^v1]v2}s2}s3^f3"_var;
+		v1.updater(2, 2, 2, "X"); ;assert(v1 == "f1^v1]v2}X}s3^f3"_var);
+		// or
+		v1(2, 2, 2) = "X"; /// Easiest.
+		// or
+		updater(v1, 2, 2, 2, "X");
+	}
+
+	printl("inserter(const int fieldno, in insertion) REF");
+	{
+		var v1 = "f1^v1]v2}s2}s3^f3"_var;
+		v1.inserter(2, "X"); ;assert(v1 == "f1^X^v1]v2}s2}s3^f3"_var);
+		// or
+		inserter(v1, 2, "X");
+	}
+
+	printl("inserter(const int fieldno, const int valueno, in insertion) REF");
+	{
+		var v1 = "f1^v1]v2}s2}s3^f3"_var;
+		v1.inserter(2, 2, "X"); ;assert(v1 == "f1^v1]X]v2}s2}s3^f3"_var);
+		// or
+		inserter(v1, 2, 2, "X");
+	}
+
+	printl("inserter(const int fieldno, const int valueno, const int subvalueno, in insertion) REF;");
+	{
+		var v1 = "f1^v1]v2}s2}s3^f3"_var;
+		v1.inserter(2, 2, 2, "X"); ;assert(v1 == "f1^v1]v2}X}s2}s3^f3"_var);
+		// or
+		v1.inserter(2, 2, 2, "X");
+	}
+
+	printl("remover(const int fieldno, const int valueno = 0, const int subvalueno = 0) REF;");
+	{
+		var v1 = "f1^v1]v2}s2}s3^f3"_var;
+		v1.remover(2, 2); ;assert(v1 == "f1^v1^f3"_var);
+		// or
+		remover(v1, 2, 2);
+	}
+
+	printl("locate(in substr) const;");
+	{
+				let pos1 = "UK]US^UA"_var.locate("US"); assert(pos1.errputl() == 2);
+		let pos2 = "UK]US^UA"_var.locate("GB"); assert(pos2.errputl() == 0);
+		// or
+		let pos3 = locate("US", "UK]US^UA"_var);
+	}
+
+	printl("locate(in substr, out position) const;");
+	{
+		var pos;
+		if (    "UK]US^UA"_var.locate("US", pos)) {/*ok*/} else  abort("locate: " ^ lasterror());  assert(position.errputl() == 2);
+		if (not "UK]US^UA"_var.locate("GB", pos)) {/*ok*/} else  abort("locate: " ^ lasterror());  assert(position.errputl() == 4);
+		// or
+		if (locate("US", "UK]US^UA"_var, pos)) {/*ok*/} else  abort("locate: " ^ lasterror());
+	}
+
+	printl("locate(in substr, out position, const int fieldno, const int valueno = 0) const;");
+	{
+		var pos;
+		if ("f1^f2v1]f2v2]s1}s2}s3}s4^f3^f4"_var.locate("s4", pos, 2, 3)) {/*ok*/} else  abort("locate: " ^ lasterror());  assert(pos.errputl() == 4 );// Return true
+	}
+
+	printl("locateby(const char* ordercode, in substr, out valueno) const;");
+	{
+		var valueno; if (not "aaa]bbb]ccc"_var.locateby("AL", "bb", valueno)) {/*ok*/} else  abort("locateby: " ^ lasterror());  assert(valueno.errputl() == 2 );// Return false and valueno = where it could be correctly inserted.
+	}
+
+	printl("locateby(const char* ordercode, in substr, out pos, const int fieldno, const int valueno = 0) const;");
+	{
+		var pos;
+		if (not "f1^f2^aaa]bbb]ccc^f4"_var.locateby("AL", "bb", pos, 3)) {/*ok*/} else  abort("locateby: " ^ lasterror());  assert(pos.errputl() == 2 );// return false and where it could be correctly inserted.
+	}
+
+	printl("locateusing(const char* usingchar, in substr) const;");
+	{
+		if ("AB,EF,CD"_var.locateusing(",", "EF")) {/*ok*/} else  abort("locateusing: " ^ lasterror());
+	}
+
+	printl("locateusing(const char* usingchar, in substr, out pos, const int fieldno = 0, const int valueno = 0, const int subvalueno = 0) const;");
+	{
+		var pos;
+		if ("f1^f2^f3c1,f3c2,f3c3^f4"_var.locateusing(",", "f3c2", pos, 3)) {/*ok*/} else  abort("locateusing: " ^ lasterror());  assert(pos.errputl() == 2 );// Return true
+	}
+
+////////////////
+// Code examples varo.h
+////////////////
+
+	printl("date();");
+	{
+		let today1 = var::date();
+		// or
+		let today2 = date();
+	}
+
+	printl("time();");
+	{
+		let now1 = var::time();
+		// or
+		let now2 = time();
+	}
+
+	printl("ostime();");
+	{
+		let now1 = var::ostime();
+		// or
+		let now2 = ostime();
+	}
+
+	printl("ostimestamp();");
+	{
+		let now1 = var::ostimestamp();
+		// or
+		let now2 = ostimestamp();
+	}
+
+	printl("ostimestamp(in ostime) const;");
+	{
+		let idate = iconv("2025-01-01", "D"), itime = iconv("23:59:59", "MT");
+		let ts1 = idate.ostimestamp(itime); assert(ts1.errputl() == 20821.99998842593);
+		// or
+		let ts2 = ostimestamp(idate, itime);
+	}
+
+	printl("ossleep(const int milliseconds);");
+	{
+		var::ossleep(100); // sleep for 100ms
+		// or
+		ossleep(100);
+	}
+
+	printl("oswait(const int milliseconds) const;");
+	{
+		let v1 = ".^/etc/hosts"_var.oswait(100); /// e.g. "IN_CLOSE_WRITE^/etc^hosts^f"_var
+		// or
+		let v2 = oswait(".^/etc/hosts"_var, 100);
+	}
+
+	printl("osopen(in osfilename, const bool utf8 = true) const;");
+	{
+		let osfilename = ostempdir() ^ "xo_gendoc_test.conf";
+		if (oswrite("" on osfilename)) {/*ok*/} else  abort("osopen: " ^ lasterror()); /// Create an empty OS file
+		var ostempfile;
+		if (ostempfile.osopen(osfilename)) {/*ok*/} else  abort("osopen: " ^ lasterror());
+		// or
+		if (osopen(osfilename to ostempfile)) {/*ok*/} else  abort("osopen: " ^ lasterror());
+	}
+
+	printl("osbwrite(in osfilevar, io offset) const;");
+	{
+		let osfilename = ostempdir() ^ "xo_gendoc_test.conf";
+		let text = "aaa=123\nbbb=456\n";
+		var offset = -1; /// -1 means append.
+		if (text.osbwrite(osfilename, offset)) {/*ok*/} else  abort("osbwrite: " ^ lasterror());  assert(offset.errputl() == 16);
+		// or
+		if (not osbwrite(text on osfilename, offset)) abort("osbwrite: " ^ lasterror());
+	}
+
+	printl("osbread(in osfilevar, io offset, const int length);");
+	{
+		let osfilename = ostempdir() ^ "xo_gendoc_test.conf";
+		var text, offset = 0;
+		if (text.osbread(osfilename, offset, 8)) {/*ok*/} else  abort("osbread: " ^ lasterror());  assert(text.errputl() == "aaa=123\n" ); assert(offset.errputl() == 8);
+		// or
+		if (osbread(text from osfilename, offset, 8)) {/*ok*/} else  abort("osbread: " ^ lasterror());  assert(text.errputl() == "bbb=456\n" ); assert(offset.errputl() == 16);
+	}
+
+	printl("osclose() const;");
+	{
+		var osfilevar; if (osfilevar.osopen(ostempfile())) {/*ok*/} else  abort("osclose: " ^ lasterror());
+		osfilevar.osclose();
+		// or
+		osclose(osfilevar);
+	}
+
+	printl("oswrite(in osfilename, const char* codepage = "") const;");
+	{
+		let text = "aaa = 123\nbbb = 456";
+		let osfilename = ostempdir() ^ "xo_gendoc_test.conf";
+		if (text.oswrite(osfilename)) {/*ok*/} else  abort("oswrite: " ^ lasterror());
+		// or
+		if (oswrite(text on osfilename)) {/*ok*/} else  abort("oswrite: " ^ lasterror());
+	}
+
+	printl("osread(const char* osfilename, const char* codepage = "");");
+	{
+		var text;
+		let osfilename = ostempdir() ^ "xo_gendoc_test.conf";
+		if (text.osread(osfilename)) {/*ok*/} else  abort("osread: " ^ lasterror());  assert(text.errputl() == "aaa = 123\nbbb = 456");
+		// or
+		if (osread(text from osfilename)) {/*ok*/} else  abort("osread: " ^ lasterror());
+		let text2 = osread(osfilename);
+	}
+
+	printl("osrename(in new_dirpath_or_filepath) const;");
+	{
+		let from_osfilename = ostempdir() ^ "xo_gendoc_test.conf";
+		let to_osfilename = from_osfilename ^ ".bak";
+
+		if (from_osfilename.osrename(to_osfilename)) {/*ok*/} else  abort("osrename: " ^ lasterror());
+		// or
+		if (osrename(from_osfilename, to_osfilename)) abort("osrename: " ^ lasterror());
+	}
+
+	printl("osmove(in to_osfilename) const;");
+	{
+		let from_osfilename = ostempdir() ^ "xo_gendoc_test.conf.bak";
+		let to_osfilename = from_osfilename.cut(-4);
+
+		if (from_osfilename.osmove(to_osfilename)) {/*ok*/} else  abort("osmove: " ^ lasterror());
+		// or
+		if (osmove(from_osfilename, to_osfilename)) abort("osmove: " ^ lasterror());
+	}
+
+	printl("oscopy(in to_osfilename) const;");
+	{
+		let from_osfilename = ostempdir() ^ "xo_gendoc_test.conf";
+		let to_osfilename = from_osfilename ^ ".bak";
+		if (from_osfilename.oscopy(to_osfilename)) {/*ok*/} else  abort("oscopy: " ^ lasterror());;
+		// or
+		if (oscopy(from_osfilename, to_osfilename)) {/*ok*/} else  abort("oscopy: " ^ lasterror());
+	}
+
+	printl("osremove() const;");
+	{
+		let osfilename = ostempdir() ^ "xo_gendoc_test.conf";
+		if (osfilename.osremove()) {/*ok*/} else  abort("osremove: " ^ lasterror());
+		// or
+		if (osremove(osfilename)) abort("osremove: " ^ lasterror());
+	}
+
+	printl("oslist(SV globpattern = "", const int mode = 0) const;");
+	{
+		var entries1 = "/etc/"_var.oslist("*.cfg"); /// e.g. "adduser.conf^ca-certificates.con^... etc."
+		// or
+		var entries2 = oslist("/etc/" "*.conf");
+	}
+
+	printl("osinfo(const int mode = 0) const;");
+	{
+		var info1 = "/etc/hosts"_var.osinfo(); /// e.g. "221^20597^78309"_var
+		// or
+		var info2 = osinfo("/etc/hosts");
+	}
+
+	printl("osfile() const;");
+	{
+		var fileinfo1 = "/etc/hosts"_var.osfile(); /// e.g. "221^20597^78309"_var
+		// or
+		var fileinfo2 = osfile("/etc/hosts");
+	}
+
+	printl("osdir() const;");
+	{
+		var dirinfo1 = "/etc/"_var.osdir(); /// e.g. "^20848^44464"_var
+		// or
+		var dirinfo2 = osfile("/etc/");
+	}
+
+	printl("osmkdir() const;");
+	{
+		let osdirname = "xo_test/aaa";
+
+		if (osdirname.osmkdir()) {/*ok*/} else  abort("osmkdir: " ^ lasterror());
+		// or
+		if (osmkdir(osdirname)) abort("osmkdir: " ^ lasterror());
+	}
+
+	printl("oscwd(SV newpath);");
+	{
+		let osdirname = "xo_test/aaa";
+		if (osdirname.oscwd()) {/*ok*/} else  abort("oscwd: " ^ lasterror());
+		// or
+		if (oscwd(osdirname)) {/*ok*/} else  abort("oscwd: " ^ lasterror());
+		if (oscwd("../..")) {/*ok*/} else  abort("oscwd: " ^ lasterror()); /// Change back to avoid errors in following code.
+	}
+
+	printl("oscwd();");
+	{
+		var cwd1 = var().oscwd();
+		// or
+		var cwd2 = oscwd();
+	}
+
+	printl("osrmdir(bool evenifnotempty = false) const;");
+	{
+		let osdirname = "xo_test/aaa";
+		if (osdirname.osrmdir()) {/*ok*/} else  abort("osrmdir: " ^ lasterror());
+		// or
+		if (osrmdir(osdirname)) abort("osrmdir: " ^ lasterror());
+	}
+
+	printl("osshell() const;");
+	{
+		let cmd = "echo $HOME";
+		if (cmd.osshell()) {/*ok*/} else  abort("osshell: " ^ lasterror());
+		// or
+		if (osshell(cmd)) {/*ok*/} else  abort("osshell: " ^ lasterror());
+	}
+
+	printl("osshellread(in oscmd);");
+	{
+		let cmd = "echo $HOME";
+		var text;
+		if (text.osshellread(cmd)) {/*ok*/} else  abort("osshellread: " ^ lasterror());
+		// or capturing stdout but ignoring exit status
+		text = osshellread(cmd);
+	}
+
+	printl("osshellwrite(in oscmd) const;");
+	{
+		let outtext = "abc xyz";
+		if (outtext.osshellwrite("grep xyz")) {/*ok*/} else  abort("osshellwrite: " ^ lasterror());
+		// or
+		if (osshellwrite(outtext, "grep xyz")) {/*ok*/} else  abort("osshellwrite: " ^ lasterror());
+	}
+
+	printl("osprocess(in oscmd, in stdin_for_process, out stdout_from_process, out stderr_from_process, out exit_status, in timeout_secs = 0);");
+	{
+		var v_stdout, v_stderr, v_exit_status;
+		if (var::osprocess("grep xyz", "abc\nxyz 123\ndef", v_stdout, v_stderr, v_exit_status)) {/*ok*/} else  abort("osprocess: " ^ lasterror());  assert(v_stdout.errputl() == "xyz 123\n" );// v_exit_status = 0
+		// or
+		if (osprocess("grep xyz", "abc\nxyz 123\ndef", v_stdout, v_stderr, v_exit_status)) {/*ok*/} else  abort("osprocess: " ^ lasterror());
+	}
+
+	printl("ostempdir();");
+	{
+		let v1 = var::ostempdir();
+		// or
+		let v2 = ostempdir();
+	}
+
+	printl("ostempfile();");
+	{
+		var temposfilename1 = var::ostempfile();
+		// or
+		var temposfilename2 = ostempfile();
+	}
+
+	printl("ossetenv(SV envcode) const;");
+	{
+		let envcode = "EXO_ABC", envvalue = "XYZ";
+		envvalue.ossetenv(envcode);
+		// or
+		ossetenv(envcode, envvalue);
+	}
+
+	printl("osgetenv(SV envcode);");
+	{
+		var envvalue1;
+		if (envvalue1.osgetenv("HOME")) {/*ok*/} else  abort("osgetenv: " ^ lasterror()); // e.g. "/home/exodus"
+		// or
+		let envvalue2 = osgetenv("EXO_ABC"); assert(envvalue2.errputl() == "XYZ");
+	}
+
+	printl("ospid();");
+	{
+		let pid1 = var::ospid(); /// e.g. 663237
+		// or
+		let pid2 = ospid();
+	}
+
+	printl("ostid();");
+	{
+		let tid1 = var::ostid(); /// e.g. 663237
+		// or
+		let tid2 = ostid();
+	}
+
+	printl("version();");
+	{
+		// e.g.
+		// Local:  doc 2025-03-19 18:15:31 +0000 219cdad8a
+		// Remote: doc 2025-03-17 15:03:00 +0000 958f412f0
+		// https://github.com/exodusdb/exodusdb/commit/219cdad8a
+		// https://github.com/exodusdb/exodusdb/archive/958f412f0.tar.gz
+		//
+		let v1 = var::version();
+		// or
+		let v2 = version();
+	}
+
+	printl("setxlocale(const char* newlocalecode);");
+	{
+		if (var::setxlocale("en_US.utf8")) {/*ok*/} else  abort("setxlocale: " ^ lasterror());
+		// or
+		if (setxlocale("en_US.utf8")) {/*ok*/} else  abort("setxlocale: " ^ lasterror());
+	}
+
+	printl("getxlocale();");
+	{
+				let v1 = var::getxlocale(); assert(v1.errputl() == "en_US.utf8");
+		// or
+		let v2 = getxlocale();
+	}
+
+	printl("outputl(in prefix = "") const;");
+	{
+		"abc"_var.outputl("xyz = "); /// Sends "xyz = abc\n" to stdout and flushes.
+		// or
+		outputl("xyz = ", "abc"); /// Any number of arguments is allowed. All will be output.
+	}
+
+	printl("logputl(in prefix = "") const;");
+	{
+		"abc"_var.logputl("xyz = "); /// Sends "xyz = abc\n" to stdlog buffer and is not flushed.
+		// or
+		logputl("xyz = ", "abc");; /// Any number of arguments is allowed. All will be output.
+	}
+
+	printl("errputl(in prefix = "") const;");
+	{
+		"abc"_var.errputl("xyz = "); /// Sends "xyz = abc\n" to stderr
+		// or
+		errputl("xyz = ", "abc"); /// Any number of arguments is allowed. All will be output.
+	}
+
+	printl("osflush() const;");
+	{
+		var().osflush();
+		// or
+		osflush();
+	}
+
+	printl("operator<<(const auto& value) const");
+	{
+		let txtfile = "t_temp.txt";
+		if (not osremove(txtfile)) {} // Remove any existing file.
+		txtfile << txtfile << " " << 123.456789 << " " << 123 << std::endl;
+		let v1 = osread(txtfile); assert(v1.errputl() == "t_temp.txt 123.457 123\n");
+	}
+
+	printl("operator<<(const auto& value) const");
+	{
+		let vout = "t_std_iomanip_overview.txt";
+		if (not osremove(vout)) {}
+		using namespace std;
+		vout << boolalpha    << true          << "\ttrue"    << endl;
+		vout << noboolalpha  << true          << "\t1"       << endl;
+		vout << showpoint    << 42.0          << "\t42.0000" << endl;
+		vout << noshowpoint  << 42.0          << "\t42"      << endl;
+		vout << showpos      << 42            << "\t+42"     << endl;
+		vout << noshowpos    << 42            << "\t42"      << endl;
+		vout << skipws       << " " << 42     << "\t 42"     << endl;
+		vout << noskipws     << " " << 42     << "\t 42"     << endl;
+		vout << unitbuf      << "a"           << "\ta"       << endl;
+		vout << nounitbuf    << "b"           << "\tb"       << endl;
+		vout << setw(6)      << 42            << "\t    42"  << endl;
+		vout << left         << setw(6) << 42 << "\t42    "  << endl;
+		vout << right        << setw(6) << 42 << "\t    42"  << endl;
+		vout << internal     << setw(6) << 42 << "\t    42"  << endl;
+		vout << setfill('*') << setw(6) << 42 << "\t****42"  << endl;
+		vout << showbase     << hex << 255    << "\t0xff"    << endl;
+		vout << noshowbase   << 255           << "\tff"      << endl;
+		vout << uppercase    << 255           << "\tFF"      << endl;
+		vout << nouppercase  << 255           << "\tff"      << endl;
+		vout << oct          << 255           << "\t377"     << endl;
+		vout << hex          << 255           << "\tff"      << endl;
+		vout << dec          << 255           << "\t255"     << endl;
+		vout << fixed        << 42.1          << "\t42.100000"            << endl;
+		vout << scientific   << 42.1          << "\t4.210000e+01"         << endl;
+		vout << hexfloat     << 42.1          << "\t0x1.50ccccccccccdp+5" << endl;
+		vout << defaultfloat << 42.1          << "\t42.1"                 << endl;
+		vout << std::setprecision(3)      << 42.1567  << "\t42.2"  << endl;
+		vout << resetiosflags(ios::fixed) << 42.1567  << "\t42.2"  << endl;
+		vout << setiosflags(ios::showpos) << 42       << "\t+42"   << endl;
+		// Verify actual v. expected.
+		var act_v_exp = osread(vout);
+		act_v_exp.converter("\n\t", FM ^ VM); /// Text to dynamic array
+		act_v_exp = invertarray(act_v_exp);   /// Columns <-> Rows
+		assert(act_v_exp.f(1) eq act_v_exp.f(2));
+	}
+
+	printl("input(in prompt = "");");
+	{
+		// var v1 = "defaultvalue";
+		// if (v1.input("Prompt:")) {/*ok*/} else  abort("input: " ^ lasterror());
+		// or
+		// var v2 = input();
+	}
+
+	printl("isterminal(const int in_out_err = 1) const;");
+	{
+		var v1 = var().isterminal(); /// 1 or 0
+		// or
+		var v2 = isterminal();
+	}
+
+	printl("from_codepage(const char* codepage) const;");
+	{
+				let v1 = "\xa4"_var.from_codepage("CP1124"); assert(v1.errputl() == "Є");
+		// or
+		let v2 = from_codepage("\xa4", "CP1124");
+		// U+0404 Cyrillic Capital Letter Ukrainian Ie Unicode character
+	}
+
+	printl("to_codepage(const char* codepage) const;");
+	{
+				let v1 = "Є"_var.to_codepage("CP1124").oconv("HEX"); assert(v1.errputl() == "A4");
+		// or
+		let v2 = to_codepage("Є", "CP1124").oconv("HEX");
 	}
 
 ////////////////
@@ -1405,6 +2459,9 @@ subroutine cleanup() {
 		if (not dbdelete("xo_gendoc_testdb2")) {}; // Cleanup first
 		if (not deleteindex("xo_clients", "DATE_CREATED")) {}; // Cleanup first
 		//if (not "xo_clients"_var.deleterecord("GD001")) {}; // Cleanup first
+		if (not osremove(ostempdir() ^ "xo_gendoc_test.conf.bak")) {}; // Cleanup first
+		if (not osremove(ostempdir() ^ "xo_gendoc_test.conf")) {}; // Cleanup first
+		if (osrmdir("xo_test/aaa")) {}; // Cleanup first
 		if (not deleterecord("xo_clients", "GD001")) {}; // Cleanup first
 		if (not osremove("xo_conf.txt")) {}; // Cleanup first
 };

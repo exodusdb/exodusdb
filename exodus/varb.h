@@ -23,6 +23,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
+// gendoc: var - Base
+
 // var_base for basic var-like functionality
 // 1. int and fp arithmetic (+, -, *, /, %)
 // 2. string concat (^)
@@ -1277,23 +1279,6 @@ class PUBLIC var_base {
 	#undef DEPRECATE
 */
 
-/////////////////////////////////////////////////////////////////////////////////////////////////
-//                                      UNARY OPERATORS
-/////////////////////////////////////////////////////////////////////////////////////////////////
-
-	// Unary
-	ND RETVAR operator+() const;
-	ND RETVAR operator-() const;
-	ND bool operator!() const {return !this->toBool();}
-
-	// Postfix increment/decrement - only on lvalue because can use + 1 on temporaries and not risk wrong code e.g. x.f(1)++;
-	RETVAR operator++(int) &;
-	RETVAR operator--(int) &;
-
-	// Prefix increment/decrement
-	VBR operator++() &;
-	VBR operator--() &;
-
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wnon-template-friend"
 
@@ -1332,6 +1317,7 @@ class PUBLIC var_base {
 
 	///////////////
 	// FRIEND UTILS
+	///  :
 	///////////////
 
 	// Logical
@@ -1347,12 +1333,12 @@ class PUBLIC var_base {
 
 	friend bool var_lt_int (      CBR1   lhs, const int    int1 );
 	friend bool int_lt_var (const int    int1,      CBR1   rhs  );
+	friend bool var_lt_bool (      CBR1  lhs, const bool   bool1);
 
 	friend bool var_lt_dbl (      CBR1   lhs, const double dbl1 );
 	friend bool dbl_lt_var (const double dbl1,      CBR1   rhs  );
+	friend bool bool_lt_var (const bool  bool1,     CBR1   rhs  );
 
-//	friend bool var_lt_bool (      CBR1  lhs, const bool   bool1) = delete;
-//	friend bool bool_lt_var (const bool  bool1,     CBR1   rhs  ) = delete;
 //	friend var operator""_var(const char* cstr, std::size_t size);
 
 	//////////////////////////////////////
@@ -1410,16 +1396,16 @@ class PUBLIC var_base {
 	}
 
 	/// UTILITY:
-	//////////
+	///////////
 
-	// integer or floating point. optional prefix -, + disallowed, solitary . and - not allowed. Empty string is numeric 0
-	//CONSTEXPR
-	ND bool isnum() const;
+	// obj is var
 
-	// Returns a copy of the var or 0 if non-numeric
-	ND RETVAR num() const;
-
+	// Get the length in chars/bytes.
+	// return: The length.
 	ND RETVAR len() const;
+
+	// Test if it is an empty string.
+	// return: True or False
 	ND bool empty() const;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1436,11 +1422,12 @@ class PUBLIC var_base {
 	// Extract a character from a constant var
 	// first=1 last=-1 etc.
 	// DONT change deprecation wordng without also changing it in cli/fixdeprecated
+	// undocumented
 	[[deprecated ("EXODUS: Replace single character accessors like xxx[n] with xxx.at(n)")]]
-	ND RETVAR operator[](int pos1) const; //{return this->at(pos1);}
+	ND RETVAR operator[](int pos1) const;
 
 	// Named member function identical to operator[]
-	//ND RETVAR at(const int pos1) const;
+	// undocumented
 	ND RETVAR at(const int pos1) const;
 
 	// as of now, sadly the following all works EXCEPT that var[99].anymethod() doesnt work
@@ -1453,34 +1440,75 @@ class PUBLIC var_base {
 //                                         PUBLIC MEMBER FUNCTIONS
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
-	// Housekeeping functions
-	/////////////////////////
 
-	// Returns: True if the var is assigned, otherwise false
+	// Check if a var has been assigned a value.
+	// return: True if the var is assigned, otherwise false
 	ND bool assigned() const;
 
-	// Returns: True if the var is unassigned, otherwise false
+	// Check if a var has not been assigned a value;
+	// return: True if the var is unassigned, otherwise false
 	ND bool unassigned() const;
 
-	// If the var is unassigned, assigns the default value to it, otherwise does nothing.
-	// Mutator.
+	// If a var is unassigned, assign a default value.
+	// If the var is unassigned then assign the default value to it, otherwise do nothing.
+	// defaultvalue: Cannot be unassigned.
+	//
+	// `var v1; // Unassigned
+	//  v1.defaulter("abc"); // v1 -> "abc"
+	//  // or
+	//  defaulter(v1, "abc");`
+	//
 	void defaulter(CBR defaultvalue);
 
-	// Returns: A copy of the var if it is assigned otherwise it returns a copy of the default var
-	// If ''defaultvalue'' is unassigned then then a VarUnassigned error is thrown.
+	// Copy a var or, if it is unassigned, copy a default value.
+	// return: A copy of the var if it is assigned or the default value if it is not.
+	// Can be used to handle optional arguments in functions.
+	// defaultvalue: Cannot be unassigned.
+	// obj is v2
+	//
+	// `var v1; // Unassigned
+	//  var v2 = v1.or_default("abc"); // v2 -> "abc"
+	//  // or
+	//  var v3 = or_default(v1, "abc");`
+	//
+	// Mutator: defaulter()
+	//
 	ND RETVAR or_default(CBR defaultvalue) const;
 
-	// "moves" the var to the destination var leaving the source var unassigned.
-	// This is useful for performance with vars which own strings larger than can be fitted inside a std::string object, which is 15 bytes on linux.
-	// The ownership of a heap allocated string can be transferred from one var to another if it is no longer required in the original var.
-	// Transferring ownership of strings only requires copying a pointer instead of performing heap allocation and deallocation and also, in the case of very large strings, copying of large areas of memory.
-	// If the source var is unassigned then then a VarUnassigned error is thrown.
+	// "move" the var to the destination var leaving the source var unassigned.
+	// This is useful for performance with vars which own strings larger than the internal buffer of a std::string object. (15 chars/bytes on linux).
+	// Move a var into another var.
+	// Performs a shallow copy of the var's data and transfers ownership of its string, if any. The moved var is set to an empty string.
+	// Enables efficient handling of large strings by moving pointers without copying or allocating memory.
+	// throw: VarUnassigned if the moved var is unassigned before the move.
+	// obj is v2
+	//
+	// `var v1 = space(65'535);
+	//  var v2;
+	//  v1.move(v2); // v2.len() -> 65'536 // v1 -> ""`
+	//
 	void move(VBR destinationvar);
 
-	// Swaps the contents of two variables.
-	// Useful for stashing large strings quicky.
-	// Works on unassigned variables without triggering an error
-	// If the source is unassigned then the target is unassigned too.
+	// "move" a var into a temporary var.
+	// See move(destinationvar).
+	//
+	// `var v1 = space(65'535);
+	//  var v2 = v1.move(); // v2.len() -> 65'536 // v1 -> ""
+	//  // or
+	//  let v3 = move(v2);`
+	//
+	ND RETVAR move();
+
+	// Swap the contents of one var with another.
+    // Useful for stashing large strings quickly. They are moved using pointers without making copies or allocating memory.
+	// Either or both variables may be unassigned.
+	//
+	// `var v1 = space(65'536);
+	//  var v2 = "";
+	//  v1.swap(v2); // v1 -> "" // v2.len() -> 65'536
+	//  // or
+	//  swap(v1, v2);`
+	//
 	void swap(VBR var2);
 
 	// Swaps the contents of two variables.
@@ -1492,22 +1520,171 @@ class PUBLIC var_base {
 	// Either or both vars may be unassigned without triggering a VarUnnassigned error.
 	void swap(CBR var2) const;
 
-	// Returns a copy of the var but works on unassigned vars without triggering an error
-	// If the source is unassigned then the copy is unassigned too.
+    // Return a copy of the var.
+    // The cloned var may be unassigned. No VarUnassigned error will not be thrown.
+	// obj is v2
+	// `var v1 = "abc";
+	//  var v2 = v1.clone(); // "abc"
+	//  // or
+	//  var v3 = clone(v2);`
+	//
 	ND RETVAR clone() const;
 
-	// "moves" the var into a new temporary var while making the var unassigned.
-	// This can be used to transfer ownership of a heap allocated string instead of replicaing it.
-	ND RETVAR move();
-
-	// Text representation of var_base internals. Works on unassigned vars.
+	// Return a string describing internal data of a var.
+	// If the var holds an internal std::string using heap storage then its its heap storage address is given.
+	// typ: Multiple typs may exist simultaneously.
+    // * 0x01 * str is available.
+    // * 0x02 * int is available.
+    // * 0x04 * dbl is available.
+    // * 0x08 * nan: str is not a number.
+    // * 0x16 * osfile (nan is true, str, int and dbl have special meaning).
+	//
+	// `var v1 = str("x", 32);
+	//  v1.dump().outputl(); /// e.g. var:0x7ffea7462cd0 typ:1 str:0x584d9e9f6e70 "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+	//  // or
+	//  outputl(dump(v1));`
+	//
 	ND RETVAR dump() const;
 
-	///// MATH/BOOLEAN:
-	//////////////////
+	////////////
+	/// NUMERIC:
+	////////////
 
-	// obj is varnum
+	// obj is var
 
+	// Unary plus.
+	// return: The numeric value of a variable or expression, or throws a VarNonNumeric error.
+	//
+	// `let v1 = 3;
+	//  let v2 = +v1; // 3`
+	//
+	ND RETVAR operator+() const;
+
+	// Unary minus.
+	// return: The negative value of a numeric variable or expression, or throws a VarNonNumeric error.
+	//
+	// `let v1 = 3;
+	//  let v2 = -v1; // -3
+	//  let v3 = -v2; // 3`
+	//
+	ND RETVAR operator-() const;
+
+	// Boolean negate.
+	// Alias: "not" as in "if (not ...)".
+	// return: True if a variable or expression is false, or False if it is true.
+	// Negate the result of the following:
+	// * Empty string * false
+	// * Non-numeric string * true
+	// * Zero (string or number) * false
+	// * Non-zero (string or number) * true
+	//
+	// `if (!var("") eq true) ... ok
+	//  if (!var("x") eq false) ... ok
+	//  if (!var("0") eq true) ... ok
+	//  if (!var("123") eq false) ... ok
+	//  // or
+	//  if (not var("") eq true) ... ok`
+	//
+	ND bool operator!() const {return !this->toBool();}
+
+	// Post-increment
+	// ++ and -- are only allowed on named variables, not expressions, to prevent writing cryptic and buggy code.
+	//
+	// `var v1 = 3;
+	//  let v2 = v1++; // v2 -> 3 // v1 -> 4`
+	//
+	RETVAR operator++(int) &;
+
+	// Post-decrement
+	//
+	// `var v1 = 3;
+	//  let v2 = v1--; // v2 -> 3 // v1 -> 2`
+	//
+	RETVAR operator--(int) &;
+
+	// Pre-increment
+	//
+	// `var v1 = 3;
+	//  let v2 = ++v1; // v2 -> 4 // v1 -> 4`
+	//
+	RETVARREF operator++() &;
+
+	// Pre-decrement
+	//
+	// `var v1 = 3;
+	//  let v2 = --v1; // v2 -> 2 // v1 -> 2`
+	//
+	RETVARREF operator--() &;
+
+	// Check if a var is numeric.
+	// return: True if a var holds a double, integer, or a string representing a numeric value.
+	// A string is considered numeric if it is:
+	// * Empty (treated as zero), or
+	// * Composed of one or more digits (0-9), an optional leading '+' or '-' sign, and an optional single decimal point ('.') placed before, within, or after the digits.
+	// * Optionally includes an exponential suffix ('e' or 'E', optionally followed by '+' or '-', and 1-3 digits).
+	//
+	// `if (   "+123.45"_var.isnum()) ... ok
+	//  if ("+1.2345e+2"_var.isnum()) ... ok
+	//  if (          ""_var.isnum()) ... ok
+	//  if (not      "."_var.isnum()) ... ok
+	//  // or
+	//  if (isnum("123.")) ... ok`
+	//
+	ND bool isnum() const;
+
+    // Copy a var if it is numeric or 0 if not.
+	// This allows working numerically with data that may be non-numeric.
+	// return: A guaranteed numeric var
+	//
+	// `var v1 = "123.45"_var.num();    // 123.45
+	//  var v2 = "abc"_var.num() + 100; // 100`
+	//
+	ND RETVAR num() const;
+
+/* for doc	
+	// Addition
+	// Any attempt to perform numeric operations on non-numeric strings will throw a runtime error VarNonNumeric.
+	// Floating point numbers are implicitly converted to strings with no more than 12 significant digits of precision. This practically eliminates all floatng point rounding errors.
+	// Internally, 0.1 + 0.2 looks like this using doubles.
+	// 0.10000000000000003 + 0.20000000000000004 -> 0.30000000000000004
+	//
+	// `var v1 = 0.1;
+	//  var v2 = v1 + 0.2; // 0.3`
+	//
+	ND var operator+(var);
+
+	// Subtraction
+	ND var operator-(var);
+
+	// Multiplication
+	ND var operator*(var);
+
+	// Division
+	ND var operator/(var);
+
+	// Modulus
+	ND var operator%(var);
+
+	// Self addition
+	//
+	// `var v1 = 0.1;
+	//  v1 += 0.2; // 0.3`
+	//
+	ND var operator+=(var);
+
+	// Self subtraction
+	ND var operator-=(var);
+
+	// Self multiplication
+	ND var operator*=(var);
+
+	// Self division
+	ND var operator/=(var);
+
+	// Self modulus
+	ND var operator%=(var);
+
+*/
 	// Absolute value.
 	// `let v1 = -12.34;
 	//  let v2 = v1.abs(); // 12.34
@@ -1622,14 +1799,65 @@ class PUBLIC var_base {
 	//
 	ND RETVAR floor() const;
 
-	// Needed in operator%
-	ND RETVAR mod(CBR divisor) const;
-	ND RETVAR mod(double divisor) const;
-	ND RETVAR mod(const int divisor) const;
+	// Get the modulo of two numbers.
+	// return: "floored division modulo" also known as Euclidean modulo.
+	// limit:
+	// * Positive * return:  range [0, limit)                    0 ≤ result < limit
+	// * Negative * return:  range (limit, 0]   limit < result ≤ 0
+	//
+	// Exodus' modulo limits the value instead of doing a kind of remainder as per C/C++ % operator which performs "truncated division modulo".
+	// Exodus' is symmetrical about 0. The symmetry property is a hallmark of floored division modulo, distinguishing it from truncated modulo.
+	// * mod(x, y) == -(mod(-x, -y))
+	//
+	// `let v01 = var(3.0).mod(3.0);   // 0
+	//  let v02 = var(2.0).mod(3.0);   // 2
+	//  let v03 = var(0.0).mod(3.0);   // 0
+	//  let v04 = var(-2.0).mod(3.0);  // 1
+	//  let v05 = var(-3.0).mod(3.0);  // 0
+	//  let v06 = var(3.0).mod(-3.0);  // 0
+	//  let v07 = var(2.0).mod(-3.0);  // -1
+	//  let v08 = var(0.0).mod(-3.0);  // 0
+	//  let v09 = var(-2.0).mod(-3.0); // -2
+	//  let v10 = var(-3.0).mod(-3.0); // 0
+	//  // or
+	//  let v11 = mod(4, 3);  // 1
+	//  // or
+	//  let v12 = var(4) % 3; // 1`
+	//
+	ND RETVAR mod(CBR limit) const;
 
-	ND static int  getprecision();
-	   static int  setprecision(int);
+	// undocumented overload for double
+	ND RETVAR mod(double limit) const;
 
+	// undocumented overload for int
+	ND RETVAR mod(const int limit) const;
+
+	// Get the precision used for floating point comparisons. The default is 4.
+	// Precision is used when comparing floating point numbers. Practically speaking, standard computer floating point numbers only have about 12 significant decimal digits. Exodus chooses to use these 12 digits to handle numbers in the range +/- 99'999'999.9999 by default.
+	// Exodus precision means the number of significant decimal digits after the decimal place. This is different from standard scientific precision which is defined as the total number of decimal digits.
+	// If precision is 4 then the smallest significant difference is 0.0001. Differences smaller than this are treated as zero.
+	// Precision can be set per thread. Exodus programs started with run() start with default precision 4.
+	// Performed or executed programs get the precision of the caller. They can change the precision without affecting the precision of the parent program.
+	//
+	// `let v1 = var(0.00001) eq 0; // true
+	//  var::setprecision(6);
+	//  let v2 = var(0.00001) eq 0; // false;
+	//  // or
+	//  setprecision(4);`
+	//
+	ND static var  getprecision();
+
+	// Set the precision to be used for floating point comparisons.
+	// See getprecision() for more info.
+	   static var  setprecision(int);
+
+	// Fix the number of decimal places.
+	//
+	// `let v1 = var(123.4).round(2);   // "123.40"
+	//  let v2 = var(123456).round(-3); // "123000"
+	//  // or
+	//  let v3 = round(123.4, 2);`
+	//
 	ND RETVAR round(const int ndecimals = 0) const;
 
 	////////////////////

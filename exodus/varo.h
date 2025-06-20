@@ -1,6 +1,8 @@
 #ifndef VAR_OS_H
 #define VAR_OS_H
 
+// gendoc: var - OS functions
+
 namespace exo {
 
 	class rex;

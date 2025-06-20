@@ -382,89 +382,56 @@ func main() {
 		// Leading spaces are not acceptable on otherwise numeric strings
 
 		// Differences from Javascript
-		// 0.999999999999 ne 1 and  ne true
+		// 0.999999999999 ne 1 and ne true
 
-		assert((var("") eq true) eq false); //same as javascript
-		assert((var("") ne true) eq true); //same as javascript
-
-		assert((var("") eq false) eq true); //javascript
-		assert((var("") ne false) eq false); //javascript
-
-//		assert(var("") eq false);
+		assert(var("") eq false);   // Same as javascript
 		assert(var("") ne true);
 
-//		assert(var(" ") eq false);//javascript
-		assert(var(" ") ne false);//exodus
-		assert(var(" ") ne true);
-
+//		assert(var(" ") eq false); // Javascript
+		assert(var(" ") ne false); // Exodus
+//		assert(var(" ") ne true);
+		assert(var(" ") eq true);  // Bug fixed in 2025
 
 		assert(var("1") ne false);
 		assert(var("1") eq true);
 
 		assert(var("2") ne false);
-		assert(var("2") ne true);
+		assert(var("2") eq true);
 
 		assert(var("x") ne false);
-		assert(var("x") ne true);
+		assert(var("x") eq true); // bug fixed in 2025
 
 		assert(var("1.01") ne false); // only zero and empty string are false
-		assert(var("1.01") ne true);  // not quite = 1
+		assert(var("1.01") eq true);  // not quite = 1
 
 		assert(var("1.001") ne false); // only zero and empty string are false
-		assert(var("1.001") ne true);  // not quite = 1
+		assert(var("1.001") eq true);  // not quite = 1
 
 		assert(var("1.0001") ne false); // only zero and empty string are false
 
-//		assert(var("1.0001") ne true);  // not quite = 1
-//		assert(var("1.0001") ne true);  // not quite = 1
-		assert(var("1.00001") eq true); //too small a difference from 1
-		assert(var("1.00001") ne false); //too small a difference from 1
+		assert(var("0.00001") eq false);
+		assert(var("0.00001") ne true);
 
-		assert(var("1.0001") ne false);//close enough to 1 to be true?
-		assert(var("1.0001") eq true);
+		assert(var("-0.00001") ne true);
+		assert(var("-0.00001") eq false);
 
-		assert(var("2.0") ne false);//neither true nor false
-		assert(var("2.0") ne true);
+		assert(var("2.0") ne false);
+		assert(var("2.0") eq true);
 
-		assert(var("x") ne false);//neither true nor false
-		assert(var("x") ne true);
+		assert(var("x") ne false);
+		assert(var("x") eq true);
 
-		assert(0.9999 ne true);// not close enough to 1
-		assert(0.9999 ne false);
+		// C++ rules promote bool true to 1.0 and false to 0.0
+		assert(0.9999 ne false);  // false 0.0
+		assert(0.9999 ne true);   // true 1.0
 
-		assert(0.99999 ne true);// close enough to 1
-		assert(0.99999 ne false);
-
-		assert(var(1.01) ne false); // only number 1 is true
-		assert(var(1.01) ne true);  // not quite = 1
-
-		assert(var(1.001) ne false); // only zero and empty string are false
-		assert(var(1.001) ne true);  // not quite = 1
-
-		assert(var(1.0001) ne false); // Only zero and empty string are false
-//		assert(var(1.0001) ne true);  // not quite = 1
-		assert(var(1.00001) eq true); //too small a difference from 1
-		assert(var(1.00001) ne false); //too small a difference from 1
-
-		assert(var(1.0001) ne false);
-		assert(var(1.0001) eq true);
-
-		assert(var(1) ne false);
-		assert(var(1) eq true);
-
-		assert(var(2) ne false);//neither true nor false
-		assert(var(2) ne true);
-
-		assert(var(1.0) ne false);
-		assert(var(1.0) eq true);
-
-		assert(var(2.0) ne false);//neither true nor false
-		assert(var(2.0) ne true);
+		assert(0.99999 ne false); // false 0.0
+		assert(0.99999 ne true);  // true 1.0
 
 	}
 	{
-		assert( var("xxx") ne true);
-		assert( true ne var("xxx"));
+		assert( var("xxx") eq true);
+		assert( true eq var("xxx"));
 
 		assert(true eq var(1));
 		assert(true eq var(1.0));
@@ -476,57 +443,86 @@ func main() {
 		assert(true eq var("1.0"));
 		assert(true eq var("+1.0"));
 
-		assert(true eq 1);
-		assert(true eq 1);
+		assert(true ne 3);   // 1 eq 3
+		assert(true ne 3.0); // 1.0 eq 3.0
 
-		assert(true ne var(0));
-		assert(true ne var(0.0));
+		assert(true ne var(0));   // true ne false
+		assert(true ne var(0.0)); // true ne false
 
-		assert(var("") lt true);
+		assert(var("") lt true);  // false lt true
 	}
 	{
 		assert(not(var("1x")   lt true));
 		assert(not(var("x")    lt true));
-		assert(    var(" ")    lt true);// javascript because leading spaces can be converted to number 0
-//		assert(not(var(" ")    lt true));
+		assert(not(var(" ")    lt true));// javascript because leading spaces can be converted to number 0
 		assert(not(var("1 ")   lt true));
 		assert(not var(") 1")  lt true);
 		assert(not(var(1)      lt true));
 		assert(    var("")     lt true);
 		assert(    var(0)      lt true);
 		assert(    var("0")    lt true);
-		assert(    var("0.1")  lt true);
-		assert(    var("-0.1") lt true);
-
+		assert(not(var("0.1")  lt true));
+		assert(not(var("-0.1") lt true));
 	}
 
 	{
-		assert(var(-0.1) lt false);
-		assert(var(0.1) gt false);
+		assert(!(var(0) eq true));
+		assert( (var(0) ne true));
+		assert( (var(0) lt true));
+		assert( (var(0) le true));
+		assert(!(var(0) gt true));
+		assert(!(var(0) ge true));
 
-		assert(var(0.9) lt true);
-		assert(var(1.1) gt true);
+		assert( (var(0) eq false));
+		assert(!(var(0) ne false));
+		assert(!(var(0) lt false));
+		assert( (var(0) le false));
+		assert(!(var(0) gt false));
+		assert( (var(0) ge false));
 
+		assert( (var(1) eq true));
+		assert(!(var(1) ne true));
+		assert(!(var(1) lt true));
+		assert( (var(1) le true));
+		assert(!(var(1) gt true));
+		assert( (var(1) ge true));
 
-		assert(var(-0.1) le false);
-		assert(var(0.1) ge false);
+		assert(!(var(1) eq false));
+		assert( (var(1) ne false));
+		assert(!(var(1) lt false));
+		assert(!(var(1) le false));
+		assert( (var(1) gt false));
+		assert( (var(1) ge false));
+	}
 
-		assert(var(0.9) le true);
-		assert(var(1.1) ge true);
+	{
+		assert(!(true eq var(0)));
+		assert( (true ne var(0)));
+		assert(!(true lt var(0)));
+		assert(!(true le var(0)));
+		assert( (true gt var(0)));
+		assert( (true ge var(0)));
 
+		assert( (false eq var(0)));
+		assert(!(false ne var(0)));
+		assert(!(false lt var(0)));
+		assert( (false le var(0)));
+		assert(!(false gt var(0)));
+		assert( (false ge var(0)));
 
-		assert(false gt var(-0.1));
-		assert(false lt var(0.1));
+		assert( (true eq var(2)));
+		assert(!(true ne var(2)));
+		assert( (true lt var(2)));
+		assert( (true le var(2)));
+		assert(!(true gt var(2)));
+		assert( (true ge var(2)));
 
-		assert(true gt var(0.9));
-		assert(true lt var(1.1));
-
-
-		assert(false ge var(-0.1));
-		assert(false le var(0.1));
-
-		assert(true ge var(0.9));
-		assert(true le var(1.1));
+		assert(!(false eq var(2)));
+		assert( (false ne var(2)));
+		assert( (false lt var(2)));
+		assert( (false le var(2)));
+		assert(!(false gt var(2)));
+		assert(!(false ge var(2)));
 
 	}
 
@@ -566,47 +562,6 @@ func main() {
 		assert( (var(false) ge var(false)));
 	}
 
-	{
-		assert((var("x") eq true) eq false);
-		assert((var("x") eq false) eq false);
-
-		assert((var("x") ne true) eq true);
-		assert((var("x") ne false) eq true);
-
-		assert((var("x") lt true) eq false);
-		assert((var("x") lt false) eq false);
-
-		assert((var("x") le true) eq false);
-		assert((var("x") le false) eq false);
-
-		assert((var("x") gt true) eq true);
-		assert((var("x") gt false) eq true);
-
-		assert((var("x") ge true) eq true);
-		assert((var("x") ge false) eq true);
-	}
-
-	{
-		assert((true eq var("x")) eq false);
-		assert((false eq var("x")) eq false);
-
-		assert((true ne var("x")) eq true);
-		assert((false ne var("x")) eq true);
-
-		assert((true lt var("x")) eq true);
-		assert((false lt var("x")) eq true);
-
-		assert((true le var("x")) eq true);
-		assert((false le var("x")) eq true);
-
-		assert((true gt var("x")) eq false);
-		assert((false gt var("x")) eq false);
-
-		assert((true ge var("x")) eq false);
-		assert((false ge var("x")) eq false);
-	}
-
-
 	for (var j = -1; j le 1; j++) {
 		for (var i = -6; i le 1; i++) {
 			var d = pwr(10, i);
@@ -627,51 +582,41 @@ func main() {
 	assert((var(0.000001) eq false) eq true );
 	assert((var(0.00001) eq true)  eq false);
 	assert((var(0.00001) eq false) eq true );
-	assert((var(0.0001) eq true)  eq false);
+	assert((var(0.0001) eq true)  eq true);
 	assert((var(0.0001) eq false) eq false);
-	assert((var(0.001) eq true)  eq false);
+	assert((var(0.001) eq true)  eq true);
 	assert((var(0.001) eq false) eq false);
-	assert((var(0.01) eq true)  eq false);
+	assert((var(0.01) eq true)  eq true);
 	assert((var(0.01) eq false) eq false);
-	assert((var(0.1) eq true)  eq false);
+	assert((var(0.1) eq true)  eq true);
 	assert((var(0.1) eq false) eq false);
 	assert((var(1) eq true)  eq true );
 	assert((var(1) eq false) eq false);
-	assert((var(10) eq true)  eq false);
+	assert((var(10) eq true)  eq true);
 	assert((var(10) eq false) eq false);
-	assert((var(100) eq true)  eq false);
-	assert((var(100) eq false) eq false);
-	assert((var(1000) eq true)  eq false);
-	assert((var(1000) eq false) eq false);
-	assert((var(10000) eq true)  eq false);
-	assert((var(10000) eq false) eq false);
-	assert((var(100000) eq true)  eq false);
-	assert((var(100000) eq false) eq false);
-	assert((var(1000000) eq true)  eq false);
-	assert((var(1000000) eq false) eq false);
 
-	assert((var(-0.999999) eq true)  eq false);
+	assert((var(-0.999999) eq true)  eq true);
 	assert((var(-0.999999) eq false) eq false);
 
-	assert((var(-0.99999) eq true)  eq false);
+	assert((var(-0.99999) eq true)  eq true);
 	assert((var(-0.99999) eq false) eq false);
 
-	assert((var(-0.9999) eq true)  eq false);
+	assert((var(-0.9999) eq true)  eq true);
 	assert((var(-0.9999) eq false) eq false);
 
-	assert((var(-0.999) eq true)  eq false);
+	assert((var(-0.999) eq true)  eq true);
 	assert((var(-0.999) eq false) eq false);
 
-	assert((var(-0.99) eq true)  eq false);
+	assert((var(-0.99) eq true)  eq true);
 	assert((var(-0.99) eq false) eq false);
 
-	assert((var(-0.9) eq true)  eq false);
+	assert((var(-0.9) eq true)  eq true);
 	assert((var(-0.9) eq false) eq false);
 
 	assert((var(0) eq true)  eq false);
 	assert((var(0) eq false) eq true );
 
-	assert((var(9) eq true)  eq false);
+	assert((var(9) eq true)  eq true);
 	assert((var(9) eq false) eq false);
 
 	assert((var(0.000001) eq true)  eq false);
@@ -680,46 +625,31 @@ func main() {
 	assert((var(0.00001) eq true)  eq false);
 	assert((var(0.00001) eq false) eq true );
 
-	assert((var(0.0001) eq true)  eq false);
+	assert((var(0.0001) eq true)  eq true);
 	assert((var(0.0001) eq false) eq false);
 
-	assert((var(0.001) eq true)  eq false);
+	assert((var(0.001) eq true)  eq true);
 	assert((var(0.001) eq false) eq false);
 
-	assert((var(0.01) eq true)  eq false);
+	assert((var(0.01) eq true)  eq true);
 	assert((var(0.01) eq false) eq false);
 
-	assert((var(0.1) eq true)  eq false);
+	assert((var(0.1) eq true)  eq true);
 	assert((var(0.1) eq false) eq false);
 
 	assert((var(1) eq true)  eq true );
 	assert((var(1) eq false) eq false);
 
-	assert((var(10) eq true)  eq false);
+	assert((var(10) eq true)  eq true);
 	assert((var(10) eq false) eq false);
 
 	assert((var(1.000001) eq true)  eq true );
 	assert((var(1.000001) eq false) eq false);
 
-	assert((var(1.00001) eq true)  eq true );
-	assert((var(1.00001) eq false) eq false);
-
-	assert((var(1.0001) eq true)  eq true );
-	assert((var(1.0001) eq false) eq false);
-
-	assert((var(1.001) eq true)  eq false);
-	assert((var(1.001) eq false) eq false);
-
-	assert((var(1.01) eq true)  eq false);
-	assert((var(1.01) eq false) eq false);
-
-	assert((var(1.1) eq true)  eq false);
-	assert((var(1.1) eq false) eq false);
-
-	assert((var(2) eq true)  eq false);
+	assert((var(2) eq true)  eq true);
 	assert((var(2) eq false) eq false);
 
-	assert((var(11) eq true)  eq false);
+	assert((var(11) eq true)  eq true);
 	assert((var(11) eq false) eq false);
 
 	printl(elapsedtimetext());

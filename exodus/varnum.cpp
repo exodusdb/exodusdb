@@ -119,7 +119,7 @@ thread_local int TO_STRING_NDECS = EXO_MAX_PRECISION - 3; // i.e. 12 assuming va
 // Returns: New precision if successful or old precision if not.
 // The default precision is 4 which corresponds to 0.0001.
 // By default, printing a raw var double smaller than 0.0001 without using oconv() or round() renders "0".
-PUBLIC int VB1::setprecision(int new_precision) /*const*/ {
+PUBLIC var VB1::setprecision(int new_precision) /*const*/ {
 //	this->assertInteger(__PRETTY_FUNCTION__);
 	// For double: -307 to +308 (binary -1021/+1024 due to 20 bit exponent)
 	if (new_precision >= std::numeric_limits<double>::min_exponent10 and new_precision <= std::numeric_limits<double>::max_exponent10) {
@@ -130,7 +130,7 @@ PUBLIC int VB1::setprecision(int new_precision) /*const*/ {
 	return EXO_PRECISION;
 }
 
-PUBLIC int VB1::getprecision() /*const*/ {
+PUBLIC var VB1::getprecision() /*const*/ {
 	return EXO_PRECISION;
 }
 

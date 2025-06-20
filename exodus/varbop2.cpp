@@ -369,7 +369,7 @@ tryagain:
 
 // Not returning void so is usable in expressions
 // No argument indicates that this is prefix override ++var
-VBR1 VB1::operator++() & {
+RETVARREF VB1::operator++() & {
 
 	// Full check done below to avoid double checking number type
 	assertVar(__PRETTY_FUNCTION__);
@@ -406,7 +406,7 @@ tryagain:
 
 // Not returning void so is usable in expressions
 // No argument indicates that this is prefix override --var
-VBR1 VB1::operator--() & {
+RETVARREF VB1::operator--() & {
 
 	// Full check done below to avoid double checking number type
 	assertVar(__PRETTY_FUNCTION__);
@@ -450,32 +450,26 @@ tryagain:
 //
 //remainder (C)
 //std::remainder (C++) No   Yes  Rounded
-
-//PICKOS modulo limits the value instead of doing a kind of remainder as per c++ % operator
-// [0 , limit) if limit is positive
-// (limit, 0] if limit is negative
-// unlike c++ which is acts more like a divisor/remainder function
-// Note that PICKOS definition is symmetrical about 0 the limit of 0
-//i.e. mod(x,y) == -(mod(-x,-y))
 static double exodusmodulo_dbl(const double dividend, const double limit) {
 
 	if (!limit)
 		UNLIKELY
 		throw VarDivideByZero("mod('" ^ var(dividend) ^ "', '" ^ var(limit) ^ ")");
-
-	double result;
-	if (limit > 0) {
-		LIKELY
-		result = std::fmod(dividend, limit);
-		if (result < 0)
-			UNLIKELY
-			result += limit;
-	} else {
-		result = -std::fmod(-dividend, -limit);
-		if (result > 0)
-			result += limit;
-	}
-	return result;
+//
+//	double result;
+//	if (limit > 0) {
+//		LIKELY
+//		result = std::fmod(dividend, limit);
+//		if (result < 0)
+//			UNLIKELY
+//			result += limit;
+//	} else {
+//		result = -std::fmod(-dividend, -limit);
+//		if (result > 0)
+//			result += limit;
+//	}
+//	return result;
+    return dividend - limit * std::floor(dividend / limit);
 }
 
 static varint_t exodusmodulo_int(const varint_t dividend, const varint_t limit) {
@@ -484,6 +478,8 @@ static varint_t exodusmodulo_int(const varint_t dividend, const varint_t limit) 
 		UNLIKELY
 		throw VarDivideByZero("mod('" ^ var(dividend) ^ "', '" ^ var(limit) ^ ")");
 
+	// There is no implementation that doesnt have two branches.
+	// A ternary would be more concise code but not allow us to insert LIKELY/UNLIKELY.
 	varint_t result;
 	if (limit > 0) {
 		LIKELY
@@ -497,6 +493,9 @@ static varint_t exodusmodulo_int(const varint_t dividend, const varint_t limit) 
 			result += limit;
 	}
 	return result;
+
+	//Doesnt work because int / int doesnt provide "floored division"
+	// return dividend - limit * (dividend / limit);
 }
 
 RETVAR VB1::mod(CBR limit) const {

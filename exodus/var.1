@@ -74,421 +74,7 @@ var x = 0.1, y = "0.2", z = x + y; // z -> 0.3
 .sp 0
 
 
-.SS
-if (v1.assigned()) ...
-.PP
-Check if a var has been assigned a value.
-.sp 0
-.PP
-\fBreturn:\fR True if the var is assigned, otherwise false
-.sp 0
-
-
-.SS
-if (v1.unassigned()) ...
-.PP
-Check if a var has not been assigned a value;
-.sp 0
-.PP
-\fBreturn:\fR True if the var is unassigned, otherwise false
-.sp 0
-
-
-.SS
-var v1 = v2.or_default(defaultvalue);
-.PP
-Copy a var or, if it is unassigned, copy a default value.
-.sp 0
-.PP
-\fBreturn:\fR A copy of the var if it is assigned or the default value if it is not.
-.sp 0
-.PP
-Can be used to handle optional arguments in functions.
-.sp 0
-.PP
-\fBdefaultvalue:\fR Cannot be unassigned.
-.sp 0
-.PP
-.PP
-\fBExample:\fR
-.EX \"<code>
-var v1; // Unassigned
-var v2 = v1.or_default("abc"); // v2 -> "abc"
-// or
-var v3 = or_default(v1, "abc");
-.EE \"</code>
-.sp 0
-.sp 0
-.PP
-.sp 0
-.PP
-\fBMutator:\fR defaulter()
-.sp 0
-
-
-.SS
-v1.defaulter(defaultvalue)
-.PP
-If a var is unassigned, assign a default value.
-.sp 0
-.PP
-If the var is unassigned then assign the default value to it, otherwise do nothing.
-.sp 0
-.PP
-\fBdefaultvalue:\fR Cannot be unassigned.
-.sp 0
-.PP
-.PP
-\fBExample:\fR
-.EX \"<code>
-var v1; // Unassigned
-v1.defaulter("abc"); // v1 -> "abc"
-// or
-defaulter(v1, "abc");
-.EE \"</code>
-.sp 0
-.sp 0
-
-
-.SS
-v1.swap(io v2)
-.PP
-Swap the contents of one var with another.
-.sp 0
-.PP
-Useful for stashing large strings quickly. They are moved using pointers without making copies or allocating memory.
-.sp 0
-.PP
-Either or both variables may be unassigned.
-.sp 0
-.PP
-.PP
-\fBExample:\fR
-.EX \"<code>
-var v1 = space(65'536);
-var v2 = "";
-v1.swap(v2); // v1 -> "" // v2.len() -> 65'536
-// or
-swap(v1, v2);
-.EE \"</code>
-.sp 0
-.sp 0
-
-
-.SS
-var v1 = v2.move();
-.PP
-Move a var into another.
-.sp 0
-.PP
-Performs a shallow copy of the var's data and transfers ownership of its string, if any. The moved var is set to an empty string.
-.sp 0
-.PP
-Enables efficient handling of large strings by moving pointers without copying or allocating memory.
-.sp 0
-.PP
-\fBthrow:\fR VarUnassigned if the moved var is unassigned before the move.
-.sp 0
-.PP
-.PP
-\fBExample:\fR
-.EX \"<code>
-var v1 = space(65'536);
-var v2 = v1.move(); // v2.len() -> 65'536 // v1 -> ""
-// or
-var v3 = move(v2);
-.EE \"</code>
-.sp 0
-.sp 0
-
-
-.SS
-var v1 = v2.clone();
-.PP
-Return a copy of the var.
-.sp 0
-.PP
-The cloned var may be unassigned, in which case the copy will be unassigned too.
-.PP
-\fBExample:\fR
-.EX \"<code>
-var v1 = "abc";
-var v2 = v1.clone(); // "abc"
-// or
-var v3 = clone(v2);
-.EE \"</code>
-.sp 0
-.sp 0
-
-
-.SS
-var v1 = v1.dump();
-.PP
-Return a string describing internal data of a var.
-.sp 0
-.PP
-If the var holds an internal std::string using heap storage then its its heap storage address is given.
-.sp 0
-.PP
-\fBtyp:\fR Multiple typs may exist simultaneously.
-.sp 0
-.PD 0 \"<dl>
-.TP 10\"<dt>
-\fB0x01\fR \"</dt>
-str is available.
-.\"</dd>
-.TP 10\"<dt>
-\fB0x02\fR \"</dt>
-int is available.
-.\"</dd>
-.TP 10\"<dt>
-\fB0x04\fR \"</dt>
-dbl is available.
-.\"</dd>
-.TP 10\"<dt>
-\fB0x08\fR \"</dt>
-nan: str is not a number.
-.\"</dd>
-.TP 10\"<dt>
-\fB0x16\fR \"</dt>
-osfile (nan is true, str, int and dbl have special meaning).
-.\"</dd>
-.PD \"</dl>
-.PP
-.PP
-\fBExample:\fR
-.EX \"<code>
-var v1 = str("x", 32);
-v1.dump().outputl(); /// e.g. var:0x7ffea7462cd0 typ:1 str:0x584d9e9f6e70 "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-// or
-outputl(dump(v1));
-.EE \"</code>
-.sp 0
-.sp 0
-
-
-.SH 2. ARITHMETICAL OPERATORS 
-.SH
-
-.SS
-if (v1.isnum()) ...
-.PP
-Check if a var is numeric.
-.sp 0
-.PP
-\fBreturn:\fR True if a var holds a double, integer, or a string representing a numeric value.
-.sp 0
-.PP
-A string is considered numeric if it is:
-.sp 0
-.br
-\(bu Empty (treated as zero), or
-.br
-\(bu Composed of one or more digits (0-9), an optional leading '+' or '-' sign, and an optional single decimal point ('.') placed before, within, or after the digits.
-.br
-\(bu Optionally includes an exponential suffix ('e' or 'E', optionally followed by '+' or '-', and 1-3 digits).
-.PP
-.PP
-\fBExample:\fR
-.EX \"<code>
-if (   "+123.45"_var.isnum()) ... ok
-if ("+1.2345e+2"_var.isnum()) ... ok
-if (          ""_var.isnum()) ... ok
-if (not      "."_var.isnum()) ... ok
-// or
-if (isnum("123.")) ... ok
-.EE \"</code>
-.sp 0
-.sp 0
-
-
-.SS
-var v1 = v1.num();
-.PP
-Return a copy of the var if it is numeric or 0 otherwise.
-.sp 0
-.PP
-Allow working numerically with data that may be non-numeric.
-.sp 0
-.PP
-\fBreturn:\fR A guaranteed numeric var
-.sp 0
-.PP
-.PP
-\fBExample:\fR
-.EX \"<code>
-var v1 = "123.45"_var.num();    // 123.45
-var v2 = "abc"_var.num() + 100; // 100
-.EE \"</code>
-.sp 0
-.sp 0
-
-
-.SS
-var v1 = v2 + v3;
-.PP
-Addition
-.sp 0
-.PP
-Any attempt to perform numeric operations on non-numeric strings will throw a runtime error VarNonNumeric.
-.sp 0
-.PP
-Floating point numbers are implicitly converted to strings with no more than 12 significant digits of precision. This practically eliminates all floatng point rounding errors.
-.sp 0
-.PP
-Internally, 0.1 + 0.2 looks like this using doubles.
-.sp 0
-.PP
-0.10000000000000003 + 0.20000000000000004 -> 0.30000000000000004
-.sp 0
-.PP
-.PP
-\fBExample:\fR
-.EX \"<code>
-var v1 = 0.1;
-var v2 = v1 + 0.2; // 0.3
-.EE \"</code>
-.sp 0
-.sp 0
-
-
-.SS
-var v1 = v2 - v3;
-.PP
-Subtraction
-.sp 0
-
-
-.SS
-var v1 = v2 * v3;
-.PP
-Multiplication
-.sp 0
-
-
-.SS
-var v1 = v2 / v3;
-.PP
-Division
-.sp 0
-
-
-.SS
-var v1 = v2 % v3;
-.PP
-Modulus
-.sp 0
-
-
-.SS
-v1 += v2
-.PP
-Self addition
-.sp 0
-.PP
-.PP
-\fBExample:\fR
-.EX \"<code>
-var v1 = 0.1;
-v1 += 0.2; // 0.3
-.EE \"</code>
-.sp 0
-.sp 0
-
-
-.SS
-v1 -= v2
-.PP
-Self subtraction
-.sp 0
-
-
-.SS
-v1 *= v2
-.PP
-Self multiplication
-.sp 0
-
-
-.SS
-v1 /= v2
-.PP
-Self division
-.sp 0
-
-
-.SS
-v1 %= v2
-.PP
-Self modulus
-.sp 0
-
-
-.SS
-v1 ++
-.PP
-Post increment
-.sp 0
-.PP
-.PP
-\fBExample:\fR
-.EX \"<code>
-var v1 = 3;
-var v2 = v1 ++; // v2 -> 3 // v1 -> 4
-.EE \"</code>
-.sp 0
-.sp 0
-
-
-.SS
-v1 --
-.PP
-Post decrement
-.sp 0
-.PP
-.PP
-\fBExample:\fR
-.EX \"<code>
-var v1 = 3;
-var v2 = v1 --; // v2 -> 3 // v1 -> 2
-.EE \"</code>
-.sp 0
-.sp 0
-
-
-.SS
-++ v1
-.PP
-Pre increment
-.sp 0
-.PP
-.PP
-\fBExample:\fR
-.EX \"<code>
-var v1 = 3;
-var v2 = ++ v1; // v2 -> 4 // v1 -> 4
-.EE \"</code>
-.sp 0
-.sp 0
-
-
-.SS
--- v1
-.PP
-Pre decrement
-.sp 0
-.PP
-.PP
-\fBExample:\fR
-.EX \"<code>
-var v1 = 3;
-var v2 = -- v1; // v2 -> 2 // v1 -> 2
-.EE \"</code>
-.sp 0
-.sp 0
-
-
-.SH 3. DYNAMIC ARRAY CREATION, ACCESS AND UPDATE
+.SH 2. DYNAMIC ARRAY CREATION, ACCESS AND UPDATE
 .SH
 
 .SS
@@ -559,7 +145,7 @@ var v1 = {11, 22, 33}; // "11^22^33"_var
 .SS
 var v1 = v2(fieldno);   v1(fieldno) = v2;
 .PP
-Dynamic array field extraction, update and append:
+Dynamic array *field* update and append:
 .sp 0
 .PP
 See also inserter() and remover().
@@ -578,13 +164,7 @@ v1(-1) = "55"; // v1 -> "aa^bb^^44^55"_var
 .PP
 .sp 0
 .PP
-Field access:
-.sp 0
-.PP
-It is recommended to use "v1.f(fieldno)" syntax using a ".f(" prefix to access fields in expressions instead of plain "v1(fieldno)". The former syntax (using .f()) will always compile whereas the latter does not compile in all contexts. It will compile only if being called on a constant var or in a location which requires a var. This is due to C++ not making a clear distinction between usage on the left and right side of assignment operator =.
-.sp 0
-.PP
-Furthermore using plain round brackets without the leading .f can be confused with function call syntax.
+It is recommended to use "v1.f(fieldno)" syntax using a ".f(" prefix to access (extract) fields in expressions instead of plain "v1(fieldno)". The syntax var.f(...) will always compile whereas var(...) does not compile in all contexts. It will compile only if being called on a constant var or in a location which requires an implicit conversion to var. This is due to C++ not making a clear distinction between usage on the left and right side of assignment operator =. Furthermore using plain round brackets without the leading .f can be confused with function call syntax.
 .sp 0
 .PP
 .PP
@@ -601,7 +181,7 @@ var v3 =   v1(2); // "bb" ///   () style access. Not recommended.
 .SS
 var v1 = v2(fieldno, valueno);   v1(fieldno, valueno) = v2;
 .PP
-Dynamic array value update and append
+Dynamic array *value* update and append
 .sp 0
 .PP
 See also inserter() and remover().
@@ -618,11 +198,6 @@ v1(2, -1) = 55; // v1 -> "aa^b1]b2]]44]55^cc"_var
 .sp 0
 .sp 0
 .PP
-.sp 0
-.PP
-Value access:
-.sp 0
-.PP
 .PP
 \fBExample:\fR
 .EX \"<code>
@@ -634,13 +209,44 @@ var v3 =   v1(2,2); // "b2" ///   () style access. Not recommended.
 .sp 0
 
 
-.SH 4. I/O CONVERSION
+.SS
+var v1 = v2(fieldno, valueno, subvalueno);   v1(fieldno, valueno, subvalueno) = v2;
+.PP
+Dynamic array *subvalue* update and append
+.sp 0
+.PP
+See also inserter() and remover().
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+var v1 = "aa^bb^cc"_var;
+v1(2, 2, 2) = "22"; // v1 -> "aa^bb]}22^cc"_var
+// subvalue number -1 causes appending a subvalue when updating.
+v1(2, 2, -1) = 33; // v1 -> "aa^bb]}22}33^cc"_var
+.EE \"</code>
+.sp 0
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+var v1 = "aa^b1]b2}s2^cc"_var;
+var v2 = v1.f(2, 2, 2); // "s2" /// .f() style access. Recommended.
+var v3 =   v1(2, 2, 2); // "s2" ///   () style access. Not recommended.
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SH 3. I/O CONVERSION
 .SH
 
 .SS
 var v1 = var.oconv(convstr);
 .PP
-Convert internal data to output external display format.
+Convert internal format data to output format for display.
 .sp 0
 .PP
 \fBconvstr:\fR A conversion code or pattern. See ICONV/OCONV PATTERNS
@@ -666,7 +272,7 @@ let v2 = oconv(30123, "D/E");
 .SS
 var v1 = var.iconv(convstr);
 .PP
-Convert external data to internal format.
+Convert output display format data to internal format.
 .sp 0
 .PP
 \fBconvstr:\fR A conversion code or pattern. See ICONV/OCONV PATTERNS
@@ -694,7 +300,7 @@ var v1 = var.format(fmt_str, args, ...);
 
 
 
-.SH 5. DATABASE ACCESS
+.SH 4. DATABASE ACCESS
 .SH
 
 .SS
@@ -1072,7 +678,7 @@ loglasterror("main:");
 .sp 0
 
 
-.SH 6. DATABASE MANAGEMENT
+.SH 5. DATABASE MANAGEMENT
 .SH
 
 .SS
@@ -1353,7 +959,7 @@ Despite the name, this doesnt flush any index.
 \(bu Cannot perform maintenance while a transaction is active.
 
 
-.SH 7. DATABASE FILE I/O
+.SH 6. DATABASE FILE I/O
 .SH
 
 .SS
@@ -2034,7 +1640,7 @@ let name_and_type = xlate("xo_clients", key, "NAME_AND_TYPE", "X"); // "Client A
 .sp 0
 
 
-.SH 8. DATABASE SORT/SELECT
+.SH 7. DATABASE SORT/SELECT
 .SH
 
 .SS
@@ -2372,354 +1978,7 @@ if (deletelist("mylist")) ...
 .sp 0
 
 
-.SH 9. MATH/BOOLEAN
-.SH
-
-.SS
-var v1 = varnum.abs();
-.PP
-Absolute value.
-.PP
-\fBExample:\fR
-.EX \"<code>
-let v1 = -12.34;
-let v2 = v1.abs(); // 12.34
-// or
-let v3 = abs(v1);
-.EE \"</code>
-.sp 0
-.sp 0
-
-
-.SS
-var v1 = varnum.pwr(exponent);
-.PP
-Power.
-.PP
-\fBExample:\fR
-.EX \"<code>
-let v1 = var(2).pwr(8); // 256
-// or
-let v2 = pwr(2, 8);
-.EE \"</code>
-.sp 0
-.sp 0
-
-
-.SS
-varnum.initrnd()
-.PP
-Initialise the seed for rnd().
-.sp 0
-.PP
-Allow the stream of pseudo random numbers generated by rnd() to be reproduced.
-.sp 0
-.PP
-Seeded from std::chrono::high_resolution_clock::now() if the argument is 0;
-.sp 0
-.PP
-.PP
-\fBExample:\fR
-.EX \"<code>
-var(123).initrnd(); /// Set seed to 123
-// or
-initrnd(123);
-.EE \"</code>
-.sp 0
-.sp 0
-
-
-.SS
-var v1 = varnum.rnd();
-.PP
-Pseudo random number generator.
-.sp 0
-.PP
-\fBreturn:\fR A pseudo random integer between 0 and the provided maximum minus 1.
-.sp 0
-.PP
-Uses std::mt19937 and std::uniform_int_distribution<int>
-.sp 0
-.PP
-.PP
-\fBExample:\fR
-.EX \"<code>
-let v1 = var(100).rnd(); /// Random 0 to 99
-// or
-let v2 = rnd(100);
-.EE \"</code>
-.sp 0
-.sp 0
-
-
-.SS
-var v1 = varnum.exp();
-.PP
-Power of e.
-.PP
-\fBExample:\fR
-.EX \"<code>
-let v1 = var(1).exp(); // 2.718281828459045
-// or
-let v2 = exp(1);
-.EE \"</code>
-.sp 0
-.sp 0
-
-
-.SS
-var v1 = varnum.sqrt();
-.PP
-Square root.
-.PP
-\fBExample:\fR
-.EX \"<code>
-let v1 = var(100).sqrt(); // 10
-// or
-let v2 = sqrt(100);
-.EE \"</code>
-.sp 0
-.sp 0
-
-
-.SS
-var v1 = varnum.sin();
-.PP
-Sine of degrees.
-.PP
-\fBExample:\fR
-.EX \"<code>
-let v1 = var(30).sin(); // 0.5
-// or
-let v2 = sin(30);
-.EE \"</code>
-.sp 0
-.sp 0
-
-
-.SS
-var v1 = varnum.cos();
-.PP
-Cosine of degrees.
-.PP
-\fBExample:\fR
-.EX \"<code>
-let v1 = var(60).cos(); // 0.5
-// or
-let v2 = cos(60);
-.EE \"</code>
-.sp 0
-.sp 0
-
-
-.SS
-var v1 = varnum.tan();
-.PP
-Tangent of degrees.
-.PP
-\fBExample:\fR
-.EX \"<code>
-let v1 = var(45).tan(); // 1
-// or
-let v2 = tan(45);
-.EE \"</code>
-.sp 0
-.sp 0
-
-
-.SS
-var v1 = varnum.atan();
-.PP
-Arctangent of degrees.
-.PP
-\fBExample:\fR
-.EX \"<code>
-let v1 = var(1).atan(); // 45
-// or
-let v2 = atan(1);
-.EE \"</code>
-.sp 0
-.sp 0
-
-
-.SS
-var v1 = varnum.loge();
-.PP
-Natural logarithm.
-.sp 0
-.PP
-\fBreturn:\fR Floating point var (double)
-.PP
-\fBExample:\fR
-.EX \"<code>
-let v1 = var(2.718281828459045).loge(); // 1
-// or
-let v2 = loge(2.718281828459045);
-.EE \"</code>
-.sp 0
-.sp 0
-
-
-.SS
-var v1 = varnum.integer();
-.PP
-Truncate decimals.
-.sp 0
-.PP
-Convert decimal to nearest integer towards zero.
-.sp 0
-.PP
-Remove decimal fraction.
-.sp 0
-.PP
-\fBreturn:\fR An integer var
-.PP
-\fBExample:\fR
-.EX \"<code>
-let v1 = var(2.9).integer(); // 2
-// or
-let v2 = integer(2.9);
-var v3 = var(-2.9).integer(); // -2
-// or
-var v4 = integer(-2.9);
-.EE \"</code>
-.sp 0
-.sp 0
-
-
-.SS
-var v1 = varnum.floor();
-.PP
-Floor decimals.
-.sp 0
-.PP
-Convert decimal to nearest integer towards negative infinity.
-.sp 0
-.PP
-\fBreturn:\fR An integer var
-.PP
-\fBExample:\fR
-.EX \"<code>
-let v1 = var(2.9).floor(); // 2
-// or
-let v2 = floor(2.9);
-var v3 = var(-2.9).floor(); // -3
-// or
-var v4 = floor(-2.9);
-.EE \"</code>
-.sp 0
-.sp 0
-
-
-.SS
-var v1 = varnum.mod(modulus);
-.PP
-Modulus function.
-.sp 0
-.PP
-Identical to C++ % operator only for positive numbers and modulus
-.sp 0
-.PP
-Negative denominators are considered as periodic with positive numbers
-.sp 0
-.PP
-Result is between [0, modulus) if modulus is positive
-.sp 0
-.PP
-Result is between (modulus, 0] if modulus is negative (symmetric)
-.sp 0
-.PP
-\fBthrow:\fR VarDivideByZero if modulus is zero.
-.sp 0
-.PP
-Floating point works.
-.PP
-\fBExample:\fR
-.EX \"<code>
-let v1 = var(11).mod(5); // 1
-// or
-let v2 = mod(11, 5); // 1
-let v3 = mod(-11, 5); // 4
-let v4 = mod(11, -5); // -4
-let v5 = mod(-11, -5); // -1
-.EE \"</code>
-.sp 0
-.sp 0
-
-
-.SS
-int i1 = var::setprecision(newprecision);
-.PP
-Set floating point precision.
-.sp 0
-.PP
-This is the number of post-decimal point digits to consider for floating point comparison and implicit conversion to strings.
-.sp 0
-.PP
-The default precision is 4 which is 0.0001.
-.sp 0
-.PP
-NUMBERS AND DIFFERENCES SMALLER THAN 0.0001 ARE TREATED AS ZERO UNLESS PRECISION IS INCREASED.
-.sp 0
-.PP
-With the default precision, Exodus handles, without assistance, conversion to and from strings for positive and negative numbers between 0.0001 and 999'999'999'999.9999 (12 digits).
-.sp 0
-.PP
-\fBnewprecision:\fR New precision between -307 and 308 inclusive.
-.sp 0
-.PP
-\fBreturn:\fR The new precision if successful or the old precision if not.
-.sp 0
-.PP
-Not required if using common numbers or using the explicit rounding and formatting functions to convert numbers to strings.
-.sp 0
-.PP
-Increasing the precision allows comparing and outputting smaller numbers but creates errors handling large numbers.
-.sp 0
-.PP
-Setting precision inside a perform, execute or dictionary function lasts until termination of the function.
-.sp 0
-.PP
-See cli/demo_precision for more info.
-.sp 0
-.PP
-.PP
-\fBExample:\fR
-.EX \"<code>
-assert(0.000001_var == 0); /// NOTE WELL: Default precision 4.
-let new_precision1 = var::setprecision(6); // 6 // Increase the precision.
-// or
-let new_precision2 = setprecision(6);
-assert(0.000001_var != 0); /// NOTE: Precision 6.
-.EE \"</code>
-.sp 0
-.sp 0
-
-
-.SS
-int i1 = var::getprecision();
-.PP
-Get current floating point precision.
-.sp 0
-.PP
-\fBreturn:\fR The current precision setting.
-.sp 0
-.PP
-See setprecision() for more info.
-.sp 0
-.PP
-.PP
-\fBExample:\fR
-.EX \"<code>
-let curr_precision1 = var::getprecision();
-// or
-let curr_precision2 = getprecision();
-.EE \"</code>
-.sp 0
-.sp 0
-
-
-.SH 10. I/O CONVERSION CODES 
+.SH 8. I/O CONVERSION CODES 
 .SH
 
 .SS
@@ -3110,7 +2369,7 @@ let v3  = oconv(v1, "T#10") ; //  "Have a    |nice day  "_var
 
 
 .SS
-varnum.oconv("MR")
+dbfile.oconv("MR")
 .PP
 oconv "MR" Replace characters.
 .sp 0
@@ -3401,6 +2660,4987 @@ Convert standard text format to dynamic array.
 .sp 0
 .PP
 Reverse of oconv("TX") above.
+.sp 0
+
+
+
+
+.TH varb.h
+
+.SH 1. UTILITY
+.SH
+
+.SS
+var v1 = var.len();
+.PP
+Get the length in chars/bytes.
+.sp 0
+.PP
+\fBreturn:\fR The length.
+.sp 0
+
+
+.SS
+if (var.empty()) ...
+.PP
+Test if it is an empty string.
+.sp 0
+.PP
+\fBreturn:\fR True or False
+.sp 0
+
+
+.SS
+if (var.assigned()) ...
+.PP
+Check if a var has been assigned a value.
+.sp 0
+.PP
+\fBreturn:\fR True if the var is assigned, otherwise false
+.sp 0
+
+
+.SS
+if (var.unassigned()) ...
+.PP
+Check if a var has not been assigned a value;
+.sp 0
+.PP
+\fBreturn:\fR True if the var is unassigned, otherwise false
+.sp 0
+
+
+.SS
+var.defaulter(defaultvalue)
+.PP
+If a var is unassigned, assign a default value.
+.sp 0
+.PP
+If the var is unassigned then assign the default value to it, otherwise do nothing.
+.sp 0
+.PP
+\fBdefaultvalue:\fR Cannot be unassigned.
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+var v1; // Unassigned
+v1.defaulter("abc"); // v1 -> "abc"
+// or
+defaulter(v1, "abc");
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+var v1 = v2.or_default(defaultvalue);
+.PP
+Copy a var or, if it is unassigned, copy a default value.
+.sp 0
+.PP
+\fBreturn:\fR A copy of the var if it is assigned or the default value if it is not.
+.sp 0
+.PP
+Can be used to handle optional arguments in functions.
+.sp 0
+.PP
+\fBdefaultvalue:\fR Cannot be unassigned.
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+var v1; // Unassigned
+var v2 = v1.or_default("abc"); // v2 -> "abc"
+// or
+var v3 = or_default(v1, "abc");
+.EE \"</code>
+.sp 0
+.sp 0
+.PP
+.sp 0
+.PP
+\fBMutator:\fR defaulter()
+.sp 0
+
+
+.SS
+v2.move(destinationvar)
+.PP
+"move" the var to the destination var leaving the source var unassigned.
+.sp 0
+.PP
+This is useful for performance with vars which own strings larger than the internal buffer of a std::string object. (15 chars/bytes on linux).
+.sp 0
+.PP
+Move a var into another var.
+.sp 0
+.PP
+Performs a shallow copy of the var's data and transfers ownership of its string, if any. The moved var is set to an empty string.
+.sp 0
+.PP
+Enables efficient handling of large strings by moving pointers without copying or allocating memory.
+.sp 0
+.PP
+\fBthrow:\fR VarUnassigned if the moved var is unassigned before the move.
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+var v1 = space(65'535);
+var v2;
+v1.move(v2); // v2.len() -> 65'536 // v1 -> ""
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+var v1 = var.move();
+.PP
+"move" a var into a temporary var.
+.sp 0
+.PP
+See move(destinationvar).
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+var v1 = space(65'535);
+var v2 = v1.move(); // v2.len() -> 65'536 // v1 -> ""
+// or
+let v3 = move(v2);
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+var.swap(var2)
+.PP
+Swap the contents of one var with another.
+.sp 0
+.PP
+Useful for stashing large strings quickly. They are moved using pointers without making copies or allocating memory.
+.sp 0
+.PP
+Either or both variables may be unassigned.
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+var v1 = space(65'536);
+var v2 = "";
+v1.swap(v2); // v1 -> "" // v2.len() -> 65'536
+// or
+swap(v1, v2);
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+var.swap(var2)
+.PP
+Swaps the contents of two variables.
+.sp 0
+.PP
+This version works on const vars
+.sp 0
+.PP
+This version of swap is marked as const despite it replacing the var with var2
+.sp 0
+.PP
+Currently this is required in rare cases where functions like exoprog::calculate
+.sp 0
+.PP
+temporarily require member variables to be something else but switch back before exiting
+.sp 0
+.PP
+If such functions throw an error without catching then it would leave the member variables in a changed state.
+.sp 0
+.PP
+Either or both vars may be unassigned without triggering a VarUnnassigned error.
+.sp 0
+
+
+.SS
+var v1 = v2.clone();
+.PP
+Return a copy of the var.
+.sp 0
+.PP
+The cloned var may be unassigned. No VarUnassigned error will not be thrown.
+.PP
+\fBExample:\fR
+.EX \"<code>
+var v1 = "abc";
+var v2 = v1.clone(); // "abc"
+// or
+var v3 = clone(v2);
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+var v1 = var.dump();
+.PP
+Return a string describing internal data of a var.
+.sp 0
+.PP
+If the var holds an internal std::string using heap storage then its its heap storage address is given.
+.sp 0
+.PP
+\fBtyp:\fR Multiple typs may exist simultaneously.
+.sp 0
+.PD 0 \"<dl>
+.TP 10\"<dt>
+\fB0x01\fR \"</dt>
+str is available.
+.\"</dd>
+.TP 10\"<dt>
+\fB0x02\fR \"</dt>
+int is available.
+.\"</dd>
+.TP 10\"<dt>
+\fB0x04\fR \"</dt>
+dbl is available.
+.\"</dd>
+.TP 10\"<dt>
+\fB0x08\fR \"</dt>
+nan: str is not a number.
+.\"</dd>
+.TP 10\"<dt>
+\fB0x16\fR \"</dt>
+osfile (nan is true, str, int and dbl have special meaning).
+.\"</dd>
+.PD \"</dl>
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+var v1 = str("x", 32);
+v1.dump().outputl(); /// e.g. var:0x7ffea7462cd0 typ:1 str:0x584d9e9f6e70 "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+// or
+outputl(dump(v1));
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SH 2. NUMERIC
+.SH
+
+.SS
+var v1 = + v1;
+.PP
+Unary plus.
+.sp 0
+.PP
+\fBreturn:\fR The numeric value of a variable or expression, or throws a VarNonNumeric error.
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+let v1 = 3;
+let v2 = +v1; // 3
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+var v1 = - v1;
+.PP
+Unary minus.
+.sp 0
+.PP
+\fBreturn:\fR The negative value of a numeric variable or expression, or throws a VarNonNumeric error.
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+let v1 = 3;
+let v2 = -v1; // -3
+let v3 = -v2; // 3
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+if (! v1) ...
+.PP
+Boolean negate.
+.sp 0
+.PP
+\fBAlias:\fR "not" as in "if (not ...)".
+.sp 0
+.PP
+\fBreturn:\fR True if a variable or expression is false, or False if it is true.
+.sp 0
+.PP
+Negate the result of the following:
+.sp 0
+.PD 0 \"<dl>
+.TP 10\"<dt>
+\fBEmpty string\fR \"</dt>
+false
+.\"</dd>
+.TP 10\"<dt>
+\fBNon-numeric string\fR \"</dt>
+true
+.\"</dd>
+.TP 10\"<dt>
+\fBZero (string or number)\fR \"</dt>
+false
+.\"</dd>
+.TP 10\"<dt>
+\fBNon-zero (string or number)\fR \"</dt>
+true
+.\"</dd>
+.PD \"</dl>
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+if (!var("") eq true) ... ok
+if (!var("x") eq false) ... ok
+if (!var("0") eq true) ... ok
+if (!var("123") eq false) ... ok
+// or
+if (not var("") eq true) ... ok
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+v1 ++
+.PP
+Post-increment
+.sp 0
+.PP
+++ and -- are only allowed on named variables, not expressions, to prevent writing cryptic and buggy code.
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+var v1 = 3;
+let v2 = v1++; // v2 -> 3 // v1 -> 4
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+v1 --
+.PP
+Post-decrement
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+var v1 = 3;
+let v2 = v1--; // v2 -> 3 // v1 -> 2
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+++ v1
+.PP
+Pre-increment
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+var v1 = 3;
+let v2 = ++v1; // v2 -> 4 // v1 -> 4
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+-- v1
+.PP
+Pre-decrement
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+var v1 = 3;
+let v2 = --v1; // v2 -> 2 // v1 -> 2
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+if (var.isnum()) ...
+.PP
+Check if a var is numeric.
+.sp 0
+.PP
+\fBreturn:\fR True if a var holds a double, integer, or a string representing a numeric value.
+.sp 0
+.PP
+A string is considered numeric if it is:
+.sp 0
+.br
+\(bu Empty (treated as zero), or
+.br
+\(bu Composed of one or more digits (0-9), an optional leading '+' or '-' sign, and an optional single decimal point ('.') placed before, within, or after the digits.
+.br
+\(bu Optionally includes an exponential suffix ('e' or 'E', optionally followed by '+' or '-', and 1-3 digits).
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+if (   "+123.45"_var.isnum()) ... ok
+if ("+1.2345e+2"_var.isnum()) ... ok
+if (          ""_var.isnum()) ... ok
+if (not      "."_var.isnum()) ... ok
+// or
+if (isnum("123.")) ... ok
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+var v1 = var.num();
+.PP
+Copy a var if it is numeric or 0 if not.
+.sp 0
+.PP
+This allows working numerically with data that may be non-numeric.
+.sp 0
+.PP
+\fBreturn:\fR A guaranteed numeric var
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+var v1 = "123.45"_var.num();    // 123.45
+var v2 = "abc"_var.num() + 100; // 100
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+var v1 = v2 + v3;
+.PP
+Addition
+.sp 0
+.PP
+Any attempt to perform numeric operations on non-numeric strings will throw a runtime error VarNonNumeric.
+.sp 0
+.PP
+Floating point numbers are implicitly converted to strings with no more than 12 significant digits of precision. This practically eliminates all floatng point rounding errors.
+.sp 0
+.PP
+Internally, 0.1 + 0.2 looks like this using doubles.
+.sp 0
+.PP
+0.10000000000000003 + 0.20000000000000004 -> 0.30000000000000004
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+var v1 = 0.1;
+var v2 = v1 + 0.2; // 0.3
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+var v1 = v2 - v3;
+.PP
+Subtraction
+.sp 0
+
+
+.SS
+var v1 = v2 * v3;
+.PP
+Multiplication
+.sp 0
+
+
+.SS
+var v1 = v2 / v3;
+.PP
+Division
+.sp 0
+
+
+.SS
+var v1 = v2 % v3;
+.PP
+Modulus
+.sp 0
+
+
+.SS
+v1 += v2
+.PP
+Self addition
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+var v1 = 0.1;
+v1 += 0.2; // 0.3
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+v1 -= v2
+.PP
+Self subtraction
+.sp 0
+
+
+.SS
+v1 *= v2
+.PP
+Self multiplication
+.sp 0
+
+
+.SS
+v1 /= v2
+.PP
+Self division
+.sp 0
+
+
+.SS
+v1 %= v2
+.PP
+Self modulus
+.sp 0
+
+
+.SS
+var v1 = var.abs();
+.PP
+Absolute value.
+.PP
+\fBExample:\fR
+.EX \"<code>
+let v1 = -12.34;
+let v2 = v1.abs(); // 12.34
+// or
+let v3 = abs(v1);
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+var v1 = var.pwr(exponent);
+.PP
+Power.
+.PP
+\fBExample:\fR
+.EX \"<code>
+let v1 = var(2).pwr(8); // 256
+// or
+let v2 = pwr(2, 8);
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+var.initrnd()
+.PP
+Initialise the seed for rnd().
+.sp 0
+.PP
+Allow the stream of pseudo random numbers generated by rnd() to be reproduced.
+.sp 0
+.PP
+Seeded from std::chrono::high_resolution_clock::now() if the argument is 0;
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+var(123).initrnd(); /// Set seed to 123
+// or
+initrnd(123);
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+var v1 = var.rnd();
+.PP
+Pseudo random number generator.
+.sp 0
+.PP
+\fBreturn:\fR A pseudo random integer between 0 and the provided maximum minus 1.
+.sp 0
+.PP
+Uses std::mt19937 and std::uniform_int_distribution<int>
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+let v1 = var(100).rnd(); /// Random 0 to 99
+// or
+let v2 = rnd(100);
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+var v1 = var.exp();
+.PP
+Power of e.
+.PP
+\fBExample:\fR
+.EX \"<code>
+let v1 = var(1).exp(); // 2.718281828459045
+// or
+let v2 = exp(1);
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+var v1 = var.sqrt();
+.PP
+Square root.
+.PP
+\fBExample:\fR
+.EX \"<code>
+let v1 = var(100).sqrt(); // 10
+// or
+let v2 = sqrt(100);
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+var v1 = var.sin();
+.PP
+Sine of degrees.
+.PP
+\fBExample:\fR
+.EX \"<code>
+let v1 = var(30).sin(); // 0.5
+// or
+let v2 = sin(30);
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+var v1 = var.cos();
+.PP
+Cosine of degrees.
+.PP
+\fBExample:\fR
+.EX \"<code>
+let v1 = var(60).cos(); // 0.5
+// or
+let v2 = cos(60);
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+var v1 = var.tan();
+.PP
+Tangent of degrees.
+.PP
+\fBExample:\fR
+.EX \"<code>
+let v1 = var(45).tan(); // 1
+// or
+let v2 = tan(45);
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+var v1 = var.atan();
+.PP
+Arctangent of degrees.
+.PP
+\fBExample:\fR
+.EX \"<code>
+let v1 = var(1).atan(); // 45
+// or
+let v2 = atan(1);
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+var v1 = var.loge();
+.PP
+Natural logarithm.
+.sp 0
+.PP
+\fBreturn:\fR Floating point var (double)
+.PP
+\fBExample:\fR
+.EX \"<code>
+let v1 = var(2.718281828459045).loge(); // 1
+// or
+let v2 = loge(2.718281828459045);
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+var v1 = var.integer();
+.PP
+Truncate decimals.
+.sp 0
+.PP
+Convert decimal to nearest integer towards zero.
+.sp 0
+.PP
+Remove decimal fraction.
+.sp 0
+.PP
+\fBreturn:\fR An integer var
+.PP
+\fBExample:\fR
+.EX \"<code>
+let v1 = var(2.9).integer(); // 2
+// or
+let v2 = integer(2.9);
+var v3 = var(-2.9).integer(); // -2
+// or
+var v4 = integer(-2.9);
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+var v1 = var.floor();
+.PP
+Floor decimals.
+.sp 0
+.PP
+Convert decimal to nearest integer towards negative infinity.
+.sp 0
+.PP
+\fBreturn:\fR An integer var
+.PP
+\fBExample:\fR
+.EX \"<code>
+let v1 = var(2.9).floor(); // 2
+// or
+let v2 = floor(2.9);
+var v3 = var(-2.9).floor(); // -3
+// or
+var v4 = floor(-2.9);
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+var v1 = var.mod(limit);
+.PP
+Get the modulo of two numbers.
+.sp 0
+.PP
+\fBreturn:\fR "floored division modulo" also known as Euclidean modulo.
+.sp 0
+.PP
+\fBlimit:\fR
+.sp 0
+.PD 0 \"<dl>
+.TP 10\"<dt>
+\fBPositive\fR \"</dt>
+return:  range [0, limit)                    0 ≤ result < limit
+.\"</dd>
+.TP 10\"<dt>
+\fBNegative\fR \"</dt>
+return:  range (limit, 0]   limit < result ≤ 0
+.\"</dd>
+.PD \"</dl>
+.PP
+.sp 0
+.PP
+Exodus' modulo limits the value instead of doing a kind of remainder as per C/C++ % operator which performs "truncated division modulo".
+.sp 0
+.PP
+Exodus' is symmetrical about 0. The symmetry property is a hallmark of floored division modulo, distinguishing it from truncated modulo.
+.sp 0
+.br
+\(bu mod(x, y) == -(mod(-x, -y))
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+let v01 = var(3.0).mod(3.0);   // 0
+let v02 = var(2.0).mod(3.0);   // 2
+let v03 = var(0.0).mod(3.0);   // 0
+let v04 = var(-2.0).mod(3.0);  // 1
+let v05 = var(-3.0).mod(3.0);  // 0
+let v06 = var(3.0).mod(-3.0);  // 0
+let v07 = var(2.0).mod(-3.0);  // -1
+let v08 = var(0.0).mod(-3.0);  // 0
+let v09 = var(-2.0).mod(-3.0); // -2
+let v10 = var(-3.0).mod(-3.0); // 0
+// or
+let v11 = mod(4, 3);  // 1
+// or
+let v12 = var(4) % 3; // 1
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+var v1 = var.getprecision();
+.PP
+Get the precision used for floating point comparisons. The default is 4.
+.sp 0
+.PP
+Precision is used when comparing floating point numbers. Practically speaking, standard computer floating point numbers only have about 12 significant decimal digits. Exodus chooses to use these 12 digits to handle numbers in the range +/- 99'999'999.9999 by default.
+.sp 0
+.PP
+Exodus precision means the number of significant decimal digits after the decimal place. This is different from standard scientific precision which is defined as the total number of decimal digits.
+.sp 0
+.PP
+If precision is 4 then the smallest significant difference is 0.0001. Differences smaller than this are treated as zero.
+.sp 0
+.PP
+Precision can be set per thread. Exodus programs started with run() start with default precision 4.
+.sp 0
+.PP
+Performed or executed programs get the precision of the caller. They can change the precision without affecting the precision of the parent program.
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+let v1 = var(0.00001) eq 0; // true
+var::setprecision(6);
+let v2 = var(0.00001) eq 0; // false;
+// or
+setprecision(4);
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+var v1 = var.setprecision(INT);
+.PP
+Set the precision to be used for floating point comparisons.
+.sp 0
+.PP
+See getprecision() for more info.
+.sp 0
+
+
+.SS
+var v1 = var.round(ndecimals = 0);
+.PP
+Fix the number of decimal places.
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+let v1 = var(123.4).round(2);   // "123.40"
+let v2 = var(123456).round(-3); // "123000"
+// or
+let v3 = round(123.4, 2);
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+
+
+.TH vars.h
+
+.SH 1. STRING CREATION 
+.SH
+
+.SS
+var v1 = v2 ^ v3;
+.PP
+String concatention operator ^
+.sp 0
+.PP
+At least one side must be a var.
+.sp 0
+.PP
+"aa" ^ "22" will not compile but "aa" "22" will.
+.sp 0
+.PP
+Floating point numbers are implicitly converted to strings with no more than 12 significant digits of precision. This practically eliminates all floatng point rounding errors.
+.PP
+\fBExample:\fR
+.EX \"<code>
+var v2 = "aa";
+var v1 = v2 ^ 22; // "aa22"
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+v1 ^= v2
+.PP
+String self concatention ^= (append)
+.PP
+\fBExample:\fR
+.EX \"<code>
+var v1 = "aa";
+v1 ^= 22; // v1 -> "aa22"
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+var v1 = varnum.round(ndecimals = 0);
+.PP
+Round a number.
+.sp 0
+.PP
+Convert a number into a string after rounding it to a given number of decimal places.
+.sp 0
+.PP
+Trailing zeros are not omitted. A leading "0." is shown where appropriate.
+.sp 0
+.PP
+0.5 always rounds away from zero. i.e. 1.5 -> 2 and -2.5 -> -3
+.sp 0
+.PP
+\fBvar:\fR The number to be converted.
+.sp 0
+.PP
+\fBndecimals:\fR Determines how many decimal places are shown to the right of the decimal point or, if ndecimals is negative, how many 0's to the left of it.
+.sp 0
+.PP
+\fBreturn:\fR A var containing an ASCII string of digits with a leading "-" if negative, and a decimal point "." if ndecimals is > 0.
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+let v1 = var(0.295).round(2);  //  "0.30"
+// or
+let v2 = round(1.295, 2);      //  "1.30"
+var v3 = var(-0.295).round(2); // "-0.30"
+// or
+var v4 = round(-1.295, 2);     // "-1.30"
+var v5 = round(0, 1);           // "0.0"
+var v6 = round(0, 0);           // "0"
+var v7 = round(0, -1);          // "0"
+.EE \"</code>
+.sp 0
+.sp 0
+.PP
+Negative number of decimals rounds to the left of the decimal point
+.PP
+\fBExample:\fR
+.EX \"<code>
+let v1 = round(123456.789,  0); // "123457"
+let v2 = round(123456.789, -1); // "123460"
+let v3 = round(123456.789, -2); // "123500"
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+var v1 = var::chr(chrnum);
+.PP
+Get a char.
+.sp 0
+.PP
+\fBchrnum:\fR An integer 0-255.
+.sp 0
+.PP
+\fBreturn:\fR A string containing a single char
+.sp 0
+.PP
+0-127 -> ASCII, 128-255 -> invalid UTF-8 which cannot be written to the database or used in many exodus string operations
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+let v1 = var::chr(0x61); // "a"
+// or
+let v2 = chr(0x61);
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+var v1 = var::textchr(codepoint);
+.PP
+Get a Unicode character.
+.sp 0
+.PP
+\fBcodepoint:\fR A Unicode Code Point (Number)
+.sp 0
+.PP
+\fBreturn:\fR A single Unicode character in UTF8 encoding.
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+let v1 = var::textchr(171416); // "𩶘" // or "\\xF0A9B698"
+// or
+let v2 = textchr(171416);
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+var v1 = var::textchrname(unicode_code_point);
+.PP
+Get a Unicode character name
+.sp 0
+.PP
+\fBunicode_code_point:\fR 0 - 0x10FFFF.
+.sp 0
+.PP
+\fBreturn:\fR Text of the name or "" if not a valid Unicode Code Point
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+let v1 = var::textchrname(91); // "LEFT SQUARE BRACKET"
+// or
+let v2 = textchrname(91);
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+var v1 = strvar.str(nreps);
+.PP
+Get a string of repeated substrings.
+.sp 0
+.PP
+\fBvar:\fR The substring to be repeated
+.sp 0
+.PP
+\fBnreps:\fR How many times to repeat the substring
+.sp 0
+.PP
+\fBreturn:\fR A string
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+let v1 = "ab"_var.str(3); // "ababab"
+// or
+let v2 = str("ab", 3);
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+var v1 = var::space(nspaces);
+.PP
+Get a string as a given number of spaces.
+.sp 0
+.PP
+\fBnspaces:\fR The number of spaces required.
+.sp 0
+.PP
+\fBreturn:\fR A string of space chars.
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+let v1 = var::space(3); // "   "
+// or
+let v2 = space(3);
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+var v1 = varnum.numberinwords(locale = "");
+.PP
+Get a number written out in words insteads of digits.
+.sp 0
+.PP
+\fBreturn:\fR A string.
+.sp 0
+.PP
+\fBlocale:\fR e.g. en_GB, ar_AE, el_CY, es_US, fr_FR etc or a language name e.g. "french".
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+let softhyphen = "\\xc2\\xad";
+let v1 = var(123.45).numberinwords("de_DE").replace(softhyphen, " "); // "ein hundert drei und zwanzig Komma vier fünf"
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SH 2. STRING SCANNING
+.SH
+
+.SS
+var v1 = strvar.at(pos1);
+.PP
+Get a single char from a string.
+.sp 0
+.PP
+\fBpos1:\fR First char is 1. Last char is -1.
+.sp 0
+.PP
+\fBreturn:\fR A single char if pos1 +/- the length of the string, or "" if greater. Returns the first char if pos1 is 0 or (-pos1) > length.
+.PP
+\fBExample:\fR
+.EX \"<code>
+var v1 = "abc";
+var v2 = v1.at(2);  // "b"
+var v3 = v1.at(-3); // "a"
+var v4 = v1.at(4);  // ""
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+var v1 = strvar.ord();
+.PP
+Get the char number of a char.
+.sp 0
+.PP
+\fBreturn:\fR A number between 0 and 255.
+.sp 0
+.PP
+If given a string, then only the first char is considered.
+.sp 0
+.PP
+Equivalent to ord() in php
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+let v1 = "abc"_var.ord(); // 0x61 // decimal 97, 'a'
+// or
+let v2 = ord("abc");
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+var v1 = strvar.textord();
+.PP
+Get the Unicode Code Point of a Unicode character.
+.sp 0
+.PP
+\fBvar:\fR A UTF-8 string. Only the first Unicode character is considered.
+.sp 0
+.PP
+\fBreturn:\fR A number 0 to 0x10FFFF.
+.sp 0
+.PP
+Equivalent to ord() in python and ruby, mb_ord() php.
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+let v1 = "Γ"_var.textord(); // 915 // U+0393: Greek Capital Letter Gamma (Unicode character)
+// or
+let v2 = textord("Γ");
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+var v1 = strvar.len();
+.PP
+Get the length of a source string in number of chars.
+.sp 0
+.PP
+\fBreturn:\fR A number
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+let v1 = "abc"_var.len(); // 3
+// or
+let v2 = len("abc");
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+if (strvar.empty()) ...
+.PP
+Check if the var is an empty string.
+.sp 0
+.PP
+\fBreturn:\fR True if it is empty amd false if not.
+.sp 0
+.PP
+This is a shorthand and more expressive way of writing 'if (var == "")' or 'if (var.len() == 0)' or 'if (not var.len())'
+.sp 0
+.PP
+Note that 'if (var.empty())' is not exactly the same as 'if (not var)' because 'if (var("0.0")' is also defined as false. If a string can be converted to 0 then it is considered to be false. Contrast this with common scripting languages where 'if (var("0"))' is defined to be true.
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+let v1 = "0";
+if (not v1.empty()) ... ok // true
+// or
+if (not empty(v1)) ... ok // true
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+var v1 = strvar.textwidth();
+.PP
+Count the number of output columns required for a given source string.
+.sp 0
+.PP
+\fBreturn:\fR A number
+.sp 0
+.PP
+Allow wide multi-column Unicode characters that occupy more than one space in a text file or terminal screen.
+.sp 0
+.PP
+Reduce combining characters to a single column. e.g. "e" followed by grave accent is multiple bytes but only occupies one output column.
+.sp 0
+.PP
+Does not properly calculate all possible combining sequences of graphemes e.g. face followed by colour
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+let v1 = "🤡x🤡"_var.textwidth(); // 5
+// or
+let v2 = textwidth("🤡x🤡");
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+var v1 = strvar.textlen();
+.PP
+Count the number of Unicode code points in a source string.
+.sp 0
+.PP
+\fBreturn:\fR A number.
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+let v1 = "Γιάννης"_var.textlen(); // 7
+// or
+let v2 = textlen("Γιάννης");
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+var v1 = strvar.fcount(sepstr);
+.PP
+Count the number of fields in a source string.
+.sp 0
+.PP
+\fBsepstr:\fR The separator character or substr that delimits individual fields.
+.sp 0
+.PP
+\fBreturn:\fR The count of the number of fields
+.sp 0
+.PP
+This is similar to "var.count(sepstr) + 1" but it returns 0 for an empty source string.
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+let v1 = "aa**cc"_var.fcount("*"); // 3
+// or
+let v2 = fcount("aa**cc", "*");
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+var v1 = strvar.count(sepstr);
+.PP
+Count the number of occurrences of a given substr in a source string.
+.sp 0
+.PP
+\fBsubstr:\fR The substr to count.
+.sp 0
+.PP
+\fBreturn:\fR The count of the number of sepstr found.
+.sp 0
+.PP
+Overlapping substrings are not counted.
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+let v1 = "aa**cc"_var.count("*"); // 2
+// or
+let v2 = count("aa**cc", "*");
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+if (strvar.starts(prefix)) ...
+.PP
+Check if a source string starts with a given prefix (substr).
+.sp 0
+.PP
+\fBprefix:\fR The substr to check for.
+.sp 0
+.PP
+\fBreturn:\fR True if the source string starts with the given prefix.
+.sp 0
+.PP
+Always returns false if suffix is "". DIFFERS from c++, javascript, python3. See contains() for more info.
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+if ("abc"_var.starts("ab")) ... true
+// or
+if (starts("abc", "ab")) ... true
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+if (strvar.starts(prefix, prefix, ..._n)) ...
+
+
+
+.SS
+if (strvar.ends(suffix)) ...
+.PP
+Check if a source string ends with a given suffix (substr).
+.sp 0
+.PP
+\fBsuffix:\fR The substr to check for.
+.sp 0
+.PP
+\fBreturn:\fR True if the source string ends with given suffix.
+.sp 0
+.PP
+Always returns false if suffix is "". DIFFERS from c++, javascript, python3. See contains() for more info.
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+if ("abc"_var.ends("bc")) ... true
+// or
+if (ends("abc", "bc")) ... true
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+if (strvar.ends(suffix, suffix, ..._n)) ...
+
+
+
+.SS
+if (strvar.contains(substr)) ...
+.PP
+Check if a given substr exists in a source string.
+.sp 0
+.PP
+\fBsubstr:\fR The substr to check for.
+.sp 0
+.PP
+\fBreturn:\fR True if the source string starts with, ends with or contains the given substr.
+.sp 0
+.PP
+Always returns false if substr is "". DIFFERS from c++, javascript, python3. See contains() for more info.
+.sp 0
+.PP
+Human logic: "" is not equal to "x" therefore x does not contain "".
+.sp 0
+.PP
+Human logic: Check each item (character) in the list for equality with what I am looking for and return success if any are equal.
+.sp 0
+.PP
+Programmer logic: Compare as many characters as are in the search string for presence in the list of characters and return success if there are no failures.
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+if ("abcd"_var.contains("bc")) ... true
+// or
+if (contains("abcd", "bc")) ... true
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+if (strvar.contains(substr, substr, ..._n)) ...
+
+
+
+.SS
+var v1 = strvar.index(substr, startchar1 = 1);
+.PP
+Find a substr in a source string.
+.sp 0
+.PP
+\fBsubstr:\fR The substr to search for.
+.sp 0
+.PP
+\fBstartchar1:\fR The char position (1 based) to start the search at. The default is 1, the first char.
+.sp 0
+.PP
+\fBreturn:\fR The char position (1 based) that the substr is found at or 0 if not present.
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+let v1 = "abcd"_var.index("bc"); // 2
+// or
+let v2 = index("abcd", "bc");
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+var v1 = strvar.indexn(substr, occurrence);
+.PP
+Find the nth occurrence of a substr in a source string.
+.sp 0
+.PP
+\fBsubstr:\fR The string to search for.
+.sp 0
+.PP
+\fBreturn:\fR char position (1 based) or 0 if not present.
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+let v1 = "abcabc"_var.indexn("bc", 2); // 5
+// or
+let v2 = indexn("abcabc", "bc", 2);
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+var v1 = strvar.indexr(substr, startchar1 = -1);
+.PP
+Find the position of substr working backwards
+.sp 0
+.PP
+Start at the end and work backwards.
+.sp 0
+.PP
+\fBsubstr:\fR The string to search for.
+.sp 0
+.PP
+\fBreturn:\fR The char position of the substr if found, or 0 if not.
+.sp 0
+.PP
+\fBstartchar1:\fR Defaults to -1 meaning start searching from the last char. Positive start1char1 counts from the beginning of the source string and negative startchar1 counts backwards from the last char.
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+let v1 = "abcabc"_var.indexr("bc"); // 5
+// or
+let v2 = indexr("abcabc", "bc");
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+if (strvar.listed(list)) ...
+.PP
+Check if something is in a list.
+.sp 0
+.PP
+The list must be comma separated without spaces.
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+let v1 = "def";
+if (v1.listed("abc,def")) ... ok
+// or
+if (listed(v1, "abc,def")) ... ok
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+if (strvar.listed(list, out position)) ...
+.PP
+Check if something is in a list and return its position.
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+let v1 = "def";
+var posn;
+if (v1.listed("abc,def", posn)) ... ok // posn -> 2
+// or
+if (listed(v1, "abc,def", posn)) ... ok
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+var v1 = strvar.match(regex_str, regex_options = "");
+.PP
+Find all matches of a given regular expression.
+.sp 0
+.PP
+\fBreturn:\fR Zero or more matching substrings separated by FMs. Any groups are in VMs.
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+let v1 = "abc1abc2"_var.match("BC(\\\\d)", "i"); // "bc1]1^bc2]2"_var
+// or
+let v2 = match("abc1abc2", "BC(\\\\d)", "i");
+.EE \"</code>
+.sp 0
+.sp 0
+.PP
+.sp 0
+.PP
+\fBregex_options:\fR
+.sp 0
+.PD 0 \"<dl>
+.TP 10\"<dt>
+\fB l\fR \"</dt>
+Literal (any regex chars are treated as normal chars)
+.\"</dd>
+.TP 10\"<dt>
+\fB i\fR \"</dt>
+Case insensitive
+.\"</dd>
+.TP 10\"<dt>
+\fB p\fR \"</dt>
+ECMAScript/Perl (the default)
+.\"</dd>
+.TP 10\"<dt>
+\fB b\fR \"</dt>
+Basic POSIX (same as sed)
+.\"</dd>
+.TP 10\"<dt>
+\fB e\fR \"</dt>
+Extended POSIX
+.\"</dd>
+.TP 10\"<dt>
+\fB a\fR \"</dt>
+awk
+.\"</dd>
+.TP 10\"<dt>
+\fB g\fR \"</dt>
+grep
+.\"</dd>
+.TP 10\"<dt>
+\fB eg\fR \"</dt>
+egrep or grep -E
+.\"</dd>
+.PD \"</dl>
+.PP
+.sp 0
+.PP
+char ranges like a-z are locale sensitive if ECMAScript
+.sp 0
+.PP
+.sp 0
+.PP
+\fBregex_options:\fR
+.sp 0
+.PD 0 \"<dl>
+.TP 10\"<dt>
+\fB m\fR \"</dt>
+Multiline. Default in boost (and therefore exodus)
+.\"</dd>
+.TP 10\"<dt>
+\fB s\fR \"</dt>
+Single line. Default in std::regex
+.\"</dd>
+.TP 10\"<dt>
+\fB f\fR \"</dt>
+First only. Only for replace() (not match() or search())
+.\"</dd>
+.TP 10\"<dt>
+\fB w\fR \"</dt>
+Wildcard glob style (e.g. *.cfg) not regex style. Only for match() and search(). Not replace().
+.\"</dd>
+.PD \"</dl>
+
+
+.SS
+var v1 = strvar.match(regex);
+.PP
+Ditto
+.sp 0
+
+
+.SS
+var v1 = strvar.search(regex_str, io startchar1, regex_options = "");
+.PP
+Search for the first match of a regular expression.
+.sp 0
+.PP
+\fBstartchar1:\fR [in] char position to start the search from
+.sp 0
+.PP
+\fBstartchar1[out]:\fR char position to start the next search from or 0 if no more matches.
+.sp 0
+.PP
+\fBreturn:\fR The 1st match like match()
+.sp 0
+.PP
+regex_options as for match()
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+var startchar1 = 1;
+let v1 = "abc1abc2"_var.search("BC(\\\\d)", startchar1, "i"); // "bc1]1"_var // startchar1 -> 5 /// Ready for the next search
+// or
+startchar1 = 1;
+let v2 = search("abc1abc2", "BC(\\\\d)", startchar1, "i");
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+var v1 = strvar.search(regex_str);
+.PP
+IMPL{var_stg startchar1 = 1; return this->search(regex_str, startchar1);}
+.sp 0
+
+
+.SS
+var v1 = strvar.search(regex, io startchar1);
+.PP
+Ditto given a rex
+.sp 0
+
+
+.SS
+var v1 = strvar.search(regex);
+.PP
+IMPL{var_stg startchar1 = 1; return this->search(regex, startchar1);}
+.sp 0
+
+
+.SS
+var v1 = strvar.hash(std::uint64_t modulus = 0);
+.PP
+Get a hash of a source string.
+.sp 0
+.PP
+\fBmodulus:\fR The result is limited to [0, modulus)
+.sp 0
+.PP
+\fBreturn:\fR A 64 bit signed integer.
+.sp 0
+.PP
+MurmurHash3 is used.
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+let v1 = "abc"_var.hash(); assert(v1 == var(6'715'211'243'465'481'821));
+// or
+let v2 = hash("abc");
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SH 3. STRING CONVERSION - NON-MUTATING - CHAINABLE
+.SH
+
+.SS
+var v1 = strvar.ucase();
+.PP
+IMPL{var_stg nrvo = this->clone(); nrvo.ucaser(); return nrvo;}
+.sp 0
+
+
+.SS
+var v1 = strvar.lcase();
+.PP
+IMPL{var_stg nrvo = this->clone(); nrvo.lcaser(); return nrvo;}
+.sp 0
+
+
+.SS
+var v1 = strvar.tcase();
+.PP
+IMPL{var_stg nrvo = this->clone(); nrvo.tcaser(); return nrvo;}
+.sp 0
+
+
+.SS
+var v1 = strvar.fcase();
+.PP
+IMPL{var_stg nrvo = this->clone(); nrvo.fcaser(); return nrvo;}
+.sp 0
+
+
+.SS
+var v1 = strvar.normalize();
+.PP
+IMPL{var_stg nrvo = this->clone(); nrvo.normalizer(); return nrvo;}
+.sp 0
+
+
+.SS
+var v1 = strvar.invert();
+.PP
+IMPL{var_stg nrvo = this->clone(); nrvo.inverter(); return nrvo;}
+.sp 0
+
+
+.SS
+var v1 = strvar.lower();
+.PP
+IMPL{var_stg nrvo = this->clone(); nrvo.lowerer(); return nrvo;}
+.sp 0
+
+
+.SS
+var v1 = strvar.raise();
+.PP
+IMPL{var_stg nrvo = this->clone(); nrvo.raiser(); return nrvo;}
+.sp 0
+
+
+.SS
+var v1 = strvar.crop();
+.PP
+IMPL{var_stg nrvo = this->clone(); nrvo.cropper(); return nrvo;}
+.sp 0
+
+
+.SS
+var v1 = strvar.quote();
+.PP
+Wrap in double quotes.
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+let v1 = "abc"_var.quote(); // "\\"abc\\""
+// or
+let v2 = quote("abc");
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+var v1 = strvar.squote();
+.PP
+Wrap in single quotes.
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+let v1 = "abc"_var.squote(); // "'abc'"
+// or
+let v2 = squote("abc");
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+var v1 = strvar.unquote();
+.PP
+Remove one pair of surrounding double or single quotes.
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+let v1 = "'abc'"_var.unquote(); // "abc"
+// or
+let v2 = unquote("'abc'");
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+var v1 = strvar.trim(trimchars = " ");
+.PP
+Remove all leading, trailing and excessive inner bytes.
+.sp 0
+.PP
+\fBtrimchars:\fR The chars (bytes) to remove. The default is space.
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+let v1 = "  a1  b2 c3  "_var.trim(); // "a1 b2 c3"
+// or
+let v2 = trim("  a1  b2 c3  ");
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+var v1 = strvar.trimfirst(trimchars = " ");
+.PP
+Ditto but only leading.
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+let v1 = "  a1  b2 c3  "_var.trimfirst(); // "a1  b2 c3  "
+// or
+let v2 = trimfirst("  a1  b2 c3  ");
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+var v1 = strvar.trimlast(trimchars = " ");
+.PP
+Ditto but only trailing.
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+let v1 = "  a1  b2 c3  "_var.trimlast(); // "  a1  b2 c3"
+// or
+let v2 = trimlast("  a1  b2 c3  ");
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+var v1 = strvar.trimboth(trimchars = " ");
+.PP
+Ditto but only leading and trailing, not inner.
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+let v1 = "  a1  b2 c3  "_var.trimboth(); // "a1  b2 c3"
+// or
+let v2 = trimboth("  a1  b2 c3  ");
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+var v1 = strvar.first();
+.PP
+Get the first char of a string.
+.sp 0
+.PP
+\fBreturn:\fR A char, or "" if empty.
+.sp 0
+.PP
+Equivalent to var.substr(1,length) or var[1, length] in Pick OS
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+let v1 = "abc"_var.first(); // "a"
+// or
+let v2 = first("abc");
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+var v1 = strvar.last();
+.PP
+Get the last char of a string.
+.sp 0
+.PP
+\fBreturn:\fR A char, or "" if empty.
+.sp 0
+.PP
+Equivalent to var.substr(-1, 1) or var[-1, 1] in Pick OS
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+let v1 = "abc"_var.last(); // "c"
+// or
+let v2 = last("abc");
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+var v1 = strvar.first(length);
+.PP
+Get the first n chars of a source string.
+.sp 0
+.PP
+\fBlength:\fR The number of chars (bytes) to get.
+.sp 0
+.PP
+\fBreturn:\fR A string of up to n chars.
+.sp 0
+.PP
+Equivalent to var.substr(1, length) or var[1, length] in Pick OS
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+let v1 = "abc"_var.first(2); // "ab"
+// or
+let v2 = first("abc", 2);
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+var v1 = strvar.last(length);
+.PP
+Extract up to length trailing chars
+.sp 0
+.PP
+Equivalent to var.substr(-length, length) or var[-length, length] in Pick OS
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+let v1 = "abc"_var.last(2); // "bc"
+// or
+let v2 = last("abc", 2);
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+var v1 = strvar.cut(length);
+.PP
+Remove n chars (bytes) from the source string.
+.sp 0
+.PP
+\fBlength:\fR Positive to remove first n chars or negative to remove the last n chars.
+.sp 0
+.PP
+If the absolute value of length is >= the number of chars in the source string then all chars will be removed.
+.sp 0
+.PP
+Equivalent to var.substr(length) or var[1, length] = "" in Pick OS
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+let v1 = "abcd"_var.cut(2); // "cd"
+// or
+let v2 = cut("abcd", 2);
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+var v1 = strvar.paste(pos1, length, replacestr);
+.PP
+IMPL{var_stg nrvo = this->clone(); nrvo.paster(pos1, length, replacestr); return nrvo;}
+.sp 0
+
+
+.SS
+var v1 = strvar.paste(pos1, insertstr);
+.PP
+IMPL{var_stg nrvo = this->clone(); nrvo.paster(pos1, insertstr); return nrvo;}
+.sp 0
+
+
+.SS
+var v1 = strvar.prefix(insertstr);
+.PP
+Insert text at the beginning
+.sp 0
+.PP
+Equivalent to var[0, 0] = substr in Pick OS
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+let v1 = "abc"_var.prefix("XYZ"); // "XYZabc"
+// or
+let v2 = prefix("abc", "XYZ");
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+var v1 = strvar.append(appendable, ...);
+.PP
+IMPL{var_stg nrvo = this->clone(); (nrvo ^= ... ^= appendable); return nrvo;}
+.sp 0
+
+
+.SS
+var v1 = strvar.pop();
+.PP
+IMPL{var_stg nrvo = this->clone(); nrvo.popper(); return nrvo;}
+.sp 0
+
+
+.SS
+var v1 = strvar.field(delimiter, fieldnx = 1, nfieldsx = 1);
+.PP
+Copy one or more consecutive fields from a string.
+.sp 0
+.PP
+\fBdelimiter:\fR A Unicode character.
+.sp 0
+.PP
+\fBfieldno:\fR The first field is 1, the last field is -1.
+.sp 0
+.PP
+\fBreturn:\fR A substring
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+let v1 = "aa*bb*cc"_var.field("*", 2); // "bb"
+// or
+let v2 = field("aa*bb*cc", "*", 2);
+.EE \"</code>
+.sp 0
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+let v1 = "aa*bb*cc"_var.field("*", -1); // "cc"
+// or
+let v2 = field("aa*bb*cc", "*", -1);
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+var v1 = strvar.field2(separator, fieldno, nfields = 1);
+.PP
+field2 is a version that treats fieldn -1 as the last field, -2 the penultimate field etc. -
+.sp 0
+.PP
+TODO Should probably make field() do this (since -1 is basically an erroneous call) and remove field2
+.sp 0
+.PP
+Same as var.field() but negative fieldnos work backwards from the last field.
+.sp 0
+
+
+.SS
+var v1 = strvar.fieldstore(separator, fieldno, nfields, replacement);
+.PP
+IMPL{var_stg nrvo = this->clone(); nrvo.fieldstorer(separator, fieldno, nfields, replacement); return nrvo;}
+.sp 0
+
+
+.SS
+var v1 = strvar.substr(pos1, length);
+.PP
+IMPL{var_stg nrvo = this->clone(); nrvo.substrer(pos1, length); return nrvo;}
+.sp 0
+
+
+.SS
+var v1 = strvar.b(pos1, length);
+.PP
+IMPL{return this->substr(pos1, length);}
+.sp 0
+
+
+.SS
+var v1 = strvar.substr(pos1);
+.PP
+IMPL{var_stg nrvo = this->clone(); nrvo.substrer(pos1); return nrvo;}
+.sp 0
+
+
+.SS
+var v1 = strvar.b(pos1);
+.PP
+IMPL{return this->substr(pos1);}
+.sp 0
+
+
+.SS
+var v1 = strvar.substr(pos1, delimiterchars, out pos2);
+.PP
+substr version 3.
+.sp 0
+.PP
+Copy a substr from a given char position up to (but excluding) any one of some given delimiter chars
+.sp 0
+.PP
+\fBreturn:\fR A substr or "".
+.sp 0
+.PP
+\fBpos1:\fR [in] The position of the first char to copy. Negative positions count backwards from the last char of the string.
+.sp 0
+.PP
+\fBpos2[out]:\fR The position of the next delimiter char, or one char position after the end of the source string if no subsequent delimiter chars are found.
+.sp 0
+.PP
+\fBCOL2:\fR Is a predefined variable that can be used for pos2 instead of declaring a variable.
+.sp 0
+.PP
+An empty string may be returned if pos1 [in] points to one of the delimiter chars or points beyond the end of the source string.
+.sp 0
+.PP
+Equivalent to var[pos1, ",."] in Pick OS (non-numeric length).
+.sp 0
+.PP
+Works with any encoding including UTF8 for the source string but the delimiter chars are bytes.
+.sp 0
+.PP
+Add 1 to pos2 to skip over the next delimiter char to copy the next substr
+.sp 0
+.PP
+Works with any encoding including UTF8 for the source string but the delimiter chars are bytes.
+.sp 0
+.PP
+This function is similar to std::string::find_first_of but that function only returns pos2.
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+var pos1 = 4;
+let v1 = "12,45 78"_var.substr(pos1, ", ", COL2);  // v1 -> "45" // COL2 -> 6 // 6 is the position of the next delimiter char found.
+// or
+let v2 = substr("12,45 78", COL2 + 1, ", ", COL2); // v2 -> "78" // COL2 -> 9 // 9 is one after the end of the string meaning that none of the delimiter chars were found.
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+var v1 = strvar.b(pos1, delimiterchars, out pos2);
+.PP
+IMPL{return this->substr(pos1, delimiterchars, pos2);}
+.sp 0
+
+
+.SS
+var v1 = strvar.substr2(io pos1, out delimiterno);
+.PP
+substr version 4.
+.sp 0
+.PP
+Copy a substr from a given char position up to (but excluding) the next field mark char (RM, FM, VM, SM, TM, STM).
+.sp 0
+.PP
+\fBreturn:\fR A substr or "".
+.sp 0
+.PP
+\fBpos1:\fR [in] The position of the first char to copy. Negative positions count backwards from the last char of the string.
+.sp 0
+.PP
+\fBpos1[out]:\fR The position of the first char of the next substr after whatever field mark char is found, or one char position after the end of the source string if no subsequent field mark char is found.
+.sp 0
+.PP
+\fBfield_mark_no[out]:\fR A number (1-6) indicating which of the standard field mark chars was found, or 0 if not.
+.sp 0
+.PP
+An empty string may be returned if the pos1 [in] points to one of the field marks or beyond the end of the source string.
+.sp 0
+.PP
+pos1 [out] is correctly positioned to copy the next substr.
+.sp 0
+.PP
+Works with any encoding including UTF8. Was called "remove" in Pick OS.
+.sp 0
+.PP
+The equivalent in Pick OS was the statement "Remove variable From string At column Setting flag"
+.sp 0
+.PP
+This function is valuable for high performance processing of dynamic arrays.
+.sp 0
+.PP
+It is notably used in "list" to print parallel columns of mixed combinations of multivalues/subvalues and text marks correctly lined up mv to mv, sv to sv, tm to tm even when particular values, subvalues and text fragments are missing from particular columns.
+.sp 0
+.PP
+It is similar to version 3 of substr - substr(pos1, delimiterchars, pos2) except that in this version the delimiter chars are hard coded as the standard field mark chars (RM, FM, VM, SM, TM, STM) and it returns the first char position of the next substr, not the char position of the next field mark char.
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+var pos1 = 4, field_mark_no;
+let v1 = "12^45^78"_var.substr2(pos1, field_mark_no);  // "45" // pos1 -> 7 // field_mark_no -> 2 // field_mark_no 2 means that a FM was found.
+// or
+let v2 = substr2("12^45^78"_var, pos1, field_mark_no); // "78" // pos1 -> 9 // field_mark_no -> 0 // field_mark_no 0 means that none of the standard field marks were found.
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+var v1 = strvar.b2(io pos1, out field_mark_no);
+.PP
+IMPL{return this->substr2(pos1, field_mark_no);}
+.sp 0
+
+
+.SS
+var v1 = strvar.convert(fromchars, tochars);
+.PP
+IMPL{var_stg nrvo = this->clone(); nrvo.converter(fromchars,tochars); return nrvo;}
+.sp 0
+
+
+.SS
+var v1 = strvar.textconvert(fromchars, tochars);
+.PP
+IMPL{var_stg nrvo = this->clone(); nrvo.textconverter(fromchars,tochars); return nrvo;}
+.sp 0
+
+
+.SS
+var v1 = strvar.replace(fromstr, tostr);
+.PP
+Replace all occurrences of one substr with another.
+.sp 0
+.PP
+Case sensitive.
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+let v1 = "Abc.Abc"_var.replace("bc", "X"); // "AX.AX"
+// or
+let v2 = replace("Abc Abc", "bc", "X");
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+var v1 = strvar.replace(regex, replacement_str);
+.PP
+Replace substrings using a regular expression.
+.sp 0
+.PP
+\fBregex:\fR A regular expression created by rex() or _rex.
+.sp 0
+.PP
+\fBreplacement_str:\fR A literal to replace all matched substrings.
+.sp 0
+.PP
+The replacement string can include the following special replacement patterns:
+.sp 0
+.PP
+Pattern
+.sp 0
+.PD 0 \"<dl>
+.TP 10\"<dt>
+\fB$$\fR \"</dt>
+Inserts a "$".
+.\"</dd>
+.TP 10\"<dt>
+\fB$&\fR \"</dt>
+Inserts the matched substring. Equivalent to $0.
+.\"</dd>
+.TP 10\"<dt>
+\fB$`\fR \"</dt>
+Inserts the portion of the string that precedes the matched substring.
+.\"</dd>
+.TP 10\"<dt>
+\fB$'\fR \"</dt>
+Inserts the portion of the string that follows the matched substring.
+.\"</dd>
+.TP 10\"<dt>
+\fB$n\fR \"</dt>
+Inserts the nth (1-indexed) capturing group where n is a positive integer less than 100.
+.\"</dd>
+.PD \"</dl>
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+let v1 = "A a B b"_var.replace("[A-Z]"_rex, "'$0'"); // "'A' a 'B' b"
+// or
+let v2 = replace("A a B b", "[A-Z]"_rex, "'$0'");
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+var v1 = strvar.replace(regex, ReplacementFunction auto repl_func);
+.PP
+Replace substrings using a regular expression and a custom function.
+.sp 0
+.PP
+Allow complex string conversions.
+.sp 0
+.PP
+\fBrepl_func:\fR A function with arguments (in match_str) that returns a var to replace match_str. May be an inline anonymous lambda function (capturing or non-capturing).
+.sp 0
+.PP
+e.g. [](auto match_str) {return match_str;} // Does nothing.
+.sp 0
+.PP
+\fBmatch_str:\fR Text of a single match. If regex groups are used, match_str.f(1, 1) is the whole match, match_str.f(1, 2) is the first group, etc.
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+// Decode hex escape codes.
+let v1 = R"(--\\0x3B--\\0x2F--)";                                 // Hex escape codes.
+let v2 = v1.replace(
+ R"(\\\\0x[0-9a-fA-F]{2,2})"_rex,                              // Find \\0xFF.
+ [](auto match_str) {return match_str.cut(3).iconv("HEX");}  // Decode to a char.
+);
+assert(v2 == "--;--/--");
+.EE \"</code>
+.sp 0
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+// Reformat dates using groups.
+let v3 = "Date: 03-15-2025";
+let v4 = v3.replace(
+ R"((\\d{2})-(\\d{2})-(\\d{4}))"_rex,
+ [](auto match_str) {return match_str.f(1, 4) ^ "-" ^ match_str.f(1, 2) ^ "-" ^ match_str.f(1, 3);}
+);
+assert(v4 == "Date: 2025-03-15");
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+var v1 = strvar.unique();
+.PP
+Remove duplicate fields, values or subvalues.
+.sp 0
+.PP
+From a dynamic array.
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+let v1 = "a1^b2^a1^c2"_var.unique(); // "a1^b2^c2"_var
+// or
+let v2 = unique("a1^b2^a1^c2"_var);
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+var v1 = strvar.sort(delimiter = FM);
+.PP
+Reorder fields, values or subvalues.
+.sp 0
+.PP
+In a dynamic array.
+.sp 0
+.PP
+Numeric data:
+.PP
+\fBExample:\fR
+.EX \"<code>
+let v1 = "20^10^2^1^1.1"_var.sort(); // "1^1.1^2^10^20"_var
+// or
+let v2 = sort("20^10^2^1^1.1"_var);
+.EE \"</code>
+.sp 0
+.sp 0
+.PP
+Alphabetic data:
+.PP
+\fBExample:\fR
+.EX \"<code>
+let v1 = "b1^a1^c20^c10^c2^c1^b2"_var.sort(); // "a1^b1^b2^c1^c10^c2^c20"_var
+// or
+let v2 = sort("b1^a1^c20^c10^c2^c1^b2"_var);
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+var v1 = strvar.reverse(delimiter = FM);
+.PP
+Reorder fields in an FM or VM etc. separated list in descending order
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+let v1 = "20^10^2^1^1.1"_var.reverse(); // "1.1^1^2^10^20"_var
+// or
+let v2 = reverse("20^10^2^1^1.1"_var);
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+var v1 = strvar.randomize(delimiter = FM);
+.PP
+Randomise the order of fields in an FM, VM separated list
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+let v1 = "20^10^2^1^1.1"_var.randomize(); /// e.g. "2^1^20^1.1^10" (random order depending on initrand())
+// or
+let v2 = randomize("20^10^2^1^1.1"_var);
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+var v1 = strvar.parse(char sepchar = ' ');
+.PP
+IMPL{var_stg nrvo = this->clone(); nrvo.parser(sepchar); return nrvo;}
+.sp 0
+
+
+.SS
+dim d1 = strvar.split(delimiter = FM);
+.PP
+Split a delimited string into a dim array.
+.sp 0
+.PP
+\fBDelimiter:\fR Can be multibyte Unicode.
+.sp 0
+.PP
+\fBreturn:\fR A dim array.
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+dim d1 = "a^b^c"_var.split(); // A dimensioned array with three elements (vars)
+// or
+dim d2 = split("a^b^c"_var);
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+var v1 = strvar.paste(pos1, length, replacestr);
+
+
+
+.SS
+var v1 = strvar.fieldstore(delimiter, fieldno, nfields, replacement);
+
+
+
+.SS
+var v1 = strvar.replace(regex, ReplacementFunction auto repl_func);
+
+
+
+.SH 4. STRING MUTATION - STANDALONE COMMANDS
+.SH
+
+.SS
+strvar.ucaser()
+.PP
+To upper case
+.sp 0
+.PP
+All string mutators follow the same pattern as ucaser. See the non-mutating functions for details.
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+var v1 = "abc";
+v1.ucaser(); // "ABC"
+// or
+ucaser(v1);
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+strvar.lcaser()
+
+
+
+.SS
+strvar.tcaser()
+
+
+
+.SS
+strvar.fcaser()
+
+
+
+.SS
+strvar.normalizer()
+
+
+
+.SS
+strvar.inverter()
+
+
+
+.SS
+strvar.quoter()
+
+
+
+.SS
+strvar.squoter()
+
+
+
+.SS
+strvar.unquoter()
+
+
+
+.SS
+strvar.lowerer()
+
+
+
+.SS
+strvar.raiser()
+
+
+
+.SS
+strvar.cropper()
+
+
+
+.SS
+strvar.trimmer(trimchars = " ")
+
+
+
+.SS
+strvar.trimmerfirst(trimchars = " ")
+
+
+
+.SS
+strvar.trimmerlast(trimchars = " ")
+
+
+
+.SS
+strvar.trimmerboth(trimchars = " ")
+
+
+
+.SS
+strvar.firster()
+
+
+
+.SS
+strvar.laster()
+
+
+
+.SS
+strvar.firster(length)
+
+
+
+.SS
+strvar.laster(length)
+
+
+
+.SS
+strvar.cutter(length)
+
+
+
+.SS
+strvar.paster(pos1, length, insertstr)
+
+
+
+.SS
+strvar.paster(pos1, insertstr)
+
+
+
+.SS
+strvar.prefixer(insertstr)
+
+
+
+.SS
+strvar.appender(appendable, ...)
+
+
+
+.SS
+strvar.popper()
+
+
+
+.SS
+strvar.fieldstorer(delimiter, fieldno, nfields, replacement)
+
+
+
+.SS
+strvar.substrer(pos1, length)
+
+
+
+.SS
+strvar.substrer(pos1)
+.PP
+IMPL{return this->substrer(pos1, this->len());}
+.sp 0
+
+
+.SS
+strvar.converter(from_chars, to_chars)
+
+
+
+.SS
+strvar.textconverter(from_characters, to_characters)
+
+
+
+.SS
+strvar.replacer(regex, tostr)
+
+
+
+.SS
+strvar.replacer(regex, ReplacementFunction auto repl_func)
+.PP
+IMPL{*this = replace(regex, repl_func);}
+.sp 0
+
+
+.SS
+strvar.replacer(fromstr, tostr)
+
+
+
+.SS
+strvar.uniquer()
+
+
+
+.SS
+strvar.sorter(delimiter = FM)
+
+
+
+.SS
+strvar.reverser(delimiter = FM)
+
+
+
+.SS
+strvar.randomizer(delimiter = FM)
+
+
+
+.SS
+strvar.parser(char sepchar = ' ')
+
+
+
+.SH 5. DYNAMIC ARRAY FUNCTIONS
+.SH
+
+.SS
+var v1 = strvar.f(fieldno, valueno = 0, subvalueno = 0);
+.PP
+f() is a highly abbreviated alias for the Pick OS field/value/subvalue extract() function.
+.sp 0
+.PP
+"f()" can be thought of as "field" although the function can extract values and subvalues as well.
+.sp 0
+.PP
+The convenient Pick OS angle bracket syntax for field extraction (e.g. xxx<20>) is not available in C++.
+.sp 0
+.PP
+The abbreviated exodus field extraction function (e.g. xxx.f(20)) is provided instead since field access is extremely heavily used in source code.
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+let v1 = "f1^f2v1]f2v2]f2v3^f2"_var;
+let v2 = v1.f(2, 2); // "f2v2"
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+var v1 = strvar.extract(fieldno, valueno = 0, subvalueno = 0);
+.PP
+IMPL{return this->f(fieldno, valueno, subvalueno);}
+.sp 0
+
+
+.SS
+var v1 = strvar.update(fieldno, valueno, subvalueno, replacement);
+.PP
+IMPL{var_stg nrvo = this->clone(); nrvo.updater(fieldno, valueno, subvalueno, replacement); return nrvo;}
+.sp 0
+
+
+.SS
+var v1 = strvar.update(fieldno, valueno, replacement);
+.PP
+IMPL{var_stg nrvo = this->clone(); nrvo.updater(fieldno, valueno, 0, replacement); return nrvo;}
+.sp 0
+
+
+.SS
+var v1 = strvar.update(fieldno, replacement);
+.PP
+IMPL{var_stg nrvo = this->clone(); nrvo.updater(fieldno, 0, 0, replacement); return nrvo;}
+.sp 0
+
+
+.SS
+var v1 = strvar.insert(fieldno, valueno, subvalueno, insertion);
+.PP
+IMPL{var_stg nrvo = this->clone(); nrvo.inserter(fieldno, valueno, subvalueno, insertion); return nrvo;}
+.sp 0
+
+
+.SS
+var v1 = strvar.insert(fieldno, valueno, insertion);
+.PP
+IMPL{var_stg nrvo = this->clone(); nrvo.inserter(fieldno, valueno, 0, insertion); return nrvo;}
+.sp 0
+
+
+.SS
+var v1 = strvar.insert(fieldno, insertion);
+.PP
+IMPL{var_stg nrvo = this->clone(); nrvo.inserter(fieldno, 0, 0, insertion); return nrvo;}
+.sp 0
+
+
+.SS
+var v1 = strvar.remove(fieldno, valueno = 0, subvalueno = 0);
+.PP
+IMPL{var_stg nrvo = this->clone(); nrvo.remover(fieldno, valueno, subvalueno); return nrvo;}
+.sp 0
+
+
+.SH 6. DYNAMIC ARRAY FILTERS
+.SH
+
+.SS
+var v1 = strvar.sum();
+.PP
+Sum up multiple values in a dynamic array.
+.sp 0
+.PP
+Whatever is the lowest level is summed up into a higher level.
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+let v1 = "1]2]3^4]5]6"_var.sum(); // "6^15"_var
+// or
+let v2 = sum("1]2]3^4]5]6"_var);
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+var v1 = strvar.sumall();
+.PP
+Sum up everything in a dynamic array.
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+let v1 = "1]2]3^4]5]6"_var.sumall(); // 21
+// or
+let v2 = sumall("1]2]3^4]5]6"_var);
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+var v1 = strvar.sum(delimiter);
+.PP
+Sum all fields using a given delimiter.
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+let v1 = "10,20,30"_var.sum(","); // 60
+// or
+let v2 = sum("10,20,30", ",");
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+var v1 = strvar.stddev();
+.PP
+Calculate basic statistics include stddev.
+.sp 0
+.PP
+\fBreturn:\fR An FM delimited string containing n, tot, min, max, tot, mean and stddev
+.sp 0
+.PP
+\fBstrvar:\fR A dynamic array containing numbers using any field, value or subvalue mark delimiters.
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+let v1 = "-11.2^0^11.5^12^13.9^14"_var.stddev(); // "6^40.2^-11.2^14^6.7^9.32344714506"_var
+// or
+let v2 = stddev("-11.2^0^11.5^12^13.9^14"_var);
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+var v1 = strvar.mv(opcode, var2);
+.PP
+Binary ops on parallel multivalues
+.sp 0
+.PP
+.sp 0
+.PP
+\fBopcode:\fR
+.sp 0
+.PD 0 \"<dl>
+.TP 10\"<dt>
+\fB+\fR \"</dt>
+Addition
+.\"</dd>
+.TP 10\"<dt>
+\fB-\fR \"</dt>
+Subtraction
+.\"</dd>
+.TP 10\"<dt>
+\fB∗\fR \"</dt>
+Multiplication
+.\"</dd>
+.TP 10\"<dt>
+\fB/\fR \"</dt>
+Division
+.\"</dd>
+.PD \"</dl>
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+let v1 = "10]20]30"_var.mv("+","2]3]4"_var); // "12]23]34"_var
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SH 7. DYNAMIC ARRAY MUTATORS STANDALONE COMMANDS
+.SH
+
+.SS
+strvar.updater(fieldno, replacement)
+.PP
+Replace a specific field in a dynamic array
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+var v1 = "f1^v1]v2}s2}s3^f3"_var;
+v1.updater(2, "X"); // "f1^X^f3"_var
+// or
+v1(2) = "X"; /// Easiest.
+// or
+updater(v1, 2, "X");
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+strvar.updater(fieldno, valueno, replacement)
+.PP
+Replace a specific value in a dynamic array.
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+var v1 = "f1^v1]v2}s2}s3^f3"_var;
+v1.updater(2, 2, "X"); // "f1^v1]X^f3"_var
+// or
+v1(2, 2) = "X"; /// Easiest.
+// or
+updater(v1, 2, 2, "X");
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+strvar.updater(fieldno, valueno, subvalueno, replacement)
+.PP
+Replace a specific subvalue in a dynamic array.
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+var v1 = "f1^v1]v2}s2}s3^f3"_var;
+v1.updater(2, 2, 2, "X"); // "f1^v1]v2}X}s3^f3"_var
+// or
+v1(2, 2, 2) = "X"; /// Easiest.
+// or
+updater(v1, 2, 2, 2, "X");
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+strvar.inserter(fieldno, insertion)
+.PP
+Insert a specific field in a dynamic array
+.sp 0
+.PP
+All other fields are moved up.
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+var v1 = "f1^v1]v2}s2}s3^f3"_var;
+v1.inserter(2, "X"); // "f1^X^v1]v2}s2}s3^f3"_var
+// or
+inserter(v1, 2, "X");
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+strvar.inserter(fieldno, valueno, insertion)
+.PP
+Insert a specific value in a dynamic array.
+.sp 0
+.PP
+All other values are moved up.
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+var v1 = "f1^v1]v2}s2}s3^f3"_var;
+v1.inserter(2, 2, "X"); // "f1^v1]X]v2}s2}s3^f3"_var
+// or
+inserter(v1, 2, 2, "X");
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+strvar.inserter(fieldno, valueno, subvalueno, insertion)
+.PP
+Insert a specific subvalue in a dynamic array.
+.sp 0
+.PP
+All other subvalues are moved up.
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+var v1 = "f1^v1]v2}s2}s3^f3"_var;
+v1.inserter(2, 2, 2, "X"); // "f1^v1]v2}X}s2}s3^f3"_var
+// or
+v1.inserter(2, 2, 2, "X");
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+strvar.remover(fieldno, valueno = 0, subvalueno = 0)
+.PP
+Remove a specific field, value, or subvalue from a dynamic array.
+.sp 0
+.PP
+All other fields, values, or subvalues are moved down.
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+var v1 = "f1^v1]v2}s2}s3^f3"_var;
+v1.remover(2, 2); // "f1^v1^f3"_var
+// or
+remover(v1, 2, 2);
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SH 8. DYNAMIC ARRAY SEARCH
+.SH
+
+.SS
+var v1 = strvar.locate(substr);
+.PP
+locate the position of a substr in dynamic array.
+.sp 0
+.PP
+Find a substr in an unordered dynamic array regardless of delimiter.
+.sp 0
+.PP
+\fBreturn:\fR The field, value or subvalue number or 0 if not found.
+.sp 0
+.PP
+Searching for empty fields, values etc. (i.e. "") will work. Locating "" returns:
+.PD 0 \"<dl>
+.TP 10\"<dt>
+\fB"]yy"\fR \"</dt>
+1
+.\"</dd>
+.TP 10\"<dt>
+\fB"xx]]zz"\fR \"</dt>
+2
+.\"</dd>
+.TP 10\"<dt>
+\fB"xx]yy]"\fR \"</dt>
+3
+.\"</dd>
+.TP 10\"<dt>
+\fB"xx"\fR \"</dt>
+0
+.\"</dd>
+.TP 10\"<dt>
+\fB""\fR \"</dt>
+1
+.\"</dd>
+.PD \"</dl>
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+let pos1 = "UK]US^UA"_var.locate("US"); // 2
+let pos2 = "UK]US^UA"_var.locate("GB"); // 0
+// or
+let pos3 = locate("US", "UK]US^UA"_var);
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+if (strvar.locate(substr, out position)) ...
+.PP
+locate substr in dynamic array returning bool and position.
+.sp 0
+.PP
+Searches an unordered dynamic array regardless of delimiter.
+.sp 0
+.PP
+\fBreturn:\fR True if found or False if not.
+.sp 0
+.PP
+\fBposition[out]:\fR The field, value or subvalue number if found or the max such number + 1 if not. If not found then position [out] is suitable for creating a new value.
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+var pos;
+if (    "UK]US^UA"_var.locate("US", pos)) ... ok // position -> 2
+if (not "UK]US^UA"_var.locate("GB", pos)) ... ok // position -> 4
+// or
+if (locate("US", "UK]US^UA"_var, pos)) ... ok
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+if (strvar.locate(substr, out position, fieldno, valueno = 0)) ...
+.PP
+locate substr in a dynamic array or field or value.
+.sp 0
+.PP
+Check if substr is present in an unordered dynamic array.
+.sp 0
+.PP
+\fBfieldno:\fR If fieldno is non-zero then search the specified field number otherwise, if fieldno is 0, search the whole value using FM as delimiter.
+.sp 0
+.PP
+\fBvalueno:\fR If provided, search the specified value number for a subvalue.
+.sp 0
+.PP
+\fBposition[out]:\fR If found, the field, value or subvalue number where it was found. If not found, the max field, value or subvalue number + 1.
+.sp 0
+.PP
+If not found then position[out] is suitable for appending a new field, value or subvalue.
+.sp 0
+.PP
+\fBreturn:\fR True if found or False if not.
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+var pos;
+if ("f1^f2v1]f2v2]s1}s2}s3}s4^f3^f4"_var.locate("s4", pos, 2, 3)) ... ok // pos -> 4 // Return true
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+if (strvar.locateby(ordercode, substr, out valueno)) ...
+.PP
+locate substr in ordered dynamic array
+.sp 0
+.PP
+locateby() without fieldno or valueno arguments, searches ordered values separated by VM chars.
+.sp 0
+.PP
+Data must already be in the correct order for searching to work properly.
+.sp 0
+.PP
+\fBordercode:\fR
+.sp 0
+.PD 0 \"<dl>
+.TP 10\"<dt>
+\fBAL\fR \"</dt>
+Ascending  - Left Justified (Alphabetic)
+.\"</dd>
+.TP 10\"<dt>
+\fBDL\fR \"</dt>
+Descending - Left Justified (Alphabetic)
+.\"</dd>
+.TP 10\"<dt>
+\fBAR\fR \"</dt>
+Ascending  - Right Justified (Numeric/Natural)
+.\"</dd>
+.TP 10\"<dt>
+\fBDR\fR \"</dt>
+Descending - Right Justified (Numeric/Natural)
+.\"</dd>
+.PD \"</dl>
+.PP
+\fBreturn:\fR True if found, otherwise false.
+.sp 0
+.PP
+\fBvalueno[out]:\fR Either the value no found or the correct value no for inserting the substr
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+var valueno; if (not "aaa]bbb]ccc"_var.locateby("AL", "bb", valueno)) ... ok // valueno -> 2 // Return false and valueno = where it could be correctly inserted.
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+if (strvar.locateby(ordercode, substr, out pos, fieldno, valueno = 0)) ...
+.PP
+locate substr in ordered dynamic array
+.sp 0
+.PP
+locateby() with fieldno and/or valueno arguments, searches fields if fieldno is 0, or values in a specific fieldno, or subvalues in a specific valueno.
+.sp 0
+.PP
+For more info, see locateby() without fieldno or valueno arguments.
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+var pos;
+if (not "f1^f2^aaa]bbb]ccc^f4"_var.locateby("AL", "bb", pos, 3)) ... ok // pos -> 2 // return false and where it could be correctly inserted.
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+if (strvar.locateusing(usingchar, substr)) ...
+.PP
+locate substr using any delimiter.
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+if ("AB,EF,CD"_var.locateusing(",", "EF")) ... ok
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+if (strvar.locateusing(usingchar, substr, out pos, fieldno = 0, valueno = 0, subvalueno = 0)) ...
+.PP
+locate substr in dynamic array using any delimiter
+.sp 0
+.PP
+Search in a specific field, value or subvalue.
+.sp 0
+.PP
+\fBpos[out]:\fR If found, the number where found, otherwise the maximum number of delimited fields + 1.
+.sp 0
+.PP
+\fBreturn:\fR True if found and False if not.
+.sp 0
+.PP
+This is similar to the main locate command but the delimiter char can be specified e.g. a comma or TM etc.
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+var pos;
+if ("f1^f2^f3c1,f3c2,f3c3^f4"_var.locateusing(",", "f3c2", pos, 3)) ... ok // pos -> 2 // Return true
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+if (strvar.locatebyusing(ordercode, usingchar, substr, out pos, fieldno = 0, valueno = 0, subvalueno = 0)) ...
+.PP
+locatebyusing() supports all the locate features in a single function.
+.sp 0
+
+
+
+
+.TH varo.h
+
+.SH 1. OS TIME/DATE
+.SH
+
+.SS
+var v1 = var::date();
+.PP
+Get the current date in internal format.
+.sp 0
+.PP
+Internal format is the number of whole days since pick epoch 1967-12-31 00:00:00 UTC. Dates prior to that are numbered negatively.
+.sp 0
+.PP
+\fBreturn:\fR A number. e.g. 20821 represents 2025-01-01 00:00:00 UTC for 24 hours.
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+let today1 = var::date();
+// or
+let today2 = date();
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+var v1 = var::time();
+.PP
+Get the current time in internal format.
+.sp 0
+.PP
+Internal time is the number of whole seconds since the last midnight 00:00:00 (UTC).
+.sp 0
+.PP
+\fBreturn:\fR A number in the range 0 - 86399 since there are 24*60*60 seconds in a day. e.g. 43200 if time is 12:00:00
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+let now1 = var::time();
+// or
+let now2 = time();
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+var v1 = var::ostime();
+.PP
+Get the current time in high resolution internal format.
+.sp 0
+.PP
+High resolution internal time is the number of fractional seconds since the last midnight 00:00:00 (UTC).
+.sp 0
+.PP
+\fBreturn:\fR A floating point with approx. nanosecond resolution depending on hardware.
+.sp 0
+.PP
+e.g. 23343.704387955 approx. 06:29:03 UTC
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+let now1 = var::ostime();
+// or
+let now2 = ostime();
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+var v1 = var::ostimestamp();
+.PP
+Get the current timestamp in internal format.
+.sp 0
+.PP
+Internal timestamp is the number of fractional days since pick epoch 1967-12-31 00:00:00 UTC. Negative for dates before.
+.sp 0
+.PP
+\fBreturn:\fR A floating point with approx. nanosecond resolution depending on hardware.
+.sp 0
+.PP
+e.g. Was 20821.99998842593 around 2025-01-01 23:59:59 UTC
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+let now1 = var::ostimestamp();
+// or
+let now2 = ostimestamp();
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+var v1 = vardate.ostimestamp(ostime);
+.PP
+Get the timestamp for a given date and time
+.sp 0
+.PP
+\fBvardate:\fR Internal date from date(), iconv("D") etc.
+.sp 0
+.PP
+\fBostime:\fR Internal time from time(), ostime(), iconv("MT") etc.
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+let idate = iconv("2025-01-01", "D"), itime = iconv("23:59:59", "MT");
+let ts1 = idate.ostimestamp(itime); // 20821.99998842593
+// or
+let ts2 = ostimestamp(idate, itime);
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+var::ossleep(milliseconds)
+.PP
+Sleep/pause/wait
+.sp 0
+.PP
+\fBmilliseconds:\fR How to long to sleep.
+.sp 0
+.PP
+Release the processor if not needed for a period of time or a delay is required.
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+var::ossleep(100); // sleep for 100ms
+// or
+ossleep(100);
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+var v1 = file_dir_list.oswait(milliseconds);
+.PP
+Sleep/pause/wait up for a file system event
+.sp 0
+.PP
+\fBfile_dir_list:\fR An FM delimited list of OS files and/or dirs to monitor.
+.sp 0
+.PP
+\fBmilliseconds:\fR How long to wait. Any terminal input (e.g. a key press) will also terminate the wait.
+.sp 0
+.PP
+\fBreturn:\fR An FM array of event information is returned. See below.
+.sp 0
+.PP
+Multiple events may be captured and are returned in multivalues.
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+let v1 = ".^/etc/hosts"_var.oswait(100); /// e.g. "IN_CLOSE_WRITE^/etc^hosts^f"_var
+// or
+let v2 = oswait(".^/etc/hosts"_var, 100);
+.EE \"</code>
+.sp 0
+.sp 0
+.PP
+.sp 0
+.PP
+Returned dynamic array fields:
+.sp 0
+.br
+1. Event type codes
+.br
+2. dirpaths
+.br
+3. filenames
+.br
+4. d=dir, f=file
+.PP
+.sp 0
+.PP
+Possible event type codes:
+.sp 0
+.PD 0 \"<dl>
+.TP 10\"<dt>
+\fBIN_CLOSE_WRITE\fR \"</dt>
+A file opened for writing was closed
+.\"</dd>
+.TP 10\"<dt>
+\fBIN_ACCESS\fR \"</dt>
+Data was read from file
+.\"</dd>
+.TP 10\"<dt>
+\fBIN_MODIFY\fR \"</dt>
+Data was written to file
+.\"</dd>
+.TP 10\"<dt>
+\fBIN_ATTRIB\fR \"</dt>
+File attributes changed
+.\"</dd>
+.TP 10\"<dt>
+\fBIN_CLOSE\fR \"</dt>
+File was closed (read or write)
+.\"</dd>
+.TP 10\"<dt>
+\fBIN_MOVED_FROM\fR \"</dt>
+File was moved away from watched directory
+.\"</dd>
+.TP 10\"<dt>
+\fBIN_MOVED_TO\fR \"</dt>
+File was moved into watched directory
+.\"</dd>
+.TP 10\"<dt>
+\fBIN_MOVE\fR \"</dt>
+File was moved (in or out of directory)
+.\"</dd>
+.TP 10\"<dt>
+\fBIN_CREATE\fR \"</dt>
+A file was created in the directory
+.\"</dd>
+.TP 10\"<dt>
+\fBIN_DELETE\fR \"</dt>
+A file was deleted from the directory
+.\"</dd>
+.TP 10\"<dt>
+\fBIN_DELETE_SELF\fR \"</dt>
+Directory or file under observation was deleted
+.\"</dd>
+.TP 10\"<dt>
+\fBIN_MOVE_SELF\fR \"</dt>
+Directory or file under observation was moved
+.\"</dd>
+.PD \"</dl>
+
+
+.SH 2. OS FILE I/O
+.SH
+
+.SS
+if (osfilevar.osopen(osfilename, utf8 = true)) ...
+.PP
+Open an OS file handle.
+.sp 0
+.PP
+Allow random read and write operations.
+.sp 0
+.PP
+Open for writing if possible, otherwise read-only.
+.sp 0
+.PP
+\fBosfilevar[out]:\fR Handle for subsequent osbread() and osbwrite() calls.
+.sp 0
+.PP
+\fBosfilename:\fR Path and name of an existing OS file.
+.sp 0
+.PP
+\fButf8:\fR True (default) removes partial UTF-8 sequences from osbread() ends; false returns raw data.
+.sp 0
+.PP
+\fBreturn:\fR True if opened successfully, false if file doesn’t exist or isn’t accessible.
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+let osfilename = ostempdir() ^ "xo_gendoc_test.conf";
+if (oswrite("" on osfilename)) ... ok /// Create an empty OS file
+var ostempfile;
+if (ostempfile.osopen(osfilename)) ... ok
+// or
+if (osopen(osfilename to ostempfile)) ... ok
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+if (strvar.osbwrite(osfilevar, io offset)) ...
+.PP
+Random write data to an OS file.
+.sp 0
+.PP
+At a specified position.
+.sp 0
+.PP
+\fBstrvar:\fR Data to write.
+.sp 0
+.PP
+\fBosfilevar:\fR Handle from osopen() or a path/filename; creates file if offset is 0 and it’s new, fails if offset isn’t 0.
+.sp 0
+.PP
+\fBoffset:\fR [in/out] Start position (0-based); updated to end of written data; -1 appends.
+.sp 0
+.PP
+\fBreturn:\fR True if write succeeds, false if file isn’t accessible, updateable, or creatable.
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+let osfilename = ostempdir() ^ "xo_gendoc_test.conf";
+let text = "aaa=123\\nbbb=456\\n";
+var offset = -1; /// -1 means append.
+if (text.osbwrite(osfilename, offset)) ... ok // offset -> 16
+// or
+if (not osbwrite(text on osfilename, offset)) ...
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+if (strvar.osbread(osfilevar, io offset, length)) ...
+.PP
+Random read data from an OS file
+.sp 0
+.PP
+From a specified position.
+.sp 0
+.PP
+\fBstrvar[out]:\fR Data read.
+.sp 0
+.PP
+\fBosfilevar:\fR Handle from osopen() or a path/filename.
+.sp 0
+.PP
+\fBoffset:\fR [in/out] Start position (0-based); updated to end of read data.
+.sp 0
+.PP
+\fBlength:\fR Chars to read; with utf8=true (default), may return less to ensure complete UTF-8 code points.
+.sp 0
+.PP
+\fBreturn:\fR True if read succeeds, false if file doesn’t exist or isn’t accessible or offset >= file size.
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+let osfilename = ostempdir() ^ "xo_gendoc_test.conf";
+var text, offset = 0;
+if (text.osbread(osfilename, offset, 8)) ... ok // text -> "aaa=123\\n" // offset -> 8
+// or
+if (osbread(text from osfilename, offset, 8)) ... ok // text -> "bbb=456\\n" // offset -> 16
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+var().osclose()
+.PP
+Close an osfilevar.
+.sp 0
+.PP
+Remove an osfilevar handle from the internal memory cache of OS file handles. This frees up both exodus process memory and operating system resources.
+.sp 0
+.PP
+It is advisable to osclose any file handles after use, regardless of whether they were specifically opened using osopen or not, especially in long running programs. Exodus performs caching of internal OS file handles per thread and OS file. If not closed, then the operating system will probably not flush deleted files from storage until the process is terminated. This can potentially create an memory issue or file system resource issue especially if osopening/osreading/oswriting many perhaps temporary files in a long running process.
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+var osfilevar; if (osfilevar.osopen(ostempfile())) ... ok
+osfilevar.osclose();
+// or
+osclose(osfilevar);
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+if (strvar.oswrite(osfilename, codepage = "")) ...
+.PP
+Create a complete OS file from a var.
+.sp 0
+.PP
+\fBstrvar:\fR The text or data to be used to create the file.
+.sp 0
+.PP
+\fBosfilename:\fR Absolute or relative path and filename to be written. Any existing OS file is removed first.
+.sp 0
+.PP
+\fBcodepage:\fR If specified then output is converted from UTF-8 to that codepage before being written. Otherwise no conversion is done.
+.sp 0
+.PP
+\fBreturn:\fR True if successful or false if not possible for any reason. e.g. Path is not writeable, permissions etc
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+let text = "aaa = 123\\nbbb = 456";
+let osfilename = ostempdir() ^ "xo_gendoc_test.conf";
+if (text.oswrite(osfilename)) ... ok
+// or
+if (oswrite(text on osfilename)) ... ok
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+if (strvar.osread(osfilename, codepage = "")) ...
+.PP
+Read a complete OS file into a var.
+.sp 0
+.PP
+\fBosfilename:\fR Absolute or relative path and filename to be read.
+.sp 0
+.PP
+\fBcodepage:\fR If specified then input is converted from that codepage to UTF-8 after being read. Otherwise no conversion is done.
+.sp 0
+.PP
+\fBstrvar[out]:\fR Is currently set to "" in case of any failure but this is may be changed in a future release to either force var to be unassigned or to leave it untouched. To guarantee future behaviour either add a line 'xxxx.defaulter("")' or set var manually in case osread() returns false. Or use the one argument free function version of osread() which always returns "" in case of failure to read.
+.sp 0
+.PP
+\fBreturn:\fR True if successful or false if not possible for any reason. e.g. File doesnt exist, insufficient permissions etc.
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+var text;
+let osfilename = ostempdir() ^ "xo_gendoc_test.conf";
+if (text.osread(osfilename)) ... ok // text -> "aaa = 123\\nbbb = 456"
+// or
+if (osread(text from osfilename)) ... ok
+let text2 = osread(osfilename);
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+if (osfile_or_dirname.osrename(new_dirpath_or_filepath)) ...
+.PP
+Rename an OS file or dir.
+.sp 0
+.PP
+In the OS file system.
+.sp 0
+.PP
+The source and target must exist in the same storage device.
+.sp 0
+.PP
+\fBosfile_or_dirname:\fR Absolute or relative path and file or dir name to be renamed.
+.sp 0
+.PP
+\fBnew_dirpath_or_filepath:\fR Will not overwrite an existing OS file or dir.
+.sp 0
+.PP
+\fBreturn:\fR True if successful or false if not possible for any reason. e.g. Target already exists, path is not writeable, permissions etc.
+.sp 0
+.PP
+Uses std::filesystem::rename internally.
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+let from_osfilename = ostempdir() ^ "xo_gendoc_test.conf";
+let to_osfilename = from_osfilename ^ ".bak";
+if (not osremove(ostempdir() ^ "xo_gendoc_test.conf.bak")) {}; // Cleanup first
+if (from_osfilename.osrename(to_osfilename)) ... ok
+// or
+if (osrename(from_osfilename, to_osfilename)) ...
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+if (osfile_or_dirname.osmove(to_osfilename)) ...
+.PP
+"Move" an OS file or dir.
+.sp 0
+.PP
+Within the OS file system.
+.sp 0
+.PP
+Attempt osrename first, then oscopy plus osremove original.
+.sp 0
+.PP
+\fBosfile_or_dirname:\fR Absolute or relative path and file or dir name to be moved.
+.sp 0
+.PP
+\fBto_osfilename:\fR Will not overwrite an existing OS file or dir.
+.sp 0
+.PP
+\fBreturn:\fR True if successful or false if not possible for any reason. e.g. Source doesnt exist or cannot be accessed, target already exists, source or target is not writeable, permissions, storage space etc.
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+let from_osfilename = ostempdir() ^ "xo_gendoc_test.conf.bak";
+let to_osfilename = from_osfilename.cut(-4);
+if (not osremove(ostempdir() ^ "xo_gendoc_test.conf")) {}; // Cleanup first
+if (from_osfilename.osmove(to_osfilename)) ... ok
+// or
+if (osmove(from_osfilename, to_osfilename)) ...
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+if (osfile_or_dirname.oscopy(to_osfilename)) ...
+.PP
+Copy an OS file or directory.
+.sp 0
+.PP
+Including subdirs.
+.sp 0
+.PP
+\fBosfile_or_dirname:\fR Absolute or relative path and file or dir name to be copied.
+.sp 0
+.PP
+\fBto_osfilename:\fR Will overwrite an existing OS file or merge into an existing dir.
+.sp 0
+.PP
+\fBreturn:\fR True if successful or false if not possible for any reason. e.g. Source doesnt exist or cannot be accessed, target is not writeable, permissions, storage space, etc.
+.sp 0
+.PP
+Uses std::filesystem::copy internally with recursive and overwrite options
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+let from_osfilename = ostempdir() ^ "xo_gendoc_test.conf";
+let to_osfilename = from_osfilename ^ ".bak";
+if (from_osfilename.oscopy(to_osfilename)) ... ok;
+// or
+if (oscopy(from_osfilename, to_osfilename)) ... ok
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+if (osfilename.osremove()) ...
+.PP
+Remove/delete an OS file.
+.sp 0
+.PP
+From the OS file system.
+.sp 0
+.PP
+Will not remove directories. Use osrmdir() to remove directories
+.sp 0
+.PP
+\fBosfilename:\fR Absolute or relative path and file name to be removed.
+.sp 0
+.PP
+\fBreturn:\fR True if successful or false if not possible for any reason. e.g. Target doesnt exist, path is not writeable, permissions etc.
+.sp 0
+.PP
+If osfilename is an osfilevar then it is automatically closed.
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+let osfilename = ostempdir() ^ "xo_gendoc_test.conf";
+if (osfilename.osremove()) ... ok
+// or
+if (osremove(osfilename)) ...
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SH 3. OS DIRECTORIES
+.SH
+
+.SS
+var v1 = dirpath.oslist(globpattern = "", mode = 0);
+.PP
+Get a list of OS files and/or dirs.
+.sp 0
+.PP
+\fBdirpath:\fR Absolute or relative dir path.
+.sp 0
+.PP
+\fBglobpattern:\fR e.g. *.conf to be appended to the dirpath or a complete path plus glob pattern e.g. /etc/ *.conf.
+.sp 0
+.PP
+\fBmode:\fR
+.sp 0
+.PD 0 \"<dl>
+.TP 10\"<dt>
+\fB0\fR \"</dt>
+Any regular OS file or dir (Default).
+.\"</dd>
+.TP 10\"<dt>
+\fB1\fR \"</dt>
+Only regular OS files.
+.\"</dd>
+.TP 10\"<dt>
+\fB2\fR \"</dt>
+Only dirs.
+.\"</dd>
+.PD \"</dl>
+.PP
+\fBreturn:\fR An FM delimited string containing all matching dir entries given a dir path
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+var entries1 = "/etc/"_var.oslist("*.cfg"); /// e.g. "adduser.conf^ca-certificates.con^... etc."
+// or
+var entries2 = oslist("/etc/" "*.conf");
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+var v1 = dirpath.oslistf(globpattern = "");
+.PP
+Get a list of OS files.
+.sp 0
+.PP
+See oslist() for info.
+.sp 0
+
+
+.SS
+var v1 = dirpath.oslistd(globpattern = "");
+.PP
+Get a list of OS dirs.
+.sp 0
+.PP
+See oslist() for info.
+.sp 0
+
+
+.SS
+var v1 = osfile_or_dirpath.osinfo(mode = 0);
+.PP
+Get dir info about an OS file or dir.
+.sp 0
+.PP
+\fBreturn:\fR A short string containing size ^ FM ^ modified_time ^ FM ^ modified_time or "" if not a regular file or dir.
+.sp 0
+.PP
+\fBmode:\fR 0: Default. 1: Must be a regular OS file. 2: Must be an OS dir.
+.sp 0
+.PP
+See also osfile() and osdir()
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+var info1 = "/etc/hosts"_var.osinfo(); /// e.g. "221^20597^78309"_var
+// or
+var info2 = osinfo("/etc/hosts");
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+var v1 = osfilename.osfile();
+.PP
+Get dir info of an OS file.
+.sp 0
+.PP
+\fBosfilename:\fR Absolute or relative path and file name.
+.sp 0
+.PP
+\fBreturn:\fR A short string containing size ^ FM ^ modified_time ^ FM ^ modified_time or "" if not a regular file.
+.sp 0
+.PP
+Alias for osinfo(1)
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+var fileinfo1 = "/etc/hosts"_var.osfile(); /// e.g. "221^20597^78309"_var
+// or
+var fileinfo2 = osfile("/etc/hosts");
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+var v1 = dirpath.osdir();
+.PP
+Get dir info of an OS dir.
+.sp 0
+.PP
+\fBdirpath:\fR Absolute or relative path and dir name.
+.sp 0
+.PP
+\fBreturn:\fR A short string containing FM ^ modified_time ^ FM ^ modified_time or "" if not a dir.
+.sp 0
+.PP
+Alias for osinfo(2)
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+var dirinfo1 = "/etc/"_var.osdir(); /// e.g. "^20848^44464"_var
+// or
+var dirinfo2 = osfile("/etc/");
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+if (dirpath.osmkdir()) ...
+.PP
+Create a new OS file system directory.
+.sp 0
+.PP
+Parent dirs wil be created if necessary.
+.sp 0
+.PP
+\fBdirpath:\fR Absolute or relative path and dir name.
+.sp 0
+.PP
+\fBreturn:\fR True if successful.
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+let osdirname = "xo_test/aaa";
+if (osrmdir("xo_test/aaa")) {}; // Cleanup first
+if (osdirname.osmkdir()) ... ok
+// or
+if (osmkdir(osdirname)) ...
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+if (var::oscwd(newpath)) ...
+.PP
+Change the current working dir.
+.sp 0
+.PP
+\fBnewpath:\fR An absolute or relative dir path and name.
+.sp 0
+.PP
+\fBreturn:\fR True if successful or false if not. e.g. Invalid dirpath, insufficient permission etc.
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+let osdirname = "xo_test/aaa";
+if (osdirname.oscwd()) ... ok
+// or
+if (oscwd(osdirname)) ... ok
+if (oscwd("../..")) ... ok /// Change back to avoid errors in following code.
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+var v1 = var::oscwd();
+.PP
+Get the current working dir path and name.
+.sp 0
+.PP
+\fBreturn:\fR The current working dir path and name.
+.sp 0
+.PP
+e.g. "/root/exodus/cli/src/xo_test/aaa"
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+var cwd1 = var().oscwd();
+// or
+var cwd2 = oscwd();
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+if (dirpath.osrmdir(evenifnotempty = false)) ...
+.PP
+Remove (deletes) an OS dir,
+.sp 0
+.PP
+\fBeventifnotempty:\fR If true any subdirs will also be removed/deleted recursively, otherwise the function will fail and return false.
+.sp 0
+.PP
+\fBreturn:\fR Returns true if successful or false if not. e.g dir doesnt exist, insufficient permission, not empty etc.
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+let osdirname = "xo_test/aaa";
+if (osdirname.osrmdir()) ... ok
+// or
+if (osrmdir(osdirname)) ...
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SH 4. OS SHELL/ENVIRONMENT
+.SH
+
+.SS
+if (command.osshell()) ...
+.PP
+Execute a shell command.
+.sp 0
+.PP
+\fBcommand:\fR An executable command to be interpreted by the default OS shell.
+.sp 0
+.PP
+\fBreturn:\fR True if the process terminates with error status 0 and false otherwise.
+.sp 0
+.PP
+Append "&>/dev/null" to the command to suppress terminal output.
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+let cmd = "echo $HOME";
+if (cmd.osshell()) ... ok
+// or
+if (osshell(cmd)) ... ok
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+if (instr.osshellread(oscmd)) ...
+.PP
+Execute a shell command and capture its stdout.
+.sp 0
+.PP
+\fBreturn:\fR The stout of the shell command.
+.sp 0
+.PP
+Append "2>&1" to the command to capture stderr/stdlog output as well.
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+let cmd = "echo $HOME";
+var text;
+if (text.osshellread(cmd)) ... ok
+// or capturing stdout but ignoring exit status
+text = osshellread(cmd);
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+if (outstr.osshellwrite(oscmd)) ...
+.PP
+Execute a shell command and provide its stdin.
+.sp 0
+.PP
+\fBreturn:\fR True if the process terminates with error status 0 and false otherwise.
+.sp 0
+.PP
+Append "&> somefile" to the command to suppress and/or capture output.
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+let outtext = "abc xyz";
+if (outtext.osshellwrite("grep xyz")) ... ok
+// or
+if (osshellwrite(outtext, "grep xyz")) ... ok
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+if (dirpath.osprocess(oscmd, stdin_for_process, out stdout_from_process, out stderr_from_process, out exit_status, timeout_secs = 0)) ...
+.PP
+Run an OS program synchronously.
+.sp 0
+.PP
+Provide its standard input and capture its output, errors, and exit status.
+.sp 0
+.PP
+Shell features (e.g., pipes, redirects) are unsupported but can be invoked via an oscmd like "bash -c 'abc|yy $HOME'".
+.sp 0
+.PP
+\fBoscmd:\fR Executable and arguments; must exist in OS PATH.
+.sp 0
+.PP
+\fBstdin_for_process:\fR Optional; input data for the program’s standard input.
+.sp 0
+.PP
+\fBstdout_from_process[out]:\fR Standard output from the program.
+.sp 0
+.PP
+\fBstderr_from_process[out]:\fR Error/log output from the program.
+.sp 0
+.PP
+\fBexit_status[out]:\fR Program’s exit status: 0 (normal), -1 (timeout), else (error).
+.sp 0
+.PP
+\fBtimeout_secs:\fR Optional; max runtime in seconds (default 0 = no timeout).
+.sp 0
+.PP
+\fBreturn:\fR True if program ran and exited with status 0 (success) or false if program failed to start, timed out, or exited with non-zero status.
+.sp 0
+.PP
+\fBthrow:\fR Pipe creation failed, fork failed, poll failed.
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+var v_stdout, v_stderr, v_exit_status;
+if (var::osprocess("grep xyz", "abc\\nxyz 123\\ndef", v_stdout, v_stderr, v_exit_status)) ... ok // v_stdout -> "xyz 123\\n" // v_exit_status = 0
+// or
+if (osprocess("grep xyz", "abc\\nxyz 123\\ndef", v_stdout, v_stderr, v_exit_status)) ... ok
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+var v1 = var::ostempdir();
+.PP
+Get the tmp dir path.
+.sp 0
+.PP
+\fBreturn:\fR A string e.g. "/tmp/"
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+let v1 = var::ostempdir();
+// or
+let v2 = ostempdir();
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+var v1 = var::ostempfile();
+.PP
+Create a temporary file.
+.sp 0
+.PP
+\fBreturn:\fR The name of new temporary file e.g. "/tmp/~exoEcLj3C"
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+var temposfilename1 = var::ostempfile();
+// or
+var temposfilename2 = ostempfile();
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+envvalue.ossetenv(envcode)
+.PP
+Set the value of an environment variable.
+.sp 0
+.PP
+\fBenvcode:\fR The code of the env variable to set.
+.sp 0
+.PP
+\fBenvvalue:\fR The new value to set the env code to.
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+let envcode = "EXO_ABC", envvalue = "XYZ";
+envvalue.ossetenv(envcode);
+// or
+ossetenv(envcode, envvalue);
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+if (envvalue.osgetenv(envcode)) ...
+.PP
+Get the value of an environment variable.
+.sp 0
+.PP
+\fBenvcode:\fR The code of the env variable to get or "" for all.
+.sp 0
+.PP
+\fBenvvalue[out]:\fR Set to the value of the env variable if set otherwise "". If envcode is "" then envvalue is set to a dynamic array of all environment variables LIKE CODE1=VALUE1^CODE2=VALUE2...
+.sp 0
+.PP
+\fBreturn:\fR True if the envcode is set or false if not.
+.sp 0
+.PP
+osgetenv and ossetenv work with a per thread copy of the OS process environment. This avoids multithreading issues but does not change the process environment. Child processes created by var::osshell() will not inherit any env variables set using ossetenv() so the oscommand will need to be prefixed to achieve the desired result.
+.sp 0
+.PP
+For the actual system environment, see "man environ". extern char **environ; // environ is a pointer to an array of pointers to char* env pairs like xxx=yyy and the last pointer in the array is nullptr.
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+var envvalue1;
+if (envvalue1.osgetenv("HOME")) ... ok // e.g. "/home/exodus"
+// or
+let envvalue2 = osgetenv("EXO_ABC"); // "XYZ"
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+var v1 = var::ospid();
+.PP
+Get the current OS process id.
+.sp 0
+.PP
+\fBreturn:\fR A number e.g. 663237.
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+let pid1 = var::ospid(); /// e.g. 663237
+// or
+let pid2 = ospid();
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+var v1 = var::ostid();
+.PP
+Get the current OS thread process id.
+.sp 0
+.PP
+\fBreturn:\fR A number e.g. 663237.
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+let tid1 = var::ostid(); /// e.g. 663237
+// or
+let tid2 = ostid();
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+var v1 = var::version();
+.PP
+Get the exodus library version info.
+.sp 0
+.PP
+\fBreturn:\fR The git commit details as at the time the library was built.
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+// e.g.
+// Local:  doc 2025-03-19 18:15:31 +0000 219cdad8a
+// Remote: doc 2025-03-17 15:03:00 +0000 958f412f0
+// https://github.com/exodusdb/exodusdb/commit/219cdad8a
+// https://github.com/exodusdb/exodusdb/archive/958f412f0.tar.gz
+//
+let v1 = var::version();
+// or
+let v2 = version();
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+if (strvar.setxlocale(newlocalecode)) ...
+.PP
+Set the current thread's default locale.
+.sp 0
+.PP
+\fBstrvar:\fR The new locale codepage code.
+.sp 0
+.PP
+True if successful
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+if (var::setxlocale("en_US.utf8")) ... ok
+// or
+if (setxlocale("en_US.utf8")) ... ok
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+var v1 = var.getxlocale();
+.PP
+Get the current thread's default locale.
+.sp 0
+.PP
+\fBreturn:\fR A locale codepage code string.
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+let v1 = var::getxlocale(); // "en_US.utf8"
+// or
+let v2 = getxlocale();
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SH 5. OUTPUT
+.SH
+
+.SS
+strvar.outputl(prefix = "")
+.PP
+Output to stdout with optional prefix.
+.sp 0
+.PP
+Append an NL char.
+.sp 0
+.PP
+Is FLUSHED, not buffered.
+.sp 0
+.PP
+The raw string bytes are output. No character or byte conversion is performed.
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+"abc"_var.outputl("xyz = "); /// Sends "xyz = abc\\n" to stdout and flushes.
+// or
+outputl("xyz = ", "abc"); /// Any number of arguments is allowed. All will be output.
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+strvar.output(prefix = "")
+.PP
+Same as outputl() but doesnt append an NL char and is BUFFERED, not flushed.
+.sp 0
+
+
+.SS
+strvar.outputt(prefix = "")
+.PP
+Same as outputl() but appends a tab char instead of an NL char and is BUFFERED, not flushed.
+.sp 0
+
+
+.SS
+strvar.logputl(prefix = "")
+.PP
+Output to stdlog with optional prefix.
+.sp 0
+.PP
+Appends an NL char.
+.sp 0
+.PP
+Is BUFFERED not flushed.
+.sp 0
+.PP
+Any of the six types of field mark chars present are converted to their visible versions,
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+"abc"_var.logputl("xyz = "); /// Sends "xyz = abc\\n" to stdlog buffer and is not flushed.
+// or
+logputl("xyz = ", "abc");; /// Any number of arguments is allowed. All will be output.
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+strvar.logput(prefix = "")
+.PP
+Same as logputl() but doesnt append an NL char.
+.sp 0
+
+
+.SS
+strvar.errputl(prefix = "")
+.PP
+Output to stderr with optional prefix.
+.sp 0
+.PP
+Appends an NL char.
+.sp 0
+.PP
+Is FLUSHED not buffered.
+.sp 0
+.PP
+Any of the six types of field mark chars present are converted to their visible versions,
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+"abc"_var.errputl("xyz = "); /// Sends "xyz = abc\\n" to stderr
+// or
+errputl("xyz = ", "abc"); /// Any number of arguments is allowed. All will be output.
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+strvar.errput(prefix = "")
+.PP
+Same as errputl() but doesnt append an NL char and is BUFFERED not flushed.
+.sp 0
+
+
+.SS
+strvar.put(std::ostream& ostream1)
+.PP
+Output to a given stream.
+.sp 0
+.PP
+Is BUFFERED not flushed.
+.sp 0
+.PP
+The raw string bytes are output. No character or byte conversion is performed.
+.sp 0
+
+
+.SS
+var().osflush()
+.PP
+Flush any and all buffered output to stdout and stdlog.
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+var().osflush();
+// or
+osflush();
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+osfile << anything << std::endl;
+.PP
+Use convenient << syntax to output anything to an osfile.
+.sp 0
+.PP
+\fBosfile:\fR An OS path and filename or an osfilevar opened by osopen(). The file will be appended, or created if it does not already exist. osfile can be "stdout" or "stderr" to simulate cout/cerr/clog.
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+let txtfile = "t_temp.txt";
+if (not osremove(txtfile)) {} // Remove any existing file.
+txtfile << txtfile << " " << 123.456789 << " " << 123 << std::endl;
+let v1 = osread(txtfile);   // "t_temp.txt 123.457 123\\n"
+.EE \"</code>
+.sp 0
+.sp 0
+.PP
+.sp 0
+.PP
+All standard c++ io manipulators may be used e.g. std::setw, setfill etc.
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+let vout = "t_std_iomanip_overview.txt";
+if (not osremove(vout)) {}
+using namespace std;
+vout << boolalpha    << true          << "\\ttrue"    << endl;
+vout << noboolalpha  << true          << "\\t1"       << endl;
+vout << showpoint    << 42.0          << "\\t42.0000" << endl;
+vout << noshowpoint  << 42.0          << "\\t42"      << endl;
+vout << showpos      << 42            << "\\t+42"     << endl;
+vout << noshowpos    << 42            << "\\t42"      << endl;
+vout << skipws       << " " << 42     << "\\t 42"     << endl;
+vout << noskipws     << " " << 42     << "\\t 42"     << endl;
+vout << unitbuf      << "a"           << "\\ta"       << endl;
+vout << nounitbuf    << "b"           << "\\tb"       << endl;
+vout << setw(6)      << 42            << "\\t    42"  << endl;
+vout << left         << setw(6) << 42 << "\\t42    "  << endl;
+vout << right        << setw(6) << 42 << "\\t    42"  << endl;
+vout << internal     << setw(6) << 42 << "\\t    42"  << endl;
+vout << setfill('*') << setw(6) << 42 << "\\t****42"  << endl;
+vout << showbase     << hex << 255    << "\\t0xff"    << endl;
+vout << noshowbase   << 255           << "\\tff"      << endl;
+vout << uppercase    << 255           << "\\tFF"      << endl;
+vout << nouppercase  << 255           << "\\tff"      << endl;
+vout << oct          << 255           << "\\t377"     << endl;
+vout << hex          << 255           << "\\tff"      << endl;
+vout << dec          << 255           << "\\t255"     << endl;
+vout << fixed        << 42.1          << "\\t42.100000"            << endl;
+vout << scientific   << 42.1          << "\\t4.210000e+01"         << endl;
+vout << hexfloat     << 42.1          << "\\t0x1.50ccccccccccdp+5" << endl;
+vout << defaultfloat << 42.1          << "\\t42.1"                 << endl;
+vout << std::setprecision(3)      << 42.1567  << "\\t42.2"  << endl;
+vout << resetiosflags(ios::fixed) << 42.1567  << "\\t42.2"  << endl;
+vout << setiosflags(ios::showpos) << 42       << "\\t+42"   << endl;
+// Verify actual v. expected.
+var act_v_exp = osread(vout);
+act_v_exp.converter("\\n\\t", FM ^ VM); /// Text to dynamic array
+act_v_exp = invertarray(act_v_exp);   /// Columns <-> Rows
+assert(act_v_exp.f(1) eq act_v_exp.f(2));
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SH 6. INPUT
+.SH
+
+.SS
+if (var.input(prompt = "")) ...
+.PP
+Read one line of input from stdin.
+.sp 0
+.PP
+\fBreturn:\fR True if successful or false if EOF or user pressed Esc or Ctrl+X in a terminal.
+.sp 0
+.PP
+\fBvar[in]:\fR The default value for terminal input and editing. Ignored if not a terminal.
+.sp 0
+.PP
+\fBvar[out]:\fR Raw bytes up to but excluding the first new line char. In case of EOF or user pressed Esc or Ctrl+X in a terminal it will be changed to "".
+.sp 0
+.PP
+\fBPrompt:\fR If provided, it will be displayed on the terminal.
+.sp 0
+.PP
+Multibyte/UTF8 friendly.
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+// var v1 = "defaultvalue";
+// if (v1.input("Prompt:")) ... ok
+// or
+// var v2 = input();
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+if (var().isterminal(in_out_err = 1)) ...
+.PP
+Check if is a terminal or a file/pipe.
+.sp 0
+.PP
+Can check stdin, stdout, stderr.
+.sp 0
+.PP
+\fBin_out_err:\fR
+.sp 0
+.PD 0 \"<dl>
+.TP 10\"<dt>
+\fB0\fR \"</dt>
+stdin
+.\"</dd>
+.TP 10\"<dt>
+\fB1\fR \"</dt>
+stdout (Default)
+.\"</dd>
+.TP 10\"<dt>
+\fB2\fR \"</dt>
+stderr.
+.\"</dd>
+.PD \"</dl>
+.PP
+\fBreturn:\fR True if it is a terminal or false if it is a file or pipe.
+.sp 0
+.PP
+Note that if the process is at the start or end of a pipeline, then only stdin or stdout will be a terminal.
+.sp 0
+.PP
+The type of stdout terminal can be obtained from the TERM environment variable.
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+var v1 = var().isterminal(); /// 1 or 0
+// or
+var v2 = isterminal();
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+if (var().hasinput(milliseconds = 0)) ...
+.PP
+Check if stdin has any bytes available for input.
+.sp 0
+.PP
+If no bytes are immediately available, the process sleeps for up to the given number of milliseconds, returning true immediately any bytes become available or false if the period expires without any bytes becoming available.
+.sp 0
+.PP
+\fBreturn:\fR True if any bytes are available otherwise false.
+.sp 0
+.PP
+It only takes a few µsecs to return false if no bytes are available and no wait time has been requested.
+.sp 0
+
+
+.SS
+if (var().eof()) ...
+.PP
+True if stdin is at end of file
+.sp 0
+
+
+.SS
+if (var().echo(on_off = true)) ...
+.PP
+Set terminal echo on or off.
+.sp 0
+.PP
+"On" causes all stdin data to be reflected to stdout if stdin is a terminal.
+.sp 0
+.PP
+Turning terminal echo off can be used to prevent display of confidential information.
+.sp 0
+.PP
+\fBreturn:\fR True if successful.
+.sp 0
+
+
+.SS
+var().breakon()
+.PP
+Install various interrupt handlers.
+.sp 0
+.PP
+Automatically called in program/thread initialisation by exodus_main.
+.sp 0
+.PD 0 \"<dl>
+.TP 10\"<dt>
+\fBSIGINT\fR \"</dt>
+Ctrl+C -> "Interrupted. (C)ontinue (Q)uit (B)acktrace (D)ebug (A)bort ?"
+.\"</dd>
+.TP 10\"<dt>
+\fBSIGHUP\fR \"</dt>
+Sets a variable "RELOAD_req" which may be handled or ignored by the program.
+.\"</dd>
+.TP 10\"<dt>
+\fBSIGTERM\fR \"</dt>
+Sets a variable "TERMINATE_req" which may be handled or ignored by the program.
+.\"</dd>
+.PD \"</dl>
+
+
+.SS
+var().breakoff()
+.PP
+Disable keyboard interrupt.
+.sp 0
+.PP
+Ctrl+C becomes inactive in terminal.
+.sp 0
+
+
+.SS
+var v1 = strvar.from_codepage(codepage);
+.PP
+Convert from codepage encoded text to UTF-8 encoded exodus text
+.sp 0
+.PP
+\fBcodepage:\fR e.g. Codepage "CP1124" (Ukrainian).
+.sp 0
+.PP
+Use Linux command "iconv -l" for a complete list of code pages and encodings.
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+let v1 = "\\xa4"_var.from_codepage("CP1124"); // "Є"
+// or
+let v2 = from_codepage("\\xa4", "CP1124");
+// U+0404 Cyrillic Capital Letter Ukrainian Ie Unicode character
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
+var v1 = strvar.to_codepage(codepage);
+.PP
+Convert to codepage encoded text from exodus UTF-8 encoded text
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+let v1 = "Є"_var.to_codepage("CP1124").oconv("HEX"); // "A4"
+// or
+let v2 = to_codepage("Є", "CP1124").oconv("HEX");
+.EE \"</code>
+.sp 0
 .sp 0
 
 
@@ -5520,7 +9760,7 @@ assert(total eq 5250);
 .SS
 yield()
 .PP
-Hand over execution to other async tasks.
+Hand over execution to other async tasks. Automatically called on every database i/o.
 .sp 0
 .PP
 Execution can be suspended with full retention of stack and state.
@@ -5551,11 +9791,6 @@ A range-based for loop to pick up all async results.
 .PP
 See async for an example.
 .sp 0
-
-
-.SS
-async_results()
-
 
 
 .SS

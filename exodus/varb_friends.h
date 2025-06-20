@@ -83,15 +83,15 @@
 	PUBLIC VAR_FRIEND bool operator<(CBR1           lhs,   const char   char2 );//IMPL {return  var_lt_var(lhs,   VAR(char2)); }
 	PUBLIC VAR_FRIEND bool operator<(CBR1           lhs,   const int    int2  );//IMPL {return  var_lt_int(lhs,   int2      ); }
 	PUBLIC VAR_FRIEND bool operator<(CBR1           lhs,   const double dbl2  );//IMPL {return  var_lt_dbl(lhs,   dbl2      ); }
-	//PUBLIC VAR_FRIEND bool operator<(CBR1         lhs,   const bool   bool1 );//IMPL {return  bool_lt_bool(lhs, bool1     ); }
+	PUBLIC VAR_FRIEND bool operator<(CBR1           lhs,   const bool   bool1 );//IMPL {return  var_lt_bool(lhs, bool1     ); }
 
 //	template<class LHS>
-//	PUBLIC VAR_FRIEND bool operator<(CBR1 LHS,             CBR1          rhs   );//IMPL {return  var_lt_var(lhs,        rhs); }
-	PUBLIC VAR_FRIEND bool operator<(const char*   cstr1, CBR1          rhs   );//IMPL {return  var_lt_var(VAR(cstr1), rhs); }
-	PUBLIC VAR_FRIEND bool operator<(const char    char1, CBR1          rhs   );//IMPL {return  var_lt_var(VAR(char1), rhs); }
-	PUBLIC VAR_FRIEND bool operator<(const int     int1,  CBR1          rhs   );//IMPL {return  int_lt_var(int1,       rhs); }
-	PUBLIC VAR_FRIEND bool operator<(const double  dbl1,  CBR1          rhs   );//IMPL {return  dbl_lt_var(dbl1,       rhs); }
-	//PUBLIC VAR_FRIEND bool operator<(const bool  bool1, CBR1          rhs   );//IMPL {return  bool_lt_bool(bool1,    rhs ); }
+//	PUBLIC VAR_FRIEND bool operator<(CBR1 LHS,            CBR1          rhs   );//IMPL {return   var_lt_var(lhs,        rhs); }
+	PUBLIC VAR_FRIEND bool operator<(const char*   cstr1, CBR1          rhs   );//IMPL {return   var_lt_var(VAR(cstr1), rhs); }
+	PUBLIC VAR_FRIEND bool operator<(const char    char1, CBR1          rhs   );//IMPL {return   var_lt_var(VAR(char1), rhs); }
+	PUBLIC VAR_FRIEND bool operator<(const int      int1, CBR1          rhs   );//IMPL {return   int_lt_var(int1,       rhs); }
+	PUBLIC VAR_FRIEND bool operator<(const double   dbl1, CBR1          rhs   );//IMPL {return   dbl_lt_var(dbl1,       rhs); }
+//	PUBLIC VAR_FRIEND bool operator<(const bool    bool1, CBR1          rhs   );//IMPL {return  bool_lt_var(bool1,      rhs); }
 
 	// >= GE friends v. main types
 
@@ -101,15 +101,15 @@
 	PUBLIC VAR_FRIEND bool operator>=(CBR1          lhs,   const char   char2 );//IMPL {return !var_lt_var(lhs,   VAR(char2)); }
 	PUBLIC VAR_FRIEND bool operator>=(CBR1          lhs,   const int    int2  );//IMPL {return !var_lt_int(lhs,   int2      ); }
 	PUBLIC VAR_FRIEND bool operator>=(CBR1          lhs,   const double dbl2  );//IMPL {return !var_lt_dbl(lhs,   dbl2      ); }
-	//PUBLIC VAR_FRIEND bool operator>=(CBR1        lhs,   const bool   bool2 );//IMPL {return !bool_lt_bool(lhs, bool2     ); }
+	PUBLIC VAR_FRIEND bool operator>=(CBR1          lhs,   const bool   bool2 );//IMPL {return !var_lt_bool(lhs,  bool2     ); }
 
 //	template<class LHS>
-//	PUBLIC VAR_FRIEND bool operator>=(LHS lhs,            CBR1          rhs   );//IMPL {return !var_lt_var(lhs,        rhs); }
-	PUBLIC VAR_FRIEND bool operator>=(const char*  cstr1, CBR1          rhs   );//IMPL {return !var_lt_var(VAR(cstr1), rhs); }
-	PUBLIC VAR_FRIEND bool operator>=(const char   char1, CBR1          rhs   );//IMPL {return !var_lt_var(VAR(char1), rhs); }
-	PUBLIC VAR_FRIEND bool operator>=(const int    int1,  CBR1          rhs   );//IMPL {return !int_lt_var(int1,       rhs); }
-	PUBLIC VAR_FRIEND bool operator>=(const double dbl1,  CBR1          rhs   );//IMPL {return !dbl_lt_var(dbl1,       rhs); }
-	//PUBLIC VAR_FRIEND bool operator>=(const bool bool1, CBR1          rhs   );//IMPL {return !bool_lt_bool(bool1,    rhs); }
+//	PUBLIC VAR_FRIEND bool operator>=(LHS lhs,           CBR1          rhs   );//IMPL {return !var_lt_var(lhs,        rhs); }
+	PUBLIC VAR_FRIEND bool operator>=(const char*  cstr1,CBR1          rhs   );//IMPL {return !var_lt_var(VAR(cstr1), rhs); }
+	PUBLIC VAR_FRIEND bool operator>=(const char   char1,CBR1          rhs   );//IMPL {return !var_lt_var(VAR(char1), rhs); }
+	PUBLIC VAR_FRIEND bool operator>=(const int    int1, CBR1          rhs   );//IMPL {return !int_lt_var(int1,       rhs); }
+	PUBLIC VAR_FRIEND bool operator>=(const double dbl1, CBR1          rhs   );//IMPL {return !dbl_lt_var(dbl1,       rhs); }
+	PUBLIC VAR_FRIEND bool operator>=(const bool  bool1, CBR1          rhs   );//IMPL {return !bool_lt_var(bool1,     rhs); }
 
 	// > GT friends v. main types
 
@@ -119,7 +119,7 @@
 	PUBLIC VAR_FRIEND bool operator>(CBR1           lhs,   const char   char2 );//IMPL {return  var_lt_var(VAR(char2), lhs); }
 	PUBLIC VAR_FRIEND bool operator>(CBR1           lhs,   const int    int2  );//IMPL {return  int_lt_var(int2,       lhs); }
 	PUBLIC VAR_FRIEND bool operator>(CBR1           lhs,   const double dbl2  );//IMPL {return  dbl_lt_var(dbl2,       lhs); }
-	//PUBLIC VAR_FRIEND bool operator>(CBR1         lhs,   const bool   bool2 );//IMPL {return  bool_lt_bool(bool2,    lhs); }
+	PUBLIC VAR_FRIEND bool operator>(CBR1           lhs,   const bool   bool2 );//IMPL {return  bool_lt_var(bool2,     lhs); }
 
 //	template<class LHS>
 //	PUBLIC VAR_FRIEND bool operator>(LHS lhs,             CBR1          rhs   );//IMPL {return  var_lt_var(rhs,   lhs       ); }
@@ -127,7 +127,7 @@
 	PUBLIC VAR_FRIEND bool operator>(const char    char1, CBR1          rhs   );//IMPL {return  var_lt_var(rhs,   VAR(char1)); }
 	PUBLIC VAR_FRIEND bool operator>(const int     int1,  CBR1          rhs   );//IMPL {return  var_lt_int(rhs,   int1      ); }
 	PUBLIC VAR_FRIEND bool operator>(const double  dbl1,  CBR1          rhs   );//IMPL {return  var_lt_dbl(rhs,   dbl1      ); }
-	//PUBLIC VAR_FRIEND bool operator>(const bool  bool1, CBR1          rhs   );//IMPL {return  bool_lt_bool(rhs, bool1     ); }
+	PUBLIC VAR_FRIEND bool operator>(const bool   bool1,  CBR1          rhs   );//IMPL {return  var_lt_bool(rhs, bool1     ); }
 
 	// <= LE friends v. main types
 
@@ -137,7 +137,7 @@
 	PUBLIC VAR_FRIEND bool operator<=(CBR1          lhs,   const char   char2 );//IMPL {return !var_lt_var(VAR(char2), lhs); }
 	PUBLIC VAR_FRIEND bool operator<=(CBR1          lhs,   const int    int2  );//IMPL {return !int_lt_var(int2,       lhs); }
 	PUBLIC VAR_FRIEND bool operator<=(CBR1          lhs,   const double dbl2  );//IMPL {return !dbl_lt_var(dbl2,       lhs); }
-	//PUBLIC VAR_FRIEND bool operator<=(CBR1        lhs,   const bool   bool2 );//IMPL {return !bool_lt_bool(bool2,    lhs); }
+	PUBLIC VAR_FRIEND bool operator<=(CBR1          lhs,   const bool   bool2 );//IMPL {return !bool_lt_var(bool2,     lhs); }
 
 //	template<class LHS>
 //	PUBLIC VAR_FRIEND bool operator<=(LHS           lhs,   CBR1          rhs   );//IMPL {return !var_lt_var(rhs,   lhs       ); }
@@ -145,7 +145,7 @@
 	PUBLIC VAR_FRIEND bool operator<=(const char    char1, CBR1          rhs   );//IMPL {return !var_lt_var(rhs,   VAR(char1)); }
 	PUBLIC VAR_FRIEND bool operator<=(const int     int1,  CBR1          rhs   );//IMPL {return !var_lt_int(rhs,   int1      ); }
 	PUBLIC VAR_FRIEND bool operator<=(const double  dbl1,  CBR1          rhs   );//IMPL {return !var_lt_dbl(rhs,   dbl1      ); }
-	//PUBLIC VAR_FRIEND bool operator<=(const bool  bool1, CBR1          rhs   );//IMPL {return !bool_lt_bool(rhs, bool1     ); }
+	PUBLIC VAR_FRIEND bool operator<=(const bool   bool1,  CBR1          rhs   );//IMPL {return !var_lt_bool(rhs, bool1     ); }
 
 	// Use nrvo (named return value optimisation) to ensure fastest implementation
 	//

@@ -102,6 +102,17 @@ bool bool_lt_bool(const bool lhs, const bool rhs) {
 
 }
 
+// toBool is the only authority on whether var is true or false
+bool var_lt_bool(CBR1 lhs, const bool rhs_bool) {
+//	return lhs.toBool() < rhs_bool;
+	return bool_lt_bool(lhs.toBool(), rhs_bool);
+}
+
+// toBool is the only authority on whether var is true or false
+bool bool_lt_var(const bool lhs_bool, CBR1 rhs) {
+	return bool_lt_bool(lhs_bool, rhs.toBool());
+}
+
 // almost identical code in var_eq_var and var_lt_var except where noted
 // NOTE doubles compare only to 0.0001 accuracy)
 bool var_eq_var(CBR1 lhs, CBR1 rhs) {
@@ -486,55 +497,11 @@ bool var_eq_dbl(CBR1 lhs, const double rhs_dbl) {
 
 }
 
-// NOTE doubles compare only to 0.0001 accuracy)
+// toBool is the only authority on whether var is true or false
 bool var_eq_bool(CBR1 lhs, const bool rhs_bool) {
-
-	lhs.assertVar(__PRETTY_FUNCTION__);
-
-	// 1. EMPTY STRING equates to false
-	if (lhs.var_typ & VARTYP_STR && lhs.var_str.empty()) {
-		return rhs_bool == false;
-	}
-
-	do {
-
-		// 2. LHS DBL
-		//
-		// 1.0 equates to true within precision limit
-		// 0.0 equates to true within precision limit
-		// All other floating point numbers equate to false
-		//
-		if (lhs.var_typ & VARTYP_DBL) {
-
-			// (DOUBLES ONLY COMPARE TO ACCURACY EXO_SMALLEST_NUMBER was 0.0001)
-			//return (std::abs(lhs.var_dbl - rhs.var_dbl) < EXO_SMALLEST_NUMBER);
-			//std::clog << "var_eq_int 2. lhs double " << lhs.var_dbl << " compare to int " << int1 << std::endl;
-			return almost_equal(lhs.var_dbl, (rhs_bool ? 1 : 0));
-
-		}
-
-		// 3. LHS INT
-		//
-		// 0 equates to false
-		// All other ints equate to
-		//
-		else if (lhs.var_typ & VARTYP_INT) {
-			//std::clog << "var_eq_int 3. lhs int " << lhs.var_int << " compare to int " << int1 << std::endl;
-			return lhs.var_int == (rhs_bool ? 1 : 0);
-
-		}
-
-		// Try to convert to number and try again
-		// Will check unassigned
-
-	} while (lhs.isnum());
-
-	// 4. NON-NUMERIC STRING doesnt equate to false or true
-	//
-
-	return false;
-
+	return lhs.toBool() == rhs_bool;
 }
+
 // NOTE doubles compare only to 0.0001 accuracy)
 bool var_eq_int(CBR1 lhs, const int rhs_int) {
 
@@ -575,22 +542,5 @@ bool var_eq_int(CBR1 lhs, const int rhs_int) {
 	return false;
 
 }
-
-/////////////////
-// INSTANTIATIONS
-/////////////////
-
-// clang-format off
-bool var_eq_var (CBR1          lhs, CBR1          rhs );
-bool var_eq_int (CBR1          lhs, const int    rhs );
-bool var_eq_dbl (CBR1          lhs, const double rhs );
-bool var_eq_bool(CBR1          lhs, const bool   rhs );
-
-bool var_lt_var (CBR1          lhs, CBR1          rhs );
-bool var_lt_int (CBR1          lhs, const int    rhs );
-bool var_lt_dbl (CBR1          lhs, const double rhs );
-bool int_lt_var (const int    lhs, CBR1          rhs );
-bool dbl_lt_var (const double lhs, CBR1          rhs );
-//clang-format on
 
 } // namespace exo

@@ -247,6 +247,8 @@ func main() {
 //		src.converter("\n\r", _FM);
 		let osfilenameonly = osfilename.field(OSSLASH, -1);
 
+		var osfile_doc_title = "";
+
 		// code is output using the name of the first file
 		if (not first_osfilenameonly)
 			first_osfilenameonly = osfilenameonly;
@@ -275,9 +277,6 @@ func main() {
 
 //		std::ofstream docfile(docfilename.toString());
 		var docfile = docfilename;
-
-		// Lines like "///... some text:"
-		const static rex doc_rex(R"__(^(/{3,})\s+(.*):$)__");
 
 		auto skipping = true;
 		auto in_table = false;
@@ -324,6 +323,10 @@ func main() {
 				// Skip noreturn
 				continue; // nextline
 
+			if (srcline.starts("[[deprecated"))
+				// Skip deprecated flags
+				continue; // nextline
+
 			if (srcline.starts("class ")) {
 				// Always capture class info
 				srcline.replacer("PUBLIC ", "");
@@ -342,10 +345,17 @@ func main() {
 			if (srcline.starts("template "))
 				continue; // nextline
 
+			// osfile title is like // gendoc: xxxxxxxxxxxxxx
+			if (srcline.starts("/" "/ gendoc:")) {
+				osfile_doc_title = srcline.field(":", 2, 999);
+				continue; // nextline
+			}
+
 			////////////////////////////
 			// Start a section and table
 			////////////////////////////
-			// Lines starting // and ending ":"
+			// Lines like "///... some text:"
+			const static rex doc_rex(R"__(^(/{3,})\s+(.*):$)__");
 			var table_title = srcline.match(doc_rex);
 			if (table_title) {
 
@@ -412,8 +422,8 @@ func main() {
 			//////////////////////////////////////
 			// function detector/rejector (tricky)
 			//////////////////////////////////////
+			// Continue to next source line on rejection
 
-			// continues to next line on rejection
 			var funcx_prefix;
 			struct Funcx {var is_static; var no_discard; var is_ctor; var prefix = "";} funcx_mut;
 			{
@@ -431,7 +441,9 @@ func main() {
 					srcline.cutter(3);
 
 				// funcx_prefix starts life as the first word
-				srcline.replacer(R"__(^((friend)|(CONST[^\s]*))\s)__"_rex, "");
+				// trim leading friend and const/constexpr etc.
+				static const rex rex1 = rex(R"__(^((friend)|(const[^\s]*))\s)__", "i");
+				srcline.replacer(rex1, "");
 				srcline.trimmerfirst();
 				funcx_prefix = srcline.field(" ", 1);
 
@@ -441,7 +453,6 @@ func main() {
 					if (not remainder.starts("operator"))
 						funcx_prefix = "";
 				}
-
 				var definitely_func = false;
 				if (funcx_prefix == "auto" and srcline.contains("->")) {
 					funcx_prefix = srcline.field("->", 2).field("{", 1).field(";", 1).trim();
@@ -468,7 +479,10 @@ func main() {
 
 				else if (funcx_prefix == "std::string") funcx_prefix = "var="; // i/oconv private
 
-				else if (funcx_prefix == "RETVAR") funcx_prefix = "="; // from var_base
+				else if (funcx_prefix.starts("var_")) funcx_prefix = "var="; // i/oconv private
+
+				else if (funcx_prefix == "RETVAR") funcx_prefix = "var="; // from var_base
+				else if (funcx_prefix == "RETVARREF") funcx_prefix = "var="; // from var_base
 
 				// const var&
 				else if (funcx_prefix == "CVR")  funcx_prefix = "expr";// only for output/logput/errput etc.
@@ -871,6 +885,7 @@ func main() {
 	//			line2.replacer("\\bdim& "_rex, ""); // needed to create this text below "dim d1 = d2; // Copy"
 				line2.replacer("\\bCVR "_rex, "");
 				line2.replacer("\\bCBR "_rex, "");
+				line2.replacer("\\bVBR "_rex, "");
 				line2.replacer("\\bVARREF "_rex, "io");
 				line2.replacer("\\bCONSTEXPR "_rex, "");
 				line2.replacer("= _", "= ");
@@ -992,6 +1007,8 @@ func main() {
 
 					}
 					else if (line2.match(R"__(\boperator\s*\(\)\s*\()__")) {
+//						var matched = line2.match(R"__(\boperator\s*\(\)\s*\()__");
+//TRACE(matched)  // "operator()("
 						//operator()(fieldno, valueno = 0, subvalueno = 0);
 						func_decl = func_decl0.replace(" = 0", "").replace(
 							R"__(\boperator\s*\(\)\s*\(\s*([^\)]+)\))__"_rex,
@@ -999,13 +1016,32 @@ func main() {
 						);
 					}
 
-					else if (line2.match(R"__(\boperator\s*[\+\-\*\/\%\^]\s*\(.*)__")) {
-						//operator+(var)
-						// v2 + v3
-						func_decl = func_decl0.replace(
-							R"__(\boperator\s*([\+\-\*\/\%\^])\s*\(.*)__"_rex,
-							class_name.first() ^ "2 $1 " ^ class_name.first() ^ "3"
-						);
+					else if (line2.match(R"__(\boperator\s*[\+\-\*\/\%\!\^]\s*\(.*)__")) {
+						var matched = line2.match(R"__(\boperator\s*[\+\-\*\/\%\!\^]\s*\(.*)__");
+//TRACE(matched)
+//TRACE(matched)  // "operator+(var)"
+//TRACE(matched)  // "operator-(var)"
+//TRACE(matched)  // "operator*(var)"
+//TRACE(matched)  // "operator/(var)"
+//TRACE(matched)  // "operator%(var)"
+
+//TRACE(matched)  // "operator+()"
+//TRACE(matched)  // "operator-()"
+//TRACE(matched)  // "operator!()"
+
+						if (matched.contains("()")) {
+							//operator+()    -> +v2
+							func_decl = func_decl0.replace(
+								R"__(\boperator\s*([\+\-\*\/\%\!\^])\s*\(.*)__"_rex,
+								"$1 " ^ class_name.first() ^ "1"
+							);
+						} else {
+							//operator+(var) -> v2 + v3
+							func_decl = func_decl0.replace(
+								R"__(\boperator\s*([\+\-\*\/\%\^])\s*\(.*)__"_rex,
+								class_name.first() ^ "2 $1 " ^ class_name.first() ^ "3"
+							);
+						}
 					}
 
 					else if (line2.match(R"__(\boperator\s*[\+\-\*\/\%\^]=\s*\(.*)__")) {
@@ -1240,7 +1276,7 @@ func main() {
 			else if (html) {
 
 				let osfile_id = osfilenameonly.field(".");
-				let osfile_title = osfilenameonly.field(".");
+				let osfile_title = osfile_doc_title ?: osfilenameonly.field(".");
 				all_html_contents ^= "<li><a href=\"#" ^ osfile_id ^ "\">" ^ osfile_title ^ "</a></li>\n";
 
 				// Contents

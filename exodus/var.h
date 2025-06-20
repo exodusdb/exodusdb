@@ -22,6 +22,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
+// gendoc: var - General
+
 // clang-format off
 
 #if EXO_MODULE
@@ -171,208 +173,7 @@ public:
 	//
 	void operator=(expression) &;
 
-	// obj is v1
-
-	// Check if a var has been assigned a value.
-	// return: True if the var is assigned, otherwise false
-	ND bool assigned() const;
-
-	// Check if a var has not been assigned a value;
-	// return: True if the var is unassigned, otherwise false
-	ND bool unassigned() const;
-
-	// Copy a var or, if it is unassigned, copy a default value.
-	// return: A copy of the var if it is assigned or the default value if it is not.
-	// Can be used to handle optional arguments in functions.
-	// defaultvalue: Cannot be unassigned.
-	// obj is v2
-	//
-	// `var v1; // Unassigned
-	//  var v2 = v1.or_default("abc"); // v2 -> "abc"
-	//  // or
-	//  var v3 = or_default(v1, "abc");`
-	//
-	// Mutator: defaulter()
-	//
-	ND var or_default(in defaultvalue) const;
-
-	// If a var is unassigned, assign a default value.
-	// If the var is unassigned then assign the default value to it, otherwise do nothing.
-	// defaultvalue: Cannot be unassigned.
-	//
-	// `var v1; // Unassigned
-	//  v1.defaulter("abc"); // v1 -> "abc"
-	//  // or
-	//  defaulter(v1, "abc");`
-	//
-	void defaulter(CVR defaultvalue);
-
-	// Swap the contents of one var with another.
-    // Useful for stashing large strings quickly. They are moved using pointers without making copies or allocating memory.
-	// Either or both variables may be unassigned.
-	//
-	// `var v1 = space(65'536);
-	//  var v2 = "";
-	//  v1.swap(v2); // v1 -> "" // v2.len() -> 65'536
-	//  // or
-	//  swap(v1, v2);`
-	//
-	void swap(io v2);
-
-	// Move a var into another.
-	// Performs a shallow copy of the var's data and transfers ownership of its string, if any. The moved var is set to an empty string.
-	// Enables efficient handling of large strings by moving pointers without copying or allocating memory.
-	// throw: VarUnassigned if the moved var is unassigned before the move.
-	// obj is v2
-	//
-	// `var v1 = space(65'536);
-	//  var v2 = v1.move(); // v2.len() -> 65'536 // v1 -> ""
-	//  // or
-	//  var v3 = move(v2);`
-	//
-	ND var move();
-
-    // Return a copy of the var.
-    // The cloned var may be unassigned, in which case the copy will be unassigned too.
-	// obj is v2
-	// `var v1 = "abc";
-	//  var v2 = v1.clone(); // "abc"
-	//  // or
-	//  var v3 = clone(v2);`
-	//
-	ND var clone() const;
-
-	// Return a string describing internal data of a var.
-	// If the var holds an internal std::string using heap storage then its its heap storage address is given.
-	// typ: Multiple typs may exist simultaneously.
-    // * 0x01 * str is available.
-    // * 0x02 * int is available.
-    // * 0x04 * dbl is available.
-    // * 0x08 * nan: str is not a number.
-    // * 0x16 * osfile (nan is true, str, int and dbl have special meaning).
-	//
-	// `var v1 = str("x", 32);
-	//  v1.dump().outputl(); /// e.g. var:0x7ffea7462cd0 typ:1 str:0x584d9e9f6e70 "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-	//  // or
-	//  outputl(dump(v1));`
-	//
-	ND var dump() const;
-
 	*/
-
-	//////////////////////////////
-	///// Arithmetical operators :
-	//////////////////////////////
-
-	/* fake for gendoc Defined for var_base in varb.h
-
-	// Check if a var is numeric.
-	// return: True if a var holds a double, integer, or a string representing a numeric value.
-	// A string is considered numeric if it is:
-	// * Empty (treated as zero), or
-	// * Composed of one or more digits (0-9), an optional leading '+' or '-' sign, and an optional single decimal point ('.') placed before, within, or after the digits.
-	// * Optionally includes an exponential suffix ('e' or 'E', optionally followed by '+' or '-', and 1-3 digits).
-	//
-	// `if (   "+123.45"_var.isnum()) ... ok
-	//  if ("+1.2345e+2"_var.isnum()) ... ok
-	//  if (          ""_var.isnum()) ... ok
-	//  if (not      "."_var.isnum()) ... ok
-	//  // or
-	//  if (isnum("123.")) ... ok`
-	//
-	bool isnum() const;
-
-    // Return a copy of the var if it is numeric or 0 otherwise.
-	// Allow working numerically with data that may be non-numeric.
-	// return: A guaranteed numeric var
-	//
-	// `var v1 = "123.45"_var.num();    // 123.45
-	//  var v2 = "abc"_var.num() + 100; // 100`
-	//
-	ND var num() const;
-
-	// Addition
-	// Any attempt to perform numeric operations on non-numeric strings will throw a runtime error VarNonNumeric.
-	// Floating point numbers are implicitly converted to strings with no more than 12 significant digits of precision. This practically eliminates all floatng point rounding errors.
-	// Internally, 0.1 + 0.2 looks like this using doubles.
-	// 0.10000000000000003 + 0.20000000000000004 -> 0.30000000000000004
-	//
-	// `var v1 = 0.1;
-	//  var v2 = v1 + 0.2; // 0.3`
-	//
-	ND var operator+(var);
-
-	// Subtraction
-	ND var operator-(var);
-
-	// Multiplication
-	ND var operator*(var);
-
-	// Division
-	ND var operator/(var);
-
-	// Modulus
-	ND var operator%(var);
-
-	// Self addition
-	//
-	// `var v1 = 0.1;
-	//  v1 += 0.2; // 0.3`
-	//
-	ND var operator+=(var);
-
-	// Self subtraction
-	ND var operator-=(var);
-
-	// Self multiplication
-	ND var operator*=(var);
-
-	// Self division
-	ND var operator/=(var);
-
-	// Self modulus
-	ND var operator%=(var);
-
-	*/
-
-	// Prefix operators must be replicated in var
-	// //////////////////////////////////////////
-	//
-	// Cannot use the var_base version because it returns a var_base which
-	// cannot be used in place of a var and would stop the use of ++xxx and --xxx
-	// in places where a var is required. e.g. some function arguments.
-	//
-	// Will be forwarded to var_base behind the scenes
-	//
-	// Must have postfix operators if prefix operators are defined
-
-	// Post increment
-	//
-	// `var v1 = 3;
-	//  var v2 = v1 ++; // v2 -> 3 // v1 -> 4`
-	//
-	   var  operator++(int) &;
-
-	// Post decrement
-	//
-	// `var v1 = 3;
-	//  var v2 = v1 --; // v2 -> 3 // v1 -> 2`
-	//
-	   var  operator--(int) &;
-
-	// Pre increment
-	//
-	// `var v1 = 3;
-	//  var v2 = ++ v1; // v2 -> 4 // v1 -> 4`
-	//
-	   io   operator++() &;
-
-	// Pre decrement
-	//
-	// `var v1 = 3;
-	//  var v2 = -- v1; // v2 -> 2 // v1 -> 2`
-	//
-	   io   operator--() &;
 
 	////////////////////////////////////////////////
 	///// Dynamic array creation, access and update:
@@ -418,7 +219,7 @@ public:
 
 	/* fake for gendoc
 
-	// Dynamic array field extraction, update and append:
+	// Dynamic array *field* update and append:
 	// See also inserter() and remover().
 	//
 	// `var v1 = "aa^bb"_var;
@@ -426,9 +227,7 @@ public:
 	//  // Field number -1 causes appending a field when updating.
 	//  v1(-1) = "55"; // v1 -> "aa^bb^^44^55"_var`
 	//
-	// Field access:
-	// It is recommended to use "v1.f(fieldno)" syntax using a ".f(" prefix to access fields in expressions instead of plain "v1(fieldno)". The former syntax (using .f()) will always compile whereas the latter does not compile in all contexts. It will compile only if being called on a constant var or in a location which requires a var. This is due to C++ not making a clear distinction between usage on the left and right side of assignment operator =.
-	// Furthermore using plain round brackets without the leading .f can be confused with function call syntax.
+	// It is recommended to use "v1.f(fieldno)" syntax using a ".f(" prefix to access (extract) fields in expressions instead of plain "v1(fieldno)". The syntax var.f(...) will always compile whereas var(...) does not compile in all contexts. It will compile only if being called on a constant var or in a location which requires an implicit conversion to var. This is due to C++ not making a clear distinction between usage on the left and right side of assignment operator =. Furthermore using plain round brackets without the leading .f can be confused with function call syntax.
 	//
 	// `var v1 = "aa^bb^cc"_var;
 	//  var v2 = v1.f(2); // "bb" /// .f() style access. Recommended.
@@ -436,15 +235,13 @@ public:
 	//
 	ND var  operator()(int fieldno) const;
 
-	// Dynamic array value update and append
+	// Dynamic array *value* update and append
 	// See also inserter() and remover().
 	//
 	// `var v1 = "aa^b1]b2^cc"_var;
 	//  v1(2, 4) = "44"; // v1 -> "aa^b1]b2]]44^cc"_var
 	//  // value number -1 causes appending a value when updating.
 	//  v1(2, -1) = 55; // v1 -> "aa^b1]b2]]44]55^cc"_var`
-	//
-	// Value access:
 	//
 	// `var v1 = "aa^b1]b2^cc"_var;
 	//  var v2 = v1.f(2,2); // "b2" /// .f() style access. Recommended.
@@ -460,7 +257,7 @@ public:
 
 	// Extract fields, values and subvalues using () int int int
 	// An alternative to .f() and extract()
-	// Equvalent to var v1 = v2.extract(1,2,3);
+	// Equivalent to var v1 = v2.extract(1,2,3);
 	// Sadly there is no way to use pick/mv angle brackets like "abc<1,2,3>"
 
 	//SADLY no way to get a different operator() function called when on the left hand side of assign
@@ -475,15 +272,13 @@ public:
 	// Note that all  function "in" arguments are const vars
 	// so will work perfectly with () extraction
 
-	// Dynamic array subvalue update and append
+	// Dynamic array *subvalue* update and append
 	// See also inserter() and remover().
 	//
 	// `var v1 = "aa^bb^cc"_var;
 	//  v1(2, 2, 2) = "22"; // v1 -> "aa^bb]}22^cc"_var
 	//  // subvalue number -1 causes appending a subvalue when updating.
 	//  v1(2, 2, -1) = 33; // v1 -> "aa^bb]}22}33^cc"_var`
-	//
-	// Subvalue access:
 	//
 	// `var v1 = "aa^b1]b2}s2^cc"_var;
 	//  var v2 = v1.f(2, 2, 2); // "s2" /// .f() style access. Recommended.
@@ -509,16 +304,17 @@ public:
 	friend class var_proxy1;
 	friend class var_proxy2;
 	friend class var_proxy3;
-	ND var_proxy1 operator()(int fieldno);
-	ND var_proxy2 operator()(int fieldno, int valueno);
-	ND var_proxy3 operator()(int fieldno, int valueno, int subvalueno);
+
+	/*nodoc*/ ND var_proxy1 operator()(int fieldno);
+	/*nodoc*/ ND var_proxy2 operator()(int fieldno, int valueno);
+	/*nodoc*/ ND var_proxy3 operator()(int fieldno, int valueno, int subvalueno);
 
 	///// I/O CONVERSION:
 	////////////////////
 
 	// obj is var
 
-	// Convert internal data to output external display format.
+	// Convert internal format data to output format for display.
 	// convstr: A conversion code or pattern. See ICONV/OCONV PATTERNS
 	// return: The data in external display format or, if the data is invalid and cannot converted, most conversions return the original data UNCONVERTED.
 	// throw: VarNotImplemented if convstr is invalid
@@ -529,7 +325,7 @@ public:
 	//
 	ND var  oconv(const char* convstr) const;
 
-	// Convert external data to internal format.
+	// Convert output display format data to internal format.
 	// convstr: A conversion code or pattern. See ICONV/OCONV PATTERNS
 	// return: The data in internal format or, if the data is invalid and cannot be converted, most conversions return the EMPTY STRING ""
 	// throw: VarNotImplemented if convstr is invalid
@@ -1413,181 +1209,6 @@ public:
 //	//      println("Key is {}, MV is {}", ID, MV);`
 //	//
 //	ND bool formlist(in keys, const int fieldno = 0);
-
-	/* For doc only. Actually implemented in var_base but documented here
-
-	///// MATH/BOOLEAN:
-	//////////////////
-
-	// obj is varnum
-
-    // Absolute value.
-    // `let v1 = -12.34;
-	//  let v2 = v1.abs(); // 12.34
-    //  // or
-    //  let v3 = abs(v1);`
-	//
-    ND var  abs() const;
-
-    // Power.
-    // `let v1 = var(2).pwr(8); // 256
-    //  // or
-    //  let v2 = pwr(2, 8);`
-	//
-    ND var  pwr(in exponent) const;
-
-    // Initialise the seed for rnd().
-	// Allow the stream of pseudo random numbers generated by rnd() to be reproduced.
-	// Seeded from std::chrono::high_resolution_clock::now() if the argument is 0;
-	//
-    // `var(123).initrnd(); /// Set seed to 123
-    //  // or
-    //  initrnd(123);`
-	//
-           void initrnd() const;
-
-    // Pseudo random number generator.
-	// return: A pseudo random integer between 0 and the provided maximum minus 1.
-	// Uses std::mt19937 and std::uniform_int_distribution<int>
-	//
-    // `let v1 = var(100).rnd(); /// Random 0 to 99
-    //  // or
-    //  let v2 = rnd(100);`
-	//
-    ND var  rnd()     const;
-
-    // Power of e.
-    // `let v1 = var(1).exp(); // 2.718281828459045
-    //  // or
-    //  let v2 = exp(1);`
-	//
-    ND var  exp()     const;
-
-    // Square root.
-    // `let v1 = var(100).sqrt(); // 10
-    //  // or
-    //  let v2 = sqrt(100);`
-	//
-    ND var  sqrt()    const;
-
-    // Sine of degrees.
-    // `let v1 = var(30).sin(); // 0.5
-    //  // or
-    //  let v2 = sin(30);`
-	//
-    ND var  sin()     const;
-
-    // Cosine of degrees.
-    // `let v1 = var(60).cos(); // 0.5
-    //  // or
-    //  let v2 = cos(60);`
-	//
-    ND var  cos()     const;
-
-    // Tangent of degrees.
-    // `let v1 = var(45).tan(); // 1
-    //  // or
-    //  let v2 = tan(45);`
-	//
-    ND var  tan()     const;
-
-    // Arctangent of degrees.
-    // `let v1 = var(1).atan(); // 45
-    //  // or
-    //  let v2 = atan(1);`
-	//
-    ND var  atan()    const;
-
-    // Natural logarithm.
-	// return: Floating point var (double)
-    // `let v1 = var(2.718281828459045).loge(); // 1
-    //  // or
-    //  let v2 = loge(2.718281828459045);`
-	//
-    ND var  loge()    const;
-
-    //  ND var  int() const;//reserved word
-
-    // Truncate decimals.
-	// Convert decimal to nearest integer towards zero.
-	// Remove decimal fraction.
-	// return: An integer var
-    // `let v1 = var(2.9).integer(); // 2
-    //  // or
-    //  let v2 = integer(2.9);
-	//
-    //  var v3 = var(-2.9).integer(); // -2
-    //  // or
-    //  var v4 = integer(-2.9);`
-	//
-    ND var  integer() const;
-
-    // Floor decimals.
-	// Convert decimal to nearest integer towards negative infinity.
-	// return: An integer var
-    // `let v1 = var(2.9).floor(); // 2
-    //  // or
-    //  let v2 = floor(2.9);
-	//
-    //  var v3 = var(-2.9).floor(); // -3
-    //  // or
-    //  var v4 = floor(-2.9);`
-	//
-    ND var  floor() const;
-
-	// Modulus function.
-	// Identical to C++ % operator only for positive numbers and modulus
-	// Negative denominators are considered as periodic with positive numbers
-	// Result is between [0, modulus) if modulus is positive
-	// Result is between (modulus, 0] if modulus is negative (symmetric)
-	// throw: VarDivideByZero if modulus is zero.
-	// Floating point works.
-	// `let v1 = var(11).mod(5); // 1
-	//  // or
-	//  let v2 = mod(11, 5); // 1
-	//  let v3 = mod(-11, 5); // 4
-	//  let v4 = mod(11, -5); // -4
-	//  let v5 = mod(-11, -5); // -1`
-	//
-	ND var  mod(in modulus) const;
-
-	// Not documenting the overloaded versions
-	// ND var  mod(double modulus) const;
-	// ND var  mod(const int modulus) const;
-
-	// Set floating point precision.
-	// This is the number of post-decimal point digits to consider for floating point comparison and implicit conversion to strings.
-	// The default precision is 4 which is 0.0001.
-	// NUMBERS AND DIFFERENCES SMALLER THAN 0.0001 ARE TREATED AS ZERO UNLESS PRECISION IS INCREASED.
-	// With the default precision, Exodus handles, without assistance, conversion to and from strings for positive and negative numbers between 0.0001 and 999'999'999'999.9999 (12 digits).
-	// newprecision: New precision between -307 and 308 inclusive.
-	// return: The new precision if successful or the old precision if not.
-	// Not required if using common numbers or using the explicit rounding and formatting functions to convert numbers to strings.
-	// Increasing the precision allows comparing and outputting smaller numbers but creates errors handling large numbers.
-	// Setting precision inside a perform, execute or dictionary function lasts until termination of the function.
-	// See cli/demo_precision for more info.
-	// obj is var()
-	//
-	// `assert(0.000001_var == 0); /// NOTE WELL: Default precision 4.
-	//  let new_precision1 = var::setprecision(6); // 6 // Increase the precision.
-	//  // or
-	//  let new_precision2 = setprecision(6);
-	//  assert(0.000001_var != 0); /// NOTE: Precision 6.`
-	//
-       static int setprecision(int newprecision);
-
-	// Get current floating point precision.
-	// return: The current precision setting.
-	// See setprecision() for more info.
-	// obj is var()
-	//
-	// `let curr_precision1 = var::getprecision();
-	//  // or
-	//  let curr_precision2 = getprecision();`
-	//
-       static int getprecision();
-
-    */  // For doc only.
 
 	// Close documentation
 	/// :
