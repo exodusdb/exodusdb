@@ -10,6 +10,8 @@ export namespace exo {
 
 	using exo::var_base;
 	using exo::var_stg;
+	using exo::var_os;
+	using exo::var_db;
 	using exo::var;
 	using exo::var_iter;
 

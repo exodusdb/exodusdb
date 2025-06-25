@@ -6,25 +6,25 @@
 #endif
 
 #include <exodus/var.h>
-//#include <exodus/dim.h>
-//#include <exodus/rex.h>
+#include <exodus/varb.h>
+#include <exodus/var_iter.h>
 
-//mv_iter class enables c++ range based programming over a dynamic array
+// var_iter class enables c++ range based programming over a dynamic array
 //
-//uses FM as field separator at the moment
+// Uses FM as field separator at the moment
 //
-//Example:
+// Example:
 //
 // for (in v : dynstr) {...}
 //
-//Warning: updating the string probably invalidates the iterator! It is a byte pointer into the string.
+// Warning: updating the string probably invalidates the iterator! It is a byte pointer into the string.
 //
-//TODO add option a) to specify field separator eg VM, SM and/or b) acquire field number as well
-//as provided by SRP precompiler
-//https://wiki.srpcs.com/display/SRPUtilities/SRP_PreCompiler#SRP_PreCompiler-ForEachLoops
-//For Each Value in MyValues using @STM setting Pos
+// TODO add option a) to specify field separator eg VM, SM and/or b) acquire field number as well
+// as provided by SRP precompiler
+// https://wiki.srpcs.com/display/SRPUtilities/SRP_PreCompiler#SRP_PreCompiler-ForEachLoops
+// For Each Value in MyValues using @STM setting Pos
 //    NewValues<Pos> = Value
-//Next Value
+// Next Value
 
 namespace exo {
 
@@ -34,9 +34,8 @@ namespace exo {
 
 //CONSTRUCTOR from a var (ie begin())
 var_iter::var_iter(in var1)
-	: pvar_(&var1){
-//	: pvar_(static_cast<const var*>(&var1)){
-	if (!var1.len())
+	: pvar_(&var1) {
+	if (var1.empty())
 		startpos_ = std::string::npos;
 }
 
@@ -48,14 +47,14 @@ bool var_iter::operator!=([[maybe_unused]] const var_iter& var_iter1) {
 }
 
 //CONVERSION - conversion to var
-var var_iter::operator*() const {
+RETVAR var_iter::operator*() const {
 
 	//find the end of the field if not already known
 //	if (endpos_ == std::string::npos) {
 	std::size_t	endpos_ = pvar_->var_str.find(FM_, startpos_);
 //	}
 
-	var rvo;
+	RETVAR rvo;
 	rvo.var_typ = VARTYP_STR;
 
 	//extract the field
@@ -154,36 +153,5 @@ var_iter var_iter::operator--(int) {
 	--*this;
 	return before;
 }
-
-//BEGIN - var member function to create an iterator -> begin
-var_iter var::begin() const {
-	return var_iter(*this);
-}
-
-//END - var member function to create an interator -> end
-var_iter var::end() const {
-	// No need to use var1 since the end is always string::npos
-	// so var_iter!=var_iter is implemented in terms of startpos_ != string::npos && startpos_ < size()
-	return var_iter();
-}
-
-//PUBLIC void var_iter::operator=(SV replacementstr) {
-//
-//	// Find the end of the field if not already found from a call to above CONVERSION
-//	if (endpos_ == std::string::npos)
-//		endpos_ = pvar_->var_str.find(FM_, startpos_);
-//
-//	// Replace the field
-//	if (endpos_ == std::string::npos) {
-//		pvar_->var_str.resize(startpos_);
-//		pvar_->var_str.append(replacementstr);
-//		endpos_ = std::string::npos;
-//	}
-//	else {
-//		pvar_->var_str.replace(startpos_, endpos_ - startpos_, replacementstr);
-//		endpos_ = startpos_ + replacementstr.size() + 1;
-//	}
-//}
-//
 
 }  //namespace exo

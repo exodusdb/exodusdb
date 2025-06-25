@@ -103,7 +103,11 @@ namespace exo {
 // Forward declarations
 
 class var;
-class var_stg; // forward declaration of a class template
+class var_stg;
+class var_os;
+class var_db;
+//class var_stg; // forward declaration of a class template
+class var_iter;
 
 #define VB1         var_base
 #define VBR1        var_base&
@@ -197,7 +201,10 @@ class PUBLIC var_base {
 	                                 // Implemented as an unsigned int 1.e. 4 bytes
 
 	friend class var;
-//	friend class var_stg;
+	friend class var_stg;
+	friend class var_os;
+	friend class var_db;
+	friend class var_iter;
 	friend class dim;
 //	friend class rex;
 
@@ -1400,12 +1407,25 @@ class PUBLIC var_base {
 
 	// obj is var
 
-	// Get the length in chars/bytes.
-	// return: The length.
+	// Get the length in number of chars/bytes.
+	// return: A number
+	//
+	// `let v1 = "abc"_var.len(); // 3
+	//  // or
+	//  let v2 = len("abc");`
+	//
 	ND RETVAR len() const;
 
-	// Test if it is an empty string.
-	// return: True or False
+	// Test if the var is an empty string.
+	// return: True if it is empty amd false if not.
+	// This is a shorthand and more expressive way of writing 'if (var == "")' or 'if (var.len() == 0)' or 'if (not var.len())'
+	// Note that 'if (var.empty())' is not exactly the same as 'if (not var)' because 'if (var("0.0")' is also defined as false. If a string can be converted to 0 then it is considered to be false. Contrast this with common scripting languages where 'if (var("0"))' is defined to be true.
+	//
+	// `let v1 = "0";
+	//  if (not v1.empty()) ... ok // true
+	//  // or
+	//  if (not empty(v1)) ... ok // true`
+	//
 	ND bool empty() const;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1552,6 +1572,31 @@ class PUBLIC var_base {
 
 	// obj is var
 
+	// Check if a var is numeric.
+	// return: True if a var holds a double, integer, or a string representing a numeric value.
+	// A string is considered numeric if it is:
+	// * Empty (treated as zero), or
+	// * Composed of one or more digits (0-9), an optional leading '+' or '-' sign, and an optional single decimal point ('.') placed before, within, or after the digits.
+	// * Optionally includes an exponential suffix ('e' or 'E', optionally followed by '+' or '-', and 1-3 digits).
+	//
+	// `if (   "+123.45"_var.isnum()) ... ok
+	//  if ("+1.2345e+2"_var.isnum()) ... ok
+	//  if (          ""_var.isnum()) ... ok
+	//  if (not      "."_var.isnum()) ... ok
+	//  // or
+	//  if (isnum("123.")) ... ok`
+	//
+	ND bool isnum() const;
+
+    // Copy a var if it is numeric or 0 if not.
+	// This allows working numerically with data that may be non-numeric.
+	// return: A guaranteed numeric var
+	//
+	// `var v1 = "123.45"_var.num();    // 123.45
+	//  var v2 = "abc"_var.num() + 100; // 100`
+	//
+	ND RETVAR num() const;
+
 	// Unary plus.
 	// return: The numeric value of a variable or expression, or throws a VarNonNumeric error.
 	//
@@ -1561,7 +1606,7 @@ class PUBLIC var_base {
 	ND RETVAR operator+() const;
 
 	// Unary minus.
-	// return: The negative value of a numeric variable or expression, or throws a VarNonNumeric error.
+	// return: The negative of a numeric variable or expression, or throws a VarNonNumeric error. Negative of a negative is a positive.
 	//
 	// `let v1 = 3;
 	//  let v2 = -v1; // -3
@@ -1616,32 +1661,7 @@ class PUBLIC var_base {
 	//
 	RETVARREF operator--() &;
 
-	// Check if a var is numeric.
-	// return: True if a var holds a double, integer, or a string representing a numeric value.
-	// A string is considered numeric if it is:
-	// * Empty (treated as zero), or
-	// * Composed of one or more digits (0-9), an optional leading '+' or '-' sign, and an optional single decimal point ('.') placed before, within, or after the digits.
-	// * Optionally includes an exponential suffix ('e' or 'E', optionally followed by '+' or '-', and 1-3 digits).
-	//
-	// `if (   "+123.45"_var.isnum()) ... ok
-	//  if ("+1.2345e+2"_var.isnum()) ... ok
-	//  if (          ""_var.isnum()) ... ok
-	//  if (not      "."_var.isnum()) ... ok
-	//  // or
-	//  if (isnum("123.")) ... ok`
-	//
-	ND bool isnum() const;
-
-    // Copy a var if it is numeric or 0 if not.
-	// This allows working numerically with data that may be non-numeric.
-	// return: A guaranteed numeric var
-	//
-	// `var v1 = "123.45"_var.num();    // 123.45
-	//  var v2 = "abc"_var.num() + 100; // 100`
-	//
-	ND RETVAR num() const;
-
-/* for doc	
+/* for gendoc
 	// Addition
 	// Any attempt to perform numeric operations on non-numeric strings will throw a runtime error VarNonNumeric.
 	// Floating point numbers are implicitly converted to strings with no more than 12 significant digits of precision. This practically eliminates all floatng point rounding errors.
@@ -1832,6 +1852,15 @@ class PUBLIC var_base {
 	// undocumented overload for int
 	ND RETVAR mod(const int limit) const;
 
+	// Fix the number of decimal places.
+	//
+	// `let v1 = var(123.4).round(2);   // "123.40"
+	//  let v2 = var(123456).round(-3); // "123000"
+	//  // or
+	//  let v3 = round(123.4, 2);`
+	//
+	ND RETVAR round(const int ndecimals = 0) const;
+
 	// Get the precision used for floating point comparisons. The default is 4.
 	// Precision is used when comparing floating point numbers. Practically speaking, standard computer floating point numbers only have about 12 significant decimal digits. Exodus chooses to use these 12 digits to handle numbers in the range +/- 99'999'999.9999 by default.
 	// Exodus precision means the number of significant decimal digits after the decimal place. This is different from standard scientific precision which is defined as the total number of decimal digits.
@@ -1850,15 +1879,6 @@ class PUBLIC var_base {
 	// Set the precision to be used for floating point comparisons.
 	// See getprecision() for more info.
 	   static var  setprecision(int);
-
-	// Fix the number of decimal places.
-	//
-	// `let v1 = var(123.4).round(2);   // "123.40"
-	//  let v2 = var(123456).round(-3); // "123000"
-	//  // or
-	//  let v3 = round(123.4, 2);`
-	//
-	ND RETVAR round(const int ndecimals = 0) const;
 
 	////////////////////
 	/// Stop documenting

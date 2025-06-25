@@ -342,7 +342,7 @@ func main() {
 				continue; // nextline
 			}
 
-			if (srcline.starts("template "))
+			if (srcline.starts("template"))
 				continue; // nextline
 
 			// osfile title is like // gendoc: xxxxxxxxxxxxxx
@@ -1098,9 +1098,12 @@ func main() {
 						} else
 							func_decl = func_decl0;
 
-						if (funcx_const.is_static)
+						if (funcx_const.is_static) {
 							// var(). -> var::
 							func_decl.replacer("().", "::");
+							// var(). -> var::
+							func_decl.replacer("var.", "var::");
+						}
 					}
 
 				} // not is_ctor

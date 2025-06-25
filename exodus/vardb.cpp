@@ -817,7 +817,7 @@ static void to_extract_text(io dictexpression) {
 				dictexpression.replacer("^exodus.extract_datetime\\("_rex, "exodus.extract_text(");
 }
 
-bool var::connect(in conninfo) {
+bool var_db::connect(in conninfo) {
 
 	THISIS("bool var::connect(in conninfo")
 	assertVar(function_sig);
@@ -884,7 +884,7 @@ bool var::connect(in conninfo) {
 
 		let errmsg = "ERROR: vardb: connect() Connection to database failed: " ^ var(PQerrorMessage(pgconn));
 
-		this->setlasterror(errmsg);
+		var::setlasterror(errmsg);
 
 		// Required even if connect fails according to docs
 		PQfinish(pgconn);
@@ -945,12 +945,12 @@ bool var::connect(in conninfo) {
 	// this turns off the notice when creating tables with a primary key
 	// DEBUG5, DEBUG4, DEBUG3, DEBUG2, DEBUG1, LOG, NOTICE, WARNING, ERROR, FATAL, and PANIC
 //	if (not this->sqlexec(var("SET client_min_messages = ") ^ (DBTRACE ? "LOG" : "WARNING"))) UNLIKELY
-//		this->loglasterror();
+//		var::loglasterror();
 
 	return true;
 }
 
-bool var::attach(in filenames) const {
+bool var_db::attach(in filenames) const {
 
 	THISIS("bool var::attach(in filenames")
 	assertVar(function_sig);
@@ -991,14 +991,14 @@ bool var::attach(in filenames) const {
 	// Fail if anything not attached
 	if (notattached_filenames) UNLIKELY {
 		let errmsg = "ERROR: vardb:/attach: " ^ notattached_filenames ^ "cannot be attached on connection " ^ this->f(1).quote();
-		this->setlasterror(errmsg);
+		var::setlasterror(errmsg);
 		return false;
 	}
 
 	return true;
 }
 
-void var::detach(in filenames) {
+void var_db::detach(in filenames) {
 
 	THISIS("bool var::detach(in filenames")
 	assertVar(function_sig);
@@ -1013,7 +1013,7 @@ void var::detach(in filenames) {
 
 // if this->obj contains connection_id, then such connection is disconnected with this-> becomes UNA
 // Otherwise, default connection is disconnected
-void var::disconnect() {
+void var_db::disconnect() {
 
 	THISIS("bool var::disconnect()")
 	assertVar(function_sig);
@@ -1076,7 +1076,7 @@ void var::disconnect() {
 }
 
 // Disconnect the current connection no (or start at 2) and all above
-void var::disconnectall() {
+void var_db::disconnectall() {
 
 	THISIS("bool var::disconnectall()")
 	assertVar(function_sig);
@@ -1113,7 +1113,7 @@ void var::disconnectall() {
 // if (not file.open(filename)) ...
 
 // Connection is optional and default connection may be used instead
-bool var::open(in filename, in connection /*DEFAULTNULL*/) {
+bool var_db::open(in filename, in connection /*DEFAULTNULL*/) {
 
 	THISIS("bool var::open(in filename, in connection)")
 	assertVar(function_sig);
@@ -1217,12 +1217,12 @@ bool var::open(in filename, in connection /*DEFAULTNULL*/) {
 
 	var result;
 	if (not connection2.sqlexec(sql, result)) UNLIKELY
-		throw VarDBException(lasterror());
+		throw VarDBException(var::lasterror());
 
 	// Failure if not found. It is not an error.
 	if (not result.ends("t")) UNLIKELY {
 		let errmsg = filename.quote() ^ " file does not exist.";
-		this->setlasterror(errmsg);
+		var::setlasterror(errmsg);
 		return false;
 	}
 
@@ -1255,11 +1255,11 @@ bool var::open(in filename, in connection /*DEFAULTNULL*/) {
 		;
 
 		if (not connection2.sqlexec(sql)) {
-			throw VarDBException(lasterror());
+			throw VarDBException(var::lasterror());
 		}
 	}
 
-	//this->setlasterror();
+	//var::setlasterror();
 
 	// var becomes a file containing the filename and connection no
 	var_str = normalized_filename.var_str;
@@ -1277,7 +1277,7 @@ bool var::open(in filename, in connection /*DEFAULTNULL*/) {
 	return true;
 }
 
-void var::close() const {
+void var_db::close() const {
 
 	THISIS("void var::close()")
 	assertString(function_sig);
@@ -1286,7 +1286,7 @@ void var::close() const {
 	*/
 }
 
-bool var::readf(in file, in key, const int fieldno) {
+bool var_db::readf(in file, in key, const int fieldno) {
 
 	// Read the whole record first
 	if (not this->read(file, key)) UNLIKELY
@@ -1302,7 +1302,7 @@ bool var::readf(in file, in key, const int fieldno) {
 	return true;
 }
 
-bool var::readc(in file, in key) {
+bool var_db::readc(in file, in key) {
 
 	THISIS("bool var::readc(in file, in key)")
 	assertVar(function_sig);
@@ -1361,7 +1361,7 @@ bool var::readc(in file, in key) {
 	return result;
 }
 
-void var::writec(in file, in key) const {
+void var_db::writec(in file, in key) const {
 
 	THISIS("void var::writec(in file, in key)")
 	assertString(function_sig);
@@ -1381,7 +1381,7 @@ void var::writec(in file, in key) const {
 	return;
 }
 
-bool var::deletec(in key) const {
+bool var_db::deletec(in key) const {
 
 	THISIS("bool var::deletec(in key)")
 	assertString(function_sig);
@@ -1399,7 +1399,93 @@ bool var::deletec(in key) const {
 }
 
 
-bool var::read(in file, in key) {
+////////
+// XLATE - Lookup a db field given file name, key and field number.
+////////
+
+// fieldno can be "" to return the whole record (0 returns the key)
+// TODO provide a version with int fieldno to handle the most frequent case
+// although may also support dictid (of target file) instead of fieldno
+
+var  var_db::xlate(in filename, in fieldno, const char* mode) const {
+
+	THISIS("var  var::xlate(in filename, in fieldno, const char* mode) const")
+	assertString(function_sig);
+	ISSTRING(filename)
+	// fieldnames are supported as exoprog::xlate
+	// but not here in var::xlate which only supports field numbers since it has no
+	// access to dictionaries
+	ISNUMERIC(fieldno)
+
+	// Use filename in case it is a file handle
+	// and can give us a non-default connection
+	auto file = filename;
+
+	// We must open the file (probably cached)
+	// to ensure that sql PREPARED statements are available.
+	// Actually only needed during transactions
+	// but checking that will increase work during transactions
+	// while perhaps being only a little faster otherwise.
+	if (!file.open(filename.lcase()))
+		throw VarDBException("xlate: " ^ var::lasterror());
+
+	char sep = fieldno.len() ? VM_ : RM_;
+
+	// TODO implement multi-key read
+
+	var response = "";
+	int nmv = this->fcount(_VM);
+	for (int vn = 1; vn <= nmv; ++vn) {
+
+		//test every time instead of always appending and removing at the end
+		//because the vast majority of xlate are single valued so it is faster
+		if (vn > 1)
+			response ^= sep;
+
+		// read the record
+		var key = this->f(1, vn);
+		var record;
+		if (!record.readc(file, key)) {
+			// If record doesnt exist then "", or original key if mode is "C"
+
+			// no record and mode C returns the key
+			// gcc warning: comparison with string literal results in unspecified
+			// behaviour if (mode=="C")
+			if (*mode == 'C')
+				response ^= key;
+
+			// no record and mode X or anything else returns ""
+			continue;
+		}
+
+		// extract the field or field 0 means return the whole record
+		if (fieldno) {
+
+			// numeric fieldno not zero return field
+			// if (fieldno.isnum())
+
+			// throw non-numeric error if fieldno not numeric
+			response ^= record.f(fieldno);
+
+			// non-numeric fieldno - cannot call calculate from here
+			// return calculate(fieldno,filename,mode);
+			continue;
+		}
+
+		// fieldno "" returns whole record
+		if (!fieldno.len()) {
+			response ^= record;
+			continue;
+		}
+
+		// field no 0 returns key
+		response ^= key;
+	}
+	//response.convert(FM^VM,"^]").outputl("RESPONSE=");
+	return response;
+}
+
+bool var_db::read(in file, in key) {
 
 	THISIS("bool var::read(in file, in key)")
 	assertVar(function_sig);
@@ -1447,7 +1533,7 @@ bool var::read(in file, in key) {
 
 		var response;
 		if (not sqlexec(sql, response)) {
-			loglasterror();
+			var::loglasterror();
 			return false;
 		}
 		if (response) {
@@ -1464,7 +1550,7 @@ bool var::read(in file, in key) {
 	const auto pgconn = get_pgconn(file);
 	if (not pgconn) UNLIKELY {
 		let errmsg = "var::read() get_pgconn() failed for " ^ file;
-		this->setlasterror(errmsg);
+		var::setlasterror(errmsg);
 		throw VarDBException(errmsg);
 	}
 
@@ -1523,7 +1609,7 @@ bool var::read(in file, in key) {
 			} else
 				errmsg ^= " " ^ (var(dbresult.pqerrmsg) ?: var(PQerrorMessage(pgconn))).trimlast("\n") ^ ". sqlstate:" ^ sqlstate;
 
-			this->setlasterror(errmsg);
+			var::setlasterror(errmsg);
 			throw VarDBException(errmsg);
 		}
 		break;
@@ -1533,7 +1619,7 @@ bool var::read(in file, in key) {
 
 		// Leave unassigned if not read
 
-		this->setlasterror("ERROR: vardb: read(" ^ file.convert("." _FM, "_^").replace("dict_","dict.").quote() ^ ") record does not exist " ^
+		var::setlasterror("ERROR: vardb: read(" ^ file.convert("." _FM, "_^").replace("dict_","dict.").quote() ^ ") record does not exist " ^
 					key.quote());
 		return false;
 	}
@@ -1541,7 +1627,7 @@ bool var::read(in file, in key) {
 	// A serious error
 	if (PQntuples(dbresult) > 1) UNLIKELY {
 		let errmsg = "ERROR: vardb: read() SELECT returned more than one record";
-		this->setlasterror(errmsg);
+		var::setlasterror(errmsg);
 		throw VarDBException(errmsg);
 	}
 
@@ -1573,7 +1659,7 @@ var  var_stg::hash(const std::uint64_t modulus) const {
 // 1  - Success
 // "" - Failure - already locked and not in a transaction
 // 2  - Success - already locked and in a transaction
-var  var::lock(in key) const {
+var  var_db::lock(in key) const {
 
 	// on postgres, repeated locks for the same thing (from the same connection) succeed and
 	// stack up they need the same number of unlocks (from the same connection) before other
@@ -1590,7 +1676,7 @@ var  var::lock(in key) const {
 		if (this->assigned())
 			errmsg ^= *this ^ ", ";
 		errmsg ^= key;
-		this->setlasterror(errmsg);
+		var::setlasterror(errmsg);
 		throw VarDBException(errmsg);
 	}
 
@@ -1645,7 +1731,7 @@ var  var::lock(in key) const {
 			(var(dbresult.pqerrmsg) ?: var(PQerrorMessage(pgconn))).trimlast("\n") ^ ". sqlstate" ^ sqlstate ^ " PQresultStatus=" ^
 			var(PQresStatus(PQresultStatus(dbresult))) ^ ", PQntuples=" ^
 			var(PQntuples(dbresult));
-		this->setlasterror(errmsg);
+		var::setlasterror(errmsg);
 		throw VarDBException(errmsg);
 	}
 
@@ -1662,7 +1748,7 @@ var  var::lock(in key) const {
 
 }
 
-bool var::unlock(in key) const {
+bool var_db::unlock(in key) const {
 
 
 	THISIS("void var::unlock(in key) const")
@@ -1677,7 +1763,7 @@ bool var::unlock(in key) const {
 		if (this->assigned())
 			errmsg ^= *this ^ ", ";
 		errmsg ^= key;
-		this->setlasterror(errmsg);
+		var::setlasterror(errmsg);
 		throw VarDBException(errmsg);
 	}
 
@@ -1721,7 +1807,7 @@ bool var::unlock(in key) const {
 				(var(dbresult.pqerrmsg) ?: var(PQerrorMessage(pgconn))).trimlast("\n") ^ "\nsqlstate" ^ sqlstate ^ " PQresultStatus=" ^
 				var(PQresStatus(PQresultStatus(dbresult))) ^ ", PQntuples=" ^
 				var(PQntuples(dbresult));
-		this->setlasterror(errmsg);
+		var::setlasterror(errmsg);
 		throw VarDBException(errmsg);
 	}
 
@@ -1729,7 +1815,7 @@ bool var::unlock(in key) const {
 	return PQntuples(dbresult) == 1;
 }
 
-bool var::unlockall() const {
+bool var_db::unlockall() const {
 
 	THISIS("void var::unlockall() const")
 	assertVar(function_sig);
@@ -1739,7 +1825,7 @@ bool var::unlockall() const {
 		var errmsg = "var::unlockall() get_pgconn() failed. ";
 		if (this->assigned())
 			errmsg ^= *this;
-		this->setlasterror(errmsg);
+		var::setlasterror(errmsg);
 		throw VarDBException(errmsg);
 	}
 
@@ -1761,11 +1847,11 @@ bool var::unlockall() const {
 
 }
 
-// returns only success or failure and any response is logged and saved for future lasterror() call
-bool var::sqlexec(in sql) const {
+// returns only success or failure and any response is logged and saved for future var::lasterror() call
+bool var_db::sqlexec(in sql) const {
 	var response = -1;	//no response required
 	if (not this->sqlexec(sql, response)) UNLIKELY {
-		this->setlasterror(response);
+		var::setlasterror(response);
 		return false;
 	}
 	return true;
@@ -1774,7 +1860,7 @@ bool var::sqlexec(in sql) const {
 // Returns success or failure
 // response [out] data or errmsg
 // response [in] can be preset to max number of tuples)
-bool var::sqlexec(in sqlcmd, io response) const {
+bool var_db::sqlexec(in sqlcmd, io response) const {
 
 	THISIS("bool var::sqlexec(in sqlcmd, io response) const")
 	ISSTRING(sqlcmd)
@@ -1782,7 +1868,7 @@ bool var::sqlexec(in sqlcmd, io response) const {
 	const auto pgconn = get_pgconn(*this);
 	if (not pgconn) UNLIKELY {
 		let errmsg = "var::sqlexec() get_pgconn() failed. " ^ (this->assigned() ? *this : "");
-		this->setlasterror(errmsg);
+		var::setlasterror(errmsg);
 		throw VarDBException(errmsg);
 	}
 
@@ -1850,7 +1936,7 @@ bool var::sqlexec(in sqlcmd, io response) const {
 }
 
 // writef writes a specific field number in a record
-void var::writef(in file, in key, const int fieldno) const {
+void var_db::writef(in file, in key, const int fieldno) const {
 
 	// Just write the whole record if field no isnt positive
 	if (fieldno <= 0) {
@@ -1885,7 +1971,7 @@ two field file is so simple void var::write(in file, in key) const {}
 */
 
 //"update if present or insert if not" is handled in postgres using ON CONFLICT clause
-void var::write(in file, in key) const {
+void var_db::write(in file, in key) const {
 
 	THISIS("void var::write(in file, in key) const")
 	assertString(function_sig);
@@ -1900,7 +1986,7 @@ void var::write(in file, in key) const {
 		//this->oswrite(key2); //.convert("\\",OSSLASH));
 		//use osfilenames unnormalised so we can read and write as is
 		if (not this->oswrite(key)) {
-			throw VarError("Could not oswrite " ^ key.squote() ^ ". " ^ this->lasterror());
+			throw VarError("Could not oswrite " ^ key.squote() ^ ". " ^ var::lasterror());
 		}
 		return;
 	}
@@ -1913,7 +1999,7 @@ void var::write(in file, in key) const {
 	if (not pgconn) UNLIKELY {
 		var errmsg = "var::write() get_pgconn() failed. ";
 		errmsg ^= file ^ ", " ^ key;
-		this->setlasterror(errmsg);
+		var::setlasterror(errmsg);
 		throw VarDBException(errmsg);
 	}
 
@@ -1989,7 +2075,7 @@ void var::write(in file, in key) const {
 
 //"updaterecord" is non-standard for pick - but allows "write only if already exists" logic
 
-bool var::updaterecord(in file, in key) const {
+bool var_db::updaterecord(in file, in key) const {
 
 	THISIS("bool var::updaterecord(in file, in key) const")
 	assertString(function_sig);
@@ -2007,7 +2093,7 @@ bool var::updaterecord(in file, in key) const {
 	if (not pgconn) UNLIKELY {
 		var errmsg = "var::updaterecord() get_pgconn() failed. ";
 		errmsg ^= file ^ ", " ^ key;
-		this->setlasterror(errmsg);
+		var::setlasterror(errmsg);
 		throw VarDBException(errmsg);
 	}
 
@@ -2037,7 +2123,7 @@ bool var::updaterecord(in file, in key) const {
 		let errmsg = "ERROR: vardb: update(" ^ file.convert(_FM, "^") ^
 				", " ^ key ^ ") sqlstate " ^ sqlstate ^ " Failed: " ^ var(PQntuples(dbresult)) ^ " " ^
 				(var(dbresult.pqerrmsg) ?: var(PQerrorMessage(pgconn))).trimlast("\n");
-		this->setlasterror(errmsg);
+		var::setlasterror(errmsg);
 		throw VarDBException(errmsg);
 	}
 
@@ -2056,7 +2142,7 @@ bool var::updaterecord(in file, in key) const {
 
 //"updatekey" is non-standard for pick - but allows changing record keys without rewriting records.
 
-bool var::updatekey(in key, in newkey) const {
+bool var_db::updatekey(in key, in newkey) const {
 
 	THISIS("bool var::updatekey(in key, in newkey) const")
 	assertString(function_sig);
@@ -2076,7 +2162,7 @@ bool var::updatekey(in key, in newkey) const {
 		let errmsg =
 			"ERROR: vardb: updatekey(" ^ this->convert(_FM, "^") ^ ", " ^ key ^ " -> " ^ newkey ^ ") "
 			"get_pgconn() failed. ";
-		this->setlasterror(errmsg);
+		var::setlasterror(errmsg);
 		throw VarDBException(errmsg);
 	}
 
@@ -2108,7 +2194,7 @@ bool var::updatekey(in key, in newkey) const {
 			"ERROR: vardb: updatekey(" ^ this->convert(_FM, "^") ^ ", " ^ key ^ " -> " ^ newkey ^ ") "
 			"sqlstate " ^ sqlstate ^ " Failed: " ^ var(PQntuples(dbresult)) ^ " " ^
 			(var(dbresult.pqerrmsg) ?: var(PQerrorMessage(pgconn))).trimlast("\n");
-		this->setlasterror(errmsg);
+		var::setlasterror(errmsg);
 
 		// Duplicate key is a normal error. Do not throw
 		if (sqlstate == 23505) {
@@ -2135,7 +2221,7 @@ bool var::updatekey(in key, in newkey) const {
 //"insertrecord" is non-standard for pick - but allows faster writes under "write only if doesnt
 // already exist" logic
 
-bool var::insertrecord(in file, in key) const {
+bool var_db::insertrecord(in file, in key) const {
 
 	THISIS("bool var::insertrecord(in file, in key) const")
 	assertString(function_sig);
@@ -2154,7 +2240,7 @@ bool var::insertrecord(in file, in key) const {
 	if (not pgconn) UNLIKELY {
 		var errmsg = "var::insertrecord() get_pgconn() failed. ";
 		errmsg ^= file ^ ", " ^ key;
-		this->setlasterror(errmsg);
+		var::setlasterror(errmsg);
 		throw VarDBException(errmsg);
 	}
 
@@ -2191,7 +2277,7 @@ bool var::insertrecord(in file, in key) const {
 				file.convert(_FM, "^") ^ ", " ^ key ^ ") Failed: " ^
 				var(PQntuples(dbresult)) ^ " sqlstate" ^ sqlstate ^ " " ^
 				(var(dbresult.pqerrmsg) ?: var(PQerrorMessage(pgconn))).trimlast("\n");
-		this->setlasterror(errmsg);
+		var::setlasterror(errmsg);
 		throw VarDBException(errmsg);
 	}
 
@@ -2207,7 +2293,7 @@ bool var::insertrecord(in file, in key) const {
 	return true;
 }
 
-bool var::deleterecord(in key) const {
+bool var_db::deleterecord(in key) const {
 
 	THISIS("bool var::deleterecord(in key) const")
 	assertString(function_sig);
@@ -2231,7 +2317,7 @@ bool var::deleterecord(in key) const {
 		if (this->assigned())
 			errmsg ^= *this ^ ", ";
 		errmsg ^= key;
-		this->setlasterror(errmsg);
+		var::setlasterror(errmsg);
 		throw VarDBException(errmsg);
 	}
 
@@ -2306,7 +2392,7 @@ bool var::deleterecord(in key) const {
 	return result;
 }
 
-void var::clearcache() const {
+void var_db::clearcache() const {
 
 	THISIS("bool var::clearcache() const")
 	assertVar(function_sig);
@@ -2340,7 +2426,7 @@ var getTransactionStatus(PGconn* conn) {
     }
 }
 
-bool var::begintrans() const {
+bool var_db::begintrans() const {
 
 	THISIS("bool var::begintrans() const")
 	assertVar(function_sig);
@@ -2360,7 +2446,7 @@ bool var::begintrans() const {
 	// Only active while an (async?) SQL command is in progress.
 //	if (status != "INTRANS" && status != "ACTIVE") {
 	if (status != "INTRANS") {
-		setlasterror("Failed to begin transaction. Status: " ^ status);
+		var::setlasterror("Failed to begin transaction. Status: " ^ status);
 		return false;
 	}
 
@@ -2373,7 +2459,7 @@ bool var::begintrans() const {
 
 }
 
-bool var::rollbacktrans() const {
+bool var_db::rollbacktrans() const {
 
 	THISIS("bool var::rollbacktrans() const")
 	assertVar(function_sig);
@@ -2396,7 +2482,7 @@ bool var::rollbacktrans() const {
 	return true;
 }
 
-bool var::committrans() const {
+bool var_db::committrans() const {
 
 	THISIS("bool var::committrans() const")
 	assertVar(function_sig);
@@ -2419,17 +2505,17 @@ bool var::committrans() const {
 	// Rollback if in error and indicate failure
 	if (status == "INERROR") {
 		if (this->rollbacktrans())
-			setlasterror("");
+			var::setlasterror("");
 		else
-			lasterror().errputl();
-		setlasterror("COMMITTRANS: Failed and rolled back due to status:" ^ status ^ " " ^ lasterror());
+			var::lasterror().errputl();
+		var::setlasterror("COMMITTRANS: Failed and rolled back due to status:" ^ status ^ " " ^ var::lasterror());
 		return false;
 	}
 
 	// Indicate failure if status incorrect.
 	if (status != "INTRANS" && status != "ACTIVE" && status != "IDLE") {
 		result = false;
-		setlasterror("COMMITTRANS: Failed. ROLLBACK due to transaction status: " ^ status);
+		var::setlasterror("COMMITTRANS: Failed. ROLLBACK due to transaction status: " ^ status);
 	}
 
 	// End (commit) a transaction.
@@ -2442,7 +2528,7 @@ bool var::committrans() const {
 
 }
 
-bool var::statustrans() const {
+bool var_db::statustrans() const {
 
 	THISIS("bool var::statustrans() const")
 	assertVar(function_sig);
@@ -2462,7 +2548,7 @@ bool var::statustrans() const {
 // connectionhandle.connect("connection string pars");
 // connectionhandle.dbcreate("mynewdb");
 
-bool var::dbcopy(in from_dbname, in to_dbname) const {
+bool var_db::dbcopy(in from_dbname, in to_dbname) const {
 	THISIS("bool var::dbcopy(in from_dbname, in new_dbname) const")
 	assertVar(function_sig);
 	ISSTRING(from_dbname)
@@ -2470,14 +2556,14 @@ bool var::dbcopy(in from_dbname, in to_dbname) const {
 
 	// Ensure to_dbname is provided to avoid bugs in app code
 	if (not to_dbname) {
-		this->setlasterror("dbcopy() requires new_dbname");
+		var::setlasterror("dbcopy() requires new_dbname");
 		return false;
 	}
 
 	return this->dbcreate(to_dbname, from_dbname);
 }
 
-bool var::dbcreate(in new_dbname, in old_dbname /* = "" */) const {
+bool var_db::dbcreate(in new_dbname, in old_dbname /* = "" */) const {
 
 	THISIS("bool var::dbcreate(in new_dbname, in old_dbname) const")
 	assertVar(function_sig);
@@ -2519,7 +2605,7 @@ bool var::dbcreate(in new_dbname, in old_dbname /* = "" */) const {
 
 }
 
-bool var::dbdelete(in dbname) const {
+bool var_db::dbdelete(in dbname) const {
 
 	THISIS("bool var::dbdelete(in dbname)")
 	assertVar(function_sig);
@@ -2528,14 +2614,14 @@ bool var::dbdelete(in dbname) const {
 	// Fail neatly if the database does not exist.
 	// SQL errors during a transaction cause the whole transaction to fail.
 	if (not this->clone().dblist().lower().locate(dbname)) UNLIKELY {
-		setlasterror(dbname.quote() ^ " db does not exist.");
+		var::setlasterror(dbname.quote() ^ " db does not exist.");
 		return false;
 	}
 
 	return this->sqlexec("DROP DATABASE " ^ dbname);
 }
 
-bool var::createfile(in filename) const {
+bool var_db::createfile(in filename) const {
 
 	THISIS("bool var::createfile(in filename)")
 	assertVar(function_sig);
@@ -2550,7 +2636,7 @@ bool var::createfile(in filename) const {
 	// Fail neatly if the file already exists.
 	// SQL errors during a transaction cause the whole transaction to fail.
 	if (this->clone().open(filename)) UNLIKELY {
-		setlasterror(filename.quote() ^ " already exists.");
+		var::setlasterror(filename.quote() ^ " already exists.");
 		return false;
 	}
 
@@ -2568,14 +2654,14 @@ bool var::createfile(in filename) const {
 
 	// Open it as well to get prepared statements implemented by open
 	if (not this->clone().open(filename, *this)) UNLIKELY {
-		setlasterror(filename.quote() ^ " created but cannot be opened.");
+		var::setlasterror(filename.quote() ^ " created but cannot be opened.");
 		return false;
 	}
 
 	return true;
 }
 
-bool var::renamefile(in filename, in newfilename) const {
+bool var_db::renamefile(in filename, in newfilename) const {
 
 	THISIS("bool var::renamefile(in filename, in newfilename)")
 	assertVar(function_sig);
@@ -2588,7 +2674,7 @@ bool var::renamefile(in filename, in newfilename) const {
 //	var file;
 //	if (not file.open(filename, *this)) UNLIKELY {
 	if (not this->clone().open(filename, *this)) UNLIKELY {
-		setlasterror(filename.quote() ^ " cannot be renamed because it does not exist.");
+		var::setlasterror(filename.quote() ^ " cannot be renamed because it does not exist.");
 		return false;
 	}
 
@@ -2596,7 +2682,7 @@ bool var::renamefile(in filename, in newfilename) const {
 	// SQL errors during a transaction cause the whole transaction to fail.
 //	if (file.open(newfilename, *this)) UNLIKELY {
 	if (this->clone().open(newfilename, *this)) UNLIKELY {
-		setlasterror(filename.quote() ^ " cannot be renamed because " ^ newfilename.quote() ^ " already exists.");
+		var::setlasterror(filename.quote() ^ " cannot be renamed because " ^ newfilename.quote() ^ " already exists.");
 		return false;
 	}
 
@@ -2608,12 +2694,12 @@ bool var::renamefile(in filename, in newfilename) const {
 
 //	if (not file.sqlexec(sql)) UNLIKELY
 	if (not this->sqlexec(sql)) UNLIKELY
-		throw VarDBException(this->lasterror());
+		throw VarDBException(var::lasterror());
 
 	return true;
 }
 
-bool var::deletefile(in filename) const {
+bool var_db::deletefile(in filename) const {
 
 	THISIS("bool var::deletefile(in filename)")
 	assertVar(function_sig);
@@ -2625,7 +2711,7 @@ bool var::deletefile(in filename) const {
 //	var file;
 //	if (not file.open(filename, *this)) UNLIKELY {
 	if (not this->clone().open(filename, *this)) UNLIKELY {
-		setlasterror(filename.quote() ^ " cannot be deleted because it does not exist.");
+		var::setlasterror(filename.quote() ^ " cannot be deleted because it does not exist.");
 		return false;
 	}
 
@@ -2641,12 +2727,12 @@ bool var::deletefile(in filename) const {
 	let sql = "DROP TABLE " ^ filename.f(1) ^ " CASCADE";
 
 	if (not this->clone().sqlexec(sql)) UNLIKELY
-		throw VarDBException(this->lasterror());
+		throw VarDBException(var::lasterror());
 
 	return true;
 }
 
-bool var::clearfile(in filename) const {
+bool var_db::clearfile(in filename) const {
 
 	THISIS("bool var::clearfile(in filename)")
 	assertVar(function_sig);
@@ -2657,14 +2743,14 @@ bool var::clearfile(in filename) const {
 //	var file;
 //	if (not file.open(filename, *this)) UNLIKELY {
 	if (not this->clone().open(filename, *this)) UNLIKELY {
-		setlasterror(filename.quote() ^ " cannot be cleared because it does not exist.");
+		var::setlasterror(filename.quote() ^ " cannot be cleared because it does not exist.");
 		return false;
 	}
 
 	let sql = "DELETE FROM " ^ filename.f(1);
 //	if (not file.sqlexec(sql)) UNLIKELY
 	if (not this->sqlexec(sql)) UNLIKELY
-		throw VarDBException(this->lasterror());
+		throw VarDBException(var::lasterror());
 
 	return true;
 }
@@ -3414,7 +3500,7 @@ static var getword(io remainingwords, io ucword) {
 	return word1;
 }
 
-bool var::select(in sortselectclause) {
+bool var_db::select(in sortselectclause) {
 
 	THISIS("bool var::select(in sortselectclause) const")
 	assertVar(function_sig);
@@ -3433,7 +3519,7 @@ bool var::select(in sortselectclause) {
 
 // Currently only called from select, selectrecord and getlist
 // TODO merge into plain select()?
-bool var::selectx(in fieldnames, in sortselectclause) {
+bool var_db::selectx(in fieldnames, in sortselectclause) {
 
 //	// private - and arguments are left unchecked for speed
 //	//?allow unconstructed usage like var xyz=xyz.select();
@@ -3460,7 +3546,7 @@ bool var::selectx(in fieldnames, in sortselectclause) {
 
 	var actualfilename = get_normalized_filename(*this);
 	var dictfilename = actualfilename;
-	var actualfieldnames = fieldnames;
+	auto actualfieldnames = fieldnames;
 	var dictfile = "";
 	var keycodes = "";
 	bool bykey = false;
@@ -4538,7 +4624,7 @@ bool var::selectx(in fieldnames, in sortselectclause) {
 		while (this->readnext(key)) {
 			//std::clog<<key<<std::endl;
 			if (not this->sqlexec("INSERT INTO " ^ temptablename ^ "(KEY) VALUES('" ^ key.replace("'", "''") ^ "')")) UNLIKELY
-				throw VarDBException(lasterror());
+				throw VarDBException(var::lasterror());
 		}
 
 		if (this->f(3)) UNLIKELY {
@@ -4552,7 +4638,7 @@ bool var::selectx(in fieldnames, in sortselectclause) {
 	// Check file exists on the same connection
 	var file;
 	if (not file.open(actualfilename, *this)) {
-		throw VarDBException(lasterror());
+		throw VarDBException(var::lasterror());
 	}
 
 	//////////////////////////////////////////
@@ -4669,13 +4755,14 @@ bool var::selectx(in fieldnames, in sortselectclause) {
 	if (calc_fields) {
 		calc_fields(5) = dictfilename.lower();
 		calc_fields(6) = maxnrecs;
-		(*this)(10) = calc_fields.lower();
+//		(*this)(10) = calc_fields.lower();
+		this->updater(10, calc_fields.lower());
 	}
 
 	return true;
 }
 
-void var::clearselect() {
+void var_db::clearselect() {
 
 	if (DBTRACE>1)
 		var("clearselect");
@@ -4870,7 +4957,7 @@ static bool readnextx(in cursor, DBconn_ptr pgconn, int direction, PGresult*& pg
 	return true;
 }
 
-bool var::deletelist(SV listname) const {
+bool var_db::deletelist(SV listname) const {
 
 	THISIS("bool var::deletelist(SV listname) const")
 	assertVar(function_sig);
@@ -4900,7 +4987,7 @@ bool var::deletelist(SV listname) const {
 	return result;
 }
 
-bool var::savelist(SV listname) {
+bool var_db::savelist(SV listname) {
 
 	THISIS("bool var::savelist(SV listname)")
 	assertVar(function_sig);
@@ -4912,7 +4999,7 @@ bool var::savelist(SV listname) {
 	var lists;
 	if (not lists.open("LISTS", *this)) UNLIKELY {
 		let errmsg = "savelist() LISTS file cannot be opened";
-		this->setlasterror(errmsg);
+		var::setlasterror(errmsg);
 		throw VarDBException(errmsg);
 	}
 
@@ -4982,12 +5069,12 @@ bool var::savelist(SV listname) {
 	// Write any pending list
 	write_list();
 
-	setlasterror(nkeys);
+	var::setlasterror(nkeys);
 
 	return listno > 1;
 }
 
-bool var::getlist(SV listname) {
+bool var_db::getlist(SV listname) {
 
 	THISIS("bool var::getlist(SV listname) const")
 	assertVar(function_sig);
@@ -5005,7 +5092,7 @@ bool var::getlist(SV listname) {
 	var lists;
 	if (not lists.open("LISTS", *this)) UNLIKELY {
 		let errmsg = "getlist() LISTS file cannot be opened";
-		this->setlasterror(errmsg);
+		var::setlasterror(errmsg);
 		throw VarDBException(errmsg);
 	}
 
@@ -5031,7 +5118,7 @@ bool var::getlist(SV listname) {
 	return true;
 }
 
-bool var::selectkeys(in keys) {
+bool var_db::selectkeys(in keys) {
 
 	THISIS("bool var::selectkeys(in keys)")
 	assertVar(function_sig);
@@ -5045,7 +5132,7 @@ bool var::selectkeys(in keys) {
 	// Keys must be provided
 	if (keys.empty()) {
 		const var errmsg = "selectkeys() keys cannot be empty";
-		this->setlasterror(errmsg);
+		var::setlasterror(errmsg);
 		return false;
 	}
 
@@ -5071,7 +5158,7 @@ bool var::selectkeys(in keys) {
 }
 
 //bool var::hasnext() const {
-bool var::hasnext() {
+bool var_db::hasnext() {
 
 	THISIS("bool var::hasnext() const")
 	// assertString(function_sig);
@@ -5099,7 +5186,7 @@ bool var::hasnext() {
 		var lists;
 		if (not lists.open("LISTS", *this)) UNLIKELY {
 			let errmsg = "var::hasnext(): LISTS file cannot be opened";
-			this->setlasterror(errmsg);
+			var::setlasterror(errmsg);
 			throw VarDBException(errmsg);
 		}
 
@@ -5134,7 +5221,7 @@ bool var::hasnext() {
 	const auto pgconn = get_pgconn(*this);
 	if (not pgconn) UNLIKELY {
 		let errmsg = "var::hasnext() get_pgconn() failed for " ^ this->quote();
-		this->setlasterror(errmsg);
+		var::setlasterror(errmsg);
 		throw VarDBException(errmsg);
 	}
 	// The following pair of db requests is rather slow
@@ -5154,12 +5241,12 @@ bool var::hasnext() {
 	return true;
 }
 
-bool var::readnext(io key) {
+bool var_db::readnext(io key) {
 	var valueno;
 	return this->readnext(key, valueno);
 }
 
-bool var::readnext(io key, io valueno) {
+bool var_db::readnext(io key, io valueno) {
 
 	THISIS("bool var::readnext(io key, io valueno) const")
 	assertVar(function_sig);
@@ -5171,7 +5258,7 @@ bool var::readnext(io key, io valueno) {
 	return this->readnext(record, key, valueno);
 }
 
-bool var::readnext(io record, io key, io valueno) {
+bool var_db::readnext(io record, io key, io valueno) {
 
 	THISIS("bool var::readnext(io record, io key, io valueno) const")
 	assertVar(function_sig);
@@ -5211,7 +5298,7 @@ bool var::readnext(io record, io key, io valueno) {
 				var lists;
 				if (not lists.open("LISTS", *this)) UNLIKELY {
 					let errmsg = "readnext() LISTS file cannot be opened";
-			        this->setlasterror(errmsg);
+			        var::setlasterror(errmsg);
 					throw VarDBException(errmsg);
 				}
 
@@ -5295,7 +5382,7 @@ bool var::readnext(io record, io key, io valueno) {
 	return true;
 }
 
-bool var::createindex(in fieldname0, in dictfile) const {
+bool var_db::createindex(in fieldname0, in dictfile) const {
 
 	THISIS("bool var::createindex(in fieldname, in dictfile) const")
 	assertString(function_sig);
@@ -5367,7 +5454,7 @@ bool var::createindex(in fieldname0, in dictfile) const {
 	// Fail neatly if the index already exists
 	// SQL errors during a transaction cause the whole transaction to fail.
 	if (this->listindex(filename, fieldname)) UNLIKELY {
-		setlasterror(filename.quote() ^ ", " ^ fieldname.quote() ^ " index already exists.");
+		var::setlasterror(filename.quote() ^ ", " ^ fieldname.quote() ^ " index already exists.");
 		return false;
 	}
 
@@ -5393,7 +5480,7 @@ bool var::createindex(in fieldname0, in dictfile) const {
 	return true;
 }
 
-bool var::deleteindex(in fieldname0) const {
+bool var_db::deleteindex(in fieldname0) const {
 
 	THISIS("bool var::deleteindex(in fieldname) const")
 	assertString(function_sig);
@@ -5411,7 +5498,7 @@ bool var::deleteindex(in fieldname0) const {
 	// Fail neatly if the index does not exist
 	// SQL errors during a transaction cause the whole transaction to fail.
 	if (not this->listindex(filename, fieldname)) UNLIKELY {
-		setlasterror(filename.quote() ^ ", " ^ fieldname.quote() ^ " index does not exist.");
+		var::setlasterror(filename.quote() ^ ", " ^ fieldname.quote() ^ " index does not exist.");
 		return false;
 	}
 
@@ -5420,7 +5507,7 @@ bool var::deleteindex(in fieldname0) const {
 	return this->sqlexec(sql);
 }
 
-var  var::listfiles() const {
+var  var_db::listfiles() const {
 
 	THISIS("var  var::listfiles() const")
 	assertVar(function_sig);
@@ -5473,7 +5560,7 @@ var  var::listfiles() const {
 	return filenames;
 }
 
-var  var::dblist() const {
+var  var_db::dblist() const {
 
 	THISIS("var  var::dblist() const")
 	assertVar(function_sig);
@@ -5507,7 +5594,7 @@ var  var::dblist() const {
 	return dbnames.sort();
 }
 
-bool var::dbcursorexists() {
+bool var_db::dbcursorexists() {
 
 	THISIS("bool var::dbcursorexists()")
 	assertVar(function_sig);
@@ -5541,7 +5628,7 @@ bool var::dbcursorexists() {
 	return PQntuples(dbresult) > 0;
 }
 
-var  var::listindex(in filename0, in fieldname0) const {
+var  var_db::listindex(in filename0, in fieldname0) const {
 
 	THISIS("var  var::listindex(in filename, in fieldname) const")
 	assertVar(function_sig);
@@ -5612,19 +5699,19 @@ var  var::listindex(in filename0, in fieldname0) const {
 	return result;
 }
 
-var  var::reccount(in filename0) const {
+var  var_db::reccount(in filename0) const {
 
 	THISIS("var  var::reccount(in file_or_filename) const")
 	assertVar(function_sig);
 	ISSTRING(filename0)
 
 	// Use var if filename not provided.
-	let filename = filename0 ?: (*this);
+	const auto filename = filename0 ?: (*this);
 
 	// Vacuum first otherwise the count is unreliable
 	// Sadly doesnt work in transactions
 	if (not this->flushindex(filename))
-		this->lasterror().logputl();
+		var::lasterror().logputl();
 
 	let sql = "SELECT reltuples::integer FROM pg_class WHERE relname = '" ^ filename.f(1).lcase() ^ "';";
 
@@ -5653,7 +5740,7 @@ var  var::reccount(in filename0) const {
 	return nrvo;
 }
 
-bool var::flushindex(in filename) const {
+bool var_db::flushindex(in filename) const {
 
 	THISIS("bool var::flushindex(in filename) const")
 	assertVar(function_sig);
@@ -5661,7 +5748,7 @@ bool var::flushindex(in filename) const {
 
 	// Skip if in a transaction
 	if (this->statustrans()) {
-		setlasterror("Error: var::flushindex cannot vacuum while transaction is active");
+		var::setlasterror("Error: var::flushindex cannot vacuum while transaction is active");
 		return false;
 	}
 
@@ -5670,19 +5757,19 @@ bool var::flushindex(in filename) const {
 	// TODO perhaps should get connection from file if passed a file
 	const auto pgconn = get_pgconn(*this);
 	if (not pgconn) UNLIKELY {
-		setlasterror("Error: var::flushindex cannot get a connection " ^ filename);
+		var::setlasterror("Error: var::flushindex cannot get a connection " ^ filename);
 		return false;
 	}
 
 	// Execute command or return false
 //	DBresult dbresult;
 //	if (not get_dbresult(sql, dbresult, pgconn)) UNLIKELY {
-//		setlasterror("Error: var::flushindex failed to get a result.");
+//		var::setlasterror("Error: var::flushindex failed to get a result.");
 //		return false;
 //	}
 	var ok; const DBresult dbresult = get_dbresult(sql, pgconn, ok);
 	if (not ok) {
-		setlasterror("Error: var::flushindex failed to get a result.");
+		var::setlasterror("Error: var::flushindex failed to get a result.");
 		return false;
 	}
 

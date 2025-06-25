@@ -520,6 +520,7 @@ std::fstream* var_os::osopenx(in osfilename, const bool utf8, const bool autocre
 	auto opening_options = std::fstream::out | std::fstream::in | std::fstream::binary;
 
 	if (osfilename.starts("std") and (osfilename == "stdout" or osfilename == "stderr")) {
+//	if (osfilename.var_str.starts_with("std") and (osfilename == "stdout" or osfilename == "stderr")) {
 
 		// Open /dev/stdout or /dev/stderr  - binary w
 		opening_options ^= std::fstream::in;

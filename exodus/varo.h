@@ -3,6 +3,8 @@
 
 // gendoc: var - OS functions
 
+#include <exodus/vars.h>
+
 namespace exo {
 
 	class rex;

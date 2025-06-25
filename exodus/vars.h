@@ -3,6 +3,8 @@
 
 // gendoc: var - String functions
 
+#include <exodus/var_iter.h>
+
 namespace exo {
 
 	class rex;
@@ -51,7 +53,7 @@ public:
 
 	/* fake for gendoc
 
-	// String concatention operator ^
+	// String concatenation operator ^
 	// At least one side must be a var.
 	// "aa" ^ "22" will not compile but "aa" "22" will.
 	// Floating point numbers are implicitly converted to strings with no more than 12 significant digits of precision. This practically eliminates all floatng point rounding errors.
@@ -65,32 +67,6 @@ public:
 	//  v1 ^= 22; // v1 -> "aa22"`
 	ND var operator^=(var);
 
-	// Round a number.
-	// Convert a number into a string after rounding it to a given number of decimal places.
-	// Trailing zeros are not omitted. A leading "0." is shown where appropriate.
-    // 0.5 always rounds away from zero. i.e. 1.5 -> 2 and -2.5 -> -3
-	// var: The number to be converted.
-	// ndecimals: Determines how many decimal places are shown to the right of the decimal point or, if ndecimals is negative, how many 0's to the left of it.
-	// return: A var containing an ASCII string of digits with a leading "-" if negative, and a decimal point "." if ndecimals is > 0.
-	// obj is varnum
-	//
-    // `let v1 = var(0.295).round(2);  //  "0.30"
-    //  // or
-    //  let v2 = round(1.295, 2);      //  "1.30"
-	//
-    //  var v3 = var(-0.295).round(2); // "-0.30"
-    //  // or
-    //  var v4 = round(-1.295, 2);     // "-1.30"
-	//
-	//  var v5 = round(0, 1);           // "0.0"
-	//  var v6 = round(0, 0);           // "0"
-	//  var v7 = round(0, -1);          // "0"`
-	// Negative number of decimals rounds to the left of the decimal point
-	// `let v1 = round(123456.789,  0); // "123457"
-	//  let v2 = round(123456.789, -1); // "123460"
-	//  let v3 = round(123456.789, -2); // "123500"`
-	//
-    ND var  round(const int ndecimals = 0) const;
 	*/
 
 	// obj is var()
@@ -202,30 +178,6 @@ public:
 	//
 	ND var  textord() const;
 
-	/* fake doc for varb.h
-
-	// Get the length of a source string in number of chars.
-	// return: A number
-	//
-	// `let v1 = "abc"_var.len(); // 3
-	//  // or
-	//  let v2 = len("abc");`
-	//
-	ND var  len() const;
-
-	// Check if the var is an empty string.
-	// return: True if it is empty amd false if not.
-	// This is a shorthand and more expressive way of writing 'if (var == "")' or 'if (var.len() == 0)' or 'if (not var.len())'
-	// Note that 'if (var.empty())' is not exactly the same as 'if (not var)' because 'if (var("0.0")' is also defined as false. If a string can be converted to 0 then it is considered to be false. Contrast this with common scripting languages where 'if (var("0"))' is defined to be true.
-	//
-	// `let v1 = "0";
-	//  if (not v1.empty()) ... ok // true
-	//  // or
-	//  if (not empty(v1)) ... ok // true`
-	//
-	ND bool empty() const;
-
-	*/
 
 	// Count the number of output columns required for a given source string.
 	// return: A number
@@ -275,65 +227,55 @@ public:
 	// ends     endsWith     str_ends_with   endswith     HasSuffix() ends_with()   ends_with
 	// contains includes()   str_contains    contains()   Contains()  contains()    contains
 
-	// Check if a source string starts with a given prefix (substr).
-	// prefix: The substr to check for.
-	// return: True if the source string starts with the given prefix.
- 	// Always returns false if suffix is "". DIFFERS from c++, javascript, python3. See contains() for more info.
+	// Check if a var starts with a given prefix.
+	// prefix: The substr to check for. Multiple substr can be provided.
+	// return: True if the source string starts with one of the given prefixes.
+ 	// Always returns false if prefix is "". DIFFERS from c++, javascript, python3. See contains() for more info.
 	//
-	// `if ("abc"_var.starts("ab")) ... true
+	// `if ("abc"_var.starts("ab", "ba")) ... true
 	//  // or
-	//  if (starts("abc", "ab")) ... true`
+	//  if (starts("abc", "ab", "ba")) ... true`
 	//
+	template<typename... T>
+	bool starts(T&&... prefix) const {assertString(__PRETTY_FUNCTION__); return (... || no_check_starts(static_cast<SV>(std::forward<T>(prefix))));}
+//		static_assert((std::is_convertible_v<T, std::string_view> && ...),
+//			"All prefix arguments must be convertible to std::string_view");
+
+	// undocumented
 	ND bool starts(SV prefix) const;
 
-	template<typename... T>
-	bool starts(SV prefix, T&&... prefix_n) const {
-		if (starts(prefix)) return true;
-//		static_assert((std::is_convertible_v<T, std::string_view> && ...),
-//			"All prefix_n arguments must be convertible to std::string_view");
-		return (... || no_check_starts(static_cast<SV>(std::forward<T>(prefix_n))));
-	}
-
-	// Check if a source string ends with a given suffix (substr).
-	// suffix: The substr to check for.
-	// return: True if the source string ends with given suffix.
+	// Check if a var ends with a given suffix.
+	// suffix: The substr to check for. Multiple suffixes can be provided.
+	// return: True if the source string ends with one of the given suffixes.
  	// Always returns false if suffix is "". DIFFERS from c++, javascript, python3. See contains() for more info.
 	//
-	// `if ("abc"_var.ends("bc")) ... true
+	// `if ("abc"_var.ends("bc", "cb")) ... true
 	//  // or
-	//  if (ends("abc", "bc")) ... true`
+	//  if (ends("abc", "bc", "cb")) ... true`
 	//
+	template<typename... T>
+	bool ends(T&&... suffix) const {assertString(__PRETTY_FUNCTION__); return (... || no_check_ends(static_cast<SV>(std::forward<T>(suffix))));}
+
+	// undocumented
 	ND bool ends(SV suffix) const;
 
-	template<typename... T>
-	bool ends(SV suffix, T&&... suffix_n) const {
-		if (ends(suffix)) return true;
-//		static_assert((std::is_convertible_v<T, std::string_view> && ...),
-//			"All suffix_n arguments must be convertible to std::string_view");
-		return (... || no_check_ends(static_cast<SV>(std::forward<T>(suffix_n))));
-	}
-
-	// Check if a given substr exists in a source string.
-	// substr: The substr to check for.
-	// return: True if the source string starts with, ends with or contains the given substr.
+	// Check if a var contains a given substr.
+	// substr: The substr to check for. Multiple substr can be provided.
+	// return: True if the var starts with, ends with or contains one of the given substrs.
 	// Always returns false if substr is "". DIFFERS from c++, javascript, python3. See contains() for more info.
     // Human logic: "" is not equal to "x" therefore x does not contain "".
     // Human logic: Check each item (character) in the list for equality with what I am looking for and return success if any are equal.
     // Programmer logic: Compare as many characters as are in the search string for presence in the list of characters and return success if there are no failures.
     //
-	// `if ("abcd"_var.contains("bc")) ... true
+	// `if ("abcd"_var.contains("bc", "cb")) ... true
 	//  // or
-	//  if (contains("abcd", "bc")) ... true`
+	//  if (contains("abcd", "bc", "cb")) ... true`
 	//
-	ND bool contains(SV substr) const;
-
 	template<typename... T>
-	bool contains(SV substr, T&&... substr_n) const {
-		if (contains(substr)) return true;
-//		static_assert((std::is_convertible_v<T, std::string_view> && ...),
-//			"All substr_n arguments must be convertible to std::string_view");
-		return (... || no_check_contains(static_cast<SV>(std::forward<T>(substr_n))));
-	}
+	bool contains(T&&... substr) const {assertString(__PRETTY_FUNCTION__); return (... || no_check_contains(static_cast<SV>(std::forward<T>(substr))));}
+
+	// undocumented
+	ND bool contains(SV substr) const;
 
 	//https://en.wikipedia.org/wiki/Comparison_of_programming_languages_(string_functions)#Find
 
@@ -435,13 +377,13 @@ public:
 	ND var  search(SV regex_str, io startchar1, SV regex_options = "") const;
 
 	// Ditto starting from first char
-	ND var  search(SV regex_str) const; //IMPL{var_stg startchar1 = 1; return this->search(regex_str, startchar1);}
+	ND var  search(SV regex_str) const;
 
 	// Ditto given a rex
 	ND var  search(const rex& regex, io startchar1) const;
 
 	// Ditto starting from first char.
-	ND var  search(const rex& regex) const; //IMPL{var_stg startchar1 = 1; return this->search(regex, startchar1);}
+	ND var  search(const rex& regex) const;
 
 	// Get a hash of a source string.
 	// modulus: The result is limited to [0, modulus)
@@ -465,7 +407,7 @@ public:
 	//  // or
 	//  let v2 = ucase("Γιάννης");`
 	//
-	ND var  ucase() const&; //IMPL{var_stg nrvo = this->clone(); nrvo.ucaser(); return nrvo;}
+	ND var  ucase() const&;
 
 	// Convert to lower case
 	//
@@ -473,7 +415,7 @@ public:
 	//  // or
 	//  let v2 = lcase("ΓΙΆΝΝΗΣ");`
 	//
-	ND var  lcase() const&; //IMPL{var_stg nrvo = this->clone(); nrvo.lcaser(); return nrvo;}
+	ND var  lcase() const&;
 
 	// Convert to title case.
 	// return: Original source string with the first letter of each word is capitalised.
@@ -482,7 +424,7 @@ public:
 	//  // or
 	//  let v2 = tcase("γιάννης παππάς");`
 	//
-	ND var  tcase() const&; //IMPL{var_stg nrvo = this->clone(); nrvo.tcaser(); return nrvo;}
+	ND var  tcase() const&;
 
 	// Convert to folded case.
 	// Case folding is the process of converting text to a case independent representation.
@@ -495,7 +437,7 @@ public:
 	//  // or
 	//  let v2 = tcase("Grüßen");`
 	//
-	ND var  fcase() const&; //IMPL{var_stg nrvo = this->clone(); nrvo.fcaser(); return nrvo;}
+	ND var  fcase() const&;
 
 	// Replace Unicode character sequences with their standardised NFC form.
 	// Unicode normalization is the process of converting Unicode strings to a standard form, making them binary comparable and suitable for text processing and comparison. It is an important part of Unicode text processing.
@@ -506,7 +448,7 @@ public:
 	//  // or
 	//  let v2 = normalize("cafe\u0301");`
 	//
-	ND var  normalize() const&; //IMPL{var_stg nrvo = this->clone(); nrvo.normalizer(); return nrvo;}
+	ND var  normalize() const&;
 
 	// Simple reversible disguising of string text.
 	// It works by treating the string as UTF8 encoded Unicode code points and inverting the first 8 bits of their Unicode Code Points.
@@ -520,7 +462,7 @@ public:
 	//  // or
 	//  let v2 = invert("abc");`
 	//
-	ND var  invert() const&; //IMPL{var_stg nrvo = this->clone(); nrvo.inverter(); return nrvo;}
+	ND var  invert() const&;
 
 	// Reduce all types of field mark chars by one level.
 	// Convert all FM to VM, VM to SM etc.
@@ -532,7 +474,7 @@ public:
 	//  // or
 	//  let v2 = lower("a1^b2^c3"_var);`
 	//
-	ND var  lower() const&; //IMPL{var_stg nrvo = this->clone(); nrvo.lowerer(); return nrvo;}
+	ND var  lower() const&;
 
 	// Increase all types of field mark chars by one level.
 	// Convert all VM to FM, SM to VM etc.
@@ -544,7 +486,7 @@ public:
 	//  // or
 	//  let v2 = "a1]b2]c3"_var;`
 	//
-	ND var  raise() const&; //IMPL{var_stg nrvo = this->clone(); nrvo.raiser(); return nrvo;}
+	ND var  raise() const&;
 
 	// Remove any redundant FM, VM etc. chars (Trailing FM; VM before FM etc.)
 	//
@@ -552,7 +494,7 @@ public:
 	//  // or
 	//  let v2 = crop("a1^b2]]^c3^^"_var);`
 	//
-	ND var  crop() const&; //IMPL{var_stg nrvo = this->clone(); nrvo.cropper(); return nrvo;}
+	ND var  crop() const&;
 
 	// Wrap in double quotes.
 	//
@@ -674,7 +616,7 @@ public:
 	//  // or
 	//  let v2 = paste("abcd", 2, 2, "XYZ");`
 	//
-	ND var  paste(const int pos1, const int length, SV replacestr) const&; //IMPL{var_stg nrvo = this->clone(); nrvo.paster(pos1, length, replacestr); return nrvo;}
+	ND var  paste(const int pos1, const int length, SV replacestr) const&;
 
 	// Insert text at char position without overwriting any following chars
 	// Equivalent to var[pos1, 0] = substr in Pick OS
@@ -683,7 +625,7 @@ public:
 	//  // or
 	//  let v2 = paste("abcd", 2, "XYZ");`
 	//
-	ND var  paste(const int pos1, SV insertstr) const&; //IMPL{var_stg nrvo = this->clone(); nrvo.paster(pos1, insertstr); return nrvo;}
+	ND var  paste(const int pos1, SV insertstr) const&;
 
 	// Insert text at the beginning
 	// Equivalent to var[0, 0] = substr in Pick OS
@@ -706,7 +648,7 @@ public:
 	// `let v1 = "abc"_var.append(" is ", 10, " ok", '.'); // "abc is 10 ok."
 	//  // or
 	//  let v2 = append("abc", " is ", 10, " ok", '.');`
-    ND var  append(const auto&... appendable) const&; //IMPL{var_stg nrvo = this->clone(); (nrvo ^= ... ^= appendable); return nrvo;}
+    ND var  append(const auto&... appendable) const&;
 	//
 	// TODO perfect forwarding on argument 1 to create the initial string?
 
@@ -717,7 +659,7 @@ public:
 	//  // or
 	//  let v2 = pop("abc");`
 	//
-	ND var  pop() const&; //IMPL{var_stg nrvo = this->clone(); nrvo.popper(); return nrvo;}
+	ND var  pop() const&;
 
 	// Copy one or more consecutive fields from a string.
 	// delimiter: A Unicode character.
@@ -771,7 +713,7 @@ public:
 	//
 	// `let v1 = "aa,bb,cc"_var.fieldstore(",", 6, 2, "11"); // "aa,bb,cc,,,11,"`
 	//
-	ND var  fieldstore(SV separator, const int fieldno, const int nfields, in replacement) const&; //IMPL{var_stg nrvo = this->clone(); nrvo.fieldstorer(separator, fieldno, nfields, replacement); return nrvo;}
+	ND var  fieldstore(SV separator, const int fieldno, const int nfields, in replacement) const&;
 
 	// substr version 1.
 	// Copy a substr of length chars from a given a starting char position.
@@ -797,10 +739,10 @@ public:
 	//  // or
 	//  let v2 = substr("abcd", 3, -2); // "cb"`
 	//
-	ND var  substr(const int pos1, const int length) const&; //IMPL{var_stg nrvo = this->clone(); nrvo.substrer(pos1, length); return nrvo;}
+	ND var  substr(const int pos1, const int length) const&;
 
 	// Abbreviated alias of substr version 1.
-	ND var  b(const int pos1, const int length) const&; //IMPL{return this->substr(pos1, length);}
+	ND var  b(const int pos1, const int length) const&;
 
 	// substr version 2.
 	// Copy a substr from a given char position up to the end of the source string
@@ -813,10 +755,10 @@ public:
 	//  // or
 	//  let v2 = substr("abcd", 2);`
 	//
-	ND var  substr(const int pos1) const&; //IMPL{var_stg nrvo = this->clone(); nrvo.substrer(pos1); return nrvo;}
+	ND var  substr(const int pos1) const&;
 
 	// Shorthand alias of substr version 2.
-	ND var  b(const int pos1) const&; //IMPL{return this->substr(pos1);}
+	ND var  b(const int pos1) const&;
 
 	// substr version 3.
 	// Copy a substr from a given char position up to (but excluding) any one of some given delimiter chars
@@ -839,7 +781,7 @@ public:
 	   var  substr(const int pos1, SV delimiterchars, out pos2) const;
 
 	// Shorthand alias of substr version 3.
-	   var  b(const int pos1, SV delimiterchars, out pos2) const; //IMPL{return this->substr(pos1, delimiterchars, pos2);}
+	   var  b(const int pos1, SV delimiterchars, out pos2) const;
 
 	// if no delimiter byte is found then it returns bytes up to the end of the string, sets
 	// offset to after tne end of the string and returns delimiter no 0 NOTE that it
@@ -868,7 +810,7 @@ public:
 	   var  substr2(io pos1, out delimiterno) const;
 
 	// Shorthand alias of substr version 4.
-	   var  b2(io pos1, out field_mark_no) const; //IMPL{return this->substr2(pos1, field_mark_no);}
+	   var  b2(io pos1, out field_mark_no) const;
 
 	// Convert or delete chars one for one to other chars
 	// from_chars: chars to convert. If longer than to_chars then delete those characters instead of converting them.
@@ -879,7 +821,7 @@ public:
 	//  // or
 	//  let v2 = convert("abcde", "aZd", "XY");`
 	//
-	ND var  convert(SV fromchars, SV tochars) const&; //IMPL{var_stg nrvo = this->clone(); nrvo.converter(fromchars,tochars); return nrvo;}
+	ND var  convert(SV fromchars, SV tochars) const&;
 
 	// Ditto for Unicode code points.
 	//
@@ -887,7 +829,7 @@ public:
 	//  // or
 	//  let v2 = textconvert("a🤡b😀c🌍d", "🤡😀", "👋");`
 	//
-	ND var  textconvert(SV fromchars, SV tochars) const&; //IMPL{var_stg nrvo = this->clone(); nrvo.textconverter(fromchars,tochars); return nrvo;}
+	ND var  textconvert(SV fromchars, SV tochars) const&;
 
 	// Replace all occurrences of one substr with another.
 	// Case sensitive.
@@ -1009,7 +951,7 @@ public:
 	//  // or
 	//  let v2 = parse("abc,\"def,\"123\" fgh\",12.34", ',');`
 	//
-	ND var  parse(char sepchar = ' ') const&; //IMPL{var_stg nrvo = this->clone(); nrvo.parser(sepchar); return nrvo;}
+	ND var  parse(char sepchar = ' ') const&;
 
 	// Split a delimited string into a dim array.
 	// Delimiter: Can be multibyte Unicode.
@@ -1073,44 +1015,44 @@ public:
 
 // On temporaries the mutator function is called to avoid creating a temporary in many cases
 
-	ND var  ucase()                             &&; //IMPL{ucaser();     return std::move(*this);}
-	ND var  lcase()                             &&; //IMPL{lcaser();     return std::move(*this);}
-	ND var  tcase()                             &&; //IMPL{tcaser();     return std::move(*this);}
-	ND var  fcase()                             &&; //IMPL{fcaser();     return std::move(*this);}
-	ND var  normalize()                         &&; //IMPL{normalizer(); return std::move(*this);}
-	ND var  invert()                            &&; //IMPL{inverter();   return std::move(*this);}
+	ND var  ucase()                             &&;
+	ND var  lcase()                             &&;
+	ND var  tcase()                             &&;
+	ND var  fcase()                             &&;
+	ND var  normalize()                         &&;
+	ND var  invert()                            &&;
 
-	ND var  lower()                             &&; //IMPL{lowerer();    return std::move(*this);}
-	ND var  raise()                             &&; //IMPL{raiser();     return std::move(*this);}
-	ND var  crop()                              &&; //IMPL{cropper();    return std::move(*this);}
+	ND var  lower()                             &&;
+	ND var  raise()                             &&;
+	ND var  crop()                              &&;
 
-	ND var  quote()                             &&; //IMPL{quoter();     return std::move(*this);}
-	ND var  squote()                            &&; //IMPL{squoter();    return std::move(*this);}
-	ND var  unquote()                           &&; //IMPL{unquoter();   return std::move(*this);}
+	ND var  quote()                             &&;
+	ND var  squote()                            &&;
+	ND var  unquote()                           &&;
 
-	ND var  trim(     SV trimchars = " ")       &&; //IMPL{trimmer(trimchars);      return std::move(*this);}
-	ND var  trimfirst(SV trimchars = " ")       &&; //IMPL{trimmerfirst(trimchars); return std::move(*this);}
-	ND var  trimlast( SV trimchars = " ")       &&; //IMPL{trimmerlast(trimchars);  return std::move(*this);}
-	ND var  trimboth( SV trimchars = " ")       &&; //IMPL{trimmerboth(trimchars);  return std::move(*this);}
+	ND var  trim(     SV trimchars = " ")       &&;
+	ND var  trimfirst(SV trimchars = " ")       &&;
+	ND var  trimlast( SV trimchars = " ")       &&;
+	ND var  trimboth( SV trimchars = " ")       &&;
 
-	ND var  first()                             &&; //IMPL{firster();               return std::move(*this);}
-	ND var  last()                              &&; //IMPL{laster();                return std::move(*this);}
-	ND var  first(const std::size_t length)     &&; //IMPL{firster(length);         return std::move(*this);}
-	ND var  last( const std::size_t length)     &&; //IMPL{laster(length);          return std::move(*this);}
-	ND var  cut(  const int length)             &&; //IMPL{cutter(length);          return std::move(*this);}
+	ND var  first()                             &&;
+	ND var  last()                              &&;
+	ND var  first(const std::size_t length)     &&;
+	ND var  last( const std::size_t length)     &&;
+	ND var  cut(  const int length)             &&;
 	ND var  paste(const int pos1, const int length, SV replacestr)
-                                                &&; //IMPL{paster(pos1, length, replacestr);    return std::move(*this);}
-	ND var  paste(const int pos1, SV insertstr) &&; //IMPL{paster(pos1, insertstr);             return std::move(*this);}
-	ND var  prefix(               SV prefixstr) &&; //IMPL{prefixer(prefixstr);                 return std::move(*this);}
-	ND var  pop()                               &&; //IMPL{popper();                            return std::move(*this);}
+                                                &&;
+	ND var  paste(const int pos1, SV insertstr) &&;
+	ND var  prefix(               SV prefixstr) &&;
+	ND var  pop()                               &&;
 
-//	ND var  append(SV appendstr)                &&; //IMPL{appender(appendstr);                 return std::move(*this);}
+//	ND var  append(SV appendstr)                &&;
 //	template <typename... ARGS>
 //	ND var  append(const ARGS&... appendable) &&; //IMPL{
 //				this->createString();
 //				(var_str += ... += appendable);
 	//
-	ND var  append(const auto&... appendable)   &&; //IMPL{((*this) ^= ... ^= appendable);      return std::move(*this);}
+	ND var  append(const auto&... appendable)   &&;
 
 //    // Helper to append one argument, handling var differently
 //    template<typename T>
@@ -1130,23 +1072,23 @@ public:
 //			}
 
 	ND var  fieldstore(SV delimiter, const int fieldno, const int nfields, in replacement)
-                                                      &&; //IMPL{fieldstorer(delimiter, fieldno, nfields, replacement); return std::move(*this);}
+                                                      &&;
 
-	ND var  substr(const int pos1, const int length)  &&; //IMPL{substrer(pos1, length);              return std::move(*this);}
-	ND var  substr(const int pos1)                    &&; //IMPL{substrer(pos1);                      return std::move(*this);}
+	ND var  substr(const int pos1, const int length)  &&;
+	ND var  substr(const int pos1)                    &&;
 
-	ND var  convert(    SV fromchars, SV tochars)     &&; //IMPL{this->converter(fromchars, tochars); return std::move(*this);}
-	ND var  textconvert(SV fromchars, SV tochars)     &&; //IMPL{textconverter(fromchars, tochars);   return std::move(*this);}
-	ND var  replace(    SV fromstr,   SV tostr)       &&; //IMPL{replacer(fromstr, tostr);            return std::move(*this);}
-	ND var  replace(const rex& regex, SV replacement) &&; //IMPL{replacer(regex, replacement);        return std::move(*this);}
+	ND var  convert(    SV fromchars, SV tochars)     &&;
+	ND var  textconvert(SV fromchars, SV tochars)     &&;
+	ND var  replace(    SV fromstr,   SV tostr)       &&;
+	ND var  replace(const rex& regex, SV replacement) &&;
 	ND var           replace(const rex& regex, ReplacementFunction auto repl_func)
-	                                                  &&; //IMPL{replacer(regex,repl_func);    return std::move(*this);}
+	                                                  &&;
 
-	ND var  unique()                                  &&; //IMPL{uniquer();           return std::move(*this);}
-	ND var  sort(   SV delimiter = _FM)               &&; //IMPL{sorter(delimiter);   return std::move(*this);}
-	ND var  reverse(SV delimiter = _FM)               &&; //IMPL{reverser(delimiter); return std::move(*this);}
-	ND var  randomize(SV delimiter = _FM)               &&; //IMPL{randomizer(delimiter); return std::move(*this);}
-	ND var  parse(char delimiter = ' ')               &&; //IMPL{parser(delimiter);   return std::move(*this);}
+	ND var  unique()                                  &&;
+	ND var  sort(   SV delimiter = _FM)               &&;
+	ND var  reverse(SV delimiter = _FM)               &&;
+	ND var  randomize(SV delimiter = _FM)               &&;
+	ND var  parse(char delimiter = ' ')               &&;
 
 	///// STRING MUTATION - Standalone commands:
 	////////////////////////////////////////////
@@ -1204,11 +1146,11 @@ public:
 
 	   IO   fieldstorer(SV delimiter, const int fieldno, const int nfields, in replacement) REF ;
 	   IO   substrer(const int pos1, const int length) REF ;
-	   IO   substrer(const int pos1) REF; //IMPL{return this->substrer(pos1, this->len());}
+	   IO   substrer(const int pos1) REF;
 	   IO   converter(SV from_chars, SV to_chars) REF;
 	   IO   textconverter(SV from_characters, SV to_characters) REF;
 	   IO   replacer(const rex& regex, SV tostr) REF;
-	   IO            replacer(const rex& regex, ReplacementFunction auto repl_func) REF; //IMPL{*this = replace(regex, repl_func);}
+	   IO            replacer(const rex& regex, ReplacementFunction auto repl_func) REF;
 	   IO   replacer(SV fromstr, SV tostr) REF;
 //	   IO   regex_replacer(SV regex, SV replacement, SV regex_options = "") REF ;
 
@@ -1250,7 +1192,7 @@ public:
 	//  // For brevity the function alias "f()" (standing for "field") is normally used instead of "extract()" as follows:
 	//  var v3 = v1.f(2, 2);`
 	//
-	ND var  extract(const int fieldno, const int valueno = 0, const int subvalueno = 0)      const; //IMPL{return this->f(fieldno, valueno, subvalueno);}
+	ND var  extract(const int fieldno, const int valueno = 0, const int subvalueno = 0)      const;
 
 	// UPDATE
 
@@ -1263,45 +1205,45 @@ public:
 	// Update (replace or insert) a specific subvalue  in a dynamic array.
 	// Same as var.updater() function but returns a new string instead of updating a variable in place. Rarely used.
 	// "update()" was called "replace()" in Pick OS/Basic.
-	ND var  update(const int fieldno, const int valueno, const int subvalueno, in replacement) const&; //IMPL{var_stg nrvo = this->clone(); nrvo.updater(fieldno, valueno, subvalueno, replacement); return nrvo;}
+	ND var  update(const int fieldno, const int valueno, const int subvalueno, in replacement) const&;
 
 	// Update (replace or insert) a specific value in a dynamic array.
-	ND var  update(const int fieldno, const int valueno, in replacement)                    const&; //IMPL{var_stg nrvo = this->clone(); nrvo.updater(fieldno, valueno, 0, replacement); return nrvo;}
+	ND var  update(const int fieldno, const int valueno, in replacement)                    const&;
 
 	// Update (replace or insert) a specific field a dynamic array.
-	ND var  update(const int fieldno, in replacement)                                       const&; //IMPL{var_stg nrvo = this->clone(); nrvo.updater(fieldno, 0, 0, replacement); return nrvo;}
+	ND var  update(const int fieldno, in replacement)                                       const&;
 
 	// INSERT
 
 	// Insert a subvalue in a dynamic array.
 	// Same as var.inserter() function but returns a new string instead of updating a variable in place.
-	ND var  insert(const int fieldno, const int valueno, const int subvalueno, in insertion) const&; //IMPL{var_stg nrvo = this->clone(); nrvo.inserter(fieldno, valueno, subvalueno, insertion); return nrvo;}
+	ND var  insert(const int fieldno, const int valueno, const int subvalueno, in insertion) const&;
 
 	// Insert a value in a dynamic array.
-	ND var  insert(const int fieldno, const int valueno, in insertion)                      const&; //IMPL{var_stg nrvo = this->clone(); nrvo.inserter(fieldno, valueno, 0, insertion); return nrvo;}
+	ND var  insert(const int fieldno, const int valueno, in insertion)                      const&;
 
 	// Insert a field in a dynamic array.
-	ND var  insert(const int fieldno, in insertion)                                         const&; //IMPL{var_stg nrvo = this->clone(); nrvo.inserter(fieldno, 0, 0, insertion); return nrvo;}
+	ND var  insert(const int fieldno, in insertion)                                         const&;
 
 	// REMOVE
 
 	// Remove a field, value or subvalue from a dynamic array.
 	// Same as var.remover() function but returns a new string instead of updating a variable in place.
 	// "remove()" was called "delete()" in Pick OS/Basic.
-	ND var  remove(const int fieldno, const int valueno = 0, const int subvalueno = 0)      const&; //IMPL{var_stg nrvo = this->clone(); nrvo.remover(fieldno, valueno, subvalueno); return nrvo;}
+	ND var  remove(const int fieldno, const int valueno = 0, const int subvalueno = 0)      const&;
 
 	// SAME AS ABOVE ON TEMPORARIES TO USE MUTATING (not documented because used difference in implementation is irrelevant to exodus users)
 	///////////////////////////////////////////////
 
-	ND var   update(const int fieldno, const int valueno, const int subvalueno, in replacement) &&; //IMPL{this->updater(fieldno, valueno, subvalueno, replacement); return std::move(*this);}
-	ND var   update(const int fieldno, const int valueno, in replacement)                       &&; //IMPL{this->updater(fieldno, valueno, 0, replacement); return std::move(*this);}
-	ND var   update(const int fieldno, in replacement)                                          &&; //IMPL{this->updater(fieldno, 0, 0, replacement); return std::move(*this);}
+	ND var   update(const int fieldno, const int valueno, const int subvalueno, in replacement) &&;
+	ND var   update(const int fieldno, const int valueno, in replacement)                       &&;
+	ND var   update(const int fieldno, in replacement)                                          &&;
 
-	ND var   insert(const int fieldno, const int valueno, const int subvalueno, in insertion)   &&; //IMPL{this->inserter(fieldno, valueno, subvalueno, insertion); return std::move(*this);}
-	ND var   insert(const int fieldno, const int valueno, in insertion)                         &&; //IMPL{this->inserter(fieldno, valueno, 0, insertion); return std::move(*this);}
-	ND var   insert(const int fieldno, in insertion)                                            &&; //IMPL{this->inserter(fieldno, 0, 0, insertion); return std::move(*this);}
+	ND var   insert(const int fieldno, const int valueno, const int subvalueno, in insertion)   &&;
+	ND var   insert(const int fieldno, const int valueno, in insertion)                         &&;
+	ND var   insert(const int fieldno, in insertion)                                            &&;
 
-	ND var   remove(const int fieldno, const int valueno = 0, const int subvalueno = 0)         &&; //IMPL{this->remover(fieldno, valueno, subvalueno); return std::move(*this);}
+	ND var   remove(const int fieldno, const int valueno = 0, const int subvalueno = 0)         &&;
 
 	///// DYNAMIC ARRAY FILTERS:
 	///////////////////////////
@@ -1549,6 +1491,18 @@ public:
 
 	// locatebyusing() supports all the locate features in a single function.
 	ND bool locatebyusing(const char* ordercode, const char* usingchar, in substr, out pos, const int fieldno = 0, const int valueno = 0, const int subvalueno = 0) const;
+
+	// Stop gendoc
+	/// :
+
+	// Iterate over fields
+	///////////////////////
+
+	// friend class to iterate over the fields of a var
+	friend class var_iter;
+
+	ND var_iter begin() const {return var_iter(*this);}
+	ND var_iter end() const   {return var_iter();}
 
 private:
 	ND bool no_check_starts(SV substr) const;

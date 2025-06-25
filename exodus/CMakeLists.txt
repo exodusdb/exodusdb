@@ -321,7 +321,7 @@ execute_process(
 		#naturalorder.cpp
 		gettimeofday.cpp
 		varoshandle.cpp
-		variter.cpp
+		var_iter.cpp
 #		dimiter.cpp
 		varput.cpp
 		timebank.cpp
@@ -464,7 +464,10 @@ execute_process(
 			FILES
 				varb.h
 				vars.h
+				varo.h
+				vard.h
 				var.h
+				var_iter.h
 				vartyp.h
 				varerr.h
 				varb_friends.h

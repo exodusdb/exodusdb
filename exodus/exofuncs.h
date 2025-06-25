@@ -430,6 +430,13 @@ ND bool starts(in instring, SV substr);
 ND bool ends(in instring, SV substr);
 ND bool contains(in instring, SV substr);
 
+template<class... T>
+ND bool starts(in instring, T&&... prefix) {return instring.starts(std::forward<T>(prefix)...);}
+template<class... T>
+ND bool ends(in instring, T&&... suffix)   {return instring.ends(std::forward<T>(suffix)...);}
+template<class... T>
+ND bool contains(in instring, T&&... substr) {return instring.contains(std::forward<T>(substr)...);}
+
 ND var  index(in instring, SV substr, const int startindex = 1 );
 ND var  indexn(in instring, SV substr, int occurrence);
 ND var  indexr(in instring, SV substr, const int startindex = -1 );
@@ -953,6 +960,15 @@ template<class... Args>
 
 #ifdef EXO_FORMAT
 
+//struct fmt::formatter<exo::var_base> {
+//    constexpr auto parse(fmt::format_parse_context& ctx) { return ctx.begin(); }
+//    template <typename FormatContext>
+//    auto format(const exo::var_base& obj, FormatContext& ctx) const {
+//        // Inline delegation to minimize instantiation
+//        return fmt::formatter<exo::var_base>().format(static_cast<const exo::var_base&>(obj).toString(), ctx);
+//    }
+//}
+
 // formatter for var must be defined in global namespace
 
 // All c++ format specifiers formatting is locale-independent by default.
@@ -965,6 +981,12 @@ template<class... Args>
 /////////////////
 // fmt::formatter - for var.
 /////////////////
+
+// NOTE: The presence of a var in a format/println fumction adds 4 seconds to compile time
+// possibly because var is a massive class since a formatter for var_base does not suffer
+// from the same problem despite the multiple inheritance.
+// Unfortunately a formatter for var_base will not be called because format will prefer
+// var's implicit conversion to std::string.
 
 // Needs to know how to delegate parse and format functions to standard string_view, double and int versions
 // therefore multiple inheritance
@@ -1011,6 +1033,7 @@ struct fmt::formatter<exo::var> : formatter<std::string_view>, formatter<double>
 	// floating point -> pad-width, precision
 	//
 	// Note: int/float are not cut down in size if they exceed the pad-width
+
 
 //////////////////////////
 // fmt::formatter::parse() - maybe at compile time
@@ -1157,6 +1180,7 @@ constexpr auto parse(ParseContext& ctx) {
 
 } // formatter::parse()
 
+
 //////////////////////
 // formatter::format() - run time
 //////////////////////
@@ -1207,7 +1231,10 @@ auto format(const exo::var& var1, FormatContext& ctx) const {
 
 	}
 } // formatter::format
+
 }; //fmt::formatter
+
+
 
 // How to format user defined types.
 //
