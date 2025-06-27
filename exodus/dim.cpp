@@ -398,7 +398,6 @@ void dim::splitter(/*in*/ const var_stg& str1, SV delimiter) {
 //	if (!ncols_) {
 	if (!base::size()) {
 		this->redim(str1.count(delimiter) + 1);
-//		this->redim(static_cast<const var&>(str1).count(delimiter) + 1);
 //		ncols_ = 1;
 	}
 
