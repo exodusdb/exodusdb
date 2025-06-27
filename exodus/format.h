@@ -21,7 +21,7 @@ THE SOFTWARE.
 */
 
 #ifndef LIBEXODUS_FORMAT_H
-#define LIBEXODUS_FORMAT_H 1
+#define LIBEXODUS_FORMAT_H
 
 #ifdef EXODUS_MACROS
 #	error exodus/format.h must be included BEFORE other exodus program headers since they define intrusive macros for general exodus programming
@@ -51,6 +51,7 @@ THE SOFTWARE.
 //#elif __has_include(<fmt/core.h>)
 // Not available in libfmt6 which doesnt compile with exodus
 #undef EXO_FORMAT
+
 #if __has_include(<fmt/args.h>)
 //#	warning Using fmt library instead std::format
 #	define EXO_FORMAT 2
@@ -78,6 +79,27 @@ THE SOFTWARE.
 //      |                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~
 #		pragma GCC diagnostic ignored "-Winline"
 #	endif
-#endif
+
+namespace exo {
+	class var;
+	class var_base;
+//}
+//namespace exo {
+// Helper to conditionally cast exo::var to exo::var_base
+template<typename T>
+auto cast_var_to_var_base(T&& arg) -> std::conditional_t<
+	std::is_same_v<std::decay_t<T>, exo::var>,
+	exo::var_base&,
+	T&&
+> {
+	if constexpr (std::is_same_v<std::decay_t<T>, exo::var>) {
+		// Ensure lvalue reference for exo::var
+		return static_cast<exo::var_base&>(arg);
+	} else {
+		return std::forward<T>(arg);
+	}
+}
+}
+#endif // __has_include(<fmt/args.h>)
 
 #endif // LIBEXODUS_FORMAT_H

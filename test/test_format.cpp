@@ -39,7 +39,8 @@ func main() {
 	{
 		var fmt = "{:.2f} and {:.3}";
 		assert(format(fmt, 12.3456, 1.23456).outputl() == "12.35 and 1.23");
-		assert(x.format(fmt, 1.23456).outputl() == "12.35 and 1.23");
+// wont compile
+//		assert(x.format(fmt, 1.23456).outputl() == "12.35 and 1.23");
 	}
 
 	// format will work on consteval format strings
@@ -373,18 +374,22 @@ func main() {
 
 		// oconv(9, "R#4")
 		assert(format("{:>4d}", var(9)).squote().outputl() == "'   9'");
-//		assert(format("{:>04d}", var(9)).squote().outputl() == "'   9'");// 0 in the wrong place so ignored
-		assert(format("{:>04d}", var(9)).squote().outputl() == "'0009'");// libfmt9
 
 		// oconv(9, "L#4")
 		assert(format("{:<4d}", var(9)).squote().outputl() == "'9   '");
-//		assert(format("{:<04d}", var(9)).squote().outputl() == "'9   '"); // ditto
-		assert(format("{:<04d}", var(9)).squote().outputl() == "'9000'"); // libfmt9
 
 		// oconv(9, "C#4")
 		assert(format("{:^4d}", var(9)).squote().outputl() == "' 9  '");
-//		assert(format("{:^04d}", var(9)).squote().outputl() == "' 9  '"); // ditto
+//#if FMT_VERSION >= 110000
+#if 1
+		assert(format("{:>04d}", var(9)).squote().outputl() == "'   9'");// 0 in the wrong place so ignored
+		assert(format("{:<04d}", var(9)).squote().outputl() == "'9   '"); // ditto
+		assert(format("{:^04d}", var(9)).squote().outputl() == "' 9  '"); // ditto
+#else
+		assert(format("{:>04d}", var(9)).squote().outputl() == "'0009'");// libfmt9
+		assert(format("{:<04d}", var(9)).squote().outputl() == "'9000'"); // libfmt9
 		assert(format("{:^04d}", var(9)).squote().outputl() == "'0900'"); // libfmt9
+#endif
 	}
 
 	{

@@ -396,7 +396,9 @@ public:
 		THISIS("var  var::format(SV fmt_str, Args&&... args) const")
 		assertString(function_sig);
 		// *this becomes the first format argument and any additional arguments become additionl format arguments
-		return fmt::vformat(std::string_view(fmt_str), fmt::make_format_args(*this, args...) );
+//		return fmt::vformat(std::string_view(fmt_str), fmt::make_format_args(*this, args...) );
+		return fmt::vformat(std::string_view(fmt_str), fmt::make_format_args(static_cast<const var_base&>(*this), cast_var_to_var_base(std::forward<Args>(args))...) );
+//		return fmt::vformat(std::string_view(fmt_str), fmt::make_format_args(cast_var_to_var_base(*this), cast_var_to_var_base(std::forward<Args>(args))...) );
 	}
 
 #endif //EXO_FORMAT

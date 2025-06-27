@@ -919,23 +919,26 @@ void printt(void) {
 template<class... Args>
 ND var  format(SV fmt_str, Args&&... args) {
 	THISIS("var  format(SV fmt_str, Args&&... args)")
-#if __clang_major__ and __clang_major__ <= 15
+//#if __clang_major__ and __clang_major__ <= 15
 	// Dont forward if the format library cannot handle it
-	return fmt::vformat(fmt_str, fmt::make_format_args(args...));
-#else
-	return fmt::vformat(fmt_str, fmt::make_format_args(std::forward<Args>(args)...));
-#endif
+//	return fmt::vformat(fmt_str, fmt::make_format_args(args...));
+	return fmt::vformat(fmt_str, fmt::make_format_args(cast_var_to_var_base(args)...));
+//#else
+//	return fmt::vformat(fmt_str, fmt::make_format_args(std::forward<Args>(args)...));
+//	return fmt::vformat(fmt_str, fmt::make_format_args(cast_var_to_var_base(std::forward<Args>(args))...));
+//#endif
 }
 
 // print
 template<class... Args>
    void print(SV fmt_str, Args&&... args) {
-#if __clang_major__ and __clang_major__ <= 15
+//#if __clang_major__ and __clang_major__ <= 15
 	// Dont forward if the format library cannot handle it
-	fmt::vprint(fmt_str, fmt::make_format_args(args...));
-#else
-	fmt::vprint(fmt_str, fmt::make_format_args(std::forward<Args>(args)...));
-#endif
+//	fmt::vprint(fmt_str, fmt::make_format_args(args...));
+	fmt::vprint(fmt_str, fmt::make_format_args(cast_var_to_var_base(args)...));
+//#else
+//	fmt::vprint(fmt_str, fmt::make_format_args(std::forward<Args>(args)...));
+//#endif
 }
 
 // println
@@ -960,15 +963,6 @@ template<class... Args>
 
 #ifdef EXO_FORMAT
 
-//struct fmt::formatter<exo::var_base> {
-//    constexpr auto parse(fmt::format_parse_context& ctx) { return ctx.begin(); }
-//    template <typename FormatContext>
-//    auto format(const exo::var_base& obj, FormatContext& ctx) const {
-//        // Inline delegation to minimize instantiation
-//        return fmt::formatter<exo::var_base>().format(static_cast<const exo::var_base&>(obj).toString(), ctx);
-//    }
-//}
-
 // formatter for var must be defined in global namespace
 
 // All c++ format specifiers formatting is locale-independent by default.
@@ -991,7 +985,8 @@ template<class... Args>
 // Needs to know how to delegate parse and format functions to standard string_view, double and int versions
 // therefore multiple inheritance
 template <>
-struct fmt::formatter<exo::var> : formatter<std::string_view>, formatter<double>, formatter<int> {
+struct fmt::formatter<exo::var_base> : formatter<std::string_view>, formatter<double>, formatter<int> {
+//struct fmt::formatter<exo::var_base> {
 
 	// Detect leading ':' -> exodus conversions/format specifiers
 	// otherwise trailing characters -> standard fmt/std format specifiers
@@ -1151,12 +1146,12 @@ constexpr auto parse(ParseContext& ctx) {
 				}
 			}
 		} catch (fmt::format_error e) {
-			throw exo::VarError("Format error: " ^ exo::var(std::string(ctx.begin(), ctx.end())).squote() + " " + e.what());
-//			throw exo::VarError("Format error: '" + std::string(std::string(ctx.begin(), ctx.end())) + "' " + e.what());
+//			throw exo::VarError("Format error: " ^ exo::var(std::string(ctx.begin(), ctx.end())).squote() + " " + e.what());
+			throw exo::VarError("Format error: '" + std::string(std::string(ctx.begin(), ctx.end())) + "' " + e.what());
 
 		} catch (...) {
-			throw exo::VarError("Format error: " ^ exo::var(std::string(ctx.begin(), ctx.end())).squote());
-//			throw exo::VarError("Format error: '" + std::string(std::string(ctx.begin(), ctx.end())) + "'");
+//			throw exo::VarError("Format error: " ^ exo::var(std::string(ctx.begin(), ctx.end())).squote());
+			throw exo::VarError("Format error: '" + std::string(std::string(ctx.begin(), ctx.end())) + "'");
 		}
 
 		fmt_code_ = *it;
@@ -1189,7 +1184,7 @@ constexpr auto parse(ParseContext& ctx) {
 // https://fmt.dev/latest/syntax.html#formatspec
 
 template <typename FormatContext>
-auto format(const exo::var& var1, FormatContext& ctx) const {
+auto format(const exo::var_base& var1, FormatContext& ctx) const {
 
 	THISIS("auto fmt::formatter::format(var) const")
 	//std::cerr << ">>> exofuncs.h format '" << fmt_str_ << "' '" << fmt_code_ << "' '" << var1 << "'\n";
@@ -1206,7 +1201,7 @@ auto format(const exo::var& var1, FormatContext& ctx) const {
 			// {::D2/E} etc.
 			// {::MTHS} etc.
 			//return formatter<std::string_view>::format(var1, ctx);
-			exo::var converted_var1 = var1.oconv(fmt_str_.c_str());
+			exo::var_base converted_var1 = static_cast<exo::var>(var1).oconv(fmt_str_.c_str());
 			auto sv1 = std::string_view(converted_var1);
 			return vformat_to(ctx.out(), "{:}", fmt::make_format_args(sv1));
 
