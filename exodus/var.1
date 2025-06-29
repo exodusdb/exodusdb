@@ -4658,8 +4658,8 @@ Searches an unordered dynamic array regardless of delimiter.
 \fBExample:\fR
 .EX \"<code>
 var pos;
-if (    "UK]US^UA"_var.locate("US", pos)) ... ok // position -> 2
-if (not "UK]US^UA"_var.locate("GB", pos)) ... ok // position -> 4
+if (    "UK]US^UA"_var.locate("US", pos)) ... ok // pos -> 2
+if (not "UK]US^UA"_var.locate("GB", pos)) ... ok // pos -> 4
 // or
 if (locate("US", "UK]US^UA"_var, pos)) ... ok
 .EE \"</code>

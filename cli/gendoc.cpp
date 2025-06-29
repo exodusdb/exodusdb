@@ -188,7 +188,7 @@ func main2(in pass1) {
 	codefile <<
 R"__(#include <cassert>
 #include <exodus/program.h>
-//#ifndef EXO_FORMAT
+//#if EXO_FORMAT
 #	define println printl
 #	define print printx
 //#endif
@@ -708,7 +708,7 @@ func main() {
 					// Exclude format from tests in old version of Ubuntu
 					bool uses_format = codematch.match(R"__((print|println|format)\()__");
 					if (uses_format) {
-						codefile << "#ifdef EXO_FORMAT\n";
+						codefile << "#if EXO_FORMAT\n";
 					}
 
 					// Lead with function name

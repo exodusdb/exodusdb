@@ -32,16 +32,14 @@ THE SOFTWARE.
 #	include <fstream>
 #	include <string>
 #	include <string_view>
-//#	include <array> // used in operator<<
 #	include <vector>
 #endif
-
-#include <exodus/format.h>
 
 // Purely #define so can done before any declarations
 // Always need to be run because modules dont export #define
 #include <exodus/vardefs.h>
-//#include <exodus/vartyp.h>
+
+#include <exodus/format.h>
 
 namespace exo {
 
@@ -62,18 +60,15 @@ namespace exo {
 	using io     =       var&;
 }
 
-// var_base provides the basic var-like functionality for var
-#include <exodus/varb.h> // var_base
-//#include <exodus/vars.h> // var_stg
-//#include <exodus/varo.h> // var_os
 #include <exodus/vard.h> // var_db
 
 namespace exo {
 
 // class var
+// Inheritance chain: var > var_db > var_os > var_stg > var_base
 class PUBLIC var : public var_db {
 
-	// "using" applies to all member functions everywhere
+	// "using" applies to all member functions except ctor/dtor/operator
 	using CVR    = const var&;
 
 	using in     = const var&;
@@ -336,7 +331,7 @@ public:
 	//
 	ND var  iconv(const char* convstr) const;
 
-#ifdef EXO_FORMAT
+#if EXO_FORMAT
 
 //template<class... Args>
 //	ND CONSTEXPR

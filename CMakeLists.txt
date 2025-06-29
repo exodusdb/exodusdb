@@ -161,7 +161,7 @@
 # ##############################
 #
 	#add_compile_options(-fvisibility=hidden) # Force g++ to hide all lib definitions by default and require PUBLIC
-	set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} -fvisibility=hidden) # Force g++ to hide all lib definitions by default and require PUBLIC
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden") # Force g++ to hide all lib definitions by default and require PUBLIC
 
 #
 # Optimise binary size
@@ -203,16 +203,33 @@
 	MESSAGE(STATUS "OS_NAME = ${OS_NAME}")
 	ADD_DEFINITIONS( -DEXO_OS_NAME=\"${OS_NAME}\" )
 
-##		message("----------------")
-##		message("-- FMT EXODUS --")
-##		message("----------------")
-#	find_package(fmt)
-#	#target_link_libraries(<your-target> fmt::fmt)
-
 ###
 ### FMT - before setting complex compiler warnings for exodus subdirs/modules
 ### ###
 ###
+
+# EXO_FORMAT 1 - std::format because it has faster end user compiling when instantiating formatter<var_base>
+
+    set(EXO_FORMAT "1" CACHE STRING "EXO_FORMAT is 0 for No, 1 for std::format, 2 for libfmt, 3 for build fmt")
+    set_property(CACHE EXO_FORMAT PROPERTY STRINGS 0 1 2 3)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DEXO_FORMAT=${EXO_FORMAT} ")
+
+# EXO_FORMAT 2
+
+	if (EXO_FORMAT EQUAL 2)
+		message("----------------")
+		message("-- FMT EXODUS --")
+		message("----------------")
+		find_package(fmt)
+		set(CMAKE_CXX_STANDARD_LIBRARIES "${CMAKE_CXX_STANDARD_LIBRARIES} -lfmt " CACHE STRING "C++ compiler link libraries" FORCE)
+	endif()
+
+#	#target_link_libraries(<your-target> fmt::fmt)
+
+
+# EXO_FORMAT 3
+
+	if (EXO_FORMAT EQUAL 3)
 ##	if (${CMAKE_CXX_COMPILER_VERSION} STRLESS "13")
 #		message("")
 #		message("----------------")
@@ -222,11 +239,14 @@
 #		# How to build
 #		set(BUILD_SHARED_LIBS true)
 #		set(FMT_PEDANTIC true)
+
 		add_subdirectory(fmt)
+
 #		set(FMT_LIBRARIES fmt)
 ##	else()
 ##		message("Omitting subdir fmt")
 ##	endif()
+	endif()
 
 #
 # Warnings

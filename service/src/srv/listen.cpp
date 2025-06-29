@@ -790,7 +790,7 @@ func loop_exit() {
 
 		// Command loop
 		for (;;) {
-			print(AT(-4));
+			printx(AT(-4));
 			if (not cmd.input("Command? ") || not cmd)
 				break;
 
@@ -860,7 +860,7 @@ func loop_exit() {
 	}
 
 	if (charx == "d") {
-		print("c to continue. ");
+		printx("c to continue. ");
 		debug();
 
 		// In main and various places

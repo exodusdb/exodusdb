@@ -16,17 +16,28 @@
 // Slows down compilation a bit so not included in standard exodus headers
 //#include <exodus/format.h>
 
+// Helper to allow temporaries to be passed as format arguments
+// WARNING only useful for simple data like doubles and ints or short strings using SSO
+template<typename T>
+const T& unmove(T&& x)
+{
+    return x;
+}
+
 #include <exodus/program.h>
 programinit()
 
 func main() {
-//#undef EXO_FORMAT
-#ifndef EXO_FORMAT
-	printl("EXO_FORMAT is not available so std::format a var is not possible.");
+
+#if !EXO_FORMAT
+		printl("EXO_FORMAT is not available so std::format a var is not possible.");
+		printl("Test passed");
+		return 0;
 #else
-//#ifndef EXO_MODULE_INITIAL_BUILD
-//	printl(std::format("EXO_FORMAT is defined so formatting a var using std::format is possible. e.g. {}", "'hello'"));
-//#endif
+
+#if EXO_FORMAT == 1
+	printl(std::format("EXO_FORMAT is defined so formatting a var using std::format is possible. e.g. {}", "'hello'"));
+#endif
 
 	var x = 12.3456;
 	assert(x.format("{:.2f}").outputl() == "12.35");
@@ -40,7 +51,7 @@ func main() {
 		var fmt = "{:.2f} and {:.3}";
 		assert(format(fmt, 12.3456, 1.23456).outputl() == "12.35 and 1.23");
 // wont compile
-//		assert(x.format(fmt, 1.23456).outputl() == "12.35 and 1.23");
+		assert(x.format(fmt, unmove(1.23456)).outputl() == "12.35 and 1.23");
 	}
 
 	// format will work on consteval format strings
@@ -214,14 +225,15 @@ func main() {
 
 //g++ 11 in Ubuntu 22.04 has format but a bug in width of unicode characters
 //#if EXO_FORMAT == 1
-#if EXO_FORMAT == 1 and __GNUG__ == 13
+//#if EXO_FORMAT == 1 and __GNUG__ == 13
+#if EXO_FORMAT == 1
 #warning EXO_FORMAT == 1 and _GNUG__ == 13 has error in formatting width of multibyte utf-8
 	// Incorrect in g++13.2
 	// Width is calculated as bytes not utf-8 character widths
 	// Cat = four bytes so takes up "4" positions in formatting
 	assert(format("{:.^5s}", var("🐱")) == "🐱.");
 
-#else
+#elif EXO_FORMAT == 2
 #warning Note: We are using fmtlib library instead of std::format for now since it appears more consistent with double width unicode chars
 	//__clang_major__ 18
 	// Correct in fmt library
@@ -296,13 +308,21 @@ func main() {
 		// must convert to string - see next block
 
 		// https://en.cppreference.com/w/cpp/utility/format/spec
-		assert(format("{:.^5s}",   "🐱").squote().outputl()     == "'.🐱..'");
+#if EXO_FORMAT == 1
 
+		// cat face in utf8 = F0 9F 90 B1
+		assert(format("{:.^5s}",   "🐱").squote().outputl()         == "'🐱.'");  // WRONG
+		assert(format("{:.^5s}",   var("🐱"), 5).squote().outputl() == "'🐱.'");  // WRONG
+		assert(format("{:.5s}",    "🐱🐱🐱").squote().outputl()     == "'🐱" "\xF0'");    // WRONG
+		assert(format("{:.<5.5s}", "🐱🐱🐱").squote().outputl()     == "'🐱" "\xF0'");  // WRONG
+#elif EXO_FORMAT == 2
+		assert(format("{:.^5s}",   "🐱").squote().outputl()     == "'.🐱..'");
 		assert(format("{:.^5s}",   var("🐱"), 5).squote().outputl()     == "'.🐱..'");
 
-		// fmtlib v10 fails following
-		//assert(format("{:.5s}",    "🐱🐱🐱").squote().outputl() == "'🐱🐱'");
-		//assert(format("{:.<5.5s}", "🐱🐱🐱").squote().outputl() == "'🐱🐱.'");
+		// fmtlib v9 and v10 fails following
+//		assert(format("{:.5s}",    "🐱🐱🐱").squote().outputl() == "'🐱🐱'");
+//		assert(format("{:.<5.5s}", "🐱🐱🐱").squote().outputl() == "'🐱🐱.'");
+#endif
 
 		// Not using dynamic arguments
 		//assert(format(FMT_COMPILE("{:4}"), var(9)).squote().outputl() == "'9   '");
@@ -381,11 +401,11 @@ func main() {
 		// oconv(9, "C#4")
 		assert(format("{:^4d}", var(9)).squote().outputl() == "' 9  '");
 //#if FMT_VERSION >= 110000
-#if 1
+#if EXO_FORMAT == 1
 		assert(format("{:>04d}", var(9)).squote().outputl() == "'   9'");// 0 in the wrong place so ignored
 		assert(format("{:<04d}", var(9)).squote().outputl() == "'9   '"); // ditto
 		assert(format("{:^04d}", var(9)).squote().outputl() == "' 9  '"); // ditto
-#else
+#elif EXO_FORMAT == 2
 		assert(format("{:>04d}", var(9)).squote().outputl() == "'0009'");// libfmt9
 		assert(format("{:<04d}", var(9)).squote().outputl() == "'9000'"); // libfmt9
 		assert(format("{:^04d}", var(9)).squote().outputl() == "'0900'"); // libfmt9

@@ -1,14 +1,3 @@
-//// EXO_FORMAT required to append -lfmt to compile and link command
-//#pragma GCC diagnostic push
-//#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
-//#include <exodus/format.h>
-#if __has_include(<fmt/args.h>)
-//# warning Using fmt library instead std::format
-#	undef EXO_FORMAT
-#	define EXO_FORMAT 2
-#endif
-//#pragma GCC diagnostic pop
-
 #include <exodus/program.h>
 programinit()
 
@@ -365,10 +354,8 @@ ENVIRONMENT
 		linkoptions ^= " -lstdc++fs -lstdc++";
 
 		// link to fmt library (only if using it instead of std::format)
-//#if __has_include(<fmt/core.h>)
-//#if EXO_FORMAT == 2
-//#if defined(EXO_FORMAT) && EXO_FORMAT == 2
-#if defined(EXO_FORMAT)
+//#if defined(EXO_FORMAT) && ( EXO_FORMAT == 2 || EXO_FORMAT == 3 )
+#if EXO_FORMAT == 2
 		linkoptions ^= " -lfmt ";
 #endif
 
@@ -436,7 +423,7 @@ ENVIRONMENT
 #ifdef EXO_FORMAT
 		// Bequeath/perpetuate the state of EXO_FORMAT to compiled programs
 		// as at original build time of the current compiler object
-		basicoptions ^= " -DEXO_FORMAT";
+		basicoptions ^= " -DEXO_FORMAT=" ^ var(EXO_FORMAT);
 #endif
 
 #if EXO_MODULE

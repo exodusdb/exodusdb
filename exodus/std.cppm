@@ -722,10 +722,10 @@ using std::uses_allocator;
 } // namespace std
 
 export namespace std {
-	// really? since we are providing fmt::format
-	// Causes "error: call to 'format' is ambiguous"
-	// Should not cause problems since we are using in the std namespace ... but it does.
-	//using std::format;
+
+#if EXO_FORMAT == 1
+	using std::format;
+#endif
 
 	// <cctype>
 	// Should not be using these since they are not fully threadsafe even for narrow chars

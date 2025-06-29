@@ -1422,8 +1422,8 @@ public:
 	// position[out]: The field, value or subvalue number if found or the max such number + 1 if not. If not found then position [out] is suitable for creating a new value.
 	//
 	// `var pos;
-	//  if (    "UK]US^UA"_var.locate("US", pos)) ... ok // position -> 2
-	//  if (not "UK]US^UA"_var.locate("GB", pos)) ... ok // position -> 4
+	//  if (    "UK]US^UA"_var.locate("US", pos)) ... ok // pos -> 2
+	//  if (not "UK]US^UA"_var.locate("GB", pos)) ... ok // pos -> 4
 	//  // or
 	//  if (locate("US", "UK]US^UA"_var, pos)) ... ok`
 	//

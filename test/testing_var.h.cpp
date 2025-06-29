@@ -2,7 +2,7 @@
 
 #include <cassert>
 #include <exodus/program.h>
-//#ifndef EXO_FORMAT
+//#if EXO_FORMAT
 #	define println printl
 #	define print printx
 //#endif
@@ -126,7 +126,7 @@ func main() {
 		// or
 		let v2 = iconv("21 JUN 2050", "D/E");
 	}
-#ifdef EXO_FORMAT
+#if EXO_FORMAT
 
 	printl("format(in fmt_str, Args&&... args) const");
 	{
@@ -1327,8 +1327,8 @@ func main() {
 	printl("locate(in substr, out position) const;");
 	{
 		var pos;
-		if (    "UK]US^UA"_var.locate("US", pos)) {/*ok*/} else  abort("locate: " ^ lasterror());  assert(position.errputl() == 2);
-		if (not "UK]US^UA"_var.locate("GB", pos)) {/*ok*/} else  abort("locate: " ^ lasterror());  assert(position.errputl() == 4);
+		if (    "UK]US^UA"_var.locate("US", pos)) {/*ok*/} else  abort("locate: " ^ lasterror());  assert(pos.errputl() == 2);
+		if (not "UK]US^UA"_var.locate("GB", pos)) {/*ok*/} else  abort("locate: " ^ lasterror());  assert(pos.errputl() == 4);
 		// or
 		if (locate("US", "UK]US^UA"_var, pos)) {/*ok*/} else  abort("locate: " ^ lasterror());
 	}
@@ -1709,7 +1709,7 @@ func main() {
 		// or
 		let name_and_type = xlate("xo_clients", key, "NAME_AND_TYPE", "X"); assert(name_and_type.errputl() == "Client AAA (A)");
 	}
-#ifdef EXO_FORMAT
+#if EXO_FORMAT
 
 	printl("select(in sort_select_command = "");");
 	{
@@ -1746,7 +1746,7 @@ func main() {
 		    assert(hasnext());
 		}
 	}
-#ifdef EXO_FORMAT
+#if EXO_FORMAT
 
 	printl("readnext(out record, out key, out valueno);");
 	{
@@ -1782,7 +1782,7 @@ func main() {
 		    if (savelist("mylist")) {/*ok*/} else  abort("savelist: " ^ lasterror());
 		}
 	}
-#ifdef EXO_FORMAT
+#if EXO_FORMAT
 
 	printl("getlist(SV listname);");
 	{

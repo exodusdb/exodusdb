@@ -1,13 +1,10 @@
 module;
 
-#include <fmt/format.h>
-#include <fmt/core.h>
-
 #include <exodus/vardefs.h>
+#include <exodus/format.h>
 
 #include <exodus/exoimpl.h>
 #include <exodus/exoprog.h>
-#include <exodus/format.h>
 #include <exodus/exofuncs.h>
 
 #include <exodus/range.h>
@@ -213,7 +210,6 @@ export namespace exo {
 
 	using exo::first;
 	using exo::floor;
-	using exo::format;
 
 	using exo::from_codepage;
 	using exo::to_codepage;
@@ -335,11 +331,14 @@ export namespace exo {
 	using exo::prefix;
 	using exo::prefixer;
 
-	using exo::print;
 	using exo::printl;
-	using exo::println;
 	using exo::printt;
 	using exo::printx;
+#if EXO_FORMAT
+	using exo::print;
+	using exo::println;
+	using exo::format;
+#endif
 
 	using exo::pwr;
 
@@ -456,9 +455,24 @@ export namespace exo {
 	using exo::xlate;
 
 }
-export namespace fmt {
-	using fmt::formatter;
-	using fmt::format;
-	using fmt::print;
-//	using fmt::println;
-}
+#if EXO_FORMAT == 1
+//	export namespace std {
+//		using std::formatter;
+//		using std::format;
+//	}
+	export namespace stdfmt {
+		using std::formatter;
+		using std::format;
+	//	using std::print;
+	//	using std::vprint;
+	//	using std::println;
+	}
+#elif EXO_FORMAT == 2 || EXO_FORMAT == 3
+	export namespace stdfmt {
+		using fmt::formatter;
+		using fmt::format;
+	//	using fmt::print;
+	//	using fmt::vprint;
+	//	using fmt::println;
+	}
+#endif // EXO_FORMAT

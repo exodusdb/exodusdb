@@ -802,7 +802,7 @@ void printt(void) {
 	std::cout << sep;
 }
 
-#ifdef EXO_FORMAT
+#if EXO_FORMAT
 
 /////////////////
 // print, println - requires compile time format string
@@ -935,7 +935,8 @@ template<class... Args>
 //#if __clang_major__ and __clang_major__ <= 15
 	// Dont forward if the format library cannot handle it
 //	fmt::vprint(fmt_str, fmt::make_format_args(args...));
-	fmt::vprint(fmt_str, fmt::make_format_args(cast_var_to_var_base(args)...));
+//	fmt::vprint(fmt_str, fmt::make_format_args(cast_var_to_var_base(args)...));
+	std::cout << fmt::vformat(fmt_str, fmt::make_format_args(cast_var_to_var_base(args)...));
 //#else
 //	fmt::vprint(fmt_str, fmt::make_format_args(std::forward<Args>(args)...));
 //#endif
@@ -961,7 +962,7 @@ template<class... Args>
 
 }  // namespace exo
 
-#ifdef EXO_FORMAT
+#if EXO_FORMAT
 
 // formatter for var must be defined in global namespace
 

@@ -1,25 +1,3 @@
-/*
-Copyright (c) 2009 steve.bush@neosys.com
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
-*/
-
 #ifndef LIBEXODUS_FORMAT_H
 #define LIBEXODUS_FORMAT_H
 
@@ -46,15 +24,15 @@ THE SOFTWARE.
 //#	include <format>
 //	namespace fmt = std;
 
-//#undef EXO_FORMAT // only to avoid warning about redefinition below
+#if EXO_FORMAT == 1
 
-//#elif __has_include(<fmt/core.h>)
-// Not available in libfmt6 which doesnt compile with exodus
-#undef EXO_FORMAT
+#	include <format>
+	namespace fmt = std;
 
-#if __has_include(<fmt/args.h>)
+#elif EXO_FORMAT == 2 || EXO_FORMAT == 3
+
 //#	warning Using fmt library instead std::format
-#	define EXO_FORMAT 2
+
 #	pragma GCC diagnostic push
 #	pragma clang diagnostic ignored "-Wdocumentation-unknown-command"
 #   pragma clang diagnostic ignored "-Wreserved-id-macro" //18 20.04
@@ -64,11 +42,12 @@ THE SOFTWARE.
 
 #	include <fmt/core.h>
 #	include <fmt/format.h> // for fmt::formatter<std::string_view> etc.
-//#	include <fmt/args.h> // only for fmt::dynamic_format_arg_store which we are not using ATM
-//	import fmt;
-//module #	include <variant>
+
 #	pragma GCC diagnostic pop
+
 #	if __GNUC__ >= 11 || __clang_major__ > 1
+
+// Avoid the following error:
 ///root/exodus/fmt/include/fmt/core.h: In member function ‘constexpr auto fmt::v10::formatter<exo::var>::parse(ParseContext&) [with ParseContext =
 // fmt::v10::basic_format_parse_context<char>]’:
 ///root/exodus/fmt/include/fmt/core.h:2712:22: warning: inlining failed in call to ‘constexpr const Char* fmt::v10::formatter<T, Char, typename std::enable_if<(fmt::v10::detail::type_constant<T, Char>::value != fmt::v10::detail::type::custom_type), void>::type>::parse(ParseContext&) [with ParseContext = fmt::v10::basic_format_parse_context<char>; T = fmt::v10::basic_string_view<char>; Char = char]’: --param max-inline-insns-single limit reached [-Winline]
@@ -77,21 +56,24 @@ THE SOFTWARE.
 ///root/exodus/test/src/../../exodus/libexodus/exodus/exofuncs.h:850:58: note: called from here
 //  850 |                 return formatter<std::string_view>::parse(ctx);
 //      |                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~
+
 #		pragma GCC diagnostic ignored "-Winline"
 #	endif
 
+#endif // EXO_FORMAT == 2 || 3
+
+#if EXO_FORMAT
 namespace exo {
 	class var;
 	class var_base;
-//}
-//namespace exo {
-// Helper to conditionally cast exo::var to exo::var_base
+
 template<typename T>
-auto cast_var_to_var_base(T&& arg) -> std::conditional_t<
-	std::is_same_v<std::decay_t<T>, exo::var>,
-	exo::var_base&,
-	T&&
-> {
+auto cast_var_to_var_base(T&& arg) ->
+	std::conditional_t<
+		std::is_same_v<std::decay_t<T>, exo::var>,
+		exo::var_base&,
+		T&&
+	> {
 	if constexpr (std::is_same_v<std::decay_t<T>, exo::var>) {
 		// Ensure lvalue reference for exo::var
 		return static_cast<exo::var_base&>(arg);
@@ -99,7 +81,9 @@ auto cast_var_to_var_base(T&& arg) -> std::conditional_t<
 		return std::forward<T>(arg);
 	}
 }
-}
-#endif // __has_include(<fmt/args.h>)
+
+} // namespace exo
+
+#endif // EXO_FORMAT
 
 #endif // LIBEXODUS_FORMAT_H

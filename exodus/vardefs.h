@@ -3,6 +3,22 @@
 
 //#include <version> // for __cpp_consteval
 
+/////////////
+// EXO_FORMAT
+/////////////
+
+#ifndef EXO_FORMAT
+#	if __has_include(<format>)
+#		define EXO_FORMAT 1
+#	elif __has_include(<fmt/args.h>)
+#		define EXO_FORMAT 2
+#	endif
+#endif
+
+/////////////
+// EXO_SNITCH
+/////////////
+
 // Tracing ctor/dtor/assign/conversions
 // Use cmake -DEXO_SNITCH=1 to enable or enable it here
 //
@@ -15,16 +31,18 @@
 #	define EXO_SNITCH(FUNC)
 #endif
 
-#define BACKTRACE_MAXADDRESSES 100
-
-#define DUMPDEFINE(x) DUMPDEFINE0(x)
-#define DUMPDEFINE0(x) #x
+/////////////////
+// EXODUS_RELEASE
+/////////////////
 
 // Info used in cli/compile
 //
-#define EXODUS_RELEASE "24.07"
-#define EXODUS_PATCH "24.07.0"
+#define EXODUS_RELEASE "25.07"
+#define EXODUS_PATCH "25.07.0"
 
+///////////
+// TO_CHARS
+///////////
 
 // 1. TO_CHARS from Ubuntu 22.04
 // Used varnum.cpp, test_main3.cpp, test_precision2.cpp.
@@ -38,21 +56,6 @@
 #else
 #endif
 
-// Used in patch of /usr/include/c++/14/ostream to exclude std::format
-// which is ambiguous with exo::format despite different namespace due to argument dependent lookup
-// https://en.wikipedia.org/wiki/Argument-dependent_name_lookup
-// Patched in CMakeLists.txt
-//    execute_process(
-//        COMMAND
-//            sed -i "s|# include <format>|# ifndef EXO_FORMAT\\n#  include <format>\\n# endif|" /usr/include/c++/14/ostream
-//        COMMAND
-//            sed -i "s|#if __cpp_lib_print|#if !defined(EXO_FORMAT) \\&\\& __cpp_lib_print|" /usr/include/c++/14/ostream
-//    )
-// Probably converted to EXO_FORMAT 2 after inclusion of exodus/format.h
-#ifndef EXO_FORMAT
-#	define EXO_FORMAT 1
-#endif
-
 // Use ASCII 0x1A-0x1F for PickOS separator chars instead
 // of PickOS 0xFA-0xFF which are illegal utf-8 bytes
 
@@ -64,6 +67,23 @@
 // Leading _ char* versions of classic pick delimiters
 // Using macros to allow use of space as compile time concatenation operator
 // e.g. _FM _VM will compile directly to "\x1F\x1E"
+
+////////////
+// BACKTRACE
+////////////
+
+#define BACKTRACE_MAXADDRESSES 100
+
+/////////////
+// DUMPDEFINE
+/////////////
+
+#define DUMPDEFINE(x) DUMPDEFINE0(x)
+#define DUMPDEFINE0(x) #x
+
+////////////////
+// _RM, _NL etc.
+////////////////
 
 #define _RM "\x1F"  // Record Mark
 #define _FM "\x1E"  // Field Mark
@@ -117,6 +137,10 @@
 
 #define _ALL_FMS _RM _FM _VM _SM _TM _STM
 
+////////
+// TRACE
+////////
+
 // Useful TRACE() function for debugging
 #define TRACE(EXPRESSION) \
 	try{ \
@@ -135,12 +159,10 @@
 ////
 //using SV = std::string_view;
 
-// [[nodiscard]]
-//
-#define ND [[nodiscard]]
-
+//////////////////
 // EXO_REGEX_BOOST
-//
+//////////////////
+
 #define EXO_REGEX_BOOST
 
 #pragma GCC diagnostic ignored "-Winline"

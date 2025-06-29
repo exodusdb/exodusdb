@@ -171,8 +171,8 @@ execute_process(
 ## fmt
 ## ###
 ##
-	include_directories(${FMT_INCLUDE})
 
+	include_directories(${FMT_INCLUDE})
 #
 # Ryu
 # ###
@@ -247,9 +247,14 @@ execute_process(
 	#			dim.cppm
 		)
 		target_link_libraries(exovar std)
-#		target_link_libraries(exovar fmt)
-#		target_link_libraries(exovar ${FMT_LIBRARIES})
-		target_link_libraries(exovar fmt::fmt)
+		if (EXO_FORMAT EQUAL 2)
+			target_link_libraries(exovar fmt)
+		endif()
+		if (EXO_FORMAT EQUAL 3)
+#			target_link_libraries(exovar ${FMT_LIBRARIES})
+#			target_link_libraries(exovar fmt::fmt)
+#			target_link_libraries(exovar fmt/libfmt.a)
+		endif()
 	endif()
 #
 # module?
@@ -269,9 +274,15 @@ execute_process(
 				exoprog.cppm
 		)
 		target_link_libraries(exoprog std)
-#		target_link_libraries(exoprog fmt)
 		target_link_libraries(exoprog exovar)
-		target_link_libraries(exovar fmt::fmt)
+		if (EXO_FORMAT EQUAL 2)
+			target_link_libraries(exoprog fmt)
+		endif()
+		if (EXO_FORMAT EQUAL 3)
+#			target_link_libraries(exoprog ${FMT_LIBRARIES})
+#			target_link_libraries(exoprog fmt::fmt)
+#			target_link_libraries(exoprog fmt/libfmt.a)
+		endif()
 	endif()
 #
 # libexodus source
@@ -381,14 +392,6 @@ execute_process(
 		)
 	endif()
 
-#	# fmt
-#	# ###
-#	#
-#	# This is probably not needed here. Maybe required by cli compile.cpp linkoptions?
-#	target_link_libraries(exodus ${FMT_LIBRARIES})
-#	target_link_libraries(exodus fmt::fmt)
-
-
 #
 # readline
 ##########
@@ -477,6 +480,21 @@ execute_process(
 				result_range.h
 				task_manager.h
 				rex.h
+				format.h
+
+				range.h
+				exoprog.h
+				exocallable.h
+				exofuncs.h
+				exoenv.h
+
+				job.h
+				job_manager.h
+				task_manager.h
+				threadpool.h
+				threadsafequeue.h
+				timebank.h
+
 			DESTINATION include/exodus
 		)
 	endif()
@@ -488,37 +506,18 @@ execute_process(
 	install(
 		FILES
 
-#			varb.h
-#			var.h
-#			vartyp.h
-#			varerr.h
-#			varb_friends.h
-#			dim.h
-#			rex.h
-
 			vardefs.h
 			exodus.h
-			range.h
+			exomacros.h
 			exoimpl.h
 			exodebug.h
-			exomacros.h
-			exoenv.h
-			threadsafequeue.h
-			exofuncs.h
-			format.h
-			#mvimpl.h mvipc.h mvconfig.h mvlink.h
+
 			program.h
 			library.h
 			dict.h
 			common.h
-			exoprog.h
-			exocallable.h
-			job.h
-			job_manager.h
-			task_manager.h
-			threadpool.h
+
 			ioconv_custom.h
-			timebank.h
 			printtx.hpp
 			htmllib2.h
 		DESTINATION include/exodus
