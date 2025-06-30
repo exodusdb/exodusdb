@@ -19,7 +19,7 @@ func main(in args1, in args2, in sep) {
 	int min_nn = nn2 > nn1 ? nn1 : nn2;
 	int max_nn = nn2 > nn1 ? nn2 : nn1;
 
-	dim output(max_nn);
+	dim output{max_nn};
 
 	// remember is 1 based
 
