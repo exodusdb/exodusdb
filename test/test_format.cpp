@@ -225,9 +225,9 @@ func main() {
 
 //g++ 11 in Ubuntu 22.04 has format but a bug in width of unicode characters
 //#if EXO_FORMAT == 1
-//#if EXO_FORMAT == 1 and __GNUG__ == 13
-#if EXO_FORMAT == 1
-#warning EXO_FORMAT == 1 and _GNUG__ == 13 has error in formatting width of multibyte utf-8
+#if EXO_FORMAT == 1 and __GNUG__ < 13
+#warning EXO_FORMAT == 1 and _GNUG__ < 13 has error in formatting width of multibyte utf-8
+
 	// Incorrect in g++13.2
 	// Width is calculated as bytes not utf-8 character widths
 	// Cat = four bytes so takes up "4" positions in formatting
@@ -308,7 +308,7 @@ func main() {
 		// must convert to string - see next block
 
 		// https://en.cppreference.com/w/cpp/utility/format/spec
-#if EXO_FORMAT == 1
+#if EXO_FORMAT == 1 && __GNUG__ < 13
 
 		// cat face in utf8 = F0 9F 90 B1
 		assert(format("{:.^5s}",   "🐱").squote().outputl()         == "'🐱.'");  // WRONG
