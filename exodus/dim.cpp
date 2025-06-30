@@ -170,9 +170,9 @@ CVR dim::getelementref(int rowno1, int colno1) const {
 	size_t ncells = base::size();
 	size_t nrows = ncells;
 	if (colno1) {
-		// 2d access requires 2nd dimension (ncols_) to have a positive size.
+		// 2d access requires ncols_ to have a positive size.
 		if (!ncols_) {
-			throw DimUndimensioned("colno: " ^ var(colno1) ^ " cannot be requested on a 1 dimensioned array");
+			throw DimUndimensioned("colno: " ^ var(colno1) ^ " cannot be requested on an undimensi0ned array");
 		}
 		// Ceiling division to include partial last row
 		nrows = (ncells + ncols_ - 1) / ncols_;

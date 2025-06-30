@@ -16,7 +16,7 @@
 #ifdef EXO_MODULE
 	import std;
 #else
-//#	include <functional>
+#	include <functional> // std::function
 //#	include <queue>
 //#	include <mutex>
 //#	include <condition_variable>

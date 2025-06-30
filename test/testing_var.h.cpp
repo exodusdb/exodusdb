@@ -1127,7 +1127,7 @@ func main() {
 		let v2 = replace("A a B b", "[A-Z]"_rex, "'$0'");
 	}
 
-	printl("replace(const rex& regex, ReplacementFunction auto repl_func) const; /*IMPL");
+	printl("replace(const rex& regex, ReplacementFunction auto repl_func) const &; /*IMPL");
 	{
 		// Decode hex escape codes.
 		let v1 = R"(--\0x3B--\0x2F--)";                                 // Hex escape codes.
@@ -1138,7 +1138,7 @@ func main() {
 		assert(v2 == "--;--/--");
 	}
 
-	printl("replace(const rex& regex, ReplacementFunction auto repl_func) const; /*IMPL");
+	printl("replace(const rex& regex, ReplacementFunction auto repl_func) const &; /*IMPL");
 	{
 		// Reformat dates using groups.
 		let v3 = "Date: 03-15-2025";
@@ -2235,7 +2235,7 @@ func main() {
 		dim d1;
 	}
 
-	printl("dim(const int nrows, const int ncols = 1);");
+	printl("dim(const int nrows, const int ncols/* = 1*/);");
 	{
 		dim d1(10);
 		dim d2(10, 3);

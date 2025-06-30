@@ -3542,7 +3542,7 @@ bool var_db::selectx(in fieldnames, in sortselectclause) {
 	}
 
 	if (DBTRACE>1)
-		TRACE(sortselectclause)
+		TRACE(sortselectclause.toString())
 
 	var actualfilename = get_normalized_filename(*this);
 	var dictfilename = actualfilename;

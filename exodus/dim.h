@@ -29,7 +29,7 @@ class PUBLIC dim final : public std::vector<var> {
 
  private:
 
-	mutable int ncols_ = 0;
+	mutable int ncols_ = 1;
 
 	// Alias for the base class
 	using base = std::vector<var>;
@@ -71,7 +71,7 @@ class PUBLIC dim final : public std::vector<var> {
 	// `dim d1(10);
 	//  dim d2(10, 3);`
 	//
-	dim(const int nrows, const int ncols = 1);
+	dim(const int nrows, const int ncols/* = 1*/);
 
 	////////////////
 	// 2. Destructor

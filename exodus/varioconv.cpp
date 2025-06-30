@@ -22,6 +22,7 @@ THE SOFTWARE.
 
 #if EXO_MODULE
 	import std;
+	using uint64_t = std::uint64_t;
 #else
 #	include <cmath>    //for pow
 #	include <algorithm> //for std::replace
@@ -33,8 +34,6 @@ THE SOFTWARE.
 //#include <utility>   //std::unreachable()
 //#include <stdexcept> // for std::invalid_argument
 #endif
-
-using uint64_t = std::uint64_t;
 
 #include "ASCIIutil.h" // for ASCII_isdigit ASCII_isalpha ASCII_toupper
 

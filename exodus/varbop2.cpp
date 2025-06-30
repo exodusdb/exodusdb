@@ -25,6 +25,7 @@ THE SOFTWARE.
 #else
 #	include <string>
 #	include <limits>
+#	include <cmath> // std::floor
 #endif
 
 #include <exodus/varb.h>

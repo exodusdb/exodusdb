@@ -450,7 +450,7 @@ bool var_os::osprocess(in oscmd, in stdin_for_process, out stdout_from_process, 
 	exit_status = process_exit_status;
 
 	const var errmsg = (result and not process_exit_status) ? "" :
-		"var::osprocess failed. " ^ var(exit_status)
+		"var::osprocess failed. " ^ exit_status
 		^ " " ^ oscmd.quote()
 		;
 	// False only when exit_status is >= 0

@@ -727,7 +727,7 @@ class PUBLIC var_base {
 //	constexpr operator const var&() const { return *reinterpret_cast<const var*>(this); }
 //	constexpr operator       var&()       { return *reinterpret_cast<var*>(this); }
 
-    constexpr operator       var()  const    ;//{ return *reinterpret_cast<const var*>(this); }
+    constexpr operator       var()  const &  ;//{ return *reinterpret_cast<const var*>(this); }
 //    constexpr operator const var()  const    ;//{ return *reinterpret_cast<const var*>(this); }
     constexpr operator const var&() const &  ;//{ return *reinterpret_cast<const var*>(this); }
     constexpr operator       var&()       &  ;//{ return *reinterpret_cast<var*>(this); }

@@ -889,7 +889,7 @@ public:
 	//  );
 	//  assert(v4 == "Date: 2025-03-15");`
 	//
-	ND var           replace(const rex& regex, ReplacementFunction auto repl_func) const; /*IMPL{
+	ND var           replace(const rex& regex, ReplacementFunction auto repl_func) const &; /*IMPL{
 
 		// Lambda to bridge the callable to a function pointer + context
 		struct Context {decltype(repl_func)* lambda;};
@@ -1081,13 +1081,13 @@ public:
 	ND var  textconvert(SV fromchars, SV tochars)     &&;
 	ND var  replace(    SV fromstr,   SV tostr)       &&;
 	ND var  replace(const rex& regex, SV replacement) &&;
-	ND var           replace(const rex& regex, ReplacementFunction auto repl_func)
+	ND var  replace(const rex& regex, ReplacementFunction auto repl_func)
 	                                                  &&;
 
 	ND var  unique()                                  &&;
 	ND var  sort(   SV delimiter = _FM)               &&;
 	ND var  reverse(SV delimiter = _FM)               &&;
-	ND var  randomize(SV delimiter = _FM)               &&;
+	ND var  randomize(SV delimiter = _FM)             &&;
 	ND var  parse(char delimiter = ' ')               &&;
 
 	///// STRING MUTATION - Standalone commands:

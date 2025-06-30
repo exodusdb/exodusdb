@@ -1128,7 +1128,7 @@ ND var  var_stg::replace(const rex& regex, ReplacementFunction auto repl_func)
 
    IO   var_stg::replacer(const rex& regex, ReplacementFunction auto repl_func) REF {*this = replace(regex, repl_func);}
 
-ND var  var_stg::replace(const rex& regex, ReplacementFunction auto repl_func) const {
+ND var  var_stg::replace(const rex& regex, ReplacementFunction auto repl_func) const & {
 
 	// Lambda to bridge the callable to a function pointer + context
 	struct Context {decltype(repl_func)* lambda;};
@@ -1169,7 +1169,7 @@ ND var  var_stg::append(const auto&... appendable)   && {((*this) ^= ... ^= appe
 // Implicit conversion of var_base to var
 //var_base::operator var()       { return *reinterpret_cast<      var*>(this); }
 //var_base::operator var() const { return *reinterpret_cast<const var*>(this); }
-	constexpr var_base::operator       var()  const    { return *reinterpret_cast<const var*>(this); }
+	constexpr var_base::operator       var()  const &  { return *reinterpret_cast<const var*>(this); }
 //	constexpr var_base::operator const var()  const    { return *reinterpret_cast<const var*>(this); }
 	constexpr var_base::operator const var&() const &  { return *reinterpret_cast<const var*>(this); }
 	constexpr var_base::operator       var&()       &  { return *reinterpret_cast<var*>(this); }

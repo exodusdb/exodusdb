@@ -166,8 +166,10 @@ func main() {
 		//TRACE(d2.at(1))
 		//TRACE(d2.at(6))
 		TRACE(d2.at(1, 0))
+		TRACE(d2.at(1, 1))
 		TRACE(d2.at(6, 0))
-		try{assert(d2.at(1, 1) eq 1); assert(false && "Cant use coln on 1d array");} catch (DimUndimensioned e) {};
+//		try{assert(d2.at(1, 1) eq 1); assert(false && "Cant use coln on 1d array");} catch (DimUndimensioned e) {};
+		try{errputl(d2.at(1, 2)); assert(false && "Cant use coln on 1d array");} catch (DimIndexOutOfBounds e) {};
 		assert(d2.at(6, 0) eq 6);
 		const dim d3 = {1, 2, 3, 4, 5, 6};
 		assert(d3.at(1, 0) eq d3[1]);
@@ -659,7 +661,8 @@ func main() {
 		x = "x";
 		assert(x.join() eq "x"_var);
 		assert(x.rows() eq 1);
-		assert(x.cols() eq 0);
+//		assert(x.cols() eq 0);
+		assert(x.cols() eq 1);
 	}
 
 	// 2
@@ -672,7 +675,8 @@ func main() {
 		x = "x";
 		assert(x.join() eq "x^x"_var);
 		assert(x.rows() eq 2);
-		assert(x.cols() eq 0);
+//		assert(x.cols() eq 0);
+		assert(x.cols() eq 1);
 	}
 
 	// 3
@@ -685,7 +689,8 @@ func main() {
 		x = "x";
 		assert(x.join() eq "x^x^x"_var);
 		assert(x.rows() eq 3);
-		assert(x.cols() eq 0);
+//		assert(x.cols() eq 0);
+		assert(x.cols() eq 1);
 	}
 
 	// CONSTRUCT PLAIN {}
@@ -700,7 +705,8 @@ func main() {
 		x = "x";
 		assert(x.join() eq "x");
 		assert(x.rows() eq 1);
-		assert(x.cols() eq 0);
+//		assert(x.cols() eq 0);
+		assert(x.cols() eq 1);
 	}
 
 	// 2
@@ -713,7 +719,8 @@ func main() {
 		x = "x";
 		assert(x.join() eq "x^x"_var);
 		assert(x.rows() eq 2);
-		assert(x.cols() eq 0);
+//		assert(x.cols() eq 0);
+		assert(x.cols() eq 1);
 	}
 
 	// 3
@@ -727,7 +734,8 @@ func main() {
 		x = "x";
 		assert(x.join() eq "x^x^x"_var);
 		assert(x.rows() eq 3);
-		assert(x.cols() eq 0);
+//		assert(x.cols() eq 0);
+		assert(x.cols() eq 1);
 	}
 
 	{

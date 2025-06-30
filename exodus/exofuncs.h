@@ -1202,7 +1202,7 @@ auto format(const exo::var_base& var1, FormatContext& ctx) const {
 			// {::D2/E} etc.
 			// {::MTHS} etc.
 			//return formatter<std::string_view>::format(var1, ctx);
-			exo::var_base converted_var1 = static_cast<exo::var>(var1).oconv(fmt_str_.c_str());
+			exo::var_base converted_var1 = static_cast<const exo::var&>(var1).oconv(fmt_str_.c_str());
 			auto sv1 = std::string_view(converted_var1);
 			return vformat_to(ctx.out(), "{:}", fmt::make_format_args(sv1));
 
