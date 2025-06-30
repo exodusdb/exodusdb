@@ -35,6 +35,15 @@ set -euxo pipefail
 	[ ${EXODUS_DIR:0:6} = /root/ ] && chmod o+x /root
 
 :
+: Install chromium to convert html to pdf 
+: =======================================
+:
+:  Dont wait for it to complete. Install will be tested near the end of this script.
+:
+	sudo snap refresh
+	sudo snap services chromium 2> /dev/null || sudo snap install chromium --no-wait
+
+:
 : Install apache with php and configure a site
 : ============================================
 :
@@ -48,6 +57,14 @@ set -euxo pipefail
 : =========================
 :
 	sudo a2dissite 000-default default-ssl.conf || true
+
+:
+: Copy logo and ico into images and web root
+: ==========================================
+
+	cd $EXODUS_DIR/service
+	cp favicon.ico www
+	cp exodusm.png www/exodus/images/theme2
 
 :
 : Compile the service
@@ -175,17 +192,22 @@ set -euxo pipefail
 #	rm wkhtmltopdf.html wkhtmltopdf.pdf
 
 :
-: Install chromium to convert html to pdf
-: =======================================
+: Check chromium converts html to pdf
+: ===================================
 :
-	sudo snap services chromium 2> /dev/null || sudo snap install chromium
+: Wait 5 mins for installation to complete
 :
-: Verify chromium pdf converter works
+	timeout 300 bash -c 'while ! snap changes | grep chromium | grep -q Done; do sleep 5; done; echo "Chromium installation done"' || echo "Timed out after 5 minutes"
 :
-: Ignore a lot of chromium error messages and check output chromium2pdf.pdf if in doubt.
-!
+: Verify chromium pdf converter works - Ignore various chromium error messages
+:
 	printf "<html><body>Nothing Special</body></html>\n" > chromium2pdf.html
-	chromium --no-sandbox --headless --disable-gpu --print-to-pdf=chromium2pdf.pdf chromium2pdf.html
+	chromium --no-sandbox --headless --disable-gpu --print-to-pdf=chromium2pdf.pdf chromium2pdf.html |& grep "dbus|dconf|touch|mkdir" -vP 1>&2
+:
+: Check pdf seems ok
+:
+	which pdfgrep || sudo DEBIAN_FRONTEND=noninteractive apt-get -y install pdfgrep
+	pdfgrep "Nothing Special" chromium2pdf.pdf
 #	rm chromium2pdf.html chromium2pdf.pdf
 
 :
@@ -193,14 +215,6 @@ set -euxo pipefail
 : ==================================
 :
 	IPNO=`ip -4 address|grep -v 127.0.0.1|grep -P '\d+\.\d+\.\d+\.\d+' -o|head -n1`
-
-:
-: Copy logo and ico into images and web root
-: ==========================================
-
-	cd $EXODUS_DIR/service
-	cp favicon.ico www
-	cp exodusm.png www/exodus/images/theme2
 
 :
 : ==============================================================
