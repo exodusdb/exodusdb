@@ -3,6 +3,12 @@
 
 // gendoc: var - String functions
 
+#if EXO_MODULE
+	import std;
+#else
+#	include <array>
+#endif
+
 #include <exodus/var_iter.h>
 
 namespace exo {

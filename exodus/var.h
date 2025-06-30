@@ -33,6 +33,7 @@ THE SOFTWARE.
 #	include <string>
 #	include <string_view>
 #	include <vector>
+#	include <array>
 #endif
 
 // Purely #define so can done before any declarations

@@ -34,6 +34,7 @@ THE SOFTWARE.
 #if EXO_MODULE
 #else
 #	include <charconv>
+#	include <array>
 #endif
 
 // EXO_USE_TO_CHARS and EXO_USE_RYU are decided in vardefs.h
