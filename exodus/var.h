@@ -1166,22 +1166,26 @@ auto var_stg::unpack/*<N>*/(SV delim /*= _FM*/) const -> std::array<var, N> {
 ND var  var_stg::append(const auto&... appendable) const& {var nrvo = this->clone(); (nrvo ^= ... ^= appendable); return nrvo;}
 ND var  var_stg::append(const auto&... appendable)   && {((*this) ^= ... ^= appendable);      return move();}
 
+#ifdef EXO_VAR_CPP
+
 // Implicit conversion of var_base to var
 //var_base::operator var()       { return *reinterpret_cast<      var*>(this); }
 //var_base::operator var() const { return *reinterpret_cast<const var*>(this); }
-	constexpr var_base::operator       var()  const &  { return *reinterpret_cast<const var*>(this); }
-//	constexpr var_base::operator const var()  const    { return *reinterpret_cast<const var*>(this); }
-	constexpr var_base::operator const var&() const &  { return *reinterpret_cast<const var*>(this); }
-	constexpr var_base::operator       var&()       &  { return *reinterpret_cast<var*>(this); }
-	constexpr var_base::operator       var()        && { return *reinterpret_cast<const var*>(this); }
+	CONSTEXPR var_base::operator       var()  const &  { return *reinterpret_cast<const var*>(this); }
+//	CONSTEXPR var_base::operator const var()  const    { return *reinterpret_cast<const var*>(this); }
+	CONSTEXPR var_base::operator const var&() const &  { return *reinterpret_cast<const var*>(this); }
+	CONSTEXPR var_base::operator       var&()       &  { return *reinterpret_cast<var*>(this); }
+	CONSTEXPR var_base::operator       var()        && { return *reinterpret_cast<const var*>(this); }
 
-//	constexpr var_db::operator       var()  const    { return *reinterpret_cast<const var*>(this); }
-//	constexpr var_db::operator const var()  const    { return *reinterpret_cast<const var*>(this); }
-//	constexpr var_db::operator const var&() const &  { return *reinterpret_cast<const var*>(this); }
-//	constexpr var_db::operator       var&()       &  { return *reinterpret_cast<var*>(this); }
-//	constexpr var_db::operator       var()        && { return *reinterpret_cast<const var*>(this); }
+//	CONSTEXPR var_db::operator       var()  const    { return *reinterpret_cast<const var*>(this); }
+//	CONSTEXPR var_db::operator const var()  const    { return *reinterpret_cast<const var*>(this); }
+//	CONSTEXPR var_db::operator const var&() const &  { return *reinterpret_cast<const var*>(this); }
+//	CONSTEXPR var_db::operator       var&()       &  { return *reinterpret_cast<var*>(this); }
+//	CONSTEXPR var_db::operator       var()        && { return *reinterpret_cast<const var*>(this); }
 
-//	constexpr exo::var_db::operator exo::var&() & {return *reinterpret_cast<exo::var*>(this);};
+//	CONSTEXPR exo::var_db::operator exo::var&() & {return *reinterpret_cast<exo::var*>(this);};
+
+#endif
 
 }  // namespace exo
 

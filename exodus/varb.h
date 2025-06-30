@@ -727,11 +727,11 @@ class PUBLIC var_base {
 //	constexpr operator const var&() const { return *reinterpret_cast<const var*>(this); }
 //	constexpr operator       var&()       { return *reinterpret_cast<var*>(this); }
 
-    constexpr operator       var()  const &  ;//{ return *reinterpret_cast<const var*>(this); }
-//    constexpr operator const var()  const    ;//{ return *reinterpret_cast<const var*>(this); }
-    constexpr operator const var&() const &  ;//{ return *reinterpret_cast<const var*>(this); }
-    constexpr operator       var&()       &  ;//{ return *reinterpret_cast<var*>(this); }
-    constexpr operator       var()        && ;//{ return *reinterpret_cast<const var*>(this); }
+    CONSTEXPR operator       var()  const &  ;//{ return *reinterpret_cast<const var*>(this); }
+//    CONSTEXPR operator const var()  const    ;//{ return *reinterpret_cast<const var*>(this); }
+    CONSTEXPR operator const var&() const &  ;//{ return *reinterpret_cast<const var*>(this); }
+    CONSTEXPR operator       var&()       &  ;//{ return *reinterpret_cast<var*>(this); }
+    CONSTEXPR operator       var()        && ;//{ return *reinterpret_cast<const var*>(this); }
 
 //	CONSTEXPR
 //	// move, like most var_base functions returns a var since var's are var_base's but not vice versa

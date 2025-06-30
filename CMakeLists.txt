@@ -208,9 +208,22 @@
 ### ###
 ###
 
+	# Include the module for checking C++ include files
+	include(CheckIncludeFileCXX)
+
+	# Check if the <format> header is available
+	check_include_file_cxx(format HAS_FORMAT_HEADER)
+
+	# Conditionally set a variable based on the result
+	if(HAS_FORMAT_HEADER)
+		set(DEFAULT_EXO_FORMAT "1")
+	else()
+		set(DEFAULT_EXO_FORMAT "2")
+	endif()
+
 # EXO_FORMAT 1 - std::format because it has faster end user compiling when instantiating formatter<var_base>
 
-    set(EXO_FORMAT "1" CACHE STRING "EXO_FORMAT is 0 for No, 1 for std::format, 2 for libfmt, 3 for build fmt")
+    set(EXO_FORMAT ${DEFAULT_EXO_FORMAT} CACHE STRING "EXO_FORMAT is 0 for No, 1 for std::format, 2 for libfmt, 3 for build fmt")
     set_property(CACHE EXO_FORMAT PROPERTY STRINGS 0 1 2 3)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DEXO_FORMAT=${EXO_FORMAT} ")
 
