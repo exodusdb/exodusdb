@@ -65,6 +65,7 @@ public:
 	// Create an independent asynchronous task by calling a function.
 	// funcname: Any callable function name. To call an Exodus program member function, it must be prefixed by "&_ExoProgram::" and followed by ", this" as follows:
 	// e.g. async(&_ExoProgram::xxxxxx, this, arg1, arg2, etc)
+	// All async functions started within a thread/job share a single copy of environment variables, RECORD, ID, ANS etc.
 	// Exodus' asynchronous tasks run sequentially, not simultaneously. Their execution will be interleaved with other async tasks in the same thread of execution. Execution switches (yields) either when a task asks for database i/o or when it explicitly calls yield(). Tasks are implicitly thread-safe but environment variables like RECORD, ID, ANS are thread-wide and shared by all async tasks in a thread.
 	// Exodus' asynchronous tasks are implemented using Boost fibers. These are similar to threads but without parallel processing or OS management. They are extremely fast to setup and and switch between and have a normal stack. They might be called "coprocesses" by comparion with "coroutines" which do not have stacks.
 	// The initial state of an asynchronous task is "ready, not running". Once the main program calls yield() then one of the "ready, not running" async tasks is selected by a round robin scheduler and it runs until complete, requests database i/o, or yields, and so on.

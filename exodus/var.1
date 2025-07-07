@@ -9878,6 +9878,9 @@ Run another program in parallel.
 Unlike perform and execute, run() does not block until it completes. It runs in parallel.
 .sp 0
 .PP
+The program runs in new thread with its own copy of environment variables, RECORD, ID, ANS etc.
+.sp 0
+.PP
 \fBcommand:\fR See perform.
 .sp 0
 .PP
@@ -10012,6 +10015,9 @@ Create an independent asynchronous task by calling a function.
 .sp 0
 .PP
 e.g. async(&_ExoProgram::xxxxxx, this, arg1, arg2, etc)
+.sp 0
+.PP
+All async functions started within a thread/job share a single copy of environment variables, RECORD, ID, ANS etc.
 .sp 0
 .PP
 Exodus' asynchronous tasks run sequentially, not simultaneously. Their execution will be interleaved with other async tasks in the same thread of execution. Execution switches (yields) either when a task asks for database i/o or when it explicitly calls yield(). Tasks are implicitly thread-safe but environment variables like RECORD, ID, ANS are thread-wide and shared by all async tasks in a thread.

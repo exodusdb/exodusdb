@@ -69,6 +69,7 @@ public:
 
 	// Run another program in parallel.
 	// Unlike perform and execute, run() does not block until it completes. It runs in parallel.
+	// The program runs in new thread with its own copy of environment variables, RECORD, ID, ANS etc.
 	// command: See perform.
 	// return: A "job" object that you can use to manage the running job.
 	// * Check if it has finished.

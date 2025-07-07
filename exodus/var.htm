@@ -8914,6 +8914,7 @@ Optional prefix of "1/" or "/" causes the reciprocal of the number to be used. e
 		<td>
 			<p>Run another program in parallel.</p>
 			<p>Unlike perform and execute, run() does not block until it completes. It runs in parallel.</p>
+			<p>The program runs in new thread with its own copy of environment variables, RECORD, ID, ANS etc.</p>
 			<p>
 				<em>command:</em> See perform.</p>
 			<p>
@@ -9053,6 +9054,7 @@ Optional prefix of "1/" or "/" causes the reciprocal of the number to be used. e
 			<p>
 				<em>funcname:</em> Any callable function name. To call an Exodus program member function, it must be prefixed by "&amp;_ExoProgram::" and followed by ", this" as follows:</p>
 			<p>e.g. async(&amp;_ExoProgram::xxxxxx, this, arg1, arg2, etc)</p>
+			<p>All async functions started within a thread/job share a single copy of environment variables, RECORD, ID, ANS etc.</p>
 			<p>Exodus' asynchronous tasks run sequentially, not simultaneously. Their execution will be interleaved with other async tasks in the same thread of execution. Execution switches (yields) either when a task asks for database i/o or when it explicitly calls yield(). Tasks are implicitly thread-safe but environment variables like RECORD, ID, ANS are thread-wide and shared by all async tasks in a thread.</p>
 			<p>Exodus' asynchronous tasks are implemented using Boost fibers. These are similar to threads but without parallel processing or OS management. They are extremely fast to setup and and switch between and have a normal stack. They might be called "coprocesses" by comparion with "coroutines" which do not have stacks.</p>
 			<p>The initial state of an asynchronous task is "ready, not running". Once the main program calls yield() then one of the "ready, not running" async tasks is selected by a round robin scheduler and it runs until complete, requests database i/o, or yields, and so on.</p>
