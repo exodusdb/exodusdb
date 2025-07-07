@@ -1483,9 +1483,25 @@ function t2h_main(in inp) {
 
 		// Outbound line conversions
 		{
+			// http links not already quoted or inside tags
+			// https://en.cppreference.com/w/cpp/container/vector.html
+			static rex href_rex = R"__(http[s]?:/[/a-zA-Z0-9_&=.:]+)__"_rex;
+			line.replacer(href_rex, "<a href=\"$0\">$0</a>");
+//			static rex href_rex = R"__(([^">])(http[s]?:/[/a-zA-Z0-9_&=.:]+))__"_rex;
+//			line.replacer(href_rex, "$1<a href=\"$2\">$2</a>");
+
+			// Emphasise first phrases ending in ::
+			static rex rex1 = R"__(^([\w _.\[\]]+)::( |<|$))__"_rex;
+			line.replacer(rex1, "<em>$1:</em>$2");
+
 			// Emphasise first words ending in :
 			// Accept \w _ . [ ]
-			line.replacer(R"__(^([\w_.\[\]]+): ?)__"_rex, "<em>$1:</em> ");
+//			line.replacer(    R"__(^([\w_.\[\]]+): ?)__"_rex, "<em>$1:</em> ");
+			static rex rex2 = R"__(^([\w_.\[\]]+): ?)__"_rex;
+			line.replacer(rex2, "<em>$1:</em> ");
+//			static rex rex2 = R"__(^([\w_.\[\]]+):([ <]))__"_rex;
+//			line.replacer(rex2, "<em>$1:</em>$2");
+
 		}
 
 		// Open a tag and output the line
@@ -2360,7 +2376,7 @@ func boxdrawing_to_html(in html) {
 		act.replacer("<p>└", "</tbody></table>");
 		act.replacer("[─┌─┬─┐├─┼─┤└─┴─┘]+"_rex, "");
 	} else {
-		act.replacer("<p>┌", "<table>\n<tr><td>");
+		act.replacer("<p>┌", "<table class=\"box_drawing\">\n<tr><td>");
 		act.replacer("<p>├", "<tr><td>");
 		act.replacer("<p>└", "<tr><td>");
 

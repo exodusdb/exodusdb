@@ -90,6 +90,10 @@
 	# Rebuild and rerun if var.h changes to generate new man page
 	add_executable(gendoc gendoc.cpp ${SRC_EXODUS_DIR}/var.h)
 	add_dependencies(gendoc htmllib2)
+	#
+	file(GLOB gendoc_files ${SRC_EXODUS_DIR}"/*.h")
+	add_custom_target(gendoc_depends ${gendoc_files})
+	add_dependencies(gendoc gendoc_depends)
 
 	#name is name only ... input and output files are exodus
 	add_executable(exodus-cli exodus.cpp)

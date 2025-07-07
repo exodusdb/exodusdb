@@ -2026,7 +2026,7 @@ var  var_stg::numberinwords(in langname_or_locale_id) {
 ////				((*this) ^= ... ^= appendable);
 //				this->createString();
 //				//(var_str += ... += appendable);
-//				(append_one(appendable), ...);  // Comma fold—calls append_one per arg
+//				(append_one(appendable), ...);  // Comma fold calls append_one per arg
 //				return move();
 //			}
 

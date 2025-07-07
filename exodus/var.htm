@@ -52,12 +52,17 @@
 		padding: 7px;
 	}
 
-	.wikitable {
+	.wikitable, .box_drawing {
 		background-color: #f8f9fa;
 		color: #202122;
 		margin: 1em 0;
 		border: 1px solid #a2a9b1;
 		border-collapse: collapse;
+	}
+
+	.box_drawing tr:nth-child(2) {
+		background-color: #eaecf0;
+		font-weight: bold;
 	}
 
 	p {
@@ -460,7 +465,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 		<th>Function</th>
 		<th>Description</th> </tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>var v1;</code></p></td>
@@ -476,7 +481,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			<p></p>
 			<p>
 				<em>Pseudonyms:</em> </p>
-			<table>
+			<table class="box_drawing">
 				<tr>
 					<td>                      </td>
 					<td>               </td>
@@ -508,7 +513,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</table>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>var v1 = expression;</code></p></td>
@@ -545,7 +550,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 		<th>Function</th>
 		<th>Description</th> </tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -575,7 +580,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>var v1 = {"a", "b", "c" ...}; // Initializer list</code></p></td>
@@ -588,7 +593,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -614,7 +619,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -638,7 +643,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -670,7 +675,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 		<th>Function</th>
 		<th>Description</th> </tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -692,7 +697,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -714,7 +719,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -734,7 +739,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -751,7 +756,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>var::setlasterror(msg)</code></p></td>
@@ -759,7 +764,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			<p>Set the lasterror() message.</p>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>var::loglasterror(source = "")</code></p></td>
@@ -784,7 +789,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 		<th>Function</th>
 		<th>Description</th> </tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -841,7 +846,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -885,7 +890,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -934,7 +939,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -971,7 +976,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -1039,7 +1044,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -1079,7 +1084,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -1100,9 +1105,9 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
-				<code>expr</code></p></td>
+				<code>chainable</code></p></td>
 		<td>
 			<p>
 				<code>var.oconv("MR")</code></p></td>
@@ -1124,7 +1129,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -1150,7 +1155,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -1167,7 +1172,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			<p>After prefixing a "0" to an odd sized input, the size of the output is always precisely half that of the input.</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -1209,7 +1214,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -1245,7 +1250,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -1263,7 +1268,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -1310,7 +1315,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -1343,7 +1348,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 		<th>Function</th>
 		<th>Description</th> </tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -1361,7 +1366,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -1382,7 +1387,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -1394,7 +1399,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 				<em>return:</em> True if the var is assigned, otherwise false</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -1406,7 +1411,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 				<em>return:</em> True if the var is unassigned, otherwise false</p>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>var.defaulter(defaultvalue)</code></p></td>
@@ -1424,7 +1429,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -1449,7 +1454,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 				<em>Mutator:</em> defaulter()</p>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>v2.move(destinationvar)</code></p></td>
@@ -1469,7 +1474,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -1487,7 +1492,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>var.swap(var2)</code></p></td>
@@ -1505,7 +1510,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>var.swap(var2)</code></p></td>
@@ -1519,7 +1524,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			<p>Either or both vars may be unassigned without triggering a VarUnnassigned error.</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -1536,7 +1541,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -1576,7 +1581,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 		<th>Function</th>
 		<th>Description</th> </tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -1603,7 +1608,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -1621,7 +1626,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -1638,7 +1643,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -1656,7 +1661,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -1690,7 +1695,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>v1 ++</code></p></td>
@@ -1704,7 +1709,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>v1 --</code></p></td>
@@ -1717,7 +1722,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>++ v1</code></p></td>
@@ -1730,7 +1735,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>-- v1</code></p></td>
@@ -1743,7 +1748,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -1762,7 +1767,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -1772,7 +1777,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			<p>Subtraction</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -1782,7 +1787,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			<p>Multiplication</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -1792,7 +1797,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			<p>Division</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -1802,7 +1807,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			<p>Modulus</p>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>v1 += v2</code></p></td>
@@ -1815,7 +1820,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>v1 -= v2</code></p></td>
@@ -1823,7 +1828,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			<p>Self subtraction</p>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>v1 *= v2</code></p></td>
@@ -1831,7 +1836,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			<p>Self multiplication</p>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>v1 /= v2</code></p></td>
@@ -1839,7 +1844,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			<p>Self division</p>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>v1 %= v2</code></p></td>
@@ -1847,7 +1852,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			<p>Self modulus</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -1863,7 +1868,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -1878,7 +1883,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>var.initrnd()</code></p></td>
@@ -1894,7 +1899,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -1913,7 +1918,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -1928,7 +1933,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -1943,7 +1948,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -1958,7 +1963,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -1973,7 +1978,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -1988,7 +1993,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -2003,7 +2008,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -2020,7 +2025,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -2043,7 +2048,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -2065,7 +2070,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -2108,7 +2113,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -2125,7 +2130,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -2148,7 +2153,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -2192,7 +2197,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 		<th>Function</th>
 		<th>Description</th> </tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -2209,7 +2214,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>v1 ^= v2</code></p></td>
@@ -2221,7 +2226,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -2242,7 +2247,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -2262,7 +2267,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -2282,7 +2287,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -2304,7 +2309,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -2324,7 +2329,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -2351,7 +2356,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 		<th>Function</th>
 		<th>Description</th> </tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -2371,7 +2376,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -2391,7 +2396,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -2412,7 +2417,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -2433,7 +2438,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -2451,7 +2456,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -2472,7 +2477,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -2493,7 +2498,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -2514,7 +2519,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -2535,7 +2540,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -2559,7 +2564,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -2581,7 +2586,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -2601,7 +2606,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -2624,7 +2629,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -2642,7 +2647,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -2660,7 +2665,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -2714,7 +2719,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</dl>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -2724,7 +2729,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			<p>Ditto</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -2749,7 +2754,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -2759,7 +2764,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			<p>Ditto starting from first char</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -2769,7 +2774,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			<p>Ditto given a rex</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -2779,7 +2784,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			<p>Ditto starting from first char.</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -2808,7 +2813,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 		<th>Function</th>
 		<th>Description</th> </tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -2824,7 +2829,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -2840,7 +2845,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -2858,7 +2863,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -2870,7 +2875,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			<p>
 				<em>return:</em> The source string standardised in a way to enable consistent indexing and searching,</p>
 			<p>
-				<em>https:</em> //www.w3.org/International/wiki/Case_folding</p>
+				<a href="https://www.w3.org/International/wiki/Case_folding">https://www.w3.org/International/wiki/Case_folding</a></p>
 			<p>Accents can be significant. As in French cote, coté, côte and côté.</p>
 			<p>Case folding is not locale-dependent.</p>
 			<p>
@@ -2881,7 +2886,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -2900,7 +2905,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -2923,7 +2928,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -2944,7 +2949,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -2965,7 +2970,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -2981,7 +2986,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -2997,7 +3002,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -3013,7 +3018,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -3029,7 +3034,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -3047,7 +3052,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -3063,7 +3068,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -3079,7 +3084,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -3095,7 +3100,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -3114,7 +3119,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -3133,7 +3138,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -3154,7 +3159,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -3171,7 +3176,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -3191,7 +3196,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -3220,7 +3225,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -3237,7 +3242,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -3254,7 +3259,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -3270,7 +3275,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -3287,7 +3292,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -3315,7 +3320,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -3327,7 +3332,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			<p>Same as var.field() but negative fieldnos work backwards from the last field.</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -3369,7 +3374,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -3410,7 +3415,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -3420,7 +3425,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			<p>Abbreviated alias of substr version 1.</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -3443,7 +3448,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -3453,7 +3458,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			<p>Shorthand alias of substr version 2.</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -3485,7 +3490,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -3495,7 +3500,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			<p>Shorthand alias of substr version 3.</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -3528,7 +3533,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -3538,7 +3543,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			<p>Shorthand alias of substr version 4.</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -3559,7 +3564,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -3575,7 +3580,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -3592,7 +3597,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -3626,7 +3631,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -3662,7 +3667,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -3679,7 +3684,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -3702,7 +3707,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -3718,7 +3723,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -3734,7 +3739,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -3754,7 +3759,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>dim=</code></p></td>
 		<td>
@@ -3774,7 +3779,43 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
+		<td style = "white-space:nowrap">
+			<p>
+				<code>auto [v1, v2, ...] = </code></p></td>
 		<td>
+			<p>
+				<code>strvar.unpack&lt;N&gt;(delim = FM)</code></p></td>
+		<td>
+			<p>Unpack a delimited string into N new vars.</p>
+			<p>Useful when marshalling multiple vars as a single string across interfaces.</p>
+			<p>Note the unusual syntax requiring literal angle brackets.</p>
+			<p>[v1, v2, ...]: New vars to be constructed.</p>
+			<p>
+				<em>N:</em> Must agree with the number of vars being created or returned.</p>
+			<p>
+				<em>delim:</em> Defaults to FM but can be multichar/unicode string. e.g. ",", VM, "| |", or "⭕".</p>
+			<p>
+				<em>return:</em> A C++ object enabling inline creation of vars.</p>
+			<p>Prefix with const to make all the new vars const; partial const declaration is not supported.</p>
+			<p>
+				<pre><span class="nf">let</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;aa&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;bb&quot;</span><span class="p">;</span>
+<span class="nf">let</span><span class="w"> </span><span class="n">pack1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="n">b</span><span class="p">};</span><span class="w"> </span><span class="c1">// &quot;aa^bb&quot;_var</span>
+<span class="k">auto</span><span class="w"> </span><span class="p">[</span><span class="n">a2</span><span class="p">,</span><span class="w"> </span><span class="n">b2</span><span class="p">,</span><span class="w"> </span><span class="n">c2</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pack1</span><span class="p">.</span><span class="n">unpack</span><span class="o">&lt;</span><span class="mi">3</span><span class="o">&gt;</span><span class="p">();</span><span class="w"> </span><span class="c1">// a2 -&gt; &quot;aa&quot; // b2 -&gt; &quot;bb&quot; // c2 -&gt; unassigned</span>
+<span class="c1">// or</span>
+<span class="k">auto</span><span class="w"> </span><span class="p">[</span><span class="n">a3</span><span class="p">,</span><span class="w"> </span><span class="n">b3</span><span class="p">,</span><span class="w"> </span><span class="n">c3</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">unpack</span><span class="o">&lt;</span><span class="mi">3</span><span class="o">&gt;</span><span class="p">(</span><span class="n">pack1</span><span class="p">);</span>
+
+<span class="c1">// Similar to:</span>
+<span class="k">auto</span><span class="w"> </span><span class="n">funcx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[]()</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">array</span><span class="o">&lt;</span><span class="kt">var</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nf">let</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;aa&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;bb&quot;</span><span class="p">;</span>
+<span class="w">    </span><span class="kr">return</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">array</span><span class="p">{</span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="n">b</span><span class="p">};</span>
+<span class="c1">//  return unpack(&quot;aa^bb&quot;_var);</span>
+<span class="p">};</span>
+<span class="k">auto</span><span class="w"> </span><span class="p">[</span><span class="n">a4</span><span class="p">,</span><span class="w"> </span><span class="n">b4</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">funcx</span><span class="p">();</span>
+</pre>
+			</p>
+		</td></tr>
+	<tr>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -3783,7 +3824,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 		<td>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -3792,7 +3833,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 		<td>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -3809,7 +3850,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 		<th>Function</th>
 		<th>Description</th> </tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>strvar.ucaser()</code></p></td>
@@ -3825,266 +3866,266 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>strvar.lcaser()</code></p></td>
 		<td>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>strvar.tcaser()</code></p></td>
 		<td>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>strvar.fcaser()</code></p></td>
 		<td>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>strvar.normalizer()</code></p></td>
 		<td>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>strvar.inverter()</code></p></td>
 		<td>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>strvar.quoter()</code></p></td>
 		<td>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>strvar.squoter()</code></p></td>
 		<td>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>strvar.unquoter()</code></p></td>
 		<td>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>strvar.lowerer()</code></p></td>
 		<td>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>strvar.raiser()</code></p></td>
 		<td>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>strvar.cropper()</code></p></td>
 		<td>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>strvar.trimmer(trimchars = " ")</code></p></td>
 		<td>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>strvar.trimmerfirst(trimchars = " ")</code></p></td>
 		<td>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>strvar.trimmerlast(trimchars = " ")</code></p></td>
 		<td>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>strvar.trimmerboth(trimchars = " ")</code></p></td>
 		<td>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>strvar.firster()</code></p></td>
 		<td>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>strvar.laster()</code></p></td>
 		<td>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>strvar.firster(length)</code></p></td>
 		<td>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>strvar.laster(length)</code></p></td>
 		<td>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>strvar.cutter(length)</code></p></td>
 		<td>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>strvar.paster(pos1, length, insertstr)</code></p></td>
 		<td>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>strvar.paster(pos1, insertstr)</code></p></td>
 		<td>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>strvar.prefixer(insertstr)</code></p></td>
 		<td>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>strvar.appender(appendable, ...)</code></p></td>
 		<td>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>strvar.popper()</code></p></td>
 		<td>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>strvar.fieldstorer(delimiter, fieldno, nfields, replacement)</code></p></td>
 		<td>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>strvar.substrer(pos1, length)</code></p></td>
 		<td>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>strvar.substrer(pos1)</code></p></td>
 		<td>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>strvar.converter(from_chars, to_chars)</code></p></td>
 		<td>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>strvar.textconverter(from_characters, to_characters)</code></p></td>
 		<td>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>strvar.replacer(regex, tostr)</code></p></td>
 		<td>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>strvar.replacer(regex, ReplacementFunction auto repl_func)</code></p></td>
 		<td>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>strvar.replacer(fromstr, tostr)</code></p></td>
 		<td>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>strvar.uniquer()</code></p></td>
 		<td>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>strvar.sorter(delimiter = FM)</code></p></td>
 		<td>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>strvar.reverser(delimiter = FM)</code></p></td>
 		<td>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>strvar.randomizer(delimiter = FM)</code></p></td>
 		<td>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>strvar.parser(char sepchar = ' ')</code></p></td>
@@ -4099,7 +4140,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 		<th>Function</th>
 		<th>Description</th> </tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -4117,7 +4158,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -4135,7 +4176,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -4147,7 +4188,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			<p>"update()" was called "replace()" in Pick OS/Basic.</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -4157,7 +4198,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			<p>Update (replace or insert) a specific value in a dynamic array.</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -4167,7 +4208,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			<p>Update (replace or insert) a specific field a dynamic array.</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -4178,7 +4219,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			<p>Same as var.inserter() function but returns a new string instead of updating a variable in place.</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -4188,7 +4229,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			<p>Insert a value in a dynamic array.</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -4198,7 +4239,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			<p>Insert a field in a dynamic array.</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -4218,7 +4259,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 		<th>Function</th>
 		<th>Description</th> </tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -4235,7 +4276,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -4251,7 +4292,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -4267,7 +4308,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -4287,7 +4328,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -4300,13 +4341,15 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 				<em>opcode:</em> </p>
 			<dl>
 				<dt>+</dt>
-				<dd>Addition</dd>
+				<dd>Add</dd>
 				<dt>-</dt>
-				<dd>Subtraction</dd>
+				<dd>Subtract</dd>
 				<dt>∗</dt>
-				<dd>Multiplication</dd>
+				<dd>Multiply</dd>
 				<dt>/</dt>
-				<dd>Division</dd>
+				<dd>Divide</dd>
+				<dt>^</dt>
+				<dd>Concatenate (or :)</dd>
 			</dl>
 			<p>
 				<pre><span class="nf">let</span><span class="w"> </span><span class="n">v1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;10]20]30&quot;</span><span class="kt">_var</span><span class="p">.</span><span class="nf">mv</span><span class="p">(</span><span class="s">&quot;+&quot;</span><span class="p">,</span><span class="s">&quot;2]3]4&quot;</span><span class="kt">_var</span><span class="p">);</span><span class="w"> </span><span class="c1">// &quot;12]23]34&quot;_var</span>
@@ -4322,7 +4365,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 		<th>Function</th>
 		<th>Description</th> </tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>strvar.updater(fieldno, replacement)</code></p></td>
@@ -4339,7 +4382,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>strvar.updater(fieldno, valueno, replacement)</code></p></td>
@@ -4356,7 +4399,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>strvar.updater(fieldno, valueno, subvalueno, replacement)</code></p></td>
@@ -4373,7 +4416,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>strvar.inserter(fieldno, insertion)</code></p></td>
@@ -4389,7 +4432,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>strvar.inserter(fieldno, valueno, insertion)</code></p></td>
@@ -4405,7 +4448,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>strvar.inserter(fieldno, valueno, subvalueno, insertion)</code></p></td>
@@ -4421,7 +4464,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>strvar.remover(fieldno, valueno = 0, subvalueno = 0)</code></p></td>
@@ -4445,7 +4488,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 		<th>Function</th>
 		<th>Description</th> </tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -4479,7 +4522,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -4502,7 +4545,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -4527,7 +4570,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -4559,7 +4602,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -4576,7 +4619,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -4590,7 +4633,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -4611,7 +4654,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -4646,7 +4689,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 		<th>Function</th>
 		<th>Description</th> </tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -4682,7 +4725,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -4711,7 +4754,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>dbconn.detach(filenames)</code></p></td>
@@ -4721,7 +4764,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 				<em>filenames:</em> FM separated list.</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -4746,7 +4789,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -4765,7 +4808,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -4790,7 +4833,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -4815,7 +4858,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -4840,7 +4883,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -4870,7 +4913,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>dbconn.disconnect()</code></p></td>
@@ -4886,7 +4929,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>dbconn.disconnectall()</code></p></td>
@@ -4911,7 +4954,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 		<th>Function</th>
 		<th>Description</th> </tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -4937,7 +4980,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -4962,7 +5005,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -4982,7 +5025,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -5005,7 +5048,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -5029,7 +5072,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -5053,7 +5096,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -5072,7 +5115,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -5094,7 +5137,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -5116,7 +5159,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -5137,7 +5180,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -5163,7 +5206,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 		<th>Function</th>
 		<th>Description</th> </tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -5191,7 +5234,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>file.close()</code></p></td>
@@ -5207,7 +5250,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -5236,7 +5279,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -5259,7 +5302,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -5283,7 +5326,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -5319,7 +5362,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -5343,7 +5386,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -5366,7 +5409,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>record.write(file, key)</code></p></td>
@@ -5389,7 +5432,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -5417,7 +5460,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -5442,7 +5485,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -5467,7 +5510,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -5492,7 +5535,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -5517,7 +5560,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -5539,7 +5582,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>strvar.writef(file, key, fieldno)</code></p></td>
@@ -5555,7 +5598,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>record.writec(file, key)</code></p></td>
@@ -5575,7 +5618,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -5603,7 +5646,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -5623,7 +5666,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>dbconn.clearcache()</code></p></td>
@@ -5640,7 +5683,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -5689,7 +5732,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 		<th>Function</th>
 		<th>Description</th> </tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -5727,7 +5770,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -5752,7 +5795,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -5778,7 +5821,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -5797,7 +5840,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 				<em>return:</em> True if a list was active and a key was acquired, false if not.</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -5809,7 +5852,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			<p>If the active list was ordered by multivalued database fields then pairs of key and multivalue number will be available to the readnext function.</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -5839,7 +5882,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>dbfile.clearselect()</code></p></td>
@@ -5861,7 +5904,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -5894,7 +5937,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -5925,7 +5968,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -5977,7 +6020,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 		<th>Function</th>
 		<th>Description</th> </tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -5996,7 +6039,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -6015,7 +6058,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -6035,7 +6078,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -6055,7 +6098,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -6076,7 +6119,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>var::ossleep(milliseconds)</code></p></td>
@@ -6093,7 +6136,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -6160,7 +6203,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 		<th>Function</th>
 		<th>Description</th> </tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -6189,7 +6232,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -6217,7 +6260,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -6246,7 +6289,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>var().osclose()</code></p></td>
@@ -6263,7 +6306,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -6289,7 +6332,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -6316,7 +6359,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -6345,7 +6388,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -6373,7 +6416,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -6400,7 +6443,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -6432,7 +6475,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 		<th>Function</th>
 		<th>Description</th> </tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -6464,7 +6507,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -6475,7 +6518,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			<p>See oslist() for info.</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -6486,7 +6529,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			<p>See oslist() for info.</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -6507,7 +6550,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -6528,7 +6571,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -6549,7 +6592,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -6572,7 +6615,26 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
+		<td style = "white-space:nowrap">
+			<p>
+				<code>var=</code></p></td>
 		<td>
+			<p>
+				<code>var::oscwd()</code></p></td>
+		<td>
+			<p>Get the current working dir path and name.</p>
+			<p>
+				<em>return:</em> The current working dir path and name.</p>
+			<p>e.g. "/root/exodus/cli/src/xo_test/aaa"</p>
+			<p>
+				<pre><span class="kt">var</span><span class="w"> </span><span class="n">cwd1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kt">var</span><span class="p">().</span><span class="nf">oscwd</span><span class="p">();</span>
+<span class="c1">// or</span>
+<span class="kt">var</span><span class="w"> </span><span class="n">cwd2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">oscwd</span><span class="p">();</span>
+</pre>
+			</p>
+		</td></tr>
+	<tr>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -6594,33 +6656,14 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
-			<p>
-				<code>var=</code></p></td>
-		<td>
-			<p>
-				<code>var::oscwd()</code></p></td>
-		<td>
-			<p>Get the current working dir path and name.</p>
-			<p>
-				<em>return:</em> The current working dir path and name.</p>
-			<p>e.g. "/root/exodus/cli/src/xo_test/aaa"</p>
-			<p>
-				<pre><span class="kt">var</span><span class="w"> </span><span class="n">cwd1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kt">var</span><span class="p">().</span><span class="nf">oscwd</span><span class="p">();</span>
-<span class="c1">// or</span>
-<span class="kt">var</span><span class="w"> </span><span class="n">cwd2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">oscwd</span><span class="p">();</span>
-</pre>
-			</p>
-		</td></tr>
-	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
 			<p>
 				<code>dirpath.osrmdir(evenifnotempty = false)</code></p></td>
 		<td>
-			<p>Remove (deletes) an OS dir,</p>
+			<p>Remove (delete) an OS dir,</p>
 			<p>
 				<em>eventifnotempty:</em> If true any subdirs will also be removed/deleted recursively, otherwise the function will fail and return false.</p>
 			<p>
@@ -6642,7 +6685,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 		<th>Function</th>
 		<th>Description</th> </tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -6664,7 +6707,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -6686,7 +6729,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -6706,7 +6749,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -6741,7 +6784,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -6759,7 +6802,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -6777,7 +6820,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>envvalue.ossetenv(envcode)</code></p></td>
@@ -6796,7 +6839,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -6821,7 +6864,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -6839,7 +6882,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -6857,7 +6900,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -6881,7 +6924,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -6900,7 +6943,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -6926,9 +6969,9 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 		<th>Function</th>
 		<th>Description</th> </tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
-				<code>expr</code></p></td>
+				<code>chainable</code></p></td>
 		<td>
 			<p>
 				<code>strvar.outputl(prefix = "")</code></p></td>
@@ -6945,9 +6988,9 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
-				<code>expr</code></p></td>
+				<code>chainable</code></p></td>
 		<td>
 			<p>
 				<code>strvar.output(prefix = "")</code></p></td>
@@ -6955,9 +6998,9 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			<p>Same as outputl() but doesnt append an NL char and is BUFFERED, not flushed.</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
-				<code>expr</code></p></td>
+				<code>chainable</code></p></td>
 		<td>
 			<p>
 				<code>strvar.outputt(prefix = "")</code></p></td>
@@ -6965,9 +7008,9 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			<p>Same as outputl() but appends a tab char instead of an NL char and is BUFFERED, not flushed.</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
-				<code>expr</code></p></td>
+				<code>chainable</code></p></td>
 		<td>
 			<p>
 				<code>strvar.logputl(prefix = "")</code></p></td>
@@ -6984,9 +7027,9 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
-				<code>expr</code></p></td>
+				<code>chainable</code></p></td>
 		<td>
 			<p>
 				<code>strvar.logput(prefix = "")</code></p></td>
@@ -6994,9 +7037,9 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			<p>Same as logputl() but doesnt append an NL char.</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
-				<code>expr</code></p></td>
+				<code>chainable</code></p></td>
 		<td>
 			<p>
 				<code>strvar.errputl(prefix = "")</code></p></td>
@@ -7013,9 +7056,9 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
-				<code>expr</code></p></td>
+				<code>chainable</code></p></td>
 		<td>
 			<p>
 				<code>strvar.errput(prefix = "")</code></p></td>
@@ -7023,9 +7066,9 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			<p>Same as errputl() but doesnt append an NL char and is BUFFERED not flushed.</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
-				<code>expr</code></p></td>
+				<code>chainable</code></p></td>
 		<td>
 			<p>
 				<code>strvar.put(std::ostream& ostream1)</code></p></td>
@@ -7035,7 +7078,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			<p>The raw string bytes are output. No character or byte conversion is performed.</p>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>var().osflush()</code></p></td>
@@ -7049,7 +7092,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>osfile << anything << std::endl;</code></p></td>
@@ -7129,7 +7172,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 		<th>Function</th>
 		<th>Description</th> </tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -7155,7 +7198,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -7186,7 +7229,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -7200,7 +7243,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			<p>It only takes a few µsecs to return false if no bytes are available and no wait time has been requested.</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -7210,7 +7253,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			<p>True if stdin is at end of file</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -7224,7 +7267,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 				<em>return:</em> True if successful.</p>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>var().breakon()</code></p></td>
@@ -7241,7 +7284,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</dl>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>var().breakoff()</code></p></td>
@@ -7250,7 +7293,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			<p>Ctrl+C becomes inactive in terminal.</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -7270,7 +7313,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -7317,20 +7360,23 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 		<th>Function</th>
 		<th>Description</th> </tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>dim d1;</code></p></td>
 		<td>
 			<p>Create an undimensioned array of vars.</p>
 			<p>Pending actual dimensions by redim, read, osread or split.</p>
+			<p>A dim array of vars is a standard c++ std::vector inheriting all its functionality, plus various additional functionality.</p>
+			<p>
+				<a href="https://en.cppreference.com/w/cpp/container/vector.html">https://en.cppreference.com/w/cpp/container/vector.html</a></p>
 			<p>
 				<pre><span class="nf">dim</span><span class="w"> </span><span class="n">d1</span><span class="p">;</span>
 </pre>
 			</p>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>dim d1(nrows, ncols = 1);</code></p></td>
@@ -7340,11 +7386,15 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			<p>
 				<pre><span class="nf">dim</span><span class="w"> </span><span class="nf">d1</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span>
 <span class="nf">dim</span><span class="w"> </span><span class="nf">d2</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">);</span>
+
+<span class="n">d1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;1&quot;</span><span class="p">;</span>
+<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">var</span><span class="o">&amp;</span><span class="w"> </span><span class="n">v1</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">d1</span><span class="p">)</span>
+<span class="w">    </span><span class="nf">printl</span><span class="p">(</span><span class="n">v1</span><span class="p">);</span>
 </pre>
 			</p>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>dim d1 = d2; // Copy</code></p></td>
@@ -7358,7 +7408,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>dim d1 = dim(); // Move</code></p></td>
@@ -7371,7 +7421,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>dim d1 = {"a", "b", "c" ...}; // Initializer list</code></p></td>
@@ -7385,7 +7435,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>dim d1 = v1;</code></p></td>
@@ -7399,7 +7449,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>d1.redim(nrows, ncols = 1)</code></p></td>
@@ -7416,7 +7466,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>d1.swap(d2) </code></p></td>
@@ -7439,7 +7489,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 		<th>Function</th>
 		<th>Description</th> </tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>var v1 = d1[rowno];
@@ -7455,7 +7505,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>var v1 = d1[rowno, colno];
@@ -7471,7 +7521,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -7488,7 +7538,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -7505,7 +7555,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -7525,14 +7575,22 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
+		<td style = "white-space:nowrap">
+			<p>
+				<code>auto [v1, v2, ...] = </code></p></td>
 		<td>
 			<p>
-				<code>std::array&lt;var, N&gt;</code></p></td>
+				<code>d1.unpack&lt;N&gt;()</code></p></td>
 		<td>
+			<p>Unpack array elements into individual variables.</p>
+			<p>Note the unusual syntax requiring literal angle brackets.</p>
+			<p>[v1, v2, ...]: New vars to be constructed.</p>
 			<p>
-				<code>d1.unpack()</code></p></td>
-		<td>
-			<p>New unpack() function to allow "auto [a,b,c] = d1.unpack&lt;3&gt;();"</p>
+				<em>N:</em> The number of variables to unpack.
+				<pre><span class="nf">dim</span><span class="w"> </span><span class="n">d1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="s">&quot;d1&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;d2&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;d3&quot;</span><span class="p">};</span>
+<span class="k">auto</span><span class="w"> </span><span class="p">[</span><span class="n">v1</span><span class="p">,</span><span class="w"> </span><span class="n">v2</span><span class="p">,</span><span class="w"> </span><span class="n">v3</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">d1</span><span class="p">.</span><span class="n">unpack</span><span class="o">&lt;</span><span class="mi">3</span><span class="o">&gt;</span><span class="p">();</span><span class="w"> </span><span class="c1">// v1 -&gt; &quot;d1&quot; // v2 -&gt; &quot;d2&quot; // v3 -&gt; &quot;d3&quot;</span>
+</pre>
+			</p>
 		</td></tr>
 </table>
 <h5 id="Dim_Array_Mutation">Dim Array Mutation</h5>
@@ -7543,7 +7601,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 		<th>Function</th>
 		<th>Description</th> </tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>d1.splitter( var_stg& str1, delimiter = FM)</code></p></td>
@@ -7563,7 +7621,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>d1.sorter(reverse = false)</code></p></td>
@@ -7580,7 +7638,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>d1.reverser()</code></p></td>
@@ -7595,7 +7653,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>d1.randomizer()</code></p></td>
@@ -7618,7 +7676,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 		<th>Function</th>
 		<th>Description</th> </tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>dim=</code></p></td>
 		<td>
@@ -7628,7 +7686,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			<p>Get a sorted copy of a dimensioned array.</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>dim=</code></p></td>
 		<td>
@@ -7638,7 +7696,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			<p>Get a reversed copy of a dimensioned array;</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>dim=</code></p></td>
 		<td>
@@ -7656,7 +7714,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 		<th>Function</th>
 		<th>Description</th> </tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>d1.write(dbfile, key)</code></p></td>
@@ -7675,7 +7733,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -7706,7 +7764,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 		<th>Function</th>
 		<th>Description</th> </tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -7731,7 +7789,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -7764,13 +7822,14 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 		<th>Function</th>
 		<th>Description</th> </tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>d1.push_back(anything)</code></p></td>
 		<td>
 			<p>All C++ vector functions and algorithms work on dim arrays.</p>
-			<p>See https://en.cppreference.com/w/cpp/container/vector.html</p>
+			<p>See
+				<a href="https://en.cppreference.com/w/cpp/container/vector.html">https://en.cppreference.com/w/cpp/container/vector.html</a></p>
 			<p>
 				<pre><span class="nf">dim</span><span class="w"> </span><span class="n">d1</span><span class="p">;</span>
 <span class="n">d1</span><span class="p">.</span><span class="n">reserve</span><span class="p">(</span><span class="mi">5</span><span class="p">);</span>
@@ -7845,7 +7904,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 		<th>Function</th>
 		<th>Description</th> </tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -7865,7 +7924,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -7880,7 +7939,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -7894,7 +7953,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -7913,7 +7972,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -7934,7 +7993,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -7958,7 +8017,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>pushselect(out cursor)</code></p></td>
@@ -7980,7 +8039,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>popselect(cursor)</code></p></td>
@@ -7991,7 +8050,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			<p>See pushselect() for more info.</p>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>clearselect()</code></p></td>
@@ -8004,7 +8063,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -8023,7 +8082,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -8042,7 +8101,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -8061,7 +8120,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -8078,7 +8137,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -8093,7 +8152,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -8102,7 +8161,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 		<td>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -8119,7 +8178,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 		<th>Function</th>
 		<th>Description</th> </tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -8149,7 +8208,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			<p>Exodus program/library/functions may also be called directly using conventional function calling syntax. To call an exodus program/library called progname using either the syntax "call progname(args...);" or "var v1 = progname(args...);" you must "#include &lt;progname.h&gt;" after the "programinit()" or "libraryinit()" lines in your program/library. See library.h for more info.</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -8160,7 +8219,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			<p>Identical to perform() but any currently active select list in the calling program/library is not accessible to the executed program/library and is preserved in the calling [program as is. Any select list created by the executed library is discarded when it terminates.</p>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>chain(command_line)</code></p></td>
@@ -8169,7 +8228,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			<p>Similar to perform() except that the current program closes first and all environment variables carry forward unchanged.</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -8191,7 +8250,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 		<th>Function</th>
 		<th>Description</th> </tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>stop(result = "")</code></p></td>
@@ -8202,7 +8261,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 				<em>result:</em> Optional. It will be used as the return value of a parent program's perform() or execute() function, or if none, and therefore returning to the OS, it will be output to stdout if non-numeric or, if numeric, used as the exit status.</p>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>abort(message = "")</code></p></td>
@@ -8213,7 +8272,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 				<em>message:</em> Optional. If exiting to the OS then it will be output to stderr or, if numeric, used as the exit status.</p>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>abortall(message = "")</code></p></td>
@@ -8230,7 +8289,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 		<th>Function</th>
 		<th>Description</th> </tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -8250,7 +8309,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</ol>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -8261,7 +8320,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			<p>Same as the one argument version of calculate() but RECORD/ID/MV are provided as arguments instead of being hard coded.</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -8312,7 +8371,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 		<th>Function</th>
 		<th>Description</th> </tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -8329,7 +8388,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			<p>[TIME2]       e.g. [TIME2,MT] [TIME2,MTS] [TIME2,MTS48]</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -8346,7 +8405,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 		<th>Function</th>
 		<th>Description</th> </tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -8378,7 +8437,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -8437,7 +8496,7 @@ Optional prefix of "1/" or "/" causes the reciprocal of the number to be used. e
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -8454,7 +8513,7 @@ Optional prefix of "1/" or "/" causes the reciprocal of the number to be used. e
 				<em>unitx[out]:</em> e.g. "USD"</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -8471,7 +8530,7 @@ Optional prefix of "1/" or "/" causes the reciprocal of the number to be used. e
 		<th>Function</th>
 		<th>Description</th> </tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -8484,7 +8543,7 @@ Optional prefix of "1/" or "/" causes the reciprocal of the number to be used. e
 			<p>Offset from UTC by TZ seconds.</p>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>getdatetime(out user_date, out user_time, out system_date, out system_time, out UTC_date, out UTC_time)</code></p></td>
@@ -8494,7 +8553,7 @@ Optional prefix of "1/" or "/" causes the reciprocal of the number to be used. e
 			<p>"system" date and time is normally the same as UTC date/time and is determined by adding the environment variable TZ.f(2)'s TZ offset (in seconds) to UTC date/time obtained from the operating system.</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -8511,7 +8570,7 @@ Optional prefix of "1/" or "/" causes the reciprocal of the number to be used. e
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -8537,7 +8596,7 @@ Optional prefix of "1/" or "/" causes the reciprocal of the number to be used. e
 		<th>Function</th>
 		<th>Description</th> </tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>note(msg, options, io response)</code></p></td>
@@ -8553,7 +8612,7 @@ Optional prefix of "1/" or "/" causes the reciprocal of the number to be used. e
 			</p>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>note(msg)</code></p></td>
@@ -8565,7 +8624,7 @@ Optional prefix of "1/" or "/" causes the reciprocal of the number to be used. e
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -8578,7 +8637,7 @@ Optional prefix of "1/" or "/" causes the reciprocal of the number to be used. e
 				<em>return:</em> The chosen option (value not number) or "" if the user cancelled.</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -8595,7 +8654,7 @@ Optional prefix of "1/" or "/" causes the reciprocal of the number to be used. e
 				<em>return:</em> The chosen option (value not number) or "" if the user cancelled.</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -8614,7 +8673,7 @@ Optional prefix of "1/" or "/" causes the reciprocal of the number to be used. e
 			</dl>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -8645,7 +8704,7 @@ Optional prefix of "1/" or "/" causes the reciprocal of the number to be used. e
 			</dl>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -8658,7 +8717,7 @@ Optional prefix of "1/" or "/" causes the reciprocal of the number to be used. e
 			<p>The terminal protocol is xterminal.</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -8696,7 +8755,7 @@ Optional prefix of "1/" or "/" causes the reciprocal of the number to be used. e
 			</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -8711,7 +8770,7 @@ Optional prefix of "1/" or "/" causes the reciprocal of the number to be used. e
 			</p>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>setcursor(cursor_coordinates)</code></p></td>
@@ -8737,7 +8796,7 @@ Optional prefix of "1/" or "/" causes the reciprocal of the number to be used. e
 		<th>Function</th>
 		<th>Description</th> </tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -8756,7 +8815,7 @@ Optional prefix of "1/" or "/" causes the reciprocal of the number to be used. e
 			</p>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>sortarray(io array, fns = "", order = "")</code></p></td>
@@ -8791,7 +8850,7 @@ Optional prefix of "1/" or "/" causes the reciprocal of the number to be used. e
 		<th>Function</th>
 		<th>Description</th> </tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -8800,7 +8859,7 @@ Optional prefix of "1/" or "/" causes the reciprocal of the number to be used. e
 		<td>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -8809,7 +8868,7 @@ Optional prefix of "1/" or "/" causes the reciprocal of the number to be used. e
 		<td>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -8818,7 +8877,7 @@ Optional prefix of "1/" or "/" causes the reciprocal of the number to be used. e
 		<td>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>if</code></p></td>
 		<td>
@@ -8846,7 +8905,7 @@ Optional prefix of "1/" or "/" causes the reciprocal of the number to be used. e
 		<th>Function</th>
 		<th>Description</th> </tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>(Job)</code></p></td>
 		<td>
@@ -8883,7 +8942,7 @@ Optional prefix of "1/" or "/" causes the reciprocal of the number to be used. e
 			</p>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>setmaxthreads(max_threads = 0)</code></p></td>
@@ -8894,7 +8953,7 @@ Optional prefix of "1/" or "/" causes the reciprocal of the number to be used. e
 				<em>max_threads:</em> The default is 0 which sets the threadpool size to the number of processors in the system.</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -8904,7 +8963,7 @@ Optional prefix of "1/" or "/" causes the reciprocal of the number to be used. e
 			<p>Get the current threadpool size.</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -8914,18 +8973,20 @@ Optional prefix of "1/" or "/" causes the reciprocal of the number to be used. e
 			<p>Get the number of processor cores available.</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
-				<code>std::generator&lt;ExoEnv&amp;&gt;</code></p></td>
+				<code>range-based-for</code></p></td>
 		<td>
 			<p>
 				<code>run_results()</code></p></td>
 		<td>
-			<p>Process all run results in parallel as they come in.</p>
+			<p>Process all run results in parallel as they become available.</p>
+			<p>
+				<em>return:</em> range based for loop argument.</p>
 			<p>See run() for an example.</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -8935,7 +8996,7 @@ Optional prefix of "1/" or "/" causes the reciprocal of the number to be used. e
 			<p>Get the number of jobs run and pending results.</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>
@@ -8945,7 +9006,7 @@ Optional prefix of "1/" or "/" causes the reciprocal of the number to be used. e
 			<p>Decrease the number of jobs pending results.</p>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>shutdown_run()</code></p></td>
@@ -8955,7 +9016,7 @@ Optional prefix of "1/" or "/" causes the reciprocal of the number to be used. e
 			<p>On program termination all jobs will be aborted.</p>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>reset_run(size_t num_threads)</code></p></td>
@@ -8983,7 +9044,7 @@ Optional prefix of "1/" or "/" causes the reciprocal of the number to be used. e
 		<th>Function</th>
 		<th>Description</th> </tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>async(funcname, args, ...)</code></p></td>
@@ -8992,34 +9053,26 @@ Optional prefix of "1/" or "/" causes the reciprocal of the number to be used. e
 			<p>
 				<em>funcname:</em> Any callable function name. To call an Exodus program member function, it must be prefixed by "&amp;_ExoProgram::" and followed by ", this" as follows:</p>
 			<p>e.g. async(&amp;_ExoProgram::xxxxxx, this, arg1, arg2, etc)</p>
-			<p>Exodus' asynchronous tasks run sequentially, not simultaneously. Their execution will be interleaved with other async tasks in the same thread of execution either whenever they ask for database i/o or when they call yield(). They are implicitly thread-safe but thread state (e.g RECORD/ID etc.) may be changed by other async tasks while yielded.</p>
+			<p>Exodus' asynchronous tasks run sequentially, not simultaneously. Their execution will be interleaved with other async tasks in the same thread of execution. Execution switches (yields) either when a task asks for database i/o or when it explicitly calls yield(). Tasks are implicitly thread-safe but environment variables like RECORD, ID, ANS are thread-wide and shared by all async tasks in a thread.</p>
 			<p>Exodus' asynchronous tasks are implemented using Boost fibers. These are similar to threads but without parallel processing or OS management. They are extremely fast to setup and and switch between and have a normal stack. They might be called "coprocesses" by comparion with "coroutines" which do not have stacks.</p>
 			<p>The initial state of an asynchronous task is "ready, not running". Once the main program calls yield() then one of the "ready, not running" async tasks is selected by a round robin scheduler and it runs until complete, requests database i/o, or yields, and so on.</p>
 			<p>Asynchronous tasks may return results in a result queue by calling set_async_result(...) one or more times.</p>
 			<p>Asynchronous tasks may use the default database connection, which is per thread, but not at the same time so they should create their own connection. Multiple asynchronous tasks using multiple asynchronous database connections is the prime use case for async tasks since while some tasks are waiting for db i/o another task can progress.</p>
 			<p></p>
 			<p>
-				<em>https:</em> //x.com/i/grok/share/N4zbWT3V2hb4qK71G0qT0togh</p>
+				<a href="https://x.com/i/grok/share/N4zbWT3V2hb4qK71G0qT0togh">https://x.com/i/grok/share/N4zbWT3V2hb4qK71G0qT0togh</a></p>
 			<p></p>
-			<dl>
-				<dt>Concept</dt>
-				<dd>"async" aligns with the computer science concept of *cooperative multitasking*, where isolated execution contexts yield to a scheduler for *interleaved*, not simultaneous, execution.</dd>
-			</dl>
+			<p>
+				<em>Concept:</em> "async" aligns with the computer science concept of *cooperative multitasking*, where isolated execution contexts yield to a scheduler for *interleaved*, not simultaneous, execution.</p>
 			<p></p>
-			<dl>
-				<dt>Asynchronous</dt>
-				<dd>Interleaved execution of multiple tasks (with full stacks) within a *single thread*, not parallelism (simultaneous multi-CPU execution).</dd>
-			</dl>
+			<p>
+				<em>Asynchronous:</em> Interleaved execution of multiple tasks (with full stacks) within a *single thread*, not parallelism (simultaneous multi-CPU execution).</p>
 			<p></p>
-			<dl>
-				<dt>Full Stacks</dt>
-				<dd>Independent, full execution context sharing global state but with separate call stacks, resembling process-like entities but not OS processes. Not lightweight coroutines (e.g., Python’s 'async def' or generators) due to their lack of isolation and stacks.</dd>
-			</dl>
+			<p>
+				<em>Full Stack:</em> Independent, full execution context sharing global state but with separate call stacks, resembling process-like entities but not OS processes. Not lightweight coroutines (e.g., Python’s 'async def' or generators) due to their lack of isolation and stacks.</p>
 			<p></p>
-			<dl>
-				<dt>Yield</dt>
-				<dd>Each async task can yield control explicitly to a scheduler, suspending its own execution and allowing another stack to run.</dd>
-			</dl>
+			<p>
+				<em>Yield:</em> Each async task can yield control explicitly to the task scheduler, suspending its own execution and allowing another tasks/stack to run.</p>
 			<p></p>
 			<p>
 				<em>Scheduler:</em> </p>
@@ -9031,25 +9084,17 @@ Optional prefix of "1/" or "/" causes the reciprocal of the number to be used. e
 				</ul>
 			</p>
 			<p></p>
-			<dl>
-				<dt>No OS</dt>
-				<dd>No OS-level process creation (e.g., no 'fork', 'spawn', or equivalents like Python’s 'multiprocessing').</dd>
-			</dl>
+			<p>
+				<em>No OS:</em> No OS-level process creation (e.g., no 'fork', 'spawn', or equivalents like Python’s 'multiprocessing').</p>
 			<p></p>
-			<dl>
-				<dt>No Threads</dt>
-				<dd>Multiple async tasks share a *single thread*. Threads can have multiple async routines but not vice versa.</dd>
-			</dl>
+			<p>
+				<em>No Threads:</em> Multiple async tasks share a *single thread*. Threads can have multiple async routines but not vice versa.</p>
 			<p></p>
-			<dl>
-				<dt>No Stackless Coroutines</dt>
-				<dd>Lightweight cooperative tasks (e.g., Python’s 'asyncio' coroutines or generators) are not considered full stacks</dd>
-			</dl>
+			<p>
+				<em>No Stackless Coroutines:</em> Lightweight cooperative tasks (e.g., Python’s 'asyncio' coroutines or generators) are not considered full stacks</p>
 			<p></p>
-			<dl>
-				<dt>No Event Loop</dt>
-				<dd>The scheduler is not driven by interrupts or events (e.g., I/O polling, timers, or signals, as in 'asyncio's event loop).</dd>
-			</dl>
+			<p>
+				<em>No Event Loop:</em> The scheduler is not driven by interrupts or events (e.g., I/O polling, timers, or signals, as in 'asyncio's event loop).</p>
 			<p></p>
 			<p>
 				<em>Comparable:</em> </p>
@@ -9072,7 +9117,7 @@ Optional prefix of "1/" or "/" causes the reciprocal of the number to be used. e
 				</dl>
 			</p>
 			<p></p>
-			<table>
+			<table class="box_drawing">
 				<tr>
 					<td>         </td>
 					<td>             </td>
@@ -9092,13 +9137,13 @@ Optional prefix of "1/" or "/" causes the reciprocal of the number to be used. e
 					<td>                         </td>
 					<td>                           </td></tr>
 				<tr>
-					<td> async   </td>
+					<td> async() </td>
 					<td> Fiber       </td>
 					<td> Cooperative, i/o or yield </td>
 					<td> Lightweight async tasks </td>
 					<td> Shares parent environment </td></tr>
 				<tr>
-					<td> run     </td>
+					<td> run()   </td>
 					<td> Thread pool </td>
 					<td> Parallel, preemptive      </td>
 					<td> Heavy parallel jobs     </td>
@@ -9112,7 +9157,7 @@ Optional prefix of "1/" or "/" causes the reciprocal of the number to be used. e
 			</table>
 			<p></p>
 			<p>Exodus uses specific definitions of asynchronous and parallel and avoids the word concurrent which covers both terms.</p>
-			<table>
+			<table class="box_drawing">
 				<tr>
 					<td>                  </td>
 					<td>                          </td>
@@ -9175,8 +9220,8 @@ Optional prefix of "1/" or "/" causes the reciprocal of the number to be used. e
 					<td>                         </td></tr>
 			</table>
 			<p></p>
-			<p>Exodus’ async() is like multitasking—juggling Tasks in one thread, like switching between email and cooking. Whereas run() launches Jobs in parallel, like multiple teams working simultaneously. Forget “concurrent”—it’s async or parallel, oil and water.</p>
-			<p>"Async Misleading: Just like std::async hides a threading model, C++ coroutines hide a stackless function model, while Boost.Fiber delivers the task-based async people intuitively expect. The “async” label gets slapped on all three, despite wildly different mechanics—classic salesman/academic hair-splitting."</p>
+			<p>Exodus’ async() is like multitasking, juggling Tasks in one thread, like switching between email and cooking. Whereas run() launches Jobs in parallel, like multiple teams working simultaneously. Forget “concurrent”, it’s async or parallel, oil and water.</p>
+			<p>Async Misleading: Just like std::async hides a threading model, C++ coroutines hide a stackless function model, while Boost.Fiber delivers the task-based async people intuitively expect. The “async” label gets slapped on all three, despite wildly different mechanics, classic salesman conflation.</p>
 			<p>
 				<pre><span class="c1">//func add(in a, in b) {</span>
 <span class="c1">//    set_async_result(a + b);</span>
@@ -9194,7 +9239,7 @@ Optional prefix of "1/" or "/" causes the reciprocal of the number to be used. e
 			</p>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>yield()</code></p></td>
@@ -9204,28 +9249,30 @@ Optional prefix of "1/" or "/" causes the reciprocal of the number to be used. e
 			<p>A round robin scheduler resumes async tasks in turn or sleeps if all are waiting for database i/o.</p>
 		</td></tr>
 	<tr>
-		<td></td>
+		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
 				<code>set_async_result(var data, var message = "")</code></p></td>
 		<td>
 			<p>Set a async result.</p>
-			<p>Callable in an async function to provide output collectible by async_results().</p>
-			<p>See async for an example.</p>
+			<p>Call once within an async function to provide output collectible by async_results().</p>
+			<p>See async() for an example.</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
-				<code>std::generator&lt;AsyncResult&amp;&gt;</code></p></td>
+				<code>range-based-for</code></p></td>
 		<td>
 			<p>
 				<code>async_results()</code></p></td>
 		<td>
-			<p>A range-based for loop to pick up all async results.</p>
-			<p>See async for an example.</p>
+			<p>Process all async results asynchronously as they become available.</p>
+			<p>
+				<em>return:</em> range based for loop argument.</p>
+			<p>See async() for an example.</p>
 		</td></tr>
 	<tr>
-		<td>
+		<td style = "white-space:nowrap">
 			<p>
 				<code>var=</code></p></td>
 		<td>

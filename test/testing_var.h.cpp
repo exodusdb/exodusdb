@@ -1198,6 +1198,22 @@ func main() {
 		dim d2 = split("a^b^c"_var);
 	}
 
+	printl("unpack/*<N>*/(SV delim = _FM) const");
+	{
+		let a = "aa", b = "bb";
+		let pack1 = {a, b}; assert(pack1.errputl() == "aa^bb"_var);
+		auto [a2, b2, c2] = pack1.unpack<3>();  assert(a2.errputl() == "aa" ); assert(b2.errputl() == "bb" ); assert(c2.unassigned());
+		// or
+		auto [a3, b3, c3] = unpack<3>(pack1);
+		// Similar to:
+		auto funcx = []() -> std::array<var, 2> {
+		    let a = "aa", b = "bb";
+		    return std::array{a, b};
+		//  return unpack("aa^bb"_var);
+		};
+		auto [a4, b4] = funcx();
+	}
+
 	printl("ucaser() REF ;");
 	{
 		var v1 = "abc";
@@ -1991,6 +2007,13 @@ func main() {
 		if (osmkdir(osdirname)) abort("osmkdir: " ^ lasterror());
 	}
 
+	printl("oscwd();");
+	{
+		var cwd1 = var().oscwd();
+		// or
+		var cwd2 = oscwd();
+	}
+
 	printl("oscwd(SV newpath);");
 	{
 		let osdirname = "xo_test/aaa";
@@ -1998,13 +2021,6 @@ func main() {
 		// or
 		if (oscwd(osdirname)) {/*ok*/} else  abort("oscwd: " ^ lasterror());
 		if (oscwd("../..")) {/*ok*/} else  abort("oscwd: " ^ lasterror()); /// Change back to avoid errors in following code.
-	}
-
-	printl("oscwd();");
-	{
-		var cwd1 = var().oscwd();
-		// or
-		var cwd2 = oscwd();
 	}
 
 	printl("osrmdir(bool evenifnotempty = false) const;");
@@ -2239,6 +2255,9 @@ func main() {
 	{
 		dim d1(10);
 		dim d2(10, 3);
+		d1 = "1";
+		for (var& v1 : d1)
+		    printl(v1);
 	}
 
 	printl("dim(const dim& rhs);");
@@ -2308,6 +2327,12 @@ func main() {
 	{
 		dim d1 = {"f1", "f2", "f3"};
 		let v1 = d1.join(); assert(v1.errputl() == "f1^f2^f3"_var);
+	}
+
+	printl("unpack/*<N>*/() const&");
+	{
+		dim d1 = {"d1", "d2", "d3"};
+		auto [v1, v2, v3] = d1.unpack<3>();  assert(v1.errputl() == "d1" ); assert(v2.errputl() == "d2" ); assert(v3.errputl() == "d3");
 	}
 
 	printl("splitter(/*in*/ const var_stg& str1, SV delimiter = _FM);");

@@ -35,12 +35,12 @@ set -euxo pipefail
 	[ ${EXODUS_DIR:0:6} = /root/ ] && chmod o+x /root
 
 :
-: Install chromium to convert html to pdf 
+: Install chromium to convert html to pdf
 : =======================================
 :
 :  Dont wait for it to complete. Install will be tested near the end of this script.
 :
-	sudo snap refresh
+#	sudo snap refresh
 	sudo snap services chromium 2> /dev/null || sudo snap install chromium --no-wait
 
 :
@@ -197,7 +197,7 @@ set -euxo pipefail
 :
 : Wait 5 mins for installation to complete
 :
-	timeout 300 bash -c 'while ! snap changes | grep chromium | grep -q Done; do sleep 5; done; echo "Chromium installation done"' || echo "Timed out after 5 minutes"
+	timeout 300 bash -c 'while snap changes | grep chromium | grep -q Doing; do sleep 5; done; snap changes | grep chromium | grep -q Done && echo "Chromium installation done" || echo "Chromium installation failed or not found"' || echo "Timed out after 5 minutes"
 :
 : Verify chromium pdf converter works - Ignore various chromium error messages
 :

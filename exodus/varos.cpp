@@ -438,9 +438,9 @@ bool var_os::osprocess(in oscmd, in stdin_for_process, out stdout_from_process, 
 	exit_status if false
 	not zero from client or
 	User createable:
-	127: No args—treated as "no program provided."
-	127: Program not found—child exits with 127.
-	-1: Timeout—internal error when we terminate the child.
+	127: No args - treated as "no program provided."
+	127: Program not found - child exits with 127.
+	-1: Timeout - internal error when we terminate the child.
 	Internal: Throwable
 	-2: Pipe fail.
 	-3: Fork fail.

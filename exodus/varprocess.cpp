@@ -87,9 +87,9 @@ std::vector<std::string> parse_command_line(const std::string& cmd) {
 exit_status if false
 not zero from client or
 User createable:
-127: No args—treated as "no program provided."
-127: Program not found—child exits with 127.
--1: Timeout—internal error when we terminate the child.
+127: No args. Treated as "no program provided."
+127: Program not found. Child exits with 127.
+-1: Timeout. Internal error when we terminate the child.
 Internal:
 -2: Pipe fail.
 -3: Fork fail.

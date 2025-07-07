@@ -101,7 +101,8 @@ public:
 
 #ifdef EXO_GENERATOR
 
-	// Process all run results in parallel as they come in.
+	// Process all run results in parallel as they become available.
+	// return: range based for loop argument.
 	// See run() for an example.
 	auto run_results() -> std::generator<ExoEnv&>;
 

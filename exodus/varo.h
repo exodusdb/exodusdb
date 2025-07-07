@@ -389,6 +389,17 @@ public:
 	//
 	ND bool osmkdir() const;
 
+	// Get the current working dir path and name.
+	// return: The current working dir path and name.
+	// e.g. "/root/exodus/cli/src/xo_test/aaa"
+	// obj is var()
+	//
+	// `var cwd1 = var().oscwd();
+	//  // or
+	//  var cwd2 = oscwd();`
+	//
+	ND static var  oscwd();
+
 	// Change the current working dir.
 	// newpath: An absolute or relative dir path and name.
 	// return: True if successful or false if not. e.g. Invalid dirpath, insufficient permission etc.
@@ -402,18 +413,7 @@ public:
 	//
 	ND static bool oscwd(SV newpath);
 
-	// Get the current working dir path and name.
-	// return: The current working dir path and name.
-	// e.g. "/root/exodus/cli/src/xo_test/aaa"
-	// obj is var()
-	//
-	// `var cwd1 = var().oscwd();
-	//  // or
-	//  var cwd2 = oscwd();`
-	//
-	ND static var  oscwd();
-
-	// Remove (deletes) an OS dir,
+	// Remove (delete) an OS dir,
 	// eventifnotempty: If true any subdirs will also be removed/deleted recursively, otherwise the function will fail and return false.
 	// return: Returns true if successful or false if not. e.g dir doesnt exist, insufficient permission, not empty etc.
 	//

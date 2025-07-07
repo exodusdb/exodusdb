@@ -112,9 +112,9 @@ func main(out bakpars, in process0 = var()) {
 		bakpars(12) = "";
 	}
 
-	if (not bakdisk_) {
-		bakpars(7) = "C:";
-	}
+//	if (not bakdisk_) {
+//		bakpars(7) = "C:";
+//	}
 	if (bakdisk2_ == "") {
 		bakpars(12) = bakdisk_;
 	}

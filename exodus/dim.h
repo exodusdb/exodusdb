@@ -55,6 +55,8 @@ class PUBLIC dim final : public std::vector<var> {
 
 	// Create an undimensioned array of vars.
 	// Pending actual dimensions by redim, read, osread or split.
+	// A dim array of vars is a standard c++ std::vector inheriting all its functionality, plus various additional functionality.
+	// https://en.cppreference.com/w/cpp/container/vector.html
 	//
 	// `dim d1;`
 	//
@@ -69,7 +71,11 @@ class PUBLIC dim final : public std::vector<var> {
 	// Specify a fixed number of columns and rows. All vars are unassigned.
 	//
 	// `dim d1(10);
-	//  dim d2(10, 3);`
+	//  dim d2(10, 3);
+	//
+	//	d1 = "1";
+	//	for (var& v1 : d1)
+	//      printl(v1);`
 	//
 	dim(const int nrows, const int ncols/* = 1*/);
 
@@ -161,10 +167,11 @@ class PUBLIC dim final : public std::vector<var> {
 
 //	dim& operator=(dim&& rhs) noexcept & {
 
-	// Move assignment operator (using swap)
+	// Move assignment operator (using swap and clear)
 	void operator=(dim&& rhs) & noexcept {
 		if (this != &rhs) {
 			swap(rhs); // Swap all members
+			rhs.clear();
 		}
 		return;
 	}
@@ -404,9 +411,15 @@ class PUBLIC dim final : public std::vector<var> {
 
     // unpack() lvalue version: Copy strings (const MyVec&)
 
-	// New unpack() function to allow "auto [a,b,c] = d1.unpack<3>();"
+	// Unpack array elements into individual variables.
+	// Note the unusual syntax requiring literal angle brackets.
+	// [v1, v2, ...]: New vars to be constructed.
+	// N: The number of variables to unpack.
+	// `dim d1 = {"d1", "d2", "d3"};
+    //  auto [v1, v2, v3] = d1.unpack<3>(); // v1 -> "d1" // v2 -> "d2" // v3 -> "d3"`
+	//
 	template <size_t N>
-	auto unpack() const& -> std::array<var, N> {
+	auto unpack/*<N>*/() const& -> std::array<var, N> {
 
 		// MUST use BASE::operator[](index) NOT (*this)[index] because dim::operator[] is 1 based
 		// Unless you use 1 based indexing and dont care about being validate by dim::operator[] all the time.
@@ -422,7 +435,7 @@ class PUBLIC dim final : public std::vector<var> {
     // Unpack rvalue version: Move strings (MyVec&&)
 
 	template <size_t N>
-	auto unpack() && -> std::array<var, N> {
+	auto unpack/*<N>*/() && -> std::array<var, N> {
 		auto fill_array = [this]<size_t... Is>(std::index_sequence<Is...>) {
 			return std::array<var, N>{
 				// If N > size of dim then create unassigned vars

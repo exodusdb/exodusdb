@@ -972,7 +972,7 @@ public:
 	// Unpack a delimited string into N new vars.
 	// Useful when marshalling multiple vars as a single string across interfaces.
 	// Note the unusual syntax requiring literal angle brackets.
-	// [a,b,c...]: New vars to be constructed.
+	// [v1, v2, ...]: New vars to be constructed.
 	// N: Must agree with the number of vars being created or returned.
 	// delim: Defaults to FM but can be multichar/unicode string. e.g. ",", VM, "| |", or "⭕".
 	// return: A C++ object enabling inline creation of vars.
@@ -1073,7 +1073,7 @@ public:
 ////				((*this) ^= ... ^= appendable);
 //				this->createString();
 //				//(var_str += ... += appendable);
-//				(append_one(appendable), ...);  // Comma fold—calls append_one per arg
+//				(append_one(appendable), ...);  // Comma fold calls append_one per arg
 //				return std::move(*this);
 //			}
 
@@ -1294,16 +1294,17 @@ public:
 	// Binary ops on parallel multivalues
 	//
 	// opcode:
-	// * + * Addition
-	// * - * Subtraction
-	// * ∗ * Multiplication
-	// * / * Division
+	// * + * Add
+	// * - * Subtract
+	// * ∗ * Multiply
+	// * / * Divide
+	// * ^ * Concatenate (or :)
 	//
 	// `let v1 = "10]20]30"_var.mv("+","2]3]4"_var); // "12]23]34"_var`
 	//
 	ND var  mv(const char* opcode, in var2) const;
 	//
-	// --- NOTE ABOVE --> ∗ <-- is not a * asteriskfg. It is Unicode character U+2217 ∗ ASTERISK OPERATOR
+	// --- NOTE ABOVE --> ∗ <-- is not a * asterisk. It is Unicode character U+2217 ∗ ASTERISK OPERATOR
 	// to enable parsing of *?* correctly
 
 	///// DYNAMIC ARRAY MUTATORS Standalone commands:

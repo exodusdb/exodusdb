@@ -454,7 +454,8 @@ func main() {
 						funcx_prefix = "";
 				}
 				var definitely_func = false;
-				if (funcx_prefix == "auto" and srcline.contains("->")) {
+//				if (funcx_prefix == "auto" and srcline.contains("->")) {
+				if (srcline.field(" ", 1) == "auto" and srcline.contains("->")) {
 					funcx_prefix = srcline.field("->", 2).field("{", 1).field(";", 1).trim();
 					srcline = srcline.field("->", 1).trimlast();
 					definitely_func = true;
@@ -468,9 +469,10 @@ func main() {
 				}
 
 				// std::array<var, N> unpack(SV delim = _FM) const {
-				else if (srcline.starts("std::") and srcline.ends("{")) {
-					funcx_prefix = "auto [a, b, ...] =";
-				}
+//				else if ((funcx_prefix.starts("std::array") or srcline.starts("std::array")) and srcline.ends("{")) {
+//				else if (funcx_prefix.starts("std::array") or srcline.starts("std::array")) {
+//					funcx_prefix = "auto [v1, v2, ...] =";
+//				}
 
 				else if (funcx_prefix == "var" or funcx_prefix == "int")
 					// Include lines starting var
@@ -485,14 +487,14 @@ func main() {
 				else if (funcx_prefix == "RETVARREF") funcx_prefix = "var="; // from var_base
 
 				// const var&
-				else if (funcx_prefix == "CVR")  funcx_prefix = "expr";// only for output/logput/errput etc.
-				else if (funcx_prefix == "CBR") funcx_prefix = "expr"; // from var_base
+				else if (funcx_prefix == "CVR")  funcx_prefix = "chainable";// only for output/logput/errput etc.
+				else if (funcx_prefix == "CBR") funcx_prefix = "chainable"; // from var_base
 
 				// var& (various types)
-				else if (funcx_prefix == "io")   funcx_prefix = "expr";// none should return this
+				else if (funcx_prefix == "io")   funcx_prefix = "chainable";// none should return this
 				else if (funcx_prefix == "IO")   funcx_prefix = "cmd"; // ditto. (now IO=void for mutator -er)
 				else if (funcx_prefix == "VARREF") funcx_prefix = "VARREF"; // exo::var& from var_base
-				else if (funcx_prefix == "out")  funcx_prefix = "expr";// only input and getlocale
+				else if (funcx_prefix == "out")  funcx_prefix = "chainable";// only input and getlocale
 
 				// bool
 				else if (funcx_prefix == "bool") funcx_prefix = "if";  // many return true/false
@@ -503,7 +505,7 @@ func main() {
 				// dim
 				else if (funcx_prefix == "dim") funcx_prefix = "dim=";
 
-				// Job
+				// Job3
 				else if (funcx_prefix == "Job") funcx_prefix = "(Job)";
 
 				// int (rare)
@@ -1164,6 +1166,17 @@ func main() {
 //////////////
 
 			// No going back from here because we start outputting to docfile
+
+			if (funcx_prefix.starts("std::array")) {
+				// std::array<var, N>
+				funcx_prefix = "auto [v1, v2, ...] = ";
+			}
+			else if (funcx_prefix.starts("std::generator")) {
+				// std::generator<AsyncResult&>
+				// std::generator<ExoEnv&>
+				funcx_prefix = "range-based-for";
+			}
+
 			if (man) {
 
 				var func_decl2 = func_decl;
@@ -1178,6 +1191,12 @@ func main() {
 //					func_decl2 = "var v1 = " ^ func_decl ^ ";";
 //					func_decl2 = "int i1 = " ^ func_decl ^ ";";
 					func_decl2 = match1 ^ " " ^ match1.first() ^ "1 = " ^ func_decl ^ ";";
+				}
+				else {
+					func_decl2 = funcx_prefix;
+					if (not funcx_prefix.empty())
+						 func_decl2 ^= " ";
+					func_decl2 ^= func_decl;
 				}
 //				else if (funcx_prefix == "var=")
 //					func_decl2 = "var v1 = " ^ func_decl ^ ";";
@@ -1213,16 +1232,25 @@ func main() {
 				docfile << comments << std::endl;
 				docfile << "" << std::endl;
 			}
+
 			else if (wiki) {
 				docfile << "|-" << std::endl;
 				docfile << "|" << funcx_prefix << "||" << func_decl << "||" << comments << std::endl;
-			} else {
+			}
+			else {
+				// html
+
+				// https links in comments are already converted to <a> tags in htmllib2("T2H") above.
 
 				let encoded_funcx_prefix = funcx_prefix.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
 				let funcx_prefix_wrapped = funcx_prefix ? ("<p><code>" ^ encoded_funcx_prefix ^ "</code></p>") : "";
 //				func_decl.replacer("&", "&amp;");
 //				func_decl.replacer("<", "&lt;");
 //				func_decl.replacer(">", "&gt;");
+
+				// template args
+				static rex template_arg_rex = R"__(<([A-Z]+)>)__"_rex;
+				func_decl.replacer(template_arg_rex, "&lt;$1&gt;");
 
 //				<p>┌─────────┬─────────────┬───────────────────────────┬─────────────────────────┬───────────────────────────┐</p>
 //				<p>│ Command │ Mechanism   │ Execution                 │ Use Case                │ Environment               │</p>
@@ -1233,7 +1261,7 @@ func main() {
 				// Finally its a three column row
 				docfile
 					<< "<tr>"
-					<< "<td>"  << funcx_prefix_wrapped << "</td>"
+					<< "<td style = \"white-space:nowrap\">"  << funcx_prefix_wrapped << "</td>"
 					<< "<td><p><code>" << func_decl<< "</code></p></td>"
 					<< "<td>"  << comments << "</td>"
 					<< "</tr>" << std::endl;
@@ -1548,12 +1576,17 @@ R"__(
 		padding: 7px;
 	}
 
-	.wikitable {
+	.wikitable, .box_drawing {
 		background-color: #f8f9fa;
 		color: #202122;
 		margin: 1em 0;
 		border: 1px solid #a2a9b1;
 		border-collapse: collapse;
+	}
+
+	.box_drawing tr:nth-child(2) {
+		background-color: #eaecf0;
+		font-weight: bold;
 	}
 
 	p {

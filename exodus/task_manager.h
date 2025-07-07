@@ -65,7 +65,7 @@ public:
 	// Create an independent asynchronous task by calling a function.
 	// funcname: Any callable function name. To call an Exodus program member function, it must be prefixed by "&_ExoProgram::" and followed by ", this" as follows:
 	// e.g. async(&_ExoProgram::xxxxxx, this, arg1, arg2, etc)
-	// Exodus' asynchronous tasks run sequentially, not simultaneously. Their execution will be interleaved with other async tasks in the same thread of execution either whenever they ask for database i/o or when they call yield(). They are implicitly thread-safe but thread state (e.g RECORD/ID etc.) may be changed by other async tasks while yielded.
+	// Exodus' asynchronous tasks run sequentially, not simultaneously. Their execution will be interleaved with other async tasks in the same thread of execution. Execution switches (yields) either when a task asks for database i/o or when it explicitly calls yield(). Tasks are implicitly thread-safe but environment variables like RECORD, ID, ANS are thread-wide and shared by all async tasks in a thread.
 	// Exodus' asynchronous tasks are implemented using Boost fibers. These are similar to threads but without parallel processing or OS management. They are extremely fast to setup and and switch between and have a normal stack. They might be called "coprocesses" by comparion with "coroutines" which do not have stacks.
 	// The initial state of an asynchronous task is "ready, not running". Once the main program calls yield() then one of the "ready, not running" async tasks is selected by a round robin scheduler and it runs until complete, requests database i/o, or yields, and so on.
 	// Asynchronous tasks may return results in a result queue by calling set_async_result(...) one or more times.
@@ -73,13 +73,13 @@ public:
 	//
 	// https://x.com/i/grok/share/N4zbWT3V2hb4qK71G0qT0togh
 	//
-	// * Concept * "async" aligns with the computer science concept of *cooperative multitasking*, where isolated execution contexts yield to a scheduler for *interleaved*, not simultaneous, execution.
+	// Concept:: "async" aligns with the computer science concept of *cooperative multitasking*, where isolated execution contexts yield to a scheduler for *interleaved*, not simultaneous, execution.
 	//
-	// * Asynchronous * Interleaved execution of multiple tasks (with full stacks) within a *single thread*, not parallelism (simultaneous multi-CPU execution).
+	// Asynchronous:: Interleaved execution of multiple tasks (with full stacks) within a *single thread*, not parallelism (simultaneous multi-CPU execution).
 	//
-	// * Full Stacks * Independent, full execution context sharing global state but with separate call stacks, resembling process-like entities but not OS processes. Not lightweight coroutines (e.g., Python’s 'async def' or generators) due to their lack of isolation and stacks.
+	// Full Stack:: Independent, full execution context sharing global state but with separate call stacks, resembling process-like entities but not OS processes. Not lightweight coroutines (e.g., Python’s 'async def' or generators) due to their lack of isolation and stacks.
 	//
-	// * Yield * Each async task can yield control explicitly to a scheduler, suspending its own execution and allowing another stack to run.
+	// Yield:: Each async task can yield control explicitly to the task scheduler, suspending its own execution and allowing another tasks/stack to run.
 	//
 	// Scheduler:
 	//
@@ -87,13 +87,13 @@ public:
 	//  * Its sole role is to *pass control* (or "hand the baton") to the next task, not to manage events (e.g., I/O, timers, or signals).
 	//  * May optionally link to events if chosen, but this is not its primary function.
 	//
-	// * No OS * No OS-level process creation (e.g., no 'fork', 'spawn', or equivalents like Python’s 'multiprocessing').
+	// No OS:: No OS-level process creation (e.g., no 'fork', 'spawn', or equivalents like Python’s 'multiprocessing').
 	//
-	// * No Threads * Multiple async tasks share a *single thread*. Threads can have multiple async routines but not vice versa.
+	// No Threads:: Multiple async tasks share a *single thread*. Threads can have multiple async routines but not vice versa.
 	//
-	// * No Stackless Coroutines * Lightweight cooperative tasks (e.g., Python’s 'asyncio' coroutines or generators) are not considered full stacks
+	// No Stackless Coroutines:: Lightweight cooperative tasks (e.g., Python’s 'asyncio' coroutines or generators) are not considered full stacks
 	//
-	// * No Event Loop * The scheduler is not driven by interrupts or events (e.g., I/O polling, timers, or signals, as in 'asyncio's event loop).
+	// No Event Loop:: The scheduler is not driven by interrupts or events (e.g., I/O polling, timers, or signals, as in 'asyncio's event loop).
 	//
 	// Comparable:
 	//
@@ -108,8 +108,8 @@ public:
 	// ┌─────────┬─────────────┬───────────────────────────┬─────────────────────────┬───────────────────────────┐
 	// │ Command │ Mechanism   │ Execution                 │ Use Case                │ Environment               │
 	// ├─────────┼─────────────┼───────────────────────────┼─────────────────────────┼───────────────────────────┤
-	// │ async   │ Fiber       │ Cooperative, i/o or yield │ Lightweight async tasks │ Shares parent environment │
-	// │ run     │ Thread pool │ Parallel, preemptive      │ Heavy parallel jobs     │ Private RECORD/ID etc.    │
+	// │ async() │ Fiber       │ Cooperative, i/o or yield │ Lightweight async tasks │ Shares parent environment │
+	// │ run()   │ Thread pool │ Parallel, preemptive      │ Heavy parallel jobs     │ Private RECORD/ID etc.    │
 	// └─────────┴─────────────┴───────────────────────────┴─────────────────────────┴───────────────────────────┘
 	//
 	// Exodus uses specific definitions of asynchronous and parallel and avoids the word concurrent which covers both terms.
@@ -129,8 +129,8 @@ public:
 	// │ Exodus classes:  │ Task/Tasks               │ Job/Jobs                │
 	// └──────────────────┴──────────────────────────┴─────────────────────────┘
 	//
-	// Exodus’ async() is like multitasking—juggling Tasks in one thread, like switching between email and cooking. Whereas run() launches Jobs in parallel, like multiple teams working simultaneously. Forget “concurrent”—it’s async or parallel, oil and water.
-	// "Async Misleading: Just like std::async hides a threading model, C++ coroutines hide a stackless function model, while Boost.Fiber delivers the task-based async people intuitively expect. The “async” label gets slapped on all three, despite wildly different mechanics—classic salesman/academic hair-splitting."
+	// Exodus’ async() is like multitasking, juggling Tasks in one thread, like switching between email and cooking. Whereas run() launches Jobs in parallel, like multiple teams working simultaneously. Forget “concurrent”, it’s async or parallel, oil and water.
+	// Async Misleading: Just like std::async hides a threading model, C++ coroutines hide a stackless function model, while Boost.Fiber delivers the task-based async people intuitively expect. The “async” label gets slapped on all three, despite wildly different mechanics, classic salesman conflation.
 	//
 	// `//func add(in a, in b) {
 	//  //    set_async_result(a + b);
@@ -164,14 +164,15 @@ public:
 	void yield() const;
 
 	// Set a async result.
-	// Callable in an async function to provide output collectible by async_results().
-	// See async for an example.
+	// Call once within an async function to provide output collectible by async_results().
+	// See async() for an example.
 	void set_async_result(var data, var message = "") const;
 
 #ifdef EXO_GENERATOR
 
-	// A range-based for loop to pick up all async results.
-	// See async for an example.
+	// Process all async results asynchronously as they become available.
+    // return: range based for loop argument.
+	// See async() for an example.
 	auto async_results() -> std::generator<AsyncResult&>;
 
 #else
