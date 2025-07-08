@@ -151,7 +151,8 @@ func main() {
 //			if (verbose)
 //				TRACE(file_included_from)
 			if (not osfilenames_to_check_commons.locate(file_included_from)) {
-				osfilenames_to_check_commons ^= file_included_from ^ FM;
+				//osfilenames_to_check_commons ^= file_included_from ^ FM;
+				osfilenames_to_check_commons(-1) = file_included_from;
 				if (verbose)
 					TRACE(osfilenames_to_check_commons)
 			}
@@ -171,7 +172,8 @@ func main() {
 		if (file_included_from and compline.contains("storage class")) {
 //		if (file_included_from and compline.contains("storage class specified for a member declaration")) {
 			if (not osfilenames_to_check_commons.locate(file_included_from)) {
-				osfilenames_to_check_commons ^= file_included_from ^ FM;
+				//osfilenames_to_check_commons ^= file_included_from ^ FM;
+				osfilenames_to_check_commons(-1) = file_included_from;
 				if (verbose)
 					TRACE(osfilenames_to_check_commons)
 			}

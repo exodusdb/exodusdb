@@ -130,7 +130,7 @@ func main(out bakpars, in process0 = var()) {
 //		bakpars(8) = "";
 //
 //		// decide backup required or not by indicating testdata
-//		if (dbcodes.locate(dbcode, dbn)) {
+//		if (dbcodes.locate(dbcode, dbn, 1)) {
 //			tt = process.f(60, dbn);
 //		} else {
 //			tt = 0;

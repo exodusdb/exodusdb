@@ -12,7 +12,8 @@ var origusername;
 func main(in cmd, in username) {
 
 	if (username) {
-		if (not SECURITY.f(1).locate(username)) {
+		var tt;
+		if (not SECURITY.locate(username, tt, 1)) {
 			call note(username.quote() ^ " user does not exist in executeas()");
 			return 0;
 		}

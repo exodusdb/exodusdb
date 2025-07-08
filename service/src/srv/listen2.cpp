@@ -178,7 +178,7 @@ func main(in request1, in request2, in request3, in request4, io request5, in re
 		// NB if "EXODUS" is in Auth File then some user restrictions apply eg password/ips
 
 		// check username exists
-		if (not SECURITY.f(1).locate(username, usern)) {
+		if (not SECURITY.locate(username, usern, 1)) {
 			usern = 0;
 		}
 

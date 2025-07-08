@@ -96,7 +96,8 @@ subr getholidaytype(in idate, in userx, in agp, in market, io holidaytype) {
 	// if holidays else
 	// holidays=
 	// end
-	if (holidays.f(1).locate(idate)) {
+	var tt;
+	if (holidays.locate(idate, tt, 1)) {
 		holidaytype = 2;
 		return;
 	}

@@ -11,7 +11,7 @@ var usern;\
 \
 function main() {\
 	#include <service_common.h>\
-	if (SECURITY.f(1).locate(ID, usern)) {\
+	if (SECURITY.locate(ID, usern, 1)) {\
 		ANS = SECURITY.f(2, usern);\
 	} else {\
 		ANS = "";\

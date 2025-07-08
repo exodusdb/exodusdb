@@ -255,7 +255,7 @@ addline:
 			if (word1 == "#include") {
 				let macroid	   = splitline.f(1, 2);
 				let lineparams = splitline.field(VM, 3, 999999);
-				if (macros.f(1).locate(macroid, macron)) {
+				if (macros.locate(macroid, macron, 1)) {
 					let macroline = raise(macros.f(2, macron));
 					var macrotext = raise(raise(macros.f(3, macron)));
 
@@ -268,7 +268,7 @@ addline:
 						if (mword1 == "#ifdef" or mword1 == "#ifndef") {
 							let mword2 = mline.field(" ", 2);
 							var paramn;
-							if (macroline.locate(mword2, paramn)) {
+							if (macroline.locate(mword2, paramn, 1)) {
 								lineparam = lineparams.f(1, paramn);
 								// dot means not defined while we are using spaces to separate params
 								if (lineparam == ".") {
@@ -287,10 +287,10 @@ deletemline:
 insertmline:
 								// remove #ifdef xxx
 								mline0.converter(" " ^ VM, VM ^ " ");
-								if (mline0.locate(mword1, wordn)) {
+								if (mline0.locate(mword1, wordn, 1)) {
 									mline0.remover(1, wordn);
 								}
-								if (mline0.locate(mword2, wordn)) {
+								if (mline0.locate(mword2, wordn, 1)) {
 									mline0.remover(1, wordn);
 								}
 								mline0.converter(" " ^ VM, VM ^ " ");
@@ -336,7 +336,7 @@ nextmln:;
 							continue;
 
 						var fieldn;
-						if (not allfields.locate(fieldname, fieldn)) {
+						if (not allfields.locate(fieldname, fieldn, 1)) {
 							allfields(1, -1) = fieldname;
 							var tempdict;
 							if (tempdict.read(DICT, fieldname)) {

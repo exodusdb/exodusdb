@@ -25,7 +25,7 @@ var msg;
 //var smtprec;
 //var vn;
 //var anydataexists;
-//var tt;
+var tt;
 //var errors;
 //var dbdir;
 //var newdbcoden;
@@ -352,7 +352,7 @@ preventupdate:
 			for (const var fn : range(100, 102)) {
 				let usercode = RECORD.f(fn);
 				if (usercode) {
-					if (not SECURITY.f(1).locate(usercode)) {
+					if (not SECURITY.locate(usercode, tt, 1)) {
 						msg = usercode.quote() ^ " is not a valid financial usercode";
 						return invalid(msg);
 					}
@@ -666,7 +666,7 @@ subr reorderdbs() {
 		let db	   = dblist.f(1, dbn);
 		let dbcode = db.f(1, 1, 2);
 		var newdbcoden;
-		if (not newdbcodes.locate(dbcode, newdbcoden)) {
+		if (not newdbcodes.locate(dbcode, newdbcoden, 1)) {
 			newdbcodes(1, newdbcoden) = dbcode;
 		}
 		newdblist(1, newdbcoden) = db;

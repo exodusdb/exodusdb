@@ -55,7 +55,8 @@ func main(in mode0) {
 
 		let datasetcodes = gosub getdatasets();
 
-		if (not datasetcodes.f(1).locate(req.is)) {
+		var tt;
+		if (not datasetcodes.locate(req.is, tt, 1)) {
 			let msg = req.is.quote() ^ " is not a dataset";
 			return invalid(msg);
 		}
@@ -83,7 +84,7 @@ func main(in mode0) {
 		// excluding the specified user.
 
 		var usern0;
-		if (not SECURITY.f(1).locate(USERNAME, usern0)) {
+		if (not SECURITY.locate(USERNAME, usern0, 1)) {
 			ANS = "";
 			return 0;
 		}
@@ -233,7 +234,7 @@ subr getuserdept2(in usercode) {
 
 	// Locate the user in the table otherwise department is ""
 	var usern0;
-	if (not SECURITY.f(1).locate(usercode, usern0)) {
+	if (not SECURITY.locate(usercode, usern0, 1)) {
 
 		// If EXODUS user isnt in the table then its dept is also EXODUS
 		if (usercode == "EXODUS") {

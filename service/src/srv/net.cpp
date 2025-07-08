@@ -266,7 +266,7 @@ listen:
 		if (PSEUDO.field(" ", 1) == "BACKUP") {
 
 			// before termination do any copy to testdata etc
-			if (SYSTEM.f(58).locate(dbcode, tt)) {
+			if (SYSTEM.locate(dbcode, tt, 58)) {
 				if (SYSTEM.f(62, tt)) {
 					perform("COPYDB " ^ dbcode);
 				}

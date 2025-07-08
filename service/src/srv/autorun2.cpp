@@ -125,7 +125,7 @@ func main(in mode0, in title0, in module, in request, in data0, in runasusercode
 	if (targetusercodes == "{GROUP}") {
 		var tt = runasusercode;
 		var usern;
-		if (SECURITY.f(1).locate(tt, usern)) {
+		if (SECURITY.locate(tt, usern, 1)) {
 			while (true) {
 				var userx;
 				if (userx.read(users, tt)) {

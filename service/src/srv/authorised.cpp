@@ -97,7 +97,7 @@ nousername0:
 
 	// find the task
 	var taskn;
-	if (SECURITY.f(10).locate(task, taskn)) {
+	if (SECURITY.locate(task, taskn, 10)) {
 
 		if (deleting) {
 			SECURITY.remover(10, taskn);
@@ -108,7 +108,7 @@ updateprivs:
 		} else if (renaming) {
 			// delete any existing rename target task
 			var taskn2;
-			if (SECURITY.f(10).locate(defaultlock, taskn2)) {
+			if (SECURITY.locate(defaultlock, taskn2, 10)) {
 				SECURITY.remover(10, taskn2);
 				SECURITY.remover(11, taskn2);
 				if (taskn2 < taskn) {
@@ -119,7 +119,8 @@ updateprivs:
 			if (renaming) {
 				// skip warning except for live databases included in startup
 				if (not SYSTEM.f(61)) {
-					if (SYSTEM.f(58).locate(SYSTEM.f(17))) {
+					var tt;
+					if (SYSTEM.locate(SYSTEM.f(17), tt, 58)) {
 						call note("Task renamed:|Old: " ^ task ^ "|New: " ^ defaultlock);
 					}
 				}
@@ -128,7 +129,7 @@ updateprivs:
 		} else if (updating) {
 			var tt = defaultlock;
 			var taskn2;
-			if (SECURITY.f(10).locate(defaultlock, taskn2)) {
+			if (SECURITY.locate(defaultlock, taskn2, 10)) {
 				tt = SECURITY.f(11, taskn2);
 			}
 			SECURITY(11, taskn) = tt;
@@ -171,7 +172,7 @@ updateprivs:
 						newlock = "";
 					} else {
 						var lockn;
-						if (SECURITY.f(10).locate(defaultlock, lockn)) {
+						if (SECURITY.locate(defaultlock, lockn, 10)) {
 							newlock = SECURITY.f(11, lockn);
 						} else {
 							newlock = defaultlock;
@@ -236,7 +237,7 @@ notallowed:
 
 	// find the user
 	var usern;
-	if (not SECURITY.f(1).locate(username, usern)) {
+	if (not SECURITY.locate(username, usern, 1)) {
 	}
 
 	// user must have all the keys for all the locks on this task

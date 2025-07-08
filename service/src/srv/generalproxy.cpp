@@ -167,7 +167,7 @@ func main() {
 	} else if (mode == "FILEMAN" and request_.f(2) == "COPYDB") {
 
 		let copydb = request_.f(3);
-		if (not SYSTEM.f(58).locate(copydb, dbn)) {
+		if (not SYSTEM.locate(copydb, dbn, 58)) {
 			// Not found. dbn points to last + 1
 		}
 		let todb = SYSTEM.f(63, dbn);

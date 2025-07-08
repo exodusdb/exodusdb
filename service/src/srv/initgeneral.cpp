@@ -756,7 +756,7 @@ nextreport:
 
 	call log2("*get codepage as an environment variable", logtime);
 	// will not override entries in SYSTEM.CFG
-	if (not SYSTEM.f(12).locate("CODEPAGE", vn)) {
+	if (not SYSTEM.locate("CODEPAGE", vn, 12)) {
 
 		// en_US.UTF-8
 		//call osgetenv("LANG", codepage);
@@ -813,7 +813,7 @@ nextreport:
 
 	// save VER
 	var envn;
-	if (not SYSTEM.f(12).locate("VER", envn)) {
+	if (not SYSTEM.locate("VER", envn, 12)) {
 		// Not found. envn points to last + 1
 	}
 	SYSTEM(12, envn) = "VER";
@@ -1402,7 +1402,8 @@ adddatasetcodename:
 	// if @username<>'EXODUS' and datasetid<4> then
 	// lock even to EXODUS to prevent installation where EXODUS pass is known
 	if (datasetid.f(4)) {
-		if (not datasetid.f(4).locate(cid())) {
+		var tt;
+		if (not datasetid.locate(cid(), tt, 4)) {
 			msg_ = var("CANNOT USE THIS DATABASE ON THIS COMPUTER").quote();
 			gosub failsys();
 			//stop();
@@ -1549,7 +1550,8 @@ adddatasetcodename:
 			versioninstalled.write(DEFINITIONS, lastupdate_key);
 
 			// email users on live systems LISTED IN SYSTEM CONFIGURATION only
-			if (SYSTEM.f(58).locate(SYSTEM.f(17))) {
+			var tt;
+			if (SYSTEM.locate(SYSTEM.f(17), tt, 58)) {
 				if (not SYSTEM.f(61)) {
 					let idate = version.field(" ", 2, 4).iconv("D");
 					let itime = version.field(" ", 1).iconv("MT");

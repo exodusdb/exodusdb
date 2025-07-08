@@ -41,7 +41,7 @@ func main(in mode) {
 				if (task) {
 					let newlock = newlocks.f(1, taskn);
 					var oldtaskn;
-					if (oldtasks.locate(task, oldtaskn)) {
+					if (oldtasks.locate(task, oldtaskn, 1)) {
 						let oldlock = oldlocks.f(1, oldtaskn);
 						if (newlock != oldlock) {
 							// changed
@@ -59,7 +59,7 @@ func main(in mode) {
 				let task = oldtasks.f(1, taskn);
 				if (task) {
 					var newtaskn;
-					if (not newtasks.locate(task, newtaskn)) {
+					if (not newtasks.locate(task, newtaskn, 1)) {
 						let oldlock	 = oldlocks.f(1, taskn);
 						emailtx2(-1) = FM ^ "Task : " ^ task ^ " *DELETED*" ^ FM ^ "Lock : " ^ oldlock;
 					}
@@ -133,7 +133,7 @@ func main(in mode) {
 
 		// customisation to convert old databases at ptcy/patsalides
 		// which had blank passwords not allowed in the new system
-		if (SECURITY.f(1).locate("MICHAEL", dummy)) {
+		if (SECURITY.locate("MICHAEL", dummy, 1)) {
 			if (newuserprivs.osread("PATSALID.CFG")) {
 			}
 		}
@@ -166,7 +166,7 @@ func main(in mode) {
 		t10.replacer("LEDGER RE-OPEN", "LEDGER REOPEN");
 
 		var tn;
-		if (t10.f(1).locate("POSTING", tn)) {
+		if (t10.locate("POSTING", tn, 1)) {
 			if (newuserprivs.f(11, tn) == "") {
 				newuserprivs(11, tn) = "UA";
 			}
@@ -208,7 +208,7 @@ func main(in mode) {
 		call log2("*make sure all users have access to company file", logtime);
 		{
 			var taskn;
-			if (newuserprivs.f(10).locate("COMPANY ACCESS", taskn)) {
+			if (newuserprivs.locate("COMPANY ACCESS", taskn, 10)) {
 				if (newuserprivs.f(11, taskn) == "AA") {
 					newuserprivs(11, taskn) = "";
 				}
@@ -225,7 +225,7 @@ func main(in mode) {
 				// /BREAK;
 				if (not tt)
 					break;
-				if (newuserprivs.f(10).locate(tt, taskn)) {
+				if (newuserprivs.locate(tt, taskn, 10)) {
 					newuserprivs.remover(10, taskn);
 					newuserprivs.remover(11, taskn);
 				}
@@ -235,13 +235,13 @@ func main(in mode) {
 		// ensure certain documents cannot be deleted
 		{
 			var taskn;
-			if (newuserprivs.f(10).locate("JOB ORDER DELETE", taskn)) {
+			if (newuserprivs.locate("JOB ORDER DELETE", taskn, 10)) {
 				newuserprivs(11, taskn) = "EXODUS";
 			}
-			if (newuserprivs.f(10).locate("JOB ESTIMATE DELETE", taskn)) {
+			if (newuserprivs.locate("JOB ESTIMATE DELETE", taskn, 10)) {
 				newuserprivs(11, taskn) = "EXODUS";
 			}
-			if (newuserprivs.f(10).locate("JOB DELETE", taskn)) {
+			if (newuserprivs.locate("JOB DELETE", taskn, 10)) {
 				newuserprivs(11, taskn) = "EXODUS";
 			}
 		}
@@ -261,7 +261,7 @@ deletetask:
 			} else {
 				// delete duplicate tasks
 				var taskn2;
-				if (tasks.f(1).locate(task, taskn2)) {
+				if (tasks.locate(task, taskn2, 1)) {
 					if (taskn2 < taskn) {
 						goto deletetask;
 					}

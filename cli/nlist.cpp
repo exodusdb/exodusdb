@@ -1974,7 +1974,7 @@ getnextword:
 	gosub getword2();
 
 	if (word.len()) {
-		if (ignorewords.f(1).locate(word, xx)) {
+		if (ignorewords.locate(word, xx, 1)) {
 			goto getnextword;
 		}
 	}

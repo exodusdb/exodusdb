@@ -76,7 +76,7 @@ func main(in mode0) {
 	// unless already automatically logged in
 	ok = 0;
 	if (not SYSTEM.f(15)) {
-		if (SECURITY.f(1).locate("MASTER", usern)) {
+		if (SECURITY.locate("MASTER", usern, 1)) {
 			if (SECURITY.f(4, usern, 2).field(TM, 7) == "") {
 				SYSTEM(22) = 1000000;
 				userx	   = "MASTER";
@@ -129,7 +129,7 @@ fail:
 
 	// check the user name and password
 	ok = 0;
-	if (SECURITY.f(1).locate(userx, usern)) {
+	if (SECURITY.locate(userx, usern, 1)) {
 		if (SECURITY.f(4, usern, 2).field(TM, 7) == "") {
 			ok = 1;
 			goto okfail;
@@ -172,7 +172,7 @@ fail:
 		// if (userx != lockx.first(userx.len())) {
 		if (not lockx.starts(userx)) {
 			lockx = userx ^ " " ^ var(1000000).rnd();
-			if (SECURITY.f(1).locate(userx, usern)) {
+			if (SECURITY.locate(userx, usern, 1)) {
 				lockx ^= " " ^ SECURITY.f(4, usern, 2).field(TM, 7).oconv("HEX2");
 			}
 		}
@@ -215,7 +215,7 @@ chknameandpass:
 
 	// check the user name and password
 	ok = 0;
-	if (SECURITY.f(1).locate(userx, usern)) {
+	if (SECURITY.locate(userx, usern, 1)) {
 		if (SECURITY.f(4, usern, 2).field(TM, 7) == encryptx) {
 			ok = 1;
 		} else {

@@ -256,7 +256,7 @@ func main(in mode) {
 			}
 
 			var newusern;
-			if (not SECURITY.f(1).locate(userdept, newusern)) {
+			if (not SECURITY.locate(userdept, newusern, 1)) {
 				msg = (userdept ^ " USER GROUP does not exist").quote();
 				gosub invalid(msg);
 				gosub unlocksec();
@@ -408,7 +408,7 @@ func getusern() {
 	if (ID == "EXODUS") {
 		// usern remains unassigned to force an error if used later on
 	} else {
-		if (not SECURITY.f(1).locate(ID, usern)) {
+		if (not SECURITY.locate(ID, usern, 1)) {
 			msg = ID.quote() ^ " User does not exist";
 			gosub invalid(msg);
 			return 0;
@@ -437,7 +437,7 @@ subr getuserdept2(in mode) {
 	// locate the user in the table
 	usercode = mode.field(",", 2);
 	var usern;
-	if (not SECURITY.f(1).locate(usercode, usern)) {
+	if (not SECURITY.locate(usercode, usern, 1)) {
 		if (usercode == "EXODUS") {
 			ANS = "EXODUS";
 			return;

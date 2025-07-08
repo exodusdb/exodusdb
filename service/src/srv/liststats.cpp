@@ -100,7 +100,7 @@ func main() {
 	rowfields.converter(SM, VM);
 
 	// remove col field from row fields because not logical or useful
-	if (rowfields.locate(colfield, vn)) {
+	if (rowfields.locate(colfield, vn, 1)) {
 		rowfields.remover(1, vn);
 	}
 
@@ -132,7 +132,7 @@ func main() {
 		}  // rown;
 	}
 
-	if (not rowfields.locate("USER_CODE", usercoln)) {
+	if (not rowfields.locate("USER_CODE", usercoln, 1)) {
 		usercoln = 0;
 	}
 

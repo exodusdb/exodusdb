@@ -92,7 +92,7 @@ readmenu:
 		let menu = menus.f(1, menun).ucase();
 		if (menu) {
 			let menutask = "MENU " ^ menu;
-			if (not SECURITY.f(10).locate(menutask, taskn)) {
+			if (not SECURITY.locate(menutask, taskn, 10)) {
 				taskn = 0;
 			}
 
@@ -100,7 +100,7 @@ readmenu:
 			if (oldmenus == "" or ((menun and SECURITY.f(11, taskn).len()))) {
 				if (not authorised(menutask)) {
 deleteit:
-					if (menus.locate(menu, menun2)) {
+					if (menus.locate(menu, menun2, 1)) {
 						menus.remover(1, menun2);
 						nmenus -= 1;
 					}

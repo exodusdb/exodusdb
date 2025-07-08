@@ -226,7 +226,7 @@ func main(in mode) {
 			let nusers	  = usercodes.fcount(VM);
 
 			var usern;
-			if (not usercodes.f(1).locate(USERNAME, usern)) {
+			if (not usercodes.locate(USERNAME, usern, 1)) {
 				msg = USERNAME ^ " user not in in authorisation file";
 				return invalid(msg);
 				//stop();
@@ -288,7 +288,8 @@ func main(in mode) {
 						let nkeys = invisiblekeys.fcount(VM);
 						for (const var keyn : range(1, nkeys)) {
 							let keyx = invisiblekeys.f(1, keyn);
-							if (not otherkeys.f(1).locate(keyx)) {
+							var tt;
+							if (not otherkeys.locate(keyx, tt, 1)) {
 								if (not visiblekeys.f(1).locate(keyx)) {
 									otherkeys ^= VM ^ keyx;
 								}
@@ -418,7 +419,7 @@ func main(in mode) {
 					}
 
 					var ousern;
-					if (not origfullrec_.f(1).locate(userx, ousern)) {
+					if (not origfullrec_.locate(userx, ousern, 1)) {
 						ousern = 0;
 					}
 
@@ -508,7 +509,7 @@ func main(in mode) {
 				let task = tasks.f(1, taskn);
 				if (task) {
 					var newtaskn;
-					if (not req.orec.f(10).locate(task, newtaskn)) {
+					if (not req.orec.locate(task, newtaskn, 10)) {
 						let lockx = locks.f(1, taskn);
 
 						if (not RECORD.f(10).locateby("AL", task, newtaskn)) {
@@ -587,7 +588,7 @@ func main(in mode) {
 					// locate user in orec<1> setting ousern then
 					var menuid = "";
 					var ousern;
-					if (origfullrec_.f(1).locate(userx, ousern)) {
+					if (origfullrec_.locate(userx, ousern, 1)) {
 						// oSYSREC=orec<4,ousern,2>
 						let osysrec = origfullrec_.f(4, ousern, 2);
 					} else {
@@ -693,7 +694,7 @@ func main(in mode) {
 				let userx = usercodes.f(1, usern);
 				if (not userx.contains("---")) {
 					if (userx and not(userx.contains("EXODUS"))) {
-						if (not RECORD.f(1).locate(userx, temp)) {
+						if (not RECORD.locate(userx, temp, 1)) {
 							var userrec;
 							if (userrec.read(users, userx)) {
 								if (users) {

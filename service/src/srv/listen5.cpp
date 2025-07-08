@@ -341,7 +341,7 @@ getvalues:
 			let nn2 = nn;
 			for (int ii = 1; ii <= nn; ++ii) {
 				let execcode = data_.f(1, ii);
-				if (execstoplist.f(1).locate(execcode, stopn)) {
+				if (execstoplist.locate(execcode, stopn, 1)) {
 					let reason = execstoplist.f(2, stopn);
 					if (reason) {
 						data_.remover(1, ii);

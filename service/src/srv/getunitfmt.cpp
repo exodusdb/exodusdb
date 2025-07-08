@@ -15,7 +15,7 @@ func main(in code, out fmtx) {
 	// Locate cached currfmt by currency code
 	// or get the next free cache fmtn
 	var fmtn;  // num
-	if (srv.currency_codes.locate(code, fmtn)) {
+	if (srv.currency_codes.locate(code, fmtn, 1)) {
 		fmtx = srv.currency_convs.f(1, fmtn);
 		return 0;
 	}

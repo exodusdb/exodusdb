@@ -169,7 +169,7 @@ func main(in mode, io logtime, in menu) {
 				printl(THREADNO ^ ":", enventry);
 			let envkey = enventry.field("=", 1);
 			let envval = enventry.field("=", 2, 999999);
-			if (not SYSTEM.f(12).locate(envkey, vn)) {
+			if (not SYSTEM.locate(envkey, vn, 12)) {
 				SYSTEM(12, vn) = envkey;
 				SYSTEM(13, vn) = envval;
 			}
@@ -255,7 +255,7 @@ nextuser:
 				goto nextuser;
 			}
 			var origuser = userx;
-			if (not SECURITY.f(1).locate(userid, usern)) {
+			if (not SECURITY.locate(userid, usern, 1)) {
 				goto nextuser;
 			}
 			userx(40)	 = SECURITY.f(6, usern);

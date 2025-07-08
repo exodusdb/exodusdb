@@ -273,7 +273,7 @@ nextprocess:
 			goto nextprocess;
 		}
 		var dbasen;
-		if (not dbasecodes.f(1).locate(dbasecode, dbasen)) {
+		if (not dbasecodes.locate(dbasecode, dbasen, 1)) {
 			dbasecodes(1, dbasen) = dbasecode;
 		}
 		dbasesystems(1, dbasen) = RECORD.f(51);
@@ -508,7 +508,7 @@ nextprocess:
 			}
 
 			var backupdriven;
-			if (not backupdrives.f(1).locate(backupdrive, backupdriven)) {
+			if (not backupdrives.locate(backupdrive, backupdriven, 1)) {
 				backupdrives(1, backupdriven) = backupdrive;
 
 				// ensure something is on the target
