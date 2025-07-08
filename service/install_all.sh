@@ -27,6 +27,27 @@ set -euxo pipefail
 	EXODUS_DIR=${EXODUS_DIR:-$(realpath `pwd`/..)}
 
 :
+: Function to call apt-get repeatedly in case of error
+: ----------------------------------------------------
+:
+function APT_GET {
+:
+	STARTED=$SECONDS
+	while [[ $(($SECONDS-$STARTED)) -lt 600 ]]; do
+:
+: Retry apt-get. $(($SECONDS-$STARTED)) secs.
+: -------------------
+:
+		# /dev/null to stop error causing random hang until timeout
+		# with apt process stuck on tcsetattr call. see gdb -p 9999
+		if timeout 120s $* < /dev/null; then
+			break
+		fi
+		sleep 5
+	done;
+}
+
+:
 : Allow cd into subdirs of /root - but no read access of course
 : =============================================================
 :
@@ -134,7 +155,7 @@ set -euxo pipefail
 :	mailutils	NOT installed. like bsd-mailx but doesnt have identical options
 :	qrencode	used in htmllib2 for KSA invoices
 :
-    sudo DEBIAN_FRONTEND=noninteractive apt-get -y install whois postfix bsd-mailx
+	APT_GET sudo DEBIAN_FRONTEND=noninteractive apt-get -y install whois postfix bsd-mailx
 :
 : Configure postfix
 : =================
@@ -192,12 +213,21 @@ set -euxo pipefail
 #	rm wkhtmltopdf.html wkhtmltopdf.pdf
 
 :
+: Install pdfgrep
+: ===============
+:
+	which pdfgrep || APT_GET sudo DEBIAN_FRONTEND=noninteractive apt-get -y install pdfgrep
+
+:
 : Check chromium converts html to pdf
 : ===================================
 :
-: Wait 5 mins for installation to complete
+: Wait 10 mins for installation to complete
 :
-	timeout 300 bash -c 'while snap changes | grep chromium | grep -q Doing; do sleep 5; done; snap changes | grep chromium | grep -q Done && echo "Chromium installation done" || echo "Chromium installation failed or not found"' || echo "Timed out after 5 minutes"
+	timeout 600 bash -c 'while snap changes | grep chromium | grep -q Doing; do sleep 5; done; snap changes | grep chromium | grep -q Done && echo "Chromium installation done" || echo "Chromium installation failed or not found"' || echo "Timed out."
+	which chromium
+	snap refresh chromium
+
 :
 : Verify chromium pdf converter works - Ignore various chromium error messages
 :
@@ -206,7 +236,6 @@ set -euxo pipefail
 :
 : Check pdf seems ok
 :
-	which pdfgrep || sudo DEBIAN_FRONTEND=noninteractive apt-get -y install pdfgrep
 	pdfgrep "Nothing Special" chromium2pdf.pdf
 #	rm chromium2pdf.html chromium2pdf.pdf
 
