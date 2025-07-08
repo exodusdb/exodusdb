@@ -47,12 +47,33 @@ set -euxo pipefail
 	fi
 
 :
+: Function to call apt-get repeatedly in case of error
+: ----------------------------------------------------
+:
+function APT_GET {
+:
+	STARTED=$SECONDS
+	while [[ $(($SECONDS-$STARTED)) -lt 600 ]]; do
+:
+: Retry apt-get. $(($SECONDS-$STARTED)) secs.
+: -------------------
+:
+		# /dev/null to stop error causing random hang until timeout
+		# with apt process stuck on tcsetattr call. see gdb -p 9999
+		if timeout 120s $* < /dev/null; then
+			break
+		fi
+		sleep 5
+	done;
+}
+
+:
 : Install apache and php
 : ======================
 :
 : Note that apache/mods may be already installed but not enabled
 :
-	sudo apt-get install -y apache2 libapache2-mod-php php php-xml
+	APT_GET sudo apt-get install -y apache2 libapache2-mod-php php php-xml
 :
 : Dump mods available and enabled
 :
@@ -134,7 +155,7 @@ set -euxo pipefail
 : Ensure setfacl is installed
 : ===========================
 :
-	which setfacl || sudo apt-get install -y acl
+	which setfacl || APT_GET sudo apt-get install -y acl
 
 :
 : Create link from hostname dir to host dir if different

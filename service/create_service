@@ -96,6 +96,27 @@ set -euxo pipefail
 	fi
 
 :
+: Function to call apt-get repeatedly in case of error
+: ----------------------------------------------------
+:
+function APT_GET {
+:
+	STARTED=$SECONDS
+	while [[ $(($SECONDS-$STARTED)) -lt 600 ]]; do
+:
+: Retry apt-get. $(($SECONDS-$STARTED)) secs.
+: -------------------
+:
+		# /dev/null to stop error causing random hang until timeout
+		# with apt process stuck on tcsetattr call. see gdb -p 9999
+		if timeout 120s $* < /dev/null; then
+			break
+		fi
+		sleep 5
+	done;
+}
+
+:
 : Create the service
 : ==================
 :
@@ -165,7 +186,7 @@ V0G0N
 : Ensure setfacl is installed
 : ===========================
 :
-    which setfacl || apt-get install -y acl
+    which setfacl || APT_GET sudo apt-get install -y acl
 
 :
 : Ensure directory permissions on data/$FULL_DB_CODE
