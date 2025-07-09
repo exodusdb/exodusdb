@@ -1,84 +1,71 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
     <script type="text/javascript">
         var gmodule = 'GENERAL'
         var gdatafilename = 'USERS'
         var gupdateonlymode = true
     </script>
-
     <script type="text/javascript" src="../exodus/scripts/client.js"></script>
-
     <script type="text/javascript" src="../exodus/scripts/system.js"></script>
-
     <script type="text/javascript" src="../general/scripts/general.js"></script>
-
     <script type="text/javascript" src="../exodus/scripts/authorisation2.js"></script>
-
     <script type="text/javascript" src="../exodus/scripts/colors.js"></script>
-
     <script type="text/javascript" src="../exodus/scripts/users.js"></script>
-    <style>
-        #DEPARTMENT {
-            background-color: inherit;
-        }
-    </style>
     <title>User Details</title>
 </head>
 <body>
-    <div align="center">
+    <div class="formpage" align="center">
         <h1> User Details </h1>
-
         <table class="exodusform">
-            <tbody>
+            <tbody class="section">
                 <tr>
-                    <td rowspan="5" style= "font-size:11px; text-align: center; padding: 20px;">
-                        <img src="../../exodus/images/theme2/profile.webp" style="height:70px; width:70px" />
-                        <br><b>Profile</b>
+                    <td rowspan="5" class="section-title">
+                        <img src="../../exodus/images/theme2/formpage_details.webp" />
+                        <br>Profile
                     </td>
-                    <td style="padding:5px;">
+                    <td>
                         User Code 
                     </td>
-                    <td colspan="1" style="padding:5px">
+                    <td>
                         <input id="USER_ID" />
                     </td>
-                    <td colspan="2" style=" padding:5px;" >
+                    <td colspan="2">
                         <input exodusgroup="0" id="button_password" title="Change the password" class="exodusbutton"
                             disabled="disabled" type="button" exodustype="B" tabindex="999" value="Reset password"
                             exodusonclick="yield* user_setpassword(true)" />
                     </td>
                 </tr>
                 <tr>
-                    <td style="padding:5px;">
+                    <td>
                         User Name
                     </td>
-                    <td colspan="4" style="padding:5px">
+                    <td colspan="4">
                         <input id="USER_NAME" />
                     </td>
                 </tr>
                 <tr>
-                    <td style="padding:5px;">
+                    <td>
                         Email Address
                     </td>
-                    <td colspan="4" style="padding:5px">
+                    <td colspan="4">
                         <input id="EMAIL_ADDRESS" />
                     </td>
                 </tr>
                 <tr>
-                    <td style="padding:5px;">
+                    <td>
 						Status
 					</td>
-                    <td colspan="1" id="expiryelement" style="padding: 5px"></td>
-                    <td style="padding:5px;">
+                    <td id="expiryelement"></td>
+                    <td>
                         Department
                     </td>
-                    <td colspan="1" style="padding:5px;">
+                    <td>
                         <input id="DEPARTMENT" />
                     </td>
                 </tr>
                 <tr>
-                    <td style="padding:5px">
+                    <td>
                         Signature
                     </td>
                     <td colspan="4">
@@ -87,7 +74,7 @@
                                 <td>
                                     <img src="" alt="" id="signature_image" onload="user_signature_onload_sync()" />
                                 </td>
-                                <td style="vertical-align: middle; padding:5px;">
+                                <td style="vertical-align: middle;">
                                     <input exodustype="B" value="Upload" exodusonclick="yield* users_upload_signature()"
                                         class="exodusbutton" type="button" title="upload user signature for various documents footings (where configured)"
                                         id="button_upload_signature" name="button_upload_signature" />
@@ -96,75 +83,76 @@
                         </table>
                     </td>
 				</tr>
-
-
+			</tbody>
+            <tbody class="section">
                 <tr>
-                    <td rowspan="6" style="font-size:11px; text-align: center; padding:20px;">
-                        <img src="../../exodus/images/theme2/paint.webp" style="height: 70px; width: 70px" />
-                        <br><b>Styles</b>
+                    <td rowspan="6" class="section-title">
+                        <img src="../../exodus/images/theme2/formpage_paint.webp" />
+                        <br>Styles
                     </td>
-					<td colspan="4" style="padding:5px;"> 
+					<td colspan="4"> 
                         <b>Screens</b>
 					</td>
 				</tr>
 				<tr>
-					<td style="padding:5px;"> 
+					<td> 
                         Font Name
 					</td>
-					<td style="padding:5px;"> 
+					<td> 
 						<input id="SCREEN_FONT" />
                     </td>
-                    <td style="padding:5px;">
+                    <td>
 						Font Size %
 					</td>
-                    <td style="padding:5px;">
+                    <td>
 						<input id="SCREEN_FONT_SIZE" />
                     </td>
 				</tr>
 				<tr>
-                    <td style="padding:5px;">
+                    <td>
                         Body Color
 					</td>
-                    <td colspan="3" style="padding:5px;">
+                    <td colspan="3">
 						<input id="SCREEN_BODY_COLOR" style="width: 100%; box-sizing: border-box;" />
                     </td>
 				</tr>
 				<tr>
-					<td colspan="4" style="padding:5px;"> 
+					<td colspan="4"> 
                         <b>Documents & Reports</b>
 					</td>
 				</tr>
 				<tr>
-                    <td style="padding:5px;">
+                    <td>
 						Font Name
 					</td>
-                    <td style="padding:5px;">
+                    <td>
 						<input id="REPORT_FONT_NAME" />
 					</td>
-                    <td style="padding:5px;">
+                    <td>
 						Font Size %
 					</td>
-                    <td style="padding:5px;">
+                    <td>
 						<input id="REPORT_FONT_SIZE" />
 					</td>
 				</tr>
 				<tr>
-                    <td style="padding:5px">
+                    <td>
                         Body Color
 					</td>
-                    <td style="padding:5px">
+                    <td>
 						<input id="REPORT_BODY_COLOR" />
 					</td>
-                    <td style="padding:5px;">
+                    <td>
 						Heading Color
 					</td>
-                    <td style="padding:5px">
+                    <td>
 						<input id="REPORT_HEAD_COLOR" />
                     </td>
 				</tr>
-
+			</tbody>
+            <tbody class="section">
                 <tr>
-                    <td colspan="7" style="padding: 5px;">
+                    <td colspan="7">
                         <table class="exodustable2" width="100%">
                             <tr style="vertical-align: top">
 
