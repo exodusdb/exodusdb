@@ -26,29 +26,6 @@ function* form_postinit() {
 
 }
 
-// SAME in clients|addresses|suppliers.js|users.js
-function* update_section_rowspans() {
-
-	//dynamically adjust section rowspan - so no need to adjust rowspan when new rows are added
-
-	document.querySelectorAll('tbody.section').forEach(section => {
-
-		var titlefield = section.querySelector('td.section-title')
-		if (!titlefield) return
-
-		var rows = Array.from(section.rows).filter(tr => getComputedStyle(tr).display != 'none')
-		//var rows = []
-		//var totalrows = section.rows
-		//for (var i=0; i<totalrows.length; i++) {
-		//  if (getComputedStyle(totalrows[i]).display != 'none')
-		//      rows.push(totalrows[i])
-		//}
-
-		titlefield.rowSpan = rows.length || 1
-	})
-}
-
-
 function* form_postdisplay() {
 
     //enable/disable password changing button
@@ -70,7 +47,7 @@ function* form_postdisplay() {
     }
 
 	// Update rowspans based on new visibility state
-	yield* update_section_rowspans()
+	yield* general_update_section_rowspans()
 
     return true
 }
