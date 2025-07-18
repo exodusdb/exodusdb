@@ -1,55 +1,52 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Stop EXODUS Service</title>
+	<title>Stop EXODUS Service</title>
 
-    <script type="text/javascript" src="scripts/client.js"></script>
+	<script type="text/javascript" src="scripts/client.js"></script>
+	<script type="text/javascript" src="../exodus/scripts/exodus.js"></script>
+	<script type="text/javascript">
 
-    <script type="text/javascript" src="../exodus/scripts/exodus.js"></script>
+		var gnosavelocation=true
 
-    <script type="text/javascript">
+		function stopservice_sync() {
+			exodussettimeout('yield* stopservice()')
+		}
 
-var gnosavelocation=true
+		function* stopservice() {
+			var modex=$$('mode')
+			db.request='STOPDB'
+			if (modex[1].checked)
+				db.request+='\rRESTART'
+			yield* db.send()
+			yield* exodusnote(db.response)
+		}
 
-function stopservice_sync() {
-    exodussettimeout('yield* stopservice()')
-}
-
-function* stopservice() {
-
- var modex=$$('mode')
- db.request='STOPDB'
- if (modex[1].checked)
-    db.request+='\rRESTART'
- yield* db.send()
- yield* exodusnote(db.response)
- 
-}
-
-    </script>
-
+	</script>
 </head>
+
 <body>
-    <div align="center">
-        <h2>
-            Stop EXODUS Service</h2>
-        <table border="0">
-            <tr>
-                <td>
-                    <input value="1" id="mode" name="mode" type="radio" /></td>
-                <td>
-                    Stop and prevent restart (To allow restart you must delete *.end files in the exodus
-                    folder)</td>
-            </tr>
-            <tr>
-                <td>
-                    <input value="2" id="mode" name="mode" type="radio" checked="checked" /></td>
-                <td>
-                    Stop and allow restart</td>
-            </tr>
-        </table>
-        <button class=exodusbutton onclick="stopservice_sync()">
-            OK</button>
-    </div>
+	<div align="center">
+		<h2>
+			Stop EXODUS Service</h2>
+		<table border="0">
+			<tr>
+				<td>
+					<input value="1" id="mode" name="mode" type="radio" /></td>
+				<td>
+					Stop and prevent restart (To allow restart you must delete *.end files in the exodus
+					folder)</td>
+			</tr>
+			<tr>
+				<td>
+					<input value="2" id="mode" name="mode" type="radio" checked="checked" /></td>
+				<td>
+					Stop and allow restart</td>
+			</tr>
+		</table>
+		<button class=exodusbutton onclick="stopservice_sync()">
+			OK
+		</button>
+	</div>
 </body>
 </html>

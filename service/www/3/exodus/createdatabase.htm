@@ -1,44 +1,43 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <script type="text/javascript">
-        var gmodule = 'GENERAL'
-        var gdatafilename = 'CREATEDATABASE'
+	<script type="text/javascript">
+		var gmodule = 'GENERAL'
+		var gdatafilename = 'CREATEDATABASE'
 
-        //evade looking for script since is incorporated below
-        dict_CREATEDATABASE = ''
+		//evade looking for script since is incorporated below
+		dict_CREATEDATABASE = ''
+	</script>
+	<script type="text/javascript" src='../exodus/scripts/client.js'></script>
+	<script type="text/javascript" src='../exodus/scripts/system.js'></script>
+	<script type="text/javascript">
+		var ggroupidgroupn
+		var guseridgroupn
+		function* dict_CREATEDATABASE(parameters) {
 
-    </script>
-    <script type="text/javascript" src='../exodus/scripts/client.js'></script>
-    <script type="text/javascript" src='../exodus/scripts/system.js'></script>
-    <script type="text/javascript">
-        var ggroupidgroupn
-        var guseridgroupn
-        function* dict_CREATEDATABASE(parameters) {
+			//returns an array representing details to create new database
 
-            //returns an array representing details to create new database
-
-            var dict = []//of dictrecs
-            var din = -1
-            groupn = 0
+			var dict = []//of dictrecs
+			var din = -1
+			groupn = 0
 			var di
 
-            ++groupn
-            ggroupidgroupn = groupn
+			++groupn
+			ggroupidgroupn = groupn
 
-            di = dict[++din] = dictrec('OLD_DATABASE_CODE', 'F', 3)
+			di = dict[++din] = dictrec('OLD_DATABASE_CODE', 'F', 3)
 			yield* system_dict_datasetcode(di, false, false,'')
 			di.validation = 'yield* database_val_olddatabasecode()'
 			exodus_dict_text(di,20)
-            di.required = true
+			di.required = true
 
-            di = dict[++din] = dictrec('NEW_DATABASE_CODE', 'F', 2)
+			di = dict[++din] = dictrec('NEW_DATABASE_CODE', 'F', 2)
 			exodus_dict_text(di,20);	
-            di.required = true
+			di.required = true
 			di.length = '25'
 			di.validation = 'yield* database_val_newdatabasecode()'
 
-            di = dict[++din] = dictrec('NEW_DATABASE_NAME', 'F', 1)
+			di = dict[++din] = dictrec('NEW_DATABASE_NAME', 'F', 1)
 			di.validcharacters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 			di.validcharacters += di.validcharacters.toLowerCase()
 			//di.validcharacters += '0123456789-\'&() '
@@ -47,34 +46,37 @@
 			//di.maxlength = '25'
 			di.maxlength = '80'
 			di.length = '25'
-            di.required = true
+			di.required = true
 
-            return dict
+			return dict
 
-        }
+		}
 
-        function* form_postinit() {
+		function* form_postinit() {
 
-            gparameters.savebuttonvalue = 'Create'
+			gparameters.savebuttonvalue = 'Create'
+			return true
 
-            return true
+		}
 
-        }
-        function* form_prewrite() {
-            return yield* exodusokcancel('Are you sure ?', 2)
-        }
-        function* form_postwrite() {
+		function* form_prewrite() {
+			return yield* exodusokcancel('Are you sure ?', 2)
+		}
+
+		function* form_postwrite() {
 			yield* cleardoc()
-            return true
-        }
-        function* database_val_olddatabasecode(){
-            if (gvalue==gdataset) {
-                return yield* exodusinvalid('The old database and the database you are curently logged into cannot be the same.\nLogin to a different database and try again.');
-            }
-            return true
-        }
+			return true
+		}
+
+		function* database_val_olddatabasecode(){
+			if (gvalue==gdataset) {
+				return yield* exodusinvalid('The old database and the database you are curently logged into cannot be the same.\nLogin to a different database and try again.');
+			}
+			return true
+		}
+
 		//allow lowercase alphanumeric only
-		function* database_val_newdatabasecode(){
+		function* database_val_newdatabasecode() {
 			if (!gvalue.match('^[0-9a-z]+$')){
 				return yield* exodusinvalid('New Database code must be lowercase alphanumeric')
 				//return false
@@ -84,50 +86,44 @@
 
 		//di.validaition = 'if (!re.match('^[\da-z]+$',gvalue)){ return yield* exodusnote('New Database code must be lowercase alphanumeric code')}'
 
-    </script>
-    <title>Create Database</title>
+	</script>
+
+	<title>Create Database</title>
+
 </head>
+
 <body>
-    <div align="center">
-        <h1 id="head1">
-            Create Database</h1>
-        <table class="exodusform" bordercolor="#d0d0d0">
-		            
-            <tr>
-                <tr>
-                    <td>
-                        Old Database Code
-                    </td>
-                    <td>
-                        <input id="OLD_DATABASE_CODE" />
-                    </td>
-                </tr>
-            <tr>
+	<div class="formpage" align="center">
+		<h1 id="head1">
+			Create Database</h1>
+		<table class="exodusform" bordercolor="#d0d0d0">
+			<tr>
+				<td>
+					Old Database Code
+				</td>
+				<td>
+					<input id="OLD_DATABASE_CODE" />
+				</td>
+			</tr>
 
+			<tr>
+				<td>
+					New Database Code
+				</td>
+				<td>
+					<input id="NEW_DATABASE_CODE" />
+				</td>
+			</tr>
 
-		    <tr>
-                <tr>
-                    <td>
-                        New Database Code
-                    </td>
-                    <td>
-                        <input id="NEW_DATABASE_CODE" />
-                    </td>
-                </tr>
-            <tr>
-
-            <tr>
-                <tr>
-                    <td>
-                        New Database Name
-                    </td>
-                    <td>
-                        <input id="NEW_DATABASE_NAME" />
-                    </td>
-                </tr>
-            <tr>
-        
-        </table>
-    </div>
+			<tr>
+				<td>
+					New Database Name
+				</td>
+				<td>
+					<input id="NEW_DATABASE_NAME" />
+				</td>
+			</tr>
+		</table>
+	</div>
 </body>
 </html>
