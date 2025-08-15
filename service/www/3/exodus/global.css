@@ -13,6 +13,11 @@ TABLE.exodusform
     text-align: left;
 }
 
+DIV.card
+{
+    background-color: #fdf5e6;
+}
+
 .exodusform > tbody > tr > td,.exodusform > tbody > tr > thead, .exodusform > thead > tr > th, .exodusform > thead > tr > td
 {
     border: 1px lightgrey solid;
@@ -58,27 +63,35 @@ BODY
 
 .exodusbutton
 {
-    
-    background-color: #F0F0F0;
-    padding: 2px 3px;
-    /*font-size: 90%;*/
-    border-color: #cccccc;
-    border-width: 2px;
-    border-style: outset;
-    border-radius: 0.3rem;
+	/*background-color: #F0F0F0;*/
+	/*padding: 2px 3px;*/
+	/*font-size: 90%;*/
+	/*border-color: #cccccc;*/
+	/*border-width: 2px;*/
+	/*border-style: outset;*/
+	/*border-radius: 0.3rem;*/
+	/*float: left;*/
+	/*font-size: inherit;*/
+	/*margin: 2px;*/
+	/*cursor: pointer;*/
+	/*background-color: #f0f0f0;*/
+	/*padding: 4px 2px 5px 2px;*/
 
-    /*float: left;*/
-/*    font-size: inherit;
-    margin: 2px;
-    cursor: pointer;
-    background-color: #f0f0f0;
-    padding: 4px 2px 5px 2px;
+	/*New style exodus button*/
+	background-color: #f9f9f9;
+	color: #333;
+	padding: 3px 6px;
+	border: 1px solid #ccc;
+	border-radius: 0.375rem;
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+	font-size: 10px;
+	cursor: pointer;
+	transition: all 0.2s ease-in-out;
+}
 
-    border-color: #cccccc;
-    border-width: 2px;
-    border-style: outset;
-    border-radius: 0.3rem;
-*/
+.exodusbutton:hover {
+	background-color: #f0f0f0;
+	border-color: #999;
 }
 
 BUTTON
@@ -320,6 +333,9 @@ span.clsReadOnly:empty
     background-color: lightgrey;
 }
 
+/*START FORMPAGE SECTION*/
+/*Need to figure out a way to de-duplicate this formpage section entirely, switch to new cards style*/
+/*Mainly padding and img and section title are whats important*/
 .formpage td {
     padding: 5px;
 }
@@ -337,19 +353,120 @@ span.clsReadOnly:empty
     text-align: center;
     vertical-align: middle;
     font-weight: bold;
-    padding: 25px;
+/*    padding: 25px;*/
 }
 
-.formpage tbody.section {
-	box-shadow:
-		0 -1px 2px #e3e3e3,
-		0 1px 2px #e3e3e3;
+.formpage .section-title2 {	
+	vertical-align: middle;
+	font-weight: bold;
+	padding: 10px;
+	border: 1px solid #ccc;
+	box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+	/*background-color: #f0f0f0;*/
+}
+.formpage .section-title2 h3 {
+	margin: 0;
 }
 
 .formpage .section-title img {
-	height: 40px;
-	width: 40px;
+	height: 50px;
+	width: 50px;
 }
+/*END FORMPAGE SECTION*/
+
+
+
+/*CARDS SECTION START*/
+
+/* layout (narrow, centered) */
+.form-container--small {
+    width: 100%;
+    box-sizing: border-box;
+    max-width: 25%;
+    margin: 0 auto;
+    padding-inline: 10px;
+}
+
+.form-container--medium {
+    width: 100%;
+    box-sizing: border-box;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding-inline: 10px;
+}
+
+/* layout (full width with padding) */
+.form-container--large {
+    width: 100%;
+    box-sizing: border-box;
+    padding-inline: 30px;
+}
+
+/*controls how and where cards appear in row + wrap*/
+.card-row {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px;
+	align-items: stretch;
+	width: 100%;
+/*	padding-inline: 30px;*/
+	box-sizing: border-box;
+}
+
+/*Spacing and internal layout of card containers*/
+.card-cell {
+	flex: 1 1 auto;
+	display: flex;
+	gap: 10px;
+	align-items: stretch;
+}
+
+/*Individual cards visual appearance*/
+.card {
+	background-color: inherit;
+	border: 1px solid lightgrey;
+	border-radius: 5px;
+	padding: 5px;
+	overflow: auto;
+	box-sizing: border-box;
+	/* make the visual card fill the cell vertically */
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+}
+
+/*Vertical spacing between card rows*/
+.card-row + .card-row {
+	margin-top: 10px;
+}
+
+/*Ensures card fills its cell if not using 70-30 or 50-50*/
+.card-cell > .card {
+	flex: 1 1 auto;
+}
+
+/* 70-30 layout */
+/*.card-row--70-30 .card-cell:first-child {*/
+/*	flex: 0 0 calc((100% - 10px) * 0.7);*/
+/*}*/
+/*.card-row--70-30 .card-cell:last-child {*/
+/*	flex: 0 0 calc((100% - 10px) * 0.3);*/
+/*}*/
+
+/* 20-80 layout */
+/*.card-row--20-80 .card-cell:first-child {*/
+/*	flex: 0 0 calc((100% - 10px) * 0.2);*/
+/*}*/
+/*3.card-row--10-80 .card-cell:last-child {*/
+/*	flex: 0 0 calc((100% - 10px) * 0.8);*/
+/*}*/
+/* 50-50 layout */
+/*.card-row--equal .card-cell {*/
+/*	flex: 1 1 0;*/
+/*}*/
+
+/*CARDS SECTION END*/
+
 
 :root {
     --bg-color: #fff;

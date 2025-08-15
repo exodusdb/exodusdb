@@ -649,9 +649,15 @@ function showhide(element, show) {
 
     if (typeof element == 'string') {
         element = $$(element)
-        if (!element)
+        if (!element) {
+			// Try to get elements by class name
+			var elements = document.querySelectorAll('.' + elementid)
+			if (elements.length == 0)
+				systemerror('showhide("' + elementid + '")', ' window element does not exist')
+			element = elements
             //return yield* exodusinvalid('element ' + elementid + ' does not exist in showhide()')
-            systemerror('showhide("' + elementid + '")', ' window element does not exist')
+            //systemerror('showhide("' + elementid + '")', ' window element does not exist')
+		}
     }
 
     //recursive
@@ -1339,6 +1345,17 @@ function exodus_set_style(mode, value, value2) {
         oldvalue = style.backgroundColor
         try {
             style.backgroundColor = value
+
+			// Apply background to main DIV rows - NEW UI CARDS
+			const cardDivs = document.querySelectorAll('div.card');
+			cardDivs.forEach(div => {
+				try {
+					div.style.backgroundColor = value;
+				} catch (e) {
+					// Silently ignore invalid color errors
+				}
+				});
+
         }
         catch (e) {
             if (e.number == -2146827908) return yield * exodusinvalid(value + ' is not a recognised color')
@@ -1438,16 +1455,17 @@ function add_exodus_menubar() {
         // menubar design
         //span.style.backgroundColor = '#f4f4f4';
         span.style.backgroundColor = '#f0f0f0';
-        span.style.color = 'black';           // Text color
+        span.style.color = 'black';				// Text color
         span.style.display = 'block';
-        span.style.width = '100%';            // Span full width
+        span.style.width = '100%';				// Span full width
         span.style.position = 'fixed';
-        span.style.top = '0';                 // Align to the top
-        span.style.left = '0';                // Align to the left
+        span.style.top = '0';					// Align to the top
+        span.style.left = '0';					// Align to the left
         //span.style.zIndex = '100';            // Cannot be overlapped
+		span.style.zIndex = '999';				// Must be higher than sticky titles
         span.style.padding = '5px 0';
         span.style.margin = '0';
-        span.style.boxSizing = 'border-box';  // Ensure padding doesn't affect width
+        span.style.boxSizing = 'border-box';	// Ensure padding doesn't affect width
         span.style.outline = '1px solid lightgrey'
 
         var navbar1 = document.getElementsByClassName('navbar')[0];
@@ -4862,6 +4880,14 @@ function exodusremoveelementsbyid(id) {
             break
         tt.parentNode.removeChild(tt)
     }
+}
+
+// Copy of exodusremoveelementsbyid, for class
+function exodusremoveelementsbyclass(classname) {
+	var elements = document.getElementsByClassName(classname);
+	while (elements.length > 0) {
+		elements[0].parentNode.removeChild(elements[0]);
+	}
 }
 
 function exodusremovenode(element) {

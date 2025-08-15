@@ -70,7 +70,9 @@ function exodus_dict_emailaddress(di,sepchar) {
  if (!sepchar)
   sepchar=''
  if (sepchar&&!di.groupno)
-  length=60
+  //length=60
+  //reduced length for email fields in new UI
+  length=30
  if (!sepchar.slice(0,1).match(/[\'\"]/))
   sepchar='"'+sepchar+'"'
  exodus_dict_text(di,length)
