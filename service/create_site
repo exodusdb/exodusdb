@@ -59,13 +59,17 @@ set -euxo pipefail
 #	sudo ls -l /etc/apache2/mods-available/
 	sudo ls -l /etc/apache2/mods-enabled/
 :
-: Ensure that  required mods are actually enabled
+: Ensure that required mods are actually enabled
 :
-	sudo a2enmod rewrite ssl php*
-:
-: Restart apache
-:
-	sudo systemctl restart apache2
+	#sudo a2enmod rewrite ssl php*
+	#Skip restart if all mods already enabled
+	#apache2 status 'start-limit-hit' - when create_site called for many sites in parallel
+	if sudo a2enmod rewrite ssl php* | egrep "^Module" | grep -v "already enabled"; then
+		:
+		: Restart apache
+		:
+		sudo systemctl restart apache2
+	fi
 
 :
 : Configure php.ini - increase limits
@@ -260,18 +264,23 @@ set -euxo pipefail
 : Disable exodus sites
 : ====================
 :
-	sudo a2dissite exodus exodus-ssl || true
-	sudo apache2ctl configtest
-	sudo apache2ctl restart
+	#sudo a2dissite exodus exodus-ssl || true
+	if sudo a2dissite exodus exodus-ssl; then
+		#sudo apache2ctl configtest
+		#restart does a configtest
+		sudo apache2ctl restart
+	fi
 
 :
 : Enable the site and restart apache - $HOST_NAME
 : ==================================
 :
 	sudo a2ensite $HOST_NAME
-	sudo apache2ctl configtest
-	sudo apache2ctl restart
+	#sudo apache2ctl configtest
+	#sudo apache2ctl restart
+	sudo apache2ctl graceful
 
 :
 : CREATED https://$SUFFIXED_FQDN
 : ===============================
+
