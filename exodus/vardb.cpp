@@ -176,6 +176,7 @@ Within transactions, lock requests for locks that have already been obtained alw
 //static std::mutex conn_mutex;
 
 #ifdef EXO_PREPARED
+// EXO_PREPARED = 1
 #else
 #define EXO_PREPARED false
 #endif
@@ -452,7 +453,7 @@ static int get_dbconn_no_or_default(in dbhandle) {
 		TRACE(dbhandle)
 
 	// dbhandle MUST always arrive in lower case to detect if "dict."
-	bool isdict = dbhandle.unassigned() ? false : dbhandle.starts("dict.");
+	bool isdict = dbhandle.unassigned() ? false : dbhandle.starts("dict.", "DICT.");
 
 	if (isdict)
 		dbconn_no = thread_default_dict_dbconn_no;
@@ -962,7 +963,7 @@ bool var_db::attach(in filenames) const {
 		filenames2 = "";
 		let allfilenames = this->listfiles();
 		for (var filename : allfilenames) {
-			if (filename.starts("dict.")) {
+			if (filename.starts("dict.", "DICT.")) {
 				filenames2 ^= filename ^ FM;
 			}
 		}
@@ -2642,7 +2643,7 @@ bool var_db::createfile(in filename) const {
 
 	// sql
 	var sql = "CREATE";
-	if (filename.ends("_temp") and not filename.starts("dict."))
+	if (filename.ends("_temp") and not filename.starts("dict.", "DICT."))
 		sql ^= " TEMPORARY ";
 	sql ^= " TABLE " ^ get_normalized_filename(filename);
 	sql ^= " (key text primary key, data text)";
@@ -2769,7 +2770,7 @@ static var get_dictexpression(in cursor, in mainfilename, in filename, in dictfi
 
 		// The dictionary of all dict. files is dict.voc. Used when selecting any dict. file.
 		var dictfilename;
-		if (mainfilename.lcase().starts("dict."))
+		if (mainfilename.lcase().starts("dict.", "DICT."))
 			dictfilename = "dict.voc";
 		else
 			dictfilename = "dict." ^ mainfilename;
@@ -3541,8 +3542,11 @@ bool var_db::selectx(in fieldnames, in sortselectclause) {
 			this->createString();
 	}
 
-	if (DBTRACE>1)
+	if (DBTRACE>1) {
+		TRACE("SELECTX")
+		TRACE(*this)
 		TRACE(sortselectclause.toString())
+	}
 
 	var actualfilename = get_normalized_filename(*this);
 	var dictfilename = actualfilename;
@@ -4968,7 +4972,7 @@ bool var_db::deletelist(SV listname) const {
 
 	// Open the lists file on the same connection
 	var lists;
-	if (not lists.open("LISTS", *this)) UNLIKELY
+	if (not lists.open("LISTS", var(*this))) UNLIKELY
 		// Skip this error for now because maybe no LISTS on some databases
 		return false;
 		//throw VarDBException("deletelist() LISTS file cannot be opened");
@@ -4998,7 +5002,7 @@ bool var_db::savelist(SV listname) {
 
 	// Open the lists file on the same connection
 	var lists;
-	if (not lists.open("LISTS", *this)) UNLIKELY {
+	if (not lists.open("LISTS", var(*this))) UNLIKELY {
 		let errmsg = "savelist() LISTS file cannot be opened";
 		var::setlasterror(errmsg);
 		throw VarDBException(errmsg);
@@ -5091,7 +5095,7 @@ bool var_db::getlist(SV listname) {
 
 	// Open the lists file on the same connection
 	var lists;
-	if (not lists.open("LISTS", *this)) UNLIKELY {
+	if (not lists.open("LISTS", var(*this))) UNLIKELY {
 		let errmsg = "getlist() LISTS file cannot be opened";
 		var::setlasterror(errmsg);
 		throw VarDBException(errmsg);
@@ -5185,7 +5189,7 @@ bool var_db::hasnext() {
 
 		// Otherwise try and get another block
 		var lists;
-		if (not lists.open("LISTS", *this)) UNLIKELY {
+		if (not lists.open("LISTS", var(*this))) UNLIKELY {
 			let errmsg = "var::hasnext(): LISTS file cannot be opened";
 			var::setlasterror(errmsg);
 			throw VarDBException(errmsg);
@@ -5297,7 +5301,7 @@ bool var_db::readnext(io record, io key, io valueno) {
 				}
 
 				var lists;
-				if (not lists.open("LISTS", *this)) UNLIKELY {
+				if (not lists.open("LISTS", var(*this))) UNLIKELY {
 					let errmsg = "readnext() LISTS file cannot be opened";
 			        var::setlasterror(errmsg);
 					throw VarDBException(errmsg);
