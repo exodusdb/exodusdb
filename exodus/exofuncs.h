@@ -601,6 +601,10 @@ ND var  lasterror(void);
 
 ND var version();
 
+////////////////////////////////
+/// print/output/errput/logput :
+////////////////////////////////
+
 ////////////////////////////////////////////
 //output(args), outputl(args), outputt(args)
 ////////////////////////////////////////////
@@ -611,24 +615,19 @@ ND var version();
 // Multi-argument
 // Only outputl(args) flushes output
 // Calls .output member function instead of direct cout/cerr/clog <<
-
-// output(args...)
-
 template <typename... Printable>
 void output(const Printable&... value) {
 	(var(value).output(), ...);
 }
 
-// outputl(args) appends \n and flushes output
-
+// Append \n and flushes output
 template <typename... Printable>
 void outputl(const Printable&... value) {
 	(var(value).output(), ...);
 	var("").outputl();
 }
 
-// outputt(args)  \t separator appends nothing
-
+// \t separator Appends nothing
 template <typename... Printable>
 void outputt(const Printable&... value) {
 	(var(value).outputt(), ...);
@@ -643,7 +642,7 @@ void outputt(const Printable&... value) {
 // Default sep is " " for printl
 // Always appends \n
 // Flushes output
-
+//
 //Use like this:
 //
 // 1. printx("hi","ho");                 // "hi ho"
@@ -652,9 +651,6 @@ void outputt(const Printable&... value) {
 //
 // 3. static char const sep[] = ", ";
 //    printx<sep>("hi","ho");            // "hi, ho"
-
-// printl(args) to cout
-
 template <auto sep = ' ', typename Printable, typename... Additional>
 void printl(const Printable& value, const Additional&... values) {
 	std::cout << value;
