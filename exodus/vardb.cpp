@@ -4599,9 +4599,10 @@ bool var_db::selectx(in fieldnames, in sortselectclause) {
 	// selecting dict files would trigger this
 	//TRACE(*this)
 	//TRACE(actualfilename)
-	if (not this->f(2) or actualfilename.lcase().starts("dict.")) {
+	if (not this->f(2) or actualfilename.starts("dict.", "DICT.")) {
 		var actualfile;
-		if (actualfile.open(actualfilename, *this))
+//		if (actualfile.open(actualfilename, *this))
+		if (actualfile.open(actualfilename))
 			this->updater(2, actualfile.f(2));
 		//TRACE(actualfile)
 	}
