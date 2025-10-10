@@ -1568,6 +1568,9 @@ adddatasetcodename:
 		}
 	}
 
+	// Testing that requires service environment
+	gosub dosystests();
+
 	call log2("*emailing any notifications, warnings or errors", logtime);
 	if (msg_) {
 		call sysmsg(msg_, "Messages from INIT.GENERAL");
@@ -1664,5 +1667,53 @@ subr failsys() {
 
 	return;
 }
+
+subr dosystests() {
+	// Service environment tests
+	// Determines whether tests should be done to avoid unnecessary test repeats
+	// and runs the test case in generalproxy
+	let lasttestkey = "LAST_SYS_TEST_DATE";
+
+	// Get last test date/time
+	var lasttestdate = "";
+	if (not lasttestdate.read(DEFINITIONS, lasttestkey)) {
+		lasttestdate = "";
+	}
+
+	// Get exoduslib last build date/time
+
+	let exolibfilename = "/usr/local/lib/libexodus.so";
+	var exobuilddate;
+	if (not osfile(exolibfilename)) {
+		sysmsg(lasterror(), " from INIT.GENERAL");
+		return;
+	}
+	if (not exobuilddate.osshellread("date -r " ^ exolibfilename ^ " +%DT%T")) {
+		sysmsg(lasterror(), " from INIT.GENERAL");
+		return;
+	}
+	// 10/01/25T06:09:44
+	var tt = exobuilddate;
+	exobuilddate  = iconv(tt.field("T", 1), "D/E") ^ ".";
+	exobuilddate ^= iconv(tt.field("T", 2), "MTS");
+
+
+	// Main logic
+	// starting service in gdb has threadno = 0
+	if (THREADNO == 1 or (TERMINAL and THREADNO == 0)) {
+		if (not lasttestdate or (lasttestdate lt exobuilddate)) {
+
+			call log2("*service environment unit tests*");
+			request_ = "SYSTEST"; // generalproxy's MODE
+			execute("GENERALPROXY");
+
+			//Update on successful testing
+			exobuilddate.write(DEFINITIONS, lasttestkey);
+		}
+	}
+
+	return;
+}
+
 
 }; // libraryexit()

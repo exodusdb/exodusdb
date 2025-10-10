@@ -712,7 +712,9 @@ void ExoProgram::note(in msg, in options, io response) const {
 	}
 }
 
-var exoprog_callsmf(const Callable& callable) {
+//var exoprog_callsmf(const Callable& callable) {
+// Requires ExoProgram::note() to update ev.USER4 used as response to frontend
+var exoprog_callsmf(const Callable& callable, const ExoProgram& exoprog) {
 
 	var nrvo;
 
@@ -766,6 +768,7 @@ var exoprog_callsmf(const Callable& callable) {
 	// Abort
 	catch (const ExoAbort& e) {
 		var::setlasterror("ExoAbort:" ^ e.message);
+		exoprog.note(e.message);
 		nrvo = "";
 	}
 
@@ -783,7 +786,6 @@ var exoprog_callsmf(const Callable& callable) {
 		//restore environment in case VarError is caught
 		//in caller and the program resumes processing
 //				restore_environment();
-
 		var::setlasterror(e.message);
 
 		// Use gdb command "catch throw" to break at error line to get back traces there
@@ -966,7 +968,8 @@ var ExoProgram::perform(in command_line) {
 
 		// Returns a var or throws VarError (catches stop/abort)
 		try {
-			nrvo = exoprog_callsmf(perform_callable);
+			//nrvo = exoprog_callsmf(perform_callable);
+			nrvo = exoprog_callsmf(perform_callable, *this);
 		}
 		catch (...) {
 			restore_environment();
@@ -1241,8 +1244,10 @@ baddict:
 
 		try {
 			// Handles stop and abort but throws VarError
-			ANS = exoprog_callsmf(*dict_callable_);
+			//ANS = exoprog_callsmf(*dict_callable_);
+			ANS = exoprog_callsmf(*dict_callable_, *this);
 		}
+
 		catch (...) {
 			restore_environment();
 			throw;

@@ -116,6 +116,49 @@ func main() {
 		// printl("TRANTEST 2.", THREADNO);
 		response_ = "OK Thread No. " ^ THREADNO ^ ", Total: " ^ (RECORD + 1);
 
+	} else if (mode == "SYSTEST") {
+
+		// Called by initgeneral()
+		// Place to test things that ideally require a service environment
+		// or cannot be done easily in exodus test_xxx programs
+
+		var errmsg;
+		// Ensure abort(errmsg) is assigned to USER4 (response_) when lib
+		// is perform() or calculate() so errmsg is handed to frtend by listen
+		// calculate() is skipped for now bc its not worth make a dic file just for this test..?
+
+		// save current related err msgs variables
+		var savedlasterror = lasterror();
+		var saveduser4 = move(USER4);
+
+
+		// TEST ABORT()
+		let abortmsg = "*testing-abort(msg)*";
+		perform("systestabort " ^ abortmsg);
+		let lasterr = lasterror();
+
+		errmsg = "";
+		if (not USER4.contains(abortmsg)) {
+			errmsg ^= "USER4 not assigned with abort()ed message!";
+		}
+		// using contains bc lasterror is prefix with ExoAbort:
+		if (not lasterr.contains(abortmsg)) {
+			errmsg ^= "|lasterror() not assigned with abort()ed message!";
+		}
+
+
+		// restore orig err msgs
+		USER4 = saveduser4;
+		var::setlasterror(savedlasterror);
+
+		if (errmsg) {
+			errmsg.prefixer("SYSTEM FAILURE in GENEALPROXY/SYSTEST: ");
+			sysmsg(errmsg);
+			call note(errmsg);
+			stop();
+		}
+
+
 	} else if (mode.f(1) == "PREVIEWLETTERHEAD") {
 
 		// comma sep

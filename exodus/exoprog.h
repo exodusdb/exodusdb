@@ -519,9 +519,10 @@ ND	var  elapsedtimetext(in timestamp1, in timestamp2) const;
 	///// Terminal i/o utilities:
 	/////////////////////////////
 
-	// Output a message to stdout and optionally request input.
+	// Output a message to stdout if called in a cli program or append message to USER4
+	// (a standard output environment variable) in libraries and optionally request input.
 	// If input is requested but stdin is not a terminal then set the response to "" and continue.
-	// options: R = Response requested. C upper case response.
+	// options: R = Response requested. C = upper case response. U = Dont update USER4
 	//
 	// `var response;
 	//  // call note("Enter something", "RC", response);`
