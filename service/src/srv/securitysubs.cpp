@@ -749,20 +749,13 @@ func main(in mode) {
 						ccaddress ^= "accounts@neosys.com";
 					}
 
-					let subject = "EXODUS New User " ^ newusers.f(ii, 2) ^ " (" ^ newusers.f(ii, 1) ^ ")";
+					let subject = "NEOSYS New User " ^ newusers.f(ii, 2) ^ " (" ^ newusers.f(ii, 1) ^ ")";
 
 					var body	= "";
-					body(1, -1) = "A new EXODUS user account has been created for you.";
+					body(1, -1) = "A new NEOSYS user account has been created for you.";
 
 					body ^= VM;
-					body(1, -1) = "User Code: %USERCODE%";
-					body(1, -1) = "User Name: %USERNAME%";
-					body(1, -1) = "Email:     %EMAIL%";
-					body(1, -1) = "Group:     %GROUP%";
-					body(1, -1) = "Database:  %DATABASE%";
-
-					body ^= VM;
-					body(1, -1)		  = "Login:";
+					body(1, -1)		  = "Login link(s):";
 					let baselinks	  = SYSTEM.f(114);
 					let baselinkdescs = SYSTEM.f(115);
 					let nlinks		  = baselinks.fcount(VM);
@@ -777,19 +770,29 @@ func main(in mode) {
 					}
 
 					body ^= VM;
-					body(1, -1) = "Password:";
-					body(1, -1) = "You must use \"Password Reset\" on the Login Screen";
-					body(1, -1) = "http://userwiki.neosys.com/index.php/resettingpassword";
+					//body(1, -1) = "User Code: %USERCODE%";
+					//body(1, -1) = "User Name: %USERNAME%";
+					body(1, -1) = "Username: %USERCODE%";
+					body(1, -1) = "Password: You must use \"Reset Password\" on the Login Screen";
+					body(1, -1) = "   http://userwiki.neosys.com/index.php/resettingpassword";
 
+					body ^= VM;
 					// in security.subs and listen2
 					// body:=vm
-					body(1, -1) = "Browser Configuration *REQUIRED*";
-					body(1, -1) = "http://userwiki.neosys.com/index.php/gettingstarted";
+					body(1, -1) = "Browser Configuration: (REQUIRED)";
+					body(1, -1) = "   http://userwiki.neosys.com/index.php/gettingstarted";
+
+					body ^= VM;
+					body ^= VM;
+					body(1, -1) = "Full Name:  %USERNAME%";
+					body(1, -1) = "Email:      %EMAIL%";
+					body(1, -1) = "Department: %GROUP%";
+					body(1, -1) = "Database:   %DATABASE%";
+
 
 					if (replyto) {
 						body ^= VM;
-						body(1, -1) = "Support:";
-						body(1, -1) = replyto;
+						body(1, -1) = "Contact NEOSYS Support: " ^ replyto;
 					}
 
 					body.replacer("%USERCODE%", newusers.f(ii, 1));
@@ -1148,7 +1151,7 @@ subr getemailtx(io emailtx, io newusers, in isnew, in userx, in userrec, in orig
 	}  // fieldn;
 
 	if (tx) {
-		emailtx(-1) = FM ^ var("User Code:").oconv("L#10") ^ userx;
+		emailtx(-1) = FM ^ var("User Code: ").oconv("L#10") ^ userx;
 		if (isnew > 0) {
 			emailtx ^= " *CREATED*";
 		} else if (isnew < 0) {
@@ -1159,11 +1162,11 @@ subr getemailtx(io emailtx, io newusers, in isnew, in userx, in userrec, in orig
 
 		// always show user name, if different from user code
 		if (origuserrec.f(1) == userrec.f(1) and userrec.f(1) != userx) {
-			emailtx(-1) = var("User Name:").oconv("L#10") ^ userrec.f(1);
+			emailtx(-1) = var("User Name: ").oconv("L#10") ^ userrec.f(1);
 		}
 		// always show user group
 		if (origuserrec.f(21) == userrec.f(21)) {
-			emailtx(-1) = var("Group:").oconv("L#10") ^ userrec.f(21);
+			emailtx(-1) = var("Group: ").oconv("L#10") ^ userrec.f(21);
 		}
 		emailtx(-1) = tx;
 	}
