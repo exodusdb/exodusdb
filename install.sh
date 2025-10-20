@@ -11,7 +11,7 @@ set -euxo pipefail
 : '"c++ 21" indicates c++20 plus informal support for c++23'
 : '"c++ 24" indicates c++23 plus informal support for c++26'
 :
-: 'Build: Ubuntu 24.04 x64 g++   13 c++ 21'
+: 'Build: Ubuntu 24.04 x64 g++   14 c++ 23'
 : 'Build: Ubuntu 22.04 x64 g++   11 c++ 21'
 : 'Build: Ubuntu 20.04 x64 g++    9 c++ 17'
 :
@@ -22,7 +22,8 @@ set -euxo pipefail
 : '------ ------------ ----- --------  ----  -----   -----'
 : 'Status Ubuntu  LTS  Name  Postgres  g++   clang   boost'
 : '------ ------------ ----- --------  ----  -----   -----'
-: 'OK     24.04   Yes  noble 16.3      13.2  18.1    83   '
+: 'OK     25.10        quest 17.6      15.   21.1    88   '
+: 'OK     24.04   Yes  noble 16.3      14.2  18.1    83   '
 : 'OK     23.10              15.4      13.2  16           '
 : 'OK     23.04              15.4      12.3               '
 : 'OK     22.04.3 Yes  jammy 14.9      11.4  14.0    74   '
