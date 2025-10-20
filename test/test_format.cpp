@@ -2,7 +2,7 @@
 #include <cassert>
 
 // Ignore a warning from gcc. TODO proper solution?
-#if __GNUC__ == 14
+#if __GNUG__ == 14
 ///usr/include/c++/14/bits/stl_algobase.h:452:30: warning:
 // ‘void* __builtin_memmove(void*, const void*, long unsigned int)’ writing between 5 and 922
 //3372036854775807 bytes into a region of size 4 overflows the destination [-Wstringop-overflow=]
@@ -223,10 +223,16 @@ func main() {
 	assert(var("🐱") == "\xF0\x9F\x90\xB1");
 	assert(var("🐱") == "\U0001F431");
 
+#if EXO_FORMAT == 1 and ( __clang_major__ > 20 or __GNUG__ >= 15 )
+
+	// Cat = four bytes but takes up "2" positions in formatting
+	println("'{:.^5s}'", var("🐱"));
+	assert(format("{:.^5s}", var("🐱")) == ".🐱..");
+
 //g++ 11 in Ubuntu 22.04 has format but a bug in width of unicode characters
 //#if EXO_FORMAT == 1
-#if EXO_FORMAT == 1 and __GNUG__ < 13
-#warning EXO_FORMAT == 1 and _GNUG__ < 13 has error in formatting width of multibyte utf-8
+#elif EXO_FORMAT == 1 and __GNUG__ < 13
+#warning EXO_FORMAT == 1 and __GNUG__ < 13 has error in formatting width of multibyte utf-8
 
 	// Incorrect in g++13.2
 	// Width is calculated as bytes not utf-8 character widths
@@ -308,7 +314,14 @@ func main() {
 		// must convert to string - see next block
 
 		// https://en.cppreference.com/w/cpp/utility/format/spec
-#if EXO_FORMAT == 1 && __GNUG__ < 13
+#if EXO_FORMAT == 1 && ( __clang_major__ >= 20 or __GNUG__ >= 15 )
+
+		// cat face in utf8 = F0 9F 90 B1
+		assert(format("{:.^5s}",   "🐱").squote().outputl()         == "'.🐱..'");
+		assert(format("{:.^5s}",   var("🐱"), 5).squote().outputl() == "'.🐱..'");
+		assert(format("{:.5s}",    "🐱🐱🐱").squote().outputl()     == "'🐱🐱'");
+		assert(format("{:.<5.5s}", "🐱🐱🐱").squote().outputl()     == "'🐱🐱.'");
+#elif EXO_FORMAT == 1 && __GNUG__ < 13
 
 		// cat face in utf8 = F0 9F 90 B1
 		assert(format("{:.^5s}",   "🐱").squote().outputl()         == "'🐱.'");  // WRONG
