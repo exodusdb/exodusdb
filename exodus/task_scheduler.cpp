@@ -112,7 +112,10 @@ void task_scheduler::suspend_until(std::chrono::steady_clock::time_point const& 
 
 void task_scheduler::notify() noexcept {
 	LOG << "Notified, posting to io_context" << std::endl;
-	io_context_.post([this] {
+//	io_context_.post([this] {
+// Suggested by grok to cater for long deprecated .post function finally removed in Boost 1.87
+// https://x.com/i/grok/share/RYVdpebhVk1WkN2Ah22BQoMWx
+	boost::asio::post(io_context_.get_executor(), [this] {
 		std::unique_lock<std::mutex> lock(mutex_);
 		notified_ = true;
 		cond_.notify_all();
@@ -131,3 +134,4 @@ task_scheduler::~task_scheduler() {
 }
 
 } // namespace exo
+
