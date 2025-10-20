@@ -1213,8 +1213,8 @@ baddict:
 				)
 					UNLIKELY
 					throw VarError("ExoProgram::calculate() Cannot find Library " +
-								  libname + ", or function " +
-								  dictid.lcase() + " is not present");
+								  libname + ", or function " ^
+								  dictid.lcase() ^ " is not present");
 
 				// Cache it
 				cached_dict_functions[callable_cachekey] = dict_callable_;
