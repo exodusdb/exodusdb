@@ -468,7 +468,8 @@ function* sessionkeepalive() {
         tempdb.request = 'KEEPALIVE'
         yield* tempdb.send()
         //if (!(yield* db.send())) alert(db.response)
-        window.status = time + ' Keep Alive'
+        //window.status = time + ' Keep Alive' // deprecated
+        console.log(time + ' Keep Alive');
     }
 
 }
@@ -1212,7 +1213,8 @@ function* exodusbreak(cmd, funcname, position) {
 
     if (!gstepping) return
 
-    window.status = funcname + ' ' + position + ' ' + cmd
+    //window.status = funcname + ' ' + position + ' ' + cmd
+    console.log(funcname + ' ' + position + ' ' + cmd);
 
     if (!cmd) cmd = ' '
 
@@ -2460,12 +2462,12 @@ function* exodusdblink_send_byhttp_using_xmlhttp(data) {
         //send
 
         try {
-
             //needs Tools, Internet Options, Security, Trusted Sites, Sites, Add, Close, OK
             var action = 'Requested ' + new Date() + ' ' + thisrequest
             //dont show pass!
             if (!glogging && thisrequest.indexOf('LOGIN') < 0)
-                window.status = action
+                //window.status = action
+                console.log(action);
 
             var timesent = new Date
             //alert('DEBUG: pre:'+thisrequest)
@@ -2473,7 +2475,8 @@ function* exodusdblink_send_byhttp_using_xmlhttp(data) {
             //alert('DEBUG: post:'+thisrequest)
 
             //log(action + ' ' + (new Date() - timesent) + 'ms')
-            window.status = ''
+            //window.status = ''
+            console.log('');
 
             //force an error if ignoreresult since ignoreresult ignores all errors or success
             if (ignoreresult)
@@ -3455,7 +3458,8 @@ function getancestor(startelement, ancestorTag) {
 function wstatus(msg) {
     //needs Tools, Internet Options, Security, Trusted Sites, Sites, Add, Close, OK
     //or "Allow scripting to update status bar"
-    window.status = msg
+    //window.status = msg
+    console.log(msg);
 }
 
 function loadcache() {
@@ -3769,7 +3773,8 @@ function* sorttable(event, order) {
     if (!groupno)
         return yield* exodusinvalid(colid + ' is not multivalued for sorting')
 
-    window.status = 'Sorting, please wait ...'
+    //window.status = 'Sorting, please wait ...'
+    console.log('Sorting, please wait ...');
 
     //get the data rows
     if (!groupno) groupno = 1
@@ -3914,8 +3919,8 @@ function* sorttable(event, order) {
             return yield* exodusinvalid()
     }
 
-    window.status = ''
-
+    //window.status = ''
+    console.log('')
 }
 
 //******//

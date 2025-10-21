@@ -8368,7 +8368,8 @@ function* form_filter(mode, colidorgroupno, regexp, maxrecn, elem) {
         return true
     }
 
-    window.status = 'Filtering, please wait ...'
+    //window.status = 'Filtering, please wait ...'
+    console.log('Filtering, please wait ...');
 
     //get the value and values to be filtered
     var value
@@ -8482,7 +8483,8 @@ function* form_filter(mode, colidorgroupno, regexp, maxrecn, elem) {
         yield* calcfields()
     }
 
-    window.status = ''
+    //window.status = ''
+    console.log('');
 
     return true
 

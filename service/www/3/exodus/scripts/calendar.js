@@ -536,7 +536,7 @@ Calendar.prototype._update = function() {
 	}
         
     for (i = 1; i <= monthLength; i++, index++) {
-//window.status=new Date()+' '+today+' '+toISODate(d1)
+        //window.status=new Date()+' '+today+' '+toISODate(d1)
 
         var ptr=this._dateSlot[index];//exodus        
 		ptr.value = i;
