@@ -749,10 +749,10 @@ func main(in mode) {
 						ccaddress ^= "accounts@neosys.com";
 					}
 
-					let subject = "NEOSYS New User " ^ newusers.f(ii, 2) ^ " (" ^ newusers.f(ii, 1) ^ ")";
+					let subject = "New User " ^ newusers.f(ii, 2) ^ " (" ^ newusers.f(ii, 1) ^ ")";
 
 					var body	= "";
-					body(1, -1) = "A new NEOSYS user account has been created for you.";
+					body(1, -1) = "A new EXODUS user account has been created for you.";
 
 					body ^= VM;
 					body(1, -1)		  = "Login link(s):";
@@ -792,7 +792,7 @@ func main(in mode) {
 
 					if (replyto) {
 						body ^= VM;
-						body(1, -1) = "Contact NEOSYS Support: " ^ replyto;
+						body(1, -1) = "Contact Support: " ^ replyto;
 					}
 
 					body.replacer("%USERCODE%", newusers.f(ii, 1));
