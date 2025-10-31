@@ -599,7 +599,17 @@ function install_exodus {
 :
 : Note: Using 'echo sudo dd' trick because 'sudo echo xxx > yyy' doesnt sudo the '> yyy' bit.
 :
-	printf 'export PATH="${PATH}:~/bin"\nexport LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${HOME}/lib"\n' | sudo dd of=/etc/profile.d/exodus.sh status=none
+	#printf 'export PATH="${PATH}:~/bin"\nexport LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${HOME}/lib"\n' | sudo dd of=/etc/profile.d/exodus.sh status=none
+:
+: Update /etc/profile.d/exodus.sh
+:
+	cat > /etc/profile.d/exodus.sh << 'V0G0N'
+		#Created by exodus/install.sh
+	    #Only add if new path hasnt already been added
+	    #Only add colon when appending to an existing set of paths, avoids LD_PRELOAD vulnerability
+		[[ ! $PATH =~ \~/bin ]] && export PATH="${PATH:+$PATH:}~/bin"
+		[[ ! $LD_LIBRARY_PATH =~ ${HOME}/lib(:|$) ]] && export LD_LIBRARY_PATH=${LD_LIBRARY_PATH:+$LD_LIBRARY_PATH:}${HOME}/lib
+V0G0N
 :
 } # end of install_exodus
 
