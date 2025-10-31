@@ -607,7 +607,7 @@ function install_exodus {
 		#Created by exodus/install.sh
 	    #Only add if new path hasnt already been added
 	    #Only add colon when appending to an existing set of paths, avoids LD_PRELOAD vulnerability
-		[[ ! $PATH =~ \~/bin ]] && export PATH="${PATH:+$PATH:}~/bin"
+		[[ ! $PATH =~ \~/bin ]] && export PATH="${PATH:+$PATH:}${HOME}/bin"
 		[[ ! $LD_LIBRARY_PATH =~ ${HOME}/lib(:|$) ]] && export LD_LIBRARY_PATH=${LD_LIBRARY_PATH:+$LD_LIBRARY_PATH:}${HOME}/lib
 V0G0N
 :
