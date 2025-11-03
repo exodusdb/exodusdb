@@ -1084,8 +1084,14 @@ openlink1:
 		// cleanup the input file
 		// convert '&' to fm in request
 		request_.converter("\r\n", _FM);
-		request_.replacer("\\\\", "\\");
-		request_.replacer("\\r", _FM);
+		//request_.replacer("\\\\", "\\");
+		//request_.replacer("\\r", _FM);
+		// incorrectly replaces upload path parts starting with bug 'r'
+		// 1. GENERAL\rOPENUPLOAD\rpubliscreen_test\\upload\\vouchers\\rec-250080-1\\1\rNEW
+		// 2. GENERAL^OPENUPLOAD^publiscreen_test\upload\vouchers^ec-250080-1\1^NEW
+		//                                                        ^ wrong
+		request_.replacer(R"([^\\]\r)"_rex, _FM); // replace \r but not \\r
+		request_.replacer(R"(\\)", R"(\)");       // replace \\ -> \ in file path
 		request_.trimmerlast(_FM);
 
 		// eg /var/www/html/exodus2/EXODUS//data/BASIC/~9979714.1
