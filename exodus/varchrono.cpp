@@ -671,9 +671,13 @@ std::string var::oconv_D(const char* conversion) const {
 			ss << sepchar;
 	}
 
-	//determine if day first if not forced
+	// determine if day first if not forced
 	if (not day_first && alpha_month && not year_first)
 		day_first = true;
+
+	// ISO YYYY/MM/DD 'S' has no regional variation 'E'
+	if (day_first and year_first)
+		day_first = false;
 
 	// day first
 	if (day_first) {

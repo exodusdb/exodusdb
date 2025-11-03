@@ -345,6 +345,9 @@ func main() {
 		assert(test(v1, "[DATE,D!Z]" , " 9JAN2020"	, "No separators. Leading zeros become spaces."));
 		assert(test(v1, "[DATE,D!ZZ]" , "9JAN2020"	, "No separators. Leading zeros are removed."));
 
+		// E excluded from DATEFMT if conv contains S (ISO DATE not suject to regional variations)
+		assert(test(v1, "[DATE,DS-E]", "2020-01-09",     "ISO date with hyphen separator "));
+
 		// Check "[DATE" still picks up E flavour from DATEFMT
 		assert(iconv("9 1 2020", "[DATE]") == 19002);
 		assert(iconv("9 1 2020", "[DATE,D]") == 19002);

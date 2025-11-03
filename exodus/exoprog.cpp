@@ -2003,9 +2003,12 @@ var ExoProgram::exoprog_date(in type, in in0, in mode0, out outx) {
 			// Dont use DATEFMT except for its E if present
 			raw_D = true;
 
-			if (DATEFMT.contains("E"))
-				// Copy DATEFMT's E if present
-				mode ^= "E";
+			// ISO YYYY/MM/DD 'S' has no regional variation 'E'
+			if (not mode.contains("S")) {
+				if (DATEFMT.contains("E"))
+					// Copy DATEFMT's E if present
+					mode ^= "E";
+			}
 
 		} else {
 
