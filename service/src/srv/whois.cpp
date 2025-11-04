@@ -78,7 +78,8 @@ returnzero:
 		text =
 			"http:/"
 //			"/geoiplookup.net/ip/" ^
-			"/geoiplookup.io/geo/" ^
+//			"/geoiplookup.io/geo/" ^
+			"/geoiplookup.io/geoip/" ^
 			ipno;
 	} else {
 		cmd = SYSTEM.f(50);
