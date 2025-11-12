@@ -3,14 +3,14 @@ programinit()
 
 func main() {
 
-	let dbname2 = COMMAND.f(2);
+	let foreign_dbcode = COMMAND.f(2);
 	var filenames = COMMAND.field(FM, 3, 999999);
 
-	if (not dblist().contains(dbname2)) {
-		abort("Arg 2, " ^ dbname2.quote() ^ " is not a valid dbcode");
+	if (not dblist().contains(foreign_dbcode)) {
+		abort("Arg 2, " ^ foreign_dbcode.quote() ^ " is not a valid dbcode");
 	}
 
-	if (not dbname2 and not OPTIONS) {
+	if (not foreign_dbcode and not OPTIONS) {
 
 		let syntax =
 			"NAME\n"
@@ -122,36 +122,36 @@ func main() {
 		if (not conn1.sqlexec("CREATE EXTENSION IF NOT EXISTS postgres_fdw WITH SCHEMA public"))
 			abort(conn1.lasterror());
 
-		if (not dbname2)
+		if (not foreign_dbcode)
 			return 0;
 
 		// Reset the interdb connection to the target db. Remove all connected tables.
-		if (not conn1.sqlexec("DROP SERVER IF EXISTS " ^ dbname2 ^ " CASCADE"))
+		if (not conn1.sqlexec("DROP SERVER IF EXISTS " ^ foreign_dbcode ^ " CASCADE"))
 			abort(conn1.lasterror());
 
 		// Create an interdb connection to the target server
 		if (OPTIONS.contains("RR"))
 			return 0;
 
-		if (not conn1.sqlexec("CREATE SERVER IF NOT EXISTS " ^ dbname2 ^ " FOREIGN DATA WRAPPER postgres_fdw OPTIONS (host 'localhost', dbname '" ^ dbname2 ^ "', port '5432')"))
+		if (not conn1.sqlexec("CREATE SERVER IF NOT EXISTS " ^ foreign_dbcode ^ " FOREIGN DATA WRAPPER postgres_fdw OPTIONS (host 'localhost', dbname '" ^ foreign_dbcode ^ "', port '5432')"))
 			abort(conn1.lasterror());
 
 		// Allow current user to use the interdb connection
-		if (not conn1.sqlexec("GRANT USAGE ON FOREIGN SERVER " ^ dbname2 ^ " TO " ^ dbuser1))
+		if (not conn1.sqlexec("GRANT USAGE ON FOREIGN SERVER " ^ foreign_dbcode ^ " TO " ^ dbuser1))
 			abort(conn1.lasterror());
 
 		// Remove any existing user/connection configuration
-		if (not conn1.sqlexec("DROP USER MAPPING IF EXISTS FOR " ^ dbuser1 ^ " SERVER " ^ dbname2))
+		if (not conn1.sqlexec("DROP USER MAPPING IF EXISTS FOR " ^ dbuser1 ^ " SERVER " ^ foreign_dbcode))
 			abort(conn1.lasterror());
 
 		if (OPTIONS.contains("R"))
 			return 0;
 
 		// Configure user/connection parameters. Target dbuser and dbpass.
-		if (not conn1.sqlexec("CREATE USER MAPPING FOR " ^ dbuser1 ^ " SERVER " ^ dbname2 ^ " OPTIONS (user '" ^ dbuser2 ^ "', password '" ^dbpass2 ^ "')"))
+		if (not conn1.sqlexec("CREATE USER MAPPING FOR " ^ dbuser1 ^ " SERVER " ^ foreign_dbcode ^ " OPTIONS (user '" ^ dbuser2 ^ "', password '" ^dbpass2 ^ "')"))
 			abort(conn1.lasterror());
 
-		//printl("OK user " ^ dbuser1 ^ " in db " ^ dbname1 ^ " now has access to db " ^ dbname2);
+		//printl("OK user " ^ dbuser1 ^ " in db " ^ dbname1 ^ " now has access to db " ^ foreign_dbcode);
 
 		return 0;
 	}
@@ -189,7 +189,7 @@ func main() {
 
 		//logputl("Connect to the foreign table " ^ filename);
 		// creates the local foreign table
-		let sql = "IMPORT FOREIGN SCHEMA public LIMIT TO (" ^ filename ^ ") FROM SERVER " ^ dbname2 ^ " INTO public";
+		let sql = "IMPORT FOREIGN SCHEMA public LIMIT TO (" ^ filename ^ ") FROM SERVER " ^ foreign_dbcode ^ " INTO public";
 		if (not conn1.sqlexec(sql)) {
 			let lasterror = conn1.lasterror();
 
