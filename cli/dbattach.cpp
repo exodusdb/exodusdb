@@ -6,6 +6,10 @@ func main() {
 	let dbname2 = COMMAND.f(2);
 	var filenames = COMMAND.field(FM, 3, 999999);
 
+	if (not dblist().contains(dbname2)) {
+		abort("Arg 2, " ^ dbname2.quote() ^ " is not a valid dbcode");
+	}
+
 	if (not dbname2 and not OPTIONS) {
 
 		let syntax =
@@ -168,23 +172,23 @@ func main() {
 		if (not filename)
 			continue;
 
-		if (conn1.open(filename)) {
+		//logputl("Remove any existing connected foreign table " ^ filename);
+		if (conn1.open(filename) and not conn1.sqlexec("DROP FOREIGN TABLE IF EXISTS " ^ filename))
+			{}//abort(conn1.lasterror());
 
-			// Option to forcibly delete any existing files in the default database
-			if (OPTIONS.contains("F")) {
+		// Option to forcibly delete any existing files in the local/default database
+		if (OPTIONS.contains("F")) {
 
-				//logputl("Remove any existing table " ^ filename);
-				//if (not conn1.sqlexec("DROP TABLE IF EXISTS " ^ filenames.replace(","," ")))
-				//      abort(conn1.lasterror());
-				if (not conn1.deletefile(filename))
-					{}//logputl(conn1.lasterror());
-			}
-
-			//logputl("Remove any existing connected foreign table " ^ filename);
-			if (conn1.open(filename) and not conn1.sqlexec("DROP FOREIGN TABLE IF EXISTS " ^ filename))
-				{}//abort(conn1.lasterror());
+			//logputl("Remove any existing table " ^ filename);
+			//if (not conn1.sqlexec("DROP TABLE IF EXISTS " ^ filenames.replace(","," ")))
+			//      abort(conn1.lasterror());
+			// after dropping foreign table, this open will check for local table
+			if (conn1.open(filename) and not conn1.deletefile(filename))
+				{}//logputl(conn1.lasterror());
 		}
+
 		//logputl("Connect to the foreign table " ^ filename);
+		// creates the local foreign table
 		let sql = "IMPORT FOREIGN SCHEMA public LIMIT TO (" ^ filename ^ ") FROM SERVER " ^ dbname2 ^ " INTO public";
 		if (not conn1.sqlexec(sql)) {
 			let lasterror = conn1.lasterror();
