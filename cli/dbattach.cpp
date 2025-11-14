@@ -6,10 +6,6 @@ func main() {
 	let foreign_dbcode = COMMAND.f(2);
 	var filenames = COMMAND.field(FM, 3, 999999);
 
-	if (not dblist().contains(foreign_dbcode)) {
-		abort("Arg 2, " ^ foreign_dbcode.quote() ^ " is not a valid dbcode");
-	}
-
 	if (not foreign_dbcode and not OPTIONS) {
 
 		let syntax =
@@ -17,7 +13,7 @@ func main() {
 			"    dbattach - Attach foreign database files to the current default database\n"
 			"\n"
 			"SYNOPSIS\n"
-			"    dbattach TARGETDB [FILENAME,...] {OPTION...}\n"
+			"    dbattach [TARGETDB] [FILENAME,...] {OPTION...}\n"
 			"\n"
 			"EXAMPLE\n"
 			"    EXO_DATA=db1 dbattach db2 file1 filen2 {F}\n"
@@ -55,9 +51,9 @@ func main() {
 	}
 
 	// TODO Get user from .config/Allow control
-	var dbname1 = osgetenv("EXO_DATA");
-	if (not dbname1)
-		dbname1 = "exodus";
+	var dbcode = osgetenv("EXO_DATA");
+	if (not dbcode)
+		dbcode = "exodus";
 
 	// TODO Get user from .config/Allow control
 	var dbuser1 = osgetenv("EXO_USER");
@@ -151,7 +147,7 @@ func main() {
 		if (not conn1.sqlexec("CREATE USER MAPPING FOR " ^ dbuser1 ^ " SERVER " ^ foreign_dbcode ^ " OPTIONS (user '" ^ dbuser2 ^ "', password '" ^dbpass2 ^ "')"))
 			abort(conn1.lasterror());
 
-		//printl("OK user " ^ dbuser1 ^ " in db " ^ dbname1 ^ " now has access to db " ^ foreign_dbcode);
+		//printl("OK user " ^ dbuser1 ^ " in db " ^ dbcode ^ " now has access to db " ^ foreign_dbcode);
 
 		return 0;
 	}
