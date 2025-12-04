@@ -1529,7 +1529,11 @@ subr process() {
 			if (not begintrans())
 				abort(lasterror());
 			gosub process2();
-			if (not committrans())
+			//if (not committrans())
+			// Typically programs are written with checks that produce non-VarError errors e.g missing auth,
+			// to be complete before updates to db, however in some cases, this is not possible.
+			// Add ability for programs to do rollbacktrans on Non VarError errors after db updates
+			if (statustrans() and not committrans())
 				response_ = "Error: Cannot commit " ^ lasterror() ^ FM ^ response_;
 
 		} catch (VarError& e) {
