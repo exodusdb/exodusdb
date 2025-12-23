@@ -160,7 +160,9 @@ function exodus_dict_year(dicti,from,to,defaultyear) {
  if (!to) to=0
  exodusassertobject(dicti,'exodus_dict_year','dicti')
  dicti.conversion='[NUMBER,0]'
- dicti.align='R'
+ //dicti.align='R'
+ // see exodus_dict_date() why switch to L
+ dicti.align='L'
  dicti.length=4
  var curryear=exodusdate().exodusoconv('[DATE,YEAR]')
  var years=''
@@ -178,7 +180,9 @@ function exodus_dict_datetimeupdated(di) {
  exodus_dict_datetime(di)
  di.readonly=true
  di.copyable=false
- di.align='R'
+ //di.align='R'
+ // see exodus_dict_date() why switch to L
+ di.align='L'
  di.lowercase=true
 }
 
@@ -186,7 +190,9 @@ function exodus_dict_datetime(di,params) {
 
  if (!params) params=''
  di.conversion='[DATE_TIME,'+params+']'
- di.align='R'
+ //di.align='R'
+ // see exodus_dict_date() why switch to L
+ di.align='L'
  di.lowercase=true
 }
 
@@ -254,7 +260,9 @@ function exodus_dict_period(di,mode,otherperiodid,conversion) {
  if (!conversion) conversion=''
  exodusassertobject(di,'exodus_dict_period','di')
  di.conversion='[PERIOD_OF_YEAR]'
- di.align='R'
+ //di.align='R'
+ // see exodus_dict_date() why switch to L
+ di.align='L'
  di.length=5
  if (di.type=='F') di.validation='yield* exodus_val_period("'+mode+'","'+otherperiodid+'")'
 }
@@ -264,7 +272,9 @@ function exodus_dict_year_period(di,mode) {
  if (!mode) mode=''
  exodusassertobject(di,'exodus_dict_yearperiod','di')
  di.conversion='[YEAR_PERIOD,'+mode+']'
- di.align='R'
+ //di.align='R'
+ // see exodus_dict_date() why switch to L
+ di.align='L'
  di.length=5
 }
 
@@ -348,10 +358,17 @@ function exodus_dict_yesno(dicti,defaultvalue,type) {
 function exodus_dict_date(dicti,params) {
 
  if (typeof params=='undefined') params=''
+
  exodusassertobject(dicti,'exodus_dict_date','dicti')
  dicti.conversion='[DATE,'+params+']'
  //dicti.align='R' causes funny columns data entry (where?)
- dicti.align='R'//put back so reports.htm shows neatly
+ //dicti.align='R' //put back so reports.htm shows neatly
+ // dbform.js fixed to actaully do align = 'R', previously only did left
+ // decided best to preserve the current but technically wrong left alignment
+ // as to not disrupt users and in case aligning to right creates some bug
+ dicti.align = 'L'
+
+
  dicti.length=10
  dicti.popup='yield* form_pop_calendar()'
  if (!gcalendarscript) gcalendarscript=1
@@ -373,9 +390,11 @@ function exodus_dict_number(dicti,params,minimum,maximum) {
  if (typeof minimum=='undefined') minimum=''
  if (typeof maximum=='undefined') maximum=''
  params+=','+minimum+','+maximum
- 
  dicti.conversion='[NUMBER,'+params+']'
- dicti.align='R'
+ //dicti.align='R'
+ // see exodus_dict_date() why switch to L
+ dicti.align = 'L'
+
 }
 
 function exodus_dict_text(dicti,size,rows) {

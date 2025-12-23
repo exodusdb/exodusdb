@@ -787,6 +787,21 @@ function* formfunctions_onload() {
                 if (cellnode && !cellnode.parentNode.align && !cellnode.align) cellnode.align = 'right'
             }
 
+			// align
+			// Fix missing handing of right alignment for elements that no not
+			// meet previous right alignment conditions e.g type URl or conversion
+			// type is NUMBER. Done so that 'Other lang' Address fields can be right aligned
+			// for Arabic text in E-invoicing enabled databases
+			// Safety measure, dont interfere with existing assignments
+			if (element.style.textAlign == '') {
+				let tt = element.getAttribute('exodusalign')
+
+				if (tt.toUpperCase().startsWith('R'))
+					element.style.textAlign = 'right'
+				else if (tt.toUpperCase().startsWith('L') || tt.toUpperCase().startsWith('T'))
+					element.style.textAlign = 'left'
+			}
+
             //length and maxlength
             if (element.tagName.match(gtexttagnames)) {
                 if (element.size != 1 && element.getAttribute('exoduslength')) {
