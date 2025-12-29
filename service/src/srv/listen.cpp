@@ -1797,9 +1797,13 @@ noupdate:
 
 			// record doesnt exist
 		} else {
+
 			// if @file.error<1>='100' then
 			// NO FILE ERROR FOR JBASE
 			if (not(FILEERROR) or FILEERROR.f(1) == "100") {
+
+				// failed read() unassigns data_
+				data_ = "";
 
 				// no spaces in new keys
 				// allow in multipart keys on the assumption that they are old keys with spaces
@@ -1829,7 +1833,7 @@ noupdate:
 				}
 
 				// response='Error: ':quote(keyx):' does not exist in the ':quote(filetitle):' file'
-				data_ = "";
+				//data_ = ""; // moved up
 				// response='Error: NO RECORD'
 				call listen4(8, response_);
 				if (sessionid) {
