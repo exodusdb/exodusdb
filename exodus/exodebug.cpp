@@ -220,8 +220,10 @@ auto exo_savestack(void* stack_addresses[BACKTRACE_MAXADDRESSES], std::size_t* s
 
 //	std::string gdb_cmd = "gdb -batch -p " + pid + " -ex 'thread apply all bt full' -ex 'detach' -ex 'quit' > backtrace." + pid + ".log 2>/dev/null";
 
-	if (not "which gdb")
+	if (not "which gdb") {
+		std::cerr << "----- gdb not installed/available. -----" << std::endl;
 		return true;
+	}
 
 	let logfilename = "backtrace." ^ var::ospid() ^ ".log";
 	std::cerr << "----- gdb " << logfilename << " -----" << std::endl;

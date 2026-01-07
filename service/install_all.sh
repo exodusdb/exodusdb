@@ -222,7 +222,7 @@ function APT_GET {
 : Check chromium converts html to pdf
 : ===================================
 :
-: Wait 10 mins for installation to complete
+: Wait up to 10 mins for snap installation to complete.
 :
 	timeout 600 bash -c 'while snap changes | grep chromium | grep -q Doing; do sleep 5; done; snap changes | grep chromium | grep -q Done && echo "Chromium installation done" || echo "Chromium installation failed or not found"' || echo "Timed out."
 	which chromium
