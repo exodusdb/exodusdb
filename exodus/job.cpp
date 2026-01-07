@@ -4,7 +4,6 @@
 	import var;
 #else
 	#include <future>
-	#include <memory>
 	#include <chrono> // For std::chrono types
 #endif
 
@@ -120,7 +119,8 @@ Job::Job (
 	auto shared_env = std::make_shared<ExoEnv>(std::move(new_env));
 
 	// Create a lambda to be queued on the threadpool's task queue.
-	auto task = [promise, shared_env, command, cv = &cv, result_queuex]() mutable {
+//	auto task = [promise, shared_env, command, mutex = &mutex, cv = &cv, result_queuex]() mutable {
+	auto task = [promise, shared_env, command, result_queuex]() mutable {
 		try {
 
 			// Prepare to load and use a shared library
@@ -149,26 +149,30 @@ Job::Job (
 				// OR (Why not both since it is a shared_ptr)
 				promise->set_value(std::move(*shared_env));
 
-			// Notify Job
-			cv->notify_one();
-
 		} catch (VarError& e) {
-			std::cerr << command << std::endl;
+			std::cerr << "Job: " << command << std::endl;
 			std::cerr << e.stack() << std::endl;
 			// Push abnormal result
 			if (result_queuex) {
 				result_queuex->push(std::move(*shared_env));
 			}
 			promise->set_exception(std::current_exception());
-			cv->notify_one(); // Notify on exception
-		} catch (...) {
-			std::cerr << "Error: Job: Unknown error in " << command << std::endl;
+
+		} catch (std::exception& e) {
+			std::cerr << "Error: std::exception: " << e.what() << " Job: " << command << std::endl;
 			// Push abnormal result
 			if (result_queuex) {
 				result_queuex->push(std::move(*shared_env));
 			}
 			promise->set_exception(std::current_exception());
-			cv->notify_one(); // Notify on exception
+
+		} catch (...) {
+			std::cerr << "Error: Unknown error. Job: " << command << std::endl;
+			// Push abnormal result
+			if (result_queuex) {
+				result_queuex->push(std::move(*shared_env));
+			}
+			promise->set_exception(std::current_exception());
 		}
 //		std::clog << "Job:task lambda finished" << std::endl;
 
@@ -179,7 +183,6 @@ Job::Job (
 		threadpool1.enqueue(std::move(task));
 	} catch (const std::exception& e) {
 		promise->set_exception(std::current_exception());
-		cv.notify_one(); // Notify on enqueue failure
 	}
 }
 

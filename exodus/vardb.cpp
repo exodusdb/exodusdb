@@ -4972,7 +4972,7 @@ bool var_db::deletelist(SV listname) const {
 
 	// Open the lists file on the same connection
 	var lists;
-	if (not lists.open("LISTS", var(*this))) UNLIKELY
+	if (not lists.open("LISTS", var_db(*this))) UNLIKELY
 		// Skip this error for now because maybe no LISTS on some databases
 		return false;
 		//throw VarDBException("deletelist() LISTS file cannot be opened");
@@ -5002,7 +5002,7 @@ bool var_db::savelist(SV listname) {
 
 	// Open the lists file on the same connection
 	var lists;
-	if (not lists.open("LISTS", var(*this))) UNLIKELY {
+	if (not lists.open("LISTS", var_db(*this))) UNLIKELY {
 		let errmsg = "savelist() LISTS file cannot be opened";
 		var::setlasterror(errmsg);
 		throw VarDBException(errmsg);
@@ -5095,7 +5095,7 @@ bool var_db::getlist(SV listname) {
 
 	// Open the lists file on the same connection
 	var lists;
-	if (not lists.open("LISTS", var(*this))) UNLIKELY {
+	if (not lists.open("LISTS", var_db(*this))) UNLIKELY {
 		let errmsg = "getlist() LISTS file cannot be opened";
 		var::setlasterror(errmsg);
 		throw VarDBException(errmsg);
@@ -5189,7 +5189,7 @@ bool var_db::hasnext() {
 
 		// Otherwise try and get another block
 		var lists;
-		if (not lists.open("LISTS", var(*this))) UNLIKELY {
+		if (not lists.open("LISTS", var_db(*this))) UNLIKELY {
 			let errmsg = "var::hasnext(): LISTS file cannot be opened";
 			var::setlasterror(errmsg);
 			throw VarDBException(errmsg);
@@ -5301,7 +5301,7 @@ bool var_db::readnext(io record, io key, io valueno) {
 				}
 
 				var lists;
-				if (not lists.open("LISTS", var(*this))) UNLIKELY {
+				if (not lists.open("LISTS", var_db(*this))) UNLIKELY {
 					let errmsg = "readnext() LISTS file cannot be opened";
 			        var::setlasterror(errmsg);
 					throw VarDBException(errmsg);

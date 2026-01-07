@@ -206,7 +206,7 @@ public:
 
 		for (auto item : list) {
 			//(*this) ^= item;
-			var_str += std::string_view(var(item));
+			var_str += std::string_view(var_base(item));
 			var_str.push_back(FM_);
 		}
 		if (!var_str.empty())
