@@ -65,7 +65,11 @@ func main() {
 		}
 		d0.redim(2, 2);
 		d0 = "3";
+#ifdef __cpp_multidimensional_subscript
 		d0[1, 1] = "q";
+#else
+		d0[1] = "q";
+#endif
 //		TRACE(d0.join())
 //		try {assert(d0.join() == ""); assert(false);} catch(VarUnassigned e) {};
 		d0 = "x";
@@ -162,25 +166,17 @@ func main() {
 		assert(d1.at(3, 2) eq "x");
 
 		const dim d2 = {1, 2, 3, 4, 5, 6};
-		TRACE(d2.join())
-		//TRACE(d2.at(1))
-		//TRACE(d2.at(6))
-		TRACE(d2.at(1, 0))
-		TRACE(d2.at(1, 1))
-		TRACE(d2.at(6, 0))
-//		try{assert(d2.at(1, 1) eq 1); assert(false && "Cant use coln on 1d array");} catch (DimUndimensioned e) {};
-		try{errputl(d2.at(1, 2)); assert(false && "Cant use coln on 1d array");} catch (DimIndexOutOfBounds e) {};
-		assert(d2.at(6, 0) eq 6);
-		const dim d3 = {1, 2, 3, 4, 5, 6};
-		assert(d3.at(1, 0) eq d3[1]);
-		assert(d3.at(6, 0) eq d3[6]);
+		assert(d2.join() == "1^2^3^4^5^6"_var);
+		try{errputl(d2.at(1, 0)); assert(false);} catch (DimIndexOutOfBounds e) {};
 
-		assert(d2.at(1, 0) eq 1);
-		assert(d2.at(6, 0) eq 6);
+		try{errputl(d2.at(1, 2)); assert(false && "Cant use coln on 1d array");} catch (DimIndexOutOfBounds e) {};
+
+		dim d3 = {1, 2, 3, 4, 5, 6};
+		assert(d3.join() == "1^2^3^4^5^6"_var);
+		try{errputl(d3.at(1, 0)); assert(false);} catch (DimIndexOutOfBounds e) {};
 
 		// Disallowed0
-		try{d1.at(0, 0) = "qwe"; assert(false);} catch (DimIndexOutOfBounds e) {};
-		try{assert(d1.at(0, 0) == "qwe"); assert(false);} catch (DimIndexOutOfBounds e) {};
+		try{errputl(d1.at(0, 0)); assert(false);} catch (DimIndexOutOfBounds e) {};
 //		assert(d1.at(0, 0) eq "qwe");
 
 		//const dim d4 = {{1, 2}, {3, 4}, {5, 6}};
@@ -802,13 +798,21 @@ func main() {
 		// Testing two dimensional esp. negative row and col
 
 		dim d(3, 2);
+#ifdef __cpp_multidimensional_subscript
 		d[1, 1]=11;
 		d[1, 2]="aa";
 		d[2, 1]=22;
 		d[2, 2]="bb";
 		d[3, 1]=33;
 		d[3, 2]="cc";
-
+#else
+		d.at(1, 1)=11;
+		d.at(1, 2)="aa";
+		d.at(2, 1)=22;
+		d.at(2, 2)="bb";
+		d.at(3, 1)=33;
+		d.at(3, 2)="cc";
+#endif
 		//TODO could be ] and ^
 		assert(d.join().outputl() == "11^aa^22^bb^33^cc"_var);
 
@@ -818,6 +822,7 @@ func main() {
 		{
 			// coln = 1
 
+#ifdef __cpp_multidimensional_subscript
 			assert((d[-3, 1].outputl() == "11"));
 			assert((d[-2, 1].outputl() == "22"));
 			assert((d[-1, 1].outputl() == "33"));
@@ -825,15 +830,31 @@ func main() {
 			assert((d[1, 1].outputl() == "11"));
 			assert((d[2, 1].outputl() == "22"));
 			assert((d[3, 1].outputl() == "33"));
+#else
+			assert((d.at(-3, 1).outputl() == "11"));
+			assert((d.at(-2, 1).outputl() == "22"));
+			assert((d.at(-1, 1).outputl() == "33"));
 
+			assert((d.at(1, 1).outputl() == "11"));
+			assert((d.at(2, 1).outputl() == "22"));
+			assert((d.at(3, 1).outputl() == "33"));
+#endif
 			//DimIndexOutOfBounds:row:-4 can be -3 to +3 - Aborting.
 			try {
-				assert((d[-4, 1] == ""));
+#ifdef __cpp_multidimensional_subscript
+				errputl(d[-4, 1]);
+#else
+				errputl(d.at(-4, 1));
+#endif
 				assert(false);
 			}
 			catch (DimIndexOutOfBounds e) {};
 			try {
-				assert((d[4, 1] == ""));
+#ifdef __cpp_multidimensional_subscript
+				errputl(d[4, 1]);
+#else
+				errputl(d.at(4, 1));
+#endif
 				assert(false);
 			}
 			catch (DimIndexOutOfBounds e) {};
@@ -843,6 +864,7 @@ func main() {
 		{
 			// coln 2
 
+#ifdef __cpp_multidimensional_subscript
 			assert((d[-3, 2].outputl() == "aa"));
 			assert((d[-2, 2].outputl() == "bb"));
 			assert((d[-1, 2].outputl() == "cc"));
@@ -850,12 +872,21 @@ func main() {
 			assert((d[1, 2].outputl() == "aa"));
 			assert((d[2, 2].outputl() == "bb"));
 			assert((d[3, 2].outputl() == "cc"));
+#else
+			assert((d.at(-3, 2).outputl() == "aa"));
+			assert((d.at(-2, 2).outputl() == "bb"));
+			assert((d.at(-1, 2).outputl() == "cc"));
 
+			assert((d.at(1, 2).outputl() == "aa"));
+			assert((d.at(2, 2).outputl() == "bb"));
+			assert((d.at(3, 2).outputl() == "cc"));
+#endif
 		}
 
 		{
 			// coln 2 == -1
 
+#ifdef __cpp_multidimensional_subscript
 			assert((d[-3, 2].outputl() == d[-3,  -1]));
 			assert((d[-2, 2].outputl() == d[-2, -1]));
 			assert((d[-1, 2].outputl() == d[-1, -1]));
@@ -863,12 +894,21 @@ func main() {
 			assert((d[1, 2].outputl() == d[1, -1]));
 			assert((d[2, 2].outputl() == d[2, -1]));
 			assert((d[3, 2].outputl() == d[3, -1]));
+#else
+			assert((d.at(-3, 2).outputl() == d.at(-3,  -1)));
+			assert((d.at(-2, 2).outputl() == d.at(-2, -1)));
+			assert((d.at(-1, 2).outputl() == d.at(-1, -1)));
 
+			assert((d.at(1, 2).outputl() == d.at(1, -1)));
+			assert((d.at(2, 2).outputl() == d.at(2, -1)));
+			assert((d.at(3, 2).outputl() == d.at(3, -1)));
+#endif
 		}
 
 		{
 			// coln 1 == -2
 
+#ifdef __cpp_multidimensional_subscript
 			assert((d[-3, 1].outputl() == d[-3, -2]));
 			assert((d[-2, 1].outputl() == d[-2, -2]));
 			assert((d[-1, 1].outputl() == d[-1, -2]));
@@ -876,20 +916,36 @@ func main() {
 			assert((d[1, 1].outputl() == d[1, -2]));
 			assert((d[2, 1].outputl() == d[2, -2]));
 			assert((d[3, 1].outputl() == d[3, -2]));
+#else
+			assert((d.at(-3, 1).outputl() == d.at(-3, -2)));
+			assert((d.at(-2, 1).outputl() == d.at(-2, -2)));
+			assert((d.at(-1, 1).outputl() == d.at(-1, -2)));
 
+			assert((d.at(1, 1).outputl() == d.at(1, -2)));
+			assert((d.at(2, 1).outputl() == d.at(2, -2)));
+			assert((d.at(3, 1).outputl() == d.at(3, -2)));
+#endif
 		}
 
 		{
 			//col -3 and 3 error
-			//DimIndexOutOfBounds:row:-4 can be -3 to +3 - Aborting.
+			//DimIndexOutOfBounds:col:-3 can be -2 to +2 - Aborting.
 
 			try {
-				assert((d[1,-3] == ""));
+#ifdef __cpp_multidimensional_subscript
+				errputl(d[1,-3]);
+#else
+				errputl(d.at(1,-3));
+#endif
 				assert(false);
 			}
 			catch (DimIndexOutOfBounds e) {};
 			try {
-				assert((d[1, 3] == ""));
+#ifdef __cpp_multidimensional_subscript
+				errputl(d[1, 3]);
+#else
+				errputl(d.at(1, 3));
+#endif
 				assert(false);
 			}
 			catch (DimIndexOutOfBounds e) {};
@@ -899,25 +955,34 @@ func main() {
 		{
 			// Row 0?
 			try {
-				assert((d[0, 1] == ""));
+#ifdef __cpp_multidimensional_subscript
+				errputl(d[0, 1]);
+#else
+				errputl(d.at(0, 1));
+#endif
 				assert(false);
 			}
 			catch (DimIndexOutOfBounds e) {};
 
 			// Col 0?
 			try {
-				assert((d[1, 0] == ""));
+#ifdef __cpp_multidimensional_subscript
+				errputl(d[1, 0]);
+#else
+				errputl(d.at(1, 0));
+#endif
 				assert(false);
 			}
 			catch (DimIndexOutOfBounds e) {};
 
 			// both 0?
+#ifdef __cpp_multidimensional_subscript
 			try {
-				assert((d[0, 0] == ""));
+				errputl(d[0, 0]);
 				assert(false);
 			}
 			catch (DimIndexOutOfBounds e) {};
-
+#endif
 		}
 
 	}

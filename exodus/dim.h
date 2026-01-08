@@ -340,12 +340,16 @@ class PUBLIC dim final : public std::vector<var> {
 	//
 	ND VARREF operator[](int rowno, int colno) {
 		if (!colno)
-	        throw DimIndexOutOfBounds("colno:" ^ var(colno));
+			throw DimIndexOutOfBounds("colno:" ^ var(colno));
 		return getelementref(rowno, colno);
 	}
 
 	// Undocumented
-	ND CVR operator[](int rowno, int colno) const {return getelementref(rowno, colno);}
+	ND CVR operator[](int rowno, int colno) const {
+		if (!colno)
+			throw DimIndexOutOfBounds("colno:" ^ var(colno));
+		return getelementref(rowno, colno);
+	}
 #else
 #	define DEPRECATED_PARENS [[deprecated("EXODUS: Replace single dimensioned array accessors like () with [] e.g. dimarray(n) -> dimarray[n]")]]
 #	define DEPRECATED_PARENS2
@@ -365,18 +369,32 @@ class PUBLIC dim final : public std::vector<var> {
 	// The following const version is called if we do () on a dim which was defined as const xx
 	DEPRECATED_PARENS2
 	// Undocumented
-	ND VARREF operator()(int rowno, int colno) {return getelementref(rowno, colno);}
+	ND VARREF operator()(int rowno, int colno) {
+		if (!colno)
+			throw DimIndexOutOfBounds("colno:" ^ var(colno));
+		return getelementref(rowno, colno);
+	}
 	DEPRECATED_PARENS2
 	// Undocumented
-	ND CVR operator()(int rowno, int colno) const {return getelementref(rowno, colno);}
-
+	ND CVR operator()(int rowno, int colno) const {
+		if (!colno)
+			throw DimIndexOutOfBounds("colno:" ^ var(colno));
+		return getelementref(rowno, colno);
+	}
 	// Transition alternative for () and [] syntax to be used in libexodus, cli, service and test.
 	// Should be removed in 2028 when Ubuntu 24.04 is the oldest to be supported by exodus
 	// [[deprecated
-	ND VARREF at(int rowno, int colno) {return getelementref(rowno, colno);}
+	ND VARREF at(int rowno, int colno) {
+		if (!colno)
+			throw DimIndexOutOfBounds("colno:" ^ var(colno));
+		return getelementref(rowno, colno);
+	}
 	// [[deprecated
-	ND CVR at(int rowno, int colno) const {return getelementref(rowno, colno);}
-
+	ND CVR at(int rowno, int colno) const {
+		if (!colno)
+			throw DimIndexOutOfBounds("colno:" ^ var(colno));
+		return getelementref(rowno, colno);
+	}
 	// obj is d1
 
 	// Get the number of rows in the dimensioned array
