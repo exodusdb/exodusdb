@@ -219,17 +219,23 @@ function APT_GET {
 	which pdfgrep || APT_GET sudo DEBIAN_FRONTEND=noninteractive apt-get -y install pdfgrep
 
 :
-: Check chromium converts html to pdf
-: ===================================
+: Wait for chromium snap install to complete
+: ===========================================
 :
-: Wait up to 10 mins for snap installation to complete.
+: Wait up to 10 mins for snap installation to complete. Often randomly fails. Just redo.
 :
-	timeout 600 bash -c 'while snap changes | grep chromium | grep -q Doing; do sleep 5; done; snap changes | grep chromium | grep -q Done && echo "Chromium installation done" || echo "Chromium installation failed or not found"' || echo "Timed out."
+	for x in 1 2; do
+		snap changes | grep chromium || true
+		timeout 600 bash -c 'while snap changes | grep chromium | grep -q Doing; do sleep 5; done; snap changes | grep chromium | grep -q Done && echo "Chromium installation done" || echo "Chromium installation failed or not found"' || echo "Timed out."
+	done
+	snap changes | grep chromium || true
+:
 	which chromium
 	snap refresh chromium
-
 :
-: Verify chromium pdf converter works - Ignore various chromium error messages
+: Check chromium converts html to pdf
+: ===================================
+: Ignore various chromium error messages
 :
 	printf "<html><body>Nothing Special</body></html>\n" > chromium2pdf.html
 	chromium --no-sandbox --headless --disable-gpu --print-to-pdf=chromium2pdf.pdf chromium2pdf.html |& grep "dbus|dconf|touch|mkdir" -vP 1>&2
