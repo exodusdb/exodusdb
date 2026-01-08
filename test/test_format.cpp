@@ -223,7 +223,14 @@ func main() {
 	assert(var("🐱") == "\xF0\x9F\x90\xB1");
 	assert(var("🐱") == "\U0001F431");
 
-#if EXO_FORMAT == 1 and ( __clang_major__ > 20 or __GNUG__ >= 15 )
+#ifdef __clang_major__)
+	TRACE(__clang_major__)
+#endif
+#ifdef __GNUG__)
+	TRACE(__GNUG__)
+#endif
+//#if EXO_FORMAT == 1 and ( __clang_major__ > 20 or __GNUG__ >= 15 )
+#if EXO_FORMAT == 1 and ( __clang_major__ >= 20 or __GNUG__ >= 15 )
 
 	// Cat = four bytes but takes up "2" positions in formatting
 	println("'{:.^5s}'", var("🐱"));
@@ -237,6 +244,8 @@ func main() {
 	// Incorrect in g++13.2
 	// Width is calculated as bytes not utf-8 character widths
 	// Cat = four bytes so takes up "4" positions in formatting
+	TRACE(format("{:.^5s}", var("🐱")));
+	TRACE(var(format("{:.^5s}", var("🐱"))).oconv("HEX"));
 	assert(format("{:.^5s}", var("🐱")) == "🐱.");
 
 #elif EXO_FORMAT == 2
