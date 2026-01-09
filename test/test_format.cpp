@@ -223,10 +223,10 @@ func main() {
 	assert(var("🐱") == "\xF0\x9F\x90\xB1");
 	assert(var("🐱") == "\U0001F431");
 
-#ifdef __clang_major__)
+#ifdef __clang_major__
 	TRACE(__clang_major__)
 #endif
-#ifdef __GNUG__)
+#ifdef __GNUG__
 	TRACE(__GNUG__)
 #endif
 //#if EXO_FORMAT == 1 and ( __clang_major__ > 20 or __GNUG__ >= 15 )
