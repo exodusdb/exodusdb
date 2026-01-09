@@ -7,17 +7,19 @@ set -euxo pipefail
 : Build, install and test exodus
 : ==========================================================
 :
-: 'Output from cli exodus.cpp for 3 OS x 2 compilers'
+: 'Default clang compiler on Ubuntu 24.04 is 19 since 20 has problems'
+:
+: 'Output from cli/exodus by OS for 2 compilers'
 : '"c++ 21" indicates c++20 plus informal support for c++23'
 : '"c++ 24" indicates c++23 plus informal support for c++26'
 :
 : 'Build: Ubuntu 25.10 x64 gcc   15 c++ 24'
-: 'Build: Ubuntu 24.04 x64 g++   14 c++ 23'
+: 'Build: Ubuntu 24.04 x64 gcc   14 c++ 23'
 : 'Build: Ubuntu 22.04 x64 g++   11 c++ 21'
 : 'Build: Ubuntu 20.04 x64 g++    9 c++ 17'
 :
 : 'Build: Ubuntu 25.10 x64 clang 21 c++ 24'
-: 'Build: Ubuntu 24.04 x64 clang 18 c++ 24'
+: 'Build: Ubuntu 24.04 x64 clang 19 c++ 24'
 : 'Build: Ubuntu 22.04 x64 clang 14 c++ 21'
 : 'Build: Ubuntu 20.04 x64 clang 10 c++ 20'
 :
@@ -26,7 +28,7 @@ set -euxo pipefail
 : '------ ------------ ----- --------  ----    -----   -----'
 : 'OK     25.10        quest 17.6      15.2.0  21.1.2  88   '
 :
-: 'OK     24.04   Yes  noble 16.3?     13.3    19.1.1  83   clang-19 and g++ work'
+: 'OK     24.04   Yes  noble 16.3?     13.3    19.1.1  83   clang-18/19 and g++ work. clang-20 doesnt.'
 : 'KO     24.04   Yes  noble 16.3?     14.2    20.?    83   latest'
 : 'OK     24.04   Yes  noble 16.3      13.3.0  18.1.3  83   default'
 :
@@ -88,7 +90,7 @@ set -euxo pipefail
 :	"clang-18, clang-min, clang-latest, clang-default"
 :	"g++-14, g++-min, g++-latest, g++-default"
 :
-:	If version no is omitted, the LATEST available for the OS will be used.
+:	If version no is omitted, the LATEST available for the OS will be used except clang 19 on Ubuntu 24.04
 :
 :	Choosing compiler/version only has effect on the initial b stage when installing build dependencies.
 :
@@ -102,12 +104,20 @@ set -euxo pipefail
 	REQ_STAGES=${1:?STAGES is required and must be one or more *consecutive* letters from $ALL_STAGES or from $SUB_STAGES, or A for all stages except W, or AW for all stages}
 	COMPILER=${2:-clang}
 	PG_VER=${3:-}
-
-	# Remove the phrase -latest since we treat enpty as meaning -latest
+:
+: Default clang compiler is 19 on Ubuntu since 20 has problems
+:
+	if [[ $(lsb_release -rs 2>/dev/null) == "24.04" ]] && [[ $COMPILER == @(clang|clang-default) ]]; then
+		COMPILER=clang-19
+	fi
+:
+: Remove the compiler phrase -latest since we treat enpty as meaning -latest
+:
 	COMPILER=${COMPILER/-latest/}
+	COMPILER_OR_DEFAULT=${COMPILER/-default/}
+:
 	CMAKE_BUILD_OPTIONS=-GNinja
-	BUILD_DEPS="ninja-build ${COMPILER/clang/clang-tools} libfmt-dev libreadline-dev"
-
+	BUILD_DEPS="ninja-build ${COMPILER_OR_DEFAULT/clang/clang-tools} libfmt-dev libreadline-dev"
 :
 : Validate
 : --------
@@ -143,15 +153,15 @@ set -euxo pipefail
 	#RUNNER_DEBUG=1
 
 :
-: Function to call apt-get three times in case of timeout
-: -------------------------------------------------------
+: Function to retry three times in case of timeout
+: ------------------------------------------------
 :
-function APT_GET {
+function APT_RETRY {
 :
 	for N in 1 2 3; do
 :
-: Retry apt-get three times if it times out. $N/3
-: ----------------------------------------------
+: Retry three times if it times out. $N/3
+: ---------------------------------------
 :
 		# /dev/null to stop timeout causing random hang until timeout
 		# with apt process stuck on tcsetattr call. see gdb -p 9999
@@ -159,6 +169,19 @@ function APT_GET {
 			break
 		fi
 	done
+}
+
+:
+: Function to call apt-get install three times in case of timeout
+: ---------------------------------------------------------------
+:
+function APT_INSTALL {
+:
+	APT_RETRY sudo apt-get install -y $*
+:
+: Verify all packages are installed
+:
+	for pkg in $*; do dpkg -s "$pkg" >/dev/null 2>&1 || { echo "See above 'Unable to locate package'"; exit 1; }; done; echo "All packages installed."
 }
 
 :
@@ -313,7 +336,7 @@ function get_dependencies_for_build_and_install {
 : Update apt
 : ----------
 :
-	APT_GET sudo apt-get -y update
+	APT_RETRY sudo apt-get -y update
 
 :
 : Download Postgresql dev and client package
@@ -325,8 +348,8 @@ function get_dependencies_for_build_and_install {
 	#Specified PG_VER for postgresql-server-dev-NN installed later in this stage
 	# 1/49 Test  #1: pgexodus_test ....................***Failed    0.08 sec
 	#  grep: /etc/postgresql/16/main/postgresql.conf: No such file or directory
-	APT_GET sudo apt-get remove -y 'postgresql-server-dev-all' && APT_GET sudo apt-get -y autoremove || true
-	APT_GET sudo apt-get install -y postgresql-common
+	APT_RETRY sudo apt-get remove -y 'postgresql-server-dev-all' && APT_RETRY sudo apt-get -y autoremove || true
+	APT_INSTALL postgresql-common
 
 :
 : Download pgexodus and fmt submodules source in b and B stages
@@ -370,7 +393,7 @@ function get_dependencies_for_build_and_install {
 :
 : Repeated in Build stage
 :
-	APT_GET sudo apt-get install -y cmake $BUILD_DEPS
+	APT_INSTALL cmake $BUILD_DEPS
 
 :
 : Determine actual compiler version if min/default requested
@@ -394,23 +417,22 @@ function get_dependencies_for_build_and_install {
 :
 : e.g. g++, g++-12, clang, clang-12 etc.
 :
-
-	APT_GET sudo apt-get install -y $COMPILER
+	APT_INSTALL $COMPILER_OR_DEFAULT
 
 :
 : Set as the default ++ compiler
 :
 : NB SETTING c++ not g++ or clang
 :
-	sudo update-alternatives --install /usr/bin/c++ c++ /usr/bin/$COMPILER 0
-	sudo update-alternatives --set c++ /usr/bin/$COMPILER
+	sudo update-alternatives --install /usr/bin/c++ c++ /usr/bin/$COMPILER_OR_DEFAULT 0
+	sudo update-alternatives --set c++ /usr/bin/$COMPILER_OR_DEFAULT
 	readlink `which c++` -e
 
 :
 : Set as the default c compiler. Why is this necessary?
 : 24.04 clang postgres c build fails with an invalid compiler flag -Weverything
 :
-	C_COMPILER=${COMPILER//+/c} #g++XXXXX becomes gccXXXXX
+	C_COMPILER=${COMPILER_OR_DEFAULT//+/c} #g++XXXXX becomes gccXXXXX
 	sudo update-alternatives --install /usr/bin/cc cc /usr/bin/$C_COMPILER 0
 	sudo update-alternatives --set cc /usr/bin/$C_COMPILER
 	readlink `which cc` -e
@@ -437,7 +459,7 @@ function get_dependencies_for_build_and_install {
 :
 :	Avoid "CMAKE_CXX_COMPILER_CLANG_SCAN_DEPS" error
 	CLANG_VERSION=`c++ --version | head -n1|cut -d'.' -f 1|grep -Po '\d+'`
-	APT_GET sudo apt-get install -y clang-tools-$CLANG_VERSION
+	APT_INSTALL clang-tools-$CLANG_VERSION
 
 :
 : Prevent clang from using later versions of gcc tool chains which are troublesome
@@ -459,8 +481,8 @@ function get_dependencies_for_build_and_install {
 : Download and install dev packages for postgresql client lib and boost
 : ---------------------------------------------------------------------
 :
-	APT_GET sudo apt-get install -y libpq-dev libboost-regex-dev libboost-locale-dev libboost-fiber-dev libboost-context-dev
-	#APT_GET sudo apt-get install -y g++ libboost-date-time-dev libboost-system-dev libboost-thread-dev
+	APT_INSTALL libpq-dev libboost-regex-dev libboost-locale-dev libboost-fiber-dev libboost-context-dev
+	#APT_INSTALL g++ libboost-date-time-dev libboost-system-dev libboost-thread-dev
 
 :
 : Download and install pgexodus postgres build dependencies
@@ -468,8 +490,8 @@ function get_dependencies_for_build_and_install {
 :
 	ls -l /usr/lib/postgresql || true
 :
-	APT_GET sudo apt-get install -y postgresql-server-dev-$SERVER_PG_VER
-	APT_GET sudo apt-get install -y postgresql-common
+	APT_INSTALL postgresql-server-dev-$SERVER_PG_VER
+	APT_INSTALL postgresql-common
 :
 	pg_config
 :
@@ -479,7 +501,7 @@ function get_dependencies_for_build_and_install {
 : Install pygments syntax highlighter for cli gendoc
 : --------------------------------------------------
 :
-	APT_GET sudo apt-get install -y python3-pygments # || FAILED to install pygments
+	APT_INSTALL python3-pygments # || FAILED to install pygments
 
 :
 : Install exodus lexer plugin for pygment syntax highlighter
@@ -534,7 +556,7 @@ function build_only {
 :
 : Repeated from Build stage
 :
-	APT_GET sudo apt-get install -y cmake $BUILD_DEPS
+	APT_INSTALL cmake $BUILD_DEPS
 
 :
 : Patch /usr/include/c++/*/ostream
@@ -605,17 +627,7 @@ function install_exodus {
 :
 : Note: Using 'echo sudo dd' trick because 'sudo echo xxx > yyy' doesnt sudo the '> yyy' bit.
 :
-	#printf 'export PATH="${PATH}:~/bin"\nexport LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${HOME}/lib"\n' | sudo dd of=/etc/profile.d/exodus.sh status=none
-:
-: Update /etc/profile.d/exodus.sh
-:
-	cat > /etc/profile.d/exodus.sh << 'V0G0N'
-		#Created by exodus/install.sh
-	    #Only add if new path hasnt already been added
-	    #Only add colon when appending to an existing set of paths, avoids LD_PRELOAD vulnerability
-		[[ ! $PATH =~ \~/bin ]] && export PATH="${PATH:+$PATH:}${HOME}/bin"
-		[[ ! $LD_LIBRARY_PATH =~ ${HOME}/lib(:|$) ]] && export LD_LIBRARY_PATH=${LD_LIBRARY_PATH:+$LD_LIBRARY_PATH:}${HOME}/lib
-V0G0N
+	printf 'export PATH="${PATH}:~/bin"\nexport LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${HOME}/lib"\n' | sudo dd of=/etc/profile.d/exodus.sh status=none
 :
 } # end of install_exodus
 
@@ -633,7 +645,7 @@ function get_dependencies_for_database {
 : pgexodus
 : --------
 :
-	APT_GET sudo apt-get install -y postgresql$PG_VER_SUFFIX #for pgexodus install
+	APT_INSTALL postgresql$PG_VER_SUFFIX #for pgexodus install
 }
 
 function install_database {
