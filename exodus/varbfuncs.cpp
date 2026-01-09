@@ -37,6 +37,7 @@ Binary    Hex          Comments
 #	include <locale>  // For std::use_facet
 #endif
 
+#include <boost/version.hpp>
 #include <boost/locale.hpp> // For locate aware compare
 
 #include <exodus/varimpl.h>
@@ -143,13 +144,12 @@ int VB1::localeAwareCompare(const std::string& str1, const std::string& str2) {
 	// 4 = quaternary – consider all case,
 	// accents, and punctuation. The words must be identical in terms of Unicode representation.
 	// 5 = identical – as quaternary, but compare code points as well.
-	//#define COMP_LEVEL identical
-#define COMP_LEVEL identical
 	int result = std::use_facet<boost::locale::collator<char>>(thread_boost_locale1)
+#define COMP_LEVEL identical
 #if BOOST_VERSION < 108300
-					.compare(boost::locale::collator_base::COMP_LEVEL, str1, str2);
+				.compare(boost::locale::collator_base::COMP_LEVEL, str1, str2);
 #else
-					.compare(boost::locale::collate_level::COMP_LEVEL, str1, str2);
+				.compare(boost::locale::collate_level::COMP_LEVEL, str1, str2);
 #endif
 
 	return result;
