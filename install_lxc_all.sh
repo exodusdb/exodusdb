@@ -5,6 +5,9 @@ set -euxo pipefail
 : Build and install exodus on multiple OS and compilers in one command  using install_lxc.sh
 : ==========================================================================================
 :
+: 2026-01-09 Success build on 3 OS x 2 Compilers
+: ./install_lxc_all.sh u2204,u2404,u2510 bBdDTW clang,g++
+:
 : Syntax:
 :
 : "$0 <BASE_CONTAINERS,> <STAGES> [clang,clang-default,clang-18,clang-latest,g++,g++-default,g++-14,g++-latest, ]"
