@@ -3,7 +3,7 @@
 
 //#include <stddef> // std::size_t
 
-#if EXO_MDOULE
+#if EXO_MODULE
 	import std;
 #else
 #	include <string>

@@ -8601,10 +8601,11 @@ Optional prefix of "1/" or "/" causes the reciprocal of the number to be used. e
 			<p>
 				<code>note(msg, options, io response)</code></p></td>
 		<td>
-			<p>Output a message to stdout and optionally request input.</p>
+			<p>Output a message to stdout if called in a cli program or append message to USER4</p>
+			<p>(a standard output environment variable) in libraries and optionally request input.</p>
 			<p>If input is requested but stdin is not a terminal then set the response to "" and continue.</p>
 			<p>
-				<em>options:</em> R = Response requested. C upper case response.</p>
+				<em>options:</em> R = Response requested. C = upper case response. U = Dont update USER4</p>
 			<p>
 				<pre><span class="kt">var</span><span class="w"> </span><span class="n">response</span><span class="p">;</span>
 <span class="c1">// call note(&quot;Enter something&quot;, &quot;RC&quot;, response);</span>

@@ -9525,13 +9525,16 @@ let v2 = elapsedtimetext(0, 0.001); // "1 min, 26 secs"
 .SS
 note(msg, options, io response)
 .PP
-Output a message to stdout and optionally request input.
+Output a message to stdout if called in a cli program or append message to USER4
+.sp 0
+.PP
+(a standard output environment variable) in libraries and optionally request input.
 .sp 0
 .PP
 If input is requested but stdin is not a terminal then set the response to "" and continue.
 .sp 0
 .PP
-\fBoptions:\fR R = Response requested. C upper case response.
+\fBoptions:\fR R = Response requested. C = upper case response. U = Dont update USER4
 .sp 0
 .PP
 .PP
