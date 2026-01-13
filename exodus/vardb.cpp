@@ -1533,7 +1533,9 @@ bool var_db::read(in file, in key) {
 			" LIMIT 65536";
 
 		var response;
-		if (not sqlexec(sql, response)) {
+		//if (not sqlexec(sql, response)) {
+		// use file to determine the database
+		if (not file.sqlexec(sql, response)) {
 			var::loglasterror();
 			return false;
 		}
