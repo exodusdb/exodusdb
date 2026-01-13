@@ -889,12 +889,11 @@ compile_it:
 
 				// Make the target directory
 				if (not osdir(outputdir)) {
-					let cmd = "mkdir " ^ outputdir;
 					if (verbose)
-						printl(cmd);
+						printl("mkdir", outputdir);
 					//osshell(cmd);
-					if (!osmkdir(outputdir))
-						cmd.errputl("ERROR: Failed to make directory");
+					if (!osmkdir(outputdir) && not osdir(outputdir))
+						outputdir.errputl("ERROR: Failed to make directory ");
 				}
 
 				// Check can install file
