@@ -3,6 +3,7 @@
 
 #if EXO_MODULE
 	import std;
+	import var;
 #else
 #	include <string>
 #	include <future>

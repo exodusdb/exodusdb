@@ -44,6 +44,9 @@
 # C++ standard
 # ############
 #
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -stdlib=libc++")
+set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -stdlib=libc++")
 	# CMake max supporting C++ versions
 	#https://cmake.org/cmake/help/latest/prop_tgt/CXX_STANDARD.html
 	#CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++2a"
@@ -74,11 +77,12 @@
 # Modules option -DEXO_MODULE=ON/OFF or enabled by default for clang >= 18
 # ##############
 #
-	if (${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" AND ${CMAKE_CXX_COMPILER_VERSION} VERSION_GREATER_EQUAL 18.0)
-		option(EXO_MODULE "Build as c++ modules if clang >= 18" ON) # Enabled clang >= 18
-#	else()
-		option(EXO_MODULE "Build as c++ modules if not clang >= 18" OFF) # Disabled by default
-	endif()
+#	if (${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" AND ${CMAKE_CXX_COMPILER_VERSION} VERSION_GREATER_EQUAL 18.0)
+#		option(EXO_MODULE "Build as c++ modules if clang >= 18" ON) # Enabled clang >= 18
+##	else()
+#		option(EXO_MODULE "Build as c++ modules if not clang >= 18" OFF) # Disabled by default
+#	endif()
+	option(EXO_MODULE "Build as c++ modules" OFF) # Disabled by default
 	message("-- EXO_MODULE is ${EXO_MODULE}")
 
 	add_compile_definitions(EXO_MODULE_INITIAL_BUILD=1)

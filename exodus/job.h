@@ -7,12 +7,12 @@
 #else
 	#include <future>
 //	#include <memory>
-namespace std {
-	template<typename> class future; // Forward declaration of std::future
-	enum class future_status; // Forward declaration of std::future_status
-//	class condition_variable; // Forward declaration of std::condition_variable
-//	class mutex; // Forward declaration of std::mutex
-}
+//namespace std {
+//	template<typename> class future; // Forward declaration of std::future
+//	enum class future_status; // Forward declaration of std::future_status
+////	class condition_variable; // Forward declaration of std::condition_variable
+////	class mutex; // Forward declaration of std::mutex
+//}
 #endif
 
 enum class TimeUnit { Milliseconds, Seconds };

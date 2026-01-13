@@ -351,7 +351,8 @@ ENVIRONMENT
 #endif
 
 		// Mandatory c++ library and file system library
-		linkoptions ^= " -lstdc++fs -lstdc++";
+//		linkoptions ^= " -lstdc++fs -lstdc++";
+		linkoptions ^= " -stdlib=libc++";
 
 		// link to fmt library (only if using it instead of std::format)
 //#if defined(EXO_FORMAT) && ( EXO_FORMAT == 2 || EXO_FORMAT == 3 )

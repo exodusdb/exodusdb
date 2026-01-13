@@ -9,6 +9,14 @@
 	message("-- CMAKE LIBEXODUS --")
 	message("---------------------")
 
+# Force our custom ICU location
+set(ICU_ROOT "/usr/local/icu-libcxx-78.2")
+
+# Optional: also add to prefix path for safety (helps if FindICU falls back to config mode)
+list(APPEND CMAKE_PREFIX_PATH "${ICU_ROOT}")
+
+find_package(ICU REQUIRED COMPONENTS uc i18n data)
+
 #
 # BOOST FIBER OPTION -DEXO_MODULE=ON/OFF or enabled by default
 # ##################
@@ -140,9 +148,11 @@ execute_process(
 	set(Boost_USE_STATIC_RUNTIME      OFF)
 	set(Boost_Boost_USE_DEBUG_RUNTIME OFF)
 
+	set(Boost_NO_BOOST_CMAKE ON CACHE BOOL "Disable Boost's own CMake config mode")
 #	find_package(Boost REQUIRED COMPONENTS date_time system regex thread locale)
     if (EXO_BOOST_FIBER)
-		find_package(Boost REQUIRED COMPONENTS date_time system regex thread locale fiber context)
+#		find_package(Boost REQUIRED COMPONENTS date_time system regex thread locale fiber context)
+		find_package(Boost REQUIRED COMPONENTS date_time regex thread locale fiber context)
 	else()
 		find_package(Boost REQUIRED COMPONENTS date_time system regex thread locale)
 	endif()
@@ -363,6 +373,17 @@ execute_process(
 #
 	# Boost and Postgresql
 	target_link_libraries(exodus
+		ICU::i18n
+		ICU::uc
+		ICU::data
+    Boost::locale
+    Boost::fiber
+    Boost::regex          # often needed if regex is used anywhere
+    Boost::thread
+    Boost::date_time
+    Boost::chrono
+    Boost::atomic
+    Boost::context
 		${Boost_LIBRARIES}
 		${PostgreSQL_LIBRARIES}
 	)

@@ -411,9 +411,7 @@ function get_dependencies_for_build_and_install {
 		COMPILER=$COMPILER_NAME-$COMPILER_VERSION
 	fi
 
-:
-: Download and install compiler $COMPILER
-: ---------------------------------------
+function gcc_compiler {
 :
 : e.g. g++, g++-12, clang, clang-12 etc.
 :
@@ -447,12 +445,12 @@ function get_dependencies_for_build_and_install {
 :
 	apt list libstdc++*dev |& grep libstdc || true
 
-:
-: Check if clang compiler
-: -----------------------
-:
-	if [[ $COMPILER =~ ^clang ]]; then
+} # end of gcc compiler
 
+function clang_compiler_apt {
+:
+: Install clang from apt
+: ----------------------
 :
 : Clang module building needs its scan tools in the path
 : ------------------------------------------------------
@@ -475,14 +473,39 @@ function get_dependencies_for_build_and_install {
 #		sudo rm /usr/include/x86_64-linux-gnu/c++/$GCC_FAKE_VERSION -f
 #		sudo rm /usr/include/c++/$GCC_FAKE_VERSION -f
 
+} # end of clang_compiler_apt
+
+function clang_compiler_llvm {
+:
+: Install clang from llvm
+: -----------------------
+:
+	./install_clang.sh
+	./install_icu.sh
+	./install_boost.sh
+}
+
+:
+: Download and install compiler $COMPILER
+: ---------------------------------------
+
+	if [[ $COMPILER =~ ^clang ]]; then
+#		clang_compiler_apt
+		clang_compiler_llvm
+	else
+		gcc_compiler
+:
+: Download and install dev packages for  boost
+: --------------------------------------------
+:
+		APT_INSTALL libboost-regex-dev libboost-locale-dev libboost-fiber-dev libboost-context-dev
 	fi
 
 :
-: Download and install dev packages for postgresql client lib and boost
-: ---------------------------------------------------------------------
+: Download and install dev packages for postgresql client lib
+: -----------------------------------------------------------
 :
-	APT_INSTALL libpq-dev libboost-regex-dev libboost-locale-dev libboost-fiber-dev libboost-context-dev
-	#APT_INSTALL g++ libboost-date-time-dev libboost-system-dev libboost-thread-dev
+	APT_INSTALL libpq-dev
 
 :
 : Download and install pgexodus postgres build dependencies
@@ -490,8 +513,7 @@ function get_dependencies_for_build_and_install {
 :
 	ls -l /usr/lib/postgresql || true
 :
-	APT_INSTALL postgresql-server-dev-$SERVER_PG_VER
-	APT_INSTALL postgresql-common
+	APT_INSTALL postgresql-common postgresql-server-dev-$SERVER_PG_VER
 :
 	pg_config
 :
@@ -579,7 +601,7 @@ function build_only {
 :
 	echo PGPATH=${PGPATH:-}
 	rm $EXODUS_DIR/build -rf
-	cmake -L -S $EXODUS_DIR -B $EXODUS_DIR/build $CMAKE_BUILD_OPTIONS #--warn-uninitialized --trace-expanded
+	cmake -L -S $EXODUS_DIR -B $EXODUS_DIR/build -DEXO_MODULE=OFF $CMAKE_BUILD_OPTIONS #--warn-uninitialized --trace-expanded
 :
 : Build
 :

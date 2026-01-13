@@ -83,10 +83,11 @@ func main() {
 //	print(s1, "yyy");
 //	println(v1, "yyy");
 //	println(s1, "yyy");
-	print(v1, "yyy");
-	print(s1, "yyy");
-	println(v1, "yyy");
-	println(s1, "yyy");
+
+//	print(v1, "yyy");
+//	print(s1, "yyy");
+//	println(v1, "yyy");
+//	println(s1, "yyy");
 
 //	printl(fmt::format("abc {} ghi", "def"));
 

@@ -772,7 +772,7 @@ subr unlockfile(in filename) {
 subr parseline(io line) {
 
 	// preserve escaped quotes
-	line.replacer(_BS _DQ, "&quote;");
+	line.replacer(B_S _DQ, "&quote;");
 
 	// preserve commas inside quotes
 	nquotes = line.count(DQ);

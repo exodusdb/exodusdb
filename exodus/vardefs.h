@@ -93,7 +93,7 @@
 #define _STM "\x1A"  // Subtext Mark
 
 #define _NL "\n"
-#define _BS "\\"
+#define B_S "\\"
 #define _DQ "\""
 #define _SQ "\'"
 
