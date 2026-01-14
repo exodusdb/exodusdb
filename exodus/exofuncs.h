@@ -450,11 +450,11 @@ ND var  field2(in instring, SV substr, const int fieldno, const int nfields = 1 
 
 ND var  substr2(in fromstr, io startindex, out delimiterno);
 
-template<size_t N>
+template<std::size_t N>
 ND auto unpack(in v1, SV delim = _FM) {return v1.unpack<N>(delim);}
-template<size_t N>
+template<std::size_t N>
 ND auto unpack(const dim& dim1) {return dim1.unpack<N>();}
-template<size_t N>
+template<std::size_t N>
 ND auto unpack(dim&& dim1) {return dim1.unpack<N>();}
 
 ND dim  split(in sourcevar, SV delimiter = _FM );

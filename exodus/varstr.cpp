@@ -260,7 +260,7 @@ IO   var_stg::fieldstorer(SV separator, const int fieldnx, const int nfieldsx, i
 /////////
 
 // Defined in varlisted.cpp
-auto findSubstringInCommaSeparated(SV s1, SV s2, bool indexed = true) -> size_t;
+auto findSubstringInCommaSeparated(SV s1, SV s2, bool indexed = true) -> std::size_t;
 
 bool var_stg::listed(SV list) const {
 	THISIS("bool var_stg::listed(SV list) const")
@@ -1349,7 +1349,7 @@ var  var_stg::cut(const int length) const& {
 	if (length >= 0) {
 		LIKELY
 
-		if (static_cast<size_t>(length) >= var_str.length()) {
+		if (static_cast<std::size_t>(length) >= var_str.length()) {
 
 			// Number of bytes to trim matches or exceeds string length.
 			// Example "ab".cut(2) return ""
@@ -1365,7 +1365,7 @@ var  var_stg::cut(const int length) const& {
 
 	// Negative. Trim last n bytes
 
-	size_t nbytes_to_trim = static_cast<size_t>(-length);
+	std::size_t nbytes_to_trim = static_cast<std::size_t>(-length);
 
 	// Number of bytes to trim matches or exceeds string length.
 	if (nbytes_to_trim >= var_str.length()) {
@@ -1393,7 +1393,7 @@ IO   var_stg::cutter(const int length) REF {
 
 		// Positive or zero. Trim first n bytes
 
-		if (static_cast<size_t>(length) >= var_str.length()) {
+		if (static_cast<std::size_t>(length) >= var_str.length()) {
 
 			// Number of bytes to trim matches or exceeds string length.
 			// Example "ab".cutter(2) return ""
@@ -1411,7 +1411,7 @@ IO   var_stg::cutter(const int length) REF {
 
 		// Negative. Trim last n bytes
 
-		size_t nbytes_to_trim = static_cast<size_t>(-length);
+		std::size_t nbytes_to_trim = static_cast<std::size_t>(-length);
 		if (nbytes_to_trim >= var_str.length()) {
 
 			// Number of bytes to trim matches or exceeds string length.

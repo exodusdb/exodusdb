@@ -992,7 +992,7 @@ public:
 	//  };
 	//  auto [a4, b4] = funcx();`
 	//
-	template <size_t N>
+	template <std::size_t N>
 	auto unpack/*<N>*/(SV delim = _FM) const -> std::array<var, N>; /*IMPL{
         THISIS("auto var::unpack<N>(SV delim = _FM) const")
         assertString(function_sig);
@@ -1003,7 +1003,7 @@ public:
 		auto basic_split(in v1, SV delim) -> std::vector<var>;
 		// undocumented
 		auto vv1 = basic_split(var_str, delim);
-		return [&vv1]<size_t... Is>(std::index_sequence<Is...>) {
+		return [&vv1]<std::size_t... Is>(std::index_sequence<Is...>) {
 		return std::array<var, N>{
 			(Is < vv1.size() ? std::move(vv1[Is]) : std::move(var()))...
 		};

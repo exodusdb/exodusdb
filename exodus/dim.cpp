@@ -167,8 +167,8 @@ CVR dim::getelementref(int rowno1, int colno1) const {
 	// ncols_ = 0 Indicates 1d data
 
 	// Calculate nrows.
-	size_t ncells = base::size();
-	size_t nrows = ncells;
+	std::size_t ncells = base::size();
+	std::size_t nrows = ncells;
 	if (colno1) {
 		// 2d access requires ncols_ to have a positive size.
 		if (!ncols_) {
@@ -184,12 +184,12 @@ CVR dim::getelementref(int rowno1, int colno1) const {
 	// Convert negative into positive to access std::vector.
 	// Negative -1 -> last rown
 	// Throw error if rowno not +/- nrows
-	size_t rowno = static_cast<size_t>(rowno1);
+	std::size_t rowno = static_cast<std::size_t>(rowno1);
 	if (rowno1 < 0) {
 		if (rowno1 < -static_cast<int>(nrows)) {
 			goto throw_bounds_error_row;
 		}
-		rowno = static_cast<size_t>(rowno1 + static_cast<int>(nrows) + 1);
+		rowno = static_cast<std::size_t>(rowno1 + static_cast<int>(nrows) + 1);
 	}
 	if (rowno < 1 || rowno > nrows) {
 throw_bounds_error_row:
@@ -197,13 +197,13 @@ throw_bounds_error_row:
 	}
 
 	// Ditto for colno.
-	size_t colno = static_cast<size_t>(colno1);
+	std::size_t colno = static_cast<std::size_t>(colno1);
 	if (colno1) {
 		if (colno1 < 0) {
 			if (colno1 < -static_cast<int>(ncols_)) {
 				goto throw_bounds_error_col;
 			}
-			colno = static_cast<size_t>(colno1 + static_cast<int>(ncols_) + 1);
+			colno = static_cast<std::size_t>(colno1 + static_cast<int>(ncols_) + 1);
 		}
 		if (colno < 1 || colno > ncols_) {
 throw_bounds_error_col:
@@ -212,13 +212,13 @@ throw_bounds_error_col:
 	}
 
 	// Calculate combined 0 based index.
-	size_t cell_index0 = colno ? (rowno - 1) * ncols_ + (colno - 1) : (rowno - 1);
+	std::size_t cell_index0 = colno ? (rowno - 1) * ncols_ + (colno - 1) : (rowno - 1);
 
 	// Check bounds and throw DimIndexOutOfBounds.
 	if (cell_index0 >= ncells) { UNLIKELY
 		// For 2D, check if the row/col combination is valid
 		if (colno && rowno == nrows) {
-			size_t max_cols = ncells % ncols_;
+			std::size_t max_cols = ncells % ncols_;
 			if (max_cols == 0) max_cols = ncols_;
 			if (colno > max_cols) {
 				throw DimIndexOutOfBounds("colno:" ^ var(colno1) ^ " exceeds partial row columns (" ^ var(max_cols) ^ ") at row:" ^ var(rowno));
@@ -730,9 +730,9 @@ PUBLIC auto basic_split(const std::string_view str, char separator) -> std::vect
     result.reserve(std::count(str.begin(), str.end(), separator) + 1);
 
     std::string_view sv(str);
-    size_t start = 0;
+    std::size_t start = 0;
     while (start < sv.size()) {
-        size_t end = sv.find(separator, start);
+        std::size_t end = sv.find(separator, start);
         if (end == std::string_view::npos) {
             result.emplace_back(sv.substr(start));
             break;

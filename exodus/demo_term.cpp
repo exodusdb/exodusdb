@@ -1,4 +1,4 @@
-#include <stdio.h>
+#include <cstdio>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <termios.h>
@@ -14,7 +14,7 @@ int main() {
 //  cout << "ID: " << tty << '\n';
 //
 //  int fd = ::open(tty, O_RDONLY);
-//  if (fd < 0) perror("Could not open terminal");
+//  if (fd < 0) std::perror("Could not open terminal");
 //
 //  else {
 //    cout << "Opened terminal\n";
@@ -22,7 +22,7 @@ int main() {
 //    // Do we have attributes?
 //    struct termios term;
 //    int r = tcgetattr(fd, &term);
-//    if (r < 0) perror("Could not get attributes");
+//    if (r < 0) std::perror("Could not get attributes");
 //    else cout << "Got attributes\n";
 //
 //  }
@@ -36,7 +36,7 @@ int main() {
 
   struct stat stats;
   int r = fstat(fileno(stdin), &stats);
-  if (r < 0) perror("fstat failed");
+  if (r < 0) std::perror("fstat failed");
   else {
 
     if (S_ISCHR(stats.st_mode)) cout << "S_ISCHR\n";

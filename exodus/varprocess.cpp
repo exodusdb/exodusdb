@@ -1,15 +1,24 @@
-#include <iostream>
+#if EXO_MODULE
+	import std;
+#else
+#	include <iostream>
+#	include <cstring>
+#	include <ctime>
+#	include <cctype>
+#	include <string>
+#	include <vector>
+//#	include <cerrno>
+#endif
+
+#include <cerrno> // for errno EAGAIN EINTR
+#include <cstdlib> // for EXIT_FAILURE
+#include <cstdio> // for stderr
+
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/wait.h>
-#include <cstring>
-#include <errno.h>
-#include <string>
-#include <vector>
 #include <poll.h>
-#include <ctime>
 #include <sys/time.h>
-#include <cctype>
 
 namespace exo {
 
@@ -62,7 +71,8 @@ std::vector<std::string> parse_command_line(const std::string& cmd) {
 			if (c == '"' || c == '\'') {
 				in_quotes = true;
 				quote_type = c;
-			} else if (std::isspace(static_cast<unsigned char>(c))) {
+//			} else if (std::isspace(static_cast<unsigned char>(c))) {
+			} else if (c == ' '  || c == '\t' || c == '\n' || c == '\v' || c == '\f' || c == '\r') {
 				if (!current_arg.empty()) {
 					args.push_back(current_arg);
 					current_arg.clear();
@@ -104,7 +114,7 @@ bool run_piped_process_with_timeout(const std::string& input, std::string& stdou
     int child_to_parent_err[2];
 
     if (pipe(parent_to_child) == -1 || pipe(child_to_parent) == -1 || pipe(child_to_parent_err) == -1) {
-        perror("pipe failed");
+        std::perror("pipe failed");
         exit_status = -2; // Pipe fail (throw)
         return false;     // Will throw in caller if needed
     }
@@ -136,7 +146,7 @@ bool run_piped_process_with_timeout(const std::string& input, std::string& stdou
 
     pid_t pid = fork();
     if (pid == -1) {
-        perror("fork failed");
+        std::perror("fork failed");
         close(parent_to_child[0]);
         close(parent_to_child[1]);
         close(child_to_parent[0]);
@@ -161,7 +171,7 @@ bool run_piped_process_with_timeout(const std::string& input, std::string& stdou
         close(child_to_parent_err[1]);
 
         execvp(exec_args[0], const_cast<char* const*>(exec_args.data()));
-        perror("execvp failed");
+        std::perror("execvp failed");
         exit(127); // Program not found
     }
 
@@ -204,7 +214,7 @@ bool run_piped_process_with_timeout(const std::string& input, std::string& stdou
         if (timeout_seconds > 0 && elapsed_since_last_read >= timeout) {
             log("Timeout reached (no read activity for " + std::to_string(timeout_seconds) + "s), killing child " + std::to_string(pid));
             if (kill(pid, SIGTERM) == -1) {
-                perror("kill failed");
+                std::perror("kill failed");
             }
             close(parent_to_child[1]);
             close(child_to_parent[0]);
@@ -212,7 +222,7 @@ bool run_piped_process_with_timeout(const std::string& input, std::string& stdou
             int status = 0;
             pid_t wait_result = waitpid(pid, &status, 0);
             if (wait_result == -1) {
-                perror("waitpid failed after timeout");
+                std::perror("waitpid failed after timeout");
                 exit_status = -1; // Timeout (document)
             } else {
                 exit_status = -1; // Timeout, we sent SIGTERM
@@ -248,7 +258,7 @@ bool run_piped_process_with_timeout(const std::string& input, std::string& stdou
         int poll_result = poll(fds, 3, 100);
         if (poll_result == -1) {
             if (errno == EINTR) continue;
-            perror("poll failed");
+            std::perror("poll failed");
             int status = 0;
             pid_t wait_result = waitpid(pid, &status, WNOHANG);
             if (wait_result == pid) {
@@ -286,7 +296,7 @@ bool run_piped_process_with_timeout(const std::string& input, std::string& stdou
                     written += static_cast<size_t>(bytes_written);
                     log("Wrote " + std::to_string(bytes_written) + " bytes, total " + std::to_string(written));
                 } else if (bytes_written == -1 && errno != EAGAIN && errno != EWOULDBLOCK) {
-                    perror("write failed");
+                    std::perror("write failed");
                     break;
                 }
             }
@@ -309,7 +319,7 @@ bool run_piped_process_with_timeout(const std::string& input, std::string& stdou
                 close(child_to_parent[0]);
                 stdout_done = true;
             } else if (bytes_read == -1 && errno != EAGAIN && errno != EWOULDBLOCK) {
-                perror("read stdout failed");
+                std::perror("read stdout failed");
                 break;
             }
         }
@@ -325,7 +335,7 @@ bool run_piped_process_with_timeout(const std::string& input, std::string& stdou
                 close(child_to_parent_err[0]);
                 stderr_done = true;
             } else if (bytes_read == -1 && errno != EAGAIN && errno != EWOULDBLOCK) {
-                perror("read stderr failed");
+                std::perror("read stderr failed");
                 break;
             }
         }
@@ -355,7 +365,7 @@ bool run_piped_process_with_timeout(const std::string& input, std::string& stdou
                 return false; // Will throw in caller if needed
             }
         } else if (wait_result == -1) {
-            perror("Final waitpid failed");
+            std::perror("Final waitpid failed");
             exit_status = -4; // Rare internal failure (throw)
             return false;     // Will throw in caller if needed
         }
@@ -374,7 +384,7 @@ bool run_piped_process_with_timeout(const std::string& input, std::string& stdou
                     close(child_to_parent[0]);
                     stdout_done = true;
                 } else if (bytes_read == -1 && errno != EAGAIN && errno != EWOULDBLOCK) {
-                    perror("post-exit read stdout failed");
+                    std::perror("post-exit read stdout failed");
                     stdout_done = true;
                 }
             }
@@ -389,7 +399,7 @@ bool run_piped_process_with_timeout(const std::string& input, std::string& stdou
                     close(child_to_parent_err[0]);
                     stderr_done = true;
                 } else if (bytes_read == -1 && errno != EAGAIN && errno != EWOULDBLOCK) {
-                    perror("post-exit read stderr failed");
+                    std::perror("post-exit read stderr failed");
                     stderr_done = true;
                 }
             }
@@ -615,7 +625,7 @@ int main() {
 // slowchild.c
 
 #include <unistd.h>
-#include <stdio.h>
+#include <cstdio>
 
 int main() {
 	char buffer[1048576]; // 1MB buffer
@@ -642,13 +652,13 @@ int main() {
 // large_stderr.c
 
 #include <unistd.h>
-#include <string.h>
+#include <cstring>
 #include <algorithm>
 
 using namespace std;
 int main() {
 	const char* msg = "Large stderr output line\n";
-	size_t msg_len = strlen(msg);
+	size_t msg_len = std::strlen(msg);
 	size_t total_size = 1024 * 1024; // 1MB
 	size_t written = 0;
 

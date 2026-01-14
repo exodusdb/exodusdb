@@ -24,12 +24,12 @@ THE SOFTWARE.
 #else
 #	include <math.h>
 #	include <cmath>
-#   include <cstdint> // for std::int64_t etc.
-#   include <cmath>   // for std::fmod etc.
-#   include <cstring> // for std::strstr etc.
+#	include <cstdint> // for std::int64_t etc.
+#	include <cmath>   // for std::fmod etc.
+#	include <cstring> // for std::strstr etc.
 #endif
 
-#include <errno.h>
+//#include <cerrno>
 
 #include "varimpl.h"
 

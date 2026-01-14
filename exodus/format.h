@@ -26,8 +26,13 @@
 
 #if EXO_FORMAT == 1
 
+#if EXO_MODULE
+	import std;
+	namespace fmt = std;
+#else
 #	include <format>
 	namespace fmt = std;
+#endif
 
 #elif EXO_FORMAT == 2 || EXO_FORMAT == 3
 

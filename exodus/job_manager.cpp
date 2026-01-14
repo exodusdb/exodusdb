@@ -41,7 +41,7 @@ auto JobManager::shutdown_run() -> void {
 	threadpool1.shutdown();
 }
 
-void JobManager::reset_run(size_t num_threads) {
+void JobManager::reset_run(std::size_t num_threads) {
 	ThreadPool::reset(&threadpool1, num_threads);
 }
 

@@ -1,11 +1,10 @@
-#if EXO_MODULE
-	import std;
-#else
-#	include <unistd.h>
-#	include <errno.h>
-#	include <stdlib.h> // for EXIT_FAILURE
-#	include <cstdio> // for stderr
-#endif
+//#if EXO_MODULE
+//	import std;
+//#endif
+
+#include <cerrno> // for errno EAGAIN EINTR
+#include <cstdlib> // for EXIT_FAILURE
+#include <cstdio> // for stderr
 
 #include <unistd.h>
 #include <sys/inotify.h>
@@ -32,10 +31,10 @@ using let = const var;
 //return true if any relevent events
 static var handle_events(int inotify_fd, int* wd, const int argc, const char* argv[]) {
 	/* Some systems cannot read integer variables if they are not
-      properly aligned. On other systems, incorrect alignment may
-      decrease performance. Hence, the buffer used for reading from
-      the inotify file descriptor should have the same alignment as
-      struct inotify_event. */
+	  properly aligned. On other systems, incorrect alignment may
+	  decrease performance. Hence, the buffer used for reading from
+	  the inotify file descriptor should have the same alignment as
+	  struct inotify_event. */
 
 	char buf[4096]
 		__attribute__((aligned(__alignof__(struct inotify_event))));
@@ -159,8 +158,8 @@ static var wait_main(const int argc, const char* argv[], const int wait_time_ms)
 	//check at least one item to watch
 	// or crash
 	if (argc < 2) {
-		fprintf(stderr, "oswait must specify at least one directory or file\n");
-		exit(EXIT_FAILURE);
+		std::fprintf(stderr, "oswait must specify at least one directory or file\n");
+		std::exit(EXIT_FAILURE);
 	}
 
 	//printf("Press any key to terminate.\n");
@@ -175,7 +174,7 @@ static var wait_main(const int argc, const char* argv[], const int wait_time_ms)
 
 	//Allocate memory for watch descriptors
 	// or crash
-	wd = reinterpret_cast<int*>(calloc(argc, sizeof(int)));
+	wd = reinterpret_cast<int*>(std::calloc(argc, sizeof(int)));
 	if (wd == nullptr) {
 		std::perror("varwait: calloc");
 		std::exit(EXIT_FAILURE);
@@ -192,7 +191,7 @@ static var wait_main(const int argc, const char* argv[], const int wait_time_ms)
 		);
 		// or crash
 		if (wd[i] == -1) {
-			fprintf(stderr, "Cannot watch '%s'\n", argv[i]);
+			std::fprintf(stderr, "Cannot watch '%s'\n", argv[i]);
 			std::perror("varwait: inotify_add_watch");
 			std::exit(EXIT_FAILURE);
 		}
@@ -288,7 +287,7 @@ static var wait_main(const int argc, const char* argv[], const int wait_time_ms)
 				/* Console input is available. Empty stdin and quit */
 
 				//while (read(STDIN_FILENO, &buf, 1) > 0 && buf != '\n')
-				//    continue;
+				//	continue;
 				break;
 			}
 
@@ -312,7 +311,7 @@ static var wait_main(const int argc, const char* argv[], const int wait_time_ms)
 	// Close inotify file descriptor
 	close(inotify_fd);
 
-	free(wd);
+	std::free(wd);
 
 	// restore terminal attributes (probably linewise input and echo)
 	if (nfds == 2) {

@@ -1146,7 +1146,7 @@ ND var  var_stg::replace(const rex& regex, ReplacementFunction auto repl_func) c
 
 // Unpack
 
-template <size_t N>
+template <std::size_t N>
 auto var_stg::unpack/*<N>*/(SV delim /*= _FM*/) const -> std::array<var, N> {
     THISIS("auto var::unpack<N>(SV delim /*= _FM*/) const")
     assertString(function_sig);
@@ -1155,7 +1155,7 @@ auto var_stg::unpack/*<N>*/(SV delim /*= _FM*/) const -> std::array<var, N> {
 	// Utility somewhere in the forest
 	/*nondoc*/ auto basic_split(const var& v1, SV delim) -> std::vector<var>;
 	/*nondoc*/ auto vv1 = basic_split(var_str, delim);
-	return [&vv1]<size_t... Is>(std::index_sequence<Is...>) {
+	return [&vv1]<std::size_t... Is>(std::index_sequence<Is...>) {
 	return std::array<var, N>{
 		(Is < vv1.size() ? std::move(vv1[Is]) : std::move(var()))...
 	};

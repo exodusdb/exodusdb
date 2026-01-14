@@ -32,7 +32,7 @@ auto get_timebank_acno(const std::string_view /*arg1*/) -> int {return 0;}
 #	include <array>
 #	include <cstring> // for strcmp
 #	include <time.h>
-#	include <stdio.h>
+#	include <cstdio>
 #endif
 
 namespace exo {

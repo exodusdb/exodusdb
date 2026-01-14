@@ -1,6 +1,9 @@
-#include <stdio.h>
-#include <string.h>
-//#include <utility> // for std::unreachable();
+//#if EXO_MODULE
+//	import std;
+//#else
+//#	include <cstdio>
+//#	include <cstring>
+//#endif
 
 #ifndef FM
 #define FM_ '\x1E'

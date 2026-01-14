@@ -34,7 +34,7 @@ THE SOFTWARE.
 #if EXO_MODULE
 	import std;
 #else
-#	include <stdio.h>
+#	include <cstdio>
 #	include <cstdlib>
 #	include <iostream>
 #	include <string>
@@ -232,7 +232,7 @@ auto exo_savestack(void* stack_addresses[BACKTRACE_MAXADDRESSES], std::size_t* s
 	var gdb_cmds = " -ex 'thread apply all bt' -ex 'detach' -ex 'quit'";
 	var gdb_cmd = "gdb -batch -p " ^ pid ^ gdb_cmds ^ " > backtrace." ^ pid ^ ".log 2>/dev/null < /dev/null";
 
-	if (system(gdb_cmd.c_str()) != 0) {
+	if (std::system(gdb_cmd.c_str()) != 0) {
 		// gdb not installed. Rely on ::backtrace above which isnt very accurate in threads or fibers.
 		return true;
 	}
@@ -300,12 +300,12 @@ auto exo_savestack(void* stack_addresses[BACKTRACE_MAXADDRESSES], std::size_t* s
 //			// Search backtrace for lines starting _ExoProgram
 //			var("Search backtrace for lines starting _ExoProgram.").logputl();
 //			let cmd1 = "gdb -q -p " ^ var::ospid() ^ " -ex 'bt' -ex 'detach' -ex 'quit' 2> /dev/null | grep -P '^#[0-9]+\\s+_ExoProgram'";
-//			system(cmd1);
+//			std::system(cmd1);
 
 			// Attach gdb interactively
 			let cmd = "gdb -q -p " ^ var::ospid();
 			cmd.logputl();
-			if (system(cmd) == 0) {
+			if (std::system(cmd) == 0) {
 				// gdb use completed.
 			} else {
 				// gdb not installed or already attached?
@@ -376,7 +376,7 @@ auto exo_backtrace(void* stack_addresses[BACKTRACE_MAXADDRESSES], std::size_t st
 
 	//warning: conversion from ‘std::size_t’ {aka ‘long unsigned int’} to ‘int’ may change value [-Wconversion]
 	//char** strings = backtrace_symbols(stack_addresses, static_cast<int>(stack_size));
-	auto strings = std::unique_ptr<char*[], void(*)(void*)>{backtrace_symbols(stack_addresses, static_cast<int>(stack_size)), ::free};
+	auto strings = std::unique_ptr<char*[], void(*)(void*)>{backtrace_symbols(stack_addresses, static_cast<int>(stack_size)), std::free};
 
 	for (std::size_t frameno = 0; frameno < stack_size; frameno++) {
 
@@ -392,7 +392,7 @@ auto exo_backtrace(void* stack_addresses[BACKTRACE_MAXADDRESSES], std::size_t st
 //#endif
 
 #if TRACING
-		fprintf(stderr, "Backtrace %d: %p \"%s\"\n", int(frameno), stack_addresses[frameno], strings[frameno]);
+		std::fprintf(stderr, "Backtrace %d: %p \"%s\"\n", int(frameno), stack_addresses[frameno], strings[frameno]);
 		// Backtrace 0: 0x7f9d247cf9fd
 		// "/usr/local/lib/libexodus.so.19.01(_ZN6exodus9backtraceEv+0x62) [0x7f9d247cf9fd]"
 		// Backtrace 5: 0x7f638280e3f6 "/root/lib/libl1.so(+0xa3f6) [0x7f638280e3f6]"
@@ -458,7 +458,7 @@ auto exo_backtrace(void* stack_addresses[BACKTRACE_MAXADDRESSES], std::size_t st
 		//	continue;
 
 //#if TRACING
-//		fprintf(stderr, " %s addr:%s\n", objfilename.c_str(), objaddress.c_str());
+//		std::fprintf(stderr, " %s addr:%s\n", objfilename.c_str(), objaddress.c_str());
 ////		objfilename.errput("objfilename=");
 ////		objaddress.errputl(" objaddress=");
 //#endif
@@ -612,13 +612,13 @@ auto exo_backtrace(void* stack_addresses[BACKTRACE_MAXADDRESSES], std::size_t st
 //service managers like systemd will send a polite SIGTERM signal
 //and wait for say 90 seconds before sending a kill signal
 static void SIGTERM_handler(int) {
-	fprintf(stderr, "=== SIGTERM_handler: Set TERMINATE_req = true ===\n");
+	std::fprintf(stderr, "=== SIGTERM_handler: Set TERMINATE_req = true ===\n");
 	TERMINATE_req = true;
 }
 
 //restart
 static void SIGHUP_handler(int) {
-	fprintf(stderr, "=== SIGHUP_handler: Set RELOAD_req = true ===\n");
+	std::fprintf(stderr, "=== SIGHUP_handler: Set RELOAD_req = true ===\n");
 	RELOAD_req = true;
 }
 
@@ -685,7 +685,7 @@ static void SIGINT_handler(int sig [[maybe_unused]]) {
 //	VarError err("backtrace()");
 
 	// interact on a new line
-//	fprintf(stderr, "SIGINT_handler\n");
+//	std::fprintf(stderr, "SIGINT_handler\n");
 
 	// Break straight into debugger via stack capture
 	var exo_debug;
@@ -693,7 +693,7 @@ static void SIGINT_handler(int sig [[maybe_unused]]) {
             // Attach gdb interactively
             let cmd = "gdb -q -p " ^ var::ospid();
             cmd.logputl();
-            if (system(cmd) == 0) {
+            if (std::system(cmd) == 0) {
                 // gdb use completed.
             } else {
                 // gdb not installed or already attached?
@@ -702,11 +702,11 @@ static void SIGINT_handler(int sig [[maybe_unused]]) {
 
 	while (not exo_debug) {
 
-//		fprintf(stderr, "SIGINT_handler loop\n");
+//		std::fprintf(stderr, "SIGINT_handler loop\n");
 		var cmd = "A";
 
 		if (var().isterminal()) {
-			fprintf(stderr, "Interrupted. (C)ontinue (Q)uit (A)bort (B)acktrace (D)ebug ? ");
+			std::fprintf(stderr, "Interrupted. (C)ontinue (Q)uit (A)bort (B)acktrace (D)ebug ? ");
 			fflush(stderr);
 			if (!cmd.inputn(1))
 				continue;
@@ -717,7 +717,7 @@ static void SIGINT_handler(int sig [[maybe_unused]]) {
 
 		if (cmd1 == "C") {
 
-			fprintf(stderr, "ontinuing ...\n");
+			std::fprintf(stderr, "ontinuing ...\n");
 			fflush(stderr);
 
 			// Continue
@@ -729,14 +729,14 @@ static void SIGINT_handler(int sig [[maybe_unused]]) {
 			// TODO flag to caller(s) to exit
 
 			// var().abort("Aborted. User interrupt");
-			fprintf(stderr, "uitting ...\n");
+			std::fprintf(stderr, "uitting ...\n");
 
 			// Quit
-			exit(1);
+			std::exit(1);
 
 		} else if (cmd1 == "B") {
 
-			fprintf(stderr, "acktracing ...\n");
+			std::fprintf(stderr, "acktracing ...\n");
 			fflush(stderr);			// duplicated in init and B
 
 			// Backtrace
@@ -745,7 +745,7 @@ static void SIGINT_handler(int sig [[maybe_unused]]) {
 
 		} else if (cmd1 == "D") {
 
-			fprintf(stderr, "ebugging ... ");
+			std::fprintf(stderr, "ebugging ... ");
 			fflush(stderr);			// duplicated in init and B
 
 			breakon();
@@ -760,18 +760,18 @@ static void SIGINT_handler(int sig [[maybe_unused]]) {
 
 		} else if (cmd1 == "A") {
 
-			fprintf(stderr, "borting ...\n");
+			std::fprintf(stderr, "borting ...\n");
 			fflush(stderr);			// duplicated in init and B
 
 			// Abort using SIGABT
-			// fprintf(stderr,"To continue from here in GDB: \"signal 0\"\n");
+			// std::fprintf(stderr,"To continue from here in GDB: \"signal 0\"\n");
 			raise(SIGABRT);
 			// breakpoint();
 
 		} else {
 
 			// Invalid option - try again.
-			fprintf(stderr, "\n");
+			std::fprintf(stderr, "\n");
 		}
 
 	}
@@ -787,7 +787,7 @@ static void SIGINT_handler(int sig [[maybe_unused]]) {
 	// Stop ignoring this signal
 //	breakon();
 	// faster/safer?
-	fprintf(stderr, "restablish SIGINT_handler\n");
+	std::fprintf(stderr, "restablish SIGINT_handler\n");
 	signal(SIGINT, SIGINT_handler);
 
 }

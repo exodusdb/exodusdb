@@ -436,12 +436,12 @@ class PUBLIC dim final : public std::vector<var> {
 	// `dim d1 = {"d1", "d2", "d3"};
     //  auto [v1, v2, v3] = d1.unpack<3>(); // v1 -> "d1" // v2 -> "d2" // v3 -> "d3"`
 	//
-	template <size_t N>
+	template <std::size_t N>
 	auto unpack/*<N>*/() const& -> std::array<var, N> {
 
 		// MUST use BASE::operator[](index) NOT (*this)[index] because dim::operator[] is 1 based
 		// Unless you use 1 based indexing and dont care about being validate by dim::operator[] all the time.
-		auto result = [this]<size_t... Is>(std::index_sequence<Is...>) {
+		auto result = [this]<std::size_t... Is>(std::index_sequence<Is...>) {
 			return std::array<var, N> {
 				// If N > size of dim then create unassigned vars
 				(Is < base::size() ? base::operator[](Is) : var())...
@@ -452,9 +452,9 @@ class PUBLIC dim final : public std::vector<var> {
 
     // Unpack rvalue version: Move strings (MyVec&&)
 
-	template <size_t N>
+	template <std::size_t N>
 	auto unpack/*<N>*/() && -> std::array<var, N> {
-		auto fill_array = [this]<size_t... Is>(std::index_sequence<Is...>) {
+		auto fill_array = [this]<std::size_t... Is>(std::index_sequence<Is...>) {
 			return std::array<var, N>{
 				// If N > size of dim then create unassigned vars
 				(Is < base::size() ? std::move(base::operator[](Is)) : std::move(var()))...

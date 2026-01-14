@@ -124,7 +124,7 @@ public:
 
 	// Start a new batch of jobs.
 	// Calls shutdown_run() first.
-	static auto reset_run(size_t num_threads) -> void;
+	static auto reset_run(std::size_t num_threads) -> void;
 
 /*nodoc*/	auto result_queue() -> std::shared_ptr<ResultQueue>;
 

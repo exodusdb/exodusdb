@@ -45,7 +45,7 @@ class ThreadPool {
 public:
 	// Constructs a thread pool with an initial maximum number of workers.
 	// @param max_threads The initial number of workers to allow.
-	ThreadPool(size_t max_threads);
+	ThreadPool(std::size_t max_threads);
 
 	// Destroys the thread pool, stopping all workers and joining their threads.
 	~ThreadPool();
@@ -57,14 +57,14 @@ public:
 	// @param task The task (function) to execute.
 	void enqueue(std::function<void()> task);
 
-	size_t get_total_tasks_enqueued() const;
-	size_t decrement_total_tasks_enqueued() const;
+	std::size_t get_total_tasks_enqueued() const;
+	std::size_t decrement_total_tasks_enqueued() const;
 
 	// Sets the desired number of live workers, increasing or decreasing the pool.
 	// Workers with IDs >= max_worker_id exit when idle to reduce the pool size.
 	// Setting max_threads to 0 stops all workers.
 	// @param max_threads The desired number of live workers.
-	auto set_max_threads(size_t max_threads) -> void;
+	auto set_max_threads(std::size_t max_threads) -> void;
 	auto get_max_threads() -> std::size_t;
 	auto get_num_cores()   -> std::size_t;
 
@@ -72,15 +72,15 @@ public:
 	void shutdown();
 
 	// Reset in place
-	static void reset(ThreadPool* ptr, size_t num_threads);
+	static void reset(ThreadPool* ptr, std::size_t num_threads);
 
 private:
 
-	std::unique_ptr<std::atomic<size_t>> total_tasks_enqueued;
+	std::unique_ptr<std::atomic<std::size_t>> total_tasks_enqueued;
 
 	// Maximum worker ID threshold. Workers with worker_id >= max_worker_id exit when idle.
 	// Adjusted by set_max_threads to control the number of live workers.
-	std::unique_ptr<std::atomic<size_t>> max_worker_id_;
+	std::unique_ptr<std::atomic<std::size_t>> max_worker_id_;
 
 	// Count of live workers (running, either executing tasks or idle).
 	// Incremented when a worker is created, decremented when a worker exits.
@@ -88,11 +88,11 @@ private:
 	// tracks currently running workers, while workers.size() is the total number of worker
 	// threads ever created, including dead (exited) ones that remain in workers until
 	// destruction.
-	std::unique_ptr<std::atomic<size_t>> live_worker_count;
+	std::unique_ptr<std::atomic<std::size_t>> live_worker_count;
 
 	// Count of workers currently executing tasks (running tasks).
 	// Incremented before a task is executed, decremented after.
-	std::unique_ptr<std::atomic<size_t>> running_task_count;
+	std::unique_ptr<std::atomic<std::size_t>> running_task_count;
 
 	// Queue of tasks awaiting execution by workers.
 	std::unique_ptr<TaskQueue> pending_tasks;

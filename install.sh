@@ -1,6 +1,7 @@
 #!/bin/bash
 [ $SHLVL -le 3 ] && exec > >(tee -a "$(basename `echo ${0/.sh/}.$*.log | sed 's/ /\./g'`)") 2>&1
 set -euxo pipefail
+PS4='+ [${SECONDS}s] '
 :
 : $0 $*
 : ==========================================================
@@ -828,11 +829,11 @@ function test_exodus_and_database {
 :
 	cd $EXODUS_DIR/build && CTEST_OUTPUT_ON_FAILURE=1 CTEST_PARALLEL_LEVEL=$((`nproc`+1)) ctest
 
-:
-: Run the demo program - testsort
-: --------------------
-:
-	testsort
+#:
+#: Run the demo program - testsort
+#: --------------------
+#:
+#	testsort
 :
 : 'Recommended: "su -"'
 : 'or logout/login to get new path/libs from /etc/profile.d/exodus.sh'

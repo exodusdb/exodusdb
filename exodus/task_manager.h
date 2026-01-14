@@ -39,7 +39,7 @@ struct TaskManager_Impl;
 class PUBLIC TaskManager {
 
 	std::unique_ptr<TaskManager_Impl> impl_;
-	size_t async_count_ = 0;
+	std::size_t async_count_ = 0;
 	std::exception_ptr err_ptr;
 
 	void async_impl(std::function<void()> fn);
@@ -187,7 +187,7 @@ public:
 	auto async_count() const -> var {return async_count_;}
 
 //    // Calls shutdown, dtor, ctor. Useful to start a new batch of jobs followed by async collection of all async_results.
-//    static auto reset_async(size_t num_threads) -> void;
+//    static auto reset_async(std::size_t num_threads) -> void;
 //
 };
 

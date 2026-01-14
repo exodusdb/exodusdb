@@ -51,13 +51,13 @@ func main() {
 }
 
 // Simpler, slower algorithm: Split s2 by commas and check each token
-auto simpleFindSubstring(const std::string& s1, const std::string& s2, bool indexed) -> size_t {
+auto simpleFindSubstring(const std::string& s1, const std::string& s2, bool indexed) -> std::size_t {
 	if (s1.empty() || s2.empty()) return false;
 
 	std::stringstream ss(s2);
 	std::string token;
-	size_t tokenn = 0;
-	size_t index1 = 1;
+	std::size_t tokenn = 0;
+	std::size_t index1 = 1;
 	while (std::getline(ss, token, ',')) {
 		tokenn++;
 		if (token == s1) {
@@ -89,7 +89,7 @@ std::string generateRandomString(std::mt19937& rng, int minLen, int maxLen, bool
 }
 
 // Fuzz testing function
-void fuzzTest(size_t numTests, unsigned int seed, bool indexed) {
+void fuzzTest(std::size_t numTests, unsigned int seed, bool indexed) {
 	std::mt19937 rng(seed);
 	int failures = 0;
 	int foundCases = 0; // Counter for found cases
@@ -114,7 +114,7 @@ void fuzzTest(size_t numTests, unsigned int seed, bool indexed) {
 	std::cout << (indexed ? "Indexed" : "Counted") << std::endl;
 
 	std::cout << "Testing " << edgeCases.size() << " edge cases...\n";
-	for (size_t i = 0; i < edgeCases.size(); ++i) {
+	for (std::size_t i = 0; i < edgeCases.size(); ++i) {
 		const auto& [s1, s2] = edgeCases[i];
 		auto resultSlow = simpleFindSubstring(s1, s2, indexed);
 #ifdef RAWCPP
@@ -140,7 +140,7 @@ void fuzzTest(size_t numTests, unsigned int seed, bool indexed) {
 
 	auto start = std::chrono::high_resolution_clock::now();
 
-	for (size_t i = 0; i < numTests; ++i) {
+	for (std::size_t i = 0; i < numTests; ++i) {
 		// Generate random strings (1-10 chars)
 		std::string s1 = generateRandomString(rng, 1, 10, false); // s1: no commas
 		std::string s2 = generateRandomString(rng, 1, 10, true);  // s2: allow commas
@@ -179,7 +179,7 @@ void fuzzTest(size_t numTests, unsigned int seed, bool indexed) {
 	std::cout << "\nFuzz testing complete!\n";
 	std::cout << "Random seed: " << random_seed << "\n";
 	std::cout << (indexed ? "Indexed" : "Counted") << std::endl;
-	std::cout << "Total tests: " << size_t(numTests) + edgeCases.size() << " (including " << edgeCases.size() << std::endl;
+	std::cout << "Total tests: " << std::size_t(numTests) + edgeCases.size() << " (including " << edgeCases.size() << std::endl;
 	std::cout << "Found cases: " << foundCases << "\n";
 	std::cout << "Failures: " << failures << "\n";
 	std::cout << "Time taken: " << duration.count() << " seconds\n";

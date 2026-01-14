@@ -251,7 +251,7 @@ function main() {
 						if (ch eq ")") {
 							if (level eq 0) {
 								//funcargsdecl.firster(charn - 1);
-								funcargsdecl.firster(static_cast<size_t>(charn - 1));
+								funcargsdecl.firster(static_cast<std::size_t>(charn - 1));
 								break;
 							}
 							--level;

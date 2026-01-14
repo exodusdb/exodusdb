@@ -1723,7 +1723,7 @@ var h2m_convert_to_man(const std::vector<std::string>& tokens, out exit_status) 
         {"</table>",        "\n.TE\n"}          // End table
     };
 
-    for (size_t i = 0; i < tokens.size(); ++i) {  // Process each token
+    for (std::size_t i = 0; i < tokens.size(); ++i) {  // Process each token
         std::string token = tokens[i];
 
         if (token[0] == '<') {
@@ -1818,7 +1818,7 @@ var h2m_convert_to_man(const std::vector<std::string>& tokens, out exit_status) 
 			// Unescape the critical html codes
 
 		    // Step 1: Replace < with <
-		    size_t pos = 0;
+		    std::size_t pos = 0;
 		    while ((pos = token.find("&lt;", pos)) != std::string::npos) {
 		        token.replace(pos, 4, "<");
 		        pos += 1; // Move past <
@@ -1839,7 +1839,7 @@ var h2m_convert_to_man(const std::vector<std::string>& tokens, out exit_status) 
 		    }
 
             // Skip whitespace-only tokens (Fix 2)
-            size_t j0 = token.find_first_not_of(" \t\n");
+            std::size_t j0 = token.find_first_not_of(" \t\n");
             if (j0 == std::string::npos)
                 continue;
 
@@ -1853,7 +1853,7 @@ var h2m_convert_to_man(const std::vector<std::string>& tokens, out exit_status) 
             std::string escaped;
 			// Allow "\xff\x00" in code
 //            if (!in_code) {  // Escape troff special chars outside code blocks
-                for (size_t j = j0; j < token.length(); ++j) {  // Index-based loop for compatibility
+                for (std::size_t j = j0; j < token.length(); ++j) {  // Index-based loop for compatibility
                     char c = token[j];
                     if (c == '.' && escaped.empty()) escaped += "\\&.";  // Escape leading dot
                     else if (c == '\\') escaped += "\\\\";              // Escape backslash
@@ -1870,7 +1870,7 @@ var h2m_convert_to_man(const std::vector<std::string>& tokens, out exit_status) 
     }
 
     // Output footnotes for <a href> links
-    for (size_t i = 0; i < footnotes.size(); ++i) {
+    for (std::size_t i = 0; i < footnotes.size(); ++i) {
         ss_out << "\n.br\n\\(dg " << i + 1 << ". " << footnotes[i] << "\n";
     }
 
@@ -1950,10 +1950,10 @@ public:
     HTMLTagValidator() {}
 
     bool process(const std::string& html) {
-        size_t pos = 0;
+        std::size_t pos = 0;
         while (pos < html.length()) {
             if (html[pos] == '<') {
-                size_t end = html.find('>', pos);
+                std::size_t end = html.find('>', pos);
                 if (end == std::string::npos) return false;
 
                 std::string tagContent = html.substr(pos + 1, end - pos - 1);
@@ -1961,7 +1961,7 @@ public:
 
                 if (isCommentOrSpecial(tagContent)) {
                     if (tagContent.substr(0, 3) == "!--") {
-                        size_t commentEnd = html.find("-->", pos);
+                        std::size_t commentEnd = html.find("-->", pos);
                         if (commentEnd == std::string::npos) return false;
                         pos = commentEnd + 3;
                     } else {
@@ -1982,7 +1982,7 @@ public:
                     if (tags.empty() || tags.top() != tagName) return false;
                     tags.pop();
                 } else {
-                    size_t spacePos = tagContent.find(' ');
+                    std::size_t spacePos = tagContent.find(' ');
                     std::string tagName = (spacePos == std::string::npos) ? tagContent : tagContent.substr(0, spacePos);
                     bool hasSlash = tagContent.back() == '/' && (spacePos == std::string::npos || spacePos == tagContent.length() - 1);
                     if (hasSlash && spacePos == std::string::npos) tagName = tagName.substr(0, tagName.length() - 1);
@@ -2022,7 +2022,7 @@ int h2m_selftest_validator() {
     };
 
     int passed = 0;
-    for (size_t i = 0; i < test_cases.size(); ++i) {
+    for (std::size_t i = 0; i < test_cases.size(); ++i) {
 
 //        const auto& [html, expected_status] = test_cases[i];
 		auto case1 = test_cases[i];
@@ -2046,7 +2046,7 @@ int h2m_selftest_validator() {
 
     std::clog << "Test passed. " << passed << " out of " << test_cases.size() << " tests.\n";
 
-    return (static_cast<size_t>(passed) == test_cases.size()) ? 0 : 1;
+    return (static_cast<std::size_t>(passed) == test_cases.size()) ? 0 : 1;
 }
 
 
@@ -2068,12 +2068,12 @@ int h2m_selftest_validator() {
 std::vector<std::string> h2m_parser(const std::string& all_input, out exit_status) {
     std::vector<std::string> tokens;
     std::string line;
-    size_t input_pos = 0;
+    std::size_t input_pos = 0;
 
     // Process input line-by-line
     while (input_pos < all_input.length()) {
         // Extract one line (up to and including \n)
-        size_t line_end = all_input.find('\n', input_pos);
+        std::size_t line_end = all_input.find('\n', input_pos);
         if (line_end == std::string::npos) {
             line = all_input.substr(input_pos);
             input_pos = all_input.length();
@@ -2082,10 +2082,10 @@ std::vector<std::string> h2m_parser(const std::string& all_input, out exit_statu
             input_pos = line_end + 1;
         }
 
-        size_t pos = 0;
+        std::size_t pos = 0;
         while (pos < line.length()) {
             if (line[pos] == '<') {  // Start of a tag
-                size_t end = line.find('>', pos);
+                std::size_t end = line.find('>', pos);
                 if (end == std::string::npos) {
                     std::cerr << "h2ml::parser ERROR: Unterminated tag (no '>') in line: " << line << "\n";
                     exit_status = 1;
@@ -2096,7 +2096,7 @@ std::vector<std::string> h2m_parser(const std::string& all_input, out exit_statu
                 tokens.push_back(tag);
                 pos = end + 1;
             } else {  // Plain text between tags
-                size_t next_tag = line.find('<', pos);
+                std::size_t next_tag = line.find('<', pos);
                 if (next_tag == std::string::npos) next_tag = line.length();
                 std::string text = line.substr(pos, next_tag - pos);
                 if (!text.empty()) {
@@ -2225,7 +2225,7 @@ int html_tidy_main2(const std::string& input, std::string& output, std::stringst
 
     // Initialize output string with reserved capacity (1.1x input size)
 //    std::string output;
-    output.reserve(static_cast<size_t>(double(input.size()) * 1.1));
+    output.reserve(static_cast<std::size_t>(double(input.size()) * 1.1));
 
     int indent_level = -1; // Current indentation level (start at -1 so <body> is 0)
     int excessive_undent = 0; // Count attempts to undent below 0
@@ -2233,7 +2233,7 @@ int html_tidy_main2(const std::string& input, std::string& output, std::stringst
     const char indent_unit = '\t'; // Tab character
 
     // Find <body> or <BODY> position
-    size_t body_pos = input.find("<body");
+    std::size_t body_pos = input.find("<body");
     if (body_pos == std::string::npos) {
         body_pos = input.find("<BODY");
         if (body_pos == std::string::npos) {
@@ -2248,7 +2248,7 @@ int html_tidy_main2(const std::string& input, std::string& output, std::stringst
     output.append(input_view.substr(0, body_pos));
 
     // Count lines in pre-<body> content
-    for (size_t i = 0; i < body_pos && input_cstr[i] != '\0'; ++i) {
+    for (std::size_t i = 0; i < body_pos && input_cstr[i] != '\0'; ++i) {
         if (input_cstr[i] == '\n') {
             ++line_number;
         }

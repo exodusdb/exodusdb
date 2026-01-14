@@ -1,5 +1,9 @@
-#include <stdio.h>
-#include <string.h>
+//#if EXO_MODULE
+//	import std;
+//#else
+//#	include <cstdio>
+//#	include <cstring>
+//#endif
 
 #ifndef FM
 #define FM_ '\x1E'

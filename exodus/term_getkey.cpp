@@ -2,7 +2,7 @@
 //#if EXO_MODULE
 //	import std;
 //#endif
-#include <stdio.h>		 //fileno(), stdin
+#include <cstdio>		 //fileno(), stdin
 #include <unistd.h>		 //read()
 #include <fcntl.h>		 //fcntl()
 #include <sys/select.h>	 //select()

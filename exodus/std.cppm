@@ -1,16 +1,18 @@
 module;
 
-//#include <unistd.h>
 #include "std-gmf.hpp"
-
 #include "allstd.hpp"
 
 export module std;
 
 // Export POSIX functions into the global namespace
-export using ::size_t;
-export using ::getpid;
-export using ::isatty;
+//export using ::size_t;
+//export using ::getpid;
+//export using ::isatty;
+export using ::stdin;
+export using ::stdout;
+export using ::stderr;
+export using ::fflush;
 
 export namespace __gnu_cxx {
 
@@ -32,6 +34,7 @@ export namespace __gnu_cxx {
 
 export namespace std {
 
+	using std::system;
 	using std::count;
 
 	using std::raise;
@@ -140,6 +143,7 @@ export namespace std {
 	using std::stop_token;
 	using std::make_exception_ptr;
 	using std::conditional;
+	using std::conditional_t;
 	using std::condition_variable;
 	using std::queue;
 	using std::unique_lock;
@@ -303,6 +307,7 @@ export namespace std {
 	using std::is_signed;
 	using std::is_unsigned;
 	using std::is_same;
+	using std::same_as;
 
 	using std::mutex;
 	using std::lock_guard;
@@ -342,6 +347,7 @@ export namespace std {
 	using std::ofstream;
 	using std::istream;
 	using std::ostream;
+	using std::streamsize;
 
 	using std::istringstream;
 	using std::ostringstream;
@@ -725,6 +731,11 @@ export namespace std {
 
 #if EXO_FORMAT == 1
 	using std::format;
+	using std::vformat;
+//	using std::print; // causes ambiguity with exodus' print
+	using std::make_format_args;
+	using std::formatter;
+	using std::format_error;
 #endif
 
 	// <cctype>
@@ -734,6 +745,7 @@ export namespace std {
 	//	using std::isalpha;
 	//	using std::toupper;
 	//	using std::tolower;
+	//	using std::isspace;
 }
 
 export namespace std {

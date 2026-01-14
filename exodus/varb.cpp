@@ -186,7 +186,7 @@ RETVAR VB1::dump() const {
 	var nrvo = "var:";
 
 	// Append the var's address
-	const var var_addr = int64_t(static_cast<const void*>(this));
+	const var var_addr = std::int64_t(static_cast<const void*>(this));
 	nrvo ^= "0x" ^ var_addr.oconv("MX").lcase();
 
 	// Append the var typ as a single int.
@@ -217,9 +217,9 @@ RETVAR VB1::dump() const {
 		// Append the string's address if not within the var e.g. it on the heap. not SSO
 		const char* str_start = var_str.c_str();
 		const char* obj_start = reinterpret_cast<const char*>(&var_str);
-		ptrdiff_t diff = str_start - obj_start;
+		std::ptrdiff_t diff = str_start - obj_start;
 		if (std::abs(diff) > 32) {
-			const var str_addr = int64_t(static_cast<const void*>(var_str.c_str()));
+			const var str_addr = std::int64_t(static_cast<const void*>(var_str.c_str()));
 			nrvo ^= "0x" ^ str_addr.oconv("MX").lcase();
 		}
 
