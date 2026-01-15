@@ -245,28 +245,30 @@ function do_one_stage {
 	#		Avoid push unless it is a local container since pushing thousands of files isnt efficient
 	#		lxc file push ~/exodus ${NEW_C}${TARGET_HOME} --recursive --create-dirs
 :
-:	tar local exodus dir
+:	Copy current exodus dir to $NEW_C/root/exodus
 :
-			TAR_FILENAME=${ALL_TAR_FILENAME:-../lxc_$$_exodus.tar.z}
-			if [[ ! -f $TAR_FILENAME ]]; then
-				tar cfz $TAR_FILENAME ../exodus
-			fi
-			TAR_SIZE=$(ls -lh $TAR_FILENAME|cut -d' ' -f5)
-:
-:	Push the tar file $TAR_SIZE to $NEW_C
-:
-			lxc file push $TAR_FILENAME ${NEW_C}${TARGET_HOME}/$TAR_FILENAME
-:
-:	Remove the tar file if not running under install_lxc_all.sh
-:
-			if [[ ! -n ${ALL_TAR_FILENAME:-} ]]; then
-				rm $TAR_FILENAME -f
-			fi
-:
-:	Untar exodus on the target - $NEW_C
-:
-			lxc exec $NEW_C -- bash -c "tar xfz $TAR_FILENAME"
-:
+#			TAR_FILENAME=${ALL_TAR_FILENAME:-../lxc_$$_exodus.tar.z}
+#			if [[ ! -f $TAR_FILENAME ]]; then
+#				tar cfz $TAR_FILENAME ../exodus
+#			fi
+#			TAR_SIZE=$(ls -lh $TAR_FILENAME|cut -d' ' -f5)
+#:
+#:	Push the tar file $TAR_SIZE to $NEW_C
+#:
+#			lxc file push $TAR_FILENAME ${NEW_C}${TARGET_HOME}/$TAR_FILENAME
+#:
+#:	Remove the tar file if not running under install_lxc_all.sh
+#:
+#			if [[ ! -n ${ALL_TAR_FILENAME:-} ]]; then
+#				rm $TAR_FILENAME -f
+#			fi
+#:
+#:	Untar exodus on the target - $NEW_C
+#:
+#			lxc exec $NEW_C -- bash -c "tar xfz $TAR_FILENAME"
+#:
+		lxc exec ${NEW_C} -- mkdir -p /root/exodus
+		tar cf - . | lxc exec ${NEW_C} -- tar xf - -C /root/exodus
 
 #		fi #not USE_SSH
 
