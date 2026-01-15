@@ -230,11 +230,27 @@ func main() {
 	TRACE(__GNUG__)
 #endif
 //#if EXO_FORMAT == 1 and ( __clang_major__ > 20 or __GNUG__ >= 15 )
-#if EXO_FORMAT == 1 and ( __clang_major__ >= 20 or __GNUG__ >= 15 )
-
+//#if EXO_FORMAT == 1 and ( __clang_major__ >= 20 or __GNUG__ >= 15 )
+#ifdef _LIBCPP_VERSION
+	TRACE(_LIBCPP_VERSION)
+#endif
+#ifdef __GLIBCXX__
+	TRACE(__GLIBCXX__)
+#endif
+#if EXO_FORMAT == 1 && \
+    ( \
+      defined(_LIBCPP_VERSION) && _LIBCPP_VERSION >= 15000 /* LLVM 15+ ≈ 2022: solid grapheme + emoji width support */ \
+      || \
+      defined(__GLIBCXX__) && __GLIBCXX__ >= 20250101 /* GCC 14+ Unicode tables landed late 2023 / early 2024 */ \
+      || \
+      __GNUC__ >= 15 /* Fallback for libstdc++ when date macro isn't reliable */ \
+    )
+#define EXO_MULTICOL_OK
 	// Cat = four bytes but takes up "2" positions in formatting
 	println("'{:.^5s}'", var("🐱"));
 	assert(format("{:.^5s}", var("🐱")) == ".🐱..");
+
+	var multicol_ok = true;
 
 //g++ 11 in Ubuntu 22.04 has format but a bug in width of unicode characters
 //#if EXO_FORMAT == 1
@@ -323,7 +339,8 @@ func main() {
 		// must convert to string - see next block
 
 		// https://en.cppreference.com/w/cpp/utility/format/spec
-#if EXO_FORMAT == 1 && ( __clang_major__ >= 20 or __GNUG__ >= 15 )
+//#if EXO_FORMAT == 1 && ( __clang_major__ >= 20 or __GNUG__ >= 15 )
+#if EXO_FORMAT == 1 && defined(EXO_MULTICOL_OK)
 
 		// cat face in utf8 = F0 9F 90 B1
 		assert(format("{:.^5s}",   "🐱").squote().outputl()         == "'.🐱..'");

@@ -74,10 +74,15 @@
 # Modules option -DEXO_MODULE=ON/OFF or enabled by default for clang >= 18
 # ##############
 #
-	if (${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" AND ${CMAKE_CXX_COMPILER_VERSION} VERSION_GREATER_EQUAL 18.0)
-		option(EXO_MODULE "Build as c++ modules if clang >= 18" ON) # Enabled clang >= 18
+	cmake_host_system_information(RESULT DISTRO_VERSION_ID  QUERY DISTRIB_VERSION_ID)
+
+	if (${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang"
+		AND ${CMAKE_CXX_COMPILER_VERSION} VERSION_GREATER_EQUAL 18.0
+        AND DISTRO_VERSION_ID VERSION_GREATER_EQUAL "24.04"
+	)
+		option(EXO_MODULE "Build as c++ modules on 24.04+ if clang >= 18" ON) # Enabled clang >= 18
 #	else()
-		option(EXO_MODULE "Build as c++ modules if not clang >= 18" OFF) # Disabled by default
+		option(EXO_MODULE "Build as c++ modules on 24.04+ if not clang >= 18" OFF) # Disabled by default
 	endif()
 	message("-- EXO_MODULE is ${EXO_MODULE}")
 

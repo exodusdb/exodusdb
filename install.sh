@@ -112,13 +112,17 @@ PS4='+ [${SECONDS}s] '
 		COMPILER=clang-19
 	fi
 :
-: Remove the compiler phrase -latest since we treat enpty as meaning -latest
+: Remove the compiler phrase -latest since we treat empty as meaning -latest
 :
 	COMPILER=${COMPILER/-latest/}
 	COMPILER_OR_DEFAULT=${COMPILER/-default/}
 :
 	CMAKE_BUILD_OPTIONS=-GNinja
-	BUILD_DEPS="ninja-build ${COMPILER_OR_DEFAULT/clang/clang-tools} libfmt-dev libreadline-dev"
+	BUILD_DEPS="ninja-build libfmt-dev libreadline-dev"
+#    if [[ $COMPILER =~ ^clang ]]; then
+#		BUILD_DEPS="$BUILD_DEPS ${COMPILER_OR_DEFAULT/clang/clang-tools}"
+#	fi
+
 :
 : Validate
 : --------
@@ -157,7 +161,7 @@ PS4='+ [${SECONDS}s] '
 : Function to retry three times in case of timeout
 : ------------------------------------------------
 :
-function APT_RETRY {
+function CMD_RETRY {
 :
 	for N in 1 2 3; do
 :
@@ -178,7 +182,7 @@ function APT_RETRY {
 :
 function APT_INSTALL {
 :
-	APT_RETRY sudo apt-get install -y $*
+	CMD_RETRY sudo apt-get install -y $*
 :
 : Verify all packages are installed
 :
@@ -337,7 +341,7 @@ function get_dependencies_for_build_and_install {
 : Update apt
 : ----------
 :
-	APT_RETRY sudo apt-get -y update
+	CMD_RETRY sudo apt-get -y update
 
 :
 : Download Postgresql dev and client package
@@ -349,7 +353,7 @@ function get_dependencies_for_build_and_install {
 	#Specified PG_VER for postgresql-server-dev-NN installed later in this stage
 	# 1/49 Test  #1: pgexodus_test ....................***Failed    0.08 sec
 	#  grep: /etc/postgresql/16/main/postgresql.conf: No such file or directory
-	APT_RETRY sudo apt-get remove -y 'postgresql-server-dev-all' && APT_RETRY sudo apt-get -y autoremove || true
+	CMD_RETRY sudo apt-get remove -y 'postgresql-server-dev-all' && CMD_RETRY sudo apt-get -y autoremove || true
 	APT_INSTALL postgresql-common
 
 :
@@ -394,14 +398,15 @@ function get_dependencies_for_build_and_install {
 :
 : Repeated in Build stage
 :
-	APT_INSTALL cmake $BUILD_DEPS
+	CMD_RETRY sudo snap install cmake --classic
+	APT_INSTALL $BUILD_DEPS
 
 :
 : Determine actual compiler version if min/default requested
 : ------------------------------------------------------
 :
 	COMPILER_VERSION=`echo $COMPILER | cut -d'-' -f2`
-	if [[ $COMPILER_VERSION != default ]]; then
+	if ! [[ $COMPILER_VERSION == "default" || $COMPILER_VERSION =~ ^-?[0-9]+$ ]]; then
 		COMPILER_NAME=`echo $COMPILER|cut -d'-' -f1`
 		if [[ $COMPILER_VERSION = min ]]; then
 			HEAD_OR_TAIL=head
@@ -410,6 +415,23 @@ function get_dependencies_for_build_and_install {
 		fi
 		COMPILER_VERSION=`apt search $COMPILER_NAME |& grep "$COMPILER_NAME-[0-9][0-9.]*" -o | grep '[0-9]*' -o|sort -n|uniq|$HEAD_OR_TAIL -n1`
 		COMPILER=$COMPILER_NAME-$COMPILER_VERSION
+	fi
+
+:
+: Download clang llvm if clang
+: ----------------------------
+:
+	if [[ $COMPILER =~ ^clang ]]; then
+:
+: 'llvm.sh registers and installs a single presumably stable version, (current default is 20 - 1:20.1.8) regardless of OS.'
+: 'if the llvm version is <= the existing ubuntu version then apt prefers the ubuntu version for installion.'
+: 'Available clang versions currently are 14-21 (with 22 a development version)'
+:
+#	CLANG_MAJOR=22
+		CLANG_MAJOR=$COMPILER_VERSION
+		CMD_RETRY sudo wget https://apt.llvm.org/llvm.sh
+		chmod +x llvm.sh
+		CMD_RETRY sudo ./llvm.sh $CLANG_MAJOR
 	fi
 
 :
@@ -462,19 +484,19 @@ function get_dependencies_for_build_and_install {
 	CLANG_VERSION=`c++ --version | head -n1|cut -d'.' -f 1|grep -Po '\d+'`
 	APT_INSTALL clang-tools-$CLANG_VERSION
 
-:
-: Prevent clang from using later versions of gcc tool chains which are troublesome
-: Force clang to use same version of the gcc tool chain as gcc
-: See initial info on libstdc++ in install log - Build stage, above and below.
-:
-		GCC_VERSION=$(gcc -v|&grep gcc\ version|cut -d' ' -f3|cut -d'.' -f1)
-		GCC_FAKE_VERSION=99
-		sudo ln -snf /usr/lib/gcc/x86_64-linux-gnu/$GCC_VERSION /usr/lib/gcc/x86_64-linux-gnu/$GCC_FAKE_VERSION
-		sudo ln -snf /usr/include/x86_64-linux-gnu/c++/$GCC_VERSION /usr/include/x86_64-linux-gnu/c++/$GCC_FAKE_VERSION
-		sudo ln -snf /usr/include/c++/$GCC_VERSION /usr/include/c++/$GCC_FAKE_VERSION
-#		sudo rm /usr/lib/gcc/x86_64-linux-gnu/$GCC_FAKE_VERSION -f
-#		sudo rm /usr/include/x86_64-linux-gnu/c++/$GCC_FAKE_VERSION -f
-#		sudo rm /usr/include/c++/$GCC_FAKE_VERSION -f
+#:
+#: Prevent clang from using later versions of gcc tool chains which are troublesome
+#: Force clang to use same version of the gcc tool chain as gcc
+#: See initial info on libstdc++ in install log - Build stage, above and below.
+#:
+#		GCC_VERSION=$(gcc -v|&grep gcc\ version|cut -d' ' -f3|cut -d'.' -f1)
+#		GCC_FAKE_VERSION=99
+#		sudo ln -snf /usr/lib/gcc/x86_64-linux-gnu/$GCC_VERSION /usr/lib/gcc/x86_64-linux-gnu/$GCC_FAKE_VERSION
+#		sudo ln -snf /usr/include/x86_64-linux-gnu/c++/$GCC_VERSION /usr/include/x86_64-linux-gnu/c++/$GCC_FAKE_VERSION
+#		sudo ln -snf /usr/include/c++/$GCC_VERSION /usr/include/c++/$GCC_FAKE_VERSION
+##		sudo rm /usr/lib/gcc/x86_64-linux-gnu/$GCC_FAKE_VERSION -f
+##		sudo rm /usr/include/x86_64-linux-gnu/c++/$GCC_FAKE_VERSION -f
+##		sudo rm /usr/include/c++/$GCC_FAKE_VERSION -f
 
 	fi
 
@@ -557,7 +579,8 @@ function build_only {
 :
 : Repeated from Build stage
 :
-	APT_INSTALL cmake $BUILD_DEPS
+	CMD_RETRY sudo snap refresh cmake
+	APT_INSTALL $BUILD_DEPS
 
 :
 : Patch /usr/include/c++/*/ostream
@@ -816,7 +839,7 @@ function test_exodus_and_database {
 : used in testing_var.h.cpp
 : -----------------------------------------------------------------
 :
-	testsort
+	testsort > /dev/null
 
 :
 : Many tests using ctest - In parallel. Output only on error
@@ -828,12 +851,12 @@ function test_exodus_and_database {
 : This test is run in the exodus/build
 :
 	cd $EXODUS_DIR/build && CTEST_OUTPUT_ON_FAILURE=1 CTEST_PARALLEL_LEVEL=$((`nproc`+1)) ctest
-
-#:
-#: Run the demo program - testsort
-#: --------------------
-#:
-#	testsort
+	sleep 1
+:
+: Run the demo program - testsort
+: --------------------
+:
+	testsort
 :
 : 'Recommended: "su -"'
 : 'or logout/login to get new path/libs from /etc/profile.d/exodus.sh'
