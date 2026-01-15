@@ -2,7 +2,7 @@
 #ifndef EXO_JOB_H
 #define EXO_JOB_H
 
-#ifdef EXO_MODULE
+#if EXO_MODULE
 	import std;
 #else
 	#include <future>

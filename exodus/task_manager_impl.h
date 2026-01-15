@@ -1,7 +1,7 @@
 #ifndef EXO_TASK_MANAGER_IMPL_H
 #define EXO_TASK_MANAGER_IMPL_H
 
-#ifdef EXO_MODULE
+#if EXO_MODULE
 	import std;
 	import var;
 #else
