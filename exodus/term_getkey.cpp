@@ -1,8 +1,4 @@
 // https://stackoverflow.com/questions/14322430/how-to-do-console-input-like-in-the-top-linux-command
-//#if EXO_MODULE
-//	import std;
-//#endif
-#include <cstdio>		 //fileno(), stdin
 #include <unistd.h>		 //read()
 #include <fcntl.h>		 //fcntl()
 #include <sys/select.h>	 //select()
@@ -10,6 +6,13 @@
 //#include <sys/ioctl.h>
 //#include <sys/time.h>
 //#include <sys/types.h>
+
+#if EXO_MODULE > 1
+	import std;
+#else
+#	include <cstdio>		 //fileno(), stdin
+#endif
+#include <stdio.h> // file()
 
 //------------------------------------------------------------------------------
 // term_getkey() returns the next char in the stdin buffer if available, otherwise

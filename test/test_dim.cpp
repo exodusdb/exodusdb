@@ -1,12 +1,12 @@
 #undef NDEBUG  //because we are using assert to check actual operations that cannot be skipped in release mode testing
 #include <cassert>
 
-#if EXO_MODULE
-	import std;
+#if EXO_MODULE > 1
 //#	include <vector>
 #else
 #	include <map>
 #	include <algorithm>
+#	include <vector>	// erase_if
 #endif
 
 #include <exodus/program.h>
@@ -19,7 +19,7 @@ programinit()
 	// Compiles but initializes to 0
 	//
 	dim ww{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-dim registerx{0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+	dim registerx{0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 //
 // Solution is to use default constructor and dimension in a default constructor of this common array
 //

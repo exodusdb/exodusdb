@@ -25,7 +25,7 @@ THE SOFTWARE.
 #if EXO_MODULE
 	import var;
 #else
-#	include <cstdlib> //for atexit()
+//#	include <cstdlib> //for atexit()
 #	include <exodus/var.h>
 #	include <exodus/dim.h>
 #	include <exodus/rex.h>

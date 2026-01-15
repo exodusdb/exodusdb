@@ -1,7 +1,7 @@
 #ifndef TASK_SCHEDULER_H
 #define TASK_SCHEDULER_H
 
-#if EXO_MODULE
+#if EXO_MODULE > 1
 	import std;
 #else
 #	include <chrono>

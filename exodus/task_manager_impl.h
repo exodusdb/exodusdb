@@ -1,9 +1,9 @@
 #ifndef EXO_TASK_MANAGER_IMPL_H
 #define EXO_TASK_MANAGER_IMPL_H
 
-#if EXO_MODULE
+#if EXO_MODULE > 1
 	import std;
-	import var;
+//	import var;
 #else
 #	include <vector>
 #	include <mutex>

@@ -1,7 +1,8 @@
 //
 // Copyright (c) 2010 steve.bush@neosys.com
 //
-#if EXO_MODULE
+#if EXO_MODULE > 1
+	import std;
 #else
 #	include <cstring>
 //#	include <algorithm>

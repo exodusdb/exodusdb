@@ -1,4 +1,5 @@
-#ifndef EXO_MODULE // exclude the whole thing since we have generator in our std module
+#if EXO_MODULE > 1 // exclude the whole thing since we have generator in our std module
+#else
 
 //#include <version>
 //#ifndef __cpp_lib_generator // 202207L

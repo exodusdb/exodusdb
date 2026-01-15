@@ -1,16 +1,14 @@
 #ifndef TASK_MANAGER_HPP
 #define TASK_MANAGER_HPP
 
-#if EXO_MODULE
+#if EXO_MODULE > 1
 	import std;
-	import var;
 #	define EXO_GENERATOR
-//#	include <exodus/result_range.h>
 #else
 #	include <utility>
-#   include <functional>
-#   include <memory>
-#   include <tuple>
+#	include <functional>
+#	include <memory>
+#	include <tuple>
 #	include <exception>
 //#	include <version>
 //#	ifdef __cpp_lib_generator // 202207L
@@ -20,7 +18,11 @@
 #	else
 #		include <exodus/result_range.h>
 #	endif
+#endif
 
+#if EXO_MODULE
+	import var;
+#else
 #	include <exodus/var.h>
 #endif
 

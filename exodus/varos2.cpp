@@ -21,7 +21,7 @@ THE SOFTWARE.
 */
 
 #include <unistd.h> //for getpid/gettid
-#if EXO_MODULE
+#if EXO_MODULE > 1
 	import std;
 #else
 #	include <thread> //for sleep

@@ -26,7 +26,7 @@ THE SOFTWARE.
 
 // clang-format off
 
-#if EXO_MODULE
+#if EXO_MODULE > 1
 	import std;
 #else
 #	include <fstream>

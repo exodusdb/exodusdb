@@ -10,7 +10,7 @@
 	message("---------------------")
 
 #
-# BOOST FIBER OPTION -DEXO_MODULE=ON/OFF or enabled by default
+# BOOST FIBER OPTION -DEXO_BOOST_FIBER=ON/OFF or enabled by default
 # ##################
 #
 # Requires: apt install libboost-fiber-dev libboost-context-dev
@@ -246,7 +246,9 @@ execute_process(
 				var.cppm
 	#			dim.cppm
 		)
-		target_link_libraries(exovar std)
+		if (EXO_MODULE EQUAL 2)
+			target_link_libraries(exovar std)
+		endif()
 		if (EXO_FORMAT EQUAL 2)
 			target_link_libraries(exovar fmt)
 		endif()
@@ -273,7 +275,9 @@ execute_process(
 			FILES
 				exoprog.cppm
 		)
-		target_link_libraries(exoprog std)
+		if (EXO_MODULE EQUAL 2)
+			target_link_libraries(exoprog std)
+		endif()
 		target_link_libraries(exoprog exovar)
 		if (EXO_FORMAT EQUAL 2)
 			target_link_libraries(exoprog fmt)
@@ -289,9 +293,6 @@ execute_process(
 ##################
 #
 	add_library(exodus SHARED
-#	)
-#	target_sources(exodus
-#		PUBLIC
 		# Big ones first for efficient parallel compilation
 		exoprog.cpp
 		vardb.cpp varregex.cpp varos.cpp varos2.cpp varstr.cpp

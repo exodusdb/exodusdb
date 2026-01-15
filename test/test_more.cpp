@@ -2,11 +2,11 @@
 #include <cassert>
 
 #if EXO_MODULE
-	import std;
+	import std; // for ""s suffix
 #else
 #	include <functional>
 #	include <limits>
-#	include <string>  //for ""_s suffix
+#	include <string>  //for ""s suffix
 #endif
 
 using namespace std::literals;

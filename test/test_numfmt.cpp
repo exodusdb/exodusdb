@@ -1,11 +1,11 @@
 #undef NDEBUG  //because we are using assert to check actual operations that cannot be skipped in release mode testing
 #include <cassert>
 
-#if EXO_MODULE
-	import std;
-#endif
-
-using namespace std;
+//#if EXO_MODULE
+//	import std;
+//#endif
+//
+//using namespace std;
 
 #include <exodus/program.h>
 programinit()

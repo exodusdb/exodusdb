@@ -2,9 +2,14 @@
 //	import std;
 //#endif
 
+#if EXO_MODULE > 1
+	import std;
+#else
+#	include <cstdio> // for stderr
+#endif
+
 #include <cerrno> // for errno EAGAIN EINTR
 #include <cstdlib> // for EXIT_FAILURE
-#include <cstdio> // for stderr
 
 #include <unistd.h>
 #include <sys/inotify.h>

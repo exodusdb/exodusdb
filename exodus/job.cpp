@@ -1,10 +1,10 @@
 // job.cpp
-#if EXO_MODULE
+#if EXO_MODULE > 1
 	import std;
-	import var;
 #else
 	#include <future>
 	#include <chrono> // For std::chrono types
+	#include <iostream> // for std::cerr
 #endif
 
 #include "exoenv.h"

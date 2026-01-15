@@ -1,4 +1,5 @@
-#ifndef EXO_MODULE
+#if EXO_MODULE > 1
+#else
 #	include <stack>
 #	include <vector> // Actually already comes with dim.h
 #	include <map>    // Actually already comes with ?

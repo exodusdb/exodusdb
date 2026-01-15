@@ -12,7 +12,7 @@
 #ifndef LIBEXODUS_VAROSHANDLE_H_
 #define LIBEXODUS_VAROSHANDLE_H_
 
-#if EXO_MODULE
+#if EXO_MODULE > 1
 	import std;
 #else
 //#	include <cstdlib>

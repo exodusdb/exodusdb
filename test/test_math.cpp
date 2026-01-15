@@ -3,6 +3,7 @@
 
 #if EXO_MODULE
 	import std;
+	using namespace std::literals;
 #else
 #	include <cmath>
 #endif

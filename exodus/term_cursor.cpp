@@ -1,4 +1,9 @@
-#include <iostream>
+#if EXO_MODULE > 1
+	import std;
+#else
+#	include <iostream>
+#endif
+
 #include <cstdio>
 #include <termios.h>
 #include <unistd.h>

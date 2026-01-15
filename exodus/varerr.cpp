@@ -24,7 +24,7 @@ THE SOFTWARE.
 //#include <exodus/var.h>
 //#include <exodus/exoimpl.h>
 
-#if EXO_MODULE
+#if EXO_MODULE > 1
 	import std;
 #else
 #	include <string>
