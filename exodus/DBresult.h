@@ -1,7 +1,7 @@
 #ifndef DBRESULT_H
 #define DBRESULT_H
 
-#if EXO_MODULE
+#if EXO_MODULE > 1
 	import std;
 #else
 #	include <string>

@@ -26,7 +26,7 @@
 
 #if EXO_FORMAT == 1
 
-#if EXO_MODULE
+#if EXO_MODULE > 1
 	import std;
 	namespace fmt = std;
 #else

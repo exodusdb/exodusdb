@@ -1,7 +1,7 @@
 #ifndef EXODUS_EXODEBUG_H
 #define EXODUS_EXODEBUG_H
 
-#if EXO_MODULE
+#if EXO_MODULE > 1
 	import std;
 #else
 #	include <string>

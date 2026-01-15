@@ -7,12 +7,11 @@ export module std;
 
 // Export POSIX functions into the global namespace
 //export using ::size_t;
-//export using ::getpid;
-//export using ::isatty;
 export using ::stdin;
 export using ::stdout;
 export using ::stderr;
 export using ::fflush;
+//export using errno; // Cant export macros from <cerrno>
 
 export namespace __gnu_cxx {
 
@@ -319,8 +318,6 @@ export namespace std {
 	using std::shuffle;
 	using std::reverse;
 	using std::sort;
-	using ::getpid;
-	using std::getpid;
 	using std::list;
 	using std::bitset;
 	using std::codecvt_base;

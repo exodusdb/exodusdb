@@ -1,7 +1,7 @@
 #ifndef VAR_DIM_H
 #define VAR_DIM_H
 
-#if EXO_MODULE
+#if EXO_MODULE > 1
 	import std;
 #else
 #	include <vector>

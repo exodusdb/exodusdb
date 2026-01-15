@@ -1,7 +1,7 @@
 #ifndef VARDBCONN_H_
 #define VARDBCONN_H_
 
-#if EXO_MODULE
+#if EXO_MODULE > 1
 	import std;
 #else
 #	include <string>

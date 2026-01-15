@@ -71,20 +71,29 @@
 	message("")
 
 #
-# Modules option -DEXO_MODULE=ON/OFF or enabled by default for clang >= 18
+# Modules option -DEXO_MODULE=0, 1, 2 and std. enabled by default for clang >= 18
 # ##############
 #
 	cmake_host_system_information(RESULT DISTRO_VERSION_ID  QUERY DISTRIB_VERSION_ID)
-
-	if (${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang"
-		AND ${CMAKE_CXX_COMPILER_VERSION} VERSION_GREATER_EQUAL 18.0
-        AND DISTRO_VERSION_ID VERSION_GREATER_EQUAL "24.04"
-	)
-		option(EXO_MODULE "Build as c++ modules on 24.04+ if clang >= 18" ON) # Enabled clang >= 18
-#	else()
-		option(EXO_MODULE "Build as c++ modules on 24.04+ if not clang >= 18" OFF) # Disabled by default
+	# environment EXO_MODULE=0,1,2
+	if(DEFINED ENV{EXO_MODULE})
+		set(_default_exo_module $ENV{EXO_MODULE})
+	elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang"
+		AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 18.0
+		AND DISTRO_VERSION_ID VERSION_GREATER_EQUAL "24.04")
+		set(_default_exo_module 1)
+	else()
+		set(_default_exo_module 0)
 	endif()
-	message("-- EXO_MODULE is ${EXO_MODULE}")
+	# Make it overridable from command line (-DEXO_MODULE=...) or CMakePresets
+	set(EXO_MODULE "${_default_exo_module}" CACHE STRING "EXO_MODULE is 0 for No, 1 for Yes, 2 for Yes (+Build exodus std module)")
+	set_property(CACHE EXO_MODULE PROPERTY STRINGS 0 1 2)
+
+	# ─ OR ─ apply globally (if really needed)
+	add_compile_definitions(
+		$<$<BOOL:${EXO_MODULE}>:EXO_MODULE=${EXO_MODULE}>
+	)
+	message(STATUS "EXO_MODULE = ${EXO_MODULE}")
 
 	add_compile_definitions(EXO_MODULE_INITIAL_BUILD=1)
 
@@ -92,7 +101,7 @@
 	# See CMP0155 scanning defaults to yes for c++20 files from cmake 3.28 onwards
 	# Why is this required then?
 	if (EXO_MODULE)
-		add_compile_definitions(EXO_MODULE=1)
+#		add_compile_definitions(EXO_MODULE=1)
 		set(CMAKE_CXX_SCAN_FOR_MODULES ON)
 	else()
 #		add_compile_definitions(EXO_MODULE=0)
@@ -228,8 +237,8 @@
 
 # EXO_FORMAT 1 - std::format because it has faster end user compiling when instantiating formatter<var_base>
 
-    set(EXO_FORMAT ${DEFAULT_EXO_FORMAT} CACHE STRING "EXO_FORMAT is 0 for No, 1 for std::format, 2 for libfmt, 3 for build fmt")
-    set_property(CACHE EXO_FORMAT PROPERTY STRINGS 0 1 2 3)
+	set(EXO_FORMAT ${DEFAULT_EXO_FORMAT} CACHE STRING "EXO_FORMAT is 0 for No, 1 for std::format, 2 for libfmt, 3 for build fmt")
+	set_property(CACHE EXO_FORMAT PROPERTY STRINGS 0 1 2 3)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DEXO_FORMAT=${EXO_FORMAT} ")
 
 # EXO_FORMAT 2

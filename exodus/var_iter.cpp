@@ -1,13 +1,12 @@
-
-#if EXO_MODULE
+#if EXO_MODULE > 1
 	import std;
 #else
 #	include <string>
 #endif
 
-#include <exodus/var.h>
-#include <exodus/varb.h>
-#include <exodus/var_iter.h>
+#	include <exodus/var.h>
+#	include <exodus/varb.h>
+#	include <exodus/var_iter.h>
 
 // var_iter class enables c++ range based programming over a dynamic array
 //

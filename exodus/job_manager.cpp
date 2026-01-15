@@ -1,6 +1,6 @@
-#if EXO_MODULE
+#if EXO_MODULE > 1
 	import std;
-	import var;
+//	import var;
 //#	include <memory> // work around bug in std module that disallows "using std::make_shared;"
 #else
 //#	include <vector>

@@ -20,9 +20,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#if EXO_MODULE
+#if EXO_MODULE > 1
 	import std;
-	using uint64_t = std::uint64_t;
+//	using uint64_t = std::uint64_t;
 #else
 #	include <cmath>    //for pow
 #	include <algorithm> //for std::replace
@@ -1252,7 +1252,7 @@ var  var::oconv(const char* conversion_in) const {
 										static constexpr char hex_table[] = "0123456789ABCDEF";
 										// TODO convert to inline function std::string int_to_hex(int64_t value) {
 										char buffer[16];
-										uint64_t uvalue = static_cast<uint64_t>(part.var_int);
+										std::uint64_t uvalue = static_cast<std::uint64_t>(part.var_int);
 										int pos = 15;
 										do {
 											buffer[pos--] = hex_table[uvalue & 0xF];

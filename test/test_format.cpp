@@ -1,6 +1,13 @@
 #undef NDEBUG  //because we are using assert to check actual operations that cannot be skipped in release mode testing
 #include <cassert>
 
+// For std::format
+#if EXO_MODULE
+	import std;
+#elif EXO_FORMAT == 1
+	#include <format>
+#endif
+
 // Ignore a warning from gcc. TODO proper solution?
 #if __GNUG__ == 14
 ///usr/include/c++/14/bits/stl_algobase.h:452:30: warning:

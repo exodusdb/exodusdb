@@ -1,10 +1,3 @@
-//#if EXO_MODULE
-//	import std;
-//#else
-//#	include <cstdio>
-//#	include <cstring>
-//#endif
-
 #ifndef FM
 #define FM_ '\x1E'
 #define VM_ '\x1D'

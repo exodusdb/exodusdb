@@ -28,9 +28,9 @@ THE SOFTWARE.
 // to avoid its macros causing problems in standard libraries
 /////////////////////////////////////////////////////////////
 
-#if EXO_MODULE
-	import std; // only for std::string_view in timebank get_timebank_acno?
-#endif
+//#if EXO_MODULE > 1
+//	import std; // only for std::string_view in timebank get_timebank_acno?
+//#endif
 
 #if EXO_MODULE
 	import var;

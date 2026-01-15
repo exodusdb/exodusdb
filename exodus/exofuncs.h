@@ -23,12 +23,16 @@ THE SOFTWARE.
 #ifndef EXODUSFUNCS_H
 #define EXODUSFUNCS_H 1
 
-#if EXO_MODULE
+#if EXO_MODULE > 1
 	import std;
-	import var;
 #else
 #	include <mutex>
+#	include <iostream>
 #endif
+
+//#if EXO_MODULE
+//	import var;
+//#endif
 
 //#include <exodus/var.h>
 #include <exodus/vardefs.h>

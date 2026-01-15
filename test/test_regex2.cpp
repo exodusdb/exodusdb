@@ -1,7 +1,7 @@
 #undef NDEBUG  //because we are using assert to check actual operations that cannot be skipped in release mode testing
 #include <cassert>
 
-#ifdef EXO_MODULE
+#if EXO_MODULE
 	import std;
 #else
 #	include <iostream>
@@ -18,7 +18,8 @@ func main() {
 
 // Evade clang 18 warning about for std::regex -Wdeprecated-declarations
 // Probably need some additional "using" clause in std.cppm or #include <iostream> above to get some missing definitions
-#ifndef EXO_MODULE
+#if EXO_MODULE
+#else
 	{
 		// Example of std::regex from cppref
 		// https://en.cppreference.com/w/cpp/regex/syntax_option_type

@@ -1,9 +1,8 @@
 #ifndef JOB_MANAGER_HPP
 #define JOB_MANAGER_HPP
 
-#if EXO_MODULE
+#if EXO_MODULE > 1
 	import std;
-	import var;
 #	define EXO_GENERATOR
 //#		include <exodus/result_range.h>
 #else
@@ -20,6 +19,11 @@
 #		include <exodus/result_range.h>
 #	endif
 #
+#endif
+
+#if EXO_MODULE
+	import var;
+#else
 #	include <exodus/var.h>
 #endif
 

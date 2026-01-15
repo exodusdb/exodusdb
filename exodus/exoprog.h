@@ -1,7 +1,7 @@
 #ifndef LIBEXODUS_EXOPROG_H_
 #define LIBEXODUS_EXOPROG_H_
 
-#if EXO_MODULE
+#if EXO_MODULE > 1
 	import std;
 #else
 #	include <string>
@@ -14,10 +14,15 @@
 // https://youtu.be/M2fKMP47slQ?t=476
 #	include <map>
 
-#	include <exodus/var.h>
 #endif
 
+#if EXO_MODULE
+	import var;
+#else
+#	include <exodus/var.h>
+#endif
 #include <exodus/vardefs.h>
+
 #include <exodus/exoimpl.h>
 #include <exodus/exoenv.h>
 #include <exodus/exocallable.h>

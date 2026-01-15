@@ -1,8 +1,9 @@
 // threadpool.cpp
-#include <vector>
-#if EXO_MODULE
+#if EXO_MODULE > 1
+#	include <vector> // here to solve bug in building module?
 	import std;
 #else
+#	include <vector>
 #	include <functional>
 #	include <queue>
 #	include <mutex>
@@ -10,20 +11,20 @@
 #	include <thread>
 #	include <atomic>
 #	include <memory>
+
+// Logging macro with relative timestamp from program start
+//#define ENABLE_LOGGING
 #	include <iostream> // unlike clang, g++ wants this to compile std::cerr in logging despite if (0)
+#	ifdef ENABLE_LOGGING
+#		include <iomanip>
+#		include <chrono>
+#		include <thread>
+#	endif
 #endif
 
 #include "threadpool.h"
 
-// Logging macro with relative timestamp from program start
-//#define ENABLE_LOGGING
 #ifdef ENABLE_LOGGING
-#ifndef EXO_MODULE
-#	include <iostream>
-#	include <iomanip>
-#	include <chrono>
-#	include <thread>
-#endif
 //	// Static variable to capture initial time (initialized once at program start)
 static const auto start_time = std::chrono::system_clock::now();
 #	define LOG std::cerr << "[" << std::fixed << std::setprecision(3) \

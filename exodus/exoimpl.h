@@ -37,18 +37,21 @@ THE SOFTWARE.
 
 #include <version> // Only for __cpp_lib_constexpr_string >= 201907L TODO remove
 
+//#if EXO_MODULE > 1
+//	import std;
+//#endif
+
 #if EXO_MODULE
-	import std;
 	import var;
 #else
 #	include <exodus/var.h>
 //#	include <exodus/dim.h>
 //#	include <exodus/rex.h>
 #endif
+#include <exodus/vardefs.h> // for PUBLIC
 
 #include "exodebug.h"
 
-#include <exodus/vardefs.h> // for PUBLIC
 
     using VAR    =       exo::var;
     using VARREF =       exo::var&;

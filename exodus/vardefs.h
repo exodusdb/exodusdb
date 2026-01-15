@@ -1,6 +1,12 @@
 #ifndef EXO_VARDEFS_H
 #define EXO_VARDEFS_H
 
+#if EXO_MODULE > 1
+	import std;
+#else
+#	include <iostream>
+#endif
+
 //#include <version> // for __cpp_consteval
 
 /////////////

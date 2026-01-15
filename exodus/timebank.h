@@ -23,7 +23,7 @@ auto get_timebank_acno(const std::string_view /*arg1*/) -> int {return 0;}
 // ACTUAL TIMEBANK HEADER
 /////////////////////////
 
-#if EXO_MODULE
+#if EXO_MODULE > 1
 	import std;
 // slows all compilations down but std.cppm seems to be missing some export using clause
 //#	include <chrono>

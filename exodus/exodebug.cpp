@@ -31,7 +31,7 @@ THE SOFTWARE.
 // For debugging
 #define TRACING 0
 
-#if EXO_MODULE
+#if EXO_MODULE > 1
 	import std;
 #else
 #	include <cstdio>
@@ -52,7 +52,12 @@ THE SOFTWARE.
 #endif
 //#include <backward.hpp>
 
-#include <exodus/var.h>
+#if EXO_MODULE
+	import var;
+#else
+#	include <exodus/var.h>
+#endif
+
 #include <exodus/exoimpl.h>
 #include <exodus/range.h>
 #include "exodebug.h"
@@ -230,7 +235,7 @@ auto exo_savestack(void* stack_addresses[BACKTRACE_MAXADDRESSES], std::size_t* s
 
 	// Get all thread info because there is no gdb command to switch to thread (LWP) by LWP id.
 	var gdb_cmds = " -ex 'thread apply all bt' -ex 'detach' -ex 'quit'";
-	var gdb_cmd = "gdb -batch -p " ^ pid ^ gdb_cmds ^ " > backtrace." ^ pid ^ ".log 2>/dev/null < /dev/null";
+	var gdb_cmd = "gdb -batch -p " ^ (pid ^ gdb_cmds) ^ " > backtrace." ^ pid ^ ".log 2>/dev/null < /dev/null";
 
 	if (std::system(gdb_cmd.c_str()) != 0) {
 		// gdb not installed. Rely on ::backtrace above which isnt very accurate in threads or fibers.

@@ -130,7 +130,7 @@
 
 		if (EXO_MODULE)
 			target_link_libraries(${file_without_ext}
-				exovar
+				std exovar
 			)
 		endif()
 

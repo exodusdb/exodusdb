@@ -1,7 +1,7 @@
 #ifndef DBCONN_H
 #define DBCONN_H
 
-#if EXO_MODULE
+#if EXO_MODULE > 1
 	import std;
 #else
 #	include <string>

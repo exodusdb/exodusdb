@@ -3,9 +3,13 @@
 
 #ifdef EXO_TIMEBANK
 
-#include <iostream>
-#include <iomanip>
-#include <cstring> // for strcmp
+#if EXO_MODULE > 2
+	import std;
+#else
+#	include <iostream>
+#	include <iomanip>
+#	include <cstring> // for strcmp
+#endif
 
 #include <exodus/var.h>
 #include <exodus/timebank.h>

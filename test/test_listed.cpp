@@ -1,6 +1,9 @@
-#ifndef EXO_MODULE
+#if EXO_MODULEn> 1
+	import std;
+#else
 #	include <random>
 #	include <chrono>
+#	include <random>
 #endif
 #include <cassert>
 

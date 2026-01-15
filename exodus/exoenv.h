@@ -23,9 +23,8 @@ THE SOFTWARE.
 #ifndef EXOENV_H
 #define EXOENV_H 1
 
-#if EXO_MODULE
+#if EXO_MODULE > 1
 	import std;
-	import var;
 #else
 #	include <string>
 #	include <map>

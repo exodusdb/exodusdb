@@ -1,12 +1,16 @@
-#if EXO_MODULE
+#if EXO_MODULE > 1
 	import std;
-	import var;
 #	include <cstddef>
 #else
 #	include <new>
 #	include <type_traits>
 #	include <stdexcept>
 #	include <utility>
+#endif
+
+#if EXO_MODULE
+	import var;
+#else
 #	include <exodus/var.h>
 #	include <exodus/dim.h>
 #endif
