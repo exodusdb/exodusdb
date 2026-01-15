@@ -13,7 +13,7 @@
 //	  |	   ^		  ~~~~~~~~~~~~~~~~
 // <plus of similar note:s
 
-#ifdef EXO_MODULE
+#if EXO_MODULE
 	import std;
 #else
 #	include <functional> // std::function

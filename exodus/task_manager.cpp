@@ -1,4 +1,4 @@
-#ifdef EXO_MODULE
+#if EXO_MODULE
 	import std;
 	import var;
 	import exoprog; // for ExoExit

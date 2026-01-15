@@ -1,4 +1,4 @@
-#ifdef EXO_MODULE
+#if EXO_MODULE
 	import std;
 	import var;
 //#	include <memory> // work around bug in std module that disallows "using std::make_shared;"

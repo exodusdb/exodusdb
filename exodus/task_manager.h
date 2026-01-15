@@ -1,7 +1,7 @@
 #ifndef TASK_MANAGER_HPP
 #define TASK_MANAGER_HPP
 
-#ifdef EXO_MODULE
+#if EXO_MODULE
 	import std;
 	import var;
 #	define EXO_GENERATOR

@@ -3,7 +3,7 @@
 // variable (that is linked to SQL TABLE name - in field 2 of file handle)
 //
 
-#ifdef EXO_MODULE
+#if EXO_MODULE
 	import std;
 #else
 #	include <string>

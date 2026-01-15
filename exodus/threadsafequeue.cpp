@@ -1,6 +1,6 @@
 #include "threadsafequeue.h"
 
-#ifdef EXO_MODULE
+#if EXO_MODULE
     import var;
 #else
 #   include "var.h"

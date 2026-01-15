@@ -29,7 +29,7 @@ Binary    Hex          Comments
 11110xxx  0xF0..0xF4   First byte of a 4-byte character encoding
 */
 
-#ifdef EXO_MODULE
+#if EXO_MODULE
 	import std;
 #else
 #	include <string>
