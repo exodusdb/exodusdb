@@ -1,8 +1,9 @@
 #undef NDEBUG  //because we are using assert to check actual operations that cannot be skipped in release mode testing
 #include <cassert>
 
-#if EXO_MODULE > 1
+#if EXO_MODULE
 //#	include <vector>
+	import std;
 #else
 #	include <map>
 #	include <algorithm>

@@ -430,7 +430,7 @@ ENVIRONMENT
 
 		// Bequeath/perpetuate the state of EXO_MODULE to compiled programs
 		// as at original build time of the current compiler object
-		basicoptions ^= " -DEXO_MODULE=1";
+		basicoptions ^= " -DEXO_MODULE=" ^ var(EXO_MODULE);
 
 		// Add path to var and std modules
 		// std exovar exoprog

@@ -1,6 +1,6 @@
 #undef NDEBUG  //because we are using assert to check actual operations that cannot be skipped in release mode testing
 
-#if EXO_MODULE > 1
+#if EXO_MODULE
 	import var;
 #else
 #	include <exodus/var.h>
