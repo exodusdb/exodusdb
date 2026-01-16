@@ -289,4 +289,10 @@ exo::Timer thisistimer(exo::get_timebank_acno(FUNC_DESC));
 // "SomeFunction_that_returns_a_var"
 #define SomeFunction var(*sf)
 
+// Standard utilities to double quote and escape especially c++ macros
+#define EXO_STRINGIFY_IMPL(x)   #x
+#define EXO_STRINGIFY(x)        EXO_STRINGIFY_IMPL(x)
+#define EXO_CONCAT_IMPL(a,b)    a##b
+#define EXO_CONCAT(a,b)         EXO_CONCAT_IMPL(a,b)
+
 #endif //EXO_VARDEFS_H

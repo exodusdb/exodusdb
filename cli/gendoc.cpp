@@ -187,7 +187,8 @@ func main2(in pass1) {
 	codefile << "\n";
 	codefile <<
 R"__(#include <cassert>
-#if EXO_MODULE > 1
+#if EXO_MODULE
+	import std;
 #else
 #	include <vector>
 #	include <iomanip>

@@ -61,6 +61,13 @@
 	include_directories(${SRC_EXODUS_DIR}/.. ${FAST_FLOAT_DIR}/include)
 	link_directories(${EXODUS_DIR})
 
+	if(TARGET exovar)
+		link_libraries(exovar)
+	endif()
+	if(TARGET std)
+		link_libraries(std)
+	endif()
+
 #
 # Turn off optimisation since compile time of test_main currently becomes 60 seconds
 # ##################################################################################
@@ -127,12 +134,6 @@
 		add_executable(${file_without_ext} ${file})
 
 		target_link_libraries(${file_without_ext} exodus ${PROJECT_LIBS})
-
-		if (EXO_MODULE)
-			target_link_libraries(${file_without_ext}
-				std exovar
-			)
-		endif()
 
 		#setup a classic test i.e. requiring output of "Test passed"
 		add_test(NAME ${file_without_ext} COMMAND ${file_without_ext} WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
