@@ -1,4 +1,5 @@
-#if EXO_MODULE > 1
+#if EXO_MODULE
+	import std;
 #else
 #	include <stack>
 #	include <vector> // Actually already comes with dim.h

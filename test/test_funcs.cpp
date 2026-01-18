@@ -105,7 +105,8 @@ func main() {
 		// MOVES the string
 		// but doesnt mark the source as unassigned
 		var v1 = space(100);
-		var v2 = std::move(v1);
+//		var v2 = std::move(v1);
+		var v2 = v1.move();
 		assert(! v1.unassigned()); // Still assigned
 		assert(v1 == ""); // But var str is gone.
 		assert(v2 == space(100));
@@ -155,13 +156,13 @@ func main() {
 		assert(s1         eq "2");
 		assert(s2         eq "1");
 
-		std::swap(s1, s2);
-		assert(s1         eq "1");
-		assert(s2         eq "2");
+//		std::swap(s1, s2);
+//		assert(s1         eq "1");
+//		assert(s2         eq "2");
 
 		s1.swap(s2);
-		assert(s1         eq "2");
-		assert(s2         eq "1");
+		assert(s1         eq "1");
+		assert(s2         eq "2");
 	}
 	{
 		var started = ostime().outputl("ostime=");

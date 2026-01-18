@@ -460,6 +460,8 @@ function get_dependencies_for_build_and_install {
 	sudo update-alternatives --set cc /usr/bin/$C_COMPILER
 	readlink `which cc` -e
 
+	sudo update-alternatives --install /usr/bin/c++ clang++ /usr/bin/clang++-21 0
+	sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-21 0
 :
 : Show libstdc++ and clang information
 : ------------------------------------

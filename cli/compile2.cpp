@@ -1,3 +1,9 @@
+#if EXO_MODULE
+	import std;
+#else
+#	include <array>
+#endif
+
 #include <exodus/library.h>
 libraryinit()
 

@@ -1,7 +1,8 @@
 #if EXO_MODULE > 1
 	import std;
-#	include <cstddef>
+//#	include <cstddef>
 #else
+#	include <cstddef>
 #	include <new>
 #	include <type_traits>
 #	include <stdexcept>
@@ -35,15 +36,15 @@ PUBLIC void reset_range(T& first, T& last) {
     }
 
     // Calculate the size of the range in bytes (inclusive)
-    std::ptrdiff_t byte_diff = reinterpret_cast<char*>(end) - reinterpret_cast<char*>(start) + static_cast<ptrdiff_t>(sizeof(T));
+    std::ptrdiff_t byte_diff = reinterpret_cast<char*>(end) - reinterpret_cast<char*>(start) + static_cast<std::ptrdiff_t>(sizeof(T));
 
     // Sanity check: Ensure the range is a whole number of T objects
-    if (byte_diff % static_cast<ptrdiff_t>(sizeof(T)) != 0) {
+    if (byte_diff % static_cast<std::ptrdiff_t>(sizeof(T)) != 0) {
         throw std::invalid_argument("Range size is not a multiple of object size");
     }
 
     // Calculate the number of objects (inclusive)
-    size_t count = static_cast<size_t>(byte_diff / static_cast<ptrdiff_t>(sizeof(T)));
+    size_t count = static_cast<size_t>(byte_diff / static_cast<std::ptrdiff_t>(sizeof(T)));
 
     // Destroy all objects in the range
     for (size_t i = 0; i < count; ++i) {

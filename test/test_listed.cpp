@@ -1,4 +1,4 @@
-#if EXO_MODULEn> 1
+#if EXO_MODULE
 	import std;
 #else
 #	include <random>

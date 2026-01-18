@@ -1,11 +1,10 @@
 #ifndef EXODUS_EXODEBUG_H
 #define EXODUS_EXODEBUG_H
 
-#if EXO_MODULE > 1
-	import std;
+#if EXO_MODULE > 1 || (EXO_MODULE && LIBEXODUS_EXODUS_H_)
+//	import std;
 #else
 #	include <string>
-#endif
 
 #include "vardefs.h"
 
@@ -19,4 +18,6 @@ namespace exo {
 	PUBLIC void debug(std::string_view sv1 = "");
 
 }
+#endif
+
 #endif // EXODUS_EXODEBUG_H

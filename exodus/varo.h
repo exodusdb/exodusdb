@@ -657,7 +657,8 @@ public:
 	//
 	// `let txtfile = "t_temp.txt";
 	//  if (not osremove(txtfile)) {} // Remove any existing file.
-	//  txtfile << txtfile << " " << 123.456789 << " " << 123 << std::endl;
+	//  txtfile << txtfile << " " << 123.456789 << " " << 123 << '\n';
+	//  osflush();
 	//  let v1 = osread(txtfile);   // "t_temp.txt 123.457 123\n"`
 	//
 	// All standard c++ io manipulators may be used e.g. std::setw, setfill etc.
@@ -666,46 +667,46 @@ public:
 	//  if (not osremove(vout)) {}
 	//  using namespace std;
 	//
-	//  vout << boolalpha    << true          << "\ttrue"    << endl;
-	//  vout << noboolalpha  << true          << "\t1"       << endl;
+	//  vout << boolalpha    << true          << "\ttrue"    << '\n';
+	//  vout << noboolalpha  << true          << "\t1"       << '\n';
 	//
-	//  vout << showpoint    << 42.0          << "\t42.0000" << endl;
-	//  vout << noshowpoint  << 42.0          << "\t42"      << endl;
+	//  vout << showpoint    << 42.0          << "\t42.0000" << '\n';
+	//  vout << noshowpoint  << 42.0          << "\t42"      << '\n';
 	//
-	//  vout << showpos      << 42            << "\t+42"     << endl;
-	//  vout << noshowpos    << 42            << "\t42"      << endl;
+	//  vout << showpos      << 42            << "\t+42"     << '\n';
+	//  vout << noshowpos    << 42            << "\t42"      << '\n';
 	//
-	//  vout << skipws       << " " << 42     << "\t 42"     << endl;
-	//  vout << noskipws     << " " << 42     << "\t 42"     << endl;
+	//  vout << skipws       << " " << 42     << "\t 42"     << '\n';
+	//  vout << noskipws     << " " << 42     << "\t 42"     << '\n';
 	//
-	//  vout << unitbuf      << "a"           << "\ta"       << endl;
-	//  vout << nounitbuf    << "b"           << "\tb"       << endl;
+	//  vout << unitbuf      << "a"           << "\ta"       << '\n';
+	//  vout << nounitbuf    << "b"           << "\tb"       << '\n';
 	//
-	//  vout << setw(6)      << 42            << "\t    42"  << endl;
+	//  vout << setw(6)      << 42            << "\t    42"  << '\n';
 	//
-	//  vout << left         << setw(6) << 42 << "\t42    "  << endl;
-	//  vout << right        << setw(6) << 42 << "\t    42"  << endl;
-	//  vout << internal     << setw(6) << 42 << "\t    42"  << endl;
-	//  vout << setfill('*') << setw(6) << 42 << "\t****42"  << endl;
+	//  vout << left         << setw(6) << 42 << "\t42    "  << '\n';
+	//  vout << right        << setw(6) << 42 << "\t    42"  << '\n';
+	//  vout << internal     << setw(6) << 42 << "\t    42"  << '\n';
+	//  vout << setfill('*') << setw(6) << 42 << "\t****42"  << '\n';
 	//
-	//  vout << showbase     << hex << 255    << "\t0xff"    << endl;
-	//  vout << noshowbase   << 255           << "\tff"      << endl;
+	//  vout << showbase     << hex << 255    << "\t0xff"    << '\n';
+	//  vout << noshowbase   << 255           << "\tff"      << '\n';
 	//
-	//  vout << uppercase    << 255           << "\tFF"      << endl;
-	//  vout << nouppercase  << 255           << "\tff"      << endl;
+	//  vout << uppercase    << 255           << "\tFF"      << '\n';
+	//  vout << nouppercase  << 255           << "\tff"      << '\n';
 	//
-	//  vout << oct          << 255           << "\t377"     << endl;
-	//  vout << hex          << 255           << "\tff"      << endl;
-	//  vout << dec          << 255           << "\t255"     << endl;
+	//  vout << oct          << 255           << "\t377"     << '\n';
+	//  vout << hex          << 255           << "\tff"      << '\n';
+	//  vout << dec          << 255           << "\t255"     << '\n';
 	//
-	//  vout << fixed        << 42.1          << "\t42.100000"            << endl;
-	//  vout << scientific   << 42.1          << "\t4.210000e+01"         << endl;
-	//  vout << hexfloat     << 42.1          << "\t0x1.50ccccccccccdp+5" << endl;
-	//  vout << defaultfloat << 42.1          << "\t42.1"                 << endl;
+	//  vout << fixed        << 42.1          << "\t42.100000"            << '\n';
+	//  vout << scientific   << 42.1          << "\t4.210000e+01"         << '\n';
+	//  vout << hexfloat     << 42.1          << "\t0x1.50ccccccccccdp+5" << '\n';
+	//  vout << defaultfloat << 42.1          << "\t42.1"                 << '\n';
 	//
-	//  vout << std::setprecision(3)      << 42.1567  << "\t42.2"  << endl;
-	//  vout << resetiosflags(ios::fixed) << 42.1567  << "\t42.2"  << endl;
-	//  vout << setiosflags(ios::showpos) << 42       << "\t+42"   << endl;
+	//  vout << std::setprecision(3)      << 42.1567  << "\t42.2"  << '\n';
+	//  vout << resetiosflags(ios::fixed) << 42.1567  << "\t42.2"  << '\n';
+	//  vout << setiosflags(ios::showpos) << 42       << "\t+42"   << '\n';
 	//
 	//  // Verify actual v. expected.
 	//  var act_v_exp = osread(vout);

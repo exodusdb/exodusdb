@@ -1,8 +1,12 @@
 #undef NDEBUG  //because we are using assert to check actual operations that cannot be skipped in release mode testing
 #include <cassert>
 
-#include <stdio.h>
-#include <string.h>
+#if EXO_MODULE
+	import std;
+#else
+#	include <stdio.h>
+#	include <string.h>
+#endif
 
 //#include <boost/range/irange.hpp>
 
@@ -595,9 +599,6 @@ void extract2(char * instring, int inlength, int fieldno, int valueno, int subva
 
 	return;
 }
-
-#include <stdio.h>
-#include <string.h>
 
 /*
 TODO algorithm could be improved for value and subvalue extraction

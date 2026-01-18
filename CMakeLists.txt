@@ -8,6 +8,8 @@
 #
 	cmake_minimum_required(VERSION 3.10)
 #	cmake_minimum_required(VERSION 3.28)
+
+#	set(CMAKE_EXPERIMENTAL_CXX_IMPORT_STD "d0edc3af-4c50-42ea-a356-e2862fe7a444")  # example for ~4.0; update if needed!)
 	project(exodus)
 
 #	cmake versions available 2024-06-10
@@ -44,6 +46,10 @@
 # C++ standard
 # ############
 #
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
+	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -stdlib=libc++")
+	set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -stdlib=libc++")
+
 	# CMake max supporting C++ versions
 	#https://cmake.org/cmake/help/latest/prop_tgt/CXX_STANDARD.html
 	#CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++2a"
@@ -63,11 +69,14 @@
 
 	endif()
 
+#	set(CMAKE_CXX_MODULE_STD 1)
+
 	message("")
 
 	message(STATUS "CMAKE_CXX_COMPILER_ID      is ${CMAKE_CXX_COMPILER_ID}")
 	message(STATUS "CMAKE_CXX_COMPILER_VERSION is ${CMAKE_CXX_COMPILER_VERSION}")
 	message(STATUS "CMAKE_CXX_FLAGS            is ${CMAKE_CXX_FLAGS}")
+#	message(STATUS "CMAKE_CXX_MODULE_STD       is ${CMAKE_CXX_MODULE_STD}")
 	message("")
 
 #
@@ -96,6 +105,15 @@
 	message(STATUS "EXO_MODULE = ${EXO_MODULE}")
 
 	add_compile_definitions(EXO_MODULE_INITIAL_BUILD=1)
+
+	# Force Clang to use only libc++ includes (suppress GCC sysroot paths)
+	if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+		add_compile_options(
+#			-nostdinc++                     # disable default standard includes
+#			-isystem /usr/lib/llvm-21/include/c++/v1   # explicit libc++ headers (adjust if your path differs)
+			-fprebuilt-module-path=/usr/local/lib
+		)
+	endif()
 
 	# man cmake-cxxmodules
 	# See CMP0155 scanning defaults to yes for c++20 files from cmake 3.28 onwards
@@ -217,64 +235,65 @@
 	MESSAGE(STATUS "OS_NAME = ${OS_NAME}")
 	ADD_DEFINITIONS( -DEXO_OS_NAME=\"${OS_NAME}\" )
 
-###
-### FMT - before setting complex compiler warnings for exodus subdirs/modules
-### ###
-###
-
-	# Include the module for checking C++ include files
-	include(CheckIncludeFileCXX)
-
-	# Check if the <format> header is available
-	check_include_file_cxx(format HAS_FORMAT_HEADER)
-
-	# Conditionally set a variable based on the result
-	if(HAS_FORMAT_HEADER)
-		set(DEFAULT_EXO_FORMAT "1")
-	else()
-		set(DEFAULT_EXO_FORMAT "2")
-	endif()
-
-# EXO_FORMAT 1 - std::format because it has faster end user compiling when instantiating formatter<var_base>
-
-	set(EXO_FORMAT ${DEFAULT_EXO_FORMAT} CACHE STRING "EXO_FORMAT is 0 for No, 1 for std::format, 2 for libfmt, 3 for build fmt")
-	set_property(CACHE EXO_FORMAT PROPERTY STRINGS 0 1 2 3)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DEXO_FORMAT=${EXO_FORMAT} ")
-
-# EXO_FORMAT 2
-
-	if (EXO_FORMAT EQUAL 2)
-		message("----------------")
-		message("-- FMT EXODUS --")
-		message("----------------")
-		find_package(fmt)
-		set(CMAKE_CXX_STANDARD_LIBRARIES "${CMAKE_CXX_STANDARD_LIBRARIES} -lfmt " CACHE STRING "C++ compiler link libraries" FORCE)
-	endif()
-
-#	#target_link_libraries(<your-target> fmt::fmt)
-
-
-# EXO_FORMAT 3
-
-	if (EXO_FORMAT EQUAL 3)
-##	if (${CMAKE_CXX_COMPILER_VERSION} STRLESS "13")
-#		message("")
+	#Use std::format
+	set(EXO_FORMAT 1)
+####
+#### FMT - before setting complex compiler warnings for exodus subdirs/modules
+#### ###
+####
+#
+#	# Include the module for checking C++ include files
+#	include(CheckIncludeFileCXX)
+#
+#	# Check if the <format> header is available
+#	check_include_file_cxx(format HAS_FORMAT_HEADER)
+#
+#	# Conditionally set a variable based on the result
+#	if(HAS_FORMAT_HEADER)
+#		set(DEFAULT_EXO_FORMAT "1")
+#	else()
+#		set(DEFAULT_EXO_FORMAT "2")
+#	endif()
+#
+## EXO_FORMAT 1 - std::format because it has faster end user compiling when instantiating formatter<var_base>
+#
+#	set(EXO_FORMAT ${DEFAULT_EXO_FORMAT} CACHE STRING "EXO_FORMAT is 0 for No, 1 for std::format, 2 for libfmt, 3 for build fmt")
+#	set_property(CACHE EXO_FORMAT PROPERTY STRINGS 0 1 2 3)
+#	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DEXO_FORMAT=${EXO_FORMAT} ")
+#
+## EXO_FORMAT 2
+#
+#	if (EXO_FORMAT EQUAL 2)
 #		message("----------------")
 #		message("-- FMT EXODUS --")
 #		message("----------------")
-#		# See https://fmt.dev/latest/usage.html
-#		# How to build
-#		set(BUILD_SHARED_LIBS true)
-#		set(FMT_PEDANTIC true)
-
-		add_subdirectory(fmt)
-
-#		set(FMT_LIBRARIES fmt)
-##	else()
-##		message("Omitting subdir fmt")
-##	endif()
-	endif()
-
+#		find_package(fmt)
+#		set(CMAKE_CXX_STANDARD_LIBRARIES "${CMAKE_CXX_STANDARD_LIBRARIES} -lfmt " CACHE STRING "C++ compiler link libraries" FORCE)
+#	endif()
+#
+##	#target_link_libraries(<your-target> fmt::fmt)
+#
+#
+## EXO_FORMAT 3
+#
+#	if (EXO_FORMAT EQUAL 3)
+###	if (${CMAKE_CXX_COMPILER_VERSION} STRLESS "13")
+##		message("")
+##		message("----------------")
+##		message("-- FMT EXODUS --")
+##		message("----------------")
+##		# See https://fmt.dev/latest/usage.html
+##		# How to build
+##		set(BUILD_SHARED_LIBS true)
+##		set(FMT_PEDANTIC true)
+#
+#		add_subdirectory(fmt)
+#
+##		set(FMT_LIBRARIES fmt)
+###	else()
+###		message("Omitting subdir fmt")
+###	endif()
+#	endif()
 #
 # Warnings
 # ########

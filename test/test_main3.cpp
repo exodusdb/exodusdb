@@ -262,39 +262,39 @@ func main() {
 	{
 		// More oconv "TX" tests
 
-#define TX_DOUBLE_ESCAPED_NL _BS _BS "n"
-#define TX_NL _BS "n"
+#define TX_DOUBLE_ESCAPED_NL _BSL _BSL "n"
+#define TX_NL _BSL "n"
 #define TX_FM _NL
-#define TX_VM _BS _NL
-#define TX_SM _BS _BS _NL
-#define TX_TM _BS _BS _BS _NL
-#define TX_ST _BS _BS _BS _BS _NL
+#define TX_VM _BSL _NL
+#define TX_SM _BSL _BSL _NL
+#define TX_TM _BSL _BSL _BSL _NL
+#define TX_ST _BSL _BSL _BSL _BSL _NL
 
-			assert(var(_BS _BS "n" "\n" _FM _VM _SM _TM _STM).oconv("TX").outputl() == _BS  TX_DOUBLE_ESCAPED_NL  TX_NL   TX_FM  TX_VM  TX_SM  TX_TM  TX_ST);
+			assert(var(_BSL _BSL "n" "\n" _FM _VM _SM _TM _STM).oconv("TX").outputl() == _BSL  TX_DOUBLE_ESCAPED_NL  TX_NL   TX_FM  TX_VM  TX_SM  TX_TM  TX_ST);
 
 			// backslash in text remains backslash
-			assert(var(_BS).oconv("TX").outputl() == _BS);
+			assert(var(_BSL).oconv("TX").outputl() == _BSL);
 
-			// 1. Double escape any _BS "n" -> _BS _BS "n"
-			assert(var(_BS "n").oconv("TX").outputl() == _BS _BS "n");
+			// 1. Double escape any _BSL "n" -> _BSL _BSL "n"
+			assert(var(_BSL "n").oconv("TX").outputl() == _BSL _BSL "n");
 
-			// 2. Single escape any _NL -> _BS "n"
-			assert(var(_NL).oconv("TX").outputl() == _BS "n");
+			// 2. Single escape any _NL -> _BSL "n"
+			assert(var(_NL).oconv("TX").outputl() == _BSL "n");
 
 			// 3. FMs -> _NL (⏎)
 			assert("🌍^🌍"_var.oconv("TX").outputl() == "🌍" _NL "🌍");
 
-			// 4. VMs -> _BS _NL (\⏎)
-			assert("🌍]🌍"_var.oconv("TX").outputl() == "🌍" _BS _NL "🌍");
+			// 4. VMs -> _BSL _NL (\⏎)
+			assert("🌍]🌍"_var.oconv("TX").outputl() == "🌍" _BSL _NL "🌍");
 
-			// 5. SMs -> _BS _BS _NL (\\⏎)
-			assert("🌍}🌍"_var.oconv("TX").outputl() == "🌍" _BS _BS _NL "🌍");
+			// 5. SMs -> _BSL _BSL _NL (\\⏎)
+			assert("🌍}🌍"_var.oconv("TX").outputl() == "🌍" _BSL _BSL _NL "🌍");
 
-			// 6. TMs -> _BS _BS _BS _NL (\\\⏎)
-			assert("🌍|🌍"_var.oconv("TX").outputl() == "🌍" _BS _BS _BS _NL "🌍");
+			// 6. TMs -> _BSL _BSL _BSL _NL (\\\⏎)
+			assert("🌍|🌍"_var.oconv("TX").outputl() == "🌍" _BSL _BSL _BSL _NL "🌍");
 
-			// 7. STs -> _BS _BS _BS _BS _NL (\\\\⏎)
-			assert("🌍~🌍"_var.oconv("TX").outputl() == "🌍" _BS _BS _BS _BS _NL "🌍");
+			// 7. STs -> _BSL _BSL _BSL _BSL _NL (\\\\⏎)
+			assert("🌍~🌍"_var.oconv("TX").outputl() == "🌍" _BSL _BSL _BSL _BSL _NL "🌍");
 
 	}
 

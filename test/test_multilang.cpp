@@ -65,7 +65,8 @@ func main() {
 	assert(EN_RU_UA_cp1251.from_codepage(cyrillic_cp) eq EN_RU_UA_utf8);
 	assert(EN_RU_UA_cp1251                            eq EN_RU_UA_utf8.to_codepage(cyrillic_cp));
 
-	std::cout << ">[English language][Русский язык][Українська мова]" << std::endl;
+//	std::cout << ">[English language][Русский язык][Українська мова]" << std::endl;
+	TRACE(">[English language][Русский язык][Українська мова]")
 	EN_RU_UA_cp1251.from_codepage(cyrillic_cp).outputl(">");
 
 	//convert write utf8 with code page

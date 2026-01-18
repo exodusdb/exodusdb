@@ -347,12 +347,12 @@ ENVIRONMENT
 
 		// Precompiled modules need -f ... var.pcm and -l ... libexovar.so
 #if EXO_MODULE
-		linkoptions ^= " -lexovar -lexoprog -lstd";
+		linkoptions ^= " -lexovar -lexoprog -lc++";
 #endif
-
+#if __GLIBCXX__
 		// Mandatory c++ library and file system library
 		linkoptions ^= " -lstdc++fs -lstdc++";
-
+#endif
 		// link to fmt library (only if using it instead of std::format)
 //#if defined(EXO_FORMAT) && ( EXO_FORMAT == 2 || EXO_FORMAT == 3 )
 #if EXO_FORMAT == 2
