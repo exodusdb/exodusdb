@@ -653,6 +653,7 @@ function test_exodus_without_database {
 :
 	#cd $EXODUS_DIR/build/test/src && EXO_NODATA=1 CTEST_OUTPUT_ON_FAILURE=1 CTEST_PARALLEL_LEVEL=$((`nproc`+1)) ctest
 	cd $EXODUS_DIR/build/test && EXO_NODATA=1 CTEST_OUTPUT_ON_FAILURE=1 CTEST_PARALLEL_LEVEL=$((`nproc`+1)) ctest
+	sleep 1
 :
 } # end of test_exodus_without_database
 

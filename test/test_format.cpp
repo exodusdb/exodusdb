@@ -2,7 +2,7 @@
 #include <cassert>
 
 #if EXO_MODULE
-//	import std;
+	import std; // only for std::string
 #elif EXO_FORMAT == 1
 //	#include <format>
 #endif
@@ -89,6 +89,32 @@ func main() {
 //	println(s1, "yyy");
 	print(v1, "yyy");
 	println(v1, "yyy");
+
+	TRACE(std::string().capacity())
+
+	{
+		std::string s{"x"};
+
+		// only exo:: is able to format a std::string
+	//	println(s,var("x"));
+	//	std::println(s,var("x"));
+		exo::println(s, var("x"));
+
+		// cstr cannot be handled by std::
+		//	std::println("{}",var("x"));
+
+		// cstr can be handled by implicit or explicit exo::
+		// (with var or built-in arguments)
+		// var arguments:
+		println("{}", var("x"));
+		exo::println("{}", var("x"));
+		// built-in arguments:
+		println("{}", 123.45);
+		exo::println("{}", 123.45);
+		// Mixed arguments:
+		println("{} - {}", var("x"), 123.45);
+		exo::println("{} - {}", var("x"), 123.45);
+	}
 
 #if EXO_MODULE
 #else

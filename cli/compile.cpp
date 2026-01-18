@@ -343,11 +343,12 @@ ENVIRONMENT
 		//else
 		//linkoptions = " -lexodus -lstdc++fs -lpthread";
 
-		linkoptions = "  -lexodus";
+		linkoptions = "  -lexodus -L/usr/local/lib";
 
 		// Precompiled modules need -f ... var.pcm and -l ... libexovar.so
 #if EXO_MODULE
-		linkoptions ^= " -lexovar -lexoprog -lc++";
+//		linkoptions ^= " -lexovar -lexoprog -lc++ -stdlib=libc++";
+		linkoptions ^= " -stdlib=libc++";
 #endif
 #if __GLIBCXX__
 		// Mandatory c++ library and file system library
@@ -434,9 +435,12 @@ ENVIRONMENT
 
 		// Add path to var and std modules
 		// std exovar exoprog
-		basicoptions ^= " -fmodule-file=var=/usr/local/lib/var.pcm";
-		basicoptions ^= " -fmodule-file=std=/usr/local/lib/std.pcm";
-		basicoptions ^= " -fmodule-file=exoprog=/usr/local/lib/exoprog.pcm";
+//		basicoptions ^= " -fmodule-file=var=/usr/local/lib/var.pcm";
+//		basicoptions ^= " -fmodule-file=std=/usr/local/lib/std.pcm";
+//		basicoptions ^= " -fmodule-file=exoprog=/usr/local/lib/exoprog.pcm";
+		basicoptions ^= " -fprebuilt-module-path=/usr/local/lib";
+		// clang linker must faster
+		basicoptions ^= " -fuse-ld=lld";
 //		basicoptions ^= " -fmodule-file=fmt=/usr/local/lib/fmt.pcm";
 #endif
 		if (color_option) {
