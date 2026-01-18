@@ -1,7 +1,3 @@
-//#if EXO_MODULE
-//	import std;
-//#endif
-
 #if EXO_MODULE > 1
 	import std;
 #else

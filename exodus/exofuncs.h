@@ -42,81 +42,9 @@ THE SOFTWARE.
 
 // clang-format off
 
-//#include <exodus/format.h>
-
 // add global function type syntax to the exodus users
 // SIMILAR code in exofuncs.h and varimpl.h
 namespace exo {
-//
-//
-//#pragma clang diagnostic push
-//#pragma clang diagnostic ignored "-Wexit-time-destructors"
-//#pragma clang diagnostic ignored "-Wglobal-constructors"
-//#pragma clang diagnostic ignored "-Wreserved-identifier"
-//
-//#if defined _MSC_VER || defined __CYGWIN__ || defined __MINGW32__
-//
-//#	define                         _EOL        "\r\n"
-////	extern const var         EOL      = _EOL;
-//
-//#	define                         _OSSLASH    "\\"
-////	extern const var         OSSLASH  = _OSSLASH;
-//
-////	CONSTINIT_OR_CONSTEXPR auto     OSSLASH_ = '\\';
-//
-////	CONSTINIT_OR_CONSTEXPR auto     OSSLASH_IS_BACKSLASH = true;
-//
-//#else
-//
-//#	define                          _EOL       "\n"
-////	extern const var          EOL     = _EOL;
-//
-//#	define                         _OSSLASH    "/"
-////	extern const var         OSSLASH  = _OSSLASH;
-//
-////	CONSTINIT_OR_CONSTEXPR auto     OSSLASH_ = '/';
-////	CONSTINIT_OR_CONSTEXPR auto     OSSLASH_IS_BACKSLASH = false;
-//
-//#endif
-//
-//	// _cplusplus is in format YYYYMM e.g. 202002, 202102, 202302 etc.
-//	// We will extract the two digit year only - using integer division and integer remainder ops.
-//	// Years e.g. 21 which are in between the actual standards like c++20, c++23, c++26 etc.
-//	// indicate partial informal support for some features of the next standard
-//	// 20 c++20
-//	// 21 some c++23
-//	// 23 c++23
-//	// 24 some c++26
-////	CONSTINIT_OR_CONSTEXPR auto _CPP_STANDARD=__cplusplus / 100 % 1000;
-//
-//#if defined(_WIN64) or defined(_LP64)
-//#	define                    _PLATFORM   "x64"
-//#else
-//#	define                    _PLATFORM   "x86"
-//#endif
-//	extern const var    PLATFORM = _PLATFORM;
-//
-//#ifdef __clang__
-//	//__clang_major__
-//	//__clang_minor__
-//	//__clang_patchlevel__
-//	//__clang_version__
-//	inline CONSTINIT_OR_CONSTEXPR auto _COMPILER =  "clang";
-//	inline CONSTINIT_OR_CONSTEXPR auto _COMPILER_VERSION =  __clang_major__;
-//#elif defined(__GNUC__)
-//	//__GNUC__
-//	//__GNUC_MINOR__
-//	//__GNUC_PATCHLEVEL__
-//	inline CONSTINIT_OR_CONSTEXPR auto _COMPILER =  "gcc";
-//	inline CONSTINIT_OR_CONSTEXPR auto _COMPILER_VERSION =  __GNUC__;
-//#else
-//	inline CONSTINIT_OR_CONSTEXPR auto _COMPILER =  "unknown";
-//	inline CONSTINIT_OR_CONSTEXPR auto _COMPILER_VERSION = 0;
-//#endif
-//
-//#pragma clang diagnostic pop
-//
-//// clang-format on
 
 #ifndef EXO_FUNCS_CPP
 	extern

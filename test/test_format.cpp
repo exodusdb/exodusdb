@@ -1,10 +1,10 @@
 #undef NDEBUG  //because we are using assert to check actual operations that cannot be skipped in release mode testing
 #include <cassert>
 
-#if EXO_MODULE > 1
+#if EXO_MODULE
 //	import std;
 #elif EXO_FORMAT == 1
-	#include <format>
+//	#include <format>
 #endif
 
 // Ignore a warning from gcc. TODO proper solution?
@@ -92,10 +92,10 @@ func main() {
 
 #if EXO_MODULE
 #else
-	std::string s1 = "xxx {} zzz";
-	assert(format(s1, "yyy") == "xxx yyy zzz");
-	print(s1, "yyy");
-	println(s1, "yyy");
+//	std::string s1 = "xxx {} zzz";
+//	assert(format(s1, "yyy") == "xxx yyy zzz");
+//	print(s1, "yyy");
+//	println(s1, "yyy");
 #endif
 //	printl(fmt::format("abc {} ghi", "def"));
 

@@ -1,7 +1,7 @@
 module;
 
 #include <exodus/vardefs.h>
-#include <exodus/format.h>
+//#include <exodus/format.h>
 
 #include <exodus/exoimpl.h>
 #include <exodus/exoprog.h>

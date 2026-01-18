@@ -42,10 +42,6 @@ THE SOFTWARE.
 
 namespace exo {
 
-//ND PUBLIC var   var::format(SV format_str) const {
-//	return vformat(format_str,*this);
-//}
-
 ND PUBLIC var  osgetenv(SV envcode /*=""*/) {var envvalue = ""; if (not envvalue.osgetenv(envcode)) {} return envvalue;}
 ND PUBLIC bool osgetenv(SV code, out value) {return value.osgetenv(code);}
    PUBLIC void ossetenv(SV code, in value) {return value.ossetenv(code);}

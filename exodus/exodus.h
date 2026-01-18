@@ -40,7 +40,6 @@ THE SOFTWARE.
 #	include <exodus/rex.h>
 #endif
 
-//#include <exodus/format.h>
 #include <exodus/vardefs.h>
 
 #if EXO_MODULE
