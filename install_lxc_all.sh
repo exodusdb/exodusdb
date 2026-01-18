@@ -70,12 +70,12 @@ PS4='+ [${SECONDS}s] '
 : Check base container exists $OS
 : ---------------------------
 :
-		lxc info $OS >/dev/null
+			lxc info $OS >/dev/null
 :
 : Start base container $OS
 : --------------------
 :
-			lxc restart $OS || true
+			lxc start $OS || true
 :
 : Upgrade all in base container - $OS
 : -----------------------------

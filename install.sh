@@ -158,15 +158,6 @@ PS4='+ [${SECONDS}s] '
 	#RUNNER_DEBUG=1
 
 :
-: ---------------------------------------------
-: Disable unattended upgrades until next reboot
-: ---------------------------------------------
-:
-	sudo systemctl disable --runtime apt-daily.timer apt-daily-upgrade.timer unattended-upgrades
-#	sudo systemctl mask --runtime unattended-upgrades apt-daily.timer apt-daily-upgrade.timer
-	sudo systemctl stop unattended-upgrades apt-daily.timer apt-daily-upgrade.timer
-
-:
 : Function to retry three times in case of timeout
 : ------------------------------------------------
 :
@@ -248,6 +239,15 @@ function download_submodules {
 : Generate error if timeout reached. Otherwise display various host info.
 :
 	hostnamectl status
+
+:
+: ---------------------------------------------
+: Disable unattended upgrades until next reboot
+: ---------------------------------------------
+:
+	sudo systemctl disable --runtime apt-daily.timer apt-daily-upgrade.timer unattended-upgrades
+#	sudo systemctl mask --runtime unattended-upgrades apt-daily.timer apt-daily-upgrade.timer
+	sudo systemctl stop unattended-upgrades apt-daily.timer apt-daily-upgrade.timer
 
 :
 : ----------
