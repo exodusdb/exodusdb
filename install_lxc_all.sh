@@ -44,16 +44,8 @@ PS4='+ [${SECONDS}s] '
 : Main
 : ----
 :
-: Remove any previous exodus dir tar files
-:
-	rm ../lxc_*_exodus.tar.z -f
-:
-: Setup a tar file to be used for all OS/compiler combinations
-:
-	export ALL_TAR_FILENAME=../lxc_$$_exodus.tar.z
-:
-: Loop through base containers
-: ----------------------------
+: Loop through requested base containers
+: --------------------------------------
 :
 #	for OS in u2404 u2204 u2004; do
 	for OS in ${BASE_CONTAINERS//,/ }; do
@@ -99,10 +91,6 @@ PS4='+ [${SECONDS}s] '
 
 		done # next compiler
 	done # next OS
-:
-: Clean up
-:
-	rm $ALL_TAR_FILENAME -f
 :
 : ====================================================================
 : Finished $0 $* in $((SECONDS / 60)) mins and $((SECONDS % 60)) secs.
