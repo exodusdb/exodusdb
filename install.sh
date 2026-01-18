@@ -118,7 +118,8 @@ PS4='+ [${SECONDS}s] '
 	COMPILER_OR_DEFAULT=${COMPILER/-default/}
 :
 	CMAKE_BUILD_OPTIONS=-GNinja
-	BUILD_DEPS="ninja-build libfmt-dev libreadline-dev"
+#	BUILD_DEPS="ninja-build libfmt-dev libreadline-dev"
+	BUILD_DEPS="libreadline-dev"
 #    if [[ $COMPILER =~ ^clang ]]; then
 #		BUILD_DEPS="$BUILD_DEPS ${COMPILER_OR_DEFAULT/clang/clang-tools}"
 #	fi
@@ -513,6 +514,13 @@ function get_dependencies_for_build_and_install {
 ##		sudo rm /usr/include/c++/$GCC_FAKE_VERSION -f
 
 	fi
+
+:
+: Download, build and install ninja
+: ---------------------------------
+:
+	apt remove ninja-build -qq || true
+	./install.ninja.sh
 
 :
 : Download and install dev packages for postgresql client lib and boost

@@ -89,7 +89,8 @@
 		set(_default_exo_module $ENV{EXO_MODULE})
 	elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang"
 		AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 18.0
-		AND DISTRO_VERSION_ID VERSION_GREATER_EQUAL "24.04" #Ninja doesnt support modules
+# Ubuntu 22.04 apt ninja doesnt support modules but we build it from source
+#		AND DISTRO_VERSION_ID VERSION_GREATER_EQUAL "24.04"
 	)
 		set(_default_exo_module 1)
 	else()
