@@ -11,12 +11,12 @@ set -euxo pipefail
 	URL="https://github.com/unicode-org/icu/releases/download/release-${ICU_VER}/${TARBALL}"
 
 	EXPECTED_SHA256="3e99687b5c435d4b209630e2d2ebb79906c984685e78635078b672e03c89df35"
-:
-: Ensure clang tools are available for libc++
-:
+#:
+#: Ensure clang tools are available for libc++
+#:
 	INSTALL_PREFIX=/usr/local/icu-libcxx-${ICU_VER}
 	CLANG_MAJOR=$(cc --version 2>&1 | grep -oP '^Ubuntu clang version \K\d+')
-	sudo apt -y install lld-$CLANG_MAJOR libc++-$CLANG_MAJOR-dev libc++abi-$CLANG_MAJOR-dev clang-tools-$CLANG_MAJOR
+#	sudo apt -y install lld-$CLANG_MAJOR libc++-$CLANG_MAJOR-dev libc++abi-$CLANG_MAJOR-dev clang-tools-$CLANG_MAJOR
 
 :
 : Download + verify
@@ -46,9 +46,11 @@ set -euxo pipefail
 #	export CXX=clang++
 	export CC=cc
 	export CXX=c++
-#	export CFLAGS="-O2 -Wall -fPIC"
-	export CXXFLAGS="-stdlib=libc++ -O2 -Wall -fPIC"
+	export CFLAGS="-O2 -Wall -fPIC"
+#	export CXXFLAGS="-stdlib=libc++ -O2 -Wall -fPIC"
+	export CXXFLAGS="-O2 -Wall -fPIC"
 	export LDFLAGS="-stdlib=libc++ -lc++abi"
+#	export LIBS="-lc++abi"   # sometimes needed instead of/in addition to LDFLAGS
 
 :
 : Optional but recommended: help find libc++ headers if needed

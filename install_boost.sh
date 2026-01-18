@@ -56,7 +56,7 @@ set -euxo pipefail
 : ============================================
 :
 : STEP 1: Install dependencies
-:
+: ============================
 : → Installing build dependencies...
 :
 	sudo apt install -y \
@@ -70,7 +70,7 @@ set -euxo pipefail
 #		build-essential
 :
 : STEP 2: Build Boost with custom ICU
-:
+: ===================================
 : → Downloading and building Boost ${BOOST_VERSION}...
 :
 	cd ~
@@ -86,21 +86,21 @@ set -euxo pipefail
 	cd "${BOOST_DIR}"
 :
 : Clean previous build artifacts ?
-:
+: --------------------------------
 	rm -rf bin.v2 || true
 :
 : Bootstrapping Boost with clang
-:
-#	test -x ./b2 ||
+: ------------------------------
+	test -x ./b2 ||
 	./bootstrap.sh --with-toolset=clang
 :
 : Configure user-config.jam for libc++
-:
-	echo 'using clang : : clang++ : <cxxflags>"-stdlib=libc++" <linkflags>"-stdlib=libc++" ;' > tools/build/src/user-config.jam
+: ------------------------------------
+	(set +x && echo 'using clang : : clang++ : <cxxflags>"-stdlib=libc++" <linkflags>"-stdlib=libc++" ;' > tools/build/src/user-config.jam)
 :
 : Build selected libraries
-:
-echo -e "${YELLOW}Building Boost libraries...${NC}"
+: ------------------------
+	(set +x && echo -e "${YELLOW}Building Selected Boost libraries...${NC}")
 
 	sudo ./b2 -j${JOBS} \
 		"-sICU_PATH=${ICU_PREFIX}" \
@@ -126,18 +126,22 @@ echo -e "${YELLOW}Building Boost libraries...${NC}"
 :
 :  ==================== VERIFICATION ====================
 
-	echo -e "\n${YELLOW}→ Verification:${NC}"
+	(set +x && echo -e "\n${YELLOW}→ Verification:${NC}")
 
-	echo -e "\nICU libs:"
+	(set +x && echo -e "\nICU libs:")
 	ls -l "${ICU_PREFIX}/lib/" | grep icu
 
-	echo -e "\nChecking for libstdc++ dependency (should be empty!):"
-	echo -e "${YELLOW}libboost_regex:${NC}"
-	ldd "${BOOST_INSTALL_PREFIX}/lib/libboost_regex.so" | grep -i stdc++ || echo -e "${GREEN}→ No libstdc++ found (good!)${NC}"
+	(set +x && echo -e "\nChecking for libstdc++ dependency (should be empty!):")
+	for LIBBOOST_FILE in /usr/local/lib/libboost*.so; do
+		if ldd "${LIBBOOST_FILE}" | grep -i stdc++; then
+			(set +x && echo -e "${RED}→ libstdc++ found in ${LIBBOOST_FILE} (bad!)${NC}")
+			exit 1
+		else
+			(set +x && echo -e "${GREEN}→ No libstdc++ found in ${LIBBOOST_FILE} (good!)${NC}")
+		fi
+	done
 
-	echo -e "\n${YELLOW}libboost_locale:${NC}"
-	ldd "${BOOST_INSTALL_PREFIX}/lib/libboost_locale.so" | grep -i stdc++ || echo -e "${GREEN}→ No libstdc++ found (good!)${NC}"
-	echo -e "${GREEN}Build completed successfully!${NC}"
+	(set +x && echo -e "${GREEN}Build completed successfully!${NC}")
 
 :
 : You can now rebuild your project with -stdlib=libc++ flags.
