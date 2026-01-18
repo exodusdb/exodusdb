@@ -755,6 +755,8 @@ export namespace std {
 		using std::filesystem::temp_directory_path;
 		using std::filesystem::is_directory;
 		using std::filesystem::path;
+		using std::filesystem::path::const_iterator; //??
+		using std::filesystem::const_iterator; //??
 		using std::filesystem::current_path;
 		using std::filesystem::absolute;
 		using std::filesystem::create_directories;

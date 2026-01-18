@@ -2,6 +2,7 @@
 #include <cassert>
 
 #if EXO_MODULE
+	import std;
 #else
 #	include <functional>
 #	include <limits>

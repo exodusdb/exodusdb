@@ -1,3 +1,9 @@
+#if EXO_MODULE
+	import std;
+#else
+#	include <iostream>
+#endif
+
 #include <exodus/program.h>
 programinit()
 
@@ -1073,11 +1079,11 @@ src = all_code_matches.split();
 				// man page formatting at the end
 
 				// Escape back slashes for man pages comments
-				doc_body.replacer("&bsol;", _BS);
-				doc_body.replacer(_BS, _BS _BS);
+				doc_body.replacer("&bsol;", _BSL);
+				doc_body.replacer(_BSL, _BSL _BSL);
 
 				// but man pages require some real BS in macros
-				doc_body.replacer("<REAL_BS>", _BS);
+				doc_body.replacer("<REAL_BS>", _BSL);
 
 				// Emphasise/highlight leading words xxxxxxx:
 				doc_body.replacer(R"__(^([a-zA-Z0-9_."]+):(\s+))__"_rex, R"__(\fB$1:\fR$2)__");

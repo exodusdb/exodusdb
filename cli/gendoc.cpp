@@ -1,3 +1,9 @@
+#if EXO_MODULE
+	import std;
+#else
+#	include <iostream>
+#endif
+
 #include <exodus/program.h>
 programinit()
 
@@ -188,7 +194,9 @@ func main2(in pass1) {
 	codefile <<
 R"__(#include <cassert>
 #if EXO_MODULE
-	import std;
+//	import std;
+#	include <vector>
+#	include <iomanip>
 #else
 #	include <vector>
 #	include <iomanip>
@@ -786,7 +794,7 @@ func main() {
 								// html escapes
 								.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
 								// man page escapes (handled by h2m in final stage)
-								//.replace(_BS, _BS _BS).replace(".", _BS "&.")
+								//.replace(_BSL, _BSL _BSL).replace(".", _BSL "&.")
 							;
 							return "\n<p><b>Example:</b><code>\n" ^ group1 ^ "\n</code></p>\n";
 						}

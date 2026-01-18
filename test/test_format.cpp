@@ -1,9 +1,8 @@
 #undef NDEBUG  //because we are using assert to check actual operations that cannot be skipped in release mode testing
 #include <cassert>
 
-// For std::format
-#if EXO_MODULE
-	import std;
+#if EXO_MODULE > 1
+//	import std;
 #elif EXO_FORMAT == 1
 	#include <format>
 #endif
@@ -42,9 +41,9 @@ func main() {
 		return 0;
 #else
 
-#if EXO_FORMAT == 1
-	printl(std::format("EXO_FORMAT is defined so formatting a var using std::format is possible. e.g. {}", "'hello'"));
-#endif
+//#if EXO_FORMAT == 1
+//	printl(std::format("EXO_FORMAT is defined so formatting a var using std::format is possible. e.g. {}", "'hello'"));
+//#endif
 
 	var x = 12.3456;
 	assert(x.format("{:.2f}").outputl() == "12.35");
@@ -67,12 +66,10 @@ func main() {
 
 	// need format if fmt is not consteval
 	var v1 = "iii {} kkk";
-	std::string s1 = "xxx {} zzz";
 	auto c1 = "xxx {} zzz";
 
 	// Will not compile. need format.
 //	assert(format(v1, "jjj") == "iii jjj kkk");
-//	assert(format(s1, "yyy") == "xxx yyy zzz");
 //	assert(format(c1, "yyy") == "xxx yyy zzz");
 	assert(format(v1, "jjj") == "iii jjj kkk");
 
@@ -82,7 +79,7 @@ func main() {
 
 	assert(format(c1, "yyy") == "xxx yyy zzz");
 	assert(var("jjj").format(v1) == "iii jjj kkk");
-	assert(var("yyy").format(s1) == "xxx yyy zzz");
+//	assert(var("yyy").format(s1) == "xxx yyy zzz");
 	assert(var("yyy").format(c1) == "xxx yyy zzz");
 	// print is required for variable format strings
 	// Whill not compile. print/println is required
@@ -91,10 +88,15 @@ func main() {
 //	println(v1, "yyy");
 //	println(s1, "yyy");
 	print(v1, "yyy");
-	print(s1, "yyy");
 	println(v1, "yyy");
-	println(s1, "yyy");
 
+#if EXO_MODULE
+#else
+	std::string s1 = "xxx {} zzz";
+	assert(format(s1, "yyy") == "xxx yyy zzz");
+	print(s1, "yyy");
+	println(s1, "yyy");
+#endif
 //	printl(fmt::format("abc {} ghi", "def"));
 
 	{

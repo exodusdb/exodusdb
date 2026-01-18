@@ -1,10 +1,11 @@
 #ifndef EXO_VARDEFS_H
 #define EXO_VARDEFS_H
 
-#if EXO_MODULE > 1
-	import std;
-#else
-#	include <iostream>
+#include <unistd.h>   // write(), STDERR_FILENO
+#if EXO_MODULE > 1 || (EXO_MODULE && LIBEXODUS_EXODUS_H_)
+//	import std;
+#elif LIBEXODUS_EXODUS_H_
+//#	include <iostream>
 #endif
 
 //#include <version> // for __cpp_consteval
@@ -99,7 +100,7 @@
 #define _STM "\x1A"  // Subtext Mark
 
 #define _NL "\n"
-#define _BS "\\"
+#define _BSL "\\"
 #define _DQ "\""
 #define _SQ "\'"
 
@@ -154,12 +155,15 @@
 		/* Must use errputl to convert all fms to visible fms*/ \
 		TRACE_expressionx.quote().errputl("TRACE(" #EXPRESSION ")\t/" "/ "); \
 	} catch (VarError e) { \
-		/*var(e.stack()).errputl(e.message);*/ \
-		std::cerr << var(e.message).field(":", 1) << ": " << var(e.stack()) << std::endl; \
+		var(e.stack()).errputl(e.message); \
+		/*std::cerr << var(e.message).field(":", 1) << ": " << var(e.stack()) << std::endl;*/ \
 	};
 
 #define TRACE2(EXPRESSION) \
-	std::cerr << (EXPRESSION) << std::endl;
+	/*std::cerr << (EXPRESSION) << std::endl;*/ \
+	var TRACE_expressionx {EXPRESSION}; \
+	/* Must use errputl to convert all fms to visible fms*/ \
+	TRACE_expressionx.quote().errputl("TRACE(" #EXPRESSION ")\t/" "/ ");
 
 //// string::view
 ////

@@ -9,6 +9,14 @@
 	message("-- CMAKE LIBEXODUS --")
 	message("---------------------")
 
+# Force our custom ICU location
+set(ICU_ROOT "/usr/local/icu-libcxx-78.2")
+
+# Optional: also add to prefix path for safety (helps if FindICU falls back to config mode)
+list(APPEND CMAKE_PREFIX_PATH "${ICU_ROOT}")
+
+find_package(ICU REQUIRED COMPONENTS uc i18n data)
+
 #
 # BOOST FIBER OPTION -DEXO_BOOST_FIBER=ON/OFF or enabled by default
 # ##################
@@ -140,9 +148,12 @@ execute_process(
 	set(Boost_USE_STATIC_RUNTIME      OFF)
 	set(Boost_Boost_USE_DEBUG_RUNTIME OFF)
 
+	set(Boost_NO_BOOST_CMAKE ON CACHE BOOL "Disable Boost's own CMake config mode")
+
 #	find_package(Boost REQUIRED COMPONENTS date_time system regex thread locale)
     if (EXO_BOOST_FIBER)
-		find_package(Boost REQUIRED COMPONENTS date_time system regex thread locale fiber context)
+		find_package(Boost REQUIRED COMPONENTS date_time regex thread locale fiber context)
+#		find_package(Boost REQUIRED COMPONENTS date_time system regex thread locale fiber context)
 	else()
 		find_package(Boost REQUIRED COMPONENTS date_time system regex thread locale)
 	endif()
@@ -197,7 +208,7 @@ execute_process(
 # module std
 # ##########
 #
-	if (EXO_MODULE)
+	if (EXO_MODULE EQUAL 2)
 		add_library(std)
 		target_sources(std
 			PUBLIC
@@ -242,15 +253,14 @@ execute_process(
 			FILE_SET modules_public
 			TYPE CXX_MODULES
 			FILES
-	#			exo.cppm
 				var.cppm
-	#			dim.cppm
 		)
+		target_link_libraries(exovar)
 		if (EXO_MODULE EQUAL 2)
-			target_link_libraries(exovar std)
+			target_link_libraries(std)
 		endif()
 		if (EXO_FORMAT EQUAL 2)
-			target_link_libraries(exovar fmt)
+			target_link_libraries(fmt)
 		endif()
 		if (EXO_FORMAT EQUAL 3)
 #			target_link_libraries(exovar ${FMT_LIBRARIES})
@@ -364,6 +374,17 @@ execute_process(
 #
 	# Boost and Postgresql
 	target_link_libraries(exodus
+		ICU::i18n
+		ICU::uc
+		ICU::data
+		Boost::locale
+		Boost::fiber
+		Boost::regex          # often needed if regex is used anywhere
+		Boost::thread
+		Boost::date_time
+		Boost::chrono
+		Boost::atomic
+		Boost::context
 		${Boost_LIBRARIES}
 		${PostgreSQL_LIBRARIES}
 	)
@@ -445,7 +466,14 @@ execute_process(
 
 	if (EXO_MODULE)
 		install(
-			TARGETS std exovar exoprog # fmt
+			TARGETS exovar exoprog
+			DESTINATION lib
+		)
+	endif()
+
+	if (EXO_MODULE EQUAL 2)
+		install(
+			TARGETS std
 			DESTINATION lib
 		)
 	endif()

@@ -782,28 +782,28 @@ public:
 	// obj is strvar
 	//
 	// `// 1. Backslash in text remains backslash
-	//  let v1 = var(_BS).oconv("TX");     // _BS
+	//  let v1 = var(_BSL).oconv("TX");     // _BSL
 	//
 	//  // 2. Literal "\n" -> literal "\\n" (Double escape any escaped NL chars)
-	//  let v2 = var(_BS "n").oconv("TX"); // _BS _BS "n"
+	//  let v2 = var(_BSL "n").oconv("TX"); // _BSL _BSL "n"
 	//
 	//  // 3. \n becomes literal "\n" (Single escape any NL chars)
-	//  let v3 = var(_NL).oconv("TX");     // _BS "n"
+	//  let v3 = var(_NL).oconv("TX");     // _BSL "n"
 	//
 	//  // 4. FM -> \n
 	//  let v4 = "f1^f2"_var.oconv("TX");  // "f1" _NL "f2"
 	//
 	//  // 5. VM -> "\" \n
-	//  let v5 = "v1]v2"_var.oconv("TX");  // "v1" _BS _NL "v2"
+	//  let v5 = "v1]v2"_var.oconv("TX");  // "v1" _BSL _NL "v2"
 	//
 	//  // 6. SM -> "\\" \n
-	//  let v6 = "s1}s2"_var.oconv("TX");  // "s1" _BS _BS _NL "s2"
+	//  let v6 = "s1}s2"_var.oconv("TX");  // "s1" _BSL _BSL _NL "s2"
 	//
 	//  // 7. TM -> "\\\" \n
-	//  let v7 = "t1|t2"_var.oconv("TX");  // "t1" _BS _BS _BS _NL "t2"
+	//  let v7 = "t1|t2"_var.oconv("TX");  // "t1" _BSL _BSL _BSL _NL "t2"
 	//
 	//  // 8. STM -> "\\\\" \n
-	//  let v8 = "st1~st2"_var.oconv("TX"); // "st1" _BS _BS _BS _BS _NL "st2"`
+	//  let v8 = "st1~st2"_var.oconv("TX"); // "st1" _BSL _BSL _BSL _BSL _NL "st2"`
 	//
 	ND std::string oconv_TX(const char* conversion) const;
 

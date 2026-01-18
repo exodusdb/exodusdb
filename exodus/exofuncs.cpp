@@ -22,6 +22,7 @@ THE SOFTWARE.
 
 // clang-format off
 
+//#include <type_traits> // bug work around in clang-21?
 #if EXO_MODULE
 	import var;
 #else

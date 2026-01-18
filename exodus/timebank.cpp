@@ -3,7 +3,7 @@
 
 #ifdef EXO_TIMEBANK
 
-#if EXO_MODULE > 2
+#if EXO_MODULE > 1
 	import std;
 #else
 #	include <iostream>

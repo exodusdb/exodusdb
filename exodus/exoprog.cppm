@@ -334,11 +334,11 @@ export namespace exo {
 	using exo::printl;
 	using exo::printt;
 	using exo::printx;
-#if EXO_FORMAT
+	using exo::format;
+//#if EXO_FORMAT && __GLIBCXX__
 	using exo::print;
 	using exo::println;
-	using exo::format;
-#endif
+//#endif
 
 	using exo::pwr;
 

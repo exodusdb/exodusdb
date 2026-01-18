@@ -929,6 +929,9 @@ ND var  format(SV fmt_str, Args&&... args) {
 //#endif
 }
 
+// Avoid ambiguous with std::print/println
+//#if __GLIBCXX__
+
 // print
 template<class... Args>
    void print(SV fmt_str, Args&&... args) {
@@ -957,6 +960,7 @@ template<class... Args>
 //        return fmt::vformat(std::string_view(fmt_str), fmt::make_format_args(*this, args...) );
 //    }
 
+//#endif // __GLIBCXX__
 
 #endif //EXO_FORMAT
 

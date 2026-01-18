@@ -1,9 +1,11 @@
 #undef NDEBUG  //because we are using assert to check actual operations that cannot be skipped in release mode testing
 #include <cassert>
 
-//#if EXO_MODULE
-//	import std;
-//#endif
+#if EXO_MODULE
+	import std;
+#else
+#	include <string>
+#endif
 
 #include <exodus/program.h>
 programinit()
@@ -30,14 +32,16 @@ func main() {
 	// Test move constructor
 	{
 		//warning: moving a temporary object prevents copy elision [-Wpessimizing-move]
-		var x = std::move(var("xyz"));
+//		var x = std::move(var("xyz"));
+		var x = var("xyz").move();
 		assert(x eq "xyz");
 	}
 	// Test move assign
 	{
 		var x;
 		//warning: moving a temporary object prevents copy elision [-Wpessimizing-move]
-		x = std::move(var("xyz"));
+//		x = std::move(var("xyz"));
+		x = var("xyz").move();
 		assert(x eq "xyz");
 	}
 #pragma GCC diagnostic pop

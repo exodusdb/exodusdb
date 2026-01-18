@@ -1,7 +1,11 @@
 //#include <boost/date_time/posix_time/posix_time.hpp>
 
-//#include <iostream> // for stdout/stderr
+#if EXO_MODULE
+	import std;
+#else
+#	include <iostream> // for stdout/stderr
 //#include <cstdio>
+#endif
 
 #include <exodus/program.h>
 programinit()

@@ -19,19 +19,19 @@
 #	include <functional> // std::function
 //#	include <queue>
 //#	include <mutex>
-//#	include <condition_variable>
-//#	include <thread>
+#	include <condition_variable>
+#	include <thread>
 #	include <vector>
 //#	include <atomic>
 #endif
 
 // Forward declarations
-namespace std {
-	class mutex;
-	class condition_variable;
-	class thread;
-	template<typename T> class atomic;
-}
+//namespace std {
+//	class mutex;
+//	class condition_variable;
+//	class thread;
+//	template<typename T> class atomic;
+//}
 
 namespace exo {
 

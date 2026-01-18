@@ -119,7 +119,7 @@ func main() {
 					let nfs2 = fcount(rec2, FM);
 					//if (nfs2 > nfs)
 					//	nfs = nfs2;
-					for (let fn : range(1, std::max(nfs, nfs2))) {
+					for (let fn : range(1, nfs > nfs2 ? nfs : nfs2)) {
 						let f1 = RECORD.f(fn);
 						let f2 = rec2.f(fn);
 						if (f1 != f2) {

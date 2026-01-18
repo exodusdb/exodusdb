@@ -65,7 +65,7 @@ func main() {
 
 		// Escape any ( ) or { }
 		if (var("(){}").contains(word))
-			word = _BS ^ word;
+			word = _BSL ^ word;
 
 		oscmd ^= word ^ " ";
 	}
