@@ -158,6 +158,15 @@ PS4='+ [${SECONDS}s] '
 	#RUNNER_DEBUG=1
 
 :
+: ---------------------------------------------
+: Disable unattended upgrades until next reboot
+: ---------------------------------------------
+:
+	sudo systemctl disable --runtime apt-daily.timer apt-daily-upgrade.timer unattended-upgrades
+#	sudo systemctl mask --runtime unattended-upgrades apt-daily.timer apt-daily-upgrade.timer
+	sudo systemctl stop unattended-upgrades apt-daily.timer apt-daily-upgrade.timer
+
+:
 : Function to retry three times in case of timeout
 : ------------------------------------------------
 :
@@ -170,7 +179,7 @@ function CMD_RETRY {
 :
 		# /dev/null to stop timeout causing random hang until timeout
 		# with apt process stuck on tcsetattr call. see gdb -p 9999
-		if timeout 120s $* < /dev/null; then
+		if timeout 300s $* < /dev/null; then
 			break
 		fi
 	done
@@ -429,10 +438,13 @@ function get_dependencies_for_build_and_install {
 :
 #	CLANG_MAJOR=22
 		CLANG_MAJOR=$COMPILER_VERSION
-		CMD_RETRY sudo wget https://apt.llvm.org/llvm.sh
-		chmod +x llvm.sh
-		CMD_RETRY sudo ./llvm.sh $CLANG_MAJOR
-	fi
+#		CMD_RETRY sudo wget https://apt.llvm.org/llvm.sh
+#		chmod +x llvm.sh
+#		sudo ./llvm.sh $CLANG_MAJOR
+		./install_clang.sh $CLANG_MAJOR
+		./install_icu.sh
+		./install_boost.sh
+	else
 
 :
 : Download and install compiler $COMPILER
@@ -508,6 +520,8 @@ function get_dependencies_for_build_and_install {
 :
 	APT_INSTALL libpq-dev libboost-regex-dev libboost-locale-dev libboost-fiber-dev libboost-context-dev
 	#APT_INSTALL g++ libboost-date-time-dev libboost-system-dev libboost-thread-dev
+
+	fi # not clang llvm
 
 :
 : Download and install pgexodus postgres build dependencies
