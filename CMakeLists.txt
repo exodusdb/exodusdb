@@ -118,6 +118,9 @@
 #			"$<$<COMPILE_LANGUAGE:CXX>:-isystem;/usr/lib/llvm-21/include/c++/v1>"
 			"$<$<COMPILE_LANGUAGE:CXX>:-fprebuilt-module-path=/usr/local/lib>"
 	)
+		add_link_options(
+			"$<$<COMPILE_LANGUAGE:CXX>:-fuse-ld=lld>"
+	)
 	endif()
 
 	# man cmake-cxxmodules
