@@ -89,7 +89,8 @@
 		set(_default_exo_module $ENV{EXO_MODULE})
 	elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang"
 		AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 18.0
-		AND DISTRO_VERSION_ID VERSION_GREATER_EQUAL "24.04")
+		AND DISTRO_VERSION_ID VERSION_GREATER_EQUAL "24.04" #Ninja doesnt support modules
+	)
 		set(_default_exo_module 1)
 	else()
 		set(_default_exo_module 0)
@@ -111,8 +112,11 @@
 		add_compile_options(
 #			-nostdinc++                     # disable default standard includes
 #			-isystem /usr/lib/llvm-21/include/c++/v1   # explicit libc++ headers (adjust if your path differs)
-			-fprebuilt-module-path=/usr/local/lib
-		)
+#			-fprebuilt-module-path=/usr/local/lib
+#			"$<$<COMPILE_LANGUAGE:CXX>:-nostdinc++>"
+#			"$<$<COMPILE_LANGUAGE:CXX>:-isystem;/usr/lib/llvm-21/include/c++/v1>"
+			"$<$<COMPILE_LANGUAGE:CXX>:-fprebuilt-module-path=/usr/local/lib>"
+	)
 	endif()
 
 	# man cmake-cxxmodules
