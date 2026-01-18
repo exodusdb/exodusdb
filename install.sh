@@ -516,20 +516,23 @@ function get_dependencies_for_build_and_install {
 	fi
 
 :
-: Download, build and install ninja
-: ---------------------------------
-:
-	apt remove ninja-build -qq || true
-	./install.ninja.sh
-
-:
 : Download and install dev packages for postgresql client lib and boost
 : ---------------------------------------------------------------------
 :
 	APT_INSTALL libpq-dev libboost-regex-dev libboost-locale-dev libboost-fiber-dev libboost-context-dev
 	#APT_INSTALL g++ libboost-date-time-dev libboost-system-dev libboost-thread-dev
 
+:
+: End of not clang
+:
 	fi # not clang llvm
+
+:
+: Download, build and install ninja
+: ---------------------------------
+:
+	apt remove ninja-build -qq || true
+	./install_ninja.sh
 
 :
 : Download and install pgexodus postgres build dependencies
