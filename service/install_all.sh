@@ -222,11 +222,11 @@ function APT_GET {
 : Wait for chromium snap install to complete
 : ===========================================
 :
-: Wait up to 10 mins for snap installation to complete. Often randomly fails. Just redo.
+: Wait up to 5x2 mins for snap installation to complete. Can randomly fails. Just redo.
 :
-	for x in 1 2; do
+	for x in 1 5; do
 		snap changes | grep chromium || true
-		timeout 600 bash -c 'while snap changes | grep chromium | grep -q Doing; do sleep 5; done; snap changes | grep chromium | grep -q Done && echo "Chromium installation done" || echo "Chromium installation failed or not found"' || echo "Timed out."
+		timeout 120 bash -c 'while snap changes | grep chromium | grep -Pqw "Do|Doing"; do sleep 5; done; snap changes | grep chromium | grep -q Done && echo "Chromium installation done" || echo "Chromium installation failed or not found"' || echo "Timed out."
 	done
 	snap changes | grep chromium || true
 :
@@ -240,7 +240,7 @@ function APT_GET {
 	printf "<html><body>Nothing Special</body></html>\n" > chromium2pdf.html
 	chromium --no-sandbox --headless --disable-gpu --print-to-pdf=chromium2pdf.pdf chromium2pdf.html |& grep "dbus|dconf|touch|mkdir" -vP 1>&2
 :
-: Check pdf seems ok
+: Verify pdf seems ok
 :
 	pdfgrep "Nothing Special" chromium2pdf.pdf
 #	rm chromium2pdf.html chromium2pdf.pdf
