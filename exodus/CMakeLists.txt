@@ -148,17 +148,18 @@ execute_process(
 	set(Boost_USE_STATIC_RUNTIME      OFF)
 	set(Boost_Boost_USE_DEBUG_RUNTIME OFF)
 
+	if(POLICY CMP0167)
+		cmake_policy(SET CMP0167 OLD)
+	endif()
+	set(Boost_NO_WARN_NEW_VERSIONS ON)
 	set(Boost_NO_BOOST_CMAKE ON CACHE BOOL "Disable Boost's own CMake config mode")
 
-#	find_package(Boost REQUIRED COMPONENTS date_time system regex thread locale)
     if (EXO_BOOST_FIBER)
-		find_package(Boost REQUIRED COMPONENTS date_time regex thread locale fiber context)
-#		find_package(Boost REQUIRED COMPONENTS date_time system regex thread locale fiber context)
+		find_package(Boost REQUIRED COMPONENTS date_time regex thread locale chrono atomic fiber context)
 	else()
-		find_package(Boost REQUIRED COMPONENTS date_time system regex thread locale)
+		find_package(Boost REQUIRED COMPONENTS date_time regex thread locale chrono atomic)
 	endif()
 
-	#message(" Boost_LIBRARY_DIRS=${Boost_LIBRARY_DIRS}")
 	message(" Boost_LIBRARIES=${Boost_LIBRARIES}")
 	message(" Boost_INCLUDEDIR=${Boost_INCLUDE_DIR}")
 	message(" Boost_VERSION=${Boost_VERSION}")
@@ -184,19 +185,6 @@ execute_process(
 ##
 
 	include_directories(${FMT_INCLUDE})
-#
-# Ryu
-# ###
-#
-#	Only needed for speed on older compilers pre Ubuntu 22.04 which dont have floating point to_chars
-#	See varnum.cpp
-#	#if __GNUC__ >= 11 || __clang_major__ >=  14
-#		#define EXO_USE_TO_CHARS
-	message("BOOST")
-
-	find_library(RYU_LIBRARIES NAMES ryu)
-
-	message(" RYU_LIBRARIES=${RYU_LIBRARIES}")
 
 #
 # exodus own include
@@ -404,15 +392,6 @@ execute_process(
 	target_link_libraries(exodus
 		dl
 	)
-
-	# ryu
-	# ###
-	#
-	if (NOT RYU_LIBRARIES STREQUAL "RYU_LIBRARIES-NOTFOUND")
-		target_link_libraries(exodus
-			${RYU_LIBRARIES}
-		)
-	endif()
 
 #
 # readline
