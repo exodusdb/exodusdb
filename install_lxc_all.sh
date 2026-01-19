@@ -1,6 +1,6 @@
 #!/bin/bash
 set -euxo pipefail
-PS4='+ [${SECONDS}s] '
+PS4='+ [lxc ${SECONDS}s] '
 : $0$*
 : ==========================================================================================
 : Build and install exodus on multiple OS and compilers in one command  using install_lxc.sh

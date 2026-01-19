@@ -297,26 +297,28 @@ ENVIRONMENT
 					break;
 				default:
 					// Max supported will be discovered from man pages below
+					std = "c++26"; // some c++26
+					// __cplusplus on clang 20 ,21 and 22 is 202400
 					{}
 			}
 		}
 
-		// If unknown compiler name or version, try to find latest supported version in man pages
-		if (not std) {
-
-			// Determine the actual compiler being used
-			let manpage_compiler = osshellread("readlink -f `which " ^ compiler ^ "`").trim("\n").field(_OSSLASH, -1);
-			// /x86_64-linux-gnu-g++-13
-			// /usr/lib/llvm-18/bin/clang
-
-			// Find all man page occurrences of c++2X and c++3X where X is a digit or letter
-			let manpage_versions = osshellread("man " ^ manpage_compiler ^ "|grep c++[23][0-9a-z] -o|sort -r|uniq").trim("\n");
-
-			// Choose the greatest c++ standard available from the compiler according to its man page
-			std = manpage_versions.field("\n", 1);
-			if (verbose)
-				printl("man pages for", compiler, manpage_compiler, "-> latest -std=" ^ std);
-		}
+//		// If unknown compiler name or version, try to find latest supported version in man pages
+//		if (not std) {
+//
+//			// Determine the actual compiler being used
+//			let manpage_compiler = osshellread("readlink -f `which " ^ compiler ^ "`").trim("\n").field(_OSSLASH, -1);
+//			// /x86_64-linux-gnu-g++-13
+//			// /usr/lib/llvm-18/bin/clang
+//
+//			// Find all man page occurrences of c++2X and c++3X where X is a digit or letter
+//			let manpage_versions = osshellread("man " ^ manpage_compiler ^ "|grep c++[23][0-9a-z] -o|sort -r|uniq").trim("\n");
+//
+//			// Choose the greatest c++ standard available from the compiler according to its man page
+//			std = manpage_versions.field("\n", 1);
+//			if (verbose)
+//				printl("man pages for", compiler, manpage_compiler, "-> latest -std=" ^ std);
+//		}
 
 		// Append c++ standard option
 		if (std) {

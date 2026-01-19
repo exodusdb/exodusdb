@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -euxo pipefail
+PS4='+ [ninja ${SECONDS}s] '
 :
 : "=== DL Build and install Ninja from exodusdb fork"
 : =================================================
