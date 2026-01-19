@@ -7,6 +7,7 @@
 	#include <iostream> // for std::cerr
 #endif
 
+#include "exoprog.h"	// for exo::ExoStop/ExoExit
 #include "exoenv.h"
 #include "threadsafequeue.h"
 #include "job.h"
@@ -137,8 +138,7 @@ Job::Job (
 				throw std::runtime_error("Failed to initialize shared member function");
 
 			// Call a shared library objects member function.
-			// It will handle only its ExoExit exceptions (Stop/Abort)
-			// not VarError or anything else.
+			// TODO: Replace with call to exoprog_callsmf() to standardise handling of exceptions (Stop/Abort/VarError etc.)
 			shared_env->ANS = std::move(callable.callsmf());
 
 			// Push normal result
@@ -149,10 +149,29 @@ Job::Job (
 				// OR (Why not both since it is a shared_ptr)
 				promise->set_value(std::move(*shared_env));
 
+		} catch (ExoStop& e) {
+			// Normal exit from stop()
+			// Recommend any required results are placed in ANS or other ExoEnv vars
+			if (e.message)
+				shared_env->ANS = e.message;
+			if (result_queuex)
+				result_queuex->push(std::move(*shared_env));
+			else
+				promise->set_value(std::move(*shared_env));
+
+		} catch (ExoExit& e) {
+			// Push abnormal exit from abort() or abortall()
+			shared_env->ANS = "";
+			if (result_queuex)
+				result_queuex->push(std::move(*shared_env));
+			else
+				promise->set_value(std::move(*shared_env));
+
 		} catch (VarError& e) {
 			std::cerr << "Job: " << command << std::endl;
 			std::cerr << e.stack() << std::endl;
 			// Push abnormal result
+			shared_env->ANS = "";
 			if (result_queuex) {
 				result_queuex->push(std::move(*shared_env));
 			}
@@ -161,6 +180,7 @@ Job::Job (
 		} catch (std::exception& e) {
 			std::cerr << "Error: std::exception: " << e.what() << " Job: " << command << std::endl;
 			// Push abnormal result
+			shared_env->ANS = "";
 			if (result_queuex) {
 				result_queuex->push(std::move(*shared_env));
 			}
@@ -169,6 +189,7 @@ Job::Job (
 		} catch (...) {
 			std::cerr << "Error: Unknown error. Job: " << command << std::endl;
 			// Push abnormal result
+			shared_env->ANS = "";
 			if (result_queuex) {
 				result_queuex->push(std::move(*shared_env));
 			}

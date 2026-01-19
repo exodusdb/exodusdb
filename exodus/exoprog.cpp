@@ -762,6 +762,7 @@ var exoprog_callsmf(const Callable& callable, const ExoProgram& exoprog) {
 		// without needing to setup chains of returns
 		// to exit from nested functions
 		var::setlasterror("");
+		// TODO: Return ANS if e.message is ""
 		nrvo = e.message;
 	}
 
