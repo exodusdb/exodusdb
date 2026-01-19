@@ -73,7 +73,7 @@ set -euxo pipefail
 : ===================================
 : → Downloading and building Boost ${BOOST_VERSION}...
 :
-	cd ~
+#	cd ~
 
 	if [ ! -f "${BOOST_TAR}" ]; then
 		wget --timestamping "${BOOST_URL}"
@@ -118,7 +118,8 @@ set -euxo pipefail
 		--with-locale \
 		--with-fiber \
 		--with-context \
-		install --prefix="${BOOST_INSTALL_PREFIX}"
+		--durations \
+		install --prefix="${BOOST_INSTALL_PREFIX}" | grep -vP "^(include/boost|common.copy)"
 
 	ldconfig
 :

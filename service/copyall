@@ -70,7 +70,6 @@ set -euxo pipefail
 :	otherwise new code may not become active and/or undefined behaviour i.e. crashes etc.
 :
 	rsync $DRYRUN -av --whole-file --delete $HOME/{bin,lib,dat,inc} ~/live
-
 :
 : Copy '$EXO_INSTALL_DIR' bin, lib and inc files to /usr/local/live
 : ===============================================================
@@ -78,7 +77,7 @@ set -euxo pipefail
 :	Note that ldconfig will not see or use /usr/local/live.
 :	We are relying on PATH and LD_LIBRARY_PATH configuration in the live service to use it.
 :
-	sudo rsync $DRYRUN -av --delete $EXO_INSTALL_DIR/{bin,lib,share,include} $EXO_INSTALL_DIR/live
+	sudo rsync $DRYRUN -av --delete $EXO_INSTALL_DIR/{bin,lib,share,include} --exclude include/boost $EXO_INSTALL_DIR/live
 
 :
 : Finished $DRYRUN copying EXODUS programs to live in $(($SECONDS / 60)) minutes and $(($SECONDS % 60)) seconds.
