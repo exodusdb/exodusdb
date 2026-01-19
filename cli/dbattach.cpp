@@ -103,10 +103,13 @@ func main() {
 		// Must be done as a superuser eg postgres or exodus with superuser power
 		/////////////////////////////////////////////////////////////////////////
 
-		// Check we are a superuser
+		// Check/get superuser access
 		sql = "ALTER USER " ^ dbuser1 ^ " WITH SUPERUSER";
-		if (not conn1.sqlexec(sql))
-			abort(conn1.lasterror());
+		if (not conn1.sqlexec(sql)) {
+			if (not osshell("sudo -u postgres psql -c " ^ sql.quote()))
+				abort(conn1.lasterror());
+		}
+		// Revoked by subr revokesuperuser()
 
 		// Reset all interdb connections
 		if (OPTIONS.contains("RRR")) {
@@ -140,8 +143,10 @@ func main() {
 		if (not conn1.sqlexec("DROP USER MAPPING IF EXISTS FOR " ^ dbuser1 ^ " SERVER " ^ foreign_dbcode))
 			abort(conn1.lasterror());
 
-		if (OPTIONS.contains("R"))
+		if (OPTIONS.contains("R")) {
+			revokesuperuser(dbuser1, conn1);
 			return 0;
+		}
 
 		// Configure user/connection parameters. Target dbuser and dbpass.
 		if (not conn1.sqlexec("CREATE USER MAPPING FOR " ^ dbuser1 ^ " SERVER " ^ foreign_dbcode ^ " OPTIONS (user '" ^ dbuser2 ^ "', password '" ^dbpass2 ^ "')"))
@@ -149,6 +154,7 @@ func main() {
 
 		//printl("OK user " ^ dbuser1 ^ " in db " ^ dbcode ^ " now has access to db " ^ foreign_dbcode);
 
+		revokesuperuser(dbuser1, conn1);
 		return 0;
 	}
 
@@ -204,6 +210,14 @@ func main() {
 	}
 
 	return 0;
+}
+
+subroutine revokesuperuser(in dbuser, in dbconn) {
+	let sql = "ALTER USER " ^ dbuser ^ " WITH NOSUPERUSER";
+	if (not osshell("sudo -u postgres psql -c " ^ sql.quote()))
+		abort(dbconn.lasterror());
+
+	return;
 }
 
 }; // programexit()
