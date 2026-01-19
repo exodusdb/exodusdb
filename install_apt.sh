@@ -44,7 +44,7 @@ set -euxo pipefail
 :
 	EXODUS_DIR=${1:-~/exodus}
 	EXODUS_BRANCH_OR_TAG=${2:-master}
-	COMPILER=${3:-gcc}
+	COMPILER=${3:-clang-20}
 :
 : Update apt and install git
 : --------------------------

@@ -1,5 +1,6 @@
 #!/bin/bash
 set -euxo pipefail
+PS4='+ [boost ${SECONDS}s] '
 :
 :  =============================================================================
 :  'Complete script: Build ICU + Boost with Clang + libc++ on Ubuntu LTS'
@@ -76,7 +77,7 @@ set -euxo pipefail
 #	cd ~
 
 	if [ ! -f "${BOOST_TAR}" ]; then
-		wget --timestamping "${BOOST_URL}"
+		wget --no-verbose --timestamping "${BOOST_URL}"
 	fi
 
 	if [ ! -d "${BOOST_DIR}" ]; then
@@ -91,7 +92,7 @@ set -euxo pipefail
 :
 : Bootstrapping Boost with clang
 : ------------------------------
-	test -x ./b2 ||
+#	test -x ./b2 ||
 	./bootstrap.sh --with-toolset=clang
 :
 : Configure user-config.jam for libc++
@@ -102,11 +103,17 @@ set -euxo pipefail
 : ------------------------
 	(set +x && echo -e "${YELLOW}Building Selected Boost libraries...${NC}")
 
+:
+: IF ANY TESTS FAIL THAT SHOULDNT e.g. has_icu - important for boost_locale, see
+: boost_1_90_0/bin.v2/config.log for info
+:
+: Add -ldl linker flag to allow use linking to custom icu on older OS e.g. 20.04
+:
 	sudo ./b2 -j${JOBS} \
 		"-sICU_PATH=${ICU_PREFIX}" \
 		toolset=clang \
 		cxxflags="-stdlib=libc++ -I${ICU_PREFIX}/include" \
-		linkflags="-stdlib=libc++ -L${ICU_PREFIX}/lib" \
+		linkflags="-stdlib=libc++ -L${ICU_PREFIX}/lib -ldl" \
 		threading=multi \
 		link=shared,static \
 		boost.locale.icu=on \
@@ -133,8 +140,11 @@ set -euxo pipefail
 	ls -l "${ICU_PREFIX}/lib/" | grep icu
 
 	(set +x && echo -e "\nChecking for libstdc++ dependency (should be empty!):")
-	for LIBBOOST_FILE in /usr/local/lib/libboost*.so; do
-		if ldd "${LIBBOOST_FILE}" | grep -i stdc++; then
+#	for LIBBOOST_FILE in /usr/local/lib/libboost*.so; do
+	for BOOST_LIBNAME in atomic chrono date_time locale regex thread fiber context; do
+		LIBBOOST_FILE=/usr/local/lib/libboost_${BOOST_LIBNAME}.so
+		test -x ${LIBBOOST_FILE}
+		if ldd ${LIBBOOST_FILE} | grep -i stdc++; then
 			(set +x && echo -e "${RED}→ libstdc++ found in ${LIBBOOST_FILE} (bad!)${NC}")
 			exit 1
 		else

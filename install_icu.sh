@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -euxo pipefail
-
+PS4='+ [icu ${SECONDS}s] '
 :
 : Prerequisites - run once
 :
@@ -22,8 +22,7 @@ set -euxo pipefail
 : Download + verify
 : =================
 :
-#	wget --timestamping -O "${TARBALL}" "${URL}"
-	wget --timestamping "${URL}"
+	wget --no-verbose --timestamping "${URL}"
 	ACTUAL=$(sha256sum "${TARBALL}" | cut -d' ' -f1)
 	[[ "$ACTUAL" != "$EXPECTED_SHA256" ]] && { echo "Hash mismatch!"; exit 1; }
 : "Hash OK"

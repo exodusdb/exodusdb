@@ -1,5 +1,6 @@
 #!/bin/bash
 set -euxo pipefail
+PS4='+ [clang ${SECONDS}s] '
 :
 : 'Install clang from llvm and precompile std.cppm'
 : ===============================================
@@ -66,16 +67,38 @@ set -euxo pipefail
 		--precompile -o std.pcm "$STD_CPPM_FILE"
 	mv std.pcm /usr/local/lib
 
-#main.cpp
-#import std;
-#
-#int main() {
-#    std::print("Hello modules from Clang " __clang_major__ " + libc++! π ≈ {:.6}\n", std::numbers::pi);
-#}
-#	# 3. Compile & link your program
-#	clang++-$CLANG_VER -std=c++23 -stdlib=libc++ \
-#	  -fmodule-file=std=std.pcm \
-#	  std.pcm main.cpp -o myprogram
-#
-#	# Run
-#./myprogram
+:
+: Test compiling modules
+: ----------------------
+:
+: Create a cpp file
+:
+	CLANG_VER=20
+    TESTFILE=/tmp/test_clang_$CLANG_VER
+    cat <<-EOF > $TESTFILE.cpp
+		import std;
+		int main() {
+			std::println("Hello modules from Clang {} + libc++! π ≈ {:.6}", __clang_major__, std::numbers::pi);
+		}
+	EOF
+:
+: Compile it
+:
+    clang++-$CLANG_VER \
+        -std=c++26 \
+        -stdlib=libc++ \
+        -fprebuilt-module-path=/usr/local/lib \
+        -o $TESTFILE \
+        $TESTFILE.cpp
+:
+: Run it
+:
+    $TESTFILE
+:
+: Verify output
+:
+	$TESTFILE | grep "Clang $CLANG_VER"
+:
+: Clean up
+:
+    rm $TESTFILE.cpp $TESTFILE
