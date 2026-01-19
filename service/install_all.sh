@@ -1,6 +1,6 @@
 #!/bin/bash
 set -euxo pipefail
-PS4='+ [${SECONDS}s] '
+PS4='+ [service ${SECONDS}s] '
 : ===========================
 : Installs EXODUS web service
 : ===========================
