@@ -2,45 +2,46 @@
 set -euxo pipefail
 PS4='+ [ninja ${SECONDS}s] '
 :
-: "=== DL Build and install Ninja from exodusdb fork"
+: "=== Download, build and install ninja from github"
 : =================================================
 :
-: Configuration
+: 'Syntax is ./install_ninja.sh [BRANCH_TAG_HASH]'
 :
-	REPO_URL="https://github.com/exodusdb/ninja.git"
+: 'BRANCH_TAG_HASH :'
+:
+: 'release : (default) Latest release -> 1.13.2 currently'
+: 'master  :           Latest dev     -> 1.14.0 currently'
+: 'v1.12.0 : Available tags - see github repo for info.'
+: '3441b63 : Any available hash'
+:
+: 'Installs /usr/local/bin/ninja (overides apt and snap ninja)'
+:
+	BRANCH_TAG_HASH=${1:-release}
+:
+: 0. Configuration
+:
+	GIT_REPO_URL=https://github.com/ninja-build/ninja
 	INSTALL_DIR="/usr/local/bin"
 	NINJA_BIN="ninja"
 	BUILD_DIR="build-cmake"
-	CLONE_DIR="$HOME/ninja-exodusdb"   # or /tmp/ninja-exodusdb if you prefer temporary
-#:
-#: 1. Install build dependencies (if missing)
-#: "→ Installing dependencies (sudo may ask for password)"
-#:
+	CLONE_DIR="$HOME/ninja-exodusdb"
+	CLONE_DIR="/tmp/ninja-exodusdb"
+	RM_SRC_AFTER=true
+:
+: 1. Install dependencies
+:
 #	sudo apt update -qq
 #	sudo apt install -y --no-install-recommends \
 #	    git cmake build-essential ninja-build  # ninja-build here is only for bootstrapping cmake if needed
 :
-: 2. Clone or update the repository
+: 2. Get repo
 :
-	if [ -d "$CLONE_DIR" ]; then
+    rm "$CLONE_DIR" -rf
+    git clone --depth 1 --single-branch ${BRANCH_TAG_HASH:+-b $BRANCH_TAG_HASH} "$GIT_REPO_URL" "$CLONE_DIR"
+    cd "$CLONE_DIR"
 :
-: "→ Updating existing clone in $CLONE_DIR"
+: 3. Make
 :
-	    cd "$CLONE_DIR"
-	    git fetch --quiet origin
-	    git reset --hard origin/master   # or replace 'master' with the branch you want
-	    git clean -fdx -q || true
-	else
-:
-: "→ Cloning fresh copy to $CLONE_DIR"
-:
-	    git clone --depth 1 "$REPO_URL" "$CLONE_DIR"
-	    cd "$CLONE_DIR"
-	fi
-
-:
-: "→ Configuring and building Ninja with CMake"
-:	rm -rf "$BUILD_DIR"
 	cmake -S . -B "$BUILD_DIR" \
 	    -DCMAKE_BUILD_TYPE=Release \
 	    -DBUILD_TESTING=OFF \
@@ -48,24 +49,24 @@ PS4='+ [ninja ${SECONDS}s] '
 
 	cmake --build "$BUILD_DIR" --config Release --parallel "$(nproc)"
 :
-: 4. Verify the built binary
+: 4. Verify
 :
 	if [ ! -f "$BUILD_DIR/$NINJA_BIN" ]; then
 		echo "Error: Ninja binary not found in $BUILD_DIR/$NINJA_BIN"
 	    exit 1
 	fi
 :
-: "→ Installing ninja to $INSTALL_DIR (sudo required)"
+: 5. Install
 :
 	sudo cp -f "$BUILD_DIR/$NINJA_BIN" "$INSTALL_DIR/$NINJA_BIN"
 	sudo chmod 755 "$INSTALL_DIR/$NINJA_BIN"
 :
-: "→ Cleaning up"
+: 6. Cleanup
 :
 	cd ..
-	rm -rf "$CLONE_DIR"
+	$RM_SRC_AFTER && rm -rf "$CLONE_DIR"
 :
-: "=== Installation complete ==="
+: 7. Complete
 :
 	"$INSTALL_DIR/$NINJA_BIN" --version
 	ninja --version
