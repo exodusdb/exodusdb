@@ -224,7 +224,7 @@ function APT_GET {
 :
 : Wait up to 5x2 mins for snap installation to complete. Can randomly fails. Just redo.
 :
-	for x in 1 5; do
+	for x in {1..5}; do
 		snap changes | grep chromium || true
 		timeout 120 bash -c 'while snap changes | grep chromium | grep -Pqw "Do|Doing"; do sleep 5; done; snap changes | grep chromium | grep -q Done && echo "Chromium installation done" || echo "Chromium installation failed or not found"' || echo "Timed out."
 	done

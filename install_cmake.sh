@@ -41,7 +41,8 @@ PS4='+ [cmake ${SECONDS}s] '
 #	    git cmake build-essential cmake-build  # cmake-build here is only for bootstrapping cmake if needed
 :
 	if [[ $MODE == binary ]]; then
-		wget $GIT_REPO_URL/releases/download/v$RELEASE/cmake-$RELEASE-linux-x86_64.sh
+		rm -rf cmake-$RELEASE-linux-x86_64.sh
+		wget --no-verbose $GIT_REPO_URL/releases/download/v$RELEASE/cmake-$RELEASE-linux-x86_64.sh
 		sudo sh cmake-$RELEASE-linux-x86_64.sh --prefix=$INSTALL_PREFIX --exclude-subdir --skip-license
 		rm cmake-$RELEASE-linux-x86_64.sh
 	else
