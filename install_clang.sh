@@ -73,7 +73,6 @@ PS4='+ [clang ${SECONDS}s] '
 :
 : Create a cpp file
 :
-	CLANG_VER=20
     TESTFILE=/tmp/test_clang_$CLANG_VER
     cat <<-EOF > $TESTFILE.cpp
 		import std;
