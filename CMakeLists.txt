@@ -1,14 +1,14 @@
 #use make VERBOSE=1 to debug make
-	message("------------------")
-	message("-- CMAKE EXODUS --")
-	message("------------------")
-#
 # CONFIG
 # ######
 #
 	cmake_minimum_required(VERSION 3.10)
 #	cmake_minimum_required(VERSION 3.28)
 
+# ────────────────────────────────────────
+	message("-- CMAKE EXODUS --")
+	message(STATUS "Building with CMake version: ${CMAKE_VERSION}")
+# ────────────────────────────────────────
 #	set(CMAKE_EXPERIMENTAL_CXX_IMPORT_STD "d0edc3af-4c50-42ea-a356-e2862fe7a444")  # example for ~4.0; update if needed!)
 	project(exodus)
 

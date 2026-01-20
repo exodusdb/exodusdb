@@ -42,7 +42,8 @@ PS4='+ [ninja ${SECONDS}s] '
 	apt-get install -y unzip
 :
 	if [[ $MODE == binary ]]; then
-		wget $GIT_REPO_URL/releases/download/v$RELEASE/ninja-linux.zip
+		rm -rf ninja-linux.zip
+		wget --no-verbose $GIT_REPO_URL/releases/download/v$RELEASE/ninja-linux.zip
 		unzip -o ninja-linux.zip -d $INSTALL_PREFIX/bin
 		rm ninja-linux.zip
 	else
