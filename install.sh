@@ -8,53 +8,69 @@ PS4='+ [install ${SECONDS}s] '
 : Build, install and test exodus
 : ==========================================================
 :
-: 'Default clang compiler on Ubuntu 24.04 is 19 since 20 has problems'
+:	Builds with clang-20, 21 and 22
+:	using libc++, modules and std=c++26
+:	on all Ubuntu LTS 20.04 - 24.04 and 25.10
 :
-: 'Output from cli/exodus by OS for 2 compilers'
-: '"c++ 21" indicates c++20 plus informal support for c++23'
-: '"c++ 24" indicates c++23 plus informal support for c++26'
+:	Depend   Ver    Source    Type
+:	------   ---    ------    ----
+:	clang    20-22  llvm      apt binary
+:	cmake    4.2.1  github    binary or source
+:	icu      78     github    source
+:	boost    90     github    source
+:	chromium 143    canonical snap
+:	ninja    1.14.0 github    binary or source
 :
-: 'Build: Ubuntu 25.10 x64 gcc   15 c++ 24'
-: 'Build: Ubuntu 24.04 x64 gcc   14 c++ 23'
-: 'Build: Ubuntu 22.04 x64 g++   11 c++ 21'
-: 'Build: Ubuntu 20.04 x64 g++    9 c++ 17'
-:
-: 'Build: Ubuntu 25.10 x64 clang 21 c++ 24'
-: 'Build: Ubuntu 24.04 x64 clang 19 c++ 24'
-: 'Build: Ubuntu 22.04 x64 clang 14 c++ 21'
-: 'Build: Ubuntu 20.04 x64 clang 10 c++ 20'
-:
-: '------ ------------ ----- --------  ----    -----   -----'
-: 'Status Ubuntu  LTS  Name  Postgres  g++     clang   boost'
-: '------ ------------ ----- --------  ----    -----   -----'
-: 'OK     25.10        quest 17.6      15.2.0  21.1.2  88   '
-:
-: 'OK     24.04   Yes  noble 16.3?     13.3    19.1.1  83   clang-18/19 and g++ work. clang-20 doesnt.'
-: 'KO     24.04   Yes  noble 16.3?     14.2    20.?    83   latest'
-: 'OK     24.04   Yes  noble 16.3      13.3.0  18.1.3  83   default'
-:
-: 'OK     23.10              15.4      13.2    16           '
-: 'OK     23.04              15.4      12.3                 '
-: 'OK     22.04.3 Yes  jammy 14.9      11.4    14.0    74   '
-: 'OK     20.04.6 Yes  focal 12.16      9.4    10      71   '
-: '------ -----------  ----- --------  ----    -----   -----'
-: 'KO     18.04   Yes        10                           '
-: '------ -----------  ----- --------  ----  -----   -----'
-: 'Exodus now requires c++20 so will no longer build on 18.04'
-:
-: min/default/latest compiler version
-: --------------------------------
-:
-: OS      g++             clang
-:         min def latest  min def latest
-: 24.04    09  13  14      14  18  18
-: 22.04    09  11  12      11  14  15
-: 20.04    07  09  10      07  10  12
-:
-: OS          Cmake
-: Noble 24.04 3.28.3
-: jammy 22.04 3.22.1
-: focal 20.04 3.16.3
+:	Currently no longer building with g++
+:	and default versions supplied by OS
+#
+#: 'Default clang compiler on Ubuntu 24.04 is 19 since 20 has problems'
+#:
+#: 'Output from cli/exodus by OS for 2 compilers'
+#: '"c++ 21" indicates c++20 plus informal support for c++23'
+#: '"c++ 24" indicates c++23 plus informal support for c++26'
+#:
+#: 'Build: Ubuntu 25.10 x64 gcc   15 c++ 24'
+#: 'Build: Ubuntu 24.04 x64 gcc   14 c++ 23'
+#: 'Build: Ubuntu 22.04 x64 g++   11 c++ 21'
+#: 'Build: Ubuntu 20.04 x64 g++    9 c++ 17'
+#:
+#: 'Build: Ubuntu 25.10 x64 clang 21 c++ 24'
+#: 'Build: Ubuntu 24.04 x64 clang 19 c++ 24'
+#: 'Build: Ubuntu 22.04 x64 clang 14 c++ 21'
+#: 'Build: Ubuntu 20.04 x64 clang 10 c++ 20'
+#:
+#: '------ ------------ ----- --------  ----    -----   -----'
+#: 'Status Ubuntu  LTS  Name  Postgres  g++     clang   boost'
+#: '------ ------------ ----- --------  ----    -----   -----'
+#: 'OK     25.10        quest 17.6      15.2.0  21.1.2  88   '
+#:
+#: 'OK     24.04   Yes  noble 16.3?     13.3    19.1.1  83   clang-18/19 and g++ work. clang-20 doesnt.'
+#: 'KO     24.04   Yes  noble 16.3?     14.2    20.?    83   latest'
+#: 'OK     24.04   Yes  noble 16.3      13.3.0  18.1.3  83   default'
+#:
+#: 'OK     23.10              15.4      13.2    16           '
+#: 'OK     23.04              15.4      12.3                 '
+#: 'OK     22.04.3 Yes  jammy 14.9      11.4    14.0    74   '
+#: 'OK     20.04.6 Yes  focal 12.16      9.4    10      71   '
+#: '------ -----------  ----- --------  ----    -----   -----'
+#: 'KO     18.04   Yes        10                           '
+#: '------ -----------  ----- --------  ----  -----   -----'
+#: 'Exodus now requires c++20 so will no longer build on 18.04'
+#:
+#: min/default/latest compiler version
+#: --------------------------------
+#:
+#: OS      g++             clang
+#:         min def latest  min def latest
+#: 24.04    09  13  14      14  18  18
+#: 22.04    09  11  12      11  14  15
+#: 20.04    07  09  10      07  10  12
+#:
+#: OS          Cmake
+#: Noble 24.04 3.28.3
+#: jammy 22.04 3.22.1
+#: focal 20.04 3.16.3
 
 : ------
 : Syntax
