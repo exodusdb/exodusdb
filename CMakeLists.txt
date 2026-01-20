@@ -310,6 +310,7 @@
 #	add_compile_options(-Winline)
 	#switch off nodiscard warnings
 	#add_compile_options(-Wno-unused-result)
+	add_compile_options(-Werror=return-type)
 
 	if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
 

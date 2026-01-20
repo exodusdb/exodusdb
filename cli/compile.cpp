@@ -471,6 +471,9 @@ ENVIRONMENT
 //			enabled individually.
 			basicoptions ^= " -Wall";
 
+			// Missing return in non-void function must be an error otherwise may get double free at runtime
+			basicoptions ^= " -Werror=return-type";
+
 			//This enables some extra warning flags that are not enabled by -Wall.
 			basicoptions ^= " -Wextra";
 
