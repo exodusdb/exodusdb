@@ -2,31 +2,54 @@
 set -euxo pipefail
 PS4='+ [icu ${SECONDS}s] '
 :
-: Prerequisites - run once
+: Download, build and install icu from github with clang/libc++
+: =============================================================
 :
-	sudo apt install -y make wget tar
+: './install_icu.sh [ICU_VER]'
+:
+	DEFAULT_ICU_VER=78.2
+:	etc. - See https://github.com/unicode-org/icu/releases
+:
+: Config
+: ------
+:
+	ICU_VER=${1:-$DEFAULT_ICU_VER}
+	INSTALL_PREFIX=/usr/local/icu-libcxx-${ICU_VER}
 
-	ICU_VER="78.2"
 	TARBALL="icu4c-${ICU_VER}-sources.tgz"
 	URL="https://github.com/unicode-org/icu/releases/download/release-${ICU_VER}/${TARBALL}"
+:
+: Configure with clang + libc++
+:
+#	export CC=clang
+#	export CXX=clang++
+	export CC=cc
+	export CXX=c++
+	export CFLAGS="-O2 -Wall -fPIC"
+	export CXXFLAGS="-O2 -Wall -fPIC"
+	export CXXFLAGS="$CXXFLAGS -nostdinc++ -isystem/usr/include/c++/v1"
+	export LDFLAGS="-stdlib=libc++ -lc++abi -fuse-ld=lld"
+#	export LIBS="-lc++abi"   # sometimes needed instead of/in addition to LDFLAGS
+	CLANG_MAJOR=$(cc --version 2>&1 | grep -oP 'clang version \K\d+')
 
-	EXPECTED_SHA256="3e99687b5c435d4b209630e2d2ebb79906c984685e78635078b672e03c89df35"
-#:
-#: Ensure clang tools are available for libc++
-#:
-	INSTALL_PREFIX=/usr/local/icu-libcxx-${ICU_VER}
-	CLANG_MAJOR=$(cc --version 2>&1 | grep -oP '^Ubuntu clang version \K\d+')
-#	sudo apt -y install lld-$CLANG_MAJOR libc++-$CLANG_MAJOR-dev libc++abi-$CLANG_MAJOR-dev clang-tools-$CLANG_MAJOR
-
+:
+: Install dependencies
+: --------------------
+:
+	sudo apt install -y make wget tar curl gpg
 :
 : Download + verify
-: =================
+: -----------------
 :
-	wget --no-verbose --timestamping "${URL}"
-	ACTUAL=$(sha256sum "${TARBALL}" | cut -d' ' -f1)
-	[[ "$ACTUAL" != "$EXPECTED_SHA256" ]] && { echo "Hash mismatch!"; exit 1; }
-: "Hash OK"
-
+	curl -LO "${URL}"
+:
+: Verify
+: ------
+:
+	curl -LO "${URL}.asc"
+	curl -LO https://raw.githubusercontent.com/unicode-org/icu/main/KEYS
+	gpg --import KEYS
+	gpg --verify "${TARBALL}.asc" "${TARBALL}"
 :
 : Extract official tarball creates top-level icu/
 : ===============================================
@@ -35,26 +58,7 @@ PS4='+ [icu ${SECONDS}s] '
 	rm $RELEASE_DIR -rf
 	mkdir --parents $RELEASE_DIR
 	tar xzf "${TARBALL}" -C $RELEASE_DIR --strip-components=1
-	cd $RELEASE_DIR/source
-
-:
-: Configure with clang + libc++
-: =============================
-:
-#	export CC=clang
-#	export CXX=clang++
-	export CC=cc
-	export CXX=c++
-	export CFLAGS="-O2 -Wall -fPIC"
-#	export CXXFLAGS="-stdlib=libc++ -O2 -Wall -fPIC"
-	export CXXFLAGS="-O2 -Wall -fPIC"
-	export LDFLAGS="-stdlib=libc++ -lc++abi"
-#	export LIBS="-lc++abi"   # sometimes needed instead of/in addition to LDFLAGS
-
-:
-: Optional but recommended: help find libc++ headers if needed
-:
-	export CXXFLAGS="$CXXFLAGS -nostdinc++ -isystem/usr/include/c++/v1"
+	pushd $RELEASE_DIR/source
 
 	./runConfigureICU Linux \
 	  --prefix=${INSTALL_PREFIX} \
@@ -64,20 +68,29 @@ PS4='+ [icu ${SECONDS}s] '
 	  --disable-samples \
 	  --disable-tests \
 	  --disable-strict
-
 :
 : Build
-: =====
+: -----
 :
 	make clean
 	make -j$(nproc)
 
 :
 : Install
-: =======
+: -------
 :
 	sudo make install
 
 :
-: ICU 78.2 with libc++ installed to $INSTALL_PREFIX
+: Cleanup
+: -------
+:
+	popd
+	rm $RELEASE_DIR -rf
+	rm $TARBALL
+	rm $TARBALL.asc
+	rm KEYS
+
+: ====================================================================
+: ICU ${ICU_VER} with libc++ installed to $INSTALL_PREFIX
 : ====================================================================
