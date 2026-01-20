@@ -408,7 +408,8 @@ function get_dependencies_for_build_and_install {
 :
 : Repeated in Build stage
 :
-	CMD_RETRY sudo snap install cmake --classic
+#	CMD_RETRY sudo snap install cmake --classic
+	CMD_RETRY ./install_cmake.sh
 	APT_INSTALL $BUILD_DEPS
 
 :
@@ -606,7 +607,7 @@ function build_only {
 :
 : Repeated from Build stage
 :
-	CMD_RETRY sudo snap refresh cmake
+#	CMD_RETRY sudo snap refresh cmake
 	APT_INSTALL $BUILD_DEPS
 
 :
