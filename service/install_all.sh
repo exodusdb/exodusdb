@@ -222,7 +222,7 @@ function APT_GET {
 : Wait for chromium snap install to complete
 : ===========================================
 :
-: Wait up to 5x2 mins for snap installation to complete. Can randomly fails. Just redo.
+: Wait up to 5x2 mins for snap installation to complete. Can randomly fail. Just redo.
 :
 	for x in {1..5}; do
 		snap changes | grep chromium || true
