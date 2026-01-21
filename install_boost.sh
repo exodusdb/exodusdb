@@ -152,6 +152,7 @@ PS4='+ [boost ${SECONDS}s] '
 
 	(set +x && echo -e "${GREEN}Build completed successfully!${NC}")
 
+	popd
 	rm ${BOOST_DIR} -rf
 :
 : You can now rebuild your project with -stdlib=libc++ flags.
