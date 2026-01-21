@@ -25,8 +25,6 @@ PS4='+ [install ${SECONDS}s] '
 :	the sensitive default dependencies supplied by OS
 :	except postgresql.
 #
-#: 'Default clang compiler on Ubuntu 24.04 is 19 since 20 has problems'
-#:
 #: 'Output from cli/exodus by OS for 2 compilers'
 #: '"c++ 21" indicates c++20 plus informal support for c++23'
 #: '"c++ 24" indicates c++23 plus informal support for c++26'
@@ -122,12 +120,12 @@ PS4='+ [install ${SECONDS}s] '
 	REQ_STAGES=${1:?STAGES is required and must be one or more *consecutive* letters from $ALL_STAGES or from $SUB_STAGES, or A for all stages except W, or AW for all stages}
 	COMPILER=${2:-clang}
 	PG_VER=${3:-}
-:
-: Default clang compiler is 19 on Ubuntu since 20 has problems
-:
-	if [[ $(lsb_release -rs 2>/dev/null) == "24.04" ]] && [[ $COMPILER == @(clang|clang-default) ]]; then
-		COMPILER=clang-19
-	fi
+#:
+#: Default clang compiler is 19 on Ubuntu since 20 has problems
+#:
+#	if [[ $(lsb_release -rs 2>/dev/null) == "24.04" ]] && [[ $COMPILER == @(clang|clang-default) ]]; then
+#		COMPILER=clang-19
+#	fi
 :
 : Remove the compiler phrase -latest since we treat empty as meaning -latest
 :
