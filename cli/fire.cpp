@@ -68,7 +68,7 @@ func main() {
 			try {
 				RECORD.replacer(find_rex, repl);
 			} catch (VarError e) {
-				if (e.message.contains("UTF-8"))
+				if (var(e.message).contains("UTF-8")) // c++23
 					outputl(osfilename, ": Not UTF-8");
 				else {
 					nerrors++;

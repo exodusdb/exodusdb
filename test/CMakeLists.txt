@@ -58,7 +58,7 @@
 # ###############################
 #
 	cmake_policy(SET CMP0015 NEW)
-	include_directories(${SRC_EXODUS_DIR}/.. ${FAST_FLOAT_DIR}/include)
+	include_directories(${SRC_EXODUS_DIR}/..)
 	link_directories(${EXODUS_DIR})
 
 	if(TARGET exovar)
