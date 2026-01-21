@@ -812,6 +812,9 @@ ENVIRONMENT
 
 	} // of not posix
 
+	//create include directory if doesnt already exist
+	call make_include_dir(incdir);
+
 	if (not bindir.ends(OSSLASH))
 		bindir ^= OSSLASH;
 	if (not libdir.ends(OSSLASH))
@@ -889,9 +892,6 @@ ENVIRONMENT
 				}
 				continue;
 			}
-
-			//create include directory if doesnt already exist
-			call make_include_dir(incdir);
 
 			if (osread(targetfilename) != srctext) {
 
