@@ -536,9 +536,6 @@ add_definitions(-DGIT_REMOTE_COMMIT_HASH_SHORT="${GIT_REMOTE_COMMIT_HASH_SHORT}"
 # Subdirs/submodules
 # ##################
 
-	# header only
-#    set(FASTFLOAT_DIR fast_float)
-
 	message("")
     set(EXODUS_DIR exodus)
     set(SRC_EXODUS_DIR ${CMAKE_SOURCE_DIR}/${EXODUS_DIR})

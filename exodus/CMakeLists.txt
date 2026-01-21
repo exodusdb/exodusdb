@@ -166,18 +166,10 @@ execute_process(
 
 	include_directories(${BOOST_INCLUDE_DIR})
 
-#	find_library(LIBUV_LIBRARY NAMES uv libuv uv1 libuv1)
-#	link_libraries(uv)
-
-#	find_package(PkgConfig REQUIRED)
-#	pkg_check_modules(LIBUV REQUIRED libuv)
-# find_library(LIBUV_LIBRARY NAMES uv libuv)
-# find_path(LIBUV_INCLUDE_DIR NAMES uv.h)
-#
-# fast_float
+# ??
 ############
 #
-	include_directories(. .. ../fast_float/include)
+	include_directories(. ..)
 
 ##
 ## fmt
