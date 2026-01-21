@@ -164,6 +164,12 @@ PS4='+ [install ${SECONDS}s] '
 		exit 1
 	fi
 
+:	Prevent clang lt 20
+	if  [[ $COMPILER =~ ^clang- && "${COMPILER#*-}" -lt 20 ]]; then
+		echo "Minimum clang ver is 20. Try clang-20"
+		exit  1
+	fi
+
 :
 : ------
 : CONFIG
@@ -252,7 +258,7 @@ function download_submodules {
 :
 : Loop until success or timeout
 :
-	while ! hostnamectl status > /dev/null && [[ $SECONDS -lt 60 ]]; do sleep 2; done
+	bash -c "while ! hostnamectl status 2> /dev/null && [[ $SECONDS -lt 60 ]]; do sleep 2; done"
 :
 : Generate error if timeout reached. Otherwise display various host info.
 :
@@ -459,7 +465,7 @@ function get_dependencies_for_build_and_install {
 : 'if the llvm version is <= the existing ubuntu version then apt prefers the ubuntu version for installion.'
 : 'Available clang versions currently are 14-21 (with 22 a development version)'
 :
-		if  [[ $COMPILER_NAME = clang && $COMPILER_VERSION -lt 20 ]]; then
+		if  [[ $COMPILER =~ ^clang && $COMPILER_VERSION -lt 20 ]]; then
 			COMPILER_VERSION=20
 			echo "Minimum clang ver is 20. Try clang-20"
 			exit 1
