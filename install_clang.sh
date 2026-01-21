@@ -33,7 +33,7 @@ PS4='+ [clang ${SECONDS}s] '
 :
 : 1. llvm.sh - Download and run the automatic installer script for version $CLANG_VER
 :
-	wget https://apt.llvm.org/llvm.sh
+	curl -LO https://apt.llvm.org/llvm.sh
 	chmod +x llvm.sh
 	sudo ./llvm.sh $CLANG_VER
 :
