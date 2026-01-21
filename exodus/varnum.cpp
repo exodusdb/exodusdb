@@ -38,54 +38,51 @@ THE SOFTWARE.
 #	include <array>
 #endif
 
-// EXO_USE_TO_CHARS and EXO_USE_RYU are decided in vardefs.h
-// Use ryu if GNUC < 11 and ryu include available
+#include <exodus/varimpl.h>
 
-//ryu            1234.5678 -> "1234.5678" 500ns
-//ryu_printf     1234.5678 -> "1234.5678" 800ns
-//sstream/printf 1234.5678 -> "1234.5678" 1800ns
+// FROM_CHARS
+/////////////
 
-//#include <limits> //for std::numeric_limits<double>::digits10
-
-//module #include <string>
-//#include <sstream>
-
-//fastfloat  "1234.5678" -> 1234.5678  56ns (but does it round trip?)
-//ryu        "1234.5678" -> 1234.5678 184ns
-//std::stod  "1234.5678" -> 1234.5678 192ns (but does it round trip?)
-//from_chars "1234.5678" -> 1234.5678 ???ns (but does it round trip?)
-
-//Eisel-Lemire algorithm seems to be fastest "parse chars to double" according to Lavavej at Microsoft
-//Feb 2021 https://reviews.llvm.org/D70631 "There have been a couple of algorithmic developments very recently
-// - for parsing (from_chars), the Eisel-Lemire algorithm is much faster than the technique used here.
-// I would have used it if it were available back then!"
+// As of early 2026, fast_float (the library behind fast_float::from_chars)
+// remains one of the fastest general-purpose, exact (correctly rounded,
+// round-to-even compliant) std::from_chars-style floating-point parsers
+// available in C++ for typical real-world inputs.It is widely adopted in
+// performance-critical projects (GCC 12+ libstdc++, Chromium,
+// WebKit/Safari, MySQL, Redis, simdjson, Apache Arrow, etc.) precisely
+// because it is usually significantly faster than libc++ / libstdc++
+// std::from_chars while being exact and header-only / easy to vendor.
 //
-//double only available in gcc 11 onwards. msvc has it from 2017 or 19
-//https://github.com/fastfloat/fast_float
-#if __GNUC__ >= 11 || __clang_major__ >= 20
-#	define STD_OR_FASTFLOAT std
-#elif __has_include(<fast_float/fast_float.h>)
+// SEE exodus/ff_vs_std.cpp for performance test
+//
+// https://github.com/fastfloat/fast_float/releases/download/v8.2.2/fast_float.h
+#if __has_include("fast_float.h")
+
 #	pragma GCC diagnostic push
 #	pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
 #	pragma clang diagnostic ignored "-Wextra-semi-stmt"
 #	pragma clang diagnostic ignored "-Wold-style-cast"
 #	pragma clang diagnostic ignored "-Wreserved-identifier"
 #	pragma GCC diagnostic ignored "-Winline"
-#	include <fast_float/fast_float.h>
-#	pragma GCC diagnostic pop
-#	define STD_OR_FASTFLOAT fast_float
-#endif
 
-//gcc 10 doesnt include conv from and to floating point
-//#include <charconv>	 // for from_chars and to_chars
+#	include "fast_float.h"
+
+#	pragma GCC diagnostic pop
+
+#	define STD_OR_FASTFLOAT fast_float
+
+#elif __GNUC__ >= 11 || __clang_major__ >= 20
+#	warning "using std::from_chars()->double because fast_format.h is missing."
+#	define STD_OR_FASTFLOAT std
+
+#else
+#	error "No usable std::from_chars()-> double found"
+#endif
 
 //#ifndef M_PI
 ////#	define M_PI 3.14159265358979323846f
 //#	define M_PI 3.14159265
 ////	2643383279502884197169399375105820974944592307816406286208998f;
 //#endif
-
-#include <exodus/varimpl.h>
 
 namespace exo {
 
