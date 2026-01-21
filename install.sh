@@ -442,6 +442,10 @@ function get_dependencies_for_build_and_install {
 			HEAD_OR_TAIL=tail
 		fi
 		COMPILER_VERSION=`apt search $COMPILER_NAME |& grep "$COMPILER_NAME-[0-9][0-9.]*" -o | grep '[0-9]*' -o|sort -n|uniq|$HEAD_OR_TAIL -n1`
+: Minimum for clang is 20
+		if  [[ $COMPILER_NAME = clang && $COMPILER_VERSION -lt 20 ]]; then
+			COMPILER_VERSION=20
+		fi
 		COMPILER=$COMPILER_NAME-$COMPILER_VERSION
 	fi
 
@@ -455,6 +459,11 @@ function get_dependencies_for_build_and_install {
 : 'if the llvm version is <= the existing ubuntu version then apt prefers the ubuntu version for installion.'
 : 'Available clang versions currently are 14-21 (with 22 a development version)'
 :
+		if  [[ $COMPILER_NAME = clang && $COMPILER_VERSION -lt 20 ]]; then
+			COMPILER_VERSION=20
+			echo "Minimum clang ver is 20. Try clang-20"
+			exit 1
+		fi
 #	CLANG_MAJOR=22
 		CLANG_MAJOR=$COMPILER_VERSION
 #		CMD_RETRY sudo wget https://apt.llvm.org/llvm.sh
