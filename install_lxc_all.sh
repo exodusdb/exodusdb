@@ -85,6 +85,12 @@ PS4='+ [lxc_all ${SECONDS}s] '
 : Install using specific compiler - $COMPILER
 : -------------------------------
 :
+: Prevent clang lt 20
+			if  [[ $COMPILER =~ ^clang- && "${COMPILER#*-}" -lt 20 ]]; then
+				echo "Minimum clang ver is 20. Try clang-20"
+				exit  1
+			fi
+
 			export CXX_OPTIONS=-fdiagnostics-color=always
 			LOGFILE=${OS}${COMPILER:0:1}-$STAGES.log
 			./install_lxc.sh $OS ${OS} $STAGES $COMPILER |& tee $LOGFILE
