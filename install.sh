@@ -15,14 +15,15 @@ PS4='+ [install ${SECONDS}s] '
 :	Depend   Ver    Source    Type
 :	------   ---    ------    ----
 :	clang    20-22  llvm      apt binary
-:	cmake    4.2.1  github    binary or source
 :	icu      78     github    source
 :	boost    90     github    source
 :	chromium 143    canonical snap
+:	cmake    4.2.1  github    binary or source
 :	ninja    1.14.0 github    binary or source
 :
-:	Currently no longer building with g++
-:	and default versions supplied by OS
+:	Currently no longer building with g++ nor using
+:	the sensitive default dependencies supplied by OS
+:	except postgresql.
 #
 #: 'Default clang compiler on Ubuntu 24.04 is 19 since 20 has problems'
 #:

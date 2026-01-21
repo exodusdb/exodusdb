@@ -76,15 +76,13 @@ PS4='+ [boost ${SECONDS}s] '
 :
 #	cd ~
 
-	if [ ! -f "${BOOST_TAR}" ]; then
-		wget --no-verbose --timestamping "${BOOST_URL}"
-	fi
+	curl -LO "${BOOST_URL}"
 
-	if [ ! -d "${BOOST_DIR}" ]; then
-		tar -xjf "${BOOST_TAR}"
-	fi
+	rm -rf "${BOOST_DIR}"
+	tar -xjf "${BOOST_TAR}"
+	rm "${BOOST_TAR}"
 
-	cd "${BOOST_DIR}"
+	pushd "${BOOST_DIR}"
 :
 : Clean previous build artifacts ?
 : --------------------------------
@@ -154,6 +152,7 @@ PS4='+ [boost ${SECONDS}s] '
 
 	(set +x && echo -e "${GREEN}Build completed successfully!${NC}")
 
+	rm ${BOOST_DIR} -rf
 :
 : You can now rebuild your project with -stdlib=libc++ flags.
 : Recommended CMake additions:
