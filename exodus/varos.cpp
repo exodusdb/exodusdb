@@ -199,7 +199,8 @@ static const std::string to_path_string(in path) {
 	static thread_local std::string home = temp.osgetenv("HOME") ? temp.normalize() : "";
 
 	// For security, the HOME dir cannot contain "..".
-	if (home.contains("..")) {
+//	if (home.contains("..")) { // c++23
+	if (var(home).contains("..")) {
 		("varos: " ^ var(home).squote() ^ " For security, the HOME dir cannot contain '..'").logputl();
 		return result;
 	}

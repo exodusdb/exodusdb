@@ -7,7 +7,7 @@
 
 # ────────────────────────────────────────
 	message("-- CMAKE EXODUS --")
-	message(STATUS "Building with CMake version: ${CMAKE_VERSION}")
+	message(STATUS "CMAKE_VERSION              is ${CMAKE_VERSION}")
 # ────────────────────────────────────────
 #	set(CMAKE_EXPERIMENTAL_CXX_IMPORT_STD "d0edc3af-4c50-42ea-a356-e2862fe7a444")  # example for ~4.0; update if needed!)
 	project(exodus)
@@ -50,32 +50,18 @@
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -stdlib=libc++")
 	set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -stdlib=libc++")
 
-	# CMake max supporting C++ versions
-	#https://cmake.org/cmake/help/latest/prop_tgt/CXX_STANDARD.html
-	#CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++2a"
-	if(CMAKE_VERSION VERSION_LESS "3.12.0")
-		#set(CMAKE_CXX_STANDARD 20)
-		#try building without specifying c++ version
-		# but exodus requires c++20 minimum
-
-	elseif(CMAKE_VERSION VERSION_LESS "3.20.0")
-		set(CMAKE_CXX_STANDARD 20)
-
-	elseif(CMAKE_VERSION VERSION_LESS "3.25.0")
-		set(CMAKE_CXX_STANDARD 23)
-
-	else()
+	if (NOT DEFINED CMAKE_CXX_STANDARD)
+#		set(CMAKE_CXX_STANDARD 20)
+#		set(CMAKE_CXX_STANDARD 23)
 		set(CMAKE_CXX_STANDARD 26)
-
 	endif()
 
 #	set(CMAKE_CXX_MODULE_STD 1)
 
-	message("")
-
+	message(STATUS "CMAKE_CXX_STANDARD         is ${CMAKE_CXX_STANDARD}")
 	message(STATUS "CMAKE_CXX_COMPILER_ID      is ${CMAKE_CXX_COMPILER_ID}")
 	message(STATUS "CMAKE_CXX_COMPILER_VERSION is ${CMAKE_CXX_COMPILER_VERSION}")
-	message(STATUS "CMAKE_CXX_FLAGS            is ${CMAKE_CXX_FLAGS}")
+	message(STATUS "CMAKE_CXX_FLAGS            is${CMAKE_CXX_FLAGS}")
 #	message(STATUS "CMAKE_CXX_MODULE_STD       is ${CMAKE_CXX_MODULE_STD}")
 	message("")
 
