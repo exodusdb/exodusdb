@@ -62,35 +62,28 @@ THE SOFTWARE.
 //
 //double only available in gcc 11 onwards. msvc has it from 2017 or 19
 //https://github.com/fastfloat/fast_float
-#if __has_include(<fast_float/fast_float.h>)
-#define HAS_FASTFLOAT
-#pragma GCC diagnostic push
-#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
-#pragma clang diagnostic ignored "-Wextra-semi-stmt"
-#pragma clang diagnostic ignored "-Wold-style-cast"
-#pragma clang diagnostic ignored "-Wreserved-identifier"
-#pragma GCC diagnostic ignored "-Winline"
-#include <fast_float/fast_float.h>
-#pragma GCC diagnostic pop
-#define STD_OR_FASTFLOAT fast_float
-
-#elif __GNUC__ >= 11
-#define USE_CHARCONV
-#define STD_OR_FASTFLOAT std
-
-//#elif __has_include(<ryu/ryu.h>)
-//#define HAS_RYU
-//#include <ryu/ryu.h>
+#if __GNUC__ >= 11 || __clang_major__ >= 20
+#	define STD_OR_FASTFLOAT std
+#elif __has_include(<fast_float/fast_float.h>)
+#	pragma GCC diagnostic push
+#	pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
+#	pragma clang diagnostic ignored "-Wextra-semi-stmt"
+#	pragma clang diagnostic ignored "-Wold-style-cast"
+#	pragma clang diagnostic ignored "-Wreserved-identifier"
+#	pragma GCC diagnostic ignored "-Winline"
+#	include <fast_float/fast_float.h>
+#	pragma GCC diagnostic pop
+#	define STD_OR_FASTFLOAT fast_float
 #endif
 
 //gcc 10 doesnt include conv from and to floating point
 //#include <charconv>	 // for from_chars and to_chars
 
-#ifndef M_PI
-//#define M_PI 3.14159265358979323846f
-#define M_PI 3.14159265
-// 2643383279502884197169399375105820974944592307816406286208998f;
-#endif
+//#ifndef M_PI
+////#	define M_PI 3.14159265358979323846f
+//#	define M_PI 3.14159265
+////	2643383279502884197169399375105820974944592307816406286208998f;
+//#endif
 
 #include <exodus/varimpl.h>
 

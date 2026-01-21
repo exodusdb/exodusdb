@@ -537,7 +537,7 @@ add_definitions(-DGIT_REMOTE_COMMIT_HASH_SHORT="${GIT_REMOTE_COMMIT_HASH_SHORT}"
 # ##################
 
 	# header only
-    set(FASTFLOAT_DIR fast_float)
+#    set(FASTFLOAT_DIR fast_float)
 
 	message("")
     set(EXODUS_DIR exodus)
