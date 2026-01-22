@@ -1,13 +1,11 @@
 module;
 
-#include <exodus/vardefs.h>
-#include <exodus/format.h>
+#include <var/vardefs.h>
+#include <var/format.h>
 
 #include <exodus/exoimpl.h>
 #include <exodus/exoprog.h>
 #include <exodus/exofuncs.h>
-
-#include <exodus/range.h>
 
 export module exoprog;
 
@@ -45,9 +43,6 @@ export namespace exo {
 
 //	using exo::dim;
 //	using exo::rex;
-
-	using exo::range;
-	using exo::reverse_range;
 
 	using exo::ExoEnv;
 
@@ -99,9 +94,6 @@ export namespace exo {
 	using exo::ThreadSafeQueue;
 	using exo::TaskManager;
 //	using exo::ExoCommon;
-
-	using exo::RELOAD_req;
-	using exo::TERMINATE_req;
 
 //	using exo::DimIndexOutOfBounds;
 //	using exo::DimUndimensioned;

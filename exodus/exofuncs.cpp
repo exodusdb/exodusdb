@@ -27,13 +27,13 @@ THE SOFTWARE.
 	import var;
 #else
 //#	include <cstdlib> //for atexit()
-#	include <exodus/var.h>
-#	include <exodus/dim.h>
-#	include <exodus/rex.h>
+#	include <var/var.h>
+//#	include <var/dim.h>
+//#	include <var/rex.h>
 #endif
-#include <exodus/vardefs.h>
+#include <var/vardefs.h>
 
-#include <exodus/format.h>
+#include <var/format.h>
 
 #include <exodus/exoenv.h>
 

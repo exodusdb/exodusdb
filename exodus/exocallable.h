@@ -81,7 +81,7 @@ dictinit(bbb)
 //#include <map>
 //#include <mutex>
 //#include <string>
-#	include <exodus/var.h>
+#	include <var/var.h>
 #endif
 
 #include <exodus/exoimpl.h>

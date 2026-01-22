@@ -523,6 +523,13 @@ add_definitions(-DGIT_REMOTE_COMMIT_HASH_SHORT="${GIT_REMOTE_COMMIT_HASH_SHORT}"
 # ##################
 
 	message("")
+    set(VAR_DIR var)
+    set(SRC_VAR_DIR ${CMAKE_SOURCE_DIR}/${VAR_DIR})
+    message("SRC_VAR_DIR ${CMAKE_SOURCE_DIR}/${VAR_DIR}")
+	#target_compile_options(var PUBLIC -Wall)
+	add_subdirectory(var)
+
+	message("")
     set(EXODUS_DIR exodus)
     set(SRC_EXODUS_DIR ${CMAKE_SOURCE_DIR}/${EXODUS_DIR})
     message("SRC_EXODUS_DIR ${CMAKE_SOURCE_DIR}/${EXODUS_DIR}")

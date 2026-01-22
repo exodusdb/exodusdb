@@ -79,20 +79,20 @@
 # Build test programs not like test_*.cpp
 # #######################################
 #
-	add_executable(testcommandline testcommandline.cpp ${SRC_EXODUS_DIR}/var.h)
-	target_link_libraries(testcommandline exodus ${PROJECT_LIBS})
+	add_executable(testcommandline testcommandline.cpp ${SRC_VAR_DIR}/var.h)
+	target_link_libraries(testcommandline exodus var ${PROJECT_LIBS})
 
 	# lib #
 	add_library(testecho SHARED testecho.cpp)
 	# REQUIRED only for c++ module discovery
-	target_link_libraries(testecho exodus ${PROJECT_LIBS})
+	target_link_libraries(testecho exodus var ${PROJECT_LIBS})
 
 
 # Build and test testing_var.h.cpp - created by cli/gendoc.sh
 # ################################
 
 	add_executable(testing_var_h testing_var.h.cpp)
-	target_link_libraries(testing_var_h exodus ${PROJECT_LIBS})
+	target_link_libraries(testing_var_h exodus var ${PROJECT_LIBS})
 	if (EXO_MODULE)
 		target_link_libraries(
 			testing_var_h
@@ -133,7 +133,7 @@
 
 		add_executable(${file_without_ext} ${file})
 
-		target_link_libraries(${file_without_ext} exodus ${PROJECT_LIBS})
+		target_link_libraries(${file_without_ext} exodus var ${PROJECT_LIBS})
 
 		#setup a classic test i.e. requiring output of "Test passed"
 		add_test(NAME ${file_without_ext} COMMAND ${file_without_ext} WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})

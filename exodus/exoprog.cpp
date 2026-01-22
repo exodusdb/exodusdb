@@ -4,14 +4,21 @@
 #	include <atomic>
 #	include <future>
 #	include <memory>
+#	include <iostream>
 //#	include <generator>
-#	include <exodus/dim.h>
-#	include <exodus/rex.h>
+#endif
+
+#if EXO_MODULE
+	import var;
+#else
+#	include <var/dim.h>
+#	include <var/rex.h>
 #endif
 
 #define EXO_EXOPROG_CPP
 #include <exodus/exoprog.h>
 #include <exodus/exocallable.h>
+#include <var/exodebug.h>
 
 #include <exodus/exoimpl.h>
 
