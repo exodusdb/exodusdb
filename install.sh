@@ -9,7 +9,7 @@ PS4='+ [install ${SECONDS}s] '
 : ==========================================================
 :
 :	Builds with clang-20, 21 and 22
-:	using libc++, modules and std=c++26
+:	using libc++, modules and std=c++23-26
 :	on all Ubuntu LTS 20.04 - 24.04 and 25.10
 :
 :	Depend   Ver    Source    Type
