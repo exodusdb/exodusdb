@@ -1,6 +1,6 @@
 #!/bin/bash
 set -euxo pipefail
-PS4='+ [lxc ${SECONDS}s] '
+PS4='+ [lxc $1 ${SECONDS}s] '
 :
 : $0 $*
 : ===========================================================

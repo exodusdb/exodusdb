@@ -77,7 +77,13 @@ set -euxo pipefail
 :	Note that ldconfig will not see or use /usr/local/live.
 :	We are relying on PATH and LD_LIBRARY_PATH configuration in the live service to use it.
 :
-	sudo rsync $DRYRUN -av --delete $EXO_INSTALL_DIR/{bin,lib,share,include} --exclude include/boost $EXO_INSTALL_DIR/live
+	sudo rsync $DRYRUN -av \
+		--delete --delete-excluded \
+		--exclude include/boost \
+		--exclude lib/cmake* \
+		--exclude share/cmake* \
+		$EXO_INSTALL_DIR/{bin,lib,share,include} \
+		$EXO_INSTALL_DIR/live
 
 :
 : Finished $DRYRUN copying EXODUS programs to live in $(($SECONDS / 60)) minutes and $(($SECONDS % 60)) seconds.
