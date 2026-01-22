@@ -72,7 +72,7 @@
 	foreach(exe IN LISTS EXECUTABLES)
 		string(REGEX REPLACE "^([^-]+).*" "\\1" source_file_name "${exe}")
 		add_executable(${exe} ${source_file_name}.cpp)
-		target_link_libraries(${exe} PRIVATE exodus stdc++fs pthread)
+		target_link_libraries(${exe} PRIVATE exodus var stdc++fs pthread)
 		install(TARGETS ${exe} DESTINATION bin)
 	endforeach()
 
@@ -110,7 +110,7 @@
 
 # Extra sources
 	target_sources(gendoc PRIVATE
-		${SRC_EXODUS_DIR}/var.h
+		${SRC_VAR_DIR}/var.h
 	)
 
 # Output name rename

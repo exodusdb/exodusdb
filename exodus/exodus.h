@@ -28,19 +28,16 @@ THE SOFTWARE.
 // to avoid its macros causing problems in standard libraries
 /////////////////////////////////////////////////////////////
 
-//#if EXO_MODULE > 1
-//	import std; // only for std::string_view in timebank get_timebank_acno?
-//#endif
-
 #if EXO_MODULE
 	import var;
 #else
-#	include <exodus/var.h>
-#	include <exodus/dim.h>
-#	include <exodus/rex.h>
+#	include <var/var.h>
+#	include <var/dim.h>
+#	include <var/rex.h>
+#	include <var/range.h>
 #endif
 
-#include <exodus/vardefs.h>
+#include <var/vardefs.h>
 
 #if EXO_MODULE
 	import exoprog;
@@ -49,7 +46,6 @@ THE SOFTWARE.
 #	include <exodus/exoprog.h>
 #	include <exodus/exocallable.h>
 #	include <exodus/exofuncs.h>
-#	include <exodus/range.h>
 #endif
 
 //#include <exodus/program.h>

@@ -6,7 +6,7 @@
 //#include <cctype> // for std::isdigit
 #include "ASCIIutil.h" // for ASCII_isdigit ASCII_isalpha ASCII_toupper
 
-#include <exodus/var.h>
+#include <var/var.h>
 
 namespace exo {
 

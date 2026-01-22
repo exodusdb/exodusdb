@@ -345,7 +345,7 @@ ENVIRONMENT
 		//else
 		//linkoptions = " -lexodus -lstdc++fs -lpthread";
 
-		linkoptions = "  -lexodus -L/usr/local/lib";
+		linkoptions = "  -lexodus -lvar -L/usr/local/lib";
 
 		// Precompiled modules need -f ... var.pcm and -l ... libexovar.so
 #if EXO_MODULE

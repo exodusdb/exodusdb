@@ -10,11 +10,11 @@
 	import var;
 	import exoprog; // for ExoExit
 #else
-#	include <exodus/var.h>
+#	include <var/var.h>
+#	include <var/task_scheduler.h>
 #	include <exodus/exoprog.h>
 #endif
 
-#include "task_scheduler.h"
 #include "task_manager.h"
 #include "task_manager_impl.h"
 

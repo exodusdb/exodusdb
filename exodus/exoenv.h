@@ -36,7 +36,7 @@ THE SOFTWARE.
 #else
 #	include <exodus/exoimpl.h>
 #endif
-#include <exodus/vardefs.h>
+#include <var/vardefs.h>
 #include <exodus/exocallable.h>
 #include <exodus/threadpool.h>
 #include <exodus/threadsafequeue.h>

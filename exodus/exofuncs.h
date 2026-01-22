@@ -34,9 +34,9 @@ THE SOFTWARE.
 //	import var;
 //#endif
 
-//#include <exodus/var.h>
-#include <exodus/vardefs.h>
-#include <exodus/timebank.h>
+//#include <var/var.h>
+#include <var/vardefs.h>
+//#include <var/timebank.h>
 
 #include <exodus/exoimpl.h>
 

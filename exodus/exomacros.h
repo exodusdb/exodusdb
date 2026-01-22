@@ -33,7 +33,7 @@ THE SOFTWARE.
 #if EXO_MODULE
 	import var;
 #else
-#	include <exodus/var.h>
+#	include <var/var.h>
 #	include <exodus/exocallable.h>
 #endif
 

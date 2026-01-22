@@ -19,9 +19,9 @@
 #if EXO_MODULE
 	import var;
 #else
-#	include <exodus/var.h>
+#	include <var/var.h>
 #endif
-#include <exodus/vardefs.h>
+#include <var/vardefs.h>
 
 #include <exodus/exoimpl.h>
 #include <exodus/exoenv.h>
