@@ -41,13 +41,13 @@ PS4='+ [icu ${SECONDS}s] '
 : Download + verify
 : -----------------
 :
-	curl -LO "${URL}"
+	curl -LOs "${URL}"
 :
 : Verify
 : ------
 :
-	curl -LO "${URL}.asc"
-	curl -LO https://raw.githubusercontent.com/unicode-org/icu/main/KEYS
+	curl -LOs "${URL}.asc"
+	curl -LOs https://raw.githubusercontent.com/unicode-org/icu/main/KEYS
 	gpg --import KEYS
 	gpg --verify "${TARBALL}.asc" "${TARBALL}"
 :

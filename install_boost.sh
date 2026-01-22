@@ -2,39 +2,36 @@
 set -euxo pipefail
 PS4='+ [boost ${SECONDS}s] '
 :
-:  =============================================================================
-:  'Complete script: Build ICU + Boost with Clang + libc++ on Ubuntu LTS'
-:  'Goal: Clean Boost libraries (especially regex & locale) without libstdc++.so dependency'
+: =============================================================================
+: 'Build Boost with Clang + libc++ on Ubuntu LTS'
+: 'Output: libs especially regex & locale without libstdc++.so dependency'
+: 'Default is Boost 1.90.0, requires and discovers latest /usr/local/icu-libcxx-NN.N'
 :
-:  'Current as of January 2026'
-:  'ICU 78.2 (latest stable), Boost 1.90.0'
-:  =============================================================================
-
-
-:  ==================== CONFIGURATION ====================
-
-#	ICU_VERSION="78.2"
-#	ICU_TAR="icu4c-78_2-src.tgz"
-#	ICU_URL="https://github.com/unicode-org/icu/releases/download/release-78-2/${ICU_TAR}"
-#	ICU_PREFIX="/usr/local/icu-libcxx-${ICU_VERSION}"
-
-	ICU_VERSION="78.2"
-	TAG="release-${ICU_VERSION}"
-	ICU_TAR="${TAG}.tar.gz"
-	ICU_URL="https://github.com/unicode-org/icu/archive/${TAG}.tar.gz"
-	ICU_PREFIX="/usr/local/icu-libcxx-${ICU_VERSION}"
-
-	BOOST_VERSION="1.90.0"
-	BOOST_DIR="boost_1_90_0"
-	BOOST_TAR="boost_1_90_0.tar.bz2"
-	BOOST_URL="https://archives.boost.io/release/${BOOST_VERSION}/source/${BOOST_TAR}"
-	BOOST_INSTALL_PREFIX="/usr/local"
-
-	apt install -y bzip2 make
+: './install_boost.sh [BOOST_VER] # default is 1.90.0'
 :
-: Number of cores for parallel build
+: =============================================================================
+	BOOST_VER=${1:-1.90.0}
 :
-	JOBS=$(nproc)
+: Config
+:
+	INSTALL_PREFIX="/usr/local"
+:
+	ICU_PREFIX=$(ls $INSTALL_PREFIX/icu-libcxx-* -d|sort --version-sort|tail -n1)
+:
+: From github
+:
+	# boost-1.90.0
+	BOOST_DIR="boost-${BOOST_VER}"
+	# boost-1.90.0-b2-nodocs.tar.gz
+	BOOST_TAR="${BOOST_DIR}-b2-nodocs.tar.gz"
+	BOOST_URL="https://github.com/boostorg/boost/releases/download/boost-${BOOST_VER}/${BOOST_TAR}"
+#:
+#: From archives.boost.io
+#:
+#	BOOST_DIR="boost_${BOOST_VER//./_}"
+#	BOOST_TAR="${BOOST_DIR}.tar.bz2"
+#	# https://archives.boost.io/release/1.90.0/source/boost_1_90_0.tar.gz
+#	BOOST_URL="https://archives.boost.io/release/${BOOST_VER}/source/${BOOST_TAR}"
 :
 :  Colors for output
 :
@@ -42,55 +39,65 @@ PS4='+ [boost ${SECONDS}s] '
 	GREEN='\033[0;32m'
 	YELLOW='\033[1;33m'
 	NC='\033[0m' # No Color
-
 :
 : clang++ and clang are required
 : ==============================
 :
-	if ! which clang++ || !which clang ; then
+	if ! which clang++ || ! which clang ; then
 		CLANG_VER=`c++ --version | head -n1|cut -d'.' -f 1|grep -Po '\d+'`
 		sudo update-alternatives --install /usr/bin/clang   clang   /usr/bin/clang-$CLANG_VER   80
 		sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-$CLANG_VER 80
 	fi
 :
-: Starting ICU + Boost libc++ build process...
-: ============================================
-:
-: STEP 1: Install dependencies
+: STEP 0: Install dependencies
 : ============================
-: → Installing build dependencies...
 :
 	sudo apt install -y \
-		wget \
+		curl \
 		tar \
 		xz-utils \
 		pkg-config \
 		libbz2-dev \
 		zlib1g-dev \
+		bzip2 \
+		make
 
-#		build-essential
 :
-: STEP 2: Build Boost with custom ICU
-: ===================================
-: → Downloading and building Boost ${BOOST_VERSION}...
+: STEP 1: Download and extract boost
+: ==================================
 :
-#	cd ~
-
-	curl -LO "${BOOST_URL}"
-
+: Download
+:
+	curl -LOs "${BOOST_URL}"
+:
+: Verify checksum
+:
+	curl -LOs "${BOOST_URL}.txt"
+	EXPECTED_CHECKSUM=$(awk '{ print $1 }' "$BOOST_TAR.txt")
+#	sha256sum boost-1.90.0-b2-nodocs.tar.gz
+	CURRENT_CHECKSUM=$(sha256sum "$BOOST_TAR" | awk '{ print $1 }')
+	[[ "$CURRENT_CHECKSUM" = "$EXPECTED_CHECKSUM" ]]
+	rm $BOOST_TAR.txt
+:
+: Unpack
+:
 	rm -rf "${BOOST_DIR}"
-	tar -xjf "${BOOST_TAR}"
+#	tar -xjf "${BOOST_TAR}"
+	tar -xzf "${BOOST_TAR}"
 	rm "${BOOST_TAR}"
-
+:
+: STEP 2: Build and install
+: =========================
+:
 	pushd "${BOOST_DIR}"
 :
-: Clean previous build artifacts ?
-: --------------------------------
+: Clean previous build artifacts
+: ------------------------------
 	rm -rf bin.v2 || true
 :
 : Bootstrapping Boost with clang
 : ------------------------------
-#	test -x ./b2 ||
+:
 	./bootstrap.sh --with-toolset=clang
 :
 : Configure user-config.jam for libc++
@@ -100,14 +107,13 @@ PS4='+ [boost ${SECONDS}s] '
 : Build selected libraries
 : ------------------------
 	(set +x && echo -e "${YELLOW}Building Selected Boost libraries...${NC}")
-
 :
 : IF ANY TESTS FAIL THAT SHOULDNT e.g. has_icu - important for boost_locale, see
 : boost_1_90_0/bin.v2/config.log for info
 :
 : Add -ldl linker flag to allow use linking to custom icu on older OS e.g. 20.04
 :
-	sudo ./b2 -j${JOBS} \
+	sudo ./b2 -j$(nproc) \
 		"-sICU_PATH=${ICU_PREFIX}" \
 		toolset=clang \
 		cxxflags="-stdlib=libc++ -I${ICU_PREFIX}/include" \
@@ -124,14 +130,14 @@ PS4='+ [boost ${SECONDS}s] '
 		--with-fiber \
 		--with-context \
 		--durations \
-		install --prefix="${BOOST_INSTALL_PREFIX}" | grep -vP "^(include/boost|common.copy)"
+		install --prefix="${INSTALL_PREFIX}" | grep -vP "^(include/boost|common.copy)"
 
+	popd
 	ldconfig
 :
-: Boost ${BOOST_VERSION} installed successfully to ${BOOST_INSTALL_PREFIX}
+: STEP 3: Verify
+: ==============
 :
-:  ==================== VERIFICATION ====================
-
 	(set +x && echo -e "\n${YELLOW}→ Verification:${NC}")
 
 	(set +x && echo -e "\nICU libs:")
@@ -151,13 +157,16 @@ PS4='+ [boost ${SECONDS}s] '
 	done
 
 	(set +x && echo -e "${GREEN}Build completed successfully!${NC}")
-
-	popd
+:
+: Cleanup
+:
 	rm ${BOOST_DIR} -rf
 :
-: You can now rebuild your project with -stdlib=libc++ flags.
+: ===========================================================
+: Boost ${BOOST_VER} installed successfully to ${INSTALL_PREFIX}
+: You can now build your boost project with -stdlib=libc++ flags.
 : Recommended CMake additions:
 :   add_compile_options\(-stdlib=libc++\)
 :   add_link_options\(-stdlib=libc++\)
-:
 : Enjoy your clean libc++ Boost stack\! 🚀
+: ============================================================
