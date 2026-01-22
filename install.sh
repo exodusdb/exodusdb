@@ -1,7 +1,7 @@
 #!/bin/bash
 [ $SHLVL -le 3 ] && exec > >(tee -a "$(basename `echo ${0/.sh/}.$*.log | sed 's/ /\./g'`)") 2>&1
 set -euxo pipefail
-PS4='+ [install ${SECONDS}s] '
+PS4='+ [ins ${1:-?} ${SECONDS}s] '
 :
 : $0 $*
 : ==========================================================
