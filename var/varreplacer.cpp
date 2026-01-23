@@ -7,7 +7,7 @@ IO   var_stg::updater(int fieldno, int valueno, int subvalueno, in replacement) 
 
 	THISIS("void var_stg::updater(int fieldno, int valueno, int subvalueno, in replacement) &")
 	assertStringMutator(function_sig);
-	ISSTRING(replacement)
+	replacement.assertString(function_sig, "replacement");
 
 	// return whole thing if replace 0,0,0
 	if (fieldno == 0 && valueno == 0 && subvalueno == 0) {

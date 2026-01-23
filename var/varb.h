@@ -351,7 +351,7 @@ class PUBLIC var_base {
 	void operator=(CBR rhs) & {
 
 		//assertVar(__PRETTY_FUNCTION__);  //could be skipped for speed?
-		rhs.assertAssigned(__PRETTY_FUNCTION__);
+		rhs.assertAssigned(__PRETTY_FUNCTION__, "rhs");
 
 		// Prevent self assign
 		// Removed for speed since we assume std::string handles it ok
@@ -1035,13 +1035,14 @@ class PUBLIC var_base {
 	//////////////////
 	CONSTEXPR
 	void operator=(const char char2) & {
-
 		//THISIS("RETVARREF operator= (const char char2) &")
 		// protect against unlikely syntax as follows:
 		// var undefinedassign=undefinedassign=L'X';
 		// this causes crash due to bad memory access due to setting string that doesnt exist
 		// slows down all string settings so consider NOT CHECKING in production code
-		//THISISVAR()	 // ALN:TODO: this definition kind of misleading, try to find
+		//
+		//assertVar(function_sig);
+		//assertVar()	 // ALN:TODO: this definition kind of misleading, try to find
 		// ALN:TODO: or change name to something like: THISISNOTDEAD :)
 		// ALN:TODO: argumentation: var with mvtyp=0 is NOT defined
 
@@ -1065,7 +1066,7 @@ class PUBLIC var_base {
 		// var undefinedassign=undefinedassign="xxx";
 		// this causes crash due to bad memory access due to setting string that doesnt exist
 		// slows down all string settings so consider NOT CHECKING in production code
-		//THISISVAR()
+		//assertVar(function_sig);
 
 		var_str = cstr;
 
@@ -1086,7 +1087,7 @@ class PUBLIC var_base {
 //		// var undefinedassign=undefinedassign=std::string("xxx"";
 //		// this causes crash due to bad memory access due to setting string that doesnt exist
 //		// slows down all string settings so consider NOT CHECKING in production code
-//		//THISISVAR()
+//		assertVar(function_sig);
 //		var_str = string2;
 //		var_typ = VARTYP_STR;  // reset to one unique type
 //
@@ -1118,7 +1119,7 @@ class PUBLIC var_base {
 		// var undefinedassign=undefinedassign=std::string("xxx"";
 		// this causes crash due to bad memory access due to setting string that doesnt exist
 		// slows down all string settings so consider NOT CHECKING in production code
-		//THISISVAR()
+		//assertVar(function_sig);
 
 		var_str = std::forward<std::string>(string2);
 
@@ -1387,8 +1388,8 @@ class PUBLIC var_base {
 	friend std::istream& operator>>(std::istream& istream1, VBR invar) {
 
 //		THISIS("istream >> var")
-//		invar.assertVar(function_sig);
-		invar.assertVar("istream >> var");
+//		invar.assertVar(function_sig, "invar");
+		invar.assertVar("istream >> var", "invar");
 
 		invar.var_str.clear();
 		invar.var_typ = VARTYP_STR;

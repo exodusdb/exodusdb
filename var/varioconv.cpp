@@ -1366,7 +1366,9 @@ var  var::oconv(const char* conversion_in) const {
 							}
 						} else {
 							// HEX represents strings so create var_str from int or double
-							ISSTRING(*this)
+//							#define ISSTRING(VARNAME) (VARNAME).assertString(function_sig, #VARNAME);
+//							ISSTRING(*this)
+							(*this).assertString(function_sig, "this");
 						}
 
 						// The first char after "HEX" determines the width of hex codes

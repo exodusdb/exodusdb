@@ -503,7 +503,7 @@ RETVAR VB1::mod(CBR limit) const {
 
 	THISIS("var  var::mod(in limit) const")
 	assertNumeric(function_sig);
-	ISNUMERIC(limit)
+	limit.assertNumeric(function_sig, "limit");
 
 	// prefer double dividend
 	if (this->var_typ & VARTYP_DBL) {

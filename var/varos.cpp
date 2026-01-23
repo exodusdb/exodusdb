@@ -118,7 +118,7 @@ static std::locale get_locale(const char* locale_name)	// throw (VarError)
 {
 	// assume is checked prior to calling since this is an internal exodus function
 	// THISIS("std::locale get_locale(const char* locale_name)")
-	// ISSTRING(locale_name)
+	// locale_name.assertString(function_sig, "locale_name");
 
 	if (not *locale_name || strcmp(locale_name, "utf8") == 0) {
 		std::locale old_locale;
@@ -328,7 +328,7 @@ bool var_os::osshellread(in oscmd) {
 	THISIS("bool var::osshellread(in oscmd)")
 	// will be checked again by toString()
 	// but put it here so any unassigned error shows in osshell
-	ISSTRING(oscmd)
+	oscmd.assertString(function_sig, "oscmd");
 
 	// THIS = ""
 	// In case popen or pclose fail
@@ -378,7 +378,7 @@ bool var_os::osshellwrite(in oscmd) const {
 	// will be checked again by toString()
 	// but put it here so any unassigned error shows in osshell
 	assertString(function_sig);
-	ISSTRING(oscmd)
+	oscmd.assertString(function_sig, "oscmd");
 
 	//"w" means read
 	// std::FILE* pfile = popen(to_oscmd_string(oscmd).c_str(), "w");
@@ -419,9 +419,9 @@ bool var_os::osprocess(in oscmd, in stdin_for_process, out stdout_from_process, 
 	// Does not use bash or support sh-like functionality e.g. ; | || && > etc.
 
 	THISIS("bool var::osprocess(in oscmd, in stdin_for_process, out stdout_from_process, out stderr_from_process, out exit_status, in timeout_secs) static")
-	ISSTRING(oscmd)
-	ISSTRING(stdin_for_process)
-	ISNUMERIC(timeout_secs)
+	oscmd.assertString(function_sig, "oscmd");
+	stdin_for_process.assertString(function_sig, "stdin_for_process");
+	timeout_secs.assertNumeric(function_sig, "timeout_secs");
 
 	stdout_from_process = "";
 	stderr_from_process = "";
@@ -472,7 +472,7 @@ bool var_os::osopen(in osfilename, const bool utf8 /*=true*/) const {
 
 	THISIS("bool var::osopen(in osfilename, const bool utf8)")
 	assertVar(function_sig);
-	ISSTRING(osfilename)
+	osfilename.assertString(function_sig, "osfilename");
 
 	// if reopening an osfile that is already opened then close and reopen
 	if (THIS_IS_OSFILE())
@@ -513,7 +513,7 @@ std::fstream* var_os::osopenx(in osfilename, const bool utf8, const bool autocre
 
 	// Delay checking args until necessary
 	THISIS("bool var::osopenx(in osfilename, const bool utf8, const bool autocreate_or_throw)")
-	ISSTRING(osfilename)
+	osfilename.assertString(function_sig, "osfilename");
 
 	// Use unique_ptr since we have many return paths
 	auto fs = std::make_unique<std::fstream>();
@@ -644,7 +644,7 @@ WINDOWS-1258
 // bool var_os::osread(in osfilename, const char* codepage) {
 //
 //	THISIS("bool var::osread(in osfilename, const char* codepage")
-//	ISSTRING(osfilename)
+//	osfilename.assertString(function_sig, "osfilename");
 //	return osread(to_path_string(osfilename).c_str(), codepage);
 // }
 //
@@ -843,7 +843,7 @@ bool var_os::oswrite(in osfilename, const char* codepage) const {
 
 	THISIS("bool var::oswrite(in osfilename, const char* codepage) const")
 	assertString(function_sig);
-	ISSTRING(osfilename)
+	osfilename.assertString(function_sig, "osfilename");
 
 	const var osfilename2 = to_path_string(osfilename);
 
@@ -899,7 +899,7 @@ bool var_os::osbwrite(in osfilevar, io offset) const {
 
 	THISIS("bool var::osbwrite(in osfilevar, io offset) const")
 	assertString(function_sig);
-	ISNUMERIC(offset)
+	offset.assertNumeric(function_sig, "offset");
 
 	// Get the buffered file handle/open on the fly
 	// Create missing file IIF offset is 0
@@ -944,7 +944,7 @@ bool var_os::osbread(in osfilevar, io offset, const int bytesize) {
 
 	THISIS("bool var::osbread(in osfilevar, io offset, const int bytesize")
 	assertVar(function_sig);
-	ISNUMERIC(offset)
+	offset.assertNumeric(function_sig, "offset");
 
 	// default is to return empty string in any case
 	var_str.clear();
@@ -1083,7 +1083,7 @@ bool var_os::osrename(in new_dirpath_or_filepath) const {
 
 	THISIS("bool var::osrename(in new_dirpath_or_filepath) const")
 	assertString(function_sig);
-	ISSTRING(new_dirpath_or_filepath)
+	new_dirpath_or_filepath.assertString(function_sig, "new_dirpath_or_filepath");
 
 	std::string path1 = to_path_string(*this);
 	std::string path2 = to_path_string(new_dirpath_or_filepath);
@@ -1137,7 +1137,7 @@ bool var_os::oscopy(in new_dirpath_or_filepath) const {
 
 	THISIS("bool var::oscopy(in new_dirpath_or_filepath) const")
 	assertString(function_sig);
-	ISSTRING(new_dirpath_or_filepath)
+	new_dirpath_or_filepath.assertString(function_sig, "new_dirpath_or_filepath");
 
 	std::string path1 = to_path_string(*this);
 	std::string path2 = to_path_string(new_dirpath_or_filepath);
@@ -1171,7 +1171,7 @@ bool var_os::osmove(in new_dirpath_or_filepath) const {
 
 	THISIS("bool var::osmove(in new_dirpath_or_filepath) const")
 	assertString(function_sig);
-	ISSTRING(new_dirpath_or_filepath)
+	new_dirpath_or_filepath.assertString(function_sig, "new_dirpath_or_filepath");
 
 	std::string path1 = to_path_string(*this);
 	std::string path2 = to_path_string(new_dirpath_or_filepath);
@@ -1421,8 +1421,8 @@ var var_os::oslist(SV globpattern0, const int mode) const {
 
 	THISIS("var  var::oslist(in globpattern, const int mode) const")
 	assertVar(function_sig);
-	// ISSTRING(path0)
-	// ISSTRING(globpattern0)
+	// path0.assertString(function_sig, "path0");
+	// globpattern0.assertString(function_sig, "globpattern0");
 
 	// returns an FM separated list of files and/or folders
 

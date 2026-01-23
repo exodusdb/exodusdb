@@ -54,7 +54,7 @@ static thread_local var thread_lasterror = "";
 void  var::setlasterror(in msg) {
 	// No checking for speed
 	// THISIS("void var::lasterror(in msg")
-	// ISSTRING(msg)
+	// msg.assertString(function_sig, "msg");
 
 	// tcache_get (tc_idx=12) at malloc.c:2943
 	// 2943    malloc.c: No such file or directory.
