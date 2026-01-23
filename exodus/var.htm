@@ -727,14 +727,22 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 				<code>var.format(fmt_str, args, ...)</code></p></td>
 		<td>
 			<p>Classic format function in printf style</p>
-			<p>vars can be formatted either with C++ format codes e.g. {:_&gt;8.2f}</p>
-			<p>or with exodus oconv codes e.g. {::MD20P|R(_)#8} as in the below example.</p>
+			<p>vars and raw values can be formatted either with C++ format codes</p>
+			<p>e.g. {:_&gt;8.2f}.</p>
+			<p>or with exodus oconv codes prefixed by "::"</p>
+			<p>e.g. {::MD20P|R(_)#8} as in the below example.</p>
+			<p>"|" can separate multiple exodus conversions.</p>
 			<p>
-				<pre><span class="nf">let</span><span class="w"> </span><span class="n">v1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kt">var</span><span class="p">(</span><span class="mf">12.345</span><span class="p">).</span><span class="nf">format</span><span class="p">(</span><span class="s">&quot;&#39;{:_&gt;8.2f}&#39;&quot;</span><span class="p">);</span><span class="w"> </span><span class="c1">// &quot;&#39;___12.35&#39;&quot;</span>
-<span class="nf">let</span><span class="w"> </span><span class="n">v2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kt">var</span><span class="p">(</span><span class="mf">12.345</span><span class="p">).</span><span class="nf">format</span><span class="p">(</span><span class="s">&quot;&#39;{::MD20P|R(_)#8}&#39;&quot;</span><span class="p">);</span>
+				<em>fmt_str:</em> See standard C++ std::format documentation.</p>
+			<p>
+				<em>args:</em> Optional additional values for the 2nd and subsequent "{}" markers in the fmt_str.</p>
+			<p>print/println(fmt_str, arg1, ...); : Free functions that output to standard output.</p>
+			<p>
+				<pre><span class="nf">let</span><span class="w"> </span><span class="n">v1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kt">var</span><span class="p">(</span><span class="mf">12.345</span><span class="p">).</span><span class="nf">format</span><span class="p">(</span><span class="s">&quot;&#39;{:_&gt;8.2f}&#39;&quot;</span><span class="p">);</span><span class="w">         </span><span class="c1">// &quot;&#39;___12.35&#39;&quot;</span>
+<span class="nf">let</span><span class="w"> </span><span class="n">v2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kt">var</span><span class="p">(</span><span class="mf">12.345</span><span class="p">).</span><span class="nf">format</span><span class="p">(</span><span class="s">&quot;&#39;{::MD20P|R(_)#8}&#39;&quot;</span><span class="p">);</span><span class="w">  </span><span class="c1">// &quot;&#39;___12.35&#39;&quot;</span>
 <span class="c1">// or</span>
-<span class="kt">var</span><span class="w"> </span><span class="n">v3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">format</span><span class="p">(</span><span class="s">&quot;&#39;{:_&gt;8.2f}&#39;&quot;</span><span class="p">,</span><span class="w"> </span><span class="kt">var</span><span class="p">(</span><span class="mf">12.345</span><span class="p">));</span><span class="w"> </span><span class="c1">// &quot;&#39;___12.35&#39;&quot;</span>
-<span class="kt">var</span><span class="w"> </span><span class="n">v4</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">format</span><span class="p">(</span><span class="s">&quot;&#39;{::MD20P|R(_)#8}&#39;&quot;</span><span class="p">,</span><span class="w"> </span><span class="kt">var</span><span class="p">(</span><span class="mf">12.345</span><span class="p">));</span>
+<span class="kt">var</span><span class="w"> </span><span class="n">v3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">format</span><span class="p">(</span><span class="s">&quot;&#39;{:_&gt;8.2f}&#39;&quot;</span><span class="p">,</span><span class="w"> </span><span class="kt">var</span><span class="p">(</span><span class="mf">12.345</span><span class="p">));</span><span class="w">        </span><span class="c1">// &quot;&#39;___12.35&#39;&quot;</span>
+<span class="kt">var</span><span class="w"> </span><span class="n">v4</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">format</span><span class="p">(</span><span class="s">&quot;&#39;{::MD20P|R(_)#8}&#39;&quot;</span><span class="p">,</span><span class="w"> </span><span class="kt">var</span><span class="p">(</span><span class="mf">12.345</span><span class="p">));</span><span class="w"> </span><span class="c1">// &quot;&#39;___12.35&#39;&quot;</span>
 </pre>
 			</p>
 		</td></tr>
@@ -1469,7 +1477,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			<p>
 				<pre><span class="kt">var</span><span class="w"> </span><span class="n">v1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">space</span><span class="p">(</span><span class="mi">65&#39;535</span><span class="p">);</span>
 <span class="kt">var</span><span class="w"> </span><span class="n">v2</span><span class="p">;</span>
-<span class="n">v1</span><span class="p">.</span><span class="nf">move</span><span class="p">(</span><span class="n">v2</span><span class="p">);</span><span class="w"> </span><span class="c1">// v2.len() -&gt; 65&#39;536 // v1 -&gt; &quot;&quot;</span>
+<span class="n">v1</span><span class="p">.</span><span class="nf">move</span><span class="p">(</span><span class="n">v2</span><span class="p">);</span><span class="w"> </span><span class="c1">// v2.len() -&gt; 65&#39;535 // v1 -&gt; &quot;&quot;</span>
 </pre>
 			</p>
 		</td></tr>
@@ -1485,7 +1493,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			<p>See move(destinationvar).</p>
 			<p>
 				<pre><span class="kt">var</span><span class="w"> </span><span class="n">v1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">space</span><span class="p">(</span><span class="mi">65&#39;535</span><span class="p">);</span>
-<span class="kt">var</span><span class="w"> </span><span class="n">v2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">v1</span><span class="p">.</span><span class="nf">move</span><span class="p">();</span><span class="w"> </span><span class="c1">// v2.len() -&gt; 65&#39;536 // v1 -&gt; &quot;&quot;</span>
+<span class="kt">var</span><span class="w"> </span><span class="n">v2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">v1</span><span class="p">.</span><span class="nf">move</span><span class="p">();</span><span class="w"> </span><span class="c1">// v2.len() -&gt; 65&#39;535 // v1 -&gt; &quot;&quot;</span>
 <span class="c1">// or</span>
 <span class="nf">let</span><span class="w"> </span><span class="n">v3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">move</span><span class="p">(</span><span class="n">v2</span><span class="p">);</span>
 </pre>
@@ -1501,9 +1509,9 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			<p>Useful for stashing large strings quickly. They are moved using pointers without making copies or allocating memory.</p>
 			<p>Either or both variables may be unassigned.</p>
 			<p>
-				<pre><span class="kt">var</span><span class="w"> </span><span class="n">v1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">space</span><span class="p">(</span><span class="mi">65&#39;536</span><span class="p">);</span>
+				<pre><span class="kt">var</span><span class="w"> </span><span class="n">v1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">space</span><span class="p">(</span><span class="mi">65&#39;535</span><span class="p">);</span>
 <span class="kt">var</span><span class="w"> </span><span class="n">v2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="p">;</span>
-<span class="n">v1</span><span class="p">.</span><span class="nf">swap</span><span class="p">(</span><span class="n">v2</span><span class="p">);</span><span class="w"> </span><span class="c1">// v1 -&gt; &quot;&quot; // v2.len() -&gt; 65&#39;536</span>
+<span class="n">v1</span><span class="p">.</span><span class="nf">swap</span><span class="p">(</span><span class="n">v2</span><span class="p">);</span><span class="w"> </span><span class="c1">// v1 -&gt; &quot;&quot; // v2.len() -&gt; 65&#39;535</span>
 <span class="c1">// or</span>
 <span class="nf">swap</span><span class="p">(</span><span class="n">v1</span><span class="p">,</span><span class="w"> </span><span class="n">v2</span><span class="p">);</span>
 </pre>

@@ -301,20 +301,38 @@ var v1 = var.format(fmt_str, args, ...);
 Classic format function in printf style
 .sp 0
 .PP
-vars can be formatted either with C++ format codes e.g. {:_>8.2f}
+vars and raw values can be formatted either with C++ format codes
 .sp 0
 .PP
-or with exodus oconv codes e.g. {::MD20P|R(_)#8} as in the below example.
+e.g. {:_>8.2f}.
+.sp 0
+.PP
+or with exodus oconv codes prefixed by "::"
+.sp 0
+.PP
+e.g. {::MD20P|R(_)#8} as in the below example.
+.sp 0
+.PP
+"|" can separate multiple exodus conversions.
+.sp 0
+.PP
+\fBfmt_str:\fR See standard C++ std::format documentation.
+.sp 0
+.PP
+\fBargs:\fR Optional additional values for the 2nd and subsequent "{}" markers in the fmt_str.
+.sp 0
+.PP
+print/println(fmt_str, arg1, ...); : Free functions that output to standard output.
 .sp 0
 .PP
 .PP
 \fBExample:\fR
 .EX \"<code>
-let v1 = var(12.345).format("'{:_>8.2f}'"); // "'___12.35'"
-let v2 = var(12.345).format("'{::MD20P|R(_)#8}'");
+let v1 = var(12.345).format("'{:_>8.2f}'");         // "'___12.35'"
+let v2 = var(12.345).format("'{::MD20P|R(_)#8}'");  // "'___12.35'"
 // or
-var v3 = format("'{:_>8.2f}'", var(12.345)); // "'___12.35'"
-var v4 = format("'{::MD20P|R(_)#8}'", var(12.345));
+var v3 = format("'{:_>8.2f}'", var(12.345));        // "'___12.35'"
+var v4 = format("'{::MD20P|R(_)#8}'", var(12.345)); // "'___12.35'"
 .EE \"</code>
 .sp 0
 .sp 0
@@ -1208,7 +1226,7 @@ Enables efficient handling of large strings by moving pointers without copying o
 .EX \"<code>
 var v1 = space(65'535);
 var v2;
-v1.move(v2); // v2.len() -> 65'536 // v1 -> ""
+v1.move(v2); // v2.len() -> 65'535 // v1 -> ""
 .EE \"</code>
 .sp 0
 .sp 0
@@ -1227,7 +1245,7 @@ See move(destinationvar).
 \fBExample:\fR
 .EX \"<code>
 var v1 = space(65'535);
-var v2 = v1.move(); // v2.len() -> 65'536 // v1 -> ""
+var v2 = v1.move(); // v2.len() -> 65'535 // v1 -> ""
 // or
 let v3 = move(v2);
 .EE \"</code>
@@ -1250,9 +1268,9 @@ Either or both variables may be unassigned.
 .PP
 \fBExample:\fR
 .EX \"<code>
-var v1 = space(65'536);
+var v1 = space(65'535);
 var v2 = "";
-v1.swap(v2); // v1 -> "" // v2.len() -> 65'536
+v1.swap(v2); // v1 -> "" // v2.len() -> 65'535
 // or
 swap(v1, v2);
 .EE \"</code>
