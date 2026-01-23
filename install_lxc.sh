@@ -248,7 +248,7 @@ function do_one_stage {
 :	Copy current exodus dir to $NEW_C/root/exodus
 :
 		lxc exec ${NEW_C} -- mkdir -p /root/exodus
-		tar cf - . | lxc exec ${NEW_C} -- tar xf - -C /root/exodus
+		tar cf - --exclude='*.log' . | lxc exec ${NEW_C} -- tar xf - -C /root/exodus
 
 #		fi #not USE_SSH
 
