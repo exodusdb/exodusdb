@@ -157,6 +157,8 @@ ND PUBLIC var  loge(in num1) {return num1.loge();}
 ND PUBLIC var  mod(in dividend, in divisor) {return dividend.mod(divisor);}
 ND PUBLIC var  mod(in dividend, const double divisor) {return dividend.mod(divisor);}
 ND PUBLIC var  mod(in dividend, const int divisor) {return dividend.mod(divisor);}
+ND PUBLIC var  min(in arg1, in arg2) {return arg1.min(arg2);}
+ND PUBLIC var  max(in arg1, in arg2) {return arg1.max(arg2);}
 
 // integer() represents pick int() because int() is reserved word in c/c++
 // Note that integer like pick int() is the same as floor()

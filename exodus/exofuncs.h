@@ -177,6 +177,8 @@ ND var  loge(in num1);
 ND var  mod(in dividend, in divisor);
 ND var  mod(in dividend, const double divisor);
 ND var  mod(in dividend, const int divisor);
+ND var  min(in arg1, in arg2);
+ND var  max(in arg1, in arg2);
 
 // integer(void) represents pick int(void) because int(void) is reserved word in c/c++
 // Note that integer like pick int(void) is the same as floor(void)

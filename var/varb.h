@@ -1852,6 +1852,25 @@ class PUBLIC var_base {
 	// undocumented overload for int
 	ND RETVAR mod(const int limit) const;
 
+	// Get the maximum of two values
+	// Can be numeric or alphanumeric
+	//
+	// `let v1 = 100;
+	//  let v2 = 200;
+	//  //
+	//  let v3 = v1.max(v2);  // 200
+	//  // or
+	//  let v4 = max(v1, v2); // 200
+	//  // also
+	//  let v5 = v1.min(v2);  // 100
+	//  let v6 = min(v1, v2); // 100`
+	//
+	ND RETVAR max(in arg2) const;
+
+	// Get the min of two values
+	// Similar to max()
+	ND RETVAR min(in arg2) const;
+
 	// Fix the number of decimal places.
 	//
 	// `let v1 = var(123.4).round(2);   // "123.40"

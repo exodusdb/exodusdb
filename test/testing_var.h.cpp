@@ -639,6 +639,19 @@ func main() {
 		let v12 = var(4) % 3; assert(v12.errputl() == 1);
 	}
 
+	printl("max(in arg2) const;");
+	{
+		let v1 = 100;
+		let v2 = 200;
+		//
+		let v3 = v1.max(v2); assert(v3.errputl() == 200);
+		// or
+		let v4 = max(v1, v2); assert(v4.errputl() == 200);
+		// also
+		let v5 = v1.min(v2); assert(v5.errputl() == 100);
+		let v6 = min(v1, v2); assert(v6.errputl() == 100);
+	}
+
 	printl("round(const int ndecimals = 0) const;");
 	{
 				let v1 = var(123.4).round(2); assert(v1.errputl() == "123.40");
