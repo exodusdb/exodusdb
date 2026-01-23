@@ -143,12 +143,10 @@ PS4='+ [ins ${1:-?} ${SECONDS}s] '
 : Validate
 : --------
 :
-	if [[ $REQ_STAGES == AW ]]; then
-		REQ_STAGES={$DEFAULT_STAGES}W
-	fi
-	if [[ $REQ_STAGES == A ]]; then
-		REQ_STAGES=$DEFAULT_STAGES
-	fi
+: A -> $DEFAULT_STAGES
+:
+	REQ_STAGES=${REQ_STAGES/A/$DEFAULT_STAGES}
+:
 	if [[ ! $ALL_STAGES =~ $REQ_STAGES ]]; then
 		if [[ ! $SUB_STAGES =~ $REQ_STAGES ]]; then
 			echo STAGES "'$REQ_STAGES'" must be one or more consecutive letters from $ALL_STAGES or from $SUB_STAGES
@@ -263,13 +261,15 @@ function download_submodules {
 	hostnamectl status
 
 :
-: ---------------------------------------------
-: Disable unattended upgrades until next reboot
-: ---------------------------------------------
+: --------------------------------------------------------------------
+: Disable unattended upgrades until next reboot if any stage b, d or W
+: --------------------------------------------------------------------
 :
-	sudo systemctl disable --runtime apt-daily.timer apt-daily-upgrade.timer unattended-upgrades
-#	sudo systemctl mask --runtime unattended-upgrades apt-daily.timer apt-daily-upgrade.timer
-	sudo systemctl stop unattended-upgrades apt-daily.timer apt-daily-upgrade.timer
+	if [[ "$REQ_STAGES" =~ [bdW] ]]; then
+		sudo systemctl disable --runtime apt-daily.timer apt-daily-upgrade.timer unattended-upgrades
+#		sudo systemctl mask --runtime unattended-upgrades apt-daily.timer apt-daily-upgrade.timer
+		sudo systemctl stop unattended-upgrades apt-daily.timer apt-daily-upgrade.timer
+	fi
 
 :
 : ----------
