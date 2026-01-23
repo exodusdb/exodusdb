@@ -193,19 +193,24 @@ func main2(in pass1) {
 	codefile << "\n";
 	codefile <<
 R"__(#include <cassert>
+
 #if EXO_MODULE
-//	import std;
-#	include <vector>
-#	include <iomanip>
+	import std;
+//#	include <vector>
+//#	include <iomanip>
 #else
 #	include <vector>
 #	include <iomanip>
 #endif
+
 #include <exodus/program.h>
+
 //#if EXO_FORMAT
-#	define println printl
-#	define print printx
+//#else
+//#	define println printl
+//#	define print printx
 //#endif
+
 programinit()
 
 // For co_run example

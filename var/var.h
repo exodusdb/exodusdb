@@ -378,14 +378,20 @@ public:
 //	}
 
 	// Classic format function in printf style
-	// vars can be formatted either with C++ format codes e.g. {:_>8.2f}
-	// or with exodus oconv codes e.g. {::MD20P|R(_)#8} as in the below example.
+	// vars and raw values can be formatted either with C++ format codes
+	// e.g. {:_>8.2f}.
+	// or with exodus oconv codes prefixed by "::"
+	// e.g. {::MD20P|R(_)#8} as in the below example.
+	// "|" can separate multiple exodus conversions.
+	// fmt_str: See standard C++ std::format documentation.
+	// args: Optional additional values for the 2nd and subsequent "{}" markers in the fmt_str.
+	// print/println(fmt_str, arg1, ...); : Free functions that output to standard output.
 	//
-	// `let v1 = var(12.345).format("'{:_>8.2f}'"); // "'___12.35'"
-	//  let v2 = var(12.345).format("'{::MD20P|R(_)#8}'");
+	// `let v1 = var(12.345).format("'{:_>8.2f}'");         // "'___12.35'"
+	//  let v2 = var(12.345).format("'{::MD20P|R(_)#8}'");  // "'___12.35'"
 	//  // or
-	//  var v3 = format("'{:_>8.2f}'", var(12.345)); // "'___12.35'"
-	//  var v4 = format("'{::MD20P|R(_)#8}'", var(12.345));`
+	//  var v3 = format("'{:_>8.2f}'", var(12.345));        // "'___12.35'"
+	//  var v4 = format("'{::MD20P|R(_)#8}'", var(12.345)); // "'___12.35'"`
 	//
 	template<class... Args>
 	ND var  format(in fmt_str, Args&&... args) const {

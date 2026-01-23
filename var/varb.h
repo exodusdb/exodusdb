@@ -1505,7 +1505,7 @@ class PUBLIC var_base {
 	//
 	// `var v1 = space(65'535);
 	//  var v2;
-	//  v1.move(v2); // v2.len() -> 65'536 // v1 -> ""`
+	//  v1.move(v2); // v2.len() -> 65'535 // v1 -> ""`
 	//
 	void move(VBR destinationvar);
 
@@ -1513,7 +1513,7 @@ class PUBLIC var_base {
 	// See move(destinationvar).
 	//
 	// `var v1 = space(65'535);
-	//  var v2 = v1.move(); // v2.len() -> 65'536 // v1 -> ""
+	//  var v2 = v1.move(); // v2.len() -> 65'535 // v1 -> ""
 	//  // or
 	//  let v3 = move(v2);`
 	//
@@ -1523,9 +1523,9 @@ class PUBLIC var_base {
     // Useful for stashing large strings quickly. They are moved using pointers without making copies or allocating memory.
 	// Either or both variables may be unassigned.
 	//
-	// `var v1 = space(65'536);
+	// `var v1 = space(65'535);
 	//  var v2 = "";
-	//  v1.swap(v2); // v1 -> "" // v2.len() -> 65'536
+	//  v1.swap(v2); // v1 -> "" // v2.len() -> 65'535
 	//  // or
 	//  swap(v1, v2);`
 	//
