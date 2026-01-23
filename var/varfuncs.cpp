@@ -165,7 +165,7 @@ bool var_os::input(in prompt /*=""*/) {
 
 	THISIS("out  var::input(in prompt")
 	assertVar(function_sig);
-	ISSTRING(prompt)
+	prompt.assertString(function_sig, "prompt");
 
 	var default_input = this->assigned() ? (*this) : "";
 
@@ -1244,7 +1244,7 @@ IO   var_stg::paster(const int pos1, const int length, SV replacestr) REF {
 
 	THISIS("void var_stg::paster(const int pos1, const int length, SV replacestr) &")
 	assertStringMutator(function_sig);
-	//ISSTRING(insertstr)
+	//insertstr.assertString(function_sig, "insertstr");
 
 	std::size_t start0;
 	std::size_t lengthb;
@@ -1316,7 +1316,7 @@ IO   var_stg::paster(const int pos1, SV insertstr) REF {
 
 	THISIS("void var_stg::paster(const int pos1, SV insertstr) &")
 	assertStringMutator(function_sig);
-	//ISSTRING(insertstr)
+	//insertstr.assertString(function_sig, "insertstr");
 
 	if (pos1 > 0) {
 		if (static_cast<unsigned int>(pos1) > var_str.size())
@@ -1703,7 +1703,7 @@ var  var_stg::fcount(SV sepstr) const {
 
 	THISIS("var  var::fcount(SV sepstr) const")
 	assertString(function_sig);
-	//ISSTRING(sep)
+	//sep.assertString(function_sig, "sep");
 
 	if (var_str.empty())
 		return 0;

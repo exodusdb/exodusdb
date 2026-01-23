@@ -150,7 +150,7 @@ var  var_base::pwr(in exponent) const {
 
 	THISIS("var  var::pwr(in exponent) const")
 	assertNumeric(function_sig);
-	ISNUMERIC(exponent)
+	exponent.assertNumeric(function_sig, "exponent");
 
 	// prefer double
 	if (this->var_typ & VARTYP_DBL)

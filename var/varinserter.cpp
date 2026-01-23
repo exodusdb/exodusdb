@@ -7,7 +7,7 @@ IO   var_stg::inserter(const int fieldno, const int valueno, const int subvaluen
 
 	THISIS("void var_stg::inserter(const int fieldno, const int valueno, const int subvalueno, in insertion) &")
 	assertStringMutator(function_sig);
-	ISSTRING(insertion)
+	insertion.assertString(function_sig, "insertion");
 
 	// 0,0,0 is like 1,0,0
 	if (fieldno == 0 && valueno == 0 && subvalueno == 0) {

@@ -66,7 +66,7 @@ bool VB1::assigned() const {
 	// treat undefined as unassigned
 	// undefined is a state where we are USING the variable before its contructor has been
 	// called! which is possible (in syntax like var xx.osread()?) and also when passing default
-	// variables to functions in the callables on ISVAR(gcc)
+	// variables to functions in the callables on gcc.assertVar(function_sig, "gcc")
 
 	if (var_typ & VARTYP_MASK)
 		return false;
@@ -161,7 +161,7 @@ void VB1::defaulter(CBR defaultvalue) {
 	// assertVar(function_sig);
 
 	THISIS("void var::defaulter(in defaultvalue)")
-	ISASSIGNED(defaultvalue)
+	defaultvalue.assertAssigned(function_sig, "defaultvalue");
 
 	// Allow undefined usage like var xyz=xyz.readnext();
 	// if (var_typ & VARTYP_MASK)
@@ -175,7 +175,7 @@ void VB1::defaulter(CBR defaultvalue) {
 RETVAR VB1::or_default(CBR defaultvalue) const {
 
 	THISIS("var  var::or_default(in defaultvalue) const")
-	ISASSIGNED(defaultvalue)
+	defaultvalue.assertAssigned(function_sig, "defaultvalue");
 
 	if (this->unassigned()) {
 		return *static_cast<const exo::var*>(&defaultvalue);
@@ -225,7 +225,7 @@ void VB1::move(VARBASEREF tovar) {
 
 	THISIS("void var::move(io tovar)")
 	assertAssigned(function_sig);
-	ISVAR(tovar)
+	tovar.assertVar(function_sig, "tovar");
 
 	// move the string
 	tovar.var_str = std::move(var_str);
@@ -250,7 +250,7 @@ void VB1::swap(CBR var2) const {
 
 	// Works on unassigned vars
 	assertVar(function_sig);
-	ISVAR(var2)
+	var2.assertVar(function_sig, "var2");
 
 	// copy var2 to temp
 	auto mvtypex = var2.var_typ;
@@ -281,7 +281,7 @@ void VB1::swap(VARBASEREF var2) {
 
 	// Works on unassigned vars
 	assertVar(function_sig);
-	ISVAR(var2)
+	var2.assertVar(function_sig, "var2");
 
 	// copy var2 to temp
 	auto mvtypex = var2.var_typ;

@@ -607,8 +607,8 @@ bool var_stg::locate(in target, out setting, const int fieldno, const int valuen
 
 	THISIS("bool var_stg::locate(in target, out setting, const int fieldno, const int valueno) const")
 	assertString(function_sig);
-	ISSTRING(target)
-	ISVAR(setting)
+	target.assertString(function_sig, "target");
+	setting.assertVar(function_sig, "setting");
 
 	std::string usingchar;
 	if (valueno != 0)
@@ -629,8 +629,8 @@ bool var_stg::locate(in target, out setting, const int fieldno, const int valuen
 //
 //	THISIS("bool var_stg::locate(in target, out setting, const int fieldno, const int valueno) const")
 //	assertString(function_sig);
-//	ISSTRING(target)
-//	ISVAR(setting)
+//	target.assertString(function_sig, "target");
+//	setting.assertVar(function_sig, "setting");
 //
 //	return locatex(var_str, target.var_str, "", _VM, setting, 0, 0, 0);
 //}
@@ -640,7 +640,7 @@ bool var_stg::locate(in target, out setting, const int fieldno, const int valuen
 //
 //	THISIS("bool var_stg::locate(in target) const")
 //	assertString(function_sig);
-//	ISSTRING(target)
+//	target.assertString(function_sig, "target");
 //
 //	let setting;
 //	return locatex(var_str, target.var_str, "", _VM, setting, 0, 0, 0);
@@ -651,7 +651,7 @@ bool var_stg::locate(in target, out setting, const int fieldno, const int valuen
 //
 //	THISIS("bool var_stg::locate(in target) const")
 //	assertString(function_sig);
-//	ISSTRING(target)
+//	target.assertString(function_sig, "target");
 //
 //	// locate "" always false
 //	if (!target.var_str.size())
@@ -710,8 +710,8 @@ bool var_stg::locate(in target, out setting) const {
 
 //	THISIS("bool var_stg::locate(in target, out setting) const")
 //	assertString(function_sig);
-//	ISSTRING(target)
-//	ISVAR(setting)
+//	target.assertString(function_sig, "target");
+//	setting.assertVar(function_sig, "setting");
 //	return locatex(var_str, target.var_str, "", _VM, setting, 0, 0, 0);
 
 	setting = this->locate(target);
@@ -750,7 +750,7 @@ var var_stg::locate(in target) const {
 
 	THISIS("var  var_stg::locate(in target) const")
 	assertString(function_sig);
-	ISSTRING(target)
+	target.assertString(function_sig, "target");
 
 	const std::size_t target_size = target.var_str.size();
 
@@ -858,8 +858,8 @@ bool var_stg::locateby(const char* ordercode, in target, out setting) const {
 
 	THISIS("bool var_stg::locateby(const char* ordercode, in target, out setting) const")
 	assertString(function_sig);
-	ISSTRING(target)
-	ISVAR(setting)
+	target.assertString(function_sig, "target");
+	setting.assertVar(function_sig, "setting");
 
 	// TODO either make a "locatefrom" version of the above where the locate STARTS its search
 	// from the last numbered subvalue (add a new parameter), value or field. OR possibly modify
@@ -880,8 +880,8 @@ bool var_stg::locateby(const char* ordercode, in target, out setting, const int 
 
 	THISIS("bool var_stg::locateby(const char* ordercode, in target, out setting, const int fieldno, const int valueno) const")
 	assertString(function_sig);
-	ISSTRING(target)
-	ISVAR(setting)
+	target.assertString(function_sig, "target");
+	setting.assertVar(function_sig, "setting");
 
 	// TODO either make a "locatefrom" version of the above where the locate STARTS its search
 	// from the last numbered subvalue (add a new parameter), value or field. OR possibly modify
@@ -913,8 +913,8 @@ bool var_stg::locatebyusing(const char* ordercode, const char* usingchar, in tar
 
 	THISIS("bool var_stg::locatebyusing(const char* ordercode, const char* usingchar, in target, out setting, const int fieldno, const int valueno, const int valueno) const")
 	assertString(function_sig);
-	ISSTRING(target)
-	ISVAR(setting)
+	target.assertString(function_sig, "target");
+	setting.assertVar(function_sig, "setting");
 
 	// TODO either make a "locatefrom" version of the above where the locate STARTS its search
 	// from the last numbered subvalue (add a new parameter), value or field. OR possibly modify
@@ -937,7 +937,7 @@ bool var_stg::locateusing(const char* usingchar, in target) const {
 
 	THISIS("bool var_stg::locateusing(const char* usingchar, in target) const")
 	assertString(function_sig);
-	ISSTRING(target)
+	target.assertString(function_sig, "target");
 
 	var setting = "";
 //	return locatex(var_str, target.var_str, "", usingchar, setting, 0, 0, 0);
@@ -951,8 +951,8 @@ bool var_stg::locateusing(const char* usingchar, in target, out setting, const i
 //	THISIS("bool var_stg::locateusing(const char* usingchar, in target, out setting, const int fieldno, const int valueno, const int subvalueno) const")
 	THISIS("bool var_stg::locateusing(const char* usingchar, in target, out setting, const int fieldno, const int valueno, const int subvalueno) const")
 	assertString(function_sig);
-	ISSTRING(target)
-	ISVAR(setting)
+	target.assertString(function_sig, "target");
+	setting.assertVar(function_sig, "setting");
 
 	return locatex(var_str, target.var_str, "", usingchar, setting, fieldno, valueno,
 				   subvalueno);
@@ -1606,7 +1606,7 @@ var  var_stg::mv(const char* opcode, in var2) const {
 
 	THISIS("var  var::multivalued(const char* opcode, in var2) const")
 	assertString(function_sig);
-	ISSTRING(var2)
+	var2.assertString(function_sig, "var2");
 
 	var nrvo = "";
 	var mv1;
@@ -1733,7 +1733,7 @@ var  var_stg::substr(const int pos1, SV delimiterchars, out pos2) const {
 
 	THISIS("var  var_stg::substr(const int pos1, SV delimiterchars, out pos2) const")
 	assertString(function_sig);
-//	ISSTRING(delimiterchars)
+//	delimiterchars.assertString(function_sig, "delimiterchars");
 
 	std::size_t pos0;
 
@@ -1788,8 +1788,8 @@ var  var_stg::substr2(io pos1, out delimiterno) const {
 
 	THISIS("var  var_stg::substr2(io pos1, out delimiterno) const")
 	assertString(function_sig);
-	ISNUMERIC(pos1)
-	ISVAR(delimiterno)
+	pos1.assertNumeric(function_sig, "pos1");
+	delimiterno.assertVar(function_sig, "delimiterno");
 
 	int startindex0 = pos1.toInt() - 1;
 	std::size_t pos = (startindex0 >= 0) ? startindex0 : 0;
@@ -1965,14 +1965,14 @@ var  var_stg::sum() const {
 
 		} else {
 
-			ISSTRING(accum)
+			accum.assertString(function_sig, "accum");
 			if (not accum.var_str.empty()) {
 
 				// Fix decimal places
 				accum = accum.round(static_cast<int>(maxndecimals));
 
 				// Check round returned a string
-				ISSTRING(accum)
+				accum.assertString(function_sig, "accum");
 
 				// Remove trailing zeros if floating point is present
                 if (accum.var_str.find('.') != std::string::npos) {

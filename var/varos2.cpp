@@ -174,7 +174,7 @@ bool var_os::osgetenv(SV envcode) {
 	THISIS("bool var::osgetenv(SV envcode)")
 	assertVar(function_sig);
 	//assertStringMutator(function_sig);
-	//ISSTRING(envcode)
+	//envcode.assertString(function_sig, "envcode");
 
 	// Initialise the thread local cache if not already done
 	if (thread_environ.empty()) {

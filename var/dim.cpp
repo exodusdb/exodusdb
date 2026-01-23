@@ -389,7 +389,7 @@ void dim::splitter(/*in*/ const var_stg& str1, SV delimiter) {
 	//TODO If delimiter is "" split every utf8 chararacter?
 
 	THISIS("dim& dim::splitter(in str1, SV delimiter)")
-	ISSTRING(str1)
+	str1.assertString(function_sig, "str1");
 
 	// Only if not already dimensioned, dimension to the number of delimited fields present.
 	// Do not always redimension always since often we are dim reading db records
@@ -498,8 +498,8 @@ void dim::randomizer() {
 bool dim::read(in filevar, in key) {
 
 	THISIS("bool dim::read(in filevar, in key)")
-	ISSTRING(filevar)
-	ISSTRING(key)
+	filevar.assertString(function_sig, "filevar");
+	key.assertString(function_sig, "key");
 
 	var temprecord;
 	if (!temprecord.read(filevar, key))
@@ -523,8 +523,8 @@ bool dim::read(in filevar, in key) {
 void dim::write(in filevar, in key) const {
 
 	THISIS("void dim::write(in filevar, in key) const")
-	ISSTRING(filevar)
-	ISSTRING(key)
+	filevar.assertString(function_sig, "filevar");
+	key.assertString(function_sig, "key");
 
 	let temprecord = this->join().trimlast(_FM);
 
@@ -535,7 +535,7 @@ void dim::write(in filevar, in key) const {
 bool dim::osread(in osfilename, const char* codepage) {
 
 	THISIS("bool dim::osread(in osfilename, const char* codepage = "")")
-	ISSTRING(osfilename)
+	osfilename.assertString(function_sig, "osfilename");
 
 	// Acquire the whole file as a single var.
 	var txt;
@@ -566,7 +566,7 @@ bool dim::osread(in osfilename, const char* codepage) {
 bool dim::oswrite(in osfilename, const char* codepage) const {
 
 	THISIS("bool dim::oswrite(in osfilename, const char* codepage = "")")
-	ISSTRING(osfilename)
+	osfilename.assertString(function_sig, "osfilename");
 
 	std::string linesep = "\n";
 

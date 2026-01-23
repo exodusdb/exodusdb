@@ -344,7 +344,7 @@ var  var_stg::match(SV regex_str, SV regex_options) const {
 
 	THISIS("var  var_stg::match(SV regex_str, SV regex_options) const")
 	assertString(function_sig);
-	//ISSTRING(regex_str)
+	//regex_str.assertString(function_sig, "regex_str");
 
 	// wild cards like
 	// *.* or *.???

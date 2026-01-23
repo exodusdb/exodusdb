@@ -822,7 +822,7 @@ bool var_db::connect(in conninfo) {
 
 	THISIS("bool var::connect(in conninfo")
 	assertVar(function_sig);
-	ISSTRING(conninfo)
+	conninfo.assertString(function_sig, "conninfo");
 
 //	// NB DONT
 //  // log/trace or otherwise output the full connection info without HIDING the
@@ -955,7 +955,7 @@ bool var_db::attach(in filenames) const {
 
 	THISIS("bool var::attach(in filenames")
 	assertVar(function_sig);
-	ISSTRING(filenames)
+	filenames.assertString(function_sig, "filenames");
 
 	// Option to attach all dict files
 	var filenames2;
@@ -1003,7 +1003,7 @@ void var_db::detach(in filenames) {
 
 	THISIS("bool var::detach(in filenames")
 	assertVar(function_sig);
-	ISSTRING(filenames)
+	filenames.assertString(function_sig, "filenames");
 
 	for (var filename : filenames) {
 		// Similar code in detach and deletefile
@@ -1118,7 +1118,7 @@ bool var_db::open(in filename, in connection /*DEFAULTNULL*/) {
 
 	THISIS("bool var::open(in filename, in connection)")
 	assertVar(function_sig);
-	ISSTRING(filename)
+	filename.assertString(function_sig, "filename");
 
 	const var normalized_filename = get_normalized_filename(filename);
 
@@ -1307,8 +1307,8 @@ bool var_db::readc(in file, in key) {
 
 	THISIS("bool var::readc(in file, in key)")
 	assertVar(function_sig);
-	ISSTRING(file)
-	ISSTRING(key)
+	file.assertString(function_sig, "file");
+	key.assertString(function_sig, "key");
 
 	// Check cache first, and return any cached record
 	int dbconn_no = get_dbconn_no_or_default(file);
@@ -1366,8 +1366,8 @@ void var_db::writec(in file, in key) const {
 
 	THISIS("void var::writec(in file, in key)")
 	assertString(function_sig);
-	ISSTRING(file)
-	ISSTRING(key)
+	file.assertString(function_sig, "file");
+	key.assertString(function_sig, "key");
 
 	// Update cache
 	// Virtually identical code in read and write/update/insert/delete
@@ -1386,7 +1386,7 @@ bool var_db::deletec(in key) const {
 
 	THISIS("bool var::deletec(in key)")
 	assertString(function_sig);
-	ISSTRING(key)
+	key.assertString(function_sig, "key");
 
 	// Update cache
 	// Virtually identical code in read and write/update/insert/delete
@@ -1412,11 +1412,11 @@ var  var_db::xlate(in filename, in fieldno, const char* mode) const {
 
 	THISIS("var  var::xlate(in filename, in fieldno, const char* mode) const")
 	assertString(function_sig);
-	ISSTRING(filename)
+	filename.assertString(function_sig, "filename");
 	// fieldnames are supported as exoprog::xlate
 	// but not here in var::xlate which only supports field numbers since it has no
 	// access to dictionaries
-	ISNUMERIC(fieldno)
+	fieldno.assertNumeric(function_sig, "fieldno");
 
 	// Use filename in case it is a file handle
 	// and can give us a non-default connection
@@ -1490,8 +1490,8 @@ bool var_db::read(in file, in key) {
 
 	THISIS("bool var::read(in file, in key)")
 	assertVar(function_sig);
-	ISSTRING(file)
-	ISSTRING(key)
+	file.assertString(function_sig, "file");
+	key.assertString(function_sig, "key");
 
 	// Initialise the record var to unassigned
 	// unless record and key are the same variable
@@ -1671,7 +1671,7 @@ var  var_db::lock(in key) const {
 
 	THISIS("var  var::lock(in key) const")
 	assertVar(function_sig);
-	ISSTRING(key)
+	key.assertString(function_sig, "key");
 
 	auto pgconn = get_pgconn(*this);
 	if (not pgconn) UNLIKELY {
@@ -1756,7 +1756,7 @@ bool var_db::unlock(in key) const {
 
 	THISIS("void var::unlock(in key) const")
 	assertVar(function_sig);
-	ISSTRING(key)
+	key.assertString(function_sig, "key");
 
 	auto hash64 = vardb_hash_file_and_key(*this, key);
 
@@ -1866,7 +1866,7 @@ bool var_db::sqlexec(in sql) const {
 bool var_db::sqlexec(in sqlcmd, io response) const {
 
 	THISIS("bool var::sqlexec(in sqlcmd, io response) const")
-	ISSTRING(sqlcmd)
+	sqlcmd.assertString(function_sig, "sqlcmd");
 
 	const auto pgconn = get_pgconn(*this);
 	if (not pgconn) UNLIKELY {
@@ -1952,8 +1952,8 @@ void var_db::writef(in file, in key, const int fieldno) const {
 	assertString(function_sig);
 //	// will be duplicated in read and write but do here to present the correct function name on
 //	// error
-//	ISSTRING(file)
-//	ISSTRING(key)
+//	file.assertString(function_sig, "file");
+//	key.assertString(function_sig, "key");
 
 	// Get the old record or use ""
 	var record;
@@ -1978,8 +1978,8 @@ void var_db::write(in file, in key) const {
 
 	THISIS("void var::write(in file, in key) const")
 	assertString(function_sig);
-	ISSTRING(file)
-	ISSTRING(key)
+	file.assertString(function_sig, "file");
+	key.assertString(function_sig, "key");
 
 	const std::string key2 = key.normalize().var_str;
 	const std::string data2 = this->normalize().var_str;
@@ -2082,8 +2082,8 @@ bool var_db::updaterecord(in file, in key) const {
 
 	THISIS("bool var::updaterecord(in file, in key) const")
 	assertString(function_sig);
-	ISSTRING(file)
-	ISSTRING(key)
+	file.assertString(function_sig, "file");
+	key.assertString(function_sig, "key");
 
 	// Clear any cache when updating actual records
 	// to prevent any future readc getting known obsolete records
@@ -2149,8 +2149,8 @@ bool var_db::updatekey(in key, in newkey) const {
 
 	THISIS("bool var::updatekey(in key, in newkey) const")
 	assertString(function_sig);
-	ISSTRING(key)
-	ISSTRING(newkey)
+	key.assertString(function_sig, "key");
+	newkey.assertString(function_sig, "newkey");
 
 	// Clear any cache when updating actual records
 	// to prevent any future readc getting known obsolete records
@@ -2228,8 +2228,8 @@ bool var_db::insertrecord(in file, in key) const {
 
 	THISIS("bool var::insertrecord(in file, in key) const")
 	assertString(function_sig);
-	ISSTRING(file)
-	ISSTRING(key)
+	file.assertString(function_sig, "file");
+	key.assertString(function_sig, "key");
 
 	// Clear any cache when inserting actual records
 	// although there should be none when inserting new records
@@ -2300,7 +2300,7 @@ bool var_db::deleterecord(in key) const {
 
 	THISIS("bool var::deleterecord(in key) const")
 	assertString(function_sig);
-	ISSTRING(key)
+	key.assertString(function_sig, "key");
 
 	// Clear any cache when deleting actual records
 	// to prevent and future readc getting known non-existent records
@@ -2554,8 +2554,8 @@ bool var_db::statustrans() const {
 bool var_db::dbcopy(in from_dbname, in to_dbname) const {
 	THISIS("bool var::dbcopy(in from_dbname, in new_dbname) const")
 	assertVar(function_sig);
-	ISSTRING(from_dbname)
-	ISSTRING(to_dbname)
+	from_dbname.assertString(function_sig, "from_dbname");
+	to_dbname.assertString(function_sig, "to_dbname");
 
 	// Ensure to_dbname is provided to avoid bugs in app code
 	if (not to_dbname) {
@@ -2570,8 +2570,8 @@ bool var_db::dbcreate(in new_dbname, in old_dbname /* = "" */) const {
 
 	THISIS("bool var::dbcreate(in new_dbname, in old_dbname) const")
 	assertVar(function_sig);
-	ISSTRING(new_dbname)
-	ISSTRING(old_dbname)
+	new_dbname.assertString(function_sig, "new_dbname");
+	old_dbname.assertString(function_sig, "old_dbname");
 
 	// TODO Fail neatly if the source db doesnt exist or the target db already exists
 
@@ -2612,7 +2612,7 @@ bool var_db::dbdelete(in dbname) const {
 
 	THISIS("bool var::dbdelete(in dbname)")
 	assertVar(function_sig);
-	ISSTRING(dbname)
+	dbname.assertString(function_sig, "dbname");
 
 	// Fail neatly if the database does not exist.
 	// SQL errors during a transaction cause the whole transaction to fail.
@@ -2628,7 +2628,7 @@ bool var_db::createfile(in filename) const {
 
 	THISIS("bool var::createfile(in filename)")
 	assertVar(function_sig);
-	ISSTRING(filename)
+	filename.assertString(function_sig, "filename");
 
 	// var tablename = "TEMP" ^ var(100000000).rnd();
 	// Postgres The ON COMMIT clause for temporary tables also resembles the SQL standard, but
@@ -2668,8 +2668,8 @@ bool var_db::renamefile(in filename, in newfilename) const {
 
 	THISIS("bool var::renamefile(in filename, in newfilename)")
 	assertVar(function_sig);
-	ISSTRING(filename)
-	ISSTRING(newfilename)
+	filename.assertString(function_sig, "filename");
+	newfilename.assertString(function_sig, "newfilename");
 
 	// Fail neatly if the old file does not exist.
 	// SQL errors during a transaction cause the whole transaction to fail.
@@ -2706,7 +2706,7 @@ bool var_db::deletefile(in filename) const {
 
 	THISIS("bool var::deletefile(in filename)")
 	assertVar(function_sig);
-	ISSTRING(filename)
+	filename.assertString(function_sig, "filename");
 
 	// Fail neatly if the file does not exist
 	// SQL errors during a transaction cause the whole transaction to fail.
@@ -2739,7 +2739,7 @@ bool var_db::clearfile(in filename) const {
 
 	THISIS("bool var::clearfile(in filename)")
 	assertVar(function_sig);
-	ISSTRING(filename)
+	filename.assertString(function_sig, "filename");
 
 	// Fail neatly if the file does not exist
 	// SQL errors during a transaction cause the whole transaction to fail.
@@ -3507,7 +3507,7 @@ bool var_db::select(in sortselectclause) {
 
 	THISIS("bool var::select(in sortselectclause) const")
 	assertVar(function_sig);
-	ISSTRING(sortselectclause)
+	sortselectclause.assertString(function_sig, "sortselectclause");
 	auto started = var().ostime();
 	bool result;
 	if (not sortselectclause or sortselectclause.ends("R)"))
@@ -5129,7 +5129,7 @@ bool var_db::selectkeys(in keys) {
 
 	THISIS("bool var::selectkeys(in keys)")
 	assertVar(function_sig);
-	ISSTRING(keys)
+	keys.assertString(function_sig, "keys");
 
 	if (DBTRACE>1)
 		this->logputl("DBTR var::selectkeys(" ^ keys.field(_FM, 1, 3).quote() ^ "...) ");
@@ -5269,8 +5269,8 @@ bool var_db::readnext(io record, io key, io valueno) {
 
 	THISIS("bool var::readnext(io record, io key, io valueno) const")
 	assertVar(function_sig);
-	ISVAR(key)
-	ISVAR(record)
+	key.assertVar(function_sig, "key");
+	record.assertVar(function_sig, "record");
 
 	// Default cursor is ""
 	this->defaulter("");
@@ -5393,8 +5393,8 @@ bool var_db::createindex(in fieldname0, in dictfile) const {
 
 	THISIS("bool var::createindex(in fieldname, in dictfile) const")
 	assertString(function_sig);
-	ISSTRING(fieldname0)
-	ISSTRING(dictfile)
+	fieldname0.assertString(function_sig, "fieldname0");
+	dictfile.assertString(function_sig, "dictfile");
 
 	let filename = get_normalized_filename(*this);
 	let fieldname = fieldname0.convert(".", "_");
@@ -5491,7 +5491,7 @@ bool var_db::deleteindex(in fieldname0) const {
 
 	THISIS("bool var::deleteindex(in fieldname) const")
 	assertString(function_sig);
-	ISSTRING(fieldname0)
+	fieldname0.assertString(function_sig, "fieldname0");
 
 	let filename = get_normalized_filename(*this);
 	let fieldname = fieldname0.convert(".", "_");
@@ -5639,8 +5639,8 @@ var  var_db::listindex(in filename0, in fieldname0) const {
 
 	THISIS("var  var::listindex(in filename, in fieldname) const")
 	assertVar(function_sig);
-	ISSTRING(filename0)
-	ISSTRING(fieldname0)
+	filename0.assertString(function_sig, "filename0");
+	fieldname0.assertString(function_sig, "fieldname0");
 
 	let filename = filename0.f(1);
 	let fieldname = fieldname0.convert(".", "_");
@@ -5710,7 +5710,7 @@ var  var_db::reccount(in filename0) const {
 
 	THISIS("var  var::reccount(in file_or_filename) const")
 	assertVar(function_sig);
-	ISSTRING(filename0)
+	filename0.assertString(function_sig, "filename0");
 
 	// Use var if filename not provided.
 	const auto filename = filename0 ?: (*this);
@@ -5751,7 +5751,7 @@ bool var_db::flushindex(in filename) const {
 
 	THISIS("bool var::flushindex(in filename) const")
 	assertVar(function_sig);
-	ISSTRING(filename)
+	filename.assertString(function_sig, "filename");
 
 	// Skip if in a transaction
 	if (this->statustrans()) {
