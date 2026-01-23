@@ -370,6 +370,8 @@ export namespace exo {
 	using exo::randomizer;
 
 	using exo::sin;
+	using exo::min;
+	using exo::max;
 
 	using exo::sort;
 	using exo::sorter;

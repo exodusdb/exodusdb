@@ -238,4 +238,14 @@ var var_base::floor() const {
 	return var_int;
 }
 
+var  var_base::max(in arg2) const {
+	THISIS("var  var::max(in arg2) const")
+	return var(*this > arg2 ? *this : arg2);
+}
+
+var  var_base::min(in arg2) const {
+	THISIS("var  var::min(in arg2) const")
+	return var(*this < arg2 ? *this : arg2);
+}
+
 } // namespace exo

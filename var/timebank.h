@@ -249,6 +249,8 @@ auto get_timebank_acno(const std::string_view arg1) -> int {
 	else if (++acno && arg1 == "var  var::sqrt() const") {}
 	else if (++acno && arg1 == "var  var::pwr(in exponent) const") {}
 	else if (++acno && arg1 == "var  var::exp() const") {}
+	else if (++acno && arg1 == "var  var::min(in arg2) const") {}
+	else if (++acno && arg1 == "var  var::max(in arg2) const") {}
 	else if (++acno && arg1 == "bool var::osshell() const") {}
 	else if (++acno && arg1 == "bool var::osshellwrite(in oscmd) const") {}
 	else if (++acno && arg1 == "bool var::osshellread(in oscmd)") {}
