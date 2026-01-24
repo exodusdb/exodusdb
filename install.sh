@@ -694,7 +694,7 @@ function install_exodus_paths {
 : --------------------
 :
 : Add \${HOME}/bin to PATH and \${HOME}/lib to LD_LIBRARY_PATH
-" for all users in /etc/profile.d/exodus.sh
+: for all users in /etc/profile.d/exodus.sh
 : -------------------------------------------------------------
 :
 : Enable exodus programs created with edic/compile
@@ -703,7 +703,7 @@ function install_exodus_paths {
 :
 : Note: Using 'echo sudo dd' trick because 'sudo echo xxx > yyy' doesnt sudo the '> yyy' bit.
 :
-	printf 'export PATH="${PATH}:{HOME}/bin"\nexport LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${HOME}/lib"\n' | sudo dd of=/etc/profile.d/exodus.sh status=none
+	printf 'export PATH="${PATH}:${HOME}/bin"\nexport LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${HOME}/lib"\n' | sudo dd of=/etc/profile.d/exodus.sh status=none
 :
 } # end of install_exodus_paths
 
