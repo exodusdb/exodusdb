@@ -599,7 +599,7 @@ function get_dependencies_for_build_and_install {
 	readlink `which c++` -e
 	dpkg -l | egrep "g++|clang|libstd|libc\+\+" | awk '{print $2}'
 
-} # end of stage b - Install dependencies
+} # end of stage b - get_dependencies_for_build_and_install
 
 function build_only {
 :
@@ -688,6 +688,25 @@ function test_exodus_without_database {
 :
 } # end of test_exodus_without_database
 
+function install_exodus_paths {
+:
+: Install exodus_paths $*
+: --------------------
+:
+: Add \${HOME}/bin to PATH and \${HOME}/lib to LD_LIBRARY_PATH
+" for all users in /etc/profile.d/exodus.sh
+: -------------------------------------------------------------
+:
+: Enable exodus programs created with edic/compile
+: to be run from command line without full path to \~/bin
+: Requires re-login after installation.
+:
+: Note: Using 'echo sudo dd' trick because 'sudo echo xxx > yyy' doesnt sudo the '> yyy' bit.
+:
+	printf 'export PATH="${PATH}:{HOME}/bin"\nexport LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${HOME}/lib"\n' | sudo dd of=/etc/profile.d/exodus.sh status=none
+:
+} # end of install_exodus_paths
+
 function install_exodus {
 :
 : Install exodus $*
@@ -700,17 +719,7 @@ function install_exodus {
 		sudo cmake --install $EXODUS_DIR/build
 	fi
 
-:
-: Add \~/bin to PATH and \~/lib to LD_LIBRARY_PATH for all users
-: ------------------------------------------------------------
-:
-: Enable exodus programs created with edic/compile
-: to be run from command line without full path to \~/bin
-: Requires re-login after installation.
-:
-: Note: Using 'echo sudo dd' trick because 'sudo echo xxx > yyy' doesnt sudo the '> yyy' bit.
-:
-	printf 'export PATH="${PATH}:~/bin"\nexport LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${HOME}/lib"\n' | sudo dd of=/etc/profile.d/exodus.sh status=none
+	install_exodus_paths
 :
 } # end of install_exodus
 
@@ -950,11 +959,15 @@ function install_www_service {
 : ----
 :
 
-	if [[ $REQ_STAGES =~ b ]]; then get_dependencies_for_build_and_install; fi
+	if [[ $REQ_STAGES =~ b ]]; then
+		get_dependencies_for_build_and_install
+		install_exodus_paths
+	fi
 	if [[ $REQ_STAGES =~ B ]]; then
 		build_only
 		test_exodus_without_database
 		install_exodus
+		install_exodus_paths
 	fi
 	if [[ $REQ_STAGES =~ I ]]; then install_exodus; fi # Done as part of B
 
