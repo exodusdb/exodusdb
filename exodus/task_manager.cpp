@@ -1,6 +1,11 @@
-#if EXO_MODULE > 1
+#include <boost/fiber/all.hpp>
+// N.B. Building task manager without import std
+// until import std is compatible with include <string> etc. as included by boost below
+// task_manager_imp
+
+#if EXO_MODULE// > 1
 	import std;
-#	include <memory> // work around bug in std module that disallows "using std::make_shared;"
+//#	include <memory> // work around bug in std module that disallows "using std::make_shared;"
 #else
 #	include <vector>
 #	include <mutex>
@@ -17,8 +22,6 @@
 
 #include "task_manager.h"
 #include "task_manager_impl.h"
-
-#include <boost/fiber/all.hpp>
 
 #define LOG if (0) std::cerr
 //#define LOG std::cerr
@@ -134,7 +137,7 @@ void TaskManager::set_async_result(var data, var message) const {
 	impl_->result_channel.push(result_ptr);
 }
 
-#ifdef EXO_GENERATOR
+#ifdef EXO_STD_GENERATOR
 auto TaskManager::async_results() -> std::generator<AsyncResult&> {
 	LOG << "Expecting " << async_count_ << " results" << std::endl;
 	while (async_count_) {

@@ -1,4 +1,4 @@
-#if EXO_MODULE > 1
+#if EXO_MODULE// > 1
 	import std;
 #else
 #	include <atomic>
@@ -18,7 +18,7 @@
 #define EXO_EXOPROG_CPP
 #include <exodus/exoprog.h>
 #include <exodus/exocallable.h>
-#include <var/exodebug.h>
+//#include <var/exodebug.h>
 
 #include <exodus/exoimpl.h>
 

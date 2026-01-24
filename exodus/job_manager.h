@@ -1,24 +1,22 @@
 #ifndef JOB_MANAGER_HPP
 #define JOB_MANAGER_HPP
 
-#if EXO_MODULE > 1
+#if EXO_MODULE// > 1
 	import std;
-#	define EXO_GENERATOR
-//#		include <exodus/result_range.h>
 #else
 #	include <utility>
 #   include <functional>
 #   include <memory>
 #   include <tuple>
+#endif
+
 //#	include <version>
 //#	ifdef __cpp_lib_generator // 202207L
-#	if __has_include(<generator>)
-#		define EXO_GENERATOR
-#   	include <generator>
-#	else
-#		include <exodus/result_range.h>
-#	endif
-#
+#if __has_include(<generator>)
+#	define EXO_STD_GENERATOR
+#  	include <generator>
+#else
+#	include <exodus/result_range.h>
 #endif
 
 #if EXO_MODULE
@@ -48,7 +46,7 @@ public:
 	JobManager(const JobManager&) = delete;
 	JobManager& operator=(const JobManager&) = delete;
 
-#ifndef EXO_GENERATOR
+#ifndef EXO_STD_GENERATOR
 	friend ResultRange<JobManager, ExoEnv>;
 #endif
 
@@ -104,7 +102,7 @@ public:
 	// Get the number of processor cores available.
 	auto getnumcores() -> var;
 
-#ifdef EXO_GENERATOR
+#ifdef EXO_STD_GENERATOR
 
 	// Process all run results in parallel as they become available.
 	// return: range based for loop argument.

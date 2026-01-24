@@ -1,4 +1,4 @@
-#if EXO_MODULE > 1
+#if EXO_MODULE// > 1
 	import std;
 //	import var;
 //#	include <memory> // work around bug in std module that disallows "using std::make_shared;"
@@ -45,7 +45,7 @@ void JobManager::reset_run(std::size_t num_threads) {
 	ThreadPool::reset(&threadpool1, num_threads);
 }
 
-#ifdef EXO_GENERATOR
+#ifdef EXO_STD_GENERATOR
 auto JobManager::run_results() -> std::generator<ExoEnv&> {
 	int rc = run_count();
 	for (int i = 0; i < rc; ++i) {

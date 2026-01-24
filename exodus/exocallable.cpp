@@ -47,7 +47,7 @@ constexpr int TRACING = 0;
 #	include <ios>
 #endif
 
-#if EXO_MODULE > 1
+#if EXO_MODULE// > 1
 	import std;
 #else
 #	include <iostream>

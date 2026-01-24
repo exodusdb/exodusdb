@@ -55,12 +55,13 @@
 // Used varnum.cpp, test_main3.cpp, test_precision2.cpp.
 #if __GNUC__ >= 11 || __clang_major__ >=  14
 #	define EXO_USE_TO_CHARS
-// 2. RYU
-#elif __has_include(<ryu/ryu.h>)
-#	define EXO_USE_RYU
-#	include <ryu/ryu.h>
-// 3. STRINGSTREAM
+//// 2. RYU
+//#elif __has_include(<ryu/ryu.h>)
+//#	define EXO_USE_RYU
+//#	include <ryu/ryu.h>
+//// 3. STRINGSTREAM
 #else
+#	error "Cant build without to_chars(double)"
 #endif
 
 // Use ASCII 0x1A-0x1F for PickOS separator chars instead

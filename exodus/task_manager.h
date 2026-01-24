@@ -1,23 +1,23 @@
 #ifndef TASK_MANAGER_HPP
 #define TASK_MANAGER_HPP
 
-#if EXO_MODULE > 1
+#if EXO_MODULE// > 1
 	import std;
-#	define EXO_GENERATOR
 #else
 #	include <utility>
 #	include <functional>
 #	include <memory>
 #	include <tuple>
 #	include <exception>
+#endif
+
 //#	include <version>
 //#	ifdef __cpp_lib_generator // 202207L
-#	if __has_include(<generator>)
-#		define EXO_GENERATOR
-#   	include <generator>
-#	else
-#		include <exodus/result_range.h>
-#	endif
+#if __has_include(<generator>)
+#	define EXO_STD_GENERATOR
+#  	include <generator>
+#else
+#	include <exodus/result_range.h>
 #endif
 
 #if EXO_MODULE
@@ -46,7 +46,7 @@ class PUBLIC TaskManager {
 
 	void async_impl(std::function<void()> fn);
 
-#ifndef EXO_GENERATOR
+#ifndef EXO_STD_GENERATOR
     friend class ResultRange<TaskManager, AsyncResult>; // Allow access to impl_, err_ptr, async_count_
 #endif
 
@@ -171,7 +171,7 @@ public:
 	// See async() for an example.
 	void set_async_result(var data, var message = "") const;
 
-#ifdef EXO_GENERATOR
+#ifdef EXO_STD_GENERATOR
 
 	// Process all async results asynchronously as they become available.
     // return: range based for loop argument.
