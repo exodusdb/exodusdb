@@ -1250,14 +1250,19 @@ R"__(
 			}
 			var stats = rep_optimes.pop().stddev().oconv("MD30");
 //			logputl();
-			if (nreps > 1)
-				errput("Rep:" , repn.oconv("MD0,"), "/", oconv(nreps, "MD0,"), ". ", oconv(nops, "MD0,"), " ops/rep  min:", stats.f(3), "  max:", stats.f(4), "  avg:", stats.f(5), " ± ", stats.f(6), " ", opunit, "/op");
+			if (nreps > 1) {
+				errput("Rep:" , repn.oconv("MD0,"), "/", oconv(nreps, "MD0,"), ". ", oconv(nops, "MD0,"), " ops/rep  min:", stats.f(3), "  max:", stats.f(4), "  avg:", stats.f(5));
+//				errput(" ± ", stats.f(6), " ", opunit, "/op");
+				var margin_of_error_95 = 1.96 * stats.f(6) / sqrt(nreps);
+				errput(" ±", margin_of_error_95.oconv("MD30"));
+				errput( " ", opunit, "/op");
+			}
 			else if (nops > 1)
 				errput(oconv(nops, "MD0,"), " ops. ", stats.f(5), " ", opunit, "/op");
 			else
 				errput(stats.f(5), " ", opunit);
 			if (repn == nreps or ANS.len() <= 32)
-				errput("  ", ANS.squote());
+				errput("  output: ", ANS.squote());
 			osflush();
 		}
 	} // repn
@@ -1285,7 +1290,7 @@ R"__(
 
 	// Create a tmp cpp file
 //	let tempfilebase = ostempfile();
-	let tempfilebase = ostempdir() ^ "~exo" ^ prog.hash(0xFF'FFFF).oconv("MX");
+	let tempfilebase = ostempdir() ^ "exo" ^ prog.hash(0xFF'FFFF).oconv("MX");
 
 //	let tempfilebase = ostempdir() ^ "~eeval";
 	let tempfilesrc	 = tempfilebase ^ ".cpp";
@@ -1294,11 +1299,13 @@ R"__(
 
 	// Compile it
 	let options = " {SS" ^ str("V", verbose)  ^ str("F", force) ^ "}";
-	if (not osshell("CXX_OPTIONS='-Wno-unused-result' compile " ^ tempfilesrc ^ options))
+	var cmd = "CXX_OPTIONS='-Wno-unused-result' compile " ^ tempfilesrc ^ options;
+	if (not osshell(cmd))
 		abort(lasterror());
 
 	// Run it
-	if (not osshell(tempfilebase.field("/", -1) ^ " " ^ act_nreps ^ " " ^ act_nops))
+	cmd = tempfilebase.field("/", -1) ^ " " ^ act_nreps ^ " " ^ act_nops;
+	if (not osshell(cmd))
 		{} // loglasterror();
 
 	// Start a new line in case output left the cursor hanging mid line.
