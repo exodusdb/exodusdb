@@ -7,6 +7,7 @@
 #include <cerrno> // for errno EAGAIN EINTR
 #include <cstdlib> // for EXIT_FAILURE
 
+#include <stdio.h> // for stderr
 #include <unistd.h>
 #include <sys/inotify.h>
 #include <poll.h>

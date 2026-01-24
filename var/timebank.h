@@ -346,8 +346,8 @@ auto get_timebank_acno(const std::string_view arg1) -> int {
 
 	else if (++acno && arg1 == "var  var::format(SV fmt_str, Args&&... args) const") {}
 	else if (++acno && arg1 == "var  format(SV fmt_str, Args&&... args)") {}
-	//else if (++acno && arg1 == "auto fmt::formatter::parse(...)") {}
-	else if (++acno && arg1 == "auto fmt::formatter::format(var) const") {}
+	//else if (++acno && arg1 == "auto std::formatter::parse(...)") {}
+	else if (++acno && arg1 == "auto std::formatter::format(var) const") {}
 
 	else if (++acno && arg1 == "var  var::match(const rex& regex) const") {}
 	else if (++acno && arg1 == "var  var::search(const rex& regex, io startchar1) const") {}

@@ -1,7 +1,7 @@
 #ifndef THREAD_SAFE_QUEUE_HPP
 #define THREAD_SAFE_QUEUE_HPP
 
-#if EXO_MODULE// > 1
+#if EXO_MODULE > 1
 	import std;
 #else
 #	include <queue>

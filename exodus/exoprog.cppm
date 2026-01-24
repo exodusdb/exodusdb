@@ -464,10 +464,10 @@ export namespace exo {
 	}
 #elif EXO_FORMAT == 2 || EXO_FORMAT == 3
 	export namespace stdfmt {
-		using fmt::formatter;
-		using fmt::format;
-	//	using fmt::print;
-	//	using fmt::vprint;
-	//	using fmt::println;
+		using std::formatter;
+		using std::format;
+	//	using std::print;
+	//	using std::vprint;
+	//	using std::println;
 	}
 #endif // EXO_FORMAT

@@ -31,15 +31,6 @@ THE SOFTWARE.
 	//v.isnum();         //+???ns (???ns using <charconv> from_chars)
 */
 
-#if EXO_MODULE > 1
-	import std;
-#else
-#	include <charconv>
-#	include <array>
-#endif
-
-#include <var/varimpl.h>
-
 // FROM_CHARS
 /////////////
 
@@ -77,6 +68,15 @@ THE SOFTWARE.
 #else
 #	error "No usable std::from_chars()-> double found"
 #endif
+
+#if EXO_MODULE > 1
+	import std;
+#else
+#	include <charconv>
+#	include <array>
+#endif
+
+#include <var/varimpl.h>
 
 //#ifndef M_PI
 ////#	define M_PI 3.14159265358979323846f

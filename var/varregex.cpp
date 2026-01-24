@@ -71,15 +71,6 @@ takes one template parameter (the iterator type). It also calls u32regex_search 
 allowing it to interface correctly with UTF-8, UTF-16, and UTF-32 data:
 */
 
-#if EXO_MODULE > 1
-	import std;
-#else
-#	include <cstring>	// for str::strlen etc.
-#	include <iostream>
-#	include <utility> //for replace
-#	include <string>
-#endif
-
 #include <boost/algorithm/string/replace.hpp>
 
 #define EXO_BOOST_REGEX
@@ -94,6 +85,15 @@ allowing it to interface correctly with UTF-8, UTF-16, and UTF-32 data:
 #		include <regex>
 #	endif
 #	define std_or_boost std
+#endif
+
+#if EXO_MODULE > 1
+	import std;
+#else
+#	include <cstring>	// for str::strlen etc.
+#	include <iostream>
+#	include <utility> //for replace
+#	include <string>
 #endif
 
 #include <var/varimpl.h>

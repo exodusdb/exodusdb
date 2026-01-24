@@ -29,6 +29,9 @@ Binary    Hex          Comments
 11110xxx  0xF0..0xF4   First byte of a 4-byte character encoding
 */
 
+#include <boost/version.hpp>
+#include <boost/locale.hpp> // For locate aware compare
+
 #if EXO_MODULE > 1
 	import std;
 #else
@@ -36,9 +39,6 @@ Binary    Hex          Comments
 #	include <utility> // For std::move
 #	include <locale>  // For std::use_facet
 #endif
-
-#include <boost/version.hpp>
-#include <boost/locale.hpp> // For locate aware compare
 
 #include <var/varimpl.h>
 

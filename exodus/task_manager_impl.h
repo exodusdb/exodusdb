@@ -3,7 +3,7 @@
 
 #include <boost/fiber/all.hpp>
 
-#if EXO_MODULE// > 1
+#if EXO_MODULE > 1
 	import std;
 //	import var;
 #else

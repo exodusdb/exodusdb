@@ -1,13 +1,3 @@
-#if EXO_MODULE > 1
-	import std;
-#else
-#	include <iostream>
-#	include <iomanip>
-#	include <chrono>
-#	include <string>
-#	include <utility>
-#endif
-
 // A fiber uses a boost::fiber:promise/future/get to talk DIRECT to io_context
 // using a boost::asio::posix::stream_descriptor/socket
 // This disables the fiber until OS io replies and our custom fiber scheduler
@@ -31,6 +21,16 @@
 #include <boost/fiber/all.hpp>
 
 #include <libpq-fe.h>
+
+#if EXO_MODULE > 1
+	import std;
+#else
+#	include <iostream>
+#	include <iomanip>
+#	include <chrono>
+#	include <string>
+#	include <utility>
+#endif
 
 #include "DBresult.h"
 #include "DBconn.h"

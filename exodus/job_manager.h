@@ -1,7 +1,7 @@
 #ifndef JOB_MANAGER_HPP
 #define JOB_MANAGER_HPP
 
-#if EXO_MODULE// > 1
+#if EXO_MODULE > 1
 	import std;
 #else
 #	include <utility>

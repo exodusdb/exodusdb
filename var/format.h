@@ -5,7 +5,7 @@
 #	error exodus/format.h must be included BEFORE other exodus program headers since they define intrusive macros for general exodus programming
 #endif
 
-// Including the large fmt library header here so exo::format can precompile strings using fmt::vformat
+// Including the large fmt library header here so exo::format can precompile strings using std::vformat
 //
 // Sadly that implies that it will be waste time in endless recompilations until it becomes
 // a c++ module.
@@ -46,16 +46,16 @@
 #	pragma GCC diagnostic ignored "-Wswitch-default"
 
 #	include <fmt/core.h>
-#	include <fmt/format.h> // for fmt::formatter<std::string_view> etc.
+#	include <fmt/format.h> // for std::formatter<std::string_view> etc.
 
 #	pragma GCC diagnostic pop
 
 #	if __GNUC__ >= 11 || __clang_major__ > 1
 
 // Avoid the following error:
-///root/exodus/fmt/include/fmt/core.h: In member function ‘constexpr auto fmt::v10::formatter<exo::var>::parse(ParseContext&) [with ParseContext =
-// fmt::v10::basic_format_parse_context<char>]’:
-///root/exodus/fmt/include/fmt/core.h:2712:22: warning: inlining failed in call to ‘constexpr const Char* fmt::v10::formatter<T, Char, typename std::enable_if<(fmt::v10::detail::type_constant<T, Char>::value != fmt::v10::detail::type::custom_type), void>::type>::parse(ParseContext&) [with ParseContext = fmt::v10::basic_format_parse_context<char>; T = fmt::v10::basic_string_view<char>; Char = char]’: --param max-inline-insns-single limit reached [-Winline]
+///root/exodus/fmt/include/fmt/core.h: In member function ‘constexpr auto std::v10::formatter<exo::var>::parse(ParseContext&) [with ParseContext =
+// std::v10::basic_format_parse_context<char>]’:
+///root/exodus/fmt/include/fmt/core.h:2712:22: warning: inlining failed in call to ‘constexpr const Char* std::v10::formatter<T, Char, typename std::enable_if<(std::v10::detail::type_constant<T, Char>::value != std::v10::detail::type::custom_type), void>::type>::parse(ParseContext&) [with ParseContext = std::v10::basic_format_parse_context<char>; T = std::v10::basic_string_view<char>; Char = char]’: --param max-inline-insns-single limit reached [-Winline]
 // 2712 |   FMT_CONSTEXPR auto parse(ParseContext& ctx) -> const Char* {
 //      |                      ^~~~~
 ///root/exodus/test/src/../../exodus/libexodus/exodus/exofuncs.h:850:58: note: called from here
