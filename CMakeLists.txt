@@ -78,12 +78,12 @@
 # Ubuntu 22.04 apt ninja doesnt support modules but we build it from source
 #		AND DISTRO_VERSION_ID VERSION_GREATER_EQUAL "24.04"
 	)
-		set(_default_exo_module 1)
+		set(_default_exo_module 2)
 	else()
 		set(_default_exo_module 0)
 	endif()
 	# Make it overridable from command line (-DEXO_MODULE=...) or CMakePresets
-	set(EXO_MODULE "${_default_exo_module}" CACHE STRING "EXO_MODULE is 0 for No, 1 for Yes, 2 for Yes (+Build exodus std module)")
+	set(EXO_MODULE "${_default_exo_module}" CACHE STRING "EXO_MODULE is 0 for No, 1 for Yes, 2 for Yes (+Build exodus with std module)")
 	set_property(CACHE EXO_MODULE PROPERTY STRINGS 0 1 2)
 
 	# ─ OR ─ apply globally (if really needed)

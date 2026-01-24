@@ -3,7 +3,7 @@
 // until import std is compatible with include <string> etc. as included by boost below
 // task_manager_imp
 
-#if EXO_MODULE// > 1
+#if EXO_MODULE > 1
 	import std;
 //#	include <memory> // work around bug in std module that disallows "using std::make_shared;"
 #else

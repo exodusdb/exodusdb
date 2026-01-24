@@ -216,8 +216,8 @@
 715 str  var::oconv_MT(const char* conversion) const
 716 var  var::format(SV fmt_str, Args&&... args) const
 717 var  format(SV fmt_str, Args&&... args)
-718 auto fmt::formatter::parse(...)
-719 auto fmt::formatter::format(var) const
+718 auto std::formatter::parse(...)
+719 auto std::formatter::format(var) const
 720 var  var::match(const rex& regex) const
 721 var  var::search(const rex& regex, io startchar1) const
 722 out  var::getxlocale() static

@@ -22,11 +22,13 @@ THE SOFTWARE.
 
 // clang-format off
 
+#if EXO_MODULE > 1
+	import std;
+#endif
+
 //#include <type_traits> // bug work around in clang-21?
 #if EXO_MODULE
-	import std;
 	import var;
-	namespace fmt=std;
 #else
 //#	include <cstdlib> //for atexit()
 #	include <var/var.h>
@@ -34,6 +36,7 @@ THE SOFTWARE.
 //#	include <var/rex.h>
 #	include <var/format.h>
 #endif
+//	namespace fmt=std;
 #include <var/vardefs.h>
 
 #include <exodus/exoenv.h>

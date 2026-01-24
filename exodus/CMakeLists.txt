@@ -118,16 +118,16 @@ find_package(ICU REQUIRED COMPONENTS uc i18n data)
 			FILES
 				exoprog.cppm
 		)
-		if (EXO_MODULE EQUAL 2)
-			target_link_libraries(exoprog std)
-		endif()
+#		if (EXO_MODULE EQUAL 2)
+#			target_link_libraries(exoprog std)
+#		endif()
 		target_link_libraries(exoprog exovar)
 		if (EXO_FORMAT EQUAL 2)
 			target_link_libraries(exoprog fmt)
 		endif()
 		if (EXO_FORMAT EQUAL 3)
 #			target_link_libraries(exoprog ${FMT_LIBRARIES})
-#			target_link_libraries(exoprog fmt::fmt)
+#			target_link_libraries(exoprog std::fmt)
 #			target_link_libraries(exoprog fmt/libfmt.a)
 		endif()
 	endif()
@@ -213,12 +213,12 @@ find_package(ICU REQUIRED COMPONENTS uc i18n data)
 		)
 	endif()
 
-	if (EXO_MODULE EQUAL 2)
-		install(
-			TARGETS std
-			DESTINATION lib
-		)
-	endif()
+#	if (EXO_MODULE EQUAL 2)
+#		install(
+#			TARGETS std
+#			DESTINATION lib
+#		)
+#	endif()
 
 # Install headers - non module
 # ###############

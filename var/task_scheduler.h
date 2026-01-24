@@ -1,6 +1,10 @@
 #ifndef TASK_SCHEDULER_H
 #define TASK_SCHEDULER_H
 
+#include <boost/asio.hpp>
+#include <boost/fiber/all.hpp>
+//#include <boost/fibers/algo/round_robin.hpp>
+
 #if EXO_MODULE > 1
 	import std;
 #else
@@ -9,10 +13,6 @@
 #	include <mutex>
 #	include <condition_variable>
 #endif
-
-#include <boost/asio.hpp>
-#include <boost/fiber/all.hpp>
-//#include <boost/fibers/algo/round_robin.hpp>
 
 namespace exo {
 

@@ -1,10 +1,12 @@
 #ifndef EXODUS_EXODEBUG_H
 #define EXODUS_EXODEBUG_H
 
-#if EXO_MODULE > 1 || (EXO_MODULE && LIBEXODUS_EXODUS_H_)
-//	import std;
+#if EXO_MODULE > 1
+// || (EXO_MODULE && LIBEXODUS_EXODUS_H_)
+	import std;
 #else
 #	include <string>
+#endif
 
 #include <var/vardefs.h>
 
@@ -26,6 +28,5 @@ namespace exo {
 	PUBLIC inline bool RELOAD_req = false;
 
 }
-#endif
 
 #endif // EXODUS_EXODEBUG_H

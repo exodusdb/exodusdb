@@ -23,7 +23,7 @@ THE SOFTWARE.
 #ifndef EXODUSFUNCS_H
 #define EXODUSFUNCS_H 1
 
-#if EXO_MODULE// > 1
+#if EXO_MODULE > 1
 	import std;
 #else
 #	include <mutex>
@@ -740,10 +740,10 @@ void printt(void) {
 
 //#ifdef __cpp_lib_format
 
-//using fmt::print;
-//using fmt::println;
-//using fmt::vprint;
-//using fmt::vprintln;
+//using std::print;
+//using std::println;
+//using std::vprint;
+//using std::vprintln;
 
 //void println() {
 //	std::cout << std::endl;
@@ -755,14 +755,14 @@ void printt(void) {
 //
 //template <typename... Args>
 //void vprint(std::string_view fmt_str, Args&&... args) {
-//	std::cout << fmt::vformat(fmt_str, fmt::make_format_args(args...));
-////	fmt::vformat_to(std::cout, fmt_str, fmt::make_format_args(args...));
+//	std::cout << std::vformat(fmt_str, std::make_format_args(args...));
+////	std::vformat_to(std::cout, fmt_str, std::make_format_args(args...));
 //}
 //
 //template <typename... Args>
 //void vprintln(std::string_view fmt_str, Args&&... args) {
-//	std::cout << fmt::vformat(fmt_str, fmt::make_format_args(args...)) << std::endl;
-////	fmt::vformat_to(std::cout, fmt_str, fmt::make_format_args(args...));
+//	std::cout << std::vformat(fmt_str, std::make_format_args(args...)) << std::endl;
+////	std::vformat_to(std::cout, fmt_str, std::make_format_args(args...));
 ////	std::cout << std::endl;
 //}
 //
@@ -773,11 +773,11 @@ void printt(void) {
 //// not using fmt/std::vformat because we want to return a var
 //template <typename... Args>
 //ND var xvformat(SV fmt_str, Args&&... args) {
-////	return fmt::vformat(fmt_str, fmt::make_format_args(std::forward<Args>(args)...));
+////	return std::vformat(fmt_str, std::make_format_args(std::forward<Args>(args)...));
 ////error: cannot bind non-const lvalue reference of type ‘exo::var&’ to an rvalue of type ‘exo::var’
 //	try {
-//		return fmt::vformat(fmt_str, fmt::make_format_args(args...));
-//	} catch (fmt::format_error e) {
+//		return std::vformat(fmt_str, std::make_format_args(args...));
+//	} catch (std::format_error e) {
 ////		throw exo::VarError("Format error: " ^ var(fmt_str).squote() ^ " " ^ e.what());
 //		throw exo::VarError("Format error: " ^ var(fmt_str).squote() ^ " " ^ e.what());
 //	}
@@ -786,8 +786,8 @@ void printt(void) {
 //// Replicated in var.h and exofuncs.h - KEEP IN SYNC
 //#if __GNUC__ >= 7 || __clang_major__ > 15
 //    // Works at compile time (only? or if possible)
-//#   define EXO_FORMAT_STRING_TYPE1 fmt::format_string<var, Args...>
-//#   define EXO_FORMAT_STRING_TYPE2 fmt::format_string<Args...>
+//#   define EXO_FORMAT_STRING_TYPE1 std::format_string<var, Args...>
+//#   define EXO_FORMAT_STRING_TYPE2 std::format_string<Args...>
 //#else
 //    // Always run time
 //#   define EXO_FORMAT_STRING_TYPE1 SV
@@ -797,14 +797,14 @@ void printt(void) {
 //// not using fmt/std::vformat because we want to return a var
 //template <typename... Args>
 //ND var xformat(EXO_FORMAT_STRING_TYPE2 fmt_str, Args&&... args) {
-////	return fmt::vformat(fmt_str, fmt::make_format_args(std::forward<Args>(args)...));
+////	return std::vformat(fmt_str, std::make_format_args(std::forward<Args>(args)...));
 //// error: cannot bind non-const lvalue reference of type ‘exo::var&’ to an rvalue of type ‘exo::var’
-//	return fmt::vformat(fmt_str, fmt::make_format_args(args...));
+//	return std::vformat(fmt_str, std::make_format_args(args...));
 //}
 
 //template<class... Args>
 //ND var vformat(SV fmt_str, Args&&... args) {
-//	return fmt::vformat(fmt_str, fmt::make_format_args(*this, args...) );
+//	return std::vformat(fmt_str, std::make_format_args(*this, args...) );
 //}
 
 ///////////
@@ -816,14 +816,14 @@ void printt(void) {
 //// by introducting an overload of std::format that only differs in return type?
 //#ifdef EXO_FORMAT_MF
 //template<class... Args>
-//ND var xformat(fmt::format_string<Args...> fmt_str, Args&&... args) {
+//ND var xformat(std::format_string<Args...> fmt_str, Args&&... args) {
 ////#if __cpp_if_consteval >= 202106L
 ////	if consteval {
-////		return fmt::format(fmt_str, args... );
+////		return std::format(fmt_str, args... );
 ////	} else
 ////#endif
 //	{
-//		return fmt::vformat(fmt_str, fmt::make_format_args(args...) );
+//		return std::vformat(fmt_str, std::make_format_args(args...) );
 //	}
 //}
 ////#else
@@ -834,12 +834,12 @@ void printt(void) {
 //#endif
 
 //using print = std::print;
-//using format = fmt::format;
+//using format = std::format;
 
 //// Takes and returns a var instead of a std::string
 //template<class... Args>
 //ND var format(var fmt_str, Args&&... args) {
-//	return fmt::vformat(fmt_str, fmt::make_format_args(args...));
+//	return std::vformat(fmt_str, std::make_format_args(args...));
 //}
 
 // Returns a var instead of a std::string
@@ -851,11 +851,11 @@ ND var  format(SV fmt_str, Args&&... args) {
 	THISIS("var  format(SV fmt_str, Args&&... args)")
 //#if __clang_major__ and __clang_major__ <= 15
 	// Dont forward if the format library cannot handle it
-//	return fmt::vformat(fmt_str, fmt::make_format_args(args...));
-	return fmt::vformat(fmt_str, fmt::make_format_args(cast_var_to_var_base(args)...));
+//	return std::vformat(fmt_str, std::make_format_args(args...));
+	return std::vformat(fmt_str, std::make_format_args(cast_var_to_var_base(args)...));
 //#else
-//	return fmt::vformat(fmt_str, fmt::make_format_args(std::forward<Args>(args)...));
-//	return fmt::vformat(fmt_str, fmt::make_format_args(cast_var_to_var_base(std::forward<Args>(args))...));
+//	return std::vformat(fmt_str, std::make_format_args(std::forward<Args>(args)...));
+//	return std::vformat(fmt_str, std::make_format_args(cast_var_to_var_base(std::forward<Args>(args))...));
 //#endif
 }
 
@@ -867,18 +867,18 @@ template<class... Args>
    void print(SV fmt_str, Args&&... args) {
 //#if __clang_major__ and __clang_major__ <= 15
 	// Dont forward if the format library cannot handle it
-//	fmt::vprint(fmt_str, fmt::make_format_args(args...));
-//	fmt::vprint(fmt_str, fmt::make_format_args(cast_var_to_var_base(args)...));
-	std::cout << fmt::vformat(fmt_str, fmt::make_format_args(cast_var_to_var_base(args)...));
+//	std::vprint(fmt_str, std::make_format_args(args...));
+//	std::vprint(fmt_str, std::make_format_args(cast_var_to_var_base(args)...));
+	std::cout << std::vformat(fmt_str, std::make_format_args(cast_var_to_var_base(args)...));
 //#else
-//	fmt::vprint(fmt_str, fmt::make_format_args(std::forward<Args>(args)...));
+//	std::vprint(fmt_str, std::make_format_args(std::forward<Args>(args)...));
 //#endif
 }
 
 // println
 template<class... Args>
    void println(SV fmt_str, Args&&... args) {
-//	fmt::vprint(fmt_str, fmt::make_format_args(std::forward<Args>(args)...));
+//	std::vprint(fmt_str, std::make_format_args(std::forward<Args>(args)...));
 	print(fmt_str, std::forward<Args>(args)...);
 	printl();
 }
@@ -887,7 +887,7 @@ template<class... Args>
 //    ND var  format(in fmt_str, Args&&... args) const {
 //        THISIS("var  format(SV fmt_str, Args&&... args) const")
 //        assertString(function_sig);
-//        return fmt::vformat(std::string_view(fmt_str), fmt::make_format_args(*this, args...) );
+//        return std::vformat(std::string_view(fmt_str), std::make_format_args(*this, args...) );
 //    }
 
 //#endif // __GLIBCXX__
@@ -908,7 +908,7 @@ template<class... Args>
 // Exodus conversions likewise although note that some conversions by oconv member function of exoprog is dependent on exoenv globals
 
 /////////////////
-// fmt::formatter - for var.
+// std::formatter - for var.
 /////////////////
 
 // NOTE: The presence of a var in a format/println fumction adds 4 seconds to compile time
@@ -920,8 +920,8 @@ template<class... Args>
 // Needs to know how to delegate parse and format functions to standard string_view, double and int versions
 // therefore multiple inheritance
 template <>
-struct fmt::formatter<exo::var_base> : formatter<std::string_view>, formatter<double>, formatter<int> {
-//struct fmt::formatter<exo::var_base> {
+struct std::formatter<exo::var_base> : formatter<std::string_view>, formatter<double>, formatter<int> {
+//struct std::formatter<exo::var_base> {
 
 	// Detect leading ':' -> exodus conversions/format specifiers
 	// otherwise trailing characters -> standard fmt/std format specifiers
@@ -966,7 +966,7 @@ struct fmt::formatter<exo::var_base> : formatter<std::string_view>, formatter<do
 
 
 //////////////////////////
-// fmt::formatter::parse() - maybe at compile time
+// std::formatter::parse() - maybe at compile time
 //////////////////////////
 //
 //	NOTE that providing a parse function means the context object passed into format
@@ -985,7 +985,7 @@ template<typename ParseContext>
 constexpr auto parse(ParseContext& ctx) {
 
 	// Cannot use static timebank in a constexpr function
-	//THISIS("auto fmt::formatter::parse(...)");
+	//THISIS("auto std::formatter::parse(...)");
 
 	//std::cerr << " \n>>> exofuncs.h parse  '" << std::string(ctx.begin(), ctx.end()) << "'" << std::endl;
 
@@ -1024,7 +1024,7 @@ constexpr auto parse(ParseContext& ctx) {
 					//throw_format_error(std::string("exofuncs.h: formatter_parse: invalid dynamic arg ") + arg_str);
 					//throw_format_error(std::string("exofuncs.h: formatter_parse: invalid dynamic arg '" + arg_str + "'").c_str());
 					// Cannot throw VarError in constexpr parse expression
-					throw  fmt::format_error(std::string("exofuncs.h: formatter_parse: invalid dynamic arg '" + arg_str + "'").c_str());
+					throw  std::format_error(std::string("exofuncs.h: formatter_parse: invalid dynamic arg '" + arg_str + "'").c_str());
 				}
 			}
 
@@ -1080,7 +1080,7 @@ constexpr auto parse(ParseContext& ctx) {
 						return formatter<std::string_view>::parse(ctx);
 				}
 			}
-		} catch (fmt::format_error e) {
+		} catch (std::format_error e) {
 //			throw exo::VarError("Format error: " ^ exo::var(std::string(ctx.begin(), ctx.end())).squote() + " " + e.what());
 			throw exo::VarError("Format error: '" + std::string(std::string(ctx.begin(), ctx.end())) + "' " + e.what());
 
@@ -1100,7 +1100,7 @@ constexpr auto parse(ParseContext& ctx) {
 //#if EXO_FORMAT == 1
 	[[unlikely]]
 	// Cannot throw VarError in constexpr parse
-	throw fmt::format_error("exofuncs.h: formatter_parse: format missing trailing }");
+	throw std::format_error("exofuncs.h: formatter_parse: format missing trailing }");
 //#else
 //	throw_format_error("exofuncs.h: formatter_parse: format missing trailing }");
 //		fmt_str_ = "{}";
@@ -1121,7 +1121,7 @@ constexpr auto parse(ParseContext& ctx) {
 template <typename FormatContext>
 auto format(const exo::var_base& var1, FormatContext& ctx) const {
 
-	THISIS("auto fmt::formatter::format(var) const")
+	THISIS("auto std::formatter::format(var) const")
 	//std::cerr << ">>> exofuncs.h format '" << fmt_str_ << "' '" << fmt_code_ << "' '" << var1 << "'\n";
 
 	switch (fmt_code_) {
@@ -1138,7 +1138,7 @@ auto format(const exo::var_base& var1, FormatContext& ctx) const {
 			//return formatter<std::string_view>::format(var1, ctx);
 			exo::var_base converted_var1 = static_cast<const exo::var&>(var1).oconv(fmt_str_.c_str());
 			auto sv1 = std::string_view(converted_var1);
-			return vformat_to(ctx.out(), "{:}", fmt::make_format_args(sv1));
+			return vformat_to(ctx.out(), "{:}", std::make_format_args(sv1));
 
 		}
 
@@ -1162,7 +1162,7 @@ auto format(const exo::var_base& var1, FormatContext& ctx) const {
 	}
 } // formatter::format
 
-}; //fmt::formatter
+}; //std::formatter
 
 
 
@@ -1243,7 +1243,7 @@ std::cerr << " has dynargn4 " << bool(ctx.arg(4)) << std::endl;
 //
 // requires #include <fmt/args.h>
 
-		fmt::dynamic_format_arg_store<FormatContext> store;
+		std::dynamic_format_arg_store<FormatContext> store;
 		store.push_back(var1.toString());
 
 //	https://en.cppreference.com/w/cpp/utility/format/basic_format_arg
@@ -1299,7 +1299,7 @@ std::cerr << " has dynargn4 " << bool(ctx.arg(4)) << std::endl;
 
 //				if (std::is_same<decltype(vx), const char*>::value)
 //					return int(2);
-				if (std::is_same<decltype(vx), const fmt::v10::monostate>::value)
+				if (std::is_same<decltype(vx), const std::v10::monostate>::value)
 					return int(5);
 				if (std::is_same<decltype(vx), std::monostate>::value)
 					return int(5);
@@ -1342,7 +1342,7 @@ std::cerr << " has dynargn4 " << bool(ctx.arg(4)) << std::endl;
 //				if (std::is_arithmetic_v<decltype(vx)>)
 //					return static_cast<int>(vx);
 				//return uint(sizeof vx);
-//				fmt::println("missing {}", typeid(vx));
+//				std::println("missing {}", typeid(vx));
 				return int(6);
 		},
 	};

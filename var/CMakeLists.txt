@@ -184,22 +184,22 @@ execute_process(
 #
 	include_directories(exodus)
 
-#
-# module std
-# ##########
-#
-	if (EXO_MODULE EQUAL 2)
-		add_library(std)
-		target_sources(std
-			PUBLIC
-			FILE_SET modules_public
-			TYPE CXX_MODULES
-			FILES
-				std.cppm
-		)
-		target_compile_options(std PRIVATE -Wno-include-angled-in-module-purview -Wno-reserved-module-identifier)
-	#	target_link_libraries(std allstd)
-	endif()
+##
+## module std
+## ##########
+##
+#	if (EXO_MODULE EQUAL 2)
+#		add_library(std)
+#		target_sources(std
+#			PUBLIC
+#			FILE_SET modules_public
+#			TYPE CXX_MODULES
+#			FILES
+#				std.cppm
+#		)
+#		target_compile_options(std PRIVATE -Wno-include-angled-in-module-purview -Wno-reserved-module-identifier)
+#	#	target_link_libraries(std allstd)
+#	endif()
 
 ##
 ## module fmt
@@ -236,15 +236,15 @@ execute_process(
 				var.cppm
 		)
 #		target_link_libraries(exovar)
-		if (EXO_MODULE EQUAL 2)
-			target_link_libraries(exovar std)
-		endif()
+#		if (EXO_MODULE EQUAL 2)
+#			target_link_libraries(exovar std)
+#		endif()
 		if (EXO_FORMAT EQUAL 2)
 			target_link_libraries(exovar fmt)
 		endif()
 		if (EXO_FORMAT EQUAL 3)
 #			target_link_libraries(exovar ${FMT_LIBRARIES})
-#			target_link_libraries(exovar fmt::fmt)
+#			target_link_libraries(exovar std::fmt)
 #			target_link_libraries(exovar fmt/libfmt.a)
 		endif()
 	endif()
@@ -401,12 +401,12 @@ execute_process(
 		)
 	endif()
 
-	if (EXO_MODULE EQUAL 2)
-		install(
-			TARGETS std
-			DESTINATION lib
-		)
-	endif()
+#	if (EXO_MODULE EQUAL 2)
+#		install(
+#			TARGETS std
+#			DESTINATION lib
+#		)
+#	endif()
 
 #
 # Install headers - non module

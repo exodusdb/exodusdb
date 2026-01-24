@@ -1,7 +1,7 @@
 #ifndef LIBEXODUS_EXOPROG_H_
 #define LIBEXODUS_EXOPROG_H_
 
-#if EXO_MODULE// > 1
+#if EXO_MODULE > 1
 	import std;
 #else
 #	include <string>

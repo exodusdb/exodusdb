@@ -1,3 +1,5 @@
+#include "task_scheduler.h"
+
 #if EXO_MODULE > 1
 	import std;
 #else
@@ -10,8 +12,6 @@
 // 1. Allow a thread to act as its own io event loop whether it has fibers or not.
 // 2. Allow multiple fibers within a thread to use async io independently without blocking all fibers in the thread as would be the case if they rely on ordinary threadwise async io like poll/select.
 // 3. If no fibers are enabled (all are waiting for i/o) then the whole thread should be in suspense until any i/o occurs.
-
-#include "task_scheduler.h"
 
 #define LOG if (0) std::cerr
 //#define LOG std::cerr << "[Task Scheduler T" << std::this_thread::get_id() << "] "

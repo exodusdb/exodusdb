@@ -338,9 +338,9 @@ public:
 //	ND CONSTEXPR
 //	   var  format(EXO_FORMAT_STRING_TYPE1&& fmt_str, Args&&... args) const {
 //
-////error: call to consteval function 'fmt::basic_format_string<char, exo::var &>
-////::basic_format_string<fmt::basic_format_string<char, const exo::var &>, 0>' is not a constant expression
-//// 2033 |                         return fmt::format(fmt_str, *this, args... );
+////error: call to consteval function 'std::basic_format_string<char, exo::var &>
+////::basic_format_string<std::basic_format_string<char, const exo::var &>, 0>' is not a constant expression
+//// 2033 |                         return std::format(fmt_str, *this, args... );
 ////      |                                            ^
 //
 //#if __clang_major__ == 0
@@ -351,12 +351,12 @@ public:
 //#endif
 //// OK in 2404 g++ but not OK in 2404 clang
 //// clang on 22.04 cannot accept compile time format string even if a cstr
-/////root/exodus/test/src/test_format.cpp:14:18: error: call to consteval function 'fmt::basic_format_string<char, exo::var>::basic_format_string<ch
+/////root/exodus/test/src/test_format.cpp:14:18: error: call to consteval function 'std::basic_format_string<char, exo::var>::basic_format_string<ch
 ////ar[7], 0>' is not a constant expression
 ////        assert(x.format("{:.2f}") == "12.35");
 //
 //			THISIS("var  format(SV fmt_str, Args&&... args) const")
-//			return fmt::format(std::forward<EXO_FORMAT_STRING_TYPE1>(fmt_str), *this, std::forward<Args>(args)... );
+//			return std::format(std::forward<EXO_FORMAT_STRING_TYPE1>(fmt_str), *this, std::forward<Args>(args)... );
 //		} else
 //#endif
 //
@@ -365,7 +365,7 @@ public:
 ////			THISIS("var  format(" DUMPDEFINE0(EXO_FORMAT_STRING_TYPE1) "&& fmt_str, Args&&... args) const")
 //			THISIS("var  format(SV fmt_str, Args&&... args) const")
 //			assertString(function_sig);
-//			return fmt::vformat(fmt_str, fmt::make_format_args(*this, std::forward<Args>(args)...) );
+//			return std::vformat(fmt_str, std::make_format_args(*this, std::forward<Args>(args)...) );
 //		}
 //	}
 //
@@ -374,7 +374,7 @@ public:
 //	ND var  vformat(SV fmt_str, Args&&... args) const {
 //		THISIS("var  vformat(SV fmt_str, Args&&... args) const")
 //		assertString(function_sig);
-//		return fmt::vformat(fmt_str, fmt::make_format_args(*this, args...) );
+//		return std::vformat(fmt_str, std::make_format_args(*this, args...) );
 //	}
 
 	// Classic format function in printf style
@@ -398,9 +398,9 @@ public:
 		THISIS("var  var::format(SV fmt_str, Args&&... args) const")
 		assertString(function_sig);
 		// *this becomes the first format argument and any additional arguments become additionl format arguments
-//		return fmt::vformat(std::string_view(fmt_str), fmt::make_format_args(*this, args...) );
-		return fmt::vformat(std::string_view(fmt_str), fmt::make_format_args(static_cast<const var_base&>(*this), cast_var_to_var_base(std::forward<Args>(args))...) );
-//		return fmt::vformat(std::string_view(fmt_str), fmt::make_format_args(cast_var_to_var_base(*this), cast_var_to_var_base(std::forward<Args>(args))...) );
+//		return std::vformat(std::string_view(fmt_str), std::make_format_args(*this, args...) );
+		return std::vformat(std::string_view(fmt_str), std::make_format_args(static_cast<const var_base&>(*this), cast_var_to_var_base(std::forward<Args>(args))...) );
+//		return std::vformat(std::string_view(fmt_str), std::make_format_args(cast_var_to_var_base(*this), cast_var_to_var_base(std::forward<Args>(args))...) );
 	}
 
 #endif //EXO_FORMAT

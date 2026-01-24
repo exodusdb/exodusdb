@@ -1,5 +1,5 @@
 // threadpool.cpp
-#if EXO_MODULE// > 1
+#if EXO_MODULE > 1
 #	include <vector> // here to solve bug in building module?
 	import std;
 #else

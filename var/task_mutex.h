@@ -1,7 +1,11 @@
 #ifndef TASK_MUTEX_HPP
 #define TASK_MUTEX_HPP
 
-#include <memory> // For std::unique_ptr
+#if EXO_MODULE > 1
+	import std;
+#else
+#	include <memory> // For std::unique_ptr
+#endif
 
 namespace exo {
 

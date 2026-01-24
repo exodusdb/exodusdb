@@ -40,11 +40,12 @@ THE SOFTWARE.
 #	include <string>
 #	include <unistd.h> // for getpid
 //#	include <signal.h>
-#	include <memory> // for make_unique
+#	include <memory>   // for make_unique
 #endif
 
+#include <stdio.h>     // for stderr etc.
 #include <termios.h>
-#include <execinfo.h> // for backtrace
+#include <execinfo.h>  // for backtrace
 #include <csignal>
 
 #if TRACING

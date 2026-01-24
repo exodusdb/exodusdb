@@ -20,6 +20,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
+// used to convert to and from utf8 in osread and oswrite
+// #include <boost/detail/utf8_codecvt_facet.hpp>
+#include <boost/locale.hpp>
+
 #if EXO_MODULE > 1
 	import std;
 #else
@@ -41,10 +45,6 @@ THE SOFTWARE.
 #include <fnmatch.h>  //for fnmatch() globbing
 #include <sys/stat.h>
 #include <unistd.h>	 //for close()
-
-// used to convert to and from utf8 in osread and oswrite
-// #include <boost/detail/utf8_codecvt_facet.hpp>
-#include <boost/locale.hpp>
 
 // #include <boost/date_time/posix_time/posix_time.hpp>
 
