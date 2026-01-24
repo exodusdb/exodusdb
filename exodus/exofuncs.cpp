@@ -24,16 +24,17 @@ THE SOFTWARE.
 
 //#include <type_traits> // bug work around in clang-21?
 #if EXO_MODULE
+	import std;
 	import var;
+	namespace fmt=std;
 #else
 //#	include <cstdlib> //for atexit()
 #	include <var/var.h>
 //#	include <var/dim.h>
 //#	include <var/rex.h>
+#	include <var/format.h>
 #endif
 #include <var/vardefs.h>
-
-#include <var/format.h>
 
 #include <exodus/exoenv.h>
 

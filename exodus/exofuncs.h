@@ -23,7 +23,7 @@ THE SOFTWARE.
 #ifndef EXODUSFUNCS_H
 #define EXODUSFUNCS_H 1
 
-#if EXO_MODULE > 1
+#if EXO_MODULE// > 1
 	import std;
 #else
 #	include <mutex>

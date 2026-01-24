@@ -2,6 +2,7 @@ module;
 
 #include <var/vardefs.h>
 #include <var/format.h>
+//#include <var/exodebug.h>
 
 #include <exodus/exoimpl.h>
 #include <exodus/exoprog.h>
@@ -168,7 +169,7 @@ export namespace exo {
 	using exo::dbdelete;
 	using exo::dblist;
 
-	using exo::debug;
+//	using exo::debug;
 	using exo::defaulter;
 	using exo::deletec;
 	using exo::deletefile;

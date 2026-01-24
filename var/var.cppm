@@ -10,6 +10,8 @@ export module var;
 
 export namespace exo {
 
+	using exo::debug;
+//	using exo::fmt;
 	using exo::var_base;
 	using exo::var_stg;
 	using exo::var_os;

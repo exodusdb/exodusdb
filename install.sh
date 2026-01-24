@@ -244,7 +244,7 @@ function download_submodules {
 : Verify submodules exist
 : -----------------------
 :
-	test -f $EXODUS_DIR/fmt/CMakeLists.txt
+#	test -f $EXODUS_DIR/fmt/CMakeLists.txt
 	test -f $EXODUS_DIR/pgexodus/CMakeLists.txt
 }
 
@@ -388,8 +388,8 @@ function get_dependencies_for_build_and_install {
 	APT_INSTALL postgresql-common
 
 :
-: Download pgexodus and fmt submodules source in b and B stages
-: -------------------------------------------
+: Download pgexodus submodule source in b and B stages
+: ----------------------------------------------------
 :
 	download_submodules
 
@@ -629,8 +629,8 @@ function build_only {
 	cd $EXODUS_DIR
 
 :
-: Download pgexodus and fmt submodules source in b and B stages
-: -------------------------------------------------------------
+: Download pgexodus submodule source in b and B stages
+: ----------------------------------------------------
 :
 	download_submodules
 

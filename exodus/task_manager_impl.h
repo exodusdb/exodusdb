@@ -1,15 +1,15 @@
 #ifndef EXO_TASK_MANAGER_IMPL_H
 #define EXO_TASK_MANAGER_IMPL_H
 
-#if EXO_MODULE > 1
+#include <boost/fiber/all.hpp>
+
+#if EXO_MODULE// > 1
 	import std;
 //	import var;
 #else
 #	include <vector>
 #	include <mutex>
 #endif
-
-#include <boost/fiber/all.hpp>
 
 namespace exo {
 
