@@ -1,6 +1,6 @@
 // threadpool.cpp
 #if EXO_MODULE > 1
-#	include <vector> // here to solve bug in building module?
+//#	include <vector> // here to solve bug in building module?
 	import std;
 #else
 #	include <vector>
@@ -46,12 +46,12 @@ struct TaskQueue {
 };
 
 // Initialize the thread pool with a maximum number of workers
-ThreadPool::ThreadPool(size_t max_threads)
+ThreadPool::ThreadPool(std::size_t max_threads)
 	:
-	total_tasks_enqueued(std::make_unique<std::atomic<size_t>>(0)),
-	max_worker_id_(std::make_unique<std::atomic<size_t>>(max_threads)),
-	live_worker_count(std::make_unique<std::atomic<size_t>>(0)),
-	running_task_count(std::make_unique<std::atomic<size_t>>(0)),
+	total_tasks_enqueued(std::make_unique<std::atomic<std::size_t>>(0)),
+	max_worker_id_(std::make_unique<std::atomic<std::size_t>>(max_threads)),
+	live_worker_count(std::make_unique<std::atomic<std::size_t>>(0)),
+	running_task_count(std::make_unique<std::atomic<std::size_t>>(0)),
 	pending_tasks(std::make_unique<TaskQueue>()),
 	mutex(std::make_unique<std::mutex>()),
 	condition(std::make_unique<std::condition_variable>()) {}
@@ -100,7 +100,7 @@ void ThreadPool::enqueue(std::function<void()> task) {
 
 		// Create a new worker if running tasks plus queued tasks exceed live workers and capacity exists
 		if ((*running_task_count).load() + pending_tasks->queue.size() > (*live_worker_count).load() && (*live_worker_count).load() < (*max_worker_id_).load()) {
-			size_t worker_id = workers.size() + 1; // Assign worker_id based on current size (Start at 1 so setting max to 0 can stop it)
+			std::size_t worker_id = workers.size() + 1; // Assign worker_id based on current size (Start at 1 so setting max to 0 can stop it)
 			(*live_worker_count).fetch_add(1); // Increment count of live workers
 			workers.emplace_back([this, worker_id] {
 				while (true) {
@@ -146,13 +146,13 @@ void ThreadPool::enqueue(std::function<void()> task) {
 }
 
 // New method to get the total number of tasks enqueued
-size_t ThreadPool::get_total_tasks_enqueued() const {
+std::size_t ThreadPool::get_total_tasks_enqueued() const {
 	return (*total_tasks_enqueued).load();
 }
 
 // Decrement e.g. when consuming result queue.
-size_t ThreadPool::decrement_total_tasks_enqueued() const {
-size_t current = total_tasks_enqueued->load();
+std::size_t ThreadPool::decrement_total_tasks_enqueued() const {
+std::size_t current = total_tasks_enqueued->load();
 while (current > 0) {
     if (total_tasks_enqueued->compare_exchange_strong(current, current - 1)) {
         break; // Successfully decremented
@@ -164,11 +164,11 @@ while (current > 0) {
 }
 
 // Set the desired number of live workers
-void ThreadPool::set_max_threads(size_t max_threads) {
+void ThreadPool::set_max_threads(std::size_t max_threads) {
 	{
 		std::unique_lock<std::mutex> lock(*mutex);
-		size_t live_count = (*live_worker_count).load(); // Current count of live workers
-		size_t new_max_worker_id;
+		std::size_t live_count = (*live_worker_count).load(); // Current count of live workers
+		std::size_t new_max_worker_id;
 		if (max_threads == 0) {
 			new_max_worker_id = 0; // Stop all workers
 		} else {
@@ -205,7 +205,7 @@ void ThreadPool::shutdown() {
 	}
 }
 // Static function to reset a ThreadPool object in place
-void ThreadPool::reset(ThreadPool* ptr, size_t num_threads) {
+void ThreadPool::reset(ThreadPool* ptr, std::size_t num_threads) {
 	if (!ptr) {
 //		std::cerr << "Invalid ThreadPool pointer\n";
 		return;

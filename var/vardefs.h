@@ -1,12 +1,13 @@
 #ifndef EXO_VARDEFS_H
 #define EXO_VARDEFS_H
 
-#include <unistd.h>   // write(), STDERR_FILENO
-#if EXO_MODULE > 1 || (EXO_MODULE && LIBEXODUS_EXODUS_H_)
-//	import std;
-#elif LIBEXODUS_EXODUS_H_
-//#	include <iostream>
-#endif
+//#include <unistd.h>   // write(), STDERR_FILENO
+//#if EXO_MODULE > 1 || (EXO_MODULE && LIBEXODUS_EXODUS_H_)
+//#if EXO_MODULE > 1
+////	import std;
+//#elif LIBEXODUS_EXODUS_H_
+////#	include <iostream>
+//#endif
 
 //#include <version> // for __cpp_consteval
 
