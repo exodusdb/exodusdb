@@ -8,6 +8,8 @@ module;
 #include <exodus/exoprog.h>
 #include <exodus/exofuncs.h>
 
+#include <exodus/varformatter.h>
+
 export module exoprog;
 
 export import var;

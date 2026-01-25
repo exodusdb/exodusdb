@@ -78,7 +78,10 @@
 # Ubuntu 22.04 apt ninja doesnt support modules but we build it from source
 #		AND DISTRO_VERSION_ID VERSION_GREATER_EQUAL "24.04"
 	)
-		set(_default_exo_module 2)
+		# Build var and exodus without importing std and exoprog
+		# because compilation becomes very slow (nearly 50%)
+		set(_default_exo_module 1)
+#		set(_default_exo_module 2)
 	else()
 		set(_default_exo_module 0)
 	endif()
