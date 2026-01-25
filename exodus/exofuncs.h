@@ -896,10 +896,19 @@ template<class... Args>
 
 }  // namespace exo
 
+//// ALternatives in exofuncs.h and exodus.h
 //#if EXO_FORMAT
+//#if EXO_MODULE > 1
+//#else
 //#	include <exodus/varformatter.h>
-//#	include <exodus/varformatter_null.h>
+//#endif
+////#	include <exodus/varformatter_null.h>
 //#endif	// EXO_FORMAT
+
+#if EXO_MODULE
+#else
+#	include <exodus/varformatter.h>
+#endif
 
 // clang-format on
 

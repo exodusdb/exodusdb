@@ -48,7 +48,12 @@ THE SOFTWARE.
 #	include <exodus/exofuncs.h>
 #endif
 
-#include <exodus/varformatter.h>
+//// Alternatives in exofuncs.h and exodus.h
+//#if EXO_FORMAT
+//#if EXO_MODULE > 1
+//#	include <exodus/varformatter.h>
+//#endif
+//#endif
 
 //#include <exodus/program.h>
 //#include <exodus/library.h>
