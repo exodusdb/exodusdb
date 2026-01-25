@@ -159,7 +159,7 @@ VARREF dim::getelementref(int rowno, int colno) {
 
 
 CVR dim::getelementref(int rowno1, int colno1) const {
-	THISIS("CVR dim::getelementref(int rowno1, int colno1) const")
+	THISIS("CVR  dim::getelementref(int rowno1, int colno1) const")
 
 	// rowno1 and colno1 is 1 based index into our inherited base (std::vector)
 	// Allow 1d access to 2d data but not vice versa.
@@ -589,7 +589,7 @@ IO   var_stg::sorter(SV delimiter) REF {
 //sorting var - using temporary dim
 var  var_stg::sort(SV delimiter) const& {
 
-	THISIS("var  var_stg::sort(SV delimiter)")
+	THISIS("var  var::sort(SV delimiter)")
 	assertString(function_sig);
 
 	//perhaps is slower but sorts testing var < var linguistically but not natural numbers like 10a 2b
@@ -615,7 +615,7 @@ IO   var_stg::reverser(SV delimiter) REF {
 //reversing var - not using dim
 var  var_stg::reverse(SV delimiter) const& {
 
-	THISIS("var  var_stg::reverse(SV delimiter)")
+	THISIS("var  var::reverse(SV delimiter)")
 	assertString(function_sig);
 
 	const auto delimitersize = delimiter.size();

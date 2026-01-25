@@ -253,7 +253,7 @@
 #pragma clang diagnostic ignored "-Wreserved-id-macro"
 
 #ifdef EXO_TIMEBANK
-//#	define THISIS(FUNC_DESC) [[maybe_unused]] static const char* function_sig = FUNC_DESC; \
+//#	define THISIS(FUNC_DESC) [[maybe_unused]] static const char* function_sig = FUNC_DESC;
 #	define THISIS(FUNC_DESC) [[maybe_unused]] constexpr char function_sig[] = FUNC_DESC; \
 	exo::Timer thisistimer(exo::get_timebank_acno(FUNC_DESC));
 #else

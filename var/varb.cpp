@@ -151,7 +151,7 @@ var  VB1::len() const {
 
 bool VB1::empty() const {
 
-	THISIS("var  var::empty() const")
+	THISIS("bool var::empty() const")
 	assertString(function_sig);
 
 	return var_str.empty();

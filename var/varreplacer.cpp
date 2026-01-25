@@ -5,7 +5,7 @@
 
 IO   var_stg::updater(int fieldno, int valueno, int subvalueno, in replacement) REF {
 
-	THISIS("void var_stg::updater(int fieldno, int valueno, int subvalueno, in replacement) &")
+	THISIS("void var::updater(int fieldno, int valueno, int subvalueno, in replacement) &")
 	assertStringMutator(function_sig);
 	replacement.assertString(function_sig, "replacement");
 

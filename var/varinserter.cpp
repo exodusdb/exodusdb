@@ -5,7 +5,7 @@
 
 IO   var_stg::inserter(const int fieldno, const int valueno, const int subvalueno, in insertion) REF {
 
-	THISIS("void var_stg::inserter(const int fieldno, const int valueno, const int subvalueno, in insertion) &")
+	THISIS("void var::inserter(const int fieldno, const int valueno, const int subvalueno, in insertion) &")
 	assertStringMutator(function_sig);
 	insertion.assertString(function_sig, "insertion");
 
