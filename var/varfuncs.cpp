@@ -384,7 +384,7 @@ var&  var_os::keypressed(const bool wait /*=false*/) {
 //// Synonym for length for compatibility with pick's len() which is bytes
 //var  var_stg::len() const {
 //
-//	THISIS("var  var_stg::len() const")
+//	THISIS("var  var::len() const")
 //	assertString(function_sig);
 //
 //	return var_str.size();
@@ -396,7 +396,7 @@ var&  var_os::keypressed(const bool wait /*=false*/) {
 //
 //bool var_stg::empty() const {
 //
-//	THISIS("bool var_stg::empty() const")
+//	THISIS("bool var::empty() const")
 //	assertString(function_sig);
 //
 //	return var_str.empty();
@@ -414,7 +414,7 @@ var&  var_os::keypressed(const bool wait /*=false*/) {
 // the current locale.
 var  var_stg::textwidth() const {
 
-	THISIS("var  var_stg::textwidth() const")
+	THISIS("var  var::textwidth() const")
 	assertString(function_sig);
 
 	// If all ASCII then return count of non-control chars
@@ -467,7 +467,7 @@ unicode:
 
 var  var_stg::textlen() const {
 
-	THISIS("var  var_stg::textlen()")
+	THISIS("var  var::textlen()")
 	assertString(function_sig);
 
 	var result = 0;
@@ -488,7 +488,7 @@ var  var_stg::textlen() const {
 // Const
 var  var_stg::trim(SV trimchars /*= " "*/) const& {
 
-	THISIS("io   var_stg::trim(SV trimchars)")
+	THISIS("io   var::trim(SV trimchars)")
 	assertString(function_sig);
 
 	return boost::algorithm::trim_all_copy_if(var_str, boost::algorithm::is_any_of(trimchars));
@@ -500,7 +500,7 @@ IO   var_stg::trimmer(SV trimchars /*= " "*/) REF {
 	// TODO reimplement with boost string trim_if algorithm
 	// http://www.boost.org/doc/libs/1_39_0/doc/html/string_algo/reference.html
 
-	THISIS("void var_stg::trimmer(SV trimchars) &")
+	THISIS("void var::trimmer(SV trimchars) &")
 	assertStringMutator(function_sig);
 
 //	trimmerlast_helper(var_str, trimchars);
@@ -517,7 +517,7 @@ IO   var_stg::trimmer(SV trimchars /*= " "*/) REF {
 // Const
 var  var_stg::trimfirst(SV trimchars /*= " "*/) const& {
 
-	THISIS("io   var_stg::trimfirst(SV trimchars) const&")
+	THISIS("io   var::trimfirst(SV trimchars) const&")
 	assertString(function_sig);
 
 	return boost::algorithm::trim_left_copy_if(var_str, boost::algorithm::is_any_of(trimchars));
@@ -526,7 +526,7 @@ var  var_stg::trimfirst(SV trimchars /*= " "*/) const& {
 // Mutate
 IO   var_stg::trimmerfirst(SV trimchars /*= " "*/) REF {
 
-	THISIS("void var_stg::trimmerfirst(SV trimchars) &")
+	THISIS("void var::trimmerfirst(SV trimchars) &")
 	assertStringMutator(function_sig);
 
 	boost::algorithm::trim_left_if(var_str, boost::algorithm::is_any_of(trimchars));
@@ -539,7 +539,7 @@ IO   var_stg::trimmerfirst(SV trimchars /*= " "*/) REF {
 // Const
 var  var_stg::trimlast(SV trimchars /*= " "*/) const& {
 
-	THISIS("io   var_stg::trimlast(SV trimchars) const&")
+	THISIS("io   var::trimlast(SV trimchars) const&")
 	assertString(function_sig);
 
 	return boost::algorithm::trim_right_copy_if(var_str, boost::algorithm::is_any_of(trimchars));
@@ -548,7 +548,7 @@ var  var_stg::trimlast(SV trimchars /*= " "*/) const& {
 // Mutate
 IO   var_stg::trimmerlast(SV trimchars /*= " "*/) REF {
 
-	THISIS("void var_stg::trimmerlast(SV trimchars) &")
+	THISIS("void var::trimmerlast(SV trimchars) &")
 	assertStringMutator(function_sig);
 
 	//trimmerlast_helper(var_str, trimchars);
@@ -562,7 +562,7 @@ IO   var_stg::trimmerlast(SV trimchars /*= " "*/) REF {
 // Const
 var  var_stg::trimboth(SV trimchars /*= " "*/) const& {
 
-	THISIS("io   var_stg::trimboth(SV trimchars) const&")
+	THISIS("io   var::trimboth(SV trimchars) const&")
 	assertString(function_sig);
 
 	return boost::algorithm::trim_copy_if(var_str, boost::algorithm::is_any_of(trimchars));
@@ -571,7 +571,7 @@ var  var_stg::trimboth(SV trimchars /*= " "*/) const& {
 // Mutate
 IO   var_stg::trimmerboth(SV trimchars /*= " "*/) REF {
 
-	THISIS("void var_stg::trimmerboth(SV trimchars) &")
+	THISIS("void var::trimmerboth(SV trimchars) &")
 	assertStringMutator(function_sig);
 
 	boost::algorithm::trim_if(var_str, boost::algorithm::is_any_of(trimchars));
@@ -584,7 +584,7 @@ IO   var_stg::trimmerboth(SV trimchars /*= " "*/) REF {
 // Mutate
 IO   var_stg::inverter() REF {
 
-	THISIS("void var_stg::inverter() &")
+	THISIS("void var::inverter() &")
 	assertStringMutator(function_sig);
 
 	// xor each unicode code point, with the bits we want to toggle ... ie the bottom 8
@@ -684,7 +684,7 @@ IO   var_stg::inverter() REF {
 // Mutate
 IO   var_stg::ucaser() REF {
 
-	THISIS("void var_stg::ucaser() &")
+	THISIS("void var::ucaser() &")
 	assertStringMutator(function_sig);
 
 #define EXO_ULCASE_TRY_ASCII
@@ -783,7 +783,7 @@ IO   var_stg::ucaser() REF {
 // Mutate
 IO   var_stg::lcaser() REF {
 
-	THISIS("void var_stg::lcaser() &")
+	THISIS("void var::lcaser() &")
 	assertStringMutator(function_sig);
 
 	// For comments, see ucaser above.
@@ -823,7 +823,7 @@ IO   var_stg::lcaser() REF {
 // Mutate
 IO   var_stg::tcaser() REF {
 
-	THISIS("void var_stg::tcaser() &")
+	THISIS("void var::tcaser() &")
 	assertStringMutator(function_sig);
 	//assertString(function_sig);
 
@@ -860,7 +860,7 @@ IO   var_stg::tcaser() REF {
 // Mutate
 IO   var_stg::fcaser() REF {
 
-	THISIS("void var_stg::fcaser() &")
+	THISIS("void var::fcaser() &")
 	assertStringMutator(function_sig);
 	//assertString(function_sig);
 
@@ -891,7 +891,7 @@ IO   var_stg::fcaser() REF {
 // Mutate
 IO   var_stg::normalizer() REF {
 
-	THISIS("void var_stg::normalizer() &")
+	THISIS("void var::normalizer() &")
 	assertStringMutator(function_sig);
 	//assertString(function_sig);
 
@@ -928,7 +928,7 @@ IO   var_stg::uniquer() REF {
 // Constant
 var  var_stg::unique() const& {
 
-	THISIS("var  var_stg::unique()")
+	THISIS("var  var::unique()")
 	assertString(function_sig);
 
 	// linemark
@@ -972,7 +972,7 @@ var  var_stg::unique() const& {
 // BINARY - 1st byte
 var  var_stg::ord() const {
 
-	THISIS("var  var_stg::ord() const")
+	THISIS("var  var::ord() const")
 	assertString(function_sig);
 
 	if (var_str.empty())
@@ -991,7 +991,7 @@ var  var_stg::ord() const {
 
 var  var_stg::textord() const {
 
-	THISIS("var  var_stg::textord() const")
+	THISIS("var  var::textord() const")
 	assertString(function_sig);
 
 	if (var_str.empty())
@@ -1098,7 +1098,7 @@ var  var_stg::textchr(const int utf_codepoint) {
 // Const
 var  var_stg::quote() const& {
 
-	THISIS("var  var_stg::quote() const&")
+	THISIS("var  var::quote() const&")
 	assertString(function_sig);
 
 	var rvo = DQ_;
@@ -1111,7 +1111,7 @@ var  var_stg::quote() const& {
 // Mutate
 IO   var_stg::quoter() REF {
 
-	THISIS("void var_stg::quoter() &")
+	THISIS("void var::quoter() &")
 	assertStringMutator(function_sig);
 
 	// Use std::string "replace" to insert
@@ -1129,7 +1129,7 @@ IO   var_stg::quoter() REF {
 // Const
 var  var_stg::squote() const& {
 
-	THISIS("var  var_stg::squote() const&")
+	THISIS("var  var::squote() const&")
 	assertString(function_sig);
 
 	var rvo = SQ_;
@@ -1142,7 +1142,7 @@ var  var_stg::squote() const& {
 // Mutate
 IO   var_stg::squoter() REF {
 
-	THISIS("void var_stg::squoter() &")
+	THISIS("void var::squoter() &")
 	assertStringMutator(function_sig);
 
 	// std::string "replace" to insert
@@ -1160,7 +1160,7 @@ IO   var_stg::squoter() REF {
 // Const
 var  var_stg::unquote() const& {
 
-	THISIS("var  var_stg::unquote() const&")
+	THISIS("var  var::unquote() const&")
 	assertString(function_sig);
 
 	// Removes MATCHING beginning and terminating " or ' characters.
@@ -1202,7 +1202,7 @@ return_this:
 // Mutate
 IO   var_stg::unquoter() REF {
 
-	THISIS("void var_stg::unquoter() &")
+	THISIS("void var::unquoter() &")
 	assertStringMutator(function_sig);
 
 	// removes MATCHING beginning and terminating " or ' characters
@@ -1242,7 +1242,7 @@ IO   var_stg::unquoter() REF {
 // Mutate
 IO   var_stg::paster(const int pos1, const int length, SV replacestr) REF {
 
-	THISIS("void var_stg::paster(const int pos1, const int length, SV replacestr) &")
+	THISIS("void var::paster(const int pos1, const int length, SV replacestr) &")
 	assertStringMutator(function_sig);
 	//insertstr.assertString(function_sig, "insertstr");
 
@@ -1314,7 +1314,7 @@ IO   var_stg::paster(const int pos1, const int length, SV replacestr) REF {
 // Mutate
 IO   var_stg::paster(const int pos1, SV insertstr) REF {
 
-	THISIS("void var_stg::paster(const int pos1, SV insertstr) &")
+	THISIS("void var::paster(const int pos1, SV insertstr) &")
 	assertStringMutator(function_sig);
 	//insertstr.assertString(function_sig, "insertstr");
 
@@ -1354,7 +1354,7 @@ IO   var_stg::paster(const int pos1, SV insertstr) REF {
 // Constant
 var  var_stg::prefix(SV prefixstr) const& {
 
-	THISIS("var  var_stg::prefix(SV prefixstr)")
+	THISIS("var  var::prefix(SV prefixstr)")
 	assertString(function_sig);
 
 	var nrvo = prefixstr;
@@ -1367,7 +1367,7 @@ var  var_stg::prefix(SV prefixstr) const& {
 // Mutate
 IO   var_stg::prefixer(SV prefixstr) REF {
 
-	THISIS("void var_stg::prefixer(SV prefixstr) &")
+	THISIS("void var::prefixer(SV prefixstr) &")
 	assertStringMutator(function_sig);
 
 	var_str.insert(0, prefixstr);
@@ -1383,7 +1383,7 @@ IO   var_stg::prefixer(SV prefixstr) REF {
 // Mutate
 IO   var_stg::popper() REF {
 
-	THISIS("void var_stg::popper() &")
+	THISIS("void var::popper() &")
 	assertStringMutator(function_sig);
 
 	if (!var_str.empty())

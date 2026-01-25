@@ -305,7 +305,7 @@ var var_os::ostempfile() {
 
 bool var_os::osshell() const {
 
-	THISIS("bool var_os::osshell() const")
+	THISIS("bool var::osshell() const")
 	// will be checked again by toString()
 	// but put it here so any unassigned error shows in osshell
 	assertString(function_sig);

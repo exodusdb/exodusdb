@@ -5,7 +5,7 @@
 
 IO   var_stg::remover(int fieldno, int valueno, int subvalueno) REF {
 
-	THISIS("void var_stg::remover(int fieldno, int valueno, int subvalueno) &")
+	THISIS("void var::remover(int fieldno, int valueno, int subvalueno) &")
 	assertStringMutator(function_sig);
 
 

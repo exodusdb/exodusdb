@@ -1154,7 +1154,7 @@ ND var  var_stg::replace(const rex& regex, ReplacementFunction auto repl_func) c
 
 template <std::size_t N>
 auto var_stg::unpack/*<N>*/(SV delim /*= _FM*/) const -> std::array<var, N> {
-    THISIS("auto var::unpack<N>(SV delim /*= _FM*/) const")
+    THISIS("auto var::unpack<N>(SV delim = _FM) const")
     assertString(function_sig);
 
 	// std::vector<var> vv1 = this->split(delim);
