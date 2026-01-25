@@ -1,8 +1,8 @@
 #ifndef EXODUS_EXODEBUG_H
 #define EXODUS_EXODEBUG_H
 
-#if EXO_MODULE > 1
 // || (EXO_MODULE && LIBEXODUS_EXODUS_H_)
+#if EXO_MODULE > 1
 	import std;
 #else
 #	include <string>

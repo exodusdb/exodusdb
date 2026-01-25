@@ -40,15 +40,15 @@ PUBLIC void reset_range(T& first, T& last) {
     }
 
     // Calculate the number of objects (inclusive)
-    size_t count = static_cast<size_t>(byte_diff / static_cast<std::ptrdiff_t>(sizeof(T)));
+    std::size_t count = static_cast<std::size_t>(byte_diff / static_cast<std::ptrdiff_t>(sizeof(T)));
 
     // Destroy all objects in the range
-    for (size_t i = 0; i < count; ++i) {
+    for (std::size_t i = 0; i < count; ++i) {
         (start + i)->~T();
     }
 
     // Reconstruct all objects with default construction
-    for (size_t i = 0; i < count; ++i) {
+    for (std::size_t i = 0; i < count; ++i) {
         new (start + i) T();
     }
 }
