@@ -48,6 +48,8 @@ THE SOFTWARE.
 #	include <exodus/exofuncs.h>
 #endif
 
+#include <exodus/varformatter.h>
+
 //#include <exodus/program.h>
 //#include <exodus/library.h>
 //#include <exodus/common.h>

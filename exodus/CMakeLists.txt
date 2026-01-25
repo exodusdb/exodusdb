@@ -141,6 +141,7 @@ find_package(ICU REQUIRED COMPONENTS uc i18n data)
 		exoenv.cpp
 		exofuncs.cpp
 		exocallable.cpp
+		varformatter.h
 
 		task_manager.cpp
 
@@ -254,6 +255,7 @@ find_package(ICU REQUIRED COMPONENTS uc i18n data)
 			exodus.h
 			exomacros.h
 			exoimpl.h
+			varformatter.h
 
 			program.h
 			library.h
