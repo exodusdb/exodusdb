@@ -12,6 +12,21 @@ export module exoprog;
 
 export import var;
 
+// Unfortunately we need to #include <exodus/varformatter.h>
+// in exodus.h in order to generate templates on the fly
+// that sadly cannot seem to be generated from a module
+// possibly because they need to be in std namespace
+import std;
+export namespace std {
+	using std::formatter;
+//	using std::format_to;
+	using std::make_format_args;
+	using std::format_error;
+	using std::string;
+	using std::stoi;
+	using std::string_view;
+}
+
 export namespace exo {
 
 // Here for keywords.sh

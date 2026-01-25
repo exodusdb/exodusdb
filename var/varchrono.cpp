@@ -23,6 +23,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
+#pragma GCC diagnostic push
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
+#include <var/gregorian.h>
+#pragma GCC diagnostic pop
+
 #if EXO_MODULE > 1
 	import std;
 #else
@@ -40,11 +45,6 @@ THE SOFTWARE.
 #endif
 
 #	include "ASCIIutil.h" // for ASCII_isdigit ASCII_isalpha ASCII_toupper
-
-#pragma GCC diagnostic push
-#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
-#include <var/gregorian.h>
-#pragma GCC diagnostic pop
 
 #if EXO_MODULE
 #else
