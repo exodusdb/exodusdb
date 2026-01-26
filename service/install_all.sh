@@ -149,11 +149,12 @@ function APT_GET {
 : Install required packages
 : =========================
 :
-:	whois		used in unknown ip no login notification emails
-:	bsd-mailx	provides "mail" which is required to send email?
+:	whois       used in unknown ip no login notification emails
+:	bsd-mailx   provides "mail" which is required to send email?
 :	postfix     email handler
-:	mailutils	NOT installed. like bsd-mailx but doesnt have identical options
-:	qrencode	used in htmllib2 for KSA invoices
+:	mailutils   NOT installed. like bsd-mailx but doesnt have identical options
+:	qrencode    used in htmllib2 for KSA invoices
+:	jq          Only to display chromium snap versions available
 :
 	APT_GET sudo DEBIAN_FRONTEND=noninteractive apt-get -y install whois postfix bsd-mailx
 :
@@ -217,6 +218,17 @@ function APT_GET {
 : ===============
 :
 	which pdfgrep || APT_GET sudo DEBIAN_FRONTEND=noninteractive apt-get -y install pdfgrep
+
+:
+: Display chromium snap versions available
+: ========================================
+:
+	snapname="chromium"
+	curl -s -H "Snap-Device-Series: 16" \
+	     -H "Snap-Device-Architecture: $(uname -m)" \
+	     "https://api.snapcraft.io/v2/snaps/info/$snapname" \
+	| jq -r '.["channel-map"][] | "Version: \(.version), Rev: \(.revision), Channel: \(.channel.name)"' \
+	| sort -rV || true  # sort by version descending. ignore failure.
 
 :
 : Wait for chromium snap install to complete
