@@ -12,6 +12,10 @@
 #	set(CMAKE_EXPERIMENTAL_CXX_IMPORT_STD "d0edc3af-4c50-42ea-a356-e2862fe7a444")  # example for ~4.0; update if needed!)
 	project(exodus)
 
+#	grep -P "26.01|EXODUS_RELEASE|EXODUS_PATCH" -r */*.{cpp*,h*,txt} *.{cpp,h*,txt}
+	set(EXODUS_RELEASE 26.01)
+	set(EXODUS_PATCH 26.01.00)
+
 #	cmake versions available 2024-06-10
 #
 #	Ubuntu       24.04   22.04   20.04
@@ -39,7 +43,7 @@
 #
 	#update version in mv.h and libexodus/exodus/CMakeLists.txt
 	set(CPACK_PACKAGE_CONTACT neo)
-	set(CPACK_PACKAGE_VERSION 25.07.1)
+	set(CPACK_PACKAGE_VERSION ${EXODUS_PATCH})
 	INCLUDE(CPack)
 
 #

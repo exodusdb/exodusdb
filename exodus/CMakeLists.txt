@@ -192,11 +192,11 @@ find_package(ICU REQUIRED COMPONENTS uc i18n data)
 	)
 
 #
-# Request .so versioning e.g. /usr/local/lib/libexodus.so -> libexodus.so.25.07
+# Request .so versioning e.g. /usr/local/lib/libexodus.so -> libexodus.so.XX.YY
 # ######################
 #
 	#set_target_properties(exodus PROPERTIES SOVERSION "${MAJOR_VERSION}.${MINOR_VERSION}.${BUILD_VERSION}")
-	set_target_properties(exodus PROPERTIES SOVERSION "25.07")
+	set_target_properties(exodus PROPERTIES SOVERSION "${EXODUS_RELEASE}")
 
 #
 # Install libexodus.so and exovar

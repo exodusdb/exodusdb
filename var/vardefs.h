@@ -44,9 +44,9 @@
 /////////////////
 
 // Info used in cli/compile
-//
-#define EXODUS_RELEASE "25.07"
-#define EXODUS_PATCH "25.07.0"
+// Now built into exodus build using -DEXODUS_RELEASE/PATCH=...
+//#define EXODUS_RELEASE "25.07"
+//#define EXODUS_PATCH "25.07.0"
 
 ///////////
 // TO_CHARS
