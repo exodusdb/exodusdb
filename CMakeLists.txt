@@ -7,7 +7,7 @@
 
 # ────────────────────────────────────────
 	message("-- CMAKE EXODUS --")
-	message(STATUS "CMAKE_VERSION              is ${CMAKE_VERSION}")
+	message(STATUS "CMAKE_VERSION is ${CMAKE_VERSION}")
 # ────────────────────────────────────────
 #	set(CMAKE_EXPERIMENTAL_CXX_IMPORT_STD "d0edc3af-4c50-42ea-a356-e2862fe7a444")  # example for ~4.0; update if needed!)
 	project(exodus)
@@ -106,10 +106,10 @@
 #			"$<$<COMPILE_LANGUAGE:CXX>:-nostdinc++>"
 #			"$<$<COMPILE_LANGUAGE:CXX>:-isystem;/usr/lib/llvm-21/include/c++/v1>"
 			"$<$<COMPILE_LANGUAGE:CXX>:-fprebuilt-module-path=/usr/local/lib>"
-	)
+		)
 		add_link_options(
 			"$<$<COMPILE_LANGUAGE:CXX>:-fuse-ld=lld>"
-	)
+		)
 	endif()
 
 	# man cmake-cxxmodules
@@ -524,6 +524,15 @@ add_definitions(-DGIT_REMOTE_COMMIT_HASH_SHORT="${GIT_REMOTE_COMMIT_HASH_SHORT}"
 #
 # Subdirs/submodules
 # ##################
+
+	message("")
+	add_subdirectory(exostd)
+	add_compile_options(
+		# Only apply to C++ sources (not C)
+		"$<$<COMPILE_LANGUAGE:CXX>:-fprebuilt-module-path=${STD_PCM_BUILD_DIR}>"
+		# Optional: also add the install-time fallback
+		#        "$<$<COMPILE_LANGUAGE:CXX>:-fprebuilt-module-path=$<INSTALL_INTERFACE:lib>>"
+	)
 
 	message("")
     set(VAR_DIR var)

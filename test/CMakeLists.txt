@@ -80,10 +80,14 @@
 # #######################################
 #
 	add_executable(testcommandline testcommandline.cpp ${SRC_VAR_DIR}/var.h)
+	add_dependencies(testcommandline std_module)
+
 	target_link_libraries(testcommandline exodus var ${PROJECT_LIBS})
 
 	# lib #
 	add_library(testecho SHARED testecho.cpp)
+	add_dependencies(testecho std_module)
+
 	# REQUIRED only for c++ module discovery
 	target_link_libraries(testecho exodus var ${PROJECT_LIBS})
 
@@ -92,6 +96,8 @@
 # ################################
 
 	add_executable(testing_var_h testing_var.h.cpp)
+	add_dependencies(testing_var_h std_module)
+
 	target_link_libraries(testing_var_h exodus var ${PROJECT_LIBS})
 	if (EXO_MODULE)
 		target_link_libraries(
@@ -132,6 +138,7 @@
 		string(REGEX REPLACE "(^.*/|\\.[^.]*$)" "" file_without_ext ${file})
 
 		add_executable(${file_without_ext} ${file})
+		add_dependencies(${file_without_ext} std_module)
 
 		target_link_libraries(${file_without_ext} exodus var ${PROJECT_LIBS})
 

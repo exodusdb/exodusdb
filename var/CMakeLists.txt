@@ -224,6 +224,7 @@ execute_process(
 #
 	if (EXO_MODULE)
 		add_library(exovar)
+		add_dependencies(exovar std_module)
 		target_include_directories(exovar PRIVATE ${PostgreSQL_INCLUDE_DIRS} ${BOOST_INCLUDE_DIR})
 		target_include_directories(exovar PRIVATE ${FMT_INCLUDE})
 		#target_include_directories(exovar PRIVATE exodus/include)
@@ -313,6 +314,7 @@ execute_process(
 		task_mutex.cpp
 		task_mutex.h
 	)
+	add_dependencies(var std_module)
 
 #
 # link libs
