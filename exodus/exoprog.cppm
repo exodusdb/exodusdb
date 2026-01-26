@@ -2,7 +2,6 @@ module;
 
 #include <var/vardefs.h>
 #include <var/format.h>
-//#include <var/exodebug.h>
 
 #include <exodus/exoimpl.h>
 #include <exodus/exoprog.h>
@@ -113,26 +112,6 @@ export namespace exo {
 	using exo::TaskManager;
 //	using exo::ExoCommon;
 
-//	using exo::DimIndexOutOfBounds;
-//	using exo::DimUndimensioned;
-
-//	using exo::VarDBException;
-//	using exo::VarDebug;
-//	using exo::VarDivideByZero;
-//	using exo::VarError;
-//	using exo::VarInvalidPointer;
-//	using exo::VarNonNumeric;
-//	using exo::VarNonPositive;
-//	using exo::VarNotImplemented;
-//	using exo::VarNumOverflow;
-//	using exo::VarNumUnderflow;
-//	using exo::VarOutOfMemory;
-//	using exo::VarUnassigned;
-//	using exo::VarUnconstructed;
-
-//	using exo::exo_backtrace;
-//	using exo::exo_savestack;
-
 	// This is mostly exporting the free functions defined in exofuncs.h
 
 	using exo::reset_range;
@@ -186,7 +165,6 @@ export namespace exo {
 	using exo::dbdelete;
 	using exo::dblist;
 
-//	using exo::debug;
 	using exo::defaulter;
 	using exo::deletec;
 	using exo::deletefile;

@@ -64,7 +64,7 @@ find_package(ICU REQUIRED COMPONENTS uc i18n data)
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-inline -Wno-attributes")
 	endif()
 
-    #// Required to allow exodebug to get absolute addresses instead of function name + offset
+    #// Required to allow vardebug to get absolute addresses instead of function name + offset
     #// bad: "/root/lib/libnlist.so(_ZN11_ExoProgram4mainEv+0x403) [0x7aa6aa9c3ec3]"
     # "-fvisibility-inlines-hidden";
     add_compile_options("-fvisibility-inlines-hidden")
@@ -264,7 +264,7 @@ execute_process(
 		varb.cpp
 		var.cpp
 		dim.cpp
-		exodebug.cpp
+		vardebug.cpp
 		varnum.cpp
 		varmath.cpp
 		varcompare.cpp
@@ -443,7 +443,7 @@ execute_process(
 	install(
 		FILES
 			vardefs.h
-			exodebug.h
+			vardebug.h
 		DESTINATION include/var
 	)
 

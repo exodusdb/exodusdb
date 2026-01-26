@@ -18,7 +18,6 @@
 #define EXO_EXOPROG_CPP
 #include <exodus/exoprog.h>
 #include <exodus/exocallable.h>
-//#include <var/exodebug.h>
 
 #include <exodus/exoimpl.h>
 
@@ -128,9 +127,6 @@ bool ExoProgram::select(in sortselectclause_or_filehandle) {
 	//ONLY TEST MATERIALS FOR NOW
 	//if (!calc_fields.ucase().contains("MATERIALS"))
 	//	return true;
-
-	//debug
-	//calc_fields.convert(FM^VM^SM,"   ").logputl("calc=");
 
 	var dictfilename = calc_fields.f(5, 1);
 
@@ -1099,8 +1095,6 @@ var ExoProgram::calculate(in dictid, in dictfile, in id, in record, in mvno) {
 
 // calculate 1
 var ExoProgram::calculate(in dictid) {
-	// THISIS("var ExoProgram::calculate(in dictid)")
-	// ISSTRING(dictid)
 
 	// return ID^"*"^dictid;
 
@@ -2621,7 +2615,7 @@ var ExoProgram::amountunit(in input0, out unitx) {
 //	return 0;
 //}
 
-// In exofuncs.h and exodebug.cpp
+// In exofuncs.h and vardebug.cpp
 void breakon();
 
 int ExoProgram::run_main(var (ExoProgram::*main_func)(), int argc, const char* argv[], int threadno) {

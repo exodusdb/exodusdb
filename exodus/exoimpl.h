@@ -47,7 +47,6 @@ THE SOFTWARE.
 #	include <var/var.h>
 //#	include <var/dim.h>
 //#	include <var/rex.h>
-#	include <var/exodebug.h>
 #endif
 #include <var/vardefs.h> // for PUBLIC
 

@@ -3,7 +3,7 @@
 #if EXO_MODULE
     import var;
 #else
-#   include "var.h"
+#   include <var/var.h>
 #endif
 
 #define PUBLIC __attribute__((visibility("default")))

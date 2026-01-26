@@ -29,7 +29,7 @@ THE SOFTWARE.
 
 #include <var/vardefs.h>
 #include <var/varerr.h>
-#include <var/exodebug.h>
+#include <var/vardebug.h>
 
 namespace exo {
 
