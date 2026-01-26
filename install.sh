@@ -593,6 +593,12 @@ function get_dependencies_for_build_and_install {
 	cd ..
 
 :
+: Install c.nanorc for nano exodus/var keyword syntax highlighting
+: ----------------------------------------------------------------
+:
+	cp c.nanorc /usr/share/nano
+
+:
 : Show installed compilers and standard library versions
 : ------------------------------------------------------
 :
