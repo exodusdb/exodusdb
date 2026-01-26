@@ -143,7 +143,7 @@ PS4='+ [ins ${1:-?} ${SECONDS}s] '
 : Validate
 : --------
 :
-: A -> $DEFAULT_STAGES
+: "A = $DEFAULT_STAGES"
 :
 	REQ_STAGES=${REQ_STAGES/A/$DEFAULT_STAGES}
 :
