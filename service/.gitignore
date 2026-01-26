@@ -11,5 +11,6 @@ www/exodus/images/theme2/neosysm2.png
 www/exodus/images/theme2/neosyss.png
 systemctl.daemon-reload.required
 wkhtmltox_*.deb
-google.pdf
+chromium2pdf.html
+chromium2pdf.pdf
 src/dic

@@ -69,9 +69,9 @@ PS4='+ [lxc $1 ${SECONDS}s] '
 : Validate
 : --------
 :
-	if [[ $REQ_STAGES = "A" ]]; then
-		REQ_STAGES=$DEFAULT_STAGES
-	fi
+: "A = $DEFAULT_STAGES"
+:
+	REQ_STAGES=${REQ_STAGES/A/$DEFAULT_STAGES}
 	if [[ ! $ALL_STAGES =~ $REQ_STAGES ]]; then
 		echo INVALID STAGES "'$REQ_STAGES'" must be one or more consecutive letters from $ALL_STAGES
 		exit 1
