@@ -111,6 +111,9 @@
 # Compile options
 	target_compile_options(nlist PUBLIC "-O2")
 
+# Compile options
+	target_compile_options(compile PUBLIC -DEXODUS_RELEASE=${EXODUS_RELEASE} -DEXODUS_PATCH=${EXODUS_PATCH})
+
 # Extra sources
 	target_sources(gendoc PRIVATE
 		${SRC_VAR_DIR}/var.h

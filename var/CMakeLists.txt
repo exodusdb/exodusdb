@@ -355,11 +355,11 @@ execute_process(
 	)
 
 #
-# Request .so versioning e.g. /usr/local/lib/libexodus.so -> libexodus.so.25.07
+# Request .so versioning e.g. /usr/local/lib/libexodus.so -> libexodus.so.XX.YY
 # ######################
 #
 	#set_target_properties(exodus PROPERTIES SOVERSION "${MAJOR_VERSION}.${MINOR_VERSION}.${BUILD_VERSION}")
-	set_target_properties(var PROPERTIES SOVERSION "25.07")
+	set_target_properties(var PROPERTIES SOVERSION "${EXODUS_RELEASE}")
 
 #
 # Create timebank.txt from timebank.h

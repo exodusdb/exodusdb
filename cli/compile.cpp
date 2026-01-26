@@ -647,7 +647,7 @@ ENVIRONMENT
 				searched ^= "\nEXO_PATH is " ^ exoduspath;
 			else {
 				searched ^= "\nEXO_PATH environment variable is not set";
-				exoduspath = "\\Program Files\\exodus\\" EXODUS_RELEASE "\\";
+				exoduspath = "\\Program Files\\exodus\\" EXO_STRINGIFY(EXODUS_RELEASE) "\\";
 				if (not osdir(exoduspath)) {
 					searched ^= "\n" ^ exoduspath;
 					exoduspath.prefixer("C:");
