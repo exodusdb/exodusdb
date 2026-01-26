@@ -72,6 +72,7 @@
 	foreach(exe IN LISTS EXECUTABLES)
 		string(REGEX REPLACE "^([^-]+).*" "\\1" source_file_name "${exe}")
 		add_executable(${exe} ${source_file_name}.cpp)
+		add_dependencies(${exe} std_module)
 		target_link_libraries(${exe} PRIVATE exodus var stdc++fs pthread)
 		install(TARGETS ${exe} DESTINATION bin)
 	endforeach()
@@ -90,6 +91,8 @@
 
 	foreach(lib IN LISTS LIBRARIES)
 		add_library(${lib} SHARED ${lib}.cpp)
+
+		add_dependencies(${lib} std_module)
 
 		target_link_libraries(${lib} PRIVATE exodus)
 #		if(TARGET std)

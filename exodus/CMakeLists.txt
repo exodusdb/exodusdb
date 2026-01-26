@@ -106,6 +106,7 @@ find_package(ICU REQUIRED COMPONENTS uc i18n data)
 #
 	if (EXO_MODULE)
 		add_library(exoprog)
+		add_dependencies(exoprog std_module)
 #		target_include_directories(exoprog PRIVATE ${PostgreSQL_INCLUDE_DIRS} ${BOOST_INCLUDE_DIR})
 		target_include_directories(exoprog PRIVATE ${BOOST_INCLUDE_DIR})
 #		target_include_directories(exoprog PRIVATE ${FMT_INCLUDE})
@@ -153,6 +154,7 @@ find_package(ICU REQUIRED COMPONENTS uc i18n data)
 
 		term_cursor.cpp
 	)
+	add_dependencies(exodus std_module)
 
 #
 # link libs

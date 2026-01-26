@@ -65,70 +65,70 @@ PS4='+ [clang ${SECONDS}s] '
 :
 	sudo update-alternatives --set clang   /usr/bin/clang-$CLANG_VER
 	sudo update-alternatives --set cc      /usr/bin/clang-$CLANG_VER
-:
-: 'Precompile std.pcm to allow import std;'
-: =======================================
-:
-: 1. Locate std.cppm. path can vary a little.
-:
-: Common locations in 2025–2026:
-: /usr/lib/llvm-$CLANG_VER/share/libc++/v1/std.cppm
-: /usr/share/libc++/v1/std.cppm
-:
-:
-: 2. Precompile the std module. BMI = .pcm file
-:
-	clang++-$CLANG_VER \
-		-std=$CPPSTD \
-		-stdlib=$STDLIB \
-		-Wno-reserved-identifier \
-		-Wno-reserved-module-identifier \
-		--precompile \
-		-o std.pcm \
-		$STD_CPPM_FILE
-
-	mv std.pcm $INSTALL_PREFIX/lib
-	echo $CPPSTD > $INSTALL_PREFIX/lib/cppstd
-
-:
-: Create a cpp file to test import std;
-:
-    TESTFILE=/tmp/test_clang_$CLANG_VER
-    cat <<-'EOF' > $TESTFILE.cpp
-		import std;
-		#include <version>
-		int main() {
-		#if __cpp_lib_print
-		    std::println("std::println: Hello modules from Clang-{} c++{} + libc++! π ≈ {:.6}", __clang_major__, __cplusplus/100%100, std::numbers::pi);
-		#else
-		    std::printf("std::printf: Hello modules from Clang-%d c++%ld + libc++! π ≈ %.6f\n", __clang_major__, __cplusplus/100%100, std::numbers::pi);
-		#endif
-		    std::printf("std::string SSO capacity is %ld\n", std::string().capacity());
-		    return 0;
-		}
-	EOF
-:
-: Compile it
-:
-    clang++-$CLANG_VER \
-        -std=$CPPSTD \
-        -stdlib=$STDLIB \
-        -fprebuilt-module-path=$INSTALL_PREFIX/lib \
-        -o $TESTFILE \
-        $TESTFILE.cpp
-:
-: Run it
-:
-    $TESTFILE
-:
-: Verify output
-:
-	$TESTFILE | grep "Clang-$CLANG_VER"
+#:
+#: 'Precompile std.pcm to allow import std;'
+#: =======================================
+#:
+#: 1. Locate std.cppm. path can vary a little.
+#:
+#: Common locations in 2025–2026:
+#: /usr/lib/llvm-$CLANG_VER/share/libc++/v1/std.cppm
+#: /usr/share/libc++/v1/std.cppm
+#:
+#:
+#: 2. Precompile the std module. BMI = .pcm file
+#:
+#	clang++-$CLANG_VER \
+#		-std=$CPPSTD \
+#		-stdlib=$STDLIB \
+#		-Wno-reserved-identifier \
+#		-Wno-reserved-module-identifier \
+#		--precompile \
+#		-o std.pcm \
+#		$STD_CPPM_FILE
+#
+#	mv std.pcm $INSTALL_PREFIX/lib
+#	echo $CPPSTD > $INSTALL_PREFIX/lib/cppstd
+#
+#:
+#: Create a cpp file to test import std;
+#:
+#	TESTFILE=/tmp/test_clang_$CLANG_VER
+#	cat <<-'EOF' > $TESTFILE.cpp
+#		import std;
+#		#include <version>
+#		int main() {
+#		#if __cpp_lib_print
+#			std::println("std::println: Hello modules from Clang-{} c++{} + libc++! π ≈ {:.6}", __clang_major__, __cplusplus/100%100, std::numbers::pi);
+#		#else
+#			std::printf("std::printf: Hello modules from Clang-%d c++%ld + libc++! π ≈ %.6f\n", __clang_major__, __cplusplus/100%100, std::numbers::pi);
+#		#endif
+#			std::printf("std::string SSO capacity is %ld\n", std::string().capacity());
+#			return 0;
+#		}
+#	EOF
+#:
+#: Compile it
+#:
+#	clang++-$CLANG_VER \
+#		-std=$CPPSTD \
+#		-stdlib=$STDLIB \
+#		-fprebuilt-module-path=$INSTALL_PREFIX/lib \
+#		-o $TESTFILE \
+#		$TESTFILE.cpp
+#:
+#: Run it
+#:
+#	$TESTFILE
+#:
+#: Verify output
+#:
+#	$TESTFILE | grep "Clang-$CLANG_VER"
+#	rm $TESTFILE.cpp $TESTFILE
 :
 : Clean up
 :
-    rm $TESTFILE.cpp $TESTFILE
-    rm llvm.sh
+	rm llvm.sh
 :
 : =======================================
 : $0 $* Completed
