@@ -40,8 +40,8 @@
 	# Export build-tree path for consumers
 	set(STD_PCM_BUILD_DIR "${CMAKE_CURRENT_BINARY_DIR}" PARENT_SCOPE)
 
-#   set(TESTFILE "${CMAKE_CURRENT_BINARY_DIR}/test_clang")
-	set(TESTFILE "${CMAKE_CURRENT_SOURCE_DIR}/test_clang")
+	set(TESTFILE_BIN "${CMAKE_CURRENT_BINARY_DIR}/test_clang")
+	set(TESTFILE_SRC "${CMAKE_CURRENT_SOURCE_DIR}/test_clang.cpp")
 	set(VERIFY_DONE "${CMAKE_CURRENT_BINARY_DIR}/verify.done")
 
 #
@@ -74,11 +74,10 @@
 	add_custom_command(
 		OUTPUT ${VERIFY_DONE}
 		COMMAND ${CMAKE_COMMAND} -E touch ${VERIFY_DONE}
-		COMMAND ${CLANG_CXX} -std=${CPPSTD} -stdlib=${STDLIB} -fprebuilt-module-path=${CMAKE_CURRENT_BINARY_DIR} -o ${TESTFILE} ${TESTFILE}.cpp
-		COMMAND ${TESTFILE}
-		COMMAND ${TESTFILE} | grep "Clang-${CLANG_MAJOR_VERSION}"
+		COMMAND ${CLANG_CXX} -std=${CPPSTD} -stdlib=${STDLIB} -fprebuilt-module-path=${CMAKE_CURRENT_BINARY_DIR} -o ${TESTFILE_BIN} ${TESTFILE_SRC}
+		COMMAND ${TESTFILE_BIN}
+		COMMAND ${TESTFILE_BIN} | grep "Clang-${CLANG_MAJOR_VERSION}"
 		COMMAND ${CMAKE_COMMAND} -E touch ${VERIFY_DONE}
-#	   COMMAND ${CMAKE_COMMAND} -E remove ${TESTFILE}.cpp ${TESTFILE}
 		DEPENDS ${PCM_OUTPUT} ${CPPSTD_OUTPUT}  # Ensure PCM and cppstd are ready
 		WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 		COMMENT "Verifying std module precompilation"
