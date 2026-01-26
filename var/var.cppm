@@ -4,7 +4,7 @@ module;
 #include <var/dim.h>
 #include <var/rex.h>
 #include <var/range.h>
-#include <var/exodebug.h>
+#include <var/vardebug.h>
 
 export module var;
 

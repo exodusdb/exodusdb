@@ -56,7 +56,7 @@ THE SOFTWARE.
 #include <var/var.h>
 //#include <exodus/exoimpl.h>
 #include <var/range.h>
-#include <var/exodebug.h>
+#include <var/vardebug.h>
 
 namespace exo {
 
@@ -404,7 +404,7 @@ auto exo_backtrace(void* stack_addresses[BACKTRACE_MAXADDRESSES], std::size_t st
 		if (gdb) {
 			var objaddress = var(strings[frameno]).field("(", 2).field(")", 1);
 			//gdb --batch -ex "file /root/exodus/build/exodus/libexodus.so.24.07" -ex "list *(_ZN3exo13exo_savestackEPPvPm+0x12)"
-			//0x124992 is in exo::exo_savestack(void**, unsigned long*) (/root/exodus/exodus/exodebug.cpp:120).
+			//0x124992 is in exo::exo_savestack(void**, unsigned long*) (/root/exodus/exodus/vardebug.cpp:120).
 			//115	 //	  thread_local std::size_t thread_stack_size = 0;
 			//116	 //}
 			//117

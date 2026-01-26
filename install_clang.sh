@@ -55,8 +55,9 @@ PS4='+ [clang ${SECONDS}s] '
 :
 : Optional: also register the generic c++ / cc names. Very useful
 :
-	sudo update-alternatives --install /usr/bin/c++ c++ /usr/bin/clang++-$CLANG_VER 80
-	sudo update-alternatives --install /usr/bin/cc  cc  /usr/bin/clang-$CLANG_VER   80
+	sudo update-alternatives --install /usr/bin/c++  c++  /usr/bin/clang++-$CLANG_VER 80
+	sudo update-alternatives --install /usr/bin/cc   cc   /usr/bin/clang-$CLANG_VER   80
+	sudo update-alternatives --install /usr/bin/lldb lldb /usr/bin/lldb-$CLANG_VER   80
 :
 : 2. Then just set the alternatives.
 :
@@ -65,6 +66,7 @@ PS4='+ [clang ${SECONDS}s] '
 :
 	sudo update-alternatives --set clang   /usr/bin/clang-$CLANG_VER
 	sudo update-alternatives --set cc      /usr/bin/clang-$CLANG_VER
+	sudo update-alternatives --set lldb    /usr/bin/lldb-$CLANG_VER
 #:
 #: 'Precompile std.pcm to allow import std;'
 #: =======================================
