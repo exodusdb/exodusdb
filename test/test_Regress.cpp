@@ -36,19 +36,21 @@ func main() {
 			//return 0;
 			filenames = "ALL";
 		}
-		exodusdir = osgetenv("HOME") ^ OSSLASH ^ "exodus";
+		exodusdir = osgetenv("HOME") ^ _OSSLASH "exodus";
 	}
 
-	var testdatadir = exodusdir ^ OSSLASH ^ "/data";
+	var testdatadir = exodusdir ^ _OSSLASH "test/data";
 
 	// If cant find test data then look for it in parent directory
 	if (not osdir(testdatadir)) {
 		printl("dir doesnt exist " ^ testdatadir);
-		testdatadir = "../data";
+		testdatadir = "../test/data";
+		if (not osdir(testdatadir))
+			abort(lasterror());
 	}
 
 	if (not filenames or filenames eq "ALL") {
-		filenames = oslistf(testdatadir ^ OSSLASH ^ "*.TXT");
+		filenames = oslistf(testdatadir ^ _OSSLASH "*.TXT");
 		if (not filenames)
 			printl("Cannot find any files " ^ testdatadir);
 	}
