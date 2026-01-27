@@ -1,16 +1,13 @@
-All the main directories are now directly under ~/exodusdb.
 exodusdb
-├── cli         * Command line programs
-├── var         * Core var, dim and rex classes
-├── exodus      * Exodus cli/lib programming
-├── fmt         Unused fork of fmtlib/fmt
-├── pgexodus    * Postgres database extension
-│   └── src
-├── pygment     Exodus C++ syntax highlighting for html and nano
-├── service     Web service
-│   ├── src     cpp
-│   └── www     htm, js and images
-├── data        Belongs to test
-└── test        * Unit test programs
-
-* = cmake subdirs
+├── cli         Builds command line programs. cpp, h.
+├── var         Builds var module with core var, dim and rex classes. cppm, cpp, h.
+├── exodus      Builds exodus module for Exodus cli/lib programming. cppm, cpp, h.
+├── test        Builds unit test programs. cpp.
+│   └── data    Expected results. txt.
+├── std         Builds C++ std module. cppm.
+├── pgexodus    Builds Postgres database extension.
+│   └── src     c, h
+├── service     Web UI and service.
+│   ├── src     cpp, h.
+│   └── www     htm, js, images.
+└── pygment     Exodus C++ syntax highlighting for html doc.

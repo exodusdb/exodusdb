@@ -102,7 +102,7 @@
 		COMPONENT std_module
 	)
 
-# In your parent CMakeLists.txt, add_subdirectory(exostd)
+# In your parent CMakeLists.txt, add_subdirectory(std)
 # Then, for other targets: add_dependencies(your_other_target std_module)
 #
 # To tell your other targets where to find std.pcm during build:

@@ -530,7 +530,7 @@ add_definitions(-DGIT_REMOTE_COMMIT_HASH_SHORT="${GIT_REMOTE_COMMIT_HASH_SHORT}"
 # ##################
 
 	message("")
-	add_subdirectory(exostd)
+	add_subdirectory(std)
 	add_compile_options(
 		# Only apply to C++ sources (not C)
 		"$<$<COMPILE_LANGUAGE:CXX>:-fprebuilt-module-path=${STD_PCM_BUILD_DIR}>"
