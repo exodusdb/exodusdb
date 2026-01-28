@@ -445,6 +445,12 @@ span.clsReadOnly:empty
 	flex: 1 1 auto;
 }
 
+.card-cell b {
+    margin-bottom: -4px;
+    /* Use display block since the card title is wrapped in <td> <th> */
+    display: block;
+}
+
 /* 70-30 layout */
 /*.card-row--70-30 .card-cell:first-child {*/
 /*	flex: 0 0 calc((100% - 10px) * 0.7);*/
