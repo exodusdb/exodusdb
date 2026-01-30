@@ -67,9 +67,10 @@ color brightwhite,yellow "\<(FIXME|TODO|XXX)\>"
 # Import/export
 color brightyellow "^[[:blank:]]*(import|export)[[:blank:]]*[a-zA-Z0-9_]+"
 
-# Preprocessor directives.
-color brightcyan start="^[[:blank:]]*#[[:blank:]]*(if(n?def)?|elif|warning|error|pragma)\>" end="(\`|[^\])$"
-color brightcyan "^[[:blank:]]*#[[:blank:]]*((define|else|endif|include(_next)?|line|undef)\>|$)"
+## Preprocessor directives.
+# Must be last
+#color brightcyan start="^[[:blank:]]*#[[:blank:]]*(if(n?def)?|elif|warning|error|pragma)\>" end="(\`|[^\])$"
+#color brightcyan "^[[:blank:]]*#[[:blank:]]*((define|else|endif|include(_next)?|line|undef)\>|$)"
 
 # Exodus thread globals
 #######################
@@ -228,8 +229,13 @@ color bold,yellow "\<(OSSLASH|_OSSLASH|OSSLASH_)\>"
 # Posix: "\n"  Windows: "\r\n"
 color bold,yellow "\<(EOL|_EOL)\>"
 
+## Preprocessor directives.
+# Must be almost last
+color brightcyan start="^[[:blank:]]*#[[:blank:]]*(if(n?def)?|elif|warning|error|pragma)\>" end="(\`|[^\])$"
+color brightcyan "^[[:blank:]]*#[[:blank:]]*((define|else|endif|include(_next)?|line|undef)\>|$)"
+
 ##########
-# Comments - bold cyan
+# Comments - bold cyan - preprocessor removes comments before looking at # directives
 ##########
 
 color bold,cyan "//.*"
