@@ -64,13 +64,6 @@ find_package(ICU REQUIRED COMPONENTS uc i18n data)
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-inline -Wno-attributes")
 	endif()
 
-    #// Required to allow vardebug to get absolute addresses instead of function name + offset
-    #// bad: "/root/lib/libnlist.so(_ZN11_ExoProgram4mainEv+0x403) [0x7aa6aa9c3ec3]"
-    # "-fvisibility-inlines-hidden";
-    add_compile_options("-fvisibility-inlines-hidden")
-
-    add_compile_options("-fno-omit-frame-pointer" "-ffunction-sections" "-fdata-sections")
-
 #
 # Timebank option -DEXO_TIMEBANK=ON
 # ###############
