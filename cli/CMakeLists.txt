@@ -18,14 +18,6 @@
 		link_libraries(std)
 	endif()
 
-# Common compile options for everything
-	add_compile_options(
-		"-fvisibility-inlines-hidden"
-		"-fno-omit-frame-pointer"
-		"-ffunction-sections"
-		"-fdata-sections"
-	)
-
 # ───────────────────────────────────────────────
 # 1. CREATE EXECUTABLES + INSTALL
 # ───────────────────────────────────────────────

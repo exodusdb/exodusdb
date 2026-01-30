@@ -404,15 +404,36 @@ ENVIRONMENT
 		}
 		//}
 
-//		basicoptions ^= " -fno-omit-frame-pointer ";
-		// Minor space savings
-//		basicoptions ^= " -ffunction-sections -fdata-sections ";
-
 		// Help fixdeprecated get all errors and deprecations
 		if (clang)
 			basicoptions ^= " -ferror-limit=9999";
 		else if (gcc)
 			basicoptions ^= " -fmax-errors=9999";
+
+#ifdef EXO_COMPILE_ARGS
+
+//		Kept in sync from:
+//			exodus/CMakeLists.txt
+//			cli/compile.cpp using -DEXO_COMPILE_ARGS
+//
+//		-gdwarf-5                        # Emit DWARF v5 debug info (better inline + discriminator support)
+//		-fno-omit-frame-pointer          # Critical to preserve frame pointers for reliable stack unwinding / backtracing
+//		-fno-limit-debug-info            # Prevent Clang from thinning debug info under optimisation
+//		-fvisibility=hidden              # Hide all symbols by default (explicit exports only)
+//		-fvisibility-inlines-hidden      # Hide inline function symbols unless explicitly exported
+//		-ffunction-sections              # Place each function in its own section (enables linker GC)
+//		-fdata-sections                  # Place each data object in its own section (enables linker GC)
+		basicoptions ^= " " EXO_STRINGIFY(EXO_COMPILE_ARGS);
+
+		// Pass them on
+//		basicoptions ^= " -DEXO_COMPILE_ARGS='" EXO_STRINGIFY(EXO_COMPILE_ARGS) "'";
+
+#else
+		// Try to ensure full info to enable good debug backtracing
+		basicoptions ^= " -fno-omit-frame-pointer ";
+
+		// Minor space savings
+//		basicoptions ^= " -ffunction-sections -fdata-sections ";
 
 		// Use c++ (g++/clang) -fvisibility=hidden to make all hidden except those marked DLL_PUBLIC ie "default"
 #if __GNUC__ >= 4
@@ -421,6 +442,7 @@ ENVIRONMENT
 		// Required to allow exodebug to get absolute addresses instead of function name + offset
 		// bad: "/root/lib/libnlist.so(_ZN11_ExoProgram4mainEv+0x403) [0x7aa6aa9c3ec3]"
 		basicoptions ^= " -fvisibility-inlines-hidden ";
+#endif
 #endif
 
 #ifdef EXO_FORMAT

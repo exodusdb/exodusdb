@@ -190,19 +190,70 @@
 	#add_compile_options(-flto) # Link time optimisation. Makes linking of libexodus.so very slow
 
 #
-# Optimise runtime linking speed
-# ##############################
+# Optimise build flags
+# ####################
 #
-	#add_compile_options(-fvisibility=hidden) # Force g++ to hide all lib definitions by default and require PUBLIC
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden") # Force g++ to hide all lib definitions by default and require PUBLIC
+#	# Keep in sync in exodus/CMakeLists.txt and cli/compile.cpp
+#	add_compile_options(
+#		"$<$<COMPILE_LANGUAGE:CXX>:-gdwarf-5>"                   # ?
+#		"$<$<COMPILE_LANGUAGE:CXX>:-fno-omit-frame-pointer>"     # Important to ease backtracing to meaningful source
+#		"$<$<COMPILE_LANGUAGE:CXX>:-fno-limit-debug-info>"       # Maximise debugging info without reducing performance
+#		"$<$<COMPILE_LANGUAGE:CXX>:-fvisibility=hidden>"         # Hide all lib definitions by default and require PUBLIC
+#		"$<$<COMPILE_LANGUAGE:CXX>:-fvisibility-inlines-hidden>" # More hiding?
+#		"$<$<COMPILE_LANGUAGE:CXX>:-ffunction-sections>"         # All functions in a different linkable sections, enabling removal during linking
+#		"$<$<COMPILE_LANGUAGE:CXX>:-fdata-sections>"             # All data in different linkable sections
+#	)
+#
+#	add_link_options(
+#		$<$<COMPILE_LANGUAGE:CXX>:-Wl,--gc-sections>             # Remove unused sections
+#	)
 
 #
-# Optimise binary size
+# Optimise build flags
 # ####################
 #
 
-#	add_compile_options(-ffunction-sections -fdata-sections) # linker reduces size of output
-	#add_compile_options(-g)
+# Canonical list of C++ compile flags.
+# This list is the SINGLE SOURCE OF TRUTH.
+# Keep in sync with:
+#   - exodus/CMakeLists.txt
+#   - cli/compile.cpp using -DEXO_COMPILE_ARGS
+#
+	set(EXO_COMPILE_ARGS
+		-gdwarf-5                        # Emit DWARF v5 debug info (better inline + discriminator support)
+		-fno-omit-frame-pointer          # Critical to preserve frame pointers for reliable stack unwinding / backtracing
+		-fno-limit-debug-info            # Prevent Clang from thinning debug info under optimisation
+		-fvisibility=hidden              # Hide all symbols by default (explicit exports only)
+		-fvisibility-inlines-hidden      # Hide inline function symbols unless explicitly exported
+		-ffunction-sections              # Place each function in its own section (enables linker GC)
+		-fdata-sections                  # Place each data object in its own section (enables linker GC)
+	)
+
+#
+# Apply compile flags (C++ only, module-safe)
+# ------------------------------------------
+#   - One flag per generator expression
+#   - Required for Clang + C++ modules + clang-scan-deps
+#
+	foreach(flag IN LISTS EXO_COMPILE_ARGS)
+		add_compile_options(
+			"$<$<COMPILE_LANGUAGE:CXX>:${flag}>"
+		)
+	endforeach()
+
+#
+# Export compile flags to C++ as a string macro -DEXO_COMPILE_ARGS
+# ----------------------------------------------------------------
+# This allows the running program to:
+#   - log the exact build flags
+#   - embed them in crash reports
+#   - include them in build fingerprints
+#
+	list(JOIN EXO_COMPILE_ARGS " " EXO_COMPILE_ARGS_STRING)
+
+	add_compile_definitions(
+	    EXO_COMPILE_ARGS=${EXO_COMPILE_ARGS_STRING}
+	)
 
 #
 # Libraries
