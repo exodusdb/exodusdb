@@ -7227,7 +7227,22 @@ Get dir info about an OS file or dir.
 \fBreturn:\fR A short string containing size ^ FM ^ modified_time ^ FM ^ modified_time or "" if not a regular file or dir.
 .sp 0
 .PP
-\fBmode:\fR 0: Default. 1: Must be a regular OS file. 2: Must be an OS dir.
+\fBmode:\fR
+.PP
+\fB0:\fR Default.
+.sp 0
+.PP
+\fB1:\fR Must be a regular OS file. Same as osfile()
+.sp 0
+.PP
+\fB2:\fR Must be an OS dir. Doesnt return size. Same as osdir()
+.sp 0
+.PP
+\fB4:\fR Must be an OS dir. Slow. Returns total size and latest modification date of all files and subdirs recursively.
+.sp 0
+.sp 0
+.PP
+Mode 4 also updates the dir and all subdir modification times according to their files and subdirs recursively. So you can use dir times to reliably exclude whole trees of files knowing their latest modification time - assuming no further modifications.
 .sp 0
 .PP
 See also osfile() and osdir()
