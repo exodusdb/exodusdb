@@ -28,6 +28,10 @@ THE SOFTWARE.
 #pragma clang diagnostic pop
 #endif
 
+#define SAVESTACK_ATTACHES_DEBUGGER 0
+
+// Note EXO_DEBUG = 0, 1, 2 = backtrace exodus libs, 3 = backtrace all.
+
 // For debugging
 #define TRACING 0
 
@@ -48,9 +52,9 @@ THE SOFTWARE.
 #include <execinfo.h>  // for backtrace
 #include <csignal>
 
-#if TRACING
-#	include <boost/stacktrace.hpp>
-#endif
+//#if TRACING
+//#	include <boost/stacktrace.hpp>
+//#endif
 //#include <backward.hpp>
 
 #include <var/var.h>
@@ -62,7 +66,7 @@ namespace exo {
 
 using let = const var;
 
-static void addbacktraceline(in frameno, in sourcefilename, in lineno, io returnlines) {
+static void addbacktraceline(in frameno, in sourcefilename, in lineno, in exo_debug, io returnlines) {
 
 	//#if TRACING
 	//	sourcefilename.errputl("SOURCEFILENAME=");
@@ -91,13 +95,16 @@ static void addbacktraceline(in frameno, in sourcefilename, in lineno, io return
 	if ((not line or line.match("^\\s*}")) and not raw)
 		return;
 
-	// Suppress confusing and unhelpful exodus macros like programinit/exit, libraryinit/exit, classinit/exit
-	if (/* not raw and */ line.match("^(program|library|class)(init|exit)\\("))
-		return;
+	if (exo_debug < 2) {
 
-	// Skip "return nn"
-	if (line.match("^\\s*return\\s*\\d*") and not raw)
-		return;
+		// Suppress confusing and unhelpful exodus macros like programinit/exit, libraryinit/exit, classinit/exit
+		if (/* not raw and */ line.match("^(program|library|class)(init|exit)\\("))
+			return;
+
+		// Skip "return nn"
+		if (line.match("^\\s*return\\s*\\d*") and not raw)
+			return;
+	}
 
 #if TRACING
 	line.errputl();
@@ -162,6 +169,10 @@ var summarise_gdb_bt(in osfilename) {
 					}
 				}
 
+				// Skip #11 inc/l1.h:43 return CALLMEMBERFUNCTION(*(this->plibobject_),
+				if (srcfileline.contains("/inc/"))
+					continue;
+
 				var src;
 				if (not src.osread(srcfileline.field(":",1)))
 					continue;
@@ -214,6 +225,8 @@ auto exo_savestack(void* stack_addresses[BACKTRACE_MAXADDRESSES], std::size_t* s
 	if (exo_debug.osgetenv("EXO_DEBUG") and not exo_debug)
 		return true;
 
+#if SAVESTACK_ATTACHES_DEBUGGER
+
 #if TRACING
 	std::cerr << "Attaching GDB to PID: " << getpid() << "\n";
 #endif
@@ -258,6 +271,8 @@ auto exo_savestack(void* stack_addresses[BACKTRACE_MAXADDRESSES], std::size_t* s
 		return false;
 	}
 
+#endif // SAVESTACK_ATTACHES_DEBUGGER
+
 //	std::cerr << "----- gdb " << logfilename << " -----" << std::endl;
 
 	// EXO_DEBUG=1 signifies desire to break into gdb.
@@ -270,33 +285,34 @@ auto exo_savestack(void* stack_addresses[BACKTRACE_MAXADDRESSES], std::size_t* s
 		if (exo_debug) {
 
 			// Display filtered backtrace
-			summarise_gdb_bt(logfilename).logputl();
-
-			std::cerr << var("-").str(logfilename.len() + 16) << std::endl;
+//			summarise_gdb_bt(logfilename).logputl();
+//			std::cerr << var("-").str(logfilename.len() + 16) << std::endl;
+			var(exo_backtrace(stack_addresses, *stack_size)).convert(_FM, "\n").logputl();
+			var("-").str(32).logputl();
 
 			// Patch .gdbinit to suppress long list of system file symbol loading
 			var gdbinit;
 			bool gdbinit_update = false;
-			if (gdbinit.osread("~/.gdbinit")) {
-				if (not gdbinit.contains("symbol-loading")) {
-					gdbinit ^=
-						"\n"
-						"# Suppress long list when auto-attaching to gdb in new version of Exodus.\n"
-						"set print symbol-loading off\n"
-					;
-					gdbinit_update = true;
-				}
-				if (not gdbinit.contains("debuginfod")) {
-					gdbinit ^=
-						"\n"
-						"# Suppress long list when auto-attaching to gdb in new version of Exodus.\n"
-						"set debuginfod enabled off\n"
-					;
-					gdbinit_update = true;
-				}
-				if (gdbinit_update and gdbinit.oswrite("~/.gdbinit"))
-					var("~/.gdbinit updated.").logputl();
+			if (gdbinit.osread("~/.gdbinit"))
+				gdbinit = "";
+			if (not gdbinit.contains("symbol-loading")) {
+				gdbinit ^=
+					"\n"
+					"# Suppress long list when auto-attaching to gdb in new version of Exodus.\n"
+					"set print symbol-loading off\n"
+				;
+				gdbinit_update = true;
 			}
+			if (not gdbinit.contains("debuginfod")) {
+				gdbinit ^=
+					"\n"
+					"# Suppress long list when auto-attaching to gdb in new version of Exodus.\n"
+					"set debuginfod enabled off\n"
+				;
+				gdbinit_update = true;
+			}
+			if (gdbinit_update and gdbinit.oswrite("~/.gdbinit"))
+				var("~/.gdbinit updated.").logputl();
 
 //			// Search backtrace for lines starting _ExoProgram
 //			var("Search backtrace for lines starting _ExoProgram.").logputl();
@@ -335,10 +351,14 @@ auto exo_savestack(void* stack_addresses[BACKTRACE_MAXADDRESSES], std::size_t* s
 // http://www.delorie.com/gnu/docs/glibc/libc_665.html
 auto exo_backtrace(void* stack_addresses[BACKTRACE_MAXADDRESSES], std::size_t stack_size, std::size_t limit) -> std::string {
 
+#if SAVESTACK_ATTACHES_DEBUGGER
 	// Utilise gdb backtrace.$pid.log if available
 	var returnlines = summarise_gdb_bt("backtrace." ^ var::ospid() ^ ".log");
 	if (returnlines)
 		return returnlines;
+#else
+	var returnlines = "";
+#endif
 
 	std::size_t nlines = 0;
 	var mangled_addresses = "";
@@ -375,6 +395,10 @@ auto exo_backtrace(void* stack_addresses[BACKTRACE_MAXADDRESSES], std::size_t st
 
 	// TODO autodetect if addr2line or dwalfdump/dSYM is available
 
+	// 1=normal debugging, 2=exodus lib debugging, 3=std lib debugging)
+	var exo_debug;
+	if (exo_debug.osgetenv("EXO_DEBUG")) {};
+
 	//warning: conversion from ‘std::size_t’ {aka ‘long unsigned int’} to ‘int’ may change value [-Wconversion]
 	//char** strings = backtrace_symbols(stack_addresses, static_cast<int>(stack_size));
 	auto strings = std::unique_ptr<char*[], void(*)(void*)>{backtrace_symbols(stack_addresses, static_cast<int>(stack_size)), std::free};
@@ -386,12 +410,6 @@ auto exo_backtrace(void* stack_addresses[BACKTRACE_MAXADDRESSES], std::size_t st
 		var objfilename = var(strings[frameno]).field("(", 1).field(" ", 1).field("[", 1);
 		var objaddress = var(strings[frameno]).field("[", 2).field("]", 1);
 
-		// Skip libc
-//#if TRACING < 2
-		if (objfilename.contains("libc.so"))
-			continue;
-//#endif
-
 #if TRACING
 		std::fprintf(stderr, "Backtrace %d: %p \"%s\"\n", int(frameno), stack_addresses[frameno], strings[frameno]);
 		// Backtrace 0: 0x7f9d247cf9fd
@@ -399,10 +417,33 @@ auto exo_backtrace(void* stack_addresses[BACKTRACE_MAXADDRESSES], std::size_t st
 		// Backtrace 5: 0x7f638280e3f6 "/root/lib/libl1.so(+0xa3f6) [0x7f638280e3f6]"
 #endif
 
+		// 0, 1=normal debugging, 2=exodus lib debugging, 3=std lib debugging)
+		auto skippable = [exo_debug](in osfilename) -> bool {
+			if (osfilename.starts("/usr/local") and exo_debug < 2) {
+				// Skip exodus libs
+//var("SKIP " ^ osfilename).errputl();
+				return true;
+			}
+			if ((osfilename.starts("/lib/") || osfilename.starts("/usr/lib/") || osfilename.empty()) and exo_debug < 3) {
+				// Skip system libs
+//var("SKIP " ^ osfilename).errputl();
+				return true;
+			}
+//var("KEEP " ^ osfilename).errputl();
+			return false;
+		};
+
+		// Skip various files
+		if (skippable(objfilename))
+			continue;
+
+		var reladdress = var(strings[frameno]).field("(", 2).field(")", 1);
+
 		// Use gdb by preference because it finds source file, line numbers AND source line all in one
+		// BUT it resolves inlined code wrongly unless attached at the stack capture site (which is slow)
+		// whereas objdump scans backwards for the actual .cpp line.
 		static bool gdb = var("which gdb > /dev/null").osshell();
-		if (gdb) {
-			var objaddress = var(strings[frameno]).field("(", 2).field(")", 1);
+		auto gdb2source = [&exo_debug, &skippable](in frameno, in objfilename, in reladdress, io returnlines) -> bool {
 			//gdb --batch -ex "file /root/exodus/build/exodus/libexodus.so.24.07" -ex "list *(_ZN3exo13exo_savestackEPPvPm+0x12)"
 			//0x124992 is in exo::exo_savestack(void**, unsigned long*) (/root/exodus/exodus/vardebug.cpp:120).
 			//115	 //	  thread_local std::size_t thread_stack_size = 0;
@@ -416,23 +457,29 @@ auto exo_backtrace(void* stack_addresses[BACKTRACE_MAXADDRESSES], std::size_t st
 			//123	 #endif
 			//124	 }
 			//07:52:45 root@de1:~/exodus/exodus#
-			var stdout;
-			var stderr;
-			var exit_status;
-			let cmd = "gdb --batch -ex \"file " ^ objfilename ^ "\" -ex \"list *(" ^ objaddress ^ ")\"";
-//				TRACE(cmd)
-			if (var::osprocess(cmd, "", stdout, stderr, exit_status)) {
-				let source_file_line = stdout.field(_NL, 1).field("(", -1).field(")", 1);
-				let lineno = source_file_line.field(":", 2);
-				var col2;
-				let sourceline = stdout.substr(stdout.index(_NL ^ lineno ^ "\t") + 1, _NL, col2).cut(lineno.len()).trimfirst(" \t");
-//				addbacktraceline(frameno, source_file_line, sourceline, returnlines);
-				returnlines ^= var(frameno) ^ ": " ^ source_file_line ^ ":\t" ^ sourceline ^ FM;
-				continue;
-			}
-		}
+			var gdb_out;
+			let cmd = "gdb --batch -ex \"file " ^ objfilename ^ "\" -ex \"list *(" ^ reladdress ^ ")\"";
+			if (not gdb_out.osshellread(cmd))
+				return false;
 
-		// Handle high addresses that are random loaded .so and therefore useless.
+			let source_file_line = gdb_out.field(_NL, 1).field("(", -1).field(")", 1);
+			let lineno = source_file_line.field(":", 2);
+
+			// Skip various files
+			if (skippable(source_file_line))
+				return false;
+
+			var col2;
+			// Extract the desired line starting with the desired line_no
+			let sourceline = gdb_out.substr(gdb_out.index(_NL ^ lineno ^ "\t") + 1, _NL, col2).cut(lineno.len()).trimfirst(" \t");
+//				addbacktraceline(frameno, source_file_line, sourceline, exo_debug, returnlines);
+			returnlines ^= var(frameno) ^ ": " ^ source_file_line ^ ":\t" ^ sourceline ^ FM;
+
+			return true;
+		};
+
+		// Handle high addresses that are random loaded .so
+		// and they cannot be discovered by objdump
 		if (objaddress.len() > 9) {
 			objaddress = var(strings[frameno]).field("(", 2).field(")", 1);
 			if (objaddress.starts("+")) {
@@ -440,14 +487,13 @@ auto exo_backtrace(void* stack_addresses[BACKTRACE_MAXADDRESSES], std::size_t st
 				objaddress.cutter(1);
 			}
 			else {
-				// Handle FUNCNAME+RELATIVE address by not adding source line for now.
-				// TODO
-				// Anything before the + means a relative address and we havent bothered to code for it.
+
+				// Handle FUNCNAME+RELATIVE address
+				// Anything before the + means a relative address
 				// /usr/local/lib/libexodus.so.24.07(_ZN3exo10ExoProgram7performERKNS_3varE+0x5d0) [0x7fe49b202710]
-				if (not objfilename.contains("libexodus.so")) {
-					addbacktraceline(frameno, objfilename.field("/", -1), "", returnlines);
+				if (gdb && gdb2source(frameno, objfilename, reladdress, returnlines))
 					continue;
-				}
+				continue;
 			}
 		}
 
@@ -525,45 +571,37 @@ auto exo_backtrace(void* stack_addresses[BACKTRACE_MAXADDRESSES], std::size_t st
 		const var nn2 = objdump_out.fcount(FM);
 		var line = "";
 		let linesource = "";
-		//for (var frameno2 = 1; frameno2 < nn2; ++frameno2) {
-		for (var frameno2 : reverse_range(1, nn2)) {
-			if (objdump_out.f(frameno2).contains(".cpp:")) {
-//				let nextline = objdump_out.f(frameno2);
-//				// Skip disassembly lines
-//				if (not nextline.match("	[0-9a-f]: ")) {
-//					// Skip lines like "return 1;" since they seem to be spurious
-//					if (nextline.match("^\\s*return\\s*\\d+;"))
-//						break;
-					line = objdump_out.f(frameno2);
-//					linesource = nextline;
-//#if TRACING
-//					TRACE(line)
-//					TRACE(linesource)
-//#endif
+		// Find previous .cpp or .c
+		for (var fn : reverse_range(1, nn2)) {
+			if (objdump_out.f(fn).match("\\.cpp:|\\.c:")) {
+					line = objdump_out.f(fn);
 					break;
-//				}
+			}
+		}
+		// Find previous .h if no .cpp can be found
+		if (not line) {
+			for (var fn : reverse_range(1, nn2)) {
+				if (objdump_out.f(fn).contains(".h:")) {
+						line = objdump_out.f(fn);
+						break;
+				}
 			}
 		}
 
-//#if TRACING
-//		if (line)
-//			line.errputl("line=");
-//#endif
-
-		// Skip library internals
-		if (objfilename.contains("libexodus.so"))
+		// Skip various files
+		if (skippable(line))
 			continue;
 
 		// append the source line text and number to the output
 		if (line) {
 			let sourcefilename = line.field(":", 1);
 			let lineno = line.field(":", 2).field(" ", 1);
-			addbacktraceline(frameno, sourcefilename, lineno, returnlines);
+			addbacktraceline(frameno, sourcefilename, lineno, exo_debug, returnlines);
 			//7: p1.cpp:13: return 1;
 			//returnlines ^= var(frameno + 1) ^ ": " ^ sourcefilename ^ ":" ^ lineno ^ ": " ^ linesource ^ FM;
 			//returnlines ^= var(frameno + 1) ^ ": " ^ line.field2(_OSSLASH, -1) ^ " " ^ linesource ^ FM;
-		} else if (not objfilename.contains("libexodus.so")) {
-			addbacktraceline(frameno, objfilename.field("/", -1), "", returnlines);
+		} else {
+			addbacktraceline(frameno, objfilename.field("/", -1), "", exo_debug, returnlines);
 		}
 
 #if TRACING
@@ -573,7 +611,7 @@ auto exo_backtrace(void* stack_addresses[BACKTRACE_MAXADDRESSES], std::size_t st
 		if (limit && nlines++ >= limit)
 			break;
 
-	}
+	} // frameno
 
 	if (mangled_addresses) {
 		var stdout;
