@@ -669,11 +669,13 @@ function main() {
 
 	if (generateheadersonly)
 		return "OK Header only";
-
 	// Skip compilation if the output file is newer than source file and all include files
 	//////////////////////////////////////////////////////////////////////////////////////
 
 	let outfileinfo = osfile(outputdir ^ field(binfilename, OSSLASH, -1));
+	//TRACE(outfileinfo)
+	//TRACE(srcfileinfo)
+	//TRACE(latest_exo_info)
 	if (outfileinfo
 		and not(force)
 		and not(generateheadersonly)

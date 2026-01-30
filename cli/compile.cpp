@@ -185,7 +185,7 @@ ENVIRONMENT
 //				latest_exo_info = info;
 //		}
 //	}
-	for (auto dir : "/usr/local/lib^usr/local/bin^/usr/local/include/exodus"_var) {
+	for (auto dir : "/usr/local/lib^/usr/local/bin^/usr/local/include/exodus"_var) {
 		let info = osinfo(dir);
 		if (is_newer(info, latest_exo_info))
 			latest_exo_info = info;
@@ -372,7 +372,7 @@ ENVIRONMENT
 			/*
 				-no-pie
 					Don't produce a dynamically linked position independent executable.
-*/
+			*/
 			//basicoptions ^= " -no-pie";
 
 			// Enable function names for backtrace in executables?

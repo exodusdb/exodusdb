@@ -67,6 +67,8 @@ namespace exo {
 
 // class var
 // Inheritance chain: var > var_db > var_os > var_stg > var_base
+// Only var_base has any data
+// No virtual members at any level
 class PUBLIC var : public var_db {
 
 	// "using" applies to all member functions except ctor/dtor/operator
