@@ -1398,7 +1398,10 @@ var var_os::osinfo(const int mode /*=0*/) const {
 				tot_recursive_size
 //				, global_max_time
 			);
-			// TODO error handling?
+
+			// Abort
+			if (max_file_mtime == fs::file_time_type::min())
+				return "";
 
 			nrvo = tot_recursive_size;
 			if (mode == 4) {
