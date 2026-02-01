@@ -20,6 +20,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
+#include <var/fixdirtime.h>
+
 // used to convert to and from utf8 in osread and oswrite
 // #include <boost/detail/utf8_codecvt_facet.hpp>
 #include <boost/locale.hpp>
@@ -46,7 +48,7 @@ THE SOFTWARE.
 #include <sys/stat.h>
 #include <unistd.h>	  //for close()
 
-#include <var/fixdirtime.h>
+//#include <var/fixdirtime.h>
 
 // #include <boost/date_time/posix_time/posix_time.hpp>
 
@@ -1318,19 +1320,12 @@ bool var_os::osrmdir(bool evenifnotempty) const {
 	return true;
 }
 
-// utility defined in mvdatetime.cpp
-// void ptime2mvdatetime(const boost::posix_time::ptime& ptimex, int& mvdate, int& mvtime);
-// WARNING ACTUALLY DEFINED WITH BOOST POSIX TIME BUT IT IS THE SAME
-// void ptime2mvdatetime(const std::filesystem::file_time_type& ptimex, int& mvdate, int& mvtime);
-void time_t_to_pick_date_time(time_t time, int* pick_date, int* pick_time);
+// Implemented in varchrono.cpp
+// Per second
+ND auto time_t_to_pick_date_time(time_t time) noexcept -> std::array<int, 2>;
 
-// convert some clock to time_t (for osfile() and osdir()
-// template <typename TP>
-// std::time_t to_time_t(TP tp) {
-//	using namespace std::chrono;
-//	auto sctp = time_point_cast<system_clock::duration>(tp - TP::clock::now() + system_clock::now());
-//	return system_clock::to_time_t(sctp);
-// }
+// Per nanosecond (8 byte secs and 8 byte nsecs?)
+ND auto file_time_type_to_pick_date_time(const std::filesystem::file_time_type& ft) noexcept -> std::array<int, 2>;
 
 // Return for a file or dir, a short string containing modified_date ^ FM ^ modified_time ^ FM ^size
 var var_os::osinfo(const int mode /*=0*/) const {
@@ -1343,6 +1338,8 @@ var var_os::osinfo(const int mode /*=0*/) const {
 	// mode 1 return "" if not a file or link to file
 	// mode 2 return "" if not a dir or link to dir
 	// mode 4 return "" if not a dir or link to dir but get subdir file size and update max time/date modified including of all subdirs
+	// mode 6 (undocumented) like 4 but verifies updates but does not actually update.
+	//        Checks max recursive file/dir time according to find verbosely and quits on verification failure.
 
 	// Why use stat instead of std::filesystem?
 	// stat uses one call.
@@ -1361,60 +1358,6 @@ var var_os::osinfo(const int mode /*=0*/) const {
 	// If require a file/dir type then return "" if not matching
 	switch (mode) {
 
-        case 4: {
-
-			// Mode 3: recursive dir size + subtree max mtime update
-			// Verify is dir
-			if (!S_ISDIR(statinfo.st_mode)) {
-				std::perror("nftw");
-				return nrvo;
-			}
-
-			// Initialise file tree walker - FTW
-			ftw_stack.clear();
-			ftw_recursive_size = 0;
-			ftw_max_mtime = {0, 0};
-
-			// Configure ftw
-			ftw_verbose = 0;
-			ftw_update = true;
-			ftw_ignore = true;
-
-			// Call file tree walker - ftw
-			//////////////////////////////
-			// FTW_DEPTH for recursive.     Callback with FTW_F and FTW_DP but no FTW_D.
-			// FTW_PHYS  dont follow links. Symlinks are still treated as files for their mtimes.
-			constexpr int ftw_max_depth = 64;
-			if (::nftw(path_string.c_str(), ftw_callback, ftw_max_depth, FTW_DEPTH | FTW_PHYS) != 0) {
-				std::perror("nftw");
-				return nrvo;
-			}
-
-			// Get latest time from dir
-			if (stat(path_string.c_str(), &statinfo) != 0)
-				return nrvo;
-
-			nrvo = ftw_recursive_size;
-
-//			// Determine Pick date and time
-//			int pick_date, pick_time;
-//			time_t_to_pick_date_time(ftw_max_mtime.tv_sec, &pick_date, &pick_time);
-//			// Build return: recursive_size ^ max_date ^ max_time
-//			nrvo = static_cast<varint_t>(ftw_recursive_size) ^ FM_ ^ pick_date ^ FM_ ^ pick_time;
-//
-//			// Return size ^ date ^ date
-//			nrvo.appender(FM_, pick_date, FM_, pick_time);
-//			return nrvo;
-
-			break;
-		}
-		case 2:
-			// Reject non-dirs. Symbolic links to dirs are ok.
-			if ((statinfo.st_mode & S_IFMT) != S_IFDIR)
-				return nrvo;
-			// Dont get size
-			break;
-
 		case 1:
 			// Reject non-files. Symbolic links to files are ok.
 			if ((statinfo.st_mode & S_IFMT) != S_IFREG)
@@ -1423,6 +1366,57 @@ var var_os::osinfo(const int mode /*=0*/) const {
 			nrvo = static_cast<varint_t>(statinfo.st_size);
 			break;
 
+		case 2:
+			// Reject non-dirs. Symbolic links to dirs are ok.
+			if ((statinfo.st_mode & S_IFMT) != S_IFDIR)
+				return nrvo;
+			// Dont get size
+			break;
+
+		case 4:
+		case 6: {
+			// Verify is dir
+			if (!S_ISDIR(statinfo.st_mode)) {
+				std::perror("nftw");
+				return nrvo;
+			}
+
+			// Deep call
+			auto tot_recursive_size = uintmax_t(0);
+			auto max_file_mtime      = post_order_process(
+				fs::path(path_string.c_str()),
+				0, //depth
+				(mode == 4) ?
+					WalkOptions{} :
+					WalkOptions {
+						.update        = false,
+						.verify        = true,
+						.ignore_errors = false,
+						.verbose       = 1,
+						//.max_depth   = 64,
+					},
+				tot_recursive_size
+//				, global_max_time
+			);
+			// TODO error handling?
+
+			nrvo = tot_recursive_size;
+			if (mode == 4) {
+				// Get latest time from dir
+				if (stat(path_string.c_str(), &statinfo) != 0)
+					return "";
+			}
+			else {
+
+				// Convert std fs file time (128 bit ns) to pickos integer date and time
+				auto const [pick_date, pick_time] = file_time_type_to_pick_date_time(max_file_mtime);
+
+				nrvo.appender(FM_, pick_date, FM_, pick_time);
+				return nrvo;
+			}
+
+			break;
+		}
 		default:
 			// Mode 0 (or any mode ne 1 or 2)
 			// Get size if a file or symbolic link to file.
@@ -1432,8 +1426,7 @@ var var_os::osinfo(const int mode /*=0*/) const {
 	}
 
 	// Convert c style time_t to pickos integer date and time
-	int pick_date, pick_time;
-	time_t_to_pick_date_time(statinfo.st_mtime, &pick_date, &pick_time);
+	auto const [pick_date, pick_time] =	time_t_to_pick_date_time(statinfo.st_mtime);
 
 	// Size is only available for files or mode eq 3
 	// Return size ^ date ^ date
