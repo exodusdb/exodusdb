@@ -42,6 +42,7 @@ THE SOFTWARE.
 #	include <ctime> // for std::time_t
 //#	include <cctype> // for std::isalpha std::toupper
 
+#	include <filesystem>
 #endif
 
 #	include "ASCIIutil.h" // for ASCII_isdigit ASCII_isalpha ASCII_toupper
@@ -125,7 +126,8 @@ namespace exo {
 using let = const var;
 
 // std::time_t -> pick integer date, time
-void time_t_to_pick_date_time(const std::time_t time, int* pick_date, int* pick_time) noexcept {
+/////////////////////////////////////////
+auto time_t_to_pick_date_time(const std::time_t time) noexcept -> std::array<int, 2> {
 
 	// ASSUMPTION: td::chrono::system_clock() epoch is 1970/01/01 00:00:00
 
@@ -140,12 +142,60 @@ void time_t_to_pick_date_time(const std::time_t time, int* pick_date, int* pick_
 
 	//Modulo 86'400 to seconds within day
 	// warning: conversion from ‘std::chrono::duration<long int>::rep’ {aka ‘long int’} to ‘int’ may change value [-Wconversion]
-	*pick_time = static_cast<int>(duration_in_secs.count()) % 86'400;
+	int pick_time = static_cast<int>(duration_in_secs.count()) % 86'400;
 
 	// Integer division by 86'400 to get whole days
 	//warning: conversion from ‘std::chrono::duration<long int>::rep’ {aka ‘long int’} to ‘int’ may change value [-Wconversion]
-	*pick_date = static_cast<int>(duration_in_secs.count()) / 86'400 - PICK_UNIX_DATE_OFFSET;
+	int pick_date = static_cast<int>(duration_in_secs.count()) / 86'400 - PICK_UNIX_DATE_OFFSET;
 
+	return {pick_date, pick_time};
+
+}
+
+// std::filesystem::file_time_type -> pick integer date, time
+/////////////////////////////////////////////////////////////
+// Exact duplicate of the original logic + 0.5 second round-up (ceiling at 0.5 s)
+ND auto file_time_type_to_pick_date_time(
+    const std::filesystem::file_time_type& ft
+) noexcept -> std::array<int, 2> {
+
+    // ASSUMPTION: std::chrono::system_clock() epoch is 1970/01/01 00:00:00
+
+    // https://howardhinnant.github.io/date_algorithms.html#What%20can%20I%20do%20with%20that%20%3Ccode%3Echrono%3C/code%3E%20compatibility?
+
+//    const auto sys_time = std::chrono::clock_cast<std::chrono::system_clock>(ft);
+//    const auto duration_since_epoch = sys_time.time_since_epoch();
+	// posix only
+	const auto duration_since_epoch = ft.time_since_epoch();
+
+    // ───────────────────────────────────────────────────────────────
+    // Added: round up if fractional second ≥ 0.5
+    // ───────────────────────────────────────────────────────────────
+
+    using namespace std::chrono;
+
+    auto duration_since_epoch_whole_seconds = duration_cast<seconds>(duration_since_epoch);
+    auto remainder_ns  = (duration_since_epoch - duration_since_epoch_whole_seconds).count();
+
+    if (remainder_ns >= 500'000'000LL) {
+        duration_since_epoch_whole_seconds += seconds(1);
+    }
+
+    // Now use the rounded seconds instead of the original duration_in_secs
+    const auto duration_in_secs = duration_since_epoch_whole_seconds;
+
+    //Modulo 86'400 to seconds within day
+    // warning: conversion from ‘std::chrono::duration<long int>::rep’ {aka ‘long int’} to ‘int’ may change value [-Wconversion]
+    int pick_time = static_cast<int>(duration_in_secs.count()) % 86'400;
+
+    // Integer division by 86'400 to get whole days
+    //warning: conversion from ‘std::chrono::duration<long int>::rep’ {aka ‘long int’} to ‘int’ may change value [-Wconversion]
+    int pick_date = static_cast<int>(duration_in_secs.count()) / 86'400 - PICK_UNIX_DATE_OFFSET;
+
+	return {pick_date, pick_time};
+
+    //  const auto duration_in_days = std::chrono::duration_cast<std::chrono::days>(duration_since_epoch);
+    //  idate = duration_in_days.count();
 }
 
 // -> number of days since the pick date epoch 31/12/1967

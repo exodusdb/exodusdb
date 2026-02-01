@@ -253,6 +253,7 @@ execute_process(
 		varregex.cpp
 		varos.cpp
 		varos2.cpp
+		fixdirtime.cpp # slow because of std::format/print
 		varstr.cpp
 		varb.cpp
 		var.cpp
