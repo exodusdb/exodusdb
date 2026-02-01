@@ -126,8 +126,8 @@ bool verify_proposed(
 
 	// find command to output the latest file/dir time found
 	std::string cmd =
-		"find " + dir.string() +
-		" -exec stat -c '%y %n' {} + 2>/dev/null | sort | tail -n 1";
+		"find '" + dir.string() +
+		"' -exec stat -c '%y %n' {} + 2>/dev/null | sort | tail -n 1";
 
 	// Execute
 	// TODO convert to use var::process or var::osshellread?
@@ -146,6 +146,7 @@ bool verify_proposed(
 	// Handle mismatch
 	bool match = result.starts_with(expected_str);
 	if (!match || opt.verbose) {
+		std::print("[FIND  ] {}\n", cmd);
 		std::print(
 			stderr,
 			"[{: <6}] Verify {} → exp {}   got {}\n",
@@ -259,8 +260,8 @@ fs::file_time_type post_order_process(
 			// Skip volatile / special filesystems
 			std::string subdir_path = p.lexically_normal().string();
 			if (subdir_path == ("/proc")   ||
-//				subdir_path == ("/sys")  ||
-//				subdir_path == ("/run")   ||
+				subdir_path == ("/sys")  ||
+				subdir_path == ("/run")   ||
 				subdir_path == ("/dev")   ||
 				subdir_path == ("/var")) {
 
@@ -284,6 +285,14 @@ fs::file_time_type post_order_process(
 			// ── Recurse ─────────────────────────────────────────────────────
 			auto sub_max_file_time = post_order_process(p, depth + 1, opt, recursive_size);
 
+			// Propagate abort
+			if (sub_max_file_time == fs::file_time_type::min() && !opt.ignore_errors) {
+				// Log that we're aborting this level too
+				if (opt.verbose)
+					std::print(stderr, "[ABORT ] Propagating verify failure from {}\n", p.string());
+				return fs::file_time_type::min();  // propagate abort upward
+			}
+
 			// Bump time
 			if (sub_max_file_time > max_file_time)
 				max_file_time = sub_max_file_time;
@@ -295,7 +304,9 @@ fs::file_time_type post_order_process(
 
 	// Update top dir.
 	// Note: Cannot update root dir /
-	if (max_file_time > fs::last_write_time(dir) && dir != dir.root_directory()) {
+	if (max_file_time > fs::last_write_time(dir)
+		&& dir != dir.root_directory()
+	) {
 
 		// Verify
 		if (opt.verify && !verify_proposed(dir, max_file_time, opt)) {
