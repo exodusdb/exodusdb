@@ -1330,7 +1330,8 @@ ND auto file_time_type_to_pick_date_time(const std::filesystem::file_time_type& 
 // Return for a file or dir, a short string containing modified_date ^ FM ^ modified_time ^ FM ^size
 var var_os::osinfo(const int mode /*=0*/) const {
 
-	assertString(__PRETTY_FUNCTION__);
+	THISIS("var  var::osinfo(const int mode) const")
+	assertString(function_sig);
 
 	// return size^date^time
 	// return "" if no such file or dir
@@ -1351,6 +1352,7 @@ var var_os::osinfo(const int mode /*=0*/) const {
 	var path_string = to_path_string(*this);
 
 	// Get stat info or return ""
+	// (stat dereferences symbolic links)
 	struct stat statinfo;
 	if (stat(path_string.c_str(), &statinfo) != 0)
 		return nrvo;
@@ -1358,58 +1360,73 @@ var var_os::osinfo(const int mode /*=0*/) const {
 	// If require a file/dir type then return "" if not matching
 	switch (mode) {
 
+		case 0:
+			// Get size if a file.
+			// and dir/file mtime will be added below.
+			if ((statinfo.st_mode & S_IFMT) == S_IFREG)
+				nrvo = static_cast<varint_t>(statinfo.st_size);
+			break;
+
 		case 1:
-			// Reject non-files. Symbolic links to files are ok.
-			if ((statinfo.st_mode & S_IFMT) != S_IFREG)
+			// Reject non-files.
+			if (!S_ISREG(statinfo.st_mode))
 				return nrvo;
 			// Get size
+			// file mtime will be added below.
 			nrvo = static_cast<varint_t>(statinfo.st_size);
 			break;
 
 		case 2:
-			// Reject non-dirs. Symbolic links to dirs are ok.
-			if ((statinfo.st_mode & S_IFMT) != S_IFDIR)
+			// Reject non-dir
+			if (!S_ISDIR(statinfo.st_mode))
 				return nrvo;
-			// Dont get size
+			// Dont get size. Not available/meaningful for dirs.
+			// dir mtime will be added below.
 			break;
 
 		case 4:
-		case 6: {
-			// Verify is dir
-			if (!S_ISDIR(statinfo.st_mode)) {
-				std::perror("nftw");
+		case 6:
+		case 8: {
+			// Reject non-dir
+			if (!S_ISDIR(statinfo.st_mode))
 				return nrvo;
-			}
 
-			// Deep call
+			WalkOptions walk_options;
+			// Default walk options are ignore_errors and max_depth 64.
+			if (mode == 4) {}
+
+			else if (mode == 6)
+				walk_options.update        = true;
+
+			else if (mode == 8) {
+				// Undocumented self testing
+				// e.g. compile 'osinfo("/", 8)'
+				walk_options.verify        = true;
+				walk_options.ignore_errors = false;
+				walk_options.verbose       = 1;
+			}
+//			else error
+
+			// Deep recursive call
 			auto tot_recursive_size = uintmax_t(0);
-			auto max_file_mtime      = post_order_process(
+			auto const max_file_mtime      = post_order_process(
 				fs::path(path_string.c_str()),
-				0, //depth
-				(mode == 4) ?
-					WalkOptions{} :
-					WalkOptions {
-						.update        = false,
-						.verify        = true,
-						.ignore_errors = false,
-						.verbose       = 1,
-						//.max_depth   = 64,
-					},
+				walk_options,
 				tot_recursive_size
-//				, global_max_time
 			);
 
-			// Abort
+			// Detect abort
 			if (max_file_mtime == fs::file_time_type::min())
 				return "";
 
 			nrvo = tot_recursive_size;
-			if (mode == 4) {
-				// Get latest time from dir
-				if (stat(path_string.c_str(), &statinfo) != 0)
-					return "";
-			}
-			else {
+//			if (mode == 6) {
+//				// Get latest time from dir since we updated it
+//				if (stat(path_string.c_str(), &statinfo) != 0)
+//					return "";
+//			}
+//			else
+			{
 
 				// Convert std fs file time (128 bit ns) to pickos integer date and time
 				auto const [pick_date, pick_time] = file_time_type_to_pick_date_time(max_file_mtime);
@@ -1421,11 +1438,7 @@ var var_os::osinfo(const int mode /*=0*/) const {
 			break;
 		}
 		default:
-			// Mode 0 (or any mode ne 1 or 2)
-			// Get size if a file or symbolic link to file.
-			if ((statinfo.st_mode & S_IFMT) == S_IFREG)
-				nrvo = static_cast<varint_t>(statinfo.st_size);
-			break;
+			throw VarError(var(function_sig) ^ " mode " ^ mode ^ " is not supported.");
 	}
 
 	// Convert c style time_t to pickos integer date and time

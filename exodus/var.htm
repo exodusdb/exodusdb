@@ -6581,18 +6581,20 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			<p>Get dir info about an OS file or dir.</p>
 			<p>
 				<em>return:</em> A short string containing size ^ FM ^ modified_time ^ FM ^ modified_time or "" if not a regular file or dir.</p>
+			<p>Symlinks are followed to their targets.</p>
 			<p>
 				<em>mode:</em>
 				<p>
-					<em>0:</em> Default.</p>
+					<em>0:</em> Default. Target can be a file or dir.</p>
 				<p>
 					<em>1:</em> Must be a regular OS file. Same as osfile()</p>
 				<p>
 					<em>2:</em> Must be an OS dir. Doesnt return size. Same as osdir()</p>
 				<p>
 					<em>4:</em> Must be an OS dir. Slow. Returns total size and latest modification date of all files and subdirs recursively.</p>
+				<p>
+					<em>6:</em> Same as mode 4 but also updates the dir and all subdir modification times according to their files and subdirs recursively. This allows using osdir() to reliably exclude whole trees of files knowing their latest modification time - but only until further modification. Note that typically creation and deletion of files causes automatic updating of parent dir modification times.</p>
 			</p>
-			<p>Mode 4 also updates the dir and all subdir modification times according to their files and subdirs recursively. So you can use dir times to reliably exclude whole trees of files knowing their latest modification time - assuming no further modifications.</p>
 			<p>See also osfile() and osdir()</p>
 			<p>
 				<pre><span class="kt">var</span><span class="w"> </span><span class="n">info1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;/etc/hosts&quot;</span><span class="kt">_var</span><span class="p">.</span><span class="nf">osinfo</span><span class="p">();</span><span class="w"> </span><span class="c1">/// e.g. &quot;221^20597^78309&quot;_var</span>
