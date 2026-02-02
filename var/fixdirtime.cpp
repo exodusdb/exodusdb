@@ -172,11 +172,9 @@ namespace exo {
 // ──────────────────────────────────────────────────────────────────────────────
 fs::file_time_type post_order_process(
 	const fs::path& dir,
-	int depth,
 	const WalkOptions& opt,
-	fs__file_size_type& recursive_size
-//,
-//	fs::file_time_type global_max_mtime
+	fs__file_size_type& recursive_size,
+	int depth
 ) {
 
 	// lambda for logging
@@ -283,7 +281,7 @@ fs::file_time_type post_order_process(
 			}
 
 			// ── Recurse ─────────────────────────────────────────────────────
-			auto sub_max_file_time = post_order_process(p, depth + 1, opt, recursive_size);
+			auto sub_max_file_time = post_order_process(p, opt, recursive_size, depth + 1);
 
 			// Propagate abort
 			if (sub_max_file_time == fs::file_time_type::min() && !opt.ignore_errors) {

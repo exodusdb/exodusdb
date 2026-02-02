@@ -1,5 +1,7 @@
 #pragma once
 
+// Self test with compile 'osinfo("/", 8)'
+
 #if EXO_MODULE > 1
 	import std;
 #else
@@ -16,12 +18,12 @@ namespace exo {
 struct WalkOptions {
 	bool update        = false;
 	bool verify        = false;
-	bool ignore_errors = false;
+	bool ignore_errors = true;
 	int  verbose       = 0;
 	int  max_depth     = 64;
 };
 
-// Instead of raw uintmax
+// typdef for missing file_size_type - use instead of raw uintmax
 using fs__file_size_type =
 	decltype(std::filesystem::file_size(std::declval<std::filesystem::path>()));
 
@@ -30,11 +32,9 @@ using fs__file_size_type =
 // ──────────────────────────────────────────────────────────────────────────────
 fs::file_time_type post_order_process(
 	const fs::path& dir,
-	int depth,
 	const WalkOptions& opt,
-	fs__file_size_type& recursive_size
-//,
-//	fs::file_time_type global_max_mtime = fs::file_time_type::min()
+	fs__file_size_type& recursive_size,
+	int depth = 0
 );
 
 } // namespace exo

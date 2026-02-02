@@ -341,12 +341,13 @@ public:
 
 	// Get dir info about an OS file or dir.
 	// return: A short string containing size ^ FM ^ modified_time ^ FM ^ modified_time or "" if not a regular file or dir.
+	// Symlinks are followed to their targets.
 	// mode:
-	//  0: Default.
+	//  0: Default. Target can be a file or dir.
 	//  1: Must be a regular OS file. Same as osfile()
     //  2: Must be an OS dir. Doesnt return size. Same as osdir()
 	//  4: Must be an OS dir. Slow. Returns total size and latest modification date of all files and subdirs recursively.
-	// Mode 4 also updates the dir and all subdir modification times according to their files and subdirs recursively. So you can use dir times to reliably exclude whole trees of files knowing their latest modification time - assuming no further modifications.
+	//  6: Same as mode 4 but also updates the dir and all subdir modification times according to their files and subdirs recursively. This allows using osdir() to reliably exclude whole trees of files knowing their latest modification time - but only until further modification. Note that typically creation and deletion of files causes automatic updating of parent dir modification times.
 	// See also osfile() and osdir()
 	// obj is osfile_or_dirpath
 	//
