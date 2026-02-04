@@ -617,14 +617,15 @@ function get_dependencies_for_build_and_install {
 : Install pygments syntax highlighter for cli gendoc
 : --------------------------------------------------
 :
-	APT_INSTALL python3-pygments # || FAILED to install pygments
+	APT_INSTALL python3-pygments python3-setuptools # || FAILED to install pygments
 
 :
 : Install exodus lexer plugin for pygment syntax highlighter
 : ----------------------------------------------------------
 :
 	cd $EXODUS_DIR/pygment
-	./install.sh && ./test.sh && echo ok # || echo FAILED to install pygment plugin
+	./install.sh
+	./test.sh
 	cd ..
 
 :
