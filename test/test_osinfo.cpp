@@ -64,13 +64,15 @@ function main() {
 	printl("test_osinfo says 'Hello World!'");
 
 	// Temporary working dir
-	let tempdirname = "t1_osinfo";
+	let tempdirname = "t_osinfo";
 	if ((osdir(tempdirname) and not osrmdir(tempdirname, true)) or not osmkdir(tempdirname) or not oscwd(tempdirname))
 		abort(lasterror());
 
 	// Save the origin and expected data
 	if (not oswrite(origin on "t_origin.txt")) abort(lasterror());
 	if (not oswrite(expect on "t_expect.txt")) abort(lasterror());
+	gosub cleancols("t_origin.txt");
+	gosub cleancols("t_expect.txt");
 
 	// multiple spaces are just column separators
 	var raw = origin.trim();
@@ -114,7 +116,8 @@ function main() {
 		if (not txt.osshellread(cmd))
 			abort(lasterror());
 		if (not oswrite(txt on "t_" ^ tagname ^ ".txt"))
-		abort(lasterror());
+			abort(lasterror());
+		gosub cleancols("t_" ^ tagname ^ ".txt");
 
 	};
 
@@ -181,6 +184,13 @@ function main() {
 	printl("Test passed.");
 
 	return 0;
+}
+
+subr cleancols(in txtfilename) {
+	// Remove the first 5 fragile columns except the first letter of the line
+	// drwxr-xr-x 1 root root  8 2026-02-02 06:30:26.363399901 +0000 a1
+	if (not osshell(R"(sed -E -i 's/^(\S)(\S+\s+)(\S+\s+)(\S+\s+)(\S+\s+)(\S+\s+)/\1 /' )" ^ txtfilename))
+		abort(lasterror());
 }
 
 }; // programexit()
