@@ -42,6 +42,7 @@ THE SOFTWARE.
 #	include <algorithm>
 #	include <vector>
 #	include <codecvt>
+#	include <stdlib.h> // for getenv
 #endif
 
 #include <fnmatch.h>  //for fnmatch() globbing
@@ -182,7 +183,7 @@ static bool checknotabsoluterootfolder(std::string dirpath) {
 
 // Only substitutes initial ~/ with $HOME/
 // and removes all trailing \n
-static const std::string to_path_string(in path) {
+static const std::string to_path_string(in path, bool traceable = true) {
 
 	std::string result = path;
 
@@ -193,6 +194,9 @@ static const std::string to_path_string(in path) {
 	// Remove any trailing \n
 	while (result.back() == '\n') UNLIKELY
 		result.pop_back();
+
+	if (traceable && getenv("EXO_OSTRACE"))
+		path.logputl("TRACE: ");
 
 	// Usually no leading ~/
 	if (not result.starts_with("~/")) LIKELY
@@ -225,7 +229,10 @@ static const std::string to_oscmd_string(in cmd) {
 	//	if (cmd.contains("\\") && !cmd.contains("\\$"))
 	//		cmd.errputl("WARNING BACKSLASHES IN OS COMMAND:");
 
-	return to_path_string(cmd.field(" ", 1)) + " " + cmd.field(" ", 2, 999999).toString();
+	if (getenv("EXO_OSTRACE"))
+		cmd.logputl("TRACE: ");
+
+	return to_path_string(cmd.field(" ", 1), /*traceable=*/ false) + " " + cmd.field(" ", 2, 999999).toString();
 }
 
 // Returns with trailing OSSLASH
