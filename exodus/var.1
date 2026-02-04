@@ -7120,7 +7120,7 @@ if (oscopy(from_osfilename, to_osfilename)) ... ok
 
 
 .SS
-if (osfilename.osremove()) ...
+if (osfilename.osremove(force = false)) ...
 .PP
 Remove/delete an OS file.
 .sp 0
@@ -7132,6 +7132,9 @@ Will not remove directories. Use osrmdir() to remove directories
 .sp 0
 .PP
 \fBosfilename:\fR Absolute or relative path and file name to be removed.
+.sp 0
+.PP
+\fBforce:\fR If true then no error is returned if the target doesnt exist;
 .sp 0
 .PP
 \fBreturn:\fR True if successful or false if not possible for any reason. e.g. Target doesnt exist, path is not writeable, permissions etc.

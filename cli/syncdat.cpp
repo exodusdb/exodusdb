@@ -383,7 +383,7 @@ func main() {
 					let olddict_cpp_filename = incfiletext.field(DQ, 2).field(" ", 2);
 
 					if (not olddict_cpp_filename.ends(dict_cpp_filename)) {
-						if (osremove(olddict_cpp_filename)) {
+						if (osremove(olddict_cpp_filename, true)) {
 							printl("Removed old cpp file:", olddict_cpp_filename);
 						} else {
 							errputl(lasterror());

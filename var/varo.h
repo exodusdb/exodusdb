@@ -299,6 +299,7 @@ public:
 	// From the OS file system.
 	// Will not remove directories. Use osrmdir() to remove directories
 	// osfilename: Absolute or relative path and file name to be removed.
+	// force: If true then no error is returned if the target doesnt exist;
 	// return: True if successful or false if not possible for any reason. e.g. Target doesnt exist, path is not writeable, permissions etc.
 	// If osfilename is an osfilevar then it is automatically closed.
 	// obj is osfilename
@@ -308,7 +309,7 @@ public:
 	//  // or
 	//  if (osremove(osfilename)) ...`
 	//
-	ND bool osremove() const;
+	ND bool osremove(bool force = false) const;
 
 	///// OS DIRECTORIES:
 	////////////////////

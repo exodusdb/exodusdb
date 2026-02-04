@@ -266,7 +266,7 @@ auto get_timebank_acno(const std::string_view arg1) -> int {
 	else if (++acno && arg1 == "bool var::osrename(in new_dirpath_or_filepath) const") {}
 	else if (++acno && arg1 == "bool var::oscopy(in new_dirpath_or_filepath) const") {}
 	else if (++acno && arg1 == "bool var::osmove(in new_dirpath_or_filepath) const") {}
-	else if (++acno && arg1 == "bool var::osremove() const") {}
+	else if (++acno && arg1 == "bool var::osremove(force = false) const") {}
 	else if (++acno && arg1 == "bool var::osrmdir(bool evenifnotempty) const") {}
 	else if (++acno && arg1 == "var  var::oslist(in globpattern, const int mode) const") {}
 	else if (++acno && arg1 == "bool var::oscwd(SV newpath) static") {}

@@ -1988,7 +1988,7 @@ func main() {
 		if (oscopy(from_osfilename, to_osfilename)) {/*ok*/} else  abort("oscopy: " ^ lasterror());
 	}
 
-	printl("osremove() const;");
+	printl("osremove(bool force = false) const;");
 	{
 		let osfilename = ostempdir() ^ "xo_gendoc_test.conf";
 		if (osfilename.osremove()) {/*ok*/} else  abort("osremove: " ^ lasterror());

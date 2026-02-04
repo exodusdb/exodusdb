@@ -624,6 +624,16 @@ func main() {
 
 	}
 
+	{
+		// Non existing file returns false (unless force in which case its true)
+		assert(osremove("nosuchfile") == false);
+		assert(osremove("nosuchfile", true) == true);
+
+		// Unremovable file always false
+		assert(osremove("/proc/partitions") == false);
+		assert(osremove("/proc/partitions", true) == false);
+	}
+
 	printl(elapsedtimetext());
 	printl("Test passed");
 

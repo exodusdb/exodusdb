@@ -184,7 +184,6 @@ func main2(in pass1) {
 	static let codefile = ostempfile();
 //	std::ofstream codefile(codefile.toString());
 	osclose(codefile);
-//	osremove(codefile);
 	if (not oswrite("" on codefile))
 		abort(lasterror());
 	if (osfile(codefile).f(1))

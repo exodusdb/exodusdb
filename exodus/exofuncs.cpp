@@ -104,7 +104,7 @@ ND PUBLIC var  osread(in osfilepath) {var data; if (data.osread(osfilepath)) ret
 ND PUBLIC bool oswrite(const dim& data, in osfilepath, const char* codepage /*=""*/) {return data.oswrite(osfilepath, codepage);}
 ND PUBLIC bool osread(dim& data, in osfilepath, const char* codepage /*=""*/) {return data.osread(osfilepath, codepage);}
 
-ND PUBLIC bool osremove(in ospath) {return ospath.osremove();}
+ND PUBLIC bool osremove(in ospath, bool force /*=force*/) {return ospath.osremove(force);}
 ND PUBLIC bool osrename(in old_ospath, in new_ospath) {return old_ospath.osrename(new_ospath);}
 ND PUBLIC bool oscopy(in from_ospath, in to_ospath) {return from_ospath.oscopy(to_ospath);}
 ND PUBLIC bool osmove(in from_ospath, in to_ospath) {return from_ospath.osmove(to_ospath);}

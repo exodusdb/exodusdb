@@ -120,7 +120,7 @@ ND var  osread(in osfilepath);
 ND bool oswrite(const dim& data, in osfilepath, const char* codepage = "" );
 ND bool osread(dim& data, in osfilepath, const char* codepage = "" );
 
-ND bool osremove(in ospath);
+ND bool osremove(in ospath, bool force = false);
 ND bool osrename(in old_ospath, in new_ospath);
 ND bool oscopy(in from_ospath, in to_ospath);
 ND bool osmove(in from_ospath, in to_ospath);

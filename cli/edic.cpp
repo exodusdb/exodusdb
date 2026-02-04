@@ -304,10 +304,8 @@ func main() {
 			else {
 				//delete the skeleton
 				printl("File unchanged. Not saving.");
-				//if (newfile)
-				//	osremove(filename);
 				if (newfile) {
-					if (osfile(filename) and not osremove(filename)) {
+					if (not osremove(filename, true)) {
 						abort(lasterror());
 					}
 				}
@@ -359,8 +357,7 @@ func main() {
 			// If any errors then optionally loop back to edit again
 			var errors;
 			if (osread(errors, compileoutputfilename, "utf8")) {
-				//osremove(compileoutputfilename);
-				if (osfile(compileoutputfilename) and not osremove(compileoutputfilename)) {
+				if (not osremove(compileoutputfilename, true)) {
 					abort(lasterror());
 				}
 				if (OSSLASH != "/")

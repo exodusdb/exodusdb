@@ -36,13 +36,14 @@ THE SOFTWARE.
 #	include <locale>
 #	include <mutex>
 #	include <filesystem>
+#	include <system_error>  // for std::errc
 #	include <chrono>
 #	include <memory>
 #	include <string>
 #	include <algorithm>
 #	include <vector>
 #	include <codecvt>
-#	include <stdlib.h> // for getenv
+#	include <cstdlib> // for getenv
 #endif
 
 #include <fnmatch.h>  //for fnmatch() globbing
@@ -1235,27 +1236,51 @@ bool var_os::osmove(in new_dirpath_or_filepath) const {
 	return true;
 }
 
-bool var_os::osremove() const {
-
-	THISIS("bool var::osremove() const")
+bool var_os::osremove(bool force /*= true*/) const
+{
+	THISIS("bool var::osremove(bool force = false) const");
 	assertVar(function_sig);
 
 	// In case this is cached opened file handle
 	this->osclose();
 
-	const std::string filename2 = to_path_string(*this);
+	const std::string filename_str = to_path_string(*this);
+	std::filesystem::path p(filename_str);
 
-	// Prevent removal of dirs. Use osrmdir for that.
-	if (std::filesystem::is_directory(filename2)) {
-		var::setlasterror(var(filename2).quote() ^ " osremove failed - is a directory.");
+	// Prevent removal of directories even if empty (use osrmdir for that)
+	if (std::filesystem::is_directory(p)) {
+		var::setlasterror(var(filename_str).quote() ^ " osremove failed - is a directory.");
 		return false;
 	}
 
-	if (std::remove(filename2.c_str())) {
-		var::setlasterror(var(filename2).quote() ^ " failed to osremove");
-		return false;
+	std::error_code ec;
+	if (std::filesystem::remove(p, ec))
+		// File existed and was deleted
+		return true;
+
+	if (ec == std::errc::no_such_file_or_directory || !ec) {
+		// File did not exist
+		if (force) {
+			return true;  // Treat as success
+		} else {
+			var::setlasterror(var(filename_str).quote() ^ " osremove: file does not exist");
+			return false;
+		}
 	}
-	return true;
+
+	// Other real errors (permissions, busy, etc.)
+	std::string err_msg = ec.message();
+	if (err_msg.empty() || err_msg == "Success") {
+		err_msg = "unknown filesystem error (code " + std::to_string(ec.value()) + ")";
+	}
+	var::setlasterror(
+		var(filename_str).quote().append(
+			" osremove failed: " , err_msg,
+			" (code " , std::to_string(ec.value()) , ")"
+		)
+	);
+	return false;
+
 }
 
 bool var_os::osmkdir() const {

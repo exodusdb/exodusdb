@@ -100,9 +100,6 @@ constexpr int TRACING = 0;
 
 #endif
 
-// Needed for getenv
-//#include <stdlib.h>
-
 // Probably no need for LOCKDLCACHE since we have a separate cache per exoenv
 //module #include <mutex>
 static std::mutex global_mutex_lockdlcache;

@@ -6490,13 +6490,15 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 				<code>if</code></p></td>
 		<td>
 			<p>
-				<code>osfilename.osremove()</code></p></td>
+				<code>osfilename.osremove(force = false)</code></p></td>
 		<td>
 			<p>Remove/delete an OS file.</p>
 			<p>From the OS file system.</p>
 			<p>Will not remove directories. Use osrmdir() to remove directories</p>
 			<p>
 				<em>osfilename:</em> Absolute or relative path and file name to be removed.</p>
+			<p>
+				<em>force:</em> If true then no error is returned if the target doesnt exist;</p>
 			<p>
 				<em>return:</em> True if successful or false if not possible for any reason. e.g. Target doesnt exist, path is not writeable, permissions etc.</p>
 			<p>If osfilename is an osfilevar then it is automatically closed.</p>

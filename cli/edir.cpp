@@ -144,7 +144,7 @@ func main() {
 		let temposfilename = getosfilename(workdir, dbfilename, fieldno, ID);
 
 		// Remove any previous version of the OS file
-//		if (osfile(temposfilename) && not osremove(temposfilename))
+//		if (osremove(temposfilename, true))
 //			abort(lasterror());
 
 		// Check osfile does not already exist in the new dir
@@ -363,10 +363,8 @@ func main() {
 		}
 
 //		//clean up any temporary osfile
-//		if (osfile(temposfilename)) {
-//			if (not osremove(temposfilename)) {
-//				lasterror().errputl();
-//			}
+//		if (not osremove(temposfilename), true) {
+//			lasterror().errputl();
 //		}
 
 	} // osfilename
