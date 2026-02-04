@@ -172,6 +172,9 @@ PS4='+ [ins ${1:-?} ${SECONDS}s] '
 : ------
 :
 	export DEBIAN_FRONTEND=noninteractive
+#	export NEEDRESTART_MODE=l # list-only
+	export NEEDRESTART_MODE=a # automatic
+
 	#EXODUS_DIR=${GITHUB_WORKSPACE:-~/exodus}
 	export EXODUS_DIR=$(pwd)
 	# Set by github action if chosen to rerun in debug mode?
@@ -202,7 +205,18 @@ function CMD_RETRY {
 :
 function APT_INSTALL {
 :
-	CMD_RETRY sudo apt-get install -y $*
+	#CMD_RETRY sudo apt-get install -y $*
+	NEEDRESTART_MODE=a \
+	DEBIAN_FRONTEND=noninteractive \
+	apt-get -y\
+		-o Dpkg::Options::=--force-confdef \
+		-o Dpkg::Options::=--force-confold \
+		-o Acquire::http::Timeout=120 \
+		-o Acquire::https::Timeout=120 \
+		-o Acquire::Retries=3 \
+		--no-install-recommends \
+		install $* < /dev/null
+
 :
 : Verify all packages are installed
 :
@@ -268,8 +282,29 @@ function download_submodules {
 	if [[ "$REQ_STAGES" =~ [bdW] ]]; then
 		sudo systemctl disable --runtime apt-daily.timer apt-daily-upgrade.timer unattended-upgrades
 #		sudo systemctl mask --runtime unattended-upgrades apt-daily.timer apt-daily-upgrade.timer
-		sudo systemctl stop unattended-upgrades apt-daily.timer apt-daily-upgrade.timer
+		sudo systemctl stop unattended-upgrades apt-daily.timer apt-daily-upgrade.timer || true
 	fi
+
+:
+: ---------------------------
+: Configure automatic apt-get
+: ---------------------------
+:
+	sudo tee /etc/apt/apt.conf.d/99unattended-noninteractive <<-'EOF'
+		# Automatic retries on transient network failures
+		Acquire::Retries "3";
+		Acquire::http::Timeout "120";
+		Acquire::https::Timeout "120";
+
+		# Always keep locally modified config files during upgrades/installs
+		Dpkg::Options {
+		   "--force-confdef";
+		   "--force-confold";
+		};
+
+		# Auto-answer "yes" to installation prompts
+		# APT::Get::Assume-Yes "true";
+	EOF
 
 :
 : ----------

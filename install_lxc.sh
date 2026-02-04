@@ -58,8 +58,8 @@ PS4='+ [lxc $1 ${SECONDS}s] '
 #: Parse command line
 : ------------------
 :
-	#export DEBIAN_FRONTEND=noninteractive
-	#export NEEDRESTART_MODE=a
+	export DEBIAN_FRONTEND=noninteractive
+	export NEEDRESTART_MODE=a
 	SOURCE=${1:?SOURCE is required. e.g. ubuntu, ubuntu:22.04 etc. or container code}
 	NEW_CONTAINER_NAME=${2:?NEW_CONTAINER_NAME is required. e.g. u2204 for lxc}
 	REQ_STAGES=${3:?Stages is required. A for '$DEFAULT_STAGES' - all except Web service}

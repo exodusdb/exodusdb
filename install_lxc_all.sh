@@ -72,7 +72,7 @@ PS4='+ [lxc_all ${SECONDS}s] '
 : Upgrade all in base container - $OS
 : -----------------------------
 :
-			lxc exec $OS -- bash -c "apt-get update && apt-get -y dist-upgrade || true"
+			lxc exec $OS -- bash -c "apt-get update && apt-get -y dist-upgrade < /dev/null || true"
 :
 		fi # upgrading base container
 
