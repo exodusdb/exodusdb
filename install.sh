@@ -827,15 +827,16 @@ function install_database {
 :
 	sudo chmod o+x $HOME
 
-:
-: Test the pgexodus postgresql extension
-: --------------------------------------
-:
-#: Restart postgresql in case regression database is stuck
-#: Now done in cmake pgexodus_test
-#	sudo systemctl restart postgresql
-:
-	cd $EXODUS_DIR/build/exodus/pgexodus && CTEST_OUTPUT_ON_FAILURE=1 ctest
+# Already done as part of the extension installation
+#:
+#: Test the pgexodus postgresql extension
+#: --------------------------------------
+#:
+##: Restart postgresql in case regression database is stuck
+##: Now done in cmake pgexodus_test
+##	sudo systemctl restart postgresql
+#:
+#	cd $EXODUS_DIR/build/pgexodus && CTEST_OUTPUT_ON_FAILURE=1 ctest
 
 :
 : -------------------------------
@@ -912,11 +913,12 @@ V0G0N
 	mkdir -p ~/.config/exodus
 	echo "host=127.0.0.1 port=${EXO_PORT:-5432} dbname=exodus user=exodus password=somesillysecret" > ~/.config/exodus/exodus.cfg
 #
+# Already done as part of the extension installation
 #:
 #: Test the pgexodus postgresql extension
 #: --------------------------------------
 #:
-#	cd $EXODUS_DIR/build/exodus/pgexodus && CTEST_OUTPUT_ON_FAILURE=1 ctest
+#	cd $EXODUS_DIR/build/pgexodus && CTEST_OUTPUT_ON_FAILURE=1 ctest
 #
 
 :
