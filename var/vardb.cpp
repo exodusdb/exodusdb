@@ -2051,7 +2051,9 @@ void var_db::write(in file, in key) const {
 			let sqlstate = var(PQresultErrorField(dbresult, PG_DIAG_SQLSTATE));
 			var errmsg = "ERROR: vardb: write(" ^ file.convert(_FM, "^") ^
 						", " ^ key ^ ")";
-			if (sqlstate == "26000") {
+			if (sqlstate == "42P01")
+				errmsg ^= " File doesnt exist.";
+			else if (sqlstate == "26000") {
 				if (not pgconn.dbconn->in_transaction_) {
 					maybe_prepared = false;
 					continue;
@@ -2367,7 +2369,9 @@ bool var_db::deleterecord(in key) const {
 		if (PQresultStatus(dbresult) != PGRES_COMMAND_OK) UNLIKELY {
 			let sqlstate = var(PQresultErrorField(dbresult, PG_DIAG_SQLSTATE));
 			var errmsg = "ERROR: vardb: deleterecord(" ^ this->convert(_FM, "^") ^ ", " ^ key ^ ")";
-			if (sqlstate == "26000") {
+			if (sqlstate == "42P01")
+				errmsg ^= " File doesnt exist.";
+			else if (sqlstate == "26000") {
 				if (not pgconn.dbconn->in_transaction_) {
 					maybe_prepared = false;
 					continue;
