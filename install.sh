@@ -390,12 +390,13 @@ function download_submodules {
 		if [ "$PG_PORT" ]; then
 			PSQL_PORT_OPT="-p $PG_PORT"
 		fi
-: For exodus programs like dict2sql and testsort
-		export EXO_PORT=$PG_PORT
 	else
 		PG_PORT=
 		PSQL_PORT_OPT=
 	fi
+:
+: For exodus programs like dict2sql and testsort
+	export EXO_PORT=$PG_PORT
 :
 
 function get_dependencies_for_build_and_install {
