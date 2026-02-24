@@ -1,5 +1,5 @@
 #!/bin/bash
-[ $SHLVL -le 3 ] && exec > >(tee -a "$(basename `echo ${0/.sh/}.$*.log | sed 's/ /\./g'`)") 2>&1
+[ $SHLVL -le 3 ] && exec > >(tee -a "$(echo ${0##*/}.$*.0${RANDOM:0:4}.log | tr ' :' '._')") 2>&1
 set -euxo pipefail
 PS4='+ [ins ${1:-?} ${SECONDS}s] '
 :
@@ -937,7 +937,7 @@ function test_exodus_and_database {
 : TEST EXODUS AND DATABASE $*
 : ------------------------
 :
-: Postgres version and port - SERVER_PG_VER ${SERVER_PG_VER} and EXO_PORT=$EXO_PORT
+: Postgres version and port - SERVER_PG_VER ${SERVER_PG_VER} and EXO_PORT=${EXO_PORT:-5432}
 : -------------------------
 :
 : Start postgresql although it should be running
