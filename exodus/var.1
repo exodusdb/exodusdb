@@ -125,6 +125,31 @@ var v1 = "f1^f2^v1]v2^f4"_var; // "f1" _FM "f2" _FM "v1" _VM "v2" _FM "f4"
 
 
 .SS
+var v1 = ""_heredoc;
+.PP
+Literal suffix "_heredoc".
+.sp 0
+.PP
+Create a var from a raw string as a heredoc like syntax but indent removed.
+.sp 0
+.PP
+All white space indent discovered on the first line is removed from it and all following lines. Any additional indent on following lines is preserved.
+.sp 0
+.PP
+.PP
+\fBExample:\fR
+.EX \"<code>
+var v1 = R"!(
+>>>>//aaa one indent removed
+>>>>....//bbb double indent - one preserved
+>>>>//ccc one indent removed
+ )!"_heredoc;
+.EE \"</code>
+.sp 0
+.sp 0
+
+
+.SS
 var v1 = {"a", "b", "c" ...}; // Initializer list
 .PP
 Code a dynamic array var as as list.

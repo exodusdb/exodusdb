@@ -191,6 +191,18 @@ public:
 	//
 	friend var  operator""_var(const char* cstr, std::size_t size);
 
+	// Literal suffix "_heredoc".
+	// Create a var from a raw string as a heredoc like syntax but indent removed.
+	// All white space indent discovered on the first line is removed from it and all following lines. Any additional indent on following lines is preserved.
+	//
+	// `var v1 = R"!(
+	//  >>>>//aaa one indent removed
+	//  >>>>....//bbb double indent - one preserved
+	//  >>>>//ccc one indent removed
+	//      )!"_heredoc;`
+    //
+	friend var  operator""_heredoc(const char* cstr, std::size_t size);
+
 	template <class T>
     // Code a dynamic array var as as list.
 	// C++ constrains list elements to be all the same type: var, string, double, int, etc. but they all end up as fields of a dynamic array string.
@@ -1112,9 +1124,9 @@ ND inline var_proxy3 var::operator()(int fieldno, int valueno, int subvalueno) {
 #endif // EXO_VAR_CPP
 
 //
-/////////////////////
-// _var user literals
-/////////////////////
+//////////////////////////////////
+// _var and _heredoc user literals
+//////////////////////////////////
 
 // "abc^def"_var
 ND PUBLIC var  operator""_var(const char* cstr, std::size_t size);
@@ -1125,6 +1137,9 @@ ND PUBLIC var  operator""_var(unsigned long long int i);
 
 // 123.456_var
 ND PUBLIC var  operator""_var(long double d);
+
+// "abc^def"_var
+ND PUBLIC var  operator""_heredoc(const char* cstr, std::size_t size);
 
 ///////////////////////////////
 // var_stg template definitions

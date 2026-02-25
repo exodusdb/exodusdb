@@ -76,6 +76,15 @@ func main() {
 				var v1 = "f1^f2^v1]v2^f4"_var; assert(v1.errputl() == "f1" _FM "f2" _FM "v1" _VM "v2" _FM "f4");
 	}
 
+	printl("operator""_heredoc(const char* cstr, std::size_t size);");
+	{
+		var v1 = R"!(
+		>>>>//aaa one indent removed
+		>>>>....//bbb double indent - one preserved
+		>>>>//ccc one indent removed
+		    )!"_heredoc;
+	}
+
 	printl("var(std::initializer_list<T> list)");
 	{
 				var v1 = {11, 22, 33}; assert(v1.errputl() == "11^22^33"_var);

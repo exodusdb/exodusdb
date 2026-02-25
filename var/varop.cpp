@@ -75,6 +75,69 @@ ND var operator""_var(long double d) {
     return var(d);
 }
 
+// R"(
+//    aaa
+//        bbb
+//    ccc
+//    )"_heredoc
+
+//////////////
+ND var operator""_heredoc(const char* in_cstr, std::size_t in_len) {
+
+	std::string_view in_sv{in_cstr, in_len};
+
+	// Skip leading \n right away — before loop
+	std::size_t pos = in_sv.starts_with('\n') ? 1 : 0;
+
+	var out_var = "";
+
+	// Early exit
+	if (pos >= in_sv.size())
+		return out_var;
+
+	// Minus at least 1 tab or 4 or 8 spaces per line
+	std::string out_str;
+	out_str.reserve(in_len);
+
+	std::string_view indent;
+	bool got_indent = false;
+
+	while (pos < in_sv.size()) {
+
+		auto next_nl_pos = in_sv.find('\n', pos);
+		if (next_nl_pos == std::string_view::npos)
+			next_nl_pos = in_sv.size();
+
+		std::string_view line = in_sv.substr(pos, next_nl_pos - pos);
+
+		if (!got_indent && line.size()) {
+			got_indent = true;
+			auto first = line.find_first_not_of(" \t");
+			if (first == std::string_view::npos)
+				indent = line;
+			else
+				indent = line.substr(0, first);
+		}
+
+		if (got_indent && line.starts_with(indent))
+			out_str.append(line.substr(indent.size()));
+		else
+			out_str.append(line);
+
+		out_str.push_back('\n');
+
+		pos = next_nl_pos + 1;
+	}
+
+	// remove final \n if in_sv didn't end with one
+	if (in_sv.back() != '\n')
+		out_str.pop_back();
+
+	out_var = std::move(out_str);
+
+	return out_var;
+}
+
 // Inheriting from var_base now
 //////////////////////////////////////////
 //// SELF INCREMENT/DECREMENT var versions

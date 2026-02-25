@@ -114,7 +114,7 @@ color bold,green "\<(first|second)\>"
 ################
 
 #Exodus types
-color bold,green "\<(let|var|_var|dim|redim|rex|_rex|SV)\>"
+color bold,green "\<(let|var|_var|_heredoc|dim|redim|rex|_rex|SV)\>"
 color bold,green "\<(in|out|io|exo|range|reverse_range)\>"
 
 #VAR_BASE internals

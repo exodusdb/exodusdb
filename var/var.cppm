@@ -23,6 +23,7 @@ export namespace exo {
 	using exo::rex;
 	using exo::VarError;
 	using exo::operator""_var;
+	using exo::operator""_heredoc;
 	using exo::operator""_rex;
 
 	using exo::range;

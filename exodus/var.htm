@@ -580,6 +580,26 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 			</p>
 		</td></tr>
 	<tr>
+		<td style = "white-space:nowrap">
+			<p>
+				<code>var=</code></p></td>
+		<td>
+			<p>
+				<code>""_heredoc</code></p></td>
+		<td>
+			<p>Literal suffix "_heredoc".</p>
+			<p>Create a var from a raw string as a heredoc like syntax but indent removed.</p>
+			<p>All white space indent discovered on the first line is removed from it and all following lines. Any additional indent on following lines is preserved.</p>
+			<p>
+				<pre><span class="kt">var</span><span class="w"> </span><span class="n">v1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="sa">R</span><span class="s">&quot;</span><span class="dl">!(</span>
+<span class="s">&gt;&gt;&gt;&gt;//aaa one indent removed</span>
+<span class="s">&gt;&gt;&gt;&gt;....//bbb double indent - one preserved</span>
+<span class="s">&gt;&gt;&gt;&gt;//ccc one indent removed</span>
+<span class="s">    </span><span class="dl">)!</span><span class="s">&quot;</span><span class="n">_heredoc</span><span class="p">;</span>
+</pre>
+			</p>
+		</td></tr>
+	<tr>
 		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>

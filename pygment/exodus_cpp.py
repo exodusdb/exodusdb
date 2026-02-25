@@ -95,7 +95,7 @@ class ExodusCppLexer(CppLexer):
     } # EXODUS_FUNCTIONS  .nf
 
     EXTRA_TYPES = {
-         'dim', 'var', '_var', 'rex', '_rex', 'let', 'in', 'out', 'io', 'qqqqqqq'
+         'dim', 'var', '_var', '_heredoc', 'rex', '_rex', 'let', 'in', 'out', 'io', 'qqqqqqq'
         'programexit', 'programinit',
         'libraryinit', 'libraryexit',
          'commoninit', 'commonexit',
