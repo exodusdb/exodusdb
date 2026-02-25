@@ -210,32 +210,6 @@ if ($token) {
 	$globalserverfilename = $gdatalocation . $databasedir . $database . '.SVR';
 }
 
-/*
-WESTERN UNITED STATES -> CP437
-administrator@adlineb.hosts.neosys.com	437
-administrator@adlinem.hosts.neosys.com	437
-administrator@tdaddb.hosts.neosys.com	437
-administrator@mediaone.hosts.neosys.com	437
-administrator@ums.hosts.neosys.com	437
-administrator@hosts2.neosys.com		437
-
-ARABIC -> CP1256
-administrator@adlinec.hosts.neosys.com	720
-administrator@adlined.hosts.neosys.com	720
-administrator@adlined2.hosts.neosys.com	720
-administrator@adlinek.hosts.neosys.com	720
-administrator@amc.hosts.neosys.com	720
-administrator@bates.hosts.neosys.com	720
-administrator@asha.hosts.neosys.com	720
-administrator@win3.neosys.com		720
-
-GREEK -> CP1253
-administrator@ptcy.hosts.neosys.com	737
-
-WESTERN UNITED KINGDOM -> CP850 (server should be configured as US)
-administrator@win10.neosys.com		850
-administrator@win10b.neosys.com		850
-*/
 $gweb_codepage = 'UTF-8';
 $gdatabase_codepage = '';
 $gdatabase_codepage = 'UTF-8';
