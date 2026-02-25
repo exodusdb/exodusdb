@@ -111,7 +111,8 @@ func main() {
 	var doall = true;
 
 	// Option to install standard exodus functions
-	if (locateusing(",", filenames.f(1), "pgsql,pgexodus,exodus")) {
+//	if (locateusing(",", filenames.f(1), "pgsql,pgexodus,exodus")) {
+	if (filenames.f(1).listed("pgsql,pgexodus,exodus")) {
 		install_exodus_extensions = filenames.f(1);
 		filenames.remover(1);
 		doall = false;

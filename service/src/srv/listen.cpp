@@ -2393,7 +2393,8 @@ badwrite:
 
 		// pass the output file in linkfilename2
 		// not good method, pass in system?
-		if ("LIST,SELECTJOURNALS"_var.locateusing(",", request_.f(1))) {
+//		if ("LIST,SELECTJOURNALS"_var.locateusing(",", request_.f(1))) {
+		if (request_.f(1).listed("LIST,SELECTJOURNALS")) {
 			data_ = linkfilename2;
 		}
 		if (request_.f(1).starts("VAL.")) {

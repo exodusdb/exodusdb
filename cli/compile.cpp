@@ -4,9 +4,9 @@ programinit()
 	// CONSTANTS
 
 	// Source extensions
-	let src_extensions = "cpp cxx cc";
-	let inc_extensions = "h hpp hxx";
-	let noncompilable_extensions = " out so o";
+	let src_extensions = "cpp,cxx,cc";
+	let inc_extensions = "h,hpp,hxx";
+	let noncompilable_extensions = "out,so,o";
 	let default_extension = "cpp";
 
 	// Platform
@@ -874,14 +874,16 @@ ENVIRONMENT
 		//OK if one of the compilable default file extension
 		srcfilename.trimmerlast(".");
 		let fileext = srcfilename.field(".", -1).lcase();
-		if (src_extensions.locateusing(" ", fileext)) {
+//		if (src_extensions.locateusing(" ", fileext)) {
+		if (fileext.listed(src_extensions)) {
 			//filepath_without_ext = srcfilename.cut(-len(fileext) - 1);
 		}
 
 		// Install/copy and header files found to inc directory
 		// .h files are not compiled. They are COPIED.
 		// except xxx_common.h files are used to GENERATE two line .cpp files
-		else if (inc_extensions.locateusing(" ", fileext)) {
+//		else if (inc_extensions.locateusing(" ", fileext)) {
+		else if (fileext.listed(inc_extensions)) {
 			var srctext = osread(srcfilename);
 
 			// Hotfix old commons from 2 arg macros to 1 arg
@@ -956,7 +958,8 @@ ENVIRONMENT
 		} // .h file
 
 		//skip definitely non-compilable files
-		else if (noncompilable_extensions.locateusing(" ", fileext)) {
+//		else if (noncompilable_extensions.locateusing(" ", fileext)) {
+		else if (fileext.listed(noncompilable_extensions)) {
 			//errputl(srcfilename^" "^fileext^" is not compilable");
 			continue;
 		}

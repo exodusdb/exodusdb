@@ -355,7 +355,8 @@ func getrec() {
 				targetfilename = targetfilename.cut(7);
 
 			// Skip unwanted files
-			if (not dictonly and sourcefilename and not sourcefilename.locateusing(targetfilename, ","))
+//			if (not dictonly and sourcefilename and not sourcefilename.locateusing(targetfilename, ","))
+			if (not dictonly and sourcefilename and not targetfilename.listed(sourcefilename))
 				continue;
 
 			// Skip file if not dict. and only dicts wanted

@@ -296,7 +296,8 @@ function main() {
 
 					//default all if all are var (in io out)
 					if (nodefaults) {
-						if (var("in io out").locateusing(" ", funcarg.field(" ", 1)))
+//						if (var("in io out").locateusing(" ", funcarg.field(" ", 1)))
+						if (funcarg.field(" ", 1).listed("in,io,out"))
 							fieldstorer(funcargsdecl2, ",", argn, 1, funcarg ^ "=var()");
 						else
 							//reset to original if anything except in io out

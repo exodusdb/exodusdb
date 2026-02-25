@@ -67,7 +67,8 @@ func main(in mode) {
 
 		// system configuration
 		// locate @id in 'SYSTEM.CFG,SYSTEM,..\..\SYSTEM.CFG' using ',' setting xx then
-		if (systemcodes.locateusing(",", ID)) {
+//		if (systemcodes.locateusing(",", ID)) {
+		if (ID.listed(systemcodes)) {
 
 			gosub security2(mode, "SYSTEM CONFIGURATION");
 			if (not req.valid) {
@@ -89,7 +90,8 @@ func main(in mode) {
 		// NB also called from postwrite
 
 		// system configuration
-		if (systemcodes.locateusing(",", ID)) {
+//		if (systemcodes.locateusing(",", ID)) {
+		if (ID.listed(systemcodes)) {
 
 			gosub security2(mode, "SYSTEM CONFIGURATION");
 			if (not req.valid) {
@@ -413,7 +415,8 @@ preventupdate:
 	} else if (mode == "POSTWRITE") {
 
 		// system configuration
-		if (systemcodes.locateusing(",", ID)) {
+//		if (systemcodes.locateusing(",", ID)) {
+		if (ID.listed(systemcodes)) {
 
 			// op='SYSTEM CONFIGURATION'
 			// gosub security2
@@ -560,7 +563,8 @@ preventupdate:
 	} else if (mode == "PREDELETE") {
 
 		// system configuration
-		if (systemcodes.locateusing(",", ID)) {
+//		if (systemcodes.locateusing(",", ID)) {
+		if (ID.listed(systemcodes)) {
 
 			gosub security2(mode, "SYSTEM CONFIGURATION");
 			if (not req.valid) {
