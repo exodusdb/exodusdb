@@ -90,14 +90,11 @@ func main() {
 	// Schema | Name | Result data type | Argument data types | Type
 	// -------+---------------------------+--------------------+---------------------+--------
 	// exodus | exodus.count | integer | text, text | normal
-	// exodus | exodus_trim | text | data text
+	// exodus | exodus.trim | text | data text
 	// ...
 
 	//establish the default connection BEFORE opening a connection to dict database
 	if (not connect())
-		abort(lasterror());
-
-	if (not begintrans())
 		abort(lasterror());
 
 	//for dicts if not default
@@ -109,6 +106,11 @@ func main() {
 	verbose = OPTIONS.count("V");
 	force = OPTIONS.contains("F");
 	var doall = true;
+
+	if (verbose)
+		"begintrans()"_var.outputl();
+	if (not begintrans())
+		abort(lasterror());
 
 	// Option to install standard exodus functions
 	if (locateusing(",", filenames.f(1), "pgsql,pgexodus,exodus")) {
@@ -242,27 +244,27 @@ COST 10;
 
 		//create exodus pgsql functions
 
-		//exodus_trim (leading, trailing and excess inner spaces)
+		//exodus.trim (leading, trailing and excess inner spaces)
 		let trimsql = R"(return regexp_replace(regexp_replace(data, '^\s+|\s+$', '', 'g'),'\s{2,}',' ','g');)";
 		create_function("exodus.trim(data text)", "text", trimsql, sqltemplate);
 
-		//exodus_field_replace (a field)
+		//exodus.field_replace (a field)
 		create_function("exodus.field_replace(data text, sep text, fieldno int, replacement text)", "text", field_replace_sql, sqltemplate);
 
-		//exodus_field_remove (a field)
+		//exodus.field_remove (a field)
 		create_function("exodus.field_remove(data text, sep text, fieldno int)", "text", field_remove_sql, sqltemplate);
 
-		//exodus_split 123.45USD -> 123.45
+		//exodus.split 123.45USD -> 123.45
 		create_function("exodus.split(data text)", "text", split_sql, sqltemplate);
 
-		//exodus_unique (fields)
+		//exodus.unique (fields)
 		//https://github.com/JDBurnZ/postgresql-anyarray/blob/master/stable/anyarray_uniq.sql
 		create_function("exodus.unique(mvstring text, sepchar text)", "text", unique_sql, sqltemplate);
 
-		//exodus_locate -> int
+		//exodus.locate -> int
 		create_function("exodus.locate(substr text, searchstr text, sepchar text default VM)", "int", locate_sql, sqltemplate);
 
-		//exodus_isnum -> bool
+		//exodus.isnum -> bool
 		create_function("exodus.isnum(instring text)", "bool", isnum_sql, sqltemplate);
 
 		//exodus.tobool(text) -> bool
@@ -271,19 +273,19 @@ COST 10;
 		//exodus.tobool(numeric) -> bool
 		create_function("exodus.tobool(innum numeric)", "bool", numeric_tobool_sql, sqltemplate);
 
-		//exodus_date -> int (today's date as a number according to pickos)
+		//exodus.date -> int (today's date as a number according to pickos)
 		create_function("exodus.date()", "int", exodus_todays_date_sql, sqltemplate);
 
-		//exodus_extract_date_array -> date[]
+		//exodus.extract_date_array -> date[]
 		create_function("exodus.extract_date_array(data text, fn int, vn int, sn int)", "date[]", exodus_extract_date_array_sql, sqltemplate);
 
 		//return time as interval which can handle times like 25:00
-		//exodus_extract_time_array -> time[]
+		//exodus.extract_time_array -> time[]
 		//create_function("exodus.extract_time_array(data text, fn int, vn int, sn int)", "time[]", exodus_extract_time_array_sql, sqltemplate);
-		//exodus_extract_time_array -> time[]
+		//exodus.extract_time_array -> time[]
 		create_function("exodus.extract_time_array(data text, fn int, vn int, sn int)", "interval[]", exodus_extract_time_array_sql, sqltemplate);
 
-		//exodus_addcent4 -> text
+		//exodus.addcent4 -> text
 		create_function("exodus.addcent4(data text)", "text", exodus_addcent4_sql, sqltemplate);
 	}
 
@@ -304,9 +306,10 @@ COST 10;
 
 		//add one file for the dict_all sql using sql UNION
 		if (viewsql) {
-			viewsql ^= "SELECT '" ^ filename.cut(5).ucase() ^ "'||'*'||key as key, data\n";
-			viewsql ^= "FROM " ^ filename ^ "\n";
-			viewsql ^= "UNION\n";
+			viewsql ^=
+				"SELECT '" ^ filename.cut(5).ucase() ^ "'||'*'||key as key, data\n"
+				"FROM " ^ filename ^ "\n"
+				"UNION\n";
 		}
 	}
 
@@ -314,6 +317,14 @@ COST 10;
 
 		if (filenames.contains(FM)) {
 		//if (filenames.contains(FM) and viewsql.ends("UNION\n")) {
+
+			// We are probably updating a shared dict database e.g. exodus
+			// Possibly concurrently so will ignore errors
+			// and will assume that one process will succeed.
+			if (not dictconnection.begintrans()) {
+				// Unlikely so ignore
+				loglasterror();
+			}
 
 			//ignore error if doesnt exist
 			if (not dictconnection.sqlexec("DROP MATERIALIZED VIEW IF EXISTS dict.all"))
@@ -326,16 +337,23 @@ COST 10;
 				viewsql.output("SQL:");
 
 			var errmsg;
-			if (dictconnection.sqlexec(viewsql, errmsg))
-				printl("dict.all file created");
-			else {
-				if (not verbose)
-					viewsql.outputl("SQL:");
-				errmsg.outputl("Error:");
+			if (dictconnection.sqlexec(viewsql, errmsg)) {
+//				printl("dict.all file created");
+			} else {
+				// TODO detect failure due to concurrent which is OK.
+//				if (not verbose)
+//					viewsql.outputl("SQL:");
+				if (verbose)
+					errmsg.outputl("Error:");
 			}
-		}
+			if (dictconnection.committrans()) {
+				printl("dict.all file created");
+			}
+ 		}
 	}
 
+	if (verbose)
+		"committrans()"_var.outputl();
 	if (not committrans())
 		errors(-1) = lasterror();
 
@@ -438,23 +456,27 @@ subr create_function(in functionname_and_args, in return_sqltype, in sql, in sql
 		//null
 	}
 
-	// Get rid of old superfluous public schema function if more than one function
+	// Note: search path for user/role exodus is "public, exodus". Set in install.sh.
+	// So everything gets created in public unless schema is prefixed.
+	// The postgres default path is $user, public - which would cause exodus
+	// user to auto create everything in the exodus schema since it exists.
+
+	// Get rid of old superfluous public/exodus schema function if more than one function
 	if (oldfunction.count(RM) > 1) {
 		reindex_if_indexed = true;
 		//DROP FUNCTION IF EXISTS public.dict_addresses_person_xref(key text, data text);
-		logputl("dict2sql: deleting old public version of " ^ functionname_and_args);
-		if (not var().sqlexec("DROP FUNCTION IF EXISTS public." ^ functionname_and_args.replace("exodus.", "")))
+		logputl("dict2sql: deleting duplicate version of " ^ functionname_and_args);
+		var cmd;
+		if (functionname_and_args.starts("exodus."))
+			cmd = "DROP FUNCTION IF EXISTS public." ^ functionname_and_args.replace("exodus.", "");
+		else
+			cmd = "DROP FUNCTION IF EXISTS exodus." ^ functionname_and_args;
+		if (not var().sqlexec(cmd ^ " CASCADE"))
 			var().lasterror().logput("dict2sql: error: ");
-
-		// Get hopefully only one function now.
-		if (not var().sqlexec(sql_get_existing_declaration, oldfunction)) {
-			var().lasterror().logput("dict2sql: error:" ^ oldfunction);
-			//null
-		}
-
 	}
 
-	oldfunction.substrer(oldfunction.index("\n") + 1);
+//	oldfunction.substrer(oldfunction.index("\n") + 1);
+	oldfunction.cutter(oldfunction.index("\n"));
 //	TRACE(functionname)
 //	if (functionname eq "dict_jobs_text") {
 //		oswrite(oldfunction on "of");
@@ -507,7 +529,8 @@ subr create_function(in functionname_and_args, in return_sqltype, in sql, in sql
 
 	printl(functionname_and_args, "->", return_sqltype);
 
-	//create the function
+	// Create the function
+	//////////////////////
 	var errmsg;
 	//supposedly this is on the default connection
 	rawsqlexec(functionsql, errmsg);
@@ -544,6 +567,23 @@ subr create_function(in functionname_and_args, in return_sqltype, in sql, in sql
 		//		}
 		errmsg.errputl();
 	}
+
+	// verify only one function
+	var tempfunction;
+	if (not var().sqlexec(sql_get_existing_declaration, tempfunction)) {
+		var().lasterror().logput("dict2sql: error:" ^ tempfunction);
+		//null
+	}
+	if (tempfunction.count(RM) > 1) {
+//		if (not ANS.sqlexec("select current_schema()"))
+		var search_path;
+		if (sqlexec("show search_path", search_path))
+			search_path.logputl("pg search_path=");
+		else
+			loglasterror();
+		logputl("Failed to delete public. function?");
+	}
+
 	if (reindex_if_indexed) {
 		//drop any index using the previous function
 		//TODO identify file/fields like production_orders_date_time
@@ -1032,132 +1072,284 @@ COST 10;
 
 }  //onedictid
 
-//exodus_field_remove
+//exodus.field_remove
 
 var field_remove_sql = R"V0G0N(
+-- SIMILAR CODE IN FIELD_REMOVE AND FIELD_REPLACE
 DECLARE
- charn int;
- nchars int;
- currfieldn int;
- ans text;
-
+    fields text[];
 BEGIN
+    IF fieldno <= 0 THEN
+        IF fieldno = 0 THEN
+            RETURN '';
+        END IF;
+        RETURN data;
+    END IF;
 
- -- SIMILAR CODE IN FIELD_REMOVE AND FIELD_REPLACE
+    IF data IS NULL OR data = '' THEN
+        RETURN data;
+    END IF;
 
- if fieldno<=0 then
-  if fieldno=0 then
-   return '';
-  end if;
-  return data;
- end if;
+    fields := string_to_array(data, sep);
 
- ans := '';
- currfieldn :=1;
- nchars := length(data);
- for charn in 1..nchars loop
+    IF fieldno > cardinality(fields) THEN
+        RETURN data;
+    END IF;
 
-  continue when substring(data,charn,1) <> sep;
+    fields := fields[1:fieldno-1] || fields[fieldno+1:cardinality(fields)];
 
-  --if substring(data,charn,1) = sep then
-
-   currfieldn=currfieldn+1;
-
-  if currfieldn=fieldno then
-   ans := substring(data,1,charn-1);
-
-  elseif currfieldn>fieldno then
-   if ans<>'' then
-    ans := ans || sep || substring(data,charn+1);
-   else
-    ans := substring(data,charn+1);
-   end if;
-   return ans;
-  end if;
-
-  --end if;
-
- end loop;
-
- -- deleting beyond the number of existing fields
- if currfieldn<fieldno then
-  return data;
-  end if;
-
- return ans;
-
+    RETURN array_to_string(fields, sep);
 END;
 )V0G0N";
 
-//exodus_field_replace
+//exodus.field_replace
+
+// New array based version - still extremely slow and inefficient - resolves the following error:
+
+// psql c2comms_test
+// c2comms_test=# select exodus.dict_clients_sequence(key, data) from clients;
+// ERROR:  invalid byte sequence for encoding "UTF8": 0xc3
+// CONTEXT:  PL/pgSQL function field_replace(text,text,integer,text) line 31 at CONTINUE
+// PL/pgSQL function dict_clients_sequence(text,text) line 9 at assignment
+
+// New array based version still very slow and inefficient because there is no incremental way to find the nth index of a char in pg text (utf8)
+// This function is only used when rebuilding indexes so performance is not critical
+// If performance was critical then it can easily be added to pgexodus
+// TODO field_remove probably has the same issue
 
 var field_replace_sql = R"V0G0N(
-DECLARE
- charn int;
- nchars int;
- currfieldn int;
- ans text;
-
-BEGIN
 
  -- SIMILAR CODE IN FIELD_REMOVE AND FIELD_REPLACE
 
- if fieldno<=0 then
-  if fieldno=0 then
-   return replacement;
-  end if;
-  if data='' then
-   return replacement;
-  else
-   return data || sep || replacement;
-  end if;
+DECLARE
+    fields text[];
+BEGIN
+    IF fieldno = 0 THEN
+        RETURN replacement;
+    END IF;
 
- end if;
+    IF fieldno < 0 THEN
+        IF data = '' OR data IS NULL THEN
+            RETURN replacement;
+        ELSE
+            RETURN data || sep || replacement;
+        END IF;
+    END IF;
 
- ans := '';
- currfieldn :=1;
- nchars := length(data);
- for charn in 1..nchars loop
+    IF fieldno < 1 OR data IS NULL THEN
+        RETURN data;
+    END IF;
 
-  continue when substring(data,charn,1) <> sep;
-  --if substring(data,charn,1) = sep then
+    fields := string_to_array(data, sep);
 
-  currfieldn=currfieldn+1;
+    IF cardinality(fields) < fieldno THEN
+        fields := fields || array_fill(''::text, ARRAY[fieldno - cardinality(fields)]);
+    END IF;
 
-  if currfieldn=fieldno then
-   ans := substring(data,1,charn-1);
+    fields[fieldno] := replacement;
 
-  elseif currfieldn>fieldno then
-   if ans<>'' then
-    ans := ans || sep || replacement || sep || substring(data,charn+1);
-   else
-    ans := replacement || sep || substring(data,charn+1);
-   end if;
-   return ans;
-  end if;
-
-  --end if;
-
- end loop;
-
- -- deleting beyond the number of existing fields
- if currfieldn<fieldno then
-   if replacement<>'' then
-    data := data || repeat(sep,fieldno-currfieldn)|| replacement;
-   end if;
-  return data;
-  end if;
-
- if replacement<>'' then
-  ans := ans || sep || replacement;
-  end if;
-
- return ans;
-
+    RETURN array_to_string(fields, sep);
 END;
 )V0G0N";
 
-//exodus_split
+/*
+
+-- pgsql test for the exodus.field_store function
+
+WITH tests AS (
+    -- 1 Replace first field, non-empty replacement
+    SELECT 1 AS id, '\x1E'||'b'||'\x1E'||'c' AS input, '\x1E' AS sep, 1 AS fieldno, 'X' AS replacement,
+           'X'||'\x1E'||'b'||'\x1E'||'c' AS expected UNION ALL
+    -- 2 Replace first field, empty replacement
+    SELECT 2, '\x1E'||'b'||'\x1E'||'c', '\x1E', 1, '', '\x1E'||'b'||'\x1E'||'c' UNION ALL
+    -- 3 Replace middle field, non-empty
+    SELECT 3, 'a'||'\x1E'||'\x1E'||'c', '\x1E', 2, 'Y', 'a'||'\x1E'||'Y'||'\x1E'||'c' UNION ALL
+    -- 4 Replace middle field, empty
+    SELECT 4, 'a'||'\x1E'||'\x1E'||'c', '\x1E', 2, '', 'a'||'\x1E'||'\x1E'||'c' UNION ALL
+    -- 5 Replace last field, non-empty
+    SELECT 5, 'a'||'\x1E'||'b'||'\x1E', '\x1E', 3, 'Z', 'a'||'\x1E'||'b'||'\x1E'||'Z' UNION ALL
+    -- 6 Replace last field, empty
+    SELECT 6, 'a'||'\x1E'||'b'||'\x1E', '\x1E', 3, '', 'a'||'\x1E'||'b'||'\x1E' UNION ALL
+    -- 7 Field beyond end, non-empty
+    SELECT 7, 'a'||'\x1E'||'b', '\x1E', 4, 'W', 'a'||'\x1E'||'b'||'\x1E'||'\x1E'||'W' UNION ALL
+    -- 8 Field beyond end, empty
+    SELECT 8, 'a'||'\x1E'||'b', '\x1E', 4, '', 'a'||'\x1E'||'b'||'\x1E'||'\x1E' UNION ALL
+    -- 9 Empty input, replace field 1
+    SELECT 9, '', '\x1E', 1, 'A', 'A' UNION ALL
+    -- 10 Empty input, replace field 3
+    SELECT 10, '', '\x1E', 3, 'B', '\x1E'||'\x1E'||'B' UNION ALL
+    -- 11 Consecutive empty fields, replace second
+    SELECT 11, 'a'||'\x1E'||'\x1E'||'c', '\x1E', 2, 'X', 'a'||'\x1E'||'X'||'\x1E'||'c' UNION ALL
+    -- 12 Consecutive empty fields, replace third
+    SELECT 12, 'a'||'\x1E'||'\x1E'||'c', '\x1E', 3, 'Y', 'a'||'\x1E'||'\x1E'||'Y' UNION ALL
+    -- 13 Single-field string, replace field 1
+    SELECT 13, 'only', '\x1E', 1, 'new', 'new' UNION ALL
+    -- 14 Single-field string, replace field 3 (padding)
+    SELECT 14, 'only', '\x1E', 3, 'added', 'only'||'\x1E'||'\x1E'||'added' UNION ALL
+    -- 15 Field beyond end, replacement empty
+    SELECT 15, 'a', '\x1E', 3, '', 'a'||'\x1E'||'\x1E' UNION ALL
+    -- 16 Replace last field, replacement empty, multiple separators
+    SELECT 16, 'a'||'\x1E'||'b'||'\x1E'||'\x1E', '\x1E', 4, '', 'a'||'\x1E'||'b'||'\x1E'||'\x1E' UNION ALL
+    -- 17 Replace first field, input empty, replacement empty
+    SELECT 17, '', '\x1E', 1, '', '' UNION ALL
+    -- 18 Replace middle field, consecutive empties, replacement non-empty
+    SELECT 18, 'a'||'\x1E'||'\x1E'||'\x1E'||'d', '\x1E', 3, 'X', 'a'||'\x1E'||'\x1E'||'X'||'\x1E'||'d' UNION ALL
+    -- 19 Replace field beyond end, empty input, replacement empty
+    SELECT 19, '', '\x1E', 4, '', '\x1E'||'\x1E'||'\x1E' UNION ALL
+    -- 20 Replace field beyond end, empty input, replacement 'Z'
+    SELECT 20, '', '\x1E', 3, 'Z', '\x1E'||'\x1E'||'Z' UNION ALL
+
+
+-- Special cases: fieldno = 0 and -1
+    SELECT 21 AS id, '' AS input, '\x1E' AS sep, 0 AS fieldno, '' AS replacement, '' AS expected UNION ALL
+    SELECT 22, '', '\x1E', 0, 'x', 'x' UNION ALL
+    SELECT 23, 'a'||'\x1E'||'b'||'\x1E'||'c', '\x1E', 0, '', '' UNION ALL
+    SELECT 24, 'a'||'\x1E'||'b'||'\x1E'||'c', '\x1E', 0, 'x', 'x' UNION ALL
+    SELECT 25, '', '\x1E', -1, '', '' UNION ALL
+    SELECT 26, '', '\x1E', -1, 'x', 'x' UNION ALL
+    SELECT 27, 'a'||'\x1E'||'b'||'\x1E'||'c', '\x1E', -1, '', 'a'||'\x1E'||'b'||'\x1E'||'c'||'\x1E' UNION ALL
+    SELECT 28, 'a'||'\x1E'||'b'||'\x1E'||'c', '\x1E', -1, 'x', 'a'||'\x1E'||'b'||'\x1E'||'c'||'\x1E'||'x'
+
+)
+SELECT
+    id,
+    input,
+    sep,
+    fieldno,
+    replacement,
+    exodus.field_replace(input, sep, fieldno, replacement) AS actual,
+    expected,
+    (exodus.field_replace(input, sep, fieldno, replacement) = expected) AS pass
+FROM tests
+ORDER BY id;
+*/
+
+// OLD BUGGY VERSION
+//var field_remove_sql = R"V0G0N(
+//DECLARE
+// charn int;
+// nchars int;
+// currfieldn int;
+// ans text;
+//
+//BEGIN
+//
+// -- SIMILAR CODE IN FIELD_REMOVE AND FIELD_REPLACE
+//
+// if fieldno<=0 then
+//  if fieldno=0 then
+//   return '';
+//  end if;
+//  return data;
+// end if;
+//
+// ans := '';
+// currfieldn :=1;
+// nchars := length(data);
+// for charn in 1..nchars loop
+//
+//  continue when substring(data,charn,1) <> sep;
+//
+//  --if substring(data,charn,1) = sep then
+//
+//   currfieldn=currfieldn+1;
+//
+//  if currfieldn=fieldno then
+//   ans := substring(data,1,charn-1);
+//
+//  elseif currfieldn>fieldno then
+//   if ans<>'' then
+//    ans := ans || sep || substring(data,charn+1);
+//   else
+//    ans := substring(data,charn+1);
+//   end if;
+//   return ans;
+//  end if;
+//
+//  --end if;
+//
+// end loop;
+//
+// -- deleting beyond the number of existing fields
+// if currfieldn<fieldno then
+//  return data;
+//  end if;
+//
+// return ans;
+//
+//END;
+//)V0G0N";
+
+// OLD BUGGY VERSION
+////exodus.field_replace
+//
+//var field_replace_sql = R"V0G0N(
+//DECLARE
+// charn int;
+// nchars int;
+// currfieldn int;
+// ans text;
+//
+//BEGIN
+//
+// -- SIMILAR CODE IN FIELD_REMOVE AND FIELD_REPLACE
+//
+// if fieldno<=0 then
+//  if fieldno=0 then
+//   return replacement;
+//  end if;
+//  if data='' then
+//   return replacement;
+//  else
+//   return data || sep || replacement;
+//  end if;
+//
+// end if;
+//
+// ans := '';
+// currfieldn :=1;
+// nchars := length(data);
+// for charn in 1..nchars loop
+//
+//  continue when substring(data,charn,1) <> sep;
+//  --if substring(data,charn,1) = sep then
+//
+//  currfieldn=currfieldn+1;
+//
+//  if currfieldn=fieldno then
+//   ans := substring(data,1,charn-1);
+//
+//  elseif currfieldn>fieldno then
+//   if ans<>'' then
+//    ans := ans || sep || replacement || sep || substring(data,charn+1);
+//   else
+//    ans := replacement || sep || substring(data,charn+1);
+//   end if;
+//   return ans;
+//  end if;
+//
+//  --end if;
+//
+// end loop;
+//
+// -- deleting beyond the number of existing fields
+// if currfieldn<fieldno then
+//   if replacement<>'' then
+//    data := data || repeat(sep,fieldno-currfieldn)|| replacement;
+//   end if;
+//  return data;
+//  end if;
+//
+// if replacement<>'' then
+//  ans := ans || sep || replacement;
+//  end if;
+//
+// return ans;
+//
+//END;
+//)V0G0N";
+
+//exodus.split
 
 var split_sql = R"V0G0N(
 DECLARE
@@ -1209,7 +1401,7 @@ END;
 
 )V0G0N";
 
-//exodus_unique
+//exodus.unique
 
 var unique_sql = R"V0G0N(
 DECLARE
@@ -1248,7 +1440,7 @@ RETURN array_to_string(return_array,sepchar,'');
 END;
 )V0G0N";
 
-//exodus_locate
+//exodus.locate
 
 var locate_sql = R"V0G0N(
 DECLARE
@@ -1279,7 +1471,7 @@ BEGIN
 END;
 )V0G0N";
 
-//exodus_isnum -> bool
+//exodus.isnum -> bool
 
 var isnum_sql = R"V0G0N(
 DECLARE
@@ -1303,7 +1495,7 @@ EXCEPTION WHEN others THEN
 END;
 )V0G0N";
 
-//exodus_tobool -> bool
+//exodus.tobool -> bool
 
 var text_tobool_sql = R"V0G0N(
 DECLARE
@@ -1339,14 +1531,14 @@ BEGIN
 END;
 )V0G0N";
 
-//exodus_date -> int
+//exodus.date -> int
 var exodus_todays_date_sql =
 	R"V0G0N(
  return current_date-'1968-1-1'::date;
 )V0G0N";
 
-//exodus_extract_date_array -> date[]
-//almost identical code in exodus_extract_time_array
+//exodus.extract_date_array -> date[]
+//almost identical code in exodus.extract_time_array
 
 var exodus_extract_date_array_sql = R"V0G0N(
 DECLARE
@@ -1375,8 +1567,8 @@ BEGIN
 END;
 )V0G0N";
 
-//exodus_extract_time_array -> interval[]
-//almost identical code in exodus_extract_date_array
+//exodus.extract_time_array -> interval[]
+//almost identical code in exodus.extract_date_array
 
 var exodus_extract_time_array_sql = R"V0G0N(
 DECLARE
@@ -1405,7 +1597,7 @@ BEGIN
 END;
 )V0G0N";
 
-//exodus_addcent4 -> text
+//exodus.addcent4 -> text
 
 var exodus_addcent4_sql = R"V0G0N(
 DECLARE
