@@ -1,4 +1,5 @@
 #!/bin/bash
+[ "$EXO_INSTALL_SH" ] || { EXO_INSTALL_SH=1 exec bash "$0" "$@" 2>&1 | tee -a "$(echo ${0##*/}.$*.$(printf "%04d" $(( RANDOM % 10000 ))).log | tr ' :@' '.__')"; exit; }
 set -euxo pipefail
 PS4='+ [lxc_all ${SECONDS}s] '
 : $0$*
@@ -37,7 +38,7 @@ PS4='+ [lxc_all ${SECONDS}s] '
 : ------
 :
 	BASE_CONTAINERS=${1:?BASE_CONTAINERS is required. e.g u2404 or using commas: u2404,u2202. Must exist and will be copied.}
-	STAGES=${2:?Stages is required e.g. A for all or any consecutive chars of 'bBdDTW'}
+	STAGES=${2:?Stages is required e.g. A for all except W, AW for all, or any consecutive chars of 'bBdDTW'}
 	COMPILERS=${3:-clang}
 
 :
@@ -92,8 +93,7 @@ PS4='+ [lxc_all ${SECONDS}s] '
 			fi
 
 			export CXX_OPTIONS=-fdiagnostics-color=always
-			LOGFILE=${OS}${COMPILER:0:1}-$STAGES.log
-			./install_lxc.sh $OS ${OS} $STAGES $COMPILER |& tee $LOGFILE
+			./install_lxc.sh $OS ${OS} $STAGES $COMPILER
 
 		done # next compiler
 	done # next OS

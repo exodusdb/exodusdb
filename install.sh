@@ -1,5 +1,5 @@
 #!/bin/bash
-[ $SHLVL -le 3 ] && exec > >(tee -a "$(echo ${0##*/}.$*.0${RANDOM:0:4}.log | tr ' :' '._')") 2>&1
+[ "$EXO_INSTALL_SH" ] || { EXO_INSTALL_SH=1 exec bash "$0" "$@" 2>&1 | tee -a "$(echo ${0##*/}.$*.$(printf "%04d" $(( RANDOM % 10000 ))).log | tr ' :@' '.__')"; exit; }
 set -euxo pipefail
 PS4='+ [ins ${1:-?} ${SECONDS}s] '
 :
