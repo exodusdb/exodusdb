@@ -1,9 +1,11 @@
 #!/bin/bash
+[ "$INSTALL_SH" ] || { INSTALL_SH=1 exec bash "$0" "$@" 2>&1 | tee -a "$(echo ${0##*/}.$*.$(printf "%04d" $(( RANDOM % 10000 ))).log | tr ' :@' '.__')"; exit "${PIPESTATUS[0]}"; }
 set -euxo pipefail
-:
-: -------------------------------------------------------
+PS4='+ [$0 ${SECONDS}s] '
+: $0 $*
+: =======================================================
 : Download, build and install the full exodus environment
-: -------------------------------------------------------
+: =======================================================
 :
 : Includes libexodus, exodus cli, c++ compiler and postgresql database.
 :

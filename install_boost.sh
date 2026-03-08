@@ -1,15 +1,17 @@
 #!/bin/bash
+[ "$INSTALL_SH" ] || { INSTALL_SH=1 exec bash "$0" "$@" 2>&1 | tee -a "$(echo ${0##*/}.$*.$(printf "%04d" $(( RANDOM % 10000 ))).log | tr ' :@' '.__')"; exit "${PIPESTATUS[0]}"; }
 set -euxo pipefail
 PS4='+ [boost ${SECONDS}s] '
-:
+: $0 $*
 : =============================================================================
-: 'Build Boost with Clang + libc++ on Ubuntu LTS'
+: Build Boost with Clang + libc++ on Ubuntu LTS
+: =============================================================================
+:
 : 'Output: libs especially regex & locale without libstdc++.so dependency'
 : 'Default is Boost 1.90.0, requires and discovers latest /usr/local/icu-libcxx-NN.N'
 :
 : './install_boost.sh [BOOST_VER] # default is 1.90.0'
 :
-: =============================================================================
 	BOOST_VER=${1:-1.90.0}
 :
 : Config
