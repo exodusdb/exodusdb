@@ -353,8 +353,6 @@ function download_submodules {
 	if [[ -z $SERVER_PG_VER ]]; then
 #        yes | sudo /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh || true
 		SERVER_PG_VER=$(apt-cache search postgresql-server-* 2> /dev/null|grep -o -P 'dev-[0-9]{2}\b'|sort|tail -n1|cut -d- -f2||true)
-		PG_VER=$SERVER_PG_VER
-		PG_VER_SUFFIX=-$PG_VER
 	fi
 
 	if [[ -z $SERVER_PG_VER ]]; then
@@ -435,6 +433,30 @@ function get_dependencies_for_build_and_install {
 : Get the full postgres debian repos IF we require a specific version
 : -------------------------------------------------------------------
 	if [[ -n $PG_VER ]]; then
+
+		PIN_FILE="/etc/apt/preferences.d/pgdg-no-auto.pref"
+		cat > "${PIN_FILE}" <<-'EOF'
+
+			#  Purpose: Prevent automatic upgrades/downgrades from the PGDG repository
+			#           while still allowing explicit installation of packages from it.
+
+			# Prevent automatic upgrades from PostgreSQL PGDG repository
+			# (https://apt.postgresql.org)
+			#
+			# Priority 100 = install only when explicitly requested with -t <suite>-pgdg
+			# Distro packages remain at default 500
+
+			Package: *
+			Pin: origin "apt.postgresql.org"
+			Pin-Priority: 100
+
+			# Optional: even stricter – also pin packages with .pgdg suffix very low
+			# (usually not needed if the origin pin is enough)
+			# Package: *pgdg*
+			# Pin: release o=apt.postgresql.org
+			# Pin-Priority: 100
+		EOF
+
 		yes | sudo /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh || true
 	fi
 
