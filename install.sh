@@ -351,7 +351,10 @@ function download_submodules {
 : 2. From latest version available in apt
 :
 	if [[ -z $SERVER_PG_VER ]]; then
+#        yes | sudo /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh || true
 		SERVER_PG_VER=$(apt-cache search postgresql-server-* 2> /dev/null|grep -o -P 'dev-[0-9]{2}\b'|sort|tail -n1|cut -d- -f2||true)
+		PG_VER=$SERVER_PG_VER
+		PG_VER_SUFFIX=-$PG_VER
 	fi
 
 	if [[ -z $SERVER_PG_VER ]]; then
