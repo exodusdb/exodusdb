@@ -22,17 +22,18 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-// in case of migration to db2 or mysql here is a very detailed comparison in 2006
-// http://www.ibm.com/developerworks/data/library/techarticle/dm-0606khatri/
-
+// EXODUS environment variables override .config/exodus.conf
+// and pqlib defaults but not connection arguments
+//  EXO_CONN EXO_HOST EXO_PORT EXO_USER EXO_DATA EXO_PASS
+// pqlib built in defaults
 // http://www.postgresql.org/docs/8.3/static/libpq-envars.html
-// PGHOST/PGHOSTADDR
-// PGPORT
-// PGDATABASE
-// PGUSER
-// PGPASSWORD
-// PGPASSFILE defaults to ~/.pgpass
-// PGSERVICE in pg_service.conf in PGSYSCONFDIR
+//  PGHOST/PGHOSTADDR
+//  PGPORT
+//  PGDATABASE
+//  PGUSER
+//  PGPASSWORD
+//  PGPASSFILE defaults to ~/.pgpass
+//  PGSERVICE in pg_service.conf in PGSYSCONFDIR
 
 // TODO sql quoting of all parameters like dbname filename etc to prevent sql injection.
 
