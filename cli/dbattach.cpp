@@ -42,29 +42,21 @@ func main() {
 			"\n"
 			"    Current user must have access to the foreign database.\n"
 			"\n"
-			"    If EXO_USER and EXO_PASS are not set then exodus defaults are used.\n"
-			"\n"
-			"    exodus .config file is not used currently.\n"
+			"    If EXO_USER and EXO_PASS are not set then exodus .config file is used.\n"
 			;
-
 		abort(syntax);
 	}
 
-	// TODO Get user from .config/Allow control
-	var dbcode = osgetenv("EXO_DATA");
-	if (not dbcode)
-		dbcode = "exodus";
+	auto getconfigvalue = [](in key) -> auto {
+		static let config = osread("~/.config/exodus/exodus.cfg");
+		rex re(var("(KEY=)([^\\s]+)").replace("KEY", key));
+		return config.match(re).f(1, 3);
+	};
 
-	// TODO Get user from .config/Allow control
-	var dbuser1 = osgetenv("EXO_USER");
-	if (not dbuser1)
-		dbuser1 = "exodus";
-
-	// TODO Allow control over dbuser2/dbpass2
+	var dbcode = osgetenv("EXO_DATA")?: getconfigvalue("dbname");
+	var dbuser1 = osgetenv("EXO_USER")?: getconfigvalue("user");
 	let dbuser2 = dbuser1;
-	var dbpass2 = osgetenv("EXO_PASS");
-	if (not dbpass2)
-		dbpass2 = "somesillysecret";
+	var dbpass2 = osgetenv("EXO_PASS")?: getconfigvalue("password");
 
 	// Default connection
 	var conn1;

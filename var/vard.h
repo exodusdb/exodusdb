@@ -43,16 +43,20 @@ public:
 
 	// Establish a connection to a database.
 	// conninfo: The DB connection string parameters are merged from the following places in descending priority.
-	// 1. Provided in connect()'s conninfo argument. See the last option. for the complete list of parameters.
-	// 2. Any environment variables EXO_HOST EXO_PORT EXO_USER EXO_DATA EXO_PASS EXO_TIME
-	// 3. Any parameters found in a configuration file at ~/.config/exodus/exodus.cfg
-	// 4. The default conninfo is "host=127.0.0.1 port=5432 dbname=exodus user=exodus password=somesillysecret connect_timeout=10"
-	// Setting environment variable EXO_DBTRACE=1 will cause tracing of DB interface including SQL commands.
+	// 1. Provided in connect()'s conninfo argument. See postgresql doc for the complete list of parameters.
+	// 2. Environment variables EXO_HOST EXO_PORT EXO_DATA EXO_USER EXO_PASS EXO_TIME
+	// 3. Environment variables PGHOST PGPORT PGDATABASE PGUSER PGPASSWORD PGTIMEPASSWORD
+	// 4. Any parameters found in a configuration file at ~/.config/exodus/exodus.cfg
+	// 5. The default conninfo "dbname=exodus user=exodus password=somesillysecret connect_timeout=10"
+	// Omitting host= or setting it to something like /var/run/postgresql causes connection on local raw socket which may require configuring postgresql permissions e.g. "local all exodus scram-sha-256".
+	// Setting host= to a host or domain name or ip no causes tcp/ip connection.
+	// Setting username= when connecting via local raw socket causes password-less peer authentication using the current linux process username.
 	// dbconn[out]: Becomes a reference or handle for future functions that require a connection argument.
-	// For all the various DB function calls, the dbconn or operative var can be either:
+	// For all the various DB function calls, the dbconn argument or operative var can be either:
 	// * A DB connection created with dbconnect().
 	// * A file var created with open().
 	// * Any var. A default connection will be established on the fly.
+	// Setting environment variable EXO_DBTRACE=1, 2 or 3 will cause tracing of DB interface including SQL commands.
 	//
 	// `var dbconn = "exodus";
 	//  if (not dbconn.connect("dbname=exodus user=exodus password=somesillysecret")) ...;

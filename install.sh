@@ -861,7 +861,24 @@ function install_database {
 ##	sudo systemctl restart postgresql
 #:
 #	cd $EXODUS_DIR/build/pgexodus && CTEST_OUTPUT_ON_FAILURE=1 ctest
-
+:
+: -------------------------------------------------------------------------
+: Allow password login on local socket connection
+: -------------------------------------------------------------------------
+:
+: # exodus allow password login on local socket connection
+: # Twice as fast as tcp/ip socket
+: #
+: #conn   #db   #user  #method
+: local   all   exodus scram-sha-256
+:
+	PASS_METHOD=scram-sha-256
+	PG_HBA=/etc/postgresql/$PG_VER/main/pg_hba.conf
+:
+	if ! grep -qE "^[[:space:]]*local[[:space:]]+all[[:space:]]+exodus[[:space:]]+$PASS_METHOD" $PG_HBA; then
+		sed -i "1i#\n# Allow exodus password login on local socket connection\n# Twice as fast as tcp/ip connection\n#\n#conn   #db   #user  #method\nlocal   all   exodus $PASS_METHOD\n" $PG_HBA
+	fi
+	sudo systemctl restart postgresql
 :
 : -------------------------------
 : Configure postgresql for exodus
@@ -931,11 +948,15 @@ V0G0N
 	sudo -u postgres psql $PSQL_PORT_OPT exodus < $EXODUS_DIR/install_template1.sql
 
 :
-: Configure exodus for postgres
+: Configure exodus for postgres - Omit host means use local db socket connection
 : -----------------------------
 :
-	mkdir -p ~/.config/exodus
-	echo "host=127.0.0.1 port=${EXO_PORT:-5432} dbname=exodus user=exodus password=somesillysecret" > ~/.config/exodus/exodus.cfg
+	EXODUS_CFG=~/.config/exodus/exodus.cfg
+	mkdir -p ${EXODUS_CFG%/*}
+	rm -rf $EXODUS_CFG
+#	printf "host=127.0.0.1 " > $EXODUS_CFG           # Slow tcp/ip connection
+	printf "host=/var/run/postgresql " > $EXODUS_CFG # Fast Unix socket connection
+	printf "port=${EXO_PORT:-5432} dbname=exodus user=exodus password=somesillysecret\n" >> $EXODUS_CFG
 #
 # Already done as part of the extension installation
 #:

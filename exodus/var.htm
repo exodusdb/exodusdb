@@ -595,7 +595,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <span class="s">&gt;&gt;&gt;&gt;//aaa one indent removed</span>
 <span class="s">&gt;&gt;&gt;&gt;....//bbb double indent - one preserved</span>
 <span class="s">&gt;&gt;&gt;&gt;//ccc one indent removed</span>
-<span class="s">    </span><span class="dl">)!</span><span class="s">&quot;</span><span class="n">_heredoc</span><span class="p">;</span>
+<span class="s">    </span><span class="dl">)!</span><span class="s">&quot;</span><span class="kt">_heredoc</span><span class="p">;</span>
 </pre>
 			</p>
 		</td></tr>
@@ -4762,20 +4762,24 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 			<p>
 				<em>conninfo:</em> The DB connection string parameters are merged from the following places in descending priority.</p>
 			<ol>
-				<li>Provided in connect()'s conninfo argument. See the last option. for the complete list of parameters.</li>
-				<li>Any environment variables EXO_HOST EXO_PORT EXO_USER EXO_DATA EXO_PASS EXO_TIME</li>
+				<li>Provided in connect()'s conninfo argument. See postgresql doc for the complete list of parameters.</li>
+				<li>Environment variables EXO_HOST EXO_PORT EXO_DATA EXO_USER EXO_PASS EXO_TIME</li>
+				<li>Environment variables PGHOST PGPORT PGDATABASE PGUSER PGPASSWORD PGTIMEPASSWORD</li>
 				<li>Any parameters found in a configuration file at ~/.config/exodus/exodus.cfg</li>
-				<li>The default conninfo is "host=127.0.0.1 port=5432 dbname=exodus user=exodus password=somesillysecret connect_timeout=10"</li>
+				<li>The default conninfo "dbname=exodus user=exodus password=somesillysecret connect_timeout=10"</li>
 			</ol>
-			<p>Setting environment variable EXO_DBTRACE=1 will cause tracing of DB interface including SQL commands.</p>
+			<p>Omitting host= or setting it to something like /var/run/postgresql causes connection on local raw socket which may require configuring postgresql permissions e.g. "local all exodus scram-sha-256".</p>
+			<p>Setting host= to a host or domain name or ip no causes tcp/ip connection.</p>
+			<p>Setting username= when connecting via local raw socket causes password-less peer authentication using the current linux process username.</p>
 			<p>
 				<em>dbconn[out]:</em> Becomes a reference or handle for future functions that require a connection argument.</p>
-			<p>For all the various DB function calls, the dbconn or operative var can be either:</p>
+			<p>For all the various DB function calls, the dbconn argument or operative var can be either:</p>
 			<ul>
 				<li>A DB connection created with dbconnect().</li>
 				<li>A file var created with open().</li>
 				<li>Any var. A default connection will be established on the fly.</li>
 			</ul>
+			<p>Setting environment variable EXO_DBTRACE=1, 2 or 3 will cause tracing of DB interface including SQL commands.</p>
 			<p>
 				<pre><span class="kt">var</span><span class="w"> </span><span class="n">dbconn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;exodus&quot;</span><span class="p">;</span>
 <span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="ow">not</span><span class="w"> </span><span class="n">dbconn</span><span class="p">.</span><span class="nf">connect</span><span class="p">(</span><span class="s">&quot;dbname=exodus user=exodus password=somesillysecret&quot;</span><span class="p">))</span><span class="w"> </span><span class="p">...;</span>

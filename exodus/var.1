@@ -4969,21 +4969,29 @@ Establish a connection to a database.
 \fBconninfo:\fR The DB connection string parameters are merged from the following places in descending priority.
 .sp 0
 .br
-1. Provided in connect()'s conninfo argument. See the last option. for the complete list of parameters.
+1. Provided in connect()'s conninfo argument. See postgresql doc for the complete list of parameters.
 .br
-2. Any environment variables EXO_HOST EXO_PORT EXO_USER EXO_DATA EXO_PASS EXO_TIME
+2. Environment variables EXO_HOST EXO_PORT EXO_DATA EXO_USER EXO_PASS EXO_TIME
 .br
-3. Any parameters found in a configuration file at ~/.config/exodus/exodus.cfg
+3. Environment variables PGHOST PGPORT PGDATABASE PGUSER PGPASSWORD PGTIMEPASSWORD
 .br
-4. The default conninfo is "host=127.0.0.1 port=5432 dbname=exodus user=exodus password=somesillysecret connect_timeout=10"
+4. Any parameters found in a configuration file at ~/.config/exodus/exodus.cfg
+.br
+5. The default conninfo "dbname=exodus user=exodus password=somesillysecret connect_timeout=10"
 .PP
-Setting environment variable EXO_DBTRACE=1 will cause tracing of DB interface including SQL commands.
+Omitting host= or setting it to something like /var/run/postgresql causes connection on local raw socket which may require configuring postgresql permissions e.g. "local all exodus scram-sha-256".
+.sp 0
+.PP
+Setting host= to a host or domain name or ip no causes tcp/ip connection.
+.sp 0
+.PP
+Setting username= when connecting via local raw socket causes password-less peer authentication using the current linux process username.
 .sp 0
 .PP
 \fBdbconn[out]:\fR Becomes a reference or handle for future functions that require a connection argument.
 .sp 0
 .PP
-For all the various DB function calls, the dbconn or operative var can be either:
+For all the various DB function calls, the dbconn argument or operative var can be either:
 .sp 0
 .br
 \(bu A DB connection created with dbconnect().
@@ -4991,6 +4999,9 @@ For all the various DB function calls, the dbconn or operative var can be either
 \(bu A file var created with open().
 .br
 \(bu Any var. A default connection will be established on the fly.
+.PP
+Setting environment variable EXO_DBTRACE=1, 2 or 3 will cause tracing of DB interface including SQL commands.
+.sp 0
 .PP
 .PP
 \fBExample:\fR

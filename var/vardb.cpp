@@ -249,8 +249,8 @@ Within transactions, lock requests for locks that have already been obtained alw
 #include "timebank.h"
 #endif
 
+// DBTRACE starts life at -1 but is initialised in the first connection from env EXO_DBTRACE
 #define DBTRACE_SELECT DBTRACE>1
-
 #define DBTRACE_CONN DBTRACE
 
 #define DEBUG_LOG_SQL0 if (DBTRACE) {\
@@ -276,10 +276,18 @@ static inline int DBTRACE = -1;
 //#define EXO_DBTRACE
 using let = const var;
 
-// The idea is for exodus to have access to one standard database without secret password
-static const var defaultconninfo =
-	"host=127.0.0.1 port=5432 dbname=exodus user=exodus "
-	"password=somesillysecret connect_timeout=10";
+//// The idea is for exodus to have access to one standard database without secret password
+//static const var defaultconninfo =
+////	"host=127.0.0.1 port=5432 dbname=exodus user=exodus "
+//// PGDATABASE
+//// PGUSER
+//// PGPASSWORD
+//	"dbname=exodus user=exodus "
+//	"password=somesillysecret connect_timeout=10";
+//constexpr const char* default_data = "exodus";
+//constexpr const char* default_time = "10";
+//constexpr const char* default_user = "exodus";
+//constexpr const char* default_pass = "somesillysecret";
 
 // this front end C interface is based on postgres
 // http://www.postgresql.org/docs/8.2/static/libpq-exec.html
@@ -704,48 +712,41 @@ static var build_conn_info(in conninfo) {
 	if (not result.contains("host=") or not result.contains("port=") or not result.contains("dbname=") or
 		not result.contains("user=") or not result.contains("password=")) {
 
-		// Discover any configuration file parameters
+		// Discover any configuration in the CONFIGURATION files
 		// TODO parse config properly instead of just changing \r\n to spaces!
-		var configfilename = "";
-		var home = "";
-		if (home.osgetenv("HOME"))
-			configfilename = home ^ "/.config/exodus/exodus.cfg";
-		else if (home.osgetenv("USERPROFILE"))
-			configfilename ^= home ^ "\\Exodus\\.exodus";
-		var configconn = "";
-		if (not configconn.osread(configfilename) and not configconn.osread("exodus.cfg"))
-			configconn = "";
-		// postgres ignores after \n?
-		configconn.converter("\r\n","  ");
+		static const var configconn = []() {
+			var configconn = "";
+			var configfilename = "";
+			var home = "";
+			if (home.osgetenv("HOME"))
+				configfilename = home ^ "/.config/exodus/exodus.cfg";
+			else if (home.osgetenv("USERPROFILE"))
+				configfilename ^= home ^ "\\Exodus\\.exodus";
+			if (not configconn.osread(configfilename) and not configconn.osread("exodus.cfg"))
+				configconn = "";
+			// postgres ignores after \n?
+			configconn.converter("\r\n","  ");
+			configconn.trimmer();
+			return configconn;
+		}();
 
-		// Discover any configuration in the environment
-		var envconn = "";
-		var temp;
-		if (temp.osgetenv("EXO_CONN") and temp)
-			envconn ^= " " ^ temp;
+		// Discover any configuration in the ENVIRONMENT
+		static const var envconn = []() {
+			var envconn = "";
+			var temp;
 
-		// Specific variables are appended ie override
-		if (temp.osgetenv("EXO_HOST") and temp)
-			envconn ^= " host=" ^ temp;
+			if (temp.osgetenv("EXO_CONN") and temp)
+				envconn.appender(temp, " ");
 
-		if (temp.osgetenv("EXO_PORT") and temp)
-			envconn ^= " port=" ^ temp;
+			let exocodes = "EXO_HOST]host^EXO_PORT]port^EXO_DATA]dbname^EXO_USER]user^EXO_PASS]password"_var;
+			for (const var exocode : exocodes) {
+				if (temp.osgetenv(exocode.f(1, 1)) and not temp.empty())
+					envconn.appender(exocode.f(1,2), "=", temp, " ");
+			}
+			return envconn.pop();
+		}();
 
-		if (temp.osgetenv("EXO_USER") and temp)
-			envconn ^= " user=" ^ temp;
-
-		if (temp.osgetenv("EXO_DATA") and temp) {
-			envconn.replacer(R"(dbname\s*=\s*\w*)"_rex, "");
-			envconn ^= " dbname=" ^ temp;
-		}
-
-		if (temp.osgetenv("EXO_PASS") and temp)
-			envconn ^= " password=" ^ temp;
-
-		if (temp.osgetenv("EXO_TIME") and temp)
-			envconn ^= " connect_timeout=" ^ temp;
-
-		result = defaultconninfo ^ " " ^ configconn ^ " " ^ envconn ^ " " ^ result;
+		result = configconn ^ " " ^ envconn ^ " " ^ result;
 	}
 
 	// Remove excess spaces. Especially around = to enable parsing using space
@@ -764,7 +765,8 @@ static var build_conn_info(in conninfo) {
 			continue;
 		keys ^= key ^ VM;
 
-		result ^= part ^ " ";
+		if (not part.field("=", 2).empty())
+			result ^= part ^ " ";
 	}
 	result.popper();
 
@@ -857,28 +859,29 @@ bool var_db::connect(in conninfo) {
 	fullconninfo = build_conn_info(fullconninfo);
 
 	// Log the conninfo without password
-	if (DBTRACE_CONN > 1) {
-//		fullconninfo.replace(R"(password\s*=\s*\w*)"_rex, "password=**********").logputl("\nvar::connect( ) ");
-		fullconninfo.replace(R"(password\s*=\s*\w*)"_rex, "").logputl("\nvar::connect( ) ");
+	if (DBTRACE_CONN > 0) {
+		fullconninfo.replace(R"(password\s*=\s*\w*)"_rex, "pass****=********").logputl("\nvar::connect( ) ");
 	}
 
+	// Raw pointer requires careful storage in thread_dbpool or PQfinish
+	// TODO use RAII for confidence and safety
 	PGconn* pgconn;
-	for (;;) {
+//	for (;;) {
 
 		// Attempt connection
 		pgconn = PQconnectdb(fullconninfo.var_str.c_str());
 
-		// Connected OK
-		if (PQstatus(pgconn) == CONNECTION_OK or fullconninfo)
-			break;
-
-		// Required even if connect fails according to docs
-		PQfinish(pgconn);
-
-		// Try again with default conninfo
-		fullconninfo = defaultconninfo;
-
-	}
+//		// Connected OK
+//		if (PQstatus(pgconn) == CONNECTION_OK or fullconninfo)
+//			break;
+//
+//		// Required even if connect fails according to docs
+//		PQfinish(pgconn);
+//
+//		// Try again with default conninfo
+//		fullconninfo = defaultconninfo;
+//
+//	}
 
 	// Failed to connect so return false
 	if (PQstatus(pgconn) != CONNECTION_OK) UNLIKELY {
