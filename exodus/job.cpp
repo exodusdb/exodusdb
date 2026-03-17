@@ -168,8 +168,8 @@ Job::Job (
 				promise->set_value(std::move(*shared_env));
 
 		} catch (VarError& e) {
-			std::cerr << "Job: " << command << std::endl;
-			std::cerr << e.message << std::endl;
+			std::cerr << "VarError: Job: command: " << command << std::endl;
+			std::cerr << "VarError: " << var(e.message).quote() << std::endl;
 			std::cerr << var(e.stack()).convert(_FM, _NL) << std::endl;
 			// Push abnormal result
 			shared_env->ANS = "";
@@ -179,7 +179,7 @@ Job::Job (
 			promise->set_exception(std::current_exception());
 
 		} catch (std::exception& e) {
-			std::cerr << "Error: std::exception: " << e.what() << " Job: " << command << std::endl;
+			std::cerr << "Error: std::exception: " << e.what() << " Job: command: " << command << std::endl;
 			// Push abnormal result
 			shared_env->ANS = "";
 			if (result_queuex) {
@@ -188,7 +188,7 @@ Job::Job (
 			promise->set_exception(std::current_exception());
 
 		} catch (...) {
-			std::cerr << "Error: Unknown error. Job: " << command << std::endl;
+			std::cerr << "Error: Unknown error. Job: command: " << command << std::endl;
 			// Push abnormal result
 			shared_env->ANS = "";
 			if (result_queuex) {

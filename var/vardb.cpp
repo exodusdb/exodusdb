@@ -5411,8 +5411,11 @@ bool var_db::createindex(in fieldname0, in dictfile) const {
 	var actualdictfile;
 	if (dictfile.assigned() and dictfile != "")
 		actualdictfile = dictfile;
-	else
+	else {
 		actualdictfile = "dict." ^ filename;
+		if (not actualdictfile.open(actualdictfile))
+			return false;
+	}
 
 	// Example sql
 	// create index ads__brand_code on ads (exodus.extract_text(data,3,0,0));
