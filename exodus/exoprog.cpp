@@ -2172,11 +2172,24 @@ var ExoProgram::exoprog_number(in type, in input0, in ndecs0, out outx) {
 		zz = "Z";
 	}
 
-	// Remove all thousands separators (comma or dot)
-	// depending on BASEFMT
-	// Also remove all spaces
+	//// Remove all thousands separators (comma or dot)
+	//// depending on BASEFMT
+	//// Also remove all spaces
 	var input;
-	if (BASEFMT.starts("MC")) {
+	//if (BASEFMT.starts("MC")) {
+	//  // ASSUME the number format is in Euro style (1.234,5)
+	//	input = input0.convert(". ", "");
+	//} else {
+	//  // ASSUME the number format is in Normal style (1,234.5)
+	//	input = input0.convert(", ", "");
+	//}
+	// This code was originally executed for ICONV only, then was later changed to execute for OCONV too.
+	// But this meant that if internal MD amounts in database were OCONVed to MC,
+	// then the decimal point is lost!
+	// e.g 1234.56 (MD amt in database) --> OCONV (basefmt=MC) --> (remove '.' and ' ') ==> 123456 !
+	// Reverted to old code, which effectively removed the thou sep (.) if ICONV-ing and BASEFMT is MC
+
+	if (type == "ICONV" and BASEFMT.starts("MC")) {
 		input = input0.convert(". ", "");
 	} else {
 		input = input0.convert(", ", "");
