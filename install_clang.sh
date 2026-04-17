@@ -36,11 +36,13 @@ PS4='+ [clang ${SECONDS}s] '
 :
 	curl -LOs https://apt.llvm.org/llvm.sh
 	chmod +x llvm.sh
-	sudo ./llvm.sh $CLANG_VER
+	sudo ./llvm.sh $CLANG_VER || {
+:		Not available for our OS
+	}
 :
 : 2. Install all the important and useful clang packages
 :
-	sudo apt -y install clang-$CLANG_VER lld-$CLANG_VER libc++-$CLANG_VER-dev libc++abi-$CLANG_VER-dev clang-tools-$CLANG_VER
+	sudo apt -y install clang-$CLANG_VER lld-$CLANG_VER libc++-$CLANG_VER-dev libc++abi-$CLANG_VER-dev clang-tools-$CLANG_VER lldb-$CLANG_VER
 :
 : Optional but very useful extras
 :

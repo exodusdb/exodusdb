@@ -207,7 +207,7 @@ function APT_INSTALL {
 	#CMD_RETRY sudo apt-get install -y $*
 	NEEDRESTART_MODE=a \
 	DEBIAN_FRONTEND=noninteractive \
-	apt-get -y\
+	sudo apt-get -y\
 		-o Dpkg::Options::=--force-confdef \
 		-o Dpkg::Options::=--force-confold \
 		-o Acquire::http::Timeout=120 \
@@ -875,8 +875,8 @@ function install_database {
 	PASS_METHOD=scram-sha-256
 	PG_HBA=/etc/postgresql/$PG_VER/main/pg_hba.conf
 :
-	if ! grep -qE "^[[:space:]]*local[[:space:]]+all[[:space:]]+exodus[[:space:]]+$PASS_METHOD" $PG_HBA; then
-		sed -i "1i#\n# Allow exodus password login on local socket connection\n# Twice as fast as tcp/ip connection\n#\n#conn   #db   #user  #method\nlocal   all   exodus $PASS_METHOD\n" $PG_HBA
+	if ! sudo grep -qE "^[[:space:]]*local[[:space:]]+all[[:space:]]+exodus[[:space:]]+$PASS_METHOD" $PG_HBA; then
+		sudo sed -i "1i#\n# Allow exodus password login on local socket connection\n# Twice as fast as tcp/ip connection\n#\n#conn   #db   #user  #method\nlocal   all   exodus $PASS_METHOD\n" $PG_HBA
 	fi
 	sudo systemctl restart postgresql
 :
