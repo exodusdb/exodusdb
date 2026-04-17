@@ -234,13 +234,18 @@ func main() {
 			let f1 = RECORD.f(1);
 			if (generate and isdict and f1 and var("FS").contains(RECORD.f(1))) {
 
+				var errmsg = "syncdat: Error: In " ^ filepath.quote() ^ " ";
+				let hints = "\nHINT: If previous fields have line continuation marker '\', ensure the marker is the last character on it's line (e.g 'v1 = 10;\\ ' is invalid)";
+
 				// Check justification
 				if (not var("LRTC").contains(RECORD.f(9)))
-					abort("syncdat: Error: In " ^ filepath.quote() ^ " Field 9 of F/S dict items cannot be " ^ RECORD.f(9).quote() ^ "\nField 9 of F/S dict items must be L, R, C, T.");
+					//abort("syncdat: Error: In " ^ filepath.quote() ^ " Field 9 of F/S dict items cannot be " ^ RECORD.f(9).quote() ^ "\nField 9 of F/S dict items must be L, R, C, T.");
+					abort(errmsg ^ "Field 9 of F/S dict items must be L, R, C, T.\nField 9=" ^ RECORD.f(9).quote() ^ hints);
 
 				// Check width
 				if (not RECORD.f(10).isnum())
-					abort("syncdat: Error: In " ^ filepath.quote() ^ " Field 10 of F/S items cannot be " ^ RECORD.f(10).quote() ^ "\nField 10 of F/S items must be numeric");
+					//abort("syncdat: Error: In " ^ filepath.quote() ^ " Field 10 of F/S items cannot be " ^ RECORD.f(10).quote() ^ "\nField 10 of F/S items must be numeric");
+					abort(errmsg ^ "Field 10 of F/S items must be numeric.\nField 10=" ^ RECORD.f(10).quote() ^ hints);
 			}
 
 			// Add it to new_cpp_text
