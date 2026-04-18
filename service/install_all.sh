@@ -57,14 +57,14 @@ function APT_GET {
 :
 	[ ${EXODUS_DIR:0:6} = /root/ ] && chmod o+x /root
 
-:
-: Install chromium to convert html to pdf
-: =======================================
-:
-:  Dont wait for it to complete. Install will be tested near the end of this script.
-:
-#	sudo snap refresh
-	sudo snap services chromium 2> /dev/null || sudo snap install chromium --no-wait
+#:
+#: Install chromium to convert html to pdf
+#: =======================================
+#:
+#:  Dont wait for it to complete. Install will be tested near the end of this script.
+#:
+##	sudo snap refresh
+#	sudo snap services chromium 2> /dev/null || sudo snap install chromium --no-wait
 
 :
 : Install apache with php and configure a site
@@ -156,7 +156,7 @@ function APT_GET {
 :	postfix     email handler
 :	mailutils   NOT installed. like bsd-mailx but doesnt have identical options
 :	qrencode    used in htmllib2 for KSA invoices
-:	jq          Only to display chromium snap versions available
+#:	jq          Only to display chromium snap versions available
 :
 	APT_GET sudo DEBIAN_FRONTEND=noninteractive apt-get -y install whois postfix bsd-mailx
 :
@@ -221,38 +221,52 @@ function APT_GET {
 :
 	which pdfgrep || APT_GET sudo DEBIAN_FRONTEND=noninteractive apt-get -y install pdfgrep
 
+#:
+#: Display chromium snap versions available
+#: ========================================
+#:
+#	snapname="chromium"
+#	curl -s -H "Snap-Device-Series: 16" \
+#	     -H "Snap-Device-Architecture: $(uname -m)" \
+#	     "https://api.snapcraft.io/v2/snaps/info/$snapname" \
+#	| jq -r '.["channel-map"][] | "Version: \(.version), Rev: \(.revision), Channel: \(.channel.name)"' \
+#	| sort -rV || true  # sort by version descending. ignore failure.
+#
+#:
+#: Wait for chromium snap install to complete
+#: ===========================================
+#:
+#: Wait up to 5x2 mins for snap installation to complete. Can randomly fail. Just redo.
+#:
+#	for x in {1..5}; do
+#		snap changes | grep chromium || true
+#		timeout 120 bash -c 'while snap changes | grep chromium | grep -Pqw "Do|Doing"; do sleep 5; done; snap changes | grep chromium | grep -q Done && echo "Chromium installation done" || echo "Chromium installation failed or not found"' || echo "Timed out."
+#	done
+#	snap changes | grep chromium || true
+#:
+#	which chromium
+#	snap refresh chromium
 :
-: Display chromium snap versions available
-: ========================================
+: Remove snap chromium if installed
+: =================================
 :
-	snapname="chromium"
-	curl -s -H "Snap-Device-Series: 16" \
-	     -H "Snap-Device-Architecture: $(uname -m)" \
-	     "https://api.snapcraft.io/v2/snaps/info/$snapname" \
-	| jq -r '.["channel-map"][] | "Version: \(.version), Rev: \(.revision), Channel: \(.channel.name)"' \
-	| sort -rV || true  # sort by version descending. ignore failure.
-
+	if which chromium; then
+		snap remove --purge chromium || true
+	fi
 :
-: Wait for chromium snap install to complete
-: ===========================================
+: Install google-chrome and alias chromium
+: =====================
 :
-: Wait up to 5x2 mins for snap installation to complete. Can randomly fail. Just redo.
+	wget -O "/tmp/google-chrome.deb" https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+	sudo apt install -y "/tmp/google-chrome.deb"
 :
-	for x in {1..5}; do
-		snap changes | grep chromium || true
-		timeout 120 bash -c 'while snap changes | grep chromium | grep -Pqw "Do|Doing"; do sleep 5; done; snap changes | grep chromium | grep -q Done && echo "Chromium installation done" || echo "Chromium installation failed or not found"' || echo "Timed out."
-	done
-	snap changes | grep chromium || true
+	ln -snf `which /usr/bin/google-chrome` /usr/bin/chromium
 :
-	which chromium
-	snap refresh chromium
-:
-: Check chromium converts html to pdf
-: ===================================
-: Ignore various chromium error messages
+: Check html conversion to pdf
+: ============================
 :
 	printf "<html><body>Nothing Special</body></html>\n" > chromium2pdf.html
-	chromium --no-sandbox --headless --disable-gpu --print-to-pdf=chromium2pdf.pdf chromium2pdf.html |& grep "dbus|dconf|touch|mkdir" -vP 1>&2
+	chromium --no-sandbox --headless --disable-gpu --print-to-pdf=chromium2pdf.pdf chromium2pdf.html
 :
 : Verify pdf seems ok
 :

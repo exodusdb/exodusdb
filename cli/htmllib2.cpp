@@ -644,6 +644,7 @@ func getcss(io css, in version = "", in stationery = "") {
 	// and using the chromium scripting interface requires the installation of complex dependencies
 	// Test for chromium is duplicated in convpdf.cpp and htmllib2.cpp
 
+	// chromium might be aliased to google-chrome
 	let pdfcmd = "chromium";
 	if (stationery.assigned() and stationery > 2 and osshell("which " ^ pdfcmd ^ " > /dev/null")) {
 

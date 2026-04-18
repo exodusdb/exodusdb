@@ -89,6 +89,7 @@ func main(io osfilename, in printopts0, out errors) {
 //	} else {
 
 	// Test is duplicated in convpdf.cpp and htmllib2.cpp
+	// chromium might be aliased to google-chrome
 	pdfcmd = "chromium";
 	if (osshell("which " ^ pdfcmd ^ " > /dev/null")) {
 

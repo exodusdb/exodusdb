@@ -9,14 +9,15 @@ PS4='+ [ins ${1:-?} ${SECONDS}s] '
 :
 :	Builds with clang-20, 21 and 22
 :	using libc++, modules and std=c++23-26
-:	on all Ubuntu LTS 20.04 - 24.04 and 25.10
+:	on all Ubuntu LTS 20.04 - 26.04
 :
 :	Depend   Ver    Source    Type
 :	------   ---    ------    ----
 :	clang    20-22  llvm      apt binary
 :	icu      78     github    source
 :	boost    90     github    source
-:	chromium 143    canonical snap
+#:	chromium 143    canonical snap
+:	chrome   147    google    apt
 :	cmake    4.2.1  github    binary or source
 :	ninja    1.14.0 github    binary or source
 :
