@@ -247,13 +247,6 @@ function APT_GET {
 #	which chromium
 #	snap refresh chromium
 :
-: Remove snap chromium if installed
-: =================================
-:
-	if which chromium; then
-		snap remove --purge chromium || true
-	fi
-:
 : Install google-chrome and alias chromium
 : =====================
 :
@@ -268,10 +261,16 @@ function APT_GET {
 	printf "<html><body>Nothing Special</body></html>\n" > chromium2pdf.html
 	chromium --no-sandbox --headless --disable-gpu --print-to-pdf=chromium2pdf.pdf chromium2pdf.html
 :
-: Verify pdf seems ok
-:
 	pdfgrep "Nothing Special" chromium2pdf.pdf
 #	rm chromium2pdf.html chromium2pdf.pdf
+:
+: Remove snap chromium if installed
+: =================================
+:
+	if which chromium; then
+		snap remove --purge chromium || true
+		rm /root/snap/chromium -rf
+	fi
 
 :
 : Determine local ip number for info
