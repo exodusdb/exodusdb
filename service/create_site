@@ -68,26 +68,6 @@ function APT_GET {
 #	APT_GET sudo apt-get install -y apache2 libapache2-mod-php php php-xml
 	APT_GET sudo apt-get install -y apache2 php php-fpm php-xml
 :
-: If installing into /root/
-:
-: TODO move ~/hosts and exodus/service/www out of /root or /home
-:
-	if [ ${EXODUS:0:6} = /root/ ]; then
-	:
-	: Allow transit through /root/ into subdirs - but no ls or read access in root
-	:
-		sudo chmod o+x /root
-	:
-	: Remove systemd blockade on /root commenced in Ubuntu 26.04
-	:
-		apache_service_conf=/etc/systemd/system/multi-user.target.wants/apache2.service
-		if sudo grep '^InaccessiblePaths=/root' $apache_service_conf; then
-			sudo sed -i 's|^\(InaccessiblePaths=/root\)|#\1|' $apache_service_conf
-			sudo systemctl daemon-reload
-			sudo systemctl restart apache2
-		fi
-	fi
-:
 : Ensure that required confs are actually enabled
 :
 	a2enconf php*-fpm
@@ -104,6 +84,26 @@ function APT_GET {
 		: Restart apache
 		:
 		sudo systemctl restart apache2
+	fi
+:
+: Fix permissions - if installing into /root/
+: ===========================================
+: TODO move ~/hosts and ~/exodus/service/www out of /root or /home
+:
+	if [ ${EXODUS:0:6} = /root/ ]; then
+	:
+	: Allow transit through /root/ into subdirs - but no ls or read access in root
+	:
+		sudo chmod o+x /root
+	:
+	: Remove systemd blockade on /root commenced in Ubuntu 26.04
+	:
+		apache_service_conf=/etc/systemd/system/multi-user.target.wants/apache2.service
+		if sudo grep '^InaccessiblePaths=/root' $apache_service_conf; then
+			sudo sed -i 's|^\(InaccessiblePaths=/root\)|#\1|' $apache_service_conf
+			sudo systemctl daemon-reload
+			sudo systemctl restart apache2
+		fi
 	fi
 :
 : Configure php.ini - increase limits
