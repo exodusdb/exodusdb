@@ -168,7 +168,7 @@ function APT_GET {
 	:
 	: Remove systemd blockade on /root commenced in Ubuntu 26.04
 	:
-		apache_service_conf=/etc/systemd/system/multi-user.target.wants/apache2.service
+		apache_service_conf=/usr/lib/systemd/system/apache2.service
 		if sudo grep '^InaccessiblePaths=/root' $apache_service_conf; then
 			sudo sed -i 's|^\(InaccessiblePaths=/root\)|#\1|' $apache_service_conf
 			sudo systemctl daemon-reload
