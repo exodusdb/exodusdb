@@ -79,7 +79,7 @@ function APT_GET {
 :
 : Ensure that required mods are actually enabled
 :
-	if sudo a2enmod rewrite ssl | egrep "^Module" | grep -v "already enabled"; then
+	if sudo a2enmod rewrite ssl proxy_fcgi | egrep "^Module" | grep -v "already enabled"; then
 		:
 		: Restart apache
 		:
