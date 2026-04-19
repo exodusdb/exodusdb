@@ -86,26 +86,6 @@ function APT_GET {
 		sudo systemctl restart apache2
 	fi
 :
-: Fix permissions - if installing into /root/
-: ===========================================
-: TODO move ~/hosts and ~/exodus/service/www out of /root or /home
-:
-	if [ ${EXODUS:0:6} = /root/ ]; then
-	:
-	: Allow transit through /root/ into subdirs - but no ls or read access in root
-	:
-		sudo chmod o+x /root
-	:
-	: Remove systemd blockade on /root commenced in Ubuntu 26.04
-	:
-		apache_service_conf=/etc/systemd/system/multi-user.target.wants/apache2.service
-		if sudo grep '^InaccessiblePaths=/root' $apache_service_conf; then
-			sudo sed -i 's|^\(InaccessiblePaths=/root\)|#\1|' $apache_service_conf
-			sudo systemctl daemon-reload
-			sudo systemctl restart apache2
-		fi
-	fi
-:
 : Configure php.ini - increase limits
 : ===================================
 :
@@ -175,6 +155,26 @@ function APT_GET {
     mkdir -p $DB_DIR
     chmod a+srw $DB_DIR
     setfacl -d -m g::rw $DB_DIR
+:
+: Fix permissions - if installing into /root/
+: ===========================================
+: TODO move ~/hosts and ~/exodus/service/www out of /root or /home
+:
+	if [ ${EXODUS:0:6} = /root/ ]; then
+	:
+	: Allow transit through /root/ into subdirs - but no ls or read access in root
+	:
+		sudo chmod o+x /root
+	:
+	: Remove systemd blockade on /root commenced in Ubuntu 26.04
+	:
+		apache_service_conf=/etc/systemd/system/multi-user.target.wants/apache2.service
+		if sudo grep '^InaccessiblePaths=/root' $apache_service_conf; then
+			sudo sed -i 's|^\(InaccessiblePaths=/root\)|#\1|' $apache_service_conf
+			sudo systemctl daemon-reload
+			sudo systemctl restart apache2
+		fi
+	fi
 
 :
 : Link to exodus www
