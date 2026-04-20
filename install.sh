@@ -208,6 +208,7 @@ function APT_INSTALL {
 :
 	NEEDRESTART_MODE="a"                   \
 	DEBIAN_FRONTEND="noninteractive"       \
+	DEBCONF_NOWARNINGS="yes"               \
 	sudo apt-get -y                        \
 		-o Dpkg::Options::=--force-confdef \
 		-o Dpkg::Options::=--force-confold \
