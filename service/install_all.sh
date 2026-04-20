@@ -29,26 +29,35 @@ PS4='+ [service ${SECONDS}s] '
 	EXODUS_DIR=${EXODUS_DIR:-$(realpath `pwd`/..)}
 
 :
-: Function to call apt-get repeatedly in case of error
-: ----------------------------------------------------
+: Function to call apt-get install three times in case of timeout
+: ---------------------------------------------------------------
 :
-function APT_GET {
+function APT_INSTALL {
 :
-	STARTED=$SECONDS
-	while [[ $(($SECONDS-$STARTED)) -lt 600 ]]; do
+: Set environment variables for non-interactive installation
 :
-: Retry apt-get. $(($SECONDS-$STARTED)) secs.
-: -------------------
+	NEEDRESTART_MODE="a"                   \
+	DEBIAN_FRONTEND="noninteractive"       \
+	sudo apt-get -y                        \
+		-o Dpkg::Options::=--force-confdef \
+		-o Dpkg::Options::=--force-confold \
+		-o Acquire::http::Timeout=120      \
+		-o Acquire::https::Timeout=120     \
+		-o Acquire::Retries=3              \
+		--no-install-recommends            \
+		install "$@" < /dev/null
 :
-		# /dev/null to stop error causing random hang until timeout
-		# with apt process stuck on tcsetattr call. see gdb -p 9999
-		if timeout 120s $* < /dev/null; then
-			break
+: Verify all packages are installed
+:
+	for pkg in "$@"; do
+		# Skip check for files with extension '.deb'
+		if [ ${pkg##*.} != "deb" ] && ! dpkg -s "$pkg" &>/dev/null; then
+			: "Error: Unable to locate package '$pkg'"
+			exit 1
 		fi
-		sleep 5
-	done;
+	done
+	: "All packages installed successfully."
 }
-
 :
 : Allow cd into subdirs of /root - but no read access of course
 : =============================================================
@@ -158,7 +167,7 @@ function APT_GET {
 :	qrencode    used in htmllib2 for KSA invoices
 #:	jq          Only to display chromium snap versions available
 :
-	APT_GET sudo DEBIAN_FRONTEND=noninteractive apt-get -y install whois postfix bsd-mailx
+	APT_INSTALL whois postfix bsd-mailx
 :
 : Configure postfix
 : =================
@@ -219,7 +228,7 @@ function APT_GET {
 : Install pdfgrep
 : ===============
 :
-	which pdfgrep || APT_GET sudo DEBIAN_FRONTEND=noninteractive apt-get -y install pdfgrep
+	which pdfgrep || APT_INSTALL pdfgrep
 
 #:
 #: Display chromium snap versions available
@@ -250,8 +259,8 @@ function APT_GET {
 : Install google-chrome and alias chromium
 : =====================
 :
-	wget -O "/tmp/google-chrome.deb" https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-	sudo apt install -y "/tmp/google-chrome.deb"
+	wget --no-verbose -O "/tmp/google-chrome.deb" https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+	APT_INSTALL "/tmp/google-chrome.deb"
 :
 	ln -snf `which /usr/bin/google-chrome` /usr/bin/chromium
 :
@@ -259,7 +268,7 @@ function APT_GET {
 : ============================
 :
 	printf "<html><body>Nothing Special</body></html>\n" > chromium2pdf.html
-	chromium --no-sandbox --headless --disable-gpu --print-to-pdf=chromium2pdf.pdf chromium2pdf.html
+	chromium --no-sandbox --headless --disable-gpu --print-to-pdf=chromium2pdf.pdf chromium2pdf.html |& grep -v 'ERROR:dbus'
 :
 	pdfgrep "Nothing Special" chromium2pdf.pdf
 #	rm chromium2pdf.html chromium2pdf.pdf
