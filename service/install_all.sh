@@ -27,7 +27,6 @@ PS4='+ [service ${SECONDS}s] '
 :
 #	EXODUS_DIR=~/exodus
 	EXODUS_DIR=${EXODUS_DIR:-$(realpath `pwd`/..)}
-
 :
 : Function to call apt-get install three times in case of timeout
 : ---------------------------------------------------------------

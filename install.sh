@@ -198,31 +198,36 @@ function CMD_RETRY {
 		fi
 	done
 }
-
 :
 : Function to call apt-get install three times in case of timeout
 : ---------------------------------------------------------------
 :
 function APT_INSTALL {
 :
-	#CMD_RETRY sudo apt-get install -y $*
-	NEEDRESTART_MODE=a \
-	DEBIAN_FRONTEND=noninteractive \
-	sudo apt-get -y\
+: Set environment variables for non-interactive installation
+:
+	NEEDRESTART_MODE="a"                   \
+	DEBIAN_FRONTEND="noninteractive"       \
+	sudo apt-get -y                        \
 		-o Dpkg::Options::=--force-confdef \
 		-o Dpkg::Options::=--force-confold \
-		-o Acquire::http::Timeout=120 \
-		-o Acquire::https::Timeout=120 \
-		-o Acquire::Retries=3 \
-		--no-install-recommends \
-		install $* < /dev/null
-
+		-o Acquire::http::Timeout=120      \
+		-o Acquire::https::Timeout=120     \
+		-o Acquire::Retries=3              \
+		--no-install-recommends            \
+		install "$@" < /dev/null
 :
 : Verify all packages are installed
 :
-	for pkg in $*; do dpkg -s "$pkg" >/dev/null 2>&1 || { echo "See above 'Unable to locate package'"; exit 1; }; done; echo "All packages installed."
+	for pkg in "$@"; do
+		# Skip check for files with extension '.deb'
+		if [ ${pkg##*.} != "deb" ] && ! dpkg -s "$pkg" &>/dev/null; then
+			: "Error: Unable to locate package '$pkg'"
+			exit 1
+		fi
+	done
+	: "All packages installed successfully."
 }
-
 :
 : Function to download submodules
 : -------------------------------
@@ -531,9 +536,6 @@ function get_dependencies_for_build_and_install {
 		fi
 #	CLANG_MAJOR=22
 		CLANG_MAJOR=$COMPILER_VERSION
-#		CMD_RETRY sudo wget https://apt.llvm.org/llvm.sh
-#		chmod +x llvm.sh
-#		sudo ./llvm.sh $CLANG_MAJOR
 		./install_clang.sh $CLANG_MAJOR
 		./install_icu.sh
 		./install_boost.sh
@@ -705,7 +707,6 @@ function build_only {
 :
 : Repeated from Build stage
 :
-#	CMD_RETRY sudo snap refresh cmake
 	APT_INSTALL $BUILD_DEPS
 
 :
