@@ -2633,14 +2633,14 @@ int ExoProgram::run_main(var (ExoProgram::*main_func)(), int argc, const char* a
 // Use gdb catch throw (somehow skip catching ExoExit (Stop/Abort) exceptions)
 // to catch any std::exception or unknown exceptions.
 //
-	// Check EXO_DEBUG using ExoEnv
-	var exo_debug;
-	if (exo_debug.osgetenv("EXO_DEBUG") and exo_debug) {
-		var("Debug Init Thread:" ^ ev.THREADNO ^ " " ^ ev.SENTENCE).errputl();
-		// Debug mode: no exception catching
-		result = (this->*main_func)();
-		var("Debug Exit Thread:" ^ ev.THREADNO ^ " " ^ ev.SENTENCE).errputl();
-	} else {
+//	// Check EXO_DEBUG using ExoEnv
+//	var exo_debug;
+//	if (exo_debug.osgetenv("EXO_DEBUG") and exo_debug) {
+//		var("Debug Init Thread:" ^ ev.THREADNO ^ " " ^ ev.SENTENCE).errputl();
+//		// Debug mode: no exception catching
+//		result = (this->*main_func)();
+//		var("Debug Exit Thread:" ^ ev.THREADNO ^ " " ^ ev.SENTENCE).errputl();
+//	} else {
 		try {
 			// Normal mode: catch exceptions
 			result = (this->*main_func)().or_default("");
@@ -2669,7 +2669,7 @@ int ExoProgram::run_main(var (ExoProgram::*main_func)(), int argc, const char* a
 			var(e.stack()).convert(FM, "\n").errputl();
 			result = ev.OPTIONS.contains("I") ? 0 : 999;
 		}
-	}
+//	}
 
 	// Cleanup
 	var().disconnectall();
