@@ -5442,7 +5442,8 @@ bool var_db::createindex(in fieldname0, in dictfile) const {
 
 	// Index on calculated columns causes an additional column to be created
 	if (dictexpression.contains("exodus_call")) UNLIKELY {
-		("ERROR: Cannot create index on " ^ filename ^ " for calculated field " ^ fieldname).errputl();
+//		("ERROR: Cannot create index on " ^ filename ^ " for calculated field " ^ fieldname).errputl();
+		var::setlasterror("ERROR: Cannot create index on " ^ filename ^ " for calculated field " ^ fieldname);
 		return false;
 
 		/*
@@ -5472,7 +5473,7 @@ bool var_db::createindex(in fieldname0, in dictfile) const {
 	// Fail neatly if the index already exists
 	// SQL errors during a transaction cause the whole transaction to fail.
 	if (this->listindex(filename, fieldname)) UNLIKELY {
-		var::setlasterror(filename.quote() ^ ", " ^ fieldname.quote() ^ " index already exists.");
+		var::setlasterror("Cannot create index. Index already exists. " ^ filename ^ ", " ^ fieldname);
 		return false;
 	}
 
@@ -5490,8 +5491,10 @@ bool var_db::createindex(in fieldname0, in dictfile) const {
 	if (not this->sqlexec(sql, response)) UNLIKELY {
 		//ERROR:  cannot create index on foreign table "clients"
 		//sqlstate:42809 CREATE INDEX index__suppliers__SEQUENCE_XREF ON suppliers USING GIN (to_tsvector('simple',dict_suppliers_SEQUENCE_XREF(suppliers.key, suppliers.data)))
-		if (not response.contains("sqlstate:42809"))
-			response.errputl();
+//		if (not response.contains("sqlstate:42809"))
+//			response.errputl();
+// TODO crash with system error?
+		var::setlasterror("Cannot create index for " ^ filename ^ ", " ^ fieldname ^ ".\n" ^ response);
 		return false;
 	}
 
@@ -5516,7 +5519,7 @@ bool var_db::deleteindex(in fieldname0) const {
 	// Fail neatly if the index does not exist
 	// SQL errors during a transaction cause the whole transaction to fail.
 	if (not this->listindex(filename, fieldname)) UNLIKELY {
-		var::setlasterror(filename.quote() ^ ", " ^ fieldname.quote() ^ " index does not exist.");
+		var::setlasterror("Cannot delete index. Index does not exist. " ^ filename ^ ", " ^ fieldname);
 		return false;
 	}
 

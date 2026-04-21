@@ -9,6 +9,7 @@ func main() {
 	if (not indexnames)
 		abort("Syntax is 'createindex [filename] [filename__]fieldname... {F=Force}'");
 
+	// "createindex xref" means redo all _xref indexes
 	if (indexnames == "xref") {
 		indexnames = var().listindex();
 		var indexnames2 = "";
@@ -25,7 +26,8 @@ func main() {
 
 	var result = 0;
 
-	for (var indexn : range(1, nindexes)) {
+//	for (var indexn : range(1, nindexes)) {
+	for (var indexn = 1; indexn le nindexes; ++indexn) {
 
 		var filename = indexnames.f(indexn);
 		if (not filename)
@@ -42,15 +44,15 @@ func main() {
 
 		let indexname = filename ^ "__" ^ fieldname;
 		if (force && listindex(filename, fieldname)) {
-			printl("Deleting index", indexname);
+			printl("deleteindex", filename, fieldname);
 			if (not filename.deleteindex(fieldname)) {
-				errputl("Cannot delete index", indexname);
+				errputl(lasterror());
 				result = 1;
 			}
 		}
-		printl("Creating index", indexname);
+		printl("createindex", filename, fieldname);
 		if (not filename.createindex(fieldname)) {
-			errputl("Cannot create index", indexname);
+			errputl(lasterror());
 			result = 1;
 		}
 	}

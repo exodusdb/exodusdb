@@ -28,9 +28,9 @@ func main() {
 			indexn += 1;
 		}
 
-		printl("Deleting index " ^ filename ^ "__" ^ fieldname);
+		printl("deleteindex", filename, fieldname);
 		if (not filename.deleteindex(fieldname)) {
-			errputl("Cannot delete index " ^ filename ^ "__" ^ fieldname);
+			errputl(lasterror());
 			result = 1;
 		}
 	}
