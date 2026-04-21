@@ -975,7 +975,26 @@ V0G0N
 #:
 #	cd $EXODUS_DIR/build/pgexodus && CTEST_OUTPUT_ON_FAILURE=1 ctest
 #
-
+:
+: psql alias - user : exodus, search_path : public, exodus
+: --------------------------------------
+:
+	cat > /etc/.psqlrc <<-EOF
+		\echo bash alias psql='sudo PSQLRC=/etc/.psqlrc -u postgres psql'
+		set role exodus;
+		SET search_path TO public, exodus;
+		select current_user as current_user \gset
+		SELECT current_setting('search_path') AS search_path \gset
+		\echo 'db:':DBNAME' Current role is ':current_user'. You may set role ':USER'. search_path is ':search_path'. This is /etc/.psqlrc.'
+	EOF
+	alias_psql="alias psql='sudo PSQLRC=/etc/.psqlrc -u postgres psql'"
+	if grep -q "alias psql=" ~/.bash_aliases; then
+		if ! grep -q -F "$alias_psql" ~/.bash_aliases; then
+			sed -i "s|alias psql=.*|$alias_psql|" ~/.bash_aliases
+		fi
+	else
+		echo "$alias_psql" >> ~/.bash_aliases
+	fi
 :
 : Install lots of pgsql utility functions
 : ---------------------------------------
