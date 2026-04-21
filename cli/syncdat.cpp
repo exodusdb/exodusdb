@@ -1,10 +1,10 @@
 #include <exodus/program.h>
 programinit()
 
-	var force = index(OPTIONS, "F");
-	let generate = index(OPTIONS, "G");
-	let ignore_nodb = index(OPTIONS, "I");
-	let verbose = index(OPTIONS, "V");
+	var force = OPTIONS.contains("F") ? "F" : "";
+	let generate = OPTIONS.contains("G");
+	let ignore_nodb = OPTIONS.contains("I");
+	let verbose = "V"_var.str(OPTIONS.count("V"));
 
 	var last_sync_date;
 	var last_sync_time;
@@ -13,7 +13,7 @@ programinit()
 
 func main() {
 
-	if (index(OPTIONS, "H")) {
+	if (OPTIONS.contains("H")) {
 		logputl(
 			"NAME\n"
 			"\n"
@@ -115,12 +115,14 @@ func main() {
 		let dependent_dirinfo = osfile(osshellread("which " ^ dependent));
 		if (not force and (dependent_dirinfo.empty() or is_newer_than_last_sync(dependent_dirinfo))) {
 			printl(THREADNO ^ ":", "syncdat: (F)orce because newer " ^ dependent ^ " (or cant be found) since last sync time ", last_sync_date.oconv("D-Y"), last_sync_time.oconv("MTS"));
-			force = true;
+			force = "F";
 		}
 	}
 
 	// Skip if nothing new
-	let datinfo = osdir(datpath);
+//	let datinfo = osdir(datpath);
+	// Mode 6 - scan and update all dir's time modified
+	let datinfo = datpath.osinfo(6);
 	if (not datinfo) {
 		abort(prefix ^ " Error: " ^ datpath.quote() ^ " dat dir missing");
 	}
@@ -341,7 +343,7 @@ func main() {
 
 		// Load and changed functions into database
 		if (dict2sql_ids) {
-			let cmd = "dict2sql " ^ dbfilename ^ " " ^ dict2sql_ids;// ^ " {V}";
+			let cmd = "dict2sql " ^ dbfilename ^ " " ^ dict2sql_ids ^ " {" ^ force ^ verbose ^ "}";
 			if (verbose)
 				cmd.logputl();
 			if (not osshell(cmd)) {

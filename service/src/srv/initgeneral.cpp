@@ -359,6 +359,7 @@ updateversion:
 	call log2("*install any new db dat data if thread 0 or 1", logtime);
 	if (THREADNO <= 1) {
 		if (not osshell("syncdat"))
+//		if (not osshell("syncdat {V}"))
 			loglasterror();
 	}
 

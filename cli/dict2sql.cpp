@@ -7,16 +7,16 @@
 
 	EXTENSIONS
 
-		Optional or can be "pgsql" or "pgexodus".
+		Optional or can be "exodus", "pgsql" or "pgexodus".
 
-		Normally this is not required since they are installed during installation
+		"exodus"   Just add collations and unaccent. Assume pgexodus installed during installation
 
-		"pgexodus" requires postgres SUPERUSER permissions.
+		"pgexodus" c extension - requires postgres SUPERUSER permissions.
+		           Inconvenient due to requirement to install extension in server
+		           30% FASTER than using pgsql postgres script functions
 
-		"pgsql" very easy to install but maybe 25% SLOWER than using pgexodus.so c function  extension
-
-		"pgexodus" - inconvenient due to requirement to install extension in server
-		and require super user rights but 30% FASTER than using pgsql functions
+		"pgsql"    postgresql script - very easy to install.
+		           25% SLOWER than using pgexodus.so c function  extension
 
 	FILENAME
 
@@ -461,6 +461,14 @@ subr create_function(in functionname_and_args, in return_sqltype, in sql, in sql
 	// The postgres default path is $user, public - which would cause exodus
 	// user to auto create everything in the exodus schema since it exists.
 
+	// WARNING since Ubuntu 26.04/Postgres 17?, function names in functions used for indexing must be schema qualified
+	// because for security, the search_path e.g. "public, exodus" is no longer used.
+	// So in dict.invoices TEXT_XREF
+	// dict_vouchers_text(key,data)
+	// becomes:
+	// public.dict_vouchers_text(key,data)
+	// This is converted automatically here for .XREF dicts and can be manually done in dat/dict. src
+
 	// Get rid of old superfluous public/exodus schema function if more than one function
 	if (oldfunction.count(RM) > 1) {
 		reindex_if_indexed = true;
@@ -597,12 +605,12 @@ subr create_function(in functionname_and_args, in return_sqltype, in sql, in sql
 			filename.converter("ABCDEFGHIJKLMNOPQRSTUVWXYZ", "");
 			filename.trimmer("_");
 			if (filename.listindex(filename, fieldname)) {
-				logputl("Deleting index " ^ filename ^ " " ^ fieldname);
+				logputl("deleteindex " ^ filename ^ " " ^ fieldname);
 				//filename.deleteindex(fieldname);
 				if (not filename.deleteindex(fieldname)) {
 					abort(lasterror());
 				}
-				logputl("Creating index " ^ filename ^ " " ^ fieldname);
+				logputl("createindex " ^ filename ^ " " ^ fieldname);
 				//filename.createindex(fieldname);
 				if (not filename.createindex(fieldname)) {
 					abort(lasterror());
@@ -716,7 +724,7 @@ subr onedictid(in dictfile, in dictfilename, io dictid, in reqdictid) {
 		//note postgres string prefix E'...'
 		// E is required to enable \xFF hex decoding
 		//LIMIT TO 1000 characters since postgres index limit is around 2700 BYTES
-		sourcecode(1, -1) = "ans:=upper(translate(substring(" ^ dictfilename.convert(".", "_") ^ "_" ^ fulltext_dictid.lcase() ^ "(key,data),0,1000)" ^ ",E'" ^ chars ^ "'" ^ ",repeat(' '," ^ (len(chars) + 20) ^ ")));";
+		sourcecode(1, -1) = "ans:=upper(translate(substring(public." ^ dictfilename.convert(".", "_") ^ "_" ^ fulltext_dictid.lcase() ^ "(key,data),0,1000)" ^ ",E'" ^ chars ^ "'" ^ ",repeat(' '," ^ (len(chars) + 20) ^ ")));";
 //		sourcecode.r(1, -1,
 //					 "*"
 //					 "/");
@@ -768,6 +776,16 @@ subr onedictid(in dictfile, in dictfilename, io dictid, in reqdictid) {
 	if (lastpos) {
 		//sql.pasterall(lastpos - 1, "");
 		sql.firster(lastpos - 1);
+	}
+
+	// Fix missing schema for functions that will be used in indexing
+	// since 26.04 the search_path is not used so only system funcs are valid without schema
+	// upper(translate(substring(dict_schedules_text(key,data),0,1000)
+	// upper(translate(substring(public.dict_schedules_text(key,data),0,1000)
+	if (dictid.ends("XREF")) {
+		sql.replacer("(dict_", "(public.dict_");
+	} else {
+		sql.replacer("dict_journals_year_period", "public.dict_journals_year_period");
 	}
 
 	var xlatetemplate;
