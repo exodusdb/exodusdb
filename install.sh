@@ -907,25 +907,32 @@ function install_database {
 : ------------------------------------------------------------------------------------
 :
 	sudo -u postgres psql $PSQL_PORT_OPT <<-V0G0N
-		--
-		-- user 'exodus'
-		--
-	    -- The role was created without login permission when creating the extension
-	    -- since its objects are assigned to exodus.
-	    --
-	    -- Allow login with password and creation of users and databases
-	    -- but not superuser
-		--
+		\echo
+		\echo user 'exodus'
+		\echo
+	    \echo The role was created without login permission when creating the extension
+	    \echo since its objects are assigned to exodus.
+	    \echo
+	    \echo Allow login with password and creation of users and databases
+	    \echo but not superuser
+		\echo
+	    \echo ALTER ROLE exodus
+	    \echo     LOGIN
+	    \echo     PASSWORD 'somesillysecret'
+	    \echo     CREATEDB
+	    \echo     CREATEROLE
+	    \echo ;
 	    ALTER ROLE exodus
 	        LOGIN
 	        PASSWORD 'somesillysecret'
 	        CREATEDB
 	        CREATEROLE
 	    ;
-		--
-		-- Force exodus to create new files in public schema instead of exodus
-		-- in all databases.
-		--
+		\echo
+		\echo Force exodus to create new files in public schema instead of exodus
+		\echo in all databases.
+		\echo
+		\echo ALTER ROLE exodus SET search_path TO public, exodus;
 		ALTER ROLE exodus SET search_path TO public, exodus;
 V0G0N
 
