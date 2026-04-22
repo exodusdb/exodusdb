@@ -28,10 +28,6 @@ THE SOFTWARE.
 #pragma clang diagnostic pop
 #endif
 
-#define SAVESTACK_ATTACHES_DEBUGGER 0
-
-// Note EXO_DEBUG = 0, 1, 2 = backtrace exodus libs, 3 = backtrace all.
-
 // For debugging
 #define TRACING 0
 
@@ -41,6 +37,7 @@ THE SOFTWARE.
 #	include <cstdio>
 #	include <cstdlib>
 #	include <iostream>
+#	include <fstream>
 #	include <string>
 #	include <unistd.h> // for getpid
 //#	include <signal.h>
@@ -52,11 +49,6 @@ THE SOFTWARE.
 #include <execinfo.h>  // for backtrace
 #include <csignal>
 
-//#if TRACING
-//#	include <boost/stacktrace.hpp>
-//#endif
-//#include <backward.hpp>
-
 #include <var/var.h>
 //#include <exodus/exoimpl.h>
 #include <var/range.h>
@@ -65,6 +57,21 @@ THE SOFTWARE.
 namespace exo {
 
 using let = const var;
+
+ND PUBLIC var getexecpath();
+
+bool in_debugger() {
+	std::ifstream status("/proc/self/status");
+	std::string line;
+
+	while (std::getline(status, line)) {
+		if (line.rfind("TracerPid:", 0) == 0) {
+			int tracerPid = std::stoi(line.substr(10));
+			return tracerPid != 0;
+		}
+	}
+	return false;
+}
 
 static void addbacktraceline(in frameno, in sourcefilename, in lineno, in exo_debug, io returnlines) {
 
@@ -181,7 +188,7 @@ var summarise_gdb_bt(in osfilename) {
 				if (currthreadtitle) {
 					// Thread 1 is usually last.
 					// and we dont output it unless other threads already output.
-					currthreadtitle.logputl();
+					currthreadtitle.errputl();
 					currthreadtitle = "";
 				}
 				result.appender(line, _NL);
@@ -192,162 +199,169 @@ var summarise_gdb_bt(in osfilename) {
 	return result;
 }
 
-////////////////////////////////////////////////////////////////////
-//// Reserve space for snapshot of stack taken on every mv exception
-////////////////////////////////////////////////////////////////////
-//// in case the exception is caught then it is wasted time
-//namespace {
-//	#define BACKTRACE_MAXADDRESSES 100
-//	thread_local void* thread_stack_addresses[BACKTRACE_MAXADDRESSES];
-//	thread_local std::size_t thread_stack_size = 0;
-//}
+auto raise_SIGTRAP() -> void {
+#if __has_include(<signal.h>)
+	::raise(SIGTRAP);
+#elif 1
+	__asm__("int3");
+// another way to break into the debugger by causing a seg fault
+#elif 0
+	*(int*)0 = 0;
+#endif
+}
 
-//// Capture the current stack addresses for later decoding
-//void exo_savestack(void* stack_addresses[BACKTRACE_MAXADDRESSES], std::size_t* stack_size) {
-//	*stack_size = ::backtrace(stack_addresses, BACKTRACE_MAXADDRESSES);
-//#if TRACING
-//	std::cout << boost::stacktrace::stacktrace();
-//#endif
-//}
+// ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+// Open the or a debugger
+// ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+auto open_debugger() -> void {
 
-// Capture the current stack addresses for later decoding.
-// false indicates that gdb is available but already attached and caller can throw to get into gdb.
-// We always get the basic stack and gdb is to get accurate backtrace in backtrace.$pid.log
-auto exo_savestack(void* stack_addresses[BACKTRACE_MAXADDRESSES], std::size_t* stack_size) -> bool{
+	// Use attached debugger
+	// ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+	if (in_debugger()) {
+		raise_SIGTRAP();
+		return;
+	}
 
-	// Always get the basic stack because it is quick
-	// but is it not very accurate inside threads and fibers
+	// Prep to attach debugger
+	// ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+	// Patch .gdbinit. Suppress long list of system file symbol loading
+	var gdbinit;
+	if (not gdbinit.osread("~/.gdbinit"))
+		gdbinit = "";
+	let gdbinit_orig = gdbinit;
+	if (not gdbinit.contains("symbol-loading")) {
+		gdbinit ^=
+			"\n"
+			"# Suppress long list when auto-attaching to gdb in new version of Exodus.\n"
+			"set print symbol-loading off\n"
+		;
+	}
+	if (not gdbinit.contains("debuginfod")) {
+		gdbinit ^=
+			"\n"
+			"# Suppress long list when auto-attaching to gdb in new version of Exodus.\n"
+			"set debuginfod enabled off\n"
+		;
+	}
+	if (not gdbinit.contains("inferior-events")) {
+		gdbinit ^=
+			"\n"
+			"# Suppress long list when auto-attaching to gdb in new version of Exodus.\n"
+			"set print inferior-events off\n"
+		;
+	}
+	if (gdbinit != gdbinit_orig) {
+		if (gdbinit.oswrite("~/.gdbinit"))
+			var("~/.gdbinit updated.").errputl();
+		else
+			var::loglasterror();
+	}
+
+	// Attach debugger for UI
+	// ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+//	let cmd = "gdb -q -p " ^ var::ospid();
+	let cmd = "lldb -Q -p " ^ var::ospid() ^ " " ^ getexecpath();
+//	cmd.errputl();
+	if (std::system(cmd) == 0) {
+		// gdb use completed.
+	} else {
+		// gdb not installed or already attached?
+	}
+
+	return;
+}
+
+// ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+// Capture stack. Display source backtrace and maybe drop into debugger.
+// ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+auto exo_savestack(void* stack_addresses[BACKTRACE_MAXADDRESSES], std::size_t* stack_size, const std::string& context_msg) -> void {
+
+	// Get the low-level stack addresses.
 	*stack_size = ::backtrace(stack_addresses, BACKTRACE_MAXADDRESSES);
 
-	// EXO_DEBUG=0 to suppress using gdb for backtracing.
-	// Speeds up testing various VarError conditions which use try/catch and dont need backtracing.
-	var exo_debug;
-	if (exo_debug.osgetenv("EXO_DEBUG") and not exo_debug)
-		return true;
+	// EXO_DEBUG=1,2,3 signifies desire to attach debugger is not already debugging.
+	// Otherwise VarError should use standard handler or try/catch
 
-#if SAVESTACK_ATTACHES_DEBUGGER
+	// Get EXO_DEBUG env once.
+	static let exo_debug = [](){var v1; if (v1.osgetenv("EXO_DEBUG")){}; return v1;}();
 
-#if TRACING
-	std::cerr << "Attaching GDB to PID: " << getpid() << "\n";
-#endif
-	std::string pid = std::to_string(getpid());
+	// Suppress backtracing if EXO_DEBUG=0.
+	// Use normal handler or try/catch if present.
+	// Useful to speed up testing of VarError exceptions that use try/catch but do not need stack tracing.
+	if (exo_debug == 0)
+		return;
 
-//	std::string gdb_cmd = "gdb -batch -p " + pid + " -ex 'thread apply all bt full' -ex 'detach' -ex 'quit' > backtrace." + pid + ".log 2>/dev/null";
-
-	if (not "which gdb") {
-		std::cerr << "----- gdb not installed/available. -----" << std::endl;
-		return true;
-	}
-
-	let logfilename = "backtrace." ^ var::ospid() ^ ".log";
-	std::cerr << "----- gdb " << logfilename << " -----" << std::endl;
-
-	// Get all thread info because there is no gdb command to switch to thread (LWP) by LWP id.
-	var gdb_cmds = " -ex 'thread apply all bt' -ex 'detach' -ex 'quit'";
-	var gdb_cmd = "gdb -batch -p " ^ (pid ^ gdb_cmds) ^ " > backtrace." ^ pid ^ ".log 2>/dev/null < /dev/null";
-
-	if (std::system(gdb_cmd.c_str()) != 0) {
-		// gdb not installed. Rely on ::backtrace above which isnt very accurate in threads or fibers.
-		return true;
-	}
-//	if (not gdb_cmd.osshell()) {
-//		var::lasterror().logputl();
-//		return true;
-//	}
-
-	var txt;
-	if (not txt.osread(logfilename)) {
-		// gdb not installed. Rely on ::backtrace above which isnt very accurate in threads or fibers.
-//		std::cerr << "Could not attach gdb" << std::endl;
-		return true;
-	}
-
-	// If running under gdb or gdb already attached then we cannot attach again.
-	if (not txt.contains("#0")) {
-		std::clog << "gdb is already attached to pid " << var::ospid() << ". Search backtrace starting ExoProgram." << std::endl;
-		// Could not attach to process.  If your uid matches the uid of the target
-		// process, check the setting of /proc/sys/kernel/yama/ptrace_scope, or try
-		// again as the root user.  For more details, see /etc/sysctl.d/10-ptrace.conf
-		return false;
-	}
-
-#endif // SAVESTACK_ATTACHES_DEBUGGER
-
-//	std::cerr << "----- gdb " << logfilename << " -----" << std::endl;
-
-	// EXO_DEBUG=1 signifies desire to break into gdb.
-	// instead being caught by program or perform/execute/run exception handlers
-	// EXO_DEBUG=1 used to signify running under gdb
-	// but now we can detect that automatically by an inability to attach dynamically.
-	// TODO Move to VarError handler?
-	if (not exo_debug.empty()) {
-		// EXO_DEBUG=0 to suppress using it for backtracing. Speeds up testing various VarError conditions.
-		if (exo_debug) {
-
-			// Display filtered backtrace
-//			summarise_gdb_bt(logfilename).logputl();
-//			std::cerr << var("-").str(logfilename.len() + 16) << std::endl;
-			var(exo_backtrace(stack_addresses, *stack_size)).convert(_FM, "\n").logputl();
-			var("-").str(32).logputl();
-
-			// Patch .gdbinit to suppress long list of system file symbol loading
-			var gdbinit;
-			bool gdbinit_update = false;
-			if (gdbinit.osread("~/.gdbinit"))
-				gdbinit = "";
-			if (not gdbinit.contains("symbol-loading")) {
-				gdbinit ^=
-					"\n"
-					"# Suppress long list when auto-attaching to gdb in new version of Exodus.\n"
-					"set print symbol-loading off\n"
-				;
-				gdbinit_update = true;
-			}
-			if (not gdbinit.contains("debuginfod")) {
-				gdbinit ^=
-					"\n"
-					"# Suppress long list when auto-attaching to gdb in new version of Exodus.\n"
-					"set debuginfod enabled off\n"
-				;
-				gdbinit_update = true;
-			}
-			if (gdbinit_update and gdbinit.oswrite("~/.gdbinit"))
-				var("~/.gdbinit updated.").logputl();
-
-//			// Search backtrace for lines starting _ExoProgram
-//			var("Search backtrace for lines starting _ExoProgram.").logputl();
-//			let cmd1 = "gdb -q -p " ^ var::ospid() ^ " -ex 'bt' -ex 'detach' -ex 'quit' 2> /dev/null | grep -P '^#[0-9]+\\s+_ExoProgram'";
-//			std::system(cmd1);
-
-			// Attach gdb interactively
-			let cmd = "gdb -q -p " ^ var::ospid();
-			cmd.logputl();
-			if (std::system(cmd) == 0) {
-				// gdb use completed.
-			} else {
-				// gdb not installed or already attached?
-			}
-
-		} else {
-			// No gdb but use ::backtrace stack addresses captured above
-			return true;
-		}
-	}
-
-//	else
-//		std::cerr << "Backtrace saved to backtrace.log\n";
-
+//#if SAVESTACK_ATTACHES_DEBUGGER
+//
 //#if TRACING
-//	std::cout << boost::stacktrace::stacktrace();
+//	std::cerr << "Attaching GDB to PID: " << getpid() << "\n";
 //#endif
-	return true;
+//	std::string pid = std::to_string(getpid());
+//
+////	std::string gdb_cmd = "gdb -batch -p " + pid + " -ex 'thread apply all bt full' -ex 'detach' -ex 'quit' > backtrace." + pid + ".log 2>/dev/null";
+//
+//	if (not "which gdb") {
+//		std::cerr << "----- gdb not installed/available. -----" << std::endl;
+//		return;
+//	}
+//
+//	let logfilename = "backtrace." ^ var::ospid() ^ ".log";
+//	std::cerr << "----- gdb " << logfilename << " -----" << std::endl;
+//
+//	// Get all thread info because there is no gdb command to switch to thread (LWP) by LWP id.
+//	var gdb_cmds = " -ex 'thread apply all bt' -ex 'detach' -ex 'quit'";
+//	var gdb_cmd = "gdb -batch -p " ^ (pid ^ gdb_cmds) ^ " > backtrace." ^ pid ^ ".log 2>/dev/null < /dev/null";
+//
+//	if (std::system(gdb_cmd.c_str()) != 0) {
+//		// gdb not installed. Rely on ::backtrace above which isnt very accurate in threads or fibers.
+//		return;
+//	}
+////	if (not gdb_cmd.osshell()) {
+////		var::lasterror().errputl();
+////		return;
+////	}
+//
+//	var txt;
+//	if (not txt.osread(logfilename)) {
+//		// gdb not installed. Rely on ::backtrace above which isnt very accurate in threads or fibers.
+////		std::cerr << "Could not attach gdb" << std::endl;
+//		return;
+//	}
+//
+//	// If running under gdb or gdb already attached then we cannot attach again.
+//	if (not txt.contains("#0")) {
+//		std::clog << "gdb is already attached to pid " << var::ospid() << ". Search backtrace starting ExoProgram." << std::endl;
+//		// Could not attach to process.  If your uid matches the uid of the target
+//		// process, check the setting of /proc/sys/kernel/yama/ptrace_scope, or try
+//		// again as the root user.  For more details, see /etc/sysctl.d/10-ptrace.conf
+//		return;
+//	}
+//
+//#endif // SAVESTACK_ATTACHES_DEBUGGER
+
+	auto debugging = in_debugger();
+
+	// If no debugger, and no debugging requested.
+	// quit and use normal handler or try/catch.
+	if (not exo_debug and not debugging)
+		return;
+
+	// Display backtrace - source lines
+	// ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+//	std::cout << std::flush;
+	var(exo_backtrace(stack_addresses, *stack_size)).convert(_FM, _NL).errputl();
+	var(context_msg).errputl();
+	var("⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯").errputl();
+	//	var("-").str(32).errputl();
+
+	open_debugger();
 }
 
 //}
 
-////////////////////////////////////////////////////////////////////
+// ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
 // Given stack addresses, get the source file, line no and line text
-////////////////////////////////////////////////////////////////////
+// ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
 // http://www.delorie.com/gnu/docs/glibc/libc_665.html
 auto exo_backtrace(void* stack_addresses[BACKTRACE_MAXADDRESSES], std::size_t stack_size, std::size_t limit) -> std::string {
 
@@ -634,28 +648,13 @@ auto exo_backtrace(void* stack_addresses[BACKTRACE_MAXADDRESSES], std::size_t st
 
 }
 
-/* Possible plan to extend exodus signal handling
-	SIGHUP
-	Reload config. Same as issuing the command RELOAD on the console.
-	SIGTERM
-	Super safe shutdown. Wait for all existing clients to disconnect, but don’t accept new connections. This is the same as issuing SHUTDOWN WAIT_FOR_CLIENTS on the console. If this signal is received while there is already a shutdown in progress, then an “immediate shutdown” is triggered instead of a “super safe shutdown”. In PgBouncer versions earlier than 1.23.0, this signal would cause an “immediate shutdown”.
-	SIGINT
-	Safe shutdown. Same as issuing SHUTDOWN WAIT_FOR_SERVERS on the console. If this signal is received while there is already a shutdown in progress, then an “immediate shutdown” is triggered instead of a “safe shutdown”.
-	SIGQUIT
-	Immediate shutdown. Same as issuing SHUTDOWN on the console.
-	SIGUSR1
-	Same as issuing PAUSE on the console.
-	SIGUSR2
-	Same as issuing RESUME on the console.
-*/
-//service managers like systemd will send a polite SIGTERM signal
-//and wait for say 90 seconds before sending a kill signal
+// Terminate - Signal handler
 static void SIGTERM_handler(int) {
 	std::fprintf(stderr, "=== SIGTERM_handler: Set TERMINATE_req = true ===\n");
 	TERMINATE_req = true;
 }
 
-//restart
+// Restart - signal handler
 static void SIGHUP_handler(int) {
 	std::fprintf(stderr, "=== SIGHUP_handler: Set RELOAD_req = true ===\n");
 	RELOAD_req = true;
@@ -730,8 +729,9 @@ static void SIGINT_handler(int sig [[maybe_unused]]) {
 	var exo_debug;
 	if (exo_debug.osgetenv("EXO_DEBUG") and exo_debug) {
             // Attach gdb interactively
-            let cmd = "gdb -q -p " ^ var::ospid();
-            cmd.logputl();
+//            let cmd = "gdb -q -p " ^ var::ospid();
+            let cmd = "lldb -Q -p " ^ var::ospid();
+            cmd.errputl();
             if (std::system(cmd) == 0) {
                 // gdb use completed.
             } else {
@@ -793,9 +793,9 @@ static void SIGINT_handler(int sig [[maybe_unused]]) {
 			// duplicated in init and B
 			let pid = getpid();
 			let cmd = "gdb -p " ^ pid;
-			cmd.logputl(" ");
+			cmd.errputl(" ");
 			if (not cmd.osshell())
-				var().lasterror().logputl();
+				var().lasterror().errputl();
 
 		} else if (cmd1 == "A") {
 
@@ -847,7 +847,6 @@ PUBLIC void breakon()  {
 	signal(SIGTTOU, SIG_IGN);
 }
 
-// Get a stack list on demand
 ND PUBLIC auto backtrace() -> std::string {
 	VarError e("backtrace()");
 	return e.stack();
@@ -861,23 +860,7 @@ PUBLIC void debug(SV var1) {
 
 	//use gdb "n" command(s) to single step
 	//use gdb "c" command(s) to resume
-
-#if __has_include(<signal.h>)
-	::raise(SIGTRAP);
-
-#elif 1
-	__asm__("int3");
-	//__asm__("int3");
-	//__asm__("int3");
-
-#elif defined(_MSC_VER)
-	// this will terminate the program rather than invoke the debugger but is catchable
-	//UNLIKELY throw VarDebug(var1);
-
-// another way to break into the debugger by causing a seg fault
-#elif 0
-	*(int*)0 = 0;
-#endif
+	open_debugger();
 
 	return;
 }

@@ -2,7 +2,7 @@
 set -euxo pipefail
 
 : ====================================================================
-: Stop a background test service and run it in the foreground with gdb
+: Stop a background test service and run it in the foreground
 : ====================================================================
 :
 :	'Syntax is ./test [DBNAME]'

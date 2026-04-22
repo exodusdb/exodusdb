@@ -33,8 +33,9 @@ THE SOFTWARE.
 
 namespace exo {
 
+// ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
 // Exception constructors
-//
+// ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
 // clang-format off
 VarUnconstructed   ::VarUnconstructed   (std::string errmsg) : VarError("VarUnconstructed: "    + errmsg) {}
 VarUnassigned      ::VarUnassigned      (std::string errmsg) : VarError("VarUnassigned: "       + errmsg) {}
@@ -51,74 +52,48 @@ VarDebug           ::VarDebug           (std::string errmsg) : VarError("VarDebu
 
 DimUndimensioned   ::DimUndimensioned   (std::string errmsg) : VarError("DimUndimensioned: "    + errmsg) {}
 DimIndexOutOfBounds::DimIndexOutOfBounds(std::string errmsg) : VarError("DimIndexOutOfBounds: " + errmsg) {}
-
 // clang-format on
 
-// std::string utility
-inline void varb_replace_string (std::string& subject, const std::string& search, const std::string& replace) {
+// ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+// std::string replace utility
+// ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+auto replace_all_inplace (std::string& subject, const std::string& search, const std::string& replace) -> void {
 	std::size_t pos = 0;
-//	while
-	if ((pos = subject.find(search, pos)) != std::string::npos) {
+	while ((pos = subject.find(search, pos)) != std::string::npos) {
 		subject.replace(pos, search.length(), replace);
-//		pos += replace.length();
-		}
+		pos += replace.length();
 	}
+}
 
+// ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
 // VarError constructor
-//
+// ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
 VarError::VarError(std::string message_)
 	: message(message_) {
-	// *** WARNING ***
-	// any errors in this constructor
-	// will cause recursion and hang/segfault
 
-//	if (message.assigned())
-//		message.put(std::cerr);
-//	var("\n").put(std::cerr);
+	// *** WARNING *** Any VarError errors in this constructor will cause recursion and hang/segfault
 
-	// Capture the stack at point of creation i.e. when thrown
-	// TODO capture in caller using default argument to VarError?
-	if (not exo_savestack(stack_addresses_, &stack_size_)) {
-		// gdb exists but could not attach to the process so it must already be attached.
-		// Flush any stdout error messages out
-		std::cout << std::flush;
-		std::cerr << "\n" << message_ << std::endl;
-		// break out into gdb
-		debug();
+	// Hide inherited complexity of var class
+	if (message.find("var_") != std::string::npos) {
+		replace_all_inplace(message, "exo::var_base<exo::var_stg<exo::var>>", "var");
+		replace_all_inplace(message, " [var = exo::var_stg<exo::var>]", "");
+		replace_all_inplace(message, " [var = exo::var_stg<exo::var>, ", "[");
 	}
 
 	// Flush any stdout error messages out
 	std::cout << std::flush;
 
-//	this->stack = exo_backtrace();
-//	((message.assigned() ? message : "") ^ "\n" ^ stack.convert(FM, "\n") ^ "\n").put(std::cerr);
-//	this->stack = "";
+	// Capture the stack at point of creation i.e. when thrown
+	// TODO capture in caller using default argument to VarError?
+	// Break into debugger if running under debugger or EXO_DEBUG is set to 1
+	exo_savestack(stack_addresses_, &stack_size_, message);
 
-//	stack.convert(FM, "\n").put(std::cerr);
-//	var("\n").put(std::cerr);
-
-	// Hide complexity
-//	if (message.contains("var_")) {
-	if (message.find("var_") != std::string::npos) {
-	    varb_replace_string(message, "exo::var_base<exo::var_stg<exo::var>>", "var");
-    	varb_replace_string(message, " [var = exo::var_stg<exo::var>]", "");
-    	varb_replace_string(message, " [var = exo::var_stg<exo::var>, ", "[");
-	}
-
-	// Break into debugger if EXO_DEBUG is set to 1
-	// otherwise allow catch at a higher level or terminate
-	// Probably already broken into debugger in the exo_savestack call above.
-//	var exo_debug;
-//	if (exo_debug.osgetenv("EXO_DEBUG") and exo_debug == 1) {
-//		var(message).errputl("\n");
-//		var(stack()).convert(FM, "\n").errputl();
-//		debug();
-//	}
 }
 
-// stack - source line acquisition
-//
-std::string VarError::stack(const std::size_t limit) const {
+// ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+// VarError::stack() - return source level backtrace text
+// ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+auto VarError::stack(const std::size_t limit) const -> std::string {
 
 	// Convert the stack addresses into source code lines
 	return exo_backtrace(stack_addresses_, stack_size_, limit);

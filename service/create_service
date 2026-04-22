@@ -108,7 +108,7 @@ function APT_GET {
 : -------------------
 :
 		# /dev/null to stop error causing random hang until timeout
-		# with apt process stuck on tcsetattr call. see gdb -p 9999
+		# with apt process stuck on tcsetattr call. see gdb/lldb -p 9999
 		if timeout 120s $* < /dev/null; then
 			break
 		fi

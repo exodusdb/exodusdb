@@ -1,9 +1,8 @@
 #!/bin/bash
 set -euxo pipefail
-
-: ====================================================================
+: ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
 : Stop a background service and run it in the foreground for debugging
-: ====================================================================
+: ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
 :
 : 'Syntax is ./run DBNAME [OPTION...]'
 :
@@ -28,17 +27,15 @@ set -euxo pipefail
 :
 : - Service: HOME/live/lib, bin etc.        From service/copyall
 : - System : /user/local/live/lib, bin etc. From service/copyall
-
 :
 : Validate
-: ========
+: ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
 :
 	DB_CODE=${1:?DBNAME argument is required.}
 	OPTIONS=${2:-}
-
 :
 : Config
-: ======
+: ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
 :
 : Caller sets APP_CODE or it defaults to exo
 :
@@ -51,25 +48,19 @@ set -euxo pipefail
 : Break into debugger on all errors
 :
 	export EXO_DEBUG=${EXO_DEBUG:-1}
-
 :
 : Remove any _test suffix from DB_CODE to get the working host dir
-: ================================================================
-:
+: ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
 	if [ -z ${SITE_DIR:-} ]; then
 		SITE_DIR=${DB_CODE%_test}
 	fi
-
 :
 : Always use the test programs in ~/ when running manually
-: ========================================================
-:
+: ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
 	export EXO_HOME=~
-
 :
 : Ensure the right EXODUS SYSTEM bin and lib are used.
-: ====================================================
-:
+: ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
 #	Example environment from live systemd service.
 #	Note prefix /usr/local/live/bin on PATH and /usr/local/live/lib on LD_LIBRARY_PATH
 #
@@ -78,7 +69,7 @@ set -euxo pipefail
 #	export EXO_DICT=exodus_live"
 #	export PATH=/usr/local/live/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/root/live/bin
 #	export LD_LIBRARY_PATH=/usr/local/live/lib:/root/live/lib"
-
+:
 	if [ -n "$EXO_LIVE" ]; then
 :
 : live/ service programs.
@@ -115,10 +106,9 @@ set -euxo pipefail
 :
 		export EXO_DICT=exodus
 	fi
-
 :
 : Ensure SERVICE bin and lib files can be found
-: =============================================
+: ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
 :
 :	Make sure it comes before any already configured path.
 :	Will not override any manually configured LD_LIBRARY_PATH
@@ -129,10 +119,9 @@ set -euxo pipefail
 :	Will not override any manually configured LD_LIBRARY_PATH
 :
 	export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$EXO_HOME/lib"
-
 :
 : Service code is APP_live@xxxxxxxx or APP_test@xxxxxxxx
-: ==========================================================
+: ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
 :
 : Where APP defaults to exo
 : and xxxxxxxx is the database code WITHOUT any _test suffix
@@ -144,58 +133,36 @@ set -euxo pipefail
 	fi
 :
 	FULL_SERVICE_CODE=${APP_CODE}_${SERVICE_SUFFIX}@${DB_CODE%_test}
-
 :
 : Change to the working directory
-: ===============================
-:
+: ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
 	cd ~/hosts/$SITE_DIR/work
-
 :
 : Stop the background process
-: ===========================
-:
+: ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
 	RESTART_AFTER=
 	if [ "$SERVICE_SUFFIX" = "test" ] && sudo systemctl is-active $FULL_SERVICE_CODE > /dev/null; then
 		RESTART_AFTER=yes
 		sudo systemctl stop $FULL_SERVICE_CODE
 	fi
-
 :
 : Indicate the database to use and request debugging
-: ==================================================
-:
+: ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
 	export EXO_DATA=$DB_CODE
-
 :
-: Install gdb if necessary
-: ========================
-:
-    which gdb || apt-get install -y gdb
-
-:
-: Start the server process under gdb
-: ==================================
-:
-#	Running under gdb for convenience
-	gdb -ex "set print inferior-events off" -ex run --args serve_any serve_${APP_CODE} $DB_CODE $OPTIONS
-#	No longer need to run under GDB since EXO_DEBUG=1 requests attach on error.
-#	and can break into gdb using Ctrl+C and option (D)ebug.
-#	gdb -ex "set print inferior-events off" -ex run --args serve_any serve_${APP_CODE} $DB_CODE $OPTIONS
-
+: Start the server process
+: ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+	serve_any serve_${APP_CODE} $DB_CODE $OPTIONS
 :
 : Check if background service should be restarted
-: ===============================================
-:
+: ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
 	if [ $RESTART_AFTER ]; then
-
 :
 : After debugging is finished, resume the normal background service
-: =================================================================
+: ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
 :
 		sudo systemctl start $FULL_SERVICE_CODE
 	fi
-
-:
+: ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
 : Finished debug of $SITE_DIR - $DB_CODE in $(($SECONDS / 60)) minutes and $(($SECONDS % 60)) seconds
-: ====================================================================
+: ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
