@@ -27,7 +27,7 @@ private:
     thread_local static const char* default_text_to_use;
 
 	// Complexity required by readline
-    static int startup_hook(void) {
+    static int startup_hook() {
         if (default_text_to_use != nullptr) {
             rl_insert_text(default_text_to_use);
 //            rl_point = 0; // Cursor to start

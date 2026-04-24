@@ -8797,6 +8797,80 @@ let v13 = d1.join();              // "2^4"_var
 
 
 
+.TH vardebug.h
+
+.SH 1. DEBUGGING 
+.SH
+
+.SS
+var v1 = backtrace();
+.PP
+Get stack backtrace text for the current program execution location.
+.sp 0
+
+
+.SS
+debug(var condition = INT_MAX)
+.PP
+Display stack backtrace text and attach debugger.
+.sp 0
+.PP
+The debugger can be used to inspect the current program internals.
+.sp 0
+.PP
+Quitting the debugger causes the program to resume execution.
+.sp 0
+.PP
+The debugger defaults to lldb if exodus was built with clang or gdb if built with g++. The enviroment variable EXO_DEBUGGER can be set to override the default.
+.sp 0
+.PP
+Access to the debugger and backtrace can also be triggered by Ctrl+C in terminal mode as long as breakoff() is not active.
+.sp 0
+.PP
+Ctrl+C: "Interrupted. (R)esume (Q)uit (A)bort (B)acktrace (D)ebug ?"
+.sp 0
+.PP
+\fBcondition:\fR If set to "" or 0 then debug will be skipped. This allows for conditional debugging.
+.sp 0
+.PP
+\fBEXO_DEBUG:\fR An environment variable that causes automatic attachment of debugger on VarError exception.
+.sp 0
+.PD 0 \"<dl>
+.TP 10\"<dt>
+\fB0\fR \"</dt>
+Suppress output of backtrace on VarError. Useful for speed if using try/catch to handle VarError exceptions.
+.\"</dd>
+.TP 10\"<dt>
+\fB1\fR \"</dt>
+Attach debugger on VarError exception.
+.\"</dd>
+.TP 10\"<dt>
+\fB2\fR \"</dt>
+Ditto but backtrace exodus library functions too.
+.\"</dd>
+.TP 10\"<dt>
+\fB3\fR \"</dt>
+Ditto but backtrace system library functions too.
+.\"</dd>
+.PD \"</dl>
+
+
+.SS
+breakon()
+.PP
+Enable Ctrl+C/SIGINT interrupt.
+.sp 0
+
+
+.SS
+breakoff()
+.PP
+Disable Ctrl+C/SIGINT interrupt.
+.sp 0
+
+
+
+
 .TH exoprog.h
 
 .SH 1. SELECT LISTS

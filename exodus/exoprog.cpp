@@ -784,15 +784,15 @@ var exoprog_callsmf(const Callable& callable, const ExoProgram& exoprog) {
 		nrvo = "";
 	}
 
-	// We break into gdb at point of VarError exception construction
-	// if gdb available and EXO_DEBUG=1 or if running under gdb already
+	// We break into debugger at point of VarError exception construction
+	// if debugger available and EXO_DEBUG=1 or if running under debugger already
 	catch (const VarError& e) {
 		//restore environment in case VarError is caught
 		//in caller and the program resumes processing
 //				restore_environment();
 		var::setlasterror(e.message);
 
-		// Use gdb command "catch throw" to break at error line to get back traces there
+		// Use debugger command "catch throw" to break at error line to get back traces there
 		UNLIKELY
 		throw;
 	}
@@ -2628,48 +2628,33 @@ int ExoProgram::run_main(var (ExoProgram::*main_func)(), int argc, const char* a
 	var caught = "";
 	int exit_status = 0;
 
-// We break into gdb at point of VarError exception construction
-// if gdb available and EXO_DEBUG=1 or if running under gdb already
-// Use gdb catch throw (somehow skip catching ExoExit (Stop/Abort) exceptions)
-// to catch any std::exception or unknown exceptions.
-//
-//	// Check EXO_DEBUG using ExoEnv
-//	var exo_debug;
-//	if (exo_debug.osgetenv("EXO_DEBUG") and exo_debug) {
-//		var("Debug Init Thread:" ^ ev.THREADNO ^ " " ^ ev.SENTENCE).errputl();
-//		// Debug mode: no exception catching
-//		result = (this->*main_func)();
-//		var("Debug Exit Thread:" ^ ev.THREADNO ^ " " ^ ev.SENTENCE).errputl();
-//	} else {
-		try {
-			// Normal mode: catch exceptions
-			result = (this->*main_func)().or_default("");
-		} catch (const ExoStop& e) {
-			result = e.message;
-		} catch (const ExoAbort& e) {
-			caught = "ExoAbort: ";
-			result = e.message;
-			exit_status = 1;
-		} catch (const ExoAbortAll& e) {
-			caught = "ExoAbortAll: ";
-			result = e.message;
-			exit_status = 2;
-		} catch (const VarError& e) {
-			caught = "VarError: ";
-			result = e.message;
-			exit_status = 3;
-			var(e.stack()).convert(FM, "\n").errputl();
-		} catch (const std::exception& e) {
-			(var(e.what()) ^ " - Aborting.").errputl();
-			result = 1;
-		} catch (...) {
-			let msg = "Error: Unknown exception caught in " ^ var(__PRETTY_FUNCTION__);
-			msg.errputl();
-			auto e = VarError(msg);
-			var(e.stack()).convert(FM, "\n").errputl();
-			result = ev.OPTIONS.contains("I") ? 0 : 999;
-		}
-//	}
+	try {
+		result = (this->*main_func)().or_default("");
+	} catch (const ExoStop& e) {
+		result = e.message;
+	} catch (const ExoAbort& e) {
+		caught = "ExoAbort: ";
+		result = e.message;
+		exit_status = 1;
+	} catch (const ExoAbortAll& e) {
+		caught = "ExoAbortAll: ";
+		result = e.message;
+		exit_status = 2;
+	} catch (const VarError& e) {
+		caught = "VarError: ";
+		result = e.message;
+		exit_status = 3;
+		var(e.stack()).convert(FM, "\n").errputl();
+	} catch (const std::exception& e) {
+		(var(e.what()) ^ " - Aborting.").errputl();
+		result = 1;
+	} catch (...) {
+		let msg = "Error: Unknown exception caught in " ^ var(__PRETTY_FUNCTION__);
+		msg.errputl();
+		auto e = VarError(msg);
+		var(e.stack()).convert(FM, "\n").errputl();
+		result = ev.OPTIONS.contains("I") ? 0 : 999;
+	}
 
 	// Cleanup
 	var().disconnectall();

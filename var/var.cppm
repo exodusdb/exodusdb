@@ -10,6 +10,7 @@ export module var;
 
 export namespace exo {
 
+	using exo::backtrace;
 	using exo::debug;
 //	using exo::fmt;
 	using exo::var_base;

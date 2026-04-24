@@ -532,7 +532,7 @@ PUBLIC void VB1::createString() const {
 // 3. digits (0-9) must occur 1 or more times (but see rule 0.)
 // 4. all characters mean non-numeric
 
-PUBLIC bool VB1::isnum(void) const {
+PUBLIC bool VB1::isnum() const {
 
 	// TODO make isnum private and ensure ISVAR is checked before all calls to isnum
 	// to save the probably double check here
@@ -650,7 +650,7 @@ PUBLIC bool VB1::isnum(void) const {
 	return true;
 }
 
-PUBLIC RETVAR VB1::num(void) const {
+PUBLIC RETVAR VB1::num() const {
 	RETVAR result;
 	if (this->isnum())
 		result = this->clone();

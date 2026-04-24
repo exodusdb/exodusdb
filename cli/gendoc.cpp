@@ -443,7 +443,8 @@ func main() {
 			// Continue to next source line on rejection
 
 			var funcx_prefix;
-			struct Funcx {var is_static; var no_discard; var is_ctor; var prefix = "";} funcx_mut;
+//			struct Funcx {var is_static; var no_discard; var is_ctor; var prefix = "";} funcx_mut;
+			struct Funcx {var is_static; var is_ctor; var prefix = "";} funcx_mut;
 			{
 				//	static int getprecision() const;
 				let origsrcline = srcline;
@@ -453,10 +454,18 @@ func main() {
 				srcline.replacer(R"__(\bstatic\s+)__"_rex, "");
 				funcx_mut.is_static = srcline ne origsrcline;
 
-				// Not documenting ND or not since mostly ND
-				funcx_mut.no_discard = srcline.starts("ND ");
-				if (funcx_mut.no_discard)
+//				// Not documenting ND or not since mostly ND
+//				funcx_mut.no_discard = srcline.starts("ND ");
+//				if (funcx_mut.no_discard)
+//					srcline.cutter(3);
+
+				// Ignore leading ND
+				if (srcline.starts("ND "))
 					srcline.cutter(3);
+
+				// Ignore leading PUBLIC
+				if (srcline.starts("PUBLIC "))
+					srcline.cutter(7);
 
 				// funcx_prefix starts life as the first word
 				// trim leading friend and const/constexpr etc.
@@ -1124,6 +1133,7 @@ func main() {
 							// var(). -> var::
 							func_decl.replacer("var.", "var::");
 						}
+						func_decl.replacer("none.", "");
 					}
 
 				} // not is_ctor

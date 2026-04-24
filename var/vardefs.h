@@ -157,8 +157,9 @@
 		/* Must use errputl to convert all fms to visible fms*/ \
 		TRACE_expressionx.quote().errputl("TRACE(" #EXPRESSION ")\t/" "/ "); \
 	} catch (VarError e) { \
-		var(e.stack()).errputl(e.message); \
-		/*std::cerr << var(e.message).field(":", 1) << ": " << var(e.stack()) << std::endl;*/ \
+		/*e.stack().errputl(e.message + '\n');*/ \
+		var(e.message).errputl(); \
+		var(e.stack()).errputl(); \
 	};
 
 #define TRACE2(EXPRESSION) \

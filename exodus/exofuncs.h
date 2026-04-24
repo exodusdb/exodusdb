@@ -149,8 +149,6 @@ ND bool osshellread(out readstr, in command);
 ND var  osshellread(in command);
 ND bool osprocess(in oscmd, in stdin_to_process, out stdout_from_process, out stderr_from_process, out exit_status, in timeout_secs = 0);
 
-ND auto backtrace(void) -> std::string;
-
    bool setxlocale(const char* newlocalecode);
 ND var  getxlocale(void);
 

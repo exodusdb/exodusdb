@@ -2470,6 +2470,10 @@ func main() {
 	}
 
 ////////////////
+// Code examples vardebug.h
+////////////////
+
+////////////////
 // Code examples exoprog.h
 ////////////////
 

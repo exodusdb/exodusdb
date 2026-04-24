@@ -66,7 +66,7 @@ func main() {
 	SYSTEM(33, 3) = "EXODUS";
 
 	// f5 key
-	PRIORITYINT(2) = "x";
+	PRIORITYINT(2) = "e";
 
 	// Create database dir
 	let datadir = "../data/";

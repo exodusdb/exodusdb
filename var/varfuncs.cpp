@@ -299,7 +299,8 @@ var&  var_os::keypressed(const bool wait /*=false*/) {
 	assertVar(function_sig);
 
 	// Function declared in term_getkey.cpp
-	char term_getkey(void);
+//	char term_getkey(void);
+	auto term_getkey() -> char;
 
 	// Return empty string by default
 	var_str.clear();

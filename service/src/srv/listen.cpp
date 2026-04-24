@@ -91,7 +91,6 @@ var replyfilename;
 var stack;
 var lastrequestdate;
 var lastrequesttime;
-var breaktime;
 var timenow;
 var cmd;
 var linkfilename0;
@@ -207,7 +206,7 @@ var compcode;
 var logid;
 
 var nextconnection;
-let interactive_prompt = "(q)uit, e(x)ecute or (d)ebug:\nListening ...\r";
+let interactive_prompt = AT(-40) ^ "(Q)uit, (E)xecute or (D)ebug:\nListening ...\r";
 
 func main() {
 
@@ -546,15 +545,9 @@ func loop_init() {
 	// clear any file handles
 	osflush();
 
-	// on win95 this runs at same speed in full screen or windowed
-
 	locks1.unlock("REQUEST*" ^ linkfilename1);
 	locks1.unlock("REQUEST*" ^ replyfilename);
-	// print 'unlock locks,REQUEST*':linkfilename1
-	// print 'unlock locks,REQUEST*':replyfilename
 	call listen5("UNLOCKLONGPROCESS");
-
-	breaktime = "X";
 
 nextsearch0:
 	// //////////
@@ -746,15 +739,11 @@ func loop_exit() {
 	if (charx.contains(tt)) {
 		// leading space to avoid chars after ESC pressed being ANSI control sequences
 		tt.replacer(chr(27), "Esc");
-//		call note("Press " ^ tt ^ " again to confirm|", "UB", buffer);
-//		echo(0);
-//		reply.inputn(1);
-//		reply.lcaser();
-//		echo(1);
-//		call note("", "DB", buffer);
 		output("Press " ^ tt ^ " again to confirm: ");
 		osflush();
+		echo(false);
 		reply.inputn(1);
+		echo(true);
 
 		if (reply == INTCONST.f(1)) {
 			// space to defeat ANSI control chars after pressing Esc
@@ -762,16 +751,16 @@ func loop_exit() {
 			// gosub main_exit();
 			return false;
 		}
-		// "x"
-		if (reply == INTCONST.f(7) or reply.listed("x,d")) {
-			if (reply == "x")
+		if (reply == INTCONST.f(7) or reply.listed("e,d")) {
+			if (reply == "e")
 				outputl();
 			charx = reply;
 		} else {
-			outputl(" ignored.");
+//			outputl(" ignored.");
 
 			// In main and various places
 			output(interactive_prompt);
+//			output(AT(-40));
 			osflush();
 
 			return true;
@@ -784,8 +773,9 @@ func loop_exit() {
 	// gosub exit
 	// end
 
-	// 'x' execute commands
-	if (charx.lcase() == PRIORITYINT.f(2)) {
+	// 'e' execute command
+//	if (charx.lcase() == PRIORITYINT.f(2)) { // "x"
+	if (charx.lcase() == "e") {
 		cmd = "";
 
 		// Command loop
@@ -871,7 +861,11 @@ func loop_exit() {
 	}
 
 	if (charx == "\n") {
-		printl();
+//		printl();
+		// In main and various places
+		output(interactive_prompt);
+		osflush();
+
 		return true;
 	}
 

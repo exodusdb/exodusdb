@@ -23,7 +23,7 @@
 
 namespace exo {
 
-char term_getkey(void) {
+char term_getkey() {
 	char ch = 0;
 	int error;
 	struct termios oldAttr, newAttr;

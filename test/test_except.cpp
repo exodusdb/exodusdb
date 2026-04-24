@@ -8,6 +8,8 @@
 #	include <limits>
 #endif
 
+// Needs EXO_DEBUG=0 to avoid very slow and not required backtracing on every VarError.
+
 #include <exodus/program.h>
 programinit()
 

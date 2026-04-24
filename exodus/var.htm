@@ -433,6 +433,8 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 		<li>
 			<a href="#dim">dim</a></li>
 		<li>
+			<a href="#vardebug">vardebug</a></li>
+		<li>
 			<a href="#exoprog">exoprog</a></li>
 		<li>
 			<a href="#job_manager">job_manager</a></li>
@@ -7944,6 +7946,78 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 <span class="nf">let</span><span class="w"> </span><span class="n">v13</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">d1</span><span class="p">.</span><span class="nf">join</span><span class="p">();</span><span class="w">              </span><span class="c1">// &quot;2^4&quot;_var</span>
 </pre>
 			</p>
+		</td></tr>
+</table>
+
+<div class="toc">
+	<h4 id="vardebug">Contents:</h4>
+	<ol>
+		<li>
+			<a href="#Debugging_">Debugging </a></li>
+
+	</ol>
+</div>
+
+
+<h5 id="Debugging_">Debugging </h5>
+
+<table class="wikitable">
+	<tr>
+		<th>Use</th>
+		<th>Function</th>
+		<th>Description</th> </tr>
+	<tr>
+		<td style = "white-space:nowrap">
+			<p>
+				<code>var=</code></p></td>
+		<td>
+			<p>
+				<code>backtrace()</code></p></td>
+		<td>
+			<p>Get stack backtrace text for the current program execution location.</p>
+		</td></tr>
+	<tr>
+		<td style = "white-space:nowrap"></td>
+		<td>
+			<p>
+				<code>debug(var condition = INT_MAX)</code></p></td>
+		<td>
+			<p>Display stack backtrace text and attach debugger.</p>
+			<p>The debugger can be used to inspect the current program internals.</p>
+			<p>Quitting the debugger causes the program to resume execution.</p>
+			<p>The debugger defaults to lldb if exodus was built with clang or gdb if built with g++. The enviroment variable EXO_DEBUGGER can be set to override the default.</p>
+			<p>Access to the debugger and backtrace can also be triggered by Ctrl+C in terminal mode as long as breakoff() is not active.</p>
+			<p>Ctrl+C: "Interrupted. (R)esume (Q)uit (A)bort (B)acktrace (D)ebug ?"</p>
+			<p>
+				<em>condition:</em> If set to "" or 0 then debug will be skipped. This allows for conditional debugging.</p>
+			<p>
+				<em>EXO_DEBUG:</em> An environment variable that causes automatic attachment of debugger on VarError exception.</p>
+			<dl>
+				<dt>0</dt>
+				<dd>Suppress output of backtrace on VarError. Useful for speed if using try/catch to handle VarError exceptions.</dd>
+				<dt>1</dt>
+				<dd>Attach debugger on VarError exception.</dd>
+				<dt>2</dt>
+				<dd>Ditto but backtrace exodus library functions too.</dd>
+				<dt>3</dt>
+				<dd>Ditto but backtrace system library functions too.</dd>
+			</dl>
+		</td></tr>
+	<tr>
+		<td style = "white-space:nowrap"></td>
+		<td>
+			<p>
+				<code>breakon()</code></p></td>
+		<td>
+			<p>Enable Ctrl+C/SIGINT interrupt.</p>
+		</td></tr>
+	<tr>
+		<td style = "white-space:nowrap"></td>
+		<td>
+			<p>
+				<code>breakoff()</code></p></td>
+		<td>
+			<p>Disable Ctrl+C/SIGINT interrupt.</p>
 		</td></tr>
 </table>
 

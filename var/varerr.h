@@ -30,8 +30,8 @@ class PUBLIC VarError {
 	// Otherwise the only the stack track captured by the exception site will be available. 
 	std::string message;
 
-	// function to convert stack addresses to source code if available
-	std::string stack(const std::size_t limit = 0) const;
+	// Function to convert stack addresses to source code if available
+	auto stack(const std::size_t limit = 0) const -> std::string;
 
  private:
 

@@ -126,7 +126,6 @@ export namespace exo {
 
 	using exo::atan;
 	using exo::attach;
-	using exo::backtrace;
 
 	using exo::begintrans;
 	using exo::committrans;

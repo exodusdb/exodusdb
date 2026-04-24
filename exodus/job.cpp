@@ -170,7 +170,7 @@ Job::Job (
 		} catch (VarError& e) {
 			std::cerr << "VarError: Job: command: " << command << std::endl;
 			std::cerr << "VarError: " << var(e.message).quote() << std::endl;
-			std::cerr << var(e.stack()).convert(_FM, _NL) << std::endl;
+			std::cerr << e.stack() << std::endl;
 			// Push abnormal result
 			shared_env->ANS = "";
 			if (result_queuex) {
