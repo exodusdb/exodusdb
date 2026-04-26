@@ -3,9 +3,9 @@
 set -euxo pipefail
 PS4='+ [boost ${SECONDS}s] '
 : $0 $*
-: =============================================================================
+: ─────────────────────────────────────────────────────────────────────────────────
 : Build Boost with Clang + libc++ on Ubuntu LTS
-: =============================================================================
+: ─────────────────────────────────────────────────────────────────────────────────
 :
 : 'Output: libs especially regex & locale without libstdc++.so dependency'
 : 'Default is Boost 1.90.0, requires and discovers latest /usr/local/icu-libcxx-NN.N'
@@ -43,7 +43,7 @@ PS4='+ [boost ${SECONDS}s] '
 	NC='\033[0m' # No Color
 :
 : clang++ and clang are required
-: ==============================
+: ────────────────────────────────────────
 :
 	if ! which clang++ || ! which clang ; then
 		CLANG_VER=`c++ --version | head -n1|cut -d'.' -f 1|grep -Po '\d+'`
@@ -52,7 +52,7 @@ PS4='+ [boost ${SECONDS}s] '
 	fi
 :
 : STEP 0: Install dependencies
-: ============================
+: ────────────────────────────────────────
 :
 	sudo apt install -y \
 		curl \
@@ -66,7 +66,7 @@ PS4='+ [boost ${SECONDS}s] '
 
 :
 : STEP 1: Download and extract boost
-: ==================================
+: ────────────────────────────────────────
 :
 : Download
 :
@@ -89,25 +89,25 @@ PS4='+ [boost ${SECONDS}s] '
 	rm "${BOOST_TAR}"
 :
 : STEP 2: Build and install
-: =========================
+: ────────────────────────────────────────
 :
 	pushd "${BOOST_DIR}"
 :
 : Clean previous build artifacts
-: ------------------------------
+: ────────────────────────────────────────
 	rm -rf bin.v2 || true
 :
 : Bootstrapping Boost with clang
-: ------------------------------
+: ────────────────────────────────────────
 :
 	./bootstrap.sh --with-toolset=clang
 :
 : Configure user-config.jam for libc++
-: ------------------------------------
+: ────────────────────────────────────────
 	(set +x && echo 'using clang : : clang++ : <cxxflags>"-stdlib=libc++" <linkflags>"-stdlib=libc++" ;' > tools/build/src/user-config.jam)
 :
 : Build selected libraries
-: ------------------------
+: ────────────────────────────────────────
 	(set +x && echo -e "${YELLOW}Building Selected Boost libraries...${NC}")
 :
 : IF ANY TESTS FAIL THAT SHOULDNT e.g. has_icu - important for boost_locale, see
@@ -138,7 +138,7 @@ PS4='+ [boost ${SECONDS}s] '
 	ldconfig
 :
 : STEP 3: Verify
-: ==============
+: ────────────────────────────────────────
 :
 	(set +x && echo -e "\n${YELLOW}→ Verification:${NC}")
 
@@ -164,11 +164,11 @@ PS4='+ [boost ${SECONDS}s] '
 :
 	rm ${BOOST_DIR} -rf
 :
-: ===========================================================
+: ─────────────────────────────────────────────────────────────────────────────────
 : Boost ${BOOST_VER} installed successfully to ${INSTALL_PREFIX}
 : You can now build your boost project with -stdlib=libc++ flags.
 : Recommended CMake additions:
 :   add_compile_options\(-stdlib=libc++\)
 :   add_link_options\(-stdlib=libc++\)
 : Enjoy your clean libc++ Boost stack\! 🚀
-: ============================================================
+: ─────────────────────────────────────────────────────────────────────────────────

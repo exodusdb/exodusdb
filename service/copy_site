@@ -1,9 +1,9 @@
 #!/bin/bash
 set -euxo pipefail
 
-: ======================================================
+: ─────────────────────────────────────────────────────────────────────────────────
 : Copy a site from a remote server to the current server
-: ======================================================
+: ─────────────────────────────────────────────────────────────────────────────────
 :
 : 'Syntax is ./copy_site copy|move SSH_HOST[:SSH_PORT] DELETE DB_NAME'
 :
@@ -27,7 +27,7 @@ set -euxo pipefail
 
 :
 : Config
-: ======
+: ────────────────────────────────────────
 :
 	export APP_CODE=agy
 
@@ -49,7 +49,7 @@ set -euxo pipefail
 
 :
 : If mode is move then shutdown the remote site
-: =============================================
+: ────────────────────────────────────────
 :
 	if [ $MODE = move ]; then
 		$SSH "cd $NEOSYS_DIR && ./doall $COPY_EXO_DATA stop && ./doall $COPY_EXO_DATA disable"
@@ -57,7 +57,7 @@ set -euxo pipefail
 
 :
 : Backup the site database on the remote server
-: =============================================
+: ────────────────────────────────────────
 :
 : This dumps the postgresql database into an sql file in the remote site work dir
 :
@@ -65,29 +65,29 @@ set -euxo pipefail
 
 :
 : Copy the remote work dir to this server
-: =======================================
+: ────────────────────────────────────────
 :
 	rsync -e "ssh -p $SSH_PORT" -avz --delete $SSH_USER@$SSH_HOST:$HOSTS_DIR/$EXO_SITE/ $HOSTS_DIR/$EXO_SITE
 
 :
 : Restore the database
-: ====================
+: ────────────────────────────────────────
 :
 	cd $NEOSYS_DIR
 	./doall $COPY_EXO_DATA restore_db
 
 :
 : Create the live database from the restored _test version
-: ========================================================
+: ────────────────────────────────────────
 :
 	cd $SERVICE_DIR
 	EXO_DATA= ./copy_db ${COPY_EXO_DATA}_test $COPY_EXO_DATA $DELETE
 
 :
 : Check the database has been copied correctly.
-: ============================================================
+: ─────────────────────────────────────────────────────────────────────────────────
 : Skipped for speed unless moving. Do it manually if required.
-: ============================================================
+: ─────────────────────────────────────────────────────────────────────────────────
 :
 	if [ $MODE = move ]; then
 		dbcomp ${COPY_EXO_DATA}_test $COPY_EXO_DATA > /dev/null
@@ -95,4 +95,4 @@ set -euxo pipefail
 
 :
 : Finished $0 $* in $(($SECONDS/60)) mins. and $(($SECONDS%60)) secs.
-: ===================================================================
+: ────────────────────────────────────────

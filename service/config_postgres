@@ -1,9 +1,9 @@
 #!/bin/bash
 set -euxo pipefail
 
-: ===================================================
+: ─────────────────────────────────────────────────────────────────────────────────
 : Configure Postgres with more connections and memory
-: ===================================================
+: ─────────────────────────────────────────────────────────────────────────────────
 :
 : Note: Restarts postgres
 :
@@ -13,7 +13,7 @@ set -euxo pipefail
 
 :
 : Not configuring for SSD because initial tests didnt show much difference
-: ========================================================================
+: ────────────────────────────────────────
 :
 	SSD=
 	if [ $SSD ]; then
@@ -22,9 +22,9 @@ set -euxo pipefail
 		RANDOM_PAGE_COST=4
 	fi
 
-: ==============================================================
+: ─────────────────────────────────────────────────────────────────────────────────
 : A function to show the maximum connections and memory reserved
-: ==============================================================
+: ─────────────────────────────────────────────────────────────────────────────────
 :
 function showmax() {
 	sudo -u postgres psql <<-V0G0N
@@ -35,9 +35,9 @@ function showmax() {
 V0G0N
 }
 
-: ==========================================================
+: ─────────────────────────────────────────────────────────────────────────────────
 : A function to show any connections idle longer than x mins
-: ==========================================================
+: ─────────────────────────────────────────────────────────────────────────────────
 :
 function showidle() {
 	sudo -u postgres psql <<-V0G0N
@@ -50,9 +50,9 @@ function showidle() {
 V0G0N
 }
 
-: ===================================================================
+: ─────────────────────────────────────────────────────────────────────────────────
 : A function to kill any postgres connections idle longer than x mins
-: ===================================================================
+: ─────────────────────────────────────────────────────────────────────────────────
 :
 function killidle() {
 	sudo -u postgres psql <<-V0G0N
@@ -66,31 +66,31 @@ function killidle() {
 }
 
 :
-: =============
+: ─────────────────────────────────────────────────────────────────────────────────
 : Main function
-: =============
+: ─────────────────────────────────────────────────────────────────────────────────
 
 :
 : Check postgresql is installed
-: =============================
+: ────────────────────────────────────────
 :
 	test -d /etc/postgresql/*/main/conf.d
 
 :
 : Show connections idle > 1 min
-: =============================
+: ────────────────────────────────────────
 :
 	showidle 1
 
 :
 : Show the current maxima
-: =======================
+: ────────────────────────────────────────
 :
 	showmax
 
 :
 : Set new maxima
-: ==============
+: ────────────────────────────────────────
 :
 #	echo "max_connections = 300" > /etc/postgresql/12/main/conf.d/neosys.conf && service postgresql restart
 	sudo -u postgres psql <<-V0G0N
@@ -100,7 +100,7 @@ function killidle() {
 
 :
 : Configure for ssd or spinning rust
-: ==================================
+: ────────────────────────────────────────
 :
 	sudo -u postgres psql <<-V0G0N
 		ALTER SYSTEM SET random_page_cost TO '$RANDOM_PAGE_COST';
@@ -108,7 +108,7 @@ function killidle() {
 
 :
 : Log to syslog
-: =============
+: ────────────────────────────────────────
 :
 : https://logtail.com/tutorials/how-to-start-logging-with-postgresql/
 :
@@ -123,7 +123,7 @@ function killidle() {
 
 :
 : Log all statements longer than n ms
-: ===================================
+: ────────────────────────────────────────
 :
 	sudo -u postgres psql <<-V0G0N
 		ALTER SYSTEM SET log_min_duration_statement TO 500;
@@ -131,16 +131,16 @@ function killidle() {
 
 :
 : Restart postgresql
-: ==================
+: ────────────────────────────────────────
 :
 	sudo service postgresql restart
 
 :
 : Show the new maxima
-: ===================
+: ────────────────────────────────────────
 :
 	showmax
 
 :
 : Finished config_postgres
-: ========================
+: ────────────────────────────────────────

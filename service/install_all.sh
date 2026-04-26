@@ -3,9 +3,9 @@
 set -euxo pipefail
 PS4='+ [service ${SECONDS}s] '
 : $0 $*
-: ===========================
+: ─────────────────────────────────────────────────────────────────────────────────
 : Installs EXODUS web service
-: ===========================
+: ─────────────────────────────────────────────────────────────────────────────────
 :
 : 'Syntax is ./install_all.sh [SITE_NAME|exodus|none] [DOMAIN_PREFIX]'
 :
@@ -21,7 +21,7 @@ PS4='+ [service ${SECONDS}s] '
 
 :
 : Config
-: ======
+: ────────────────────────────────────────
 :
 :	EXODUS_DIR provided by caller or default to the parent dir of the current working dir
 :
@@ -29,7 +29,7 @@ PS4='+ [service ${SECONDS}s] '
 	EXODUS_DIR=${EXODUS_DIR:-$(realpath `pwd`/..)}
 :
 : Function to call apt-get install three times in case of timeout
-: ---------------------------------------------------------------
+: ────────────────────────────────────────
 :
 function APT_INSTALL {
 :
@@ -60,7 +60,7 @@ function APT_INSTALL {
 }
 :
 : Allow cd into subdirs of /root - but no read access of course
-: =============================================================
+: ────────────────────────────────────────
 :
 : 	Only if installing into /root/
 :
@@ -68,7 +68,7 @@ function APT_INSTALL {
 
 #:
 #: Install chromium to convert html to pdf
-#: =======================================
+#: ────────────────────────────────────────
 #:
 #:  Dont wait for it to complete. Install will be tested near the end of this script.
 #:
@@ -77,7 +77,7 @@ function APT_INSTALL {
 
 :
 : Install apache with php and configure a site
-: ============================================
+: ────────────────────────────────────────
 :
 	if [ $SITE_NAME != none ]; then
 		cd $EXODUS_DIR/service
@@ -86,13 +86,13 @@ function APT_INSTALL {
 
 :
 : Disable default web sites
-: =========================
+: ────────────────────────────────────────
 :
 	sudo a2dissite 000-default default-ssl.conf || true
 
 :
 : Copy logo and ico into images and web root
-: ==========================================
+: ────────────────────────────────────────
 
 	cd $EXODUS_DIR/service
 	cp favicon.ico www
@@ -100,27 +100,27 @@ function APT_INSTALL {
 
 :
 : Compile the service
-: ===================
+: ────────────────────────────────────────
 :
 	cd $EXODUS_DIR/service/src
 	./compall
 
 :
 : Copy all $EXODUS_DIR/bin,lib,dat to ~/live
-: ======================================
+: ────────────────────────────────────────
 :
 	cd $EXODUS_DIR/service
 	./copyall CONFIRM
 
 :
 : Create exodus_live db for live dictionaries if not already present
-: ==================================================================
+: ────────────────────────────────────────
 :
 	dblist|grep exodus_live > /dev/null || dbcreate exodus_live
 
 :
 : Import dat files into exodus and exodus_live
-: ===========================================
+: ────────────────────────────────────────
 :
 	cd /tmp
 	#sudo -u postgres psql exodus < $EXODUS_DIR/service/src/sql/dict_voc.sql
@@ -140,7 +140,7 @@ function APT_INSTALL {
 
 :
 : Configure the exodus service
-: ============================
+: ────────────────────────────────────────
 :
 	if [ $SITE_NAME != none ]; then
 		cd $EXODUS_DIR/service
@@ -149,7 +149,7 @@ function APT_INSTALL {
 
 :
 : Start the service
-: =================
+: ────────────────────────────────────────
 :
 	if [ $SITE_NAME != none ]; then
 		cd $EXODUS_DIR/service
@@ -158,7 +158,7 @@ function APT_INSTALL {
 
 :
 : Install required packages
-: =========================
+: ────────────────────────────────────────
 :
 :	whois       used in unknown ip no login notification emails
 :	bsd-mailx   provides "mail" which is required to send email?
@@ -170,7 +170,7 @@ function APT_INSTALL {
 	APT_INSTALL whois postfix bsd-mailx
 :
 : Configure postfix
-: =================
+: ────────────────────────────────────────
 :
 	#JE: Postfix config done in install.neosys1 script
 	#postconf myhostname=$SITE_NAME
@@ -179,7 +179,7 @@ function APT_INSTALL {
 
 #:
 #: Install html2pdf
-#: ================
+#: ────────────────────────────────────────
 #:
 #: https://wkhtmltopdf.org/downloads.html
 #:
@@ -226,13 +226,13 @@ function APT_INSTALL {
 
 :
 : Install pdfgrep
-: ===============
+: ────────────────────────────────────────
 :
 	which pdfgrep || APT_INSTALL pdfgrep
 
 #:
 #: Display chromium snap versions available
-#: ========================================
+#: ────────────────────────────────────────
 #:
 #	snapname="chromium"
 #	curl -s -H "Snap-Device-Series: 16" \
@@ -243,7 +243,7 @@ function APT_INSTALL {
 #
 #:
 #: Wait for chromium snap install to complete
-#: ===========================================
+#: ────────────────────────────────────────
 #:
 #: Wait up to 5x2 mins for snap installation to complete. Can randomly fail. Just redo.
 #:
@@ -257,7 +257,7 @@ function APT_INSTALL {
 #	snap refresh chromium
 :
 : Install google-chrome and alias chromium
-: =====================
+: ────────────────────────────────────────
 :
 	wget --no-verbose -O "/tmp/google-chrome.deb" https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
 	APT_INSTALL "/tmp/google-chrome.deb"
@@ -265,7 +265,7 @@ function APT_INSTALL {
 	ln -snf `which /usr/bin/google-chrome` /usr/bin/chromium
 :
 : Check html conversion to pdf
-: ============================
+: ────────────────────────────────────────
 :
 	printf "<html><body>Nothing Special</body></html>\n" > chromium2pdf.html
 	chromium --no-sandbox --headless --disable-gpu --print-to-pdf=chromium2pdf.pdf chromium2pdf.html |& grep -v 'ERROR:dbus'
@@ -274,7 +274,7 @@ function APT_INSTALL {
 #	rm chromium2pdf.html chromium2pdf.pdf
 :
 : Remove snap chromium if installed
-: =================================
+: ────────────────────────────────────────
 :
 	if which chromium; then
 		snap remove --purge chromium || true
@@ -283,14 +283,14 @@ function APT_INSTALL {
 
 :
 : Determine local ip number for info
-: ==================================
+: ────────────────────────────────────────
 :
 	IPNO=`ip -4 address|grep -v 127.0.0.1|grep -P '\d+\.\d+\.\d+\.\d+' -o|head -n1`
 
 :
-: ==============================================================
+: ─────────────────────────────────────────────────────────────────────────────────
 : Finished $0 $* in $(($SECONDS/60)) minutes and $(($SECONDS%60)) seconds.
-: ==============================================================
+: ─────────────────────────────────────────────────────────────────────────────────
 :
 :	Apache is now listening on https://$IPNO
 :

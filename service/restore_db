@@ -1,9 +1,9 @@
 #!/bin/bash
 set -euxo pipefail
 
-: ===============================================================
+: ─────────────────────────────────────────────────────────────────────────────────
 : Restore a postgres database from an sql dump to a _test database
-: ===============================================================
+: ─────────────────────────────────────────────────────────────────────────────────
 :
 : 'Syntax:'
 :
@@ -17,7 +17,7 @@ set -euxo pipefail
 
 :
 : Check Syntax
-: ============
+: ────────────────────────────────────────
 :
 	if [ -z "LIVE_EXO_DATA"  -o  -z "$NEW_BACKUP_DIR" ]; then
 		set +x
@@ -33,13 +33,13 @@ set -euxo pipefail
 
 :
 : Detect if target is running
-: ===========================
+: ────────────────────────────────────────
 :
 	./service ${LIVE_EXO_DATA} is-active test &> /dev/null && RESTART_REQUIRED=Y || RESTART_REQUIRED=N
 
 :
 : Stop the target database
-: ========================
+: ────────────────────────────────────────
 :
 	[ $RESTART_REQUIRED = Y ] && ./service ${LIVE_EXO_DATA} stop test
 
@@ -51,7 +51,7 @@ set -euxo pipefail
 
 :
 : Kill any test process running the target database
-: =================================================
+: ────────────────────────────────────────
 :
 	#PIDFILENAME=/run/serve_${APP_CODE}/${APP_CODE}_test@${DB_CODE}.pid
 	#save having to assign DB_CODE when executing restore_db directly in cli
@@ -62,7 +62,7 @@ set -euxo pipefail
 
 :
 : Kill any existing connections to the target database
-: ====================================================
+: ────────────────────────────────────────
 :
 : dropdb only has the force option from postgres v13
 :
@@ -70,20 +70,20 @@ set -euxo pipefail
 
 :
 : Drop the target database
-: ========================
+: ────────────────────────────────────────
 :
 	sudo -u postgres dropdb --if-exists $TEST_EXO_DATA
 
 :
 : Create the target database as empty
-: ===================================
+: ────────────────────────────────────────
 :
 	sudo -u postgres createdb --owner exodus --template template1 $TEST_EXO_DATA
 	#sudo -u postgres createdb --owner exodus --template template0 $TEST_EXO_DATA
 
 :
 : Restore into the target database
-: ================================
+: ────────────────────────────────────────
 :
 	#zcat $NEW_BACKUP_DIR/$LIVE_EXO_DATA.sql.gz | sudo -u postgres psql $TEST_EXO_DATA > /dev/null
 :   Suppress various "No function matches ..." errors since functions may not be loaded in dependency order
@@ -103,13 +103,13 @@ set -euxo pipefail
 
 :
 : Create all pgsql functions
-: ==========================
+: ────────────────────────────────────────
 :
 	EXO_DATA=$TEST_EXO_DATA dict2sql > /dev/null
 
 :
 : Reattach to foreign test database
-: =================================
+: ─────────────────────────────────────────────────────────────────────────────────
 : 'because pg_dump/restore preservers foreign table attachments'
 : 'leaving foreign tables in test databases access to update tables in live databases'
 : 'users of databases with foreign tables are restricted from updating but EXODUS is not!'
@@ -164,13 +164,13 @@ set -euxo pipefail
 
 :
 : Repopulate pg_statistic to avoid unnecessary aggressive autovacuum, send it to background
-: =========================================================================================
+: ─────────────────────────────────────────────────────────────────────────────────
 :
        sudo -u postgres psql $TEST_EXO_DATA -c "ANALYZE;" &
 
 :
 : Optionally restart the target database
-: ======================================
+: ────────────────────────────────────────
 :
 	if [ "$RESTART_REQUIRED" = "Y" ]; then
 		./service ${LIVE_EXO_DATA} start test
@@ -178,4 +178,4 @@ set -euxo pipefail
 
 :
 : Finished restore_db $1 in $(($SECONDS / 60)) minutes and $(($SECONDS % 60)) seconds.
-: ======================================================
+: ────────────────────────────────────────

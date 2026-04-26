@@ -3,7 +3,7 @@ set -euo pipefail
 
 
 : show status of NEOSYS processes
-: ===============================
+: ────────────────────────────────────────
 :
 
 getpidinfo() {
@@ -62,7 +62,7 @@ function live_or_test() {
 
 :
 : Green, orange or red depending on age  lt 10sec or gt 60 seconds
-: ================================================================
+: ────────────────────────────────────────
 :
 		if [ $age_in_secs -gt 60 ]; then
 			printf "\e[31m"	#red
@@ -80,7 +80,7 @@ function live_or_test() {
 
 :
 : Reset colour to normal
-: ======================
+: ────────────────────────────────────────
 :
 		##reset color
 		printf "\e[0m"
@@ -91,7 +91,7 @@ function main() {
 
 :
 : Output columns headings
-: =======================
+: ────────────────────────────────────────
 :
 #	hostcodes=$(ls ~/hosts)
 	hostcodes=$(find ~/hosts/* -maxdepth 0 -type d,l -printf "%f\n")
@@ -110,7 +110,7 @@ function main() {
 
 :
 : Output one line per live database in ~/hosts
-: ============================================
+: ────────────────────────────────────────
 :
 	for hostcode in $hostcodes; do
 

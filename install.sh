@@ -3,16 +3,16 @@
 set -euxo pipefail
 PS4='+ [ins ${1:-?} ${SECONDS}s] '
 : $0 $*
-: ==========================================================
+: ─────────────────────────────────────────────────────────────────────────────────
 : Build, install and test exodus
-: ==========================================================
+: ─────────────────────────────────────────────────────────────────────────────────
 :
 :	Builds with clang-20, 21 and 22
 :	using libc++, modules and std=c++23-26
 :	on all Ubuntu LTS 20.04 - 26.04
 :
 :	Depend   Ver    Source    Type
-:	------   ---    ------    ----
+: ────────────────────────────────────────
 :	clang    20-22  llvm      apt binary
 :	icu      78     github    source
 :	boost    90     github    source
@@ -39,9 +39,9 @@ PS4='+ [ins ${1:-?} ${SECONDS}s] '
 #: 'Build: Ubuntu 22.04 x64 clang 14 c++ 21'
 #: 'Build: Ubuntu 20.04 x64 clang 10 c++ 20'
 #:
-#: '------ ------------ ----- --------  ----    -----   -----'
+: ─────────────────────────────────────────────────────────────────────────────────
 #: 'Status Ubuntu  LTS  Name  Postgres  g++     clang   boost'
-#: '------ ------------ ----- --------  ----    -----   -----'
+: ─────────────────────────────────────────────────────────────────────────────────
 #: 'OK     25.10        quest 17.6      15.2.0  21.1.2  88   '
 #:
 #: 'OK     24.04   Yes  noble 16.3?     13.3    19.1.1  83   clang-18/19 and g++ work. clang-20 doesnt.'
@@ -52,13 +52,13 @@ PS4='+ [ins ${1:-?} ${SECONDS}s] '
 #: 'OK     23.04              15.4      12.3                 '
 #: 'OK     22.04.3 Yes  jammy 14.9      11.4    14.0    74   '
 #: 'OK     20.04.6 Yes  focal 12.16      9.4    10      71   '
-#: '------ -----------  ----- --------  ----    -----   -----'
+: ─────────────────────────────────────────────────────────────────────────────────
 #: 'KO     18.04   Yes        10                           '
-#: '------ -----------  ----- --------  ----  -----   -----'
+: ─────────────────────────────────────────────────────────────────────────────────
 #: 'Exodus now requires c++20 so will no longer build on 18.04'
 #:
 #: min/default/latest compiler version
-#: --------------------------------
+#: ────────────────────────────────────────
 #:
 #: OS      g++             clang
 #:         min def latest  min def latest
@@ -71,9 +71,9 @@ PS4='+ [ins ${1:-?} ${SECONDS}s] '
 #: jammy 22.04 3.22.1
 #: focal 20.04 3.16.3
 
-: ------
+: ─────────────────────────────────────────────────────────────────────────────────
 : Syntax
-: ------
+: ─────────────────────────────────────────────────────────────────────────────────
 :
 : $0 ' <STAGES> [<COMPILER>] [<PG_VER>]'
 :
@@ -115,7 +115,7 @@ PS4='+ [ins ${1:-?} ${SECONDS}s] '
 :	e.g. 14 or default depends on apt and the Ubuntu version
 :
 : Parse command line
-: ------------------
+: ────────────────────────────────────────
 :
 	REQ_STAGES=${1:?STAGES is required and must be one or more *consecutive* letters from $ALL_STAGES or from $SUB_STAGES, or A for all stages except W, or AW for all stages}
 	COMPILER=${2:-clang}
@@ -141,7 +141,7 @@ PS4='+ [ins ${1:-?} ${SECONDS}s] '
 
 :
 : Validate
-: --------
+: ────────────────────────────────────────
 :
 : "A = $DEFAULT_STAGES"
 :
@@ -167,9 +167,9 @@ PS4='+ [ins ${1:-?} ${SECONDS}s] '
 	fi
 
 :
-: ------
+: ─────────────────────────────────────────────────────────────────────────────────
 : CONFIG
-: ------
+: ─────────────────────────────────────────────────────────────────────────────────
 :
 	export DEBIAN_FRONTEND=noninteractive
 #	export NEEDRESTART_MODE=l # list-only
@@ -180,16 +180,15 @@ PS4='+ [ins ${1:-?} ${SECONDS}s] '
 	# Set by github action if chosen to rerun in debug mode?
 	#RUNNER_DEBUG=1
 
-:
-: Function to retry three times in case of timeout
-: ------------------------------------------------
-:
 function CMD_RETRY {
+: ────────────────────────────────────────
+: Function to retry three times in case of timeout
+: ────────────────────────────────────────
 :
 	for N in 1 2 3; do
 :
 : Retry three times if it times out. $N/3
-: ---------------------------------------
+: ────────────────────────────────────────
 :
 		# /dev/null to stop timeout causing random hang until timeout
 		# with apt process stuck on tcsetattr call. see gdb -p 9999
@@ -198,11 +197,11 @@ function CMD_RETRY {
 		fi
 	done
 }
-:
-: Function to call apt-get install three times in case of timeout
-: ---------------------------------------------------------------
-:
+
 function APT_INSTALL {
+: ────────────────────────────────────────
+: Function to call apt-get install three times in case of timeout
+: ────────────────────────────────────────
 :
 : Set environment variables for non-interactive installation
 :
@@ -229,11 +228,11 @@ function APT_INSTALL {
 	done
 	: "All packages installed successfully."
 }
-:
-: Function to download submodules
-: -------------------------------
-:
+
 function download_submodules {
+: ────────────────────────────────────────
+: Function to download submodules
+: ────────────────────────────────────────
 :
 #: Note that main git repo contains just a hash/pointer to the commit to be checked out,
 #: not a tag to master, and the initial state will be "HEAD detached".
@@ -262,7 +261,7 @@ function download_submodules {
 
 :
 : Verify submodules exist
-: -----------------------
+: ────────────────────────────────────────
 :
 #	test -f $EXODUS_DIR/fmt/CMakeLists.txt
 	test -f $EXODUS_DIR/pgexodus/CMakeLists.txt
@@ -270,7 +269,7 @@ function download_submodules {
 
 :
 : Wait for systemctl to get its brain in gear and be ready to serve hostname to sudo
-: ----------------------------------------------------------------------------------
+: ────────────────────────────────────────
 :
 : Loop until success or timeout
 :
@@ -281,9 +280,9 @@ function download_submodules {
 	hostnamectl status
 
 :
-: --------------------------------------------------------------------
+: ─────────────────────────────────────────────────────────────────────────────────
 : Disable unattended upgrades until next reboot if any stage b, d or W
-: --------------------------------------------------------------------
+: ─────────────────────────────────────────────────────────────────────────────────
 :
 	if [[ "$REQ_STAGES" =~ [bdW] ]]; then
 		sudo systemctl disable --runtime apt-daily.timer apt-daily-upgrade.timer unattended-upgrades
@@ -292,9 +291,9 @@ function download_submodules {
 	fi
 
 :
-: ---------------------------
+: ─────────────────────────────────────────────────────────────────────────────────
 : Configure automatic apt-get
-: ---------------------------
+: ─────────────────────────────────────────────────────────────────────────────────
 :
 	sudo tee /etc/apt/apt.conf.d/99unattended-noninteractive <<-'EOF'
 		# Automatic retries on transient network failures
@@ -313,9 +312,9 @@ function download_submodules {
 	EOF
 
 :
-: ----------
+: ─────────────────────────────────────────────────────────────────────────────────
 : Update apt
-: ----------
+: ─────────────────────────────────────────────────────────────────────────────────
 :
 #	rm /var/lib/dpkg/lock-frontend || true
 
@@ -325,9 +324,9 @@ function download_submodules {
 	done
 
 :
-: -----------------------------------------
+: ─────────────────────────────────────────────────────────────────────────────────
 : Work out postgres version suffix e.g. -14
-: -----------------------------------------
+: ─────────────────────────────────────────────────────────────────────────────────
 :
 : If PG_VER not specified, use the latest version
 : of postgres installed as per pg_config
@@ -367,9 +366,9 @@ function download_submodules {
 		exit 1
 	fi
 :
-: ------------------------------
+: ─────────────────────────────────────────────────────────────────────────────────
 : Discover postsgresql db socket
-: ------------------------------
+: ─────────────────────────────────────────────────────────────────────────────────
 :
 : Version to port can be found in /etc/postgresql/NN/main/postgresql.conf
 :
@@ -377,7 +376,7 @@ function download_submodules {
 : and psql default connects to the wrong one.
 :
 : Info about postgres
-: -------------------
+: ────────────────────────────────────────
 :
 	grep '^\s*port\s*=\s*\([0-9]\)*' /etc/postgresql/*/main/postgresql.conf || true
 :
@@ -388,7 +387,7 @@ function download_submodules {
 	ls -l /run/postgresql/ 2> /dev/null || true
 :
 : Postgres ports
-: --------------
+: ────────────────────────────────────────
 :
 	if [[ -n $PG_VER ]]; then
 		PG_PORT=`grep '^\s*port\s*=\s*\([0-9]\)*' /etc/postgresql/$PG_VER/main/postgresql.conf|grep [0-9]* -o || true`
@@ -407,19 +406,18 @@ function download_submodules {
 :
 
 function get_dependencies_for_build_and_install {
-:
-: --------------------------------------
+: ─────────────────────────────────────────────────────────────────────────────────
 : GET DEPENDENCIES FOR BUILD AND INSTALL $*
-: --------------------------------------
+: ─────────────────────────────────────────────────────────────────────────────────
 :
 : Update apt
-: ----------
+: ────────────────────────────────────────
 :
 	CMD_RETRY sudo apt-get -y update
 
 :
 : Download Postgresql dev and client package
-: ------------------------------------------
+: ────────────────────────────────────────
 :
 	#Uninstall postgresql-server-dev-all for old existing installations
 	#otherwise all postgres versions are installed and pg_config outputs latest version
@@ -432,13 +430,13 @@ function get_dependencies_for_build_and_install {
 
 :
 : Download pgexodus submodule source in b and B stages
-: ----------------------------------------------------
+: ────────────────────────────────────────
 :
 	download_submodules
 
 :
 : Get the full postgres debian repos IF we require a specific version
-: -------------------------------------------------------------------
+: ────────────────────────────────────────
 	if [[ -n $PG_VER ]]; then
 
 		PIN_FILE="/etc/apt/preferences.d/pgdg-no-auto.pref"
@@ -469,19 +467,19 @@ function get_dependencies_for_build_and_install {
 
 :
 : List installed postgresql
-: -------------------------
+: ────────────────────────────────────────
 :
 	apt list postgresql* --installed |& grep postgresql || echo No postgresql
 
 :
 : List available postgresql
-: -------------------------
+: ────────────────────────────────────────
 :
 	apt list postgresql*dev* |& grep postgresql || echo No postgresql
 
 :
 : Remove local libfmt if installed
-: --------------------------------
+: ────────────────────────────────────────
 :
 #	if [[ -d /usr/local/include/fmt ]]; then
 		sudo rm /usr/local/include/fmt -rf
@@ -492,7 +490,7 @@ function get_dependencies_for_build_and_install {
 
 :
 : Download and install build dependencies for exodus and pgexodus
-: ---------------------------------------------------------------
+: ────────────────────────────────────────
 :
 : Repeated in Build stage
 :
@@ -502,7 +500,7 @@ function get_dependencies_for_build_and_install {
 
 :
 : Determine actual compiler version if min/default requested
-: ------------------------------------------------------
+: ────────────────────────────────────────
 :
 	COMPILER_VERSION=`echo $COMPILER | cut -d'-' -f2`
 	if ! [[ $COMPILER_VERSION == "default" || $COMPILER_VERSION =~ ^-?[0-9]+$ ]]; then
@@ -522,7 +520,7 @@ function get_dependencies_for_build_and_install {
 
 :
 : Download clang llvm if clang
-: ----------------------------
+: ────────────────────────────────────────
 :
 	if [[ $COMPILER =~ ^clang ]]; then
 :
@@ -544,7 +542,7 @@ function get_dependencies_for_build_and_install {
 
 :
 : Download and install compiler $COMPILER
-: ---------------------------------------
+: ────────────────────────────────────────
 :
 : e.g. g++, g++-12, clang, clang-12 etc.
 :
@@ -572,7 +570,7 @@ function get_dependencies_for_build_and_install {
 	sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-21 0
 :
 : Show libstdc++ and clang information
-: ------------------------------------
+: ────────────────────────────────────────
 :
 	apt list libstdc++*dev --installed |& grep libstdc || true
 :
@@ -582,13 +580,13 @@ function get_dependencies_for_build_and_install {
 
 :
 : Check if clang compiler
-: -----------------------
+: ────────────────────────────────────────
 :
 	if [[ $COMPILER =~ ^clang ]]; then
 
 :
 : Clang module building needs its scan tools in the path
-: ------------------------------------------------------
+: ────────────────────────────────────────
 :
 :	Avoid "CMAKE_CXX_COMPILER_CLANG_SCAN_DEPS" error
 	CLANG_VERSION=`c++ --version | head -n1|cut -d'.' -f 1|grep -Po '\d+'`
@@ -612,7 +610,7 @@ function get_dependencies_for_build_and_install {
 
 :
 : Download and install dev packages for postgresql client lib and boost
-: ---------------------------------------------------------------------
+: ────────────────────────────────────────
 :
 	APT_INSTALL libpq-dev libboost-regex-dev libboost-locale-dev libboost-fiber-dev libboost-context-dev
 	#APT_INSTALL g++ libboost-date-time-dev libboost-system-dev libboost-thread-dev
@@ -624,14 +622,14 @@ function get_dependencies_for_build_and_install {
 
 :
 : Download, build and install ninja
-: ---------------------------------
+: ────────────────────────────────────────
 :
 	apt remove ninja-build -qq || true
 	./install_ninja.sh
 
 :
 : Download and install pgexodus postgres build dependencies
-: ---------------------------------------------------------
+: ────────────────────────────────────────
 :
 	ls -l /usr/lib/postgresql || true
 :
@@ -644,13 +642,13 @@ function get_dependencies_for_build_and_install {
 
 :
 : Install pygments syntax highlighter for cli gendoc
-: --------------------------------------------------
+: ────────────────────────────────────────
 :
 	APT_INSTALL python3-pygments python3-setuptools # || FAILED to install pygments
 
 :
 : Install exodus lexer plugin for pygment syntax highlighter
-: ----------------------------------------------------------
+: ────────────────────────────────────────
 :
 	cd $EXODUS_DIR/pygment
 	./install.sh
@@ -659,13 +657,13 @@ function get_dependencies_for_build_and_install {
 
 :
 : Install c.nanorc for nano exodus/var keyword syntax highlighting
-: ----------------------------------------------------------------
+: ────────────────────────────────────────
 :
 	cp c.nanorc /usr/share/nano
 
 :
 : Show installed compilers and standard library versions
-: ------------------------------------------------------
+: ────────────────────────────────────────
 :
 	readlink `which c++` -e
 	dpkg -l | egrep "g++|clang|libstd|libc\+\+" | awk '{print $2}'
@@ -673,10 +671,9 @@ function get_dependencies_for_build_and_install {
 } # end of stage b - get_dependencies_for_build_and_install
 
 function build_only {
-:
-: -----
+: ─────────────────────────────────────────────────────────────────────────────────
 : BUILD $*
-: -----
+: ─────────────────────────────────────────────────────────────────────────────────
 :
 : 1. libexodus
 : 2. exodus cli
@@ -695,13 +692,13 @@ function build_only {
 
 :
 : Build
-: -----
+: ────────────────────────────────────────
 :
 	cd $EXODUS_DIR
 
 :
 : Download pgexodus submodule source in b and B stages
-: ----------------------------------------------------
+: ────────────────────────────────────────
 :
 	download_submodules
 
@@ -712,7 +709,7 @@ function build_only {
 
 :
 : Patch /usr/include/c++/*/ostream
-: --------------------------------
+: ────────────────────────────────────────
 :
 : Duplicate code in install.sh and CMakeLists.txt - KEEP IN SYNC
 :
@@ -725,7 +722,7 @@ function build_only {
 
 :
 : Build exodus
-: ------------
+: ────────────────────────────────────────
 :
 : Prep
 :
@@ -744,9 +741,9 @@ function build_only {
 } # end of substage B
 
 function test_exodus_without_database {
-:
+: ────────────────────────────────────────
 : Run tests that do not require database
-: --------------------------------------
+: ────────────────────────────────────────
 :
 #: 1. Test in build/test/src to avoid testing pgexodus lib since postgres is not installed yet
 : 1. Test in build/test to avoid testing pgexodus lib since postgres is not installed yet
@@ -759,13 +756,13 @@ function test_exodus_without_database {
 } # end of test_exodus_without_database
 
 function install_exodus_paths {
-:
+: ────────────────────────────────────────
 : Install exodus_paths $*
-: --------------------
+: ────────────────────────────────────────
 :
 : Add \${HOME}/bin to PATH and \${HOME}/lib to LD_LIBRARY_PATH
 : for all users in /etc/profile.d/exodus.sh
-: -------------------------------------------------------------
+: ────────────────────────────────────────
 :
 : Enable exodus programs created with edic/compile
 : to be run from command line without full path to \~/bin
@@ -778,9 +775,9 @@ function install_exodus_paths {
 } # end of install_exodus_paths
 
 function install_exodus {
-:
+: ────────────────────────────────────────
 : Install exodus $*
-: --------------
+: ────────────────────────────────────────
 :
 : Also installs pgexodus.so to /usr/lib/postgresql but not actually required.
 :
@@ -794,27 +791,25 @@ function install_exodus {
 } # end of install_exodus
 
 function get_dependencies_for_database {
-:
-: ----------------------------------------------
+: ────────────────────────────────────────
 : DOWNLOAD AND INSTALL DEPENDENCIES FOR DATABASE $*
-: ----------------------------------------------
+: ────────────────────────────────────────
 :
 : exodus
-: ------
+: ────────────────────────────────────────
 :
 	#postgresql-client-$PG_VER already installed by ?
 :
 : pgexodus
-: --------
+: ────────────────────────────────────────
 :
 	APT_INSTALL postgresql$PG_VER_SUFFIX #for pgexodus install
 }
 
 function install_database {
-:
-: ----------------
+: ────────────────────────────────────────
 : INSTALL DATABASE $*
-: ----------------
+: ────────────────────────────────────────
 :
 	# Already installed in b stage along main exodus
 	# but here only the postgresl extension is installed
@@ -827,15 +822,14 @@ function install_database {
 #-- Up-to-date: /usr/share/postgresql/16/extension/pgexodus--1.0.sql
 :
 #:
-#: -------------------------------
 #: Test exodus except db functions
-#: -------------------------------
+#: ────────────────────────────────────────
 #:
 #	cd $EXODUS_DIR/build
 #	CTEST_OUTPUT_ON_FAILURE=1 CTEST_PARALLEL_LEVEL=$((`nproc`+1)) ctest
-: ----------------------------------------
+:
 : Check that postgresql is running locally
-: ----------------------------------------
+: ────────────────────────────────────────
 	psql $PSQL_PORT_OPT --version || true
 	#pg_ctl start || true
 	sudo systemctl start postgresql || sudo systemctl start postgresql || true # no systemctl on docker
@@ -845,7 +839,7 @@ function install_database {
 
 :
 : Optional grant others cd into HOME.
-: -----------------------------------
+: ────────────────────────────────────────
 :
 : Removes warning by enable others/postgres to cd into build dir
 : 'could not change directory to "/root": Permission denied'
@@ -857,7 +851,7 @@ function install_database {
 # Already done as part of the extension installation
 #:
 #: Test the pgexodus postgresql extension
-#: --------------------------------------
+#: ────────────────────────────────────────
 #:
 ##: Restart postgresql in case regression database is stuck
 ##: Now done in cmake pgexodus_test
@@ -865,9 +859,8 @@ function install_database {
 #:
 #	cd $EXODUS_DIR/build/pgexodus && CTEST_OUTPUT_ON_FAILURE=1 ctest
 :
-: -------------------------------------------------------------------------
 : Allow password login on local socket connection
-: -------------------------------------------------------------------------
+: ────────────────────────────────────────
 :
 : # exodus allow password login on local socket connection
 : # Twice as fast as tcp/ip socket
@@ -883,15 +876,14 @@ function install_database {
 	fi
 	sudo systemctl restart postgresql
 :
-: -------------------------------
 : Configure postgresql for exodus
-: -------------------------------
+: ─────────────────────────────────────────────────────────────────────────────────
 :
 	# Waiting for postgresql to start?
 	#(while ! nc -z -v -w1 localhost 5432 2>/dev/null; do echo "Waiting for port 5432 to open..."; sleep 2; done)
 :
 : Install into template1
-: ----------------------
+: ────────────────────────────────────────
 :
 : --  extension 'pgexodus'
 : --  collation 'exodus_natural'
@@ -904,7 +896,7 @@ function install_database {
 :
 : Grant exodus login, createrole and createdatabase but not superuser
 : Force exodus to create new files in public schema instead of exodus in all databases
-: ------------------------------------------------------------------------------------
+: ────────────────────────────────────────
 :
 	sudo -u postgres psql $PSQL_PORT_OPT <<-V0G0N
 		\echo
@@ -938,7 +930,7 @@ V0G0N
 
 :
 : Create exodus user login and database
-: -------------------------------------
+: ────────────────────────────────────────
 :
 : 1. exodus user login/password
 : 2. exodus database
@@ -950,7 +942,7 @@ V0G0N
 
 :
 : Install into into exodus database as well.
-: ------------------------------------------
+: ────────────────────────────────────────
 :
 : Only required if exodus db already existed and was
 : therefore not created from template1 in above step.
@@ -959,7 +951,7 @@ V0G0N
 
 :
 : Configure exodus for postgres - Omit host means use local db socket connection
-: -----------------------------
+: ────────────────────────────────────────
 :
 	EXODUS_CFG=~/.config/exodus/exodus.cfg
 	mkdir -p ${EXODUS_CFG%/*}
@@ -971,13 +963,13 @@ V0G0N
 # Already done as part of the extension installation
 #:
 #: Test the pgexodus postgresql extension
-#: --------------------------------------
+#: ────────────────────────────────────────
 #:
 #	cd $EXODUS_DIR/build/pgexodus && CTEST_OUTPUT_ON_FAILURE=1 ctest
 #
 :
 : psql alias - user : exodus, search_path : public, exodus
-: --------------------------------------
+: ────────────────────────────────────────
 :
 	cat > /etc/.psqlrc <<-EOF
 		\echo bash alias psql='sudo PSQLRC=/etc/.psqlrc -u postgres psql'
@@ -997,7 +989,7 @@ V0G0N
 	fi
 :
 : Install lots of pgsql utility functions
-: ---------------------------------------
+: ────────────────────────────────────────
 :
 : Necessary to test many exodus pgsql function e.g. exodus_date - not exodus::extract_date
 :
@@ -1009,13 +1001,12 @@ V0G0N
 } # end of stage D - Install database
 
 function test_exodus_and_database {
-:
-: ------------------------
+: ─────────────────────────────────────────────────────────────────────────────────
 : TEST EXODUS AND DATABASE $*
-: ------------------------
+: ─────────────────────────────────────────────────────────────────────────────────
 :
 : Postgres version and port - SERVER_PG_VER ${SERVER_PG_VER} and EXO_PORT=${EXO_PORT:-5432}
-: -------------------------
+: ────────────────────────────────────────
 :
 : Start postgresql although it should be running
 :
@@ -1024,13 +1015,13 @@ function test_exodus_and_database {
 :
 : Run cli/testsort once to generate some test files like xo_clients
 : used in testing_var.h.cpp
-: -----------------------------------------------------------------
+: ────────────────────────────────────────
 :
 	testsort > /dev/null
 
 :
 : Many tests using ctest - In parallel. Output only on error
-: ----------------------
+: ────────────────────────────────────────
 :
 #: Note that all the exodus/build/test/src test to that do not require database were already run
 : Note that all the exodus/build/test test to that do not require database were already run
@@ -1041,7 +1032,7 @@ function test_exodus_and_database {
 	sleep 1
 :
 : Run the demo program - testsort
-: --------------------
+: ────────────────────────────────────────
 :
 	testsort
 :
@@ -1053,10 +1044,9 @@ function test_exodus_and_database {
 } # end of stage T - Test exodus and database
 
 function install_www_service {
-:
-: -------------------
+: ────────────────────────────────────────
 : INSTALL WWW SERVICE
-: -------------------
+: ────────────────────────────────────────
 :
 	export EXODUS_DIR
 	cd $EXODUS_DIR/service
@@ -1064,18 +1054,18 @@ function install_www_service {
 }
 :
 #function build_service {
-#: -------------
+#: ────────────────────────────────────────
 #: BUILD SERVICE
-#: -------------
+#: ────────────────────────────────────────
 #:
 #	cd $EXODUS_DIR/service/src
 #	./compall
 #}
 
 :
-: ----
+: ─────────────────────────────────────────────────────────────────────────────────
 : MAIN $*
-: ----
+: ─────────────────────────────────────────────────────────────────────────────────
 :
 
 	if [[ $REQ_STAGES =~ b ]]; then
@@ -1098,6 +1088,6 @@ function install_www_service {
 
 	if [[ $REQ_STAGES =~ W ]]; then install_www_service; fi
 :
-: ================================================================
+: ─────────────────────────────────────────────────────────────────────────────────
 : Finished $0 $* in $((SECONDS/60)) mins and $((SECONDS%60)) secs.
-: ================================================================
+: ─────────────────────────────────────────────────────────────────────────────────

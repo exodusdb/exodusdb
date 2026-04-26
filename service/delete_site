@@ -1,9 +1,9 @@
 #!/bin/bash
 set -euxo pipefail
 
-: =====================
+: ─────────────────────────────────────────────────────────────────────────────────
 : Delete an apache site
-: =====================
+: ─────────────────────────────────────────────────────────────────────────────────
 :
 : 'Syntax is ./delete_site HOST_NAME [SITE_DIR]'
 :
@@ -14,13 +14,13 @@ set -euxo pipefail
 
 :
 : Disable the site
-: ================
+: ────────────────────────────────────────
 :
 	a2dissite $SITE_CODE || true
 
 :
 : Remove the site
-: ===============
+: ────────────────────────────────────────
 :
 	rm /etc/apache2/sites-available/$SITE_CODE.conf || true
 
@@ -30,4 +30,4 @@ set -euxo pipefail
 
 :
 : DELETED Apache site $SITE_CODE
-: ==============================
+: ────────────────────────────────────────

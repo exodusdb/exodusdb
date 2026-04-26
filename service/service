@@ -1,9 +1,9 @@
 #!/bin/bash
 set -euxo pipefail
 
-: =================================================================================
+: ─────────────────────────────────────────────────────────────────────────────────
 : Service commands start, stop, restart, reload, status, is-active, enable, disable
-: =================================================================================
+: ─────────────────────────────────────────────────────────────────────────────────
 :
 : 'Syntax is ./service DB_CODE start|stop|restart|reload|status|is-active|enable|disable [test|live]'
 :

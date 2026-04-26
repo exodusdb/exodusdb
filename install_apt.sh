@@ -3,9 +3,9 @@
 set -euxo pipefail
 PS4='+ [$0 ${SECONDS}s] '
 : $0 $*
-: =======================================================
+: ─────────────────────────────────────────────────────────────────────────────────
 : Download, build and install the full exodus environment
-: =======================================================
+: ─────────────────────────────────────────────────────────────────────────────────
 :
 : Includes libexodus, exodus cli, c++ compiler and postgresql database.
 :
@@ -42,20 +42,20 @@ PS4='+ [$0 ${SECONDS}s] '
 : "Linux debian32 2.6.32-5-686" #1 SMP Wed May 18 07:08:50 UTC 2011 i686 GNU/Linux
 :
 : Parse command line
-: ------------------
+: ────────────────────────────────────────
 :
 	EXODUS_DIR=${1:-~/exodus}
 	EXODUS_BRANCH_OR_TAG=${2:-master}
 	COMPILER=${3:-clang-20}
 :
 : Update apt and install git
-: --------------------------
+: ────────────────────────────────────────
 :
 	sudo apt-get update
 	sudo DEBIAN_FRONTEND=noninteractive apt-get -y install git
 :
 : Git clone exodus or refresh if already present?
-: -----------------------------------------------
+: ────────────────────────────────────────
 :
 	if [ ! -d $EXODUS_DIR ]; then
 		git clone --recursive --branch $EXODUS_BRANCH_OR_TAG https://github.com/exodusdb/exodusdb $EXODUS_DIR
@@ -67,11 +67,11 @@ PS4='+ [$0 ${SECONDS}s] '
 	fi
 :
 : Install all
-: -----------
+: ────────────────────────────────────────
 :
 	cd $EXODUS_DIR
 	./install.sh A $COMPILER
 :
 : Finished $0 $* in $((SECONDS/60)) mins and $((SECONDS%60)) secs.
-: ----------------------------------------------------------------
+: ────────────────────────────────────────
 :

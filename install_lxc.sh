@@ -3,12 +3,12 @@
 set -euxo pipefail
 PS4='+ [lxc $1 ${SECONDS}s] '
 : $0 $*
-: ===========================================================
+: ─────────────────────────────────────────────────────────────────────────────────
 : Install current dir of exodus in an LXC container in stages
-: ===========================================================
+: ─────────────────────────────────────────────────────────────────────────────────
 :
 : Syntax
-: ------
+: ────────────────────────────────────────
 :
 :	$0 " <SOURCE> <NEW_CONTAINER_NAME> <REQ_STAGES> [<COMPILER>] [<PG_VER>]"
 :
@@ -56,7 +56,7 @@ PS4='+ [lxc $1 ${SECONDS}s] '
 :	e.g. Overwriting /etc/apt/sources.list. See that file for more info how to prevent that.
 
 #: Parse command line
-: ------------------
+: ────────────────────────────────────────
 :
 	export DEBIAN_FRONTEND=noninteractive
 	export NEEDRESTART_MODE=a
@@ -67,7 +67,7 @@ PS4='+ [lxc $1 ${SECONDS}s] '
 	PG_VER=${5:-}
 :
 : Validate
-: --------
+: ────────────────────────────────────────
 :
 : "A = $DEFAULT_STAGES"
 :
@@ -89,7 +89,7 @@ PS4='+ [lxc $1 ${SECONDS}s] '
 	fi
 :
 : Config
-: ------
+: ────────────────────────────────────────
 :
 #	# Install into user 'ubuntu'
 #	TARGET_UID=1000
@@ -123,14 +123,14 @@ function do_one_stage {
 	STAGE_LETTER=${ALL_STAGES:$((STAGE_NO-1)):1}
 	NEW_C=${NEW_CONTAINER_NAME}${COMPILER:0:1}-$STAGE_NO
 :
-: ============
+: ─────────────────────────────────────────────────────────────────────────────────
 : Do one stage - $STAGE_LETTER in ${NEW_C}
-: ============
+: ─────────────────────────────────────────────────────────────────────────────────
 :
 	OLD_C=${NEW_CONTAINER_NAME}${COMPILER:0:1}-$(($1 - 1))
 :
 : Create/Overwrite container - $NEW_C
-: --------------------------
+: ────────────────────────────────────────
 :
 	if lxc info $NEW_C &> /dev/null; then
 		lxc rm $NEW_C --force |& grep -v "already stopped"|| true
@@ -156,7 +156,7 @@ function do_one_stage {
 	fi
 :
 : On the first stage copy local exodus to the target container - $NEW_C
-: ------------------------------------------------------------
+: ────────────────────────────────────────
 :
 : TODO update the source container instead
 :
@@ -169,7 +169,7 @@ function do_one_stage {
 #
 #:
 #: Check if remote lxc host
-#: ------------------------
+#: ────────────────────────────────────────
 #	:
 #		if [[ $NEW_C =~ : ]]; then
 #			USE_SSH=NO
@@ -180,7 +180,7 @@ function do_one_stage {
 #		if [[ $USE_SSH == YES ]]; then
 #:
 #: Wait for ip no
-#: --------------
+#: ────────────────────────────────────────
 #:
 #			for i in {1..100}; do
 #				IPNO=`lxc list $NEW_C --format csv --columns 4 | grep -P -o "\d+\.\d+\.\d+\.\d+" || true`
@@ -196,7 +196,7 @@ function do_one_stage {
 #
 #:
 #: Enable ssh login
-#: ----------------
+#: ────────────────────────────────────────
 #:
 #			lxc exec $NEW_C -- bash -c "ssh-keygen -t rsa -N '' -f ~/.ssh/id_rsa <<< y"
 #
@@ -210,7 +210,7 @@ function do_one_stage {
 #			fi
 #
 #: Check again
-#: -----------
+#: ────────────────────────────────────────
 #:
 #			if ! ssh $SSH_OPT root@$IPNO pwd; then
 #				USE_SSH=NO
@@ -219,7 +219,7 @@ function do_one_stage {
 #
 #:
 #: Update container with local exodus dir
-#: --------------------------------------
+#: ────────────────────────────────────────
 #:
 #		if [[ $USE_SSH == YES ]]; then
 #
@@ -235,7 +235,7 @@ function do_one_stage {
 
 :
 : Update container with local exodus dir
-: --------------------------------------
+: ────────────────────────────────────────
 			#lxc file push * $NEW_C/root/exodus --recursive --create-dirs --quiet
 			#lxc file push . $NEW_C/root --recursive --create-dirs --quiet
 			#lxc file push ~/exodus $NEW_C/root --recursive --create-dirs --quiet --gid 0 --uid 0
@@ -254,26 +254,26 @@ function do_one_stage {
 
 :
 : Avoid git error: "fatal: detected dubious ownership in repository at '.../exodus'"
-: ----------------------------------------------------------------------------------
+: ────────────────────────────────────────
 :
 		lxc exec $NEW_C -- bash -c "chown -R $TARGET_UID:$TARGET_GID ${TARGET_HOME}/exodus"
 
 :
 : End of updating exodus on first stage - $STAGE_NO $STAGE_LETTER
-: -------------------------------------
+: ────────────────────────────────────────
 :
 	fi
 
 :
 : Run the exodus/install.sh script on the target - $NEW_C
-: ----------------------------------------------
+: ────────────────────────────────────────
 :
 	lxc exec $NEW_C  --user $TARGET_UID --group $TARGET_GID -- bash -c "cd $TARGET_HOME/exodus && HOME=${TARGET_HOME} ./install.sh \"$STAGE_LETTER\" \"$COMPILER\" ${PG_VER:-''}"
 }
 :
-: ====
+: ─────────────────────────────────────────────────────────────────────────────────
 : MAIN
-: ====
+: ─────────────────────────────────────────────────────────────────────────────────
 :
 	FIRST_STAGE_UPDATE_EXODUS=YES
 	if [[ $REQ_STAGES =~ b ]]; then do_one_stage 1; fi # 'Get dependencies for build'
@@ -283,6 +283,6 @@ function do_one_stage {
 	if [[ $REQ_STAGES =~ T ]]; then do_one_stage 5; fi # 'Test'
 	if [[ $REQ_STAGES =~ W ]]; then do_one_stage 6; fi # 'Install www service'
 :
-: ===============================================================
+: ─────────────────────────────────────────────────────────────────────────────────
 : Finished $0 $* in $((SECONDS/60)) mins and $((SECONDS%60)) secs
-: ===============================================================
+: ─────────────────────────────────────────────────────────────────────────────────
