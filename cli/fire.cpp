@@ -8,13 +8,21 @@ func main() {
 //	TRACE(SENTENCE)
 	COMMAND.remover(1);
 
-	let find = COMMAND.f(1);
+	let findwhat = COMMAND.f(1);
 	COMMAND.remover(1);
 
-	let repl = COMMAND.f(1);
+	let replacement =
+		COMMAND.f(1)
+		.replace("\\" "n" , "\n")
+		.replace("\\" "t" , "\t")
+		.replace("\\" "r" , "\r")
+		.replace("\\" "\"", "\"")
+		.replace("\\" "0" , "\0")
+		.replace("\\" "\\", "\\")
+	;
 	COMMAND.remover(1);
 
-	if (not find or OPTIONS.convert("rsiUV", "")) {
+	if (not findwhat or OPTIONS.convert("rsiUV", "")) {
 		let syntax = "\n"
 			"SYNOPSIS\n"
 			"	fire FIND REPL filepath ... {OPTIONS}\n"
@@ -38,7 +46,7 @@ func main() {
 	let rxopts = OPTIONS.convert("rUV", "");
 
 	// TODO Enable fire to replace only outside/only inside quotes/literals/comments.
-	rex find_rex = rex(find,rxopts);
+	rex find_rex = rex(findwhat,rxopts);
 
 	var nerrors = 0;
 	for (in osfilename : COMMAND) {
@@ -63,10 +71,10 @@ func main() {
 		let origrec = RECORD;
 
 		if (raw)
-			RECORD.replacer(find, repl);
+			RECORD.replacer(findwhat, replacement);
 		else {
 			try {
-				RECORD.replacer(find_rex, repl);
+				RECORD.replacer(find_rex, replacement);
 			} catch (VarError e) {
 				if (var(e.message).contains("UTF-8")) // c++23
 					outputl(osfilename, ": Not UTF-8");
