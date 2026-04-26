@@ -4,43 +4,32 @@ set -euxo pipefail
 : ─────────────────────────────────────────────────────────────────────────────────
 : Compile EXODUS service programs and install script and dat files
 : ─────────────────────────────────────────────────────────────────────────────────
-:
 	COMPILER_OPTIONS=${1:-}
-
 :
 : "dat" means no compilations and only copy dat files
 : ────────────────────────────────────────
-:
 	if [ "$COMPILER_OPTIONS" = "dat" ];then
 		COMPILER_OPTIONS=X
 	fi
-
 :
 : Install dat files
 : ────────────────────────────────────────
-:
 	# Do not delete because dict.voc is merged with applications
 	# Empty files will be deleted in the end
 	#rsync -avz --delete ./dat/* ~/dat/
 	rsync -avz ./dat/* ~/dat/
-
 :
 : Generate all headers first
 : ────────────────────────────────────────
-:
 	compile alt exo srv {hS$COMPILER_OPTIONS}
-
 :
 : Regenerate dict_xxxxxxxx.cpp files where dat have files changed
 : ────────────────────────────────────────
-:
 	touch dat
 	syncdat dat {IG$COMPILER_OPTIONS}
-
 :
 : Compile EXODUS service
 : ────────────────────────────────────────
-:
 : O/o Increase/reduce optimisation level
 : W/w Increase/reduce warning level
 : F - Force
@@ -50,14 +39,12 @@ set -euxo pipefail
 : V - Verbose
 :
 	compile ??? {S${COMPILER_OPTIONS}}
-
 :
 : Flag syncdat to review all and syncdat to exodus
 : ────────────────────────────────────────
-:
 	touch ~/dat
 	syncdat
-
 :
+: ────────────────────────────────────────
 : Finished compiling EXODUS service in $(($SECONDS/60)) minutes and $(($SECONDS%60)) seconds.
 : ────────────────────────────────────────

@@ -4,7 +4,6 @@ set -euxo pipefail
 : ─────────────────────────────────────────────────────────────────────────────────
 : test if a postgresql database exists
 : ─────────────────────────────────────────────────────────────────────────────────
-:
 : 'Syntax is ./test_db DBNAME'
 :
 	EXO_DATA=${1:?DBNAME argument is required.}

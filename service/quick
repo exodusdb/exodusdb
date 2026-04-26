@@ -4,7 +4,6 @@ set -euo pipefail
 
 : show status of NEOSYS processes
 : ────────────────────────────────────────
-:
 
 getpidinfo() {
 
@@ -59,11 +58,9 @@ function live_or_test() {
 		local pid=$(cat /run/neo/$prefix@$hostcode.pid 2>/dev/null || true)
 
 		pidinfo=$(getpidinfo $pid)
-
 :
 : Green, orange or red depending on age  lt 10sec or gt 60 seconds
 : ────────────────────────────────────────
-:
 		if [ $age_in_secs -gt 60 ]; then
 			printf "\e[31m"	#red
 		elif [ $age_in_secs -gt 10 ]; then
@@ -71,28 +68,23 @@ function live_or_test() {
 		else
 			printf "\e[32m"	#green
 		fi
-
 :
 :
 		##printf "%6s:%02i:%02i %5s " $(($age_in_secs/3600)) $(($age_in_secs/60%60)) $(($age_in_secs%60)) $pidinfo
 #printf "\n$pidinfo\n"
 		printf "%6s:%02i:%02i %5s" $(($age_in_secs/3600)) $(($age_in_secs/60%60)) $(($age_in_secs%60)) $pidinfo
-
 :
 : Reset colour to normal
 : ────────────────────────────────────────
-:
 		##reset color
 		printf "\e[0m"
 
 }
 
 function main() {
-
 :
 : Output columns headings
 : ────────────────────────────────────────
-:
 #	hostcodes=$(ls ~/hosts)
 	hostcodes=$(find ~/hosts/* -maxdepth 0 -type d,l -printf "%f\n")
 
@@ -107,11 +99,9 @@ function main() {
 	printf "%12s %5s " age CPU%
 	printf "%12s %5s " age CPU%
 	printf "\n"
-
 :
 : Output one line per live database in ~/hosts
 : ────────────────────────────────────────
-:
 	for hostcode in $hostcodes; do
 
 		printf "%30s " $hostcode

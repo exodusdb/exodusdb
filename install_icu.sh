@@ -6,7 +6,6 @@ PS4='+ [icu ${SECONDS}s] '
 : ─────────────────────────────────────────────────────────────────────────────────
 : Download, build and install icu from github with clang/libc++
 : ─────────────────────────────────────────────────────────────────────────────────
-:
 : './install_icu.sh [ICU_VER]'
 :
 	DEFAULT_ICU_VER=78.2
@@ -14,7 +13,6 @@ PS4='+ [icu ${SECONDS}s] '
 :
 : Config
 : ────────────────────────────────────────
-:
 	ICU_VER=${1:-$DEFAULT_ICU_VER}
 	INSTALL_PREFIX=/usr/local/icu-libcxx-${ICU_VER}
 
@@ -33,21 +31,17 @@ PS4='+ [icu ${SECONDS}s] '
 	export LDFLAGS="-stdlib=libc++ -lc++abi -fuse-ld=lld"
 #	export LIBS="-lc++abi"   # sometimes needed instead of/in addition to LDFLAGS
 	CLANG_MAJOR=$(cc --version 2>&1 | grep -oP 'clang version \K\d+')
-
 :
 : Install dependencies
 : ────────────────────────────────────────
-:
 	sudo apt install -y make wget tar curl gpg
 :
 : Download + verify
 : ────────────────────────────────────────
-:
 	curl -LOs "${URL}"
 :
 : Verify
 : ────────────────────────────────────────
-:
 	curl -LOs "${URL}.asc"
 	curl -LOs https://raw.githubusercontent.com/unicode-org/icu/main/KEYS
 	gpg --import KEYS
@@ -55,7 +49,6 @@ PS4='+ [icu ${SECONDS}s] '
 :
 : Extract official tarball creates top-level icu/
 : ────────────────────────────────────────
-:
 	RELEASE_DIR=icu-release-${ICU_VER}
 	rm $RELEASE_DIR -rf
 	mkdir --parents $RELEASE_DIR
@@ -73,20 +66,15 @@ PS4='+ [icu ${SECONDS}s] '
 :
 : Build
 : ────────────────────────────────────────
-:
 	make clean
 	make -j$(nproc)
-
 :
 : Install
 : ────────────────────────────────────────
-:
 	sudo make install
-
 :
 : Cleanup
 : ────────────────────────────────────────
-:
 	popd
 	rm $RELEASE_DIR -rf
 	rm $TARBALL

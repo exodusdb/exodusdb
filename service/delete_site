@@ -4,30 +4,25 @@ set -euxo pipefail
 : ─────────────────────────────────────────────────────────────────────────────────
 : Delete an apache site
 : ─────────────────────────────────────────────────────────────────────────────────
-:
 : 'Syntax is ./delete_site HOST_NAME [SITE_DIR]'
 :
 	HOST_NAME=${1:?HOST_NAME argument is required.}
 	SITE_DIR=${2:-$1}
 
 	SITE_CODE=$HOST_NAME
-
 :
 : Disable the site
 : ────────────────────────────────────────
-:
 	a2dissite $SITE_CODE || true
-
 :
 : Remove the site
 : ────────────────────────────────────────
-:
 	rm /etc/apache2/sites-available/$SITE_CODE.conf || true
 
 	( apache2ctl configtest && apache2ctl restart ) || true
 
 : rm ~/hosts/$SITE_DIR -r || true
-
 :
-: DELETED Apache site $SITE_CODE
+: ────────────────────────────────────────
+: Finished delete_site - DELETED Apache site $SITE_CODE
 : ────────────────────────────────────────

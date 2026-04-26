@@ -6,7 +6,6 @@ PS4='+ [boost ${SECONDS}s] '
 : ─────────────────────────────────────────────────────────────────────────────────
 : Build Boost with Clang + libc++ on Ubuntu LTS
 : ─────────────────────────────────────────────────────────────────────────────────
-:
 : 'Output: libs especially regex & locale without libstdc++.so dependency'
 : 'Default is Boost 1.90.0, requires and discovers latest /usr/local/icu-libcxx-NN.N'
 :
@@ -44,7 +43,6 @@ PS4='+ [boost ${SECONDS}s] '
 :
 : clang++ and clang are required
 : ────────────────────────────────────────
-:
 	if ! which clang++ || ! which clang ; then
 		CLANG_VER=`c++ --version | head -n1|cut -d'.' -f 1|grep -Po '\d+'`
 		sudo update-alternatives --install /usr/bin/clang   clang   /usr/bin/clang-$CLANG_VER   80
@@ -53,7 +51,6 @@ PS4='+ [boost ${SECONDS}s] '
 :
 : STEP 0: Install dependencies
 : ────────────────────────────────────────
-:
 	sudo apt install -y \
 		curl \
 		tar \
@@ -63,11 +60,9 @@ PS4='+ [boost ${SECONDS}s] '
 		zlib1g-dev \
 		bzip2 \
 		make
-
 :
 : STEP 1: Download and extract boost
 : ────────────────────────────────────────
-:
 : Download
 :
 	curl -LOs "${BOOST_URL}"
@@ -90,7 +85,6 @@ PS4='+ [boost ${SECONDS}s] '
 :
 : STEP 2: Build and install
 : ────────────────────────────────────────
-:
 	pushd "${BOOST_DIR}"
 :
 : Clean previous build artifacts
@@ -99,7 +93,6 @@ PS4='+ [boost ${SECONDS}s] '
 :
 : Bootstrapping Boost with clang
 : ────────────────────────────────────────
-:
 	./bootstrap.sh --with-toolset=clang
 :
 : Configure user-config.jam for libc++
@@ -139,7 +132,6 @@ PS4='+ [boost ${SECONDS}s] '
 :
 : STEP 3: Verify
 : ────────────────────────────────────────
-:
 	(set +x && echo -e "\n${YELLOW}→ Verification:${NC}")
 
 	(set +x && echo -e "\nICU libs:")

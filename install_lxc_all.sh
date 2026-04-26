@@ -6,7 +6,6 @@ PS4='+ [lxc_all ${SECONDS}s] '
 : ─────────────────────────────────────────────────────────────────────────────────
 : Build and install exodus on multiple OS and compilers in one command  using install_lxc.sh
 : ─────────────────────────────────────────────────────────────────────────────────
-:
 : 2026-01-09 Success build on 3 OS x 2 Compilers
 : ./install_lxc_all.sh u2204,u2404,u2510 bBdDTW clang,g++
 :
@@ -36,56 +35,44 @@ PS4='+ [lxc_all ${SECONDS}s] '
 :
 : Config
 : ────────────────────────────────────────
-:
 	BASE_CONTAINERS=${1:?BASE_CONTAINERS is required. e.g u2404 or using commas: u2404,u2202. Must exist and will be copied.}
 	STAGES=${2:?Stages is required e.g. A for all except W, AW for all, or any consecutive chars of 'bBdDTW'}
 	COMPILERS=${3:-clang}
-
 :
 : Main
 : ----
 :
 : Loop through requested base containers
 : ────────────────────────────────────────
-:
 #	for OS in u2404 u2204 u2004; do
 	for OS in ${BASE_CONTAINERS//,/ }; do
 
 : Check if starting from stage 1 - $OS
 : ────────────────────────────────────────
-:
 		if [[ "bA" =~ ${STAGES} ]]; then
-
 :
 : Upgrade base container
 : ────────────────────────────────────────
-:
 : Check base container exists $OS
 : ────────────────────────────────────────
-:
 			lxc info $OS >/dev/null
 :
 : Start base container $OS
 : ────────────────────────────────────────
-:
 			lxc start $OS || true
 :
 : Upgrade all in base container - $OS
 : ────────────────────────────────────────
-:
 			lxc exec $OS -- bash -c "apt-get update && apt-get -y dist-upgrade < /dev/null || true"
 :
 		fi # upgrading base container
-
 :
 : For each requested compiler - $COMPILERS
 : ────────────────────────────────────────
-:
 		for COMPILER in ${COMPILERS//,/ }; do
 :
 : Install using specific compiler - $COMPILER
 : ────────────────────────────────────────
-:
 :			'Prevent clang lt 20'
 			if  [[ $COMPILER =~ ^clang- && "${COMPILER#*-}" -lt 20 ]]; then
 				echo "Minimum clang ver is 20. Try clang-20"

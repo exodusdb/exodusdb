@@ -4,28 +4,23 @@ set -euxo pipefail
 : ─────────────────────────────────────────────────────────────────────────────────
 : Create test database
 : ─────────────────────────────────────────────────────────────────────────────────
-:
 : 'Syntax is ./create_testdb LIVE_EXO_DATA'
 :
 	LIVE_EXO_DATA=${1:?LIVE_EXO_DATA argument is required.}
 	TEST_EXO_DATA=$1_test
-
 :
 : Check Syntax
 : ────────────────────────────────────────
-:
 	if [ -z "LIVE_EXO_DATA"  ]; then
 		set +x
 		echo 'Syntax is wrong. Cannot continue.'
 		exit 1
 	fi
-
 :
 : Do the copy
 : ────────────────────────────────────────
-:
 	./copy_db $LIVE_EXO_DATA $TEST_EXO_DATA DELETE
-
 :
-: Finished create_testdb $1 in $(($SECONDS / 60)) minutes and $(($SECONDS % 60)) seconds.
+: ────────────────────────────────────────
+: Finished create_testdb - $1 in $(($SECONDS / 60)) minutes and $(($SECONDS % 60)) seconds.
 : ────────────────────────────────────────

@@ -4,7 +4,6 @@ set -euxo pipefail
 : ─────────────────────────────────────────────────────────────────────────────────
 : Create/update an apache site for exodus
 : ─────────────────────────────────────────────────────────────────────────────────
-:
 : 'Syntax is ./create_site <FQDN> "[HOST_DIR]" "[DB_CODE]" [SITE_NAME_PREFIX]'
 :
 : 'Example:  ./create_site exodus'
@@ -15,11 +14,9 @@ set -euxo pipefail
 	HOST_DIR=${2:-}
 	DB_CODE=${3:-}
 	SITE_PREFIX=${4-}
-
 :
 : Config
 : ────────────────────────────────────────
-:
 #	FQDN=exodus.hosts.neosys.com
 	HOST_NAME=${FQDN%%.*} # first word of FQDN e.g. exodus
 	DOMAIN_NAME=${FQDN#*.} # remainder of FQDN e.g. hosts.exodus.com
@@ -30,26 +27,21 @@ set -euxo pipefail
 	DOMAIN_NAME=${DOMAIN_NAME:-exodus.com}
 	HOST_DIR=${HOST_DIR:-$HOST_NAME}
 	DB_CODE=${DB_CODE:-$HOST_NAME}
-
 :
 : Check current directory
 : ────────────────────────────────────────
-:
 	EXODUS=`pwd`
 	test -f $EXODUS/install_www_apt.sh || ( echo Must be run in exodus install dir without path && exit )
 
-:
+function APT_GET {
+: ────────────────────────────────────────
 : Function to call apt-get repeatedly in case of error
 : ────────────────────────────────────────
-:
-function APT_GET {
-:
 	STARTED=$SECONDS
 	while [[ $(($SECONDS-$STARTED)) -lt 600 ]]; do
 :
 : Retry apt-get. $(($SECONDS-$STARTED)) secs.
 : ────────────────────────────────────────
-:
 		# /dev/null to stop error causing random hang until timeout
 		# with apt process stuck on tcsetattr call. see gdb/lldb -p 9999
 		if timeout 120s $* < /dev/null; then
@@ -58,11 +50,9 @@ function APT_GET {
 		sleep 5
 	done;
 }
-
 :
 : Install apache and php
 : ────────────────────────────────────────
-:
 : Note that apache/mods may be already installed but not enabled
 :
 #	APT_GET sudo apt-get install -y apache2 libapache2-mod-php php php-xml
@@ -88,7 +78,6 @@ function APT_GET {
 :
 : Configure php.ini - increase limits
 : ────────────────────────────────────────
-:
 	PHP_CONF_DIR=`php --ini|grep '/etc/php/[0-9.]*' -o | head -n1`
 	PHP_EXODUS_INI=${PHP_CONF_DIR}/fpm/conf.d/00-exodus.ini
 :
@@ -109,46 +98,35 @@ function APT_GET {
 			post_max_size = 10M
 		V0G0N
 	fi
-
 :
 : Enable module to add headers
 : ────────────────────────────────────────
-:
 	sudo a2enmod headers
-
 :
 : Enable module for case insensitivity in images folder
 : ────────────────────────────────────────
-:
 	sudo a2enmod speling
-
 :
 : Ensure setfacl is installed
 : ────────────────────────────────────────
-:
 	which setfacl || APT_GET sudo apt-get install -y acl
-
 :
 : Create link from hostname dir to host dir if different
 : ────────────────────────────────────────
-:
 	if [ "$HOST_NAME" != "$HOST_DIR" ]; then
 		ln -snf ~/hosts/$HOST_DIR ~/hosts/$HOST_NAME
 	fi
                              :
 : Make site directories like ~/hosts/demo/{work,data,images}
 : ────────────────────────────────────────
-:
 	SITEDIR=~/hosts/$HOST_DIR
 	for SUBHOST_DIR in work data images; do
 		mkdir -p $SITEDIR/$SUBHOST_DIR
 		chmod a+srw $SITEDIR/$SUBHOST_DIR
 	done
-
 :
 : Ensure directory permissions on data/$DB_CODE
 : ────────────────────────────────────────
-:
 : KEEP IN SYNC. SIMILAR code in create_site, create_service and generalproxy.cpp
 :
     DB_DIR=~/hosts/$HOST_DIR/data/$DB_CODE
@@ -157,7 +135,7 @@ function APT_GET {
     setfacl -d -m g::rw $DB_DIR
 :
 : Fix permissions - if installing into /root/
-: ─────────────────────────────────────────────────────────────────────────────────
+: ────────────────────────────────────────
 : TODO move ~/hosts and ~/exodus/service/www out of /root or /home
 :
 	if [ ${EXODUS:0:6} = /root/ ]; then
@@ -175,18 +153,14 @@ function APT_GET {
 			sudo systemctl restart apache2
 		fi
 	fi
-
 :
 : Link to exodus www
-: ─────────────────────────────────────────────────────────────────────────────────
-:
+: ────────────────────────────────────────
 	rm $SITEDIR/www -rf
 	ln -snf ~/exodus/service/www/ $SITEDIR/www
-
 :
 : Configure Certificates
 : ────────────────────────────────────────
-:
 : Check for cert/key for FQDN $FQDN or wildkey cert/key for domain name $DOMAIN_NAME
 :
 	for DN in $FQDN $DOMAIN_NAME; do
@@ -204,7 +178,6 @@ function APT_GET {
 			break;
 		fi
 	done
-
 :
 : Check if cert/key found for FQDN or domain name
 :
@@ -215,7 +188,6 @@ function APT_GET {
 		PUBCERT=/etc/ssl/certs/ssl-cert-snakeoil.pem
 		PRIVKEY=/etc/ssl/private/ssl-cert-snakeoil.key
 	fi
-
 :
 : Provide a fixed link to the chosen cert and key
 :
@@ -224,11 +196,9 @@ function APT_GET {
 :
 	sudo ln -snf $PUBCERT $PUBCERT_LINK
 	sudo ln -snf $PRIVKEY $PRIVKEY_LINK
-
 :
 : Create an Apache virtual site
 : ────────────────────────────────────────
-:
 	APACHE_SITE_CONF=/etc/apache2/sites-available/$HOST_NAME.conf
 	TMPFILE=$(mktemp /tmp/create_site.XXXXXXXX)
 	sudo dd of=${TMPFILE} status=none <<-V0G0N
@@ -271,28 +241,24 @@ function APT_GET {
 		</VirtualHost>
 		V0G0N
 	sudo mv $TMPFILE $APACHE_SITE_CONF
-
 :
 : Disable exodus sites
 : ────────────────────────────────────────
-:
 	#sudo a2dissite exodus exodus-ssl || true
 	if sudo a2dissite exodus exodus-ssl; then
 		#sudo apache2ctl configtest
 		#restart does a configtest
 		sudo apache2ctl restart
 	fi
-
 :
 : Enable the site and restart apache - $HOST_NAME
 : ────────────────────────────────────────
-:
 	sudo a2ensite $HOST_NAME
 	#sudo apache2ctl configtest
 	#sudo apache2ctl restart
 	sudo apache2ctl graceful
-
 :
-: CREATED https://$SUFFIXED_FQDN
+: ────────────────────────────────────────
+: Finished create_site - https://$SUFFIXED_FQDN
 : ────────────────────────────────────────
 

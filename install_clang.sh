@@ -6,7 +6,6 @@ PS4='+ [clang ${SECONDS}s] '
 : ─────────────────────────────────────────────────────────────────────────────────
 : Install clang from llvm and precompile std.cppm
 : ─────────────────────────────────────────────────────────────────────────────────
-:
 : 'Syntax is ./install_clang.sh [CLANG_VER] [CPPSTD]'
 :
 	CLANG_VER=${1:-22}
@@ -21,7 +20,6 @@ PS4='+ [clang ${SECONDS}s] '
 :
 : Validate
 : ────────────────────────────────────────
-:
 	if [[ ! $CPPSTD =~ \+\+ ]]; then
 		echo "CPPSTD must be like c++20, c++2c, gnu++23 etc."
 		exit 1

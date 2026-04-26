@@ -4,7 +4,6 @@ set -euxo pipefail
 : ─────────────────────────────────────────────────────────────────────────────────
 : Copy a single EXODUS program to live
 : ─────────────────────────────────────────────────────────────────────────────────
-:
 : 'Syntax is ./copyone PROGNAME_OR_LIBNAME'
 :
 : 'Example:  ./copyone serve_exo'
@@ -12,11 +11,9 @@ set -euxo pipefail
 : 'Example:  ./copyone extract_xyz'
 :
 	PROGNAME=${1:?progname_or_libname argument is required.}
-
 :
 : Copy using rsync
 : ────────────────────────────────────────
-:
 : The following may not be true and may not actually be required.
 : Use 'whole file' option to ensure that the OS dlopen understands everything has changed
 : otherwise new code may not become active and/or undefined behaviour i.e. crashes etc.
@@ -29,7 +26,6 @@ set -euxo pipefail
 :
 		rsync -av --whole-file $LIBFILENAME ~/live/lib
 	else
-
 :
 : Look for bin file
 :
@@ -45,7 +41,5 @@ set -euxo pipefail
 : The following may not be true and may not actually be required.
 : NOTE - You must restart all/selected live processes for the new program to become effective
 : ─────────────────────────────────────────────────────────────────────────────────
-:
-:
 : Finished copying $PROGNAME to live in $(($SECONDS / 60)) minutes and $(($SECONDS % 60)) seconds.
 : ────────────────────────────────────────

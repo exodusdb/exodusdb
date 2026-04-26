@@ -4,7 +4,6 @@ set -euxo pipefail
 : ─────────────────────────────────────────────────────────────────────────────────
 : Create/Recreate an EXODUS service
 : ─────────────────────────────────────────────────────────────────────────────────
-:
 : 'Syntax is ./create_service APP_CODE HOST_DIR "[BASE_DB_CODE]" live|test'
 :
 : 'Example:  ./create_service exo exodus "" live'
@@ -18,21 +17,17 @@ set -euxo pipefail
 :
 	SERVICE_CODE=${APP_CODE}_$LIVE_OR_TEST
 	FULL_SERVICE_CODE=$SERVICE_CODE@${BASE_DB_CODE}
-
 :
 : Check syntax
 : ────────────────────────────────────────
-:
 	if [ $LIVE_OR_TEST != live -a $LIVE_OR_TEST != test ]; then
 :		'Syntax error'
 		exit 1
 	fi
-
 :
 : For live databases, EXO_HOME is $HOME/live and EXO_DICT=exodus_live
 : For test databases, EXO_HOME is $HOME      and EXO_DICT=exodus
 : ────────────────────────────────────────
-:
 	if [ $LIVE_OR_TEST = test ]; then
 		export EXO_HOME=$HOME
 		export IDB_CODE=%i_test
@@ -55,32 +50,26 @@ set -euxo pipefail
     if [ $HOST_DIR = "ptcy" ]; then
         WORK_DIR2=~/hosts/ptcy/work/
     fi
-
 :
 : Symbolic link for extra databases that dont match the working directory
 : ────────────────────────────────────────
-:
 	HOST_DIR1=${WORK_DIR1%/work/}
 	HOST_DIR3=${WORK_DIR3%/work/}
 	if [ $WORK_DIR1 != $WORK_DIR3 ]; then
 		test -d $WORK_DIR3 || ln -s $HOST_DIR1 $HOST_DIR3
 	fi
-
 :
 : Check serve_any is available
 : ────────────────────────────────────────
-:
 	SERVICE_BIN=$EXO_HOME/bin/serve_any
 	if ! test -x $SERVICE_BIN; then
 		set +x
 		echo "$SERVICE_BIN program not available or not executable. Cannot create service."
 		exit 1
 	fi
-
 :
 : Check the server library and work directory are actually available
 : ────────────────────────────────────────
-:
 	SERVICE_CMD=serve_$APP_CODE
 	SERVICE_LIB=$EXO_HOME/lib/libserve_$APP_CODE.so
 	if ! test -x $SERVICE_LIB; then
@@ -95,18 +84,15 @@ set -euxo pipefail
 		exit 1
 	fi
 
-:
+function APT_GET {
+: ────────────────────────────────────────
 : Function to call apt-get repeatedly in case of error
 : ────────────────────────────────────────
-:
-function APT_GET {
-:
 	STARTED=$SECONDS
 	while [[ $(($SECONDS-$STARTED)) -lt 600 ]]; do
 :
 : Retry apt-get. $(($SECONDS-$STARTED)) secs.
 : ────────────────────────────────────────
-:
 		# /dev/null to stop error causing random hang until timeout
 		# with apt process stuck on tcsetattr call. see gdb/lldb -p 9999
 		if timeout 120s $* < /dev/null; then
@@ -115,11 +101,9 @@ function APT_GET {
 		sleep 5
 	done;
 }
-
 :
 : Create the service
 : ────────────────────────────────────────
-:
 	SERVICE_FILENAME=/etc/systemd/system/$SERVICE_CODE@.service
 	TMPFILE=$(mktemp /tmp/create_service.XXXXXXXXX)
 :
@@ -159,54 +143,41 @@ V0G0N
 :
 	sudo mv $TMPFILE $SERVICE_FILENAME
 	chmod a+r $SERVICE_FILENAME
-
 :
 : Set trigger to reload systemd
 : ────────────────────────────────────────
-:
 	if [ -z ${DOALL:-} ]; then
 		sudo systemctl daemon-reload
 	else
 		touch /tmp/systemctl.daemon-reload.required
 	fi
-
 :
 : Configure the exodus service to autostart
 : ────────────────────────────────────────
-:
 	sudo systemctl enable $FULL_SERVICE_CODE
-
 :
 : NOT Starting the service
 : ────────────────────────────────────────
-:
 :	sudo service $FULL_SERVICE_CODE start &
-
 :
 : Ensure setfacl is installed
 : ────────────────────────────────────────
-:
     which setfacl || APT_GET sudo apt-get install -y acl
-
 :
 : Ensure directory permissions on data/$FULL_DB_CODE
 : ────────────────────────────────────────
-:
 : KEEP IN SYNC. SIMILAR code in create_site, create_service and generalproxy.cpp
 :
 	DB_DIR=~/hosts/$HOST_DIR/data/$FULL_DB_CODE
 	mkdir -p $DB_DIR
 	chmod a+srw $DB_DIR
 	setfacl -d -m g::rw $DB_DIR
-
 :
+: ────────────────────────────────────────
 : Finished creating service $FULL_SERVICE_CODE
 : ────────────────────────────────────────
-
-:
-: Managing the service
+: Note: Managing the service
 : ────────────────────────────────────────
-:
 : sudo service $FULL_SERVICE_CODE {start/stop/restart/status}
 :  or
 : ./debug $BASE_DB_CODE

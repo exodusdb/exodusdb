@@ -6,7 +6,6 @@ PS4='+ [$0 ${SECONDS}s] '
 : ─────────────────────────────────────────────────────────────────────────────────
 : Download, build and install the full exodus environment
 : ─────────────────────────────────────────────────────────────────────────────────
-:
 : Includes libexodus, exodus cli, c++ compiler and postgresql database.
 :
 : You can view the latest version of this script directly using wget or curl
@@ -43,20 +42,17 @@ PS4='+ [$0 ${SECONDS}s] '
 :
 : Parse command line
 : ────────────────────────────────────────
-:
 	EXODUS_DIR=${1:-~/exodus}
 	EXODUS_BRANCH_OR_TAG=${2:-master}
 	COMPILER=${3:-clang-20}
 :
 : Update apt and install git
 : ────────────────────────────────────────
-:
 	sudo apt-get update
 	sudo DEBIAN_FRONTEND=noninteractive apt-get -y install git
 :
 : Git clone exodus or refresh if already present?
 : ────────────────────────────────────────
-:
 	if [ ! -d $EXODUS_DIR ]; then
 		git clone --recursive --branch $EXODUS_BRANCH_OR_TAG https://github.com/exodusdb/exodusdb $EXODUS_DIR
 	else
@@ -68,10 +64,9 @@ PS4='+ [$0 ${SECONDS}s] '
 :
 : Install all
 : ────────────────────────────────────────
-:
 	cd $EXODUS_DIR
 	./install.sh A $COMPILER
 :
+: ────────────────────────────────────────
 : Finished $0 $* in $((SECONDS/60)) mins and $((SECONDS%60)) secs.
 : ────────────────────────────────────────
-:

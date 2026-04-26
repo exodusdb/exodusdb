@@ -6,7 +6,6 @@ PS4='+ [ninja ${SECONDS}s] '
 : ─────────────────────────────────────────────────────────────────────────────────
 : Install ninja from github binary or source
 : ─────────────────────────────────────────────────────────────────────────────────
-:
 : 'Syntax is ./install_ninja.sh binary [RELEASE]'
 : 'Syntax is ./install_ninja.sh source [BRANCH_OR_TAG_OR_HASH]'
 :

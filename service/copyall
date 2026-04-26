@@ -2,16 +2,13 @@
 set -euxo pipefail
 
 : ────────────────────────────────────────
-#: Copy all EXODUS dictionaries and programs to live
 : Copy all EXODUS programs to live. User and system installed.
 : ────────────────────────────────────────
-:
 : 'Syntax is ./copyall [CONFIRM]'
 :
 : '  ./copyall                 # dry run'
 :
 : '  ./copyall CONFIRM         # really does it'
-
 :
 : EXODUS installed in
 : ────────────────────────────────────────
@@ -21,7 +18,6 @@ set -euxo pipefail
 :
 : Dry run or not
 : ────────────────────────────────────────
-:
 	DRYRUN=--dry-run
 	if [ "${1:-}" = "CONFIRM" ]; then
 		DRYRUN=
@@ -29,17 +25,14 @@ set -euxo pipefail
 :		Invalid syntax
 		exit 1
 	fi
-
 :
 : Create exodus_live database if not present
 : ────────────────────────────────────────
-:
 	listfiles exodus_live > /dev/null || dbcreate exodus_live
 
 #:
 #: Copy all dictionaries from exodus to exodus_live
-#: ================================================
-#:
+#: ────────────────────────────────────────
 #: Use --clean option to drop dict files before importing them
 #:
 #	if [ -z $DRYRUN ]; then
@@ -47,25 +40,20 @@ set -euxo pipefail
 #	else
 #:
 #:		$DRYRUN --- Skipping ---
-#:		==========================
-#:
+#		: ────────────────────────────────────────
 #:		"~/exodus/service# sudo -u postgres pg_dump --clean -t 'dict.*' exodus|psql exodus_live"
 #	fi
-
 :
 : Create a directory for live services binaries
 : ────────────────────────────────────────
-:
 : May be used for EXODUS environment variable "EXO_HOME"
 : and system environment variables '$PATH' and '$LD_LIBRARY_PATH'
 :
 	mkdir -p $EXO_HOME/live
 	mkdir -p $EXO_INSTALL_DIR/live
-
 :
 : Copy all '$EXO_HOME' bin, lib, dat and inc files to ~/live
 : ────────────────────────────────────────
-:
 :	MUST use 'whole file' option to ensure that the OS dlopen understands everything has changed
 :	otherwise new code may not become active and/or undefined behaviour i.e. crashes etc.
 :
@@ -73,7 +61,6 @@ set -euxo pipefail
 :
 : Copy '$EXO_INSTALL_DIR' bin, lib and inc files to /usr/local/live
 : ────────────────────────────────────────
-:
 :	Note that ldconfig will not see or use /usr/local/live.
 :	We are relying on PATH and LD_LIBRARY_PATH configuration in the live service to use it.
 :
@@ -84,36 +71,28 @@ set -euxo pipefail
 		--exclude share/cmake* \
 		$EXO_INSTALL_DIR/{bin,lib,share,include} \
 		$EXO_INSTALL_DIR/live
-
 :
 : Finished $DRYRUN copying EXODUS programs to live in $(($SECONDS / 60)) minutes and $(($SECONDS % 60)) seconds.
 : ────────────────────────────────────────
-:
 : Warn DRYRUN if not CONFIRMed, or Restart required if CONFIRMed
 : ────────────────────────────────────────
-:
 	if [[ -n "$DRYRUN" ]]; then
 		tput setaf 1
 :
-: ─────────────────────────────────────────────────────────────────────────────────
 : DRYRUN - - no CONFIRM provided
-: ─────────────────────────────────────────────────────────────────────────────────
+: ────────────────────────────────────────
 		tput sgr0
 	else
 :
-: ─────────────────────────────────────────────────────────────────────────────────
 : Restarting all live processes
-: ─────────────────────────────────────────────────────────────────────────────────
-:
+: ────────────────────────────────────────
 #	Only needed if sync_dat failed and need to force all
 #	touch ~/live/{bin,lib,dat,dat/*,dat/*/*}
 	touch ~/live/{bin,lib,dat}
-
 :
 : ─────────────────────────────────────────────────────────────────────────────────
 : Listing unconverted live services. If any then recreate any ONE service to fix all
 : ─────────────────────────────────────────────────────────────────────────────────
-:
 	grep PATH /etc/systemd/system/*_live@* | grep -v /usr/local/live || : None. All live services converted.
 
 	fi

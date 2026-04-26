@@ -4,92 +4,71 @@ set -euxo pipefail
 : ─────────────────────────────────────────────────────────────────────────────────
 : Copy a postgres database
 : ─────────────────────────────────────────────────────────────────────────────────
-:
 : 'Syntax is ./copy_db FROM_DBCODE TO_DBCODE [DELETE]'
 :
 	SOURCE_EXO_DATA=${1:?FROM_DBCODE argument is required.}
 	TARGET_EXO_DATA=${2:?TO_DBCODE argument is required.}
 	OPTIONS=${3:-}
-
 :
 : Determine source service. Simply remove any _test from the source db name
 : ────────────────────────────────────────
-:
 	SOURCE_SERVICE=${SOURCE_EXO_DATA%_test}
-
 :
 : Determine source type - live or test
 : ────────────────────────────────────────
-:
 	if [[ $SOURCE_EXO_DATA =~ "_test" ]]; then
 		SOURCE_TYPE=test
 	else
 		SOURCE_TYPE=live
 	fi
-
 :
 : Verify that source service is NOT running otherwise we cannot copy it using dbcopy
 : ────────────────────────────────────────
-:
 	if ./service ${SOURCE_SERVICE} is-active $SOURCE_TYPE &> /dev/null ; then
 		echo "SOURCE_EXO_DATA is running so it cannot be copied" 1>&2
 		exit 1
 	fi
-
 :
 : Determine target service. Simply remove any _test from the target db name
 : ────────────────────────────────────────
-:
 	TARGET_SERVICE=${TARGET_EXO_DATA%_test}
-
 :
 : Determine target type - live or test
 : ────────────────────────────────────────
-:
 	if [[ $TARGET_EXO_DATA =~ "_test" ]]; then
 		TARGET_TYPE=test
 	else
 		TARGET_TYPE=live
 	fi
-
 :
 : Detect if target service is running so we can restart after copying
 : ────────────────────────────────────────
-:
 	./service ${TARGET_SERVICE} is-active $TARGET_TYPE &> /dev/null && RESTART_REQUIRED=Y || RESTART_REQUIRED=N
-
 :
 : Stop the target service if it is running so we can drop its database
 : ────────────────────────────────────────
-:
 	[ $RESTART_REQUIRED = Y ] && ./service ${TARGET_SERVICE} stop ${TARGET_TYPE}
-
 :
 : Delete any existing target database
 : ────────────────────────────────────────
-:
 	if [ "$OPTIONS" = "DELETE" ]; then
 		#sudo -u postgres dropdb $TARGET_EXO_DATA || true
 		for TRY in 1 2 3; do
 			dbdelete $TARGET_EXO_DATA && break || true
 		done
 	fi
-
 :
 : Copy source database to target
 : ────────────────────────────────────────
-:
 	#sudo -u postgres createdb -O exodus -T $SOURCE_EXO_DATA $TARGET_EXO_DATA
 	dbcopy $SOURCE_EXO_DATA $TARGET_EXO_DATA
-
 :
 : Restart target service if it was running before
 : ────────────────────────────────────────
-:
 	if [ $RESTART_REQUIRED = Y ]; then
 		./service $TARGET_SERVICE start $TARGET_TYPE || true
 	fi
-
 :
+: ────────────────────────────────────────
 : Finished $0 $* in $(($SECONDS / 60)) minutes and $(($SECONDS % 60)) seconds.
 : ────────────────────────────────────────

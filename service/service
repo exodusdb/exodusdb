@@ -4,7 +4,6 @@ set -euxo pipefail
 : ─────────────────────────────────────────────────────────────────────────────────
 : Service commands start, stop, restart, reload, status, is-active, enable, disable
 : ─────────────────────────────────────────────────────────────────────────────────
-:
 : 'Syntax is ./service DB_CODE start|stop|restart|reload|status|is-active|enable|disable [test|live]'
 :
 : 'Environment variable: $APP_CODE Defaults to "exo". Used for prefix on services'
@@ -18,18 +17,15 @@ set -euxo pipefail
 	LIVE_OR_TEST=${3:-}
 
 	if [ "$LIVE_OR_TEST" != "test" ]; then
-:
-:		LIVE
-:		====
-:
+	:
+	: LIVE
+	: ────────────────────────────────────────
 		sudo systemctl $CMD ${APP_CODE}_live@$DB_CODE
 	fi
 
 	if [ "$LIVE_OR_TEST" != "live" ]; then
-:
-:		TEST
-:		====
-:
+	:
+	: TEST
+	: ────────────────────────────────────────
 		sudo systemctl $CMD ${APP_CODE}_test@$DB_CODE
 	fi
-

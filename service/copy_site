@@ -4,7 +4,6 @@ set -euxo pipefail
 : ─────────────────────────────────────────────────────────────────────────────────
 : Copy a site from a remote server to the current server
 : ─────────────────────────────────────────────────────────────────────────────────
-:
 : 'Syntax is ./copy_site copy|move SSH_HOST[:SSH_PORT] DELETE DB_NAME'
 :
 : 'e.g. ./copy_site copy nl10:19525 DELETE test'
@@ -24,75 +23,61 @@ set -euxo pipefail
 	COPY_EXO_DATA=${4:?DB_NAME is required.}
 
 	EXO_SITE=${5:-${COPY_EXO_DATA}}
-
 :
 : Config
 : ────────────────────────────────────────
-:
 	export APP_CODE=agy
 
 	SSH_USER=root
 	HOSTS_DIR=~/hosts
 	NEOSYS_DIR=~/neosys
 	SERVICE_DIR=~/exodus/service
-
 :
-: Init
-: ====
-:
+: Command line
+: ────────────────────────────────────────
 	EXO_SITE=$COPY_EXO_DATA
 
     SSH_PORT=`echo $SSH_HOST:|cut -d':' -f2`
     SSH_HOST=`echo $SSH_HOST:|cut -d':' -f1`
-
+:
+: Config
+: ────────────────────────────────────────
 	SSH="ssh -p $SSH_PORT $SSH_USER@$SSH_HOST"
-
 :
 : If mode is move then shutdown the remote site
 : ────────────────────────────────────────
-:
 	if [ $MODE = move ]; then
 		$SSH "cd $NEOSYS_DIR && ./doall $COPY_EXO_DATA stop && ./doall $COPY_EXO_DATA disable"
 	fi
-
 :
 : Backup the site database on the remote server
 : ────────────────────────────────────────
-:
 : This dumps the postgresql database into an sql file in the remote site work dir
 :
 	$SSH "cd ~/neosys && ./doall $COPY_EXO_DATA backup_db B"
-
 :
 : Copy the remote work dir to this server
 : ────────────────────────────────────────
-:
 	rsync -e "ssh -p $SSH_PORT" -avz --delete $SSH_USER@$SSH_HOST:$HOSTS_DIR/$EXO_SITE/ $HOSTS_DIR/$EXO_SITE
-
 :
 : Restore the database
 : ────────────────────────────────────────
-:
 	cd $NEOSYS_DIR
 	./doall $COPY_EXO_DATA restore_db
-
 :
 : Create the live database from the restored _test version
 : ────────────────────────────────────────
-:
 	cd $SERVICE_DIR
 	EXO_DATA= ./copy_db ${COPY_EXO_DATA}_test $COPY_EXO_DATA $DELETE
-
 :
 : Check the database has been copied correctly.
 : ─────────────────────────────────────────────────────────────────────────────────
 : Skipped for speed unless moving. Do it manually if required.
 : ─────────────────────────────────────────────────────────────────────────────────
-:
 	if [ $MODE = move ]; then
 		dbcomp ${COPY_EXO_DATA}_test $COPY_EXO_DATA > /dev/null
 	fi
-
 :
+: ────────────────────────────────────────
 : Finished $0 $* in $(($SECONDS/60)) mins. and $(($SECONDS%60)) secs.
 : ────────────────────────────────────────

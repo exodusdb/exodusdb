@@ -6,7 +6,6 @@ PS4='+ [cmake ${SECONDS}s] '
 : ─────────────────────────────────────────────────────────────────────────────────
 : Install cmake from github binary or source
 : ─────────────────────────────────────────────────────────────────────────────────
-:
 : 'Syntax is ./install_cmake.sh binary [RELEASE]'
 : 'Syntax is ./install_cmake.sh source [BRANCH_OR_TAG_OR_HASH]'
 :

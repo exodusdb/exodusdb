@@ -1,5 +1,6 @@
 #!/bin/bash
 set -euxo pipefail
+
 : ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
 : Stop a background service and run it in the foreground for debugging
 : ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
@@ -28,7 +29,7 @@ set -euxo pipefail
 : - Service: HOME/live/lib, bin etc.        From service/copyall
 : - System : /user/local/live/lib, bin etc. From service/copyall
 :
-: Validate
+: Command line
 : ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
 :
 	DB_CODE=${1:?DBNAME argument is required.}
@@ -164,5 +165,5 @@ set -euxo pipefail
 		sudo systemctl start $FULL_SERVICE_CODE
 	fi
 : ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
-: Finished debug of $SITE_DIR - $DB_CODE in $(($SECONDS / 60)) minutes and $(($SECONDS % 60)) seconds
+: Finished run - $SITE_DIR - $DB_CODE in $(($SECONDS / 60)) minutes and $(($SECONDS % 60)) seconds
 : ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯

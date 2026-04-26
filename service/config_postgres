@@ -4,17 +4,13 @@ set -euxo pipefail
 : ─────────────────────────────────────────────────────────────────────────────────
 : Configure Postgres with more connections and memory
 : ─────────────────────────────────────────────────────────────────────────────────
-:
 : Note: Restarts postgres
 :
-
 	MAX_CONNECTIONS=500
 	SHARED_BUFFERS=256MB
-
 :
 : Not configuring for SSD because initial tests didnt show much difference
 : ────────────────────────────────────────
-:
 	SSD=
 	if [ $SSD ]; then
 		RANDOM_PAGE_COST=1
@@ -22,24 +18,22 @@ set -euxo pipefail
 		RANDOM_PAGE_COST=4
 	fi
 
-: ─────────────────────────────────────────────────────────────────────────────────
-: A function to show the maximum connections and memory reserved
-: ─────────────────────────────────────────────────────────────────────────────────
-:
 function showmax() {
+: ────────────────────────────────────────
+: Show the maximum connections and memory reserved
+: ────────────────────────────────────────
 	sudo -u postgres psql <<-V0G0N
 		show max_connections;
 		show shared_buffers;
 		show random_page_cost;
 		show synchronous_commit;
-V0G0N
+	V0G0N
 }
 
-: ─────────────────────────────────────────────────────────────────────────────────
-: A function to show any connections idle longer than x mins
-: ─────────────────────────────────────────────────────────────────────────────────
-:
 function showidle() {
+: ────────────────────────────────────────
+: Show any connections idle longer than x mins
+: ────────────────────────────────────────
 	sudo -u postgres psql <<-V0G0N
 		SELECT datid, datname, pid, usesysid, usename, application_name, client_addr, client_hostname, client_port
 		FROM pg_stat_activity
@@ -47,14 +41,13 @@ function showidle() {
 		AND pid <> pg_backend_pid()
 		AND state in ('idle', 'idle in transaction', 'idle in transaction (aborted)', 'disabled')
 		AND state_change < current_timestamp - INTERVAL '$1' MINUTE; -- You can set your own
-V0G0N
+	V0G0N
 }
 
-: ─────────────────────────────────────────────────────────────────────────────────
-: A function to kill any postgres connections idle longer than x mins
-: ─────────────────────────────────────────────────────────────────────────────────
-:
 function killidle() {
+: ────────────────────────────────────────
+: Kill any postgres connections idle longer than x mins
+: ────────────────────────────────────────
 	sudo -u postgres psql <<-V0G0N
 		SELECT pg_terminate_backend(pid)
 		FROM pg_stat_activity
@@ -64,83 +57,59 @@ function killidle() {
 		AND state_change < current_timestamp - INTERVAL '$1' MINUTE;
 	V0G0N
 }
-
 :
 : ─────────────────────────────────────────────────────────────────────────────────
 : Main function
 : ─────────────────────────────────────────────────────────────────────────────────
-
-:
 : Check postgresql is installed
 : ────────────────────────────────────────
-:
 	test -d /etc/postgresql/*/main/conf.d
-
 :
 : Show connections idle > 1 min
 : ────────────────────────────────────────
-:
 	showidle 1
-
 :
 : Show the current maxima
 : ────────────────────────────────────────
-:
 	showmax
-
 :
 : Set new maxima
 : ────────────────────────────────────────
-:
 #	echo "max_connections = 300" > /etc/postgresql/12/main/conf.d/neosys.conf && service postgresql restart
 	sudo -u postgres psql <<-V0G0N
 		ALTER SYSTEM SET max_connections TO '$MAX_CONNECTIONS';
 		ALTER SYSTEM SET shared_buffers TO '$SHARED_BUFFERS'
 	V0G0N
-
 :
 : Configure for ssd or spinning rust
 : ────────────────────────────────────────
-:
 	sudo -u postgres psql <<-V0G0N
 		ALTER SYSTEM SET random_page_cost TO '$RANDOM_PAGE_COST';
 	V0G0N
-
 :
 : Log to syslog
 : ────────────────────────────────────────
-:
 : https://logtail.com/tutorials/how-to-start-logging-with-postgresql/
 :
-#	sudo -u postgres psql <<-V0G0N
-#		ALTER SYSTEM SET log_destination TO 'syslog';
-#		ALTER SYSTEM SET log_line_prefix TO '%d'
-#	V0G0N
 	sudo -u postgres psql <<-V0G0N
 		ALTER SYSTEM RESET log_destination;
 		ALTER SYSTEM RESET log_line_prefix;
 	V0G0N
-
 :
 : Log all statements longer than n ms
 : ────────────────────────────────────────
-:
 	sudo -u postgres psql <<-V0G0N
 		ALTER SYSTEM SET log_min_duration_statement TO 500;
 	V0G0N
-
 :
 : Restart postgresql
 : ────────────────────────────────────────
-:
 	sudo service postgresql restart
-
 :
 : Show the new maxima
 : ────────────────────────────────────────
-:
 	showmax
-
 :
-: Finished config_postgres
+: ────────────────────────────────────────
+: Finished "$@"
 : ────────────────────────────────────────
