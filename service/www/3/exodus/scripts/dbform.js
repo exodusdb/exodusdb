@@ -339,11 +339,7 @@ function* formfunctions_onload() {
             //from here on there should be no need for references to the dictitem
 
             //build radio and check boxes
-            if (
-                (element.getAttribute('exodusradio') && element.type != 'radio')
-                ||
-                (element.getAttribute('exoduscheckbox') && element.type != 'checkbox')
-            ) {
+            if ((element.getAttribute('exodusradio') && element.type != 'radio')||(element.getAttribute('exoduscheckbox') && element.type != 'checkbox')) {
 
                 //radio has preference over checkbox
                 if (element.getAttribute('exodusradio'))
@@ -618,9 +614,12 @@ function* formfunctions_onload() {
             }
 
             //prevent tab focussing on uneditable spans
-            if (element.tagName == 'SPAN' && element.getAttribute('exodustype') == 'S')
+            if (element.tagName == 'SPAN' && element.getAttribute('exodustype') == 'S') {
                 element.tabIndex = -1
-
+                //change styling for the calculated fields
+                element.style.fontStyle = 'italic'
+                element.style.backgroundColor = 'rgba(255, 255, 255, 0.5)'
+            }
             //add button before element with popups (and selects to make it clear to users that F7 is available - especially since useful when selecting multivalues)
             if (
                 (
@@ -859,8 +858,13 @@ function* formfunctions_onload() {
                             element.rows = exodusrows
                     }
                 }
-                if (element.getAttribute('exodusmaxlength'))
+                if (element.getAttribute('exodusmaxlength')) {
                     element.maxLength = parseInt(element.getAttribute('exodusmaxlength'), 10)
+					// Ensures users and tasks cards remain side by side
+                    if (gdatafilename == 'DEFINITIONS') {
+                        element.style.maxWidth = element.maxLength + 'px';
+                    }
+                }
             }
 
             //lower case
@@ -1019,6 +1023,10 @@ function* formfunctions_onload() {
                 //elements with group no - set the data source of repeating lines
             }
             else {
+				// GBEDIT TEMP
+				if (element.name == 'INVOICE_DATE') {
+					console.log('')
+				}
 
                 if (groupno > gmaxgroupno)
                     gmaxgroupno = groupno
@@ -1769,6 +1777,7 @@ function* setfirstlastcolumn(groupno) {
 
 }
 
+// GBEDIT TEMP
 function* updatedisplay(elements) {
 
     //seems to be only implemented for non-bound forms

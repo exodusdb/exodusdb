@@ -46,28 +46,36 @@
 	<title>Log</title>
 </head>
 <body>
-	<div class="formpage" align="center">
+	<!-- <div class="formpage" align="center"> -->
 		<h1>
 			Log
 		</h1>
-		<table class="exodusform" bordercolor="#d0d0d0">
-			<tr id="dateoptions">
-				<td>
-					Which date(s) do you want?</td>
-				<td style="vertical-align:middle">
-					<input id="FROM_DATE" />
-					to
-					<input id="UPTO_DATE" />
-				</td>
-			</tr>
-			<tr>
-				<td>
-					Containing the word or phrase?</td>
-				<td style="vertical-align:middle">
-					<input id="CONTAINING" />
-				</td>
-			</tr>
-		</table>
-	</div>
+		<div class="form-container">
+			<div class="card-row">
+				<div class="card-cell">
+					<div class="card">
+						<table class="exodusform" bordercolor="#d0d0d0">
+							<tr id="dateoptions">
+								<td>
+									Which date(s) do you want?</td>
+								<td style="vertical-align:middle">
+									<input id="FROM_DATE" />
+									to
+									<input id="UPTO_DATE" />
+								</td>
+							</tr>
+							<tr>
+								<td>
+									Containing the word or phrase?</td>
+								<td style="vertical-align:middle">
+									<input id="CONTAINING" />
+								</td>
+							</tr>
+						</table>
+					</div> <!-- CARD -->
+				</div> <!-- CARD CELL -->
+			</div> <!-- CARD ROW -->
+		</div> <!-- FORM CONTAINER -->
+	<!-- </div> FORM PAEG-->
 </body>
 </html>

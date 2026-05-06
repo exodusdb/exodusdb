@@ -46,9 +46,6 @@ function* form_postdisplay() {
         //    gettingstarted.innerHTML='<font color=red><strong>Click HERE for browser configuration *REQUIRED*</strong></font>'
     }
 
-	// Update rowspans based on new visibility state
-	yield* general_update_section_rowspans()
-
     return true
 }
 

@@ -32,6 +32,7 @@ function* dict_AUTHORISATION(parameters) {
     if (!(yield* exodussecurity('AUTHORISATION UPDATE GROUPS'))) di.readonly = gmsg
     exodus_dict_text(di)
     di.length = 40
+	di.maxlength = 40 // keeps user and task cards side by side
     di.lowercase = false
     di.validation = 'yield* user_val_keys()'
     //prevent accepting bad white space characters like 160 nbsp which dont act as key separators (on LOCKS and KEYS)

@@ -67,63 +67,71 @@
 	<title>Request Log</title>
 </head>
 <body>
-	<div class="formpage" align="center">
+	<!-- <div class="formpage" align="center"> -->
 		<h1>
 			Request Log
 		</h1>
-		<table class="exodusform" bordercolor="#d0d0d0">
-			<tr id="dateoptions">
-				<td>
-					Which date range do you want?</td>
-				<td style="vertical-align: middle">
-					<input id="FROM_DATE" />
-					to
-					<input id="UPTO_DATE" />
-				</td>
-			</tr>
-			<tr id="Tr1">
-				<td>
-					Which time range do you want?</td>
-				<td style="vertical-align: middle">
-					<input id="FROM_TIME" />
-					to
-					<input id="UPTO_TIME" />
-				</td>
-			</tr>
-			<tr>
-				<td>
-					Containing the word or phrase?</td>
-				<td style="vertical-align: middle">
-					<input id="CONTAINING" />
-				</td>
-			</tr>
-			<tr>
-				<td>
-					Processing time >= seconds?</td>
-				<td style="vertical-align: middle">
-					<input id="DURATION_SECS" />
-				</td>
-			</tr>
-			<tr>
-				<td>
-					User(s)?</td>
-				<td style="vertical-align: middle">
-					<table>
-						<tr>
-							<td>
-								<input id="USER_CODE" /></td>
-						</tr>
-					</table>
-				</td>
-			</tr>
-			<tr>
-				<td>
-					Relocks</td>
-				<td style="vertical-align: middle">
-								<input id="RELOCKS" />
-				</td>
-			</tr>
-		</table>
-	</div>
+		<div class="form-container">
+			<div class="card-row">
+				<div class="card-cell">
+					<div class="card">
+						<table class="exodusform" bordercolor="#d0d0d0">
+							<tr id="dateoptions">
+								<td>
+									Which date range do you want?</td>
+								<td style="vertical-align: middle">
+									<input id="FROM_DATE" />
+									to
+									<input id="UPTO_DATE" />
+								</td>
+							</tr>
+							<tr id="Tr1">
+								<td>
+									Which time range do you want?</td>
+								<td style="vertical-align: middle">
+									<input id="FROM_TIME" />
+									to
+									<input id="UPTO_TIME" />
+								</td>
+							</tr>
+							<tr>
+								<td>
+									Containing the word or phrase?</td>
+								<td style="vertical-align: middle">
+									<input id="CONTAINING" />
+								</td>
+							</tr>
+							<tr>
+								<td>
+									Processing time >= seconds?</td>
+								<td style="vertical-align: middle">
+									<input id="DURATION_SECS" />
+								</td>
+							</tr>
+							<tr>
+								<td>
+									User(s)?</td>
+								<td style="vertical-align: middle">
+									<table>
+										<tr>
+											<td>
+												<input id="USER_CODE" /></td>
+										</tr>
+									</table>
+								</td>
+							</tr>
+							<tr>
+								<td>
+									Relocks</td>
+								<td style="vertical-align: middle">
+												<input id="RELOCKS" />
+								</td>
+							</tr>
+						</table>
+					</div> <!-- CARD -->
+				</div> <!-- CARD CELL -->
+			</div> <!-- CARD ROW -->
+		</div> <!-- FORM CONTAINER -->
+	<!-- </div> FORM PAGE -->
 </body>
 </html>

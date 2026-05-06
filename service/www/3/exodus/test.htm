@@ -166,113 +166,121 @@
 	<div class="formpage" align="center">
 		<h2>
 			Connection Speed Test</h2>
-		<table class="exodusform" bordercolor="#d0d0d0">
-			<tr>
-				<td>
-					Number of times to repeat</td>
-				<td>
-					<input name="ntests" type="radio" value="1" />1<br />
-					<input name="ntests" type="radio" value="10" checked="checked" />10<br />
-					<input name="ntests" type="radio" value="100" />100<br />
-					<input name="ntests" type="radio" value="1000" />1000</td>
-			</tr>
-			<tr>
-				<td>
-					Tests
-					<input type="button" value="Run" onclick="test_run_sync('ALL')" /></td>
-				<td>
-					<table class="exodusform" width="100%">
-						<thead>
+		<div class="form-container">
+			<div class="card-row">
+				<div class="card-cell">
+					<div class="card">
+						<table class="exodusform" bordercolor="#d0d0d0">
 							<tr>
-								<th style="display: none">
-								</th>
-								<th>
-									Type</th>
-								<th>
-									Count</th>
-								<th>
-									milliseconds per request</th>
+								<td>
+									Number of times to repeat</td>
+								<td>
+									<input name="ntests" type="radio" value="1" />1<br />
+									<input name="ntests" type="radio" value="10" checked="checked" />10<br />
+									<input name="ntests" type="radio" value="100" />100<br />
+									<input name="ntests" type="radio" value="1000" />1000</td>
 							</tr>
-						</thead>
-						<tr>
-							<td style="display: none">
-								<input type="button" value="Run" onclick="test_run_sync('LOOPBACK')" /></td>
-							<td>
-								<input id="check_LOOPBACK" checked type="checkbox" />
-								Web server loopback</td>
-							<td id="count_LOOPBACK">
-							</td>
-							<td id="milliseconds_LOOPBACK">
-							</td>
-						</tr>
-						<tr>
-							<td style="display: none">
-								<input type="button" value="Run" onclick="test_run_sync('TEST')" /></td>
-							<td>
-								<input id="check_TEST" checked type="checkbox" />
-								EXODUS server loopback</td>
-							<td id="count_TEST">
-							</td>
-							<td id="milliseconds_TEST">
-							</td>
-						</tr>
-						<tr>
-							<td style="display: none">
-								<input type="button" value="Run" onclick="test_run_sync('SELECT')" /></td>
-							<td>
-								<input id="check_SELECT" checked type="checkbox" />
-								EXODUS application loopback</td>
-							<td id="count_SELECT">
-							</td>
-							<td id="milliseconds_SELECT">
-							</td>
-						</tr>
-					</table>
-				</td>
-			</tr>
-			<tr id="customcommandrow" style="display: none" valign="top">
-				<td>
-					Custom Command
-					<input type="button" value="Run" onclick="test_run_sync('CUSTOM')" /><br />
-					<span style="font-size: 0.8em">EXODUS only</span></td>
-				<td>
-					<input id="customcommand" value="SELECT\rCURRENCIES\rBY CURRENCY_CODE\rCURRENCY_CODE CURRENCY_NAME\rXML"
-						size="60" />
-					<br />
-					<span id="count_CUSTOM"></span>&nbsp;<span id="milliseconds_CUSTOM"></span>
-				</td>
-			</tr>
-			<tr style="display: none">
-				<td>
-					Stop on error</td>
-				<td>
-					<input id="stoponerror" checked="checked" type="checkbox" /></td>
-			</tr>
-			<tr valign="top">
-				<td>
-					Last Request</td>
-				<td id="last_request">
-				</td>
-			</tr>
-			<tr valign="top">
-				<td>
-					Last Data Sent</td>
-				<td id="last_data_sent">
-				</td>
-			</tr>
-			<tr valign="top">
-				<td>
-					Last Response</td>
-				<td id="last_response">
-				</td>
-			</tr>
-			<tr valign="top">
-				<td>
-					Last Data Received</td>
-				<td id="last_data_received">
-				</td>
-			</tr>
-		</table>
+							<tr>
+								<td>
+									Tests
+									<input type="button" value="Run" onclick="test_run_sync('ALL')" /></td>
+								<td>
+									<table class="exodusform" width="100%">
+										<thead>
+											<tr>
+												<th style="display: none">
+												</th>
+												<th>
+													Type</th>
+												<th>
+													Count</th>
+												<th>
+													milliseconds per request</th>
+											</tr>
+										</thead>
+										<tr>
+											<td style="display: none">
+												<input type="button" value="Run" onclick="test_run_sync('LOOPBACK')" /></td>
+											<td>
+												<input id="check_LOOPBACK" checked type="checkbox" />
+												Web server loopback</td>
+											<td id="count_LOOPBACK">
+											</td>
+											<td id="milliseconds_LOOPBACK">
+											</td>
+										</tr>
+										<tr>
+											<td style="display: none">
+												<input type="button" value="Run" onclick="test_run_sync('TEST')" /></td>
+											<td>
+												<input id="check_TEST" checked type="checkbox" />
+												EXODUS server loopback</td>
+											<td id="count_TEST">
+											</td>
+											<td id="milliseconds_TEST">
+											</td>
+										</tr>
+										<tr>
+											<td style="display: none">
+												<input type="button" value="Run" onclick="test_run_sync('SELECT')" /></td>
+											<td>
+												<input id="check_SELECT" checked type="checkbox" />
+												EXODUS application loopback</td>
+											<td id="count_SELECT">
+											</td>
+											<td id="milliseconds_SELECT">
+											</td>
+										</tr>
+									</table>
+								</td>
+							</tr>
+							<tr id="customcommandrow" style="display: none" valign="top">
+								<td>
+									Custom Command
+									<input type="button" value="Run" onclick="test_run_sync('CUSTOM')" /><br />
+									<span style="font-size: 0.8em">EXODUS only</span></td>
+								<td>
+									<input id="customcommand" value="SELECT\rCURRENCIES\rBY CURRENCY_CODE\rCURRENCY_CODE CURRENCY_NAME\rXML"
+										size="60" />
+									<br />
+									<span id="count_CUSTOM"></span>&nbsp;<span id="milliseconds_CUSTOM"></span>
+								</td>
+							</tr>
+							<tr style="display: none">
+								<td>
+									Stop on error</td>
+								<td>
+									<input id="stoponerror" checked="checked" type="checkbox" /></td>
+							</tr>
+							<tr valign="top">
+								<td>
+									Last Request</td>
+								<td id="last_request">
+								</td>
+							</tr>
+							<tr valign="top">
+								<td>
+									Last Data Sent</td>
+								<td id="last_data_sent">
+								</td>
+							</tr>
+							<tr valign="top">
+								<td>
+									Last Response</td>
+								<td id="last_response">
+								</td>
+							</tr>
+							<tr valign="top">
+								<td>
+									Last Data Received</td>
+								<td id="last_data_received">
+								</td>
+							</tr>
+						</table>
+					</div> <!-- CARD -->
+				</div> <!-- CARD CELL -->
+			</div> <!-- CARD ROW -->
+		</div> <!-- FORM CONTAINER -->
 	</div>
 </body>
 </html>

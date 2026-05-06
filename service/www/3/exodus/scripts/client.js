@@ -5189,7 +5189,9 @@ function* exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negativebut
     var div = document.createElement('div')
     div.id = 'exodusconfirmdiv'
     // popups should overlap menubar which has 100zIndex
-    div.style.zIndex = '200'
+    // do not overlap the menubar
+    div.style.zIndex = '1000'
+    //div.style.zIndex = '200'
     div.style.position = 'fixed'
     div.style.textAlign = 'center'
     div.style.background = 'lightgrey'
@@ -5198,7 +5200,11 @@ function* exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negativebut
     div.style.padding = '10px'
     div.style.boxShadow = '0px 0px 7px #666666'
     //div.style.fontSize=25//had no effect
-    div.style.maxHeight = (window.innerHeight - 50) + 'px'
+
+    // adjust the height to fit under the menu bar (fit in the white space)
+    div.style.maxHeight = (window.innerHeight - 120) + 'px'
+    //div.style.maxHeight = (window.innerHeight - 120) + 'px'
+
     div.style.maxWidth = window.innerWidth + 'px'
     //div.style.maxHeight=(window.outerHeight-50)+'px'
     //div.style.maxWidth=window.outerWidth+'px'

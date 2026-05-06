@@ -85,61 +85,69 @@
 	<title>Email Users</title>
 </head>
 <body>
-	<div class="formpage" align="center">
+	<!-- <div class="formpage" align="center"> -->
 		<h1 id="head1">
 			Email Users</h1>
-		<table class="exodusform" bordercolor="#d0d0d0">
-			<tr>
-				<td>
-					To groups:
-				</td>
-				<td style="vertical-align:middle">
-					<table>
-						<tr>
-							<td>
-								<input id="TO_GROUP_CODE" />
-							</td>
-							<td>
-								<span id="TO_GROUP_NAME" />
-							</td>
-						</tr>
-					</table>
-				</td>
-			</tr>
-			<tr>
-				<td>
-					To users:
-				</td>
-				<td style="vertical-align:middle">
-					<table>
-						<tr>
-							<td>
-								<input id="TO_USER_CODE" />
-							</td>
-							<td>
-								<span id="TO_USER_NAME" />
-							</td>
-						</tr>
-					</table>
-				</td>
-			</tr>
-			<tr>
-				<td>
-					Subject
-				</td>
-				<td style="vertical-align:middle" style="text-align: left">
-					<input id="EMAIL_SUBJECT" />
-				</td>
-			</tr>
-			<tr>
-				<td>
-					Message
-				</td>
-				<td style="vertical-align:middle">
-					<textarea id="EMAIL_MESSAGE" />
-				</td>
-			</tr>
-		</table>
-	</div>
+		<div class="form-container">
+			<div class="card-row">
+				<div class="card-cell">
+					<div class="card">
+						<table class="exodusform" bordercolor="#d0d0d0">
+							<tr>
+								<td>
+									To groups:
+								</td>
+								<td style="vertical-align:middle">
+									<table>
+										<tr>
+											<td>
+												<input id="TO_GROUP_CODE" />
+											</td>
+											<td>
+												<span id="TO_GROUP_NAME" />
+											</td>
+										</tr>
+									</table>
+								</td>
+							</tr>
+							<tr>
+								<td>
+									To users:
+								</td>
+								<td style="vertical-align:middle">
+									<table>
+										<tr>
+											<td>
+												<input id="TO_USER_CODE" />
+											</td>
+											<td>
+												<span id="TO_USER_NAME" />
+											</td>
+										</tr>
+									</table>
+								</td>
+							</tr>
+							<tr>
+								<td>
+									Subject
+								</td>
+								<td style="vertical-align:middle" style="text-align: left">
+									<input id="EMAIL_SUBJECT" />
+								</td>
+							</tr>
+							<tr>
+								<td>
+									Message
+								</td>
+								<td style="vertical-align:middle">
+									<textarea id="EMAIL_MESSAGE" />
+								</td>
+							</tr>
+						</table>
+					</div> <!-- CARD -->
+				</div> <!-- CARD CELL -->
+			</div> <!-- CARD ROW -->
+		</div> <!-- FORM CONTAINER -->
+	<!-- </div> FORM PAGE -->
 </body>
 </html>

@@ -1,44 +1,40 @@
 /*must be first in order to customise screen form color*/
-TABLE.exodusform
-{
+TABLE.exodusform {
+    /*
+    exodusform was given to the tables of a screen that were visibly separate.
+    For example, Job File had one, what can best be described as a visible card.
+    Schedule file had many, vehicle lines, materials, versions; with one exception
+    were the Note fields exodusform and %/tax/total exodusform live in one "card".
+    */
+
     /*display: none; this used to be cleared by something on successful loading */
     margin: 1px; /*inconsistent color setting bug in ie7xp if you dont set it to something and display is initially inline*/
     border-collapse: collapse;
-    /*background-color: #ffffc0; /*cellpadding: 1;*/*/
+    /*background-color: #ffffc0; /*cellpadding: 1;*/
     background-color: #fdf5e6;
     border-color: #d0d0d0;
-    border-width: 1px 1px 1px 1px;
+    /*border-width: 1px 1px 1px 1px;*/
     border-style:  solid; /* works in ie     border-right: thin;     border-left: thin;     border-bottom: thin;     border-top: thin;     */
     padding: 1px;
     text-align: left;
 }
 
-DIV.card
-{
-    background-color: #fdf5e6;
+.exodusform > tbody > tr > td thead,
+.exodusform > thead > tr > th td {
+    /*border: 1px lightgrey solid;*/
+    /*2026 UI revamp - minimalist*/
 }
 
-.exodusform > tbody > tr > td,.exodusform > tbody > tr > thead, .exodusform > thead > tr > th, .exodusform > thead > tr > td
-{
-    border: 1px lightgrey solid;
-}
+/*=====================================-=====================================*/
+/*============================ GLOBAL HTML TAGS =============================*/
+/*===========================================================================*/
 
-TABLE
-{
+TABLE {
     border-collapse: collapse;
     border-width: 0px;
 }
 
-@media print
-{
-    TABLE.exodusform
-    {
-        display: block;
-    }
-}
-
-BODY, BUTTON, INPUT, SELECT, TEXTAREA, SPAN, DIV, TD, TH, P, BR, A, SMALL, BIG
-{
+BODY, BUTTON, INPUT, SELECT, TEXTAREA, SPAN, DIV, TD, TH, P, BR, A, SMALL, BIG {
     /*all rules with font-family will have their font-size controlled*/
     font-family: verdana,sans-serif,arial,helvetica;
     font-size: 8pt;
@@ -46,93 +42,27 @@ BODY, BUTTON, INPUT, SELECT, TEXTAREA, SPAN, DIV, TD, TH, P, BR, A, SMALL, BIG
     border: 1px;
 }
 
-BUTTON:focus, SELECT:focus, TEXTAREA:focus, INPUT:focus, SPAN:focus
-{
-    /*box-shadow: 0px 0px 10px #666666;
-    border-color: #9393f3;
-    opacity: 1;*/
-    outline:thin solid;
-}
-
-BODY
-{
+BODY {
     /*background: #ffffff;*/
     background: #f9f9f9;
     color: #000000;
 }
 
-.exodusbutton
-{
-	/*background-color: #F0F0F0;*/
-	/*padding: 2px 3px;*/
-	/*font-size: 90%;*/
-	/*border-color: #cccccc;*/
-	/*border-width: 2px;*/
-	/*border-style: outset;*/
-	/*border-radius: 0.3rem;*/
-	/*float: left;*/
-	/*font-size: inherit;*/
-	/*margin: 2px;*/
-	/*cursor: pointer;*/
-	/*background-color: #f0f0f0;*/
-	/*padding: 4px 2px 5px 2px;*/
 
-	/*New style exodus button*/
-	background-color: #f9f9f9;
-	color: #333;
-	padding: 3px 6px;
-	border: 1px solid #ccc;
-	border-radius: 0.375rem;
-	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-	font-size: 10px;
-	cursor: pointer;
-	transition: all 0.2s ease-in-out;
-}
-
-.exodusbutton:hover {
-	background-color: #f0f0f0;
-	border-color: #999;
-}
-
-BUTTON
-{
-    cursor: pointer;
-    background-color: #F0F0F0;
-    border-radius:0.3rem;
-}
-
-TH
-{
+TH {
     font-weight: normal;
     text-align: left;
     /*deprecated in html5 - removed to fix alignment issue in schedules*/
     /*vertical-align: baseline;*/
 }
-A:link
-{
-    color: #003399;
-    text-decoration: none;
-}
-A:visited
-{
-    color: #6699cc;
-    text-decoration: none;
-}
-A:hover
-{
-    /*text-decoration: underline;*/
-}
 
-
-P
-{
+P {
     margin-top: 0.5em;
     margin-bottom: 1em;
     line-height: 1.5em;
 }
 
-PRE
-{
+PRE {
     padding-right: 5pt;
     margin-top: 1em;
     padding-left: 5pt;
@@ -143,76 +73,158 @@ PRE
     padding-top: 5pt;
 }
 
-H1
-{
+A {
+    &:link {
+        color: #003399;
+        text-decoration: none;
+    }
+    &:visited {
+        color: #6699cc;
+        text-decoration: none;
+    }
+    &:hover {
+        /*text-decoration: underline;*/
+    }
+}
+
+
+
+/*=====================================-=====================================*/
+/*============================== PDF/PRINT VIEW =============================*/
+/*===========================================================================*/
+@media print {
+    TABLE.exodusform {
+        display: block;
+    }
+}
+
+
+/*=====================================-=====================================*/
+/*================================= BUTTONS =================================*/
+/*===========================================================================*/
+.exodusbutton {
+    /*New style exodus button*/
+    background-color: #f9f9f9;
+    color: #333;
+    padding: 3px 6px;
+    border: 1px solid #ccc;
+    border-radius: 0.375rem;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    font-size: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    &:hover { /*why here? theres a dedicated place for button hover*/
+        background-color: #f0f0f0;
+        border-color: #999;
+    }
+}
+
+BUTTON {
+    cursor: pointer;
+    background-color: #F0F0F0;
+    border-radius:0.3rem;
+}
+
+BUTTON:focus, SELECT:focus, TEXTAREA:focus, INPUT:focus, SPAN:focus {
+    /*box-shadow: 0px 0px 10px #666666;
+    border-color: #9393f3;
+    opacity: 1*/;
+    outline: none;
+}
+SELECT:focus, TEXTAREA:focus, INPUT:focus, SPAN:focus {
+    border-bottom: 1.7px solid red;
+}
+
+/*eg. Ok/Cancel buttons*/
+.graphicbutton {
+    float: left;
+    font-size: inherit;
+    background-color: #f0f0f0;
+    margin: 2px;
+    border-width: 2px;
+    border-style: outset;
+    cursor: pointer;
+    padding: 4px 2px 5px 2px;
+    border-radius: 0.3rem;
+    border-color: #cccccc;
+    &:hover {
+        border-color: #aaaaaa;
+    }
+}
+
+/*eg. Refresh/New buttons*/
+.menubutton {
+    float: left;
+    background-color: inherit;
+    border-color: #cccccc;
+    margin: 2px;
+    cursor: pointer;
+    padding: 4px 2px 5px 2px;
+    border-radius: 0.3rem;
+    &:hover {
+        /*background-color: highlight;*/
+        /*color: highlighttext;*/
+        background-color: lightgrey;
+    }
+}
+
+/*=====================================-=====================================*/
+/* ================================ HEADERS =================================*/
+/* ==========================================================================*/
+H1 {
     margin: 0px 0px 5px;
     font-weight: normal;
     font-size: 165%;
+    text-align: center;
 }
-H2
-{
+
+H2 {
     margin-top: 1em;
     margin-bottom: 0.5em;
     font-weight: bold;
     font-size: 125%;
 }
 
-
-H3
-{
+H3 {
     margin-bottom: 0.5em;
     font-weight: bold;
     font-size: 115%;
 }
-H4
-{
+
+H4 {
+    /*for class="card" titles*/
+    margin-top: 0.2em;
     margin-bottom: 0.5em;
     font-weight: bold;
     font-size: 100%;
 }
-H5
-{
+H5 {
     margin-bottom: 0.5em;
     font-weight: bold;
     font-size: 67%;
 }
-H6
-{
+H6 {
     margin-bottom: 0.5em;
     font-weight: bold;
     font-size: 50%;
 }
 
-/*.clsNotRequired*/
-/*{*/
-/*    background-color: #ffffff;*/
-/*    border: solid 1px #E0E0E0;*/
-/*    margin: 0px;*/
-/*    padding: 0px;*/
-/*}*/
-/**/
-/*.clsRequired*/
-/*{*/
-/*    background-color: #FFFFFF;*/
-/*    border: solid 1px #333333;*/
-/*    margin: 0px;*/
-/*    padding: 0px;*/
-/*}*/
-/* Abandoned feature to differentiate between required/non-required fields (different border colors)
-1.For better aesthetics 2.Feature was unintuitive 3.UI anyway alerts users for empty required fields
-Considered marking required fields with red *, but it would clutter dense screens like schedules
-Did not remove clsRequired class since it is used in few places like index.html */
-.clsRequired, .clsNotRequired
-{
-    background-color: #F9F9F9;
+/*=====================================-=====================================*/
+/*=============================== DATA FIELDS ===============================*/
+/*===========================================================================*/
+
+.clsRequired, .clsNotRequired {
+    /*background-color: #F9F9F9;
     border: solid 1px #CCCCCC;
     border-radius: 5px;
+    2026 UI revamp*/
+    background-color: transparent;
+    border: none;
+    border-bottom: 1.7px dotted black;
     margin: 0px;
     padding: 0 1px;
 }
-
-.clsReadOnly
-{
+.clsReadOnly {
     background-color: #F9F9F9;
     border: solid 1px #F4F4F4;
     border-radius: 5px;
@@ -222,22 +234,17 @@ Did not remove clsRequired class since it is used in few places like index.html 
     /*filter: alpha(opacity=80);
     opacity: 0.80;*/
 }
-
-/*Removes the vertical white lines produced due to empty read-only fields*/
-/*Apply to span only since input type read-only fields need to show white empty field*/
-span.clsReadOnly:empty
-{
+span.clsReadOnly:empty {
+    /*Hide white vertical slithers from empty read-only symbolic fields*/
     background-color: transparent;
     border: none;
 }
 
-.menu:focus 
-{
-    outline: 0;
-}
 
-.menu
-{
+/*=====================================-=====================================*/
+/*================================ MENU BAR =================================*/
+/*===========================================================================*/
+.menu {
     /*font-size: inherit;*/
     font-size: 15px;
     position: absolute;
@@ -256,10 +263,12 @@ span.clsReadOnly:empty
     padding-left: 3px;
     padding: 5px;
     box-shadow: 1.5px 1.5px 1px rgba(0, 0, 0, 0.125);
+    &:focus {
+        outline: 0;
+    }
 }
 
-.menuitem
-{
+.menuitem {
     /*border: thin;*/
     border-radius: 0.3rem;
     white-space: nowrap;
@@ -271,205 +280,188 @@ span.clsReadOnly:empty
     /*line-height: 16pt;*/
     line-height: 18pt;
     cursor: pointer;
+
+    &:link {
+        color: black;
+    }
+    &:visited {
+        color: black;
+    }
+    &:hover {
+        padding: 5px;
+        cursor: pointer;
+    }
 }
 
-.menuitem:link
-{
-    color: black;
-}
-.menuitem:visited
-{
-    color: black;
-}
-
-
-.menuitem:hover
-{
-    padding: 5px;
-    cursor: pointer;
-}
-
-.menu_hr
-{
+.menu_hr {
     /*border:1px dotted lightgrey*/
     border:1px solid lightgrey
 }
 
-.graphicbutton:hover
-{
-    border-color: #aaaaaa;
+
+
+/*=====================================-=====================================*/
+/*============================ SCREEN CONTAINERS ============================*/
+/*============================ & NEW CARD DESIGN ============================*/
+/*=====================================-=====================================*/
+
+/*
+ ==== NEW CARD LAYOUT ===
+ The tables that group sets of fields has remained unchanged. (.exodusform)
+ Instead of using table/tr/td to control the layout of those "inner" .exodusform
+ tables, we switched to converted the "outer" table/tr/td to divs with flexbox atttribute.
+ The mental model is practically the same, rows with cells.
+  The top most table is now a div with class .form-container + .form-container--medium,--large
+  The rows are divs with class .card-row, the cells, .card-cell and finally oddly .card
+  The diff between .card-cell and .card is merely formatting, may get consolidated later
+  Inside the .card div are the original unchanged .exodusform tables of labels/fields
+
+ The flexbox css allows for a more modern and dynamic control of layout, and allowed
+ us to move one step forward towards mobile friendly because now cards on rows, fold to new row
+ depending on the available width, means users can scroll downwards instead of sideways most of the time
+
+ The .form-container[--medium,--large] mainly control the width of card-rows within the screen
+  .form-container : List of XXXX/Media diary, is the most "relaxed" container
+  --large:  Schedule File for example, stretches cards (evenly) to use near full width of screen
+  --medium: Job File (one cell per row type screen) stretches cards evenly to match largest card width
+
+*/
+/*.formpage tr.heading th { TODO .heading only used in ratecard. Remove it and just do bolding there*/
+/*  font-weight: bold;*/
+/*    font-size: 12px;*/
+/*}*/
+.tightpadding td {
+    padding: 1px !important;
 }
 
-/*eg. Ok/Cancel buttons*/
-.graphicbutton
-{
-    float: left;
-    font-size: inherit;
-    background-color: #f0f0f0;
-    border-color: #cccccc;
-    margin: 2px;
-    border-width: 2px;
-    border-style: outset;
-    cursor: pointer;
-    padding: 4px 2px 5px 2px;
-    border-radius: 0.3rem;
-}
-
-/*eg. Refresh/New buttons*/
-.menubutton
-{
-    float: left;
-    background-color: inherit;
-    border-color: #cccccc;
-    margin: 2px;
-    cursor: pointer;
-    padding: 4px 2px 5px 2px;
-    border-radius: 0.3rem;
-}
-
-.menubutton:hover {
-    /*background-color: highlight;*/
-    /*color: highlighttext;*/
-    background-color: lightgrey;
-}
-
-/*START FORMPAGE SECTION*/
-/*Need to figure out a way to de-duplicate this formpage section entirely, switch to new cards style*/
-/*Mainly padding and img and section title are whats important*/
-.formpage td {
-    padding: 5px;
-}
-
-.formpage .tightpadding td {
-	padding: 1px !important;
-}
-
-.formpage tr.heading th {
-    font-weight: bold;
-	font-size: 12px;
-}
-
-.formpage .section-title {
-    text-align: center;
-    vertical-align: middle;
-    font-weight: bold;
-/*    padding: 25px;*/
-}
-
-.formpage .section-title2 {	
-	vertical-align: middle;
-	font-weight: bold;
-	padding: 10px;
-	border: 1px solid #ccc;
-	box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
-	/*background-color: #f0f0f0;*/
-}
-.formpage .section-title2 h3 {
-	margin: 0;
-}
-
-.formpage .section-title img {
-	height: 50px;
-	width: 50px;
-}
-/*END FORMPAGE SECTION*/
-
-
-
-/*CARDS SECTION START*/
-
-/* layout (narrow, centered) */
-.form-container--small {
-    width: 100%;
+.form-container {
+    /*Container for screens with multi cards of different widths
+    but do not require max width of screen e.g Media Diary, List of XXXXX*/
     box-sizing: border-box;
-    max-width: 25%;
-    margin: 0 auto;
-    padding-inline: 10px;
+    & td {
+        padding: 5px;
+    }
+    & tr.heading th {
+        font-weight: bold;
+        font-size: 12px;
+    }
 }
 
+/*Extend .form-container with this*/
 .form-container--medium {
-    width: 100%;
-    box-sizing: border-box;
-    max-width: 1000px;
-    margin: 0 auto;
-    padding-inline: 10px;
+    /*Container for screens where there is one card per row
+    and the card widths are uniform. e.g Job File, Company File*/
+    width: max-content;
+
+    /*Controls screen padding*/
+    /*padding-inline: 30px;*/
+    margin-left: auto;
+    margin-right: auto;
+
+    /*IDENTICAL CODE IN .form-container--medium AND .form-container--large*/
+    & .card-row {
+        /*justify-content overriden in journals.htm*/
+        justify-content: normal;
+        & .card-cell {
+            /*Override default .card-row
+            'flex: 0' to grow to max space*/
+            flex: 1 1 auto;
+        }
+    }
 }
 
-/* layout (full width with padding) */
+/*Extend .form-container with this*/
 .form-container--large {
+    /*Container for Schedule File (Only)*/
     width: 100%;
     box-sizing: border-box;
+
+    /*Controls screen padding*/
     padding-inline: 30px;
+
+    /*IDENTICAL CODE IN .form-container--medium AND .form-container--large*/
+    & .card-row {
+        /*justify-content overriden in journals.htm*/
+        justify-content:normal;
+        & .card-cell {
+            /*Override default .card-row
+            'flex: 0' to grow to max space*/
+            flex: 1 1 auto;
+        }
+    }
+
+    /*Effectively the same idea as &nbsp but between cards
+    however could not work out how to fold cards in a group
+    when the view port was skinner than the group's miniumum width
+    & .card-row {
+        & .card-group {
+            flex-wrap: nowrap;
+        }
+    }
+    */
 }
 
-/*controls how and where cards appear in row + wrap*/
 .card-row {
-	display: flex;
-	flex-wrap: wrap;
-	gap: 10px;
-	align-items: stretch;
-	width: 100%;
-/*	padding-inline: 30px;*/
-	box-sizing: border-box;
+    /*controls how and where cards appear in row + wrap*/
+    display: flex;        /*1 1 auto: enables default flexbox behavior in direct childen*/
+    flex-wrap: wrap;      /*allow flexbox childs to wrap*/
+    gap: 10px;            /*spacing flexbox childen and wrapped row*/
+    align-items: stretch; /*Match tallest ???, pointless? card-row parents are not flexbox containers*/
+    width: 100%;          /*obvs*/
+    box-sizing: border-box; /* Removed.. no noticable diff on sch file*/
+    margin-bottom: 8px;
+    justify-content: center; /*overridden in journals.htm to left*/
+    & + .card-row {
+        /*Vertical spacing between card rows*/
+        margin-top: 10px;
+    }
+    /*Used on auth file to force users/task cells to be
+    side by side for better usability*/
+    & .cell-group {
+        flex-wrap: nowrap;
+    }
 }
 
-/*Spacing and internal layout of card containers*/
 .card-cell {
-	flex: 1 1 auto;
-	display: flex;
-	gap: 10px;
-	align-items: stretch;
+    /*Spacing and internal layout of card*/
+    flex: 0 1 auto; /*n=grow, n=shrink, auto=does?*/
+    display: flex;
+    gap: 10px;
+    align-items: stretch;
 }
 
-/*Individual cards visual appearance*/
 .card {
-	background-color: inherit;
-	border: 1px solid lightgrey;
-	border-radius: 5px;
-	padding: 5px;
-	overflow: auto;
-	box-sizing: border-box;
-	/* make the visual card fill the cell vertically */
-	display: flex;
-	flex-direction: column;
-	height: 100%;
+    /*Individual cards visual appearance*/
+    background-color: inherit;
+    border: 1px solid lightgrey;
+    border-radius: 5px;
+    padding: 5px;
+    box-sizing: border-box;
+    /* make the visual card fill the cell vertically */
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    flex: 1 1 auto;
 }
 
-/*Vertical spacing between card rows*/
-.card-row + .card-row {
-	margin-top: 10px;
-}
-
-/*Ensures card fills its cell if not using 70-30 or 50-50*/
-.card-cell > .card {
-	flex: 1 1 auto;
-}
-
-.card-cell b {
+.card > .card-title {
     margin-bottom: -4px;
-    /* Use display block since the card title is wrapped in <td> <th> */
     display: block;
+    padding: 5px;
+    font-weight: bold;
 }
 
-/* 70-30 layout */
-/*.card-row--70-30 .card-cell:first-child {*/
-/*	flex: 0 0 calc((100% - 10px) * 0.7);*/
-/*}*/
-/*.card-row--70-30 .card-cell:last-child {*/
-/*	flex: 0 0 calc((100% - 10px) * 0.3);*/
-/*}*/
-
-/* 20-80 layout */
-/*.card-row--20-80 .card-cell:first-child {*/
-/*	flex: 0 0 calc((100% - 10px) * 0.2);*/
-/*}*/
-/*3.card-row--10-80 .card-cell:last-child {*/
-/*	flex: 0 0 calc((100% - 10px) * 0.8);*/
-/*}*/
-/* 50-50 layout */
-/*.card-row--equal .card-cell {*/
-/*	flex: 1 1 0;*/
-/*}*/
+/*Needed for Address File, img field grouping*/
+/*Address file is the only screen were joel's
+img to group fields has been preserved because it
+looks barren without now, after having gotton use to it..*/
+.section-title {
+    max-width: 50px; /*ensures fn labels of vertically consec cards align*/
+    min-width: 50px; /*ditto*/
+    width: 50px;     /*ditto*/
+    text-align: center;
+       font-weight: bold;
+}
 
 /*CARDS SECTION END*/
 
@@ -560,13 +552,12 @@ input:disabled {
     border-color: lightgrey;
 }
 
-input[type="radio"],input[type="checkbox"]{
+input[type="radio"],input[type="checkbox"] {
     cursor:pointer;
 }
 
 /*must be last*/
-
-.demotext
-{
+.demotext {
     display: none;
 }
+
