@@ -700,6 +700,7 @@ function install_database {
 	sudo systemctl status postgresql || true
 	sudo pgrep postgres -a || true
 	ls /var/run/postgresql || true
+	pg_isready --timeout=30
 :
 : Optional grant others cd into HOME.
 : ────────────────────────────────────────
@@ -736,6 +737,7 @@ function install_database {
 		sudo sed -i "1i#\n# Allow exodus password login on local socket connection\n# Twice as fast as tcp/ip connection\n#\n#conn   #db   #user  #method\nlocal   all   exodus $PASS_METHOD\n" $PG_HBA
 	fi
 	sudo systemctl restart postgresql
+	pg_isready --timeout=30
 :
 : Configure postgresql for exodus
 : ─────────────────────────────────────────────────────────────────────────────────
@@ -859,6 +861,7 @@ function test_exodus_and_database {
 : Start postgresql although it should be running
 :
 	sudo systemctl start postgresql
+	pg_isready --timeout=30
 :
 : Run cli/testsort once to generate some test files like xo_clients
 : used in testing_var.h.cpp
