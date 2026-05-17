@@ -3,8 +3,10 @@
 set -euxo pipefail
 PS4='+ [ins ${1:-?} ${SECONDS}s] '
 : $0 $*
+
+function main() {
 : ─────────────────────────────────────────────────────────────────────────────────
-: Build, install and test exodus and its web service
+: Build, install and test exodus and its web service in stages
 : ─────────────────────────────────────────────────────────────────────────────────
 :	Builds with clang-20, 21 and 22
 :	using libc++, modules and std=c++23-26
@@ -119,7 +121,7 @@ PS4='+ [ins ${1:-?} ${SECONDS}s] '
 	fi
 :
 : Config
-: ─────────────────────────────────────────────────────────────────────────────────
+: ────────────────────────────────────────
 	export DEBIAN_FRONTEND=noninteractive
 #	export NEEDRESTART_MODE=l # list-only
 	export NEEDRESTART_MODE=a # automatic
@@ -128,87 +130,40 @@ PS4='+ [ins ${1:-?} ${SECONDS}s] '
 	export EXODUS_DIR=$(pwd)
 	# Set by github action if chosen to rerun in debug mode?
 	#RUNNER_DEBUG=1
-
-function CMD_RETRY {
-: ────────────────────────────────────────
-: Function to retry three times in case of timeout
-: ────────────────────────────────────────
-	for N in 1 2 3; do
+: ─────────────────────────────────────────────────────────────────────────────────
+: Start
+: ─────────────────────────────────────────────────────────────────────────────────
+	init_apt
+	discover_postgres
 :
-: Retry three times if it times out. $N/3
-: ────────────────────────────────────────
-		# /dev/null to stop timeout causing random hang until timeout
-		# with apt process stuck on tcsetattr call. see gdb -p 9999
-		if timeout 300s $* < /dev/null; then
-			break
-		fi
-	done
+	if [[ $REQ_STAGES =~ b ]]; then
+		req_stage=b
+		get_dependencies_for_build_and_install
+		install_exodus_paths
+	fi
+	if [[ $REQ_STAGES =~ B ]]; then
+		req_stage=B
+		build_only
+		test_exodus_without_database
+		install_exodus
+		install_exodus_paths
+	fi
+	if [[ $REQ_STAGES =~ I ]]; then req_stage=I; install_exodus; fi # Done as part of B
+
+	if [[ $REQ_STAGES =~ d ]]; then req_stage=d; get_dependencies_for_database; fi
+	if [[ $REQ_STAGES =~ D ]]; then req_stage=D; install_database; fi
+
+	if [[ $REQ_STAGES =~ t ]]; then req_stage=t; test_exodus_without_database; fi # Done as part B
+	if [[ $REQ_STAGES =~ T ]]; then req_stage=T; test_exodus_and_database; fi
+
+	if [[ $REQ_STAGES =~ W ]]; then req_stage=W; install_www_service; fi
+:
+: ─────────────────────────────────────────────────────────────────────────────────
+: Finished $0 $* in $((SECONDS/60)) mins and $((SECONDS%60)) secs.
+: ─────────────────────────────────────────────────────────────────────────────────
 }
 
-function APT_INSTALL {
-: ────────────────────────────────────────
-: Function to call apt-get install three times in case of timeout
-: ────────────────────────────────────────
-: Set environment variables for non-interactive installation
-:
-	NEEDRESTART_MODE="a"                   \
-	DEBIAN_FRONTEND="noninteractive"       \
-	DEBCONF_NOWARNINGS="yes"               \
-	sudo apt-get -y                        \
-		-o Dpkg::Options::=--force-confdef \
-		-o Dpkg::Options::=--force-confold \
-		-o Acquire::http::Timeout=120      \
-		-o Acquire::https::Timeout=120     \
-		-o Acquire::Retries=3              \
-		--no-install-recommends            \
-		install "$@" < /dev/null
-:
-: Verify all packages are installed
-:
-	for pkg in "$@"; do
-		# Skip check for files with extension '.deb'
-		if [ ${pkg##*.} != "deb" ] && ! dpkg -s "$pkg" &>/dev/null; then
-			: "Error: Unable to locate package '$pkg'"
-			exit 1
-		fi
-	done
-	: "All packages installed successfully."
-}
-
-function download_submodules {
-: ────────────────────────────────────────
-: Function to download submodules
-: ────────────────────────────────────────
-#: Note that main git repo contains just a hash/pointer to the commit to be checked out,
-#: not a tag to master, and the initial state will be "HEAD detached".
-#:
-#	# Does having branch = master in .submodules have any effect?
-#	git submodule init
-##	git submodule update --remote
-#	git submodule update
-#:
-#: Reconnect submodule to HEAD in case development/push desired
-#:
-##	git submodule foreach git pull origin master
-#	git submodule foreach git checkout master
-#	git submodule foreach git pull
-##	git submodule foreach git reset --hard
-	git submodule init
-	git submodule update --recursive --init
-	git submodule sync --recursive
-	git submodule status --recursive
-#	git submodule foreach 'git switch master || git checkout -b master; git reset --soft HEAD'
-	git submodule foreach 'git switch master || git checkout -b master; git reset --soft HEAD; git branch --set-upstream-to=origin/master master 2>/dev/null || true'
-
-:	"Verifying submodules..."
-	git submodule foreach 'git fetch origin && echo "Submodule: $name" && git branch -r | grep -q "origin/master" && echo "  - Has origin/master: Yes" || echo "  - Has origin/master: No"; git branch -r --contains $(git rev-parse HEAD) | grep -q "origin/master" && echo "  - HEAD $(git rev-parse --short HEAD) is on origin/master: Yes" || echo "  - HEAD $(git rev-parse --short HEAD) is on origin/master: No"'
-:	"Verification complete."
-:
-: Verify submodules exist
-: ────────────────────────────────────────
-#	test -f $EXODUS_DIR/fmt/CMakeLists.txt
-	test -f $EXODUS_DIR/pgexodus/CMakeLists.txt
-}
+function init_apt() {
 :
 : Wait for systemctl to get its brain in gear and be ready to serve hostname to sudo
 : ────────────────────────────────────────
@@ -255,7 +210,11 @@ function download_submodules {
 		sleep 1
 	done
 :
-: Work out postgres version suffix e.g. -14
+} # function init_apt
+
+function discover_postgres() {
+: ────────────────────────────────────────
+: Work out postgres PG_VER and PG_PORT
 : ────────────────────────────────────────
 : If PG_VER not specified, use the latest version
 : of postgres installed as per pg_config
@@ -329,6 +288,43 @@ function download_submodules {
 : For exodus programs like dict2sql and testsort
 	export EXO_PORT=$PG_PORT
 :
+} # function discover_postgres
+
+function download_submodules {
+: ────────────────────────────────────────
+: Function to download submodules
+: ────────────────────────────────────────
+#: Note that main git repo contains just a hash/pointer to the commit to be checked out,
+#: not a tag to master, and the initial state will be "HEAD detached".
+#:
+#	# Does having branch = master in .submodules have any effect?
+#	git submodule init
+##	git submodule update --remote
+#	git submodule update
+#:
+#: Reconnect submodule to HEAD in case development/push desired
+#:
+##	git submodule foreach git pull origin master
+#	git submodule foreach git checkout master
+#	git submodule foreach git pull
+##	git submodule foreach git reset --hard
+	git submodule init
+	git submodule update --recursive --init
+	git submodule sync --recursive
+	git submodule status --recursive
+#	git submodule foreach 'git switch master || git checkout -b master; git reset --soft HEAD'
+	git submodule foreach 'git switch master || git checkout -b master; git reset --soft HEAD; git branch --set-upstream-to=origin/master master 2>/dev/null || true'
+
+:	"Verifying submodules..."
+	git submodule foreach 'git fetch origin && echo "Submodule: $name" && git branch -r | grep -q "origin/master" && echo "  - Has origin/master: Yes" || echo "  - Has origin/master: No"; git branch -r --contains $(git rev-parse HEAD) | grep -q "origin/master" && echo "  - HEAD $(git rev-parse --short HEAD) is on origin/master: Yes" || echo "  - HEAD $(git rev-parse --short HEAD) is on origin/master: No"'
+:	"Verification complete."
+:
+: Verify submodules exist
+: ────────────────────────────────────────
+#	test -f $EXODUS_DIR/fmt/CMakeLists.txt
+	test -f $EXODUS_DIR/pgexodus/CMakeLists.txt
+:
+} # function download_submodules
 
 function get_dependencies_for_build_and_install {
 : ─────────────────────────────────────────────────────────────────────────────────
@@ -550,7 +546,7 @@ function get_dependencies_for_build_and_install {
 	readlink `which c++` -e
 	dpkg -l | egrep "g++|clang|libstd|libc\+\+" | awk '{print $2}'
 
-} # end of stage b - get_dependencies_for_build_and_install
+} # function get_dependencies_for_build_and_install - stage b
 
 function build_only {
 : ─────────────────────────────────────────────────────────────────────────────────
@@ -610,7 +606,7 @@ function build_only {
 	#cmake --build $EXODUS_DIR/build -j$((`nproc`+1))
 	cmake --build $EXODUS_DIR/build
 :
-} # end of substage B
+} # function build - stage B
 
 function test_exodus_without_database {
 : ─────────────────────────────────────────────────────────────────────────────────
@@ -624,7 +620,7 @@ function test_exodus_without_database {
 	cd $EXODUS_DIR/build/test && EXO_NODATA=1 CTEST_OUTPUT_ON_FAILURE=1 CTEST_PARALLEL_LEVEL=$((`nproc`+1)) ctest
 	sleep 1
 :
-} # end of test_exodus_without_database
+} # function test_exodus_without_database - stage t
 
 function install_exodus_paths {
 : ────────────────────────────────────────
@@ -641,7 +637,7 @@ function install_exodus_paths {
 :
 	printf 'export PATH="${PATH}:${HOME}/bin"\nexport LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${HOME}/lib"\n' | sudo dd of=/etc/profile.d/exodus.sh status=none
 :
-} # end of install_exodus_paths
+} # function install_exodus_paths - part of stage b
 
 function install_exodus {
 : ─────────────────────────────────────────────────────────────────────────────────
@@ -656,7 +652,7 @@ function install_exodus {
 
 	install_exodus_paths
 :
-} # end of install_exodus
+} # function install_exodus - stage B and I
 
 function get_dependencies_for_database {
 : ─────────────────────────────────────────────────────────────────────────────────
@@ -669,7 +665,8 @@ function get_dependencies_for_database {
 : pgexodus
 : ────────────────────────────────────────
 	APT_INSTALL postgresql$PG_VER_SUFFIX #for pgexodus install
-}
+:
+} # function get_dependencies_for_database - stage d
 
 function install_database {
 : ─────────────────────────────────────────────────────────────────────────────────
@@ -849,8 +846,7 @@ V0G0N
 :
 	dict2sql
 :
-
-} # end of stage D - Install database
+} # function install_database stage D
 
 function test_exodus_and_database {
 : ─────────────────────────────────────────────────────────────────────────────────
@@ -886,8 +882,8 @@ function test_exodus_and_database {
 : 'or logout/login to get new path/libs from /etc/profile.d/exodus.sh'
 : 'which will enable running exodus programs created by edic/compile'
 : 'from the command line without prefixing ~/bin/'
-
-} # end of stage T - Test exodus and database
+:
+} # function test_exodus_and_database - stage T
 
 function install_www_service {
 : ─────────────────────────────────────────────────────────────────────────────────
@@ -896,41 +892,55 @@ function install_www_service {
 	export EXODUS_DIR
 	cd $EXODUS_DIR/service
 	sudo ./install_all.sh
-}
+} # function install_www_service
+
+
+function CMD_RETRY {
+: ────────────────────────────────────────
+: Function to retry three times in case of timeout
+: ────────────────────────────────────────
+	for N in 1 2 3; do
 :
-#function build_service {
-#: ────────────────────────────────────────
-#: BUILD SERVICE
-#: ────────────────────────────────────────
-#:
-#	cd $EXODUS_DIR/service/src
-#	./compall
-#}
+: Retry three times if it times out. $N/3
+: ────────────────────────────────────────
+		# /dev/null to stop timeout causing random hang until timeout
+		# with apt process stuck on tcsetattr call. see gdb -p 9999
+		if timeout 300s $* < /dev/null; then
+			break
+		fi
+	done
 :
-: ─────────────────────────────────────────────────────────────────────────────────
-: MAIN $*
-: ─────────────────────────────────────────────────────────────────────────────────
+} # function CMD_RETRY
 
-	if [[ $REQ_STAGES =~ b ]]; then
-		get_dependencies_for_build_and_install
-		install_exodus_paths
-	fi
-	if [[ $REQ_STAGES =~ B ]]; then
-		build_only
-		test_exodus_without_database
-		install_exodus
-		install_exodus_paths
-	fi
-	if [[ $REQ_STAGES =~ I ]]; then install_exodus; fi # Done as part of B
-
-	if [[ $REQ_STAGES =~ d ]]; then get_dependencies_for_database; fi
-	if [[ $REQ_STAGES =~ D ]]; then install_database; fi
-
-	if [[ $REQ_STAGES =~ t ]]; then test_exodus_without_database; fi # Done as part B
-	if [[ $REQ_STAGES =~ T ]]; then test_exodus_and_database; fi
-
-	if [[ $REQ_STAGES =~ W ]]; then install_www_service; fi
+function APT_INSTALL {
+: ────────────────────────────────────────
+: Function to call apt-get install three times in case of timeout
+: ────────────────────────────────────────
+: Set environment variables for non-interactive installation
 :
-: ─────────────────────────────────────────────────────────────────────────────────
-: Finished $0 $* in $((SECONDS/60)) mins and $((SECONDS%60)) secs.
-: ─────────────────────────────────────────────────────────────────────────────────
+	NEEDRESTART_MODE="a"                   \
+	DEBIAN_FRONTEND="noninteractive"       \
+	DEBCONF_NOWARNINGS="yes"               \
+	sudo apt-get -y                        \
+		-o Dpkg::Options::=--force-confdef \
+		-o Dpkg::Options::=--force-confold \
+		-o Acquire::http::Timeout=120      \
+		-o Acquire::https::Timeout=120     \
+		-o Acquire::Retries=3              \
+		--no-install-recommends            \
+		install "$@" < /dev/null
+:
+: Verify all packages are installed
+:
+	for pkg in "$@"; do
+		# Skip check for files with extension '.deb'
+		if [ ${pkg##*.} != "deb" ] && ! dpkg -s "$pkg" &>/dev/null; then
+			: "Error: Unable to locate package '$pkg'"
+			exit 1
+		fi
+	done
+: "Packages installed successfully."
+:
+} # function CMD_RETRY
+
+main "$@"

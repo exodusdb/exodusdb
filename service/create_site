@@ -254,9 +254,9 @@ function APT_GET {
 : Enable the site and restart apache - $HOST_NAME
 : ────────────────────────────────────────
 	sudo a2ensite $HOST_NAME
-	#sudo apache2ctl configtest
-	#sudo apache2ctl restart
-	sudo apache2ctl graceful
+	sudo apache2ctl configtest
+	sudo apache2ctl restart
+#	sudo apache2ctl graceful
 :
 : ────────────────────────────────────────
 : Finished create_site - https://$SUFFIXED_FQDN
