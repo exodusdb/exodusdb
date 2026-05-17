@@ -1,7 +1,7 @@
 #!/bin/bash
 [ "$INSTALL_SH" ] || { INSTALL_SH=1 exec bash "$0" "$@" 2>&1 | tee -a "$(echo ${0##*/}.$*.$(printf "%04d" $(( RANDOM % 10000 ))).log | tr ' :@' '.__')"; exit "${PIPESTATUS[0]}"; }
 set -euxo pipefail
-PS4='+ [lxc_all ${SECONDS}s] '
+PS4='+ [install_lxc_all.sh ${SECONDS}s] '
 : $0 $*
 : ─────────────────────────────────────────────────────────────────────────────────
 : Build and install exodus on multiple OS and compilers in one command  using install_lxc.sh
