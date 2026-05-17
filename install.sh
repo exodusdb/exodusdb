@@ -313,7 +313,7 @@ function download_submodules {
 	git submodule sync --recursive
 	git submodule status --recursive
 #	git submodule foreach 'git switch master || git checkout -b master; git reset --soft HEAD'
-	git submodule foreach 'git switch master || git checkout -b master; git reset --soft HEAD; git branch --set-upstream-to=origin/master master 2>/dev/null || true'
+	git submodule foreach 'git switch master || git checkout -b master; git pull; git reset --soft HEAD; git branch --set-upstream-to=origin/master master 2>/dev/null || true'
 
 :	"Verifying submodules..."
 	git submodule foreach 'git fetch origin && echo "Submodule: $name" && git branch -r | grep -q "origin/master" && echo "  - Has origin/master: Yes" || echo "  - Has origin/master: No"; git branch -r --contains $(git rev-parse HEAD) | grep -q "origin/master" && echo "  - HEAD $(git rev-parse --short HEAD) is on origin/master: Yes" || echo "  - HEAD $(git rev-parse --short HEAD) is on origin/master: No"'
