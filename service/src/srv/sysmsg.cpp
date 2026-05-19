@@ -90,6 +90,27 @@ func main(in msg0, in subject0 = "", in username0 = "") {
 	}
 	call log("SYSMSG", logmsg);
 
+	// Logging to journalctl as sysmsg
+	// journalctl -t sysmsg
+	{
+		let log_datasetcode = datasetcode ?: osgetenv("EXO_DATA");
+		var txt = "----------";
+		if (username)
+			txt ^= "\nuser: " ^ username;
+		if (log_datasetcode)
+			txt ^= "\ndatabase: " ^ log_datasetcode;
+		if (subjectin)
+			txt ^= "\nsubject: " ^ subjectin;
+		txt ^= "\nsysmsg: " ^ msg;
+
+		if (not osshellwrite(txt on "systemd-cat -t sysmsg"))
+			loglasterror();
+	}
+
+	// Suppress emails on disabled systems
+	if (osfile("~/hosts/disabled.cfg"))
+		return 0;
+
 	// get backup parameters
 	call getbackpars(bakpars);
 

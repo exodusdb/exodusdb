@@ -182,7 +182,7 @@ forcedemail:
 			subject ^= ")";
 
 			// sendmail outputs the actual email address if forced (e.g. due to lack of "live.txt", presence of "exodus.id", SYSTEM(117), SYSTEM(61) or user "exodus")
-			printx(" forced to :", toaddress);
+//			printx(" forced to :", toaddress);
 
 			// each request can set a global forced email address
 			// for the duration of the request
