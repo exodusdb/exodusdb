@@ -325,7 +325,7 @@ public:
 	// obj is var
 
 	// Convert internal format data to output format for display.
-	// convstr: A conversion code or pattern. See ICONV/OCONV PATTERNS
+	// convstr: A conversion code or pattern. See I/O CONVERSION CODES
 	// return: The data in external display format or, if the data is invalid and cannot converted, most conversions return the original data UNCONVERTED.
 	// throw: VarNotImplemented if convstr is invalid
 	//
@@ -336,7 +336,7 @@ public:
 	ND var  oconv(const char* convstr) const;
 
 	// Convert output display format data to internal format.
-	// convstr: A conversion code or pattern. See ICONV/OCONV PATTERNS
+	// convstr: A conversion code or pattern. See I/O CONVERSION CODES
 	// return: The data in internal format or, if the data is invalid and cannot be converted, most conversions return the EMPTY STRING ""
 	// throw: VarNotImplemented if convstr is invalid
 	//
