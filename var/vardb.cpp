@@ -3310,7 +3310,7 @@ exodus_call:
 		//this is the sole creation of to_tsvector in vardb.cpp
 		//it will be used like to_tsvector(...) @@ to_tsquery(...)
 		if (fieldname.ucase().ends("XREF"))
-			sqlexpression = "immutable_unaccent(" ^ sqlexpression ^ ")";
+			sqlexpression = "immutable_unaccent(public." ^ sqlexpression ^ ")";
 		sqlexpression = "to_tsvector('simple', " ^ sqlexpression ^ ")";
 		//sqlexpression = "to_tsvector('simple', " ^ sqlexpression ^ ")";
 		//sqlexpression = "to_tsvector('english'," ^ sqlexpression ^ ")";

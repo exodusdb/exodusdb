@@ -782,11 +782,22 @@ subr onedictid(in dictfile, in dictfilename, io dictid, in reqdictid) {
 	// since 26.04 the search_path is not used so only system funcs are valid without schema
 	// upper(translate(substring(dict_schedules_text(key,data),0,1000)
 	// upper(translate(substring(public.dict_schedules_text(key,data),0,1000)
-	if (dictid.ends("XREF")) {
+//	if (dictid.ends("XREF")) {
 		sql.replacer("(dict_", "(public.dict_");
-	} else {
-		sql.replacer("dict_journals_year_period", "public.dict_journals_year_period");
-	}
+		sql.replacer(" dict_", " public.dict_");
+//	} else {
+//		sql.replacer("dict_journals_year_period", "public.dict_journals_year_period");
+//		sql.replacer(":=dict_", ":=public.dict_");
+		sql.replacer("=dict_", "=public.dict_");
+		sql.replacer("\tdict_", "\tpublic.dict_");
+		sql.replacer("if dict_", "if public.dict_");
+//	}
+	sql.replacer("|| dict_", "|| public.dict_");
+	sql.replacer(":= dict_", ":= public.dict_");
+	sql.replacer(" schedules on ", " public.schedules on ");
+	sql.replacer(" plans on ", " public.plans on ");
+	sql.replacer("\tschedules on ", "\tpublic.schedules on ");
+	sql.replacer("\tplans on ", "\tpublic.plans on ");
 
 	var xlatetemplate;
 	if (ismv)
@@ -986,7 +997,7 @@ $RETVAR := array_to_string
 
 					// Call the dict function matching the given field name
 					// e.g. dict_suppliers_company_code(suppliers.key,suppliers.data)
-					target_expr = "dict_" ^ target_filename ^ "_" ^ target_expr ^ "(" ^ target_filename ^ ".key," ^ target_filename ^ ".data)";
+					target_expr = "public.dict_" ^ target_filename ^ "_" ^ target_expr ^ "(" ^ target_filename ^ ".key," ^ target_filename ^ ".data)";
 				}
 
 				else {
@@ -1026,9 +1037,10 @@ $RETVAR := array_to_string
 				//line^="\n WHERE "^target_filename^".key="^source_key_expression^";";
 				let origline = line;
 				line = xlatetemplate;
+				let schema_target_filename = target_filename.contains(".") ? target_filename : ("public." ^ target_filename);
 				line.replacer("$COMMENT", origline);
 				line.replacer("$RETVAR", targetvariablename);
-				line.replacer("$TARGETFILE", target_filename);
+				line.replacer("$TARGETFILE", schema_target_filename);
 				line.replacer("$SOURCEKEY_EXPR", source_key_expr);
 				line.replacer("$TARGET_EXPR", target_expr);
 				line.replacer("$COALESCE_TO", coalesce_to);
