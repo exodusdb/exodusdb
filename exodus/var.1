@@ -274,7 +274,7 @@ var v1 = var.oconv(convstr);
 Convert internal format data to output format for display.
 .sp 0
 .PP
-\fBconvstr:\fR A conversion code or pattern. See ICONV/OCONV PATTERNS
+\fBconvstr:\fR A conversion code or pattern. See I/O CONVERSION CODES
 .sp 0
 .PP
 \fBreturn:\fR The data in external display format or, if the data is invalid and cannot converted, most conversions return the original data UNCONVERTED.
@@ -300,7 +300,7 @@ var v1 = var.iconv(convstr);
 Convert output display format data to internal format.
 .sp 0
 .PP
-\fBconvstr:\fR A conversion code or pattern. See ICONV/OCONV PATTERNS
+\fBconvstr:\fR A conversion code or pattern. See I/O CONVERSION CODES
 .sp 0
 .PP
 \fBreturn:\fR The data in internal format or, if the data is invalid and cannot be converted, most conversions return the EMPTY STRING ""
@@ -8827,7 +8827,7 @@ The debugger defaults to lldb if exodus was built with clang or gdb if built wit
 Access to the debugger and backtrace can also be triggered by Ctrl+C in terminal mode as long as breakoff() is not active.
 .sp 0
 .PP
-Ctrl+C: "Interrupted. (R)esume (Q)uit (A)bort (B)acktrace (D)ebug ?"
+Ctrl+C: "Interrupted. (c)ontinue (q)uit (a)bort (b)acktrace (d)ebug ?"
 .sp 0
 .PP
 \fBcondition:\fR If set to "" or 0 then debug will be skipped. This allows for conditional debugging.
