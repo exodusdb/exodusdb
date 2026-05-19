@@ -784,28 +784,28 @@ static void SIGINT_handler(int sig [[maybe_unused]]) {
 		// (A)bort if no terminal for input.
 		var cmd = "A";
 
-//		// (R)esume if no terminal for input.
-//		var cmd = "R";
+//		// (C)ontinue if no terminal for input.
+//		var cmd = "C";
 
 		// Prompt and wait for one char input. Enter = repeat.
 		if (var().isterminal()) {
 			var().echo(false);
-			std::fprintf(stderr, "Interrupted. (R)esume (q)uit (a)bort (b)acktrace (d)ebug ? ");
+			std::fprintf(stderr, "Interrupted. (c)ontinue (q)uit (a)bort (b)acktrace (d)ebug ? ");
 			fflush(stderr);
 			if (!cmd.inputn(1) || cmd == "\r" || cmd == "\n")
-				cmd = "R";
+				cmd = "c";
 			var().echo(true);
 		}
 		// Uppercase first char
 		let cmd1 = var(cmd.first()).ucase();
 
-		if (cmd1 == "R") {
+		if (cmd1 == "C") {
 
-			// (R)esume
-			std::fprintf(stderr, "Resuming ...\n");
+			// (c)ontinue
+			std::fprintf(stderr, "Continuing ...\n");
 			fflush(stderr);
 
-			// Exit the SIGINT_handler - Return to and resume interrupted code.
+			// Exit the SIGINT_handler - Return to and continue interrupted code.
 			break;
 
 		} else if (cmd1 == "Q") {

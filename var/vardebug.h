@@ -60,7 +60,7 @@ namespace exo {
 	// Quitting the debugger causes the program to resume execution.
 	// The debugger defaults to lldb if exodus was built with clang or gdb if built with g++. The enviroment variable EXO_DEBUGGER can be set to override the default.
 	// Access to the debugger and backtrace can also be triggered by Ctrl+C in terminal mode as long as breakoff() is not active.
-	// Ctrl+C: "Interrupted. (R)esume (Q)uit (A)bort (B)acktrace (D)ebug ?"
+	// Ctrl+C: "Interrupted. (c)ontinue (q)uit (a)bort (b)acktrace (d)ebug ?"
 	// condition: If set to "" or 0 then debug will be skipped. This allows for conditional debugging.
 	// EXO_DEBUG: An environment variable that causes automatic attachment of debugger on VarError exception.
 	// * 0 * Suppress output of backtrace on VarError. Useful for speed if using try/catch to handle VarError exceptions.
