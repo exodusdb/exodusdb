@@ -5486,6 +5486,7 @@ bool var_db::createindex(in fieldname0, in dictfile) const {
 	// unaccent requires "CREATE EXTENSION unaccent" in postgres
 	sql ^= dictexpression;
 	sql ^= ")";
+	sql ^= " WHERE left(key,1) <> '%' OR right(key,1) <> '%';";
 
 	var response = "";
 	if (not this->sqlexec(sql, response)) UNLIKELY {
