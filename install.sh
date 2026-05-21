@@ -664,7 +664,7 @@ function get_dependencies_for_database {
 :
 : pgexodus
 : ────────────────────────────────────────
-	APT_INSTALL postgresql$PG_VER_SUFFIX #for pgexodus install
+	APT_INSTALL postgresql$PG_VER_SUFFIX postgresql-plperl$PG_VER_SUFFIX #for pgexodus install
 :
 } # function get_dependencies_for_database - stage d
 
@@ -741,7 +741,14 @@ function install_database {
 	# Waiting for postgresql to start?
 	#(while ! nc -z -v -w1 localhost 5432 2>/dev/null; do echo "Waiting for port 5432 to open..."; sleep 2; done)
 :
-: Install into template1
+: Clean the template1 database
+: ────────────────────────────────────────
+	sudo -u postgres psql -c "ALTER DATABASE template1 WITH ALLOW_CONNECTIONS false;"
+	sudo -u postgres psql -c "UPDATE pg_database SET datistemplate = false WHERE datname = 'template1';"
+	sudo -u postgres psql -c "DROP DATABASE template1;"
+	sudo -u postgres psql -c "CREATE DATABASE template1 WITH TEMPLATE template0 IS_TEMPLATE true;"
+:
+: Install exodus into template1
 : ────────────────────────────────────────
 : --  extension 'pgexodus'
 : --  collation 'exodus_natural'
@@ -785,15 +792,20 @@ function install_database {
 		ALTER ROLE exodus SET search_path TO public, exodus;
 V0G0N
 :
-: Create exodus user login and database
+: Re/Create exodus database and user login
 : ────────────────────────────────────────
 : 1. exodus user login/password
 : 2. exodus database
 :
 	#sudo -u postgres psql $PSQL_PORT_OPT < $EXODUS_DIR/install_exodus.sql
-	if ! sudo -u postgres psql $PSQL_PORT_OPT exodus -c 'select version();' 2>/dev/null; then
-		sudo -u postgres psql $PSQL_PORT_OPT -c 'CREATE DATABASE exodus OWNER exodus;'
+#	if ! sudo -u postgres psql $PSQL_PORT_OPT exodus -c 'select version();' 2>/dev/null; then
+#		sudo -u postgres psql $PSQL_PORT_OPT -c 'CREATE DATABASE exodus OWNER exodus;'
+#	fi
+	if sudo -u postgres psql $PSQL_PORT_OPT exodus -c 'select version();' 2>/dev/null; then
+		sudo -u postgres psql $PSQL_PORT_OPT -c 'DROP DATABASE exodus'
 	fi
+	sudo -u postgres psql $PSQL_PORT_OPT -c 'CREATE DATABASE exodus OWNER exodus;'
+
 :
 : Install into into exodus database as well.
 : ────────────────────────────────────────

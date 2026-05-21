@@ -190,7 +190,7 @@ func main() {
 	printl("\nJust type 'list' to see the syntax of list");
 	printl("or list dict." ^ filename ^ " to see the dictionary");
 	printl("or just listdict " ^ filename ^ " for the same");
-	printl("Type 'edic ~/exodus/cli/src/testsort' to view, edit and recompile this program.");
+	printl("Type 'edic ~/exodus/cli/testsort' to view, edit and recompile this program then ~/bin/testsort to run it.");
 
 	return 0;
 }

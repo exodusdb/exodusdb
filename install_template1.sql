@@ -17,6 +17,7 @@
 -- extension 'pgexodus' - requires superuser
 
 	-- DROP EXTENSION IF EXISTS pgexodus;
+	CREATE EXTENSION IF NOT EXISTS plperl;
 	CREATE EXTENSION IF NOT EXISTS pgexodus;
 
 -- collation 'exodus_natural'
