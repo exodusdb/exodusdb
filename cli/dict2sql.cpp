@@ -267,11 +267,13 @@ COST 10;
 		//exodus.isnum -> bool
 		create_function("exodus.isnum(instring text)", "bool", isnum_sql, sqltemplate);
 
-		//exodus.tobool(text) -> bool
-		create_function("exodus.tobool(instring text)", "bool", text_tobool_sql, sqltemplate);
-
-		//exodus.tobool(numeric) -> bool
-		create_function("exodus.tobool(innum numeric)", "bool", numeric_tobool_sql, sqltemplate);
+// Moved to pgexodus extension since toBool is required by var::select
+//
+//		//exodus.tobool(text) -> bool
+//		create_function("exodus.tobool(instring text)", "bool", text_tobool_sql, sqltemplate);
+//
+//		//exodus.tobool(numeric) -> bool
+//		create_function("exodus.tobool(innum numeric)", "bool", numeric_tobool_sql, sqltemplate);
 
 		//exodus.date -> int (today's date as a number according to pickos)
 		create_function("exodus.date()", "int", exodus_todays_date_sql, sqltemplate);

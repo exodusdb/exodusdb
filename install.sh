@@ -748,49 +748,46 @@ function install_database {
 	sudo -u postgres psql -c "DROP DATABASE template1;"
 	sudo -u postgres psql -c "CREATE DATABASE template1 WITH TEMPLATE template0 IS_TEMPLATE true;"
 :
-: Install exodus into template1
+: Install exodus functions etc. into template1 using install_template1.sql
 : ────────────────────────────────────────
-: --  extension 'pgexodus'
+: pgexodus extension has already been installed into postgresql using
+: /usr/share/postgresql/18/extension/pgexodus--1.0.sql
+: /usr/share/postgresql/18/extension/pgexodus.control
+:
+: --  extension 'pgexodus' Creates and owns schema exodus. Anything added to exodus will be dropped if exodus is dropped.
 : --  collation 'exodus_natural'
 : --  extension 'unaccent' and function 'immutable_unaccent'
 : --  schema 'dict'
 : --  table 'lists'
 : --  table 'dict.voc'
 :
-	sudo -u postgres psql $PSQL_PORT_OPT template1 < $EXODUS_DIR/install_template1.sql
+	sudo -u postgres psql --echo-all $PSQL_PORT_OPT template1 < $EXODUS_DIR/install_template1.sql
 :
 : Grant exodus login, createrole and createdatabase but not superuser
 : Force exodus to create new files in public schema instead of exodus in all databases
 : ────────────────────────────────────────
-	sudo -u postgres psql $PSQL_PORT_OPT <<-V0G0N
-		\echo
-		\echo user 'exodus'
-		\echo
-	    \echo The role was created without login permission when creating the extension
-	    \echo since its objects are assigned to exodus.
-	    \echo
-	    \echo Allow login with password and creation of users and databases
-	    \echo but not superuser
-		\echo
-	    \echo ALTER ROLE exodus
-	    \echo     LOGIN
-	    \echo     PASSWORD 'somesillysecret'
-	    \echo     CREATEDB
-	    \echo     CREATEROLE
-	    \echo ;
-	    ALTER ROLE exodus
-	        LOGIN
-	        PASSWORD 'somesillysecret'
-	        CREATEDB
-	        CREATEROLE
-	    ;
-		\echo
-		\echo Force exodus to create new files in public schema instead of exodus
-		\echo in all databases.
-		\echo
-		\echo ALTER ROLE exodus SET search_path TO public, exodus;
-		ALTER ROLE exodus SET search_path TO public, exodus;
-V0G0N
+	sudo -u postgres psql --echo-all $PSQL_PORT_OPT <<-V0G0N
+		--
+		-- user 'exodus'
+		--
+	    -- The role was created without login permission when creating the extension
+	    -- since its objects are assigned to exodus.
+	    --
+	    -- Allow login with password and creation of users and databases
+	    -- but not superuser
+		--
+		    ALTER ROLE exodus
+		        LOGIN
+		        PASSWORD 'somesillysecret'
+		        CREATEDB
+		        CREATEROLE
+		    ;
+		-- -------------------------------------------------------------------
+		-- Force exodus to create new files in public schema instead of exodus
+		-- in all databases.
+		-- -------------------------------------------------------------------
+			ALTER ROLE exodus SET search_path TO public, exodus;
+	V0G0N
 :
 : Re/Create exodus database and user login
 : ────────────────────────────────────────
@@ -812,7 +809,7 @@ V0G0N
 : Only required if exodus db already existed and was
 : therefore not created from template1 in above step.
 :
-	sudo -u postgres psql $PSQL_PORT_OPT exodus < $EXODUS_DIR/install_template1.sql
+	sudo -u postgres psql --echo-all $PSQL_PORT_OPT exodus < $EXODUS_DIR/install_template1.sql
 :
 : Configure exodus for postgres - Omit host means use local db socket connection
 : ────────────────────────────────────────

@@ -2,7 +2,7 @@
 #define LIBEXODUS_FORMAT_H
 
 #ifdef EXODUS_MACROS
-#	error exodus/format.h must be included BEFORE other exodus program headers since they define intrusive macros for general exodus programming
+#	error format.h must be included BEFORE other exodus program headers since they define intrusive macros for general exodus programming
 #endif
 
 // Including the large fmt library header here so exo::format can precompile strings using std::vformat

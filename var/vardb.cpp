@@ -40,17 +40,19 @@ THE SOFTWARE.
 // 0=silent, 1=errors, 2=warnings, 3=results, 4=tracing, 5=debugging
 // 0=silent, 1=errors, 2=warnings, 3=failures, 4=successes, 5=debugging ?
 
-// MSVC requires exception handling (eg compile with /EHsc or EHa?) for delayed dll loading
-// detection
+// Note: exodus_call and exodus_sort are nominal exodus postgres select 'column extraction/calculation functions'.
+// They do not actually exist since they are placeholders for the final functionality.
+// 1. 'exodus_call' triggers two stage select. i.e. passed back to client for execution in the callers exodus c++ environment.
+// 2. 'extract_sort' becomes 'extract_text ... collate exodus_natural'
 
 ////ALN:TODO: REFACTORING NOTES
-// Proposed to split content of mvdbpostres.cpp into 3 layers (classic approach):
-//	mvdbfuncs.cpp - api things, like exedusfuncs.cpp
-//	mvdbdrv.cpp - base abstract class mv_db_drv or MvDbDrv to define db access operations (db
-// driver interface); mvdbdrvpostgres.cpp - subclass of mv_db_drv, specific to PostgreSQL things
+// Proposed to split content of vardbpostres.cpp into 3 layers (classic approach):
+//	vardbfuncs.cpp - api things, like exedusfuncs.cpp
+//	vardbdrv.cpp - base abstract class var_db_drv or varDbDrv to define db access operations (db
+// driver interface); vardbdrvpostgres.cpp - subclass of var_db_drv, specific to PostgreSQL things
 // like
-// PGconn and PQfinish; mvdbdrvmsde.cpp - possible subclass of mv_db_drv, specific to MSDE (AKA
-// MSSQL Express); mvdblogic.cpp - intermediate processing (most of group 2) functions.
+// PGconn and PQfinish; vardbdrvmsde.cpp - possible subclass of var_db_drv, specific to MSDE (AKA
+// MSSQL Express); vardblogic.cpp - intermediate processing (most of group 2) functions.
 // Proposed refactoring would:
 //		- improve modularity of the Exodus platform;
 //		- allow easy expanding to other DB engines.
@@ -71,13 +73,15 @@ On committing, any and all updates that you made will be immediately visible to 
 
 During your transaction you will not see any updates from transactions committed after you started your transaction.
 
-3. Lock visibility
+3. Postgresql lock visibility
 
-Locks are essentially independent of transactions and can be seen by other connections in real time.
+Postgresql locks are essentially independent of transactions and can be seen by other connections in real time.
 
 However, locks placed during a transaction cannot be unlocked and are automatically released after you commit. Unlock commands are therefore ignored.
 
 Within transactions, lock requests for locks that have already been obtained always SUCCEED. This is the opposite of duplicate locks outside of transactions, which FAIL.
+
+*** However, exodus implementation of lock() checks for double locking and FAILS.
 
 4. How to coordinate updates between asynchronous processes using locks.
 

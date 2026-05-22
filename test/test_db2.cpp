@@ -180,6 +180,11 @@ dict(AGE_IN_YEARS) {
 
 	assert(committrans());
 
+	// Check we can use implicit toBool i.e. "with/without column" without specifying any value
+	assert(select("xo_clients with balance and with code"));
+	clearselect();
+
+	// listfiles
 	var filenames  = listfiles();
 	var indexnames = listindex("test_people");
 
