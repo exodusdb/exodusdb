@@ -1,5 +1,6 @@
 #!/bin/bash
 set -euxo pipefail
+PS4='+ [./restore_db ${LIVE_EXO_DATA:-${1-}} ${SECONDS}s] '
 
 : ─────────────────────────────────────────────────────────────────────────────────
 : Restore a postgres database from an sql dump to a _test database

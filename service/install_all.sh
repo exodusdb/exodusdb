@@ -1,7 +1,7 @@
 #!/bin/bash
 [ "$INSTALL_SH" ] || { INSTALL_SH=1 exec bash "$0" "$@" 2>&1 | tee -a "$(echo ${0##*/}.$*.$(printf "%04d" $(( RANDOM % 10000 ))).log | tr ' :@' '.__')"; exit "${PIPESTATUS[0]}"; }
 set -euxo pipefail
-PS4='+ [service ${SECONDS}s] '
+PS4='+ [./install_all.sh ${SITE_NAME:-${1-}} ${SECONDS}s] '
 : $0 $*
 : ─────────────────────────────────────────────────────────────────────────────────
 : Installs EXODUS web service

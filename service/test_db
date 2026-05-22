@@ -1,5 +1,6 @@
 #!/bin/bash
 set -euxo pipefail
+PS4='+ [./test ${EXO_DATA:-${1-}} ${SECONDS}s] '
 
 : ─────────────────────────────────────────────────────────────────────────────────
 : test if a postgresql database exists

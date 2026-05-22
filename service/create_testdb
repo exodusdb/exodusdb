@@ -1,5 +1,6 @@
 #!/bin/bash
 set -euxo pipefail
+PS4='+ [./create_testdb ${TEST_EXO_DATA:-${1-}} ${SECONDS}s] '
 
 : ─────────────────────────────────────────────────────────────────────────────────
 : Create test database
