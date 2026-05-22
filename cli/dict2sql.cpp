@@ -409,14 +409,31 @@ subr create_function(in functionname_and_args, in return_sqltype, in sql, in sql
 	if (verbose > 1)
 		functionsql.outputl();
 
-	//decide if reindex is required - only if function has changed
-	var reindex_if_indexed = false;
 	var oldfunction;
 	let functionname0 = field(functionname_and_args, "(", 1).lcase();
 	let schemaname = field(functionname0, ".", 1);
 	let functionname = field(functionname0, ".", 2);
 	if (not functionname)
 		schemaname.swap(functionname);
+
+	//decide if reindex is required - only if function has changed
+	var reindex_if_indexed = false;
+	var was_indexed = false;
+	//drop any index using the previous function
+	//TODO identify file/fields like production_orders_date_time
+	//var filename=functionname_and_args.field("_",2);
+	//var fieldname=functionname_and_args.field("_",3,99).field("(",1);
+	var filename = functionname_and_args.field("_", 2, 999).field("(", 1);
+	//var fieldname = filename.convert(LOWERCASE, "").trim("_");
+	let fieldname = filename.convert("abcdefghijklmnopqrstuvwxyz", "").trim("_");
+	//filename = filename.convert(UPPERCASE, "").trim("_");
+	if (filename and fieldname) {
+		filename.converter("ABCDEFGHIJKLMNOPQRSTUVWXYZ", "");
+		filename.trimmer("_");
+		if (filename.listindex(filename, fieldname)) {
+			was_indexed = true;
+		}
+	}
 
 	// Split out new argtypes and argnames
 	var argtypes = "";
@@ -471,18 +488,23 @@ subr create_function(in functionname_and_args, in return_sqltype, in sql, in sql
 	// public.dict_vouchers_text(key,data)
 	// This is converted automatically here for .XREF dicts and can be manually done in dat/dict. src
 
+	auto rm_duplicate_func = [](in functionname_and_args){
+		let funcname =
+			functionname_and_args.starts("exodus.") ?
+				("public." ^ functionname_and_args.replace("exodus.", ""))
+			:
+				("exodus." ^ functionname_and_args.replace("public.", ""))
+		;
+		logputl("dict2sql: Deleting duplicate function " ^ funcname);
+		if (not var().sqlexec("DROP FUNCTION IF EXISTS " ^ funcname ^ " CASCADE"))
+			var().lasterror().logput("dict2sql: error: ");
+	};
+
+	// Repeated before and after function creation
 	// Get rid of old superfluous public/exodus schema function if more than one function
 	if (oldfunction.count(RM) > 1) {
 		reindex_if_indexed = true;
-		//DROP FUNCTION IF EXISTS public.dict_addresses_person_xref(key text, data text);
-		logputl("dict2sql: deleting duplicate version of " ^ functionname_and_args);
-		var cmd;
-		if (functionname_and_args.starts("exodus."))
-			cmd = "DROP FUNCTION IF EXISTS public." ^ functionname_and_args.replace("exodus.", "");
-		else
-			cmd = "DROP FUNCTION IF EXISTS exodus." ^ functionname_and_args;
-		if (not var().sqlexec(cmd ^ " CASCADE"))
-			var().lasterror().logput("dict2sql: error: ");
+		rm_duplicate_func(functionname_and_args);
 	}
 
 //	oldfunction.substrer(oldfunction.index("\n") + 1);
@@ -578,47 +600,28 @@ subr create_function(in functionname_and_args, in return_sqltype, in sql, in sql
 		errmsg.errputl();
 	}
 
-	// verify only one function
+	// Verify only one function (public./exodus.) - after creating the function.
+	// Repeated before and after function creation
+	// Get rid of old superfluous public/exodus schema function if more than one function
 	var tempfunction;
 	if (not var().sqlexec(sql_get_existing_declaration, tempfunction)) {
 		var().lasterror().logput("dict2sql: error:" ^ tempfunction);
 		//null
 	}
 	if (tempfunction.count(RM) > 1) {
-//		if (not ANS.sqlexec("select current_schema()"))
-		var search_path;
-		if (sqlexec("show search_path", search_path))
-			search_path.logputl("pg search_path=");
-		else
-			loglasterror();
-		logputl("Failed to delete public. function?");
+		reindex_if_indexed = true;
+		rm_duplicate_func(functionname_and_args);
 	}
 
-	if (reindex_if_indexed) {
-		//drop any index using the previous function
-		//TODO identify file/fields like production_orders_date_time
-		//var filename=functionname_and_args.field("_",2);
-		//var fieldname=functionname_and_args.field("_",3,99).field("(",1);
-		var filename = functionname_and_args.field("_", 2, 999).field("(", 1);
-		//var fieldname = filename.convert(LOWERCASE, "").trim("_");
-		let fieldname = filename.convert("abcdefghijklmnopqrstuvwxyz", "").trim("_");
-		//filename = filename.convert(UPPERCASE, "").trim("_");
-		if (filename and fieldname) {
-			filename.converter("ABCDEFGHIJKLMNOPQRSTUVWXYZ", "");
-			filename.trimmer("_");
-			if (filename.listindex(filename, fieldname)) {
-				logputl("deleteindex " ^ filename ^ " " ^ fieldname);
-				//filename.deleteindex(fieldname);
-				if (not filename.deleteindex(fieldname)) {
-					abort(lasterror());
-				}
-				logputl("createindex " ^ filename ^ " " ^ fieldname);
-				//filename.createindex(fieldname);
-				if (not filename.createindex(fieldname)) {
-					abort(lasterror());
-				}
-			}
-		}
+	// Reindex was indexed and the function was changed
+	if (reindex_if_indexed and was_indexed) {
+//		logputl("deleteindex " ^ filename ^ " " ^ fieldname);
+//		if (not filename.deleteindex(fieldname)) {
+//			abort(lasterror());
+//		}
+		logputl("createindex " ^ filename ^ " " ^ fieldname);
+		if (not filename.createindex(fieldname))
+			abort(lasterror());
 	}
 
 	return;
