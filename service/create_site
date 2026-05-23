@@ -243,9 +243,10 @@ function APT_GET {
 		fi
 	fi
 :
-: Disable exodus sites
+: Disable any exodus sites
 : ────────────────────────────────────────
 	#sudo a2dissite exodus exodus-ssl || true
+	#if sudo a2dissite exodus exodus-ssl |& grep -v "does not exist"; then
 	if sudo a2dissite exodus exodus-ssl; then
 		#sudo apache2ctl configtest
 		#restart does a configtest
@@ -256,12 +257,13 @@ function APT_GET {
 : ────────────────────────────────────────
 	sudo a2ensite $HOST_NAME
 	sudo apache2ctl configtest
-	if ! sudo apache2ctl restart; then
-		sudo journalctl -u apache2
-		exit 99
+	if ! sudo apache2ctl graceful; then
+		systemctl reset-failed apache2.service
+		if ! sudo apache2ctl restart; then
+			journalctl -xeu apache2.service
+			exit 99
+		fi
 	fi
-#	graceful wont work after a2enmod ssl
-#	sudo apache2ctl graceful
 :
 : ────────────────────────────────────────
 : Finished create_site - https://$SUFFIXED_FQDN
