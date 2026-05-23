@@ -495,7 +495,8 @@ subr create_function(in functionname_and_args, in return_sqltype, in sql, in sql
 			:
 				("exodus." ^ functionname_and_args.replace("public.", ""))
 		;
-		logputl("dict2sql: Deleting duplicate function " ^ funcname);
+		if (funcname.starts("public."))
+			logputl("dict2sql: Deleting duplicate function " ^ funcname);
 		if (not var().sqlexec("DROP FUNCTION IF EXISTS " ^ funcname ^ " CASCADE"))
 			var().lasterror().logput("dict2sql: error: ");
 	};
