@@ -256,7 +256,11 @@ function APT_GET {
 : ────────────────────────────────────────
 	sudo a2ensite $HOST_NAME
 	sudo apache2ctl configtest
-	sudo apache2ctl restart
+	if ! sudo apache2ctl restart; then
+		sudo journalctl -u apache2
+		exit 99
+	fi
+#	graceful wont work after a2enmod ssl
 #	sudo apache2ctl graceful
 :
 : ────────────────────────────────────────
