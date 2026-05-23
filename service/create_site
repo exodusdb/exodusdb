@@ -32,7 +32,7 @@ PS4='+ [./create_site ${DB_CODE:-${3-}} ${SECONDS}s] '
 : Check current directory
 : ────────────────────────────────────────
 	EXODUS=`pwd`
-	test -f $EXODUS/install_www_apt.sh || ( echo Must be run in exodus install dir without path && exit )
+#	test -f $EXODUS/install_www_apt.sh || ( echo Must be run in exodus install dir without path && exit )
 
 function APT_GET {
 : ────────────────────────────────────────
@@ -247,11 +247,12 @@ function APT_GET {
 : ────────────────────────────────────────
 	#sudo a2dissite exodus exodus-ssl || true
 	#if sudo a2dissite exodus exodus-ssl |& grep -v "does not exist"; then
-	if sudo a2dissite exodus exodus-ssl; then
-		#sudo apache2ctl configtest
-		#restart does a configtest
-		sudo apache2ctl restart
-	fi
+	#if sudo a2dissite exodus exodus-ssl; then
+	#	#sudo apache2ctl configtest
+	#	#restart does a configtest
+	#	sudo apache2ctl restart
+	#fi
+	rm -rf /etc/apache2/sites-enabled/{exodus,exodus-ssl}
 :
 : Enable the site and restart apache - $HOST_NAME
 : ────────────────────────────────────────
