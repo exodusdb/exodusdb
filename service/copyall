@@ -20,8 +20,11 @@ PS4='+ [./copyall $* ${SECONDS}s] '
 : Dry run or not
 : ────────────────────────────────────────
 	DRYRUN=--dry-run
+	color_on="tput bold"
+	color_off="tput sgr0"
 	if [ "${1:-}" = "CONFIRM" ]; then
 		DRYRUN=
+		color_on="tput setaf 10"
 	elif [ "${1:-}" != "" ]; then
 :		Invalid syntax
 		exit 1
@@ -58,20 +61,24 @@ PS4='+ [./copyall $* ${SECONDS}s] '
 :	MUST use 'whole file' option to ensure that the OS dlopen understands everything has changed
 :	otherwise new code may not become active and/or undefined behaviour i.e. crashes etc.
 :
-	rsync $DRYRUN -av --whole-file --delete $HOME/{bin,lib,dat,inc} ~/live
+	$color_on
+	rsync $DRYRUN -ai --whole-file --delete $HOME/{bin,lib,dat,inc} ~/live
+	$color_off
 :
 : Copy '$EXO_INSTALL_DIR' bin, lib and inc files to /usr/local/live
 : ────────────────────────────────────────
 :	Note that ldconfig will not see or use /usr/local/live.
 :	We are relying on PATH and LD_LIBRARY_PATH configuration in the live service to use it.
 :
-	sudo rsync $DRYRUN -av \
+	$color_on
+	sudo rsync $DRYRUN -ai \
 		--delete --delete-excluded \
 		--exclude include/boost \
 		--exclude lib/cmake* \
 		--exclude share/cmake* \
 		$EXO_INSTALL_DIR/{bin,lib,share,include} \
 		$EXO_INSTALL_DIR/live
+	$color_off
 :
 : Finished $DRYRUN copying EXODUS programs to live in $(($SECONDS / 60)) minutes and $(($SECONDS % 60)) seconds.
 : ────────────────────────────────────────
