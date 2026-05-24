@@ -131,6 +131,7 @@ func main() {
 		loglasterror();
 	if (DATA)
 		logput(DATA);
+	//NOTICE:  drop cascades to index ads__brand_and_date
 
 	// Option to install standard exodus functions
 	if (locateusing(",", filenames.f(1), "pgsql,pgexodus,exodus")) {
@@ -207,56 +208,56 @@ COST 10;
 
 	}
 
-	if (install_exodus_extensions == "pgexodus") {
-
-		let sqltemplate_strict =
-			R"V0G0N(
-CREATE OR REPLACE FUNCTION $functionname_and_args RETURNS $return_type
-AS 'pgexodus', '$functionname'
-LANGUAGE 'c'
-IMMUTABLE STRICT
-SECURITY
-DEFINER
-COST 10;
-)V0G0N";
-
-		let sqltemplate = sqltemplate_strict.replace(" STRICT", "");
-
-		create_function("exodus.extract_text(data text, fn int4, vn int4, sn int4)", "text", "", sqltemplate);
-		create_function("exodus.extract_number(data text, fn int4, vn int4, sn int4)", "float8", "", sqltemplate);
-		create_function("exodus.count(data text, countchar text)", "integer", "", sqltemplate);
-
-		//create_function("exodus.extract_sort(data text, fn int4, vn int4, sn int4)", "text", "", sqltemplate);
-		create_function("exodus.extract_date(data text, fn int4, vn int4, sn int4)", "date", "", sqltemplate_strict);
-		create_function("exodus.extract_time(data text, fn int4, vn int4, sn int4)", "interval", "", sqltemplate_strict);
-		create_function("exodus.extract_datetime(data text, fn int4, vn int4, sn int4)", "timestamp", "", sqltemplate_strict);
-
-	} else if (install_exodus_extensions == "pgsql") {
-
-		//rawsqlexec("DROP FUNCTION IF EXISTS exodus.extract_sort(text, int4, int4, int4);");
-
-		//exodus.extract_text<fn,vn,sn> returns an sql text type
-		create_function("exodus.extract_text(data text, fn int, vn int, sn int)", "text", exodus_extract_text_sql, sqltemplate);
-
-		//NOT implemented in pgsql. ::select uses COLLATE instead
-		//exodus.extract_sortt<fn,vn,sn> returns an sql text type
-		//create_function("exodus.extract_sort(data text, fn int, vn int, sn int)", "text", exodus_extract_text_sql, sqltemplate);
-
-		//exodus.extract_date<fn,vn,sn> returns an sql data type
-		create_function("exodus.extract_date(data text, fn int4, vn int4, sn int4)", "date", exodus_extract_date_sql, sqltemplate);
-
-		//exodus.extract_time<fn,vn,sn> returns an sql time type
-		create_function("exodus.extract_time(data text, fn int4, vn int4, sn int4)", "time", exodus_extract_time_sql, sqltemplate);
-
-		//exodus.extract_date<fn,vn,sn> returns an sql data type
-		create_function("exodus.extract_datetime(data text, fn int4, vn int4, sn int4)", "timestamp", exodus_extract_datetime_sql, sqltemplate);
-
-		//exodus.extract_number<fn,vn,sn> returns an sql float8 type
-		create_function("exodus.extract_number(data text, fn int4, vn int4, sn int4)", "float8", exodus_extract_number_sql, sqltemplate);
-
-		//exodus.count(str,ch) returns an int
-		create_function("exodus.count(data text, countchar text)", "integer", exodus_count_sql, sqltemplate);
-	}
+//	if (install_exodus_extensions == "pgexodus") {
+//
+//		let sqltemplate_strict =
+//			R"V0G0N(
+//CREATE OR REPLACE FUNCTION $functionname_and_args RETURNS $return_type
+//AS 'pgexodus', '$functionname'
+//LANGUAGE 'c'
+//IMMUTABLE STRICT
+//SECURITY
+//DEFINER
+//COST 10;
+//)V0G0N";
+//
+//		let sqltemplate = sqltemplate_strict.replace(" STRICT", "");
+//
+//		create_function("exodus.extract_text(data text, fn int4, vn int4, sn int4)", "text", "", sqltemplate);
+//		create_function("exodus.extract_number(data text, fn int4, vn int4, sn int4)", "float8", "", sqltemplate);
+//		create_function("exodus.count(data text, countchar text)", "integer", "", sqltemplate);
+//
+//		//create_function("exodus.extract_sort(data text, fn int4, vn int4, sn int4)", "text", "", sqltemplate);
+//		create_function("exodus.extract_date(data text, fn int4, vn int4, sn int4)", "date", "", sqltemplate_strict);
+//		create_function("exodus.extract_time(data text, fn int4, vn int4, sn int4)", "interval", "", sqltemplate_strict);
+//		create_function("exodus.extract_datetime(data text, fn int4, vn int4, sn int4)", "timestamp", "", sqltemplate_strict);
+//
+//	} else if (install_exodus_extensions == "pgsql") {
+//
+//		//rawsqlexec("DROP FUNCTION IF EXISTS exodus.extract_sort(text, int4, int4, int4);");
+//
+//		//exodus.extract_text<fn,vn,sn> returns an sql text type
+//		create_function("exodus.extract_text(data text, fn int, vn int, sn int)", "text", exodus_extract_text_sql, sqltemplate);
+//
+//		//NOT implemented in pgsql. ::select uses COLLATE instead
+//		//exodus.extract_sortt<fn,vn,sn> returns an sql text type
+//		//create_function("exodus.extract_sort(data text, fn int, vn int, sn int)", "text", exodus_extract_text_sql, sqltemplate);
+//
+//		//exodus.extract_date<fn,vn,sn> returns an sql data type
+//		create_function("exodus.extract_date(data text, fn int4, vn int4, sn int4)", "date", exodus_extract_date_sql, sqltemplate);
+//
+//		//exodus.extract_time<fn,vn,sn> returns an sql time type
+//		create_function("exodus.extract_time(data text, fn int4, vn int4, sn int4)", "time", exodus_extract_time_sql, sqltemplate);
+//
+//		//exodus.extract_date<fn,vn,sn> returns an sql data type
+//		create_function("exodus.extract_datetime(data text, fn int4, vn int4, sn int4)", "timestamp", exodus_extract_datetime_sql, sqltemplate);
+//
+//		//exodus.extract_number<fn,vn,sn> returns an sql float8 type
+//		create_function("exodus.extract_number(data text, fn int4, vn int4, sn int4)", "float8", exodus_extract_number_sql, sqltemplate);
+//
+//		//exodus.count(str,ch) returns an int
+//		create_function("exodus.count(data text, countchar text)", "integer", exodus_count_sql, sqltemplate);
+//	}
 
 	// Various exodus pgsql utility functions
 	/////////////////////////////////////////
@@ -431,10 +432,8 @@ subr create_function(in functionname_and_args, in return_sqltype, in sql, in sql
 
 	var oldfunction;
 	let functionname0 = field(functionname_and_args, "(", 1).lcase();
-	let schemaname = field(functionname0, ".", 1);
-	let functionname = field(functionname0, ".", 2);
-	if (not functionname)
-		schemaname.swap(functionname);
+	let schemaname = functionname0.contains(".") ? field(functionname0, ".", 1) : "public";
+	let functionname = field(functionname0, ".", functionname0.contains(".") ? 2 : 1);
 
 	//decide if reindex is required - only if function has changed
 	var reindex_if_indexed = false;
@@ -487,7 +486,7 @@ subr create_function(in functionname_and_args, in return_sqltype, in sql, in sql
 		" LEFT JOIN pg_catalog.pg_namespace n ON n.oid = pronamespace"
 		" WHERE     proname   = " ^ squote(functionname) ^
 		" AND       proargnames " ^ (argnames ? (" = '{" ^ argnames ^ "}'") : " is null") ^
-//		" AND       n.nspname = 'exodus'"
+		" AND       n.nspname = " ^ squote(schemaname) ^
 		" AND       n.nspname != 'pg_catalog'"
 	;
 	if (not var().sqlexec(sql_get_existing_declaration, oldfunction)) {
@@ -508,25 +507,25 @@ subr create_function(in functionname_and_args, in return_sqltype, in sql, in sql
 	// public.dict_vouchers_text(key,data)
 	// This is converted automatically here for .XREF dicts and can be manually done in dat/dict. src
 
-	auto rm_duplicate_func = [](in functionname_and_args){
-		let funcname =
-			functionname_and_args.starts("exodus.") ?
-				("public." ^ functionname_and_args.replace("exodus.", ""))
-			:
-				("exodus." ^ functionname_and_args.replace("public.", ""))
-		;
-		if (funcname.starts("public."))
-			logputl("dict2sql: Deleting duplicate function " ^ funcname);
-		if (not var().sqlexec("DROP FUNCTION IF EXISTS " ^ funcname ^ " CASCADE"))
-			var().lasterror().logput("dict2sql: error: ");
-	};
-
-	// Repeated before and after function creation
-	// Get rid of old superfluous public/exodus schema function if more than one function
-	if (oldfunction.count(RM) > 1) {
-		reindex_if_indexed = true;
-		rm_duplicate_func(functionname_and_args);
-	}
+//	auto rm_duplicate_func = [](in functionname_and_args){
+//		let funcname =
+//			functionname_and_args.starts("exodus.") ?
+//				("public." ^ functionname_and_args.replace("exodus.", ""))
+//			:
+//				("exodus." ^ functionname_and_args.replace("public.", ""))
+//		;
+//		if (funcname.starts("public."))
+//			logputl("dict2sql: Deleting duplicate function " ^ funcname);
+//		if (not var().sqlexec("DROP FUNCTION IF EXISTS " ^ funcname ^ " CASCADE"))
+//			var().lasterror().logput("dict2sql: error: ");
+//	};
+//
+//	// Repeated before and after function creation
+//	// Get rid of old superfluous public/exodus schema function if more than one function
+//	if (oldfunction.count(RM) > 1) {
+//		reindex_if_indexed = true;
+//		rm_duplicate_func(functionname_and_args);
+//	}
 
 //	oldfunction.substrer(oldfunction.index("\n") + 1);
 	oldfunction.cutter(oldfunction.index("\n"));
@@ -622,18 +621,18 @@ subr create_function(in functionname_and_args, in return_sqltype, in sql, in sql
 		errmsg.errputl();
 	}
 
-	// Verify only one function (public./exodus.) - after creating the function.
-	// Repeated before and after function creation
-	// Get rid of old superfluous public/exodus schema function if more than one function
-	var tempfunction;
-	if (not var().sqlexec(sql_get_existing_declaration, tempfunction)) {
-		var().lasterror().logput("dict2sql: error:" ^ tempfunction);
-		//null
-	}
-	if (tempfunction.count(RM) > 1) {
-		reindex_if_indexed = true;
-		rm_duplicate_func(functionname_and_args);
-	}
+//	// Verify only one function (public./exodus.) - after creating the function.
+//	// Repeated before and after function creation
+//	// Get rid of old superfluous public/exodus schema function if more than one function
+//	var tempfunction;
+//	if (not var().sqlexec(sql_get_existing_declaration, tempfunction)) {
+//		var().lasterror().logput("dict2sql: error:" ^ tempfunction);
+//		//null
+//	}
+//	if (tempfunction.count(RM) > 1) {
+//		reindex_if_indexed = true;
+//		rm_duplicate_func(functionname_and_args);
+//	}
 
 	// Reindex was indexed and the function was changed
 	if (reindex_if_indexed and was_indexed) {
@@ -1674,151 +1673,151 @@ EXCEPTION WHEN others THEN
 END;
 )V0G0N";
 
-//exodus.extract_text -> text
-
-var exodus_extract_text_sql = R"V0G0N(
- if fn < 1 then
-  return data;
- end if;
-
- if vn < 1 then
-  return split_part(data, E'\x1E', fn);
- end if;
-
- if sn < 1 then
-  return split_part(split_part(data, E'\x1E', fn), E'\x1D', vn);
- end if;
-
-  return split_part(split_part(split_part(data, E'\x1E', fn), E'\x1D', vn), E'\x1C', sn);
-)V0G0N";
-
-//exodus.extract_date -> date SIMILAR CODE in extract_number, extract_date and extract_time
-
-var exodus_extract_date_sql = R"V0G0N(
-DECLARE
- ans text;
-BEGIN
-
- if fn < 1 then
-  return case when data = '' then NULL else '1967/12/31'::date + data::int end;
- end if;
-
- ans = split_part(data, E'\x1E', fn);
-
- if vn < 1 then
-  return case when ans = '' then NULL else '1967/12/31'::date + ans::int end;
- end if;
-
- ans = split_part(ans, E'\x1D', vn);
-
- if sn < 1 then
-  return case when ans = '' then NULL else '1967/12/31'::date + ans::int end;
- end if;
-
- ans = split_part(ans, E'\x1C', sn);
-
- return case when ans = '' then NULL else '1967/12/31'::date + ans::int end;
-
-END;
-)V0G0N";
-
-//exodus.extract_time -> interval SIMILAR CODE in extract_number, extract_date and extract_time
-
-var exodus_extract_time_sql = R"V0G0N(
-DECLARE
- ans text;
-BEGIN
-
- if fn < 1 then
-  return case when text = '' then NULL else make_interval(secs => data::int) end;
- end if;
-
- ans = split_part(data, E'\x1E', fn);
-
- if vn < 1 then
-  return case when ans = '' then NULL else make_interval(secs => ans::int) end;
- end if;
-
- ans = split_part(ans, E'\x1D', vn);
-
- if sn < 1 then
-  return case when ans = '' then NULL else make_interval(secs => ans::int) end;
- end if;
-
- ans = split_part(ans, E'\x1C', sn);
-
- return case when ans = '' then NULL else make_interval(secs => ans::int) end;
-
-END;
-)V0G0N";
-
-//exodus.extract_datetime -> timestamp SIMILAR CODE in extract_number, extract_date and extract_time
-
-var exodus_extract_datetime_sql = R"V0G0N(
-DECLARE
- ans text;
-BEGIN
-
- if fn < 1 then
-  ans := data;
- else
-  ans = split_part(data, E'\x1E', fn);
-  if vn >= 1 then
-   ans := split_part(ans, E'\x1D', vn);
-   if sn >= 1 then
-    ans := split_part(ans, E'\x1C', sn);
-   end if;
-  end if;
- end if;
-
- if ans = '' then
-  return NULL;
- else
-  return to_timestamp((split_part(ans,'.',1)::int-732)*86400 + split_part(ans,'.',2)::int);
- end if;
-
-END;
-)V0G0N";
-
-//exodus.extract_number -> number SIMILAR CODE in extract_number, extract_date and extract_time
-
-var exodus_extract_number_sql = R"V0G0N(
-DECLARE
- ans text;
-BEGIN
-
- if fn < 1 then
-  return case when text = '' then 0 else text::float8 end;
- end if;
-
- ans = split_part(data, E'\x1E', fn);
-
- if vn < 1 then
-  return case when ans = '' then 0 else ans::float8 end;
- end if;
-
- ans = split_part(ans, E'\x1D', vn);
-
- if sn < 1 then
-  return case when ans = '' then 0 else ans::float8  end;
- end if;
-
- ans = split_part(ans, E'\x1C', sn);
-
- return case when ans = '' then 0 else ans::float8 end;
-
-END;
-)V0G0N";
-
-//exodus.count
-
-var exodus_count_sql = R"V0G0N(
-BEGIN
-
- return (CHAR_LENGTH(data) - CHAR_LENGTH(REPLACE(data, ch, '')));
-
-END;
-)V0G0N";
+////exodus.extract_text -> text
+//
+//var exodus_extract_text_sql = R"V0G0N(
+// if fn < 1 then
+//  return data;
+// end if;
+//
+// if vn < 1 then
+//  return split_part(data, E'\x1E', fn);
+// end if;
+//
+// if sn < 1 then
+//  return split_part(split_part(data, E'\x1E', fn), E'\x1D', vn);
+// end if;
+//
+//  return split_part(split_part(split_part(data, E'\x1E', fn), E'\x1D', vn), E'\x1C', sn);
+//)V0G0N";
+//
+////exodus.extract_date -> date SIMILAR CODE in extract_number, extract_date and extract_time
+//
+//var exodus_extract_date_sql = R"V0G0N(
+//DECLARE
+// ans text;
+//BEGIN
+//
+// if fn < 1 then
+//  return case when data = '' then NULL else '1967/12/31'::date + data::int end;
+// end if;
+//
+// ans = split_part(data, E'\x1E', fn);
+//
+// if vn < 1 then
+//  return case when ans = '' then NULL else '1967/12/31'::date + ans::int end;
+// end if;
+//
+// ans = split_part(ans, E'\x1D', vn);
+//
+// if sn < 1 then
+//  return case when ans = '' then NULL else '1967/12/31'::date + ans::int end;
+// end if;
+//
+// ans = split_part(ans, E'\x1C', sn);
+//
+// return case when ans = '' then NULL else '1967/12/31'::date + ans::int end;
+//
+//END;
+//)V0G0N";
+//
+////exodus.extract_time -> interval SIMILAR CODE in extract_number, extract_date and extract_time
+//
+//var exodus_extract_time_sql = R"V0G0N(
+//DECLARE
+// ans text;
+//BEGIN
+//
+// if fn < 1 then
+//  return case when text = '' then NULL else make_interval(secs => data::int) end;
+// end if;
+//
+// ans = split_part(data, E'\x1E', fn);
+//
+// if vn < 1 then
+//  return case when ans = '' then NULL else make_interval(secs => ans::int) end;
+// end if;
+//
+// ans = split_part(ans, E'\x1D', vn);
+//
+// if sn < 1 then
+//  return case when ans = '' then NULL else make_interval(secs => ans::int) end;
+// end if;
+//
+// ans = split_part(ans, E'\x1C', sn);
+//
+// return case when ans = '' then NULL else make_interval(secs => ans::int) end;
+//
+//END;
+//)V0G0N";
+//
+////exodus.extract_datetime -> timestamp SIMILAR CODE in extract_number, extract_date and extract_time
+//
+//var exodus_extract_datetime_sql = R"V0G0N(
+//DECLARE
+// ans text;
+//BEGIN
+//
+// if fn < 1 then
+//  ans := data;
+// else
+//  ans = split_part(data, E'\x1E', fn);
+//  if vn >= 1 then
+//   ans := split_part(ans, E'\x1D', vn);
+//   if sn >= 1 then
+//    ans := split_part(ans, E'\x1C', sn);
+//   end if;
+//  end if;
+// end if;
+//
+// if ans = '' then
+//  return NULL;
+// else
+//  return to_timestamp((split_part(ans,'.',1)::int-732)*86400 + split_part(ans,'.',2)::int);
+// end if;
+//
+//END;
+//)V0G0N";
+//
+////exodus.extract_number -> number SIMILAR CODE in extract_number, extract_date and extract_time
+//
+//var exodus_extract_number_sql = R"V0G0N(
+//DECLARE
+// ans text;
+//BEGIN
+//
+// if fn < 1 then
+//  return case when text = '' then 0 else text::float8 end;
+// end if;
+//
+// ans = split_part(data, E'\x1E', fn);
+//
+// if vn < 1 then
+//  return case when ans = '' then 0 else ans::float8 end;
+// end if;
+//
+// ans = split_part(ans, E'\x1D', vn);
+//
+// if sn < 1 then
+//  return case when ans = '' then 0 else ans::float8  end;
+// end if;
+//
+// ans = split_part(ans, E'\x1C', sn);
+//
+// return case when ans = '' then 0 else ans::float8 end;
+//
+//END;
+//)V0G0N";
+//
+////exodus.count
+//
+//var exodus_count_sql = R"V0G0N(
+//BEGIN
+//
+// return (CHAR_LENGTH(data) - CHAR_LENGTH(REPLACE(data, ch, '')));
+//
+//END;
+//)V0G0N";
 
 subr rawsqlexec(in sql) {
 	if (verbose)

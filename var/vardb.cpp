@@ -5487,9 +5487,16 @@ bool var_db::createindex(in fieldname0, in dictfile) const {
 	if (dictexpression.contains("to_tsvector("))
 		sql ^= " USING GIN";
 	sql ^= " (";
+
+	// Force plain functions into the public. namespace
+	if (dictexpression.starts("dict_"))
+		sql ^= "public.";
+
 	// unaccent requires "CREATE EXTENSION unaccent" in postgres
 	sql ^= dictexpression;
 	sql ^= ")";
+
+	// Omit "info" records with keys staring and ending '%' e.g. '%XYZ%'
 	sql ^= " WHERE left(key,1) <> '%' OR right(key,1) <> '%';";
 
 	var response = "";
