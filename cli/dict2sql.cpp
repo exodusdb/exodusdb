@@ -620,6 +620,8 @@ subr create_function(in functionname_and_args, in return_sqltype, in sql, in sql
 //		if (not filename.deleteindex(fieldname)) {
 //			abort(lasterror());
 //		}
+		if (listindex(filename, fieldname) and not filename.deleteindex(fieldname))
+			loglasterror();
 		logputl("createindex " ^ filename ^ " " ^ fieldname);
 		if (not filename.createindex(fieldname))
 			abort(lasterror());
