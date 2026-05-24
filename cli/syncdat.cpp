@@ -343,7 +343,8 @@ func main() {
 
 		// Load and changed functions into database
 		if (dict2sql_ids) {
-			let cmd = "dict2sql " ^ dbfilename ^ " " ^ dict2sql_ids ^ " {" ^ force ^ verbose ^ "}";
+//			let cmd = "dict2sql " ^ dbfilename ^ " " ^ dict2sql_ids ^ " {" ^ force ^ verbose ^ "}";
+			let cmd = "dict2sql " ^ dbfilename ^ " " ^ dict2sql_ids ^ " {" ^ verbose ^ "}";
 			if (verbose)
 				cmd.logputl();
 			if (not osshell(cmd)) {

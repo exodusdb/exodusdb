@@ -112,6 +112,26 @@ func main() {
 	if (not begintrans())
 		abort(lasterror());
 
+	if (not sqlexec(R"(
+		DO $$
+		DECLARE
+			rec RECORD;
+		BEGIN
+			FOR rec IN
+				SELECT ns.nspname, p.proname, pg_get_function_identity_arguments(p.oid) AS args
+				FROM pg_proc p
+				JOIN pg_namespace ns ON p.pronamespace = ns.oid
+				WHERE ns.nspname = 'exodus'
+				  AND p.proname LIKE 'dict_%'
+			LOOP
+				EXECUTE format('DROP FUNCTION %I.%I(%s) CASCADE;', rec.nspname, rec.proname, rec.args);
+			END LOOP;
+		END $$;
+	)"_heredoc, DATA))
+		loglasterror();
+	if (DATA)
+		logput(DATA);
+
 	// Option to install standard exodus functions
 	if (locateusing(",", filenames.f(1), "pgsql,pgexodus,exodus")) {
 		install_exodus_extensions = filenames.f(1);
@@ -171,8 +191,8 @@ COST 10;
 		//drop function immutable_unaccent(text) cascade;
 
 		// Add the unaccent extension and functions
-        // Maybe better to use the last option "mydict" in the following link
-        // https://dba.stackexchange.com/questions/177020/creating-a-case-insensitive-and-accent-diacritics-insensitive-search-on-a-field
+		// Maybe better to use the last option "mydict" in the following link
+		// https://dba.stackexchange.com/questions/177020/creating-a-case-insensitive-and-accent-diacritics-insensitive-search-on-a-field
 		rawsqlexec("CREATE EXTENSION IF NOT EXISTS unaccent");
 		//
 		rawsqlexec(
@@ -518,6 +538,7 @@ subr create_function(in functionname_and_args, in return_sqltype, in sql, in sql
 
 	// Skip if no change in name, arg types and body
 	if (not force && oldfunction && functionsql.contains(oldfunction) ) {
+//	if (oldfunction.count(FM) < 2 && oldfunction && functionsql.contains(oldfunction) ) {
 		if (verbose)
 			printl(functionname_and_args, "No change. Skipped.");
 		return;
