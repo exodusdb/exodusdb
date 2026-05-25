@@ -71,9 +71,9 @@ PS4='+ [./restore_db ${LIVE_EXO_DATA:-${1-}} ${SECONDS}s] '
 : Restore into the target database
 : ────────────────────────────────────────
 	#zcat $NEW_BACKUP_DIR/$LIVE_EXO_DATA.sql.gz | sudo -u postgres psql $TEST_EXO_DATA > /dev/null
-:   Suppress various "No function matches ..." errors since functions may not be loaded in dependency order
+:   Suppress various "No function matches ..." since functions may not be loaded in dependency order
 	#Example:
-	#ERROR:  function dict_journals_year_period(text, text) does not exist
+	#ERR.R:  function dict_journals_year_period(text, text) does not exist
 	#LINE 3:   '20' || dict_journals_year_period(key,data)
 	#                  ^
 	#HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
@@ -84,7 +84,7 @@ PS4='+ [./restore_db ${LIVE_EXO_DATA:-${1-}} ${SECONDS}s] '
 :
 	zcat $NEW_BACKUP_DIR/$LIVE_EXO_DATA.sql.gz |\
 	sudo -u postgres psql $TEST_EXO_DATA 2>&1 >/dev/null |\
-	(egrep -v '(^ERROR:  function |^LINE [0-9]+: |^  |^HINT:  No function matches |^QUERY: |^CONTEXT: )' || true)
+	(egrep -v '(^ERR.R:  function |^LINE [0-9]+: |^  |^HINT:  No function matches |^QUERY: |^CONTEXT: )' || true)
 :
 : Create all pgsql functions
 : ────────────────────────────────────────
@@ -105,7 +105,7 @@ PS4='+ [./restore_db ${LIVE_EXO_DATA:-${1-}} ${SECONDS}s] '
 			#Get foreign server name
 			FOREIGN_SERVER=`sudo -u postgres psql $TEST_EXO_DATA -t -c "\des+" | awk '{ print $1}'`
 			if [ "`echo $FOREIGN_SERVER | wc -l`" -gt 1 ]; then
-				: "ERROR: Reattaching foreign tables expects only one foreign server!"
+				: "ERR.R: Reattaching foreign tables expects only one foreign server!"
 				exit 1
 			fi
 
