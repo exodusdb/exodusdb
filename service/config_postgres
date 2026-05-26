@@ -7,8 +7,9 @@ PS4='+ [./config_postgres ${SECONDS}s] '
 : ─────────────────────────────────────────────────────────────────────────────────
 : Note: Restarts postgres
 :
-	MAX_CONNECTIONS=500
-	SHARED_BUFFERS=1GB
+	MAX_CONNECTIONS=500                       # postgres default is 100
+	SHARED_BUFFERS=1GB                        # postgres default is 128MB
+	MAX_PARALLEL_SHARED_MAINTENANCE_WORKERS=4 # postgres default is 2
 :
 : Not configuring for SSD because initial tests didnt show much difference
 : ────────────────────────────────────────
@@ -24,10 +25,12 @@ function showmax() {
 : Show the maximum connections and memory reserved
 : ────────────────────────────────────────
 	sudo -u postgres psql <<-V0G0N
+		SELECT pg_reload_conf();
 		show max_connections;
 		show shared_buffers;
 		show random_page_cost;
 		show synchronous_commit;
+		show max_parallel_maintenance_workers;
 	V0G0N
 }
 
@@ -79,7 +82,9 @@ function killidle() {
 #	echo "max_connections = 300" > /etc/postgresql/12/main/conf.d/neosys.conf && service postgresql restart
 	sudo -u postgres psql <<-V0G0N
 		ALTER SYSTEM SET max_connections TO '$MAX_CONNECTIONS';
-		ALTER SYSTEM SET shared_buffers TO '$SHARED_BUFFERS'
+		ALTER SYSTEM SET shared_buffers TO '$SHARED_BUFFERS';
+		ALTER SYSTEM SET max_parallel_maintenance_workers = '$MAX_PARALLEL_MAINTENANCE_WORKERS';
+		SELECT pg_reload_conf();
 	V0G0N
 :
 : Configure for ssd or spinning rust
@@ -102,10 +107,10 @@ function killidle() {
 	sudo -u postgres psql <<-V0G0N
 		ALTER SYSTEM SET log_min_duration_statement TO 500;
 	V0G0N
-:
-: Restart postgresql
-: ────────────────────────────────────────
-	sudo service postgresql restart
+#:
+#: Restart postgresql
+#: ────────────────────────────────────────
+#	sudo service postgresql restart
 :
 : Show the new maxima
 : ────────────────────────────────────────
