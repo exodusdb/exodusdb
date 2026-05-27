@@ -400,7 +400,11 @@ tryagain:
 	}
 
 	// OK to return *this in prefix ++
-	return *this;
+	// Post-grin: we no longer have implicit var_base -> var conversion.
+	// While var publicly inherits from var_base, this static_cast through void*
+	// is the remaining manual "grin" until these operators are moved to be
+	// defined directly on var instead of VB1/var_base.
+	return *static_cast<var*>(static_cast<void*>(this));
 }
 
 // -- VAR
@@ -439,7 +443,8 @@ tryagain:
 	}
 
 	// OK to return *this in prefix --
-	return *this;
+	// Post-grin: manual upcast until these are moved onto var directly.
+	return *static_cast<var*>(static_cast<void*>(this));
 }
 
 //C/C++                Int  Float	Definition

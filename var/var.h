@@ -101,6 +101,10 @@ public:
 	// Move ctor
 	var(var&& other) noexcept = default;
 
+	// Explicit/safe conversion from var_base (replacement for the old
+	// reinterpret_cast-based implicit conversions — the final grin).
+	explicit var(const var_base& base);
+
 	// ASSIGNMENT
 
 	// Inherit all assignment operators to convert all types DIRECTLY
@@ -126,7 +130,10 @@ public:
 
 	// Implicit conversions to var
 
-    using var_base::operator var;  // Stage 1
+    // using var_base::operator var;  // The grin of the Cheshire cat — last to disappear.
+    // These implicit conversions (the final remnants of the old layered hierarchy)
+    // are being removed. Any code that relied on var_base being implicitly convertible
+    // to var must now be updated.
 
 	// Tabular documentation is generated for comments starting /// or more and ending with a colon
 
@@ -1205,6 +1212,15 @@ ND var  var::append(const auto&... appendable)   && {((*this) ^= ... ^= appendab
 
 #ifdef EXO_VAR_CPP
 
+// The grin of the Cheshire cat was last to disappear.
+//
+// These four conversion operators (the final UB-laden link between var_base and var)
+// have been removed. The old layered hierarchy is gone; only the data remains in var_base
+// for now, but implicit punning conversions no longer exist.
+//
+// If something fails to compile, the call site must now explicitly construct a var
+// or the implementation needs to be moved up into var itself.
+#if 0
 // Implicit conversion of var_base to var
 //var_base::operator var()       { return *reinterpret_cast<      var*>(this); }
 //var_base::operator var() const { return *reinterpret_cast<const var*>(this); }
@@ -1213,6 +1229,14 @@ ND var  var::append(const auto&... appendable)   && {((*this) ^= ... ^= appendab
 	CONSTEXPR var_base::operator const var&() const &  { return *reinterpret_cast<const var*>(this); }
 	CONSTEXPR var_base::operator       var&()       &  { return *reinterpret_cast<var*>(this); }
 	CONSTEXPR var_base::operator       var()        && { return *reinterpret_cast<const var*>(this); }
+#endif
+
+// Safe constructor from var_base (the post-grin replacement)
+var::var(const var_base& base)
+	: var_base(base)   // copy the data members
+{
+	// nothing else needed
+}
 
 //	CONSTEXPR var_db::operator       var()  const    { return *reinterpret_cast<const var*>(this); }
 //	CONSTEXPR var_db::operator const var()  const    { return *reinterpret_cast<const var*>(this); }
