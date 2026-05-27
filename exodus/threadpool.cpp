@@ -155,7 +155,8 @@ std::size_t ThreadPool::decrement_total_tasks_enqueued() const {
 std::size_t current = total_tasks_enqueued->load();
 while (current > 0) {
     if (total_tasks_enqueued->compare_exchange_strong(current, current - 1)) {
-        break; // Successfully decremented
+//        break; // Successfully decremented
+		return current - 1;
     }
     // Optional: Add a pause or yield to reduce contention
 //    std::this_thread::yield(); // Helps in high-contention scenarios

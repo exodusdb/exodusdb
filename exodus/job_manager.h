@@ -116,7 +116,7 @@ public:
 	// Get the number of jobs run and pending results.
 	auto run_count() -> var;
 
-	// Decrease the number of jobs pending results.
+	// undocumented
 	auto decrement_run_count() -> var;
 
 	// Wait for all jobs to finish.

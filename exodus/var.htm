@@ -7575,8 +7575,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
-				<code>var v1 = d1[rowno];
-					<br>d1[rowno] = v1;</code></p></td>
+				<code>var v1 = d1[rowno];&lt;br&gt;d1[rowno] = v1;</code></p></td>
 		<td>
 			<p>[row] Access and update dimensioned array elements.</p>
 			<p>Two dimensioned arrays can be traversed, columnwise then rowwise, using one dimension array access and vice versa.</p>
@@ -7591,8 +7590,7 @@ If nfields is negative then delete abs(n) fields before inserting whatever field
 		<td style = "white-space:nowrap"></td>
 		<td>
 			<p>
-				<code>var v1 = d1[rowno, colno];
-					<br>d1[rowno, colno] = v1;</code></p></td>
+				<code>var v1 = d1[rowno, colno];&lt;br&gt;d1[rowno, colno] = v1;</code></p></td>
 		<td>
 			<p>[row, col] Access and update dimensioned array elements.</p>
 			<p>
@@ -9151,16 +9149,6 @@ Optional prefix of "1/" or "/" causes the reciprocal of the number to be used. e
 				<code>run_count()</code></p></td>
 		<td>
 			<p>Get the number of jobs run and pending results.</p>
-		</td></tr>
-	<tr>
-		<td style = "white-space:nowrap">
-			<p>
-				<code>var=</code></p></td>
-		<td>
-			<p>
-				<code>decrement_run_count()</code></p></td>
-		<td>
-			<p>Decrease the number of jobs pending results.</p>
 		</td></tr>
 	<tr>
 		<td style = "white-space:nowrap"></td>
