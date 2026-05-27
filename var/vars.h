@@ -1,57 +1,9 @@
-#ifndef VAR_STR_H
-#define VAR_STR_H
-
-// gendoc: var - String functions
-
-#if EXO_MODULE > 1
-	import std;
-#else
-#	include <array>
-#endif
-
-#include <var/var_iter.h>
-
-namespace exo {
-
-	class rex;
-	class var;
-	class dim;
-
-	// Concept to constrain replace()'s callback function
-	template <typename F>
-	concept ReplacementFunction  = requires(F f, const var& v) {
-		{ f(v) } -> std::same_as<var>; // Must take const var& and return var
-	};
-
-class PUBLIC var_stg : public var_base {
+//#ifndef VAR_STR_H
+//#define VAR_STR_H
+//
+//// gendoc: var - String functions
 
 public:
-
-	// Inherit constructors
-	using var_base::var_base;
-
-	// Inherit assignment operators
-	using var_base::operator=;
-
-	// Inherit conversion to var;
-	using var_base::operator var;
-
-//	using VAR    =       var;
-//	using VARREF =       var&;
-//	using CVR    = const var&;
-//	using TVR    =       var&&;
-
-	using in     = const var_stg&;
-	using out    =       var_stg&;
-	using io     =       var_stg&;
-
-	// Implicitly convert var_stg to var
-
-//	// Type conversion since reference will be optimised away by -O2
-//	// Note that most var_base function directly return a var since var's have full functionality
-//	// and can be implicitly used as var_base but not vice versa.
-//	CONSTEXPR
-//	operator var&() &;
 
 	///////////////////////
 	///// String creation :
@@ -1516,8 +1468,4 @@ private:
 	ND bool no_check_ends(SV substr) const;
 	ND bool no_check_contains(SV substr) const;
 
-};
-
-} // namespace exo
-
-#endif // VAR_STR_H
+//#endif // VAR_STR_H

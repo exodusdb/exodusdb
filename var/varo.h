@@ -2,44 +2,8 @@
 //#define VAR_OS_H
 //
 //// gendoc: var - OS functions
-//
-//#include <var/vars.h>
-//
-//namespace exo {
-//
-//	class rex;
-//	class var;
-//	class dim;
-//
-//class PUBLIC var_os : public var_stg {
 
 public:
-
-//	// Inherit constructors
-//	using var_stg::var_stg;
-//
-//	// Inherit assignment operators
-//	using var_stg::operator=;
-//
-//	// Inherit conversion to var;
-//	using var_stg::operator var;
-//
-////	using VAR    =       var;
-////	using VARREF =       var&;
-////	using CVR    = const var&;
-////	using TVR    =       var&&;
-//
-//	using in     = const var_os&;
-//	using out    =       var_os&;
-//	using io     =       var_os&;
-//
-//	// Implicitly convert var_os to var
-//
-////	// Type conversion since reference will be optimised away by -O2
-////	// Note that most var_base function directly return a var since var's have full functionality
-////	// and can be implicitly used as var_base but not vice versa.
-////	CONSTEXPR
-////	operator var&() &;
 
 	///// OS TIME/DATE:
 	//////////////////
@@ -852,9 +816,5 @@ private:
        bool THIS_IS_OSFILE() const { return ((var_typ & VARTYP_OSFILE) != VARTYP_UNA); }
 
 	ND std::fstream* osopenx(in osfilename, const bool utf8 = true, const bool or_throw = false) const;
-//
-//}; // class var_os
-//
-//} // namespace exo
-//
+
 //#endif // VAR_OS_H

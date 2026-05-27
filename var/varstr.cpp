@@ -43,11 +43,10 @@ void extract_v4(char * instring, int inlength, int fieldno, int valueno, int sub
 namespace exo {
 
 using let = const var;
-//using out = var_stg&;
 
 // includes dim::split
 
-// and var_stg::field,field2,locate,extract,remove,update,insert,substr,paste,remove
+// and var::field,field2,locate,extract,remove,update,insert,substr,paste,remove
 
 //////////////////////////////
 // REMOVE was PickOS "DELETE()"
@@ -74,7 +73,7 @@ using let = const var;
 ////////
 
 // var.field(separator,fieldno,nfields)
-var  var_stg::field(SV delimiter, const int fieldnx, const int nfieldsx) const {
+var  var::field(SV delimiter, const int fieldnx, const int nfieldsx) const {
 
 	THISIS("var  var::field(SV delimiter, const int fieldnx, const int nfieldsx) const")
 	assertString(function_sig);
@@ -165,7 +164,7 @@ var  var_stg::field(SV delimiter, const int fieldnx, const int nfieldsx) const {
 //}
 
 // Mutator
-IO   var_stg::fieldstorer(SV separator, const int fieldnx, const int nfieldsx, in replacementx) REF {
+IO   var::fieldstorer(SV separator, const int fieldnx, const int nfieldsx, in replacementx) REF {
 
 	THISIS("void var::fieldstorer(SV separator0, const int fieldnx, const int nfieldsx, in replacementx) &")
 	assertStringMutator(function_sig);
@@ -263,13 +262,13 @@ IO   var_stg::fieldstorer(SV separator, const int fieldnx, const int nfieldsx, i
 // Defined in varlisted.cpp
 auto findSubstringInCommaSeparated(SV s1, SV s2, bool indexed = true) -> std::size_t;
 
-bool var_stg::listed(SV list) const {
+bool var::listed(SV list) const {
 	THISIS("bool var::listed(SV list) const")
 	assertString(function_sig);
 	return findSubstringInCommaSeparated(var_str, list, false);
 }
 
-bool var_stg::listed(SV list, out position) const {
+bool var::listed(SV list, out position) const {
 	// TODO position = max count + 1 if not found
 	THISIS("bool var::listed(SV list, out position) const")
 	assertString(function_sig);
@@ -283,7 +282,7 @@ bool var_stg::listed(SV list, out position) const {
 
 // hardcore string locate function given a section of a string and all parameters
 
-static bool locateat(SV sv_source, SV sv_target, const char* ordercode, SV usingchar, /*out*/ var_stg& setting) {
+static bool locateat(SV sv_source, SV sv_target, const char* ordercode, SV usingchar, /*out*/ var& setting) {
 
 	// Use vars in AR/DR for numerical ordering
 	var var_target;
@@ -456,7 +455,7 @@ static bool locateat(SV sv_source, SV sv_target, const char* ordercode, SV using
 }
 
 // locate within extraction
-static bool locatex(SV source, SV target, const char* ordercode, SV usingchar, /*out*/ var_stg& setting, int fieldno, int valueno, const int subvalueno) {
+static bool locatex(SV source, SV target, const char* ordercode, SV usingchar, /*out*/ var& setting, int fieldno, int valueno, const int subvalueno) {
 	// private - assume everything is defined/assigned correctly
 
 	// any negatives at all returns ""
@@ -603,7 +602,7 @@ static bool locatex(SV source, SV target, const char* ordercode, SV usingchar, /
 	return locateat(SV(source.data() + pos, subvalue_end_pos - pos), target, ordercode, usingchar, setting);
 }
 
-bool var_stg::locate(in target, out setting, const int fieldno, const int valueno /*=0*/) const {
+bool var::locate(in target, out setting, const int fieldno, const int valueno /*=0*/) const {
 
 	THISIS("bool var::locate(in target, out setting, const int fieldno, const int valueno) const")
 	assertString(function_sig);
@@ -625,7 +624,7 @@ bool var_stg::locate(in target, out setting, const int fieldno, const int valuen
 }
 
 //// default locate using VM
-//bool var_stg::locate(in target, out setting) const {
+//bool var::locate(in target, out setting) const {
 //
 //	THISIS("bool var::locate(in target, out setting, const int fieldno, const int valueno) const")
 //	assertString(function_sig);
@@ -636,7 +635,7 @@ bool var_stg::locate(in target, out setting, const int fieldno, const int valuen
 //}
 //
 //// without setting
-//bool var_stg::locate(in target) const {
+//bool var::locate(in target) const {
 //
 //	THISIS("bool var::locate(in target) const")
 //	assertString(function_sig);
@@ -647,7 +646,7 @@ bool var_stg::locate(in target, out setting, const int fieldno, const int valuen
 //}
 
 //// without setting
-//bool var_stg::locate(in target) const {
+//bool var::locate(in target) const {
 //
 //	THISIS("bool var::locate(in target) const")
 //	assertString(function_sig);
@@ -706,7 +705,7 @@ static inline std::size_t count_all_field_marks(SV sv1) {
 
 // locate with setting.
 // Returns nfields + 1 in setting if not found
-bool var_stg::locate(in target, out setting) const {
+bool var::locate(in target, out setting) const {
 
 //	THISIS("bool var::locate(in target, out setting) const")
 //	assertString(function_sig);
@@ -746,7 +745,7 @@ inline std::size_t find_first_fm(const std::string& s1, std::size_t pos) {
 
 // locate without setting.
 // Returns field/value number etc. if found else 0
-var var_stg::locate(in target) const {
+var var::locate(in target) const {
 
 	THISIS("var  var::locate(in target) const")
 	assertString(function_sig);
@@ -841,20 +840,20 @@ next_search:
 ////////////
 
 //// 1. rare syntax where the order is given as a variable
-//bool var_stg::locateby(in ordercode, in target, out setting, const int fieldno, const int valueno /*=0*/) const {
+//bool var::locateby(in ordercode, in target, out setting, const int fieldno, const int valueno /*=0*/) const {
 //	return locateby(ordercode.toString().c_str(), target, setting, fieldno, valueno);
 //}
 
 //// 2. no fieldno or valueno means locate using character VM
 //// caters for the rare syntax where the order is given as a variable
-//bool var_stg::locateby(in ordercode, in target, out setting) const {
+//bool var::locateby(in ordercode, in target, out setting) const {
 //	return locateby(ordercode.toString().c_str(), target, setting);
 //}
 
 // 3. no fieldno or valueno means locate using character VM
 // specialised const char version of ordercode for speed of usual syntax where ordermode is given as
 // string it avoids the conversion from string to var and back again
-bool var_stg::locateby(const char* ordercode, in target, out setting) const {
+bool var::locateby(const char* ordercode, in target, out setting) const {
 
 	THISIS("bool var::locateby(const char* ordercode, in target, out setting) const")
 	assertString(function_sig);
@@ -876,7 +875,7 @@ bool var_stg::locateby(const char* ordercode, in target, out setting) const {
 
 // 4. specialised const char version of ordercode for speed of usual syntax where ordermode is given as
 // string it avoids the conversion from string to var and back again
-bool var_stg::locateby(const char* ordercode, in target, out setting, const int fieldno, const int valueno /*=0*/) const {
+bool var::locateby(const char* ordercode, in target, out setting, const int fieldno, const int valueno /*=0*/) const {
 
 	THISIS("bool var::locateby(const char* ordercode, in target, out setting, const int fieldno, const int valueno) const")
 	assertString(function_sig);
@@ -909,7 +908,7 @@ bool var_stg::locateby(const char* ordercode, in target, out setting, const int 
 // LOCATE BY, USING
 ///////////////////
 
-bool var_stg::locatebyusing(const char* ordercode, const char* usingchar, in target, out setting, const int fieldno /*=0*/, const int valueno /*=0*/, const int subvalueno /*=0*/) const {
+bool var::locatebyusing(const char* ordercode, const char* usingchar, in target, out setting, const int fieldno /*=0*/, const int valueno /*=0*/, const int subvalueno /*=0*/) const {
 
 	THISIS("bool var::locatebyusing(const char* ordercode, const char* usingchar, in target, out setting, const int fieldno, const int valueno, const int valueno) const")
 	assertString(function_sig);
@@ -933,7 +932,7 @@ bool var_stg::locatebyusing(const char* ordercode, const char* usingchar, in tar
 ///////////////
 
 // 1. simple version
-bool var_stg::locateusing(const char* usingchar, in target) const {
+bool var::locateusing(const char* usingchar, in target) const {
 
 	THISIS("bool var::locateusing(const char* usingchar, in target) const")
 	assertString(function_sig);
@@ -946,7 +945,7 @@ bool var_stg::locateusing(const char* usingchar, in target) const {
 }
 
 // 2. specify field/value/subvalue and return position
-bool var_stg::locateusing(const char* usingchar, in target, out setting, const int fieldno /*=0*/, const int valueno /*=0*/, const int subvalueno /*=0*/) const {
+bool var::locateusing(const char* usingchar, in target, out setting, const int fieldno /*=0*/, const int valueno /*=0*/, const int subvalueno /*=0*/) const {
 
 //	THISIS("bool var::locateusing(const char* usingchar, in target, out setting, const int fieldno, const int valueno, const int subvalueno) const")
 	THISIS("bool var::locateusing(const char* usingchar, in target, out setting, const int fieldno, const int valueno, const int subvalueno) const")
@@ -973,7 +972,7 @@ bool var_stg::locateusing(const char* usingchar, in target, out setting, const i
 // Abbreviated xxxx.f(1,2,3) syntax. PickOS angle bracket syntax (xxx<1,2,3>) not possible in C++
 //     xxx = yyy.f(1,2,3)
 //
-var  var_stg::f(const int argfieldn, const int argvaluen/*=0*/, const int argsubvaluen/*=0*/) const {
+var  var::f(const int argfieldn, const int argvaluen/*=0*/, const int argsubvaluen/*=0*/) const {
 
 	THISIS("var  var::f(const int argfieldn, const int argvaluen, const int argsubvaluen) const")
 	assertString(function_sig);
@@ -1108,23 +1107,23 @@ var  var_stg::f(const int argfieldn, const int argvaluen/*=0*/, const int argsub
 //starting is equivalent to x::index(y) == 1
 //contains is equivalent to x::index(y) != 0
 
-bool var_stg::starts(SV prefix) const {
+bool var::starts(SV prefix) const {
 
 	THISIS("bool var::starts(SV prefix) const")
 	assertString(function_sig);
 
-	// Differ from c++, javascript, python3 - see comment on var_stg::contains
+	// Differ from c++, javascript, python3 - see comment on var::contains
 	return no_check_starts(prefix);
 }
 
-bool var_stg::no_check_starts(SV prefix) const {
+bool var::no_check_starts(SV prefix) const {
 	if (prefix.empty())
 		return false;
 
 	return var_str.starts_with(prefix);
 }
 
-bool var_stg::ends(SV suffix) const {
+bool var::ends(SV suffix) const {
 
 	THISIS("bool var::ends(SV suffix) const")
 	assertString(function_sig);
@@ -1133,7 +1132,7 @@ bool var_stg::ends(SV suffix) const {
 	return no_check_ends(suffix);
 }
 
-bool var_stg::no_check_ends(SV suffix) const {
+bool var::no_check_ends(SV suffix) const {
 
 	if (suffix.empty())
 		return false;
@@ -1141,7 +1140,7 @@ bool var_stg::no_check_ends(SV suffix) const {
 	return var_str.ends_with(suffix);
 }
 
-bool var_stg::contains(SV substr) const {
+bool var::contains(SV substr) const {
 
 	THISIS("bool var::contains(SV substr) const")
 	assertString(function_sig);
@@ -1157,7 +1156,7 @@ bool var_stg::contains(SV substr) const {
 	return no_check_contains(substr);
 }
 
-bool var_stg::no_check_contains(SV substr) const {
+bool var::no_check_contains(SV substr) const {
     if (substr.empty())
         return false;
 
@@ -1175,7 +1174,7 @@ bool var_stg::no_check_contains(SV substr) const {
 
 //[1,1]
 // .substr(1,1)
-var  var_stg::first() const& {
+var  var::first() const& {
 
 	THISIS("var  var::first() const")
 	assertString(function_sig);
@@ -1193,7 +1192,7 @@ var  var_stg::first() const& {
 
 //[1,1]
 // .substr(1,1)
-IO   var_stg::firster() REF {
+IO   var::firster() REF {
 
 	THISIS("void var::firster() &")
 	assertStringMutator(function_sig);
@@ -1206,7 +1205,7 @@ IO   var_stg::firster() REF {
 	return THIS;
 }
 
-var  var_stg::first(const std::size_t  length) const& {
+var  var::first(const std::size_t  length) const& {
 
 	THISIS("var  var::first(const std::size_t length) const")
 	assertString(function_sig);
@@ -1224,7 +1223,7 @@ var  var_stg::first(const std::size_t  length) const& {
 
 //[1,y]
 // var.substr(1,length)
-IO   var_stg::firster(const std::size_t length) REF {
+IO   var::firster(const std::size_t length) REF {
 
 	THISIS("void var::firster(const std::size_t length) &")
 	assertStringMutator(function_sig);
@@ -1249,7 +1248,7 @@ IO   var_stg::firster(const std::size_t length) REF {
 
 // [-1]
 // .substr(1, 1)
-var  var_stg::last() const& {
+var  var::last() const& {
 
 	THISIS("var  var::last() const")
 	assertString(function_sig);
@@ -1265,7 +1264,7 @@ var  var_stg::last() const& {
 
 //[-1]
 // .substr(-1,1)
-IO   var_stg::laster() REF {
+IO   var::laster() REF {
 
 	THISIS("void var::laster() &")
 	assertStringMutator(function_sig);
@@ -1278,7 +1277,7 @@ IO   var_stg::laster() REF {
 }
 
 
-var  var_stg::last(const std::size_t  length) const& {
+var  var::last(const std::size_t  length) const& {
 
 	THISIS("var  var::last(const std::size_t length) const")
 	assertString(function_sig);
@@ -1308,7 +1307,7 @@ var  var_stg::last(const std::size_t  length) const& {
 
 //[-y]
 // var.s(-length) substring
-IO   var_stg::laster(const std::size_t length) REF {
+IO   var::laster(const std::size_t length) REF {
 
 	THISIS("void var::laster(const std::size_t length) &")
 	assertStringMutator(function_sig);
@@ -1340,7 +1339,7 @@ IO   var_stg::laster(const std::size_t length) REF {
 // var[1,length] = ""         cut first n bytes
 // var[-length, length] = ""  cut last n bytes
 
-var  var_stg::cut(const int length) const& {
+var  var::cut(const int length) const& {
 
 	THISIS("var  var::cut(const int length) const")
 	assertString(function_sig);
@@ -1384,7 +1383,7 @@ var  var_stg::cut(const int length) const& {
 // x[1, length] = ""
 // x[-length, length] = ""
 
-IO   var_stg::cutter(const int length) REF {
+IO   var::cutter(const int length) REF {
 
 	THISIS("void var::cutter(const int length) &")
 	assertStringMutator(function_sig);
@@ -1472,7 +1471,7 @@ IO   var_stg::cutter(const int length) REF {
 
 //// x[1, length] = ""
 //// x[-length, length] = ""
-//io   var_stg::cutter(const int length) {
+//io   var::cutter(const int length) {
 //
 //	THISIS("io   var::cutter(const int length)")
 //	assertStringMutator(function_sig);
@@ -1526,7 +1525,7 @@ IO   var_stg::cutter(const int length) REF {
 
 //[x,y]
 // var.s(start,length) substring
-IO   var_stg::substrer(const int pos1, const int length) REF {
+IO   var::substrer(const int pos1, const int length) REF {
 
 	THISIS("void var::substrer(const int pos1, const int length) &")
 	assertStringMutator(function_sig);
@@ -1602,7 +1601,7 @@ IO   var_stg::substrer(const int pos1, const int length) REF {
 
 // performs an operation + - * / : on two multivalued strings in parallel
 // returning a multivalued string of the results
-var  var_stg::mv(const char* opcode, in var2) const {
+var  var::mv(const char* opcode, in var2) const {
 
 	THISIS("var  var::multivalued(const char* opcode, in var2) const")
 	assertString(function_sig);
@@ -1723,13 +1722,13 @@ getnextp2:
 }
 
 ////////
-// SUBSTR upto any specified characters - similar to var_stg::substr3
+// SUBSTR upto any specified characters - similar to var::substr3
 ////////
 
 // version 3 returns the characters up to the next delimiter
 // also returns the index of the next delimiter discovered or 1 after the string if none (like
 // COL2() in pickos) NOTE pos1 is 1 based not 0. anything less than 1 is treated as 1
-var  var_stg::substr(const int pos1, SV delimiterchars, out pos2) const {
+var  var::substr(const int pos1, SV delimiterchars, out pos2) const {
 
 	THISIS("var  var::substr(const int pos1, SV delimiterchars, out pos2) const")
 	assertString(function_sig);
@@ -1784,7 +1783,7 @@ var  var_stg::substr(const int pos1, SV delimiterchars, out pos2) const {
 // returns the characters up to the next delimiter
 // delimiter returned as numbers RM=1F=1 FM=1E=2, VM=1D=3 SM=1C=4 TM=1B=5 to STM=1A=6 or 0 if not found
 // NOTE pos1 is 1 based not 0. anything less than 1 is treated as 1
-var  var_stg::substr2(io pos1, out delimiterno) const {
+var  var::substr2(io pos1, out delimiterno) const {
 
 	THISIS("var  var::substr2(io pos1, out delimiterno) const")
 	assertString(function_sig);
@@ -1847,7 +1846,7 @@ var  var_stg::substr2(io pos1, out delimiterno) const {
 //////
 // SUM
 //////
-var  var_stg::sumall() const {
+var  var::sumall() const {
 
 	THISIS("var  var::sumall() const")
 	assertString(function_sig);
@@ -1886,7 +1885,7 @@ var  var_stg::sumall() const {
 	return nrvo.round(static_cast<int>(maxdecimals));
 }
 
-var  var_stg::sum() const {
+var  var::sum() const {
 
 	THISIS("var  var::sum() const")
 	assertString(function_sig);
@@ -2002,7 +2001,7 @@ var  var_stg::sum() const {
 	return nrvo;
 }
 
-var  var_stg::sum(SV separator) const {
+var  var::sum(SV separator) const {
 
 	THISIS("var  var::sum(SV separator) const")
 	assertString(function_sig);
@@ -2027,7 +2026,7 @@ var  var_stg::sum(SV separator) const {
 	return nrvo;	//NRVO hopefully since single named return
 }
 
-var  var_stg::stddev() const {
+var  var::stddev() const {
 
 	THISIS("var  var::stddev() const")
 	assertString(function_sig);

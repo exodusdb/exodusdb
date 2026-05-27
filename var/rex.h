@@ -15,7 +15,6 @@ namespace exo {
 class PUBLIC rex final {
 
 friend class var;
-friend class var_stg;
 friend class var_base;
 
  private:

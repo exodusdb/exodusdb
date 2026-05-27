@@ -373,9 +373,9 @@ var  dim::join(SV delimiter) const {
 	return nrvo;
 }
 
-// var_stg::split()
+// var::split()
 // d1 = v1.split()
-dim  var_stg::split(SV delimiter) const {
+dim  var::split(SV delimiter) const {
 
 	// Will be dimensioned to hold the exact number of fields present
 	dim nrvo;
@@ -384,7 +384,7 @@ dim  var_stg::split(SV delimiter) const {
 }
 
 // d.splitter(v, sep)
-void dim::splitter(/*in*/ const var_stg& str1, SV delimiter) {
+void dim::splitter(/*in*/ const var& str1, SV delimiter) {
 
 	//TODO If delimiter is "" split every utf8 chararacter?
 
@@ -581,13 +581,13 @@ bool dim::oswrite(in osfilename, const char* codepage) const {
 
 // no speed or memory advantage since not sorting in place
 // but provided for syntactical convenience avoiding need to assign output of sort()
-IO   var_stg::sorter(SV delimiter) REF {
+IO   var::sorter(SV delimiter) REF {
 	(*this) = this->split(delimiter).sort().join(delimiter);
 	return THIS;
 }
 
 //sorting var - using temporary dim
-var  var_stg::sort(SV delimiter) const& {
+var  var::sort(SV delimiter) const& {
 
 	THISIS("var  var::sort(SV delimiter)")
 	assertString(function_sig);
@@ -607,13 +607,13 @@ var  var_stg::sort(SV delimiter) const& {
 
 // no speed or memory advantage since not sorting in place
 // but provided for syntactical convenience avoiding need to assign output of reverse()
-IO   var_stg::reverser(SV delimiter) REF {
+IO   var::reverser(SV delimiter) REF {
 	(*this) = this->split(delimiter).reverse().join(delimiter);
 	return THIS;
 }
 
 //reversing var - not using dim
-var  var_stg::reverse(SV delimiter) const& {
+var  var::reverse(SV delimiter) const& {
 
 	THISIS("var  var::reverse(SV delimiter)")
 	assertString(function_sig);
@@ -710,14 +710,14 @@ var  var_stg::reverse(SV delimiter) const& {
 
 // No speed or memory advantage since not shuffling in place
 // but provided for syntactical convenience avoiding need to assign output of randomize()
-IO   var_stg::randomizer(SV delimiter) REF {
+IO   var::randomizer(SV delimiter) REF {
 	*this = this->split(delimiter).randomize().join(delimiter);
 	return THIS;
 }
 
 // No speed or memory advantage since not shuffling in place
 // but provided for syntactical convenience avoiding need to assign output of randomize()
-var  var_stg::randomize(SV delimiter) const& {
+var  var::randomize(SV delimiter) const& {
 	auto _ = this->split(delimiter);
 	_.randomizer();
 	return _.join(delimiter);

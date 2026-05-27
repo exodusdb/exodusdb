@@ -2371,7 +2371,7 @@ func main() {
 		auto [v1, v2, v3] = d1.unpack<3>();  assert(v1.errputl() == "d1" ); assert(v2.errputl() == "d2" ); assert(v3.errputl() == "d3");
 	}
 
-	printl("splitter(/*in*/ const var_stg& str1, SV delimiter = _FM);");
+	printl("splitter(/*in*/ const var& str1, SV delimiter = _FM);");
 	{
 		dim d1;
 		d1.splitter("f1^f2^f3"_var);  assert(d1.rows().errputl() == 3  );//// Automatically dimensioned.

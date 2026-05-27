@@ -75,9 +75,9 @@ VarError::VarError(std::string message_)
 
 	// Hide inherited complexity of var class
 	if (message.find("var_") != std::string::npos) {
-		replace_all_inplace(message, "exo::var_base<exo::var_stg<exo::var>>", "var");
-		replace_all_inplace(message, " [var = exo::var_stg<exo::var>]", "");
-		replace_all_inplace(message, " [var = exo::var_stg<exo::var>, ", "[");
+		replace_all_inplace(message, "exo::var_base<exo::var<exo::var>>", "var");
+		replace_all_inplace(message, " [var = exo::var<exo::var>]", "");
+		replace_all_inplace(message, " [var = exo::var<exo::var>, ", "[");
 	}
 
 	// Flush any stdout error messages out

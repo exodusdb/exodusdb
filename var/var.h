@@ -42,11 +42,14 @@ THE SOFTWARE.
 
 #include <var/format.h>
 
+#include <var/var_iter.h>
+
 namespace exo {
 
 	class var;
 	class rex;
 	class dim;
+
 	class var_proxy1;
 	class var_proxy2;
 	class var_proxy3;
@@ -59,13 +62,20 @@ namespace exo {
 	using in     = const var&;
 	using out    =       var&;
 	using io     =       var&;
+
+	// Concept to constrain replace()'s callback function
+	template <typename F>
+	concept ReplacementFunction  = requires(F f, const var& v) {
+		{ f(v) } -> std::same_as<var>; // Must take const var& and return var
+	};
+
 }
 
-#include <var/vars.h>
+#include <var/varb.h>
 
 namespace exo {
 
-class PUBLIC var : public var_stg {
+class PUBLIC var : public var_base {
 
 	// "using" applies to all member functions except ctor/dtor/operator
 	using CVR    = const var&;
@@ -82,8 +92,8 @@ public:
 	// Note:  Define all ctor/assign/conversions inline to ensure optimisation can remove redundant assembler.
 	// This is important for value types like var.
 
-	// Inherit all constructors from var_stg > var_stg > var_base (Stage 1)
-	using var_stg::var_stg;
+	// Inherit all constructors from var_base > var_base > var_base (Stage 1)
+	using var_base::var_base;
 
 	// Copy ctor
 	var(const var& other) = default;
@@ -95,28 +105,28 @@ public:
 
 	// Inherit all assignment operators to convert all types DIRECTLY
 	// otherwise we get nonsense like using our implicit copy/move ctors from var AFTER using var_base ctors from various types
-    using var_stg::operator=;  // Stage 1
+    using var_base::operator=;  // Stage 1
 
 	// Return void to prevent accidental use in conditionals (e.g., if (v = "x"))
 	// and to discourage assignment chaining, enhancing code clarity.
 
 	// Copy assignment
 	void /*var&*/ operator=(const var& other) {  // Suppress implicit operators
-		var_stg::operator=(other);  // Stage 1
+		var_base::operator=(other);  // Stage 1
 		return /**this*/;
 	}
 
 	// Move assignment
-	void /*var&*/ operator=(var&& other) & noexcept { var_stg::operator=(std::move(other)); }
+	void /*var&*/ operator=(var&& other) & noexcept { var_base::operator=(std::move(other)); }
 
 	// Initializer list
 	void /*var&*/ operator=(std::initializer_list<var> list) & {
-		var_stg::operator=(var(list));  // Stage 1
+		var_base::operator=(var(list));  // Stage 1
 	}
 
 	// Implicit conversions to var
 
-    using var_stg::operator var;  // Stage 1
+    using var_base::operator var;  // Stage 1
 
 	// Tabular documentation is generated for comments starting /// or more and ending with a colon
 
@@ -844,6 +854,7 @@ public:
 // into the public part of var.
 #include "vard.h"
 #include "varo.h"
+#include "vars.h"
 
 };  // class "var"
 
@@ -1144,17 +1155,17 @@ ND PUBLIC var  operator""_var(long double d);
 ND PUBLIC var  operator""_heredoc(const char* cstr, std::size_t size);
 
 ///////////////////////////////
-// var_stg template definitions
+// var template definitions
 ///////////////////////////////
 
 // Replace
 
-ND var  var_stg::replace(const rex& regex, ReplacementFunction auto repl_func)
+ND var  var::replace(const rex& regex, ReplacementFunction auto repl_func)
                                                            && {replacer(regex,repl_func);    return move();}
 
-   IO   var_stg::replacer(const rex& regex, ReplacementFunction auto repl_func) REF {*this = replace(regex, repl_func);}
+   IO   var::replacer(const rex& regex, ReplacementFunction auto repl_func) REF {*this = replace(regex, repl_func);}
 
-ND var  var_stg::replace(const rex& regex, ReplacementFunction auto repl_func) const & {
+ND var  var::replace(const rex& regex, ReplacementFunction auto repl_func) const & {
 
 	// Lambda to bridge the callable to a function pointer + context
 	struct Context {decltype(repl_func)* lambda;};
@@ -1172,7 +1183,7 @@ ND var  var_stg::replace(const rex& regex, ReplacementFunction auto repl_func) c
 // Unpack
 
 template <std::size_t N>
-auto var_stg::unpack/*<N>*/(SV delim /*= _FM*/) const -> std::array<var, N> {
+auto var::unpack/*<N>*/(SV delim /*= _FM*/) const -> std::array<var, N> {
     THISIS("auto var::unpack<N>(SV delim = _FM) const")
     assertString(function_sig);
 
@@ -1189,8 +1200,8 @@ auto var_stg::unpack/*<N>*/(SV delim /*= _FM*/) const -> std::array<var, N> {
 
 // Append
 
-ND var  var_stg::append(const auto&... appendable) const& {var nrvo = this->clone(); (nrvo ^= ... ^= appendable); return nrvo;}
-ND var  var_stg::append(const auto&... appendable)   && {((*this) ^= ... ^= appendable);      return move();}
+ND var  var::append(const auto&... appendable) const& {var nrvo = this->clone(); (nrvo ^= ... ^= appendable); return nrvo;}
+ND var  var::append(const auto&... appendable)   && {((*this) ^= ... ^= appendable);      return move();}
 
 #ifdef EXO_VAR_CPP
 

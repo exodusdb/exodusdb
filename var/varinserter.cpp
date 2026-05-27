@@ -3,7 +3,7 @@
 // nano varreplacer.cpp varinserter.cpp varremover.cpp
 // alt+, and alt+. to switch file in nano
 
-IO   var_stg::inserter(const int fieldno, const int valueno, const int subvalueno, in insertion) REF {
+IO   var::inserter(const int fieldno, const int valueno, const int subvalueno, in insertion) REF {
 
 	THISIS("void var::inserter(const int fieldno, const int valueno, const int subvalueno, in insertion) &")
 	assertStringMutator(function_sig);

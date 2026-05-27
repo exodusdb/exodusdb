@@ -1647,7 +1647,7 @@ bool var::read(in file, in key) {
 	return true;
 }
 
-var  var_stg::hash(const std::uint64_t modulus) const {
+var  var::hash(const std::uint64_t modulus) const {
 
 	THISIS("var  var::hash() const")
 	assertVar(function_sig);

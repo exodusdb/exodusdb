@@ -103,10 +103,6 @@ namespace exo {
 // Forward declarations
 
 class var;
-class var_stg;
-class var_os;
-class var_db;
-//class var_stg; // forward declaration of a class template
 class var_iter;
 
 #define VB1         var_base
