@@ -317,11 +317,11 @@ class PUBLIC dim final : public std::vector<var> {
 	//  d1[3] = "X";
 	//  let v1 = d1[3]; // "X"`
 	//
-	ND VARREF operator[](int rowno) {return getelementref(rowno, 0);}
+	ND VARREF operator[](int rowno) {return base::operator[](get_cell_index(rowno, 0));}
 
 	// Following const version is called if we do () on a dim which was defined as const xx
 	// Undocumented
-	ND CVR operator[](int rowno) const {return getelementref(rowno, 0);}
+	ND CVR operator[](int rowno) const {return base::operator[](get_cell_index(rowno, 0));}
 
 	// Provide 2d version of bracket operator if c++23+
 	// and deprecate the parenthesis operator
@@ -341,14 +341,14 @@ class PUBLIC dim final : public std::vector<var> {
 	ND VARREF operator[](int rowno, int colno) {
 		if (!colno)
 			throw DimIndexOutOfBounds("colno:" ^ var(colno));
-		return getelementref(rowno, colno);
+		return base::operator[](get_cell_index(rowno, colno));
 	}
 
 	// Undocumented
 	ND CVR operator[](int rowno, int colno) const {
 		if (!colno)
 			throw DimIndexOutOfBounds("colno:" ^ var(colno));
-		return getelementref(rowno, colno);
+		return base::operator[](get_cell_index(rowno, colno));
 	}
 #else
 #	define DEPRECATED_PARENS [[deprecated("EXODUS: Replace single dimensioned array accessors like () with [] e.g. dimarray(n) -> dimarray[n]")]]
@@ -357,10 +357,10 @@ class PUBLIC dim final : public std::vector<var> {
 
 	DEPRECATED_PARENS
 	// Undocumented
-	ND VARREF operator()(int rowno) {return getelementref(rowno, 0);}
+	ND VARREF operator()(int rowno) {return base::operator[](get_cell_index(rowno, 0));}
 	DEPRECATED_PARENS
 	// Undocumented
-	ND CVR operator()(int rowno) const {return getelementref(rowno, 0);}
+	ND CVR operator()(int rowno) const {return base::operator[](get_cell_index(rowno, 0));}
 
 	// Parenthesis operators often come in pairs
 	// Returns a reference to one var of the array
@@ -372,14 +372,14 @@ class PUBLIC dim final : public std::vector<var> {
 	ND VARREF operator()(int rowno, int colno) {
 		if (!colno)
 			throw DimIndexOutOfBounds("colno:" ^ var(colno));
-		return getelementref(rowno, colno);
+		return base::operator[](get_cell_index(rowno, colno));
 	}
 	DEPRECATED_PARENS2
 	// Undocumented
 	ND CVR operator()(int rowno, int colno) const {
 		if (!colno)
 			throw DimIndexOutOfBounds("colno:" ^ var(colno));
-		return getelementref(rowno, colno);
+		return base::operator[](get_cell_index(rowno, colno));
 	}
 	// Transition alternative for () and [] syntax to be used in libexodus, cli, service and test.
 	// Should be removed in 2028 when Ubuntu 24.04 is the oldest to be supported by exodus
@@ -387,13 +387,13 @@ class PUBLIC dim final : public std::vector<var> {
 	ND VARREF at(int rowno, int colno) {
 		if (!colno)
 			throw DimIndexOutOfBounds("colno:" ^ var(colno));
-		return getelementref(rowno, colno);
+		return base::operator[](get_cell_index(rowno, colno));
 	}
 	// [[deprecated
 	ND CVR at(int rowno, int colno) const {
 		if (!colno)
 			throw DimIndexOutOfBounds("colno:" ^ var(colno));
-		return getelementref(rowno, colno);
+		return base::operator[](get_cell_index(rowno, colno));
 	}
 	// obj is d1
 
@@ -646,8 +646,9 @@ class PUBLIC dim final : public std::vector<var> {
 
 	dim& init(in var1);
 
-	ND CVR getelementref(int row, int colno) const;
-	ND VARREF getelementref(int row, int colno);
+//	ND CVR getelementref(int row, int colno) const;
+//	ND VARREF getelementref(int row, int colno);
+	ND auto get_cell_index(int row, int colno) const -> size_t;
 
 }; // class dim
 

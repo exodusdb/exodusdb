@@ -152,14 +152,13 @@ void dim::redim(/*unsigned*/ int rows, /*unsigned*/ int cols) {
 	return;
 }
 
-// dim[] operator utility (non-const)
-VARREF dim::getelementref(int rowno, int colno) {
-	return const_cast<var&>(const_cast<const dim*>(this)->getelementref(rowno, colno));
-}
+//// dim[] operator utility (non-const)
+//VARREF dim::getelementref(int rowno, int colno) {
+//	return const_cast<var&>(const_cast<const dim*>(this)->getelementref(rowno, colno));
+//}
 
-
-CVR dim::getelementref(int rowno1, int colno1) const {
-	THISIS("CVR  dim::getelementref(int rowno1, int colno1) const")
+auto dim::get_cell_index(int rowno1, int colno1) const -> size_t {
+	THISIS("size dim::get_cell_index(int rowno1, int colno1) const")
 
 	// rowno1 and colno1 is 1 based index into our inherited base (std::vector)
 	// Allow 1d access to 2d data but not vice versa.
@@ -231,7 +230,8 @@ throw_bounds_error_col:
 		);
 	}
 
-	return base::operator[](cell_index0);
+//	return base::operator[](cell_index0);
+	return cell_index0;
 }
 
 //// dim[] operator utility (const)
