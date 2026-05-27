@@ -203,7 +203,7 @@ class PUBLIC var_base {
 	friend class var;
 	friend class var_stg;
 	friend class var_os;
-	friend class var_db;
+//	friend class var_db;
 	friend class var_iter;
 	friend class dim;
 //	friend class rex;

@@ -5,7 +5,7 @@
 
 namespace exo {
 
-bool var_os::isterminal(const int in_out_err) const {
+bool var::isterminal(const int in_out_err) const {
 
 	// 0 stdin, 1 stdout, 2 stderr/stdlog
 	int filen;
@@ -20,7 +20,7 @@ bool var_os::isterminal(const int in_out_err) const {
 }
 
 //echo on/off true/false
-bool var_os::echo(const bool on_off) const {
+bool var::echo(const bool on_off) const {
 
 	// Probably not available if running as a service or in a pipe
 	struct termios curtio;

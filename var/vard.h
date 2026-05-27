@@ -1,40 +1,40 @@
-#ifndef VAR_DB_H
-#define VAR_DB_H
-
-// gendoc: var - DB functions
-
-#include <var/varb.h>
-//#include <var/vars.h>
-#include <var/varo.h>
-//#include <var/var.h>
-
-namespace exo {
-
-	class rex;
-	class var;
-	class dim;
-
-class PUBLIC var_db : public var_os {
-
+//#ifndef VAR_DB_H
+//#define VAR_DB_H
+//
+//// gendoc: var - DB functions
+//
+//#include <var/varb.h>
+////#include <var/vars.h>
+//#include <var/varo.h>
+////#include <var/var.h>
+//
+//namespace exo {
+//
+//	class rex;
+//	class var;
+//	class dim;
+//
+//class PUBLIC var_db : public var_os {
+//
 public:
 
-	// Inherit constructors
-	using var_os::var_os;
-
-	// Inherit assignment operators
-	using var_os::operator=;
-
-	// Inherit conversion to var;
-	using var_os::operator var;
-
-//	using VAR    =       var;
-//	using VARREF =       var&;
-//	using CVR    = const var&;
-//	using TVR    =       var&&;
-
-	using in     = const var_db&;
-	using out    =       var_db&;
-	using io     =       var_db&;
+//	// Inherit constructors
+//	using var::var_os;
+//
+//	// Inherit assignment operators
+//	using var::operator=;
+//
+//	// Inherit conversion to var;
+//	using var::operator var;
+//
+////	using VAR    =       var;
+////	using VARREF =       var&;
+////	using CVR    = const var&;
+////	using TVR    =       var&&;
+//
+//	using in     = const var_db&;
+//	using out    =       var_db&;
+//	using io     =       var_db&;
 
 	///// DATABASE ACCESS:
 	/////////////////////
@@ -830,8 +830,8 @@ private:
 	ND bool dbcursorexists(); //database, not terminal
 	ND bool selectx(in fieldnames, in sortselectclause);
 
-}; // class var_db
-
-} // namespace exo
-
-#endif // VAR_DB_H
+//}; // class var_db
+//
+//} // namespace exo
+//
+//#endif // VAR_DB_H

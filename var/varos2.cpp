@@ -154,7 +154,7 @@ void var_base::initrnd() const {
 	thread_RNG = std::make_unique<RNG_typ>(seed);
 }
 
-void var_os::ossleep(const int milliseconds) {
+void var::ossleep(const int milliseconds) {
 
 	THISIS("void var::ossleep(const int milliseconds) static")
 //	assertVar(function_sig);	 // not needed if *this not used
@@ -165,7 +165,7 @@ void var_os::ossleep(const int milliseconds) {
 
 static thread_local std::string thread_environ;
 
-bool var_os::osgetenv(SV envcode) {
+bool var::osgetenv(SV envcode) {
 
 	// TIP if you cant seem to set osgetenv vars in bash/sh
 	// then ensure you set them with "export"
@@ -272,7 +272,7 @@ bool var_os::osgetenv(SV envcode) {
 
 }
 
-void var_os::ossetenv(SV envcode) const {
+void var::ossetenv(SV envcode) const {
 
 	THISIS("bool var::ossetenv(SV envcode) const")
 	assertString(function_sig);
@@ -309,12 +309,12 @@ void var_os::ossetenv(SV envcode) const {
 	return;
 }
 
-var  var_os::ospid() {
+var  var::ospid() {
 	//THISIS("var  var::ospid() const")
 	return getpid();
 }
 
-var  var_os::ostid() {
+var  var::ostid() {
 	//THISIS("var  var::ospid() const")
 //	return syscall(SYS_gettid);
 	return gettid();

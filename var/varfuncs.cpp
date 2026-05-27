@@ -131,7 +131,7 @@ static void string_converter(T1& var_str, const T2 fromchars, const T3 tochars) 
 	return;
 }
 
-var  var_os::version() {
+var  var::version() {
 	std::ostringstream oss;
 	oss << "Local:  " << GIT_BRANCH << " " << GIT_LOCAL_COMMIT_TIMESTAMP << " " << GIT_LOCAL_COMMIT_HASH << "\n"
 	    << "Remote: " << GIT_BRANCH << " " << GIT_REMOTE_COMMIT_TIMESTAMP << " " << GIT_REMOTE_COMMIT_HASH_SHORT;
@@ -145,7 +145,7 @@ var  var_os::version() {
 
 }
 
-bool var_os::eof() const {
+bool var::eof() const {
 	THISIS("bool var::eof() const")
 	// assertVar(function_sig);
 
@@ -153,7 +153,7 @@ bool var_os::eof() const {
 }
 
 // 3 usecs
-bool var_os::hasinput(const int milliseconds) const {
+bool var::hasinput(const int milliseconds) const {
 
 	// Defined in haskey.cpp
 	bool haskey(int milliseconds);
@@ -161,7 +161,7 @@ bool var_os::hasinput(const int milliseconds) const {
 	return haskey(milliseconds);
 }
 
-bool var_os::input(in prompt /*=""*/) {
+bool var::input(in prompt /*=""*/) {
 
 	THISIS("out  var::input(in prompt")
 	assertVar(function_sig);
@@ -210,7 +210,7 @@ bool var_os::input(in prompt /*=""*/) {
 
 // For nchars, use int instead of var to trigger error at point of calling not here
 // Not binary safe if nchars = 0 because we allow line editing assuming terminal console
-var&  var_os::inputn(const int nchars) {
+var&  var::inputn(const int nchars) {
 
 	THISIS("out  var::inputn(const int nchars")
 	assertVar(function_sig);
@@ -293,7 +293,7 @@ var&  var_os::inputn(const int nchars) {
 	return *this;
 }
 
-var&  var_os::keypressed(const bool wait /*=false*/) {
+var&  var::keypressed(const bool wait /*=false*/) {
 
 	THISIS("out  var::keypressed(const bool wait = false)")
 	assertVar(function_sig);

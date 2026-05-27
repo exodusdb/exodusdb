@@ -61,15 +61,11 @@ namespace exo {
 	using io     =       var&;
 }
 
-#include <var/vard.h> // var_db
+#include <var/vars.h>
 
 namespace exo {
 
-// class var
-// Inheritance chain: var > var_db > var_os > var_stg > var_base
-// Only var_base has any data
-// No virtual members at any level
-class PUBLIC var : public var_db {
+class PUBLIC var : public var_stg {
 
 	// "using" applies to all member functions except ctor/dtor/operator
 	using CVR    = const var&;
@@ -86,8 +82,8 @@ public:
 	// Note:  Define all ctor/assign/conversions inline to ensure optimisation can remove redundant assembler.
 	// This is important for value types like var.
 
-	// Inherit all constructors from var_db > var_os > var_stg > var_base
-	using var_db::var_db;
+	// Inherit all constructors from var_stg > var_stg > var_base (Stage 1)
+	using var_stg::var_stg;
 
 	// Copy ctor
 	var(const var& other) = default;
@@ -99,28 +95,28 @@ public:
 
 	// Inherit all assignment operators to convert all types DIRECTLY
 	// otherwise we get nonsense like using our implicit copy/move ctors from var AFTER using var_base ctors from various types
-    using var_db::operator=;
+    using var_stg::operator=;  // Stage 1
 
 	// Return void to prevent accidental use in conditionals (e.g., if (v = "x"))
 	// and to discourage assignment chaining, enhancing code clarity.
 
 	// Copy assignment
 	void /*var&*/ operator=(const var& other) {  // Suppress implicit operators
-		var_db::operator=(other);  // Delegate to base
+		var_stg::operator=(other);  // Stage 1
 		return /**this*/;
 	}
 
 	// Move assignment
-	void /*var&*/ operator=(var&& other) & noexcept { var_db::operator=(std::move(other)); }
+	void /*var&*/ operator=(var&& other) & noexcept { var_stg::operator=(std::move(other)); }
 
 	// Initializer list
 	void /*var&*/ operator=(std::initializer_list<var> list) & {
-		var_db::operator=(var(list));  // Reuse constructor, assign via var_db
+		var_stg::operator=(var(list));  // Stage 1
 	}
 
 	// Implicit conversions to var
 
-    using var_db::operator var;
+    using var_stg::operator var;  // Stage 1
 
 	// Tabular documentation is generated for comments starting /// or more and ending with a colon
 
@@ -842,6 +838,12 @@ public:
 	// MD_ Decimal <- Decimal - Not implemented yet
 	//  Any Dynamic array structure is preserved.
 	ND var  iconv_MD(const char* conversion) const;
+
+// STAGE 1: DB layer declarations must be included at the very end of class var.
+// Placing it here ensures its internal "private:" section does not leak
+// into the public part of var.
+#include "vard.h"
+#include "varo.h"
 
 };  // class "var"
 
