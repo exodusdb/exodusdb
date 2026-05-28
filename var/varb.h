@@ -1649,14 +1649,14 @@ class PUBLIC var_base {
 	// `var v1 = 3;
 	//  let v2 = ++v1; // v2 -> 4 // v1 -> 4`
 	//
-	RETVARREF operator++() &;
+	VARBASEREF operator++() &;
 
 	// Pre-decrement
 	//
 	// `var v1 = 3;
 	//  let v2 = --v1; // v2 -> 2 // v1 -> 2`
 	//
-	RETVARREF operator--() &;
+	VARBASEREF operator--() &;
 
 /* for gendoc
 	// Addition

@@ -460,7 +460,7 @@ tryagain:
 
 // Not returning void so is usable in expressions
 // No argument indicates that this is prefix override ++var
-RETVARREF VB1::operator++() & {
+VARBASEREF VB1::operator++() & {
 
 	// Full check done below to avoid double checking number type
 	assertVar(__PRETTY_FUNCTION__);
@@ -489,12 +489,7 @@ tryagain:
 		assertNumeric(__PRETTY_FUNCTION__);
 	}
 
-	// OK to return *this in prefix ++
-	// Post-grin: we no longer have implicit var_base -> var conversion.
-	// While var publicly inherits from var_base, this static_cast through void*
-	// is the remaining manual "grin" until these operators are moved to be
-	// defined directly on var instead of VB1/var_base.
-	return *static_cast<var*>(static_cast<void*>(this));
+	return *this;
 }
 
 // ++ VAR (copied to var for the full type - clean, no manual casts)
@@ -543,7 +538,7 @@ tryagain:
 
 // Not returning void so is usable in expressions
 // No argument indicates that this is prefix override --var
-RETVARREF VB1::operator--() & {
+VARBASEREF VB1::operator--() & {
 
 	// Full check done below to avoid double checking number type
 	assertVar(__PRETTY_FUNCTION__);
@@ -574,9 +569,7 @@ tryagain:
 		assertNumeric(__PRETTY_FUNCTION__);
 	}
 
-	// OK to return *this in prefix --
-	// Post-grin: manual upcast until these are moved onto var directly.
-	return *static_cast<var*>(static_cast<void*>(this));
+	return *this;
 }
 
 // -- VAR (copied to var for the full type - clean, no manual casts)

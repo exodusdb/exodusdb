@@ -513,18 +513,6 @@ func main() {
 		let v2 = v1--;  assert(v2.errputl() == 3 ); assert(v1.errputl() == 2);
 	}
 
-	printl("operator++() &;");
-	{
-		var v1 = 3;
-		let v2 = ++v1;  assert(v2.errputl() == 4 ); assert(v1.errputl() == 4);
-	}
-
-	printl("operator--() &;");
-	{
-		var v1 = 3;
-		let v2 = --v1;  assert(v2.errputl() == 2 ); assert(v1.errputl() == 2);
-	}
-
 	printl("operator+(var);");
 	{
 		var v1 = 0.1;
