@@ -34,7 +34,7 @@ THE SOFTWARE.
 ////#include <vector>
 #endif
 
-#include <var/varb.h>
+#include <var/var_base.h>
 #include <var/var.h>
 
 namespace exo {

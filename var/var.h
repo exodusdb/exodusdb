@@ -71,7 +71,7 @@ namespace exo {
 
 }
 
-#include <var/varb.h>
+#include <var/var_base.h>
 
 namespace exo {
 

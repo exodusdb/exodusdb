@@ -122,7 +122,7 @@ void VB1::from_u32string(std::u32string u32str) const {
 }
 
 // CONSTRUCTOR from const std::u32string converts to utf-8
-// Not inline to avoid including boost headers in varb.h
+// Not inline to avoid including boost headers in var_base.h
 VB1::var_base(const std::wstring& wstr1) {
 	var_typ = VARTYP_STR;
 	var_str = boost::locale::conv::utf_to_utf<char>(wstr1);

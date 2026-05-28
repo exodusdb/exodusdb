@@ -102,7 +102,7 @@ public:
 
 	// obj is strvar
 
-	/* fake for gendoc from var_base in varb.h
+	/* fake for gendoc from var_base in var_base.h
 
 	// Get a single char from a string.
 	// pos1: First char is 1. Last char is -1.

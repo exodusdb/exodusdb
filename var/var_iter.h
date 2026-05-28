@@ -5,7 +5,7 @@
 // var_iter - iterate over fields
 /////////////////////////////////
 
-#include <var/varb.h>
+#include <var/var_base.h>
 
 namespace exo {
 

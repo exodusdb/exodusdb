@@ -411,7 +411,7 @@ execute_process(
 	if (NOT EXO_MODULE)
 		install(
 			FILES
-				varb.h
+				var_base.h
 				vars.h
 				varo.h
 				vard.h

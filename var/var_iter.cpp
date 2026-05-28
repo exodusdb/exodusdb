@@ -5,7 +5,7 @@
 #endif
 
 #	include <var/var.h>
-#	include <var/varb.h>
+#	include <var/var_base.h>
 #	include <var/var_iter.h>
 
 // var_iter class enables c++ range based programming over a dynamic array

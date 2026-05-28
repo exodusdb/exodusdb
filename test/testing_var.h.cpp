@@ -388,7 +388,7 @@ func main() {
 	}
 
 ////////////////
-// Code examples varb.h
+// Code examples var_base.h
 ////////////////
 
 	printl("len() const;");

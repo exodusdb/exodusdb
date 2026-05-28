@@ -3,7 +3,7 @@
 //
 //// gendoc: var - DB functions
 //
-//#include <var/varb.h>
+//#include <var/var_base.h>
 ////#include <var/vars.h>
 //#include <var/varo.h>
 ////#include <var/var.h>
