@@ -115,6 +115,25 @@ class var_iter;
 #define CBR   const var_base&
 #define TBR         var_base&&
 
+// Design contract for var_base
+//
+// The fundamental purpose of var_base is to overload the basic operators (including ^ for concatenation)
+// to provide a dynamic, late-bound value type that can be used as the foundation for a richer parent class (currently `var`).
+//
+// Key points:
+// - var_base is not designed to be used completely standalone. Almost all of its public API is declared
+//   to return the richer parent type (`var`) via the RETVAR / RETVARREF macros.
+// - The parent class `var` currently adds no additional data members beyond what exists in var_base.
+//   This relationship is now explicit rather than implicit via inheritance layering.
+// - There is no longer any automatic upcasting from var_base (or its former derived layers) to `var`.
+//   Such upcasting was Undefined Behavior (strict aliasing violation) but worked in production for years,
+//   likely because the conversions were almost always applied to temporaries with identical storage layout.
+//
+// If a future use case requires a truly standalone `var_base` (without any dependence on `var`),
+// a separate set of macros and return types would be needed.
+//
+//#define RETVAR      exo::var_base
+//#define RETVARREF   exo::var_base&
 #define RETVAR      exo::var
 #define RETVARREF   exo::var&
 
@@ -1628,6 +1647,23 @@ class PUBLIC var_base {
 	//  if (not var("") eq true) ... ok`
 	//
 	ND bool operator!() const {return !this->toBool();}
+
+	// Note on increment/decrement operators on var_base:
+	//
+	// These are the only "self-processing" mutating operators on var_base that must
+	// return *this (rather than void). This is required to support the expected C++
+	// chaining behaviour of prefix ++ and -- (e.g. ++x or --x used in expressions).
+	//
+	// All other self-mutating operators on var_base (e.g. +=, -=, *=, etc.) are
+	// deliberately defined to return void (via VBR1_OR_VOID). This design choice
+	// prevents accidental misuse by clients. Because they return void, there is
+	// never a requirement for the base to return a richer 'var' from these
+	// operations, so no upcasting from var_base to var is ever needed.
+	//
+	// The increment and decrement operators are therefore special: they were the
+	// only place where var_base historically needed to upcast itself to var when
+	// returning *this. With these operators now replicated directly on the parent
+	// 'var' class, var_base no longer performs any such upcast for them.
 
 	// Post-increment
 	// ++ and -- are only allowed on named variables, not expressions, to prevent writing cryptic and buggy code.
