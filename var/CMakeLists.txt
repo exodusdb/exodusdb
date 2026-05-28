@@ -255,21 +255,21 @@ execute_process(
 		varos2.cpp
 		fixdirtime.cpp # slow because of std::format/print
 		varstr.cpp
-		varb.cpp
+		var_base.cpp
 		var.cpp
 		dim.cpp
 		vardebug.cpp
 		varnum.cpp
 		varmath.cpp
 		varcompare.cpp
-		varbop.cpp
-		varbop2.cpp
+		var_base_op.cpp
+		var_base_op2.cpp
 		varop.cpp
 		varprocess.cpp
 		varchrono.cpp
 		varfuncs.cpp
 		varioconv.cpp
-		varbfuncs.cpp
+		var_base_funcs.cpp
 
 		vardb_async.cpp
 		task_scheduler.cpp
@@ -412,14 +412,14 @@ execute_process(
 		install(
 			FILES
 				var_base.h
-				vars.h
-				varo.h
-				vard.h
+				varstr.h
+				varos.h
+				vardb.h
 				var.h
 				var_iter.h
 				vartyp.h
 				varerr.h
-				varb_friends.h
+				var_base_friends.h
 				dim.h
 				rex.h
 				format.h

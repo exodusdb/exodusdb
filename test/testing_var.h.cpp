@@ -672,7 +672,7 @@ func main() {
 	}
 
 ////////////////
-// Code examples vars.h
+// Code examples varstr.h
 ////////////////
 
 	printl("operator^(var);");
@@ -1401,7 +1401,7 @@ func main() {
 	}
 
 ////////////////
-// Code examples vard.h
+// Code examples vardb.h
 ////////////////
 
 	printl("connect(in conninfo = "");");
@@ -1847,7 +1847,7 @@ func main() {
 	}
 
 ////////////////
-// Code examples varo.h
+// Code examples varos.h
 ////////////////
 
 	printl("date();");

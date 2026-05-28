@@ -1369,14 +1369,14 @@ class PUBLIC var_base {
 	//////////////////////////////////////
 
 	// and an edited version "varb_friend_impl.h" which contains implementations is included in var.cpp
-	// ENSURE all changes in varb_friends.h and varb_friends_impl.h are replicated using sed commands listed in the files
-	// Implementations are in varb_friends_impl.h included in var.cpp
+	// ENSURE all changes in var_base_friends.h and var_base_friends_impl.h are replicated using sed commands listed in the files
+	// Implementations are in var_base_friends_impl.h included in var.cpp
 
 // Also included *without* friend definition after class var_base definition below.
 #define VAR_FRIEND friend
-#include "varb_friends.h"
-// Implementation in varb.cpp
-//#include "varb_friends_impl.h"
+#include "var_base_friends.h"
+// Implementation in var_base.cpp
+//#include "var_base_friends_impl.h"
 
 #pragma GCC diagnostic pop // "-Wnon-template-friend"
 
@@ -2065,15 +2065,15 @@ protected:
 
 }; // class var_base
 
-// varb_friends again to add [[nodicard]] attribute
+// var_base_friends again to add [[nodicard]] attribute
 #undef VAR_FRIEND
 #define VAR_FRIEND
 #undef PUBLIC
 #define PUBLIC [[nodiscard]] __attribute__((visibility("default")))
-#include "varb_friends.h"
+#include "var_base_friends.h"
 #undef PUBLIC
 #define PUBLIC __attribute__((visibility("default")))
-////#include "varb_friends_impl.h"
+////#include "var_base_friends_impl.h"
 
 } // namespace exo
 

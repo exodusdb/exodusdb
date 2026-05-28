@@ -889,9 +889,9 @@ public:
 // STAGE 1: DB layer declarations must be included at the very end of class var.
 // Placing it here ensures its internal "private:" section does not leak
 // into the public part of var.
-#include "vard.h"
-#include "varo.h"
-#include "vars.h"
+#include "vardb.h"
+#include "varos.h"
+#include "varstr.h"
 
 };  // class "var"
 

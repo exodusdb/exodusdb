@@ -42,7 +42,7 @@ Binary    Hex          Comments
 
 namespace exo {
 
-// exodus uses one locale per thread defined in varbfuncs.cpp
+// exodus uses one locale per thread defined in var_base_funcs.cpp
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wexit-time-destructors"
 #pragma clang diagnostic ignored "-Wglobal-constructors"

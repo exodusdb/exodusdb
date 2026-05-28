@@ -234,6 +234,6 @@ inline void varb_replace_string (std::string& subject, const std::string& search
 // error: explicit specialization of 'clone' after instantiation
 #undef VAR_FRIEND
 #define VAR_FRIEND
-#include "varb_friends_impl.h"
+#include "var_base_friends_impl.h"
 
 }  // namespace exo
