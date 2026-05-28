@@ -856,6 +856,36 @@ public:
 	//  Any Dynamic array structure is preserved.
 	ND var  iconv_MD(const char* conversion) const;
 
+public:
+
+	// Post-increment
+	//
+	// `var v1 = 3;
+	//  let v2 = v1++; // v2 -> 3 // v1 -> 4`
+	//
+	var operator++(int) &;
+
+	// Post-decrement
+	//
+	// `var v1 = 3;
+	//  let v2 = v1--; // v2 -> 3 // v1 -> 2`
+	//
+	var operator--(int) &;
+
+	// Pre-increment
+	//
+	// `var v1 = 3;
+	//  let v2 = ++v1; // v2 -> 4 // v1 -> 4`
+	//
+	var& operator++() &;
+
+	// Pre-decrement
+	//
+	// `var v1 = 3;
+	//  let v2 = --v1; // v2 -> 2 // v1 -> 2`
+	//
+	var& operator--() &;
+
 // STAGE 1: DB layer declarations must be included at the very end of class var.
 // Placing it here ensures its internal "private:" section does not leak
 // into the public part of var.

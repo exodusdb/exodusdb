@@ -320,11 +320,101 @@ tryagain:
 	return priorvalue;
 }
 
+// VAR ++ (copied to var)
+// VAR ++
+
+// You must *not* make the postfix version return the 'this' object by reference
+//
+// *** YOU HAVE BEEN WARNED ***
+// Not returning void so is usable in expressions
+// The int argument indicates that this is POSTFIX override v++
+var var::operator++(int) & {
+
+	// Full check done below to avoid double checking number type
+	assertVar(__PRETTY_FUNCTION__);
+
+	var priorvalue;
+
+tryagain:
+	// Prefer int since ++ nearly always on integers
+	if (var_typ & VARTYP_INT) {
+		if (var_int == std::numeric_limits<decltype(var_int)>::max())
+			UNLIKELY
+			throw VarNumOverflow("operator++");
+		priorvalue = var(var_int);
+		var_int++;
+		var_typ = VARTYP_INT;  // Reset to one unique type
+
+	} else if (var_typ & VARTYP_DBL) {
+		priorvalue = var_dbl;
+		var_dbl++;
+		var_typ = VARTYP_DBL;  // Reset to one unique type
+
+	} else if (var_typ & VARTYP_STR) {
+		// Try to convert to numeric
+		if (isnum())
+			goto tryagain;
+
+		// Trigger VarNonNumeric
+		assertNumeric(__PRETTY_FUNCTION__);
+
+	} else {
+		// Trigger VarUnassigned
+		assertNumeric(__PRETTY_FUNCTION__);
+	}
+
+	// NO DO NOT! return *this ... postfix return a temporary!!! eg var(*this)
+	return priorvalue;
+}
+
 // VAR --
 
 // Not returning void so is usable in expressions
 // The int argument indicates that this is POSTFIX override v--
 RETVAR VB1::operator--(int) & {
+
+	// Full check done below to avoid double checking number type
+	assertVar(__PRETTY_FUNCTION__);
+
+	var priorvalue;
+
+tryagain:
+	// Prefer int since -- nearly always on integers
+	if (var_typ & VARTYP_INT) {
+		if (var_int == std::numeric_limits<decltype(var_int)>::min())
+			UNLIKELY
+			throw VarNumUnderflow("operator--");
+		priorvalue = var(var_int);
+		var_int--;
+		var_typ = VARTYP_INT;  // Reset to one unique type
+
+	} else if (var_typ & VARTYP_DBL) {
+		priorvalue = var_dbl;
+		var_dbl--;
+		var_typ = VARTYP_DBL;  // Reset to one unique type
+
+	} else if (var_typ & VARTYP_STR) {
+		// Try to convert to numeric
+		if (isnum())
+			goto tryagain;
+
+		// Trigger VarNonNumeric
+		assertNumeric(__PRETTY_FUNCTION__);
+
+	} else {
+		// Trigger VarUnassigned
+		assertNumeric(__PRETTY_FUNCTION__);
+	}
+
+	return priorvalue;
+}
+
+// VAR -- (copied to var for the full type)
+// VAR --
+
+// Not returning void so is usable in expressions
+// The int argument indicates that this is POSTFIX override v--
+var var::operator--(int) & {
 
 	// Full check done below to avoid double checking number type
 	assertVar(__PRETTY_FUNCTION__);
@@ -407,11 +497,94 @@ tryagain:
 	return *static_cast<var*>(static_cast<void*>(this));
 }
 
+// ++ VAR (copied to var for the full type - clean, no manual casts)
+// ++ VAR
+
+// Not returning void so is usable in expressions
+// No argument indicates that this is prefix override ++var
+var& var::operator++() & {
+
+	// Full check done below to avoid double checking number type
+	assertVar(__PRETTY_FUNCTION__);
+
+tryagain:
+	// Prefer int since -- nearly always on integers
+	if (var_typ & VARTYP_INT) {
+		if (var_int == std::numeric_limits<decltype(var_int)>::max())
+			UNLIKELY
+			throw VarNumOverflow("operator++");
+		var_int++;
+		var_typ = VARTYP_INT;  // Reset to one unique type
+	} else if (var_typ & VARTYP_DBL) {
+		var_dbl++;
+		var_typ = VARTYP_DBL;  // Reset to one unique type
+	} else if (var_typ & VARTYP_STR) {
+		// Try to convert to numeric
+		if (isnum())
+			goto tryagain;
+
+		// Trigger VarNonNumeric
+		assertNumeric(__PRETTY_FUNCTION__);
+
+	} else {
+		// Trigger VarUnassigned
+		assertNumeric(__PRETTY_FUNCTION__);
+	}
+
+	// OK to return *this in prefix ++
+	// Post-grin: we no longer have implicit var_base -> var conversion.
+	// While var publicly inherits from var_base, this static_cast through void*
+	// is the remaining manual "grin" until these operators are moved to be
+	// defined directly on var instead of VB1/var_base.
+	return *static_cast<var*>(static_cast<void*>(this));
+}
+
 // -- VAR
 
 // Not returning void so is usable in expressions
 // No argument indicates that this is prefix override --var
 RETVARREF VB1::operator--() & {
+
+	// Full check done below to avoid double checking number type
+	assertVar(__PRETTY_FUNCTION__);
+
+tryagain:
+	// Prefer int since -- nearly always on integers
+	if (var_typ & VARTYP_INT) {
+		if (var_int == std::numeric_limits<decltype(var_int)>::min())
+			UNLIKELY
+			throw VarNumUnderflow("operator--");
+		var_int--;
+		var_typ = VARTYP_INT;  // Reset to one unique type
+
+	} else if (var_typ & VARTYP_DBL) {
+		var_dbl--;
+		var_typ = VARTYP_DBL;  // Reset to one unique type
+
+	} else if (var_typ & VARTYP_STR) {
+		// Try to convert to numeric
+		if (isnum())
+			goto tryagain;
+
+		// Trigger VarNonNumeric
+		assertNumeric(__PRETTY_FUNCTION__);
+
+	} else {
+		// Trigger VarUnassigned
+		assertNumeric(__PRETTY_FUNCTION__);
+	}
+
+	// OK to return *this in prefix --
+	// Post-grin: manual upcast until these are moved onto var directly.
+	return *static_cast<var*>(static_cast<void*>(this));
+}
+
+// -- VAR (copied to var for the full type - clean, no manual casts)
+// -- VAR
+
+// Not returning void so is usable in expressions
+// No argument indicates that this is prefix override --var
+var& var::operator--() & {
 
 	// Full check done below to avoid double checking number type
 	assertVar(__PRETTY_FUNCTION__);
