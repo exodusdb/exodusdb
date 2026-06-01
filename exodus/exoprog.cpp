@@ -1458,8 +1458,9 @@ lock:
 	} else {
 		if (waitsecs) {
 
-			if ((waitsecs0 - waitsecs) >  30)
-				var("").errputl("Locking file : " ^ file.f(1).quote() ^ " key : " ^ keyx.quote() ^ " secs : " ^ waitsecs ^ "/" ^ waitsecs0);
+//			if ((waitsecs0 - waitsecs) >  30)
+			if (not (waitsecs % 10))
+				var("").errputl(THREADNO ^ ": Locking file : " ^ file.f(1).quote() ^ " key : " ^ keyx.quote() ^ " secs : " ^ waitsecs ^ "/" ^ waitsecs0);
 
 			var().ossleep(1000);
 			waitsecs -= 1;
