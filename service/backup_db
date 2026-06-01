@@ -49,7 +49,7 @@ PS4='+ [./backup_db $* ${SECONDS}s] '
 : ────────────────────────────────────────
 	if [[ $OPTIONS =~ "B" ]]; then
 		#NCPUS=`grep -c processor /proc/cpuinfo`
-		sudo -u postgres pg_dump $LIVE_EXO_DATA | gzip > $NEW_BACKUP_DIR/$LIVE_EXO_DATA.sql.gz.part
+		sudo -u postgres pg_dump $LIVE_EXO_DATA | gzip --rsyncable > $NEW_BACKUP_DIR/$LIVE_EXO_DATA.sql.gz.part
 		mv $NEW_BACKUP_DIR/$LIVE_EXO_DATA.sql.gz.part $NEW_BACKUP_DIR/$LIVE_EXO_DATA.sql.gz
 	fi
 :
