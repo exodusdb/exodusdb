@@ -266,6 +266,13 @@ function APT_GET {
 		fi
 	fi
 :
+: Mandatory apache restart after editing the systemd service above for InaccessiblePaths
+: ────────────────────────────────────────
+	if ! sudo apache2ctl restart; then
+		journalctl -xeu apache2.service
+		exit 99
+	fi
+:
 : ────────────────────────────────────────
 : Finished create_site - https://$SUFFIXED_FQDN
 : ────────────────────────────────────────
