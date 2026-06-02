@@ -84,6 +84,7 @@ function APT_GET {
 :
 :
 	if [ ! -e $PHP_EXODUS_INI ]; then
+		restart_apache_required="true"
 		# sudo cat > ${PHP_EXODUS_INI} <<-V0G0N
 		# Use sudo dd because sudo doesnt work with redirection
 		# sudo acts after the redirection is established
@@ -240,6 +241,7 @@ function APT_GET {
 			sudo sed -i 's|^\(InaccessiblePaths=/root\)|#\1|' $apache_service_conf
 			sudo systemctl daemon-reload
 #			sudo systemctl restart apache2
+			restart_apache_required="true"
 		fi
 	fi
 :
@@ -264,11 +266,12 @@ function APT_GET {
 			journalctl -xeu apache2.service
 			exit 99
 		fi
+		restart_apache2_required="false"
 	fi
 :
-: Mandatory apache restart after editing the systemd service above for InaccessiblePaths
+: Apache restart after editing the systemd service above for InaccessiblePaths
 : ────────────────────────────────────────
-	if ! sudo apache2ctl restart; then
+	if ${restart_apache_required:-false} && ! sudo apache2ctl restart; then
 		journalctl -xeu apache2.service
 		exit 99
 	fi
