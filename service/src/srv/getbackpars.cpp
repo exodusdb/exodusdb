@@ -50,11 +50,6 @@ var dbn;
 func main(out bakpars, in process0 = var()) {
 
 	// optonally get the backpars for a specific process if given
-//	if (process0.unassigned()) {
-//		process = SYSTEM;
-//	} else {
-//		process = process0;
-//	}
 	process = process0.or_default(SYSTEM);
 
 	// by test data means any non-live data that doesnt require backup
@@ -124,40 +119,22 @@ func main(out bakpars, in process0 = var()) {
 	let dbcode	= process.f(17).lcase();
 	let dbcodes = process.f(58).lcase();
 
-//	if (dbcodes and VOLUMES) {
-//
-//		// databases to be excluded
-//		bakpars(8) = "";
-//
-//		// decide backup required or not by indicating testdata
-//		if (dbcodes.locate(dbcode, dbn, 1)) {
-//			tt = process.f(60, dbn);
-//		} else {
-//			tt = 0;
-//		}
-//		// test/nonlive data
-//		bakpars(11) = not(tt);
-//
-//		// otherwise backup depending on backup.cfg etc
-//	} else {
-
-		// autodetermine if it is "test" data
-		if (baktestdata_ == "") {
-			var testdata = 1;
-			if (process.f(17).ends("_test")) {
-			} else if (process.f(23).ucase().contains("TRAINING")) {
-			} else if (process.f(23).ucase().contains("TESTING")) {
-			} else if (osfile("~/hosts/disabled.cfg")) {
-			} else {
-				// not otherwise specified then exclude database if in list of non-live data
-				// none-live could include test data or consolidated copies
-				if (not bakexcludedatasets_.locate(process.f(17))) {
-					testdata = 0;
-				}
+	// autodetermine if it is "test" data
+	if (baktestdata_ == "") {
+		var testdata = 1;
+		if (process.f(17).ends("_test")) {
+		} else if (process.f(23).ucase().contains("TRAINING")) {
+		} else if (process.f(23).ucase().contains("TESTING")) {
+		} else if (osfile("~/hosts/disabled.cfg")) {
+		} else {
+			// not otherwise specified then exclude database if in list of non-live data
+			// none-live could include test data or consolidated copies
+			if (not bakexcludedatasets_.locate(process.f(17))) {
+				testdata = 0;
 			}
-			bakpars(11) = testdata;
 		}
-//	}
+		bakpars(11) = testdata;
+	}
 
 	return 0;
 }

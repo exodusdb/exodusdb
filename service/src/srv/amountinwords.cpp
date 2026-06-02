@@ -1,6 +1,8 @@
 #include <exodus/library.h>
 #include <srv_common.h>
 
+// Obsolete - replaced by exodus var built-in
+
 libraryinit()
 
 #include <amountinwords.h>
@@ -44,14 +46,6 @@ func main(in amountfmlanguage, in currcode0) {
 		stop();
 	}
 
-//	if (currcode0.unassigned()) {
-//		currcode = "";
-//	} else {
-//		currcode = currcode0;
-//		if (not amountcurrency.read(srv.currencies, currcode)) {
-//			amountcurrency = "";
-//		}
-//	}
 	amountcurrency = "";
 	currcode = currcode0.or_default("");
 	if (currcode) {

@@ -30,11 +30,6 @@ var allowablechars;
 
 func main(in mode0) {
 
-//	if (mode0.unassigned()) {
-//		mode = "";
-//	} else {
-//		mode = mode0;
-//	}
 	mode = mode0.or_default("");
 
 	var().osflush();
@@ -59,19 +54,6 @@ func main(in mode0) {
 
 	gosub getsec();
 
-	/*dos and not supported any longer;
-		// auto login for particular station ids
-		if addresses='' then;
-			if len(@station) then;
-				locate @station in userprivs<5> setting stationn then;
-					userx=userprivs<1,stationn>;
-					ok=1;
-					goto okfail;
-					end;
-				end;
-			end;
-		*/
-
 	// if there is a user called MASTER with no password then login automatically
 	// unless already automatically logged in
 	ok = 0;
@@ -86,12 +68,6 @@ func main(in mode0) {
 			}
 		}
 	}
-
-	// sleep
-	// if mode='SLEEP' then
-	// call clearscreen(buffer,attribute)
-	// call note('This computer workstation has gone to sleep,|please enter your password to wake it up,| or press Esc to exit EXODUS.','UB':fm:fm:fm:1,buff,'')
-	// end
 
 	// get the user name
 inpname:
@@ -198,12 +174,6 @@ fail:
 
 		goto okfail;
 
-		// print char(7):
-		// msg='That is not the correct key'
-		// call msg(msg)
-		// if keyfail >= 3 then goto fail
-		// keyfail+=1
-		// goto inp.key
 	}
 
 chknameandpass:
@@ -297,27 +267,6 @@ okfail:
 subr inputx() {
 	call inputbox(msg, maxlen, show, allowablechars, xdata, escx);
 	return;
-	/*;
-	// ///////
-	makepass:
-	// ///////
-		encryptkey = 1234567;
-
-		// pass1
-		loop;
-			while encryptx # '';
-			encryptkey = mod(encryptkey, 390001) * ord(encryptx[1, 1]) + 1;
-			encryptx[1, 1]='';
-			repeat;
-
-		// pass2
-		loop;
-			encryptx := char(65 + mod(encryptkey, 50));
-			encryptkey = int(encryptkey / 50);
-		while encryptkey repeat;
-
-		return;
-	*/
 }
 
 subr getsec() {

@@ -148,7 +148,6 @@ func main(in mode) {
 
 		if (emaildomains) {
 			// check emails
-			// emails=lcase(@record<7>)
 			var emails = req.is.lcase();
 			emails.converter(FM ^ VM ^ SM ^ ", ", ";;;;;");
 			let nn = emails.fcount(";");
@@ -222,8 +221,6 @@ func main(in mode) {
 					if (req.orec.f(36)) {
 						RECORD(36) = req.orec.f(36);
 					}
-					// tt=@record<19>
-					// swap 'Default' with '' in tt
 					// username
 					RECORD(1) = req.orec.f(1);
 					// department

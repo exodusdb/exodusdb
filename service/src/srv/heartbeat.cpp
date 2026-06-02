@@ -22,11 +22,6 @@ func main(in mode, in status0 = "") {
 	// 1. saves process info and status in processes file
 	// 2. checks for .end flags and performs logoff/shutdown if present
 
-//	if (status.unassigned()) {
-//		status = "";
-//	} else {
-//		status = status0;
-//	}
 	status = status0.or_default("");
 
 	// mode is always CHECK

@@ -29,16 +29,6 @@ func main(io ranges0, in basekey0 = "", in listid0 = "") {
 	// equ maxlistpartsize to 32000
 	let maxlistpartsize = maxstrsize_ / 2;
 
-//	if (basekey0.unassigned()) {
-//		basekey = "";
-//	} else {
-//		basekey = basekey0;
-//	}
-//	if (listid0.unassigned()) {
-//		listid = "";
-//	} else {
-//		listid = listid0;
-//	}
 	basekey = basekey0.or_default("");
 	listid = listid0.or_default("");
 
@@ -53,7 +43,6 @@ func main(io ranges0, in basekey0 = "", in listid0 = "") {
 	// comma/space/fm separated ranges
 
 	var ranges = ranges0.trim();
-	// convert ',/' to '  ' in ranges
 	// dont convert / since an invoice number may contain a slash
 	ranges.converter(",", " ");
 	ranges.trimmer();

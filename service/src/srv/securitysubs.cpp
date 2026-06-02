@@ -119,9 +119,6 @@ func main(in mode) {
 	} else if (mode == "SETUP") {
 
 		// check allowed access
-//		if (req.templatex.unassigned()) {
-//			req.templatex = "";
-//		}
 		req.templatex.defaulter("");
 		var filename;
 		var defaultlock;
@@ -1029,21 +1026,6 @@ func generatepassword() {
 subr newpass3(io sysrec, in userx, in newpassword) {
 
 	req.valid  = 0;
-//	let lastfn = 9;
-
-//	var passwordfn;
-//	if (sysrec.f(1) == "USER" or sysrec == "") {
-//		passwordfn = 7;
-//	} else if (sysrec.f(1) == "ACCOUNT") {
-//		passwordfn = 6;
-//	} else {
-//		var dummy;
-//		call note("W123", "", dummy, userx);
-//		return;
-//	}
-
-//	let v12 = 0;
-
 	gosub makesysrec(sysrec, userx, newpassword);
 	return;
 }
@@ -1059,7 +1041,6 @@ subr makesysrec(io sysrec, in userx, in newpassword) {
 	if (not sysrec.f(5)) {
 		sysrec(5) = "EXODUS";
 	}
-	// if SYSREC<last.fn> else SYSREC<last.fn>='xxxxx'
 	if (not sysrec.f(9)) {
 		sysrec(9) = "xxxxx";
 	}

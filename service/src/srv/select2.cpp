@@ -60,44 +60,15 @@ func main(in filenamex, in linkfilename2, in sortselect0, in dictids0, in option
 	var filename = filenamex;
 
 	var sortselect = sortselect0;
-//	if (dictids0.unassigned()) {
-//		dictids = "";
-//	} else {
-//		dictids = dictids0;
-//	}
-//	if (options0.unassigned()) {
-//		options = "";
-//	} else {
-//		options = options0;
-//	}
-//	if (maxnrecs0.unassigned()) {
-//		maxnrecs = "";
-//	} else {
-//		maxnrecs = maxnrecs0;
-//	}
 	dictids = dictids0.or_default("");
 	options = options0.or_default("");
 	maxnrecs = maxnrecs0.or_default("");
-	// 	if (limitfields.unassigned()) {
-	// 		nlimitfields = 0;
-	// 	} else {
-	// 		nlimitfields = limitfields.fcount(VM);
-	// 	}
-//	let nlimitfields = limitfields.default_from("").fcount(VM);
 	let nlimitfields = limitfields.or_default("").fcount(VM);
 
 	let xml		= options.contains("XML");
 	let rawread = options.contains("RAW");
 
 	datax = "";
-
-//	if (linkfilename2) {
-//		hexx.redim(8);
-//		// changed to allow language characters to pass through x80-xF9
-//		for (const var ii : range(249, 255)) {
-//			hexx[ii - 249] = "%" ^ ii.oconv("MX").oconv("R(0)#2");
-//		}  // ii;
-//	}
 
 	useactivelist = sortselect.contains("%SELECTLIST%");
 	sortselect.replacer("%SELECTLIST%", "");
@@ -136,8 +107,6 @@ nocommon:
 		req.valid.move(savevalid);
 	}
 
-	// if unassigned(limitfields) then limitfields=''
-
 	// filename can be 'filename USING dictfilename'
 
 	let filename0 = filename;
@@ -159,9 +128,7 @@ nocommon:
 	}
 
 	if (linkfilename2) {
-		//call oswrite("", linkfilename2);
 		if (not oswrite("", linkfilename2)) {
-			//abort(lasterror());
 			response = "Error: select2: Cannot write to output file" ^ (linkfilename2.quote());
 
 			// abort
@@ -169,7 +136,6 @@ nocommon:
 			return 0;
 		}
 		if (not linkfile2.osopen(linkfilename2)) {
-			//response = "Error: select2: " ^ (linkfilename2.quote()) ^ " cannot open output file";
 			response = "Error: select2: Cannot open output file" ^ (linkfilename2.quote());
 
 			// abort
@@ -186,7 +152,6 @@ nocommon:
 		cmd ^= " " ^ maxnrecs;
 	}
 	cmd ^= " " ^ filename0;
-	// if trim(@station)='SBCP1800' then cmd='SELECT 10 ':filename
 
 	// check no @ in xml dict ids because cannot return xml tag with @
 	if (xml and dictids.contains("@")) {
@@ -198,9 +163,6 @@ nocommon:
 	}
 
 	var oconvsx = "";
-//	if (dictids.unassigned()) {
-//		dictids = "";
-//	}
 	dictids.defaulter("");
 	if (dictids == "") {
 		dictids = "ID";
@@ -235,11 +197,6 @@ nocommon:
 
 	let ndictids = dictids.fcount(FM);
 	if (dictids != "RECORD") {
-		// 		while (true) {
-		// 			// /BREAK;
-		// 			if (not dictids.ends(FM)) break;
-		// 			dictids.popper();
-		// 		}// loop;
 		dictids.trimmerlast(FM);
 		if (dictids == "") {
 			dictids = "ID";
@@ -281,18 +238,11 @@ nocommon:
 		tx ^=
 			"<records>"
 			"\n";
-		//call osbwrite(tx, linkfile2, dataptr);
 		if (not osbwrite(tx, linkfile2, dataptr)) {
 			abort(lasterror());
 		}
 	}
 
-	// read xx from @dict,'AUTHORISED' then
-	// if index(sortselect,' WITH AUTHORISED',1) else
-	//  if index(' ':sortselect,' WITH ',1) then sortselect:=' AND'
-	//  sortselect:=' WITH AUTHORISED'
-	//  end
-	// end
 	var chk_authorised;
 	if (not chk_authorised.read(DICT, "AUTHORISED")) {
 		chk_authorised = 0;
@@ -547,12 +497,6 @@ nextrec:
 			if (not rowpart)
 				break;
 
-//			rowpart.replacer("%", "%25");
-//			// changed to allow language characters to pass through x80-xF9
-//			for (const var ii : range(249, 255)) {
-//				rowpart.replacer(chr(ii), hexx[ii - 249]);
-//			}  // ii;
-//
 			// output converted row part
 			//call osbwrite(rowpart, linkfile2, dataptr);
 			if (not osbwrite(rowpart, linkfile2, dataptr)) {

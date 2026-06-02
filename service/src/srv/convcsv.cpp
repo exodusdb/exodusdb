@@ -52,16 +52,6 @@ func main(in sentence0, in select0 = "", in filters0 = "") {
 	// BP MEDIADIARY2 ditto
 	// ABP JOURNALS   ditto
 
-//	if (sentence0.unassigned()) {
-//		sentencex = "";
-//	} else {
-//		sentencex = sentence0;
-//	}
-//	if (select0.unassigned()) {
-//		selectx = "";
-//	} else {
-//		selectx = select0;
-//	}
 	sentencex = sentence0.or_default("");
 	selectx = select0.or_default("");
 

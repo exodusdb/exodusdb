@@ -26,9 +26,6 @@ func main(in msg0, io time0) {
 		// Try multiple start points in case hit middle of multibyte character
 		// space to defeat convsyntax
 		for (var ptr = logfilelength - 1024; ptr <= logfilelength - 1021; ptr++) {
-			// for (const var ptr : range(logfilelength - 1024, logfilelength - 1021)) {
-			// for (const var ptr : range(logfilelength - 1024, logfilelength - 1021)) {
-			//call osbread(datax, logfile, ptr, 1024);
 			if (not osbread(datax, logfile, ptr, 1024)) {
 				abort(lasterror());
 			}
@@ -45,9 +42,6 @@ func main(in msg0, io time0) {
 	}
 
 	time2 = ostime();
-//	if (time0.unassigned()) {
-//		time0 = time2;
-//	}
 	time0.defaulter(time2);
 
 	var entry = "";

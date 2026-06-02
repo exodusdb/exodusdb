@@ -14,35 +14,6 @@ func main(io processid, in processcategory0, in /*sparevar*/ = "", in processpar
 
 	// "heartbeat" called from messaging
 
-//	if (processid.unassigned()) {
-//		processid = "";
-//	}
-//	// 	if (sparevar.unassigned()) {
-//	// 		sparevar = "";
-//	// 	}
-//	if (processcategory0.unassigned()) {
-//		processcategory = "";
-//	} else {
-//		processcategory = processcategory0;
-//	}
-//	if (processrec.unassigned()) {
-//		processrec = "";
-//	}
-//	if (processparameters0.unassigned()) {
-//		processparameters = "";
-//	} else {
-//		processparameters = processparameters0;
-//	}
-//	if (processresult0.unassigned()) {
-//		processresult = "";
-//	} else {
-//		processresult = processresult0;
-//	}
-//	if (processcomments0.unassigned()) {
-//		processcomments = "";
-//	} else {
-//		processcomments = processcomments0;
-//	}
 	processid.defaulter("");
 	processcategory = processcategory0.or_default("");
 	processrec.defaulter("");
@@ -50,12 +21,9 @@ func main(io processid, in processcategory0, in /*sparevar*/ = "", in processpar
 	processresult = processresult0.or_default("");
 	processcomments = processcomments0.or_default("");
 
-	// if definitions else
 	if (not DEFINITIONS.open("DEFINITIONS", "")) {
 		return 0;
 	}
-	// if definitions else return
-	// end
 
 	if (processid == "") {
 		processid = SYSTEM.f(4);
@@ -111,12 +79,10 @@ func main(io processid, in processcategory0, in /*sparevar*/ = "", in processpar
 
 		processrec.write(DEFINITIONS, "PROCESS*" ^ processid);
 	}
-	// L468:
 	return 0;
 }
 
 subr newprocessid(io processid) {
-	// newprocessid(io processid)
 	timex = ostime();
 
 	while (true) {

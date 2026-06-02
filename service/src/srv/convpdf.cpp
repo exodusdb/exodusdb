@@ -60,18 +60,12 @@ func main(io osfilename, in printopts0, out errors) {
 	errors = "";
 
 	// X means dont convert
-//	if (printopts0.unassigned()) {
-//		printopts = "";
-//	} else {
-//		printopts = printopts0;
-//	}
 	printopts = printopts0.or_default("");
 	if (printopts.contains("X")) {
 		return 0;
 	}
 
 	// only convert .htm files
-//	if (osfilename.lcase().last(4) != ".htm") {
 	if (not osfilename.lcase().ends(".htm")) {
 		return 0;
 	}
@@ -79,14 +73,6 @@ func main(io osfilename, in printopts0, out errors) {
 	// generate an output filename
 	var pdffilename = osfilename;
 	pdffilename.paster(-3, 3, "pdf");
-
-//	if (VOLUMES) {
-//		let exe = oscwd().contains(":") ? ".exe" : "";
-//		pdfcmd	= "html2pdf";
-//		if (exe) {
-//			pdfcmd = "c:\\windows\\" ^ pdfcmd ^ exe;
-//		}
-//	} else {
 
 	// Test is duplicated in convpdf.cpp and htmllib2.cpp
 	// chromium might be aliased to google-chrome
@@ -121,7 +107,6 @@ func main(io osfilename, in printopts0, out errors) {
 		if (not pdfcmd.osfile()) {
 			pdfcmd = "/usr/bin/wkhtmltopdf";
 		}
-//	}
 
 		// quit without conversion if conversion program doesnt exist
 		if (not pdfcmd.osfile()) {

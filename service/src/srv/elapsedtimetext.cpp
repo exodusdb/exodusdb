@@ -5,21 +5,10 @@ func main(in fromdate, in fromtime, io uptodate, io uptotime) {
 
 	var text = "";
 
-//	if (uptodate.unassigned()) {
-//		uptodate = date();
-//	}
-//	if (uptotime.unassigned()) {
-//		uptotime = ostime();
-//	}
 	uptodate.defaulter(date());
 	uptotime.defaulter(ostime());
-	// uptodate=date()
-	// CALL DOSTIME(uptotime)
 
-	// NSECS=INT(uptotime-fromTIME)
 	var nsecs = uptotime - fromtime;
-	// IF NSECS ELSE NSECS=1
-	// uptodate=date()
 	if (fromdate != uptodate) {
 		nsecs += (uptodate - fromdate) * 24 * 3600;
 	}

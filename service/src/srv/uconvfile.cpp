@@ -23,16 +23,6 @@ func main(in inputfilename, in encoding1i, in encoding2i, out result, out msg) {
 	//
 	// http://www.microsoft.com/globaldev/reference/cphome.mspx
 
-//	if (encoding1i.unassigned()) {
-//		encoding1 = "";
-//	} else {
-//		encoding1 = encoding1i;
-//	}
-//	if (encoding2i.unassigned()) {
-//		encoding2 = "";
-//	} else {
-//		encoding2 = encoding2i;
-//	}
 	encoding1 = encoding1i.or_default("");
 	encoding2 = encoding2i.or_default("");
 
@@ -114,11 +104,7 @@ func main(in inputfilename, in encoding1i, in encoding2i, out result, out msg) {
 		}
 
 		// overwrite the input file with the temporary
-//		if (VOLUMES) {
-//			cmd = "xcopy " ^ tempfilename ^ " " ^ inputfilename ^ " /y";
-//		} else {
-			cmd = "cp " ^ tempfilename ^ " " ^ inputfilename;
-//		}
+		cmd = "cp " ^ tempfilename ^ " " ^ inputfilename;
 		result = shell2(cmd, errors);
 		if (errors) {
 			msg = "UCONVFILE: xcopy " ^ errors;
@@ -126,7 +112,6 @@ func main(in inputfilename, in encoding1i, in encoding2i, out result, out msg) {
 		}
 
 		// delete the temporary
-		//tempfilename.osremove();
 		if (osfile(tempfilename) and not tempfilename.osremove()) {
 			loglasterror();
 		}

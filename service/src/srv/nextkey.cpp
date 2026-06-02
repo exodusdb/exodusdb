@@ -4,12 +4,6 @@ libraryinit()
 var previous;  // num
 
 func main(in mode, in previous0 = "") {
-	// jbase linemark
-//	if (previous0.unassigned()) {
-//		previous = 0;
-//	} else {
-//		previous = previous0;
-//	}
 	previous = previous0.or_default("");
 
 	var result = "";

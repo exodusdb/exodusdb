@@ -1,23 +1,3 @@
-////#include <boost/archive/iterators/binary_from_base64.hpp>
-//#include <boost/archive/iterators/base64_from_binary.hpp>
-//#include <boost/archive/iterators/transform_width.hpp>
-////#include <boost/algorithm/string.hpp>
-//
-//std::string decode64(const std::string &val) {
-//    using namespace boost::archive::iterators;
-//    using It = transform_width<binary_from_base64<std::string::const_iterator>, 8, 6>;
-//    return boost::algorithm::trim_right_copy_if(std::string(It(std::begin(val)), It(std::end(val))), [](char c) {
-//        return c == '\0';
-//    });
-//}
-//
-//std::string encode64(const std::string &val) {
-//    using namespace boost::archive::iterators;
-//    using It = base64_from_binary<transform_width<std::string::const_iterator, 6, 8>>;
-//    auto tmp = std::string(It(std::begin(val)), It(std::end(val)));
-//    return tmp.append((3 - val.size() % 3) % 3, '=');
-//}
-
 // To avoid loading the whole attached file into memory for encoding we now use
 // linux os cmd "openssl" with option "base64" to pipe the encoding to a temp file
 
@@ -57,41 +37,6 @@ var home = "";
 
 func main(in toaddress0, in ccaddress0, in subject0, in body0, in attachfilename0, in delete0, out errormsg, in replyto0 = var(), in params0 = var()) {
 
-//	if (ccaddress0.unassigned()) {
-//		ccaddress = "";
-//	} else {
-//		ccaddress = ccaddress0;
-//	}
-//	if (subject0.unassigned()) {
-//		subject = "";
-//	} else {
-//		subject = subject0;
-//	}
-//	if (body0.unassigned()) {
-//		body = "";
-//	} else {
-//		body = body0;
-//	}
-//	if (attachfilename0.unassigned()) {
-//		attachfilename = "";
-//	} else {
-//		attachfilename = attachfilename0;
-//	}
-//	if (delete0.unassigned()) {
-//		deletex = "";
-//	} else {
-//		deletex = delete0;
-//	}
-//	if (replyto0.unassigned()) {
-//		replyto = "";
-//	} else {
-//		replyto = replyto0;
-//	}
-//	if (params0.unassigned()) {
-//		params = "";
-//	} else {
-//		params = params0;
-//	}
 	ccaddress      = ccaddress0.or_default("");
 	subject        = subject0.or_default("");
 	body           = body0.or_default("");
@@ -121,9 +66,6 @@ func main(in toaddress0, in ccaddress0, in subject0, in body0, in attachfilename
 					  "test body line2",
 					  v5, v6, errormsg, v8, params);
 		savesentence.move(SENTENCE);
-		// if errormsg then call msg(toaddress:' ':@fm:errormsg)
-		// call msg(toaddress:' ':@fm:errormsg)
-		// if errormsg then call msg(toaddress:' ':@fm:errormsg)
 		if (errormsg) {
 			errormsg = (toaddress ^ " " _FM ^ errormsg).oconv("T#60");
 			errormsg.converter(_TM, _FM);
@@ -163,12 +105,6 @@ func main(in toaddress0, in ccaddress0, in subject0, in body0, in attachfilename
 		// if system<61> or (@username='EXODUS' and system<17,1>[-4,4]='TEST') then
 
 		// testdata and user exodus - always email sysmsg@neosys.com
-		//home.osgetenv("HOME");
-		//if (not home.osgetenv("HOME")) {
-		//	//set in systemd service file
-		//	abort(lasterror());
-		//}
-		// if (osfile(home ^ "/hosts/disabled.cfg") or (SYSTEM.f(61) and USERNAME == "EXODUS") or osfile(home ^ "/hosts/serve_agy.disabled")) {
 		if (not osfile("live.txt") or (SYSTEM.f(61) and USERNAME.ucase() == "EXODUS")) {
 			forcedemailx = "sysmsg@neosys.com";
 
@@ -210,15 +146,6 @@ forcedemail:
 
 	// send mail requires confirmation if user is EXODUS
 	// CANNOT because backup in exodus.net would be interrupted
-	// declare function decide
-	// if @username='EXODUS' then
-	// s33=system<33>
-	// q='You are EXODUS.|Send mail to ':toaddress:'|':subject:'|':body0
-	// convert "\r\n" to @fm in q
-	// if decide(q,'',reply) else reply=2
-	// if reply=1 else return
-	// system<33>=s33
-	// end
 
 	var params1 = "";
 	if (DEFINITIONS.open("DEFINITIONS", "")) {
@@ -542,25 +469,6 @@ forcedemail:
 			if (not osshell("openssl base64 -in " ^ attachfilename.quote() ^ " >> " ^ tempfilename ^ " && printf \"\r\n" ^ delimiter ^ "\r\n\" >> " ^ tempfilename)) {
 				abort(lasterror());
 			}
-			/*
-			// Append a closing delimiter
-			let fileinfo = osfile(tempfilename);
-			let offset = fileinfo.f(1);
-TRACE(offset)
-			let osfile;
-			if (osfile.osopen(tempfilename)) {
-
-				offset = -1; //append
-TRACE(offset)
-				delimiter.osbwrite(osfile, offset);
-TRACE(offset)
-
-				var("\r\n").osbwrite(osfile, offset);
-				headers.osbwrite(osfile, offset);
-TRACE(offset)
-
-			}
-*/
 			// Reconstruct the complete input for sendmail
 			// tempfilename.osrename(bodyfilename);
 			//tempfilename.oscopy(bodyfilename);
@@ -599,7 +507,6 @@ TRACE(offset)
         }
 	}
 	if (paramfilename) {
-		//paramfilename.osremove();
 		if (paramfilename.osfile() and not paramfilename.osremove()) {
 			abort(lasterror());
 		}
@@ -618,7 +525,6 @@ TRACE(offset)
 		if (not errormsg.osread(errorfilename)) {
 			errormsg	 = "Unknown error in sendmail.js Failed to complete";
 			errormsg(-1) = cmd;
-			// errormsg<-1>=params 'T#60'
 			errormsg(-1) = params;
 		}
 	} else {
@@ -635,7 +541,6 @@ TRACE(offset)
 	errormsg.converter(_TM, _FM);
 
 	if (errorfilename) {
-		//errorfilename.osremove();
 		if (errorfilename.osfile() and not errorfilename.osremove()) {
 			abort(lasterror());
 		}
@@ -655,12 +560,6 @@ TRACE(offset)
 		call log("SENDMAIL", details);
 	} else {
 		errormsg.trimmerlast(_FM);
-		// errormsg<-1>=@fm:'Size:     ':msgsize '[XBYTES]'
-		// errormsg<-1>='From:     ':params1<1>
-		// errormsg<-1>='To:       ':toaddress
-		// if ccaddress then
-		// errormsg<-1>='cc:       ':ccaddress
-		// end
 		errormsg(-1) = _FM ^ details;
 		errormsg(-1) = _FM "Server:   " ^ params1.f(2);
 		errormsg(-1) = "Port:     " ^ params1.f(3);
@@ -681,10 +580,6 @@ TRACE(offset)
 
 subr addlinks2osfilename() {
 	tt = osfilename;
-	// tt.converter("\\", "/");
-	// if (tt.starts("../")) {
-	//  tt.cutter(3);
-	// }
 
 	// attachment path must start with '/data/'
 	// Apache will replace the alias /data/ to absolute path from /

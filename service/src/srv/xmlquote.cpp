@@ -4,12 +4,6 @@ libraryinit()
 var string1;
 
 func main(in string0) {
-//	if (string0.unassigned()) {
-//		// de bug
-//		string1 = "UNASSIGNED";
-//	} else {
-//		string1 = string0;
-//	}
 	string1 = string0.or_default("UNASSIGNED");
 
 	string1.replacer("&", "&amp;");

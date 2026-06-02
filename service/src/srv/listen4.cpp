@@ -4,11 +4,7 @@ libraryinit()
 var params;
 
 func main(in msgno, io msg, in params0 = "") {
-//	if (params0.unassigned()) {
-//		params = "";
-//	} else {
-//		params = params0;
-//	}
+
 	params = params0.or_default("");
 
 	switch (msgno.toInt()) {

@@ -2714,11 +2714,6 @@ subr properlock() {
 	// also in balances
 	// will cause the LOCK statement to fail
 	srcfile2 = req.srcfile;
-	/*
-	if (not req.srcfile.unassigned()) {
-		srcfile2.replacer("SHADOW.MFS" ^ SM, "");
-	}
-	*/
 
 	// dont pass the filename because that causes persistent lock checking
 	// in jbase version of lockrecord()

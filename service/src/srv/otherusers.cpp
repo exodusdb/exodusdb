@@ -7,9 +7,6 @@ var databasecode;
 var usercode;  // num
 var lockprefix;
 var result;
-//var xx;
-//var yy;
-//var zz;
 
 func main(in databasecode0 = "", in usercode0 = "") {
 
@@ -18,18 +15,8 @@ func main(in databasecode0 = "", in usercode0 = "") {
 	if (SENTENCE.field(" ", 1) == "OTHERUSERS") {
 		databasecode = SENTENCE.field(" ", 2);
 	} else {
-//		if (databasecode0.unassigned()) {
-//			databasecode = "";
-//		} else {
-//			databasecode = databasecode0;
-//		}
 		databasecode = databasecode0.or_default("");
 	}
-//	if (usercode0.unassigned()) {
-//		usercode = "";
-//	} else {
-//		usercode = usercode0;
-//	}
 	usercode = usercode0.or_default("");
 
 	var processes = "";
@@ -39,8 +26,6 @@ func main(in databasecode0 = "", in usercode0 = "") {
 
 	var returndata	   = 0;
 	var otherusercodes = "";
-
-	// IF @STATION # '' THEN
 
 	// we are at rev 2.0
 	// IF revRELEASE()>= 2.1 THEN
@@ -56,8 +41,6 @@ func main(in databasecode0 = "", in usercode0 = "") {
 	} else {
 		lockprefix = "U" ^ var("99999").last(4);
 	}
-
-	// FOR lockno = 1 TO RUNTIME();*SYSE3_NUSERS
 
 	for (const var lockno : range(1, 100)) {
 

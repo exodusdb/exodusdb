@@ -21,9 +21,6 @@ var paramrec;
 func main(in dataset, in username, io cookie, io msg, io authcompcodes) {
 
 	// this is a special login routine called from LISTEN2
-	// declare function validcode1
-	// $insert abp,common
-	// $insert bp,agency.common
 	cookie		  = "";
 	authcompcodes = "";
 

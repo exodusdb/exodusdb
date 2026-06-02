@@ -41,16 +41,6 @@ func main(in msg0, in subject0 = "", in username0 = "") {
 	// ??? nice idea but it isnt in the MSG() routine???
 
 	var msg = msg0;
-//	if (subject0.unassigned()) {
-//		subjectin = "";
-//	} else {
-//		subjectin = subject0;
-//	}
-//	if (username0.unassigned()) {
-//		username = "";
-//	} else {
-//		username = username0;
-//	}
 	subjectin = subject0.or_default("");
 	username = username0.or_default("");
 
@@ -59,8 +49,6 @@ func main(in msg0, in subject0 = "", in username0 = "") {
 
 	// Output to log/screen
 	if (not interactive) {
-		// print msg:', ':subjectin:', ':username
-		//printl("sysmsg: ", subjectin, ", ", username, ", ", msg.f(1, 1).field("|", 1).f(1, 1));
 		printx("sysmsg:");
 		if (not msg.contains(subjectin))
 			printx(" ", subjectin);
@@ -77,7 +65,6 @@ func main(in msg0, in subject0 = "", in username0 = "") {
 	}
 
 	// remove html tags from message and decode things like &nbsp;
-//	if (msg.first(2) != "@@") {
 	if (not msg.starts("@@")) {
 		call htmllib2("STRIPTAGS", msg);
 		call htmllib2("DECODEHTML", msg);
@@ -119,7 +106,6 @@ func main(in msg0, in subject0 = "", in username0 = "") {
 	// then exodus will not receive any message
 	var useremail	 = username.xlate("USERS", 7, "X").lcase();
 	let userfullname = username.xlate("USERS", 1, "X");
-	// if username='EXODUS' and @username<>'EXODUS' then
 	var emailaddrs = bakpars.f(6);
 	var ccaddrs	   = "";
 	if (bakpars.f(10)) {
@@ -129,7 +115,6 @@ func main(in msg0, in subject0 = "", in username0 = "") {
 		emailaddrs ^= bakpars.f(10);
 	}
 	emailaddrs = emailaddrs.field("/", 1);
-	// if emailaddrs='' then readf emailaddrs from definitions,'REPLICATION',12 else emailaddrs=''
 	emailaddrs.replacer("backups@neosys.com", "sysmsg@neosys.com");
 
 	// suppress login failure messages
@@ -179,7 +164,6 @@ func main(in msg0, in subject0 = "", in username0 = "") {
 	}
 
 	// determine subject
-	// subject='EXODUS System Message: ':datasetcode
 	var subject = "EXODUS System: " ^ datasetcode;
 	let tt		= msg.index("ERROR NO:");
 	if (tt) {
@@ -309,7 +293,6 @@ func main(in msg0, in subject0 = "", in username0 = "") {
 		}
 
 	} else {
-		// print 'EXCEEDED'
 		// log excessive sysmsg
 		call log("SYSMSG", exceededmsg);
 	}

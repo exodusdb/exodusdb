@@ -18,19 +18,6 @@ var lockfile;
 
 func main(in mode, in lockfilename, in lockkey, in lockdesc0, io locklist, in ntries0, out msg) {
 
-//	if (locklist.unassigned()) {
-//		locklist = "";
-//	}
-//	if (ntries0.unassigned()) {
-//		ntries = 100;
-//	} else {
-//		ntries = ntries0;
-//	}
-//	if (lockdesc0.unassigned()) {
-//		lockdesc = "";
-//	} else {
-//		lockdesc = lockdesc0;
-//	}
 	locklist.defaulter("");
 	ntries = ntries0.or_default(100);
 	lockdesc = lockdesc0.or_default("");
@@ -157,10 +144,6 @@ subr unlockall(io locklist, io msg) {
 
 	var filename2 = "";
 	let file	  = "";
-	// 	for (lockn : range(1, 9999)) {
-	// 		lockitem = locklist.f(lockn);
-	// 		// /BREAK;
-	// 		if (not lockitem) break;
 	for (in lockitem : locklist) {
 		let filename = lockitem.field(lockitemsep_, 1);
 		let lockkeyx = lockitem.field(lockitemsep_, 2, 9999);

@@ -17,9 +17,6 @@ var codepage;
 func main(in origprogname, in languagecode0, in origdatatype, io languagefile, io lang) {
 
 	lang = "";
-//	if (languagefile.unassigned()) {
-//		languagefile = "";
-//	}
 	languagefile.defaulter("");
 	if (languagefile == "") {
 		if (not languagefile.open("ALANGUAGE", "")) {
@@ -53,14 +50,8 @@ func main(in origprogname, in languagecode0, in origdatatype, io languagefile, i
 			lang   = "";
 			let n1 = lang1.fcount(FM);
 			let n2 = lang2.fcount(FM);
-			// 			if (n1 < n2) {
-			// 				nn = n2;
-			// 			} else {
-			// 				nn = n1;
-			// 			}
 			let nn = (n1 < n2) ? n2 : n1;
 			for (const var fn : range(1, nn)) {
-				// lang(fn) = (lang1.f(fn) ^ " " ^ lang2.f(fn)).trim();
 				let lang1line = lang1.f(fn);
 				let lang2line = lang2.f(fn);
 				let nparts	  = fcount(lang1line, "|");
