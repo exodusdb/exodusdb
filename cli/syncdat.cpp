@@ -327,7 +327,8 @@ func main() {
 					} else {
 						// Write the RECORD
 						write(RECORD on dbfile, ID);
-						printl("syncdat:", dbfilename, ID, "Written");
+						if (verbose or not force)
+							printl("syncdat:", dbfilename, ID, "Written");
 					}
 				}
 
