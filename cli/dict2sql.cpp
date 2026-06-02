@@ -102,7 +102,7 @@ func main() {
 
 	var filenames = COMMAND.f(2).lcase();
 	let dictids = COMMAND.field(FM, 3, 999999);
-	// VV shows function bodies as well
+	// VV shows sql functions
 	verbose = OPTIONS.count("V");
 	force = OPTIONS.contains("F");
 	var doall = true;
@@ -207,57 +207,6 @@ COST 10;
 		rawsqlexec("ALTER FUNCTION public.immutable_unaccent(text) OWNER TO exodus");
 
 	}
-
-//	if (install_exodus_extensions == "pgexodus") {
-//
-//		let sqltemplate_strict =
-//			R"V0G0N(
-//CREATE OR REPLACE FUNCTION $functionname_and_args RETURNS $return_type
-//AS 'pgexodus', '$functionname'
-//LANGUAGE 'c'
-//IMMUTABLE STRICT
-//SECURITY
-//DEFINER
-//COST 10;
-//)V0G0N";
-//
-//		let sqltemplate = sqltemplate_strict.replace(" STRICT", "");
-//
-//		create_function("exodus.extract_text(data text, fn int4, vn int4, sn int4)", "text", "", sqltemplate);
-//		create_function("exodus.extract_number(data text, fn int4, vn int4, sn int4)", "float8", "", sqltemplate);
-//		create_function("exodus.count(data text, countchar text)", "integer", "", sqltemplate);
-//
-//		//create_function("exodus.extract_sort(data text, fn int4, vn int4, sn int4)", "text", "", sqltemplate);
-//		create_function("exodus.extract_date(data text, fn int4, vn int4, sn int4)", "date", "", sqltemplate_strict);
-//		create_function("exodus.extract_time(data text, fn int4, vn int4, sn int4)", "interval", "", sqltemplate_strict);
-//		create_function("exodus.extract_datetime(data text, fn int4, vn int4, sn int4)", "timestamp", "", sqltemplate_strict);
-//
-//	} else if (install_exodus_extensions == "pgsql") {
-//
-//		//rawsqlexec("DROP FUNCTION IF EXISTS exodus.extract_sort(text, int4, int4, int4);");
-//
-//		//exodus.extract_text<fn,vn,sn> returns an sql text type
-//		create_function("exodus.extract_text(data text, fn int, vn int, sn int)", "text", exodus_extract_text_sql, sqltemplate);
-//
-//		//NOT implemented in pgsql. ::select uses COLLATE instead
-//		//exodus.extract_sortt<fn,vn,sn> returns an sql text type
-//		//create_function("exodus.extract_sort(data text, fn int, vn int, sn int)", "text", exodus_extract_text_sql, sqltemplate);
-//
-//		//exodus.extract_date<fn,vn,sn> returns an sql data type
-//		create_function("exodus.extract_date(data text, fn int4, vn int4, sn int4)", "date", exodus_extract_date_sql, sqltemplate);
-//
-//		//exodus.extract_time<fn,vn,sn> returns an sql time type
-//		create_function("exodus.extract_time(data text, fn int4, vn int4, sn int4)", "time", exodus_extract_time_sql, sqltemplate);
-//
-//		//exodus.extract_date<fn,vn,sn> returns an sql data type
-//		create_function("exodus.extract_datetime(data text, fn int4, vn int4, sn int4)", "timestamp", exodus_extract_datetime_sql, sqltemplate);
-//
-//		//exodus.extract_number<fn,vn,sn> returns an sql float8 type
-//		create_function("exodus.extract_number(data text, fn int4, vn int4, sn int4)", "float8", exodus_extract_number_sql, sqltemplate);
-//
-//		//exodus.count(str,ch) returns an int
-//		create_function("exodus.count(data text, countchar text)", "integer", exodus_count_sql, sqltemplate);
-//	}
 
 	// Various exodus pgsql utility functions
 	/////////////////////////////////////////
@@ -580,7 +529,8 @@ subr create_function(in functionname_and_args, in return_sqltype, in sql, in sql
 		COST 10;
 	*/
 
-	printl(functionname_and_args, "->", return_sqltype);
+	if (verbose)
+		printl(functionname_and_args, "->", return_sqltype);
 
 	// Create the function
 	//////////////////////
@@ -717,7 +667,7 @@ subr onedictid(in dictfile, in dictfilename, io dictid, in reqdictid) {
 			dict_returns = "float";
 	}
 
-	let function_name_and_args = dictfilename.convert(".", "_") ^ "_" ^ dictid ^ "(key text, data text)";
+	let function_name_and_args = dictfilename.convert(".", "_") ^ "_" ^ dictid.lcase() ^ "(key text, data text)";
 
 	//auto generate pgsql code for ..._XREF dict records (full text)
 	if (sourcecode.starts("CALL XREF({")) {
