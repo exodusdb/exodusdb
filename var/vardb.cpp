@@ -1139,7 +1139,7 @@ bool var::open(in filename, in connection /*DEFAULTNULL*/) {
 
 	// Either use connection provided
 	var connection2;
-	if (connection) {
+	if (connection.assigned() && connection) {
 		connection2 = connection;
 	}
 	else {

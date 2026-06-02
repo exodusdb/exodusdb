@@ -206,7 +206,7 @@ var compcode;
 var logid;
 
 var nextconnection;
-let interactive_prompt = AT(-40) ^ "(Q)uit, (E)xecute or (D)ebug:\nListening ...\r";
+let interactive_prompt = AT(-40) ^ "(q)uit, (e)xecute or (d)ebug:\nListening ...\r";
 
 func main() {
 
@@ -498,7 +498,7 @@ func main_init() {
 		loglasterror();
 
 	// In init_main and loop_exit with commands
-	// q to quit, x to execute commands
+	// q to quit, e to execute commands
 	if (isterminal(0)) {
  		output(interactive_prompt);
 		osflush();
@@ -745,7 +745,8 @@ func loop_exit() {
 		reply.inputn(1);
 		echo(true);
 
-		if (reply == INTCONST.f(1)) {
+		// q
+		if (reply == INTCONST.f(1) or reply.listed("q")) {
 			// space to defeat ANSI control chars after pressing Esc
 			printx(" ");
 			// gosub main_exit();
