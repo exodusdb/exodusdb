@@ -17,41 +17,6 @@ var title;
 
 func main(in mode0, in title0, in module, in request, in data0, in runasusercode0, in targetusercodes0, io document0, io docid, out msg) {
 
-	// creates an autorun record in documents
-	// GBP CREATEALERT mode WRITE
-	// GBP GENERAL.SUBS2 mode ASAP
-	// BP MEDIADIARY mode WRITE/ASP for media diary
-	// ABP none
-
-	// default unassigned parameters
-//	if (mode0.unassigned()) {
-//		mode = "";
-//	} else {
-//		mode = mode0;
-//	}
-//	if (data0.unassigned()) {
-//		datax = "";
-//	} else {
-//		datax = data0;
-//	}
-//	if (runasusercode0.unassigned()) {
-//		runasusercode = "";
-//	} else {
-//		runasusercode = runasusercode0;
-//	}
-//	if (targetusercodes0.unassigned()) {
-//		targetusercodes = "";
-//	} else {
-//		targetusercodes = targetusercodes0;
-//	}
-//	if (document0.unassigned()) {
-//		srv.document = "";
-//	} else {
-//		srv.document = document0;
-//	}
-//	if (docid.unassigned()) {
-//		docid = "";
-//	}
 	mode            = mode0.or_default("");
 	datax           = data0.or_default("");
 	runasusercode   = runasusercode0.or_default("");

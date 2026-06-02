@@ -363,26 +363,26 @@ updateversion:
 			loglasterror();
 	}
 
-	call log2("*copy any new data records", logtime);
-	var	 bp;
-	if (bp.open("GBP", "")) {
-		for (const var ii : range(1, 9999)) {
-			var rec;
-			if (not rec.read(bp, "$DATA." ^ ii)) {
-				rec = "";
-			}
-			// /BREAK;
-			if (rec == "")
-				break;
-			let filename = rec.f(1);
-			let id		 = rec.f(2);
-			rec			 = rec.field(FM, 3, 99999);
-			var file;
-			if (file.open(filename, "")) {
-				rec.write(file, id);
-			}
-		}  // ii;
-	}
+//	call log2("*copy any new data records", logtime);
+//	var	 bp;
+//	if (bp.open("GBP", "")) {
+//		for (const var ii : range(1, 9999)) {
+//			var rec;
+//			if (not rec.read(bp, "$DATA." ^ ii)) {
+//				rec = "";
+//			}
+//			// /BREAK;
+//			if (rec == "")
+//				break;
+//			let filename = rec.f(1);
+//			let id		 = rec.f(2);
+//			rec			 = rec.field(FM, 3, 99999);
+//			var file;
+//			if (file.open(filename, "")) {
+//				rec.write(file, id);
+//			}
+//		}  // ii;
+//	}
 
 	// syslock=if revrelease()>=2.1 then 36 else 23
 

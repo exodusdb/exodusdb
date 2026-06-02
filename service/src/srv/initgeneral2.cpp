@@ -72,10 +72,8 @@ func main(in mode, io logtime, in menu) {
 
 	} else if (mode == "UPDATEIPNOS4EXODUS") {
 
-		call log2("*update EXODUS-allowed ipnos from GBP file", logtime);
+		call log2("*update EXODUS-allowed ipnos", logtime);
 
-		// open 'GBP' to gbp else return
-		// read hosts from gbp,'$HOSTS.ALLOW' else return
 		call readhostsallow(hosts);
 
 		// convert hosts.allow format to sv list of valid ip numbers or partial ip nos

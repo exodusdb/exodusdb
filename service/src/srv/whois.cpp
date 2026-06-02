@@ -60,7 +60,6 @@ func main(in /*mode*/, in ipno, out text) {
 
 	// skip EXODUS internet ip numbers and those in system configuration file
 	// ZZZ should really detect net ranges like /24 and .*
-	// allowedips=' ':xlate('GBP','$HOSTS.ALLOW','','X'):' '
 	call readhostsallow(allowedips);
 	allowedips(-1) = SYSTEM.f(39);
 	allowedips.converter(_FM _VM

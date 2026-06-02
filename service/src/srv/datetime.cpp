@@ -8,14 +8,6 @@ func main(in type, in inx, in mode, out outx) {
 		return 0;
 	}
 
-	// nospaces=index(mode,'*',1)
-	// if nospaces then convert '*' to '' in mode
-	// IF MODE THEN
-	// IF MODE='4' THEN MODE=@DATE.FORMAT;MODE[2,1]='4'
-	// END ELSE
-	// IF @DATE.FORMAT THEN MODE=@DATE.FORMAT ELSE MODE='D2/E'
-	// END
-
 	var datemode = "[DATE," ^ mode.field(",", 1) ^ "]";
 	var timemode = mode.field(",", 2);
 
@@ -26,7 +18,7 @@ func main(in type, in inx, in mode, out outx) {
 		var in2 = inx.field(".", 2);
 
 		// find all DOS in accessible columns
-		// find all DOS related code by searching GBP for /86400
+		// find all DOS related code by searching src for /86400
 		if (datemode.contains("DOS")) {
 			datemode.replacer("DOS", "");
 			// in1-=24873
