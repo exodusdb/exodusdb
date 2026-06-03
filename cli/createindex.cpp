@@ -4,10 +4,11 @@ programinit()
 func main() {
 
 	let force = OPTIONS.contains("F");
+	let silent = OPTIONS.count("S");
 	var indexnames = COMMAND.remove(1);
 
 	if (not indexnames)
-		abort("Syntax is 'createindex [filename] [filename__]fieldname... {F=Force}'");
+		abort("Syntax is 'createindex [filename] [filename__]fieldname... {F=Force, S=Silent, SS=No error messages}'");
 
 	// "createindex xref" means redo all _xref indexes
 	if (indexnames == "xref") {
@@ -23,6 +24,7 @@ func main() {
 	}
 
 	let nindexes = fcount(indexnames, FM);
+	let exo_data = osgetenv("EXO_DATA");
 
 	var result = 0;
 
@@ -44,15 +46,19 @@ func main() {
 
 		let indexname = filename ^ "__" ^ fieldname;
 		if (force && listindex(filename, fieldname)) {
-			printl("deleteindex", filename, fieldname);
+			if (not silent)
+				printl(exo_data, "deleteindex", filename, fieldname);
 			if (not filename.deleteindex(fieldname)) {
-				errputl(lasterror());
+				if (silent < 2)
+					errputl(lasterror());
 				result = 1;
 			}
 		}
-		printl("createindex", filename, fieldname);
+		if (not silent)
+			printl(exo_data, "createindex", filename, fieldname);
 		if (not filename.createindex(fieldname)) {
-			errputl(lasterror());
+			if (silent < 2)
+				errputl(lasterror());
 			result = 1;
 		}
 	}

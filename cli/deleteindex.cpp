@@ -3,13 +3,15 @@ programinit()
 
 func main() {
 
-	let force = OPTIONS.contains("F");
+	let silent = OPTIONS.count("S");
+
 	let indexnames = COMMAND.remove(1);
 	let nindexes = fcount(indexnames, FM);
 
 	if (not nindexes)
-		abort("Syntax is 'deleteindex filename__fieldname ...'");
+		abort("Syntax is 'deleteindex filename__fieldname ... {S=Silent, SS=No error messages}'");
 
+	let exo_data = osgetenv("EXO_DATA");
 	var result = 0;
 
 	var indexn;
@@ -28,9 +30,11 @@ func main() {
 			indexn += 1;
 		}
 
-		printl("deleteindex", filename, fieldname);
+		if (not silent)
+			printl(exo_data, "deleteindex", filename, fieldname);
 		if (not filename.deleteindex(fieldname)) {
-			errputl(lasterror());
+			if (silent < 2)
+				errputl(lasterror());
 			result = 1;
 		}
 	}
