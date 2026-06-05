@@ -1906,7 +1906,11 @@ bool var::sqlexec(in sqlcmd, io response) const {
 //		}
 		let sqlstate = var(PQresultErrorField(dbresult, PG_DIAG_SQLSTATE));
 		// sql state 42P03 = duplicate_cursor
+		// sql state 23505 = duplicate create table
 		response = "var::sqlexec: " ^ (var(dbresult.pqerrmsg) ?: var(PQerrorMessage(pgconn))).trimlast("\n") ^ ". sqlstate:" ^ sqlstate ^ " " ^ sqlcmd;
+//		TRACE(sqlcmd)
+//		TRACE(sqlstate)
+//		TRACE(response)
 		return false;
 	}
 
@@ -2655,17 +2659,22 @@ bool var::createfile(in filename) const {
 		return false;
 	}
 
-	// sql
+	// sql CREATE TABLE
+	// IF NOT EXISTS added to avoid race to create after concurrent failure to open above
+	// var::sqlexec: ERROR:  duplicate key value violates unique constraint "pg_type_typname_nsp_index"
+	// Key (typname, typnamespace)=(documents, 16413) already exists.. sqlstate:23505 CREATE TABLE dict.documents (key text primary key, data text)
 	var sql = "CREATE";
 	if (filename.ends("_temp") and not filename.starts("dict.", "DICT."))
 		sql ^= " TEMPORARY ";
-	sql ^= " TABLE " ^ get_normalized_filename(filename);
+	sql ^= " TABLE IF NOT EXISTS " ^ get_normalized_filename(filename);
 	sql ^= " (key text primary key, data text)";
 
 	// Create it
 	//     if (not (this->assigned() ? *this : filename).sqlexec(sql))
-	if (not this->sqlexec(sql))
+	if (not this->sqlexec(sql)) {
+		// lasterror already set
 		return false;
+	}
 
 	// Open it as well to get prepared statements implemented by open
 	if (not this->clone().open(filename, *this)) UNLIKELY {
