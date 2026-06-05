@@ -2669,10 +2669,12 @@ bool var::createfile(in filename) const {
 	// Wrap in advisory lock to avoid race to create after concurrent failure to open above
 	// var::sqlexec: ERROR:  duplicate key value violates unique constraint "pg_type_typname_nsp_index"
 	// Key (typname, typnamespace)=(documents, 16413) already exists.. sqlstate:23505 CREATE TABLE dict.documents (key text primary key, data text)
+	// Dont use pg_advisory_xact_lock since that lock will not clear until the end of the trans and second call to create the same table would hang
+	// Use implicit single-statement transaction to gain lock with wait and create release all together
 	sql =
 		"DO $$\n"
 		"BEGIN\n"
-		"	PERFORM pg_advisory_xact_lock(hashtext('var::createfile(" ^ filename ^ ")'));\n"
+		"	PERFORM pg_advisory_lock(hashtext('var::createfile(" ^ filename ^ ")'));\n"
 		"   " ^ sql ^ "\n"
 		"END $$;"
 	;
