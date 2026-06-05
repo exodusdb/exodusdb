@@ -2660,14 +2660,22 @@ bool var::createfile(in filename) const {
 	}
 
 	// sql CREATE TABLE
-	// IF NOT EXISTS added to avoid race to create after concurrent failure to open above
-	// var::sqlexec: ERROR:  duplicate key value violates unique constraint "pg_type_typname_nsp_index"
-	// Key (typname, typnamespace)=(documents, 16413) already exists.. sqlstate:23505 CREATE TABLE dict.documents (key text primary key, data text)
 	var sql = "CREATE";
 	if (filename.ends("_temp") and not filename.starts("dict.", "DICT."))
 		sql ^= " TEMPORARY ";
 	sql ^= " TABLE IF NOT EXISTS " ^ get_normalized_filename(filename);
-	sql ^= " (key text primary key, data text)";
+	sql ^= " (key text primary key, data text);";
+
+	// Wrap in advisory lock to avoid race to create after concurrent failure to open above
+	// var::sqlexec: ERROR:  duplicate key value violates unique constraint "pg_type_typname_nsp_index"
+	// Key (typname, typnamespace)=(documents, 16413) already exists.. sqlstate:23505 CREATE TABLE dict.documents (key text primary key, data text)
+	sql =
+		"DO $$\n"
+		"BEGIN\n"
+		"	PERFORM pg_advisory_xact_lock(hashtext('var::createfile(" ^ filename ^ ")'));\n"
+		"   " ^ sql ^ "\n"
+		"END $$;"
+	;
 
 	// Create it
 	//     if (not (this->assigned() ? *this : filename).sqlexec(sql))
