@@ -36,14 +36,14 @@ PS4='+ [./create_site ${DB_CODE:-${3-}} ${SECONDS}s] '
 
 function APT_GET {
 : ────────────────────────────────────────
-: Function to call apt-get repeatedly in case of error
+: Function to call apt-get repeatedly in case of err
 : ────────────────────────────────────────
 	STARTED=$SECONDS
 	while [[ $(($SECONDS-$STARTED)) -lt 600 ]]; do
 :
 : Retry apt-get. $(($SECONDS-$STARTED)) secs.
 : ────────────────────────────────────────
-		# /dev/null to stop error causing random hang until timeout
+		# /dev/null to stop err causing random hang until timeout
 		# with apt process stuck on tcsetattr call. see gdb/lldb -p 9999
 		if timeout 120s $* < /dev/null; then
 			break
@@ -198,7 +198,7 @@ function APT_GET {
 		    DocumentRoot $HOME/hosts/$HOST_DIR/www/
 		    Alias /data/ $HOME/hosts/$HOST_DIR/data/
 		    Alias /images/ $HOME/hosts/$HOST_DIR/images/
-		    #emerg/alert/crit/error/warn/notice/info/debug/trace1/.../trace8
+		    #emerg/alert/crit/err.r/warn/notice/info/debug/trace1/.../trace8
 		    LogLevel info
 		    AddDefaultCharset utf-8
 		    Header set Cache-Control "max-age=300, public"

@@ -171,7 +171,7 @@ function init_apt() {
 :
 	bash -c "while ! hostnamectl status 2> /dev/null && [[ $SECONDS -lt 60 ]]; do sleep 2; done"
 :
-: Generate error if timeout reached. Otherwise display various host info.
+: Generate err if timeout reached. Otherwise display various host info.
 :
 	hostnamectl status
 :
@@ -481,7 +481,7 @@ function get_dependencies_for_build_and_install {
 :
 : Clang module building needs its scan tools in the path
 : ────────────────────────────────────────
-:	Avoid "CMAKE_CXX_COMPILER_CLANG_SCAN_DEPS" error
+:	Avoid "CMAKE_CXX_COMPILER_CLANG_SCAN_DEPS" err
 	CLANG_VERSION=`c++ --version | head -n1|cut -d'.' -f 1|grep -Po '\d+'`
 	APT_INSTALL clang-tools-$CLANG_VERSION
 
@@ -873,7 +873,7 @@ function test_exodus_and_database {
 : ────────────────────────────────────────
 	testsort > /dev/null
 :
-: Many tests using ctest - In parallel. Output only on error
+: Many tests using ctest - In parallel. Output only on err
 : ────────────────────────────────────────
 #: Note that all the exodus/build/test/src test to that do not require database were already run
 : Note that all the exodus/build/test test to that do not require database were already run

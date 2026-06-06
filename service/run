@@ -47,7 +47,7 @@ PS4='+ [./run ${DB_CODE:-${1-}} ${SECONDS}s] '
 :
 	EXO_LIVE=${EXO_LIVE:-}
 :
-: Break into debugger on all errors
+: Break into debugger on all err
 :
 	export EXO_DEBUG=${EXO_DEBUG:-1}
 :

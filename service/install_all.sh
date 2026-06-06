@@ -240,7 +240,7 @@ function APT_INSTALL {
 : Check html conversion to pdf
 : ────────────────────────────────────────
 	printf "<html><body>Nothing Special</body></html>\n" > chromium2pdf.html
-	chromium --no-sandbox --headless --disable-gpu --print-to-pdf=chromium2pdf.pdf chromium2pdf.html |& grep -v 'ERROR:dbus'
+	chromium --no-sandbox --headless --disable-gpu --print-to-pdf=chromium2pdf.pdf chromium2pdf.html |& grep -v 'ERR.R:dbus'
 :
 	pdfgrep "Nothing Special" chromium2pdf.pdf
 #	rm chromium2pdf.html chromium2pdf.pdf

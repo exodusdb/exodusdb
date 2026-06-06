@@ -87,14 +87,14 @@ PS4='+ [./create_service ${BASE_DB_CODE:-${2-}} ${SECONDS}s] '
 
 function APT_GET {
 : ────────────────────────────────────────
-: Function to call apt-get repeatedly in case of error
+: Function to call apt-get repeatedly in case of err
 : ────────────────────────────────────────
 	STARTED=$SECONDS
 	while [[ $(($SECONDS-$STARTED)) -lt 600 ]]; do
 :
 : Retry apt-get. $(($SECONDS-$STARTED)) secs.
 : ────────────────────────────────────────
-		# /dev/null to stop error causing random hang until timeout
+		# /dev/null to stop err causing random hang until timeout
 		# with apt process stuck on tcsetattr call. see gdb/lldb -p 9999
 		if timeout 120s $* < /dev/null; then
 			break
@@ -133,9 +133,9 @@ function APT_GET {
 		ExecStart=$SERVICE_BIN $SERVICE_CMD $IDB_CODES
 		ExecReload=/bin/kill -s HUP \$MAINPID
 		#StandardOutput=append:/var/log/neo/${IDB_CODE}.log
-		#StandardError=append:/var/log/neo/${IDB_CODE}_error.log
+		#StandardErr.r=append:/var/log/neo/${IDB_CODE}_err.r.log
 		#StandardOutput=syslog
-		#StandardError=syslog
+		#StandardErr.r=syslog
 		SyslogIdentifier=$SERVICE_CODE@%i
 		#
 		[Install]
