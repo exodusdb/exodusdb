@@ -75,7 +75,7 @@ function APT_INSTALL {
 	if [ $SITE_NAME != none ]; then
 		cd $EXODUS_DIR/service
 		./create_site $SITE_NAME '' '' $DOMAIN_PREFIX
-		[ -f ~/hosts/clients.cfg ] || echo "doone $site_name '' ''" > ~/hosts/clients.cfg
+		[ -f ~/hosts/clients.cfg ] || echo "doone $SITE_NAME '' ''" > ~/hosts/clients.cfg
 	fi
 :
 : Disable default web sites
