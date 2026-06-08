@@ -514,6 +514,7 @@ static int get_dbconn_no_or_default(in dbhandle) {
 			if (not thread_default_data_dbconn_no) {
 				defaultdb = "";
 				if (not defaultdb.connect()) {
+					var("Warning: Default db connection failed.").errputl();
 					//null
 				}
 			}
@@ -523,6 +524,8 @@ static int get_dbconn_no_or_default(in dbhandle) {
 			if (DBTRACE_CONN >= 3)
 				TRACE(thread_default_data_dbconn_no)
 
+		} else {
+			var("Warning: Default db connection failed. " ^ defaultdb).errputl();
 		}
 
 		if (DBTRACE_CONN >= 3)
@@ -1560,7 +1563,7 @@ bool var::read(in file, in key) {
 	// Get file specific connection or fail
 	const auto pgconn = get_pgconn(file);
 	if (not pgconn) UNLIKELY {
-		let errmsg = "var::read() get_pgconn() failed for " ^ file;
+		let errmsg = "var::read() get_pgconn(" ^ file ^ ", " ^ key ^ ") failed for " ^ file;
 		var::setlasterror(errmsg);
 		throw VarDBException(errmsg);
 	}
@@ -1683,7 +1686,7 @@ var  var::lock(in key) const {
 
 	auto pgconn = get_pgconn(*this);
 	if (not pgconn) UNLIKELY {
-		var errmsg = "var::lock() get_pgconn() failed. ";
+		var errmsg = "var::lock() get_pgconn(" ^ (*this) ^ ", " ^ key ^ ") failed. ";
 		if (this->assigned())
 			errmsg ^= *this ^ ", ";
 		errmsg ^= key;
@@ -1770,7 +1773,7 @@ bool var::unlock(in key) const {
 
 	const auto pgconn = get_pgconn(*this);
 	if (not pgconn) UNLIKELY {
-		var errmsg = "var::unlock() get_pgconn() failed. ";
+		var errmsg = "var::unlock() get_pgconn(" ^ (*this) ^ ", " ^ key ^ ") failed. ";
 		if (this->assigned())
 			errmsg ^= *this ^ ", ";
 		errmsg ^= key;
@@ -1833,7 +1836,7 @@ bool var::unlockall() const {
 
 	const auto pgconn = get_pgconn(*this);
 	if (not pgconn) UNLIKELY {
-		var errmsg = "var::unlockall() get_pgconn() failed. ";
+		var errmsg = "var::unlockall() get_pgconn(" ^ (*this) ^ ") failed. ";
 		if (this->assigned())
 			errmsg ^= *this;
 		var::setlasterror(errmsg);
@@ -1878,7 +1881,7 @@ bool var::sqlexec(in sqlcmd, io response) const {
 
 	const auto pgconn = get_pgconn(*this);
 	if (not pgconn) UNLIKELY {
-		let errmsg = "var::sqlexec() get_pgconn() failed. " ^ (this->assigned() ? *this : "");
+		let errmsg = "var::sqlexec() get_pgconn() failed. " ^ (this->assigned() ? *this : "") ^ " - " ^ sqlcmd;
 		var::setlasterror(errmsg);
 		throw VarDBException(errmsg);
 	}
@@ -2012,7 +2015,7 @@ void var::write(in file, in key) const {
 
 	const auto pgconn = get_pgconn(file);
 	if (not pgconn) UNLIKELY {
-		var errmsg = "var::write() get_pgconn() failed. ";
+		var errmsg = "var::write(" ^ file ^ ", " ^ key ^ ") get_pgconn() failed. ";
 		errmsg ^= file ^ ", " ^ key;
 		var::setlasterror(errmsg);
 		throw VarDBException(errmsg);
@@ -2108,7 +2111,7 @@ bool var::updaterecord(in file, in key) const {
 
 	const auto pgconn = get_pgconn(file);
 	if (not pgconn) UNLIKELY {
-		var errmsg = "var::updaterecord() get_pgconn() failed. ";
+		var errmsg = "var::updaterecord(" ^ file ^ ", " ^ key ^ ") get_pgconn() failed. ";
 		errmsg ^= file ^ ", " ^ key;
 		var::setlasterror(errmsg);
 		throw VarDBException(errmsg);
@@ -2255,7 +2258,7 @@ bool var::insertrecord(in file, in key) const {
 
 	const auto pgconn = get_pgconn(file);
 	if (not pgconn) UNLIKELY {
-		var errmsg = "var::insertrecord() get_pgconn() failed. ";
+		var errmsg = "var::insertrecord(" ^ file ^ ", " ^ key ^ ") get_pgconn() failed. ";
 		errmsg ^= file ^ ", " ^ key;
 		var::setlasterror(errmsg);
 		throw VarDBException(errmsg);
@@ -2330,7 +2333,7 @@ bool var::deleterecord(in key) const {
 
 	const auto pgconn = get_pgconn(*this);
 	if (not pgconn) UNLIKELY {
-		var errmsg = "var::deleterecord() get_pgconn() failed. ";
+		var errmsg = "var::deleterecord(" ^ (*this) ^ ", " ^ key ^ ") get_pgconn() failed. ";
 		if (this->assigned())
 			errmsg ^= *this ^ ", ";
 		errmsg ^= key;
@@ -5258,7 +5261,7 @@ bool var::hasnext() {
 
 	const auto pgconn = get_pgconn(*this);
 	if (not pgconn) UNLIKELY {
-		let errmsg = "var::hasnext() get_pgconn() failed for " ^ this->quote();
+		let errmsg = "var::hasnext() get_pgconn(" ^ (*this) ^ ") failed for " ^ this->quote();
 		var::setlasterror(errmsg);
 		throw VarDBException(errmsg);
 	}
