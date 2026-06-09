@@ -666,6 +666,14 @@ function get_dependencies_for_database {
 : ────────────────────────────────────────
 	APT_INSTALL postgresql$PG_VER_SUFFIX postgresql-plperl$PG_VER_SUFFIX #for pgexodus install
 :
+: Prevent postgres disabling itself after restarting from snapshots or abnormal shutdowns
+: ────────────────────────────────────────
+	mkdir -p /etc/systemd/system/postgresql.service.d
+	cat > /etc/systemd/system/postgresql.service.d/50-rm-stale-pids.conf <<-EOF
+		[Service]
+		ExecStartPre=/bin/rm -f /var/lib/postgresql/*/main/postmaster.pid
+	EOF
+:
 } # function get_dependencies_for_database - stage d
 
 function install_database {
