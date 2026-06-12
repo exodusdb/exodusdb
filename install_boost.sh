@@ -65,11 +65,11 @@ PS4='+ [install_boost.sh ${SECONDS}s] '
 : ────────────────────────────────────────
 : Download
 :
-	curl -LOs "${BOOST_URL}"
+	curl --retry 3 -LOs "${BOOST_URL}"
 :
 : Verify checksum
 :
-	curl -LOs "${BOOST_URL}.txt"
+	curl --retry 3 -LOs "${BOOST_URL}.txt"
 	EXPECTED_CHECKSUM=$(awk '{ print $1 }' "$BOOST_TAR.txt")
 #	sha256sum boost-1.90.0-b2-nodocs.tar.gz
 	CURRENT_CHECKSUM=$(sha256sum "$BOOST_TAR" | awk '{ print $1 }')

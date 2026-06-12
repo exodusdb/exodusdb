@@ -38,12 +38,12 @@ PS4='+ [install_icu.sh ${SECONDS}s] '
 :
 : Download + verify
 : ────────────────────────────────────────
-	curl -LOs "${URL}"
+	curl --retry 3 -LOs "${URL}"
 :
 : Verify
 : ────────────────────────────────────────
-	curl -LOs "${URL}.asc"
-	curl -LOs https://raw.githubusercontent.com/unicode-org/icu/main/KEYS
+	curl --retry 3 -LOs "${URL}.asc"
+	curl --retry 3 -LOs https://raw.githubusercontent.com/unicode-org/icu/main/KEYS
 	gpg --import KEYS
 	gpg --verify "${TARBALL}.asc" "${TARBALL}"
 :
