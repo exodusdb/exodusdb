@@ -528,7 +528,7 @@ function get_dependencies_for_build_and_install {
 :
 : Install pygments syntax highlighter for cli gendoc
 : ────────────────────────────────────────
-	APT_INSTALL python3-pygments python3-setuptools # || FAILED to install pygments
+	APT_INSTALL python3-pygments python3-pip # || FAILED to install pygments
 :
 : Install exodus lexer plugin for pygment syntax highlighter
 : ────────────────────────────────────────
