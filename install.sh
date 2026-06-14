@@ -1,7 +1,7 @@
 #!/bin/bash
 [ "$INSTALL_SH" ] || { INSTALL_SH=1 exec bash "$0" "$@" 2>&1 | tee -a "$(echo ${0##*/}.$*.$(printf "%04d" $(( RANDOM % 10000 ))).log | tr ' :@' '.__')"; exit "${PIPESTATUS[0]}"; }
 set -euxo pipefail
-PS4='+ [install.sh ${1:-?} ${SECONDS}s] '
+PS4='+ [install.sh:$LINENO ${1:-${req_stage:-${REQ_STAGES:-?}}} ${SECONDS}s] '
 : $0 $*
 
 function main() {
@@ -612,6 +612,15 @@ function build_only {
 	#ninja
 	#cmake --build $EXODUS_DIR/build -j$((`nproc`+1))
 	cmake --build $EXODUS_DIR/build
+:
+: 'Optional: generate full HTML documentation (var.htm).'
+: 'This is allowed to fail (|| true) so that problems with the'
+: 'pygments/exoduscpp syntax highlighter do not obstruct the main'
+: 'build, test and install of exodus.'
+: 'The man page (var.1) and testing_var.h.cpp are generated reliably'
+: 'as a side-effect of the cli/gendoc build (via its POST_BUILD).'
+:
+	(cd $EXODUS_DIR/build && cmake --build . --target doc) || true
 :
 } # function build - stage B
 

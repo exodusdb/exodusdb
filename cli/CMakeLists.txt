@@ -148,18 +148,25 @@
 # The actual generation commands live in doc/gendoc_helper.sh
 # (single source of truth — no duplication of the gendoc invocations).
 #
-# A lightweight POST_BUILD on gendoc triggers the helper so that
-# normal builds of the CLI tools automatically refresh the docs
-# (var.1 / var.htm) and the header-derived test file (testing_var.h.cpp).
-# This preserves the useful coupling the project has historically relied on.
+# A lightweight POST_BUILD on gendoc triggers the helper (in {m} mode)
+# so that normal builds of the CLI tools automatically refresh:
+#   - the man page (var.1)
+#   - the header-derived test file (testing_var.h.cpp)
 #
-# See ../doc/CMakeLists.txt for the explicit 'documentation' custom target
-# (for "ninja documentation" or making it a dependency of other things).
+# This is considered essential because the generated test extensively
+# exercises the public API documented in the headers.
+#
+# The HTML documentation (var.htm) lives in the separate 'doc' subproject
+# and is deliberately **not** built automatically. It can be requested
+# explicitly with "ninja doc" (or equivalent) and is allowed to fail
+# in install.sh so that pygments plugin issues do not block the main build.
+#
+# See ../doc/CMakeLists.txt for the 'doc' / 'documentation' target.
 
 	add_custom_command(TARGET gendoc POST_BUILD
 		COMMAND ${CMAKE_COMMAND} -E env EXO_LIBDIR=${CMAKE_CURRENT_BINARY_DIR}
 		        ${CMAKE_SOURCE_DIR}/doc/gendoc_helper.sh ${CMAKE_CURRENT_BINARY_DIR} ${SRC_EXODUS_DIR} ${CMAKE_SOURCE_DIR}/test ${GENDOC_INPUT_HEADERS}
-		COMMENT "Running gendoc post-build to generate man page, html docs and testing_var.h.cpp"
+		COMMENT "Running gendoc post-build to generate man page + testing_var.h.cpp (the {m} mode)"
 		VERBATIM
 	)
 
