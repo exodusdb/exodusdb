@@ -602,8 +602,9 @@ add_definitions(-DGIT_REMOTE_COMMIT_HASH_SHORT="${GIT_REMOTE_COMMIT_HASH_SHORT}"
     message("SRC_EXODUS_DIR ${CMAKE_SOURCE_DIR}/${EXODUS_DIR}")
 
 	# Headers consumed by gendoc (for dependency tracking in cli/ and doc/)
-	# This is the single source of truth. Passed as arguments to doc/gendoc_helper.sh.
-	# (The list must match the headers used in gendoc.sh for manual runs.)
+	# This is the single source of truth for the list of input headers.
+	# Passed as arguments to doc/gendoc_helper.sh (the build-system generation script).
+	# Keep the fallback list inside gendoc.sh (for manual runs) in sync if you change this.
 	set(GENDOC_INPUT_HEADERS
 		${SRC_VAR_DIR}/var.h
 		${SRC_VAR_DIR}/var_base.h

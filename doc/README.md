@@ -26,10 +26,14 @@ After building the `cli` tools (which produces the `gendoc` executable):
     # or
     make documentation
 
-This target depends on `gendoc` and runs `cli/gendoc.sh` using the
+This target depends on `gendoc` and runs `doc/gendoc_helper.sh` using the
 *built* version of the tool (the mechanism that resolved the historical
 circular dependencies between doc generation, the test file, and the
 libraries).
+
+Building the `documentation` target (or having it as a side-effect via
+the POST_BUILD on `gendoc` in cli/) is what refreshes both the docs
+and `testing_var.h.cpp`.
 
 ## Relationship to other subprojects
 
@@ -68,10 +72,13 @@ generated HTML.
 ## Files of interest
 
 - `CMakeLists.txt` — defines the `documentation` custom target
-- `../cli/gendoc.sh` — thin wrapper that invokes the built `gendoc`
-  binary (kept in cli/ for now)
-- `../cli/gendoc.cpp` — the actual documentation extractor
+- `gendoc_helper.sh` — the script containing the actual generation commands
+  (single source of truth for the two gendoc invocations; called by the build system)
+- `../cli/gendoc.sh` — kept for manual/ad-hoc runs from a source checkout
+  (has its own fallback header list)
+- `../cli/gendoc.cpp` — the actual documentation extractor (the C++ tool)
 - `../test/CMakeLists.txt` — consumes the generated `testing_var.h.cpp`
+  (via auto-glob + a small amount of special-case code)
 - `../exodus/var.1` and `var.htm` — the generated documentation (committed)
 
 ## Future possibilities

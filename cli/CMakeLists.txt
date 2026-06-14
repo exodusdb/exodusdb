@@ -142,18 +142,20 @@
 	)
 
 # ───────────────────────────────────────────────
-# 6. MAN PAGES & generated files (documentation + test file)
+# 6. Documentation & generated test file
 # ───────────────────────────────────────────────
 #
-# Generation is triggered automatically as a POST_BUILD on the gendoc
-# target (so that building the CLI tools refreshes the docs and the
-# header-derived test file `testing_var.h.cpp`).
+# The actual generation commands live in doc/gendoc_helper.sh
+# (single source of truth — no duplication of the gendoc invocations).
 #
-# See ../doc/CMakeLists.txt for the additional named `documentation`
-# custom target (for explicit "ninja documentation").
+# A lightweight POST_BUILD on gendoc triggers the helper so that
+# normal builds of the CLI tools automatically refresh the docs
+# (var.1 / var.htm) and the header-derived test file (testing_var.h.cpp).
+# This preserves the useful coupling the project has historically relied on.
+#
+# See ../doc/CMakeLists.txt for the explicit 'documentation' custom target
+# (for "ninja documentation" or making it a dependency of other things).
 
-	# Trigger documentation generation (and test file) as side-effect of building gendoc.
-	# Actual commands are in doc/gendoc_helper.sh (single source of truth, no duplication).
 	add_custom_command(TARGET gendoc POST_BUILD
 		COMMAND ${CMAKE_COMMAND} -E env EXO_LIBDIR=${CMAKE_CURRENT_BINARY_DIR}
 		        ${CMAKE_SOURCE_DIR}/doc/gendoc_helper.sh ${CMAKE_CURRENT_BINARY_DIR} ${SRC_EXODUS_DIR} ${CMAKE_SOURCE_DIR}/test ${GENDOC_INPUT_HEADERS}
@@ -161,9 +163,8 @@
 		VERBATIM
 	)
 
-	install(FILES ${SRC_EXODUS_DIR}/var.1
-		DESTINATION share/man/man1
-	)
+# The install for var.1 has been moved to doc/CMakeLists.txt
+# (to keep documentation artifacts with the doc subproject).
 
 
 # ───────────────────────────────────────────────
