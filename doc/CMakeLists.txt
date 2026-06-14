@@ -52,9 +52,7 @@ if(NOT DEFINED SRC_EXODUS_DIR)
     message(FATAL_ERROR "SRC_EXODUS_DIR must be set by parent before add_subdirectory(doc)")
 endif()
 
-set(SET_MY_ENV ${CMAKE_COMMAND} -E env EXO_LIBDIR=${BIN_CLI_DIR})
-
-# Outputs produced by gendoc.sh (still generated into the source tree for Option A)
+# Outputs produced by gendoc (still generated into the source tree for Option A)
 set(GENERATED_VAR1   ${SRC_EXODUS_DIR}/var.1)
 set(GENERATED_VARHTM ${SRC_EXODUS_DIR}/var.htm)
 set(GENERATED_TEST   ${CMAKE_SOURCE_DIR}/test/testing_var.h.cpp)
@@ -62,9 +60,8 @@ set(GENERATED_TEST   ${CMAKE_SOURCE_DIR}/test/testing_var.h.cpp)
 add_custom_command(
     OUTPUT ${GENERATED_VAR1} ${GENERATED_VARHTM} ${GENERATED_TEST}
     DEPENDS gendoc ${GENDOC_INPUT_HEADERS}
-    COMMAND ${SET_MY_ENV} bash -c 
-        "\"${BIN_CLI_DIR}/gendoc\" \"${CMAKE_SOURCE_DIR}/test\" ${GENDOC_INPUT_HEADERS} {m} > \"${GENERATED_VAR1}\" && 
-         \"${BIN_CLI_DIR}/gendoc\" ${GENDOC_INPUT_HEADERS} {h} > \"${GENERATED_VARHTM}\" "
+    COMMAND ${CMAKE_COMMAND} -E env EXO_LIBDIR=${BIN_CLI_DIR}
+            ${CMAKE_SOURCE_DIR}/doc/gendoc_helper.sh ${BIN_CLI_DIR} ${SRC_EXODUS_DIR} ${CMAKE_SOURCE_DIR}/test ${GENDOC_INPUT_HEADERS}
     COMMENT "Running gendoc to generate man page (var.1), HTML docs (var.htm), and testing_var.h.cpp from headers"
     VERBATIM
 )

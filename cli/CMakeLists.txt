@@ -152,12 +152,12 @@
 # See ../doc/CMakeLists.txt for the additional named `documentation`
 # custom target (for explicit "ninja documentation").
 
-	# Trigger documentation generation (which also produces testing_var.h.cpp)
-	# as a side-effect whenever the gendoc tool itself is built.
-	# The actual commands live in doc/CMakeLists.txt (single source of truth).
+	# Trigger documentation generation (and test file) as side-effect of building gendoc.
+	# Actual commands are in doc/gendoc_helper.sh (single source of truth, no duplication).
 	add_custom_command(TARGET gendoc POST_BUILD
-		COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target documentation --config $<CONFIG>
-		COMMENT "Triggering documentation target (man page + test file generation) after building gendoc"
+		COMMAND ${CMAKE_COMMAND} -E env EXO_LIBDIR=${CMAKE_CURRENT_BINARY_DIR}
+		        ${CMAKE_SOURCE_DIR}/doc/gendoc_helper.sh ${CMAKE_CURRENT_BINARY_DIR} ${SRC_EXODUS_DIR} ${CMAKE_SOURCE_DIR}/test ${GENDOC_INPUT_HEADERS}
+		COMMENT "Running gendoc post-build to generate man page, html docs and testing_var.h.cpp"
 		VERBATIM
 	)
 
