@@ -600,6 +600,21 @@ add_definitions(-DGIT_REMOTE_COMMIT_HASH_SHORT="${GIT_REMOTE_COMMIT_HASH_SHORT}"
     set(EXODUS_DIR exodus)
     set(SRC_EXODUS_DIR ${CMAKE_SOURCE_DIR}/${EXODUS_DIR})
     message("SRC_EXODUS_DIR ${CMAKE_SOURCE_DIR}/${EXODUS_DIR}")
+
+	# Headers consumed by gendoc (for dependency tracking in cli/ and doc/)
+	set(GENDOC_INPUT_HEADERS
+		${SRC_VAR_DIR}/var.h
+		${SRC_VAR_DIR}/var_base.h
+		${SRC_VAR_DIR}/varstr.h
+		${SRC_VAR_DIR}/vardb.h
+		${SRC_VAR_DIR}/varos.h
+		${SRC_VAR_DIR}/dim.h
+		${SRC_VAR_DIR}/vardebug.h
+		${SRC_EXODUS_DIR}/exoprog.h
+		${SRC_EXODUS_DIR}/job_manager.h
+		${SRC_EXODUS_DIR}/task_manager.h
+	)
+
 	#target_compile_options(exodus PUBLIC -Wall)
 	add_subdirectory(exodus)
 

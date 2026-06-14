@@ -41,8 +41,9 @@
 # automatically overwrite source files.
 
 # We expect the following variables to have been set by the parent:
-#   BIN_CLI_DIR     - binary directory of the cli subproject (where gendoc lives)
-#   SRC_EXODUS_DIR  - source directory of the exodus/ subproject (for headers + output of .1/.htm)
+#   BIN_CLI_DIR        - binary directory of the cli subproject (where gendoc lives)
+#   SRC_EXODUS_DIR     - source directory of the exodus/ subproject (for headers + output of .1/.htm)
+#   GENDOC_INPUT_HEADERS - list of headers passed to gendoc (for proper dependency tracking)
 
 if(NOT DEFINED BIN_CLI_DIR)
     message(FATAL_ERROR "BIN_CLI_DIR must be set by parent before add_subdirectory(doc)")
@@ -53,15 +54,25 @@ endif()
 
 set(SET_MY_ENV ${CMAKE_COMMAND} -E env EXO_LIBDIR=${BIN_CLI_DIR})
 
-add_custom_target(documentation
-    DEPENDS gendoc
+# Outputs produced by gendoc.sh (still generated into the source tree for Option A)
+set(GENERATED_VAR1   ${SRC_EXODUS_DIR}/var.1)
+set(GENERATED_VARHTM ${SRC_EXODUS_DIR}/var.htm)
+set(GENERATED_TEST   ${CMAKE_SOURCE_DIR}/test/testing_var.h.cpp)
+
+add_custom_command(
+    OUTPUT ${GENERATED_VAR1} ${GENERATED_VARHTM} ${GENERATED_TEST}
+    DEPENDS gendoc ${GENDOC_INPUT_HEADERS}
     COMMAND ${SET_MY_ENV} bash -c "${CMAKE_SOURCE_DIR}/cli/gendoc.sh ${BIN_CLI_DIR}/ ${SRC_EXODUS_DIR}"
     COMMENT "Running gendoc to generate man page (var.1), HTML docs (var.htm), and testing_var.h.cpp from headers"
     VERBATIM
 )
 
+add_custom_target(documentation
+    DEPENDS ${GENERATED_VAR1} ${GENERATED_VARHTM} ${GENERATED_TEST}
+)
+
 # Install the generated man page.
 # (var.htm is treated as a committed documentation source artifact.)
-install(FILES ${SRC_EXODUS_DIR}/var.1
+install(FILES ${GENERATED_VAR1}
     DESTINATION share/man/man1
 )

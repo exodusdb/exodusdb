@@ -106,17 +106,16 @@
 # Compile options
 	target_compile_options(compile PUBLIC -DEXODUS_RELEASE=${EXODUS_RELEASE} -DEXODUS_PATCH=${EXODUS_PATCH})
 
-# Extra sources
-	target_sources(gendoc PRIVATE
-		${SRC_VAR_DIR}/var.h
-	)
+# Extra sources + full header dependencies for gendoc
+# (gendoc reads these headers at runtime to extract documentation and examples,
+#  so we must make the gendoc target depend on them for correct incremental builds)
+	target_sources(gendoc PRIVATE ${GENDOC_INPUT_HEADERS})
 
 # Output name rename
 	set_target_properties(exodus-cli PROPERTIES OUTPUT_NAME exodus)
 
-# Rebuild gendoc when headers change
-	file(GLOB gendoc_files "${SRC_EXODUS_DIR}/*.h")
-	add_custom_target(gendoc_depends SOURCES ${gendoc_files})
+# Rebuild gendoc when any of its input headers change
+	add_custom_target(gendoc_depends SOURCES ${GENDOC_INPUT_HEADERS})
 	add_dependencies(gendoc htmllib2 gendoc_depends)
 
 # ───────────────────────────────────────────────
@@ -143,17 +142,27 @@
 	)
 
 # ───────────────────────────────────────────────
-# 6. Documentation generation has moved to the doc/ subproject
+# 6. MAN PAGES & generated files (documentation + test file)
 # ───────────────────────────────────────────────
 #
-# See ../doc/CMakeLists.txt for the 'documentation' custom target.
-# It depends on the gendoc executable and runs gendoc.sh to produce:
-#   - var.1 / var.htm
-#   - test/testing_var.h.cpp (as a side-effect, preserving the previous coupling)
+# Generation is triggered automatically as a POST_BUILD on the gendoc
+# target (so that building the CLI tools refreshes the docs and the
+# header-derived test file `testing_var.h.cpp`).
 #
-# This keeps doc generation out of the cli build while still allowing
-# "build the docs (and refresh the header-derived test) by building the
-# documentation target after (or as a dependency of) the cli tools".
+# See ../doc/CMakeLists.txt for the additional named `documentation`
+# custom target (for explicit "ninja documentation").
+
+	set(SET_MY_ENV ${CMAKE_COMMAND} -E env EXO_LIBDIR=${CMAKE_CURRENT_BINARY_DIR})
+	add_custom_command(TARGET gendoc POST_BUILD
+					   COMMAND ${SET_MY_ENV} bash -c "${CMAKE_CURRENT_SOURCE_DIR}/gendoc.sh ${CMAKE_CURRENT_BINARY_DIR}/ ${SRC_EXODUS_DIR}"
+					   COMMENT "Running gendoc post-build to generate man page, html docs and testing_var.h.cpp"
+					   VERBATIM
+	)
+
+	install(FILES ${SRC_EXODUS_DIR}/var.1
+		DESTINATION share/man/man1
+	)
+
 
 # ───────────────────────────────────────────────
 # 7. CLEANUP local shadowing files
