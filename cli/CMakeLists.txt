@@ -143,20 +143,17 @@
 	)
 
 # ───────────────────────────────────────────────
-# 6. MAN PAGES & generated files
+# 6. Documentation generation has moved to the doc/ subproject
 # ───────────────────────────────────────────────
-
-# Post-build step: generate man page etc.
-	set(SET_MY_ENV ${CMAKE_COMMAND} -E env EXO_LIBDIR=${CMAKE_CURRENT_BINARY_DIR})
-	add_custom_command(TARGET gendoc POST_BUILD
-					   COMMAND ${SET_MY_ENV} bash -c "${CMAKE_CURRENT_SOURCE_DIR}/gendoc.sh ${CMAKE_CURRENT_BINARY_DIR}/ ${SRC_EXODUS_DIR}"
-					   COMMENT "Running gendoc post-build to generate man page & related files"
-					   VERBATIM
-	)
-
-	install(FILES ${SRC_EXODUS_DIR}/var.1
-		DESTINATION ${CMAKE_INSTALL_PREFIX}/share/man/man1
-	)
+#
+# See ../doc/CMakeLists.txt for the 'documentation' custom target.
+# It depends on the gendoc executable and runs gendoc.sh to produce:
+#   - var.1 / var.htm
+#   - test/testing_var.h.cpp (as a side-effect, preserving the previous coupling)
+#
+# This keeps doc generation out of the cli build while still allowing
+# "build the docs (and refresh the header-derived test) by building the
+# documentation target after (or as a dependency of) the cli tools".
 
 # ───────────────────────────────────────────────
 # 7. CLEANUP local shadowing files

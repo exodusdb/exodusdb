@@ -1,0 +1,85 @@
+# Documentation Generation for Exodus
+
+This subdirectory owns the generation of the project's documentation
+and the derived comprehensive test file.
+
+## What it produces
+
+- `exodus/var.1`   — man page (troff)
+- `exodus/var.htm` — HTML documentation
+- `test/testing_var.h.cpp` — a large generated test program that exercises
+  the public API using the examples and function descriptions extracted
+  from the headers (`var.h`, `var_base.h`, etc. + selected exodus/ headers).
+
+The `testing_var.h.cpp` file is intentionally generated into the source
+tree (under `test/`) so that the existing auto-discovery mechanism in
+`test/CMakeLists.txt` (GLOB_RECURSE on `test_*.cpp`) continues to work
+without further changes. A committed copy acts as a bootstrap so that
+a plain build of the test subproject succeeds even if the `documentation`
+target has never been built.
+
+## How to (re)generate
+
+After building the `cli` tools (which produces the `gendoc` executable):
+
+    ninja documentation
+    # or
+    make documentation
+
+This target depends on `gendoc` and runs `cli/gendoc.sh` using the
+*built* version of the tool (the mechanism that resolved the historical
+circular dependencies between doc generation, the test file, and the
+libraries).
+
+## Relationship to other subprojects
+
+- Depends on the `gendoc` target from the `cli` subproject.
+- The generation is deliberately kept as a side-effect of the
+  `documentation` target rather than a POST_BUILD on `gendoc` itself.
+  This reduces complexity in `cli/`.
+- The "incestuous" coupling the project historically relied on is
+  preserved: building `documentation` ensures both fresh docs and a
+  fresh `testing_var.h.cpp` derived from the current headers.
+- The `test` subproject continues to consume `testing_var.h.cpp` via
+  its normal test discovery (plus a small amount of special-case code
+  for historical reasons).
+
+## Why a separate `doc/` subproject?
+
+Previously the generation logic lived as a POST_BUILD side-effect inside
+`cli/CMakeLists.txt`. Moving it here:
+
+- Keeps `cli/` focused on shipping user tools.
+- Makes the documentation step an explicit, named, top-level target.
+- Still allows the useful automatic refresh of the header-derived test
+  file when you choose to build documentation.
+- Does not force every normal build to re-run documentation.
+
+## One-time preparation on a new/minimal system
+
+See the top of `install.sh` (in this directory) for the recommended
+minimal `apt-get` command (or use `python3 -m ensurepip` as a fallback
+on systems where you prefer to avoid apt).
+
+After that, `./install.sh` (or direct `pip install .`) will install
+the modern lexer plugin used by gendoc for syntax highlighting in the
+generated HTML.
+
+## Files of interest
+
+- `CMakeLists.txt` — defines the `documentation` custom target
+- `../cli/gendoc.sh` — thin wrapper that invokes the built `gendoc`
+  binary (kept in cli/ for now)
+- `../cli/gendoc.cpp` — the actual documentation extractor
+- `../test/CMakeLists.txt` — consumes the generated `testing_var.h.cpp`
+- `../exodus/var.1` and `var.htm` — the generated documentation (committed)
+
+## Future possibilities
+
+If desired, the generation of `testing_var.h.cpp` can later be moved to
+the build tree only (with an explicit `add_executable` + custom command
+in `test/CMakeLists.txt`), at which point the source copy could be
+gitignored. This would eliminate source-tree mutation side-effects
+for the test file while still allowing the `documentation` target to
+drive regeneration when wanted. That would be a step toward Option B
+in the original design discussion.

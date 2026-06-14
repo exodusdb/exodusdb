@@ -615,6 +615,9 @@ add_definitions(-DGIT_REMOTE_COMMIT_HASH_SHORT="${GIT_REMOTE_COMMIT_HASH_SHORT}"
 	add_subdirectory(cli)
 
 	message("")
+	add_subdirectory(doc)
+
+	message("")
     set(TEST_DIR test)
 	#target_compile_options(test_Regress PUBLIC "-O2")
 	add_subdirectory(test)
