@@ -62,7 +62,9 @@ set(GENERATED_TEST   ${CMAKE_SOURCE_DIR}/test/testing_var.h.cpp)
 add_custom_command(
     OUTPUT ${GENERATED_VAR1} ${GENERATED_VARHTM} ${GENERATED_TEST}
     DEPENDS gendoc ${GENDOC_INPUT_HEADERS}
-    COMMAND ${SET_MY_ENV} bash -c "${CMAKE_SOURCE_DIR}/cli/gendoc.sh ${BIN_CLI_DIR}/ ${SRC_EXODUS_DIR}"
+    COMMAND ${SET_MY_ENV} bash -c 
+        "\"${BIN_CLI_DIR}/gendoc\" \"${CMAKE_SOURCE_DIR}/test\" ${GENDOC_INPUT_HEADERS} {m} > \"${GENERATED_VAR1}\" && 
+         \"${BIN_CLI_DIR}/gendoc\" ${GENDOC_INPUT_HEADERS} {h} > \"${GENERATED_VARHTM}\" "
     COMMENT "Running gendoc to generate man page (var.1), HTML docs (var.htm), and testing_var.h.cpp from headers"
     VERBATIM
 )
