@@ -46,9 +46,13 @@ var glogsettimeout
 //various images
 var gimagetheme = '../../exodus/images/theme2/'
 //var gmenuimage=gimagetheme+'menu.png'//'add.png'
-var gmenuimage = gimagetheme + 'menu.gif'//'add.gif'
-var glogoutimage = gimagetheme + 'disconnect.png'//'add.png'
-var grefreshimage = gimagetheme + 'refresh.png'
+var gmenuimage = gimagetheme + 'menu_burger.svg'
+var glogoutimage = gimagetheme + 'disconnect.png' //'add.png'
+var grefreshimage = gimagetheme + 'refresh.svg'
+var gthemeimage = gimagetheme + 'theme_button.svg'
+var gcompanyimage = gimagetheme + 'formpage_companies.svg'
+
+var gisdarktheme
 
 var gcache
 
@@ -326,6 +330,12 @@ function exodus_client_init() {
         document.writeln('<scr' + 'ipt type="text/javascript" src="' + EXODUSlocation + 'scripts/server.js"></scr' + 'ipt>')
     }
 
+    // Pre-emptively set CSS screen theme to avoid flash of switching from
+    // default theme (light or user color) mode to dark theme if dark theme is active
+    theme_toggle(exodusgetcookie2('dt', 'theme') ? 'dark_mode' : 'default')
+    // if cookie does not exist, there is no error thrown, concerning!
+    // as we assumed cookie will be preserved across logins
+
     //style sheet
     document.writeln('<link id="exodus_global_css" rel="stylesheet" type="text/css" href="' + EXODUSlocation + 'global.css">')
 
@@ -354,7 +364,9 @@ function exodus_client_init() {
 
     //ensure print preview styles are set during print/preview
     //window.onbeforeprint = window_onbeforeprint
-    addeventlistener(window, 'beforeprint', 'window_onbeforeprint')
+    //addeventlistener(window, 'beforeprint', 'window_onbeforeprint')
+    // After introducing dark theme, switching to dark theme before print (i.e display) was not ideal because the
+    // inital page is white background, so not using this anymore and switching to dark theme if applicable
 
     //save location except if logging in
     if (typeof gnosavelocation == 'undefined' && !window.dialogArguments && EXODUSlocation != './exodus/') {
@@ -378,9 +390,13 @@ function exodus_client_init() {
 //end of main initialisation.
 //what follows should be functions and their global variables only
 
-function* window_onbeforeprint() {
-    yield* clientfunctions_setstyle()
-}
+//function* window_onbeforeprint() {
+//    yield* clientfunctions_setstyle()
+//}
+// this just use to call exodus_set_style (i.e switch to user custom screen styles)
+// as early as possible in client.js to mitigate the flash from default screen styles to user's
+// however theme_toggle() now does this and is called even earlier. (see just before global.css linked in)
+
 
 function* exoduslogout_onclick() {
 
@@ -887,7 +903,7 @@ function* exodusshowmodaldialog(url, arguments, dialogstyle) {
             Center: yes, Help: no, Resizable: yes, Scroll: yes, Status: no, scrollbars=1,
             alwaysRaised=yes, DialogWidth:1870px, DialogHeight:1053px, width=1870, height=1053, left=50, top=27
             ;
-            Center: yes; Help: no; Resizable: yes; Scroll: yes; Status: no; scrollbars=1; 
+            Center: yes; Help: no; Resizable: yes; Scroll: yes; Status: no; scrollbars=1;
             alwaysRaised=yes; DialogWidth:1870px; DialogHeight:1053px; width=1870; height=1053; left=50; top=27
             */
             dialogstyle = '' // now always show in a tab
@@ -1304,80 +1320,81 @@ function* exoduswarning(msg) {
 
 function exodus_set_style(mode, value, value2) {
 
-    if (value.toUpperCase() == 'DEFAULT') value = ''
+    // Purpose is to override the styles of screen card colour and (fonts in the future)
+    // of the currently active CSS theme
 
-    //restore original value
-    if (!value && goriginalstyles[mode]) value = goriginalstyles[mode]
+    // called by theme_toggle() in screencolor mode
+    // called by colors_val_screencolor() on change of screencolour in sys/company/user cfg
 
-    //ensure display is set to inline even if not changing color
-    //if (!value) return
+    // modes == screencolor|screenfont
+    if (value.toUpperCase() == 'DEFAULT') { value = '' }
 
-    //var rules = document.styleSheets[0].cssRules||document.styleSheets[0].rules
-    //var ss = document.getElementById('exodus_global_css');
-    var link=document.querySelector("link[href='../exodus/global.css']")
-    if (!link)
-        return
-    var ss = link.sheet
-    var rules = ss.cssRules || ss.rules
-    var oldvalue = ''
+    // Modify default card colour with user preferred color if
+    // saved (cookie) or on screen color tryout in screen color dropdowns
+    // NB style is false on report pages
+    if (mode == 'screencolor' && (value || exodusgetcookie2('fc'))) {
 
-    //screencolor
-    if (mode == 'screencolor'
-        && rules) {
+        oldvalue = exodusgetcookie2('fc')
+        let gradient_endcolor = '#'
 
-        //make everything visible!
-        var style = rules[0].style
-        //style.display='block'//ie6/7 ok ff3 shows 100% width
-        //following is not supported in IE5.5 and FF2
-        //but ok in IE6 IE7 IE8b1 FF3 Saf3.0Win Saf3.1Win Opera9.5b Konqueror3.5.7
-        //IE 6/7 only where there is a natural display: inline.
-        //http://www.quirksmode.org/css/display.html
-        //style.display = 'inline-block'
-        style.display = ''
+        // Default screen colour
+        if (!value) { value = '#fdf5e6' } // oldlace
 
-        if (!value) {
-            //initial color is buff yellow
-            //value = '#ffffc0'
-            //initial color is oldlace
-            value = '#fdf5e6'
-		}
+        // Determine screen colour gradient
+        if (value.toUpperCase() == '#FDF5E6') {
+            gradient_endcolor = '#fefbf5' // custom gradient for oldlace
+        } else {
+            let screencolour_hex = value.replace('#', '');
+            let strength = 12 // DO NOT PUT DECIMALS IT BREAKS
+            gradient_endcolor = '#'
+            for (let hex_rgb_pos of ['0','2','4']) {
+                gradient_endcolor += Math.min(255, parseInt(screencolour_hex.substr(hex_rgb_pos, 2), 16) + strength).toString(16).padStart(2, '0')
+            }
+        }
 
-        oldvalue = style.backgroundColor
+        // Set screen colour
         try {
-            style.backgroundColor = value
-
-			// Apply background to main DIV rows - NEW UI CARDS
-			const cardDivs = document.querySelectorAll('div.card');
-			cardDivs.forEach(div => {
-				try {
-					div.style.backgroundColor = value;
-				} catch (e) {
-					// Silently ignore invalid color errors
-				}
-				});
-
+            // NB overrides CSS variable by setting property on document root i.e <html>. Doesn't change the value in the client side global.css
+            document.documentElement.style.setProperty('--exodus-cardcolor', 'linear-gradient(to bottom, ' + value + ', ' + gradient_endcolor);
         }
         catch (e) {
-            if (e.number == -2146827908) return yield * exodusinvalid(value + ' is not a recognised color')
+            if (e.number == -2146827908) {
+                return yield * exodusinvalid(value + ' is not a recognised color')
+            }
             return systemerror('exodus_set_style("' + mode + '","' + value + '")', e.number + ' ' + e.description)
         }
     }
 
-    //screenfont
-    else if (mode == 'screenfont' && rules) {
 
-        //initial font is ... 8pt
-        var basefontsize = 8
+    // Moved from above since mode = screencolor no longer updates global.css
+    // instead it does setProperty(--exodus-cardcolor) on <html> adds inline override of a CSS var
+    // and in order to set the user's preferred color on page load and mitigate the
+    // flash between default CSS theme and colour mode, the in-line setting of card color is
+    // done before global.css is linked, overriding the CSS var before it can load the defaults
+    var link=document.querySelector("link[href='../exodus/global.css']")
+    if (!link) { return }
+    var ss = link.sheet
+    var rules = ss.cssRules || ss.rules
 
-        if (!value) value = 'verdana,sans-serif,arial,helvetica'
-        if (!value2) value2 = 100
+    // Modify screen font & size
+    if (mode == 'screenfont' && rules) {
+
+        // Default font
+        if (!value) { value = 'verdana,sans-serif,arial,helvetica' }
+
+        // Default font size %
+        if (!value2) { value2 = 100 }
         if (!(Number(value2))) {
             alert(value2 + ' is not a recognised font size, using 100%')
             value2 = 100
         }
-        if (typeof gformfontscale != 'undefined' && gformfontscale) value2 *= gformfontscale
+        if (typeof gformfontscale != 'undefined' && gformfontscale) {
+            value2 *= gformfontscale
+        }
+        var basefontsize = 8
         value2 = (basefontsize * Number(value2) / 100) + 'pt'
 
+        // Alter the font family in all CSS rules
         for (var rulen = 0; rulen < rules.length; rulen++) {
 
             var style = rules[rulen].style
@@ -1396,16 +1413,135 @@ function exodus_set_style(mode, value, value2) {
         }
     }
 
-    //save the original style
-    if (!goriginalstyles[mode] && oldvalue) goriginalstyles[mode] = oldvalue
+    //save the original style. Why?
+    if (!goriginalstyles[mode] && oldvalue) {
+        goriginalstyles[mode] = oldvalue
+    }
+    return
+}
 
+function add_theme_toggle_btn() {
+
+    // Interactive theme toggle: hidden checkbox + styled label (with SVGs + CSS animation).
+    // Label makes it clickable and visually toggle-like; hidden checkbox provides .checked state.
+    // Required because theme can also change via User Details screen color (not just click).
+    // Event listener on checkbox 'change' (label click proxies to input).
+
+    const label = document.createElement('label');
+
+    const input   = document.createElement('input');
+    input.type    = 'checkbox';
+    input.id      = 'theme_toggle';
+    input.checked = gisdarktheme;
+
+    const toggle_button_element     = document.createElement('div');
+    toggle_button_element.className = 'toggle_button';
+
+    const knob = document.createElement('div');
+    knob.className = 'knob';
+
+    const sun_svg  = `<svg viewBox="0 0 24 24" fill="none" stroke="#ffc53b" stroke-linecap="round" stroke-width="1.5"><circle cx="12" cy="12" r="6" fill="#ffc53b" stroke="none"/><path d="M12 6v-3M12 18v3M3.5 12h3M17.5 12h3M5.64 5.64l2.12 2.12M16.36 16.36l2.12 2.12M5.64 18.36l2.12-2.12M16.36 7.64l2.12-2.12"/></svg>`;
+    const moon_svg = `<svg viewBox="0 0 24 24" fill="#383838"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>`;
+
+    knob.innerHTML = gisdarktheme ? moon_svg : sun_svg;
+
+    toggle_button_element.appendChild(knob);
+    label.appendChild(input);
+    label.appendChild(toggle_button_element);
+
+    // Event listener for the toggle
+    input.addEventListener('change', () => {
+        knob.innerHTML = input.checked ? moon_svg : sun_svg;
+        theme_toggle(gisdarktheme ? 'default' : 'dark_mode')
+
+        // Set cookie to preserve theme across different login sessions on the same browser
+        exodussetcookie(glogincode, 'theme', (gisdarktheme ? 1 : '' ), 'dt', true)
+    });
+
+    return label;
+}
+
+function theme_toggle(theme = 'default') {
+
+    // Switch between dark and light (color) modes using CSS themes
+
+    // 1. Called very early in client.js just before global.css is linked
+    // 2. Called by theme_onclick() for dark/light toggle button
+
+    const html = document.documentElement;
+
+    // No dark theme for login
+    if (document.title.toUpperCase() == 'EXODUS LOGIN') {
+        html.removeAttribute('data-theme');
+        return true;
+    }
+
+    // Activate light theme and apply possible custom screen colour
+    if (theme == 'default') {
+
+        gisdarktheme = false
+
+        // DONT CHANGE ORDER to prevent flash bang effect
+        // Apply user prefered color or NEOSYS default
+        exodus_set_style('screencolor', exodusgetcookie2('fc'), '')
+        // Switch to default theme
+        html.removeAttribute('data-theme')
+
+    // Activate dark theme and remove possible custom screen colour
+    } else {
+
+        gisdarktheme = true
+
+        // switch to dark theme
+        html.setAttribute('data-theme', theme)
+
+        // Remove possible user preferred colour
+        // added to <html> tag by exodus_set_style
+        html.style.removeProperty('--exodus-cardcolor');
+    }
+
+    // Switch colour of button icons
+    const xform_postload = document.readyState === 'complete'
+    if (xform_postload) {
+
+        const icon_paths = { 'gfindimage' : gfindimage, 'gprintsendimage' : gprintsendimage, 'glistimage' : glistimage, 'gthemeimage' : gthemeimage, 'glinkimage' : glinkimage }
+        if (gdatafilename == 'ADDRESSES') {
+            // non-button images that needs switching
+            icon_paths['gcompanyimage'] = gcompanyimage
+        }
+        const filetype_rex = /(\.[a-zA-Z]+$)/
+
+
+        for (let [icon_varname, icon_path] of Object.entries(icon_paths)) {
+        // e.g.     "gfindimage"  "../../exodus/images/theme2/zoom_darkmode.svg"
+
+            document.querySelectorAll(`img[src*="${icon_path}"]`).forEach(img => {
+                if (gisdarktheme) {
+                    // FYI dont use img.src for extraction because browsers will convert relative path into full url path
+                    img.setAttribute('src', img.getAttribute('src').replace(filetype_rex, "_darkmode$1"))
+                } else {
+                    img.setAttribute('src', img.getAttribute('src').replace('_darkmode', ''))
+                }
+
+                // update global var once only
+                if (img.getAttribute('src') != window[icon_path]) {
+                    window[icon_varname] = img.getAttribute('src')
+                }
+            });
+        }
+    }
+
+    return true
 }
 
 //called early in decide and decide2
+//and on event pageprint
 function* clientfunctions_setstyle() {
+
     //set font first since setting color changes style display from none to inline
     exodus_set_style('screenfont', exodusgetcookie2('ff'), exodusgetcookie2('fs'))
-    exodus_set_style('screencolor', exodusgetcookie2('fc'))
+    //exodus_set_style('screencolor', exodusgetcookie2('fc'))
+    // screencolour is handled by theme_toggle() much earlier in client.js just before global.css linked in
 }
 
 function* clientfunctions_getglobals() {
@@ -1443,30 +1579,33 @@ function* clientfunctions_getglobals() {
 
 function add_exodus_menubar() {
 
+    gexodus_menubar = document.getElementById('exodus_menu')
+
     //if no exodus_menubar element
     //create a exodus_menu span
     // at the beginning of the body
     // or after the first navbar element
-
-    gexodus_menubar = document.getElementById('exodus_menu')
+    // done so there wont be a duplication of this block of code in every htm file
     if (!gexodus_menubar) {
         var span = document.createElement('SPAN')
         span.id = 'exodus_menu'
         // menubar design
         //span.style.backgroundColor = '#f4f4f4';
-        span.style.backgroundColor = '#f0f0f0';
-        span.style.color = 'black';				// Text color
-        span.style.display = 'block';
-        span.style.width = '100%';				// Span full width
-        span.style.position = 'fixed';
-        span.style.top = '0';					// Align to the top
-        span.style.left = '0';					// Align to the left
-        //span.style.zIndex = '100';            // Cannot be overlapped
-		span.style.zIndex = '999';				// Must be higher than sticky titles
-        span.style.padding = '5px 0';
-        span.style.margin = '0';
-        span.style.boxSizing = 'border-box';	// Ensure padding doesn't affect width
-        span.style.outline = '1px solid lightgrey'
+
+        //span.style.background = 'linear-gradient(to top, #EBEBEB, #F5F5F5)';
+        //span.style.color = 'black';                // Text color
+        //span.style.display = 'block';
+        //span.style.width = '100%';                // Span full width
+        //span.style.position = 'fixed';
+        //span.style.top = '0';                    // Align to the top
+        //span.style.left = '0';                    // Align to the left
+        ////span.style.zIndex = '100';            // Cannot be overlapped
+        //span.style.zIndex = '999';                // Must be higher than sticky titles
+        //span.style.padding = '5px 0';
+        //span.style.margin = '0';
+        //span.style.boxSizing = 'border-box';    // Ensure padding doesn't affect width
+        //span.style.outline = '1px solid lightgrey'
+        // Consolidated CSS into one place - global.css
 
         var navbar1 = document.getElementsByClassName('navbar')[0];
         if (navbar1)
@@ -1564,29 +1703,37 @@ function* clientfunctions_windowonload() {
 
         //insert buttons in reverse order
 
+        let button = ''
+
         //button to refresh (clear cache)
         if (typeof gshowrefreshcachebutton == 'undefined' || gshowrefreshcachebutton) {
-            var temp2 = document.createElement('span')
-            temp2.innerHTML = menubuttonhtml('refreshcache', grefreshimage, '<u>R</u>efresh', 'Refresh the Database Cache. ' + ctrlalt + '+R', 'X')
-            //document.body.insertBefore(temp2, document.body.firstChild)
-            gexodus_menubar.insertBefore(temp2, gexodus_menubar.firstChild)
-            temp2.style.float = 'left'
-            temp2.style.paddingLeft = '5px'
+            button = document.createElement('span')
+            button.innerHTML = menubuttonhtml('refreshcache', grefreshimage, '<u>R</u>efresh', 'Refresh the Database Cache. ' + ctrlalt + '+R', 'X')
+            //document.body.insertBefore(button, document.body.firstChild)
+            gexodus_menubar.insertBefore(button, gexodus_menubar.firstChild)
+            button.style.float = 'left'
+            button.style.paddingLeft = '5px'
             //if no dbform
             if (typeof gdictfilename == 'undefined')
-                addeventlistener(temp2, 'click', 'refreshcache_onclick')
+                addeventlistener(button, 'click', 'refreshcache_onclick')
         }
 
+        //button to theme toggle
+        button = add_theme_toggle_btn()
+        gexodus_menubar.insertBefore(button, gexodus_menubar.firstChild)
+        button.classList.add('theme_button')
+
         //button to logout
-        var temp2 = document.createElement('span')
-        temp2.innerHTML = menubuttonhtml('exoduslogout', glogoutimage, 'Lo<u>g</u>out', 'Logout. ' + ctrlalt + '+G', 'G')
-        //document.body.insertBefore(temp2, document.body.firstChild)
-        gexodus_menubar.insertBefore(temp2, gexodus_menubar.firstChild)
-        //temp2.style.float = 'left
-        temp2.style.float = 'right'
-        temp2.style.marginRight = '10px'
-        temp2.style.paddingLeft = '5px'
-        temp2.style.borderLeft = '0.2px solid lightgrey'
+        button = document.createElement('span')
+        button.innerHTML = menubuttonhtml('exoduslogout', glogoutimage, 'Lo<u>g</u>out', 'Logout. ' + ctrlalt + '+G', 'G')
+        gexodus_menubar.insertBefore(button, gexodus_menubar.firstChild)
+        //button.style.float = 'left
+        //button.style.float = 'right'
+        //button.style.marginRight = '10px'
+        //button.style.paddingLeft = '5px'
+        //button.style.borderLeft = '0.2px solid #2b2b2b'
+        //. Styling moved to global.css under #logout_wrapper
+        button.classList.add('logout_wrapper')
 
         if (!gusername) {
             var temp = $$('exoduslogoutbutton')
@@ -1595,17 +1742,19 @@ function* clientfunctions_windowonload() {
         }
         //if no dbform
         if (typeof gdictfilename == 'undefined')
-            addeventlistener(temp2, 'click', 'exoduslogout_onclick')
+            addeventlistener(button, 'click', 'exoduslogout_onclick')
 
-        //button for menu
+        //button for menu dropdown
         if (gmenucodes && gmenucodes != 'EXIT2') {
             var menu_span = document.createElement('span')
-            menu_span.style.float = 'left'
-            menu_span.style.maxWidth = '65px'//stop first button flashing very wide initially
             menu_span.innerHTML = menubuttonhtml('menu', gmenuimage, '<u>M</u>enu', 'Menu. ' + ctrlalt + '+M', 'M')
-            menu_span.style.paddingLeft = '5px'
-            menu_span.style.borderRight = '0.2px solid lightgrey'
-            //document.body.insertBefore(menu_span, document.body.firstChild)
+            //menu_span.style.float = 'left'
+            //menu_span.style.maxWidth = '65px'//stop first button flashing very wide initially
+            //menu_span.style.paddingLeft = '5px'
+            //menu_span.style.borderRight = '0.2px solid #2b2b2b'
+            //styling moved to global.css under .hamburger_menu
+            menu_span.classList.add('hamburger_menu')
+
             gexodus_menubar.insertBefore(menu_span, gexodus_menubar.firstChild)
 
             //div to retrieve menu structure (insert into end of Menu button span)
@@ -4188,6 +4337,7 @@ function menuonmouseout(event) {
     event = getevent(event)
 
     gnmenus = 0
+    // hide all menus after one second when mouse moves off menu areas
     gmenutimeout = exodussettimeout('menuclose()', 1000)
     //window.event.srcElement.style.color='black'
 }
@@ -4370,8 +4520,9 @@ function menuchangeoption(menu, newmenuoption) {
 
     //newmenuoption.style.backgroundColor = 'highlight'
     //newmenuoption.style.color = 'highlighttext'
-    newmenuoption.style.backgroundColor = 'lightgrey'
-    //record new highlighted item in the menu
+    //newmenuoption.style.backgroundColor = 'lightgrey'
+    newmenuoption.style.background = (gisdarktheme) ? '#303030' : '#d3d3d3'
+    newmenuoption.style.borderRadius = '8px'
     menu.highlightedelement = newmenuoption
 
     //focus and onkeydown should remain on the menu div not the item
@@ -4504,11 +4655,14 @@ function exoduscancelevent(event) {
     event.cancelBubble = true
     event.returnValue = false
 
+    // prevents triggering of events on parent elements, useful for popups
+    // e.g. 'F9' will only trigger for focused child element
     if (event.stopPropagation) {
         //console.log('event.stopPropagation()')
         event.stopPropagation()
     }
 
+    // Prevents browser event execution e.g. pressing down 'a' will not be registered
     if (event.preventDefault) {
         //console.log('event.preventDefault()')
         event.preventDefault()
@@ -4767,7 +4921,7 @@ function starteventhandler(eventfunctionname, functionx) {
 
             //onbeforeunload may return text immediately so return that
             if (result)
-                event.returnValue = result//what exactly does this do?
+                event.returnValue = result // what exactly does this do?
             else
                 result = false
 
@@ -5097,7 +5251,7 @@ function setdisabledandhidden(element, truefalse) {
     if (!element)
         return
     if (truefalse) {
-        element.disabled = true//this seems to have the effect of setting attribute disabled to "" in modern browsers!
+        element.disabled = true //this seems to have the effect of setting attribute disabled to "" in modern browsers!
         element.setAttribute('disabled', 'disabled')
         element.style.display = 'none'
     }
@@ -5145,7 +5299,7 @@ function* exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negativebut
     //exodusconfirm: questions (yes/no/cancel) and one line inputs
     //exodusdecide/exodusdecide2: selections
 
-    var decide_args//holds popup list args if any
+    var decide_args //holds popup list args if any
 
     if (typeof questionx == 'object') {
 
@@ -5161,21 +5315,19 @@ function* exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negativebut
         //if (decide_returnmany)
         //    questionx += '&nbsp;&nbsp;<span style="font-size:66%">(A=All)</span>'
 
-    } else
+    } else {
         var decide_args = undefined
+    }
 
     var nbuttons = 0
     var buttons = []
 
     gexodusconfirmletters = []
 
-    //check buttons
-    if (positivebuttonx)
-        nbuttons++
-    if (negativebuttonx)
-        nbuttons++
-    if (cancelbuttonx)
-        nbuttons++
+    // check buttons
+    if (positivebuttonx) { nbuttons++ }
+    if (negativebuttonx) { nbuttons++ }
+    if (cancelbuttonx)   { nbuttons++ }
     if (nbuttons == 0) {
         positivebuttonx = '<u>Y</u>es'
         negativebuttonx = '<u>N</u>o'
@@ -5187,61 +5339,64 @@ function* exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negativebut
 
     //create a centralised div with the appropriate buttons or input box
     var div = document.createElement('div')
+
+    // id name determines style, see global.css
     div.id = 'exodusconfirmdiv'
-    // popups should overlap menubar which has 100zIndex
-    // do not overlap the menubar
-    div.style.zIndex = '1000'
-    //div.style.zIndex = '200'
-    div.style.position = 'fixed'
-    div.style.textAlign = 'center'
-    div.style.background = 'lightgrey'
-    div.style.border = '1px solid grey'
-    div.style.borderRadius = '10px'
-    div.style.padding = '10px'
-    div.style.boxShadow = '0px 0px 7px #666666'
-    //div.style.fontSize=25//had no effect
+    //div.style.zIndex = '1000'
+    //div.style.position = 'fixed'
+    //div.style.textAlign = 'center'
+    //div.style.background = 'lightgrey'
+    //div.style.border = '1px solid grey'
+    //div.style.borderRadius = '10px'
+    //div.style.padding = '10px'
+    //div.style.boxShadow = '0px 0px 7px #666666'
+    // Consolidate CSS into global.css
+    div.classList.add('exodusconfirmdiv')
 
-    // adjust the height to fit under the menu bar (fit in the white space)
+    // adjust the height to always fit under the menu
     div.style.maxHeight = (window.innerHeight - 120) + 'px'
-    //div.style.maxHeight = (window.innerHeight - 120) + 'px'
-
     div.style.maxWidth = window.innerWidth + 'px'
-    //div.style.maxHeight=(window.outerHeight-50)+'px'
-    //div.style.maxWidth=window.outerWidth+'px'
     div.style.overflow = 'auto'
 
-    //image
+
+    // Set type of image depending on question contents
+    if (!imagesrc && (questionx.indexOf('!') + 1
+        || questionx.toLowerCase().indexOf('are you sure ') + 1
+        || questionx.toLowerCase().indexOf('warning') + 1)) {
+        imagesrc = 'warning'
+    } else if (!imagesrc) {
+        imagesrc = (nbuttons == 1) ? 'info' : 'question1'
+    }
 
     var html = ''
-    if (!imagesrc && (questionx.indexOf('!') + 1 || questionx.toLowerCase().indexOf('are you sure ') + 1 || questionx.toLowerCase().indexOf('warning') + 1))
-        imagesrc = 'warning'
-    else if (!imagesrc) {
-        if (nbuttons == 1)
-            imagesrc = 'info'
-        else
-            imagesrc = 'question1'
-    }
     if (imagesrc) {
         if (imagesrc == 'critical') {
-            //imagesrc = 'xpcritical.gif'
             imagesrc = 'xpcritical.webp'
-            div.style.backgroundColor = '#ffdddd'//reddish
+            //div.style.backgroundColor = '#ffdddd'
+            //div.style.border = '1px solid #ff3434'
+            //both moved to global.css
+            div.classList.add('exodusconfirm_critical')
         }
         if (imagesrc == 'warning') {
-            //imagesrc = 'xpwarning.gif'
             imagesrc = 'xpwarning.webp'
-            div.style.backgroundColor = '#ffff99'//yellowish
-            //darker than usual messages to distinguish from the usual buff document background color
+            //div.style.backgroundColor = '#ffff99'
+            //div.style.border = '1px solid #ffff99'
+            //both moved to global.css
+            div.classList.add('exodusconfirm_warning')
         }
         if (imagesrc == 'info') {
-            //imagesrc = 'xpinfo.gif'
             imagesrc = 'xpinfo.webp'
-            div.style.backgroundColor = '#ddffdd'//greenish
+            //div.style.backgroundColor = '#ddffdd'
+            //div.style.border = '1px solid #ddffdd'
+            //both moved to global.css
+            div.classList.add('exodusconfirm_info')
         }
         if (imagesrc == 'question1') {
-            //imagesrc = 'xpquestion.gif'
             imagesrc = 'xpquestion.webp'
-            div.style.backgroundColor = '#ddddff'//blueish
+            //div.style.backgroundColor = '#ddddff'
+            //div.style.border = '1px solid #6262ff'
+            //both moved to global.css
+            div.classList.add('exodusconfirm_question1')
         }
         if (!(imagesrc.indexOf('/') + 1 + imagesrc.indexOf('\\') + 1)) {
             imagesrc = gimagetheme + imagesrc
@@ -5343,7 +5498,7 @@ function* exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negativebut
         //    window.setTimeout('gdefaultbutton.focus()', 10)
         //}
 
-    }//end of addbutton
+    } //end of addbutton
 
     //template for html framework
     var html = '\
@@ -5531,7 +5686,7 @@ function decide_onload(decide_args) {
     var data = decide_args[1]
     var cols = decide_args[2]
     var decide_returncolid = decide_args[3]
-    var defaultreply = decide_args[4]//must be an array with method exoduslocate
+    var defaultreply = decide_args[4] //must be an array with method exoduslocate
     var decide_returnmany = decide_args[5]
     var decide_inverted = decide_args[6]
 
@@ -7020,3 +7175,4 @@ function logevent(msg) {
 }
 
 //end of client.js
+

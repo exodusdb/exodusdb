@@ -1,7 +1,21 @@
 
 function* colors_val_screencolor() {
+
     if (!(yield* exodus_val_color())) return yield* exodusinvalid()
+    if (gisdarktheme) {
+        // purpose of code below is to do the toggle animation when user changes preferred color
+        // as it is not allowed to have user set color in dark mode, switching to light mode needs
+        // to be done and along with the switching of the toggle to reflect the current state
+        const toggle = document.getElementById("theme_toggle");
+        toggle.checked = false
+        // just changing the value of the element the event listener is listening to
+        // does NOT execute the event listener, thats why its fired manually below
+        toggle.dispatchEvent(new Event('change'));
+
+        theme_toggle('default')
+    }
     exodus_set_style('screencolor', gvalue)
+
     return true
 }
 
@@ -335,6 +349,8 @@ function exodus_get_fonts(tt) {
 function exodus_dict_colorfontsize(dict, fn) {
 
     var din = dict.length - 1
+
+    // DONT CHANGE ORDER UNLESS YOU CHANGE ORDER IN BACKEND
 
     di = dict[++din] = dictrec('REPORT_HEAD_COLOR', 'F', fn)
     di.wordsep = vm
