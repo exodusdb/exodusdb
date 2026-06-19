@@ -27,6 +27,12 @@ PS4='+ [install_ninja.sh:$LINENO ${SECONDS}s] '
 	RELEASE=${2:-1.13.2}
 	BRANCH_OR_TAG_OR_HASH=${2:-release}
 :
+: Quit if already installed
+:
+	if ninja --version|grep $RELEASE; then
+		exit 0
+	fi
+:
 : 0. Configuration
 :
 	GIT_REPO_URL=https://github.com/ninja-build/ninja

@@ -27,6 +27,12 @@ PS4='+ [install_cmake.sh:$LINENO ${SECONDS}s] '
 	RELEASE=${2:-4.2.1}
 	BRANCH_OR_TAG_OR_HASH=${2:-release}
 :
+: Quit if already installed
+:
+	if cmake --version|grep $RELEASE; then
+		exit 0
+	fi
+:
 : 0. Configuration
 :
 	GIT_REPO_URL=https://github.com/Kitware/CMake

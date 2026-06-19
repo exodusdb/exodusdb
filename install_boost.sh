@@ -17,6 +17,12 @@ PS4='+ [install_boost.sh:$LINENO ${SECONDS}s] '
 :
 	INSTALL_PREFIX="/usr/local"
 :
+: Quit if already installed
+:
+	if find /usr/local/lib -name "libboost_*${BOOST_VER}" -print -quit | grep .; then
+		exit 0
+	fi
+:
 	ICU_PREFIX=$(ls $INSTALL_PREFIX/icu-libcxx-* -d|sort --version-sort|tail -n1)
 :
 : From github

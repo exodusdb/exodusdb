@@ -34,30 +34,45 @@ PS4='+ [./create_site:$LINENO ${DB_CODE:-${3-}} ${SECONDS}s] '
 	EXODUS=`pwd`
 #	test -f $EXODUS/install_www_apt.sh || ( echo Must be run in exodus install dir without path && exit )
 
-function APT_GET {
+function APT_INSTALL {
 : ────────────────────────────────────────
-: Function to call apt-get repeatedly in case of err
+: Function to call apt-get install three times in case of timeout
 : ────────────────────────────────────────
-	STARTED=$SECONDS
-	while [[ $(($SECONDS-$STARTED)) -lt 600 ]]; do
+: Set environment variables for non-interactive installation
 :
-: Retry apt-get. $(($SECONDS-$STARTED)) secs.
-: ────────────────────────────────────────
-		# /dev/null to stop err causing random hang until timeout
-		# with apt process stuck on tcsetattr call. see gdb/lldb -p 9999
-		if timeout 120s $* < /dev/null; then
-			break
+	sudo env \
+		NEEDRESTART_MODE="a"               \
+		DEBIAN_FRONTEND="noninteractive"   \
+		DEBCONF_NOWARNINGS="yes"           \
+		apt-get -y                         \
+		-o Dpkg::Options::=--force-confdef \
+		-o Dpkg::Options::=--force-confold \
+		-o Acquire::http::Timeout=120      \
+		-o Acquire::https::Timeout=120     \
+		-o Acquire::Retries=3              \
+		--no-install-recommends            \
+		install "$@" < /dev/null
+:
+: Verify all packages are installed
+:
+	for pkg in "$@"; do
+		# Skip check for files with extension '.deb'
+		if [ ${pkg##*.} != "deb" ] && ! dpkg -s "$pkg" &>/dev/null; then
+			: "Error: Unable to locate package '$pkg'"
+			exit 1
 		fi
-		sleep 5
-	done;
-}
+	done
+: "Packages installed successfully."
+:
+} # function APT_INSTALL
+
 :
 : Install apache and php
 : ────────────────────────────────────────
 : Note that apache/mods may be already installed but not enabled
 :
 #	APT_GET sudo apt-get install -y apache2 libapache2-mod-php php php-xml
-	APT_GET sudo apt-get install -y apache2 php php-fpm php-xml
+	APT_INSTALL apache2 php php-fpm php-xml
 :
 : Ensure that required confs are actually enabled
 :
@@ -111,7 +126,7 @@ function APT_GET {
 :
 : Ensure setfacl is installed
 : ────────────────────────────────────────
-	which setfacl || APT_GET sudo apt-get install -y acl
+	which setfacl || APT_INSTALL acl
 :
 : Create link from hostname dir to host dir if different
 : ────────────────────────────────────────

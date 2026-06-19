@@ -16,6 +16,14 @@ PS4='+ [install_icu.sh:$LINENO ${SECONDS}s] '
 	ICU_VER=${1:-$DEFAULT_ICU_VER}
 	INSTALL_PREFIX=/usr/local/icu-libcxx-${ICU_VER}
 
+:
+: Quit if already installed
+:
+	if test -d $INSTALL_PREFIX; then
+		exit 0
+	fi
+
+:
 	TARBALL="icu4c-${ICU_VER}-sources.tgz"
 	URL="https://github.com/unicode-org/icu/releases/download/release-${ICU_VER}/${TARBALL}"
 :

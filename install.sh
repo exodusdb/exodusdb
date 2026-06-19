@@ -966,6 +966,6 @@ function APT_INSTALL {
 	done
 : "Packages installed successfully."
 :
-} # function CMD_RETRY
+} # function APT_INSTALL
 
 main "$@"
