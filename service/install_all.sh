@@ -1,7 +1,7 @@
 #!/bin/bash
 [ "$INSTALL_SH" ] || { INSTALL_SH=1 exec bash "$0" "$@" 2>&1 | tee -a "$(echo ${0##*/}.$*.$(printf "%04d" $(( RANDOM % 10000 ))).log | tr ' :@' '.__')"; exit "${PIPESTATUS[0]}"; }
 set -euxo pipefail
-PS4='+ [./install_all.sh ${SITE_NAME:-${1-}} ${SECONDS}s] '
+PS4='+ [install_all.sh:$LINENO ${SITE_NAME:-${1-}} ${SECONDS}s] '
 : $0 $*
 : ─────────────────────────────────────────────────────────────────────────────────
 : Installs EXODUS web service
@@ -31,10 +31,11 @@ function APT_INSTALL {
 : ────────────────────────────────────────
 : Set environment variables for non-interactive installation
 :
-	NEEDRESTART_MODE="a"                   \
-	DEBIAN_FRONTEND="noninteractive"       \
-	DEBCONF_NOWARNINGS="yes"               \
-	sudo apt-get -y                        \
+	sudo env \
+		NEEDRESTART_MODE="a"               \
+		DEBIAN_FRONTEND="noninteractive"   \
+		DEBCONF_NOWARNINGS="yes"           \
+		apt-get -y                         \
 		-o Dpkg::Options::=--force-confdef \
 		-o Dpkg::Options::=--force-confold \
 		-o Acquire::http::Timeout=120      \

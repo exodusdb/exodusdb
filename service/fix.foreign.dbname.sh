@@ -1,7 +1,7 @@
 #!/bin/bash
 #[ "$INSTALL_SH" ] || [ "$0" = bash ] || { INSTALL_SH=1 exec bash "$0" "$@" 2>&1 | tee -a "$(echo ${0##*/}.$*.$(date +%H%M%S).log | tr ' :@' '.__')>
 set -euxom pipefail
-PS4='+ [./fix.foreign.dbname.sh ${1-} ${SECONDS}s] '
+PS4='+ [./fix.foreign.dbname.sh:$LINENO ${1-} ${SECONDS}s] '
 : $0 "$@"
 :
 : Ensure foreign dbname suffix _test matches the dbname suffix _test or lack thereof

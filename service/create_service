@@ -1,6 +1,6 @@
 #!/bin/bash
 set -euxo pipefail
-PS4='+ [./create_service ${BASE_DB_CODE:-${2-}} ${SECONDS}s] '
+PS4='+ [./create_service:$LINENO ${BASE_DB_CODE:-${2-}} ${SECONDS}s] '
 
 : ─────────────────────────────────────────────────────────────────────────────────
 : Create/Recreate an EXODUS service

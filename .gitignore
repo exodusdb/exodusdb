@@ -1,3 +1,4 @@
+llvm.sh
 *.log
 [a-z]
 [a-z][0-9]*

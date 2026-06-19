@@ -942,10 +942,11 @@ function APT_INSTALL {
 : ────────────────────────────────────────
 : Set environment variables for non-interactive installation
 :
-	NEEDRESTART_MODE="a"                   \
-	DEBIAN_FRONTEND="noninteractive"       \
-	DEBCONF_NOWARNINGS="yes"               \
-	sudo apt-get -y                        \
+	sudo env \
+		NEEDRESTART_MODE="a"               \
+		DEBIAN_FRONTEND="noninteractive"   \
+		DEBCONF_NOWARNINGS="yes"           \
+		apt-get -y                         \
 		-o Dpkg::Options::=--force-confdef \
 		-o Dpkg::Options::=--force-confold \
 		-o Acquire::http::Timeout=120      \

@@ -1,6 +1,6 @@
 #!/bin/bash
 set -euxo pipefail
-PS4='+ [./config_postgres ${SECONDS}s] '
+PS4='+ [./config_postgres:$LINENO ${SECONDS}s] '
 
 : ─────────────────────────────────────────────────────────────────────────────────
 : Configure Postgres with more connections and memory
