@@ -163,7 +163,7 @@ subr writedict() {
 		if (suffixno)
 			dictrec.replacer("{||}", suffixno);
 
-		// Get the relevent column title
+		// Get the relevant column title
 		if (suffixno)
 			dictrec(3) = basedictrec.f(3, suffixno);
 

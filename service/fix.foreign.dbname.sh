@@ -20,7 +20,7 @@ PS4='+ [./fix.foreign.dbname.sh:$LINENO ${1-} ${SECONDS}s] '
 : ────────────────────────────────────────
 : 'Also remove the host so the connection are fast linux socket connections instead of tcp/ip'
 :
-: 'Only the foreign dbname is important. The actual foreign server name is just an ID or handle and is irrelevent.'
+: 'Only the foreign dbname is important. The actual foreign server name is just an ID or handle and is irrelevant.'
 :
 : 'Changing a foreign servers dbname changes the attachment of all foreign tables that were associated with that foreign server'
 :

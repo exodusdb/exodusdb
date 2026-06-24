@@ -1075,7 +1075,7 @@ var ExoProgram::calculate(in dictid, in dictfile, in id, in record, in mvno) {
 	// and all it to work with const arguments.
 	// TODO replace with const_cast?
 
-	// Save and reconfigure the relevent environment variables
+	// Save and reconfigure the relevant environment variables
 	DICT.swap(dictfile);
 	ID.swap(id);
 	RECORD.swap(record);
@@ -1787,7 +1787,7 @@ void ExoProgram::getdatetime(out user_date, out user_time, out system_date, out 
 	UTC_time = system_time;
 	UTC_date = system_date;
 
-	//following is irrelevent until we support user tz when server tz ISNT gmt/utc
+	//following is irrelevant until we support user tz when server tz ISNT gmt/utc
 	//
 	//remove server tz to get gmt/utc. if server is ahead of gmt then serv tz is +
 	tt = TZ.f(2);

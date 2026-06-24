@@ -30,7 +30,7 @@ using let = const var;
   argv is the list of watched directories.
   Entry 0 of wd and argv is unused. */
 
-//return true if any relevent events
+//return true if any relevant events
 static var handle_events(int inotify_fd, int* wd, const int argc, const char* argv[]) {
 	/* Some systems cannot read integer variables if they are not
 	  properly aligned. On other systems, incorrect alignment may
@@ -276,7 +276,7 @@ static var wait_main(const int argc, const char* argv[], const int wait_time_ms)
 			if (fds[0].revents & POLLIN) {
 
 				/* Inotify events are available */
-				//quit if any relevent events
+				//quit if any relevant events
 				events = handle_events(inotify_fd, wd, argc, argv);
 				if (events)
 					break;

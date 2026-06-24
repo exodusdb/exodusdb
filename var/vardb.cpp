@@ -585,7 +585,7 @@ static DBconn_ptr get_pgconn(in dbhandle) {
 		std::clog << "CONN " << dbconn_no << std::endl;
 	}
 
-	// Return the relevent pg_connection structure
+	// Return the relevant pg_connection structure
 //	const auto pgconn = thread_dbpool.get_dbconn(dbconn_no)->pgconn_;
 	// TODO error abort if zero
 	return pgconn;
@@ -2944,7 +2944,7 @@ static var get_dictexpression(in cursor, in mainfilename, in filename, in dictfi
 			else
 				sqlexpression = get_fileexpression(mainfilename, filename, "key");
 
-			// Multipart key - extract relevent field based on "*" separator
+			// Multipart key - extract relevant field based on "*" separator
 			let keypartn = dictrec.f(5);
 			if (keypartn) {
 				sqlexpression =
