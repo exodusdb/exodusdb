@@ -370,8 +370,9 @@ function exodus_dict_date(dicti,params) {
  // as to not disrupt users and in case aligning to right creates some bug
  dicti.align = 'L'
 
-
- dicti.length=10
+ //dicti.length=10
+ // reduced to remove overly excess right spacing
+ dicti.length=7
  dicti.popup='yield* form_pop_calendar()'
  if (!gcalendarscript) gcalendarscript=1
  if (params) dicti.lowercase=true
