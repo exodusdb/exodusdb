@@ -4517,12 +4517,14 @@ function menuchangeoption(menu, newmenuoption) {
 
     //highlight new menu item
     //newmenuoption.style.backgroundColor='#d0d0d0'
-
+    newmenuoption.style.background = 'var(--exodus-menuhighlight)'
+    newmenuoption.style.borderRadius = '8px'
     //newmenuoption.style.backgroundColor = 'highlight'
     //newmenuoption.style.color = 'highlighttext'
     //newmenuoption.style.backgroundColor = 'lightgrey'
-    newmenuoption.style.background = (gisdarktheme) ? '#303030' : '#d3d3d3'
-    newmenuoption.style.borderRadius = '8px'
+    // static styling, moved to global.css, only highlight colouring is left
+    // because of existing mechanisms that determine which item to highlight
+    // is not portable to css
     menu.highlightedelement = newmenuoption
 
     //focus and onkeydown should remain on the menu div not the item
