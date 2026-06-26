@@ -329,6 +329,11 @@ Calendar.prototype.create = function() {
 	//
 	td = document.createElement("td");
 	this._clearButton = document.createElement("button");
+	// Experimental
+	// Aligns the clear button to the right side of the dropdown
+	// for symmetry
+	// TODO: Align it the proper way instead of hard coding
+	this._clearButton.style.marginLeft = '80px';
 	var today = new Date();
 	buttonText = "Clear";
 	this._clearButton.appendChild(document.createTextNode(buttonText));
