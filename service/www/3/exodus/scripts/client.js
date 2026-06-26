@@ -719,10 +719,13 @@ function blockmodalui_sync() {
 
     //YIELD//console.log('BLOCKING UI')
 
+    // TODO: chance here to move css styling to global.css
+    //       as we currently only override/modify the below styles
+    //       in global.css using !important
     blocker = document.createElement('div')
     blocker.style.width = '100%'
     blocker.style.height = '100%'
-    blocker.style.background = 'rgba(255,255,255,0.25)'//white overlay with only 25% opacity
+    blocker.style.background = 'rgba(255,255,255,0.25)' // white overlay with only 25% opacity
     blocker.style.position = 'fixed'
     blocker.style.top = '0'
     blocker.style.left = '0'
@@ -965,12 +968,14 @@ function* exodus_yield(source) {
     //NOTE IN NON-YIELDING CODE THE FOLLOWING LINE IS ONLY A COMMENT
     ////////////////////////////////////////////////////////////////
 
+    // /* yield */ comment trick is so the same source can be
+    // machine-stripped to run in old IE, I think.
+
     /* yield */   var result = yield source
 
     logevent('          << AFTER YIELD ' + source)
 
     return result
-
 }
 
 //called by child windows to return result to the parent before closing
@@ -978,7 +983,7 @@ function exoduswindowclose(returnvalues) {
 
     //window.opener.gchildwin_returnvalue = returnvalues
     if (window.opener) {
-        window.opener.focus()//for MSEDGE
+        window.opener.focus() //for MSEDGE
         if (window.opener.exodus_setchildwin_returnvalue) {
             if (typeof returnvalues == 'undefined')
                 returnvalues = ''
@@ -1061,7 +1066,6 @@ function exodus_resume(value, source) {
     //probably no purpose in returning this since we are not using generator functions to acquire values,
     //only to act as suspended functions until some data they need is acquired asynchronously from exodusdiv, child window, xmlhttp
     return next.value
-
 }
 
 function exodus_next(value, source) {
@@ -1332,7 +1336,10 @@ function exodus_set_style(mode, value, value2) {
     // Modify default card colour with user preferred color if
     // saved (cookie) or on screen color tryout in screen color dropdowns
     // NB style is false on report pages
-    if (mode == 'screencolor' && (value || exodusgetcookie2('fc'))) {
+    //if (mode == 'screencolor' && (value || exodusgetcookie2('fc'))) {
+    // value and fc cookie will be '' if user has chosen default, so we should not check for that
+    // because thats how this function sets the old lace theme
+    if (mode == 'screencolor') {
 
         oldvalue = exodusgetcookie2('fc')
         let gradient_endcolor = '#'
@@ -1400,6 +1407,8 @@ function exodus_set_style(mode, value, value2) {
             var style = rules[rulen].style
             if (!style || !style.fontFamily) continue
 
+            // if oldvalue is not defined, that means something has gone wrong in global.css linking
+            // or there is a syntax error in global.css like unmatched {}
             oldvalue = style.fontFamily
             try {
                 style.fontFamily = value
@@ -1700,6 +1709,18 @@ function* clientfunctions_windowonload() {
     if (!window.dialogArguments && (typeof gshowmenu == 'undefined' || gshowmenu) && EXODUSlocation != './exodus/' && document.getElementsByClassName('navbar').length == 0) {
 
         var ctrlalt = isMac ? 'Ctrl' : 'Alt'
+
+        // !! WIP !!
+        // LG/AP: idea Experimental, button to default to the chosen saved options
+        // Guarangs request that could also be good for other clients and pages.
+        //if (document.URL.includes("ledgerprint.htm")) {
+        //    var temp2 = document.createElement('span')
+        //    temp2.innerHTML = menubuttonhtml('refreshcache', gsaveimage, '<u>S</u>ave Default', 'Save Options as Default. ' + ctrlalt + '+R', 'X')
+        //    gexodus_menubar.insertBefore(temp2, gexodus_menubar.firstChild)
+        //    temp2.style.float = 'left'
+        //    temp2.style.paddingLeft = '5px'
+        //    addeventlistener(temp2, 'click', 'ledger_account_default_options')
+        //}
 
         //insert buttons in reverse order
 
@@ -3541,9 +3562,16 @@ function* exodusconfirm(question, defaultbutton, yesbuttontitle, nobuttontitle, 
 
     //use div to avoid opening a new window if possible
     //if ((!gusername || gusername=='EXODUS') && guseyield && !istextinput) {
-    if (guseyield && !istextinput) {
+    var response
+    //if (guseyield && !istextinput) {
+    if (guseyield) {
 
-        return yield* exodusconfirm2(question, defaultbutton, yesbuttontitle, nobuttontitle, cancelbuttontitle, text, texthidden, image)
+        // New in window text input popups - previously new tabs
+        if (istextinput) {
+            response = yield* exodusconfirm3(question, text);
+        } else {
+            return yield* exodusconfirm2(question, defaultbutton, yesbuttontitle, nobuttontitle, cancelbuttontitle, text, texthidden, image)
+        }
 
         //use separate window for popup if yield is not available eg internet explorer
     } else {
@@ -3566,7 +3594,8 @@ function* exodusconfirm(question, defaultbutton, yesbuttontitle, nobuttontitle, 
         //sadly has no effect
         dialogstyle +', menubar=no, scrollbars=no, status=no, titlebar=no, toolbar=no'
 
-        var response = yield* exodusshowmodaldialog(EXODUSlocation + 'confirm.htm', dialogargs, dialogstyle)
+        //var response = yield* exodusshowmodaldialog(EXODUSlocation + 'confirm.htm', dialogargs, dialogstyle)
+        response = yield* exodusshowmodaldialog(EXODUSlocation + 'confirm.htm', dialogargs, dialogstyle)
     }
 
     //text input returns a string (may be zero length) or false if clicked cancel
@@ -4802,7 +4831,7 @@ function getmaxwindow_sync() {
 }
 
 
-var gblockevents//stops onclick event at the same time as onfocus event
+var gblockevents //stops onclick event at the same time as onfocus event
 function form_blockevents(truefalse, callinfo) {
 
     var callername = ''
@@ -4851,14 +4880,19 @@ function starteventhandler(eventfunctionname, functionx) {
         //onfocus is yielding to async events like window.open etc
         //var uiblockerdiv=$$('uiblockerdiv')
         //if (gblockevents||uiblockerdiv) {
-        if (gblockevents) {
 
+        if (gblockevents) {
             if (event.type == 'unload' || event.type == 'beforeunload') {
                 //always call unloadevents
                 //TODO create a new gcurrentevent?
 
                 //special treatment of events while exodusconfirm is up
-            } else if ($$('exodusconfirmdiv')) {
+            } else if (document.querySelector('.exodusconfirmdiv')) {
+
+                // FYI: Depending on Key pressed, call a function with a delay then cancel that event
+                // to  hijack the functionality of the Event e.g window.setTimeout('do_something_instead_of_what_key_usually_does')
+                // and cancel the actual Key event return exoduscancelevent(event)
+                // to truly allow a key event like typing Must do an early return
 
                 //allow mouse right click, copy of error message text etc.
                 if (event.type == 'copy')
@@ -4876,15 +4910,25 @@ function starteventhandler(eventfunctionname, functionx) {
                     logevent('exodus_anon_sync_event_handler+exodusconfirmdiv ' + event.target.id + ' ctrlKey:' + event.ctrlKey + ' key:' + keycode + ' letter:' + keyletter)
 
                     //FIX detection of specific keys on buttons like Y N etc
-
+                    let text_input_popup = document.querySelector('.exodustextinputpopup');
                     //POSITIVE = F9 or Ctrl+Enter or SPACE some initial
                     if (keycode == 120 || (keycode == 13) || (keycode == 32) || keyletter == gexodusconfirmletters[1]) {
-                        window.setTimeout('exodus_confirm_function1()', 1)
+                        if (text_input_popup) {
+                            const ok_button = text_input_popup.querySelector('#okbtn');
+							ok_button.click()
+						} else {
+                            window.setTimeout('exodus_confirm_function1()', 1)
+                        }
                         return exoduscancelevent(event)
                     }
 
                     //CANCEL = Esc or some initial
                     else if (keycode == 27 || keyletter == gexodusconfirmletters[3]) {
+                         if (text_input_popup) {
+                            const cancel_button = text_input_popup.querySelector('#cancelbtn');
+                            cancel_button.click()
+                            return
+                        }
                         window.setTimeout('exodus_confirm_function3()', 1)
                         return exoduscancelevent(event)
                     }
@@ -4894,14 +4938,18 @@ function starteventhandler(eventfunctionname, functionx) {
                         window.setTimeout('exodus_confirm_function2()', 1)
                         return exoduscancelevent(event)
                     }
+
+                    // Allow keyboard typing for text popups
+                    if (text_input_popup) {
+                        return true
+                    }
                 }
             }
 
             logevent('!!!SKIPPING event!!! ' + eventdescription + ' because gblockevents is set, and not keydown related to exodusconfirmdiv')
-
             return exoduscancelevent(event)
 
-        }//end of event blocking
+        } //end of event blocking
 
         //events are not blocked - create a new event handler
 
@@ -5594,10 +5642,13 @@ function* exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negativebut
 
     }
 
-    var top = window.innerHeight / 2 - div.offsetHeight / 2
-    var left = window.innerWidth / 2 - div.offsetWidth / 2
-    div.style.top = top + 'px'
-    div.style.left = left + 'px'
+    // centers exodusconfirmdiv popups
+    //var top = window.innerHeight / 2 - div.offsetHeight / 2
+    //var left = window.innerWidth / 2 - div.offsetWidth / 2
+    //div.style.top = top + 'px'
+    //div.style.left = left + 'px'
+    // converted to dynamic centering, because if the screen is resized,
+    // the styling will not change, see exodusconfirmdiv global.css
 
     //if case too much to fit vertically on the screen, use scrollbars
     //for messages show the bottom of the message
@@ -5615,7 +5666,6 @@ function* exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negativebut
     //////////////////////////////////////////////////////////////////////////////////////////////////
 
     var response = yield* exodus_yield('exodusconfirm2')
-
     exodusremovenode(div)
 
     //text input returns a string (may be zero length) or false if clicked cancel
@@ -5635,17 +5685,72 @@ function* exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negativebut
     return response
 }
 
-//return 1
+function* exodusconfirm3(question, default_text) {
+
+    // Creates a popup with a text input that uses existing
+    // Generator function coroutine mechnaisms.
+    // FYI: this function always runs until let result
+    //      then when the onclick event listener calls exodus_resume()
+    //      the function "resumes" or runs again starting from let result
+    //      like reading a book starting at a bookmark
+
+    const div = document.createElement('div');
+    div.id = "exodusconfirmdiv"
+    div.classList.add("exodusconfirmdiv", "exodustextinputpopup", "exodusconfirm_question1") //.
+
+	// Check if question has inline (overriding) css styling
+    const hasownhtmlfmt = /<[a-z][\s\S]*?>/i.test(question)
+    div.innerHTML = !hasownhtmlfmt ? `<p>${question}</p>` : question;
+
+    div.innerHTML += `
+        <input id="textinput" type="text" style="width:100%;margin:10px 0;">
+        <br>
+        <button id="okbtn" class="graphicbutton">OK</button> //.
+        <button id="cancelbtn" class="graphicbutton">Cancel</button> //.
+    `;
+
+
+    let input = div.querySelector('#textinput'); //.
+    input.value = default_text //.
+
+    div.querySelector('#okbtn').onclick = () => {
+        input = div.querySelector('#textinput');
+        const val = input ? input.value : '';
+
+        // somewhere along the call stack .next(val) is called on the coroutine
+        // passing a return value and ending the coroutine, freeing up the slot
+        // letting another function start a coroutine
+        exodus_resume(val, 'exodusconfirm3');
+    };
+
+    div.querySelector('#cancelbtn').onclick = () => {
+        // ditto
+        exodus_resume('', 'exodusconfirm3');
+    };
+
+    document.body.appendChild(div);
+    input.focus(); // focuses cursor in the input box
+
+    // Start coroutine, after coroutine is resolved by exodus_resume() above
+    // function resumes back at this point, that is why we have the one place
+    // that removes the div popup here (before it was in the event listeners)
+    let result = yield* exodus_yield('exodusconfirm3')
+    document.body.removeChild(div);
+
+    return result
+}
+
+//return 1 - Positive Button i.e. 'Ok'
 function exodus_confirm_function1(event) {
     return exodus_confirm_function(1, event)
 }
 
-//return 2
+//return 2 - Negative Button i.e. 'No'
 function exodus_confirm_function2(event) {
     return exodus_confirm_function(2, event)
 }
 
-//return 0
+//return 0 - Cancel Button
 function exodus_confirm_function3(event) {
     return exodus_confirm_function(0, event)
 }
@@ -7177,4 +7282,3 @@ function logevent(msg) {
 }
 
 //end of client.js
-
