@@ -33,7 +33,7 @@
 			text-align: center;
 			overflow: hidden;
 		}
-		#dropbox:hover { 
+		#dropbox:hover {
 			border-color: #777 !important;
 		}
 		#dropbox.dragover {
@@ -96,8 +96,11 @@
 									<td>
 									</td>
 									<td style="text-align:center; vertical-align:middle; padding:10px;">
-										<input id="button_submit" class="exodusbutton" type="button" value="Upload" accesskey="2" title="Upload (Alt+2)" />
-										<button class="exodusbutton" onclick="window.close()" title="Close window (Esc)">Close</button>
+<!--										<input id="button_submit" class="exodusbutton" type="button" value="Upload" accesskey="2" title="Upload (Alt+2)" />-->
+<!--										<button class="exodusbutton" onclick="window.close()" title="Close window (Esc)">Close</button>-->
+										<!--made both buttons to use <button> element as it is the cleaner route to insert an icon/image as the button if we wanted to go that route in the future--->
+										<button id="button_submit" class="exodusbutton" onclick="yield* upload_onclick" title="Close window (Esc)">Upload</button>
+										<button id="button_close"  class="exodusbutton" onclick="window.close()" title="Close window (Esc)">Close</button>
 									</td>
 									<span style="margin-left: 2.5px; display:none;" id="uploadpathtext"></span>
 								</tr>
@@ -145,7 +148,6 @@
 			</div> <!--card-cell-->
 		</div> <!--card-row-->
 
-		
 		<div id="images" style="align-items: center;"></div>
 	<!-- </div> formpage -->
 	</div> <!--form-conatiner-->
