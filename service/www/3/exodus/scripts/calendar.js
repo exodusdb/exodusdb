@@ -116,7 +116,8 @@ Calendar.prototype.create = function() {
 	this._calDiv.className = "calendar";
 	this._calDiv.style.position = "absolute";
 	this._calDiv.style.display = "none";
-	this._calDiv.style.border = "1px solid WindowText";
+	//this._calDiv.style.border = "1px solid WindowText";
+	//Removed border for 2026 UI revamp with dark mode
 	this._calDiv.style.textAlign = "center";
 	this._calDiv.style.background = "Window";
 	this._calDiv.style.zIndex = "400";
@@ -126,9 +127,10 @@ Calendar.prototype.create = function() {
 	// header div
 	div = document.createElement("div");
 	div.className = "calendarHeader";
-	div.style.background = "ActiveCaption";
+	//div.style.background = "ActiveCaption";
 	div.style.padding = "3px";
-	div.style.borderBottom = "1px solid WindowText";
+	//Styling moved to global.css under class, so that it can change depending on light/dark theme
+	//div.style.borderBottom = "1px solid WindowText";
 	this._calDiv.appendChild(div);
 	
 	table = document.createElement("table");
@@ -218,7 +220,10 @@ Calendar.prototype.create = function() {
 	
 	table.style.color		= "WindowText";
 	table.style.cursor		= "default";
-	table.cellPadding		= "3";
+	//table.cellPadding		= "3";
+	//New styling + it makes the bottom-borders inline with each other
+	//on the Day of week name
+	table.cellPadding		= "4";
 	table.cellSpacing		= "0";
 	
     div.appendChild(table);
@@ -242,7 +247,8 @@ Calendar.prototype.create = function() {
 		td.appendChild(text);
 		td.className = "weekDayHead";
 		td.style.fontWeight = "bold";
-		td.style.borderBottom = "1px solid WindowText";
+		//Styling moved to global.css under class, so that it can change depending on light/dark theme
+		//td.style.borderBottom = "1px solid WindowText";
 		tr.appendChild(td);
 	}
 	
@@ -531,7 +537,9 @@ Calendar.prototype._update = function() {
 		ptr=ptr.style;//exodus
 		ptr.fontWeight = "normal";
 		ptr.border= "none";
-		ptr.color= 'black';
+		//Removed text color to inherit color from <body> styling in global.css
+		//so that text color will change depending on theme
+		//ptr.color= 'black';
 		index++;
 	}
         
@@ -543,9 +551,10 @@ Calendar.prototype._update = function() {
 		ptr.data.data = i;
 		
 		ptr=ptr.data.parentNode;//exodus
-		ptr.className = "";
 		ptr.style.fontWeight = "normal";
-		ptr.style.color = "black";
+		//Removed text color so that it inherits color instead from <body> styling in global.css
+		//so that text color will change depending on theme
+		//ptr.style.color = "black";
 		ptr.style.border= "none";
 		if (toISODate(d1) == today) {
 			ptr.className = "today";

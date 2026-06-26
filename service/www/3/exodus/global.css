@@ -1,9 +1,14 @@
 /*================================-================================*/
 /*============================ THEMES =============================*/
 /*=================================================================*/
+/* Define ALL theme variables in both root and dark */
+/* Missing vars break styles on theme switch.*/
 
-/*Default (light mode)*/
+/*Default Light Theme*/
 :root {
+
+    /* ALL VARIABLES ARE SHARED */
+
     --exodus-bkgcolor: #f9f9f9;
     --exodus-cardcolor: linear-gradient(to bottom, #fdf5e6, #fefbf5); /*Oldlace*/
     /*see exodus_set_style for what happens if custom user card colour.*/
@@ -18,14 +23,16 @@
     /* Opacity is set so the radio color looks uniform in different card colors in light mode*/
     --exodus-radiocolor: rgba(0, 84, 187, 0.596);
     --exodus-buttoncolor: #f5f5f5;
-    --exodus-accentcolor: #ff6f6f;
     --exodus-inputdisabled: #d4d4d4;
     --exodus-boxshadow: #d8d8d8 0px 1px 1px;
     --exodus-menuboxshadow: #d8d8d8 0px 1px 3px;
     --exodus-popupblur: blur(5px);
-    --exodus-popupshadow: #000000 0px 0px 15px;
+    --exodus-popupshadow: #444444 0px 0px 15px;
     --exodus-popupborderwidth: 2px;
     --exodus-buttonboxshadow: none;
+    --exodus-calendarbordercolor: 1px solid rgb(255, 255, 255, 0.325);
+    --exodus-calendarborderbottom: 1px solid #afafaf;
+    --exodus-menuhighlight: #d3d3d3;
 
     /* Glass Button*/
     --exodus-glass-button-bkg: rgba(255, 255, 255, 0);
@@ -35,7 +42,7 @@
     --exodus-glass-box-shadow:
         0 4px 12px rgba(0, 0, 0, 0.05),
         0 1px 3px rgba(0, 0, 0, 0.06),
-        inset 0 1px 0 rgba(255, 255, 255, 0.9),
+        inset 0 1px 0 rgba(255, 255, 255, 0.7), /* 0.7 was 0.9 before, toned down the white top highlight */
         inset 0 -1px 3px rgba(0, 0, 0, 0.25);
     --exodus-glass-blur: blur(10px);
 
@@ -49,6 +56,9 @@
 
 /*Dark Theme*/
 :root[data-theme="dark_mode"] {
+
+    /* ALL VARIABLES ARE SHARED */
+
     --exodus-bkgcolor: #181818;
     --exodus-cardcolor: linear-gradient(to top, #1e1e1e, #272727);
     --exodus-textcolor: #ffffff;
@@ -68,22 +78,25 @@
     --exodus-popupshadow: #000000  0px 0px 100px;
     --exodus-popupborderwidth: 1px;
     --exodus-buttonboxshadow: 0 5px 32px rgba(0, 0, 0, 0.1);
+    --exodus-calendarbordercolor: 1px solid #303030;
+    --exodus-calendarborderbottom: 1px solid #303030;
+    --exodus-menuhighlight: #303030;
 
     /* Glass Button*/
     --exodus-glass-button-bkg: transparent;
     --exodus-glass-grain-image: transparent;
-
     --exodus-glass-button-border: 1px solid rgba(255, 255, 255, 0.18);
     --exodus-glass-button-border-radius: 9999px;
     --exodus-glass-box-shadow:
         0 6px 16px rgba(0, 0, 0, 0.4),
-        inset 0 1px 0 rgba(255, 255, 255, 0.18),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1), /*0.1 was 0.18 before, changed to 0.1 makes the top highlight more subtle in darkmode */
         inset 0 -2px 3px rgba(0, 0, 0, 0.3);
     --exodus-glass-blur: blur(12px);
 
     --exodus-glass-hover-bkg:rgba(50, 50, 55, 0.75);
     --exodus-glass-hover-border-color: rgba(255, 255, 255, 0.28);
-    --exodus-glass-hover-box-shadow: 0 8px 20px rgba(0, 0, 0, 0.45),
+    --exodus-glass-hover-box-shadow:
+        0 8px 20px rgba(0, 0, 0, 0.45),
         inset 0 1px 0 rgba(255, 255, 255, 0.35);
 }
 /*Experimental themes kept at bottom of file*/
@@ -121,10 +134,16 @@ commented out on - 2026 UI revamp - minimalist*/
 /*===========================================================================*/
 .exodusconfirmdiv {
 
+	/* Centers popup dynamically even if page is resized*/
+    width: fit-content;
+    height: fit-content;
+    margin: auto;
+    inset: 0;
+
     z-index: 1000;
     position: fixed; /*fixed to position this popup above elements on the screen*/
     text-align: center;
-    border: 1px solid grey;
+    border: 1px solid grey; /* Only affects .calendar*/
     border-radius: 10px !important;
     padding: 10px;
     box-shadow: 0px 0px 7px purple; /*should be overwritten*/
@@ -149,6 +168,35 @@ commented out on - 2026 UI revamp - minimalist*/
     &.exodusconfirm_question1 {
         border: 1px solid #6262ff; /*light blue*/
     }
+    &.exodustextinputpopup {
+        padding: 20px;
+
+        & #textinput {
+            background: transparent;
+            border-bottom: 1.7px dotted var(--exodus-dotcolor);
+            border-bottom: 1.7px solid #ff6428;
+        }
+    }
+}
+
+/* Moved out of .exodusconfirm and instead took styling from there instead of */
+/* Adding .exodusconfirm class onto calendars because calendar has different */
+/* Positioning in the screen, and .exodusconfirm is now dynamically centered */
+.calendar {
+    border: var(--exodus-calendarbordercolor);
+    border-radius: 10px !important;
+    border-width: var(--exodus-popupborderwidth) !important;
+    outline: none;
+    padding: 10px;
+    background: transparent !important;
+    box-shadow: var(--exodus-popupshadow) !important;
+    backdrop-filter: var(--exodus-popupblur) !important;
+
+    /*Calendar popup*/
+    & .weekDayHead, & .calendarHeader {
+        border-bottom: var(--exodus-calendarborderbottom);
+    }
+
 }
 
 #uiblockerdiv {
@@ -172,7 +220,7 @@ BODY {
 BODY, BUTTON, INPUT, SELECT, TEXTAREA, SPAN, DIV, TD, TH, P, BR, A, SMALL, BIG {
     /*all rules with font-family will have their font-size controlled*/
     font-family: verdana,sans-serif,arial,helvetica;
-    font-size: 8pt;
+    font-size: 8pt; /*NB .clsReadOnly (usually symbolic "fields") use slightly bigger & see schedule_grid2list()*/
     color: var(--exodus-textcolor);
     min-height: 13px;
     border: 1px;
@@ -258,6 +306,13 @@ A {
         transform: translateY(-1px);
         cursor: pointer;
     }
+}
+
+/* customization of show all button*/
+/* since it is a button that has 2 lines of text, it needs different styling*/
+.exodusid_exodusgroup1showall {
+    border-radius: 18px;
+    padding-top: 4px;
 }
 
 BUTTON {
@@ -379,6 +434,7 @@ H6 {
     /*filter: alpha(opacity=80);
     opacity: 0.80;*/
     background: transparent !important;
+    font-size: 9pt;
 }
 
 /* New tab popups with text area input */
@@ -553,8 +609,9 @@ svg { width: 24px; height: 24px; }
 }
 
 .form-container {
+    /* Base class. To be used with .form-container--medium .form-container--large*/
     /*Container for screens with multi cards of different widths
-    but do not require max width of screen e.g Media Diary, List of XXXXX*/
+    but do not require max width of screen */
     box-sizing: border-box;
     & td {
         padding: 5px;
@@ -590,7 +647,7 @@ svg { width: 24px; height: 24px; }
 
 /*Extend .form-container with this*/
 .form-container--large {
-    /*Container for Schedule File (Only)*/
+    /*To be used for forms that require as much width as possible*/
     width: 100%;
     box-sizing: border-box;
 
@@ -642,7 +699,7 @@ svg { width: 24px; height: 24px; }
 
 .card-cell {
     /*Spacing and internal layout of card*/
-    flex: 0 1 auto; /*n=grow, n=shrink, auto=does?*/
+    flex: 0 1 auto;
     display: flex;
     gap: 10px;
     align-items: stretch;
@@ -663,9 +720,31 @@ svg { width: 24px; height: 24px; }
     background: var(--exodus-cardcolor) !important;
 }
 
+/*TODO: REPLACE .card and .card-cell with this new merged class*/
+/*      REMOVE the '& .card-cell {' in the medium and large form-containers too*/
+/*      REMOVE ALL DIVS with .card-cell in htm files*/
+/*.card {*/
+/*    /* Cell + Card combined */
+/*    flex: 1 1 auto;*/
+/*    display: flex;*/
+/*    flex-direction: column;*/
+/*    gap: 10px;*/
+/*    align-items: stretch;*/
+/*    height: 100%;*/
+/**/
+/*    /* Card visuals */
+/*    border: 1px solid var(--exodus-bordercolor);*/
+/*    border-radius: 10px;*/
+/*    padding: 5px;*/
+/*    box-sizing: border-box;*/
+/*    box-shadow: var(--exodus-boxshadow);*/
+/*    background: var(--exodus-cardcolor) !important;*/
+/*}*/
+
 /* Complicated to apply class="card-title" to schedules.htm as it breaks positioning*/
 /* Why does it have to be accessed like this, cant we just do .card-title directly*/
-.card > .card-title {
+/*.card > .card-title {*/
+.card-title {
     margin-bottom: -4px;
     display: block;
     padding: 5px;
@@ -674,7 +753,7 @@ svg { width: 24px; height: 24px; }
 }
 
 /*Needed for Address File, img field grouping*/
-/*Address file is the only screen were joel's
+/*Address file is the only screen where joel's
 img to group fields has been preserved because it
 looks barren without now, after having gotton use to it..*/
 .section-title {
@@ -763,29 +842,6 @@ input[type="radio"],input[type="checkbox"] {
 }
 
 
-/*Experimental light mode (replace yellow default) theme */
-/* :root {
-    --exodus-bkgcolor: linear-gradient(to top, #D7D7D7, #F5F5F5);
-    --exodus-bkgcolor: #eff1f3;
-    --exodus-cardcolor: #ffffff;
-    --exodus-textcolor: #000000;
-    --exodus-menubkgcolor: linear-gradient(to top, #D7D7D7, #F5F5F5);
-    --exodus-menubkgcolor: #ffffff;
-    --exodus-bordercolor: #e8eaeb;
-    --exodus-dotcolor: #000000;
-    --exodus-smallerbordercolor: #e8eaeb;
-    --exodus-buttonbordercolor: #c0c0c0;
-    --exodus-inputbordercolor: #4c4c4c;
-    --exodus-buttoncolor: #f5f5f5;
-    --exodus-inputdisabled: #d4d4d4;
-    --exodus-boxshadow: #d1d3d5 0px 1px 2px;
-    --exodus-menuboxshadow: #d1d3d5 0px 1px 2px;
-    --exodus-popupblur: blur(35px);
-    --exodus-popupshadow: #000000  0px 0px 15px;
-    --exodus-popupborderwidth: 2px;
-    --exodus-buttonboxshadow: none;
-} */
-
 /*Experimental very dark theme
 :root[data-theme="dark_black"] {
     --exodus-bkgcolor: #050505;
@@ -808,3 +864,27 @@ input[type="radio"],input[type="checkbox"] {
     --exodus-buttonboxshadow: 0 5px 32px rgba(0, 0, 0, 0.1);
 }*/
 
+/*
+Experimental: Shake the field related to the error popup message,
+to better grab user attention
+Highlight field that requires input, and used to shake to better focus users attention
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-6px); }
+    40%, 80% { transform: translateX(6px); }
+}
+HOW TO USE: add/remove class 'shake' on the element you want to shake
+            then add css below to existing element ruleset
+&.means if element has both classes (1. = '&',  2. = '.className')
+&.shake {
+    animation: shake 0.4s ease;
+}
+HOW IT WORKS: when the class 'shake is added' &.shake ruleset becomes live and performs animation 'shake'
+JS EXAMPLE:
+if (text_input_popup) {
+  text_input_popup.classList.remove('shake')
+    void text_input_popup.offsetWidth
+    text_input_popup.classList.add('shake')
+    text_input_popup.querySelector('#textinput').focus()
+}
+*/
