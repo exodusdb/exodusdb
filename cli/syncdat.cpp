@@ -122,7 +122,8 @@ func main() {
 	// Skip if nothing new
 //	let datinfo = osdir(datpath);
 	// Mode 6 - scan and update all dir's time modified
-	let datinfo = datpath.osinfo(6);
+	let datinfo = datpath.osinfo();
+//	let datinfo = datpath.osinfo(6);
 	if (not datinfo) {
 		abort(prefix ^ " Error: " ^ datpath.quote() ^ " dat dir missing");
 	}
