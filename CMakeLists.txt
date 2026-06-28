@@ -106,10 +106,11 @@
 		add_compile_options(
 #			-nostdinc++                     # disable default standard includes
 #			-isystem /usr/lib/llvm-21/include/c++/v1   # explicit libc++ headers (adjust if your path differs)
-#			-fprebuilt-module-path=/usr/local/lib
-#			"$<$<COMPILE_LANGUAGE:CXX>:-nostdinc++>"
-#			"$<$<COMPILE_LANGUAGE:CXX>:-isystem;/usr/lib/llvm-21/include/c++/v1>"
-			"$<$<COMPILE_LANGUAGE:CXX>:-fprebuilt-module-path=/usr/local/lib>"
+#			# NOTE: Do NOT add a hard-coded /usr/local/lib path here.
+#			# It can pick up a stale std.pcm built by a different clang "branch"/packaging,
+#			# triggering the "built from a different branch" error.
+#			# We rely on the in-tree build dir path added after add_subdirectory(std).
+#			"$<$<COMPILE_LANGUAGE:CXX>:-fprebuilt-module-path=/usr/local/lib>"
 		)
 		add_link_options(
 			"$<$<COMPILE_LANGUAGE:CXX>:-fuse-ld=lld>"
@@ -583,7 +584,11 @@ add_definitions(-DGIT_REMOTE_COMMIT_HASH_SHORT="${GIT_REMOTE_COMMIT_HASH_SHORT}"
 	message("")
 	add_subdirectory(std)
 	add_compile_options(
-		# Only apply to C++ sources (not C)
+		# Prefer the freshly-built std.pcm from this exact compiler invocation.
+		# Using -fmodule-file=std=... pins it exactly and avoids picking up any
+		# stale /usr/local/lib/std.pcm that was built by a different clang "branch".
+		"$<$<COMPILE_LANGUAGE:CXX>:-fmodule-file=std=${STD_PCM_BUILD_DIR}/std.pcm>"
+		# Also add the directory (useful for any other prebuilt modules, and as fallback).
 		"$<$<COMPILE_LANGUAGE:CXX>:-fprebuilt-module-path=${STD_PCM_BUILD_DIR}>"
 		# Optional: also add the install-time fallback
 		#        "$<$<COMPILE_LANGUAGE:CXX>:-fprebuilt-module-path=$<INSTALL_INTERFACE:lib>>"
