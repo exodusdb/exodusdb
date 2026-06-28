@@ -126,12 +126,13 @@ func main() {
 	if (not datinfo) {
 		abort(prefix ^ " Error: " ^ datpath.quote() ^ " dat dir missing");
 	}
-	printl(prefix, "Scanning", datpath, datinfo.f(2).oconv("D-Y"), datinfo.f(3).oconv("MTS"));
+	printx(prefix, "Scanning", datpath, datinfo.f(2).oconv("D-Y"), datinfo.f(3).oconv("MTS"));
 	if (not force and not is_newer_than_last_sync(datinfo)) {
-		if (verbose)
-			printl("No change since last sync time ", last_sync_date.oconv("D-Y"), last_sync_time.oconv("MTS"));
+//		if (verbose)
+			printl(" - No change since last sync time ", last_sync_date.oconv("D-Y"), last_sync_time.oconv("MTS"));
 		return 0;
 	}
+	printl();
 
 	//errors = "";
 	if (not begintrans()) {

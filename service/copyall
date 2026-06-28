@@ -96,7 +96,7 @@ PS4='+ [./copyall:$LINENO $* ${SECONDS}s] '
 : ────────────────────────────────────────
 #	Only needed if sync_dat failed and need to force all
 #	touch ~/live/{bin,lib,dat,dat/*,dat/*/*}
-	touch ~/live/{bin,lib,dat}
+	touch ~/live/{bin,lib,dat/*}
 :
 : ─────────────────────────────────────────────────────────────────────────────────
 : Listing unconverted live services. If any then recreate any ONE service to fix all
