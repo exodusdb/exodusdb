@@ -282,14 +282,15 @@ func main() {
 
 				// Skip on dir date time above
 
-				// Skip files/records which are not newer
-				// because reloading pg functions in slow
-				// to force updates, perhaps touch dat dat/* and dat/*/*
-				if (not force and not is_newer_than_last_sync(osfile(filepath))) {
-					if (verbose)
-						printl("Not newer", dbfilename, ID);
-					continue;
-				}
+// Skip only if dat and RECORD are the same
+//				// Skip files/records which are not newer
+//				// because reloading pg functions in slow
+//				// to force updates, perhaps touch dat dat/* and dat/*/*
+//				if (not force and not is_newer_than_last_sync(osfile(filepath))) {
+//					if (verbose)
+//						printl("Not newer", dbfilename, ID);
+//					continue;
+//				}
 
 				// Moved up so we can generate complete dict_xxxxxxxx.cpp source
 				//if (not osread(RECORD from filepath)) {
@@ -316,6 +317,8 @@ func main() {
 					} else {
 						if (verbose)
 							printl("Not changed", dbfilename, ID);
+						if (not force)
+							continue;
 					}
 				} else {
 					if (RECORD.len() == 0) {
