@@ -138,7 +138,7 @@ PS4='+ [install_boost.sh:$LINENO ${SECONDS}s] '
 :
 : STEP 3: Verify
 : ────────────────────────────────────────
-	(set +x && echo -e "\n${YELLOW}→ Verification:${NC}")
+	(set +x && echo -e "\n${YELLOW}➔ Verification:${NC}")
 
 	(set +x && echo -e "\nICU libs:")
 	ls -l "${ICU_PREFIX}/lib/" | grep icu
@@ -149,10 +149,10 @@ PS4='+ [install_boost.sh:$LINENO ${SECONDS}s] '
 		LIBBOOST_FILE=/usr/local/lib/libboost_${BOOST_LIBNAME}.so
 		test -x ${LIBBOOST_FILE}
 		if ldd ${LIBBOOST_FILE} | grep -i stdc++; then
-			(set +x && echo -e "${RED}→ libstdc++ found in ${LIBBOOST_FILE} (bad!)${NC}")
+			(set +x && echo -e "${RED}➔ libstdc++ found in ${LIBBOOST_FILE} (bad!)${NC}")
 			exit 1
 		else
-			(set +x && echo -e "${GREEN}→ No libstdc++ found in ${LIBBOOST_FILE} (good!)${NC}")
+			(set +x && echo -e "${GREEN}➔ No libstdc++ found in ${LIBBOOST_FILE} (good!)${NC}")
 		fi
 	done
 

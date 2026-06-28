@@ -154,9 +154,9 @@ public:
 	// ┌──────────────────────┬───────────────┬──────────────────┐
 	// │ Usage                │ Non-Constant  │ Constant         │
 	// ├──────────────────────┼───────────────┼──────────────────┤
-	// │ Variables:           │    var → var  │ let → const var  │
+	// │ Variables:           │    var ➔ var  │ let ➔ const var  │
 	// ├──────────────────────┼───────────────┼──────────────────┤
-	// │ Function parameters: │ out/io → var& │ in  → const var& │
+	// │ Function parameters: │ out/io ➔ var& │ in  ➔ const var& │
 	// └──────────────────────┴───────────────┴──────────────────┘
 	//
     var() = default;
