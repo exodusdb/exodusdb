@@ -358,7 +358,7 @@ updateversion:
 	// also load any new or amended pgsql functions found in dict files in dat
 	call log2("*install any new db dat data if thread 0 or 1", logtime);
 	if (THREADNO <= 1) {
-		if (not osshell("syncdat"))
+		if (not osshell("syncdat {V}"))
 //		if (not osshell("syncdat {V}"))
 			loglasterror();
 	}
