@@ -71,8 +71,13 @@ $upload_time =time() - $_SERVER['REQUEST_TIME'];
 // and will be limited to a fixed location relative to exodus.net, or require manual configuration
 //https://www.php.net/manual/en/function.apache-lookup-uri.php
 //https://hotexamples.com/examples/-/-/apache_lookup_uri/php-apache_lookup_uri-function-examples.html
-$realpath = apache_lookup_uri($pathdata . '/')->filename;
+//$realpath = apache_lookup_uri($pathdata . '/')->filename;
 //debug(print_r(apache_lookup_uri($pathdata),true));
+
+// Works without mod-php
+// /root/hosts/orange/www/ plus /images -> /root/hosts/orange/images/
+$exodusrootpath = $_SERVER['DOCUMENT_ROOT'];
+$realpath = str_replace('/www/', '/' . trim($pathdata, '/') . '/', $exodusrootpath);
 
 $target_path = $realpath .  '/' . $filename;
 $target_path = str_replace("\\","/",$target_path);
