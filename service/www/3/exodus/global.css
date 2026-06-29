@@ -168,14 +168,10 @@ commented out on - 2026 UI revamp - minimalist*/
     &.exodusconfirm_question1 {
         border: 1px solid #6262ff; /*light blue*/
     }
-    &.exodustextinputpopup {
-        padding: 20px;
-
-        & #textinput {
-            background: transparent;
-            border-bottom: 1.7px dotted var(--exodus-dotcolor);
-            border-bottom: 1.7px solid #ff6428;
-        }
+    & #exodusconfirmdiv_textinput {
+        background: transparent;
+        border-bottom: 1.7px dotted var(--exodus-dotcolor);
+        border-bottom: 1.7px solid #ff6428;
     }
 }
 

@@ -3566,12 +3566,7 @@ function* exodusconfirm(question, defaultbutton, yesbuttontitle, nobuttontitle, 
     //if (guseyield && !istextinput) {
     if (guseyield) {
 
-        // New in window text input popups - previously new tabs
-        if (istextinput) {
-            response = yield* exodusconfirm3(question, text);
-        } else {
-            return yield* exodusconfirm2(question, defaultbutton, yesbuttontitle, nobuttontitle, cancelbuttontitle, text, texthidden, image)
-        }
+        return yield* exodusconfirm2(question, defaultbutton, yesbuttontitle, nobuttontitle, cancelbuttontitle, text, texthidden, image)
 
         //use separate window for popup if yield is not available eg internet explorer
     } else {
@@ -4887,7 +4882,7 @@ function starteventhandler(eventfunctionname, functionx) {
                 //TODO create a new gcurrentevent?
 
                 //special treatment of events while exodusconfirm is up
-            } else if (document.querySelector('.exodusconfirmdiv')) {
+            } else if ($$('exodusconfirmdiv')) {
 
                 // FYI: Depending on Key pressed, call a function with a delay then cancel that event
                 // to  hijack the functionality of the Event e.g window.setTimeout('do_something_instead_of_what_key_usually_does')
@@ -4907,28 +4902,20 @@ function starteventhandler(eventfunctionname, functionx) {
                     var keycode = event.keyCode ? event.keyCode : event.which
                     var keyletter = String.fromCharCode(keycode).toUpperCase()
 
+
                     logevent('exodus_anon_sync_event_handler+exodusconfirmdiv ' + event.target.id + ' ctrlKey:' + event.ctrlKey + ' key:' + keycode + ' letter:' + keyletter)
 
                     //FIX detection of specific keys on buttons like Y N etc
-                    let text_input_popup = document.querySelector('.exodustextinputpopup');
+
                     //POSITIVE = F9 or Ctrl+Enter or SPACE some initial
                     if (keycode == 120 || (keycode == 13) || (keycode == 32) || keyletter == gexodusconfirmletters[1]) {
-                        if (text_input_popup) {
-                            const ok_button = text_input_popup.querySelector('#okbtn');
-							ok_button.click()
-						} else {
-                            window.setTimeout('exodus_confirm_function1()', 1)
-                        }
+
+                        window.setTimeout('exodus_confirm_function1()', 1)
                         return exoduscancelevent(event)
                     }
 
                     //CANCEL = Esc or some initial
                     else if (keycode == 27 || keyletter == gexodusconfirmletters[3]) {
-                         if (text_input_popup) {
-                            const cancel_button = text_input_popup.querySelector('#cancelbtn');
-                            cancel_button.click()
-                            return
-                        }
                         window.setTimeout('exodus_confirm_function3()', 1)
                         return exoduscancelevent(event)
                     }
@@ -4940,7 +4927,7 @@ function starteventhandler(eventfunctionname, functionx) {
                     }
 
                     // Allow keyboard typing for text popups
-                    if (text_input_popup) {
+                    if ($$('exodusconfirmdiv_textinput')) {
                         return true
                     }
                 }
@@ -5348,6 +5335,7 @@ function* exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negativebut
     //replaces (or called by)
     //exodusconfirm: questions (yes/no/cancel) and one line inputs
     //exodusdecide/exodusdecide2: selections
+    // Now handles text input popups and returns the input box value ()
 
     var decide_args //holds popup list args if any
 
@@ -5485,9 +5473,9 @@ function* exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negativebut
         //make sure no button is default unless specified
         if (!defaultbuttonn) {
             if (istextinput) {
-                exodussettimeout('focusontext()', 10)
-            }
-            else {
+                //exodussettimeout('focusontext()', 10)
+                // this function exists only in confirm.htm, idk why its being called here
+            } else {
                 //xxtry{gbuttons[0].blur()}catch(e){}
             }
         }
@@ -5513,7 +5501,6 @@ function* exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negativebut
         html += ' onmouseup="this.style.borderStyle=\'solid\'"'
         html += ' onmouseout="this.style.borderStyle=\'solid\'"'
         html += ' onclick="exodus_confirm_function' + buttonn + '()"'
-
 
         //letter
         var letter = buttontext.match(/(<[uU]>)(.)/)
@@ -5596,10 +5583,27 @@ function* exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negativebut
                 Cancel</button>\
             </td>\
             </tr>'
-    }
 
+
+    } else if (istextinput) {
+        // NB id 'exodusconfirmdiv_textinput' used starteventhandler()
+        html += `\
+                <tr>\
+                    <td>\
+                        &nbsp;\
+                    </td>\
+                    <td>\
+                        <input id="exodusconfirmdiv_textinput" size="60" style="display: block; margin-bottom: 15px;" value="${text}">\
+                        <span id="yesnocancelbuttons">${buttonshtml}</span>\
+                    </td>\
+                </tr>\
+                </table>`
+
+
+    // The hidden input fields are for re-login after session timed out.
+    // NB: bc second field is type="password", browsers will assume one before it must be username and autofill it
     //OK/Cancel/Print buttons at the bottom
-    else {
+    } else {
         html += '\
                 <tr>\
                     <td>\
@@ -5625,6 +5629,10 @@ function* exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negativebut
 
     //insert and centralise the div after it has autosized itself
     document.body.insertBefore(div, null)
+
+    if (istextinput) {
+        $$('exodusconfirmdiv_textinput').focus()
+    }
 
     //build rows of decide popup
     if (decide_args) {
@@ -5685,64 +5693,20 @@ function* exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negativebut
     return response
 }
 
-function* exodusconfirm3(question, default_text) {
+////return text value
+//functionexodus_confirm_function_text(event) {
+//    return exodus_confirm_function(value, event)
+//}
 
-    // Creates a popup with a text input that uses existing
-    // Generator function coroutine mechnaisms.
-    // FYI: this function always runs until let result
-    //      then when the onclick event listener calls exodus_resume()
-    //      the function "resumes" or runs again starting from let result
-    //      like reading a book starting at a bookmark
-
-    const div = document.createElement('div');
-    div.id = "exodusconfirmdiv"
-    div.classList.add("exodusconfirmdiv", "exodustextinputpopup", "exodusconfirm_question1") //.
-
-	// Check if question has inline (overriding) css styling
-    const hasownhtmlfmt = /<[a-z][\s\S]*?>/i.test(question)
-    div.innerHTML = !hasownhtmlfmt ? `<p>${question}</p>` : question;
-
-    div.innerHTML += `
-        <input id="textinput" type="text" style="width:100%;margin:10px 0;">
-        <br>
-        <button id="okbtn" class="graphicbutton">OK</button> //.
-        <button id="cancelbtn" class="graphicbutton">Cancel</button> //.
-    `;
-
-
-    let input = div.querySelector('#textinput'); //.
-    input.value = default_text //.
-
-    div.querySelector('#okbtn').onclick = () => {
-        input = div.querySelector('#textinput');
-        const val = input ? input.value : '';
-
-        // somewhere along the call stack .next(val) is called on the coroutine
-        // passing a return value and ending the coroutine, freeing up the slot
-        // letting another function start a coroutine
-        exodus_resume(val, 'exodusconfirm3');
-    };
-
-    div.querySelector('#cancelbtn').onclick = () => {
-        // ditto
-        exodus_resume('', 'exodusconfirm3');
-    };
-
-    document.body.appendChild(div);
-    input.focus(); // focuses cursor in the input box
-
-    // Start coroutine, after coroutine is resolved by exodus_resume() above
-    // function resumes back at this point, that is why we have the one place
-    // that removes the div popup here (before it was in the event listeners)
-    let result = yield* exodus_yield('exodusconfirm3')
-    document.body.removeChild(div);
-
-    return result
-}
-
-//return 1 - Positive Button i.e. 'Ok'
+//return 1 - Positive Button i.e. 'Ok' with optional text input
 function exodus_confirm_function1(event) {
-    return exodus_confirm_function(1, event)
+
+	// return text input if applicable
+	let textinput = undefined
+	if ($$('exodusconfirmdiv_textinput')) {
+        textinput = $$('exodusconfirmdiv_textinput').value;
+	}
+    return exodus_confirm_function(textinput != undefined ? textinput : 1, event)
 }
 
 //return 2 - Negative Button i.e. 'No'
@@ -5757,7 +5721,12 @@ function exodus_confirm_function3(event) {
 
 function exodus_confirm_function(buttonno, event) {
 
-    console.log('exodus_confirm_function buttonno:' + buttonno)
+    if (typeof buttonno !== 'number' && ! isNaN(buttonno)) {
+        console.log('exodus_confirm_function_text textinput: "' + buttonno + '"')
+    } else {
+        console.log('exodus_confirm_function buttonno:' + buttonno)
+    }
+
     event = getevent(event)
     exoduscancelevent(event)
     exodus_resume(buttonno, 'exodus_confirm_function')
