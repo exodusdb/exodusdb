@@ -88,6 +88,17 @@ func main(io osfilename, in printopts0, out errors) {
 		// Only required for older versions of chromium when headless
 		pdfcmd ^= " --disable-gpu";
 
+		// Various for good luck
+		pdfcmd ^= "\
+			--disable-setuid-sandbox \
+			--disable-dev-shm-usage \
+			--disable-background-timer-throttling \
+			--disable-backgrounding-occluded-windows \
+			--disable-renderer-backgrounding \
+			--no-first-run \
+			--user-data-dir=/tmp/chrome-headless \
+		";
+
 		// Output file
 		pdfcmd ^= " --print-to-pdf=" ^ pdffilename;
 
@@ -132,13 +143,15 @@ func main(io osfilename, in printopts0, out errors) {
 	}
 
 	printx("convhtml2pdf :");
+	pdfcmd = "DBUS_SESSION_BUS_ADDRESS=disabled: " ^ pdfcmd;
 	call shell2(pdfcmd, errors);
 
-	if (errors) {
-		errors = "html2pdf: " ^ errors;
+	if (errors and not osfile(pdffilename).f(1)) {
+		errors = pdfcmd ^ "\nxxx\n" ^ errors;
 		printl(pdfcmd);
 		printl(errors);
 	} else {
+		errors = "";
 		osfilename = pdffilename;
 	}
 
