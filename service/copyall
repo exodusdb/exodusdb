@@ -94,9 +94,10 @@ PS4='+ [./copyall:$LINENO $* ${SECONDS}s] '
 :
 : Restarting all live processes
 : ────────────────────────────────────────
-#	Only needed if sync_dat failed and need to force all
+#	Only needed if syncdat failed and need to force all
 #	touch ~/live/{bin,lib,dat,dat/*,dat/*/*}
-	touch ~/live/{bin,lib,dat/*}
+: Note that cli syncdat may reset the dat dir mtime to the max mtime of all subdirs/files and service listen restarts if it changes.
+	touch ~/live/{bin,lib,dat,dat/*}
 :
 : ─────────────────────────────────────────────────────────────────────────────────
 : Listing unconverted live services. If any then recreate any ONE service to fix all
