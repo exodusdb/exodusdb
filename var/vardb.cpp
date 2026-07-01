@@ -5525,10 +5525,10 @@ bool var::createindex(in fieldname0, in dictfile) const {
 	if (not this->sqlexec(sql, response)) UNLIKELY {
 		//ERROR:  cannot create index on foreign table "clients"
 		//sqlstate:42809 CREATE INDEX index__suppliers__SEQUENCE_XREF ON suppliers USING GIN (to_tsvector('simple',dict_suppliers_SEQUENCE_XREF(suppliers.key, suppliers.data)))
-//		if (not response.contains("sqlstate:42809"))
-//			response.errputl();
-// TODO crash with system error?
-		var::setlasterror("Cannot create index for " ^ filename ^ ", " ^ fieldname ^ ".\n" ^ response);
+		if (not response.contains("sqlstate:42809")) {
+			response.errputl();
+			var::setlasterror(response);
+		}
 		return false;
 	}
 
