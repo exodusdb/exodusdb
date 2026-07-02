@@ -233,10 +233,12 @@ function APT_INSTALL {
 :
 : Install google-chrome and alias chromium
 : ────────────────────────────────────────
-	wget --no-verbose -O "/tmp/google-chrome.deb" https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-	APT_INSTALL "/tmp/google-chrome.deb"
-:
-	ln -snf `which /usr/bin/google-chrome` /usr/bin/chromium
+	if ! which google-chrome; then
+		wget --no-verbose -O "/tmp/google-chrome.deb" https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+		APT_INSTALL "/tmp/google-chrome.deb"
+	:
+		ln -snf `which /usr/bin/google-chrome` /usr/bin/chromium
+	fi
 :
 : Check html conversion to pdf
 : ────────────────────────────────────────
