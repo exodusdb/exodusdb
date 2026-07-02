@@ -150,7 +150,7 @@ $requests = explode("\r", $request . "\r\r\r\r\r\r\r\r");
 
 if ($token) {
 
-	//if login then save new details regardless of success or not
+	//if login then get details from request
 	if ($requests[0] == 'LOGIN') {
 
 		$request = $requests[0];
@@ -163,11 +163,15 @@ if ($token) {
 		$requests[2] = '';
 		error_log(implode(' ', array_slice($requests, 0, 6)));
 
-		$_SESSION[$token . '_username'] = $username;
-		$_SESSION[$token . '_password'] = $password;
-		$_SESSION[$token . '_database'] = $database;
-		$_SESSION[$token . '_system'] = $system;
-		$_SESSION[$token . '_timeout'] = $timeout_ms;
+// Session will be created if LOGIN successful
+//		$_SESSION[$token . '_username'] = $username;
+//		$_SESSION[$token . '_password'] = $password;
+//		$_SESSION[$token . '_database'] = $database;
+//		$_SESSION[$token . '_system'] = $system;
+//		$_SESSION[$token . '_timeout'] = $timeout_ms;
+		$login_password = $password;
+		$login_timeout_ms = $timeout_ms;
+
 	} else {
 
 		//try and get the username, password and database from the session
@@ -649,6 +653,16 @@ if ($gdebug_data && $data_out)
 //		debug("RESULT  :$result");
 if ($gdebug_xml)
 	debug("XMLOUT  :$xmltext");
+
+// And one more thing, create a login session.
+
+	if ($requests[0] == 'LOGIN' && $result == "1") {
+		$_SESSION[$token . '_username'] = $requests[1];
+		$_SESSION[$token . '_password'] = $login_password;
+		$_SESSION[$token . '_database'] = $requests[3];
+		$_SESSION[$token . '_system'] = $requests[5];
+		$_SESSION[$token . '_timeout'] = $login_timeout_ms;
+	}
 
 /// finished
 
