@@ -47,8 +47,8 @@ ini_set('max_input_time', 600);
 ini_set('max_execution_time', 600);
 
 $redirectpage=$_REQUEST ['redirectpage'];
-$pathdata    =$_REQUEST ["pathdata"];
-$filename    =$_REQUEST ["filename"];
+$pathdata    =$_REQUEST ["pathdata"]; // hard coded as images for security below
+$filename    =$_REQUEST ["filename"]; // e.g. c2comms\upload\jobs\64100\2.Screenshot.png
 $localdir    =__DIR__;
 $origfilename=$_FILES   ['filedata']['name'];
 $filesize    =$_FILES   ['filedata']['size'];
@@ -56,6 +56,23 @@ $tmpfilename =$_FILES   ['filedata']['tmp_name'];
 $hostdomain  =$_SERVER  ['HTTP_HOST'];
 $https       =$_SERVER  ['HTTPS'];
 $upload_time =time() - $_SERVER['REQUEST_TIME'];
+
+// normalise path separators
+$filename = str_replace('\\', '/', $filename);
+
+// detect login session (uses $_SESSION as set by xhttp.php for authenticated requests)
+session_start();
+$has_session = false;
+foreach ($_SESSION as $k => $v) {
+	if (substr($k, -9) === '_username' && $v) {
+		$has_session = true;
+		break;
+	}
+}
+if (!$has_session) {
+	echo "Error: No login session.<br />";
+	exit;
+}
 
 //=D:/hosts/testimages/TEST/upload/jobs/5400/7.EXODUS_signature.jpg", referer: https://localhost/3/exodus/upload.htm
 
@@ -83,6 +100,15 @@ $realpath = str_replace('/www/', '/' . trim($pathdata, '/') . '/', $exodusrootpa
 $target_path = $realpath .  '/' . $filename;
 $target_path = str_replace("\\","/",$target_path);
 
+// verify the (constructed) path does not contain any "/." sequences that allow misdirection (e.g. ../ or ./ )
+// This catches traversal even if raw $filename had ".." ( "/images/../foo" contains "/." ).
+// We rely on this + the hard-coded "images" base rather than rejecting all ".." in the raw name.
+if (strpos($target_path, '/.') !== false) {
+	debug("upload.php blocked path with '/.' misdirection: $target_path");
+	echo "There was an error with the path. Get technical support.<br />";
+	exit;
+}
+
 // localdir=D:\\hosts\\test\\exodus.net\\exodus\\dll"
 // target_path=debug("---------- upload.php ----------");
 debug("upload.php localdir    =$localdir");
@@ -107,15 +133,21 @@ $redirect_url=$protocol . "://$hostdomain" . $redirectpage . "?FileName=$filenam
 
 $target_dir=pathinfo($target_path,PATHINFO_DIRNAME);
 debug("upload.php target_dir  =$target_dir");
-if (! is_dir($target_dir) && ! mkdir($target_dir,0774,true)) {
+
+// ensure dirs and files created do not allow execution (0755 dirs for needed traverse x, 0644 files with no x bits)
+$dir_perms = 0755;
+$old_umask = umask(0022);
+if (! is_dir($target_dir) && ! mkdir($target_dir, $dir_perms, true)) {
     echo "There was an error creating dir '$target_dir' Get technical support.<br />";
-};
+}
+umask($old_umask);
+@chmod($target_dir, $dir_perms);
 
-
+$file_perms = 0644;
 if (move_uploaded_file($tmpfilename, $target_path)) {
     //echo "The file ".  basename( $_FILES['filedata']['name'])." has been uploaded";
 	//ob_start();
-	chmod($target_path,0666);
+	chmod($target_path, $file_perms);
     header('Location: '.$redirect_url,true,302);
     //ob_end_flush();
     //die();
