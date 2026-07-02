@@ -62,6 +62,11 @@ $script = $_SERVER['SCRIPT_NAME'] ?? $_SERVER['PHP_SELF'] ?? '';
 $dir = dirname($script);
 $redirectpage = rtrim($dir, '/') . '/upload2.htm';
 
+if (mb_strlen($filename) > 128 ) {
+	echo "Error: Maximum directory plus file name is 128 characters.<br />";
+	exit;
+}
+
 // Normalise path separators
 $echoedfilename = $filename;
 $filename = str_replace('\\', '/', $filename);
