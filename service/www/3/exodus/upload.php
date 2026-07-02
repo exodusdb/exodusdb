@@ -58,6 +58,7 @@ $https       =$_SERVER  ['HTTPS'];
 $upload_time =time() - $_SERVER['REQUEST_TIME'];
 
 // normalise path separators
+$echoedfilename = $filename;
 $filename = str_replace('\\', '/', $filename);
 
 // detect login session (uses $_SESSION as set by xhttp.php for authenticated requests)
@@ -99,10 +100,6 @@ $realpath = str_replace('/www/', '/' . trim($pathdata, '/') . '/', $exodusrootpa
 
 $target_path = $realpath .  '/' . $filename;
 $target_path = str_replace("\\","/",$target_path);
-
-// $filename may contain subdir structure for placement under images/ (e.g. c2comms/upload/jobs/64100/2.Screenshot.png)
-// but for the redirect back to client we want only the leaf filename (as was the previous behaviour)
-$echoedfilename = basename($filename);
 
 // verify the (constructed) path does not contain any "/." sequences that allow misdirection (e.g. ../ or ./ )
 // This catches traversal even if raw $filename had ".." ( "/images/../foo" contains "/." ).
