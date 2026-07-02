@@ -77,6 +77,7 @@ $upload_time =time() - $_SERVER['REQUEST_TIME'];
 // Works without mod-php
 // /root/hosts/orange/www/ plus /images -> /root/hosts/orange/images/
 $exodusrootpath = $_SERVER['DOCUMENT_ROOT'];
+$pathdata = "images"; // hard coded override for security
 $realpath = str_replace('/www/', '/' . trim($pathdata, '/') . '/', $exodusrootpath);
 
 $target_path = $realpath .  '/' . $filename;
