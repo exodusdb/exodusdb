@@ -100,6 +100,10 @@ $realpath = str_replace('/www/', '/' . trim($pathdata, '/') . '/', $exodusrootpa
 $target_path = $realpath .  '/' . $filename;
 $target_path = str_replace("\\","/",$target_path);
 
+// $filename may contain subdir structure for placement under images/ (e.g. c2comms/upload/jobs/64100/2.Screenshot.png)
+// but for the redirect back to client we want only the leaf filename (as was the previous behaviour)
+$echoedfilename = basename($filename);
+
 // verify the (constructed) path does not contain any "/." sequences that allow misdirection (e.g. ../ or ./ )
 // This catches traversal even if raw $filename had ".." ( "/images/../foo" contains "/." ).
 // We rely on this + the hard-coded "images" base rather than rejecting all ".." in the raw name.
@@ -115,6 +119,7 @@ debug("upload.php localdir    =$localdir");
 debug("upload.php pathdata    =$pathdata");
 debug("upload.php realpath    =$realpath");
 debug("upload.php filename    =$filename");
+debug("upload.php echoedfilename=$echoedfilename");
 debug("upload.php origfilename=$origfilename");
 debug("upload.php tmpfilename =$tmpfilename");
 debug("upload.php target_path =$target_path");
@@ -129,7 +134,7 @@ debug("upload.php target_path =$target_path");
 //target_path  = D:/exodus/images/DEVDTEST/upload/jobs/mo5070/4.gg.png
 
 if ($https=="on") $protocol="https"; else $protocol="http";
-$redirect_url=$protocol . "://$hostdomain" . $redirectpage . "?FileName=$filename" . "&FileSize=$filesize" . "&TimeElapsed=$upload_time";
+$redirect_url=$protocol . "://$hostdomain" . $redirectpage . "?FileName=$echoedfilename" . "&FileSize=$filesize" . "&TimeElapsed=$upload_time";
 
 $target_dir=pathinfo($target_path,PATHINFO_DIRNAME);
 debug("upload.php target_dir  =$target_dir");
