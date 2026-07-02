@@ -135,6 +135,10 @@ if ($xml->database)
 if ($gdebug_data && strlen($xml->data))
 	debug("DATA_IN :" . $xml->data);
 
+// The custom tokens (db*user*) are login namespacing keys to allow one PHP session cookie
+// to carry state for concurrent login to multiple databases-users.
+// They are not an authentication secret.
+
 //request contains token, request, database and data
 $token = unescape($xml->token);
 $request = unescape($xml->request);
@@ -317,6 +321,12 @@ while (1) {
 		break;
 	}
 
+	// Sanity check username
+	if (!preg_match('/^[A-Z0-9 -.]+$/', $username)) {
+		$response = 'Error: Invalid username. Only A-Z, 0-9, space, - and . are allowed.';
+		break;
+	}
+
 	//check password is present
 	if (!$password) {
 		$response = 'Error: Password parameter is missing';
@@ -326,6 +336,12 @@ while (1) {
 	//check database is present
 	if (!$database) {
 		$response = 'Error: Dataset parameter is missing';
+		break;
+	}
+
+	// Sanity check dataset
+	if (!preg_match('/^[a-z0-9_]+$/', $database)) {
+		$response = 'Error: Invalid dataset code. Only a-z, 0-9 and _ are allowed.';
 		break;
 	}
 
