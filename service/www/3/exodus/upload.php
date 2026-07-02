@@ -46,8 +46,8 @@ ini_set('post_max_size', '100M');
 ini_set('max_input_time', 600);
 ini_set('max_execution_time', 600);
 
-$redirectpage=$_REQUEST ['redirectpage'];
-$pathdata    =$_REQUEST ["pathdata"]; // hard coded as images for security below
+$redirectpage=$_REQUEST ['redirectpage']; // Ignored. Overridden below.
+$pathdata    ='/images';     //$_REQUEST ["pathdata"];
 $filename    =$_REQUEST ["filename"]; // e.g. c2comms\upload\jobs\64100\2.Screenshot.png
 $localdir    =__DIR__;
 $origfilename=$_FILES   ['filedata']['name'];
@@ -57,7 +57,12 @@ $hostdomain  =$_SERVER  ['HTTP_HOST'];
 $https       =$_SERVER  ['HTTPS'];
 $upload_time =time() - $_SERVER['REQUEST_TIME'];
 
-// normalise path separators
+// Derive $redirectpage ourselves from PHP server vars (the web path to this script) for security.
+$script = $_SERVER['SCRIPT_NAME'] ?? $_SERVER['PHP_SELF'] ?? '';
+$dir = dirname($script);
+$redirectpage = rtrim($dir, '/') . '/upload2.htm';
+
+// Normalise path separators
 $echoedfilename = $filename;
 $filename = str_replace('\\', '/', $filename);
 
@@ -95,7 +100,6 @@ if (!$has_session) {
 // Works without mod-php
 // /root/hosts/orange/www/ plus /images -> /root/hosts/orange/images/
 $exodusrootpath = $_SERVER['DOCUMENT_ROOT'];
-$pathdata = "images"; // hard coded override for security
 $realpath = str_replace('/www/', '/' . trim($pathdata, '/') . '/', $exodusrootpath);
 
 $target_path = $realpath .  '/' . $filename;
