@@ -2134,7 +2134,7 @@ async function exodusdblink_login(username, password, dataset, system) {
             //otherwise get all datasets
             if (!datasets) {
                 logindb.request = 'GETDATASETS'
-                if (!(yield* logindb.send())) {
+                if (!(await logindb.send())) {
                     await exodusinvalid(logindb.response)
                     return 0
                 }
@@ -2940,7 +2940,7 @@ async function exodusdecide(question, data, cols, returncoln, defaultreply, many
     //the data might be a db request prefixed with '@'
     if (typeof data == 'string' && data.slice(0, 1) == '@') {
         db.request = data.slice(1)
-        if (!(yield* db.send())) {
+        if (!(await db.send())) {
             await exodusinvalid(db.response)
             return null
         }
@@ -3365,7 +3365,7 @@ async function exodussetdropdown(element, request, colarray, selectedvalues, noa
         return (0)
 
     db.request = request
-    if (yield* db.send()) {
+    if (await db.send()) {
 
         //console.log('exodussetdropdown:'+db.data)
 
@@ -3830,7 +3830,8 @@ async function sorttable(event, order) {
     var colid = event.target.sorttableelementid
 
     if (typeof form_presort == 'function') {
-        yield* exodusevaluate('await form_presort(','yield* formfunctions_onload()')
+        var _e = exodusevaluate('await form_presort(','yield* formfunctions_onload()');
+        (_e && _e.next ? exodusneweventhandler(_e, 'form_presort label').value : _e);
         if (!(await form_presort(colid)))
             return await exodusinvalid()
     }
@@ -3983,7 +3984,8 @@ async function sorttable(event, order) {
     gds.data['group' + groupno] = newdatarows
 
     if (typeof form_postsort == 'function') {
-        yield* exodusevaluate('await form_postsort(','yield* formfunctions_onload()')
+        var _e = exodusevaluate('await form_postsort(','yield* formfunctions_onload()');
+        (_e && _e.next ? exodusneweventhandler(_e, 'form_postsort label').value : _e);
         if (!(await form_postsort(colid)))
             return await exodusinvalid()
     }

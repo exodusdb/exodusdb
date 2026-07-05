@@ -2485,7 +2485,8 @@ async function document_onkeydown2(event) {
         //force error and into exodusbreak
         if (event.shiftKey && event.ctrlKey) {
             gstepping = true
-            yield* exodusbreak('', 'F12', '')
+            var _b = exodusbreak('', 'F12', '');
+            if (_b && _b.next) exodusneweventhandler(_b, 'F12');
             return exoduscancelevent(event)
         }
 
@@ -2494,7 +2495,7 @@ async function document_onkeydown2(event) {
             glogging = true
             wstatus('glogging=true')
             if (geventlog) {
-                windowx = yield* windowopen()
+                windowx = await windowopen()
                 if (windowx)
                     windowx.document.body.innerHTML = geventlog
             }
@@ -2513,7 +2514,7 @@ async function document_onkeydown2(event) {
         }
 
         if (temp && (temp.outerHTML || temp.innerHTML)) {
-            var windowx = yield* windowopen()
+            var windowx = await windowopen()
             if (windowx)
                 //windowx.document.body.innerText=decodehtmlcodes(temp.outerHTML?temp.outerHTML:temp.innerHTML)
                 windowx.document.body.innerHTML = encodehtmlcodes(temp.outerHTML ? temp.outerHTML : temp.innerHTML)
@@ -3615,7 +3616,8 @@ async function saverecord_onclick() {
         //custom postwrite function
         if (typeof form_postwrite == 'function') {
             //yield* exodusevaluateall('await form_postwrite()')
-            if (!(yield* exodusevaluateall('await form_postwrite()')))
+            var _e = exodusevaluateall('await form_postwrite()');
+            if (!((_e && _e.next ? exodusneweventhandler(_e, 'await form_postwrite()').value : _e)))
                 return false
         }
         //otherwise automatic option to print if available
@@ -3682,8 +3684,10 @@ async function saverecord_onclick() {
         return false
 
     //if postwrite routine
-    if (typeof (form_postwrite) == 'function')
-        yield* exodusevaluateall('await form_postwrite(db)', 'await saverecord_onclick()')
+    if (typeof (form_postwrite) == 'function') {
+        var _e = exodusevaluateall('await form_postwrite(db)', 'await saverecord_onclick()');
+        (_e && _e.next ? exodusneweventhandler(_e, 'await form_postwrite(db)').value : _e);
+    }
 
     //otherwise, if no postwrite function then assume that
     //returned data is a url and open it (in a new tab by preference or a new window if cannot)
@@ -3691,9 +3695,9 @@ async function saverecord_onclick() {
         //dont open in tab if dialog window and not closing
         //because user cant focus on underlying window tabs while in (pseudo) modal dialog window
         if (gisdialog && !closeafter)
-            yield* windowopen(db.data)//new window
+            await windowopen(db.data)//new window
         else
-            yield* windowopen(db.data, '', 'tab')//tab
+            await windowopen(db.data, '', 'tab')//tab
     }
 
     //option to close window
@@ -3780,7 +3784,8 @@ async function deleterecord_onclick(event) {
     //custom postdelete function
     if (typeof form_postdelete == 'function') {
         //yield* exodusevaluateall('form_postdelete()')
-        if (!(yield* exodusevaluateall('form_postdelete()')))
+        var _e = exodusevaluateall('form_postdelete()');
+        if (!((_e && _e.next ? exodusneweventhandler(_e, 'form_postdelete()').value : _e)))
             return false
     }
 
@@ -3936,7 +3941,7 @@ async function opendoc2(newkey0) {
     gro.key = gkey
     if (gkey || !gupdateonlymode)
     //read with key='' means get the next sequential number
-        /**/ yield* gro.read(!greadonlymode && !gparameters.openreadonly)
+        /**/ await gro.read(!greadonlymode && !gparameters.openreadonly)
 
     //switch off one-time option
     gparameters.openreadonly = false
@@ -4542,7 +4547,8 @@ async function cleardoc() {
     //TODO convert all postpostread( to use this new hook function instead of timeout
     if (typeof form_postdisplay == 'function') {
         grecn = null
-        yield* exodusevaluateall('await form_postdisplay()', 'yield* formfunctions_onload()')
+        var _e = exodusevaluateall('await form_postdisplay()', 'yield* formfunctions_onload()');
+    (_e && _e.next ? exodusneweventhandler(_e, 'await form_postdisplay()').value : _e);
     }
 
     //logout('cleardoc')
@@ -4603,7 +4609,7 @@ async function deletedoc() {
 
     //delete it
     db.request = 'DELETE\r' + gdatafilename + '\r' + gkey + '\r\r' + gro.sessionid
-    if (!(yield* db.send())) {
+    if (!(await db.send())) {
 
         //await exodusnote(db.response)
         await exodusinvalid(db.response)
@@ -4828,7 +4834,8 @@ async function writedoc(unlock) {
     goldvalue = ''
     gvalue = ''
     if (typeof (form_prewrite) == 'function') {
-        if (!(yield* exodusevaluateall('await form_prewrite()', 'await writedoc()'))) return false
+        var _e = exodusevaluateall('await form_prewrite()', 'await writedoc()');
+        if (!((_e && _e.next ? exodusneweventhandler(_e, 'await form_prewrite()').value : _e))) return false
         ///log('form_prewrite - after')
     }
 
@@ -4839,7 +4846,7 @@ async function writedoc(unlock) {
 
     gro.request = unlock ? 'WRITEU' : 'WRITE' + '\r' + gdatafilename + '\r' + gkey
     gro.data = gds.data
-    if (!(/**/ yield* gro.writex(unlock))) {
+    if (!(/**/ await gro.writex(unlock))) {
 
         //await exodusnote('Cannot save '+exodusquote(gkeyexternal)+' because: \r\r'+gro.response)
         await exodusinvalid('Cannot save ' + exodusquote(gkeyexternal) + ' because: \n\n' + gro.response)
@@ -4929,7 +4936,7 @@ async function relockdoc() {
     relockdb.request = 'RELOCK\r' + gdatafilename + '\r' + gkey + '\r' + gro.sessionid + '\r' + glocktimeoutinmins
     //document.bgcolor='green'
     var result
-    if (yield* relockdb.send()) {
+    if (await relockdb.send()) {
         //document.bgcolor='white'
         result = true
     }
@@ -4980,7 +4987,7 @@ async function unlockdoc() {
     if (glocked) {
         while (true) {
             db.request = 'UNLOCK\r' + gdatafilename + '\r' + gkey + '\r' + gro.sessionid
-            if (yield* db.send())
+            if (await db.send())
                 break
             if (!(await exodusyesno('Cannot release document - try again?\n\n' + db.response))) break
         }
@@ -5000,7 +5007,7 @@ async function unlockdoc() {
 
 ////////////////////// FIELD FUNCTIONS //////////////////////
 
-function focuson(element) {
+async function focuson(element) {
 
     //login('focuson')
 
@@ -5050,7 +5057,7 @@ function focuson(element) {
         //gpreviouselement = element
         //gpreviousvalue = getvalue(gpreviouselement)
         setgpreviouselement(element)
-        yield * setdefault(element)
+        await setdefault(element)
         //should really call setgpreviouselement again here
         ///log('gpreviouselement and value set to ' + gpreviouselement.id + ' ' + exodusquote(gpreviousvalue))
 
@@ -6757,7 +6764,7 @@ async function validate(element) {
         if (filename == 'ACCOUNTS') key = '.' + gvalue
 
         db.request = 'CACHE\rREAD\r' + filename + '\r' + key
-        if (!(yield* db.send())) {
+        if (!(await db.send())) {
 
             if (db.response.indexOf('NO RECORD') >= 0) db.response = exodusquote(gvalue) + ' ' + element.getAttribute('exodustitle') + ' is not on file.'
 
@@ -7234,7 +7241,13 @@ async function form_deleterow(event, element) {
     var predeleterow = window['form_predeleterow' + groupno]
     if (typeof predeleterow == 'function') {
         //if (!(yield* exodusevaluate('yield * form_predeleterow' + groupno + '()')))
-        if (!(yield* predeleterow(event)))
+        var p = predeleterow(event);
+        if (p && typeof p.then === 'function') {
+            p = await p;
+        } else if (p && typeof p.next === 'function') {
+            p = exodusneweventhandler(p, 'predeleterow').value;
+        }
+        if (!p)
             return false //logout('deleterow - predelete false')
     }
 
@@ -7277,7 +7290,8 @@ async function form_deleterow(event, element) {
     //form specific after row delete function
     var postdeleterow = window['form_postdeleterow' + groupno]
     if (typeof postdeleterow == 'function') {
-        yield* exodusevaluate('yield * form_postdeleterow' + groupno + '()')
+        var _e = exodusevaluate('yield * form_postdeleterow' + groupno + '()');
+        (_e && _e.next ? exodusneweventhandler(_e, 'postdeleterow').value : _e);
     }
 
     var deps = tablex.getAttribute('exodusdependents')
@@ -7583,7 +7597,9 @@ async function form_insertrow(event, append) {
     //form specific before row insert function
     var preinsertrow = window['form_preinsertrow' + groupno]
     if (typeof preinsertrow == 'function') {
-        if (!(yield* exodusevaluate('yield * form_preinsertrow' + groupno + '()')))
+        var _e = exodusevaluate('yield * form_preinsertrow' + groupno + '()');
+        var p = (_e && _e.next ? exodusneweventhandler(_e, 'preinsertrow').value : _e);
+        if (!p)
             return false //logout('insertrow - preinsert false')
     }
 
@@ -7610,8 +7626,10 @@ async function form_insertrow(event, append) {
 
     //form specific after row insert function
     var postinsertrow = window['form_postinsertrow' + groupno]
-    if (typeof postinsertrow == 'function')
-        yield* exodusevaluate('yield * form_postinsertrow' + groupno + '()')
+    if (typeof postinsertrow == 'function') {
+        var _e = exodusevaluate('yield * form_postinsertrow' + groupno + '()');
+        (_e && _e.next ? exodusneweventhandler(_e, 'postinsertrow').value : _e);
+    }
 
     //focus on first column of new row (after running postinsert routine to avoid event within event - if postinsert yields for some user input for example)
     if (!append) {
@@ -8051,7 +8069,7 @@ async function exoduspopup2(element) {
                         if (key)
                             //doesnt work when multiple .. due to using cookies to communicate? perhaps chain opening passing remaining keys to each window
                             //yield* windowopenkey(window.location.href.toString(), key)
-                            yield* windowopen(window.location.href.toString().split('?')[0] + '?key=' + key)
+                            await windowopen(window.location.href.toString().split('?')[0] + '?key=' + key)
                     }
                     //window.location.assign(window.location.href.toString().split('?')[0] + '?key=' + reply[0])
                     reply = [reply[0]]//return the first key only
@@ -8106,7 +8124,8 @@ async function getkeyexternal() {
 
 async function debug(v) {
     if (!(confirm(v))) {
-        yield* exodusbreak()
+        var _b = exodusbreak();
+        if (_b && _b.next) exodusneweventhandler(_b, 'break');
     }
 }
 
@@ -8665,7 +8684,7 @@ async function form_val_index(filename, fieldname, allownew) {
 async function form_get_index(filename, fieldname) {
 
     db.request = 'CACHE\rGETINDEXVALUESXML\r' + filename + '\r' + fieldname
-    if (!(yield* db.send())) {
+    if (!(await db.send())) {
         await exodusinvalid(db.response)
         return ''
     }
@@ -8705,7 +8724,7 @@ async function copyrecord_onclick() {
 
     //read the record to be copied
     var copyrecord = []
-    if (!(yield* copyrecord.exodusread(gdatafilename, glastkey)))
+    if (!(await copyrecord.exodusread(gdatafilename, glastkey)))
         return await exodusinvalid(copyrecord.exodusresponse)
 
     //remove any uncopyable data
@@ -9155,7 +9174,8 @@ async function form_onpaste_generic(event, elementid, validatedata_function, imp
     //update
     ////////
     var savegrecn = grecn
-    var result = yield* importdata_function(data)
+    var p = importdata_function(data);
+    var result = (p && typeof p.then === 'function' ? await p : (p && p.next ? exodusneweventhandler(p, 'importdata').value : p));
 
     await calcfields()
 
@@ -9284,7 +9304,7 @@ async function form_onpaste_generic_validatedata(data) {
 
                     //warn and blank if not on file
                     var rec = []
-                    if (!(yield* rec.exodusread(col.filename, ivalue))) {
+                    if (!(await rec.exodusread(col.filename, ivalue))) {
                         //'Format must be '+conversion.slice(1,-1).split(',')[0]
                         if (!(await form_onpaste_ignore_cancel(ln, datacoln, data.cols[coln][1], ivalue, 'Code does not exist or cannot be accessed')))
                             return false
