@@ -101,7 +101,7 @@ async function dict_USERS() {
 
  di=dict[++din]=dictrec('MARKET_CODE', 'F',25)
  if (typeof general_dict_marketcode !== 'undefined')
-     yield* general_dict_marketcode(di)
+     await general_dict_marketcode(di)
  else {
      di.filename = 'MARKETS'
  }

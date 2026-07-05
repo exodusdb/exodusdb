@@ -155,10 +155,10 @@ function* formfunctions_onload() {
  if (!gparameters.filename)
     gparameters.filename=''
 
- await loadimages()
+ yield* fromPromise( loadimages() )
 
  if (gparameters.showupload)
-     await showuploadtable()
+     yield* fromPromise( showuploadtable() )
 
  return true
 
@@ -197,7 +197,7 @@ async function audiovisual_delete(event) {
  if (!(await exodusyesno(filename+'\rWarning! Are you SURE that you want to irrevocably delete this file permanently?\r\rNote: This is irreversible!',2))) return await exodusinvalid()
  
  db.request='EXECUTE\rGENERAL\rDELETEUPLOAD\r'+filename.toLowerCase()
- if (!(yield* db.send()))
+ if (!(await db.send()))
   return await exodusinvalid(db.response)
   
  await loadimages()
@@ -288,7 +288,7 @@ async function upload_onclick() {
   +'\r'+gparameters.key
   +'\r'+gparameters.ensurenotlocked
   
-  if (!(yield* db.send()))
+  if (!(await db.send()))
    return await exodusinvalid(db.response)
  }
  
@@ -397,7 +397,7 @@ async function loadimages() {
  if (gparameters.newstatus)
     db.request+='\rNEW'
 
- if (!(yield* db.send()))
+ if (!(await db.send()))
   return await exodusinvalid(db.response)
 
  var imagedata=(fm+db.data).split(fm)

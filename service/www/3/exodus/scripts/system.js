@@ -69,7 +69,7 @@ var gdatasets
 async function system_getdatasets(refresh) {
     if (refresh || !gdatasets) {
         db.request = 'EXECUTE\rGENERAL\rGETDATASETS'
-        if (!(yield* db.send())) return await exodusinvalid(db.response)
+        if (!(await db.send())) return await exodusinvalid(db.response)
         //split inverted
         gdatasets = db.data.exodussplit(vm + sm, true)
     }
@@ -149,7 +149,7 @@ async function system_getdepartments(deptoptions) {
     var onlyactivegroups = deptoptions.indexOf('A') >= 0
 
     var security = []
-    if (!(yield* security.exodusread('DEFINITIONS', 'SECURITY*USERS')))
+    if (!(await security.exodusread('DEFINITIONS', 'SECURITY*USERS')))
         return await exodusinvalid(security.exodusresponse)
     security = exodus_splitarray(security, [[[1, 9]], [[10, 11]]])
     gdepts = [[], [], []]

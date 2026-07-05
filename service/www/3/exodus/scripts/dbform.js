@@ -270,7 +270,7 @@ function* formfunctions_onload() {
             if (gKeyNodes) {
                 var words = fieldname.split('_')
                 for (var wordn = 0; wordn < words.length; ++wordn) {
-                    if (!(await exodussecurity(gdatafilename.exodussingular() + ' UPDATE ' + words.slice(0, wordn + 1).join(' ').exodusquote()))) {
+                    if (!(yield* fromPromise( exodussecurity(gdatafilename.exodussingular() + ' UPDATE ' + words.slice(0, wordn + 1).join(' ').exodusquote()) ))) {
                         dictitem.readonly = gmsg
                         break;
                     }
@@ -443,7 +443,7 @@ function* formfunctions_onload() {
                 selectelement.id = element.id
 
                 //create all the options of the element
-                await exodussetdropdown(selectelement, 'CACHE\r' + request, colarray, '', noautoselection)
+                yield* fromPromise( exodussetdropdown(selectelement, 'CACHE\r' + request, colarray, '', noautoselection) )
 
                 element = selectelement
                 //    element.innerHTML=element.innerHTML+' '
@@ -903,7 +903,7 @@ function* formfunctions_onload() {
                     }
                 }
 
-                await setfirstlastelement(element)
+                yield* fromPromise( setfirstlastelement(element) )
 
             }
 
@@ -1132,8 +1132,8 @@ function* formfunctions_onload() {
                     //maybe remove insertrow/deleterow buttons (in case first group dictionary element does not have the flag)
                     //if (element.getAttribute('exodusnoinsertrow') && !tablex.getAttribute('noinsertrow')) {
                     //if (element.getAttribute('exodusnodeleterow')&& !tablex.getAttribute('nodeleterow')) {
-                    await maybe_remove_rowbutton('insert')
-                    await maybe_remove_rowbutton('delete')
+                    yield* fromPromise( maybe_remove_rowbutton('insert') )
+                    yield* fromPromise( maybe_remove_rowbutton('delete') )
 
                 }
                 else {
@@ -1527,7 +1527,7 @@ function* formfunctions_onload() {
     }
 
     if (firstrecord)
-        await setgkeys([])
+        yield* fromPromise( setgkeys([]) )
 
     if (newrecord && (greadonlymode || gupdateonlymode || gpreventcreation)) {
         setdisabledandhidden(newrecord, true)
@@ -7065,7 +7065,7 @@ function* exodusevaluate(functionorcode, callerfunctionname, arg1name, arg1, thi
             //} if (e) {
             //if (typeof callerfunctionname == 'undefined') callerfunctionname = '"not specified"'
             systemerror('yield* exodusevaluate()' + functionorcode, e)
-            return await exodusinvalid()
+            return yield* fromPromise( exodusinvalid() )
         }
 
     }

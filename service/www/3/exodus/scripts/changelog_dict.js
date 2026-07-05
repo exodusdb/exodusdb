@@ -8,7 +8,7 @@ async function changelog_pop_number(many) {
 
 async function changelog_list() {
 
- yield* windowopen('../general/whatsnew.htm')
+ await windowopen('../general/whatsnew.htm')
  return true
 }
 

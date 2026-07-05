@@ -39,7 +39,7 @@ async function sysconfig_copynow(event) {
         return false
     
     db.request='EXECUTE\rGENERAL\rFILEMAN\rCOPYDB\r'+fromdatabase
-    if (!(yield* db.send()))
+    if (!(await db.send()))
         return await exodusinvalid(db.response)
     await exodusnote(db.response.slice(2))
 }

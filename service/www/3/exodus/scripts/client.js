@@ -421,7 +421,7 @@ async function exodussecurity(task) {
     //make sure task list is loaded (clearing cache also clears gtasks for convenience)
     if (!gtasks) {
         db.request = 'CACHE\rEXECUTE\rGENERAL\rGETTASKS\rNOT'
-        if (!(yield* db.send())) {
+        if (!(await db.send())) {
             gtasks = ''
             gmsg = db.response
             await exodusinvalid(gmsg)
@@ -467,7 +467,7 @@ async function sessionkeepalive() {
     if (time >= nextconnection && typeof db != 'undefined') {
         var tempdb = new exodusdblink()
         tempdb.request = 'KEEPALIVE'
-        yield* tempdb.send()
+        await tempdb.send()
         //if (!(yield* db.send())) alert(db.response)
         //window.status = time + ' Keep Alive' // deprecated
         console.log(time + ' Keep Alive');
@@ -478,8 +478,10 @@ async function sessionkeepalive() {
 function exodussetexpression(elementsorelementid, attributename, expression) {
 
     //check element exists
-    if (!elementsorelementid)
-        return yield * exodusinvalid('missing element in exodussetexpression ' + attributename + ' ' + expression)
+    if (!elementsorelementid) {
+        exodusinvalid('missing element in exodussetexpression ' + attributename + ' ' + expression)
+        return
+    }
 
     //elements can be elementnames too
 
@@ -599,7 +601,7 @@ function exodussetexpression2b(expressionid, elements, style, attributename, exp
 //this is called at intervals
 async function exodussetexpression2c(elements, style, attributename, expression) {
     //set the attribute expression for all elements
-    var result = yield* exodusevaluate(expression)
+    var result = await exodusevaluate(expression)
     //console.log(expression+' is '+result+')
     if (attributename == 'disabled')
         1 == 1
@@ -650,9 +652,11 @@ function showhide(element, show) {
 
     if (typeof element == 'string') {
         element = $$(element)
-        if (!element)
-            return await exodusinvalid('element ' + elementid + ' does not exist in showhide(')
+        if (!element) {
+            exodusinvalid('element ' + elementid + ' does not exist in showhide(')
             systemerror('showhide("' + elementid + '")', ' window element does not exist')
+            return
+        }
     }
 
     //recursive
@@ -847,17 +851,17 @@ function getdialogstyle_sync(dialogstyle) {
     return dialogstyle
 }
 
-async function exodusshowmodaldialog(url, arguments, dialogstyle) {
+async function exodusshowmodaldialog(url, dialogargs, dialogstyle) {
 
-    if (!arguments)
-        var arguments = new Object
-    if (!arguments.gtasks)
-        arguments.gtasks = gtasks
+    if (!dialogargs)
+        var dialogargs = new Object
+    if (!dialogargs.gtasks)
+        dialogargs.gtasks = gtasks
 
     dialogstyle = getdialogstyle_sync(dialogstyle)
 
     //always send login code
-    arguments.logincode = glogincode
+    dialogargs.logincode = glogincode
     try {
 
         //provide an alternative location for the child dialogWindow to get dialogArguments
@@ -866,12 +870,12 @@ async function exodusshowmodaldialog(url, arguments, dialogstyle) {
         //currently only used in index.html when being used as a modal dialog to do a login on the fly
         //eg when accessing pages via favourites without going through index.html first
 
-        dialogArgumentsForChild = arguments
+        dialogArgumentsForChild = dialogargs
 
         //non-yielding code with showModalDialog
         var result
         if (!guseyield)
-            result = window.showModalDialog(url, arguments, dialogstyle)
+            result = window.showModalDialog(url, dialogargs, dialogstyle)
 
         //yielding code
         else {
@@ -896,7 +900,7 @@ async function exodusshowmodaldialog(url, arguments, dialogstyle) {
             }
 
             //pass arguments and callback/resume function to child window
-            gchildwin.dialogArguments = arguments
+            gchildwin.dialogArguments = dialogargs
 
             //auto resume if the child window disappears - every poll every n ms
             //this will stop when it goes out of scope when this function terminates
@@ -1370,7 +1374,7 @@ function exodus_set_style(mode, value, value2) {
             style.backgroundColor = value
         }
         catch (e) {
-            if (e.number == -2146827908) return yield * exodusinvalid(value + ' is not a recognised color')
+            if (e.number == -2146827908) { exodusinvalid(value + ' is not a recognised color'); return }
             return systemerror('exodus_set_style("' + mode + '","' + value + '")', e.number + ' ' + e.description)
         }
     }
@@ -1401,8 +1405,8 @@ function exodus_set_style(mode, value, value2) {
                 style.fontSize = value2
             }
             catch (e) {
-                if (e.number == -2146827908) return yield * exodusinvalid(value + ' is not a recognised font')
-                if (e.number == -2147024809) return yield * exodusinvalid(value2 + ' is not a recognised fontsize')
+                if (e.number == -2146827908) { exodusinvalid(value + ' is not a recognised font'); return }
+                if (e.number == -2147024809) { exodusinvalid(value2 + ' is not a recognised fontsize'); return }
                 return systemerror('exodus_set_style("' + mode + '","' + value + '","' + value2 + '")', e.number + ' ' + e.description)
             }
         }
@@ -1527,7 +1531,7 @@ function* clientfunctions_windowonload() {
         yield* db.send()
     }
 
-    await clientfunctions_setstyle()
+    yield* fromPromise( clientfunctions_setstyle() )
 
     //if (gautofitwindow && document.getElementById('autofitwindowelement'))
     //    exodussettimeout('exodusautofitwindow()', 10)
@@ -1733,7 +1737,7 @@ Array.prototype.exodusread = async function array_exodusread(filename, key, fiel
     else
         db.request = ''
     db.request += 'READ\r' + filename + '\r' + key
-    if (!(yield* db.send())) {
+    if (!(await db.send())) {
         if (db.response.indexOf('NO RECORD') >= 0) {
             //var temp=filename.toLowerCase().exodussingular().replace(/_/,' ')
             return false
@@ -1805,7 +1809,7 @@ Array.prototype.exodusxlate = async function arrayxlate(filename, fieldno, mode)
 
         //select the (deduplicated) records or return systemerror
         db.request = 'SELECT\r' + filename + '\r\rRECORD'
-        if (!(yield* db.send(uncachedkeys.join(fm)))) {
+        if (!(await db.send(uncachedkeys.join(fm)))) {
             systemerror(db.response)
             this.exodusresponse = db.response
             return []
@@ -1853,7 +1857,7 @@ String.prototype.exodusxlate = async function stringxlate(filename, fieldno, mod
     exodusassertnumeric(fieldno, 'xlate', filename + ' ' + key)
 
     var record = []
-    yield* record.exodusread(filename, this)
+    await record.exodusread(filename, this)
     if (db.response.indexOf('file is not available') >= 0) systemerror('xlate', db.response)
 
     return await exodusxlatelogic(filename, record, fieldno, mode, key)
@@ -1919,7 +1923,7 @@ async function exodusfilepopup(filename, cols, coln, sortselectionclause, many, 
 	collist = collist.replace(/[\r\n]/g, ' ')
     db.request = 'CACHE\rSELECT\r' + filename.toUpperCase() + '\r' + sortselectionclause + '\r' + collist + '\rXML\r' + maxnrecs
     //db.request='CACHE\rSELECT\r'+filename.toUpperCase()+'\r'+sortselectionclause+'\r'+collist+' ID'
-    if (!(yield* db.send())) {
+    if (!(await db.send())) {
         await exodusinvalid(db.response)
         return null
     }
@@ -2237,7 +2241,7 @@ function* exodusdblink_send_byhttp_using_forms(data) {
 
         //var params='dialogHeight:100px; dialogWidth:200px; center:Yes; help:No; resizable:No; status:No'
         //params='dialogHeight: 201px; dialogWidth: 201px; dialogTop: px; dialogLeft: px; center: Yes; help: Yes; resizable: Yes; status: Yes;'
-        var reply = await exodusshowmodaldialog(EXODUSlocation + 'rs/index.html', [this.timeout, this.request, this.data])
+        var reply = yield* fromPromise( exodusshowmodaldialog(EXODUSlocation + 'rs/index.html', [this.timeout, this.request, this.data]) )
         if (!reply) {
             this.data = ''
             this.response = ('ERROR: Request to server failed')
@@ -3161,7 +3165,7 @@ function checkisdropdown(element) {
     assertelement(element, 'checkisdropdown', 'element')
 
     if (typeof (element) != 'object' || element.tagName != 'SELECT') {
-        yield * exodusinvalid('Error: The target is not a SELECT tag')
+        exodusinvalid('Error: The target is not a SELECT tag')
         return false
     }
     return true

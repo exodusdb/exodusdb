@@ -59,7 +59,7 @@ async function user_showtasks(event) {
     var userid = await gds.get1('USER_ID',grecn)
 
     db.request = 'EXECUTE\rGENERAL\rGETTASKS\r\r' + userid
-    if (!(yield* db.send()))
+    if (!(await db.send()))
         return await exodusinvalid(db.response)
 
     var taskid = await exodusdecide('Tasks authorised for ' + userid, db.data, [[0, 'Task'], [1, 'Lock']], 0, '', '', inverted = true)
@@ -77,8 +77,8 @@ async function user_showtasks(event) {
 }
 
 async function authorisation_print() {
-    yield* openwindow('EXECUTE\rGENERAL\rLISTAUTH.TASKS')
-    yield* openwindow('EXECUTE\rGENERAL\rLISTAUTH.USERS')
+    await openwindow('EXECUTE\rGENERAL\rLISTAUTH.TASKS')
+    await openwindow('EXECUTE\rGENERAL\rLISTAUTH.USERS')
     return true
 }
 
@@ -245,7 +245,7 @@ async function user_val_userid() {
 
         //copy the other row here  
         var datarow = gds.updaterow('copy', gds.data.group1[grecn], gds.data.group1[otherln1 - 1])
-        /**/ yield * gds.rebind(datarow, datarow, forced = true)
+        /**/ await gds.rebind(datarow, datarow, forced = true)
 
         //delete the other row
         gds.deleterow(1, otherln1 - 1)

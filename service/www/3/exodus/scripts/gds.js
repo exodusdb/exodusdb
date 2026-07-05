@@ -41,13 +41,13 @@ function exodusdatasource() {
 //NB arguments are fieldname, filename not filename, fieldname as in server side xlate ATM
 //this is because rapid readability is vastly better due to sequence of sourcefieldname->filename/fieldno
 async function gds_xlate(sourcefieldname,targetfilename,targetfieldno,mode){
-    var keys=yield* this.getx(sourcefieldname)
-    return yield* keys.exodusxlate(targetfilename,targetfieldno,mode)
+    var keys=await this.getx(sourcefieldname)
+    return await keys.exodusxlate(targetfilename,targetfieldno,mode)
 }
 
 async function gds_rexlate(sourcefieldname,targetfilename,targetfieldno,mode){
-    var keys=yield* this.regetx(sourcefieldname)
-    return yield* keys.exodusxlate(targetfilename,targetfieldno,mode)
+    var keys=await this.regetx(sourcefieldname)
+    return await keys.exodusxlate(targetfilename,targetfieldno,mode)
 }
 
 async function gds_evaluate(functionx) {
@@ -66,7 +66,7 @@ async function gds_evaluate(functionx) {
 
     //this=whatever gds object the evaluate method has been called on
     //because of .apply() in exodusevaluate3
-    var result=yield* exodusevaluate(
+    var result=await exodusevaluate(
         functionx,   //function string or object
         'gds_evaluate',//for debugging
         'gds',  //any "gds" variable in the function code will actually access
@@ -97,7 +97,7 @@ async function gds_regetx(dictitemorid, recn) {
 
         //recalc doesnt need to be called for F items but if it is should work like getx
         if (dictitem.type == 'F')
-            return yield* this.getx(dictitem.name, recn)
+            return await this.getx(dictitem.name, recn)
 
         return ''
     }
@@ -110,13 +110,13 @@ async function gds_regetx(dictitemorid, recn) {
     //login('regetx '+dictitem.id+' '+grecn)
 
     //calculate the answer (possibly multivalued)
-    /* yield */ var results = /**/ yield * this.tempfunction.apply(this)
+    /* yield */ var results = /**/ await this.tempfunction.apply(this)
     // noyield // var results = this.tempfunction()
     if (typeof results == 'undefined') systemerror('gds_regetx', (dictitem.name ? dictitem.name : dictitem.id) + ' function returned undefined')
 
     //and update the record and display
     /*if (dictitem.type!='S') */
-    yield* this.setx(dictitem, !dictitem.groupno ? 0 : grecn, results)
+    await this.setx(dictitem, !dictitem.groupno ? 0 : grecn, results)
 
     grecn = storegrecn
 
@@ -129,7 +129,7 @@ async function gds_regetx(dictitemorid, recn) {
 
 //getall
 async function gds_getall(name, oldtext) {
-    return yield* this.getx(name,null,oldtext)
+    return await this.getx(name,null,oldtext)
 }
 
 //get1 - should only be called on multivalued fields and only with specific recn (or null for grecn)
@@ -137,7 +137,7 @@ async function gds_getall(name, oldtext) {
 async function gds_get1(name, recn, oldtext) {
     if (recn)
         exodusassertnumeric(recn,'gds_get1','recn')
-    return (yield* this.getx(name,recn,oldtext))[0]
+    return (await this.getx(name,recn,oldtext))[0]
 }
 
 //getx - NB returns an array if multivalued field even for one recn
@@ -386,8 +386,8 @@ async function gds_setx(element, recn, values) {
         }
     }
 
-    //result = /**/ yield * this.setx2(cells, values)
-    return /**/ yield * this.setx2(cells, values)
+    //result = /**/ await this.setx2(cells, values)
+    return /**/ await this.setx2(cells, values)
 }
 
 //SETDEFAULTED
@@ -551,7 +551,7 @@ async function gds_load(exodusrecordobject1) {
     this.loading = true
     this.readystate = 'loading'
     if (typeof (this.onreadystatechange) == 'function')
-        /**/ yield * this.onreadystatechange()
+        /**/ await this.onreadystatechange()
 
     //grab the dict and dictitem method
     this.dict = exodusrecordobject1.dict
@@ -559,13 +559,13 @@ async function gds_load(exodusrecordobject1) {
     
     //bind newdatasource to the HTML screen
     this.data = exodusrecordobject1.data
-    /**/ yield * this.bind(this.data, '', 0)
+    /**/ await this.bind(this.data, '', 0)
 
     //trigger completion event
     this.loading = false
     this.readystate = 'complete'
     if (typeof (this.onreadystatechange) == 'function')
-        /**/ yield * this.onreadystatechange()
+        /**/ await this.onreadystatechange()
 
     //logout('load')
 
@@ -656,7 +656,7 @@ function gds_addrow(groupno, newdatarow) {
     var datarow = group[group.length - 1]
     if (newdatarow) {
         //not tested/debugged yet
-        /**/ yield * this.rebind(datarow, newdatarow)
+        /**/ this.rebind(datarow, newdatarow)
     }
     else {
         this.blankrowx(datarow, newrow, true)
@@ -840,7 +840,7 @@ async function gds_bind(datasource, elements, rownx) {
 
         //many rows
         if (propname.slice(0, 5) == 'group') {
-            /**/ yield * this.bindgroup(datasource, propname)
+            /**/ await this.bindgroup(datasource, propname)
         }
         //one row or the header
         else {
@@ -1026,7 +1026,7 @@ async function gds_bind(datasource, elements, rownx) {
             //alert('rowx.exodusfields:'+rowx.exodusfields)
             //call bind data recursively to the new row
             //async function gds_bind(datasource,elements,rownx)
-            /**/ yield * this.bind(rows[rown], rowx.exodusfields, rown)
+            /**/ await this.bind(rows[rown], rowx.exodusfields, rown)
             //alert('bound:'+rown)
             //gtimers.stop(3)
 
@@ -1056,7 +1056,7 @@ async function gds_bind(datasource, elements, rownx) {
                         if (!oldrows[rown])
                             this.addrow(groupno)
 
-                        /**/ yield * gds.rebind(newrows[rown], oldrows[rown])
+                        /**/ await gds.rebind(newrows[rown], oldrows[rown])
 
                     }
 
@@ -1083,7 +1083,7 @@ async function gds_bind(datasource, elements, rownx) {
                 // /**/ yield * this.setx2([oldcell], [newvalue])
                 var cells = [oldcell]
                 cells.dictid = propname//needed to enable afterupdate function
-                /**/ yield * this.setx2(cells, [newvalue], forced)
+                /**/ await this.setx2(cells, [newvalue], forced)
             }
             //initialise "oldtext"
             oldcell.oldtext = newvalue

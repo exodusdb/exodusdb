@@ -13,7 +13,7 @@ async function dict_PARTS() {
  di=dict[++din]=dictrec('SUB_PART_CODE','F',2)
  di.filename='PARTS'
  di.unique=true
- di.validation=function () {
+ di.validation=async function () {
 
   if (gvalue==gkey) return await exodusinvalid('Sorry, parts cannot be made of each other')
  }

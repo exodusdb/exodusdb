@@ -61,7 +61,7 @@ function* formfunctions_onload() {
         //gpassword_element.value=gDialogArguments[1]
         var datasetx = gDialogArguments[2]
         var datasetlist = gDialogArguments[4]
-        await setdropdown2(gdataset_element, datasetlist, Array("code", "name"), datasetx, null)
+        yield* fromPromise( setdropdown2(gdataset_element, datasetlist, Array("code", "name"), datasetx, null) )
 
         if (gDialogArguments[5] == 'true') {
             gusername_element.innerText = gDialogArguments[0]
@@ -89,7 +89,7 @@ function* formfunctions_onload() {
             if (typeof exodusgetcookie == 'undefined')
                 datasetcode = datasetcode.substr(0,8).toUpperCase()
         }
-        await exodussetdropdown(gdataset_element, "GETDATASETS\r" + gsystem, Array("code", "name"), datasetcode, null)
+        yield* fromPromise( exodussetdropdown(gdataset_element, "GETDATASETS\r" + gsystem, Array("code", "name"), datasetcode, null) )
         if (startinglocation != 'login' && exodusgetcookie2('a', 'EXODUS', '') == 'true') {
             gusername_element.value = exodusgetcookie2('u', 'EXODUS', '')
             gpassword_element.value = exodusgetcookie2('p', 'EXODUS', '')
@@ -123,7 +123,7 @@ function* formfunctions_onload() {
 
     //autologin (except if shift key is pressed - MSIE only)
     if ((!window.event || !window.event.shiftKey) && gautologin_element.value == 'on')
-        await dblogin()
+        yield* fromPromise( dblogin() )
 
 }
 
@@ -264,7 +264,7 @@ async function login_onclick() {
         exodussetcookie('', 'EXODUSlogincode', glogincode, 'logincode')
 
         db.request = 'LOGIN\r' + gusername_element.value + '\r' + gpassword_element.value + '\r' + datasetx + '\r' + authno + '\r' + gsystem + '\r' + gportno + '\rnewpass'
-        if (yield* db.send()) {
+        if (await db.send()) {
 
             //save the settings
 
