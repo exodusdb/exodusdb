@@ -161,7 +161,7 @@ function* formfunctions_onload() {
 
     //form customisation
     if (typeof form_onload == 'function') {
-        if (!(yield* exodusevaluate('await form_onload() )', 'await form_onload() )')))
+        if (!(yield* exodusevaluate('await form_onload()', 'await form_onload()')))
             return
     }
 
@@ -270,7 +270,7 @@ function* formfunctions_onload() {
             if (gKeyNodes) {
                 var words = fieldname.split('_')
                 for (var wordn = 0; wordn < words.length; ++wordn) {
-                    if (!(yield* fromPromise( exodussecurity(gdatafilename.exodussingular() + ' UPDATE ' + words.slice(0, wordn + 1).join(' ').exodusquote()) ))) {
+                    if (!(await exodussecurity(gdatafilename.exodussingular() + ' UPDATE ' + words.slice(0, wordn + 1).join(' ').exodusquote()))) {
                         dictitem.readonly = gmsg
                         break;
                     }
@@ -349,7 +349,7 @@ function* formfunctions_onload() {
                 if (element.getAttribute('exodusradio'))
                     element.setAttribute('exoduscheckbox', '')
 
-                //gdefault=yield* fromPromise( getdefault(element) )
+                //gdefault=await getdefault(element)
 
                 //build html for multiple inputs
                 var options = (element.getAttribute('exodusradio') ? element.getAttribute('exodusradio') : element.getAttribute('exoduscheckbox')).exodussplit(':;')
@@ -405,7 +405,7 @@ function* formfunctions_onload() {
                         //addeventlistener(element, 'focus', 'document_onfocus')
                         //addlistener doesnt work on rows since cloning rows doesnt clone listeners
                         //addeventlistener(element, 'click', 'onclickradiocheckbox')
-                        element.setAttribute('exodusonclick', 'await onclickradiocheckbox() )')
+                        element.setAttribute('exodusonclick', 'await onclickradiocheckbox()')
                     }
 
                 }
@@ -443,7 +443,7 @@ function* formfunctions_onload() {
                 selectelement.id = element.id
 
                 //create all the options of the element
-                yield* fromPromise( exodussetdropdown(selectelement, 'CACHE\r' + request, colarray, '', noautoselection) )
+                await exodussetdropdown(selectelement, 'CACHE\r' + request, colarray, '', noautoselection)
 
                 element = selectelement
                 //    element.innerHTML=element.innerHTML+' '
@@ -903,7 +903,7 @@ function* formfunctions_onload() {
                     }
                 }
 
-                yield* fromPromise( setfirstlastelement(element) ) )
+                await setfirstlastelement(element)
 
             }
 
@@ -1051,7 +1051,7 @@ function* formfunctions_onload() {
                     element2.originalsrc = element2.src
                     element2.title = 'Sort by ' + element.getAttribute('exodustitle')
                     //addeventlistener(element2, 'click', 'sorttable')
-                    element2.setAttribute('exodusonclick', 'await sorttable(event) )')
+                    element2.setAttribute('exodusonclick', 'await sorttable(event)')
                     element2.sorttableelementid = element.id
                     gsortimages[element.id] = element2
 
@@ -1132,8 +1132,8 @@ function* formfunctions_onload() {
                     //maybe remove insertrow/deleterow buttons (in case first group dictionary element does not have the flag)
                     //if (element.getAttribute('exodusnoinsertrow') && !tablex.getAttribute('noinsertrow')) {
                     //if (element.getAttribute('exodusnodeleterow')&& !tablex.getAttribute('nodeleterow')) {
-                    yield* fromPromise( maybe_remove_rowbutton('insert') )
-                    yield* fromPromise( maybe_remove_rowbutton('delete') )
+                    await maybe_remove_rowbutton('insert')
+                    await maybe_remove_rowbutton('delete')
 
                 }
                 else {
@@ -1199,14 +1199,14 @@ function* formfunctions_onload() {
                     if (!(element.getAttribute('exodusnoinsertrow'))) {
                         t += '  <IMG id=insertrowbutton' + groupno
                             + ' title="Insert a new row here ' + t2
-                            + '" exodusonclick="await insertrow_onclick(event) )" src="' + ginsertrowimage
+                            + '" exodusonclick="await insertrow_onclick(event)" src="' + ginsertrowimage
                             + '" style="cursor:pointer;">'//: solid 1px">'
                     }
                     //if (!(exodusgetattribute(element,'exodusnodeleterow')))
                     if (!(element.getAttribute('exodusnodeleterow'))) {
                         t += '  <IMG id=deleterowbutton' + groupno
                             + ' title="Delete this row ' + t3
-                            + '" exodusonclick="await deleterow_onclick(event) )" src ="' + gdeleterowimage
+                            + '" exodusonclick="await deleterow_onclick(event)" src ="' + gdeleterowimage
                             + '" style="cursor:pointer">'//: solid 1px">'
                     }
                     t += ' </span>'
@@ -1228,14 +1228,14 @@ function* formfunctions_onload() {
 
                     var t = '&nbsp;'
                     t += '<button id=exodusgroup' + groupno + 'showall class=exodusbutton'
-                    t += ' style=display:none exodusonclick="await form_filter(\'unfilter\',' + groupno + ') )"'
+                    t += ' style=display:none exodusonclick="await form_filter(\'unfilter\',' + groupno + ')"'
                     t += '>Show All</button>'
 
                     if (groupno == 1 && typeof gallowfilter != 'undefined' && gallowfilter) {
                         t += '<input id="exodusgroup' + groupno + 'filter"'
                         t += ' class="clsNotRequired"'
-                        t += ' onblur="await form_filter(\'filterall\',' + groupno + ',null,null,this) )"'
-                        t += ' onfocus="await form_filter(\'filterfocus\',' + groupno + ',null,null,this) )"'
+                        t += ' onblur="await form_filter(\'filterall\',' + groupno + ',null,null,this)"'
+                        t += ' onfocus="await form_filter(\'filterfocus\',' + groupno + ',null,null,this)"'
                         t += ' contenteditable="true"'
                         t += ' size="3"'
                         t += ' tabIndex="-1"'
@@ -1527,7 +1527,7 @@ function* formfunctions_onload() {
     }
 
     if (firstrecord)
-        yield* fromPromise( setgkeys([]) ) )
+        await setgkeys([])
 
     if (newrecord && (greadonlymode || gupdateonlymode || gpreventcreation)) {
         setdisabledandhidden(newrecord, true)
@@ -1644,7 +1644,7 @@ function* formfunctions_onload() {
     //if form has a custom postinit routine
     if (typeof form_postinit == 'function') {
         //login('form_postinit before')
-        yield* exodusevaluate('await form_postinit() )', 'form_functions()')
+        yield* exodusevaluate('await form_postinit()', 'form_functions()')
         //logout('form_postinit after')
 
         //reverse the effect of any setvalue commands in postinit
@@ -1686,22 +1686,22 @@ function* formfunctions_onload() {
 
             //allow multiple keys to be loaded
             if (typeof gparameters.key == 'object') {
-                yield* fromPromise( setgkeys(gparameters.key) )
+                await setgkeys(gparameters.key)
                 gparameters.key = gparameters.key[0]
             }
 
             //necessary to initialise gds else any expressions relying on gds.data will
             //crash after this routine returns
-            yield* fromPromise( cleardoc() ) )
+            await cleardoc()
 
-            //exodussettimeout('await opendoc(' + exodusquote(gparameters.key.replace(/\\/g, '\\\\') ) + ')', 1)
+            //exodussettimeout('await opendoc(' + exodusquote(gparameters.key.replace(/\\/g, '\\\\')) + ')', 1)
             //we cant allow another event like focus to occur before this event is over
             //because there is only one geventhandler to rememeber which yielding function is pending resumption
             //therefore call opendoc immediately - seems to cause no problem
-            yield* fromPromise( opendoc(gparameters.key.replace(/\\/g, '\\\\')) )
+            await opendoc(gparameters.key.replace(/\\/g, '\\\\'))
         }
         else
-            yield* fromPromise( cleardoc() ) )
+            await cleardoc()
     }
 
     //non-record based forms can get parameters from URL or dialog arguments
@@ -1711,13 +1711,13 @@ function* formfunctions_onload() {
         if (gparameters.defaultrevstr)
             gro.defaultrevstr = gparameters.defaultrevstr
 
-        yield* fromPromise( cleardoc() ) )
+        await cleardoc()
 
-        yield* fromPromise( validateall('filldefaults') )
+        await validateall('filldefaults')
 
         grecn = null
-        yield* fromPromise( calcfields() ) )
-        yield* fromPromise( updatedisplay() ) )
+        await calcfields()
+        await updatedisplay()
 
     }
 
@@ -1755,7 +1755,7 @@ async function setfirstlastcolumn(groupno) {
 
     var tablex = $$('exodusgroup' + groupno)
     if (!tablex)
-        yield* fromPromise( exodusinvalid('setfirstlastcolumn() table' + groupno + ' is missing') )
+        await exodusinvalid('await setfirstlastcolumn() table' + groupno + ' is missing')
 
     for (var ii = 0; ii < gtables[groupno].length; ii++) {
         var screenfn = gtables[groupno][ii]
@@ -1777,12 +1777,12 @@ async function updatedisplay(elements) {
 
     //option to do all elements recursively
     if (typeof elements == 'undefined')
-        return yield* fromPromise( updatedisplay(gfields) ) )
+        return await updatedisplay(gfields)
 
     //do multiple elements recursively
     if (!elements.tagName) {
         for (var ii = 0; ii < elements.length; ii++)
-            yield* fromPromise( updatedisplay(elements[ii]) ) )
+            await updatedisplay(elements[ii])
         return
     }
 
@@ -1795,9 +1795,9 @@ async function updatedisplay(elements) {
     //login('updatedisplay ' + element.id)
 
     //determine required display
-    var display = yield* gds.evaluate(element.getAttribute('exodusdisplay'))
+    var display = await gds.evaluate(element.getAttribute('exodusdisplay'))
     if (typeof display == 'undefined') {
-        systemerror('yield* fromPromise( updatedisplay(' + element.id + ') ) )', '.display() returned undefined')
+        systemerror('await updatedisplay(' + element.id + ')', '.display() returned undefined')
     }
     display = display ? '' : 'none'
 
@@ -1849,7 +1849,7 @@ async function element_exodussetdropdown(element, request, noautoselection) {
     assertelement(element, 'element_setdropdown', 'element')
 
     if (!(element.getAttribute('exodusdropdown'))) {
-        systemerror('await element_exodussetdropdown() )', element.id + ' has no dropdown')
+        systemerror('await element_exodussetdropdown()', element.id + ' has no dropdown')
         return
     }
 
@@ -1857,7 +1857,7 @@ async function element_exodussetdropdown(element, request, noautoselection) {
     var request = 'CACHE\r' + dropdown[0]
     var colarray = dropdown[1].split('\r')
 
-    yield* fromPromise( exodussetdropdown(element, request, colarray, '', noautoselection) )
+    await exodussetdropdown(element, request, colarray, '', noautoselection)
 
 }
 
@@ -1926,7 +1926,7 @@ async function newrecordfocus() {
     //do this BEFORE setting gpreviouselement as setdefault will overwrite it
     if (!gKeyNodes || glocked) {
         //check group 0 always
-        yield* fromPromise( checkrequired(gfields, element, 0) ) )
+        await checkrequired(gfields, element, 0)
     }
 
     //required so that if still focused on an element AFTER loading the record
@@ -1938,9 +1938,9 @@ async function newrecordfocus() {
 
     //why false??? if (false&&gpreviouselement)
     //false results in repetitive batch number changing still asking discard? when no changes made
-    //dont want to do this when in yield* fromPromise( cleardoc() ) otherwise always starts a batch
+    //dont want to do this when in await cleardoc() otherwise always starts a batch
     if (gpreviouselement) {
-        yield* fromPromise( setdefault(gpreviouselement) ) )
+        await setdefault(gpreviouselement)
         //gpreviouselement = $$(element.id)
         //if (gpreviouselement && gpreviouselement[0])
         //    gpreviouselement = gpreviouselement[0]
@@ -1971,8 +1971,8 @@ async function gds_onreadystatechange() {
     if (gds.readystate != 'complete') return
     //login('gds_onreadystatechange')
     grecn = null
-    yield* fromPromise( calcfields() ) )
-    yield* fromPromise( newrecordfocus() ) )
+    await calcfields()
+    await newrecordfocus()
     //logout('gds_onreadystatechange')
 }
 
@@ -1987,7 +1987,7 @@ async function tablex_onreadystatechange(event) {
 
     //login('tablex_onreadystatechange ' + Number(event.target.getAttribute('exodusgroupno')))
 
-    yield* fromPromise( newrecordfocus() ) )
+    await newrecordfocus()
 
     //logout('tablex_onreadystatechange ' + Number(event.target.getAttribute('exodusgroupno')))
 
@@ -2007,14 +2007,14 @@ async function printsendrecord_onclick(event) {
     //NB case INsensitive
     printfunction = printfunction.replace(/%KEY%/gi, gkey)
     //alert('DEBUG: saoc')
-    yield* fromPromise( validateupdate() ) )
-    if (gchangesmade && !(await saveandorcleardoc('PRINT') ))) {
+    await validateupdate()
+    if (gchangesmade && !(await saveandorcleardoc('PRINT'))) {
         focusongpreviouselement()
         return
     }
     //alert('DEBUG: printfunction')
-    yield* exodusevaluate(printfunction, 'await printsendrecord_onclick() )')
-    //exodussettimeout("yield* exodusevaluate('"+printfunction+"','await printsendrecord_onclick() )')",100)
+    yield* exodusevaluate(printfunction, 'await printsendrecord_onclick()')
+    //exodussettimeout("yield* exodusevaluate('"+printfunction+"','await printsendrecord_onclick()')",100)
 
 }
 
@@ -2028,14 +2028,14 @@ async function listrecord_onclick(event) {
     if (!listfunction)
         return
 
-    yield* fromPromise( validateupdate() ) )
+    await validateupdate()
     listfunction = listfunction.replace(/%KEY%/gi, gkey)
 
-    if (gchangesmade && !(await saveandorcleardoc('PRINT') ))) {
+    if (gchangesmade && !(await saveandorcleardoc('PRINT'))) {
         focusongpreviouselement()
         return
     }
-    yield* exodusevaluate(listfunction, 'await listrecord_onclick() )')
+    yield* exodusevaluate(listfunction, 'await listrecord_onclick()')
 
 }
 
@@ -2105,7 +2105,7 @@ function window_onunload_sync() {
         exodussetcookie(glogincode, 'EXODUSpending', pending)
 
         console.log('trying to unlock ' + gkey + ' immediately but async request doesnt seem to reach server reliably while unloading')
-        //await unlockdoc() )
+        //await unlockdoc()
         var result = unlockdoc()
         if (result.next)
             result.next()
@@ -2124,7 +2124,7 @@ async function document_onclick(event) {
     event = getevent(event)
 
     if (!event.target.getAttribute) {
-        console.log('await document_onclick() ) missing event.target or event.target.getAttribute() ' + event)
+        console.log('await document_onclick() missing event.target or event.target.getAttribute() ' + event)
         return
     }
 
@@ -2136,10 +2136,10 @@ async function document_onclick(event) {
     var result
 
     if (event.target.getAttribute('isexoduspopup'))
-        result = yield* fromPromise( exoduspopup(event) )
+        result = await exoduspopup(event)
 
     else if (event.target.getAttribute('isexoduslink'))
-        result = yield* fromPromise( exoduslink(event) )
+        result = await exoduslink(event)
 
     //call the first exodusonclick expression found in element then parents
     var target = event.target
@@ -2219,7 +2219,7 @@ async function document_onkeydown(event) {
     }
 
     gonkeydown = true
-    var result = yield* fromPromise( document_onkeydown2(event) )
+    var result = await document_onkeydown2(event)
     gonkeydown = false
 
     return result
@@ -2316,7 +2316,7 @@ async function document_onkeydown2(event) {
     //custom key handlers
     //must return false to prevent further action
     if (typeof form_onkeydown == 'function') {
-        if (!(await form_onkeydown(event) ))) {
+        if (!(await form_onkeydown(event))) {
             return exoduscancelevent(event)
         }
     }
@@ -2350,19 +2350,19 @@ async function document_onkeydown2(event) {
 
     //F6 is now link
     if (keycode == 117) {
-        yield* fromPromise( exoduslink(event) )
+        await exoduslink(event)
         return exoduscancelevent(event)
     }
 
     //F7 is now popup (used to be F2 in DOS) also replaces windows standard alt+down combination
     if (keycode == 118 || (event.altKey && keycode == 40 && element.tagName == 'SELECT')) {
-        yield* fromPromise( exoduspopup(event) )
+        await exoduspopup(event)
         return exoduscancelevent(event)
     }
 
     //close (F8)
     if (keycode == 119) {
-        await closedoc('CLEAR') )
+        await closedoc('CLEAR')
         return exoduscancelevent(event)
     }
 
@@ -2411,18 +2411,18 @@ async function document_onkeydown2(event) {
         //was done by accesskeys on hidden buttons but firefox requires shift+alt for access
         // unless configure http://kb.mozillazine.org/Ui.key.contentAccess
         // dont use timeout since allows the user interface to resume and send ANOTHER event in FF3
-        //else if (gkeycode==76) exodussettimeout('await exoduslogout_onclick() )',1)
+        //else if (gkeycode==76) exodussettimeout('await exoduslogout_onclick()',1)
         //Logout and List swapped to be G and L respectively
-        else if (gkeycode == 71) await exoduslogout_onclick() )//g
-        else if (gkeycode == 78) await newrecord_onclick() )//n
-        else if (gkeycode == 79) await openrecord_onclick() )//o
-        else if (gkeycode == 83) await saverecord_onclick() )//s
-        else if (gkeycode == 67) await closerecord_onclick() )//c
-        else if (gkeycode == 69) await editreleaserecord_onclick() )//e
-        //else if (gkeycode == 68) await deleterecord_onclick() )//d reserved
-        else if (gkeycode == 76) await listrecord_onclick() )//l
-        else if (gkeycode == 80) await printsendrecord_onclick() )//p
-        else if (gkeycode == 82) await refreshcache_onclick() )//r
+        else if (gkeycode == 71) await exoduslogout_onclick()//g
+        else if (gkeycode == 78) await newrecord_onclick()//n
+        else if (gkeycode == 79) await openrecord_onclick()//o
+        else if (gkeycode == 83) await saverecord_onclick()//s
+        else if (gkeycode == 67) await closerecord_onclick()//c
+        else if (gkeycode == 69) await editreleaserecord_onclick()//e
+        //else if (gkeycode == 68) await deleterecord_onclick()//d reserved
+        else if (gkeycode == 76) await listrecord_onclick()//l
+        else if (gkeycode == 80) await printsendrecord_onclick()//p
+        else if (gkeycode == 82) await refreshcache_onclick()//r
         else
             found = false
         return exoduscancelevent(event)
@@ -2430,31 +2430,31 @@ async function document_onkeydown2(event) {
 
     //alt+{ is first record
     if (keycode == 219 && event.altKey && event.shiftKey) {
-        exodussettimeout('await firstrecord_onclick() )', 1)
+        exodussettimeout('await firstrecord_onclick()', 1)
         return exoduscancelevent(event)
     }
 
     //alt+} is last record
     if (keycode == 221 && event.altKey && event.shiftKey) {
-        exodussettimeout('await lastrecord_onclick() )', 1)
+        exodussettimeout('await lastrecord_onclick()', 1)
         return exoduscancelevent(event)
     }
 
     //alt+[ is previous record
     if (keycode == 219 && event.altKey) {
-        exodussettimeout('await previousrecord_onclick() )', 1)
+        exodussettimeout('await previousrecord_onclick()', 1)
         return exoduscancelevent(event)
     }
 
     //alt+] is next record
     if (keycode == 221 && event.altKey) {
-        exodussettimeout('await nextrecord_onclick() )', 1)
+        exodussettimeout('await nextrecord_onclick()', 1)
         return exoduscancelevent(event)
     }
 
     //alt+^ is select record
     if (keycode == 54 && event.altKey && event.shiftKey) {
-        exodussettimeout('await selectrecord_onclick() )', 1)
+        exodussettimeout('await selectrecord_onclick()', 1)
         return exoduscancelevent(event)
     }
 
@@ -2581,13 +2581,13 @@ async function document_onkeydown2(event) {
 
         //first update the current field
         //otherwise the db is updated without the last entry!!!
-        if (!(yield* fromPromise( validateupdate() ) )))
+        if (!(await validateupdate()))
             return exoduscancelevent(event)
 
         //prevent document save unless the save button is enabled
         if (!(saverecord.getAttribute('disabled'))) {
-            //await savedoc() )
-            yield* fromPromise( saverecord_onclick() )
+            //await savedoc()
+            await saverecord_onclick()
         }
 
         return exoduscancelevent(event)
@@ -2599,7 +2599,7 @@ async function document_onkeydown2(event) {
     if (keycode == 27) {
 
         //close any "modal" popups
-        if (yield* fromPromise( form_closepopups() ) )) {
+        if (await form_closepopups()) {
             //prevent normal esc handling
             return exoduscancelevent(event)
         }
@@ -2610,7 +2610,7 @@ async function document_onkeydown2(event) {
             value = getvalue(element)
 
             //old value
-            gdefaultvalue = yield* fromPromise( getdefault(element) ) )
+            gdefaultvalue = await getdefault(element)
             if (gpreviousvalue == '' && gdefaultvalue)
                 gpreviousvalue = gdefaultvalue
 
@@ -2638,7 +2638,7 @@ async function document_onkeydown2(event) {
             }
         }
 
-        yield* fromPromise( closerecord_onclick() )
+        await closerecord_onclick()
 
         return exoduscancelevent(event)
 
@@ -2684,7 +2684,7 @@ async function document_onkeydown2(event) {
         var rs = gds.data['group' + ggroupno]
         if (!rs) {
             exoduscancelevent(event)
-            return await exodusinvalid('Group number on non-group field') )
+            return await exodusinvalid('Group number on non-group field')
         }
         //zzz if "paging" should be offset by subtracting record number of first row
         grecn = rown
@@ -2702,7 +2702,7 @@ async function document_onkeydown2(event) {
 
     //ctrl+G is goto line
     if (keycode == 71 & event.ctrlKey) {
-        if (!(yield* fromPromise( validateupdate() ) )))
+        if (!(await validateupdate()))
             return false
         while (true) {
 
@@ -2731,7 +2731,7 @@ async function document_onkeydown2(event) {
     //alt+Y is copy previous record/column
     if (keycode == 89 && event.altKey && element.type != 'button') {
         if (grecn > 0) {
-            setvalue(element, yield* fromPromise( getpreviousrow(element.id, true) ))
+            setvalue(element, await getpreviousrow(element.id, true))
             try { element.select() } catch (e) { }
             return exoduscancelevent(event)
         }
@@ -2807,7 +2807,7 @@ async function document_onkeydown2(event) {
             ) {
                 if (glocked || !gKeyNodes) {
                     //exodusaddrow(ggroupno)
-                    if (!(await form_insertrow(event, true) )))
+                    if (!(await form_insertrow(event, true)))
                         return exoduscancelevent(event)
                     //continue on to focus on it
                     //var nextelement=$$(gfields[tablex.getAttribute('exodusfirstinputcolscreenfn')].id)[grecn+1]
@@ -2837,8 +2837,8 @@ async function document_onkeydown2(event) {
             )
         ) {
             if (!(saverecord.getAttribute('disabled'))) {
-                //await savedoc() )
-                yield* fromPromise( saverecord_onclick() )
+                //await savedoc()
+                await saverecord_onclick()
             }
             return exoduscancelevent(event)
         }
@@ -3060,7 +3060,7 @@ async function document_onkeydown2(event) {
             //on first column, add a new row
             if (glocked || !gKeyNodes) {
                 //exodusaddrow(ggroupno)
-                yield* fromPromise( form_insertrow(event, true) )
+                await form_insertrow(event, true)
                 //and continue to focus on it
             }
         }
@@ -3082,7 +3082,7 @@ async function document_onkeydown2(event) {
             if (rown < nrows - 1) {
                 if (keycode == 40) {
                     if (!grows[rown + 1].exodusfields[id]) {
-                        systemerror('await document_onkeydown() )', 'Cannot locate id ' + id + ' in rown: ' + rown + ' nrows:' + grows.length + ' tagname:' + grows[rown + 1].exodusfields[id])
+                        systemerror('await document_onkeydown()', 'Cannot locate id ' + id + ' in rown: ' + rown + ' nrows:' + grows.length + ' tagname:' + grows[rown + 1].exodusfields[id])
                         return false
                     }
                     focuson(grows[rown + 1].exodusfields[id])
@@ -3171,7 +3171,7 @@ async function document_onkeydown2(event) {
         var button = rowx.exodusfields['insertrowbutton' + ggroupno]
         if (!event.repeat && button && button.style && button.style.display != 'none') {
             exoduscancelevent(event)
-            yield* fromPromise( form_insertrow(event) )
+            await form_insertrow(event)
         }
         return false
     }
@@ -3182,7 +3182,7 @@ async function document_onkeydown2(event) {
         var button = rowx.exodusfields['deleterowbutton' + ggroupno]
         if (!event.repeat && button && button.style && button.style.display != 'none') {
             exoduscancelevent(event)
-            yield* fromPromise( form_deleterow(event, event.target) )
+            await form_deleterow(event, event.target)
         }
         return false
     }
@@ -3199,10 +3199,10 @@ async function document_onkeydown2(event) {
         if (![9, 16, 17, 18, 20, 35, 36, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123].exoduslocate(keycode)) {
             exoduscancelevent(event)
             if (gKeyNodes && !glocked) {
-                return yield* fromPromise( readonlydocmsg() )
+                return await readonlydocmsg()
             }
             else if (element.getAttribute('exodusreadonly') != 'true') {
-                await exodusinvalid(element.getAttribute('exodusreadonly') ))
+                await exodusinvalid(element.getAttribute('exodusreadonly'))
             }
             return false
         }
@@ -3408,7 +3408,7 @@ function focusdirection(direction, element, notgroupno, scopex) {
 
         //(isMSIE && nextelement.currentStyle && nextelement.currentStyle.display == 'none' && nextelement.parentNode.currentStyle.display == 'none')
         //should also text mozilla currentstyle
-        //(await getcurrentstyle(nextelement) ) && await getcurrentstyle(nextelement) ).display == 'none' && await getcurrentstyle(nextelement.parentNode) ).display == 'none')
+        //(await getcurrentstyle(nextelement) && await getcurrentstyle(nextelement).display == 'none' && await getcurrentstyle(nextelement.parentNode).display == 'none')
         if (isMSIE && !exodusenabledandvisible(nextelement)) {
             //console.log('SKIP '+nextid+' isMSIE and not enabledandvisible')
             continue
@@ -3510,7 +3510,7 @@ function scrollintoview(element) {
 async function newrecord_onclick() {
 
     //save and close existing document otherwise cancel
-    if (gkey && !(await closedoc('NEW') )))
+    if (gkey && !(await closedoc('NEW')))
         return false
 
     //suppress defaulting if is a fixed default (eg current market in market file)
@@ -3528,9 +3528,9 @@ async function newrecord_onclick() {
             //if already defaulted with fixed string then remove default value and prevent defaulting
             //if they enter something then click New it will be like they clicked Tab to the first non-key element
             var keyid = keyelement.id
-            var currentvalue = yield* gds.getx(keyid)
+            var currentvalue = await gds.getx(keyid)
             if (currentvalue && currentvalue == eval(defaultvalue)) {
-                yield* gds.setx(keyid, '', '')
+                await gds.setx(keyid, '', '')
                 gds.setdefaulted(keyid, null, true)
             }
             //focus on the key element
@@ -3552,7 +3552,7 @@ async function newrecord_onclick() {
 
     exodussettimeout('focuson("' + tt + '")', 200)
 
-    //yield* fromPromise( newrecordfocus() ) )
+    //await newrecordfocus()
     return true
 
 }
@@ -3563,12 +3563,12 @@ async function editreleaserecord_onclick() {
 
     //not locked and there is a key
     if (!glocked) {
-        yield* fromPromise( opendoc(gkey) )
+        await opendoc(gkey)
         return true
     }
 
-    //if (!(await saveandunlockdoc() ))) return false
-    if (!(await saveandorcleardoc('RELEASE') )))
+    //if (!(await saveandunlockdoc())) return false
+    if (!(await saveandorcleardoc('RELEASE')))
         return false
 
     //editreleaserecord.value=' Edit'
@@ -3585,11 +3585,11 @@ async function saverecord_onclick() {
 
     //first update the current field
     //otherwise the db is updated without the last entry!!!
-    if (!(yield* fromPromise( validateupdate() ) )))
+    if (!(await validateupdate()))
         return false
 
     //check for missing required
-    if (!(await validateall() )))
+    if (!(await validateall()))
         return false
 
     // saverecord.focus()
@@ -3598,7 +3598,7 @@ async function saverecord_onclick() {
     if (gKeyNodes) {
 
         //save the record
-        if (!(await savedoc() )))
+        if (!(await savedoc()))
             return false
 
         //prune the cache to reselect any edited record
@@ -3608,14 +3608,14 @@ async function saverecord_onclick() {
 
         //custom postwrite function
         if (typeof form_postwrite == 'function') {
-            //yield* exodusevaluateall('await form_postwrite() )')
-            if (!(yield* exodusevaluateall('await form_postwrite() )')))
+            //yield* exodusevaluateall('await form_postwrite()')
+            if (!(yield* exodusevaluateall('await form_postwrite()')))
                 return false
         }
         //otherwise automatic option to print if available
         else {
             //TODO put this back as a form level opt in
-            //   if (printsendrecord&&!printsendrecord.getAttribute('disabled')&&(await exodusyesno('Print/Send '+gkeyexternal+' ?',2) ))) await printsendrecord_onclick() )
+            //   if (printsendrecord&&!printsendrecord.getAttribute('disabled')&&(await exodusyesno('Print/Send '+gkeyexternal+' ?',2))) await printsendrecord_onclick()
         }
 
         return true
@@ -3627,12 +3627,12 @@ async function saverecord_onclick() {
 
     //custom prewrite function
     if (typeof (form_prewrite) == 'function')
-        if (!(yield* exodusevaluateall('await form_prewrite() )', 'await saverecord_onclick() )')))
+        if (!(yield* exodusevaluateall('await form_prewrite()', 'await saverecord_onclick()')))
             return false
 
     //option to confirm
     if (gparameters.confirm || gparameters.savemode && gparameters.savemode.indexOf('CONFIRM') >= 0) {
-        if (!(await exodusyesno('OK to continue?', 2) )))
+        if (!(await exodusyesno('OK to continue?', 2)))
             return false
     }
 
@@ -3646,12 +3646,12 @@ async function saverecord_onclick() {
     //custom write and postwrite routine
     if (typeof form_write == 'function') {
 
-        if (!(yield* exodusevaluateall('await form_write() )', 'await saverecord_onclick() )')))
+        if (!(yield* exodusevaluateall('await form_write()', 'await saverecord_onclick()')))
             return false
         setchangesmade(false)
 
         if (typeof (form_postwrite) == 'function')
-            yield* exodusevaluateall('await form_postwrite(db) )', 'await saverecord_onclick() )')
+            yield* exodusevaluateall('await form_postwrite(db)', 'await saverecord_onclick()')
 
         return true
     }
@@ -3667,12 +3667,12 @@ async function saverecord_onclick() {
     }
 
     //standard unbound write routine
-    if (!(await unbound_form_write() )))
+    if (!(await unbound_form_write()))
         return false
 
     //if postwrite routine
     if (typeof (form_postwrite) == 'function')
-        yield* exodusevaluateall('await form_postwrite(db) )', 'await saverecord_onclick() )')
+        yield* exodusevaluateall('await form_postwrite(db)', 'await saverecord_onclick()')
 
     //otherwise, if no postwrite function then assume that
     //returned data is a url and open it (in a new tab by preference or a new window if cannot)
@@ -3702,12 +3702,12 @@ async function unbound_form_write() {
     //send the instructions for processing and open the report
     db.request = 'EXECUTE\r' + gmodule + '\r' + gdatafilename
     if (!(yield* db.send(gro.revstr))) {
-        yield* fromPromise( exodusinvalid(db.response) )
+        await exodusinvalid(db.response)
         return false
     }
     setchangesmade(false)
     if (db.response.slice(0, 3) == 'OK ') {
-        yield* fromPromise( exodusnote(db.response.slice(3)) )
+        await exodusnote(db.response.slice(3))
     }
 
     return true
@@ -3725,7 +3725,7 @@ async function closerecord_onclick() {
 
         //user confirms or cancels
         if (gchangesmade) {
-            var response = await exodusconfirm('Discard data or instructions entered ?', 1, '', 'D<u>i</u>scard', '<u>C</u>ancel') )
+            var response = await exodusconfirm('Discard data or instructions entered ?', 1, '', 'D<u>i</u>scard', '<u>C</u>ancel')
             if (response != 2) return false
         }
 
@@ -3736,7 +3736,7 @@ async function closerecord_onclick() {
             gwindowunloading = true
             if (!gchangesmade)
                 returnvalue = 'ACCESS ' + gkey
-            yield* fromPromise( cleardoc() ) )
+            await cleardoc()
         }
 
         if (window.dialogArguments) {
@@ -3749,7 +3749,7 @@ async function closerecord_onclick() {
 
     }
 
-    return await closedoc('CLOSE') )
+    return await closedoc('CLOSE')
 
 }
 
@@ -3759,7 +3759,7 @@ async function deleterecord_onclick(event) {
 
     event = getevent(event)
 
-    if (!(await deletedoc() )))
+    if (!(await deletedoc()))
         return exoduscancelevent(event)
 
     //prune the cache to reselect any deleted record
@@ -3808,14 +3808,14 @@ var gopening = false
 async function opendoc(newkey) {
 
     //login('opendoc')
-    var result = yield* fromPromise( opendoc_body(newkey) )
+    var result = await opendoc_body(newkey)
     //logout('opendoc '+result)
 
     return result
 }
 
 async function opendoc_body(newkey) {
-    //await debug('opendoc:'+newkey) )
+    //await debug('opendoc:'+newkey)
     //how to avoid double calls from multiple timeouts
     if (newkey == gkey && glocked)
         return true
@@ -3837,7 +3837,7 @@ async function opendoc_body(newkey) {
 
     //gopening = true
     //login('pre opendoc2')
-    var opened = yield* fromPromise( opendoc2(newkey) )
+    var opened = await opendoc2(newkey)
     //logout('pre opendoc2 opened='+opened)
     gopening = false
 
@@ -3845,7 +3845,7 @@ async function opendoc_body(newkey) {
     if (opened && gKeyNodes) {
         if (!gkeys.exoduslocate(gkey)) {
             gkeys = gkeys.exodusinsert(gkeyn + 1 + 1, gkey)
-            yield* fromPromise( setgkeys(gkeys) )
+            await setgkeys(gkeys)
             if (gkeys.length > 1)
                 gkeyn++
         }
@@ -3869,7 +3869,7 @@ function getlockholder(response) {
 }
 
 async function opendoc2(newkey0) {
-    //await debug('opendoc2:'+newkey0) )
+    //await debug('opendoc2:'+newkey0)
 
     //login('opendoc2')
 
@@ -3880,7 +3880,7 @@ async function opendoc2(newkey0) {
     }
     else {
         if (gKeyNodes) {
-            newkey = yield* fromPromise( getkey() )
+            newkey = await getkey()
             if (newkey == gkey && gloaded) {
                 //newkey=''
                 return false //logout('opendoc2 - no new key')
@@ -3895,20 +3895,20 @@ async function opendoc2(newkey0) {
     //unload previous doc first
     ///////////////////////////
     //have to clear even if not loaded othewise setkeyvalues fails because gds.data not yet available when key=xxx in the url
-    if (!(await closedoc('OPEN') ))) {
+    if (!(await closedoc('OPEN'))) {
         //qqq should try and restore the previous key data?
         return false //logout('opendoc2 - did not close currently open doc')
     }
 
-    await setkeyvalues(newkey) )//closedoc zaps them.
+    await setkeyvalues(newkey)//closedoc zaps them.
     gkey = newkey
-    gkeyexternal = yield* fromPromise( getkeyexternal() )
+    gkeyexternal = await getkeyexternal()
 
     //optional preread function (returns false to abort)
     if (typeof (form_preread) == 'function') {
 
         ///log('preread external key=' + gkeyexternal + ' internalkey=' + gkey)
-        if (!(yield* exodusevaluateall('await form_preread() )', 'await opendoc2()')))
+        if (!(yield* exodusevaluateall('await form_preread()', 'await opendoc2()')))
             return false //logout('opendoc2 - preread false')
 
     }
@@ -3929,7 +3929,7 @@ async function opendoc2(newkey0) {
     //switch off one-time option
     gparameters.openreadonly = false
 
-    yield* fromPromise( loadnewkey() )
+    await loadnewkey()
 
     glocked = gro.sessionid != ''
     //ensure lock is automatically re-locked every x minutes while record is active on-screen
@@ -3941,18 +3941,18 @@ async function opendoc2(newkey0) {
 
     if (!gro.data) {
         if (glocked)
-            yield* fromPromise( unlockdoc() )//fail safe
+            await unlockdoc()//fail safe
 
         //logout('opendoc2 - no data')
-        return yield* fromPromise( exodusinvalid(gro.response) )
+        return await exodusinvalid(gro.response)
     }
 
     var lockholder = getlockholder(db.response)
 
     if (db.response.toUpperCase().slice(0, 16) == 'ERROR: NO RECORD') {
         if (gupdateonlymode) {
-            //await exodusinvalid(exodusquote(gkeyexternal) )+' does not exist.')
-            await exodusinvalid(exodusquote(await getkeyexternal() )) + ' does not exist.')
+            //await exodusinvalid(exodusquote(gkeyexternal)+' does not exist.')
+            await exodusinvalid(exodusquote(await getkeyexternal()) + ' does not exist.')
             //('opendoc2 - cannot create new record because gupdateonlymode is true')
             return false
         }
@@ -3961,44 +3961,44 @@ async function opendoc2(newkey0) {
 
             //cannot create records if cannot lock them
             if (db.response.toUpperCase().indexOf('LOCK NOT AUTHORISED') >= 0) {
-                await exodusinvalid('Sorry, you are not authorised to create new records in this file.') )
+                await exodusinvalid('Sorry, you are not authorised to create new records in this file.')
                 return false //logout('opendoc2 - cannot create new record because lock not authorised')
             }
 
             //may not be authorised to read a record
             if (db.response.toUpperCase().indexOf('NOT AUTHORISED') >= 0) {
-                yield* fromPromise( exodusinvalid(db.response) )
+                await exodusinvalid(db.response)
                 return false //logout('opendoc2 - cannot access record because not authorised')
             }
 
             //cannot create a record in read only mode or update only mode
             if (greadonlymode || gupdateonlymode || gpreventcreation) {
-                //await exodusinvalid('Sorry, '+gkeyexternal+' does not exist and\nyou are not authorised to create new records in this file.') )
-                await exodusinvalid('Sorry, ' + (await getkeyexternal() )) + ' does not exist and\nyou are not authorised to create new records in this file.')
+                //await exodusinvalid('Sorry, '+gkeyexternal+' does not exist and\nyou are not authorised to create new records in this file.')
+                await exodusinvalid('Sorry, ' + (await getkeyexternal()) + ' does not exist and\nyou are not authorised to create new records in this file.')
                 return false //logout('opendoc2 - cannot create new record in read only mode')
             }
 
             //cannot create a record without a lock
             //if possible get another default key
             if (gKeyNodes.length == 1 && gKeyNodes[0].getAttribute('exodusdefaultvalue')) {
-                var newkey = yield* fromPromise( getdefault(gKeyNodes[0]) ) )
+                var newkey = await getdefault(gKeyNodes[0])
                 if (newkey && newkey != gkey) {
                     //logout('opendoc2 - cannot create new record because ' + lockholder + ' is creating it.')
-                    return yield* fromPromise( opendoc2(newkey) )
+                    return await opendoc2(newkey)
                 }
             }
 
-            await exodusinvalid(exodusquote(gkeyexternal) ) + ' is being created by ' + lockholder + '.\r\n\r\nYou cannot view or update it until they have finished or cancel.')
+            await exodusinvalid(exodusquote(gkeyexternal) + ' is being created by ' + lockholder + '.\r\n\r\nYou cannot view or update it until they have finished or cancel.')
             //logout('opendoc2 - cannot create new record because ' + lockholder + ' is creating it.')
             return false
         }
 
         /*
         //optionally cancel if (record does not exist
-        if (!(await exodusokcancel('Document '+exodusquote(getkeyexternal) )+' does not exist. Create a new document ?',2))) {
+        if (!(await exodusokcancel('Document '+exodusquote(getkeyexternal)+' does not exist. Create a new document ?',2))) {
 
         if (glocked)
-        yield* fromPromise( unlockdoc() )
+        await unlockdoc()
         exoduscancelevent(event)
         return false //logout('opendoc - user chose not to create new record')
         }
@@ -4022,7 +4022,7 @@ async function opendoc2(newkey0) {
                 }
                 else {
                     if (db.response.toUpperCase().indexOf('CANNOT LOCK RECORD') >= 0) {
-                        if ((await exodusconfirm(exodusquote(gkeyexternal) ) + ' is being updated by ' + lockholder + '.\nOpen for viewing only?', 1, 'Yes', '', 'Cancel')) != 1) {
+                        if ((await exodusconfirm(exodusquote(gkeyexternal) + ' is being updated by ' + lockholder + '.\nOpen for viewing only?', 1, 'Yes', '', 'Cancel')) != 1) {
                             return false //logout('opendoc2 - because it is being updated by ' + lockholder + ' and the user chose not to open it in read only mode')
                         }
                         //editreleaserecord.value='Edit'
@@ -4031,9 +4031,9 @@ async function opendoc2(newkey0) {
                     }
                     else {
                         if (db.response.toString().slice(0, 2) != 'OK')
-                            return yield* fromPromise( exodusinvalid(db.response) )
+                            return await exodusinvalid(db.response)
                         else
-                            yield* fromPromise( exodusnote(db.response.toString() ) ).slice(2)
+                            await exodusnote(db.response.toString().slice(2))
                     }
                 }
             }
@@ -4058,12 +4058,12 @@ async function opendoc2(newkey0) {
     //postread
     if (typeof form_postread == 'function') {
         grecn = null
-        if (!(yield* exodusevaluateall('await form_postread() )', 'await opendoc2()')))
-        //if (!(await form_postread() )))
+        if (!(yield* exodusevaluateall('await form_postread()', 'await opendoc2()')))
+        //if (!(await form_postread()))
         {
             if (glocked)
-                yield* fromPromise( unlockdoc() )//fail safe
-            yield* fromPromise( cleardoc() ) )
+                await unlockdoc()//fail safe
+            await cleardoc()
             return false //logout('opendoc2 - postread failed')
         }
 
@@ -4075,7 +4075,7 @@ async function opendoc2(newkey0) {
     else
         wstatus('Formatting, please wait ...')
     gloaded = true
-    yield* gds.load(gro)
+    await gds.load(gro)
 
     if (!gds.isnewrecord)
         wstatus('Existing record')
@@ -4118,10 +4118,10 @@ async function opendoc2(newkey0) {
     //TODO convert all postpostread( to use this new hook function instead of timeout
     if (typeof form_postdisplay == 'function') {
         grecn = null
-        if (!(yield* exodusevaluateall('await form_postdisplay() )', 'await opendoc2()'))) {
+        if (!(yield* exodusevaluateall('await form_postdisplay()', 'await opendoc2()'))) {
             if (glocked)
-                yield* fromPromise( unlockdoc() )//fail safe
-            yield* fromPromise( cleardoc() ) )
+                await unlockdoc()//fail safe
+            await cleardoc()
             return false //logout('opendoc2 - postdisplay failed')
         }
 
@@ -4137,10 +4137,10 @@ async function loadnewkey() {
 
     //load the new key
     if (gkey != gro.key) {
-        yield* fromPromise( setkeyvalues(gro.key) )
-        gkey = yield* fromPromise( getkey() )
+        await setkeyvalues(gro.key)
+        gkey = await getkey()
         //form key  x*y*z* could be a little different than the db key x*y*z
-        gkeyexternal = yield* fromPromise( getkeyexternal() )
+        gkeyexternal = await getkeyexternal()
     }
 
 }
@@ -4156,13 +4156,13 @@ async function closedoc(mode) {
 
     //first update the current field
     //otherwise the db is updated without the last entry!!!
-    //if (save&&!(yield* fromPromise( validateupdate() ) )))
+    //if (save&&!(await validateupdate()))
     // return false
     //should not do validateupdate since maybe called from validateupdate to close/ timeout to open a new record
 
-    //return await saveandorcleardoc(mode,save,clear=mode!='OPEN') )
-    //return await saveandorcleardoc(mode,save=mode!='CLEAR',clear=mode!='OPEN') )
-    var result = yield* fromPromise( saveandorcleardoc(mode) )
+    //return await saveandorcleardoc(mode,save,clear=mode!='OPEN')
+    //return await saveandorcleardoc(mode,save=mode!='CLEAR',clear=mode!='OPEN')
+    var result = await saveandorcleardoc(mode)
 
     /*/msie needs to result null otherwise prompts to leave or stay in window
     //this is how we tell that we are in msie and onbeforeunload event
@@ -4178,11 +4178,11 @@ async function closedoc(mode) {
 
 //makedoc readonly
 async function saveandunlockdoc() {
-    if (!(yield* fromPromise( validateupdate() ) )))
+    if (!(await validateupdate()))
         return false
-    if (gchangesmade && !(await savedoc() )))
+    if (gchangesmade && !(await savedoc()))
         return false
-    if (!(await unlockdoc() )))
+    if (!(await unlockdoc()))
         return false
     return true
 }
@@ -4198,7 +4198,7 @@ async function savedoc(mode) {
         return false
 
     gform_in_savedoc = true
-    var result = yield* fromPromise( savedoc_body(mode) )
+    var result = await savedoc_body(mode)
     gform_in_savedoc = false
 
     return result
@@ -4206,22 +4206,22 @@ async function savedoc(mode) {
 
 async function savedoc_body(mode) {
 
-    //called from await saverecord_onclick() )
+    //called from await saverecord_onclick()
     if (!mode)
         mode = 'SAVE'
 
     //first update the current field
     //otherwise the db is updated without the last entry!!!
-    if (!(yield* fromPromise( validateupdate() ) )))
+    if (!(await validateupdate()))
         return false
 
     if (gKeyNodes && (!gchangesmade || !glocked) && !gallowsavewithoutchanges) {
-        await exodusinvalid('Nothing to be saved.\n\nPlease enter or change some data first or just click Close') )
+        await exodusinvalid('Nothing to be saved.\n\nPlease enter or change some data first or just click Close')
         return false
     }
 
-    //return await saveandorcleardoc(mode,save=true,clear=false) )
-    return yield* fromPromise( saveandorcleardoc(mode) )
+    //return await saveandorcleardoc(mode,save=true,clear=false)
+    return await saveandorcleardoc(mode)
 
 }
 
@@ -4237,7 +4237,7 @@ async function saveandorcleardoc(mode) {
 
     gform_in_saveandorcleardoc = true
 
-    var result = yield* fromPromise( saveandorcleardoc_body(mode) )
+    var result = await saveandorcleardoc_body(mode)
 
     gform_in_saveandorcleardoc = false
 
@@ -4246,14 +4246,14 @@ async function saveandorcleardoc(mode) {
 
 async function saveandorcleardoc_body(mode) {
 
-    // await debug('saveandorcleardoc:'+mode) )
+    // await debug('saveandorcleardoc:'+mode)
 
     //mode CLOSE, SAVE, CLEAR, CHANGEKEY, PRINT
     var save = (mode != 'CLOSE')
     //var clear=(mode!='SAVE'&&mode!='OPEN'&&mode!='CLOSE')
     var clear = (mode == 'CLOSE' || mode == 'NEW' || mode == 'CLEAR')
     var unlock = (mode != 'SAVE' && mode != 'PRINT' && mode != 'LIST' && mode != 'NEW')
-    //await debug('saveandorclear '+save+' '+clear+' '+unlock) )
+    //await debug('saveandorclear '+save+' '+clear+' '+unlock)
     //called from
     //should not do validateupdate since maybe called from validateupdate to close/ timeout to open a new record
 
@@ -4273,7 +4273,7 @@ async function saveandorcleardoc_body(mode) {
 
     //first update the current field
     //otherwise the db is updated without the last entry!!!
-    //if (save&&!(yield* fromPromise( validateupdate() ) )))
+    //if (save&&!(await validateupdate()))
     // return false //logout('saveandorcleardoc - invalidateupdate failed')
 
     //if anything updated then option to save
@@ -4290,7 +4290,7 @@ async function saveandorcleardoc_body(mode) {
     ) {
 
         //check last data entry is valid unless closing in which case discard will not validate
-        if (mode != 'CHANGEKEY' && mode != 'CLOSE' && !(yield* fromPromise( validateupdate() ) ))) {
+        if (mode != 'CHANGEKEY' && mode != 'CLOSE' && !(await validateupdate())) {
             focusongpreviouselement()
             return false //logout('saveandorcleardoc - invalid input')
         }
@@ -4300,7 +4300,7 @@ async function saveandorcleardoc_body(mode) {
 
             //confirm specific save
             if (gparameters.savemode == 'CONFIRM') {
-                if (!(await exodusokcancel('OK to save ' + exodusquote(gkeyexternal.exodusconvert('*', ' ') )) + ' ?', 1))) {
+                if (!(await exodusokcancel('OK to save ' + exodusquote(gkeyexternal.exodusconvert('*', ' ')) + ' ?', 1))) {
                     //return false
                     return false //logout('saveandorcleardoc - user cancelled')
                 }
@@ -4325,7 +4325,7 @@ async function saveandorcleardoc_body(mode) {
                 action += discardtitle
             }
             var canceltitle = '<u>C</u>ancel'//Cancel
-            var response = await exodusconfirm(action + ' ' + exodusquote(gkeyexternal.exodusconvert('*', ' ') )) + ' ?', 1, savetitle, discardtitle, canceltitle)
+            var response = await exodusconfirm(action + ' ' + exodusquote(gkeyexternal.exodusconvert('*', ' ')) + ' ?', 1, savetitle, discardtitle, canceltitle)
         }
 
         //user cancels
@@ -4342,8 +4342,8 @@ async function saveandorcleardoc_body(mode) {
 
             //first update the current field
             //otherwise the db is updated without the last entry!!!
-            //if (mode!='CHANGEKEY'&&!(yield* fromPromise( validateupdate() ) )))
-            if (mode == 'CLOSE' && !(yield* fromPromise( validateupdate() ) ))) {
+            //if (mode!='CHANGEKEY'&&!(await validateupdate()))
+            if (mode == 'CLOSE' && !(await validateupdate())) {
                 focusongpreviouselement()
                 return false //logout('saveandorcleardoc - user cancelled')
             }
@@ -4352,7 +4352,7 @@ async function saveandorcleardoc_body(mode) {
             var wasnewrecord = gds.isnewrecord
 
             //WRITEDOC
-            if (!(await writedoc(unlock) )))
+            if (!(await writedoc(unlock)))
                 return false //logout('saveandorcleardoc - writedoc failed')
 
             //prepare to close modal window
@@ -4363,7 +4363,7 @@ async function saveandorcleardoc_body(mode) {
         //close window if modal also in deletedoc
         if (window.dialogArguments && (mode == 'SAVE' || mode == 'DELETE' || mode == 'CLOSE')) {
             gwindowunloading = true
-            yield* fromPromise( cleardoc() ) )
+            await cleardoc()
 
             //close the window
             //window.returnValue=''
@@ -4380,12 +4380,12 @@ async function saveandorcleardoc_body(mode) {
 
     //clear
     if (clear || response == 2) {
-        yield* fromPromise( cleardoc() ) )
+        await cleardoc()
     }
 
     //unlock
     else if (unlock && glocked) {
-        if (!(await unlockdoc() )))
+        if (!(await unlockdoc()))
             return false //logout('saveandorcleardoc - could not unlock')
     }
 
@@ -4414,7 +4414,7 @@ async function cleardoc() {
 
     //login('cleardoc')
 
-    if (gKeyNodes && !(await unlockdoc() )))
+    if (gKeyNodes && !(await unlockdoc()))
         return false //logout('cleardoc - unlockdoc failed')
 
     //disable the buttons
@@ -4431,7 +4431,7 @@ async function cleardoc() {
         //    setdisabledandhidden(printsendrecord, true)
     }
 
-    //set this before clear because .load will call yield* fromPromise( newrecordfocus() ) )
+    //set this before clear because .load will call await newrecordfocus()
     //gpreviouselement = null
     //gpreviousvalue = ''
     setgpreviouselement(null)
@@ -4452,7 +4452,7 @@ async function cleardoc() {
         gro.key = ''
         gro.revstr = gro.defaultrevstr
         gro.rev2obj()
-        yield* gds.load(gro)
+        await gds.load(gro)
 
         //any parameters named like form by matching name
         for (var paramid in gparameters) {
@@ -4465,12 +4465,12 @@ async function cleardoc() {
                 var element = $$(paramid)
                 if (element && element[0])
                     element = element[0]
-                yield* fromPromise( insertallrows(element, paramvalue.split(vm) ))
+                await insertallrows(element, paramvalue.split(vm))
             }
 
             //update single values
             else {
-                yield* gds.setx(paramid, null, paramvalue)
+                await gds.setx(paramid, null, paramvalue)
             }
 
         }
@@ -4478,7 +4478,7 @@ async function cleardoc() {
         //  }
         wstatus('')
 
-        yield* fromPromise( resetsortimages() )
+        await resetsortimages()
 
     }
 
@@ -4495,7 +4495,7 @@ async function cleardoc() {
         var focussed = false
         if (gKeyNodes && gKeyNodes.length > 1) {
             for (var ii = 0; ii < gKeyNodes.length; ii++) {
-                yield* fromPromise( setdefault(gKeyNodes[ii]) ) )
+                await setdefault(gKeyNodes[ii])
                 if (!(getvalue(gKeyNodes[ii]))) {
                     focuson(gKeyNodes[ii])
                     focussed = true
@@ -4505,7 +4505,7 @@ async function cleardoc() {
         }
 
         if (!focussed) {
-            yield* fromPromise( setdefault(gstartelement) ) )
+            await setdefault(gstartelement)
             focuson(gstartelement)
             //if (gstartelement&&gstartelement.tagName!='TEXTAREA')
             if (gstartelement.select)
@@ -4522,13 +4522,13 @@ async function cleardoc() {
     }
 
     //force any updates to be validated
-    yield* fromPromise( validateupdate() ) )
+    await validateupdate()
 
     //postdisplay in cleardoc and postinit
     //TODO convert all postpostread( to use this new hook function instead of timeout
     if (typeof form_postdisplay == 'function') {
         grecn = null
-        yield* exodusevaluateall('await form_postdisplay() )', 'yield* formfunctions_onload()')
+        yield* exodusevaluateall('await form_postdisplay()', 'yield* formfunctions_onload()')
     }
 
     //logout('cleardoc')
@@ -4539,7 +4539,7 @@ async function resetsortimages(groupno) {
     //reset the sort buttons
     if (!groupno) {
         for (groupno = 1; groupno < 99; groupno++) {
-            yield* fromPromise( resetsortimages(groupno) )
+            await resetsortimages(groupno)
         }
         return
     }
@@ -4568,17 +4568,17 @@ async function deletedoc() {
 
     //prevent delete if not locked
     if (!glocked)
-        return await exodusinvalid(await readonlydocmsg() ))
+        return await exodusinvalid(await readonlydocmsg())
 
     //prevent delete if new record
     if (gds.isnewrecord)
-        return await exodusinvalid('You cannot delete this document because it hasnt been saved') )
+        return await exodusinvalid('You cannot delete this document because it hasnt been saved')
 
     //login('deletedoc')
 
     var question = exodusquote(gkeyexternal) + '\nWarning! Are you SURE that you want to delete this document?'
-    if ((await exodusyesno(question, 2) )) != 1) {
-        await exodusinvalid('The document has NOT been deleted\nbecause you did not confirm.') )
+    if ((await exodusyesno(question, 2)) != 1) {
+        await exodusinvalid('The document has NOT been deleted\nbecause you did not confirm.')
         return false //logout('deletedoc - user cancelled')
     }
 
@@ -4591,8 +4591,8 @@ async function deletedoc() {
     db.request = 'DELETE\r' + gdatafilename + '\r' + gkey + '\r\r' + gro.sessionid
     if (!(yield* db.send())) {
 
-        //await exodusnote(db.response) )
-        yield* fromPromise( exodusinvalid(db.response) )
+        //await exodusnote(db.response)
+        await exodusinvalid(db.response)
 
         //start the relocker again
         startrelocker()
@@ -4603,17 +4603,17 @@ async function deletedoc() {
 
     //any warnings are appended after response like 'OK xxx'
     if (db.response != 'OK' && typeof form_postdelete == 'undefined')
-        await exoduswarning(db.response.slice(2) ))
+        await exoduswarning(db.response.slice(2))
 
     //deleting a record automatically unlocks it
     glocked = false
 
-    await exoduswarning(exodusquote(gkeyexternal) ) + ' has been deleted.')
+    await exoduswarning(exodusquote(gkeyexternal) + ' has been deleted.')
 
     //close window if modal also in writedoc
     if (window.dialogArguments) {
         gwindowunloading = true
-        yield* fromPromise( cleardoc() ) )
+        await cleardoc()
 
         //close the window
         //window.returnValue = 'DELETE ' + savekey
@@ -4622,7 +4622,7 @@ async function deletedoc() {
 
     }
 
-    yield* fromPromise( cleardoc() ) )
+    await cleardoc()
 
     //logout('deletedoc')
 
@@ -4657,7 +4657,7 @@ async function form_onchangeselect(event) {
         setgpreviouselement(event.target)
     }
 
-    if (!(await validateupdate(event) )))
+    if (!(await validateupdate(event)))
         return exodusinvalid()
 
     //encourage changing key or key part in a SELECT to change record
@@ -4728,7 +4728,7 @@ async function validateall(mode) {
                 //do not default in rows to avoid problem of blank line and first/line line
                 //filling in unwanted data (perhaps select tags also have similar problem)
                 if (!groupno) {
-                    gdefault = yield* fromPromise( getdefault(element) ) )
+                    gdefault = await getdefault(element)
                     if (gdefault != null && gdefault != '') {
                         cell.text = gdefault
                         anydata = true
@@ -4757,7 +4757,7 @@ async function validateall(mode) {
 
             //fail if any missing data
             if (missingelement && (!allowemptyrows || anydata)) {
-                await exodusinvalid(missingelement.getAttribute('exodustitle') ) + ' is required.')
+                await exodusinvalid(missingelement.getAttribute('exodustitle') + ' is required.')
                 focuson(missingelement)
                 return false //logout('validateall ' + mode)
             }
@@ -4769,7 +4769,7 @@ async function validateall(mode) {
                 && rown < (rows.length - 1)) {
                 if (!allowemptyrows) {
                     var missingelement = rows[0][firstcolumnname].element
-                    await exodusinvalid('Empty rows are not allowed for ' + missingelement.getAttribute('exodustitle') ))
+                    await exodusinvalid('Empty rows are not allowed for ' + missingelement.getAttribute('exodustitle'))
                     focuson(missingelement)
                     return false //logout('validateall ' + mode + ' empty row')
                 }
@@ -4790,7 +4790,7 @@ async function validateall(mode) {
             && exodusenabledandvisible($$('exodusgroup' + groupno))
         ) {
             var missingelement = rows[0][firstcolumnname].element
-            await exodusinvalid('At least one ' + missingelement.getAttribute('exodustitle') ) + ' is required.')
+            await exodusinvalid('At least one ' + missingelement.getAttribute('exodustitle') + ' is required.')
             focuson(missingelement)
             return false //logout('validateall ' + mode + ' no rows')
         }
@@ -4807,14 +4807,14 @@ async function writedoc(unlock) {
     //login('writedoc')
 
     //check all required fields are present
-    if (!(await validateall() )))
+    if (!(await validateall()))
         return false //logout('writedoc - validate all failed')
 
     //custom prewrite routine
     goldvalue = ''
     gvalue = ''
     if (typeof (form_prewrite) == 'function') {
-        if (!(yield* exodusevaluateall('await form_prewrite() )', 'await writedoc() )'))) return false
+        if (!(yield* exodusevaluateall('await form_prewrite()', 'await writedoc()'))) return false
         ///log('form_prewrite - after')
     }
 
@@ -4827,8 +4827,8 @@ async function writedoc(unlock) {
     gro.data = gds.data
     if (!(/**/ yield* gro.writex(unlock))) {
 
-        //await exodusnote('Cannot save '+exodusquote(gkeyexternal) )+' because: \r\r'+gro.response)
-        await exodusinvalid('Cannot save ' + exodusquote(gkeyexternal) ) + ' because: \n\n' + gro.response)
+        //await exodusnote('Cannot save '+exodusquote(gkeyexternal)+' because: \r\r'+gro.response)
+        await exodusinvalid('Cannot save ' + exodusquote(gkeyexternal) + ' because: \n\n' + gro.response)
 
         return false //logout('writedoc - write failed')
 
@@ -4836,7 +4836,7 @@ async function writedoc(unlock) {
 
     //any warnings are appended after response like 'OK xxx'
     if (gro.response != 'OK' && typeof form_postwrite == 'undefined') {
-        await exoduswarning(gro.response.slice(2) ))
+        await exoduswarning(gro.response.slice(2))
     }
 
     //if a cached is written then remove it from the cache (could update it instead?)
@@ -4849,7 +4849,7 @@ async function writedoc(unlock) {
         //restart the relocker if failed to save
         startrelocker()
 
-    yield* fromPromise( loadnewkey() )
+    await loadnewkey()
 
     //merge new data back into the screen
     if (gro.data) {
@@ -4858,11 +4858,11 @@ async function writedoc(unlock) {
         //existing gds' elements are pointing to screen elements so do not copy
         //gds.data=gro.data
 
-        /**/ yield* gds.rebind(gro.data)
+        /**/ await gds.rebind(gro.data)
 
         var recn = grecn
         grecn = null
-        yield* fromPromise( calcfields() ) )
+        await calcfields()
         grecn = recn
 
         wstatus('')
@@ -4890,7 +4890,7 @@ async function writedoc(unlock) {
 
 function startrelocker() {
     //2.2 ie try at least two relocks within the locktimeout period
-    grelocker = exodussetinterval('await relockdoc() )', glocktimeoutinmins / 2.2 * 60 * 1000)
+    grelocker = exodussetinterval('await relockdoc()', glocktimeoutinmins / 2.2 * 60 * 1000)
 }
 
 function stoprelocker() {
@@ -4932,10 +4932,10 @@ async function relockdoc() {
             setdisabledandhidden(saverecord, true)
             setgraphicbutton(editreleaserecord, '<u>E</u>dit', geditimage)
             setdisabledandhidden(deleterecord, true)
-            await exoduswarning(response) )
+            await exoduswarning(response)
         }
         else {
-            await exodusnote(response) )
+            await exodusnote(response)
         }
 
     }
@@ -4968,7 +4968,7 @@ async function unlockdoc() {
             db.request = 'UNLOCK\r' + gdatafilename + '\r' + gkey + '\r' + gro.sessionid
             if (yield* db.send())
                 break
-            if (!(await exodusyesno('Cannot release document - try again?\n\n' + db.response) ))) break
+            if (!(await exodusyesno('Cannot release document - try again?\n\n' + db.response))) break
         }
     }
 
@@ -5053,7 +5053,7 @@ function focuson(element) {
 
         //taken out otherwise F7 on job number goes to market code
         // and validateupdate fails because record has not been loaded
-        //yield* fromPromise( setdefault(element) ) )
+        //await setdefault(element)
 
         gfocusonelement = element
         exodussettimeout('focuson2()', 10)
@@ -5206,11 +5206,11 @@ async function document_onfocus(event) {
     }
 
     ///log('drop down any "modal" popup divs')
-    yield* fromPromise( form_closepopups() ) )
+    await form_closepopups()
 
     ///log('quit if refocussing')
     if (element == gonfocuselement) {
-        //  if (yield* fromPromise( setdefault(element) ) ))  if (element.tagName!='TEXTAREA') element.select()
+        //  if (await setdefault(element))  if (element.tagName!='TEXTAREA') element.select()
         return false //logout('document_onfocus')
     }
     gonfocuselement = element
@@ -5226,7 +5226,7 @@ async function document_onfocus(event) {
     ///log('check if changed element')
     if (element != gpreviouselement) {
         ///log('validate/update previous data entry ' + (gpreviouselement ? gpreviouselement.id : ''))
-        if (!(yield* fromPromise( validateupdate() ) )))
+        if (!(await validateupdate()))
             return false //logout('document_onfocus')
     }
 
@@ -5245,7 +5245,7 @@ async function document_onfocus(event) {
 
     ///log('check key fields')
     if (gKeyNodes && !glocked) {
-        if (!(yield* fromPromise( checkrequired(gKeyNodes, element, 0) ) )))
+        if (!(await checkrequired(gKeyNodes, element, 0)))
             return false //logout('document_onfocus' + ' ' + elementid + ' is required but is blank (0)')
     }
 
@@ -5255,7 +5255,7 @@ async function document_onfocus(event) {
     {
 
         ///log('check no missing data in group 0 always')
-        if (!(yield* fromPromise( checkrequired(gfields, element, 0) ) )))
+        if (!(await checkrequired(gfields, element, 0)))
             return false //logout('document_onfocus' + ' ' + elementid + ' a prior element is visible and required but is blank (1)')
 
         //check specific group if >0
@@ -5263,7 +5263,7 @@ async function document_onfocus(event) {
         //if (Number(element.getAttribute('exodusgroupno')))
         //{
         // elements=getancestor(element,'TR').all
-        // if (!(yield* fromPromise( checkrequired(elements,element,Number(element.getAttribute('exodusgroupno') ) )))))
+        // if (!(await checkrequired(elements,element,Number(element.getAttribute('exodusgroupno')))))
         //  return false //logout('document_onfocus'+' '+elementid+' a prior element is visible and required but is blank (2)')
         //}
 
@@ -5277,14 +5277,14 @@ async function document_onfocus(event) {
     //if (!gloaded&&gKeyNodes&&element.getAttribute('exodusfieldno')!=0)
     //dont check if element not changed to avoid endless loop if opendoc errors
     if (gKeyNodes && element != gpreviouselement) {
-        var nextkey = await getkey() )
+        var nextkey = await getkey()
         //if (nextkey.toUpperCase() != nextkey)
         //    xxx = 1
         if (nextkey && (gloaded && nextkey != gkey) || (!gloaded && element.getAttribute('exodusfieldno') != 0))
         //if (key&&(gloaded&&key!=gkey)||(!gloaded))
         {
-            //exodussettimeout('await opendoc() )',100)
-            await opendoc(nextkey) )
+            //exodussettimeout('await opendoc()',100)
+            await opendoc(nextkey)
             return false //logout('document_onfocus' + ' ' + exodusquote(elementid) + ' new record')
         }
     }
@@ -5309,7 +5309,7 @@ async function document_onfocus(event) {
     setgpreviouselement(element)
 
     ///log('set the default of the current element')
-    yield* fromPromise( setdefault(element, donotvalidateupdate = true) ) )
+    await setdefault(element, donotvalidateupdate = true)
 
     ///log('deselect previous (this does not work unless .select() is used')
     ///log(' but causes a problem in focussing on the previous element and rescrolling')
@@ -5388,7 +5388,7 @@ event=getevent(event)
 //alert(event.target.getAttribute)
 //alert('onclickradiocheckbox')
 //validate or return to original
-if (!(yield* fromPromise( validateupdate() ) ))) {
+if (!(await validateupdate())) {
 
 setvalue(gpreviouselement,gpreviousvalue)
 return
@@ -5411,14 +5411,14 @@ async function onclickradiocheckbox(event) {
         //get the CURRENT value BEFORE it was clicked
         //NB converted to grecn/gpreviousvalue IF AND AFTER previous element validates below
         var recn = getrecn(event.target)
-        var previousvalue = yield* gds.getx(event.target, recn)
+        var previousvalue = await gds.getx(event.target, recn)
         //checkbox and radio buttons are currently not supported in multivalues
         //so the following is probably never executed
         if (typeof recn == 'number')
             previousvalue = previousvalue[0]
 
         //validate the PREVIOUS field
-        if (!(yield* fromPromise( validateupdate() ) ))) {
+        if (!(await validateupdate())) {
             //if returning to previous field then reset the CURRENT element
             // back to what it was prior to clicking it
             setvalue(event.target, previousvalue)
@@ -5439,7 +5439,7 @@ async function onclickradiocheckbox(event) {
     //alert(event.target.getAttribute)
     //alert('onclickradiocheckbox')
     //validate or return to original
-    if (!(yield* fromPromise( validateupdate() ) ))) {
+    if (!(await validateupdate())) {
         setvalue(gpreviouselement, gpreviousvalue)
         return
     }
@@ -5474,7 +5474,7 @@ async function validateupdate() {
     var elements
     if (Number(gpreviouselement.getAttribute('exodusgroupno'))) {
         elements = getancestor(gpreviouselement, 'TR').getElementsByTagName('*')
-        if (!(yield* fromPromise( checkrequired(elements, gpreviouselement, Number(gpreviouselement.getAttribute('exodusgroupno') ) ))))) {
+        if (!(await checkrequired(elements, gpreviouselement, Number(gpreviouselement.getAttribute('exodusgroupno'))))) {
             setvalue(gpreviouselement, gpreviousvalue)
             return false //logout('validateupdate ' + id + ' a prior element is visible and required but is blank')
         }
@@ -5502,7 +5502,7 @@ async function validateupdate() {
     //validate it and put back focus if it fails
     ////////////////////////////////////////////
     //NOTE gets/sets gvalue
-    if (!(await onbeforeupdate(gpreviouselement) ))) {
+    if (!(await onbeforeupdate(gpreviouselement))) {
         focusongpreviouselement()
 
         //logout('validateupdate - onbeforeupdate failed')
@@ -5524,7 +5524,7 @@ async function validateupdate() {
             multiplegvalue = true
 
             var elementid = gpreviouselement.id
-            await insertallrows(gpreviouselement, gvalue) )
+            await insertallrows(gpreviouselement, gvalue)
 
             //focus on next element AFTER table
             element = $$(elementid)
@@ -5542,7 +5542,7 @@ async function validateupdate() {
     if (!multiplegvalue) {
         var defaulted = gpreviouselement.dataitem && gpreviouselement.dataitem.defaulted
 
-        yield* gds.setx(gpreviouselement, grecn, gvalue)
+        await gds.setx(gpreviouselement, grecn, gvalue)
 
         //restore defaulted status if case it was reset by setx
         if (defaulted)
@@ -5555,17 +5555,17 @@ async function validateupdate() {
         var nextkey
         if (gKeyNodes
          && gpreviouselement.getAttribute('exodusfieldno') == 0
-         && (nextkey = await getkey() ))
+         && (nextkey = await getkey())
          && nextkey != gkey) {
             //do not change key if user chooses not to unload an existing document
-            if (!(await closedoc('CHANGEKEY') ))) {
+            if (!(await closedoc('CHANGEKEY'))) {
                 focusongpreviouselement()
                 return false //logout('validateupdate - closedoc refused')
             }
     
             //return false and just allow opendoc to happen
     
-            //exodussettimeout('await opendoc("'+nextkey+'") )',1)
+            //exodussettimeout('await opendoc("'+nextkey+'")',1)
             //alert('DEBUG: settimeout opendoc gkey:'+gkey+' nextkey:'+nextkey)
             //settimeout results in overlapping xmlhttp requests in FF 3.0.3
             //eg alt+P
@@ -5576,7 +5576,7 @@ async function validateupdate() {
             //5.opendoc timesout(?!)
             //6.opendoc issues ANOTHER XML request and we get a trap message due to this.listening being already set
             //try to avoid the above by calling opendoc directly BUT this may cause errors on return from validateupdate
-            await opendoc(nextkey) )
+            await opendoc(nextkey)
     
             //logout('validateupdate - opendoc')
             return false
@@ -5592,7 +5592,7 @@ async function validateupdate() {
     }
 
     //calculate dependencies
-    await calcfields(gdependents) )
+    await calcfields(gdependents)
     gdependents = []
 
     //why is this necessary?
@@ -5653,7 +5653,7 @@ async function earlyupdate() {
     if (!gpreviouselement || !gpreviouselement.id || (gpreviouselement.type && gpreviouselement.type == 'button'))
         return
 
-    yield* gds.setx(gpreviouselement, grecn, gvalue)
+    await gds.setx(gpreviouselement, grecn, gvalue)
 
 }
 
@@ -5716,7 +5716,7 @@ async function checkrequired(elements, element, groupno) {
                     && getvalue(element2) == '') {
 
                     //try to set the default
-                    if (!(yield* fromPromise( setdefault(element2) ) )) && exodusenabledandvisible(element2)) {
+                    if (!(await setdefault(element2)) && exodusenabledandvisible(element2)) {
                         focuson(element2)
                         return false
                     }
@@ -5731,7 +5731,7 @@ async function checkrequired(elements, element, groupno) {
 
                         //put up a message unless is the first column of a row
                         if (true || !(element2.getAttribute('exodusisfirstinputcolumn')))
-                            await exodusinvalid(element2.getAttribute('exodustitle') ) + ' is required..')
+                            await exodusinvalid(element2.getAttribute('exodustitle') + ' is required..')
 
                         focuson(element2)
                         //if (!(Number(element2.getAttribute('exodusgroupno'))))
@@ -6170,7 +6170,7 @@ async function readonly_onchange(event) {
 
     setvalue(gpreviouselement, gpreviousvalue)
 
-    await exodusinvalid(readonlymsg) )
+    await exodusinvalid(readonlymsg)
 
     return exoduscancelevent(event)
 
@@ -6417,7 +6417,7 @@ async function getdefault(element) {
     //login('getdefault ' + element.id)
 
     //calculate default
-    var defaultvalue = yield* exodusevaluate(defaultvalueexpression, 'yield* fromPromise( getdefault(' + element.id + ') ) )')
+    var defaultvalue = yield* exodusevaluate(defaultvalueexpression, 'await getdefault(' + element.id + ')')
 
     //select elements always have a default
     if (element.tagName == 'SELECT') {
@@ -6436,7 +6436,7 @@ async function getdefault(element) {
     if (typeof defaultvalue == 'number')
         defaultvalue = defaultvalue.toString()
     if (typeof defaultvalue != 'string') {
-        await exodusinvalid(element.id + ' default returned is ' + typeof defaultvalue + ' - "" used\nExpression:' + defaultvalueexpression) )
+        await exodusinvalid(element.id + ' default returned is ' + typeof defaultvalue + ' - "" used\nExpression:' + defaultvalueexpression)
         defaultvalue = ''
     }
 
@@ -6508,7 +6508,7 @@ async function setdefault(element, donotupdate) {
     //get the default value
     var storegrecn = grecn
     grecn = getrecn(element)
-    gdefault = yield* fromPromise( getdefault(element) ) )
+    gdefault = await getdefault(element)
     grecn = storegrecn
 
     //for select elements with no default, the first element is the default
@@ -6528,9 +6528,9 @@ async function setdefault(element, donotupdate) {
     element.setAttribute('exodusdefault', gdefault)
 
     //set the value (externally only)
-    //yield* gds.setx(element,grecn,gdefault)
+    //await gds.setx(element,grecn,gdefault)
 
-    setvalue(element, await oconvertvalue(gdefault, element.getAttribute('exodusconversion') )))
+    setvalue(element, await oconvertvalue(gdefault, element.getAttribute('exodusconversion')))
 
     //call the validate/update routine
     if (!donotupdate) {
@@ -6543,7 +6543,7 @@ async function setdefault(element, donotupdate) {
         //gpreviousvalue = ''//gpreviousvalue=value
         setgpreviouselement(element, '')
 
-        if (!(yield* fromPromise( validateupdate() ) ))) {
+        if (!(await validateupdate())) {
             //logout('setdefault ' + element.id + ' invalid')
             return false
         }
@@ -6592,13 +6592,13 @@ async function onbeforeupdate(element) {
     //if (element.getAttribute('exodusfieldno')!=0&&gKeyNodes&&(!glocked||saverecord.getAttribute('disabled')))
     if (element.getAttribute('exodusfieldno') != 0 && gKeyNodes && !glocked) {
         setvalue(gpreviouselement, gpreviousvalue)
-        await readonlydocmsg() )
+        await readonlydocmsg()
         //logout('onbeforeupdate')
-        return await exodusinvalid('') )
+        return await exodusinvalid('')
     }
 
     //post entry processing
-    if (!(await validate(element) ))) {
+    if (!(await validate(element))) {
         //this should already have been done in the validate routine
         //element.focus()
         return false //logout('onbeforeupdate')
@@ -6610,7 +6610,7 @@ async function onbeforeupdate(element) {
 
 }
 
-//only called from yield* fromPromise( validateupdate() ) ) so some code might be unnecessary duplicated like getvalue() etc
+//only called from await validateupdate() so some code might be unnecessary duplicated like getvalue() etc
 async function validate(element) {
 
     //new value
@@ -6640,7 +6640,7 @@ async function validate(element) {
         var tt = gvalue.toUpperCase()
         if (tt != gvalue) {
             gvalue = tt
-            //update it immediately in case something like await getkey() )
+            //update it immediately in case something like await getkey()
             setvalue(element, gvalue)
         }
     }
@@ -6676,7 +6676,7 @@ async function validate(element) {
 
             //prevent anything that is effectively 0 unless it is a checkbox
             if (element.type != 'checkbox' && exodusnum(gvalue) && !Number(gvalue)) {
-                await exodusinvalid(elementtitle + ' cannot be zero') )
+                await exodusinvalid(elementtitle + ' cannot be zero')
                 return false //logout('validate')
             }
         }
@@ -6704,7 +6704,7 @@ async function validate(element) {
             //get used invalid characters
             charsx = invalidcharacters.exodusconvert(charsx, '').exodusswap('|', '&#124;')
             //.exodusswap(fm,'&u'+fm.charCodeAt(0)+';')
-            await exodusinvalid('The following characters are not allowed in ' + elementtitle + '.\n\n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="border:1px solid #DDDDDD;padding-bottom:2px"> ' + charsx.exodusswap(' ', ' space ') ) + '&nbsp;</span><br />&nbsp;')
+            await exodusinvalid('The following characters are not allowed in ' + elementtitle + '.\n\n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="border:1px solid #DDDDDD;padding-bottom:2px"> ' + charsx.exodusswap(' ', ' space ') + '&nbsp;</span><br />&nbsp;')
             return false //logout('validate')
         }
 
@@ -6713,7 +6713,7 @@ async function validate(element) {
 
             var temp = gvalue.exodusconvert(element.getAttribute('exodusvalidcharacters'), '')
             if (temp != '') {
-                await exodusinvalid('Only the following characters are allowed in ' + elementtitle + '.\n\&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"' + element.getAttribute('exodusvalidcharacters') ).exodusswap('|', '&#124;') + '\"')
+                await exodusinvalid('Only the following characters are allowed in ' + elementtitle + '.\n\&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"' + element.getAttribute('exodusvalidcharacters').exodusswap('|', '&#124;') + '\"')
                 return false //logout('validate')
             }
         }
@@ -6725,7 +6725,7 @@ async function validate(element) {
     if (gvalue == ''
         && element.getAttribute('exodusrequired')
         && exodusenabledandvisible(element)) {
-        await exodusinvalid(elementtitle + ' is required...') )
+        await exodusinvalid(elementtitle + ' is required...')
         return false //logout('validate')
     }
 
@@ -6746,7 +6746,7 @@ async function validate(element) {
 
             if (db.response.indexOf('NO RECORD') >= 0) db.response = exodusquote(gvalue) + ' ' + element.getAttribute('exodustitle') + ' is not on file.'
 
-            yield* fromPromise( exodusinvalid(db.response) )
+            await exodusinvalid(db.response)
 
             return false //logout('validate - not on file ' + gvalue)
 
@@ -6784,14 +6784,14 @@ async function validate(element) {
         var expression = convarray[0] + '(' + '"ICONV","' + value + '","' + convarray.slice(1) + '")'
 
         gmsg = ''
-        ivalue = yield* exodusevaluate(expression, 'await validate(' + element.id + ') ) iconv')
+        ivalue = yield* exodusevaluate(expression, 'await validate(' + element.id + ') iconv')
         if (typeof ivalue == 'undefined')
             return false //logout('validate - system error in input conversion')
 
         //null means failed to convert to internal value therefore invalid
         if (gvalue == null || ivalue == null) {
             //error message (use the conversion program name in the message)
-            await exodusinvalid(exodusquote(gvalue) ) + ' is not a valid ' + convarray[0].toLowerCase().replace(/_/g, ' ') + '\n\n' + gmsg)
+            await exodusinvalid(exodusquote(gvalue) + ' is not a valid ' + convarray[0].toLowerCase().replace(/_/g, ' ') + '\n\n' + gmsg)
             return false //logout('validate - input conversion returned null')
         }
 
@@ -6810,13 +6810,13 @@ async function validate(element) {
         if (typeof elementvalidation == 'function')
             ok = elementvalidation()
         else
-            ok = yield* exodusevaluate(elementvalidation, 'await validate() ) functioncode')
+            ok = yield* exodusevaluate(elementvalidation, 'await validate() functioncode')
 
         if (gvalue == null)
-            await exoduswarning(element.id + ' validation routine returned gvalue=null') )
+            await exoduswarning(element.id + ' validation routine returned gvalue=null')
         if (!ok || gvalue == null) {
             grecn = storegrecn
-            await exodusinvalid() )
+            await exodusinvalid()
             console.log('validate - VALIDATION FUNCTION CODE RETURNED FALSE OR GVALUE AS NULL')
             return false //logout('validate - validation function code returned false or gvalue as null')
         }
@@ -6830,7 +6830,7 @@ async function validate(element) {
     //check for uniqueness for multivalues
     //log('before unique check')
     if (gvalue && ggroupno > 0 && element.getAttribute('exodusunique')) {
-        var othervalues = yield* gds.getall(element.id)
+        var othervalues = await gds.getall(element.id)
         var ln
         //othervalues[grecn]='' //not needed because only validate if changed
         othervalues[grecn] = '' //put back because of a validation after a multiple choice popup fails
@@ -6839,12 +6839,12 @@ async function validate(element) {
             if (element.getAttribute('exodusnonuniquewarning')) {
                 if (!(confirm('Warning:\n\n' + gmsg, 1))) {
                     //logout('validate - not unique warning')
-                    return await exodusinvalid() )
+                    return await exodusinvalid()
                 }
             }
             else {
                 //logout('validate - not unique')
-                return await exodusinvalid(gmsg) )
+                return await exodusinvalid(gmsg)
             }
         }
     }
@@ -6858,18 +6858,18 @@ async function validate(element) {
         var title = element.getAttribute('exodustitle')
         if (elementsequence == 'A') {
             var temp
-            if ((temp = await getpreviousrow('', true, true) ))
+            if ((temp = await getpreviousrow('', true, true))
                 && gvalue < temp) {
                 //    alert(typeof gvalue+' '+gvalue+' < '+typeof temp+' '+temp)
                 //logout('validate - not sequential')
-                return await exodusinvalid(title + ' cannot be less than ' + title + ' in the previous row above') )
+                return await exodusinvalid(title + ' cannot be less than ' + title + ' in the previous row above')
             }
             var temp
-            if ((temp = await getnextrow('', true, true) ))
+            if ((temp = await getnextrow('', true, true))
                 && gvalue > temp) {
                 //    alert(typeof gvalue+' '+gvalue+' > '+typeof temp+' '+temp)
                 //logout('validate - not sequential')
-                return await exodusinvalid(title + ' cannot be greater than ' + title + ' in the next row below') )
+                return await exodusinvalid(title + ' cannot be greater than ' + title + ' in the next row below')
             }
         }
     }
@@ -6877,7 +6877,7 @@ async function validate(element) {
     //output conversion
     //log('before output conversion')
 
-    ovalue = await validateoconv(element, gvalue) )
+    ovalue = await validateoconv(element, gvalue)
     if (ovalue == 'undefined' || ovalue == null)
         return false //logout('validate - oconv failed')
 
@@ -6931,7 +6931,7 @@ async function validateoconv(element, ivalue) {
 
     //null means failed to convert to external value therefore invalid
     if (ovalue == null) {
-        await exodusinvalid(exodusquote(ivalue) ) + ' is not a valid ' + convarray[0].toLowerCase() + '\n' + gmsg)
+        await exodusinvalid(exodusquote(ivalue) + ' is not a valid ' + convarray[0].toLowerCase() + '\n' + gmsg)
         return false
     }
 
@@ -6956,7 +6956,7 @@ async function calcfields(fieldns) {
         for (var fn = 0; fn < gfields.length; fn++) {
             var field = gfields[fn]
             if (!field) {
-                systemerror('yield* fromPromise( calcfields() ) )', 'gfields[' + fn + '] is undefined.')
+                systemerror('await calcfields()', 'gfields[' + fn + '] is undefined.')
             }
             else {
                 if (field.getAttribute('exodusfunctioncode') && field.getAttribute('exodustype') != 'F') {
@@ -6990,7 +6990,7 @@ async function calcfields(fieldns) {
                 }
 
                 //recalculate and update record
-                yield* gds.regetx(field.id)
+                await gds.regetx(field.id)
 
             }
         }
@@ -7065,14 +7065,14 @@ function* exodusevaluate(functionorcode, callerfunctionname, arg1name, arg1, thi
             //} if (e) {
             //if (typeof callerfunctionname == 'undefined') callerfunctionname = '"not specified"'
             systemerror('yield* exodusevaluate()' + functionorcode, e)
-            return await exodusinvalid() )
+            return await exodusinvalid()
         }
 
     }
 
     //check that the function returned something
     //if (typeof result == 'undefined') {
-    //    await exodusinvalid('Error in' + '\n' + functioncode.toString() ).substr(0, 500))
+    //    await exodusinvalid('Error in' + '\n' + functioncode.toString().substr(0, 500))
     //    systemerror('yield* exodusevaluate()', 'Function returned "undefined"\nCalled from ' + callerfunctionname + '\n\n' + functioncode.toString().substr(0, 500))
     //    result = ''
     //}
@@ -7102,16 +7102,10 @@ function* exodusevaluate3(functionorcode, functionname, arg1name, arg1, thisobje
         functioncode = 'return ' + functioncode
 
     //yielding function code - wrap in a generator function
-    // updated for async conversion
-    var hasAwait = functioncode.match && functioncode.match(/await /);
-    if (functioncode.match && (functioncode.match(gyieldregex) || hasAwait)) {
+    if (functioncode.match && functioncode.match(gyieldregex)) {
         if (guseyield) {
             try {
-                if (hasAwait) {
-                    /* yield */ functioncode = 'return async function (){' + functioncode + '}'
-                } else {
-                    /* yield */ functioncode = 'return function *(){' + functioncode + '}'
-                }
+                /* yield */ functioncode = 'return function *(){' + functioncode + '}'
                 //arg1name can be the textual name of any variable or argumentname in the text of the function code
                 functionx = new Function(arg1name, functioncode)
             }
@@ -7122,11 +7116,7 @@ function* exodusevaluate3(functionorcode, functionname, arg1name, arg1, thisobje
                 try {
 
                     //we pass in the value of arg1 when calling the function
-                    if (hasAwait) {
-                        /* yield */ var result = await functionx(arg1).apply(thisobject || this)() );
-                    } else {
-                        /* yield */var result = yield* functionx(arg1).apply(thisobject || this)
-                    }
+                    /* yield */var result = yield* functionx(arg1).apply(thisobject || this)
                     return result
                 }
                 catch (e) {
@@ -7135,11 +7125,7 @@ function* exodusevaluate3(functionorcode, functionname, arg1name, arg1, thisobje
                 //commented out to enable showing of run time script errors
             } else {
                     //we pass in the value of arg1 when calling the function
-                    if (hasAwait) {
-                        /* yield */ var result = await functionx(arg1).apply(thisobject || this)() );
-                    } else {
-                        /* yield */var result = yield* functionx(arg1).apply(thisobject || this)
-                    }
+                    /* yield */var result = yield* functionx(arg1).apply(thisobject || this)
                 return result
             }
 
@@ -7168,11 +7154,11 @@ async function oconvertvalue(ivalue, conversion) {
 }
 
 async function deleterow_onclick(event) {
-    return await form_deleterow(event) )
+    return await form_deleterow(event)
 }
 
 async function insertrow_onclick(event) {
-    return await form_insertrow(event) )
+    return await form_insertrow(event)
 }
 
 //'''''''''''
@@ -7209,13 +7195,13 @@ async function form_deleterow(event, element) {
         (gpreviouselement
         && (Number(gpreviouselement.getAttribute('exodusgroupno')) != groupno
             || getrecn(gpreviouselement) != rown)
-        && !(yield* fromPromise( validateupdate() ) ))
+        && !(await validateupdate())
     )
         return false //logout('deleterow gprevious invalid')
 
     //cannot delete if keyed and not locked
     if (gKeyNodes && !glocked) {
-        await readonlydocmsg() )
+        await readonlydocmsg()
         return false //logout('deleterow')
     }
 
@@ -7279,7 +7265,7 @@ async function form_deleterow(event, element) {
     var deps = tablex.getAttribute('exodusdependents')
     if (deps) {
 
-        await calcfields(deps.split(';') ))
+        await calcfields(deps.split(';'))
     }
 
     //logout('deleterow')
@@ -7335,7 +7321,7 @@ async function deleteallrows(groupnoorelement, fromrecn) {
         fromrecn = 0
 
     if (!gds.data['group' + groupno]) {
-        systemerror('await deleteallrows() )', 'group number ' + groupnoorelement + ' doesnt exist')
+        systemerror('await deleteallrows()', 'group number ' + groupnoorelement + ' doesnt exist')
     }
 
     //insert a blank row (to clear any formatting)
@@ -7396,8 +7382,8 @@ async function insertallrows2(elements, values, fromrecn) {
     var groupno = Number(element.getAttribute('exodusgroupno'))
 
     //if (elements.length == 1)
-    //await deleteallrows(element, fromrecn) )
-    await deleteallrows(element, fromrecn + 1) )
+    //await deleteallrows(element, fromrecn)
+    await deleteallrows(element, fromrecn + 1)
 
     //get the group
     var rows = gds.data['group' + groupno]
@@ -7418,10 +7404,10 @@ async function insertallrows2(elements, values, fromrecn) {
 
         //set the record and form values
         for (var coln = 0; coln < elements.length && coln < rowvalues.length; coln++) {
-            //yield* gds.setx(elements[coln], rown + fromrecn, rowvalues[coln])
+            //await gds.setx(elements[coln], rown + fromrecn, rowvalues[coln])
 
             var element = elements[coln]
-            var oldvalue = yield* gds.get1(element, rown + fromrecn)
+            var oldvalue = await gds.get1(element, rown + fromrecn)
             var newvalue = rowvalues[coln]
 
             //set and call validation to trigger any consequences
@@ -7436,8 +7422,8 @@ async function insertallrows2(elements, values, fromrecn) {
                     if (gpreviouselement[grecn])
                         gpreviouselement = gpreviouselement[grecn]
                 } 
-                //yield* gds.setx(element, grecn, newvalue)
-                var ovalue = await validateoconv(gpreviouselement, newvalue) )
+                //await gds.setx(element, grecn, newvalue)
+                var ovalue = await validateoconv(gpreviouselement, newvalue)
                 if (typeof ovalue == 'undefined' || ovalue == null) {
                     return false                                       
                 }
@@ -7445,7 +7431,7 @@ async function insertallrows2(elements, values, fromrecn) {
                 //if (conversion && conversion.substr(0,1) == '[')
                 //    newvalue = newvalue.exodusoconv(conversion)
                 setvalue(gpreviouselement,ovalue)
-                if ((!gKeyNodes || glocked) && !(yield* fromPromise( validateupdate() ) )))
+                if ((!gKeyNodes || glocked) && !(await validateupdate()))
                     return false
                 gpreviousvalue = newvalue
             }
@@ -7467,7 +7453,7 @@ async function insertallrows2(elements, values, fromrecn) {
     dependentfieldnos = dependentfieldnos.slice(1).split(';')
     grecn = null
 
-    await calcfields(dependentfieldnos) )
+    await calcfields(dependentfieldnos)
 
     //logout('insertallrows')
 
@@ -7488,11 +7474,11 @@ async function readonlydocmsg() {
 
     //readonly after key has been entered
     if (gKeyNodes || gkey)
-        return await exodusinvalid('This document is currently "read only"') )
+        return await exodusinvalid('This document is currently "read only"')
 
     //readonly before key has been entered
     else if (!gkey)
-        return await exodusinvalid('Please open a document first') )
+        return await exodusinvalid('Please open a document first')
 }
 
 //'''''''''''
@@ -7505,7 +7491,7 @@ async function form_insertrow(event, append) {
         return
 
     //make sure any previous stuff is validatedupdated
-    if (!(await validateupdate(event) )))
+    if (!(await validateupdate(event)))
         return false
 
     //login('insertrow')
@@ -7548,7 +7534,7 @@ async function form_insertrow(event, append) {
         //clicking a single row OR clicking the penultimate row
         else if (nrows == 1 || rown == nrows - 2) {
             var defaultchoice = (nrows == 1) ? 2 : 1
-            var choice = await exodusconfirm('Insert row before or after?', 1, 'Before', 'After', 'Cancel') )
+            var choice = await exodusconfirm('Insert row before or after?', 1, 'Before', 'After', 'Cancel')
             if (!choice)
                 return false
             if (choice == 2)
@@ -7572,7 +7558,7 @@ async function form_insertrow(event, append) {
 
     //cannot update if (locked
     if (gKeyNodes && !glocked) {
-        await readonlydocmsg() )
+        await readonlydocmsg()
         return false //logout('insertrow')
     }
 
@@ -7652,7 +7638,7 @@ async function openrecord_onclick() {
 
     //login('openrecord')
 
-    if (!(yield* fromPromise( validateupdate() ) )))
+    if (!(await validateupdate()))
         return false
 
     var reply
@@ -7661,16 +7647,16 @@ async function openrecord_onclick() {
         return false //logout('openrecord')
 
     //forget it if no change
-    if (reply == (await getkey() )))
+    if (reply == (await getkey()))
         return false //logout('openrecord no change')
 
     //do not change key if user chooses not to unload an existing document
-    if (!(await closedoc('OPEN') ))) {
+    if (!(await closedoc('OPEN'))) {
         //logout('openrecord user cancelled')
         return false
     }
 
-    await opendoc(reply) )
+    await opendoc(reply)
 
     //logout('openrecord')
 
@@ -7707,7 +7693,7 @@ async function nextrecord2(event, direction) {
 
     //goto one of many ... or if select many then reduce list to those selected
     if (direction == 0) {
-        var selkeys = await exodusdecide('', gkeys, [[0, 'Key']], 0, '', many = true) )
+        var selkeys = await exodusdecide('', gkeys, [[0, 'Key']], 0, '', many = true)
         if (!selkeys) return false
         if (selkeys.length > 1) {
             nextkeys = selkeys
@@ -7736,13 +7722,13 @@ async function nextrecord2(event, direction) {
     //switch to new key if new and user accepts to close the current one
     if (nextkey != gkey) {
         //do not change key if user chooses not to unload an existing document
-        if (!(await closedoc('OPEN') )))
+        if (!(await closedoc('OPEN')))
             return false
-        await setgkeyn(nextkeyn) )
-        await opendoc(nextkey) )
+        await setgkeyn(nextkeyn)
+        await opendoc(nextkey)
     }
 
-    await setgkeys(nextkeys, nextkeyn) )
+    await setgkeys(nextkeys, nextkeyn)
 
     return true
 
@@ -7787,7 +7773,7 @@ async function exoduslink(event, element) {
     if (!(element.getAttribute('exoduslowercase')))
         gvalue = gvalue.toUpperCase()
 
-    var reply = yield* exodusevaluate(element.getAttribute('exoduslink'), 'await exoduslink() )')
+    var reply = yield* exodusevaluate(element.getAttribute('exoduslink'), 'await exoduslink()')
 
     //logout('exoduslink')
 
@@ -7828,19 +7814,19 @@ async function exoduspopup(event, element) {
         return false //logout('exoduspopup - no element')
 
     //log('check no missing data in group 0 always')
-    if (!(yield* fromPromise( checkrequired(gfields, element, 0) ) )))
+    if (!(await checkrequired(gfields, element, 0)))
         return false //logout('exoduspopup' + ' ' + element.id + ' a prior element is visible and required but is blank (1)')
 
     //validateupdate previous field
     //if (element.id!=gpreviouselement.id)
     if (element != gpreviouselement) {
-        if (!(yield* fromPromise( validateupdate() ) )))
+        if (!(await validateupdate()))
             return false //logout('exoduspopup - validateupdate failed')
     }
 
     //cannot update anything but key field if not locked or save button not enabled
     if (element.getAttribute('exodusfieldno') != 0 && gKeyNodes && (!glocked || saverecord.getAttribute('disabled'))) {
-        await readonlydocmsg() )
+        await readonlydocmsg()
         return false //logout('exoduspopup - read only document')
     }
 
@@ -7848,7 +7834,7 @@ async function exoduspopup(event, element) {
     var readonly = element.getAttribute('exodusreadonly')
     if (readonly) {
         if (readonly != 'true')
-            await exodusinvalid(element.getAttribute('exodusreadonly') ))
+            await exodusinvalid(element.getAttribute('exodusreadonly'))
         return false //logout('exoduspopup - read only')
     }
 
@@ -7887,7 +7873,7 @@ async function exoduspopup(event, element) {
 
         //deselect items already selected
         if (grecn > 0) {
-            var prevalues = ((yield* gds.getall(elementid))).slice(0, grecn)
+            var prevalues = ((await gds.getall(elementid))).slice(0, grecn)
             for (var ii = 0; ii < prevalues.length; ++ii) {
                 var replyn
                 if (replyn = reply.exoduslocate(prevalues[ii]))
@@ -7897,7 +7883,7 @@ async function exoduspopup(event, element) {
                 return false //logout('exoduspopup - no new selections')
         }
 
-        await insertallrows(element, reply, grecn) )
+        await insertallrows(element, reply, grecn)
         setchangesmade(true)//should this be done in insertallrows to ensure Save button is enabled in other cases too?
 
         //focus on next element AFTER table
@@ -7923,12 +7909,12 @@ async function exoduspopup(event, element) {
     }
 
     //do not change key if user chooses not to unload an existing document
-    if (element.getAttribute('exodusfieldno') == 0 && gloaded && !(await closedoc('OPEN') )))
+    if (element.getAttribute('exodusfieldno') == 0 && gloaded && !(await closedoc('OPEN')))
         return false //logout('exoduspopup - user cancelled unloaddoc')
 
     //output convert it
     if (element.getAttribute('exodusconversion')) {
-        reply = await validateoconv(element, reply, reply) )
+        reply = await validateoconv(element, reply, reply)
         if (typeof reply == 'undefined' || reply == null) {
             return false //logout('exoduspopup - oconv failed')
         }
@@ -7946,11 +7932,11 @@ async function exoduspopup(event, element) {
     //have to force validation since the focus may already be on the next field
     //if clicked on the popup
     gvalidatingpopup = true
-    if (yield* fromPromise( validateupdate() ) ))
+    if (await validateupdate())
         focusnext(element)
     gvalidatingpopup = false
     //exodussettimeout('focusnext()',10)
-    //yield* fromPromise( validateupdate() ) )
+    //await validateupdate()
 
     //logout('exoduspopup')
 
@@ -8027,7 +8013,7 @@ async function exoduspopup2(element) {
         //if popup returns nothing but gdependents is set then the popup must have updated
         //something itself so recalc dependents
         if (gdependents.length) {
-            await calcfields(gdependents) )
+            await calcfields(gdependents)
         }
     }
 
@@ -8037,7 +8023,7 @@ async function exoduspopup2(element) {
 
             if (reply.length > 1 && reply.length <= 50) {
                 var openall = 2
-                openall = await exodusconfirm('Open all in one tab?', 1, 'One', 'Many') )
+                openall = await exodusconfirm('Open all in one tab?', 1, 'One', 'Many')
                 if (!openall)
                     return false
                 if (openall == 2) {
@@ -8054,11 +8040,11 @@ async function exoduspopup2(element) {
                 }
             }
 
-            await setgkeys(reply, 0) )
+            await setgkeys(reply, 0)
             reply = reply[0]
         }
         else {
-            await setgkeys([reply], 0) )
+            await setgkeys([reply], 0)
         }
     }
 
@@ -8085,7 +8071,7 @@ async function setgkeys(keys, keyn) {
         }
     }
     if (keyn < gkeys.length) {
-        await setgkeyn(keyn) )
+        await setgkeyn(keyn)
     }
 }
 
@@ -8097,7 +8083,7 @@ async function setgkeyn(keyn) {
 }
 
 async function getkeyexternal() {
-    return await getkey('oconv') )
+    return await getkey('oconv')
 }
 
 async function debug(v) {
@@ -8132,7 +8118,7 @@ async function getkey(mode) {
     else {
         key = key.join(' ')
     }
-    //await debug(key) )
+    //await debug(key)
 
     //logout('getkey ' + key)
 
@@ -8147,7 +8133,7 @@ async function setkeyvalues(key) {
         //var conversion=gKeyNodes[ii].getAttribute('exodusconversion')
         //if (conversion.slice(0,1)=='[') temp=temp.exodusoconv(conversion)
         //setvalue(gKeyNodes[ii],temp)
-        yield* gds.setx(gKeyNodes[ii].id, '', temp)
+        await gds.setx(gKeyNodes[ii].id, '', temp)
     }
 }
 
@@ -8224,11 +8210,11 @@ function getrecn(element) {
 }
 
 async function getnextrow(dictid, skipblanks, iconv) {
-    return await getrowx(dictid, skipblanks, true, iconv) )
+    return await getrowx(dictid, skipblanks, true, iconv)
 }
 
 async function getpreviousrow(dictid, skipblanks, iconv) {
-    return await getrowx(dictid, skipblanks, false, iconv) )
+    return await getrowx(dictid, skipblanks, false, iconv)
 }
 
 async function getrowx(dictid, skipblanks, forward, iconv) {
@@ -8246,7 +8232,7 @@ async function getrowx(dictid, skipblanks, forward, iconv) {
         if (grecn == 0)
             return ''
         if (iconv)
-            value = yield* gds.get1(dictid, grecn - 1)
+            value = await gds.get1(dictid, grecn - 1)
         else
             value = getvalue(dictid, grecn - 1)
         if (value)
@@ -8260,7 +8246,7 @@ async function getrowx(dictid, skipblanks, forward, iconv) {
     //var values=getvalues(dictid)
     var values
     if (iconv)
-        values = yield* gds.getall(dictid)
+        values = await gds.getall(dictid)
     else
         //values = getvalues(document.getElementsByName(dictid))
         values = getvalues(dictid)
@@ -8288,7 +8274,7 @@ async function getrowx(dictid, skipblanks, forward, iconv) {
 
 async function form_ondblclick(event) {
     event = getevent(event)
-    return await form_filter('filter') )
+    return await form_filter('filter')
 }
 
 async function form_onrightclick(event) {
@@ -8302,13 +8288,13 @@ async function form_filter(mode, colidorgroupno, regexp, maxrecn, elem) {
 
     if (mode == 'refilter') {
         colidorgroupno2 = colidorgroupno
-        await form_filter('unfilter', colidorgroupno2) )
+        await form_filter('unfilter', colidorgroupno2)
         mode = 'filter'
     }
 
     if (mode == 'filterfocus') {
         //following only applies to schedules! convert to any form
-        if (!(yield* gds.get1('VEHICLE_CODE', 0))) {
+        if (!(await gds.get1('VEHICLE_CODE', 0))) {
             focuson('VEHICLE_CODE')
             return false
         }
@@ -8341,10 +8327,10 @@ async function form_filter(mode, colidorgroupno, regexp, maxrecn, elem) {
     if (typeof colidorgroupno != 'number' && (mode == 'filter' || mode == 'unfilter')) {
         var dictitem = gds.dictitem(colid)
         //if (!dictitem)
-        // return await exodusinvalid(colid+' dictitem does not exist in await form_filter() )')
+        // return await exodusinvalid(colid+' dictitem does not exist in await form_filter()')
         groupno = dictitem.groupno
         if (!groupno)
-            return await exodusinvalid() )//colid+' is not multivalued for sorting'
+            return await exodusinvalid()//colid+' is not multivalued for sorting'
     }
     else {
         groupno = colidorgroupno
@@ -8357,13 +8343,13 @@ async function form_filter(mode, colidorgroupno, regexp, maxrecn, elem) {
     if (typeof form_prefilter == 'function') {
         //yield* exodusevaluate('form_prefilter()','yield* formfunctions_onload()')
         if (!(form_prefilter(mode, colid)))
-            return await exodusinvalid() )
+            return await exodusinvalid()
     }
 
     //get the table rows
     var tablex = $$('exodusgroup' + groupno)
     if (!tablex)
-        return await exodusinvalid(colid + ' is not part of a table') )
+        return await exodusinvalid(colid + ' is not part of a table')
     grows = tablex.tBodies[0].rows
 
     //unfilter and exit (not tested or used anywhere)
@@ -8374,7 +8360,7 @@ async function form_filter(mode, colidorgroupno, regexp, maxrecn, elem) {
             //grows[rown].style.display=''
             grows[rown].style.display = ''
         }
-        yield* fromPromise( calcfields() ) )
+        await calcfields()
         return true
     }
 
@@ -8382,7 +8368,7 @@ async function form_filter(mode, colidorgroupno, regexp, maxrecn, elem) {
     var tablexshowall = $$('exodusgroup' + groupno + 'showall')
     var tablexfilter = $$('exodusgroup' + groupno + 'filter')
     if (!tablexshowall) {
-        //syserror('await form_filter() )','Cannot find showall button, are you missing a thead?')
+        //syserror('await form_filter()','Cannot find showall button, are you missing a thead?')
         return true
     }
 
@@ -8400,7 +8386,7 @@ async function form_filter(mode, colidorgroupno, regexp, maxrecn, elem) {
         showhide('exodusgroup' + groupno + 'showall', false)
         if (typeof tablexfilter != 'undefined' && tablexfilter)
             tablexfilter.size = 3
-        yield* fromPromise( calcfields() ) )
+        await calcfields()
         return true
     }
 
@@ -8424,7 +8410,7 @@ async function form_filter(mode, colidorgroupno, regexp, maxrecn, elem) {
 
     }
     else {
-        values = yield* gds.regetx(colid, null)
+        values = await gds.regetx(colid, null)
         if (!regexp && !maxrecn) {
             grecn = getrecn()
             var value = values[grecn]
@@ -8503,7 +8489,7 @@ async function form_filter(mode, colidorgroupno, regexp, maxrecn, elem) {
     }
 
     if (!anyunhiddenrows && !maxrecn) {
-        //await form_filter('unfilter', colidorgroupno) )
+        //await form_filter('unfilter', colidorgroupno)
     }
     else {
         for (rownn = 0; rownn < hiderowns.length; ++rownn) {
@@ -8516,7 +8502,7 @@ async function form_filter(mode, colidorgroupno, regexp, maxrecn, elem) {
         for (var rown = 0; rown < lastunhiddenrows.length; ++rown)
             //change to expandrow image
             setinsertimage('expand', lastunhiddenrows[rown], groupno)
-        yield* fromPromise( calcfields() ) )
+        await calcfields()
     }
 
     //window.status = ''
@@ -8603,7 +8589,7 @@ async function form_closepopups() {
         }
         catch (e) {
             if (gusername == 'EXODUS')
-                await exodusnote('couldnt drop calendar\n' + e.description) )
+                await exodusnote('couldnt drop calendar\n' + e.description)
         }
         calendar_checkInDatePicker = ''
         anyclosed = true
@@ -8624,7 +8610,7 @@ async function form_val_index(filename, fieldname, allownew) {
         fieldname = gpreviouselement.name
 
     //get the existing values
-    var indexvalues = await form_get_index(filename, fieldname) )
+    var indexvalues = await form_get_index(filename, fieldname)
     if (!indexvalues)
         return true
     indexvalues = indexvalues.group1
@@ -8638,8 +8624,8 @@ async function form_val_index(filename, fieldname, allownew) {
     //optionally change case
     for (var ii = 0; ii < indexvalues.length; ii++) {
         if (indexvalues[ii][fieldname].text.toUpperCase() == gvalue.toUpperCase()) {
-            if (!(reply = await exodusconfirm('Change the capitalisation of your entry?\n\nFrom: ' + gvalue.exodusquote() ) + '\n\n  To: ' + indexvalues[ii][fieldname].text.exodusquote(), 1)))
-                return await exodusinvalid() )
+            if (!(reply = await exodusconfirm('Change the capitalisation of your entry?\n\nFrom: ' + gvalue.exodusquote() + '\n\n  To: ' + indexvalues[ii][fieldname].text.exodusquote(), 1)))
+                return await exodusinvalid()
             if (reply == 1)
                 gvalue = indexvalues[ii][fieldname].text
             return true
@@ -8648,10 +8634,10 @@ async function form_val_index(filename, fieldname, allownew) {
 
     //option to allow/prevent new index values
     if (!allownew)
-        return await exodusinvalid(gvalue + ' ' + fieldname.toLowerCase() ) + ' does not exist')
+        return await exodusinvalid(gvalue + ' ' + fieldname.toLowerCase() + ' does not exist')
 
     //confirm is new index value
-    if (gvalue && ((await exodusyesno(' Is ' + exodusquote(gvalue) ) + ' to be a new ' + fieldname.toLowerCase() + ' for ' + filename.toLowerCase() + ' ?', 1)) != 1))
+    if (gvalue && ((await exodusyesno(' Is ' + exodusquote(gvalue) + ' to be a new ' + fieldname.toLowerCase() + ' for ' + filename.toLowerCase() + ' ?', 1)) != 1))
         return false
 
     return true
@@ -8662,7 +8648,7 @@ async function form_get_index(filename, fieldname) {
 
     db.request = 'CACHE\rGETINDEXVALUESXML\r' + filename + '\r' + fieldname
     if (!(yield* db.send())) {
-        yield* fromPromise( exodusinvalid(db.response) )
+        await exodusinvalid(db.response)
         return ''
     }
 
@@ -8683,9 +8669,9 @@ async function form_pop_index(filename, fieldname, many) {
         fieldname = gpreviouselement.name
 
     //get index values
-    var indexvalues = await form_get_index(filename, fieldname) )
+    var indexvalues = await form_get_index(filename, fieldname)
     if (!indexvalues || indexvalues.group1.length == 0)
-        return await exodusinvalid('No ' + fieldname.toLowerCase() ).exodusconvert('_', ' ') + '(s) have been entered on ' + filename.toLowerCase().exodusconvert('._', '  ') + ' file yet')
+        return await exodusinvalid('No ' + fieldname.toLowerCase().exodusconvert('_', ' ') + '(s) have been entered on ' + filename.toLowerCase().exodusconvert('._', '  ') + ' file yet')
 
     //user selects index value(s)
     var result = await exodusdecide2('', indexvalues, [[fieldname, fieldname.exoduscapitalise()]], 0, '', many)
@@ -8697,12 +8683,12 @@ async function form_pop_index(filename, fieldname, many) {
 async function copyrecord_onclick() {
 
     if (!gkey || !glastkey || !gds.isnewrecord || gchangesmade)
-        return await exodusinvalid('To copy a record you must:\n\n1. Open the record to copy\n2. Start a new record&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\n3. Click the Copy button&nbsp;&nbsp;&nbsp;&nbsp;') )
+        return await exodusinvalid('To copy a record you must:\n\n1. Open the record to copy\n2. Start a new record&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\n3. Click the Copy button&nbsp;&nbsp;&nbsp;&nbsp;')
 
     //read the record to be copied
     var copyrecord = []
     if (!(yield* copyrecord.exodusread(gdatafilename, glastkey)))
-        return await exodusinvalid(copyrecord.exodusresponse) )
+        return await exodusinvalid(copyrecord.exodusresponse)
 
     //remove any uncopyable data
     for (var dictname in gds.dict) {
@@ -8712,14 +8698,14 @@ async function copyrecord_onclick() {
     }
 
     //validate copy
-    //if (!(yield* exodusevaluate('await form_copyrecord() )','await copyrecord_onclick() )')))
-    if (!(await form_copyrecord(copyrecord) )))
-        return await exodusinvalid() )
+    //if (!(yield* exodusevaluate('await form_copyrecord()','await copyrecord_onclick()')))
+    if (!(await form_copyrecord(copyrecord)))
+        return await exodusinvalid()
 
     //load the new record
     gro.revstr = copyrecord.slice(1).join(fm)
     gro.rev2obj()
-    yield* gds.load(gro)
+    await gds.load(gro)
 
     return true
 
@@ -8768,15 +8754,15 @@ function form_setdefault(str) {
 async function form_postread_noteifdeleted(descending) {
 
     //skip if not deleted. deleted = gds.isnewrecord but has some version
-    if (!gds.isnewrecord || !(yield* gds.getx('VERSION')))
+    if (!gds.isnewrecord || !(await gds.getx('VERSION')))
         return false
 
     //descending means the latest log is inserted as first mv, which is the least common option, in PLAN/SCHEDULE/BATCHES
     var logn = descending ? 0 : -1
 
-    var note = 'This record was deleted by ' + (yield* gds.get1('USERNAME_UPDATED', logn)) + ' on ' + (yield* gds.get1('DATETIME_UPDATED', logn)).exodusoconv('[DATE_TIME]') + '.'
+    var note = 'This record was deleted by ' + (await gds.get1('USERNAME_UPDATED', logn)) + ' on ' + (await gds.get1('DATETIME_UPDATED', logn)).exodusoconv('[DATE_TIME]') + '.'
     note += '\n\nYou can restore it by saving it again'
-    await exodusnote(note) )
+    await exodusnote(note)
 
     gallowsavewithoutchanges = true
     setchangesmade(false, true)//change style of Save button
@@ -8798,7 +8784,7 @@ async function document_oncopy(event) {
 
     //return true if handled EVEN IF FAILED
     //return false to allow normal handler below
-    if (await form_oncopy(event) )) {
+    if (await form_oncopy(event)) {
         return exoduscancelevent(event)
     }
 
@@ -8811,7 +8797,7 @@ async function form_oncopy_generic(event) {
     event = getevent(event)
 
     //resolve any data entry issues first
-    if (!(yield* fromPromise( validateupdate() ) )))
+    if (!(await validateupdate()))
         return true//prevent normal copy
 
     //if no cols to copy then return false to trigger normal copy
@@ -8861,7 +8847,7 @@ async function form_oncopy_generic(event) {
                 //empty col for letters and dates multi-row generated below
                 txln.push('')
             else {
-                var cell = yield* gds.get1(dictid, ln)
+                var cell = await gds.get1(dictid, ln)
                 if (colpars[2] && colpars[2].slice(0, 1) == '[')
                     cell = cell.exodusoconv(colpars[2])
                 txln.push(cell)
@@ -8898,7 +8884,7 @@ async function document_onpaste(event) {
 			msg = 'This is a read-only field'
 		}
         exoduscancelevent()
-   	    return await exodusinvalid(msg) )
+   	    return await exodusinvalid(msg)
 	}
 
     //only supporting form_paste in first column
@@ -8926,7 +8912,7 @@ async function document_onpaste(event) {
         form_onpaste = form_onpaste_generic
 
     //return true to suppress normal handler EVEN IF FAILED
-    if (await form_onpaste(event) ))
+    if (await form_onpaste(event))
         return exoduscancelevent(event)
 
     //in case we selected a text node
@@ -9050,7 +9036,7 @@ async function form_onpaste_generic(event, elementid, validatedata_function, imp
     //    ,1)
     //    
     //resolve any data entry issues first
-    if (!(yield* fromPromise( validateupdate() ) )))
+    if (!(await validateupdate()))
         return true
 
     //from here on we do NOT want normal paste to happen afterwards
@@ -9076,7 +9062,7 @@ async function form_onpaste_generic(event, elementid, validatedata_function, imp
     //    if (!data) {
     //        //args.SCHEDULE_TEXT = gscheduleimportdata.exodusconvert(tm,vm)
     //        var args = {}
-    //        data = await exodusshowmodaldialog('../media/schedules_import.htm', args) )
+    //        data = await exodusshowmodaldialog('../media/schedules_import.htm', args)
     //        if (!data)
     //            return true
     //        data = data.replace(tm, '\n')
@@ -9121,8 +9107,8 @@ async function form_onpaste_generic(event, elementid, validatedata_function, imp
 
     data.startln = 1
     if (nlines < data.startln + 1) {
-        //await form_undopaste(beforepaste_element,beforepaste_value) )
-        await exodusinvalid('Not enough lines to import') )
+        //await form_undopaste(beforepaste_element,beforepaste_value)
+        await exodusinvalid('Not enough lines to import')
         return true
     }
 
@@ -9132,18 +9118,18 @@ async function form_onpaste_generic(event, elementid, validatedata_function, imp
     //////////        
     //validate
     //////////
-    var ninvalid = await validatedata_function(data) )
+    var ninvalid = await validatedata_function(data)
     if (ninvalid === false)
         return true
 
     if (data.length <= 1) {
-        await exodusinvalid('Nothing to import') )
+        await exodusinvalid('Nothing to import')
         return true
     }
 
     //option to quit if any invalid items
     if (ninvalid) {
-        if (!(await exodusyesno('There were ' + ninvalid + ' invalid items\nDo you want to continue?\n\n(Invalid items will be imported as blank) )')))
+        if (!(await exodusyesno('There were ' + ninvalid + ' invalid items\nDo you want to continue?\n\n(Invalid items will be imported as blank)')))
             return true
     }
 
@@ -9153,7 +9139,7 @@ async function form_onpaste_generic(event, elementid, validatedata_function, imp
     var savegrecn = grecn
     var result = yield* importdata_function(data)
 
-    yield* fromPromise( calcfields() ) )
+    await calcfields()
 
     //focus on new row
     focuson(document.getElementsByName(elementid)[savegrecn])
@@ -9163,7 +9149,7 @@ async function form_onpaste_generic(event, elementid, validatedata_function, imp
 }
 
 async function form_onpaste_ignore_cancel(rown, coln, coltitle, data, msg) {
-    return await exodusokcancel('WARNING! in Row:' + (rown + 1) ) + ' Col:' + (coln + 1) + '\n\n' + coltitle + ' = "' + data + '"\n\n' + msg, 'Ignore', 'Cancel')
+    return await exodusokcancel('WARNING! in Row:' + (rown + 1) + ' Col:' + (coln + 1) + '\n\n' + coltitle + ' = "' + data + '"\n\n' + msg, 'Ignore', 'Cancel')
 }
 
 async function form_onpaste_generic_validatedata(data) {
@@ -9220,7 +9206,7 @@ async function form_onpaste_generic_validatedata(data) {
         var allcoltx = []
         for (var coln = 0; coln < ncols; ++coln)
             allcoltx.push(data.cols[coln][1])
-        return await exodusinvalid('No recognisable columns in data\n\nPossible columns: ' + allcoltx.join(', ') ))
+        return await exodusinvalid('No recognisable columns in data\n\nPossible columns: ' + allcoltx.join(', '))
     }
 
     //for each line of pasted data
@@ -9265,7 +9251,7 @@ async function form_onpaste_generic_validatedata(data) {
                     //blank any invalid values
                     if (ivalue === null) {
                         //'Format must be '+conversion.slice(1,-1).split(',')[0]
-                        if (!(await form_onpaste_ignore_cancel(ln, datacoln, data.cols[coln][1], ovalue, gmsg) )))
+                        if (!(await form_onpaste_ignore_cancel(ln, datacoln, data.cols[coln][1], ovalue, gmsg)))
                             return false
                         ivalue = ''
                         ninvalid++
@@ -9282,7 +9268,7 @@ async function form_onpaste_generic_validatedata(data) {
                     var rec = []
                     if (!(yield* rec.exodusread(col.filename, ivalue))) {
                         //'Format must be '+conversion.slice(1,-1).split(',')[0]
-                        if (!(await form_onpaste_ignore_cancel(ln, datacoln, data.cols[coln][1], ivalue, 'Code does not exist or cannot be accessed') )))
+                        if (!(await form_onpaste_ignore_cancel(ln, datacoln, data.cols[coln][1], ivalue, 'Code does not exist or cannot be accessed')))
                             return false
                         ivalue = ''
                         ninvalid++
@@ -9314,7 +9300,7 @@ async function form_onpaste_generic_importdata(data) {
 
         //add a new row if last row is not blank
         //var rown = gds.data.group1.length - 1
-        //if (yield* gds.get1('VEHICLE_CODE', rown)) {
+        //if (await gds.get1('VEHICLE_CODE', rown)) {
         //    exodusaddrow(1)
         //    rown += 1
         //}
@@ -9336,7 +9322,7 @@ async function form_onpaste_generic_importdata(data) {
                 gpreviousvalue = getvalue(gpreviouselement)
                 setvalue(gpreviouselement, line[datacoln])
 
-                if (!(yield* fromPromise( validateupdate() ) )))
+                if (!(await validateupdate()))
                     return false
 
             }

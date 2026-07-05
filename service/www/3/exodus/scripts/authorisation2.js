@@ -13,7 +13,7 @@ async function user_setpassword(savemode,element) {
  
  //grecn=element?getrecn(element):null
  
- var userid=yield* gds.getx('USER_ID',grecn)
+ var userid=await gds.getx('USER_ID',grecn)
  if (typeof userid!='string') userid=userid[0]
  if (!userid)
   //return await exodusinvalid('Please select a user first')
@@ -84,7 +84,7 @@ async function user_setpassword(savemode,element) {
   
  }
 
- yield* gds.setx('PASSWORD',grecn,newpassword.toUpperCase())
+ await gds.setx('PASSWORD',grecn,newpassword.toUpperCase())
  setchangesmade(true)
  
  //login with new password after writing if you change your own password

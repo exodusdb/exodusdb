@@ -219,7 +219,7 @@ async function exodus_def_time(mode,othertimeid) {
 
  if (!othertimeid) return ''
  
- othertime=yield* gds.getx(othertimeid)
+ othertime=await gds.getx(othertimeid)
  if (typeof othertime=='object') othertime=othertime[0]
 
  return othertime
@@ -232,7 +232,7 @@ async function exodus_val_time(mode,otherid) {
  var time=+gvalue
  var oldtime=+goldvalue
  
- var othertime=yield* gds.getx(otherid)
+ var othertime=await gds.getx(otherid)
  if (typeof othertime=='object') othertime=othertime[0]
  var othertime2=+othertime
 
@@ -244,7 +244,7 @@ async function exodus_val_time(mode,otherid) {
  if (mode=='FROM'&&(othertime==''||othertime==oldtime)) othertime2=time
 
  //update the otherperiod
- if (othertime2!=(+othertime)) yield* gds.setx(otherid,grecn,othertime.toString())
+ if (othertime2!=(+othertime)) await gds.setx(otherid,grecn,othertime.toString())
 
  //gvalue=time
   
@@ -288,7 +288,7 @@ async function exodus_val_period(mode,otherperiodid) {
  
  if (mode&&otherperiodid) {
  
-  otherperiod=yield* gds.getx(otherperiodid)
+  otherperiod=await gds.getx(otherperiodid)
   if (typeof otherperiod=='object') otherperiod=otherperiod[0]
   var othervalue=otherperiod.split('/')
   
@@ -327,7 +327,7 @@ async function exodus_val_period(mode,otherperiodid) {
   if (mode=='FROM'&&(otherperiod==''||otherperiod==goldvalue)) othervalue=value
 
   //update the otherperiod
-  if (otherperiod!=othervalue.join('/')) yield* gds.setx(otherperiodid,grecn,othervalue.join('/'))
+  if (otherperiod!=othervalue.join('/')) await gds.setx(otherperiodid,grecn,othervalue.join('/'))
 
   gvalue=value.join('/')
   

@@ -7,13 +7,13 @@ async function form_postinit() {
 }
 
 async function form_postdisplay() {
-    showhide('databasesection', (!gexodus_server && (yield* gds.getall('SCOPE'))=='SYSTEM.CFG'))
+    showhide('databasesection', (!gexodus_server && (await gds.getall('SCOPE'))=='SYSTEM.CFG'))
     showhide(['backupsection','old_server'], !gexodus_server)
     return true
 }
 
 async function form_prewrite() {
-    if ((yield* gds.getx('SCOPE'))=='SYSTEM.CFG' && !(yield* gds.getx('HOST_NAME')))
+    if ((await gds.getx('SCOPE'))=='SYSTEM.CFG' && !(await gds.getx('HOST_NAME')))
         return await exodusinvalid('Host Name is required when Scope is "Current Installation"')
     return true
 }
@@ -23,8 +23,8 @@ async function sysconfig_copynow(event) {
     event=getevent(event)
     grecn = getrecn()
     
-    var fromdatabase=yield* gds.get1('DATABASE_CODE')
-    var todatabase=yield* gds.get1('TEST_DATABASE_CODE')
+    var fromdatabase=await gds.get1('DATABASE_CODE')
+    var todatabase=await gds.get1('TEST_DATABASE_CODE')
 
     if (!(await saveandunlockdoc()))
         return false

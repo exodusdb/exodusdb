@@ -7,12 +7,12 @@ async function colors_val_screencolor() {
 
 async function colors_val_screenfont() {
     if (!(await exodus_val_font())) return await exodusinvalid()
-    exodus_set_style('screenfont', gvalue, yield* gds.getx('SCREEN_FONT_SIZE'))
+    exodus_set_style('screenfont', gvalue, await gds.getx('SCREEN_FONT_SIZE'))
     return true
 }
 
 async function colors_val_screenfontsize() {
-    exodus_set_style('screenfont', yield* gds.getx('SCREEN_FONT'), gvalue)
+    exodus_set_style('screenfont', await gds.getx('SCREEN_FONT'), gvalue)
     return true
 }
 

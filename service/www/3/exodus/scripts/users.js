@@ -40,7 +40,7 @@ async function form_postdisplay() {
 
     var firstlogin=false
     if (gkey==gusername) {
-        var loginstatus=yield* gds.getall('LOGIN_RESULT')
+        var loginstatus=await gds.getall('LOGIN_RESULT')
         loginstatus[0]=''//remove current login OK
         //if (true||!loginstatus.exoduslocate('OK'))
         //    gettingstarted.innerHTML='<font color=red><strong>Click HERE for browser configuration *REQUIRED*</strong></font>'
@@ -65,9 +65,9 @@ async function form_postwrite() {
     gtasks_newpassword = false
 
     //to avoid need full login to get new font/colors
-    exodussetcookie(glogincode, 'EXODUS2', yield* gds.getx('SCREEN_BODY_COLOR'), 'fc')
-    exodussetcookie(glogincode, 'EXODUS2', yield* gds.getx('SCREEN_FONT'), 'ff')
-    exodussetcookie(glogincode, 'EXODUS2', yield* gds.getx('SCREEN_FONT_SIZE'), 'fs')
+    exodussetcookie(glogincode, 'EXODUS2', await gds.getx('SCREEN_BODY_COLOR'), 'fc')
+    exodussetcookie(glogincode, 'EXODUS2', await gds.getx('SCREEN_FONT'), 'ff')
+    exodussetcookie(glogincode, 'EXODUS2', await gds.getx('SCREEN_FONT_SIZE'), 'fs')
 
     return true
 
@@ -104,12 +104,12 @@ async function users_postdisplay() {
     $expiryelement = $$('expiryelement')
     $expiryelement.innerHTML = ''//also done in form_postdisplay because this function doesnt get called after await cleardoc()?
 
-    var userexpirydate=yield* gds.getx('EXPIRY_DATE')
+    var userexpirydate=await gds.getx('EXPIRY_DATE')
     if (userexpirydate && userexpirydate <= exodusdate()) {
         $expiryelement.innerHTML = '<font color=red><strong>EXPIRED ' + userexpirydate.exodusoconv('[DATE]') + '</strong></font>'
     } else {
         var reminderdays = 6
-        var passwordexpires = yield* gds.getx('PASSWORD_EXPIRY_DATE')
+        var passwordexpires = await gds.getx('PASSWORD_EXPIRY_DATE')
         //if (passwordexpires) {
         if (!passwordexpires) {
             $expiryelement.innerHTML = '<font color=green><strong>ACTIVE</strong></font>'

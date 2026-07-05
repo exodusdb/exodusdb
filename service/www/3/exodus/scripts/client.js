@@ -395,7 +395,7 @@ async function exoduslogout_onclick() {
         newwindowlocation += '??' + system
 
     //clear various session variable
-    await  dblogout()
+    await dblogout()
 
     //switch to login window
     try {
@@ -416,7 +416,7 @@ async function exodussecurity(task) {
 
     //look for ancient source code
     if (task.indexOf(' FILE ') >= 0)
-        await  exoduswarning('FILE should not be in task ' + task)
+        await exoduswarning('FILE should not be in task ' + task)
 
     //make sure task list is loaded (clearing cache also clears gtasks for convenience)
     if (!gtasks) {
@@ -424,7 +424,7 @@ async function exodussecurity(task) {
         if (!(yield* db.send())) {
             gtasks = ''
             gmsg = db.response
-            await  exodusinvalid(gmsg)
+            await exodusinvalid(gmsg)
             return false
         }
         gtasks = db.data.split(fm)[0].split(vm)
@@ -651,7 +651,7 @@ function showhide(element, show) {
     if (typeof element == 'string') {
         element = $$(element)
         if (!element)
-            return await  exodusinvalid('element ' + elementid + ' does not exist in showhide(')
+            return await exodusinvalid('element ' + elementid + ' does not exist in showhide(')
             systemerror('showhide("' + elementid + '")', ' window element does not exist')
     }
 
@@ -1111,20 +1111,20 @@ function displayresponsedata_sync(request, data) {
         exodusneweventhandler(temp, 'displayresponsedata')
 }
 
-function* displayresponsedata(request, data) {
+async function displayresponsedata(request, data) {
 
     if (!data)
         data = ''
 
     db.request = request
-    if (!(yield* db.send(data))) {
-        yield* fromPromise( exodusinvalid(db.response) )
+    if (!(await db.send(data))) {
+        await exodusinvalid(db.response)
         return false
     }
     if (db.data)
-        await exodusnote(db.data) )
+        await exodusnote(db.data)
     else
-        await exodusnote(db.response.slice(2)) )
+        await exodusnote(db.response.slice(2))
 
     return true
 
@@ -1141,32 +1141,32 @@ function openwindow_sync(request, data) {
 
 //function to simplify passing a db request (with optional data)
 //that returns a URL to be opened in an independent window
-function* openwindow(request, data) {
+async function openwindow(request, data) {
 
     if (!data)
         data = ''
     db.request = request
-    if (!(yield* db.send(data))) {
-        yield* fromPromise( exodusinvalid(db.response) )
+    if (!(await db.send(data))) {
+        await exodusinvalid(db.response)
         return false
     }
 
     if (db.response != 'OK')
-        yield* fromPromise( exodusnote(db.response.slice(3)) )
+        await exodusnote(db.response.slice(3))
 
     if (db.data) {
         var urls = db.data.split(fm)
         var result
         for (ii = 0; ii < urls.length; ++ii)
-            result = yield* windowopen(urls[ii])
+            result = await windowopen(urls[ii])
         return result
     }
 }
 
-function* windowopenkey(url, key) {
+async function windowopenkey(url, key) {
     if (!key)
         key = gvalue
-    return yield* windowopen(url, { 'key': key })
+    return await windowopen(url, { 'key': key })
 }
 
 function windowopen_sync(url, parameters, style) {
@@ -1178,7 +1178,7 @@ function windowopen_sync(url, parameters, style) {
 }
 
 var gwindowopenparameters
-function* windowopen(url, parameters, style) {
+async function windowopen(url, parameters, style) {
 
     url = url || ''
     parameters = parameters || ''
@@ -1286,7 +1286,7 @@ function assertelement(element, funcname, varname) {
 async function exodusnote(msg, mode) {
 
     //if (!msg) return false
-    allow return await  exodusnote( ) to be opposite of return await  exodusinvalid(
+    //allow return await exodusnote() to be opposite of return await exodusinvalid()
     if (!msg)
         return true
 
@@ -1301,7 +1301,7 @@ async function exodusnote(msg, mode) {
     msg = msg.toString().replace(FMre, '\r\n').replace(VMre, '\r\n')
     msg = msg.replace(/\|/g, '\r\n')
 
-    await  exodusconfirm(msg, 1, 'OK', '', '', null, false, mode)
+    await exodusconfirm(msg, 1, 'OK', '', '', null, false, mode)
 
     return true
 
@@ -1321,8 +1321,8 @@ async function exodusinvalid(msg) {
 //''''''''
 async function exoduswarning(msg) {
     //displays a message if provided and returns true
-    so you can use it like "return await  exoduswarning(msg" to save a line
-    return await  exodusnote(msg, 'warning')
+    //so you can use it like "return await exoduswarning(msg)" to save a line
+    return await exodusnote(msg, 'warning')
 }
 
 function exodus_set_style(mode, value, value2) {
@@ -1527,7 +1527,7 @@ function* clientfunctions_windowonload() {
         yield* db.send()
     }
 
-    await  clientfunctions_setstyle()
+    await clientfunctions_setstyle()
 
     //if (gautofitwindow && document.getElementById('autofitwindowelement'))
     //    exodussettimeout('exodusautofitwindow()', 10)
@@ -1782,7 +1782,7 @@ Array.prototype.exodusxlate = async function arrayxlate(filename, fieldno, mode)
         var rec
         if (rec = readcache(cachekey)) {
             //and do xlate logic on cached record
-            results[keyn] = await  exodusxlatelogic(filename, (key + fm + rec ).split(fm), fieldno, mode, key)
+            results[keyn] = await exodusxlatelogic(filename, (key + fm + rec).split(fm), fieldno, mode, key)
         }
 
         //or build a unique list of keys of records to be selected
@@ -1821,7 +1821,7 @@ Array.prototype.exodusxlate = async function arrayxlate(filename, fieldno, mode)
             //do xlate logic on the record
             var keyrec = recset[ii].split(fm)
             var key = keyrec[0]
-            var result = await  exodusxlatelogic(filename, keyrec, fieldno, mode, key)
+            var result = await exodusxlatelogic(filename, keyrec, fieldno, mode, key)
 
             //store the results whereever they are needed
             var keyn = 0
@@ -1856,7 +1856,7 @@ String.prototype.exodusxlate = async function stringxlate(filename, fieldno, mod
     yield* record.exodusread(filename, this)
     if (db.response.indexOf('file is not available') >= 0) systemerror('xlate', db.response)
 
-    return await  exodusxlatelogic(filename, record, fieldno, mode, key)
+    return await exodusxlatelogic(filename, record, fieldno, mode, key)
 
 }
 
@@ -1920,7 +1920,7 @@ async function exodusfilepopup(filename, cols, coln, sortselectionclause, many, 
     db.request = 'CACHE\rSELECT\r' + filename.toUpperCase() + '\r' + sortselectionclause + '\r' + collist + '\rXML\r' + maxnrecs
     //db.request='CACHE\rSELECT\r'+filename.toUpperCase()+'\r'+sortselectionclause+'\r'+collist+' ID'
     if (!(yield* db.send())) {
-        await  exodusinvalid(db.response)
+        await exodusinvalid(db.response)
         return null
     }
 
@@ -1931,7 +1931,7 @@ async function exodusfilepopup(filename, cols, coln, sortselectionclause, many, 
             msg += '\nfor ' + filtertitle
         else if (sortselectionclause.indexOf('WITH COMPANY_CODE') >= 0)
             msg += '\nfor the chosen company'
-        await  exodusinvalid(msg)
+        await exodusinvalid(msg)
         return null
     }
 
@@ -2079,7 +2079,7 @@ async function exodusdblink_login(username, password, dataset, system) {
         if (glocked && gchangesmade)
             question += '\n\nWarning! Your current work on ' + gkey + ' will be lost if you dont resume login.'
         question += '\n\nResume login as ' + gusername + '?'
-        if (!(await  exodusyesno(question, 1 ))) {
+        if (!(await exodusyesno(question, 1))) {
 
             //switch to login window
             exodussettimeout('window.location.assign("../index.html")', 1)
@@ -2091,7 +2091,7 @@ async function exodusdblink_login(username, password, dataset, system) {
             this.requesting = false
             db.requesting = false
 
-            await  exodusinvalid()
+            await exodusinvalid()
             failed = true
             //pity there is no way to abort script without generating an error
             //TODO avoid showing error message in catch clause if switching to index.html
@@ -2131,7 +2131,7 @@ async function exodusdblink_login(username, password, dataset, system) {
             if (!datasets) {
                 logindb.request = 'GETDATASETS'
                 if (!(yield* logindb.send())) {
-                    await  exodusinvalid(logindb.response)
+                    await exodusinvalid(logindb.response)
                     return 0
                 }
                 datasets = exodusxml2obj(logindb.data)
@@ -2140,7 +2140,7 @@ async function exodusdblink_login(username, password, dataset, system) {
             arguments[4] = datasets
 
             url = '../index.html'
-            arguments = await  exodusshowmodaldialog(url, arguments)
+            arguments = await exodusshowmodaldialog(url, arguments)
 
         }
 
@@ -2187,7 +2187,7 @@ async function exodusdblink_login(username, password, dataset, system) {
             //temporary cookie for menu
             exodussetcookie(glogincode, 'EXODUS2', logindb.data)
 
-            await  clientfunctions_getglobals()
+            await clientfunctions_getglobals()
 
             //temporary cookie for the dataset and username (and password for file protocol)
             var temp = 'dataset=' + gdataset + '&username=' + gusername + '&system=' + gsystem
@@ -2237,7 +2237,7 @@ function* exodusdblink_send_byhttp_using_forms(data) {
 
         //var params='dialogHeight:100px; dialogWidth:200px; center:Yes; help:No; resizable:No; status:No'
         //params='dialogHeight: 201px; dialogWidth: 201px; dialogTop: px; dialogLeft: px; center: Yes; help: Yes; resizable: Yes; status: Yes;'
-        var reply = await  exodusshowmodaldialog(EXODUSlocation + 'rs/index.html', [this.timeout, this.request, this.data])
+        var reply = await exodusshowmodaldialog(EXODUSlocation + 'rs/index.html', [this.timeout, this.request, this.data])
         if (!reply) {
             this.data = ''
             this.response = ('ERROR: Request to server failed')
@@ -2937,7 +2937,7 @@ async function exodusdecide(question, data, cols, returncoln, defaultreply, many
     if (typeof data == 'string' && data.slice(0, 1) == '@') {
         db.request = data.slice(1)
         if (!(yield* db.send())) {
-            await  exodusinvalid(db.response)
+            await exodusinvalid(db.response)
             return null
         }
         data = db.data
@@ -2946,7 +2946,7 @@ async function exodusdecide(question, data, cols, returncoln, defaultreply, many
 
     //abort if no records found
     if (data == '' || data == '<records>\r\n</records>')
-        return await  exodusinvalid('No records found')
+        return await exodusinvalid('No records found')
 
     if (typeof data == 'string' && data.slice(0, 8) == '<records')
         data = exodusxml2obj(data)
@@ -3007,7 +3007,7 @@ async function exodusdecide2(question, data, cols, returncoln, defaultreply, man
             //if (!returncoln)
             //    returncoln=0
         }
-        var results = await  exodusdecide(question, data, cols, returncoln, defaultreply, many)
+        var results = await exodusdecide(question, data, cols, returncoln, defaultreply, many)
 
         //callers of decide2 expect reply in array
         if (results && (typeof results == 'string' || typeof results == 'number'))
@@ -3059,7 +3059,7 @@ async function setdropdown2(element, dataobj, colnames, selectedvalues, required
     for (var i = 0; i < records.length; i++) {
         var cell = records[i][valuecolname]
         if (typeof (cell) == 'undefined') {
-            await  exodusinvalid('Error: "' + valuecolname + '" not in data line ' + i + ' for setdropdown2 for "' + element.id + '" (1')
+            await exodusinvalid('Error: "' + valuecolname + '" not in data line ' + i + ' for setdropdown2 for "' + element.id + '" (1')
             systemerror('Error: "' + valuecolname + '" not in data line ' + i + ' "' + records[i] + '" for setdropdown2 for "' + element.id + '" (1)')
             return (0)
         }
@@ -3072,7 +3072,7 @@ async function setdropdown2(element, dataobj, colnames, selectedvalues, required
 
             var cell = records[i][textcolname]
             if (typeof (cell) == 'undefined') {
-                await  exodusinvalid('Error: "' + textcolname + '" not in data line ' + i + ' for setdropdown2 for "' + element.id + '" (2')
+                await exodusinvalid('Error: "' + textcolname + '" not in data line ' + i + ' for setdropdown2 for "' + element.id + '" (2')
                 systemerror('Error: "' + textcolname + '" not in data line ' + i + ' for setdropdown2 for "' + element.id + '" (2)')
                 return (0)
             }
@@ -3231,7 +3231,7 @@ function setdropdown3(element, dropdowndata, colns, selectedvalues, requiredvalu
     if (typeof (requiredvalues) == 'undefined') requiredvalues = []
     if (typeof (requiredvalues) != 'object') requiredvalues = [requiredvalues]
 
-    await  exodusinvalid(selectedvalues.join()
+    //await exodusinvalid(selectedvalues.join())
     //method
     ////////
 
@@ -3375,7 +3375,7 @@ async function exodussetdropdown(element, request, colarray, selectedvalues, noa
             element.setAttribute('exodusdropdown', '')
     }
     else {
-        await  exodusinvalid(db.response)
+        await exodusinvalid(db.response)
     }
     return true
 }
@@ -3413,15 +3413,15 @@ function exodusgetdropdown(element, mode) {
 
 async function exodusinput(question, text, texthidden) {
     if (!text) text = ''
-    return await  exodusconfirm(question, '', 'OK', '', 'Cancel', text, texthidden)
+    return await exodusconfirm(question, '', 'OK', '', 'Cancel', text, texthidden)
 }
 
 async function exodusyesno(question, defaultbutton) {
-    return ((await  exodusconfirm(question, defaultbutton, 'Yes', 'No' )) == 1)
+    return ((await exodusconfirm(question, defaultbutton, 'Yes', 'No')) == 1);
 }
 
 async function exodusokcancel(question, defaultbutton) {
-    return await  exodusconfirm(question, defaultbutton, 'OK', '', 'Cancel')
+    return await exodusconfirm(question, defaultbutton, 'OK', '', 'Cancel')
 }
 
 async function exodusconfirm(question, defaultbutton, yesbuttontitle, nobuttontitle, cancelbuttontitle, text, texthidden, image) {
@@ -3464,7 +3464,7 @@ async function exodusconfirm(question, defaultbutton, yesbuttontitle, nobuttonti
         //sadly has no effect
         dialogstyle +', menubar=no, scrollbars=no, status=no, titlebar=no, toolbar=no'
 
-        var response = await  exodusshowmodaldialog(EXODUSlocation + 'confirm.htm', dialogargs, dialogstyle)
+        var response = await exodusshowmodaldialog(EXODUSlocation + 'confirm.htm', dialogargs, dialogstyle)
     }
 
     //text input returns a string (may be zero length) or false if clicked cancel
@@ -3493,7 +3493,7 @@ async function makeXMLisland(xmlelement,cmd) {
 db.request=cmd+'\rXML'
 if(!yield* db.send()) {
 
-await  exodusinvalid(db.response)
+await exodusinvalid(db.response)
 return false
 }
 xmlelement.loadXML(db.data)
@@ -3826,17 +3826,17 @@ async function sorttable(event, order) {
     var colid = event.target.sorttableelementid
 
     if (typeof form_presort == 'function') {
-        yield* exodusevaluate('await  form_presort(','yield* formfunctions_onload()')
-        if (!(await  form_presort(colid )))
-            return await  exodusinvalid()
+        yield* exodusevaluate('await form_presort(','yield* formfunctions_onload()')
+        if (!(await form_presort(colid)))
+            return await exodusinvalid()
     }
 
     //determine the groupno
     var dictitem = gds.dictitem(colid)
-    if (!dictitem) return await  exodusinvalid()
+    if (!dictitem) return await exodusinvalid()
     var groupno = dictitem.groupno
     if (!groupno)
-        return await  exodusinvalid(colid + ' is not multivalued for sorting')
+        return await exodusinvalid(colid + ' is not multivalued for sorting')
 
     //window.status = 'Sorting, please wait ...'
     console.log('Sorting, please wait ...');
@@ -3898,7 +3898,7 @@ async function sorttable(event, order) {
 
                 //refuse to sort in reverse if indented
                 if (order == 'up') {
-                    return await  exodusinvalid('Cannot reverse sort when any data is indented')
+                    return await exodusinvalid('Cannot reverse sort when any data is indented')
                 }
 
                 var prefix = ''
@@ -3957,7 +3957,7 @@ async function sorttable(event, order) {
 
     //change the sort image now confirmed
     try {
-        await  resetsortimages(groupno)
+        await resetsortimages(groupno)
         clickedelement.src = gimagetheme + 'smallsort' + order + '.gif'
     } catch (e) { }
 
@@ -3979,9 +3979,9 @@ async function sorttable(event, order) {
     gds.data['group' + groupno] = newdatarows
 
     if (typeof form_postsort == 'function') {
-        yield* exodusevaluate('await  form_postsort(','yield* formfunctions_onload()')
-        if (!(await  form_postsort(colid )))
-            return await  exodusinvalid()
+        yield* exodusevaluate('await form_postsort(','yield* formfunctions_onload()')
+        if (!(await form_postsort(colid)))
+            return await exodusinvalid()
     }
 
     //window.status = ''
@@ -4056,8 +4056,8 @@ function menuhide(element) {
                         var menuaccesskey = underlineelement[0].innerText.exodustrim().slice(0, 1).toUpperCase()
                         var temp = element.exodusmenuaccesskeys[menuaccesskey]
                         if (gusername == 'EXODUS' && temp)
-                            await  exodusnote('Duplicate menu access key ' + menuaccesskey.exodusquote( + ' for\r' + child.innerText + '\rand\r' + temp.innerText)
-                            alert('Duplicate menu access key ' + menuaccesskey.exodusquote() + ' for \r' + child.innerText + ' \rand \r' + temp.innerText)
+                            await exodusnote('Duplicate menu access key ' + menuaccesskey.exodusquote() + ' for\r' + child.innerText + '\rand\r' + temp.innerText)
+                            // alert('Duplicate menu access key ' + menuaccesskey.exodusquote() + ' for \r' + child.innerText + ' \rand \r' + temp.innerText)
                         element.exodusmenuaccesskeys[menuaccesskey] = child
                     }
                 }
@@ -4532,10 +4532,10 @@ function setgraphicbutton(button, labeltext, src) {
 
 async function refreshcache_onclick() {
     if (clearcache())
-        await  exodusnote('All EXODUS data cached in this window has been cleared\rand will be retrieved from the server again as and when required.')
+        await exodusnote('All EXODUS data cached in this window has been cleared\rand will be retrieved from the server again as and when required.')
     // \r\rN.B. EXODUS forms and scripts will remain cached and may\rbe updated when you close and reopen all browser\rwindows - depending on the cache settings in your browser.')
     else
-        await  exodusnote('Cannot clear cache.')
+        await exodusnote('Cannot clear cache.')
     return true
 }
 
@@ -4886,7 +4886,7 @@ async function startAsyncFlow(asyncHandler, location, event) {
     try {
         // For top level, we call the async function (it may expect event or not).
         // The blocking stays active for the duration of the await, matching old semantics.
-        const result = await  asyncHandler(event );
+        const result = await asyncHandler(event);
         return { value: result, done: true };
     } finally {
         form_blockevents(false, location);
@@ -5376,11 +5376,11 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
     if (!decide_args) {
         var nbuttons = 0
         if (positivebuttonx)
-            await  addbutton('positive', 1, positivebuttonx, 'F9')
+            await addbutton('positive', 1, positivebuttonx, 'F9')
         if (negativebuttonx)
-            await  addbutton('negative', 2, negativebuttonx, 'F8')
+            await addbutton('negative', 2, negativebuttonx, 'F8')
         if (cancelbuttonx)
-            await  addbutton('cancel', 3, cancelbuttonx, 'Esc')
+            await addbutton('cancel', 3, cancelbuttonx, 'Esc')
 
         //make sure no button is default unless specified
         if (!defaultbuttonn) {
@@ -6687,7 +6687,7 @@ function DATE(mode, value, params) {
             params = params.split('=')
             fromto = params[0]
             var otherdateid = params[1]
-            //otherdate = yield* gds.getx(otherdateid,grecn)
+            //otherdate = await gds.getx(otherdateid,grecn)
             //otherdate = getvalue(otherdateid,grecn)
             //direct access to gds.data to get the internal date (getvalue gets the external format)
             //should NOT be accessing gds directly but cannot use yielding .getx from non-yielding oconv/iconv
@@ -6810,8 +6810,8 @@ function DATE(mode, value, params) {
 
                 //cant call async gds.setx while oconv is not async so do it by timeout
                 //cant call setvalue either since that only updates the screen and not gds
-                //yield* gds.setx(otherdateid, grecn, otherdate)
-                exodussettimeout('yield* gds.setx("' + otherdateid + '", ' + grecn + ', ' + otherdate + ')', 1)
+                //await gds.setx(otherdateid, grecn, otherdate)
+                exodussettimeout('await gds.setx("' + otherdateid + '", ' + grecn + ', ' + otherdate + ')', 1)
             }
 
         }

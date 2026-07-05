@@ -206,10 +206,10 @@ function exodusdblink_send_byfile(data) {
                 exodussetcookie('', 'EXODUSsystem', this.system)
             }
             else {
-                Session('username') = this.username
-                Session('password') = this.password
-                Session('dataset') = this.dataset
-                Session('system') = this.system
+                // Session('username') = this.username
+                // Session('password') = this.password
+                // Session('dataset') = this.dataset
+                // Session('system') = this.system
                 //to be restored as follows in the 'on server' version of exodusdblink
             }
         }

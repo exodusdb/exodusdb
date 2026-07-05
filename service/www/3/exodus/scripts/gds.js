@@ -146,7 +146,7 @@ async function gds_getx(name, recn, oldtext) {
 
     //if no data section then return nothing
     //eg in postinit setting expressions based on gds before there is any data section
-    //exodussetexpression('currencycode_span','innerText','yield* gds.getx("CURRENCY_CODE")')
+    //exodussetexpression('currencycode_span','innerText','await gds.getx("CURRENCY_CODE")')
     //(not necessary now that cleardoc is *always* called in forminit
     //if (!this.data) return ''
 
@@ -161,7 +161,7 @@ async function gds_getx(name, recn, oldtext) {
     elements = this.getcells(name, recn)
 
     if (elements.length == 0) {
-        systemerror('yield* gds.getx()', name + ' is not in the dictionary\ror is not in the correct group.')
+        systemerror('await gds.getx()', name + ' is not in the dictionary\ror is not in the correct group.')
         results[0] = ''
         return results
     }

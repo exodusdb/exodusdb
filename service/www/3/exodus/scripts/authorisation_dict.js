@@ -80,7 +80,7 @@ async function dict_AUTHORISATION(parameters) {
     di = dict[++din] = dictrec('HIDDEN_LINES', 'S', '', '', tasksgroupn)
     di.functioncode = async function authorisation_HIDDEN_LINES() {
         var hides = ['0']//dont hide first item
-        var taskcodes = yield* gds.getall('TASK_ID')
+        var taskcodes = await gds.getall('TASK_ID')
         var lasttaskcode = ''
         for (var taskn = 0; taskn < taskcodes.length; taskn++) {
             var thistaskcode = taskcodes[taskn] = taskcodes[taskn].split(' ')[0]
@@ -117,10 +117,10 @@ async function dict_AUTHORISATION(parameters) {
 
     di = dict[++din] = dictrec('LAST_LOGIN_DATE_TIME', 'S', '', '', usersgroupn)
     exodus_dict_datetime(di)
-    di.functioncode = 'return yield* gds.xlate("USER_ID", "USERS",13)'
+    di.functioncode = 'return await gds.xlate("USER_ID", "USERS",13)'
 
     di = dict[++din] = dictrec('LAST_LOGIN_LOCATION', 'S', '', '', usersgroupn)
-    di.functioncode = 'return yield* gds.xlate("USER_ID", "USERS",14)'
+    di.functioncode = 'return await gds.xlate("USER_ID", "USERS",14)'
 
     return dict
 

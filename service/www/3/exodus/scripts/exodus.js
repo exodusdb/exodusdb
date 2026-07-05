@@ -861,7 +861,7 @@ function NUMBER(mode, value, params) {
         //if (params=='NDECS') params=['2']
         if (params[0] == 'NDECS') {
             //params[0]=(typeof gndecs=='undefined')?getrecord('NDECS'):gndecs.toString()
-            //params[0] = (typeof gndecs == 'undefined') ? yield* gds.getx('NDECS') : gndecs.toString()
+            //params[0] = (typeof gndecs == 'undefined') ? await gds.getx('NDECS') : gndecs.toString()
             //params[0] = (typeof gndecs == 'undefined') ? getvalue('NDECS') : gndecs.toString()
             if (typeof gndecs=='undefined')
                 params[0]=gds.data['NDECS'].text
