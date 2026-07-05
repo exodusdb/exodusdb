@@ -386,7 +386,7 @@ async function loadimages() {
  //removed path as it is not relevant to user
  //document.getElementById("uploadpathtext").textContent = gparameters.originalkeyversionno;
  
- //return yield* openwindow('EXECUTE\rGENERAL\rOPENUPLOAD',key+'.'+versionno)
+ //return yield* openwindow('EXECUTE\rGENERAL\rOPENUPLOAD',key+'.'+versionno) // old
  
  gexistingextensions=[]
  gexistingbasefilenames=[]

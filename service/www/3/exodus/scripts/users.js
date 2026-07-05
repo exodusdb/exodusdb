@@ -17,7 +17,7 @@ async function form_postinit() {
         exodussetcookie(glogincode, 'EXODUS2', '', 'wn')
         exodussetcookie(glogincode, 'EXODUS2', gwhatsnew, 'wn2')
         exodussettimeout('await windowopen(gwhatsnew)', 1000)
-        //yield* windowopen(gwhatsnew)
+        //yield* windowopen(gwhatsnew) // old
     }
 
     //addeventlistener($$('button_password'),'click','user_setpassword')

@@ -127,15 +127,15 @@ if (typeof document.createElement('div').innerText == 'undefined') {
         */
     }
 }
-//define if our source contains function * and yield * statements
-//HARD CODED DEPENDING ON PRESENCE OR NOT OF YIELD STATEMENTS IN SOURCE CODE
+//define if our source contains function * and yield * statements (legacy only now)
+//HARD CODED DEPENDING ON PRESENCE OR NOT OF YIELD STATEMENTS IN SOURCE CODE (mostly for transition)
 //AND THEREFORE CANNOT BE CHANGED
 /* yield */ var guseyield = true
 // noyield // var guseyield=false
 var gyieldregex = /yield ?\*/g
 // legacy for any remaining generator code during transition to async/await
 
-//determine if yield * supported by browser (not used anywhere atm)
+//determine if yield * supported by browser (legacy, not used in new async paths)
 var gcan_yield
 try { eval('function * gcan_yield(x){return yield * true;}'); gcan_yield = true } catch (e) { gcan_yield = false }
 
@@ -582,7 +582,7 @@ function exodussetexpression2b(expressionid, elements, style, attributename, exp
         //build a closure containing all the elements to be updated
         //and to be called at intervals
         function anon_from_exodussetexpression2b() {
-            //NB LEAVE A SPACE BEFORE THE LEFT BRACKET to prevent converter adding yield * in front of it
+            //NB LEAVE A SPACE BEFORE THE LEFT BRACKET to prevent old converter adding yield * in front of it
             //NB next line in yielding code is a method call and is NOT ONLY a comment
             exodussetexpression2c(elements, style, attributename, expression)
             /* yield */.next()
@@ -593,7 +593,7 @@ function exodussetexpression2b(expressionid, elements, style, attributename, exp
             //because it is in an anonymous function that will be called at intervals by window
             //and if the anonymous function were to be marked function * (ie to be a yielding function
             //known as a generator) the window call at intervals would only create a generator
-            // and not actually start the function by calling its next() method
+            // and not actually start the function by calling its next() method (legacy notes)
         }
         , 250)//every quarter second
 }
@@ -1108,8 +1108,8 @@ function exodus_next(value, source) {
 }
 
 function displayresponsedata_sync(request, data) {
-    //yield* displayresponsedata(request, data).next()
-    //hide function from converter to yield *
+    //displayresponsedata(request, data).next()
+    //hide function from converter to yield * (legacy)
     var temp = window['displayresponsedata'](request, data)
     if (temp.next)
         exodusneweventhandler(temp, 'displayresponsedata')
@@ -2209,7 +2209,7 @@ async function exodusdblink_login(username, password, dataset, system) {
     }
 }
 
-function* exodusdblink_send_byhttp_using_forms(data) {
+async function exodusdblink_send_byhttp_using_forms(data) {
 
     //log(this.request)
     //alert('exodusdblink_send_byhttp_using_forms\n...\n'+this.request+'\n...\n'+ data)
@@ -2241,7 +2241,7 @@ function* exodusdblink_send_byhttp_using_forms(data) {
 
         //var params='dialogHeight:100px; dialogWidth:200px; center:Yes; help:No; resizable:No; status:No'
         //params='dialogHeight: 201px; dialogWidth: 201px; dialogTop: px; dialogLeft: px; center: Yes; help: Yes; resizable: Yes; status: Yes;'
-        var reply = yield* fromPromise( exodusshowmodaldialog(EXODUSlocation + 'rs/index.html', [this.timeout, this.request, this.data]) )
+        var reply = await exodusshowmodaldialog(EXODUSlocation + 'rs/index.html', [this.timeout, this.request, this.data])  // now async path
         if (!reply) {
             this.data = ''
             this.response = ('ERROR: Request to server failed')
@@ -2260,7 +2260,7 @@ function* exodusdblink_send_byhttp_using_forms(data) {
             //    glocked=false
             //    gchangesmade=false
             //}
-            if (!(yield* fromPromise( this.login() ))) {
+            if (!(await this.login() )) {
                 this.data = ''
                 this.response = ('ERROR: Please login')
                 this.result = ''
@@ -2409,7 +2409,7 @@ async function exodusdblink_send_byhttp_using_xmlhttp(data) {
         // The XHR network I/O is the isolated leaf. We drive ONLY the wait using
         // a real Promise + the existing fromPromise adapter. This introduces await-capable
         // transport without touching geventhandler, gblockevents, exodus_yield, exodus_resume,
-        // starteventhandler, UI modals, or any business logic yield* call sites.
+        // starteventhandler, UI modals, or any business logic yield* call sites. (legacy notes)
         var netPromise
         if (gasynchronous) {
 
@@ -2578,7 +2578,7 @@ async function exodusdblink_send_byhttp_using_xmlhttp(data) {
             // The netPromise resolves from XHR handlers; fromPromise feeds the value
             // into the existing global geventhandler via exodus_resume exactly as before.
             // This is the reliable first conversion of an async leaf to Promise-based code.
-            // All callers continue to use unchanged "yield* db.send(...)".
+            // All callers continue to use unchanged "yield* db.send(...)" (or await in new paths).
             ///////////////////////////////////////////////////////////////
             var result = await netPromise
 
@@ -2630,7 +2630,7 @@ async function exodusdblink_send_byhttp_using_xmlhttp(data) {
                 //                tt=gusername
                 //alert(origrequest+' gusername='+tt)
                 tt = ''
-                if (!(/**/ yield* this.login(tt))) {
+                if (!(await this.login(tt) )) {
                     this.data = ''
                     this.response = ('ERROR: Please login')
                     this.result = ''
@@ -4485,7 +4485,7 @@ function menubuttonhtml(id, imagesrc, name, title, accesskey, align) {
 
     //tx += ' exodusonclick=' + id + '_onclick(event)"'
     tx += ' exodusonclick="'
-    /* yield */ tx += 'yield * '
+    /* yield */ tx += 'await '
     tx += id + '_onclick(event)"'
 
     tx += '>'
@@ -4515,7 +4515,7 @@ function menubuttonhtml(id, imagesrc, name, title, accesskey, align) {
         // hide access keys on screen
         tx += '<button xtabindex=-1 style="display:none;"'
         tx += ' accesskey="' + accesskey + '"'
-        /* yield */ tx += 'yield * '
+        /* yield */ tx += 'await '
         tx += ' exodusonclick="' + id + '_onclick(event)"'
         tx += '></button>'
     }
@@ -5570,7 +5570,7 @@ async function exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negati
     // The various click/key handlers now resolve this promise (via resolvePendingConfirm).
     // fromPromise feeds the value to the existing generator machinery exactly as before.
     // All higher wrappers (exodusconfirm, decide*, yesno, input, filepopup etc.) and
-    // all call sites using yield* continue to work unchanged.
+    // all call sites using yield* continue to work unchanged (via bridges for remaining generators).
     var confirmResolve
     var confirmPromise = new Promise((resolve) => {
         confirmResolve = resolve
@@ -5617,7 +5617,7 @@ function exodus_confirm_function3(event) {
 function resolvePendingConfirm(value, source) {
     // Phase 1.2 microstep: route confirm/decide resumption through a Promise
     // so the leaf can be driven by native async while existing yield* callers
-    // continue to work via the fromPromise adapter (which does the exodus_resume).
+    // continue to work via the fromPromise adapter (which does the exodus_resume). (hybrid support)
     if (gpendingConfirmResolve) {
         var resolver = gpendingConfirmResolve;
         gpendingConfirmResolve = null;

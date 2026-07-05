@@ -191,7 +191,7 @@ async function formfunctions_onload() {
         return false //logout('formfunctions_onload - dict function missing')
     }
 
-    //gro = new exodusrecord(yield* exodusevaluate('dict_' + gdictfilename + '(gparameters)', 'yield* formfunctions_onload()'), gdatafilename)
+    //gro = new exodusrecord(yield* exodusevaluate('dict_' + gdictfilename + '(gparameters)', 'yield* formfunctions_onload()'), gdatafilename) // old comment
     var dictfunctionname = 'dict_' + gdictfilename
     var dictarray = await exodusevaluate(dictfunctionname + '(gparameters)', 'formfunctions_onload');
     gro = new exodusrecord(dictarray, gdatafilename)
@@ -2014,7 +2014,7 @@ async function printsendrecord_onclick(event) {
     }
     //alert('DEBUG: printfunction')
     await exodusevaluate(printfunction, 'await printsendrecord_onclick()');
-    //exodussettimeout("yield* exodusevaluate('"+printfunction+"','await printsendrecord_onclick()')",100)
+    //exodussettimeout("yield* exodusevaluate('"+printfunction+"','await printsendrecord_onclick()')",100) // old yield example
 
 }
 
@@ -2096,7 +2096,7 @@ function window_onunload_sync() {
     exodussetcookie('', 'EXODUSlogincode', glogincode, 'logincode')
 
     //unlock any document before unloading
-    //using .next() instead of yield* to call async code
+    //using .next() instead of yield* to call async code (legacy note)
     if (glocked) {
 
         //Save unlock request for following window to perform hopefully
@@ -3610,7 +3610,7 @@ async function saverecord_onclick() {
 
         //custom postwrite function
         if (typeof form_postwrite == 'function') {
-            //yield* exodusevaluateall('await form_postwrite()')
+            //yield* exodusevaluateall('await form_postwrite()') // old
             if (!(await exodusevaluateall('await form_postwrite()')))
                 return false
         }
@@ -3773,7 +3773,7 @@ async function deleterecord_onclick(event) {
 
     //custom postdelete function
     if (typeof form_postdelete == 'function') {
-        //yield* exodusevaluateall('form_postdelete()')
+        //yield* exodusevaluateall('form_postdelete()') // old
         if (!(await exodusevaluateall('form_postdelete()')))
             return false
     }
@@ -5107,7 +5107,7 @@ function focuson2() {
 //'ON FOCUS
 //'''''''''
 function document_onfocus_sync(event) {
-    //LEAVE SPACE after function name to prevent this having yield * prefixed
+    //LEAVE SPACE after function name to prevent this having yield * prefixed (legacy)
     var result = document_onfocus(event)
     //above in yielding code returns an object with a method .next() to actually run it
     /* yield */ result = result.next()
@@ -7229,7 +7229,7 @@ async function form_deleterow(event, element) {
     //form specific before row delete function
     var predeleterow = window['form_predeleterow' + groupno]
     if (typeof predeleterow == 'function') {
-        //if (!(yield* exodusevaluate('yield * form_predeleterow' + groupno + '()')))
+        //if (!(await exodusevaluate('yield * form_predeleterow' + groupno + '()')))  // legacy example
         var p = predeleterow(event);
         if (p && typeof p.then === 'function') {
             p = await p;
@@ -8379,7 +8379,7 @@ async function form_filter(mode, colidorgroupno, regexp, maxrecn, elem) {
 
     //prefilter
     if (typeof form_prefilter == 'function') {
-        //yield* exodusevaluate('form_prefilter()','yield* formfunctions_onload()')
+        //yield* exodusevaluate('form_prefilter()','yield* formfunctions_onload()') // old
         if (!(form_prefilter(mode, colid)))
             return await exodusinvalid()
     }
@@ -8736,7 +8736,7 @@ async function copyrecord_onclick() {
     }
 
     //validate copy
-    //if (!(yield* exodusevaluate('await form_copyrecord()','await copyrecord_onclick()')))
+    //if (!(yield* exodusevaluate('await form_copyrecord()','await copyrecord_onclick()'))) // old
     if (!(await form_copyrecord(copyrecord)))
         return await exodusinvalid()
 
