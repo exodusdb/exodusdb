@@ -903,7 +903,18 @@ function* exodusshowmodaldialog(url, arguments, dialogstyle) {
 
             //wait here until exodus_autoresume detects that the child window is closed
             // and passes its return value here
-            result = yield* exodus_yield('exodusshowmodaldialog ' + url)
+            //
+            // Phase 1.3 microstep: drive the child-window wait via Promise + fromPromise.
+            // autoresume now resolves instead of direct exodus_resume.
+            // Polling, gchildwin handling, gchildwin_returnvalue, early returns, etc. unchanged.
+            var dialogResolve
+            var dialogPromise = new Promise((resolve) => {
+                dialogResolve = resolve
+            })
+            gpendingDialogResolve = dialogResolve
+
+            result = yield* fromPromise(dialogPromise)
+            gpendingDialogResolve = null
             console.log('exodusshowmodaldialog result is ' + result)
         }
 
@@ -949,6 +960,22 @@ function* exodus_yield(source) {
 
     return result
 
+}
+
+// Adapter so generator code can wait on a Promise using the existing
+// global geventhandler mechanism. This lets us introduce real Promises
+// (and later async/await) in leaf operations without changing all callers yet.
+function* fromPromise(p) {
+  let resolved;
+  p.then((v) => {
+    resolved = v;
+    exodus_resume(v, 'fromPromise');
+  }).catch((e) => {
+    resolved = { error: e };
+    exodus_resume(resolved, 'fromPromise error');
+  });
+  yield* exodus_yield('from promise');
+  return resolved;
 }
 
 //called by child windows to return result to the parent before closing
@@ -1012,15 +1039,17 @@ function exodus_autoresume() {
         gchildwin_returnvalue = undefined
     }
 
-    exodus_resume(returnvalue, 'exodus_autoresume')
+    //exodus_resume(returnvalue, 'exodus_autoresume')
+    resolvePendingDialog(returnvalue, 'exodus_autoresume')
 
 }
 
 //given a result from some event, resume a yielded geventhandler function, passing it a result
 // after closing the modaluiblocker
-//1. a child window is closed
-//2. an xmlhttp action completes (ok/error/timeout/abort)
-//3. user clicks various keys while a exodusconfirmdiv is present
+// (via direct call or via fromPromise adapter after a leaf's promise resolves)
+//1. a child window is closed (via autoresume -> resolvePendingDialog -> fromPromise)
+//2. an xmlhttp action completes (ok/error/timeout/abort) (via XHR promise)
+//3. user clicks various keys while a exodusconfirmdiv is present (via resolvePendingConfirm)
 function exodus_resume(value, source) {
 
     logevent(' ')
@@ -2371,6 +2400,13 @@ function* exodusdblink_send_byhttp_using_xmlhttp(data) {
 
         //g because perhaps will be a global variable
         var gasynchronous = guseyield && !(gonunload || gonbeforeunload)
+
+        // STEP 1 of incremental async/await migration:
+        // The XHR network I/O is the isolated leaf. We drive ONLY the wait using
+        // a real Promise + the existing fromPromise adapter. This introduces await-capable
+        // transport without touching geventhandler, gblockevents, exodus_yield, exodus_resume,
+        // starteventhandler, UI modals, or any business logic yield* call sites.
+        var netPromise
         if (gasynchronous) {
 
             gchildwin = { lazy: true }
@@ -2380,31 +2416,57 @@ function* exodusdblink_send_byhttp_using_xmlhttp(data) {
             //a reference to xhttp so we can call abort on it if user chooses to close the window
             gxhttp = xhttp
 
-            xhttp.onload = function (e) {
-                if (xhttp.readyState === 4) {
-                    if (xhttp.status === 200) {
-                        //console.log(xhttp.responseText);
-                        exodus_resume('ok', 'OK exodusdblink_send_byhttp_using_xmlhttp');
-                    } else {
-                        console.error(xhttp.status + ' ' + xhttp.statusText);
-                        exodus_resume('ok', 'OK exodusdblink_send_byhttp_using_xmlhttp ' + xhttp.status + ' ' + xhttp.statusText);
+            var self = this;  // for setting response/result from inside XHR callbacks
+            netPromise = new Promise((resolve) => {
+                xhttp.onload = function (e) {
+                    if (xhttp.readyState === 4) {
+                        if (xhttp.status === 200) {
+                            //console.log(xhttp.responseText);
+                            resolve('ok');
+                        } else {
+                            // HTTP error status but server may still have returned a body (or not).
+                            // Preserve old signalling of 'ok' here so control flow proceeds to parse/responseText checks,
+                            // but make the console + resolved value carry the detail that used to go into resume source.
+                            const detail = 'OK-with-http-error ' + xhttp.status + ' ' + xhttp.statusText;
+                            console.error(detail);
+                            resolve('ok');  // keep original signalling for this branch
+                        }
                     }
-                }
-            };
-            xhttp.onerror = function (e) {
-                console.error(xhttp.status + ' ' + xhttp.statusText);
-                exodus_resume('error', 'ERROR exodusdblink_send_byhttp_using_xmlhttp' + xhttp.status + ' ' + xhttp.statusText);
-            };
-            xhttp.ontimeout = function () {
-                console.error("The request for " + url + " timed out.");
-                exodus_resume('timeout', 'TIMEOUT exodusdblink_send_byhttp_using_xmlhttp');
-            };
-            xhttp.onabort = function (e) {
-                console.error('XMLHTTPREQEST ABORTED --- ' + xhttp.statusText);
-                xhttpaborted = true
-                if (!gonunload)
-                    exodus_resume('abort', 'ABORT exodusdblink_send_byhttp_using_xmlhttp');
-            };
+                };
+                xhttp.onerror = function (e) {
+                    const detail = 'ERROR exodusdblink_send_byhttp_using_xmlhttp ' + (xhttp.status || '0') + ' ' + (xhttp.statusText || 'network error');
+                    console.error(detail);
+                    if (self) {
+                        self.response = detail;
+                        self.result = '';
+                    }
+                    // Resolve with the rich detail (instead of bare 'error') so it appears in
+                    // logevent("exodus_resume <in " + value + " from fromPromise") and any
+                    // higher trace. The caller only uses this for logs / final !OK return false.
+                    // Also populates this.response immediately so callers see useful db.response.
+                    resolve(detail);
+                };
+                xhttp.ontimeout = function () {
+                    const detail = 'TIMEOUT exodusdblink_send_byhttp_using_xmlhttp ' + thisrequest;
+                    console.error(detail);
+                    if (self) {
+                        self.response = detail;
+                        self.result = '';
+                    }
+                    resolve(detail);
+                };
+                xhttp.onabort = function (e) {
+                    const detail = 'ABORT exodusdblink_send_byhttp_using_xmlhttp ' + (xhttp.statusText || '');
+                    console.error(detail);
+                    xhttpaborted = true
+                    if (self) {
+                        self.response = detail;
+                        self.result = '';
+                    }
+                    if (!gonunload)
+                        resolve(detail);
+                };
+            });
         }
 
         //open
@@ -2508,18 +2570,21 @@ function* exodusdblink_send_byhttp_using_xmlhttp(data) {
         if (gasynchronous) {
 
             ///////////////////////////////////////////////////////////////
-            //PAUSE HERE until child window closes and our autoresume
-            //function calls .next(childwin.returnValue) to put into result
+            // PAUSE HERE via fromPromise bridge.
+            // The netPromise resolves from XHR handlers; fromPromise feeds the value
+            // into the existing global geventhandler via exodus_resume exactly as before.
+            // This is the reliable first conversion of an async leaf to Promise-based code.
+            // All callers continue to use unchanged "yield* db.send(...)".
             ///////////////////////////////////////////////////////////////
-            var result = yield* exodus_yield('exodusdblink_send_byhttp_using_xmlhttp : ' + thisrequest)
+            var result = yield* fromPromise(netPromise)
 
-            //ignoring result since xhttp contains error codes
-            //maybe could process differently
-            //if (result=='error') {}
-            //else if (result=='timeout') {}
-            //else if (result=='abort') {}
-            //else if (result=='ok') {}
-            //else {/*unexpected result*/}
+            // The transport signal (result) is 'ok' on success path or a descriptive
+            // string (e.g. "ERROR exodusdblink...") on network failure. We still largely
+            // ignore the signal value itself (original code did too) and rely on:
+            // - xhttp.responseXML / responseText for normal responses
+            // - this.response having been populated in the XHR error handlers above
+            // - the post-yield error handling + retry confirm dialog
+            // The detail is now visible in logevent traces via the value passed through fromPromise.
 
         }
 
@@ -4666,6 +4731,12 @@ function starteventhandler(eventfunctionname, functionx) {
     //5. any window/xmlhttp that wishes the function to resume
     //   can call geventhandler .next(data) where data is the value to be used
     //   as the expression to the right of the yield statement
+
+    // Updated to support bulk conversion to async/await.
+    // If the target functionx is an async function, we start it as a promise-based flow
+    // at the new geventhandler marker, using the same blocking.
+    const isAsyncTarget = functionx && functionx.constructor && functionx.constructor.name === 'AsyncFunction';
+
     return function exodus_anon_sync_event_handler(event) {
 
         event = getevent(event)
@@ -4731,6 +4802,13 @@ function starteventhandler(eventfunctionname, functionx) {
 
         //events are not blocked - create a new event handler
 
+        if (isAsyncTarget) {
+            // For async targets (after bulk conversion), start the async flow directly using the marker logic.
+            // This bypasses generator creation.
+            return startAsyncFlow(functionx, eventdescription + ' (async) in starteventhandler', event);
+        }
+
+        // old generator path
         //make the global generator function (that can yield) and can be resumed by calling .next()
         var eventhandler = functionx(event)
         if (!eventhandler) {
@@ -4765,11 +4843,29 @@ function starteventhandler(eventfunctionname, functionx) {
 var geventhandler
 var geventn = 0
 
+// Used during conversion of the confirm/decide leaf (Phase 1) so that button/key/click
+// handlers resolve a Promise instead of directly calling exodus_resume.
+// The fromPromise adapter then feeds the value into the normal geventhandler machinery.
+var gpendingConfirmResolve
+
+// For the child window / showmodaldialog leaf (next after confirm).
+var gpendingDialogResolve
+
 function exodusneweventhandler(eventhandler, location) {
 
     ++geventn
     logevent(' ')
     logevent('=== NEW EVENT HANDLER ' + geventn + ' for ' + location + '===')
+
+    // Support for async conversion: if we are passed an async function (or a function that returns a promise),
+    // run it as a top-level await flow instead of a generator.
+    // This is the central marker the user identified.
+    if (eventhandler && typeof eventhandler === 'function' &&
+        (eventhandler.constructor.name === 'AsyncFunction' ||
+         (eventhandler() && typeof eventhandler().then === 'function'))) {
+        return startAsyncFlow(eventhandler, location);
+    }
+
     geventhandler = eventhandler
 
     //run the generator function to first yield or completion if no yielding
@@ -4779,6 +4875,23 @@ function exodusneweventhandler(eventhandler, location) {
     //IF the function yielded to window.open for example
     //temp.value will be 1 and temp.done will be false
     return next
+}
+
+async function startAsyncFlow(asyncHandler, location, event) {
+    logevent('=== STARTING ASYNC FLOW (no generator) for ' + location + '===');
+
+    form_blockevents(true, location);
+    blockmodalui_sync();
+
+    try {
+        // For top level, we call the async function (it may expect event or not).
+        // The blocking stays active for the duration of the await, matching old semantics.
+        const result = await asyncHandler(event);
+        return { value: result, done: true };
+    } finally {
+        form_blockevents(false, location);
+        unblockmodalui_sync();
+    }
 }
 
 function addeventlistener(element, eventname, functionx) {
@@ -5425,8 +5538,20 @@ function* exodusconfirm2(questionx, defaultbuttonn, positivebuttonx, negativebut
     //2. keyword "yield" causes crash in internet explorer so it will be commented out in /2/ version
     //////////////////////////////////////////////////////////////////////////////////////////////////
 
-    var response = yield* exodus_yield('exodusconfirm2')
+    // Phase 1.2: convert the confirm/decide UI leaf to Promise-driven.
+    // The various click/key handlers now resolve this promise (via resolvePendingConfirm).
+    // fromPromise feeds the value to the existing generator machinery exactly as before.
+    // All higher wrappers (exodusconfirm, decide*, yesno, input, filepopup etc.) and
+    // all call sites using yield* continue to work unchanged.
+    var confirmResolve
+    var confirmPromise = new Promise((resolve) => {
+        confirmResolve = resolve
+    })
+    gpendingConfirmResolve = confirmResolve
 
+    var response = yield* fromPromise(confirmPromise)
+
+    gpendingConfirmResolve = null
     exodusremovenode(div)
 
     //text input returns a string (may be zero length) or false if clicked cancel
@@ -5461,12 +5586,46 @@ function exodus_confirm_function3(event) {
     return exodus_confirm_function(0, event)
 }
 
+function resolvePendingConfirm(value, source) {
+    // Phase 1.2 microstep: route confirm/decide resumption through a Promise
+    // so the leaf can be driven by native async while existing yield* callers
+    // continue to work via the fromPromise adapter (which does the exodus_resume).
+    if (gpendingConfirmResolve) {
+        var resolver = gpendingConfirmResolve;
+        gpendingConfirmResolve = null;
+        logevent('resolvePendingConfirm value=' + value + ' from ' + source);
+        resolver(value);
+        return true;
+    }
+    // No pending confirm (should not happen in normal one-flow-at-a-time use).
+    // Fall back to direct resume to avoid breaking anything during transition.
+    exodus_resume(value, source);
+    return false;
+}
+
+function resolvePendingDialog(value, source) {
+    // Phase 1.3: child window / showmodaldialog leaf conversion.
+    // autoresume (polling) and setchildwin_returnvalue path now resolve promise.
+    // fromPromise then drives the normal resume path.
+    if (gpendingDialogResolve) {
+        var resolver = gpendingDialogResolve;
+        gpendingDialogResolve = null;
+        logevent('resolvePendingDialog value=' + value + ' from ' + source);
+        resolver(value);
+        return true;
+    }
+    // Fallback for safety during incremental conversion.
+    exodus_resume(value, source);
+    return false;
+}
+
 function exodus_confirm_function(buttonno, event) {
 
     console.log('exodus_confirm_function buttonno:' + buttonno)
     event = getevent(event)
     exoduscancelevent(event)
-    exodus_resume(buttonno, 'exodus_confirm_function')
+    //exodus_resume(buttonno, 'exodus_confirm_function')
+    resolvePendingConfirm(buttonno, 'exodus_confirm_function')
 }
 
 //backpage when popup is up should remove the popup and NOT backpage
@@ -5485,7 +5644,8 @@ function cancel_backpage_event(event) {
     //remove the popup and its controlling generator/coroutine
     //exodusremovenode(exodusconfirmdiv)
     //geventhandler = false
-    exodus_resume(false, 'cancel_backpage_event')
+    //exodus_resume(false, 'cancel_backpage_event')
+    resolvePendingConfirm(false, 'cancel_backpage_event')
 
     //make sure there is some history remains
     history.pushState(null, null, window.location.pathname);
@@ -6097,13 +6257,15 @@ function decide_onload(decide_args) {
         var returnvalues = decide_getreturnvalues()
 
         //return exoduswindowclose(returnvalues)
-        exodus_resume(returnvalues, 'decide_ok_onclick')
+        //exodus_resume(returnvalues, 'decide_ok_onclick')
+        resolvePendingConfirm(returnvalues, 'decide_ok_onclick')
 
     }
 
     function decide_cancel_onclick() {
         //return exoduswindowclose('')
-        exodus_resume('', 'decide_ok_onclick')
+        //exodus_resume('', 'decide_ok_onclick')
+        resolvePendingConfirm('', 'decide_ok_onclick')
     }
 
     //purely to suppress any automatic checkbox ticking by the browser
