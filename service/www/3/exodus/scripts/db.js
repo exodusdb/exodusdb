@@ -563,9 +563,9 @@ function exodusrecord(dictarray,filename) {
    if(typeof functioncode=='string'&&functioncode) {
     try {
 
-        /* yield */ functioncode='return function *(){'+functioncode+'}'//wrap source code to create a generator
+        functioncode='return async function(){'+functioncode+'}'
         functioncode=new Function(functioncode)
-        /* yield */ functioncode=functioncode()//call function to get a generator
+        functioncode=functioncode()
     } catch (e) {
         var msg='Invalid function in '+filename+' '+name+': '
         if (e.description)

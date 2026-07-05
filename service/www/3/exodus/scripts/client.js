@@ -5012,7 +5012,7 @@ function systemerror(functionname, e) {
     //if (gstepping||(!ginitok&&gusername=='EXODUS')) crashhere2
     //if (gstepping || (gusername == 'EXODUS') || (gdataset && gdataset.slice(-4) == 'TEST'))
     if (gstepping || (gusername == 'EXODUS'))
-        exodus_javascript_system_error
+        debugger
 }
 
 //works like msie

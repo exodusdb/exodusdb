@@ -5107,11 +5107,8 @@ function focuson2() {
 //'ON FOCUS
 //'''''''''
 function document_onfocus_sync(event) {
-    //LEAVE SPACE after function name to prevent this having yield * prefixed (legacy)
-    var result = document_onfocus(event)
-    //above in yielding code returns an object with a method .next() to actually run it
-    /* yield */ result = result.next()
-    return result
+    var eventhandlerx = starteventhandler('exoduscode', document_onfocus)
+    return eventhandlerx(event)
 }
 
 async function document_onfocus(event) {
