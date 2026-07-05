@@ -100,7 +100,6 @@ var gkeepalivemins = 10
 //check browser capabilities
 
 var gunsupported = ''
-var gswitchingbrowser = false
 
 //support "innerText" or fail
 if (typeof document.createElement('div').innerText == 'undefined') {
@@ -130,45 +129,11 @@ if (typeof document.createElement('div').innerText == 'undefined') {
 //define if our source contains function * and yield * statements (legacy only for dynamic strings)
 //HARD CODED DEPENDING ON PRESENCE OR NOT OF YIELD STATEMENTS IN SOURCE CODE (mostly for transition)
 //AND THEREFORE CANNOT BE CHANGED
-/* yield */ var guseyield = true
-// noyield // var guseyield=false
 var gyieldregex = /yield ?\*/g
-// legacy regex to detect old 'yield * ' strings in dynamic code (settimeout, attrs, etc.)
+// legacy regex to detect old 'yield * ' strings in dynamic user code (settimeout, functioncode attrs, etc.)
+// guseyield and browser yield/modal capability testing removed - fully async now.
 
-//determine if yield * supported by browser (legacy detection, only for old generator paths)
-var gcan_yield
-try { eval('function * gcan_yield(x){return yield * true;}'); gcan_yield = true } catch (e) { gcan_yield = false }
-
-var gcan_showmodaldialog = window.showModalDialog
-
-//this forces pages going to /2/ to switch to /3/ which might be important for backend generated links to /2/ eg exodus/dblink.htm
-//simulate no modal dialog in firefox as will happen in mid 2015-2016
-//apparently it is not actually blocked in firefox yet (2016) but, without special configuration, user is given annoying options to suppress the popup
-if (gcan_yield)
-    gcan_showmodaldialog = false
-
-//this code only executes in /2/ ie javascript without yield option
-//cannot continue in non-yielding code if browser does not support showmodaldialog
-//maybe could be used to inform user/support team
-//that the user could use alternative web site supporting yield (if detected gcan_yield above)
-if (!guseyield) {
-    if (!gcan_showmodaldialog) {
-        //switch to exodus/3 if browser hasnt showModalDialog but can yield
-        if (gcan_yield) {
-
-            var url = window.location.toString()
-            window.location = url.replace(/\/[12]\//g, '/3/')
-            gswitchingbrowser = true
-            //return // no return in global code
-        } else
-            gunsupported += ' showModalDialog() or yield'
-    }
-}
-
-//call remainder of global code only if not switching browser
-if (!gswitchingbrowser) {
-    exodus_client_init()
-}
+exodus_client_init()
 
 //this is only called if not switching browser
 //any global variable defined in this function must not of course be declare var here otherwise would be local function variables
@@ -179,7 +144,7 @@ function exodus_client_init() {
         gunsupported += ' getElementsByClassName or .all'
 
     //check right browser and cookies allowed else switch to login which handled this error
-    if (gunsupported && !gswitchingbrowser) {
+    if (gunsupported) {
         alert('Sorry, your web browser does not support EXODUS.\nUse Internet Explorer 6+, Safari 3+, Firefox 3+ or Chrome 8.0+\n\nIt doesnt support' + gunsupported)
         //window.location.assign(EXODUSlocation+'wrongbrowser.htm')
         if (typeof glogin == 'undefined') {
@@ -872,56 +837,44 @@ async function exodusshowmodaldialog(url, dialogargs, dialogstyle) {
 
         dialogArgumentsForChild = dialogargs
 
-        //non-yielding code with showModalDialog
-        var result
-        if (!guseyield)
-            result = window.showModalDialog(url, dialogargs, dialogstyle)
+        // modern async path using window.open + promise (no more showModalDialog or guseyield branching)
+        //example
+        //../media/schedulefind.htm?FILENAME=SCHEDULES
+        /*
+        Center: yes, Help: no, Resizable: yes, Scroll: yes, Status: no, scrollbars=1,
+        alwaysRaised=yes, DialogWidth:1870px, DialogHeight:1053px, width=1870, height=1053, left=50, top=27
+        ;
+        Center: yes; Help: no; Resizable: yes; Scroll: yes; Status: no; scrollbars=1; 
+        alwaysRaised=yes; DialogWidth:1870px; DialogHeight:1053px; width=1870; height=1053; left=50; top=27
+        */
+        dialogstyle = '' // now always show in a tab
 
-        //yielding code
-        else {
+        //open the child window async
+        gchildwin = window.open(url, '', dialogstyle)
 
-            //example
-            //../media/schedulefind.htm?FILENAME=SCHEDULES
-            /*
-            Center: yes, Help: no, Resizable: yes, Scroll: yes, Status: no, scrollbars=1,
-            alwaysRaised=yes, DialogWidth:1870px, DialogHeight:1053px, width=1870, height=1053, left=50, top=27
-            ;
-            Center: yes; Help: no; Resizable: yes; Scroll: yes; Status: no; scrollbars=1; 
-            alwaysRaised=yes; DialogWidth:1870px; DialogHeight:1053px; width=1870; height=1053; left=50; top=27
-            */
-            dialogstyle = '' // now always show in a tab
-
-            //open the child window async
-            gchildwin = window.open(url, '', dialogstyle)
-
-            if (!gchildwin) {
-                alert('Unable to show popup window - please enable popups; disable your popup blocker.')
-                return
-            }
-
-            //pass arguments and callback/resume function to child window
-            gchildwin.dialogArguments = dialogargs
-
-            //auto resume if the child window disappears - every poll every n ms
-            //this will stop when it goes out of scope when this function terminates
-            window.setTimeout('exodus_autoresume()', 100)
-
-            //wait here until exodus_autoresume detects that the child window is closed
-            // and passes its return value here
-            //
-            // Phase 1.3 microstep: drive the child-window wait via Promise + fromPromise.
-            // autoresume now resolves instead of direct exodus_resume.
-            // Polling, gchildwin handling, gchildwin_returnvalue, early returns, etc. unchanged.
-            var dialogResolve
-            var dialogPromise = new Promise((resolve) => {
-                dialogResolve = resolve
-            })
-            gpendingDialogResolve = dialogResolve
-
-            result = await dialogPromise
-            gpendingDialogResolve = null
-            console.log('exodusshowmodaldialog result is ' + result)
+        if (!gchildwin) {
+            alert('Unable to show popup window - please enable popups; disable your popup blocker.')
+            return
         }
+
+        //pass arguments and callback/resume function to child window
+        gchildwin.dialogArguments = dialogargs
+
+        //auto resume if the child window disappears - every poll every n ms
+        //this will stop when it goes out of scope when this function terminates
+        window.setTimeout('exodus_autoresume()', 100)
+
+        //wait here until exodus_autoresume detects that the child window is closed
+        // and passes its return value here
+        var dialogResolve
+        var dialogPromise = new Promise((resolve) => {
+            dialogResolve = resolve
+        })
+        gpendingDialogResolve = dialogResolve
+
+        var result = await dialogPromise
+        gpendingDialogResolve = null
+        console.log('exodusshowmodaldialog result is ' + result)
 
         //Safari doesnt return an error and looks like a Window [x] close unfortunately
         if (typeof result == 'undefined' && window.navigator.appVersion.indexOf('Safari') >= 0)
@@ -942,8 +895,8 @@ async function exodusshowmodaldialog(url, dialogargs, dialogstyle) {
 
 }
 
-// Legacy yield* bridges removed – the system is now fully async/await.
-// Old 'yield * ' strings in dynamic data (if any) are handled via adapters or async wrappers.
+// The yield* generator system has been fully removed.
+// Legacy 'yield * ' strings (if any remain in old dynamic data) are routed to async paths or adapters in evaluate.
 
 //called by child windows to return result to the parent before closing
 function exoduswindowclose(returnvalues) {
@@ -2365,7 +2318,7 @@ async function exodusdblink_send_byhttp_using_xmlhttp(data) {
         var xhttpaborted = false
 
         //g because perhaps will be a global variable
-        var gasynchronous = guseyield && !(gonunload || gonbeforeunload)
+        var gasynchronous = !(gonunload || gonbeforeunload)
 
         // STEP 1 of incremental async/await migration:
         // The XHR network I/O is the isolated leaf. We drive ONLY the wait using
@@ -2960,27 +2913,24 @@ function rearray(array) {
 async function exodusdecide2(question, data, cols, returncoln, defaultreply, many) {
 
     //new in-window style popup
-    if (guseyield) {
-
-        //if row columns are not numeric then convert numeric return column number into named column in data rows
-        //also done in decide_onload() after splitting string into columns (could remove from here)
-        //alert('data:'+data+'\ncols:'+cols+'\nreturncoln:'+returncoln)
-        if (typeof cols != 'string') {
-            var tt = cols[returncoln]
-            if (tt && tt[0])
-                returncoln = tt[0]
-            //empty returncoln means return row number(s) of option(s) selected
-            //if (!returncoln)
-            //    returncoln=0
-        }
-        var results = await exodusdecide(question, data, cols, returncoln, defaultreply, many)
-
-        //callers of decide2 expect reply in array
-        if (results && (typeof results == 'string' || typeof results == 'number'))
-            results = [results]
-
-        return results
+    //if row columns are not numeric then convert numeric return column number into named column in data rows
+    //also done in decide_onload() after splitting string into columns (could remove from here)
+    //alert('data:'+data+'\ncols:'+cols+'\nreturncoln:'+returncoln)
+    if (typeof cols != 'string') {
+        var tt = cols[returncoln]
+        if (tt && tt[0])
+            returncoln = tt[0]
+        //empty returncoln means return row number(s) of option(s) selected
+        //if (!returncoln)
+        //    returncoln=0
     }
+    var results = await exodusdecide(question, data, cols, returncoln, defaultreply, many)
+
+    //callers of decide2 expect reply in array
+    if (results && (typeof results == 'string' || typeof results == 'number'))
+        results = [results]
+
+    return results
 
 }
 
@@ -3404,12 +3354,10 @@ async function exodusconfirm(question, defaultbutton, yesbuttontitle, nobuttonti
     var istextinput = typeof text != 'undefined' && text !== null
 
     //use div to avoid opening a new window if possible
-    //if ((!gusername || gusername=='EXODUS') && guseyield && !istextinput) {
-    if (guseyield && !istextinput) {
+    if (!istextinput) {
 
         return await exodusconfirm2(question, defaultbutton, yesbuttontitle, nobuttontitle, cancelbuttontitle, text, texthidden, image)
 
-        //use separate window for popup if yield is not available eg internet explorer
     } else {
 
         var dialogargs = [question, defaultbutton, yesbuttontitle, nobuttontitle, cancelbuttontitle, text, texthidden, image]
@@ -4874,8 +4822,7 @@ function addeventlistener(element, eventname, functionx) {
         functionx = window[functionx]
         if (!functionx)
             systemerror('error: in addeventlistener ' + functionxname + ' function does not exist')
-        if (guseyield)
-            functionx = starteventhandler(eventname, functionx)
+        functionx = starteventhandler(eventname, functionx)
     }
 
     //normally using bubbling style but focus event doesnt bubble so we use capture style for that
@@ -4979,44 +4926,19 @@ function exodusint2date(exodusdate) {
 
 }
 
-//thin wrapper to handle timeouts with/without yielding code
-//command should be in text format; prefer 'await myfunc()' ; 'yield * ' is legacy for old generator mode
+//thin wrapper to handle timeouts. Prefer 'await myfunc()' in the command string.
+//' yield * ' prefix is legacy (still supported by routing to async path).
 function exodussettimeout(command, milliseconds) {
     if (glogsettimeout)
         console.log('exodussetimeout(' + command + ')')
-    if (typeof command == 'string' && command.match(gyieldregex)) {
-        // legacy 'yield * ' prefix – treat as await for modern path (cautious deprecation)
-        command = command.replace(gyieldregex, '').replace(/"/g, "'")
-        return window.setTimeout('exodustimeout_async_sync("' + command + '")', milliseconds)
-    } else if (typeof command == 'string' && command.match(/await /)) {
-        // support for new async style in commands
-        command = command.replace(/await /g, '').replace(/"/g, "'")
+    if (typeof command == 'string' && (command.match(gyieldregex) || command.match(/await /))) {
+        command = command.replace(gyieldregex, '').replace(/await /g, '').replace(/"/g, "'")
         return window.setTimeout('exodustimeout_async_sync("' + command + '")', milliseconds)
     } else
         return window.setTimeout(command, milliseconds)
 }
 
-//sync function called on timeout in yielding code (legacy, now rarely used as yield* routes to async)
-//spins off an async/yielding function
-function exodustimeout_sync(command) {
-
-    logevent('exodustimeout_sync:geventhandler.done:' + geventhandler.done)
-
-    //if another event handler is already running then defer execution for 100ms
-    if (gblockevents) {
-        window.setTimeout('exodustimeout_sync("' + command + '")', 100)
-        return
-    }
-
-    //the async function should run to completion
-    // even if it pauses for multiple async operations on the way.
-    //command MUST be prefixed with "yield *" (legacy) and return a generator
-    var generator = eval(command);
-    exodusneweventhandler(generator, 'exodustimeout_sync() ' + command)//yielding code
-    //not interested in result
-}
-
-// support for async commands
+// support for async commands (legacy yield* prefix is now also routed here)
 async function exodustimeout_async_sync(command) {
     if (gblockevents) {
         window.setTimeout('exodustimeout_async_sync("' + command + '")', 100)
@@ -5028,36 +4950,14 @@ async function exodustimeout_async_sync(command) {
     await fn();
 }
 
-//thin wrapper to handle timeouts with/without yielding code (legacy 'yield * ' support)
+//thin wrapper to handle intervals. Prefer 'await myfunc()'.
+//Legacy 'yield * ' prefix routed to async.
 function exodussetinterval(command, milliseconds) {
-    // legacy yield* support (commented check) – treat as await for modern path
-    if (typeof command == 'string' && command.match(gyieldregex)) {
-        command = command.replace(gyieldregex, '').replace(/"/g, "'")
-        return window.setInterval('exodusinterval_async_sync("' + command + '")', milliseconds)
-    } else if (typeof command == 'string' && command.match(/await /)) {
-        command = command.replace(/await /g, '').replace(/"/g, "'")
+    if (typeof command == 'string' && (command.match(gyieldregex) || command.match(/await /))) {
+        command = command.replace(gyieldregex, '').replace(/await /g, '').replace(/"/g, "'")
         return window.setInterval('exodusinterval_async_sync("' + command + '")', milliseconds)
     } else
         return window.setInterval(command, milliseconds)
-}
-
-//sync function called at intervals in yielding code (legacy, now rarely used)
-//spins off an async/yielding function
-function exodusinterval_sync(command) {
-
-    //if another event handler is already running then defer execution for 100ms
-    if (gblockevents) {
-        return
-    }
-
-    //the async function should run to completion
-    // even if it pauses for multiple async operations on the way.
-    //We create a new generator object each interval
-    //We do not create one generator and call its .next() each interval
-    //command MUST be prefixed with "yield *" (legacy) and return a generator
-    var generator = eval(command);
-    exodusneweventhandler(generator, 'exodusinterval_sync() ' + command)//yielding code
-    //not interested in result
 }
 
 async function exodusinterval_async_sync(command) {

@@ -54,36 +54,9 @@
 		var EXODUSlocation = 'exodus/'
 		var glogin = true
 		var gshowmenu = false
-		var gswitchingbrowser = false
 
-		//1. following code will, in exodus/3, switch to exodus (exodus/2 in future) if the browser doesnt support yield - eg MSIE
-		//2. note that client.js in exodus2 will switch to exodus/3 if showmodaldialog is not supported (and yield is supported)
-		// yield //var guseyield=false //activated in exodus/2 - code doesnt use yield
-		/* yield */var guseyield = true  //activated in exodus/3 - code has yield
-		if (guseyield) {
-
-			//determine if yield * supported by browser
-			var gcan_yield
-			try { eval('function * f(x){return yield * true;}'); gcan_yield = true } catch (e) { gcan_yield = false }
-
-			//cannot continue in non-yielding code if browser does not support showmodaldialog
-			//if (!window.showModalDialog && !guseyield) {
-			if (!gcan_yield) {
-				gswitchingbrowser = true
-				if (window.showModalDialog) {
-					var oldurl = window.location.toString()
-					window.location = oldurl.replace(/\/3\//, '/2/')
-				}
-			}
-
-		}
-
-		//dont include exodus/3 yielding code with function * or yield * until we know the browser can handler them
-		//because the browser will fail and anyway, we are switching to a different url that doesnt require yielding browser
-		if (!gswitchingbrowser) {
-			document.writeln('<scr' + 'ipt type="text/javascript" src="' + EXODUSlocation + 'scripts/client.js"></scr' + 'ipt>')
-			document.writeln('<scr' + 'ipt type="text/javascript" src="' + EXODUSlocation + 'scripts/login.js"></scr' + 'ipt>')
-		}
+		document.writeln('<scr' + 'ipt type="text/javascript" src="' + EXODUSlocation + 'scripts/client.js"></scr' + 'ipt>')
+		document.writeln('<scr' + 'ipt type="text/javascript" src="' + EXODUSlocation + 'scripts/login.js"></scr' + 'ipt>')
 
 <!--		To ensure the focus moves from Login button to Usercode field-->
 		window.addEventListener('DOMContentLoaded', (event) => {

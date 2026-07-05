@@ -7106,40 +7106,9 @@ async function exodusevaluate3(functionorcode, functionname, arg1name, arg1, thi
     if (functioncode.indexOf('return ') < 0)
         functioncode = 'return ' + functioncode
 
-    //yielding function code - wrap in a generator function
+    //legacy 'yield * ' prefix in dynamic function code - strip and run via async path below
     if (functioncode.match && functioncode.match(gyieldregex)) {
-        if (guseyield) {
-            try {
-                /* yield */ functioncode = 'return function *(){' + functioncode + '}'
-                //arg1name can be the textual name of any variable or argumentname in the text of the function code
-                functionx = new Function(arg1name, functioncode)
-            }
-            catch (e) {
-                return systemerror('exodusevaluate3()\nError creating function \n' + functioncode, e)
-            }
-            if (gcatcherrors) {
-                try {
-
-                    //we pass in the value of arg1 when calling the function
-                    var sub = functionx(arg1);
-                    var subcall = sub && sub.apply ? sub.apply(thisobject || this) : sub;
-                    var result = (subcall && subcall.next ? exodusneweventhandler(subcall, functioncode).value : (subcall && subcall.then ? await subcall : subcall));
-                    return result
-                }
-                catch (e) {
-                    return systemerror('exodusevaluate3()\n' + functioncode, e)
-                }
-                //commented out to enable showing of run time script errors
-            } else {
-                    //we pass in the value of arg1 when calling the function
-                    var sub = functionx(arg1);
-                    var subcall = sub && sub.apply ? sub.apply(thisobject || this) : sub;
-                    var result = (subcall && subcall.next ? exodusneweventhandler(subcall, functioncode).value : (subcall && subcall.then ? await subcall : subcall));
-                return result
-            }
-
-        } else
-            functioncode = functioncode.replace(gyieldregex, '')
+        functioncode = functioncode.replace(gyieldregex, '')
     }
 
     //non-yielding function code
