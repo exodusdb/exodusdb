@@ -3970,7 +3970,7 @@ function menuhide(element) {
                         var menuaccesskey = underlineelement[0].innerText.exodustrim().slice(0, 1).toUpperCase()
                         var temp = element.exodusmenuaccesskeys[menuaccesskey]
                         if (gusername == 'EXODUS' && temp)
-                            await exodusnote('Duplicate menu access key ' + menuaccesskey.exodusquote() + ' for\r' + child.innerText + '\rand\r' + temp.innerText)
+                            void exodusnote('Duplicate menu access key ' + menuaccesskey.exodusquote() + ' for\r' + child.innerText + '\rand\r' + temp.innerText)
                             // alert('Duplicate menu access key ' + menuaccesskey.exodusquote() + ' for \r' + child.innerText + ' \rand \r' + temp.innerText)
                         element.exodusmenuaccesskeys[menuaccesskey] = child
                     }
