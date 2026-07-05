@@ -123,7 +123,7 @@ if (typeof gdictfilename == 'undefined' || !gdictfilename)
     gdictfilename = gdatafilename
 if (typeof gdatafilename == 'undefined' || !gdatafilename)
     gdatafilename = gdictfilename
-//  var temp='<SCR'+'IPT onload="yield* formfunctions_onload()" id=maindict src="scripts/'+gdictfilename.toLowerCase()+'_dict.js"></SCR'+'IPT>'
+//  var temp='<SCR'+'IPT onload="yield* formfunctions_onload()" id=maindict src="scripts/'+gdictfilename.toLowerCase()+'_dict.js"></SCR'+'IPT>' // old legacy example
 if (eval('typeof dict_' + gdictfilename + '=="undefined"')) {
     var temp = '<SCR' + 'IPT id=maindict src="scripts/' + gdictfilename.toLowerCase() + '_dict.js"></SCR' + 'IPT>'
     document.writeln(temp)
@@ -191,7 +191,7 @@ async function formfunctions_onload() {
         return false //logout('formfunctions_onload - dict function missing')
     }
 
-    //gro = new exodusrecord(yield* exodusevaluate('dict_' + gdictfilename + '(gparameters)', 'yield* formfunctions_onload()'), gdatafilename) // old comment
+    //gro = new exodusrecord(yield* exodusevaluate('dict_' + gdictfilename + '(gparameters)', 'yield* formfunctions_onload()'), gdatafilename) // old comment (legacy)
     var dictfunctionname = 'dict_' + gdictfilename
     var dictarray = await exodusevaluate(dictfunctionname + '(gparameters)', 'formfunctions_onload');
     gro = new exodusrecord(dictarray, gdatafilename)
@@ -469,11 +469,11 @@ async function formfunctions_onload() {
 
                     //convert element to a SELECT
 
-                    // if (element.id=='USER_CODE') yield* exodusbreak('x '+element.id+' '+element.getAttribute('exodusrequired')+' '+element.outerHTML)
+                    // if (element.id=='USER_CODE') yield* exodusbreak('x '+element.id+' '+element.getAttribute('exodusrequired')+' '+element.outerHTML) // legacy example
                     var temp = document.createElement('select')
                     copydictitem(dictitem, temp)
 
-                    //if (element.id=='USER_CODE') yield* exodusbreak('y '+temp.id+' '+temp.getAttribute('exodusrequired')+' '+temp.outerHTML)
+                    //if (element.id=='USER_CODE') yield* exodusbreak('y '+temp.id+' '+temp.getAttribute('exodusrequired')+' '+temp.outerHTML) // legacy example
                     temp.size = 1
                     //element.swapNode(t)
                     element.parentNode.replaceChild(temp, element)
@@ -2014,7 +2014,7 @@ async function printsendrecord_onclick(event) {
     }
     //alert('DEBUG: printfunction')
     await exodusevaluate(printfunction, 'await printsendrecord_onclick()');
-    //exodussettimeout("yield* exodusevaluate('"+printfunction+"','await printsendrecord_onclick()')",100) // old yield example
+    //exodussettimeout("yield* exodusevaluate('"+printfunction+"','await printsendrecord_onclick()')",100) // old yield example (legacy)
 
 }
 
@@ -8069,7 +8069,7 @@ async function exoduspopup2(element) {
                         var key = reply[keyn]
                         if (key)
                             //doesnt work when multiple .. due to using cookies to communicate? perhaps chain opening passing remaining keys to each window
-                            //yield* windowopenkey(window.location.href.toString(), key)
+                            //yield* windowopenkey(window.location.href.toString(), key) // legacy example
                             await windowopen(window.location.href.toString().split('?')[0] + '?key=' + key)
                     }
                     //window.location.assign(window.location.href.toString().split('?')[0] + '?key=' + reply[0])
@@ -8379,7 +8379,7 @@ async function form_filter(mode, colidorgroupno, regexp, maxrecn, elem) {
 
     //prefilter
     if (typeof form_prefilter == 'function') {
-        //yield* exodusevaluate('form_prefilter()','yield* formfunctions_onload()') // old
+        //yield* exodusevaluate('form_prefilter()','yield* formfunctions_onload()') // old (legacy)
         if (!(form_prefilter(mode, colid)))
             return await exodusinvalid()
     }
@@ -8736,7 +8736,7 @@ async function copyrecord_onclick() {
     }
 
     //validate copy
-    //if (!(yield* exodusevaluate('await form_copyrecord()','await copyrecord_onclick()'))) // old
+    //if (!(yield* exodusevaluate('await form_copyrecord()','await copyrecord_onclick()'))) // old (legacy)
     if (!(await form_copyrecord(copyrecord)))
         return await exodusinvalid()
 

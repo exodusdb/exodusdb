@@ -8,7 +8,7 @@ function exodusdatasource() {
     this.readystate = 'initialised'
 
     //async methods (capitalised only to evade yield conversion programs)
-    //require yield * in call like "abc=YIELD* GDS.GETX(..."
+    //require yield * in call like "abc=YIELD* GDS.GETX(..." (legacy; now supports await too via evaluate)
     this.xlate = gds_xlate
     this.rexlate = gds_rexlate
     this.evaluate = gds_evaluate
@@ -110,7 +110,7 @@ async function gds_regetx(dictitemorid, recn) {
     //login('regetx '+dictitem.id+' '+grecn)
 
     //calculate the answer (possibly multivalued)
-    /* yield */ var results = /**/ await this.tempfunction.apply(this)
+    /* yield */ var results = /**/ await this.tempfunction.apply(this)  // legacy marker, now async
     // noyield // var results = this.tempfunction()
     if (typeof results == 'undefined') systemerror('gds_regetx', (dictitem.name ? dictitem.name : dictitem.id) + ' function returned undefined')
 
@@ -528,7 +528,7 @@ async function gds_setx2(cells, values, forced) {
         if (afterupdate) {
             try {
                 var result=afterupdate(cells, values)
-                /* yield */ if (result.next) result.next()
+                /* yield */ if (result.next) result.next()  // legacy iterator check
             }
             catch (e) {
                 systemerror(e.description + ' ' + e.number, 'in afterupdate() in await gds_setx(' + cells.dictid + ')')
@@ -1080,7 +1080,7 @@ async function gds_bind(datasource, elements, rownx) {
             if (forced || newvalue != oldcell.text) {
                 //alert(propname+' '+newvalue+' '+oldcell.text)
                 //if (oldcell.element&&oldcell.element.getAttribute('exodusfieldno'))
-                // /**/ yield * this.setx2([oldcell], [newvalue])
+                // /**/ yield * this.setx2([oldcell], [newvalue]) // old comment
                 var cells = [oldcell]
                 cells.dictid = propname//needed to enable afterupdate function
                 /**/ await this.setx2(cells, [newvalue], forced)

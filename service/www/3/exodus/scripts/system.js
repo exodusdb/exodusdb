@@ -127,14 +127,14 @@ async function system_val_users() {
 
 async function system_dict_username(di, usercodeid) {
     if (typeof usercodeid == 'undefined') usercodeid = 'USER_CODE'
-    di.functioncode = 'return yield* this.xlate("' + usercodeid + '", "USERS",1)'
+    di.functioncode = 'return await this.xlate("' + usercodeid + '", "USERS",1)'
     di.length = 30
 }
 
 /*
 async function system_getdepartments_old() {
 db.request = 'EXECUTE\rGENERAL\rGETDEPTS'
-if (!(yield* db.send())) return await exodusinvalid(db.response)
+if (!(yield* db.send())) return await exodusinvalid(db.response) // old commented code
 gdepartments = db.data
 }
 */
